@@ -1,6 +1,6 @@
 'use client'
 
-import { Component, useCallback, useEffect, useMemo, useRef, useState, type ErrorInfo, type MutableRefObject, type ReactNode } from 'react'
+import { Component, useCallback, useEffect, useMemo, useState, type ErrorInfo, type ReactNode } from 'react'
 
 import Box from '@mui/material/Box'
 import Fade from '@mui/material/Fade'
@@ -10,11 +10,8 @@ import Typography from '@mui/material/Typography'
 
 import {
   AssistantRuntimeProvider,
-  useLocalRuntime,
   useAuiState
 } from '@assistant-ui/react'
-import type { ChatModelAdapter, ChatModelRunResult } from '@assistant-ui/react'
-import type { ReadonlyJSONObject, ReadonlyJSONValue } from 'assistant-stream/utils'
 
 import NexaHero from './components/NexaHero'
 import NexaThread from './components/NexaThread'
@@ -24,8 +21,8 @@ import QuickAccess from './components/QuickAccess'
 import OperationStatus, { type StatusItem } from './components/OperationStatus'
 
 import NexaInsightsBlock, { type NexaInsightItem } from '@/components/greenhouse/NexaInsightsBlock'
-import { DEFAULT_NEXA_MODEL, resolveNexaModel, type NexaModelId } from '@/config/nexa-models'
-import type { NexaResponse } from '@/lib/nexa/nexa-contract'
+import { type NexaModelId } from '@/config/nexa-models'
+import { useNexaPersistentRuntime } from '@/lib/nexa/use-nexa-runtime'
 import type { HomeSnapshot } from '@/types/home'
 import { getMicrocopy } from '@/lib/copy'
 
@@ -33,111 +30,6 @@ const GREENHOUSE_COPY = getMicrocopy()
 
 
 const SNAPSHOT_TIMEOUT_MS = 5000
-const NEXA_MODEL_STORAGE_KEY = 'greenhouse:nexa:model'
-
-// ── Nexa adapter ───────────────────────────────────────────────
-
-const toJsonValue = (value: unknown): ReadonlyJSONValue => {
-  if (
-    value === null ||
-    typeof value === 'string' ||
-    typeof value === 'number' ||
-    typeof value === 'boolean'
-  ) {
-    return value
-  }
-
-  if (Array.isArray(value)) {
-    return value.map(item => toJsonValue(item))
-  }
-
-  if (value && typeof value === 'object') {
-    return Object.fromEntries(
-      Object.entries(value).map(([key, item]) => [key, toJsonValue(item)])
-    ) as ReadonlyJSONObject
-  }
-
-  return null
-}
-
-type AdapterRefs = {
-  selectedModelRef: MutableRefObject<NexaModelId>
-  threadIdRef: MutableRefObject<string | null>
-  onSuggestionsChange: (suggestions: string[]) => void
-  onThreadIdChange: (threadId: string) => void
-}
-
-const createNexaAdapter = (refs: AdapterRefs): ChatModelAdapter => ({
-  async run({ messages, abortSignal }): Promise<ChatModelRunResult> {
-    const lastMessage = messages[messages.length - 1]
-
-    const prompt = lastMessage?.content
-      ?.filter(part => part.type === 'text')
-      .map(part => (part as { type: 'text'; text: string }).text)
-      .join('') ?? ''
-
-    const history = messages.slice(-10).map(m => ({
-      role: m.role as 'user' | 'assistant',
-      content: m.content
-        ?.filter(part => part.type === 'text')
-        .map(part => (part as { type: 'text'; text: string }).text)
-        .join('') ?? ''
-    }))
-
-    let res: Response
-
-    try {
-      res = await fetch('/api/home/nexa', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          prompt,
-          history,
-          model: refs.selectedModelRef.current,
-          threadId: refs.threadIdRef.current
-        }),
-        signal: abortSignal
-      })
-    } catch (err) {
-      if (err instanceof DOMException && err.name === 'AbortError') throw err
-
-      throw new Error('No pude conectarme con Nexa. Verifica tu conexion e intenta de nuevo.')
-    }
-
-    if (!res.ok) {
-      const errorBody = await res.json().catch(() => null)
-
-      throw new Error(errorBody?.error || `Error ${res.status}: no se pudo procesar tu mensaje.`)
-    }
-
-    const data = await res.json() as NexaResponse
-
-    // Track threadId from response
-    if (data.threadId) {
-      refs.threadIdRef.current = data.threadId
-      refs.onThreadIdChange(data.threadId)
-    }
-
-    // Track suggestions from response
-    refs.onSuggestionsChange(data.suggestions ?? [])
-
-    const toolParts = (data.toolInvocations || []).map(invocation => ({
-      type: 'tool-call' as const,
-      toolCallId: invocation.toolCallId,
-      toolName: invocation.toolName,
-      args: toJsonValue(invocation.args) as ReadonlyJSONObject,
-      argsText: JSON.stringify(invocation.args ?? {}),
-      result: toJsonValue(invocation.result)
-    }))
-
-    return {
-      content: [
-        ...toolParts,
-        { type: 'text' as const, text: data.content || '' }
-      ]
-    }
-  }
-})
 
 // ── Error boundary ─────────────────────────────────────────────
 
@@ -312,46 +204,15 @@ const HomeView = () => {
   const [snapshot, setSnapshot] = useState<HomeSnapshot | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [selectedModel, setSelectedModel] = useState<NexaModelId>(DEFAULT_NEXA_MODEL)
-  const [suggestions, setSuggestions] = useState<string[]>([])
-  const [threadId, setThreadId] = useState<string | null>(null)
 
-  const selectedModelRef = useRef<NexaModelId>(DEFAULT_NEXA_MODEL)
-  const threadIdRef = useRef<string | null>(null)
-
-  useEffect(() => {
-    const storedModel = typeof window !== 'undefined' ? window.localStorage.getItem(NEXA_MODEL_STORAGE_KEY) : null
-
-    const resolved = resolveNexaModel({ requestedModel: storedModel })
-
-    setSelectedModel(resolved)
-    selectedModelRef.current = resolved
-  }, [])
-
-  const handleModelChange = useCallback((model: NexaModelId) => {
-    const resolved = resolveNexaModel({ requestedModel: model })
-
-    setSelectedModel(resolved)
-    selectedModelRef.current = resolved
-    window.localStorage.setItem(NEXA_MODEL_STORAGE_KEY, resolved)
-  }, [])
-
-  const handleThreadIdChange = useCallback((id: string) => {
-    setThreadId(id)
-    threadIdRef.current = id
-  }, [])
-
+  // Switch de conversación del Home: recarga la página (comportamiento histórico —
+  // `useLocalRuntime` no resetea mensajes en caliente). El panel flotante usa el
+  // switch client-side (keyed remount) del mismo hook.
   const handleSelectThread = useCallback(async (selectedThreadId: string) => {
-    // For now, navigate to reload with the thread — full thread loading requires
-    // resetting the LocalRuntime which isn't cleanly supported. Reload with param.
-    threadIdRef.current = selectedThreadId
-    setThreadId(selectedThreadId)
     window.location.href = `/home?thread=${selectedThreadId}`
   }, [])
 
   const handleNewThread = useCallback(() => {
-    threadIdRef.current = null
-    setThreadId(null)
     window.location.href = '/home'
   }, [])
 
@@ -447,17 +308,8 @@ const HomeView = () => {
     ]
   }, [snapshot?.financeStatus])
 
-  const nexaAdapter = useMemo(() => createNexaAdapter({
-    selectedModelRef,
-    threadIdRef,
-    onSuggestionsChange: setSuggestions,
-    onThreadIdChange: handleThreadIdChange
-  }), [handleThreadIdChange])
-
-  const runtime = useLocalRuntime(nexaAdapter, {
-    initialMessages: [
-      { role: 'assistant', content: [{ type: 'text' as const, text: nexaIntro }] }
-    ]
+  const { runtime, selectedModel, handleModelChange, suggestions, threadId } = useNexaPersistentRuntime({
+    initialMessages: [{ role: 'assistant', content: [{ type: 'text' as const, text: nexaIntro }] }]
   })
 
   if (loading) return <HomeViewSkeleton />

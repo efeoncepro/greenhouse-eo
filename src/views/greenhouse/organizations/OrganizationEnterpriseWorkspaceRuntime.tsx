@@ -33,6 +33,7 @@ import {
 import { getMicrocopy } from '@/lib/copy'
 import { GH_ORGANIZATION_WORKSPACE } from '@/lib/copy/agency'
 import { hubspotIndustryLabel } from '@/config/hubspot-industries'
+import { NexaContextScope } from '@/lib/nexa/nexa-page-context'
 import {
   organizationIdentitySourceDisplay,
   organizationWorkspaceSourceDisplay
@@ -606,9 +607,14 @@ const OrganizationEnterpriseWorkspaceRuntime = ({
     ]
   }, [activeLabel, activeTone, data360, detail, effectiveFacet, runtime.financeSummary])
 
+  // TASK-1078 Tier 1.5 — declara la entidad para Nexa (nombre real → prompts contextuales
+  // "Cliente · {nombre}"). Renderiza null; el panel flotante lo lee vía useNexaPageContext.
+  const nexaScope = <NexaContextScope entityName={detail.organizationName} />
+
   if (projection.degradedMode) {
     return (
       <>
+        {nexaScope}
         <SectionShell title={GH_ORGANIZATION_WORKSPACE.shell.degraded.title} subtitle={GH_ORGANIZATION_WORKSPACE.shell.degraded.reasons.unknown}>
           <Typography variant='body2' color='text.secondary'>
             {projection.degradedReason ?? 'unknown'}
@@ -621,6 +627,7 @@ const OrganizationEnterpriseWorkspaceRuntime = ({
 
   return (
     <>
+      {nexaScope}
       <Box data-capture='organization-workspace-enterprise-runtime'>
         <Stack spacing={0} sx={{ bgcolor: 'background.paper', border: theme => `1px solid ${theme.palette.divider}` }}>
           <Box data-capture='organization-enterprise-reference-anchor' sx={visuallyHiddenSx}>

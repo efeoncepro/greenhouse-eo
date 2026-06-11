@@ -1,13 +1,11 @@
 'use client'
 
 import '@assistant-ui/react-markdown/styles/dot.css'
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useRef, useState, type RefObject } from 'react'
 
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import IconButton from '@mui/material/IconButton'
-import InputAdornment from '@mui/material/InputAdornment'
-import Skeleton from '@mui/material/Skeleton'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
@@ -24,13 +22,15 @@ import { MarkdownTextPrimitive } from '@assistant-ui/react-markdown'
 import { alpha, useTheme, type Theme } from '@mui/material/styles'
 
 import { getMicrocopy } from '@/lib/copy'
+import { GH_NEXA } from '@/lib/copy/nexa'
 
-
-import { NexaGlowBorder } from '@/components/greenhouse/primitives'
+import { GreenhouseThinkingBeat, NexaComposer, NexaComposerInput, NexaComposerActionButton } from '@/components/greenhouse/primitives'
 import { GREENHOUSE_NEXA_BRAND_COLORS } from '@/components/greenhouse/primitives/greenhouse-nexa-brand-controller'
 import CustomTextField from '@core/components/mui/TextField'
 
 import type { NexaModelId } from '@/config/nexa-models'
+
+import { nexaThinScrollbarSx } from '@/views/greenhouse/nexa/floating-chat/nexa-scrollbar'
 
 import NexaModelSelector from './NexaModelSelector'
 import NexaToolRenderer from './NexaToolRenderers'
@@ -40,7 +40,6 @@ const TASK407_ARIA_RESPUESTA_UTIL = "Respuesta util"
 const TASK407_ARIA_RESPUESTA_NO_UTIL = "Respuesta no util"
 const TASK407_ARIA_COPIAR_RESPUESTA = "Copiar respuesta"
 const TASK407_ARIA_REGENERAR_RESPUESTA = "Regenerar respuesta"
-const TASK407_ARIA_NEXA_ESTA_PENSANDO = "Nexa esta pensando"
 const TASK407_ARIA_DETENER_GENERACION = "Detener generacion"
 const TASK407_ARIA_HISTORIAL_DE_CONVERSACIONES = "Historial de conversaciones"
 const TASK407_ARIA_IR_AL_FINAL = "Ir al final"
@@ -306,6 +305,25 @@ const FeedbackThumbs = ({ messageId }: { messageId: string }) => {
   )
 }
 
+/* ── Thinking beat — "Nexa está pensando" (progreso indeterminado) ──
+   Solo cuando el mensaje está corriendo (belt-and-suspenders sobre `hasContent={false}`:
+   un mensaje vacío YA completado nunca queda con el beat colgado). El primitive hornea
+   el pulse+stagger, reduced-motion y el contrato a11y (role=status + aria-live). */
+const NexaThinkingBeatRow = () => {
+  const running = useAuiState(s => (s.message?.status?.type ?? '') === 'running')
+
+  if (!running) return null
+
+  return (
+    <Stack direction='row' spacing={1.25} alignItems='center' sx={{ pt: 0.5, pb: 0.75 }}>
+      {/* Spacer = ancho del avatar (NexaSenderMark, 28px) → el beat arranca alineado con
+          la "N" de Nexa (mismo gap que el sender row), no debajo del avatar. */}
+      <Box aria-hidden sx={{ width: 28, flexShrink: 0 }} />
+      <GreenhouseThinkingBeat kind='nexa' variant='inline' motion='wave' dotCount={5} dotSize={7} />
+    </Stack>
+  )
+}
+
 /* ── Assistant message — open prose, no bubble ── */
 const AssistantMessage = () => {
   const messageId = useAuiState(s => {
@@ -326,6 +344,14 @@ const AssistantMessage = () => {
             Nexa
           </Typography>
         </Stack>
+
+        {/* Thinking beat — mientras Nexa compone (mensaje corriendo, aún sin contenido).
+            UN solo avatar (el de arriba) + indicador VIVO honesto (no skeleton estático):
+            progreso indeterminado → GreenhouseThinkingBeat (dots Nexa, role=status/aria-live
+            + reduced-motion horneados). Se reemplaza por el texto al llegar la respuesta. */}
+        <MessagePrimitive.If hasContent={false}>
+          <NexaThinkingBeatRow />
+        </MessagePrimitive.If>
 
         {/* Prose content — no bubble, no border */}
         <Box sx={{ '& .aui-md': proseSx }}>
@@ -488,35 +514,13 @@ const FollowupSuggestions = ({ suggestions }: { suggestions: string[] }) => {
   )
 }
 
-/* ── Thinking indicator — shimmer skeleton ── */
-const ThinkingIndicator = () => {
-  const isRunning = useAuiState(s => s.thread.isRunning)
-
-  if (!isRunning) return null
-
-  return (
-    <Box sx={{ mb: 4 }} aria-live='polite' aria-label={TASK407_ARIA_NEXA_ESTA_PENSANDO}>
-      <Stack direction='row' spacing={1.25} alignItems='center' sx={{ mb: 1.5 }}>
-        <NexaSenderMark />
-        <Typography component='span' sx={[nexaWordmarkInlineSx, { color: 'text.secondary' }]}>
-          Nexa
-        </Typography>
-      </Stack>
-      <Stack spacing={1} sx={{ pt: 0.5 }}>
-        <Skeleton variant='text' animation='wave' width='70%' height={16} sx={{ borderRadius: 1 }} />
-        <Skeleton variant='text' animation='wave' width='50%' height={16} sx={{ borderRadius: 1 }} />
-        <Skeleton variant='text' animation='wave' width='35%' height={16} sx={{ borderRadius: 1 }} />
-      </Stack>
-    </Box>
-  )
-}
-
 /* ── Premium composer ── */
 const ChatComposer = () => {
-  const theme = useTheme()
   const isRunning = useAuiState(s => s.thread.isRunning)
 
   return (
+    // Placement del composer (sticky sobre paper, banda 720 centrada). La presentación
+    // intrínseca (glow + input + botón send/stop + disclaimer) la canoniza `NexaComposer`.
     <Box sx={{
       position: 'sticky',
       bottom: 0,
@@ -531,121 +535,97 @@ const ChatComposer = () => {
       width: '100%'
     }} data-capture='nexa-composer'>
       <ComposerPrimitive.Root>
-        <NexaGlowBorder radius={14} focusRingColor={theme.palette.primary.main}>
+        <NexaComposer disclaimer={GH_NEXA.floating.composer_disclaimer}>
           <ComposerPrimitive.Input asChild>
-            <CustomTextField
+            <NexaComposerInput
               id='nexa-floating-composer-input'
-              fullWidth
-              multiline
-              minRows={1}
-              maxRows={4}
-              placeholder='Pregúntale a Nexa sobre tu operación…'
-              autoComplete='off'
-              sx={{
-                // El CustomTextField usa la variante FILLED de Vuexy: el
-                // .MuiFilledInput-root trae su propio radius=6px + sombra azul de foco
-                // → ESE es el "box interno" de radio distinto. Lo anulamos por completo
-                // (sin radius propio, sin sombra, sin underline, fondo transparente):
-                // el input no dibuja ningún box, y el acento azul de foco lo pinta
-                // NexaGlowBorder (focusRingColor) en la MISMA caja del glow (radio 14).
-                '& .MuiFilledInput-root': {
-                  borderRadius: '14px',
-                  fontSize: '0.9375rem',
-                  lineHeight: 1.6,
-                  py: 0.5,
-                  border: 'none !important',
-                  backgroundColor: 'transparent !important',
-                  boxShadow: 'none !important',
-                  '&:before, &:after': { display: 'none' },
-                  '&:hover': { border: 'none !important', backgroundColor: 'transparent !important', boxShadow: 'none !important' },
-                  '&.Mui-focused': { border: 'none !important', backgroundColor: 'transparent !important', boxShadow: 'none !important' }
-                }
-              }}
-              slotProps={{
-                input: {
-                  endAdornment: (
-                    <InputAdornment position='end' sx={{ alignSelf: 'flex-end', mb: '5px' }}>
-                      {isRunning ? (
-                        <ComposerPrimitive.Cancel asChild>
-                          <IconButton
-                            aria-label={TASK407_ARIA_DETENER_GENERACION}
-                            sx={{
-                              bgcolor: 'error.lighterOpacity',
-                              color: 'error.main',
-                              '&:hover': { bgcolor: 'error.lightOpacity' },
-                              width: 30,
-                              height: 30,
-                              borderRadius: '50%'
-                            }}
-                          >
-                            <i className='tabler-player-stop-filled' style={{ fontSize: '0.9375rem' }} />
-                          </IconButton>
-                        </ComposerPrimitive.Cancel>
-                      ) : (
-                        <ComposerPrimitive.Send asChild>
-                          <Box
-                            component='button'
-                            type='button'
-                            aria-label={TASK407_ARIA_ENVIAR_MENSAJE}
-                            sx={{
-                              width: 30,
-                              height: 30,
-                              flexShrink: 0,
-                              p: 0,
-                              border: 'none',
-                              borderRadius: '50%',
-                              cursor: 'pointer',
-                              display: 'inline-flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              bgcolor: GREENHOUSE_NEXA_BRAND_COLORS.midnightNavy,
-                              color: 'common.white',
-                              boxShadow: `0 1px 3px ${alpha(GREENHOUSE_NEXA_BRAND_COLORS.midnightNavy, 0.32)}`,
-                              transition: theme => theme.transitions.create(['background-color', 'color', 'transform', 'box-shadow'], { duration: theme.transitions.duration.shortest }),
-                              '&:hover': {
-                                bgcolor: GREENHOUSE_NEXA_BRAND_COLORS.electricTeal,
-                                color: GREENHOUSE_NEXA_BRAND_COLORS.midnightNavy,
-                                transform: 'translateY(-1px) scale(1.04)',
-                                boxShadow: `0 2px 8px ${alpha(GREENHOUSE_NEXA_BRAND_COLORS.electricTeal, 0.45)}`
-                              },
-                              '&:hover svg': { stroke: GREENHOUSE_NEXA_BRAND_COLORS.midnightNavy },
-                              '&:active': { transform: 'scale(0.94)' },
-                              '&:focus-visible': { outline: 'none', boxShadow: `0 0 0 3px ${alpha(GREENHOUSE_NEXA_BRAND_COLORS.electricTeal, 0.5)}` },
-                              '&:disabled': { bgcolor: alpha(theme.palette.text.primary, 0.08), color: 'action.disabled', boxShadow: 'none', cursor: 'default', transform: 'none' },
-                              '&:disabled svg': { stroke: theme.palette.action.disabled }
-                            }}
-                          >
-                            <Box
-                              component='svg'
-                              aria-hidden
-                              viewBox='0 0 24 24'
-                              fill='none'
-                              sx={{ width: 15, height: 15, stroke: theme.palette.common.white, strokeWidth: 2.25, strokeLinecap: 'round', strokeLinejoin: 'round' }}
-                            >
-                              <path d='M12 19V5' />
-                              <path d='M5 12l7-7 7 7' />
-                            </Box>
-                          </Box>
-                        </ComposerPrimitive.Send>
-                      )}
-                    </InputAdornment>
-                  )
-                }
-              }}
+              placeholder={GH_NEXA.floating.composer_placeholder}
+              endAdornment={
+                isRunning ? (
+                  <ComposerPrimitive.Cancel asChild>
+                    <NexaComposerActionButton variant='stop' aria-label={TASK407_ARIA_DETENER_GENERACION} />
+                  </ComposerPrimitive.Cancel>
+                ) : (
+                  <ComposerPrimitive.Send asChild>
+                    <NexaComposerActionButton variant='send' aria-label={TASK407_ARIA_ENVIAR_MENSAJE} />
+                  </ComposerPrimitive.Send>
+                )
+              }
             />
           </ComposerPrimitive.Input>
-        </NexaGlowBorder>
+        </NexaComposer>
       </ComposerPrimitive.Root>
-      <Typography variant='caption' color='text.disabled' sx={{ textAlign: 'center', display: 'block', mt: 1, fontSize: '0.6875rem', letterSpacing: 0.1 }}>
-        Nexa analiza tus datos en tiempo real. Verifica antes de una decisión crítica.
-      </Typography>
     </Box>
   )
 }
 
+/* Estado de scroll del chat, escrito como ATRIBUTOS en un ancestro (NO en el elemento
+   scrollable). Crítico: assistant-ui pone un MutationObserver sobre el viewport (con
+   `attributes:true`, filtrando solo mutaciones de `style`); escribir `data-*` ahí dispara
+   su re-ancla al fondo y bloquea el scroll hacia arriba. Por eso los atributos van al
+   wrapper (ancestro, fuera del subtree observado) y la reveal de scrollbar/sombra se hace
+   por CSS descendente. Sin state → cero re-render. Un solo listener passive:
+   - `data-scrolling` (transient, ~1s): auto-hide del scrollbar (fade soft).
+   - `data-scrolled` (scrollTop > umbral): sombra de profundidad bajo el header. */
+const useChatScrollAttributes = (
+  scrollRef: RefObject<HTMLElement | null>,
+  wrapperRef: RefObject<HTMLElement | null>
+) => {
+  useEffect(() => {
+    const el = scrollRef.current
+    const wrapper = wrapperRef.current
+
+    if (!el || !wrapper) return
+
+    let timeout: ReturnType<typeof setTimeout>
+
+    const onScroll = () => {
+      wrapper.setAttribute('data-scrolling', 'true')
+      clearTimeout(timeout)
+      timeout = setTimeout(() => wrapper.setAttribute('data-scrolling', 'false'), 1000)
+      wrapper.setAttribute('data-scrolled', el.scrollTop > 4 ? 'true' : 'false')
+    }
+
+    el.addEventListener('scroll', onScroll, { passive: true })
+
+    return () => {
+      el.removeEventListener('scroll', onScroll)
+      clearTimeout(timeout)
+    }
+  }, [scrollRef, wrapperRef])
+}
+
 /* ── Main thread ── */
-const NexaThread = ({ onBack, selectedModel, onModelChange, compact, suggestions = [], onHistoryToggle, hideHeader }: NexaThreadProps) => (
-  <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: compact ? 'auto' : '60vh' }}>
+const NexaThread = ({ onBack, selectedModel, onModelChange, compact, suggestions = [], onHistoryToggle, hideHeader }: NexaThreadProps) => {
+  const viewportRef = useRef<HTMLDivElement>(null)
+  const wrapperRef = useRef<HTMLDivElement>(null)
+
+  useChatScrollAttributes(viewportRef, wrapperRef)
+
+  return (
+    // minHeight:0 cuando el thread vive en un shell de altura acotada (panel flotante,
+    // `hideHeader`) → permite que el Viewport interno scrollee en vez de empujar el panel.
+    // En el Home (no acotado) se conserva el 60vh histórico.
+    // ref={wrapperRef}: el hook escribe data-scrolling / data-scrolled ACÁ (ancestro), no en
+    // el viewport — y la reveal de scrollbar + la sombra se hacen por CSS descendente.
+    <Box
+      ref={wrapperRef}
+      sx={theme => ({
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
+        minHeight: hideHeader ? 0 : compact ? 'auto' : '60vh',
+        // Scrollbar: revela el thumb durante el scroll-activity (data-scrolling, transient).
+        '&[data-scrolling="true"] [data-capture="nexa-thread-viewport"]': {
+          scrollbarColor: `${alpha(theme.palette.text.primary, 0.26)} transparent`
+        },
+        '&[data-scrolling="true"] [data-capture="nexa-thread-viewport"]::-webkit-scrollbar-thumb': {
+          backgroundColor: alpha(theme.palette.text.primary, 0.24)
+        },
+        // Sombra de profundidad bajo el header: visible mientras hay contenido scrolleado.
+        '&[data-scrolled="true"] .nexa-header-shadow': { opacity: 1 }
+      })}
+    >
     {/* Frosted header */}
     {!compact && !hideHeader && (
       <Box sx={{
@@ -699,23 +679,73 @@ const NexaThread = ({ onBack, selectedModel, onModelChange, compact, suggestions
     )}
 
     {/* Thread */}
-    <ThreadPrimitive.Root style={{ display: 'flex', flexDirection: 'column', flex: 1, position: 'relative' }}>
-      <ThreadPrimitive.Viewport
-        style={{
-          flex: 1,
-          overflowY: 'auto',
-          maxWidth: compact ? undefined : 720,
-          margin: '0 auto',
-          width: '100%',
-          paddingLeft: 24,
-          paddingRight: 24,
-          paddingTop: 24
-        }}
-      >
-        <ThreadPrimitive.Messages
-          components={{ UserMessage, AssistantMessage }}
+    <ThreadPrimitive.Root style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, position: 'relative' }}>
+      {/* Sombra de separación bajo el header — SOLO cuando el shell provee su propio header
+          (panel flotante, `hideHeader`) y SOLO si hay contenido scrolleado debajo
+          (data-scrolled, gobernado por el wrapper). Da profundidad del canvas del chat respecto al header, minimalista
+          (soft shadow del borde superior, fade-in). Decorativa, fuera del viewport scrollable. */}
+      {hideHeader && (
+        <Box
+          aria-hidden
+          className='nexa-header-shadow'
+          sx={theme => ({
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            height: 18,
+            zIndex: 6,
+            pointerEvents: 'none',
+            // Opacity la gobierna el ancestro vía `[data-scrolled="true"] .nexa-header-shadow`
+            // (CSS, sin re-render). Gradiente de profundidad (no box-shadow de 1px, que era
+            // imperceptible): el header "flota" y proyecta una sombra suave sobre el canvas.
+            opacity: 0,
+            background: `linear-gradient(to bottom, ${alpha(theme.palette.common.black, 0.14)} 0%, ${alpha(
+              theme.palette.common.black,
+              0.05
+            )} 42%, ${alpha(theme.palette.common.black, 0)} 100%)`,
+            transition: 'opacity 220ms cubic-bezier(0.4, 0, 0.2, 1)',
+            '@media (prefers-reduced-motion: reduce)': { transition: 'none' }
+          })}
         />
-        <ThinkingIndicator />
+      )}
+      <ThreadPrimitive.Viewport asChild>
+        <Box
+          ref={viewportRef}
+          data-capture='nexa-thread-viewport'
+          sx={theme => ({
+            flex: 1,
+            // El min-height:0 es lo que permite que ESTE contenedor scrollee (en vez de
+            // crecer y empujar el panel/página). overscrollBehavior:contain evita que el
+            // scroll se "encadene" a la página al llegar al tope/fondo.
+            minHeight: 0,
+            overflowY: 'auto',
+            overscrollBehavior: 'contain',
+            // Smooth scroll: SOLO afecta el scroll PROGRAMÁTICO (el auto-scroll-to-bottom de
+            // assistant-ui), NO el wheel/trackpad del usuario (siempre nativo). El bug del
+            // up-scroll era el MutationObserver sobre este elemento (ya resuelto: los atributos
+            // viven en el wrapper) — no el smooth. reduced-motion lo apaga abajo.
+            scrollBehavior: 'smooth',
+            maxWidth: compact ? undefined : 720,
+            mx: 'auto',
+            width: '100%',
+            // Margen lateral amplio (alineado con el composer, px:4) → el contenido respira.
+            px: 4,
+            pt: 3,
+            // Scrollbar canónico thin + auto-hide (helper compartido con el rail → consistencia,
+            // sin "doble scroll" chunky). La reveal por scroll-activity la agrega el ancestro
+            // (`[data-scrolling]`); acá solo base + hover/focus (pseudo-clases seguras).
+            ...nexaThinScrollbarSx(theme),
+            '@media (prefers-reduced-motion: reduce)': {
+              scrollBehavior: 'auto',
+              '&::-webkit-scrollbar-thumb': { transition: 'none' }
+            }
+          })}
+        >
+          <ThreadPrimitive.Messages
+            components={{ UserMessage, AssistantMessage }}
+          />
+        </Box>
       </ThreadPrimitive.Viewport>
 
       <FollowupSuggestions suggestions={suggestions} />
@@ -746,7 +776,8 @@ const NexaThread = ({ onBack, selectedModel, onModelChange, compact, suggestions
 
       <ChatComposer />
     </ThreadPrimitive.Root>
-  </Box>
-)
+    </Box>
+  )
+}
 
 export default NexaThread

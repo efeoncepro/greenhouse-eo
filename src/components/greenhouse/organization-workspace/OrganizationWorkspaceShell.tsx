@@ -21,6 +21,7 @@ import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSu
 import { GH_ORGANIZATION_WORKSPACE } from '@/lib/copy/agency'
 import { formatCurrency as formatGreenhouseCurrency } from '@/lib/format'
 import { hubspotIndustryLabel } from '@/config/hubspot-industries'
+import { NexaContextScope } from '@/lib/nexa/nexa-page-context'
 
 import OrganizationLogoAvatarEditor from './OrganizationLogoAvatarEditor'
 
@@ -133,6 +134,10 @@ const OrganizationWorkspaceShell = ({
 }: OrganizationWorkspaceShellProps) => {
   const copy = GH_ORGANIZATION_WORKSPACE.shell
 
+  // TASK-1078 Tier 1.5 — declara la entidad para Nexa (nombre real → prompts contextuales
+  // "Cliente · {nombre}"). Renderiza null; el panel flotante lo lee vía useNexaPageContext.
+  const nexaScope = <NexaContextScope entityName={organization.organizationName} />
+
   const statusColor = STATUS_COLOR[organization.status] ?? 'secondary'
   const statusLabel = resolveStatusLabel(organization.status)
   const flag = organization.country ? (COUNTRY_FLAGS[organization.country] ?? '') : ''
@@ -156,6 +161,7 @@ const OrganizationWorkspaceShell = ({
   if (projection.degradedMode) {
     return (
       <Stack spacing={4}>
+        {nexaScope}
         <Card elevation={0} sx={{ border: theme => `1px solid ${theme.palette.divider}` }}>
           <CardContent>
             <Stack direction='row' spacing={2} alignItems='center'>
@@ -179,6 +185,7 @@ const OrganizationWorkspaceShell = ({
   return (
     <>
       <Stack spacing={6}>
+        {nexaScope}
         {headerBanner}
         {/* ── Header ── */}
         <Card elevation={0} sx={{ border: theme => `1px solid ${theme.palette.divider}` }}>

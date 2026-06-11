@@ -63,9 +63,16 @@ export const GREENHOUSE_THINKING_BEAT_KIND_CONFIG: Record<
   }
 }
 
+export type GreenhouseThinkingBeatMotion = 'bounce' | 'wave'
+
 export const GREENHOUSE_THINKING_BEAT_MOTION = {
+  // bounce (default histórico): pulse + translateY corto.
   durationMs: 600,
-  staggerMs: 150
+  staggerMs: 150,
+  // wave: barrido suave de brillo/escala (sin bounce) — lectura "componiendo" más
+  // premium; cadencia más lenta y calma para un indicador que loopea.
+  waveDurationMs: 1150,
+  waveStaggerMs: 120
 } as const
 
 export const resolveGreenhouseThinkingBeatVariant = (variant?: GreenhouseThinkingBeatVariant) =>

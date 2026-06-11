@@ -328,5 +328,142 @@ export const GH_NEXA = {
   agent_summary: (analyzed: number, actions: number) =>
     `${analyzed} ${analyzed === 1 ? 'señal analizada' : 'señales analizadas'} · ${actions} con acción sugerida`,
   agent_working: 'Nexa está analizando tu desempeño',
-  agent_footer: 'Nexa aprende de tus datos para darte mejores insights cada día'
+  agent_footer: 'Nexa aprende de tus datos para darte mejores insights cada día',
+
+  // ── TASK-1078 — Floating chat (concepto B): panel expandible + historial ──
+  floating: {
+    // aria / chrome
+    panel_aria: 'Nexa AI',
+    presence_online: 'En línea',
+    presence_thinking: 'Pensando',
+    close_aria: 'Cerrar Nexa',
+    new_conversation_aria: 'Nueva conversación',
+    expand_aria: 'Expandir panel',
+    collapse_aria: 'Colapsar panel',
+
+    // history rail
+    search_placeholder: 'Buscar conversación',
+    search_aria: 'Buscar conversación',
+    search_clear_aria: 'Limpiar búsqueda',
+    search_clear: 'Limpiar búsqueda',
+    rail_actions_aria: (title: string) => `Acciones de ${title}`,
+    rename: 'Renombrar',
+    delete: 'Eliminar',
+    rename_dialog_title: 'Renombrar conversación',
+    rename_field_label: 'Título',
+    rename_save: 'Guardar',
+    rename_cancel: 'Cancelar',
+    delete_dialog_title: '¿Eliminar esta conversación?',
+    delete_dialog_body: (title: string) =>
+      `Se eliminará «${title}» y todos sus mensajes. Esta acción no se puede deshacer.`,
+    delete_confirm: 'Eliminar',
+    delete_cancel: 'Cancelar',
+    rail_empty_title: 'Aún no tienes conversaciones',
+    rail_empty_body: 'Inicia una nueva y aparecerá aquí.',
+    rail_filtered_empty: (query: string) => `Sin resultados para «${query}»`,
+    rail_load_error_title: 'No pudimos cargar tu historial',
+    rail_load_error_body: 'Reintenta en unos segundos.',
+    rail_load_error_cta: 'Reintentar',
+    rail_loading_aria: 'Cargando historial de conversaciones',
+
+    // empty hero
+    empty_subtitle: 'Pregúntame por tus métricas, cuentas o proyecciones.',
+    empty_context_general: 'Vista general',
+    empty_prompts: [
+      'Resumen ejecutivo del mes',
+      '¿Qué cuentas están en riesgo de churn?',
+      'Compara ingresos por línea de servicio',
+      'Proyecta el MRR a fin de mes'
+    ] as string[],
+    // Prompts CONTEXTUALES (Tier 1): el set cambia según la pantalla donde el usuario
+    // abre a Nexa (resolver por ruta en src/lib/nexa/suggested-prompts.ts). Es-CL tuteo.
+    // La interpolación del nombre de la entidad (ej. "Cliente · Sky Airline") es el
+    // Tier 1.5 (requiere que la página declare su contexto) — por ahora, genérico.
+    prompt_contexts: {
+      general: {
+        label: 'Vista general',
+        icon: '',
+        prompts: [
+          'Resumen ejecutivo del mes',
+          '¿Qué cuentas están en riesgo de churn?',
+          'Compara ingresos por línea de servicio',
+          'Proyecta el MRR a fin de mes'
+        ]
+      },
+      finance: {
+        label: 'Finanzas · P&L',
+        icon: 'tabler-chart-pie',
+        prompts: [
+          'Desglosa el P&L del mes',
+          '¿Dónde se fue el gasto este mes?',
+          'Margen por línea de servicio',
+          'Flujo de caja a 30 días'
+        ]
+      },
+      client: {
+        // `{entity}` se interpola con el nombre real del cliente cuando la página lo declara
+        // (Tier 1.5, NexaContextScope); si no, cae a "este cliente" (genérico).
+        label: 'Cliente',
+        icon: 'tabler-building-store',
+        prompts: [
+          '¿Cómo viene {entity} este mes?',
+          'Riesgo de churn de {entity}',
+          'Rentabilidad de {entity}',
+          'Próximas renovaciones de {entity}'
+        ]
+      },
+      payroll: {
+        label: 'Nómina',
+        icon: 'tabler-cash',
+        prompts: [
+          'Resumen de la nómina del mes',
+          '¿Quién tiene variaciones este mes?',
+          'Costo laboral por equipo',
+          'Pendientes antes del cierre'
+        ]
+      }
+    } as Record<string, { label: string; icon: string; prompts: string[] }>,
+    // Saludo del empty hero — rota en cada nueva conversación. `{name}` se reemplaza
+    // con el primer nombre del usuario en sesión; si no hay nombre, esas frases se
+    // filtran (mismo patrón que agent_headline_rotation_*). Cortos (1 línea),
+    // ocurrentes, es-CL tuteo.
+    greetings: [
+      'Hola, {name}. ¿Qué número desarmamos?',
+      '{name}, tus datos ya calientan motores.',
+      'Hola, {name}. ¿Qué te quita el sueño?',
+      '{name}, los insights no se me esconden.',
+      'Hola, {name}. ¿Le tomamos el pulso al mes?',
+      '{name}, de datos a decisiones.',
+      'Hola, {name}. ¿Por dónde cavamos hoy?',
+      '{name}, el churn no se analiza solo.',
+      'Hola, {name}. Pregúntame lo difícil.',
+      '{name}, hoy los KPIs hablan claro.',
+      'Hola, {name}. ¿Qué dicen tus métricas?',
+      '{name}, démosle sentido a los números.',
+      '{name}, tu operación sin letra chica.',
+      'Hola, {name}. ¿Proyectamos el cierre?',
+      'Hola, {name}. Tírame una cuenta.',
+      '{name}, no hay dato que se me resista.',
+      'Hola, {name}. ¿Qué decisión preparamos?',
+      '{name}, leo entre líneas de datos.',
+      'Hola, {name}. ¿Quién sube y quién baja?',
+      '{name}, tus dashboards me conocen.',
+      'Hola, {name}. Cero rodeos, puro insight.',
+      '{name}, ¿el pulso de los ingresos?',
+      'Hola, {name}. ¿El porqué del número?',
+      '{name}, convierto ruido en señal.',
+      'Hola, {name}. ¿Qué riesgo cazamos hoy?',
+      '{name}, tú traes datos, yo traduzco.',
+      'Hola, {name}. ¿Empezamos por lo urgente?',
+      '{name}, miro lo que nadie mira.',
+      'Hola, {name}. Tu copiloto, café en mano.',
+      '{name}, dame el qué y te doy el porqué.'
+    ] as string[],
+    // Saludo sin nombre (cuando la sesión no expone un primer nombre).
+    greeting_no_name: 'Hola. ¿Qué número desarmamos?',
+
+    // composer
+    composer_placeholder: 'Pregúntale a Nexa sobre tu operación…',
+    composer_disclaimer: 'Nexa analiza tus datos en tiempo real. Verifica antes de una decisión crítica.'
+  }
 } as const

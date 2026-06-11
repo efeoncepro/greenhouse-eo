@@ -10,6 +10,14 @@ import { alpha } from '@mui/material/styles'
 
 import AxisWordmark from '@/components/greenhouse/brand/AxisWordmark'
 import { typographyScale } from '@/components/theme/typography-tokens'
+import {
+  NexaComposer,
+  NexaComposerInput,
+  NexaComposerActionButton,
+  NexaFace,
+  NexaPresenceMark
+} from '@/components/greenhouse/primitives'
+import { GREENHOUSE_NEXA_BRAND_COLORS } from '@/components/greenhouse/primitives/greenhouse-nexa-brand-controller'
 
 import { DESIGN_SYSTEM_LAB_TOKENS } from './design-system-lab-tokens'
 
@@ -70,8 +78,9 @@ const ANATOMY: { region: string; detail: string }[] = [
 // Primitives / piezas que lo COMPONEN (es un organismo, no una primitive).
 const COMPOSED_OF: { name: string; role: string; status: string }[] = [
   { name: 'NexaGlowBorder', role: 'Borde "línea de luz" del composer (dos capas + máscara + beam).', status: 'Primitive canónica ✅' },
-  { name: 'NexaComposer', role: 'Input + botón enviar + glow como una unidad reusable.', status: 'A extraer ⏳ (follow-up)' },
-  { name: 'NexaPresenceMark / Header', role: 'Cara/mark + nombre + dot "En línea" con ping.', status: 'A extraer ⏳' },
+  { name: 'NexaComposer', role: 'Input (caja Vuexy anulada → el glow pinta todo) + botón send/stop + glow + disclaimer, como unidad reusable. Partes: NexaComposerInput / NexaComposerActionButton.', status: 'Primitive canónica ✅' },
+  { name: 'NexaPresenceMark', role: 'Header: crossfade "En línea" ↔ "Pensando…" con elipsis animada (reduced-motion horneado).', status: 'Primitive canónica ✅' },
+  { name: 'NexaFace', role: 'Avatar cara real de Nexa con variants hero (76) / header (44, borde teal) / message (32). Single source del asset.', status: 'Primitive canónica ✅' },
   { name: 'NexaSenderMark', role: 'Avatar por-mensaje (disco navy + glyph teal/sparkle blanco).', status: 'A extraer ⏳' },
   { name: 'NexaConversationRail', role: 'Rail de historial glass (search + grupos + items + estados).', status: 'Parte del patrón' },
   { name: 'NexaEmptyHero', role: 'Saludo + chip de contexto + prompts + firma.', status: 'Parte del patrón' },
@@ -167,6 +176,78 @@ const NexaChatLabView = () => (
       </Stack>
     </Section>
 
+    {/* Specimen vivo — los átomos extraídos, renderizados */}
+    <Section eyebrow='Specimen' title='Átomos vivos'>
+      <Stack spacing={DESIGN_SYSTEM_LAB_TOKENS.spacing.tight}>
+        {/* NexaFace */}
+        <Card>
+          <Typography variant='subtitle2' sx={{ mb: 1.5 }}>
+            <InlineCode>NexaFace</InlineCode> — variants
+          </Typography>
+          <Stack direction='row' spacing={3} alignItems='flex-end' flexWrap='wrap'>
+            <Stack spacing={0.5} alignItems='center'>
+              <NexaFace variant='hero' />
+              <Typography variant='caption' color='text.secondary'>hero · 76</Typography>
+            </Stack>
+            <Stack spacing={0.5} alignItems='center'>
+              <NexaFace variant='header' />
+              <Typography variant='caption' color='text.secondary'>header · 44</Typography>
+            </Stack>
+            <Stack spacing={0.5} alignItems='center'>
+              <NexaFace variant='message' />
+              <Typography variant='caption' color='text.secondary'>message · 32</Typography>
+            </Stack>
+          </Stack>
+        </Card>
+
+        {/* NexaPresenceMark — sobre navy (su contexto real es el header) */}
+        <Card>
+          <Typography variant='subtitle2' sx={{ mb: 1.5 }}>
+            <InlineCode>NexaPresenceMark</InlineCode> — estados
+          </Typography>
+          <Stack direction='row' spacing={2} flexWrap='wrap'>
+            {[
+              { thinking: false, label: 'reposo' },
+              { thinking: true, label: 'pensando' }
+            ].map(s => (
+              <Stack key={s.label} spacing={0.5} alignItems='center'>
+                <Box sx={{ px: 2, py: 1, borderRadius: 2, bgcolor: GREENHOUSE_NEXA_BRAND_COLORS.midnightNavy }}>
+                  <NexaPresenceMark thinking={s.thinking} />
+                </Box>
+                <Typography variant='caption' color='text.secondary'>{s.label}</Typography>
+              </Stack>
+            ))}
+          </Stack>
+        </Card>
+
+        {/* NexaComposer — la unidad completa (presentacional; sin runtime cableado acá) */}
+        <Card>
+          <Typography variant='subtitle2' sx={{ mb: 1.5 }}>
+            <InlineCode>NexaComposer</InlineCode> — unidad (glow + input + botón + disclaimer)
+          </Typography>
+          <NexaComposer disclaimer='Nexa analiza tus datos en tiempo real. Verifica antes de una decisión crítica.'>
+            <NexaComposerInput
+              placeholder='Pregúntale a Nexa sobre tu operación…'
+              endAdornment={<NexaComposerActionButton variant='send' aria-label='Enviar mensaje' />}
+            />
+          </NexaComposer>
+          <Stack direction='row' spacing={2} alignItems='center' sx={{ mt: 2 }}>
+            <Typography variant='caption' color='text.secondary'>
+              <InlineCode>NexaComposerActionButton</InlineCode>:
+            </Typography>
+            <Stack spacing={0.5} alignItems='center'>
+              <NexaComposerActionButton variant='send' aria-label='Enviar mensaje' />
+              <Typography variant='caption' color='text.secondary'>send</Typography>
+            </Stack>
+            <Stack spacing={0.5} alignItems='center'>
+              <NexaComposerActionButton variant='stop' aria-label='Detener generación' />
+              <Typography variant='caption' color='text.secondary'>stop</Typography>
+            </Stack>
+          </Stack>
+        </Card>
+      </Stack>
+    </Section>
+
     {/* Modos */}
     <Section eyebrow='Modos de interacción' title='Dock / Expandible / Lane'>
       <Stack spacing={DESIGN_SYSTEM_LAB_TOKENS.spacing.tight}>
@@ -187,7 +268,7 @@ const NexaChatLabView = () => (
         <Stack spacing={DESIGN_SYSTEM_LAB_TOKENS.spacing.tight}>
           <Typography variant='body2'>✓ Reusar este patrón + sus primitives en toda superficie donde aparezca Nexa.</Typography>
           <Typography variant='body2'>✓ Empty hero: saludo rotativo + prompts contextuales (por ruta/entidad/rol) + firma Efeonce solo aquí.</Typography>
-          <Typography variant='body2'>✓ Composer siempre vía <InlineCode>NexaGlowBorder</InlineCode> (futuro <InlineCode>NexaComposer</InlineCode>); cero hardcode (tokens AXIS + brand Nexa SSOT + escala SoT).</Typography>
+          <Typography variant='body2'>✓ Composer siempre vía <InlineCode>NexaComposer</InlineCode> (que envuelve <InlineCode>NexaGlowBorder</InlineCode>); cero hardcode (tokens AXIS + brand Nexa SSOT + escala SoT).</Typography>
           <Typography variant='body2' color='error.main'>✗ No crear un chat de Nexa paralelo por pantalla ni reimplementar el composer/rail.</Typography>
           <Typography variant='body2' color='error.main'>✗ No usar la firma Efeonce fuera del empty state ni la cara real per-mensaje (ahí va el mark).</Typography>
         </Stack>

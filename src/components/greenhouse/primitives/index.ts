@@ -37,6 +37,17 @@ export { default as GreenhouseNexaAnimatedMark } from './GreenhouseNexaAnimatedM
 export type { GreenhouseNexaAnimatedMarkProps } from './GreenhouseNexaAnimatedMark'
 export { default as NexaGlowBorder } from './NexaGlowBorder'
 export type { NexaGlowBorderProps } from './NexaGlowBorder'
+export { default as NexaComposer, NexaComposerInput, NexaComposerActionButton } from './NexaComposer'
+export type {
+  NexaComposerProps,
+  NexaComposerInputProps,
+  NexaComposerActionButtonProps,
+  NexaComposerActionVariant
+} from './NexaComposer'
+export { default as NexaFace, NEXA_FACE_SRC } from './NexaFace'
+export type { NexaFaceProps, NexaFaceVariant } from './NexaFace'
+export { default as NexaPresenceMark } from './NexaPresenceMark'
+export type { NexaPresenceMarkProps } from './NexaPresenceMark'
 export { default as GreenhouseNexaAnimatedAskBadge } from './GreenhouseNexaAnimatedAskBadge'
 export type { GreenhouseNexaAnimatedAskBadgeProps } from './GreenhouseNexaAnimatedAskBadge'
 export { default as EfeonceOrbitalLogoMark } from './EfeonceOrbitalLogoMark'
