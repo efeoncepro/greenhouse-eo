@@ -1,5 +1,14 @@
 # Release 2026-06-10 #2 — develop→main `6c649b2a6` RELEASED
 
+## Sesion 2026-06-11 — Knowledge Answer Trace Studio mockup (TASK-1084 visual, con contratos 1083/1085/1086)
+
+- Se construyó la base visual elegida para Knowledge humano + agentes: **Answer Trace Studio** en `/knowledge/mockup/answer-trace` (runtime local, mock data tipado, sin access real ni API productiva). URL local mientras el dev server siga activo: `http://localhost:3000/knowledge/mockup/answer-trace`.
+- Archivos: `src/app/(dashboard)/knowledge/mockup/answer-trace/page.tsx`, `src/views/greenhouse/knowledge/mockup/answer-trace/KnowledgeAnswerTraceMockupView.tsx`, `src/views/greenhouse/knowledge/mockup/answer-trace/data.ts`, `src/lib/copy/knowledge.ts`, `design-qa.md`.
+- UX validada: pregunta -> trace rail -> respuesta verificable -> tabs `Fuentes | Packet | Evals`, modos `Humano | Nexa | MCP`, lector humano, packet para agentes, feedback y estados de gap/freshness. Se mantuvo route-local; no nace primitive nueva todavía.
+- Evidencia: GVC desktop `.captures/2026-06-11T23-31-10_inline-knowledge-mockup-answer-trace/frames/01-snapshot.png`; mobile `.captures/2026-06-11T23-31-11_inline-knowledge-mockup-answer-trace/frames/01-snapshot.png`; comparación source vs implementación `.captures/2026-06-11T23-31-10_inline-knowledge-mockup-answer-trace/comparison-source-vs-implementation.png`; `design-qa.md` `final result: passed`.
+- Validación: `pnpm exec tsc --noEmit --pretty false`, ESLint focal, `pnpm design:lint`, `pnpm ops:lint --changed`, `pnpm task:lint --task TASK-1083/1084/1085/1086`. `pnpm docs:closure-check` queda con warnings advisory por handoff/changelog/UI docs; handoff+changelog fueron actualizados, no se creó manual funcional porque no hay workflow productivo ni rollout.
+- Docs de task sincronizadas: `TASK-1084` como dueña del mockup; `TASK-1083`, `TASK-1085`, `TASK-1086` como contrato visual downstream. Pendiente real: implementar `TASK-1083` antes de conectar `/knowledge`, Nexa o MCP a datos reales.
+
 ## Sesion 2026-06-11 — Knowledge ingestion COMPLETA (TASK-1082, develop)
 
 - **TASK-1082 `complete`** en `develop` (sin branch, override del operador). Pipeline de ingesta del corpus piloto a `greenhouse_knowledge`.

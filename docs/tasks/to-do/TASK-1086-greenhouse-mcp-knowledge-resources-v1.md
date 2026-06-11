@@ -7,6 +7,17 @@ Cerrado por **TASK-1080** (alineado, sin cambio estructural):
 - MCP es downstream de la API Platform (TASK-1083); hereda el filtrado por `agentic_policy` — los resources/tools nunca exponen docs `agent_excluded` ni `quarantined`. Read-only V1, sin Notion directo, sin writes.
 - Corpus MVP **solo interno**; la capability de retrieval agéntica es `knowledge.agentic.retrieve` (definida en TASK-1080 / sembrada en TASK-1081).
 
+## Delta 2026-06-11 — Visual contract input from Answer Trace Studio
+
+El mockup `/knowledge/mockup/answer-trace` incluye un modo `MCP` y una tarjeta de consumo machine con URI `greenhouse://knowledge/...`, packet versionado y disclosure para agentes. No implementa resources/tools MCP; fija la experiencia esperada cuando el MCP envuelva el reader de `TASK-1083`.
+
+Implicaciones para esta task:
+
+- Los resources/tools MCP deben devolver un mapping fiel del mismo `KnowledgeRetrievalPacket`, no una forma paralela.
+- Las URIs `greenhouse://knowledge/...` deben ser estables, legibles y alineadas con los recursos documentados.
+- El payload para agentes debe conservar confidence, freshness, citations, denied/filtered count y no-answer, sin exponer contenido `agent_excluded` ni `quarantined`.
+- La UX humana ya muestra cómo auditar lo que consume un agente; MCP debe preservar esa trazabilidad para debugging y governance.
+
 <!-- ZONE 0 — IDENTITY & TRIAGE -->
 
 ## Status

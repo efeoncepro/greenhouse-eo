@@ -1,0 +1,866 @@
+'use client'
+
+import { useMemo, useState } from 'react'
+
+import Alert from '@mui/material/Alert'
+import Box from '@mui/material/Box'
+import Divider from '@mui/material/Divider'
+import IconButton from '@mui/material/IconButton'
+import InputAdornment from '@mui/material/InputAdornment'
+import LinearProgress from '@mui/material/LinearProgress'
+import Stack from '@mui/material/Stack'
+import Tab from '@mui/material/Tab'
+import Tabs from '@mui/material/Tabs'
+import ToggleButton from '@mui/material/ToggleButton'
+import ToggleButtonGroup from '@mui/material/ToggleButtonGroup'
+import Tooltip from '@mui/material/Tooltip'
+import Typography from '@mui/material/Typography'
+import { alpha, useTheme, type Theme } from '@mui/material/styles'
+
+import CustomTextField from '@core/components/mui/TextField'
+
+import {
+  GreenhouseBreadcrumbs,
+  GreenhouseButton,
+  GreenhouseChip,
+  GreenhouseNexaAnimatedMark,
+  GreenhouseStatusDot
+} from '@/components/greenhouse/primitives'
+import { GH_KNOWLEDGE_COPY } from '@/lib/copy/knowledge'
+
+import {
+  answerSteps,
+  contextHooks,
+  evalRows,
+  learningPaths,
+  manualSections,
+  packetRows,
+  sourceExcerpts,
+  traceSteps,
+  type AnswerMode,
+  type ProofTab,
+  type StatusTone
+} from './data'
+
+const toneToChipTone = (tone?: StatusTone) => {
+  if (tone === 'default' || !tone) return 'default'
+  if (tone === 'primary') return 'primary'
+
+  return tone
+}
+
+const panelSx = (theme: Theme) => ({
+  backgroundColor: theme.palette.background.paper,
+  border: `1px solid ${theme.palette.divider}`,
+  borderRadius: `${theme.shape.customBorderRadius.md}px`,
+  boxShadow: 'none'
+})
+
+const sectionHeaderSx = {
+  px: { xs: 4, md: 5 },
+  py: 3,
+  minBlockSize: 56,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  gap: 3
+}
+
+const TraceStepCard = ({ index }: { index: number }) => {
+  const theme = useTheme()
+  const step = traceSteps[index]
+  const active = step.state === 'active'
+  const complete = step.state === 'complete'
+
+  return (
+    <Box
+      data-capture={`knowledge-trace-step-${step.id}`}
+      sx={{
+        position: 'relative',
+        flex: 1,
+        minInlineSize: { xs: 240, md: 0 },
+        px: { xs: 3, md: 4 },
+        py: 3,
+        borderInlineEnd: { xs: 0, md: index < traceSteps.length - 1 ? `1px solid ${theme.palette.divider}` : 0 },
+        borderBlockEnd: {
+          xs: index < traceSteps.length - 1 ? `1px solid ${theme.palette.divider}` : '2px solid transparent',
+          md: active ? `2px solid ${theme.palette.primary.main}` : '2px solid transparent'
+        },
+        backgroundColor: active ? alpha(theme.palette.primary.main, 0.04) : 'transparent'
+      }}
+    >
+      <Stack direction='row' spacing={3} alignItems='flex-start'>
+        <Box
+          sx={{
+            inlineSize: 28,
+            blockSize: 28,
+            borderRadius: '50%',
+            display: 'grid',
+            placeItems: 'center',
+            flex: '0 0 auto',
+            color: complete || active ? theme.palette.primary.contrastText : theme.palette.text.secondary,
+            backgroundColor: complete ? theme.palette.success.main : active ? theme.palette.primary.main : theme.palette.action.selected
+          }}
+        >
+          <Typography variant='caption' sx={{ color: 'inherit', fontWeight: 600 }}>
+            {index + 1}
+          </Typography>
+        </Box>
+
+        <Stack spacing={1} sx={{ minInlineSize: 0 }}>
+          <Stack direction='row' spacing={2} alignItems='center'>
+            <Typography variant='h6' sx={{ color: theme.palette.text.primary }}>
+              {step.label}
+            </Typography>
+            {complete ? <GreenhouseStatusDot tone='success' ariaLabel={GH_KNOWLEDGE_COPY.aria.completedStep} /> : null}
+          </Stack>
+          <Typography variant='caption' color='text.secondary'>
+            {step.description}
+          </Typography>
+          <Typography variant='caption' color='text.secondary'>
+            {step.metadata}
+          </Typography>
+        </Stack>
+      </Stack>
+    </Box>
+  )
+}
+
+const SourceCard = ({ source }: { source: (typeof sourceExcerpts)[number] }) => {
+  const theme = useTheme()
+
+  return (
+    <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1.4fr 0.9fr' }, gap: 4, py: 4 }}>
+      <Stack spacing={3}>
+        <Stack direction='row' spacing={2} alignItems='center' flexWrap='wrap' useFlexGap>
+          <Box
+            sx={{
+              inlineSize: 28,
+              blockSize: 28,
+              borderRadius: `${theme.shape.customBorderRadius.sm}px`,
+              display: 'grid',
+              placeItems: 'center',
+              color: theme.palette.primary.main,
+              backgroundColor: alpha(theme.palette.primary.main, 0.08)
+            }}
+          >
+            <i className='tabler-file-text' aria-hidden='true' />
+          </Box>
+          <Typography variant='h6'>{source.title}</Typography>
+          <GreenhouseChip size='small' variant='label' tone='primary' label={source.version} />
+          <GreenhouseChip size='small' variant='label' tone='success' label={source.freshness} />
+        </Stack>
+        <Typography variant='caption' color='text.secondary'>
+          Ruta: {source.route}
+        </Typography>
+        <Box
+          sx={{
+            borderInlineStart: `3px solid ${theme.palette.primary.main}`,
+            backgroundColor: alpha(theme.palette.primary.main, 0.04),
+            borderRadius: `${theme.shape.customBorderRadius.sm}px`,
+            px: 4,
+            py: 3
+          }}
+        >
+          <Typography variant='body2'>{source.quote}</Typography>
+        </Box>
+        <Typography variant='caption' color='text.secondary'>
+          Ancla de cita: {source.anchor}
+        </Typography>
+      </Stack>
+
+      <Stack spacing={2}>
+        <Typography variant='caption' color='text.secondary'>
+          Owner
+        </Typography>
+        <Typography variant='body2'>{source.owner}</Typography>
+        <Typography variant='caption' color='text.secondary'>
+          Última revisión
+        </Typography>
+        <Typography variant='body2'>{source.reviewedAt}</Typography>
+        <Typography variant='caption' color='text.secondary'>
+          Seleccionado porque
+        </Typography>
+        <Stack direction='row' spacing={2} alignItems='center'>
+          <GreenhouseStatusDot tone='success' ariaLabel={GH_KNOWLEDGE_COPY.aria.alignedSource} />
+          <Typography variant='body2' color='success.main'>
+            {source.whySelected}
+          </Typography>
+        </Stack>
+      </Stack>
+    </Box>
+  )
+}
+
+const PacketRows = () => (
+  <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(2, minmax(0, 1fr))' }, columnGap: 6 }}>
+    {packetRows.map(row => (
+      <Stack
+        key={row.label}
+        direction='row'
+        spacing={4}
+        alignItems='flex-start'
+        justifyContent='space-between'
+        sx={{ py: 2, borderBlockEnd: theme => `1px solid ${theme.palette.divider}` }}
+      >
+        <Typography variant='caption' color='text.secondary'>
+          {row.label}
+        </Typography>
+        {row.tone ? (
+          <GreenhouseChip size='small' variant='label' tone={toneToChipTone(row.tone)} label={row.value} />
+        ) : (
+          <Typography variant='body2' sx={{ textAlign: 'end', overflowWrap: 'anywhere' }}>
+            {row.value}
+          </Typography>
+        )}
+      </Stack>
+    ))}
+  </Box>
+)
+
+const EvalsPanel = () => (
+  <Stack spacing={0}>
+    {evalRows.map(row => (
+      <Stack
+        key={row.label}
+        direction='row'
+        spacing={4}
+        alignItems='center'
+        justifyContent='space-between'
+        sx={{ py: 3, borderBlockEnd: theme => `1px solid ${theme.palette.divider}` }}
+      >
+        <Stack spacing={1}>
+          <Typography variant='h6'>{row.label}</Typography>
+          <Typography variant='caption' color='text.secondary'>
+            {row.value}
+          </Typography>
+        </Stack>
+        <GreenhouseChip size='small' variant='label' tone={toneToChipTone(row.tone)} label={row.status} />
+      </Stack>
+    ))}
+  </Stack>
+)
+
+const LearningPathRail = () => {
+  const theme = useTheme()
+
+  return (
+    <Box sx={panelSx(theme)} data-capture='knowledge-learning-paths'>
+      <Box sx={sectionHeaderSx}>
+        <Typography variant='h5'>Rutas de aprendizaje</Typography>
+      </Box>
+      <Divider />
+      <Stack spacing={0}>
+        {learningPaths.map(path => (
+          <Box
+            key={path.label}
+            sx={{
+              px: 4,
+              py: 3,
+              borderInlineStart: path.active ? `3px solid ${theme.palette.primary.main}` : '3px solid transparent',
+              backgroundColor: path.active ? alpha(theme.palette.primary.main, 0.05) : 'transparent',
+              borderBlockEnd: `1px solid ${theme.palette.divider}`
+            }}
+          >
+            <Stack direction='row' alignItems='center' justifyContent='space-between' spacing={3}>
+              <Stack spacing={1}>
+                <Typography variant='h6'>{path.label}</Typography>
+                <Typography variant='caption' color='text.secondary'>
+                  {path.docs}
+                </Typography>
+              </Stack>
+              <Typography variant='caption' color='text.secondary'>
+                {path.progress}%
+              </Typography>
+            </Stack>
+            <LinearProgress
+              variant='determinate'
+              value={path.progress}
+              aria-label={`Progreso de ${path.label}`}
+              sx={{
+                mt: 2,
+                blockSize: 4,
+                borderRadius: '9999px',
+                backgroundColor: alpha(theme.palette.primary.main, 0.12)
+              }}
+            />
+          </Box>
+        ))}
+      </Stack>
+      <Box sx={{ p: 4 }}>
+        <GreenhouseButton variant='text' size='small' trailingIconClassName='tabler-arrow-right' fullWidth>
+          Ver todas las rutas
+        </GreenhouseButton>
+      </Box>
+    </Box>
+  )
+}
+
+const ManualReader = () => {
+  const theme = useTheme()
+
+  return (
+    <Box sx={panelSx(theme)} data-capture='knowledge-manual-reader'>
+      <Box sx={sectionHeaderSx}>
+        <Stack direction='row' alignItems='center' spacing={2} flexWrap='wrap' useFlexGap>
+          <Typography variant='h5'>{GH_KNOWLEDGE_COPY.manualTitle}</Typography>
+          <GreenhouseChip size='small' variant='label' tone='default' label='v4.3' />
+          <GreenhouseChip size='small' variant='label' tone='success' label='Actual' />
+          <GreenhouseChip size='small' variant='label' tone='success' label='agent_allowed' />
+        </Stack>
+        <Tooltip title={GH_KNOWLEDGE_COPY.openDocument}>
+          <IconButton size='small' aria-label={GH_KNOWLEDGE_COPY.openDocument}>
+            <i className='tabler-external-link' />
+          </IconButton>
+        </Tooltip>
+      </Box>
+      <Divider />
+
+      <Stack direction='row' spacing={2} sx={{ px: 5, py: 2, overflowX: 'auto' }}>
+        {manualSections.map(section => (
+          <GreenhouseButton
+            key={section.id}
+            size='small'
+            variant={section.active ? 'solid' : 'text'}
+            tone={section.active ? 'primary' : 'secondary'}
+          >
+            {section.label}
+          </GreenhouseButton>
+        ))}
+      </Stack>
+      <Divider />
+
+      <Box sx={{ p: { xs: 4, md: 5 }, display: 'grid', gridTemplateColumns: { xs: '1fr', lg: '1.45fr 0.75fr' }, gap: 5 }}>
+        <Stack spacing={4}>
+          <Stack spacing={2}>
+            <Typography variant='h5'>1. Propósito</Typography>
+            <Typography variant='body2' color='text.secondary'>
+              Mi Desempeño te permite revisar tus objetivos, ver feedback y dar seguimiento a tu crecimiento profesional
+              dentro de Greenhouse.
+            </Typography>
+          </Stack>
+
+          <Alert severity='success' icon={<i className='tabler-bulb' aria-hidden='true' />}>
+            Consejo: usa Mi Desempeño para alinear prioridades con tu líder y registrar avances de impacto.
+          </Alert>
+
+          <Stack spacing={2}>
+            <Typography variant='h5'>2. Acceder a Mi Desempeño</Typography>
+            <Typography variant='body2' color='text.secondary'>
+              Desde Home, haz clic en el acceso rápido Mi Desempeño o ingresa desde el menú principal.
+            </Typography>
+          </Stack>
+
+          <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '0.8fr 1fr' }, gap: 3 }}>
+            <Box
+              sx={{
+                border: `1px solid ${theme.palette.divider}`,
+                borderRadius: `${theme.shape.customBorderRadius.sm}px`,
+                overflow: 'hidden'
+              }}
+            >
+              {['Home', 'Mi Desempeño', 'Mis objetivos', 'Feedback'].map((item, index) => (
+                <Stack
+                  key={item}
+                  direction='row'
+                  spacing={2}
+                  alignItems='center'
+                  sx={{
+                    px: 3,
+                    py: 2,
+                    backgroundColor: index === 1 ? alpha(theme.palette.primary.main, 0.08) : 'transparent'
+                  }}
+                >
+                  <i className={index === 1 ? 'tabler-chart-dots-3' : 'tabler-circle'} aria-hidden='true' />
+                  <Typography variant='caption'>{item}</Typography>
+                </Stack>
+              ))}
+            </Box>
+
+            <Box
+              sx={{
+                border: `1px solid ${theme.palette.divider}`,
+                borderRadius: `${theme.shape.customBorderRadius.sm}px`,
+                p: 3
+              }}
+            >
+              <Stack direction='row' justifyContent='space-between' alignItems='center'>
+                <Typography variant='h6'>Mis objetivos</Typography>
+                <GreenhouseChip size='small' variant='label' tone='info' label='60%' />
+              </Stack>
+              <Stack spacing={2} sx={{ mt: 3 }}>
+                {[72, 54, 38].map(value => (
+                  <LinearProgress key={value} variant='determinate' value={value} aria-label={`Objetivo ${value}%`} />
+                ))}
+              </Stack>
+            </Box>
+          </Box>
+        </Stack>
+
+        <Stack spacing={4}>
+          <Box
+            sx={{
+              border: `1px solid ${theme.palette.divider}`,
+              borderRadius: `${theme.shape.customBorderRadius.sm}px`,
+              p: 4
+            }}
+          >
+            <Typography variant='h6'>Contextual help hooks</Typography>
+            <Stack spacing={3} sx={{ mt: 3 }}>
+              {contextHooks.map(hook => (
+                <Stack key={hook.title} direction='row' spacing={3}>
+                  <Box
+                    sx={{
+                      inlineSize: 34,
+                      blockSize: 34,
+                      borderRadius: `${theme.shape.customBorderRadius.sm}px`,
+                      display: 'grid',
+                      placeItems: 'center',
+                      backgroundColor: alpha(theme.palette.primary.main, 0.08),
+                      color: theme.palette.primary.main
+                    }}
+                  >
+                    <i className={hook.icon} aria-hidden='true' />
+                  </Box>
+                  <Stack spacing={1}>
+                    <Typography variant='h6'>{hook.title}</Typography>
+                    <Typography variant='caption' color='text.secondary'>
+                      {hook.body}
+                    </Typography>
+                  </Stack>
+                </Stack>
+              ))}
+            </Stack>
+            <GreenhouseButton variant='outlined' size='small' fullWidth sx={{ mt: 4 }}>
+              Ver todos los hooks
+            </GreenhouseButton>
+          </Box>
+
+          <Box
+            sx={{
+              border: `1px solid ${theme.palette.divider}`,
+              borderRadius: `${theme.shape.customBorderRadius.sm}px`,
+              p: 4
+            }}
+          >
+            <Typography variant='h6'>Salud del documento</Typography>
+            <Stack spacing={2} sx={{ mt: 3 }}>
+              {['Encabezados estables', 'Sin secretos / PII', 'Política agentic permitida', 'Última revisión: 07 may 2025'].map(
+                item => (
+                  <Stack key={item} direction='row' spacing={2} alignItems='center'>
+                    <GreenhouseStatusDot tone='success' ariaLabel={GH_KNOWLEDGE_COPY.aria.documentHealthOk} />
+                    <Typography variant='caption'>{item}</Typography>
+                  </Stack>
+                )
+              )}
+            </Stack>
+          </Box>
+        </Stack>
+      </Box>
+    </Box>
+  )
+}
+
+const KnowledgeAnswerTraceMockupView = () => {
+  const theme = useTheme()
+  const [proofTab, setProofTab] = useState<ProofTab>('sources')
+  const [mode, setMode] = useState<AnswerMode>('human')
+  const [feedback, setFeedback] = useState('useful')
+  const [copiedUri, setCopiedUri] = useState(false)
+  const [feedbackSubmitted, setFeedbackSubmitted] = useState(false)
+
+  const proofContent = useMemo(() => {
+    if (proofTab === 'packet') return <PacketRows />
+    if (proofTab === 'evals') return <EvalsPanel />
+
+    return (
+      <Stack spacing={0} divider={<Divider />}>
+        {sourceExcerpts.map(source => (
+          <SourceCard key={source.id} source={source} />
+        ))}
+        <Stack direction='row' spacing={2} alignItems='center' sx={{ py: 3 }}>
+          <Typography variant='caption' color='text.secondary'>
+            Ver más fuentes filtradas (1)
+          </Typography>
+          <GreenhouseChip size='small' variant='label' tone='success' label='agent_allowed' />
+        </Stack>
+      </Stack>
+    )
+  }, [proofTab])
+
+  return (
+    <Stack spacing={5} data-capture='knowledge-answer-trace-page'>
+      <Stack direction={{ xs: 'column', md: 'row' }} justifyContent='space-between' spacing={4} alignItems={{ md: 'flex-start' }}>
+        <Stack spacing={2}>
+          <GreenhouseBreadcrumbs
+            kind='pageHierarchy'
+            items={[
+              { label: GH_KNOWLEDGE_COPY.breadcrumbRoot, href: '/home' },
+              { label: GH_KNOWLEDGE_COPY.breadcrumbCurrent }
+            ]}
+          />
+          <Stack spacing={1}>
+            <Typography variant='surfaceHeroTitle'>{GH_KNOWLEDGE_COPY.pageTitle}</Typography>
+            <Typography variant='body2' color='text.secondary'>
+              {GH_KNOWLEDGE_COPY.pageSubtitle}
+            </Typography>
+          </Stack>
+        </Stack>
+
+        <Stack direction='row' spacing={3} flexWrap='wrap' useFlexGap>
+          <GreenhouseButton variant='outlined' tone='secondary' leadingIconClassName='tabler-message' size='small'>
+            {GH_KNOWLEDGE_COPY.sendFeedback}
+          </GreenhouseButton>
+          <GreenhouseButton variant='outlined' tone='secondary' leadingIconClassName='tabler-download' trailingIconClassName='tabler-chevron-down' size='small'>
+            {GH_KNOWLEDGE_COPY.export}
+          </GreenhouseButton>
+        </Stack>
+      </Stack>
+
+      <Box sx={panelSx(theme)} data-capture='knowledge-command-center'>
+        <Stack spacing={3} sx={{ p: { xs: 4, md: 5 } }}>
+          <Stack direction={{ xs: 'column', md: 'row' }} spacing={3}>
+            <CustomTextField
+              fullWidth
+              multiline
+              maxRows={2}
+              value={GH_KNOWLEDGE_COPY.commandPlaceholder}
+              aria-label={GH_KNOWLEDGE_COPY.commandPlaceholder}
+              InputProps={{
+                readOnly: true,
+                startAdornment: (
+                  <InputAdornment position='start'>
+                    <i className='tabler-sparkles' aria-hidden='true' />
+                  </InputAdornment>
+                ),
+                endAdornment: (
+                  <InputAdornment position='end'>
+                    <Typography variant='caption' color='text.secondary'>
+                      ⌘ K
+                    </Typography>
+                  </InputAdornment>
+                )
+              }}
+            />
+            <GreenhouseButton kind='primaryAction' leadingIconClassName='tabler-send' reserveInlineSize={136}>
+              {GH_KNOWLEDGE_COPY.sendQuestion}
+            </GreenhouseButton>
+            <ToggleButtonGroup
+              exclusive
+              value={mode}
+              onChange={(_, nextMode: AnswerMode | null) => {
+                if (nextMode) setMode(nextMode)
+              }}
+              aria-label={GH_KNOWLEDGE_COPY.aria.modeSelector}
+              size='small'
+              sx={{
+                '& .MuiToggleButton-root': {
+                  minInlineSize: 92,
+                  borderRadius: `${theme.shape.customBorderRadius.sm}px`
+                }
+              }}
+            >
+              <ToggleButton value='human'>{GH_KNOWLEDGE_COPY.mode.human}</ToggleButton>
+              <ToggleButton value='nexa'>{GH_KNOWLEDGE_COPY.mode.nexa}</ToggleButton>
+              <ToggleButton value='mcp'>{GH_KNOWLEDGE_COPY.mode.mcp}</ToggleButton>
+            </ToggleButtonGroup>
+          </Stack>
+
+          <CustomTextField
+            fullWidth
+            multiline
+            maxRows={2}
+            value={GH_KNOWLEDGE_COPY.selectedQuestion}
+            aria-label={GH_KNOWLEDGE_COPY.aria.selectedQuestion}
+            InputProps={{
+              readOnly: true,
+              startAdornment: (
+                <InputAdornment position='start'>
+                  <i className='tabler-search' aria-hidden='true' />
+                </InputAdornment>
+              ),
+              endAdornment: (
+                <InputAdornment position='end'>
+                  <i className='tabler-x' aria-hidden='true' />
+                </InputAdornment>
+              )
+            }}
+          />
+          <Stack direction='row' spacing={2} alignItems='center' role='status' aria-live='polite'>
+            <GreenhouseStatusDot tone='info' ariaLabel={GH_KNOWLEDGE_COPY.aria.activeMode} />
+            <Typography variant='caption' color='text.secondary'>
+              {GH_KNOWLEDGE_COPY.currentModeHelper[mode]}
+            </Typography>
+          </Stack>
+        </Stack>
+
+        <Divider />
+
+        <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, overflowX: 'auto' }}>
+          {traceSteps.map((_, index) => (
+            <TraceStepCard key={traceSteps[index].id} index={index} />
+          ))}
+        </Box>
+      </Box>
+
+      <Box
+        sx={{
+          display: 'grid',
+          gridTemplateColumns: { xs: '1fr', lg: 'minmax(0, 0.92fr) minmax(0, 1.08fr)' },
+          gap: 5,
+          alignItems: 'start'
+        }}
+      >
+        <Box sx={panelSx(theme)} data-capture='knowledge-verifiable-answer'>
+          <Box sx={sectionHeaderSx}>
+            <Stack direction='row' spacing={2} alignItems='center'>
+              <GreenhouseNexaAnimatedMark kind='inlineMark' size='small' ariaLabel='Nexa' />
+              <Typography variant='h5'>{GH_KNOWLEDGE_COPY.responseTitle}</Typography>
+            </Stack>
+            <GreenhouseChip size='small' variant='label' tone='success' label={`Modo ${GH_KNOWLEDGE_COPY.mode[mode]}`} />
+          </Box>
+          <Divider />
+
+          <Stack spacing={4} sx={{ p: { xs: 4, md: 5 } }}>
+            <Typography variant='body2'>
+              {GH_KNOWLEDGE_COPY.answer} Las métricas ICO son{' '}
+              <Box component='strong' sx={{ fontWeight: 600 }}>
+                Impacto, Colaboración y Orientación al Cliente
+              </Box>
+              , cada una con su definición y escala de 0 a 100.
+            </Typography>
+
+            <Stack spacing={2}>
+              {answerSteps.map((step, index) => (
+                <Stack key={step} direction='row' spacing={3} alignItems='flex-start'>
+                  <Box
+                    sx={{
+                      inlineSize: 22,
+                      blockSize: 22,
+                      borderRadius: '50%',
+                      display: 'grid',
+                      placeItems: 'center',
+                      color: theme.palette.success.main,
+                      border: `1px solid ${theme.palette.success.main}`,
+                      flex: '0 0 auto'
+                    }}
+                  >
+                    <Typography variant='caption' sx={{ color: 'inherit', fontWeight: 600 }}>
+                      {index + 1}
+                    </Typography>
+                  </Box>
+                  <Typography variant='body2'>{step}</Typography>
+                </Stack>
+              ))}
+            </Stack>
+
+            <Alert
+              severity='warning'
+              action={
+                <GreenhouseButton variant='outlined' tone='secondary' size='small'>
+                  {GH_KNOWLEDGE_COPY.consultData}
+                </GreenhouseButton>
+              }
+            >
+              <Typography variant='h6'>{GH_KNOWLEDGE_COPY.operationalDataWarning}</Typography>
+              <Typography variant='body2'>{GH_KNOWLEDGE_COPY.operationalDataWarningBody}</Typography>
+            </Alert>
+
+            <Stack spacing={2}>
+              <Typography variant='h6'>Fuentes (2)</Typography>
+              <Stack direction='row' spacing={3} flexWrap='wrap' useFlexGap>
+                {sourceExcerpts.map(source => (
+                  <GreenhouseChip
+                    key={source.id}
+                    size='medium'
+                    variant='outlined'
+                    tone='primary'
+                    iconClassName='tabler-file-text'
+                    label={source.title.replace('Manual: ', '').replace('Glosario: ', '')}
+                  />
+                ))}
+              </Stack>
+            </Stack>
+
+            <Stack direction='row' spacing={3} flexWrap='wrap' useFlexGap>
+              <GreenhouseButton variant='outlined' leadingIconClassName='tabler-external-link'>
+                {GH_KNOWLEDGE_COPY.openManual}
+              </GreenhouseButton>
+              <GreenhouseButton variant='outlined' tone='secondary' leadingIconClassName='tabler-bookmark'>
+                {GH_KNOWLEDGE_COPY.saveGuide}
+              </GreenhouseButton>
+              <GreenhouseButton variant='outlined' tone='secondary' leadingIconClassName='tabler-flag'>
+                {GH_KNOWLEDGE_COPY.reportGap}
+              </GreenhouseButton>
+            </Stack>
+          </Stack>
+        </Box>
+
+        <Box sx={panelSx(theme)} data-capture='knowledge-proof-trace'>
+          <Box sx={sectionHeaderSx}>
+            <Typography variant='h5'>{GH_KNOWLEDGE_COPY.proofTitle}</Typography>
+            <Tabs
+              value={proofTab}
+              onChange={(_, value: ProofTab) => setProofTab(value)}
+              aria-label={GH_KNOWLEDGE_COPY.aria.proofTabs}
+              sx={{ minBlockSize: 36, '& .MuiTab-root': { minBlockSize: 36 } }}
+            >
+              <Tab value='sources' label={GH_KNOWLEDGE_COPY.evidenceTabs.sources} />
+              <Tab value='packet' label={GH_KNOWLEDGE_COPY.evidenceTabs.packet} />
+              <Tab value='evals' label={GH_KNOWLEDGE_COPY.evidenceTabs.evals} />
+            </Tabs>
+          </Box>
+          <Divider />
+          <Box sx={{ px: { xs: 4, md: 5 }, py: 2 }}>{proofContent}</Box>
+        </Box>
+      </Box>
+
+      <Box
+        sx={{
+          display: 'grid',
+          gridTemplateColumns: { xs: '1fr', lg: '280px minmax(0, 1fr)' },
+          gap: 5,
+          alignItems: 'start'
+        }}
+      >
+        <LearningPathRail />
+        <Stack spacing={5}>
+          <ManualReader />
+
+          <Box sx={panelSx(theme)} data-capture='knowledge-agent-consumption'>
+            <Box sx={sectionHeaderSx}>
+              <Stack spacing={1}>
+                <Typography variant='h5'>{GH_KNOWLEDGE_COPY.agentTitle} (Nexa y MCP)</Typography>
+                <Typography variant='caption' color='text.secondary'>
+                  Esta respuesta es consumible por agentes bajo política agent_allowed.
+                </Typography>
+              </Stack>
+              <GreenhouseChip size='small' variant='label' tone='success' label='agent_allowed' />
+            </Box>
+            <Divider />
+            <Box
+              sx={{
+                p: { xs: 4, md: 5 },
+                display: 'grid',
+                gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' },
+                gap: 4
+              }}
+            >
+              <Box
+                sx={{
+                  border: `1px solid ${theme.palette.divider}`,
+                  borderRadius: `${theme.shape.customBorderRadius.sm}px`,
+                  p: 4
+                }}
+              >
+                <Typography variant='h6'>MCP URI</Typography>
+                <Stack direction='row' spacing={2} alignItems='center' sx={{ mt: 3 }}>
+                  <Typography variant='body2' color='primary.main' sx={{ overflowWrap: 'anywhere' }}>
+                    greenhouse://knowledge/document/mi-desempeno
+                  </Typography>
+                  <Tooltip title={copiedUri ? GH_KNOWLEDGE_COPY.copiedUri : GH_KNOWLEDGE_COPY.copyUri}>
+                    <IconButton
+                      size='small'
+                      aria-label={copiedUri ? GH_KNOWLEDGE_COPY.copiedUri : GH_KNOWLEDGE_COPY.copyUri}
+                      color={copiedUri ? 'success' : 'default'}
+                      onClick={() => {
+                        setCopiedUri(true)
+                        window.setTimeout(() => setCopiedUri(false), 1600)
+                      }}
+                    >
+                      <i className={copiedUri ? 'tabler-check' : 'tabler-copy'} />
+                    </IconButton>
+                  </Tooltip>
+                </Stack>
+                <Typography variant='caption' color='text.secondary'>
+                  Formato: knowledge_document
+                </Typography>
+              </Box>
+
+              <Box
+                sx={{
+                  border: `1px solid ${theme.palette.divider}`,
+                  borderRadius: `${theme.shape.customBorderRadius.sm}px`,
+                  p: 4
+                }}
+              >
+                <Stack direction='row' spacing={3} alignItems='center' justifyContent='space-between'>
+                  <Stack direction='row' spacing={2} alignItems='center'>
+                    <i className='tabler-braces' aria-hidden='true' />
+                    <Typography variant='h6'>KnowledgeRetrievalPacket</Typography>
+                  </Stack>
+                  <GreenhouseButton variant='text' size='small' trailingIconClassName='tabler-download'>
+                    {GH_KNOWLEDGE_COPY.viewFullPacket}
+                  </GreenhouseButton>
+                </Stack>
+                <Typography variant='caption' color='text.secondary'>
+                  Formato: v1.0 · 3 chunks incluidos · 1 filtrado.
+                </Typography>
+              </Box>
+            </Box>
+            <Divider />
+            <Stack direction='row' spacing={2} alignItems='center' sx={{ px: { xs: 4, md: 5 }, py: 3 }}>
+              <i className='tabler-shield-check' aria-hidden='true' />
+              <Typography variant='caption' color='text.secondary'>
+                {GH_KNOWLEDGE_COPY.agentDisclosure}
+              </Typography>
+            </Stack>
+          </Box>
+
+          <Box sx={panelSx(theme)} data-capture='knowledge-feedback'>
+            <Box sx={{ p: { xs: 4, md: 5 } }}>
+              <Typography variant='h5'>{GH_KNOWLEDGE_COPY.feedbackQuestion}</Typography>
+              <Stack direction={{ xs: 'column', md: 'row' }} spacing={3} sx={{ mt: 4 }}>
+                <ToggleButtonGroup
+                  exclusive
+                  value={feedback}
+                  onChange={(_, value: string | null) => {
+                    if (value) setFeedback(value)
+                  }}
+                  aria-label={GH_KNOWLEDGE_COPY.aria.feedbackSelector}
+                  size='small'
+                >
+                  <ToggleButton value='useful'>
+                    <Stack direction='row' spacing={2} alignItems='center'>
+                      <i className='tabler-thumb-up' aria-hidden='true' />
+                      <span>{GH_KNOWLEDGE_COPY.feedbackUseful}</span>
+                    </Stack>
+                  </ToggleButton>
+                  <ToggleButton value='not-useful'>
+                    <Stack direction='row' spacing={2} alignItems='center'>
+                      <i className='tabler-thumb-down' aria-hidden='true' />
+                      <span>{GH_KNOWLEDGE_COPY.feedbackNotUseful}</span>
+                    </Stack>
+                  </ToggleButton>
+                  <ToggleButton value='incorrect'>
+                    <Stack direction='row' spacing={2} alignItems='center'>
+                      <i className='tabler-alert-triangle' aria-hidden='true' />
+                      <span>{GH_KNOWLEDGE_COPY.feedbackIncorrect}</span>
+                    </Stack>
+                  </ToggleButton>
+                </ToggleButtonGroup>
+
+                <CustomTextField fullWidth placeholder={GH_KNOWLEDGE_COPY.feedbackPlaceholder} aria-label={GH_KNOWLEDGE_COPY.feedbackPlaceholder} />
+                <GreenhouseButton
+                  kind='primaryAction'
+                  reserveInlineSize={104}
+                  leadingIconClassName={feedbackSubmitted ? 'tabler-check' : undefined}
+                  onClick={() => setFeedbackSubmitted(true)}
+                >
+                  {GH_KNOWLEDGE_COPY.feedbackSubmit}
+                </GreenhouseButton>
+              </Stack>
+              {feedbackSubmitted ? (
+                <Alert severity='success' sx={{ mt: 4 }} role='status' data-capture='knowledge-feedback-success'>
+                  {GH_KNOWLEDGE_COPY.feedbackRegistered}
+                </Alert>
+              ) : null}
+            </Box>
+          </Box>
+        </Stack>
+      </Box>
+    </Stack>
+  )
+}
+
+export default KnowledgeAnswerTraceMockupView

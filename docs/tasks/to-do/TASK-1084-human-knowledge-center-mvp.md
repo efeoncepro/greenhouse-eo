@@ -10,6 +10,35 @@ Naming/ruta/audiencia **cerrados por TASK-1080**:
 - Ruta de aprendizaje inicial: **"Operación Greenhouse — Primeros pasos"** (docs #1, #3, #6, #7, #9, #10 del corpus piloto; ver arquitectura Delta tabla C).
 - **Corpus ya ingerido (TASK-1082, 2026-06-11):** hay contenido real en `greenhouse_knowledge` en dev (11 docs publicados + 263 chunks) — el Knowledge Center se construye contra datos reales, no fixtures. Esta task SÍ siembra el viewCode `plataforma.knowledge` + la migración seed (gobernanza TASK-827) + la página `/knowledge`, que TASK-1081 difirió a aquí.
 
+## Delta 2026-06-11 — Product Design prototype: Answer Trace Studio
+
+Se construyó un mockup runtime local como base visual para el Human Knowledge Center: `/knowledge/mockup/answer-trace`. Es un **prototipo de diseño** con mock data tipado; no implementa todavía `/knowledge`, `plataforma.knowledge`, access real, API Platform ni datos productivos. La implementación final de esta task debe usarlo como norte UX, no como bypass de las dependencias de `TASK-1083`.
+
+Archivos creados:
+
+- `src/app/(dashboard)/knowledge/mockup/answer-trace/page.tsx`
+- `src/views/greenhouse/knowledge/mockup/answer-trace/KnowledgeAnswerTraceMockupView.tsx`
+- `src/views/greenhouse/knowledge/mockup/answer-trace/data.ts`
+- `src/lib/copy/knowledge.ts`
+- `design-qa.md`
+
+Decisiones UX/UI capturadas:
+
+- First fold orientado a una pregunta real: command bar, modo `Humano | Nexa | MCP`, trace rail, respuesta verificable y panel de prueba/trazabilidad.
+- La pantalla prioriza **"respuesta con evidencia"** sobre dump documental: fuentes, packet y evals viven en tabs; la ruta de aprendizaje y lector humano quedan como soporte operativo.
+- Estados de confianza/freshness y gap honesto son visibles (`No consulté datos actuales...`) para entrenar expectativas humanas y agentic.
+- Feedback humano queda presente como acción de mejora, pero sin persistencia real todavía.
+- Desktop usa split answer/proof; mobile apila trace steps para evitar clipping horizontal.
+- Decisión de componentización: route-local con primitives existentes (`GreenhouseBreadcrumbs`, `GreenhouseButton`, `GreenhouseChip`, `GreenhouseStatusDot`, Vuexy/MUI). No nace primitive nueva; promover solo si otros surfaces repiten el patrón Answer Trace.
+
+Evidencia GVC/Product Design QA:
+
+- Desktop final: `.captures/2026-06-11T23-31-10_inline-knowledge-mockup-answer-trace/frames/01-snapshot.png`
+- Mobile final: `.captures/2026-06-11T23-31-11_inline-knowledge-mockup-answer-trace/frames/01-snapshot.png`
+- Comparación source visual vs implementación: `.captures/2026-06-11T23-31-10_inline-knowledge-mockup-answer-trace/comparison-source-vs-implementation.png`
+- `design-qa.md` quedó con `final result: passed`.
+- Validado con `pnpm exec tsc --noEmit --pretty false`, ESLint focal, `pnpm design:lint` y GVC desktop/mobile.
+
 ## Delta 2026-06-11 — Full API Parity hardening (pre-execution)
 
 Revisado con arch-architect bajo el lente **Full API Parity** (decisión #16: la UI es cliente de un contrato gobernado, no la fuente de verdad). El Knowledge Center es el *consumidor* de la API de TASK-1083 — debe nacer como cliente estricto del contrato, **nunca** tocar `knowledge_chunks`/`knowledge_documents` directo ni llamar al `store` server-only desde una ruta ad-hoc. 5 ajustes:

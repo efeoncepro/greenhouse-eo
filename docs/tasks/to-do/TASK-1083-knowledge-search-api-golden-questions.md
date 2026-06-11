@@ -70,6 +70,18 @@ Aplicando el principio canónico **Full API Parity** (`GREENHOUSE_FULL_API_PARIT
 
 > Estos 5 + los 5 ajustes del Delta de revisión arquitectónica (substrato FTS, reader 2-modos, packet→columnas, signal a 1085, golden questions fixtures) son el contrato endurecido con el que arranca la implementación.
 
+## Delta 2026-06-11 — Visual contract input from Answer Trace Studio
+
+El mockup `/knowledge/mockup/answer-trace` de `TASK-1084` define el target visual para el output de esta API: el usuario ve una respuesta trazable, source chips, excerpts, `KnowledgeRetrievalPacket`, `deniedOrFilteredCount`, confidence/freshness y un bloque de evals/golden questions. Este delta **no implementa** `searchKnowledge`, endpoints ni GIN; solo fija cómo debe sentirse el packet cuando lo consuman humanos, Nexa y MCP.
+
+Implicaciones para esta task:
+
+- Mantener `KnowledgeRetrievalPacket` legible y estable para UI y machine consumers (`contractVersion: 'knowledge-search.v1'`).
+- Incluir suficiente metadata para renderizar tabs `Fuentes | Packet | Evals` sin queries extra desde la view.
+- Soportar no-answer honesto (`confidence='none'`) y freshness/gap explícitos.
+- Exponer `deniedOrFilteredCount` como señal de filtrado sin revelar contenido denegado.
+- Los golden questions deben poder explicar fuente correcta, fuente equivocada, no-answer y stale/deprecated con evidencia revisable.
+
 <!-- ZONE 0 — IDENTITY & TRIAGE -->
 
 ## Status

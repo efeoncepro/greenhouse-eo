@@ -8,6 +8,18 @@ Cerrado por **TASK-1080** (alineado, sin cambio estructural):
 - **Dominios sensibles** (finance, payroll, legal, security, access): Nexa no los usa sin la firma del approver de dominio (ver arquitectura Delta tabla D). Hasta esa firma nacen `agent_excluded`.
 - Sigue flag-gated (`NEXA_KNOWLEDGE_RETRIEVAL_ENABLED` default false); esta aceptación NO levanta el gate.
 
+## Delta 2026-06-11 — Visual contract input from Answer Trace Studio
+
+El mockup `/knowledge/mockup/answer-trace` deja un target de UX para Nexa cuando use Knowledge Retrieval: respuesta verificable, citas visibles, warning de freshness, gap honesto y feedback de mejora. No conecta Nexa ni levanta `NEXA_KNOWLEDGE_RETRIEVAL_ENABLED`; la integración sigue bloqueada por `TASK-1083`.
+
+Implicaciones para esta task:
+
+- Nexa debe renderizar/emitir fuentes como evidencia, no solo como texto decorativo.
+- Si el packet indica baja confianza, stale/deprecated o datos operativos no consultados, la respuesta debe decirlo de forma directa.
+- El copy de gap honesto validado en el prototipo es: `No consulté datos actuales ni fuentes fuera de Knowledge. Si necesitas estado productivo, valida en el módulo operativo.`
+- El feedback de respuesta debe mapear al contrato compartido de Knowledge feedback, no a un handler local del chat.
+- La métrica `knowledge.retrieval.low_citation_rate` se evalúa contra respuestas con citas reales; el mockup sirve como forma objetivo, no como medición.
+
 <!-- ZONE 0 — IDENTITY & TRIAGE -->
 
 ## Status
