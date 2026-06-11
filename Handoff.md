@@ -1,5 +1,16 @@
 # Release 2026-06-10 #2 — develop→main `6c649b2a6` RELEASED
 
+## Sesion 2026-06-11 — Knowledge Platform readiness humano + agéntico
+
+- Se amplió la propuesta Knowledge Platform con el checklist completo de lo que falta considerar para ambas capas.
+- Capa humana documentada: taxonomía editorial (`manual`, `how_to`, `sop`, `runbook`, `faq`, `glossary`, `troubleshooting`, `policy`, `onboarding_path`), rutas de aprendizaje por rol, ayuda contextual desde UI, workflow de publicación Notion→Greenhouse y estados (`draft`, `review`, `published`, `stale`, `deprecated`, `quarantined`, `agent_excluded`).
+- Capa agéntica documentada: readiness gates antes de Nexa/MCP, golden questions/evals, sanitización contra prompt injection, pre-LLM filtering, feedback loop y diagnóstico de fallas por tipo (`missing_doc`, retrieval fallido, stale, access, respuesta incorrecta).
+- MVP recomendado: piloto interno con 10-20 documentos de alto valor, `knowledge_search` read-only con citas, full-text + metadata fuerte, freshness states y feedback antes de embeddings o ingesta amplia de Notion.
+- Se agregaron títulos candidatos adicionales, **sin crear archivos `TASK-###`**: Human Learning Paths + Contextual Help, Nexa Knowledge Evals + Golden Questions, Publication Workflow + Editorial Governance, Prompt Injection Sanitizer + Quarantine Rules.
+- Rollout/implementación: docs-only. No runtime, no migrations, no env vars.
+
+---
+
 ## Sesion 2026-06-11 — Triple documentacion obligatoria (policy)
 
 - Se endureció el contrato documental: toda capacidad Greenhouse debe tener documentación técnica, documentación funcional y manual de uso/runbook.

@@ -132,6 +132,13 @@ While this ADR is `Proposed`, it does not authorize implementation. If accepted 
 - If retrieved knowledge is insufficient, stale or contradictory, Nexa must answer with an honest gap instead of smoothing over uncertainty.
 - Access policy is resolved by Greenhouse user/tenant/capability context, not by free-text labels or Notion page titles.
 - Documents containing secrets, uncontrolled PII or unsupported legal/financial commitments are quarantined or excluded from agentic retrieval.
+- Every published document must declare owner, audience, sensitivity, source, review cadence, last reviewed date and whether it is allowed for agentic retrieval.
+- Human-facing knowledge must be organized as learning paths, manuals, SOPs, runbooks, FAQs, glossary entries, troubleshooting guides or policies, not exposed as raw Notion dumps.
+- Documents visible to humans may be marked `agent_excluded` when Nexa/MCP should not retrieve them.
+- Agentic retrieval requires pre-LLM filtering. Denied chunks are never passed to the model for discretionary filtering.
+- Ingested content must be treated as untrusted input: prompt-injection-like instructions, secrets and unsafe embeds must be sanitized, quarantined or excluded before indexing.
+- Each pilot corpus must define golden questions and expected citations before broad Nexa exposure.
+- The first implementation should start with a small internal corpus, full-text search plus strong metadata filters, feedback capture and freshness states before embeddings or broad Notion ingestion.
 - Existing Notion delivery/metrics sync remains a separate operational data pipeline; this platform governs knowledge documents, not task metrics.
 
 ## Initial Task Titles To Mature
@@ -146,6 +153,10 @@ No task files are created by this ADR. Candidate titles for later discussion:
 6. Greenhouse MCP Knowledge Resources V1
 7. Knowledge Freshness, Feedback and Reliability Signals
 8. Knowledge Access Policy + Quarantine Workflow
+9. Knowledge Human Learning Paths + Contextual Help
+10. Nexa Knowledge Evals + Golden Questions
+11. Knowledge Publication Workflow + Editorial Governance
+12. Knowledge Prompt Injection Sanitizer + Quarantine Rules
 
 ## Revisit When
 

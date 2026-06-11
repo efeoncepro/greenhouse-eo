@@ -200,6 +200,93 @@ Principio de UX:
 
 > La capa humana enseña. No debe parecer un dump de Notion.
 
+### 8.1 Taxonomía Editorial
+
+La capa humana debe tener tipos editoriales explícitos. El tipo del documento define estructura, expectativas de freshness y cómo Nexa puede usarlo.
+
+Tipos iniciales:
+
+- `manual`: explicación estable de una funcionalidad o dominio;
+- `how_to`: pasos guiados para completar una tarea frecuente;
+- `sop`: procedimiento operativo estándar con owner y condición de uso;
+- `runbook`: respuesta a incidente, degradación, conexión externa o flujo sensible;
+- `faq`: respuestas cortas a dudas recurrentes;
+- `glossary`: definición canónica de términos, métricas, estados y nomenclatura;
+- `troubleshooting`: diagnóstico guiado de errores conocidos;
+- `policy`: regla interna, compliance, seguridad, finanzas, payroll o acceso;
+- `onboarding_path`: secuencia de aprendizaje por rol o momento del journey.
+
+Todo documento publicado debe declarar:
+
+- owner;
+- audience;
+- sensitivity;
+- review cadence;
+- last reviewed date;
+- source system;
+- canonical human URL;
+- si es permitido para agentic retrieval;
+- qué capa documental cubre (`technical`, `functional`, `manual`) cuando aplique.
+
+### 8.2 Rutas De Aprendizaje
+
+La surface humana debe organizar el conocimiento por rutas, no solo por búsqueda.
+
+Rutas candidatas:
+
+- **Primeros pasos Greenhouse:** navegación, Home, Nexa, espacios principales.
+- **Colaborador:** Mi desempeño, tareas, feedback, métricas ICO personales.
+- **Manager / Operations:** Person 360, Agency 360, Space 360, performance operations.
+- **Cliente:** lectura de reportes, onboarding, solicitudes y estados visibles.
+- **Admin interno:** usuarios, roles, entitlements, integraciones, auditoría.
+- **Finance / Payroll:** ciclos, evidencias, aprobaciones y degradaciones honestas.
+- **Nexa:** cómo preguntar, qué puede hacer, límites, fuentes y escalamiento humano.
+- **Integraciones:** Notion, HubSpot, Teams, Google, Azure, Vercel y webhooks cuando corresponda.
+
+### 8.3 Ayuda Contextual
+
+La Knowledge Platform debe alimentar ayuda dentro del producto.
+
+Entrypoints:
+
+- links "Aprender" desde headers de página;
+- sidecar contextual para manuales cortos o SOPs;
+- empty states con guía asociada;
+- errores y estados degradados con troubleshooting relevante;
+- tooltips ricos solo cuando la explicación sea breve;
+- Nexa citando la guía humana equivalente en cada respuesta grounded.
+
+Regla:
+
+> Si una feature tiene una manual page publicada, la UI debe poder enlazarla desde el contexto donde se usa.
+
+### 8.4 Publicación
+
+Flujo editorial propuesto:
+
+```text
+Notion draft
+  -> source classification
+  -> editorial / domain review
+  -> safety classification
+  -> Greenhouse snapshot
+  -> publish version
+  -> index human + agentic layers
+  -> monitor feedback / freshness
+```
+
+No todo lo que existe en Notion se publica. La publicación es una decisión explícita.
+
+Estados mínimos:
+
+- `draft`: existe en Notion o staging, no visible en runtime;
+- `review`: listo para aprobación humana;
+- `published`: visible según audience y access policy;
+- `stale`: visible con warning y retrieval permitido con declaración;
+- `deprecated`: histórico, no recomendado;
+- `quarantined`: bloqueado para humanos y agentes hasta remediar;
+- `agent_excluded`: visible para humanos, excluido de Nexa/MCP.
+
 ## 9. Capa Agéntica
 
 La capa agéntica expone conocimiento a Nexa y MCP.
@@ -221,6 +308,64 @@ Reglas:
 - si no hay fuente suficiente, Nexa no inventa;
 - no recuperar chunks en cuarentena;
 - no exponer secretos, PII no gobernada o compromisos legales/financieros no aprobados.
+
+### 9.1 Readiness Agéntico
+
+Un documento no queda listo para Nexa solo por estar escrito. Debe pasar gates de uso agéntico.
+
+Checklist inicial:
+
+- tiene owner y fecha de revisión;
+- tiene audience y sensitivity correctos;
+- no contiene secretos, tokens, credenciales, datos personales no gobernados ni instrucciones privadas;
+- no contiene prompts o instrucciones que intenten controlar al agente fuera del contenido del documento;
+- tiene headings estables para citas;
+- tiene alcance claro: qué cubre y qué no cubre;
+- declara si aplica a clientes, internos o ambos;
+- si toca finance, payroll, legal, security o contractual commitments, tiene aprobación del dominio;
+- tiene al menos una pregunta esperada o caso de uso para evals;
+- tiene fallback humano o ruta de escalamiento cuando el documento no basta.
+
+### 9.2 Evals Y Golden Questions
+
+La capa agéntica necesita evaluación desde el inicio, aunque el MVP use full-text search.
+
+Cada corpus piloto debe definir:
+
+- golden questions por documento o ruta de aprendizaje;
+- respuesta esperada de alto nivel;
+- fuentes que deberían citarse;
+- fuentes que no deberían aparecer;
+- casos de no respuesta cuando no hay evidencia;
+- casos de conflicto entre doc vigente y doc stale/deprecated;
+- casos sensibles donde Nexa debe pedir validación humana.
+
+Signals mínimos:
+
+- precisión de retrieval;
+- tasa de respuestas con fuente;
+- tasa de fuente equivocada;
+- tasa de no respuesta correcta;
+- tasa de uso de fuente stale;
+- feedback negativo por documento.
+
+### 9.3 Sanitización Contra Prompt Injection
+
+Todo contenido que entra desde Notion u otra fuente editable debe tratarse como dato no confiable.
+
+La ingesta debe:
+
+- normalizar bloques antes de chunking;
+- eliminar o marcar instrucciones que intenten modificar el comportamiento de Nexa;
+- separar contenido visible de metadata operacional;
+- bloquear embeds o links no permitidos;
+- detectar secretos y patrones sensibles;
+- registrar razones de quarantine;
+- impedir que instrucciones del documento sobrescriban system prompt, policy, access control o tool choice.
+
+Regla:
+
+> Los documentos pueden enseñar procesos. No pueden dar órdenes al runtime del agente.
 
 ## 10. API Platform
 
@@ -453,7 +598,101 @@ Cada respuesta de Nexa que use knowledge debería generar metadata auditable:
 
 Esto habilita mejorar el corpus sin inspeccionar conversaciones completas.
 
-## 13. Access And Safety
+### 12.8 Agentic Quality Loop
+
+El ciclo de calidad de Nexa debe operar como producto:
+
+```text
+question
+  -> retrieval packet
+  -> answer with citations
+  -> user feedback / implicit signal
+  -> knowledge issue or doc update
+  -> eval regression
+  -> publish new version
+```
+
+Cuando una respuesta falle, el sistema debe poder distinguir:
+
+- falta documento;
+- documento existe pero no fue recuperado;
+- documento recuperado era stale;
+- documento correcto fue recuperado pero Nexa respondió mal;
+- el usuario no tenía acceso a la fuente correcta;
+- la pregunta pedía una acción operativa, no conocimiento.
+
+## 13. Human + Agentic Readiness Checklist
+
+Antes de ampliar el corpus, cada dominio publicado debe pasar una revisión de dos capas.
+
+### 13.1 Capa Humana
+
+- Existe una ruta humana para encontrar el contenido sin saber el título exacto.
+- El documento está escrito para enseñar, no como notas internas crudas.
+- Tiene owner, fecha de revisión, audiencia y sensibilidad.
+- Tiene status visible y muestra si está stale o deprecated.
+- Tiene enlaces desde la feature, error state o flujo donde se necesita.
+- Distingue uso interno vs cliente cuando corresponde.
+- Declara el siguiente paso o escalamiento humano.
+- Cumple la doctrina de triple documentación cuando cubre una capacidad Greenhouse: técnica, funcional y manual/runbook.
+
+### 13.2 Capa Agéntica
+
+- El documento puede chunkearse con headings y citas estables.
+- Está permitido para `knowledge_search` o marcado como `agent_excluded`.
+- Los chunks quedan filtrados por access policy antes del LLM.
+- Tiene evals mínimas o golden questions.
+- Tiene reglas de no respuesta para huecos, conflictos y sensibilidad.
+- Está protegido contra prompt injection y contenido no confiable.
+- Sus respuestas esperadas pueden citar una fuente Greenhouse canonical.
+- Su feedback puede convertirse en issue editorial sin exponer conversaciones completas.
+
+### 13.3 Shared Governance
+
+- Hay un source registry claro: qué Notion bases entran, con qué policy y owner.
+- Hay approvers por dominio, especialmente finance, payroll, legal, security y access.
+- Hay estrategia de naming para la surface humana (`Knowledge`, `Academy`, `Manual`, `Learn`).
+- Hay decisión de búsqueda inicial: full-text, híbrida o vector posterior.
+- Hay política de versionado para cambios sensibles.
+- Hay métricas de adoption humana y calidad agéntica.
+- Hay criterio para excluir documentos de Nexa aunque sean visibles para humanos.
+
+## 14. MVP Recomendado
+
+El primer corte debería ser interno, pequeño y evaluable.
+
+Scope recomendado:
+
+- 10 a 20 documentos de alto valor;
+- solo audience interno;
+- una o dos rutas humanas, no todo el portal;
+- `knowledge_search` read-only con citas;
+- full-text search con filtros fuertes por metadata;
+- `agent_excluded`, `stale`, `deprecated` y `quarantined` desde V1;
+- golden questions antes de conectar a Nexa en producción;
+- feedback humano visible en la surface;
+- no embeddings hasta medir calidad y volumen real del corpus.
+
+Corpus inicial sugerido:
+
+- manual de uso de Nexa;
+- manual de Mi desempeño;
+- glosario ICO;
+- runbook de degradación honesta;
+- guía de roles/access básicos;
+- guía de conexión Notion;
+- guía de diferencia entre Efeonce, Greenhouse y Nexa;
+- guía de cómo interpretar fuentes/citas en respuestas de Nexa.
+
+Anti-scope del MVP:
+
+- ingerir todo Notion;
+- permitir writes desde MCP;
+- responder preguntas legales/financieras sensibles sin approval domain-specific;
+- usar Notion MCP como runtime primario;
+- prometer que Nexa sabe algo si no hay documento publicado.
+
+## 15. Access And Safety
 
 La política de acceso debe ser Greenhouse-native.
 
@@ -476,7 +715,7 @@ Estados especiales:
 - `stale`: visible con warning, retrieval permitido solo si la respuesta lo declara;
 - `deprecated`: visible como histórico, no recomendado por Nexa salvo pregunta explícita.
 
-## 14. Observability
+## 16. Observability
 
 Signals iniciales:
 
@@ -501,7 +740,7 @@ Audit mínimo:
 - Nexa answer metadata for source usage, without storing full private prompts by default;
 - feedback events.
 
-## 15. Candidate Task Titles
+## 17. Candidate Task Titles
 
 Estos títulos se documentan para madurar el programa. **No existen archivos `TASK-###` todavía y no deben tratarse como backlog formal hasta que se creen con ID estable.**
 
@@ -513,19 +752,27 @@ Estos títulos se documentan para madurar el programa. **No existen archivos `TA
 6. **Greenhouse MCP Knowledge Resources V1**
 7. **Knowledge Freshness, Feedback and Reliability Signals**
 8. **Knowledge Access Policy + Quarantine Workflow**
+9. **Knowledge Human Learning Paths + Contextual Help**
+10. **Nexa Knowledge Evals + Golden Questions**
+11. **Knowledge Publication Workflow + Editorial Governance**
+12. **Knowledge Prompt Injection Sanitizer + Quarantine Rules**
 
-## 16. Open Questions
+## 18. Open Questions
 
 - ¿La primera superficie humana se llama Knowledge, Academy, Manual o Learn?
 - ¿Qué bases Notion son el piloto inicial?
 - ¿El corpus inicial será solo interno o también cliente-facing?
 - ¿Quién aprueba publicación desde Notion hacia Greenhouse?
 - ¿Qué documentos quedan humanos-only y fuera de Nexa?
-- ¿Qué fuente se usa para embeddings si se aceptan en una fase posterior?
+- ¿Qué docs deben nacer como `agent_excluded` aunque sean visibles para humanos?
+- ¿Qué búsqueda se usa primero: full-text, híbrida o vector?
 - ¿Qué capabilities gobiernan lectura, publicación y administración?
 - ¿Cómo se versionan cambios de documentos que afectan legal, finance o payroll?
+- ¿Cuál es el set inicial de golden questions y quién lo aprueba?
+- ¿Qué eventos de feedback generan tarea editorial vs ajuste de retrieval?
+- ¿Cómo se conectan los manuales de uso existentes bajo `docs/manual-de-uso/` con el corpus publicado?
 
-## 17. References
+## 19. References
 
 - Notion MCP overview: https://developers.notion.com/guides/mcp/overview
 - Notion MCP connection guide: https://developers.notion.com/guides/mcp/get-started-with-mcp
