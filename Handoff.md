@@ -1,4 +1,16 @@
-# Sesion 2026-06-10 — EPIC-018 / TASK-1075: RESUME POINT (build editorial brief en curso)
+# Release 2026-06-10 #2 — develop→main `6c649b2a6` RELEASED
+
+> Promoción `develop→main` (UI + docs, 39 archivos) vía orchestrator canónico **run `27319773037` = success**. `release_id` `6c649b2a6a9a-eb1f8093-1da3-48ca-b3c4-e79bbd5b6fd8`, manifest **released**, attempt_n=1.
+>
+> - **Batch:** `release_batch_policy=ship` (cero migraciones, api/services, payroll/finance/auth). Solo TASK-1075 (Nexa Insights redesign + DS lab + `/my/performance` enterprise mockup) + docs/tasks (TASK-1073/1074/1076/1077, EPIC-018).
+> - **Preflight:** dispatch #1 (`27319582551`) falló por `playwright_smoke "0 workflows"` (by design: el push-trigger de Playwright solo cubre `develop`, no merge commits de main). Único no-ok, cero errores; árbol byte-idéntico a develop HEAD `8e096e2a` (Playwright verde en CI develop). Re-dispatch con `bypass_preflight_reason` → `--override-batch-policy --bypass-preflight-warnings` (degrada solo warnings; mecanismo de operador documentado, NO parche).
+> - **Gates:** 2 aprobaciones (approval-gate + ola workers/Azure), autorización plena del operador. Azure: skip Bicep (sin diff `infra/azure/**`).
+> - **Verificado:** 4 Cloud Run @ GIT_SHA `6c649b2a6a9a` (cero drift, gcloud); watchdog limpio (`worker_revision_drift`/`stale_approval`/`pending_without_jobs` = 0, vía `gh` — el CLI `release:watchdog` no corrió por reauth ADC local); Vercel prod READY + `/api/auth/health` 200 (overallStatus=ready).
+> - **Pendiente menor (no bloqueante):** reauth de `gcloud auth application-default login` para que `pnpm release:watchdog` corra local (los 3 signals se verificaron por vías equivalentes).
+
+---
+
+## Sesion 2026-06-10 — EPIC-018 / TASK-1075: RESUME POINT (build editorial brief en curso)
 
 > **CHECKPOINT por inestabilidad de la API Claude (rate limit + clasificador Bash caído).** Estado exacto para retomar sin perder trabajo.
 
