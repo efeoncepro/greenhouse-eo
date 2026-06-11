@@ -1,5 +1,14 @@
 # TASK-1084 — Human Knowledge Center MVP
 
+## Delta 2026-06-11
+
+Naming/ruta/audiencia **cerrados por TASK-1080**:
+
+- Surface humana = **Knowledge**, ruta única **`/knowledge`** (se descartan `/learn` y `/academy`). Ya no hace falta "confirmar nombre con operador".
+- Gating: viewCode **`plataforma.knowledge`** (routeGroup `internal`) + capability `knowledge.document.read`. MVP **solo interno** (defensive redirect si `tenantType==='client'`).
+- Estados a mostrar: `publication_status` (lifecycle, con badge `stale`/`deprecated`) + `agentic_policy` ortogonal (un doc puede ser `agent_excluded`).
+- Ruta de aprendizaje inicial: **"Operación Greenhouse — Primeros pasos"** (docs #1, #3, #6, #7, #9, #10 del corpus piloto; ver arquitectura Delta tabla C).
+
 <!-- ZONE 0 — IDENTITY & TRIAGE -->
 
 ## Status
@@ -82,7 +91,7 @@ Reglas obligatorias:
 
 ### Already exists
 
-- Architecture define routes tentativas `/knowledge`, `/learn`, `/academy`.
+- Ruta decidida por TASK-1080: **`/knowledge`** (se descartan `/learn` y `/academy`).
 - No hay surface Knowledge Center runtime.
 
 ### Gap
@@ -154,7 +163,7 @@ Usar composición enterprise densa y escaneable. La primera pantalla debe ser el
 
 ### Out-of-band coordination required
 
-- Confirmar nombre/ruta con operador si `TASK-1080` no lo cerró.
+- Nombre/ruta ya cerrados por `TASK-1080` (**Knowledge** / `/knowledge`). Sin coordinación pendiente en este punto.
 
 <!-- ZONE 4 — ACCEPTANCE & CLOSURE -->
 

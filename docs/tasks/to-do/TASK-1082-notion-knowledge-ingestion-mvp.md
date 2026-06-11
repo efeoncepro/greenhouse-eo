@@ -1,5 +1,13 @@
 # TASK-1082 — Notion Knowledge Ingestion MVP
 
+## Delta 2026-06-11
+
+Cerrado por **TASK-1080** (sin cambio estructural, solo se fija el alcance):
+
+- **Corpus piloto concreto** = 14 docs internos mapeados en `GREENHOUSE_KNOWLEDGE_PLATFORM_ARCHITECTURE_V1.md` → Delta tabla C. Ingerir **solo** ese corpus (MVP `audience='internal'`). No broad sync.
+- Al clasificar, poblar las **dos columnas ortogonales** `publication_status` y `agentic_policy` (no un enum mezclado); ≥1 doc nace `agent_excluded` (doc #14) y el de payroll (#13) nace `agent_excluded` hasta firma de `hr_payroll`.
+- `quarantined` se aplica cuando el sanitizer detecta secretos/PII/prompt-injection.
+
 <!-- ZONE 0 — IDENTITY & TRIAGE -->
 
 ## Status

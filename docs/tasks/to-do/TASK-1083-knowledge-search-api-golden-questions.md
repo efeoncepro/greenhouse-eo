@@ -1,5 +1,13 @@
 # TASK-1083 — Knowledge Search API + Golden Questions
 
+## Delta 2026-06-11
+
+Cerrado por **TASK-1080** (alineado, sin cambio estructural):
+
+- Búsqueda V1 = **full-text Postgres + filtros fuertes de metadata** (`audience`, `sensitivity`, `publication_status`, `agentic_policy`, `owner_domain`). Embeddings/vector **fuera** del MVP (decisión explícita; substrato vector se evalúa después con la calidad medida aquí).
+- El filtrado pre-LLM debe respetar las **dos dimensiones**: nunca retornar chunks `agent_excluded` ni `quarantined` para retrieval agéntico.
+- Golden questions: TASK-1080 difirió aquí el set final + su approver (por dominio del doc).
+
 <!-- ZONE 0 — IDENTITY & TRIAGE -->
 
 ## Status

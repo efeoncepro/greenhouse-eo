@@ -1,5 +1,14 @@
 # TASK-1081 — Knowledge Core Schema + Source Registry
 
+## Delta 2026-06-11
+
+Aceptación cerrada por **TASK-1080** (ADR `Accepted (direction)`). Ajustes que esta task debe respetar:
+
+- **Estado editorial = DOS columnas ortogonales** (no un enum mezclado): `publication_status` (`draft | review | published | stale | deprecated`, + `quarantined` como bloqueo que gana sobre todo) **y** `agentic_policy` (`agent_allowed | agent_excluded`), independientes. Un doc `published` puede ser `agent_excluded`. El schema NO debe meter `agent_excluded` dentro del enum de lifecycle.
+- `sensitivity`: `internal | restricted` en el MVP (`client_safe` diferido a fase cliente; MVP es **solo interno** → `audience='internal'`).
+- **Capabilities a sembrar aquí** (módulo `knowledge`, con grant en `runtime.ts` en el mismo PR — invariante TASK-873/935): `knowledge.document.read`, `knowledge.document.publish`, `knowledge.source.admin`, `knowledge.agentic.retrieve`, `knowledge.feedback.submit`. viewCode `plataforma.knowledge` (routeGroup `internal`, solo roles internos).
+- Detalle: `GREENHOUSE_KNOWLEDGE_PLATFORM_ARCHITECTURE_V1.md` → `## Delta 2026-06-11` (tablas A-G).
+
 <!-- ZONE 0 — IDENTITY & TRIAGE -->
 
 ## Status
@@ -48,7 +57,7 @@ Reglas obligatorias:
 
 - No leer Notion en esta task.
 - No exponer API pública todavía.
-- El schema debe soportar `agent_excluded`, `quarantined`, `stale`, `deprecated`, owner, audience, sensitivity y review cadence desde V1.
+- El schema debe modelar `publication_status` (`draft`/`review`/`published`/`stale`/`deprecated` + `quarantined`) y `agentic_policy` (`agent_allowed`/`agent_excluded`) como **dos columnas ortogonales** (ver Delta 2026-06-11), más owner, audience, sensitivity y review cadence desde V1.
 
 ## Normative Docs
 

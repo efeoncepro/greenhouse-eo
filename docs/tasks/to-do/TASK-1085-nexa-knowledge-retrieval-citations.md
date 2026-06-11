@@ -1,5 +1,13 @@
 # TASK-1085 — Nexa Knowledge Retrieval With Citations
 
+## Delta 2026-06-11
+
+Cerrado por **TASK-1080** (alineado, sin cambio estructural):
+
+- Nexa retira solo docs `agent_allowed` (la columna `agentic_policy` es la compuerta; un doc `published` puede ser `agent_excluded` y queda fuera de Nexa). Corpus MVP **solo interno**.
+- **Dominios sensibles** (finance, payroll, legal, security, access): Nexa no los usa sin la firma del approver de dominio (ver arquitectura Delta tabla D). Hasta esa firma nacen `agent_excluded`.
+- Sigue flag-gated (`NEXA_KNOWLEDGE_RETRIEVAL_ENABLED` default false); esta aceptación NO levanta el gate.
+
 <!-- ZONE 0 — IDENTITY & TRIAGE -->
 
 ## Status

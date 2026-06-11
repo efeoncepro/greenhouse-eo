@@ -1,5 +1,12 @@
 # TASK-1086 — Greenhouse MCP Knowledge Resources V1
 
+## Delta 2026-06-11
+
+Cerrado por **TASK-1080** (alineado, sin cambio estructural):
+
+- MCP es downstream de la API Platform (TASK-1083); hereda el filtrado por `agentic_policy` — los resources/tools nunca exponen docs `agent_excluded` ni `quarantined`. Read-only V1, sin Notion directo, sin writes.
+- Corpus MVP **solo interno**; la capability de retrieval agéntica es `knowledge.agentic.retrieve` (definida en TASK-1080 / sembrada en TASK-1081).
+
 <!-- ZONE 0 — IDENTITY & TRIAGE -->
 
 ## Status
