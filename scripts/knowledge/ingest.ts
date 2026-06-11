@@ -1,61 +1,48 @@
 /**
- * TASK-1082 — Knowledge ingestion CLI.
+ * TASK-1082 — Knowledge ingestion CLI (corpus piloto repo_docs).
  *
- * Dry-run (default) reporta candidatos del corpus piloto, disponibilidad y
- * (Slice 2-3) conteos de versiones/chunks/quarantine. `--apply` escribe a
- * `greenhouse_knowledge` (Slice 3).
+ * Dry-run (default) reporta qué se publicaría/cuarentenaría sin escribir (sí lee
+ * para idempotencia honesta). `--apply` registra el source, abre un sync run y
+ * publica versiones idempotentes por checksum a `greenhouse_knowledge`.
  *
  * Uso:
  *   npx tsx --require ./scripts/lib/server-only-shim.cjs scripts/knowledge/ingest.ts [--apply]
  */
 
-import { checksumMarkdown, chunkMarkdown } from '@/lib/knowledge/ingestion/markdown'
+import { runKnowledgeIngestion } from '@/lib/knowledge/ingestion/pipeline'
 import { RepoDocsKnowledgeConnector } from '@/lib/knowledge/ingestion/repo-docs-connector'
 
 const main = async (): Promise<void> => {
   const apply = process.argv.includes('--apply')
-  const connector = new RepoDocsKnowledgeConnector()
 
-  const items = await connector.list()
-  const available = items.filter(item => item.kind === 'available')
-  const unavailable = items.filter(item => item.kind === 'unavailable')
+  const report = await runKnowledgeIngestion({
+    connector: new RepoDocsKnowledgeConnector(),
+    apply
+  })
+
+  const { counts } = report
 
   console.log('Knowledge ingestion — source: repo_docs (pilot corpus)')
-  console.log(`mode: ${apply ? 'APPLY' : 'DRY-RUN'}`)
+  console.log(`mode: ${apply ? 'APPLY' : 'DRY-RUN'} · sourceId: ${report.sourceId ?? '(none — would register)'}`)
   console.log(
-    `candidates: ${items.length} | available: ${available.length} | skipped (to-author/missing): ${unavailable.length}`
+    `candidates: ${counts.candidates} | published: ${counts.published} | unchanged: ${counts.skippedUnchanged} | ` +
+      `quarantined: ${counts.quarantined} | skipped: ${counts.skippedUnavailable} | failed: ${counts.failed} | chunks: ${counts.chunks}`
   )
   console.log('')
 
-  for (const item of unavailable) {
-    console.log(`  SKIP  ${item.candidate.slug.padEnd(34)} — ${item.reason}`)
+  for (const doc of report.documents) {
+    const detail =
+      doc.status === 'quarantined'
+        ? `findings: ${(doc.findings ?? []).map(f => f.code).join(', ')}`
+        : doc.status === 'skipped_unavailable' || doc.status === 'failed'
+          ? doc.reason ?? ''
+          : `${doc.chunkCount} chunks${doc.versionNumber ? ` · v${doc.versionNumber}` : ''}`
+
+    console.log(`  ${doc.status.toUpperCase().padEnd(20)} ${doc.slug.padEnd(34)} ${detail}`)
   }
 
-  let totalChunks = 0
-
-  for (const item of available) {
-    if (item.kind !== 'available') {
-      continue
-    }
-
-    const loaded = await connector.load(item.candidate)
-    const chunks = chunkMarkdown(loaded.rawMarkdown)
-
-    totalChunks += chunks.length
-    const checksum = checksumMarkdown(loaded.rawMarkdown)
-
-    console.log(
-      `  OK    ${item.candidate.slug.padEnd(34)} — ${item.candidate.documentType} · ${item.candidate.agenticPolicy} · ${chunks.length} chunks · ${checksum.slice(0, 16)}…`
-    )
-  }
-
-  console.log('')
-  console.log(`would publish ${available.length} documents · ${totalChunks} chunks total`)
-
-  if (apply) {
-    console.error('\napply: no implementado hasta TASK-1082 Slice 3.')
-    process.exit(1)
-  }
+  // Explicit exit: the shared PG pool keeps the event loop alive otherwise.
+  process.exit(counts.failed > 0 ? 1 : 0)
 }
 
 main().catch((err: unknown) => {
