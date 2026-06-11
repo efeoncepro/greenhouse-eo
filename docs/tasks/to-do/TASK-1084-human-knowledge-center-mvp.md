@@ -8,6 +8,7 @@ Naming/ruta/audiencia **cerrados por TASK-1080**:
 - Gating: viewCode **`plataforma.knowledge`** (routeGroup `internal`) + capability `knowledge.document.read`. MVP **solo interno** (defensive redirect si `tenantType==='client'`).
 - Estados a mostrar: `publication_status` (lifecycle, con badge `stale`/`deprecated`) + `agentic_policy` ortogonal (un doc puede ser `agent_excluded`).
 - Ruta de aprendizaje inicial: **"Operación Greenhouse — Primeros pasos"** (docs #1, #3, #6, #7, #9, #10 del corpus piloto; ver arquitectura Delta tabla C).
+- **Corpus ya ingerido (TASK-1082, 2026-06-11):** hay contenido real en `greenhouse_knowledge` en dev (11 docs publicados + 263 chunks) — el Knowledge Center se construye contra datos reales, no fixtures. Esta task SÍ siembra el viewCode `plataforma.knowledge` + la migración seed (gobernanza TASK-827) + la página `/knowledge`, que TASK-1081 difirió a aquí.
 
 <!-- ZONE 0 — IDENTITY & TRIAGE -->
 

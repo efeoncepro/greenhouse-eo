@@ -7,6 +7,7 @@ Cerrado por **TASK-1080** (alineado, sin cambio estructural):
 - Búsqueda V1 = **full-text Postgres + filtros fuertes de metadata** (`audience`, `sensitivity`, `publication_status`, `agentic_policy`, `owner_domain`). Embeddings/vector **fuera** del MVP (decisión explícita; substrato vector se evalúa después con la calidad medida aquí).
 - El filtrado pre-LLM debe respetar las **dos dimensiones**: nunca retornar chunks `agent_excluded` ni `quarantined` para retrieval agéntico.
 - Golden questions: TASK-1080 difirió aquí el set final + su approver (por dominio del doc).
+- **Corpus ya ingerido (TASK-1082, 2026-06-11):** hay datos reales en `greenhouse_knowledge` en dev (11 docs publicados + 263 chunks, `periodos-de-nomina` `agent_excluded`). El connector/pipeline de ingesta + el chunker (`chunkMarkdown`, heading_path + `citation_anchor`) existen — la search API consume estos chunks. El tsvector/GIN sigue siendo de esta task (se agrega sobre `knowledge_chunks.body_text`).
 
 <!-- ZONE 0 — IDENTITY & TRIAGE -->
 

@@ -4250,6 +4250,19 @@ El mapeo superficie↔nodo AXIS del Design System es **data-driven** desde la DB
 
 **Spec canónica**: `docs/tasks/complete/TASK-1081-knowledge-core-schema-source-registry.md` + `GREENHOUSE_KNOWLEDGE_PLATFORM_ARCHITECTURE_V1.md` Delta 2026-06-11. Migraciones: `20260611200140700` (schema), `20260611201441449` (capabilities). Patrón fuente: TASK-790 (state machine + CHECK + audit trio + módulo puro/server-only), TASK-413 SCL (schema documents+versions+quarantine — boundary), TASK-873/935 (capability grant coverage), TASK-721 (append-only forensic).
 
+### Knowledge ingestion invariants (TASK-1082, desde 2026-06-11)
+
+La ingesta del corpus a `greenhouse_knowledge` es un **pipeline source-agnostic** (`src/lib/knowledge/ingestion/`): connector interface → `load` → normalize (`markdown.ts`: chunker heading-pathed + checksum sha256) → sanitize (`sanitization/detect.ts`) → `(quarantine | publish + chunks)`, con modos **dry-run/apply** e idempotencia por **checksum**. Fuente V1 = connector `repo_docs` (markdown del repo); connector Notion (block fetcher + `blocks→markdown`) **diferido a TASK-1088**, gated en secret. CLI: `scripts/knowledge/ingest.ts`.
+
+- **Notion es authoring, Greenhouse es runtime.** NUNCA Notion live ni Notion MCP como runtime primario de Nexa. La ingesta hace **snapshot** (no lectura live). NUNCA ingerir todo Notion — solo el source/corpus autorizado (manifest `pilot-corpus.ts`, MVP `audience='internal'`).
+- **Sanitize-before-chunk (fail-closed):** tratar el contenido como input NO confiable. Un doc flagged (valores de secretos/PII/prompt-injection) se pone `quarantined` **antes** de chunkear → NUNCA se vuelve recuperable. El detector apunta a **SHAPES de valor** (JWT, `sk-`, private key, RUT, "ignore previous instructions"), NO a menciones de "secret" en prosa (el corpus describe higiene de secrets — 0 falsos positivos verificado). NUNCA escribir secretos/tokens reales en `normalized_markdown`/chunks.
+- **quarantine es knowledge-native:** `publication_status='quarantined'` + `run_kind='quarantine'`. NUNCA escribir a la tabla SCL `context_document_quarantine` (otro dominio).
+- **Idempotente por checksum:** re-correr `--apply` NO duplica; publica versión nueva solo si el contenido cambió. NUNCA habilitar `apply` sin dry-run revisado; producción se mantiene `sync_enabled=FALSE` hasta aprobación humana.
+- **Gobernanza editorial declarativa:** la metadata (audience/sensitivity/agentic_policy/approver) la declara el manifest, NO se infiere del contenido. `#13 periodos-de-nomina` + `#14 politica-secretos` nacen `agent_excluded`.
+- **NUNCA** `Sentry.captureException` directo — `captureWithDomain(err, 'knowledge', …)`. Errores sanitizados con `redactErrorForResponse`. **2 reliability signals** (módulo `knowledge`): `knowledge.publication.quarantine_count` (data_quality, steady=0) + `knowledge.sync.failed_source` (freshness, steady=0).
+
+**Spec canónica**: `docs/tasks/complete/TASK-1082-notion-knowledge-ingestion-mvp.md` + `GREENHOUSE_KNOWLEDGE_PLATFORM_ARCHITECTURE_V1.md` Delta 2026-06-11 (Ingesta MVP). Follow-up: **TASK-1088** (Notion connector). Patrón fuente: TASK-790/822 (módulo puro + server-only), TASK-771 (run audit), TASK-721 (sanitize/quarantine), TASK-1081 (store + boundary SCL).
+
 ### SQL Signal Reader Schema Validation Gate (TASK-893 hotfix #3, desde 2026-05-16)
 
 Toda query SQL embebida en TS que aparezca en code paths productivos — especialmente signal readers, reliability queries, materializers, audit scripts — **debe validar sus assumptions de schema contra PG real antes de mergear**. `db.d.ts` (Kysely codegen) NO es source of truth — infiere DATE columns como `Timestamp` TS, lo cual lleva al bug class `EXTRACT(EPOCH FROM (date - date))` que produce `function pg_catalog.extract(unknown, integer) does not exist` en runtime.

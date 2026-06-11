@@ -98,9 +98,36 @@ await transitionKnowledgeDocumentStatus(doc.documentId, 'quarantined', {
 | `knowledge_feedback is append-only` | Intento de UPDATE/DELETE sobre feedback | Es por diseño; el feedback no se edita ni borra. |
 | Error de FK al borrar un documento | El documento tiene runs/versiones que lo referencian (RESTRICT) | No se borra; se descontinúa (`deprecated`) o se pone en cuarentena. |
 
+## Ingerir el corpus piloto (TASK-1082)
+
+La ingesta toma los 14 documentos del corpus piloto (manifest `src/lib/knowledge/ingestion/pilot-corpus.ts`), los normaliza a chunks, los sanitiza y los publica en `greenhouse_knowledge`. Fuente actual: **archivos markdown del repo** (`repo_docs`). El connector Notion llega en TASK-1088.
+
+Siempre correr **dry-run primero**, revisar los conteos, y solo después `--apply`:
+
+```bash
+# Cargar credenciales (ADC + PG) y correr dry-run (no escribe; lee para idempotencia)
+set -a && source .env.local && set +a
+npx tsx --require ./scripts/lib/server-only-shim.cjs scripts/knowledge/ingest.ts
+
+# Aplicar (registra el source, abre un sync run y publica versiones idempotentes)
+npx tsx --require ./scripts/lib/server-only-shim.cjs scripts/knowledge/ingest.ts --apply
+```
+
+El reporte muestra por documento: `PUBLISHED` (n chunks · v#), `SKIPPED_UNCHANGED` (mismo checksum), `QUARANTINED` (el sanitizer detectó secretos/PII/prompt-injection), `SKIPPED_UNAVAILABLE` (to-author / archivo faltante) o `FAILED`.
+
+### Qué significan / qué cuidar
+
+- **Idempotente:** re-correr `--apply` no duplica. Solo publica una versión nueva si el checksum del contenido cambió.
+- **Cuarentena:** un documento flagged NO se chunkea ni se vuelve recuperable; queda `quarantined` con la razón en el run. Remediá la fuente (sacá el secreto) y re-ingerí.
+- **Solo el source piloto:** `knowledge_sources.sync_enabled` está en `FALSE` por default; producción se mantiene deshabilitada hasta aprobación humana.
+- **No** ingerir contenido con secretos/tokens reales — el sanitizer los pone en cuarentena, pero el principio es no meterlos.
+
+> Observabilidad: dos reliability signals en `/admin/operations` (módulo Knowledge Platform): `knowledge.publication.quarantine_count` y `knowledge.sync.failed_source` (ambos steady=0).
+
 ## Referencias técnicas
 
 - Schema: `migrations/*_task-1081-knowledge-core-schema.sql`
 - Capabilities: `migrations/*_task-1081-knowledge-capabilities-registry-seed.sql` + `src/config/entitlements-catalog.ts` + `src/lib/entitlements/runtime.ts`
-- Helpers: `src/lib/knowledge/`
+- Helpers: `src/lib/knowledge/` (ingesta en `src/lib/knowledge/ingestion/` + `src/lib/knowledge/sanitization/`)
+- CLI de ingesta: `scripts/knowledge/ingest.ts`
 - Arquitectura: [GREENHOUSE_KNOWLEDGE_PLATFORM_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_KNOWLEDGE_PLATFORM_ARCHITECTURE_V1.md)

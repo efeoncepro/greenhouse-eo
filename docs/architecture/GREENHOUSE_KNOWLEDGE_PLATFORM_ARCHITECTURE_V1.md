@@ -911,3 +911,36 @@ La foundation persistente ya está en el repo (additive, sin consumidores runtim
 ### Verificación
 
 Migración aplicada en dev compartida (anti pre-up-marker DO blocks OK). Tests: pure (state-machine + validators) + live PG (`store.live.test.ts`: publish, transition trigger, chunks denormalizados, feedback append-only) + `parity.live.test` (catalog⇆registry) verdes. tsc + eslint limpios.
+
+## Delta 2026-06-11 — Ingesta MVP (TASK-1082)
+
+Pipeline de ingesta source-agnostic que materializa el corpus piloto en `greenhouse_knowledge`. Connector `repo_docs` real; connector Notion **diferido a TASK-1088** (gated en secret).
+
+### Decisión de fuente
+
+El corpus piloto (tabla C) son **archivos markdown del repo** (11/12 existen). No hay teamspace Notion de knowledge ni secret. → se ingiere vía connector `repo_docs` (`source_system='repo_docs'`, `source_kind='markdown_collection'`). El connector Notion (block fetcher `GET /v1/blocks/{id}/children` + `blocks→markdown`) se construye en **TASK-1088** cuando el operador provisione el teamspace + secret `notion-integration-token-greenhouse-knowledge-*`.
+
+### Módulos (`src/lib/knowledge/`)
+
+| Pieza | Rol |
+| --- | --- |
+| `ingestion/connector.ts` | Interface `KnowledgeSourceConnector` (source-agnostic, puro): `list()` + `load()`. |
+| `ingestion/pilot-corpus.ts` | Manifest declarativo de los 14 docs (gobernanza editorial, no inferida del contenido). `sourceFiles=null` = to-author (skipped). |
+| `ingestion/repo-docs-connector.ts` | Connector `repo_docs` (lee markdown del repo, server-only). |
+| `ingestion/markdown.ts` | Puro: `stripFrontmatter` + `chunkMarkdown` (heading_path + `citation_anchor` estable + token_estimate + soft-split) + `checksumMarkdown` (sha256). Sin deps externas. |
+| `sanitization/detect.ts` | Puro: detecta **valores** de secretos + RUT + prompt-injection (no menciones de "secret" en prosa). |
+| `ingestion/pipeline.ts` | Server-only: orquesta `list→load→normalize→sanitize→(quarantine\|publish+chunks)`. dry-run/apply, idempotente por checksum, get-or-create del source, run audit, `captureWithDomain('knowledge')`. |
+| `ingestion/run-tracking.ts` | begin/complete sync run sobre `knowledge_publication_runs`. |
+
+CLI: `scripts/knowledge/ingest.ts` (`--apply`). `quarantine` es **knowledge-native** (`publication_status='quarantined'` + `run_kind='quarantine'`), NO la tabla SCL.
+
+### Reliability signals (módulo `knowledge`)
+
+- `knowledge.publication.quarantine_count` (data_quality, warning>0, steady=0).
+- `knowledge.sync.failed_source` (freshness, error>0, steady=0).
+
+Nuevo módulo reliability `knowledge` (subsystem "Knowledge Platform") en el registry.
+
+### Verificación live
+
+`--apply` en dev: registró el source `repo_docs` piloto, publicó **11 docs** (10 `agent_allowed` + 1 `agent_excluded` `periodos-de-nomina`) + **263 chunks**; re-run **idempotente** (11 unchanged, 0 published); **0 quarantine** (sanitizer sin falsos positivos en el corpus real que menciona nombres de secrets). Signals = `ok`. 14 focal + 418 reliability tests verdes.

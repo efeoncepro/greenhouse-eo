@@ -65,4 +65,13 @@ En el MVP todo es **solo interno** — los clientes todavía no ven nada de la K
 - **TASK-1085** — conexión de Nexa con citas.
 - **TASK-1086** — recursos MCP read-only.
 
-> Operación de la foundation (aplicar migración, usar los helpers): ver el [manual de uso](../../manual-de-uso/plataforma/knowledge-platform.md).
+## Cómo entra el conocimiento (ingesta, TASK-1082)
+
+El conocimiento no se escribe a mano en Greenhouse: se **ingiere** desde una fuente autorizada. La ingesta toma cada documento, lo parte en pedazos (chunks) con su "ruta de títulos" para poder citarlo, lo **revisa** (sanitiza) y solo entonces lo publica.
+
+- **De dónde viene hoy:** los 14 documentos del corpus piloto son **archivos del repositorio** (manuales y docs que ya existen). Cuando se conecte un teamspace de Notion de conocimiento (TASK-1088), entrarán también desde ahí — pero el flujo es el mismo.
+- **La revisión de seguridad va primero:** si un documento trae un secreto, un dato personal o una instrucción que intente "controlar" a Nexa, se pone en **cuarentena** (no se publica ni Nexa lo puede usar) hasta limpiarlo.
+- **Es idempotente:** re-correr la ingesta no duplica nada; solo publica una versión nueva si el contenido cambió de verdad.
+- **Es auditada:** cada corrida queda registrada (qué se publicó, qué se puso en cuarentena, qué se omitió).
+
+> Detalle técnico: el pipeline de ingesta vive en `src/lib/knowledge/ingestion/` y `src/lib/knowledge/sanitization/`. Operar la foundation (aplicar migración, ingerir el corpus, usar los helpers): ver el [manual de uso](../../manual-de-uso/plataforma/knowledge-platform.md).
