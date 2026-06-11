@@ -22,7 +22,7 @@ Discovery confirmó: el corpus piloto son **archivos markdown del repo** (11/12 
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -175,27 +175,38 @@ La ingesta debe poder correr en modo dry-run y apply. El dry-run debe reportar d
 
 ## Acceptance Criteria
 
-- [ ] Dry-run muestra conteos de documentos, versiones, chunks, quarantine y omisiones.
-- [ ] Apply es idempotente por source + checksum.
-- [ ] Documentos con secretos/prompt-injection-like content no quedan recuperables por agentes.
-- [ ] No se usa Notion MCP como runtime primario.
-- [ ] Manual/runbook de operación de ingesta queda actualizado.
+- [x] Dry-run muestra conteos de documentos, versiones, chunks, quarantine y omisiones. → CLI reporta candidates/published/unchanged/quarantined/skipped/failed/chunks.
+- [x] Apply es idempotente por source + checksum. → verificado live: re-run `--apply` = 11 unchanged, 0 published.
+- [x] Documentos con secretos/prompt-injection-like content no quedan recuperables por agentes. → sanitizer → `quarantined` antes de chunkear (knowledge-native).
+- [x] No se usa Notion MCP como runtime primario. → connector `repo_docs` (snapshot); Notion diferido a TASK-1088.
+- [x] Manual/runbook de operación de ingesta queda actualizado. → `docs/manual-de-uso/plataforma/knowledge-platform.md` + doc funcional + arch Delta + CLAUDE.md.
+
+## Delta 2026-06-11 — Closed (develop)
+
+Implementada en `develop` (sin branch). 6 commits. Decisiones del operador: `repo_docs` ahora + Notion connector diferido a **TASK-1088**.
+
+- **Slice 1:** connector interface + manifest 14 docs + repo_docs connector + dry-run CLI.
+- **Slice 2:** chunker markdown puro (heading_path + citation_anchor + checksum) — 263 chunks.
+- **Slice 3:** sanitizer (secrets/PII/injection, 0 falsos positivos) + pipeline dry-run/apply + quarantine-native + run audit.
+- **Reliability:** 2 signals + módulo `knowledge` nuevo (ambos `ok` live).
+- **Verificado live:** `--apply` = 11 docs + 263 chunks; idempotente; 0 quarantine. `pnpm test` + `pnpm build` verdes.
 
 ## Verification
 
-- tests focales de ingestion/sanitization
-- dry-run contra source piloto
-- `pnpm task:lint --task TASK-1082`
-- `pnpm docs:closure-check --staged`
+- tests focales de ingestion/sanitization ✓ (manifest + chunker + sanitizer)
+- dry-run + apply contra source piloto repo_docs ✓
+- `pnpm task:lint --task TASK-1082` ✓ · `pnpm docs:closure-check --staged` ✓
+- `pnpm test` (full) + `pnpm build` ✓
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` sincronizado con carpeta.
-- [ ] `docs/tasks/README.md` actualizado.
-- [ ] `Handoff.md` actualizado con source piloto, run evidence y pendientes.
-- [ ] `changelog.md` actualizado.
-- [ ] Chequeo de impacto sobre `TASK-1083` y `TASK-1084`.
+- [x] `Lifecycle` sincronizado con carpeta. → `complete` + movido a `complete/`.
+- [x] `docs/tasks/README.md` actualizado.
+- [x] `Handoff.md` actualizado con source piloto, run evidence y pendientes.
+- [x] `changelog.md` actualizado.
+- [x] Chequeo de impacto sobre `TASK-1083` y `TASK-1084`. → Deltas agregadas (corpus ingerido).
 
 ## Follow-ups
 
 - `TASK-1083` search/evals.
+- `TASK-1088` Notion connector (block fetcher + blocks→markdown, gated en secret).

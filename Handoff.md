@@ -1,12 +1,13 @@
 # Release 2026-06-10 #2 — develop→main `6c649b2a6` RELEASED
 
-## Sesion 2026-06-11 — Knowledge ingestion en curso (TASK-1082, develop)
+## Sesion 2026-06-11 — Knowledge ingestion COMPLETA (TASK-1082, develop)
 
-- **TASK-1082 `in-progress`** en `develop` (sin branch, override del operador). Ingesta del corpus piloto hacia `greenhouse_knowledge`.
-- **Discovery clave:** el corpus piloto son **archivos markdown del repo** (11/12 existen), NO hay fuente Notion de knowledge ni secret, ni parser Notion-blocks ni chunker markdown en el repo.
-- **Decisión del operador:** `repo_docs` ahora (ingiere el markdown real end-to-end, desbloquea 1083/1084) + connector Notion **diferido a TASK-1088** (gated en secret a provisionar). Pipeline source-agnostic con connector interface.
-- **Plan:** Slice 1 (connector interface + manifest 14 docs + repo_docs connector + run tracking + dry-run CLI) → Slice 2 (chunker markdown puro + checksum + versionado idempotente) → Slice 3 (sanitizer secrets/PII/injection + quarantine-native + apply + 2 signals).
-- **Pendiente:** implementación.
+- **TASK-1082 `complete`** en `develop` (sin branch, override del operador). Pipeline de ingesta del corpus piloto a `greenhouse_knowledge`.
+- **Decisión de fuente:** el corpus piloto son **archivos markdown del repo** (no hay fuente Notion de knowledge ni secret) → connector `repo_docs` real; connector Notion **diferido a TASK-1088** (gated en secret a provisionar).
+- **Implementado:** pipeline source-agnostic (`src/lib/knowledge/ingestion/`): connector interface + manifest 14 docs + repo_docs connector + chunker markdown puro (heading_path + citation_anchor + checksum sha256) + sanitizer (`sanitization/detect.ts`: valores de secretos/PII/prompt-injection) + pipeline dry-run/apply idempotente por checksum + run audit + 2 reliability signals (módulo `knowledge` nuevo). CLI `scripts/knowledge/ingest.ts`.
+- **Verificado live (dev):** `--apply` publicó **11 docs + 263 chunks** (`periodos-de-nomina` `agent_excluded`); re-run idempotente (11 unchanged); **0 quarantine** (sanitizer sin falsos positivos en el corpus real). Signals = `ok`. 14 focal + 418 reliability tests verdes; `pnpm test` + `pnpm build` verdes.
+- **Desbloquea TASK-1083/1084** con contenido real en dev. Follow-up: **TASK-1088** (Notion connector).
+- **Nota multi-agente:** durante esta sesión había WIP de Codex sin commitear (intento abandonado de "Nexa Chat en Home") en el working tree. Se apartó a `stash@{0}` (recuperable) tras pausar Codex; mis commits TASK-1082 nunca lo incluyeron. Los 3 archivos `@menu` que Codex tocó se limpiaron al pausarlo.
 
 ---
 
