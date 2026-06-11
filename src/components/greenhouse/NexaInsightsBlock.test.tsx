@@ -4,6 +4,7 @@ import { afterEach, beforeAll, describe, expect, it } from 'vitest'
 import { cleanup } from '@testing-library/react'
 
 import { renderWithTheme } from '@/test/render'
+import { GH_NEXA } from '@/lib/copy/nexa'
 
 import NexaInsightsBlock, { type NexaInsightItem } from './NexaInsightsBlock'
 
@@ -101,8 +102,8 @@ describe('NexaInsightsBlock — honest degradation states (TASK-946)', () => {
       />
     )
 
-    // El header "Nexa Insights" sí aparece (chrome canonical del bento).
-    expect(getAllByText('Nexa Insights').length).toBeGreaterThan(0)
+    // El título del bloque (Nexa Insights) aparece en estado ready.
+    expect(getAllByText(GH_NEXA.insights_title).length).toBeGreaterThan(0)
     // Las microcopy honest degradation NO aparecen en estado ready.
     expect(queryAllByText('Aún sin observaciones para este período').length).toBe(0)
     expect(queryAllByText('Sin anomalías detectadas').length).toBe(0)

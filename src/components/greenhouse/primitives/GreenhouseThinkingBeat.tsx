@@ -21,6 +21,8 @@ export type GreenhouseThinkingBeatProps = {
   decorative?: boolean
   ariaLabel?: string
   dataCapture?: string
+  /** Override the variant's dot size (px). For pairing inline with larger text. */
+  dotSize?: number
   sx?: SxProps<Theme>
 }
 
@@ -60,12 +62,14 @@ const GreenhouseThinkingBeat = ({
   decorative = false,
   ariaLabel,
   dataCapture,
+  dotSize,
   sx
 }: GreenhouseThinkingBeatProps) => {
   const reduced = useReducedMotion()
   const variantConfig = resolveGreenhouseThinkingBeatVariant(variant)
   const kindConfig = resolveGreenhouseThinkingBeatKind(kind)
   const resolvedAriaLabel = ariaLabel ?? kindConfig.ariaLabel
+  const resolvedDotSize = dotSize ?? variantConfig.dotSize
 
   return (
     <Box
@@ -104,8 +108,8 @@ const GreenhouseThinkingBeat = ({
 
             return {
               display: 'block',
-              inlineSize: variantConfig.dotSize,
-              blockSize: variantConfig.dotSize,
+              inlineSize: resolvedDotSize,
+              blockSize: resolvedDotSize,
               borderRadius: '50%',
               backgroundColor: colors[dot],
               opacity: active ? 0.45 : 0.28,

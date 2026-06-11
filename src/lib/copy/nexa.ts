@@ -213,6 +213,27 @@ export const GH_NEXA = {
   list_card_aria_label: (metric: string, severity: string) =>
     `Observación de ${metric}, severidad ${severity.toLowerCase()}. Haz clic para ver causa raíz.`,
   list_card_scope_template: (space: string, metric: string) => `${space} · ${metric}`,
+  // TASK-1075 follow-up — el block (Home / Mi Performance) ya expone la causa raíz
+  // inline (colapsable). Su drill por-insight abre el análisis completo en Nexa
+  // (/nexa/insights/[id]) → etiqueta distinta para no chocar con "Ver causa raíz".
+  insights_open_detail_cta: 'Abrir en Nexa',
+  insights_open_detail_aria: (metric: string, severity: string) =>
+    `Abrir el análisis completo de ${metric} en Nexa, severidad ${severity.toLowerCase()}.`,
+
+  // Progressive disclosure del feed embebido (cap + "Ver más" in-place).
+  // El bloque es un resumen priorizado: muestra las primeras N y revela el
+  // resto sin sacar al usuario de la vista. El footer "Ver todos" sigue yendo
+  // al full list page /nexa/insights (paginación numerada vive allá).
+  insights_show_more: (remaining: number) =>
+    `Ver ${remaining} ${remaining === 1 ? 'observación más' : 'observaciones más'}`,
+  insights_show_less: 'Ver menos',
+  insights_show_more_aria: (remaining: number, total: number) =>
+    `Mostrar ${remaining} observaciones más de un total de ${total}.`,
+  insights_show_less_aria: 'Mostrar menos observaciones.',
+
+  // Disclosure del panel Nexa (el Nexa Mark morfa como toggle).
+  insights_collapse_aria: 'Contraer el panel de Nexa Insights',
+  insights_expand_aria: 'Expandir el panel de Nexa Insights',
 
   // Degraded banner (honest, accionable, escalation a /admin/ops-health)
   list_degraded_title: 'No pudimos cargar las observaciones',
@@ -227,5 +248,85 @@ export const GH_NEXA = {
   home_bento_menu_configure: 'Configurar análisis',
   home_bento_last_analysis: (count: number, label: string) =>
     `${count} ${count === 1 ? 'señal analizada' : 'señales analizadas'} · último análisis: ${label}`,
-  home_bento_view_all_cta: 'Ver todos los insights del mes'
+  home_bento_view_all_cta: 'Ver todos los insights del mes',
+
+  // ── Nexa agent panel (concept C redesign) — conversational header ──
+  agent_eyebrow: 'Nexa',
+  // Self-view (mentionSafeMode): Nexa speaks to the person (2nd person, es-CL tuteo).
+  agent_headline_self: 'Revisé tu período y resalté lo que más mueve tus resultados.',
+  // Observer/admin view: Nexa speaks about the member (3rd person).
+  agent_headline_observer: 'Revisé este período y resalté lo que más mueve los resultados.',
+  // Rotating headline — 30 paraphrases que ciclan en el header (Nexa "narrando").
+  // self = 2ª persona (tu/tus); observer = genérico (este/los). El índice 0 es el
+  // headline canónico (sin regresión). Se renderiza con el thinking-beat al final.
+  // `{name}` se reemplaza con el primer nombre del usuario en sesión (self lens);
+  // si no hay nombre, esas frases se filtran. Solo algunas lo usan (no todas).
+  agent_headline_rotation_self: [
+    'Revisé tu período y resalté lo que más mueve tus resultados.',
+    'Le di una vuelta a tus señales, {name}, y separé lo que de verdad importa.',
+    'Miré tu mes con lupa y te dejo arriba lo que cambia el resultado.',
+    'Hay una palanca clara este mes — te la dejo a mano.',
+    'Crucé tus números y encontré dónde está el verdadero foco.',
+    'Leí todo tu período; esto es lo que yo miraría primero.',
+    'Tu mes tiene una historia, {name}, y acá está el titular.',
+    'Ordené el ruido y dejé solo lo que vale la pena accionar.',
+    'Pasé por cada señal y prioricé la que mueve la aguja.',
+    'Esto es lo que más pesa en tu mes — sin vueltas.',
+    'Te resumo el período en una palanca concreta.',
+    'Revisé tu avance y marqué dónde conviene poner energía.',
+    '{name}, tu calidad de primera entrega es la protagonista del mes.',
+    'Miré la tendencia y te muestro qué la está moviendo.',
+    'Separé lo urgente de lo accesorio; esto es lo urgente.',
+    'Acá está el dato que cambia cómo cerrás el mes.',
+    'Repasé tus métricas clave y subrayé la que más rinde.',
+    'Tu período en una frase: esto es lo que importa ahora.',
+    'Encontré un patrón en tus señales que vale tu atención.',
+    '{name}, si miras una sola cosa hoy, que sea esta.',
+    'Dejé arriba lo que más impacto tiene en tu resultado.',
+    'Crucé tu desempeño y te muestro dónde ganás más.',
+    'Lo bueno y lo mejorable de tu mes, sin rodeos.',
+    'Prioricé por impacto: esto primero, el resto después.',
+    'Tu mes tiene foco — te lo dejo claro acá.',
+    'Revisé las señales recientes y destaqué la decisiva.',
+    '{name}, acá está la palanca con más retorno este mes.',
+    'Miré tus resultados y ordené qué atacar ya.',
+    'Esto movería tu número si lo trabajás hoy.',
+    'Repasé tus datos y resalté lo que de verdad cambia tu mes.'
+  ] as string[],
+  agent_headline_rotation_observer: [
+    'Revisé este período y resalté lo que más mueve los resultados.',
+    'Le di una vuelta a las señales y separé lo que de verdad importa.',
+    'Miré el mes con lupa y dejo arriba lo que cambia el resultado.',
+    'Hay una palanca clara este mes — la dejo a mano.',
+    'Crucé los números y encontré dónde está el verdadero foco.',
+    'Leí todo el período; esto es lo que miraría primero.',
+    'El mes tiene una historia, y acá está el titular.',
+    'Ordené el ruido y dejé solo lo que vale la pena accionar.',
+    'Pasé por cada señal y prioricé la que mueve la aguja.',
+    'Esto es lo que más pesa en el mes — sin vueltas.',
+    'Resumo el período en una palanca concreta.',
+    'Revisé el avance y marqué dónde conviene poner energía.',
+    'La calidad de primera entrega es la protagonista del mes.',
+    'Miré la tendencia y muestro qué la está moviendo.',
+    'Separé lo urgente de lo accesorio; esto es lo urgente.',
+    'Acá está el dato que cambia cómo cierra el mes.',
+    'Repasé las métricas clave y subrayé la que más rinde.',
+    'El período en una frase: esto es lo que importa ahora.',
+    'Encontré un patrón en las señales que vale la atención.',
+    'Si hay una sola cosa para mirar hoy, es esta.',
+    'Dejé arriba lo que más impacto tiene en el resultado.',
+    'Crucé el desempeño y muestro dónde se gana más.',
+    'Lo bueno y lo mejorable del mes, sin rodeos.',
+    'Prioricé por impacto: esto primero, el resto después.',
+    'El mes tiene foco — lo dejo claro acá.',
+    'Revisé las señales recientes y destaqué la decisiva.',
+    'Acá está la palanca con más retorno este mes.',
+    'Miré los resultados y ordené qué atacar ya.',
+    'Esto movería el número si se trabaja hoy.',
+    'Repasé los datos y resalté lo que de verdad cambia el mes.'
+  ] as string[],
+  agent_summary: (analyzed: number, actions: number) =>
+    `${analyzed} ${analyzed === 1 ? 'señal analizada' : 'señales analizadas'} · ${actions} con acción sugerida`,
+  agent_working: 'Nexa está analizando tu desempeño',
+  agent_footer: 'Nexa aprende de tus datos para darte mejores insights cada día'
 } as const

@@ -39,6 +39,7 @@ const DESIGN_SYSTEM_ROUTE_LABELS = {
   [`${DESIGN_SYSTEM_ROUTE}/mockup/brand-color-system`]: 'Brand Color System',
   [`${DESIGN_SYSTEM_ROUTE}/motion`]: 'Motion',
   [`${DESIGN_SYSTEM_ROUTE}/nexa-brand`]: 'Nexa Brand',
+  [`${DESIGN_SYSTEM_ROUTE}/nexa-insights`]: 'Nexa Insights',
   [`${DESIGN_SYSTEM_ROUTE}/talent-profile`]: 'Talent Profile',
   [`${DESIGN_SYSTEM_ROUTE}/typography`]: 'Typography',
   [`${DESIGN_SYSTEM_ROUTE}/typography/mockup`]: 'Typography Mockup',

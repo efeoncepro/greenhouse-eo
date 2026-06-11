@@ -1,3 +1,70 @@
+# Sesion 2026-06-10 — EPIC-018 / TASK-1075: RESUME POINT (build editorial brief en curso)
+
+> **CHECKPOINT por inestabilidad de la API Claude (rate limit + clasificador Bash caído).** Estado exacto para retomar sin perder trabajo.
+
+## Dónde quedó el trabajo (TASK-1075, in-progress)
+
+**Decisión de diseño vigente (NO recapturar):** se descartó el primer mockup (card-grid A+C) por feedback del operador ("card sobre card, no enterprise, no accionable"). Loop nuevo de conceptos v2 (`.captures/concepts/v2-{a,b,c}-*.png`, gitignored). Operador eligió **concepto A — editorial brief**. Reencuadre crítico del operador: la vista es del **COLABORADOR**, NO del cliente → la cadena causal ICO va en lens colaborador (**calidad → tu ritmo → tu foco**), NUNCA "Revenue Enabled / ganaste más" (eso es el pitch comercial / Space-Agency-cliente). Copy **es-CL tuteo**, CERO voseo argentino (el operador cazó "reforzá/alineá/controlás" — ya corregidos).
+
+**Superficie:** ruta mockup nueva `/my/performance/mockup/enterprise` (NO pisa el mockup TASK-1027 existente). Archivos:
+- `src/app/(dashboard)/my/performance/mockup/enterprise/page.tsx`
+- `src/views/greenhouse/my/performance/mockup/enterprise/MyPerformanceEnterpriseMockupView.tsx`
+- `src/views/greenhouse/my/performance/mockup/enterprise/data.ts`
+
+**Layout concepto A (implementado):** una superficie plana (1 Card, hairline `<Divider>` entre secciones, **cero card-on-card**) con: header (eyebrow + member + toggle período Mayo cerrado/Junio en curso + score 78/100) → headline editorial dominante (h2, verdicto) → banda **cadena causal** (3 nodos lens colaborador: "Lo que controlas" FTR / "Tu ritmo" retrabajo / "Tu foco ahora" acción, con flechas) → **chart hero Recharts** (área FTR con cliff May 95→44.6, gridlines, ReferenceLine meta 80, ReferenceDot rojo en el cliff) → fila Nexa (Nexa Mark REAL `GreenhouseNexaAnimatedMark` + narrativa 2ª persona + chip acción) → **ribbon plano** de las otras 5 métricas (OTD/RpA/Throughput/Cycle/Stuck, sparklines Apex, hairline dividers, NO cards) → footer.
+
+## ⚠️ ESTADO GIT (importante — recuperar antes de seguir)
+
+- **Remoto `develop` (último push exitoso): commit `75aefddea`** = todavía el mockup VIEJO card-grid A+C. El rediseño editorial NO está en remoto.
+- **Local HEAD = un commit "feat: editorial brief A rebuild" que NO se pusheó** (el pre-push `pnpm local:check` falló por 1 error tsc: el `formatter` del RechartsTooltip). Ese commit tiene el bug tsc en su snapshot.
+- **Working tree (sin commitear) tiene los fixes encima:** (1) formatter tsc corregido (`formatter={value => [...] as [string,string]}`) → **tsc ahora 0 errores (verificado)**; (2) voseo "controlás"→"controlas" en data.ts; (3) chart text: removidos los `<Label>` de adentro del SVG + removido el import `Label` + agregado `data-capture='hero-chart'`.
+- **Para recuperar:** commitear el working tree (mejor `git commit --amend` o un commit nuevo encima) y **push** — el tsc ya pasa, debería pushear bien.
+
+## EXACTAMENTE dónde me quedé (siguiente micro-paso)
+
+Arreglando **"los textos del chart se ven mal"** (feedback operador). Causa: el wrapper `AppRecharts` fuerza `caption` 13px por CSS `!important` a TODO el texto SVG (TASK-1041), así que los labels de anotación Recharts perdían tamaño/peso y el callout del cliff se cortaba en el borde derecho. **Fix en curso:** saqué el texto de adentro del SVG (ya removí los `<Label>`). **FALTA terminar:** (a) poner "Meta ≥ 80%" como indicador HTML en el header del chart + una leyenda (dot verde punteado); (b) agregar un **caption HTML limpio bajo el chart** con el quiebre ("El quiebre de mayo: −50.6 pts vs abril — más piezas volvieron con cambios."), tipografía controlada; (c) re-lint + GVC `clipSelector='[data-capture="hero-chart"]'` (resize con `sips -Z 1500` porque el clip retina excede 2000px y la API lo rechaza) → mirar → iterar.
+
+## Pendientes del loop (autocrítica vs v2-a, para enterprise-grade)
+
+- Terminar el fix de textos del chart (arriba).
+- Verificar **mobile** del editorial brief (última verificación fue desktop).
+- Evaluar headline a h1 (32px) si se quiere más dominante (hoy h2/24).
+- Considerar consolidar a UNA librería de charts en el view (hoy hero=Recharts + ribbon-sparklines=Apex; OK para mockup, consolidar en runtime). echarts NO está instalado (CLAUDE.md "ECharts no se usa hoy") — agregarlo sería decisión de dep aparte.
+- Tras aprobación visual: promover hero-score/cadena-causal/KPI-story/ribbon a **primitives del registry** (Primitive+Variants+Kinds) + cutover runtime flag-gated (resto de TASK-1075) + TASK-1076 (Agency/Space/Person 360, con el boundary de lens por audiencia).
+
+## Boundary canónico a fijar (anotado, aún no en CLAUDE.md)
+
+Mismas métricas ICO, **el lens narrativo cambia por audiencia**: colaborador (`/my/performance`, craft/desarrollo, 2ª persona) ≠ manager (Person 360, coaching, 3ª persona observer) ≠ cliente (Space/Agency/portal, Revenue Enabled comercial). El nivel 3 de la cadena causal NUNCA es "revenue" en la vista del colaborador.
+
+---
+
+# Sesion 2026-06-10 — EPIC-018: Performance Dashboard Storytelling (diseño + concepto elegido)
+
+**Auditoría enterprise de `/my/performance` (Mi Desempeño) + arranque del rediseño cross-surface.** Disparado por feedback del operador ("se ve terrible, poco moderna; modernizar nivel enterprise, gráficos impactantes, data storytelling"). GVC real entrando como `daniela.ferreira@efeonce.org` (junio 2026, estado degradado, desktop+mobile fullPage) + skills `greenhouse-ui-orchestrator`/`-enterprise-review`/`modern-ui`/`dataviz-design`/`state-design`/`greenhouse-ux`/`modern-web-guidance`/`product-design-loop`/`greenhouse-ux-writing`/`greenhouse-ico`/`arch-architect`.
+
+- **Veredicto:** BLOCK, rubric ~2.0/5. 3 causas raíz **estructurales** (no cosméticas): (1) cero data storytelling — números sin contexto; (2) modelo temporal incoherente que engaña — KPI cards muestran junio en curso (OTD 5%) y los trends justo debajo muestran mayo cerrado (OTD 100%) sin rótulo; (3) madurez visual template plano 2018.
+- **Backlog creado (commit `c9595ea77`):** **EPIC-018** (Performance Dashboard Storytelling Platform) + **TASK-1075** (foundation: primitives reusables + piloto `/my/performance`; depende TASK-1073 + TASK-1074) + **TASK-1076** (adopción hermana Agency ICO / Space 360 / Person 360, consume sin fork; Person 360 = voz observer). Estructura foundation→adoption.
+- **Tasks satélite previas (`a9f3d62c5`, `97431853a`):** **TASK-1073** (Nexa self-view 2ª persona) + **TASK-1074** (RpA "—" microcopy honesto — verificado contra BQ: suprimido en junio porque las 28 tareas cerradas tienen `rpa_value=0`/"✅ 0" = 0 correcciones; nada roto).
+- **product-design-loop:** Fase 1 (3 conceptos IA en `.captures/concepts/concept-{a,b,c}-*.png`, gitignored) → Fase 2 cerrada: operador eligió **mix A+C** (split-temporal mes-cerrado|en-curso + score-hero por lane + insight Nexa narrativo arriba). Registrado en TASK-1075 Detailed Spec.
+- **TASK-1075 → in-progress.** Próximo: Fase 3 (build mockup tokenizado `/my/performance/mockup` + GVC loop) bajo Figma Implementation Contract.
+- **Nota:** TASK-1027 (`/my/performance`) ya shipeó en el release `e8705157e` de hoy — el view actual ES esa superficie; TASK-1075 la moderniza.
+
+---
+
+# Sesion 2026-06-10 — RELEASE develop→main `e8705157e` (RELEASED)
+
+**Release a producción completado y verificado.** Manifest `released`, orchestrator run `27293405799` = success.
+
+- **SHA released:** `e8705157ed07282a4f839d2753379312eb4c3643` (merge `release: develop→main 2026-06-10` desde develop `10e378e73`, árbol byte-idéntico a develop). Remote main = `e8705157e`. `release_id` = `e8705157ed07-b7d1a77e-c5c1-4a15-b63f-7f9becfa2cd9`.
+- **Bundle (44 commits acumulados desde el release 2026-06-09):** TASK-1072 (rol `designer` + Figma node linking AXIS data-driven: SSOT `design_system_figma_nodes` + capability `design_system.figma_node.link` + render real del nodo Figma + 6 migraciones, ya aplicadas al Cloud SQL compartido) · TASK-1027 (/my/performance self-service dashboard + ISSUE-091 PII leak fix) · TASK-1070 (Design System fuera de Admin → `/design-system`, viewCode `plataforma.design_system`, acceso `collaborator`) · Nexa animated mark primitives · CLI canónica `pnpm ai:image` (gpt-image-2) · Disclosure + funnel pattern primitives · fix CI `test:results` pipefail (e1f676bbf — cierra el masking que el release previo dejó como follow-up abierto).
+- **Orchestrator:** preflight ✅ (con `bypass_preflight_reason` por `release_batch_policy=requires_break_glass` — bundle toca migraciones/identity; override auditado canónico que dispara `--override-batch-policy --bypass-preflight-warnings`, Lesson 3) → manifest started ✅ → Wait Vercel READY ✅ (match exacto del target_sha) → 2 approval gates (workers + Azure) aprobados vía `gh api` ✅ → 4 workers Cloud Run + Azure (skip Bicep, sin diff `infra/azure/**`) ✅ → post-release health ✅ → manifest → **released** ✅.
+- **Cloud Run GIT_SHA (los 4):** `e8705157e` — match perfecto, cero drift. ops-worker `00340-cxn` · commercial-cost-worker `00257-cmf` · ico-batch-worker `00158-87h` · hubspot-integration `00086-88g`.
+- **Watchdog:** `pnpm release:watchdog` → **Aggregate OK, exit 0**. Los 3 signals salieron `unknown` por falta de `GITHUB_RELEASE_OBSERVER_TOKEN` local (degradación honesta, no falla); el único load-bearing — `worker_revision_drift` — verificado autoritativamente vía `gcloud` (los 4 workers en el SHA exacto = 0 drift).
+- **Vercel prod READY** (`greenhouse-3upi6zg0i`) + `greenhouse.efeoncepro.com` `/api/auth/health` **HTTP 200 overallStatus=ready** (azure-ad/google/credentials ready, nextAuthSecretReady=true).
+- **Pre-release verde:** CI verde en HEAD `10e378e73` · pre-push hook (lint+tsc) verde · 0 migraciones pendientes (Cloud SQL compartido) · pg:doctor verde · cero hotfixes perdidos en main (21 únicos = merge commits) · merge byte-idéntico a develop.
+
+---
+
 # Sesion 2026-06-10 — TASK-1072: rol `designer` + Figma node linking data-driven (COMPLETE en develop)
 
 El operador pidió implementar TASK-1072 quedándose en `develop` (sin push remoto) y luego: dar el rol `designer` (además de `collaborator`) a Daniela Ferreira, Andrés Carlosama y Melkin Hernández sin quitarle a Daniela sus otros roles; y resolver de forma robusta (no parche) el drift de parity catalog⇆registry.

@@ -31,7 +31,8 @@ Registro canónico de asignación de IDs `EPIC-###` para evitar colisiones y ren
 | `EPIC-015` | `to-do` | `docs/epics/to-do/EPIC-015-client-portal-domain-consolidation.md` |
 | `EPIC-016` | `to-do` | `docs/epics/to-do/EPIC-016-revenue-first-sequencing-program.md` |
 | `EPIC-017` | `to-do` | `docs/epics/to-do/EPIC-017-unified-workforce-foundation-iterative-program.md` |
+| `EPIC-018` | `to-do` | `docs/epics/to-do/EPIC-018-performance-dashboard-storytelling-platform.md` |
 
 ## Siguiente ID disponible
 
-- `EPIC-018`
+- `EPIC-019`

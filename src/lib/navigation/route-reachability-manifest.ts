@@ -132,6 +132,13 @@ export const DECLARED_CHILD_ROUTES: readonly ChildRouteDeclaration[] = [
       'Disclosure Lab (TASK-1072) — child surface del Design System para GreenhouseDisclosureTrigger (+ rotatorio) y GreenhouseAnchoredDisclosure; alcanzable desde el catalogo canonico /design-system.'
   },
   {
+    route: '/design-system/nexa-insights',
+    parent: '/design-system',
+    via: 'inline-link',
+    reason:
+      'Nexa Insights Lab (TASK-1075 follow-up) — child surface del Design System para el patron compuesto NexaInsightsBlock (disclosure morph, rotating headline + thinking beat, segmented control, insight rows); alcanzable desde el catalogo canonico /design-system.'
+  },
+  {
     route: '/design-system/loaders',
     parent: '/design-system',
     via: 'inline-link',
