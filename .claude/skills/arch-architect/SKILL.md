@@ -29,6 +29,7 @@ This overlay pins the Greenhouse decisions so the global skill's "boring tech pr
 - **`docs/architecture/GREENHOUSE_RELIABILITY_CONTROL_PLANE_V1.md`** — reliability registry.
 - **`docs/architecture/GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md`** + Platform Health V1.
 - **`docs/architecture/GREENHOUSE_AUTH_RESILIENCE_V1.md`** — TASK-742 7-layer defense template.
+- **`docs/architecture/GREENHOUSE_FULL_API_PARITY_DECISION_V1.md`** — Full API parity (UI is a client of governed contracts; Duncan Lennox / HubSpot principle). See pinned decision #16.
 
 ## Pinned decisions (OVERRIDES global arch-architect)
 
@@ -157,6 +158,19 @@ Any architecture spec from this skill that requires implementation creates a TAS
 
 `redactErrorForResponse` and `redactSensitive` from `src/lib/observability/redact.ts` for any error / response that crosses a security boundary. NEVER raw `error.message` or `error.stack` in HTTP responses.
 
+### 16. Full API Parity — the UI is a client, not the source of truth
+
+Canonical Greenhouse decision (`GREENHOUSE_FULL_API_PARITY_DECISION_V1.md`, CLAUDE.md §"Full API Parity Principle"). Operating principle adopted from **Duncan Lennox (HubSpot)**: *everything doable inside the product must be doable — or have a planned path to be doable — through a governed programmatic contract.* The UI is **not** the source of truth of a capability; it is a client of server-side commands, readers, projections and API contracts.
+
+When designing any capability, this skill must:
+
+- **Model the aggregate / command / reader FIRST, the UI second.** Never put business logic (state changes, permissions, approvals, exports, recoveries, reports, config) inside a UI component if it affects state. Extract the canonical primitive into `src/lib/**` and expose it through a contract.
+- **Never design endpoints that are "remote click handlers"** coupled to a visible component. Model the resource/command and its stable contract — the same reader/command serves the UI, Nexa, MCP, CLI/runbooks and ecosystem consumers (this is the SSOT-reader pattern: one reader, many surfaces).
+- **Declare the programmatic path** for every new visible action: internal Product API, `api/platform/app/*`, `api/platform/ecosystem/*`, MCP downstream, or an explicit follow-up task if deferred. "UI-only for now" is acceptable only with a documented planned path.
+- **Read endpoints model `resource`/`search`, not visual handlers.** Write endpoints get command semantics + tenant-safe authz + audit/outbox + idempotency + sanitized errors.
+
+This composes with #5 (read vs write separation): the read API serves shape+latency for many clients; the write command serves correctness+audit. Source: `GREENHOUSE_FULL_API_PARITY_DECISION_V1.md` + `GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md`.
+
 ## Greenhouse-canonical patterns inventory
 
 When designing in this repo, the 3-most-relevant-patterns step (from the global skill's investigation protocol) starts with this set:
@@ -178,6 +192,7 @@ When designing in this repo, the 3-most-relevant-patterns step (from the global 
 ## Hard rules (Greenhouse-specific)
 
 - **NEVER** create a parallel identity for a 360 object.
+- **NEVER** put a business capability (state change, permission, approval, export, recovery, report, config) only inside a UI component — extract the canonical command/reader in `src/lib/**` and expose a governed contract first (Full API parity, decision #16). The UI is a client, never the source of truth.
 - **NEVER** read or write canonical aggregations (FX, settlement, P&L, ICO) outside their canonical VIEW + helper.
 - **NEVER** put async-critical work on Vercel cron. Use Cloud Scheduler + ops-worker.
 - **NEVER** ship a write surface without: capability + DB constraint + reliability signal + audit log.
