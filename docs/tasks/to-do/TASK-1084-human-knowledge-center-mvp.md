@@ -10,6 +10,24 @@ Naming/ruta/audiencia **cerrados por TASK-1080**:
 - Ruta de aprendizaje inicial: **"Operación Greenhouse — Primeros pasos"** (docs #1, #3, #6, #7, #9, #10 del corpus piloto; ver arquitectura Delta tabla C).
 - **Corpus ya ingerido (TASK-1082, 2026-06-11):** hay contenido real en `greenhouse_knowledge` en dev (11 docs publicados + 263 chunks) — el Knowledge Center se construye contra datos reales, no fixtures. Esta task SÍ siembra el viewCode `plataforma.knowledge` + la migración seed (gobernanza TASK-827) + la página `/knowledge`, que TASK-1081 difirió a aquí.
 
+## Delta 2026-06-11 — Full API Parity hardening (pre-execution)
+
+Revisado con arch-architect bajo el lente **Full API Parity** (decisión #16: la UI es cliente de un contrato gobernado, no la fuente de verdad). El Knowledge Center es el *consumidor* de la API de TASK-1083 — debe nacer como cliente estricto del contrato, **nunca** tocar `knowledge_chunks`/`knowledge_documents` directo ni llamar al `store` server-only desde una ruta ad-hoc. 5 ajustes:
+
+1. **Secuencia / dependencia dura.** El *shell* (ruta `/knowledge`, nav, view, copy, scaffolding de learning paths, estados empty/degraded) puede construirse ya, pero **tipado contra `knowledge-search.v1`** (TASK-1083), no contra las tablas. El *wireo de datos reales* (browse/search/read/feedback) queda **bloqueado por TASK-1083** — no se mergea consumiendo tablas directo "mientras tanto". `Blocked by` pasa a `TASK-1081, TASK-1083`.
+
+2. **La UI NO toca el corpus directo (Full API Parity #2).** Las operaciones consumen contratos, no SQL ni el `store`:
+   - browse/list → `GET /api/platform/app/knowledge/documents` (TASK-1083 #1)
+   - search → contrato `knowledge-search.v1`, **modo humano** (TASK-1083 #2)
+   - feedback → `POST /api/platform/app/knowledge/feedback` (TASK-1083 #5), con el **enum canónico de `knowledge_feedback`** (TASK-1081 CHECK), nunca un kind inventado en JSX
+   - La lint rule `greenhouse/no-direct-knowledge-chunk-query` (TASK-1083 #2) cubre también `src/views/greenhouse/knowledge/**`.
+
+3. **Gap real — endpoint de read-detail.** "browse/search/read" no tiene contrato para *leer el documento publicado completo* (search devuelve chunks; browse devuelve lista). Falta `GET /api/platform/app/knowledge/documents/[id]` (versión publicada vigente + metadata, access-filtered server-side). **Pertenece al reader SSOT de TASK-1083** (ahí viven todos los query paths) → se declara como dependencia; NO se improvisa una query de detalle dentro de la view.
+
+4. **viewCode seed governance como criterio duro (TASK-827).** Sembrar `plataforma.knowledge` en `VIEW_REGISTRY` (TS) **y** la migración seed en el MISMO PR, + ruta alcanzable por nav (TASK-982). Sube de prosa a Acceptance Criteria.
+
+5. **Reader lane-agnóstico (Full API Parity #4).** La UI es lane `app` (interno): pasa el `subject` de sesión al contrato y el filtrado por audiencia/sensibilidad/`agentic_policy` lo hace el server (anti-tamper). El redirect defensivo `tenantType==='client'` se mantiene como segunda capa, no como el control primario.
+
 <!-- ZONE 0 — IDENTITY & TRIAGE -->
 
 ## Status
@@ -23,7 +41,7 @@ Naming/ruta/audiencia **cerrados por TASK-1080**:
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `platform|content|ui|identity`
-- Blocked by: `TASK-1081`
+- Blocked by: `TASK-1081, TASK-1083`
 - Branch: `task/TASK-1084-human-knowledge-center`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -72,8 +90,8 @@ Reglas obligatorias:
 
 ### Depends on
 
-- `TASK-1081` para documentos/versiones.
-- `TASK-1083` si la búsqueda humana consume el mismo search API.
+- `TASK-1081` para documentos/versiones (shell tipado contra el contrato).
+- `TASK-1083` para **todo** query path real (browse, search, read-detail, feedback). No es condicional: la UI consume el contrato `knowledge-search.v1` + endpoints, nunca las tablas (Full API Parity #2).
 
 ### Blocks / Impacts
 
@@ -108,7 +126,7 @@ Reglas obligatorias:
 ### Slice 1 — Internal browse/search/read
 
 - Route interna decidida por `TASK-1080`.
-- Listado/search, filtros por tipo/ruta/audience/status y vista detalle.
+- Listado/search, filtros por tipo/ruta/audience/status y vista detalle — **todo vía los endpoints/contrato de TASK-1083** (browse `GET …/documents`, search `knowledge-search.v1` modo humano, read-detail `GET …/documents/[id]`). Cero acceso directo a `knowledge_chunks`/`knowledge_documents` desde la view.
 - Metadata visible: owner, last reviewed, freshness, source, status.
 
 ### Slice 2 — Learning paths + contextual help hooks
@@ -119,8 +137,8 @@ Reglas obligatorias:
 
 ### Slice 3 — Human feedback
 
-- Feedback `useful`, `not_useful`, `stale`, `missing_doc`, `wrong_source`.
-- Persistir feedback en `knowledge_feedback` o helper de `TASK-1081`.
+- Feedback `useful`, `not_useful`, `stale`, `missing_doc`, `wrong_source` (enum canónico del CHECK de `knowledge_feedback`, TASK-1081 — no inventar kinds).
+- Persistir vía el contrato compartido `POST /api/platform/app/knowledge/feedback` (TASK-1083 #5), NO con una ruta ad-hoc que llame al `store` server-only ni con SQL directo.
 
 ## Out of Scope
 
@@ -171,9 +189,11 @@ Usar composición enterprise densa y escaneable. La primera pantalla debe ser el
 ## Acceptance Criteria
 
 - [ ] Surface interna permite browse/search/read de docs publicados.
+- [ ] **La UI consume SOLO los endpoints/contrato de TASK-1083** (browse + `knowledge-search.v1` modo humano + read-detail + feedback); cero query directa a `knowledge_chunks`/`knowledge_documents` (Full API Parity #2; lint rule activa cubre `src/views/greenhouse/knowledge/**`).
 - [ ] Status, source, owner, last reviewed y freshness son visibles.
 - [ ] Rutas de aprendizaje iniciales existen.
-- [ ] Feedback humano queda persistido o trazado.
+- [ ] Feedback humano queda persistido vía `POST …/knowledge/feedback` con el enum canónico de `knowledge_feedback`.
+- [ ] viewCode `plataforma.knowledge` sembrado en `VIEW_REGISTRY` (TS) **+ migración seed en el mismo PR** (gobernanza TASK-827) **+ ruta alcanzable por nav** (TASK-982).
 - [ ] GVC desktop/mobile revisado.
 - [ ] Documentación funcional y manual de uso quedan actualizadas.
 
