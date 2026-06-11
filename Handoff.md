@@ -1,5 +1,17 @@
 # Release 2026-06-10 #2 — develop→main `6c649b2a6` RELEASED
 
+## Sesion 2026-06-11 — Knowledge Platform acceptance cerrada (TASK-1080)
+
+- **TASK-1080 `complete`** (policy / decision-closure, con overlay `arch-architect`). Convierte el ADR Knowledge Platform de `Proposed` → **`Accepted (direction) — runtime gated per task`**.
+- Decisiones del operador (AskUserQuestion): surface **Knowledge** `/knowledge`; audiencia **solo interno**; ADR aceptado en dirección con runtime gated por task.
+- Taxonomía piloto fijada en `GREENHOUSE_KNOWLEDGE_PLATFORM_ARCHITECTURE_V1.md` → `## Delta 2026-06-11` (tablas A-G): capabilities `knowledge.*`, estados ortogonales `publication_status` × `agentic_policy`, corpus piloto (14 docs internos), approvers por dominio (`ROLE_CODES` reales), búsqueda full-text + metadata, rollout, disposición de las 12 Open Questions §18.
+- **Ajuste arquitectónico introducido:** se separó `agent_excluded` del enum de lifecycle → dos dimensiones ortogonales (`publication_status` vs `agentic_policy`). TASK-1081 lo materializa como dos columnas.
+- **Desbloquea TASK-1081..1086.** Cada una conserva su gate propio (flags default false, migraciones, aprobación de dominio). Esta aceptación NO autoriza ingesta masiva ni levanta esos gates.
+- Próximo paso ejecutable: **TASK-1081** (schema `greenhouse_knowledge` + source registry + capabilities + grants en `runtime.ts` mismo PR).
+- Docs tocados: ADR + arquitectura + `DECISIONS_INDEX` + `docs/tasks/README.md` + `changelog.md`. Sin runtime/migración/código.
+
+---
+
 ## Sesion 2026-06-11 — Knowledge Platform tasks creadas
 
 - Se creó la primera ola compacta de tasks ejecutables para Knowledge Platform:

@@ -1,7 +1,7 @@
 # Greenhouse Knowledge Platform Architecture V1
 
 > **Tipo de documento:** Architecture proposal
-> **Status:** `Draft / proposed`
+> **Status:** `Accepted (direction) — runtime gated per task` (desde 2026-06-11, TASK-1080; ver `## Delta 2026-06-11 — Acceptance (TASK-1080)`)
 > **Creado:** 2026-06-11
 > **Owner:** Platform / Nexa / Knowledge Operations
 > **Relacionado:** `GREENHOUSE_KNOWLEDGE_PLATFORM_DECISION_V1.md`, `GREENHOUSE_NEXA_ARCHITECTURE_V1.md`, `GREENHOUSE_MCP_ARCHITECTURE_V1.md`, `GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md`, `GREENHOUSE_STRUCTURED_CONTEXT_LAYER_V1.md`
@@ -778,3 +778,97 @@ Estos títulos se documentan para madurar el programa. **No existen archivos `TA
 - Notion MCP connection guide: https://developers.notion.com/guides/mcp/get-started-with-mcp
 - Notion data source query reference: https://developers.notion.com/reference/query-a-data-source
 - Notion data source object reference: https://developers.notion.com/reference/data-source
+
+## Delta 2026-06-11 — Acceptance (TASK-1080)
+
+El ADR pasó a `Accepted (direction) — runtime gated per task`. Esta Delta fija la taxonomía piloto ejecutable. Las **Open Questions** §18 que aquí se resuelven quedan respondidas; el resto sigue diferido con owner (ver ADR `## Acceptance Decision`).
+
+### A. Naming + acceso (resuelve §18 Q1, Q8)
+
+- Surface humana: **Knowledge**, ruta `/knowledge`. Schema `greenhouse_knowledge`, TS root `src/lib/knowledge/`, viewCode `plataforma.knowledge` (routeGroup `internal`, solo roles internos — nunca `client_*`).
+- Capabilities (módulo `knowledge`, granulares):
+
+  | Capability | Acción | Quién (grant inicial) |
+  | --- | --- | --- |
+  | `knowledge.document.read` | read | route groups internos + `efeonce_admin` |
+  | `knowledge.document.publish` | create/update | owner domain del doc + `efeonce_admin`; sensibles exigen approver de dominio |
+  | `knowledge.source.admin` | admin | `efeonce_admin` |
+  | `knowledge.agentic.retrieve` | execute | capability de sistema/agente (Nexa/MCP) |
+  | `knowledge.feedback.submit` | create | cualquier usuario interno autenticado |
+
+  Cada capability se siembra con grant en `runtime.ts` en el mismo PR que la crea (TASK-1081), bajo el guard `capability-grant-coverage.test.ts` (invariante TASK-873/935).
+
+### B. Dos dimensiones ortogonales de estado (corrige §8.4 + §15)
+
+`§8.4` listaba `agent_excluded` dentro del enum de lifecycle. Se separan (regla anti-enum-mixto):
+
+- `publication_status` (lifecycle): `draft | review | published | stale | deprecated`. `quarantined` = bloqueo alcanzable desde cualquier estado; gana sobre todo (invisible humanos **y** agentes).
+- `agentic_policy` (compuerta retrieval, ortogonal): `agent_allowed | agent_excluded`. `published + agent_excluded` = visible para humanos, fuera de Nexa/MCP.
+- `sensitivity`: `internal | restricted` en el MVP (`client_safe` diferido a fase cliente). `internal_only` deja de ser un "estado" y se expresa como `audience=internal`.
+
+### C. Corpus piloto MVP (resuelve §18 Q2, Q3, Q5, Q6) — 14 docs, internal-only
+
+Mapeado a documentación existente (la ingesta real es TASK-1082; algunos requieren un manual nuevo derivado de la fuente). Todos `audience=internal`, `sensitivity=internal` salvo donde se indica.
+
+| # | Documento | type | Fuente existente | owner_domain | approver | agentic_policy |
+| --- | --- | --- | --- | --- | --- | --- |
+| 1 | Qué es y cómo preguntar a Nexa | how_to | `documentation/plataforma/saludo-nexa-home.md` | platform/nexa | efeonce_admin | agent_allowed |
+| 2 | Cómo interpretar fuentes y citas en respuestas de Nexa | how_to | nuevo (deriva de esta arquitectura §12.4) | platform/nexa | efeonce_admin | agent_allowed |
+| 3 | Diferencia Efeonce / Greenhouse / Nexa | glossary | `context/03_ecosistema-producto.md`, `04_greenhouse-producto.md` | platform | efeonce_admin | agent_allowed |
+| 4 | Glosario ICO (RpA, OTD, FTR, Cycle Time, CSC) | glossary | `context/07_ico.md`, `06_glosario-metricas.md` | delivery | efeonce_operations | agent_allowed |
+| 5 | Motor ICO: métricas operativas | manual | `documentation/delivery/motor-ico-metricas-operativas.md` | delivery | efeonce_operations | agent_allowed |
+| 6 | Roles y acceso básicos en Greenhouse | manual | `documentation/identity/sistema-identidad-roles-acceso.md` | identity | efeonce_admin | agent_allowed |
+| 7 | Accesos rápidos (atajos) | how_to | `manual-de-uso/plataforma/accesos-rapidos.md` | platform | efeonce_admin | agent_allowed |
+| 8 | Conexión Notion de un cliente | runbook | `manual-de-uso/operations/notion-bq-sync-operacion.md` | operations | efeonce_operations | agent_allowed |
+| 9 | Reliability Control Plane: leer `/admin/operations` | manual | `documentation/plataforma/reliability-control-plane.md` | platform | efeonce_admin | agent_allowed |
+| 10 | Degradación honesta: cómo leer estados degradados | policy | `documentation/plataforma/reliability-control-plane.md` (deriva) | platform | efeonce_admin | agent_allowed |
+| 11 | Alta de cliente (onboarding) | how_to | `manual-de-uso/agency/alta-de-cliente.md` | commercial | efeonce_account | agent_allowed |
+| 12 | MCP Greenhouse read-only: cómo usarlo | manual | `manual-de-uso/plataforma/mcp-greenhouse-read-only.md` | platform | efeonce_admin | agent_allowed |
+| 13 | Períodos de nómina: cómo funcionan | manual | `manual-de-uso/hr/periodos-de-nomina.md` | payroll | hr_payroll | agent_allowed (¹) |
+| 14 | Política interna de secretos y acceso sensible | policy | `CLAUDE.md` §Secret Manager Hygiene (deriva, `sensitivity=restricted`) | security | efeonce_admin | **agent_excluded** (²) |
+
+- (¹) Toca payroll → `agent_allowed` solo tras revisión del approver `hr_payroll`/`hr_manager` (describe el flujo, no montos). Hasta esa firma nace `agent_excluded`.
+- (²) Ejercita la compuerta desde V1: visible para humanos internos, nunca retornado por `knowledge_search`/MCP. `restricted`.
+
+**Ruta de aprendizaje inicial** (una sola, no todo el portal): **"Operación Greenhouse — Primeros pasos"** = docs #1, #3, #6, #7, #9, #10 en secuencia.
+
+### D. Owners + approvers por dominio (resuelve §18 Q4)
+
+`ROLE_CODES` reales (no roles fantasma — invariante TASK-935):
+
+| owner_domain | approver_role | ¿sensible? (requiere firma de dominio antes de `agent_allowed`) |
+| --- | --- | --- |
+| platform / nexa | `efeonce_admin` | no |
+| delivery | `efeonce_operations` (+ `efeonce_admin`) | no |
+| identity / access | `efeonce_admin` | sí (access) |
+| security | `efeonce_admin` | sí |
+| commercial | `efeonce_account` (+ `efeonce_admin`) | no |
+| finance | `finance_admin` | sí |
+| payroll / hr | `hr_payroll` / `hr_manager` | sí |
+| legal | `efeonce_admin` + confirmación humana out-of-band (no existe rol `legal`) | sí |
+
+### E. Búsqueda inicial (resuelve §18 Q7)
+
+- V1: **full-text Postgres (FTS) + filtros fuertes por metadata** (`audience`, `sensitivity`, `publication_status`, `agentic_policy`, `owner_domain`). Postgres-first.
+- Embeddings/vector: **diferidos**, fase aditiva tras medir calidad/volumen en TASK-1083. Substrato (`pgvector` vs Vertex/BQ) no se elige aquí.
+
+### F. Secuencia de rollout
+
+`TASK-1080 (esta) → 1081 (schema + capabilities) → 1082 (ingesta Notion MVP) → 1083 (search API + golden questions) → 1084 (Human Center) ∥ 1085 (Nexa) ∥ 1086 (MCP)`. Cada task downstream conserva su `Out of Scope` y su gate propio (flags default false). Esta aceptación **no** levanta esos gates.
+
+### G. Open Questions §18 — disposición
+
+| §18 | Disposición |
+| --- | --- |
+| Q1 naming | Resuelto: **Knowledge** `/knowledge` |
+| Q2 corpus piloto | Resuelto: tabla C (14 docs) |
+| Q3 audiencia | Resuelto: **solo interno** |
+| Q4 approvers | Resuelto: tabla D |
+| Q5 humanos-only / fuera de Nexa | Resuelto: `agentic_policy=agent_excluded` (doc #14; #13 hasta firma) |
+| Q6 nacen `agent_excluded` | Resuelto: doc #14 (y #13 condicional) |
+| Q7 búsqueda inicial | Resuelto: full-text + metadata; vector diferido |
+| Q8 capabilities | Resuelto: tabla A |
+| Q9 versionado legal/finance/payroll | Diferido → TASK-1081/1082 (publish workflow) |
+| Q10 golden questions + approver | Diferido → TASK-1083 (por dominio del doc) |
+| Q11 feedback → tarea editorial vs retrieval | Diferido → TASK-1085 (feedback loop §12.7) |
+| Q12 link manuales `docs/manual-de-uso/` ↔ corpus | Resuelto en parte: tabla C los mapea; la ingesta canónica es TASK-1082 |

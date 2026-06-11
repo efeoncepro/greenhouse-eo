@@ -4,7 +4,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Bajo`
@@ -156,11 +156,19 @@ La salida debe ser una decisión pequeña pero ejecutable: una tabla de pilot co
 
 ## Acceptance Criteria
 
-- [ ] ADR/arquitectura declaran si la decisión queda `Accepted` o qué la bloquea.
-- [ ] Pilot corpus inicial y audience quedan documentados.
-- [ ] Estados editoriales y gates `agent_allowed`/`agent_excluded`/`quarantined` quedan definidos.
-- [ ] Capabilities/views iniciales quedan propuestas para implementación downstream.
-- [ ] `TASK-1081..1086` quedan desbloqueadas o con blockers explícitos.
+- [x] ADR/arquitectura declaran si la decisión queda `Accepted` o qué la bloquea. → `Accepted (direction) — runtime gated per task` (ADR `## Acceptance Decision`, arquitectura `## Delta 2026-06-11`).
+- [x] Pilot corpus inicial y audience quedan documentados. → 14 docs internal-only (arquitectura Delta tabla C); audience `internal`.
+- [x] Estados editoriales y gates `agent_allowed`/`agent_excluded`/`quarantined` quedan definidos. → dimensiones ortogonales `publication_status` × `agentic_policy` (D-3 / Delta B).
+- [x] Capabilities/views iniciales quedan propuestas para implementación downstream. → módulo `knowledge` + viewCode `plataforma.knowledge` (D-6 / Delta A).
+- [x] `TASK-1081..1086` quedan desbloqueadas o con blockers explícitos. → desbloqueadas; cada una conserva su gate propio (D-7 / Delta F).
+
+## Delta 2026-06-11 — Closed (decision-closure)
+
+Cerrada con overlay `arch-architect` + 3 decisiones del operador (AskUserQuestion): naming **Knowledge** `/knowledge`, audiencia **solo interno**, ADR **Accepted (direction) + runtime gated por task**.
+
+Ajuste introducido durante la ejecución (no estaba en el draft): se **separó el estado editorial en dos dimensiones ortogonales** (`publication_status` lifecycle vs `agentic_policy` retrieval gate), porque el draft mezclaba `agent_excluded` dentro del enum de lifecycle (viola la regla anti-enum-mixto del overlay). TASK-1081 materializa el schema con esas dos columnas.
+
+Entregables: ADR flip + `## Acceptance Decision`; arquitectura `## Delta 2026-06-11` (tablas A-G: capabilities, estados, corpus piloto, approvers, búsqueda, rollout, disposición de §18); `DECISIONS_INDEX` Proposed→Accepted. Sin runtime, sin migración, sin código (task `policy`).
 
 ## Verification
 
@@ -170,11 +178,11 @@ La salida debe ser una decisión pequeña pero ejecutable: una tabla de pilot co
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` sincronizado con carpeta.
-- [ ] `docs/tasks/README.md` actualizado.
-- [ ] `Handoff.md` actualizado con decisiones y próximos pasos.
-- [ ] `changelog.md` actualizado si cambia el contrato.
-- [ ] Chequeo cruzado sobre `TASK-1081..1086`.
+- [x] `Lifecycle` sincronizado con carpeta. → `complete` + archivo movido a `docs/tasks/complete/`.
+- [x] `docs/tasks/README.md` actualizado.
+- [x] `Handoff.md` actualizado con decisiones y próximos pasos.
+- [x] `changelog.md` actualizado si cambia el contrato.
+- [x] Chequeo cruzado sobre `TASK-1081..1086` → siguen `Blocked by: TASK-1080`; ahora **desbloqueadas** (dirección aceptada), cada una con su gate propio.
 
 ## Follow-ups
 
