@@ -9,6 +9,51 @@ Cerrado por **TASK-1080** (alineado, sin cambio estructural):
 - Golden questions: TASK-1080 difirió aquí el set final + su approver (por dominio del doc).
 - **Corpus ya ingerido (TASK-1082, 2026-06-11):** hay datos reales en `greenhouse_knowledge` en dev (11 docs publicados + 263 chunks, `periodos-de-nomina` `agent_excluded`). El connector/pipeline de ingesta + el chunker (`chunkMarkdown`, heading_path + `citation_anchor`) existen — la search API consume estos chunks. El tsvector/GIN sigue siendo de esta task (se agrega sobre `knowledge_chunks.body_text`).
 
+## Delta 2026-06-11 — Pre-execution review (arch-architect)
+
+TASK-1081 (schema) **y** TASK-1082 (ingesta) están **completas** → esta task está **desbloqueada** y corre contra datos reales (no fixtures). Review contra la realidad materializada + patrones canónicos (CQRS-lite read API, SSOT reader, defense-in-depth, eval-driven AI). Ajustes:
+
+### A. Substrato full-text — DECISIÓN PINEADA (esta task lo posee)
+
+- **Columna generada + GIN** sobre `knowledge_chunks` vía migración (`pnpm migrate:create`): `body_tsv tsvector GENERATED ALWAYS AS (setweight(to_tsvector('spanish', coalesce(array_to_string(heading_path, ' '), '')), 'A') || setweight(to_tsvector('spanish', body_text), 'B')) STORED` + `CREATE INDEX ... USING GIN (body_tsv)`.
+  - **Weighted (heading A > body B):** un chunk cuyo encabezado matchea la query es más relevante; `ts_rank` lo premia. Patrón canónico de FTS de calidad.
+  - **Config `'spanish'`** (corpus es-CL dominante; el stemming da recall real: `periodos`↔`periodo`, `nóminas`↔`nómina`). Términos técnicos en inglés (RpA, OTD, paths) matchean como tokens casi-exactos (el stemmer ES los deja intactos). **Tunable** (la columna generada se puede ALTERar; `pg_trgm` para acrónimos si las golden questions muestran recall pobre). El substrato vector/embeddings es la escalación diferida (TASK-1080), no este MVP.
+- **`confidence`** se deriva de `ts_rank` (umbrales high/medium/low) + nº de resultados; **`confidence='none'` cuando 0 resultados** (fuerza el no-answer honesto). Resuelve el open question de "confidence básico".
+
+### B. UN reader SSOT, DOS modos de filtrado (el ajuste más importante)
+
+`searchKnowledge({ query, subject, mode })` es el **único** lugar que recupera; lo consumen el endpoint humano (1084), Nexa (1085) y MCP (1086). Las **dos dimensiones ortogonales** se enforzan según el modo:
+
+| modo | capability | `agent_excluded` | `quarantined` | `publication_status` |
+|---|---|---|---|---|
+| `human` | `knowledge.document.read` | **SÍ visible** (humanos los ven) | nunca | published/stale/deprecated |
+| `agentic` | `knowledge.agentic.retrieve` | **NUNCA** (excluido de Nexa/MCP) | nunca | published/stale (deprecated solo bajo pregunta explícita) |
+
+Ambos modos filtran SIEMPRE por `audience`/`sensitivity`/`tenant_type` **antes** del LLM/consumer (pre-LLM filtering en SQL, no post-hoc). Los chunks denegados nunca salen del reader (solo `deniedOrFilteredCount`). MVP solo interno: `audience='internal'`; `sensitivity='restricted'` no se retorna en modo agentic.
+
+### C. El packet mapea a columnas materializadas
+
+`KnowledgeRetrievalPacket` (arch §12.3) se construye desde el schema real: `text`=`body_text`; `headingPath`=`heading_path[]`; `citationLabel` desde `heading_path` + `citation_anchor`; `humanUrl`=`knowledge_documents.human_url` + `#${citation_anchor}`; `freshness`/`sensitivity`/`agenticPolicy` denormalizados en el chunk; `title`=`knowledge_documents.title`.
+
+### D. Corrección de signal (estaba mal ubicado)
+
+`knowledge.retrieval.low_citation_rate` mide **respuestas de Nexa** (cuántas citan) → **pertenece a TASK-1085**, no aquí (en 1083 todavía no hay "respuesta"). La **quality gate de esta task es el eval harness offline** (golden questions: fuente correcta/equivocada/no-answer/stale). Runtime signal de search en V1: no se requiere (opcional `knowledge.search.zero_result_rate` si se quiere observabilidad; YAGNI hasta tener tráfico).
+
+### E. Golden questions = fixtures TS versionadas
+
+El set de golden questions vive como **fixtures TS** en el repo (versionado, revisable, corre en CI), NO una tabla DB (YAGNI). Cada caso: `{ query, mode, expectedAnchors[], mustNotReturn[], expectNoAnswer? }`. El approver del set lo difirió TASK-1080 (por dominio del doc) — al menos cubrir los 11 docs ingeridos.
+
+### Files owned (adicional)
+
+- `migrations/*task-1083*knowledge-search*.sql` (columna `body_tsv` + GIN).
+
+### 4-pillar
+
+- **Safety:** pre-LLM filtering en SQL (chunks denegados nunca salen del reader); dos modos con capability distinta; agentic nunca retorna `agent_excluded`/`quarantined`/`restricted`; tests de scope. Read-only (sin write path).
+- **Robustness:** `confidence='none'` testeado (no-answer honesto); reader SSOT (cero recompute en consumers); columna generada = el tsvector no puede desincronizarse del body.
+- **Resilience:** eval harness como regresión (eval-driven); degradación honesta si el índice falta (`baseline`/error sanitizado, no falso 0).
+- **Scalability:** GIN sobre tsvector escala a miles de chunks; vector es escalación aditiva, no rework; full-text antes de comprometer un substrato vectorial sin medir.
+
 <!-- ZONE 0 — IDENTITY & TRIAGE -->
 
 ## Status
@@ -77,6 +122,7 @@ Reglas obligatorias:
 
 ### Files owned
 
+- `migrations/*task-1083*knowledge-search*.sql` (columna generada `body_tsv` + GIN sobre `knowledge_chunks`)
 - `src/lib/knowledge/search/**`
 - `src/app/api/platform/app/knowledge/search/route.ts`
 - `src/app/api/platform/app/knowledge/documents/**`
@@ -135,8 +181,8 @@ El response debe seguir el shape conceptual de `KnowledgeRetrievalPacket` docume
 
 | Riesgo | Sistema | Probabilidad | Mitigation | Signal de alerta |
 |---|---|---|---|---|
-| Retrieval cita fuente equivocada | nexa/content | medium | golden questions + expected citations | `knowledge.retrieval.low_citation_rate` |
-| Access leak en search | api/security | medium | pre-LLM filtering + tests de scopes | denied chunks en payload |
+| Retrieval cita fuente equivocada | nexa/content | medium | golden questions + expected citations (eval harness offline) | eval harness en rojo (`knowledge.retrieval.low_citation_rate` mide respuestas de Nexa → es de TASK-1085, ver Delta D) |
+| Access leak en search | api/security | medium | pre-LLM filtering en SQL + tests de scopes (modo human vs agentic, Delta B) | denied chunks en payload |
 
 ### Feature flags / cutover
 
