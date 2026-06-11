@@ -6,6 +6,27 @@
 
 ---
 
+## Delta 2026-06-11 — Nexa Insights pattern redesign + disclosure `nexaMark` + ThinkingBeat `dotSize` (TASK-1075 follow-up)
+
+Iteración de producto sobre el pattern compuesto `NexaInsightsBlock` (`src/components/greenhouse/`), con dos extensiones a primitives y registro en el Design System.
+
+**Primitives extendidas (aditivo, backward-safe):**
+
+- `GreenhouseDisclosureTrigger` gana la variante **`nexaMark`** + kind `expandNexaInsights`. En vez de rotar un ícono, el isotipo de Nexa **morfa** (framer-motion): cerrado = mark completo (arco + spark), abierto = el arco se desvanece y el spark planea al centro. El SVG hereda `currentColor` → el contrato idle-gris→hover-azul del primitive tiñe el morph gratis. Reduced-motion → swap instantáneo. Discriminador `morph: 'iconRotation' | 'nexaMark'` en el controller.
+- `GreenhouseThinkingBeat` gana el override opcional **`dotSize`** (px) para emparejar inline con texto más grande (ej. `body1`) sin escalar con transform.
+
+**`NexaInsightsBlock` (cambios de pattern):**
+
+- **Título** "Nexa Insights" (h3 usa `insights_title`, consistente con el estado non-ready).
+- **Panel colapsable** como los hermanos: el toggle es el `nexaMark` (arriba a la derecha); body en `Collapse`; default abierto (`defaultExpanded`).
+- **Rotating headline** — Nexa "narra en vivo": máquina de fases `writing → reading → thinking`. Typewriter + caret escribe una de **30 paráfrasis** (arrays `agent_headline_rotation_self` / `_observer` en `src/lib/copy/nexa.ts`), la deja leer (cadencia calma: write 48ms/char · read 7.6s · think 2.6s) y al terminar aparece el `GreenhouseThinkingBeat kind='nexa'` (decorative, `dotSize=6`) antes de pensar la próxima. Algunas frases usan `{name}` → primer nombre del usuario en sesión (nueva prop `viewerName`; si no hay nombre, esas frases se filtran). Reduced-motion → frase estática. Sin `aria-live` (no spamea SR; el dato real vive en chip + summary).
+- **Segmented control** Recientes/Historial: track neutro + thumb blanco (`theme.greenhouseElevation.raised`) **deslizante** (framer-motion), texto/icono activo en primary, hover en inactivo. Padding generoso (`px 3.5 · py 1.25 · minHeight 44`, inset del thumb 6px) para que el segmento más ancho respire.
+- **"Ver más"** progressive disclosure: cap a 4 observaciones + botón `GreenhouseButton variant='label' tone='primary'` armonizado lado a lado con el gateway "Ver todos los insights →".
+
+**Ubicación ICO:** en `AgencyIcoEngineView` el `IcoAdvisoryBlock` (Nexa) se movió a **primero** (antes de KPIs/charts/scorecard/report).
+
+**Design System:** nuevo lab `/design-system/nexa-insights` (`NexaInsightsLabView`, kind Pattern · status Hardening · owner `NexaInsightsBlock`) — live specimen, composición, matriz de estados (honest degradation) y nota Variants&Kinds (próximo). Registrado en `DesignSystemCatalogView`, breadcrumb shell y `route-reachability-manifest.ts`. Scenario GVC committeado `design-system-nexa-insights`.
+
 ## Delta 2026-06-10d — Disclosure primitives (trigger rotatorio + anchored disclosure)
 
 TASK-1072. Se canonizaron dos primitives nuevas en `src/components/greenhouse/primitives/`:

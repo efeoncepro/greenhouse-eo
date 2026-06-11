@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useCallback, useEffect, useId, useState } from 'react'
 
 import Link from 'next/link'
 
@@ -11,12 +11,13 @@ import Alert from '@mui/material/Alert'
 import AlertTitle from '@mui/material/AlertTitle'
 import Box from '@mui/material/Box'
 import Card from '@mui/material/Card'
+import Collapse from '@mui/material/Collapse'
 import Divider from '@mui/material/Divider'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import ToggleButton from '@mui/material/ToggleButton'
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup'
-import { alpha, useTheme } from '@mui/material/styles'
+import { alpha, keyframes, useTheme } from '@mui/material/styles'
 
 import CustomChip from '@core/components/mui/Chip'
 import EmptyState from '@/components/greenhouse/EmptyState'
@@ -29,6 +30,7 @@ import NexaInsightRootCauseSection from '@/components/greenhouse/NexaInsightRoot
 import NexaInsightsTimeline, {
   type NexaTimelineItem
 } from '@/components/greenhouse/NexaInsightsTimeline'
+import { GreenhouseButton, GreenhouseDisclosureTrigger, GreenhouseThinkingBeat } from '@/components/greenhouse/primitives'
 import { GREENHOUSE_NEXA_BRAND_COLORS } from '@/components/greenhouse/primitives/greenhouse-nexa-brand-controller'
 import { buildNexaInsightDrillHref } from '@/lib/ico-engine/ai/nexa-insight-href'
 import type {
@@ -95,6 +97,11 @@ export type NexaInsightsBlockProps = {
    * on self-service surfaces (`/my/*`). Default `false` keeps admin navigation.
    */
   mentionSafeMode?: boolean
+  /**
+   * Nombre del usuario en sesión (self lens). Algunas frases rotatorias del header
+   * usan `{name}` (su primer nombre); si no se provee, esas frases se filtran.
+   */
+  viewerName?: string
 }
 
 // ─── Helpers ───────────────────────────────────────────────────────────────
@@ -131,6 +138,11 @@ const getRunChip = (status: string | null) => ({
 })
 
 // ─── Subcomponents ─────────────────────────────────────────────────────────
+
+// Resumen priorizado: cuántas observaciones se muestran antes de "Ver más".
+// El bloque es un feed embebido, no un destino "browse everything" — el cap
+// evita el scroll interminable en superficies densas (ICO). Ajustable.
+const INITIAL_VISIBLE_INSIGHTS = 4
 
 // Severity icon canonical — matches the `/nexa/insights` list card contract
 // (icon + label, NUNCA color-only — WCAG 2.2 AA).
@@ -215,7 +227,10 @@ const InsightRow = ({
         <i className={severityIcon} style={{ fontSize: 18 }} aria-hidden='true' />
       </Box>
 
-      <Stack spacing={1.25} sx={{ flex: 1, minWidth: 0 }}>
+      {/* pr mirrors the left severity-icon gutter (icon 36 + spacing 16 ≈ 52px) so the
+          narrative + callouts + drill don't run flush to the card's right edge —
+          symmetric horizontal breathing within the card. */}
+      <Stack spacing={1.25} sx={{ flex: 1, minWidth: 0, pr: { xs: 0, sm: 5, md: 6 } }}>
         {/* Header line: metric + severity label + signal type + (right) sparkline + resolved */}
         <Stack direction='row' spacing={1} alignItems='center' sx={{ flexWrap: 'wrap', rowGap: 0.5 }}>
           <Typography variant='subtitle2' sx={{ fontWeight: 700, color: theme => theme.palette.customColors.midnight }}>
@@ -260,41 +275,51 @@ const InsightRow = ({
           />
         )}
 
-        {/* Action row — recommended action pill (with mentions) + drill link */}
-        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} alignItems={{ sm: 'center' }} sx={{ flexWrap: 'wrap', rowGap: 1 }}>
-          {item.recommendedAction && (
-            <Stack
-              direction='row'
-              spacing={1}
-              alignItems='flex-start'
-              sx={{
-                px: 1.5,
-                py: 1,
-                borderRadius: theme => `${theme.shape.customBorderRadius.md}px`,
-                bgcolor: alpha(theme.palette.primary.main, 0.07),
-                border: `1px solid ${alpha(theme.palette.primary.main, 0.18)}`,
-                minWidth: 0
-              }}
-            >
-              <i className='tabler-bulb' style={{ fontSize: 15, marginTop: 2, color: theme.palette.primary.main }} aria-hidden='true' />
-              <NexaMentionText
-                text={item.recommendedAction}
-                variant='body2'
-                safeMode={mentionSafeMode}
-                sx={{ color: 'primary.main', fontWeight: 600 }}
-              />
+        {/* Recommendation callout — labeled action zone, NOT a link. Prose in
+            text.primary (the false-link blue prose is gone); the bulb + overline
+            label frame it as "Acción sugerida". The only clickable element is the
+            drill CTA below. */}
+        {item.recommendedAction && (
+          <Box
+            sx={{
+              px: 1.75,
+              py: 1.25,
+              borderRadius: theme => `${theme.shape.customBorderRadius.md}px`,
+              bgcolor: alpha(theme.palette.primary.main, 0.06),
+              border: `1px solid ${alpha(theme.palette.primary.main, 0.16)}`,
+              minWidth: 0
+            }}
+          >
+            <Stack direction='row' spacing={0.75} alignItems='center' sx={{ mb: 0.5 }}>
+              <i className='tabler-bulb' style={{ fontSize: 14, color: theme.palette.primary.main }} aria-hidden='true' />
+              <Typography
+                variant='caption'
+                sx={{ fontWeight: 700, color: 'primary.main', textTransform: 'uppercase', letterSpacing: '0.5px', lineHeight: 1 }}
+              >
+                {GH_NEXA.insights_action_label}
+              </Typography>
             </Stack>
-          )}
+            <NexaMentionText
+              text={item.recommendedAction}
+              variant='body2'
+              safeMode={mentionSafeMode}
+              sx={{ color: theme => theme.palette.customColors.midnight }}
+            />
+          </Box>
+        )}
+
+        {/* Single drill CTA — opens the full analysis in Nexa (/nexa/insights/[id]).
+            Distinct label from the inline "Ver causa raíz" disclosure above. */}
+        <Box>
           <Typography
             component={Link}
             href={drillHref}
             variant='button'
-            aria-label={GH_NEXA.list_card_aria_label(metricName, severityLabel)}
+            aria-label={GH_NEXA.insights_open_detail_aria(metricName, severityLabel)}
             sx={{
               display: 'inline-flex',
               alignItems: 'center',
               gap: 0.5,
-              flexShrink: 0,
               color: 'primary.main',
               fontWeight: 600,
               textTransform: 'none',
@@ -304,10 +329,10 @@ const InsightRow = ({
               '&:focus-visible': { outline: theme => `2px solid ${theme.palette.primary.main}`, outlineOffset: 2 }
             }}
           >
-            {GH_NEXA.list_card_drill_cta}
+            {GH_NEXA.insights_open_detail_cta}
             <i className='tabler-arrow-right' style={{ fontSize: 15 }} aria-hidden='true' />
           </Typography>
-        </Stack>
+        </Box>
       </Stack>
     </Stack>
   )
@@ -321,6 +346,155 @@ const InsightRow = ({
   )
 }
 
+// Rotating headline — Nexa "narra en vivo": escribe una frase (typewriter + caret),
+// la deja leer, y al terminar aparece el thinking-beat (está por "pensar" la próxima);
+// entonces la frase se desvanece y escribe la siguiente. Cicla 30 paráfrasis.
+// Máquina de fases: writing → reading → thinking → (next). SSR-safe (arranca en 0,
+// solo cicla en cliente). Reduced-motion → frase estática, sin typing/ciclado.
+// Sin aria-live (no spamea SR cada frase); el dato real vive en el chip + summary.
+const NEXA_WRITE_MS_PER_CHAR = 48
+const NEXA_READ_MS = 7600
+const NEXA_THINK_MS = 2600
+
+const nexaCaretBlink = keyframes({
+  '0%, 45%': { opacity: 1 },
+  '50%, 95%': { opacity: 0 },
+  '100%': { opacity: 1 }
+})
+
+// Types `text` char-by-char, shows a blinking caret while writing, calls `onDone`
+// when complete. Fresh instance per phrase (remounted by key) → types from empty.
+const NexaTypewriter = ({ text, onDone }: { text: string; onDone: () => void }) => {
+  const [count, setCount] = useState(0)
+
+  useEffect(() => {
+    if (text.length === 0) {
+      onDone()
+
+      return
+    }
+
+    let i = 0
+
+    const timer = setInterval(() => {
+      i += 1
+      setCount(i)
+
+      if (i >= text.length) {
+        clearInterval(timer)
+        onDone()
+      }
+    }, NEXA_WRITE_MS_PER_CHAR)
+
+    return () => clearInterval(timer)
+  }, [text, onDone])
+
+  const writing = count < text.length
+
+  return (
+    <>
+      {text.slice(0, count)}
+      {writing && (
+        <Box
+          component='span'
+          aria-hidden='true'
+          sx={{
+            display: 'inline-block',
+            inlineSize: '2px',
+            blockSize: '1.05em',
+            ml: '1px',
+            verticalAlign: 'text-bottom',
+            borderRadius: '1px',
+            bgcolor: 'primary.main',
+            animation: `${nexaCaretBlink} 1s steps(1) infinite`
+          }}
+        />
+      )}
+    </>
+  )
+}
+
+const RotatingNexaHeadline = ({ messages, reduced }: { messages: string[]; reduced: boolean }) => {
+  const [idx, setIdx] = useState(0)
+  const [phase, setPhase] = useState<'writing' | 'reading' | 'thinking'>('writing')
+
+  // reading → thinking → advance (single timer per phase, clean teardown).
+  useEffect(() => {
+    if (reduced) return
+
+    if (phase === 'reading') {
+      const t = setTimeout(() => setPhase('thinking'), NEXA_READ_MS)
+
+      return () => clearTimeout(t)
+    }
+
+    if (phase === 'thinking') {
+      const t = setTimeout(() => {
+        setIdx(prev => (prev + 1) % messages.length)
+        setPhase('writing')
+      }, NEXA_THINK_MS)
+
+      return () => clearTimeout(t)
+    }
+  }, [phase, reduced, messages.length])
+
+  const handleTyped = useCallback(() => setPhase('reading'), [])
+
+  const text = messages[idx] ?? messages[0]
+
+  // maxWidth holgado → las frases entran en 1 línea en desktop (sin wrap).
+  // minHeight = 1 línea: SOLO evita que el renglón colapse durante el crossfade
+  // (cuando la frase saliente ya se fue y la entrante aún no escribe) — así el
+  // resumen de abajo no salta ni queda separado. Sin reservar 2 líneas.
+  const lineSx = {
+    mt: 0.75,
+    color: 'text.secondary',
+    textWrap: 'balance' as const,
+    maxWidth: '70ch',
+    minHeight: '1.6em'
+  }
+
+  if (reduced) {
+    return (
+      <Typography variant='body1' component='div' sx={lineSx}>
+        {messages[0]}
+        <GreenhouseThinkingBeat kind='nexa' variant='inline' decorative dotSize={6} sx={{ ml: 1.25 }} />
+      </Typography>
+    )
+  }
+
+  return (
+    <Typography variant='body1' component='div' sx={lineSx}>
+      <AnimatePresence mode='wait' initial={false}>
+        <motion.span
+          key={idx}
+          style={{ display: 'inline' }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.22, ease: 'easeOut' }}
+        >
+          <NexaTypewriter text={text} onDone={handleTyped} />
+        </motion.span>
+      </AnimatePresence>
+      <AnimatePresence>
+        {phase === 'thinking' && (
+          <motion.span
+            key='nexa-beat'
+            style={{ display: 'inline-block', verticalAlign: 'middle' }}
+            initial={{ opacity: 0, scale: 0.7 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.7 }}
+            transition={{ duration: 0.25, ease: 'easeOut' }}
+          >
+            <GreenhouseThinkingBeat kind='nexa' variant='inline' decorative dotSize={6} sx={{ ml: 1.25 }} />
+          </motion.span>
+        )}
+      </AnimatePresence>
+    </Typography>
+  )
+}
+
 // ─── Main Component ────────────────────────────────────────────────────────
 
 const NexaInsightsBlock = ({
@@ -331,7 +505,8 @@ const NexaInsightsBlock = ({
   defaultExpanded,
   timelineInsights,
   dataStatus,
-  mentionSafeMode = false
+  mentionSafeMode = false,
+  viewerName
 }: NexaInsightsBlockProps) => {
   const theme = useTheme()
   const prefersReduced = useReducedMotion()
@@ -342,6 +517,26 @@ const NexaInsightsBlock = ({
   const timelineAvailable = timelineCount > 0
   const [viewMode, setViewMode] = useState<NexaInsightsViewMode>('recent')
   const activeView: NexaInsightsViewMode = timelineAvailable ? viewMode : 'recent'
+
+  // Progressive disclosure: el bloque es un resumen priorizado. Cap a las
+  // primeras N observaciones y revela el resto in-place con "Ver más" — evita
+  // la lista interminable en superficies densas (ICO) sin sacar al usuario de
+  // la vista. El footer "Ver todos" sigue yendo al full list page. NO paginación
+  // numerada acá (eso es del destino dedicado /nexa/insights).
+  // Panel disclosure — el bloque ready ahora colapsa como los hermanos de arriba,
+  // pero el toggle es el Nexa Mark que morfa (variant 'nexaMark'). Default abierto:
+  // es el tier de valor; colapsado-by-default lo escondería. defaultExpanded lo gobierna.
+  const [panelOpen, setPanelOpen] = useState(defaultExpanded ?? true)
+  const panelContentId = useId()
+
+  const [showAllInsights, setShowAllInsights] = useState(false)
+
+  const visibleInsights =
+    showAllInsights || insights.length <= INITIAL_VISIBLE_INSIGHTS
+      ? insights
+      : insights.slice(0, INITIAL_VISIBLE_INSIGHTS)
+
+  const remainingInsights = insights.length - visibleInsights.length
 
   // TASK-946 — Honest degradation dispatcher. Si el server pasa `dataStatus`,
   // routea al render canonical correspondiente. Si NO lo pasa (backward-compat
@@ -427,11 +622,23 @@ const NexaInsightsBlock = ({
     )
   }
 
-  const agentHeadline = mentionSafeMode ? GH_NEXA.agent_headline_self : GH_NEXA.agent_headline_observer
+  // Resuelve `{name}` con el primer nombre del usuario en sesión; si no hay nombre,
+  // filtra las frases que lo requieren (en vez de mostrar un token vacío/raro).
+  const viewerFirstName = viewerName?.trim().split(/\s+/)[0] ?? null
+
+  const headlineRotation = (
+    mentionSafeMode ? GH_NEXA.agent_headline_rotation_self : GH_NEXA.agent_headline_rotation_observer
+  )
+    .map(msg =>
+      msg.includes('{name}') ? (viewerFirstName ? msg.replaceAll('{name}', viewerFirstName) : null) : msg
+    )
+    .filter((msg): msg is string => msg !== null)
 
   return (
     <Card elevation={0} data-capture='nexa-insights-block' sx={{ border: theme => `1px solid ${theme.palette.customColors.lightAlloy}` }}>
-      <Box sx={{ p: { xs: 3, md: 5 } }}>
+      {/* Horizontal padding > vertical: la card es ancha, así el contenido (icono a la
+          izq, texto a la der) no queda apretado contra ambos bordes. TASK-1075 follow-up. */}
+      <Box sx={{ py: { xs: 3, md: 5 }, px: { xs: 3, md: 7, lg: 8 } }}>
         {/* Nexa agent header — Nexa is the protagonist: the mark + the NAME lead;
             the sentence is what Nexa says (supporting subtitle). */}
         <Stack direction='row' spacing={{ xs: 2, md: 3 }} alignItems='center'>
@@ -441,7 +648,7 @@ const NexaInsightsBlock = ({
           <Box sx={{ flex: 1, minWidth: 0 }}>
             <Stack direction='row' spacing={1.5} alignItems='center' sx={{ flexWrap: 'wrap', rowGap: 0.5 }}>
               <Typography variant='h3' sx={{ color: theme => theme.palette.customColors.midnight }}>
-                {GH_NEXA.agent_eyebrow}
+                {GH_NEXA.insights_title}
               </Typography>
               <CustomChip
                 round='true'
@@ -457,52 +664,120 @@ const NexaInsightsBlock = ({
                 </Typography>
               )}
             </Stack>
-            <Typography
-              variant='body1'
-              sx={{ mt: 0.75, color: 'text.secondary', textWrap: 'balance', maxWidth: '52ch' }}
-            >
-              {agentHeadline}
-            </Typography>
+            <RotatingNexaHeadline messages={headlineRotation} reduced={prefersReduced} />
             <Typography variant='caption' sx={{ display: 'block', color: 'text.disabled', mt: 0.75 }}>
               {GH_NEXA.agent_summary(totalAnalyzed, countWithActions)}
             </Typography>
           </Box>
+
+          {/* Disclosure — el Nexa Mark ES el toggle: cerrado = mark completo,
+              abierto = solo el spark. Idle gris → hover azul (contrato del primitive). */}
+          <Box sx={{ flexShrink: 0, alignSelf: 'flex-start' }}>
+            <GreenhouseDisclosureTrigger
+              variant='nexaMark'
+              size='medium'
+              open={panelOpen}
+              ariaLabel={panelOpen ? GH_NEXA.insights_collapse_aria : GH_NEXA.insights_expand_aria}
+              aria-controls={panelContentId}
+              dataCapture='nexa-insights-disclosure'
+              onClick={() => setPanelOpen(prev => !prev)}
+            />
+          </Box>
         </Stack>
 
-        <Divider sx={{ mt: 3, mb: 1 }} />
+        <Collapse in={panelOpen} timeout='auto' unmountOnExit={false}>
+          <Box id={panelContentId}>
+            <Divider sx={{ mt: 3, mb: 1 }} />
 
-        {/* View mode toggle (shown only when historical data is available) */}
+        {/* View mode toggle — segmented control enterprise: track neutro + thumb
+            blanco (elevation raised) que DESLIZA entre segmentos. Texto/icono
+            activo en primary; inactivo en text.secondary → text.primary en hover.
+            Motion tokenizado (spring) + reduced-motion (sin slide). a11y intacta
+            (ToggleButtonGroup exclusive: role group + aria-pressed + flechas). */}
         {timelineAvailable && (
           <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
-            <ToggleButtonGroup
-              value={activeView}
-              exclusive
-              onChange={(_, next) => {
-                if (next === 'recent' || next === 'timeline') setViewMode(next)
-              }}
-              size='small'
-              aria-label={GH_NEXA.insights_view_mode_aria}
+            <Box
+              data-capture='nexa-view-toggle'
               sx={{
-                '& .MuiToggleButton-root': {
-                  textTransform: 'none',
-                  fontSize: '0.75rem',
-                  fontWeight: 600,
-                  px: 2,
-                  py: 0.5,
-                  lineHeight: 1.5,
-                  minHeight: 32
-                }
+                position: 'relative',
+                display: 'inline-flex',
+                p: 0.75,
+                borderRadius: theme => `${theme.shape.customBorderRadius.lg}px`,
+                bgcolor: theme => alpha(theme.palette.text.primary, 0.05)
               }}
             >
-              <ToggleButton value='recent' aria-label={GH_NEXA.insights_view_mode_recent}>
-                <i className='tabler-list-details' style={{ fontSize: 16, marginRight: 6 }} aria-hidden='true' />
-                {GH_NEXA.insights_view_mode_recent}
-              </ToggleButton>
-              <ToggleButton value='timeline' aria-label={GH_NEXA.insights_view_mode_timeline}>
-                <i className='tabler-history' style={{ fontSize: 16, marginRight: 6 }} aria-hidden='true' />
-                {GH_NEXA.insights_view_mode_timeline}
-              </ToggleButton>
-            </ToggleButtonGroup>
+              {/* Thumb deslizante — la superficie elevada vive detrás de las labels. */}
+              <motion.div
+                aria-hidden='true'
+                initial={false}
+                animate={{ x: activeView === 'timeline' ? '100%' : '0%' }}
+                transition={prefersReduced ? { duration: 0 } : { type: 'spring', stiffness: 420, damping: 34, mass: 0.7 }}
+                style={{ position: 'absolute', top: 6, bottom: 6, left: 6, width: 'calc(50% - 6px)', zIndex: 0 }}
+              >
+                <Box
+                  sx={{
+                    width: '100%',
+                    height: '100%',
+                    borderRadius: theme => `${theme.shape.customBorderRadius.md}px`,
+                    bgcolor: 'background.paper',
+                    border: theme => `1px solid ${theme.palette.divider}`,
+                    boxShadow: theme => theme.greenhouseElevation.raised.boxShadow
+                  }}
+                />
+              </motion.div>
+              <ToggleButtonGroup
+                value={activeView}
+                exclusive
+                onChange={(_, next) => {
+                  if (next === 'recent' || next === 'timeline') setViewMode(next)
+                }}
+                size='small'
+                aria-label={GH_NEXA.insights_view_mode_aria}
+                sx={{
+                  position: 'relative',
+                  zIndex: 1,
+                  gap: 0,
+                  '& .MuiToggleButton-root': {
+                    flex: 1,
+                    whiteSpace: 'nowrap',
+                    textTransform: 'none',
+                    fontSize: '0.8125rem',
+                    fontWeight: 600,
+                    px: 3.5,
+                    py: 1.25,
+                    lineHeight: 1.5,
+                    minHeight: 44,
+                    border: 0,
+                    borderRadius: theme => `${theme.shape.customBorderRadius.md}px !important`,
+                    color: 'text.secondary',
+                    bgcolor: 'transparent',
+                    transition: theme =>
+                      prefersReduced
+                        ? 'none'
+                        : theme.transitions.create(['color', 'transform'], {
+                            duration: theme.transitions.duration.shorter
+                          }),
+                    '& i': { transition: 'none' },
+                    '&:hover': { bgcolor: 'transparent', color: 'text.primary' },
+                    '&.Mui-selected, &.Mui-selected:hover': { bgcolor: 'transparent', color: 'primary.main' },
+                    '&:active': { transform: prefersReduced ? 'none' : 'scale(0.97)' },
+                    '&.Mui-focusVisible': {
+                      outline: theme => `2px solid ${theme.palette.primary.main}`,
+                      outlineOffset: 2
+                    }
+                  }
+                }}
+              >
+                <ToggleButton value='recent' aria-label={GH_NEXA.insights_view_mode_recent}>
+                  <i className='tabler-list-details' style={{ fontSize: 16, marginRight: 8 }} aria-hidden='true' />
+                  {GH_NEXA.insights_view_mode_recent}
+                </ToggleButton>
+                <ToggleButton value='timeline' aria-label={GH_NEXA.insights_view_mode_timeline}>
+                  <i className='tabler-history' style={{ fontSize: 16, marginRight: 8 }} aria-hidden='true' />
+                  {GH_NEXA.insights_view_mode_timeline}
+                </ToggleButton>
+              </ToggleButtonGroup>
+            </Box>
           </Box>
         )}
 
@@ -511,7 +786,7 @@ const NexaInsightsBlock = ({
           <Box sx={{ mt: 1 }}>
             <AnimatePresence>
               <Stack divider={<Divider />}>
-                {insights.map((item, i) => (
+                {visibleInsights.map((item, i) => (
                   <InsightRow
                     key={item.id}
                     item={item}
@@ -531,36 +806,66 @@ const NexaInsightsBlock = ({
           </Box>
         )}
 
-        {/* Footer — gateway to the full list + Nexa learning note */}
+        {/* Footer — affordances de navegación armonizadas + nota de Nexa.
+            Ambas en el accent primary (familia Nexa): "Ver más" revela in-place
+            (progressive disclosure, tonal button); "Ver todos" navega al full
+            list page (gateway, text link). Side by side en desktop. */}
         <Stack
-          spacing={1.25}
+          spacing={1.5}
           alignItems='center'
           sx={{ mt: 3, pt: 3, borderTop: theme => `1px solid ${theme.palette.customColors.lightAlloy}` }}
         >
-          <Typography
-            component={Link}
-            href='/nexa/insights'
-            variant='button'
-            sx={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 0.5,
-              color: 'primary.main',
-              fontWeight: 600,
-              textTransform: 'none',
-              textDecoration: 'none',
-              borderRadius: '4px',
-              '&:hover': { textDecoration: 'underline' },
-              '&:focus-visible': { outline: theme => `2px solid ${theme.palette.primary.main}`, outlineOffset: 2 }
-            }}
+          <Stack
+            direction={{ xs: 'column', sm: 'row' }}
+            spacing={{ xs: 1.25, sm: 2 }}
+            alignItems='center'
+            justifyContent='center'
           >
-            {GH_NEXA.home_bento_menu_view_all}
-            <i className='tabler-arrow-right' style={{ fontSize: 15 }} aria-hidden='true' />
-          </Typography>
+            {activeView === 'recent' && insights.length > INITIAL_VISIBLE_INSIGHTS && (
+              <GreenhouseButton
+                variant='label'
+                tone='primary'
+                size='small'
+                dataCapture='nexa-insights-show-more'
+                onClick={() => setShowAllInsights(prev => !prev)}
+                aria-expanded={showAllInsights}
+                aria-label={
+                  showAllInsights
+                    ? GH_NEXA.insights_show_less_aria
+                    : GH_NEXA.insights_show_more_aria(remainingInsights, insights.length)
+                }
+                trailingIconClassName={showAllInsights ? 'tabler-chevron-up' : 'tabler-chevron-down'}
+              >
+                {showAllInsights ? GH_NEXA.insights_show_less : GH_NEXA.insights_show_more(remainingInsights)}
+              </GreenhouseButton>
+            )}
+            <Typography
+              component={Link}
+              href='/nexa/insights'
+              variant='button'
+              sx={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 0.5,
+                color: 'primary.main',
+                fontWeight: 600,
+                textTransform: 'none',
+                textDecoration: 'none',
+                borderRadius: '4px',
+                '&:hover': { textDecoration: 'underline' },
+                '&:focus-visible': { outline: theme => `2px solid ${theme.palette.primary.main}`, outlineOffset: 2 }
+              }}
+            >
+              {GH_NEXA.home_bento_menu_view_all}
+              <i className='tabler-arrow-right' style={{ fontSize: 15 }} aria-hidden='true' />
+            </Typography>
+          </Stack>
           <Typography variant='caption' sx={{ color: 'text.disabled', textAlign: 'center' }}>
             {GH_NEXA.agent_footer}
           </Typography>
         </Stack>
+          </Box>
+        </Collapse>
       </Box>
     </Card>
   )

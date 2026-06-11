@@ -261,6 +261,20 @@ const CATALOG_ITEMS: CatalogItem[] = [
     icon: 'tabler-filter-cog'
   },
   {
+    id: 'nexa-insights',
+    title: 'Nexa Insights',
+    description:
+      'Patrón del panel donde Nexa lee un período y resalta lo que más mueve los resultados: disclosure morph, rotating headline con thinking beat, segmented control e insight rows con drill.',
+    route: '/design-system/nexa-insights',
+    category: 'Patterns',
+    kind: 'Pattern',
+    status: 'Hardening',
+    owner: 'NexaInsightsBlock',
+    tags: ['nexa', 'insights', 'thinking-beat', 'disclosure', 'rotating', 'pattern'],
+    searchAliases: ['nexa insights', 'insights', 'nexa', 'thinking beat', 'panel nexa', 'observaciones'],
+    icon: 'tabler-sparkles'
+  },
+  {
     id: 'utilities',
     title: 'Utilities',
     description: 'Timelines y utilities para auditoría, handoff y trazas de documentos.',

@@ -140,6 +140,13 @@ const AgencyIcoEngineView = ({ data, onComputeLive, computingLive }: Props) => {
         />
       ) : (
         <>
+          {/* Advisory AI Block — Nexa Insights primero (lectura de Nexa antes que los KPIs crudos) */}
+          {data.aiLlm && (
+            <SectionErrorBoundary sectionName='ico-advisory' description='No pudimos cargar las señales de Nexa Insights.'>
+              <IcoAdvisoryBlock aiLlm={data.aiLlm} />
+            </SectionErrorBoundary>
+          )}
+
           {/* KPIs */}
           <SectionErrorBoundary sectionName='ico-kpis' description='No pudimos calcular los KPIs del ICO Engine.'>
             <IcoGlobalKpis spaces={data.spaces} />
@@ -354,13 +361,6 @@ const AgencyIcoEngineView = ({ data, onComputeLive, computingLive }: Props) => {
               </Stack>
             </SectionErrorBoundary>
           ) : null}
-
-          {/* Advisory AI Block — LLM enrichment surfacing */}
-          {data.aiLlm && (
-            <SectionErrorBoundary sectionName='ico-advisory' description='No pudimos cargar las señales de Nexa Insights.'>
-              <IcoAdvisoryBlock aiLlm={data.aiLlm} />
-            </SectionErrorBoundary>
-          )}
         </>
       )}
     </Stack>

@@ -47,6 +47,7 @@ const MyPerformanceEnterpriseMockupView = () => {
           dataStatus='ready'
           defaultExpanded
           mentionSafeMode
+          viewerName={b.member}
         />
 
         {/* Tier 4 — supporting metrics */}

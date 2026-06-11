@@ -5,6 +5,7 @@ import { forwardRef } from 'react'
 import IconButton from '@mui/material/IconButton'
 import type { IconButtonProps } from '@mui/material/IconButton'
 
+import { motion } from '@/libs/FramerMotion'
 import useReducedMotion from '@/hooks/useReducedMotion'
 
 import {
@@ -36,12 +37,57 @@ export interface GreenhouseDisclosureTriggerProps extends Omit<IconButtonProps, 
 const SIZE_PX = { small: 32, medium: 40 } as const
 
 /**
+ * Nexa brand mark morph (TASK-1075 follow-up). Inherits `currentColor`, so the
+ * trigger's idle-gray → hover-blue contract tints it for free. Closed: full mark
+ * (arc + spark). Open: the arc fades + collapses, the spark glides to center and
+ * grows — the brand mark itself signals state. Reduced-motion → instant swap.
+ */
+const NexaMarkMorph = ({ open, reduced, sizePx }: { open: boolean; reduced: boolean; sizePx: number }) => {
+  const arcTransition = reduced ? { duration: 0 } : { type: 'spring' as const, stiffness: 380, damping: 30, mass: 0.6 }
+  const sparkTransition = reduced ? { duration: 0 } : { type: 'spring' as const, stiffness: 300, damping: 18, mass: 0.7 }
+
+  return (
+    <svg
+      viewBox='0 0 48 48'
+      aria-hidden='true'
+      width={Math.round(sizePx * 0.58)}
+      height={Math.round(sizePx * 0.58)}
+      style={{ display: 'block', overflow: 'visible' }}
+    >
+      {/* Arc — fades + collapses to its own center when open. */}
+      <motion.path
+        d='M9 27 Q19 39 29 27'
+        fill='none'
+        stroke='currentColor'
+        strokeWidth={4}
+        strokeLinecap='round'
+        initial={false}
+        style={{ transformBox: 'fill-box', transformOrigin: 'center' }}
+        animate={open ? { opacity: 0, scale: 0.2 } : { opacity: 1, scale: 1 }}
+        transition={arcTransition}
+      />
+      {/* Spark — glides to center + grows when open; returns home when closed. */}
+      <motion.path
+        d='M34 9 C35 12.5 36.5 14 40 15 C36.5 16 35 17.5 34 21 C33 17.5 31.5 16 28 15 C31.5 14 33 12.5 34 9 Z'
+        fill='currentColor'
+        initial={false}
+        style={{ transformBox: 'fill-box', transformOrigin: 'center' }}
+        animate={open ? { x: -10, y: 9, scale: 1.5, rotate: 8 } : { x: 0, y: 0, scale: 1, rotate: 0 }}
+        transition={sparkTransition}
+      />
+    </svg>
+  )
+}
+
+/**
  * GreenhouseDisclosureTrigger — canonical icon-only trigger that signals open/closed
- * via icon rotation (TASK-1072). Atom of the Anchored Disclosure pattern, but usable
- * standalone (accordion chevron, add-row toggle…). a11y: `aria-expanded`, required
- * `ariaLabel`. Motion: tokenized (`theme.transitions`) + reduced-motion baked. Zero
- * hardcode — borders/hover from theme. Wraps MUI `IconButton` (never reinvents the base);
- * `forwardRef` so it spreads cleanly as a FloatingSurface anchor.
+ * via icon rotation, or the Nexa brand-mark morph (`variant='nexaMark'`, TASK-1075).
+ * Atom of the Anchored Disclosure pattern, usable standalone (accordion chevron,
+ * add-row toggle, Nexa panel…). a11y: `aria-expanded`, required `ariaLabel`. Motion:
+ * tokenized (`theme.transitions` for the box; spring for the Nexa morph) + reduced-motion
+ * baked. Zero hardcode — borders/hover/tint from theme via `currentColor`. Wraps MUI
+ * `IconButton` (never reinvents the base); `forwardRef` so it spreads cleanly as a
+ * FloatingSurface anchor.
  */
 const GreenhouseDisclosureTrigger = forwardRef<HTMLButtonElement, GreenhouseDisclosureTriggerProps>(
   ({ variant, kind, open, iconClassName, size = 'small', ariaLabel, dataCapture, sx, ...rest }, ref) => {
@@ -51,6 +97,7 @@ const GreenhouseDisclosureTrigger = forwardRef<HTMLButtonElement, GreenhouseDisc
 
     const isOpen = open ?? (rest as Record<string, unknown>)['data-state'] === 'open'
     const px = SIZE_PX[size]
+    const isNexaMark = config.morph === 'nexaMark'
 
     return (
       <IconButton
@@ -82,7 +129,11 @@ const GreenhouseDisclosureTrigger = forwardRef<HTMLButtonElement, GreenhouseDisc
           ...(Array.isArray(sx) ? sx : [sx])
         ]}
       >
-        <i className={iconClassName ?? config.defaultIconClassName} aria-hidden='true' />
+        {isNexaMark ? (
+          <NexaMarkMorph open={isOpen} reduced={reduced} sizePx={px} />
+        ) : (
+          <i className={iconClassName ?? config.defaultIconClassName} aria-hidden='true' />
+        )}
       </IconButton>
     )
   }
