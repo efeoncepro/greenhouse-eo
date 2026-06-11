@@ -1,5 +1,15 @@
 # Release 2026-06-10 #2 — develop→main `6c649b2a6` RELEASED
 
+## Sesion 2026-06-11 — Knowledge Platform proposal (docs-only)
+
+- Se creó una propuesta de arquitectura para conectar knowledge bases Notion a Greenhouse con dos capas: **humana** (manual/academy para aprender a operar Greenhouse) y **agéntica** (Nexa/MCP/webMCP con retrieval gobernado, citas y freshness).
+- Archivos nuevos: `docs/architecture/GREENHOUSE_KNOWLEDGE_PLATFORM_DECISION_V1.md` (`Status: Proposed`) y `docs/architecture/GREENHOUSE_KNOWLEDGE_PLATFORM_ARCHITECTURE_V1.md` (`Draft / proposed`).
+- `DECISIONS_INDEX.md` queda actualizado en "Decisiones propuestas / en discusion". `changelog.md` registra el delta.
+- Se documentaron títulos candidatos de primeras tasks dentro de los docs, **sin crear archivos `TASK-###` todavía** por instrucción del operador.
+- Boundary importante: Notion = authoring; Greenhouse = runtime publicado/versionado; Nexa no debe depender de lecturas live Notion ni de Notion MCP como path productivo primario. MCP de Greenhouse sigue downstream de API Platform.
+- Rollout/implementación: ninguno. No migrations, no runtime, no env vars.
+
+---
 > Promoción `develop→main` (UI + docs, 39 archivos) vía orchestrator canónico **run `27319773037` = success**. `release_id` `6c649b2a6a9a-eb1f8093-1da3-48ca-b3c4-e79bbd5b6fd8`, manifest **released**, attempt_n=1.
 >
 > - **Batch:** `release_batch_policy=ship` (cero migraciones, api/services, payroll/finance/auth). Solo TASK-1075 (Nexa Insights redesign + DS lab + `/my/performance` enterprise mockup) + docs/tasks (TASK-1073/1074/1076/1077, EPIC-018).
