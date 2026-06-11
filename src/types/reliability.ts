@@ -26,6 +26,7 @@ export type ReliabilityModuleKey =
   | 'platform' // TASK-848 — production release control plane (release_manifests, GH workflow blockers, WIF subjects, deploy duration p95)
   | 'workforce' // TASK-1019 — Workforce Contracting Studio (offer letters + employment contracts, AI drafting)
   | 'documents' // TASK-490 — Signature orchestration + document vault (EPIC-001 signable pack)
+  | 'knowledge' // TASK-1082 — Knowledge Platform ingestion (corpus + chunks + sanitize/quarantine)
 
 export type ReliabilityModuleDomain =
   | 'platform'

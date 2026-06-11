@@ -122,7 +122,9 @@ const MODULE_TITLE_HINTS: Record<ReliabilityModuleKey, string[]> = {
     'signature orchestration',
     'document vault',
     'signable'
-  ]
+  ],
+  // TASK-1082 — Knowledge Platform ingestion.
+  knowledge: ['knowledge_', 'knowledge platform', 'knowledge ingestion', 'quarantine', 'greenhouse_knowledge']
 }
 
 /**
@@ -146,6 +148,8 @@ const MODULE_PRIORITY: Record<ReliabilityModuleKey, number> = {
   // Por encima de cloud para que un incident `signature_request`/`zapsign` ruteee
   // al subsystem Documents y no al fallback cloud genérico.
   documents: 17,
+  // TASK-1082 — knowledge ingestion: prioridad media (dueño del corpus/quarantine).
+  knowledge: 16,
   home: 15,
   // TASK-773 — sync infraestructure: prioridad media-baja. Si un incident
   // matchea ambos `outbox` y `finance`, finance gana (el outbox es el medium,
