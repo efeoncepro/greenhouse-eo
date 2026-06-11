@@ -178,9 +178,17 @@ const NexaFloatingButton = ({ docked = false }: NexaFloatingButtonProps) => {
       <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         {/* Mini header */}
         <Stack direction='row' justifyContent='space-between' alignItems='center' sx={{ px: 2, py: 1.5, borderBottom: 1, borderColor: 'divider' }}>
-          <Stack direction='row' spacing={1} alignItems='center'>
-            <GreenhouseNexaBrandMark kind='badgeIcon' size='small' />
-            <Typography variant='subtitle2'>Nexa AI</Typography>
+          <Stack direction='row' spacing={1.25} alignItems='center'>
+            <GreenhouseNexaBrandMark kind='badgeIcon' size='small' sx={{ inlineSize: 24, blockSize: 24 }} />
+            {/* Wordmark Nexa en Poppins (display SoT) a 16px/600 — presencia sin pesar.
+                Excepción deliberada del fontSize inline (regla warn); se centralizará
+                con el NexaComposer/wordmark primitive (TASK-1078 follow-up). */}
+            <Typography
+              component='span'
+              sx={theme => ({ fontFamily: theme.typography.h4.fontFamily, fontWeight: 600, fontSize: '1rem', lineHeight: 1, letterSpacing: 0.1 })}
+            >
+              Nexa AI
+            </Typography>
           </Stack>
           <IconButton size='small' onClick={() => setOpen(false)} aria-label={TASK407_ARIA_CERRAR_NEXA}>
             <i className='tabler-x' style={{ fontSize: '1rem' }} />

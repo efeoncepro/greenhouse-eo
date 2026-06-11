@@ -21,9 +21,13 @@ import {
 } from '@assistant-ui/react'
 import { MarkdownTextPrimitive } from '@assistant-ui/react-markdown'
 
+import { alpha, useTheme, type Theme } from '@mui/material/styles'
+
 import { getMicrocopy } from '@/lib/copy'
 
-import CustomAvatar from '@core/components/mui/Avatar'
+
+import { NexaGlowBorder } from '@/components/greenhouse/primitives'
+import { GREENHOUSE_NEXA_BRAND_COLORS } from '@/components/greenhouse/primitives/greenhouse-nexa-brand-controller'
 import CustomTextField from '@core/components/mui/TextField'
 
 import type { NexaModelId } from '@/config/nexa-models'
@@ -40,6 +44,7 @@ const TASK407_ARIA_NEXA_ESTA_PENSANDO = "Nexa esta pensando"
 const TASK407_ARIA_DETENER_GENERACION = "Detener generacion"
 const TASK407_ARIA_HISTORIAL_DE_CONVERSACIONES = "Historial de conversaciones"
 const TASK407_ARIA_IR_AL_FINAL = "Ir al final"
+const TASK407_ARIA_ENVIAR_MENSAJE = "Enviar mensaje"
 
 
 const GREENHOUSE_COPY = getMicrocopy()
@@ -51,6 +56,12 @@ export interface NexaThreadProps {
   compact?: boolean
   suggestions?: string[]
   onHistoryToggle?: () => void
+  /**
+   * Suprime el header interno (marca "Nexa AI" + selector de modelo). Para
+   * embeber el thread dentro de un shell que ya provee su propio header
+   * (ej. panel flotante TASK-1078). Opt-in; default conserva el header (Home).
+   */
+  hideHeader?: boolean
 }
 
 /* ── Subtle entrance animation ── */
@@ -59,7 +70,50 @@ const msgInSx = {
     '0%': { opacity: 0, transform: 'translateY(6px)' },
     '100%': { opacity: 1, transform: 'translateY(0)' }
   },
-  animation: 'nexa-msg-in 0.25s ease-out'
+  animation: 'nexa-msg-in 0.2s cubic-bezier(0.2, 0, 0, 1)',
+  '@media (prefers-reduced-motion: reduce)': { animation: 'none' }
+}
+
+/* ── Wordmark "Nexa" inline (labels por-mensaje) ── Poppins (display SoT) a 16px/600:
+   presencia de marca sin pesar como el header (h4 20px). El fontSize inline es una
+   excepción deliberada del wordmark (la regla es warn); se centralizará cuando el
+   NexaComposer/wordmark pase a primitive del Design System (TASK-1078 follow-up). */
+const nexaWordmarkInlineSx = (theme: Theme) => ({
+  fontFamily: theme.typography.h4.fontFamily,
+  fontWeight: 600,
+  fontSize: '1rem',
+  lineHeight: 1,
+  letterSpacing: 0.1
+})
+
+/* ── Avatar por-mensaje de Nexa ── Nexa Mark en disco navy circular con anillo teal:
+   minimalista (un disco con el mark) + presencia (contraste navy/teal). El glyph va
+   inline para controlar sus colores: sonrisa teal + sparkle BLANCO (sobre navy el
+   sparkle azul se perdía) y tamaño generoso dentro del disco. */
+const NexaSenderMark = () => {
+  const theme = useTheme()
+
+  return (
+    <Box
+      aria-hidden
+      sx={{
+        width: 28,
+        height: 28,
+        borderRadius: '50%',
+        flexShrink: 0,
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        bgcolor: GREENHOUSE_NEXA_BRAND_COLORS.midnightNavy,
+        boxShadow: `0 0 0 1.5px ${alpha(GREENHOUSE_NEXA_BRAND_COLORS.electricTeal, 0.35)}`
+      }}
+    >
+      <Box component='svg' viewBox='0 0 48 48' sx={{ width: 19, height: 19, display: 'block' }}>
+        <path d='M9 27 Q19 39 29 27' fill='none' stroke={GREENHOUSE_NEXA_BRAND_COLORS.electricTeal} strokeWidth={4} strokeLinecap='round' />
+        <path d='M34 9 C35 12.5 36.5 14 40 15 C36.5 16 35 17.5 34 21 C33 17.5 31.5 16 28 15 C31.5 14 33 12.5 34 9 Z' fill={theme.palette.common.white} />
+      </Box>
+    </Box>
+  )
 }
 
 const TextPart = ({ text }: { text: string }) => (
@@ -265,12 +319,10 @@ const AssistantMessage = () => {
   return (
     <MessagePrimitive.Root>
       <Box sx={{ mb: 4, ...msgInSx }}>
-        {/* Sender label */}
-        <Stack direction='row' spacing={0.75} alignItems='center' sx={{ mb: 1 }}>
-          <CustomAvatar skin='light' color='primary' variant='circular' size={24}>
-            <i className='tabler-sparkles' style={{ fontSize: '0.75rem' }} />
-          </CustomAvatar>
-          <Typography variant='caption' sx={{ fontWeight: 600, color: 'text.secondary' }}>
+        {/* Sender label — glyph en círculo outline: presencia liviana, content-first */}
+        <Stack direction='row' spacing={1.25} alignItems='center' sx={{ mb: 1.5 }}>
+          <NexaSenderMark />
+          <Typography component='span' sx={[nexaWordmarkInlineSx, { color: 'text.secondary' }]}>
             Nexa
           </Typography>
         </Stack>
@@ -373,41 +425,63 @@ const FollowupSuggestions = ({ suggestions }: { suggestions: string[] }) => {
   if (isRunning || suggestions.length === 0) return null
 
   return (
-    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5, maxWidth: 720, mx: 'auto', mt: 1, mb: 2, px: 2, ...msgInSx }}>
+    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5, maxWidth: 720, mx: 'auto', mt: 1, mb: 2, px: 3, ...msgInSx }}>
       {suggestions.map(suggestion => (
         <Box
           key={suggestion}
+          role='button'
+          tabIndex={0}
           onClick={() => {
             aui.thread().append({
               role: 'user',
               content: [{ type: 'text' as const, text: suggestion }]
             })
           }}
+          onKeyDown={e => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault()
+              aui.thread().append({ role: 'user', content: [{ type: 'text' as const, text: suggestion }] })
+            }
+          }}
           sx={{
             border: '1px solid',
             borderColor: 'divider',
-            borderRadius: '10px',
+            borderRadius: '12px',
             px: 2,
-            py: 1.5,
+            py: 1.25,
             cursor: 'pointer',
             maxWidth: 280,
             display: 'flex',
-            alignItems: 'flex-start',
-            gap: 1,
-            transition: 'all 0.15s ease',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 1.5,
+            bgcolor: 'background.paper',
+            transition: 'border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s cubic-bezier(0.2, 0, 0, 1)',
+            '& .nexa-suggestion-arrow': {
+              opacity: 0,
+              transform: 'translateX(-4px)',
+              transition: 'opacity 0.15s ease, transform 0.15s ease',
+              color: 'primary.main',
+              flexShrink: 0
+            },
             '&:hover': {
               borderColor: 'primary.main',
-              bgcolor: 'primary.lighterOpacity'
+              boxShadow: theme => theme.greenhouseElevation.raised.boxShadow,
+              transform: 'translateY(-1px)'
             },
-            '&:active': {
-              transform: 'scale(0.98)'
-            }
+            '&:hover .nexa-suggestion-arrow': { opacity: 1, transform: 'translateX(0)' },
+            '&:focus-visible': {
+              outline: '2px solid var(--mui-palette-primary-main)',
+              outlineOffset: 2
+            },
+            '&:active': { transform: 'translateY(0)' },
+            '@media (prefers-reduced-motion: reduce)': { transition: 'none', '&:hover': { transform: 'none' } }
           }}
         >
-          <i className='tabler-sparkles' style={{ fontSize: '0.875rem', color: 'var(--mui-palette-primary-main)', marginTop: 2, flexShrink: 0 }} />
-          <Typography variant='body2' color='text.primary' sx={{ lineHeight: 1.5 }}>
+          <Typography variant='body2' color='text.primary' sx={{ lineHeight: 1.45 }}>
             {suggestion}
           </Typography>
+          <i className='tabler-arrow-up-right nexa-suggestion-arrow' style={{ fontSize: '0.9rem' }} />
         </Box>
       ))}
     </Box>
@@ -422,11 +496,9 @@ const ThinkingIndicator = () => {
 
   return (
     <Box sx={{ mb: 4 }} aria-live='polite' aria-label={TASK407_ARIA_NEXA_ESTA_PENSANDO}>
-      <Stack direction='row' spacing={0.75} alignItems='center' sx={{ mb: 1 }}>
-        <CustomAvatar skin='light' color='primary' variant='circular' size={24}>
-          <i className='tabler-sparkles' style={{ fontSize: '0.75rem' }} />
-        </CustomAvatar>
-        <Typography variant='caption' sx={{ fontWeight: 600, color: 'text.secondary' }}>
+      <Stack direction='row' spacing={1.25} alignItems='center' sx={{ mb: 1.5 }}>
+        <NexaSenderMark />
+        <Typography component='span' sx={[nexaWordmarkInlineSx, { color: 'text.secondary' }]}>
           Nexa
         </Typography>
       </Stack>
@@ -441,32 +513,25 @@ const ThinkingIndicator = () => {
 
 /* ── Premium composer ── */
 const ChatComposer = () => {
+  const theme = useTheme()
   const isRunning = useAuiState(s => s.thread.isRunning)
 
   return (
     <Box sx={{
       position: 'sticky',
       bottom: 0,
-      bgcolor: 'background.default',
-      borderTop: '1px solid',
-      borderColor: 'divider',
-      pt: 2.5,
-      pb: 2,
-      px: 1,
+      // Composer sobre blanco (paper), sin banda gris ni borde → experiencia
+      // conversacional continua (UI moderna: el grey backing fragmenta el chat).
+      bgcolor: 'background.paper',
+      pt: 2,
+      pb: 2.5,
+      px: 4,
       maxWidth: 720,
       mx: 'auto',
       width: '100%'
-    }}>
+    }} data-capture='nexa-composer'>
       <ComposerPrimitive.Root>
-        <Box sx={{
-          boxShadow: '0 1px 6px rgba(0,0,0,0.06), 0 0 0 1px rgba(0,0,0,0.04)',
-          borderRadius: '12px',
-          bgcolor: 'background.paper',
-          transition: 'box-shadow 0.15s ease',
-          '&:focus-within': {
-            boxShadow: '0 2px 12px rgba(0,0,0,0.08), 0 0 0 2px var(--mui-palette-primary-main)'
-          }
-        }}>
+        <NexaGlowBorder radius={14} focusRingColor={theme.palette.primary.main}>
           <ComposerPrimitive.Input asChild>
             <CustomTextField
               id='nexa-floating-composer-input'
@@ -474,22 +539,32 @@ const ChatComposer = () => {
               multiline
               minRows={1}
               maxRows={4}
-              placeholder='Pregunta sobre tu operacion...'
+              placeholder='Pregúntale a Nexa sobre tu operación…'
               autoComplete='off'
               sx={{
-                '& .MuiOutlinedInput-root': {
-                  borderRadius: '12px',
+                // El CustomTextField usa la variante FILLED de Vuexy: el
+                // .MuiFilledInput-root trae su propio radius=6px + sombra azul de foco
+                // → ESE es el "box interno" de radio distinto. Lo anulamos por completo
+                // (sin radius propio, sin sombra, sin underline, fondo transparente):
+                // el input no dibuja ningún box, y el acento azul de foco lo pinta
+                // NexaGlowBorder (focusRingColor) en la MISMA caja del glow (radio 14).
+                '& .MuiFilledInput-root': {
+                  borderRadius: '14px',
                   fontSize: '0.9375rem',
                   lineHeight: 1.6,
                   py: 0.5,
-                  bgcolor: 'transparent',
-                  '& fieldset': { border: 'none' }
+                  border: 'none !important',
+                  backgroundColor: 'transparent !important',
+                  boxShadow: 'none !important',
+                  '&:before, &:after': { display: 'none' },
+                  '&:hover': { border: 'none !important', backgroundColor: 'transparent !important', boxShadow: 'none !important' },
+                  '&.Mui-focused': { border: 'none !important', backgroundColor: 'transparent !important', boxShadow: 'none !important' }
                 }
               }}
               slotProps={{
                 input: {
                   endAdornment: (
-                    <InputAdornment position='end' sx={{ alignSelf: 'flex-end', mb: 0.5 }}>
+                    <InputAdornment position='end' sx={{ alignSelf: 'flex-end', mb: '5px' }}>
                       {isRunning ? (
                         <ComposerPrimitive.Cancel asChild>
                           <IconButton
@@ -498,30 +573,59 @@ const ChatComposer = () => {
                               bgcolor: 'error.lighterOpacity',
                               color: 'error.main',
                               '&:hover': { bgcolor: 'error.lightOpacity' },
-                              width: 36,
-                              height: 36,
+                              width: 30,
+                              height: 30,
                               borderRadius: '50%'
                             }}
                           >
-                            <i className='tabler-player-stop-filled' style={{ fontSize: '1.125rem' }} />
+                            <i className='tabler-player-stop-filled' style={{ fontSize: '0.9375rem' }} />
                           </IconButton>
                         </ComposerPrimitive.Cancel>
                       ) : (
                         <ComposerPrimitive.Send asChild>
-                          <IconButton
-                            color='primary'
+                          <Box
+                            component='button'
+                            type='button'
+                            aria-label={TASK407_ARIA_ENVIAR_MENSAJE}
                             sx={{
-                              bgcolor: 'primary.main',
-                              color: 'primary.contrastText',
-                              '&:hover': { bgcolor: 'primary.dark' },
-                              '&.Mui-disabled': { bgcolor: 'action.disabledBackground', color: 'action.disabled' },
-                              width: 36,
-                              height: 36,
-                              borderRadius: '50%'
+                              width: 30,
+                              height: 30,
+                              flexShrink: 0,
+                              p: 0,
+                              border: 'none',
+                              borderRadius: '50%',
+                              cursor: 'pointer',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              bgcolor: GREENHOUSE_NEXA_BRAND_COLORS.midnightNavy,
+                              color: 'common.white',
+                              boxShadow: `0 1px 3px ${alpha(GREENHOUSE_NEXA_BRAND_COLORS.midnightNavy, 0.32)}`,
+                              transition: theme => theme.transitions.create(['background-color', 'color', 'transform', 'box-shadow'], { duration: theme.transitions.duration.shortest }),
+                              '&:hover': {
+                                bgcolor: GREENHOUSE_NEXA_BRAND_COLORS.electricTeal,
+                                color: GREENHOUSE_NEXA_BRAND_COLORS.midnightNavy,
+                                transform: 'translateY(-1px) scale(1.04)',
+                                boxShadow: `0 2px 8px ${alpha(GREENHOUSE_NEXA_BRAND_COLORS.electricTeal, 0.45)}`
+                              },
+                              '&:hover svg': { stroke: GREENHOUSE_NEXA_BRAND_COLORS.midnightNavy },
+                              '&:active': { transform: 'scale(0.94)' },
+                              '&:focus-visible': { outline: 'none', boxShadow: `0 0 0 3px ${alpha(GREENHOUSE_NEXA_BRAND_COLORS.electricTeal, 0.5)}` },
+                              '&:disabled': { bgcolor: alpha(theme.palette.text.primary, 0.08), color: 'action.disabled', boxShadow: 'none', cursor: 'default', transform: 'none' },
+                              '&:disabled svg': { stroke: theme.palette.action.disabled }
                             }}
                           >
-                            <i className='tabler-arrow-up' style={{ fontSize: '1.25rem' }} />
-                          </IconButton>
+                            <Box
+                              component='svg'
+                              aria-hidden
+                              viewBox='0 0 24 24'
+                              fill='none'
+                              sx={{ width: 15, height: 15, stroke: theme.palette.common.white, strokeWidth: 2.25, strokeLinecap: 'round', strokeLinejoin: 'round' }}
+                            >
+                              <path d='M12 19V5' />
+                              <path d='M5 12l7-7 7 7' />
+                            </Box>
+                          </Box>
                         </ComposerPrimitive.Send>
                       )}
                     </InputAdornment>
@@ -530,20 +634,20 @@ const ChatComposer = () => {
               }}
             />
           </ComposerPrimitive.Input>
-        </Box>
+        </NexaGlowBorder>
       </ComposerPrimitive.Root>
-      <Typography variant='caption' color='text.disabled' sx={{ textAlign: 'center', display: 'block', mt: 1 }}>
-        Nexa puede cometer errores. Verifica la informacion.
+      <Typography variant='caption' color='text.disabled' sx={{ textAlign: 'center', display: 'block', mt: 1, fontSize: '0.6875rem', letterSpacing: 0.1 }}>
+        Nexa analiza tus datos en tiempo real. Verifica antes de una decisión crítica.
       </Typography>
     </Box>
   )
 }
 
 /* ── Main thread ── */
-const NexaThread = ({ onBack, selectedModel, onModelChange, compact, suggestions = [], onHistoryToggle }: NexaThreadProps) => (
+const NexaThread = ({ onBack, selectedModel, onModelChange, compact, suggestions = [], onHistoryToggle, hideHeader }: NexaThreadProps) => (
   <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: compact ? 'auto' : '60vh' }}>
     {/* Frosted header */}
-    {!compact && (
+    {!compact && !hideHeader && (
       <Box sx={{
         position: 'sticky',
         top: 0,
@@ -584,7 +688,7 @@ const NexaThread = ({ onBack, selectedModel, onModelChange, compact, suggestions
         </Box>
         <Stack direction='row' spacing={0.75} alignItems='center'>
           <i className='tabler-sparkles' style={{ fontSize: '1rem', color: 'var(--mui-palette-primary-main)' }} />
-          <Typography variant='subtitle2' sx={{ fontWeight: 600, color: 'text.primary' }}>
+          <Typography component='span' sx={[nexaWordmarkInlineSx, { color: 'text.primary' }]}>
             Nexa AI
           </Typography>
         </Stack>
@@ -603,8 +707,8 @@ const NexaThread = ({ onBack, selectedModel, onModelChange, compact, suggestions
           maxWidth: compact ? undefined : 720,
           margin: '0 auto',
           width: '100%',
-          paddingLeft: 16,
-          paddingRight: 16,
+          paddingLeft: 24,
+          paddingRight: 24,
           paddingTop: 24
         }}
       >
@@ -616,27 +720,29 @@ const NexaThread = ({ onBack, selectedModel, onModelChange, compact, suggestions
 
       <FollowupSuggestions suggestions={suggestions} />
 
-      <ThreadPrimitive.ScrollToBottom asChild>
-        <IconButton
-          aria-label={TASK407_ARIA_IR_AL_FINAL}
-          sx={{
-            position: 'absolute',
-            bottom: 100,
-            left: '50%',
-            transform: 'translateX(-50%)',
-            bgcolor: 'background.paper',
-            border: 1,
-            borderColor: 'divider',
-            boxShadow: 2,
-            '&:hover': { bgcolor: 'action.hover' },
-            width: 36,
-            height: 36,
-            zIndex: 10
-          }}
-        >
-          <i className='tabler-arrow-down' style={{ fontSize: '1.25rem' }} />
-        </IconButton>
-      </ThreadPrimitive.ScrollToBottom>
+      {!hideHeader && (
+        <ThreadPrimitive.ScrollToBottom asChild>
+          <IconButton
+            aria-label={TASK407_ARIA_IR_AL_FINAL}
+            sx={{
+              position: 'absolute',
+              bottom: 100,
+              left: '50%',
+              transform: 'translateX(-50%)',
+              bgcolor: 'background.paper',
+              border: 1,
+              borderColor: 'divider',
+              boxShadow: 2,
+              '&:hover': { bgcolor: 'action.hover' },
+              width: 36,
+              height: 36,
+              zIndex: 10
+            }}
+          >
+            <i className='tabler-arrow-down' style={{ fontSize: '1.25rem' }} />
+          </IconButton>
+        </ThreadPrimitive.ScrollToBottom>
+      )}
 
       <ChatComposer />
     </ThreadPrimitive.Root>

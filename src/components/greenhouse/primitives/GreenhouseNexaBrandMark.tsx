@@ -49,8 +49,13 @@ const GreenhouseNexaBrandMark = ({
           alignItems: 'center',
           justifyContent: 'center',
           gap: isPill ? `${sizeConfig.gap}px` : 0,
-          minHeight: isPill ? sizeConfig.minHeight : sizeConfig.iconOnlySize,
+          // Pill: minHeight gobierna el alto. iconBadge/inline: contenedor CUADRADO
+          // (inlineSize + blockSize = iconOnlySize) para que el consumer pueda
+          // re-dimensionarlo vía `sx` sin distorsión (antes minHeight fijo lo dejaba
+          // 22×32 → imagen estirada).
+          minHeight: isPill ? sizeConfig.minHeight : undefined,
           inlineSize: isPill ? 'auto' : sizeConfig.iconOnlySize,
+          blockSize: isPill ? undefined : sizeConfig.iconOnlySize,
           paddingInline: isPill ? `${sizeConfig.paddingInline}px` : 0,
           paddingBlock: isPill ? `${sizeConfig.paddingBlock}px` : 0,
           borderRadius: isPill ? sizeConfig.borderRadius : `${theme.shape.customBorderRadius.md}px`,
@@ -75,8 +80,12 @@ const GreenhouseNexaBrandMark = ({
         aria-hidden='true'
         sx={{
           display: 'block',
-          inlineSize: isPill ? sizeConfig.iconSize : sizeConfig.iconOnlySize,
-          blockSize: isPill ? sizeConfig.iconSize : sizeConfig.iconOnlySize,
+          // Pill: tamaño fijo del glyph dentro del pill. iconBadge/inline: la imagen
+          // LLENA el contenedor (100%) para que el tamaño lo gobierne el consumer vía
+          // `sx` (antes quedaba fijo en iconOnlySize y se desbordaba si el contenedor
+          // se reducía → badge desproporcionado/pegado al texto).
+          inlineSize: isPill ? sizeConfig.iconSize : '100%',
+          blockSize: isPill ? sizeConfig.iconSize : '100%',
           transform: isPill ? 'scale(1.22)' : 'none',
           transformOrigin: 'center',
           flexShrink: 0

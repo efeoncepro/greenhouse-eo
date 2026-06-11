@@ -35,6 +35,8 @@ export type {
 export { default as GreenhouseNexaBrandMark } from './GreenhouseNexaBrandMark'
 export { default as GreenhouseNexaAnimatedMark } from './GreenhouseNexaAnimatedMark'
 export type { GreenhouseNexaAnimatedMarkProps } from './GreenhouseNexaAnimatedMark'
+export { default as NexaGlowBorder } from './NexaGlowBorder'
+export type { NexaGlowBorderProps } from './NexaGlowBorder'
 export { default as GreenhouseNexaAnimatedAskBadge } from './GreenhouseNexaAnimatedAskBadge'
 export type { GreenhouseNexaAnimatedAskBadgeProps } from './GreenhouseNexaAnimatedAskBadge'
 export { default as EfeonceOrbitalLogoMark } from './EfeonceOrbitalLogoMark'

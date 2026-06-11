@@ -8,6 +8,7 @@
 - Rollout/implementación: docs-only, sin runtime ni tasks nuevas.
 
 ---
+
 ## Sesion 2026-06-11 — Knowledge Platform proposal (docs-only)
 
 - Se creó una propuesta de arquitectura para conectar knowledge bases Notion a Greenhouse con dos capas: **humana** (manual/academy para aprender a operar Greenhouse) y **agéntica** (Nexa/MCP/webMCP con retrieval gobernado, citas y freshness).
@@ -26,6 +27,24 @@
 > - **Gates:** 2 aprobaciones (approval-gate + ola workers/Azure), autorización plena del operador. Azure: skip Bicep (sin diff `infra/azure/**`).
 > - **Verificado:** 4 Cloud Run @ GIT_SHA `6c649b2a6a9a` (cero drift, gcloud); watchdog limpio (`worker_revision_drift`/`stale_approval`/`pending_without_jobs` = 0, vía `gh` — el CLI `release:watchdog` no corrió por reauth ADC local); Vercel prod READY + `/api/auth/health` 200 (overallStatus=ready).
 > - **Pendiente menor (no bloqueante):** reauth de `gcloud auth application-default login` para que `pnpm release:watchdog` corra local (los 3 signals se verificaron por vías equivalentes).
+
+---
+
+## Sesion 2026-06-11 — TASK-1078 Slice 1: Nexa Chat (patrón compuesto + página DS)
+
+> **Slice 1 de TASK-1078 CERRADO** (mockup concepto B con acabado enterprise, pulido en loop GVC + skills). Decisión canónica de la sesión: **lo construido es un patrón compuesto** (no una primitive) → canonizado con página DS propia.
+
+**Dónde quedó:**
+- **Route live mockup:** `/nexa/floating-chat/mockup` (toggles Estado/Footprint/Contexto). **Nada se persiste — mock data.**
+- **Página DS nueva:** `/design-system/nexa-chat` (catálogo `Patterns` · `NexaChatLabView`) — documenta clasificación + anatomía (5 regiones) + primitives que lo componen + modos + reglas + specimen vivo. Registrada en catálogo + route-reachability (0 orphans) + `ui-platform/PATTERNS.md`.
+- **Primitive nueva:** `NexaGlowBorder` (`src/components/greenhouse/primitives/`, en el barrel). + `NexaSenderMark`/`HeaderIconButton` locales (a extraer).
+- **`NexaThread` compartido editado** (avatar per-mensaje, wordmark Poppins, botón enviar, composer sin box gris) → mejora consistente en Home, sin regresión (GVC).
+
+**Decisiones clave:** `NexaModelSelector` ELIMINADO (Nexa elige modelo). Glass rail (panel transparente + secciones con su fondo). Saludo rotativo (30 mensajes). Prompts contextuales (Tier 1/2 en follow-ups). Firma Efeonce sutil solo en empty state (excepción de marca — confirmar con operador).
+
+**Pendiente (Slices 2-4):** runtime persistente + `NexaThreadSidebar` real (S2); non-modal + a11y + composer autosize (S3); flag `NEXA_FLOATING_EXPANDABLE_ENABLED` + cutover + port a `NexaFloatingButton` (S4); extraer `NexaComposer`/`NexaPresenceMark`/`NexaSenderMark` como primitives. Detalle: `docs/tasks/in-progress/TASK-1078-...md` (Delta 2026-06-11).
+
+**Estado git:** trabajo en working tree (no commiteado). Operador no pidió push.
 
 ---
 

@@ -275,6 +275,20 @@ const CATALOG_ITEMS: CatalogItem[] = [
     icon: 'tabler-sparkles'
   },
   {
+    id: 'nexa-chat',
+    title: 'Nexa Chat',
+    description:
+      'La superficie conversacional canónica de Nexa (patrón compuesto): header de presencia, rail de historial glass, cuerpo de conversación, empty hero con saludo rotativo + prompts contextuales, composer con glow.',
+    route: '/design-system/nexa-chat',
+    category: 'Patterns',
+    kind: 'Pattern',
+    status: 'Hardening',
+    owner: 'Nexa floating chat (TASK-1078)',
+    tags: ['nexa', 'chat', 'composer', 'glow', 'glass', 'empty-state', 'pattern'],
+    searchAliases: ['nexa chat', 'chat', 'nexa', 'conversacion', 'floating', 'asistente', 'composer', 'glow'],
+    icon: 'tabler-message-chatbot'
+  },
+  {
     id: 'utilities',
     title: 'Utilities',
     description: 'Timelines y utilities para auditoría, handoff y trazas de documentos.',

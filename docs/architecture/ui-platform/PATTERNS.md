@@ -215,3 +215,44 @@ Para vistas data-dense con más de 10 tarjetas en scroll vertical, usar **Accord
 - Reports detallados → Accordion colapsado por defecto
 - Cada Accordion summary muestra chip con estado/resumen para que el usuario sepa si vale la pena expandir
 - Implementado en: Agency ICO Engine tab (3 Accordions para performance report)
+
+## Nexa Chat Pattern (TASK-1078)
+
+La superficie **conversacional canónica de Nexa**. Es un **patrón compuesto** (organismo platform-level), no una primitive suelta — misma categoría que el `NexaInsightsBlock`. Toda superficie donde aparezca Nexa como chat (botón flotante global, Home, futuros sidecars) **reusa este patrón + sus primitives**, sin forkear chats paralelos por pantalla.
+
+**Página DS:** `/design-system/nexa-chat` (catálogo `Patterns` · kind `Pattern`). **Spec:** `docs/tasks/in-progress/TASK-1078-...md`. **Mockup vivo:** `/nexa/floating-chat/mockup`.
+
+### Anatomía (5 regiones)
+
+1. **Header de presencia** — cara real de Nexa + wordmark Poppins + estado "En línea" con ping vivo + controles circulares (nueva conversación `+` / expandir / cerrar, mismo hover).
+2. **Rail de conversaciones (glass)** — glassmorfismo blanco (`backdrop-filter`, panel transparente + secciones con su fondo); buscador con filtro, grupos temporales con jerarquía label↔ítem, item activo = píldora tintada, kebab de acciones (hover/focus), estados empty / filtered-empty.
+3. **Cuerpo de conversación** — thread headless (`@assistant-ui/react`) con avatar por-mensaje + **runtime propio keyed** → nueva conversación limpia y fluida (fade); el empty hero se decide por `messages.length === 0`.
+4. **Empty hero** — saludo **rotativo por nombre** (rota con cada nueva conversación) + chip de contexto + grilla de **prompts contextuales** (por ruta/entidad/rol) + **firma de marca Efeonce** sutil (wordmark gris sólido vía `mask`, **solo aquí**).
+5. **Composer** — input sobre blanco (sin box propio) envuelto en `NexaGlowBorder` + botón enviar navy↔teal compacto + disclaimer de confianza.
+
+### Primitives que lo componen
+
+| Pieza | Rol | Estado |
+|---|---|---|
+| `NexaGlowBorder` | Borde "línea de luz" del composer (dos capas + máscara + beam, reduced-motion horneado). | Primitive canónica ✅ |
+| `NexaComposer` | Input + botón enviar + glow como unidad reusable. | A extraer ⏳ (follow-up) |
+| `NexaPresenceMark` / `NexaPresenceHeader` | Cara/mark + nombre + dot "En línea" con ping. | A extraer ⏳ |
+| `NexaSenderMark` | Avatar por-mensaje (disco navy + glyph teal/sparkle blanco inline-SVG). | A extraer ⏳ |
+| `NexaConversationRail` | Rail de historial glass (search + grupos + items + estados). | Parte del patrón |
+| `NexaEmptyHero` | Saludo + chip de contexto + prompts + firma. | Parte del patrón |
+| `GreenhouseFloatingSurface` / `AdaptiveSidecarLayout` | Anclaje del panel (modo expandible) / lane (modo C). | Primitives reusadas |
+
+### Modos de interacción (preferencia user-facing futura)
+
+- **Dock compacto (A)** — el más liviano, panel chico anclado. `[deferred]`
+- **Panel expandible (B)** — compacto ↔ ancho con rail de historial. Concepto vigente.
+- **Lane sidecar (C)** — full-height in-flow (`AdaptiveSidecarLayout`), el contexto principal sigue visible. `[deferred-but-committed]`
+
+### Reglas
+
+- ✓ Reusar este patrón + sus primitives en toda superficie de Nexa-como-chat.
+- ✓ Empty hero: saludo rotativo + prompts contextuales + firma Efeonce **solo** en empty state.
+- ✓ Composer siempre vía `NexaGlowBorder` (futuro `NexaComposer`); cero hardcode (tokens AXIS + brand Nexa SSOT + escala tipográfica SoT).
+- ✗ No crear un chat de Nexa paralelo por pantalla ni reimplementar composer/rail.
+- ✗ No usar la firma Efeonce fuera del empty state ni la cara real per-mensaje (ahí va el mark).
+- ✗ Prompts: NUNCA hardcodear el set; derivar del contexto (Tier 1 frontend resolver, Tier 2 backend data-aware — ver TASK-1078 follow-ups).
