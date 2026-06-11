@@ -2,6 +2,7 @@
 
 ## 2026-06-11
 
+- **Knowledge Platform — contrato de contexto para Nexa.** Se amplió la arquitectura propuesta con el mecanismo explícito para que Nexa use knowledge como contexto: retrieval-on-demand vía `knowledge_search`, no corpus completo en prompt; packet acotado con chunks, citas, freshness, access scope y confidence; reglas de respuesta con fuentes, no-invención, manejo de stale/deprecated y jerarquía de confianza (`runtime/API/ADR` > docs publicados > Notion stale > handoff histórico). También se agregaron observability signals para respuestas sin fuente, stale-source y low-confidence retrieval. Sigue sin crear tasks ni runtime.
 - **Knowledge Platform — ADR + arquitectura propuesta.** Se abrió la propuesta `GREENHOUSE_KNOWLEDGE_PLATFORM_DECISION_V1` + `GREENHOUSE_KNOWLEDGE_PLATFORM_ARCHITECTURE_V1` para conectar bases de conocimiento Notion a Greenhouse en dos capas: una capa humana de aprendizaje/manual y una capa agéntica para Nexa/MCP con retrieval gobernado, citas, freshness y access policy Greenhouse-native. La decisión queda en `Proposed`: Notion se mantiene como authoring, Greenhouse como runtime publicado/versionado; Nexa no dependería de lecturas live de Notion ni de Notion MCP como path productivo primario. Se documentaron títulos candidatos de las primeras tasks, sin crear archivos `TASK-###` todavía.
 
 ## 2026-06-10

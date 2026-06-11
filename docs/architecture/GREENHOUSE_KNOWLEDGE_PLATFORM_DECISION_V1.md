@@ -126,7 +126,10 @@ While this ADR is `Proposed`, it does not authorize implementation. If accepted 
 - Notion-origin documents are snapshotted and versioned before they are exposed to Nexa.
 - Human UI, Nexa and MCP consume API Platform contracts, not Notion directly.
 - Greenhouse MCP knowledge tools are downstream of API Platform and read-only in V1.
+- Nexa uses published knowledge through scoped retrieval tools, not by loading the whole corpus into the system prompt.
+- Knowledge retrieval returns a bounded citation packet: chunks, source document metadata, freshness, access decision and confidence.
 - Every agentic answer that uses the corpus must preserve citations and freshness metadata.
+- If retrieved knowledge is insufficient, stale or contradictory, Nexa must answer with an honest gap instead of smoothing over uncertainty.
 - Access policy is resolved by Greenhouse user/tenant/capability context, not by free-text labels or Notion page titles.
 - Documents containing secrets, uncontrolled PII or unsupported legal/financial commitments are quarantined or excluded from agentic retrieval.
 - Existing Notion delivery/metrics sync remains a separate operational data pipeline; this platform governs knowledge documents, not task metrics.
@@ -139,7 +142,7 @@ No task files are created by this ADR. Candidate titles for later discussion:
 2. Knowledge Source Registry + Notion Connector Discovery
 3. Notion Knowledge Ingestion MVP: Snapshot, Normalize, Version
 4. Human Knowledge Center: Greenhouse Academy / Manual
-5. Nexa Knowledge Retrieval Tool With Citations
+5. Nexa Knowledge Context Retrieval Tool With Citations
 6. Greenhouse MCP Knowledge Resources V1
 7. Knowledge Freshness, Feedback and Reliability Signals
 8. Knowledge Access Policy + Quarantine Workflow

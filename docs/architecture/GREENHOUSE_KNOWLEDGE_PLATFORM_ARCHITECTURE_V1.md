@@ -285,6 +285,174 @@ Prompt rule:
 - preguntas de cómo usar, qué significa, cómo se hace, runbooks y procedimientos usan Knowledge Platform;
 - si ambos aplican, Nexa combina señal operacional + conocimiento publicado.
 
+### 12.1 Context Contract
+
+Nexa no debe cargar el corpus completo en el prompt ni depender de un bloque estático de knowledge inyectado en cada turno.
+
+El contrato correcto es retrieval-on-demand:
+
+```text
+Nexa system prompt
+  -> reglas estables de uso de knowledge
+
+User turn
+  -> intención / route context / user context
+  -> knowledge_search()
+  -> retrieval packet acotado
+  -> respuesta con citas
+```
+
+Esto mantiene:
+
+- bajo el costo de tokens;
+- controlados los permisos;
+- trazable la fuente;
+- explícito el freshness;
+- observable qué conocimiento fue usado.
+
+### 12.2 Retrieval Trigger
+
+Nexa debe llamar Knowledge Platform cuando la pregunta sea sobre:
+
+- cómo usar Greenhouse;
+- qué significa una métrica, estado, capability, módulo o proceso;
+- qué pasos seguir en un runbook;
+- troubleshooting operativo;
+- política interna, guía de uso o onboarding;
+- interpretación de datos operativos cuando necesite definiciones o reglas publicadas.
+
+Nexa no debe llamar Knowledge Platform cuando:
+
+- la pregunta requiere estado operacional actual y ya existe tool de dominio;
+- el usuario pide una acción que requiere command semantics;
+- la respuesta puede resolverse desde contexto runtime fresco ya provisto;
+- el usuario pide algo fuera del scope publicado.
+
+Cuando ambos planos aplican, Nexa debe combinar:
+
+```text
+operational tool result
+  + knowledge retrieval packet
+  -> respuesta grounded en datos actuales + regla publicada
+```
+
+### 12.3 Retrieval Packet Shape
+
+`knowledge_search` debe devolver un paquete acotado, no documentos completos por defecto.
+
+Shape conceptual:
+
+```ts
+interface KnowledgeRetrievalPacket {
+  query: string
+  generatedAt: string
+  accessScope: {
+    tenantType: string
+    tenantId: string
+    userId: string
+    roleCodes: string[]
+    routeGroups: string[]
+    capabilities: string[]
+  }
+  confidence: 'high' | 'medium' | 'low' | 'none'
+  freshness: 'current' | 'stale' | 'deprecated' | 'unknown'
+  chunks: Array<{
+    chunkId: string
+    documentId: string
+    documentVersionId: string
+    title: string
+    headingPath: string[]
+    text: string
+    sourceUrl: string | null
+    humanUrl: string
+    citationLabel: string
+    updatedAt: string | null
+    freshness: 'current' | 'stale' | 'deprecated' | 'unknown'
+    sensitivity: 'client_safe' | 'internal' | 'restricted'
+  }>
+  deniedOrFilteredCount: number
+  notes: string[]
+}
+```
+
+Hard rules:
+
+- `chunks[]` debe estar filtrado antes de llegar al LLM;
+- el LLM nunca recibe chunks denegados para "decidir";
+- `sourceUrl` puede apuntar a Notion solo si el usuario tiene acceso y el producto lo permite;
+- `humanUrl` apunta a la surface Greenhouse canonical para lectura humana;
+- `deniedOrFilteredCount` permite observabilidad sin filtrar contenido sensible;
+- `confidence='none'` obliga respuesta de no-encontrado, no invención.
+
+### 12.4 Answer Rules
+
+Si Nexa usa Knowledge Platform:
+
+- debe responder solo con contenido respaldado por el retrieval packet;
+- debe citar documentos/secciones usados;
+- debe declarar cuando la fuente está stale o deprecated;
+- debe distinguir dato operativo actual vs regla/documentación publicada;
+- debe pedir validación humana cuando la pregunta toca legal, payroll, finance, security o contractual commitments y la fuente no está marcada como aprobada para ese uso;
+- debe decir "no encontré una guía publicada" cuando no hay evidencia suficiente.
+
+Formato UI recomendado:
+
+```text
+Respuesta breve
+
+Fuentes:
+- <Título> · <Sección> · actualizado <fecha>
+- <Título> · <Sección> · actualizado <fecha>
+```
+
+En el chat compacto, las fuentes pueden renderizarse como chips/accordion para no saturar la conversación.
+
+### 12.5 Conflict Resolution
+
+Jerarquía de confianza para conocimiento:
+
+1. runtime verificado / código / schema / API contract;
+2. arquitectura Greenhouse vigente y ADRs aceptados;
+3. docs Knowledge Platform publicados y current;
+4. Notion publicado pero stale;
+5. handoff histórico, task antigua o documento deprecated.
+
+Nexa no debe promediar fuentes contradictorias. Si recupera chunks con conflicto, debe:
+
+- preferir la fuente de mayor jerarquía;
+- mencionar que encontró una guía más antigua si es relevante;
+- evitar dar instrucciones operativas basadas en fuentes deprecated;
+- sugerir validación cuando el conflicto afecte acciones sensibles.
+
+### 12.6 Prompt Boundary
+
+El system prompt de Nexa debe contener reglas estables, no contenido de manual.
+
+Ejemplo conceptual:
+
+```text
+Si la pregunta requiere conocimiento publicado de Greenhouse, usa knowledge_search.
+No inventes reglas operativas.
+Si usas chunks de knowledge, cita fuentes.
+Si la fuente está stale/deprecated, dilo.
+Si no hay fuente suficiente, responde con un gap honesto.
+```
+
+El contenido recuperado vive en el tool result del turno, no en prompts globales versionados a mano.
+
+### 12.7 Feedback Loop
+
+Cada respuesta de Nexa que use knowledge debería generar metadata auditable:
+
+- query normalizada;
+- chunk IDs usados;
+- confidence;
+- si hubo respuesta con fuentes;
+- feedback del usuario (`useful`, `not_useful`, `wrong_source`, `stale`, `missing_doc`);
+- link a documento humano para corrección.
+
+Esto habilita mejorar el corpus sin inspeccionar conversaciones completas.
+
 ## 13. Access And Safety
 
 La política de acceso debe ser Greenhouse-native.
@@ -319,6 +487,9 @@ Signals iniciales:
 - `knowledge.retrieval.low_citation_rate`
 - `knowledge.feedback.negative_rate`
 - `knowledge.mcp.error_rate`
+- `knowledge.nexa.no_source_answer_rate`
+- `knowledge.nexa.stale_source_answer_rate`
+- `knowledge.nexa.low_confidence_retrieval_rate`
 
 Audit mínimo:
 
@@ -327,6 +498,7 @@ Audit mínimo:
 - document version creation;
 - quarantine decisions;
 - agent retrieval events with chunk IDs, not full sensitive content;
+- Nexa answer metadata for source usage, without storing full private prompts by default;
 - feedback events.
 
 ## 15. Candidate Task Titles

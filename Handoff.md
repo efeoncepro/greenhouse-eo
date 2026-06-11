@@ -3,6 +3,7 @@
 ## Sesion 2026-06-11 — Knowledge Platform proposal (docs-only)
 
 - Se creó una propuesta de arquitectura para conectar knowledge bases Notion a Greenhouse con dos capas: **humana** (manual/academy para aprender a operar Greenhouse) y **agéntica** (Nexa/MCP/webMCP con retrieval gobernado, citas y freshness).
+- Ampliación posterior: se documentó cómo Nexa usa esa knowledge como contexto: retrieval-on-demand (`knowledge_search`) con packet acotado de chunks/citas/freshness/confidence/access scope; NO corpus completo en prompt; respuesta obligada a citar, declarar stale/deprecated y no inventar cuando no hay evidencia.
 - Archivos nuevos: `docs/architecture/GREENHOUSE_KNOWLEDGE_PLATFORM_DECISION_V1.md` (`Status: Proposed`) y `docs/architecture/GREENHOUSE_KNOWLEDGE_PLATFORM_ARCHITECTURE_V1.md` (`Draft / proposed`).
 - `DECISIONS_INDEX.md` queda actualizado en "Decisiones propuestas / en discusion". `changelog.md` registra el delta.
 - Se documentaron títulos candidatos de primeras tasks dentro de los docs, **sin crear archivos `TASK-###` todavía** por instrucción del operador.
