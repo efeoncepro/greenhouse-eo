@@ -6885,6 +6885,110 @@ export interface GreenhouseHrWorkRelationshipOnboardingCases {
   user_id: string | null;
 }
 
+export interface GreenhouseKnowledgeKnowledgeChunks {
+  agentic_policy: Generated<string>;
+  allowed_scopes: Generated<string[]>;
+  audience: string;
+  body_text: string;
+  chunk_id: Generated<string>;
+  chunk_index: number;
+  citation_anchor: string;
+  created_at: Generated<Timestamp>;
+  document_id: string;
+  document_version_id: string;
+  freshness: Generated<string>;
+  heading_path: Generated<string[]>;
+  sensitivity: string;
+  source_position: number | null;
+  token_estimate: Generated<number>;
+}
+
+export interface GreenhouseKnowledgeKnowledgeDocuments {
+  agentic_policy: Generated<string>;
+  approver_role: string | null;
+  audience: Generated<string>;
+  created_at: Generated<Timestamp>;
+  created_by_user_id: string | null;
+  current_version_id: string | null;
+  doc_layer: string | null;
+  document_id: Generated<string>;
+  document_type: string;
+  human_url: string | null;
+  last_reviewed_at: Timestamp | null;
+  owner_domain: string;
+  public_id: Generated<string>;
+  publication_status: Generated<string>;
+  review_cadence_days: number | null;
+  sensitivity: Generated<string>;
+  slug: string;
+  source_id: string;
+  title: string;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseKnowledgeKnowledgeDocumentVersions {
+  checksum: string;
+  created_at: Generated<Timestamp>;
+  document_id: string;
+  normalized_markdown: string;
+  published_at: Timestamp | null;
+  published_by_user_id: string | null;
+  sensitivity: string;
+  source_created_at: Timestamp | null;
+  source_edited_at: Timestamp | null;
+  source_page_id: string | null;
+  source_url: string | null;
+  version_id: Generated<string>;
+  version_number: number;
+  version_status: Generated<string>;
+}
+
+export interface GreenhouseKnowledgeKnowledgeFeedback {
+  chunk_id: string | null;
+  comment: string | null;
+  context_json: Generated<Json>;
+  created_at: Generated<Timestamp>;
+  document_id: string | null;
+  feedback_id: Generated<string>;
+  feedback_kind: string;
+  submitted_at: Generated<Timestamp>;
+  submitted_by_user_id: string | null;
+}
+
+export interface GreenhouseKnowledgeKnowledgePublicationRuns {
+  actor: string | null;
+  created_at: Generated<Timestamp>;
+  details_json: Generated<Json>;
+  document_id: string | null;
+  error_summary: string | null;
+  finished_at: Timestamp | null;
+  run_id: Generated<string>;
+  run_kind: string;
+  source_id: string | null;
+  started_at: Generated<Timestamp>;
+  status: string;
+}
+
+export interface GreenhouseKnowledgeKnowledgeSources {
+  audience: Generated<string>;
+  created_at: Generated<Timestamp>;
+  created_by_user_id: string | null;
+  last_synced_at: Timestamp | null;
+  name: string;
+  owner_domain: string;
+  public_id: Generated<string>;
+  publication_policy: Generated<string>;
+  secret_ref: string | null;
+  source_id: Generated<string>;
+  source_kind: string;
+  source_system: string;
+  status: Generated<string>;
+  sync_enabled: Generated<boolean>;
+  tenant_scope_id: string | null;
+  tenant_scope_type: Generated<string>;
+  updated_at: Generated<Timestamp>;
+}
+
 export interface GreenhouseNotificationsEmailDeliveries {
   actor_email: string | null;
   attachment_size_bytes: number | null;
@@ -10171,6 +10275,12 @@ export interface DB {
   "greenhouse_hr.workforce_contracting_case_events": GreenhouseHrWorkforceContractingCaseEvents;
   "greenhouse_hr.workforce_contracting_cases": GreenhouseHrWorkforceContractingCases;
   "greenhouse_hr.workforce_contracting_drafts": GreenhouseHrWorkforceContractingDrafts;
+  "greenhouse_knowledge.knowledge_chunks": GreenhouseKnowledgeKnowledgeChunks;
+  "greenhouse_knowledge.knowledge_document_versions": GreenhouseKnowledgeKnowledgeDocumentVersions;
+  "greenhouse_knowledge.knowledge_documents": GreenhouseKnowledgeKnowledgeDocuments;
+  "greenhouse_knowledge.knowledge_feedback": GreenhouseKnowledgeKnowledgeFeedback;
+  "greenhouse_knowledge.knowledge_publication_runs": GreenhouseKnowledgeKnowledgePublicationRuns;
+  "greenhouse_knowledge.knowledge_sources": GreenhouseKnowledgeKnowledgeSources;
   "greenhouse_notifications.email_deliveries": GreenhouseNotificationsEmailDeliveries;
   "greenhouse_notifications.email_engagement": GreenhouseNotificationsEmailEngagement;
   "greenhouse_notifications.email_subscriptions": GreenhouseNotificationsEmailSubscriptions;

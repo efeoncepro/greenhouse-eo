@@ -13,7 +13,7 @@ Aceptación cerrada por **TASK-1080** (ADR `Accepted (direction)`). Ajustes que 
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`

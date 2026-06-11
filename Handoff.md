@@ -1,5 +1,15 @@
 # Release 2026-06-10 #2 — develop→main `6c649b2a6` RELEASED
 
+## Sesion 2026-06-11 — Knowledge Platform foundation en curso (TASK-1081, develop)
+
+- **TASK-1081 `in-progress`** en `develop` (sin branch, override del operador). Foundation persistente de Knowledge Platform.
+- **Synergy check clave:** `greenhouse_knowledge` NO es identidad paralela de `greenhouse_context` (Structured Context Layer). SCL = sidecar JSONB de memoria de agente/replay sobre aggregates; Knowledge = corpus de documentos prosa + chunks con gobernanza editorial. Boundary confirmado por el propio doc SCL (§900-906). Schema separado correcto.
+- **Slice 1 DONE (DDL):** migración `20260611200140700_task-1081-knowledge-core-schema.sql` aplicada en dev compartida (Cloud SQL). Schema `greenhouse_knowledge` + 6 tablas: `knowledge_sources`, `knowledge_documents`, `knowledge_document_versions`, `knowledge_chunks`, `knowledge_publication_runs` (anti-DELETE), `knowledge_feedback` (append-only). Dos dimensiones ortogonales `publication_status` × `agentic_policy` (decisión TASK-1080). Transition trigger en documents + touch updated_at + anti pre-up-marker DO block. `db.d.ts` regenerado (6 tablas). tsc verde.
+- **Decisiones de ejecución (refinamientos documentados):** tsvector/GIN diferido a TASK-1083 (search); outbox events diferidos (sin consumidor, audit via publication_runs); viewCode `plataforma.knowledge` diferido a TASK-1084 (nace con la página); capabilities `knowledge.*` SÍ se siembran aquí (SSOT, Slice 2). Patrón módulo = `query()` raw tipado (espejo TASK-790), no Kysely.
+- **Pendiente:** Slice 2 (src/lib/knowledge/ core server-only + capabilities seed/grants + CaptureDomain 'knowledge'), Slice 3 (triple doc + CLAUDE.md + Delta arquitectura). Push a develop al cierre (aprobado).
+
+---
+
 ## Sesion 2026-06-11 — Knowledge Platform acceptance cerrada (TASK-1080)
 
 - **TASK-1080 `complete`** (policy / decision-closure, con overlay `arch-architect`). Convierte el ADR Knowledge Platform de `Proposed` → **`Accepted (direction) — runtime gated per task`**.
