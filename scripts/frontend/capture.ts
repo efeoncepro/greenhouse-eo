@@ -12,6 +12,8 @@ import { fileURLToPath } from 'node:url'
 import { parseArgs } from 'node:util'
 
 import { appendAudit, resolveActor } from './lib/audit'
+import { writeCaptureIndex } from './lib/capture-index'
+import { pruneScenarioRuns } from './gc'
 import { ensureStorageStateFresh, refreshStorageState } from './lib/auth'
 import { runBaselineDiffContract } from './lib/baseline-contract'
 import { assertNotRedirectedToLogin, launchCaptureSession } from './lib/browser'
@@ -52,6 +54,8 @@ Opciones:
   --device=<name>   Device Playwright para capturas inline
   --upload=<bucket> Sube artifacts a GCS
   --prod            Triple gate explícito para production
+  --task=<id>       Tag de trazabilidad al work-item (TASK-###/ISSUE-###/label).
+                    Aparece en .captures/INDEX.md agrupado por work-item.
   -h, --help        Muestra esta ayuda
 
 Ejemplos:
@@ -359,6 +363,7 @@ const main = async (): Promise<void> => {
       prod: { type: 'boolean', default: false },
       device: { type: 'string' },
       upload: { type: 'string' },
+      task: { type: 'string' },
       help: { type: 'boolean', short: 'h', default: false }
     }
   })
@@ -508,6 +513,7 @@ const main = async (): Promise<void> => {
     exitCode: rootExitCode,
     durationMs: variantSummaries.reduce((acc, v) => acc + v.durationMs, 0),
     actor: resolveActor(),
+    task: typeof values.task === 'string' && values.task.trim().length > 0 ? values.task.trim() : undefined,
     error: rootExitCode === 1
       ? variants.length === 1
         ? primaryManifest?.error?.message ?? 'Capture failed'
@@ -519,6 +525,20 @@ const main = async (): Promise<void> => {
         : 'helper_error'
       : undefined
   })
+
+  // Auto-poda: cada scenario se auto-limita a sus N corridas más recientes (la
+  // evidencia vigente), borrando las iteraciones viejas del MISMO scenario para
+  // que .captures/ no se acumule. La ventana de gracia protege la sesión en curso.
+  // Opt-out con GVC_NO_AUTOPRUNE=1; tamaño configurable con GVC_KEEP_PER_SCENARIO.
+  if (rootExitCode === 0 && process.env.GVC_NO_AUTOPRUNE !== '1') {
+    const keepPerScenario = Number(process.env.GVC_KEEP_PER_SCENARIO ?? 3)
+    const pruned = pruneScenarioRuns(scenario.name, Number.isFinite(keepPerScenario) ? keepPerScenario : 3)
+
+    if (pruned > 0) PRINT(`✓ auto-poda: ${pruned} iteración(es) vieja(s) de '${scenario.name}' eliminada(s)`)
+  }
+
+  // Regenera el índice navegable (.captures/INDEX.md + index.json). Best-effort.
+  writeCaptureIndex(CAPTURES_DIR)
 
   PRINT('')
   PRINT(`═══════════════════════════════════════`)

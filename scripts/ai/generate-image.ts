@@ -1,7 +1,7 @@
 import 'server-only'
 
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
-import { dirname, isAbsolute, join } from 'node:path'
+import { basename, dirname, isAbsolute, join } from 'node:path'
 import { spawn } from 'node:child_process'
 
 import { config as loadEnv } from 'dotenv'
@@ -48,12 +48,16 @@ loadEnv({ path: join(process.cwd(), '.env.local') })
 
 const DEFAULT_OUT_DIR = join(process.cwd(), 'public', 'images', 'generated')
 
+const CONCEPTS_DIR = join(process.cwd(), '.captures', 'concepts')
+
 interface CliArgs {
   prompt?: string
   promptFile?: string
   batch?: string
   out?: string
   outDir?: string
+  concept?: string
+  task?: string
   size: OpenAIImageSize
   quality: OpenAIImageQuality
   background: OpenAIImageBackground
@@ -71,6 +75,13 @@ const HELP = `Greenhouse AI image CLI — OpenAI gpt-image-2
                 [--timeout 280000] [--open]
   pnpm ai:image --prompt-file <path> ...
   pnpm ai:image --batch <json>          # [{ "filename": "a.png", "prompt": "…" }, …]
+  pnpm ai:image --concept <loop> --batch <json> [--task TASK-###]   # conceptos del design-loop
+
+Concept mode:
+  --concept <loop>   Rutea a .captures/concepts/<loop>/ (gitignored, trazable, protegido
+                     del GC) y escribe manifest.json. Para product-design-loop. Prioridad
+                     sobre --out-dir. Aparece en \`pnpm fe:capture:index\` por loop.
+  --task <id>        Tag de work-item (TASK-###/ISSUE-###) registrado en el manifest.
 
 Defaults: model gpt-image-2 · size 1536x1024 · quality high · background opaque · out-dir public/images/generated
 Requires OPENAI_API_KEY_SECRET_REF (or OPENAI_API_KEY) — resolved server-side, never printed.`
@@ -106,6 +117,12 @@ const parseArgs = (argv: string[]): CliArgs => {
         break
       case '--out-dir':
         args.outDir = next()
+        break
+      case '--concept':
+        args.concept = next()
+        break
+      case '--task':
+        args.task = next()
         break
       case '--size':
         args.size = next() as OpenAIImageSize
@@ -148,6 +165,56 @@ const slugify = (text: string): string =>
     .slice(0, 40) || 'image'
 
 const resolvePath = (p: string): string => (isAbsolute(p) ? p : join(process.cwd(), p))
+
+const resolveActor = (): string => {
+  if (process.env.GITHUB_ACTOR) return `gh:${process.env.GITHUB_ACTOR}`
+  if (process.env.USER) return `user:${process.env.USER}`
+
+  return 'unknown'
+}
+
+interface ConceptManifestItem {
+  file: string
+  prompt: string
+}
+
+/**
+ * Escribe/mergea `.captures/concepts/<loop>/manifest.json` para que el índice GVC
+ * (`pnpm fe:capture:index`) ubique el loop, su work-item y los prompts. Mergea por
+ * filename (regenerar un concepto pisa su entrada, no duplica). Best-effort.
+ */
+const writeConceptManifest = async (loopDir: string, args: CliArgs, items: GenItem[]): Promise<void> => {
+  try {
+    const manifestPath = join(loopDir, 'manifest.json')
+    const fresh: ConceptManifestItem[] = items.map(it => ({ file: basename(it.filePath), prompt: it.prompt }))
+
+    let merged = fresh
+
+    try {
+      const prev = JSON.parse(await readFile(manifestPath, 'utf8')) as { items?: ConceptManifestItem[] }
+      const byFile = new Map<string, ConceptManifestItem>((prev.items ?? []).map(i => [i.file, i]))
+
+      for (const i of fresh) byFile.set(i.file, i)
+      merged = [...byFile.values()]
+    } catch {
+      // sin manifest previo — se crea nuevo.
+    }
+
+    const manifest = {
+      kind: 'concept' as const,
+      loop: args.concept,
+      task: args.task ?? null,
+      model: args.model,
+      generatedAt: new Date().toISOString(),
+      actor: resolveActor(),
+      items: merged
+    }
+
+    await writeFile(manifestPath, JSON.stringify(manifest, null, 2) + '\n', 'utf8')
+  } catch {
+    // nunca romper la generación por el manifest.
+  }
+}
 
 const openInViewer = (filePath: string) => {
   if (process.platform !== 'darwin') return
@@ -198,7 +265,10 @@ const main = async () => {
     process.exit(args.help ? 0 : 1)
   }
 
-  const outDir = args.outDir ? resolvePath(args.outDir) : DEFAULT_OUT_DIR
+  // --concept <loop> rutea a la taxonomía de conceptos de GVC (gitignored, trazable,
+  // protegida del garbage collector). Tiene prioridad sobre --out-dir.
+  const conceptLoop = args.concept ? slugify(args.concept) : null
+  const outDir = conceptLoop ? join(CONCEPTS_DIR, conceptLoop) : args.outDir ? resolvePath(args.outDir) : DEFAULT_OUT_DIR
   const items: GenItem[] = []
 
   if (args.batch) {
@@ -229,6 +299,11 @@ const main = async () => {
     } catch (err) {
       process.stdout.write(`  ✗ ${item.filePath.replace(process.cwd(), '.')} FAILED: ${(err as Error)?.message ?? err}\n`)
     }
+  }
+
+  if (conceptLoop) {
+    await writeConceptManifest(outDir, args, items)
+    process.stdout.write(`  ✎ concepto '${conceptLoop}' → .captures/concepts/${conceptLoop}/ (manifest.json actualizado)\n`)
   }
 
   process.stdout.write('done\n')
