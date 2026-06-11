@@ -2,6 +2,16 @@
 
 Documentacion oficial de la plataforma Greenhouse. Cada documento describe como opera un modulo o dominio del portal en terminos claros, orientados a entender el funcionamiento y las reglas de negocio. Para detalle tecnico (schemas, APIs, decisiones de diseno), cada seccion enlaza a su spec de arquitectura correspondiente.
 
+## Regla obligatoria
+
+Todo dominio, modulo, funcionalidad, feature, workflow, integration, tool, API o surface de Greenhouse debe tener tres capas documentales:
+
+- **Documentacion tecnica:** `docs/architecture/`, `docs/api/`, ADR o spec tecnica.
+- **Documentacion funcional:** esta carpeta, `docs/documentation/<dominio>/`.
+- **Manual de uso / runbook:** `docs/manual-de-uso/<dominio>/`.
+
+La documentacion funcional no reemplaza el manual ni la arquitectura. Explica que hace la capacidad, como se comporta, que reglas de negocio aplica, que estados muestra y como se relaciona con otros modulos. Si una capacidad nueva no tiene documento funcional, hay que crearlo o dejar una excepcion explicita con owner y condicion de retiro en la task/handoff.
+
 ## Indice por dominio
 
 ### Identidad y acceso

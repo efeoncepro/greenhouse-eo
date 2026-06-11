@@ -1,5 +1,13 @@
 # Release 2026-06-10 #2 — develop→main `6c649b2a6` RELEASED
 
+## Sesion 2026-06-11 — Triple documentacion obligatoria (policy)
+
+- Se endureció el contrato documental: toda capacidad Greenhouse debe tener documentación técnica, documentación funcional y manual de uso/runbook.
+- Archivos actualizados: `docs/operations/DOCUMENTATION_OPERATING_MODEL_V1.md`, `AGENTS.md`, `CLAUDE.md`, `docs/documentation/README.md`, `docs/manual-de-uso/README.md`, `project_context.md`, `changelog.md`, `Handoff.md`.
+- Regla de cierre: la proporcionalidad solo cambia tamaño/delta; no declarar `complete` si falta una capa requerida. Si una capa no aplica todavía, dejar razón, owner y condición de retiro en task/handoff.
+- Rollout/implementación: docs-only, sin runtime ni tasks nuevas.
+
+---
 ## Sesion 2026-06-11 — Knowledge Platform proposal (docs-only)
 
 - Se creó una propuesta de arquitectura para conectar knowledge bases Notion a Greenhouse con dos capas: **humana** (manual/academy para aprender a operar Greenhouse) y **agéntica** (Nexa/MCP/webMCP con retrieval gobernado, citas y freshness).

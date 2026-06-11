@@ -201,8 +201,7 @@ Si falta alguno de esos pasos, el cierre debe decir `code complete, rollout pend
   - skills de Claude viven en `.claude/skills/<skill-name>/SKILL.md` (mayuscula — convencion oficial vigente de Claude/Agent Skills)
   - los archivos Claude legacy en `.claude/skills/*/skill.md` se preservan solo como compatibilidad historica; no usarlos como patron para skills nuevas
   - antes de crear una skill nueva, revisar primero ejemplos locales existentes en `.codex/skills/*` o `.claude/skills/*`
-- Si el cambio afecta como funciona un modulo desde la perspectiva del usuario, verificar si existe documentacion funcional en `docs/documentation/` para el dominio afectado y actualizarla.
-- Si el cambio agrega o modifica una capacidad visible que el usuario debe saber operar paso a paso, actualizar o crear un manual en `docs/manual-de-uso/` con la categoria del dominio correspondiente. Los manuales no reemplazan arquitectura ni documentacion funcional: explican como usar la feature, que permisos requiere, que no hacer y como resolver problemas comunes.
+- **Triple documentacion obligatoria:** todo dominio, modulo, funcionalidad, feature, workflow, integration, tool, API o surface debe tener tres capas: documentacion tecnica (`docs/architecture/`, `docs/api/` o ADR/spec tecnica), documentacion funcional (`docs/documentation/<dominio>/`) y manual de uso/runbook (`docs/manual-de-uso/<dominio>/`). La proporcionalidad cambia el tamano del doc, no la obligacion. Si una capa no aplica todavia, documentar la razon, owner y condicion de retiro en la task/handoff; no declarar `complete` si falta una capa requerida.
 - Aplicar `docs/operations/DOCUMENTATION_OPERATING_MODEL_V1.md` para documentar con una fuente canonica y deltas cortos en los documentos vivos.
 - Revisar `git status` y no asumir que el arbol esta limpio.
 - Confirmar si el cambio toca layout global, navegacion, autenticacion, tema o deploy. Si toca alguno, documentarlo en `Handoff.md`.
