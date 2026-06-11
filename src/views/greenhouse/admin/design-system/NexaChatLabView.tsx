@@ -15,7 +15,8 @@ import {
   NexaComposerInput,
   NexaComposerActionButton,
   NexaFace,
-  NexaPresenceMark
+  NexaPresenceMark,
+  NexaSenderMark
 } from '@/components/greenhouse/primitives'
 import { GREENHOUSE_NEXA_BRAND_COLORS } from '@/components/greenhouse/primitives/greenhouse-nexa-brand-controller'
 
@@ -81,7 +82,7 @@ const COMPOSED_OF: { name: string; role: string; status: string }[] = [
   { name: 'NexaComposer', role: 'Input (caja Vuexy anulada → el glow pinta todo) + botón send/stop + glow + disclaimer, como unidad reusable. Partes: NexaComposerInput / NexaComposerActionButton.', status: 'Primitive canónica ✅' },
   { name: 'NexaPresenceMark', role: 'Header: crossfade "En línea" ↔ "Pensando…" con elipsis animada (reduced-motion horneado).', status: 'Primitive canónica ✅' },
   { name: 'NexaFace', role: 'Avatar cara real de Nexa con variants hero (76) / header (44, borde teal) / message (32). Single source del asset.', status: 'Primitive canónica ✅' },
-  { name: 'NexaSenderMark', role: 'Avatar por-mensaje (disco navy + glyph teal/sparkle blanco).', status: 'A extraer ⏳' },
+  { name: 'NexaSenderMark', role: 'Avatar por-mensaje (disco navy + anillo teal + glyph arco teal/sparkle blanco inline).', status: 'Primitive canónica ✅' },
   { name: 'NexaConversationRail', role: 'Rail de historial glass (search + grupos + items + estados).', status: 'Parte del patrón' },
   { name: 'NexaEmptyHero', role: 'Saludo + chip de contexto + prompts + firma.', status: 'Parte del patrón' },
   { name: 'GreenhouseFloatingSurface / AdaptiveSidecar', role: 'Anclaje del panel (modo expandible) / lane (modo C).', status: 'Primitives reusadas' }
@@ -196,6 +197,23 @@ const NexaChatLabView = () => (
             <Stack spacing={0.5} alignItems='center'>
               <NexaFace variant='message' />
               <Typography variant='caption' color='text.secondary'>message · 32</Typography>
+            </Stack>
+          </Stack>
+        </Card>
+
+        {/* NexaSenderMark — avatar por-mensaje (disco navy, se ve sobre paper) */}
+        <Card>
+          <Typography variant='subtitle2' sx={{ mb: 1.5 }}>
+            <InlineCode>NexaSenderMark</InlineCode> — avatar por-mensaje
+          </Typography>
+          <Stack direction='row' spacing={3} alignItems='center' flexWrap='wrap'>
+            <Stack spacing={0.5} alignItems='center'>
+              <NexaSenderMark />
+              <Typography variant='caption' color='text.secondary'>default · 28</Typography>
+            </Stack>
+            <Stack spacing={0.5} alignItems='center'>
+              <NexaSenderMark size={40} />
+              <Typography variant='caption' color='text.secondary'>size 40</Typography>
             </Stack>
           </Stack>
         </Card>

@@ -19,13 +19,12 @@ import {
 } from '@assistant-ui/react'
 import { MarkdownTextPrimitive } from '@assistant-ui/react-markdown'
 
-import { alpha, useTheme, type Theme } from '@mui/material/styles'
+import { alpha, type Theme } from '@mui/material/styles'
 
 import { getMicrocopy } from '@/lib/copy'
 import { GH_NEXA } from '@/lib/copy/nexa'
 
-import { GreenhouseThinkingBeat, NexaComposer, NexaComposerInput, NexaComposerActionButton } from '@/components/greenhouse/primitives'
-import { GREENHOUSE_NEXA_BRAND_COLORS } from '@/components/greenhouse/primitives/greenhouse-nexa-brand-controller'
+import { GreenhouseThinkingBeat, NexaComposer, NexaComposerInput, NexaComposerActionButton, NexaSenderMark } from '@/components/greenhouse/primitives'
 import CustomTextField from '@core/components/mui/TextField'
 
 import type { NexaModelId } from '@/config/nexa-models'
@@ -84,36 +83,6 @@ const nexaWordmarkInlineSx = (theme: Theme) => ({
   lineHeight: 1,
   letterSpacing: 0.1
 })
-
-/* ── Avatar por-mensaje de Nexa ── Nexa Mark en disco navy circular con anillo teal:
-   minimalista (un disco con el mark) + presencia (contraste navy/teal). El glyph va
-   inline para controlar sus colores: sonrisa teal + sparkle BLANCO (sobre navy el
-   sparkle azul se perdía) y tamaño generoso dentro del disco. */
-const NexaSenderMark = () => {
-  const theme = useTheme()
-
-  return (
-    <Box
-      aria-hidden
-      sx={{
-        width: 28,
-        height: 28,
-        borderRadius: '50%',
-        flexShrink: 0,
-        display: 'inline-flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        bgcolor: GREENHOUSE_NEXA_BRAND_COLORS.midnightNavy,
-        boxShadow: `0 0 0 1.5px ${alpha(GREENHOUSE_NEXA_BRAND_COLORS.electricTeal, 0.35)}`
-      }}
-    >
-      <Box component='svg' viewBox='0 0 48 48' sx={{ width: 19, height: 19, display: 'block' }}>
-        <path d='M9 27 Q19 39 29 27' fill='none' stroke={GREENHOUSE_NEXA_BRAND_COLORS.electricTeal} strokeWidth={4} strokeLinecap='round' />
-        <path d='M34 9 C35 12.5 36.5 14 40 15 C36.5 16 35 17.5 34 21 C33 17.5 31.5 16 28 15 C31.5 14 33 12.5 34 9 Z' fill={theme.palette.common.white} />
-      </Box>
-    </Box>
-  )
-}
 
 const TextPart = ({ text }: { text: string }) => (
   <span style={{ whiteSpace: 'pre-wrap' }}>{text}</span>
