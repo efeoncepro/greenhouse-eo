@@ -45,13 +45,14 @@ pnpm ai:image --prompt "<text>" [--out <path>] [--size 1024x1024|1536x1024|1024x
               [--model gpt-image-2] [--count N] [--timeout 280000] [--open]
 pnpm ai:image --prompt-file <path>          # long prompts
 pnpm ai:image --batch concepts.json         # [{ "filename": "a.png", "prompt": "…" }, …] — multiple
+pnpm ai:image --concept <loop> [--task TASK-###] --batch concepts.json   # design-loop concepts
 ```
 
 - Wraps the canonical `generateOpenAIImage` (`src/lib/ai/openai-image.ts`). Self-contained: loads `.env.local`, resolves `OPENAI_API_KEY_SECRET_REF` server-side, never prints the secret.
 - Defaults: `gpt-image-2 · 1536x1024 · quality high · opaque · out-dir public/images/generated`. Timeout default **280s** (gpt-image-2 `high` exceeds the 125s of the runtime `generateImage` helper).
 - `--background transparent` falls back to `gpt-image-1.5` (gpt-image-2 has no alpha). Still **raster** (PNG) — for real vectors use Higgsfield + Recraft V4.1.
 - The CLI **operates** the model; THIS skill is the **art direction** (brief, composition, finish, palette, QA). Run the skill to write the prompt, then the CLI to generate, then critique + GVC if it lands in UI.
-- Keep exploratory concepts out of commits (gitignored dir, e.g. `.captures/concepts/`).
+- **Concepts: use `--concept <loop>`** (optionally `--task TASK-###`) — it auto-routes to `.captures/concepts/<loop>/` (gitignored, **protected from the GVC garbage collector**), writes a traceable `manifest.json`, and surfaces in `pnpm fe:capture:index` grouped by loop. Don't hand-route concepts with `--out`/`--out-dir`, and never commit them.
 
 ## Provider Choice
 

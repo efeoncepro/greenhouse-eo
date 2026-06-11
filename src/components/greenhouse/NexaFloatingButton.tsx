@@ -1,16 +1,17 @@
 'use client'
 
-import { useCallback, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { usePathname } from 'next/navigation'
 
 import Box from '@mui/material/Box'
 import Card from '@mui/material/Card'
+import ClickAwayListener from '@mui/material/ClickAwayListener'
 import Fab from '@mui/material/Fab'
 import Fade from '@mui/material/Fade'
+import FocusTrap from '@mui/material/Unstable_TrapFocus'
 import IconButton from '@mui/material/IconButton'
 import Stack from '@mui/material/Stack'
-import Typography from '@mui/material/Typography'
 import useMediaQuery from '@mui/material/useMediaQuery'
 import { alpha, useTheme } from '@mui/material/styles'
 import Drawer from '@mui/material/Drawer'
@@ -24,10 +25,12 @@ import type { ReadonlyJSONObject, ReadonlyJSONValue } from 'assistant-stream/uti
 
 import { DEFAULT_NEXA_MODEL, resolveNexaModel, type NexaModelId } from '@/config/nexa-models'
 import type { NexaResponse } from '@/lib/nexa/nexa-contract'
+import { isNexaFloatingExpandableEnabled } from '@/lib/nexa/flags'
 import { GreenhouseNexaAnimatedMark, GreenhouseNexaBrandMark } from '@/components/greenhouse/primitives'
 import { GREENHOUSE_NEXA_BRAND_COLORS } from '@/components/greenhouse/primitives/greenhouse-nexa-brand-controller'
 
 import NexaThread from '@/views/greenhouse/home/components/NexaThread'
+import NexaFloatingPanel from '@/views/greenhouse/nexa/floating-chat/NexaFloatingPanel'
 
 const TASK407_ARIA_CERRAR_NEXA = "Cerrar Nexa"
 const TASK407_ARIA_ABRIR_NEXA_AI = "Abrir Nexa AI"
@@ -97,6 +100,47 @@ const NexaFloatingButton = ({ docked = false }: NexaFloatingButtonProps) => {
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
   const [open, setOpen] = useState(false)
+  const [expanded, setExpanded] = useState(false)
+  const fabRef = useRef<HTMLButtonElement>(null)
+  const expandableEnabled = isNexaFloatingExpandableEnabled()
+
+  const closePanel = useCallback(() => {
+    setOpen(false)
+    // Non-modal: el foco vuelve al FAB al cerrar (Escape / click-fuera / botón cerrar).
+    requestAnimationFrame(() => fabRef.current?.focus())
+  }, [])
+
+  const handleClickAway = useCallback(
+    (event: MouseEvent | TouchEvent) => {
+      const target = event.target
+
+      // El FAB togglea aparte; no dejar que el click-away lo trate como "fuera".
+      if (fabRef.current && target instanceof Node && fabRef.current.contains(target)) return
+
+      closePanel()
+    },
+    [closePanel]
+  )
+
+  // Escape cierra; al cerrar, el panel vuelve a compacto para el próximo open.
+  useEffect(() => {
+    if (!open) {
+      setExpanded(false)
+
+      return
+    }
+
+    if (!expandableEnabled) return
+
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') closePanel()
+    }
+
+    window.addEventListener('keydown', onKey)
+
+    return () => window.removeEventListener('keydown', onKey)
+  }, [open, expandableEnabled, closePanel])
+
   const [selectedModel, setSelectedModel] = useState<NexaModelId>(DEFAULT_NEXA_MODEL)
   const modelRef = useRef<NexaModelId>(DEFAULT_NEXA_MODEL)
 
@@ -178,9 +222,18 @@ const NexaFloatingButton = ({ docked = false }: NexaFloatingButtonProps) => {
       <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         {/* Mini header */}
         <Stack direction='row' justifyContent='space-between' alignItems='center' sx={{ px: 2, py: 1.5, borderBottom: 1, borderColor: 'divider' }}>
-          <Stack direction='row' spacing={1} alignItems='center'>
-            <GreenhouseNexaBrandMark kind='badgeIcon' size='small' />
-            <Typography variant='subtitle2'>Nexa AI</Typography>
+          <Stack direction='row' spacing={1.25} alignItems='center'>
+            <GreenhouseNexaBrandMark kind='badgeIcon' size='small' sx={{ inlineSize: 24, blockSize: 24 }} />
+            {/* Wordmark Nexa en Poppins (display SoT) a 16px/600 — presencia sin pesar.
+                Es un one-off fuera del SoT (el tier display arranca en h4=20px; no hay
+                variante Poppins-16) → se renderiza como Box, no Typography. Su home
+                canónica es el NexaComposer/wordmark primitive (TASK-1078 follow-up). */}
+            <Box
+              component='span'
+              sx={theme => ({ fontFamily: theme.typography.h4.fontFamily, fontWeight: 600, fontSize: '1rem', lineHeight: 1, letterSpacing: 0.1 })}
+            >
+              Nexa AI
+            </Box>
           </Stack>
           <IconButton size='small' onClick={() => setOpen(false)} aria-label={TASK407_ARIA_CERRAR_NEXA}>
             <i className='tabler-x' style={{ fontSize: '1rem' }} />
@@ -208,6 +261,7 @@ const NexaFloatingButton = ({ docked = false }: NexaFloatingButtonProps) => {
         sx={nexaFabAuraSx}
       >
         <Fab
+          ref={fabRef}
           color='primary'
           size='medium'
           aria-label={TASK407_ARIA_ABRIR_NEXA_AI}
@@ -246,8 +300,38 @@ const NexaFloatingButton = ({ docked = false }: NexaFloatingButtonProps) => {
         </Fab>
       </Box>
 
-      {/* Panel: Drawer on mobile, positioned Card on desktop */}
-      {isMobile ? (
+      {/* Panel expandible persistido (TASK-1078) detrás del flag; con flag OFF, el
+          panel efímero histórico (Drawer mobile / Card desktop) bit-for-bit. */}
+      {expandableEnabled ? (
+        <Fade in={open} unmountOnExit>
+          <Box
+            sx={{
+              position: 'fixed',
+              bottom: isMobile
+                ? 12
+                : docked
+                  ? 'calc(var(--gh-floating-actions-safe-block-size) + var(--gh-floating-actions-gap))'
+                  : 88,
+              right: isMobile ? 12 : docked ? 'var(--gh-floating-actions-inline-offset)' : 24,
+              zIndex: theme.zIndex.speedDial - 1
+            }}
+          >
+            <FocusTrap open={open}>
+              <Box tabIndex={-1} sx={{ outline: 'none' }}>
+                <ClickAwayListener onClickAway={handleClickAway} mouseEvent='onMouseDown' touchEvent='onTouchStart'>
+                  <Box>
+                    <NexaFloatingPanel
+                      expanded={expanded}
+                      onToggleExpanded={() => setExpanded(v => !v)}
+                      onClose={closePanel}
+                    />
+                  </Box>
+                </ClickAwayListener>
+              </Box>
+            </FocusTrap>
+          </Box>
+        </Fade>
+      ) : isMobile ? (
         <Drawer
           anchor='bottom'
           open={open}

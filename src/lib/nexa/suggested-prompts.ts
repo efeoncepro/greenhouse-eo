@@ -1,0 +1,65 @@
+import { GH_NEXA } from '@/lib/copy/nexa'
+
+// TASK-1078 — Prompts sugeridos CONTEXTUALES, Tier 1 (resolver frontend, sin backend).
+// Mapea la familia de ruta donde el usuario abre a Nexa → un set curado de prompts.
+// Determinístico, cero costo IA, cero datos. El Tier 2 (data-aware, anomalías/pendientes
+// reales) y la interpolación del nombre de la entidad ("Cliente · Sky Airline") son
+// follow-ups (requieren readers de dominio / que la página declare su contexto).
+
+export type NexaPromptContextKey = 'general' | 'finance' | 'client' | 'payroll'
+
+export interface NexaPromptContext {
+  key: NexaPromptContextKey
+  label: string
+  icon: string
+  prompts: string[]
+}
+
+/**
+ * Contexto que una página declara para Nexa (Tier 1.5). `entityName` interpola el nombre
+ * real en los prompts/label (ej. "Cliente · Sky Airline"); `contextKey` puede forzar la
+ * familia si la ruta no la resuelve. Ambos opcionales — sin esto, se resuelve por ruta.
+ */
+export interface NexaPageContextValue {
+  entityName?: string
+  contextKey?: NexaPromptContextKey
+}
+
+const CONTEXTS = GH_NEXA.floating.prompt_contexts
+
+// Fallback genérico para el placeholder `{entity}` cuando la página no declaró el nombre.
+const GENERIC_ENTITY = 'este cliente'
+
+const routeContextKey = (path: string): NexaPromptContextKey => {
+  // Página de un cliente/organización específico (agency o finance) → contexto Cliente.
+  if (/\/(agency|finance)\/(clients|organizations)\/[^/]+/.test(path)) return 'client'
+
+  // Familia Nómina.
+  if (path.startsWith('/hr/payroll') || path.startsWith('/hr/nomina') || path.includes('/payroll')) return 'payroll'
+
+  // Familia Finanzas (P&L, gasto, margen, flujo).
+  if (path.startsWith('/finance')) return 'finance'
+
+  return 'general'
+}
+
+/**
+ * Resuelve el contexto de prompts desde la ruta + el contexto declarado por la página.
+ * El `contextKey` declarado gana sobre la ruta; el `entityName` interpola `{entity}` en los
+ * prompts y agrega "· {nombre}" al label del contexto Cliente.
+ */
+export const resolveNexaPromptContext = (
+  pathname: string | null | undefined,
+  pageContext?: NexaPageContextValue | null
+): NexaPromptContext => {
+  const path = (pathname ?? '').toLowerCase()
+  const key = pageContext?.contextKey ?? routeContextKey(path)
+  const ctx = CONTEXTS[key] ?? CONTEXTS.general
+
+  const entityName = pageContext?.entityName?.trim()
+  const entity = entityName || GENERIC_ENTITY
+  const prompts = ctx.prompts.map(prompt => prompt.replace(/\{entity\}/g, entity))
+  const label = key === 'client' && entityName ? `${ctx.label} · ${entityName}` : ctx.label
+
+  return { key, label, icon: ctx.icon, prompts }
+}

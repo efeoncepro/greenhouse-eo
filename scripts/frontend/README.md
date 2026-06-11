@@ -70,9 +70,12 @@ Playwright ad-hoc queda como complemento para consola/red/API payloads o pasos q
 scripts/frontend/
 ├── capture.ts                 # CLI entrypoint (tsx)
 ├── micro.ts                   # sampler de microinteracciones selector-scoped
-├── gc.ts                      # purga capturas por antigüedad/tamaño
+├── gc.ts                      # purga por antigüedad/tamaño/per-scenario + auto-poda
+├── index-cmd.ts               # fe:capture:index — regenera índice navegable
 ├── README.md                  # este archivo
 ├── lib/
+│   ├── capture-paths.ts       # scenarioFromDirName + dirs reservados (concepts)
+│   ├── capture-index.ts       # taxonomía derivada: INDEX.md + index.json
 │   ├── env.ts                 # 3 envs: local | staging | dev-agent | production
 │   ├── auth.ts                # delega a scripts/playwright-auth-setup.mjs
 │   ├── browser.ts             # chromium + viewport + bypass + recordVideo
@@ -143,4 +146,50 @@ pnpm fe:capture:gc                         # dry-run, lista qué borraría (>30d
 pnpm fe:capture:gc --apply                 # ejecuta
 pnpm fe:capture:gc --apply --days=7        # threshold custom
 pnpm fe:capture:gc --max-gb=15 --keep=20   # dry-run por tamaño, protege lo más reciente
+pnpm fe:capture:gc --per-scenario=1 --apply  # conserva 1 evidencia por scenario,
+                                             # purga las iteraciones anteriores
 ```
+
+El ruido real de `.captures/` no son los `tmp-*` sino re-correr el MISMO scenario
+decenas de veces iterando. `--per-scenario=N` conserva las N corridas más recientes
+de cada scenario (= la evidencia final de esa superficie) y purga las iteraciones
+viejas, sin importar la edad. `--grace-days=N` (default 2) nunca toca runs de una
+sesión en curso.
+
+**Auto-poda**: cada captura exitosa auto-limita su scenario a 3 corridas. Opt-out con
+`GVC_NO_AUTOPRUNE=1`; tamaño con `GVC_KEEP_PER_SCENARIO=N`. Por eso `.captures/` ya no
+se vuelve a acumular solo.
+
+## Índice navegable (taxonomía trazable)
+
+`.captures/` es plano, pero un índice DERIVADO (regenerable, nunca driftea) deja
+ubicar qué está iterando un agente y cuál es la evidencia final de cada superficie.
+
+```bash
+pnpm fe:capture:index          # regenera .captures/INDEX.md + index.json
+pnpm fe:capture:index --json   # modelo JSON a stdout (para agentes)
+```
+
+- `.captures/INDEX.md` → navegación humana: 🔴 **iterando ahora** (newest < 2h),
+  agrupación **por work-item**, y tabla de **todas las superficies** con su evidencia.
+- `.captures/index.json` → mismo modelo para consumo programático de agentes.
+- Se **auto-regenera** tras cada captura y tras cada `fe:capture:gc --apply`.
+
+**Tag de trazabilidad** (opcional): `pnpm fe:capture <scenario> --task=TASK-1053`
+marca la corrida con su work-item; el índice agrupa por TASK-### en una sección propia.
+
+Dimensiones (ortogonales): superficie (scenario) · work-item (`--task`) ·
+lifecycle (evidencia vs iteración) · actividad (en curso) · tiempo.
+
+### Conceptos IA (`.captures/concepts/`)
+
+`.captures/` tiene dos *kinds*: capturas GVC (`<timestamp>_<scenario>/`) y **conceptos**
+de IA del `product-design-loop`. El CLI los rutea solo:
+
+```bash
+pnpm ai:image --concept <loop> [--task TASK-###] --batch concepts.json
+```
+
+→ `.captures/concepts/<loop>/` + `manifest.json` trazable. Los conceptos están
+**protegidos del GC** (curados, no efímeros — un `gc --apply` nunca los borra) y el
+índice los muestra en su propia sección "🎨 Conceptos IA" agrupados por loop.

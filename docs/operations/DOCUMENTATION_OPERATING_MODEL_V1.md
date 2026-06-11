@@ -8,6 +8,29 @@ Cada cambio debe documentarse, pero no cada documento debe repetir la historia c
 
 La calidad de solucion no debe duplicarse en cada spec. La fuente canonica transversal es `docs/operations/SOLUTION_QUALITY_OPERATING_MODEL_V1.md`: soluciones seguras, robustas, resilientes y escalables por defecto; workarounds solo temporales, reversibles y documentados.
 
+## Regla obligatoria — triple documentacion por capacidad
+
+Todo dominio, modulo, funcionalidad, feature, workflow, integration, tool, API o surface de Greenhouse debe tener **tres capas documentales** cuando existe o cambia:
+
+1. **Documentacion tecnica** — como esta construido y cual es el contrato tecnico.
+   - Home canonico: `docs/architecture/`, `docs/api/`, ADRs o specs tecnicas del dominio.
+   - Responde: source of truth, schema/modelo, APIs, eventos, permisos, flags, jobs, dependencias, degraded modes y decisiones.
+2. **Documentacion funcional** — como funciona desde producto/negocio, sin depender de leer codigo.
+   - Home canonico: `docs/documentation/<dominio>/`.
+   - Responde: para que sirve, reglas de negocio, estados, roles, flujos, datos visibles, limites y relacion con otros modulos.
+3. **Manual de uso** — como operarlo paso a paso.
+   - Home canonico: `docs/manual-de-uso/<dominio>/`.
+   - Responde: antes de empezar, pasos, permisos requeridos, que no hacer, problemas comunes, verificacion y escalamiento.
+
+Esta regla es **obligatoria**, no best-effort. La proporcionalidad cambia el tamano del documento, no la existencia de la capa:
+
+- feature pequeña sobre capacidad ya documentada -> delta corto en los tres documentos existentes;
+- feature nueva o capacidad sin docs -> crear los tres artefactos o documentar explicitamente en la task/handoff por que una capa no aplica todavia;
+- arquitectura/pipeline/API sin UI visible -> igual requiere documentacion tecnica + funcional + manual operativo/runbook si alguien debe usarlo, monitorearlo, configurarlo o diagnosticarlo;
+- mockup, lab o experimento no productivo -> documentar como draft o dentro del Design System si se espera reutilizacion; si no se promueve, dejar claro que no es capacidad productiva.
+
+Una task o cierre no debe declararse `complete` si falta una de las tres capas para la capacidad que entrega. En ese caso el cierre correcto es `code complete, documentacion pendiente` u `operativamente bloqueado`, con owner y proximo paso en `Handoff.md`.
+
 ## Layout del repo
 
 ### 1. Raiz operativa
@@ -34,6 +57,21 @@ La calidad de solucion no debe duplicarse en cada spec. La fuente canonica trans
   - `docs/operations/`
   - `docs/tasks/`
 - `docs/README.md` debe servir como indice maestro.
+
+## Diferencia entre las tres capas
+
+| Capa | Audiencia principal | Pregunta que responde | Donde vive |
+| --- | --- | --- | --- |
+| Tecnica | devs, agentes, operadores tecnicos, auditorias | Como esta construido y que contratos no se deben romper | `docs/architecture/`, `docs/api/`, ADRs, specs tecnicas |
+| Funcional | producto, operaciones, soporte, liderazgo, clientes internos | Que hace, por que existe y como se comporta | `docs/documentation/<dominio>/` |
+| Manual de uso | usuario-operador, soporte, agentes ejecutores | Como lo uso o diagnostico paso a paso | `docs/manual-de-uso/<dominio>/` |
+
+No mezclar las capas:
+
+- la documentacion funcional no debe convertirse en diagrama de schema;
+- el manual no debe reemplazar el contrato tecnico;
+- la arquitectura no debe ser la unica forma de aprender a operar la capacidad;
+- el changelog y `Handoff.md` no cuentan como ninguna de las tres capas.
 
 ## Estructura canonica
 
@@ -69,6 +107,18 @@ La calidad de solucion no debe duplicarse en cada spec. La fuente canonica trans
   - `docs/ui/GREENHOUSE_EXECUTIVE_UI_SYSTEM_V1.md`
   - `docs/ui/SKY_TENANT_EXECUTIVE_SLICE_V1.md`
 - Deben contener contrato y decisiones de su dominio, no repetir contexto general del repo.
+
+### 5.a. Documentacion funcional
+- `docs/documentation/`
+- Aqui vive la descripcion funcional de dominios, modulos y capacidades.
+- Es obligatoria para toda capacidad Greenhouse y debe enlazar su documentacion tecnica y manual de uso cuando existan.
+- Debe explicar el comportamiento en lenguaje de producto/operacion, no el codigo.
+
+### 5.b. Manuales de uso
+- `docs/manual-de-uso/`
+- Aqui viven los pasos accionables para operar, configurar, validar o diagnosticar una capacidad.
+- Son obligatorios para toda capacidad que una persona o agente deba ejecutar, monitorear, configurar o resolver.
+- Deben enlazar documentacion funcional y tecnica; no duplicarlas.
 
 ### 5.0. Calidad de solucion transversal
 - `docs/operations/SOLUTION_QUALITY_OPERATING_MODEL_V1.md`
@@ -144,6 +194,12 @@ Cuando un cambio toque varios documentos:
 
 ### changelog
 - una linea de impacto
+
+### Triple documentacion
+- documentacion tecnica actualizada o creada
+- documentacion funcional actualizada o creada
+- manual de uso actualizado o creado
+- si una capa no aplica todavia, dejar razon explicita, owner y condicion de retiro
 
 ## Regla para UI y librerias
 

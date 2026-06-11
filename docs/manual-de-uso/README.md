@@ -96,10 +96,10 @@ _Pendiente._
 
 ## Regla para agentes
 
-Cuando una implementacion agrega o cambia una capacidad visible, el agente debe revisar si existe un manual de uso para esa capacidad.
+Todo dominio, modulo, funcionalidad, feature, workflow, integration, tool, API o surface que una persona o agente deba operar, configurar, validar o diagnosticar debe tener manual de uso o runbook en esta carpeta.
 
 - Si existe, actualizarlo.
-- Si no existe y la capacidad requiere pasos, permisos, decisiones o cuidado operativo para usarla bien, crearlo.
+- Si no existe, crearlo o dejar una excepcion explicita con owner y condicion de retiro en la task/handoff.
 - Si la feature es pequena pero cambia una pantalla ya documentada, agregar un delta corto en el manual existente.
 
-El manual debe quedar orientado al usuario-operador: claro, accionable y sin depender de leer codigo.
+El manual debe quedar orientado al usuario-operador: claro, accionable y sin depender de leer codigo. No reemplaza la documentacion funcional (`docs/documentation/`) ni la tecnica (`docs/architecture/`, `docs/api/`, ADRs); las tres capas son obligatorias para cerrar una capacidad Greenhouse.

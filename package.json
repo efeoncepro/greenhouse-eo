@@ -123,6 +123,7 @@
     "ai:image": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/ai/generate-image.ts",
     "fe:capture": "tsx scripts/frontend/capture.ts",
     "fe:capture:gc": "tsx scripts/frontend/gc.ts",
+    "fe:capture:index": "tsx scripts/frontend/index-cmd.ts",
     "fe:capture:micro": "tsx scripts/frontend/micro.ts",
     "fe:capture:diff": "tsx scripts/frontend/diff.ts",
     "fe:capture:health": "tsx scripts/frontend/health.ts",

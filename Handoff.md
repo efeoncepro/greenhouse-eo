@@ -1,4 +1,82 @@
-# Sesion 2026-06-10 — EPIC-018 / TASK-1075: RESUME POINT (build editorial brief en curso)
+# Release 2026-06-10 #2 — develop→main `6c649b2a6` RELEASED
+
+## Sesion 2026-06-11 — Knowledge Platform tasks creadas
+
+- Se creó la primera ola compacta de tasks ejecutables para Knowledge Platform:
+  - `TASK-1080` Acceptance + Pilot Taxonomy (`policy`)
+  - `TASK-1081` Knowledge Core Schema + Source Registry
+  - `TASK-1082` Notion Knowledge Ingestion MVP
+  - `TASK-1083` Knowledge Search API + Golden Questions
+  - `TASK-1084` Human Knowledge Center MVP
+  - `TASK-1085` Nexa Knowledge Retrieval With Citations
+  - `TASK-1086` Greenhouse MCP Knowledge Resources V1
+- Orden recomendado: `1080 -> 1081 -> 1082 -> 1083 -> 1084/1085 -> 1086`.
+- Diseño de scope: cada task es compacta y robusta, con out-of-scope explícito para evitar mega-task: no broad Notion sync, no embeddings en MVP, no Notion MCP runtime, no writes MCP V1.
+- `docs/tasks/README.md` y `docs/tasks/TASK_ID_REGISTRY.md` quedaron sincronizados; siguiente ID disponible `TASK-1087`.
+- Rollout/implementación: docs/tasks-only, sin runtime, migrations, env vars ni deploy.
+
+---
+
+## Sesion 2026-06-11 — Knowledge Platform readiness humano + agéntico
+
+- Se amplió la propuesta Knowledge Platform con el checklist completo de lo que falta considerar para ambas capas.
+- Capa humana documentada: taxonomía editorial (`manual`, `how_to`, `sop`, `runbook`, `faq`, `glossary`, `troubleshooting`, `policy`, `onboarding_path`), rutas de aprendizaje por rol, ayuda contextual desde UI, workflow de publicación Notion→Greenhouse y estados (`draft`, `review`, `published`, `stale`, `deprecated`, `quarantined`, `agent_excluded`).
+- Capa agéntica documentada: readiness gates antes de Nexa/MCP, golden questions/evals, sanitización contra prompt injection, pre-LLM filtering, feedback loop y diagnóstico de fallas por tipo (`missing_doc`, retrieval fallido, stale, access, respuesta incorrecta).
+- MVP recomendado: piloto interno con 10-20 documentos de alto valor, `knowledge_search` read-only con citas, full-text + metadata fuerte, freshness states y feedback antes de embeddings o ingesta amplia de Notion.
+- Se agregaron títulos candidatos adicionales, **sin crear archivos `TASK-###`**: Human Learning Paths + Contextual Help, Nexa Knowledge Evals + Golden Questions, Publication Workflow + Editorial Governance, Prompt Injection Sanitizer + Quarantine Rules.
+- Rollout/implementación: docs-only. No runtime, no migrations, no env vars.
+
+---
+
+## Sesion 2026-06-11 — Triple documentacion obligatoria (policy)
+
+- Se endureció el contrato documental: toda capacidad Greenhouse debe tener documentación técnica, documentación funcional y manual de uso/runbook.
+- Archivos actualizados: `docs/operations/DOCUMENTATION_OPERATING_MODEL_V1.md`, `AGENTS.md`, `CLAUDE.md`, `docs/documentation/README.md`, `docs/manual-de-uso/README.md`, `project_context.md`, `changelog.md`, `Handoff.md`.
+- Regla de cierre: la proporcionalidad solo cambia tamaño/delta; no declarar `complete` si falta una capa requerida. Si una capa no aplica todavía, dejar razón, owner y condición de retiro en task/handoff.
+- Rollout/implementación: docs-only, sin runtime ni tasks nuevas.
+
+---
+
+## Sesion 2026-06-11 — Knowledge Platform proposal (docs-only)
+
+- Se creó una propuesta de arquitectura para conectar knowledge bases Notion a Greenhouse con dos capas: **humana** (manual/academy para aprender a operar Greenhouse) y **agéntica** (Nexa/MCP/webMCP con retrieval gobernado, citas y freshness).
+- Ampliación posterior: se documentó cómo Nexa usa esa knowledge como contexto: retrieval-on-demand (`knowledge_search`) con packet acotado de chunks/citas/freshness/confidence/access scope; NO corpus completo en prompt; respuesta obligada a citar, declarar stale/deprecated y no inventar cuando no hay evidencia.
+- Archivos nuevos: `docs/architecture/GREENHOUSE_KNOWLEDGE_PLATFORM_DECISION_V1.md` (`Status: Proposed`) y `docs/architecture/GREENHOUSE_KNOWLEDGE_PLATFORM_ARCHITECTURE_V1.md` (`Draft / proposed`).
+- `DECISIONS_INDEX.md` queda actualizado en "Decisiones propuestas / en discusion". `changelog.md` registra el delta.
+- Se documentaron títulos candidatos de primeras tasks dentro de los docs, **sin crear archivos `TASK-###` todavía** por instrucción del operador.
+- Boundary importante: Notion = authoring; Greenhouse = runtime publicado/versionado; Nexa no debe depender de lecturas live Notion ni de Notion MCP como path productivo primario. MCP de Greenhouse sigue downstream de API Platform.
+- Rollout/implementación: ninguno. No migrations, no runtime, no env vars.
+
+---
+> Promoción `develop→main` (UI + docs, 39 archivos) vía orchestrator canónico **run `27319773037` = success**. `release_id` `6c649b2a6a9a-eb1f8093-1da3-48ca-b3c4-e79bbd5b6fd8`, manifest **released**, attempt_n=1.
+>
+> - **Batch:** `release_batch_policy=ship` (cero migraciones, api/services, payroll/finance/auth). Solo TASK-1075 (Nexa Insights redesign + DS lab + `/my/performance` enterprise mockup) + docs/tasks (TASK-1073/1074/1076/1077, EPIC-018).
+> - **Preflight:** dispatch #1 (`27319582551`) falló por `playwright_smoke "0 workflows"` (by design: el push-trigger de Playwright solo cubre `develop`, no merge commits de main). Único no-ok, cero errores; árbol byte-idéntico a develop HEAD `8e096e2a` (Playwright verde en CI develop). Re-dispatch con `bypass_preflight_reason` → `--override-batch-policy --bypass-preflight-warnings` (degrada solo warnings; mecanismo de operador documentado, NO parche).
+> - **Gates:** 2 aprobaciones (approval-gate + ola workers/Azure), autorización plena del operador. Azure: skip Bicep (sin diff `infra/azure/**`).
+> - **Verificado:** 4 Cloud Run @ GIT_SHA `6c649b2a6a9a` (cero drift, gcloud); watchdog limpio (`worker_revision_drift`/`stale_approval`/`pending_without_jobs` = 0, vía `gh` — el CLI `release:watchdog` no corrió por reauth ADC local); Vercel prod READY + `/api/auth/health` 200 (overallStatus=ready).
+> - **Pendiente menor (no bloqueante):** reauth de `gcloud auth application-default login` para que `pnpm release:watchdog` corra local (los 3 signals se verificaron por vías equivalentes).
+
+---
+
+## Sesion 2026-06-11 — TASK-1078 Slice 1: Nexa Chat (patrón compuesto + página DS)
+
+> **Slice 1 de TASK-1078 CERRADO** (mockup concepto B con acabado enterprise, pulido en loop GVC + skills). Decisión canónica de la sesión: **lo construido es un patrón compuesto** (no una primitive) → canonizado con página DS propia.
+
+**Dónde quedó:**
+- **Route live mockup:** `/nexa/floating-chat/mockup` (toggles Estado/Footprint/Contexto). **Nada se persiste — mock data.**
+- **Página DS nueva:** `/design-system/nexa-chat` (catálogo `Patterns` · `NexaChatLabView`) — documenta clasificación + anatomía (5 regiones) + primitives que lo componen + modos + reglas + specimen vivo. Registrada en catálogo + route-reachability (0 orphans) + `ui-platform/PATTERNS.md`.
+- **Primitive nueva:** `NexaGlowBorder` (`src/components/greenhouse/primitives/`, en el barrel). + `NexaSenderMark`/`HeaderIconButton` locales (a extraer).
+- **`NexaThread` compartido editado** (avatar per-mensaje, wordmark Poppins, botón enviar, composer sin box gris) → mejora consistente en Home, sin regresión (GVC).
+
+**Decisiones clave:** `NexaModelSelector` ELIMINADO (Nexa elige modelo). Glass rail (panel transparente + secciones con su fondo). Saludo rotativo (30 mensajes). Prompts contextuales (Tier 1/2 en follow-ups). Firma Efeonce sutil solo en empty state (excepción de marca — confirmar con operador).
+
+**Pendiente (Slices 2-4):** runtime persistente + `NexaThreadSidebar` real (S2); non-modal + a11y + composer autosize (S3); flag `NEXA_FLOATING_EXPANDABLE_ENABLED` + cutover + port a `NexaFloatingButton` (S4); extraer `NexaComposer`/`NexaPresenceMark`/`NexaSenderMark` como primitives. Detalle: `docs/tasks/in-progress/TASK-1078-...md` (Delta 2026-06-11).
+
+**Estado git:** trabajo en working tree (no commiteado). Operador no pidió push.
+
+---
+
+## Sesion 2026-06-10 — EPIC-018 / TASK-1075: RESUME POINT (build editorial brief en curso)
 
 > **CHECKPOINT por inestabilidad de la API Claude (rate limit + clasificador Bash caído).** Estado exacto para retomar sin perder trabajo.
 

@@ -18,6 +18,7 @@ import VerticalFooter from '@components/layout/vertical/Footer'
 import HorizontalFooter from '@components/layout/horizontal/Footer'
 import ScrollToTop from '@core/components/scroll-to-top'
 import NexaFloatingButton from '@/components/greenhouse/NexaFloatingButton'
+import { NexaContextProvider } from '@/lib/nexa/nexa-page-context'
 import RecentsTracker from '@/components/greenhouse/RecentsTracker'
 import ChunkRecoveryClear from '@/components/ChunkRecoveryClear'
 import { AdaptiveSidecarShellProvider, ShellFloatingActionDock } from '@/components/greenhouse/primitives'
@@ -51,31 +52,36 @@ const Layout = async (props: ChildrenType) => {
 
   return (
     <Providers direction={direction} session={session}>
-      <AdaptiveSidecarShellProvider>
-        <LayoutWrapper
-          systemMode={systemMode}
-          verticalLayout={
-            <VerticalLayout navigation={<Navigation mode={mode} />} navbar={<Navbar />} footer={<VerticalFooter />}>
-              {children}
-            </VerticalLayout>
-          }
-          horizontalLayout={
-            <HorizontalLayout header={<Header />} footer={<HorizontalFooter />}>
-              {children}
-            </HorizontalLayout>
-          }
-        />
-      </AdaptiveSidecarShellProvider>
-      <ShellFloatingActionDock>
-        <ScrollToTop docked className='mui-fixed'>
-          <Button variant='contained' className='is-10 bs-10 rounded-full p-0 min-is-0 flex items-center justify-center'>
-            <i className='tabler-arrow-up' />
-          </Button>
-        </ScrollToTop>
-        <NexaFloatingButton docked />
-      </ShellFloatingActionDock>
-      <RecentsTracker />
-      <ChunkRecoveryClear />
+      {/* NexaContextProvider envuelve las páginas (que declaran su entidad vía
+          NexaContextScope) y el NexaFloatingButton (que la lee) → prompts contextuales
+          con el nombre real (Tier 1.5). */}
+      <NexaContextProvider>
+        <AdaptiveSidecarShellProvider>
+          <LayoutWrapper
+            systemMode={systemMode}
+            verticalLayout={
+              <VerticalLayout navigation={<Navigation mode={mode} />} navbar={<Navbar />} footer={<VerticalFooter />}>
+                {children}
+              </VerticalLayout>
+            }
+            horizontalLayout={
+              <HorizontalLayout header={<Header />} footer={<HorizontalFooter />}>
+                {children}
+              </HorizontalLayout>
+            }
+          />
+        </AdaptiveSidecarShellProvider>
+        <ShellFloatingActionDock>
+          <ScrollToTop docked className='mui-fixed'>
+            <Button variant='contained' className='is-10 bs-10 rounded-full p-0 min-is-0 flex items-center justify-center'>
+              <i className='tabler-arrow-up' />
+            </Button>
+          </ScrollToTop>
+          <NexaFloatingButton docked />
+        </ShellFloatingActionDock>
+        <RecentsTracker />
+        <ChunkRecoveryClear />
+      </NexaContextProvider>
     </Providers>
   )
 }

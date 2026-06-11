@@ -765,6 +765,14 @@ Si un archivo en `docs/tasks/` no es una task sino una spec de arquitectura o re
 
 ## Platform Documentation Protocol
 
+Toda capacidad Greenhouse debe cerrar con **triple documentación obligatoria**:
+
+- **Documentación técnica**: `docs/architecture/`, `docs/api/`, ADRs o spec técnica del dominio.
+- **Documentación funcional**: `docs/documentation/<dominio>/`, explica qué hace y cómo se comporta.
+- **Manual de uso / runbook**: `docs/manual-de-uso/<dominio>/`, explica cómo operarlo, configurarlo, verificarlo o diagnosticarlo paso a paso.
+
+La proporcionalidad cambia el tamaño del documento, no la obligación. Una feature pequeña puede ser un delta corto en docs existentes; una capacidad nueva debe crear las tres capas. Si una capa no aplica todavía, documentar razón, owner y condición de retiro en task/handoff. No declarar una task `complete` si falta una capa documental requerida.
+
 La documentación funcional de la plataforma vive en `docs/documentation/` y explica cómo funciona cada módulo en lenguaje simple (no técnico). Su índice es `docs/documentation/README.md`.
 
 ### Estructura
@@ -785,8 +793,10 @@ docs/documentation/
 
 ### Cuándo crear o actualizar
 
-- **Al completar una task** que cambie comportamiento visible de un módulo, verificar si existe documentación funcional del módulo afectado en `docs/documentation/`. Si existe, actualizarla. Si no existe y el cambio es significativo, considerar crearla.
-- **Al cerrar un bloque de tasks** (como un hardening o una feature completa), crear el documento funcional del dominio si aún no existe.
+- **Al completar una task** que cambie comportamiento de un módulo, actualizar o crear documentación funcional en `docs/documentation/`.
+- **Al completar una task** que una persona o agente deba operar/configurar/diagnosticar, actualizar o crear manual en `docs/manual-de-uso/`.
+- **Al completar una task** que cambie contratos, runtime, datos, access, API, integración o arquitectura, actualizar o crear documentación técnica en `docs/architecture/`, `docs/api/` o ADR/spec correspondiente.
+- **Al cerrar un bloque de tasks** (como un hardening o una feature completa), verificar que el dominio tenga las tres capas documentales.
 - **Al modificar roles, permisos, menú o acceso**, actualizar `docs/documentation/identity/sistema-identidad-roles-acceso.md`.
 
 ### Convención de nombres

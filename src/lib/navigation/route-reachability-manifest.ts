@@ -139,6 +139,13 @@ export const DECLARED_CHILD_ROUTES: readonly ChildRouteDeclaration[] = [
       'Nexa Insights Lab (TASK-1075 follow-up) — child surface del Design System para el patron compuesto NexaInsightsBlock (disclosure morph, rotating headline + thinking beat, segmented control, insight rows); alcanzable desde el catalogo canonico /design-system.'
   },
   {
+    route: '/design-system/nexa-chat',
+    parent: '/design-system',
+    via: 'inline-link',
+    reason:
+      'Nexa Chat Pattern (TASK-1078) — child surface del Design System para el patron compuesto de la superficie conversacional de Nexa (header de presencia, rail glass, cuerpo de conversacion, empty hero, composer con NexaGlowBorder); alcanzable desde el catalogo canonico /design-system.'
+  },
+  {
     route: '/design-system/loaders',
     parent: '/design-system',
     via: 'inline-link',

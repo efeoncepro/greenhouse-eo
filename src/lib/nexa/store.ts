@@ -360,3 +360,54 @@ export const getNexaThreadDetail = async (input: {
     messages: messageRows.map(toThreadMessage)
   }
 }
+
+export const renameNexaThread = async (input: {
+  threadId: string
+  userId: string
+  clientId: string
+  title: string
+}): Promise<boolean> => {
+  await assertNexaRuntimeReady()
+
+  const title = truncateTitle(input.title)
+
+  if (!title) {
+    throw new Error('Thread title cannot be empty')
+  }
+
+  const rows = await runGreenhousePostgresQuery<{ thread_id: string }>(
+    `
+      UPDATE greenhouse_ai.nexa_threads
+      SET title = $4
+      WHERE thread_id = $1
+        AND user_id = $2
+        AND client_id = $3
+      RETURNING thread_id
+    `,
+    [input.threadId, input.userId, input.clientId, title]
+  )
+
+  return rows.length > 0
+}
+
+export const deleteNexaThread = async (input: {
+  threadId: string
+  userId: string
+  clientId: string
+}): Promise<boolean> => {
+  await assertNexaRuntimeReady()
+
+  // Messages cascade via FK (nexa_messages.thread_id ... ON DELETE CASCADE).
+  const rows = await runGreenhousePostgresQuery<{ thread_id: string }>(
+    `
+      DELETE FROM greenhouse_ai.nexa_threads
+      WHERE thread_id = $1
+        AND user_id = $2
+        AND client_id = $3
+      RETURNING thread_id
+    `,
+    [input.threadId, input.userId, input.clientId]
+  )
+
+  return rows.length > 0
+}

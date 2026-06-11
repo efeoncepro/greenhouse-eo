@@ -23,6 +23,8 @@ export interface AuditEntry {
   exitCode: 0 | 1
   durationMs: number
   actor: string
+  /** Tag de trazabilidad opcional al work-item (TASK-###, ISSUE-###, label libre). */
+  task?: string
   error?: string
   failureCategory?: FailureCategory
 }
