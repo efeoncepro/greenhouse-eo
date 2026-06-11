@@ -8,11 +8,21 @@ Cerrado por **TASK-1080** (sin cambio estructural, solo se fija el alcance):
 - Al clasificar, poblar las **dos columnas ortogonales** `publication_status` y `agentic_policy` (no un enum mezclado); ≥1 doc nace `agent_excluded` (doc #14) y el de payroll (#13) nace `agent_excluded` hasta firma de `hr_payroll`.
 - `quarantined` se aplica cuando el sanitizer detecta secretos/PII/prompt-injection.
 
+## Delta 2026-06-11 — Pre-execution decisions (implementación)
+
+Discovery confirmó: el corpus piloto son **archivos markdown del repo** (11/12 existen), NO existe fuente Notion de knowledge ni secret, y no hay parser Notion-blocks ni chunker markdown. Decisiones del operador (AskUserQuestion) + arch-architect:
+
+- **Fuente del MVP = `repo_docs` ahora.** Se construye el pipeline source-agnostic (connector interface + normalize + checksum + version idempotente + sanitize + quarantine + chunk + publish + dry-run/apply + run audit) y el connector **repo_docs** que ingiere el corpus markdown real end-to-end. Desbloquea TASK-1083/1084 con contenido real. `source_system='repo_docs'`/`source_kind='markdown_collection'` (ya soportado por el schema TASK-1081).
+- **Connector Notion DIFERIDO a task derivada** (TASK-1088). La interfaz queda lista; el block fetcher (`GET /v1/blocks/{id}/children`) + `blocks→markdown` se construyen cuando el operador provisione un teamspace Notion de knowledge + secret `notion-integration-token-greenhouse-knowledge-*`. `src/lib/knowledge/notion/**` NO se construye en esta task.
+- **quarantine es knowledge-native:** `publication_status='quarantined'` + `run_kind='quarantine'`. NO se escribe a la tabla SCL `context_document_quarantine`.
+- **Manifest declarativo** `src/lib/knowledge/ingestion/pilot-corpus.ts` (14 docs con slug/title/type/owner/approver/audience/sensitivity/agentic_policy/sourceFiles). Docs to-author (#2/#10/#14 + multi-file) → reportados `skipped` honesto.
+- **2 reliability signals** nuevos: `knowledge.sync.failed_source` + `knowledge.publication.quarantine_count` (steady=0).
+
 <!-- ZONE 0 — IDENTITY & TRIAGE -->
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`

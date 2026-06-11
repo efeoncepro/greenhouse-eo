@@ -1,5 +1,15 @@
 # Release 2026-06-10 #2 — develop→main `6c649b2a6` RELEASED
 
+## Sesion 2026-06-11 — Knowledge ingestion en curso (TASK-1082, develop)
+
+- **TASK-1082 `in-progress`** en `develop` (sin branch, override del operador). Ingesta del corpus piloto hacia `greenhouse_knowledge`.
+- **Discovery clave:** el corpus piloto son **archivos markdown del repo** (11/12 existen), NO hay fuente Notion de knowledge ni secret, ni parser Notion-blocks ni chunker markdown en el repo.
+- **Decisión del operador:** `repo_docs` ahora (ingiere el markdown real end-to-end, desbloquea 1083/1084) + connector Notion **diferido a TASK-1088** (gated en secret a provisionar). Pipeline source-agnostic con connector interface.
+- **Plan:** Slice 1 (connector interface + manifest 14 docs + repo_docs connector + run tracking + dry-run CLI) → Slice 2 (chunker markdown puro + checksum + versionado idempotente) → Slice 3 (sanitizer secrets/PII/injection + quarantine-native + apply + 2 signals).
+- **Pendiente:** implementación.
+
+---
+
 ## Sesion 2026-06-11 — Knowledge Platform foundation COMPLETA (TASK-1081, develop)
 
 - **TASK-1081 `complete`** en `develop` (sin branch, override del operador). 3 slices verdes. Foundation persistente de Knowledge Platform.
