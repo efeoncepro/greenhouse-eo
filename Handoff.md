@@ -1,5 +1,22 @@
 # Release 2026-06-10 #2 — develop→main `6c649b2a6` RELEASED
 
+## Sesion 2026-06-11 — Knowledge Platform tasks creadas
+
+- Se creó la primera ola compacta de tasks ejecutables para Knowledge Platform:
+  - `TASK-1080` Acceptance + Pilot Taxonomy (`policy`)
+  - `TASK-1081` Knowledge Core Schema + Source Registry
+  - `TASK-1082` Notion Knowledge Ingestion MVP
+  - `TASK-1083` Knowledge Search API + Golden Questions
+  - `TASK-1084` Human Knowledge Center MVP
+  - `TASK-1085` Nexa Knowledge Retrieval With Citations
+  - `TASK-1086` Greenhouse MCP Knowledge Resources V1
+- Orden recomendado: `1080 -> 1081 -> 1082 -> 1083 -> 1084/1085 -> 1086`.
+- Diseño de scope: cada task es compacta y robusta, con out-of-scope explícito para evitar mega-task: no broad Notion sync, no embeddings en MVP, no Notion MCP runtime, no writes MCP V1.
+- `docs/tasks/README.md` y `docs/tasks/TASK_ID_REGISTRY.md` quedaron sincronizados; siguiente ID disponible `TASK-1087`.
+- Rollout/implementación: docs/tasks-only, sin runtime, migrations, env vars ni deploy.
+
+---
+
 ## Sesion 2026-06-11 — Knowledge Platform readiness humano + agéntico
 
 - Se amplió la propuesta Knowledge Platform con el checklist completo de lo que falta considerar para ambas capas.
