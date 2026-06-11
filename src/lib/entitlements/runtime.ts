@@ -1881,6 +1881,38 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
     })
   }
 
+  // TASK-1081 — Knowledge Platform capabilities. MVP solo interno. Sembradas en el
+  // catalog + capabilities_registry en el mismo PR (invariant TASK-873/935; guard
+  // capability-grant-coverage.test.ts). Aún no can()-checked: los consumidores
+  // (search API / human center / Nexa / MCP) llegan en TASK-1083/1084.
+  //   document.read / agentic.retrieve / feedback.submit -> internal ∪ admins
+  //   document.publish                                    -> internal ∪ EFEONCE_ADMIN
+  //   source.admin                                        -> EFEONCE_ADMIN only
+  if (
+    hasRouteGroup(subject, 'internal') ||
+    hasRole(subject, ROLE_CODES.EFEONCE_ADMIN) ||
+    hasRole(subject, ROLE_CODES.FINANCE_ADMIN) ||
+    hasRole(subject, ROLE_CODES.HR_MANAGER) ||
+    hasRole(subject, ROLE_CODES.EFEONCE_OPERATIONS)
+  ) {
+    const source: TenantEntitlementSource = hasRouteGroup(subject, 'internal') ? 'route_group' : 'role'
+
+    addEntitlement(entries, { module: 'knowledge', capability: 'knowledge.document.read', action: 'read', scope: 'tenant', source })
+    addEntitlement(entries, { module: 'knowledge', capability: 'knowledge.agentic.retrieve', action: 'read', scope: 'all', source })
+    addEntitlement(entries, { module: 'knowledge', capability: 'knowledge.feedback.submit', action: 'create', scope: 'tenant', source })
+  }
+
+  if (hasRouteGroup(subject, 'internal') || hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)) {
+    const source: TenantEntitlementSource = hasRouteGroup(subject, 'internal') ? 'route_group' : 'role'
+
+    addEntitlement(entries, { module: 'knowledge', capability: 'knowledge.document.publish', action: 'create', scope: 'tenant', source })
+    addEntitlement(entries, { module: 'knowledge', capability: 'knowledge.document.publish', action: 'update', scope: 'tenant', source })
+  }
+
+  if (hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)) {
+    addEntitlement(entries, { module: 'knowledge', capability: 'knowledge.source.admin', action: 'manage', scope: 'all', source: 'role' })
+  }
+
   const resolvedEntries = Array.from(entries.values())
   const moduleKeys = Array.from(new Set(resolvedEntries.map(entry => entry.module)))
 
