@@ -146,6 +146,21 @@ export class GreenhouseApiPlatformClient {
     return this.request(`/api/platform/ecosystem/webhook-deliveries/${encodedId}`)
   }
 
+  // TASK-1086 — Knowledge (read-only, downstream del lane ecosystem). El packet
+  // `knowledge-search.v1` ya trae citas/humanUrl/freshness/confidence; NO mapping paralelo.
+  async searchKnowledge(input: { query: string; limit?: number }) {
+    return this.request('/api/platform/ecosystem/knowledge/search', {
+      query: input.query,
+      limit: input.limit
+    })
+  }
+
+  async getKnowledgeDocument(input: { id: string }) {
+    const encodedId = encodeURIComponent(input.id)
+
+    return this.request(`/api/platform/ecosystem/knowledge/documents/${encodedId}`)
+  }
+
   private async request<TData>(
     path: string,
     query: QueryParams = {}

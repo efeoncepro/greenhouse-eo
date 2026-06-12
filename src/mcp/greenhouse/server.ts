@@ -1,5 +1,5 @@
 import * as z from 'zod/v4'
-import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
+import { McpServer, ResourceTemplate } from '@modelcontextprotocol/sdk/server/mcp.js'
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 
 import { GreenhouseApiPlatformClient } from './http-client'
@@ -176,6 +176,62 @@ export const createGreenhouseMcpServer = (
       outputSchema: greenhouseMcpToolOutputSchema
     },
     async args => handlers.getWebhookDelivery(args)
+  )
+
+  // TASK-1086 — Knowledge (read-only). El reader agéntico ya filtra a `agent_allowed`
+  // interno y excluye sensibles/cuarentena; si confidence='none' el agente NO debe inventar.
+  server.registerTool(
+    'search_knowledge',
+    {
+      title: 'Search Knowledge',
+      description:
+        'Search the governed Greenhouse knowledge corpus (published, agent-allowed, internal). Returns a citation packet (chunks with citationLabel, humanUrl, freshness, confidence). When confidence is "none", report that no published guidance was found instead of inventing an answer.',
+      inputSchema: {
+        query: z.string().trim().min(1),
+        limit: z.number().int().positive().max(20).optional()
+      },
+      outputSchema: greenhouseMcpToolOutputSchema
+    },
+    async args => handlers.searchKnowledge(args)
+  )
+
+  server.registerTool(
+    'get_knowledge_document',
+    {
+      title: 'Get Knowledge Document',
+      description:
+        'Load one published, agent-allowed knowledge document by id, with its sections (heading path + citation anchor + body). Documents that are draft, deprecated, agent-excluded, restricted or non-internal are not found.',
+      inputSchema: {
+        id: z.string().trim().min(1)
+      },
+      outputSchema: greenhouseMcpToolOutputSchema
+    },
+    async args => handlers.getKnowledgeDocument(args)
+  )
+
+  // Resource addressable: el mismo documento read-only por URI estable.
+  server.registerResource(
+    'knowledge_document',
+    new ResourceTemplate('greenhouse://knowledge/document/{id}', { list: undefined }),
+    {
+      title: 'Greenhouse Knowledge Document',
+      description: 'A published, agent-allowed knowledge document (read-only) addressable by id.',
+      mimeType: 'application/json'
+    },
+    async (uri, variables) => {
+      const id = Array.isArray(variables.id) ? variables.id[0] : variables.id
+      const result = await client.getKnowledgeDocument({ id: String(id) })
+
+      return {
+        contents: [
+          {
+            uri: uri.href,
+            mimeType: 'application/json',
+            text: JSON.stringify(result.data)
+          }
+        ]
+      }
+    }
   )
 
   return server

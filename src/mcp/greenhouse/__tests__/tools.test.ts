@@ -28,7 +28,9 @@ describe('createGreenhouseMcpHandlers', () => {
       listWebhookSubscriptions: vi.fn(),
       getWebhookSubscription: vi.fn(),
       listWebhookDeliveries: vi.fn(),
-      getWebhookDelivery: vi.fn()
+      getWebhookDelivery: vi.fn(),
+      searchKnowledge: vi.fn(),
+      getKnowledgeDocument: vi.fn()
     })
 
     const result = await handlers.getContext()
@@ -102,7 +104,9 @@ describe('createGreenhouseMcpHandlers', () => {
       listWebhookSubscriptions: vi.fn(),
       getWebhookSubscription: vi.fn(),
       listWebhookDeliveries: vi.fn(),
-      getWebhookDelivery: vi.fn()
+      getWebhookDelivery: vi.fn(),
+      searchKnowledge: vi.fn(),
+      getKnowledgeDocument: vi.fn()
     })
 
     const forbiddenResult = await handlers.getOrganization({ id: 'org-1' })
