@@ -1038,3 +1038,33 @@ Integración dedicada **Knowledge** (`notion-integration-token-greenhouse-knowle
 ### Estado
 
 V1 con corpus vacío + sin token provisionado (gated). El connector existe y degrada honesto; la ingesta real arranca cuando el operador comparte las páginas con la integración dedicada + declara el corpus. 23 tests focales nuevos (17 markdown + 6 connector) + 18 de ingesta intactos.
+
+## Delta 2026-06-12 — Ingesta de Wikis Notion (data_source) (TASK-1088 Slice 5)
+
+El connector ahora ingiere **Wikis** (databases Notion), no solo páginas sueltas. Una Wiki = una `data_source` cuyas filas son artículos (cada fila es una página de prosa).
+
+### Modelo de corpus (unión discriminada)
+
+`NotionCorpusEntry` pasa a ser `page | data_source`:
+- `page` — una página de prosa = un documento (slug/title declarados).
+- `data_source` — una Wiki: en `list()` se **expande** a N candidatos (uno por artículo), heredando la gobernanza declarada a nivel Wiki. Slug **estable desde el page id** (`${slugPrefix}/<pageId>`) — NUNCA del título (el título cambia → doc huérfano). El título visible viene de la fila.
+
+### Mecánica
+
+- `queryDataSourcePages(dataSourceId)` (`notion-knowledge-client.ts`): `POST /v1/data_sources/{id}/query` (canónico, **NO** `/databases/{id}/query`), paginación con cursor opaco, filtro `in_trash`, detección del cap 10k (`request_status.incomplete` → `hitResultLimit`, logueado a `captureWithDomain('knowledge')`).
+- Connector: `list()` expande las Wikis (provenance de cada artículo cacheada para evitar un fetch extra); `load()` unificado — el page id viaja en `sourceLocator` (página suelta o artículo), un solo path. El pipeline (sanitize/quarantine/version/chunk) no cambia.
+
+### Fix descubierto en smoke real
+
+Las imágenes Notion-hosted exponen URLs S3 **presigned** (`file.url` con `X-Amz-Credential=ASIA…`): efímeras + con credenciales en el query string que **dispararían el sanitizer** → cuarentena de todo artículo con imagen. `blocks→markdown` ahora omite esas URLs (solo emite URLs estables external/bookmark; las Notion-hosted quedan como caption placeholder).
+
+### Verificación live
+
+Contra Notion real (token `Greenhouse KNOW`, workspace Efeonce): **Wiki de IA → 37 artículos** enumerados; primer artículo → árbol de bloques → markdown limpio (19.6k chars, headings `## …` correctas). 35 tests focales en `notion/` (18 markdown + 9 connector + 8 client).
+
+### Reglas duras (Wikis)
+
+- **NUNCA** query por `/v1/databases/{id}/query` (deprecado 2025-09-03) — siempre `/v1/data_sources/{id}/query`.
+- **NUNCA** derivar el slug de un artículo del título (inestable) — siempre del page id.
+- **NUNCA** declarar databases operacionales (Sprints/Proyectos/Tareas/Calendarios/Revisiones) en el corpus de knowledge — son data estructurada del pipeline de delivery, no conocimiento de prosa.
+- **NUNCA** emitir la URL S3 presigned de un archivo Notion-hosted al markdown (efímera + dispara el sanitizer).
