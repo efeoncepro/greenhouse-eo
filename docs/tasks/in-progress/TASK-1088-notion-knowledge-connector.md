@@ -129,7 +129,8 @@ El connector debe ser drop-in tras la interfaz existente: el pipeline (sanitize/
 
 ## Follow-ups
 
-- Ninguno (cierra el gap de fuente Notion del programa Knowledge).
+- **TASK-1094 — Notion Knowledge Webhook Auto-Ingest + Freshness** absorbe la **automatización** que esta task dejó fuera de scope (era "construir el conector", no "regarlo"): webhook que re-ingiere por artículo al publicar/editar, **deprecación por borrado** (cierra ese gap), y señal de frescura + reconcile on-demand (sin cron, decisión operador). TASK-1094 **depende de** este conector + pipeline.
+- **Rollout operativo (no es código):** ingerir el resto de las Wikis declaradas (SOPs 44 · AXIS 55 · Inicio empresa 32 · Contenidos 101 a revisar · 2 páginas) corriendo `ingest --source=notion --only=<wiki> --apply`. Es *usar* el conector terminado; se hace incrementalmente. Buyer Personas ya ingerida en vivo (21 docs).
 
 ---
 
