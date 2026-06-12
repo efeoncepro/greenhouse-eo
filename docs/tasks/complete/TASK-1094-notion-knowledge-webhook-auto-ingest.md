@@ -221,3 +221,38 @@ Implementado en `develop` (sin branch, override operador). Detrás del flag `NOT
 ### Estado: code complete, rollout operador pendiente
 
 El código está completo + verificado, **detrás del flag OFF**. Para activar (runbook `docs/operations/runbooks/notion-knowledge-webhook.md`): crear secret HMAC + suscribir el webhook en la integración "Greenhouse KNOW" + `NOTION_KNOWLEDGE_TOKEN_SECRET_REF` en el ops-worker + flag ON + smoke. Mismo patrón flag-OFF-merge + operador-activa que TASK-912.
+
+---
+
+## Activation Playbook — ejecutar en sesión fresca (rollout pesado, separado del code-complete)
+
+> **Por qué sesión fresca:** el código quedó completo + verde + commiteado local en `develop` (sin push) el 2026-06-12, pero el rollout requiere **deploy a producción** (release develop→main) + config en Notion + secrets, que es pesado para la sesión de implementación. **NO se desplegó** por pedido del operador: Codex estaba terminando **TASK-1084** (Knowledge Center UI) del mismo programa — pushear `develop` con su WIP en curso era desprolijo. Esperar a que 1084 cierre antes de pushear.
+
+### Pre-condiciones antes de activar
+
+- [ ] TASK-1084 (Codex) cerrado/commiteado → `develop` en estado pusheable (verificar `git status` limpio del WIP ajeno + `pnpm local:check` verde).
+- [ ] Decidir entorno: **staging primero** (recomendado, validar) o directo **producción**.
+  - staging = push `develop` (deploy automático a `dev-greenhouse.efeoncepro.com`).
+  - producción = release `develop→main` (orquestador, pesado — ver `greenhouse-production-release` skill).
+- [ ] El endpoint debe estar **desplegado** ANTES de crear la suscripción en Notion (Notion hace un handshake POST al endpoint).
+
+### Pasos (≈10 min una vez desplegado)
+
+1. **Deploy** el endpoint (push `develop` para staging, o release a main para prod). Confirmar `POST /api/webhooks/notion-knowledge` responde 200 en el host objetivo.
+2. **Notion** (operador): integración "Greenhouse KNOW" → Webhooks → Create subscription → URL = `https://<host>/api/webhooks/notion-knowledge` + eventos `page.created`, `page.content_updated`, `page.properties_updated`, `page.deleted`. Notion muestra un **verification token** → copiarlo. **ESE token ES el signing secret** (no generar uno aleatorio).
+3. **Secret** (agente con gcloud): `printf %s "<verification_token>" | gcloud secrets create greenhouse-notion-knowledge-webhook-signing-secret --data-file=- --replication-policy=automatic --project=efeonce-group`.
+4. **Env vars** (agente con vercel + ops-worker):
+   - `NOTION_KNOWLEDGE_WEBHOOK_SIGNING_SECRET_REF=greenhouse-notion-knowledge-webhook-signing-secret` (target del entorno donde apunta el webhook).
+   - `NOTION_KNOWLEDGE_TOKEN_SECRET_REF=notion-integration-token-greenhouse-knowledge` en el ops-worker (`services/ops-worker/deploy.sh`) — el consumer re-ingiere desde ahí.
+   - `NOTION_KNOWLEDGE_WEBHOOK_ENABLED=true`.
+5. **Redeploy** Vercel + ops-worker (para tomar las env vars).
+6. **Smoke** (juntos): editar un artículo de prueba en una Wiki declarada → en ~1 min verificar nueva versión del doc; borrarlo → verificar `publication_status='deprecated'`; `scripts/knowledge/reconcile.ts` dry-run → 0 huérfanos; señal `knowledge.notion.ingest_dead_letter` en 0 en `/admin/operations`.
+
+### Notas para el agente de la sesión fresca
+
+- **Todo el código YA existe + está verde** (este doc, slices 1-4). NO re-implementar — solo desplegar + configurar.
+- El handler ACK-ea el handshake de verificación **aunque el flag esté OFF y el secret no exista todavía** (por eso el paso 2 funciona antes del 3-4).
+- El webhook apunta a UN entorno (una URL). Para mover de staging→prod, re-apuntar la suscripción en Notion (o crear una 2da).
+- Rollback: flag `NOTION_KNOWLEDGE_WEBHOOK_ENABLED=false` + redeploy → ACK + drop. La ingesta vuelve a manual (CLI).
+- Runbook completo: `docs/operations/runbooks/notion-knowledge-webhook.md`.
+- Commits del code-complete (todos en `develop` local, sin push): `2f1078ac1` (S1), `6250db591` (S2), `f9113f774` (S3), `3bb1cb21d` (S4a), `96cddceec` (S4b), `512952bf8` (cierre).
