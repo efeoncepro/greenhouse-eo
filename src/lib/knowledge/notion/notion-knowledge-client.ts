@@ -49,6 +49,8 @@ export interface NotionBlock {
   id: string
   type: string
   has_children: boolean
+  /** Canónico desde Notion-Version 2026-03-11 (`archived` deprecado). `DELETE /v1/blocks` lo setea. */
+  in_trash?: boolean
   /** Hidratado por el fetcher (recursión de children). */
   children?: NotionBlock[]
   [key: string]: unknown
@@ -196,6 +198,8 @@ export class NotionKnowledgeClient {
       )
 
       for (const block of json.results ?? []) {
+        // Bloques soft-deleted (`in_trash`) no deben ingerirse.
+        if (block.in_trash === true) continue
         blocks.push(block)
       }
 

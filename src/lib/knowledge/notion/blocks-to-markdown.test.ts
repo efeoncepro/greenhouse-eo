@@ -143,13 +143,24 @@ describe('blocksToMarkdown', () => {
     expect(md).toBe('inside')
   })
 
-  it('omits child_page and renders unknown blocks with text as paragraphs', () => {
+  it('omits child_page and renders unknown leaf blocks with text as paragraphs', () => {
     const md = blocksToMarkdown([
       block('child_page', { title: 'Sub' }),
       block('some_future_block', { rich_text: [rt('still readable')] })
     ])
 
     expect(md).toBe('still readable')
+  })
+
+  it('flattens children of unknown container blocks (e.g. tab) instead of dropping them', () => {
+    const md = blocksToMarkdown([
+      block('tab', { rich_text: [] }, [
+        block('heading_2', { rich_text: [rt('Tab section')] }),
+        block('paragraph', { rich_text: [rt('Tab body')] })
+      ])
+    ])
+
+    expect(md).toBe('## Tab section\n\nTab body')
   })
 
   it('collapses excess blank lines and trims', () => {

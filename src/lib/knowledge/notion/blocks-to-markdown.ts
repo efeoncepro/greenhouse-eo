@@ -208,9 +208,17 @@ const renderBlock = (block: NotionBlock, depth: number, numberedIndex: number): 
       return url ? `[${caption}](${url})` : ''
     }
 
-    default:
-      // Desconocido: degrada a párrafo si trae texto; sino se omite.
-      return text
+    default: {
+      // Desconocido: si es contenedor (trae children — ej. `tab`, agregado 2026-03-25),
+      // aplana los children para no perder contenido; sino degrada a párrafo honesto.
+      if (children.length === 0) {
+        return text
+      }
+
+      const flattened = renderBlocks(children, depth)
+
+      return text ? `${text}\n\n${flattened}` : flattened
+    }
   }
 }
 
