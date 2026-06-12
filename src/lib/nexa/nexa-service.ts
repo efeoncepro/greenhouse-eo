@@ -1,20 +1,14 @@
 import 'server-only'
 
-import {
-  FunctionCallingConfigMode,
-  createModelContent,
-  createPartFromFunctionCall,
-  createUserContent
-} from '@google/genai'
-
 import { resolveNexaModel, type NexaModelId } from '@/config/nexa-models'
-import { getGoogleGenAIClient, getGreenhouseAgentModel } from '@/lib/ai/google-genai'
+import { getGreenhouseAgentModel } from '@/lib/ai/google-genai'
 import { KNOWLEDGE_SEARCH_CONTRACT_VERSION, type KnowledgeRetrievalPacket } from '@/lib/knowledge/search'
 import type { NexaMessage, HomeSnapshot } from '@/types/home'
 
 import { isNexaKnowledgeRetrievalEnabled } from './flags'
 import type { NexaResponse, NexaRuntimeContext, NexaToolInvocation } from './nexa-contract'
-import { executeNexaTool, getNexaToolDeclarations } from './nexa-tools'
+import type { NexaChatProvider } from './nexa-provider'
+import { GeminiNexaProvider } from './providers/gemini'
 
 interface NexaServiceInput {
   prompt: string
@@ -25,8 +19,13 @@ interface NexaServiceInput {
 }
 
 /**
- * Nexa Service: The AI core for Greenhouse Home.
- * Uses Google GenAI (Gemini) to provide conversational assistance.
+ * Nexa Service: orquestador conversacional de Greenhouse Home.
+ *
+ * TASK-1091 — provider-agnóstico: construye el system prompt + contexto (lógica
+ * compartida), delega el "hablar con el modelo" a un `NexaChatProvider` (Gemini hoy;
+ * Claude/router en slices siguientes) y aplica las Answer Rules de knowledge sobre el
+ * texto resultante. El tool `search_knowledge` y las Answer Rules (TASK-1085) son
+ * provider-agnósticos y NO se tocan.
  */
 export class NexaService {
   private static getTimestamp() {
@@ -130,24 +129,6 @@ export class NexaService {
     ].join('\n')
   }
 
-  private static buildContents(input: NexaServiceInput) {
-    return [
-      ...input.history.map(msg => ({
-        role: msg.role === 'assistant' ? 'model' : 'user',
-        parts: [{ text: msg.content }]
-      })),
-      { role: 'user', parts: [{ text: input.prompt }] }
-    ]
-  }
-
-  private static buildToolFallbackMessage(toolInvocations: NexaToolInvocation[]) {
-    const visible = toolInvocations.slice(0, 3).map(invocation => `- ${invocation.result.summary}`)
-
-    return visible.length > 0
-      ? ['Recuperé señal operativa real:', ...visible].join('\n')
-      : 'Recuperé datos operativos, pero no pude sintetizarlos en lenguaje natural.'
-  }
-
   private static getKnowledgePackets(toolInvocations: NexaToolInvocation[]): KnowledgeRetrievalPacket[] {
     return toolInvocations
       .filter(invocation => invocation.toolName === 'search_knowledge')
@@ -192,181 +173,48 @@ export class NexaService {
     return `${text.trim()}\n\n${sourcesBlock}`
   }
 
-  private static async generateSuggestions({
-    client,
-    model,
-    prompt,
-    responseText
-  }: {
-    client: Awaited<ReturnType<typeof getGoogleGenAIClient>>
-    model: string
-    prompt: string
-    responseText: string
-  }) {
-    try {
-      const suggestionResult = await client.models.generateContent({
-        model,
-        contents: [
-          {
-            role: 'user',
-            parts: [
-              {
-                text: [
-                  'Genera exactamente 3 preguntas de seguimiento cortas en español para una conversación operativa.',
-                  'Devuelve solo JSON válido con forma {"suggestions":["...", "...", "..."]}.',
-                  'No uses markdown.',
-                  `Prompt original: ${prompt}`,
-                  `Respuesta de Nexa: ${responseText}`
-                ].join('\n')
-              }
-            ]
-          }
-        ] as any,
-        config: {
-          temperature: 0.3,
-          maxOutputTokens: 200
-        }
-      })
-
-      const rawText = suggestionResult.text?.trim() || ''
-
-      if (!rawText) {
-        return []
-      }
-
-      const parsed = JSON.parse(rawText) as { suggestions?: unknown }
-
-      if (!Array.isArray(parsed.suggestions)) {
-        return []
-      }
-
-      return parsed.suggestions
-        .filter((item): item is string => typeof item === 'string')
-        .map(item => item.trim())
-        .filter(Boolean)
-        .slice(0, 3)
-    } catch {
-      return []
-    }
-  }
-
-  private static async resolveToolTurn({
-    client,
-    model,
-    systemPrompt,
-    input
-  }: {
-    client: Awaited<ReturnType<typeof getGoogleGenAIClient>>
-    model: string
-    systemPrompt: string
-    input: NexaServiceInput
-  }) {
-    const contents = this.buildContents(input)
-
-    const firstPass = await client.models.generateContent({
-      model,
-      contents: contents as any,
-      config: {
-        systemInstruction: systemPrompt,
-        temperature: 0.2,
-        maxOutputTokens: 500,
-        tools: [{ functionDeclarations: getNexaToolDeclarations(input.runtimeContext) }],
-        toolConfig: {
-          functionCallingConfig: {
-            mode: FunctionCallingConfigMode.AUTO
-          }
-        }
-      }
-    })
-
-    const functionCalls = firstPass.functionCalls?.filter(call => call.name) ?? []
-
-    if (functionCalls.length === 0) {
-      return {
-        text: firstPass.text?.trim() || 'Lo siento, no pude procesar tu solicitud en este momento.',
-        toolInvocations: [] as NexaToolInvocation[]
-      }
-    }
-
-    const toolInvocations = await Promise.all(
-      functionCalls.map(call =>
-        executeNexaTool({
-          toolCallId: call.id || crypto.randomUUID(),
-          toolName: call.name || 'check_payroll',
-          args: call.args,
-          context: input.runtimeContext
-        })
-      )
-    )
-
-    const followUp = await client.models.generateContent({
-      model,
-      contents: [
-        ...contents,
-        createModelContent(
-          functionCalls.map(call => createPartFromFunctionCall(call.name || 'unknown_tool', call.args ?? {}))
-        ),
-        createUserContent(
-          // ISSUE-092 — el functionCall part se construye SIN id, así que el
-          // functionResponse tampoco debe llevarlo: `createPartFromFunctionResponse`
-          // (@google/genai 1.45.0) inyecta un id huérfano que Gemini rechaza con
-          // "Unknown name 'id' at function_response" (rompía TODO tool-calling de Nexa).
-          // Gemini matchea call↔response por nombre.
-          toolInvocations.map(invocation => ({
-            functionResponse: {
-              name: invocation.toolName,
-              response: invocation.result as unknown as Record<string, unknown>
-            }
-          }))
-        )
-      ] as any,
-      config: {
-        systemInstruction: systemPrompt,
-        temperature: 0.2,
-        maxOutputTokens: 500
-      }
-    })
-
-    const responseText = followUp.text?.trim() || this.buildToolFallbackMessage(toolInvocations)
-
-    return {
-      text: this.ensureKnowledgeSourcesVisible(responseText, toolInvocations),
-      toolInvocations
-    }
+  /**
+   * TASK-1091 — selección de provider. Slice 1: siempre Gemini (cero cambio de
+   * comportamiento). Slice 3 reemplaza esto por el router interno por intención + failover.
+   */
+  private static getProvider(): NexaChatProvider {
+    return new GeminiNexaProvider()
   }
 
   static async generateResponse(input: NexaServiceInput): Promise<NexaResponse> {
-    const client = await getGoogleGenAIClient()
-
     const model = resolveNexaModel({
       requestedModel: input.requestedModel,
       fallbackModel: getGreenhouseAgentModel()
     })
 
     const systemPrompt = this.buildSystemPrompt(input.context)
+    const provider = this.getProvider()
 
     try {
-      const result = await this.resolveToolTurn({
-        client,
-        model,
+      const turn = await provider.resolveTurn({
         systemPrompt,
-        input
+        history: input.history,
+        prompt: input.prompt,
+        runtimeContext: input.runtimeContext,
+        context: input.context,
+        model
       })
 
-      const suggestions = await this.generateSuggestions({
-        client,
+      const content = this.ensureKnowledgeSourcesVisible(turn.text, turn.toolInvocations)
+
+      const suggestions = await provider.generateSuggestions({
         model,
         prompt: input.prompt,
-        responseText: result.text
+        responseText: content
       })
 
       return {
         id: crypto.randomUUID(),
         role: 'assistant',
-        content: result.text,
+        content,
         timestamp: this.getTimestamp(),
         suggestions,
-        toolInvocations: result.toolInvocations,
+        toolInvocations: turn.toolInvocations,
         modelId: model
       }
     } catch (error) {
