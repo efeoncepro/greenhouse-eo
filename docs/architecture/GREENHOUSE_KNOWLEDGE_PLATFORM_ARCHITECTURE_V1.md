@@ -1005,3 +1005,36 @@ Tercer lane de Full API Parity sobre el mismo SSOT `searchKnowledge`: el **Green
 - **2 tools**: `search_knowledge` (packet `knowledge-search.v1` con citas; la descripción instruye **no inventar** cuando `confidence='none'`) + `get_knowledge_document` (read-detail por id, anti-oracle 404). `get_knowledge_citations` se descartó (redundante con el packet + read-detail).
 - **1 resource**: `greenhouse://knowledge/document/{id}` (el mismo documento read-only addressable por URI estable). `source/{id}` y `runbook/{slug}` diferidos (un `source/{id}` expone config de ingesta sin valor para un agente).
 - **Mapping fiel, no forma paralela**: el MCP devuelve el packet/documento tal cual; preserva `confidence`/`freshness`/`citations`/`deniedOrFilteredCount`. Un doc `agent_excluded`/`quarantined`/`restricted`/no-interno NUNCA aparece (filtro horneado en el reader + gate de scope `internal` en el binding).
+
+## Delta 2026-06-12 — Connector Notion de Knowledge (TASK-1088)
+
+Cierra el gap que TASK-1082 dejó diferido: la ingesta ahora soporta el teamspace Notion de conocimiento, **sin tocar** el pipeline (sanitize/quarantine/version/chunk). El connector solo cambia la **fuente** del markdown; el resto es drop-in.
+
+### Pipeline parametrizado (Slice 1)
+
+El pipeline ya no hardcodea `repo_docs`. La interface `KnowledgeSourceConnector` gana `sourceDescriptor` (`sourceSystem`/`sourceKind`/`name`/`ownerDomain`/`audience`) — el connector es **dueño de su identidad de source** (SSOT). `findSourceId`/`registerKnowledgeSource` lo consumen. `repo_docs` preservado bit-for-bit (18 tests de ingesta verdes).
+
+### Módulos nuevos (`src/lib/knowledge/notion/`)
+
+| Pieza | Rol |
+| --- | --- |
+| `notion-knowledge-client.ts` | Server-only: block fetcher `GET /v1/blocks/{id}/children` (paginado + recursivo, guard 5000 bloques/12 niveles) + provenance `GET /v1/pages/{id}`. Token vía `resolveSecretByRef(NOTION_KNOWLEDGE_TOKEN_SECRET_REF)`, Notion-Version `2026-03-11`, 429 retry con Retry-After, errores sanitizados que **nunca** incluyen el token. `fetch` inyectable para test. |
+| `blocks-to-markdown.ts` | **Puro** (sin IO): bloques Notion → markdown que el chunker heading-pathed consume. Headings limpias, listas (ordenadas con numeración contigua + reset), to_do, quote, callout, code fence, divider, toggle, tablas, contenedores aplanados, media como link. Bloques desconocidos degradan a párrafo honesto. 17 tests con fixtures. |
+| `notion-corpus.ts` | Manifest declarativo (gobernanza editorial, no inferida). **Nace vacío**: el operador declara `notionPageId` + metadata por documento autorizado. NUNCA descubre Notion en vivo. |
+| `notion-connector.ts` | `NotionKnowledgeConnector implements KnowledgeSourceConnector`. `list()` degrada honesto a `unavailable` si el token no está provisionado; `load()` = fetch tree → `blocks→markdown` → provenance. Cliente inyectable (`NotionKnowledgeReader`) para test. 6 tests con mock reader. |
+
+CLI: `scripts/knowledge/ingest.ts [--apply] [--source=repo_docs|notion]` (guard que rechaza `--source` desconocido).
+
+### Integración (Notion Integrations Registry)
+
+Integración dedicada **Knowledge** (`notion-integration-token-greenhouse-knowledge` → `NOTION_KNOWLEDGE_TOKEN_SECRET_REF`), scoped **solo** al teamspace de conocimiento. NUNCA se reusa el token de BigQuery Sync / PRD / demo, ni el de knowledge para otro pipeline (su aislamiento evita contaminar el mirror BQ). Es ingesta operada por ops, no runtime del portal.
+
+### Boundary (no-regresión)
+
+- **Notion authoring, Greenhouse runtime**: el connector hace **snapshot** (no Notion live para una respuesta de Nexa). NUNCA ingiere todo Notion — solo el corpus autorizado.
+- **Sanitize-before-chunk + quarantine** aplican idéntico: el contenido Notion es input no confiable igual que el del repo.
+- **Provider/source-agnostic**: agregar un connector futuro (otro teamspace, otra fuente) = nuevo `sourceDescriptor` + connector, sin tocar el pipeline.
+
+### Estado
+
+V1 con corpus vacío + sin token provisionado (gated). El connector existe y degrada honesto; la ingesta real arranca cuando el operador comparte las páginas con la integración dedicada + declara el corpus. 23 tests focales nuevos (17 markdown + 6 connector) + 18 de ingesta intactos.
