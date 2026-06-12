@@ -4,7 +4,6 @@ import {
   FunctionCallingConfigMode,
   createModelContent,
   createPartFromFunctionCall,
-  createPartFromFunctionResponse,
   createUserContent
 } from '@google/genai'
 
@@ -12,6 +11,7 @@ import { resolveNexaModel, type NexaModelId } from '@/config/nexa-models'
 import { getGoogleGenAIClient, getGreenhouseAgentModel } from '@/lib/ai/google-genai'
 import type { NexaMessage, HomeSnapshot } from '@/types/home'
 
+import { isNexaKnowledgeRetrievalEnabled } from './flags'
 import type { NexaResponse, NexaRuntimeContext, NexaToolInvocation } from './nexa-contract'
 import { executeNexaTool, getNexaToolDeclarations } from './nexa-tools'
 
@@ -76,6 +76,21 @@ export class NexaService {
   private static buildSystemPrompt(context: HomeSnapshot): string {
     const { user, modules, tasks } = context
 
+    // TASK-1085 — reglas de knowledge SOLO cuando el tool está activo (flag ON);
+    // si no, no mencionar un tool que no existe (evita que el modelo lo "alucine").
+    const knowledgeRules = isNexaKnowledgeRetrievalEnabled()
+      ? [
+          '',
+          'REGLAS DE BASE DE CONOCIMIENTO (tool search_knowledge):',
+          '- Si la pregunta es sobre procesos, políticas, guías, definiciones o "cómo se hace X", usa el tool search_knowledge ANTES de responder.',
+          '- Responde SOLO con lo respaldado por los fragmentos recuperados y CITA la fuente (el citationLabel que trae cada fragmento).',
+          '- Si una fuente viene marcada stale o deprecated, decláralo en la respuesta.',
+          '- Si search_knowledge no encuentra documentación (confianza none), di con honestidad que no encontraste una guía publicada y NO inventes la respuesta.',
+          '- Distingue guía publicada vs dato operativo en vivo: el conocimiento explica CÓMO funciona algo, no afirma el estado real del usuario. Si te piden su dato real (su ICO, su nómina, su estado), dilo: "No consulté datos actuales ni fuentes fuera de Knowledge. Si necesitas estado productivo, valida en el módulo operativo."',
+          '- En temas sensibles (finanzas, nómina, legal, seguridad, compromisos contractuales), responde solo con fuente aprobada y sugiere validación humana cuando corresponda.'
+        ]
+      : []
+
     const financeContext = context.financeStatus
       ? [
           '',
@@ -108,6 +123,7 @@ export class NexaService {
       '- Si el usuario pregunta por algo que está en sus tareas pendientes, menciónalo directamente.',
       '- Si el usuario pregunta por cierre de período, margen o estado financiero y ya hay señal en contexto, úsala antes de responder con generalidades.',
       '- Mantén las respuestas breves para que quepan bien en el panel de Home.',
+      ...knowledgeRules,
       '',
       'Recuerda: Eres parte de Efeonce Group y Greenhouse es la plataforma que materializa la visión de sus proyectos.'
     ].join('\n')
@@ -246,13 +262,17 @@ export class NexaService {
           functionCalls.map(call => createPartFromFunctionCall(call.name || 'unknown_tool', call.args ?? {}))
         ),
         createUserContent(
-          toolInvocations.map(invocation =>
-            createPartFromFunctionResponse(
-              invocation.toolCallId,
-              invocation.toolName,
-              invocation.result as unknown as Record<string, unknown>
-            )
-          )
+          // ISSUE-092 — el functionCall part se construye SIN id, así que el
+          // functionResponse tampoco debe llevarlo: `createPartFromFunctionResponse`
+          // (@google/genai 1.45.0) inyecta un id huérfano que Gemini rechaza con
+          // "Unknown name 'id' at function_response" (rompía TODO tool-calling de Nexa).
+          // Gemini matchea call↔response por nombre.
+          toolInvocations.map(invocation => ({
+            functionResponse: {
+              name: invocation.toolName,
+              response: invocation.result as unknown as Record<string, unknown>
+            }
+          }))
         )
       ] as any,
       config: {
