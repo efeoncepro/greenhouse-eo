@@ -112,3 +112,19 @@ Para que Nexa Knowledge pueda prenderse en producción, no basta con que la resp
 La brecha de **modo mantenimiento** quedó clasificada como cobertura de manifest/ingesta: el manual existe en `docs/manual-de-uso/plataforma/modo-mantenimiento.md` y ahora está incluido en el corpus piloto. Eso no se resuelve ajustando ranking; requiere re-ingerir el corpus y validar QA K5 en staging.
 
 La matriz QA operativa vive en `pnpm qa:nexa-knowledge -- --env=staging`. Production permanece apagado hasta que esa matriz pase en staging con el código desplegado y se revisen las señales de reliability del módulo Knowledge.
+
+## Cómo se mantiene al día el conocimiento (auto-ingest, TASK-1094)
+
+Antes, cuando alguien agregaba o editaba un artículo en Notion, el conocimiento de Nexa **no se enteraba** hasta que alguien re-corría un comando a mano. Con el auto-ingest, **se mantiene solo**:
+
+- **Agregás un artículo** en una Wiki conectada → Nexa lo ve automáticamente (segundos).
+- **Editás un artículo** → se actualiza solo.
+- **Borrás un artículo** → desaparece de Nexa solo (deja de citarse).
+
+Cómo funciona en simple: Notion **avisa** (webhook) cuando algo cambia; Greenhouse escucha ese aviso, va a buscar esa página y la actualiza en la base de conocimiento. Nexa no entra a Notion en vivo — consulta la copia ya indexada.
+
+**Solo las Wikis/páginas autorizadas.** Un cambio en una Wiki que NO está en la lista se ignora (control de gobernanza).
+
+**Red de seguridad honesta.** Los avisos de Notion raramente se pueden perder. Por eso hay (a) una alarma que avisa si un cambio no se pudo procesar, y (b) un comando de "reconciliación" que el operador corre para recuperar lo perdido y borrar de la base lo que ya no existe en Notion. Así nunca queda desincronizado en silencio.
+
+> Detalle técnico: arquitectura `GREENHOUSE_KNOWLEDGE_PLATFORM_ARCHITECTURE_V1.md` Delta 2026-06-12; runbook operativo `docs/operations/runbooks/notion-knowledge-webhook.md`.

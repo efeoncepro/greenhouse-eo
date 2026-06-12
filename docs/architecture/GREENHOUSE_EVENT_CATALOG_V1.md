@@ -1031,3 +1031,11 @@ Spec: `docs/tasks/in-progress/TASK-1024-workforce-contracting-signature-consumer
 - **Sin consumer reactivo en V1** — la feature es link-only síncrona. El enrichment del nodo (render real vía Figma REST) sería un consumer futuro (Slice 4 diferido).
 
 Spec: `docs/tasks/complete/TASK-1072-designer-role-figma-node-linking.md`.
+
+## Delta 2026-06-12 — Knowledge auto-ingest (TASK-1094)
+
+| Evento | Versión | Aggregate | Emisor | Consumer |
+| --- | --- | --- | --- | --- |
+| `knowledge.notion.page_change_signal` | v1 | `knowledge_notion_page` (page id) | webhook `notion-knowledge` (HMAC, gated `NOTION_KNOWLEDGE_WEBHOOK_ENABLED`) | projection `knowledge_notion_ingest` (ops-worker) |
+
+**Payload v1**: `{ schemaVersion: 1, pageId, notionEventType, isDeletion, parentId, sourceEventId, occurredAt }`. Trigger ligero (NO confiable como source of truth) — el consumer re-fetchea la página, aplica el gate de gobernanza (parent data_source ∈ corpus declarado) y re-ingiere idempotente o deprecia (borrado). Mismo patrón re-fetch que `notion.task.page_change_signal` (TASK-912).
