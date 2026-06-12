@@ -996,3 +996,12 @@ Nexa **consume el contrato** `knowledge-search.v1` (NO las tablas) vía un tool 
 - **Señales** (moduleKey `knowledge`, leídas del jsonb `nexa_messages.tool_invocations`, sin writes nuevos): `knowledge.nexa.no_source_answer_rate` (cobertura), `knowledge.nexa.stale_source_retrievals` (steady=0) y `knowledge.retrieval.low_citation_rate` (respuestas sin citas renderizables). Ver Reliability Control Plane V1 Delta 2026-06-12.
 - **Feedback** vía el contrato compartido `POST /api/platform/app/knowledge/feedback` (Full API Parity #5), no un handler local del chat.
 - **Bug class destapada (ISSUE-092):** el smoke end-to-end reveló que el tool-calling de Nexa estaba roto en producción (Gemini 2.5 rechaza el `id` huérfano que `createPartFromFunctionResponse` de @google/genai 1.45.0 inyecta en `functionResponse`). Fix raíz en el path compartido `nexa-service.ts` (`{ name, response }` sin id, match por nombre/orden) → desbloquea TODOS los tools.
+
+## Delta 2026-06-12 — Consumo MCP de Knowledge (TASK-1086)
+
+Tercer lane de Full API Parity sobre el mismo SSOT `searchKnowledge`: el **Greenhouse MCP server** (`src/mcp/greenhouse/**`) expone el corpus a agentes MCP **read-only, downstream del lane ecosystem** (NO SQL/Notion directo, NO writes).
+
+- **Lane ecosystem creado primero** (el gap que el audit destapó): el MCP consume solo `/api/platform/ecosystem/*`, y los endpoints de knowledge ahí no existían — TASK-1083 solo había construido el lane `app`. Ver `GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md` Delta 2026-06-12 (lane ecosystem de Knowledge).
+- **2 tools**: `search_knowledge` (packet `knowledge-search.v1` con citas; la descripción instruye **no inventar** cuando `confidence='none'`) + `get_knowledge_document` (read-detail por id, anti-oracle 404). `get_knowledge_citations` se descartó (redundante con el packet + read-detail).
+- **1 resource**: `greenhouse://knowledge/document/{id}` (el mismo documento read-only addressable por URI estable). `source/{id}` y `runbook/{slug}` diferidos (un `source/{id}` expone config de ingesta sin valor para un agente).
+- **Mapping fiel, no forma paralela**: el MCP devuelve el packet/documento tal cual; preserva `confidence`/`freshness`/`citations`/`deniedOrFilteredCount`. Un doc `agent_excluded`/`quarantined`/`restricted`/no-interno NUNCA aparece (filtro horneado en el reader + gate de scope `internal` en el binding).

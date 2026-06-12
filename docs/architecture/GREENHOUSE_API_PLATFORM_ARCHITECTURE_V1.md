@@ -9,6 +9,17 @@
 
 ---
 
+## Delta 2026-06-12 — Lane ecosystem de Knowledge (TASK-1086)
+
+El reader SSOT `searchKnowledge` (TASK-1083) ahora sirve **tres lanes** con cero lógica de dominio duplicada (Full API Parity en acción): `app` (UI/Nexa, session-authed), `ecosystem` (MCP, machine-authed) y, vía el tool de Nexa, el agente conversacional. TASK-1086 agregó el lane **ecosystem**:
+
+- `GET /api/platform/ecosystem/knowledge/search` + `GET /api/platform/ecosystem/knowledge/documents/[id]` vía `runEcosystemReadRoute`. Resource builders en `src/lib/api-platform/resources/ecosystem-knowledge.ts`.
+- **Subject derivado del binding** (no hay sesión/roleCodes): `buildEcosystemKnowledgeSubject(context)` construye el `KnowledgeSearchSubject` desde el binding sister-platform. Es la **única diferencia** con el lane `app` (que lo deriva de `TenantContext`); el reader, el filtrado pre-LLM y el contrato `knowledge-search.v1` son idénticos.
+- **Governance gate default-DENY**: solo bindings de `greenhouseScopeType='internal'` recuperan conocimiento agéntico (corpus interno-only MVP) → si no, `403 scope_not_allowed`. Defensa en profundidad: el reader en modo `agentic` ya excluye `agent_excluded`/`restricted`/`quarantined` (un binding autorizado NUNCA ve docs sensibles).
+- Read-detail con **anti-oracle 404** (predicado local `isDocumentAgenticallyVisible` que espeja el filtro agéntico del SQL). Read-only V1. Sin SQL/Notion directo (lint `greenhouse/no-direct-knowledge-chunk-query`).
+
+El MCP server (`src/mcp/greenhouse/**`) consume este lane (2 tools + 1 resource) — ver `GREENHOUSE_KNOWLEDGE_PLATFORM_ARCHITECTURE_V1.md` Delta 2026-06-12 (MCP).
+
 ## Delta 2026-06-03 — Full API parity como principio de producto/plataforma
 
 ADR canonico: `docs/architecture/GREENHOUSE_FULL_API_PARITY_DECISION_V1.md`.
