@@ -1,11 +1,11 @@
 # TASK-1085 — Nexa Knowledge Retrieval With Citations
 
-## Delta 2026-06-12 — UI pre-construida (NexaComposer + assistant-ui) + cruce con el contrato
+## Delta 2026-06-12 — UI pre-construida (NexaComposer) + runtime canónico + cruce con el contrato
 
-Codex canonizó la primitive `NexaComposer` (variant `chat`, runtime-agnóstica) + incorporó `@assistant-ui/react`/`-react-markdown` como dependencia (commit `78346c636`). Para 1085:
+Codex canonizó la primitive `NexaComposer` (variant `chat`, runtime-agnóstica; commit `78346c636`). El runtime conversacional **`@assistant-ui/react` es canónico** (NO es dependencia nueva — es el runtime de Nexa desde TASK-009/110/114, en `ui-platform/STACK.md`; **formalizado en `DECISIONS_INDEX` por el operador 2026-06-12**). Para 1085:
 
 - **El cruce crítico es acá:** cuando el composer envíe la pregunta, la respuesta DEBE venir de `searchKnowledge({ mode: 'agentic' })` (citas + filtrado agéntico + `confidence='none'`→no-inventar), NUNCA un LLM call sin retrieval ni query directo a las tablas. El composer deja esto abierto correctamente (no cablea el retrieval adentro).
-- **ADR pendiente:** `@assistant-ui/react` como runtime canónico de chat de Nexa es una decisión de plataforma — declararla como ADR en esta task (o una derivada) antes de cablear el runtime productivo.
+- **Wiring:** Nexa cablea `@assistant-ui/react` (`ComposerPrimitive.Root/.Input/.Send/.Cancel`) sobre `NexaComposer`/`NexaComposerInput`/`NexaComposerActionButton` vía `asChild` (la primitive es presentacional, el runtime lo trae el consumer). El thread/respuesta consume el packet `knowledge-search.v1`.
 
 ## Delta 2026-06-12 — desbloqueada por TASK-1083 (contrato listo)
 
