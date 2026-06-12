@@ -1,17 +1,17 @@
 export const GH_KNOWLEDGE_COPY = {
   pageTitle: 'Knowledge',
-  pageSubtitle: 'Nexa consulta Knowledge y devuelve una respuesta trazable para humanos, chat y MCP.',
+  pageSubtitle: 'Pregúntale a Nexa y revisa de dónde sale cada respuesta antes de actuar.',
   commandPlaceholder: 'Pregúntale a Nexa',
   followUpPlaceholder: 'Haz otra pregunta a Nexa',
   selectedQuestion: '¿Cómo reviso mis métricas ICO personales y qué significan?',
   sendQuestion: 'Preguntar',
   sendFeedback: 'Reportar mejora',
   export: 'Exportar',
-  responseTitle: 'Respuesta verificable',
+  responseTitle: 'Respuesta de Nexa',
   assistantName: 'Nexa',
   responseThinkingLabel: 'Nexa está refinando la respuesta',
   sourcesLabel: 'Fuentes',
-  proofTitle: 'Prueba y trazabilidad',
+  proofTitle: 'Fuentes y trazabilidad',
   agentTitle: 'Para agentes',
   breadcrumbRoot: 'Greenhouse',
   breadcrumbCurrent: 'Knowledge',
@@ -19,13 +19,13 @@ export const GH_KNOWLEDGE_COPY = {
   openDocument: 'Abrir documento',
   copyUri: 'Copiar URI',
   viewFullPacket: 'Ver packet completo',
-  agentDisclosure: 'Los agentes usan el mismo corpus gobernado que los humanos. Los chunks denegados no llegan al modelo.',
+  agentDisclosure: 'Los agentes usan el mismo corpus gobernado que las personas. Los fragmentos restringidos no llegan al modelo.',
   answer:
     'Para revisar tus métricas ICO personales, entra a Mi Desempeño desde el menú principal. Ahí puedes ver tus indicadores por objetivo, colaborar con tu líder y dar seguimiento a tu crecimiento.',
   currentModeHelper: {
-    human: 'Modo humano: prioriza una explicación accionable y el manual completo.',
-    nexa: 'Modo Nexa: muestra cómo se cita la respuesta antes de responder.',
-    mcp: 'Modo MCP: expone el packet que consumen los agentes externos.'
+    human: 'Respuesta para personas: explicación accionable y fuentes visibles.',
+    nexa: 'Respuesta de Nexa: muestra cómo se apoyó en Knowledge.',
+    mcp: 'Vista técnica: expone el paquete que consumen agentes y MCP.'
   },
   operationalDataWarning: 'No consulté datos actuales',
   operationalDataWarningBody: 'Esta respuesta usa guías publicadas. Para ver tu estado real, consulta tus datos de desempeño.',
@@ -56,9 +56,9 @@ export const GH_KNOWLEDGE_COPY = {
   },
   evidenceTabs: {
     sources: 'Fuentes',
-    trace: 'Trace',
-    packet: 'Packet',
-    evals: 'Evals'
+    trace: 'Cómo llegó',
+    packet: 'Paquete',
+    evals: 'Revisión'
   },
   mode: {
     human: 'Humano',

@@ -63,19 +63,28 @@ Regla corta: **el deliverable de primitives de 1093 es 1 generalización (`NexaA
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-06-12 — ejecución Codex en develop con override documentado
+
+`pnpm codex:task-hook TASK-1093 --develop` bloqueó inicialmente porque la task todavía declaraba blockers `TASK-1085` y `TASK-1089`. Se verificó el estado actualizado:
+
+- `TASK-1085` ya está en `complete` y la QA staging con flag ON quedó documentada.
+- `TASK-1089` permanece `in-progress`, pero su Status real es `Code complete local / esperando feedback`; la foundation `NexaKnowledgeAnswerSurface` ya existe y 1093 se limita al V1 acotado que no reemplaza esa surface ni cambia su experiencia idle.
+
+El operador pidió explícitamente leer la actualización de Claude y ejecutar 1093. Por eso se toma la task en `develop`, sin worktree nuevo, con este guardrail: **no tocar `TASK-1092`, no crear shell multi-surface, no mover 1089 a complete, y serializar cualquier cambio que solape `NexaThread`/runtime con WIP de otros agentes**.
+
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `none`
-- Status real: `Diseño validado por sinergia Nexa Chat + AnswerSurface; falta plataforma reusable`
+- Status real: `V1 acotado completo: evidence view-model + renderer compartido + rehidratación segura`
 - Rank: `TBD`
 - Domain: `ui|platform|nexa|ai|content`
-- Blocked by: `TASK-1085`, `TASK-1089`
-- Branch: `task/TASK-1093-greenhouse-conversational-experience-platform-v1`
+- Blocked by: `none`
+- Branch: `develop`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
@@ -125,7 +134,7 @@ Reglas obligatorias:
 
 ## Normative Docs
 
-- `docs/tasks/in-progress/TASK-1085-nexa-knowledge-retrieval-citations.md`
+- `docs/tasks/complete/TASK-1085-nexa-knowledge-retrieval-citations.md`
 - `docs/tasks/in-progress/TASK-1089-nexa-knowledge-answer-surface.md`
 - `docs/tasks/to-do/TASK-1092-nexa-knowledge-production-readiness-inline-citations.md`
 - `docs/tasks/to-do/TASK-1078-nexa-floating-chat-expandable-persisted.md`
@@ -344,14 +353,14 @@ N/A — repo-only change. Product review required before replacing active surfac
 
 ## Acceptance Criteria
 
-- [ ] Existe un evidence view-model común usado por Knowledge evidence y listo para otras tool evidences.
-- [ ] `NexaThread` y `NexaKnowledgeAnswerSurface` comparten la misma base visual de answer turn/evidence o adapters documentados sin divergencia visual.
-- [ ] La experiencia sin pregunta conserva el empty state/composer actual.
-- [ ] Al preguntar, la UI mantiene burbuja de usuario, respuesta de Nexa con avatar después de la burbuja y composer de follow-up debajo.
-- [ ] Las cards de intento/retrieval/trace no rompen la conversación; viven como panel/disclosure/evidence lane según variant.
-- [ ] Threads rehidratados conservan evidence cards o degradan honestamente sin re-ejecutar tools.
-- [ ] `/design-system/nexa-chat` documenta los variants/kinds nuevos.
-- [ ] GVC desktop/mobile cubre chat, AnswerSurface y overview compacta.
+- [x] Existe un evidence view-model común usado por Knowledge evidence y listo para otras tool evidences.
+- [x] `NexaThread` y `NexaKnowledgeAnswerSurface` comparten la misma base visual de answer turn/evidence o adapters documentados sin divergencia visual.
+- [x] La experiencia sin pregunta conserva el empty state/composer actual.
+- [x] Al preguntar, la UI mantiene burbuja de usuario, respuesta de Nexa con avatar después de la burbuja y composer de follow-up debajo.
+- [x] Las cards de intento/retrieval/trace no rompen la conversación; viven como panel/disclosure/evidence lane según variant.
+- [x] Threads rehidratados conservan evidence cards o degradan honestamente sin re-ejecutar tools.
+- [x] `/design-system/nexa-chat` documenta los variants/kinds nuevos.
+- [x] GVC desktop/mobile cubre V1 acotado: lab Nexa Chat + Knowledge AnswerSurface. Overview compacta queda diferida por el corte de scope 2026-06-12.
 
 ## Verification
 
@@ -362,8 +371,21 @@ N/A — repo-only change. Product review required before replacing active surfac
 - `pnpm design:lint`
 - `pnpm fe:capture design-system-nexa-chat --env=local`
 - `pnpm fe:capture knowledge-answer-trace --env=local`
-- GVC de floating/home route según scenario disponible o nuevo scenario creado
-- `pnpm docs:closure-check --changed`
+- `pnpm docs:closure-check -- <paths>` (`--changed` no existe en este repo; drift documentado)
+
+### Evidence 2026-06-12
+
+- `pnpm codex:task-hook TASK-1093 --develop`
+- `pnpm exec eslint src/lib/nexa/conversational-evidence.ts src/lib/nexa/use-nexa-runtime.ts src/lib/nexa/use-nexa-runtime.test.ts src/components/greenhouse/primitives/NexaEvidencePanel.tsx src/components/greenhouse/primitives/NexaKnowledgeAnswerSurface.tsx src/components/greenhouse/primitives/NexaComposer.tsx src/components/greenhouse/primitives/nexa-composer-controller.ts src/components/greenhouse/primitives/nexa-knowledge-answer-surface-controller.ts src/views/greenhouse/home/components/NexaToolRenderers.tsx src/views/greenhouse/home/components/NexaToolRenderers.test.ts src/views/greenhouse/admin/design-system/NexaChatLabView.tsx src/components/greenhouse/primitives/__tests__/NexaComposer.test.tsx src/components/greenhouse/primitives/__tests__/NexaKnowledgeAnswerSurface.test.tsx`
+- `pnpm vitest run src/views/greenhouse/home/components/NexaToolRenderers.test.ts src/lib/nexa/use-nexa-runtime.test.ts src/components/greenhouse/primitives/__tests__/NexaComposer.test.tsx src/components/greenhouse/primitives/__tests__/NexaKnowledgeAnswerSurface.test.tsx` → 10 tests verdes.
+- `pnpm exec tsc --noEmit --pretty false`
+- `pnpm design:lint`
+- `pnpm fe:capture design-system-nexa-chat --env=local` → `.captures/2026-06-12T12-07-29_design-system-nexa-chat`
+- `pnpm fe:capture knowledge-answer-trace --env=local` → `.captures/2026-06-12T12-06-34_knowledge-answer-trace`
+- `pnpm task:lint --task TASK-1093`
+- `pnpm ops:lint --changed`
+- `git diff --check`
+- `pnpm docs:closure-check -- Handoff.md changelog.md project_context.md docs/tasks/README.md docs/tasks/TASK_ID_REGISTRY.md docs/tasks/in-progress/TASK-1093-greenhouse-conversational-experience-platform-v1.md docs/architecture/ui-platform/PRIMITIVES.md docs/architecture/ui-platform/PATTERNS.md docs/architecture/ui-platform/HISTORIAL.md docs/documentation/plataforma/knowledge-platform.md docs/manual-de-uso/plataforma/knowledge-platform.md src/lib/nexa/conversational-evidence.ts src/lib/nexa/use-nexa-runtime.ts src/components/greenhouse/primitives/NexaEvidencePanel.tsx src/components/greenhouse/primitives/NexaKnowledgeAnswerSurface.tsx src/views/greenhouse/home/components/NexaToolRenderers.tsx src/views/greenhouse/admin/design-system/NexaChatLabView.tsx` → warnings 0.
 
 ## Closing Protocol
 

@@ -59,16 +59,16 @@ export interface ContextHook {
 export const traceSteps: TraceStep[] = [
   {
     id: 'intent',
-    label: 'Intento detectado: aprender',
-    description: 'Clasificación: guía operativa',
+    label: 'Nexa entendió la intención',
+    description: 'Quiere explicar una guía operativa',
     metadata: 'Dominio: Mi Desempeño',
     state: 'complete'
   },
   {
     id: 'retrieval',
-    label: 'Retrieval: 3 chunks incluidos',
-    description: 'Confianza del retrieval: 0.93',
-    metadata: 'Filtrados por policy: 1',
+    label: 'Buscó 3 fragmentos útiles',
+    description: 'Confianza de búsqueda: 0.93',
+    metadata: '1 fragmento restringido quedó fuera',
     state: 'complete'
   },
   {
@@ -81,7 +81,7 @@ export const traceSteps: TraceStep[] = [
   {
     id: 'feedback',
     label: 'Feedback y mejora',
-    description: 'Tu feedback mejora la memoria',
+    description: 'Tu señal mejora Knowledge',
     metadata: 'Último feedback: hoy 09:41',
     state: 'pending'
   }
@@ -117,16 +117,16 @@ export const sourceExcerpts: SourceExcerpt[] = [
 export const packetRows: PacketRow[] = [
   { label: 'confidence', value: '0.91 (high)', tone: 'success' },
   { label: 'freshness', value: 'current (07 may 2025)', tone: 'success' },
-  { label: 'deniedOrFilteredCount', value: '1' },
-  { label: 'accessScope', value: 'internal' },
-  { label: 'audience', value: 'Colaboradores corporativos' },
-  { label: 'sensitivity', value: 'internal' },
-  { label: 'agentic_policy', value: 'agent_allowed', tone: 'success' },
-  { label: 'chunkIncluded', value: '3' },
-  { label: 'chunksFiltered', value: '1' },
-  { label: 'mcp_uri', value: 'greenhouse://knowledge/document/mi-desempeno' },
-  { label: 'retrieval_id', value: 'kr_2025-05-19_09-41-22_7f3c9a' },
-  { label: 'notes', value: 'Secciones con datos personales filtradas.' }
+  { label: 'fragmentos restringidos', value: '1' },
+  { label: 'alcance de acceso', value: 'internal' },
+  { label: 'audiencia', value: 'Colaboradores corporativos' },
+  { label: 'sensibilidad', value: 'internal' },
+  { label: 'política para agentes', value: 'agent_allowed', tone: 'success' },
+  { label: 'fragmentos incluidos', value: '3' },
+  { label: 'fragmentos filtrados', value: '1' },
+  { label: 'URI MCP', value: 'greenhouse://knowledge/document/mi-desempeno' },
+  { label: 'ID de búsqueda', value: 'kr_2025-05-19_09-41-22_7f3c9a' },
+  { label: 'nota', value: 'Secciones con datos personales filtradas.' }
 ]
 
 export const evalRows: EvalRow[] = [

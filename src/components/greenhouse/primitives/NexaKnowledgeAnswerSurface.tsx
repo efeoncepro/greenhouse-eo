@@ -17,6 +17,7 @@ import GreenhouseChip from './GreenhouseChip'
 import GreenhouseStatusDot from './GreenhouseStatusDot'
 import GreenhouseThinkingBeat from './GreenhouseThinkingBeat'
 import NexaComposer, { NexaComposerActionButton, NexaComposerInput } from './NexaComposer'
+import NexaEvidencePanel from './NexaEvidencePanel'
 import NexaSenderMark from './NexaSenderMark'
 import {
   resolveNexaKnowledgeAnswerSurfaceKind,
@@ -24,6 +25,7 @@ import {
   type NexaKnowledgeAnswerSurfaceKind,
   type NexaKnowledgeAnswerSurfaceVariant
 } from './nexa-knowledge-answer-surface-controller'
+import type { ConversationalEvidencePacket } from '@/lib/nexa/conversational-evidence'
 
 export type NexaKnowledgeAnswerTraceStepState = 'complete' | 'active' | 'pending'
 
@@ -85,7 +87,9 @@ export interface NexaKnowledgeAnswerSurfaceProps<TMode extends string = string, 
   proofTabs: readonly NexaKnowledgeAnswerProofTab<TTab>[]
   onProofTabChange: (value: TTab) => void
   proofTabsAriaLabel: string
-  proofContent: ReactNode
+  proofContent?: ReactNode
+  evidence?: ConversationalEvidencePacket
+  evidenceFeedbackEnabled?: boolean
 }
 
 const traceStepMotionSx = {
@@ -427,7 +431,9 @@ const NexaKnowledgeAnswerSurface = <TMode extends string = string, TTab extends 
   proofTabs,
   onProofTabChange,
   proofTabsAriaLabel,
-  proofContent
+  proofContent,
+  evidence,
+  evidenceFeedbackEnabled = true
 }: NexaKnowledgeAnswerSurfaceProps<TMode, TTab>) => {
   const theme = useTheme()
   const kindConfig = resolveNexaKnowledgeAnswerSurfaceKind(kind)
@@ -459,6 +465,7 @@ const NexaKnowledgeAnswerSurface = <TMode extends string = string, TTab extends 
         overflow: 'hidden',
         inlineSize: '100%',
         minInlineSize: 0,
+        scrollMarginBlockStart: { xs: '168px', md: '96px' },
         transition: theme.transitions.create('box-shadow', { duration: theme.transitions.duration.short })
       }}
     >
@@ -523,7 +530,15 @@ const NexaKnowledgeAnswerSurface = <TMode extends string = string, TTab extends 
       {variantConfig.showTrace && !conversationStarted ? (
         <>
           <Divider />
-          <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, minInlineSize: 0 }} data-capture='nexa-knowledge-trace-steps'>
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: { xs: 'column', md: 'row' },
+              minInlineSize: 0,
+              backgroundColor: alpha(theme.palette.background.default, 0.72)
+            }}
+            data-capture='nexa-knowledge-trace-steps'
+          >
             {traceSteps.map((step, index) => (
               <TraceStepCard key={step.id} step={step} index={index} isLast={index === traceSteps.length - 1} />
             ))}
@@ -569,9 +584,9 @@ const NexaKnowledgeAnswerSurface = <TMode extends string = string, TTab extends 
 
           {conversationStarted ? (
             <Box data-capture='nexa-knowledge-follow-up-composer' sx={{ pl: { xs: 0, md: 11 } }}>
-              <NexaComposer kind='knowledgeAsk'>
+              <NexaComposer kind='inlineFollowUp'>
                 <NexaComposerInput
-                  kind='knowledgeAsk'
+                  kind='inlineFollowUp'
                   fullWidth
                   value={draft}
                   placeholder={followUpPlaceholder}
@@ -617,7 +632,13 @@ const NexaKnowledgeAnswerSurface = <TMode extends string = string, TTab extends 
             </Tabs>
           </Box>
           <Divider />
-          <Box sx={{ px: { xs: 4, md: 5 }, py: 2 }}>{proofContent}</Box>
+          <Box sx={{ px: { xs: 4, md: 5 }, py: 2 }}>
+            {evidence ? (
+              <NexaEvidencePanel evidence={evidence} variant='proofPanel' feedbackEnabled={evidenceFeedbackEnabled} />
+            ) : (
+              proofContent
+            )}
+          </Box>
         </Box>
       </Box>
     </Box>

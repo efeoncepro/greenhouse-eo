@@ -1,6 +1,7 @@
 ## Estado vigente para agentes
 
 - **Nexa Knowledge evidence vigente (TASK-1085/1089, 2026-06-12):** `NexaKnowledgeAnswerSurface` sigue siendo la composition primitive transversal props-only para respuestas Nexa con evidencia (mockup/overview/Answer Trace). La experiencia real del thread ya renderiza el tool `search_knowledge` debajo de la respuesta vía `NexaToolRenderers.tsx`, validando `raw.packet.contractVersion='knowledge-search.v1'` y derivando trace/fuentes desde el packet; no consultar tablas de Knowledge desde UI. Flag productivo `NEXA_KNOWLEDGE_RETRIEVAL_ENABLED` sigue default OFF hasta rollout.
+- **Conversational Evidence V1 vigente (TASK-1093, 2026-06-12):** el packet `knowledge-search.v1` se adapta a `ConversationalEvidencePacket` (`nexa-evidence.v1`) en `src/lib/nexa/conversational-evidence.ts`. `NexaEvidencePanel` es el renderer compartido para chat `search_knowledge` y `NexaKnowledgeAnswerSurface`; `NexaComposer kind='inlineFollowUp'` gobierna follow-ups descendidos y `mapThreadMessagesToInitial()` rehidrata tool-calls persistidos cuando existen.
 - **Triple documentacion obligatoria (2026-06-11):** todo dominio, modulo, funcionalidad, feature, workflow, integration, tool, API o surface de Greenhouse debe tener tres capas: documentacion tecnica (`docs/architecture/`, `docs/api/`, ADR/spec), documentacion funcional (`docs/documentation/<dominio>/`) y manual de uso/runbook (`docs/manual-de-uso/<dominio>/`). La proporcionalidad cambia el tamano, no la obligacion: delta corto en docs existentes para cambios pequeños; docs nuevos para capacidades nuevas. No declarar `complete` si falta una capa requerida; si una capa no aplica todavia, documentar razon, owner y condicion de retiro en task/handoff. Fuente canonica: `docs/operations/DOCUMENTATION_OPERATING_MODEL_V1.md`.
 - **Radius tokens en MUI `sx` — gotcha vigente (2026-06-10):** `theme.shape.customBorderRadius.*` almacena números en px, pero `borderRadius` numérico dentro de `sx` lo transforma MUI como multiplicador de `theme.shape.borderRadius`. En `sx`, usar siempre CSS length (`'4px'`, `'6px'`, etc.; o `9999px`/`50%` para pills/círculos). No volver a documentar `borderRadius: theme.shape.customBorderRadius.*` como ejemplo correcto dentro de `sx`; infla radios y hace superficies demasiado blandas.
 - **GreenhouseBreadcrumbs primitive vigente (2026-06-10):** `GreenhouseBreadcrumbs` (`src/components/greenhouse/primitives/`) es la primitive canónica para navegación jerárquica basada en AXIS Figma `Breadcrumbs Greenhouse` (fileKey `yyMksCoijfMaIoYplXKZaR`, node `205:234905`). Variants oficiales: `default|compact`; kinds: `pageHierarchy|workbenchHierarchy|designSystemSpecimen|legacy|custom`; separators `slash|chevron`. Usa MUI Breadcrumbs como base semántica accesible, ancestors como links reales y current page con `aria-current='page'`; el wrapper legacy `Breadcrumb` delega en la primitive. Lab interno: `/admin/design-system/breadcrumbs`; scenario GVC: `design-system-breadcrumbs`. Regla: no duplicar breadcrumbs con botones "volver".
@@ -1288,6 +1289,12 @@
   - el esquema se puede desmontar eliminando worktrees cuando ya no hagan falta
 - referencia corta en `AGENTS.md`:
   - coordinación entre agentes y branching ya apuntan al operating model nuevo
+
+## Delta 2026-06-12 WIP untracked en worktree compartido queda protegido
+
+- Lección operativa TASK-1085/TASK-1086: `git stash -u` sobre rutas nuevas de otro agente en el checkout compartido hace desaparecer su WIP del filesystem aunque sea reversible; eso rompe su loop.
+- Contrato vigente: archivos `untracked`/unstaged que no pertenecen a tu task se tratan como estado vivo de otro agente/operador. No se stashean, limpian, restauran ni mueven para pasar hooks.
+- Si un push propio queda bloqueado por WIP ajeno, coordinar con el owner, trabajar desde un worktree aislado o pedir autorización explícita para un bypass de hook ya verificado. Fuente canónica: `docs/operations/MULTI_AGENT_WORKTREE_OPERATING_MODEL_V1.md`.
 
 ## Delta 2026-04-13 Structured Context Layer formalizada como foundation arquitectónica
 

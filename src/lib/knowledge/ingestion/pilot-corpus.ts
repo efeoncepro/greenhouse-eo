@@ -1,7 +1,8 @@
 /**
  * TASK-1082 — Pilot corpus manifest (declarativo, pure).
  *
- * Los 14 documentos internos del MVP (TASK-1080 → arquitectura Delta tabla C),
+ * Los 15 documentos internos del MVP (TASK-1080 → arquitectura Delta tabla C +
+ * TASK-1092 coverage readiness),
  * mapeados a sus archivos markdown del repo. La metadata de gobernanza
  * (audience/sensitivity/agentic_policy/approver) es decisión editorial declarada
  * aquí — NO se infiere del contenido.
@@ -13,6 +14,7 @@
  *  - MVP solo interno: audience='internal'.
  *  - #13 (períodos de nómina) nace `agent_excluded` hasta firma de hr_payroll.
  *  - #14 (política de secretos) nace `agent_excluded` + `restricted` (humanos-only).
+ *  - #15 (modo mantenimiento) se agrega por TASK-1092 para cerrar K5 de QA.
  */
 
 import type { KnowledgeDocCandidate } from './connector'
@@ -207,6 +209,19 @@ export const PILOT_CORPUS: readonly PilotCorpusEntry[] = [
     docLayer: 'technical',
     humanUrl: humanUrl('politica-secretos-acceso'),
     sourceFiles: null // to-author (extracto curado; NO ingerir CLAUDE.md crudo)
+  },
+  {
+    slug: 'modo-mantenimiento',
+    title: 'Modo mantenimiento: activar y desactivar',
+    documentType: 'runbook',
+    ownerDomain: 'platform',
+    approverRole: 'efeonce_admin',
+    audience: 'internal',
+    sensitivity: 'internal',
+    agenticPolicy: 'agent_allowed',
+    docLayer: 'manual',
+    humanUrl: humanUrl('modo-mantenimiento'),
+    sourceFiles: ['docs/manual-de-uso/plataforma/modo-mantenimiento.md']
   }
 ] as const
 

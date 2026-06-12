@@ -372,6 +372,7 @@ El guard `capability-grant-coverage.test.ts` atrapa el bug en CI cuando hay capa
 - No usar `develop`, Vercel Preview o GitHub Actions como loop de exploracion si el cambio puede validarse en local. Push remoto requiere confirmacion humana o instruccion explicita.
 - Todo trabajo de agentes debe salir desde rama propia salvo cambios minimos de emergencia.
 - Si varios agentes trabajan en paralelo, cada uno debe usar rama propia y, cuando compartan máquina/workspace físico, worktree propio para no alterar el branch visible del otro agente.
+- En un checkout compartido, el WIP `untracked`/unstaged de otro agente es estado vivo: **no usar `git stash -u`, `git clean`, `git restore`, moves ni pathspecs amplios para apartarlo**. Si tu hook/push queda bloqueado por WIP ajeno, coordinar con el owner, mover tu cierre a un worktree aislado o pedir autorización explícita para un bypass ya verificado. Fuente canónica: `docs/operations/MULTI_AGENT_WORKTREE_OPERATING_MODEL_V1.md`.
 - Formato recomendado de ramas:
   - `feature/<owner>-<tema>`
   - `fix/<owner>-<tema>`

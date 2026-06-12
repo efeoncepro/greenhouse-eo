@@ -34,6 +34,8 @@ describe('NexaComposer', () => {
     expect(resolveNexaComposerKind('knowledgeAsk').variant).toBe('command')
     expect(resolveNexaComposerVariant(undefined, 'knowledgeAsk').shortcutLabel).toBe('↵')
     expect(resolveNexaComposerVariant(undefined, 'globalCommand').shortcutLabel).toBe('⌘ K')
+    expect(resolveNexaComposerKind('inlineFollowUp').variant).toBe('chat')
+    expect(resolveNexaComposerVariant(undefined, 'inlineFollowUp').showNexaMark).toBe(false)
   })
 
   it('renders the command input with Nexa mark and shortcut affordance', () => {

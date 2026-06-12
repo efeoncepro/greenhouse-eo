@@ -9,6 +9,7 @@ import {
 
 import { resolveNexaModel, type NexaModelId } from '@/config/nexa-models'
 import { getGoogleGenAIClient, getGreenhouseAgentModel } from '@/lib/ai/google-genai'
+import { KNOWLEDGE_SEARCH_CONTRACT_VERSION, type KnowledgeRetrievalPacket } from '@/lib/knowledge/search'
 import type { NexaMessage, HomeSnapshot } from '@/types/home'
 
 import { isNexaKnowledgeRetrievalEnabled } from './flags'
@@ -83,11 +84,11 @@ export class NexaService {
           '',
           'REGLAS DE BASE DE CONOCIMIENTO (tool search_knowledge):',
           '- Si la pregunta es sobre procesos, políticas, guías, definiciones o "cómo se hace X", usa el tool search_knowledge ANTES de responder.',
-          '- Responde SOLO con lo respaldado por los fragmentos recuperados y CITA la fuente (el citationLabel que trae cada fragmento).',
+          '- Responde SOLO con lo respaldado por los fragmentos recuperados. Usa marcadores inline [n] ligados al fragmento n (ej. "... [1]") y cierra con "Fuentes: [n] = citationLabel".',
           '- Si una fuente viene marcada stale o deprecated, decláralo en la respuesta.',
           '- Si search_knowledge no encuentra documentación (confianza none), di con honestidad que no encontraste una guía publicada y NO inventes la respuesta.',
           '- Distingue guía publicada vs dato operativo en vivo: el conocimiento explica CÓMO funciona algo, no afirma el estado real del usuario. Si te piden su dato real (su ICO, su nómina, su estado), dilo: "No consulté datos actuales ni fuentes fuera de Knowledge. Si necesitas estado productivo, valida en el módulo operativo."',
-          '- En temas sensibles (finanzas, nómina, legal, seguridad, compromisos contractuales), responde solo con fuente aprobada y sugiere validación humana cuando corresponda.'
+          '- En temas sensibles (finanzas, nómina, legal, seguridad, compromisos contractuales), responde solo con fuente aprobada, cita siempre con [n] y sugiere validación humana cuando corresponda.'
         ]
       : []
 
@@ -145,6 +146,50 @@ export class NexaService {
     return visible.length > 0
       ? ['Recuperé señal operativa real:', ...visible].join('\n')
       : 'Recuperé datos operativos, pero no pude sintetizarlos en lenguaje natural.'
+  }
+
+  private static getKnowledgePackets(toolInvocations: NexaToolInvocation[]): KnowledgeRetrievalPacket[] {
+    return toolInvocations
+      .filter(invocation => invocation.toolName === 'search_knowledge')
+      .map(invocation => invocation.result.raw?.packet)
+      .filter((packet): packet is KnowledgeRetrievalPacket => {
+        if (!packet || typeof packet !== 'object') {
+          return false
+        }
+
+        const candidate = packet as Partial<KnowledgeRetrievalPacket>
+
+        return candidate.contractVersion === KNOWLEDGE_SEARCH_CONTRACT_VERSION && Array.isArray(candidate.chunks)
+      })
+  }
+
+  private static buildKnowledgeSourcesBlock(toolInvocations: NexaToolInvocation[]): string | null {
+    const citationLabels = this.getKnowledgePackets(toolInvocations)
+      .filter(packet => packet.confidence !== 'none' && packet.chunks.length > 0)
+      .flatMap(packet => packet.chunks.map(chunk => chunk.citationLabel.trim()))
+      .filter(Boolean)
+
+    const uniqueLabels = Array.from(new Set(citationLabels))
+
+    if (uniqueLabels.length === 0) {
+      return null
+    }
+
+    return ['Fuentes:', ...uniqueLabels.map((label, index) => `[${index + 1}] = ${label}`)].join('\n')
+  }
+
+  private static ensureKnowledgeSourcesVisible(text: string, toolInvocations: NexaToolInvocation[]): string {
+    if (/\[\d+\]/u.test(text)) {
+      return text
+    }
+
+    const sourcesBlock = this.buildKnowledgeSourcesBlock(toolInvocations)
+
+    if (!sourcesBlock) {
+      return text
+    }
+
+    return `${text.trim()}\n\n${sourcesBlock}`
   }
 
   private static async generateSuggestions({
@@ -282,8 +327,10 @@ export class NexaService {
       }
     })
 
+    const responseText = followUp.text?.trim() || this.buildToolFallbackMessage(toolInvocations)
+
     return {
-      text: followUp.text?.trim() || this.buildToolFallbackMessage(toolInvocations),
+      text: this.ensureKnowledgeSourcesVisible(responseText, toolInvocations),
       toolInvocations
     }
   }

@@ -3,7 +3,7 @@
 > **Tipo de documento:** Manual de uso / runbook
 > **Versión:** 1.0
 > **Creado:** 2026-06-11 por Claude (TASK-1081)
-> **Última actualización:** 2026-06-12 por Codex (TASK-1089)
+> **Última actualización:** 2026-06-12 por Codex (TASK-1092)
 > **Documentación funcional:** [knowledge-platform.md](../../documentation/plataforma/knowledge-platform.md)
 > **Documentación técnica:** [GREENHOUSE_KNOWLEDGE_PLATFORM_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_KNOWLEDGE_PLATFORM_ARCHITECTURE_V1.md)
 
@@ -100,7 +100,7 @@ await transitionKnowledgeDocumentStatus(doc.documentId, 'quarantined', {
 
 ## Ingerir el corpus piloto (TASK-1082)
 
-La ingesta toma los 14 documentos del corpus piloto (manifest `src/lib/knowledge/ingestion/pilot-corpus.ts`), los normaliza a chunks, los sanitiza y los publica en `greenhouse_knowledge`. Fuente actual: **archivos markdown del repo** (`repo_docs`). El connector Notion llega en TASK-1088.
+La ingesta toma los 15 documentos del corpus piloto (manifest `src/lib/knowledge/ingestion/pilot-corpus.ts`), los normaliza a chunks, los sanitiza y los publica en `greenhouse_knowledge`. Fuente actual: **archivos markdown del repo** (`repo_docs`). El connector Notion llega en TASK-1088.
 
 Siempre correr **dry-run primero**, revisar los conteos, y solo después `--apply`:
 
@@ -148,9 +148,12 @@ Qué revisar:
 - La pregunta debe quedar visible como burbuja de usuario.
 - Nexa debe responder debajo con fuentes y warning honesto cuando no consulta datos actuales.
 - El composer glow debe quedar debajo de la respuesta para follow-up.
-- El panel `Fuentes | Packet | Evals` debe seguir visible y legible.
+- El panel `Fuentes | Cómo llegó | Paquete | Revisión` debe seguir visible y legible.
+- El scenario envía la pregunta con `Enter` para cubrir el flujo de teclado; los frames post-pregunta son full-page para evitar artefactos de recorte con headers sticky.
 
 No usar este mockup como prueba de retrieval real: aún usa data mock tipada y no llama `searchKnowledge`.
+
+Nota operativa para QA de Nexa: cuando una respuesta viene desde `search_knowledge`, las fuentes deben verse iguales en el chat y en Answer Trace porque ambas superficies consumen `NexaEvidencePanel`. Al reabrir un thread histórico, la evidence card debe reaparecer si el mensaje persistió `tool_invocations`; si no, el thread debe seguir legible como texto sin bloquear la conversación.
 
 ## Nexa y el conocimiento (TASK-1085 — code complete local, detrás de flag)
 
@@ -170,3 +173,26 @@ Estado de la experiencia:
 - No actives el flag sin coordinación: requiere el corpus piloto cargado (TASK-1082) y la firma del approver de dominio para temas sensibles (finance/payroll/legal/security).
 
 Observabilidad (cuando esté activo): en Admin > Ops Health, módulo **Knowledge**, las señales `knowledge.nexa.no_source_answer_rate` (cuántas preguntas no encuentran documentación → huecos de cobertura), `knowledge.nexa.stale_source_retrievals` (respuestas apoyadas en docs vencidos → revisar/actualizar) y `knowledge.retrieval.low_citation_rate` (respuestas sin citas renderizables).
+
+## Production readiness de Nexa Knowledge (TASK-1092)
+
+Antes de activar `NEXA_KNOWLEDGE_RETRIEVAL_ENABLED` en producción, cada respuesta grounded de Nexa debe conservar trazabilidad visible:
+
+- Si `search_knowledge` devuelve fragmentos (`chunks.length > 0`) con `confidence != 'none'`, Nexa debe usar marcadores inline `[n]` ligados al fragmento recuperado y cerrar con `Fuentes: [n] = citationLabel`.
+- Si el modelo omite los marcadores, `NexaService` agrega un bloque determinístico `Fuentes:` derivado del packet `knowledge-search.v1`. Ese fallback no inventa dónde iba la cita en la frase; solo deja la evidencia visible.
+- Si `confidence='none'` o no hay chunks, Nexa no fabrica fuentes ni procedimientos. Debe responder con gap honesto.
+- En temas sensibles (finanzas, nómina, legal, seguridad o compromisos contractuales), la respuesta debe citar y pedir validación humana cuando corresponda.
+
+La matriz QA canonizada se ejecuta así:
+
+```bash
+# Staging, con agent-session y bypass de Vercel
+pnpm qa:nexa-knowledge -- --env=staging --json
+
+# Local, si el servidor local fue levantado con el flag de Knowledge encendido
+pnpm qa:nexa-knowledge -- --env=local --case=K1,K2,G1
+```
+
+Interpretación importante: la pregunta sobre **modo mantenimiento** fue un coverage-gap de manifest/ingesta, no de ranking. El manual existe en `docs/manual-de-uso/plataforma/modo-mantenimiento.md` y ahora está incluido en `src/lib/knowledge/ingestion/pilot-corpus.ts`; falta re-ingerir el corpus y correr QA K5 en staging para probar recuperación real.
+
+Production sigue OFF hasta que la matriz staging pase post-deploy, se revisen las señales `knowledge.retrieval.low_citation_rate`, `knowledge.nexa.no_source_answer_rate` y `knowledge.nexa.stale_source_retrievals`, y el operador apruebe el flip.

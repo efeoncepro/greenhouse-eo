@@ -306,7 +306,7 @@ const ManualReader = () => {
           <Typography variant='h5'>{GH_KNOWLEDGE_COPY.manualTitle}</Typography>
           <GreenhouseChip size='small' variant='label' tone='default' label='v4.3' />
           <GreenhouseChip size='small' variant='label' tone='success' label='Actual' />
-          <GreenhouseChip size='small' variant='label' tone='success' label='agent_allowed' />
+          <GreenhouseChip size='small' variant='label' tone='success' label='Nexa permitido' />
         </Stack>
         <Tooltip title={GH_KNOWLEDGE_COPY.openDocument}>
           <IconButton size='small' aria-label={GH_KNOWLEDGE_COPY.openDocument}>
@@ -414,7 +414,7 @@ const ManualReader = () => {
               p: 4
             }}
           >
-            <Typography variant='h6'>Contextual help hooks</Typography>
+            <Typography variant='h6'>Dónde aparece esta ayuda</Typography>
             <Stack spacing={3} sx={{ mt: 3 }}>
               {contextHooks.map(hook => (
                 <Stack key={hook.title} direction='row' spacing={3}>
@@ -441,7 +441,7 @@ const ManualReader = () => {
               ))}
             </Stack>
             <GreenhouseButton variant='outlined' size='small' fullWidth sx={{ mt: 4 }}>
-              Ver todos los hooks
+              Ver usos conectados
             </GreenhouseButton>
           </Box>
 
@@ -454,7 +454,7 @@ const ManualReader = () => {
           >
             <Typography variant='h6'>Salud del documento</Typography>
             <Stack spacing={2} sx={{ mt: 3 }}>
-              {['Encabezados estables', 'Sin secretos / PII', 'Política agentic permitida', 'Última revisión: 07 may 2025'].map(
+              {['Encabezados estables', 'Sin secretos ni PII', 'Permitido para Nexa', 'Última revisión: 07 may 2025'].map(
                 item => (
                   <Stack key={item} direction='row' spacing={2} alignItems='center'>
                     <GreenhouseStatusDot tone='success' ariaLabel={GH_KNOWLEDGE_COPY.aria.documentHealthOk} />
@@ -516,7 +516,7 @@ const KnowledgeAnswerTraceMockupView = () => {
           <Typography variant='caption' color='text.secondary'>
             Ver más fuentes filtradas (1)
           </Typography>
-          <GreenhouseChip size='small' variant='label' tone='success' label='agent_allowed' />
+          <GreenhouseChip size='small' variant='label' tone='success' label='Nexa permitido' />
         </Stack>
       </Stack>
     )
@@ -640,10 +640,10 @@ const KnowledgeAnswerTraceMockupView = () => {
               <Stack spacing={1}>
                 <Typography variant='h5'>{GH_KNOWLEDGE_COPY.agentTitle} (Nexa y MCP)</Typography>
                 <Typography variant='caption' color='text.secondary'>
-                  Esta respuesta es consumible por agentes bajo política agent_allowed.
+                  Nexa y MCP reciben el mismo paquete gobernado, sin fragmentos restringidos.
                 </Typography>
               </Stack>
-              <GreenhouseChip size='small' variant='label' tone='success' label='agent_allowed' />
+              <GreenhouseChip size='small' variant='label' tone='success' label='Nexa permitido' />
             </Box>
             <Divider />
             <Box
@@ -681,7 +681,7 @@ const KnowledgeAnswerTraceMockupView = () => {
                   </Tooltip>
                 </Stack>
                 <Typography variant='caption' color='text.secondary'>
-                  Formato: knowledge_document
+                  Tipo de recurso: knowledge_document
                 </Typography>
               </Box>
 
@@ -695,14 +695,14 @@ const KnowledgeAnswerTraceMockupView = () => {
                 <Stack direction='row' spacing={3} alignItems='center' justifyContent='space-between'>
                   <Stack direction='row' spacing={2} alignItems='center'>
                     <i className='tabler-braces' aria-hidden='true' />
-                    <Typography variant='h6'>KnowledgeRetrievalPacket</Typography>
+                    <Typography variant='h6'>Paquete de evidencia</Typography>
                   </Stack>
                   <GreenhouseButton variant='text' size='small' trailingIconClassName='tabler-download'>
                     {GH_KNOWLEDGE_COPY.viewFullPacket}
                   </GreenhouseButton>
                 </Stack>
                 <Typography variant='caption' color='text.secondary'>
-                  Formato: v1.0 · 3 chunks incluidos · 1 filtrado.
+                  Versión v1.0 · 3 fragmentos incluidos · 1 filtrado.
                 </Typography>
               </Box>
             </Box>

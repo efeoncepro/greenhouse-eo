@@ -660,7 +660,8 @@ const buildKnowledgeGroundingSummary = (packet: KnowledgeRetrievalPacket): strin
 
   return [
     `Fragmentos recuperados del corpus de conocimiento (confianza retrieval: ${packet.confidence}, freshness: ${packet.freshness}).`,
-    'Responde SOLO con lo respaldado por estos fragmentos y CITA la fuente (citationLabel). Si alguna fuente es stale/deprecated, decláralo.',
+    'Responde SOLO con lo respaldado por estos fragmentos. Usa el marcador [n] inline ligado al fragmento n (ej. "... [1]") y cierra con "Fuentes: [n] = citationLabel". Si alguna fuente es stale/deprecated, decláralo.',
+    'En temas sensibles (finanzas, nómina, legal, seguridad o compromisos contractuales), cita siempre con [n] y sugiere validación humana cuando corresponda.',
     '',
     ...lines,
     deniedNote

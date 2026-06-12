@@ -2,8 +2,10 @@ import { describe, expect, it } from 'vitest'
 
 import type { KnowledgeRetrievalPacket } from '@/lib/knowledge/search'
 import type { NexaToolResult } from '@/lib/nexa/nexa-contract'
-
-import { deriveKnowledgeTraceSummary, extractKnowledgePacket } from './NexaToolRenderers'
+import {
+  extractKnowledgePacketFromToolResult,
+  knowledgePacketToConversationalEvidence
+} from '@/lib/nexa/conversational-evidence'
 
 const packet: KnowledgeRetrievalPacket = {
   contractVersion: 'knowledge-search.v1',
@@ -68,18 +70,19 @@ describe('Nexa search_knowledge renderer helpers', () => {
       raw: { packet }
     }
 
-    expect(extractKnowledgePacket(result)).toBe(packet)
+    expect(extractKnowledgePacketFromToolResult(result)).toBe(packet)
   })
 
-  it('derives trace numbers only from the packet', () => {
-    const summary = deriveKnowledgeTraceSummary(packet)
+  it('derives evidence numbers only from the packet', () => {
+    const evidence = knowledgePacketToConversationalEvidence(packet)
 
-    expect(summary.maxScore).toBe(0.93)
-    expect(summary.citedDocumentCount).toBe(2)
-    expect(summary.primaryTarget).toEqual({ chunkId: 'kch-1', documentId: 'kdoc-1' })
-    expect(summary.traceSteps[1].label).toBe('Búsqueda: 2 fragmentos incluidos')
-    expect(summary.traceSteps[1].metadata).toContain('puntaje máx. 0.93')
-    expect(summary.traceSteps[1].metadata).toContain('filtrados por política: 1')
-    expect(summary.traceSteps[2].description).toBe('2 fuentes citadas')
+    expect(evidence.contractVersion).toBe('nexa-evidence.v1')
+    expect(evidence.maxScore).toBe(0.93)
+    expect(evidence.citedDocumentCount).toBe(2)
+    expect(evidence.primaryFeedbackTarget).toEqual({ chunkId: 'kch-1', documentId: 'kdoc-1' })
+    expect(evidence.traceSteps[1].label).toBe('Buscó 2 fragmentos útiles')
+    expect(evidence.traceSteps[1].metadata).toContain('puntaje máx. 0.93')
+    expect(evidence.traceSteps[1].metadata).toContain('filtrados por política: 1')
+    expect(evidence.traceSteps[2].description).toBe('2 fuentes citadas')
   })
 })

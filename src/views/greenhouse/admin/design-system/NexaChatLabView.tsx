@@ -21,6 +21,7 @@ import {
 } from '@/components/greenhouse/primitives'
 import { GREENHOUSE_NEXA_BRAND_COLORS } from '@/components/greenhouse/primitives/greenhouse-nexa-brand-controller'
 import type { NexaToolResult } from '@/lib/nexa/nexa-contract'
+import { nexaToolResultToConversationalEvidence } from '@/lib/nexa/conversational-evidence'
 import { NexaKnowledgeToolTraceCard } from '@/views/greenhouse/home/components/NexaToolRenderers'
 
 import { DESIGN_SYSTEM_LAB_TOKENS } from './design-system-lab-tokens'
@@ -84,6 +85,7 @@ const COMPOSED_OF: { name: string; role: string; status: string }[] = [
   { name: 'NexaGlowBorder', role: 'Borde "línea de luz" del composer (dos capas + máscara + beam).', status: 'Primitive canónica ✅' },
   { name: 'NexaComposer', role: 'Input (caja Vuexy anulada → el glow pinta todo) + botón send/stop + glow + disclaimer, como unidad reusable. Partes: NexaComposerInput / NexaComposerActionButton.', status: 'Primitive canónica ✅' },
   { name: 'NexaKnowledgeAnswerSurface', role: 'Superficie de respuesta trazable: pregunta-burbuja + respuesta Nexa + composer descendido + proof panel lateral.', status: 'Composition primitive ✅' },
+  { name: 'NexaEvidencePanel', role: 'Renderer compartido de evidencia versionada: trace, fuentes, freshness, confidence y feedback desde ConversationalEvidencePacket.', status: 'Primitive canónica ✅' },
   { name: 'NexaPresenceMark', role: 'Header: crossfade "En línea" ↔ "Pensando…" con elipsis animada (reduced-motion horneado).', status: 'Primitive canónica ✅' },
   { name: 'NexaFace', role: 'Avatar cara real de Nexa con variants hero (76) / header (44, borde teal) / message (32). Single source del asset.', status: 'Primitive canónica ✅' },
   { name: 'NexaSenderMark', role: 'Avatar por-mensaje (disco navy + anillo teal + glyph arco teal/sparkle blanco inline).', status: 'Primitive canónica ✅' },
@@ -163,9 +165,10 @@ const KNOWLEDGE_TOOL_TRACE_SPECIMEN: NexaToolResult = {
 const KnowledgeAnswerSurfaceSpecimen = () => {
   const [draft, setDraft] = useState('')
   const [mode, setMode] = useState<'human' | 'nexa' | 'mcp'>('human')
-  const [proofTab, setProofTab] = useState<'sources' | 'packet' | 'evals'>('sources')
+  const [proofTab, setProofTab] = useState<'sources' | 'trace' | 'packet' | 'review'>('sources')
   const [question, setQuestion] = useState('¿Cómo reviso mis métricas ICO personales?')
   const [thinking, setThinking] = useState(false)
+  const evidence = nexaToolResultToConversationalEvidence(KNOWLEDGE_TOOL_TRACE_SPECIMEN)
 
   const submit = () => {
     const nextQuestion = draft.trim()
@@ -180,7 +183,7 @@ const KnowledgeAnswerSurfaceSpecimen = () => {
   }
 
   return (
-    <NexaKnowledgeAnswerSurface<'human' | 'nexa' | 'mcp', 'sources' | 'packet' | 'evals'>
+    <NexaKnowledgeAnswerSurface<'human' | 'nexa' | 'mcp', 'sources' | 'trace' | 'packet' | 'review'>
       kind='knowledgeAnswerTrace'
       question={question}
       draft={draft}
@@ -225,15 +228,18 @@ const KnowledgeAnswerSurfaceSpecimen = () => {
       proofTab={proofTab}
       proofTabs={[
         { value: 'sources', label: 'Fuentes' },
-        { value: 'packet', label: 'Packet' },
-        { value: 'evals', label: 'Evals' }
+        { value: 'trace', label: 'Cómo llegó' },
+        { value: 'packet', label: 'Paquete' },
+        { value: 'review', label: 'Revisión' }
       ]}
       onProofTabChange={setProofTab}
       proofTabsAriaLabel='Prueba y trazabilidad'
+      evidence={proofTab === 'sources' || proofTab === 'trace' ? evidence ?? undefined : undefined}
+      evidenceFeedbackEnabled={false}
       proofContent={
         <Stack spacing={1.5}>
           <Typography variant='body2' sx={{ fontWeight: 600 }}>
-            {proofTab === 'sources' ? '2 fuentes publicadas' : proofTab === 'packet' ? 'knowledge-search.v1' : 'Golden question: passed'}
+            {proofTab === 'packet' ? 'knowledge-search.v1' : 'Golden question: passed'}
           </Typography>
           <Typography variant='caption' color='text.secondary'>
             Specimen vivo de la primera kind transversal de respuestas Nexa para Knowledge.
@@ -429,7 +435,7 @@ const NexaChatLabView = () => (
           </Stack>
         </Card>
 
-        <Box data-capture='nexa-knowledge-answer-surface-specimen'>
+        <Box data-capture='nexa-knowledge-answer-surface-specimen' sx={{ scrollMarginBlockStart: { xs: 19, md: 13 } }}>
           <Typography variant='subtitle2' sx={{ mb: 1.5 }}>
             <InlineCode>NexaKnowledgeAnswerSurface</InlineCode> — pregunta, respuesta y prueba sin salto abrupto
           </Typography>

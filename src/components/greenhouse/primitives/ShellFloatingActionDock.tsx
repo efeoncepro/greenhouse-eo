@@ -19,7 +19,7 @@ const ShellFloatingActionDock = ({
 }: ShellFloatingActionDockProps) => {
   const pathname = usePathname()
 
-  if (pathname === '/knowledge/mockup/answer-trace' || pathname === '/design-system/nexa-chat') return null
+  if (pathname === '/design-system/nexa-chat') return null
 
   return (
     <>

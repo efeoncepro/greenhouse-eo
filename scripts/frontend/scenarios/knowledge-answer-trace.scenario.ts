@@ -23,7 +23,12 @@ export const scenario: CaptureScenario = {
   },
   assertions: [
     { kind: 'noLoginRedirect', reason: 'mockup interno autenticado via GVC local actor' },
-    { kind: 'noErrorBoundary', reason: 'la captura no debe ser un error boundary' }
+    { kind: 'noErrorBoundary', reason: 'la captura no debe ser un error boundary' },
+    {
+      kind: 'visible',
+      selector: '[data-nexa-floating-trigger="true"]',
+      reason: 'el FAB flotante de Nexa debe estar disponible sobre Knowledge'
+    }
   ],
   quality: {
     allowLoading: true,
@@ -71,10 +76,10 @@ export const scenario: CaptureScenario = {
       interaction: {
         name: 'submit-knowledge-question',
         intent: 'La pregunta se preserva como burbuja y el composer queda disponible debajo',
-        action: { kind: 'click', selector: '[data-capture="nexa-knowledge-top-composer"] button[aria-label="Preguntar"]' },
+        action: { kind: 'press', selector: 'input[aria-label="Pregúntale a Nexa"]', key: 'Enter' },
         frames: [
-          { label: 'question-promoted-0ms', atMs: 0, clipSelector: '[data-capture="nexa-knowledge-answer-surface"]' },
-          { label: 'question-promoted-750ms', atMs: 750, clipSelector: '[data-capture="nexa-knowledge-answer-surface"]' }
+          { label: 'question-promoted-0ms', atMs: 0, fullPage: true },
+          { label: 'question-promoted-750ms', atMs: 750, fullPage: true }
         ]
       }
     }

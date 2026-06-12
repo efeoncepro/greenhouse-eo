@@ -62,6 +62,8 @@ export { default as NexaPresenceMark } from './NexaPresenceMark'
 export type { NexaPresenceMarkProps } from './NexaPresenceMark'
 export { default as NexaSenderMark } from './NexaSenderMark'
 export type { NexaSenderMarkProps } from './NexaSenderMark'
+export { default as NexaEvidencePanel } from './NexaEvidencePanel'
+export type { NexaEvidencePanelProps, NexaEvidencePanelVariant } from './NexaEvidencePanel'
 export { default as NexaKnowledgeAnswerSurface } from './NexaKnowledgeAnswerSurface'
 export type {
   NexaKnowledgeAnswerModeOption,

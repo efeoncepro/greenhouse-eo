@@ -1,5 +1,51 @@
 # Release 2026-06-10 #2 — develop→main `6c649b2a6` RELEASED
 
+## Sesion 2026-06-12 — TASK-1092 tomada por Codex (in-progress)
+
+- **Toma:** Codex mueve `TASK-1092` a `in-progress` después de verificar que el blocker formal `TASK-1085` ya está `complete` y staging fue verificado con el flag ON.
+- **Excepción operativa:** ejecución en `develop`/checkout compartido por continuidad de la sesión; no se crea worktree y no se toca WIP ajeno.
+- **Implementado local:** `nexa-tools.ts` y `nexa-service.ts` ahora exigen `[n]` inline + `Fuentes: [n] = citationLabel`; `NexaService` agrega fallback determinístico de fuentes cuando una respuesta grounded omite marcadores. Tests focales verdes: `pnpm exec vitest run src/lib/nexa/nexa-service.test.ts src/lib/nexa/search-knowledge-tool.test.ts`.
+- **QA matrix:** runner nuevo `pnpm qa:nexa-knowledge -- --env=staging --json` contra `/api/home/nexa` autenticado. No correr production flip con esto sin deployment staging + revisión humana.
+- **Cobertura:** "modo mantenimiento" quedó absorbido en TASK-1092: existe `docs/manual-de-uso/plataforma/modo-mantenimiento.md` y ya fue agregado a `PILOT_CORPUS` como entrada `modo-mantenimiento` (`agent_allowed`, owner `platform`, approver `efeonce_admin`). No hay `TASK-1094` separada; siguiente pendiente es re-ingerir corpus en staging + QA K5.
+- **Estado:** TASK-1092 sigue `in-progress`. Production sigue OFF hasta matriz staging post-deploy + reliability signals + aprobación explícita del operador.
+
+## Sesion 2026-06-12 — TASK-1093 Conversational Evidence V1 (Codex, complete)
+
+- **Excepción de rama:** operador pidió ejecutar en `develop`; se corrió `pnpm codex:task-hook TASK-1093 --develop` después de mover la task a `in-progress` y corregir blockers stale. No se creó branch/worktree.
+- **Scope ejecutado:** V1 acotado, sin shell multi-surface. Se agregó `src/lib/nexa/conversational-evidence.ts` con `ConversationalEvidencePacket` (`nexa-evidence.v1`) y adapters desde `knowledge-search.v1`/`NexaToolResult`.
+- **UI compartida:** nueva primitive `NexaEvidencePanel` renderiza trace, fuentes, freshness/confidence, filtered count y feedback. `NexaToolRenderers` dejó de duplicar la card de Knowledge y ahora usa ese panel. `NexaKnowledgeAnswerSurface` puede recibir `evidence` y renderizar el mismo panel en el proof slot.
+- **Kinds/variants:** `NexaComposer` suma `kind='inlineFollowUp'`; `NexaKnowledgeAnswerSurface` suma `variant='toolResult'` y `kind='knowledgeToolResult'`. No se creó `NexaConversationShell`.
+- **Runtime:** `mapThreadMessagesToInitial()` rehidrata tool-calls persistidos desde `nexa_messages.tool_invocations`; threads viejos sin payload degradan a texto.
+- **Verificado:** ESLint focal, Vitest focal (10 tests), `pnpm exec tsc --noEmit --pretty false`, `pnpm design:lint`, `pnpm task:lint --task TASK-1093`, `pnpm ops:lint --changed`, `git diff --check`, docs closure con paths explícitos y GVC local. Capturas: `.captures/2026-06-12T12-07-29_design-system-nexa-chat` y `.captures/2026-06-12T12-06-34_knowledge-answer-trace`.
+
+## Sesion 2026-06-12 — Regla multi-agente: proteger WIP untracked ajeno
+
+- **Incidente operativo:** durante el cierre de TASK-1085, Codex apartó con `git stash -u` rutas untracked de TASK-1086 para aislar el push. Aunque reversible, eso hizo desaparecer archivos del filesystem mientras Claude trabajaba en 1086.
+- **Regla documentada:** en checkout compartido, WIP `untracked`/unstaged de otro agente es estado vivo, no scratch movible. No usar `git stash -u`, `git clean`, `git restore`, moves ni pathspecs amplios sobre paths que no pertenecen a tu task.
+- **Fuente canónica actualizada:** `docs/operations/MULTI_AGENT_WORKTREE_OPERATING_MODEL_V1.md`; referencias cortas en `AGENTS.md`, `CLAUDE.md` y `project_context.md`.
+- **Mitigación futura:** si un hook/push propio queda bloqueado por WIP ajeno, coordinar con el owner, usar worktree propio o pedir bypass explícito ya verificado. No ocultar WIP del otro agente.
+
+## Sesion 2026-06-12 — TASK-1092 creada: Nexa Knowledge production readiness
+
+- **Task documentada:** `docs/tasks/to-do/TASK-1092-nexa-knowledge-production-readiness-inline-citations.md` nace como P1 para cerrar production readiness de Nexa Knowledge Retrieval.
+- **Estado runtime:** staging ya tiene `NEXA_KNOWLEDGE_RETRIEVAL_ENABLED=true`; production permanece OFF. La QA staging de TASK-1085 probó el circuito Nexa -> `search_knowledge` -> packet `knowledge-search.v1` -> evidence UI, pero detectó gaps de citas inline y cobertura/ranking.
+- **Bloqueo explícito:** no activar production hasta resolver disciplina de citas, revisar misses conocidos como "modo mantenimiento", repetir matriz QA y revisar reliability (`low_citation_rate`, `no_source_answer_rate`, `stale_source_retrievals`).
+- **Verificado docs:** `pnpm task:lint --task TASK-1092` verde; `docs:closure-check` de task/registry/README quedó cubierto con esta nota de handoff.
+
+## Sesion 2026-06-12 — TASK-1093 creada: Greenhouse Conversational Experience Platform V1
+
+- **Task documentada:** `docs/tasks/to-do/TASK-1093-greenhouse-conversational-experience-platform-v1.md` formaliza la siguiente capa transversal para Nexa Chat + AnswerSurface.
+- **Decisión de arquitectura de producto:** no seguir creando surfaces conversacionales separadas. La plataforma debe unificar answer turns, evidence packets, tool/citation rendering, persistencia/rehidratación de evidence y variants/kinds para chat, floating panel, sidecar, Knowledge Answer Trace y AI Overview.
+- **Base existente:** `NexaThread` aporta runtime vivo/assistant-ui/historial/composer/tools; `NexaKnowledgeAnswerSurface` aporta la coreografía premium de respuesta trazable; `NexaToolRenderers` aporta evidencia real de `search_knowledge`; `NexaComposer` ya es primitive reusable.
+- **Riesgo principal:** si se adopta sin contrato común, Greenhouse termina con múltiples experiencias "Nexa" y múltiples lenguajes visuales de citas. Ejecutar por slices y con GVC.
+
+## Sesion 2026-06-12 — Knowledge Answer Trace UX polish end-to-end
+
+- **Iteración aplicada:** revisión Product Design/UX writing del mockup `/knowledge/mockup/answer-trace`; se humanizó el lenguaje de trace/packet/evals, se redujo jerga visible (`chunks`, `policy`, `agent_allowed`) y se reforzó la narrativa principal "pregunta a Nexa + verifica fuentes".
+- **UI ajustada:** `NexaKnowledgeAnswerSurface` suma `scrollMarginBlockStart` para convivir con headers sticky y el trace inicial baja peso visual; el mockup usa labels humanos como "Fuentes y trazabilidad", "Cómo llegó", "Paquete" y "Revisión".
+- **GVC actualizado:** `knowledge-answer-trace` ahora envía la pregunta con `Enter` en el input y captura el estado post-pregunta full-page para evitar artefactos de recorte con header fixed.
+- **Verificación:** ESLint focal, `tsc --noEmit`, `design:lint`, `git diff --check` y GVC local desktop/mobile verdes. Captura final: `.captures/2026-06-12T11-46-20_knowledge-answer-trace`. Nota: GVC sigue reportando 1 warning best-effort de hydration global, sin console/page/http errors.
+
 ## Sesion 2026-06-12 — TASK-1085 Codex: UI runtime + evidence renderer (code complete local)
 
 - **Excepción de rama:** operador pidió ejecutar en `develop`; se corrió `pnpm codex:task-hook TASK-1085 --develop` después de corregir drift documental (TASK-1083 ya estaba complete). No se creó branch/worktree.

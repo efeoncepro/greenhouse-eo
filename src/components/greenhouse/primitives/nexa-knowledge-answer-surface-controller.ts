@@ -1,5 +1,5 @@
-export type NexaKnowledgeAnswerSurfaceVariant = 'conversationTrace' | 'overviewPanel'
-export type NexaKnowledgeAnswerSurfaceKind = 'knowledgeAnswerTrace'
+export type NexaKnowledgeAnswerSurfaceVariant = 'conversationTrace' | 'overviewPanel' | 'toolResult'
+export type NexaKnowledgeAnswerSurfaceKind = 'knowledgeAnswerTrace' | 'knowledgeToolResult'
 
 export interface NexaKnowledgeAnswerSurfaceVariantConfig {
   variant: NexaKnowledgeAnswerSurfaceVariant
@@ -26,6 +26,11 @@ export const NEXA_KNOWLEDGE_ANSWER_SURFACE_VARIANT_CONFIG: Record<
     variant: 'overviewPanel',
     proofPlacement: 'inline',
     showTrace: false
+  },
+  toolResult: {
+    variant: 'toolResult',
+    proofPlacement: 'inline',
+    showTrace: false
   }
 }
 
@@ -37,6 +42,11 @@ export const NEXA_KNOWLEDGE_ANSWER_SURFACE_KIND_CONFIG: Record<
     kind: 'knowledgeAnswerTrace',
     variant: 'conversationTrace',
     ariaLabel: 'Respuesta trazable de Nexa para Knowledge'
+  },
+  knowledgeToolResult: {
+    kind: 'knowledgeToolResult',
+    variant: 'toolResult',
+    ariaLabel: 'Resultado de herramienta de Nexa con evidencia'
   }
 }
 

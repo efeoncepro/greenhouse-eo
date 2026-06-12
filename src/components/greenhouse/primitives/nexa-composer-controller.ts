@@ -1,5 +1,5 @@
 export type NexaComposerVariant = 'chat' | 'command'
-export type NexaComposerKind = 'floatingChat' | 'knowledgeAsk' | 'globalCommand'
+export type NexaComposerKind = 'floatingChat' | 'knowledgeAsk' | 'globalCommand' | 'inlineFollowUp'
 
 export interface NexaComposerVariantConfig {
   variant: NexaComposerVariant
@@ -66,6 +66,11 @@ export const NEXA_COMPOSER_KIND_CONFIG: Record<NexaComposerKind, NexaComposerKin
     kind: 'globalCommand',
     variant: 'command',
     ariaLabel: 'Comando para Nexa'
+  },
+  inlineFollowUp: {
+    kind: 'inlineFollowUp',
+    variant: 'chat',
+    ariaLabel: 'Continuar conversación con Nexa'
   }
 }
 

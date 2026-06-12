@@ -6,6 +6,19 @@
 
 ---
 
+## Delta 2026-06-12c — Conversational Evidence V1 (TASK-1093)
+
+Se consolidó el gap real entre Nexa Chat y AnswerSurface sin crear una shell paralela:
+
+- Nuevo contrato `ConversationalEvidencePacket` (`nexa-evidence.v1`) en `src/lib/nexa/conversational-evidence.ts`, con adapters desde `knowledge-search.v1` y `NexaToolResult`.
+- Nueva primitive `NexaEvidencePanel` para renderizar trace, fuentes, confidence, freshness, filtered count y feedback desde el view-model común.
+- `NexaToolRenderers` deja de derivar/renderizar Knowledge evidence localmente y consume `NexaEvidencePanel`.
+- `NexaKnowledgeAnswerSurface` puede recibir `evidence` y renderizar el mismo panel en el proof slot; no consulta DB/API.
+- `NexaComposer` suma `kind='inlineFollowUp'`; `NexaKnowledgeAnswerSurface` suma `variant='toolResult'` y `kind='knowledgeToolResult'`.
+- `mapThreadMessagesToInitial()` rehidrata tool-calls persistidos para que threads históricos con `tool_invocations` recuperen evidence cards sin re-ejecutar tools; threads antiguos sin payload siguen como texto.
+
+La shell multi-surface (`floatingChat`/`embeddedChat`/`sidecarLane` sobre `AdaptiveSidecarLayout variant='assistant'`) y `aiOverviewPanel` quedan diferidos hasta que TASK-1084/TASK-1079 aterricen como consumidores reales.
+
 ## Delta 2026-06-12b — NexaKnowledgeAnswerSurface (TASK-1089)
 
 Se creó `NexaKnowledgeAnswerSurface` como **composition primitive transversal** para respuestas Nexa con evidencia, usando Primitive+Variants+Kinds:

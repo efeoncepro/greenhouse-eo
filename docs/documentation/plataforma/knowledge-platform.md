@@ -3,7 +3,7 @@
 > **Tipo de documento:** Documentación funcional (lenguaje simple)
 > **Versión:** 1.0
 > **Creado:** 2026-06-11 por Claude (TASK-1081)
-> **Última actualización:** 2026-06-12 por Codex (TASK-1089)
+> **Última actualización:** 2026-06-12 por Codex (TASK-1092)
 > **Documentación técnica:** [GREENHOUSE_KNOWLEDGE_PLATFORM_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_KNOWLEDGE_PLATFORM_ARCHITECTURE_V1.md) · [GREENHOUSE_KNOWLEDGE_PLATFORM_DECISION_V1.md](../../architecture/GREENHOUSE_KNOWLEDGE_PLATFORM_DECISION_V1.md)
 
 ## Qué es
@@ -78,7 +78,7 @@ La búsqueda es **un solo contrato** que usan por igual las personas, Nexa y el 
 
 El conocimiento no se escribe a mano en Greenhouse: se **ingiere** desde una fuente autorizada. La ingesta toma cada documento, lo parte en pedazos (chunks) con su "ruta de títulos" para poder citarlo, lo **revisa** (sanitiza) y solo entonces lo publica.
 
-- **De dónde viene hoy:** los 14 documentos del corpus piloto son **archivos del repositorio** (manuales y docs que ya existen). Cuando se conecte un teamspace de Notion de conocimiento (TASK-1088), entrarán también desde ahí — pero el flujo es el mismo.
+- **De dónde viene hoy:** los 15 documentos del corpus piloto son **archivos del repositorio** (manuales y docs que ya existen). Cuando se conecte un teamspace de Notion de conocimiento (TASK-1088), entrarán también desde ahí — pero el flujo es el mismo.
 - **La revisión de seguridad va primero:** si un documento trae un secreto, un dato personal o una instrucción que intente "controlar" a Nexa, se pone en **cuarentena** (no se publica ni Nexa lo puede usar) hasta limpiarlo.
 - **Es idempotente:** re-correr la ingesta no duplica nada; solo publica una versión nueva si el contenido cambió de verdad.
 - **Es auditada:** cada corrida queda registrada (qué se publicó, qué se puso en cuarentena, qué se omitió).
@@ -89,10 +89,26 @@ El conocimiento no se escribe a mano en Greenhouse: se **ingiere** desde una fue
 
 El mockup interno `/knowledge/mockup/answer-trace` ahora muestra el patrón transversal elegido para respuestas con evidencia: la pregunta sube como burbuja, Nexa responde con fuentes visibles y el composer glow baja debajo de la respuesta para seguir preguntando sin sentir que el usuario "salió" a otra experiencia.
 
-El panel de trazabilidad permanece al lado en desktop y debajo en mobile con tres lentes:
+El panel de trazabilidad permanece al lado en desktop y debajo en mobile con cuatro lentes:
 
 - **Fuentes:** documentos y extractos citados.
-- **Packet:** forma del contrato `knowledge-search.v1` que consumen agentes.
-- **Evals:** checks de calidad/golden questions.
+- **Cómo llegó:** pasos humanos de intención, búsqueda, respuesta y feedback.
+- **Paquete:** forma del contrato `knowledge-search.v1` que consumen agentes.
+- **Revisión:** checks de calidad/golden questions.
 
 Esta pantalla sigue siendo mockup interno. No activa retrieval real ni consulta tablas; `TASK-1085` conectará Nexa al reader de Knowledge y al feedback compartido.
+
+Desde `TASK-1093`, la evidencia conversacional se normaliza antes de renderizarse: el packet `knowledge-search.v1` se adapta a `ConversationalEvidencePacket` (`nexa-evidence.v1`) y se muestra con `NexaEvidencePanel`. Esto evita que el chat de Nexa y la Answer Surface tengan cards de fuentes diferentes. La rehidratación de threads también conserva los tool-calls persistidos cuando existen; si un historial antiguo no trae evidence, mantiene el texto sin re-ejecutar herramientas.
+
+## Qué exige production readiness (TASK-1092)
+
+Para que Nexa Knowledge pueda prenderse en producción, no basta con que la respuesta use Knowledge internamente: la persona debe poder ver de dónde salió cada respuesta.
+
+- Las respuestas grounded deben mostrar marcadores `[n]` en el texto y una lista de fuentes (`Fuentes: [n] = documento/sección`).
+- Si Nexa recupera fragmentos pero el modelo omite esos marcadores, el runtime agrega un bloque de fuentes derivado del packet. Es una red de seguridad honesta: no inventa en qué frase iba cada cita.
+- Si Knowledge no encuentra una guía (`confidence='none'`), Nexa debe decir que no encontró documentación publicada y no crear un procedimiento de la nada.
+- En temas sensibles como nómina, finanzas, legal, seguridad o compromisos contractuales, Nexa debe citar y sugerir validación humana cuando corresponda.
+
+La brecha de **modo mantenimiento** quedó clasificada como cobertura de manifest/ingesta: el manual existe en `docs/manual-de-uso/plataforma/modo-mantenimiento.md` y ahora está incluido en el corpus piloto. Eso no se resuelve ajustando ranking; requiere re-ingerir el corpus y validar QA K5 en staging.
+
+La matriz QA operativa vive en `pnpm qa:nexa-knowledge -- --env=staging`. Production permanece apagado hasta que esa matriz pase en staging con el código desplegado y se revisen las señales de reliability del módulo Knowledge.

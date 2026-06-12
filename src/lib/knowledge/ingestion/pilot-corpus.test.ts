@@ -15,8 +15,8 @@ const ROLE_VALUES = new Set<string>(Object.values(ROLE_CODES))
 const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
 
 describe('pilot corpus manifest (TASK-1082)', () => {
-  it('has the 14 canonical pilot docs', () => {
-    expect(PILOT_CORPUS).toHaveLength(14)
+  it('has the 15 canonical pilot docs', () => {
+    expect(PILOT_CORPUS).toHaveLength(15)
   })
 
   it('slugs are unique kebab-case', () => {
@@ -59,6 +59,13 @@ describe('pilot corpus manifest (TASK-1082)', () => {
     expect(payroll?.agenticPolicy).toBe('agent_excluded')
     expect(secrets?.agenticPolicy).toBe('agent_excluded')
     expect(secrets?.sensitivity).toBe('restricted')
+  })
+
+  it('maintenance mode is agent-allowed for production-readiness QA', () => {
+    const maintenance = PILOT_CORPUS.find(e => e.slug === 'modo-mantenimiento')
+
+    expect(maintenance?.agenticPolicy).toBe('agent_allowed')
+    expect(maintenance?.sourceFiles).toContain('docs/manual-de-uso/plataforma/modo-mantenimiento.md')
   })
 
   it('humanUrl points at the canonical /knowledge/<slug>', () => {

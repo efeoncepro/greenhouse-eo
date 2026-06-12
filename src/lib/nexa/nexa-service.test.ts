@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 vi.mock('server-only', () => ({}))
 
@@ -41,6 +41,10 @@ describe('NexaService', () => {
         generateContent: mockGenerateContent
       }
     })
+  })
+
+  afterEach(() => {
+    vi.unstubAllEnvs()
   })
 
   it('returns the model response when Vertex succeeds', async () => {
@@ -176,5 +180,210 @@ describe('NexaService', () => {
     expect(response.suggestions).toHaveLength(3)
     expect(response.toolInvocations).toHaveLength(1)
     expect(response.toolInvocations?.[0]?.toolName).toBe('check_payroll')
+  })
+
+  it('adds an honest sources block when grounded Knowledge text omits inline citation markers', async () => {
+    vi.stubEnv('NEXA_KNOWLEDGE_RETRIEVAL_ENABLED', 'true')
+
+    mockGenerateContent
+      .mockResolvedValueOnce({
+        text: '',
+        functionCalls: [
+          {
+            id: 'tool-knowledge-1',
+            name: 'search_knowledge',
+            args: { query: '¿Cómo reviso mis métricas ICO?' }
+          }
+        ]
+      })
+      .mockResolvedValueOnce({
+        text: 'Para revisar tus métricas ICO, entra a Mi Desempeño y revisa los indicadores por objetivo.'
+      })
+      .mockResolvedValueOnce({
+        text: '{"suggestions":["¿Qué significa OTD?","¿Qué significa RpA?","¿Dónde veo mis objetivos?"]}'
+      })
+
+    mockExecuteNexaTool.mockResolvedValue({
+      toolCallId: 'tool-knowledge-1',
+      toolName: 'search_knowledge',
+      args: { query: '¿Cómo reviso mis métricas ICO?' },
+      result: {
+        available: true,
+        summary: 'Recuperé 2 fragmentos de Knowledge.',
+        source: 'postgres',
+        scopeLabel: 'Knowledge',
+        generatedAt: '2026-06-12T12:00:00.000Z',
+        metrics: [],
+        raw: {
+          packet: {
+            contractVersion: 'knowledge-search.v1',
+            query: '¿Cómo reviso mis métricas ICO?',
+            generatedAt: '2026-06-12T12:00:00.000Z',
+            mode: 'agentic',
+            accessScope: {
+              tenantType: 'efeonce_internal',
+              tenantId: null,
+              userId: 'user-1',
+              roleCodes: ['efeonce_admin'],
+              routeGroups: ['internal'],
+              capabilities: ['knowledge.agentic.retrieve']
+            },
+            confidence: 'high',
+            freshness: 'current',
+            chunks: [
+              {
+                chunkId: 'chunk-1',
+                documentId: 'doc-1',
+                documentVersionId: 'version-1',
+                title: 'Manual: Cómo usar Mi Desempeño',
+                headingPath: ['Introducción', 'Propósito'],
+                text: 'Mi Desempeño permite revisar objetivos e indicadores.',
+                sourceUrl: null,
+                humanUrl: '/knowledge/mi-desempeno',
+                citationLabel: 'Manual: Cómo usar Mi Desempeño',
+                score: 0.93,
+                updatedAt: '2026-06-01T00:00:00.000Z',
+                freshness: 'current',
+                sensitivity: 'internal'
+              },
+              {
+                chunkId: 'chunk-2',
+                documentId: 'doc-2',
+                documentVersionId: 'version-2',
+                title: 'Glosario: Métricas ICO personales',
+                headingPath: ['Impacto'],
+                text: 'Impacto mide contribución a objetivos clave.',
+                sourceUrl: null,
+                humanUrl: '/knowledge/glosario-ico',
+                citationLabel: 'Glosario: Métricas ICO personales',
+                score: 0.87,
+                updatedAt: '2026-06-01T00:00:00.000Z',
+                freshness: 'current',
+                sensitivity: 'internal'
+              }
+            ],
+            deniedOrFilteredCount: 0,
+            notes: []
+          }
+        }
+      }
+    })
+
+    const response = await NexaService.generateResponse({
+      prompt: '¿Cómo reviso mis métricas ICO?',
+      history: [],
+      context: {
+        user: { firstName: 'Julio', lastName: null, role: 'admin' },
+        greeting: { title: '', subtitle: '' },
+        modules: [],
+        tasks: [],
+        nexaIntro: '',
+        computedAt: '2026-06-12T00:00:00.000Z'
+      },
+      runtimeContext
+    })
+
+    expect(response.content).toContain('Fuentes:')
+    expect(response.content).toContain('[1] = Manual: Cómo usar Mi Desempeño')
+    expect(response.content).toContain('[2] = Glosario: Métricas ICO personales')
+  })
+
+  it('does not fabricate a sources block when Knowledge confidence is none', async () => {
+    vi.stubEnv('NEXA_KNOWLEDGE_RETRIEVAL_ENABLED', 'true')
+
+    mockGenerateContent
+      .mockResolvedValueOnce({
+        text: '',
+        functionCalls: [
+          {
+            id: 'tool-knowledge-empty',
+            name: 'search_knowledge',
+            args: { query: 'zxqv procedimiento inexistente' }
+          }
+        ]
+      })
+      .mockResolvedValueOnce({
+        text: 'No encontré una guía publicada para esa consulta en Knowledge.'
+      })
+      .mockResolvedValueOnce({
+        text: '{"suggestions":["Probar otra búsqueda","Revisar manuales","Reportar falta"]}'
+      })
+
+    mockExecuteNexaTool.mockResolvedValue({
+      toolCallId: 'tool-knowledge-empty',
+      toolName: 'search_knowledge',
+      args: { query: 'zxqv procedimiento inexistente' },
+      result: {
+        available: true,
+        summary: 'No hay una guía publicada para esa consulta.',
+        source: 'postgres',
+        scopeLabel: 'Knowledge',
+        generatedAt: '2026-06-12T12:00:00.000Z',
+        metrics: [],
+        raw: {
+          packet: {
+            contractVersion: 'knowledge-search.v1',
+            query: 'zxqv procedimiento inexistente',
+            generatedAt: '2026-06-12T12:00:00.000Z',
+            mode: 'agentic',
+            accessScope: {
+              tenantType: 'efeonce_internal',
+              tenantId: null,
+              userId: 'user-1',
+              roleCodes: ['efeonce_admin'],
+              routeGroups: ['internal'],
+              capabilities: ['knowledge.agentic.retrieve']
+            },
+            confidence: 'none',
+            freshness: 'unknown',
+            chunks: [],
+            deniedOrFilteredCount: 0,
+            notes: []
+          }
+        }
+      }
+    })
+
+    const response = await NexaService.generateResponse({
+      prompt: 'zxqv procedimiento inexistente',
+      history: [],
+      context: {
+        user: { firstName: 'Julio', lastName: null, role: 'admin' },
+        greeting: { title: '', subtitle: '' },
+        modules: [],
+        tasks: [],
+        nexaIntro: '',
+        computedAt: '2026-06-12T00:00:00.000Z'
+      },
+      runtimeContext
+    })
+
+    expect(response.content).not.toContain('Fuentes:')
+    expect(response.content).not.toContain('[1]')
+  })
+
+  it('adds inline citation and human-validation rules to the system prompt when Knowledge is enabled', async () => {
+    vi.stubEnv('NEXA_KNOWLEDGE_RETRIEVAL_ENABLED', 'true')
+    mockGenerateContent.mockResolvedValue({ text: 'Listo.' })
+
+    await NexaService.generateResponse({
+      prompt: '¿Cómo funciona una guía de nómina?',
+      history: [],
+      context: {
+        user: { firstName: 'Julio', lastName: null, role: 'admin' },
+        greeting: { title: '', subtitle: '' },
+        modules: [],
+        tasks: [],
+        nexaIntro: '',
+        computedAt: '2026-06-12T00:00:00.000Z'
+      },
+      runtimeContext
+    })
+
+    const systemInstruction = mockGenerateContent.mock.calls[0]?.[0]?.config?.systemInstruction
+
+    expect(systemInstruction).toContain('Usa marcadores inline [n]')
+    expect(systemInstruction).toContain('cita siempre con [n]')
+    expect(systemInstruction).toContain('validación humana')
   })
 })
