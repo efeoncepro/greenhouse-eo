@@ -6,6 +6,25 @@
 
 ---
 
+## Delta 2026-06-12e — AnswerSurface idle contract (TASK-1090 follow-up)
+
+Se corrigió la promoción de Answer Trace para conservar el patrón tipo Google AI Mode:
+
+- `NexaKnowledgeAnswerSurface` en `conversationStarted=false` renderiza solo el composer glow/entrada; no muestra respuesta, proof panel ni trace rail antes de una pregunta.
+- Al preguntar, aparece la coreografía completa: pregunta-burbuja → identidad/avatar Nexa → respuesta → composer `inlineFollowUp` → proof panel.
+- `showTraceRail?: boolean` queda opt-in y default `false`; las cards de intento/retrieval no interrumpen la conversación y la trazabilidad vive en `NexaEvidencePanel`.
+- GVC `knowledge-answer-trace` ahora captura idle composer primero y conversation lane/proof panel solo después del submit.
+
+## Delta 2026-06-12d — Knowledge lenses coherence (TASK-1090)
+
+`/knowledge` adopta un shell común de lentes **Humano | Nexa | MCP** sin forkear AnswerSurface:
+
+- `NexaKnowledgeAnswerSurface` suma `showModeSelector?: boolean` con default `true`. Esto preserva el mockup `/knowledge/mockup/answer-trace`; `/knowledge` lo pasa en `false` porque el selector común vive en la surface madre.
+- `NexaEvidencePanel` y AnswerSurface endurecen mobile para títulos/fuentes largas: `minmax(0, 1fr)`, `minInlineSize: 0`, wrapping/truncation controlado y acciones responsive.
+- Scenario GVC nuevo `knowledge-lenses`: Humano default → Nexa pregunta → MCP packet. Baseline protegido `knowledge-answer-trace` sigue verde.
+
+Evidencia local: `.captures/2026-06-12T18-50-06_knowledge-lenses` y `.captures/2026-06-12T18-50-07_knowledge-answer-trace`.
+
 ## Delta 2026-06-12c — Conversational Evidence V1 (TASK-1093)
 
 Se consolidó el gap real entre Nexa Chat y AnswerSurface sin crear una shell paralela:

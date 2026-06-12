@@ -52,19 +52,13 @@ export const scenario: CaptureScenario = {
       kind: 'mark',
       label: 'knowledge-answer-trace-fullpage',
       fullPage: true,
-      note: 'Surface completa: pregunta-burbuja, respuesta Nexa, composer descendido y prueba lateral'
+      note: 'Estado inicial Google AI Mode: composer glow sin respuesta fabricada ni proof panel prematuro'
     },
     {
       kind: 'mark',
-      label: 'knowledge-conversation-lane',
-      clipSelector: '[data-capture="nexa-knowledge-conversation-lane"]',
-      note: 'Lane conversacional con continuidad pregunta → respuesta → follow-up'
-    },
-    {
-      kind: 'mark',
-      label: 'knowledge-proof-panel',
-      clipSelector: '[data-capture="nexa-knowledge-proof-panel"]',
-      note: 'Panel de trazabilidad Fuentes/Packet/Evals'
+      label: 'knowledge-answer-trace-idle-composer',
+      clipSelector: '[data-capture="nexa-knowledge-top-composer"]',
+      note: 'Composer inicial antes de preguntar'
     },
     {
       kind: 'fill',
@@ -82,6 +76,18 @@ export const scenario: CaptureScenario = {
           { label: 'question-promoted-750ms', atMs: 750, fullPage: true }
         ]
       }
+    },
+    {
+      kind: 'mark',
+      label: 'knowledge-conversation-lane',
+      clipSelector: '[data-capture="nexa-knowledge-conversation-lane"]',
+      note: 'Lane conversacional con continuidad pregunta → respuesta → follow-up'
+    },
+    {
+      kind: 'mark',
+      label: 'knowledge-proof-panel',
+      clipSelector: '[data-capture="nexa-knowledge-proof-panel"]',
+      note: 'Panel de trazabilidad Fuentes/Packet/Evals después de la respuesta'
     }
   ]
 }

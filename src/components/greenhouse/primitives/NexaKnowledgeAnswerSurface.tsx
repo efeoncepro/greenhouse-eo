@@ -69,6 +69,8 @@ export interface NexaKnowledgeAnswerSurfaceProps<TMode extends string = string, 
   onModeChange: (value: TMode) => void
   modeHelper: ReactNode
   modeSelectorAriaLabel: string
+  showModeSelector?: boolean
+  showTraceRail?: boolean
   traceSteps: readonly NexaKnowledgeAnswerTraceStep[]
   responseTitle: string
   assistantName?: string
@@ -108,6 +110,18 @@ const messageMotionSx = {
   },
   animation: 'nexa-knowledge-message-in 0.24s cubic-bezier(0.2, 0, 0, 1) both',
   '@media (prefers-reduced-motion: reduce)': { animation: 'none' }
+}
+
+const conversationPanelMotionSx = {
+  '@keyframes nexa-knowledge-panel-open': {
+    '0%': { opacity: 0, transform: 'translateY(-10px)', clipPath: 'inset(0 0 100% 0 round 12px)' },
+    '100%': { opacity: 1, transform: 'translateY(0)', clipPath: 'inset(0 0 0 0 round 12px)' }
+  },
+  animation: 'nexa-knowledge-panel-open 0.32s cubic-bezier(0.2, 0, 0, 1) both',
+  '@media (prefers-reduced-motion: reduce)': {
+    animation: 'none',
+    clipPath: 'none'
+  }
 }
 
 const sectionHeaderSx = {
@@ -375,7 +389,7 @@ const NexaAnswerBubble = ({
             <Typography variant='h6'>
               {sourcesLabel} ({sources.length})
             </Typography>
-            <Stack direction='row' spacing={3} flexWrap='wrap' useFlexGap>
+            <Stack direction='row' spacing={3} flexWrap='wrap' useFlexGap sx={{ minInlineSize: 0, maxInlineSize: '100%' }}>
               {sources.map(source => (
                 <GreenhouseChip
                   key={source.id}
@@ -384,6 +398,13 @@ const NexaAnswerBubble = ({
                   tone='primary'
                   iconClassName='tabler-file-text'
                   label={source.title.replace('Manual: ', '').replace('Glosario: ', '')}
+                  sx={{
+                    maxInlineSize: '100%',
+                    '& .MuiChip-label': {
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis'
+                    }
+                  }}
                 />
               ))}
             </Stack>
@@ -413,6 +434,8 @@ const NexaKnowledgeAnswerSurface = <TMode extends string = string, TTab extends 
   onModeChange,
   modeHelper,
   modeSelectorAriaLabel,
+  showModeSelector = true,
+  showTraceRail = false,
   traceSteps,
   responseTitle,
   assistantName,
@@ -491,31 +514,33 @@ const NexaKnowledgeAnswerSurface = <TMode extends string = string, TTab extends 
                 />
               </NexaComposer>
             </Box>
-            <ToggleButtonGroup
-              exclusive
-              value={mode}
-              onChange={(_, nextMode: TMode | null) => {
-                if (nextMode) onModeChange(nextMode)
-              }}
-              aria-label={modeSelectorAriaLabel}
-              size='small'
-              sx={{
-                display: 'grid',
-                gridTemplateColumns: `repeat(${modeOptions.length}, minmax(0, 1fr))`,
-                inlineSize: { xs: '100%', md: 'auto' },
-                minInlineSize: 0,
-                '& .MuiToggleButton-root': {
-                  minInlineSize: { xs: 0, md: 92 },
-                  borderRadius: `${theme.shape.customBorderRadius.sm}px`
-                }
-              }}
-            >
-              {modeOptions.map(option => (
-                <ToggleButton key={option.value} value={option.value}>
-                  {option.label}
-                </ToggleButton>
-              ))}
-            </ToggleButtonGroup>
+            {showModeSelector ? (
+              <ToggleButtonGroup
+                exclusive
+                value={mode}
+                onChange={(_, nextMode: TMode | null) => {
+                  if (nextMode) onModeChange(nextMode)
+                }}
+                aria-label={modeSelectorAriaLabel}
+                size='small'
+                sx={{
+                  display: 'grid',
+                  gridTemplateColumns: `repeat(${modeOptions.length}, minmax(0, 1fr))`,
+                  inlineSize: { xs: '100%', md: 'auto' },
+                  minInlineSize: 0,
+                  '& .MuiToggleButton-root': {
+                    minInlineSize: { xs: 0, md: 92 },
+                    borderRadius: `${theme.shape.customBorderRadius.sm}px`
+                  }
+                }}
+              >
+                {modeOptions.map(option => (
+                  <ToggleButton key={option.value} value={option.value}>
+                    {option.label}
+                  </ToggleButton>
+                ))}
+              </ToggleButtonGroup>
+            ) : null}
           </Stack>
 
           <Stack direction='row' spacing={2} alignItems='center' role='status' aria-live='polite'>
@@ -527,7 +552,7 @@ const NexaKnowledgeAnswerSurface = <TMode extends string = string, TTab extends 
         </Stack>
       ) : null}
 
-      {variantConfig.showTrace && !conversationStarted ? (
+      {showTraceRail && conversationStarted && variantConfig.showTrace && traceSteps.length ? (
         <>
           <Divider />
           <Box
@@ -546,43 +571,42 @@ const NexaKnowledgeAnswerSurface = <TMode extends string = string, TTab extends 
         </>
       ) : null}
 
-      {!conversationStarted ? <Divider /> : null}
+      {conversationStarted ? (
+        <Box
+          sx={{
+            p: { xs: 4, md: 5 },
+            display: 'grid',
+            minInlineSize: 0,
+            gridTemplateColumns:
+              variantConfig.proofPlacement === 'sidecar'
+                ? { xs: 'minmax(0, 1fr)', xl: 'minmax(0, 0.92fr) minmax(420px, 1.08fr)' }
+                : 'minmax(0, 1fr)',
+            gap: 5,
+            alignItems: 'start',
+            backgroundColor: alpha(theme.palette.primary.main, 0.015),
+            ...conversationPanelMotionSx
+          }}
+        >
+          <Stack spacing={4} data-capture='nexa-knowledge-conversation-lane' sx={{ minInlineSize: 0 }}>
+            <Box sx={{ minInlineSize: 0 }}>
+              <NexaAnswerBubble
+                question={question}
+                title={responseTitle}
+                assistantName={assistantName}
+                modeLabel={responseModeLabel}
+                thinkingLabel={responseThinkingLabel}
+                answerIntro={answerIntro}
+                answerSteps={answerSteps}
+                sourcesLabel={sourcesLabel}
+                sources={sources}
+                warningTitle={warningTitle}
+                warningBody={warningBody}
+                warningAction={warningAction}
+                responseActions={responseActions}
+                isThinking={isThinking}
+              />
+            </Box>
 
-      <Box
-        sx={{
-          p: { xs: 4, md: 5 },
-          display: 'grid',
-          minInlineSize: 0,
-          gridTemplateColumns:
-            variantConfig.proofPlacement === 'sidecar'
-              ? { xs: '1fr', xl: 'minmax(0, 0.92fr) minmax(420px, 1.08fr)' }
-              : '1fr',
-          gap: 5,
-          alignItems: 'start',
-          backgroundColor: alpha(theme.palette.primary.main, 0.015)
-        }}
-      >
-        <Stack spacing={4} data-capture='nexa-knowledge-conversation-lane'>
-          <Box>
-            <NexaAnswerBubble
-              question={conversationStarted ? question : undefined}
-              title={responseTitle}
-              assistantName={assistantName}
-              modeLabel={responseModeLabel}
-              thinkingLabel={responseThinkingLabel}
-              answerIntro={answerIntro}
-              answerSteps={answerSteps}
-              sourcesLabel={sourcesLabel}
-              sources={sources}
-              warningTitle={warningTitle}
-              warningBody={warningBody}
-              warningAction={warningAction}
-              responseActions={responseActions}
-              isThinking={isThinking}
-            />
-          </Box>
-
-          {conversationStarted ? (
             <Box data-capture='nexa-knowledge-follow-up-composer' sx={{ pl: { xs: 0, md: 11 } }}>
               <NexaComposer kind='inlineFollowUp'>
                 <NexaComposerInput
@@ -602,45 +626,45 @@ const NexaKnowledgeAnswerSurface = <TMode extends string = string, TTab extends 
                 />
               </NexaComposer>
             </Box>
-          ) : null}
-        </Stack>
+          </Stack>
 
-        <Box
-          data-capture='nexa-knowledge-proof-panel'
-          sx={{
-            minInlineSize: 0,
-            border: `1px solid ${theme.palette.divider}`,
-            borderRadius: `${theme.shape.customBorderRadius.lg}px`,
-            backgroundColor: theme.palette.background.paper,
-            boxShadow: `0 12px 34px ${alpha(theme.palette.common.black, 0.05)}`,
-            overflow: 'hidden'
-          }}
-        >
-          <Box sx={sectionHeaderSx}>
-            <Typography variant='h5'>{proofTitle}</Typography>
-            <Tabs
-              value={proofTab}
-              onChange={(_, value: TTab) => onProofTabChange(value)}
-              aria-label={proofTabsAriaLabel}
-              variant='scrollable'
-              allowScrollButtonsMobile
-              sx={{ minBlockSize: 36, '& .MuiTab-root': { minBlockSize: 36, minInlineSize: 72 } }}
-            >
-              {proofTabs.map(tab => (
-                <Tab key={tab.value} value={tab.value} label={tab.label} />
-              ))}
-            </Tabs>
-          </Box>
-          <Divider />
-          <Box sx={{ px: { xs: 4, md: 5 }, py: 2 }}>
-            {evidence ? (
-              <NexaEvidencePanel evidence={evidence} variant='proofPanel' feedbackEnabled={evidenceFeedbackEnabled} />
-            ) : (
-              proofContent
-            )}
+          <Box
+            data-capture='nexa-knowledge-proof-panel'
+            sx={{
+              minInlineSize: 0,
+              border: `1px solid ${theme.palette.divider}`,
+              borderRadius: `${theme.shape.customBorderRadius.lg}px`,
+              backgroundColor: theme.palette.background.paper,
+              boxShadow: `0 12px 34px ${alpha(theme.palette.common.black, 0.05)}`,
+              overflow: 'hidden'
+            }}
+          >
+            <Box sx={sectionHeaderSx}>
+              <Typography variant='h5'>{proofTitle}</Typography>
+              <Tabs
+                value={proofTab}
+                onChange={(_, value: TTab) => onProofTabChange(value)}
+                aria-label={proofTabsAriaLabel}
+                variant='scrollable'
+                allowScrollButtonsMobile
+                sx={{ minBlockSize: 36, '& .MuiTab-root': { minBlockSize: 36, minInlineSize: 72 } }}
+              >
+                {proofTabs.map(tab => (
+                  <Tab key={tab.value} value={tab.value} label={tab.label} />
+                ))}
+              </Tabs>
+            </Box>
+            <Divider />
+            <Box sx={{ px: { xs: 4, md: 5 }, py: 2 }}>
+              {evidence ? (
+                <NexaEvidencePanel evidence={evidence} variant='proofPanel' feedbackEnabled={evidenceFeedbackEnabled} />
+              ) : (
+                proofContent
+              )}
+            </Box>
           </Box>
         </Box>
-      </Box>
+      ) : null}
     </Box>
   )
 }

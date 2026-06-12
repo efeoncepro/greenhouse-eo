@@ -100,13 +100,13 @@ describe('NexaKnowledgeAnswerSurface', () => {
     expect(onSubmit).toHaveBeenCalledTimes(1)
   })
 
-  it('keeps the original trace experience before a user asks a question', () => {
+  it('keeps the Google AI Mode idle state clean before a user asks a question', () => {
     const modeOptions = [{ value: 'human' as const, label: 'Humano' }]
     const traceSteps = [{ id: 'answer', label: 'Respuesta', description: 'Con citas', metadata: '2 fuentes', state: 'active' as const }]
     const sources = [{ id: 'manual', title: 'Manual: Cómo usar Mi Desempeño' }]
     const proofTabs = [{ value: 'sources' as const, label: 'Fuentes' }]
 
-    const { container, queryByLabelText, queryByText } = renderWithTheme(
+    const { container, getByLabelText, queryByLabelText, queryByText } = renderWithTheme(
       <NexaKnowledgeAnswerSurface<'human', 'sources'>
         kind='knowledgeAnswerTrace'
         question='¿Cómo reviso Mi Desempeño?'
@@ -142,8 +142,12 @@ describe('NexaKnowledgeAnswerSurface', () => {
     )
 
     expect(container.querySelector('[data-state="idle"]')).toBeInTheDocument()
-    expect(container.querySelector('[data-capture="nexa-knowledge-trace-steps"]')).toBeInTheDocument()
-    expect(queryByText('Respuesta verificable')).toBeInTheDocument()
+    expect(container.querySelector('[data-capture="nexa-knowledge-top-composer"]')).toBeInTheDocument()
+    expect(container.querySelector('[data-capture="nexa-knowledge-trace-steps"]')).not.toBeInTheDocument()
+    expect(container.querySelector('[data-capture="nexa-knowledge-conversation-lane"]')).not.toBeInTheDocument()
+    expect(container.querySelector('[data-capture="nexa-knowledge-proof-panel"]')).not.toBeInTheDocument()
+    expect(getByLabelText('Pregúntale a Nexa')).toBeInTheDocument()
+    expect(queryByText('Respuesta verificable')).not.toBeInTheDocument()
     expect(queryByText('¿Cómo reviso Mi Desempeño?')).not.toBeInTheDocument()
     expect(queryByLabelText('Haz otra pregunta a Nexa')).not.toBeInTheDocument()
   })

@@ -1,27 +1,116 @@
-# TASK-1090 — Answer Trace mockup → runtime: blueprint de promoción
+# TASK-1090 — Answer Trace mockup → runtime: Knowledge lenses promotion
+
+## Status
+
+Lifecycle: in-progress
+Priority: P1
+Effort: Medio
+Type: implementation
+Domain: platform|content|ui|nexa|knowledge
+Branch: develop (operator override; no branch switch in shared worktree)
+Owner: Codex UI
 
 > **Renombrada 2026-06-12:** nació por error con el ID `TASK-1084` (colisión con el `TASK-1084` canónico = Human Knowledge Center MVP, registrado y bloqueado por TASK-1081). Conserva el ID 1090.
 > **Corrección 2026-06-12:** deja de ser solo un blueprint repartidor. Pasa a ser la **spec de reconciliación/promoción** que debe convertir `/knowledge` en la promoción runtime del mockup aprobado `answer-trace`.
+> **Corrección Product Design 2026-06-12:** después de comparar con GVC `/knowledge` y `/knowledge/mockup/answer-trace`, la promoción ya no significa reemplazar toda la experiencia humana por Answer Trace. La decisión vigente es: `/knowledge` mantiene **Humano** como default documental, y Answer Trace se integra como el modo **Nexa** dentro de la misma ruta.
 > **Tipo:** spec de ejecución (product-design + arquitectura). Companion de `TASK-1084-human-knowledge-center-mvp.md`.
 > **Creado:** 2026-06-11 — synth de skills `arch-architect` + `greenhouse-ux` + `state-design` + `greenhouse-ux-writing`.
 > **Mockup fuente:** `src/app/(dashboard)/knowledge/mockup/answer-trace/` (aprobado, GVC desktop+mobile, `design-qa.md` passed).
 > **Contrato de datos:** `knowledge-search.v1` + endpoints de **TASK-1083** (la UI es cliente del contrato, nunca toca las tablas — Full API Parity #2).
 
-Este documento gobierna cómo reconciliar el mockup `answer-trace` con `/knowledge` runtime. NO es un permiso para bypassear TASK-1083: el mockup es el norte UX, pero todo runtime usa contratos reales.
+Este documento gobierna cómo reconciliar el mockup `answer-trace` con `/knowledge` runtime. NO es un permiso para bypassear TASK-1083: el mockup es el norte UX del **modo Nexa**, pero todo runtime usa contratos reales.
 
 ---
 
-## Delta 2026-06-12 — Corrección de reconciliación: Answer Trace manda, `/knowledge` se recompone
+## Delta 2026-06-12c — Decisión Product Design: una ruta, tres lentes
+
+GVC comparó las dos surfaces vigentes:
+
+- `/knowledge` (`knowledge-workbench`) pasa como experiencia humana/documental: búsqueda, rutas, guías, detalle, vigencia y feedback. Riesgo detectado: la caja superior dice "Pregúntale a Nexa" aunque el comportamiento real es búsqueda humana.
+- `/knowledge/mockup/answer-trace` (`knowledge-answer-trace`) pasa como experiencia conversacional: pregunta como burbuja, Nexa responde, evidence/proof panel y composer descendido. GVC no reportó findings de calidad en el mockup.
+
+Decisión:
+
+- `/knowledge` sigue siendo la ruta productiva única.
+- El default al entrar es **Humano**: centro documental para explorar, buscar y leer Knowledge.
+- **Nexa** usa la coreografía de Answer Trace dentro de `/knowledge`, no como ruta productiva separada.
+- **MCP** es lente técnica/complementaria: paquete, URI/resource y trazabilidad para agentes, solo con contratos reales.
+- Los botones `Humano | Nexa | MCP` dejan de ser ornamentales y se vuelven un switch real de experiencia.
+
+Rationale:
+
+- El usuario humano que entra a Knowledge puede no querer conversar; puede querer leer una guía, revisar vigencia o navegar rutas.
+- Answer Trace es más fuerte cuando hay intención de pregunta/respuesta, no como biblioteca default.
+- Una sola ruta evita duplicidad de producto, pero tres lentes evitan mezclar jobs incompatibles en una misma composición.
+
+Implicación de implementación:
+
+- En modo Humano, la caja debe decir "Buscar guías en Knowledge" y actualizar la exploración documental.
+- En modo Nexa, la caja debe decir "Pregúntale a Nexa" y activar la experiencia Answer Trace.
+- En modo MCP, la UI debe mostrar contratos/resource/evidence de forma honesta; si un dato no existe en contrato real, se degrada sin mock.
+
+---
+
+## Delta 2026-06-12d — Implementación Codex: coherencia Humano/Nexa/MCP sin perder AnswerSurface
+
+Se implementó el primer slice runtime de `TASK-1090` sobre `/knowledge`:
+
+- `/knowledge` ahora tiene un selector persistente **Humano | Nexa | MCP** arriba de la surface. El selector es el marco común de la experiencia; cada lente cambia el contenido, no la navegación mental del usuario.
+- **Humano** conserva la experiencia documental de `TASK-1084`: búsqueda de guías, rutas, lista, inspector, evidencia compartida y feedback.
+- **Nexa** consume `NexaKnowledgeAnswerSurface` como Answer Trace real dentro de `/knowledge`: pregunta como burbuja, avatar de Nexa después de la pregunta, respuesta con fuentes, composer glow descendido y proof panel `Fuentes | Cómo llegó | Paquete | Revisión`.
+- **MCP** consume el mismo evidence packet/resource URI sin mockear datos técnicos.
+- `NexaKnowledgeAnswerSurface` sumó `showModeSelector?: boolean` con default `true`. El mockup `/knowledge/mockup/answer-trace` no cambia; `/knowledge` lo usa en `false` porque el shell de Knowledge gobierna el selector común.
+- `NexaEvidencePanel` y `NexaKnowledgeAnswerSurface` recibieron hardening responsive (`minmax(0, 1fr)`, `minInlineSize: 0`, wrapping/truncation controlado) para evitar clipping en mobile con fuentes largas.
+- Se agregó `knowledge-lenses.scenario.ts` como GVC canónico del flujo conectado: Humano default → Nexa pregunta → MCP packet.
+
+Evidencia:
+
+- `pnpm fe:capture knowledge-lenses --env=local` → `.captures/2026-06-12T18-50-06_knowledge-lenses` (desktop/mobile OK).
+- `pnpm fe:capture knowledge-answer-trace --env=local` → `.captures/2026-06-12T18-50-07_knowledge-answer-trace` (mockup baseline OK).
+- `pnpm exec eslint src/views/greenhouse/knowledge/KnowledgeCenterView.tsx src/components/greenhouse/primitives/NexaKnowledgeAnswerSurface.tsx src/components/greenhouse/primitives/NexaEvidencePanel.tsx scripts/frontend/scenarios/knowledge-lenses.scenario.ts`
+- `pnpm exec tsc --noEmit --pretty false`
+- `pnpm exec vitest run src/components/greenhouse/primitives/__tests__/NexaKnowledgeAnswerSurface.test.tsx`
+
+Guardrail multi-agente: se preservó WIP ajeno en `src/config/nexa-models.ts` y `.playwright-mcp/`; no se hizo stash/clean/restore amplio.
+
+---
+
+## Delta 2026-06-12e — Corrección UX: Nexa debe conservar el patrón Google AI Mode
+
+Feedback del operador: la primera integración hizo que el lente Nexa se sintiera demasiado absorbido por el Workbench de Knowledge y cambió la experiencia aprobada de AnswerSurface.
+
+Contrato corregido:
+
+- En **idle**, Nexa muestra solo el composer glow/entrada conversacional. No hay respuesta, proof panel ni trace rail antes de que exista una pregunta.
+- Al preguntar, la pregunta sube como burbuja, Nexa aparece después con identidad/avatar, la respuesta se despliega hacia abajo y el composer glow baja debajo de la respuesta para follow-up.
+- Las cards superiores de intento/retrieval no interrumpen la conversación; la trazabilidad vive dentro del proof panel.
+- `/knowledge/mockup/answer-trace` sigue como baseline visual de la AnswerSurface y `/knowledge` debe consumir esa coreografía, no reimaginarla como una card documental.
+
+Implementación:
+
+- `NexaKnowledgeAnswerSurface` ahora protege el estado idle limpio: `conversationStarted=false` renderiza solo el composer superior y estado ligero.
+- `NexaKnowledgeAnswerSurface.showTraceRail` queda opt-in y default `false`; la información de trace se mantiene en `NexaEvidencePanel`/proof panel.
+- El scenario `knowledge-answer-trace` valida primero el idle composer y solo después del submit captura conversation lane + proof panel.
+
+Evidencia:
+
+- `pnpm fe:capture knowledge-answer-trace --env=local` → `.captures/2026-06-12T19-42-37_knowledge-answer-trace`.
+- `pnpm fe:capture knowledge-lenses --env=local` → `.captures/2026-06-12T19-42-38_knowledge-lenses`.
+
+---
+
+## Delta 2026-06-12 — Corrección de reconciliación: Answer Trace gobierna el modo Nexa de `/knowledge`
 
 La primera implementación de `TASK-1084` aterrizó `/knowledge` como un **Knowledge Workbench** funcional: browse/search/read/feedback, access/nav/viewCode, adapters de evidencia y GVC. Eso es útil como sustrato, pero **no debe canonizarse como la experiencia final**.
 
-La experiencia más trabajada y aprobada del programa es `/knowledge/mockup/answer-trace`. Por eso, `TASK-1090` debe reconciliar el rumbo:
+La experiencia más trabajada y aprobada del programa para **Nexa** es `/knowledge/mockup/answer-trace`. Por eso, `TASK-1090` debe reconciliar el rumbo:
 
 - `/knowledge/mockup/answer-trace` queda como **source visual aprobado** y baseline GVC.
 - `/knowledge` es la **ruta productiva única**; cuando se promueva Answer Trace, no nace otra ruta ni otra Knowledge.
+- Answer Trace no reemplaza el modo Humano: se convierte en la lente **Nexa** dentro de `/knowledge`.
 - El Workbench actual de `TASK-1084` se reutiliza como **infraestructura funcional**: endpoints, estados, reader, feedback, evidence adapter y access.
-- El layout dominante de `/knowledge` debe recomponerse desde Answer Trace por copy-and-patch, no seguir evolucionando como directorio documental independiente.
-- La salida final debe sentirse como **Answer Trace con datos reales**, con browse/read/feedback como rails o paneles de soporte.
+- El layout dominante del modo **Nexa** debe recomponerse desde Answer Trace por copy-and-patch, no crear un chat paralelo.
+- La salida final debe sentirse como **Knowledge con lentes reales**: Humano documental default, Nexa conversacional y MCP técnico.
 
 Estado real que cambia el plan original:
 
@@ -36,23 +125,23 @@ División de ownership del programa:
 - **Claude**: backend, contratos, readers, retrieval, MCP/resources, QA backend y señales runtime.
 - **Codex**: UI, promoción visual, composición runtime, microinteracciones, UX writing, GVC y reconciliación del mockup aprobado con `/knowledge`.
 
-Por lo tanto, ya no es correcto decir simplemente "answer-trace espera a 1085/1086". Lo correcto es: `TASK-1090` promueve la coreografía Answer Trace a `/knowledge` usando las piezas reales disponibles entregadas por el backend de Claude, y degrada honestamente cualquier lente que el ambiente activo todavía no pueda resolver. Codex **no reimplementa backend** en esta task; si una respuesta/API falla, se documenta el drift y se coordina con el owner backend.
+Por lo tanto, ya no es correcto decir simplemente "answer-trace espera a 1085/1086". Lo correcto es: `TASK-1090` promueve la coreografía Answer Trace como lente **Nexa** de `/knowledge`, usando las piezas reales disponibles entregadas por el backend de Claude, y degrada honestamente cualquier lente que el ambiente activo todavía no pueda resolver. Codex **no reimplementa backend** en esta task; si una respuesta/API falla, se documenta el drift y se coordina con el owner backend.
 
 ---
 
-## 0. Decisión de alcance corregida — `TASK-1090` promueve Answer Trace a `/knowledge`
+## 0. Decisión de alcance corregida — `TASK-1090` integra Answer Trace como modo Nexa de `/knowledge`
 
-El mockup sigue abarcando el programa completo, pero el punto de integración ya no es repartirlo y olvidarlo: `TASK-1090` debe convertirlo en la composición principal de `/knowledge`.
+El mockup sigue abarcando el programa completo, pero el punto de integración ya no es repartirlo y olvidarlo: `TASK-1090` debe convertirlo en la composición principal del modo **Nexa** dentro de `/knowledge`.
 
 | Panel del mockup | Dueño | Por qué |
 |---|---|---|
-| Shell visual, caja glow, pregunta como burbuja, respuesta/evidencia y composer descendido | **TASK-1090** | Es la promoción del mockup aprobado hacia `/knowledge` runtime. |
-| Manual reader, learning path rail, contextual help hooks y feedback | **TASK-1084 como sustrato; TASK-1090 recompone** | Ya hay implementación funcional; debe reubicarse como rails/paneles dentro de Answer Trace, no dominar la experiencia. |
-| Browse/search humano contra contratos app | **TASK-1084 como sustrato; TASK-1090 recompone** | La búsqueda alimenta la pregunta y las fuentes reales del Answer Trace. |
+| Shell visual, caja glow, pregunta como burbuja, respuesta/evidencia y composer descendido | **TASK-1090** | Es la promoción del mockup aprobado como modo Nexa de `/knowledge`. |
+| Manual reader, learning path rail, contextual help hooks y feedback | **TASK-1084 como sustrato; TASK-1090 recompone** | Ya hay implementación funcional; permanece en el modo Humano y puede aparecer como soporte bajo Nexa/MCP cuando aporte contexto. |
+| Browse/search humano contra contratos app | **TASK-1084 como sustrato; TASK-1090 recompone** | Alimenta el modo Humano; no debe tener copy de "pregúntale a Nexa" si su comportamiento es search documental. |
 | Respuesta verificable, fuentes y evidence panel | **TASK-1085 + TASK-1093; TASK-1090 integra** | Ya existen retrieval/evidence primitives; usar `NexaKnowledgeAnswerSurface` + `NexaEvidencePanel`, sin inventar renderer paralelo. |
 | Packet / Evals / MCP lens | **TASK-1086 backend + TASK-1090 UI** | Codex solo compone la lente visual con contratos reales. Si el ambiente no puede resolver algo, disabled/degraded honesto; nunca mock. |
 
-**Regla dura corregida:** `/knowledge` no debe quedar como un Workbench independiente que "también" tiene evidencia. Debe ser **Answer Trace promovido**, con browse/read/feedback como soporte operativo. Lo que no tenga backend real se degrada de forma explícita; no se rellena con mock data.
+**Regla dura corregida:** `/knowledge` no debe quedar como un Workbench independiente con tabs decorativas, ni como un chat que borra la experiencia humana. Debe ser una ruta con lentes reales: **Humano** para Knowledge documental, **Nexa** para Answer Trace conversacional y **MCP** para consumo técnico/agéntico. Lo que no tenga backend real se degrada de forma explícita; no se rellena con mock data.
 
 ---
 
@@ -142,7 +231,7 @@ El mockup pinta solo el estado **Default**. Cada superficie runtime debe shippea
 - `variant='surfaceHeroTitle'` (page title) — confirmar que es variante canónica del SoT tipográfico (TASK-1038); si no, el page-title de producto es `h4` (Poppins 20).
 - Skeletons nuevos (estado loading) deben matchear el tamaño del contenido final (anti-CLS) + `role=status aria-busy`.
 - Targets interactivos ≥ 24×24px; focus ring 2px / 3:1; heading hierarchy sin saltos.
-- Densidad: el mockup fusiona ~8 paneles; al promoverlo no se deben apilar todos con igual peso. Answer Trace manda el primer plano; reader + learning + feedback viven como rails/paneles secundarios.
+- Densidad: el mockup fusiona ~8 paneles; al promoverlo no se deben apilar todos con igual peso. Answer Trace gobierna el primer plano del lente **Nexa**; reader + learning + feedback viven como rails/paneles secundarios o en el lente **Humano**.
 
 ---
 
@@ -180,7 +269,7 @@ El mockup pinta solo el estado **Default**. Cada superficie runtime debe shippea
 - [ ] viewCode `plataforma.knowledge` + migración seed (mismo PR, TASK-827) + ruta alcanzable por nav (TASK-982).
 - [ ] Acceso: tenant cliente → `notFound()` (anti-oracle), no 403.
 - [ ] GVC desktop+mobile mirada por estado nuevo + baseline diff del happy-path.
-- [ ] `/knowledge` usa Answer Trace como composición principal promovida; el Workbench/listado queda como soporte, no como experiencia paralela.
+- [ ] `/knowledge` usa una estructura común de lentes: Humano documental default, Nexa con Answer Trace y MCP técnico. El Workbench/listado queda como el lente Humano, no como experiencia paralela.
 - [ ] `/knowledge/mockup/answer-trace` permanece como baseline/lab o queda claramente marcado como referencia, nunca como ruta productiva alternativa.
 - [ ] Codex no reimplementa backend ni crea endpoints nuevos en esta task; consume lo entregado por Claude y documenta cualquier drift real.
 
@@ -189,7 +278,7 @@ El mockup pinta solo el estado **Default**. Cada superficie runtime debe shippea
 ## 8. Hard rules
 
 - **NUNCA** cablear `data.ts` del mockup directo a runtime — pasa por el contrato 1083.
-- **NUNCA** canonizar un Workbench paralelo si el mockup Answer Trace sigue siendo el source aprobado. La promoción correcta es recomponer `/knowledge` desde Answer Trace y reutilizar el Workbench como sustrato.
+- **NUNCA** canonizar un Workbench paralelo si el mockup Answer Trace sigue siendo el source aprobado para Nexa. La promoción correcta es una sola ruta `/knowledge` con lentes reales y Answer Trace como lente **Nexa**.
 - **NUNCA** rellenar Answer Trace con mock data en `/knowledge`; si falta una pieza real, disabled/degraded honesto o follow-up.
 - **NUNCA** reabrir backend dentro de `TASK-1090` salvo bug mínimo bloqueante acordado con el owner; esta task es UI promotion sobre contratos ya entregados por Claude.
 - **NUNCA** shippear el reader sin los banners stale/deprecated/agent_excluded — un doc obsoleto sin warning es deuda de confianza.

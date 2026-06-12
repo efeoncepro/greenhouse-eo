@@ -3,7 +3,7 @@
 > **Tipo de documento:** Manual de uso / runbook
 > **Versión:** 1.0
 > **Creado:** 2026-06-11 por Claude (TASK-1081)
-> **Última actualización:** 2026-06-12 por Codex (TASK-1092)
+> **Última actualización:** 2026-06-12 por Codex (TASK-1090)
 > **Documentación funcional:** [knowledge-platform.md](../../documentation/plataforma/knowledge-platform.md)
 > **Documentación técnica:** [GREENHOUSE_KNOWLEDGE_PLATFORM_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_KNOWLEDGE_PLATFORM_ARCHITECTURE_V1.md)
 
@@ -145,6 +145,7 @@ Ruta local: `/knowledge/mockup/answer-trace`.
 
 Qué revisar:
 
+- Antes de preguntar, la surface debe mostrar solo el composer glow de Nexa; no debe aparecer respuesta ni proof panel prematuro.
 - La pregunta debe quedar visible como burbuja de usuario.
 - Nexa debe responder debajo con fuentes y warning honesto cuando no consulta datos actuales.
 - El composer glow debe quedar debajo de la respuesta para follow-up.
@@ -155,14 +156,16 @@ No usar este mockup como prueba de retrieval real: aún usa data mock tipada y n
 
 Nota operativa para QA de Nexa: cuando una respuesta viene desde `search_knowledge`, las fuentes deben verse iguales en el chat y en Answer Trace porque ambas superficies consumen `NexaEvidencePanel`. Al reabrir un thread histórico, la evidence card debe reaparecer si el mensaje persistió `tool_invocations`; si no, el thread debe seguir legible como texto sin bloquear la conversación.
 
-## Usar y validar el Knowledge Workbench humano (TASK-1084)
+## Usar y validar Knowledge con lentes Humano / Nexa / MCP (TASK-1084 + TASK-1090)
 
 Ruta local/runtime: `/knowledge`.
 
 Qué debe pasar:
 
-- La caja glow **Pregúntale a Nexa** permite buscar en lenguaje natural dentro del corpus publicado para humanos.
-- La lista de guías permite seleccionar y leer una fuente sin abrir otra experiencia.
+- La página muestra un selector persistente **Humano | Nexa | MCP**. Cambiar de lente no debe sentirse como navegar a otra herramienta.
+- En **Humano**, la caja glow permite buscar guías publicadas en Knowledge; la lista permite seleccionar y leer una fuente sin abrir otra experiencia.
+- En **Nexa**, la AnswerSurface empieza en modo AI Mode limpio: solo composer glow. Después de preguntar muestra pregunta como burbuja, avatar de Nexa después de la pregunta, respuesta con fuentes, proof panel y composer glow descendido para follow-up.
+- En **MCP**, la página muestra URI/resource y paquete de evidencia para agentes, sin datos mock.
 - El inspector muestra owner, fuente, vigencia, política IA y un bloque **Evidencia compartida con Nexa**.
 - **Continuar con Nexa** abre el Nexa flotante existente; no debe montar un chat paralelo dentro del Workbench.
 - El feedback de la guía se envía por el endpoint compartido de Knowledge.
@@ -171,12 +174,15 @@ Validación visual local:
 
 ```bash
 pnpm dev
-pnpm fe:capture knowledge-workbench --env=local
+pnpm fe:capture knowledge-lenses --env=local
+pnpm fe:capture knowledge-answer-trace --env=local
 ```
 
-La captura debe revisar desktop y mobile. Evidencia de implementación inicial: `.captures/2026-06-12T17-38-24_knowledge-workbench`.
+La captura `knowledge-lenses` valida la ruta productiva conectada: Humano default → Nexa pregunta → MCP packet. La captura `knowledge-answer-trace` protege el mockup baseline para asegurar que la AnswerSurface aprobada no se perdió.
 
-No validar esta pantalla como “Nexa respondió”: en TASK-1084 la caja es búsqueda humana. La respuesta conversacional con tool `search_knowledge` pertenece a Nexa/TASK-1085 y usa el mismo `NexaEvidencePanel` para que la transición se sienta continua.
+Evidencia de implementación TASK-1090: `.captures/2026-06-12T18-50-06_knowledge-lenses` y `.captures/2026-06-12T18-50-07_knowledge-answer-trace`.
+
+No validar el lente Humano como “Nexa respondió”: Humano es exploración documental. La respuesta conversacional vive en el lente Nexa y usa el mismo `NexaEvidencePanel` para que la transición se sienta continua.
 
 ## Nexa y el conocimiento (TASK-1085 — code complete local, detrás de flag)
 

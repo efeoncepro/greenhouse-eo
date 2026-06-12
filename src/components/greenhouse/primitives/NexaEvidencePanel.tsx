@@ -83,11 +83,20 @@ const EvidenceSourceCard = ({ source }: { source: ConversationalEvidenceSource }
         border: `1px solid ${theme.palette.divider}`,
         borderRadius: `${theme.shape.customBorderRadius.md}px`,
         backgroundColor: theme.palette.background.paper,
-        p: 3
+        p: 3,
+        minInlineSize: 0,
+        maxInlineSize: '100%'
       }}
     >
-      <Stack spacing={2}>
-        <Stack direction='row' spacing={1.5} alignItems='center' flexWrap='wrap' useFlexGap>
+      <Stack spacing={2} sx={{ minInlineSize: 0 }}>
+        <Stack
+          direction={{ xs: 'column', sm: 'row' }}
+          spacing={1.5}
+          alignItems={{ xs: 'flex-start', sm: 'center' }}
+          flexWrap='wrap'
+          useFlexGap
+          sx={{ minInlineSize: 0 }}
+        >
           <Box
             sx={{
               inlineSize: 28,
@@ -101,7 +110,15 @@ const EvidenceSourceCard = ({ source }: { source: ConversationalEvidenceSource }
           >
             <i className='tabler-file-text' aria-hidden='true' />
           </Box>
-          <Typography variant='subtitle2' sx={{ minInlineSize: 0, overflowWrap: 'anywhere' }}>
+          <Typography
+            variant='subtitle2'
+            sx={{
+              flex: { sm: '1 1 220px' },
+              minInlineSize: 0,
+              maxInlineSize: '100%',
+              overflowWrap: 'anywhere'
+            }}
+          >
             {source.title}
           </Typography>
           <Typography variant='caption' color='primary.main' sx={{ fontWeight: 700 }}>
@@ -224,7 +241,9 @@ const NexaEvidencePanel = ({
         borderRadius: isTraceCard ? `${theme.shape.customBorderRadius.lg}px` : 0,
         backgroundColor: theme.palette.background.paper,
         boxShadow: isTraceCard ? `0 12px 30px ${alpha(theme.palette.common.black, 0.05)}` : 'none',
-        overflow: 'hidden'
+        overflow: 'hidden',
+        minInlineSize: 0,
+        maxInlineSize: '100%'
       }}
     >
       <Box sx={{ px: isTraceCard ? 3 : 0, py: isTraceCard ? 2.5 : 0 }}>
@@ -237,7 +256,7 @@ const NexaEvidencePanel = ({
               Evidencia versionada desde {evidence.sourceContractVersion}.
             </Typography>
           </Stack>
-          <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
+          <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap sx={{ minInlineSize: 0, justifyContent: { xs: 'flex-start', sm: 'flex-end' } }}>
             <GreenhouseChip size='small' variant='label' tone={evidence.confidence === 'none' ? 'warning' : 'primary'} label={`Confianza: ${evidenceConfidenceLabel(evidence.confidence)}`} />
             <GreenhouseChip size='small' variant='label' tone={evidence.freshness === 'current' ? 'success' : 'warning'} label={evidenceFreshnessLabel(evidence.freshness)} />
             <GreenhouseChip size='small' variant='label' tone='default' label={`${evidence.sources.length} fragmentos`} />
@@ -260,7 +279,7 @@ const NexaEvidencePanel = ({
             <Typography variant='subtitle2'>
               {GH_KNOWLEDGE_COPY.sourcesLabel} ({evidence.citedDocumentCount})
             </Typography>
-            <Stack spacing={2}>
+            <Stack spacing={2} sx={{ minInlineSize: 0 }}>
               {visibleSources.map(source => (
                 <EvidenceSourceCard key={source.id} source={source} />
               ))}

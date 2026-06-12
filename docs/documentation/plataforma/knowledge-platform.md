@@ -3,7 +3,7 @@
 > **Tipo de documento:** Documentación funcional (lenguaje simple)
 > **Versión:** 1.0
 > **Creado:** 2026-06-11 por Claude (TASK-1081)
-> **Última actualización:** 2026-06-12 por Codex (TASK-1092)
+> **Última actualización:** 2026-06-12 por Codex (TASK-1090)
 > **Documentación técnica:** [GREENHOUSE_KNOWLEDGE_PLATFORM_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_KNOWLEDGE_PLATFORM_ARCHITECTURE_V1.md) · [GREENHOUSE_KNOWLEDGE_PLATFORM_DECISION_V1.md](../../architecture/GREENHOUSE_KNOWLEDGE_PLATFORM_DECISION_V1.md)
 
 ## Qué es
@@ -63,18 +63,22 @@ En el MVP todo es **solo interno** — los clientes todavía no ven nada de la K
 - **TASK-1085** — conexión de Nexa con citas.
 - **TASK-1086** — recursos MCP read-only.
 
-## Cómo se usa la capa humana en Greenhouse (TASK-1084)
+## Cómo se usa Knowledge en Greenhouse (TASK-1084 + TASK-1090)
 
-La ruta `/knowledge` es el **Workbench humano** de la Knowledge Platform: una superficie interna para buscar guías publicadas, leerlas con metadata de vigencia/fuente/owner y dejar feedback cuando algo falta o no sirve.
+La ruta `/knowledge` es una sola superficie interna con **tres lentes conectados**:
 
-No es otra experiencia de Nexa ni un segundo Knowledge. Es la capa de lectura y auditoría que **expande** la experiencia conversacional:
+- **Humano:** busca guías publicadas, permite leerlas con metadata de vigencia/fuente/owner y deja feedback cuando algo falta o no sirve.
+- **Nexa:** usa la AnswerSurface conversacional. En idle muestra solo el composer glow; al preguntar, la pregunta sube como burbuja, Nexa responde debajo, el composer baja para follow-up y las fuentes/trazabilidad quedan en el proof panel.
+- **MCP:** muestra el paquete técnico/resource URI que consumen agentes, siempre desde contratos reales.
 
-- La caja glow usa el mismo `NexaComposer kind='knowledgeAsk'` que el resto de la familia Nexa, pero en este contexto dispara búsqueda humana (`mode=human`), no generación de respuesta.
-- El inspector muestra la evidencia con `NexaEvidencePanel`, el mismo panel de trazabilidad que usa Nexa cuando responde con Knowledge.
-- La acción **Continuar con Nexa** abre el Nexa flotante existente con el contexto de la guía, para que la conversación continúe sin cambiar de producto.
+No es otra experiencia de Nexa ni un segundo Knowledge. Es una ruta única donde el usuario cambia de lente sin sentir que cambió de producto:
+
+- La caja glow usa el mismo `NexaComposer kind='knowledgeAsk'` que el resto de la familia Nexa; en Humano busca guías y en Nexa pregunta a Nexa.
+- El inspector y la AnswerSurface muestran evidencia con `NexaEvidencePanel`, el mismo panel de trazabilidad que usa Nexa cuando responde con Knowledge.
+- La acción **Continuar con Nexa** sigue abriendo el Nexa flotante existente con el contexto de la guía, para que la conversación continúe sin crear un chat paralelo.
 - El feedback se guarda en el mismo contrato de Knowledge (`POST /api/platform/app/knowledge/feedback`) que alimenta la mejora del corpus para humanos, Nexa y MCP.
 
-Así, `/knowledge` responde “muéstrame y déjame revisar la fuente”; Nexa responde “conversemos y actuemos con esa evidencia”.
+Así, `/knowledge` responde “muéstrame y déjame revisar la fuente”, “pregúntale a Nexa con esa evidencia” y “exponlo para agentes” dentro de la misma experiencia.
 
 ## Cómo se busca el conocimiento (TASK-1083)
 
@@ -100,7 +104,7 @@ El conocimiento no se escribe a mano en Greenhouse: se **ingiere** desde una fue
 
 ## Cómo se ve una respuesta de Nexa con Knowledge (TASK-1089)
 
-El mockup interno `/knowledge/mockup/answer-trace` ahora muestra el patrón transversal elegido para respuestas con evidencia: la pregunta sube como burbuja, Nexa responde con fuentes visibles y el composer glow baja debajo de la respuesta para seguir preguntando sin sentir que el usuario "salió" a otra experiencia.
+El mockup interno `/knowledge/mockup/answer-trace` ahora muestra el patrón transversal elegido para respuestas con evidencia: estado inicial limpio con composer glow, pregunta que sube como burbuja, Nexa respondiendo con fuentes visibles y composer glow descendido debajo de la respuesta para seguir preguntando sin sentir que el usuario "salió" a otra experiencia.
 
 El panel de trazabilidad permanece al lado en desktop y debajo en mobile con cuatro lentes:
 
@@ -109,7 +113,7 @@ El panel de trazabilidad permanece al lado en desktop y debajo en mobile con cua
 - **Paquete:** forma del contrato `knowledge-search.v1` que consumen agentes.
 - **Revisión:** checks de calidad/golden questions.
 
-Esta pantalla sigue siendo mockup interno. No activa retrieval real ni consulta tablas; `TASK-1085` conectará Nexa al reader de Knowledge y al feedback compartido.
+Esta pantalla sigue siendo mockup interno y baseline visual. La promoción runtime sucede en `/knowledge`: el lente **Nexa** usa `NexaKnowledgeAnswerSurface` con contratos reales, mientras el mockup conserva la experiencia aprobada para comparación GVC.
 
 Desde `TASK-1093`, la evidencia conversacional se normaliza antes de renderizarse: el packet `knowledge-search.v1` se adapta a `ConversationalEvidencePacket` (`nexa-evidence.v1`) y se muestra con `NexaEvidencePanel`. Esto evita que el chat de Nexa y la Answer Surface tengan cards de fuentes diferentes. La rehidratación de threads también conserva los tool-calls persistidos cuando existen; si un historial antiguo no trae evidence, mantiene el texto sin re-ejecutar herramientas.
 

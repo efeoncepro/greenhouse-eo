@@ -22,7 +22,8 @@ import {
   NexaEvidencePanel,
   NexaComposer,
   NexaComposerActionButton,
-  NexaComposerInput
+  NexaComposerInput,
+  NexaKnowledgeAnswerSurface
 } from '@/components/greenhouse/primitives'
 import { GH_KNOWLEDGE_COPY } from '@/lib/copy/knowledge'
 import { formatDate } from '@/lib/format'
@@ -33,8 +34,11 @@ import { knowledgePacketToConversationalEvidence } from '@/lib/nexa/conversation
 import { NEXA_FLOATING_OPEN_EVENT } from '@/lib/nexa/floating-events'
 
 import type { KnowledgeFeedbackKind, KnowledgeFreshness } from '@/lib/knowledge/types'
-import type { KnowledgeRetrievalChunk, KnowledgeRetrievalPacket } from '@/lib/knowledge/search'
+import type { KnowledgeRetrievalChunk, KnowledgeRetrievalPacket, KnowledgeSearchMode } from '@/lib/knowledge/search'
 import type { ConversationalEvidencePacket } from '@/lib/nexa/conversational-evidence'
+
+type KnowledgeLens = 'human' | 'nexa' | 'mcp'
+type KnowledgeProofTab = 'sources' | 'trace' | 'packet' | 'review'
 
 type ApiEnvelope<T> = {
   data?: T
@@ -84,6 +88,19 @@ type WorkbenchResult = {
 type LoadState = 'idle' | 'loading' | 'ready' | 'empty' | 'error'
 
 const MotionBox = motion(Box)
+
+const KNOWLEDGE_MODE_OPTIONS = [
+  { value: 'human' as const, label: GH_KNOWLEDGE_COPY.mode.human },
+  { value: 'nexa' as const, label: GH_KNOWLEDGE_COPY.mode.nexa },
+  { value: 'mcp' as const, label: GH_KNOWLEDGE_COPY.mode.mcp }
+] as const
+
+const KNOWLEDGE_PROOF_TABS = [
+  { value: 'sources' as const, label: GH_KNOWLEDGE_COPY.evidenceTabs.sources },
+  { value: 'trace' as const, label: GH_KNOWLEDGE_COPY.evidenceTabs.trace },
+  { value: 'packet' as const, label: GH_KNOWLEDGE_COPY.evidenceTabs.packet },
+  { value: 'review' as const, label: GH_KNOWLEDGE_COPY.evidenceTabs.evals }
+] as const
 
 const requestJson = async <T,>(url: string, init?: RequestInit): Promise<T> => {
   const response = await fetch(url, init)
@@ -236,11 +253,46 @@ const buildResults = (
   return Array.from(bestByDocument.values()).sort((a, b) => (b.score ?? 0) - (a.score ?? 0))
 }
 
+const trimExcerpt = (value: string, max = 178) => {
+  const normalized = value.replace(/\s+/g, ' ').trim()
+
+  return normalized.length > max ? `${normalized.slice(0, max).trim()}...` : normalized
+}
+
+const buildAnswerSteps = (evidence: ConversationalEvidencePacket | null, detail: KnowledgeDocumentDetailPayload | null) => {
+  const evidenceSteps = evidence?.sources.slice(0, 4).map(source => trimExcerpt(source.excerpt))
+
+  if (evidenceSteps?.length) return evidenceSteps
+
+  const detailSteps = detail?.sections.slice(0, 4).map(section => trimExcerpt(section.bodyText))
+
+  if (detailSteps?.length) return detailSteps
+
+  return ['Haz una pregunta o selecciona una guía publicada para ver una respuesta con fuentes reales.']
+}
+
+const buildAnswerSources = (evidence: ConversationalEvidencePacket | null, selectedResult: WorkbenchResult | null) => {
+  const evidenceSources = evidence?.sources.map(source => ({ id: source.id, title: source.title }))
+
+  if (evidenceSources?.length) return evidenceSources
+
+  return selectedResult ? [{ id: selectedResult.document.documentId, title: selectedResult.document.title }] : []
+}
+
+const mcpDocumentUri = (document: KnowledgeDocumentSummary | null | undefined) =>
+  document ? `greenhouse://knowledge/document/${document.publicId || document.documentId}` : 'greenhouse://knowledge/document/{id}'
+
 const KnowledgeCenterView = () => {
   const theme = useTheme()
   const reducedMotion = useReducedMotion()
+  const [activeMode, setActiveMode] = useState<KnowledgeLens>('human')
   const [query, setQuery] = useState('')
   const [submittedQuery, setSubmittedQuery] = useState('')
+  const [nexaDraft, setNexaDraft] = useState('')
+  const [nexaQuestion, setNexaQuestion] = useState<string>(GH_KNOWLEDGE_COPY.selectedQuestion)
+  const [nexaAsked, setNexaAsked] = useState(false)
+  const [nexaThinking, setNexaThinking] = useState(false)
+  const [proofTab, setProofTab] = useState<KnowledgeProofTab>('sources')
   const [documents, setDocuments] = useState<KnowledgeDocumentSummary[]>([])
   const [packet, setPacket] = useState<KnowledgeRetrievalPacket | null>(null)
   const [selectedDocumentId, setSelectedDocumentId] = useState<string | null>(null)
@@ -341,9 +393,8 @@ const KnowledgeCenterView = () => {
     }
   }, [results, selectedDocumentId])
 
-  const handleSearch = async (event?: FormEvent) => {
-    event?.preventDefault()
-    const trimmed = query.trim()
+  const runKnowledgeSearch = async (searchText: string, mode: KnowledgeSearchMode) => {
+    const trimmed = searchText.trim()
 
     if (!trimmed) {
       setSubmittedQuery('')
@@ -357,7 +408,7 @@ const KnowledgeCenterView = () => {
 
     try {
       const data = await requestJson<KnowledgeRetrievalPacket>(
-        `/api/platform/app/knowledge/search?mode=human&limit=10&q=${encodeURIComponent(trimmed)}`
+        `/api/platform/app/knowledge/search?mode=${mode}&limit=10&q=${encodeURIComponent(trimmed)}`
       )
 
       setPacket(data)
@@ -367,7 +418,7 @@ const KnowledgeCenterView = () => {
         contractVersion: 'knowledge-search.v1',
         query: trimmed,
         generatedAt: new Date().toISOString(),
-        mode: 'human',
+        mode,
         accessScope: {
           tenantType: 'efeonce_internal',
           tenantId: null,
@@ -385,6 +436,27 @@ const KnowledgeCenterView = () => {
     } finally {
       setSearching(false)
     }
+  }
+
+  const handleSearch = async (event?: FormEvent) => {
+    event?.preventDefault()
+    await runKnowledgeSearch(query, activeMode === 'mcp' ? 'agentic' : 'human')
+  }
+
+  const handleNexaSubmit = async () => {
+    const trimmed = nexaDraft.trim()
+
+    if (!trimmed) return
+
+    setNexaQuestion(trimmed)
+    setNexaDraft('')
+    setNexaAsked(true)
+    setProofTab('trace')
+    setNexaThinking(true)
+
+    await runKnowledgeSearch(trimmed, 'agentic')
+
+    window.setTimeout(() => setNexaThinking(false), 520)
   }
 
   const handleFeedback = async (kind: KnowledgeFeedbackKind) => {
@@ -443,6 +515,14 @@ const KnowledgeCenterView = () => {
 
   const selectedFreshness = selectedResult?.chunk?.freshness ?? selectedResult?.document.publicationStatus
   const hasSearch = Boolean(submittedQuery)
+  const packetEvidence = packet ? knowledgePacketToConversationalEvidence(packet) : null
+  const lensEvidence = activeMode === 'human' ? selectedEvidence : packetEvidence ?? selectedEvidence
+
+  const modeSubtitle = activeMode === 'human' ? GH_KNOWLEDGE_COPY.workbenchSubtitle : GH_KNOWLEDGE_COPY.pageSubtitle
+  const commandPlaceholder = activeMode === 'mcp' ? GH_KNOWLEDGE_COPY.mcpSearchPlaceholder : GH_KNOWLEDGE_COPY.humanSearchPlaceholder
+  const modeHelper = activeMode === 'mcp' ? GH_KNOWLEDGE_COPY.mcpModeHelper : GH_KNOWLEDGE_COPY.workbenchModeHelper
+  const answerSteps = buildAnswerSteps(lensEvidence, detail)
+  const answerSources = buildAnswerSources(lensEvidence, selectedResult)
 
   return (
     <>
@@ -465,7 +545,7 @@ const KnowledgeCenterView = () => {
               {GH_KNOWLEDGE_COPY.pageTitle}
             </Typography>
             <Typography variant='body1' color='text.secondary'>
-              {GH_KNOWLEDGE_COPY.workbenchSubtitle}
+              {modeSubtitle}
             </Typography>
           </Box>
         </Stack>
@@ -479,43 +559,42 @@ const KnowledgeCenterView = () => {
         </Stack>
       </Stack>
 
-      <Box sx={panelSx} data-capture='knowledge-command-surface'>
-        <Stack spacing={4} sx={{ p: { xs: 4, md: 5 } }}>
-          <Stack component='form' onSubmit={event => void handleSearch(event)} direction={{ xs: 'column', lg: 'row' }} spacing={3} alignItems='stretch'>
-            <Box sx={{ flex: 1, minWidth: 0 }}>
-              <NexaComposer kind='knowledgeAsk'>
-                <NexaComposerInput
-                  kind='knowledgeAsk'
-                  value={query}
-                  onChange={event => setQuery(event.target.value)}
-                  placeholder={GH_KNOWLEDGE_COPY.commandPlaceholder}
-                  actionAdornment={
-                    <NexaComposerActionButton
-                      variant='send'
-                      icon='search'
-                      disabled={searching}
-                      aria-label={GH_KNOWLEDGE_COPY.aria.searchKnowledge}
-                      onClick={() => void handleSearch()}
-                    />
-                  }
-                />
-              </NexaComposer>
-            </Box>
-            <Stack direction='row' spacing={1} role='tablist' aria-label={GH_KNOWLEDGE_COPY.aria.modeSelector}>
-              <ModePill label={GH_KNOWLEDGE_COPY.mode.human} active />
-              <ModePill label={GH_KNOWLEDGE_COPY.mode.nexa} helper={GH_KNOWLEDGE_COPY.workbenchModesSoon} />
-              <ModePill label={GH_KNOWLEDGE_COPY.mode.mcp} helper={GH_KNOWLEDGE_COPY.workbenchModesSoon} />
+      <KnowledgeLensSwitcher activeMode={activeMode} onModeChange={setActiveMode} />
+
+      {activeMode !== 'nexa' ? (
+        <Box sx={panelSx} data-capture='knowledge-command-surface'>
+          <Stack spacing={4} sx={{ p: { xs: 4, md: 5 } }}>
+            <Stack component='form' onSubmit={event => void handleSearch(event)} direction={{ xs: 'column', lg: 'row' }} spacing={3} alignItems='stretch'>
+              <Box sx={{ flex: 1, minWidth: 0 }}>
+                <NexaComposer kind='knowledgeAsk'>
+                  <NexaComposerInput
+                    kind='knowledgeAsk'
+                    value={query}
+                    onChange={event => setQuery(event.target.value)}
+                    placeholder={commandPlaceholder}
+                    actionAdornment={
+                      <NexaComposerActionButton
+                        variant='send'
+                        icon='search'
+                        disabled={searching}
+                        aria-label={GH_KNOWLEDGE_COPY.aria.searchKnowledge}
+                        onClick={() => void handleSearch()}
+                      />
+                    }
+                  />
+                </NexaComposer>
+              </Box>
             </Stack>
+            <Stack direction='row' spacing={2} alignItems='center' role='status'>
+              <GreenhouseStatusDot tone={searching ? 'primary' : 'success'} ariaLabel={searching ? GH_KNOWLEDGE_COPY.workbenchSearchStatus : GH_KNOWLEDGE_COPY.workbenchSearchIdle} />
+              <Typography variant='body2' color='text.secondary'>
+                {searching ? GH_KNOWLEDGE_COPY.workbenchSearchStatus : modeHelper}
+              </Typography>
+            </Stack>
+            {searching ? <LinearProgress color='primary' sx={{ borderRadius: `${theme.shape.customBorderRadius.sm}px` }} /> : null}
           </Stack>
-          <Stack direction='row' spacing={2} alignItems='center' role='status'>
-            <GreenhouseStatusDot tone={searching ? 'primary' : 'success'} ariaLabel={searching ? GH_KNOWLEDGE_COPY.workbenchSearchStatus : GH_KNOWLEDGE_COPY.workbenchSearchIdle} />
-            <Typography variant='body2' color='text.secondary'>
-              {searching ? GH_KNOWLEDGE_COPY.workbenchSearchStatus : GH_KNOWLEDGE_COPY.workbenchModeHelper}
-            </Typography>
-          </Stack>
-          {searching ? <LinearProgress color='primary' sx={{ borderRadius: `${theme.shape.customBorderRadius.sm}px` }} /> : null}
-        </Stack>
-      </Box>
+        </Box>
+      ) : null}
 
       {browseState === 'error' ? (
         <Alert severity='error' data-capture='knowledge-workbench-error'>
@@ -524,7 +603,83 @@ const KnowledgeCenterView = () => {
         </Alert>
       ) : null}
 
-      <Box
+      {activeMode === 'nexa' ? (
+        <NexaKnowledgeAnswerSurface<KnowledgeLens, KnowledgeProofTab>
+            kind='knowledgeAnswerTrace'
+            question={nexaQuestion}
+            conversationStarted={nexaAsked}
+            draft={nexaDraft}
+            onDraftChange={setNexaDraft}
+            onSubmit={handleNexaSubmit}
+            isThinking={searching || nexaThinking}
+            commandPlaceholder={GH_KNOWLEDGE_COPY.commandPlaceholder}
+            followUpPlaceholder={GH_KNOWLEDGE_COPY.followUpPlaceholder}
+            sendLabel={GH_KNOWLEDGE_COPY.sendQuestion}
+            mode={activeMode}
+            modeOptions={KNOWLEDGE_MODE_OPTIONS}
+            onModeChange={setActiveMode}
+            modeHelper={GH_KNOWLEDGE_COPY.currentModeHelper[activeMode]}
+            modeSelectorAriaLabel={GH_KNOWLEDGE_COPY.aria.modeSelector}
+            showModeSelector={false}
+            traceSteps={lensEvidence?.traceSteps ?? []}
+            responseTitle={GH_KNOWLEDGE_COPY.responseTitle}
+            assistantName={GH_KNOWLEDGE_COPY.assistantName}
+            responseThinkingLabel={GH_KNOWLEDGE_COPY.responseThinkingLabel}
+            responseModeLabel={`Modo ${GH_KNOWLEDGE_COPY.mode.nexa}`}
+            answerIntro={
+              lensEvidence?.sources.length
+                ? `Encontré ${lensEvidence.sources.length} fuente${lensEvidence.sources.length === 1 ? '' : 's'} publicada${lensEvidence.sources.length === 1 ? '' : 's'} para responder sin salir del corpus gobernado.`
+                : 'Pregúntale a Nexa para recuperar fuentes publicadas y revisar la trazabilidad antes de actuar.'
+            }
+            answerSteps={answerSteps}
+            sourcesLabel={GH_KNOWLEDGE_COPY.sourcesLabel}
+            sources={answerSources}
+            warningTitle={GH_KNOWLEDGE_COPY.operationalDataWarning}
+            warningBody={GH_KNOWLEDGE_COPY.operationalDataWarningBody}
+            warningAction={
+              <GreenhouseButton variant='outlined' tone='secondary' size='small' onClick={() => setActiveMode('human')}>
+                {GH_KNOWLEDGE_COPY.consultData}
+              </GreenhouseButton>
+            }
+            responseActions={
+              <Stack
+                direction={{ xs: 'column', sm: 'row' }}
+                spacing={3}
+                flexWrap={{ sm: 'wrap' }}
+                useFlexGap
+                sx={{ '& .MuiButtonBase-root': { inlineSize: { xs: '100%', sm: 'auto' } } }}
+              >
+                <GreenhouseButton variant='outlined' leadingIconClassName='tabler-external-link' href={selectedResult?.document.humanUrl ?? undefined}>
+                  {GH_KNOWLEDGE_COPY.openManual}
+                </GreenhouseButton>
+                <GreenhouseButton variant='outlined' tone='secondary' leadingIconClassName='tabler-bookmark'>
+                  {GH_KNOWLEDGE_COPY.saveGuide}
+                </GreenhouseButton>
+                <GreenhouseButton variant='outlined' tone='secondary' leadingIconClassName='tabler-flag' onClick={() => void handleFeedback('missing_doc')}>
+                  {GH_KNOWLEDGE_COPY.reportGap}
+                </GreenhouseButton>
+              </Stack>
+            }
+            proofTitle={GH_KNOWLEDGE_COPY.proofTitle}
+            proofTab={proofTab}
+            proofTabs={KNOWLEDGE_PROOF_TABS}
+            onProofTabChange={setProofTab}
+            proofTabsAriaLabel={GH_KNOWLEDGE_COPY.aria.proofTabs}
+            proofContent={<KnowledgeProofContent evidence={lensEvidence} activeTab={proofTab} />}
+          />
+      ) : null}
+
+      {activeMode === 'mcp' ? (
+        <McpKnowledgeLens
+          evidence={lensEvidence}
+          selectedResult={selectedResult}
+          panelSx={panelSx}
+          searching={searching}
+        />
+      ) : null}
+
+      {activeMode === 'human' ? (
+        <Box
         sx={{
           display: 'grid',
           gridTemplateColumns: { xs: '1fr', lg: '280px minmax(0, 1fr) 360px' },
@@ -759,20 +914,234 @@ const KnowledgeCenterView = () => {
             </MotionBox>
           </AnimatePresence>
         </Box>
-      </Box>
+        </Box>
+      ) : null}
       </Stack>
     </>
   )
 }
 
-const ModePill = ({ label, active = false, helper }: { label: string; active?: boolean; helper?: string }) => {
+const KnowledgeLensSwitcher = ({
+  activeMode,
+  onModeChange
+}: {
+  activeMode: KnowledgeLens
+  onModeChange: (mode: KnowledgeLens) => void
+}) => {
+  const theme = useTheme()
+
+  return (
+    <Box
+      data-capture='knowledge-lens-switcher'
+      sx={{
+        border: `1px solid ${alpha(theme.palette.text.primary, 0.1)}`,
+        borderRadius: `${theme.shape.customBorderRadius.md}px`,
+        bgcolor: 'background.paper',
+        px: { xs: 3, md: 4 },
+        py: 3
+      }}
+    >
+      <Stack direction={{ xs: 'column', md: 'row' }} spacing={3} alignItems={{ xs: 'stretch', md: 'center' }} justifyContent='space-between'>
+        <Stack spacing={0.5}>
+          <Typography variant='subtitle2'>{GH_KNOWLEDGE_COPY.lensSwitcherTitle}</Typography>
+          <Typography variant='body2' color='text.secondary'>
+            {GH_KNOWLEDGE_COPY.lensSwitcherBody}
+          </Typography>
+        </Stack>
+        <Stack direction='row' spacing={1} role='tablist' aria-label={GH_KNOWLEDGE_COPY.aria.modeSelector}>
+          {KNOWLEDGE_MODE_OPTIONS.map(option => (
+            <ModePill
+              key={option.value}
+              label={option.label}
+              active={activeMode === option.value}
+              onSelect={() => onModeChange(option.value)}
+            />
+          ))}
+        </Stack>
+      </Stack>
+    </Box>
+  )
+}
+
+const KnowledgeProofContent = ({
+  evidence,
+  activeTab
+}: {
+  evidence: ConversationalEvidencePacket | null
+  activeTab: KnowledgeProofTab
+}) => {
+  const theme = useTheme()
+
+  if (!evidence) {
+    return (
+      <EmptyState
+        icon='tabler-file-search'
+        title={GH_KNOWLEDGE_COPY.mcpLensEmptyTitle}
+        description={GH_KNOWLEDGE_COPY.mcpLensEmptyBody}
+        minHeight={220}
+      />
+    )
+  }
+
+  if (activeTab === 'packet') {
+    const rows = [
+      { label: 'contractVersion', value: evidence.sourceContractVersion },
+      { label: 'confidence', value: evidence.confidence },
+      { label: 'freshness', value: evidence.freshness },
+      { label: 'sources', value: String(evidence.citedDocumentCount) },
+      { label: 'filtered', value: String(evidence.deniedOrFilteredCount) },
+      { label: 'maxScore', value: evidence.maxScore == null ? 'null' : evidence.maxScore.toFixed(2) }
+    ]
+
+    return (
+      <Stack spacing={2} data-capture='knowledge-proof-packet'>
+        {rows.map(row => (
+          <Stack
+            key={row.label}
+            direction='row'
+            spacing={3}
+            justifyContent='space-between'
+            sx={{ py: 2, borderBlockEnd: `1px solid ${theme.palette.divider}` }}
+          >
+            <Typography variant='caption' color='text.secondary'>{row.label}</Typography>
+            <Typography variant='body2' sx={{ overflowWrap: 'anywhere', textAlign: 'end' }}>{row.value}</Typography>
+          </Stack>
+        ))}
+        <Typography variant='caption' color='text.secondary'>{GH_KNOWLEDGE_COPY.mcpNoMock}</Typography>
+      </Stack>
+    )
+  }
+
+  if (activeTab === 'review') {
+    return (
+      <Stack spacing={2} data-capture='knowledge-proof-review'>
+        <Alert severity={evidence.sources.length ? 'success' : 'warning'} variant='outlined'>
+          {evidence.sources.length
+            ? `Respuesta respaldada por ${evidence.sources.length} fuente${evidence.sources.length === 1 ? '' : 's'} recuperada${evidence.sources.length === 1 ? '' : 's'}.`
+            : 'No encontré fuentes publicadas para esta pregunta.'}
+        </Alert>
+        <Typography variant='body2' color='text.secondary'>
+          Confianza: {evidence.confidence} · Frescura: {evidence.freshness} · Filtrados por política: {evidence.deniedOrFilteredCount}
+        </Typography>
+      </Stack>
+    )
+  }
+
+  return (
+    <NexaEvidencePanel
+      evidence={{
+        ...evidence,
+        traceSteps: activeTab === 'sources' ? evidence.traceSteps : evidence.traceSteps.map(step => ({ ...step, state: step.state }))
+      }}
+      variant='proofPanel'
+      feedbackEnabled={activeTab === 'sources'}
+    />
+  )
+}
+
+const McpKnowledgeLens = ({
+  evidence,
+  selectedResult,
+  panelSx,
+  searching
+}: {
+  evidence: ConversationalEvidencePacket | null
+  selectedResult: WorkbenchResult | null
+  panelSx: Record<string, unknown>
+  searching: boolean
+}) => {
+  const theme = useTheme()
+  const resourceUri = mcpDocumentUri(selectedResult?.document)
+
+  return (
+    <Box sx={panelSx} data-capture='knowledge-mcp-lens'>
+      <Stack spacing={0}>
+        <Stack
+          direction={{ xs: 'column', md: 'row' }}
+          spacing={3}
+          alignItems={{ xs: 'flex-start', md: 'center' }}
+          justifyContent='space-between'
+          sx={{ p: { xs: 4, md: 5 } }}
+        >
+          <Stack spacing={1}>
+            <Typography variant='h5'>{GH_KNOWLEDGE_COPY.mcpLensTitle}</Typography>
+            <Typography variant='body2' color='text.secondary'>{GH_KNOWLEDGE_COPY.mcpLensSubtitle}</Typography>
+          </Stack>
+          <GreenhouseChip size='small' variant='label' tone='success' label='Nexa permitido' />
+        </Stack>
+        <Divider />
+        {searching ? <LinearProgress color='primary' /> : null}
+        <Box sx={{ p: { xs: 4, md: 5 }, display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 4 }}>
+          <Box
+            sx={{
+              border: `1px solid ${theme.palette.divider}`,
+              borderRadius: `${theme.shape.customBorderRadius.sm}px`,
+              p: 4,
+              minInlineSize: 0
+            }}
+          >
+            <Typography variant='h6'>{GH_KNOWLEDGE_COPY.mcpResourceUri}</Typography>
+            <Typography variant='body2' color='primary.main' sx={{ mt: 2, overflowWrap: 'anywhere' }}>
+              {resourceUri}
+            </Typography>
+            <Typography variant='caption' color='text.secondary'>
+              {selectedResult?.document.title ?? GH_KNOWLEDGE_COPY.mcpLensEmptyTitle}
+            </Typography>
+          </Box>
+
+          <Box
+            sx={{
+              border: `1px solid ${theme.palette.divider}`,
+              borderRadius: `${theme.shape.customBorderRadius.sm}px`,
+              p: 4,
+              minInlineSize: 0
+            }}
+          >
+            <Stack direction='row' spacing={2} alignItems='center' justifyContent='space-between'>
+              <Typography variant='h6'>{GH_KNOWLEDGE_COPY.mcpEvidencePacket}</Typography>
+              <GreenhouseButton variant='text' size='small' trailingIconClassName='tabler-download'>
+                {GH_KNOWLEDGE_COPY.viewFullPacket}
+              </GreenhouseButton>
+            </Stack>
+            <Typography variant='body2' color='text.secondary' sx={{ mt: 2 }}>
+              {evidence
+                ? `${GH_KNOWLEDGE_COPY.mcpContractVersion}: ${evidence.sourceContractVersion} · ${evidence.sources.length} fuentes · ${evidence.deniedOrFilteredCount} filtrados.`
+                : GH_KNOWLEDGE_COPY.mcpLensEmptyBody}
+            </Typography>
+          </Box>
+        </Box>
+        <Divider />
+        <Box sx={{ px: { xs: 4, md: 5 }, py: 3 }}>
+          {evidence ? (
+            <NexaEvidencePanel evidence={evidence} variant='proofPanel' feedbackEnabled={false} />
+          ) : (
+            <Alert severity='info' variant='outlined'>{GH_KNOWLEDGE_COPY.mcpNoMock}</Alert>
+          )}
+        </Box>
+      </Stack>
+    </Box>
+  )
+}
+
+const ModePill = ({
+  label,
+  active = false,
+  helper,
+  onSelect
+}: {
+  label: string
+  active?: boolean
+  helper?: string
+  onSelect: () => void
+}) => {
   const theme = useTheme()
 
   return (
     <Tooltip title={helper ?? ''} disableHoverListener={!helper}>
-      <Box
+      <ButtonBase
         role='tab'
         aria-selected={active}
+        onClick={onSelect}
         sx={{
           minInlineSize: 96,
           minBlockSize: 44,
@@ -785,11 +1154,12 @@ const ModePill = ({ label, active = false, helper }: { label: string; active?: b
           alignItems: 'center',
           justifyContent: 'center',
           fontWeight: 600,
-          cursor: helper ? 'help' : 'default'
+          cursor: 'pointer',
+          '&:focus-visible': { outline: `2px solid ${theme.palette.primary.main}`, outlineOffset: 2 }
         }}
       >
         {label}
-      </Box>
+      </ButtonBase>
     </Tooltip>
   )
 }
@@ -878,6 +1248,7 @@ const ResultRow = ({
   return (
     <MotionBox
       layout
+      data-capture='knowledge-result-row'
       initial={reducedMotion ? false : { opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       exit={reducedMotion ? { opacity: 0 } : { opacity: 0, y: -8 }}
