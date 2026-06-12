@@ -9,9 +9,10 @@ import type {
   KnowledgeConnectorListItem,
   KnowledgeDocCandidate,
   KnowledgeLoadedDocument,
-  KnowledgeSourceConnector
+  KnowledgeSourceConnector,
+  KnowledgeSourceDescriptor
 } from './connector'
-import { PILOT_CORPUS, type PilotCorpusEntry } from './pilot-corpus'
+import { PILOT_CORPUS, PILOT_REPO_DOCS_SOURCE_NAME, type PilotCorpusEntry } from './pilot-corpus'
 
 const REPO_ROOT = process.cwd()
 
@@ -45,6 +46,14 @@ const fileExists = async (relPath: string): Promise<boolean> => {
  */
 export class RepoDocsKnowledgeConnector implements KnowledgeSourceConnector {
   readonly sourceSystem = 'repo_docs' as const
+
+  readonly sourceDescriptor: KnowledgeSourceDescriptor = {
+    sourceSystem: 'repo_docs',
+    sourceKind: 'markdown_collection',
+    name: PILOT_REPO_DOCS_SOURCE_NAME,
+    ownerDomain: 'platform',
+    audience: 'internal'
+  }
 
   private readonly entries: readonly PilotCorpusEntry[]
 

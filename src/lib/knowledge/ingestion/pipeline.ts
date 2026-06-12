@@ -14,9 +14,12 @@ import {
 } from '../store'
 import { sanitizeKnowledgeContent, type SanitizationFinding } from '../sanitization/detect'
 
-import type { KnowledgeDocCandidate, KnowledgeSourceConnector } from './connector'
+import type {
+  KnowledgeDocCandidate,
+  KnowledgeSourceConnector,
+  KnowledgeSourceDescriptor
+} from './connector'
 import { checksumMarkdown, chunkMarkdown } from './markdown'
-import { PILOT_REPO_DOCS_SOURCE_NAME } from './pilot-corpus'
 import { beginKnowledgeRun, completeKnowledgeRun } from './run-tracking'
 
 export type IngestionDocStatus =
@@ -67,13 +70,13 @@ const candidateToCreateInput = (candidate: KnowledgeDocCandidate, sourceId: stri
   docLayer: candidate.docLayer
 })
 
-const findPilotSourceId = async (): Promise<string | null> => {
+const findSourceId = async (descriptor: KnowledgeSourceDescriptor): Promise<string | null> => {
   const rows = await query<{ source_id: string; [column: string]: unknown }>(
     `SELECT source_id FROM greenhouse_knowledge.knowledge_sources
-     WHERE source_system = 'repo_docs' AND name = $1
+     WHERE source_system = $2 AND name = $1
      ORDER BY created_at ASC
      LIMIT 1`,
-    [PILOT_REPO_DOCS_SOURCE_NAME]
+    [descriptor.name, descriptor.sourceSystem]
   )
 
   return rows[0]?.source_id ?? null
@@ -191,16 +194,17 @@ export const runKnowledgeIngestion = async (options: {
 }): Promise<IngestionRunReport> => {
   const { connector, apply } = options
   const actor = options.actor ?? 'knowledge-ingest-cli'
+  const descriptor = connector.sourceDescriptor
 
-  let sourceId = await findPilotSourceId()
+  let sourceId = await findSourceId(descriptor)
 
   if (apply && !sourceId) {
     const source = await registerKnowledgeSource({
-      sourceSystem: 'repo_docs',
-      sourceKind: 'markdown_collection',
-      name: PILOT_REPO_DOCS_SOURCE_NAME,
-      ownerDomain: 'platform',
-      audience: 'internal',
+      sourceSystem: descriptor.sourceSystem,
+      sourceKind: descriptor.sourceKind,
+      name: descriptor.name,
+      ownerDomain: descriptor.ownerDomain,
+      audience: descriptor.audience,
       publicationPolicy: 'manual_review',
       syncEnabled: true,
       actorUserId: actor

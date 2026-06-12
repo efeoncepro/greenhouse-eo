@@ -15,6 +15,7 @@ import type {
   KnowledgeDocLayer,
   KnowledgeDocumentType,
   KnowledgeSensitivity,
+  KnowledgeSourceKind,
   KnowledgeSourceSystem
 } from '../types'
 
@@ -59,8 +60,24 @@ export type KnowledgeConnectorListItem =
   | { kind: 'available'; candidate: KnowledgeDocCandidate }
   | { kind: 'unavailable'; candidate: KnowledgeDocCandidate; reason: string }
 
+/**
+ * Identidad del source que el connector representa, para registrar/lookup en
+ * `greenhouse_knowledge.knowledge_sources`. El connector es dueño de su identidad
+ * (SSOT) — el pipeline NO la hardcodea (TASK-1088: habilita `notion` además de `repo_docs`).
+ */
+export interface KnowledgeSourceDescriptor {
+  sourceSystem: KnowledgeSourceSystem
+  sourceKind: KnowledgeSourceKind
+  /** Nombre estable del source (clave de lookup + registro). */
+  name: string
+  ownerDomain: string
+  audience: KnowledgeAudience
+}
+
 export interface KnowledgeSourceConnector {
   readonly sourceSystem: KnowledgeSourceSystem
+  /** Identidad del source (SSOT del registro/lookup en knowledge_sources). */
+  readonly sourceDescriptor: KnowledgeSourceDescriptor
   /** Enumera los candidatos del corpus + disponibilidad (no lee contenido). */
   list(): Promise<KnowledgeConnectorListItem[]>
   /** Carga el markdown crudo + provenance de un candidato disponible. */
