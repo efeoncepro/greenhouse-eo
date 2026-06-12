@@ -11,7 +11,7 @@ Codex canonizó la primitive **`NexaComposer`** (Primitive + Variants + Kinds, c
 
 ## Delta 2026-06-12 — TASK-1083 completa: el contrato existe (gap cerrado)
 
-Los 4 contratos que el blueprint de promoción (`TASK-1084-answer-trace-promotion-spec.md`) declaró faltantes ya existen — incluido el **read-detail** que era el gap real:
+Los 4 contratos que el blueprint de promoción (`TASK-1090-answer-trace-promotion-spec.md`) declaró faltantes ya existen — incluido el **read-detail** que era el gap real:
 
 - `GET /api/platform/app/knowledge/documents` (browse/list, access-guarded)
 - `GET /api/platform/app/knowledge/search?mode=human` (packet `knowledge-search.v1`)

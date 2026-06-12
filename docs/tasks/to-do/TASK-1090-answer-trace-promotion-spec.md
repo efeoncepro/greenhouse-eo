@@ -1,5 +1,6 @@
-# TASK-1084 — Answer Trace mockup → runtime: blueprint de promoción
+# TASK-1090 — Answer Trace mockup → runtime: blueprint de promoción
 
+> **Renombrada 2026-06-12:** nació por error con el ID `TASK-1084` (colisión con el `TASK-1084` canónico = Human Knowledge Center MVP, registrado y bloqueado por TASK-1081). Es un **blueprint cross-program** (no un MVP ejecutable): reparte los paneles del mockup `answer-trace` entre TASK-1084 (reader/browse/feedback), TASK-1085 (respuesta + packet) y TASK-1086 (MCP). Conserva el ID 1090.
 > **Tipo:** spec de ejecución (product-design + arquitectura). Companion de `TASK-1084-human-knowledge-center-mvp.md`.
 > **Creado:** 2026-06-11 — synth de skills `arch-architect` + `greenhouse-ux` + `state-design` + `greenhouse-ux-writing`.
 > **Mockup fuente:** `src/app/(dashboard)/knowledge/mockup/answer-trace/` (aprobado, GVC desktop+mobile, `design-qa.md` passed).
