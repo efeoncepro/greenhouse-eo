@@ -1,5 +1,18 @@
 # TASK-1086 — Greenhouse MCP Knowledge Resources V1
 
+## Delta 2026-06-12 — CIERRE (complete; código ya en `origin/develop`)
+
+El "push held" del Delta de implementación quedó **obsoleto**: los commits `c72958575` (Slice 1) + `cebf75bd3` (Slices 2-3) **ya están en `origin/develop`** (entraron en un release posterior; `HEAD == origin/develop`). Cierre documental ejecutado hoy:
+
+- **CLAUDE.md** — invariante dedicado "Knowledge MCP / ecosystem lane invariants (TASK-1086)" (default-DENY scope `internal`, anti-oracle 404, read-only/no-invención, `isDocumentAgenticallyVisible` local en sync con el `WHERE` agéntico, cero subject-builder paralelo).
+- **Deltas de arquitectura** — ya presentes y verificados: `GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1` Delta 2026-06-12 (lane ecosystem de Knowledge) + `GREENHOUSE_KNOWLEDGE_PLATFORM_ARCHITECTURE_V1` Delta 2026-06-12 (Consumo MCP).
+- **Manual de uso** — `docs/manual-de-uso/plataforma/mcp-greenhouse-read-only.md` sección "7. Conocimiento (Knowledge)": 2 tools + resource + reglas (no-invención, scope internal, read-only) + referencia técnica.
+- **Doc funcional** — `docs/documentation/plataforma/knowledge-platform.md` ya cubre MCP (contrato compartido, dos preguntas separadas, feedback).
+- **README + TASK_ID_REGISTRY** — flip `to-do`/`in-progress` → `complete`; path a `complete/`.
+- **Verificación de cierre**: 17 tests focales (ecosystem builder + MCP knowledge/tools) verdes en el WT actual; código sin cambios desde el commit verificado (tsc=0, lint=0, 29 tests + smoke live PG en el Delta de implementación).
+
+**Pendiente operativo (post-deploy, no bloquea complete — patrón 1085/1091/1094)**: smoke MCP **end-to-end** contra staging requiere un binding `sister_platform_consumers` con `greenhouse_scope_type='internal'` (artefacto operador-configurado) + la URL `.vercel.app`. El smoke a nivel builder (PG live) ya está verificado; el transporte HTTP del MCP está cubierto por los 18 tests del `http-client`/`tools`.
+
 ## Delta 2026-06-12 — IMPLEMENTACIÓN (code-complete local, verificada; push held)
 
 Implementadas las 3 slices del plan corregido (commits LOCAL en `develop`; push held por WIP de Codex en el WT — ver abajo). Read-only, scope-gated.
@@ -82,13 +95,13 @@ Implicaciones para esta task:
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `none`
-- Status real: `Diseño — auditada y ajustada 2026-06-12 (crea el lane ecosystem de knowledge primero; subject desde binding default-deny; get_knowledge_citations descartado)`
+- Status real: `Complete 2026-06-12 — code en origin/develop; cierre documental hecho (CLAUDE.md invariant + Deltas arch + manual MCP + README/registry). Pendiente operativo post-deploy: smoke MCP e2e con binding internal en staging.`
 - Rank: `TBD`
 - Domain: `mcp|platform|api|content`
 - Blocked by: `TASK-1083`
