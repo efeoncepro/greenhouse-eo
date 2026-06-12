@@ -42,7 +42,7 @@ Esta task existe para crear Nexa Answers como experiencia propia y consistente, 
 
 - Definir y construir `NexaAnswersSurface` como surface contextual embebida.
 - Garantizar la coreografia visual: idle -> submit -> question bubble -> Nexa identity/thinking -> answer -> trust cue -> composer below -> proof on demand -> compact follow-up.
-- Usar Knowledge como primer consumer real, preservando `/knowledge/mockup/answer-trace` como baseline/lab.
+- Usar Knowledge como primer consumer real porque estamos cerrando esa experiencia y es de bajo riesgo, preservando `/knowledge/mockup/answer-trace` como baseline/lab.
 - Crear fixtures/specimens para Nexa Insight promoted y finance/chart context sin hacer rollout real de esos dominios.
 - Documentar y verificar la experiencia con Design System + GVC.
 
@@ -113,6 +113,9 @@ Reglas obligatorias:
 
 - `src/components/greenhouse/primitives/NexaKnowledgeAnswerSurface.tsx`
 - `src/components/greenhouse/primitives/nexa-knowledge-answer-surface-controller.ts`
+- `src/components/greenhouse/primitives/nexa-answer-bubble/NexaAnswerBubble.tsx`
+- `src/components/greenhouse/primitives/nexa-answer-bubble/nexa-answer-bubble-controller.ts`
+- `src/components/greenhouse/primitives/nexa-answer-bubble/nexa-answer-bubble-types.ts`
 - `src/components/greenhouse/primitives/NexaEvidencePanel.tsx`
 - `src/components/greenhouse/primitives/NexaComposer.tsx`
 - `src/lib/copy/nexa.ts`
@@ -121,6 +124,8 @@ Reglas obligatorias:
 - `src/views/greenhouse/admin/design-system/NexaChatLabView.tsx`
 - `scripts/frontend/scenarios/knowledge-answer-trace.scenario.ts`
 - `scripts/frontend/scenarios/knowledge-lenses.scenario.ts`
+- `scripts/frontend/scenarios/nexa-answers-surface.scenario.ts`
+- `scripts/frontend/scenarios/design-system-nexa-chat.scenario.ts`
 - `docs/architecture/ui-platform/PRIMITIVES.md`
 - `docs/architecture/ui-platform/PATTERNS.md`
 - `docs/architecture/ui-platform/HISTORIAL.md`
@@ -158,13 +163,58 @@ The desired experience is achievable from the current repo, but not by treating 
 - TASK-1096 must not create global history rail, thread navigation or floating chat chrome. Those belong to Nexa Chat.
 - TASK-1096 must not invent `surfaceContext`. It consumes TASK-1095's contract and focuses on choreography, responsive behavior, copy, a11y, specimens and GVC.
 
+### Slice progress — 2026-06-12
+
+Foundation visual slice advanced:
+
+- `NexaAnswersCanvas` is now a canonical primitive under `src/components/greenhouse/primitives/nexa-answers-canvas/`.
+- Initial canvas modes: `renderPlan` and `runtime`. `renderPlan` consumes `nexa-answer-render-plan.v1`; `runtime` can host a headless/assistant-ui slot without forcing the canvas to own the model runtime.
+- Initial canvas variants: `embedded`, `sidecar`, `inline`; initial kinds: `knowledgeEmbedded`, `financeChartEmbedded`, `agencyInsightEmbedded`, `peopleInsightEmbedded`, `commercialInsightEmbedded`, `custom`.
+- Initial canvas states: `idle`, `submitted`, `thinking`, `streaming`, `answered`, `proofOpen`, `followup`, `compacted`, `degraded`, `error`.
+- The canvas owns the UI choreography: idle composer glow, question bubble, Nexa identity/thinking, answer block, proof under demand, composer descent and compact previous turns.
+- The first renderer registry supports `answerBubble` and `compactAnswer`, with allowlist validation from `surfaceContext.allowedRenderers`.
+- `NexaAnswerBubble` is now a canonical primitive under `src/components/greenhouse/primitives/nexa-answer-bubble/`.
+- Initial variants: `explanation`, `chart` and `metricSummary`.
+- Initial kinds: `knowledgeExplanationAnswer`, `knowledgeChartAnswer`, `financeChartAnswer`, `financeMetricSummary`, `commercialMetricSummary`, `agencyMetricSummary`, `peopleMetricSummary`, `surfaceMetricSummary`, `surfaceChartInsight`, `custom`.
+- The chart variant uses a generic chart contract: `series[]`, `trend[]`, `composition[]`, `valueSuffix`.
+- The chart variant renders three Recharts modes: `trend`, `comparison`, `composition`.
+- The metric summary variant uses a compact KPI contract: 2-4 metrics, value, helper, semantic delta and mini trend. It is intended for Finance, Commercial, Agency and Personas when a big chart would overpower the conversational answer.
+- `/knowledge/mockup/nexa-answers` now consumes `NexaAnswerBubble kind='knowledgeChartAnswer'` instead of owning a route-local bubble.
+- `/knowledge/mockup/nexa-answers` now consumes `NexaAnswersCanvas` instead of locally assembling all answer states.
+- `/design-system/nexa-chat` includes `data-capture='nexa-answer-bubble-chart-specimen'`, `data-capture='nexa-answer-bubble-metric-summary-specimen'` and `data-capture='nexa-answers-canvas-specimen'`.
+
+This does **not** complete TASK-1096. Remaining scope still includes production Knowledge consumer integration, promoted Nexa Insight specimen, finance/chart fixture, assistant runtime/adapters from TASK-1095, final copy governance, follow-up compaction in real multi-turn runtime and GVC coverage for the complete surface.
+
 Design implication:
 
 1. Product name: `Nexa Answers`.
 2. Internal unit: `Nexa AnswerTurn`.
 3. Runtime/context substrate: TASK-1095.
-4. First real consumer: Knowledge.
+4. First real consumer: Knowledge, deliberately chosen because it is low risk, read/explain oriented and already being completed.
 5. First real non-Knowledge pilot: follow-up child task after specimens validate the pattern.
+
+### UI-first visual prototype — 2026-06-12
+
+Codex created a high-fidelity visual prototype before backend/runtime wiring:
+
+- Route: `/knowledge/mockup/nexa-answers`
+- View: `src/views/greenhouse/knowledge/mockup/nexa-answers/NexaAnswersExperienceMockupView.tsx`
+- Scenario: `scripts/frontend/scenarios/nexa-answers-surface.scenario.ts`
+- Latest GVC evidence: `.captures/2026-06-12T23-21-09_nexa-answers-surface`
+- Design System evidence: `.captures/2026-06-12T23-19-53_design-system-nexa-chat`
+
+The prototype is intentionally frontend-only and contract-aware. It uses typed fixtures that mirror the desired `surfaceContext`, answer-turn, trust cue and evidence packet shape without calling live Nexa runtime. It proves:
+
+- idle composer without fake answer/proof,
+- question bubble promotion,
+- Nexa identity/thinking,
+- answer-first response,
+- compact trust cue,
+- proof disclosure on demand,
+- follow-up compaction with inherited evidence,
+- Knowledge as the first real low-risk surface.
+
+This visual does not replace `/knowledge/mockup/answer-trace`; that route remains the protected baseline/lab for the existing AnswerSurface.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE

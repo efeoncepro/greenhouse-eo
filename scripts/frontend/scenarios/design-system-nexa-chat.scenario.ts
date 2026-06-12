@@ -57,6 +57,40 @@ export const scenario: CaptureScenario = {
     },
     {
       kind: 'scroll',
+      selector: '[data-capture="nexa-answer-bubble-chart-specimen"]',
+      scrollBlock: 'center'
+    },
+    {
+      kind: 'mark',
+      label: 'nexa-answer-bubble-chart-specimen',
+      clipSelector: '[data-capture="nexa-answer-bubble-chart-specimen"]',
+      note: 'Primitive NexaAnswerBubble con variante chart y Recharts'
+    },
+    {
+      kind: 'scroll',
+      selector: '[data-capture="nexa-answer-bubble-metric-summary-specimen"]',
+      scrollBlock: 'start',
+      scrollY: -128
+    },
+    {
+      kind: 'mark',
+      label: 'nexa-answer-bubble-metric-summary-specimen',
+      clipSelector: '[data-capture="nexa-answer-bubble-metric-summary-specimen"]',
+      note: 'Primitive NexaAnswerBubble con variante metricSummary para lectura ejecutiva de KPIs'
+    },
+    {
+      kind: 'scroll',
+      selector: '[data-capture="nexa-answers-canvas-specimen"]',
+      scrollBlock: 'center'
+    },
+    {
+      kind: 'mark',
+      label: 'nexa-answers-canvas-specimen',
+      clipSelector: '[data-capture="nexa-answers-canvas-specimen"]',
+      note: 'Primitive NexaAnswersCanvas con render plan, proof bajo demanda y composer persistente'
+    },
+    {
+      kind: 'scroll',
       selector: '[data-capture="nexa-knowledge-tool-trace-specimen"]',
       scrollBlock: 'start',
       scrollY: -128

@@ -36,7 +36,7 @@ La raiz del problema no es un pixel de `/knowledge`: es que Greenhouse necesita 
 
 La experiencia objetivo no debe sentirse como otro panel de datos ni como un visor tecnico de retrieval. Debe sentirse como una conversacion competente dentro de Greenhouse: Nexa responde con claridad, entiende la surface desde donde fue invocada, recuerda el contexto inmediato, muestra suficiente confianza para trabajar y deja la maquinaria tecnica disponible solo cuando el usuario la necesita.
 
-Knowledge es el primer consumer serio, no el destino final del patron. La misma base debe poder aparecer junto a un chart financiero, en una vista de Agency, en Personas, en Commercial o dentro de un flujo operacional. En cada caso cambia el contexto, el riesgo y las acciones disponibles; no cambia el contrato conversacional de fondo.
+Knowledge es el primer consumer real de Nexa Answers porque estamos terminando de construir esa experiencia y es la surface de menor riesgo para aprender el patron: lectura/explicacion sobre documentos gobernados, fuentes, citas y freshness, sin writes operacionales. No es el destino final ni el owner conceptual del patron. La misma base debe poder aparecer junto a un chart financiero, en una vista de Agency, en Personas, en Commercial o dentro de un flujo operacional. En cada caso cambia el contexto, el riesgo y las acciones disponibles; no cambia el contrato conversacional de fondo.
 
 En `/knowledge`, el selector comun gobierna la intencion: **Humano | Nexa | MCP**.
 
@@ -111,7 +111,7 @@ Reglas obligatorias:
 
 - No crear otro chat de Nexa. `NexaThread`, `useNexaPersistentRuntime`, `NexaFloatingPanel`, `NexaComposer`, `NexaToolRenderers`, `NexaKnowledgeAnswerSurface` y `NexaEvidencePanel` son la base a converger.
 - No crear `NexaAnswerTurn` paralelo si `NexaKnowledgeAnswerSurface` puede evolucionar por alias, facade, rename gradual o variants/kinds. La decision debe quedar documentada antes de tocar consumers.
-- No acoplar la experiencia conversacional a Knowledge. Knowledge es reference consumer; Finance, charts, Agency, Personas, Commercial y futuros modulos deben poder consumir el mismo contrato mediante context adapters.
+- No acoplar la experiencia conversacional a Knowledge. Knowledge es el primer consumer real por bajo riesgo y porque su experiencia se esta cerrando; Finance, charts, Agency, Personas, Commercial y futuros modulos deben poder consumir el mismo contrato mediante context adapters.
 - Cada consumer debe aportar un `surfaceContext` tipado: surface id, dominio, entidad o metrica actual, rango temporal cuando aplique, capabilities/acciones permitidas, nivel de sensibilidad, estado de datos y provenance disponible.
 - La plataforma conversacional no decide permisos de negocio por UI. Debe recibir capabilities/entitlements ya resueltos o invocar readers/commands canonicos server-side; no debe inferir acceso desde la ruta visible.
 - El idle conversacional aprobado es limpio: composer/empty state, sin respuesta falsa, proof panel ni trace rail prematuro.
@@ -250,7 +250,7 @@ Execution implication:
 
 1. Start with `src/lib/nexa/surface-context.ts` and fixtures before touching product consumers.
 2. Keep Knowledge as the reference consumer but do not let Knowledge fields leak into the generic contract.
-3. Keep the first real non-Knowledge rollout out of TASK-1095. Use fixtures/specimens only; open a child pilot after TASK-1096.
+3. Keep Knowledge as the first real low-risk rollout surface, but keep the first real non-Knowledge rollout out of TASK-1095. Use fixtures/specimens only; open a child pilot after TASK-1096.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -277,7 +277,7 @@ Execution implication:
   - `surfaceContext` schema and invariants,
   - AI experience moment map: direct conversational consumers, conversationally promotable moments and technical/MCP moments,
   - pre-implementation checklist from `GREENHOUSE_CONVERSATIONAL_EXPERIENCE_PLATFORM_V2.md`,
-  - recommended delivery boundary: platform + Knowledge reference + non-Knowledge fixtures now; real non-Knowledge pilot as child follow-up,
+  - recommended delivery boundary: platform + Knowledge first real low-risk consumer + non-Knowledge fixtures now; real non-Knowledge pilot as child follow-up,
   - consumer adapter lifecycle,
   - access/capability boundary,
   - redaction/sensitivity model,
@@ -377,7 +377,7 @@ Execution implication:
 
 - Do not build the full sidecar lane C; `TASK-1079` owns the interaction mode preference and lane implementation.
 - Do not implement full conversational features in Finance, Agency, Personas or Commercial as product rollout in this task. This task defines the shared contract and representative fixtures/specimens so those domains can adopt it without re-architecture.
-- Default follow-up recommendation: create a child task for finance/chart insight explanation as the first real non-Knowledge consumer. Agency account health is the alternate if product prioritizes operational next-best-action.
+- Default follow-up recommendation: create a child task for finance/chart insight explanation as the first real non-Knowledge consumer. Knowledge remains the first real consumer because it is low risk and already under active experience completion. Agency account health is the alternate if product prioritizes operational next-best-action.
 - Do not replace Nexa Insights list/detail/block UX with chat. V2 only defines the escalation contract from an insight into conversation.
 - Do not implement token-by-token streaming; document it as a follow-up unless it already exists in `assistant-ui` without broad refactor.
 - Do not activate production `NEXA_KNOWLEDGE_RETRIEVAL_ENABLED`; `TASK-1092` owns production readiness.
@@ -591,7 +591,7 @@ Follow-up turns must carry prior conversational context and provenance reference
 - [ ] The ADR explicitly rejects domain-local chat forks and Knowledge-only coupling, and defines the runtime contract for `surfaceContext`, answer-turn, provenance/trust cues and access boundaries.
 - [ ] The architecture maps AI experience moments: Nexa Chat as direct shell consumer, Nexa Insights as conversationally promotable advisory surface, Knowledge as reference embedded consumer, charts/domain summaries as contextual consumers and MCP as technical lane.
 - [ ] The architecture pre-implementation checklist is resolved or explicitly deferred: first child pilot, `surfaceContext` home, answer-turn naming, AI moments registry, trust cue copy, sensitivity tiers, observability, autonomy boundary, context persistence, Nexa Insights promotion and GVC specimens.
-- [ ] TASK-1095 scope remains platform + Knowledge reference + non-Knowledge fixtures/specimens; first real non-Knowledge rollout is documented as child follow-up, defaulting to finance/chart insight explanation.
+- [ ] TASK-1095 scope remains platform + Knowledge as first real low-risk consumer + non-Knowledge fixtures/specimens; first real non-Knowledge rollout is documented as child follow-up, defaulting to finance/chart insight explanation.
 - [ ] A canonical conversational state contract exists and is consumed or referenced by the relevant Nexa/Knowledge/domain surfaces.
 - [ ] A multi-surface `surfaceContext` / consumer adapter contract exists and can represent Nexa Chat, Nexa Insight promotion, Knowledge, finance/chart insight and at least one operational domain without Knowledge-specific fields.
 - [ ] Surface context carries safe refs, capabilities, data reality, sensitivity and provenance refs; it does not serialize raw private records or infer authorization from UI route/role.

@@ -1,13 +1,64 @@
 # Release 2026-06-10 #2 — develop→main `6c649b2a6` RELEASED
 
+## Sesion 2026-06-12 — NexaAnswerBubble metricSummary (Codex)
+
+- **Qué quedó:** `NexaAnswerBubble` suma variante oficial `metricSummary` para lectura ejecutiva compacta de KPIs. Kinds iniciales: `financeMetricSummary`, `commercialMetricSummary`, `agencyMetricSummary`, `peopleMetricSummary`, `surfaceMetricSummary`.
+- **Contrato:** `NexaAnswerMetricSummarySpec` modela `title`, `helper`, `interpretation` y hasta 4 métricas con `value`, `helper`, `deltaLabel`, `deltaTone` y mini trend. El `NexaAnswersCanvas` puede pasar `metricSummary` dentro de un block `answerBubble`.
+- **Design System:** `/design-system/nexa-chat` suma specimen `nexa-answer-bubble-metric-summary-specimen`; scenario actualizado para capturarlo.
+- **Verificación parcial:** ESLint focal y `pnpm exec tsc --noEmit --pretty false` verdes. GVC `design-system-nexa-chat` verde en `.captures/2026-06-12T23-51-06_design-system-nexa-chat`; desktop revisado bien. Mobile usable, con ajuste de scenario posterior para evitar overlay del header sticky en la captura.
+- **Pendiente inmediato:** relanzar GVC tras el ajuste de offset del scenario y correr gates finales (`ops:lint --changed`, `docs:closure-check`, `git diff --check`) antes de commit.
+
+## Sesion 2026-06-12 — NexaAnswersCanvas transversal (Codex)
+
+- **Qué quedó:** `NexaAnswersCanvas` nace como primitive transversal en `src/components/greenhouse/primitives/nexa-answers-canvas/`, exportada desde el barrel público. Modes: `renderPlan` y `runtime`; variants: `embedded`, `sidecar`, `inline`; kinds: `knowledgeEmbedded`, `financeChartEmbedded`, `agencyInsightEmbedded`, `peopleInsightEmbedded`, `commercialInsightEmbedded`, `custom`.
+- **Contrato UI:** el canvas consume `NexaAnswersSurfaceContext` (domain, placement, dataReality, sensitivity, `allowedRenderers`, `allowedActions`) y `NexaAnswersRenderPlan` (`nexa-answer-render-plan.v1`). Valida que el plan no pida renderers fuera de la allowlist. Registry inicial: `answerBubble` y `compactAnswer`.
+- **Coreografía centralizada:** idle composer glow → pregunta-burbuja → identidad Nexa/thinking → bloque de respuesta → proof bajo demanda → composer descendido → follow-up/turnos compactados. El modo `runtime` deja slot para assistant-ui/headless runtime sin pelear con Tailwind/CSS/MUI del canvas.
+- **Consumers/specimens:** `/knowledge/mockup/nexa-answers` ahora consume `NexaAnswersCanvas` en vez de ensamblar estados localmente. `/design-system/nexa-chat` suma specimen `nexa-answers-canvas-specimen`; el scenario `design-system-nexa-chat` lo captura.
+- **Docs:** `ui-platform/PRIMITIVES.md`, `HISTORIAL.md`, ADR `GREENHOUSE_CONVERSATIONAL_EXPERIENCE_PLATFORM_DECISION_V1`, arquitectura `GREENHOUSE_CONVERSATIONAL_EXPERIENCE_PLATFORM_V2`, `TASK-1096`, `changelog.md` y este handoff sincronizados.
+- **Verificación:** ESLint focal verde; `pnpm exec tsc --noEmit --pretty false` verde; GVC verde `.captures/2026-06-12T23-21-09_nexa-answers-surface` y `.captures/2026-06-12T23-19-53_design-system-nexa-chat`. Frames revisados: laptop/mobile mantienen composer visible, charts sin clipping y proof bajo demanda.
+- **Pendiente:** esto NO completa TASK-1096 ni reemplaza TASK-1095. Faltan adapters/runtime server-side, integración productiva de `/knowledge`, fixture promoted Nexa Insight, fixture finance/chart no-Knowledge, observabilidad/evals y contrato final de acciones/capabilities.
+- **Coordinación WT compartido:** no tocar `.playwright-mcp/`. Stagear solo archivos propios de TASK-1096 si se commitea.
+
+## Sesion 2026-06-12 — TASK-1098 GVC explore mode + scenario promotion (Claude)
+
+- **Qué quedó:** cierra el loop observe→author→determinismo sobre GVC (follow-up de TASK-1097). `pnpm fe:capture:explore --route=X` (`scripts/frontend/explore.ts` + `lib/explore.ts`) observa la página viva (read-only) → `.captures/_explore/<slug>/{session.json,aria.txt,snapshot.png}` con candidatos `getByRole(...)` + uniqueness validada + markers + `--probe`. `pnpm fe:capture:promote --route=X --name=<n>` (`promote.ts` + `lib/promote.ts`) cristaliza la sesión en un `.scenario.ts` válido (gate `validateScenario`, readiness auto, marks). Scripts wired en `package.json`. Reusa env/auth/bypass/browser de GVC. Cero code-as-action en runtime; output gobernado/determinístico.
+- **Microinteracciones/coreografía:** fuera de scope V1 — promote emite baseline estático de `mark`s; coreografía sigue con el step `interaction` (V2) / `fe:capture:micro`. (Respuesta a la pregunta del operador.)
+- **Verificación:** 16 tests focales (`lib/explore-promote.test.ts`) + tsc 0 + lint 0 + **e2e real**: `explore /coming-soon` → candidatos+probe → `promote` (scenario válido, readiness de heading único) → `fe:capture` OK 1 frame. Throwaway scenario borrado.
+- **Docs:** TASK-1098 → complete; skill `greenhouse-gvc-playwright` (roadmap→shipped + comandos), helper doc V1.8, DSL README, registry/README/changelog sincronizados.
+- **Coordinación WT compartido:** commit selectivo (explore/promote + lib + tests + skill + tasks + helper doc + DSL README + registry/README/changelog + package.json). Handoff **NO** en mi `git add` (Codex tiene WIP). `.playwright-mcp/` + WIP 1095/1096 sin tocar. Sin push.
+
+## Sesion 2026-06-12 — TASK-1097 GVC aria-observation + skill greenhouse-gvc-playwright (Claude)
+
+- **Qué quedó:** GVC fortalecido para reducir la fricción de Claude/Codex con Playwright (autorar a ciegas). **Capa 1** (`recorder.ts` + `manifest.ts`): cada `mark` escribe `frames/<NN>-<label>.aria.txt` (árbol de accesibilidad de la región) + `manifest.frames[].ariaSnapshotPath`. El agente lee el a11y tree y escribe `getByRole(...)` en vez de adivinar el selector. **Skill** `greenhouse-gvc-playwright` (.claude + .codex mirror): técnicas destiladas de `microsoft/webwright` (`local_browser.py`) + gotchas GVC (sidebar fixed clip, readiness anti-Turbopack, agent-auth, mutating safety). Aditivo (schemaVersion 1, best-effort/graceful degrade → nunca rompe un mark).
+- **Verificación:** tests GVC lib 30 verdes + standalone (PW 1.59 `ariaSnapshot`) + **e2e real** `fe:capture coming-soon --env=local` → `ariaSnapshotPath` poblado + `.aria.txt` con el árbol real de `/coming-soon` (desktop+mobile). `.captures/` es gitignored.
+- **Tasks:** TASK-1097 (complete, shipped) + TASK-1098 (to-do, roadmap Capa 2/3 = explore mode `fe:capture --explore` + `promote` exploración→scenario). Registry/README/changelog/helper-doc V1.7/DSL README sincronizados.
+- **Origen:** investigación de `microsoft/webwright` a pedido del operador. Tomamos las **técnicas** (aria-observation, user-facing locators, layered timeouts, graceful degrade), NO el code-as-action en runtime (GVC se queda determinístico/gobernado — Full API Parity + tenant safety).
+- **Coordinación WT compartido:** commit selectivo de mis archivos (lib GVC, skill, tasks 1097/1098, helper doc, DSL README, registry/README/changelog limpios tras el commit de Codex `11c64db0d`). Handoff **NO** incluido en mi `git add` (Codex tiene 1 línea WIP acá). `.playwright-mcp/` (logs) sin tocar. Sin push.
+
 ## Sesion 2026-06-12 — TASK-1095/TASK-1096 Conversational Experience discovery documentado (Codex)
 
 - **Scope:** discovery profundo/documental solamente. No se implementó runtime ni UI nueva. El objetivo fue explicitar qué falta para lograr el deseable de **Nexa Answers** sobre la base actual de Knowledge/AnswerSurface/Nexa Chat.
 - **Estado git:** ejecución en `develop` por instrucción del operador. `TASK-1095` hook OK con override `--develop`; `TASK-1096` hook queda bloqueado por `TASK-1095`, como corresponde. Worktree compartido: no tocar `.playwright-mcp/`.
 - **Docs actualizados:** arquitectura propuesta `GREENHOUSE_CONVERSATIONAL_EXPERIENCE_PLATFORM_V2`, task `TASK-1095`, task `TASK-1096`, UI platform `PATTERNS`/`HISTORIAL`, ADR/index/registry ya preparados.
 - **Hallazgo central:** hoy existe una buena seed visual (`NexaKnowledgeAnswerSurface`) y runtime persistente de Nexa Chat (`useNexaPersistentRuntime` + `/api/home/nexa`), pero no existe todavía plataforma multi-surface: falta `surfaceContext`, adapters, compact trust cue, provenance genérica, promoción formal de Nexa Insights y runtime contextual embebido.
-- **Boundary recomendado:** `TASK-1095` funda el sistema nervioso (`surfaceContext`, adapters, provenance/trust/proof, observability); `TASK-1096` construye la experiencia sentida (`Nexa Answers`, choreografía, proof-on-demand, specimens/GVC). Primer piloto real no-Knowledge debe ser child follow-up; recomendado finance/chart explanation.
+- **Boundary recomendado:** `TASK-1095` funda el sistema nervioso (`surfaceContext`, adapters, provenance/trust/proof, observability); `TASK-1096` construye la experiencia sentida (`Nexa Answers`, choreografía, proof-on-demand, specimens/GVC). Knowledge es el primer consumer real porque estamos cerrando esa experiencia y es de bajo riesgo; el primer piloto real no-Knowledge debe ser child follow-up, recomendado finance/chart explanation.
 - **Pendiente:** si se ejecuta 1095, mover task a `in-progress` siguiendo el hook y documentar la excepción de rama si se mantiene `develop`. No iniciar 1096 hasta resolver/aceptar el soporte de 1095.
+
+## Sesion 2026-06-12 — Nexa Answers visual prototype UI-first (Codex)
+
+- **Qué quedó:** nueva visual/lab navegable en `/knowledge/mockup/nexa-answers`, sin tocar el baseline protegido `/knowledge/mockup/answer-trace`. Es frontend-only y contract-aware: fixtures de `surfaceContext`, answer-turn, trust cue y `nexa-evidence.v1`.
+- **Experiencia prototipada:** idle limpio → pregunta burbuja → Nexa identity/thinking → respuesta answer-first → trust cue compacto → proof bajo demanda → follow-up compactado con evidencia heredada.
+- **Archivos propios:** `src/app/(dashboard)/knowledge/mockup/nexa-answers/page.tsx`, `src/views/greenhouse/knowledge/mockup/nexa-answers/NexaAnswersExperienceMockupView.tsx`, `scripts/frontend/scenarios/nexa-answers-surface.scenario.ts`, update en `TASK-1096`.
+- **GVC:** `.captures/2026-06-12T21-42-06_nexa-answers-surface` desktop/mobile, 10 frames. Revisado manualmente: rail contractual en desktop, mobile sin clipping, FAB global oculto en esta ruta-lab para no competir con la surface embebida.
+- **Verificación:** ESLint focal y `pnpm exec tsc --noEmit --pretty false` verdes. No hay backend/runtime wiring todavía.
+
+## Sesion 2026-06-12 — NexaAnswerBubble canonizada + variante chart (Codex)
+
+- **Qué quedó:** `NexaAnswerBubble` deja de ser local del mockup y nace como primitive en `src/components/greenhouse/primitives/nexa-answer-bubble/`, exportada desde el barrel público. Variants iniciales: `explanation` y `chart`; kinds iniciales: `knowledgeExplanationAnswer`, `knowledgeChartAnswer`, `financeChartAnswer`, `surfaceChartInsight`, `custom`.
+- **Chart variant:** contrato genérico `series[]`/`trend[]`/`composition[]`/`valueSuffix` para no hardcodear ICO en la primitive. Soporta Recharts en modos `trend`, `comparison`, `composition`; trust/proof queda compacto para mantener visible el composer glow.
+- **Consumers/specimens:** `/knowledge/mockup/nexa-answers` consume `NexaAnswerBubble kind='knowledgeChartAnswer'`. `/design-system/nexa-chat` suma specimen `nexa-answer-bubble-chart-specimen`; scenario `design-system-nexa-chat` lo captura explícitamente.
+- **Docs:** `docs/architecture/ui-platform/PRIMITIVES.md`, `HISTORIAL.md`, `changelog.md` y `TASK-1096` sincronizados. No se mueve TASK-1096 a complete; esto es un slice visual/foundation dentro de la task.
+- **Verificación:** ESLint focal verde, `pnpm exec tsc --noEmit --pretty false` verde, `pnpm ops:lint --changed` verde, `git diff --check` verde. GVC verde: `.captures/2026-06-12T22-59-33_nexa-answers-surface` y `.captures/2026-06-12T23-01-05_design-system-nexa-chat`; revisados manualmente laptop/mobile, sin clipping de charts ni choque `0 pts`/`Abr`.
 
 ## Sesion 2026-06-12 — TASK-1086 CIERRE a complete (MCP Knowledge Resources) (Claude)
 

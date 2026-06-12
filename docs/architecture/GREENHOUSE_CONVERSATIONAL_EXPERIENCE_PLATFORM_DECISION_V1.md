@@ -34,7 +34,7 @@ The architecture is still reversible before runtime adoption. Once multiple doma
 
 Medium-high.
 
-The decision aligns with existing Greenhouse architecture: Nexa as grounded assistant, API parity, primitive + variants + kinds, Adaptive Sidecar, MCP as technical lane and server-side authorization. Confidence should become high after the first non-Knowledge pilot validates `surfaceContext`.
+The decision aligns with existing Greenhouse architecture: Nexa as grounded assistant, API parity, primitive + variants + kinds, Adaptive Sidecar, MCP as technical lane and server-side authorization. Knowledge is the first real low-risk consumer, and confidence should become high after the first non-Knowledge pilot validates `surfaceContext` outside document retrieval.
 
 ## Validated As Of
 
@@ -91,7 +91,7 @@ Greenhouse will treat Nexa Conversational Experience V2 as a multi-surface platf
 6. Authorization remains server-side. Surface adapters may receive resolved capabilities and safe refs; they may not infer permissions from route, role label or visible UI.
 7. AI moments that are not chat, especially Nexa Insights, may remain compact/advisory but must be conversationally promotable through `surfaceContext` when the user wants to ask follow-up questions.
 
-Knowledge is the first reference consumer. It is not the owner of the platform.
+Knowledge is the first real surface/consumer because Greenhouse is finishing that experience now and it is a low-risk read/explain domain with governed documents, citations and freshness. It is not the owner of the platform.
 Nexa Chat is the primary shell consumer. Nexa Insights is a sibling AI moment that escalates into the platform when useful.
 
 ## Alternatives Considered
@@ -184,7 +184,7 @@ TASK-1096 should deliver the Nexa Answers product/UI layer:
 - Knowledge reference consumer,
 - non-Knowledge fixtures/specimens for promoted insight and finance/chart contexts.
 
-Neither TASK-1095 nor TASK-1096 should ship the first real non-Knowledge product rollout. That belongs in a child follow-up task once the foundation and surface experience are accepted.
+Neither TASK-1095 nor TASK-1096 should ship the first real non-Knowledge product rollout. Knowledge is the first real consumer; the first cross-domain/non-Knowledge rollout belongs in a child follow-up task once the foundation and surface experience are accepted.
 
 Recommended child pilot:
 
@@ -194,6 +194,7 @@ Recommended child pilot:
 ### Required runtime concepts
 
 - `surfaceContext` typed contract
+- `NexaAnswersCanvas` as the canonical UI canvas for embedded answer render plans
 - consumer adapters
 - AI moment promotion contract for Nexa Insights and similar surfaces
 - canonical conversational state machine
@@ -210,6 +211,8 @@ Recommended child pilot:
 - `NexaFloatingPanel`
 - `NexaComposer`
 - `NexaKnowledgeAnswerSurface`
+- `NexaAnswersCanvas`
+- `NexaAnswerBubble`
 - `NexaEvidencePanel`
 - `ConversationalEvidencePacket`
 - `NexaToolRenderers`

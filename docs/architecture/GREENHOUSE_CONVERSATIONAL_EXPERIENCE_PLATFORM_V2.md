@@ -25,7 +25,7 @@ The platform must be consumable by:
 - Home / floating Nexa
 - future sidecars, MCP resources and operational inspectors
 
-Knowledge is the first serious reference consumer. It is not the owner of the pattern.
+Knowledge is the first real surface/consumer for Nexa Answers because Greenhouse is already finishing its conversational experience and the domain is comparatively low risk: read/explain over governed documents, sources and freshness, without operational writes. It is not the owner of the pattern.
 
 The broader product rule:
 
@@ -392,7 +392,7 @@ Evals should include:
 - Preserve `/knowledge/mockup/answer-trace` as lab/baseline.
 - Keep Humano and MCP as distinct lenses.
 
-### Phase D: First non-Knowledge pilot
+### Phase D: First cross-domain pilot after Knowledge
 
 - Pick one small consumer after V2 lands.
 - Default recommendation: finance/chart insight explanation because it tests metric context, time range, provenance and degraded drilldown without HR/payroll sensitivity.
@@ -405,8 +405,9 @@ Before runtime work starts, TASK-1095 must resolve or explicitly defer these ite
 
 | Topic | Decision needed | Recommended stance |
 | --- | --- | --- |
-| Delivery boundary | What does TASK-1095 ship? | Platform foundation + support contracts. TASK-1096 owns the Nexa Answers product/UI choreography. First real non-Knowledge product rollout becomes child follow-up. |
-| First child pilot | Which non-Knowledge surface validates the platform in product? | Default: finance/chart insight explanation. Alternative: Agency account health. |
+| Delivery boundary | What does TASK-1095 ship? | Platform foundation + support contracts. TASK-1096 owns the Nexa Answers product/UI choreography. Knowledge is the first real low-risk surface because its experience is already being finished; the first non-Knowledge product rollout becomes a child follow-up. |
+| First surface | Why Knowledge first? | It is low risk, read/explain oriented, already has governed documents, citations, freshness, a protected mockup/baseline and GVC coverage. It validates the experience without making the platform Knowledge-owned. |
+| First cross-domain child pilot | Which non-Knowledge surface validates generality in product? | Default: finance/chart insight explanation. Alternative: Agency account health. |
 | `surfaceContext` home | Where does the type live? | Start in `src/lib/nexa/surface-context.ts`; keep naming generic enough to move later if an AI Experience package emerges. |
 | Answer surface naming | Facade or rename? | TASK-1096 should define `NexaAnswersSurface` as the embedded contextual surface. Internally it may use an answer-turn facade over `NexaKnowledgeAnswerSurface`; defer mechanical rename if risky. |
 | AI moments registry | How are Nexa Chat, Insights, Knowledge, digests, summaries and MCP mapped? | Create a minimal registry/view-model during Slice 2; do not make every AI moment conversational by default. |
@@ -422,11 +423,13 @@ Before runtime work starts, TASK-1095 must resolve or explicitly defer these ite
 
 TASK-1095 should not attempt to ship the first real non-Knowledge product rollout. That would mix platform foundation with domain-specific product QA.
 
+Knowledge is the first real rollout surface for Nexa Answers because it is the right low-risk place to finish the conversational experience: it is grounded in documents, can prove trust/proof behavior, and does not execute business actions. That does not make the platform Knowledge-owned.
+
 Recommended split:
 
 1. TASK-1095 ships the platform contract, architecture/ADR, `surfaceContext`, AI moments map, provenance/trust cue layers and support primitives.
-2. TASK-1096 ships the Nexa Answers product/UI contract: embedded contextual surface, choreography, Knowledge reference consumer and representative fixtures/specimens for non-Knowledge domains.
-3. A later child follow-up task ships the first real non-Knowledge pilot. Default candidate: finance/chart insight explanation. It should be read/explain/suggest only.
+2. TASK-1096 ships the Nexa Answers product/UI contract and uses Knowledge as the first real low-risk consumer while preserving `/knowledge/mockup/answer-trace` as baseline/lab.
+3. A later child follow-up task ships the first real cross-domain/non-Knowledge pilot. Default candidate: finance/chart insight explanation. It should be read/explain/suggest only.
 
 ## 19. What this reveals is missing
 
@@ -440,7 +443,7 @@ Recommended split:
 - Non-Knowledge sample fixtures do not exist.
 - Confidence semantics are not separated enough for finance/person/commercial risk.
 - Observability for proof expansion, trust cue state and surface-specific degraded modes is not yet formalized.
-- The first non-Knowledge pilot is not selected.
+- The first real surface is Knowledge by product decision: low-risk, already in progress and useful for finishing the experience. The first non-Knowledge pilot remains a follow-up validation of generality; finance/chart is the default recommendation unless product selects Agency account health.
 
 ## 20. Deep discovery snapshot — 2026-06-12
 
@@ -470,11 +473,25 @@ This discovery was performed against the local repo on `develop` after TASK-1090
 
 TASK-1095 must create the platform substrate first: typed `surfaceContext`, adapters, state/answer-turn contract, trust/proof/provenance layering, observability/evals and compatibility with current Knowledge.
 
-TASK-1096 must then create the product/UI experience: `Nexa Answers` as an embedded contextual surface, the exact choreography, proof-on-demand, compact follow-ups, Design System specimens and GVC coverage.
+TASK-1096 must then create the product/UI experience: `Nexa Answers` as an embedded contextual surface, the exact choreography, proof-on-demand, compact follow-ups, Design System specimens and GVC coverage. Its first real consumer is Knowledge because that surface is already being completed and has the safest evidence model for learning the pattern.
 
 The first real non-Knowledge rollout should remain a child follow-up. The recommended pilot is still finance/chart explanation because it validates metric context, period, calculation provenance and degraded drilldown without starting in a higher-sensitivity HR/payroll surface.
 
-## 21. Revisit triggers
+## 21. Implementation slice — NexaAnswersCanvas V1 (2026-06-12)
+
+TASK-1096 now has an executable UI/platform primitive for the desired surface choreography:
+
+- `NexaAnswersCanvas` lives in `src/components/greenhouse/primitives/nexa-answers-canvas/`.
+- It is a canvas, not a backend runtime. It can consume a typed `nexa-answer-render-plan.v1` or host a headless/runtime slot through `mode='runtime'`.
+- Its local `NexaAnswersSurfaceContext` is the first executable shape for the broader `surfaceContext` idea: `surfaceId`, `domain`, `placement`, `dataReality`, `sensitivity`, `allowedRenderers` and `allowedActions`.
+- It validates that a render plan only asks for renderers permitted by the host surface.
+- Its first renderer registry supports `answerBubble` and `compactAnswer`, delegating to `NexaAnswerBubble` and `NexaCompactAnswerBubble`.
+- It centralizes the UI choreography: idle composer, question bubble, Nexa identity/thinking, answer block, proof under demand, composer descent and compact previous turns.
+- `/knowledge/mockup/nexa-answers` consumes the canvas as the first low-risk consumer; `/design-system/nexa-chat` has a deterministic specimen.
+
+This does not replace TASK-1095. The broader platform still needs server-side adapters, canonical domain context builders, capability resolution, observability/evals and assistant runtime integration. The canvas is the product/UI contract that those runtime pieces should feed.
+
+## 22. Revisit triggers
 
 Revisit this architecture when:
 
@@ -485,7 +502,7 @@ Revisit this architecture when:
 - model/provider routing changes the answer-turn contract,
 - sidecar lane C becomes the primary assistant placement.
 
-## 22. 12-month self-critique
+## 23. 12-month self-critique
 
 Most likely failure mode: `surfaceContext` becomes a loose bag of optional fields. If so, each domain will smuggle its own semantics into the shared runtime and V2 will become a soft fork.
 
@@ -496,7 +513,7 @@ Mitigation:
 - lint/test rule for raw payload leakage
 - docs that distinguish references from records
 
-## 23. 36-month self-critique
+## 24. 36-month self-critique
 
 Most likely failure mode: the platform accumulates too many UI placements and autonomy tiers without a clearer agent/action governance layer.
 
@@ -506,17 +523,17 @@ Mitigation:
 - keep writes behind commands and capability gates
 - add a V3 ADR before autonomous actions become default
 
-## 23. Cognitive debt risk
+## 25. Cognitive debt risk
 
 The largest cognitive debt risk is naming. If the generic answer-turn continues to be called `NexaKnowledgeAnswerSurface`, future agents will keep treating Knowledge as the owner. V2 should add a facade or rename plan early.
 
-## 24. Lock-in assessment
+## 26. Lock-in assessment
 
 - Low lock-in to a specific visual implementation if the answer-turn facade is introduced.
 - Medium lock-in to assistant-ui runtime because Home/floating already depend on it, but current architecture treats composer/answer-turn as Greenhouse primitives.
 - High product lock-in to `surfaceContext` semantics once adopted across domains; this is why the ADR is required.
 
-## 25. Open questions
+## 27. Open questions
 
 - Should `surfaceContext` live under `src/lib/nexa/` or a broader UI platform context module?
 - What is the first non-Knowledge pilot after Knowledge: finance chart or agency account health?

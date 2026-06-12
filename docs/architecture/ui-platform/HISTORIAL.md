@@ -6,6 +6,40 @@
 
 ---
 
+## Delta 2026-06-12i — NexaAnswerBubble `metricSummary` variant (TASK-1096)
+
+Se extendió `NexaAnswerBubble` con la variante oficial `metricSummary`:
+
+- Propósito: lectura ejecutiva compacta para 2-4 KPIs cuando Nexa necesita decir "qué cambió y cuánto importa" sin abrir un chart grande.
+- Kinds iniciales: `financeMetricSummary`, `commercialMetricSummary`, `agencyMetricSummary`, `peopleMetricSummary`, `surfaceMetricSummary`.
+- Contrato de datos: `NexaAnswerMetricSummarySpec` con `metrics[]`, valor, helper, delta semántico (`success`/`warning`/`error`/`info`/`neutral`) y mini trend por métrica.
+- La variante conserva el mismo contrato de trust/proof/actions que `chart` y `explanation`.
+- El renderer de `NexaAnswersCanvas` puede recibir `metricSummary` en un bloque `answerBubble`, por lo que la variante queda disponible para render plans transversales.
+- El lab `/design-system/nexa-chat` suma specimen `data-capture='nexa-answer-bubble-metric-summary-specimen'`.
+
+## Delta 2026-06-12h — NexaAnswersCanvas transversal (TASK-1096)
+
+Se creó `NexaAnswersCanvas` como primitive transversal para contener la experiencia Nexa Answers sin acoplarla a Knowledge:
+
+- Modos oficiales: `renderPlan` y `runtime`. `renderPlan` consume un plan tipado local (`nexa-answer-render-plan.v1`); `runtime` permite alojar un runtime headless/assistant-ui por slot sin pelear con el canvas visual.
+- Variants iniciales: `embedded`, `sidecar`, `inline`; kinds iniciales: `knowledgeEmbedded`, `financeChartEmbedded`, `agencyInsightEmbedded`, `peopleInsightEmbedded`, `commercialInsightEmbedded`, `custom`.
+- Estados iniciales: `idle`, `submitted`, `thinking`, `streaming`, `answered`, `proofOpen`, `followup`, `compacted`, `degraded`, `error`.
+- El `surfaceContext` del canvas declara domain, placement, data reality, sensitivity, renderers permitidos y acciones permitidas; el canvas valida que el render plan no use renderers fuera de la allowlist.
+- El renderer registry inicial soporta `answerBubble` y `compactAnswer`, delegando en `NexaAnswerBubble` y `NexaCompactAnswerBubble`.
+- El canvas centraliza la coreografía: idle composer glow → pregunta burbuja → identidad Nexa + thinking → answer block → proof bajo demanda → composer descendido → follow-up/turnos compactados.
+- `/knowledge/mockup/nexa-answers` consume el canvas en vez de ensamblar estados localmente; `/design-system/nexa-chat` suma specimen `data-capture='nexa-answers-canvas-specimen'`.
+
+## Delta 2026-06-12g — NexaAnswerBubble primitive + chart variant (TASK-1096)
+
+Se canonizó `NexaAnswerBubble` como primitive reusable de answer-turn para Nexa Answers:
+
+- Variants oficiales iniciales: `explanation` y `chart`.
+- Kinds iniciales: `knowledgeExplanationAnswer`, `knowledgeChartAnswer`, `financeChartAnswer`, `surfaceChartInsight`, `custom`.
+- La variante `chart` es chart-first y compacta: prioriza Recharts con modos `trend` / `comparison` / `composition`, conserva un insight corto, un trust cue compacto y proof bajo demanda para no desplazar el composer conversacional en laptop.
+- El contrato de chart queda genérico (`series[]`, `trend[]`, `composition[]`, `valueSuffix`) para que Knowledge no hardcodee métricas ICO dentro de la primitive y futuras surfaces puedan usar ARR, pipeline, tickets, personas o métricas operativas.
+- `/knowledge/mockup/nexa-answers` deja de ser owner del bubble; ahora consume la primitive desde `@/components/greenhouse/primitives`.
+- El lab `/design-system/nexa-chat` suma specimen `data-capture='nexa-answer-bubble-chart-specimen'`.
+
 ## Delta 2026-06-12f — Conversational Experience V2 discovery (TASK-1095/TASK-1096)
 
 Se documentó el discovery profundo de la experiencia conversacional multi-surface:

@@ -85,6 +85,74 @@ export type {
   NexaKnowledgeAnswerSurfaceVariant,
   NexaKnowledgeAnswerSurfaceVariantConfig
 } from './nexa-knowledge-answer-surface-controller'
+export { default as NexaAnswerBubble, NexaCompactAnswerBubble } from './nexa-answer-bubble/NexaAnswerBubble'
+export type {
+  NexaAnswerAction,
+  NexaAnswerBubbleKind,
+  NexaAnswerBubbleProps,
+  NexaAnswerBubbleVariant,
+  NexaAnswerChartCompositionPoint,
+  NexaAnswerChartMode,
+  NexaAnswerChartSeries,
+  NexaAnswerChartSeriesPoint,
+  NexaAnswerChartSpec,
+  NexaAnswerChartTone,
+  NexaAnswerMetricDeltaTone,
+  NexaAnswerMetricSummaryItem,
+  NexaAnswerMetricSummarySpec,
+  NexaAnswerMetricTrendPoint,
+  NexaAnswerPoint,
+  NexaAnswerTrustCue,
+  NexaCompactAnswerBubbleProps
+} from './nexa-answer-bubble/nexa-answer-bubble-types'
+export {
+  NEXA_ANSWER_BUBBLE_KIND_CONFIG,
+  NEXA_ANSWER_BUBBLE_VARIANT_CONFIG,
+  resolveNexaAnswerBubbleVariant
+} from './nexa-answer-bubble/nexa-answer-bubble-controller'
+export type {
+  NexaAnswerBubbleKindConfig,
+  NexaAnswerBubbleVariantConfig
+} from './nexa-answer-bubble/nexa-answer-bubble-controller'
+export { default as NexaAnswersCanvas } from './nexa-answers-canvas/NexaAnswersCanvas'
+export type {
+  NexaAnswersAction,
+  NexaAnswersActionRiskLevel,
+  NexaAnswersAutonomyTier,
+  NexaAnswersBlockBase,
+  NexaAnswersBubbleBlock,
+  NexaAnswersCanvasCopy,
+  NexaAnswersCanvasDensity,
+  NexaAnswersCanvasKind,
+  NexaAnswersCanvasMode,
+  NexaAnswersCanvasProps,
+  NexaAnswersCanvasSlots,
+  NexaAnswersCanvasState,
+  NexaAnswersCanvasVariant,
+  NexaAnswersCompactAnswerBlock,
+  NexaAnswersIntent,
+  NexaAnswersProofSpec,
+  NexaAnswersRenderBlock,
+  NexaAnswersRendererKind,
+  NexaAnswersRenderPlan,
+  NexaAnswersSurfaceContext
+} from './nexa-answers-canvas/nexa-answers-canvas-types'
+export {
+  assertNexaAnswersRenderPlanAllowed,
+  NEXA_ANSWERS_CANVAS_KIND_CONFIG,
+  NEXA_ANSWERS_CANVAS_VARIANT_CONFIG,
+  resolveNexaAnswersCanvasDensity,
+  resolveNexaAnswersCanvasVariant
+} from './nexa-answers-canvas/nexa-answers-canvas-controller'
+export type {
+  NexaAnswersCanvasKindConfig,
+  NexaAnswersCanvasVariantConfig
+} from './nexa-answers-canvas/nexa-answers-canvas-controller'
+export {
+  NEXA_ANSWERS_RENDERER_REGISTRY,
+  renderNexaAnswersBlock
+} from './nexa-answers-canvas/nexa-answers-canvas-renderers'
+export type { NexaAnswersBlockRenderContext } from './nexa-answers-canvas/nexa-answers-canvas-renderers'
 export { default as GreenhouseNexaAnimatedAskBadge } from './GreenhouseNexaAnimatedAskBadge'
 export type { GreenhouseNexaAnimatedAskBadgeProps } from './GreenhouseNexaAnimatedAskBadge'
 export { default as EfeonceOrbitalLogoMark } from './EfeonceOrbitalLogoMark'

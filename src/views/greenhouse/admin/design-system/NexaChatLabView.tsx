@@ -11,6 +11,8 @@ import { alpha } from '@mui/material/styles'
 import AxisWordmark from '@/components/greenhouse/brand/AxisWordmark'
 import { typographyScale } from '@/components/theme/typography-tokens'
 import {
+  NexaAnswerBubble,
+  NexaAnswersCanvas,
   NexaComposer,
   NexaComposerInput,
   NexaComposerActionButton,
@@ -18,6 +20,16 @@ import {
   NexaKnowledgeAnswerSurface,
   NexaPresenceMark,
   NexaSenderMark
+} from '@/components/greenhouse/primitives'
+import type {
+  NexaAnswerAction,
+  NexaAnswerChartSpec,
+  NexaAnswerMetricSummarySpec,
+  NexaAnswerPoint,
+  NexaAnswerTrustCue,
+  NexaAnswersCanvasCopy,
+  NexaAnswersRenderPlan,
+  NexaAnswersSurfaceContext
 } from '@/components/greenhouse/primitives'
 import { GREENHOUSE_NEXA_BRAND_COLORS } from '@/components/greenhouse/primitives/greenhouse-nexa-brand-controller'
 import type { NexaToolResult } from '@/lib/nexa/nexa-contract'
@@ -85,6 +97,8 @@ const COMPOSED_OF: { name: string; role: string; status: string }[] = [
   { name: 'NexaGlowBorder', role: 'Borde "línea de luz" del composer (dos capas + máscara + beam).', status: 'Primitive canónica ✅' },
   { name: 'NexaComposer', role: 'Input (caja Vuexy anulada → el glow pinta todo) + botón send/stop + glow + disclaimer, como unidad reusable. Partes: NexaComposerInput / NexaComposerActionButton.', status: 'Primitive canónica ✅' },
   { name: 'NexaKnowledgeAnswerSurface', role: 'Superficie de respuesta trazable: pregunta-burbuja + respuesta Nexa + composer descendido + proof panel lateral.', status: 'Composition primitive ✅' },
+  { name: 'NexaAnswersCanvas', role: 'Canvas transversal para render plans: surfaceContext + estados + registry de renderers + composer/proof/choreography.', status: 'Primitive canónica ✅' },
+  { name: 'NexaAnswerBubble', role: 'Bubble answer-turn canónica: variante chart con Recharts trend/comparison/composition y variante explanation para respuesta textual enriquecida.', status: 'Primitive canónica ✅' },
   { name: 'NexaEvidencePanel', role: 'Renderer compartido de evidencia versionada: trace, fuentes, freshness, confidence y feedback desde ConversationalEvidencePacket.', status: 'Primitive canónica ✅' },
   { name: 'NexaPresenceMark', role: 'Header: crossfade "En línea" ↔ "Pensando…" con elipsis animada (reduced-motion horneado).', status: 'Primitive canónica ✅' },
   { name: 'NexaFace', role: 'Avatar cara real de Nexa con variants hero (76) / header (44, borde teal) / message (32). Single source del asset.', status: 'Primitive canónica ✅' },
@@ -160,6 +174,155 @@ const KNOWLEDGE_TOOL_TRACE_SPECIMEN: NexaToolResult = {
       ]
     }
   }
+}
+
+const ANSWER_BUBBLE_POINTS: NexaAnswerPoint[] = [
+  {
+    title: 'Resultado antes que actividad',
+    body: 'Lee primero qué cambió para cliente, equipo u operación; después mira la actividad que lo produjo.'
+  },
+  {
+    title: 'Se interpreta en conjunto',
+    body: 'Contrasta la señal principal con sus señales hermanas para evitar una lectura aislada.'
+  },
+  {
+    title: 'Validación si decide algo sensible',
+    body: 'Si la respuesta sostiene una decisión operativa, abre la base y revisa freshness, citas y gaps.'
+  }
+]
+
+const ANSWER_BUBBLE_TRUST_CUE: NexaAnswerTrustCue = {
+  tone: 'success',
+  label: 'Basado en 3 fuentes actuales',
+  detail: 'confianza alta · 0 filtradas por política'
+}
+
+const ANSWER_BUBBLE_ACTIONS: NexaAnswerAction[] = [
+  { label: 'Abrir guía', iconClassName: 'tabler-book', variant: 'outlined', tone: 'primary' },
+  { label: 'Ver base', iconClassName: 'tabler-database-search', variant: 'text', tone: 'secondary' }
+]
+
+const ANSWER_BUBBLE_CHART_SPEC: NexaAnswerChartSpec = {
+  title: 'Señales operativas',
+  helper: 'Último corte · Agosto',
+  valueSuffix: 'pts',
+  modes: [
+    { mode: 'trend', label: 'Tendencia', ariaLabel: 'Ver tendencia de señales operativas' },
+    { mode: 'comparison', label: 'Comparativo', ariaLabel: 'Ver comparativo de señales operativas' },
+    { mode: 'composition', label: 'Composición', ariaLabel: 'Ver composición de señales operativas' }
+  ],
+  series: [
+    { key: 'primarySignal', label: 'Señal principal', compactLabel: 'Principal', tone: 'primary' },
+    { key: 'supportSignal', label: 'Soporte', compactLabel: 'Soporte', tone: 'secondary' },
+    { key: 'qualitySignal', label: 'Calidad', compactLabel: 'Calidad', tone: 'success' }
+  ],
+  trend: [
+    { label: 'Abr', primarySignal: 61, supportSignal: 68, qualitySignal: 64 },
+    { label: 'May', primarySignal: 66, supportSignal: 70, qualitySignal: 67 },
+    { label: 'Jun', primarySignal: 72, supportSignal: 73, qualitySignal: 71 },
+    { label: 'Jul', primarySignal: 75, supportSignal: 76, qualitySignal: 74 },
+    { label: 'Ago', primarySignal: 81, supportSignal: 78, qualitySignal: 77 }
+  ],
+  composition: [
+    { label: 'Señal principal', value: 43, tone: 'primary' },
+    { label: 'Soporte', value: 31, tone: 'secondary' },
+    { label: 'Calidad', value: 26, tone: 'success' }
+  ]
+}
+
+const ANSWER_BUBBLE_METRIC_SUMMARY_SPEC: NexaAnswerMetricSummarySpec = {
+  title: 'Resumen ejecutivo',
+  helper: 'Corte actual · comparado con el periodo anterior',
+  interpretation: 'La mejora es real, pero todavía depende de sostener margen y bajar el riesgo de conversión.',
+  metrics: [
+    {
+      id: 'revenue',
+      label: 'Revenue',
+      value: '$128k',
+      helper: 'run-rate mensual',
+      deltaLabel: '+12%',
+      deltaTone: 'success',
+      emphasis: true,
+      trend: [
+        { label: 'Abr', value: 91 },
+        { label: 'May', value: 98 },
+        { label: 'Jun', value: 104 },
+        { label: 'Jul', value: 116 },
+        { label: 'Ago', value: 128 }
+      ]
+    },
+    {
+      id: 'margin',
+      label: 'Margen',
+      value: '34%',
+      helper: 'después de delivery',
+      deltaLabel: '+3 pts',
+      deltaTone: 'success',
+      trend: [
+        { label: 'Abr', value: 27 },
+        { label: 'May', value: 29 },
+        { label: 'Jun', value: 31 },
+        { label: 'Jul', value: 32 },
+        { label: 'Ago', value: 34 }
+      ]
+    },
+    {
+      id: 'pipeline',
+      label: 'Pipeline',
+      value: '$420k',
+      helper: 'ponderado',
+      deltaLabel: '-6%',
+      deltaTone: 'warning',
+      trend: [
+        { label: 'Abr', value: 390 },
+        { label: 'May', value: 438 },
+        { label: 'Jun', value: 452 },
+        { label: 'Jul', value: 447 },
+        { label: 'Ago', value: 420 }
+      ]
+    },
+    {
+      id: 'risk',
+      label: 'Riesgo',
+      value: 'Medio',
+      helper: '2 cuentas sensibles',
+      deltaLabel: 'estable',
+      deltaTone: 'info',
+      trend: [
+        { label: 'Abr', value: 42 },
+        { label: 'May', value: 38 },
+        { label: 'Jun', value: 44 },
+        { label: 'Jul', value: 43 },
+        { label: 'Ago', value: 41 }
+      ]
+    }
+  ]
+}
+
+const ANSWERS_CANVAS_SURFACE_CONTEXT: NexaAnswersSurfaceContext = {
+  surfaceId: 'design-system.nexa-answers.canvas',
+  domain: 'knowledge',
+  placement: 'embedded',
+  dataReality: 'synthetic',
+  sensitivity: 'tenant_internal',
+  allowedRenderers: ['answerBubble', 'compactAnswer'],
+  allowedActions: ['read', 'explain', 'drill_down']
+}
+
+const ANSWERS_CANVAS_COPY: NexaAnswersCanvasCopy = {
+  assistantName: 'Nexa',
+  idleTitle: 'Pregúntale a Nexa',
+  idleBody: 'El canvas recibe el contexto de la surface y renderiza la respuesta sin pelear con el shell conversacional.',
+  idlePlaceholder: 'Pregúntale a Nexa',
+  followUpPlaceholder: 'Continúa con Nexa',
+  submitLabel: 'Preguntar',
+  followUpLabel: 'Enviar follow-up',
+  thinkingLabel: 'Nexa está preparando la respuesta.',
+  readyLabel: 'Respuesta lista',
+  degradedTitle: 'Respuesta parcial',
+  degradedBody: 'La evidencia no alcanza para una decisión sensible.',
+  errorTitle: 'No pudimos completar la respuesta',
+  errorBody: 'Intenta de nuevo o revisa la base directamente.'
 }
 
 const KnowledgeAnswerSurfaceSpecimen = () => {
@@ -246,6 +409,101 @@ const KnowledgeAnswerSurfaceSpecimen = () => {
           </Typography>
         </Stack>
       }
+    />
+  )
+}
+
+const NexaAnswerBubbleSpecimen = () => {
+  const [proofOpen, setProofOpen] = useState(false)
+
+  return (
+    <NexaAnswerBubble
+      kind='surfaceChartInsight'
+      title='La señal principal mejora, pero debe leerse con soporte y calidad.'
+      body='La variante chart prioriza el gráfico y deja la evidencia como trust cue compacto para no desplazar el composer conversacional.'
+      metaLabel='Answer-first · chart bubble · proof bajo demanda'
+      points={ANSWER_BUBBLE_POINTS}
+      actions={ANSWER_BUBBLE_ACTIONS}
+      trustCue={ANSWER_BUBBLE_TRUST_CUE}
+      proofOpen={proofOpen}
+      onProofToggle={() => setProofOpen(current => !current)}
+      chart={ANSWER_BUBBLE_CHART_SPEC}
+    />
+  )
+}
+
+const NexaAnswerMetricSummarySpecimen = () => {
+  const [proofOpen, setProofOpen] = useState(false)
+
+  return (
+    <NexaAnswerBubble
+      kind='financeMetricSummary'
+      title='Revenue sube, pero el pipeline empieza a enfriarse.'
+      body='La lectura ejecutiva no necesita un chart grande: Nexa resume qué cambió, cuánto importa y dónde mirar después.'
+      metaLabel='Metric summary · executive read'
+      points={ANSWER_BUBBLE_POINTS}
+      actions={ANSWER_BUBBLE_ACTIONS}
+      trustCue={ANSWER_BUBBLE_TRUST_CUE}
+      proofOpen={proofOpen}
+      onProofToggle={() => setProofOpen(current => !current)}
+      metricSummary={ANSWER_BUBBLE_METRIC_SUMMARY_SPEC}
+    />
+  )
+}
+
+const NexaAnswersCanvasSpecimen = () => {
+  const [draft, setDraft] = useState('')
+  const [proofOpen, setProofOpen] = useState(false)
+  const evidence = nexaToolResultToConversationalEvidence(KNOWLEDGE_TOOL_TRACE_SPECIMEN)
+
+  const renderPlan: NexaAnswersRenderPlan = {
+    id: 'design-system-nexa-answers-canvas-plan',
+    version: 'nexa-answer-render-plan.v1',
+    intent: 'diagnose',
+    autonomyTier: 'observeOnly',
+    primaryBlockId: 'chart-answer',
+    trustCue: ANSWER_BUBBLE_TRUST_CUE,
+    actions: ANSWER_BUBBLE_ACTIONS.map((action, index) => ({
+      ...action,
+      id: `canvas-action-${index + 1}`,
+      intent: index === 0 ? 'openSource' : 'drillDown',
+      riskLevel: 'low'
+    })),
+    proof: {
+      id: 'design-system-proof',
+      label: 'Base',
+      collapsedLabel: 'Ver base',
+      expandedLabel: 'Ocultar base',
+      evidence: evidence ?? undefined
+    },
+    blocks: [
+      {
+        id: 'chart-answer',
+        renderer: 'answerBubble',
+        rendererVersion: 'v1',
+        kind: 'surfaceChartInsight',
+        title: 'El canvas deja que el gráfico sea protagonista.',
+        body: 'La copia contextual acompaña la lectura; el proof queda bajo demanda y el composer permanece visible para continuar.',
+        metaLabel: 'Nexa Answers Canvas · render plan v1',
+        points: ANSWER_BUBBLE_POINTS,
+        chart: ANSWER_BUBBLE_CHART_SPEC
+      }
+    ]
+  }
+
+  return (
+    <NexaAnswersCanvas
+      kind='knowledgeEmbedded'
+      state={proofOpen ? 'proofOpen' : 'answered'}
+      surfaceContext={ANSWERS_CANVAS_SURFACE_CONTEXT}
+      renderPlan={renderPlan}
+      question='¿Qué está pasando con estas señales operativas?'
+      draft={draft}
+      onDraftChange={setDraft}
+      onSubmit={() => setDraft('')}
+      proofOpen={proofOpen}
+      onProofToggle={() => setProofOpen(current => !current)}
+      copy={ANSWERS_CANVAS_COPY}
     />
   )
 }
@@ -440,6 +698,27 @@ const NexaChatLabView = () => (
             <InlineCode>NexaKnowledgeAnswerSurface</InlineCode> — pregunta, respuesta y prueba sin salto abrupto
           </Typography>
           <KnowledgeAnswerSurfaceSpecimen />
+        </Box>
+
+        <Box data-capture='nexa-answer-bubble-chart-specimen' sx={{ scrollMarginBlockStart: { xs: 19, md: 13 } }}>
+          <Typography variant='subtitle2' sx={{ mb: 1.5 }}>
+            <InlineCode>NexaAnswerBubble</InlineCode> — variante chart reusable
+          </Typography>
+          <NexaAnswerBubbleSpecimen />
+        </Box>
+
+        <Box data-capture='nexa-answer-bubble-metric-summary-specimen' sx={{ scrollMarginBlockStart: { xs: 19, md: 13 } }}>
+          <Typography variant='subtitle2' sx={{ mb: 1.5 }}>
+            <InlineCode>NexaAnswerBubble</InlineCode> — variante metricSummary
+          </Typography>
+          <NexaAnswerMetricSummarySpecimen />
+        </Box>
+
+        <Box data-capture='nexa-answers-canvas-specimen' sx={{ scrollMarginBlockStart: { xs: 19, md: 13 } }}>
+          <Typography variant='subtitle2' sx={{ mb: 1.5 }}>
+            <InlineCode>NexaAnswersCanvas</InlineCode> — canvas transversal renderPlan/runtime
+          </Typography>
+          <NexaAnswersCanvasSpecimen />
         </Box>
 
         <Box data-capture='nexa-knowledge-tool-trace-specimen' sx={{ scrollMarginBlockStart: { xs: 19, md: 13 } }}>
