@@ -63,6 +63,53 @@ export interface NotionPageProvenance {
   lastEditedTime: string | null
 }
 
+/** Fila (artículo) de una Wiki/data_source: la página + su provenance. */
+export interface NotionDataSourceRow {
+  pageId: string
+  title: string
+  url: string | null
+  createdTime: string | null
+  lastEditedTime: string | null
+}
+
+export interface NotionDataSourceQueryResult {
+  rows: NotionDataSourceRow[]
+  /** `true` si Notion truncó a 10k filas (cap Apr 2026, `request_status.incomplete`). */
+  hitResultLimit: boolean
+}
+
+interface NotionQueryPage {
+  id: string
+  in_trash?: boolean
+  url?: string
+  created_time?: string
+  last_edited_time?: string
+  properties?: Record<string, { type?: string; title?: Array<{ plain_text?: string }> }>
+}
+
+interface NotionDataSourceQueryResponse {
+  results?: NotionQueryPage[]
+  has_more?: boolean
+  next_cursor?: string | null
+  request_status?: { type?: string }
+}
+
+const extractPageTitle = (page: NotionQueryPage): string => {
+  const props = page.properties ?? {}
+
+  for (const key of Object.keys(props)) {
+    const prop = props[key]
+
+    if (prop?.type === 'title' && Array.isArray(prop.title)) {
+      const text = prop.title.map(t => t?.plain_text ?? '').join('').trim()
+
+      if (text) return text
+    }
+  }
+
+  return '(sin título)'
+}
+
 /** Error sanitizado del cliente Notion de knowledge — NUNCA incluye el token. */
 export class NotionKnowledgeClientError extends Error {
   readonly statusCode: number | null
@@ -120,23 +167,28 @@ export class NotionKnowledgeClient {
     return (await this.resolveToken()) !== null
   }
 
-  private async request<T>(path: string): Promise<T> {
+  private async request<T>(path: string, init?: { method?: string; body?: unknown }): Promise<T> {
     const token = await this.resolveToken()
 
     if (!token) {
       throw new NotionKnowledgeClientError('Notion knowledge token no configurado.', null)
     }
 
+    const method = init?.method ?? 'GET'
+    const hasBody = init?.body !== undefined
+
     for (let attempt = 0; attempt <= MAX_RATE_LIMIT_RETRIES; attempt += 1) {
       let response: Response
 
       try {
         response = await this.fetchImpl(`${NOTION_API}${path}`, {
-          method: 'GET',
+          method,
           headers: {
             Authorization: `Bearer ${token}`,
-            'Notion-Version': NOTION_VERSION
+            'Notion-Version': NOTION_VERSION,
+            ...(hasBody ? { 'Content-Type': 'application/json' } : {})
           },
+          ...(hasBody ? { body: JSON.stringify(init?.body) } : {}),
           signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS)
         })
       } catch (error) {
@@ -182,6 +234,50 @@ export class NotionKnowledgeClient {
       createdTime: page.created_time ?? null,
       lastEditedTime: page.last_edited_time ?? null
     }
+  }
+
+  /**
+   * Enumera las filas (artículos) de una Wiki/data_source vía
+   * `POST /v1/data_sources/{id}/query` (canónico, NO `/databases/{id}/query`).
+   * Pagina con cursor opaco, filtra `in_trash`, y detecta el cap 10k (`request_status`).
+   */
+  async queryDataSourcePages(dataSourceId: string): Promise<NotionDataSourceQueryResult> {
+    const rows: NotionDataSourceRow[] = []
+    let cursor: string | undefined
+    let hitResultLimit = false
+
+    do {
+      const body: Record<string, unknown> = { page_size: PAGE_SIZE }
+
+      if (cursor) body.start_cursor = cursor
+
+      const json = await this.request<NotionDataSourceQueryResponse>(
+        `/data_sources/${encodeURIComponent(dataSourceId)}/query`,
+        { method: 'POST', body }
+      )
+
+      for (const page of json.results ?? []) {
+        // Filas soft-deleted no deben ingerirse.
+        if (page.in_trash === true) continue
+        rows.push({
+          pageId: page.id,
+          title: extractPageTitle(page),
+          url: page.url ?? null,
+          createdTime: page.created_time ?? null,
+          lastEditedTime: page.last_edited_time ?? null
+        })
+      }
+
+      // Cap 10k (Apr 2026): Notion trunca y marca request_status.incomplete.
+      if (json.request_status?.type === 'incomplete') {
+        hitResultLimit = true
+        break
+      }
+
+      cursor = json.has_more ? json.next_cursor ?? undefined : undefined
+    } while (cursor)
+
+    return { rows, hitResultLimit }
   }
 
   private async fetchChildren(blockId: string): Promise<NotionBlock[]> {

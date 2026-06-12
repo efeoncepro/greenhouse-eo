@@ -202,10 +202,15 @@ const renderBlock = (block: NotionBlock, depth: number, numberedIndex: number): 
 
     case 'embed': {
       const payload = payloadOf(block)
-      const url = payload.external?.url ?? payload.file?.url ?? payload.url ?? ''
+
+      // SOLO URLs estables (external / bookmark / embed). Las de archivos Notion-hosted
+      // (`file.url`) son S3 presigned: efímeras (expiran) + con credenciales AWS en el
+      // query string (`X-Amz-Credential=ASIA…`) que dispararían el sanitizer → cuarentena
+      // de cualquier artículo con imagen. Se omiten; queda solo el caption como placeholder.
+      const url = payload.external?.url ?? payload.url ?? ''
       const caption = richTextToMarkdown(payload.caption) || block.type
 
-      return url ? `[${caption}](${url})` : ''
+      return url ? `[${caption}](${url})` : `(${caption})`
     }
 
     default: {

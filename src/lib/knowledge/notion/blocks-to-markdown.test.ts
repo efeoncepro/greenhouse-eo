@@ -152,6 +152,20 @@ describe('blocksToMarkdown', () => {
     expect(md).toBe('still readable')
   })
 
+  it('emits external image links but drops Notion-hosted presigned S3 urls (would trip the sanitizer)', () => {
+    const md = blocksToMarkdown([
+      block('image', { external: { url: 'https://cdn.example.com/logo.png' }, caption: [rt('Logo')] }),
+      block('image', {
+        file: { url: 'https://prod-files-secure.s3.us-west-2.amazonaws.com/x.png?X-Amz-Credential=ASIA123&X-Amz-Signature=abc' },
+        caption: [rt('Diagrama')]
+      })
+    ])
+
+    // external → link estable; file (presigned) → solo caption, sin la URL con credenciales
+    expect(md).toBe('[Logo](https://cdn.example.com/logo.png)\n\n(Diagrama)')
+    expect(md).not.toContain('X-Amz-Credential')
+  })
+
   it('flattens children of unknown container blocks (e.g. tab) instead of dropping them', () => {
     const md = blocksToMarkdown([
       block('tab', { rich_text: [] }, [
