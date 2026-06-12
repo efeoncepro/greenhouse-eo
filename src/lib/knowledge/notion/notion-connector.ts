@@ -65,23 +65,33 @@ const pageEntryToCandidate = (entry: NotionPageCorpusEntry): KnowledgeDocCandida
   sourceLocator: entry.notionPageId
 })
 
-/** Candidato por artículo de una Wiki: slug/humanUrl estables desde el page id. */
+/**
+ * Candidato por artículo de una Wiki. El slug es estable desde el page id
+ * (`<slugPrefix>-<pageId>`, NUNCA del título) y kebab-case ascii: el separador es
+ * `-` (no `/`) porque el slug es la clave canónica del documento y el store exige
+ * `^[a-z0-9]+(-[a-z0-9]+)*$` (`assertKnowledgeSlug`). El page id UUID es lowercase
+ * hex + guiones → segmentos kebab válidos.
+ */
 const articleToCandidate = (
   entry: NotionDataSourceCorpusEntry,
   row: { pageId: string; title: string }
-): KnowledgeDocCandidate => ({
-  slug: `${entry.slugPrefix}/${row.pageId}`,
-  title: row.title,
-  documentType: entry.documentType,
-  ownerDomain: entry.ownerDomain,
-  approverRole: entry.approverRole,
-  audience: entry.audience,
-  sensitivity: entry.sensitivity,
-  agenticPolicy: entry.agenticPolicy,
-  docLayer: entry.docLayer,
-  humanUrl: `/knowledge/${entry.slugPrefix}/${row.pageId}`,
-  sourceLocator: row.pageId
-})
+): KnowledgeDocCandidate => {
+  const slug = `${entry.slugPrefix}-${row.pageId}`
+
+  return {
+    slug,
+    title: row.title,
+    documentType: entry.documentType,
+    ownerDomain: entry.ownerDomain,
+    approverRole: entry.approverRole,
+    audience: entry.audience,
+    sensitivity: entry.sensitivity,
+    agenticPolicy: entry.agenticPolicy,
+    docLayer: entry.docLayer,
+    humanUrl: `/knowledge/${slug}`,
+    sourceLocator: row.pageId
+  }
+}
 
 /** Candidato placeholder de una Wiki cuando el token no está configurado. */
 const dataSourceUnavailableCandidate = (entry: NotionDataSourceCorpusEntry): KnowledgeDocCandidate => ({

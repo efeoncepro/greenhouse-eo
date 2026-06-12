@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 
 import { KnowledgeNotFoundError } from '../errors'
+import { assertKnowledgeSlug } from '../validators'
 
 import { NotionKnowledgeConnector, type NotionKnowledgeReader } from './notion-connector'
 import type { NotionBlock } from './notion-knowledge-client'
@@ -136,15 +137,31 @@ describe('NotionKnowledgeConnector — data_source (Wiki) expansion', () => {
 
     expect(items).toHaveLength(2)
     expect(items.every(i => i.kind === 'available')).toBe(true)
-    // slug estable desde el page id (NUNCA del título), namespaced por la Wiki
-    expect(items[0].candidate.slug).toBe('wiki-sops/art-1')
-    expect(items[1].candidate.slug).toBe('wiki-sops/art-2')
+    // slug estable desde el page id (NUNCA del título), kebab-case ascii (separador '-', no '/')
+    expect(items[0].candidate.slug).toBe('wiki-sops-art-1')
+    expect(items[1].candidate.slug).toBe('wiki-sops-art-2')
     expect(items[0].candidate.title).toBe('SOP de cierre')
     expect(items[0].candidate.sourceLocator).toBe('art-1')
     // gobernanza heredada de la Wiki
     expect(items[0].candidate.documentType).toBe('sop')
     expect(items[0].candidate.agenticPolicy).toBe('agent_allowed')
     expect(client.queryDataSourcePages).toHaveBeenCalledWith('ds-99')
+  })
+
+  it('generates slugs that pass the store kebab-case validation (real UUID page ids)', async () => {
+    const client = reader({
+      queryDataSourcePages: vi.fn().mockResolvedValue({
+        rows: [{ pageId: '1c386bde-8c5b-40fb-9378-d26b6df3219a', title: 'Artículo' }],
+        hitResultLimit: false
+      })
+    })
+
+    const connector = new NotionKnowledgeConnector({ entries: [WIKI_ENTRY], client })
+    const items = await connector.list()
+
+    // No debe lanzar — el slug es la clave canónica del documento en el store.
+    expect(() => assertKnowledgeSlug(items[0].candidate.slug)).not.toThrow()
+    expect(items[0].candidate.slug).toBe('wiki-sops-1c386bde-8c5b-40fb-9378-d26b6df3219a')
   })
 
   it('loads a Wiki article using cached provenance (no extra page fetch)', async () => {

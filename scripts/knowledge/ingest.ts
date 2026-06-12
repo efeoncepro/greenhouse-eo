@@ -7,16 +7,20 @@
  *
  * Source (default `repo_docs`):
  *   --source=repo_docs   corpus piloto markdown del repo
- *   --source=notion      teamspace Notion de knowledge (gated en secret; corpus vacío en V1)
+ *   --source=notion      teamspace Notion de knowledge (gated en secret)
+ *
+ * Scope (solo `--source=notion`): `--only=<slugPrefix|slug>` ingiere una sola
+ * entrada del corpus (rollout incremental por Wiki/página).
  *
  * Uso:
- *   npx tsx --require ./scripts/lib/server-only-shim.cjs scripts/knowledge/ingest.ts [--apply] [--source=notion]
+ *   npx tsx --require ./scripts/lib/server-only-shim.cjs scripts/knowledge/ingest.ts [--apply] [--source=notion] [--only=<slug>]
  */
 
 import type { KnowledgeSourceConnector } from '@/lib/knowledge/ingestion/connector'
 import { runKnowledgeIngestion } from '@/lib/knowledge/ingestion/pipeline'
 import { RepoDocsKnowledgeConnector } from '@/lib/knowledge/ingestion/repo-docs-connector'
 import { NotionKnowledgeConnector } from '@/lib/knowledge/notion/notion-connector'
+import { NOTION_KNOWLEDGE_CORPUS } from '@/lib/knowledge/notion/notion-corpus'
 
 const resolveSource = (): 'repo_docs' | 'notion' => {
   const flag = process.argv.find(arg => arg.startsWith('--source='))?.split('=')[1]
@@ -30,12 +34,28 @@ const resolveSource = (): 'repo_docs' | 'notion' => {
   return 'repo_docs'
 }
 
+const buildNotionConnector = (): NotionKnowledgeConnector => {
+  const only = process.argv.find(arg => arg.startsWith('--only='))?.split('=')[1]
+
+  if (!only) return new NotionKnowledgeConnector()
+
+  const entries = NOTION_KNOWLEDGE_CORPUS.filter(
+    entry => (entry.kind === 'data_source' ? entry.slugPrefix : entry.slug) === only
+  )
+
+  if (entries.length === 0) {
+    throw new Error(`--only=${only} no coincide con ninguna entrada del corpus Notion`)
+  }
+
+  return new NotionKnowledgeConnector({ entries })
+}
+
 const main = async (): Promise<void> => {
   const apply = process.argv.includes('--apply')
   const source = resolveSource()
 
   const connector: KnowledgeSourceConnector =
-    source === 'notion' ? new NotionKnowledgeConnector() : new RepoDocsKnowledgeConnector()
+    source === 'notion' ? buildNotionConnector() : new RepoDocsKnowledgeConnector()
 
   const report = await runKnowledgeIngestion({ connector, apply })
 
