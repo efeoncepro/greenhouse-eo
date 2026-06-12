@@ -385,3 +385,55 @@ Disclaimer: "Nexa usa IA generativa. Verifica la informacion importante."
 | Portal-wide | Floating modal en todas las paginas | TASK-110 Slice 4 | Pendiente |
 | Enriquecer snapshot | Payroll + OTD + emails en landing | TASK-009 Slice D | Pendiente |
 | Navegacion | Control Tower → admin, /home como default | TASK-009 Slice C | Pendiente |
+
+## Delta 2026-06-12 — TASK-1091: abstracción de provider LLM + router interno ("auto")
+
+El "hablar con el modelo" de Nexa quedó detrás de una interfaz `NexaChatProvider`
+(`src/lib/nexa/nexa-provider.ts`): `resolveTurn` (2-pass tool loop: primer pase con
+tools AUTO → ejecutar tools vía `executeNexaTool` → follow-up con resultados) +
+`generateSuggestions`. `nexa-service.ts` quedó como **orquestador provider-agnóstico**:
+construye el system prompt + aplica las Answer Rules de knowledge
+(`ensureKnowledgeSourcesVisible`) y delega el modelo al provider.
+
+### Providers
+
+| Provider | Archivo | Modelo(s) | Transporte |
+|---|---|---|---|
+| Gemini (Vertex) | `src/lib/nexa/providers/gemini.ts` | `google/gemini-*@default` (default) | `@google/genai` `generateContent` (fix ISSUE-092: functionResponse sin `id`) |
+| Anthropic (Claude) | `src/lib/nexa/providers/anthropic.ts` | `anthropic/claude-sonnet-4-6@default` | `getAnthropicClient` Messages API (`tool_use`/`tool_result` **con** `tool_use_id` — su contrato correcto, NO el workaround de Gemini) |
+
+Cada adapter produce el MISMO shape `{ text, toolInvocations }` con el `raw.packet`
+(`knowledge-search.v1`) idéntico → las señales TASK-1085, la persistencia en
+`nexa_messages.tool_invocations` y el Answer Trace (TASK-1089) funcionan sin cambios.
+El tool `search_knowledge`, las Answer Rules y el contrato `knowledge-search.v1` son
+**provider-agnósticos** y NO se tocaron (invariante TASK-1085).
+
+### Router interno ("auto") — `src/lib/nexa/nexa-model-router.ts` (puro)
+
+`classifyNexaIntent(prompt)` → `operational | knowledge | general` (operativo gana, tiene
+tools dedicados en vivo); `routeNexaProviderKey({intent, knowledgeRetrievalEnabled})` →
+`anthropic` solo para conocimiento con retrieval activo, `google` para el resto;
+`nexaProviderFailoverChain(primary)` → `[primary, otro]`. La selección es **100% interna,
+NUNCA expuesta al usuario**; el picker (`NEXA_MODEL_OPTIONS`) sigue solo-Gemini.
+
+`NexaService.buildProviderPlan` decide con precedencia: **modelo pedido soportado** >
+`NEXA_PROVIDER` (pin) > **auto-router** (intención + failover) > **default Gemini**.
+`generateResponse` itera el plan: si el primario falla, hace **failover** al siguiente
+provider; el último relanza o degrada (Vertex permission-denied → fallback honesto).
+
+### Flags + observabilidad
+
+- `NEXA_PROVIDER` (server-only): pin a `google`|`anthropic`. Sin failover (intención del operador).
+- `NEXA_AUTO_ROUTER_ENABLED` (default `false`): con OFF, Nexa usa **siempre Gemini** —
+  ruta single-provider byte-idéntica al comportamiento previo. Activar "auto" es config
+  sin deploy (rollback = flag flip).
+- Observabilidad: `NexaResponse.modelId` (persistido en `nexa_messages`) registra el
+  provider que **resolvió** cada turno (derivable vía `resolveNexaProviderKey`); el
+  failover se loggea. Una métrica estructurada de tasa-de-failover queda como follow-up.
+
+### Activación (gated)
+
+Activar `NEXA_AUTO_ROUTER_ENABLED=true` requiere: `ANTHROPIC_API_KEY_SECRET_REF` resuelto
+en el runtime + eval de paridad (golden questions de knowledge: ambos providers citan
+`[n]` + respetan no-invención en `confidence='none'`) + smoke live de ambos providers +
+sign-off del operador. Modelo Claude objetivo: Sonnet 4.6.

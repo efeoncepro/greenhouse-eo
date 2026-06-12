@@ -1,5 +1,21 @@
 # Release 2026-06-10 #2 — develop→main `6c649b2a6` RELEASED
 
+## Sesion 2026-06-12 — TASK-1091 COMPLETA (Nexa provider abstraction + router interno, flag OFF) (Claude)
+
+- **Qué quedó:** el "hablar con el modelo" de Nexa vive detrás de `NexaChatProvider` (`src/lib/nexa/nexa-provider.ts`). `nexa-service.ts` es el orquestador provider-agnóstico (system prompt + Answer Rules de knowledge); delega el modelo a `providers/gemini.ts` (default, extrae el loop actual + fix ISSUE-092) o `providers/anthropic.ts` (Claude, tool-use conversacional `tool_use`/`tool_result` **con** `tool_use_id` — su contrato correcto, NO el workaround de Gemini). Router interno puro `nexa-model-router.ts` (intención → provider) + failover cross-provider en `buildProviderPlan`/`generateResponse`. Flags `NEXA_PROVIDER` (pin) + `NEXA_AUTO_ROUTER_ENABLED` (**default OFF** → ruta single-provider byte-idéntica a la previa). `nexa-models.ts`: id `anthropic/claude-sonnet-4-6@default` (router-internal, fuera del picker) + `resolveNexaProviderKey`/`resolveNexaSdkModel`.
+- **Invariante preservado (TASK-1085):** `nexa-tools.ts` (`search_knowledge`), Answer Rules y `knowledge-search.v1` NO se tocaron — cada adapter devuelve el `raw.packet` idéntico → señales + persistencia + Answer Trace intactos. Observabilidad = `NexaResponse.modelId` (persistido, provider derivable vía `resolveNexaProviderKey`); failover loggeado.
+- **4 slices, commits atómicos:** S1 abstracción+Gemini `bfd8b28e9` · S2 adapter Anthropic `4ba526193` · S3 router+failover+flags `9ccbbe8c7` · S4 docs/closing (este). Tests: suite nexa+models 42 passed (+ 3 skip); `nexa-service.test.ts` 7/7 intacto; provider Anthropic 6 + router 12 + selección/failover 6 nuevos. tsc nexa limpio.
+- **Activación gated (Activation Playbook en la task):** `NEXA_AUTO_ROUTER_ENABLED=true` requiere `ANTHROPIC_API_KEY_SECRET_REF` resuelto en runtime + smoke live ambos providers + eval de paridad golden questions + sign-off operador. Config sin deploy, rollback = flag flip. Sesión live pendiente.
+- **Coordinación WT compartido:** Codex está en TASK-1092 (toca `nexa-service.ts`/`nexa-tools.ts`) + 1084. Mi footprint en `nexa-service.ts` fue mínimo y aditivo (provider plan + loop); el tool quedó intacto para 1092. Commits propios solamente (`git add` selectivo); WIP ajeno no tocado.
+
+## Sesion 2026-06-12 — TASK-1090 Knowledge lenses coherence (Codex, code complete local)
+
+- **Implementado local:** `/knowledge` queda como una sola ruta con lentes reales **Humano | Nexa | MCP**. Humano conserva el Workbench documental; Nexa usa `NexaKnowledgeAnswerSurface`/Answer Trace con pregunta-burbuja, avatar de Nexa después de la pregunta, composer glow descendido y proof panel; MCP muestra paquete/resource/evidence sin mock.
+- **Preservación AnswerSurface:** no se modificó la ruta mockup `/knowledge/mockup/answer-trace`. La primitive `NexaKnowledgeAnswerSurface` solo suma `showModeSelector?: boolean` default `true`; `/knowledge` lo pasa en `false` para evitar selector duplicado porque el shell común gobierna los lentes.
+- **Responsive/polish:** `NexaKnowledgeAnswerSurface` y `NexaEvidencePanel` quedaron endurecidos contra clipping mobile con fuentes largas (`minmax(0, 1fr)`, `minInlineSize: 0`, wrapping/truncation controlado). Se agregó marker `knowledge-result-row` y scenario `knowledge-lenses`.
+- **Verificación:** ESLint focal verde, `pnpm exec tsc --noEmit --pretty false` verde, `pnpm exec vitest run src/components/greenhouse/primitives/__tests__/NexaKnowledgeAnswerSurface.test.tsx` verde. GVC verde: `.captures/2026-06-12T18-50-06_knowledge-lenses` y `.captures/2026-06-12T18-50-07_knowledge-answer-trace`.
+- **Coordinación WT compartido:** WIP ajeno de Claude en `src/config/nexa-models.ts` y `.playwright-mcp/` se dejó intacto; no usar stash/clean/restore amplio. Dev server local quedó levantado en `http://localhost:3000` tras reinicio por `next-server` CPU alto.
+
 ## Sesion 2026-06-12 — TASK-1084 Knowledge Workbench runtime (Codex, code complete local)
 
 - **Implementado local:** `/knowledge` como Workbench humano interno: browse/search/read vía endpoints app de Knowledge (`documents`, `search?mode=human`, `documents/:id`, `feedback`), nav `plataforma.knowledge`, migración seed aditiva y scenario GVC `knowledge-workbench`.
