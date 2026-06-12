@@ -1,5 +1,13 @@
 # Release 2026-06-10 #2 — develop→main `6c649b2a6` RELEASED
 
+## Sesion 2026-06-12 — TASK-1088 COMPLETA (conector Notion + ingesta en vivo) + TASK-1094 creada (Claude)
+
+- **TASK-1088 cerrada** (`develop`, sin push): conector `notion` con modos `page` + `data_source` (Wikis → expanden a artículos vía `/v1/data_sources/{id}/query`, slug estable desde page id). Token scoped `notion-integration-token-greenhouse-knowledge` **provisionado en Secret Manager** + `NOTION_KNOWLEDGE_TOKEN_SECRET_REF` en `.env.local`. Hardening del smoke real: filtro `in_trash`, aplanar contenedores desconocidos (`tab`), omitir URLs S3 presigned de imágenes. CLI `--source=notion --only=<wiki>`. 36 tests focales.
+- **Ingesta real verificada en vivo:** integración Notion "Greenhouse KNOW" creada (read-only, workspace Efeonce). Corpus declarado: 5 Wikis (SOPs 44 · Contenidos 101 · AXIS 55 · Inicio empresa 32 · Buyer Personas 21) + 2 páginas (Onboarding, Guía Automatizaciones); **Wiki de IA descartada por el operador**, Casos de Negocio diferida. **Buyer Personas ingerida**: 21 docs · 111 chunks · 0 cuarentena · 0 fallos · FTS buscable (`body_tsv` poblado). Bug atrapado + corregido en `--apply` real: slug de artículo de Wiki necesitaba `-` (no `/`) para pasar `assertKnowledgeSlug` (guard anti-regresión agregado).
+- **TASK-1094 creada (to-do):** Notion Knowledge Webhook Auto-Ingest + Freshness. Diseño con skills arch-architect + notion-platform: webhook (no cron, decisión operador) → re-ingest dirigido idempotente + deprecación por borrado + señal de drift + reconcile on-demand. Depende de TASK-1088; absorbe la automatización que 1088 dejó fuera de scope.
+- **Pendiente operativo (no código):** ingerir el resto de las Wicks declaradas (SOPs/AXIS/Inicio empresa/Contenidos a revisar + 2 páginas) corriendo `ingest --source=notion --only=<wiki> --apply` — es *usar* el conector terminado. Contenidos (101) a revisar antes (como IA, puede tener ruido).
+- **Notas:** commits locales en `develop`, sin push (WT compartido con Codex). Higiene: el token se pegó en chat → tratado como expuesto (guardado en Secret Manager); rotación opcional pendiente decisión operador.
+
 ## Sesion 2026-06-12 — TASK-1092 tomada por Codex (in-progress)
 
 - **Toma:** Codex mueve `TASK-1092` a `in-progress` después de verificar que el blocker formal `TASK-1085` ya está `complete` y staging fue verificado con el flag ON.

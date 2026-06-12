@@ -4,13 +4,13 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `none`
-- Status real: `Code complete (flip de lifecycle held por WT compartido — ver Delta de cierre)`
+- Status real: `Completa — conector probado en vivo (Buyer Personas); automatización → TASK-1094`
 - Rank: `TBD`
 - Domain: `platform|content|integrations.notion`
 - Blocked by: `TASK-1082`
