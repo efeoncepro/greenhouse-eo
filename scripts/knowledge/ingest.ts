@@ -1,28 +1,47 @@
 /**
- * TASK-1082 — Knowledge ingestion CLI (corpus piloto repo_docs).
+ * TASK-1082 / TASK-1088 — Knowledge ingestion CLI.
  *
  * Dry-run (default) reporta qué se publicaría/cuarentenaría sin escribir (sí lee
  * para idempotencia honesta). `--apply` registra el source, abre un sync run y
  * publica versiones idempotentes por checksum a `greenhouse_knowledge`.
  *
+ * Source (default `repo_docs`):
+ *   --source=repo_docs   corpus piloto markdown del repo
+ *   --source=notion      teamspace Notion de knowledge (gated en secret; corpus vacío en V1)
+ *
  * Uso:
- *   npx tsx --require ./scripts/lib/server-only-shim.cjs scripts/knowledge/ingest.ts [--apply]
+ *   npx tsx --require ./scripts/lib/server-only-shim.cjs scripts/knowledge/ingest.ts [--apply] [--source=notion]
  */
 
+import type { KnowledgeSourceConnector } from '@/lib/knowledge/ingestion/connector'
 import { runKnowledgeIngestion } from '@/lib/knowledge/ingestion/pipeline'
 import { RepoDocsKnowledgeConnector } from '@/lib/knowledge/ingestion/repo-docs-connector'
+import { NotionKnowledgeConnector } from '@/lib/knowledge/notion/notion-connector'
+
+const resolveSource = (): 'repo_docs' | 'notion' => {
+  const flag = process.argv.find(arg => arg.startsWith('--source='))?.split('=')[1]
+
+  if (flag === 'notion') return 'notion'
+
+  if (flag && flag !== 'repo_docs') {
+    throw new Error(`--source desconocido: ${flag} (usa repo_docs | notion)`)
+  }
+
+  return 'repo_docs'
+}
 
 const main = async (): Promise<void> => {
   const apply = process.argv.includes('--apply')
+  const source = resolveSource()
 
-  const report = await runKnowledgeIngestion({
-    connector: new RepoDocsKnowledgeConnector(),
-    apply
-  })
+  const connector: KnowledgeSourceConnector =
+    source === 'notion' ? new NotionKnowledgeConnector() : new RepoDocsKnowledgeConnector()
+
+  const report = await runKnowledgeIngestion({ connector, apply })
 
   const { counts } = report
 
-  console.log('Knowledge ingestion — source: repo_docs (pilot corpus)')
+  console.log(`Knowledge ingestion — source: ${source}`)
   console.log(`mode: ${apply ? 'APPLY' : 'DRY-RUN'} · sourceId: ${report.sourceId ?? '(none — would register)'}`)
   console.log(
     `candidates: ${counts.candidates} | published: ${counts.published} | unchanged: ${counts.skippedUnchanged} | ` +
