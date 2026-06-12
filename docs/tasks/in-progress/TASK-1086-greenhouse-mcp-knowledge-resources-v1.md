@@ -1,5 +1,22 @@
 # TASK-1086 — Greenhouse MCP Knowledge Resources V1
 
+## Delta 2026-06-12 — IMPLEMENTACIÓN (code-complete local, verificada; push held)
+
+Implementadas las 3 slices del plan corregido (commits LOCAL en `develop`; push held por WIP de Codex en el WT — ver abajo). Read-only, scope-gated.
+
+- **Slice 1 — Ecosystem-lane knowledge endpoints** (commit `c72958575`):
+  - `src/lib/api-platform/resources/ecosystem-knowledge.ts`: `getEcosystemKnowledgeSearchPayload` (→ `searchKnowledge({ mode:'agentic' })`) + `getEcosystemKnowledgeDocumentPayload` (read-detail anti-oracle 404). Cero lógica de dominio nueva — reusa el SSOT + readers del store.
+  - `buildEcosystemKnowledgeSubject`: deriva el `KnowledgeSearchSubject` del binding sister-platform. Governance gate **default-DENY**: solo `greenhouseScopeType==='internal'` (corpus interno-only) → si no, `403 scope_not_allowed`.
+  - `isDocumentAgenticallyVisible`: predicado **local** (mismo patrón que `HUMAN_VISIBLE_STATUSES` del lane app) que espeja el filtro agéntico del SQL (`published`/`stale` + `agent_allowed` + `sensitivity='internal'` + audience interno). Se mantuvo local — el intento de exportarlo desde `search-knowledge.ts` fue revertido 2× por el WT churn de Codex; local es robusto + sin colisión.
+  - 2 rutas `GET /api/platform/ecosystem/knowledge/{search,documents/[id]}` vía `runEcosystemReadRoute`.
+- **Slices 2-3 — MCP client + tools + resource** (commit `cebf75bd3`):
+  - `http-client.ts`: `searchKnowledge` + `getKnowledgeDocument` (hacia los endpoints ecosystem).
+  - `tools.ts` + `server.ts`: 2 tools (`search_knowledge`, `get_knowledge_document`) con descripción que instruye no-invención (`confidence='none'`) + el resource addressable `greenhouse://knowledge/document/{id}`.
+- **Decisiones de scope** (vs el audit): `get_knowledge_citations` **descartado** (redundante con el packet + read-detail); resource `source/{id}` y `runbook/{slug}` **diferidos** (un `source/{id}` expone config de ingesta sin valor para un agente; V1 = `document/{id}`).
+- **Verificación**: tsc=0, lint=0; **29 tests focales** (11 ecosystem builder + predicado · 18 MCP, 5 archivos); **smoke live PG** del builder: binding interno recupera 4 chunks reales con citas+score (confidence=high), binding client → `scope_not_allowed`, read-detail → doc + 49 secciones.
+- **Push HELD** (protocolo multi-agente, sin stash): Codex está activo en la 2da mitad de 1085 en el mismo WT y el pre-push hook corre sobre todo el árbol. NO se pushea hasta que el WT quede limpio. El WT churn de Codex (git clean/checkout) **revirtió 2× archivos míos untracked** (rutas + edits a `search-knowledge.ts` + el lifecycle move) → de ahí el patrón **commit-inmediato por slice**: lo commiteado sobrevive, lo untracked se wipea.
+- **Pendiente de cierre** (cuando el WT esté limpio + push): mover a `complete/`, sync README/registry, Handoff, changelog, Deltas en `GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1` (lane ecosystem de knowledge) + `GREENHOUSE_KNOWLEDGE_PLATFORM_ARCHITECTURE_V1`, CLAUDE.md invariant, doc funcional + manual (acceso MCP a knowledge), y **smoke del path MCP end-to-end** (requiere un binding sister-platform `internal` + dev server) en staging.
+
 ## Delta 2026-06-12 — AUDIT ARQUITECTÓNICO (arch-architect + Full API Parity): el lane ecosystem de knowledge NO existe, hay que crearlo
 
 Auditada contra el runtime real (post-1083/1085). **La task subestimaba el trabajo**: el Delta de abajo dice "el MCP lo envuelve en el lane ecosystem **sin lógica nueva**" — verificado contra el repo, eso es **inexacto**. Hallazgos:
@@ -65,7 +82,7 @@ Implicaciones para esta task:
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`
