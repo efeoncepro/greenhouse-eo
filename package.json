@@ -129,6 +129,8 @@
     "fe:capture:diff": "tsx scripts/frontend/diff.ts",
     "fe:capture:health": "tsx scripts/frontend/health.ts",
     "fe:capture:review": "tsx scripts/frontend/review.ts",
+    "fe:capture:explore": "tsx scripts/frontend/explore.ts",
+    "fe:capture:promote": "tsx scripts/frontend/promote.ts",
     "release:rollback": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/release/production-rollback.ts",
     "release:watchdog": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/release/production-release-watchdog.ts",
     "release:preflight": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/release/production-preflight.ts",

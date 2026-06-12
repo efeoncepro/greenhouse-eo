@@ -218,7 +218,19 @@ No adivines selectores. Cada `mark` escribe `frames/<NN>-<label>.aria.txt` con e
   - img "Efeonce"
 ```
 
-Leé ese archivo y escribí `getByRole('button', { name: 'Notifícame' })` contra lo que existe — en vez de `[class*="MuiButton"]:nth-child(3)` adivinado. Para una ruta que nunca capturaste: hacé un throwaway `pnpm fe:capture --route=/x --env=staging --hold=2000` primero, leé el `.aria.txt`, y *después* autorá el scenario. **Preferí user-facing locators** (`getByRole`/`getByText`/data-markers `[data-capture]`) sobre CSS/`nth-child` (frágil). Detalle: skill `greenhouse-gvc-playwright`.
+Leé ese archivo y escribí `getByRole('button', { name: 'Notifícame' })` contra lo que existe — en vez de `[class*="MuiButton"]:nth-child(3)` adivinado. **Preferí user-facing locators** (`getByRole`/`getByText`/data-markers `[data-capture]`) sobre CSS/`nth-child` (frágil). Detalle: skill `greenhouse-gvc-playwright`.
+
+### Explore → promote (TASK-1098)
+
+En vez del throwaway manual, usá el modo explore:
+
+```bash
+pnpm fe:capture:explore --route=/finance/cash-out --env=staging   # observá la página viva (read-only)
+pnpm fe:capture:promote --route=/finance/cash-out --name=mi-feature   # → scripts/frontend/scenarios/mi-feature.scenario.ts
+pnpm fe:capture mi-feature --env=staging   # revisá selectores/marks y capturá
+```
+
+`explore` persiste `.captures/_explore/<slug>/{session.json, aria.txt, snapshot.png}` con los candidatos + su `getByRole(...)` sugerido + uniqueness validada + markers + probes (`--probe 'role=button[name="X"]'`). `promote` cristaliza la sesión en un `.scenario.ts` válido (readiness auto + marks). **Estático:** para microinteracciones/coreografía usá el step `interaction` (abajo) o `fe:capture:micro` — promote no los auto-genera.
 
 ## Reglas duras
 

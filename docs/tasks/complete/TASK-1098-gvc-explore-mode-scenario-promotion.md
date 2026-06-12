@@ -1,14 +1,25 @@
 # TASK-1098 — GVC explore mode + scenario promotion (Capa 2/3)
 
+## Delta 2026-06-12 — COMPLETE (shipped local, sin push)
+
+Implementado y verificado e2e. `fe:capture:explore` + `fe:capture:promote` cierran el loop observe→author→determinismo.
+
+- **`fe:capture:explore --route=X`** (`scripts/frontend/explore.ts` + `lib/explore.ts`): observa la página viva (read-only por construcción) y persiste en `.captures/_explore/<slug>/` → `session.json` + `aria.txt` + `snapshot.png`. Da: árbol de accesibilidad + `candidates[]` con `getByRole(...)` sugerido + **validación de uniqueness** (¿el locator resuelve a 1 nodo?) + bounding boxes + markers `data-capture`/`data-gvc-ready` + `--probe '<selector>'` (valida un locator Playwright). Reusa env/auth/bypass/browser de GVC. `enforceProductionGate` respetado.
+- **`fe:capture:promote --route=X --name=<n>`** (`scripts/frontend/promote.ts` + `lib/promote.ts`): cristaliza la sesión en un `.scenario.ts` **válido** (gate `validateScenario`): readiness auto-elegido (marker `data-gvc-ready` > `data-capture` > heading único vía `role=heading[name="…"]`) + `mark` inicial + `scroll`+`mark` (clipSelector) por cada `--mark`. NUNCA `mutating`. Serializa con JSON (subset TS válido, sin inyección).
+- **Guardrail mantenido:** el output durable es el DSL gobernado; explore/promote son **ayuda de autoría**, no runtime de producto; cero code-as-action.
+- **Scope V1 — estático:** promote emite un baseline de `mark`s; **NO** auto-genera `interaction` steps (microinteracciones/coreografía). Eso sigue siendo autoría manual con el DSL `interaction` (V2) existente o `fe:capture:micro`. Un explore que *grabe* una interacción (probe → before/feedback/settled) queda como follow-up posible.
+- **Verificado:** 16 tests focales (`lib/explore-promote.test.ts`) + tsc 0 + lint 0 + **e2e real**: `explore /coming-soon` → candidatos+probe → `promote` (scenario válido, readiness de heading único) → `fe:capture` OK 1 frame.
+- **Wire:** `package.json` scripts `fe:capture:explore` + `fe:capture:promote`. Skill `greenhouse-gvc-playwright` + helper doc + DSL README actualizados.
+
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P3`
 - Impact: `Medio`
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `none`
-- Status real: `Diseño — follow-up de TASK-1097 (Capa 1 aria observation + skill ya shipped).`
+- Status real: `Complete 2026-06-12 — explore + promote shipped local (sin push). Verificado e2e. Microinteracciones fuera de scope V1 (DSL interaction existente).`
 - Rank: `TBD`
 - Domain: `tooling|frontend|dx`
 - Blocked by: `none` (TASK-1097 Capa 1 ya en develop local)

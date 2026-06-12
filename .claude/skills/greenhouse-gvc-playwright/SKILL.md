@@ -112,15 +112,22 @@ El DSL de GVC cubre captura/scroll/interacción/baseline. Caé a Playwright ad-h
 
 Webwright **ejecuta Python que el modelo escribe libremente** contra el browser. En Greenhouse eso violaría Full API Parity (la UI/agente es cliente de commands/readers gobernados, no una superficie scripteable), tenant safety y determinismo de baselines. Tomamos las **técnicas** (aria observation, user-facing locators, layered timeouts, graceful degrade) dentro del DSL gobernado; el code-as-action en runtime **no**.
 
-**Roadmap** (TASK-1098, Capa 2/3): un modo `fe:capture --explore` (REPL de autoría contra la página viva) + `promote` (exploración → `.scenario.ts`). Hasta entonces, el loop de Regla #1 (throwaway capture → leer `.aria.txt` → autorar) es el camino.
+**Explore mode (TASK-1098, ya shipped):** el loop de Regla #1 ahora tiene comandos dedicados:
+- `pnpm fe:capture:explore --route=/x --env=staging [--ready=<sel>] [--probe='role=button[name="X"]']` — observa la página viva (read-only) y persiste `.captures/_explore/<slug>/{session.json,aria.txt,snapshot.png}`: candidatos con `getByRole(...)` sugerido + **uniqueness validada** (¿resuelve a 1 nodo?) + markers `data-capture`/`data-gvc-ready` + probes. Es el `spawn→inspect→discard` de Webwright aplicado a la autoría.
+- `pnpm fe:capture:promote --route=/x --name=<scenario> [--mark='<sel>']` — cristaliza la sesión en un `.scenario.ts` válido (readiness auto desde marker/heading único + marks). Revisás y `pnpm fe:capture <scenario>`.
+
+**Coreografía / microinteracciones:** explore/promote generan un **baseline estático** de `mark`s. Para probar feedback de una acción (hover→feedback→settled, choreografía, motion) usá el step `interaction` (V2) del DSL o `pnpm fe:capture:micro` — promote NO los auto-genera.
 
 ---
 
 ## Comandos canónicos
 
 ```bash
+pnpm fe:capture:explore --route=/x --env=staging   # observá la página viva ANTES de autorar (TASK-1098)
+pnpm fe:capture:promote --route=/x --name=<scenario>  # cristaliza la sesión en un .scenario.ts válido
 pnpm fe:capture <scenario> --env=staging        # captura (lee el .aria.txt del run)
 pnpm fe:capture --route=/x --env=staging --hold=2000   # throwaway para observar antes de autorar
+pnpm fe:capture:micro <scenario> --env=staging  # microinteractions / coreografía (DSL interaction V2)
 pnpm fe:capture:review <scenario|capture-dir>   # dossier Apto/Revisar/Iterar (self-reflection gate)
 pnpm fe:capture:diff <prev> <curr>              # before/after (mockup→runtime)
 pnpm fe:capture:health                          # salud local del helper
