@@ -54,6 +54,18 @@ export const scenario: CaptureScenario = {
       label: 'nexa-knowledge-answer-surface-specimen',
       clipSelector: '[data-capture="nexa-knowledge-answer-surface-specimen"]',
       note: 'Composition primitive para respuestas Knowledge con pregunta-burbuja y proof panel'
+    },
+    {
+      kind: 'scroll',
+      selector: '[data-capture="nexa-knowledge-tool-trace-specimen"]',
+      scrollBlock: 'start',
+      scrollY: -128
+    },
+    {
+      kind: 'mark',
+      label: 'nexa-knowledge-tool-trace-specimen',
+      clipSelector: '[data-capture="nexa-knowledge-tool-trace-specimen"]',
+      note: 'Renderer del tool search_knowledge debajo de la respuesta Nexa'
     }
   ]
 }

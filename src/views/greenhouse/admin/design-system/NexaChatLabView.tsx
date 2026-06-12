@@ -20,6 +20,8 @@ import {
   NexaSenderMark
 } from '@/components/greenhouse/primitives'
 import { GREENHOUSE_NEXA_BRAND_COLORS } from '@/components/greenhouse/primitives/greenhouse-nexa-brand-controller'
+import type { NexaToolResult } from '@/lib/nexa/nexa-contract'
+import { NexaKnowledgeToolTraceCard } from '@/views/greenhouse/home/components/NexaToolRenderers'
 
 import { DESIGN_SYSTEM_LAB_TOKENS } from './design-system-lab-tokens'
 
@@ -96,6 +98,67 @@ const MODES: { mode: string; detail: string }[] = [
   { mode: 'Panel expandible (B)', detail: 'Compacto ↔ ancho con rail de historial. Concepto vigente de esta task.' },
   { mode: 'Lane sidecar (C)', detail: 'Full-height in-flow (AdaptiveSidecarLayout), el contexto principal sigue visible. [deferred-but-committed]' }
 ]
+
+const KNOWLEDGE_TOOL_TRACE_SPECIMEN: NexaToolResult = {
+  available: true,
+  summary: 'Fragmentos recuperados del corpus de conocimiento.',
+  source: 'postgres',
+  scopeLabel: 'Base de conocimientos',
+  generatedAt: '2026-06-12T10:00:00.000Z',
+  metrics: [],
+  raw: {
+    packet: {
+      contractVersion: 'knowledge-search.v1',
+      query: '¿Qué significa Impacto en mis métricas ICO?',
+      generatedAt: '2026-06-12T10:00:00.000Z',
+      mode: 'agentic',
+      accessScope: {
+        tenantType: 'efeonce_internal',
+        tenantId: null,
+        userId: 'design-system',
+        roleCodes: ['EFEONCE_ADMIN'],
+        routeGroups: ['internal'],
+        capabilities: ['knowledge.agentic.retrieve']
+      },
+      confidence: 'high',
+      freshness: 'current',
+      deniedOrFilteredCount: 1,
+      notes: [],
+      chunks: [
+        {
+          chunkId: 'kch-design-1',
+          documentId: 'kdoc-design-1',
+          documentVersionId: 'kdv-design-1',
+          title: 'Manual: Cómo usar Mi Desempeño',
+          headingPath: ['Mi Desempeño', 'Propósito'],
+          text: 'Mi Desempeño te permite revisar objetivos, ver feedback y dar seguimiento a tu crecimiento profesional.',
+          sourceUrl: null,
+          humanUrl: '/knowledge/documents/kdoc-design-1',
+          citationLabel: 'Manual: Cómo usar Mi Desempeño',
+          score: 0.93,
+          updatedAt: '2026-05-07T00:00:00.000Z',
+          freshness: 'current',
+          sensitivity: 'internal'
+        },
+        {
+          chunkId: 'kch-design-2',
+          documentId: 'kdoc-design-2',
+          documentVersionId: 'kdv-design-2',
+          title: 'Glosario: Métricas ICO personales',
+          headingPath: ['Impacto'],
+          text: 'Impacto mide la contribución al logro de objetivos clave con foco en resultados.',
+          sourceUrl: null,
+          humanUrl: '/knowledge/documents/kdoc-design-2',
+          citationLabel: 'Glosario: Métricas ICO personales',
+          score: 0.87,
+          updatedAt: '2026-05-02T00:00:00.000Z',
+          freshness: 'current',
+          sensitivity: 'internal'
+        }
+      ]
+    }
+  }
+}
 
 const KnowledgeAnswerSurfaceSpecimen = () => {
   const [draft, setDraft] = useState('')
@@ -371,6 +434,13 @@ const NexaChatLabView = () => (
             <InlineCode>NexaKnowledgeAnswerSurface</InlineCode> — pregunta, respuesta y prueba sin salto abrupto
           </Typography>
           <KnowledgeAnswerSurfaceSpecimen />
+        </Box>
+
+        <Box data-capture='nexa-knowledge-tool-trace-specimen' sx={{ scrollMarginBlockStart: { xs: 19, md: 13 } }}>
+          <Typography variant='subtitle2' sx={{ mb: 1.5 }}>
+            <InlineCode>search_knowledge</InlineCode> — evidence card del packet real debajo de la respuesta
+          </Typography>
+          <NexaKnowledgeToolTraceCard result={KNOWLEDGE_TOOL_TRACE_SPECIMEN} feedbackEnabled={false} />
         </Box>
       </Stack>
     </Section>

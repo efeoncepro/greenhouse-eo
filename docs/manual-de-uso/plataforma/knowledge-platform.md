@@ -152,7 +152,7 @@ Qué revisar:
 
 No usar este mockup como prueba de retrieval real: aún usa data mock tipada y no llama `searchKnowledge`.
 
-## Nexa y el conocimiento (TASK-1085 — en preparación, detrás de flag)
+## Nexa y el conocimiento (TASK-1085 — code complete local, detrás de flag)
 
 Nexa puede responder dudas de proceso/política/definición **recuperando del corpus gobernado y citando** la fuente, pero está **detrás del flag `NEXA_KNOWLEDGE_RETRIEVAL_ENABLED` (default apagado)** — no está activo en producción todavía.
 
@@ -163,9 +163,10 @@ Cómo funciona cuando se active:
 - Si una fuente está desactualizada (`stale`/`deprecated`), Nexa lo declara en la respuesta.
 - Nunca afirma tu estado operativo real (tu ICO, tu nómina): el conocimiento explica **cómo** funciona algo; para tu dato real, te remite al módulo operativo.
 
-Qué NO esperar todavía:
+Estado de la experiencia:
 
-- La experiencia visual (respuesta con citas + panel de evidencia) la cablea la mitad de UI; hasta que aterrice, el flag se mantiene apagado.
+- En código local, el thread de Nexa ya puede mostrar una tarjeta de **Prueba y trazabilidad** debajo de la respuesta cuando el tool `search_knowledge` devuelve un packet `knowledge-search.v1`.
+- Esa tarjeta muestra confianza, vigencia, fragmentos usados, fuentes y acceso a la fuente; el feedback se envía al contrato compartido de Knowledge.
 - No actives el flag sin coordinación: requiere el corpus piloto cargado (TASK-1082) y la firma del approver de dominio para temas sensibles (finance/payroll/legal/security).
 
-Observabilidad (cuando esté activo): en Admin > Ops Health, módulo **Knowledge**, las señales `knowledge.nexa.no_source_answer_rate` (cuántas preguntas no encuentran documentación → huecos de cobertura) y `knowledge.nexa.stale_source_retrievals` (respuestas apoyadas en docs vencidos → revisar/actualizar).
+Observabilidad (cuando esté activo): en Admin > Ops Health, módulo **Knowledge**, las señales `knowledge.nexa.no_source_answer_rate` (cuántas preguntas no encuentran documentación → huecos de cobertura), `knowledge.nexa.stale_source_retrievals` (respuestas apoyadas en docs vencidos → revisar/actualizar) y `knowledge.retrieval.low_citation_rate` (respuestas sin citas renderizables).

@@ -1,5 +1,14 @@
 # Release 2026-06-10 #2 — develop→main `6c649b2a6` RELEASED
 
+## Sesion 2026-06-12 — TASK-1085 Codex: UI runtime + evidence renderer (code complete local)
+
+- **Excepción de rama:** operador pidió ejecutar en `develop`; se corrió `pnpm codex:task-hook TASK-1085 --develop` después de corregir drift documental (TASK-1083 ya estaba complete). No se creó branch/worktree.
+- **Implementado por Codex:** el adapter de Nexa (`src/lib/nexa/use-nexa-runtime.ts`) renderiza respuesta textual primero y evidencia del tool después; `search_knowledge` tiene renderer específico en `NexaToolRenderers.tsx` que valida `raw.packet.contractVersion='knowledge-search.v1'`, deriva trace/fuentes desde el packet y usa `POST /api/platform/app/knowledge/feedback` para feedback real. El lab `/design-system/nexa-chat` suma specimen `nexa-knowledge-tool-trace-specimen`.
+- **Observabilidad:** `src/lib/reliability/queries/nexa-knowledge-retrieval-signals.ts` suma `knowledge.retrieval.low_citation_rate` en el mismo scan JSONB y endurece `jsonb_array_elements` contra filas no-array.
+- **GVC:** `design-system-nexa-chat` actualizado con mark específico. Captura final local: `.captures/2026-06-12T10-24-31_design-system-nexa-chat` (desktop+mobile, 8 frames, sin errores runtime).
+- **Verificado:** ESLint focal, Vitest focal (13 tests), `pnpm exec tsc --noEmit --pretty false`, GVC local. Falta `pnpm docs:closure-check` tras docs.
+- **Estado:** code complete local, **rollout staging/prod pendiente**. `NEXA_KNOWLEDGE_RETRIEVAL_ENABLED` sigue default OFF; smoke local con flag ON verde y `pnpm local:check` verde. No se activa staging/prod sin decisión explícita del operador.
+
 ## Sesion 2026-06-12 — TASK-1085 Nexa Knowledge Retrieval: mitad backend (Claude) · commits LOCAL · push held
 
 - **Excepción de rama:** instrucción explícita del operador de mantenerse en `develop`, sin worktree. División del programa Knowledge: **backend/contrato/engine = Claude · UI/wiring/primitives = Codex**.
@@ -7,12 +16,12 @@
 - **Implementado (code complete LOCAL, behind flag `NEXA_KNOWLEDGE_RETRIEVAL_ENABLED` default OFF):**
   - **Slice 1 (tool):** `search_knowledge` (function-calling) en `src/lib/nexa/nexa-tools.ts` → `searchKnowledge({ mode: 'agentic' })` (SSOT 1083). `isAvailable` = flag ON **y** grant agéntico del tenant (interno ∪ {EFEONCE_ADMIN, FINANCE_ADMIN, HR_MANAGER, EFEONCE_OPERATIONS}; cliente NUNCA). Packet completo en `result.raw.packet`. Flag en `src/lib/nexa/flags.ts`. Provider-agnóstico (swap Gemini→Claude no lo toca). Commit `26fd0c5f4`.
   - **Slice 2 (reglas):** Answer Rules en el system prompt **solo con flag ON** (`buildSystemPrompt` → `...knowledgeRules`): citar, gap honesto en `confidence='none'`, declarar stale/deprecated, no inventar, validación humana en finance/payroll/legal/security. Mismo commit.
-  - **Slice 3 (señales):** 2 reliability signals (`src/lib/reliability/queries/nexa-knowledge-retrieval-signals.ts`, moduleKey `knowledge`) leídas del jsonb `nexa_messages.tool_invocations` **sin writes nuevos**: `knowledge.nexa.no_source_answer_rate` (cobertura) + `knowledge.nexa.stale_source_retrievals` (steady=0). Wired en `get-reliability-overview.ts`. Commit `6c43bcb9e`.
+  - **Slice 3 (señales backend iniciales):** 2 reliability signals (`src/lib/reliability/queries/nexa-knowledge-retrieval-signals.ts`, moduleKey `knowledge`) leídas del jsonb `nexa_messages.tool_invocations` **sin writes nuevos**: `knowledge.nexa.no_source_answer_rate` (cobertura) + `knowledge.nexa.stale_source_retrievals` (steady=0). Wired en `get-reliability-overview.ts`. Commit `6c43bcb9e`. Codex agregó arriba la señal answer-level `knowledge.retrieval.low_citation_rate`.
 - **ISSUE-092 (resuelta) — destapada por el smoke:** todo el tool-calling de Nexa estaba roto en producción (HTTP 400 `Unknown name "id" at function_response`; @google/genai inyecta un id huérfano que Gemini 2.5 rechaza). Fix raíz en `nexa-service.ts` (`{ name, response }` sin id). Doc `docs/issues/resolved/ISSUE-092-...md` + README.
 - **Verificado:** tsc full = 0, lint focal = 0, 6 tests del tool + 5 tests de señales verdes, smoke end-to-end live (Nexa cita "Motor ICO: métricas operativas [2]", sin inventar) + smoke de señales contra PG real (steady=ok, flag OFF).
-- **Le corresponde a Codex (mitad UI, pendiente):** cablear `@assistant-ui/react` sobre `NexaComposer` (`asChild`) → ruta Nexa que invoca `search_knowledge`; alimentar `NexaKnowledgeAnswerSurface` (TASK-1089) con `raw.packet` según el mapeo packet→UI (cada número del trace sale del packet); generar la "confianza de respuesta" + badge "verificada" + prosa (answer-level, 1085); botón de feedback → `POST /api/platform/app/knowledge/feedback`; la señal answer-level `knowledge.retrieval.low_citation_rate` (requiere "respuesta" renderizada). Detalle en el Delta de implementación de TASK-1085.
-- **Docs sincronizadas:** TASK-1085 (Delta implementación + Status real), `CLAUDE.md` (Nexa Knowledge Retrieval invariants), `GREENHOUSE_KNOWLEDGE_PLATFORM_ARCHITECTURE_V1.md` (Delta Retrieval de Nexa), `GREENHOUSE_RELIABILITY_CONTROL_PLANE_V1.md` (Delta 2 señales), `changelog.md`, ISSUE-092.
-- **Push HELD (protocolo multi-agente, sin stash):** los 3 commits backend están LOCAL (ahead 3). El WT tiene WIP no commiteado de Codex (su mitad UI en curso) y el pre-push hook (`pnpm local:check`) corre sobre todo el WT. Hacer stash del WIP de Codex **rompe su trabajo** (regla dura del operador) → se sostiene el push hasta que Codex commitee su mitad o el operador indique. No mergear a main ni mover TASK-1085 a `complete` hasta que la mitad UI aterrice + push.
+- **Mitad UI Codex:** aterrizada en la sección anterior (renderer `search_knowledge`, feedback compartido, GVC, `low_citation_rate`). Pendiente real: rollout/flag ON smoke staging/prod.
+- **Docs sincronizadas:** TASK-1085 (Delta implementación + Status real), `CLAUDE.md` (Nexa Knowledge Retrieval invariants), `GREENHOUSE_KNOWLEDGE_PLATFORM_ARCHITECTURE_V1.md`, `GREENHOUSE_RELIABILITY_CONTROL_PLANE_V1.md` (3 señales), `changelog.md`, ISSUE-092.
+- **Rollout pendiente:** no mover TASK-1085 a `complete` hasta smoke staging/prod con flag ON y activación gradual aprobada.
 
 ## Sesion 2026-06-12 — TASK-1089 Nexa Knowledge Answer Surface (code complete local, develop)
 

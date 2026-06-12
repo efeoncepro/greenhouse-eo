@@ -126,7 +126,7 @@ export const createNexaChatAdapter = (refs: NexaAdapterRefs): ChatModelAdapter =
     }))
 
     return {
-      content: [...toolParts, { type: 'text' as const, text: data.content || '' }]
+      content: [{ type: 'text' as const, text: data.content || '' }, ...toolParts]
     }
   }
 })

@@ -274,7 +274,9 @@ La superficie **conversacional canónica de Nexa**. Es un **patrón compuesto** 
 
 **Reglas:**
 
-- La primitive es **props-only**: no consulta tablas, no llama APIs y no decide retrieval. `TASK-1085` conectará el packet real de `knowledge-search.v1`.
+- La primitive es **props-only**: no consulta tablas, no llama APIs y no decide retrieval. En el thread real de Nexa, `TASK-1085` renderiza el packet `knowledge-search.v1` mediante el renderer `search_knowledge` debajo de la respuesta; la primitive sigue siendo la surface componible para experiencias Answer Trace/overview.
 - Reusar `NexaComposer kind='knowledgeAsk'`, `NexaSenderMark`, `GreenhouseThinkingBeat`, `GreenhouseChip` y `GreenhouseButton`.
 - Motion breve y semántica `aria-live` para el estado de thinking; reduced-motion desactiva entradas decorativas.
 - Mantener el proof panel visible; las citas no son decoración.
+
+No usar el mockup como prueba de retrieval real: usa data tipada. Para evidencia del renderer real del packet, usar el specimen `nexa-knowledge-tool-trace-specimen` del lab `/design-system/nexa-chat` y el scenario GVC `design-system-nexa-chat`.
