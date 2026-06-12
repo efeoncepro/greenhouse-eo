@@ -4,17 +4,17 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Alto`
 - Type: `implementation`
 - Epic: `none`
-- Status real: `Diseno (arch + notion skill aplicadas)`
+- Status real: `En implementacion (develop, sin branch — override operador)`
 - Rank: `TBD`
 - Domain: `platform|content|integrations.notion|knowledge`
-- Blocked by: `TASK-1088`
-- Branch: `task/TASK-1094-notion-knowledge-webhook-auto-ingest`
+- Blocked by: `TASK-1088 (complete)`
+- Branch: `develop (override operador — sin branch)`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
