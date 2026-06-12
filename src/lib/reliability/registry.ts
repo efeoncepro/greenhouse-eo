@@ -541,7 +541,7 @@ export const STATIC_RELIABILITY_REGISTRY: ReliabilityModuleDefinition[] = [
     ],
     smokeTests: [],
     filesOwned: ['src/lib/knowledge/**', 'src/lib/reliability/queries/knowledge-*.ts'],
-    expectedSignalKinds: ['data_quality', 'freshness', 'incident'],
+    expectedSignalKinds: ['data_quality', 'freshness', 'dead_letter', 'incident'],
     incidentDomainTag: 'knowledge'
   }
 ]
