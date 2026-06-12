@@ -10,32 +10,38 @@ Cuando alguien cambia un artículo en Notion, la integración "Greenhouse KNOW" 
 
 El código está mergeado con el flag **OFF** (cero efecto). Para activarlo:
 
-### 1. Secret HMAC del webhook
+### 0. Pre-requisito: el endpoint debe estar desplegado
+
+El handler `/api/webhooks/notion-knowledge` debe estar **en vivo** para que Notion pueda alcanzarlo durante el handshake. Es decir: pushear `develop` (staging) o release a `main` (prod) **antes** de crear la suscripción en Notion. El handshake de verificación se ACK-ea aunque el flag esté OFF y el secret no exista todavía.
+
+### 1. Crear la suscripción en Notion (genera el secret)
+
+En la integración **"Greenhouse KNOW"** (Notion → Settings → Connections → Develop/manage integrations → la integración → Webhooks → Create subscription):
+- **URL**: el endpoint desplegado, `https://<host>/api/webhooks/notion-knowledge`
+  - staging: `https://dev-greenhouse.efeoncepro.com/api/webhooks/notion-knowledge`
+  - producción: `https://greenhouse.efeoncepro.com/api/webhooks/notion-knowledge`
+- **Eventos**: `page.created`, `page.content_updated`, `page.properties_updated`, `page.deleted` (opcional `page.undeleted`, `page.moved`).
+- Notion envía un `verification_token` al endpoint → el handler lo ACK-ea (200). Notion muestra ese **verification token** en el dashboard → **copiarlo**. **ESE token ES el signing secret** (no se genera uno aleatorio).
+
+### 2. Guardar el verification_token como secret HMAC
 
 ```bash
-# Generar un secret aleatorio
-SECRET=$(openssl rand -hex 32)
-printf %s "$SECRET" | gcloud secrets create greenhouse-notion-knowledge-webhook-signing-secret --data-file=- --replication-policy=automatic --project=efeonce-group
+# TOKEN = el verification_token que Notion mostró en el paso 1
+printf %s "$TOKEN" | gcloud secrets create greenhouse-notion-knowledge-webhook-signing-secret --data-file=- --replication-policy=automatic --project=efeonce-group
+# (si ya existe: ... | gcloud secrets versions add greenhouse-notion-knowledge-webhook-signing-secret --data-file=-)
 ```
 
-Setear el ref (Vercel prod/staging + ops-worker):
+Setear el ref (Vercel staging+prod + ops-worker):
 ```bash
 printf %s "greenhouse-notion-knowledge-webhook-signing-secret" | vercel env add NOTION_KNOWLEDGE_WEBHOOK_SIGNING_SECRET_REF production --force --scope efeonce-7670142f
 ```
-(idem `preview`/`development` si aplica; + setear en el ops-worker `deploy.sh`).
+(idem el target del entorno donde apuntás el webhook; + setear en el ops-worker `deploy.sh`).
 
-> El secret HMAC del webhook es **distinto** del token de la integración (`notion-integration-token-greenhouse-knowledge`). No reusar.
+> El signing secret (verification_token de Notion) es **distinto** del token de la integración (`notion-integration-token-greenhouse-knowledge`). No reusar.
 
-### 2. Token de knowledge en el ops-worker
+### 3. Token de knowledge en el ops-worker
 
 El consumer re-ingiere desde el ops-worker, que necesita `NOTION_KNOWLEDGE_TOKEN_SECRET_REF=notion-integration-token-greenhouse-knowledge` en su entorno Cloud Run. Verificar/agregar en `services/ops-worker/deploy.sh`.
-
-### 3. Suscripción del webhook en Notion
-
-En la integración **"Greenhouse KNOW"** (Notion → Settings → Connections → la integración → Webhooks):
-- **URL**: `https://greenhouse.efeoncepro.com/api/webhooks/notion-knowledge`
-- **Eventos**: `page.created`, `page.content_updated`, `page.properties_updated`, `page.deleted` (opcional `page.undeleted`, `page.moved`).
-- Notion envía un `verification_token` al crear la suscripción → el handler lo ACK-ea automáticamente (no requiere el flag ON ni el secret todavía). Copiar ese token y subirlo como el secret HMAC del paso 1 (ES el signing secret).
 
 ### 4. Flip del flag
 
