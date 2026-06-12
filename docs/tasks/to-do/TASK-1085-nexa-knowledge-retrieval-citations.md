@@ -1,5 +1,22 @@
 # TASK-1085 — Nexa Knowledge Retrieval With Citations
 
+## Delta 2026-06-12 — contrato de la experiencia Answer Trace (mapeo packet→UI, TASK-1089)
+
+Codex construyó la cáscara UI en **TASK-1089** (`NexaKnowledgeAnswerSurface`, mock). 1085 la **casa** con el packet `knowledge-search.v1` (TASK-1083). Mapeo canónico packet→UI (cada número del trace sale del packet, NUNCA fabricado):
+
+| UI (Answer Trace) | Campo del packet | Notas |
+|---|---|---|
+| "Retrieval: N chunks · Filtrados por policy: M" | `chunks.length` · `deniedOrFilteredCount` | M = denegados por política, sin contenido |
+| "Confianza del retrieval" | `confidence` (categórica) + `max(chunks.score)` (número) | distinta de la confianza de respuesta |
+| "Freshness: Actual/…" | `freshness` | |
+| "Chunks recuperados · Score 0.96" | `chunks[].score` | el `ts_rank` redondeado (SSOT del número) |
+| "Fuentes citadas · Confianza 0.94" | **derivada** de `chunks[].score` agrupando por `documentId` | NO un campo nuevo; se deriva |
+| "Manual: … v4.3 · Actual" (cita) | `chunks[].citationLabel` + `freshness` + `humanUrl` | el clic va a la biblioteca (1084) |
+| tab "Evals" | salud del **eval harness offline** (golden questions, CI) | NO un campo por-consulta |
+| "Confianza de respuesta 0.91 · Respuesta verificada" | **lo genera 1085** (no es del packet) | answer-level, distinta del retrieval |
+
+Regla dura: la respuesta en prosa + la "confianza de respuesta" + el badge "verificada" los **genera 1085** desde el packet; los números de retrieval (score/confianza/freshness/denied) son del packet. Si la UI muestra un número que no sale del packet ni de la generación gobernada de 1085, es teatro.
+
 ## Delta 2026-06-12 — UI pre-construida (NexaComposer) + runtime canónico + cruce con el contrato
 
 Codex canonizó la primitive `NexaComposer` (variant `chat`, runtime-agnóstica; commit `78346c636`). El runtime conversacional **`@assistant-ui/react` es canónico** (NO es dependencia nueva — es el runtime de Nexa desde TASK-009/110/114, en `ui-platform/STACK.md`; **formalizado en `DECISIONS_INDEX` por el operador 2026-06-12**). Para 1085:

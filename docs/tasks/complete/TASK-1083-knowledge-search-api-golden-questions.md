@@ -1,5 +1,9 @@
 # TASK-1083 — Knowledge Search API + Golden Questions
 
+## Delta 2026-06-12b — `score` por chunk (post-cierre, aditivo)
+
+Conectando con TASK-1089 (Answer Trace surface) emergió que la UI muestra "Score 0.96" por chunk + "Confianza 0.94" por fuente, números que el packet no exponía. Se agregó `KnowledgeRetrievalChunk.score` (el `ts_rank` redondeado) — **aditivo dentro de `knowledge-search.v1`** (read-only, backward-compatible, no bumpea a v2). Es el SSOT del número del trace; la confianza por fuente/overall se **deriva** de él, no se inventa. Reader lo pobla desde `ts_rank`; live test asserta `score>0` + orden desc. Habilita el wiring honesto 1089→1085 sin reshape.
+
 ## Delta 2026-06-11
 
 Cerrado por **TASK-1080** (alineado, sin cambio estructural):

@@ -980,3 +980,7 @@ El filtrado lee el **documento vivo** (`kd`), no el chunk denormalizado (que pue
 ### Verificación live
 
 22/22 tests verdes contra el corpus TASK-1082 (263 chunks): human ve `periodos-de-nomina` (`agent_excluded`), agentic lo excluye + `deniedOrFilteredCount≥1`; browse 0 leak de draft/quarantined; read-detail 30 secciones; no-answer off-corpus → `confidence='none'`.
+
+### Delta 2026-06-12b — `score` por chunk (Answer Trace contract)
+
+El packet expone `KnowledgeRetrievalChunk.score` (el `ts_rank` redondeado) — aditivo dentro de `knowledge-search.v1` (read-only, backward-compatible). Es el **SSOT del número del trace**: la Answer Trace surface (TASK-1089) muestra "Score 0.96" por chunk y "Confianza 0.94" por fuente; sin este campo esos números serían fabricados. La confianza por fuente/overall se **deriva** del score (agregando por documento o el máximo), nunca se inventa un número paralelo. Distinta de la **confianza de respuesta** que genera Nexa al componer (TASK-1085). La tab "Evals" del trace es la salud del eval harness offline (golden questions), no un campo por-consulta. Habilita el wiring honesto 1089 (UI) → 1085 (retrieval) sin reshape.
