@@ -84,12 +84,15 @@ describe('NotionKnowledgeClient', () => {
     await expect(client.fetchBlockTree('p')).rejects.toThrow(/token de knowledge \(auth\)/)
   })
 
-  it('reads page provenance (created/edited/url)', async () => {
+  it('reads page provenance (created/edited/url) + parent data_source + in_trash', async () => {
     const fetchImpl = vi.fn(async () =>
       jsonResponse({
         url: 'https://notion.so/p',
         created_time: '2026-01-01T00:00:00.000Z',
-        last_edited_time: '2026-02-01T00:00:00.000Z'
+        last_edited_time: '2026-02-01T00:00:00.000Z',
+        in_trash: true,
+        parent: { type: 'data_source_id', data_source_id: 'ds-77' },
+        properties: { Name: { type: 'title', title: [{ plain_text: 'Mi artículo' }] } }
       })
     )
 
@@ -98,9 +101,12 @@ describe('NotionKnowledgeClient', () => {
 
     expect(provenance).toEqual({
       pageId: 'p',
+      title: 'Mi artículo',
       url: 'https://notion.so/p',
       createdTime: '2026-01-01T00:00:00.000Z',
-      lastEditedTime: '2026-02-01T00:00:00.000Z'
+      lastEditedTime: '2026-02-01T00:00:00.000Z',
+      parentDataSourceId: 'ds-77',
+      inTrash: true
     })
   })
 })

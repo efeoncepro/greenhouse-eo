@@ -75,6 +75,7 @@ import { notionRpaComputeProjection } from './notion-rpa-compute'
 import { notionRpaWritebackProjection } from './notion-rpa-writeback'
 import { notionFtrComputeProjection } from './notion-ftr-compute'
 import { notionFtrWritebackProjection } from './notion-ftr-writeback'
+import { knowledgeNotionIngestProjection } from './knowledge-notion-ingest'
 import { sampleSprintHubSpotOutboundProjection } from './sample-sprint-hubspot-outbound'
 import { sampleSprintRuntimeCacheInvalidationProjection } from './sample-sprint-runtime-cache-invalidation'
 
@@ -165,4 +166,5 @@ registerProjection(contractorPayableExpenseMaterializeProjection)
   registerProjection(notionRpaWritebackProjection) // TASK-916 Slice 4 — PATCH Notion [GH] RpA v2 PRODUCTIVO con valor del snapshot, gated NOTION_RPA_WRITEBACK_ENABLED (default OFF hasta TASK-917 Flip A)
   registerProjection(notionFtrComputeProjection) // TASK-903 Slice 1 — compute FTR PRODUCTIVO (Efeonce/Sky) via calculateFtr post notion.task.status_transitioned + snapshot task_ftr_snapshots + chain event ftr_writeback_requested
   registerProjection(notionFtrWritebackProjection) // TASK-903 Slice 2 — PATCH Notion select [GH] FTR PRODUCTIVO con veredicto del snapshot, gated NOTION_FTR_WRITEBACK_ENABLED (default OFF)
+  registerProjection(knowledgeNotionIngestProjection) // TASK-1094 — re-fetch + gate + re-ingest idempotente | deprecación de páginas de knowledge Notion (webhook-triggered); gated upstream por NOTION_KNOWLEDGE_WEBHOOK_ENABLED
 }

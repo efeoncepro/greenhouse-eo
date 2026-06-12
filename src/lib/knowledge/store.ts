@@ -256,6 +256,26 @@ export const getKnowledgeDocumentBySlug = async (
   return rows[0] ? mapDocument(rows[0]) : null
 }
 
+/**
+ * TASK-1094 — Encuentra el documento cuya VERSIÓN VIGENTE proviene de una página
+ * Notion (`source_page_id`). Lo usa el consumer de auto-ingest para deprecar el doc
+ * cuando su página se borra en Notion. Null si ninguna versión vigente la referencia.
+ */
+export const getKnowledgeDocumentBySourcePageId = async (
+  sourcePageId: string
+): Promise<KnowledgeDocument | null> => {
+  const rows = await query<KnowledgeDocumentRow>(
+    `SELECT kd.*
+     FROM greenhouse_knowledge.knowledge_documents kd
+     JOIN greenhouse_knowledge.knowledge_document_versions kdv ON kdv.version_id = kd.current_version_id
+     WHERE kdv.source_page_id = $1
+     LIMIT 1`,
+    [sourcePageId]
+  )
+
+  return rows[0] ? mapDocument(rows[0]) : null
+}
+
 export const getKnowledgeDocumentVersion = async (
   versionId: string
 ): Promise<KnowledgeDocumentVersion | null> => {

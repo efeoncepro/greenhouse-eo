@@ -33,9 +33,12 @@ const reader = (overrides: Partial<NotionKnowledgeReader> = {}): NotionKnowledge
   fetchBlockTree: vi.fn().mockResolvedValue([]),
   fetchPageProvenance: vi.fn().mockResolvedValue({
     pageId: 'page-123',
+    title: 'Page 123',
     url: 'https://notion.so/page-123',
     createdTime: '2026-01-01T00:00:00.000Z',
-    lastEditedTime: '2026-02-01T00:00:00.000Z'
+    lastEditedTime: '2026-02-01T00:00:00.000Z',
+    parentDataSourceId: null,
+    inTrash: false
   }),
   queryDataSourcePages: vi.fn().mockResolvedValue({ rows: [], hitResultLimit: false }),
   ...overrides

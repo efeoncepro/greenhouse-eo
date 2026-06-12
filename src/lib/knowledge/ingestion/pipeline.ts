@@ -70,7 +70,7 @@ const candidateToCreateInput = (candidate: KnowledgeDocCandidate, sourceId: stri
   docLayer: candidate.docLayer
 })
 
-const findSourceId = async (descriptor: KnowledgeSourceDescriptor): Promise<string | null> => {
+export const findSourceId = async (descriptor: KnowledgeSourceDescriptor): Promise<string | null> => {
   const rows = await query<{ source_id: string; [column: string]: unknown }>(
     `SELECT source_id FROM greenhouse_knowledge.knowledge_sources
      WHERE source_system = $2 AND name = $1
@@ -82,7 +82,12 @@ const findSourceId = async (descriptor: KnowledgeSourceDescriptor): Promise<stri
   return rows[0]?.source_id ?? null
 }
 
-const ingestOne = async (
+/**
+ * Ingiere UN documento (load → checksum → sanitize → quarantine | publish + chunks,
+ * idempotente por checksum). Es el single source of truth del ingest por-doc; lo
+ * reusa `runKnowledgeIngestion` (corpus completo) y el auto-ingest por webhook (TASK-1094).
+ */
+export const ingestOne = async (
   connector: KnowledgeSourceConnector,
   candidate: KnowledgeDocCandidate,
   sourceId: string | null,

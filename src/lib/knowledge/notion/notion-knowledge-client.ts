@@ -58,9 +58,14 @@ export interface NotionBlock {
 
 export interface NotionPageProvenance {
   pageId: string
+  title: string
   url: string | null
   createdTime: string | null
   lastEditedTime: string | null
+  /** data_source id del parent si la página es fila de una Wiki (null si no). Gate de gobernanza (TASK-1094). */
+  parentDataSourceId: string | null
+  /** `true` si la página está soft-deleted en Notion (deprecación defensiva, TASK-1094). */
+  inTrash: boolean
 }
 
 /** Fila (artículo) de una Wiki/data_source: la página + su provenance. */
@@ -222,17 +227,25 @@ export class NotionKnowledgeClient {
     throw new NotionKnowledgeClientError('Notion rate-limit excedido tras reintentos.', 429)
   }
 
-  /** Metadata de provenance de una página (created/edited/url). */
+  /** Metadata de provenance de una página (created/edited/url/parent/in_trash). */
   async fetchPageProvenance(pageId: string): Promise<NotionPageProvenance> {
-    const page = await this.request<{ url?: string; created_time?: string; last_edited_time?: string }>(
-      `/pages/${encodeURIComponent(pageId)}`
-    )
+    const page = await this.request<
+      NotionQueryPage & {
+        url?: string
+        created_time?: string
+        last_edited_time?: string
+        parent?: { type?: string; data_source_id?: string; database_id?: string }
+      }
+    >(`/pages/${encodeURIComponent(pageId)}`)
 
     return {
       pageId,
+      title: extractPageTitle(page),
       url: page.url ?? null,
       createdTime: page.created_time ?? null,
-      lastEditedTime: page.last_edited_time ?? null
+      lastEditedTime: page.last_edited_time ?? null,
+      parentDataSourceId: page.parent?.data_source_id ?? null,
+      inTrash: page.in_trash === true
     }
   }
 

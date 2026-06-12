@@ -51,7 +51,7 @@ export interface NotionKnowledgeReader {
 const isDataSourceEntry = (entry: NotionCorpusEntry): entry is NotionDataSourceCorpusEntry =>
   entry.kind === 'data_source'
 
-const pageEntryToCandidate = (entry: NotionPageCorpusEntry): KnowledgeDocCandidate => ({
+export const pageEntryToCandidate = (entry: NotionPageCorpusEntry): KnowledgeDocCandidate => ({
   slug: entry.slug,
   title: entry.title,
   documentType: entry.documentType,
@@ -72,7 +72,7 @@ const pageEntryToCandidate = (entry: NotionPageCorpusEntry): KnowledgeDocCandida
  * `^[a-z0-9]+(-[a-z0-9]+)*$` (`assertKnowledgeSlug`). El page id UUID es lowercase
  * hex + guiones → segmentos kebab válidos.
  */
-const articleToCandidate = (
+export const articleToCandidate = (
   entry: NotionDataSourceCorpusEntry,
   row: { pageId: string; title: string }
 ): KnowledgeDocCandidate => {
@@ -161,9 +161,12 @@ export class NotionKnowledgeConnector implements KnowledgeSourceConnector {
         for (const row of result.rows) {
           this.provenanceCache.set(row.pageId, {
             pageId: row.pageId,
+            title: row.title,
             url: row.url,
             createdTime: row.createdTime,
-            lastEditedTime: row.lastEditedTime
+            lastEditedTime: row.lastEditedTime,
+            parentDataSourceId: entry.notionDataSourceId,
+            inTrash: false
           })
           items.push({ kind: 'available', candidate: articleToCandidate(entry, row) })
         }
