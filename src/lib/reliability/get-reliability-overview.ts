@@ -155,6 +155,8 @@ import { getWorkforceUnlinkedInternalUsersSignal } from './queries/workforce-unl
 // TASK-1082 — Knowledge Platform ingestion signals (moduleKey 'knowledge').
 import { getKnowledgeQuarantineCountSignal } from './queries/knowledge-quarantine-count'
 import { getKnowledgeSyncFailedSourceSignal } from './queries/knowledge-sync-failed-source'
+// TASK-1085 — Nexa knowledge retrieval observability (moduleKey 'knowledge').
+import { getNexaKnowledgeRetrievalSignals } from './queries/nexa-knowledge-retrieval-signals'
 import { getServiceEngagementEngagementKindUnmappedSignal } from './queries/service-engagement-engagement-kind-unmapped'
 import { getServiceEngagementLifecycleStageUnknownSignal } from './queries/service-engagement-lifecycle-stage-unknown'
 import { getServiceEngagementLineageOrphanSignal } from './queries/service-engagement-lineage-orphan'
@@ -574,6 +576,8 @@ interface ReliabilityOverviewSources {
   /** TASK-1082 — Knowledge ingestion signals (quarantine count + failed sync source). */
   knowledgeQuarantineCount?: ReliabilitySignal | null
   knowledgeSyncFailedSource?: ReliabilitySignal | null
+  /** TASK-1085 — Nexa knowledge retrieval signals (no-source rate + stale-source). */
+  nexaKnowledgeRetrieval?: ReliabilitySignal[] | null
 
   /**
    * TASK-773 Slice 4 — Outbox publisher health. 2 readers:
@@ -970,6 +974,8 @@ export const buildReliabilityOverview = (
     // TASK-1082 — Knowledge ingestion: quarantine count + failed sync source.
     ...(sources.knowledgeQuarantineCount ? [sources.knowledgeQuarantineCount] : []),
     ...(sources.knowledgeSyncFailedSource ? [sources.knowledgeSyncFailedSource] : []),
+    // TASK-1085 — Nexa knowledge retrieval observability (no-source rate + stale-source).
+    ...(sources.nexaKnowledgeRetrieval ?? []),
     // TASK-773 Slice 4 — Outbox publisher health (lag + dead_letter).
     ...(sources.outboxHealth ?? []),
     // TASK-408 Slice 4 — Email render/template safety net.
@@ -1362,6 +1368,12 @@ export const getReliabilityOverview = async (
     preloadedSources.knowledgeSyncFailedSource !== undefined
       ? preloadedSources.knowledgeSyncFailedSource
       : await getKnowledgeSyncFailedSourceSignal().catch(() => null)
+
+  // TASK-1085 — Nexa knowledge retrieval signals (un solo scan jsonb → 2 señales).
+  const nexaKnowledgeRetrieval =
+    preloadedSources.nexaKnowledgeRetrieval !== undefined
+      ? preloadedSources.nexaKnowledgeRetrieval
+      : await getNexaKnowledgeRetrievalSignals().catch(() => null)
 
   // TASK-773 Slice 4 — Outbox publisher health (lag + dead_letter).
   // 2 readers en paralelo. Cada uno degrada honestamente si su query falla.
@@ -2003,6 +2015,7 @@ export const getReliabilityOverview = async (
     workforceUnlinkedInternalUsers,
     knowledgeQuarantineCount,
     knowledgeSyncFailedSource,
+    nexaKnowledgeRetrieval,
     outboxHealth,
     emailRenderFailure,
     cronStagingDrift,
