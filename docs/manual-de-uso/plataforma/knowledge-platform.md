@@ -3,7 +3,7 @@
 > **Tipo de documento:** Manual de uso / runbook
 > **Versión:** 1.0
 > **Creado:** 2026-06-11 por Claude (TASK-1081)
-> **Última actualización:** 2026-06-11 por Claude (TASK-1081)
+> **Última actualización:** 2026-06-12 por Codex (TASK-1089)
 > **Documentación funcional:** [knowledge-platform.md](../../documentation/plataforma/knowledge-platform.md)
 > **Documentación técnica:** [GREENHOUSE_KNOWLEDGE_PLATFORM_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_KNOWLEDGE_PLATFORM_ARCHITECTURE_V1.md)
 
@@ -131,3 +131,41 @@ El reporte muestra por documento: `PUBLISHED` (n chunks · v#), `SKIPPED_UNCHANG
 - Helpers: `src/lib/knowledge/` (ingesta en `src/lib/knowledge/ingestion/` + `src/lib/knowledge/sanitization/`)
 - CLI de ingesta: `scripts/knowledge/ingest.ts`
 - Arquitectura: [GREENHOUSE_KNOWLEDGE_PLATFORM_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_KNOWLEDGE_PLATFORM_ARCHITECTURE_V1.md)
+
+## Revisar el mockup de respuesta trazable (TASK-1089)
+
+Para validar la experiencia visual antes del wiring real:
+
+```bash
+pnpm dev
+pnpm fe:capture knowledge-answer-trace --env=local
+```
+
+Ruta local: `/knowledge/mockup/answer-trace`.
+
+Qué revisar:
+
+- La pregunta debe quedar visible como burbuja de usuario.
+- Nexa debe responder debajo con fuentes y warning honesto cuando no consulta datos actuales.
+- El composer glow debe quedar debajo de la respuesta para follow-up.
+- El panel `Fuentes | Packet | Evals` debe seguir visible y legible.
+
+No usar este mockup como prueba de retrieval real: aún usa data mock tipada y no llama `searchKnowledge`.
+
+## Nexa y el conocimiento (TASK-1085 — en preparación, detrás de flag)
+
+Nexa puede responder dudas de proceso/política/definición **recuperando del corpus gobernado y citando** la fuente, pero está **detrás del flag `NEXA_KNOWLEDGE_RETRIEVAL_ENABLED` (default apagado)** — no está activo en producción todavía.
+
+Cómo funciona cuando se active:
+
+- Solo se ofrece a usuarios internos con el grant agéntico (no a clientes).
+- Nexa busca en Knowledge antes de responder; cita la fuente (ej. "Manual de ICO [2]") y, si no encuentra documentación, lo dice con honestidad en vez de inventar.
+- Si una fuente está desactualizada (`stale`/`deprecated`), Nexa lo declara en la respuesta.
+- Nunca afirma tu estado operativo real (tu ICO, tu nómina): el conocimiento explica **cómo** funciona algo; para tu dato real, te remite al módulo operativo.
+
+Qué NO esperar todavía:
+
+- La experiencia visual (respuesta con citas + panel de evidencia) la cablea la mitad de UI; hasta que aterrice, el flag se mantiene apagado.
+- No actives el flag sin coordinación: requiere el corpus piloto cargado (TASK-1082) y la firma del approver de dominio para temas sensibles (finance/payroll/legal/security).
+
+Observabilidad (cuando esté activo): en Admin > Ops Health, módulo **Knowledge**, las señales `knowledge.nexa.no_source_answer_rate` (cuántas preguntas no encuentran documentación → huecos de cobertura) y `knowledge.nexa.stale_source_retrievals` (respuestas apoyadas en docs vencidos → revisar/actualizar).

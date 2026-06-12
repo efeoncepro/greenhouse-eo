@@ -1,5 +1,46 @@
 # TASK-1085 — Nexa Knowledge Retrieval With Citations
 
+## Delta 2026-06-12 — IMPLEMENTACIÓN: mitad backend cerrada (Claude) · mitad UI pendiente (Codex)
+
+División de trabajo del programa Knowledge: **backend/contrato/engine = Claude · UI/primitives/wiring = Codex**. Esta task es la **keystone** que conecta el contrato (1083) con la experiencia (1089/Answer Trace).
+
+### Lo que cierra Claude (backend) — code-complete, behind flag OFF
+
+Las 3 slices del Scope (abajo) quedan implementadas, probadas y smoke-verificadas. Commits **LOCALES** (ver "Push held" abajo):
+
+- **Slice 1 — Retrieval trigger + tool contract** (commit `26fd0c5f4`):
+  - Tool `search_knowledge` (function-calling) en `src/lib/nexa/nexa-tools.ts`. `isAvailable = isNexaKnowledgeRetrievalEnabled() && hasKnowledgeAgenticAccess(tenant)` (espeja el grant agéntico de 1083: interno ∪ {EFEONCE_ADMIN, FINANCE_ADMIN, HR_MANAGER, EFEONCE_OPERATIONS}; cliente NUNCA). `execute` llama `searchKnowledge({ query, subject, mode: 'agentic' })` (SSOT de 1083) y devuelve `NexaToolResult` con grounding summary (chunks capados a 600 chars) + `raw.packet` (el `KnowledgeRetrievalPacket` v1 completo viaja en `raw` → de ahí lo leen las señales y, a futuro, la UI).
+  - Flag `NEXA_KNOWLEDGE_RETRIEVAL_ENABLED` (default false) en `src/lib/nexa/flags.ts`.
+  - **Provider-agnóstico** (el operador migrará Gemini→Claude): el tool + las Answer Rules viven en `nexa-tools.ts`/`nexa-service.ts` y NO dependen del SDK; el swap a `src/lib/ai/anthropic.ts` no toca el tool ni las reglas.
+  - 6 tests (`search-knowledge-tool.test.ts`): 3 de gate de disponibilidad (flag + tenant), 3 live de `execute` (skip sin PG).
+- **Slice 2 — Answer rules + citations** (mismo commit `26fd0c5f4`):
+  - Bloque de reglas de knowledge insertado en el system prompt **solo cuando el flag está ON** (`buildSystemPrompt` → `...knowledgeRules`): usar el tool antes de responder procesos/políticas/definiciones, citar el `citationLabel`, declarar `stale`/`deprecated`, gap honesto en `confidence='none'` ("no encontré una guía publicada", sin inventar), distinguir guía publicada vs dato operativo vivo, pedir validación humana en finance/payroll/legal/security.
+  - El render de las citas como Answer Trace (chips/accordion) es la **mitad de Codex** (ver abajo).
+- **Slice 3 — Feedback + observability metadata** (commit `6c43bcb9e`):
+  - 2 reliability signals (`src/lib/reliability/queries/nexa-knowledge-retrieval-signals.ts`, moduleKey `knowledge`), leídas de `greenhouse_ai.nexa_messages.tool_invocations` (jsonb, **sin writes nuevos** — el packet ya viaja en `result.raw.packet`):
+    - `knowledge.nexa.no_source_answer_rate` (data_quality): tasa de búsquedas con `confidence='none'` → huecos de cobertura (warning si rate ≥30% y volumen ≥10).
+    - `knowledge.nexa.stale_source_retrievals` (drift): búsquedas apoyadas en fuentes `stale`/`deprecated` (steady=0).
+  - Un solo scan jsonb → ambas señales. Wired en `get-reliability-overview.ts` (5 puntos). Smoke verde contra PG real (steady=ok, flag OFF). 5 tests focales.
+  - **El feedback auditable** (registrar chunk IDs/feedback del usuario) se canaliza por el contrato compartido `POST /api/platform/app/knowledge/feedback` (1083, Full API Parity #5) desde la UI — NO un handler local. El botón es de Codex; el endpoint ya existe.
+
+### ISSUE-092 (resuelta) — destapada por el smoke de esta task
+
+El smoke end-to-end reveló que **TODO el tool-calling de Nexa estaba roto en producción** (HTTP 400 `Unknown name "id" at function_response`, latente, afectaba `check_payroll`/`get_otd`/etc.). Causa raíz: `createPartFromFunctionResponse` (@google/genai 1.45.0) inyecta un `id` huérfano que Gemini 2.5 rechaza. Fix **raíz** en el path compartido (`nexa-service.ts`): construir el `functionResponse` como `{ name, response }` sin id (match por nombre/orden, como ya hace el `functionCall`). Arregla todos los tools. Verificado live: Nexa llama `search_knowledge`, recupera 6 chunks reales y responde **con citas** ("Motor ICO: métricas operativas [2]"), sin inventar. Doc: `docs/issues/resolved/ISSUE-092-nexa-tool-calling-broken-function-response-id.md`.
+
+### Lo que le corresponde a Codex (UI half) — pendiente
+
+Cablear la experiencia sobre la primitive ya construida (`NexaComposer` variant `chat`, TASK-009/110/114 + `NexaKnowledgeAnswerSurface` de TASK-1089). Concretamente:
+
+1. **Wiring del runtime conversacional**: cablear `@assistant-ui/react` (`ComposerPrimitive.*`, runtime canónico formalizado en `DECISIONS_INDEX` 2026-06-12) sobre `NexaComposer`/`NexaComposerInput`/`NexaComposerActionButton` vía `asChild`. Cuando el composer envíe la pregunta, la respuesta DEBE venir de la ruta Nexa que invoca `search_knowledge` (agentic) — NUNCA un LLM call sin retrieval ni query directo a tablas.
+2. **Render del packet→Answer Trace**: alimentar `NexaKnowledgeAnswerSurface` con el `raw.packet` (`knowledge-search.v1`) según el **mapeo canónico packet→UI** del Delta de abajo. Cada número del trace sale del packet (`chunks[].score`, `confidence`, `freshness`, `deniedOrFilteredCount`), NUNCA fabricado.
+3. **Answer-level UI que genera 1085** (no es del packet): la prosa de la respuesta, la "confianza de respuesta" y el badge "verificada" los compone Nexa al sintetizar; la UI los renderiza distinguiéndolos de los números de retrieval.
+4. **Botón de feedback** → `POST /api/platform/app/knowledge/feedback` (contrato compartido, ya existe).
+5. **Signal `knowledge.retrieval.low_citation_rate`** (es de esta task, Delta D de 1083): mide cuántas **respuestas** de Nexa citan. Requiere que exista "respuesta" renderizada → se evalúa/ajusta cuando la mitad UI aterrice (las 2 señales de retrieval-level de Claude ya están vivas; esta es answer-level).
+
+### Push held (protocolo multi-agente, sin stash)
+
+Los 3 commits backend (`26fd0c5f4`, `f33822479`, `6c43bcb9e`) están **LOCAL** (ahead 3). NO se pushean: el WT tiene WIP no commiteado de Codex (la mitad UI en curso) y el pre-push hook (`pnpm local:check`) corre sobre todo el WT. Hacer stash del WIP de Codex **rompe su trabajo** (regla dura del operador). Se sostiene el push hasta que el WT quede limpio (Codex commitea su mitad) o el operador indique. tsc full + lint + las suites focales de `src/lib/nexa` y `src/lib/reliability` están verdes sobre mis archivos.
+
 ## Delta 2026-06-12 — contrato de la experiencia Answer Trace (mapeo packet→UI, TASK-1089)
 
 Codex construyó la cáscara UI en **TASK-1089** (`NexaKnowledgeAnswerSurface`, mock). 1085 la **casa** con el packet `knowledge-search.v1` (TASK-1083). Mapeo canónico packet→UI (cada número del trace sale del packet, NUNCA fabricado):
@@ -63,7 +104,7 @@ Implicaciones para esta task:
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `none`
-- Status real: `Diseno`
+- Status real: `Backend code-complete (Slices 1-3, behind flag OFF, commits LOCAL ahead 3) · UI wiring pendiente (Codex) · push held`
 - Rank: `TBD`
 - Domain: `nexa|platform|content|ai`
 - Blocked by: `TASK-1083`
