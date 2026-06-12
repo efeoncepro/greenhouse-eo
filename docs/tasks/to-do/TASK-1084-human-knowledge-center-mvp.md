@@ -1,5 +1,14 @@
 # TASK-1084 — Human Knowledge Center MVP
 
+## Delta 2026-06-12 — usar la primitive `NexaComposer` (no input custom) + borde con 1085
+
+Codex canonizó la primitive **`NexaComposer`** (Primitive + Variants + Kinds, commit `78346c636`): variants `chat`/`command`, kinds `floatingChat`/`knowledgeAsk`/`globalCommand`, runtime-agnóstica (enchufa `@assistant-ui/react` por fuera vía `asChild`). Implicaciones duras para el runtime de 1084:
+
+1. **La barra de comando/búsqueda usa `NexaComposer` kind `knowledgeAsk` (variant `command`)** — NO un `CustomTextField` custom ni el del mockup. Es la regla primitive-lookup del Figma Implementation Contract: existe la primitive → se usa/expande, no se forkea.
+2. **En 1084 el composer dispara BÚSQUEDA modo `human`**: submit → `GET /api/platform/app/knowledge/search?mode=human` → render de browse / read-detail. **NO** cablear el runtime conversacional `@assistant-ui/react` (la variant `chat` + Nexa respondiendo con citas es **TASK-1085**). 1084 usa el composer como input de búsqueda gobernada, no como chat.
+3. **El toggle 3-modos del mockup (Humano/Nexa/MCP)**: en el MVP humano **solo "Humano" está vivo**. "Nexa" = TASK-1085, "MCP" = TASK-1086. No prometer Nexa/MCP en 1084 (mostrarlos disabled/"próximamente" o no mostrarlos).
+4. **`@assistant-ui/react` NO es dependencia de 1084.** El composer es runtime-agnóstico; 1084 lo consume como input controlado que dispara `searchKnowledge`. El runtime conversacional entra recién en 1085 (y merece su ADR ahí).
+
 ## Delta 2026-06-12 — TASK-1083 completa: el contrato existe (gap cerrado)
 
 Los 4 contratos que el blueprint de promoción (`TASK-1084-answer-trace-promotion-spec.md`) declaró faltantes ya existen — incluido el **read-detail** que era el gap real:
