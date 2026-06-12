@@ -590,6 +590,14 @@ export const VIEW_REGISTRY: GovernanceViewRegistryEntry[] = [
     routeGroup: 'internal'
   },
   {
+    viewCode: 'plataforma.knowledge',
+    section: 'plataforma',
+    label: 'Knowledge',
+    description: 'Centro interno para buscar, leer y corregir conocimiento publicado con fuentes, freshness y feedback.',
+    routePath: '/knowledge',
+    routeGroup: 'internal'
+  },
+  {
     viewCode: 'mi_ficha.mi_perfil',
     section: 'mi_ficha',
     label: 'Mi Perfil',

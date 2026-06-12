@@ -63,6 +63,19 @@ En el MVP todo es **solo interno** — los clientes todavía no ven nada de la K
 - **TASK-1085** — conexión de Nexa con citas.
 - **TASK-1086** — recursos MCP read-only.
 
+## Cómo se usa la capa humana en Greenhouse (TASK-1084)
+
+La ruta `/knowledge` es el **Workbench humano** de la Knowledge Platform: una superficie interna para buscar guías publicadas, leerlas con metadata de vigencia/fuente/owner y dejar feedback cuando algo falta o no sirve.
+
+No es otra experiencia de Nexa ni un segundo Knowledge. Es la capa de lectura y auditoría que **expande** la experiencia conversacional:
+
+- La caja glow usa el mismo `NexaComposer kind='knowledgeAsk'` que el resto de la familia Nexa, pero en este contexto dispara búsqueda humana (`mode=human`), no generación de respuesta.
+- El inspector muestra la evidencia con `NexaEvidencePanel`, el mismo panel de trazabilidad que usa Nexa cuando responde con Knowledge.
+- La acción **Continuar con Nexa** abre el Nexa flotante existente con el contexto de la guía, para que la conversación continúe sin cambiar de producto.
+- El feedback se guarda en el mismo contrato de Knowledge (`POST /api/platform/app/knowledge/feedback`) que alimenta la mejora del corpus para humanos, Nexa y MCP.
+
+Así, `/knowledge` responde “muéstrame y déjame revisar la fuente”; Nexa responde “conversemos y actuemos con esa evidencia”.
+
 ## Cómo se busca el conocimiento (TASK-1083)
 
 La búsqueda es **un solo contrato** que usan por igual las personas, Nexa y el MCP — ninguna pantalla consulta las tablas por su cuenta. Le das una pregunta y te devuelve los **fragmentos relevantes con su cita** (de qué documento y de qué sección salen), un **nivel de confianza** y la **frescura** de las fuentes.

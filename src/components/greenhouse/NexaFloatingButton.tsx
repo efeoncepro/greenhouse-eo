@@ -26,6 +26,7 @@ import type { ReadonlyJSONObject, ReadonlyJSONValue } from 'assistant-stream/uti
 import { DEFAULT_NEXA_MODEL, resolveNexaModel, type NexaModelId } from '@/config/nexa-models'
 import type { NexaResponse } from '@/lib/nexa/nexa-contract'
 import { isNexaFloatingExpandableEnabled } from '@/lib/nexa/flags'
+import { NEXA_FLOATING_OPEN_EVENT } from '@/lib/nexa/floating-events'
 import { GreenhouseNexaAnimatedMark, GreenhouseNexaBrandMark } from '@/components/greenhouse/primitives'
 import { GREENHOUSE_NEXA_BRAND_COLORS } from '@/components/greenhouse/primitives/greenhouse-nexa-brand-controller'
 
@@ -140,6 +141,17 @@ const NexaFloatingButton = ({ docked = false }: NexaFloatingButtonProps) => {
 
     return () => window.removeEventListener('keydown', onKey)
   }, [open, expandableEnabled, closePanel])
+
+  useEffect(() => {
+    const onOpen = () => {
+      setOpen(true)
+      if (expandableEnabled) setExpanded(true)
+    }
+
+    window.addEventListener(NEXA_FLOATING_OPEN_EVENT, onOpen)
+
+    return () => window.removeEventListener(NEXA_FLOATING_OPEN_EVENT, onOpen)
+  }, [expandableEnabled])
 
   const [selectedModel, setSelectedModel] = useState<NexaModelId>(DEFAULT_NEXA_MODEL)
   const modelRef = useRef<NexaModelId>(DEFAULT_NEXA_MODEL)

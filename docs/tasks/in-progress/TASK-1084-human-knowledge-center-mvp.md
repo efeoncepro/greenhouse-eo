@@ -1,5 +1,25 @@
 # TASK-1084 — Human Knowledge Center MVP
 
+## Delta 2026-06-12 — Garantía de sinergia: expande la Knowledge conversacional, no crea otra Knowledge
+
+Codex implementó el runtime `/knowledge` como **Knowledge Workbench humano** complementario a la experiencia conversacional existente. La regla de producto queda explícita: `/knowledge` sirve para buscar, navegar, leer y auditar guías publicadas; cuando el usuario quiere seguir conversando, la experiencia sube al **mismo Nexa flotante** y comparte la misma evidencia. No nace un segundo chat ni una segunda Knowledge paralela.
+
+Garantías aplicadas en código:
+
+- El input principal usa la primitive compartida `NexaComposer kind='knowledgeAsk'` como búsqueda humana, no un input local ni un runtime conversacional nuevo.
+- La UI consume solo los contratos app de `TASK-1083`: `documents`, `search?mode=human`, `documents/:id` y `feedback`; no consulta tablas ni helpers server-only desde la view.
+- El inspector adapta el resultado de búsqueda `knowledge-search.v1` o el detalle de documento a `ConversationalEvidencePacket` (`nexa-evidence.v1`) y renderiza `NexaEvidencePanel`, el mismo renderer usado por Nexa Chat / AnswerSurface.
+- `NexaContextScope` declara el contexto de la guía seleccionada y el CTA **Continuar con Nexa** dispara `NEXA_FLOATING_OPEN_EVENT`, abriendo el Nexa flotante existente sin importar el componente dentro del Workbench.
+- Las cards técnicas del trace no se duplican en el Workbench: quedan como evidencia compartida compacta y acción de continuidad hacia Nexa.
+
+Estado real: code-complete local, con migración seed para `plataforma.knowledge`, nav interna y scenario GVC `knowledge-workbench`. Queda pendiente commit/push y aplicar/deployar la migración en el ambiente objetivo antes de declarar la capacidad operativamente completa.
+
+Evidencia:
+
+- ESLint focal: `pnpm exec eslint src/views/greenhouse/knowledge/KnowledgeCenterView.tsx src/lib/copy/knowledge.ts src/components/greenhouse/NexaFloatingButton.tsx src/lib/nexa/floating-events.ts --max-warnings=0`
+- Typecheck: `pnpm exec tsc --noEmit --pretty false`
+- GVC desktop/mobile: `.captures/2026-06-12T17-38-24_knowledge-workbench`
+
 ## Delta 2026-06-12 — Toma Codex: Knowledge Workbench runtime
 
 Codex toma la task después de confirmar que los blockers declarados ya están resueltos: `TASK-1081` y `TASK-1083` están `complete`, y los contratos app de Knowledge existen (`documents`, `search`, `documents/:id`, `feedback`). Se corrige el lifecycle a `in-progress` y `Blocked by: none`.

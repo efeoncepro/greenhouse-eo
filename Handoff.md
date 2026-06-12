@@ -1,5 +1,12 @@
 # Release 2026-06-10 #2 — develop→main `6c649b2a6` RELEASED
 
+## Sesion 2026-06-12 — TASK-1084 Knowledge Workbench runtime (Codex, code complete local)
+
+- **Implementado local:** `/knowledge` como Workbench humano interno: browse/search/read vía endpoints app de Knowledge (`documents`, `search?mode=human`, `documents/:id`, `feedback`), nav `plataforma.knowledge`, migración seed aditiva y scenario GVC `knowledge-workbench`.
+- **Garantía de sinergia:** no se creó otra Knowledge ni otro chat. La surface expande la experiencia anterior usando `NexaComposer kind='knowledgeAsk'`, `NexaEvidencePanel` (`nexa-evidence.v1`), `NexaContextScope` y un evento liviano `NEXA_FLOATING_OPEN_EVENT` para abrir el Nexa flotante existente desde **Continuar con Nexa**.
+- **Verificación:** ESLint focal verde, `pnpm exec tsc --noEmit --pretty false` verde, GVC desktop/mobile verde en `.captures/2026-06-12T17-38-24_knowledge-workbench`.
+- **Pendiente antes de cerrar operativamente:** commit/push bajo coordinación del WT compartido, aplicar/deployar migración seed en ambiente objetivo y repetir smoke access interno vs cliente. TASK-1084 queda `in-progress`, no `complete`.
+
 ## Sesion 2026-06-12 — TASK-1094 COMPLETA (auto-ingest knowledge por webhook Notion, flag OFF) (Claude)
 
 - **TASK-1094 code-complete** (`develop`, sin branch — override operador, sin push). 4 slices detrás del flag `NOTION_KNOWLEDGE_WEBHOOK_ENABLED` (default OFF → cero efecto al merge). Diseño con skills arch-architect + notion-platform + greenhouse-backend; Discovery vía 3 subagentes Explore en paralelo.

@@ -155,6 +155,29 @@ No usar este mockup como prueba de retrieval real: aún usa data mock tipada y n
 
 Nota operativa para QA de Nexa: cuando una respuesta viene desde `search_knowledge`, las fuentes deben verse iguales en el chat y en Answer Trace porque ambas superficies consumen `NexaEvidencePanel`. Al reabrir un thread histórico, la evidence card debe reaparecer si el mensaje persistió `tool_invocations`; si no, el thread debe seguir legible como texto sin bloquear la conversación.
 
+## Usar y validar el Knowledge Workbench humano (TASK-1084)
+
+Ruta local/runtime: `/knowledge`.
+
+Qué debe pasar:
+
+- La caja glow **Pregúntale a Nexa** permite buscar en lenguaje natural dentro del corpus publicado para humanos.
+- La lista de guías permite seleccionar y leer una fuente sin abrir otra experiencia.
+- El inspector muestra owner, fuente, vigencia, política IA y un bloque **Evidencia compartida con Nexa**.
+- **Continuar con Nexa** abre el Nexa flotante existente; no debe montar un chat paralelo dentro del Workbench.
+- El feedback de la guía se envía por el endpoint compartido de Knowledge.
+
+Validación visual local:
+
+```bash
+pnpm dev
+pnpm fe:capture knowledge-workbench --env=local
+```
+
+La captura debe revisar desktop y mobile. Evidencia de implementación inicial: `.captures/2026-06-12T17-38-24_knowledge-workbench`.
+
+No validar esta pantalla como “Nexa respondió”: en TASK-1084 la caja es búsqueda humana. La respuesta conversacional con tool `search_knowledge` pertenece a Nexa/TASK-1085 y usa el mismo `NexaEvidencePanel` para que la transición se sienta continua.
+
 ## Nexa y el conocimiento (TASK-1085 — code complete local, detrás de flag)
 
 Nexa puede responder dudas de proceso/política/definición **recuperando del corpus gobernado y citando** la fuente, pero está **detrás del flag `NEXA_KNOWLEDGE_RETRIEVAL_ENABLED` (default apagado)** — no está activo en producción todavía.
