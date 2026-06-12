@@ -8,3 +8,4 @@
 
 export * from './types'
 export * from './mode'
+export * from './golden-questions'

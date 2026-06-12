@@ -23,6 +23,11 @@ const DEFAULT_LIMIT = 8
 const MAX_LIMIT = 20
 const RANK_HIGH = 0.2
 const RANK_MEDIUM = 0.05
+// Piso de relevancia: con OR, una pregunta off-corpus matchea verbos incidentales
+// ('tiene', 'preparar') con rank ~0.05-0.06; las queries reales rankean >= 0.22
+// (medido contra el corpus). El piso 0.10 rechaza el ruido (no-answer honesto) sin
+// tocar los matches reales. Tunable (igual que RANK_HIGH/MEDIUM); el eval harness lo valida.
+const MIN_RANK_FLOOR = 0.1
 
 // publication_status visible por modo (envelope). 'quarantined'/'draft'/'review'
 // NUNCA aparecen. 'agentic' excluye 'deprecated' (solo bajo pregunta explícita, 1085).
@@ -170,6 +175,12 @@ export const searchKnowledge = async (
   const agenticPolicyClause =
     mode === 'agentic' ? `AND kd.agentic_policy = 'agent_allowed' AND kd.sensitivity = 'internal'` : ''
 
+  // tsquery: unaccent (accent-insensitive) + OR-ify (replace ' & ' -> ' | '). Las
+  // preguntas naturales traen verbos/ruido que no están en el chunk; con AND (default
+  // de websearch) ningún chunk tiene TODOS los términos -> recall pobre. Con OR cualquier
+  // término matchea y ts_rank ordena por relevancia (heading weight A premia el match
+  // del encabezado). El no-answer honesto sigue siendo 0 resultados cuando ningún
+  // término del corpus aparece. Substrato vector = escalación diferida (TASK-1080).
   const rows = await query<SearchRow>(
     `SELECT kc.chunk_id, kc.document_id, kc.document_version_id, kc.heading_path,
             kc.body_text, kc.citation_anchor,
@@ -179,15 +190,16 @@ export const searchKnowledge = async (
      FROM greenhouse_knowledge.knowledge_chunks kc
      JOIN greenhouse_knowledge.knowledge_documents kd ON kd.document_id = kc.document_id
      JOIN greenhouse_knowledge.knowledge_document_versions kdv ON kdv.version_id = kc.document_version_id
-     CROSS JOIN (SELECT websearch_to_tsquery('spanish', $1) AS tsq) q
+     CROSS JOIN (SELECT replace(websearch_to_tsquery('spanish', unaccent($1))::text, ' & ', ' | ')::tsquery AS tsq) q
      WHERE kc.body_tsv @@ q.tsq
+       AND ts_rank(kc.body_tsv, q.tsq) >= $4
        AND kc.document_version_id = kd.current_version_id
        AND kd.publication_status = ANY($2::text[])
        AND kd.audience = ANY($3::text[])
        ${agenticPolicyClause}
      ORDER BY rank DESC
-     LIMIT $4`,
-    [trimmedQuery, statuses, audiences, limit]
+     LIMIT $5`,
+    [trimmedQuery, statuses, audiences, MIN_RANK_FLOOR, limit]
   )
 
   // Conteo de fragmentos que matchearon dentro del envelope pero quedaron fuera por
@@ -200,13 +212,14 @@ export const searchKnowledge = async (
       `SELECT COUNT(*) AS n
        FROM greenhouse_knowledge.knowledge_chunks kc
        JOIN greenhouse_knowledge.knowledge_documents kd ON kd.document_id = kc.document_id
-       CROSS JOIN (SELECT websearch_to_tsquery('spanish', $1) AS tsq) q
+       CROSS JOIN (SELECT replace(websearch_to_tsquery('spanish', unaccent($1))::text, ' & ', ' | ')::tsquery AS tsq) q
        WHERE kc.body_tsv @@ q.tsq
+         AND ts_rank(kc.body_tsv, q.tsq) >= $4
          AND kc.document_version_id = kd.current_version_id
          AND kd.publication_status = ANY($2::text[])
          AND kd.audience = ANY($3::text[])
          AND (kd.agentic_policy = 'agent_excluded' OR kd.sensitivity = 'restricted')`,
-      [trimmedQuery, AGENTIC_STATUSES, audiences]
+      [trimmedQuery, AGENTIC_STATUSES, audiences, MIN_RANK_FLOOR]
     )
 
     deniedOrFilteredCount = Number(deniedRows[0]?.n ?? 0)
