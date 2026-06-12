@@ -43,12 +43,19 @@ describe.skipIf(!hasPgConfig)('searchKnowledge — live PG (TASK-1083)', () => {
     expect(packet.confidence).not.toBe('none')
     expect(hasPayrollDoc(packet.chunks.map(c => c.title))).toBe(true)
 
-    // Each chunk carries a usable citation + human URL.
+    // Each chunk carries a usable citation + human URL + a real relevance score.
     for (const chunk of packet.chunks) {
       expect(chunk.citationLabel.length).toBeGreaterThan(0)
       expect(chunk.humanUrl.length).toBeGreaterThan(0)
       expect(chunk.text.length).toBeGreaterThan(0)
+      expect(typeof chunk.score).toBe('number')
+      expect(chunk.score).toBeGreaterThan(0)
     }
+
+    // Chunks vienen ordenados por score desc (el packet renderiza el trace así).
+    const scores = packet.chunks.map(c => c.score)
+
+    expect([...scores].sort((a, b) => b - a)).toEqual(scores)
   })
 
   it('agentic mode NEVER returns the agent_excluded payroll doc, and counts it as denied', async () => {

@@ -115,6 +115,9 @@ const mapChunk = (row: SearchRow): KnowledgeRetrievalChunk => {
     sourceUrl: row.source_url,
     humanUrl: buildHumanUrl(row.human_url, row.slug, row.citation_anchor),
     citationLabel: buildCitationLabel(row.title, headingPath),
+    // Score de relevancia (ts_rank) redondeado — el único número de retrieval; la UI
+    // deriva de aquí la confianza por fuente/overall (Answer Trace, TASK-1089/1085).
+    score: Math.round(Number(row.rank) * 10000) / 10000,
     updatedAt: toIso(row.last_reviewed_at),
     freshness: deriveKnowledgeChunkFreshness(status),
     sensitivity: row.sensitivity as KnowledgeSensitivity

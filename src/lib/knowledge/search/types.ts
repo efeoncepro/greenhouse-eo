@@ -57,6 +57,12 @@ export interface KnowledgeRetrievalChunk {
   /** Surface Greenhouse canónica de lectura humana. */
   humanUrl: string
   citationLabel: string
+  /**
+   * Score de relevancia (`ts_rank` redondeado) — SSOT del número del trace. La
+   * confianza por fuente/overall que muestre la UI se DERIVA de aquí (agregando por
+   * documento o tomando el máximo), nunca se inventa un número paralelo.
+   */
+  score: number
   updatedAt: string | null
   freshness: KnowledgeFreshness
   sensitivity: KnowledgeSensitivity
