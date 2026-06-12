@@ -1,5 +1,22 @@
 # TASK-1093 — Greenhouse Conversational Experience Platform V1
 
+## Delta 2026-06-12 — CORTE DE SCOPE: V1 = consolidación de gaps reales; plataforma multi-surface diferida
+
+Decisión del operador: 1093 se **adelgaza**. Principio arquitectónico "no construir la abstracción antes del 2do consumidor real": los consumidores que justifican la plataforma completa (1084 HKC, 1079 sidecar) son **to-do**. Pero **sí hay gaps reales hoy** que valen la consolidación ahora. → Effort baja de **Alto a Medio**.
+
+**V1 (esta task, hacer ahora) — solo lo que arregla gaps reales:**
+- **Evidence view-model** (`ConversationalEvidencePacket`, Slice 1): unifica las DOS renderizaciones de evidencia de Knowledge que YA pueden divergir hoy — la card del chat (`NexaToolRenderers` para `search_knowledge`) vs la answer surface (`NexaKnowledgeAnswerSurface`, 1089). **Ese es el 2do consumidor REAL que ya existe** → la consolidación NO es adelantada.
+- **Generalizar el answer-turn** (Slice 2) SOLO lo necesario para que esas dos superficies compartan el render de evidencia (`NexaKnowledgeAnswerSurface` consume el view-model). NO crear los variants especulativos de placement todavía.
+- **Unificar el evidence panel** (Slice 3) entre chat y answer surface (las dos que existen).
+- **Persistencia/rehidratación de evidencia** (Slice 4): el historial conserva sus cards o degrada honesto. **Es un bug actual** (hoy al reabrir un thread solo vuelve el texto).
+- **Design system/GVC** (Slice 6) acotado a las superficies que existen (chat + answer surface), no a las futuras.
+
+**Diferido a follow-up (gatillado por 1084/1079, NO en esta task):**
+- La **shell unificada** + variants de placement (`floatingChat`/`embeddedChat`/`sidecarLane`) montando `AdaptiveSidecarLayout variant='assistant'`.
+- **Adopción multi-surface** (Slice 5 original): el variant `aiOverviewPanel` para 1084 + el montaje sidecar para 1079 — se extraen **CUANDO esas tasks aterricen**, driven by reuse real, no por apuesta.
+
+Razón: hacer la consolidación que tiene 2 consumidores reales hoy (chat-card vs answer-surface + historial), y dejar que el resto lo gatille el reuse real. Evita plataforma adelantada, reduce blast-radius y baja el effort. (Las correcciones de primitives del Delta de abajo siguen vigentes para el V1: generalizar `NexaKnowledgeAnswerSurface`, no paralelizar; montar en Adaptive Sidecar cuando llegue el sidecar.)
+
 ## Delta 2026-06-12 — Review 3-skill (arch-architect + product-ui-architect + modern-ui)
 
 La task es **sólida**: el contrato UX (burbuja → respuesta con avatar → composer desciende, thinking beat, evidencia como panel/disclosure) está al **bar 2026** (Linear/ChatGPT/Claude/Notion AI convergen ahí); evidence-as-view-model (no primitive) es la decisión correcta; adopción gradual + slices committables + rollback per slice. Cinco ajustes, verificados contra las primitives reales del repo:
@@ -51,7 +68,7 @@ Regla corta: **el deliverable de primitives de 1093 es 1 generalización (`NexaA
 - Lifecycle: `to-do`
 - Priority: `P1`
 - Impact: `Alto`
-- Effort: `Alto`
+- Effort: `Medio`
 - Type: `implementation`
 - Epic: `none`
 - Status real: `Diseño validado por sinergia Nexa Chat + AnswerSurface; falta plataforma reusable`
@@ -210,11 +227,12 @@ Reglas obligatorias:
 - Revisar `NexaThreadMessage`, API de threads y adapter `createNexaChatAdapter` para que los historical turns puedan renderizar evidence cards sin re-ejecutar tools.
 - Sanitizar y versionar el payload persistido para evitar acoplar la UI a shapes accidentales del provider.
 
-### Slice 5 — Surface adoption
+### Slice 5 — Surface adoption (V1 acotado: solo las 2 superficies que existen)
 
-- Adoptar la capability en `NexaThread` y `NexaFloatingPanel` sin cambiar la experiencia base cuando el usuario no ha preguntado.
-- Adaptar `NexaKnowledgeAnswerSurface` para aceptar live evidence packets o view-models además de props/mock data.
-- Preparar el variant `aiOverviewPanel` para `TASK-1084`: respuesta compacta con citas a artículos Knowledge, sin thread completo cuando la intención sea lectura/overview.
+> **Corte de scope (Delta arriba):** V1 adopta SOLO las superficies vivas hoy. La adopción multi-surface especulativa (placement shell, overview, sidecar) se difiere a follow-up gatillado por 1084/1079.
+
+- **V1:** adaptar `NexaKnowledgeAnswerSurface` para aceptar live evidence packets/view-models además de props/mock data, y que la card de Knowledge del chat (`NexaToolRenderers`) consuma el mismo view-model. Sin cambiar la experiencia base cuando el usuario no ha preguntado.
+- **DIFERIDO (follow-up, NO en esta task):** el variant `aiOverviewPanel` para `TASK-1084`, el montaje sidecar (`AdaptiveSidecarLayout variant='assistant'`) para `TASK-1079`, y la shell unificada de placements. Se extraen cuando esas tasks aterricen, driven by reuse real.
 
 ### Slice 6 — Design system, motion and GVC
 
@@ -229,6 +247,7 @@ Reglas obligatorias:
 - Construir todo el Human Knowledge Center; esta task solo entrega la capability reusable que `TASK-1084` puede consumir.
 - Crear nuevos endpoints de retrieval o consultar tablas Knowledge desde UI.
 - Rediseñar la marca Nexa completa fuera de los turnos conversacionales.
+- **(Corte de scope V1)** La shell unificada de placements + variants `floatingChat`/`embeddedChat`/`sidecarLane`, el montaje en `AdaptiveSidecarLayout variant='assistant'` (1079), y el variant `aiOverviewPanel` (1084). Se difieren a follow-up gatillado por esas tasks (ver Follow-ups).
 
 ## Detailed Spec
 
@@ -353,3 +372,8 @@ N/A — repo-only change. Product review required before replacing active surfac
 - Actualizar `docs/manual-de-uso/plataforma/knowledge-platform.md` si cambia la experiencia de Knowledge.
 - Actualizar `project_context.md`, `Handoff.md` y `changelog.md` al cerrar.
 - Mover task a `docs/tasks/in-progress/` al tomarla y a `complete/` solo después de GVC + docs closure.
+
+## Follow-ups
+
+- **Plataforma conversacional multi-surface (diferido del corte de scope V1, gatillado por consumidores reales):** cuando **TASK-1084** (Human Knowledge Center) y/o **TASK-1079** (sidecar/lane) aterricen, extraer — driven by reuse real — la **shell unificada de placements** + variants `floatingChat`/`embeddedChat`/`sidecarLane` montando `AdaptiveSidecarLayout variant='assistant'`, y el variant `aiOverviewPanel`. El evidence view-model + el answer-turn generalizado de este V1 son la base que esos consumidores reusan; la primitive `NexaEvidencePanel` se promueve a standalone solo si ese punto prueba ≥2 consumers (ver "Inventario de primitives" arriba).
+- **Streaming / perceived-performance (modern-ui):** evaluar streaming token-by-token de la respuesta de Nexa (el bar 2026) si `useNexaPersistentRuntime` lo soporta; es un lift grande, fuera de este V1.
