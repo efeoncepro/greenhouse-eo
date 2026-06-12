@@ -345,7 +345,14 @@ export default [
       // futuros; el helper per-task FTR aún no tiene consumers — writeback es
       // TASK-903 futura). Promote a `error` cuando emerja el primer consumer
       // real + zero drift sostenido.
-      'greenhouse/no-inline-ftr-calculation': 'warn'
+      'greenhouse/no-inline-ftr-calculation': 'warn',
+      // TASK-1083 Slice 2 — modo warn durante V1.0. La UI/Nexa/MCP consumen el
+      // contrato (searchKnowledge / store readers / endpoints app), no las tablas
+      // del corpus directo (Full API Parity #2). Promote a `error` tras
+      // TASK-1084/1085 (cuando los consumers reales existan y estén migrados).
+      // El data layer (src/lib/knowledge/**), migrations y el plugin están exentos
+      // por path dentro de la propia rule.
+      'greenhouse/no-direct-knowledge-chunk-query': 'warn'
     }
   },
   {
