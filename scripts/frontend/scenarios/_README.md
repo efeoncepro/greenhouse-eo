@@ -202,9 +202,23 @@ pnpm fe:capture <scenario-name> --env=staging --headed    # debug visual
 `.captures/<ISO>_<scenario-name>/`:
 - `recording.webm` — video continuo del lifecycle
 - `frames/01-<label>.png`, `02-<label>.png`, ... — frames sync por `mark` step
-- `manifest.json` — scenario meta + timings + frame paths
+- `frames/01-<label>.aria.txt`, ... — **árbol de accesibilidad** de la región capturada por cada `mark` (TASK-1097)
+- `manifest.json` — scenario meta + timings + frame paths + `frames[].ariaSnapshotPath`
 - `flipbook.gif` — opt (con `--gif`)
 - `stdout.log`
+
+## Observá antes de autorar (aria snapshot — TASK-1097)
+
+No adivines selectores. Cada `mark` escribe `frames/<NN>-<label>.aria.txt` con el árbol de accesibilidad real (`manifest.frames[].ariaSnapshotPath`):
+
+```
+- main:
+  - heading "Falta poco para abrir" [level=1]
+  - button "Notifícame"
+  - img "Efeonce"
+```
+
+Leé ese archivo y escribí `getByRole('button', { name: 'Notifícame' })` contra lo que existe — en vez de `[class*="MuiButton"]:nth-child(3)` adivinado. Para una ruta que nunca capturaste: hacé un throwaway `pnpm fe:capture --route=/x --env=staging --hold=2000` primero, leé el `.aria.txt`, y *después* autorá el scenario. **Preferí user-facing locators** (`getByRole`/`getByText`/data-markers `[data-capture]`) sobre CSS/`nth-child` (frágil). Detalle: skill `greenhouse-gvc-playwright`.
 
 ## Reglas duras
 

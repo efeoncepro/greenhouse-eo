@@ -15,6 +15,7 @@ Nombre canonico de producto interno: **Greenhouse Visual Capture** (`GVC`).
 - Fecha V1.4: `2026-05-30` — evidence hardening: readiness/assertions, quality findings, report HTML, multi-viewport, microinteraction V2 y baseline mockup→runtime
 - Fecha V1.5: `2026-06-07` — mockup→runtime contract gates (TASK-1018): baseline visual diff (pixelmatch + masks + home durable), layout integrity, console/hydration/network strict, trace on failure, keyboard/focus/reduced-motion, performance budgets, enterprise rubric + resumen ejecutivo
 - Fecha V1.6: `2026-06-12` — local/Turbopack reliability: navegación `domcontentloaded` + readiness visual declarativa; `networkidle` deja de ser señal canónica para evidencia GVC.
+- Fecha V1.7: `2026-06-12` — observación máquina-legible para autoría (TASK-1097): cada `mark` escribe el árbol de accesibilidad (`frames/<NN>-<label>.aria.txt` + `manifest.frames[].ariaSnapshotPath`). Técnica destilada de `microsoft/webwright` (`local_browser.py`); convierte "mirá el PNG y adiviná el selector" en "leé el a11y tree y escribí `getByRole(...)`". Aditivo (schemaVersion 1, best-effort/graceful degrade). Acompaña la skill `greenhouse-gvc-playwright`. Roadmap: explore mode + scenario promotion (TASK-1098).
 - Owner: `Claude / Greenhouse frontend tooling`
 - Relacionado con:
   - `scripts/frontend/` (implementación canónica)
