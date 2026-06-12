@@ -6890,6 +6890,7 @@ export interface GreenhouseKnowledgeKnowledgeChunks {
   allowed_scopes: Generated<string[]>;
   audience: string;
   body_text: string;
+  body_tsv: Generated<string | null>;
   chunk_id: Generated<string>;
   chunk_index: number;
   citation_anchor: string;
