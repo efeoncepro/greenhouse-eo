@@ -233,12 +233,52 @@ El código está shipped con `NEXA_AUTO_ROUTER_ENABLED` **OFF** (cero cambio de 
 
 Modelo Claude objetivo: **Sonnet 4.6** (`anthropic/claude-sonnet-4-6@default`). Sign-off del operador antes del flip.
 
+## Pendientes — estado de cierre (lo que falta)
+
+El **código está completo y mergeado a `develop`** (`bfd8b28e9` · `4ba526193` · `9ccbbe8c7` · `a64ff79e8`), con el flag `NEXA_AUTO_ROUTER_ENABLED` **OFF** → en producción corre la ruta default Gemini, byte-idéntica a la previa. Lo que **NO** está cerrado y queda explícitamente pendiente:
+
+### A. Verificación live de los caminos NUEVOS (gated por la key Anthropic)
+
+| Camino | Verificado hoy | Pendiente |
+|---|---|---|
+| Default Gemini (activo en prod) | unit (`nexa-service` 7/7) **+ smoke live**: respuesta real sin tool + 2-pass tool loop disparando `check_payroll` contra PG real (mayo 2026, neto CLP 427.789,57) | — |
+| Adapter Anthropic (Claude) | unit (6 tests, SDK mockeado) | **smoke live real** contra la API de Claude (turno con tool + síntesis + cita) — requiere `ANTHROPIC_API_KEY_SECRET_REF` resuelto |
+| Router "auto" + failover | unit (router 12 + selección/failover 6, providers mockeados) | **smoke live** del router con `NEXA_AUTO_ROUTER_ENABLED=true` + un fallo real de provider que dispare el failover |
+
+- **Eval de paridad (golden questions de knowledge, TASK-1083): NO corrida.** Falta asertar en vivo que **ambos** providers citan `[n]` + respetan no-invención en `confidence='none'`. Es el gate que protege contra drift de instrucción al cambiar de modelo.
+
+### B. Activación en producción (gated — ver Activation Playbook arriba)
+
+1. Confirmar `ANTHROPIC_API_KEY_SECRET_REF=greenhouse-anthropic-api-key` resuelto en Vercel prod + staging (`isAnthropicConfigured()` true) — **pendiente**. Sin esto el failover Gemini→Anthropic degrada.
+2. Smoke live de ambos providers (paso A) — **pendiente**.
+3. Eval de paridad verde + documentado — **pendiente**.
+4. Shadow de latencia/costo + revisión del log de routing/failover — **pendiente**.
+5. Flip `NEXA_AUTO_ROUTER_ENABLED=true` (config sin deploy) + monitor de `knowledge.nexa.*` + tasa de failover — **pendiente**.
+
+### C. Coordinación out-of-band
+
+- Confirmar modelo Claude objetivo (Sonnet 4.6) + **budget/quota** Anthropic + **sign-off del operador** antes de activar "auto" en producción — **pendiente**.
+
+### D. Observabilidad fina (opcional, follow-up)
+
+- Hoy la observabilidad es `NexaResponse.modelId` (persistido en `nexa_messages` → provider derivable) + el `console.warn` de failover. Una **métrica estructurada de tasa-de-failover / costo-por-provider** (señal de reliability o columna) queda como follow-up si el router "auto" se vuelve permanente.
+
+> Nada de A–D bloquea el merge actual (flag OFF = cero efecto). Son los pasos para **encender el router "auto"** en una sesión live con keys + sign-off.
+
 ## Verification
 
-- `pnpm test src/lib/nexa` + tests del adapter + router
-- `pnpm lint` + `pnpm exec tsc --noEmit`
-- Smoke live de ambos providers + router "auto" (flag knowledge ON)
-- `pnpm task:lint --task TASK-1091`
+**Ejecutado en esta sesión (gate de cierre):**
+
+- `pnpm exec vitest run` (full) → **6771 passed** (972 files, 15/69 skip). `nexa-service.test.ts` 7/7 intacto (paridad ruta default). Nuevos: adapter Anthropic 6 + router 12 + selección/failover 6.
+- `pnpm exec tsc --noEmit` (full, todo el árbol) → **0 errores**.
+- `pnpm build` (producción Turbopack) → **OK** (boundary server-only).
+- **Smoke live runtime** (orquestador real → Gemini/Vertex + PG): turno sin tool (respuesta real) + turno con tool (`check_payroll` → PG real → síntesis). ✅
+
+**Pendiente (gated — sección Pendientes A/B):**
+
+- Smoke live de Anthropic + router "auto" (requiere la key Anthropic + flag ON).
+- Eval de paridad de las golden questions contra cada provider.
+- `pnpm task:lint --task TASK-1091`.
 
 ## Closing Protocol
 
