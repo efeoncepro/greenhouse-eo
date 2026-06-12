@@ -262,7 +262,7 @@ La superficie **conversacional canónica de Nexa**. Es un **patrón compuesto** 
 
 ### Nexa Knowledge Answer Surface (TASK-1089)
 
-`NexaKnowledgeAnswerSurface` es la primera **composition primitive transversal** para respuestas de Nexa con evidencia. Resuelve el patrón elegido del product-design loop opción 3: la pregunta no desaparece ni se convierte en un campo readonly; sube a burbuja, Nexa responde debajo y el composer glow baja bajo la respuesta para continuar la conversación. El modo conversacional es condicional: antes de un submit válido conserva la experiencia idle anterior con caja glow superior, trace rail y respuesta/proof panel; después del submit mueve la trazabilidad a la tab de prueba. El proof panel conserva `Fuentes | Cómo llegó | Paquete | Revisión` para humanos y agentes.
+`NexaKnowledgeAnswerSurface` es la primera **composition primitive transversal** para respuestas de Nexa con evidencia. Resuelve el patrón elegido del product-design loop opción 3: la pregunta no desaparece ni se convierte en un campo readonly; sube a burbuja, Nexa responde debajo y el composer glow baja bajo la respuesta para continuar la conversación. El modo conversacional es condicional: antes de un submit válido mantiene un idle limpio con composer glow, sin respuesta falsa, proof panel ni trace rail prematuro; después del submit muestra la coreografía pregunta-burbuja → identidad Nexa → respuesta → composer de follow-up → proof/provenance disponible. En la implementación Knowledge actual el proof panel conserva `Fuentes | Cómo llegó | Paquete | Revisión`; TASK-1095/TASK-1096 deben evolucionar el default hacia trust cue compacto + proof bajo demanda.
 
 **Variants:**
 
@@ -281,7 +281,7 @@ La superficie **conversacional canónica de Nexa**. Es un **patrón compuesto** 
 - Reusar `NexaComposer kind='knowledgeAsk'`, `NexaSenderMark`, `GreenhouseThinkingBeat`, `GreenhouseChip` y `GreenhouseButton`.
 - Para follow-ups dentro de una conversación, usar `NexaComposer kind='inlineFollowUp'`; `knowledgeAsk` queda para la caja command superior.
 - Motion breve y semántica `aria-live` para el estado de thinking; reduced-motion desactiva entradas decorativas.
-- Mantener el proof panel visible; las citas no son decoración.
+- Mantener proof/provenance disponible y grounded; en V2 no debe desplazar la respuesta ni el follow-up por defecto. El default deseado es trust cue compacto y proof expandible bajo demanda.
 
 No usar el mockup como prueba de retrieval real: usa data tipada. Para evidencia del renderer real del packet, usar los specimens `nexa-knowledge-answer-surface-specimen` y `nexa-knowledge-tool-trace-specimen` del lab `/design-system/nexa-chat` y el scenario GVC `design-system-nexa-chat`.
 

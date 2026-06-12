@@ -6,6 +6,15 @@
 
 ---
 
+## Delta 2026-06-12f — Conversational Experience V2 discovery (TASK-1095/TASK-1096)
+
+Se documentó el discovery profundo de la experiencia conversacional multi-surface:
+
+- TASK-1095 queda como soporte de plataforma: `surfaceContext`, adapters, answer-turn contract, provenance/trust/proof layers, observability/evals y compatibilidad con Knowledge.
+- TASK-1096 queda como experiencia producto/UI: **Nexa Answers** como surface contextual embebida, distinta de Nexa Chat y de un answer-turn aislado.
+- `PATTERNS.md` deja de describir el idle viejo con trace/proof visible antes de preguntar y explicita el target V2: trust cue compacto + proof bajo demanda.
+- Primer piloto real no-Knowledge recomendado: finance/chart explanation, después de fixtures/specimens y no dentro del foundation.
+
 ## Delta 2026-06-12e — AnswerSurface idle contract (TASK-1090 follow-up)
 
 Se corrigió la promoción de Answer Trace para conservar el patrón tipo Google AI Mode:

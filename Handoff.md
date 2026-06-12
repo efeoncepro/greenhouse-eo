@@ -1,5 +1,14 @@
 # Release 2026-06-10 #2 — develop→main `6c649b2a6` RELEASED
 
+## Sesion 2026-06-12 — TASK-1095/TASK-1096 Conversational Experience discovery documentado (Codex)
+
+- **Scope:** discovery profundo/documental solamente. No se implementó runtime ni UI nueva. El objetivo fue explicitar qué falta para lograr el deseable de **Nexa Answers** sobre la base actual de Knowledge/AnswerSurface/Nexa Chat.
+- **Estado git:** ejecución en `develop` por instrucción del operador. `TASK-1095` hook OK con override `--develop`; `TASK-1096` hook queda bloqueado por `TASK-1095`, como corresponde. Worktree compartido: no tocar `.playwright-mcp/`.
+- **Docs actualizados:** arquitectura propuesta `GREENHOUSE_CONVERSATIONAL_EXPERIENCE_PLATFORM_V2`, task `TASK-1095`, task `TASK-1096`, UI platform `PATTERNS`/`HISTORIAL`, ADR/index/registry ya preparados.
+- **Hallazgo central:** hoy existe una buena seed visual (`NexaKnowledgeAnswerSurface`) y runtime persistente de Nexa Chat (`useNexaPersistentRuntime` + `/api/home/nexa`), pero no existe todavía plataforma multi-surface: falta `surfaceContext`, adapters, compact trust cue, provenance genérica, promoción formal de Nexa Insights y runtime contextual embebido.
+- **Boundary recomendado:** `TASK-1095` funda el sistema nervioso (`surfaceContext`, adapters, provenance/trust/proof, observability); `TASK-1096` construye la experiencia sentida (`Nexa Answers`, choreografía, proof-on-demand, specimens/GVC). Primer piloto real no-Knowledge debe ser child follow-up; recomendado finance/chart explanation.
+- **Pendiente:** si se ejecuta 1095, mover task a `in-progress` siguiendo el hook y documentar la excepción de rama si se mantiene `develop`. No iniciar 1096 hasta resolver/aceptar el soporte de 1095.
+
 ## Sesion 2026-06-12 — TASK-1086 CIERRE a complete (MCP Knowledge Resources) (Claude)
 
 - **Qué quedó:** TASK-1086 movida `in-progress → complete`. El código (lane ecosystem de knowledge + 2 MCP tools + resource) **ya estaba en `origin/develop`** (`c72958575` + `cebf75bd3`); el "push held" del Delta de implementación quedó obsoleto. Esta sesión ejecutó solo el **cierre documental** (sin código nuevo).
