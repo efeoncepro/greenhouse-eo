@@ -4,13 +4,13 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Alto`
 - Type: `implementation`
 - Epic: `none`
-- Status real: `En implementacion (develop, sin branch — override operador)`
+- Status real: `Code complete (4 slices, test+build verdes); rollout operador pendiente (webhook Notion + secret + flag) — ver runbook`
 - Rank: `TBD`
 - Domain: `platform|content|integrations.notion|knowledge`
 - Blocked by: `TASK-1088 (complete)`
@@ -196,3 +196,28 @@ El webhook es un **trigger ligero**; el consumer hace el trabajo (re-fetch + gat
 
 - Vector/embeddings para retrieval (escalación diferida, TASK-1080).
 - Tiempo real sub-segundo si emerge necesidad (hoy el webhook da segundos).
+
+---
+
+## Delta 2026-06-12 — Cierre (4 slices en `develop`, flag OFF)
+
+Implementado en `develop` (sin branch, override operador). Detrás del flag `NOTION_KNOWLEDGE_WEBHOOK_ENABLED` (default OFF) → cero efecto al merge. Reusa el bus de webhooks (TASK-912) + outbox/consumer (TASK-771/773) + conector/pipeline (TASK-1088/1082) sin modificarlos.
+
+| Slice | Commit | Entregable |
+| --- | --- | --- |
+| 1 — Webhook handler | `2f1078ac1` | flag + handler `notion-knowledge` (handshake + HMAC propio + emite `knowledge.notion.page_change_signal`) + migración `webhook_endpoints` + event catalog. 13 tests. |
+| 2 — Consumer + helpers | `6250db591` | `fetchPageProvenance` (title/parent/in_trash) + `getKnowledgeDocumentBySourcePageId` + `ingestOne`/`findSourceId` exportados + `auto-ingest.ts` (gate puro + re-fetch → deprecar / re-ingest / ignorar) + projection `knowledge_notion_ingest` (domain `knowledge`). 8 tests. |
+| 3 — Reconcile | `f9113f774` | `reconcile.ts` (re-ingest + deprecación de huérfanos, `findOrphanDocs` puro) + CLI + `listLiveSourceDocPageRefs`. 3 tests. |
+| 4a — Señal | `3bb1cb21d` | `knowledge.notion.ingest_dead_letter` (PG-only) + wire en reliability overview + registry. |
+| 4b — Docs | `96cddceec` | arch Delta + EVENT_CATALOG + runbook + funcional + CLAUDE.md invariante. |
+
+### Verificación
+
+- `pnpm local:check` (lint + tsc full) — exit 0.
+- Suites tocadas (knowledge + webhooks/handlers + sync/projections): **499 passed**.
+- Migración `20260612165545154` aplicada (endpoint `notion-knowledge` registrado).
+- `pnpm test` (full) + `pnpm build` — gate de cierre (ver Handoff).
+
+### Estado: code complete, rollout operador pendiente
+
+El código está completo + verificado, **detrás del flag OFF**. Para activar (runbook `docs/operations/runbooks/notion-knowledge-webhook.md`): crear secret HMAC + suscribir el webhook en la integración "Greenhouse KNOW" + `NOTION_KNOWLEDGE_TOKEN_SECRET_REF` en el ops-worker + flag ON + smoke. Mismo patrón flag-OFF-merge + operador-activa que TASK-912.

@@ -1,5 +1,17 @@
 # Release 2026-06-10 #2 — develop→main `6c649b2a6` RELEASED
 
+## Sesion 2026-06-12 — TASK-1094 COMPLETA (auto-ingest knowledge por webhook Notion, flag OFF) (Claude)
+
+- **TASK-1094 code-complete** (`develop`, sin branch — override operador, sin push). 4 slices detrás del flag `NOTION_KNOWLEDGE_WEBHOOK_ENABLED` (default OFF → cero efecto al merge). Diseño con skills arch-architect + notion-platform + greenhouse-backend; Discovery vía 3 subagentes Explore en paralelo.
+  - S1 `2f1078ac1`: handler `notion-knowledge` (handshake + HMAC propio + flag + emite `knowledge.notion.page_change_signal`) + migración `webhook_endpoints` (`20260612165545154`, aplicada) + event catalog. 13 tests.
+  - S2 `6250db591`: `fetchPageProvenance` (+title/parent/in_trash) + `getKnowledgeDocumentBySourcePageId` + `ingestOne`/`findSourceId` exportados + `auto-ingest.ts` (gate de gobernanza puro + re-fetch → deprecar/re-ingest/ignorar) + projection `knowledge_notion_ingest` (domain `knowledge` nuevo, ops-worker). 8 tests.
+  - S3 `f9113f774`: `reconcile.ts` (re-ingest + deprecación de huérfanos) + CLI `scripts/knowledge/reconcile.ts`. 3 tests.
+  - S4 `3bb1cb21d` + `96cddceec`: señal `knowledge.notion.ingest_dead_letter` + docs completas (arch Delta, EVENT_CATALOG, runbook, funcional, CLAUDE.md invariante).
+- **Diseño robusto (sin bandaids):** webhook-first SIN cron (decisión operador); at-most-once cubierto por señal dead-letter (PG-only, cheap) + reconcile on-demand (eventos perdidos + huérfanos, hitea Notion solo on-demand). Re-fetch siempre (nunca confía el payload). Borrado→deprecación (cierra gap TASK-1088). Gate de gobernanza fail-safe. Drop-in: pipeline TASK-1082/1088 intacto.
+- **Verificación:** `pnpm local:check` (lint+tsc full) exit 0 · `pnpm test` **6751 passed** · `pnpm build` exit 0 · migración aplicada.
+- **Rollout operador PENDIENTE** (code-complete ≠ operationally complete): crear secret HMAC `greenhouse-notion-knowledge-webhook-signing-secret` + `NOTION_KNOWLEDGE_WEBHOOK_SIGNING_SECRET_REF` (Vercel + ops-worker); `NOTION_KNOWLEDGE_TOKEN_SECRET_REF` en ops-worker; suscribir el webhook en la integración "Greenhouse KNOW" (URL `…/api/webhooks/notion-knowledge` + eventos `page.*`); flip `NOTION_KNOWLEDGE_WEBHOOK_ENABLED=true`; smoke. Runbook: `docs/operations/runbooks/notion-knowledge-webhook.md`. Mismo patrón flag-OFF-merge + operador-activa que TASK-912.
+- **Commits locales, sin push** (WT compartido con Codex).
+
 ## Sesion 2026-06-12 — TASK-1088 COMPLETA (conector Notion + ingesta en vivo) + TASK-1094 creada (Claude)
 
 - **TASK-1088 cerrada** (`develop`, sin push): conector `notion` con modos `page` + `data_source` (Wikis → expanden a artículos vía `/v1/data_sources/{id}/query`, slug estable desde page id). Token scoped `notion-integration-token-greenhouse-knowledge` **provisionado en Secret Manager** + `NOTION_KNOWLEDGE_TOKEN_SECRET_REF` en `.env.local`. Hardening del smoke real: filtro `in_trash`, aplanar contenedores desconocidos (`tab`), omitir URLs S3 presigned de imágenes. CLI `--source=notion --only=<wiki>`. 36 tests focales.

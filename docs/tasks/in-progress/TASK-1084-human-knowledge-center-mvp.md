@@ -1,5 +1,11 @@
 # TASK-1084 — Human Knowledge Center MVP
 
+## Delta 2026-06-12 — Toma Codex: Knowledge Workbench runtime
+
+Codex toma la task después de confirmar que los blockers declarados ya están resueltos: `TASK-1081` y `TASK-1083` están `complete`, y los contratos app de Knowledge existen (`documents`, `search`, `documents/:id`, `feedback`). Se corrige el lifecycle a `in-progress` y `Blocked by: none`.
+
+Visual target aprobado por el operador: **opción 1 — Knowledge Workbench** (`/Users/jreye/.codex/generated_images/019eb8d6-d806-7630-b501-83c1a9642d45/ig_0980ee85b51a9a06016a2c3caedf6c81919d2dcc0509a12e21.png`). El runtime debe ser `/knowledge`: search humano con `NexaComposer kind='knowledgeAsk'`, rutas de aprendizaje, lista/list-detail de documentos, inspector con metadata/freshness/source y feedback. No se construye chat nuevo ni se toca tablas directas.
+
 ## Delta 2026-06-12 — usar la primitive `NexaComposer` (no input custom) + borde con 1085
 
 Codex canonizó la primitive **`NexaComposer`** (Primitive + Variants + Kinds, commit `78346c636`): variants `chat`/`command`, kinds `floatingChat`/`knowledgeAsk`/`globalCommand`, runtime-agnóstica (enchufa `@assistant-ui/react` por fuera vía `asChild`). Implicaciones duras para el runtime de 1084:
@@ -81,17 +87,17 @@ Revisado con arch-architect bajo el lente **Full API Parity** (decisión #16: la
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `none`
-- Status real: `Diseno`
+- Status real: `Visual target aprobado; implementación runtime en curso`
 - Rank: `TBD`
 - Domain: `platform|content|ui|identity`
-- Blocked by: `TASK-1081, TASK-1083`
-- Branch: `task/TASK-1084-human-knowledge-center`
+- Blocked by: `none`
+- Branch: `develop` (excepción operativa: continuidad del programa Knowledge en checkout compartido)
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
