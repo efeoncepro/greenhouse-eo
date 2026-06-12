@@ -276,6 +276,27 @@ export const getKnowledgeDocumentBySourcePageId = async (
   return rows[0] ? mapDocument(rows[0]) : null
 }
 
+/**
+ * TASK-1094 — Lista los docs VIVOS (published/stale) de un source con el page id
+ * Notion de su versión vigente. Lo usa el reconcile para detectar huérfanos
+ * (docs cuya página ya no existe en Notion → deprecar).
+ */
+export const listLiveSourceDocPageRefs = async (
+  sourceId: string
+): Promise<Array<{ documentId: string; slug: string; sourcePageId: string }>> => {
+  const rows = await query<{ document_id: string; slug: string; source_page_id: string }>(
+    `SELECT kd.document_id, kd.slug, kdv.source_page_id
+     FROM greenhouse_knowledge.knowledge_documents kd
+     JOIN greenhouse_knowledge.knowledge_document_versions kdv ON kdv.version_id = kd.current_version_id
+     WHERE kd.source_id = $1
+       AND kd.publication_status IN ('published', 'stale')
+       AND kdv.source_page_id IS NOT NULL`,
+    [sourceId]
+  )
+
+  return rows.map(r => ({ documentId: r.document_id, slug: r.slug, sourcePageId: r.source_page_id }))
+}
+
 export const getKnowledgeDocumentVersion = async (
   versionId: string
 ): Promise<KnowledgeDocumentVersion | null> => {
