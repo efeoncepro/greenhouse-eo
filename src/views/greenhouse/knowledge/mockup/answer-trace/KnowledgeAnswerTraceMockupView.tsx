@@ -9,8 +9,6 @@ import IconButton from '@mui/material/IconButton'
 import InputAdornment from '@mui/material/InputAdornment'
 import LinearProgress from '@mui/material/LinearProgress'
 import Stack from '@mui/material/Stack'
-import Tab from '@mui/material/Tab'
-import Tabs from '@mui/material/Tabs'
 import ToggleButton from '@mui/material/ToggleButton'
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup'
 import Tooltip from '@mui/material/Tooltip'
@@ -23,10 +21,8 @@ import {
   GreenhouseBreadcrumbs,
   GreenhouseButton,
   GreenhouseChip,
-  GreenhouseNexaAnimatedMark,
+  NexaKnowledgeAnswerSurface,
   GreenhouseStatusDot,
-  NexaComposer,
-  NexaComposerInput
 } from '@/components/greenhouse/primitives'
 import { GH_KNOWLEDGE_COPY } from '@/lib/copy/knowledge'
 
@@ -55,7 +51,10 @@ const panelSx = (theme: Theme) => ({
   backgroundColor: theme.palette.background.paper,
   border: `1px solid ${theme.palette.divider}`,
   borderRadius: `${theme.shape.customBorderRadius.md}px`,
-  boxShadow: 'none'
+  boxShadow: 'none',
+  inlineSize: '100%',
+  minInlineSize: 0,
+  overflow: 'hidden'
 })
 
 const sectionHeaderSx = {
@@ -63,69 +62,11 @@ const sectionHeaderSx = {
   py: 3,
   minBlockSize: 56,
   display: 'flex',
-  alignItems: 'center',
+  flexDirection: { xs: 'column', sm: 'row' },
+  alignItems: { xs: 'stretch', sm: 'center' },
   justifyContent: 'space-between',
-  gap: 3
-}
-
-const TraceStepCard = ({ index }: { index: number }) => {
-  const theme = useTheme()
-  const step = traceSteps[index]
-  const active = step.state === 'active'
-  const complete = step.state === 'complete'
-
-  return (
-    <Box
-      data-capture={`knowledge-trace-step-${step.id}`}
-      sx={{
-        position: 'relative',
-        flex: 1,
-        minInlineSize: { xs: 240, md: 0 },
-        px: { xs: 3, md: 4 },
-        py: 3,
-        borderInlineEnd: { xs: 0, md: index < traceSteps.length - 1 ? `1px solid ${theme.palette.divider}` : 0 },
-        borderBlockEnd: {
-          xs: index < traceSteps.length - 1 ? `1px solid ${theme.palette.divider}` : '2px solid transparent',
-          md: active ? `2px solid ${theme.palette.primary.main}` : '2px solid transparent'
-        },
-        backgroundColor: active ? alpha(theme.palette.primary.main, 0.04) : 'transparent'
-      }}
-    >
-      <Stack direction='row' spacing={3} alignItems='flex-start'>
-        <Box
-          sx={{
-            inlineSize: 28,
-            blockSize: 28,
-            borderRadius: '50%',
-            display: 'grid',
-            placeItems: 'center',
-            flex: '0 0 auto',
-            color: complete || active ? theme.palette.primary.contrastText : theme.palette.text.secondary,
-            backgroundColor: complete ? theme.palette.success.main : active ? theme.palette.primary.main : theme.palette.action.selected
-          }}
-        >
-          <Typography variant='caption' sx={{ color: 'inherit', fontWeight: 600 }}>
-            {index + 1}
-          </Typography>
-        </Box>
-
-        <Stack spacing={1} sx={{ minInlineSize: 0 }}>
-          <Stack direction='row' spacing={2} alignItems='center'>
-            <Typography variant='h6' sx={{ color: theme.palette.text.primary }}>
-              {step.label}
-            </Typography>
-            {complete ? <GreenhouseStatusDot tone='success' ariaLabel={GH_KNOWLEDGE_COPY.aria.completedStep} /> : null}
-          </Stack>
-          <Typography variant='caption' color='text.secondary'>
-            {step.description}
-          </Typography>
-          <Typography variant='caption' color='text.secondary'>
-            {step.metadata}
-          </Typography>
-        </Stack>
-      </Stack>
-    </Box>
-  )
+  gap: 3,
+  '& > *': { minInlineSize: 0 }
 }
 
 const SourceCard = ({ source }: { source: (typeof sourceExcerpts)[number] }) => {
@@ -243,6 +184,63 @@ const EvalsPanel = () => (
   </Stack>
 )
 
+const TraceProofPanel = () => {
+  const theme = useTheme()
+
+  return (
+    <Stack spacing={0} data-capture='knowledge-proof-trace-steps'>
+      {traceSteps.map((step, index) => (
+        <Stack
+          key={step.id}
+          direction='row'
+          spacing={3}
+          alignItems='flex-start'
+          sx={{
+            py: 3,
+            borderBlockEnd: index === traceSteps.length - 1 ? 0 : `1px solid ${theme.palette.divider}`
+          }}
+        >
+          <Box
+            sx={{
+              inlineSize: 28,
+              blockSize: 28,
+              borderRadius: '50%',
+              display: 'grid',
+              placeItems: 'center',
+              flex: '0 0 auto',
+              color: step.state === 'pending' ? theme.palette.text.secondary : theme.palette.primary.contrastText,
+              backgroundColor:
+                step.state === 'complete'
+                  ? theme.palette.success.main
+                  : step.state === 'active'
+                    ? theme.palette.primary.main
+                    : theme.palette.action.selected
+            }}
+          >
+            <Typography variant='caption' sx={{ color: 'inherit', fontWeight: 600 }}>
+              {index + 1}
+            </Typography>
+          </Box>
+
+          <Stack spacing={1} sx={{ minInlineSize: 0 }}>
+            <Stack direction='row' spacing={2} alignItems='center' flexWrap='wrap' useFlexGap>
+              <Typography variant='h6'>{step.label}</Typography>
+              {step.state === 'active' ? <GreenhouseChip size='small' variant='label' tone='primary' label='Activo' /> : null}
+              {step.state === 'complete' ? <GreenhouseStatusDot tone='success' ariaLabel={GH_KNOWLEDGE_COPY.aria.completedStep} /> : null}
+            </Stack>
+            <Typography variant='caption' color='text.secondary'>
+              {step.description}
+            </Typography>
+            <Typography variant='caption' color='text.secondary'>
+              {step.metadata}
+            </Typography>
+          </Stack>
+        </Stack>
+      ))}
+    </Stack>
+  )
+}
+
 const LearningPathRail = () => {
   const theme = useTheme()
 
@@ -318,7 +316,16 @@ const ManualReader = () => {
       </Box>
       <Divider />
 
-      <Stack direction='row' spacing={2} sx={{ px: 5, py: 2, overflowX: 'auto' }}>
+      <Stack
+        direction='row'
+        spacing={2}
+        sx={{
+          px: 5,
+          py: 2,
+          overflowX: 'auto',
+          '& > *': { flex: '0 0 auto' }
+        }}
+      >
         {manualSections.map(section => (
           <GreenhouseButton
             key={section.id}
@@ -469,6 +476,8 @@ const KnowledgeAnswerTraceMockupView = () => {
   const [mode, setMode] = useState<AnswerMode>('human')
   const [questionDraft, setQuestionDraft] = useState('')
   const [selectedQuestion, setSelectedQuestion] = useState<string>(GH_KNOWLEDGE_COPY.selectedQuestion)
+  const [hasAskedQuestion, setHasAskedQuestion] = useState(false)
+  const [isThinking, setIsThinking] = useState(false)
   const [feedback, setFeedback] = useState('useful')
   const [copiedUri, setCopiedUri] = useState(false)
   const [feedbackSubmitted, setFeedbackSubmitted] = useState(false)
@@ -482,10 +491,19 @@ const KnowledgeAnswerTraceMockupView = () => {
   const submitNexaQuestion = () => {
     const nextQuestion = questionDraft.trim()
 
-    if (nextQuestion) setSelectedQuestion(nextQuestion)
+    if (!nextQuestion) return
+
+    setSelectedQuestion(nextQuestion)
+    setQuestionDraft('')
+    setHasAskedQuestion(true)
+    setProofTab('trace')
+
+    setIsThinking(true)
+    window.setTimeout(() => setIsThinking(false), 700)
   }
 
   const proofContent = useMemo(() => {
+    if (proofTab === 'trace') return <TraceProofPanel />
     if (proofTab === 'packet') return <PacketRows />
     if (proofTab === 'evals') return <EvalsPanel />
 
@@ -533,208 +551,84 @@ const KnowledgeAnswerTraceMockupView = () => {
         </Stack>
       </Stack>
 
-      <Box sx={panelSx(theme)} data-capture='knowledge-command-center'>
-          <Stack spacing={3} sx={{ p: { xs: 4, md: 5 } }}>
-          <Stack direction={{ xs: 'column', md: 'row' }} spacing={3}>
-            <Box sx={{ flex: '1 1 auto', minInlineSize: 0 }}>
-              <NexaComposer kind='knowledgeAsk'>
-                <NexaComposerInput
-                  kind='knowledgeAsk'
-                  fullWidth
-                  value={questionDraft}
-                  placeholder={GH_KNOWLEDGE_COPY.commandPlaceholder}
-                  onChange={event => setQuestionDraft(event.target.value)}
-                  onKeyDown={event => {
-                    if (event.key === 'Enter' && !event.shiftKey) {
-                      event.preventDefault()
-                      submitNexaQuestion()
-                    }
-                  }}
-                  inputProps={{
-                    'aria-label': GH_KNOWLEDGE_COPY.commandPlaceholder
-                  }}
-                />
-              </NexaComposer>
+      <NexaKnowledgeAnswerSurface<AnswerMode, ProofTab>
+        kind='knowledgeAnswerTrace'
+        question={selectedQuestion}
+        conversationStarted={hasAskedQuestion}
+        draft={questionDraft}
+        onDraftChange={setQuestionDraft}
+        onSubmit={submitNexaQuestion}
+        isThinking={isThinking}
+        commandPlaceholder={GH_KNOWLEDGE_COPY.commandPlaceholder}
+        followUpPlaceholder={GH_KNOWLEDGE_COPY.followUpPlaceholder}
+        sendLabel={GH_KNOWLEDGE_COPY.sendQuestion}
+        mode={mode}
+        modeOptions={[
+          { value: 'human', label: GH_KNOWLEDGE_COPY.mode.human },
+          { value: 'nexa', label: GH_KNOWLEDGE_COPY.mode.nexa },
+          { value: 'mcp', label: GH_KNOWLEDGE_COPY.mode.mcp }
+        ]}
+        onModeChange={setMode}
+        modeHelper={GH_KNOWLEDGE_COPY.currentModeHelper[mode]}
+        modeSelectorAriaLabel={GH_KNOWLEDGE_COPY.aria.modeSelector}
+        traceSteps={traceSteps}
+        responseTitle={GH_KNOWLEDGE_COPY.responseTitle}
+        assistantName={GH_KNOWLEDGE_COPY.assistantName}
+        responseThinkingLabel={GH_KNOWLEDGE_COPY.responseThinkingLabel}
+        responseModeLabel={`Modo ${GH_KNOWLEDGE_COPY.mode[mode]}`}
+        answerIntro={
+          <>
+            {GH_KNOWLEDGE_COPY.answer} Las métricas ICO son{' '}
+            <Box component='strong' sx={{ fontWeight: 600 }}>
+              Impacto, Colaboración y Orientación al Cliente
             </Box>
-            <GreenhouseButton kind='primaryAction' leadingIconClassName='tabler-send' reserveInlineSize={136} onClick={submitNexaQuestion}>
-              {GH_KNOWLEDGE_COPY.sendQuestion}
+            , cada una con su definición y escala de 0 a 100.
+          </>
+        }
+        answerSteps={answerSteps}
+        sourcesLabel={GH_KNOWLEDGE_COPY.sourcesLabel}
+        sources={sourceExcerpts}
+        warningTitle={GH_KNOWLEDGE_COPY.operationalDataWarning}
+        warningBody={GH_KNOWLEDGE_COPY.operationalDataWarningBody}
+        warningAction={
+          <GreenhouseButton variant='outlined' tone='secondary' size='small'>
+            {GH_KNOWLEDGE_COPY.consultData}
+          </GreenhouseButton>
+        }
+        responseActions={
+          <Stack direction='row' spacing={3} flexWrap='wrap' useFlexGap>
+            <GreenhouseButton variant='outlined' leadingIconClassName='tabler-external-link'>
+              {GH_KNOWLEDGE_COPY.openManual}
             </GreenhouseButton>
-            <ToggleButtonGroup
-              exclusive
-              value={mode}
-              onChange={(_, nextMode: AnswerMode | null) => {
-                if (nextMode) setMode(nextMode)
-              }}
-              aria-label={GH_KNOWLEDGE_COPY.aria.modeSelector}
-              size='small'
-              sx={{
-                '& .MuiToggleButton-root': {
-                  minInlineSize: 92,
-                  borderRadius: `${theme.shape.customBorderRadius.sm}px`
-                }
-              }}
-            >
-              <ToggleButton value='human'>{GH_KNOWLEDGE_COPY.mode.human}</ToggleButton>
-              <ToggleButton value='nexa'>{GH_KNOWLEDGE_COPY.mode.nexa}</ToggleButton>
-              <ToggleButton value='mcp'>{GH_KNOWLEDGE_COPY.mode.mcp}</ToggleButton>
-            </ToggleButtonGroup>
+            <GreenhouseButton variant='outlined' tone='secondary' leadingIconClassName='tabler-bookmark'>
+              {GH_KNOWLEDGE_COPY.saveGuide}
+            </GreenhouseButton>
+            <GreenhouseButton variant='outlined' tone='secondary' leadingIconClassName='tabler-flag'>
+              {GH_KNOWLEDGE_COPY.reportGap}
+            </GreenhouseButton>
           </Stack>
-
-          <CustomTextField
-            fullWidth
-            multiline
-            maxRows={2}
-            value={selectedQuestion}
-            aria-label={GH_KNOWLEDGE_COPY.aria.selectedQuestion}
-            InputProps={{
-              readOnly: true,
-              startAdornment: (
-                <InputAdornment position='start'>
-                  <i className='tabler-search' aria-hidden='true' />
-                </InputAdornment>
-              ),
-              endAdornment: (
-                <InputAdornment position='end'>
-                  <i className='tabler-x' aria-hidden='true' />
-                </InputAdornment>
-              )
-            }}
-          />
-          <Stack direction='row' spacing={2} alignItems='center' role='status' aria-live='polite'>
-            <GreenhouseStatusDot tone='info' ariaLabel={GH_KNOWLEDGE_COPY.aria.activeMode} />
-            <Typography variant='caption' color='text.secondary'>
-              {GH_KNOWLEDGE_COPY.currentModeHelper[mode]}
-            </Typography>
-          </Stack>
-        </Stack>
-
-        <Divider />
-
-        <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, overflowX: 'auto' }}>
-          {traceSteps.map((_, index) => (
-            <TraceStepCard key={traceSteps[index].id} index={index} />
-          ))}
-        </Box>
-      </Box>
-
-      <Box
-        sx={{
-          display: 'grid',
-          gridTemplateColumns: { xs: '1fr', lg: 'minmax(0, 0.92fr) minmax(0, 1.08fr)' },
-          gap: 5,
-          alignItems: 'start'
-        }}
-      >
-        <Box sx={panelSx(theme)} data-capture='knowledge-verifiable-answer'>
-          <Box sx={sectionHeaderSx}>
-            <Stack direction='row' spacing={2} alignItems='center'>
-              <GreenhouseNexaAnimatedMark kind='inlineMark' size='small' ariaLabel='Nexa' />
-              <Typography variant='h5'>{GH_KNOWLEDGE_COPY.responseTitle}</Typography>
-            </Stack>
-            <GreenhouseChip size='small' variant='label' tone='success' label={`Modo ${GH_KNOWLEDGE_COPY.mode[mode]}`} />
-          </Box>
-          <Divider />
-
-          <Stack spacing={4} sx={{ p: { xs: 4, md: 5 } }}>
-            <Typography variant='body2'>
-              {GH_KNOWLEDGE_COPY.answer} Las métricas ICO son{' '}
-              <Box component='strong' sx={{ fontWeight: 600 }}>
-                Impacto, Colaboración y Orientación al Cliente
-              </Box>
-              , cada una con su definición y escala de 0 a 100.
-            </Typography>
-
-            <Stack spacing={2}>
-              {answerSteps.map((step, index) => (
-                <Stack key={step} direction='row' spacing={3} alignItems='flex-start'>
-                  <Box
-                    sx={{
-                      inlineSize: 22,
-                      blockSize: 22,
-                      borderRadius: '50%',
-                      display: 'grid',
-                      placeItems: 'center',
-                      color: theme.palette.success.main,
-                      border: `1px solid ${theme.palette.success.main}`,
-                      flex: '0 0 auto'
-                    }}
-                  >
-                    <Typography variant='caption' sx={{ color: 'inherit', fontWeight: 600 }}>
-                      {index + 1}
-                    </Typography>
-                  </Box>
-                  <Typography variant='body2'>{step}</Typography>
-                </Stack>
-              ))}
-            </Stack>
-
-            <Alert
-              severity='warning'
-              action={
-                <GreenhouseButton variant='outlined' tone='secondary' size='small'>
-                  {GH_KNOWLEDGE_COPY.consultData}
-                </GreenhouseButton>
-              }
-            >
-              <Typography variant='h6'>{GH_KNOWLEDGE_COPY.operationalDataWarning}</Typography>
-              <Typography variant='body2'>{GH_KNOWLEDGE_COPY.operationalDataWarningBody}</Typography>
-            </Alert>
-
-            <Stack spacing={2}>
-              <Typography variant='h6'>Fuentes (2)</Typography>
-              <Stack direction='row' spacing={3} flexWrap='wrap' useFlexGap>
-                {sourceExcerpts.map(source => (
-                  <GreenhouseChip
-                    key={source.id}
-                    size='medium'
-                    variant='outlined'
-                    tone='primary'
-                    iconClassName='tabler-file-text'
-                    label={source.title.replace('Manual: ', '').replace('Glosario: ', '')}
-                  />
-                ))}
-              </Stack>
-            </Stack>
-
-            <Stack direction='row' spacing={3} flexWrap='wrap' useFlexGap>
-              <GreenhouseButton variant='outlined' leadingIconClassName='tabler-external-link'>
-                {GH_KNOWLEDGE_COPY.openManual}
-              </GreenhouseButton>
-              <GreenhouseButton variant='outlined' tone='secondary' leadingIconClassName='tabler-bookmark'>
-                {GH_KNOWLEDGE_COPY.saveGuide}
-              </GreenhouseButton>
-              <GreenhouseButton variant='outlined' tone='secondary' leadingIconClassName='tabler-flag'>
-                {GH_KNOWLEDGE_COPY.reportGap}
-              </GreenhouseButton>
-            </Stack>
-          </Stack>
-        </Box>
-
-        <Box sx={panelSx(theme)} data-capture='knowledge-proof-trace'>
-          <Box sx={sectionHeaderSx}>
-            <Typography variant='h5'>{GH_KNOWLEDGE_COPY.proofTitle}</Typography>
-            <Tabs
-              value={proofTab}
-              onChange={(_, value: ProofTab) => setProofTab(value)}
-              aria-label={GH_KNOWLEDGE_COPY.aria.proofTabs}
-              sx={{ minBlockSize: 36, '& .MuiTab-root': { minBlockSize: 36 } }}
-            >
-              <Tab value='sources' label={GH_KNOWLEDGE_COPY.evidenceTabs.sources} />
-              <Tab value='packet' label={GH_KNOWLEDGE_COPY.evidenceTabs.packet} />
-              <Tab value='evals' label={GH_KNOWLEDGE_COPY.evidenceTabs.evals} />
-            </Tabs>
-          </Box>
-          <Divider />
-          <Box sx={{ px: { xs: 4, md: 5 }, py: 2 }}>{proofContent}</Box>
-        </Box>
-      </Box>
+        }
+        proofTitle={GH_KNOWLEDGE_COPY.proofTitle}
+        proofTab={proofTab}
+        proofTabs={[
+          { value: 'sources', label: GH_KNOWLEDGE_COPY.evidenceTabs.sources },
+          { value: 'trace', label: GH_KNOWLEDGE_COPY.evidenceTabs.trace },
+          { value: 'packet', label: GH_KNOWLEDGE_COPY.evidenceTabs.packet },
+          { value: 'evals', label: GH_KNOWLEDGE_COPY.evidenceTabs.evals }
+        ]}
+        onProofTabChange={setProofTab}
+        proofTabsAriaLabel={GH_KNOWLEDGE_COPY.aria.proofTabs}
+        proofContent={proofContent}
+      />
 
       <Box
         sx={{
           display: 'grid',
           gridTemplateColumns: { xs: '1fr', lg: '280px minmax(0, 1fr)' },
           gap: 5,
-          alignItems: 'start'
+          alignItems: 'start',
+          minInlineSize: 0,
+          '& > *': { minInlineSize: 0 }
         }}
       >
         <LearningPathRail />

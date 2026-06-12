@@ -58,10 +58,13 @@ import {
 // ──────────────────────────────────────────────────────────────────────────────
 
 export type NexaComposerActionVariant = 'send' | 'stop'
+export type NexaComposerActionIcon = 'send' | 'search'
 
 export interface NexaComposerActionButtonProps {
   /** `send` = navy en reposo → teal al hover (energiza). `stop` = navy → gris (calma). */
   variant: NexaComposerActionVariant
+  /** Icono semántico del submit: chat usa envío; consultas command/search pueden usar búsqueda. */
+  icon?: NexaComposerActionIcon
   /** Etiqueta accesible obligatoria (la consumer la trae del copy es-CL canónico). */
   'aria-label': string
   onClick?: () => void
@@ -74,10 +77,11 @@ export interface NexaComposerActionButtonProps {
  * forwardRef + spread → válido como target `asChild` de `ComposerPrimitive.Send`/`.Cancel`.
  */
 export const NexaComposerActionButton = forwardRef<HTMLButtonElement, NexaComposerActionButtonProps>(
-  ({ variant, disabled, onClick, ...rest }, ref) => {
+  ({ variant, icon = 'send', disabled, onClick, ...rest }, ref) => {
     const theme = useTheme()
     const { midnightNavy, electricTeal } = GREENHOUSE_NEXA_BRAND_COLORS
     const isStop = variant === 'stop'
+    const actionIcon = isStop ? 'send' : icon
 
     return (
       <Box
@@ -88,11 +92,11 @@ export const NexaComposerActionButton = forwardRef<HTMLButtonElement, NexaCompos
         disabled={disabled}
         {...rest}
         sx={{
-          width: 30,
-          height: 30,
+          width: 34,
+          height: 34,
           flexShrink: 0,
           p: 0,
-          border: 'none',
+          border: '1px solid transparent',
           borderRadius: '50%',
           cursor: 'pointer',
           display: 'inline-flex',
@@ -100,20 +104,22 @@ export const NexaComposerActionButton = forwardRef<HTMLButtonElement, NexaCompos
           justifyContent: 'center',
           bgcolor: midnightNavy,
           color: 'common.white',
-          boxShadow: `0 1px 3px ${alpha(midnightNavy, 0.32)}`,
-          transition: theme.transitions.create(['background-color', 'color', 'transform', 'box-shadow'], {
+          boxShadow: `0 8px 18px ${alpha(midnightNavy, 0.22)}`,
+          transition: theme.transitions.create(['background-color', 'border-color', 'color', 'transform', 'box-shadow'], {
             duration: theme.transitions.duration.shortest
           }),
           '&:hover': isStop
             ? {
                 // Detener = acción NEUTRAL (no destructiva): hover gris calma, no energiza.
                 bgcolor: alpha(theme.palette.text.primary, 0.14),
+                borderColor: alpha(theme.palette.text.primary, 0.08),
                 color: midnightNavy,
                 transform: 'translateY(-1px)',
                 boxShadow: `0 2px 6px ${alpha(theme.palette.common.black, 0.16)}`
               }
             : {
                 bgcolor: electricTeal,
+                borderColor: alpha(electricTeal, 0.42),
                 color: midnightNavy,
                 transform: 'translateY(-1px) scale(1.04)',
                 boxShadow: `0 2px 8px ${alpha(electricTeal, 0.45)}`
@@ -124,13 +130,14 @@ export const NexaComposerActionButton = forwardRef<HTMLButtonElement, NexaCompos
             ? { outline: 'none', boxShadow: `0 0 0 3px ${alpha(theme.palette.text.primary, 0.28)}` }
             : { outline: 'none', boxShadow: `0 0 0 3px ${alpha(electricTeal, 0.5)}` },
           '&:disabled': {
-            bgcolor: alpha(theme.palette.text.primary, 0.08),
-            color: 'action.disabled',
+            bgcolor: alpha(midnightNavy, 0.07),
+            borderColor: alpha(midnightNavy, 0.1),
+            color: alpha(midnightNavy, 0.34),
             boxShadow: 'none',
             cursor: 'default',
             transform: 'none'
           },
-          '&:disabled svg': { stroke: theme.palette.action.disabled }
+          '&:disabled svg': { stroke: alpha(midnightNavy, 0.34) }
         }}
       >
         {isStop ? (
@@ -148,12 +155,21 @@ export const NexaComposerActionButton = forwardRef<HTMLButtonElement, NexaCompos
               height: 15,
               stroke: theme.palette.common.white,
               strokeWidth: 2.25,
-              strokeLinecap: 'round',
-              strokeLinejoin: 'round'
-            }}
-          >
-            <path d='M12 19V5' />
-            <path d='M5 12l7-7 7 7' />
+            strokeLinecap: 'round',
+            strokeLinejoin: 'round'
+          }}
+        >
+            {actionIcon === 'search' ? (
+              <>
+                <circle cx='11' cy='11' r='6' />
+                <path d='m16 16 4 4' />
+              </>
+            ) : (
+              <>
+                <path d='M10 14 21 3' />
+                <path d='m21 3-6.5 18-4-8.5L2 8.5 21 3Z' />
+              </>
+            )}
           </Box>
         )}
       </Box>
@@ -173,6 +189,8 @@ export type NexaComposerInputProps = TextFieldProps & {
   leadingAdornment?: ReactNode
   /** Adorno final (botón send/stop). Se inyecta en `slotProps.input.endAdornment`. */
   endAdornment?: ReactNode
+  /** Acción final que se compone después del shortcut canónico de la variant/kind. */
+  actionAdornment?: ReactNode
   shortcutLabel?: ReactNode
   showNexaMark?: boolean
 }
@@ -187,6 +205,7 @@ export const NexaComposerInput = forwardRef<HTMLDivElement, NexaComposerInputPro
   (
     {
       endAdornment,
+      actionAdornment,
       leadingAdornment,
       multiline,
       minRows,
@@ -212,11 +231,18 @@ export const NexaComposerInput = forwardRef<HTMLDivElement, NexaComposerInputPro
       <GreenhouseNexaAnimatedMark kind='inlineMark' size='small' ariaLabel='Nexa' />
     ) : null)
 
-    const resolvedEndAdornment = endAdornment ?? (resolvedShortcut ? (
+    const shortcutAdornment = resolvedShortcut ? (
       <Typography variant='caption' color='text.secondary' sx={{ whiteSpace: 'nowrap' }}>
         {resolvedShortcut}
       </Typography>
-    ) : null)
+    ) : null
+
+    const resolvedEndAdornment = endAdornment ?? (actionAdornment && shortcutAdornment ? (
+      <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 2 }}>
+        {shortcutAdornment}
+        {actionAdornment}
+      </Box>
+    ) : actionAdornment ?? shortcutAdornment)
 
     return (
       <CustomTextField

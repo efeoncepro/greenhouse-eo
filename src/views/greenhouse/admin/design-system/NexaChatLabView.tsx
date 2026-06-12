@@ -1,6 +1,6 @@
 'use client'
 
-import type { ReactNode } from 'react'
+import { useState, type ReactNode } from 'react'
 
 import Box from '@mui/material/Box'
 import Stack from '@mui/material/Stack'
@@ -15,6 +15,7 @@ import {
   NexaComposerInput,
   NexaComposerActionButton,
   NexaFace,
+  NexaKnowledgeAnswerSurface,
   NexaPresenceMark,
   NexaSenderMark
 } from '@/components/greenhouse/primitives'
@@ -80,6 +81,7 @@ const ANATOMY: { region: string; detail: string }[] = [
 const COMPOSED_OF: { name: string; role: string; status: string }[] = [
   { name: 'NexaGlowBorder', role: 'Borde "línea de luz" del composer (dos capas + máscara + beam).', status: 'Primitive canónica ✅' },
   { name: 'NexaComposer', role: 'Input (caja Vuexy anulada → el glow pinta todo) + botón send/stop + glow + disclaimer, como unidad reusable. Partes: NexaComposerInput / NexaComposerActionButton.', status: 'Primitive canónica ✅' },
+  { name: 'NexaKnowledgeAnswerSurface', role: 'Superficie de respuesta trazable: pregunta-burbuja + respuesta Nexa + composer descendido + proof panel lateral.', status: 'Composition primitive ✅' },
   { name: 'NexaPresenceMark', role: 'Header: crossfade "En línea" ↔ "Pensando…" con elipsis animada (reduced-motion horneado).', status: 'Primitive canónica ✅' },
   { name: 'NexaFace', role: 'Avatar cara real de Nexa con variants hero (76) / header (44, borde teal) / message (32). Single source del asset.', status: 'Primitive canónica ✅' },
   { name: 'NexaSenderMark', role: 'Avatar por-mensaje (disco navy + anillo teal + glyph arco teal/sparkle blanco inline).', status: 'Primitive canónica ✅' },
@@ -94,6 +96,90 @@ const MODES: { mode: string; detail: string }[] = [
   { mode: 'Panel expandible (B)', detail: 'Compacto ↔ ancho con rail de historial. Concepto vigente de esta task.' },
   { mode: 'Lane sidecar (C)', detail: 'Full-height in-flow (AdaptiveSidecarLayout), el contexto principal sigue visible. [deferred-but-committed]' }
 ]
+
+const KnowledgeAnswerSurfaceSpecimen = () => {
+  const [draft, setDraft] = useState('')
+  const [mode, setMode] = useState<'human' | 'nexa' | 'mcp'>('human')
+  const [proofTab, setProofTab] = useState<'sources' | 'packet' | 'evals'>('sources')
+  const [question, setQuestion] = useState('¿Cómo reviso mis métricas ICO personales?')
+  const [thinking, setThinking] = useState(false)
+
+  const submit = () => {
+    const nextQuestion = draft.trim()
+
+    if (nextQuestion) {
+      setQuestion(nextQuestion)
+      setDraft('')
+    }
+
+    setThinking(true)
+    window.setTimeout(() => setThinking(false), 650)
+  }
+
+  return (
+    <NexaKnowledgeAnswerSurface<'human' | 'nexa' | 'mcp', 'sources' | 'packet' | 'evals'>
+      kind='knowledgeAnswerTrace'
+      question={question}
+      draft={draft}
+      onDraftChange={setDraft}
+      onSubmit={submit}
+      isThinking={thinking}
+      commandPlaceholder='Pregúntale a Nexa'
+      followUpPlaceholder='Haz otra pregunta a Nexa'
+      sendLabel='Preguntar'
+      mode={mode}
+      modeOptions={[
+        { value: 'human', label: 'Humano' },
+        { value: 'nexa', label: 'Nexa' },
+        { value: 'mcp', label: 'MCP' }
+      ]}
+      onModeChange={setMode}
+      modeHelper='Modo humano: respuesta accionable con fuentes visibles.'
+      modeSelectorAriaLabel='Modo de respuesta'
+      traceSteps={[
+        { id: 'intent', label: 'Intento detectado', description: 'Guía operativa', metadata: 'Dominio: Mi Desempeño', state: 'complete' },
+        { id: 'retrieval', label: 'Retrieval', description: '3 chunks incluidos', metadata: 'Filtrados por policy: 1', state: 'complete' },
+        { id: 'answer', label: 'Respuesta', description: 'Citas visibles', metadata: 'Confianza: 0.91', state: 'active' },
+        { id: 'feedback', label: 'Feedback', description: 'Mejora continua', metadata: 'Listo para reportar', state: 'pending' }
+      ]}
+      responseTitle='Respuesta verificable'
+      responseThinkingLabel='Nexa está refinando la respuesta'
+      responseModeLabel={`Modo ${mode === 'human' ? 'Humano' : mode === 'nexa' ? 'Nexa' : 'MCP'}`}
+      answerIntro='Entra a Mi Desempeño desde el menú principal. Ahí puedes revisar objetivos, avances por métrica ICO y acuerdos con tu líder.'
+      answerSteps={[
+        'Abre Mi Desempeño desde Home o el menú principal.',
+        'Revisa tus objetivos activos y su avance por métrica.',
+        'Filtra por período para separar completados, activos o atrasados.'
+      ]}
+      sourcesLabel='Fuentes'
+      sources={[
+        { id: 'manual', title: 'Manual: Cómo usar Mi Desempeño' },
+        { id: 'glosario', title: 'Glosario: Métricas ICO personales' }
+      ]}
+      warningTitle='No consulté datos actuales'
+      warningBody='Esta respuesta usa guías publicadas. Para ver tu estado real, consulta el módulo operativo.'
+      proofTitle='Prueba y trazabilidad'
+      proofTab={proofTab}
+      proofTabs={[
+        { value: 'sources', label: 'Fuentes' },
+        { value: 'packet', label: 'Packet' },
+        { value: 'evals', label: 'Evals' }
+      ]}
+      onProofTabChange={setProofTab}
+      proofTabsAriaLabel='Prueba y trazabilidad'
+      proofContent={
+        <Stack spacing={1.5}>
+          <Typography variant='body2' sx={{ fontWeight: 600 }}>
+            {proofTab === 'sources' ? '2 fuentes publicadas' : proofTab === 'packet' ? 'knowledge-search.v1' : 'Golden question: passed'}
+          </Typography>
+          <Typography variant='caption' color='text.secondary'>
+            Specimen vivo de la primera kind transversal de respuestas Nexa para Knowledge.
+          </Typography>
+        </Stack>
+      }
+    />
+  )
+}
 
 const NexaChatLabView = () => (
   <Box
@@ -251,10 +337,14 @@ const NexaChatLabView = () => (
           </NexaComposer>
           <Box sx={{ mt: 3, maxInlineSize: 720 }} data-capture='nexa-composer-command-variant'>
             <Typography variant='caption' color='text.secondary' sx={{ display: 'block', mb: 1 }}>
-              <InlineCode>kind=&apos;knowledgeAsk&apos;</InlineCode> — command input con Nexa mark + shortcut
+              <InlineCode>kind=&apos;knowledgeAsk&apos;</InlineCode> — command input con Nexa mark + shortcut ↵
             </Typography>
             <NexaComposer kind='knowledgeAsk'>
-              <NexaComposerInput kind='knowledgeAsk' placeholder='Pregúntale a Nexa' />
+              <NexaComposerInput
+                kind='knowledgeAsk'
+                placeholder='Pregúntale a Nexa'
+                actionAdornment={<NexaComposerActionButton variant='send' icon='search' aria-label='Preguntar' />}
+              />
             </NexaComposer>
           </Box>
           <Stack direction='row' spacing={2} alignItems='center' sx={{ mt: 2 }}>
@@ -266,11 +356,22 @@ const NexaChatLabView = () => (
               <Typography variant='caption' color='text.secondary'>send</Typography>
             </Stack>
             <Stack spacing={0.5} alignItems='center'>
+              <NexaComposerActionButton variant='send' icon='search' aria-label='Preguntar' />
+              <Typography variant='caption' color='text.secondary'>search</Typography>
+            </Stack>
+            <Stack spacing={0.5} alignItems='center'>
               <NexaComposerActionButton variant='stop' aria-label='Detener generación' />
               <Typography variant='caption' color='text.secondary'>stop</Typography>
             </Stack>
           </Stack>
         </Card>
+
+        <Box data-capture='nexa-knowledge-answer-surface-specimen'>
+          <Typography variant='subtitle2' sx={{ mb: 1.5 }}>
+            <InlineCode>NexaKnowledgeAnswerSurface</InlineCode> — pregunta, respuesta y prueba sin salto abrupto
+          </Typography>
+          <KnowledgeAnswerSurfaceSpecimen />
+        </Box>
       </Stack>
     </Section>
 
@@ -293,6 +394,7 @@ const NexaChatLabView = () => (
       <Card>
         <Stack spacing={DESIGN_SYSTEM_LAB_TOKENS.spacing.tight}>
           <Typography variant='body2'>✓ Reusar este patrón + sus primitives en toda superficie donde aparezca Nexa.</Typography>
+          <Typography variant='body2'>✓ Para respuestas con evidencia, usar <InlineCode>NexaKnowledgeAnswerSurface</InlineCode> y su kind inicial <InlineCode>knowledgeAnswerTrace</InlineCode>.</Typography>
           <Typography variant='body2'>✓ Empty hero: saludo rotativo + prompts contextuales (por ruta/entidad/rol) + firma Efeonce solo aquí.</Typography>
           <Typography variant='body2'>✓ Composer siempre vía <InlineCode>NexaComposer</InlineCode> (que envuelve <InlineCode>NexaGlowBorder</InlineCode>); cero hardcode (tokens AXIS + brand Nexa SSOT + escala SoT).</Typography>
           <Typography variant='body2' color='error.main'>✗ No crear un chat de Nexa paralelo por pantalla ni reimplementar el composer/rail.</Typography>

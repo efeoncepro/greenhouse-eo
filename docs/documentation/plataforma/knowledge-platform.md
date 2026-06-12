@@ -3,7 +3,7 @@
 > **Tipo de documento:** Documentación funcional (lenguaje simple)
 > **Versión:** 1.0
 > **Creado:** 2026-06-11 por Claude (TASK-1081)
-> **Última actualización:** 2026-06-11 por Claude (TASK-1081)
+> **Última actualización:** 2026-06-12 por Codex (TASK-1089)
 > **Documentación técnica:** [GREENHOUSE_KNOWLEDGE_PLATFORM_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_KNOWLEDGE_PLATFORM_ARCHITECTURE_V1.md) · [GREENHOUSE_KNOWLEDGE_PLATFORM_DECISION_V1.md](../../architecture/GREENHOUSE_KNOWLEDGE_PLATFORM_DECISION_V1.md)
 
 ## Qué es
@@ -84,3 +84,15 @@ El conocimiento no se escribe a mano en Greenhouse: se **ingiere** desde una fue
 - **Es auditada:** cada corrida queda registrada (qué se publicó, qué se puso en cuarentena, qué se omitió).
 
 > Detalle técnico: el pipeline de ingesta vive en `src/lib/knowledge/ingestion/` y `src/lib/knowledge/sanitization/`. Operar la foundation (aplicar migración, ingerir el corpus, usar los helpers): ver el [manual de uso](../../manual-de-uso/plataforma/knowledge-platform.md).
+
+## Cómo se ve una respuesta de Nexa con Knowledge (TASK-1089)
+
+El mockup interno `/knowledge/mockup/answer-trace` ahora muestra el patrón transversal elegido para respuestas con evidencia: la pregunta sube como burbuja, Nexa responde con fuentes visibles y el composer glow baja debajo de la respuesta para seguir preguntando sin sentir que el usuario "salió" a otra experiencia.
+
+El panel de trazabilidad permanece al lado en desktop y debajo en mobile con tres lentes:
+
+- **Fuentes:** documentos y extractos citados.
+- **Packet:** forma del contrato `knowledge-search.v1` que consumen agentes.
+- **Evals:** checks de calidad/golden questions.
+
+Esta pantalla sigue siendo mockup interno. No activa retrieval real ni consulta tablas; `TASK-1085` conectará Nexa al reader de Knowledge y al feedback compartido.

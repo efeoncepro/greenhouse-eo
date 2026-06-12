@@ -2,11 +2,15 @@ export const GH_KNOWLEDGE_COPY = {
   pageTitle: 'Knowledge',
   pageSubtitle: 'Nexa consulta Knowledge y devuelve una respuesta trazable para humanos, chat y MCP.',
   commandPlaceholder: 'Pregúntale a Nexa',
+  followUpPlaceholder: 'Haz otra pregunta a Nexa',
   selectedQuestion: '¿Cómo reviso mis métricas ICO personales y qué significan?',
   sendQuestion: 'Preguntar',
   sendFeedback: 'Reportar mejora',
   export: 'Exportar',
   responseTitle: 'Respuesta verificable',
+  assistantName: 'Nexa',
+  responseThinkingLabel: 'Nexa está refinando la respuesta',
+  sourcesLabel: 'Fuentes',
   proofTitle: 'Prueba y trazabilidad',
   agentTitle: 'Para agentes',
   breadcrumbRoot: 'Greenhouse',
@@ -52,6 +56,7 @@ export const GH_KNOWLEDGE_COPY = {
   },
   evidenceTabs: {
     sources: 'Fuentes',
+    trace: 'Trace',
     packet: 'Packet',
     evals: 'Evals'
   },

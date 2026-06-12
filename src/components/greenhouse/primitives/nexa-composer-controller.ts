@@ -19,6 +19,7 @@ export interface NexaComposerKindConfig {
   kind: NexaComposerKind
   variant: NexaComposerVariant
   ariaLabel: string
+  shortcutLabel?: string
 }
 
 export const NEXA_COMPOSER_VARIANT_CONFIG: Record<NexaComposerVariant, NexaComposerVariantConfig> = {
@@ -58,7 +59,8 @@ export const NEXA_COMPOSER_KIND_CONFIG: Record<NexaComposerKind, NexaComposerKin
   knowledgeAsk: {
     kind: 'knowledgeAsk',
     variant: 'command',
-    ariaLabel: 'Pregúntale a Nexa'
+    ariaLabel: 'Pregúntale a Nexa',
+    shortcutLabel: '↵'
   },
   globalCommand: {
     kind: 'globalCommand',
@@ -74,7 +76,12 @@ export const resolveNexaComposerVariant = (
   variant?: NexaComposerVariant,
   kind?: NexaComposerKind
 ): NexaComposerVariantConfig => {
-  const resolvedVariant = variant ?? resolveNexaComposerKind(kind).variant
+  const kindConfig = resolveNexaComposerKind(kind)
+  const resolvedVariant = variant ?? kindConfig.variant
+  const variantConfig = NEXA_COMPOSER_VARIANT_CONFIG[resolvedVariant]
 
-  return NEXA_COMPOSER_VARIANT_CONFIG[resolvedVariant]
+  return {
+    ...variantConfig,
+    shortcutLabel: kindConfig.shortcutLabel ?? variantConfig.shortcutLabel
+  }
 }

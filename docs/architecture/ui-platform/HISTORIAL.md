@@ -6,13 +6,23 @@
 
 ---
 
+## Delta 2026-06-12b — NexaKnowledgeAnswerSurface (TASK-1089)
+
+Se creó `NexaKnowledgeAnswerSurface` como **composition primitive transversal** para respuestas Nexa con evidencia, usando Primitive+Variants+Kinds:
+
+- Variants: `conversationTrace` (pregunta-burbuja + respuesta Nexa + composer descendido + trace/proof) y `overviewPanel` (reservada para modo AI Overview compacto).
+- Kind inicial: `knowledgeAnswerTrace` → `conversationTrace`.
+- Primer consumer: `/knowledge/mockup/answer-trace`.
+
+La superficie reusa atoms de Nexa (`NexaComposer kind='knowledgeAsk'`, `NexaSenderMark`, `GreenhouseThinkingBeat`) y conserva `Fuentes | Packet | Evals` como proof panel para humanos/agentes. Es props-only: no consulta tablas ni llama endpoints; el wiring real queda para `TASK-1085` sobre `knowledge-search.v1`. El lab `/design-system/nexa-chat` suma specimen `data-capture='nexa-knowledge-answer-surface-specimen'` y GVC tiene scenario `knowledge-answer-trace`.
+
 ## Delta 2026-06-12 — NexaComposer command variant + `knowledgeAsk` kind
 
 `NexaComposer` deja de ser solo el composer de chat y gana contrato Primitive+Variants+Kinds explícito:
 
 - Variant `chat`: mantiene el composer conversacional existente.
-- Variant `command`: caja compacta con `NexaGlowBorder`, `GreenhouseNexaAnimatedMark kind='inlineMark'` al inicio y shortcut `⌘ K` al final.
-- Kinds oficiales: `floatingChat` → `chat`, `knowledgeAsk` → `command`, `globalCommand` → `command`.
+- Variant `command`: caja compacta con `NexaGlowBorder`, `GreenhouseNexaAnimatedMark kind='inlineMark'` al inicio y shortcut al final.
+- Kinds oficiales: `floatingChat` → `chat`, `knowledgeAsk` → `command` con shortcut `↵` para preguntar sin chocar con el shell, `globalCommand` → `command` con shortcut `⌘ K`.
 
 Primer consumer: `/knowledge/mockup/answer-trace`, que deja de ensamblar a mano `NexaGlowBorder` + mark + shortcut y usa `NexaComposer kind='knowledgeAsk'` + `NexaComposerInput kind='knowledgeAsk'`. El lab `/design-system/nexa-chat` suma specimen `data-capture='nexa-composer-command-variant'`.
 

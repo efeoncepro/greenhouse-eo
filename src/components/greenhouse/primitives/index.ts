@@ -62,6 +62,27 @@ export { default as NexaPresenceMark } from './NexaPresenceMark'
 export type { NexaPresenceMarkProps } from './NexaPresenceMark'
 export { default as NexaSenderMark } from './NexaSenderMark'
 export type { NexaSenderMarkProps } from './NexaSenderMark'
+export { default as NexaKnowledgeAnswerSurface } from './NexaKnowledgeAnswerSurface'
+export type {
+  NexaKnowledgeAnswerModeOption,
+  NexaKnowledgeAnswerProofTab,
+  NexaKnowledgeAnswerSource,
+  NexaKnowledgeAnswerSurfaceProps,
+  NexaKnowledgeAnswerTraceStep,
+  NexaKnowledgeAnswerTraceStepState
+} from './NexaKnowledgeAnswerSurface'
+export {
+  NEXA_KNOWLEDGE_ANSWER_SURFACE_KIND_CONFIG,
+  NEXA_KNOWLEDGE_ANSWER_SURFACE_VARIANT_CONFIG,
+  resolveNexaKnowledgeAnswerSurfaceKind,
+  resolveNexaKnowledgeAnswerSurfaceVariant
+} from './nexa-knowledge-answer-surface-controller'
+export type {
+  NexaKnowledgeAnswerSurfaceKind,
+  NexaKnowledgeAnswerSurfaceKindConfig,
+  NexaKnowledgeAnswerSurfaceVariant,
+  NexaKnowledgeAnswerSurfaceVariantConfig
+} from './nexa-knowledge-answer-surface-controller'
 export { default as GreenhouseNexaAnimatedAskBadge } from './GreenhouseNexaAnimatedAskBadge'
 export type { GreenhouseNexaAnimatedAskBadgeProps } from './GreenhouseNexaAnimatedAskBadge'
 export { default as EfeonceOrbitalLogoMark } from './EfeonceOrbitalLogoMark'

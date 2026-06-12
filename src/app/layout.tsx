@@ -2,7 +2,7 @@ import { Geist, Poppins } from 'next/font/google'
 
 import { getLocale } from 'next-intl/server'
 
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 
 // MUI Imports
 import InitColorSchemeScript from '@mui/material/InitColorSchemeScript'
@@ -56,6 +56,11 @@ export const metadata: Metadata = {
     shortcut: ['/images/greenhouse/SVG/favicon-blue-negative.svg'],
     apple: ['/images/greenhouse/SVG/favicon-blue-negative.svg']
   }
+}
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1
 }
 
 const RootLayout = async (props: ChildrenType) => {

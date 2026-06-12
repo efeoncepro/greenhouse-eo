@@ -1,5 +1,5 @@
 export type TraceStepState = 'complete' | 'active' | 'pending'
-export type ProofTab = 'sources' | 'packet' | 'evals'
+export type ProofTab = 'sources' | 'trace' | 'packet' | 'evals'
 export type AnswerMode = 'human' | 'nexa' | 'mcp'
 export type StatusTone = 'success' | 'info' | 'warning' | 'error' | 'default' | 'primary'
 

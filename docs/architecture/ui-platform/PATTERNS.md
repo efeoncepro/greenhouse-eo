@@ -236,6 +236,7 @@ La superficie **conversacional canónica de Nexa**. Es un **patrón compuesto** 
 |---|---|---|
 | `NexaGlowBorder` | Borde "línea de luz" del composer (dos capas + máscara + beam, reduced-motion horneado). | Primitive canónica ✅ |
 | `NexaComposer` | Input + botón enviar + glow como unidad reusable; variant `command` para cajas compactas con Nexa mark + shortcut. | Primitive canónica ✅ |
+| `NexaKnowledgeAnswerSurface` | Respuesta con evidencia: pregunta-burbuja, respuesta Nexa, composer descendido y proof panel lateral/inline. | Composition primitive ✅ |
 | `NexaPresenceMark` / `NexaPresenceHeader` | Cara/mark + nombre + dot "En línea" con ping. | A extraer ⏳ |
 | `NexaSenderMark` | Avatar por-mensaje (disco navy + glyph teal/sparkle blanco inline-SVG). | A extraer ⏳ |
 | `NexaConversationRail` | Rail de historial glass (search + grupos + items + estados). | Parte del patrón |
@@ -251,8 +252,29 @@ La superficie **conversacional canónica de Nexa**. Es un **patrón compuesto** 
 ### Reglas
 
 - ✓ Reusar este patrón + sus primitives en toda superficie de Nexa-como-chat.
+- ✓ Para respuestas con evidencia/citas, usar `NexaKnowledgeAnswerSurface kind='knowledgeAnswerTrace'` en vez de crear cards de respuesta locales.
 - ✓ Empty hero: saludo rotativo + prompts contextuales + firma Efeonce **solo** en empty state.
 - ✓ Composer siempre vía `NexaComposer` / `NexaComposerInput`; para cajas tipo "Pregúntale a Nexa" usar `kind='knowledgeAsk'` en vez de copiar `NexaGlowBorder` + mark + shortcut localmente.
 - ✗ No crear un chat de Nexa paralelo por pantalla ni reimplementar composer/rail.
 - ✗ No usar la firma Efeonce fuera del empty state ni la cara real per-mensaje (ahí va el mark).
 - ✗ Prompts: NUNCA hardcodear el set; derivar del contexto (Tier 1 frontend resolver, Tier 2 backend data-aware — ver TASK-1078 follow-ups).
+
+### Nexa Knowledge Answer Surface (TASK-1089)
+
+`NexaKnowledgeAnswerSurface` es la primera **composition primitive transversal** para respuestas de Nexa con evidencia. Resuelve el patrón elegido del product-design loop opción 3: la pregunta no desaparece ni se convierte en un campo readonly; sube a burbuja, Nexa responde debajo y el composer glow baja bajo la respuesta para continuar la conversación. El modo conversacional es condicional: antes de un submit válido conserva la experiencia idle anterior con caja glow superior, trace rail y respuesta/proof panel; después del submit mueve la trazabilidad a la tab `Trace`. El proof panel conserva `Fuentes | Trace | Packet | Evals` para humanos y agentes.
+
+**Variants:**
+
+- `conversationTrace`: lane conversacional + trace steps + proof sidecar en desktop (inline en mobile).
+- `overviewPanel`: reservado para el modo tipo AI Overview compacto; sin trace rail completo.
+
+**Kinds:**
+
+- `knowledgeAnswerTrace` → `conversationTrace`; primer consumer `/knowledge/mockup/answer-trace`.
+
+**Reglas:**
+
+- La primitive es **props-only**: no consulta tablas, no llama APIs y no decide retrieval. `TASK-1085` conectará el packet real de `knowledge-search.v1`.
+- Reusar `NexaComposer kind='knowledgeAsk'`, `NexaSenderMark`, `GreenhouseThinkingBeat`, `GreenhouseChip` y `GreenhouseButton`.
+- Motion breve y semántica `aria-live` para el estado de thinking; reduced-motion desactiva entradas decorativas.
+- Mantener el proof panel visible; las citas no son decoración.

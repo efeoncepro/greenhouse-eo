@@ -32,7 +32,8 @@ afterEach(() => {
 describe('NexaComposer', () => {
   it('resolves the knowledge ask kind to the command variant', () => {
     expect(resolveNexaComposerKind('knowledgeAsk').variant).toBe('command')
-    expect(resolveNexaComposerVariant(undefined, 'knowledgeAsk').shortcutLabel).toBe('⌘ K')
+    expect(resolveNexaComposerVariant(undefined, 'knowledgeAsk').shortcutLabel).toBe('↵')
+    expect(resolveNexaComposerVariant(undefined, 'globalCommand').shortcutLabel).toBe('⌘ K')
   })
 
   it('renders the command input with Nexa mark and shortcut affordance', () => {
@@ -44,6 +45,6 @@ describe('NexaComposer', () => {
 
     expect(getByRole('textbox', { name: 'Pregúntale a Nexa' })).toBeInTheDocument()
     expect(getByRole('img', { name: 'Nexa' })).toBeInTheDocument()
-    expect(getByText('⌘ K')).toBeInTheDocument()
+    expect(getByText('↵')).toBeInTheDocument()
   })
 })

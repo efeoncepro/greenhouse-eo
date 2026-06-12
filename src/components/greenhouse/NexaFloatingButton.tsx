@@ -214,8 +214,8 @@ const NexaFloatingButton = ({ docked = false }: NexaFloatingButtonProps) => {
     }
   }
 
-  // Hide on /home (Nexa is inline there)
-  if (pathname === '/home') return null
+  // Hide where Nexa already owns the surface inline.
+  if (pathname === '/home' || pathname === '/knowledge/mockup/answer-trace') return null
 
   const panelContent = (
     <AssistantRuntimeProvider runtime={runtime}>

@@ -8,7 +8,7 @@ export const scenario: CaptureScenario = {
   viewport: { width: 1280, height: 900 },
   viewports: [
     { name: 'desktop', width: 1280, height: 900 },
-    { name: 'mobile', device: 'iPhone 13' }
+    { name: 'mobile', width: 390, height: 844 }
   ],
   initialHoldMs: 1200,
   finalHoldMs: 400,
@@ -43,6 +43,17 @@ export const scenario: CaptureScenario = {
       label: 'nexa-composer-command-variant',
       clipSelector: '[data-capture="nexa-composer-command-variant"]',
       note: 'Variant command del NexaComposer con kind knowledgeAsk'
+    },
+    {
+      kind: 'scroll',
+      selector: '[data-capture="nexa-knowledge-answer-surface-specimen"]',
+      scrollBlock: 'center'
+    },
+    {
+      kind: 'mark',
+      label: 'nexa-knowledge-answer-surface-specimen',
+      clipSelector: '[data-capture="nexa-knowledge-answer-surface-specimen"]',
+      note: 'Composition primitive para respuestas Knowledge con pregunta-burbuja y proof panel'
     }
   ]
 }
