@@ -1,5 +1,13 @@
 # Release 2026-06-10 #2 — develop→main `6c649b2a6` RELEASED
 
+## Sesion 2026-06-12 — Knowledge Search API EN CURSO (TASK-1083, develop)
+
+- **TASK-1083 `in-progress`** en `develop` (sin branch, override del operador). Search read-only sobre API Platform + golden questions.
+- **Discovery + Audit + Plan completos.** Cero open questions sin resolver (pinadas en los Deltas A-E + Full API Parity #1-5 del spec). Schema vivo (263 chunks), store con readers reusables, `app` lane (`runAppRoute`), `can()` acepta `TenantContext`, `captureWithDomain('knowledge')` existe, lint plugin con template.
+- **Plan (3 slices):** (1) migración `body_tsv` GENERATED weighted A/B + GIN + reader SSOT `searchKnowledge` lane-agnóstico 2-modos (human/agentic) + packet `knowledge-search.v1`; (2) endpoints `app` (search + documents list + documents/:id + feedback) + lint rule `no-direct-knowledge-chunk-query`; (3) golden questions fixtures + eval harness. Docs al cierre.
+- **Coordinación Codex:** Codex construye TASK-1084 (consumer) en paralelo; mis archivos (`src/lib/knowledge/search/**`, API routes, migración, lint rule) no solapan con los suyos (`src/views`, `src/app/(dashboard)/knowledge`, `src/lib/copy/knowledge.ts`). Lint rule en modo `warn` para no romper el mockup.
+- Companion: `docs/tasks/in-progress/TASK-1084-answer-trace-promotion-spec.md` (blueprint mockup→runtime).
+
 ## Sesion 2026-06-11 — Knowledge Answer Trace Studio mockup (TASK-1084 visual, con contratos 1083/1085/1086)
 
 - Se construyó la base visual elegida para Knowledge humano + agentes: **Answer Trace Studio** en `/knowledge/mockup/answer-trace` (runtime local, mock data tipado, sin access real ni API productiva). URL local mientras el dev server siga activo: `http://localhost:3000/knowledge/mockup/answer-trace`.
