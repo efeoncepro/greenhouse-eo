@@ -4263,6 +4263,29 @@ La ingesta del corpus a `greenhouse_knowledge` es un **pipeline source-agnostic*
 
 **Spec canónica**: `docs/tasks/complete/TASK-1082-notion-knowledge-ingestion-mvp.md` + `GREENHOUSE_KNOWLEDGE_PLATFORM_ARCHITECTURE_V1.md` Delta 2026-06-11 (Ingesta MVP). Follow-up: **TASK-1088** (Notion connector). Patrón fuente: TASK-790/822 (módulo puro + server-only), TASK-771 (run audit), TASK-721 (sanitize/quarantine), TASK-1081 (store + boundary SCL).
 
+### Knowledge Search API invariants (TASK-1083, desde 2026-06-12)
+
+`knowledge_search` es el contrato **read-only** de retrieval del corpus, sobre API Platform, que consumen por igual UI humana (TASK-1084), Nexa (TASK-1085) y MCP (TASK-1086). **Full API Parity**: la UI/Nexa/MCP son clientes de un contrato gobernado, NO queryean las tablas. Reader SSOT `searchKnowledge` (`src/lib/knowledge/search/search-knowledge.ts`, server-only; barrel `search/index.ts` pure-only — TASK-827).
+
+- **Reader SSOT, lane-agnóstico**: `searchKnowledge({query, subject, mode})` es el ÚNICO punto de retrieval. Recibe `subject` (no `request`) → TASK-1086 lo envuelve para `ecosystem`/MCP sin lógica nueva. Packet versionado `KnowledgeRetrievalPacket` con `contractVersion: 'knowledge-search.v1'` (bump a `v2` ante cambio breaking, nunca mutación silenciosa).
+- **Dos modos, pre-LLM filtering en SQL** (las dos dimensiones ortogonales, Delta B): `human` (cap `knowledge.document.read`) ve `agent_excluded`; `agentic` (cap `knowledge.agentic.retrieve`) **NUNCA** retorna `agent_excluded`/`quarantined`/`restricted`. El binding modo→capability vive en `search/mode.ts` (SSOT). El filtrado lee el **documento vivo** (`kd`), no el chunk denormalizado (que puede lagear), y filtra `current_version_id` (ignora chunks de versiones superseded).
+- **Substrato FTS**: columna `body_tsv tsvector GENERATED` vía función IMMUTABLE SSOT `greenhouse_knowledge.knowledge_chunk_tsv` (weighted heading `'A'`>body `'B'`, config `'spanish'`, **accent-insensitive** `unaccent`) + GIN. Retrieval = OR-ify + `ts_rank` + **piso de relevancia 0.10** (no-answer honesto). Vector/embeddings = escalación diferida (TASK-1080), aditiva.
+- **Quality gate = eval harness offline**: 10 golden questions (fixtures TS, `golden-questions.ts`) — fuente correcta/equivocada/no-answer/escalación sensible. Structural test en CI + eval harness live. El signal `low_citation_rate` mide respuestas de Nexa → es de **TASK-1085**, no de aquí.
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** queryear `greenhouse_knowledge.knowledge_chunks`/`knowledge_document_versions` (contenido) directo desde un consumer (UI, Nexa, MCP, otro dominio). Consumir el contrato: `searchKnowledge` (retrieval) o los readers del store (browse/detail) o los endpoints `app`. Lint rule `greenhouse/no-direct-knowledge-chunk-query` (warn→error tras 1084/1085) lo bloquea; exime el data layer `src/lib/knowledge/**`, migrations, plugin, `db.d.ts`. (Governance ops puede `COUNT` `knowledge_documents` — metadata — legítimamente.)
+- **NUNCA** dejar que el contenido de un chunk denegado (`agent_excluded`/`restricted`/`quarantined`) entre al reader en modo agentic. El reader trae SOLO chunks permitidos; lo denegado se **cuenta** (`deniedOrFilteredCount`), nunca se trae el texto.
+- **NUNCA** filtrar policy/status por el chunk denormalizado — leer `kd` (documento vivo). El chunk copia audience/sensitivity/agentic_policy/freshness al publicar y puede lagear tras una transición.
+- **NUNCA** `to_tsvector('spanish', ...)` inline en una columna GENERATED (resuelve STABLE → rompe). Usar la función IMMUTABLE SSOT; si se tunea (weights/config/unaccent), recomputar la columna (drop+readd) en migración nueva — NUNCA editar una migración aplicada.
+- **NUNCA** devolver `confidence='none'` disfrazando un error del índice. El reader NO swallowea: una falla propaga y la sanitiza el endpoint (`captureWithDomain`). `'none'` es exclusivamente 0 resultados (no-answer honesto).
+- **NUNCA** romper el shape de `knowledge-search.v1` sin bumpear a `v2`. Nexa/MCP/partners dependen de la forma estable.
+- **NUNCA** seedear/derivar un modo nuevo sin declarar su capability en `mode.ts` + grant en `runtime.ts` (guard `capability-grant-coverage.test`).
+- **SIEMPRE** anti-oracle en read-detail: doc inexistente / draft / quarantined / audience ajena → `notFound` (404), nunca 403 (no filtra existencia).
+- **SIEMPRE** que las golden questions muestren recall/precisión pobre, tunear el substrato (umbrales, `pg_trgm`, etc.) — es el mecanismo canónico (la columna `body_tsv` se ALTERa por migración). El eval harness es la regresión.
+
+**Spec canónica**: `docs/tasks/complete/TASK-1083-knowledge-search-api-golden-questions.md` + `GREENHOUSE_KNOWLEDGE_PLATFORM_ARCHITECTURE_V1.md` Delta 2026-06-12 + `GREENHOUSE_FULL_API_PARITY_DECISION_V1.md`. Migraciones `20260612072724451` (tsvector) + `20260612075236036` (unaccent). Patrón fuente: TASK-672 (contrato versionado + composer), TASK-571/766 (VIEW/helper SSOT + lint rule), TASK-822 (lint de boundary), TASK-873/935 (capability grant coverage), TASK-872 (anti-oracle notFound).
+
 ### SQL Signal Reader Schema Validation Gate (TASK-893 hotfix #3, desde 2026-05-16)
 
 Toda query SQL embebida en TS que aparezca en code paths productivos — especialmente signal readers, reliability queries, materializers, audit scripts — **debe validar sus assumptions de schema contra PG real antes de mergear**. `db.d.ts` (Kysely codegen) NO es source of truth — infiere DATE columns como `Timestamp` TS, lo cual lleva al bug class `EXTRACT(EPOCH FROM (date - date))` que produce `function pg_catalog.extract(unknown, integer) does not exist` en runtime.

@@ -1,12 +1,14 @@
 # Release 2026-06-10 #2 — develop→main `6c649b2a6` RELEASED
 
-## Sesion 2026-06-12 — Knowledge Search API EN CURSO (TASK-1083, develop)
+## Sesion 2026-06-12 — Knowledge Search API COMPLETA (TASK-1083, develop)
 
-- **TASK-1083 `in-progress`** en `develop` (sin branch, override del operador). Search read-only sobre API Platform + golden questions.
-- **Discovery + Audit + Plan completos.** Cero open questions sin resolver (pinadas en los Deltas A-E + Full API Parity #1-5 del spec). Schema vivo (263 chunks), store con readers reusables, `app` lane (`runAppRoute`), `can()` acepta `TenantContext`, `captureWithDomain('knowledge')` existe, lint plugin con template.
-- **Plan (3 slices):** (1) migración `body_tsv` GENERATED weighted A/B + GIN + reader SSOT `searchKnowledge` lane-agnóstico 2-modos (human/agentic) + packet `knowledge-search.v1`; (2) endpoints `app` (search + documents list + documents/:id + feedback) + lint rule `no-direct-knowledge-chunk-query`; (3) golden questions fixtures + eval harness. Docs al cierre.
-- **Coordinación Codex:** Codex construye TASK-1084 (consumer) en paralelo; mis archivos (`src/lib/knowledge/search/**`, API routes, migración, lint rule) no solapan con los suyos (`src/views`, `src/app/(dashboard)/knowledge`, `src/lib/copy/knowledge.ts`). Lint rule en modo `warn` para no romper el mockup.
-- Companion: `docs/tasks/in-progress/TASK-1084-answer-trace-promotion-spec.md` (blueprint mockup→runtime).
+- **TASK-1083 `complete`** en `develop` (sin branch, override del operador). 3 slices verdes. Search read-only sobre API Platform + golden questions.
+- **Slice 1 — reader SSOT + substrato:** `searchKnowledge({query,subject,mode})` lane-agnóstico, 2 modos (human ve `agent_excluded`; agentic NUNCA), pre-LLM filtering en SQL leyendo el doc vivo + `current_version_id`, packet `knowledge-search.v1`, `confidence='none'`→no-answer honesto, NO swallowea errores. Substrato `body_tsv` GENERATED vía función IMMUTABLE SSOT (weighted A/B, `'spanish'`, **unaccent**) + GIN. Migraciones `20260612072724451` + `20260612075236036`.
+- **Slice 2 — endpoints + lint:** 4 endpoints `app` (search/documents/documents:id/feedback) vía `runAppRoute` + `can()` + errores sanitizados (rutas finas, lógica en `resources/app-knowledge.ts`); read-detail con anti-oracle `notFound`. Lint rule `greenhouse/no-direct-knowledge-chunk-query` (warn, afinada a tablas de contenido + FROM/JOIN; exime data layer/ops/db.d.ts).
+- **Slice 3 — golden questions + eval:** 10 fixtures TS + structural test (CI) + eval harness live. Tuning eval-driven: OR-ify (recall) + piso de relevancia 0.10 (precisión/no-answer).
+- **Verificación:** 22/22 tests focales verdes contra el corpus real (263 chunks); 19/19 lint-rules; `pnpm build` Turbopack **compiló OK** (boundary server-only de las rutas ✓); tsc limpio en mi código. `pnpm test` full en curso.
+- **Coordinación Codex (importante):** el `pnpm build` local falla en el **type-check** por WIP **sin commitear** de Codex en `KnowledgeAnswerTraceMockupView.tsx:484` (`setSelectedQuestion` con literal type) — NO es mi código, NO está en mis commits, NO en origin/develop (la versión commiteada del mockup es estática y buildea). Mi push solo lleva mis commits → CI verde. Mis archivos no solapan con los de Codex.
+- **Desbloquea TASK-1085** (Nexa: consume `searchKnowledge` agentic + feedback; el signal `low_citation_rate` es suyo) **y TASK-1086** (MCP: envuelve el reader lane-agnóstico en `ecosystem` sin lógica nueva). El **read-detail** cierra el gap del blueprint de promoción de TASK-1084.
 
 ## Sesion 2026-06-11 — Knowledge Answer Trace Studio mockup (TASK-1084 visual, con contratos 1083/1085/1086)
 

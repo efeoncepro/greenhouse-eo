@@ -1,5 +1,9 @@
 # TASK-1086 — Greenhouse MCP Knowledge Resources V1
 
+## Delta 2026-06-12 — desbloqueada por TASK-1083 (reader lane-agnóstico listo)
+
+El reader SSOT `searchKnowledge` es **lane-agnóstico por diseño** (Full API Parity #4): recibe `subject`, no `request`. El MCP lo envuelve en el lane `ecosystem` (`/api/platform/ecosystem/knowledge/*`) **sin lógica nueva** — `search_knowledge`/`get_knowledge_document`/`get_knowledge_citations` consumen `searchKnowledge` (modo `agentic`) + los readers del store, NUNCA SQL directo ni Notion directo (lint `greenhouse/no-direct-knowledge-chunk-query`). El packet `knowledge-search.v1` ya trae todo lo que un agente necesita (citas, `humanUrl`, `freshness`, `confidence`, `deniedOrFilteredCount`). El filtrado agéntico (excluye `agent_excluded`/`quarantined`/`restricted`) ya está horneado en el reader.
+
 ## Delta 2026-06-11
 
 Cerrado por **TASK-1080** (alineado, sin cambio estructural):

@@ -1,5 +1,16 @@
 # TASK-1084 — Human Knowledge Center MVP
 
+## Delta 2026-06-12 — TASK-1083 completa: el contrato existe (gap cerrado)
+
+Los 4 contratos que el blueprint de promoción (`TASK-1084-answer-trace-promotion-spec.md`) declaró faltantes ya existen — incluido el **read-detail** que era el gap real:
+
+- `GET /api/platform/app/knowledge/documents` (browse/list, access-guarded)
+- `GET /api/platform/app/knowledge/search?mode=human` (packet `knowledge-search.v1`)
+- `GET /api/platform/app/knowledge/documents/:id` (read-detail: versión vigente + secciones por `heading_path`; anti-oracle `notFound`) — alimenta el Manual reader
+- `POST /api/platform/app/knowledge/feedback` (enum canónico `knowledge_feedback`)
+
+El runtime de 1084 cablea **contra estos contratos**, nunca las tablas (lint `greenhouse/no-direct-knowledge-chunk-query`). El reader filtra modo `human` (ve `agent_excluded`, distinto de Nexa). `Blocked by` (TASK-1081, TASK-1083) satisfecho.
+
 ## Delta 2026-06-11
 
 Naming/ruta/audiencia **cerrados por TASK-1080**:

@@ -1,5 +1,14 @@
 # TASK-1085 — Nexa Knowledge Retrieval With Citations
 
+## Delta 2026-06-12 — desbloqueada por TASK-1083 (contrato listo)
+
+La Search API ya existe. Nexa **consume el contrato**, no las tablas:
+
+- Reader SSOT `searchKnowledge({ query, subject, mode: 'agentic' })` (`src/lib/knowledge/search/search-knowledge.ts`) — lane-agnóstico, ya filtra pre-LLM (NUNCA retorna `agent_excluded`/`quarantined`/`restricted`), devuelve `KnowledgeRetrievalPacket` v1 con citas (`citationLabel`/`humanUrl`), `confidence` (`'none'`→no-answer honesto), `freshness` y `deniedOrFilteredCount`. Nexa NO debe queryear `knowledge_chunks` directo (lint `greenhouse/no-direct-knowledge-chunk-query`).
+- Feedback: usar el contrato compartido `POST /api/platform/app/knowledge/feedback` (Full API Parity #5), no uno propio.
+- **El signal `knowledge.retrieval.low_citation_rate` es de ESTA task** (Delta D de 1083): mide cuántas respuestas de Nexa citan; en 1083 todavía no hay "respuesta".
+- Answer Rules (arch §12.4): responder solo con lo respaldado por el packet, citar, declarar stale/deprecated, distinguir dato operativo vivo vs guía publicada, pedir validación humana en legal/payroll/finance/security, decir "no encontré una guía publicada" cuando `confidence='none'`.
+
 ## Delta 2026-06-11
 
 Cerrado por **TASK-1080** (alineado, sin cambio estructural):

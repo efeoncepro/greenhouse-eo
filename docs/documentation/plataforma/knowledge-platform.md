@@ -59,11 +59,20 @@ En el MVP todo es **solo interno** — los clientes todavía no ven nada de la K
 
 ## Qué sigue
 
-- **TASK-1082** — ingesta del corpus piloto desde Notion (snapshot, normalizar, versionar, sanitizar).
-- **TASK-1083** — API de búsqueda + golden questions.
 - **TASK-1084** — el "Knowledge Center" humano en `/knowledge`.
 - **TASK-1085** — conexión de Nexa con citas.
 - **TASK-1086** — recursos MCP read-only.
+
+## Cómo se busca el conocimiento (TASK-1083)
+
+La búsqueda es **un solo contrato** que usan por igual las personas, Nexa y el MCP — ninguna pantalla consulta las tablas por su cuenta. Le das una pregunta y te devuelve los **fragmentos relevantes con su cita** (de qué documento y de qué sección salen), un **nivel de confianza** y la **frescura** de las fuentes.
+
+- **Respeta las dos preguntas separadas:** una persona puede ver un documento marcado como "no usado por Nexa" (por ejemplo, el de nómina), pero **Nexa y el MCP nunca lo reciben**. Lo que queda fuera por esa regla se **cuenta** ("3 fragmentos quedaron fuera por política") sin mostrar su contenido.
+- **Es honesta cuando no sabe:** si no hay una guía publicada que responda, dice "no encontré una guía publicada" en vez de inventar.
+- **Entiende preguntas naturales:** es insensible a acentos (`nómina` = `nomina`) y tolera que escribas la pregunta con verbos y palabras de relleno.
+- **Calidad medida:** un set de **golden questions** (preguntas con respuesta conocida) verifica que cita la fuente correcta, no cita la equivocada, responde "no sé" cuando toca, y nunca filtra a Nexa lo que no corresponde.
+
+> Detalle técnico: el reader único vive en `src/lib/knowledge/search/`; los endpoints en `/api/platform/app/knowledge/*`. Ver la [spec de arquitectura](../../architecture/GREENHOUSE_KNOWLEDGE_PLATFORM_ARCHITECTURE_V1.md) (Delta 2026-06-12).
 
 ## Cómo entra el conocimiento (ingesta, TASK-1082)
 

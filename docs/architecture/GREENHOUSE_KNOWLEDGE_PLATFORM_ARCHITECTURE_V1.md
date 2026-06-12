@@ -944,3 +944,39 @@ Nuevo módulo reliability `knowledge` (subsystem "Knowledge Platform") en el reg
 ### Verificación live
 
 `--apply` en dev: registró el source `repo_docs` piloto, publicó **11 docs** (10 `agent_allowed` + 1 `agent_excluded` `periodos-de-nomina`) + **263 chunks**; re-run **idempotente** (11 unchanged, 0 published); **0 quarantine** (sanitizer sin falsos positivos en el corpus real que menciona nombres de secrets). Signals = `ok`. 14 focal + 418 reliability tests verdes.
+
+## Delta 2026-06-12 — Search API materializada (TASK-1083)
+
+`knowledge_search` implementado como **contrato read-only sobre API Platform** que consumen por igual UI humana (TASK-1084), Nexa (TASK-1085) y MCP (TASK-1086). Decisiones materializadas:
+
+### Substrato full-text (Postgres, vector diferido)
+
+- Columna `body_tsv tsvector GENERATED` sobre `knowledge_chunks` vía función IMMUTABLE SSOT `greenhouse_knowledge.knowledge_chunk_tsv(heading, body)` — **weighted** (heading `'A'` > body `'B'`: un match en el encabezado rankea más) + config `'spanish'` + **accent-insensitive** (`unaccent`: `nómina ≡ nomina`) + GIN. La función encapsula el `to_tsvector('spanish', unaccent(...))` (que inline resuelve como STABLE y rompe la columna GENERATED) y es el único lugar donde vive la definición del índice. Migraciones `20260612072724451` + `20260612075236036`.
+- **Retrieval model**: OR-ify (`websearch_to_tsquery` con `&`→`|`) para recall sobre preguntas naturales + `ts_rank` para ranking + **piso de relevancia 0.10** para rechazar matches incidentales (no-answer honesto). Umbrales tunables; el eval harness los valida.
+
+### Reader SSOT, 2 modos (Full API Parity #2)
+
+`searchKnowledge({ query, subject, mode })` (`src/lib/knowledge/search/search-knowledge.ts`) es el **único** punto de retrieval — lane-agnóstico (recibe `subject`, no `request`; TASK-1086 lo envuelve sin lógica nueva). Pre-LLM filtering en SQL, dos modos:
+
+| modo | capability | `agent_excluded` | `restricted` | publication |
+|---|---|---|---|---|
+| `human` | `knowledge.document.read` | **visible** | visible (interno) | published/stale/deprecated |
+| `agentic` | `knowledge.agentic.retrieve` | **NUNCA** | **NUNCA** | published/stale |
+
+El filtrado lee el **documento vivo** (`kd`), no el chunk denormalizado (que puede lagear); filtra `current_version_id` (ignora chunks de versiones superseded); el contenido denegado **nunca entra al reader** (solo `deniedOrFilteredCount`). Packet versionado `KnowledgeRetrievalPacket` con `contractVersion: 'knowledge-search.v1'`; `confidence='none'` con 0 resultados (no-answer honesto).
+
+### Endpoints app + lint rule
+
+- `GET /api/platform/app/knowledge/search` (packet v1, modo→capability)
+- `GET /api/platform/app/knowledge/documents` (browse/list, Full API Parity #1)
+- `GET /api/platform/app/knowledge/documents/:id` (read-detail: versión vigente + secciones; anti-oracle `notFound` para draft/quarantined/audience ajena)
+- `POST /api/platform/app/knowledge/feedback` (contrato compartido humano+Nexa, Full API Parity #5)
+- Lint rule `greenhouse/no-direct-knowledge-chunk-query` (warn→error tras 1084/1085): bloquea `FROM/JOIN` de las tablas de **contenido** (`knowledge_chunks|document_versions`) fuera del data layer. Exime `src/lib/knowledge/**`, migrations, plugin, `db.d.ts`. No flaggea governance ops (`COUNT` de `knowledge_documents`).
+
+### Quality gate = eval harness offline (Delta D)
+
+10 **golden questions** (fixtures TS versionadas, `golden-questions.ts`) cubriendo fuente correcta (human+agentic), wrong-source guard, no-answer honesto y escalación sensible. Structural test en CI + eval harness live contra el corpus real. **No** runtime signal de search en V1 (el signal `low_citation_rate` mide respuestas de Nexa → es de TASK-1085).
+
+### Verificación live
+
+22/22 tests verdes contra el corpus TASK-1082 (263 chunks): human ve `periodos-de-nomina` (`agent_excluded`), agentic lo excluye + `deniedOrFilteredCount≥1`; browse 0 leak de draft/quarantined; read-detail 30 secciones; no-answer off-corpus → `confidence='none'`.
