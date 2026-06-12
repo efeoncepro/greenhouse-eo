@@ -24,7 +24,9 @@ import {
   GreenhouseButton,
   GreenhouseChip,
   GreenhouseNexaAnimatedMark,
-  GreenhouseStatusDot
+  GreenhouseStatusDot,
+  NexaComposer,
+  NexaComposerInput
 } from '@/components/greenhouse/primitives'
 import { GH_KNOWLEDGE_COPY } from '@/lib/copy/knowledge'
 
@@ -465,9 +467,23 @@ const KnowledgeAnswerTraceMockupView = () => {
   const theme = useTheme()
   const [proofTab, setProofTab] = useState<ProofTab>('sources')
   const [mode, setMode] = useState<AnswerMode>('human')
+  const [questionDraft, setQuestionDraft] = useState('')
+  const [selectedQuestion, setSelectedQuestion] = useState<string>(GH_KNOWLEDGE_COPY.selectedQuestion)
   const [feedback, setFeedback] = useState('useful')
   const [copiedUri, setCopiedUri] = useState(false)
   const [feedbackSubmitted, setFeedbackSubmitted] = useState(false)
+
+  const feedbackOptions = [
+    { value: 'useful', icon: 'tabler-thumb-up', label: GH_KNOWLEDGE_COPY.feedbackUseful },
+    { value: 'not-useful', icon: 'tabler-thumb-down', label: GH_KNOWLEDGE_COPY.feedbackNotUseful },
+    { value: 'incorrect', icon: 'tabler-alert-triangle', label: GH_KNOWLEDGE_COPY.feedbackIncorrect }
+  ] as const
+
+  const submitNexaQuestion = () => {
+    const nextQuestion = questionDraft.trim()
+
+    if (nextQuestion) setSelectedQuestion(nextQuestion)
+  }
 
   const proofContent = useMemo(() => {
     if (proofTab === 'packet') return <PacketRows />
@@ -518,31 +534,29 @@ const KnowledgeAnswerTraceMockupView = () => {
       </Stack>
 
       <Box sx={panelSx(theme)} data-capture='knowledge-command-center'>
-        <Stack spacing={3} sx={{ p: { xs: 4, md: 5 } }}>
+          <Stack spacing={3} sx={{ p: { xs: 4, md: 5 } }}>
           <Stack direction={{ xs: 'column', md: 'row' }} spacing={3}>
-            <CustomTextField
-              fullWidth
-              multiline
-              maxRows={2}
-              value={GH_KNOWLEDGE_COPY.commandPlaceholder}
-              aria-label={GH_KNOWLEDGE_COPY.commandPlaceholder}
-              InputProps={{
-                readOnly: true,
-                startAdornment: (
-                  <InputAdornment position='start'>
-                    <i className='tabler-sparkles' aria-hidden='true' />
-                  </InputAdornment>
-                ),
-                endAdornment: (
-                  <InputAdornment position='end'>
-                    <Typography variant='caption' color='text.secondary'>
-                      ⌘ K
-                    </Typography>
-                  </InputAdornment>
-                )
-              }}
-            />
-            <GreenhouseButton kind='primaryAction' leadingIconClassName='tabler-send' reserveInlineSize={136}>
+            <Box sx={{ flex: '1 1 auto', minInlineSize: 0 }}>
+              <NexaComposer kind='knowledgeAsk'>
+                <NexaComposerInput
+                  kind='knowledgeAsk'
+                  fullWidth
+                  value={questionDraft}
+                  placeholder={GH_KNOWLEDGE_COPY.commandPlaceholder}
+                  onChange={event => setQuestionDraft(event.target.value)}
+                  onKeyDown={event => {
+                    if (event.key === 'Enter' && !event.shiftKey) {
+                      event.preventDefault()
+                      submitNexaQuestion()
+                    }
+                  }}
+                  inputProps={{
+                    'aria-label': GH_KNOWLEDGE_COPY.commandPlaceholder
+                  }}
+                />
+              </NexaComposer>
+            </Box>
+            <GreenhouseButton kind='primaryAction' leadingIconClassName='tabler-send' reserveInlineSize={136} onClick={submitNexaQuestion}>
               {GH_KNOWLEDGE_COPY.sendQuestion}
             </GreenhouseButton>
             <ToggleButtonGroup
@@ -570,7 +584,7 @@ const KnowledgeAnswerTraceMockupView = () => {
             fullWidth
             multiline
             maxRows={2}
-            value={GH_KNOWLEDGE_COPY.selectedQuestion}
+            value={selectedQuestion}
             aria-label={GH_KNOWLEDGE_COPY.aria.selectedQuestion}
             InputProps={{
               readOnly: true,
@@ -807,51 +821,169 @@ const KnowledgeAnswerTraceMockupView = () => {
             </Stack>
           </Box>
 
-          <Box sx={panelSx(theme)} data-capture='knowledge-feedback'>
-            <Box sx={{ p: { xs: 4, md: 5 } }}>
-              <Typography variant='h5'>{GH_KNOWLEDGE_COPY.feedbackQuestion}</Typography>
-              <Stack direction={{ xs: 'column', md: 'row' }} spacing={3} sx={{ mt: 4 }}>
+          <Box
+            sx={{
+              ...panelSx(theme),
+              inlineSize: '100%',
+              maxInlineSize: { xs: 'calc(100vw - 48px)', md: 'none' },
+              minInlineSize: 0,
+              overflow: 'hidden'
+            }}
+            data-capture='knowledge-feedback'
+          >
+            <Box sx={{ pl: { xs: 4, md: 5 }, pr: { xs: 4, md: 16 }, py: 4 }}>
+              <Stack
+                direction={{ xs: 'column', lg: 'row' }}
+                spacing={3}
+                alignItems={{ xs: 'stretch', lg: 'center' }}
+                justifyContent='space-between'
+              >
+                <Stack direction='row' spacing={3} alignItems='flex-start' sx={{ minInlineSize: 0 }}>
+                  <Box
+                    sx={{
+                      inlineSize: 36,
+                      blockSize: 36,
+                      borderRadius: `${theme.shape.customBorderRadius.sm}px`,
+                      display: 'grid',
+                      placeItems: 'center',
+                      flex: '0 0 auto',
+                      color: theme.palette.primary.main,
+                      backgroundColor: alpha(theme.palette.primary.main, 0.08)
+                    }}
+                  >
+                    <i className='tabler-message-report' aria-hidden='true' />
+                  </Box>
+                  <Stack spacing={0.5} sx={{ minInlineSize: 0 }}>
+                    <Typography variant='h5'>{GH_KNOWLEDGE_COPY.feedbackQuestion}</Typography>
+                    <Typography variant='body2' color='text.secondary'>
+                      {GH_KNOWLEDGE_COPY.feedbackIntro}
+                    </Typography>
+                  </Stack>
+                </Stack>
+
+                {feedbackSubmitted ? (
+                  <GreenhouseChip
+                    size='small'
+                    variant='label'
+                    tone='success'
+                    label={GH_KNOWLEDGE_COPY.feedbackRegisteredShort}
+                    iconClassName='tabler-check'
+                  />
+                ) : null}
+              </Stack>
+
+              <Box
+                sx={{
+                  display: 'grid',
+                  gridTemplateColumns: { xs: '1fr', md: 'minmax(300px, 0.82fr) minmax(220px, 0.7fr) auto 56px' },
+                  gap: 3,
+                  alignItems: 'center',
+                  mt: 4
+                }}
+              >
                 <ToggleButtonGroup
                   exclusive
                   value={feedback}
                   onChange={(_, value: string | null) => {
-                    if (value) setFeedback(value)
+                    if (value) {
+                      setFeedback(value)
+                      setFeedbackSubmitted(false)
+                    }
                   }}
                   aria-label={GH_KNOWLEDGE_COPY.aria.feedbackSelector}
                   size='small'
+                  sx={{
+                    display: 'grid',
+                    gridTemplateColumns: { xs: '1fr', sm: 'repeat(3, minmax(0, 1fr))' },
+                    gap: 2,
+                    inlineSize: '100%',
+
+                    '& .MuiToggleButtonGroup-grouped': {
+                      m: 0,
+                      minBlockSize: 44,
+                      justifyContent: 'flex-start',
+                      gap: 2,
+                      px: 3,
+                      py: 2,
+                      color: theme.palette.text.secondary,
+                      border: `1px solid ${theme.palette.divider} !important`,
+                      borderRadius: `${theme.shape.customBorderRadius.sm}px !important`,
+                      textTransform: 'none',
+                      transition: theme.transitions.create(['background-color', 'border-color', 'color'], {
+                        duration: theme.transitions.duration.shortest
+                      }),
+
+                      '&:hover': {
+                        backgroundColor: alpha(theme.palette.primary.main, 0.04)
+                      },
+
+                      '&.Mui-selected': {
+                        color: theme.palette.primary.main,
+                        borderColor: `${alpha(theme.palette.primary.main, 0.34)} !important`,
+                        backgroundColor: alpha(theme.palette.primary.main, 0.08),
+
+                        '&:hover': {
+                          backgroundColor: alpha(theme.palette.primary.main, 0.12)
+                        }
+                      },
+
+                      '&.Mui-focusVisible': {
+                        outline: `2px solid ${theme.palette.primary.main}`,
+                        outlineOffset: 2
+                      }
+                    }
+                  }}
                 >
-                  <ToggleButton value='useful'>
-                    <Stack direction='row' spacing={2} alignItems='center'>
-                      <i className='tabler-thumb-up' aria-hidden='true' />
-                      <span>{GH_KNOWLEDGE_COPY.feedbackUseful}</span>
-                    </Stack>
-                  </ToggleButton>
-                  <ToggleButton value='not-useful'>
-                    <Stack direction='row' spacing={2} alignItems='center'>
-                      <i className='tabler-thumb-down' aria-hidden='true' />
-                      <span>{GH_KNOWLEDGE_COPY.feedbackNotUseful}</span>
-                    </Stack>
-                  </ToggleButton>
-                  <ToggleButton value='incorrect'>
-                    <Stack direction='row' spacing={2} alignItems='center'>
-                      <i className='tabler-alert-triangle' aria-hidden='true' />
-                      <span>{GH_KNOWLEDGE_COPY.feedbackIncorrect}</span>
-                    </Stack>
-                  </ToggleButton>
+                  {feedbackOptions.map(option => (
+                    <ToggleButton key={option.value} value={option.value}>
+                      <i className={option.icon} aria-hidden='true' />
+                      <Typography variant='button' component='span' sx={{ color: 'inherit', whiteSpace: 'nowrap' }}>
+                        {option.label}
+                      </Typography>
+                    </ToggleButton>
+                  ))}
                 </ToggleButtonGroup>
 
-                <CustomTextField fullWidth placeholder={GH_KNOWLEDGE_COPY.feedbackPlaceholder} aria-label={GH_KNOWLEDGE_COPY.feedbackPlaceholder} />
+                <CustomTextField
+                  fullWidth
+                  size='small'
+                  placeholder={GH_KNOWLEDGE_COPY.feedbackPlaceholder}
+                  aria-label={GH_KNOWLEDGE_COPY.feedbackCommentLabel}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position='start'>
+                        <i className='tabler-pencil' aria-hidden='true' />
+                      </InputAdornment>
+                    )
+                  }}
+                />
                 <GreenhouseButton
                   kind='primaryAction'
-                  reserveInlineSize={104}
+                  size='small'
+                  reserveInlineSize={148}
                   leadingIconClassName={feedbackSubmitted ? 'tabler-check' : undefined}
                   onClick={() => setFeedbackSubmitted(true)}
+                  sx={{
+                    justifySelf: { xs: 'stretch', md: 'end' }
+                  }}
                 >
                   {GH_KNOWLEDGE_COPY.feedbackSubmit}
                 </GreenhouseButton>
-              </Stack>
+              </Box>
               {feedbackSubmitted ? (
-                <Alert severity='success' sx={{ mt: 4 }} role='status' data-capture='knowledge-feedback-success'>
+                <Alert
+                  severity='success'
+                  variant='outlined'
+                  sx={{
+                    mt: 3,
+                    py: 1,
+                    alignItems: 'center',
+                    borderColor: alpha(theme.palette.success.main, 0.32),
+                    borderRadius: `${theme.shape.customBorderRadius.sm}px`
+                  }}
+                  role='status'
+                  data-capture='knowledge-feedback-success'
+                >
                   {GH_KNOWLEDGE_COPY.feedbackRegistered}
                 </Alert>
               ) : null}

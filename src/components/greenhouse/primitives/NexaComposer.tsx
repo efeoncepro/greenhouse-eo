@@ -7,20 +7,27 @@ import InputAdornment from '@mui/material/InputAdornment'
 import { alpha, useTheme } from '@mui/material/styles'
 import type { SxProps, Theme } from '@mui/material/styles'
 import type { TextFieldProps } from '@mui/material/TextField'
+import Typography from '@mui/material/Typography'
 
 import CustomTextField from '@core/components/mui/TextField'
 
+import GreenhouseNexaAnimatedMark from './GreenhouseNexaAnimatedMark'
 import NexaGlowBorder from './NexaGlowBorder'
 import { GREENHOUSE_NEXA_BRAND_COLORS } from './greenhouse-nexa-brand-controller'
+import {
+  resolveNexaComposerKind,
+  resolveNexaComposerVariant,
+  type NexaComposerKind,
+  type NexaComposerVariant
+} from './nexa-composer-controller'
 
 /**
  * NexaComposer — primitive canónica del campo de composición de Nexa.
  *
- * Patrón **Primitive + Variants + Kinds**: hoy la única variant materializada es `chat`
- * (el composer del chat flotante / Home). Las partes están pensadas para que mañana se
- * agreguen variants (`inlineEdit`, `search`) sin forkear: el shell (glow + disclaimer),
- * el input (caja Vuexy anulada → el glow pinta TODO) y el action button (send/stop) son
- * piezas presentacionales reusables.
+ * Patrón **Primitive + Variants + Kinds**: `chat` cubre el composer conversacional y
+ * `command` cubre entradas compactas tipo command/search con Nexa mark + shortcut.
+ * Kinds como `knowledgeAsk` resuelven a una variant oficial sin forkear el glow ni el
+ * input.
  *
  * **Runtime-agnóstica.** No importa `@assistant-ui/react`. La consumer cablea el runtime
  * (assistant-ui `ComposerPrimitive.Root/.Input/.Send/.Cancel`) vía `asChild` sobre estas
@@ -161,8 +168,13 @@ NexaComposerActionButton.displayName = 'NexaComposerActionButton'
 // ──────────────────────────────────────────────────────────────────────────────
 
 export type NexaComposerInputProps = TextFieldProps & {
+  variant?: NexaComposerVariant
+  kind?: NexaComposerKind
+  leadingAdornment?: ReactNode
   /** Adorno final (botón send/stop). Se inyecta en `slotProps.input.endAdornment`. */
   endAdornment?: ReactNode
+  shortcutLabel?: ReactNode
+  showNexaMark?: boolean
 }
 
 /**
@@ -172,45 +184,92 @@ export type NexaComposerInputProps = TextFieldProps & {
  * forwardRef + spread → válido como target `asChild` de `ComposerPrimitive.Input`.
  */
 export const NexaComposerInput = forwardRef<HTMLDivElement, NexaComposerInputProps>(
-  ({ endAdornment, multiline = true, minRows = 1, maxRows = 4, autoComplete = 'off', slotProps, sx, ...rest }, ref) => (
-    <CustomTextField
-      ref={ref}
-      fullWidth
-      multiline={multiline}
-      minRows={minRows}
-      maxRows={maxRows}
-      autoComplete={autoComplete}
-      sx={[
-        {
-          '& .MuiFilledInput-root': {
-            borderRadius: '14px',
-            fontSize: '0.9375rem',
-            lineHeight: 1.6,
-            py: 0.5,
-            border: 'none !important',
-            backgroundColor: 'transparent !important',
-            boxShadow: 'none !important',
-            '&:before, &:after': { display: 'none' },
-            '&:hover': { border: 'none !important', backgroundColor: 'transparent !important', boxShadow: 'none !important' },
-            '&.Mui-focused': { border: 'none !important', backgroundColor: 'transparent !important', boxShadow: 'none !important' }
+  (
+    {
+      endAdornment,
+      leadingAdornment,
+      multiline,
+      minRows,
+      maxRows,
+      autoComplete = 'off',
+      slotProps,
+      sx,
+      variant,
+      kind,
+      shortcutLabel,
+      showNexaMark,
+      inputProps,
+      ...rest
+    },
+    ref
+  ) => {
+    const config = resolveNexaComposerVariant(variant, kind)
+    const kindConfig = resolveNexaComposerKind(kind)
+    const resolvedShortcut = shortcutLabel ?? config.shortcutLabel
+    const shouldShowNexaMark = showNexaMark ?? config.showNexaMark
+
+    const resolvedLeadingAdornment = leadingAdornment ?? (shouldShowNexaMark ? (
+      <GreenhouseNexaAnimatedMark kind='inlineMark' size='small' ariaLabel='Nexa' />
+    ) : null)
+
+    const resolvedEndAdornment = endAdornment ?? (resolvedShortcut ? (
+      <Typography variant='caption' color='text.secondary' sx={{ whiteSpace: 'nowrap' }}>
+        {resolvedShortcut}
+      </Typography>
+    ) : null)
+
+    return (
+      <CustomTextField
+        ref={ref}
+        fullWidth
+        multiline={multiline ?? config.multiline}
+        minRows={minRows ?? config.minRows}
+        maxRows={maxRows ?? config.maxRows}
+        autoComplete={autoComplete}
+        inputProps={{
+          'aria-label': kindConfig.ariaLabel,
+          ...inputProps
+        }}
+        sx={[
+          {
+            '& .MuiInputBase-root, & .MuiFilledInput-root': {
+              minBlockSize: config.minBlockSize,
+              borderRadius: `${config.inputRadius}px`,
+              fontSize: '0.9375rem',
+              lineHeight: 1.6,
+              py: 0.5,
+              border: 'none !important',
+              backgroundColor: 'transparent !important',
+              boxShadow: 'none !important',
+              color: 'text.primary',
+              '&:before, &:after': { display: 'none' },
+              '&:hover': { border: 'none !important', backgroundColor: 'transparent !important', boxShadow: 'none !important' },
+              '&.Mui-focused': { border: 'none !important', backgroundColor: 'transparent !important', boxShadow: 'none !important' }
+            }
+          },
+          ...(Array.isArray(sx) ? sx : sx ? [sx] : [])
+        ]}
+        slotProps={{
+          ...slotProps,
+          input: {
+            ...(slotProps?.input as object | undefined),
+            startAdornment: resolvedLeadingAdornment ? (
+              <InputAdornment position='start'>{resolvedLeadingAdornment}</InputAdornment>
+            ) : undefined,
+            endAdornment: resolvedEndAdornment ? (
+              <InputAdornment
+                position='end'
+                sx={config.endAdornmentAlign === 'bottom' ? { alignSelf: 'flex-end', mb: '5px' } : { alignSelf: 'center' }}
+              >
+                {resolvedEndAdornment}
+              </InputAdornment>
+            ) : undefined
           }
-        },
-        ...(Array.isArray(sx) ? sx : sx ? [sx] : [])
-      ]}
-      slotProps={{
-        ...slotProps,
-        input: {
-          ...(slotProps?.input as object | undefined),
-          endAdornment: endAdornment ? (
-            <InputAdornment position='end' sx={{ alignSelf: 'flex-end', mb: '5px' }}>
-              {endAdornment}
-            </InputAdornment>
-          ) : undefined
-        }
-      }}
-      {...rest}
-    />
-  )
+        }}
+        {...rest}
+      />
+    )
+  }
 )
 
 NexaComposerInput.displayName = 'NexaComposerInput'
@@ -220,6 +279,8 @@ NexaComposerInput.displayName = 'NexaComposerInput'
 // ──────────────────────────────────────────────────────────────────────────────
 
 export interface NexaComposerProps {
+  variant?: NexaComposerVariant
+  kind?: NexaComposerKind
   /** El input cableado al runtime (ej. `<ComposerPrimitive.Input asChild><NexaComposerInput …/></…>`). */
   children: ReactNode
   /** Texto legal/aviso bajo el composer. One-off a 11px (bajo el piso del SoT, aprobado). */
@@ -228,6 +289,8 @@ export interface NexaComposerProps {
   focusRingColor?: string
   /** Radio del glow. Default 14 (alineado con el radius interno del input). */
   radius?: number
+  /** Grosor del anillo. Default resuelto por variant/kind. */
+  thickness?: number
   /** sx opcional para el disclaimer (raro; el default ya es el aprobado). */
   disclaimerSx?: SxProps<Theme>
 }
@@ -237,12 +300,13 @@ export interface NexaComposerProps {
  * maxWidth, `data-capture`) lo gobierna la consumer en su contenedor — así la primitive no
  * asume dónde vive (chat flotante sticky / Home / futuros surfaces).
  */
-const NexaComposer = ({ children, disclaimer, focusRingColor, radius = 14, disclaimerSx }: NexaComposerProps) => {
+const NexaComposer = ({ children, disclaimer, focusRingColor, radius, thickness, disclaimerSx, variant, kind }: NexaComposerProps) => {
   const theme = useTheme()
+  const config = resolveNexaComposerVariant(variant, kind)
 
   return (
     <>
-      <NexaGlowBorder radius={radius} focusRingColor={focusRingColor ?? theme.palette.primary.main}>
+      <NexaGlowBorder radius={radius ?? config.radius} thickness={thickness ?? config.thickness} focusRingColor={focusRingColor ?? theme.palette.primary.main}>
         {children}
       </NexaGlowBorder>
       {disclaimer ? (

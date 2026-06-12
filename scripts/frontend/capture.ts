@@ -49,6 +49,9 @@ Opciones:
   --env=<env>       Target de captura. Default: staging
   --route=<path>    Captura inline de una ruta sin scenario
   --hold=<ms>       Espera inicial para capturas inline. Default: 1500
+  --ready=<selector>
+                    Selector de readiness para capturas inline. Recomendado:
+                    [data-capture="surface-name"]
   --gif             Genera flipbook.gif
   --headed          Abre Chromium visible para debug
   --device=<name>   Device Playwright para capturas inline
@@ -96,12 +99,24 @@ const loadScenarioByName = async (name: string): Promise<CaptureScenario> => {
   return mod.scenario
 }
 
-const buildInlineScenario = (route: string, holdMs: number): CaptureScenario => ({
+const NAVIGATION_WAIT_UNTIL = 'domcontentloaded' as const
+
+const buildInlineScenario = (route: string, holdMs: number, readySelector?: string): CaptureScenario => ({
   name: `inline-${route.replace(/[^a-z0-9]+/gi, '-').replace(/^-|-$/g, '').toLowerCase()}`,
   route,
   viewport: { width: 1440, height: 900 },
   initialHoldMs: holdMs,
   finalHoldMs: 200,
+  readiness: {
+    selector: readySelector,
+    absentSelectors: ['[data-testid="login-card"]', '[data-loading="true"]', '.MuiSkeleton-root'],
+    waitForFonts: true,
+    postReadyDelayMs: 150,
+    timeout: 12000,
+    note: readySelector
+      ? 'Inline capture waits for an explicit surface selector instead of network idle.'
+      : 'Inline capture avoids network idle and applies lightweight guards before evidence.'
+  },
   assertions: [
     { kind: 'noLoginRedirect', reason: 'authenticated route expected' },
     { kind: 'noErrorBoundary', reason: 'visual evidence should not capture app error' }
@@ -175,9 +190,9 @@ const runOneCapture = async ({
   } as Awaited<ReturnType<typeof runScenario>>
 
   try {
-    PRINT(`→ goto ${envConfig.baseUrl}${scenario.route}`)
+    PRINT(`→ goto ${envConfig.baseUrl}${scenario.route} (waitUntil=${NAVIGATION_WAIT_UNTIL})`)
     await session.page.goto(`${envConfig.baseUrl}${scenario.route}`, {
-      waitUntil: 'networkidle',
+      waitUntil: NAVIGATION_WAIT_UNTIL,
       timeout: 60000
     })
 
@@ -358,6 +373,7 @@ const main = async (): Promise<void> => {
       env: { type: 'string', default: 'staging' },
       route: { type: 'string' },
       hold: { type: 'string', default: '1500' },
+      ready: { type: 'string' },
       gif: { type: 'boolean', default: false },
       headed: { type: 'boolean', default: false },
       prod: { type: 'boolean', default: false },
@@ -407,7 +423,7 @@ const main = async (): Promise<void> => {
 
   const scenario = scenarioName
     ? await loadScenarioByName(scenarioName)
-    : buildInlineScenario(values.route as string, Number(values.hold))
+    : buildInlineScenario(values.route as string, Number(values.hold), values.ready as string | undefined)
 
   const cliDevice = values.device as string | undefined
   const scenarioVariants = !cliDevice && scenario.viewports?.length ? scenario.viewports : undefined

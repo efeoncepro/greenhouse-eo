@@ -235,7 +235,7 @@ La superficie **conversacional canónica de Nexa**. Es un **patrón compuesto** 
 | Pieza | Rol | Estado |
 |---|---|---|
 | `NexaGlowBorder` | Borde "línea de luz" del composer (dos capas + máscara + beam, reduced-motion horneado). | Primitive canónica ✅ |
-| `NexaComposer` | Input + botón enviar + glow como unidad reusable. | A extraer ⏳ (follow-up) |
+| `NexaComposer` | Input + botón enviar + glow como unidad reusable; variant `command` para cajas compactas con Nexa mark + shortcut. | Primitive canónica ✅ |
 | `NexaPresenceMark` / `NexaPresenceHeader` | Cara/mark + nombre + dot "En línea" con ping. | A extraer ⏳ |
 | `NexaSenderMark` | Avatar por-mensaje (disco navy + glyph teal/sparkle blanco inline-SVG). | A extraer ⏳ |
 | `NexaConversationRail` | Rail de historial glass (search + grupos + items + estados). | Parte del patrón |
@@ -252,7 +252,7 @@ La superficie **conversacional canónica de Nexa**. Es un **patrón compuesto** 
 
 - ✓ Reusar este patrón + sus primitives en toda superficie de Nexa-como-chat.
 - ✓ Empty hero: saludo rotativo + prompts contextuales + firma Efeonce **solo** en empty state.
-- ✓ Composer siempre vía `NexaGlowBorder` (futuro `NexaComposer`); cero hardcode (tokens AXIS + brand Nexa SSOT + escala tipográfica SoT).
+- ✓ Composer siempre vía `NexaComposer` / `NexaComposerInput`; para cajas tipo "Pregúntale a Nexa" usar `kind='knowledgeAsk'` en vez de copiar `NexaGlowBorder` + mark + shortcut localmente.
 - ✗ No crear un chat de Nexa paralelo por pantalla ni reimplementar composer/rail.
 - ✗ No usar la firma Efeonce fuera del empty state ni la cara real per-mensaje (ahí va el mark).
 - ✗ Prompts: NUNCA hardcodear el set; derivar del contexto (Tier 1 frontend resolver, Tier 2 backend data-aware — ver TASK-1078 follow-ups).

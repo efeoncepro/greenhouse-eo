@@ -7,13 +7,14 @@ Nombre canonico de producto interno: **Greenhouse Visual Capture** (`GVC`).
 ## Status
 
 - Estado: `accepted`
-- Version: `1.5`
+- Version: `1.6`
 - Fecha V1.0: `2026-05-12 mañana` — Slice 0-3 (CLI + scenario + recorder + docs)
 - Fecha V1.1: `2026-05-12 tarde` — Delta OQ-1..OQ-6 (upload, device, diff, capability, reliability, ui-review scaffolding)
 - Fecha V1.2: `2026-05-29` — Hook operativo para verificación visual UI obligatoria vía `pnpm fe:capture` y comandos relacionados
 - Fecha V1.3: `2026-05-30` — Greenhouse Visual Capture named tool + scroll/captura full-page resiliente para pantallas largas
 - Fecha V1.4: `2026-05-30` — evidence hardening: readiness/assertions, quality findings, report HTML, multi-viewport, microinteraction V2 y baseline mockup→runtime
 - Fecha V1.5: `2026-06-07` — mockup→runtime contract gates (TASK-1018): baseline visual diff (pixelmatch + masks + home durable), layout integrity, console/hydration/network strict, trace on failure, keyboard/focus/reduced-motion, performance budgets, enterprise rubric + resumen ejecutivo
+- Fecha V1.6: `2026-06-12` — local/Turbopack reliability: navegación `domcontentloaded` + readiness visual declarativa; `networkidle` deja de ser señal canónica para evidencia GVC.
 - Owner: `Claude / Greenhouse frontend tooling`
 - Relacionado con:
   - `scripts/frontend/` (implementación canónica)
@@ -93,6 +94,17 @@ Scenarios de regresión V1.4:
 - `offboarding-queue-microinteractions-v2`: interaction step con frames before/during/after y keyboard evidence.
 - `gvc-multi-viewport`: variantes desktop/tablet/mobile en un solo scenario.
 - `contractor-admin-runtime-baseline`: caso vivo TASK-796 mockup→runtime sobre `/hr/contractors`.
+
+## Delta 2026-06-12 — Readiness visual sobre `networkidle` (V1.6)
+
+GVC deja de usar `networkidle` como condición de navegación. En Next/Turbopack, HMR, chunk loading y requests persistentes pueden mantener actividad de red aunque la UI ya esté lista; esperar silencio de red convierte capturas válidas en timeouts falsos y empuja a reiniciar el servidor como workaround.
+
+Contrato actualizado:
+
+- `page.goto` usa `waitUntil: 'domcontentloaded'` para llegar al documento sin bloquearse por actividad de red persistente.
+- La readiness real vive en el DSL: `scenario.readiness` para scenarios versionados y `--ready='[data-capture="..."]'` para capturas inline.
+- Las capturas inline agregan guards ligeros por defecto contra login, loading dominante y skeletons, y esperan fuentes antes del primer frame.
+- `pnpm fe:capture:health` y reinicios de servidor quedan como diagnóstico/recuperación cuando el proceso local está unhealthy, no como mecanismo primario para resolver evidencia visual.
 
 ## Por qué
 

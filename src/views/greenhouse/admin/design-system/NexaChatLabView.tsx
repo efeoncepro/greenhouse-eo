@@ -249,6 +249,14 @@ const NexaChatLabView = () => (
               endAdornment={<NexaComposerActionButton variant='send' aria-label='Enviar mensaje' />}
             />
           </NexaComposer>
+          <Box sx={{ mt: 3, maxInlineSize: 720 }} data-capture='nexa-composer-command-variant'>
+            <Typography variant='caption' color='text.secondary' sx={{ display: 'block', mb: 1 }}>
+              <InlineCode>kind=&apos;knowledgeAsk&apos;</InlineCode> — command input con Nexa mark + shortcut
+            </Typography>
+            <NexaComposer kind='knowledgeAsk'>
+              <NexaComposerInput kind='knowledgeAsk' placeholder='Pregúntale a Nexa' />
+            </NexaComposer>
+          </Box>
           <Stack direction='row' spacing={2} alignItems='center' sx={{ mt: 2 }}>
             <Typography variant='caption' color='text.secondary'>
               <InlineCode>NexaComposerActionButton</InlineCode>:

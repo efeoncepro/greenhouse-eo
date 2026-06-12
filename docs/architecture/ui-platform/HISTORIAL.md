@@ -6,6 +6,16 @@
 
 ---
 
+## Delta 2026-06-12 — NexaComposer command variant + `knowledgeAsk` kind
+
+`NexaComposer` deja de ser solo el composer de chat y gana contrato Primitive+Variants+Kinds explícito:
+
+- Variant `chat`: mantiene el composer conversacional existente.
+- Variant `command`: caja compacta con `NexaGlowBorder`, `GreenhouseNexaAnimatedMark kind='inlineMark'` al inicio y shortcut `⌘ K` al final.
+- Kinds oficiales: `floatingChat` → `chat`, `knowledgeAsk` → `command`, `globalCommand` → `command`.
+
+Primer consumer: `/knowledge/mockup/answer-trace`, que deja de ensamblar a mano `NexaGlowBorder` + mark + shortcut y usa `NexaComposer kind='knowledgeAsk'` + `NexaComposerInput kind='knowledgeAsk'`. El lab `/design-system/nexa-chat` suma specimen `data-capture='nexa-composer-command-variant'`.
+
 ## Delta 2026-06-11 — Nexa Insights pattern redesign + disclosure `nexaMark` + ThinkingBeat `dotSize` (TASK-1075 follow-up)
 
 Iteración de producto sobre el pattern compuesto `NexaInsightsBlock` (`src/components/greenhouse/`), con dos extensiones a primitives y registro en el Design System.

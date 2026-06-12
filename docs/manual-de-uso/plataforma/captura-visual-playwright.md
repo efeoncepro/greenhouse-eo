@@ -34,6 +34,7 @@ Cuando un agente o persona verifique UI visible de Greenhouse, la evidencia visu
 | Necesidad | Comando canónico |
 |---|---|
 | Ruta simple / sanity visual | `pnpm fe:capture --route=/ruta --env=staging --hold=3000` |
+| Ruta simple con readiness estable | `pnpm fe:capture --route=/ruta --env=local --ready='[data-capture="surface"]'` |
 | Flujo repetible o microinteraction | `pnpm fe:capture <scenario> --env=staging` |
 | Pantalla larga completa | Scenario con `{ kind: 'mark', label: 'full-page', fullPage: true }` |
 | Sección específica tras scroll | Scenario con `scroll selector` + `mark clipSelector` |
@@ -46,6 +47,8 @@ Cuando un agente o persona verifique UI visible de Greenhouse, la evidencia visu
 Playwright ad-hoc solo debe usarse como complemento cuando haga falta inspeccionar consola, network, payloads de API o un gesto que el DSL todavía no soporte. En ese caso, guardá artifacts bajo `.captures/`, explicá por qué no alcanzó el helper canónico y convertí el flujo en scenario si se va a repetir.
 
 Si la captura staging falla por configuración local, por ejemplo `VERCEL_AUTOMATION_BYPASS_SECRET ausente`, documentá ese bloqueo exacto y probá `--env=local` si la ruta puede validarse contra `pnpm dev`.
+
+GVC no usa `networkidle` como readiness de navegación. En Next/Turbopack puede haber HMR, chunks o requests persistentes aunque la UI ya esté lista, así que la señal canónica es un selector/guard de pantalla: en scenarios, `readiness`; en capturas inline, `--ready='[data-capture="..."]'`.
 
 ## Antes de empezar
 

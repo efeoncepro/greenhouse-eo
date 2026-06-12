@@ -44,6 +44,18 @@ export type {
   NexaComposerActionButtonProps,
   NexaComposerActionVariant
 } from './NexaComposer'
+export {
+  NEXA_COMPOSER_KIND_CONFIG,
+  NEXA_COMPOSER_VARIANT_CONFIG,
+  resolveNexaComposerKind,
+  resolveNexaComposerVariant
+} from './nexa-composer-controller'
+export type {
+  NexaComposerKind,
+  NexaComposerKindConfig,
+  NexaComposerVariant,
+  NexaComposerVariantConfig
+} from './nexa-composer-controller'
 export { default as NexaFace, NEXA_FACE_SRC } from './NexaFace'
 export type { NexaFaceProps, NexaFaceVariant } from './NexaFace'
 export { default as NexaPresenceMark } from './NexaPresenceMark'

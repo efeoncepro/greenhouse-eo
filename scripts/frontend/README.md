@@ -15,6 +15,9 @@ pnpm fe:capture offboarding-queue-microinteractions --env=staging
 # Captura simple de una ruta (sin scenario)
 pnpm fe:capture --route=/hr/offboarding --env=staging --hold=3000
 
+# Captura inline con readiness explícito de superficie
+pnpm fe:capture --route=/knowledge/mockup/answer-trace --env=local --ready='[data-capture="knowledge-command-center"]'
+
 # Con GIF (requiere ffmpeg instalado)
 pnpm fe:capture offboarding-queue-microinteractions --env=staging --gif
 
@@ -61,6 +64,8 @@ Para evidencia confiable en rutas importantes, preferí además:
 - `interaction` para microinteractions con frames relativos e intención explícita.
 - `viewports` para desktop/tablet/mobile en un solo scenario.
 - `baseline` para comparar mockup aprobado contra runtime final con `fe:capture:diff`.
+
+Las capturas inline usan navegación `domcontentloaded` y no `networkidle`; esto evita falsos bloqueos en Next/Turbopack, HMR o requests persistentes. Para una ruta puntual, pasá `--ready='[data-capture="..."]'` y dejá que GVC espere una señal visual estable antes del primer frame.
 
 Playwright ad-hoc queda como complemento para consola/red/API payloads o pasos que el DSL no soporte. Si se usa, guardar artifacts bajo `.captures/` y documentar por qué no bastó `fe:capture`. Si el flujo se repetirá, agregar o actualizar un scenario en `scripts/frontend/scenarios/`.
 
