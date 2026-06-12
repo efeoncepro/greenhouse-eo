@@ -1,5 +1,17 @@
 # TASK-1085 — Nexa Knowledge Retrieval With Citations
 
+## Delta 2026-06-12 — CIERRE (complete): capability entregada + verificada en staging; producción atada a TASK-1092
+
+Lifecycle → **complete**. Ambas mitades shipped a `origin/develop` y corriendo en **staging con `NEXA_KNOWLEDGE_RETRIEVAL_ENABLED=true`**:
+
+- **Backend (Claude):** tool `search_knowledge` + Answer Rules + flag + 3 señales (`knowledge.nexa.no_source_answer_rate`, `stale_source_retrievals`, `knowledge.retrieval.low_citation_rate`) + fix ISSUE-092 (tool-calling roto). Commits `26fd0c5f4`/`f33822479`/`6c43bcb9e`/`63a93288c`.
+- **UI (Codex):** evidence renderer sobre el contrato real `knowledge-search.v1` (`NexaToolRenderers` + Answer Surface). Commit `bc86da724`.
+- **Verificado:** QA matrix en staging (12/12 HTTP 200), Nexa cita desde el corpus real, gap honesto en `confidence='none'`, no abusa de Knowledge para datos vivos. Las 3 señales observando el rollout.
+
+**Producción NO se activa en este cierre — está atada a TASK-1092** (hardening de citas inline + coverage QA + decision packet). `NEXA_KNOWLEDGE_RETRIEVAL_ENABLED` sigue **OFF en producción**. El flip de producción es decisión del operador después de que 1092 pase su exit gate (`low_citation_rate → ~0`). Esto es Runtime Rollout Gate honesto: la **capability está completa y verificada en staging**; la **activación productiva es un paso gobernado separado** (1092), no código faltante de 1085.
+
+**Pendiente menor de docs (no bloquea el cierre de la capability):** la sección invariant de CLAUDE.md (TASK-1085) ya está committeada; Handoff + changelog ya tienen el registro de 1085 de commits previos.
+
 ## Delta 2026-06-12 — IMPLEMENTACIÓN Codex: UI runtime + evidence renderer + signal answer-level
 
 Codex aterrizó la mitad UI sobre el contrato real `knowledge-search.v1`, sin consultar tablas de Knowledge desde la vista:
@@ -119,13 +131,13 @@ Implicaciones para esta task:
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `none`
-- Status real: `Code complete local (backend + UI renderer + low_citation_rate), behind flag OFF · local flag-ON smoke OK · rollout staging/prod pendiente`
+- Status real: `Complete — capability shipped + verificada en staging (flag ON). Producción OFF, activación atada a TASK-1092 (hardening citas inline + decision packet).`
 - Rank: `TBD`
 - Domain: `nexa|platform|content|ai`
 - Blocked by: `none`
