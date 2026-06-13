@@ -9,6 +9,8 @@ import Typography from '@mui/material/Typography'
 import { alpha, useTheme, type Theme } from '@mui/material/styles'
 import { visuallyHidden } from '@mui/utils'
 
+import { Motion } from '@/components/greenhouse/motion'
+
 import NexaComposer, { NexaComposerActionButton, NexaComposerInput } from '../NexaComposer'
 import NexaEvidencePanel from '../NexaEvidencePanel'
 import GreenhouseButton from '../GreenhouseButton'
@@ -28,6 +30,7 @@ import type {
   NexaAnswersCanvasProps,
   NexaAnswersCanvasState,
   NexaAnswersCompactAnswerBlock,
+  NexaAnswersReasoningStep,
   NexaAnswersRenderPlan,
   NexaAnswersSuggestedFollowUp
 } from './nexa-answers-canvas-types'
@@ -233,6 +236,101 @@ const CanvasErrorState = ({ state, copy }: { state: NexaAnswersCanvasState; copy
   )
 }
 
+// Shimmer del footprint: ocupa el lugar donde aterrizará la respuesta mientras Nexa razona.
+// El barrido es decorativo → reduced-motion lo deja estático (sigue comunicando "viene acá").
+const AnswerFootprintShimmer = () => {
+  const theme = useTheme()
+
+  const sweep = `linear-gradient(100deg, ${alpha(theme.palette.primary.main, 0.05)} 30%, ${alpha(
+    theme.palette.primary.main,
+    0.13
+  )} 50%, ${alpha(theme.palette.primary.main, 0.05)} 70%)`
+
+  const bar = (inlineSize: string, blockSize = 12) => ({
+    inlineSize,
+    blockSize,
+    borderRadius: `${theme.shape.customBorderRadius.xs}px`,
+    background: sweep,
+    backgroundSize: '220% 100%',
+    '@keyframes nexa-answers-shimmer': {
+      '0%': { backgroundPosition: '180% 0' },
+      '100%': { backgroundPosition: '-80% 0' }
+    },
+    animation: 'nexa-answers-shimmer 1.5s linear infinite',
+    '@media (prefers-reduced-motion: reduce)': { animation: 'none', backgroundPosition: '50% 0' }
+  })
+
+  return (
+    <Box
+      aria-hidden='true'
+      data-capture='nexa-answers-canvas-shimmer'
+      sx={{
+        ml: { xs: 1.5, md: 2 },
+        border: `1px solid ${alpha(theme.palette.primary.main, 0.18)}`,
+        borderRadius: `${theme.shape.customBorderRadius.lg}px ${theme.shape.customBorderRadius.lg}px ${theme.shape.customBorderRadius.lg}px ${theme.shape.customBorderRadius.xs}px`,
+        backgroundColor: theme.palette.background.paper,
+        px: { xs: 4, md: 5 },
+        py: { xs: 4, md: 4.5 }
+      }}
+    >
+      <Stack spacing={2.25}>
+        <Box sx={bar('38%', 14)} />
+        <Box sx={bar('92%')} />
+        <Box sx={bar('80%')} />
+        <Box sx={{ ...bar('100%', 120), mt: 1 }} />
+      </Stack>
+    </Box>
+  )
+}
+
+// Razonamiento progresivo (fase 0 del despliegue, estilo AI Overview): pasos que avanzan
+// — done ✓ / active (beat) / pending — + el shimmer ocupando el footprint. El paso activo
+// se anuncia por un único live region (no duplicar con la identidad).
+const NexaReasoningTrace = ({ steps }: { steps: NexaAnswersReasoningStep[] }) => {
+  const theme = useTheme()
+  const activeStep = steps.find(step => step.status === 'active') ?? steps[steps.length - 1]
+
+  return (
+    <Stack spacing={3} data-capture='nexa-answers-canvas-reasoning'>
+      <Stack spacing={1.5} role='status' aria-live='polite'>
+        {steps.map(step => {
+          const done = step.status === 'done'
+          const active = step.status === 'active'
+
+          return (
+            <Stack key={step.id} direction='row' spacing={1.5} alignItems='center' sx={{ minInlineSize: 0 }}>
+              <Box sx={{ inlineSize: 20, display: 'grid', placeItems: 'center', flex: '0 0 auto' }}>
+                {done ? (
+                  <Box component='i' className='tabler-circle-check-filled' sx={{ color: theme.greenhouseSemantic.success.tonalText, fontSize: 18 }} />
+                ) : active ? (
+                  <GreenhouseThinkingBeat kind='nexa' variant='inline' motion='wave' dotCount={3} dotSize={5} />
+                ) : (
+                  <Box sx={{ inlineSize: 8, blockSize: 8, borderRadius: '50%', border: `1.5px solid ${alpha(theme.palette.text.disabled, 0.5)}` }} />
+                )}
+              </Box>
+              <Typography
+                variant='body2'
+                sx={{
+                  color: active ? 'text.primary' : 'text.secondary',
+                  fontWeight: active ? 600 : 400,
+                  opacity: step.status === 'pending' ? 0.6 : 1,
+                  transition: theme.transitions.create(['opacity', 'color'], { duration: theme.transitions.duration.shorter })
+                }}
+              >
+                {step.label}
+              </Typography>
+            </Stack>
+          )
+        })}
+        <Box component='span' data-gvc-ignore-layout='true' sx={visuallyHidden}>
+          {activeStep?.label}
+        </Box>
+      </Stack>
+      <AnswerFootprintShimmer />
+    </Stack>
+  )
+}
+
 // Caret de redacción: barra que parpadea al final del texto que está llegando.
 // Reduced-motion → caret fijo (sin parpadeo), sigue comunicando "escribiendo".
 const StreamingCaret = () => (
@@ -334,7 +432,7 @@ const SuggestedFollowUps = ({
   label: string
   onSelect: (followUp: NexaAnswersSuggestedFollowUp) => void
 }) => (
-  <Stack spacing={1.5} data-capture='nexa-answers-canvas-suggested-followups' sx={motionSx}>
+  <Stack spacing={1.5} data-capture='nexa-answers-canvas-suggested-followups'>
     <Typography variant='caption' color='text.secondary'>
       {label}
     </Typography>
@@ -380,6 +478,7 @@ const NexaAnswersCanvas = ({
   onProofToggle,
   previousTurns = [],
   followUpQuestion,
+  reasoningSteps,
   suggestedFollowUps,
   onSuggestedFollowUp,
   slots,
@@ -395,15 +494,16 @@ const NexaAnswersCanvas = ({
   const isProofOpen = proofOpen ?? internalProofOpen
   const proofId = `${surfaceContext.surfaceId.replace(/[^a-zA-Z0-9_-]/g, '-')}-proof`
   const thinking = isThinkingState(state)
-  // Pre-answer (submitted/thinking): solo presencia Nexa, sin pintar la respuesta todavía.
-  // `streaming` muestra la respuesta llegando (draft con caret), por eso va aparte.
-  const preAnswer = state === 'submitted' || state === 'thinking'
+  const isReasoning = state === 'reasoning'
+  // Pre-answer (submitted/thinking/reasoning): aún no se pinta la respuesta. `reasoning` muestra
+  // los pasos progresivos + shimmer; `streaming` la respuesta llegando con caret.
+  const preAnswer = state === 'submitted' || state === 'thinking' || isReasoning
   const isStreaming = state === 'streaming'
-  // La respuesta ya "asentó": answered/proofOpen/followup (no pre-answer, no streaming, no error).
-  const answerSettled = !preAnswer && !isStreaming && !isErrorState(state)
   const primaryBlock = renderPlan?.blocks.find(block => block.id === renderPlan.primaryBlockId) ?? renderPlan?.blocks[0]
   const streamingBlock = primaryBlock?.renderer === 'answerBubble' ? (primaryBlock as NexaAnswersBubbleBlock) : null
   const identityLabel = isStreaming ? copy.streamingLabel : thinking ? copy.thinkingLabel : copy.readyLabel
+  // Durante reasoning la identidad solo muestra el wordmark: el status vivo lo lleva el trace.
+  const identityStatus: 'thinking' | 'ready' | 'silent' = isReasoning ? 'silent' : thinking ? 'thinking' : isErrorState(state) ? 'silent' : 'ready'
 
   assertNexaAnswersRenderPlanAllowed({ renderPlan, allowedRenderers: surfaceContext.allowedRenderers })
 
@@ -451,33 +551,35 @@ const NexaAnswersCanvas = ({
           <Stack spacing={4} data-capture='nexa-answers-canvas-conversation' sx={motionSx}>
             {renderPlan && previousTurns.map(turn => <Box key={turn.id}>{renderPreviousTurn(turn, renderPlan, proofId)}</Box>)}
             {slots?.question ?? (question ? <QuestionBubble compact={state === 'followup'}>{question}</QuestionBubble> : null)}
-            {slots?.identity ?? (
-              <NexaIdentity
-                assistantName={copy.assistantName}
-                status={thinking ? 'thinking' : isErrorState(state) ? 'silent' : 'ready'}
-                label={identityLabel}
-              />
-            )}
+            {slots?.identity ?? <NexaIdentity assistantName={copy.assistantName} status={identityStatus} label={identityLabel} />}
             {isErrorState(state) ? (
               <CanvasErrorState state={state} copy={copy} />
-            ) : preAnswer ? null : isStreaming ? (
+            ) : preAnswer ? (
+              isReasoning && reasoningSteps && reasoningSteps.length > 0 ? <NexaReasoningTrace steps={reasoningSteps} /> : null
+            ) : isStreaming ? (
               streamingBlock ? <StreamingAnswerDraft block={streamingBlock} /> : null
-            ) : slots?.answer ? (
-              slots.answer
-            ) : primaryBlock && renderPlan ? (
-              renderNexaAnswersBlock(primaryBlock, {
-                proofOpen: isProofOpen,
-                thinking,
-                renderPlan,
-                proofPanelId: proofId,
-                onProofToggle: toggleProof,
-                onAction
-              })
-            ) : null}
-            <CanvasProof id={proofId} open={isProofOpen} renderPlan={renderPlan} slot={slots?.proof} />
-            {answerSettled && onSuggestedFollowUp && suggestedFollowUps && suggestedFollowUps.length > 0 ? (
-              <SuggestedFollowUps items={suggestedFollowUps} label={copy.suggestedFollowUpsLabel} onSelect={onSuggestedFollowUp} />
-            ) : null}
+            ) : (
+              // Settle: la respuesta + proof + sugeridos asientan con stagger orquestado del
+              // Motion primitive (fromTo + clearProps → nunca deja el contenido oculto aunque
+              // un hijo re-renderice; reduced-motion horneado).
+              <Motion variant='stagger' as='div' style={{ display: 'flex', flexDirection: 'column', gap: '2rem', minInlineSize: 0 }}>
+                {slots?.answer ??
+                  (primaryBlock && renderPlan
+                    ? renderNexaAnswersBlock(primaryBlock, {
+                        proofOpen: isProofOpen,
+                        thinking,
+                        renderPlan,
+                        proofPanelId: proofId,
+                        onProofToggle: toggleProof,
+                        onAction
+                      })
+                    : null)}
+                <CanvasProof id={proofId} open={isProofOpen} renderPlan={renderPlan} slot={slots?.proof} />
+                {onSuggestedFollowUp && suggestedFollowUps && suggestedFollowUps.length > 0 ? (
+                  <SuggestedFollowUps items={suggestedFollowUps} label={copy.suggestedFollowUpsLabel} onSelect={onSuggestedFollowUp} />
+                ) : null}
+              </Motion>
+            )}
             {followUpQuestion ? <QuestionBubble compact>{followUpQuestion}</QuestionBubble> : null}
             {slots?.composer ?? (
               <CanvasComposer

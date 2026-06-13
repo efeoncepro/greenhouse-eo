@@ -203,9 +203,11 @@ export type {
   NexaAnswersConversationBubbleBlock,
   NexaAnswersIntent,
   NexaAnswersProofSpec,
+  NexaAnswersReasoningStep,
   NexaAnswersRenderBlock,
   NexaAnswersRendererKind,
   NexaAnswersRenderPlan,
+  NexaAnswersSuggestedFollowUp,
   NexaAnswersSurfaceContext
 } from './nexa-answers-canvas/nexa-answers-canvas-types'
 export {

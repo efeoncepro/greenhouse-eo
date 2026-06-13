@@ -6,15 +6,25 @@
  * skin. Each builder receives the GSAP context (with `reduced` baked in by
  * `useGreenhouseGSAP`) and MUST honor reduced-motion.
  *
- * Honest degradation: every builder uses `gsap.from()` so the element's natural
- * (final) state is the VISIBLE one. If JS never runs, content stays visible —
- * we never leave an element stuck at `opacity: 0`.
+ * Honest degradation — content is NEVER left hidden:
+ *  · If JS never runs, the element stays in its natural (visible) CSS state.
+ *  · Builders use `gsap.fromTo(..→ visible)` with `clearProps` so that ON COMPLETE
+ *    GSAP removes every inline style it set (opacity/visibility/transform). After
+ *    the entrance the element is pure CSS again, so a later React re-render (e.g.
+ *    a child chart mounting async) can NEVER leave it stuck at `autoAlpha: 0`.
+ *    `overwrite: 'auto'` kills a conflicting tween on the same target instead of
+ *    fighting it. This closes the classic `gsap.from` + re-render hazard where an
+ *    interrupted `from` orphans the element at `visibility: hidden`.
  */
 
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
 import type { GreenhouseGsapContext } from './core'
+
+/** Inline props GSAP set during an entrance — cleared on complete so the element
+ *  returns to its natural CSS (visible) state and cannot be left hidden. */
+const ENTRANCE_CLEAR_PROPS = 'opacity,visibility,transform'
 
 export const MOTION_VARIANTS = ['entrance', 'stagger', 'scrollReveal', 'timeline'] as const
 export type MotionVariant = (typeof MOTION_VARIANTS)[number]
@@ -66,18 +76,28 @@ const entrance: VariantBuilder = ({ ctx, scope, options }) => {
 
   if (reduced) {
     // Cross-fade snap — no positional motion.
-    g.from(scope, { autoAlpha: 0, duration: options.reducedDuration, ease: 'none', delay: options.delay })
+    g.fromTo(
+      scope,
+      { autoAlpha: 0 },
+      { autoAlpha: 1, duration: options.reducedDuration, ease: 'none', delay: options.delay, clearProps: ENTRANCE_CLEAR_PROPS, overwrite: 'auto' }
+    )
 
     return
   }
 
-  g.from(scope, {
-    autoAlpha: 0,
-    y: options.distance,
-    duration: options.duration,
-    ease: options.ease,
-    delay: options.delay
-  })
+  g.fromTo(
+    scope,
+    { autoAlpha: 0, y: options.distance },
+    {
+      autoAlpha: 1,
+      y: 0,
+      duration: options.duration,
+      ease: options.ease,
+      delay: options.delay,
+      clearProps: ENTRANCE_CLEAR_PROPS,
+      overwrite: 'auto'
+    }
+  )
 }
 
 const stagger: VariantBuilder = ({ ctx, scope, options }) => {
@@ -87,19 +107,29 @@ const stagger: VariantBuilder = ({ ctx, scope, options }) => {
   if (targets.length === 0) return
 
   if (reduced) {
-    g.from(targets, { autoAlpha: 0, duration: options.reducedDuration, ease: 'none', stagger: 0 })
+    g.fromTo(
+      targets,
+      { autoAlpha: 0 },
+      { autoAlpha: 1, duration: options.reducedDuration, ease: 'none', stagger: 0, clearProps: ENTRANCE_CLEAR_PROPS, overwrite: 'auto' }
+    )
 
     return
   }
 
-  g.from(targets, {
-    autoAlpha: 0,
-    y: options.distance,
-    duration: options.duration,
-    ease: options.ease,
-    delay: options.delay,
-    stagger: options.stagger
-  })
+  g.fromTo(
+    targets,
+    { autoAlpha: 0, y: options.distance },
+    {
+      autoAlpha: 1,
+      y: 0,
+      duration: options.duration,
+      ease: options.ease,
+      delay: options.delay,
+      stagger: options.stagger,
+      clearProps: ENTRANCE_CLEAR_PROPS,
+      overwrite: 'auto'
+    }
+  )
 }
 
 const scrollReveal: VariantBuilder = ({ ctx, scope, options }) => {
@@ -110,13 +140,19 @@ const scrollReveal: VariantBuilder = ({ ctx, scope, options }) => {
 
   ensureScrollTriggerRegistered()
 
-  g.from(scope, {
-    autoAlpha: 0,
-    y: options.distance,
-    duration: options.duration,
-    ease: options.ease,
-    scrollTrigger: { trigger: scope, start: options.start, once: true }
-  })
+  g.fromTo(
+    scope,
+    { autoAlpha: 0, y: options.distance },
+    {
+      autoAlpha: 1,
+      y: 0,
+      duration: options.duration,
+      ease: options.ease,
+      clearProps: ENTRANCE_CLEAR_PROPS,
+      overwrite: 'auto',
+      scrollTrigger: { trigger: scope, start: options.start, once: true }
+    }
+  )
 }
 
 const timeline: VariantBuilder = ({ ctx, options, build }) => {

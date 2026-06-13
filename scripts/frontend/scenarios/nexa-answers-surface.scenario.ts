@@ -127,6 +127,21 @@ export const scenario: CaptureScenario = {
     },
     {
       kind: 'click',
+      selector: 'button:has-text("Razonando")'
+    },
+    {
+      kind: 'wait',
+      selector: '[data-capture="nexa-answers-canvas-reasoning"]',
+      timeout: 5000
+    },
+    {
+      kind: 'mark',
+      label: 'nexa-answers-reasoning',
+      clipSelector: '[data-capture="nexa-answers-canvas-conversation"]',
+      note: 'Razonando estilo AI Overview: pasos progresivos (done/active/pending) + shimmer ocupando el footprint.'
+    },
+    {
+      kind: 'click',
       selector: 'button:has-text("Streaming")'
     },
     {
@@ -139,6 +154,24 @@ export const scenario: CaptureScenario = {
       label: 'nexa-answers-streaming',
       clipSelector: '[data-capture="nexa-answers-canvas-conversation"]',
       note: 'Streaming honesto: titular redactado + cuerpo a mitad con caret + gráfica armándose; sin trust cue todavía.'
+    },
+    {
+      kind: 'interaction',
+      interaction: {
+        name: 'play-deploy',
+        intent: 'El despliegue completo estilo AI Overview se reproduce: razonar → streaming → respuesta que asienta.',
+        action: { kind: 'click', selector: 'button:has-text("Reproducir despliegue")' },
+        keyboardEquivalent: {
+          action: { kind: 'press', selector: 'button:has-text("Reproducir despliegue")', key: 'Enter' },
+          expected: 'El despliegue se dispara por teclado (focus + Enter), no solo por click.'
+        },
+        frames: [
+          { label: 'deploy-reasoning', atMs: 700, clipSelector: '[data-capture="nexa-answers-canvas-conversation"]', note: 'Fase 0 — razonando con pasos progresivos + shimmer.' },
+          { label: 'deploy-reasoning-late', atMs: 1800, clipSelector: '[data-capture="nexa-answers-canvas-conversation"]', note: 'Fase 0 — "Redactando…" con pasos previos en done.' },
+          { label: 'deploy-streaming', atMs: 2900, clipSelector: '[data-capture="nexa-answers-canvas-conversation"]', note: 'Fase 2 — la respuesta llega con caret y la gráfica se arma.' },
+          { label: 'deploy-settled', atMs: 4200, clipSelector: '[data-capture="nexa-answers-surface"]', note: 'Fase 4 — respuesta + trust + sugeridos asentados (settle stagger).' }
+        ]
+      }
     },
     {
       kind: 'click',

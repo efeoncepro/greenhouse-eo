@@ -37,6 +37,7 @@ export type NexaAnswersCanvasState =
   | 'idle'
   | 'submitted'
   | 'thinking'
+  | 'reasoning'
   | 'streaming'
   | 'answered'
   | 'proofOpen'
@@ -146,6 +147,13 @@ export interface NexaAnswersSuggestedFollowUp {
   label: string
 }
 
+/** Paso del razonamiento progresivo (fase 0 del despliegue, estilo AI Overview). */
+export interface NexaAnswersReasoningStep {
+  id: string
+  label: string
+  status: 'done' | 'active' | 'pending'
+}
+
 export interface NexaAnswersCanvasCopy {
   assistantName: string
   idleTitle: string
@@ -195,6 +203,8 @@ export interface NexaAnswersCanvasProps {
   onProofToggle?: () => void
   previousTurns?: NexaAnswersCompactAnswerBlock[]
   followUpQuestion?: string | null
+  /** Pasos del razonamiento progresivo; se muestran durante el estado `reasoning`. */
+  reasoningSteps?: NexaAnswersReasoningStep[]
   /** Próximas preguntas sugeridas; aparecen al terminar la respuesta (answered/followup). */
   suggestedFollowUps?: NexaAnswersSuggestedFollowUp[]
   onSuggestedFollowUp?: (followUp: NexaAnswersSuggestedFollowUp) => void

@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import Box from '@mui/material/Box'
 import Divider from '@mui/material/Divider'
@@ -21,6 +21,7 @@ import {
   type NexaAnswersCanvasCopy,
   type NexaAnswersCanvasState,
   type NexaAnswersCompactAnswerBlock,
+  type NexaAnswersReasoningStep,
   type NexaAnswersRenderPlan,
   type NexaAnswersSurfaceContext
 } from '@/components/greenhouse/primitives'
@@ -28,11 +29,12 @@ import type { ConversationalEvidencePacket } from '@/lib/nexa/conversational-evi
 
 import { answerActions, answerPoints, icoChartSpec, trustCue } from './nexa-answer-bubble-fixtures'
 
-type VisualStage = 'idle' | 'thinking' | 'streaming' | 'answered' | 'proof' | 'followup' | 'degraded' | 'error'
+type VisualStage = 'idle' | 'thinking' | 'reasoning' | 'streaming' | 'answered' | 'proof' | 'followup' | 'degraded' | 'error'
 
 const stageOptions: Array<{ value: VisualStage; label: string }> = [
   { value: 'idle', label: 'Idle' },
   { value: 'thinking', label: 'Pensando' },
+  { value: 'reasoning', label: 'Razonando' },
   { value: 'streaming', label: 'Streaming' },
   { value: 'answered', label: 'Respuesta' },
   { value: 'proof', label: 'Proof' },
@@ -177,6 +179,15 @@ const suggestedFollowUps = [
   { id: 'flag-gaps', label: '¿Dónde hay vacíos de evidencia?' }
 ]
 
+const reasoningStepLabels = ['Entendiendo la pregunta', 'Leyendo 3 fuentes de Knowledge', 'Redactando la respuesta']
+
+const buildReasoningSteps = (activeIndex: number): NexaAnswersReasoningStep[] =>
+  reasoningStepLabels.map((label, index) => ({
+    id: `reasoning-${index}`,
+    label,
+    status: index < activeIndex ? 'done' : index === activeIndex ? 'active' : 'pending'
+  }))
+
 const canvasCopy: NexaAnswersCanvasCopy = {
   assistantName: 'Nexa',
   idleTitle: 'Pregúntale a Nexa sobre este corpus',
@@ -296,7 +307,7 @@ const ContextStrip = () => (
   </Stack>
 )
 
-const ConversationSurface = ({ stage }: { stage: VisualStage }) => {
+const ConversationSurface = ({ stage, reasoningStepIndex }: { stage: VisualStage; reasoningStepIndex: number }) => {
   const [proofOpen, setProofOpen] = useState(stage === 'proof')
   const [followUpDraft, setFollowUpDraft] = useState('')
   const [submittedFollowUp, setSubmittedFollowUp] = useState<string | null>(null)
@@ -308,15 +319,17 @@ const ConversationSurface = ({ stage }: { stage: VisualStage }) => {
       ? 'error'
       : stage === 'degraded'
         ? 'degraded'
-        : stage === 'streaming'
-          ? 'streaming'
-          : thinking
-            ? 'thinking'
-            : proofOpen
-              ? 'proofOpen'
-              : isFollowUp
-                ? 'followup'
-                : 'answered'
+        : stage === 'reasoning'
+          ? 'reasoning'
+          : stage === 'streaming'
+            ? 'streaming'
+            : thinking
+              ? 'thinking'
+              : proofOpen
+                ? 'proofOpen'
+                : isFollowUp
+                  ? 'followup'
+                  : 'answered'
 
   const submitFollowUp = () => {
     const trimmed = followUpDraft.trim()
@@ -356,6 +369,7 @@ const ConversationSurface = ({ stage }: { stage: VisualStage }) => {
       onProofToggle={() => setProofOpen(current => !current)}
       previousTurns={isFollowUp ? [previousImpactTurn] : []}
       followUpQuestion={submittedFollowUp}
+      reasoningSteps={buildReasoningSteps(reasoningStepIndex)}
       suggestedFollowUps={suggestedFollowUps}
       onSuggestedFollowUp={followUp => {
         setSubmittedFollowUp(followUp.label)
@@ -429,6 +443,43 @@ const NexaAnswersExperienceMockupView = () => {
   const theme = useTheme()
   const [stage, setStage] = useState<VisualStage>('answered')
   const [draft, setDraft] = useState('¿Cómo se interpreta Impacto dentro de las métricas ICO?')
+  // Índice del paso de razonamiento activo. En el stage discreto "Razonando" se queda en el
+  // paso central (specimen estable); el play-through lo avanza en el tiempo.
+  const [reasoningStepIndex, setReasoningStepIndex] = useState(1)
+  const [isPlaying, setIsPlaying] = useState(false)
+  const playTimers = useRef<ReturnType<typeof setTimeout>[]>([])
+
+  const clearPlayTimers = () => {
+    playTimers.current.forEach(clearTimeout)
+    playTimers.current = []
+  }
+
+  // Reproduce el despliegue completo estilo AI Overview: razonar (pasos progresivos + shimmer)
+  // → streaming (respuesta llegando) → answered (settle stagger). Timings deterministas.
+  const playDeploy = () => {
+    clearPlayTimers()
+    setIsPlaying(true)
+    setStage('reasoning')
+    setReasoningStepIndex(0)
+    playTimers.current = [
+      setTimeout(() => setReasoningStepIndex(1), 800),
+      setTimeout(() => setReasoningStepIndex(2), 1600),
+      setTimeout(() => setStage('streaming'), 2400),
+      setTimeout(() => {
+        setStage('answered')
+        setIsPlaying(false)
+      }, 3600)
+    ]
+  }
+
+  useEffect(() => clearPlayTimers, [])
+
+  const onStageChange = (next: VisualStage) => {
+    clearPlayTimers()
+    setIsPlaying(false)
+    setReasoningStepIndex(1)
+    setStage(next)
+  }
 
   return (
     <Stack spacing={5} data-capture='nexa-answers-visual-page'>
@@ -455,10 +506,17 @@ const NexaAnswersExperienceMockupView = () => {
         </Stack>
 
         <Stack spacing={2} alignItems={{ xs: 'stretch', lg: 'flex-end' }}>
-          <StageSelector value={stage} onChange={setStage} />
+          <StageSelector value={stage} onChange={onStageChange} />
           <Stack direction='row' spacing={2} justifyContent={{ xs: 'flex-start', lg: 'flex-end' }}>
-            <GreenhouseButton variant='outlined' tone='secondary' size='small' leadingIconClassName='tabler-route'>
-              Ver Knowledge
+            <GreenhouseButton
+              variant='solid'
+              tone='primary'
+              size='small'
+              leadingIconClassName={isPlaying ? 'tabler-loader-2' : 'tabler-player-play'}
+              disabled={isPlaying}
+              onClick={playDeploy}
+            >
+              {isPlaying ? 'Desplegando…' : 'Reproducir despliegue'}
             </GreenhouseButton>
             <GreenhouseButton variant='outlined' tone='secondary' size='small' leadingIconClassName='tabler-flask'>
               Lab visual
@@ -522,7 +580,7 @@ const NexaAnswersExperienceMockupView = () => {
                 copy={canvasCopy}
               />
             ) : (
-              <ConversationSurface stage={stage} />
+              <ConversationSurface stage={stage} reasoningStepIndex={reasoningStepIndex} />
             )}
           </Box>
         </Box>
