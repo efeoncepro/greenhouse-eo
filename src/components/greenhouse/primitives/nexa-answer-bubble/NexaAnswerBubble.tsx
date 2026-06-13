@@ -28,11 +28,17 @@ import {
 } from '@/libs/Recharts'
 import AppRecharts from '@/libs/styles/AppRecharts'
 import useReducedMotion from '@/hooks/useReducedMotion'
+import { GH_COLORS } from '@/config/greenhouse-nomenclature'
 import GreenhouseButton from '../GreenhouseButton'
 import GreenhouseStatusDot from '../GreenhouseStatusDot'
 
 import type {
   NexaAnswerAction,
+  NexaAnswerActionPlanRisk,
+  NexaAnswerActionPlanRiskSeverity,
+  NexaAnswerActionPlanSpec,
+  NexaAnswerActionPlanTradeOff,
+  NexaAnswerActionPlanTradeOffTone,
   NexaAnswerBubbleProps,
   NexaAnswerChartCompositionPoint,
   NexaAnswerChartMode,
@@ -133,9 +139,9 @@ const useChartColors = () => {
     grid: alpha(theme.palette.text.primary, 0.08),
     axis: theme.palette.text.secondary,
     tone: {
-      primary: theme.palette.primary.main,
-      secondary: theme.palette.secondary.main,
-      success: theme.palette.success.main
+      primary: GH_COLORS.chart.categorical[0],
+      secondary: GH_COLORS.chart.categorical[1],
+      success: GH_COLORS.chart.categorical[2]
     } satisfies Record<NexaAnswerChartTone, string>
   }
 }
@@ -409,10 +415,8 @@ const AnswerChartBlock = ({ chart }: { chart: NonNullable<NexaAnswerBubbleProps[
   )
 }
 
-const MetricSparkline = ({ metric }: { metric: NexaAnswerMetricSummaryItem }) => {
-  const colors = useMetricSummaryColors()
+const MetricSparkline = ({ metric, color }: { metric: NexaAnswerMetricSummaryItem; color: string }) => {
   const prefersReducedMotion = useReducedMotion()
-  const color = colors[metric.deltaTone]
 
   return (
     <Box aria-hidden sx={{ inlineSize: '100%', blockSize: 42, minInlineSize: 0 }}>
@@ -462,7 +466,7 @@ const MetricDeltaPill = ({ label, tone }: { label: string; tone: NexaAnswerMetri
   )
 }
 
-const MetricSummaryCard = ({ metric }: { metric: NexaAnswerMetricSummaryItem }) => {
+const MetricSummaryCard = ({ metric, chartColor }: { metric: NexaAnswerMetricSummaryItem; chartColor: string }) => {
   const theme = useTheme()
 
   return (
@@ -497,7 +501,7 @@ const MetricSummaryCard = ({ metric }: { metric: NexaAnswerMetricSummaryItem }) 
         </Typography>
       ) : null}
 
-      <MetricSparkline metric={metric} />
+      <MetricSparkline metric={metric} color={chartColor} />
     </Box>
   )
 }
@@ -533,8 +537,8 @@ const MetricSummaryBlock = ({ metricSummary }: { metricSummary: NexaAnswerMetric
           minInlineSize: 0
         }}
       >
-        {visibleMetrics.map(metric => (
-          <MetricSummaryCard key={metric.id} metric={metric} />
+        {visibleMetrics.map((metric, index) => (
+          <MetricSummaryCard key={metric.id} metric={metric} chartColor={GH_COLORS.chart.categorical[index % GH_COLORS.chart.categorical.length]} />
         ))}
       </Box>
 
@@ -550,6 +554,276 @@ const MetricSummaryBlock = ({ metricSummary }: { metricSummary: NexaAnswerMetric
         <Typography variant='body2' color='text.secondary'>
           {metricSummary.interpretation}
         </Typography>
+      </Box>
+    </Stack>
+  )
+}
+
+const getTradeOffToneColor = (theme: Theme, tone: NexaAnswerActionPlanTradeOffTone) => {
+  if (tone === 'positive') return theme.palette.success.main
+  if (tone === 'caution') return theme.palette.warning.main
+
+  return theme.palette.info.main
+}
+
+const getRiskSeverityColor = (theme: Theme, severity: NexaAnswerActionPlanRiskSeverity) => {
+  if (severity === 'high') return theme.palette.error.main
+  if (severity === 'medium') return theme.palette.warning.main
+
+  return theme.palette.success.main
+}
+
+const ActionPlanDecisionPanel = ({ plan }: { plan: NexaAnswerActionPlanSpec }) => {
+  const theme = useTheme()
+
+  return (
+    <Box
+      sx={{
+        border: `1px solid ${alpha(theme.palette.primary.main, 0.16)}`,
+        borderRadius: `${theme.shape.customBorderRadius.md}px`,
+        background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.045)} 0%, ${alpha(theme.palette.background.paper, 0.82)} 100%)`,
+        px: { xs: 2.75, md: 3.5 },
+        py: { xs: 2.5, md: 3 }
+      }}
+    >
+      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2.5} alignItems={{ xs: 'flex-start', sm: 'flex-start' }}>
+        <Box
+          sx={{
+            inlineSize: 32,
+            blockSize: 32,
+            borderRadius: `${theme.shape.customBorderRadius.sm}px`,
+            display: 'grid',
+            placeItems: 'center',
+            color: theme.palette.primary.main,
+            backgroundColor: alpha(theme.palette.primary.main, 0.1),
+            flex: '0 0 auto'
+          }}
+        >
+          <i className='tabler-route-square' aria-hidden='true' />
+        </Box>
+        <Stack spacing={0.75} sx={{ minInlineSize: 0, maxInlineSize: 760 }}>
+          <Typography variant='caption' color='text.secondary' sx={{ fontWeight: 600 }}>
+            {plan.decisionLabel}
+          </Typography>
+          <Typography variant='h6'>{plan.decisionTitle}</Typography>
+          <Typography variant='body2' color='text.secondary' sx={{ maxInlineSize: '72ch' }}>
+            {plan.decisionBody}
+          </Typography>
+        </Stack>
+      </Stack>
+    </Box>
+  )
+}
+
+const ActionPlanStep = ({
+  step,
+  index
+}: {
+  step: NexaAnswerActionPlanSpec['steps'][number]
+  index: number
+}) => {
+  const theme = useTheme()
+
+  return (
+    <Stack direction='row' spacing={2.5} component='li' sx={{ minInlineSize: 0, position: 'relative' }}>
+      <Box
+        sx={{
+          position: 'relative',
+          inlineSize: 26,
+          blockSize: 26,
+          borderRadius: `${theme.shape.customBorderRadius.sm}px`,
+          display: 'grid',
+          placeItems: 'center',
+          color: theme.palette.primary.main,
+          backgroundColor: alpha(theme.palette.primary.main, 0.1),
+          flex: '0 0 auto'
+        }}
+      >
+        <Typography variant='caption' sx={{ color: 'inherit', fontWeight: 700, lineHeight: 1 }}>
+          {index + 1}
+        </Typography>
+      </Box>
+      <Stack spacing={0.5} sx={{ minInlineSize: 0 }}>
+        <Typography variant='body2' sx={{ fontWeight: 600 }}>
+          {step.title}
+        </Typography>
+        <Typography variant='body2' color='text.secondary'>
+          {step.body}
+        </Typography>
+      </Stack>
+    </Stack>
+  )
+}
+
+const ActionPlanTradeOffCard = ({ item }: { item: NexaAnswerActionPlanTradeOff }) => {
+  const theme = useTheme()
+  const color = getTradeOffToneColor(theme, item.tone)
+
+  return (
+    <Box
+      component='li'
+      sx={{
+        px: 0,
+        py: 0
+      }}
+    >
+      <Stack spacing={0.75}>
+        <Stack direction='row' spacing={1.25} alignItems='center'>
+          <Box sx={{ inlineSize: 7, blockSize: 7, borderRadius: '50%', backgroundColor: color, flex: '0 0 auto' }} />
+          <Typography variant='body2' sx={{ fontWeight: 600 }}>
+            {item.label}
+          </Typography>
+        </Stack>
+        <Typography variant='body2' color='text.secondary'>
+          {item.body}
+        </Typography>
+      </Stack>
+    </Box>
+  )
+}
+
+const ActionPlanRiskCard = ({ item }: { item: NexaAnswerActionPlanRisk }) => {
+  const theme = useTheme()
+  const color = getRiskSeverityColor(theme, item.severity)
+
+  return (
+    <Box
+      component='li'
+      sx={{
+        px: 0,
+        py: 0
+      }}
+    >
+      <Stack spacing={0.75}>
+        <Stack direction='row' spacing={1.25} alignItems='center'>
+          <Box
+            sx={{
+              inlineSize: 24,
+              blockSize: 24,
+              borderRadius: '50%',
+              display: 'grid',
+              placeItems: 'center',
+              color,
+              backgroundColor: alpha(color, 0.08),
+              flex: '0 0 auto'
+            }}
+          >
+            <Box component='i' className='tabler-alert-triangle' aria-hidden='true' />
+          </Box>
+          <Typography variant='body2' sx={{ fontWeight: 600 }}>
+            {item.label}
+          </Typography>
+        </Stack>
+        <Typography variant='body2' color='text.secondary'>
+          {item.body}
+        </Typography>
+      </Stack>
+    </Box>
+  )
+}
+
+const ActionPlanBlock = ({ actionPlan }: { actionPlan: NexaAnswerActionPlanSpec }) => {
+  const theme = useTheme()
+  const visibleSteps = actionPlan.steps.slice(0, 4)
+  const visibleTradeOffs = actionPlan.tradeOffs.slice(0, 3)
+  const visibleRisks = actionPlan.risks.slice(0, 3)
+
+  return (
+    <Stack spacing={3} data-capture='nexa-answers-action-plan-variant'>
+      <ActionPlanDecisionPanel plan={actionPlan} />
+
+      <Box
+        sx={{
+          display: 'grid',
+          gridTemplateColumns: { xs: '1fr', lg: 'minmax(0, 1.05fr) minmax(0, 0.95fr)' },
+          gap: 3,
+          alignItems: 'start',
+          minInlineSize: 0
+        }}
+      >
+        <Stack
+          sx={{
+            minInlineSize: 0,
+            border: `1px solid ${theme.palette.divider}`,
+            borderRadius: `${theme.shape.customBorderRadius.md}px`,
+            backgroundColor: alpha(theme.palette.background.paper, 0.58),
+            overflow: 'hidden'
+          }}
+        >
+          <Stack spacing={0.5} sx={{ px: 2.5, py: 2.25, borderBlockEnd: `1px solid ${alpha(theme.palette.divider, 0.72)}` }}>
+            <Typography variant='h6'>Próximo movimiento</Typography>
+            <Typography variant='caption' color='text.secondary'>
+              Secuencia corta para convertir la recomendación en ejecución.
+            </Typography>
+          </Stack>
+          <Stack
+            component='ol'
+            divider={<Divider flexItem sx={{ borderColor: alpha(theme.palette.divider, 0.72) }} />}
+            sx={{ m: 0, p: 0, listStyle: 'none' }}
+          >
+            {visibleSteps.map((step, index) => (
+              <Box key={step.id} sx={{ px: 2.5, py: 2 }}>
+                <ActionPlanStep step={step} index={index} />
+              </Box>
+            ))}
+          </Stack>
+        </Stack>
+
+        <Stack spacing={2.5} sx={{ minInlineSize: 0 }}>
+          <Stack
+            sx={{
+              border: `1px solid ${theme.palette.divider}`,
+              borderRadius: `${theme.shape.customBorderRadius.md}px`,
+              backgroundColor: alpha(theme.palette.background.paper, 0.58),
+              overflow: 'hidden'
+            }}
+          >
+            <Stack spacing={0.5} sx={{ px: 2.5, py: 2.25, borderBlockEnd: `1px solid ${alpha(theme.palette.divider, 0.72)}` }}>
+              <Typography variant='body2' sx={{ fontWeight: 600 }}>
+                Costo de la decisión
+              </Typography>
+              <Typography variant='caption' color='text.secondary'>
+                Lo que Nexa asume al recomendar este camino.
+              </Typography>
+            </Stack>
+            <Stack
+              component='ol'
+              divider={<Divider flexItem sx={{ borderColor: alpha(theme.palette.divider, 0.72) }} />}
+              sx={{ m: 0, px: 2.5, py: 2, listStyle: 'none' }}
+            >
+              {visibleTradeOffs.map(item => (
+                <ActionPlanTradeOffCard key={item.id} item={item} />
+              ))}
+            </Stack>
+          </Stack>
+
+          <Stack
+            sx={{
+              border: `1px solid ${theme.palette.divider}`,
+              borderRadius: `${theme.shape.customBorderRadius.md}px`,
+              backgroundColor: alpha(theme.palette.background.paper, 0.58),
+              overflow: 'hidden'
+            }}
+          >
+            <Stack spacing={0.5} sx={{ px: 2.5, py: 2.25, borderBlockEnd: `1px solid ${alpha(theme.palette.divider, 0.72)}` }}>
+                <Typography variant='body2' sx={{ fontWeight: 600 }}>
+                  Riesgos antes de ejecutar
+                </Typography>
+                <Typography variant='caption' color='text.secondary'>
+                  Condiciones que pueden cambiar la recomendación.
+                </Typography>
+              </Stack>
+            <Stack
+              component='ol'
+              divider={<Divider flexItem sx={{ borderColor: alpha(theme.palette.divider, 0.72) }} />}
+              sx={{ m: 0, px: 2.5, py: 2, listStyle: 'none' }}
+            >
+              {visibleRisks.map(item => (
+                <ActionPlanRiskCard key={item.id} item={item} />
+              ))}
+            </Stack>
+          </Stack>
+        </Stack>
       </Box>
     </Stack>
   )
@@ -660,6 +934,7 @@ const AnswerActionBar = ({ actions }: { actions: NexaAnswerAction[] }) => (
     {actions.map(action => (
       <GreenhouseButton
         key={action.label}
+        kind={action.kind}
         variant={action.variant}
         tone={action.tone}
         size='small'
@@ -742,6 +1017,7 @@ const ChartTrustRow = ({
       <Stack direction='row' spacing={1.5} flexWrap='wrap' useFlexGap>
         {action ? (
           <GreenhouseButton
+            kind={action.kind ?? 'inlineAction'}
             variant='text'
             tone={action.tone}
             size='small'
@@ -753,6 +1029,7 @@ const ChartTrustRow = ({
           </GreenhouseButton>
         ) : null}
         <GreenhouseButton
+          kind='inlineAction'
           variant='text'
           tone='secondary'
           size='small'
@@ -781,12 +1058,14 @@ const NexaAnswerBubble = ({
   onProofToggle,
   thinking = false,
   chart,
-  metricSummary
+  metricSummary,
+  actionPlan
 }: NexaAnswerBubbleProps) => {
   const theme = useTheme()
   const resolvedVariant = resolveNexaAnswerBubbleVariant({ kind, variant })
   const shouldRenderChart = resolvedVariant === 'chart' && chart
   const shouldRenderMetricSummary = resolvedVariant === 'metricSummary' && metricSummary
+  const shouldRenderActionPlan = resolvedVariant === 'actionPlan' && actionPlan
   const primaryChartAction = actions[0]
   const chartLeadingSeries = chart?.series[0]
   const chartLatestPoint = chart?.trend[chart.trend.length - 1]
@@ -841,7 +1120,7 @@ const NexaAnswerBubble = ({
           <Stack
             spacing={3}
             sx={{
-              px: { xs: 3, md: 4 },
+              px: { xs: 3, sm: 4, md: 5 },
               py: { xs: 3, md: 4 },
               background: bubbleSurfaceFill(theme)
             }}
@@ -893,12 +1172,32 @@ const NexaAnswerBubble = ({
             <AnswerBadge metaLabel={metaLabel} compact />
             <Stack spacing={1} sx={{ maxInlineSize: 820, minInlineSize: 0 }}>
               <Typography variant='h5'>{title}</Typography>
-              <Typography variant='body2' color='text.secondary'>
+              <Typography variant='body2' color='text.secondary' sx={{ maxInlineSize: '68ch' }}>
                 {body}
               </Typography>
             </Stack>
             <MetricSummaryBlock metricSummary={metricSummary} />
             <ChartTrustRow cue={trustCue} expanded={proofOpen} onToggle={onProofToggle} action={primaryChartAction} />
+          </Stack>
+        ) : shouldRenderActionPlan ? (
+          <Stack
+            spacing={3}
+            sx={{
+              px: { xs: 3, md: 4 },
+              py: { xs: 3, md: 4 },
+              background: bubbleSurfaceFill(theme)
+            }}
+          >
+            <AnswerBadge metaLabel={metaLabel} compact />
+            <Stack spacing={1} sx={{ maxInlineSize: 780, minInlineSize: 0 }}>
+              <Typography variant='h5'>{title}</Typography>
+              <Typography variant='body2' color='text.secondary'>
+                {body}
+              </Typography>
+            </Stack>
+            <ActionPlanBlock actionPlan={actionPlan} />
+            <AnswerActionBar actions={actions} />
+            <ChartTrustRow cue={trustCue} expanded={proofOpen} onToggle={onProofToggle} />
           </Stack>
         ) : (
           <>

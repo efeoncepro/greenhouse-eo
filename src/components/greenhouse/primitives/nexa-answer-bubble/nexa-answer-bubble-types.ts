@@ -1,6 +1,8 @@
 import type { ReactNode } from 'react'
 
-export type NexaAnswerBubbleVariant = 'explanation' | 'chart' | 'metricSummary'
+import type { GreenhouseButtonKind, GreenhouseButtonTone, GreenhouseButtonVariant } from '../greenhouse-button-controller'
+
+export type NexaAnswerBubbleVariant = 'explanation' | 'chart' | 'metricSummary' | 'actionPlan'
 
 export type NexaAnswerBubbleKind =
   | 'knowledgeChartAnswer'
@@ -11,6 +13,11 @@ export type NexaAnswerBubbleKind =
   | 'agencyMetricSummary'
   | 'peopleMetricSummary'
   | 'surfaceMetricSummary'
+  | 'financeActionPlan'
+  | 'commercialActionPlan'
+  | 'agencyActionPlan'
+  | 'peopleActionPlan'
+  | 'surfaceActionPlan'
   | 'surfaceChartInsight'
   | 'custom'
 
@@ -32,8 +39,9 @@ export interface NexaAnswerTrustCue {
 export interface NexaAnswerAction {
   label: string
   iconClassName: string
-  variant: 'outlined' | 'text'
-  tone: 'primary' | 'secondary'
+  kind?: GreenhouseButtonKind
+  variant?: GreenhouseButtonVariant
+  tone?: Extract<GreenhouseButtonTone, 'primary' | 'secondary'>
   onClick?: () => void
   disabled?: boolean
   disabledReason?: string
@@ -96,6 +104,39 @@ export interface NexaAnswerMetricSummarySpec {
   metrics: NexaAnswerMetricSummaryItem[]
 }
 
+export type NexaAnswerActionPlanTradeOffTone = 'positive' | 'caution' | 'neutral'
+
+export type NexaAnswerActionPlanRiskSeverity = 'low' | 'medium' | 'high'
+
+export interface NexaAnswerActionPlanStep {
+  id: string
+  title: string
+  body: string
+}
+
+export interface NexaAnswerActionPlanTradeOff {
+  id: string
+  label: string
+  body: string
+  tone: NexaAnswerActionPlanTradeOffTone
+}
+
+export interface NexaAnswerActionPlanRisk {
+  id: string
+  label: string
+  body: string
+  severity: NexaAnswerActionPlanRiskSeverity
+}
+
+export interface NexaAnswerActionPlanSpec {
+  decisionLabel: string
+  decisionTitle: string
+  decisionBody: string
+  steps: NexaAnswerActionPlanStep[]
+  tradeOffs: NexaAnswerActionPlanTradeOff[]
+  risks: NexaAnswerActionPlanRisk[]
+}
+
 export interface NexaAnswerBubbleProps {
   variant?: NexaAnswerBubbleVariant
   kind?: NexaAnswerBubbleKind
@@ -110,6 +151,7 @@ export interface NexaAnswerBubbleProps {
   thinking?: boolean
   chart?: NexaAnswerChartSpec
   metricSummary?: NexaAnswerMetricSummarySpec
+  actionPlan?: NexaAnswerActionPlanSpec
 }
 
 export interface NexaCompactAnswerBubbleProps {

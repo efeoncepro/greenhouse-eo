@@ -26,6 +26,11 @@ export const NEXA_ANSWER_BUBBLE_VARIANT_CONFIG = {
     variant: 'metricSummary',
     density: 'compact',
     chartFirst: false
+  },
+  actionPlan: {
+    variant: 'actionPlan',
+    density: 'rich',
+    chartFirst: false
   }
 } as const satisfies Record<NexaAnswerBubbleVariant, NexaAnswerBubbleVariantConfig>
 
@@ -61,6 +66,26 @@ export const NEXA_ANSWER_BUBBLE_KIND_CONFIG = {
   surfaceMetricSummary: {
     kind: 'surfaceMetricSummary',
     variant: 'metricSummary'
+  },
+  financeActionPlan: {
+    kind: 'financeActionPlan',
+    variant: 'actionPlan'
+  },
+  commercialActionPlan: {
+    kind: 'commercialActionPlan',
+    variant: 'actionPlan'
+  },
+  agencyActionPlan: {
+    kind: 'agencyActionPlan',
+    variant: 'actionPlan'
+  },
+  peopleActionPlan: {
+    kind: 'peopleActionPlan',
+    variant: 'actionPlan'
+  },
+  surfaceActionPlan: {
+    kind: 'surfaceActionPlan',
+    variant: 'actionPlan'
   },
   surfaceChartInsight: {
     kind: 'surfaceChartInsight',

@@ -88,6 +88,12 @@ export type {
 export { default as NexaAnswerBubble, NexaCompactAnswerBubble } from './nexa-answer-bubble/NexaAnswerBubble'
 export type {
   NexaAnswerAction,
+  NexaAnswerActionPlanRisk,
+  NexaAnswerActionPlanRiskSeverity,
+  NexaAnswerActionPlanSpec,
+  NexaAnswerActionPlanStep,
+  NexaAnswerActionPlanTradeOff,
+  NexaAnswerActionPlanTradeOffTone,
   NexaAnswerBubbleKind,
   NexaAnswerBubbleProps,
   NexaAnswerBubbleVariant,

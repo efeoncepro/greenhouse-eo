@@ -174,14 +174,21 @@ Foundation visual slice advanced:
 - The canvas owns the UI choreography: idle composer glow, question bubble, Nexa identity/thinking, answer block, proof under demand, composer descent and compact previous turns.
 - The first renderer registry supports `answerBubble` and `compactAnswer`, with allowlist validation from `surfaceContext.allowedRenderers`.
 - `NexaAnswerBubble` is now a canonical primitive under `src/components/greenhouse/primitives/nexa-answer-bubble/`.
-- Initial variants: `explanation`, `chart` and `metricSummary`.
-- Initial kinds: `knowledgeExplanationAnswer`, `knowledgeChartAnswer`, `financeChartAnswer`, `financeMetricSummary`, `commercialMetricSummary`, `agencyMetricSummary`, `peopleMetricSummary`, `surfaceMetricSummary`, `surfaceChartInsight`, `custom`.
+- Initial variants: `explanation`, `chart`, `metricSummary` and `actionPlan`.
+- Initial kinds: `knowledgeExplanationAnswer`, `knowledgeChartAnswer`, `financeChartAnswer`, `financeMetricSummary`, `commercialMetricSummary`, `agencyMetricSummary`, `peopleMetricSummary`, `surfaceMetricSummary`, `financeActionPlan`, `commercialActionPlan`, `agencyActionPlan`, `peopleActionPlan`, `surfaceActionPlan`, `surfaceChartInsight`, `custom`.
 - The chart variant uses a generic chart contract: `series[]`, `trend[]`, `composition[]`, `valueSuffix`.
 - The chart variant renders three Recharts modes: `trend`, `comparison`, `composition`.
 - The metric summary variant uses a compact KPI contract: 2-4 metrics, value, helper, semantic delta and mini trend. It is intended for Finance, Commercial, Agency and Personas when a big chart would overpower the conversational answer.
+- Metric summary sparklines and chart variant series use the canonical chart palette (`GH_COLORS.chart.categorical`); semantic tones remain only for delta/status pills.
+- The action plan variant uses a recommendation contract: suggested decision, steps, trade-offs, risks and product CTAs. It is intended for moments where Nexa proposes the next movement inside a surface instead of only explaining a signal.
+- Action plan keeps evidence in the shared trust/proof row; source review is not duplicated as a primary CTA.
+- Action plan visual contract is now canonicalized as a **decision brief**: thesis first, suggested decision, neutral grouped rows, horizontal dividers, restrained semantic dots/icons and no AI-ish side stripes or tinted alert-card stack.
+- Action plan typography follows Greenhouse variants (`h6`, `body2`, `caption`), with operational copy in `body2`, moderate label weight and no inline font sizing.
+- Action plan CTAs pass canonical `GreenhouseButton.kind` through `NexaAnswerAction.kind` (`primaryAction`, `secondaryAction`, `inlineAction`).
 - `/knowledge/mockup/nexa-answers` now consumes `NexaAnswerBubble kind='knowledgeChartAnswer'` instead of owning a route-local bubble.
 - `/knowledge/mockup/nexa-answers` now consumes `NexaAnswersCanvas` instead of locally assembling all answer states.
-- `/design-system/nexa-chat` includes `data-capture='nexa-answer-bubble-chart-specimen'`, `data-capture='nexa-answer-bubble-metric-summary-specimen'` and `data-capture='nexa-answers-canvas-specimen'`.
+- `/design-system/nexa-chat` includes `data-capture='nexa-answer-bubble-chart-specimen'`, `data-capture='nexa-answer-bubble-metric-summary-specimen'`, `data-capture='nexa-answer-bubble-action-plan-specimen'` and `data-capture='nexa-answers-canvas-specimen'`.
+- Latest accepted GVC for the action plan specimen: `.captures/2026-06-13T00-30-32_design-system-nexa-chat`.
 
 This does **not** complete TASK-1096. Remaining scope still includes production Knowledge consumer integration, promoted Nexa Insight specimen, finance/chart fixture, assistant runtime/adapters from TASK-1095, final copy governance, follow-up compaction in real multi-turn runtime and GVC coverage for the complete surface.
 

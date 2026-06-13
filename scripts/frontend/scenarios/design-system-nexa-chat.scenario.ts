@@ -70,13 +70,25 @@ export const scenario: CaptureScenario = {
       kind: 'scroll',
       selector: '[data-capture="nexa-answer-bubble-metric-summary-specimen"]',
       scrollBlock: 'start',
-      scrollY: -128
+      scrollY: -220
     },
     {
       kind: 'mark',
       label: 'nexa-answer-bubble-metric-summary-specimen',
       clipSelector: '[data-capture="nexa-answer-bubble-metric-summary-specimen"]',
       note: 'Primitive NexaAnswerBubble con variante metricSummary para lectura ejecutiva de KPIs'
+    },
+    {
+      kind: 'scroll',
+      selector: '[data-capture="nexa-answer-bubble-action-plan-specimen"]',
+      scrollBlock: 'start',
+      scrollY: -96
+    },
+    {
+      kind: 'mark',
+      label: 'nexa-answer-bubble-action-plan-specimen',
+      clipSelector: '[data-capture="nexa-answer-bubble-action-plan-specimen"]',
+      note: 'Primitive NexaAnswerBubble con variante actionPlan para recomendaciones accionables'
     },
     {
       kind: 'scroll',

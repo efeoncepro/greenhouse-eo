@@ -23,6 +23,7 @@ import {
 } from '@/components/greenhouse/primitives'
 import type {
   NexaAnswerAction,
+  NexaAnswerActionPlanSpec,
   NexaAnswerChartSpec,
   NexaAnswerMetricSummarySpec,
   NexaAnswerPoint,
@@ -198,8 +199,13 @@ const ANSWER_BUBBLE_TRUST_CUE: NexaAnswerTrustCue = {
 }
 
 const ANSWER_BUBBLE_ACTIONS: NexaAnswerAction[] = [
-  { label: 'Abrir guía', iconClassName: 'tabler-book', variant: 'outlined', tone: 'primary' },
-  { label: 'Ver base', iconClassName: 'tabler-database-search', variant: 'text', tone: 'secondary' }
+  { label: 'Abrir guía', iconClassName: 'tabler-book', kind: 'secondaryAction', variant: 'outlined', tone: 'primary' },
+  { label: 'Ver base', iconClassName: 'tabler-database-search', kind: 'inlineAction', variant: 'text', tone: 'secondary' }
+]
+
+const ANSWER_BUBBLE_ACTION_PLAN_ACTIONS: NexaAnswerAction[] = [
+  { label: 'Crear plan', iconClassName: 'tabler-checklist', kind: 'primaryAction' },
+  { label: 'Simular escenario', iconClassName: 'tabler-arrows-diff', kind: 'secondaryAction', variant: 'outlined', tone: 'primary' }
 ]
 
 const ANSWER_BUBBLE_CHART_SPEC: NexaAnswerChartSpec = {
@@ -295,6 +301,58 @@ const ANSWER_BUBBLE_METRIC_SUMMARY_SPEC: NexaAnswerMetricSummarySpec = {
         { label: 'Jul', value: 43 },
         { label: 'Ago', value: 41 }
       ]
+    }
+  ]
+}
+
+const ANSWER_BUBBLE_ACTION_PLAN_SPEC: NexaAnswerActionPlanSpec = {
+  decisionLabel: 'Decisión sugerida',
+  decisionTitle: 'Abre un plan de recuperación de 7 días.',
+  decisionBody:
+    'Dos cuentas sensibles explican la caída del pipeline ponderado. Valídalas antes de mover presupuesto adicional.',
+  steps: [
+    {
+      id: 'qualify-risk',
+      title: 'Valida las dos cuentas sensibles',
+      body: 'Confirma stage, sponsor, bloqueo y próximo compromiso antes de mover presupuesto.'
+    },
+    {
+      id: 'rebalance-spend',
+      title: 'Reasigna gasto a oportunidades activas',
+      body: 'Mantén gasto fijo bajo control y empuja solo canales con conversión reciente.'
+    },
+    {
+      id: 'manager-check',
+      title: 'Agenda revisión en 7 días',
+      body: 'Si el pipeline no recupera al menos 4 pts, escala un plan con owner comercial.'
+    }
+  ],
+  tradeOffs: [
+    {
+      id: 'speed',
+      label: 'Se pausa expansión agresiva',
+      body: 'La inversión espera hasta confirmar que el pipeline sostiene el crecimiento.',
+      tone: 'caution'
+    },
+    {
+      id: 'margin',
+      label: 'Margen protegido',
+      body: 'Reduce el riesgo de crecer revenue con delivery poco rentable o mal priorizado.',
+      tone: 'positive'
+    }
+  ],
+  risks: [
+    {
+      id: 'stale-pipeline',
+      label: 'Pipeline desactualizado',
+      body: 'Si los stages no están frescos, la recomendación puede subestimar riesgo.',
+      severity: 'medium'
+    },
+    {
+      id: 'sponsor-loss',
+      label: 'Sponsor débil',
+      body: 'Una cuenta sensible sin sponsor puede necesitar intervención ejecutiva.',
+      severity: 'high'
     }
   ]
 }
@@ -447,6 +505,25 @@ const NexaAnswerMetricSummarySpecimen = () => {
       proofOpen={proofOpen}
       onProofToggle={() => setProofOpen(current => !current)}
       metricSummary={ANSWER_BUBBLE_METRIC_SUMMARY_SPEC}
+    />
+  )
+}
+
+const NexaAnswerActionPlanSpecimen = () => {
+  const [proofOpen, setProofOpen] = useState(false)
+
+  return (
+    <NexaAnswerBubble
+      kind='commercialActionPlan'
+      title='No aceleres gasto todavía.'
+      body='Revenue y margen mejoran, pero el pipeline ponderado cae 6%. La señal pide una acción corta, medible y reversible antes de comprometer presupuesto.'
+      metaLabel='Recomendación operativa · requiere aprobación'
+      points={ANSWER_BUBBLE_POINTS}
+      actions={ANSWER_BUBBLE_ACTION_PLAN_ACTIONS}
+      trustCue={ANSWER_BUBBLE_TRUST_CUE}
+      proofOpen={proofOpen}
+      onProofToggle={() => setProofOpen(current => !current)}
+      actionPlan={ANSWER_BUBBLE_ACTION_PLAN_SPEC}
     />
   )
 }
@@ -712,6 +789,13 @@ const NexaChatLabView = () => (
             <InlineCode>NexaAnswerBubble</InlineCode> — variante metricSummary
           </Typography>
           <NexaAnswerMetricSummarySpecimen />
+        </Box>
+
+        <Box data-capture='nexa-answer-bubble-action-plan-specimen' sx={{ scrollMarginBlockStart: { xs: 19, md: 13 } }}>
+          <Typography variant='subtitle2' sx={{ mb: 1.5 }}>
+            <InlineCode>NexaAnswerBubble</InlineCode> — variante actionPlan
+          </Typography>
+          <NexaAnswerActionPlanSpecimen />
         </Box>
 
         <Box data-capture='nexa-answers-canvas-specimen' sx={{ scrollMarginBlockStart: { xs: 19, md: 13 } }}>

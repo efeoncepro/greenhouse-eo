@@ -4,6 +4,7 @@ import type { ConversationalEvidencePacket } from '@/lib/nexa/conversational-evi
 
 import type {
   NexaAnswerAction,
+  NexaAnswerActionPlanSpec,
   NexaAnswerBubbleKind,
   NexaAnswerBubbleVariant,
   NexaAnswerChartSpec,
@@ -93,6 +94,7 @@ export interface NexaAnswersBubbleBlock extends NexaAnswersBlockBase {
   trustCue?: NexaAnswerTrustCue
   chart?: NexaAnswerChartSpec
   metricSummary?: NexaAnswerMetricSummarySpec
+  actionPlan?: NexaAnswerActionPlanSpec
 }
 
 export interface NexaAnswersCompactAnswerBlock extends NexaAnswersBlockBase {

@@ -1,12 +1,22 @@
 # Release 2026-06-10 #2 — develop→main `6c649b2a6` RELEASED
 
+## Sesion 2026-06-13 — NexaAnswerBubble actionPlan (Codex)
+
+- **Qué quedó:** `NexaAnswerBubble` suma variante oficial `actionPlan` para recomendaciones accionables. Kinds iniciales: `financeActionPlan`, `commercialActionPlan`, `agencyActionPlan`, `peopleActionPlan`, `surfaceActionPlan`.
+- **Contrato:** `NexaAnswerActionPlanSpec` modela decisión sugerida, pasos, trade-offs y riesgos. El `NexaAnswersCanvas` puede pasar `actionPlan` dentro de un block `answerBubble`.
+- **Design System:** `/design-system/nexa-chat` suma specimen `nexa-answer-bubble-action-plan-specimen`; scenario actualizado para capturarlo.
+- **Decisión UX:** los CTAs quedan para acciones de negocio (`Crear plan`, `Simular escenario`); la evidencia se conserva en el trust/proof row para evitar duplicar "Ver base" dentro del cuerpo de la recomendación. Pasada posterior de typography/UX writing/product design: copy de demo eliminado, tesis más directa, aire interno aumentado y patrón final tipo decision brief con grupos neutros, rows y divisores horizontales; se retiraron barras laterales/tintes tipo AI. `NexaAnswerAction` ahora admite `kind` y el lab usa `GreenhouseButton` como `primaryAction`/`secondaryAction`/`inlineAction`.
+- **Verificación:** ESLint focal verde, `pnpm exec tsc --noEmit --pretty false` verde, GVC `design-system-nexa-chat` verde en `.captures/2026-06-13T00-30-32_design-system-nexa-chat`. Frames desktop/mobile revisados; el overlay del app bar en mobile es artifact del recorte largo del lab, no de la primitive.
+- **Coordinación WT compartido:** no tocar `.playwright-mcp/`. Stagear solo archivos propios de TASK-1096 si se commitea.
+
 ## Sesion 2026-06-12 — NexaAnswerBubble metricSummary (Codex)
 
 - **Qué quedó:** `NexaAnswerBubble` suma variante oficial `metricSummary` para lectura ejecutiva compacta de KPIs. Kinds iniciales: `financeMetricSummary`, `commercialMetricSummary`, `agencyMetricSummary`, `peopleMetricSummary`, `surfaceMetricSummary`.
 - **Contrato:** `NexaAnswerMetricSummarySpec` modela `title`, `helper`, `interpretation` y hasta 4 métricas con `value`, `helper`, `deltaLabel`, `deltaTone` y mini trend. El `NexaAnswersCanvas` puede pasar `metricSummary` dentro de un block `answerBubble`.
 - **Design System:** `/design-system/nexa-chat` suma specimen `nexa-answer-bubble-metric-summary-specimen`; scenario actualizado para capturarlo.
-- **Verificación parcial:** ESLint focal y `pnpm exec tsc --noEmit --pretty false` verdes. GVC `design-system-nexa-chat` verde en `.captures/2026-06-12T23-51-06_design-system-nexa-chat`; desktop revisado bien. Mobile usable, con ajuste de scenario posterior para evitar overlay del header sticky en la captura.
-- **Pendiente inmediato:** relanzar GVC tras el ajuste de offset del scenario y correr gates finales (`ops:lint --changed`, `docs:closure-check`, `git diff --check`) antes de commit.
+- **Color:** las series visualizadas usan `GH_COLORS.chart.categorical` (AXIS chart SoT); los tonos semánticos quedan solo en las delta/status pills.
+- **Verificación:** ESLint focal verde. GVC `design-system-nexa-chat` verde en `.captures/2026-06-12T23-56-37_design-system-nexa-chat`; desktop revisado bien. `pnpm ops:lint --changed` y `git diff --check` verdes.
+- **Nota tsc:** `pnpm exec tsc --noEmit --pretty false` falla por WIP ajeno en `scripts/frontend/explore.ts` / `scripts/frontend/lib/explore-promote.test.ts` (`ExploreSession.interactions` requerido). No pertenece a esta variante y no se tocó.
 
 ## Sesion 2026-06-12 — NexaAnswersCanvas transversal (Codex)
 

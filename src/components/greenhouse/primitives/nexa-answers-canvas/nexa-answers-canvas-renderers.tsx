@@ -51,6 +51,7 @@ const renderAnswerBubble: NexaAnswersBlockRenderer = (block, context) => {
       thinking={context.thinking}
       chart={block.chart}
       metricSummary={block.metricSummary}
+      actionPlan={block.actionPlan}
     />
   )
 }

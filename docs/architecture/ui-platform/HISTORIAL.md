@@ -6,6 +6,23 @@
 
 ---
 
+## Delta 2026-06-13 — NexaAnswerBubble `actionPlan` variant (TASK-1096)
+
+Se extendió `NexaAnswerBubble` con la variante oficial `actionPlan`:
+
+- Propósito: recomendación accionable cuando Nexa no solo explica una señal, sino que propone el próximo movimiento dentro de la surface.
+- Kinds iniciales: `financeActionPlan`, `commercialActionPlan`, `agencyActionPlan`, `peopleActionPlan`, `surfaceActionPlan`.
+- Contrato de datos: `NexaAnswerActionPlanSpec` con decisión sugerida, pasos recomendados, trade-offs y riesgos a vigilar.
+- La variante mantiene answer-first: decisión clara arriba, plan operativo después, riesgos/trade-offs como contexto y proof bajo demanda en el trust row.
+- Las acciones quedan como CTA de producto/surface; la evidencia no se duplica como acción primaria porque vive en el trust/proof contract compartido.
+- El renderer de `NexaAnswersCanvas` puede recibir `actionPlan` en un bloque `answerBubble`, por lo que queda disponible para render plans transversales.
+- El lab `/design-system/nexa-chat` suma specimen `data-capture='nexa-answer-bubble-action-plan-specimen'`.
+- Contrato visual final: patrón **decision brief**. La tesis y la decisión sugerida viven arriba; el cuerpo se ordena en grupos neutros con rows, aire interno y divisores horizontales. Evitar barras laterales por aviso, alert cards tintadas, exceso de bordes o composición tipo dashboard comprimido.
+- Tipografía: headings/labels usan variantes Greenhouse (`h6`, `body2`, `caption`) con peso moderado; cuerpos operativos en `body2`; metadata en `caption`; sin `fontSize`/`fontFamily` inline.
+- Color: el color semántico aparece solo como dot/icono de señal. No se usa como stripe lateral ni como fondo dominante del aviso.
+- Acciones: `NexaAnswerAction` admite `kind`; los CTAs deben pasar `GreenhouseButton` canónico (`primaryAction`, `secondaryAction` o `inlineAction`) y no crear botones locales dentro del bubble.
+- Evidencia GVC final: `.captures/2026-06-13T00-30-32_design-system-nexa-chat`.
+
 ## Delta 2026-06-12i — NexaAnswerBubble `metricSummary` variant (TASK-1096)
 
 Se extendió `NexaAnswerBubble` con la variante oficial `metricSummary`:
@@ -13,6 +30,7 @@ Se extendió `NexaAnswerBubble` con la variante oficial `metricSummary`:
 - Propósito: lectura ejecutiva compacta para 2-4 KPIs cuando Nexa necesita decir "qué cambió y cuánto importa" sin abrir un chart grande.
 - Kinds iniciales: `financeMetricSummary`, `commercialMetricSummary`, `agencyMetricSummary`, `peopleMetricSummary`, `surfaceMetricSummary`.
 - Contrato de datos: `NexaAnswerMetricSummarySpec` con `metrics[]`, valor, helper, delta semántico (`success`/`warning`/`error`/`info`/`neutral`) y mini trend por métrica.
+- Color: sparklines y charts usan la paleta canónica `GH_COLORS.chart.categorical`/AXIS chart SoT; los tonos semánticos quedan reservados para la píldora de delta/estado, no para las series visualizadas.
 - La variante conserva el mismo contrato de trust/proof/actions que `chart` y `explanation`.
 - El renderer de `NexaAnswersCanvas` puede recibir `metricSummary` en un bloque `answerBubble`, por lo que la variante queda disponible para render plans transversales.
 - El lab `/design-system/nexa-chat` suma specimen `data-capture='nexa-answer-bubble-metric-summary-specimen'`.
