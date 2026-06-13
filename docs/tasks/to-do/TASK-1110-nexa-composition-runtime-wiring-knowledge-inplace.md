@@ -39,7 +39,16 @@ Cablear `KnowledgeNexaCompositionLens` **dentro de la lente Humano** de `Knowled
 - Mapear los `documents` reales (`KnowledgeDocumentSummary` del view) → `KnowledgeCompositionHostDoc` (documentId/title/kind…) para el índice de anclaje.
 - `onContinueInNexaLens(query)` → `setActiveMode('nexa')` + sembrar la query en la lente takeover (sinergia overview→deep).
 
-**Decisión de producto resuelta (operador):** la composición es el transform **in-place** de la lente Humano (Opción 1 refinada), NO una pestaña nueva, NO navegar. Reconciliar con el `search→results` actual de la lente Humano: el ask compone in-place; definir si el search clásico convive o se subsume (validar con el operador al implementar; el norte es "una sola superficie que se ajusta").
+**Decisión de producto resuelta (operador):** la composición es el transform **in-place** de la lente Humano (Opción 1 refinada), NO una pestaña nueva, NO navegar.
+
+**Modelo del ask (product-ui — refinado en review):** `dormant` = el workbench browse/search **intacto y usable**; **preguntar** (una pregunta, no un filtro) → compone in-place. El browse/filter NO se destruye: filtrar/navegar docs = host; preguntar = compose. El norte es "una sola superficie que se ajusta", no "reemplazar el buscador".
+
+**Safety in-place (state-design + arch):**
+
+- Si el compose **falla** (degraded/error), el **workbench NUNCA se rompe** — el host sigue íntegro y usable; el Moment degrada honesto (ya horneado en el consumer).
+- **Focus routing** tras el morph `dormant→composed`: el foco va a la respuesta (la primitive/playbook lo exige; verificar a11y por teclado).
+- **Kill-switch (reconcile con "desplegado habilitado"):** ship **default ON** (no oculto), PERO con un gate revertible sin code-deploy si la superficie viva se rompe en prod. Preferir el **rollout-flag platform** (TASK-780, default ON) sobre un env binario. "No flag OFF" del operador = enabled-por-defecto, NO "sin red de seguridad". **Confirmar el mecanismo con el operador** antes de S1.
+- **Non-regresión:** S1 NO debe romper las lentes existentes (`human`/`nexa`/`mcp`) ni el fallback answer-trace (`NexaKnowledgeAnswerSurface`). La lente `nexa` takeover (multi-turno) y la composición coexisten como dos placements.
 
 ### Slice 2 — GVC en staging (verlo funcionando)
 
@@ -54,12 +63,25 @@ Idea del operador: canonizar `/knowledge/mockup/nexa-answers` como **page del De
 
 `eligibility` (cuándo aparece el Moment) + `next-step gobernado` (action boundary: inform/recommend/draft/execute-with-approval) + señales `nexa.moment.*` = **Moment Fabric (TASK-1095/1096, Codex)**. El consumer hoy omite el next-step honesto (no inventa acción). Coser por `surfaceContext` + `renderPlan`. Coordinar con Codex.
 
+## Riesgo & 4 pilares (arch — review pre-inicio)
+
+S1 es un cambio a una **superficie viva** (`KnowledgeCenterView`, 1368 líneas) desplegado habilitado → blast-radius real. Triage:
+
+- **Safety:** kill-switch revertible sin deploy (rollout-flag default ON, ver S1) + el host nunca se rompe si el compose falla. Lente `nexa`/answer-trace intactas.
+- **Robustness:** degraded/error honestos ya horneados en el consumer; abort en `onStopGeneration`; gap honesto si `confidence='none'`.
+- **Resilience:** rollback = flag OFF (la lente Humano vuelve a su estado actual); el answer-trace fallback sigue de red.
+- **Scalability:** el consumer es la **plantilla replicable** (host por slot + adapter + surfaceContext) → finance/agency nacen como child tasks sin tocar la primitive.
+
+**Duplicación conocida y aceptada (arch SSOT):** hay **2 hosts de Knowledge** — `KnowledgeNexaCanvasLens` (takeover, multi-turno) y `KnowledgeNexaCompositionLens` (composición, single-turn). Comparten el adapter de retrieval (`buildKnowledgeAnswerRenderPlan`) + el canvas + la coreografía, pero cada uno posee su estado de conversación (patrón self-contained del playbook). Es aceptable hoy. **Umbral de extracción:** si emerge un **3er consumer** que necesite la misma máquina de conversación, extraer un hook neutral compartido (el `useNexaConversation` que se revirtió en esta sesión) — NO antes (YAGNI; el operador lo rechazó como abstracción prematura).
+
 ## Hard rules (invariantes — no regresión)
 
 - **NUNCA** la composición navega a otra interfaz: ajusta la UI **in-place** ("Sin host ↔ con Nexa"). El puente a la lente takeover es secundario/opcional.
 - **NUNCA** la composición es "de Knowledge": la capacidad es la primitive transversal `NexaMomentComposition`. Knowledge es un **consumer** (template replicable). El consumer recibe el `host` por slot (contenido propio de cada superficie).
 - **NUNCA** desconectar de Nexa Answer: el Moment reusa `NexaAnswersCanvas` + el adapter de retrieval real + la coreografía. No hay answer-path paralelo.
-- **NUNCA** flag OFF: se despliega habilitado (decisión del operador).
+- **NUNCA** flag OFF por defecto: se despliega **habilitado** (decisión del operador) — pero **CON kill-switch revertible sin deploy** (default ON). "Habilitado" ≠ "sin red de seguridad".
+- **NUNCA** el compose roto rompe el workbench: si falla, el host (browse/search de docs) sigue íntegro y usable; degradar honesto.
+- **NUNCA** destruir el browse/search de la lente Humano: filtrar/navegar = host; **preguntar** = compose. Coexisten en la misma superficie.
 - **NUNCA** inventar el next-step gobernado / eligibility / señales — son del Moment Fabric (Codex); omitir honesto hasta la costura.
 - **SIEMPRE** las cards anclables del host llevan `data-nexa-anchor="<id>"`; las citas resaltan el ítem real (la evidencia ES el contenido operativo, no la web).
 - **SIEMPRE** GVC frame mirado (staging) antes de declarar UI lista.
