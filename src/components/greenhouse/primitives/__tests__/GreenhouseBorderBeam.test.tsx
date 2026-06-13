@@ -125,16 +125,26 @@ describe('GreenhouseBorderBeam', () => {
 
   it('renders spotlight cards with prompt colors and a Nexa brand kind', () => {
     const { container, getByText } = renderWithTheme(
-      <GreenhouseSpotlightCard kind='nexaBrand' dataCapture='spotlight-card-test'>
-        <span>Nexa spotlight</span>
-      </GreenhouseSpotlightCard>
+      <>
+        <GreenhouseSpotlightCard kind='nexaBrand' dataCapture='spotlight-card-test'>
+          <span>Nexa spotlight</span>
+        </GreenhouseSpotlightCard>
+        <GreenhouseSpotlightCard kind='nexaBrandCore' dataCapture='spotlight-card-core-test' />
+        <GreenhouseSpotlightCard kind='nexaBrandSignal' dataCapture='spotlight-card-signal-test' />
+        <GreenhouseSpotlightCard kind='nexaBrandGlass' dataCapture='spotlight-card-glass-test' />
+      </>
     )
 
     const card = container.querySelector('[data-capture="spotlight-card-test"]')
+    const brandKinds = ['nexaBrand', 'nexaBrandCore', 'nexaBrandSignal', 'nexaBrandGlass']
 
     expect(card).toHaveAttribute('data-gh-spotlight-card')
     expect(card).toHaveAttribute('data-kind', 'nexaBrand')
     expect(container.querySelector('[data-gh-spotlight-aura]')).toBeInTheDocument()
     expect(getByText('Nexa spotlight')).toBeInTheDocument()
+
+    brandKinds.forEach(kind => {
+      expect(container.querySelector(`[data-kind="${kind}"]`)).toBeInTheDocument()
+    })
   })
 })

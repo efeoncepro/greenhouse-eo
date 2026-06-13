@@ -210,43 +210,78 @@ const SpotlightCardsSpecimen = () => (
   </Box>
 )
 
-const NexaSpotlightCardSpecimen = () => (
-  <GreenhouseSpotlightCard dataCapture='border-beam-spotlight-card-nexa' kind='nexaBrand' size='md'>
-    <Stack spacing={2} sx={{ minBlockSize: '100%', color: 'inherit' }}>
-      <Stack direction='row' spacing={1} alignItems='center'>
-        <Box
-          sx={theme => ({
-            display: 'grid',
-            placeItems: 'center',
-            inlineSize: 36,
-            blockSize: 36,
-            borderRadius: '50%',
-            bgcolor: alpha(theme.palette.common.white, 0.12)
-          })}
-        >
-          <i className='tabler-sparkles' aria-hidden='true' />
-        </Box>
-        <Typography variant='h6' color='inherit'>
-          Nexa
-        </Typography>
-      </Stack>
-      <Typography variant='body2' color='inherit' sx={{ opacity: 0.78 }}>
-        Spotlight compacto con midnight navy, electric teal y blanco.
-      </Typography>
-      <CustomChip
-        label="kind='nexaBrand'"
-        size='small'
-        variant='tonal'
-        color='primary'
-        round='true'
-        sx={theme => ({
-          alignSelf: 'flex-start',
-          color: theme.palette.common.white,
-          bgcolor: alpha(theme.palette.common.white, 0.14)
-        })}
-      />
-    </Stack>
-  </GreenhouseSpotlightCard>
+const NEXA_SPOTLIGHT_VARIATIONS = [
+  {
+    kind: 'nexaBrand',
+    label: 'Nexa',
+    description: 'Base: core blue visible sobre midnight navy.'
+  },
+  {
+    kind: 'nexaBrandCore',
+    label: 'Core',
+    description: 'Azul más definido para estados de entrada principal.'
+  },
+  {
+    kind: 'nexaBrandSignal',
+    label: 'Signal',
+    description: 'Teal más activo para momentos de asistencia contextual.'
+  },
+  {
+    kind: 'nexaBrandGlass',
+    label: 'Glass',
+    description: 'Highlight blanco/teal para superficies más sobrias.'
+  }
+] as const
+
+const NexaSpotlightCardsSpecimen = () => (
+  <Box
+    data-capture='border-beam-spotlight-card-nexa-variations'
+    sx={{
+      display: 'grid',
+      gridTemplateColumns: { xs: '256px', sm: 'repeat(2, 256px)', xl: 'repeat(4, 256px)' },
+      gap: 3,
+      justifyContent: { xs: 'center', sm: 'start' }
+    }}
+  >
+    {NEXA_SPOTLIGHT_VARIATIONS.map(variation => (
+      <GreenhouseSpotlightCard key={variation.kind} dataCapture={`border-beam-spotlight-card-${variation.kind}`} kind={variation.kind} size='md'>
+        <Stack spacing={2} sx={{ minBlockSize: '100%', color: 'inherit' }}>
+          <Stack direction='row' spacing={1} alignItems='center'>
+            <Box
+              sx={theme => ({
+                display: 'grid',
+                placeItems: 'center',
+                inlineSize: 36,
+                blockSize: 36,
+                borderRadius: '50%',
+                bgcolor: alpha(theme.palette.common.white, 0.12)
+              })}
+            >
+              <i className='tabler-sparkles' aria-hidden='true' />
+            </Box>
+            <Typography variant='h6' color='inherit'>
+              {variation.label}
+            </Typography>
+          </Stack>
+          <Typography variant='body2' color='inherit' sx={{ opacity: 0.78 }}>
+            {variation.description}
+          </Typography>
+          <CustomChip
+            label={`kind='${variation.kind}'`}
+            size='small'
+            variant='tonal'
+            color='primary'
+            round='true'
+            sx={theme => ({
+              alignSelf: 'flex-start',
+              color: theme.palette.common.white,
+              bgcolor: alpha(theme.palette.common.white, 0.14)
+            })}
+          />
+        </Stack>
+      </GreenhouseSpotlightCard>
+    ))}
+  </Box>
 )
 
 const NexaSpectrumGlowBoxSpecimen = ({
@@ -541,6 +576,7 @@ const BorderBeamLabView = () => {
             sx={theme => ({
               position: 'relative',
               zIndex: 2,
+              gridColumn: { md: '1 / -1' },
               isolation: 'isolate',
               minInlineSize: 0,
               overflow: 'hidden',
@@ -553,10 +589,10 @@ const BorderBeamLabView = () => {
               <Stack spacing={1}>
                 <Typography variant='h6'>Spotlight card · Nexa brand</Typography>
                 <Typography variant='body2' color='text.secondary'>
-                  Nuevo kind de marca: no sustituye las cards originales, solo restringe el halo al universo Nexa.
+                  Variaciones de marca: no sustituyen las cards originales, solo restringen el halo al universo Nexa.
                 </Typography>
               </Stack>
-              <NexaSpotlightCardSpecimen />
+              <NexaSpotlightCardsSpecimen />
             </Stack>
           </Box>
 

@@ -9,7 +9,21 @@ import type { SxProps, Theme } from '@mui/material/styles'
 
 import { GREENHOUSE_NEXA_BRAND_COLORS } from '../greenhouse-nexa-brand-controller'
 
-export type GreenhouseSpotlightCardKind = 'blue' | 'purple' | 'green' | 'red' | 'orange' | 'nexaBrand'
+export type GreenhouseSpotlightCardKind =
+  | 'blue'
+  | 'purple'
+  | 'green'
+  | 'red'
+  | 'orange'
+  | 'nexaBrand'
+  | 'nexaBrandCore'
+  | 'nexaBrandSignal'
+  | 'nexaBrandGlass'
+
+type GreenhouseNexaSpotlightCardKind = Extract<
+  GreenhouseSpotlightCardKind,
+  'nexaBrand' | 'nexaBrandCore' | 'nexaBrandSignal' | 'nexaBrandGlass'
+>
 
 export type GreenhouseSpotlightCardSize = 'sm' | 'md' | 'lg' | 'custom'
 
@@ -30,7 +44,10 @@ const SPOTLIGHT_KIND_CONFIG: Record<GreenhouseSpotlightCardKind, { base: number;
   green: { base: 120, spread: 200 },
   red: { base: 0, spread: 200 },
   orange: { base: 30, spread: 200 },
-  nexaBrand: { base: 188, spread: 34 }
+  nexaBrand: { base: 188, spread: 34 },
+  nexaBrandCore: { base: 210, spread: 24 },
+  nexaBrandSignal: { base: 172, spread: 24 },
+  nexaBrandGlass: { base: 198, spread: 18 }
 }
 
 const SPOTLIGHT_SIZE_CONFIG: Record<Exclude<GreenhouseSpotlightCardSize, 'custom'>, { width: number; height: number }> = {
@@ -130,6 +147,9 @@ const spotlightCardGlobalStyles = (
 
 const resolveCssSize = (value: number | string | undefined) => (typeof value === 'number' ? `${value}px` : value)
 
+const isNexaSpotlightKind = (kind: GreenhouseSpotlightCardKind): kind is GreenhouseNexaSpotlightCardKind =>
+  kind.startsWith('nexaBrand')
+
 const GreenhouseSpotlightCard = ({
   children,
   contentSx,
@@ -181,17 +201,67 @@ const GreenhouseSpotlightCard = ({
         sx={[
           theme => {
             const radius = `${theme.shape.customBorderRadius.display}px`
-            const isBrand = kind === 'nexaBrand'
+            const isBrand = isNexaSpotlightKind(kind)
             const widthValue = resolveCssSize(width) ?? (sizeConfig ? `${sizeConfig.width}px` : undefined)
             const heightValue = resolveCssSize(height) ?? (sizeConfig ? `${sizeConfig.height}px` : undefined)
             const dynamicHue = `calc(${kindConfig.base} + (var(--gh-spotlight-xp, 0) * ${kindConfig.spread}))`
             const baseSpotlight = `hsl(${dynamicHue} calc(var(--gh-spotlight-saturation, 100) * 1%) calc(var(--gh-spotlight-lightness, 70) * 1%) / var(--gh-spotlight-bg-opacity, 0.1))`
             const borderSpotlight = `hsl(${dynamicHue} calc(var(--gh-spotlight-saturation, 100) * 1%) calc(var(--gh-spotlight-border-lightness, 50) * 1%) / var(--gh-spotlight-border-opacity, 1))`
             const orbSpotlight = `hsl(${dynamicHue} calc(var(--gh-spotlight-saturation, 100) * 1%) calc(var(--gh-spotlight-orb-lightness, 58) * 1%) / var(--gh-spotlight-orb-alpha, 0.18))`
-            const brandBase = alpha(GREENHOUSE_NEXA_BRAND_COLORS.coreBlue, 0.3)
-            const brandBorder = alpha(GREENHOUSE_NEXA_BRAND_COLORS.electricTeal, 0.94)
-            const brandLight = alpha(theme.palette.common.white, 0.92)
-            const brandOrb = alpha(GREENHOUSE_NEXA_BRAND_COLORS.coreBlue, 0.5)
+            const nexaKind: GreenhouseNexaSpotlightCardKind = isBrand ? kind : 'nexaBrand'
+
+            const nexaSpotlightConfig: Record<
+              GreenhouseNexaSpotlightCardKind,
+              {
+                base: string
+                border: string
+                light: string
+                orb: string
+                orbSize: string
+                orbOpacity: number
+                hoverOpacity: number
+              }
+            > = {
+              nexaBrand: {
+                base: alpha(GREENHOUSE_NEXA_BRAND_COLORS.coreBlue, 0.3),
+                border: alpha(GREENHOUSE_NEXA_BRAND_COLORS.electricTeal, 0.94),
+                light: alpha(theme.palette.common.white, 0.92),
+                orb: alpha(GREENHOUSE_NEXA_BRAND_COLORS.coreBlue, 0.5),
+                orbSize: '220px',
+                orbOpacity: 0.78,
+                hoverOpacity: 0.92
+              },
+              nexaBrandCore: {
+                base: alpha(GREENHOUSE_NEXA_BRAND_COLORS.coreBlue, 0.36),
+                border: alpha(GREENHOUSE_NEXA_BRAND_COLORS.coreBlue, 0.96),
+                light: alpha(theme.palette.common.white, 0.86),
+                orb: alpha(GREENHOUSE_NEXA_BRAND_COLORS.coreBlue, 0.62),
+                orbSize: '210px',
+                orbOpacity: 0.82,
+                hoverOpacity: 0.96
+              },
+              nexaBrandSignal: {
+                base: alpha(GREENHOUSE_NEXA_BRAND_COLORS.electricTeal, 0.24),
+                border: alpha(GREENHOUSE_NEXA_BRAND_COLORS.electricTeal, 0.98),
+                light: alpha(theme.palette.common.white, 0.9),
+                orb: alpha(GREENHOUSE_NEXA_BRAND_COLORS.electricTeal, 0.48),
+                orbSize: '200px',
+                orbOpacity: 0.72,
+                hoverOpacity: 0.9
+              },
+              nexaBrandGlass: {
+                base: alpha(theme.palette.common.white, 0.12),
+                border: alpha(theme.palette.common.white, 0.88),
+                light: alpha(GREENHOUSE_NEXA_BRAND_COLORS.electricTeal, 0.72),
+                orb: alpha(theme.palette.common.white, 0.24),
+                orbSize: '190px',
+                orbOpacity: 0.62,
+                hoverOpacity: 0.78
+              }
+            }
+
+            const nexaSpotlight = nexaSpotlightConfig[nexaKind]
+
             const backdrop = isBrand ? alpha(GREENHOUSE_NEXA_BRAND_COLORS.midnightNavy, 0.92) : alpha(theme.palette.text.primary, 0.12)
 
             return {
@@ -199,13 +269,13 @@ const GreenhouseSpotlightCard = ({
               '--gh-spotlight-spread': kindConfig.spread,
               '--gh-spotlight-border-size': '3px',
               '--gh-spotlight-size': '200px',
-              '--gh-spotlight-orb-size': isBrand ? '220px' : '180px',
+              '--gh-spotlight-orb-size': isBrand ? nexaSpotlight.orbSize : '180px',
               '--gh-spotlight-outer-opacity': 1,
-              '--gh-spotlight-orb-opacity': isBrand ? 0.78 : 0.42,
-              '--gh-spotlight-bg-color': isBrand ? brandBase : baseSpotlight,
-              '--gh-spotlight-border-color': isBrand ? brandBorder : borderSpotlight,
-              '--gh-spotlight-light-color': isBrand ? brandLight : 'hsl(0 100% 100% / var(--gh-spotlight-light-opacity, 1))',
-              '--gh-spotlight-orb-color': isBrand ? brandOrb : orbSpotlight,
+              '--gh-spotlight-orb-opacity': isBrand ? nexaSpotlight.orbOpacity : 0.42,
+              '--gh-spotlight-bg-color': isBrand ? nexaSpotlight.base : baseSpotlight,
+              '--gh-spotlight-border-color': isBrand ? nexaSpotlight.border : borderSpotlight,
+              '--gh-spotlight-light-color': isBrand ? nexaSpotlight.light : 'hsl(0 100% 100% / var(--gh-spotlight-light-opacity, 1))',
+              '--gh-spotlight-orb-color': isBrand ? nexaSpotlight.orb : orbSpotlight,
               position: 'relative',
               display: 'grid',
               gridTemplateRows: '1fr auto',
@@ -232,7 +302,7 @@ const GreenhouseSpotlightCard = ({
               backdropFilter: 'blur(5px)',
               boxShadow: `0 1rem 2rem -1rem ${alpha(theme.palette.common.black, 0.72)}`,
               '&:hover, &:focus-within': {
-                '--gh-spotlight-orb-opacity': isBrand ? 0.92 : 0.56
+                '--gh-spotlight-orb-opacity': isBrand ? nexaSpotlight.hoverOpacity : 0.56
               },
               '&:hover [data-gh-spotlight-content], &:focus-within [data-gh-spotlight-content]': {
                 transform: 'translateY(-2px)'

@@ -23,14 +23,14 @@ Se creó `GreenhouseBorderBeam` para traer el patrón de borde perimetral animad
 - Primitive nueva en `src/components/greenhouse/primitives/border-beam/`.
 - `GreenhouseSpectrumBeam` extrae el efecto `spectrum` como primitive fina reutilizable (anillo completo + aura blur amplia) sin acoplarlo a un botón.
 - `GreenhouseShinyBorder` trae el patrón `shiny-borders-button` como surface/CTA tokenizada (highlight radial superior, glow inferior y contenido elevado), sin copiar Tailwind ni HEX locales.
-- `GreenhouseSpotlightCard` trae el patrón `spotlight-card` como card con spotlight atado al puntero; kinds iniciales `blue`, `purple`, `green`, `red`, `orange` y `nexaBrand`.
+- `GreenhouseSpotlightCard` trae el patrón `spotlight-card` como card con spotlight atado al puntero; kinds iniciales `blue`, `purple`, `green`, `red`, `orange` y la familia Nexa `nexaBrand`, `nexaBrandCore`, `nexaBrandSignal`, `nexaBrandGlass`.
 - Variants oficiales: `ambient`, `interactive`, `progress`.
 - Kinds iniciales: `nexaSurface`, `promptDock`, `evidencePeek`, `approvalCard`, `asyncOperation`, `custom`.
 - Effects oficiales: `beam` para línea perimetral focal y `spectrum` para el equivalente gobernado del prompt "rainbow borders button" (anillo completo + gradiente desplazado + aura blur amplia).
 - Spectrum palettes oficiales: `axis` y `nexa`; `nexa` usa `GREENHOUSE_NEXA_BRAND_COLORS` para la variación con colores de marca.
 - Los colores se resuelven desde `theme.axis.*` / `theme.palette.*`; no hay HEX inline ni extensión de `tailwind.config`.
 - Motion: CSS `conic-gradient`/`linear-gradient` + `@property`/background-position con `prefers-reduced-motion` estático; el overlay es decorativo y respeta `border-radius: inherit`.
-- Lab interno `/design-system/border-beam` + scenario GVC `design-system-border-beam`; incluye CTA `button with border beam`, CTA `shiny realism`, cards `spotlight-card`, card `kind='nexaBrand'`, caja `Nexa glow box · spectrum` y variación `Nexa glow box · brand spectrum`.
+- Lab interno `/design-system/border-beam` + scenario GVC `design-system-border-beam`; incluye CTA `button with border beam`, CTA `shiny realism`, cards `spotlight-card`, matriz de cards Nexa brand, caja `Nexa glow box · spectrum` y variación `Nexa glow box · brand spectrum`.
 - El specimen lab-only de la caja de envío Nexa vive en `/design-system/nexa-chat`, junto a `NexaComposer` y `NexaPromptDock`, porque el efecto spectrum ahí funciona como variación del composer y no como espécimen base del beam; inicia inactive/sin texto y cambia al estado activo cuando el usuario escribe.
 
 ## Delta 2026-06-13f — GreenhouseGradientBackground primitive

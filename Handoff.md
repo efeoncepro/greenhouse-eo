@@ -1,5 +1,11 @@
 # Release 2026-06-10 #2 — develop→main `6c649b2a6` RELEASED
 
+## Sesion 2026-06-13 — Spotlight card Nexa brand variations (Codex)
+
+- **Qué quedó:** `GreenhouseSpotlightCard` suma tres kinds Nexa adicionales: `nexaBrandCore` (azul core más definido), `nexaBrandSignal` (teal más activo) y `nexaBrandGlass` (highlight blanco/teal más sobrio). No sustituyen `nexaBrand`; amplían la misma primitive.
+- **Design System:** `/design-system/border-beam` muestra una matriz con `nexaBrand`, `nexaBrandCore`, `nexaBrandSignal` y `nexaBrandGlass` dentro de la sección Spotlight card · Nexa brand.
+- **Verificación:** ESLint focal, Vitest focal `GreenhouseBorderBeam.test.tsx`, `tsc --noEmit` y GVC `design-system-border-beam` verdes. Evidencia: `.captures/2026-06-13T11-05-55_design-system-border-beam`; frames desktop/mobile revisados.
+
 ## Sesion 2026-06-13 — Nexa FAB spectrum beam hover (Codex)
 
 - **Qué quedó:** el FAB global de Nexa (`NexaFloatingButton`) reutiliza `GreenhouseSpectrumBeam` con paleta Nexa como affordance de hover/focus detrás del botón. El efecto está oculto y pausado en idle; solo aparece cuando el usuario pone el mouse/foco sobre el FAB y el panel está cerrado.
