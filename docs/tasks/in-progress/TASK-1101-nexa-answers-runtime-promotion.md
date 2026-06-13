@@ -53,7 +53,11 @@ Corrección de framing del operador. El trabajo NO es "mejorar el answer-trace":
 
 **Rollout pendiente (operador):** flag ON staging → QA golden questions sobre corpus real → sign-off → prod gradual. El grounded-rico se verifica mejor en staging (corpus + pool estable, lección ISSUE-094). Rollback = flag OFF (answer-trace legacy intacto).
 
-**Follow-ups abiertos (ninguno toca la primitive):** (a) `unhelpful`→selector de motivo (hoy mapeo mínimo `wrong_source`); (b) `share`→permalink real (necesita sync de URL state cross-lens); (c) multi-turno con compactación TASK-1102 en runtime (hoy single-turn-replace); (d) routing por el provider stream (TASK-1091) para token-streaming real del answer.
+**Próxima frontera (gaps observados en staging 2026-06-13 — `CONVERSATIONAL_EXPERIENCE.md` §13):**
+- **Gap A — adaptación conversacional *in situ* (prioritario, platform-level):** la lente hoy es un **full-surface takeover**; la visión Nexa Answers (Google AI Mode/Overviews) es que un composer "con Nexa adentro" **transforme la superficie en conversacional sin hacer desaparecer el resto** (el host se adapta/reflowea/persiste, la respuesta se inyecta como bloque protagonista). Es el **runtime del Nexa Moment Fabric** (ADR Codex) → placement/variant de composición-con-host del canvas + View Transitions same-document + container queries. Coordinar con TASK-1095/1096.
+- **Gap B — hilo multi-turno (acotado, host-state):** el host es single-turn-replace → la 2ª pregunta no muestra lo consultado arriba (se siente Q&A suelto). El canvas ya soporta `previousTurns` + compactación View Transitions (TASK-1102); el host debe mantener `turns[]` y pasar los previos compactados. La primitive no cambia.
+
+**Follow-ups menores (ninguno toca la primitive):** (a) `unhelpful`→selector de motivo (hoy mapeo mínimo `wrong_source`); (b) `share`→permalink real (sync de URL state cross-lens); (c) routing por el provider stream (TASK-1091) para token-streaming real del answer.
 
 ## Why This Task Exists
 

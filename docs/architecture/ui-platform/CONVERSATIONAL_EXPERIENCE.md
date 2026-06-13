@@ -196,3 +196,29 @@ TASK-1096 (canvas + coreografía + feature-primitives co-located) · TASK-1095 (
 La experiencia rica del canvas YA vive en la **superficie viva** de `/knowledge` (lente Nexa), cableada al retrieval real (`knowledge-search.v1`), **flag-gated** (`NEXA_ANSWERS_CANVAS_LENS_ENABLED`, default OFF). El `NexaKnowledgeAnswerSurface` (answer-trace) queda de **fallback** mientras el flag está OFF; el rollout (flag ON staging→prod) es decisión del operador. GVC-verificado (idle→thinking→reasoning→answered con corpus real + citas inline + trust cue + response toolbar; 3 quality gates + enterpriseRubric pass).
 
 **La receta de "cómo traer esto a un dominio" se canonizó en un playbook dedicado:** [`CONVERSATIONAL_EXPERIENCE_DOMAIN_PLAYBOOK.md`](./CONVERSATIONAL_EXPERIENCE_DOMAIN_PLAYBOOK.md) — los 5 pasos (domain adapter `packet→renderPlan` puro + `surfaceContext` + lens host self-contained + flag de presentación + GVC) con Knowledge (TASK-1101) como ejemplo trabajado. Archivos de referencia: `src/lib/knowledge/nexa/knowledge-answer-render-plan.ts` (adapter), `src/views/greenhouse/knowledge/KnowledgeNexaCanvasLens.tsx` (host), `src/lib/knowledge/nexa/canvas-lens-flag.ts` (flag). **Cualquier dominio nuevo (finance/agency/people/commercial) sigue el playbook; el shell no se vuelve a diseñar.**
+
+---
+
+## 13. Próxima frontera — gaps observados en el rollout staging (2026-06-13)
+
+Tras ver la lente rica viva en staging (TASK-1101), el operador validó la coreografía (transforma bien la experiencia) e identificó **dos gaps que separan "lente conversacional" de la visión real de Nexa Answers**. Son el siguiente trabajo (no son bugs del rollout actual; son la frontera de diseño).
+
+### Gap A — Adaptación conversacional *in situ* (NO full-surface takeover)
+
+**Hoy:** `KnowledgeNexaCanvasLens` es un **takeover de superficie completa** — la conversación *es* la lente Nexa (mutuamente excluyente con Humano/MCP). El composer + la conversación dueñan toda el área.
+
+**La visión (Google AI Mode / AI Overviews):** un composer **"con Nexa adentro"** embebido en CUALQUIER superficie que, al activarse, **transforma la superficie en una interfaz conversacional SIN hacer desaparecer el resto** — el contenido del host **se adapta / reflowea / persiste** y la respuesta de IA se **inyecta como bloque protagonista** (como AI Overviews: la respuesta lidera, los resultados siguen abajo; como AI Mode: la superficie entra en modo conversacional, el contexto persiste).
+
+- **arch:** es el **runtime del Nexa Moment Fabric** (ADR `GREENHOUSE_NEXA_MOMENT_FABRIC_ARCHITECTURE_V1.md`). NO un componente nuevo: una **placement/variant de composición-con-host** del canvas — el host aporta su contenido existente + un *slot* conversacional; el canvas **compone, no reemplaza**. `surfaceContext.placement` (`embedded|chart|sidecar|floating|inline`) es la dimensión donde vive; falta la semántica de **composición adaptativa in-place** (distinta del `embedded` actual = takeover). Reusar, no forkear.
+- **web (Chrome guidance):** **View Transitions same-document** para el morph de la superficie a modo conversacional (`view-transition-name` en los elementos que persisten — el helper canónico `startViewTransition` ya existe, TASK-525/1102) + **container queries** para el reflow adaptativo del contenido del host + **grid** para inyectar el bloque-respuesta conservando lo demás.
+- **product design:** la superficie adopta un **"modo conversacional"** (state-design: un estado/modo que el host entra, no un destino) con coreografía de transformación (motion-design: el host reflowea + la respuesta entra). Patrón adyacente a **Adaptive Sidecar** pero **distinto** (sidecar = lane full-height; esto = reflow conversacional *in-place* de la propia superficie).
+
+### Gap B — Hilo multi-turno (la traza/turno previo debe persistir)
+
+**Hoy:** el host runtime es **single-turn-replace** — cada pregunta reemplaza el renderPlan anterior → al hacer una segunda pregunta **no se ve lo consultado arriba** → se siente "preguntas y respuestas sueltas", no conversación.
+
+**La visión:** un **hilo** donde el turno previo persiste (compactado) sobre el nuevo — continuidad espacial estilo AI Mode.
+
+- **arch/product:** fix de **estado del host** (two-way door, bajo riesgo). El canvas **YA soporta** multi-turno: `previousTurns` (turnos compactados) + `followUpQuestion` + la **compactación con View Transitions de TASK-1102** (`answerBubble`→`compactAnswer` que se encoge hacia el historial). El host debe mantener `turns[]` (pregunta + renderPlan + packet por turno), pasar los previos compactados a `previousTurns`, y disparar la compactación en cada follow-up. **La primitive no cambia; es wiring de estado en el host.**
+
+> Ambos gaps son **del consumer/host + placement**, no de los feature-primitives. Gap A es la pieza grande (platform-level, runtime del Moment Fabric — coordinar con TASK-1095/1096 de Codex). Gap B es acotado (host-state de TASK-1101).
