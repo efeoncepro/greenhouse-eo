@@ -74,6 +74,14 @@ export interface BuildKnowledgeAnswerRenderPlanOptions {
   copy?: Partial<KnowledgeAnswerRenderPlanCopy>
   /** Máximo de pasajes citados como puntos (default 4; el resto queda en el proof). */
   maxPoints?: number
+  /**
+   * Identidad de turno (multi-turno, TASK-1102). Sufija el `blockId` → `knowledge-answer-<turnId>`
+   * para que cada turno tenga un `view-transition-name` único: sin colisión cuando el turno vivo
+   * (answerBubble) y su versión compactada en el historial coexisten, y para que el morph conecte
+   * (el compactAnswer del turno conserva el MISMO id que su answerBubble vivo). Default (sin turnId)
+   * = `knowledge-answer` → single-turn intacto, callers existentes no se tocan.
+   */
+  turnId?: string
 }
 
 const pluralFuentes = (count: number): string => (count === 1 ? '1 fuente' : `${count} fuentes`)
@@ -170,7 +178,7 @@ export const buildKnowledgeAnswerRenderPlan = (
   const hasGrounding = packet.confidence !== 'none' && packet.chunks.length > 0
   const trustCue = deriveKnowledgeTrustCue(packet, copy)
   const cited = citedDocumentCount(packet)
-  const blockId = 'knowledge-answer'
+  const blockId = options?.turnId ? `knowledge-answer-${options.turnId}` : 'knowledge-answer'
 
   const block: NexaAnswersBubbleBlock = hasGrounding
     ? {
@@ -203,7 +211,7 @@ export const buildKnowledgeAnswerRenderPlan = (
       }
 
   return {
-    id: `knowledge-answer-plan-${packet.generatedAt ?? 'now'}`,
+    id: `knowledge-answer-plan-${options?.turnId ?? packet.generatedAt ?? 'now'}`,
     version: 'nexa-answer-render-plan.v1',
     intent: 'explain',
     autonomyTier: 'observeOnly',

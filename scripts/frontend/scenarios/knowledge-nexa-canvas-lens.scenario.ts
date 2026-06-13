@@ -75,6 +75,28 @@ export const scenario: CaptureScenario = {
       label: 'canvas-lens-settled',
       fullPage: true,
       note: 'Estado asentado: respuesta grounded con citas + trust cue (o gap honesto sin corpus local).'
+    },
+    // GAP B (TASK-1102) — hilo multi-turno: el follow-up compacta el turno vivo al historial (morph VT)
+    // y el turno previo PERSISTE arriba mientras Nexa responde el nuevo. Prueba la continuidad espacial.
+    { kind: 'fill', selector: 'input[aria-label="Sigue preguntando…"]', value: '¿Y cómo se lo explico a un manager sin tecnicismos?' },
+    {
+      kind: 'interaction',
+      interaction: {
+        name: 'canvas-lens-followup',
+        intent: 'El follow-up compacta el turno anterior al historial (View Transitions) y lo mantiene visible sobre el nuevo turno.',
+        action: { kind: 'press', selector: 'input[aria-label="Sigue preguntando…"]', key: 'Enter' },
+        frames: [
+          { label: 'canvas-lens-followup-thinking-200ms', atMs: 200, fullPage: true },
+          { label: 'canvas-lens-followup-answered-3200ms', atMs: 3200, fullPage: true }
+        ]
+      }
+    },
+    { kind: 'sleep', ms: 1200 },
+    {
+      kind: 'mark',
+      label: 'canvas-lens-thread-settled',
+      fullPage: true,
+      note: 'Hilo con dos turnos: el primero compactado arriba (historial), el segundo vivo abajo.'
     }
   ]
 }
