@@ -35,12 +35,14 @@ Revisión de necesidad pedida por el operador. Veredicto: **la EXPERIENCIA está
 - Coreografía AI-Overview-grade: idle → **enviar dispara el despliegue** (razonando → streaming → settle), no salto seco (commit `9f7165fa7`).
 - **Citas inline span-level + evidence-peek** (`e8a8ef852`), **response toolbar settle** ¿útil?/copiar/compartir/regenerar (`78d30ee40`), **control "Detener"** (`4054a6014`), **test de contrato plain-text** (`d5532e777`), **portabilidad no-Knowledge** finance/chart + Insight promovido + mounted-guard del sparkline (`7beba65eb`).
 
+**✅ Decisión del operador (2026-06-13) — surface canónica = `NexaAnswersCanvas`:** ante la duplicación de mockups Knowledge (`/knowledge/mockup/nexa-answers` con `NexaAnswersCanvas` vs `/knowledge/mockup/answer-trace` con `KnowledgeAnswerTraceMockupView`), el operador decidió que **la canónica es la de esta task (`NexaAnswersCanvas`)** por ser la más rica. Evidencia que lo respalda: el answer-trace **ni siquiera modela un `surfaceContext`** (solo variants/kinds), mientras `NexaAnswersSurfaceContext` ya es el contrato completo (`surfaceId/domain/placement/dataReality/sensitivity/allowedRenderers/allowedActions`). ⇒ **answer-trace (TASK-1089/1090) converge hacia `NexaAnswersCanvas` o se deprecia.** (Coordinar con Codex, activo en 1089/1090/1092 por override del operador.)
+
+**Corrección a este delta:** el `surfaceContext` **no estaba "forkeado contra un SSOT inexistente"** — `NexaAnswersSurfaceContext` ES el contrato real y, por la decisión de arriba, es el **canónico**. Lo que TASK-1095 debe hacer ya no es inventar un SSOT nuevo, sino **bendecirlo como SSOT** (ver TASK-1095 Delta 2026-06-13) + el refinamiento A2 (descomponer la máquina de 10 estados en lifecycle×disclosure×turn) sobre este mismo canvas.
+
 **Pendiente (NO entregado por esta sesión):**
 
-1. **Reconciliación Arch Gate A1/A2** — todo lo de arriba se construyó sobre el `NexaAnswersSurfaceContext` **local** + la máquina de 10 estados, forkeando el contrato de TASK-1095. Bloqueado por que 1095 aterrice el SSOT.
+1. **Reconciliación A2** (refinamiento interno del canvas canónico: 10 estados planos → dimensiones ortogonales) + convergencia de answer-trace. No es migración a un contrato competidor — el contrato ganador es el de esta task.
 2. **Runtime** (datos reales del retrieval) → **TASK-1101** (creada 2026-06-13, 6 slices: mapper packet→citas, toolbar→feedback real, stop→abort, streaming/reasoning reales, SSR hardening, cutover flag-gated).
-
-**⚠️ Flag de duplicación (decisión del operador/arquitectura, NO la tomo unilateralmente):** existen **dos mockups Knowledge en paralelo** — `/knowledge/mockup/nexa-answers` (esta task, usa `NexaAnswersCanvas`) y `/knowledge/mockup/answer-trace` (**TASK-1089/1090**, Codex, usa `KnowledgeAnswerTraceMockupView` propio). Es exactamente el "componente paralelo" que 1095 debía prevenir. Hay que decidir **cuál es la surface canónica de la lente Nexa en Knowledge** (o cómo convergen) antes de promover a runtime. Codex está activo en 1089/1090/1092 por override del operador.
 
 **Follow-ups next-level creados (2026-06-13, to-do):** TASK-1102 (multi-turno + View Transitions), TASK-1103 (`NexaProvenanceTrace` primitive SoT del grounding), TASK-1104 (promover `NexaResponseToolbar` a primitive), TASK-1105 (`NexaStreamingText` primitive).
 
