@@ -285,6 +285,7 @@ Sin flag para la clasificacion y limpieza documental. Si Slice 2 agrega grants/d
 - [ ] `JAVASCRIPT-NEXTJS-4S` is classified as active auth outage or smoke flapping using live `/api/auth/health` evidence; `TASK-883` is updated if needed.
 - [ ] `JAVASCRIPT-NEXTJS-7H` remains owned by `TASK-1106` and severity is updated if it appears outside preview.
 - [ ] Stale Sentry issues are resolved only after evidence list and no active recurrence.
+- [ ] Every Sentry issue or repo issue claimed resolved by this task is actually closed/resolved in its source system, with date, evidence, and owner recorded in the task delta or handoff.
 
 ## Verification
 

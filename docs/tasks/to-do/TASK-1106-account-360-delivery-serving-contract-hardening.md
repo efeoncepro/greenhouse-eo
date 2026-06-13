@@ -253,6 +253,20 @@ Sin flag. La migración es additive y nullable. El cutover debe ser compatible c
 - Acceso a Cloud SQL vía `pnpm pg:connect` o pipeline de migraciones autorizado.
 - Confirmar qué deployment de Vercel/preview disparó el evento para validar el mismo target post-fix.
 
+<!-- ═══════════════════════════════════════════════════════════
+     ZONE 4 — VERIFICATION & CLOSING
+     "Como compruebo que termine y que actualizo?"
+     ═══════════════════════════════════════════════════════════ -->
+
+## Acceptance Criteria
+
+- [ ] `GET /api/organization/[id]/360?facets=delivery` responde sin error SQL ni `facetErrors` por columnas inexistentes.
+- [ ] `GET /api/organizations/[id]/workspace/compact-signals` responde sin capturar `account360.delivery.ico_serving` por `rpa_median`.
+- [ ] El contrato de `greenhouse_serving.organization_operational_metrics` queda alineado entre migración, setup SQL, proyección, tipos y reader canónico.
+- [ ] Existe guard/smoke contra PostgreSQL real que falla loud si el facet `delivery` vuelve a referenciar columnas inexistentes.
+- [ ] Sentry `JAVASCRIPT-NEXTJS-7H` / group `7545900569` queda sin recurrencia tras el quiet period definido y se marca como resolved en Sentry.
+- [ ] `ISSUE-087` se cierra/mueve a `docs/issues/resolved/` solo después de evidencia runtime + Sentry resolved; la task no puede pasar a `complete` si el issue sigue abierto.
+
 ## Verification
 
 Comandos esperados, ajustables durante ejecución:
@@ -272,6 +286,16 @@ GREENHOUSE_SKIP_PREFLIGHT=true pnpm pg:connect:shell
 ```
 
 Luego verificar columnas, conteos y una consulta equivalente al facet `delivery`.
+
+## Closing Protocol
+
+- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
+- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
+- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
+- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
+- [ ] `ISSUE-087` y Sentry `JAVASCRIPT-NEXTJS-7H` quedaron cerrados/resolved solo despues de evidencia runtime y quiet period
 
 ## Investigation Appendix
 

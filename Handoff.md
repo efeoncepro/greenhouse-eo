@@ -5,6 +5,7 @@
 - **Task creada:** `TASK-1107` documenta el cierre operacional de la cola Sentry real verificada el 2026-06-13. No implementa fixes runtime en esta sesion; registra el plan robusto para separar errores activos, recientes y stale sin mutear Sentry.
 - **Clasificacion base:** N+1 Query sigue activo como performance issue (owner `TASK-928`); `role_view_fallback_used` es drift real de grants para `designer` y queda como slice propio de `TASK-1107`; auth smoke `JAVASCRIPT-NEXTJS-4S` fue reciente pero `/api/auth/health` production respondio `overallStatus=ready` a `2026-06-13T11:54:14Z`, por lo que debe alinearse con `TASK-883`; `rpa_median` queda delegado a `TASK-1106` / `ISSUE-087`.
 - **Cierre esperado:** no resolver stale backlog en Sentry sin evidencia 24h/14d + spot-check. No bajar sampling/fingerprints. `role_view_fallback_used` debe tender a cero por grants/denials explicitos o decision de politica documentada.
+- **Acceptance criteria reforzados:** `TASK-1106` y `TASK-1107` ahora exigen cerrar/resolver el issue correspondiente en Sentry/repo issue una vez resuelto, con evidencia y fecha; no se puede mover la task a `complete` si el issue sigue abierto.
 - **Coordinacion:** se preservo WIP ajeno de Claude/Nexa; stagear solo docs de `TASK-1107` si se commitea esta sesion.
 
 ## Sesion 2026-06-13 — ISSUE-087 / TASK-1106 Account 360 delivery schema drift (Codex)
