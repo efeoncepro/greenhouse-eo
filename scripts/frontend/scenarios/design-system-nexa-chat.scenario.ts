@@ -6,6 +6,8 @@ export const scenario: CaptureScenario = {
   name: 'design-system-nexa-chat',
   route: '/design-system/nexa-chat',
   viewport: { width: 1280, height: 900 },
+  mutating: true,
+  safeForCapture: true,
   viewports: [
     { name: 'desktop', width: 1280, height: 900 },
     { name: 'mobile', width: 390, height: 844 }
@@ -46,15 +48,24 @@ export const scenario: CaptureScenario = {
     },
     {
       kind: 'mark',
-      label: 'nexa-composer-spectrum-inactive',
-      clipSelector: '[data-capture="nexa-composer-spectrum-inactive"]',
-      note: 'Variación inactive/sin texto de la caja de envío Nexa con brand spectrum'
+      label: 'nexa-composer-spectrum-idle',
+      clipSelector: '[data-capture="nexa-composer-spectrum-unified"]',
+      note: 'Caja de envío Nexa unificada en estado inactive por defecto, sin texto'
+    },
+    {
+      kind: 'fill',
+      selector: '[data-capture="nexa-composer-spectrum-input"]',
+      value: 'Resume y sugiere un paso.'
+    },
+    {
+      kind: 'sleep',
+      ms: 250
     },
     {
       kind: 'mark',
       label: 'nexa-composer-spectrum-with-text',
-      clipSelector: '[data-capture="nexa-composer-spectrum-with-text"]',
-      note: 'Variación con texto de la caja de envío Nexa con brand spectrum'
+      clipSelector: '[data-capture="nexa-composer-spectrum-unified"]',
+      note: 'La misma caja cambia a estado activo cuando el usuario agrega texto'
     },
     {
       kind: 'scroll',

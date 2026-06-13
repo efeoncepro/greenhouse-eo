@@ -51,6 +51,18 @@ export type { GreenhouseGradientBackgroundKindConfig } from './gradient-backgrou
 export { default as GreenhouseBorderBeam } from './border-beam/GreenhouseBorderBeam'
 export { default as GreenhouseSpectrumBeam } from './border-beam/GreenhouseSpectrumBeam'
 export type { GreenhouseSpectrumBeamProps } from './border-beam/GreenhouseSpectrumBeam'
+export { default as GreenhouseShinyBorder } from './border-beam/GreenhouseShinyBorder'
+export type {
+  GreenhouseShinyBorderIntensity,
+  GreenhouseShinyBorderPalette,
+  GreenhouseShinyBorderProps
+} from './border-beam/GreenhouseShinyBorder'
+export { default as GreenhouseSpotlightCard } from './border-beam/GreenhouseSpotlightCard'
+export type {
+  GreenhouseSpotlightCardKind,
+  GreenhouseSpotlightCardProps,
+  GreenhouseSpotlightCardSize
+} from './border-beam/GreenhouseSpotlightCard'
 export type {
   GreenhouseBorderBeamConfig,
   GreenhouseBorderBeamEffect,

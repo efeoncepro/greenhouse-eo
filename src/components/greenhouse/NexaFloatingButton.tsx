@@ -27,7 +27,7 @@ import { DEFAULT_NEXA_MODEL, resolveNexaModel, type NexaModelId } from '@/config
 import type { NexaResponse } from '@/lib/nexa/nexa-contract'
 import { isNexaFloatingExpandableEnabled } from '@/lib/nexa/flags'
 import { NEXA_FLOATING_OPEN_EVENT } from '@/lib/nexa/floating-events'
-import { GreenhouseNexaAnimatedMark, GreenhouseNexaBrandMark } from '@/components/greenhouse/primitives'
+import { GreenhouseNexaAnimatedMark, GreenhouseNexaBrandMark, GreenhouseSpectrumBeam } from '@/components/greenhouse/primitives'
 import { GREENHOUSE_NEXA_BRAND_COLORS } from '@/components/greenhouse/primitives/greenhouse-nexa-brand-controller'
 
 import NexaThread from '@/views/greenhouse/home/components/NexaThread'
@@ -190,36 +190,36 @@ const NexaFloatingButton = ({ docked = false }: NexaFloatingButtonProps) => {
     isolation: 'isolate',
     overflow: 'visible',
     borderRadius: '50%',
-    '&::before': {
-      content: '""',
+    '& [data-nexa-floating-spectrum="true"]': {
       position: 'absolute',
-      inset: -28,
-      zIndex: 0,
+      inset: 0,
+      zIndex: 2,
       borderRadius: '50%',
-      background: `radial-gradient(circle, ${alpha(GREENHOUSE_NEXA_BRAND_COLORS.electricTeal, 0.3)} 0%, ${alpha(
-        GREENHOUSE_NEXA_BRAND_COLORS.electricTeal,
-        0.14
-      )} 38%, ${alpha(GREENHOUSE_NEXA_BRAND_COLORS.electricTeal, 0)} 72%)`,
-      filter: 'blur(18px)',
       opacity: 0,
       pointerEvents: 'none',
-      transform: 'scale(0.74)',
+      transform: 'scale(0.86)',
       transition: theme.transitions.create(['opacity', 'transform'], {
-        duration: 820,
+        duration: 620,
         easing: theme.transitions.easing.easeOut
       })
     },
-    '&:hover::before, &:focus-within::before': {
+    '& [data-nexa-floating-spectrum="true"] [data-gh-border-beam], & [data-nexa-floating-spectrum="true"] [data-gh-border-beam-glow]': {
+      animationPlayState: 'paused'
+    },
+    '&:hover [data-nexa-floating-spectrum="true"], &:focus-within [data-nexa-floating-spectrum="true"]': {
       opacity: open ? 0 : 1,
       transform: 'scale(1)',
-      transitionDuration: '220ms'
+      transitionDuration: '180ms'
+    },
+    '&:hover [data-nexa-floating-spectrum="true"] [data-gh-border-beam], &:focus-within [data-nexa-floating-spectrum="true"] [data-gh-border-beam], &:hover [data-nexa-floating-spectrum="true"] [data-gh-border-beam-glow], &:focus-within [data-nexa-floating-spectrum="true"] [data-gh-border-beam-glow]': {
+      animationPlayState: open ? 'paused' : 'running'
     },
     '& > .MuiFab-root': {
       position: 'relative',
       zIndex: 1
     },
     '@media (prefers-reduced-motion: reduce)': {
-      '&::before, &:hover::before, &:focus-within::before': {
+      '& [data-nexa-floating-spectrum="true"], &:hover [data-nexa-floating-spectrum="true"], &:focus-within [data-nexa-floating-spectrum="true"]': {
         transform: 'none',
         transitionDuration: '1ms'
       }
@@ -272,6 +272,18 @@ const NexaFloatingButton = ({ docked = false }: NexaFloatingButtonProps) => {
         data-capture='nexa-floating-trigger'
         sx={nexaFabAuraSx}
       >
+        <Box aria-hidden data-nexa-floating-spectrum='true'>
+          <GreenhouseSpectrumBeam
+            active
+            animated
+            borderWidth={2}
+            durationSec={16}
+            intensity='strong'
+            kind='promptDock'
+            spectrumPalette='nexa'
+            variant='interactive'
+          />
+        </Box>
         <Fab
           ref={fabRef}
           color='primary'

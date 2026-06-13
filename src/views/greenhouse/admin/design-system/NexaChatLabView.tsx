@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, type ReactNode } from 'react'
+import { useState, type ChangeEvent, type ReactNode } from 'react'
 
 import Box from '@mui/material/Box'
 import MuiCard from '@mui/material/Card'
@@ -186,18 +186,10 @@ const MetaTile = ({ label, value }: { label: string; value: string }) => (
   </Box>
 )
 
-const NexaMessageComposerSpectrumSpecimen = ({
-  dataCapture,
-  defaultValue,
-  state,
-  title
-}: {
-  dataCapture: string
-  defaultValue?: string
-  state: 'inactive' | 'withText'
-  title: string
-}) => {
-  const hasText = state === 'withText'
+const NexaMessageComposerSpectrumSpecimen = ({ dataCapture }: { dataCapture: string }) => {
+  const [prompt, setPrompt] = useState('')
+  const hasText = prompt.trim().length > 0
+  const handlePromptChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => setPrompt(event.target.value)
 
   return (
     <Box
@@ -225,46 +217,21 @@ const NexaMessageComposerSpectrumSpecimen = ({
           boxShadow: `0 18px 44px ${alpha(theme.axis.ramp.primary[900], hasText ? 0.2 : 0.1)}`
         })}
       >
-        <Stack spacing={1.5}>
-          <Stack direction='row' spacing={1} alignItems='center' sx={{ px: 1.5, pt: 1, minInlineSize: 0 }}>
-            <Box
-              sx={theme => ({
-                display: 'grid',
-                flex: '0 0 auto',
-                placeItems: 'center',
-                inlineSize: 28,
-                blockSize: 28,
-                borderRadius: '50%',
-                color: theme.palette.common.white,
-                bgcolor: theme.axis.ramp.primary[900]
-              })}
-            >
-              <i className='tabler-sparkles' aria-hidden='true' />
-            </Box>
-            <Stack spacing={0} sx={{ minInlineSize: 0 }}>
-              <Typography variant='subtitle2' noWrap>
-                {title}
-              </Typography>
-              <Typography variant='caption' color='text.secondary' noWrap>
-                Lab-only: {hasText ? 'estado con texto listo para enviar.' : 'estado inactive sin texto escrito.'}
-              </Typography>
-            </Stack>
-          </Stack>
-
-          <NexaComposerInput
-            kind='knowledgeAsk'
-            defaultValue={defaultValue}
-            placeholder='Pregúntale a Nexa'
-            actionAdornment={<NexaComposerActionButton variant='send' aria-label='Enviar mensaje a Nexa' disabled={!hasText} />}
-            sx={theme => ({
-              '& .MuiInputBase-root, & .MuiFilledInput-root': {
-                minBlockSize: 54,
-                borderRadius: `${theme.shape.customBorderRadius.xl}px`,
-                color: hasText ? 'text.primary' : 'text.disabled'
-              }
-            })}
-          />
-        </Stack>
+        <NexaComposerInput
+          kind='knowledgeAsk'
+          value={prompt}
+          onChange={handlePromptChange}
+          placeholder='Pregúntale a Nexa'
+          inputProps={{ 'data-capture': 'nexa-composer-spectrum-input' }}
+          actionAdornment={<NexaComposerActionButton variant='send' aria-label='Enviar mensaje a Nexa' disabled={!hasText} />}
+          sx={theme => ({
+            '& .MuiInputBase-root, & .MuiFilledInput-root': {
+              minBlockSize: 54,
+              borderRadius: `${theme.shape.customBorderRadius.xl}px`,
+              color: hasText ? 'text.primary' : 'text.disabled'
+            }
+          })}
+        />
       </GreenhouseSpectrumBeam>
     </Box>
   )
@@ -1192,21 +1159,11 @@ const NexaChatLabView = () => (
           <Divider />
           <Stack spacing={2}>
             <Typography variant='caption' color='text.secondary'>
-              <InlineCode>GreenhouseSpectrumBeam</InlineCode> · variaciones lab-only de la caja de envío Nexa
+              <InlineCode>GreenhouseSpectrumBeam</InlineCode> · caja de envío lab-only con estado automático
             </Typography>
-            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', lg: 'repeat(2, minmax(0, 1fr))' }, gap: 3 }}>
-              <NexaMessageComposerSpectrumSpecimen
-                dataCapture='nexa-composer-spectrum-inactive'
-                state='inactive'
-                title='Nexa composer · inactive'
-              />
-              <NexaMessageComposerSpectrumSpecimen
-                dataCapture='nexa-composer-spectrum-with-text'
-                state='withText'
-                title='Nexa composer · with text'
-                defaultValue='Resume y sugiere un paso.'
-              />
-            </Box>
+            <NexaMessageComposerSpectrumSpecimen
+              dataCapture='nexa-composer-spectrum-unified'
+            />
           </Stack>
         </Stack>
       </SpecimenFrame>

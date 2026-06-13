@@ -67,6 +67,39 @@ export const scenario: CaptureScenario = {
       note: 'CTA real con GreenhouseButton envuelto por GreenhouseBorderBeam'
     },
     {
+      kind: 'scroll',
+      selector: '[data-capture="border-beam-shiny-button-card"]',
+      scrollBlock: 'center'
+    },
+    {
+      kind: 'mark',
+      label: 'border-beam-shiny-button-specimen',
+      clipSelector: '[data-capture="border-beam-shiny-button-card"]',
+      note: 'CTA shiny realism tokenizado con GreenhouseShinyBorder'
+    },
+    {
+      kind: 'scroll',
+      selector: '[data-capture="border-beam-spotlight-card-original"]',
+      scrollBlock: 'center'
+    },
+    {
+      kind: 'mark',
+      label: 'border-beam-spotlight-card-original',
+      clipSelector: '[data-capture="border-beam-spotlight-card-original"]',
+      note: 'Spotlight cards originales tokenizadas desde el prompt'
+    },
+    {
+      kind: 'scroll',
+      selector: '[data-capture="border-beam-spotlight-card-brand"]',
+      scrollBlock: 'center'
+    },
+    {
+      kind: 'mark',
+      label: 'border-beam-spotlight-card-brand',
+      clipSelector: '[data-capture="border-beam-spotlight-card-brand"]',
+      note: 'Spotlight card con kind nexaBrand y colores de marca'
+    },
+    {
       kind: 'mark',
       label: 'border-beam-nexa-spectrum-box',
       clipSelector: '[data-capture="border-beam-nexa-spectrum-box"]',

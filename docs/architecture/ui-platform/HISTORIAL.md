@@ -6,20 +6,32 @@
 
 ---
 
+## Delta 2026-06-13h — Nexa FAB brand spectrum hover
+
+El FAB global de Nexa adopta el `GreenhouseSpectrumBeam` en paleta Nexa como affordance de hover/focus:
+
+- `NexaFloatingButton` reutiliza `GreenhouseSpectrumBeam` con `kind='promptDock'`, `variant='interactive'` y `spectrumPalette='nexa'` detrás del botón.
+- El efecto está oculto y con animación pausada en idle; solo aparece en `hover`/`focus-within` cuando el panel no está abierto.
+- Se preserva el mark animado del FAB en primer plano y la sombra navy del botón; el glow no se mueve al foreground.
+- Reduced-motion conserva el fade mínimo sin transición larga.
+- Scenario GVC actualizado: `nexa-floating-hover-glow`.
+
 ## Delta 2026-06-13g — GreenhouseBorderBeam primitive
 
 Se creó `GreenhouseBorderBeam` para traer el patrón de borde perimetral animado al Design System sin copiar Tailwind/shadcn:
 
 - Primitive nueva en `src/components/greenhouse/primitives/border-beam/`.
 - `GreenhouseSpectrumBeam` extrae el efecto `spectrum` como primitive fina reutilizable (anillo completo + aura blur amplia) sin acoplarlo a un botón.
+- `GreenhouseShinyBorder` trae el patrón `shiny-borders-button` como surface/CTA tokenizada (highlight radial superior, glow inferior y contenido elevado), sin copiar Tailwind ni HEX locales.
+- `GreenhouseSpotlightCard` trae el patrón `spotlight-card` como card con spotlight atado al puntero; kinds iniciales `blue`, `purple`, `green`, `red`, `orange` y `nexaBrand`.
 - Variants oficiales: `ambient`, `interactive`, `progress`.
 - Kinds iniciales: `nexaSurface`, `promptDock`, `evidencePeek`, `approvalCard`, `asyncOperation`, `custom`.
 - Effects oficiales: `beam` para línea perimetral focal y `spectrum` para el equivalente gobernado del prompt "rainbow borders button" (anillo completo + gradiente desplazado + aura blur amplia).
 - Spectrum palettes oficiales: `axis` y `nexa`; `nexa` usa `GREENHOUSE_NEXA_BRAND_COLORS` para la variación con colores de marca.
 - Los colores se resuelven desde `theme.axis.*` / `theme.palette.*`; no hay HEX inline ni extensión de `tailwind.config`.
 - Motion: CSS `conic-gradient`/`linear-gradient` + `@property`/background-position con `prefers-reduced-motion` estático; el overlay es decorativo y respeta `border-radius: inherit`.
-- Lab interno `/design-system/border-beam` + scenario GVC `design-system-border-beam`; incluye CTA `button with border beam`, caja `Nexa glow box · spectrum` y variación `Nexa glow box · brand spectrum`.
-- Los dos estados lab-only de la caja de envío Nexa (`inactive/sin texto` y `with text`) viven en `/design-system/nexa-chat`, junto a `NexaComposer` y `NexaPromptDock`, porque el efecto spectrum ahí funciona como variación del composer y no como espécimen base del beam.
+- Lab interno `/design-system/border-beam` + scenario GVC `design-system-border-beam`; incluye CTA `button with border beam`, CTA `shiny realism`, cards `spotlight-card`, card `kind='nexaBrand'`, caja `Nexa glow box · spectrum` y variación `Nexa glow box · brand spectrum`.
+- El specimen lab-only de la caja de envío Nexa vive en `/design-system/nexa-chat`, junto a `NexaComposer` y `NexaPromptDock`, porque el efecto spectrum ahí funciona como variación del composer y no como espécimen base del beam; inicia inactive/sin texto y cambia al estado activo cuando el usuario escribe.
 
 ## Delta 2026-06-13f — GreenhouseGradientBackground primitive
 
@@ -332,8 +344,8 @@ y microinteracción, no como variantes locales por surface.
   `askBadgeVariant='animated'` para
   `GreenhouseNexaGreeting kind='funnelStageAdvisor'`.
 - El FAB global de Nexa usa `GreenhouseNexaAnimatedMark` con `autoBlink` +
-  `ambientMoments`; su aura hover/focus vive detrás del botón y no debe
-  lavarle el mark.
+  `ambientMoments`; su hover/focus usa `GreenhouseSpectrumBeam` en paleta Nexa
+  detrás del botón, pausado en idle, y no debe lavarle el mark.
 - Evidencia canónica: micro GVC del badge animado en lab Nexa
   `.captures/2026-06-09T20-52-25_micro-admin-design-system-nexa-brand-data-capture-nexa-brand-animated-ask-badge-hero`,
   micro GVC del consumer en charts

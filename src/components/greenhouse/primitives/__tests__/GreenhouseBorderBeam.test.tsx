@@ -9,7 +9,9 @@ import { axisTokens } from '@core/theme/axis-tokens'
 
 import { GREENHOUSE_NEXA_BRAND_COLORS } from '../greenhouse-nexa-brand-controller'
 import GreenhouseBorderBeam from '../border-beam/GreenhouseBorderBeam'
+import GreenhouseShinyBorder from '../border-beam/GreenhouseShinyBorder'
 import GreenhouseSpectrumBeam from '../border-beam/GreenhouseSpectrumBeam'
+import GreenhouseSpotlightCard from '../border-beam/GreenhouseSpotlightCard'
 import {
   buildGreenhouseBorderBeamConfig,
   buildGreenhouseBorderBeamGradient,
@@ -104,5 +106,35 @@ describe('GreenhouseBorderBeam', () => {
 
     expect(root).toHaveAttribute('data-effect', 'spectrum')
     expect(root).toHaveAttribute('data-kind', 'promptDock')
+  })
+
+  it('renders the shiny border effect as a tokenized button surface', () => {
+    const { container, getByRole } = renderWithTheme(
+      <GreenhouseShinyBorder asButton dataCapture='shiny-border-test'>
+        See Projects
+      </GreenhouseShinyBorder>
+    )
+
+    const button = getByRole('button', { name: 'See Projects' })
+
+    expect(button).toHaveAttribute('data-capture', 'shiny-border-test')
+    expect(button).toHaveAttribute('data-shiny-border', 'true')
+    expect(container.querySelector('[data-gh-shiny-corner-glow]')).toBeInTheDocument()
+    expect(container.querySelector('[data-gh-shiny-content]')).toHaveTextContent('See Projects')
+  })
+
+  it('renders spotlight cards with prompt colors and a Nexa brand kind', () => {
+    const { container, getByText } = renderWithTheme(
+      <GreenhouseSpotlightCard kind='nexaBrand' dataCapture='spotlight-card-test'>
+        <span>Nexa spotlight</span>
+      </GreenhouseSpotlightCard>
+    )
+
+    const card = container.querySelector('[data-capture="spotlight-card-test"]')
+
+    expect(card).toHaveAttribute('data-gh-spotlight-card')
+    expect(card).toHaveAttribute('data-kind', 'nexaBrand')
+    expect(container.querySelector('[data-gh-spotlight-aura]')).toBeInTheDocument()
+    expect(getByText('Nexa spotlight')).toBeInTheDocument()
   })
 })

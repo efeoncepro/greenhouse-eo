@@ -16,7 +16,9 @@ import CustomChip from '@core/components/mui/Chip'
 import {
   GreenhouseBorderBeam,
   GreenhouseButton,
+  GreenhouseShinyBorder,
   GreenhouseSpectrumBeam,
+  GreenhouseSpotlightCard,
   type GreenhouseBorderBeamIntensity,
   type GreenhouseBorderBeamKind,
   type GreenhouseBorderBeamSpectrumPalette,
@@ -181,6 +183,70 @@ const BeamButtonSpecimen = () => (
       active
     />
   </Box>
+)
+
+const ShinyButtonSpecimen = () => (
+  <Box data-capture='border-beam-shiny-button-specimen' sx={{ display: 'inline-flex', inlineSize: 'fit-content', maxInlineSize: '100%' }}>
+    <GreenhouseShinyBorder asButton intensity='strong' palette='axis'>
+      Ver proyectos
+    </GreenhouseShinyBorder>
+  </Box>
+)
+
+const SpotlightCardsSpecimen = () => (
+  <Box
+    data-capture='border-beam-spotlight-cards'
+    sx={{
+      display: 'grid',
+      gridTemplateColumns: { xs: '192px', sm: 'repeat(3, 192px)' },
+      gap: 3,
+      alignItems: 'center',
+      justifyContent: { xs: 'center', sm: 'start' }
+    }}
+  >
+    {(['blue', 'purple', 'orange'] as const).map(kind => (
+      <GreenhouseSpotlightCard key={kind} kind={kind} size='sm' />
+    ))}
+  </Box>
+)
+
+const NexaSpotlightCardSpecimen = () => (
+  <GreenhouseSpotlightCard dataCapture='border-beam-spotlight-card-nexa' kind='nexaBrand' size='md'>
+    <Stack spacing={2} sx={{ minBlockSize: '100%', color: 'inherit' }}>
+      <Stack direction='row' spacing={1} alignItems='center'>
+        <Box
+          sx={theme => ({
+            display: 'grid',
+            placeItems: 'center',
+            inlineSize: 36,
+            blockSize: 36,
+            borderRadius: '50%',
+            bgcolor: alpha(theme.palette.common.white, 0.12)
+          })}
+        >
+          <i className='tabler-sparkles' aria-hidden='true' />
+        </Box>
+        <Typography variant='h6' color='inherit'>
+          Nexa
+        </Typography>
+      </Stack>
+      <Typography variant='body2' color='inherit' sx={{ opacity: 0.78 }}>
+        Spotlight compacto con midnight navy, electric teal y blanco.
+      </Typography>
+      <CustomChip
+        label="kind='nexaBrand'"
+        size='small'
+        variant='tonal'
+        color='primary'
+        round='true'
+        sx={theme => ({
+          alignSelf: 'flex-start',
+          color: theme.palette.common.white,
+          bgcolor: alpha(theme.palette.common.white, 0.14)
+        })}
+      />
+    </Stack>
+  </GreenhouseSpotlightCard>
 )
 
 const NexaSpectrumGlowBoxSpecimen = ({
@@ -422,6 +488,77 @@ const BorderBeamLabView = () => {
               <BeamButtonSpecimen />
             </Stack>
           </SpecimenSurface>
+
+          <Box
+            data-capture='border-beam-shiny-button-card'
+            sx={theme => ({
+              position: 'relative',
+              zIndex: 2,
+              isolation: 'isolate',
+              minInlineSize: 0,
+              overflow: 'hidden',
+              borderRadius: `${theme.shape.customBorderRadius.lg}px`,
+              border: `1px solid ${theme.palette.divider}`,
+              bgcolor: 'background.paper'
+            })}
+          >
+            <Stack spacing={2} sx={{ p: 4, minBlockSize: 220, justifyContent: 'center' }}>
+              <Typography variant='h6'>Botón shiny realism</Typography>
+              <Typography variant='body2' color='text.secondary'>
+                Traducción tokenizada del patrón shiny borders: highlight radial, glow inferior y contenido elevado.
+              </Typography>
+              <ShinyButtonSpecimen />
+            </Stack>
+          </Box>
+
+          <Box
+            data-capture='border-beam-spotlight-card-original'
+            sx={theme => ({
+              position: 'relative',
+              zIndex: 2,
+              gridColumn: { md: '1 / -1' },
+              isolation: 'isolate',
+              minInlineSize: 0,
+              overflow: 'hidden',
+              borderRadius: `${theme.shape.customBorderRadius.lg}px`,
+              border: `1px solid ${theme.palette.divider}`,
+              bgcolor: 'background.paper'
+            })}
+          >
+            <Stack spacing={2.5} sx={{ p: 4, minBlockSize: 320, justifyContent: 'center' }}>
+              <Stack spacing={1}>
+                <Typography variant='h6'>Spotlight cards originales</Typography>
+                <Typography variant='body2' color='text.secondary'>
+                  Traducción del patrón `spotlight-card`: tres cards con spotlight atado al puntero, sin contenido obligatorio.
+                </Typography>
+              </Stack>
+              <SpotlightCardsSpecimen />
+            </Stack>
+          </Box>
+
+          <Box
+            data-capture='border-beam-spotlight-card-brand'
+            sx={theme => ({
+              position: 'relative',
+              zIndex: 2,
+              isolation: 'isolate',
+              minInlineSize: 0,
+              overflow: 'hidden',
+              borderRadius: `${theme.shape.customBorderRadius.lg}px`,
+              border: `1px solid ${theme.palette.divider}`,
+              bgcolor: 'background.paper'
+            })}
+          >
+            <Stack spacing={2.5} sx={{ p: 4, minBlockSize: 320, justifyContent: 'center' }}>
+              <Stack spacing={1}>
+                <Typography variant='h6'>Spotlight card · Nexa brand</Typography>
+                <Typography variant='body2' color='text.secondary'>
+                  Nuevo kind de marca: no sustituye las cards originales, solo restringe el halo al universo Nexa.
+                </Typography>
+              </Stack>
+              <NexaSpotlightCardSpecimen />
+            </Stack>
+          </Box>
 
           <NexaSpectrumGlowBoxSpecimen />
 
