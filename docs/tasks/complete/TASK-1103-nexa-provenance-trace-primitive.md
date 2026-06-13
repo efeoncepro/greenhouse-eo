@@ -1,22 +1,31 @@
 # TASK-1103 — `NexaProvenanceTrace` primitive (SoT del grounding de Nexa)
 
+## Delta 2026-06-13 — COMPLETADA
+
+- **Primitive canónica entregada:** `NexaProvenanceTrace` vive en `src/components/greenhouse/primitives/nexa-provenance-trace/` con variants `inline|expandable|panel`, kinds `knowledgeGrounded|signalPromoted|computed|custom`, controller `kind→variant`, types públicos y export en el barrel.
+- **Consumers migrados:** `NexaAnswersCanvas` usa la primitive para reasoning (`expandable`) y proof (`panel`); `NexaAnswerBubble` delega el trust cue compacto a `variant='inline'`; el answer-trace productivo de `/knowledge` migró su proof tabbed en `TASK-1108` usando la misma primitive.
+- **Lab + docs:** `/design-system/nexa-provenance` existe con specimens de variants/kinds y panel tabbed; `PRIMITIVES.md`, `HISTORIAL.md` y `CONVERSATIONAL_EXPERIENCE.md` declaran la primitive como SoT del grounding. No se creó ADR separado porque el contrato canónico quedó en `CONVERSATIONAL_EXPERIENCE.md` y la convergencia del proof quedó documentada en `TASK-1108`.
+- **Blocker resuelto por decisión posterior:** el blocker viejo contra `TASK-1095` quedó obsoleto al bendecirse `NexaAnswersSurfaceContext` como SSOT y al canonizar la experiencia conversacional. `TASK-1095` sigue abierto para refinamientos A2/A3/A6/A7, pero ya no bloquea esta primitive.
+- **Scope honesto:** el kind `signalPromoted` queda contract-ready; el rollout real en Nexa Insights/finance/agency sigue fuera de esta task y pertenece a consumers de dominio futuros. Esta task cierra la primitive y sus migraciones transversales inmediatas, no el despliegue de todos los dominios.
+- **Verificación de cierre:** commit previo `e058205a0` entregó primitive + Lab + GVC; `TASK-1108` validó el proof tabbed con GVC 0 findings. Cierre actual: tests focales de `nexa-provenance-trace` + `nexa-answers-canvas` verdes, ESLint focal verde, `tsc --noEmit` verde y GVC post-cierre en `design-system-nexa-provenance` + `nexa-answers-surface` verde.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `implementation`
 - Epic: `none`
-- Status real: `Diseno`
+- Status real: `Implementado`
 - Rank: `TBD`
 - Domain: `ui|platform|nexa|content|knowledge`
-- Blocked by: `TASK-1095` (contrato provenance/trust SSOT) · coordinar con `TASK-1089` (Answer Trace) y `TASK-947` (Nexa Insights drill)
-- Branch: `task/TASK-1103-nexa-provenance-trace-primitive`
+- Blocked by: `none` (blocker `TASK-1095` resuelto por SSOT existente; rollout real `signalPromoted` queda follow-up por dominio)
+- Branch: `develop` (local-first)
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
@@ -44,13 +53,13 @@ El *grounding* de Nexa es el activo de confianza de la plataforma, pero su UI es
 ## Dependencies & Impact
 
 **Depende de:**
-- `TASK-1095` — contrato provenance/trust cue SSOT (substrate). La primitive es la *vista* de ese contrato.
+- `TASK-1095` — originalmente bloqueante; resuelto para esta primitive por la decisión posterior de usar `NexaAnswersSurfaceContext` como SSOT. Los refinamientos restantes de `TASK-1095` son paralelos.
 - `TASK-1093` (complete) — `ConversationalEvidencePacket` + `NexaEvidencePanel` compartido + rehidratación. Input canónico.
 - `TASK-1085`/`TASK-1083` (complete) — `knowledge-search.v1` (chunks/score/freshness/denied) como fuente del grounding de Knowledge.
 
 **Coordinar (no duplicar):**
-- `TASK-1089` (in-progress, Codex) — Answer Trace surface: su "trace/proof lateral" es exactamente la variant `expandable`/`panel` de esta primitive. Definir boundary: Answer Trace **consume** `NexaProvenanceTrace`, no construye su propio trace.
-- `TASK-947` (complete) — Nexa Insights drill (`/nexa/insights/[id]`): la trazabilidad del signal (`EO-AIS`) es el kind `signalPromoted`.
+- `TASK-1089`/`TASK-1108` — Answer Trace consume `NexaProvenanceTrace` para proof tabbed; no mantiene su propio chrome de proof.
+- `TASK-947` (complete) — Nexa Insights drill (`/nexa/insights/[id]`): la trazabilidad del signal (`EO-AIS`) queda modelada como kind `signalPromoted`, pero su rollout real de dominio no pertenece a este cierre.
 
 **Archivos owned (nuevos):**
 - `src/components/greenhouse/primitives/nexa-provenance-trace/` (componente + types + controller `kind→variant` + barrel export).
@@ -102,10 +111,11 @@ El *grounding* de Nexa es el activo de confianza de la plataforma, pero su UI es
 
 ## Verification
 
-- `pnpm local:check` + `pnpm test` verde.
-- GVC del Lab (variants × kinds) desktop+mobile, 0 findings, a11y (disclosure + reduced-motion + foco).
-- Consumers migrados sin regresión visual (GVC diff del canvas antes/después).
-- Drift-guard: el packet es la única fuente; cero recomputación en consumers.
+- `pnpm exec vitest run src/components/greenhouse/primitives/nexa-provenance-trace/nexa-provenance-trace-controller.test.ts src/components/greenhouse/primitives/nexa-answers-canvas/nexa-answers-canvas-controller.test.ts`
+- `pnpm exec eslint src/components/greenhouse/primitives/nexa-answers-canvas/NexaAnswersCanvas.tsx src/components/greenhouse/primitives/nexa-answer-bubble/NexaAnswerBubble.tsx`
+- `pnpm fe:capture design-system-nexa-provenance --env=local` → `.captures/2026-06-13T14-38-08_design-system-nexa-provenance`
+- `pnpm fe:capture nexa-answers-surface --env=local` → `.captures/2026-06-13T14-38-38_nexa-answers-surface`
+- Drift-guard: `NexaProvenanceTrace` compone `NexaEvidencePanel` desde `nexa-evidence.v1`; consumers no recomputan evidencia.
 
 ## Out of Scope
 

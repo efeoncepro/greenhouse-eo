@@ -1,16 +1,3 @@
 {
-  "hooks": {
-    "Stop": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node \"$(git rev-parse --show-toplevel)/.codex/hooks/qa-release-stop-hook.mjs\"",
-            "timeout": 15,
-            "statusMessage": "Checking QA release closure"
-          }
-        ]
-      }
-    ]
-  }
+  "hooks": {}
 }

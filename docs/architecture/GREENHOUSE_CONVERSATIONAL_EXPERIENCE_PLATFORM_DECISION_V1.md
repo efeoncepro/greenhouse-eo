@@ -2,7 +2,9 @@
 
 ## Status
 
-Proposed
+Proposed companion draft.
+
+Direction superseded/elevated by `GREENHOUSE_NEXA_CORE_AGENTIC_PLATFORM_DECISION_V1.md` (Accepted direction, 2026-06-13). This document remains the detailed conversational-platform draft for `surfaceContext`, answer-turn, provenance and V2 gates.
 
 ## Date
 

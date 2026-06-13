@@ -1,4 +1,4 @@
-# TASK-1095 — Conversational Experience Platform V2
+# TASK-1095 — Nexa Core Agentic Platform Substrate
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
@@ -12,11 +12,11 @@
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
-- Type: `implementation`
+- Type: `architecture`
 - Epic: `none`
 - Status real: `Diseno`
 - Rank: `TBD`
-- Domain: `ui|platform|nexa|ai|content|knowledge`
+- Domain: `platform|nexa|ai|agentic|ui|knowledge`
 - Blocked by: `none`
 - Branch: `task/TASK-1095-conversational-experience-v2`
 - Legacy ID: `none`
@@ -24,7 +24,29 @@
 
 ## Summary
 
-Consolidar la segunda version de la plataforma conversacional de Nexa como una base multi-surface consumible por Knowledge, Finance, charts, Agency, Personas, Commercial y futuros modulos operacionales: estado conversacional canonico, answer-turn reusable, contexto de superficie tipado, sustrato de evidencia/provenance detras de escena y reglas de placement para Home, floating panel, AnswerSurface y sidecars/overviews. El objetivo es evitar que `/knowledge` improvise un chat local o que cada surface vuelva a renderizar preguntas, respuestas, citas, acciones y proof panels con un lenguaje distinto, sin convertir la evidencia en protagonista de la conversacion.
+Re-scope 2026-06-13: definir a Nexa como parte del core de Greenhouse, no como una feature aislada de Knowledge ni como un chat global agregado encima del portal. Esta task gobierna el **substrato agentico**: taxonomia de Nexa Moments / Conversational Moments, `NexaAnswersSurfaceContext` como contrato canonico de contexto de superficie, adapters por dominio, boundaries de capabilities/actions, provenance/reliability y reglas para que cada modulo aporte contexto sin crear "mini Nexas". La implementacion visual/productiva de esos momentos vive en TASK-1096 y la promocion runtime Knowledge vive en TASK-1101.
+
+## Delta 2026-06-13 — rescope: Nexa vive en el core agentico de Greenhouse
+
+Intencion del operador: **Greenhouse debe ser una plataforma agentica para colaboradores, clientes y operadores; Nexa debe vivir en el core y percibir sinergias en cada dominio**. Por lo tanto, TASK-1095 deja de ser una task de "construir otra conversacion V2" y pasa a ser el contrato transversal que permite que los AI Moments / Conversational Moments / Nexa Moments sean consistentes y gobernados.
+
+**Nuevo owner conceptual de TASK-1095:**
+
+- Definir el **Nexa Moment Fabric**: una taxonomia compartida para momentos directos de conversacion, answers embebidos, insights promovidos, recomendaciones operativas, technical/MCP moments y self-service client moments.
+- Bendecir `NexaAnswersSurfaceContext` como SSOT vigente del contexto de superficie (`surfaceId/domain/placement/dataReality/sensitivity/allowedRenderers/allowedActions`) y documentar si se queda in-place o se promueve a `src/lib/nexa/`.
+- Definir adapters de dominio para que Knowledge, Finance, Agency/Account 360, People, Commercial, Delivery/ICO y Client Portal aporten contexto, safe refs, allowed actions, data reality y provenance sin forkear UI/runtime.
+- Separar `context` de `action`: un momento puede explicar/sugerir, pero cualquier accion ejecutable debe pasar por commands/readers/capabilities canonicos y tenant-safe.
+- Formalizar reliability/evals minimos del fabric: contexto invalido, unsupported domain, proof unavailable y action unavailable deben degradar honradamente.
+- Declarar el primer mapa de child tasks/pilots: Knowledge runtime (`TASK-1101`), experiencia cross-domain (`TASK-1096`) y primer piloto real no-Knowledge por definir (recomendado finance/chart explanation o Account 360 signal explanation).
+
+**Fuera del nuevo scope de TASK-1095:**
+
+- No construir la UI final de Nexa Answers ni sus microinteracciones: eso es TASK-1096.
+- No promover runtime real de Knowledge: eso es TASK-1101.
+- No implementar rollouts reales en Finance/Agency/People/Commercial/Client Portal dentro de esta task; aqui quedan adapters, fixtures, readiness y tasking.
+- No crear otro chat shell, sidecar custom ni answer-turn paralelo.
+
+**Cierre esperado:** arquitectura/docs/ADR y contratos suficientes para que Greenhouse trate a Nexa como capability core de plataforma. Si se escribe codigo, debe ser minimo y de contrato (types/controllers/tests), no rollout de producto.
 
 ## Delta 2026-06-13 — corrección + decisión del operador: el surfaceContext YA existe y es el canónico
 
@@ -99,12 +121,12 @@ El segundo anti-patron: crear "mini Nexas" por modulo. Finance no debe tener su 
 
 ## Goal
 
-- Canonizar el estado conversacional de Nexa: `idle -> composing -> submitted -> thinking -> answered -> degraded`.
-- Definir un contrato multi-surface para que cualquier modulo pueda consumir la experiencia conversacional sin forkear UI, runtime ni semantics.
-- Evolucionar `NexaKnowledgeAnswerSurface` hacia el answer-turn canonico sin crear un componente paralelo.
-- Extender el contrato de evidence/provenance como sustrato runtime para Knowledge, tools operacionales, metricas, workflows y MCP sin forkear renderers ni exponer trazas completas por defecto.
-- Dejar `/knowledge` como primer consumidor correcto: Humano documental, Nexa conversacional con idle limpio y senales compactas de confianza, MCP tecnico/provenance para inspeccion mas profunda.
-- Actualizar docs, Design System y GVC para que el contrato vigente no contradiga la experiencia aprobada.
+- Definir a Nexa como capability core de Greenhouse: un fabric agentico que puede aparecer como chat, answer embebido, insight promovido, recomendacion operativa, technical/MCP moment o client self-service moment.
+- Canonizar el mapa de momentos y dominios para Knowledge, Finance, Agency/Account 360, People, Commercial, Delivery/ICO, Client Portal y future operational modules.
+- Bendecir `NexaAnswersSurfaceContext` como contrato vigente y completar su semantica: context, data reality, sensitivity, renderer/action allowlists y ownership de adapters.
+- Definir el boundary de acciones: suggestions y explanations pueden vivir en el moment; writes/approvals/retries/export/recovery deben ir por commands/API/capabilities gobernadas.
+- Formalizar reliability/evals minimos del fabric y degradacion honesta por dominio/contexto/provenance.
+- Dejar TASK-1096 y TASK-1101 desbloqueadas por contrato: 1096 diseña la experiencia sentida; 1101 promueve runtime real Knowledge.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 1 — CONTEXT & CONSTRAINTS
@@ -122,6 +144,8 @@ Revisar y respetar:
 - `docs/architecture/GREENHOUSE_FULL_API_PARITY_DECISION_V1.md`
 - `docs/architecture/GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md`
 - `docs/architecture/GREENHOUSE_NEXA_ARCHITECTURE_V1.md`
+- `docs/architecture/GREENHOUSE_NEXA_CORE_AGENTIC_PLATFORM_DECISION_V1.md`
+- `docs/architecture/GREENHOUSE_NEXA_MOMENT_FABRIC_ARCHITECTURE_V1.md`
 - `docs/architecture/GREENHOUSE_NEXA_AGENT_SYSTEM_V1.md`
 - `docs/architecture/GREENHOUSE_NEXA_INSIGHTS_LAYER_V1.md`
 - `docs/architecture/GREENHOUSE_KNOWLEDGE_PLATFORM_ARCHITECTURE_V1.md`
@@ -296,6 +320,54 @@ Execution implication:
      ═══════════════════════════════════════════════════════════ -->
 
 ## Scope
+
+### Slice 0 — Core doctrine and ADR refresh
+
+- Actualizar o crear el ADR/spec de plataforma para declarar que Nexa es una capability core de Greenhouse, no una UI local de Knowledge.
+- Nombrar el fabric como `Nexa Moment Fabric` o equivalente aprobado y fijar vocabulario: `Nexa Moment`, `Conversational Moment`, `AI Moment`, `Nexa Answers`, `Nexa Chat`, `Nexa Insight promoted`, `MCP/technical moment`.
+- Documentar la relacion Efeonce/Greenhouse: Nexa sirve a colaboradores, operadores internos y clientes segun access/tier/contexto, no solo a usuarios internos.
+
+### Slice 1 — Moment taxonomy and domain synergy map
+
+- Definir tipos de momento:
+  - direct chat,
+  - embedded answer,
+  - promoted insight,
+  - operational recommendation,
+  - workflow copilot,
+  - technical/MCP packet,
+  - client self-service moment.
+- Mapear cada tipo contra dominios: Knowledge, Finance, Agency/Account 360, People, Commercial, Delivery/ICO, Client Portal y Admin/Ops.
+- Para cada dominio, registrar contexto aportado, acciones potenciales, sensitivity tier, provenance esperada y degradacion si falta reader/API.
+
+### Slice 2 — Surface context blessing and adapter contract
+
+- Bendecir `NexaAnswersSurfaceContext` como SSOT vigente y decidir si se mantiene in-place o se promueve a `src/lib/nexa/`.
+- Separar formalmente:
+  - `context`: safe refs, labels, data reality, sensitivity, provenance refs;
+  - `rendering`: allowed renderers, placement, answer-turn affordances;
+  - `action`: allowed actions/capabilities resueltas por policy/server.
+- Definir adapter contract por dominio sin payloads crudos ni autorizacion inferida desde ruta/rol.
+
+### Slice 3 — Action/capability and autonomy boundary
+
+- Documentar que V1 de moments es explain/suggest/recommend por defecto.
+- Toda accion ejecutable debe declarar command/API/readers canonicos, authorization tenant-safe, audit/outbox cuando aplique, idempotencia y errores sanitizados.
+- Clasificar autonomy levels: `inform`, `recommend`, `draft`, `execute_requires_confirmation`, `execute_autonomous` (los ultimos dos quedan follow-up gobernado).
+
+### Slice 4 — Reliability, provenance and evals
+
+- Definir senales minimas: context invalid, unsupported domain, proof unavailable, action unavailable, stale/partial data.
+- Conectar conceptualmente con `NexaProvenanceTrace` y `ConversationalEvidencePacket` sin reabrir la primitive.
+- Aceptar degradacion honesta como comportamiento de primera clase.
+
+### Slice 5 — Program handoff
+
+- Dejar TASK-1096 como owner de experiencia/percepcion de moments.
+- Dejar TASK-1101 como owner del runtime Knowledge sobre el contrato existente.
+- Crear o referenciar el primer child pilot no-Knowledge cuando producto decida prioridad: recomendado `finance.chart_explanation` o `account360.signal_explanation`.
+
+## Historical Scope (superseded by rescope 2026-06-13)
 
 ### Slice 0 — Architecture and ADR gate
 
@@ -616,6 +688,16 @@ Follow-up turns must carry prior conversational context and provenance reference
 
 ## Acceptance Criteria
 
+- [ ] TASK-1095 consume `GREENHOUSE_NEXA_CORE_AGENTIC_PLATFORM_DECISION_V1.md` y declara a Nexa como capability core agentica de Greenhouse, no como feature local de Knowledge.
+- [ ] Existe una taxonomia inicial de `Nexa Moments` / `Conversational Moments` / `AI Moments` que distingue direct chat, embedded answer, promoted insight, operational recommendation, workflow copilot, technical/MCP moment y client self-service moment.
+- [ ] El mapa de dominios cubre Knowledge, Finance, Agency/Account 360, People, Commercial, Delivery/ICO, Client Portal y Admin/Ops con contexto, sensitivity, provenance y acciones potenciales.
+- [ ] `NexaAnswersSurfaceContext` queda bendecido como contrato canonico vigente o movido/promovido con compatibilidad clara.
+- [ ] El boundary `context` vs `rendering` vs `action` queda documentado y no permite inferir permisos desde UI.
+- [ ] Las actions ejecutables declaran command/API/capability/audit/idempotencia cuando corresponda; V1 queda explain/suggest/recommend por defecto.
+- [ ] Reliability/evals minimos quedan definidos para context invalid, unsupported domain, proof unavailable, action unavailable y stale/partial data.
+- [ ] TASK-1096 y TASK-1101 quedan explícitamente desbloqueadas por el contrato existente; no esperan que 1095 construya UI/runtime.
+- [ ] Primer child pilot no-Knowledge queda recomendado o creado como follow-up de dominio.
+- [ ] Los acceptance criteria historicos de abajo se reinterpretan bajo este rescope; cualquier criterio que implique rollout UI/runtime real se mueve a TASK-1096, TASK-1101 o child task.
 - [ ] `docs/architecture/GREENHOUSE_CONVERSATIONAL_EXPERIENCE_PLATFORM_V2.md` exists and defines the multi-surface conversational architecture.
 - [ ] `docs/architecture/GREENHOUSE_CONVERSATIONAL_EXPERIENCE_PLATFORM_DECISION_V1.md` exists as the dedicated ADR and is linked from `docs/architecture/DECISIONS_INDEX.md` when accepted.
 - [ ] The ADR explicitly rejects domain-local chat forks and Knowledge-only coupling, and defines the runtime contract for `surfaceContext`, answer-turn, provenance/trust cues and access boundaries.

@@ -1,5 +1,36 @@
 # Release 2026-06-10 #2 — develop→main `6c649b2a6` RELEASED
 
+## Sesion 2026-06-13 — ADR Nexa core agentic platform + Moment Fabric (Codex)
+
+- **Qué quedó:** nueva decisión aceptada de dirección `docs/architecture/GREENHOUSE_NEXA_CORE_AGENTIC_PLATFORM_DECISION_V1.md`: Nexa vive en el core de Greenhouse como capability agentica para colaboradores, clientes y operadores.
+- **Arquitectura operativa:** `docs/architecture/GREENHOUSE_NEXA_MOMENT_FABRIC_ARCHITECTURE_V1.md` define vocabulario, C4, elegibilidad de moments, mapa de sinergias por dominio, boundaries de contexto/evidencia/acciones/autonomía, señales/evals candidatos y secuencia de adopción.
+- **Contrato producto:** `Nexa Moment = context + evidence + permission + intent + next step`. Si falta una parte, el moment degrada honestamente o no aparece. No se autoriza "AI everywhere" decorativo.
+- **Docs enlazadas:** `DECISIONS_INDEX`, `GREENHOUSE_NEXA_ARCHITECTURE_V1`, `GREENHOUSE_CONVERSATIONAL_EXPERIENCE_PLATFORM_DECISION_V1`, TASK-1095, TASK-1096, `project_context.md` y `changelog.md`.
+- **No runtime:** no se tocó código de producto ni se activaron flags/rollouts. TASK-1095/1096/1101 siguen siendo los owners de implementación.
+
+## Sesion 2026-06-13 — Codex QA Stop hook desregistrado por defecto (Codex)
+
+- **Causa:** el hook `Stop` de `.codex/hooks.json` se ejecutaba automáticamente al cerrar el turno de Codex y, al bloquear, aparecía como un prompt out-of-band dentro de la conversación. No era deploy de producto, pero sí una interrupción no deseada del flujo.
+- **Qué cambió:** `.codex/hooks.json` queda sin hooks automáticos (`"hooks": {}`). `.codex/hooks/qa-release-stop-hook.mjs` se conserva como script opt-in y ahora solo bloquea si se habilita explícitamente con `GREENHOUSE_QA_STOP_HOOK_MODE=enforce`, `GREENHOUSE_QA_STOP_HOOK_ENFORCE=1` o payload `enforce_qa_stop_hook=true`.
+- **Contrato vigente:** QA robusta sigue siendo obligatoria para cierres riesgosos, pero se invoca manualmente con `greenhouse-qa-release-auditor` + `pnpm qa:gates --changed`; no debe volver a aparecer un prompt automático fuera de la conversación normal salvo opt-in explícito.
+- **Docs:** `AGENTS.md`, `project_context.md`, `changelog.md` y este handoff sincronizados.
+
+## Sesion 2026-06-13 — TASK-1095/TASK-1096 re-scope Nexa core agentic platform (Codex)
+
+- **Intencion del operador capturada:** Nexa debe vivir en el core de Greenhouse; Greenhouse debe sentirse como plataforma agentica para colaboradores, clientes y operadores. Los AI Moments / Conversational Moments / Nexa Moments deben percibir sinergias en cada dominio, no como widgets aislados.
+- **TASK-1095 re-scoped:** pasa de `Conversational Experience Platform V2` a **Nexa Core Agentic Platform Substrate**. Scope vigente: Nexa Moment Fabric, taxonomia de moments, mapa de sinergias por dominio, `NexaAnswersSurfaceContext` como SSOT vigente, adapter contract, boundary context/rendering/action, autonomy levels, reliability/evals y handoff a 1096/1101/child pilots. Type actualizado a `architecture`; no construye UI final ni runtime real de Knowledge.
+- **TASK-1096 re-scoped:** pasa de una task Knowledge-centric bloqueada por 1095 a **Nexa Moments Surface Experience**. `Blocked by: none`. `NexaAnswersCanvas` queda como surface canonica de embedded answers; 1096 traduce el contrato core en specimens/UX/copy/GVC para Knowledge, Finance/chart, Agency/Account 360, People/Person 360, Commercial/Bow-tie, Delivery/ICO y Client Portal. Runtime Knowledge sigue en `TASK-1101`; rollouts reales no-Knowledge deben nacer como child tasks de dominio.
+- **Docs sincronizadas:** `docs/tasks/to-do/TASK-1095-conversational-experience-v2.md`, `docs/tasks/to-do/TASK-1096-nexa-answers-surface-experience.md`, `docs/tasks/README.md`, `docs/tasks/TASK_ID_REGISTRY.md`, `project_context.md`, `changelog.md` y este handoff.
+- **Coordinacion WT compartido:** se preserva WIP ajeno/parallel: `TASK-1101` aparece movida a `docs/tasks/in-progress/` y existe `src/lib/knowledge/nexa/` sin tocar en esta sesion. Si se commitea, stagear solo los docs de este re-scope y el slice TASK-1103 propio ya documentado.
+
+## Sesion 2026-06-13 — TASK-1103 closure + residual provenance migrations (Codex)
+
+- **Qué quedó:** `TASK-1103` movida a `complete`. `NexaProvenanceTrace` queda cerrada como primitive SoT del grounding conversacional: `inline` (trust cue), `expandable` (reasoning) y `panel` (proof/evidencia), con kinds `knowledgeGrounded|signalPromoted|computed|custom`.
+- **Cierre de gaps residuales:** `NexaAnswersCanvas` ahora delega también su proof en `NexaProvenanceTrace variant='panel'` (antes componía `NexaEvidencePanel` directo) y `NexaAnswerBubble` delega el trust cue en `NexaProvenanceTrace variant='inline'` preservando el botón `Ver base`.
+- **Docs sincronizadas:** `docs/tasks/complete/TASK-1103-nexa-provenance-trace-primitive.md`, `docs/tasks/README.md`, `docs/tasks/TASK_ID_REGISTRY.md`, `changelog.md` y `project_context.md`.
+- **Scope honesto:** `signalPromoted` queda contract-ready; el rollout real en Nexa Insights/finance/agency sigue como trabajo de dominio futuro, no bloquea el cierre de la primitive.
+- **Verificación:** Vitest focal `nexa-provenance-trace-controller` + `nexa-answers-canvas-controller` verde; ESLint focal de `NexaAnswersCanvas.tsx` y `NexaAnswerBubble.tsx` verde; `tsc --noEmit` verde; GVC `design-system-nexa-provenance` verde en `.captures/2026-06-13T14-38-08_design-system-nexa-provenance` (desktop/mobile, tabs mouse+keyboard) y GVC `nexa-answers-surface` verde en `.captures/2026-06-13T14-38-38_nexa-answers-surface` (desktop/laptop/mobile, 120 frames). Frames proof expanded desktop/mobile revisados.
+
 ## Sesion 2026-06-13 — QA Release Auditor skill + `pnpm qa:gates` (Codex)
 
 - **Qué quedó:** nueva skill cross-agent `greenhouse-qa-release-auditor` en Codex y Claude. Actúa como gate final de QA/closure: clasifica riesgo, inyecta skills especializadas a demanda por namespace de agente y emite `PASS | CONDITIONAL PASS | BLOCK`; bloquea el falso cierre donde tests verdes no prueban runtime real.

@@ -310,6 +310,8 @@ Regla corta: si los docs, rollout, lifecycle y evidencia no quedaron sincronizad
 
 Antes de cerrar implementaciones no triviales, incidentes, rollouts, cambios UI/schema/integracion/tooling/skills o cualquier trabajo donde "tests verdes" no pruebe runtime real, invocar `greenhouse-qa-release-auditor` y usar `pnpm qa:gates --changed` como primera pasada mecanica. La skill clasifica riesgo, inyecta skills especializadas a demanda por namespace de agente (Codex y Claude pueden tener nombres/coberturas distintas: UI/GVC, finance, payroll, release, secrets, browser diagnostics, arquitectura, docs, etc.) y emite `PASS | CONDITIONAL PASS | BLOCK`. Si falta evidencia runtime, el cierre debe decir `code complete, rollout pendiente` u `operativamente bloqueado`.
 
+Nota de convivencia: el script `.codex/hooks/qa-release-stop-hook.mjs` es un guardrail local de Codex y queda opt-in/desregistrado por defecto para evitar prompts out-of-band; no reemplaza esta regla manual ni aplica automaticamente a Claude.
+
 ### Task Closing Quality Gate — full test + production build local (desde 2026-05-13, TASK-827 follow-up)
 
 **ANTES de mover una task de `in-progress/` a `complete/`** y declarar "ship done", correr **ambos** comandos local como gate final canonical:

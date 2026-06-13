@@ -4,6 +4,28 @@
 
 Definir el contrato arquitectonico de Nexa: el asistente IA conversacional de Greenhouse. Este documento es la fuente canonica de la capa de IA del portal — que es, como funciona, que puede hacer, y como se integra con el resto del sistema.
 
+## Delta 2026-06-13 — Nexa como core agentic platform
+
+La dirección vigente de producto queda formalizada en:
+
+- `GREENHOUSE_NEXA_CORE_AGENTIC_PLATFORM_DECISION_V1.md`
+- `GREENHOUSE_NEXA_MOMENT_FABRIC_ARCHITECTURE_V1.md`
+
+Decisión: **Nexa vive en el core de Greenhouse como capability agentica para colaboradores, clientes y operadores**, no como chat local ni widget aislado. La unidad de producto es el **Nexa Moment**:
+
+```text
+Nexa Moment = context + evidence + permission + intent + next step
+```
+
+Implicaciones:
+
+- `Nexa Chat` es una manifestación directa, no el patrón total.
+- `Nexa Answers` es la surface embebida canónica para respuestas contextuales.
+- `Nexa Insights` sigue como capa advisory/proactiva y puede promover un signal a conversación.
+- Los dominios aportan context adapters; no crean chats o answer surfaces propias.
+- Toda acción ejecutable requiere command/API/capability/audit/idempotencia según aplique.
+- V1 es explain/suggest/recommend por defecto; draft/execute/autonomous requieren tasks/ADR adicionales.
+
 ## 1. Que es Nexa
 
 Nexa es el asistente operativo de Greenhouse. Su mision es ayudar al equipo interno de Efeonce a navegar su operacion diaria a traves de lenguaje natural.

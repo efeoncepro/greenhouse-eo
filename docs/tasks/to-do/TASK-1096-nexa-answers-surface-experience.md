@@ -16,15 +16,36 @@
 - Epic: `none`
 - Status real: `Diseno`
 - Rank: `TBD`
-- Domain: `ui|platform|nexa|ai|content|knowledge`
-- Blocked by: `TASK-1095`
+- Domain: `ui|platform|nexa|ai|agentic|content|knowledge`
+- Blocked by: `none`
 - Branch: `task/TASK-1096-nexa-answers-surface-experience`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
 ## Summary
 
-Construir **Nexa Answers** como la surface contextual que transforma una UI existente en una experiencia conversacional embebida: idle limpio, pregunta como burbuja, Nexa pensando con contexto, respuesta answer-first, trust cue compacto, composer descendido, proof bajo demanda y follow-ups compactos. TASK-1095 provee el soporte de plataforma; esta task garantiza la coreografia producto/UI que el usuario debe experimentar.
+Re-scope 2026-06-13: construir el programa de experiencia de **Nexa Moments**: como se sienten y se reconocen los AI Moments / Conversational Moments / Nexa Moments dentro de Greenhouse cuando aparecen en Knowledge, Finance, Agency/Account 360, People, Commercial, Delivery/ICO y superficies cliente. `NexaAnswersCanvas` sigue siendo la surface canonica para answers embebidos, pero esta task ya no se limita a Knowledge ni queda bloqueada por TASK-1095; consume el contrato core de 1095 y traduce esa doctrina en specimens, UX rules, copy, GVC y readiness por dominio. La promocion runtime real de Knowledge vive en TASK-1101.
+
+## Delta 2026-06-13 — rescope: Nexa Moments como experiencia percibida por dominio
+
+Intencion del operador: Nexa debe vivir en el core de Greenhouse como plataforma agentica para colaboradores, clientes y operadores. Por eso los **AI Moments / Conversational Moments / Nexa Moments** deben percibir sinergias en cada dominio, no sentirse como widgets aislados.
+
+**Nuevo owner conceptual de TASK-1096:**
+
+- Definir la experiencia sentida de los Nexa Moments: answer-first, action-aware, proof-on-demand, dominio visible pero sin fork de lenguaje.
+- Mantener `NexaAnswersCanvas` como surface canonica de answers embebidos y usar sus primitives (`NexaConversationBubble`, `NexaAnswerBubble`, `NexaProvenanceTrace`, `NexaResponseToolbar`, `NexaStreamingText`) como base.
+- Crear/actualizar specimens para moments transversales:
+  - Knowledge grounded answer,
+  - Finance/chart explanation,
+  - Agency/Account 360 signal explanation,
+  - People/Person 360 governed answer,
+  - Commercial/Bow-tie next-best-action,
+  - Delivery/ICO explanation,
+  - Client Portal self-service answer.
+- Definir UX rules para que cada moment muestre la sinergia de dominio: contexto local, accion sugerida si existe capability, provenance/trust cue compacto, limitaciones honestas y siguiente paso natural.
+- Separar experiencia de runtime: TASK-1096 puede validar specimens/mockups/GVC; runtime real Knowledge es TASK-1101 y rollouts reales no-Knowledge deben nacer como child tasks.
+
+**Cambio de dependency:** deja de estar `Blocked by: TASK-1095`. TASK-1095 es ahora doctrina/contrato core; 1096 puede avanzar con el `NexaAnswersSurfaceContext` existente y coordinar deltas si el contrato se promueve o renombra.
 
 ## Delta 2026-06-13 — experiencia (mockup) sustancialmente entregada; pendiente reconciliación + runtime + decisión de duplicación
 
@@ -48,14 +69,16 @@ Revisión de necesidad pedida por el operador. Veredicto: **la EXPERIENCIA está
 
 ## Arch Review Gate (2026-06-12)
 
-Review de arquitectura (`docs/architecture/GREENHOUSE_CONVERSATIONAL_EXPERIENCE_V2_ARCH_REVIEW.md` + Delta del ADR) detectó que esta task se construyó UI-first y forkeó contratos de TASK-1095. Antes de sumar más kinds/estados, reconciliar contra el contrato canónico:
+**Nota 2026-06-13:** este gate queda parcialmente superseded por el rescope anterior. La conclusion vigente es que `NexaAnswersSurfaceContext` ya es el contrato de trabajo canonico; TASK-1095 lo bendice/ordena como core substrate y TASK-1096 puede avanzar en experiencia/specimens sin esperar un modulo nuevo en `src/lib/nexa/`.
 
-- **A1 — consumir el `surfaceContext` SSOT de TASK-1095** (`src/lib/nexa/`), no el `NexaAnswersSurfaceContext` local. El `allowedRenderers`/`allowedActions` del canvas (buena idea de seguridad) se **mergea** al contrato canónico, no se mantiene como shape paralelo.
+Review de arquitectura (`docs/architecture/GREENHOUSE_CONVERSATIONAL_EXPERIENCE_V2_ARCH_REVIEW.md` + Delta del ADR) detectó que esta task se construyó UI-first y necesitaba reconciliacion con el contrato de plataforma. Antes de sumar más kinds/estados, reconciliar contra el contrato canónico:
+
+- **A1 — consumir/bendecir `NexaAnswersSurfaceContext` como SSOT vigente.** Si TASK-1095 decide promoverlo a `src/lib/nexa/`, hacerlo como move/refactor compatible; mientras tanto, no bloquear 1096 ni inventar un shape competidor.
 - **A2 — descomponer la máquina de estados del canvas.** Los 10 estados planos (`idle|submitted|thinking|streaming|answered|proofOpen|followup|compacted|degraded|error`) mezclan 3 dimensiones ortogonales: lifecycle (los 6 de 1095 + `error`, + restaurar `composing`), disclosure (`proofOpen`), turn (`followup`/`compacted`). Modelar el producto cartesiano, no un enum de 10. `streaming` se difiere hasta el follow-up de streaming (o se especifica su a11y ahí).
 - **A5 — colapsar la explosión de kinds.** `NexaAnswerBubble` ~15 kinds (`financeChartAnswer`, `financeMetricSummary`, `commercialMetricSummary`, …`surfaceActionPlan`) = 4 variants × ~5 dominios sin consumer real. Colapsar a **4 variants** (`explanation|chart|metricSummary|actionPlan`) + **dominio como dimensión del `surfaceContext`** + resolver `kind→variant`. Diferir los kinds per-dominio hasta que cada dominio sea consumer real.
 - **A6 — implementar el contrato a11y del answer-turn** que TASK-1095 define (live region sin robar foco al composer, proof top-layer, reduced-motion). GVC `quality.keyboard` cubre el proof disclosure + foco post-submit.
 
-Esta task sigue `Blocked by: TASK-1095` — A1/A2/A6 dependen de que 1095 aterrice el contrato mínimo (types-only) primero.
+Esta task ya no queda `Blocked by: TASK-1095`; coordina con 1095 para cambios de contrato y con TASK-1101 para runtime real.
 
 ## Why This Task Exists
 
@@ -90,6 +113,8 @@ Revisar y respetar:
 
 - `docs/architecture/GREENHOUSE_CONVERSATIONAL_EXPERIENCE_PLATFORM_V2.md`
 - `docs/architecture/GREENHOUSE_CONVERSATIONAL_EXPERIENCE_PLATFORM_DECISION_V1.md`
+- `docs/architecture/GREENHOUSE_NEXA_CORE_AGENTIC_PLATFORM_DECISION_V1.md`
+- `docs/architecture/GREENHOUSE_NEXA_MOMENT_FABRIC_ARCHITECTURE_V1.md`
 - `docs/architecture/GREENHOUSE_NEXA_ARCHITECTURE_V1.md`
 - `docs/architecture/GREENHOUSE_NEXA_INSIGHTS_LAYER_V1.md`
 - `docs/architecture/GREENHOUSE_KNOWLEDGE_PLATFORM_ARCHITECTURE_V1.md`
@@ -105,7 +130,7 @@ Reglas obligatorias:
 
 - Nexa Answers no es Nexa Chat. No debe crear historial global, rail de threads ni floating shell.
 - Nexa Answers no es solo AnswerTurn. Es una surface contextual completa con composer, choreography, answer, trust cue, proof disclosure y follow-up.
-- Nexa Answers debe consumir el soporte de TASK-1095 (`surfaceContext`, trust/provenance layers, AI moments map) y no duplicarlo.
+- Nexa Answers debe consumir el soporte de TASK-1095 (`surfaceContext`, trust/provenance layers, Nexa Moment Fabric) y no duplicarlo.
 - No crear chats por dominio. Knowledge, chart, insight, Agency, Person y Commercial aportan contexto; no fork de runtime/UI.
 - No mostrar proof/retrieval cards por defecto arriba de la respuesta. La respuesta es protagonista; proof es bajo demanda.
 - Mantener `showModeSelector` default `true` y `showTraceRail` default `false` en la compatibilidad existente de `NexaKnowledgeAnswerSurface` hasta que la facade defina otro contrato.
@@ -129,7 +154,7 @@ Reglas obligatorias:
 
 ### Depends on
 
-- `TASK-1095`: architecture/support contract for multi-surface conversational platform.
+- `TASK-1095`: architecture/support contract for the Nexa core agentic platform. It is no longer a blocker for this task as long as the current `NexaAnswersSurfaceContext` remains the canonical working contract.
 - `TASK-1090`: current Knowledge lenses WIP and approved AnswerSurface direction.
 - `TASK-1089`: existing `NexaKnowledgeAnswerSurface` foundation.
 - `TASK-1085`: Knowledge retrieval packet and citations for grounded answer examples.
@@ -276,6 +301,63 @@ This visual does not replace `/knowledge/mockup/answer-trace`; that route remain
      ═══════════════════════════════════════════════════════════ -->
 
 ## Scope
+
+### Slice 0 — Nexa Moments experience contract
+
+- Documentar `Nexa Moments` como familia de momentos agenticos percibidos en producto:
+  - AI Moment = categoria general,
+  - Conversational Moment = interaccion de pregunta/respuesta/follow-up,
+  - Nexa Moment = manifestacion con identidad Nexa, contexto Greenhouse, trust cue y posible accion.
+- Fijar reglas de percepcion:
+  - el dominio se entiende por contexto, no por crear un chat separado,
+  - la respuesta o recomendacion va primero,
+  - la prueba/provenance acompaña bajo demanda,
+  - las acciones aparecen solo cuando hay capability o contrato programatico,
+  - las limitaciones son visibles y sobrias.
+
+### Slice 1 — Canonical embedded answer surface
+
+- Mantener `NexaAnswersCanvas` como surface canonica.
+- Auditar que los primitives recientes cubren las necesidades del programa:
+  - `NexaConversationBubble`,
+  - `NexaAnswerBubble`,
+  - `NexaProvenanceTrace`,
+  - `NexaResponseToolbar`,
+  - `NexaStreamingText`.
+- Crear nuevas primitives solo si hay un gap transversal real; por defecto extender variants/kinds o fixtures.
+
+### Slice 2 — Domain synergy specimens
+
+- Crear o actualizar specimens GVC-ready para:
+  - Knowledge grounded answer,
+  - Finance/chart explanation,
+  - Agency/Account 360 signal explanation,
+  - People/Person 360 governed answer,
+  - Commercial/Bow-tie next-best-action,
+  - Delivery/ICO explanation,
+  - Client Portal self-service answer.
+- Cada specimen debe declarar `surfaceContext`, data reality, sensitivity, allowed renderers/actions y proof/trust behavior.
+- Los datos deben ser synthetic/sanitized; no payloads reales ni PII.
+
+### Slice 3 — UX copy and interaction rules
+
+- Llevar copy reutilizable a `src/lib/copy/*`.
+- Definir etiquetas para trust cue, proof disclosure, limited context, unsupported action, stale/partial data y follow-up suggestions.
+- Validar que el lenguaje aplica a colaboradores, operadores internos y clientes segun contexto/tier.
+
+### Slice 4 — GVC and review loop
+
+- Mantener `nexa-answers-surface` como scenario vivo del surface canonical.
+- Agregar scenarios o marks solo cuando un specimen sea repetible y valioso.
+- Revisar frames desktop/mobile para comprobar que la sinergia de dominio se percibe sin saturar la UI.
+
+### Slice 5 — Runtime handoff
+
+- TASK-1101 consume esta experiencia para Knowledge runtime.
+- Los rollouts reales no-Knowledge quedan como child tasks con owner por dominio.
+- Recomendacion de primer piloto: finance/chart explanation si se prioriza analitica; Account 360 signal explanation si se prioriza customer operations.
+
+## Historical Scope (superseded by rescope 2026-06-13)
 
 ### Slice 0 — Product UI contract for Nexa Answers
 
@@ -591,6 +673,15 @@ Idle
 
 ## Acceptance Criteria
 
+- [ ] TASK-1096 consume `GREENHOUSE_NEXA_CORE_AGENTIC_PLATFORM_DECISION_V1.md` y documenta `Nexa Moments` como experiencia percibida por dominio, no solo como mockup Knowledge.
+- [ ] `Blocked by` queda `none`; la task coordina con TASK-1095 por contrato core y con TASK-1101 por runtime Knowledge.
+- [ ] `NexaAnswersCanvas` queda reconocido como surface canonica de embedded answers.
+- [ ] Specimens o plan ejecutable cubren Knowledge, Finance/chart, Agency/Account 360, People/Person 360, Commercial/Bow-tie, Delivery/ICO y Client Portal.
+- [ ] Cada specimen declara `surfaceContext`, data reality, sensitivity, allowed renderers/actions, trust cue/proof behavior y degradacion honesta.
+- [ ] UX rules separan contexto local, answer/action-first, proof-on-demand, follow-up natural y capability-gated actions.
+- [ ] Copy reusable de trust/proof/unsupported/stale/limited context queda en `src/lib/copy/*` cuando se implemente.
+- [ ] GVC evidence cubre los moments/specimens que se implementen visualmente; si esta task queda solo rescope docs, no requiere captura nueva.
+- [ ] Rollouts reales no-Knowledge quedan como child tasks con owner de dominio.
 - [ ] `Nexa Answers` is documented as the embedded contextual conversational surface, distinct from Nexa Chat and AnswerTurn.
 - [ ] A canonical component/facade exists or the existing component is explicitly documented as the temporary implementation of Nexa Answers.
 - [ ] Idle state is clean: composer/invitation only, no fake answer, no proof, no trace.

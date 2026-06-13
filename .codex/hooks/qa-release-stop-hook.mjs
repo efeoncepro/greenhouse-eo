@@ -6,6 +6,7 @@ import process from 'node:process'
 
 const CLOSURE_RE = /\b(listo|lista|terminad[oa]?|hecho|cerrad[oa]?|complete|completo|done|shipped|implementad[oa]?|verificad[oa]?|validado|pas[oó]|passed|green)\b/i
 const QA_EVIDENCE_RE = /(greenhouse-qa-release-auditor|qa:gates|QA Release Audit|PASS|CONDITIONAL PASS|BLOCK|docs:closure-check|GVC|fe:capture)/i
+const ENFORCE_VALUES = new Set(['1', 'true', 'yes', 'enforce', 'block'])
 
 const RISK_PATTERNS = [
   /^AGENTS\.md$/,
@@ -94,8 +95,24 @@ function isRiskyFile(filePath) {
   return RISK_PATTERNS.some(pattern => pattern.test(filePath))
 }
 
+function isHookEnforced(payload) {
+  if (payload?.enforce_qa_stop_hook === true) {
+    return true
+  }
+
+  const mode = String(process.env.GREENHOUSE_QA_STOP_HOOK_MODE || process.env.GREENHOUSE_QA_STOP_HOOK_ENFORCE || '')
+    .trim()
+    .toLowerCase()
+
+  return ENFORCE_VALUES.has(mode)
+}
+
 function needsQaReminder(payload, changedFiles) {
   if (payload?.stop_hook_active) {
+    return false
+  }
+
+  if (!isHookEnforced(payload)) {
     return false
   }
 
@@ -154,14 +171,19 @@ async function runSelfTest() {
     stop_hook_active: false,
     cwd: process.cwd(),
   }
+  const enforcedPayload = {
+    ...riskyPayload,
+    enforce_qa_stop_hook: true,
+  }
 
   assert.equal(CLOSURE_RE.test(riskyPayload.last_assistant_message), true)
   assert.equal(QA_EVIDENCE_RE.test('Verificación: pnpm qa:gates --changed'), true)
   assert.equal(isRiskyFile('src/app/page.tsx'), true)
   assert.equal(isRiskyFile('.captures/run/frame.png'), false)
-  assert.equal(needsQaReminder(riskyPayload, ['src/app/page.tsx']), true)
-  assert.equal(needsQaReminder({ ...riskyPayload, last_assistant_message: 'Listo. Verificación: pnpm qa:gates --changed PASS.' }, ['src/app/page.tsx']), false)
-  assert.equal(needsQaReminder({ ...riskyPayload, stop_hook_active: true }, ['src/app/page.tsx']), false)
+  assert.equal(needsQaReminder(riskyPayload, ['src/app/page.tsx']), false)
+  assert.equal(needsQaReminder(enforcedPayload, ['src/app/page.tsx']), true)
+  assert.equal(needsQaReminder({ ...enforcedPayload, last_assistant_message: 'Listo. Verificación: pnpm qa:gates --changed PASS.' }, ['src/app/page.tsx']), false)
+  assert.equal(needsQaReminder({ ...enforcedPayload, stop_hook_active: true }, ['src/app/page.tsx']), false)
 }
 
 if (process.argv.includes('--self-test')) {
