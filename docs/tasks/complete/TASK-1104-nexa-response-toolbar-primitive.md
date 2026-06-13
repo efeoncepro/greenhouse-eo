@@ -4,9 +4,19 @@
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-06-13 — COMPLETADA
+
+- Primitive `NexaResponseToolbar` creada en `src/components/greenhouse/primitives/nexa-response-toolbar/` (types + controller `kind→variant` + 3 variants + 4 tests del controller, verde).
+- 3 variants: `embedded` (en-flow, hairline-top, prompt + feedback izq + copiar/compartir/regenerar der — el del canvas) / `floating` (anclada, solo-ícono, derecha) / `docked` (barra fija ancho completo, fondo paper). Kinds `responseSettle`→embedded / `chatMessage`→floating / `surfaceBar`→docked.
+- Contrato preservado: `onControl(control)` con `NexaResponseToolbarControl = copy|share|helpful|unhelpful|regenerate`, labels es-CL override-ables (poda de `undefined` → no pisa defaults), clipboard self-contained optimista, feedback colapsa a acuse.
+- **Corrección de spec**: el toolbar co-located NO tenía control "Detener" (eso vive en `NexaComposerActionButton` variant `stop`, en el composer — no en el settle-toolbar). No se agregó un control fantasma; la migración es byte-idéntica.
+- Migración canvas: `NexaAnswersCanvas` consume `<NexaResponseToolbar variant='embedded' …>`; se borró el componente co-located (157 líneas) + `RESPONSE_TOOLBAR_DEFAULTS`. **GVC `nexa-answers-surface` byte-idéntico** (0 findings nuevos; frames `nexa-response-toolbar` + `…-feedback-ack` idénticos al golden).
+- Lab `/design-system/nexa-response-toolbar` + page (guard `plataforma.design_system`) + route-reachability (strict, 0 orphans) + catálogo + scenario GVC `design-system-nexa-response-toolbar` (0 findings, 3 variants + acuse). Entrada en `ui-platform/PRIMITIVES.md`.
+- Cierre: `local:check` (tsc + lint) verde; barrel `index.ts` exporta componente + types + controller.
+
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P3`
 - Impact: `Medio`
 - Effort: `Medio`

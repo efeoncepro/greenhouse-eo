@@ -157,6 +157,19 @@ export {
   resolveNexaProvenanceTraceVariant
 } from './nexa-provenance-trace/nexa-provenance-trace-controller'
 export type { NexaProvenanceTraceKindConfig } from './nexa-provenance-trace/nexa-provenance-trace-controller'
+export { default as NexaResponseToolbar } from './nexa-response-toolbar/NexaResponseToolbar'
+export type {
+  NexaResponseToolbarControl,
+  NexaResponseToolbarKind,
+  NexaResponseToolbarLabels,
+  NexaResponseToolbarProps,
+  NexaResponseToolbarVariant
+} from './nexa-response-toolbar/nexa-response-toolbar-types'
+export {
+  NEXA_RESPONSE_TOOLBAR_KIND_CONFIG,
+  resolveNexaResponseToolbarVariant
+} from './nexa-response-toolbar/nexa-response-toolbar-controller'
+export type { NexaResponseToolbarKindConfig } from './nexa-response-toolbar/nexa-response-toolbar-controller'
 export { default as NexaKnowledgeAnswerSurface } from './NexaKnowledgeAnswerSurface'
 export type {
   NexaKnowledgeAnswerModeOption,

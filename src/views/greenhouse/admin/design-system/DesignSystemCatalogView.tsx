@@ -154,6 +154,19 @@ const CATALOG_ITEMS: CatalogItem[] = [
     icon: 'tabler-shield-check'
   },
   {
+    id: 'nexa-response-toolbar',
+    title: 'Nexa response toolbar',
+    description: 'Chrome de confianza de una respuesta de Nexa: feedback ¿útil? + copiar/compartir/regenerar. Variants embedded/floating/docked. Transversal por dominio.',
+    route: '/design-system/nexa-response-toolbar',
+    category: 'Primitives',
+    kind: 'Primitive',
+    status: 'Hardening',
+    owner: 'NexaResponseToolbar',
+    tags: ['nexa', 'feedback', 'copiar', 'compartir', 'regenerar', 'toolbar', 'AI overview'],
+    searchAliases: ['toolbar', 'feedback', 'util', 'copiar', 'compartir', 'regenerar', 'nexa response toolbar', 'acciones de respuesta'],
+    icon: 'tabler-thumb-up'
+  },
+  {
     id: 'buttons',
     title: 'Buttons',
     description: 'Primitive para jerarquía de comandos, tono, iconos y estados async.',

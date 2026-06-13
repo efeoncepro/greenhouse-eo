@@ -265,6 +265,13 @@ export const DECLARED_CHILD_ROUTES: readonly ChildRouteDeclaration[] = [
       'Nexa Provenance Trace Lab (TASK-1103) — child surface del Design System para la primitive NexaProvenanceTrace (grounding canonico de Nexa: variants inline/expandable/panel + kinds knowledgeGrounded/signalPromoted/computed), alcanzable desde el catalogo canonico /design-system.'
   },
   {
+    route: '/design-system/nexa-response-toolbar',
+    parent: '/design-system',
+    via: 'inline-link',
+    reason:
+      'Nexa Response Toolbar Lab (TASK-1104) — child surface del Design System para la primitive NexaResponseToolbar (chrome de confianza canonico de una respuesta de Nexa: variants embedded/floating/docked + kinds responseSettle/chatMessage/surfaceBar), alcanzable desde el catalogo canonico /design-system.'
+  },
+  {
     route: '/design-system/geometry',
     parent: '/design-system',
     via: 'inline-link',

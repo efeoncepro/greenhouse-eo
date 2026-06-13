@@ -93,8 +93,8 @@ export const scenario: CaptureScenario = {
     },
     {
       kind: 'mark',
-      label: 'nexa-answers-response-toolbar',
-      clipSelector: '[data-capture="nexa-answers-response-toolbar"]',
+      label: 'nexa-response-toolbar',
+      clipSelector: '[data-capture="nexa-response-toolbar"]',
       note: 'Fase settle: response toolbar — feedback ¿útil? + copiar/compartir/regenerar (chrome de confianza estilo AI Overview, distinto de las acciones de dominio).'
     },
     {
@@ -117,12 +117,12 @@ export const scenario: CaptureScenario = {
         // un segundo pase de teclado que apuntaría a un botón ya inexistente — más riguroso, sin warning.
         name: 'vote-response-helpful',
         intent: 'Votar "Sí, me sirvió" por teclado (focus + Enter) colapsa el feedback a un acuse, como en AI Overview.',
-        action: { kind: 'press', selector: '[data-capture="nexa-answers-response-helpful"]', key: 'Enter' },
+        action: { kind: 'press', selector: '[data-capture="nexa-response-toolbar-helpful"]', key: 'Enter' },
         frames: [
           {
-            label: 'nexa-answers-response-feedback-ack',
+            label: 'nexa-response-toolbar-feedback-ack',
             atMs: 300,
-            clipSelector: '[data-capture="nexa-answers-response-toolbar"]',
+            clipSelector: '[data-capture="nexa-response-toolbar"]',
             note: 'Tras votar: el cluster de feedback colapsa a "¡Gracias por tu feedback!".'
           }
         ]

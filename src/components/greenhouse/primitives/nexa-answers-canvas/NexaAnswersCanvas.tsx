@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { useState, type ReactNode } from 'react'
 
 import Box from '@mui/material/Box'
 import Collapse from '@mui/material/Collapse'
@@ -14,6 +14,7 @@ import { Motion } from '@/components/greenhouse/motion'
 import NexaComposer, { NexaComposerActionButton, NexaComposerInput } from '../NexaComposer'
 import NexaEvidencePanel from '../NexaEvidencePanel'
 import NexaProvenanceTrace from '../nexa-provenance-trace/NexaProvenanceTrace'
+import NexaResponseToolbar from '../nexa-response-toolbar/NexaResponseToolbar'
 import GreenhouseButton from '../GreenhouseButton'
 import GreenhouseStatusDot from '../GreenhouseStatusDot'
 import GreenhouseThinkingBeat from '../GreenhouseThinkingBeat'
@@ -32,7 +33,6 @@ import type {
   NexaAnswersCanvasState,
   NexaAnswersCompactAnswerBlock,
   NexaAnswersRenderPlan,
-  NexaAnswersResponseControl,
   NexaAnswersSuggestedFollowUp
 } from './nexa-answers-canvas-types'
 
@@ -382,164 +382,6 @@ const SuggestedFollowUps = ({
   </Stack>
 )
 
-const RESPONSE_TOOLBAR_DEFAULTS = {
-  helpfulPrompt: '¿Te sirvió esta respuesta?',
-  helpfulYesLabel: 'Sí, me sirvió',
-  helpfulNoLabel: 'No me sirvió',
-  helpfulThanksLabel: '¡Gracias por tu feedback!',
-  copyLabel: 'Copiar',
-  copiedLabel: 'Copiado',
-  shareLabel: 'Compartir',
-  regenerateLabel: 'Regenerar'
-} as const
-
-/**
- * Response toolbar — fase "settle" del despliegue (estilo AI Overview): chrome meta de confianza
- * que asienta DESPUÉS de la respuesta. Feedback ¿útil? (colapsa a acuse tras votar, como AI Overview)
- * + copiar (clipboard self-contained, estado optimista) / compartir / regenerar. Opt-in vía
- * onResponseControl; labels con defaults es-CL. reduced-motion horneado en GreenhouseButton.
- */
-const NexaResponseToolbar = ({
-  copy,
-  plainText,
-  onControl
-}: {
-  copy: NexaAnswersCanvasProps['copy']
-  plainText: string
-  onControl: (control: NexaAnswersResponseControl) => void
-}) => {
-  const [feedback, setFeedback] = useState<'helpful' | 'unhelpful' | null>(null)
-  const [copied, setCopied] = useState(false)
-  const copiedTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
-
-  useEffect(
-    () => () => {
-      if (copiedTimer.current) clearTimeout(copiedTimer.current)
-    },
-    []
-  )
-
-  const labels = {
-    helpfulPrompt: copy.helpfulPrompt ?? RESPONSE_TOOLBAR_DEFAULTS.helpfulPrompt,
-    helpfulYesLabel: copy.helpfulYesLabel ?? RESPONSE_TOOLBAR_DEFAULTS.helpfulYesLabel,
-    helpfulNoLabel: copy.helpfulNoLabel ?? RESPONSE_TOOLBAR_DEFAULTS.helpfulNoLabel,
-    helpfulThanksLabel: copy.helpfulThanksLabel ?? RESPONSE_TOOLBAR_DEFAULTS.helpfulThanksLabel,
-    copyLabel: copy.copyLabel ?? RESPONSE_TOOLBAR_DEFAULTS.copyLabel,
-    copiedLabel: copy.copiedLabel ?? RESPONSE_TOOLBAR_DEFAULTS.copiedLabel,
-    shareLabel: copy.shareLabel ?? RESPONSE_TOOLBAR_DEFAULTS.shareLabel,
-    regenerateLabel: copy.regenerateLabel ?? RESPONSE_TOOLBAR_DEFAULTS.regenerateLabel
-  }
-
-  const handleCopy = () => {
-    // Optimista (state-design): en headless/GVC el clipboard puede estar restringido; mostramos
-    // "Copiado" igual y emitimos el control. El write real va best-effort.
-    void navigator.clipboard?.writeText?.(plainText).catch(() => undefined)
-    setCopied(true)
-    if (copiedTimer.current) clearTimeout(copiedTimer.current)
-    copiedTimer.current = setTimeout(() => setCopied(false), 1800)
-    onControl('copy')
-  }
-
-  const handleFeedback = (value: 'helpful' | 'unhelpful') => {
-    setFeedback(value)
-    onControl(value)
-  }
-
-  return (
-    <Stack
-      direction='row'
-      data-capture='nexa-answers-response-toolbar'
-      flexWrap='wrap'
-      useFlexGap
-      sx={theme => ({
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        gap: theme.spacing(1.5),
-        pt: 2,
-        borderTop: `1px solid ${theme.palette.divider}`
-      })}
-    >
-      {feedback ? (
-        <Stack direction='row' spacing={0.75} alignItems='center' data-capture='nexa-answers-response-feedback-ack'>
-          <Box
-            component='i'
-            className='tabler-circle-check'
-            aria-hidden
-            sx={theme => ({ fontSize: 18, color: theme.greenhouseSemantic.success.tonalText })}
-          />
-          <Typography variant='caption' sx={theme => ({ color: theme.greenhouseSemantic.success.tonalText, fontWeight: 600 })}>
-            {labels.helpfulThanksLabel}
-          </Typography>
-        </Stack>
-      ) : (
-        <Stack direction='row' spacing={0.5} alignItems='center' flexWrap='wrap' useFlexGap data-capture='nexa-answers-response-feedback'>
-          <Typography variant='caption' color='text.secondary' sx={{ mr: 0.5 }}>
-            {labels.helpfulPrompt}
-          </Typography>
-          <GreenhouseButton
-            variant='text'
-            tone='secondary'
-            size='small'
-            leadingIconClassName='tabler-thumb-up'
-            aria-label={labels.helpfulYesLabel}
-            dataCapture='nexa-answers-response-helpful'
-            onClick={() => handleFeedback('helpful')}
-          >
-            {labels.helpfulYesLabel}
-          </GreenhouseButton>
-          <GreenhouseButton
-            variant='text'
-            tone='secondary'
-            size='small'
-            leadingIconClassName='tabler-thumb-down'
-            aria-label={labels.helpfulNoLabel}
-            dataCapture='nexa-answers-response-unhelpful'
-            onClick={() => handleFeedback('unhelpful')}
-          >
-            {labels.helpfulNoLabel}
-          </GreenhouseButton>
-        </Stack>
-      )}
-
-      <Stack direction='row' spacing={0.25} alignItems='center' flexWrap='wrap' useFlexGap>
-        <GreenhouseButton
-          variant='text'
-          tone='secondary'
-          size='small'
-          leadingIconClassName={copied ? 'tabler-check' : 'tabler-copy'}
-          aria-label={copied ? labels.copiedLabel : labels.copyLabel}
-          dataCapture='nexa-answers-response-copy'
-          onClick={handleCopy}
-        >
-          {copied ? labels.copiedLabel : labels.copyLabel}
-        </GreenhouseButton>
-        <GreenhouseButton
-          variant='text'
-          tone='secondary'
-          size='small'
-          leadingIconClassName='tabler-share-3'
-          aria-label={labels.shareLabel}
-          dataCapture='nexa-answers-response-share'
-          onClick={() => onControl('share')}
-        >
-          {labels.shareLabel}
-        </GreenhouseButton>
-        <GreenhouseButton
-          variant='text'
-          tone='secondary'
-          size='small'
-          leadingIconClassName='tabler-refresh'
-          aria-label={labels.regenerateLabel}
-          dataCapture='nexa-answers-response-regenerate'
-          onClick={() => onControl('regenerate')}
-        >
-          {labels.regenerateLabel}
-        </GreenhouseButton>
-      </Stack>
-    </Stack>
-  )
-}
-
 const renderPreviousTurn = (turn: NexaAnswersCompactAnswerBlock, renderPlan: NexaAnswersRenderPlan, proofPanelId: string) =>
   renderNexaAnswersBlock(turn, {
     proofOpen: false,
@@ -672,7 +514,21 @@ const NexaAnswersCanvas = ({
                       })
                     : null)}
                 {onResponseControl ? (
-                  <NexaResponseToolbar copy={copy} plainText={answerPlainText} onControl={onResponseControl} />
+                  <NexaResponseToolbar
+                    variant='embedded'
+                    plainText={answerPlainText}
+                    onControl={onResponseControl}
+                    labels={{
+                      helpfulPrompt: copy.helpfulPrompt,
+                      helpfulYesLabel: copy.helpfulYesLabel,
+                      helpfulNoLabel: copy.helpfulNoLabel,
+                      helpfulThanksLabel: copy.helpfulThanksLabel,
+                      copyLabel: copy.copyLabel,
+                      copiedLabel: copy.copiedLabel,
+                      shareLabel: copy.shareLabel,
+                      regenerateLabel: copy.regenerateLabel
+                    }}
+                  />
                 ) : null}
                 <CanvasProof id={proofId} open={isProofOpen} renderPlan={renderPlan} slot={slots?.proof} />
                 {onSuggestedFollowUp && suggestedFollowUps && suggestedFollowUps.length > 0 ? (
