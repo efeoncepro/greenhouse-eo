@@ -117,6 +117,36 @@ S1 es un cambio a una **superficie viva** (`KnowledgeCenterView`, 1368 líneas) 
 - **Archivos owned:** `KnowledgeNexaCompositionLens.tsx`, el bloque de la lente Humano en `KnowledgeCenterView.tsx`, el scenario GVC runtime, y (Slice 3) la nueva page DS.
 - **Joint con Codex:** Moment Fabric (TASK-1095/1096).
 
+## Delta 2026-06-13 — Slice 1 + Slice 2 SHIPPED (local-first, gated, GVC-verificado)
+
+**Decisiones cerradas con el operador esta sesión:**
+
+- **Kill-switch = rollout-flag DB (TASK-780), ON por defecto.** flag_key `knowledge_composition_lens`, seed global `enabled=TRUE`. Revertible sin code-deploy (flip de la fila DB → lente Humano legacy). "ON el interruptor" confirmado por el operador.
+- **Ask = el composer del consumer es el único ask** (Opción A). La command-surface de búsqueda queda solo para MCP (o humano-legacy con el kill-switch OFF). `browse/navegar = host`, `preguntar = compose`. No se duplica el ask bar.
+
+**Slice 1 (`098908cff`) — wiring + kill-switch + a11y:**
+
+- Migración `20260613210340667` — extiende CHECK `home_rollout_flags_key_check` + seed global ON + DO guard. Aplicada y verificada contra PG real.
+- `HomeRolloutFlagKey` extendido (`rollout-flags.ts` + `rollout-flags-store.ts` + `VALID_FLAG_KEYS`) + env fallback `KNOWLEDGE_COMPOSITION_LENS_ENABLED` (resiliencia PG-down).
+- `page.tsx` resuelve `compositionLensEnabled` (degradación honesta: PG caído → disabled → legacy).
+- `KnowledgeCenterView` — IIFE en la rama `activeMode==='human'`: el workbench 3-col REAL es el `host` de `KnowledgeNexaCompositionLens`; `data-nexa-anchor={documentId}` en `ResultRow`; `showCommandSurface` (solo MCP/legacy); `handleContinueInNexa` (bridge overview→takeover).
+- Focus routing a11y horneado en `NexaMomentComposition`: tras el morph `dormant→composed` el foco va a la región del Momento (solo en la transición de entrada).
+
+**Slice 2 (`02e31275d`) — GVC runtime:**
+
+- `knowledge-composition.scenario.ts` (dormant→ask→thinking/reasoning→composed, desktop+mobile).
+- Fix non-regresión `knowledge-lenses.scenario.ts` (assertion humano-default → `knowledge-nexa-composition-lens`).
+- **Capturado local con corpus REAL** (`.captures/2026-06-13T21-15-34_knowledge-composition`): composed muestra la respuesta Nexa liderando con citas reales (Motor ICO, Glosario ICO, Pulse/Greenhouse/Nexa) + "Fuentes ancladas" + bridge "Seguir con Nexa", y el workbench host persiste condensado abajo. Responsive OK. **Frame mirado.** Todas las assertions `passed`; warnings = `layout_text_clipped` pre-existentes (noWrap ellipsis en learning paths, no introducido por esta task, warning-first).
+
+**Gate local:** tsc 0 · eslint 0 (mis archivos; el único fallo de `pnpm lint` es el orphan `scripts/check-codex-task-harness.mjs`, ajeno) · tests focales 33/33 (`src/lib/home` + `nexa-moment-composition`) · `pnpm build` exit 0.
+
+**Pendiente:**
+
+- **Slice 3** (DS showcase page "Nexa Answers Experience" — mover `/knowledge/mockup/nexa-answers` → `/design-system/nexa-answers-experience` + registry + reachability + PRIMITIVES + scenario): no iniciado (es "al final", showcase-curación + su propio loop GVC — conviene dirección del operador sobre alcance).
+- **Slice 4** (Moment Fabric eligibility + next-step gobernado + señales `nexa.moment.*`): joint con Codex (TASK-1095/1096), no es scope solo.
+- **Doc closure bloqueado por orphan WIP:** `Handoff.md`, `changelog.md`, `CLAUDE.md`, `AGENTS.md`, `project_context.md` están modificados (uncommitted) por el workstream Codex-harness en el checkout compartido → NO se pueden editar sin entangle. Pendiente de coordinación / que el orphan aterrice.
+- **GVC staging** (opcional): el local ya mostró composición con datos reales; un frame en staging confirmaría en el deployment activo tras push.
+
 ## Verificación de cierre
 
 - `pnpm local:check` (lint + tsc) + `pnpm build` (Turbopack — el consumer es 'use client' importando primitives; el page es server).
