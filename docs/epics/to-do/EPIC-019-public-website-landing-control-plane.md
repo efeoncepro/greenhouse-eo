@@ -1,0 +1,101 @@
+# EPIC-019 — Public Website Landing Control Plane
+
+## Status
+
+- Lifecycle: `to-do`
+- Priority: `P1`
+- Impact: `Muy alto`
+- Effort: `Alto`
+- Status real: `Arquitectura propuesta`
+- Rank: `TBD`
+- Domain: `platform|commercial|marketing-ops|integrations|cross-domain`
+- Owner: `unassigned`
+- Branch: `epic/EPIC-019-public-website-landing-control-plane`
+- GitHub Issue: `none`
+
+## Summary
+
+Programa cross-domain para que Greenhouse gobierne el sitio publico de Efeonce como una superficie operacional: inventario WordPress/Kinsta, plantillas de landing pages, aprobacion, preview, publicacion a WordPress, limpieza de cache Kinsta, auditoria, drift detection y atribucion comercial con HubSpot.
+
+La meta no es reemplazar WordPress en V1. La meta es que Greenhouse sea el **control plane** de las landing pages que crea, mientras WordPress sigue sirviendo `efeoncepro.com` y Kinsta sigue operando el hosting. El bridge WordPress debe ser **Abilities-first** cuando la version runtime lo permita, para alinearse con la direccion oficial de WordPress hacia agentes/MCP.
+
+## Why This Epic Exists
+
+El sitio publico de Efeonce es una superficie comercial, pero hoy vive fuera del loop operativo de Greenhouse. Eso crea drift entre campanas, CTAs, HubSpot, SEO/AEO, landing pages y aprendizaje comercial.
+
+La capacidad pedida por el operador es desplegar landing pages desde Greenhouse a WordPress. Eso requiere mas que una llamada a `/wp/v2/pages`: necesita source of truth, ownership, revisionado, aprobacion, permisos, secretos, audit logs, preflight, cache, rollback, drift detection, attribution y observabilidad.
+
+Sin un epic, el trabajo tenderia a partir con un script o endpoint aislado que publica HTML en WordPress. Ese camino es rapido, pero no construye una capacidad durable de Greenhouse ni respeta el contrato de full API parity.
+
+## Outcome
+
+- Greenhouse sincroniza inventario y salud de `efeoncepro.com` desde WordPress/Kinsta en modo read-only.
+- Greenhouse define un landing manifest versionado y un registry de templates gobernadas.
+- Greenhouse puede crear una landing como draft en WordPress, con metadata de ownership y preview verificable.
+- Greenhouse puede aprobar y publicar una landing a produccion con audit log, Kinsta cache clear y smoke verification.
+- Greenhouse detecta drift cuando una landing Greenhouse-owned cambia directo en WordPress.
+- Cada landing puede vincularse a HubSpot/campana/CTA/servicio/buyer persona para futura atribucion revenue.
+
+## Architecture Alignment
+
+- `docs/architecture/GREENHOUSE_PUBLIC_WEBSITE_LANDING_CONTROL_PLANE_DECISION_V1.md`
+- `docs/architecture/GREENHOUSE_PUBLIC_WEBSITE_LANDING_CONTROL_PLANE_ARCHITECTURE_V1.md`
+- `docs/architecture/GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md`
+- `docs/architecture/GREENHOUSE_FULL_API_PARITY_DECISION_V1.md`
+- `docs/architecture/GREENHOUSE_ECOSYSTEM_ACCESS_CONTROL_PLANE_V1.md`
+- `docs/architecture/GREENHOUSE_SISTER_PLATFORMS_INTEGRATION_CONTRACT_V1.md`
+- `docs/architecture/GREENHOUSE_WEBHOOKS_ARCHITECTURE_V1.md`
+- `docs/context/03_ecosistema-producto.md`
+- `docs/context/04_greenhouse-producto.md`
+- `docs/context/08_estrategia-comercial.md`
+- `docs/context/11_hubspot-bowtie.md`
+
+## Child Tasks
+
+| Task | Phase | Status | Purpose |
+| --- | --- | --- | --- |
+| `TASK-TBD` | `0` | `planned` | WordPress/Kinsta discovery + read-only inventory: inspect theme/builder/plugins, create server-side connectors, sync pages/posts/templates/plugins/backups/cache status without writes. |
+| `TASK-TBD` | `1` | `planned` | WordPress bridge plugin foundation: private namespace, Abilities API registrations, auth/signature verification, health endpoint, metadata contract and draft-only write path in safe target. |
+| `TASK-TBD` | `2` | `planned` | Landing manifest + template registry: canonical schema, revision model, SEO/CTA/HubSpot metadata, validation and audit records. |
+| `TASK-TBD` | `3` | `planned` | Greenhouse Landing Ops UI V1: internal surface for inventory, draft creation, review, preview status and operational states. |
+| `TASK-TBD` | `4` | `planned` | Publish pipeline: approval gate, WordPress publish, Kinsta cache clear, smoke verification, rollback baseline and drift detection. |
+| `TASK-TBD` | `5` | `planned` | Attribution and reporting: HubSpot campaign/form/meeting linkage, landing performance snapshot and Pulse/Account 360 hooks. |
+| `TASK-TBD` | `6` | `planned` | Nexa advisory layer: draft copy/SEO suggestions and opportunity detection after deterministic publishing is stable. |
+
+## Existing Related Work
+
+- Official WordPress Agent Skills vendored locally for both Codex and Claude in `.codex/skills/{wordpress-router,wp-*}` and `.claude/skills/{wordpress-router,wp-*}`.
+- `docs/architecture/GREENHOUSE_ECOSYSTEM_ACCESS_CONTROL_PLANE_V1.md` already includes `public_website.*` as an ecosystem access target.
+- `docs/architecture/GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md` governs app/ecosystem lanes and full API parity.
+- `docs/context/08_estrategia-comercial.md` names Greenhouse, Verk and Kortex as commercial differentiators and makes product adoption a GTM dependency.
+- `docs/context/11_hubspot-bowtie.md` governs HubSpot company/deal lifecycle and commercial motion properties.
+- `docs/context/03_ecosistema-producto.md` defines Greenhouse as the hub where ecosystem signals converge.
+
+## Exit Criteria
+
+- [ ] ADR accepted or explicitly recalibrated before write-path tasks ship beyond draft-only.
+- [ ] WordPress/Kinsta inventory visible in Greenhouse with no production writes.
+- [ ] Bridge plugin contract implemented with secrets, auth, Abilities API registrations where available, health check and least-privilege credentials.
+- [ ] Landing manifest/revision/deployment/audit model exists and is documented.
+- [ ] At least one governed landing template can publish to WordPress as draft and preview from Greenhouse.
+- [ ] Production publish requires approval, writes audit log, clears Kinsta cache and records smoke verification.
+- [ ] Drift detection flags out-of-band WordPress edits on Greenhouse-owned landings.
+- [ ] HubSpot attribution metadata is attached to each Greenhouse-owned landing.
+- [ ] No direct WordPress/Kinsta credentials in frontend code or docs.
+- [ ] Destructive Kinsta actions remain out of scope unless a future ADR/task explicitly adds them.
+
+## Non-goals
+
+- Replacing WordPress or migrating `efeoncepro.com` off Kinsta.
+- Building a full freeform page builder in Greenhouse.
+- Allowing clients to create public landing pages.
+- Publishing arbitrary HTML/scripts from Greenhouse.
+- Letting Nexa publish autonomously.
+- Making WordPress the source of truth for Greenhouse-owned landing pages.
+- Automating destructive hosting operations such as site reset, production restore or staging-to-live push in V1.
+
+## Delta 2026-06-13
+
+Epic created from operator request: "capacidad tambien de desplegar landing pages desde Greenhouse a Wordpress". Initial architecture and ADR are proposed, not implemented.
+
+Official WordPress Agent Skills from `WordPress/agent-skills` were vendored into both `.codex/skills` and `.claude/skills`; future WordPress bridge tasks must load the relevant `wp-*` skills before implementation.

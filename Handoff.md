@@ -1,5 +1,13 @@
 # Release 2026-06-10 #2 — develop→main `6c649b2a6` RELEASED
 
+## Sesion 2026-06-13 — Public Website Landing Control Plane docs + EPIC-019 creado (Codex)
+
+- **Qué quedó:** arquitectura propuesta para que Greenhouse despliegue landing pages al sitio publico Efeonce (`efeoncepro.com`) manteniendo WordPress como runtime publico y Kinsta como hosting provider. Docs: `docs/architecture/GREENHOUSE_PUBLIC_WEBSITE_LANDING_CONTROL_PLANE_DECISION_V1.md` (ADR `Proposed`) + `docs/architecture/GREENHOUSE_PUBLIC_WEBSITE_LANDING_CONTROL_PLANE_ARCHITECTURE_V1.md`.
+- **Epic nuevo:** `docs/epics/to-do/EPIC-019-public-website-landing-control-plane.md`, registrado en `EPIC_ID_REGISTRY.md` y `docs/epics/README.md`. Siguiente ID disponible: `EPIC-020`.
+- **Contrato recomendado:** Greenhouse-owned landing manifests/versiones/aprobaciones/deployments/drift viven en Greenhouse; WordPress publica/sirve la pagina; Kinsta limpia cache y reporta estado/backups; HubSpot conserva campanas/forms/meetings/deals. V1 debe partir read-only/draft-only antes de publicar en produccion. Update Abilities-first: el bridge WordPress debe registrar abilities (`wp_register_ability`) con schema/permisos/audit cuando el runtime lo soporte, manteniendo REST como transport/compat y degradando honestamente si WordPress no soporta Abilities API.
+- **Skills WordPress oficiales:** se vendorearon las 17 skills oficiales de `https://github.com/WordPress/agent-skills` (HEAD `aa735ea7111c7924ee988306bcef70439e17dec9`) en `.codex/skills/` y `.claude/skills/`: `blueprint`, `wordpress-router`, `wp-abilities-api`, `wp-abilities-audit`, `wp-abilities-verify`, `wp-block-development`, `wp-block-themes`, `wp-interactivity-api`, `wp-performance`, `wp-phpstan`, `wp-playground`, `wp-plugin-development`, `wp-plugin-directory-guidelines`, `wp-project-triage`, `wp-rest-api`, `wp-wpcli-and-ops`, `wpds`.
+- **No runtime:** no se crearon credenciales, plugin, endpoints, migrations ni UI. Proximo paso seguro: task hija de discovery WordPress/Kinsta read-only para inspeccionar theme/builder/plugins/SEO/forms/staging y confirmar el render target antes de aceptar el ADR o escribir bridge.
+
 ## Sesion 2026-06-13 — TASK-1110 composición Nexa in-place /knowledge — Slice 1 entregado MAL, en realineación (Claude)
 
 - **Qué se pusheó (develop):** Slice 1 (`098908cff`) wiring composición in-place en la lente Humano + kill-switch rollout-flag DB `knowledge_composition_lens` **ON por defecto** (migración `20260613210340667`, revertible sin deploy) + focus-routing a11y en `NexaMomentComposition`. Slice 2 (`02e31275d`) GVC scenario `knowledge-composition` + fix non-regresión `knowledge-lenses`. Gate local verde (tsc 0 · lint 0 · build 0 · tests focales 33/33).
