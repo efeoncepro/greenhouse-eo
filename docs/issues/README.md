@@ -80,7 +80,7 @@ Tasks, docs de arquitectura, o commits relacionados.
 | `ISSUE-067` | [Vitest jsdom warning por Lottie en `ServicesListView` empty state](open/ISSUE-067-jsdom-canvas-warning-lottie-empty-state-fetch-mock.md) | local test suite + CI logs | 2026-05-07 | open |
 | `ISSUE-081` | ["Días de retraso" no congela tiempo no imputable (freeze roto: `frozenDays`=0) → penaliza OTD% y bonus](open/ISSUE-081-dias-retraso-freeze-roto-frozendays-cero-penaliza-otd-bonus.md) | production (Efeonce) | 2026-05-23 | open |
 | `ISSUE-087` | [Account 360 delivery facet falla por drift de columnas RpA en serving cache](open/ISSUE-087-account-360-delivery-rpa-median-schema-drift.md) | preview | 2026-06-12 | open |
-| `ISSUE-093` | [Builds de staging fallan por timeout (45m) colgados en la subida de source-maps a Sentry (`runAfterProductionCompile`)](open/ISSUE-093-vercel-build-timeout-sentry-sourcemap-upload-hang.md) | staging | 2026-06-13 | open (compila OK; hang flaky del upload externo a Sentry, no del código) |
+| `ISSUE-093` | [Builds de staging fallan por timeout (45m) colgados en la subida de source-maps a Sentry (`runAfterProductionCompile`)](open/ISSUE-093-vercel-build-timeout-sentry-sourcemap-upload-hang.md) | staging | 2026-06-13 | code complete local / rollout pendiente (guardrail timeout 60s para `sentry-cli` source-map upload) |
 
 ## Resolved
 

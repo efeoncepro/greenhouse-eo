@@ -1,5 +1,12 @@
 # Release 2026-06-10 #2 — develop→main `6c649b2a6` RELEASED
 
+## Sesion 2026-06-13 — ISSUE-093 Vercel/Sentry source-map upload timeout guard (Codex)
+
+- **Problema vivo confirmado:** Vercel staging reportó `greenhouse-bu3i14eap` (`develop`, commit `310ae87`) en `Error` tras 46m. Logs: Next compiló OK en 2.6m y quedó en `Running next.config.js provided runAfterProductionCompile ...`. Deployment vecino `greenhouse-456owabqd` (`606e07c`) completó ese mismo hook en 14.151s y terminó `Ready` en 7m. Causa = hang flaky de upload source maps Sentry, no build roto de producto.
+- **Fix code complete local:** `next.config.ts` ahora captura el hook `runAfterProductionCompile` generado por `withSentryConfig` y lo corre vía `runSentrySourcemapUploadWithTimeout()` (`src/lib/build/sentry-sourcemap-upload-timeout.ts`). Default 60s; env override `SENTRY_SOURCEMAP_UPLOAD_TIMEOUT_MS` clamp 5s-240s. Vercel `staging` quedó configurado con override `30000` ms. Mientras corre el hook, el helper intercepta subprocess `sentry-cli` y los termina con `SIGTERM` si exceden presupuesto. Si Sentry responde, source maps se suben como antes; si falla/cuelga, warning `[sentry-build] ... Continuing deployment.`
+- **Verificación local:** Vitest focal 4/4, ESLint focal y `tsc --noEmit` verdes. `pnpm build` reprodujo el hang de Sentry y el wrapper degradó en `60046ms`; después el build siguió a TypeScript y falló por OOM local 4GB, distinto al incidente Vercel. Reintento con `NODE_OPTIONS=--max-old-space-size=8192 SENTRY_SOURCEMAP_UPLOAD_TIMEOUT_MS=5000 pnpm build` pasó completo; el hook degradó en `5028ms` y Next terminó exit 0.
+- **Estado:** `code complete local / rollout pendiente`. No se hizo push a `develop`. Para cerrar `ISSUE-093`, empujar el cambio y verificar un deployment staging: si Sentry se cuelga, debe terminar `Ready` con warning antes del presupuesto, nunca `Error` a los 45m. Luego mover issue a `resolved/` y actualizar tracker.
+
 ## Sesion 2026-06-13 — ADR Nexa core agentic platform + Moment Fabric (Codex)
 
 - **Qué quedó:** nueva decisión aceptada de dirección `docs/architecture/GREENHOUSE_NEXA_CORE_AGENTIC_PLATFORM_DECISION_V1.md`: Nexa vive en el core de Greenhouse como capability agentica para colaboradores, clientes y operadores.

@@ -2,6 +2,18 @@ import type { NextConfig } from 'next'
 import createNextIntlPlugin from 'next-intl/plugin'
 import { withSentryConfig } from '@sentry/nextjs'
 
+import { runSentrySourcemapUploadWithTimeout } from './src/lib/build/sentry-sourcemap-upload-timeout'
+
+type ProductionCompileContext = {
+  distDir: string
+}
+
+type NextConfigWithProductionCompileHook = NextConfig & {
+  compiler?: {
+    runAfterProductionCompile?: (context: ProductionCompileContext) => Promise<void> | void
+  }
+}
+
 const sourcemapsReady =
   Boolean(process.env.SENTRY_AUTH_TOKEN?.trim()) &&
   Boolean(process.env.SENTRY_ORG?.trim()) &&
@@ -22,7 +34,7 @@ const nextConfig: NextConfig = {
 
 const withNextIntl = createNextIntlPlugin()
 
-export default withSentryConfig(withNextIntl(nextConfig), {
+const sentryNextConfig = withSentryConfig(withNextIntl(nextConfig), {
   authToken: process.env.SENTRY_AUTH_TOKEN,
   org: process.env.SENTRY_ORG,
   project: process.env.SENTRY_PROJECT,
@@ -30,5 +42,21 @@ export default withSentryConfig(withNextIntl(nextConfig), {
   telemetry: false,
   sourcemaps: {
     disable: !sourcemapsReady
+  },
+  errorHandler: err => {
+    console.warn(`[sentry-build] Source-map upload failed: ${err.message}. Continuing deployment.`)
   }
-})
+}) as NextConfigWithProductionCompileHook
+
+const runAfterProductionCompile = sentryNextConfig.compiler?.runAfterProductionCompile
+
+if (typeof runAfterProductionCompile === 'function') {
+  sentryNextConfig.compiler = {
+    ...sentryNextConfig.compiler,
+    runAfterProductionCompile: async context => {
+      await runSentrySourcemapUploadWithTimeout(() => runAfterProductionCompile(context))
+    }
+  }
+}
+
+export default sentryNextConfig
