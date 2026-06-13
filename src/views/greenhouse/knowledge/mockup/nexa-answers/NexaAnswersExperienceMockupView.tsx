@@ -23,6 +23,7 @@ import {
   type NexaAnswersCompactAnswerBlock,
   type NexaAnswersReasoningStep,
   type NexaAnswersRenderPlan,
+  type NexaAnswersResponseControl,
   type NexaAnswersSurfaceContext
 } from '@/components/greenhouse/primitives'
 import type { ConversationalEvidencePacket } from '@/lib/nexa/conversational-evidence'
@@ -339,7 +340,15 @@ const ContextStrip = () => (
   </Stack>
 )
 
-const ConversationSurface = ({ stage, reasoningStepIndex }: { stage: VisualStage; reasoningStepIndex: number }) => {
+const ConversationSurface = ({
+  stage,
+  reasoningStepIndex,
+  onResponseControl
+}: {
+  stage: VisualStage
+  reasoningStepIndex: number
+  onResponseControl: (control: NexaAnswersResponseControl) => void
+}) => {
   const [proofOpen, setProofOpen] = useState(stage === 'proof')
   const [followUpDraft, setFollowUpDraft] = useState('')
   const [submittedFollowUp, setSubmittedFollowUp] = useState<string | null>(null)
@@ -407,6 +416,7 @@ const ConversationSurface = ({ stage, reasoningStepIndex }: { stage: VisualStage
         setSubmittedFollowUp(followUp.label)
         setFollowUpDraft('')
       }}
+      onResponseControl={onResponseControl}
       copy={canvasCopy}
     />
   )
@@ -513,6 +523,12 @@ const NexaAnswersExperienceMockupView = () => {
     setStage(next)
   }
 
+  // Fase settle — response toolbar. "Regenerar" re-dispara el despliegue completo (como AI Overview);
+  // copiar/compartir/feedback dan su acuse visual en la toolbar (en runtime el host emitiría analítica).
+  const onResponseControl = (control: NexaAnswersResponseControl) => {
+    if (control === 'regenerate') playDeploy()
+  }
+
   return (
     <Stack spacing={5} data-capture='nexa-answers-visual-page'>
       <GlobalStyles styles={{ '[data-nexa-floating-trigger="true"]': { display: 'none !important' } }} />
@@ -612,7 +628,7 @@ const NexaAnswersExperienceMockupView = () => {
                 copy={canvasCopy}
               />
             ) : (
-              <ConversationSurface stage={stage} reasoningStepIndex={reasoningStepIndex} />
+              <ConversationSurface stage={stage} reasoningStepIndex={reasoningStepIndex} onResponseControl={onResponseControl} />
             )}
           </Box>
         </Box>

@@ -92,6 +92,31 @@ export const scenario: CaptureScenario = {
       }
     },
     {
+      kind: 'mark',
+      label: 'nexa-answers-response-toolbar',
+      clipSelector: '[data-capture="nexa-answers-response-toolbar"]',
+      note: 'Fase settle: response toolbar — feedback ¿útil? + copiar/compartir/regenerar (chrome de confianza estilo AI Overview, distinto de las acciones de dominio).'
+    },
+    {
+      kind: 'interaction',
+      interaction: {
+        // El voto colapsa el cluster a un acuse (el botón se reemplaza), por eso es click-only:
+        // re-presionar por teclado el mismo selector apuntaría a un botón ya inexistente. Los
+        // controles son GreenhouseButton nativos → keyboard-operables por construcción.
+        name: 'vote-response-helpful',
+        intent: 'Votar "Sí, me sirvió" colapsa el feedback a un acuse, como en AI Overview.',
+        action: { kind: 'click', selector: '[data-capture="nexa-answers-response-helpful"]' },
+        frames: [
+          {
+            label: 'nexa-answers-response-feedback-ack',
+            atMs: 300,
+            clipSelector: '[data-capture="nexa-answers-response-toolbar"]',
+            note: 'Tras votar: el cluster de feedback colapsa a "¡Gracias por tu feedback!".'
+          }
+        ]
+      }
+    },
+    {
       kind: 'interaction',
       interaction: {
         name: 'show-nexa-answers-chart-comparison',

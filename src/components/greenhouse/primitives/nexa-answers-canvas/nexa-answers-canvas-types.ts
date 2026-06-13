@@ -48,6 +48,14 @@ export type NexaAnswersCanvasState =
 
 export type NexaAnswersIntent = 'explain' | 'compare' | 'diagnose' | 'recommend' | 'summarize'
 
+/**
+ * Controles de la response toolbar (fase "settle" del despliegue, estilo AI Overview): chrome
+ * meta de confianza del asistente — distinto de las acciones de dominio (`NexaAnswersAction`).
+ * `copy` se resuelve self-contained vía clipboard; el resto se emite al host (analítica, share
+ * real, regenerar). Opt-in: la toolbar solo se monta si el consumer pasa `onResponseControl`.
+ */
+export type NexaAnswersResponseControl = 'copy' | 'share' | 'helpful' | 'unhelpful' | 'regenerate'
+
 export type NexaAnswersAutonomyTier = 'observeOnly' | 'recommendWithApproval' | 'executeWithApproval' | 'executeWithLogging'
 
 export type NexaAnswersActionRiskLevel = 'low' | 'medium' | 'high'
@@ -172,6 +180,19 @@ export interface NexaAnswersCanvasCopy {
   degradedBody: string
   errorTitle: string
   errorBody: string
+  // Response toolbar (fase settle) — opcionales: la toolbar trae defaults es-CL para no
+  // romper consumers existentes del copy. Sólo overridear cuando el tono lo requiera.
+  /** Prompt del cluster de feedback ("¿Te sirvió esta respuesta?"). */
+  helpfulPrompt?: string
+  helpfulYesLabel?: string
+  helpfulNoLabel?: string
+  /** Acuse inline tras votar ("¡Gracias por tu feedback!"). */
+  helpfulThanksLabel?: string
+  copyLabel?: string
+  /** Estado transitorio tras copiar ("Copiado"). */
+  copiedLabel?: string
+  shareLabel?: string
+  regenerateLabel?: string
 }
 
 export interface NexaAnswersCanvasSlots {
@@ -212,4 +233,10 @@ export interface NexaAnswersCanvasProps {
   copy: NexaAnswersCanvasCopy
   runtimeSlot?: ReactNode
   onAction?: (action: NexaAnswersAction) => void
+  /**
+   * Habilita la response toolbar de la fase settle (feedback ¿útil? + copiar/compartir/regenerar).
+   * Opt-in: sin este callback la toolbar no se monta. `copy` igual copia al portapapeles internamente;
+   * el control se emite acá para analítica / share real / regenerar del host.
+   */
+  onResponseControl?: (control: NexaAnswersResponseControl) => void
 }

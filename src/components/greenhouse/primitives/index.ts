@@ -208,6 +208,7 @@ export type {
   NexaAnswersRenderBlock,
   NexaAnswersRendererKind,
   NexaAnswersRenderPlan,
+  NexaAnswersResponseControl,
   NexaAnswersSuggestedFollowUp,
   NexaAnswersSurfaceContext
 } from './nexa-answers-canvas/nexa-answers-canvas-types'
