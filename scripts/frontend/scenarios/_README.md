@@ -230,7 +230,9 @@ pnpm fe:capture:promote --route=/finance/cash-out --name=mi-feature   # → scri
 pnpm fe:capture mi-feature --env=staging   # revisá selectores/marks y capturá
 ```
 
-`explore` persiste `.captures/_explore/<slug>/{session.json, aria.txt, snapshot.png}` con los candidatos + su `getByRole(...)` sugerido + uniqueness validada + markers + probes (`--probe 'role=button[name="X"]'`). `promote` cristaliza la sesión en un `.scenario.ts` válido (readiness auto + marks). **Estático:** para microinteracciones/coreografía usá el step `interaction` (abajo) o `fe:capture:micro` — promote no los auto-genera.
+`explore` persiste `.captures/_explore/<slug>/{session.json, aria.txt, snapshot.png}` con los candidatos + su `getByRole(...)` sugerido + uniqueness validada + markers + probes (`--probe 'role=button[name="X"]'`). `promote` cristaliza la sesión en un `.scenario.ts` válido (readiness auto + marks). **Revisá la readiness del scenario generado** (si ancla a un heading con copy dinámico es flaky → preferí un marker estable).
+
+**Microinteracciones/coreografía (TASK-1099):** `pnpm fe:capture:explore --route=X --interaction 'hover:<selector>'` (hover/focus/click — read-only) performa la acción y observa `before`/`feedback`/`settled`; `promote` auto-emite un step `interaction` (V2) por cada interacción observada. Ajustás `intent`/timings. También podés autorar el step `interaction` a mano (abajo) o `fe:capture:micro`.
 
 ## Reglas duras
 

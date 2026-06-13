@@ -7,7 +7,7 @@
  * determinismo de baseline). Estos helpers son puros (sin IO) para testearlos.
  */
 
-import type { ExploreSession } from './explore'
+import type { ExploreInteraction, ExploreSession } from './explore'
 import type { CaptureReadiness, CaptureScenario, CaptureScenarioStep } from './scenario'
 
 export interface PromoteOptions {
@@ -54,10 +54,41 @@ const slugifyLabel = (selector: string, index: number): string => {
   return slug ? `section-${slug}` : `section-${index + 1}`
 }
 
+const KEYBOARD_KEY: Record<ExploreInteraction['action']['kind'], string> = {
+  hover: 'Tab',
+  focus: 'Tab',
+  click: 'Enter'
+}
+
+/**
+ * Destila una microinteracción observada en un step `interaction` (V2) válido:
+ * action + frames before/feedback/settled + keyboardEquivalent + reducedMotion.
+ * El `intent` es un placeholder que el agente ajusta. TASK-1099.
+ */
+export const buildInteractionStep = (interaction: ExploreInteraction): CaptureScenarioStep => ({
+  kind: 'interaction',
+  interaction: {
+    name: interaction.name,
+    action: { kind: interaction.action.kind, selector: interaction.action.selector },
+    intent: `Verificar el feedback de ${interaction.action.kind} sobre ${interaction.action.selector}`,
+    frames:
+      interaction.frames.length > 0
+        ? interaction.frames.map(f => ({ label: f.label, atMs: f.atMs }))
+        : [
+            { label: 'before', atMs: 0 },
+            { label: 'feedback', atMs: 150 },
+            { label: 'settled', atMs: 300 }
+          ],
+    keyboardEquivalent: { action: { kind: 'press', key: KEYBOARD_KEY[interaction.action.kind] }, expected: 'focus visible' },
+    reducedMotion: 'capture'
+  }
+})
+
 /**
  * Destila una sesión de explore en un `CaptureScenario` válido:
  * readiness sugerido + `mark` inicial full-viewport + un `scroll`+`mark`
- * (clipSelector) por cada selector de detalle pedido. NUNCA mutating.
+ * (clipSelector) por cada selector de detalle pedido + un step `interaction`
+ * por cada microinteracción observada (TASK-1099). NUNCA mutating.
  */
 export const buildPromotedScenario = (session: ExploreSession, opts: PromoteOptions): CaptureScenario => {
   const readinessSelector = pickReadinessSelector(session)
@@ -83,6 +114,12 @@ export const buildPromotedScenario = (session: ExploreSession, opts: PromoteOpti
 
     steps.push({ kind: 'scroll', selector, scrollBlock: 'center' })
     steps.push({ kind: 'mark', label, clipSelector: selector })
+  }
+
+  // Microinteracciones observadas (TASK-1099) → steps `interaction`.
+  for (const interaction of session.interactions ?? []) {
+    if (!interaction.resolved) continue
+    steps.push(buildInteractionStep(interaction))
   }
 
   return {

@@ -116,7 +116,12 @@ Webwright **ejecuta Python que el modelo escribe libremente** contra el browser.
 - `pnpm fe:capture:explore --route=/x --env=staging [--ready=<sel>] [--probe='role=button[name="X"]']` — observa la página viva (read-only) y persiste `.captures/_explore/<slug>/{session.json,aria.txt,snapshot.png}`: candidatos con `getByRole(...)` sugerido + **uniqueness validada** (¿resuelve a 1 nodo?) + markers `data-capture`/`data-gvc-ready` + probes. Es el `spawn→inspect→discard` de Webwright aplicado a la autoría.
 - `pnpm fe:capture:promote --route=/x --name=<scenario> [--mark='<sel>']` — cristaliza la sesión en un `.scenario.ts` válido (readiness auto desde marker/heading único + marks). Revisás y `pnpm fe:capture <scenario>`.
 
-**Coreografía / microinteracciones:** explore/promote generan un **baseline estático** de `mark`s. Para probar feedback de una acción (hover→feedback→settled, choreografía, motion) usá el step `interaction` (V2) del DSL o `pnpm fe:capture:micro` — promote NO los auto-genera.
+⚠️ **Readiness auto puede ser flaky:** si la ruta no tiene markers `data-gvc-ready`/`data-capture`, promote ancla la readiness a un heading único — y si ese heading tiene copy dinámico (rota/cambia), la readiness falla al capturar. **Revisá la readiness del scenario generado** y preferí un marker estable.
+
+**Coreografía / microinteracciones (TASK-1099):** explore/promote SÍ cubren motion:
+- `pnpm fe:capture:explore --route=/x --interaction 'hover:<selector>'` (repetible; `hover`|`focus`|`click` — read-only, NUNCA fill/press) — performa la acción y observa `before`/`feedback`/`settled`.
+- `promote` auto-emite un step **`interaction` (V2)** por cada interacción observada (frames + keyboardEquivalent + `reducedMotion: 'capture'`); ajustás `intent`/timings.
+- También podés autorar el step `interaction` a mano o usar `pnpm fe:capture:micro`.
 
 ---
 
@@ -124,7 +129,8 @@ Webwright **ejecuta Python que el modelo escribe libremente** contra el browser.
 
 ```bash
 pnpm fe:capture:explore --route=/x --env=staging   # observá la página viva ANTES de autorar (TASK-1098)
-pnpm fe:capture:promote --route=/x --name=<scenario>  # cristaliza la sesión en un .scenario.ts válido
+pnpm fe:capture:explore --route=/x --interaction 'hover:[role="tab"]'   # observá una microinteracción (TASK-1099)
+pnpm fe:capture:promote --route=/x --name=<scenario>  # cristaliza la sesión en un .scenario.ts válido (+ interaction steps)
 pnpm fe:capture <scenario> --env=staging        # captura (lee el .aria.txt del run)
 pnpm fe:capture --route=/x --env=staging --hold=2000   # throwaway para observar antes de autorar
 pnpm fe:capture:micro <scenario> --env=staging  # microinteractions / coreografía (DSL interaction V2)

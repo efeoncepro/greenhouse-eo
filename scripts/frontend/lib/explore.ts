@@ -115,6 +115,63 @@ export interface ExploreProbeResult {
   samples: { text: string; boundingBox: { x: number; y: number; width: number; height: number } | null }[]
 }
 
+/** Acciones que explore puede *performar* para observar una microinteracción. Read-only: NUNCA fill/press (mutación). */
+export type ExploreInteractionKind = 'hover' | 'focus' | 'click'
+
+const INTERACTION_KINDS = new Set<ExploreInteractionKind>(['hover', 'focus', 'click'])
+
+/**
+ * Parsea `--interaction '<kind>:<selector>'` → `{ kind, selector }`. El primer
+ * `:` separa el kind del selector (el selector puede contener `:` como en
+ * `role=tab[name="X"]`). Puro.
+ */
+export const parseInteractionSpec = (spec: string): { kind: ExploreInteractionKind; selector: string } => {
+  const sep = spec.indexOf(':')
+
+  if (sep < 0) throw new Error(`--interaction inválido (formato '<hover|focus|click>:<selector>'): "${spec}"`)
+
+  const kind = spec.slice(0, sep).trim().toLowerCase()
+  const selector = spec.slice(sep + 1).trim()
+
+  if (!INTERACTION_KINDS.has(kind as ExploreInteractionKind)) {
+    throw new Error(`--interaction kind inválido "${kind}" (solo hover|focus|click — read-only)`)
+  }
+
+  if (!selector) throw new Error(`--interaction sin selector: "${spec}"`)
+
+  return { kind: kind as ExploreInteractionKind, selector }
+}
+
+/** Nombre kebab-case estable para una interacción (del kind + selector). */
+export const interactionName = (kind: ExploreInteractionKind, selector: string): string => {
+  const slug = selector
+    .replace(/\[data-capture="?([^"\]]+)"?\]/i, '$1')
+    .replace(/role=([a-z]+)(?:\[name="?([^"\]]+)"?\])?/i, '$1-$2')
+    .replace(/[^a-z0-9]+/gi, '-')
+    .replace(/^-+|-+$/g, '')
+    .toLowerCase()
+    .slice(0, 40)
+
+  return `${kind}-${slug || 'target'}`.replace(/-+$/g, '')
+}
+
+export interface ExploreInteractionFrameObservation {
+  /** before | feedback | settled */
+  label: string
+  /** ms relativo a la acción. */
+  atMs: number
+  screenshotPath: string
+}
+
+export interface ExploreInteraction {
+  name: string
+  action: { kind: ExploreInteractionKind; selector: string }
+  /** ¿La acción resolvió a un nodo visible? (graceful degrade si no). */
+  resolved: boolean
+  frames: ExploreInteractionFrameObservation[]
+  error?: string
+}
+
 export interface ExploreSession {
   route: string
   env: string
@@ -125,4 +182,6 @@ export interface ExploreSession {
   markers: { selector: string; count: number }[]
   candidates: ExploreCandidate[]
   probes: ExploreProbeResult[]
+  /** Microinteracciones observadas (TASK-1099). Vacío = baseline estático. */
+  interactions: ExploreInteraction[]
 }

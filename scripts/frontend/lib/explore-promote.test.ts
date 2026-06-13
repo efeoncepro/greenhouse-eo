@@ -2,12 +2,15 @@ import { describe, expect, it } from 'vitest'
 
 import {
   INTERACTIVE_ROLES,
+  interactionName,
   parseAriaSnapshot,
+  parseInteractionSpec,
   slugifyRoute,
   suggestRoleLocator,
+  type ExploreInteraction,
   type ExploreSession
 } from './explore'
-import { buildPromotedScenario, pickReadinessSelector, serializeScenario } from './promote'
+import { buildInteractionStep, buildPromotedScenario, pickReadinessSelector, serializeScenario } from './promote'
 import { validateScenario } from './scenario'
 
 const SAMPLE_ARIA = `- main:
@@ -84,6 +87,7 @@ const buildSession = (overrides: Partial<ExploreSession> = {}): ExploreSession =
   markers: [],
   candidates: parseAriaSnapshot(SAMPLE_ARIA).map(c => ({ ...c, unique: true })),
   probes: [],
+  interactions: [],
   ...overrides
 })
 
@@ -153,5 +157,69 @@ describe('buildPromotedScenario + serializeScenario', () => {
     const scenario = buildPromotedScenario(buildSession(), { name: 'BadName' })
 
     expect(() => validateScenario(scenario)).toThrow()
+  })
+})
+
+describe('parseInteractionSpec + interactionName (TASK-1099)', () => {
+  it('parsea <kind>:<selector> (selector puede tener `:`)', () => {
+    expect(parseInteractionSpec('hover:[role="tab"]')).toEqual({ kind: 'hover', selector: '[role="tab"]' })
+    expect(parseInteractionSpec('click:role=button[name="X"]')).toEqual({ kind: 'click', selector: 'role=button[name="X"]' })
+  })
+
+  it('rechaza kinds mutantes (solo hover/focus/click — read-only)', () => {
+    expect(() => parseInteractionSpec('fill:[name="x"]')).toThrow()
+    expect(() => parseInteractionSpec('press:Enter')).toThrow()
+    expect(() => parseInteractionSpec('hover')).toThrow()
+  })
+
+  it('genera nombre kebab estable', () => {
+    expect(interactionName('hover', '[data-capture="timeline"]')).toBe('hover-timeline')
+    expect(interactionName('click', 'role=tab[name="Conciliados"]')).toBe('click-tab-conciliados')
+  })
+})
+
+describe('buildInteractionStep + scenario con interacciones (TASK-1099)', () => {
+  const interaction: ExploreInteraction = {
+    name: 'hover-tab',
+    action: { kind: 'hover', selector: '[role="tab"]' },
+    resolved: true,
+    frames: [
+      { label: 'before', atMs: 0, screenshotPath: 'a.png' },
+      { label: 'feedback', atMs: 150, screenshotPath: 'b.png' },
+      { label: 'settled', atMs: 300, screenshotPath: 'c.png' }
+    ]
+  }
+
+  it('emite un step interaction válido', () => {
+    const step = buildInteractionStep(interaction)
+
+    expect(step.kind).toBe('interaction')
+    expect(step.interaction?.name).toBe('hover-tab')
+    expect(step.interaction?.action).toEqual({ kind: 'hover', selector: '[role="tab"]' })
+    expect(step.interaction?.frames.map(f => f.label)).toEqual(['before', 'feedback', 'settled'])
+    expect(step.interaction?.reducedMotion).toBe('capture')
+    expect(step.interaction?.keyboardEquivalent?.action).toEqual({ kind: 'press', key: 'Tab' })
+  })
+
+  it('click → keyboardEquivalent Enter', () => {
+    const step = buildInteractionStep({ ...interaction, action: { kind: 'click', selector: '[role="tab"]' } })
+
+    expect(step.interaction?.keyboardEquivalent?.action.key).toBe('Enter')
+  })
+
+  it('buildPromotedScenario incluye interacciones resueltas y pasa validateScenario', () => {
+    const scenario = buildPromotedScenario(buildSession({ interactions: [interaction] }), { name: 'cash-out-interactions' })
+
+    expect(() => validateScenario(scenario)).not.toThrow()
+    expect(scenario.steps.some(s => s.kind === 'interaction')).toBe(true)
+  })
+
+  it('omite interacciones no resueltas', () => {
+    const scenario = buildPromotedScenario(
+      buildSession({ interactions: [{ ...interaction, resolved: false }] }),
+      { name: 'x-no-interaction' }
+    )
+
+    expect(scenario.steps.some(s => s.kind === 'interaction')).toBe(false)
   })
 })

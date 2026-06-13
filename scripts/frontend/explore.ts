@@ -24,9 +24,12 @@ import { resolveActor } from './lib/audit'
 import { assertNotRedirectedToLogin, launchCaptureSession } from './lib/browser'
 import { isValidEnv, resolveEnvConfig, type CaptureEnv } from './lib/env'
 import {
+  interactionName,
   parseAriaSnapshot,
+  parseInteractionSpec,
   slugifyRoute,
   type ExploreCandidate,
+  type ExploreInteraction,
   type ExploreProbeResult,
   type ExploreSession
 } from './lib/explore'
@@ -51,6 +54,9 @@ Opciones:
   --env=<env>        Target. Default: staging
   --ready=<selector> Selector de readiness a esperar antes de observar
   --probe=<selector> Valida un locator Playwright (role=button[name="X"], CSS, …). Repetible.
+  --interaction=<kind>:<selector>  Observa una microinteracción (hover|focus|click — read-only):
+                     performa la acción y captura before/feedback/settled. Repetible.
+                     Ej: --interaction 'hover:[role="tab"]'  → promote emite un step interaction.
   --headed           Chromium visible para debug
   -h, --help
 
@@ -147,6 +153,57 @@ const runProbes = async (page: Page, specs: string[]): Promise<ExploreProbeResul
   return results
 }
 
+/**
+ * Observa microinteracciones (TASK-1099): por cada spec, performa la acción
+ * (read-only: hover/focus/click) y captura before → feedback → settled. NUNCA
+ * fill/press (mutación). Graceful degrade: una interacción fallida no rompe el
+ * explore.
+ */
+const observeInteractions = async (page: Page, specs: string[], sessionDir: string): Promise<ExploreInteraction[]> => {
+  const out: ExploreInteraction[] = []
+
+  for (const spec of specs) {
+    const { kind, selector } = parseInteractionSpec(spec)
+    const name = interactionName(kind, selector)
+    const frames: ExploreInteraction['frames'] = []
+
+    try {
+      const locator = page.locator(selector).first()
+
+      await locator.waitFor({ state: 'visible', timeout: 8000 })
+
+      const capture = async (label: string, atMs: number): Promise<void> => {
+        const file = `interaction-${name}-${label}.png`
+
+        await page.screenshot({ path: resolve(sessionDir, file), fullPage: false })
+        frames.push({ label, atMs, screenshotPath: file })
+      }
+
+      // before → acción → feedback (150ms) → settled (300ms)
+      await capture('before', 0)
+      if (kind === 'hover') await locator.hover({ timeout: 8000 })
+      else if (kind === 'focus') await locator.focus({ timeout: 8000 })
+      else await locator.click({ timeout: 8000 })
+      await page.waitForTimeout(150)
+      await capture('feedback', 150)
+      await page.waitForTimeout(150)
+      await capture('settled', 300)
+
+      out.push({ name, action: { kind, selector }, resolved: true, frames })
+    } catch (err) {
+      out.push({
+        name,
+        action: { kind, selector },
+        resolved: false,
+        frames,
+        error: err instanceof Error ? err.message : String(err)
+      })
+    }
+  }
+
+  return out
+}
+
 const main = async (): Promise<void> => {
   const { values } = parseArgs({
     args: process.argv.slice(2),
@@ -155,6 +212,7 @@ const main = async (): Promise<void> => {
       env: { type: 'string', default: 'staging' },
       ready: { type: 'string' },
       probe: { type: 'string', multiple: true },
+      interaction: { type: 'string', multiple: true },
       headed: { type: 'boolean', default: false },
       help: { type: 'boolean', short: 'h', default: false }
     }
@@ -229,6 +287,12 @@ const main = async (): Promise<void> => {
     const markers = await collectMarkers(session.page)
     const probes = values.probe?.length ? await runProbes(session.page, values.probe as string[]) : []
 
+    // Las interacciones van AL FINAL: pueden mutar el estado visual (un click abre
+    // un drawer) y la observación estática de arriba refleja el estado inicial.
+    const interactions = values.interaction?.length
+      ? await observeInteractions(session.page, values.interaction as string[], sessionDir)
+      : []
+
     const record: ExploreSession = {
       route,
       env,
@@ -237,7 +301,8 @@ const main = async (): Promise<void> => {
       screenshotPath: 'snapshot.png',
       markers,
       candidates,
-      probes
+      probes,
+      interactions
     }
 
     writeFileSync(resolve(sessionDir, 'session.json'), `${JSON.stringify(record, null, 2)}\n`, 'utf8')
@@ -264,6 +329,14 @@ const main = async (): Promise<void> => {
 
     for (const p of probes) {
       PRINT(`Probe "${p.spec}" → ${p.count} match${p.count === 1 ? '' : 'es'}${p.samples[0]?.text ? ` · "${p.samples[0].text}"` : ''}`)
+    }
+
+    for (const i of interactions) {
+      PRINT(`Interacción "${i.name}" → ${i.resolved ? `${i.frames.length} frames (before/feedback/settled)` : `no resuelta (${i.error ?? 'sin selector visible'})`}`)
+    }
+
+    if (interactions.some(i => i.resolved)) {
+      PRINT(`  → promote la emite como step \`interaction\` (coreografía).`)
     }
 
     PRINT('')
