@@ -10,6 +10,14 @@ export type GreenhouseShinyBorderPalette = 'axis' | 'nexa'
 
 export type GreenhouseShinyBorderIntensity = 'subtle' | 'medium' | 'strong'
 
+/**
+ * Variants funcionales (no skins): `surface` = el bloque shiny generoso (default, comportamiento actual);
+ * `cta` = botón compacto con contenido inline (gap para una marca/ícono líder + label) — para acciones
+ * tipo "Seguir con Nexa". El contenido (marca + texto) lo pasa el consumer por children → la primitive
+ * queda genérica (no acopla Nexa).
+ */
+export type GreenhouseShinyBorderVariant = 'surface' | 'cta'
+
 export interface GreenhouseShinyBorderProps {
   children: ReactNode
   asButton?: boolean
@@ -19,6 +27,7 @@ export interface GreenhouseShinyBorderProps {
   intensity?: GreenhouseShinyBorderIntensity
   onClick?: MouseEventHandler<HTMLButtonElement>
   palette?: GreenhouseShinyBorderPalette
+  variant?: GreenhouseShinyBorderVariant
   sx?: SxProps<Theme>
   contentSx?: SxProps<Theme>
   type?: 'button' | 'submit' | 'reset'
@@ -44,9 +53,12 @@ const GreenhouseShinyBorder = ({
   intensity = 'medium',
   onClick,
   palette = 'axis',
+  variant = 'surface',
   sx,
   type = 'button'
 }: GreenhouseShinyBorderProps) => {
+  const isCta = variant === 'cta'
+
   const actionProps = asButton
     ? {
         component: 'button' as const,
@@ -171,14 +183,19 @@ const GreenhouseShinyBorder = ({
             return {
               position: 'relative',
               zIndex: 1,
-              px: 6,
-              py: 3,
+              // `cta` = compacto + contenido inline (marca/ícono líder + label); `surface` = bloque generoso.
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: isCta ? theme.spacing(1.25) : 0,
+              px: isCta ? 4 : 6,
+              py: isCta ? 2.25 : 3,
               borderRadius: `${theme.shape.customBorderRadius.xxl}px`,
               color: theme.palette.common.white,
               bgcolor: theme.axis.ramp.primary[900],
               background: `radial-gradient(circle ${theme.spacing(20)} at 80% -50%, ${alpha(theme.palette.common.white, 0.42)}, ${theme.axis.ramp.primary[900]} 68%)`,
               boxShadow: `inset 0 1px 0 ${alpha(theme.palette.common.white, 0.18)}`,
               fontWeight: 700,
+              fontSize: isCta ? '0.9375rem' : undefined,
               lineHeight: 1.25,
               transformOrigin: 'center',
               transition: 'transform 240ms ease',

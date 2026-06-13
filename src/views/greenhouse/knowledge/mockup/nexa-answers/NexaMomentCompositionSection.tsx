@@ -14,6 +14,8 @@ import { alpha, useTheme, type Theme } from '@mui/material/styles'
 import {
   GreenhouseButton,
   GreenhouseChip,
+  GreenhouseNexaBrandMark,
+  GreenhouseShinyBorder,
   GreenhouseSpectrumBeam,
   NexaAnswersCanvas,
   NexaComposerActionButton,
@@ -233,11 +235,16 @@ const NexaMomentCompositionSection = () => {
     </Box>
   )
 
+  // Puente a la lente — variante `cta` del Shiny Button (Shiny Realism), todo dentro del botón:
+  // marca de Nexa + "¿Seguimos?". palette nexa.
   const bridge = (
     <Stack direction='row' justifyContent='flex-end'>
-      <GreenhouseButton variant='outlined' tone='primary' size='small' trailingIconClassName='tabler-arrow-right'>
+      <GreenhouseShinyBorder asButton variant='cta' palette='nexa' ariaLabel={COPY.bridgeCta} dataCapture='nexa-moment-bridge-cta'>
+        {/* Glyph-only (arco + spark, sin disco): la marca de avatar (disco) es para "Nexa habla";
+            en un CTA el glyph inline es el semantic correcto + no anida un círculo dentro del botón. */}
+        <GreenhouseNexaBrandMark kind='inlineMarkOnDark' size='small' />
         {COPY.bridgeCta}
-      </GreenhouseButton>
+      </GreenhouseShinyBorder>
     </Stack>
   )
 

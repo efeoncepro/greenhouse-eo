@@ -1,4 +1,4 @@
-export type GreenhouseNexaBrandKind = 'askNexaBadge' | 'badgeIcon' | 'inlineMark' | 'monoMark'
+export type GreenhouseNexaBrandKind = 'askNexaBadge' | 'badgeIcon' | 'inlineMark' | 'inlineMarkOnDark' | 'monoMark'
 export type GreenhouseNexaBrandSize = 'small' | 'medium'
 
 export type GreenhouseNexaBrandKindConfig = {
@@ -10,6 +10,8 @@ export type GreenhouseNexaBrandKindConfig = {
 
 export const GREENHOUSE_NEXA_BRAND_ASSETS = {
   mark: '/images/nexa-mark/nexa-mark.svg',
+  // On-dark: misma geometría, spark en blanco (arco teal) para contraste sobre superficies oscuras (CTAs navy).
+  markOnDark: '/images/nexa-mark/nexa-mark-on-dark.svg',
   monoMark: '/images/nexa-mark/nexa-mark-mono.svg',
   badge: '/images/nexa-mark/nexa-badge.svg'
 } as const
@@ -34,6 +36,12 @@ export const GREENHOUSE_NEXA_BRAND_KIND_CONFIG: Record<GreenhouseNexaBrandKind, 
   },
   inlineMark: {
     asset: GREENHOUSE_NEXA_BRAND_ASSETS.mark,
+    ariaLabel: 'Nexa',
+    chrome: 'inline'
+  },
+  // Glyph inline para superficies OSCURAS (arco teal + spark blanco). Para CTAs navy / shiny / sobre dark.
+  inlineMarkOnDark: {
+    asset: GREENHOUSE_NEXA_BRAND_ASSETS.markOnDark,
     ariaLabel: 'Nexa',
     chrome: 'inline'
   },
