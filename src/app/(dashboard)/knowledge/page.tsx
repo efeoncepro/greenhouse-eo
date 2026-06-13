@@ -5,6 +5,7 @@ import type { Metadata } from 'next'
 import KnowledgeCenterView from '@/views/greenhouse/knowledge/KnowledgeCenterView'
 import { getTenantContext } from '@/lib/tenant/get-tenant-context'
 import { hasAuthorizedViewCode } from '@/lib/tenant/authorization'
+import { isKnowledgeCanvasLensEnabled } from '@/lib/knowledge/nexa/canvas-lens-flag'
 
 export const dynamic = 'force-dynamic'
 
@@ -33,5 +34,5 @@ export default async function KnowledgePage() {
     redirect('/401')
   }
 
-  return <KnowledgeCenterView />
+  return <KnowledgeCenterView canvasLensEnabled={isKnowledgeCanvasLensEnabled()} />
 }

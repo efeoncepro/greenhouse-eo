@@ -33,6 +33,8 @@ import { NexaContextScope } from '@/lib/nexa/nexa-page-context'
 import { knowledgePacketToConversationalEvidence } from '@/lib/nexa/conversational-evidence'
 import { NEXA_FLOATING_OPEN_EVENT } from '@/lib/nexa/floating-events'
 
+import KnowledgeNexaCanvasLens from './KnowledgeNexaCanvasLens'
+
 import type { KnowledgeFeedbackKind, KnowledgeFreshness } from '@/lib/knowledge/types'
 import type { KnowledgeRetrievalChunk, KnowledgeRetrievalPacket, KnowledgeSearchMode } from '@/lib/knowledge/search'
 import type { ConversationalEvidencePacket } from '@/lib/nexa/conversational-evidence'
@@ -274,7 +276,7 @@ const buildAnswerSources = (evidence: ConversationalEvidencePacket | null, selec
 const mcpDocumentUri = (document: KnowledgeDocumentSummary | null | undefined) =>
   document ? `greenhouse://knowledge/document/${document.publicId || document.documentId}` : 'greenhouse://knowledge/document/{id}'
 
-const KnowledgeCenterView = () => {
+const KnowledgeCenterView = ({ canvasLensEnabled = false }: { canvasLensEnabled?: boolean }) => {
   const theme = useTheme()
   const reducedMotion = useReducedMotion()
   const [activeMode, setActiveMode] = useState<KnowledgeLens>('human')
@@ -594,6 +596,11 @@ const KnowledgeCenterView = () => {
       ) : null}
 
       {activeMode === 'nexa' ? (
+        canvasLensEnabled ? (
+          // TASK-1101 — cutover de presentación: el NexaAnswersCanvas rico (coreografía + citas inline +
+          // proof + response toolbar) cableado al retrieval real. Flag OFF → answer-trace legacy (abajo).
+          <KnowledgeNexaCanvasLens />
+        ) : (
         <NexaKnowledgeAnswerSurface<KnowledgeLens>
             kind='knowledgeAnswerTrace'
             question={nexaQuestion}
@@ -659,6 +666,7 @@ const KnowledgeCenterView = () => {
             ]}
             proofTabsAriaLabel={GH_KNOWLEDGE_COPY.aria.proofTabs}
           />
+        )
       ) : null}
 
       {activeMode === 'mcp' ? (
