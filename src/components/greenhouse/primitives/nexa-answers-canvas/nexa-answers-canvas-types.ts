@@ -60,6 +60,12 @@ export type NexaAnswersAutonomyTier = 'observeOnly' | 'recommendWithApproval' | 
 
 export type NexaAnswersActionRiskLevel = 'low' | 'medium' | 'high'
 
+/**
+ * Contrato de surface CANÓNICO de Nexa Answers (SSOT — TASK-1095 A1 / decisión del operador 2026-06-13:
+ * `NexaAnswersCanvas` es la surface canónica de la lente Nexa). Punto de import canónico:
+ * `@/lib/nexa/nexa-answers-surface-context`. La definición vive acá por su acoplamiento a tipos de render;
+ * la promoción física + el split dominio/UI de campos es el siguiente slice de 1095 (diff-gateado).
+ */
 export interface NexaAnswersSurfaceContext {
   surfaceId: string
   domain: 'knowledge' | 'finance' | 'agency' | 'people' | 'commercial' | 'home' | 'custom'
