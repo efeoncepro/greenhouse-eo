@@ -64,7 +64,7 @@ Tasks, docs de arquitectura, o commits relacionados.
 
 ## Siguiente ID disponible
 
-`ISSUE-095`
+`ISSUE-096`
 
 ## Open
 
@@ -80,6 +80,7 @@ Tasks, docs de arquitectura, o commits relacionados.
 | `ISSUE-067` | [Vitest jsdom warning por Lottie en `ServicesListView` empty state](open/ISSUE-067-jsdom-canvas-warning-lottie-empty-state-fetch-mock.md) | local test suite + CI logs | 2026-05-07 | open |
 | `ISSUE-081` | ["Días de retraso" no congela tiempo no imputable (freeze roto: `frozenDays`=0) → penaliza OTD% y bonus](open/ISSUE-081-dias-retraso-freeze-roto-frozendays-cero-penaliza-otd-bonus.md) | production (Efeonce) | 2026-05-23 | open |
 | `ISSUE-087` | [Account 360 delivery facet falla por drift de columnas RpA en serving cache](open/ISSUE-087-account-360-delivery-rpa-median-schema-drift.md) | preview | 2026-06-12 | open |
+| `ISSUE-095` | [Sentry source-map upload degrada por token sin permisos de release/source maps (`403`)](open/ISSUE-095-sentry-sourcemap-upload-token-403.md) | staging | 2026-06-13 | open |
 
 ## Resolved
 

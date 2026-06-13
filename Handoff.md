@@ -1,5 +1,12 @@
 # Release 2026-06-10 #2 — develop→main `6c649b2a6` RELEASED
 
+## Sesion 2026-06-13 — ISSUE-095 Sentry source-map token 403 documentado (Codex)
+
+- **Qué falta:** el guardrail de `ISSUE-093` evita deploys de 45m/failures, pero Sentry sigue rechazando `sentry-cli releases new` / source-map upload con `403 You do not have permission to perform this action`.
+- **Issue abierto:** `docs/issues/open/ISSUE-095-sentry-sourcemap-upload-token-403.md`.
+- **Contrato de cierre:** rotar o corregir `SENTRY_AUTH_TOKEN` sin exponer valores; verificar permisos de release/source-map upload (`project:releases` + `org:read` para release management con `sentry-cli`, o Organization Token apto para CI/source maps); actualizar los Vercel environments aplicables; confirmar deployment `Ready` sin `403` y artifact bundle/source maps presentes en Sentry.
+- **No hacer:** no desactivar Sentry ni borrar credenciales como cierre permanente; el timeout defensivo de `ISSUE-093` queda aunque el token se arregle.
+
 ## Sesion 2026-06-13 — ISSUE-093 Vercel/Sentry source-map upload timeout guard (Codex, resolved)
 
 - **Problema vivo confirmado:** Vercel staging reportó `greenhouse-bu3i14eap` (`develop`, commit `310ae87`) en `Error` tras 46m. Logs: Next compiló OK en 2.6m y quedó en `Running next.config.js provided runAfterProductionCompile ...`. Deployment vecino `greenhouse-456owabqd` (`606e07c`) completó ese mismo hook en 14.151s y terminó `Ready` en 7m. Causa = hang flaky de upload source maps Sentry, no build roto de producto.
