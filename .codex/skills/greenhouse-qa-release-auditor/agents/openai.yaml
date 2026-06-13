@@ -1,0 +1,4 @@
+interface:
+  display_name: "Greenhouse QA Release Auditor"
+  short_description: "Risk-based QA gate for implementation closure."
+  default_prompt: "Use $greenhouse-qa-release-auditor to classify implementation risk, inject the needed domain skills, run or require the right evidence gates, and decide PASS, CONDITIONAL PASS, or BLOCK."

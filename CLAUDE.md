@@ -306,6 +306,10 @@ Despues de cualquier implementacion, incidente, rollout, cambio de arquitectura/
 
 Regla corta: si los docs, rollout, lifecycle y evidencia no quedaron sincronizados, el estado correcto es `code complete, rollout pendiente` u `operativamente bloqueado`, no `complete`.
 
+### QA Release Auditor Gate
+
+Antes de cerrar implementaciones no triviales, incidentes, rollouts, cambios UI/schema/integracion/tooling/skills o cualquier trabajo donde "tests verdes" no pruebe runtime real, invocar `greenhouse-qa-release-auditor` y usar `pnpm qa:gates --changed` como primera pasada mecanica. La skill clasifica riesgo, inyecta skills especializadas a demanda por namespace de agente (Codex y Claude pueden tener nombres/coberturas distintas: UI/GVC, finance, payroll, release, secrets, browser diagnostics, arquitectura, docs, etc.) y emite `PASS | CONDITIONAL PASS | BLOCK`. Si falta evidencia runtime, el cierre debe decir `code complete, rollout pendiente` u `operativamente bloqueado`.
+
 ### Task Closing Quality Gate — full test + production build local (desde 2026-05-13, TASK-827 follow-up)
 
 **ANTES de mover una task de `in-progress/` a `complete/`** y declarar "ship done", correr **ambos** comandos local como gate final canonical:

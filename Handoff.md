@@ -1,5 +1,14 @@
 # Release 2026-06-10 #2 — develop→main `6c649b2a6` RELEASED
 
+## Sesion 2026-06-13 — QA Release Auditor skill + `pnpm qa:gates` (Codex)
+
+- **Qué quedó:** nueva skill cross-agent `greenhouse-qa-release-auditor` en Codex y Claude. Actúa como gate final de QA/closure: clasifica riesgo, inyecta skills especializadas a demanda por namespace de agente y emite `PASS | CONDITIONAL PASS | BLOCK`; bloquea el falso cierre donde tests verdes no prueban runtime real.
+- **CLI nueva:** `pnpm qa:gates` (`scripts/qa-gates.mjs`) analiza changed/staged/pathspecs + flags (`--ui`, `--runtime`, `--auth`, `--finance`, `--payroll`, `--release`, `--docs`, etc.) y sugiere dominios, skills Codex, skills Claude, comandos y blockers potenciales. La CLI detecta inventario local de `.codex/skills` y `.claude/skills`, avisa skills faltantes y deja gaps explícitos (por ejemplo finance/accounting fuerte en Codex vs fallback Claude). La CLI es advisory; la skill decide.
+- **Hook Codex:** `.codex/hooks.json` registra `Stop` → `.codex/hooks/qa-release-stop-hook.mjs`. Si Codex va a cerrar con lenguaje de "listo/terminado" y hay cambios riesgosos sin evidencia QA en la respuesta, el hook pide continuar con `$greenhouse-qa-release-auditor`, `pnpm qa:gates --changed` o scope equivalente y verdict `PASS | CONDITIONAL PASS | BLOCK`. Es guardrail ligero de cierre; no reemplaza la skill. Primera vez requiere trust normal via `/hooks` en Codex.
+- **Docs/reglas:** `AGENTS.md`, `CLAUDE.md`, `project_context.md`, `changelog.md` y este handoff registran el gate. La regla operativa: si falta evidencia runtime, reportar `code complete, rollout pendiente` u `operativamente bloqueado`, no `complete`.
+- **Verificación:** `node --check scripts/qa-gates.mjs`, `pnpm codex:qa-hook:test`, simulación manual del hook `Stop` (bloquea cierre sin QA y deja pasar cierre con `qa:gates`), `pnpm qa:gates --finance --agent both --json`, `pnpm qa:gates --ui --agent both --json`, `pnpm qa:gates --changed --agent both -- <slice QA/docs>`, `git diff --check -- <slice QA/docs>`, `pnpm docs:closure-check -- <slice QA/docs>`, `pnpm ops:lint --changed` y `pnpm docs:context-check` verdes. `docs:context-check` solo emitio warnings historicos permitidos por tamaño de `Handoff.md`.
+- **Coordinación:** hay WIP Nexa/UI ajeno en el checkout; no tocar/stagear rutas fuera del slice QA/docs si se commitea este cambio.
+
 ## Sesion 2026-06-13 — TASK-1107 Current Sentry active errors closure (Codex)
 
 - **Task creada:** `TASK-1107` documenta el cierre operacional de la cola Sentry real verificada el 2026-06-13. No implementa fixes runtime en esta sesion; registra el plan robusto para separar errores activos, recientes y stale sin mutear Sentry.
