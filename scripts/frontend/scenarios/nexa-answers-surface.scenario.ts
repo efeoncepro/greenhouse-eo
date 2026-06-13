@@ -35,7 +35,10 @@ export const scenario: CaptureScenario = {
     allowLoading: true,
     layout: {
       enabled: true,
-      includeSelector: '[data-capture="nexa-answers-visual-page"]'
+      includeSelector: '[data-capture="nexa-answers-visual-page"]',
+      // El label sr-only del status "pensando" es visuallyHidden por diseño (lo anuncia el
+      // lector de pantalla); el clip es intencional, no un overflow real.
+      ignoreSelectors: ['[data-gvc-ignore-layout="true"]']
     },
     runtime: {
       failOnConsoleError: false,
@@ -73,6 +76,10 @@ export const scenario: CaptureScenario = {
         name: 'show-nexa-answers-chart-comparison',
         intent: 'El modo comparativo muestra barras Recharts asentadas dentro de la bubble.',
         action: { kind: 'click', selector: 'button:has-text("Comparativo")' },
+        keyboardEquivalent: {
+          action: { kind: 'press', selector: 'button:has-text("Comparativo")', key: 'Enter' },
+          expected: 'El segmented control de chart se activa por teclado (focus + Enter), no solo por click.'
+        },
         frames: [
           {
             label: 'nexa-answers-chart-comparison',
@@ -89,6 +96,10 @@ export const scenario: CaptureScenario = {
         name: 'show-nexa-answers-chart-composition',
         intent: 'El modo composición muestra donut Recharts asentado dentro de la bubble.',
         action: { kind: 'click', selector: 'button:has-text("Composición")' },
+        keyboardEquivalent: {
+          action: { kind: 'press', selector: 'button:has-text("Composición")', key: 'Enter' },
+          expected: 'El segmented control de chart se activa por teclado (focus + Enter), no solo por click.'
+        },
         frames: [
           {
             label: 'nexa-answers-chart-composition',
@@ -116,12 +127,53 @@ export const scenario: CaptureScenario = {
     },
     {
       kind: 'click',
+      selector: 'button:has-text("Streaming")'
+    },
+    {
+      kind: 'wait',
+      selector: '[data-capture="nexa-answers-canvas-streaming"]',
+      timeout: 5000
+    },
+    {
+      kind: 'mark',
+      label: 'nexa-answers-streaming',
+      clipSelector: '[data-capture="nexa-answers-canvas-conversation"]',
+      note: 'Streaming honesto: titular redactado + cuerpo a mitad con caret + gráfica armándose; sin trust cue todavía.'
+    },
+    {
+      kind: 'click',
       selector: 'button:has-text("Respuesta")'
     },
     {
       kind: 'wait',
       selector: '[data-capture="nexa-answers-trust-cue"]',
       timeout: 5000
+    },
+    {
+      kind: 'mark',
+      label: 'nexa-answers-suggested-followups',
+      clipSelector: '[data-capture="nexa-answers-canvas-suggested-followups"]',
+      note: 'Follow-ups sugeridos: pills de próxima pregunta tras la respuesta — la conversación sigue sin composer en blanco.'
+    },
+    {
+      kind: 'interaction',
+      interaction: {
+        name: 'pick-suggested-followup',
+        intent: 'Tocar una pregunta sugerida la promueve a turno siguiente, sin escribir en el composer.',
+        action: { kind: 'click', selector: '[data-capture="nexa-answers-canvas-suggested-followups"] button' },
+        keyboardEquivalent: {
+          action: { kind: 'press', selector: '[data-capture="nexa-answers-canvas-suggested-followups"] button', key: 'Enter' },
+          expected: 'Las preguntas sugeridas son operables por teclado (focus + Enter), no solo click.'
+        },
+        frames: [
+          {
+            label: 'nexa-answers-suggested-followup-promoted',
+            atMs: 300,
+            clipSelector: '[data-capture="nexa-answers-surface"]',
+            note: 'La sugerencia tocada sube como pregunta del turno siguiente.'
+          }
+        ]
+      }
     },
     {
       kind: 'fill',
@@ -172,6 +224,36 @@ export const scenario: CaptureScenario = {
       label: 'nexa-answers-followup-compacted',
       clipSelector: '[data-capture="nexa-answers-surface"]',
       note: 'Follow-up compacto: conserva contexto sin reimprimir todo el proof.'
+    },
+    {
+      kind: 'click',
+      selector: 'button:has-text("Degradado")'
+    },
+    {
+      kind: 'wait',
+      selector: '[data-capture="nexa-answers-canvas-degraded"]',
+      timeout: 5000
+    },
+    {
+      kind: 'mark',
+      label: 'nexa-answers-degraded',
+      clipSelector: '[data-capture="nexa-answers-surface"]',
+      note: 'Degradado honesto: respuesta parcial declarada, no base decisional ni $0 silencioso.'
+    },
+    {
+      kind: 'click',
+      selector: 'button:has-text("Error")'
+    },
+    {
+      kind: 'wait',
+      selector: '[data-capture="nexa-answers-canvas-error"]',
+      timeout: 5000
+    },
+    {
+      kind: 'mark',
+      label: 'nexa-answers-error',
+      clipSelector: '[data-capture="nexa-answers-surface"]',
+      note: 'Error honesto: causa + recuperación, sin pintar respuesta falsa.'
     },
     {
       kind: 'click',

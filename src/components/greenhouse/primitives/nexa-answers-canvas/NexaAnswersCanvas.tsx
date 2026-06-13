@@ -11,9 +11,11 @@ import { visuallyHidden } from '@mui/utils'
 
 import NexaComposer, { NexaComposerActionButton, NexaComposerInput } from '../NexaComposer'
 import NexaEvidencePanel from '../NexaEvidencePanel'
+import GreenhouseButton from '../GreenhouseButton'
 import GreenhouseStatusDot from '../GreenhouseStatusDot'
 import GreenhouseThinkingBeat from '../GreenhouseThinkingBeat'
 import NexaSenderMark from '../NexaSenderMark'
+import NexaExpressiveText, { getNexaExpressiveTextPlainText } from '../nexa-expressive-text/NexaExpressiveText'
 import {
   assertNexaAnswersRenderPlanAllowed,
   NEXA_ANSWERS_CANVAS_VARIANT_CONFIG,
@@ -22,10 +24,12 @@ import {
 } from './nexa-answers-canvas-controller'
 import { renderNexaAnswersBlock } from './nexa-answers-canvas-renderers'
 import type {
+  NexaAnswersBubbleBlock,
   NexaAnswersCanvasProps,
   NexaAnswersCanvasState,
   NexaAnswersCompactAnswerBlock,
-  NexaAnswersRenderPlan
+  NexaAnswersRenderPlan,
+  NexaAnswersSuggestedFollowUp
 } from './nexa-answers-canvas-types'
 
 const isThinkingState = (state: NexaAnswersCanvasState) => state === 'submitted' || state === 'thinking' || state === 'streaming'
@@ -77,7 +81,9 @@ const QuestionBubble = ({ children, compact = false }: { children: string; compa
   )
 }
 
-const NexaIdentity = ({ thinking, label, assistantName }: { thinking: boolean; label: string; assistantName: string }) => (
+type NexaIdentityStatus = 'thinking' | 'ready' | 'silent'
+
+const NexaIdentity = ({ status, label, assistantName }: { status: NexaIdentityStatus; label: string; assistantName: string }) => (
   <Stack spacing={1.25} data-capture='nexa-answers-canvas-identity'>
     <Stack direction='row' spacing={1.25} alignItems='center'>
       <NexaSenderMark />
@@ -85,15 +91,19 @@ const NexaIdentity = ({ thinking, label, assistantName }: { thinking: boolean; l
         {assistantName}
       </Typography>
     </Stack>
-    {thinking ? (
+    {status === 'thinking' ? (
       <Stack direction='row' spacing={1.25} alignItems='center' role='status' aria-live='polite' data-capture='nexa-answers-canvas-thinking'>
         <Box aria-hidden sx={{ width: 28, flexShrink: 0 }} />
         <GreenhouseThinkingBeat kind='nexa' variant='inline' motion='wave' dotCount={5} dotSize={7} />
-        <Box component='span' sx={visuallyHidden}>
+        {/* Anuncio sr-only del status de "pensando": contenido real del live region (lo que
+            anuncia el lector de pantalla). Es un patrón canónico de loading-status — NO pasarlo
+            a aria-hidden ni borrarlo. El marcador data-gvc-ignore-layout lo exime del layout gate
+            (visuallyHidden siempre "clipea" por diseño; flagearlo es falso positivo). */}
+        <Box component='span' data-gvc-ignore-layout='true' sx={visuallyHidden}>
           {label}
         </Box>
       </Stack>
-    ) : (
+    ) : status === 'ready' ? (
       <Stack direction='row' spacing={1.25} alignItems='center' role='status' aria-live='polite'>
         <Box aria-hidden sx={{ width: 28, flexShrink: 0 }} />
         <GreenhouseStatusDot tone='success' ariaLabel={label} />
@@ -101,7 +111,7 @@ const NexaIdentity = ({ thinking, label, assistantName }: { thinking: boolean; l
           {label}
         </Typography>
       </Stack>
-    )}
+    ) : null}
   </Stack>
 )
 
@@ -223,11 +233,134 @@ const CanvasErrorState = ({ state, copy }: { state: NexaAnswersCanvasState; copy
   )
 }
 
-const renderPreviousTurn = (turn: NexaAnswersCompactAnswerBlock, renderPlan: NexaAnswersRenderPlan) =>
+// Caret de redacción: barra que parpadea al final del texto que está llegando.
+// Reduced-motion → caret fijo (sin parpadeo), sigue comunicando "escribiendo".
+const StreamingCaret = () => (
+  <Box
+    component='span'
+    aria-hidden='true'
+    sx={theme => ({
+      display: 'inline-block',
+      inlineSize: '2px',
+      blockSize: '1.05em',
+      marginInlineStart: '3px',
+      verticalAlign: 'text-bottom',
+      borderRadius: '1px',
+      backgroundColor: theme.palette.primary.main,
+      '@keyframes nexa-stream-caret': { '0%,48%': { opacity: 1 }, '50%,100%': { opacity: 0 } },
+      animation: 'nexa-stream-caret 1.05s steps(1) infinite',
+      '@media (prefers-reduced-motion: reduce)': { animation: 'none', opacity: 1 }
+    })}
+  />
+)
+
+// Respuesta llegando: titular ya redactado + cuerpo a mitad con caret + (si es chart) el
+// gráfico todavía armándose. SIN trust cue ni acciones (llegan al cerrar). El live region
+// del status lo lleva la identidad Nexa (no duplicar aquí) → un solo anuncio.
+const StreamingAnswerDraft = ({ block }: { block: NexaAnswersBubbleBlock }) => {
+  const theme = useTheme()
+  const bodyFull = getNexaExpressiveTextPlainText(block.body)
+  const bodyPartial = bodyFull.slice(0, Math.max(24, Math.ceil(bodyFull.length * 0.6))).trimEnd()
+  const showChart = Boolean(block.chart)
+
+  return (
+    <Box
+      data-capture='nexa-answers-canvas-streaming'
+      aria-busy='true'
+      sx={{
+        ml: { xs: 1.5, md: 2 },
+        border: `1px solid ${alpha(theme.palette.primary.main, 0.34)}`,
+        borderRadius: `${theme.shape.customBorderRadius.lg}px ${theme.shape.customBorderRadius.lg}px ${theme.shape.customBorderRadius.lg}px ${theme.shape.customBorderRadius.xs}px`,
+        backgroundColor: theme.palette.background.paper,
+        boxShadow: theme.greenhouseElevation.floating.boxShadow,
+        px: { xs: 4, md: 5 },
+        py: { xs: 4, md: 4.5 }
+      }}
+    >
+      <Stack spacing={2.5} sx={{ minInlineSize: 0 }}>
+        <Box
+          sx={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 1,
+            alignSelf: 'flex-start',
+            px: 1.5,
+            py: 0.75,
+            borderRadius: `${theme.shape.customBorderRadius.sm}px`,
+            color: theme.palette.primary.main,
+            backgroundColor: alpha(theme.palette.primary.main, 0.12)
+          }}
+        >
+          <i className='tabler-sparkles' aria-hidden='true' />
+          <Typography variant='body2' sx={{ fontWeight: 600, color: 'inherit' }}>
+            Redactando respuesta
+          </Typography>
+        </Box>
+        <NexaExpressiveText value={block.title} variant='h5' />
+        <Typography variant='body2' color='text.secondary'>
+          {bodyPartial}
+          <StreamingCaret />
+        </Typography>
+        {showChart ? (
+          <Box
+            aria-hidden='true'
+            sx={{
+              blockSize: 168,
+              borderRadius: `${theme.shape.customBorderRadius.md}px`,
+              border: `1px dashed ${alpha(theme.palette.primary.main, 0.22)}`,
+              backgroundColor: alpha(theme.palette.primary.main, 0.03),
+              display: 'grid',
+              placeItems: 'center'
+            }}
+          >
+            <Typography variant='caption' color='text.secondary'>
+              Armando la gráfica…
+            </Typography>
+          </Box>
+        ) : null}
+      </Stack>
+    </Box>
+  )
+}
+
+// Próximas preguntas sugeridas: pills tappables que promueven la pregunta al turno siguiente.
+// Mata la parálisis del composer en blanco y vuelve la respuesta una conversación.
+const SuggestedFollowUps = ({
+  items,
+  label,
+  onSelect
+}: {
+  items: NexaAnswersSuggestedFollowUp[]
+  label: string
+  onSelect: (followUp: NexaAnswersSuggestedFollowUp) => void
+}) => (
+  <Stack spacing={1.5} data-capture='nexa-answers-canvas-suggested-followups' sx={motionSx}>
+    <Typography variant='caption' color='text.secondary'>
+      {label}
+    </Typography>
+    <Stack direction='row' spacing={1.5} flexWrap='wrap' useFlexGap>
+      {items.map(item => (
+        <GreenhouseButton
+          key={item.id}
+          variant='outlined'
+          tone='secondary'
+          size='small'
+          trailingIconClassName='tabler-arrow-up-right'
+          onClick={() => onSelect(item)}
+        >
+          {item.label}
+        </GreenhouseButton>
+      ))}
+    </Stack>
+  </Stack>
+)
+
+const renderPreviousTurn = (turn: NexaAnswersCompactAnswerBlock, renderPlan: NexaAnswersRenderPlan, proofPanelId: string) =>
   renderNexaAnswersBlock(turn, {
     proofOpen: false,
     thinking: false,
     renderPlan,
+    proofPanelId,
     onProofToggle: () => undefined
   })
 
@@ -247,6 +380,8 @@ const NexaAnswersCanvas = ({
   onProofToggle,
   previousTurns = [],
   followUpQuestion,
+  suggestedFollowUps,
+  onSuggestedFollowUp,
   slots,
   copy,
   runtimeSlot,
@@ -260,7 +395,15 @@ const NexaAnswersCanvas = ({
   const isProofOpen = proofOpen ?? internalProofOpen
   const proofId = `${surfaceContext.surfaceId.replace(/[^a-zA-Z0-9_-]/g, '-')}-proof`
   const thinking = isThinkingState(state)
+  // Pre-answer (submitted/thinking): solo presencia Nexa, sin pintar la respuesta todavía.
+  // `streaming` muestra la respuesta llegando (draft con caret), por eso va aparte.
+  const preAnswer = state === 'submitted' || state === 'thinking'
+  const isStreaming = state === 'streaming'
+  // La respuesta ya "asentó": answered/proofOpen/followup (no pre-answer, no streaming, no error).
+  const answerSettled = !preAnswer && !isStreaming && !isErrorState(state)
   const primaryBlock = renderPlan?.blocks.find(block => block.id === renderPlan.primaryBlockId) ?? renderPlan?.blocks[0]
+  const streamingBlock = primaryBlock?.renderer === 'answerBubble' ? (primaryBlock as NexaAnswersBubbleBlock) : null
+  const identityLabel = isStreaming ? copy.streamingLabel : thinking ? copy.thinkingLabel : copy.readyLabel
 
   assertNexaAnswersRenderPlanAllowed({ renderPlan, allowedRenderers: surfaceContext.allowedRenderers })
 
@@ -306,11 +449,19 @@ const NexaAnswersCanvas = ({
           <EmptyCanvas copy={copy} draft={draft} onDraftChange={onDraftChange} onSubmit={onSubmit} />
         ) : (
           <Stack spacing={4} data-capture='nexa-answers-canvas-conversation' sx={motionSx}>
-            {renderPlan && previousTurns.map(turn => <Box key={turn.id}>{renderPreviousTurn(turn, renderPlan)}</Box>)}
+            {renderPlan && previousTurns.map(turn => <Box key={turn.id}>{renderPreviousTurn(turn, renderPlan, proofId)}</Box>)}
             {slots?.question ?? (question ? <QuestionBubble compact={state === 'followup'}>{question}</QuestionBubble> : null)}
-            {slots?.identity ?? <NexaIdentity assistantName={copy.assistantName} thinking={thinking} label={thinking ? copy.thinkingLabel : copy.readyLabel} />}
+            {slots?.identity ?? (
+              <NexaIdentity
+                assistantName={copy.assistantName}
+                status={thinking ? 'thinking' : isErrorState(state) ? 'silent' : 'ready'}
+                label={identityLabel}
+              />
+            )}
             {isErrorState(state) ? (
               <CanvasErrorState state={state} copy={copy} />
+            ) : preAnswer ? null : isStreaming ? (
+              streamingBlock ? <StreamingAnswerDraft block={streamingBlock} /> : null
             ) : slots?.answer ? (
               slots.answer
             ) : primaryBlock && renderPlan ? (
@@ -318,11 +469,15 @@ const NexaAnswersCanvas = ({
                 proofOpen: isProofOpen,
                 thinking,
                 renderPlan,
+                proofPanelId: proofId,
                 onProofToggle: toggleProof,
                 onAction
               })
             ) : null}
             <CanvasProof id={proofId} open={isProofOpen} renderPlan={renderPlan} slot={slots?.proof} />
+            {answerSettled && onSuggestedFollowUp && suggestedFollowUps && suggestedFollowUps.length > 0 ? (
+              <SuggestedFollowUps items={suggestedFollowUps} label={copy.suggestedFollowUpsLabel} onSelect={onSuggestedFollowUp} />
+            ) : null}
             {followUpQuestion ? <QuestionBubble compact>{followUpQuestion}</QuestionBubble> : null}
             {slots?.composer ?? (
               <CanvasComposer

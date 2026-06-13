@@ -3,19 +3,25 @@
 import { useState, type ReactNode } from 'react'
 
 import Box from '@mui/material/Box'
+import MuiCard from '@mui/material/Card'
+import CardContent from '@mui/material/CardContent'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
-import Button from '@mui/material/Button'
+import Divider from '@mui/material/Divider'
 import { alpha } from '@mui/material/styles'
+
+import CustomChip from '@core/components/mui/Chip'
 
 import AxisWordmark from '@/components/greenhouse/brand/AxisWordmark'
 import { typographyScale } from '@/components/theme/typography-tokens'
 import {
+  GreenhouseButton,
   NexaAnswerBubble,
   NexaAnswersCanvas,
   NexaComposer,
   NexaComposerInput,
   NexaComposerActionButton,
+  NexaConversationBubble,
   NexaFace,
   NexaKnowledgeAnswerSurface,
   NexaPresenceMark,
@@ -30,7 +36,8 @@ import type {
   NexaAnswerTrustCue,
   NexaAnswersCanvasCopy,
   NexaAnswersRenderPlan,
-  NexaAnswersSurfaceContext
+  NexaAnswersSurfaceContext,
+  NexaExpressiveTextValue
 } from '@/components/greenhouse/primitives'
 import { GREENHOUSE_NEXA_BRAND_COLORS } from '@/components/greenhouse/primitives/greenhouse-nexa-brand-controller'
 import type { NexaToolResult } from '@/lib/nexa/nexa-contract'
@@ -59,30 +66,136 @@ const InlineCode = ({ children }: { children: string }) => (
   </Box>
 )
 
-const Section = ({ eyebrow, title, children }: { eyebrow: string; title: string; children: ReactNode }) => (
-  <Stack spacing={DESIGN_SYSTEM_LAB_TOKENS.spacing.related}>
+const Section = ({
+  eyebrow,
+  title,
+  description,
+  children
+}: {
+  eyebrow: string
+  title: string
+  description?: string
+  children: ReactNode
+}) => (
+  <Stack spacing={DESIGN_SYSTEM_LAB_TOKENS.spacing.compactGroup}>
     <Stack spacing={DESIGN_SYSTEM_LAB_TOKENS.spacing.hairline}>
       <Typography variant='overline' color='primary'>
         {eyebrow}
       </Typography>
       <Typography variant='h5'>{title}</Typography>
+      {description ? (
+        <Typography variant='body2' color='text.secondary' sx={{ maxInlineSize: DESIGN_SYSTEM_LAB_TOKENS.layout.introMaxInlineSize }}>
+          {description}
+        </Typography>
+      ) : null}
     </Stack>
     {children}
   </Stack>
 )
 
-const Card = ({ children }: { children: ReactNode }) => (
+const Card = ({ children, density = 'normal' }: { children: ReactNode; density?: 'normal' | 'compact' }) => (
+  <MuiCard
+    variant='outlined'
+    sx={theme => ({
+      border: `1px solid ${theme.palette.divider}`,
+      borderRadius: `${theme.shape.customBorderRadius.lg}px`,
+      bgcolor: 'background.paper',
+      boxShadow: 'none'
+    })}
+  >
+    <CardContent
+      sx={{
+        p: density === 'compact' ? DESIGN_SYSTEM_LAB_TOKENS.spacing.compactGroup : DESIGN_SYSTEM_LAB_TOKENS.spacing.sectionInset,
+        '&:last-child': {
+          pb: density === 'compact' ? DESIGN_SYSTEM_LAB_TOKENS.spacing.compactGroup : DESIGN_SYSTEM_LAB_TOKENS.spacing.sectionInset
+        }
+      }}
+    >
+      {children}
+    </CardContent>
+  </MuiCard>
+)
+
+const SpecimenFrame = ({
+  capture,
+  eyebrow,
+  title,
+  description,
+  children
+}: {
+  capture: string
+  eyebrow: string
+  title: string
+  description: string
+  children: ReactNode
+}) => (
+  <Box
+    data-capture={capture}
+    sx={theme => ({
+      overflow: 'hidden',
+      border: `1px solid ${theme.palette.divider}`,
+      borderRadius: `${theme.shape.customBorderRadius.lg}px`,
+      bgcolor: 'background.paper',
+      scrollMarginBlockStart: { xs: 19, md: 13 }
+    })}
+  >
+    <Box
+      sx={theme => ({
+        px: { xs: DESIGN_SYSTEM_LAB_TOKENS.spacing.sectionInset, md: 5 },
+        py: DESIGN_SYSTEM_LAB_TOKENS.spacing.compactGroup,
+        borderBlockEnd: `1px solid ${theme.palette.divider}`,
+        backgroundColor: alpha(theme.palette.primary.main, DESIGN_SYSTEM_LAB_TOKENS.opacity.subtleFill)
+      })}
+    >
+      <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} alignItems={{ md: 'center' }} justifyContent='space-between'>
+        <Stack spacing={0.5} sx={{ minInlineSize: 0 }}>
+          <Typography variant='caption' color='text.secondary'>
+            {eyebrow}
+          </Typography>
+          <Typography variant='h5'>{title}</Typography>
+          <Typography variant='body2' color='text.secondary' sx={{ maxInlineSize: 760 }}>
+            {description}
+          </Typography>
+        </Stack>
+        <CustomChip label='Specimen vivo' size='small' variant='tonal' color='primary' round='true' />
+      </Stack>
+    </Box>
+    <Box sx={{ p: { xs: DESIGN_SYSTEM_LAB_TOKENS.spacing.compactGroup, md: DESIGN_SYSTEM_LAB_TOKENS.spacing.sectionInset } }}>
+      {children}
+    </Box>
+  </Box>
+)
+
+const MetaTile = ({ label, value }: { label: string; value: string }) => (
   <Box
     sx={theme => ({
       p: DESIGN_SYSTEM_LAB_TOKENS.spacing.compactGroup,
-      border: `1px solid ${theme.palette.divider}`,
-      borderRadius: `${theme.shape.customBorderRadius.lg}px`,
-      bgcolor: 'background.paper'
+      border: `1px solid ${alpha(theme.palette.primary.main, DESIGN_SYSTEM_LAB_TOKENS.opacity.subtleBorder)}`,
+      borderRadius: `${theme.shape.customBorderRadius.md}px`,
+      bgcolor: alpha(theme.palette.background.paper, 0.72)
     })}
   >
-    {children}
+    <Typography variant='caption' color='text.secondary'>
+      {label}
+    </Typography>
+    <Typography variant='body2' sx={{ fontWeight: 600 }}>
+      {value}
+    </Typography>
   </Box>
 )
+
+const LAB_STATUS = [
+  { label: 'Familia', value: 'Conversational UI' },
+  { label: 'Owner', value: 'Nexa platform' },
+  { label: 'Estado', value: 'Hardening' },
+  { label: 'Evidencia', value: 'GVC desktop + mobile' }
+]
+
+const REVIEW_AREAS = [
+  { label: 'Átomos', value: 'Face, sender, presence y composer' },
+  { label: 'Answers', value: 'Trace, canvas, chart, metric y action plan' },
+  { label: 'Contrato', value: 'Kinds, variants, evidence y no-forks' }
+]
 
 // Anatomía: las 5 regiones del patrón (de arriba a abajo / izquierda a derecha).
 const ANATOMY: { region: string; detail: string }[] = [
@@ -99,7 +212,8 @@ const COMPOSED_OF: { name: string; role: string; status: string }[] = [
   { name: 'NexaComposer', role: 'Input (caja Vuexy anulada → el glow pinta todo) + botón send/stop + glow + disclaimer, como unidad reusable. Partes: NexaComposerInput / NexaComposerActionButton.', status: 'Primitive canónica ✅' },
   { name: 'NexaKnowledgeAnswerSurface', role: 'Superficie de respuesta trazable: pregunta-burbuja + respuesta Nexa + composer descendido + proof panel lateral.', status: 'Composition primitive ✅' },
   { name: 'NexaAnswersCanvas', role: 'Canvas transversal para render plans: surfaceContext + estados + registry de renderers + composer/proof/choreography.', status: 'Primitive canónica ✅' },
-  { name: 'NexaAnswerBubble', role: 'Bubble answer-turn canónica: variante chart con Recharts trend/comparison/composition y variante explanation para respuesta textual enriquecida.', status: 'Primitive canónica ✅' },
+  { name: 'NexaConversationBubble', role: 'Bubble conversacional base: pregunta de usuario, thinking, texto simple, follow-up y notices de estado/confianza.', status: 'Primitive canónica ✅' },
+  { name: 'NexaAnswerBubble', role: 'Bubble answer-turn enriquecida: variants explanation/chart/metricSummary/actionPlan para respuestas estructuradas.', status: 'Primitive canónica ✅' },
   { name: 'NexaEvidencePanel', role: 'Renderer compartido de evidencia versionada: trace, fuentes, freshness, confidence y feedback desde ConversationalEvidencePacket.', status: 'Primitive canónica ✅' },
   { name: 'NexaPresenceMark', role: 'Header: crossfade "En línea" ↔ "Pensando…" con elipsis animada (reduced-motion horneado).', status: 'Primitive canónica ✅' },
   { name: 'NexaFace', role: 'Avatar cara real de Nexa con variants hero (76) / header (44, borde teal) / message (32). Single source del asset.', status: 'Primitive canónica ✅' },
@@ -177,14 +291,24 @@ const KNOWLEDGE_TOOL_TRACE_SPECIMEN: NexaToolResult = {
   }
 }
 
+const expressiveText = (segments: Exclude<NexaExpressiveTextValue, string>) => segments
+
 const ANSWER_BUBBLE_POINTS: NexaAnswerPoint[] = [
   {
-    title: 'Resultado antes que actividad',
-    body: 'Lee primero qué cambió para cliente, equipo u operación; después mira la actividad que lo produjo.'
+    title: expressiveText([{ text: 'Resultado antes que actividad', style: 'strong' }]),
+    body: expressiveText([
+      { text: 'Lee primero ', style: 'soft' },
+      { text: 'qué cambió', style: 'strong' },
+      { text: ' para cliente, equipo u operación; después mira la actividad que lo produjo.' }
+    ])
   },
   {
     title: 'Se interpreta en conjunto',
-    body: 'Contrasta la señal principal con sus señales hermanas para evitar una lectura aislada.'
+    body: expressiveText([
+      { text: 'Contrasta la señal principal con sus señales hermanas para evitar una lectura ', style: 'soft' },
+      { text: 'aislada', style: 'warning' },
+      { text: '.' }
+    ])
   },
   {
     title: 'Validación si decide algo sensible',
@@ -208,9 +332,14 @@ const ANSWER_BUBBLE_ACTION_PLAN_ACTIONS: NexaAnswerAction[] = [
   { label: 'Simular escenario', iconClassName: 'tabler-arrows-diff', kind: 'secondaryAction', variant: 'outlined', tone: 'primary' }
 ]
 
+const CONVERSATION_FOLLOW_UP_ACTIONS: NexaAnswerAction[] = [
+  { label: 'Preguntar esto', iconClassName: 'tabler-arrow-up-right', kind: 'inlineAction', variant: 'text', tone: 'primary' },
+  { label: 'Abrir en chat', iconClassName: 'tabler-message-circle', kind: 'secondaryAction', variant: 'outlined', tone: 'primary' }
+]
+
 const ANSWER_BUBBLE_CHART_SPEC: NexaAnswerChartSpec = {
-  title: 'Señales operativas',
-  helper: 'Último corte · Agosto',
+  title: expressiveText([{ text: 'Señales operativas', style: 'strong' }]),
+  helper: expressiveText([{ text: 'Último corte', style: 'soft' }, { text: ' · ' }, { text: 'Agosto', style: 'metric' }]),
   valueSuffix: 'pts',
   modes: [
     { mode: 'trend', label: 'Tendencia', ariaLabel: 'Ver tendencia de señales operativas' },
@@ -363,7 +492,7 @@ const ANSWERS_CANVAS_SURFACE_CONTEXT: NexaAnswersSurfaceContext = {
   placement: 'embedded',
   dataReality: 'synthetic',
   sensitivity: 'tenant_internal',
-  allowedRenderers: ['answerBubble', 'compactAnswer'],
+  allowedRenderers: ['conversationBubble', 'answerBubble', 'compactAnswer'],
   allowedActions: ['read', 'explain', 'drill_down']
 }
 
@@ -376,7 +505,9 @@ const ANSWERS_CANVAS_COPY: NexaAnswersCanvasCopy = {
   submitLabel: 'Preguntar',
   followUpLabel: 'Enviar follow-up',
   thinkingLabel: 'Nexa está preparando la respuesta.',
+  streamingLabel: 'Nexa está escribiendo la respuesta.',
   readyLabel: 'Respuesta lista',
+  suggestedFollowUpsLabel: 'Preguntas sugeridas',
   degradedTitle: 'Respuesta parcial',
   degradedBody: 'La evidencia no alcanza para una decisión sensible.',
   errorTitle: 'No pudimos completar la respuesta',
@@ -477,9 +608,11 @@ const NexaAnswerBubbleSpecimen = () => {
   return (
     <NexaAnswerBubble
       kind='surfaceChartInsight'
-      title='La señal principal mejora, pero debe leerse con soporte y calidad.'
-      body='La variante chart prioriza el gráfico y deja la evidencia como trust cue compacto para no desplazar el composer conversacional.'
-      metaLabel='Answer-first · chart bubble · proof bajo demanda'
+      title={expressiveText([{ text: 'La señal principal mejora', style: 'positive' }, { text: ', pero debe leerse con soporte y calidad.' }])}
+      body={expressiveText([
+        { text: 'La variante chart prioriza el gráfico y deja la evidencia como trust cue compacto para no desplazar el composer conversacional.', style: 'soft' }
+      ])}
+      metaLabel={expressiveText([{ text: 'Answer-first', style: 'strong' }, { text: ' · chart bubble · proof bajo demanda', style: 'soft' }])}
       points={ANSWER_BUBBLE_POINTS}
       actions={ANSWER_BUBBLE_ACTIONS}
       trustCue={ANSWER_BUBBLE_TRUST_CUE}
@@ -496,8 +629,12 @@ const NexaAnswerMetricSummarySpecimen = () => {
   return (
     <NexaAnswerBubble
       kind='financeMetricSummary'
-      title='Revenue sube, pero el pipeline empieza a enfriarse.'
-      body='La lectura ejecutiva no necesita un chart grande: Nexa resume qué cambió, cuánto importa y dónde mirar después.'
+      title={expressiveText([{ text: 'Revenue sube', style: 'positive' }, { text: ', pero el pipeline empieza a enfriarse.', style: 'warning' }])}
+      body={expressiveText([
+        { text: 'La lectura ejecutiva no necesita un chart grande: Nexa resume ', style: 'soft' },
+        { text: 'qué cambió', style: 'strong' },
+        { text: ', cuánto importa y dónde mirar después.' }
+      ])}
       metaLabel='Metric summary · executive read'
       points={ANSWER_BUBBLE_POINTS}
       actions={ANSWER_BUBBLE_ACTIONS}
@@ -515,8 +652,12 @@ const NexaAnswerActionPlanSpecimen = () => {
   return (
     <NexaAnswerBubble
       kind='commercialActionPlan'
-      title='No aceleres gasto todavía.'
-      body='Revenue y margen mejoran, pero el pipeline ponderado cae 6%. La señal pide una acción corta, medible y reversible antes de comprometer presupuesto.'
+      title={expressiveText([{ text: 'No aceleres gasto todavía', style: 'warning' }, { text: '.' }])}
+      body={expressiveText([
+        { text: 'Revenue y margen mejoran, pero el pipeline ponderado cae ', style: 'soft' },
+        { text: '6%', style: 'metric' },
+        { text: '. La señal pide una acción corta, medible y reversible antes de comprometer presupuesto.' }
+      ])}
       metaLabel='Recomendación operativa · requiere aprobación'
       points={ANSWER_BUBBLE_POINTS}
       actions={ANSWER_BUBBLE_ACTION_PLAN_ACTIONS}
@@ -527,6 +668,56 @@ const NexaAnswerActionPlanSpecimen = () => {
     />
   )
 }
+
+const NexaConversationBubbleSpecimen = () => (
+  <Box
+    sx={theme => ({
+      p: { xs: 3, md: 4 },
+      border: `1px solid ${theme.palette.divider}`,
+      borderRadius: `${theme.shape.customBorderRadius.lg}px`,
+      background: `linear-gradient(180deg, ${alpha(theme.palette.background.paper, 0.96)}, ${alpha(theme.palette.background.default, 0.52)})`
+    })}
+  >
+    <Stack spacing={3}>
+      <NexaConversationBubble
+        kind='surfaceUserQuestion'
+        body='¿Qué debería revisar antes de mover presupuesto a esta campaña?'
+        metaLabel='Comercial · campaña Q3'
+        senderLabel='Julio'
+      />
+      <NexaConversationBubble
+        kind='nexaThinking'
+        body='Leyendo pipeline, margen y riesgo de cuentas sensibles'
+        thinkingLabel='Leyendo pipeline, margen y riesgo de cuentas sensibles'
+      />
+      <NexaConversationBubble
+        kind='nexaText'
+        title={expressiveText([{ text: 'Revisa primero ', style: 'soft' }, { text: 'la calidad del pipeline', style: 'strong' }, { text: '.' }])}
+        body={expressiveText([
+          { text: 'La señal de revenue mejora, pero ', style: 'soft' },
+          { text: 'dos cuentas sensibles', style: 'warning' },
+          { text: ' concentran el riesgo. Antes de mover presupuesto, valida stage, sponsor y fecha de próximo compromiso.' }
+        ])}
+        metaLabel='Respuesta simple · sin rich canvas'
+      />
+      <NexaConversationBubble
+        kind='nexaFollowUp'
+        title={expressiveText([{ text: 'Puedes continuar ', style: 'strong' }, { text: 'con una pregunta más precisa.' }])}
+        body={expressiveText([
+          { text: 'Nexa puede comparar el riesgo por canal o convertir esta lectura en un ', style: 'soft' },
+          { text: 'plan corto', style: 'metric' },
+          { text: ' con aprobación.' }
+        ])}
+        actions={CONVERSATION_FOLLOW_UP_ACTIONS}
+      />
+      <NexaConversationBubble
+        kind='staleData'
+        title='Datos con frescura limitada'
+        body='La recomendación usa el último corte disponible. Si la decisión mueve presupuesto, confirma que los stages estén actualizados.'
+      />
+    </Stack>
+  </Box>
+)
 
 const NexaAnswersCanvasSpecimen = () => {
   const [draft, setDraft] = useState('')
@@ -559,8 +750,12 @@ const NexaAnswersCanvasSpecimen = () => {
         renderer: 'answerBubble',
         rendererVersion: 'v1',
         kind: 'surfaceChartInsight',
-        title: 'El canvas deja que el gráfico sea protagonista.',
-        body: 'La copia contextual acompaña la lectura; el proof queda bajo demanda y el composer permanece visible para continuar.',
+        title: expressiveText([{ text: 'El canvas deja que el gráfico sea protagonista', style: 'strong' }, { text: '.' }]),
+        body: expressiveText([
+          { text: 'La copia contextual acompaña la lectura; el proof queda bajo demanda y el composer permanece ', style: 'soft' },
+          { text: 'visible', style: 'positive' },
+          { text: ' para continuar.' }
+        ]),
         metaLabel: 'Nexa Answers Canvas · render plan v1',
         points: ANSWER_BUBBLE_POINTS,
         chart: ANSWER_BUBBLE_CHART_SPEC
@@ -591,157 +786,314 @@ const NexaChatLabView = () => (
     sx={{
       display: 'flex',
       flexDirection: 'column',
-      gap: DESIGN_SYSTEM_LAB_TOKENS.layout.sectionGap,
+      gap: { xs: 4, md: DESIGN_SYSTEM_LAB_TOKENS.layout.sectionGap },
       maxWidth: DESIGN_SYSTEM_LAB_TOKENS.layout.pageMaxInlineSize,
       mx: 'auto'
     }}
   >
-    {/* Header */}
-    <Stack spacing={DESIGN_SYSTEM_LAB_TOKENS.layout.headerGap}>
-      <AxisWordmark variant='auto' height={DESIGN_SYSTEM_LAB_TOKENS.layout.logoBlockSize} sx={{ mb: DESIGN_SYSTEM_LAB_TOKENS.spacing.hairline }} />
-      <Typography variant='overline' color='primary'>
-        Nexa Chat Pattern
-      </Typography>
-      <Typography variant='h4'>Nexa Chat</Typography>
-      <Typography variant='body2' color='text.secondary' sx={{ maxWidth: DESIGN_SYSTEM_LAB_TOKENS.layout.introMaxInlineSize }}>
-        La superficie conversacional canónica de Nexa. Es un <strong>patrón compuesto</strong> (organismo), no una primitive
-        suelta: compone un header de presencia, un rail de historial glass, el cuerpo de conversación, el empty hero y el
-        composer. Las superficies donde aparece Nexa (botón flotante global, Home, futuros sidecars) deben reusar este
-        patrón y sus <InlineCode>primitives</InlineCode>, sin forkear chats paralelos. Spec: <InlineCode>{TASK_REF}</InlineCode>.
-      </Typography>
-      <Box>
-        <Button variant='contained' size='small' href={MOCKUP_ROUTE} startIcon={<i className='tabler-external-link' />}>
-          Abrir el specimen vivo
-        </Button>
+    <Box
+      sx={theme => ({
+        p: { xs: 4, md: 6 },
+        border: `1px solid ${theme.palette.divider}`,
+        borderRadius: `${theme.shape.customBorderRadius.lg}px`,
+        background: `linear-gradient(135deg, ${alpha(theme.palette.background.paper, 0.98)}, ${alpha(
+          theme.palette.primary.main,
+          DESIGN_SYSTEM_LAB_TOKENS.opacity.softAccentSurface
+        )})`
+      })}
+    >
+      <Box
+        sx={{
+          display: 'grid',
+          gridTemplateColumns: { xs: '1fr', md: 'minmax(0, 1.35fr) minmax(280px, 0.65fr)' },
+          gap: { xs: 4, md: 6 },
+          alignItems: 'start'
+        }}
+      >
+        <Stack spacing={DESIGN_SYSTEM_LAB_TOKENS.layout.headerGap}>
+          <AxisWordmark variant='auto' height={DESIGN_SYSTEM_LAB_TOKENS.layout.logoBlockSize} sx={{ mb: DESIGN_SYSTEM_LAB_TOKENS.spacing.hairline }} />
+          <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
+            <CustomChip label='Nexa Chat Pattern' size='small' variant='tonal' color='primary' round='true' />
+            <CustomChip label={TASK_REF} size='small' variant='tonal' color='secondary' round='true' />
+          </Stack>
+          <Typography variant='h4'>Nexa Chat</Typography>
+          <Typography variant='body2' color='text.secondary' sx={{ maxWidth: DESIGN_SYSTEM_LAB_TOKENS.layout.introMaxInlineSize }}>
+            La superficie conversacional canónica de Nexa. Es un <strong>patrón compuesto</strong> (organismo), no una primitive
+            suelta: compone presencia, historial, conversación, empty hero y composer. Toda surface donde aparece Nexa debe
+            reusar este patrón y sus <InlineCode>primitives</InlineCode>, sin chats paralelos.
+          </Typography>
+          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems={{ sm: 'center' }}>
+            <GreenhouseButton
+              kind='primaryAction'
+              size='small'
+              href={MOCKUP_ROUTE}
+              leadingIcon={<i className='tabler-external-link' />}
+            >
+              Abrir specimen vivo
+            </GreenhouseButton>
+            <Typography variant='caption' color='text.secondary'>
+              Ruta interna de revisión · captura GVC disponible para desktop y mobile.
+            </Typography>
+          </Stack>
+        </Stack>
+
+        <Stack spacing={2}>
+          <Box
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: { xs: '1fr 1fr', sm: 'repeat(2, minmax(0, 1fr))' },
+              gap: 2
+            }}
+          >
+            {LAB_STATUS.map(item => (
+              <MetaTile key={item.label} label={item.label} value={item.value} />
+            ))}
+          </Box>
+          <Card density='compact'>
+            <Stack spacing={1.5}>
+              <Typography variant='h5'>Mapa de revisión</Typography>
+              {REVIEW_AREAS.map(item => (
+                <Stack key={item.label} direction='row' spacing={1.5} alignItems='flex-start'>
+                  <Box
+                    sx={theme => ({
+                      inlineSize: DESIGN_SYSTEM_LAB_TOKENS.icon.badgeContainer,
+                      blockSize: DESIGN_SYSTEM_LAB_TOKENS.icon.badgeContainer,
+                      borderRadius: '9999px',
+                      bgcolor: alpha(theme.palette.primary.main, DESIGN_SYSTEM_LAB_TOKENS.opacity.softAccentSurface),
+                      color: 'primary.main',
+                      display: 'grid',
+                      placeItems: 'center',
+                      flexShrink: 0
+                    })}
+                  >
+                    <i className='tabler-check' />
+                  </Box>
+                  <Box sx={{ minInlineSize: 0 }}>
+                    <Typography variant='body2' sx={{ fontWeight: 600 }}>
+                      {item.label}
+                    </Typography>
+                    <Typography variant='caption' color='text.secondary'>
+                      {item.value}
+                    </Typography>
+                  </Box>
+                </Stack>
+              ))}
+            </Stack>
+          </Card>
+        </Stack>
       </Box>
-    </Stack>
+    </Box>
 
     {/* Clasificación */}
-    <Section eyebrow='Clasificación' title='Patrón compuesto (composition)'>
-      <Card>
-        <Stack spacing={DESIGN_SYSTEM_LAB_TOKENS.spacing.tight}>
-          <Typography variant='body2'>
-            <strong>Es:</strong> un patrón / composición platform-level (igual categoría que <InlineCode>NexaInsightsBlock</InlineCode>).
-            Ensambla primitives en un organismo reusable.
-          </Typography>
-          <Typography variant='body2' color='text.secondary'>
-            <strong>No es:</strong> una primitive única (tiene 5 regiones), ni un componente por-superficie (no se forkea
-            por pantalla). Sus átomos sí son primitives (<InlineCode>NexaGlowBorder</InlineCode> y los que se extraerán).
-          </Typography>
-        </Stack>
-      </Card>
-    </Section>
-
-    {/* Anatomía */}
-    <Section eyebrow='Anatomía' title='Las 5 regiones'>
-      <Stack spacing={DESIGN_SYSTEM_LAB_TOKENS.spacing.tight}>
-        {ANATOMY.map(item => (
-          <Card key={item.region}>
-            <Typography variant='subtitle2'>{item.region}</Typography>
-            <Typography variant='body2' color='text.secondary' sx={{ mt: 0.5 }}>
-              {item.detail}
+    <Section
+      eyebrow='Clasificación'
+      title='Patrón compuesto, primitives gobernadas'
+      description='La página separa contrato, anatomía y specimen para que cada primitive pueda revisarse sin perder el patrón completo.'
+    >
+      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(2, minmax(0, 1fr))' }, gap: 3 }}>
+        <Card>
+          <Stack spacing={1.5}>
+            <CustomChip label='Es' size='small' variant='tonal' color='success' round='true' sx={{ alignSelf: 'flex-start' }} />
+            <Typography variant='body2'>
+              Un patrón / composición platform-level, igual categoría que <InlineCode>NexaInsightsBlock</InlineCode>. Ensambla
+              primitives en un organismo reusable con contrato visual y funcional.
             </Typography>
-          </Card>
-        ))}
-      </Stack>
+          </Stack>
+        </Card>
+        <Card>
+          <Stack spacing={1.5}>
+            <CustomChip label='No es' size='small' variant='tonal' color='warning' round='true' sx={{ alignSelf: 'flex-start' }} />
+            <Typography variant='body2' color='text.secondary'>
+              No es una primitive única ni un componente por-superficie. Sus átomos sí son primitives; el chat completo no se
+              forkea por pantalla.
+            </Typography>
+          </Stack>
+        </Card>
+      </Box>
     </Section>
 
-    {/* Primitives que lo componen */}
-    <Section eyebrow='Composición' title='Primitives y piezas que lo forman'>
-      <Stack spacing={DESIGN_SYSTEM_LAB_TOKENS.spacing.tight}>
-        {COMPOSED_OF.map(item => (
-          <Card key={item.name}>
-            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={DESIGN_SYSTEM_LAB_TOKENS.spacing.tight} alignItems={{ sm: 'center' }} justifyContent='space-between'>
-              <Box>
-                <InlineCode>{item.name}</InlineCode>
-                <Typography variant='body2' color='text.secondary' sx={{ mt: 0.5 }}>
-                  {item.role}
-                </Typography>
-              </Box>
-              <Typography variant='caption' color='text.secondary' sx={{ flexShrink: 0, fontWeight: 600 }}>
-                {item.status}
+    <Section eyebrow='Anatomía' title='Las 5 regiones' description='Cada región tiene una responsabilidad visual y de interacción distinta.'>
+      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(5, minmax(0, 1fr))' }, gap: 2 }}>
+        {ANATOMY.map((item, index) => (
+          <Card key={item.region} density='compact'>
+            <Stack spacing={1.5}>
+              <Typography variant='monoId' color='primary.main'>
+                {String(index + 1).padStart(2, '0')}
+              </Typography>
+              <Typography variant='subtitle2'>{item.region}</Typography>
+              <Typography variant='caption' color='text.secondary'>
+                {item.detail}
               </Typography>
             </Stack>
           </Card>
         ))}
-      </Stack>
+      </Box>
     </Section>
 
-    {/* Specimen vivo — los átomos extraídos, renderizados */}
-    <Section eyebrow='Specimen' title='Átomos vivos'>
-      <Stack spacing={DESIGN_SYSTEM_LAB_TOKENS.spacing.tight}>
-        {/* NexaFace */}
-        <Card>
-          <Typography variant='subtitle2' sx={{ mb: 1.5 }}>
-            <InlineCode>NexaFace</InlineCode> — variants
-          </Typography>
-          <Stack direction='row' spacing={3} alignItems='flex-end' flexWrap='wrap'>
-            <Stack spacing={0.5} alignItems='center'>
-              <NexaFace variant='hero' />
-              <Typography variant='caption' color='text.secondary'>hero · 76</Typography>
-            </Stack>
-            <Stack spacing={0.5} alignItems='center'>
-              <NexaFace variant='header' />
-              <Typography variant='caption' color='text.secondary'>header · 44</Typography>
-            </Stack>
-            <Stack spacing={0.5} alignItems='center'>
-              <NexaFace variant='message' />
-              <Typography variant='caption' color='text.secondary'>message · 32</Typography>
-            </Stack>
-          </Stack>
-        </Card>
-
-        {/* NexaSenderMark — avatar por-mensaje (disco navy, se ve sobre paper) */}
-        <Card>
-          <Typography variant='subtitle2' sx={{ mb: 1.5 }}>
-            <InlineCode>NexaSenderMark</InlineCode> — avatar por-mensaje
-          </Typography>
-          <Stack direction='row' spacing={3} alignItems='center' flexWrap='wrap'>
-            <Stack spacing={0.5} alignItems='center'>
-              <NexaSenderMark />
-              <Typography variant='caption' color='text.secondary'>default · 28</Typography>
-            </Stack>
-            <Stack spacing={0.5} alignItems='center'>
-              <NexaSenderMark size={40} />
-              <Typography variant='caption' color='text.secondary'>size 40</Typography>
-            </Stack>
-          </Stack>
-        </Card>
-
-        {/* NexaPresenceMark — sobre navy (su contexto real es el header) */}
-        <Card>
-          <Typography variant='subtitle2' sx={{ mb: 1.5 }}>
-            <InlineCode>NexaPresenceMark</InlineCode> — estados
-          </Typography>
-          <Stack direction='row' spacing={2} flexWrap='wrap'>
-            {[
-              { thinking: false, label: 'reposo' },
-              { thinking: true, label: 'pensando' }
-            ].map(s => (
-              <Stack key={s.label} spacing={0.5} alignItems='center'>
-                <Box sx={{ px: 2, py: 1, borderRadius: 2, bgcolor: GREENHOUSE_NEXA_BRAND_COLORS.midnightNavy }}>
-                  <NexaPresenceMark thinking={s.thinking} />
-                </Box>
-                <Typography variant='caption' color='text.secondary'>{s.label}</Typography>
+    <Section
+      eyebrow='Composición'
+      title='Primitives y piezas que lo forman'
+      description='El grid deja visible qué ya es primitive canónica y qué sigue perteneciendo al patrón compuesto.'
+    >
+      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(2, minmax(0, 1fr))' }, gap: 2 }}>
+        {COMPOSED_OF.map(item => (
+          <Card key={item.name} density='compact'>
+            <Stack spacing={1.5}>
+              <Stack direction='row' spacing={1} alignItems='center' justifyContent='space-between'>
+                <InlineCode>{item.name}</InlineCode>
+                <Typography variant='caption' color='text.secondary' sx={{ flexShrink: 0, fontWeight: 600 }}>
+                  {item.status}
+                </Typography>
               </Stack>
-            ))}
+              <Typography variant='body2' color='text.secondary'>
+                {item.role}
+              </Typography>
+            </Stack>
+          </Card>
+        ))}
+      </Box>
+    </Section>
+
+    <Section
+      eyebrow='Átomos base'
+      title='Presencia, identidad y composer'
+      description='Estos controles son los bloques chicos que deben mantenerse consistentes antes de revisar respuestas más grandes.'
+    >
+      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', lg: 'repeat(2, minmax(0, 1fr))' }, gap: 3 }}>
+        <Card>
+          <Stack spacing={3}>
+            <Stack spacing={1}>
+              <Typography variant='h5'>
+                <InlineCode>NexaFace</InlineCode> · variants
+              </Typography>
+              <Typography variant='body2' color='text.secondary'>
+                La cara real se reserva para presencia, no para cada mensaje.
+              </Typography>
+            </Stack>
+            <Stack direction='row' spacing={3} alignItems='flex-end' flexWrap='wrap'>
+              <Stack spacing={0.5} alignItems='center'>
+                <NexaFace variant='hero' />
+                <Typography variant='caption' color='text.secondary'>hero · 76</Typography>
+              </Stack>
+              <Stack spacing={0.5} alignItems='center'>
+                <NexaFace variant='header' />
+                <Typography variant='caption' color='text.secondary'>header · 44</Typography>
+              </Stack>
+              <Stack spacing={0.5} alignItems='center'>
+                <NexaFace variant='message' />
+                <Typography variant='caption' color='text.secondary'>message · 32</Typography>
+              </Stack>
+            </Stack>
           </Stack>
         </Card>
 
-        {/* NexaComposer — la unidad completa (presentacional; sin runtime cableado acá) */}
         <Card>
-          <Typography variant='subtitle2' sx={{ mb: 1.5 }}>
-            <InlineCode>NexaComposer</InlineCode> — unidad (glow + input + botón + disclaimer)
-          </Typography>
+          <Stack spacing={3}>
+            <Stack spacing={1}>
+              <Typography variant='h5'>
+                <InlineCode>NexaSenderMark</InlineCode> · avatar por-mensaje
+              </Typography>
+              <Typography variant='body2' color='text.secondary'>
+                Marca compacta para mensajes y bubbles, sin duplicar la cara real.
+              </Typography>
+            </Stack>
+            <Stack direction='row' spacing={3} alignItems='center' flexWrap='wrap'>
+              <Stack spacing={0.5} alignItems='center'>
+                <NexaSenderMark />
+                <Typography variant='caption' color='text.secondary'>default · 28</Typography>
+              </Stack>
+              <Stack spacing={0.5} alignItems='center'>
+                <NexaSenderMark size={40} />
+                <Typography variant='caption' color='text.secondary'>size 40</Typography>
+              </Stack>
+            </Stack>
+          </Stack>
+        </Card>
+
+        <Card>
+          <Stack spacing={3}>
+            <Stack spacing={1}>
+              <Typography variant='h5'>
+                <InlineCode>NexaPresenceMark</InlineCode> · estados
+              </Typography>
+              <Typography variant='body2' color='text.secondary'>
+                Estado vivo para header sobre navy, con reduced motion horneado.
+              </Typography>
+            </Stack>
+            <Stack direction='row' spacing={2} flexWrap='wrap'>
+              {[
+                { thinking: false, label: 'reposo' },
+                { thinking: true, label: 'pensando' }
+              ].map(s => (
+                <Stack key={s.label} spacing={0.5} alignItems='center'>
+                  <Box
+                    sx={theme => ({
+                      px: 2,
+                      py: 1,
+                      borderRadius: `${theme.shape.customBorderRadius.md}px`,
+                      bgcolor: GREENHOUSE_NEXA_BRAND_COLORS.midnightNavy
+                    })}
+                  >
+                    <NexaPresenceMark thinking={s.thinking} />
+                  </Box>
+                  <Typography variant='caption' color='text.secondary'>{s.label}</Typography>
+                </Stack>
+              ))}
+            </Stack>
+          </Stack>
+        </Card>
+
+        <Card>
+          <Stack spacing={3}>
+            <Stack spacing={1}>
+              <Typography variant='h5'>
+                <InlineCode>NexaComposerActionButton</InlineCode>
+              </Typography>
+              <Typography variant='body2' color='text.secondary'>
+                Acciones compactas para enviar, buscar o detener generación dentro del composer.
+              </Typography>
+            </Stack>
+            <Stack direction='row' spacing={2} alignItems='center' flexWrap='wrap'>
+              <Stack spacing={0.5} alignItems='center'>
+                <NexaComposerActionButton variant='send' aria-label='Enviar mensaje' />
+                <Typography variant='caption' color='text.secondary'>send</Typography>
+              </Stack>
+              <Stack spacing={0.5} alignItems='center'>
+                <NexaComposerActionButton variant='send' icon='search' aria-label='Preguntar' />
+                <Typography variant='caption' color='text.secondary'>search</Typography>
+              </Stack>
+              <Stack spacing={0.5} alignItems='center'>
+                <NexaComposerActionButton variant='stop' aria-label='Detener generación' />
+                <Typography variant='caption' color='text.secondary'>stop</Typography>
+              </Stack>
+            </Stack>
+          </Stack>
+        </Card>
+      </Box>
+    </Section>
+
+    <Section
+      eyebrow='Composer'
+      title='Glow + input + acción'
+      description='El composer es una unidad: el input no pinta su propia caja y el glow gobierna el foco visual.'
+    >
+      <SpecimenFrame
+        capture='nexa-composer-command-variant'
+        eyebrow='Primitive'
+        title='NexaComposer'
+        description='Unidad completa para chat y command input; presenta el glow, el placeholder, el botón y el disclaimer.'
+      >
+        <Stack spacing={3}>
           <NexaComposer disclaimer='Nexa analiza tus datos en tiempo real. Verifica antes de una decisión crítica.'>
             <NexaComposerInput
               placeholder='Pregúntale a Nexa sobre tu operación…'
               endAdornment={<NexaComposerActionButton variant='send' aria-label='Enviar mensaje' />}
             />
           </NexaComposer>
-          <Box sx={{ mt: 3, maxInlineSize: 720 }} data-capture='nexa-composer-command-variant'>
-            <Typography variant='caption' color='text.secondary' sx={{ display: 'block', mb: 1 }}>
-              <InlineCode>kind=&apos;knowledgeAsk&apos;</InlineCode> — command input con Nexa mark + shortcut ↵
+          <Divider />
+          <Stack spacing={1}>
+            <Typography variant='caption' color='text.secondary'>
+              <InlineCode>kind=&apos;knowledgeAsk&apos;</InlineCode> · command input con Nexa mark + shortcut ↵
             </Typography>
             <NexaComposer kind='knowledgeAsk'>
               <NexaComposerInput
@@ -750,94 +1102,123 @@ const NexaChatLabView = () => (
                 actionAdornment={<NexaComposerActionButton variant='send' icon='search' aria-label='Preguntar' />}
               />
             </NexaComposer>
-          </Box>
-          <Stack direction='row' spacing={2} alignItems='center' sx={{ mt: 2 }}>
-            <Typography variant='caption' color='text.secondary'>
-              <InlineCode>NexaComposerActionButton</InlineCode>:
-            </Typography>
-            <Stack spacing={0.5} alignItems='center'>
-              <NexaComposerActionButton variant='send' aria-label='Enviar mensaje' />
-              <Typography variant='caption' color='text.secondary'>send</Typography>
-            </Stack>
-            <Stack spacing={0.5} alignItems='center'>
-              <NexaComposerActionButton variant='send' icon='search' aria-label='Preguntar' />
-              <Typography variant='caption' color='text.secondary'>search</Typography>
-            </Stack>
-            <Stack spacing={0.5} alignItems='center'>
-              <NexaComposerActionButton variant='stop' aria-label='Detener generación' />
-              <Typography variant='caption' color='text.secondary'>stop</Typography>
-            </Stack>
           </Stack>
-        </Card>
+        </Stack>
+      </SpecimenFrame>
+    </Section>
 
-        <Box data-capture='nexa-knowledge-answer-surface-specimen' sx={{ scrollMarginBlockStart: { xs: 19, md: 13 } }}>
-          <Typography variant='subtitle2' sx={{ mb: 1.5 }}>
-            <InlineCode>NexaKnowledgeAnswerSurface</InlineCode> — pregunta, respuesta y prueba sin salto abrupto
-          </Typography>
+    <Section
+      eyebrow='Surfaces de respuesta'
+      title='Specimens vivos para revisar primitives'
+      description='Cada specimen queda dentro de un frame con propósito explícito; así el reviewer puede mirar una primitive a la vez.'
+    >
+      <Stack spacing={3}>
+        <SpecimenFrame
+          capture='nexa-knowledge-answer-surface-specimen'
+          eyebrow='Composition primitive'
+          title='NexaKnowledgeAnswerSurface'
+          description='Pregunta, respuesta, composer descendido y prueba verificable para Knowledge.'
+        >
           <KnowledgeAnswerSurfaceSpecimen />
-        </Box>
+        </SpecimenFrame>
 
-        <Box data-capture='nexa-answer-bubble-chart-specimen' sx={{ scrollMarginBlockStart: { xs: 19, md: 13 } }}>
-          <Typography variant='subtitle2' sx={{ mb: 1.5 }}>
-            <InlineCode>NexaAnswerBubble</InlineCode> — variante chart reusable
-          </Typography>
+        <SpecimenFrame
+          capture='nexa-conversation-bubble-specimen'
+          eyebrow='Primitive'
+          title='NexaConversationBubble'
+          description='Bubbles base para pregunta, thinking, texto simple, follow-up y notices de confianza.'
+        >
+          <NexaConversationBubbleSpecimen />
+        </SpecimenFrame>
+
+        <SpecimenFrame
+          capture='nexa-answer-bubble-chart-specimen'
+          eyebrow='Primitive · answer turn'
+          title='NexaAnswerBubble · chart'
+          description='Respuesta enriquecida donde el gráfico es protagonista y el proof queda bajo demanda.'
+        >
           <NexaAnswerBubbleSpecimen />
-        </Box>
+        </SpecimenFrame>
 
-        <Box data-capture='nexa-answer-bubble-metric-summary-specimen' sx={{ scrollMarginBlockStart: { xs: 19, md: 13 } }}>
-          <Typography variant='subtitle2' sx={{ mb: 1.5 }}>
-            <InlineCode>NexaAnswerBubble</InlineCode> — variante metricSummary
-          </Typography>
+        <SpecimenFrame
+          capture='nexa-answer-bubble-metric-summary-specimen'
+          eyebrow='Primitive · answer turn'
+          title='NexaAnswerBubble · metricSummary'
+          description='Lectura ejecutiva compacta para 2 a 4 métricas con delta, mini trend e interpretación.'
+        >
           <NexaAnswerMetricSummarySpecimen />
-        </Box>
+        </SpecimenFrame>
 
-        <Box data-capture='nexa-answer-bubble-action-plan-specimen' sx={{ scrollMarginBlockStart: { xs: 19, md: 13 } }}>
-          <Typography variant='subtitle2' sx={{ mb: 1.5 }}>
-            <InlineCode>NexaAnswerBubble</InlineCode> — variante actionPlan
-          </Typography>
+        <SpecimenFrame
+          capture='nexa-answer-bubble-action-plan-specimen'
+          eyebrow='Primitive · answer turn'
+          title='NexaAnswerBubble · actionPlan'
+          description='Recomendación accionable con decisión sugerida, pasos, trade-offs, riesgos y CTAs.'
+        >
           <NexaAnswerActionPlanSpecimen />
-        </Box>
+        </SpecimenFrame>
 
-        <Box data-capture='nexa-answers-canvas-specimen' sx={{ scrollMarginBlockStart: { xs: 19, md: 13 } }}>
-          <Typography variant='subtitle2' sx={{ mb: 1.5 }}>
-            <InlineCode>NexaAnswersCanvas</InlineCode> — canvas transversal renderPlan/runtime
-          </Typography>
+        <SpecimenFrame
+          capture='nexa-answers-canvas-specimen'
+          eyebrow='Primitive · orchestration'
+          title='NexaAnswersCanvas'
+          description='Canvas transversal para renderPlan/runtime con proof, composer y registry de renderers.'
+        >
           <NexaAnswersCanvasSpecimen />
-        </Box>
+        </SpecimenFrame>
 
-        <Box data-capture='nexa-knowledge-tool-trace-specimen' sx={{ scrollMarginBlockStart: { xs: 19, md: 13 } }}>
-          <Typography variant='subtitle2' sx={{ mb: 1.5 }}>
-            <InlineCode>search_knowledge</InlineCode> — evidence card del packet real debajo de la respuesta
-          </Typography>
+        <SpecimenFrame
+          capture='nexa-knowledge-tool-trace-specimen'
+          eyebrow='Runtime renderer'
+          title='search_knowledge evidence card'
+          description='Renderer del packet real debajo de una respuesta Nexa, con fuentes y feedback desactivado en el lab.'
+        >
           <NexaKnowledgeToolTraceCard result={KNOWLEDGE_TOOL_TRACE_SPECIMEN} feedbackEnabled={false} />
-        </Box>
+        </SpecimenFrame>
       </Stack>
     </Section>
 
     {/* Modos */}
     <Section eyebrow='Modos de interacción' title='Dock / Expandible / Lane'>
-      <Stack spacing={DESIGN_SYSTEM_LAB_TOKENS.spacing.tight}>
+      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(3, minmax(0, 1fr))' }, gap: 2 }}>
         {MODES.map(item => (
-          <Card key={item.mode}>
+          <Card key={item.mode} density='compact'>
             <Typography variant='subtitle2'>{item.mode}</Typography>
             <Typography variant='body2' color='text.secondary' sx={{ mt: 0.5 }}>
               {item.detail}
             </Typography>
           </Card>
         ))}
-      </Stack>
+      </Box>
     </Section>
 
     {/* Reglas */}
     <Section eyebrow='Reglas de uso' title='Hacer / No hacer'>
       <Card>
-        <Stack spacing={DESIGN_SYSTEM_LAB_TOKENS.spacing.tight}>
-          <Typography variant='body2'>✓ Reusar este patrón + sus primitives en toda superficie donde aparezca Nexa.</Typography>
-          <Typography variant='body2'>✓ Para respuestas con evidencia, usar <InlineCode>NexaKnowledgeAnswerSurface</InlineCode> y su kind inicial <InlineCode>knowledgeAnswerTrace</InlineCode>.</Typography>
-          <Typography variant='body2'>✓ Empty hero: saludo rotativo + prompts contextuales (por ruta/entidad/rol) + firma Efeonce solo aquí.</Typography>
-          <Typography variant='body2'>✓ Composer siempre vía <InlineCode>NexaComposer</InlineCode> (que envuelve <InlineCode>NexaGlowBorder</InlineCode>); cero hardcode (tokens AXIS + brand Nexa SSOT + escala SoT).</Typography>
-          <Typography variant='body2' color='error.main'>✗ No crear un chat de Nexa paralelo por pantalla ni reimplementar el composer/rail.</Typography>
-          <Typography variant='body2' color='error.main'>✗ No usar la firma Efeonce fuera del empty state ni la cara real per-mensaje (ahí va el mark).</Typography>
+        <Stack spacing={2}>
+          {[
+            'Reusar este patrón + sus primitives en toda superficie donde aparezca Nexa.',
+            'Para respuestas con evidencia, usar NexaKnowledgeAnswerSurface y su kind inicial knowledgeAnswerTrace.',
+            'Empty hero: saludo rotativo + prompts contextuales por ruta, entidad o rol; firma Efeonce solo ahí.',
+            'Composer siempre vía NexaComposer; cero hardcode fuera de tokens AXIS + brand Nexa SSOT + escala SoT.'
+          ].map(rule => (
+            <Stack key={rule} direction='row' spacing={1.5} alignItems='flex-start'>
+              <CustomChip label='Hacer' size='small' variant='tonal' color='success' round='true' />
+              <Typography variant='body2'>{rule}</Typography>
+            </Stack>
+          ))}
+          <Divider />
+          {[
+            'No crear un chat de Nexa paralelo por pantalla ni reimplementar el composer o el rail.',
+            'No usar la firma Efeonce fuera del empty state ni la cara real por mensaje; ahí va NexaSenderMark.'
+          ].map(rule => (
+            <Stack key={rule} direction='row' spacing={1.5} alignItems='flex-start'>
+              <CustomChip label='Evitar' size='small' variant='tonal' color='error' round='true' />
+              <Typography variant='body2' color='error.main'>
+                {rule}
+              </Typography>
+            </Stack>
+          ))}
         </Stack>
       </Card>
     </Section>

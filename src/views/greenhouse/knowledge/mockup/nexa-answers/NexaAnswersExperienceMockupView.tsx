@@ -28,14 +28,17 @@ import type { ConversationalEvidencePacket } from '@/lib/nexa/conversational-evi
 
 import { answerActions, answerPoints, icoChartSpec, trustCue } from './nexa-answer-bubble-fixtures'
 
-type VisualStage = 'idle' | 'thinking' | 'answered' | 'proof' | 'followup'
+type VisualStage = 'idle' | 'thinking' | 'streaming' | 'answered' | 'proof' | 'followup' | 'degraded' | 'error'
 
 const stageOptions: Array<{ value: VisualStage; label: string }> = [
   { value: 'idle', label: 'Idle' },
   { value: 'thinking', label: 'Pensando' },
+  { value: 'streaming', label: 'Streaming' },
   { value: 'answered', label: 'Respuesta' },
   { value: 'proof', label: 'Proof' },
-  { value: 'followup', label: 'Follow-up' }
+  { value: 'followup', label: 'Follow-up' },
+  { value: 'degraded', label: 'Degradado' },
+  { value: 'error', label: 'Error' }
 ]
 
 const NEXA_ANSWERS_VISUAL_COPY = {
@@ -168,6 +171,12 @@ const evidencePacket: ConversationalEvidencePacket = {
 const mainQuestion = '¿Cómo se interpreta Impacto dentro de las métricas ICO?'
 const followUpQuestion = '¿Y cómo lo explicaría a un manager sin hablar de scoring técnico?'
 
+const suggestedFollowUps = [
+  { id: 'by-signal', label: 'Desglósalo por señal' },
+  { id: 'to-manager', label: 'Explícalo para un manager' },
+  { id: 'flag-gaps', label: '¿Dónde hay vacíos de evidencia?' }
+]
+
 const canvasCopy: NexaAnswersCanvasCopy = {
   assistantName: 'Nexa',
   idleTitle: 'Pregúntale a Nexa sobre este corpus',
@@ -177,7 +186,9 @@ const canvasCopy: NexaAnswersCanvasCopy = {
   submitLabel: NEXA_ANSWERS_VISUAL_COPY.aria.ask,
   followUpLabel: NEXA_ANSWERS_VISUAL_COPY.aria.sendFollowUp,
   thinkingLabel: 'Nexa está preparando la respuesta.',
+  streamingLabel: 'Nexa está escribiendo la respuesta.',
   readyLabel: 'Respuesta grounded en Knowledge',
+  suggestedFollowUpsLabel: 'Preguntas sugeridas',
   degradedTitle: 'Respuesta parcial',
   degradedBody: 'Nexa puede responder, pero la evidencia disponible no alcanza para tratar esto como base decisional.',
   errorTitle: 'No pudimos completar la respuesta',
@@ -257,10 +268,12 @@ const StageSelector = ({ value, onChange }: { value: VisualStage; onChange: (sta
       size='small'
       sx={{
         display: 'grid',
-        gridTemplateColumns: { xs: 'repeat(2, minmax(0, 1fr))', md: 'repeat(5, minmax(0, 1fr))' },
+        // 7 specimens (suma degradado/error): xs en 2 columnas, md en 4 → envuelve a 2 filas
+        // sin desbordar el header.
+        gridTemplateColumns: { xs: 'repeat(2, minmax(0, 1fr))', md: 'repeat(4, minmax(0, 1fr))' },
         inlineSize: { xs: '100%', md: 'auto' },
         '& .MuiToggleButton-root': {
-          minInlineSize: { xs: 0, md: 112 },
+          minInlineSize: { xs: 0, md: 96 },
           borderRadius: `${theme.shape.customBorderRadius.sm}px`
         }
       }}
@@ -290,7 +303,20 @@ const ConversationSurface = ({ stage }: { stage: VisualStage }) => {
   const thinking = stage === 'thinking'
   const isFollowUp = stage === 'followup' || Boolean(submittedFollowUp)
 
-  const canvasState: NexaAnswersCanvasState = thinking ? 'thinking' : proofOpen ? 'proofOpen' : isFollowUp ? 'followup' : 'answered'
+  const canvasState: NexaAnswersCanvasState =
+    stage === 'error'
+      ? 'error'
+      : stage === 'degraded'
+        ? 'degraded'
+        : stage === 'streaming'
+          ? 'streaming'
+          : thinking
+            ? 'thinking'
+            : proofOpen
+              ? 'proofOpen'
+              : isFollowUp
+                ? 'followup'
+                : 'answered'
 
   const submitFollowUp = () => {
     const trimmed = followUpDraft.trim()
@@ -330,6 +356,11 @@ const ConversationSurface = ({ stage }: { stage: VisualStage }) => {
       onProofToggle={() => setProofOpen(current => !current)}
       previousTurns={isFollowUp ? [previousImpactTurn] : []}
       followUpQuestion={submittedFollowUp}
+      suggestedFollowUps={suggestedFollowUps}
+      onSuggestedFollowUp={followUp => {
+        setSubmittedFollowUp(followUp.label)
+        setFollowUpDraft('')
+      }}
       copy={canvasCopy}
     />
   )

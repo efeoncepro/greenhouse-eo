@@ -62,6 +62,17 @@ export { default as NexaPresenceMark } from './NexaPresenceMark'
 export type { NexaPresenceMarkProps } from './NexaPresenceMark'
 export { default as NexaSenderMark } from './NexaSenderMark'
 export type { NexaSenderMarkProps } from './NexaSenderMark'
+export {
+  default as NexaExpressiveText,
+  getNexaExpressiveTextPlainText,
+  hasExpressiveTextSegments
+} from './nexa-expressive-text/NexaExpressiveText'
+export type {
+  NexaExpressiveTextProps,
+  NexaExpressiveTextSegment,
+  NexaExpressiveTextStyle,
+  NexaExpressiveTextValue
+} from './nexa-expressive-text/nexa-expressive-text-types'
 export { default as NexaEvidencePanel } from './NexaEvidencePanel'
 export type { NexaEvidencePanelProps, NexaEvidencePanelVariant } from './NexaEvidencePanel'
 export { default as NexaKnowledgeAnswerSurface } from './NexaKnowledgeAnswerSurface'
@@ -120,6 +131,24 @@ export type {
   NexaAnswerBubbleKindConfig,
   NexaAnswerBubbleVariantConfig
 } from './nexa-answer-bubble/nexa-answer-bubble-controller'
+export { default as NexaConversationBubble } from './nexa-conversation-bubble/NexaConversationBubble'
+export type {
+  NexaConversationBubbleAction,
+  NexaConversationBubbleKind,
+  NexaConversationBubbleProps,
+  NexaConversationBubbleTone,
+  NexaConversationBubbleVariant
+} from './nexa-conversation-bubble/nexa-conversation-bubble-types'
+export {
+  NEXA_CONVERSATION_BUBBLE_KIND_CONFIG,
+  NEXA_CONVERSATION_BUBBLE_VARIANT_CONFIG,
+  resolveNexaConversationBubbleKind,
+  resolveNexaConversationBubbleVariant
+} from './nexa-conversation-bubble/nexa-conversation-bubble-controller'
+export type {
+  NexaConversationBubbleKindConfig,
+  NexaConversationBubbleVariantConfig
+} from './nexa-conversation-bubble/nexa-conversation-bubble-controller'
 export { default as NexaAnswersCanvas } from './nexa-answers-canvas/NexaAnswersCanvas'
 export type {
   NexaAnswersAction,
@@ -136,6 +165,7 @@ export type {
   NexaAnswersCanvasState,
   NexaAnswersCanvasVariant,
   NexaAnswersCompactAnswerBlock,
+  NexaAnswersConversationBubbleBlock,
   NexaAnswersIntent,
   NexaAnswersProofSpec,
   NexaAnswersRenderBlock,

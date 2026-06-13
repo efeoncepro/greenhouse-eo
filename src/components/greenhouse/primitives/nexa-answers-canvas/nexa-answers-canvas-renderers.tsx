@@ -4,6 +4,7 @@ import type { ReactNode } from 'react'
 
 import GreenhouseChip from '../GreenhouseChip'
 import NexaAnswerBubble, { NexaCompactAnswerBubble } from '../nexa-answer-bubble/NexaAnswerBubble'
+import NexaConversationBubble from '../nexa-conversation-bubble/NexaConversationBubble'
 import type {
   NexaAnswersAction,
   NexaAnswersRenderBlock,
@@ -15,6 +16,7 @@ export interface NexaAnswersBlockRenderContext {
   proofOpen: boolean
   thinking: boolean
   renderPlan: NexaAnswersRenderPlan
+  proofPanelId: string
   onProofToggle: () => void
   onAction?: (action: NexaAnswersAction) => void
 }
@@ -24,11 +26,12 @@ type NexaAnswersBlockRenderer = (block: NexaAnswersRenderBlock, context: NexaAns
 const toAnswerAction = (action: NexaAnswersAction, onAction?: (action: NexaAnswersAction) => void) => ({
   label: action.label,
   iconClassName: action.iconClassName,
+  kind: action.kind,
   variant: action.disabledReason ? ('text' as const) : action.variant,
   tone: action.tone,
-  disabled: Boolean(action.disabledReason),
+  disabled: action.disabled || Boolean(action.disabledReason),
   disabledReason: action.disabledReason,
-  onClick: action.disabledReason ? undefined : () => onAction?.(action)
+  onClick: action.disabled || action.disabledReason ? undefined : () => onAction?.(action)
 })
 
 const renderAnswerBubble: NexaAnswersBlockRenderer = (block, context) => {
@@ -48,10 +51,32 @@ const renderAnswerBubble: NexaAnswersBlockRenderer = (block, context) => {
       trustCue={block.trustCue ?? context.renderPlan.trustCue}
       proofOpen={context.proofOpen}
       onProofToggle={context.onProofToggle}
+      proofPanelId={context.proofPanelId}
       thinking={context.thinking}
       chart={block.chart}
       metricSummary={block.metricSummary}
       actionPlan={block.actionPlan}
+    />
+  )
+}
+
+const renderConversationBubble: NexaAnswersBlockRenderer = (block, context) => {
+  if (block.renderer !== 'conversationBubble') return null
+
+  const actions = block.actions ?? []
+
+  return (
+    <NexaConversationBubble
+      variant={block.variant}
+      kind={block.kind}
+      title={block.title}
+      body={block.body}
+      metaLabel={block.metaLabel}
+      assistantName={block.assistantName}
+      senderLabel={block.senderLabel}
+      tone={block.tone}
+      thinkingLabel={block.thinkingLabel}
+      actions={actions.map(action => toAnswerAction(action, context.onAction))}
     />
   )
 }
@@ -70,6 +95,7 @@ const renderCompactAnswer: NexaAnswersBlockRenderer = block => {
 
 export const NEXA_ANSWERS_RENDERER_REGISTRY = {
   answerBubble: renderAnswerBubble,
+  conversationBubble: renderConversationBubble,
   compactAnswer: renderCompactAnswer
 } as const satisfies Record<NexaAnswersRendererKind, NexaAnswersBlockRenderer>
 

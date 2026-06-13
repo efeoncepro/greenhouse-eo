@@ -6,6 +6,41 @@
 
 ---
 
+## Delta 2026-06-13d — Nexa bubble entrance microinteractions (TASK-1096)
+
+Se agregó entrada suave a las bubbles de Nexa Answers:
+
+- `NexaConversationBubble` usa entrada CSS tokenizada por variant: usuario desde la derecha leve; Nexa desde abajo/izquierda; system notice desde abajo casi imperceptible.
+- `NexaAnswerBubble` usa entrada "settle" estable para superficies enriquecidas: `opacity + translate3d + scale(0.996)` con `motionCss.duration.long` y `motionCss.ease.emphasized`.
+- `NexaCompactAnswerBubble` usa entrada más corta (`motionCss.duration.medium`) para turnos compactados.
+- Motion budget: solo `opacity` y `transform`, sin blur, bounce, shadow pumping ni grandes desplazamientos.
+- Accesibilidad: `@media (prefers-reduced-motion: reduce)` elimina animación, transform y `will-change`.
+- Evidencia GVC: `.captures/2026-06-13T02-03-21_design-system-nexa-chat`.
+
+## Delta 2026-06-13c — Nexa expressive text segments (TASK-1096)
+
+Se agregó `NexaExpressiveText` como renderer compartido para que Nexa Answers pueda expresar énfasis tipográfico y emojis sin HTML libre ni estilos arbitrarios:
+
+- Contrato serializable: `NexaExpressiveTextValue = string | NexaExpressiveTextSegment[]`.
+- Segmentos oficiales: `plain`, `strong`, `emphasis`, `soft`, `metric`, `positive`, `warning`, `danger`, `emoji`, `break`.
+- A11y: emojis pueden declarar `label`; sin label quedan decorativos. `getNexaExpressiveTextPlainText()` convierte segmentos a texto para `aria-label`, status y keys.
+- Consumers: `NexaConversationBubble`, `NexaAnswerBubble`, `NexaCompactAnswerBubble` y `NexaAnswersCanvas` aceptan segmentos en `title`, `body`, `metaLabel`, points, trust cue, chart helper/title, metric summary y action plan copy.
+- Constraint: la primitive decide la apariencia desde tokens Greenhouse; Nexa no puede enviar font-size, familia, HEX, className ni HTML.
+- Evidencia GVC: `.captures/2026-06-13T01-55-30_design-system-nexa-chat`.
+
+## Delta 2026-06-13b — NexaConversationBubble base variants (TASK-1096)
+
+Se creó `NexaConversationBubble` como primitive hermana de `NexaAnswerBubble` para separar conversación base de respuestas enriquecidas:
+
+- Variants oficiales: `userQuestion`, `assistantThinking`, `assistantText`, `assistantFollowUp`, `systemNotice`.
+- Kinds iniciales: `surfaceUserQuestion`, `nexaThinking`, `nexaText`, `nexaFollowUp`, `contextLoaded`, `lowConfidence`, `staleData`, `policyFiltered`, `partialAnswer`, `custom`.
+- Propósito: cubrir el hilo conversacional esencial de Nexa Answers sin forzar cada mensaje a ser una respuesta enriquecida.
+- Reuso: las variantes assistant de `NexaConversationBubble` comparten la identidad aprobada de Nexa Chat (`NexaSenderMark` + wordmark inline Poppins); `assistantThinking` agrega `GreenhouseThinkingBeat kind='nexa' variant='inline' motion='wave' dotCount=5` alineado bajo la N del nombre; acciones usan `GreenhouseButton` por `kind`; tipografía usa variantes Greenhouse (`h6`, `body2`, `caption`).
+- `NexaAnswersCanvas` suma renderer `conversationBubble` para render plans transversales y preserva `GreenhouseButton.kind` al mapear acciones.
+- El lab `/design-system/nexa-chat` suma specimen `data-capture='nexa-conversation-bubble-specimen'`.
+- Contrato visual: bubbles no accionables usan chrome mínimo (sin sombra, borde suave y sin cola); la identidad de Nexa vive fuera del contenido para que `assistantThinking`, `assistantText` y `assistantFollowUp` no rendericen nombres con estilos divergentes. La presencia visual más fuerte queda reservada para `assistantFollowUp` u otras bubbles con CTA. Geometría de chat: Nexa usa esquina superior izquierda recta; usuario usa solo esquina inferior derecha recta; no se dibujan puntas/colas.
+- Evidencia GVC: `.captures/2026-06-13T01-45-02_design-system-nexa-chat`.
+
 ## Delta 2026-06-13 — NexaAnswerBubble `actionPlan` variant (TASK-1096)
 
 Se extendió `NexaAnswerBubble` con la variante oficial `actionPlan`:

@@ -12,6 +12,12 @@ import type {
   NexaAnswerPoint,
   NexaAnswerTrustCue
 } from '../nexa-answer-bubble/nexa-answer-bubble-types'
+import type {
+  NexaConversationBubbleKind,
+  NexaConversationBubbleTone,
+  NexaConversationBubbleVariant
+} from '../nexa-conversation-bubble/nexa-conversation-bubble-types'
+import type { NexaExpressiveTextValue } from '../nexa-expressive-text/nexa-expressive-text-types'
 
 export type NexaAnswersCanvasMode = 'renderPlan' | 'runtime'
 
@@ -74,7 +80,7 @@ export interface NexaAnswersProofSpec {
   unavailableReason?: string
 }
 
-export type NexaAnswersRendererKind = 'answerBubble' | 'compactAnswer'
+export type NexaAnswersRendererKind = 'answerBubble' | 'compactAnswer' | 'conversationBubble'
 
 export interface NexaAnswersBlockBase {
   id: string
@@ -86,9 +92,9 @@ export interface NexaAnswersBubbleBlock extends NexaAnswersBlockBase {
   renderer: 'answerBubble'
   variant?: NexaAnswerBubbleVariant
   kind?: NexaAnswerBubbleKind
-  title: string
-  body: string
-  metaLabel: string
+  title: NexaExpressiveTextValue
+  body: NexaExpressiveTextValue
+  metaLabel: NexaExpressiveTextValue
   points: NexaAnswerPoint[]
   actions?: NexaAnswersAction[]
   trustCue?: NexaAnswerTrustCue
@@ -99,12 +105,29 @@ export interface NexaAnswersBubbleBlock extends NexaAnswersBlockBase {
 
 export interface NexaAnswersCompactAnswerBlock extends NexaAnswersBlockBase {
   renderer: 'compactAnswer'
-  title: string
-  body: string
+  title: NexaExpressiveTextValue
+  body: NexaExpressiveTextValue
   trustLabel?: string
 }
 
-export type NexaAnswersRenderBlock = NexaAnswersBubbleBlock | NexaAnswersCompactAnswerBlock
+export interface NexaAnswersConversationBubbleBlock extends NexaAnswersBlockBase {
+  renderer: 'conversationBubble'
+  variant?: NexaConversationBubbleVariant
+  kind?: NexaConversationBubbleKind
+  title?: NexaExpressiveTextValue
+  body: NexaExpressiveTextValue
+  metaLabel?: NexaExpressiveTextValue
+  assistantName?: string
+  senderLabel?: string
+  tone?: NexaConversationBubbleTone
+  thinkingLabel?: string
+  actions?: NexaAnswersAction[]
+}
+
+export type NexaAnswersRenderBlock =
+  | NexaAnswersBubbleBlock
+  | NexaAnswersCompactAnswerBlock
+  | NexaAnswersConversationBubbleBlock
 
 export interface NexaAnswersRenderPlan {
   id: string
@@ -118,6 +141,11 @@ export interface NexaAnswersRenderPlan {
   proof: NexaAnswersProofSpec
 }
 
+export interface NexaAnswersSuggestedFollowUp {
+  id: string
+  label: string
+}
+
 export interface NexaAnswersCanvasCopy {
   assistantName: string
   idleTitle: string
@@ -127,7 +155,11 @@ export interface NexaAnswersCanvasCopy {
   submitLabel: string
   followUpLabel: string
   thinkingLabel: string
+  /** Status del live region mientras la respuesta llega (streaming). */
+  streamingLabel: string
   readyLabel: string
+  /** Encabezado compacto sobre los chips de follow-up sugeridos. */
+  suggestedFollowUpsLabel: string
   degradedTitle: string
   degradedBody: string
   errorTitle: string
@@ -163,6 +195,9 @@ export interface NexaAnswersCanvasProps {
   onProofToggle?: () => void
   previousTurns?: NexaAnswersCompactAnswerBlock[]
   followUpQuestion?: string | null
+  /** Próximas preguntas sugeridas; aparecen al terminar la respuesta (answered/followup). */
+  suggestedFollowUps?: NexaAnswersSuggestedFollowUp[]
+  onSuggestedFollowUp?: (followUp: NexaAnswersSuggestedFollowUp) => void
   slots?: NexaAnswersCanvasSlots
   copy: NexaAnswersCanvasCopy
   runtimeSlot?: ReactNode

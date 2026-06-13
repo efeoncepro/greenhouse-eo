@@ -1,5 +1,24 @@
 # Release 2026-06-10 #2 — develop→main `6c649b2a6` RELEASED
 
+## Sesion 2026-06-13 — `/design-system/nexa-chat` structured lab polish (Codex)
+
+- **Qué quedó:** el lab interno `/design-system/nexa-chat` se reestructuró para revisar primitives de forma más ordenada: header tipo consola con estado/owner/evidencia, grids para clasificación/anatomía/composición, sección separada de átomos base, frame consistente para cada specimen vivo y reglas Hacer/Evitar más escaneables.
+- **Alcance:** no cambia contrato de primitives ni arquitectura; es polish route-local del lab. Se corrigieron fixtures de `NexaAnswersCanvasCopy` agregando `streamingLabel` y `suggestedFollowUpsLabel` también en `/knowledge/mockup/nexa-answers`, para mantener TypeScript verde con el contrato actual.
+- **Verificación:** ESLint focal verde, `pnpm exec tsc --noEmit --pretty false` verde, GVC `design-system-nexa-chat --env=local` verde en `.captures/2026-06-13T02-26-08_design-system-nexa-chat` (desktop+mobile, 18 frames). Browser MCP sin storage compartido redirigió a `/login`; no se inyectaron cookies en claro. Evidencia visual primaria queda en GVC autenticado.
+- **Coordinación WT compartido:** WIP previo de TASK-1096/Nexa Answers sigue coexistiendo; stagear selectivamente si se commitea.
+
+## Sesion 2026-06-13 — NexaConversationBubble base (Codex)
+
+- **Qué quedó:** `NexaConversationBubble` nace como primitive hermana de `NexaAnswerBubble` para la conversación base de Nexa Answers. Variants: `userQuestion`, `assistantThinking`, `assistantText`, `assistantFollowUp`, `systemNotice`.
+- **Contrato:** kinds iniciales `surfaceUserQuestion`, `nexaThinking`, `nexaText`, `nexaFollowUp`, `contextLoaded`, `lowConfidence`, `staleData`, `policyFiltered`, `partialAnswer`, `custom`. `NexaAnswersCanvas` suma renderer `conversationBubble`.
+- **Decisión UX:** la respuesta enriquecida queda reservada para contenido estructurado; mensajes simples, thinking, follow-ups y notices viven en la nueva primitive base. Se reusan `NexaSenderMark`, `GreenhouseThinkingBeat kind='nexa'`, `NexaExpressiveText`, tipografía Greenhouse y `GreenhouseButton.kind`.
+- **Voz expresiva:** `NexaExpressiveTextValue` (`string | segment[]`) permite estilos semánticos y emojis accesibles en `NexaConversationBubble`, `NexaAnswerBubble`, compact answers y bloques del `NexaAnswersCanvas`; no acepta HTML/CSS/font-size/HEX arbitrarios.
+- **Microinteracciones:** entrada soft/enterprise con `motionCss`; conversation varía dirección por rol (usuario derecha, Nexa abajo/izquierda, notices abajo), enriched answer usa settle estable y compact answer reveal corto. Solo `opacity`/`transform`; `prefers-reduced-motion` apaga animación y `will-change`.
+- **Design System:** `/design-system/nexa-chat` suma specimen `nexa-conversation-bubble-specimen`; scenario actualizado para capturarlo.
+- **Polish visual:** las bubbles no accionables quedan más minimalistas y sin colas. Las variantes assistant comparten una sola identidad de emisor (`NexaSenderMark` + wordmark inline Poppins) fuera del contenido; `assistantThinking` solo agrega el beat de 5 dots alineado bajo el wordmark. El usuario conserva bubble enviada con esquina inferior derecha recta.
+- **Verificación:** ESLint focal verde, `pnpm exec tsc --noEmit` verde y GVC `design-system-nexa-chat` verde en `.captures/2026-06-13T02-03-21_design-system-nexa-chat`.
+- **Coordinación WT compartido:** no tocar `.playwright-mcp/`. Stagear solo archivos propios de TASK-1096 si se commitea.
+
 ## Sesion 2026-06-13 — NexaAnswerBubble actionPlan (Codex)
 
 - **Qué quedó:** `NexaAnswerBubble` suma variante oficial `actionPlan` para recomendaciones accionables. Kinds iniciales: `financeActionPlan`, `commercialActionPlan`, `agencyActionPlan`, `peopleActionPlan`, `surfaceActionPlan`.

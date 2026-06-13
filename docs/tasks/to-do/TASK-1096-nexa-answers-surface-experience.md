@@ -183,7 +183,14 @@ Foundation visual slice advanced:
 - Initial canvas variants: `embedded`, `sidecar`, `inline`; initial kinds: `knowledgeEmbedded`, `financeChartEmbedded`, `agencyInsightEmbedded`, `peopleInsightEmbedded`, `commercialInsightEmbedded`, `custom`.
 - Initial canvas states: `idle`, `submitted`, `thinking`, `streaming`, `answered`, `proofOpen`, `followup`, `compacted`, `degraded`, `error`.
 - The canvas owns the UI choreography: idle composer glow, question bubble, Nexa identity/thinking, answer block, proof under demand, composer descent and compact previous turns.
-- The first renderer registry supports `answerBubble` and `compactAnswer`, with allowlist validation from `surfaceContext.allowedRenderers`.
+- The renderer registry supports `conversationBubble`, `answerBubble` and `compactAnswer`, with allowlist validation from `surfaceContext.allowedRenderers`.
+- `NexaConversationBubble` is now a canonical primitive under `src/components/greenhouse/primitives/nexa-conversation-bubble/`.
+- Initial conversation variants: `userQuestion`, `assistantThinking`, `assistantText`, `assistantFollowUp`, `systemNotice`.
+- Initial conversation kinds: `surfaceUserQuestion`, `nexaThinking`, `nexaText`, `nexaFollowUp`, `contextLoaded`, `lowConfidence`, `staleData`, `policyFiltered`, `partialAnswer`, `custom`.
+- Conversation bubbles reuse `NexaSenderMark`, `GreenhouseThinkingBeat kind='nexa'`, Greenhouse typography variants and canonical `GreenhouseButton.kind`, so simple turns do not need to masquerade as enriched answers.
+- Non-actionable conversation bubbles intentionally use minimal chrome and no speaker tail. Assistant variants share Nexa presence from the approved Nexa Chat pattern: sender mark + inline Poppins wordmark outside the content; `assistantThinking` adds the 5-dot thinking beat aligned below the wordmark, with status text kept for accessibility instead of visible UI. Actionable follow-up bubbles can carry stronger surface treatment and CTAs. Bubble geometry identifies the speaker without tails: Nexa uses a straight top-left corner; the user's sent bubble uses only a straight bottom-right corner; the remaining corners stay rounded.
+- All Nexa bubble copy now accepts `NexaExpressiveTextValue` (`string | segment[]`) so Nexa can use controlled expressive typography and emojis across conversation, enriched answers, compact answers and render-plan blocks. Allowed segment styles are semantic only (`plain`, `strong`, `emphasis`, `soft`, `metric`, `positive`, `warning`, `danger`, `emoji`, `break`); no arbitrary HTML/CSS/font-size/HEX/className.
+- Bubble entrance microinteractions use tokenized CSS motion: `NexaConversationBubble` varies direction by role (user right, Nexa bottom/left, notices bottom), `NexaAnswerBubble` uses a stable rich-answer settle, and compact answers use a shorter reveal. Motion is limited to `opacity`/`transform` and disabled under `prefers-reduced-motion`.
 - `NexaAnswerBubble` is now a canonical primitive under `src/components/greenhouse/primitives/nexa-answer-bubble/`.
 - Initial variants: `explanation`, `chart`, `metricSummary` and `actionPlan`.
 - Initial kinds: `knowledgeExplanationAnswer`, `knowledgeChartAnswer`, `financeChartAnswer`, `financeMetricSummary`, `commercialMetricSummary`, `agencyMetricSummary`, `peopleMetricSummary`, `surfaceMetricSummary`, `financeActionPlan`, `commercialActionPlan`, `agencyActionPlan`, `peopleActionPlan`, `surfaceActionPlan`, `surfaceChartInsight`, `custom`.
@@ -198,7 +205,8 @@ Foundation visual slice advanced:
 - Action plan CTAs pass canonical `GreenhouseButton.kind` through `NexaAnswerAction.kind` (`primaryAction`, `secondaryAction`, `inlineAction`).
 - `/knowledge/mockup/nexa-answers` now consumes `NexaAnswerBubble kind='knowledgeChartAnswer'` instead of owning a route-local bubble.
 - `/knowledge/mockup/nexa-answers` now consumes `NexaAnswersCanvas` instead of locally assembling all answer states.
-- `/design-system/nexa-chat` includes `data-capture='nexa-answer-bubble-chart-specimen'`, `data-capture='nexa-answer-bubble-metric-summary-specimen'`, `data-capture='nexa-answer-bubble-action-plan-specimen'` and `data-capture='nexa-answers-canvas-specimen'`.
+- `/design-system/nexa-chat` includes `data-capture='nexa-conversation-bubble-specimen'`, `data-capture='nexa-answer-bubble-chart-specimen'`, `data-capture='nexa-answer-bubble-metric-summary-specimen'`, `data-capture='nexa-answer-bubble-action-plan-specimen'` and `data-capture='nexa-answers-canvas-specimen'`.
+- Latest accepted GVC for the conversation bubble specimen: `.captures/2026-06-13T02-03-21_design-system-nexa-chat`.
 - Latest accepted GVC for the action plan specimen: `.captures/2026-06-13T00-30-32_design-system-nexa-chat`.
 
 This does **not** complete TASK-1096. Remaining scope still includes production Knowledge consumer integration, promoted Nexa Insight specimen, finance/chart fixture, assistant runtime/adapters from TASK-1095, final copy governance, follow-up compaction in real multi-turn runtime and GVC coverage for the complete surface.

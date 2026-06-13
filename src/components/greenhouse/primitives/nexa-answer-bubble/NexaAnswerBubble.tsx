@@ -1,6 +1,6 @@
 'use client'
 
-import { useId, useMemo, useState } from 'react'
+import { useEffect, useId, useMemo, useState } from 'react'
 
 import Box from '@mui/material/Box'
 import Divider from '@mui/material/Divider'
@@ -29,8 +29,10 @@ import {
 import AppRecharts from '@/libs/styles/AppRecharts'
 import useReducedMotion from '@/hooks/useReducedMotion'
 import { GH_COLORS } from '@/config/greenhouse-nomenclature'
+import { motionCss } from '@/components/greenhouse/motion'
 import GreenhouseButton from '../GreenhouseButton'
 import GreenhouseStatusDot from '../GreenhouseStatusDot'
+import NexaExpressiveText, { getNexaExpressiveTextPlainText } from '../nexa-expressive-text/NexaExpressiveText'
 
 import type {
   NexaAnswerAction,
@@ -53,6 +55,27 @@ import type {
 import { resolveNexaAnswerBubbleVariant } from './nexa-answer-bubble-controller'
 
 const CHART_MODE_SELECTOR_ARIA_LABEL = 'Tipo de gráfica de respuesta enriquecida'
+
+// Fallback cuando el canvas no thread-ea el id real del panel de proof. El owner del
+// panel de evidencia es el canvas (CanvasProof); aria-controls debe apuntar a ESE id.
+const PROOF_DISCLOSURE_FALLBACK_ID = 'nexa-answers-proof-disclosure'
+
+const ChartBodyPlaceholder = ({ height }: { height: number }) => {
+  const theme = useTheme()
+
+  return (
+    <Box
+      aria-hidden
+      sx={{
+        blockSize: height,
+        inlineSize: '100%',
+        borderRadius: `${theme.shape.customBorderRadius.md}px`,
+        border: `1px solid ${theme.palette.divider}`,
+        backgroundColor: alpha(theme.palette.primary.main, 0.025)
+      }}
+    />
+  )
+}
 
 const formatChartValue = (value: number, suffix = 'pts') => `${Math.round(value)} ${suffix}`
 
@@ -353,13 +376,32 @@ const ChartLegend = ({
 const AnswerChartBlock = ({ chart }: { chart: NonNullable<NexaAnswerBubbleProps['chart']> }) => {
   const theme = useTheme()
   const [mode, setMode] = useState<NexaAnswerChartMode>('trend')
+  // Recharts mide su contenedor en cliente; renderizarlo en SSR produce un mismatch de
+  // hidratación. Diferimos el SVG hasta mount con un placeholder del mismo alto (sin CLS).
+  const [mounted, setMounted] = useState(false)
   const latestPoint = chart.trend[chart.trend.length - 1]
+  const chartTitleLabel = getNexaExpressiveTextPlainText(chart.title)
+  const chartHelperLabel = getNexaExpressiveTextPlainText(chart.helper)
 
-  const chartBody = {
-    trend: <TrendChart data={chart.trend} series={chart.series} valueSuffix={chart.valueSuffix} />,
-    comparison: <ComparisonChart data={chart.trend} series={chart.series} valueSuffix={chart.valueSuffix} />,
-    composition: <CompositionChart data={chart.composition} />
-  }[mode]
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  // Una respuesta nueva (otro turno/answer) vuelve al default Tendencia: el modo de chart
+  // es disclosure del turno, no estado global de la surface.
+  useEffect(() => {
+    setMode('trend')
+  }, [chartTitleLabel])
+
+  const chartBody = !mounted ? (
+    <ChartBodyPlaceholder height={220} />
+  ) : (
+    {
+      trend: <TrendChart data={chart.trend} series={chart.series} valueSuffix={chart.valueSuffix} />,
+      comparison: <ComparisonChart data={chart.trend} series={chart.series} valueSuffix={chart.valueSuffix} />,
+      composition: <CompositionChart data={chart.composition} />
+    }[mode]
+  )
 
   const selectedMode = chart.modes.find(option => option.mode === mode)
 
@@ -373,10 +415,8 @@ const AnswerChartBlock = ({ chart }: { chart: NonNullable<NexaAnswerBubbleProps[
       <Stack spacing={3}>
         <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} justifyContent='space-between' alignItems={{ xs: 'stretch', md: 'flex-start' }}>
           <Stack spacing={0.75} sx={{ minInlineSize: 0 }}>
-            <Typography variant='h6'>{chart.title}</Typography>
-            <Typography variant='caption' color='text.secondary'>
-              {chart.helper}
-            </Typography>
+            <NexaExpressiveText value={chart.title} variant='h6' />
+            <NexaExpressiveText value={chart.helper} variant='caption' color='text.secondary' />
           </Stack>
           <ToggleButtonGroup
             exclusive
@@ -404,7 +444,11 @@ const AnswerChartBlock = ({ chart }: { chart: NonNullable<NexaAnswerBubbleProps[
           </ToggleButtonGroup>
         </Stack>
 
-        <Box role='img' aria-label={`${chart.title}: ${selectedMode?.label ?? 'Vista'}; ${chart.helper}`} sx={{ minInlineSize: 0 }}>
+        <Box
+          role='img'
+          aria-label={`${chartTitleLabel}: ${selectedMode?.label ?? 'Vista'}; ${chartHelperLabel}`}
+          sx={{ minInlineSize: 0 }}
+        >
           {chartBody}
           <ScreenReaderChartTable data={chart.trend} series={chart.series} />
         </Box>
@@ -440,7 +484,7 @@ const MetricSparkline = ({ metric, color }: { metric: NexaAnswerMetricSummaryIte
   )
 }
 
-const MetricDeltaPill = ({ label, tone }: { label: string; tone: NexaAnswerMetricDeltaTone }) => {
+const MetricDeltaPill = ({ label, tone }: { label: NexaAnswerMetricSummaryItem['deltaLabel']; tone: NexaAnswerMetricDeltaTone }) => {
   const colors = useMetricSummaryColors()
   const color = colors[tone]
 
@@ -459,9 +503,7 @@ const MetricDeltaPill = ({ label, tone }: { label: string; tone: NexaAnswerMetri
       }}
     >
       <Box sx={{ inlineSize: 6, blockSize: 6, borderRadius: '50%', backgroundColor: color }} />
-      <Typography variant='caption' sx={{ color: 'inherit', fontWeight: 700, lineHeight: 1 }}>
-        {label}
-      </Typography>
+      <NexaExpressiveText value={label} variant='caption' sx={{ color: 'inherit', fontWeight: 700, lineHeight: 1 }} />
     </Box>
   )
 }
@@ -485,20 +527,14 @@ const MetricSummaryCard = ({ metric, chartColor }: { metric: NexaAnswerMetricSum
     >
       <Stack direction='row' spacing={2} justifyContent='space-between' alignItems='flex-start' sx={{ minInlineSize: 0 }}>
         <Stack spacing={0.5} sx={{ minInlineSize: 0 }}>
-          <Typography variant='caption' color='text.secondary'>
-            {metric.label}
-          </Typography>
-          <Typography variant='h5' sx={{ fontFeatureSettings: '"tnum" 1' }}>
-            {metric.value}
-          </Typography>
+          <NexaExpressiveText value={metric.label} variant='caption' color='text.secondary' />
+          <NexaExpressiveText value={metric.value} variant='h5' sx={{ fontFeatureSettings: '"tnum" 1' }} />
         </Stack>
         <MetricDeltaPill label={metric.deltaLabel} tone={metric.deltaTone} />
       </Stack>
 
       {metric.helper ? (
-        <Typography variant='disclosureText' color='text.secondary'>
-          {metric.helper}
-        </Typography>
+        <NexaExpressiveText value={metric.helper} variant='disclosureText' color='text.secondary' />
       ) : null}
 
       <MetricSparkline metric={metric} color={chartColor} />
@@ -514,10 +550,8 @@ const MetricSummaryBlock = ({ metricSummary }: { metricSummary: NexaAnswerMetric
     <Stack spacing={3} data-capture='nexa-answers-metric-summary-variant'>
       <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} justifyContent='space-between' alignItems={{ md: 'flex-end' }}>
         <Stack spacing={0.75} sx={{ minInlineSize: 0 }}>
-          <Typography variant='h6'>{metricSummary.title}</Typography>
-          <Typography variant='caption' color='text.secondary'>
-            {metricSummary.helper}
-          </Typography>
+          <NexaExpressiveText value={metricSummary.title} variant='h6' />
+          <NexaExpressiveText value={metricSummary.helper} variant='caption' color='text.secondary' />
         </Stack>
       </Stack>
 
@@ -551,9 +585,7 @@ const MetricSummaryBlock = ({ metricSummary }: { metricSummary: NexaAnswerMetric
           py: 2
         }}
       >
-        <Typography variant='body2' color='text.secondary'>
-          {metricSummary.interpretation}
-        </Typography>
+        <NexaExpressiveText value={metricSummary.interpretation} variant='body2' color='text.secondary' />
       </Box>
     </Stack>
   )
@@ -602,13 +634,9 @@ const ActionPlanDecisionPanel = ({ plan }: { plan: NexaAnswerActionPlanSpec }) =
           <i className='tabler-route-square' aria-hidden='true' />
         </Box>
         <Stack spacing={0.75} sx={{ minInlineSize: 0, maxInlineSize: 760 }}>
-          <Typography variant='caption' color='text.secondary' sx={{ fontWeight: 600 }}>
-            {plan.decisionLabel}
-          </Typography>
-          <Typography variant='h6'>{plan.decisionTitle}</Typography>
-          <Typography variant='body2' color='text.secondary' sx={{ maxInlineSize: '72ch' }}>
-            {plan.decisionBody}
-          </Typography>
+          <NexaExpressiveText value={plan.decisionLabel} variant='caption' color='text.secondary' sx={{ fontWeight: 600 }} />
+          <NexaExpressiveText value={plan.decisionTitle} variant='h6' />
+          <NexaExpressiveText value={plan.decisionBody} variant='body2' color='text.secondary' sx={{ maxInlineSize: '72ch' }} />
         </Stack>
       </Stack>
     </Box>
@@ -644,12 +672,8 @@ const ActionPlanStep = ({
         </Typography>
       </Box>
       <Stack spacing={0.5} sx={{ minInlineSize: 0 }}>
-        <Typography variant='body2' sx={{ fontWeight: 600 }}>
-          {step.title}
-        </Typography>
-        <Typography variant='body2' color='text.secondary'>
-          {step.body}
-        </Typography>
+        <NexaExpressiveText value={step.title} variant='body2' sx={{ fontWeight: 600 }} />
+        <NexaExpressiveText value={step.body} variant='body2' color='text.secondary' />
       </Stack>
     </Stack>
   )
@@ -670,13 +694,9 @@ const ActionPlanTradeOffCard = ({ item }: { item: NexaAnswerActionPlanTradeOff }
       <Stack spacing={0.75}>
         <Stack direction='row' spacing={1.25} alignItems='center'>
           <Box sx={{ inlineSize: 7, blockSize: 7, borderRadius: '50%', backgroundColor: color, flex: '0 0 auto' }} />
-          <Typography variant='body2' sx={{ fontWeight: 600 }}>
-            {item.label}
-          </Typography>
+          <NexaExpressiveText value={item.label} variant='body2' sx={{ fontWeight: 600 }} />
         </Stack>
-        <Typography variant='body2' color='text.secondary'>
-          {item.body}
-        </Typography>
+        <NexaExpressiveText value={item.body} variant='body2' color='text.secondary' />
       </Stack>
     </Box>
   )
@@ -710,13 +730,9 @@ const ActionPlanRiskCard = ({ item }: { item: NexaAnswerActionPlanRisk }) => {
           >
             <Box component='i' className='tabler-alert-triangle' aria-hidden='true' />
           </Box>
-          <Typography variant='body2' sx={{ fontWeight: 600 }}>
-            {item.label}
-          </Typography>
+          <NexaExpressiveText value={item.label} variant='body2' sx={{ fontWeight: 600 }} />
         </Stack>
-        <Typography variant='body2' color='text.secondary'>
-          {item.body}
-        </Typography>
+        <NexaExpressiveText value={item.body} variant='body2' color='text.secondary' />
       </Stack>
     </Box>
   )
@@ -832,11 +848,13 @@ const ActionPlanBlock = ({ actionPlan }: { actionPlan: NexaAnswerActionPlanSpec 
 const TrustCue = ({
   cue,
   expanded,
-  onToggle
+  onToggle,
+  proofPanelId
 }: {
   cue: NexaAnswerBubbleProps['trustCue']
   expanded: boolean
   onToggle: () => void
+  proofPanelId: string
 }) => {
   const theme = useTheme()
 
@@ -852,14 +870,10 @@ const TrustCue = ({
     >
       <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems={{ xs: 'stretch', sm: 'center' }} justifyContent='space-between'>
         <Stack direction='row' spacing={2.5} alignItems='center' sx={{ minInlineSize: 0 }}>
-          <GreenhouseStatusDot tone={cue.tone} ariaLabel={cue.label} />
+          <GreenhouseStatusDot tone={cue.tone} ariaLabel={getNexaExpressiveTextPlainText(cue.label)} />
           <Stack spacing={0.25} sx={{ minInlineSize: 0 }}>
-            <Typography variant='body2' sx={{ color: theme.palette.text.primary, fontWeight: 600 }}>
-              {cue.label}
-            </Typography>
-            <Typography variant='disclosureText' color='text.secondary'>
-              {cue.detail}
-            </Typography>
+            <NexaExpressiveText value={cue.label} variant='body2' sx={{ color: theme.palette.text.primary, fontWeight: 600 }} />
+            <NexaExpressiveText value={cue.detail} variant='disclosureText' color='text.secondary' />
           </Stack>
         </Stack>
         <GreenhouseButton
@@ -869,7 +883,7 @@ const TrustCue = ({
           trailingIconClassName={expanded ? 'tabler-chevron-up' : 'tabler-chevron-down'}
           onClick={onToggle}
           aria-expanded={expanded}
-          aria-controls='nexa-answers-proof-disclosure'
+          aria-controls={proofPanelId}
         >
           {expanded ? 'Ocultar base' : 'Ver base'}
         </GreenhouseButton>
@@ -918,12 +932,8 @@ const AnswerPoint = ({ point, index }: { point: NexaAnswerBubbleProps['points'][
         </Typography>
       </Box>
       <Stack spacing={0.5} sx={{ minInlineSize: 0, pt: 0.25 }}>
-        <Typography variant='body2' sx={{ fontWeight: 600 }}>
-          {point.title}
-        </Typography>
-        <Typography variant='body2' color='text.secondary'>
-          {point.body}
-        </Typography>
+        <NexaExpressiveText value={point.title} variant='body2' sx={{ fontWeight: 600 }} />
+        <NexaExpressiveText value={point.body} variant='body2' color='text.secondary' />
       </Stack>
     </Stack>
   )
@@ -953,7 +963,52 @@ const bubbleTailFill = (theme: Theme) => alpha(theme.palette.primary.main, 0.026
 const bubbleSurfaceFill = (theme: Theme) =>
   `linear-gradient(135deg, ${bubbleTailFill(theme)}, ${alpha(theme.palette.success.main, 0.018)} 56%, ${alpha(theme.palette.background.paper, 0)} 100%)`
 
-const AnswerBadge = ({ metaLabel, compact = false }: { metaLabel: string; compact?: boolean }) => {
+const answerBubbleEntranceSx = {
+  transformOrigin: '0 0',
+  willChange: 'opacity, transform',
+  '@keyframes nexa-answer-bubble-enter': {
+    '0%': {
+      opacity: 0,
+      transform: 'translate3d(-3px, 9px, 0) scale(0.996)'
+    },
+    '72%': {
+      opacity: 1
+    },
+    '100%': {
+      opacity: 1,
+      transform: 'translate3d(0, 0, 0) scale(1)'
+    }
+  },
+  animation: `nexa-answer-bubble-enter ${motionCss.duration.long} ${motionCss.ease.emphasized} both`,
+  '@media (prefers-reduced-motion: reduce)': {
+    animation: 'none',
+    transform: 'none',
+    willChange: 'auto'
+  }
+}
+
+const compactAnswerEntranceSx = {
+  transformOrigin: '0 0',
+  willChange: 'opacity, transform',
+  '@keyframes nexa-compact-answer-enter': {
+    '0%': {
+      opacity: 0,
+      transform: 'translate3d(0, 6px, 0) scale(0.998)'
+    },
+    '100%': {
+      opacity: 1,
+      transform: 'translate3d(0, 0, 0) scale(1)'
+    }
+  },
+  animation: `nexa-compact-answer-enter ${motionCss.duration.medium} ${motionCss.ease.emphasized} both`,
+  '@media (prefers-reduced-motion: reduce)': {
+    animation: 'none',
+    transform: 'none',
+    willChange: 'auto'
+  }
+}
+
+const AnswerBadge = ({ metaLabel, compact = false }: { metaLabel: NexaAnswerBubbleProps['metaLabel']; compact?: boolean }) => {
   const theme = useTheme()
 
   return (
@@ -975,9 +1030,7 @@ const AnswerBadge = ({ metaLabel, compact = false }: { metaLabel: string; compac
           Respuesta enriquecida
         </Typography>
       </Box>
-      <Typography variant='disclosureText' color='text.secondary'>
-        {metaLabel}
-      </Typography>
+      <NexaExpressiveText value={metaLabel} variant='disclosureText' color='text.secondary' />
     </Stack>
   )
 }
@@ -986,12 +1039,14 @@ const ChartTrustRow = ({
   cue,
   expanded,
   onToggle,
-  action
+  action,
+  proofPanelId
 }: {
   cue: NexaAnswerBubbleProps['trustCue']
   expanded: boolean
   onToggle: () => void
   action?: NexaAnswerAction
+  proofPanelId: string
 }) => {
   const theme = useTheme()
 
@@ -1009,10 +1064,13 @@ const ChartTrustRow = ({
       }}
     >
       <Stack direction='row' spacing={2} alignItems='center' sx={{ minInlineSize: 0 }}>
-        <GreenhouseStatusDot tone={cue.tone} ariaLabel={cue.label} />
-        <Typography variant='caption' color='text.secondary' sx={{ minInlineSize: 0 }}>
-          {cue.label} · {cue.detail}
-        </Typography>
+        <GreenhouseStatusDot tone={cue.tone} ariaLabel={getNexaExpressiveTextPlainText(cue.label)} />
+        <NexaExpressiveText
+          value={[{ text: getNexaExpressiveTextPlainText(cue.label) }, { text: ' · ', style: 'soft' }, { text: getNexaExpressiveTextPlainText(cue.detail), style: 'soft' }]}
+          variant='caption'
+          color='text.secondary'
+          sx={{ minInlineSize: 0 }}
+        />
       </Stack>
       <Stack direction='row' spacing={1.5} flexWrap='wrap' useFlexGap>
         {action ? (
@@ -1036,7 +1094,7 @@ const ChartTrustRow = ({
           trailingIconClassName={expanded ? 'tabler-chevron-up' : 'tabler-chevron-down'}
           onClick={onToggle}
           aria-expanded={expanded}
-          aria-controls='nexa-answers-proof-disclosure'
+          aria-controls={proofPanelId}
         >
           {expanded ? 'Ocultar base' : 'Ver base'}
         </GreenhouseButton>
@@ -1056,6 +1114,7 @@ const NexaAnswerBubble = ({
   trustCue,
   proofOpen,
   onProofToggle,
+  proofPanelId = PROOF_DISCLOSURE_FALLBACK_ID,
   thinking = false,
   chart,
   metricSummary,
@@ -1112,7 +1171,8 @@ const NexaAnswerBubble = ({
           background: bubbleSurfaceFill(theme),
           pointerEvents: 'none',
           zIndex: 3
-        }
+        },
+        ...answerBubbleEntranceSx
       }}
     >
       <Box sx={{ position: 'relative', zIndex: 1, overflow: 'hidden', borderRadius: 'inherit', backgroundColor: theme.palette.background.paper }}>
@@ -1128,8 +1188,9 @@ const NexaAnswerBubble = ({
             <AnswerBadge metaLabel={metaLabel} compact />
             <Stack direction={{ xs: 'column', md: 'row' }} spacing={3} alignItems={{ md: 'flex-end' }} justifyContent='space-between'>
               <Stack spacing={1} sx={{ maxInlineSize: 720, minInlineSize: 0 }}>
-                <Typography variant='h5'>{title}</Typography>
-                <Typography
+                <NexaExpressiveText value={title} variant='h5' />
+                <NexaExpressiveText
+                  value={body}
                   variant='body2'
                   color='text.secondary'
                   sx={{
@@ -1138,9 +1199,7 @@ const NexaAnswerBubble = ({
                     WebkitBoxOrient: 'vertical',
                     overflow: 'hidden'
                   }}
-                >
-                  {body}
-                </Typography>
+                />
               </Stack>
               <Box
                 sx={{
@@ -1158,7 +1217,7 @@ const NexaAnswerBubble = ({
               </Box>
             </Stack>
             <AnswerChartBlock chart={chart} />
-            <ChartTrustRow cue={trustCue} expanded={proofOpen} onToggle={onProofToggle} action={primaryChartAction} />
+            <ChartTrustRow cue={trustCue} expanded={proofOpen} onToggle={onProofToggle} action={primaryChartAction} proofPanelId={proofPanelId} />
           </Stack>
         ) : shouldRenderMetricSummary ? (
           <Stack
@@ -1171,13 +1230,11 @@ const NexaAnswerBubble = ({
           >
             <AnswerBadge metaLabel={metaLabel} compact />
             <Stack spacing={1} sx={{ maxInlineSize: 820, minInlineSize: 0 }}>
-              <Typography variant='h5'>{title}</Typography>
-              <Typography variant='body2' color='text.secondary' sx={{ maxInlineSize: '68ch' }}>
-                {body}
-              </Typography>
+              <NexaExpressiveText value={title} variant='h5' />
+              <NexaExpressiveText value={body} variant='body2' color='text.secondary' sx={{ maxInlineSize: '68ch' }} />
             </Stack>
             <MetricSummaryBlock metricSummary={metricSummary} />
-            <ChartTrustRow cue={trustCue} expanded={proofOpen} onToggle={onProofToggle} action={primaryChartAction} />
+            <ChartTrustRow cue={trustCue} expanded={proofOpen} onToggle={onProofToggle} action={primaryChartAction} proofPanelId={proofPanelId} />
           </Stack>
         ) : shouldRenderActionPlan ? (
           <Stack
@@ -1190,14 +1247,12 @@ const NexaAnswerBubble = ({
           >
             <AnswerBadge metaLabel={metaLabel} compact />
             <Stack spacing={1} sx={{ maxInlineSize: 780, minInlineSize: 0 }}>
-              <Typography variant='h5'>{title}</Typography>
-              <Typography variant='body2' color='text.secondary'>
-                {body}
-              </Typography>
+              <NexaExpressiveText value={title} variant='h5' />
+              <NexaExpressiveText value={body} variant='body2' color='text.secondary' />
             </Stack>
             <ActionPlanBlock actionPlan={actionPlan} />
             <AnswerActionBar actions={actions} />
-            <ChartTrustRow cue={trustCue} expanded={proofOpen} onToggle={onProofToggle} />
+            <ChartTrustRow cue={trustCue} expanded={proofOpen} onToggle={onProofToggle} proofPanelId={proofPanelId} />
           </Stack>
         ) : (
           <>
@@ -1211,10 +1266,8 @@ const NexaAnswerBubble = ({
               <Stack spacing={3} sx={{ minInlineSize: 0 }}>
                 <AnswerBadge metaLabel={metaLabel} />
                 <Stack spacing={2} sx={{ maxInlineSize: 920 }}>
-                  <Typography variant='h5'>{title}</Typography>
-                  <Typography variant='body2' color='text.secondary'>
-                    {body}
-                  </Typography>
+                  <NexaExpressiveText value={title} variant='h5' />
+                  <NexaExpressiveText value={body} variant='body2' color='text.secondary' />
                 </Stack>
               </Stack>
             </Box>
@@ -1224,14 +1277,14 @@ const NexaAnswerBubble = ({
             <Stack spacing={4} sx={{ px: { xs: 4, md: 5 }, py: { xs: 4, md: 4.5 } }}>
               <Stack component='ol' spacing={3} sx={{ m: 0, p: 0, listStyle: 'none', maxInlineSize: 980 }}>
                 {points.map((point, index) => (
-                  <AnswerPoint key={point.title} point={point} index={index} />
+                  <AnswerPoint key={`${index}-${getNexaExpressiveTextPlainText(point.title)}`} point={point} index={index} />
                 ))}
               </Stack>
 
               <AnswerActionBar actions={actions} />
             </Stack>
 
-            <TrustCue cue={trustCue} expanded={proofOpen} onToggle={onProofToggle} />
+            <TrustCue cue={trustCue} expanded={proofOpen} onToggle={onProofToggle} proofPanelId={proofPanelId} />
           </>
         )}
       </Box>
@@ -1250,7 +1303,8 @@ export const NexaCompactAnswerBubble = ({ title, body, endSlot }: NexaCompactAns
         borderRadius: `${theme.shape.customBorderRadius.lg}px`,
         backgroundColor: theme.palette.background.paper,
         boxShadow: theme.greenhouseElevation.raised.boxShadow,
-        overflow: 'hidden'
+        overflow: 'hidden',
+        ...compactAnswerEntranceSx
       }}
     >
       <Stack
@@ -1261,10 +1315,8 @@ export const NexaCompactAnswerBubble = ({ title, body, endSlot }: NexaCompactAns
         sx={{ px: { xs: 4, md: 5 }, py: 3.5 }}
       >
         <Stack spacing={1} sx={{ minInlineSize: 0 }}>
-          <Typography variant='h6'>{title}</Typography>
-          <Typography variant='body2' color='text.secondary'>
-            {body}
-          </Typography>
+          <NexaExpressiveText value={title} variant='h6' />
+          <NexaExpressiveText value={body} variant='body2' color='text.secondary' />
         </Stack>
         {endSlot}
       </Stack>

@@ -57,6 +57,18 @@ export const scenario: CaptureScenario = {
     },
     {
       kind: 'scroll',
+      selector: '[data-capture="nexa-conversation-bubble-specimen"]',
+      scrollBlock: 'start',
+      scrollY: -96
+    },
+    {
+      kind: 'mark',
+      label: 'nexa-conversation-bubble-specimen',
+      clipSelector: '[data-capture="nexa-conversation-bubble-specimen"]',
+      note: 'Primitive NexaConversationBubble con pregunta, thinking, texto simple, follow-up y notice'
+    },
+    {
+      kind: 'scroll',
       selector: '[data-capture="nexa-answer-bubble-chart-specimen"]',
       scrollBlock: 'center'
     },

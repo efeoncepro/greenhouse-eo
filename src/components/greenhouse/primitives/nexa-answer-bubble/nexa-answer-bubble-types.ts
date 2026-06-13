@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 
 import type { GreenhouseButtonKind, GreenhouseButtonTone, GreenhouseButtonVariant } from '../greenhouse-button-controller'
+import type { NexaExpressiveTextValue } from '../nexa-expressive-text/nexa-expressive-text-types'
 
 export type NexaAnswerBubbleVariant = 'explanation' | 'chart' | 'metricSummary' | 'actionPlan'
 
@@ -26,14 +27,14 @@ export type NexaAnswerChartMode = 'trend' | 'comparison' | 'composition'
 export type NexaAnswerChartTone = 'primary' | 'secondary' | 'success'
 
 export interface NexaAnswerPoint {
-  title: string
-  body: string
+  title: NexaExpressiveTextValue
+  body: NexaExpressiveTextValue
 }
 
 export interface NexaAnswerTrustCue {
   tone: 'success' | 'warning' | 'info'
-  label: string
-  detail: string
+  label: NexaExpressiveTextValue
+  detail: NexaExpressiveTextValue
 }
 
 export interface NexaAnswerAction {
@@ -66,8 +67,8 @@ export interface NexaAnswerChartCompositionPoint {
 }
 
 export interface NexaAnswerChartSpec {
-  title: string
-  helper: string
+  title: NexaExpressiveTextValue
+  helper: NexaExpressiveTextValue
   valueSuffix?: string
   modes: Array<{
     mode: NexaAnswerChartMode
@@ -88,19 +89,19 @@ export interface NexaAnswerMetricTrendPoint {
 
 export interface NexaAnswerMetricSummaryItem {
   id: string
-  label: string
-  value: string
-  helper?: string
-  deltaLabel: string
+  label: NexaExpressiveTextValue
+  value: NexaExpressiveTextValue
+  helper?: NexaExpressiveTextValue
+  deltaLabel: NexaExpressiveTextValue
   deltaTone: NexaAnswerMetricDeltaTone
   trend: NexaAnswerMetricTrendPoint[]
   emphasis?: boolean
 }
 
 export interface NexaAnswerMetricSummarySpec {
-  title: string
-  helper: string
-  interpretation: string
+  title: NexaExpressiveTextValue
+  helper: NexaExpressiveTextValue
+  interpretation: NexaExpressiveTextValue
   metrics: NexaAnswerMetricSummaryItem[]
 }
 
@@ -110,28 +111,28 @@ export type NexaAnswerActionPlanRiskSeverity = 'low' | 'medium' | 'high'
 
 export interface NexaAnswerActionPlanStep {
   id: string
-  title: string
-  body: string
+  title: NexaExpressiveTextValue
+  body: NexaExpressiveTextValue
 }
 
 export interface NexaAnswerActionPlanTradeOff {
   id: string
-  label: string
-  body: string
+  label: NexaExpressiveTextValue
+  body: NexaExpressiveTextValue
   tone: NexaAnswerActionPlanTradeOffTone
 }
 
 export interface NexaAnswerActionPlanRisk {
   id: string
-  label: string
-  body: string
+  label: NexaExpressiveTextValue
+  body: NexaExpressiveTextValue
   severity: NexaAnswerActionPlanRiskSeverity
 }
 
 export interface NexaAnswerActionPlanSpec {
-  decisionLabel: string
-  decisionTitle: string
-  decisionBody: string
+  decisionLabel: NexaExpressiveTextValue
+  decisionTitle: NexaExpressiveTextValue
+  decisionBody: NexaExpressiveTextValue
   steps: NexaAnswerActionPlanStep[]
   tradeOffs: NexaAnswerActionPlanTradeOff[]
   risks: NexaAnswerActionPlanRisk[]
@@ -140,14 +141,16 @@ export interface NexaAnswerActionPlanSpec {
 export interface NexaAnswerBubbleProps {
   variant?: NexaAnswerBubbleVariant
   kind?: NexaAnswerBubbleKind
-  title: string
-  body: string
-  metaLabel: string
+  title: NexaExpressiveTextValue
+  body: NexaExpressiveTextValue
+  metaLabel: NexaExpressiveTextValue
   points: NexaAnswerPoint[]
   actions: NexaAnswerAction[]
   trustCue: NexaAnswerTrustCue
   proofOpen: boolean
   onProofToggle: () => void
+  /** Id del panel de proof (owned por el canvas) al que apunta aria-controls del toggle. */
+  proofPanelId?: string
   thinking?: boolean
   chart?: NexaAnswerChartSpec
   metricSummary?: NexaAnswerMetricSummarySpec
@@ -155,7 +158,7 @@ export interface NexaAnswerBubbleProps {
 }
 
 export interface NexaCompactAnswerBubbleProps {
-  title: string
-  body: string
+  title: NexaExpressiveTextValue
+  body: NexaExpressiveTextValue
   endSlot?: ReactNode
 }
