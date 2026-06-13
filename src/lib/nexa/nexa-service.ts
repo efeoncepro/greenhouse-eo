@@ -1,19 +1,23 @@
 import 'server-only'
 
 import {
-  FunctionCallingConfigMode,
-  createModelContent,
-  createPartFromFunctionCall,
-  createPartFromFunctionResponse,
-  createUserContent
-} from '@google/genai'
-
-import { resolveNexaModel, type NexaModelId } from '@/config/nexa-models'
-import { getGoogleGenAIClient, getGreenhouseAgentModel } from '@/lib/ai/google-genai'
+  DEFAULT_NEXA_ANTHROPIC_MODEL,
+  isSupportedNexaModel,
+  resolveNexaModel,
+  resolveNexaProviderKey,
+  type NexaModelId,
+  type NexaProviderKey
+} from '@/config/nexa-models'
+import { getGreenhouseAgentModel } from '@/lib/ai/google-genai'
+import { KNOWLEDGE_SEARCH_CONTRACT_VERSION, type KnowledgeRetrievalPacket } from '@/lib/knowledge/search'
 import type { NexaMessage, HomeSnapshot } from '@/types/home'
 
+import { getNexaProviderOverride, isNexaAutoRouterEnabled, isNexaKnowledgeRetrievalEnabled } from './flags'
+import { classifyNexaIntent, nexaProviderFailoverChain, routeNexaProviderKey } from './nexa-model-router'
 import type { NexaResponse, NexaRuntimeContext, NexaToolInvocation } from './nexa-contract'
-import { executeNexaTool, getNexaToolDeclarations } from './nexa-tools'
+import type { NexaChatProvider } from './nexa-provider'
+import { AnthropicNexaProvider } from './providers/anthropic'
+import { GeminiNexaProvider } from './providers/gemini'
 
 interface NexaServiceInput {
   prompt: string
@@ -23,9 +27,22 @@ interface NexaServiceInput {
   requestedModel?: string | null
 }
 
+interface NexaProviderStep {
+  providerKey: NexaProviderKey
+  model: NexaModelId
+}
+
+const createNexaProvider = (providerKey: NexaProviderKey): NexaChatProvider =>
+  providerKey === 'anthropic' ? new AnthropicNexaProvider() : new GeminiNexaProvider()
+
 /**
- * Nexa Service: The AI core for Greenhouse Home.
- * Uses Google GenAI (Gemini) to provide conversational assistance.
+ * Nexa Service: orquestador conversacional de Greenhouse Home.
+ *
+ * TASK-1091 — provider-agnóstico: construye el system prompt + contexto (lógica
+ * compartida), delega el "hablar con el modelo" a un `NexaChatProvider` (Gemini hoy;
+ * Claude/router en slices siguientes) y aplica las Answer Rules de knowledge sobre el
+ * texto resultante. El tool `search_knowledge` y las Answer Rules (TASK-1085) son
+ * provider-agnósticos y NO se tocan.
  */
 export class NexaService {
   private static getTimestamp() {
@@ -76,6 +93,21 @@ export class NexaService {
   private static buildSystemPrompt(context: HomeSnapshot): string {
     const { user, modules, tasks } = context
 
+    // TASK-1085 — reglas de knowledge SOLO cuando el tool está activo (flag ON);
+    // si no, no mencionar un tool que no existe (evita que el modelo lo "alucine").
+    const knowledgeRules = isNexaKnowledgeRetrievalEnabled()
+      ? [
+          '',
+          'REGLAS DE BASE DE CONOCIMIENTO (tool search_knowledge):',
+          '- Si la pregunta es sobre procesos, políticas, guías, definiciones o "cómo se hace X", usa el tool search_knowledge ANTES de responder.',
+          '- Responde SOLO con lo respaldado por los fragmentos recuperados. Usa marcadores inline [n] ligados al fragmento n (ej. "... [1]") y cierra con "Fuentes: [n] = citationLabel".',
+          '- Si una fuente viene marcada stale o deprecated, decláralo en la respuesta.',
+          '- Si search_knowledge no encuentra documentación (confianza none), di con honestidad que no encontraste una guía publicada y NO inventes la respuesta.',
+          '- Distingue guía publicada vs dato operativo en vivo: el conocimiento explica CÓMO funciona algo, no afirma el estado real del usuario. Si te piden su dato real (su ICO, su nómina, su estado), dilo: "No consulté datos actuales ni fuentes fuera de Knowledge. Si necesitas estado productivo, valida en el módulo operativo."',
+          '- En temas sensibles (finanzas, nómina, legal, seguridad, compromisos contractuales), responde solo con fuente aprobada, cita siempre con [n] y sugiere validación humana cuando corresponda.'
+        ]
+      : []
+
     const financeContext = context.financeStatus
       ? [
           '',
@@ -108,212 +140,161 @@ export class NexaService {
       '- Si el usuario pregunta por algo que está en sus tareas pendientes, menciónalo directamente.',
       '- Si el usuario pregunta por cierre de período, margen o estado financiero y ya hay señal en contexto, úsala antes de responder con generalidades.',
       '- Mantén las respuestas breves para que quepan bien en el panel de Home.',
+      ...knowledgeRules,
       '',
       'Recuerda: Eres parte de Efeonce Group y Greenhouse es la plataforma que materializa la visión de sus proyectos.'
     ].join('\n')
   }
 
-  private static buildContents(input: NexaServiceInput) {
-    return [
-      ...input.history.map(msg => ({
-        role: msg.role === 'assistant' ? 'model' : 'user',
-        parts: [{ text: msg.content }]
-      })),
-      { role: 'user', parts: [{ text: input.prompt }] }
-    ]
-  }
-
-  private static buildToolFallbackMessage(toolInvocations: NexaToolInvocation[]) {
-    const visible = toolInvocations.slice(0, 3).map(invocation => `- ${invocation.result.summary}`)
-
-    return visible.length > 0
-      ? ['Recuperé señal operativa real:', ...visible].join('\n')
-      : 'Recuperé datos operativos, pero no pude sintetizarlos en lenguaje natural.'
-  }
-
-  private static async generateSuggestions({
-    client,
-    model,
-    prompt,
-    responseText
-  }: {
-    client: Awaited<ReturnType<typeof getGoogleGenAIClient>>
-    model: string
-    prompt: string
-    responseText: string
-  }) {
-    try {
-      const suggestionResult = await client.models.generateContent({
-        model,
-        contents: [
-          {
-            role: 'user',
-            parts: [
-              {
-                text: [
-                  'Genera exactamente 3 preguntas de seguimiento cortas en español para una conversación operativa.',
-                  'Devuelve solo JSON válido con forma {"suggestions":["...", "...", "..."]}.',
-                  'No uses markdown.',
-                  `Prompt original: ${prompt}`,
-                  `Respuesta de Nexa: ${responseText}`
-                ].join('\n')
-              }
-            ]
-          }
-        ] as any,
-        config: {
-          temperature: 0.3,
-          maxOutputTokens: 200
+  private static getKnowledgePackets(toolInvocations: NexaToolInvocation[]): KnowledgeRetrievalPacket[] {
+    return toolInvocations
+      .filter(invocation => invocation.toolName === 'search_knowledge')
+      .map(invocation => invocation.result.raw?.packet)
+      .filter((packet): packet is KnowledgeRetrievalPacket => {
+        if (!packet || typeof packet !== 'object') {
+          return false
         }
+
+        const candidate = packet as Partial<KnowledgeRetrievalPacket>
+
+        return candidate.contractVersion === KNOWLEDGE_SEARCH_CONTRACT_VERSION && Array.isArray(candidate.chunks)
       })
-
-      const rawText = suggestionResult.text?.trim() || ''
-
-      if (!rawText) {
-        return []
-      }
-
-      const parsed = JSON.parse(rawText) as { suggestions?: unknown }
-
-      if (!Array.isArray(parsed.suggestions)) {
-        return []
-      }
-
-      return parsed.suggestions
-        .filter((item): item is string => typeof item === 'string')
-        .map(item => item.trim())
-        .filter(Boolean)
-        .slice(0, 3)
-    } catch {
-      return []
-    }
   }
 
-  private static async resolveToolTurn({
-    client,
-    model,
-    systemPrompt,
-    input
-  }: {
-    client: Awaited<ReturnType<typeof getGoogleGenAIClient>>
-    model: string
-    systemPrompt: string
-    input: NexaServiceInput
-  }) {
-    const contents = this.buildContents(input)
+  private static buildKnowledgeSourcesBlock(toolInvocations: NexaToolInvocation[]): string | null {
+    const citationLabels = this.getKnowledgePackets(toolInvocations)
+      .filter(packet => packet.confidence !== 'none' && packet.chunks.length > 0)
+      .flatMap(packet => packet.chunks.map(chunk => chunk.citationLabel.trim()))
+      .filter(Boolean)
 
-    const firstPass = await client.models.generateContent({
-      model,
-      contents: contents as any,
-      config: {
-        systemInstruction: systemPrompt,
-        temperature: 0.2,
-        maxOutputTokens: 500,
-        tools: [{ functionDeclarations: getNexaToolDeclarations(input.runtimeContext) }],
-        toolConfig: {
-          functionCallingConfig: {
-            mode: FunctionCallingConfigMode.AUTO
-          }
-        }
-      }
-    })
+    const uniqueLabels = Array.from(new Set(citationLabels))
 
-    const functionCalls = firstPass.functionCalls?.filter(call => call.name) ?? []
-
-    if (functionCalls.length === 0) {
-      return {
-        text: firstPass.text?.trim() || 'Lo siento, no pude procesar tu solicitud en este momento.',
-        toolInvocations: [] as NexaToolInvocation[]
-      }
+    if (uniqueLabels.length === 0) {
+      return null
     }
 
-    const toolInvocations = await Promise.all(
-      functionCalls.map(call =>
-        executeNexaTool({
-          toolCallId: call.id || crypto.randomUUID(),
-          toolName: call.name || 'check_payroll',
-          args: call.args,
-          context: input.runtimeContext
-        })
-      )
-    )
-
-    const followUp = await client.models.generateContent({
-      model,
-      contents: [
-        ...contents,
-        createModelContent(
-          functionCalls.map(call => createPartFromFunctionCall(call.name || 'unknown_tool', call.args ?? {}))
-        ),
-        createUserContent(
-          toolInvocations.map(invocation =>
-            createPartFromFunctionResponse(
-              invocation.toolCallId,
-              invocation.toolName,
-              invocation.result as unknown as Record<string, unknown>
-            )
-          )
-        )
-      ] as any,
-      config: {
-        systemInstruction: systemPrompt,
-        temperature: 0.2,
-        maxOutputTokens: 500
-      }
-    })
-
-    return {
-      text: followUp.text?.trim() || this.buildToolFallbackMessage(toolInvocations),
-      toolInvocations
-    }
+    return ['Fuentes:', ...uniqueLabels.map((label, index) => `[${index + 1}] = ${label}`)].join('\n')
   }
 
-  static async generateResponse(input: NexaServiceInput): Promise<NexaResponse> {
-    const client = await getGoogleGenAIClient()
+  private static ensureKnowledgeSourcesVisible(text: string, toolInvocations: NexaToolInvocation[]): string {
+    if (/\[\d+\]/u.test(text)) {
+      return text
+    }
 
-    const model = resolveNexaModel({
+    const sourcesBlock = this.buildKnowledgeSourcesBlock(toolInvocations)
+
+    if (!sourcesBlock) {
+      return text
+    }
+
+    return `${text.trim()}\n\n${sourcesBlock}`
+  }
+
+  /** Modelo por defecto de cada provider. Gemini preserva la resolución actual (agente). */
+  private static defaultModelForProvider(providerKey: NexaProviderKey, input: NexaServiceInput): NexaModelId {
+    if (providerKey === 'anthropic') {
+      return DEFAULT_NEXA_ANTHROPIC_MODEL
+    }
+
+    return resolveNexaModel({
       requestedModel: input.requestedModel,
       fallbackModel: getGreenhouseAgentModel()
     })
+  }
 
+  /**
+   * TASK-1091 — plan de providers (primario + failover). Orden de decisión:
+   *   1. modelo pedido explícito (gana, deriva su provider) — single, sin failover.
+   *   2. pin `NEXA_PROVIDER` — single, sin failover (intención del operador).
+   *   3. router `NEXA_AUTO_ROUTER_ENABLED` — primario por intención + failover al otro.
+   *   4. default — Gemini, comportamiento idéntico al previo a TASK-1091 (single).
+   */
+  private static buildProviderPlan(input: NexaServiceInput): NexaProviderStep[] {
+    if (isSupportedNexaModel(input.requestedModel)) {
+      return [{ providerKey: resolveNexaProviderKey(input.requestedModel), model: input.requestedModel }]
+    }
+
+    const override = getNexaProviderOverride()
+
+    if (override) {
+      return [{ providerKey: override, model: this.defaultModelForProvider(override, input) }]
+    }
+
+    if (isNexaAutoRouterEnabled()) {
+      const intent = classifyNexaIntent(input.prompt)
+      const primary = routeNexaProviderKey({ intent, knowledgeRetrievalEnabled: isNexaKnowledgeRetrievalEnabled() })
+
+      return nexaProviderFailoverChain(primary).map(providerKey => ({
+        providerKey,
+        model: this.defaultModelForProvider(providerKey, input)
+      }))
+    }
+
+    return [{ providerKey: 'google', model: this.defaultModelForProvider('google', input) }]
+  }
+
+  static async generateResponse(input: NexaServiceInput): Promise<NexaResponse> {
+    const plan = this.buildProviderPlan(input)
     const systemPrompt = this.buildSystemPrompt(input.context)
 
-    try {
-      const result = await this.resolveToolTurn({
-        client,
-        model,
-        systemPrompt,
-        input
-      })
+    let lastError: unknown
 
-      const suggestions = await this.generateSuggestions({
-        client,
-        model,
-        prompt: input.prompt,
-        responseText: result.text
-      })
+    for (let index = 0; index < plan.length; index += 1) {
+      const step = plan[index]
+      const isLastStep = index === plan.length - 1
+      const provider = createNexaProvider(step.providerKey)
 
-      return {
-        id: crypto.randomUUID(),
-        role: 'assistant',
-        content: result.text,
-        timestamp: this.getTimestamp(),
-        suggestions,
-        toolInvocations: result.toolInvocations,
-        modelId: model
+      try {
+        const turn = await provider.resolveTurn({
+          systemPrompt,
+          history: input.history,
+          prompt: input.prompt,
+          runtimeContext: input.runtimeContext,
+          context: input.context,
+          model: step.model
+        })
+
+        const content = this.ensureKnowledgeSourcesVisible(turn.text, turn.toolInvocations)
+
+        const suggestions = await provider.generateSuggestions({
+          model: step.model,
+          prompt: input.prompt,
+          responseText: content
+        })
+
+        return {
+          id: crypto.randomUUID(),
+          role: 'assistant',
+          content,
+          timestamp: this.getTimestamp(),
+          suggestions,
+          toolInvocations: turn.toolInvocations,
+          modelId: step.model
+        }
+      } catch (error) {
+        lastError = error
+
+        const errorMessage = this.extractErrorMessage(error)
+
+        console.error(`Nexa AI generation failed (provider=${step.providerKey}):`, error)
+
+        if (!isLastStep) {
+          console.warn(`Nexa AI failing over from ${step.providerKey} to ${plan[index + 1].providerKey}.`)
+
+          continue
+        }
+
+        if (this.isVertexPermissionDenied(errorMessage)) {
+          console.warn('Nexa AI permission denied on Vertex AI, serving graceful fallback response.')
+
+          return this.buildPermissionDeniedFallback(input.context, step.model)
+        }
+
+        throw new Error(errorMessage)
       }
-    } catch (error) {
-      const errorMessage = this.extractErrorMessage(error)
-
-      console.error('Nexa AI generation failed:', error)
-
-      if (this.isVertexPermissionDenied(errorMessage)) {
-        console.warn('Nexa AI permission denied on Vertex AI, serving graceful fallback response.')
-
-        return this.buildPermissionDeniedFallback(input.context, model)
-      }
-
-      throw new Error(errorMessage)
     }
+
+    // Inalcanzable: el plan siempre tiene ≥1 paso y el último relanza o degrada.
+    throw new Error(this.extractErrorMessage(lastError))
   }
 }

@@ -17,7 +17,9 @@ export const PROJECTION_DOMAINS = [
   'finance',
   'notifications',
   'delivery',
-  'cost_intelligence'
+  'cost_intelligence',
+  // TASK-1094 — auto-ingest del corpus de conocimiento desde webhook Notion.
+  'knowledge'
 ] as const
 
 export type ProjectionDomain = (typeof PROJECTION_DOMAINS)[number]

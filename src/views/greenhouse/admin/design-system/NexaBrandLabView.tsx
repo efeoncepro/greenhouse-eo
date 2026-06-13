@@ -39,6 +39,8 @@ type KindSpecimen = {
   title: string
   description: string
   usage: string
+  /** El specimen se renderiza sobre navy (el spark blanco del on-dark no se ve sobre fondo claro). */
+  onDark?: boolean
 }
 
 const KIND_SPECIMENS: KindSpecimen[] = [
@@ -65,6 +67,13 @@ const KIND_SPECIMENS: KindSpecimen[] = [
     title: 'Mono mark',
     description: 'Versión monocroma para fondos oscuros, estados compactos o composición sobre navy.',
     usage: 'Superficies de alto contraste donde el full-color competiría con el contenido.'
+  },
+  {
+    kind: 'inlineMarkOnDark',
+    title: 'Inline mark · on-dark',
+    description: 'Isotipo dos tintas para superficies OSCURAS: arco Electric Teal + chispa en blanco (regla "chispa sobre navy = blanco" del spec, sin el contenedor badge).',
+    usage: 'CTAs/superficies sobre navy o shiny (ej. el botón "Seguir con Nexa" del Momento Nexa).',
+    onDark: true
   }
 ]
 
@@ -290,7 +299,18 @@ const NexaBrandLabView = () => (
               {item.kind}
             </Typography>
           </Stack>
-          <Box>
+          <Box
+            sx={theme =>
+              item.onDark
+                ? {
+                    display: 'inline-flex',
+                    p: 2,
+                    borderRadius: `${theme.shape.customBorderRadius.md}px`,
+                    bgcolor: theme.axis.ramp.primary[900]
+                  }
+                : {}
+            }
+          >
             <GreenhouseNexaBrandMark kind={item.kind} size={item.kind === 'askNexaBadge' ? 'small' : 'medium'} />
           </Box>
           <Typography variant='body2' color='text.secondary'>

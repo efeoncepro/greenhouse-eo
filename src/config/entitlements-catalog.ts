@@ -34,7 +34,13 @@ export const ENTITLEMENT_MODULES = [
   // capabilities de operación del DS (vincular nodos Figma hoy; tokens/specimens
   // a futuro). NO conflar con `platform` (control plane de release) ni `admin`.
   // Ver el DS es plano views (plataforma.design_system); OPERAR el DS es este módulo.
-  'design_system'
+  'design_system',
+  // TASK-1081 — namespace del Knowledge Platform (corpus de documentos prosa + chunks
+  // con gobernanza editorial, capa humana + retrieval agéntico). Distinto de `platform`
+  // (control plane release) y de greenhouse_context/SCL (sidecar JSONB de memoria de agente).
+  // 5 capabilities: knowledge.{document.read,document.publish,source.admin,agentic.retrieve,
+  // feedback.submit}. Aún no can()-checked (los consumen TASK-1083/1084).
+  'knowledge'
 ] as const
 
 export type GreenhouseEntitlementModule = (typeof ENTITLEMENT_MODULES)[number]
@@ -1482,6 +1488,39 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     key: 'design_system.figma_node.link',
     module: 'design_system',
     actions: ['update'] as const,
+    defaultScope: 'tenant'
+  },
+  // TASK-1081 — Knowledge Platform foundation (5 capabilities). Sembradas con grant
+  // en runtime.ts mismo PR (invariant TASK-873/935). Aún no can()-checked: los
+  // consumidores (search API / human center / Nexa / MCP) llegan en TASK-1083/1084.
+  {
+    key: 'knowledge.document.read',
+    module: 'knowledge',
+    actions: ['read'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'knowledge.document.publish',
+    module: 'knowledge',
+    actions: ['create', 'update'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'knowledge.source.admin',
+    module: 'knowledge',
+    actions: ['manage'] as const,
+    defaultScope: 'all'
+  },
+  {
+    key: 'knowledge.agentic.retrieve',
+    module: 'knowledge',
+    actions: ['read'] as const,
+    defaultScope: 'all'
+  },
+  {
+    key: 'knowledge.feedback.submit',
+    module: 'knowledge',
+    actions: ['create'] as const,
     defaultScope: 'tenant'
   }
 ] as const

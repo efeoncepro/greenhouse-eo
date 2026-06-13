@@ -149,6 +149,7 @@ export interface StatesCopy {
   cancelled: string
   archived: string
   scheduled: string
+  upcoming: string
   paused: string
   expired: string
   blocked: string

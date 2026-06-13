@@ -2,7 +2,9 @@
 
 ## Status
 
-`Proposed`
+`Accepted (direction) — runtime gated per task` (desde 2026-06-11, TASK-1080)
+
+> La **dirección** queda aceptada: Notion sigue como authoring; Greenhouse es el runtime gobernado de conocimiento publicado para humanos, Nexa y MCP. Esto **desbloquea** `TASK-1081..1086`. **NO autoriza** ingesta masiva ni runtime libre: cada task downstream ejecuta detrás de su propio gate (flag / migración / aprobación de dominio). Ver `## Acceptance Decision (TASK-1080)` al final.
 
 ## Date
 
@@ -167,6 +169,83 @@ Reopen this proposal if:
 - Greenhouse chooses a different enterprise knowledge system as the authoring layer.
 - API Platform or MCP architecture changes the rule that MCP must be downstream of governed API contracts.
 - Legal/compliance review requires a stricter publication or retention model.
+
+## Acceptance Decision (TASK-1080)
+
+Cerrado 2026-06-11 por el operador (Julio) con el overlay `arch-architect`. Esta sección convierte el ADR de `Proposed` a `Accepted (direction)` y fija las decisiones pequeñas que faltaban para que `TASK-1081..1086` sean ejecutables. Detalle extendido (tablas de corpus piloto, owners/approvers, capability/view sketch, estados) en `GREENHOUSE_KNOWLEDGE_PLATFORM_ARCHITECTURE_V1.md` → `## Delta 2026-06-11 — Acceptance (TASK-1080)`.
+
+### D-1 — Naming + bounded context
+
+- Superficie humana: **Knowledge**, ruta `/knowledge`.
+- Bounded context / schema: `greenhouse_knowledge`. TS root: `src/lib/knowledge/`. viewCode: `plataforma.knowledge` (routeGroup `internal`, sembrado **solo a roles internos** — nunca `client_*`).
+- El nombre de la surface y el del bounded context coinciden (sin alias visible adicional).
+
+### D-2 — Audiencia MVP
+
+- **Solo interno.** Todo el corpus piloto nace `audience = internal`, `sensitivity = internal`. Cero exposición a portal cliente en el MVP.
+- `sensitivity = client_safe` y la audiencia `client` se introducen en una fase posterior, con su propio gate y revisión de acceso (no en esta ola).
+
+### D-3 — Dos dimensiones ortogonales (corrección arquitectónica)
+
+El draft mezclaba `agent_excluded` dentro del enum de lifecycle. Se **separan en dos dimensiones ortogonales** (regla anti-enum-mixto del overlay `arch-architect`):
+
+- `publication_status` (lifecycle del documento): `draft → review → published → stale → deprecated`; `quarantined` es un estado de bloqueo alcanzable desde cualquiera.
+- `agentic_policy` (compuerta de retrieval, independiente del lifecycle): `agent_allowed | agent_excluded`. Un documento `published` puede ser `agent_excluded` (visible para humanos, fuera de Nexa/MCP).
+
+`quarantined` ⇒ invisible para humanos **y** agentes (gana sobre ambas dimensiones).
+
+### D-4 — Corpus piloto
+
+- 14 documentos internos de alto valor mapeados a `docs/manual-de-uso/` + `docs/documentation/` existentes (tabla en la arquitectura). Una sola ruta de aprendizaje inicial ("Primeros pasos / Operación Greenhouse"), no todo el portal.
+- ≥1 documento nace `agent_excluded` para ejercitar la compuerta desde V1 (política interna de secretos/acceso sensible).
+- Búsqueda V1: **full-text (Postgres FTS) + filtros fuertes por metadata**. Embeddings/vector diferidos hasta medir calidad y volumen real (Postgres-first, ADR §7.4).
+
+### D-5 — Owners + approvers por dominio
+
+- Cada documento declara `owner_domain` + `approver_role`. Mapa canónico en la arquitectura (usa `ROLE_CODES` reales: `efeonce_admin`, `finance_admin`, `hr_manager`/`hr_payroll`, `efeonce_operations`, `efeonce_account`).
+- **Dominios sensibles** (finance, payroll, legal, security, access) **no pasan a `agent_allowed` sin aprobación del approver del dominio**. No existe rol `legal` → su approver es `efeonce_admin` con confirmación humana out-of-band registrada.
+
+### D-6 — Capabilities (granular, no coarse)
+
+Módulo `knowledge`. Capabilities propuestas (materializan en TASK-1081):
+
+- `knowledge.document.read` — leer corpus publicado (scoped por tenant/role/audience/sensitivity).
+- `knowledge.document.publish` — publicar Notion→Greenhouse (owner domains + `efeonce_admin`; sensibles exigen approver de dominio).
+- `knowledge.source.admin` — administrar source registry (`efeonce_admin`).
+- `knowledge.agentic.retrieve` — retrieval Nexa/MCP scoped (capability de sistema/agente).
+- `knowledge.feedback.submit` — feedback humano sobre un documento/respuesta.
+
+Cada capability se siembra con su grant en `runtime.ts` en el mismo PR que la introduce (invariante TASK-873/935).
+
+### D-7 — Secuencia de rollout (gated por task)
+
+```text
+TASK-1080 (esta, policy/accepted)
+  -> TASK-1081 schema + source registry + capabilities (gate: migración)
+    -> TASK-1082 ingesta Notion MVP (snapshot/normalize/version/sanitize/quarantine)
+      -> TASK-1083 knowledge_search API + golden questions (gate: eval harness)
+        -> TASK-1084 Human Knowledge Center  ─┐
+        -> TASK-1085 Nexa retrieval + citas   ├─ paralelas tras 1083, cada una con su flag
+        -> TASK-1086 MCP knowledge resources  ─┘
+```
+
+Cada task downstream conserva su `Out of Scope` y su gate propio (flag `NEXA_KNOWLEDGE_RETRIEVAL_ENABLED` default false, etc.). Esta aceptación NO levanta esos gates.
+
+### 4-pillar scoring (de la decisión, no del runtime)
+
+- **Safety:** internal-only + `agentic_policy` ortogonal + pre-LLM filtering + dominios sensibles con approver + `quarantined` que gana sobre todo. Blast radius del MVP acotado a un tenant interno; cero superficie cliente.
+- **Robustness:** corpus chico y evaluable; golden questions antes de exponer a Nexa en producción; publicación como decisión explícita (no auto-publish de todo Notion).
+- **Resilience:** estados `stale/deprecated` + signals de freshness/no-source/low-confidence ya definidos en la arquitectura; degradación honesta ("no encontré guía publicada") es contractual.
+- **Scalability:** full-text antes que embeddings evita comprometer un substrato vectorial sin medir; el source registry escala a más fuentes sin rediseño; embeddings son una fase aditiva, no un rework.
+
+### Open decisions deferred (con owner + condición de cierre)
+
+| Decisión diferida | Owner | Condición de cierre |
+| --- | --- | --- |
+| Substrato vector (`pgvector` vs Vertex/BQ) | Platform | Tras medir calidad/volumen del corpus full-text en TASK-1083 |
+| Audiencia `client` + `client_safe` | Product + Identity | Fase posterior, con revisión de acceso dedicada |
+| Set final de golden questions + quién las aprueba | Nexa / dominio | Se cierra en TASK-1083 por dominio del documento |
+| Versionado de docs que tocan legal/finance/payroll | Finance/HR/Legal approvers | Se define en TASK-1081/1082 con el publish workflow |
 
 ## Related Documents
 

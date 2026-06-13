@@ -202,9 +202,37 @@ pnpm fe:capture <scenario-name> --env=staging --headed    # debug visual
 `.captures/<ISO>_<scenario-name>/`:
 - `recording.webm` — video continuo del lifecycle
 - `frames/01-<label>.png`, `02-<label>.png`, ... — frames sync por `mark` step
-- `manifest.json` — scenario meta + timings + frame paths
+- `frames/01-<label>.aria.txt`, ... — **árbol de accesibilidad** de la región capturada por cada `mark` (TASK-1097)
+- `manifest.json` — scenario meta + timings + frame paths + `frames[].ariaSnapshotPath`
 - `flipbook.gif` — opt (con `--gif`)
 - `stdout.log`
+
+## Observá antes de autorar (aria snapshot — TASK-1097)
+
+No adivines selectores. Cada `mark` escribe `frames/<NN>-<label>.aria.txt` con el árbol de accesibilidad real (`manifest.frames[].ariaSnapshotPath`):
+
+```
+- main:
+  - heading "Falta poco para abrir" [level=1]
+  - button "Notifícame"
+  - img "Efeonce"
+```
+
+Leé ese archivo y escribí `getByRole('button', { name: 'Notifícame' })` contra lo que existe — en vez de `[class*="MuiButton"]:nth-child(3)` adivinado. **Preferí user-facing locators** (`getByRole`/`getByText`/data-markers `[data-capture]`) sobre CSS/`nth-child` (frágil). Detalle: skill `greenhouse-gvc-playwright`.
+
+### Explore → promote (TASK-1098)
+
+En vez del throwaway manual, usá el modo explore:
+
+```bash
+pnpm fe:capture:explore --route=/finance/cash-out --env=staging   # observá la página viva (read-only)
+pnpm fe:capture:promote --route=/finance/cash-out --name=mi-feature   # → scripts/frontend/scenarios/mi-feature.scenario.ts
+pnpm fe:capture mi-feature --env=staging   # revisá selectores/marks y capturá
+```
+
+`explore` persiste `.captures/_explore/<slug>/{session.json, aria.txt, snapshot.png}` con los candidatos + su `getByRole(...)` sugerido + uniqueness validada + markers + probes (`--probe 'role=button[name="X"]'`). `promote` cristaliza la sesión en un `.scenario.ts` válido (readiness auto + marks). **Revisá la readiness del scenario generado** (si ancla a un heading con copy dinámico es flaky → preferí un marker estable).
+
+**Microinteracciones/coreografía (TASK-1099):** `pnpm fe:capture:explore --route=X --interaction 'hover:<selector>'` (hover/focus/click — read-only) performa la acción y observa `before`/`feedback`/`settled`; `promote` auto-emite un step `interaction` (V2) por cada interacción observada. Ajustás `intent`/timings. También podés autorar el step `interaction` a mano (abajo) o `fe:capture:micro`.
 
 ## Reglas duras
 

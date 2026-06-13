@@ -1,7 +1,7 @@
 # Greenhouse Knowledge Platform Architecture V1
 
 > **Tipo de documento:** Architecture proposal
-> **Status:** `Draft / proposed`
+> **Status:** `Accepted (direction) — runtime gated per task` (desde 2026-06-11, TASK-1080; ver `## Delta 2026-06-11 — Acceptance (TASK-1080)`)
 > **Creado:** 2026-06-11
 > **Owner:** Platform / Nexa / Knowledge Operations
 > **Relacionado:** `GREENHOUSE_KNOWLEDGE_PLATFORM_DECISION_V1.md`, `GREENHOUSE_NEXA_ARCHITECTURE_V1.md`, `GREENHOUSE_MCP_ARCHITECTURE_V1.md`, `GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md`, `GREENHOUSE_STRUCTURED_CONTEXT_LAYER_V1.md`
@@ -778,3 +778,354 @@ Estos títulos se documentan para madurar el programa. **No existen archivos `TA
 - Notion MCP connection guide: https://developers.notion.com/guides/mcp/get-started-with-mcp
 - Notion data source query reference: https://developers.notion.com/reference/query-a-data-source
 - Notion data source object reference: https://developers.notion.com/reference/data-source
+
+## Delta 2026-06-11 — Acceptance (TASK-1080)
+
+El ADR pasó a `Accepted (direction) — runtime gated per task`. Esta Delta fija la taxonomía piloto ejecutable. Las **Open Questions** §18 que aquí se resuelven quedan respondidas; el resto sigue diferido con owner (ver ADR `## Acceptance Decision`).
+
+### A. Naming + acceso (resuelve §18 Q1, Q8)
+
+- Surface humana: **Knowledge**, ruta `/knowledge`. Schema `greenhouse_knowledge`, TS root `src/lib/knowledge/`, viewCode `plataforma.knowledge` (routeGroup `internal`, solo roles internos — nunca `client_*`).
+- Capabilities (módulo `knowledge`, granulares):
+
+  | Capability | Acción | Quién (grant inicial) |
+  | --- | --- | --- |
+  | `knowledge.document.read` | read | route groups internos + `efeonce_admin` |
+  | `knowledge.document.publish` | create/update | owner domain del doc + `efeonce_admin`; sensibles exigen approver de dominio |
+  | `knowledge.source.admin` | admin | `efeonce_admin` |
+  | `knowledge.agentic.retrieve` | execute | capability de sistema/agente (Nexa/MCP) |
+  | `knowledge.feedback.submit` | create | cualquier usuario interno autenticado |
+
+  Cada capability se siembra con grant en `runtime.ts` en el mismo PR que la crea (TASK-1081), bajo el guard `capability-grant-coverage.test.ts` (invariante TASK-873/935).
+
+### B. Dos dimensiones ortogonales de estado (corrige §8.4 + §15)
+
+`§8.4` listaba `agent_excluded` dentro del enum de lifecycle. Se separan (regla anti-enum-mixto):
+
+- `publication_status` (lifecycle): `draft | review | published | stale | deprecated`. `quarantined` = bloqueo alcanzable desde cualquier estado; gana sobre todo (invisible humanos **y** agentes).
+- `agentic_policy` (compuerta retrieval, ortogonal): `agent_allowed | agent_excluded`. `published + agent_excluded` = visible para humanos, fuera de Nexa/MCP.
+- `sensitivity`: `internal | restricted` en el MVP (`client_safe` diferido a fase cliente). `internal_only` deja de ser un "estado" y se expresa como `audience=internal`.
+
+### C. Corpus piloto MVP (resuelve §18 Q2, Q3, Q5, Q6) — 14 docs, internal-only
+
+Mapeado a documentación existente (la ingesta real es TASK-1082; algunos requieren un manual nuevo derivado de la fuente). Todos `audience=internal`, `sensitivity=internal` salvo donde se indica.
+
+| # | Documento | type | Fuente existente | owner_domain | approver | agentic_policy |
+| --- | --- | --- | --- | --- | --- | --- |
+| 1 | Qué es y cómo preguntar a Nexa | how_to | `documentation/plataforma/saludo-nexa-home.md` | platform/nexa | efeonce_admin | agent_allowed |
+| 2 | Cómo interpretar fuentes y citas en respuestas de Nexa | how_to | nuevo (deriva de esta arquitectura §12.4) | platform/nexa | efeonce_admin | agent_allowed |
+| 3 | Diferencia Efeonce / Greenhouse / Nexa | glossary | `context/03_ecosistema-producto.md`, `04_greenhouse-producto.md` | platform | efeonce_admin | agent_allowed |
+| 4 | Glosario ICO (RpA, OTD, FTR, Cycle Time, CSC) | glossary | `context/07_ico.md`, `06_glosario-metricas.md` | delivery | efeonce_operations | agent_allowed |
+| 5 | Motor ICO: métricas operativas | manual | `documentation/delivery/motor-ico-metricas-operativas.md` | delivery | efeonce_operations | agent_allowed |
+| 6 | Roles y acceso básicos en Greenhouse | manual | `documentation/identity/sistema-identidad-roles-acceso.md` | identity | efeonce_admin | agent_allowed |
+| 7 | Accesos rápidos (atajos) | how_to | `manual-de-uso/plataforma/accesos-rapidos.md` | platform | efeonce_admin | agent_allowed |
+| 8 | Conexión Notion de un cliente | runbook | `manual-de-uso/operations/notion-bq-sync-operacion.md` | operations | efeonce_operations | agent_allowed |
+| 9 | Reliability Control Plane: leer `/admin/operations` | manual | `documentation/plataforma/reliability-control-plane.md` | platform | efeonce_admin | agent_allowed |
+| 10 | Degradación honesta: cómo leer estados degradados | policy | `documentation/plataforma/reliability-control-plane.md` (deriva) | platform | efeonce_admin | agent_allowed |
+| 11 | Alta de cliente (onboarding) | how_to | `manual-de-uso/agency/alta-de-cliente.md` | commercial | efeonce_account | agent_allowed |
+| 12 | MCP Greenhouse read-only: cómo usarlo | manual | `manual-de-uso/plataforma/mcp-greenhouse-read-only.md` | platform | efeonce_admin | agent_allowed |
+| 13 | Períodos de nómina: cómo funcionan | manual | `manual-de-uso/hr/periodos-de-nomina.md` | payroll | hr_payroll | agent_allowed (¹) |
+| 14 | Política interna de secretos y acceso sensible | policy | `CLAUDE.md` §Secret Manager Hygiene (deriva, `sensitivity=restricted`) | security | efeonce_admin | **agent_excluded** (²) |
+
+- (¹) Toca payroll → `agent_allowed` solo tras revisión del approver `hr_payroll`/`hr_manager` (describe el flujo, no montos). Hasta esa firma nace `agent_excluded`.
+- (²) Ejercita la compuerta desde V1: visible para humanos internos, nunca retornado por `knowledge_search`/MCP. `restricted`.
+
+**Ruta de aprendizaje inicial** (una sola, no todo el portal): **"Operación Greenhouse — Primeros pasos"** = docs #1, #3, #6, #7, #9, #10 en secuencia.
+
+### D. Owners + approvers por dominio (resuelve §18 Q4)
+
+`ROLE_CODES` reales (no roles fantasma — invariante TASK-935):
+
+| owner_domain | approver_role | ¿sensible? (requiere firma de dominio antes de `agent_allowed`) |
+| --- | --- | --- |
+| platform / nexa | `efeonce_admin` | no |
+| delivery | `efeonce_operations` (+ `efeonce_admin`) | no |
+| identity / access | `efeonce_admin` | sí (access) |
+| security | `efeonce_admin` | sí |
+| commercial | `efeonce_account` (+ `efeonce_admin`) | no |
+| finance | `finance_admin` | sí |
+| payroll / hr | `hr_payroll` / `hr_manager` | sí |
+| legal | `efeonce_admin` + confirmación humana out-of-band (no existe rol `legal`) | sí |
+
+### E. Búsqueda inicial (resuelve §18 Q7)
+
+- V1: **full-text Postgres (FTS) + filtros fuertes por metadata** (`audience`, `sensitivity`, `publication_status`, `agentic_policy`, `owner_domain`). Postgres-first.
+- Embeddings/vector: **diferidos**, fase aditiva tras medir calidad/volumen en TASK-1083. Substrato (`pgvector` vs Vertex/BQ) no se elige aquí.
+
+### F. Secuencia de rollout
+
+`TASK-1080 (esta) → 1081 (schema + capabilities) → 1082 (ingesta Notion MVP) → 1083 (search API + golden questions) → 1084 (Human Center) ∥ 1085 (Nexa) ∥ 1086 (MCP)`. Cada task downstream conserva su `Out of Scope` y su gate propio (flags default false). Esta aceptación **no** levanta esos gates.
+
+### G. Open Questions §18 — disposición
+
+| §18 | Disposición |
+| --- | --- |
+| Q1 naming | Resuelto: **Knowledge** `/knowledge` |
+| Q2 corpus piloto | Resuelto: tabla C (14 docs) |
+| Q3 audiencia | Resuelto: **solo interno** |
+| Q4 approvers | Resuelto: tabla D |
+| Q5 humanos-only / fuera de Nexa | Resuelto: `agentic_policy=agent_excluded` (doc #14; #13 hasta firma) |
+| Q6 nacen `agent_excluded` | Resuelto: doc #14 (y #13 condicional) |
+| Q7 búsqueda inicial | Resuelto: full-text + metadata; vector diferido |
+| Q8 capabilities | Resuelto: tabla A |
+| Q9 versionado legal/finance/payroll | Diferido → TASK-1081/1082 (publish workflow) |
+| Q10 golden questions + approver | Diferido → TASK-1083 (por dominio del doc) |
+| Q11 feedback → tarea editorial vs retrieval | Diferido → TASK-1085 (feedback loop §12.7) |
+| Q12 link manuales `docs/manual-de-uso/` ↔ corpus | Resuelto en parte: tabla C los mapea; la ingesta canónica es TASK-1082 |
+
+## Delta 2026-06-11 — Schema materializado (TASK-1081)
+
+La foundation persistente ya está en el repo (additive, sin consumidores runtime hasta TASK-1082+).
+
+### Materializado
+
+- Migración `migrations/20260611200140700_task-1081-knowledge-core-schema.sql` — schema `greenhouse_knowledge` + 6 tablas.
+- Migración `migrations/20260611201441449_task-1081-knowledge-capabilities-registry-seed.sql` — 5 capabilities en `capabilities_registry`.
+- Runtime `src/lib/knowledge/` — barrel puro (`index.ts`) + `store.ts` server-only (patrón TASK-790/822).
+- Capabilities: `src/config/entitlements-catalog.ts` (módulo `knowledge` + 5 caps) + grants en `src/lib/entitlements/runtime.ts` + `CaptureDomain 'knowledge'`.
+
+### Tablas (`greenhouse_knowledge`)
+
+| Tabla | Rol | Notas |
+| --- | --- | --- |
+| `knowledge_sources` | Origen autorizado | `source_system`/`source_kind`, `audience`, `sync_enabled`, `secret_ref`. public_id `EO-KSRC-*`. |
+| `knowledge_documents` | Documento lógico | `publication_status` (lifecycle) **×** `agentic_policy` (compuerta) ortogonales; `document_type`, `sensitivity`, `slug` único, `current_version_id`. public_id `EO-KDOC-*`. |
+| `knowledge_document_versions` | Snapshot publicado | `version_number` UNIQUE por doc, `checksum`, `normalized_markdown`, `version_status`. |
+| `knowledge_chunks` | Unidad de retrieval | Denormaliza `audience`/`sensitivity`/`freshness`/`agentic_policy` para filtrado pre-LLM (TASK-1083); `heading_path[]`, `citation_anchor`, `token_estimate`, `allowed_scopes[]`. |
+| `knowledge_publication_runs` | Audit (anti-DELETE) | `run_kind`/`status`, forensic. |
+| `knowledge_feedback` | Feedback (append-only) | anti-UPDATE + anti-DELETE. |
+
+### Dos dimensiones ortogonales (corrige el enum mezclado de §8.4)
+
+- `publication_status`: `draft → review → published → stale → deprecated`; `quarantined` = bloqueo alcanzable desde cualquier estado (gana sobre todo). Transiciones enforced en trigger DB `knowledge_documents_validate_transition` **y** en `assertValidKnowledgePublicationTransition` (TS, mirror exacto).
+- `agentic_policy`: `agent_allowed | agent_excluded`. Independiente del lifecycle.
+
+### Refinamientos de la aceptación TASK-1080 (decisiones de ejecución)
+
+- **viewCode `plataforma.knowledge` → diferido a TASK-1084.** Nace con la página `/knowledge` (TASK-827: viewCode + routePath + page + nav juntos). Sembrarlo ahora sería una ruta huérfana 404.
+- **Full-text / tsvector / GIN → diferido a TASK-1083** (search API). La foundation indexa owner/kind/metadata (SCL learning §269: no GIN day-one). Los chunks guardan `body_text` plano.
+- **Outbox events → diferidos.** Sin consumidores hasta TASK-1082+. El audit leg es `knowledge_publication_runs` (append-only). `event-catalog` NO se tocó.
+- **Capabilities → sembradas aquí** (SSOT): catalog + registry + grants en el mismo PR (invariant TASK-873/935). Aún no `can()`-checked.
+- **Boundary con SCL confirmado:** `greenhouse_knowledge` ≠ `greenhouse_context` (Structured Context Layer). SCL = sidecar JSONB de memoria de agente/replay; Knowledge = corpus de prosa + chunks editorial. Ver STRUCTURED_CONTEXT_LAYER_V1 §900-906.
+
+### Verificación
+
+Migración aplicada en dev compartida (anti pre-up-marker DO blocks OK). Tests: pure (state-machine + validators) + live PG (`store.live.test.ts`: publish, transition trigger, chunks denormalizados, feedback append-only) + `parity.live.test` (catalog⇆registry) verdes. tsc + eslint limpios.
+
+## Delta 2026-06-11 — Ingesta MVP (TASK-1082)
+
+Pipeline de ingesta source-agnostic que materializa el corpus piloto en `greenhouse_knowledge`. Connector `repo_docs` real; connector Notion **diferido a TASK-1088** (gated en secret).
+
+### Decisión de fuente
+
+El corpus piloto (tabla C) son **archivos markdown del repo** (11/12 existen). No hay teamspace Notion de knowledge ni secret. → se ingiere vía connector `repo_docs` (`source_system='repo_docs'`, `source_kind='markdown_collection'`). El connector Notion (block fetcher `GET /v1/blocks/{id}/children` + `blocks→markdown`) se construye en **TASK-1088** cuando el operador provisione el teamspace + secret `notion-integration-token-greenhouse-knowledge-*`.
+
+### Módulos (`src/lib/knowledge/`)
+
+| Pieza | Rol |
+| --- | --- |
+| `ingestion/connector.ts` | Interface `KnowledgeSourceConnector` (source-agnostic, puro): `list()` + `load()`. |
+| `ingestion/pilot-corpus.ts` | Manifest declarativo de los 14 docs (gobernanza editorial, no inferida del contenido). `sourceFiles=null` = to-author (skipped). |
+| `ingestion/repo-docs-connector.ts` | Connector `repo_docs` (lee markdown del repo, server-only). |
+| `ingestion/markdown.ts` | Puro: `stripFrontmatter` + `chunkMarkdown` (heading_path + `citation_anchor` estable + token_estimate + soft-split) + `checksumMarkdown` (sha256). Sin deps externas. |
+| `sanitization/detect.ts` | Puro: detecta **valores** de secretos + RUT + prompt-injection (no menciones de "secret" en prosa). |
+| `ingestion/pipeline.ts` | Server-only: orquesta `list→load→normalize→sanitize→(quarantine\|publish+chunks)`. dry-run/apply, idempotente por checksum, get-or-create del source, run audit, `captureWithDomain('knowledge')`. |
+| `ingestion/run-tracking.ts` | begin/complete sync run sobre `knowledge_publication_runs`. |
+
+CLI: `scripts/knowledge/ingest.ts` (`--apply`). `quarantine` es **knowledge-native** (`publication_status='quarantined'` + `run_kind='quarantine'`), NO la tabla SCL.
+
+### Reliability signals (módulo `knowledge`)
+
+- `knowledge.publication.quarantine_count` (data_quality, warning>0, steady=0).
+- `knowledge.sync.failed_source` (freshness, error>0, steady=0).
+
+Nuevo módulo reliability `knowledge` (subsystem "Knowledge Platform") en el registry.
+
+### Verificación live
+
+`--apply` en dev: registró el source `repo_docs` piloto, publicó **11 docs** (10 `agent_allowed` + 1 `agent_excluded` `periodos-de-nomina`) + **263 chunks**; re-run **idempotente** (11 unchanged, 0 published); **0 quarantine** (sanitizer sin falsos positivos en el corpus real que menciona nombres de secrets). Signals = `ok`. 14 focal + 418 reliability tests verdes.
+
+## Delta 2026-06-12 — Search API materializada (TASK-1083)
+
+`knowledge_search` implementado como **contrato read-only sobre API Platform** que consumen por igual UI humana (TASK-1084), Nexa (TASK-1085) y MCP (TASK-1086). Decisiones materializadas:
+
+### Substrato full-text (Postgres, vector diferido)
+
+- Columna `body_tsv tsvector GENERATED` sobre `knowledge_chunks` vía función IMMUTABLE SSOT `greenhouse_knowledge.knowledge_chunk_tsv(heading, body)` — **weighted** (heading `'A'` > body `'B'`: un match en el encabezado rankea más) + config `'spanish'` + **accent-insensitive** (`unaccent`: `nómina ≡ nomina`) + GIN. La función encapsula el `to_tsvector('spanish', unaccent(...))` (que inline resuelve como STABLE y rompe la columna GENERATED) y es el único lugar donde vive la definición del índice. Migraciones `20260612072724451` + `20260612075236036`.
+- **Retrieval model**: OR-ify (`websearch_to_tsquery` con `&`→`|`) para recall sobre preguntas naturales + `ts_rank` para ranking + **piso de relevancia 0.10** para rechazar matches incidentales (no-answer honesto). Umbrales tunables; el eval harness los valida.
+
+### Reader SSOT, 2 modos (Full API Parity #2)
+
+`searchKnowledge({ query, subject, mode })` (`src/lib/knowledge/search/search-knowledge.ts`) es el **único** punto de retrieval — lane-agnóstico (recibe `subject`, no `request`; TASK-1086 lo envuelve sin lógica nueva). Pre-LLM filtering en SQL, dos modos:
+
+| modo | capability | `agent_excluded` | `restricted` | publication |
+|---|---|---|---|---|
+| `human` | `knowledge.document.read` | **visible** | visible (interno) | published/stale/deprecated |
+| `agentic` | `knowledge.agentic.retrieve` | **NUNCA** | **NUNCA** | published/stale |
+
+El filtrado lee el **documento vivo** (`kd`), no el chunk denormalizado (que puede lagear); filtra `current_version_id` (ignora chunks de versiones superseded); el contenido denegado **nunca entra al reader** (solo `deniedOrFilteredCount`). Packet versionado `KnowledgeRetrievalPacket` con `contractVersion: 'knowledge-search.v1'`; `confidence='none'` con 0 resultados (no-answer honesto).
+
+### Endpoints app + lint rule
+
+- `GET /api/platform/app/knowledge/search` (packet v1, modo→capability)
+- `GET /api/platform/app/knowledge/documents` (browse/list, Full API Parity #1)
+- `GET /api/platform/app/knowledge/documents/:id` (read-detail: versión vigente + secciones; anti-oracle `notFound` para draft/quarantined/audience ajena)
+- `POST /api/platform/app/knowledge/feedback` (contrato compartido humano+Nexa, Full API Parity #5)
+- Lint rule `greenhouse/no-direct-knowledge-chunk-query` (warn→error tras 1084/1085): bloquea `FROM/JOIN` de las tablas de **contenido** (`knowledge_chunks|document_versions`) fuera del data layer. Exime `src/lib/knowledge/**`, migrations, plugin, `db.d.ts`. No flaggea governance ops (`COUNT` de `knowledge_documents`).
+
+### Quality gate = eval harness offline (Delta D)
+
+10 **golden questions** (fixtures TS versionadas, `golden-questions.ts`) cubriendo fuente correcta (human+agentic), wrong-source guard, no-answer honesto y escalación sensible. Structural test en CI + eval harness live contra el corpus real. **No** runtime signal de search en V1 (el signal `low_citation_rate` mide respuestas de Nexa → es de TASK-1085).
+
+### Verificación live
+
+22/22 tests verdes contra el corpus TASK-1082 (263 chunks): human ve `periodos-de-nomina` (`agent_excluded`), agentic lo excluye + `deniedOrFilteredCount≥1`; browse 0 leak de draft/quarantined; read-detail 30 secciones; no-answer off-corpus → `confidence='none'`.
+
+### Delta 2026-06-12b — `score` por chunk (Answer Trace contract)
+
+El packet expone `KnowledgeRetrievalChunk.score` (el `ts_rank` redondeado) — aditivo dentro de `knowledge-search.v1` (read-only, backward-compatible). Es el **SSOT del número del trace**: la Answer Trace surface (TASK-1089) muestra "Score 0.96" por chunk y "Confianza 0.94" por fuente; sin este campo esos números serían fabricados. La confianza por fuente/overall se **deriva** del score (agregando por documento o el máximo), nunca se inventa un número paralelo. Distinta de la **confianza de respuesta** que genera Nexa al componer (TASK-1085). La tab "Evals" del trace es la salud del eval harness offline (golden questions), no un campo por-consulta. Habilita el wiring honesto 1089 (UI) → 1085 (retrieval) sin reshape.
+
+## Delta 2026-06-12 — Retrieval de Nexa: tool + reglas + UI evidence + señales (TASK-1085)
+
+Nexa **consume el contrato** `knowledge-search.v1` (NO las tablas) vía un tool de function-calling, detrás de `NEXA_KNOWLEDGE_RETRIEVAL_ENABLED` (default false). La UI del thread renderiza el packet real como evidencia debajo de la respuesta, sin consultar `greenhouse_knowledge` directo.
+
+- **Tool `search_knowledge`** (`src/lib/nexa/nexa-tools.ts`): disponible solo cuando el flag está ON **y** el tenant tiene grant agéntico (espeja el de 1083: interno ∪ {EFEONCE_ADMIN, FINANCE_ADMIN, HR_MANAGER, EFEONCE_OPERATIONS}; cliente NUNCA). Su `execute` llama `searchKnowledge({ query, subject, mode: 'agentic' })` (SSOT, ya filtra pre-LLM: NUNCA retorna `agent_excluded`/`quarantined`/`restricted`) y devuelve el `KnowledgeRetrievalPacket` completo en `result.raw.packet` + un grounding summary acotado para el modelo. **El corpus completo NUNCA entra al prompt** — solo el packet del turno.
+- **Answer Rules** (system prompt, solo con flag ON): usar el tool antes de responder procesos/políticas/definiciones; citar el `citationLabel`; declarar `stale`/`deprecated`; gap honesto en `confidence='none'` (decir "no encontré una guía publicada", no inventar); distinguir guía publicada vs dato operativo vivo; pedir validación humana en finance/payroll/legal/security.
+- **Provider-agnóstico**: el tool y las reglas no dependen del SDK de Gemini. El swap previsto Gemini→Claude (`src/lib/ai/anthropic.ts`) no toca el tool ni las reglas — solo el cliente del modelo.
+- **UI evidence renderer** (`NexaToolRenderers.tsx`): `search_knowledge` valida `raw.packet.contractVersion='knowledge-search.v1'`, muestra trace/fuentes/freshness/score debajo de la respuesta de Nexa y cae a card genérica si el packet no existe. Los números del trace salen del packet, no de JSX mock.
+- **Señales** (moduleKey `knowledge`, leídas del jsonb `nexa_messages.tool_invocations`, sin writes nuevos): `knowledge.nexa.no_source_answer_rate` (cobertura), `knowledge.nexa.stale_source_retrievals` (steady=0) y `knowledge.retrieval.low_citation_rate` (respuestas sin citas renderizables). Ver Reliability Control Plane V1 Delta 2026-06-12.
+- **Feedback** vía el contrato compartido `POST /api/platform/app/knowledge/feedback` (Full API Parity #5), no un handler local del chat.
+- **Bug class destapada (ISSUE-092):** el smoke end-to-end reveló que el tool-calling de Nexa estaba roto en producción (Gemini 2.5 rechaza el `id` huérfano que `createPartFromFunctionResponse` de @google/genai 1.45.0 inyecta en `functionResponse`). Fix raíz en el path compartido `nexa-service.ts` (`{ name, response }` sin id, match por nombre/orden) → desbloquea TODOS los tools.
+
+## Delta 2026-06-12 — Consumo MCP de Knowledge (TASK-1086)
+
+Tercer lane de Full API Parity sobre el mismo SSOT `searchKnowledge`: el **Greenhouse MCP server** (`src/mcp/greenhouse/**`) expone el corpus a agentes MCP **read-only, downstream del lane ecosystem** (NO SQL/Notion directo, NO writes).
+
+- **Lane ecosystem creado primero** (el gap que el audit destapó): el MCP consume solo `/api/platform/ecosystem/*`, y los endpoints de knowledge ahí no existían — TASK-1083 solo había construido el lane `app`. Ver `GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md` Delta 2026-06-12 (lane ecosystem de Knowledge).
+- **2 tools**: `search_knowledge` (packet `knowledge-search.v1` con citas; la descripción instruye **no inventar** cuando `confidence='none'`) + `get_knowledge_document` (read-detail por id, anti-oracle 404). `get_knowledge_citations` se descartó (redundante con el packet + read-detail).
+- **1 resource**: `greenhouse://knowledge/document/{id}` (el mismo documento read-only addressable por URI estable). `source/{id}` y `runbook/{slug}` diferidos (un `source/{id}` expone config de ingesta sin valor para un agente).
+- **Mapping fiel, no forma paralela**: el MCP devuelve el packet/documento tal cual; preserva `confidence`/`freshness`/`citations`/`deniedOrFilteredCount`. Un doc `agent_excluded`/`quarantined`/`restricted`/no-interno NUNCA aparece (filtro horneado en el reader + gate de scope `internal` en el binding).
+
+## Delta 2026-06-12 — Connector Notion de Knowledge (TASK-1088)
+
+Cierra el gap que TASK-1082 dejó diferido: la ingesta ahora soporta el teamspace Notion de conocimiento, **sin tocar** el pipeline (sanitize/quarantine/version/chunk). El connector solo cambia la **fuente** del markdown; el resto es drop-in.
+
+### Pipeline parametrizado (Slice 1)
+
+El pipeline ya no hardcodea `repo_docs`. La interface `KnowledgeSourceConnector` gana `sourceDescriptor` (`sourceSystem`/`sourceKind`/`name`/`ownerDomain`/`audience`) — el connector es **dueño de su identidad de source** (SSOT). `findSourceId`/`registerKnowledgeSource` lo consumen. `repo_docs` preservado bit-for-bit (18 tests de ingesta verdes).
+
+### Módulos nuevos (`src/lib/knowledge/notion/`)
+
+| Pieza | Rol |
+| --- | --- |
+| `notion-knowledge-client.ts` | Server-only: block fetcher `GET /v1/blocks/{id}/children` (paginado + recursivo, guard 5000 bloques/12 niveles) + provenance `GET /v1/pages/{id}`. Token vía `resolveSecretByRef(NOTION_KNOWLEDGE_TOKEN_SECRET_REF)`, Notion-Version `2026-03-11`, 429 retry con Retry-After, errores sanitizados que **nunca** incluyen el token. `fetch` inyectable para test. |
+| `blocks-to-markdown.ts` | **Puro** (sin IO): bloques Notion → markdown que el chunker heading-pathed consume. Headings limpias, listas (ordenadas con numeración contigua + reset), to_do, quote, callout, code fence, divider, toggle, tablas, contenedores aplanados, media como link. Bloques desconocidos degradan a párrafo honesto. 17 tests con fixtures. |
+| `notion-corpus.ts` | Manifest declarativo (gobernanza editorial, no inferida). **Nace vacío**: el operador declara `notionPageId` + metadata por documento autorizado. NUNCA descubre Notion en vivo. |
+| `notion-connector.ts` | `NotionKnowledgeConnector implements KnowledgeSourceConnector`. `list()` degrada honesto a `unavailable` si el token no está provisionado; `load()` = fetch tree → `blocks→markdown` → provenance. Cliente inyectable (`NotionKnowledgeReader`) para test. 6 tests con mock reader. |
+
+CLI: `scripts/knowledge/ingest.ts [--apply] [--source=repo_docs|notion]` (guard que rechaza `--source` desconocido).
+
+### Integración (Notion Integrations Registry)
+
+Integración dedicada **Knowledge** (`notion-integration-token-greenhouse-knowledge` → `NOTION_KNOWLEDGE_TOKEN_SECRET_REF`), scoped **solo** al teamspace de conocimiento. NUNCA se reusa el token de BigQuery Sync / PRD / demo, ni el de knowledge para otro pipeline (su aislamiento evita contaminar el mirror BQ). Es ingesta operada por ops, no runtime del portal.
+
+### Boundary (no-regresión)
+
+- **Notion authoring, Greenhouse runtime**: el connector hace **snapshot** (no Notion live para una respuesta de Nexa). NUNCA ingiere todo Notion — solo el corpus autorizado.
+- **Sanitize-before-chunk + quarantine** aplican idéntico: el contenido Notion es input no confiable igual que el del repo.
+- **Provider/source-agnostic**: agregar un connector futuro (otro teamspace, otra fuente) = nuevo `sourceDescriptor` + connector, sin tocar el pipeline.
+
+### Estado
+
+V1 con corpus vacío + sin token provisionado (gated). El connector existe y degrada honesto; la ingesta real arranca cuando el operador comparte las páginas con la integración dedicada + declara el corpus. 23 tests focales nuevos (17 markdown + 6 connector) + 18 de ingesta intactos.
+
+## Delta 2026-06-12 — Ingesta de Wikis Notion (data_source) (TASK-1088 Slice 5)
+
+El connector ahora ingiere **Wikis** (databases Notion), no solo páginas sueltas. Una Wiki = una `data_source` cuyas filas son artículos (cada fila es una página de prosa).
+
+### Modelo de corpus (unión discriminada)
+
+`NotionCorpusEntry` pasa a ser `page | data_source`:
+- `page` — una página de prosa = un documento (slug/title declarados).
+- `data_source` — una Wiki: en `list()` se **expande** a N candidatos (uno por artículo), heredando la gobernanza declarada a nivel Wiki. Slug **estable desde el page id** (`${slugPrefix}/<pageId>`) — NUNCA del título (el título cambia → doc huérfano). El título visible viene de la fila.
+
+### Mecánica
+
+- `queryDataSourcePages(dataSourceId)` (`notion-knowledge-client.ts`): `POST /v1/data_sources/{id}/query` (canónico, **NO** `/databases/{id}/query`), paginación con cursor opaco, filtro `in_trash`, detección del cap 10k (`request_status.incomplete` → `hitResultLimit`, logueado a `captureWithDomain('knowledge')`).
+- Connector: `list()` expande las Wikis (provenance de cada artículo cacheada para evitar un fetch extra); `load()` unificado — el page id viaja en `sourceLocator` (página suelta o artículo), un solo path. El pipeline (sanitize/quarantine/version/chunk) no cambia.
+
+### Fix descubierto en smoke real
+
+Las imágenes Notion-hosted exponen URLs S3 **presigned** (`file.url` con `X-Amz-Credential=ASIA…`): efímeras + con credenciales en el query string que **dispararían el sanitizer** → cuarentena de todo artículo con imagen. `blocks→markdown` ahora omite esas URLs (solo emite URLs estables external/bookmark; las Notion-hosted quedan como caption placeholder).
+
+### Verificación live
+
+Contra Notion real (token `Greenhouse KNOW`, workspace Efeonce): **Wiki de IA → 37 artículos** enumerados; primer artículo → árbol de bloques → markdown limpio (19.6k chars, headings `## …` correctas). 35 tests focales en `notion/` (18 markdown + 9 connector + 8 client).
+
+### Reglas duras (Wikis)
+
+- **NUNCA** query por `/v1/databases/{id}/query` (deprecado 2025-09-03) — siempre `/v1/data_sources/{id}/query`.
+- **NUNCA** derivar el slug de un artículo del título (inestable) — siempre del page id.
+- **NUNCA** declarar databases operacionales (Sprints/Proyectos/Tareas/Calendarios/Revisiones) en el corpus de knowledge — son data estructurada del pipeline de delivery, no conocimiento de prosa.
+- **NUNCA** emitir la URL S3 presigned de un archivo Notion-hosted al markdown (efímera + dispara el sanitizer).
+
+## Delta 2026-06-12 — Auto-ingest por webhook Notion (TASK-1094)
+
+Cierra el gap operativo de TASK-1088: la ingesta era manual (re-correr el CLI). Ahora el corpus se mantiene al día **automáticamente** cuando alguien publica/edita/borra un artículo en una Wiki/página declarada, vía **webhook** (decisión del operador: NO cron). Reusa el bus de webhooks (TASK-912) + outbox→consumer reactivo (TASK-771/773) + el conector/pipeline (TASK-1088/1082) sin modificarlos.
+
+### Pipeline canónico
+
+```
+Notion (publicás/editás/borrás en una Wiki de knowledge)
+  → webhook "Greenhouse KNOW"  →  /api/webhooks/notion-knowledge   [bus TASK-912]
+     ├─ verification handshake (ACK siempre, pre-flag/pre-HMAC)
+     ├─ HMAC-SHA256 (secret propio NOTION_KNOWLEDGE_WEBHOOK_SIGNING_SECRET_REF)
+     ├─ kill-switch NOTION_KNOWLEDGE_WEBHOOK_ENABLED (default OFF → ACK + drop)
+     └─ emite outbox  knowledge.notion.page_change_signal  (page id + isDeletion)
+  → consumer reactivo (ops-worker)  knowledge_notion_ingest   [registerProjection]
+     ├─ RE-FETCH la página (NUNCA confía el payload — source of truth)
+     ├─ GATE de gobernanza: parent.data_source_id ∈ Wiki declarada, o page id ∈ página declarada → si NO, ignora
+     ├─ borrada (page.deleted o in_trash) → deprecar el doc (publication_status='deprecated')
+     └─ si está en corpus → re-ingest idempotente del artículo (mismo pipeline TASK-1082)
+  + reconcile on-demand  (red de seguridad at-most-once, NO cron):
+     re-ingest del corpus + deprecación de huérfanos (páginas borradas cuyo webhook se perdió)
+```
+
+### Decisiones (4-pillar + notion-platform)
+
+- **Webhook-first, sin cron** (decisión operador). El at-most-once de los webhooks Notion se cubre con: (a) señal PG-only `knowledge.notion.ingest_dead_letter` (re-ingests FALLIDOS, cheap), y (b) `reconcile` on-demand (eventos PERDIDOS + huérfanos, hitea Notion solo cuando el operador lo corre). El at-most-once queda **visible + recuperable**, no silencioso.
+- **Re-fetch (Pillar 1 notion-platform)**: el webhook es un trigger ligero (page id + tipo); el consumer re-fetchea la página. Robusto al coalescing (el re-fetch ve `in_trash` aunque el evento fuera un edit).
+- **Gate de gobernanza**: el `parent.data_source_id` de la página (autoritativo, 1 fetch) resuelve a qué Wiki declarada pertenece; una página fuera del corpus se ignora.
+- **Borrado = deprecación**: cierra el gap de TASK-1088. `page.deleted`/`in_trash` → `transitionKnowledgeDocumentStatus('deprecated')`.
+- **Drop-in**: el pipeline (sanitize/quarantine/version/chunk/idempotencia) NO cambia. El re-ingest por página reusa `ingestOne` (single source of truth).
+- **Aislamiento**: secret HMAC propio del webhook de knowledge + token scoped (TASK-1088). Sin echo-loop (knowledge NO escribe a Notion).
+
+### Módulos (`src/lib/knowledge/notion/` + `src/lib/sync/`)
+
+| Pieza | Rol |
+| --- | --- |
+| `webhook-flags.ts` | Kill-switch `NOTION_KNOWLEDGE_WEBHOOK_ENABLED` (default OFF). |
+| `webhooks/handlers/notion-knowledge.ts` | Handler: handshake + HMAC + flag + emite `knowledge.notion.page_change_signal`. |
+| `auto-ingest.ts` | `resolveCorpusEntryForNotionPage` (gate puro) + `ingestNotionPageById` (re-fetch → deprecar | re-ingest | ignorar). |
+| `sync/projections/knowledge-notion-ingest.ts` | Consumer reactivo (ops-worker), coalescing-safe, maxRetries=3. |
+| `reconcile.ts` + `scripts/knowledge/reconcile.ts` | Red de seguridad on-demand: re-ingest + deprecación de huérfanos (`findOrphanDocs` puro). |
+| `notion-knowledge-client.ts` | `fetchPageProvenance` extendido con `title` + `parentDataSourceId` + `inTrash`. |
+| `store.ts` | `getKnowledgeDocumentBySourcePageId` + `listLiveSourceDocPageRefs`. |
+| `pipeline.ts` | exporta `ingestOne` + `findSourceId` (reuso por el auto-ingest). |
+| `reliability/queries/knowledge-notion-ingest-dead-letter.ts` | Señal `knowledge.notion.ingest_dead_letter` (dead_letter, steady=0). |
+
+### Evento + señal
+
+- Outbox `knowledge.notion.page_change_signal` v1 (aggregate `knowledge_notion_page`). Payload: `{ schemaVersion, pageId, notionEventType, isDeletion, parentId, sourceEventId, occurredAt }`.
+- Señal `knowledge.notion.ingest_dead_letter` (moduleKey `knowledge`, kind `dead_letter`, severity error si >0, steady=0).
+
+### Rollout (operador — pendiente)
+
+Code-complete + flag OFF (cero efecto al merge). Para activar:
+1. Crear el secret HMAC del webhook en GCP + `NOTION_KNOWLEDGE_WEBHOOK_SIGNING_SECRET_REF` (Vercel + ops-worker).
+2. Asegurar `NOTION_KNOWLEDGE_TOKEN_SECRET_REF` en el ops-worker (el consumer re-ingiere desde ahí).
+3. En la integración "Greenhouse KNOW" (Notion): configurar el webhook URL `…/api/webhooks/notion-knowledge` + suscribir `page.created/content_updated/properties_updated/deleted`. Notion manda un `verification_token` → el handler lo ACK-ea.
+4. Flip `NOTION_KNOWLEDGE_WEBHOOK_ENABLED=true`.
+5. Smoke: editar un artículo de prueba → verificar re-ingest; borrarlo → verificar deprecación; `reconcile --dry-run` → 0 huérfanos; señal en 0.
+
+Runbook: `docs/operations/runbooks/notion-knowledge-webhook.md`.

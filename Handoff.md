@@ -1,5 +1,459 @@
 # Release 2026-06-10 #2 — develop→main `6c649b2a6` RELEASED
 
+## Sesion 2026-06-13 — TASK-1110 composición Nexa in-place /knowledge — Slice 1 entregado MAL, en realineación (Claude)
+
+- **Qué se pusheó (develop):** Slice 1 (`098908cff`) wiring composición in-place en la lente Humano + kill-switch rollout-flag DB `knowledge_composition_lens` **ON por defecto** (migración `20260613210340667`, revertible sin deploy) + focus-routing a11y en `NexaMomentComposition`. Slice 2 (`02e31275d`) GVC scenario `knowledge-composition` + fix non-regresión `knowledge-lenses`. Gate local verde (tsc 0 · lint 0 · build 0 · tests focales 33/33).
+- **PROBLEMA (revisión operador):** el runtime **no se ve ni se comporta como el mockup aprobado** `NexaMomentCompositionSection`. Diverge en: (1) host = workbench 3-col en vez del **grid limpio "Documentos del corpus"** (pisé el `defaultHost` del consumer); (2) **falta el next-step gobernado** (pieza central del Moment); (3) respuesta más densa (renderPlan crudo vs enriquecido del mockup); (4) **no verifiqué paridad `fe:capture:diff` mockup↔runtime**. Causa de proceso: seguí el texto literal de la spec por encima del artefacto visual aprobado cuando se contradecían.
+- **Spec correctiva completa** (objetivo + qué salió mal + qué falta): `docs/tasks/in-progress/TASK-1110-...md` sección "Corrección 2026-06-13".
+- **Pendiente:** (a) confirmar con operador host=grid-limpio + manejo del next-step; (b) **rehacer Slice 1** con paridad al mockup + `fe:capture:diff`; (c) considerar apagar el kill-switch (`knowledge_composition_lens=FALSE`, sin deploy) hasta el redo para no mostrar la versión no-fiel en staging; (d) Slice 3 (DS page) + Slice 4 (Moment Fabric joint Codex TASK-1095/1096) + doc closure.
+
+## Sesion 2026-06-13 — Codex TASK harness recalibrado + drift guard (Codex)
+
+- **Qué cambió:** `docs/operations/CODEX_EXECUTION_PROMPT_V1.md` dejó de ser un prompt largo/stale y quedó como harness vivo: local-first, sin cambio de rama/worktree por defecto, sin branch/commit obligatorio por slice, matriz de skills Codex real y cierre con QA/docs proporcionales.
+- **Guardrail nuevo:** `pnpm codex:task-hook:check` (`scripts/check-codex-task-harness.mjs`) valida que el prompt tenga bloque extraíble, protocolo de actualización continua, aliases slash-style, entrypoints sincronizados y smoke del hook contra una task activa con `--develop`.
+- **Protocolo constante:** cualquier cambio a hook, prompt, skill TASK, entrypoints TASK, comandos/gates o inventario de skills referenciado debe correr `pnpm codex:task-hook:check` y actualizar `CODEX_EXECUTION_PROMPT_V1.md` en el mismo cambio si aplica.
+- **Docs/entrypoints sincronizados:** `.codex/skills/greenhouse-task-execution-hook/SKILL.md`, `AGENTS.md`, `CLAUDE.md`, `.claude/commands/implement-task.md`, `project_context.md`, `changelog.md`, `package.json`.
+
+## Sesion 2026-06-13 — Codex slash-style TASK aliases (Codex)
+
+- **Qué cambió:** el hook Codex de ejecución TASK ahora reconoce alias estilo slash: `/implement-task TASK-###`, `/implement-task ###`, `/task TASK-###` y `/task ###`.
+- **Runtime local:** `scripts/codex-task-hook.mjs` acepta ids numéricos desnudos (`1033`) y los normaliza a `TASK-1033`, además del formato previo `TASK-1033` y rutas `docs/tasks/**`.
+- **Docs/skill sincronizadas:** `docs/operations/CODEX_EXECUTION_PROMPT_V1.md`, `.codex/skills/greenhouse-task-execution-hook/SKILL.md`, `AGENTS.md`, `project_context.md` y `changelog.md`.
+- **Uso recomendado:** el operador puede escribir simplemente `/implement-task 1109 mantente en develop` o `/task TASK-1109`; Codex debe ejecutar `pnpm codex:task-hook 1109 --develop` cuando corresponda antes de implementar.
+
+## Sesion 2026-06-13 — TASK-1109 Postgres dev pool self-healing creada (Codex)
+
+- **Task nueva:** `docs/tasks/to-do/TASK-1109-postgres-dev-pool-self-healing.md`.
+- **Por qué existe:** follow-up robusto de `ISSUE-094`; el workaround actual de reiniciar `pnpm dev` no basta como contrato para sesiones largas con HMR/GVC. El fix debe hacer que `src/lib/postgres/client.ts` no reuse un `Pool` cerrado (`Cannot use a pool after calling end on the pool`) y se autorecupere de forma controlada.
+- **Límite explícito:** no tocar Cloud SQL, PgBouncer, GCP, Vercel env vars ni secretos; el análisis con skills Google Cloud apuntó a lifecycle del cliente Node/PG, no a infraestructura.
+- **Cierre esperado:** tests focales en `src/lib/postgres/client.test.ts`, smoke local de ruta DB sin loop de retries, y `ISSUE-094` actualizado con el fix de fondo.
+
+## Sesion 2026-06-13 — GreenhouseRoadmapTimeline primitive (Codex)
+
+- **Qué quedó:** se trajo el patrón `RoadmapCard` del prompt como primitive nativa `GreenhouseRoadmapTimeline` en `src/components/greenhouse/primitives/`, con variants `horizontal|stacked|compact`, kinds `productRoadmap|releasePlan|implementationPlan|clientOnboarding|custom` y estados `complete|active|pending|blocked`.
+- **Compatibilidad del prompt:** la primitive acepta aliases `done|in-progress|upcoming` y los normaliza a estados Greenhouse. No se agregó shadcn, Tailwind, `class-variance-authority` ni `/components/ui`.
+- **Design System:** nueva ruta interna `/design-system/roadmap-timeline`, entrada en catálogo, declaration en `route-reachability-manifest.ts` y scenario GVC `design-system-roadmap-timeline`.
+- **Frontera:** no reemplaza `GreenhouseActivityTimeline` (eventos/auditoría/handoffs) ni `GreenhouseStepperProgressMicro` (progreso operativo compacto). Es para roadmaps, release plans y horizontes de producto/onboarding.
+- **Verificación:** Vitest focal `GreenhouseRoadmapTimeline.test.tsx` verde; ESLint focal verde; `NODE_OPTIONS=--max-old-space-size=8192 pnpm exec tsc --noEmit --pretty false` verde; `pnpm design:lint`, `pnpm ops:lint --changed`, `pnpm route-reachability-gate` verdes. GVC canónico `design-system-roadmap-timeline` verde en `.captures/2026-06-13T18-59-36_design-system-roadmap-timeline` (desktop/mobile, `qualityFindings=[]`). Se corrigió el primer intento visual pesado: el specimen principal ahora usa el demo exacto del prompt (`Product Roadmap`, Q1-Q4 2023), con card compacta, rail fino, dots pequeños sobre la línea y badge por periodo; también se corrigió el solape en stacked/mobile separando el rail del contenido.
+
+## Sesion 2026-06-13 — ISSUE-095 Sentry source-map token 403 documentado (Codex)
+
+- **Qué falta:** el guardrail de `ISSUE-093` evita deploys de 45m/failures, pero Sentry sigue rechazando `sentry-cli releases new` / source-map upload con `403 You do not have permission to perform this action`.
+- **Issue abierto:** `docs/issues/open/ISSUE-095-sentry-sourcemap-upload-token-403.md`.
+- **Contrato de cierre:** rotar o corregir `SENTRY_AUTH_TOKEN` sin exponer valores; verificar permisos de release/source-map upload (`project:releases` + `org:read` para release management con `sentry-cli`, o Organization Token apto para CI/source maps); actualizar los Vercel environments aplicables; confirmar deployment `Ready` sin `403` y artifact bundle/source maps presentes en Sentry.
+- **No hacer:** no desactivar Sentry ni borrar credenciales como cierre permanente; el timeout defensivo de `ISSUE-093` queda aunque el token se arregle.
+
+## Sesion 2026-06-13 — ISSUE-093 Vercel/Sentry source-map upload timeout guard (Codex, resolved)
+
+- **Problema vivo confirmado:** Vercel staging reportó `greenhouse-bu3i14eap` (`develop`, commit `310ae87`) en `Error` tras 46m. Logs: Next compiló OK en 2.6m y quedó en `Running next.config.js provided runAfterProductionCompile ...`. Deployment vecino `greenhouse-456owabqd` (`606e07c`) completó ese mismo hook en 14.151s y terminó `Ready` en 7m. Causa = hang flaky de upload source maps Sentry, no build roto de producto.
+- **Fix code complete local:** `next.config.ts` ahora captura el hook `runAfterProductionCompile` generado por `withSentryConfig` y lo corre vía `runSentrySourcemapUploadWithTimeout()` (`src/lib/sentry-build/sourcemap-upload-timeout.ts`). Default 60s; env override `SENTRY_SOURCEMAP_UPLOAD_TIMEOUT_MS` clamp 5s-240s. Vercel `staging` quedó configurado con override `30000` ms. Mientras corre el hook, el helper intercepta subprocess `sentry-cli` y los termina con `SIGTERM` si exceden presupuesto. Si Sentry responde, source maps se suben como antes; si falla/cuelga, warning `[sentry-build] ... Continuing deployment.`
+- **Fix-forward Vercel packaging:** el primer push (`d9a24f82a`) puso el helper en `src/lib/build/`, pero Vercel excluye carpetas llamadas `build` por `.vercelignore`; se movió a `src/lib/sentry-build/` para que `next.config.ts` pueda resolverlo durante `vercel build`.
+- **Verificación remota:** `greenhouse-clbkbt7o6` (`develop`, commit `a9dcb389c`) quedó `Ready` en 7m y actualizó `dev-greenhouse.efeoncepro.com`. El hook `runAfterProductionCompile` completó en `13686ms` con warnings `[sentry-build] ... Continuing deployment.`; ya no hay timeout 45m.
+- **Residual separado:** Sentry respondió `403 You do not have permission to perform this action`; el build queda protegido, pero source maps no se subirán hasta corregir permisos de `SENTRY_AUTH_TOKEN`.
+- **Verificación local:** Vitest focal 4/4, ESLint focal y `tsc --noEmit` verdes. `pnpm build` reprodujo el hang de Sentry y el wrapper degradó en `60046ms`; después el build siguió a TypeScript y falló por OOM local 4GB, distinto al incidente Vercel. Reintento con `NODE_OPTIONS=--max-old-space-size=8192 SENTRY_SOURCEMAP_UPLOAD_TIMEOUT_MS=5000 pnpm build` pasó completo; el hook degradó en `5028ms` y Next terminó exit 0.
+- **Estado:** `resolved`. Commits en `develop`: `d9a24f82a` + `a9dcb389c`. `ISSUE-093` movido a `docs/issues/resolved/`.
+
+## Sesion 2026-06-13 — ADR Nexa core agentic platform + Moment Fabric (Codex)
+
+- **Qué quedó:** nueva decisión aceptada de dirección `docs/architecture/GREENHOUSE_NEXA_CORE_AGENTIC_PLATFORM_DECISION_V1.md`: Nexa vive en el core de Greenhouse como capability agentica para colaboradores, clientes y operadores.
+- **Arquitectura operativa:** `docs/architecture/GREENHOUSE_NEXA_MOMENT_FABRIC_ARCHITECTURE_V1.md` define vocabulario, C4, elegibilidad de moments, mapa de sinergias por dominio, boundaries de contexto/evidencia/acciones/autonomía, señales/evals candidatos y secuencia de adopción.
+- **Contrato producto:** `Nexa Moment = context + evidence + permission + intent + next step`. Si falta una parte, el moment degrada honestamente o no aparece. No se autoriza "AI everywhere" decorativo.
+- **Docs enlazadas:** `DECISIONS_INDEX`, `GREENHOUSE_NEXA_ARCHITECTURE_V1`, `GREENHOUSE_CONVERSATIONAL_EXPERIENCE_PLATFORM_DECISION_V1`, TASK-1095, TASK-1096, `project_context.md` y `changelog.md`.
+- **No runtime:** no se tocó código de producto ni se activaron flags/rollouts. TASK-1095/1096/1101 siguen siendo los owners de implementación.
+
+## Sesion 2026-06-13 — Codex QA Stop hook desregistrado por defecto (Codex)
+
+- **Causa:** el hook `Stop` de `.codex/hooks.json` se ejecutaba automáticamente al cerrar el turno de Codex y, al bloquear, aparecía como un prompt out-of-band dentro de la conversación. No era deploy de producto, pero sí una interrupción no deseada del flujo.
+- **Qué cambió:** `.codex/hooks.json` queda sin hooks automáticos (`"hooks": {}`). `.codex/hooks/qa-release-stop-hook.mjs` se conserva como script opt-in y ahora solo bloquea si se habilita explícitamente con `GREENHOUSE_QA_STOP_HOOK_MODE=enforce`, `GREENHOUSE_QA_STOP_HOOK_ENFORCE=1` o payload `enforce_qa_stop_hook=true`.
+- **Contrato vigente:** QA robusta sigue siendo obligatoria para cierres riesgosos, pero se invoca manualmente con `greenhouse-qa-release-auditor` + `pnpm qa:gates --changed`; no debe volver a aparecer un prompt automático fuera de la conversación normal salvo opt-in explícito.
+- **Docs:** `AGENTS.md`, `project_context.md`, `changelog.md` y este handoff sincronizados.
+
+## Sesion 2026-06-13 — TASK-1095/TASK-1096 re-scope Nexa core agentic platform (Codex)
+
+- **Intencion del operador capturada:** Nexa debe vivir en el core de Greenhouse; Greenhouse debe sentirse como plataforma agentica para colaboradores, clientes y operadores. Los AI Moments / Conversational Moments / Nexa Moments deben percibir sinergias en cada dominio, no como widgets aislados.
+- **TASK-1095 re-scoped:** pasa de `Conversational Experience Platform V2` a **Nexa Core Agentic Platform Substrate**. Scope vigente: Nexa Moment Fabric, taxonomia de moments, mapa de sinergias por dominio, `NexaAnswersSurfaceContext` como SSOT vigente, adapter contract, boundary context/rendering/action, autonomy levels, reliability/evals y handoff a 1096/1101/child pilots. Type actualizado a `architecture`; no construye UI final ni runtime real de Knowledge.
+- **TASK-1096 re-scoped:** pasa de una task Knowledge-centric bloqueada por 1095 a **Nexa Moments Surface Experience**. `Blocked by: none`. `NexaAnswersCanvas` queda como surface canonica de embedded answers; 1096 traduce el contrato core en specimens/UX/copy/GVC para Knowledge, Finance/chart, Agency/Account 360, People/Person 360, Commercial/Bow-tie, Delivery/ICO y Client Portal. Runtime Knowledge sigue en `TASK-1101`; rollouts reales no-Knowledge deben nacer como child tasks de dominio.
+- **Docs sincronizadas:** `docs/tasks/to-do/TASK-1095-conversational-experience-v2.md`, `docs/tasks/to-do/TASK-1096-nexa-answers-surface-experience.md`, `docs/tasks/README.md`, `docs/tasks/TASK_ID_REGISTRY.md`, `project_context.md`, `changelog.md` y este handoff.
+- **Coordinacion WT compartido:** se preserva WIP ajeno/parallel: `TASK-1101` aparece movida a `docs/tasks/in-progress/` y existe `src/lib/knowledge/nexa/` sin tocar en esta sesion. Si se commitea, stagear solo los docs de este re-scope y el slice TASK-1103 propio ya documentado.
+
+## Sesion 2026-06-13 — TASK-1103 closure + residual provenance migrations (Codex)
+
+- **Qué quedó:** `TASK-1103` movida a `complete`. `NexaProvenanceTrace` queda cerrada como primitive SoT del grounding conversacional: `inline` (trust cue), `expandable` (reasoning) y `panel` (proof/evidencia), con kinds `knowledgeGrounded|signalPromoted|computed|custom`.
+- **Cierre de gaps residuales:** `NexaAnswersCanvas` ahora delega también su proof en `NexaProvenanceTrace variant='panel'` (antes componía `NexaEvidencePanel` directo) y `NexaAnswerBubble` delega el trust cue en `NexaProvenanceTrace variant='inline'` preservando el botón `Ver base`.
+- **Docs sincronizadas:** `docs/tasks/complete/TASK-1103-nexa-provenance-trace-primitive.md`, `docs/tasks/README.md`, `docs/tasks/TASK_ID_REGISTRY.md`, `changelog.md` y `project_context.md`.
+- **Scope honesto:** `signalPromoted` queda contract-ready; el rollout real en Nexa Insights/finance/agency sigue como trabajo de dominio futuro, no bloquea el cierre de la primitive.
+- **Verificación:** Vitest focal `nexa-provenance-trace-controller` + `nexa-answers-canvas-controller` verde; ESLint focal de `NexaAnswersCanvas.tsx` y `NexaAnswerBubble.tsx` verde; `tsc --noEmit` verde; GVC `design-system-nexa-provenance` verde en `.captures/2026-06-13T14-38-08_design-system-nexa-provenance` (desktop/mobile, tabs mouse+keyboard) y GVC `nexa-answers-surface` verde en `.captures/2026-06-13T14-38-38_nexa-answers-surface` (desktop/laptop/mobile, 120 frames). Frames proof expanded desktop/mobile revisados.
+
+## Sesion 2026-06-13 — QA Release Auditor skill + `pnpm qa:gates` (Codex)
+
+- **Qué quedó:** nueva skill cross-agent `greenhouse-qa-release-auditor` en Codex y Claude. Actúa como gate final de QA/closure: clasifica riesgo, inyecta skills especializadas a demanda por namespace de agente y emite `PASS | CONDITIONAL PASS | BLOCK`; bloquea el falso cierre donde tests verdes no prueban runtime real.
+- **CLI nueva:** `pnpm qa:gates` (`scripts/qa-gates.mjs`) analiza changed/staged/pathspecs + flags (`--ui`, `--runtime`, `--auth`, `--finance`, `--payroll`, `--release`, `--docs`, etc.) y sugiere dominios, skills Codex, skills Claude, comandos y blockers potenciales. La CLI detecta inventario local de `.codex/skills` y `.claude/skills`, avisa skills faltantes y deja gaps explícitos (por ejemplo finance/accounting fuerte en Codex vs fallback Claude). La CLI es advisory; la skill decide.
+- **Hook Codex:** `.codex/hooks.json` registra `Stop` → `.codex/hooks/qa-release-stop-hook.mjs`. Si Codex va a cerrar con lenguaje de "listo/terminado" y hay cambios riesgosos sin evidencia QA en la respuesta, el hook pide continuar con `$greenhouse-qa-release-auditor`, `pnpm qa:gates --changed` o scope equivalente y verdict `PASS | CONDITIONAL PASS | BLOCK`. Es guardrail ligero de cierre; no reemplaza la skill. Primera vez requiere trust normal via `/hooks` en Codex.
+- **Docs/reglas:** `AGENTS.md`, `CLAUDE.md`, `project_context.md`, `changelog.md` y este handoff registran el gate. La regla operativa: si falta evidencia runtime, reportar `code complete, rollout pendiente` u `operativamente bloqueado`, no `complete`.
+- **Verificación:** `node --check scripts/qa-gates.mjs`, `pnpm codex:qa-hook:test`, simulación manual del hook `Stop` (bloquea cierre sin QA y deja pasar cierre con `qa:gates`), `pnpm qa:gates --finance --agent both --json`, `pnpm qa:gates --ui --agent both --json`, `pnpm qa:gates --changed --agent both -- <slice QA/docs>`, `git diff --check -- <slice QA/docs>`, `pnpm docs:closure-check -- <slice QA/docs>`, `pnpm ops:lint --changed` y `pnpm docs:context-check` verdes. `docs:context-check` solo emitio warnings historicos permitidos por tamaño de `Handoff.md`.
+- **Coordinación:** hay WIP Nexa/UI ajeno en el checkout; no tocar/stagear rutas fuera del slice QA/docs si se commitea este cambio.
+
+## Sesion 2026-06-13 — TASK-1107 Current Sentry active errors closure (Codex)
+
+- **Task creada:** `TASK-1107` documenta el cierre operacional de la cola Sentry real verificada el 2026-06-13. No implementa fixes runtime en esta sesion; registra el plan robusto para separar errores activos, recientes y stale sin mutear Sentry.
+- **Clasificacion base:** N+1 Query sigue activo como performance issue (owner `TASK-928`); `role_view_fallback_used` es drift real de grants para `designer` y queda como slice propio de `TASK-1107`; auth smoke `JAVASCRIPT-NEXTJS-4S` fue reciente pero `/api/auth/health` production respondio `overallStatus=ready` a `2026-06-13T11:54:14Z`, por lo que debe alinearse con `TASK-883`; `rpa_median` queda delegado a `TASK-1106` / `ISSUE-087`.
+- **Cierre esperado:** no resolver stale backlog en Sentry sin evidencia 24h/14d + spot-check. No bajar sampling/fingerprints. `role_view_fallback_used` debe tender a cero por grants/denials explicitos o decision de politica documentada.
+- **Acceptance criteria reforzados:** `TASK-1106` y `TASK-1107` ahora exigen cerrar/resolver el issue correspondiente en Sentry/repo issue una vez resuelto, con evidencia y fecha; no se puede mover la task a `complete` si el issue sigue abierto.
+- **Coordinacion:** se preservo WIP ajeno de Claude/Nexa; stagear solo docs de `TASK-1107` si se commitea esta sesion.
+
+## Sesion 2026-06-13 — ISSUE-087 / TASK-1106 Account 360 delivery schema drift (Codex)
+
+- **Qué quedó documentado:** se creó `ISSUE-087` para el Sentry `JAVASCRIPT-NEXTJS-7H` (`GET /api/organization/[id]/360`, `column "rpa_median" does not exist`) y `TASK-1106` para resolverlo de fondo. Esta sesión documenta y planifica; no aplica el fix runtime.
+- **Causa raíz verificada:** `src/lib/account-360/facets/delivery.ts` lee `rpa_median`, `pipeline_velocity` y `stuck_asset_pct` desde `greenhouse_serving.organization_operational_metrics`, pero Cloud SQL confirma que esa tabla es compacta y no tiene esas columnas. La query ofensiva reproduce `42703 column "rpa_median" does not exist`; `ico_organization_metrics` sí tiene la forma rica.
+- **Dónde se rompió:** commit `1f06d26a835d5ae07f94253fb3ead29a32bb7283` (2026-06-09, `feat(organizations): harden enterprise workspace runtime`) cambió el facet para preferir `organization_operational_metrics` y UNION con `ico_organization_metrics`, copiando la forma rica sobre la tabla compacta. Históricamente, `7846de5a0` creó la tabla compacta y `72d22ccf` ya tenía un helper más defensivo (`getOrganizationOperationalServing`) con aliases/fallbacks.
+- **Plan canónico:** ejecutar `TASK-1106` con migración/proyección/reader/guardrails alineados. No cerrar con parche frágil de un solo `NULL AS rpa_median`; decidir y formalizar el contrato de `organization_operational_metrics`, agregar smoke live PostgreSQL para el facet `delivery` y resolver `ISSUE-087` solo con evidencia runtime + Sentry quiet.
+- **Coordinación:** había WIP ajeno en `src/components/greenhouse/primitives/index.ts` y `src/components/greenhouse/primitives/nexa-response-toolbar/`; no tocar ni stagear junto con este incidente.
+
+## Sesion 2026-06-13 — Spotlight card Nexa brand variations (Codex)
+
+- **Qué quedó:** `GreenhouseSpotlightCard` suma tres kinds Nexa adicionales: `nexaBrandCore` (azul core más definido), `nexaBrandSignal` (teal más activo) y `nexaBrandGlass` (highlight blanco/teal más sobrio). No sustituyen `nexaBrand`; amplían la misma primitive.
+- **Design System:** `/design-system/border-beam` muestra una matriz con `nexaBrand`, `nexaBrandCore`, `nexaBrandSignal` y `nexaBrandGlass` dentro de la sección Spotlight card · Nexa brand.
+- **Verificación:** ESLint focal, Vitest focal `GreenhouseBorderBeam.test.tsx`, `tsc --noEmit` y GVC `design-system-border-beam` verdes. Evidencia: `.captures/2026-06-13T11-05-55_design-system-border-beam`; frames desktop/mobile revisados.
+
+## Sesion 2026-06-13 — Nexa FAB spectrum beam hover (Codex)
+
+- **Qué quedó:** el FAB global de Nexa (`NexaFloatingButton`) reutiliza `GreenhouseSpectrumBeam` con paleta Nexa como affordance de hover/focus detrás del botón. El efecto está oculto y pausado en idle; solo aparece cuando el usuario pone el mouse/foco sobre el FAB y el panel está cerrado.
+- **Contrato preservado:** el mark animado sigue en primer plano, la sombra navy del botón no se mezcla con el glow y reduced-motion evita transición larga.
+- **Verificación:** ESLint focal y `tsc --noEmit` verdes. GVC `nexa-floating-hover-glow` verde en `.captures/2026-06-13T10-41-19_nexa-floating-hover-glow`; frames revisados: idle limpio, hover con ring pegado al borde + halo brand detrás del FAB y fade posterior sin efecto persistente.
+
+## Sesion 2026-06-13 — Spotlight card primitive (Codex)
+
+- **Qué quedó:** se agregó `GreenhouseSpotlightCard` en `src/components/greenhouse/primitives/border-beam/` para traer el prompt `spotlight-card` como card con spotlight local al puntero. Kinds originales: `blue`, `purple`, `green`, `red`, `orange`; nuevo kind de marca: `nexaBrand`.
+- **Design System:** `/design-system/border-beam` muestra tres cards originales sin contenido obligatorio y una variación `kind='nexaBrand'` con midnight navy/electric teal/blanco.
+- **Verificación:** ESLint focal, Vitest focal `GreenhouseBorderBeam.test.tsx`, `tsc --noEmit` y GVC `design-system-border-beam` verdes. Evidencia final: `.captures/2026-06-13T10-55-35_design-system-border-beam`; frames desktop/mobile revisados. Ajustes post-review: se devolvió la escala compacta del prompt, el specimen original ocupa una fila completa para no cortar la tercera card y `nexaBrand` usa core blue más perceptible sobre midnight navy.
+
+## Sesion 2026-06-13 — Shiny border button primitive (Codex)
+
+- **Qué quedó:** se agregó `GreenhouseShinyBorder` en `src/components/greenhouse/primitives/border-beam/` para traer el prompt `shiny-borders-button` como surface/CTA tokenizada: highlight radial superior, glow inferior, contenido elevado y hover scale con reduced-motion.
+- **Design System:** `/design-system/border-beam` suma el specimen `border-beam-shiny-button-specimen` dentro de la sección de specimens. No se creó `/components/ui`, no se usó Tailwind ni se copiaron HEX del prompt.
+- **Verificación:** ESLint focal, `tsc --noEmit`, Vitest focal `GreenhouseBorderBeam.test.tsx` y GVC `design-system-border-beam` verdes. Evidencia final: `.captures/2026-06-13T10-35-48_design-system-border-beam`.
+
+## Sesion 2026-06-13 — Nexa composer spectrum unificado (Codex)
+
+- **Qué quedó:** la variación lab-only de la caja de envío de Nexa con `GreenhouseSpectrumBeam` se consolidó en un solo specimen stateful en `/design-system/nexa-chat`, dentro de la sección Composer junto a `NexaComposer`, `NexaComposerInput`, `NexaComposerActionButton` y `NexaPromptDock`. Inicia inactive/sin texto y cambia al estado activo cuando el usuario escribe.
+- **Alcance:** no se aplicó al runtime de Nexa Chat. `/design-system/border-beam` conserva sólo la primitive y sus specimens base (`button with border beam`, `Nexa glow box · spectrum`, `brand spectrum`).
+- **Verificación:** ESLint focal, `tsc --noEmit`, GVC `design-system-nexa-chat` verde en `.captures/2026-06-13T10-27-31_design-system-nexa-chat` y GVC `design-system-border-beam` verde en `.captures/2026-06-13T10-24-19_design-system-border-beam`.
+
+## Sesion 2026-06-13 — GreenhouseBorderBeam primitive (Codex)
+
+- **Qué quedó:** se creó `GreenhouseBorderBeam` en `src/components/greenhouse/primitives/border-beam/` para traer el patrón Border Beam al Design System como overlay gobernado. `GreenhouseSpectrumBeam` extrae el efecto spectrum como primitive fina reutilizable (anillo completo + aura blur amplia) sin acoplarlo a un botón.
+- **Contrato:** effects `beam|spectrum`; spectrum palettes `axis|nexa`; variants `ambient`, `interactive`, `progress`; kinds `nexaSurface`, `promptDock`, `evidencePeek`, `approvalCard`, `asyncOperation`, `custom`; intensities `subtle|medium|strong`. Colores desde `theme.axis.*`/`theme.palette.*` y `GREENHOUSE_NEXA_BRAND_COLORS`; motion CSS con reduced-motion; sin Tailwind, sin `/components/ui`, sin HEX locales.
+- **Design System:** nueva ruta interna `/design-system/border-beam`, entrada en catálogo, route-reachability y scenario `design-system-border-beam`. El lab incluye el specimen explícito `button with border beam`: `GreenhouseButton` + `GreenhouseSpectrumBeam`, con anillo completo animado + aura blur amplia, la variación `Nexa glow box · spectrum` y la variación `Nexa glow box · brand spectrum` con colores de marca. La variación lab-only de la caja de envío se movió a `/design-system/nexa-chat`, junto a los otros composer; no se aplicó a Nexa Chat runtime.
+- **Verificación:** Vitest focal, ESLint focal, `tsc --noEmit`, route reachability, design lint, ops lint y GVC verdes. Evidencia final previa de Border Beam: `.captures/2026-06-13T10-16-39_design-system-border-beam`; evidencia Nexa Chat actualizada en la sesión posterior.
+
+## Sesion 2026-06-13 — GreenhouseGradientBackground primitive (Codex)
+
+- **Qué quedó:** se creó `GreenhouseGradientBackground` en `src/components/greenhouse/primitives/gradient-background/` para traer fondos degradados al Design System con presets gobernados.
+- **Contrato:** variants `surfaceWash`, `heroAurora`, `brandField`; kinds `axisSurface`, `nexaAurora`, `efeonceBrand`, `insightPanel`, `calmBackdrop`, `custom`; intensities `subtle|medium|strong`; props `animated`, `overlay`, `centerContent`. Colores desde `theme.axis.*`/`theme.palette.*`; sin Tailwind, sin OKLCH, sin framer directo.
+- **Guardrail visual:** usa bandas lineales tokenizadas, no blobs/orbs radiales. `prefers-reduced-motion` deja el fondo estático.
+- **Design System:** nueva ruta interna `/design-system/gradients`, entrada en catálogo, route-reachability y scenario `design-system-gradients`.
+- **Coordinación WT compartido:** se preserva WIP previo no mío en Motion/Nexa Answers; stagear selectivamente si se commitea.
+
+## Sesion 2026-06-13 — NexaPromptDock primitive (Codex)
+
+- **Qué quedó:** `NexaPromptDock` nace como composition primitive en `src/components/greenhouse/primitives/nexa-prompt-dock/` para el patrón dock compacto → prompt contextual de Nexa. Variants: `compactDock`, `inlinePanel`, `floatingPrompt`. Kinds: `quickAsk`, `knowledgeAsk`, `surfaceFollowUp`, `contextualAction`, `custom`.
+- **Contrato:** reusa `GreenhouseNexaAnimatedMark`, `NexaComposer`, `NexaComposerInput` y `NexaComposerActionButton`; controla open controlado/no-controlado, foco al abrir, Escape, click-outside, submit por botón y `Cmd/Ctrl + Enter`, y success feedback temporal. No copia shadcn/Tailwind/OKLCH/motion externo.
+- **Design System:** `/design-system/nexa-chat` suma specimen `nexa-prompt-dock-specimen`; scenario `design-system-nexa-chat` actualizado para capturarlo.
+- **Coordinación WT compartido:** había WIP previo no mío en `NexaAnswersCanvas`, el barrel y el mockup de Nexa Answers; se preserva. Stagear selectivamente si se commitea.
+
+## Sesion 2026-06-13 — `/design-system/nexa-chat` structured lab polish (Codex)
+
+- **Qué quedó:** el lab interno `/design-system/nexa-chat` se reestructuró para revisar primitives de forma más ordenada: header tipo consola con estado/owner/evidencia, grids para clasificación/anatomía/composición, sección separada de átomos base, frame consistente para cada specimen vivo y reglas Hacer/Evitar más escaneables.
+- **Alcance:** no cambia contrato de primitives ni arquitectura; es polish route-local del lab. Se corrigieron fixtures de `NexaAnswersCanvasCopy` agregando `streamingLabel` y `suggestedFollowUpsLabel` también en `/knowledge/mockup/nexa-answers`, para mantener TypeScript verde con el contrato actual.
+- **Verificación:** ESLint focal verde, `pnpm exec tsc --noEmit --pretty false` verde, GVC `design-system-nexa-chat --env=local` verde en `.captures/2026-06-13T02-26-08_design-system-nexa-chat` (desktop+mobile, 18 frames). Browser MCP sin storage compartido redirigió a `/login`; no se inyectaron cookies en claro. Evidencia visual primaria queda en GVC autenticado.
+- **Coordinación WT compartido:** WIP previo de TASK-1096/Nexa Answers sigue coexistiendo; stagear selectivamente si se commitea.
+
+## Sesion 2026-06-13 — NexaConversationBubble base (Codex)
+
+- **Qué quedó:** `NexaConversationBubble` nace como primitive hermana de `NexaAnswerBubble` para la conversación base de Nexa Answers. Variants: `userQuestion`, `assistantThinking`, `assistantText`, `assistantFollowUp`, `systemNotice`.
+- **Contrato:** kinds iniciales `surfaceUserQuestion`, `nexaThinking`, `nexaText`, `nexaFollowUp`, `contextLoaded`, `lowConfidence`, `staleData`, `policyFiltered`, `partialAnswer`, `custom`. `NexaAnswersCanvas` suma renderer `conversationBubble`.
+- **Decisión UX:** la respuesta enriquecida queda reservada para contenido estructurado; mensajes simples, thinking, follow-ups y notices viven en la nueva primitive base. Se reusan `NexaSenderMark`, `GreenhouseThinkingBeat kind='nexa'`, `NexaExpressiveText`, tipografía Greenhouse y `GreenhouseButton.kind`.
+- **Voz expresiva:** `NexaExpressiveTextValue` (`string | segment[]`) permite estilos semánticos y emojis accesibles en `NexaConversationBubble`, `NexaAnswerBubble`, compact answers y bloques del `NexaAnswersCanvas`; no acepta HTML/CSS/font-size/HEX arbitrarios.
+- **Microinteracciones:** entrada soft/enterprise con `motionCss`; conversation varía dirección por rol (usuario derecha, Nexa abajo/izquierda, notices abajo), enriched answer usa settle estable y compact answer reveal corto. Solo `opacity`/`transform`; `prefers-reduced-motion` apaga animación y `will-change`.
+- **Design System:** `/design-system/nexa-chat` suma specimen `nexa-conversation-bubble-specimen`; scenario actualizado para capturarlo.
+- **Polish visual:** las bubbles no accionables quedan más minimalistas y sin colas. Las variantes assistant comparten una sola identidad de emisor (`NexaSenderMark` + wordmark inline Poppins) fuera del contenido; `assistantThinking` solo agrega el beat de 5 dots alineado bajo el wordmark. El usuario conserva bubble enviada con esquina inferior derecha recta.
+- **Verificación:** ESLint focal verde, `pnpm exec tsc --noEmit` verde y GVC `design-system-nexa-chat` verde en `.captures/2026-06-13T02-03-21_design-system-nexa-chat`.
+- **Coordinación WT compartido:** no tocar `.playwright-mcp/`. Stagear solo archivos propios de TASK-1096 si se commitea.
+
+## Sesion 2026-06-13 — NexaAnswerBubble actionPlan (Codex)
+
+- **Qué quedó:** `NexaAnswerBubble` suma variante oficial `actionPlan` para recomendaciones accionables. Kinds iniciales: `financeActionPlan`, `commercialActionPlan`, `agencyActionPlan`, `peopleActionPlan`, `surfaceActionPlan`.
+- **Contrato:** `NexaAnswerActionPlanSpec` modela decisión sugerida, pasos, trade-offs y riesgos. El `NexaAnswersCanvas` puede pasar `actionPlan` dentro de un block `answerBubble`.
+- **Design System:** `/design-system/nexa-chat` suma specimen `nexa-answer-bubble-action-plan-specimen`; scenario actualizado para capturarlo.
+- **Decisión UX:** los CTAs quedan para acciones de negocio (`Crear plan`, `Simular escenario`); la evidencia se conserva en el trust/proof row para evitar duplicar "Ver base" dentro del cuerpo de la recomendación. Pasada posterior de typography/UX writing/product design: copy de demo eliminado, tesis más directa, aire interno aumentado y patrón final tipo decision brief con grupos neutros, rows y divisores horizontales; se retiraron barras laterales/tintes tipo AI. `NexaAnswerAction` ahora admite `kind` y el lab usa `GreenhouseButton` como `primaryAction`/`secondaryAction`/`inlineAction`.
+- **Verificación:** ESLint focal verde, `pnpm exec tsc --noEmit --pretty false` verde, GVC `design-system-nexa-chat` verde en `.captures/2026-06-13T00-30-32_design-system-nexa-chat`. Frames desktop/mobile revisados; el overlay del app bar en mobile es artifact del recorte largo del lab, no de la primitive.
+- **Coordinación WT compartido:** no tocar `.playwright-mcp/`. Stagear solo archivos propios de TASK-1096 si se commitea.
+
+## Sesion 2026-06-12 — NexaAnswerBubble metricSummary (Codex)
+
+- **Qué quedó:** `NexaAnswerBubble` suma variante oficial `metricSummary` para lectura ejecutiva compacta de KPIs. Kinds iniciales: `financeMetricSummary`, `commercialMetricSummary`, `agencyMetricSummary`, `peopleMetricSummary`, `surfaceMetricSummary`.
+- **Contrato:** `NexaAnswerMetricSummarySpec` modela `title`, `helper`, `interpretation` y hasta 4 métricas con `value`, `helper`, `deltaLabel`, `deltaTone` y mini trend. El `NexaAnswersCanvas` puede pasar `metricSummary` dentro de un block `answerBubble`.
+- **Design System:** `/design-system/nexa-chat` suma specimen `nexa-answer-bubble-metric-summary-specimen`; scenario actualizado para capturarlo.
+- **Color:** las series visualizadas usan `GH_COLORS.chart.categorical` (AXIS chart SoT); los tonos semánticos quedan solo en las delta/status pills.
+- **Verificación:** ESLint focal verde. GVC `design-system-nexa-chat` verde en `.captures/2026-06-12T23-56-37_design-system-nexa-chat`; desktop revisado bien. `pnpm ops:lint --changed` y `git diff --check` verdes.
+- **Nota tsc:** `pnpm exec tsc --noEmit --pretty false` falla por WIP ajeno en `scripts/frontend/explore.ts` / `scripts/frontend/lib/explore-promote.test.ts` (`ExploreSession.interactions` requerido). No pertenece a esta variante y no se tocó.
+
+## Sesion 2026-06-12 — NexaAnswersCanvas transversal (Codex)
+
+- **Qué quedó:** `NexaAnswersCanvas` nace como primitive transversal en `src/components/greenhouse/primitives/nexa-answers-canvas/`, exportada desde el barrel público. Modes: `renderPlan` y `runtime`; variants: `embedded`, `sidecar`, `inline`; kinds: `knowledgeEmbedded`, `financeChartEmbedded`, `agencyInsightEmbedded`, `peopleInsightEmbedded`, `commercialInsightEmbedded`, `custom`.
+- **Contrato UI:** el canvas consume `NexaAnswersSurfaceContext` (domain, placement, dataReality, sensitivity, `allowedRenderers`, `allowedActions`) y `NexaAnswersRenderPlan` (`nexa-answer-render-plan.v1`). Valida que el plan no pida renderers fuera de la allowlist. Registry inicial: `answerBubble` y `compactAnswer`.
+- **Coreografía centralizada:** idle composer glow → pregunta-burbuja → identidad Nexa/thinking → bloque de respuesta → proof bajo demanda → composer descendido → follow-up/turnos compactados. El modo `runtime` deja slot para assistant-ui/headless runtime sin pelear con Tailwind/CSS/MUI del canvas.
+- **Consumers/specimens:** `/knowledge/mockup/nexa-answers` ahora consume `NexaAnswersCanvas` en vez de ensamblar estados localmente. `/design-system/nexa-chat` suma specimen `nexa-answers-canvas-specimen`; el scenario `design-system-nexa-chat` lo captura.
+- **Docs:** `ui-platform/PRIMITIVES.md`, `HISTORIAL.md`, ADR `GREENHOUSE_CONVERSATIONAL_EXPERIENCE_PLATFORM_DECISION_V1`, arquitectura `GREENHOUSE_CONVERSATIONAL_EXPERIENCE_PLATFORM_V2`, `TASK-1096`, `changelog.md` y este handoff sincronizados.
+- **Verificación:** ESLint focal verde; `pnpm exec tsc --noEmit --pretty false` verde; GVC verde `.captures/2026-06-12T23-21-09_nexa-answers-surface` y `.captures/2026-06-12T23-19-53_design-system-nexa-chat`. Frames revisados: laptop/mobile mantienen composer visible, charts sin clipping y proof bajo demanda.
+- **Pendiente:** esto NO completa TASK-1096 ni reemplaza TASK-1095. Faltan adapters/runtime server-side, integración productiva de `/knowledge`, fixture promoted Nexa Insight, fixture finance/chart no-Knowledge, observabilidad/evals y contrato final de acciones/capabilities.
+- **Coordinación WT compartido:** no tocar `.playwright-mcp/`. Stagear solo archivos propios de TASK-1096 si se commitea.
+
+## Sesion 2026-06-12 — TASK-1098 GVC explore mode + scenario promotion (Claude)
+
+- **Qué quedó:** cierra el loop observe→author→determinismo sobre GVC (follow-up de TASK-1097). `pnpm fe:capture:explore --route=X` (`scripts/frontend/explore.ts` + `lib/explore.ts`) observa la página viva (read-only) → `.captures/_explore/<slug>/{session.json,aria.txt,snapshot.png}` con candidatos `getByRole(...)` + uniqueness validada + markers + `--probe`. `pnpm fe:capture:promote --route=X --name=<n>` (`promote.ts` + `lib/promote.ts`) cristaliza la sesión en un `.scenario.ts` válido (gate `validateScenario`, readiness auto, marks). Scripts wired en `package.json`. Reusa env/auth/bypass/browser de GVC. Cero code-as-action en runtime; output gobernado/determinístico.
+- **Microinteracciones/coreografía:** fuera de scope V1 — promote emite baseline estático de `mark`s; coreografía sigue con el step `interaction` (V2) / `fe:capture:micro`. (Respuesta a la pregunta del operador.)
+- **Verificación:** 16 tests focales (`lib/explore-promote.test.ts`) + tsc 0 + lint 0 + **e2e real**: `explore /coming-soon` → candidatos+probe → `promote` (scenario válido, readiness de heading único) → `fe:capture` OK 1 frame. Throwaway scenario borrado.
+- **Docs:** TASK-1098 → complete; skill `greenhouse-gvc-playwright` (roadmap→shipped + comandos), helper doc V1.8, DSL README, registry/README/changelog sincronizados.
+- **Coordinación WT compartido:** commit selectivo (explore/promote + lib + tests + skill + tasks + helper doc + DSL README + registry/README/changelog + package.json). Handoff **NO** en mi `git add` (Codex tiene WIP). `.playwright-mcp/` + WIP 1095/1096 sin tocar. Sin push.
+
+## Sesion 2026-06-12 — TASK-1097 GVC aria-observation + skill greenhouse-gvc-playwright (Claude)
+
+- **Qué quedó:** GVC fortalecido para reducir la fricción de Claude/Codex con Playwright (autorar a ciegas). **Capa 1** (`recorder.ts` + `manifest.ts`): cada `mark` escribe `frames/<NN>-<label>.aria.txt` (árbol de accesibilidad de la región) + `manifest.frames[].ariaSnapshotPath`. El agente lee el a11y tree y escribe `getByRole(...)` en vez de adivinar el selector. **Skill** `greenhouse-gvc-playwright` (.claude + .codex mirror): técnicas destiladas de `microsoft/webwright` (`local_browser.py`) + gotchas GVC (sidebar fixed clip, readiness anti-Turbopack, agent-auth, mutating safety). Aditivo (schemaVersion 1, best-effort/graceful degrade → nunca rompe un mark).
+- **Verificación:** tests GVC lib 30 verdes + standalone (PW 1.59 `ariaSnapshot`) + **e2e real** `fe:capture coming-soon --env=local` → `ariaSnapshotPath` poblado + `.aria.txt` con el árbol real de `/coming-soon` (desktop+mobile). `.captures/` es gitignored.
+- **Tasks:** TASK-1097 (complete, shipped) + TASK-1098 (to-do, roadmap Capa 2/3 = explore mode `fe:capture --explore` + `promote` exploración→scenario). Registry/README/changelog/helper-doc V1.7/DSL README sincronizados.
+- **Origen:** investigación de `microsoft/webwright` a pedido del operador. Tomamos las **técnicas** (aria-observation, user-facing locators, layered timeouts, graceful degrade), NO el code-as-action en runtime (GVC se queda determinístico/gobernado — Full API Parity + tenant safety).
+- **Coordinación WT compartido:** commit selectivo de mis archivos (lib GVC, skill, tasks 1097/1098, helper doc, DSL README, registry/README/changelog limpios tras el commit de Codex `11c64db0d`). Handoff **NO** incluido en mi `git add` (Codex tiene 1 línea WIP acá). `.playwright-mcp/` (logs) sin tocar. Sin push.
+
+## Sesion 2026-06-12 — TASK-1095/TASK-1096 Conversational Experience discovery documentado (Codex)
+
+- **Scope:** discovery profundo/documental solamente. No se implementó runtime ni UI nueva. El objetivo fue explicitar qué falta para lograr el deseable de **Nexa Answers** sobre la base actual de Knowledge/AnswerSurface/Nexa Chat.
+- **Estado git:** ejecución en `develop` por instrucción del operador. `TASK-1095` hook OK con override `--develop`; `TASK-1096` hook queda bloqueado por `TASK-1095`, como corresponde. Worktree compartido: no tocar `.playwright-mcp/`.
+- **Docs actualizados:** arquitectura propuesta `GREENHOUSE_CONVERSATIONAL_EXPERIENCE_PLATFORM_V2`, task `TASK-1095`, task `TASK-1096`, UI platform `PATTERNS`/`HISTORIAL`, ADR/index/registry ya preparados.
+- **Hallazgo central:** hoy existe una buena seed visual (`NexaKnowledgeAnswerSurface`) y runtime persistente de Nexa Chat (`useNexaPersistentRuntime` + `/api/home/nexa`), pero no existe todavía plataforma multi-surface: falta `surfaceContext`, adapters, compact trust cue, provenance genérica, promoción formal de Nexa Insights y runtime contextual embebido.
+- **Boundary recomendado:** `TASK-1095` funda el sistema nervioso (`surfaceContext`, adapters, provenance/trust/proof, observability); `TASK-1096` construye la experiencia sentida (`Nexa Answers`, choreografía, proof-on-demand, specimens/GVC). Knowledge es el primer consumer real porque estamos cerrando esa experiencia y es de bajo riesgo; el primer piloto real no-Knowledge debe ser child follow-up, recomendado finance/chart explanation.
+- **Pendiente:** si se ejecuta 1095, mover task a `in-progress` siguiendo el hook y documentar la excepción de rama si se mantiene `develop`. No iniciar 1096 hasta resolver/aceptar el soporte de 1095.
+
+## Sesion 2026-06-12 — Nexa Answers visual prototype UI-first (Codex)
+
+- **Qué quedó:** nueva visual/lab navegable en `/knowledge/mockup/nexa-answers`, sin tocar el baseline protegido `/knowledge/mockup/answer-trace`. Es frontend-only y contract-aware: fixtures de `surfaceContext`, answer-turn, trust cue y `nexa-evidence.v1`.
+- **Experiencia prototipada:** idle limpio → pregunta burbuja → Nexa identity/thinking → respuesta answer-first → trust cue compacto → proof bajo demanda → follow-up compactado con evidencia heredada.
+- **Archivos propios:** `src/app/(dashboard)/knowledge/mockup/nexa-answers/page.tsx`, `src/views/greenhouse/knowledge/mockup/nexa-answers/NexaAnswersExperienceMockupView.tsx`, `scripts/frontend/scenarios/nexa-answers-surface.scenario.ts`, update en `TASK-1096`.
+- **GVC:** `.captures/2026-06-12T21-42-06_nexa-answers-surface` desktop/mobile, 10 frames. Revisado manualmente: rail contractual en desktop, mobile sin clipping, FAB global oculto en esta ruta-lab para no competir con la surface embebida.
+- **Verificación:** ESLint focal y `pnpm exec tsc --noEmit --pretty false` verdes. No hay backend/runtime wiring todavía.
+
+## Sesion 2026-06-12 — NexaAnswerBubble canonizada + variante chart (Codex)
+
+- **Qué quedó:** `NexaAnswerBubble` deja de ser local del mockup y nace como primitive en `src/components/greenhouse/primitives/nexa-answer-bubble/`, exportada desde el barrel público. Variants iniciales: `explanation` y `chart`; kinds iniciales: `knowledgeExplanationAnswer`, `knowledgeChartAnswer`, `financeChartAnswer`, `surfaceChartInsight`, `custom`.
+- **Chart variant:** contrato genérico `series[]`/`trend[]`/`composition[]`/`valueSuffix` para no hardcodear ICO en la primitive. Soporta Recharts en modos `trend`, `comparison`, `composition`; trust/proof queda compacto para mantener visible el composer glow.
+- **Consumers/specimens:** `/knowledge/mockup/nexa-answers` consume `NexaAnswerBubble kind='knowledgeChartAnswer'`. `/design-system/nexa-chat` suma specimen `nexa-answer-bubble-chart-specimen`; scenario `design-system-nexa-chat` lo captura explícitamente.
+- **Docs:** `docs/architecture/ui-platform/PRIMITIVES.md`, `HISTORIAL.md`, `changelog.md` y `TASK-1096` sincronizados. No se mueve TASK-1096 a complete; esto es un slice visual/foundation dentro de la task.
+- **Verificación:** ESLint focal verde, `pnpm exec tsc --noEmit --pretty false` verde, `pnpm ops:lint --changed` verde, `git diff --check` verde. GVC verde: `.captures/2026-06-12T22-59-33_nexa-answers-surface` y `.captures/2026-06-12T23-01-05_design-system-nexa-chat`; revisados manualmente laptop/mobile, sin clipping de charts ni choque `0 pts`/`Abr`.
+
+## Sesion 2026-06-12 — TASK-1086 CIERRE a complete (MCP Knowledge Resources) (Claude)
+
+- **Qué quedó:** TASK-1086 movida `in-progress → complete`. El código (lane ecosystem de knowledge + 2 MCP tools + resource) **ya estaba en `origin/develop`** (`c72958575` + `cebf75bd3`); el "push held" del Delta de implementación quedó obsoleto. Esta sesión ejecutó solo el **cierre documental** (sin código nuevo).
+- **Docs sincronizados:** invariante dedicado en `CLAUDE.md` ("Knowledge MCP / ecosystem lane invariants (TASK-1086)") · sección "7. Conocimiento (Knowledge)" en el manual `mcp-greenhouse-read-only.md` (2 tools + resource + reglas no-invención/scope-internal/read-only) · flip de README + `TASK_ID_REGISTRY` a `complete` · Delta de cierre en la task. Los Deltas de arquitectura (API Platform + Knowledge Platform) y el doc funcional **ya estaban hechos** (verificado, no duplicado).
+- **Verificación:** 17 tests focales (ecosystem builder + MCP knowledge/tools) verdes en el WT actual; código sin cambios desde el commit verificado (tsc=0, lint=0, 29 tests + smoke live PG en el Delta de implementación).
+- **Pendiente operativo (post-deploy, no bloquea complete):** smoke MCP **end-to-end** contra staging necesita un binding `sister_platform_consumers` con `greenhouse_scope_type='internal'` (operador-configurado) + URL `.vercel.app`. Builder-level smoke (PG live) ya verificado; transporte HTTP cubierto por 18 tests.
+- **Coordinación WT compartido:** Codex tiene WIP sin commit en `Handoff.md`/`changelog.md` (TASK-1090). Añadí esta entrada **sin pisar** su WIP y **sin `git add`** de Handoff/changelog. Mi commit de cierre es **selectivo** (CLAUDE.md, manual, README, registry, task move) y **sin push** (operador decide). Sin `stash/clean/restore` amplios.
+
+## Fresh start — 2026-06-12 cierre de sesión Codex (Knowledge / TASK-1090)
+
+- **Branch/estado:** estamos en `develop`. Últimos commits son de Claude para `TASK-1091` (`5b7f299ae` top). Codex tiene WIP local sin commit para `TASK-1090`/Knowledge UI; no hacer `stash -u`, `clean`, `restore` ni pathspecs amplios.
+- **WIP Codex que sí pertenece a esta sesión:** `src/views/greenhouse/knowledge/KnowledgeCenterView.tsx`, `src/components/greenhouse/primitives/NexaKnowledgeAnswerSurface.tsx`, `src/components/greenhouse/primitives/NexaEvidencePanel.tsx`, `src/lib/copy/knowledge.ts`, test `NexaKnowledgeAnswerSurface`, scenarios GVC `knowledge-answer-trace` + `knowledge-lenses`, docs TASK-1090/UI platform/manual/functional/changelog/handoff/context.
+- **WIP ajeno/no tocar:** `.playwright-mcp/` y `scripts/_kcheck.ts` están untracked y no fueron creados por este cierre Codex. Tratar como estado vivo de otro agente hasta confirmar owner.
+- **Decisión UX vigente:** `/knowledge` es una sola ruta con lentes reales **Humano | Nexa | MCP**. Humano conserva el Workbench documental. Nexa usa la AnswerSurface aprobada como experiencia tipo Google AI Mode: idle limpio con solo composer glow; al preguntar, pregunta-burbuja → Nexa/avatar → respuesta → composer de follow-up → proof panel. MCP muestra paquete/resource/evidencia. El mockup `/knowledge/mockup/answer-trace` NO se borró; queda como baseline/lab.
+- **Contrato técnico nuevo:** `NexaKnowledgeAnswerSurface.showModeSelector` default `true` permite que `/knowledge` oculte el selector interno (`false`) porque el selector común gobierna lentes. `showTraceRail` default `false`; las cards de intento/retrieval no van arriba de la conversación, viven en `NexaEvidencePanel`/proof panel salvo opt-in explícito.
+- **Verificación verde:** ESLint focal, `pnpm exec tsc --noEmit --pretty false`, `pnpm exec vitest run src/components/greenhouse/primitives/__tests__/NexaKnowledgeAnswerSurface.test.tsx`, `pnpm fe:capture knowledge-answer-trace --env=local`, `pnpm fe:capture knowledge-lenses --env=local`, `pnpm task:lint --task TASK-1090`, `pnpm ops:lint --changed`, `pnpm docs:closure-check`, `git diff --check`.
+- **Capturas vigentes:** `.captures/2026-06-12T19-42-37_knowledge-answer-trace` y `.captures/2026-06-12T19-42-38_knowledge-lenses`. Miradas manualmente: idle Nexa limpio; post-submit conserva pregunta, avatar, respuesta, composer descendido y proof panel; mobile sin clipping.
+- **Servidor local:** `pnpm dev` sigue arriba en `http://localhost:3000`. Si la próxima sesión ve CPU alta de `next-server`, aplicar la secuencia Turbopack canónica antes de limpiar.
+- **Siguiente paso recomendado:** si el operador aprueba la experiencia visual, hacer commit selectivo solo de los archivos Codex listados arriba y push. No incluir `.playwright-mcp/` ni `scripts/_kcheck.ts` sin confirmar ownership. Luego seguir con el cierre/promoción de `TASK-1090` o el siguiente slice UI que el operador pida.
+
+## Sesion 2026-06-12 — TASK-1091 COMPLETA (Nexa provider abstraction + router interno, flag OFF) (Claude)
+
+- **Qué quedó:** el "hablar con el modelo" de Nexa vive detrás de `NexaChatProvider` (`src/lib/nexa/nexa-provider.ts`). `nexa-service.ts` es el orquestador provider-agnóstico (system prompt + Answer Rules de knowledge); delega el modelo a `providers/gemini.ts` (default, extrae el loop actual + fix ISSUE-092) o `providers/anthropic.ts` (Claude, tool-use conversacional `tool_use`/`tool_result` **con** `tool_use_id` — su contrato correcto, NO el workaround de Gemini). Router interno puro `nexa-model-router.ts` (intención → provider) + failover cross-provider en `buildProviderPlan`/`generateResponse`. Flags `NEXA_PROVIDER` (pin) + `NEXA_AUTO_ROUTER_ENABLED` (**default OFF** → ruta single-provider byte-idéntica a la previa). `nexa-models.ts`: id `anthropic/claude-sonnet-4-6@default` (router-internal, fuera del picker) + `resolveNexaProviderKey`/`resolveNexaSdkModel`.
+- **Invariante preservado (TASK-1085):** `nexa-tools.ts` (`search_knowledge`), Answer Rules y `knowledge-search.v1` NO se tocaron — cada adapter devuelve el `raw.packet` idéntico → señales + persistencia + Answer Trace intactos. Observabilidad = `NexaResponse.modelId` (persistido, provider derivable vía `resolveNexaProviderKey`); failover loggeado.
+- **4 slices, commits atómicos:** S1 abstracción+Gemini `bfd8b28e9` · S2 adapter Anthropic `4ba526193` · S3 router+failover+flags `9ccbbe8c7` · S4 docs/closing (este). Tests: suite nexa+models 42 passed (+ 3 skip); `nexa-service.test.ts` 7/7 intacto; provider Anthropic 6 + router 12 + selección/failover 6 nuevos. tsc nexa limpio.
+- **Activación gated (Activation Playbook en la task):** `NEXA_AUTO_ROUTER_ENABLED=true` requiere `ANTHROPIC_API_KEY_SECRET_REF` resuelto en runtime + smoke live ambos providers + eval de paridad golden questions + sign-off operador. Config sin deploy, rollback = flag flip. Sesión live pendiente.
+- **Coordinación WT compartido:** Codex está en TASK-1092 (toca `nexa-service.ts`/`nexa-tools.ts`) + 1084. Mi footprint en `nexa-service.ts` fue mínimo y aditivo (provider plan + loop); el tool quedó intacto para 1092. Commits propios solamente (`git add` selectivo); WIP ajeno no tocado.
+
+## Sesion 2026-06-12 — TASK-1090 Knowledge lenses coherence (Codex, code complete local)
+
+- **Implementado local:** `/knowledge` queda como una sola ruta con lentes reales **Humano | Nexa | MCP**. Humano conserva el Workbench documental; Nexa usa `NexaKnowledgeAnswerSurface`/Answer Trace con idle limpio estilo Google AI Mode, pregunta-burbuja, avatar de Nexa después de la pregunta, composer glow descendido y proof panel; MCP muestra paquete/resource/evidence sin mock.
+- **Preservación AnswerSurface:** no se borró la ruta mockup `/knowledge/mockup/answer-trace`. La primitive `NexaKnowledgeAnswerSurface` suma `showModeSelector?: boolean` default `true` y `showTraceRail?: boolean` default `false`; `/knowledge` pasa `showModeSelector={false}` para evitar selector duplicado porque el shell común gobierna los lentes. Contrato corregido: antes de preguntar no debe aparecer respuesta/proof/trace rail.
+- **Responsive/polish:** `NexaKnowledgeAnswerSurface` y `NexaEvidencePanel` quedaron endurecidos contra clipping mobile con fuentes largas (`minmax(0, 1fr)`, `minInlineSize: 0`, wrapping/truncation controlado). Se agregó marker `knowledge-result-row` y scenario `knowledge-lenses`.
+- **Verificación:** ESLint focal verde, `pnpm exec tsc --noEmit --pretty false` verde, `pnpm exec vitest run src/components/greenhouse/primitives/__tests__/NexaKnowledgeAnswerSurface.test.tsx` verde. GVC verde: `.captures/2026-06-12T19-42-38_knowledge-lenses` y `.captures/2026-06-12T19-42-37_knowledge-answer-trace`.
+- **Coordinación WT compartido:** WIP ajeno de Claude en `src/config/nexa-models.ts` y `.playwright-mcp/` se dejó intacto; no usar stash/clean/restore amplio. Dev server local quedó levantado en `http://localhost:3000` tras reinicio por `next-server` CPU alto.
+
+## Sesion 2026-06-12 — TASK-1084 Knowledge Workbench runtime (Codex, code complete local)
+
+- **Implementado local:** `/knowledge` como Workbench humano interno: browse/search/read vía endpoints app de Knowledge (`documents`, `search?mode=human`, `documents/:id`, `feedback`), nav `plataforma.knowledge`, migración seed aditiva y scenario GVC `knowledge-workbench`.
+- **Garantía de sinergia:** no se creó otra Knowledge ni otro chat. La surface expande la experiencia anterior usando `NexaComposer kind='knowledgeAsk'`, `NexaEvidencePanel` (`nexa-evidence.v1`), `NexaContextScope` y un evento liviano `NEXA_FLOATING_OPEN_EVENT` para abrir el Nexa flotante existente desde **Continuar con Nexa**.
+- **Verificación:** ESLint focal verde, `pnpm exec tsc --noEmit --pretty false` verde, GVC desktop/mobile verde en `.captures/2026-06-12T17-38-24_knowledge-workbench`.
+- **Pendiente antes de cerrar operativamente:** commit/push bajo coordinación del WT compartido, aplicar/deployar migración seed en ambiente objetivo y repetir smoke access interno vs cliente. TASK-1084 queda `in-progress`, no `complete`.
+
+## Sesion 2026-06-12 — TASK-1094 COMPLETA (auto-ingest knowledge por webhook Notion, flag OFF) (Claude)
+
+- **TASK-1094 code-complete** (`develop`, sin branch — override operador, sin push). 4 slices detrás del flag `NOTION_KNOWLEDGE_WEBHOOK_ENABLED` (default OFF → cero efecto al merge). Diseño con skills arch-architect + notion-platform + greenhouse-backend; Discovery vía 3 subagentes Explore en paralelo.
+  - S1 `2f1078ac1`: handler `notion-knowledge` (handshake + HMAC propio + flag + emite `knowledge.notion.page_change_signal`) + migración `webhook_endpoints` (`20260612165545154`, aplicada) + event catalog. 13 tests.
+  - S2 `6250db591`: `fetchPageProvenance` (+title/parent/in_trash) + `getKnowledgeDocumentBySourcePageId` + `ingestOne`/`findSourceId` exportados + `auto-ingest.ts` (gate de gobernanza puro + re-fetch → deprecar/re-ingest/ignorar) + projection `knowledge_notion_ingest` (domain `knowledge` nuevo, ops-worker). 8 tests.
+  - S3 `f9113f774`: `reconcile.ts` (re-ingest + deprecación de huérfanos) + CLI `scripts/knowledge/reconcile.ts`. 3 tests.
+  - S4 `3bb1cb21d` + `96cddceec`: señal `knowledge.notion.ingest_dead_letter` + docs completas (arch Delta, EVENT_CATALOG, runbook, funcional, CLAUDE.md invariante).
+- **Diseño robusto (sin bandaids):** webhook-first SIN cron (decisión operador); at-most-once cubierto por señal dead-letter (PG-only, cheap) + reconcile on-demand (eventos perdidos + huérfanos, hitea Notion solo on-demand). Re-fetch siempre (nunca confía el payload). Borrado→deprecación (cierra gap TASK-1088). Gate de gobernanza fail-safe. Drop-in: pipeline TASK-1082/1088 intacto.
+- **Verificación:** `pnpm local:check` (lint+tsc full) exit 0 · `pnpm test` **6751 passed** · `pnpm build` exit 0 · migración aplicada.
+- **Rollout operador PENDIENTE → SESIÓN FRESCA** (code-complete ≠ operationally complete; el paso a prod es pesado). **NO desplegar todavía**: el 2026-06-12 Codex estaba terminando **TASK-1084** (Knowledge Center UI) del mismo programa con WIP sin commitear — pushear `develop` con su trabajo en curso es desprolijo. **Esperar a que 1084 cierre** antes de pushear. El secret del webhook = el `verification_token` que Notion genera (NO uno aleatorio); el endpoint debe estar desplegado ANTES de crear la suscripción. **Playbook completo paso-a-paso** en el doc de la task (`docs/tasks/complete/TASK-1094-...md` → "Activation Playbook") + runbook `docs/operations/runbooks/notion-knowledge-webhook.md`. Mismo patrón flag-OFF-merge + operador-activa que TASK-912.
+- **Commits locales, sin push** (WT compartido con Codex, ahora trabajando 1084).
+
+## Sesion 2026-06-12 — TASK-1088 COMPLETA (conector Notion + ingesta en vivo) + TASK-1094 creada (Claude)
+
+- **TASK-1088 cerrada** (`develop`, sin push): conector `notion` con modos `page` + `data_source` (Wikis → expanden a artículos vía `/v1/data_sources/{id}/query`, slug estable desde page id). Token scoped `notion-integration-token-greenhouse-knowledge` **provisionado en Secret Manager** + `NOTION_KNOWLEDGE_TOKEN_SECRET_REF` en `.env.local`. Hardening del smoke real: filtro `in_trash`, aplanar contenedores desconocidos (`tab`), omitir URLs S3 presigned de imágenes. CLI `--source=notion --only=<wiki>`. 36 tests focales.
+- **Ingesta real verificada en vivo:** integración Notion "Greenhouse KNOW" creada (read-only, workspace Efeonce). Corpus declarado: 5 Wikis (SOPs 44 · Contenidos 101 · AXIS 55 · Inicio empresa 32 · Buyer Personas 21) + 2 páginas (Onboarding, Guía Automatizaciones); **Wiki de IA descartada por el operador**, Casos de Negocio diferida. **Buyer Personas ingerida**: 21 docs · 111 chunks · 0 cuarentena · 0 fallos · FTS buscable (`body_tsv` poblado). Bug atrapado + corregido en `--apply` real: slug de artículo de Wiki necesitaba `-` (no `/`) para pasar `assertKnowledgeSlug` (guard anti-regresión agregado).
+- **TASK-1094 creada (to-do):** Notion Knowledge Webhook Auto-Ingest + Freshness. Diseño con skills arch-architect + notion-platform: webhook (no cron, decisión operador) → re-ingest dirigido idempotente + deprecación por borrado + señal de drift + reconcile on-demand. Depende de TASK-1088; absorbe la automatización que 1088 dejó fuera de scope.
+- **Pendiente operativo (no código):** ingerir el resto de las Wicks declaradas (SOPs/AXIS/Inicio empresa/Contenidos a revisar + 2 páginas) corriendo `ingest --source=notion --only=<wiki> --apply` — es *usar* el conector terminado. Contenidos (101) a revisar antes (como IA, puede tener ruido).
+- **Notas:** commits locales en `develop`, sin push (WT compartido con Codex). Higiene: el token se pegó en chat → tratado como expuesto (guardado en Secret Manager); rotación opcional pendiente decisión operador.
+
+## Sesion 2026-06-12 — TASK-1092 tomada por Codex (in-progress)
+
+- **Toma:** Codex mueve `TASK-1092` a `in-progress` después de verificar que el blocker formal `TASK-1085` ya está `complete` y staging fue verificado con el flag ON.
+- **Excepción operativa:** ejecución en `develop`/checkout compartido por continuidad de la sesión; no se crea worktree y no se toca WIP ajeno.
+- **Implementado local:** `nexa-tools.ts` y `nexa-service.ts` ahora exigen `[n]` inline + `Fuentes: [n] = citationLabel`; `NexaService` agrega fallback determinístico de fuentes cuando una respuesta grounded omite marcadores. Tests focales verdes: `pnpm exec vitest run src/lib/nexa/nexa-service.test.ts src/lib/nexa/search-knowledge-tool.test.ts`.
+- **QA matrix:** runner nuevo `pnpm qa:nexa-knowledge -- --env=staging --json` contra `/api/home/nexa` autenticado. No correr production flip con esto sin deployment staging + revisión humana.
+- **Cobertura:** "modo mantenimiento" quedó absorbido en TASK-1092: existe `docs/manual-de-uso/plataforma/modo-mantenimiento.md` y ya fue agregado a `PILOT_CORPUS` como entrada `modo-mantenimiento` (`agent_allowed`, owner `platform`, approver `efeonce_admin`). No hay `TASK-1094` separada; siguiente pendiente es re-ingerir corpus en staging + QA K5.
+- **Estado:** TASK-1092 sigue `in-progress`. Production sigue OFF hasta matriz staging post-deploy + reliability signals + aprobación explícita del operador.
+
+## Sesion 2026-06-12 — TASK-1093 Conversational Evidence V1 (Codex, complete)
+
+- **Excepción de rama:** operador pidió ejecutar en `develop`; se corrió `pnpm codex:task-hook TASK-1093 --develop` después de mover la task a `in-progress` y corregir blockers stale. No se creó branch/worktree.
+- **Scope ejecutado:** V1 acotado, sin shell multi-surface. Se agregó `src/lib/nexa/conversational-evidence.ts` con `ConversationalEvidencePacket` (`nexa-evidence.v1`) y adapters desde `knowledge-search.v1`/`NexaToolResult`.
+- **UI compartida:** nueva primitive `NexaEvidencePanel` renderiza trace, fuentes, freshness/confidence, filtered count y feedback. `NexaToolRenderers` dejó de duplicar la card de Knowledge y ahora usa ese panel. `NexaKnowledgeAnswerSurface` puede recibir `evidence` y renderizar el mismo panel en el proof slot.
+- **Kinds/variants:** `NexaComposer` suma `kind='inlineFollowUp'`; `NexaKnowledgeAnswerSurface` suma `variant='toolResult'` y `kind='knowledgeToolResult'`. No se creó `NexaConversationShell`.
+- **Runtime:** `mapThreadMessagesToInitial()` rehidrata tool-calls persistidos desde `nexa_messages.tool_invocations`; threads viejos sin payload degradan a texto.
+- **Verificado:** ESLint focal, Vitest focal (10 tests), `pnpm exec tsc --noEmit --pretty false`, `pnpm design:lint`, `pnpm task:lint --task TASK-1093`, `pnpm ops:lint --changed`, `git diff --check`, docs closure con paths explícitos y GVC local. Capturas: `.captures/2026-06-12T12-07-29_design-system-nexa-chat` y `.captures/2026-06-12T12-06-34_knowledge-answer-trace`.
+
+## Sesion 2026-06-12 — Regla multi-agente: proteger WIP untracked ajeno
+
+- **Incidente operativo:** durante el cierre de TASK-1085, Codex apartó con `git stash -u` rutas untracked de TASK-1086 para aislar el push. Aunque reversible, eso hizo desaparecer archivos del filesystem mientras Claude trabajaba en 1086.
+- **Regla documentada:** en checkout compartido, WIP `untracked`/unstaged de otro agente es estado vivo, no scratch movible. No usar `git stash -u`, `git clean`, `git restore`, moves ni pathspecs amplios sobre paths que no pertenecen a tu task.
+- **Fuente canónica actualizada:** `docs/operations/MULTI_AGENT_WORKTREE_OPERATING_MODEL_V1.md`; referencias cortas en `AGENTS.md`, `CLAUDE.md` y `project_context.md`.
+- **Mitigación futura:** si un hook/push propio queda bloqueado por WIP ajeno, coordinar con el owner, usar worktree propio o pedir bypass explícito ya verificado. No ocultar WIP del otro agente.
+
+## Sesion 2026-06-12 — TASK-1092 creada: Nexa Knowledge production readiness
+
+- **Task documentada:** `docs/tasks/to-do/TASK-1092-nexa-knowledge-production-readiness-inline-citations.md` nace como P1 para cerrar production readiness de Nexa Knowledge Retrieval.
+- **Estado runtime:** staging ya tiene `NEXA_KNOWLEDGE_RETRIEVAL_ENABLED=true`; production permanece OFF. La QA staging de TASK-1085 probó el circuito Nexa -> `search_knowledge` -> packet `knowledge-search.v1` -> evidence UI, pero detectó gaps de citas inline y cobertura/ranking.
+- **Bloqueo explícito:** no activar production hasta resolver disciplina de citas, revisar misses conocidos como "modo mantenimiento", repetir matriz QA y revisar reliability (`low_citation_rate`, `no_source_answer_rate`, `stale_source_retrievals`).
+- **Verificado docs:** `pnpm task:lint --task TASK-1092` verde; `docs:closure-check` de task/registry/README quedó cubierto con esta nota de handoff.
+
+## Sesion 2026-06-12 — TASK-1093 creada: Greenhouse Conversational Experience Platform V1
+
+- **Task documentada:** `docs/tasks/to-do/TASK-1093-greenhouse-conversational-experience-platform-v1.md` formaliza la siguiente capa transversal para Nexa Chat + AnswerSurface.
+- **Decisión de arquitectura de producto:** no seguir creando surfaces conversacionales separadas. La plataforma debe unificar answer turns, evidence packets, tool/citation rendering, persistencia/rehidratación de evidence y variants/kinds para chat, floating panel, sidecar, Knowledge Answer Trace y AI Overview.
+- **Base existente:** `NexaThread` aporta runtime vivo/assistant-ui/historial/composer/tools; `NexaKnowledgeAnswerSurface` aporta la coreografía premium de respuesta trazable; `NexaToolRenderers` aporta evidencia real de `search_knowledge`; `NexaComposer` ya es primitive reusable.
+- **Riesgo principal:** si se adopta sin contrato común, Greenhouse termina con múltiples experiencias "Nexa" y múltiples lenguajes visuales de citas. Ejecutar por slices y con GVC.
+
+## Sesion 2026-06-12 — Knowledge Answer Trace UX polish end-to-end
+
+- **Iteración aplicada:** revisión Product Design/UX writing del mockup `/knowledge/mockup/answer-trace`; se humanizó el lenguaje de trace/packet/evals, se redujo jerga visible (`chunks`, `policy`, `agent_allowed`) y se reforzó la narrativa principal "pregunta a Nexa + verifica fuentes".
+- **UI ajustada:** `NexaKnowledgeAnswerSurface` suma `scrollMarginBlockStart` para convivir con headers sticky y el trace inicial baja peso visual; el mockup usa labels humanos como "Fuentes y trazabilidad", "Cómo llegó", "Paquete" y "Revisión".
+- **GVC actualizado:** `knowledge-answer-trace` ahora envía la pregunta con `Enter` en el input y captura el estado post-pregunta full-page para evitar artefactos de recorte con header fixed.
+- **Verificación:** ESLint focal, `tsc --noEmit`, `design:lint`, `git diff --check` y GVC local desktop/mobile verdes. Captura final: `.captures/2026-06-12T11-46-20_knowledge-answer-trace`. Nota: GVC sigue reportando 1 warning best-effort de hydration global, sin console/page/http errors.
+
+## Sesion 2026-06-12 — TASK-1085 Codex: UI runtime + evidence renderer (code complete local)
+
+- **Excepción de rama:** operador pidió ejecutar en `develop`; se corrió `pnpm codex:task-hook TASK-1085 --develop` después de corregir drift documental (TASK-1083 ya estaba complete). No se creó branch/worktree.
+- **Implementado por Codex:** el adapter de Nexa (`src/lib/nexa/use-nexa-runtime.ts`) renderiza respuesta textual primero y evidencia del tool después; `search_knowledge` tiene renderer específico en `NexaToolRenderers.tsx` que valida `raw.packet.contractVersion='knowledge-search.v1'`, deriva trace/fuentes desde el packet y usa `POST /api/platform/app/knowledge/feedback` para feedback real. El lab `/design-system/nexa-chat` suma specimen `nexa-knowledge-tool-trace-specimen`.
+- **Observabilidad:** `src/lib/reliability/queries/nexa-knowledge-retrieval-signals.ts` suma `knowledge.retrieval.low_citation_rate` en el mismo scan JSONB y endurece `jsonb_array_elements` contra filas no-array.
+- **GVC:** `design-system-nexa-chat` actualizado con mark específico. Captura final local: `.captures/2026-06-12T10-24-31_design-system-nexa-chat` (desktop+mobile, 8 frames, sin errores runtime).
+- **Verificado:** ESLint focal, Vitest focal (13 tests), `pnpm exec tsc --noEmit --pretty false`, GVC local. Falta `pnpm docs:closure-check` tras docs.
+- **Estado:** code complete local, **rollout staging/prod pendiente**. `NEXA_KNOWLEDGE_RETRIEVAL_ENABLED` sigue default OFF; smoke local con flag ON verde y `pnpm local:check` verde. No se activa staging/prod sin decisión explícita del operador.
+
+## Sesion 2026-06-12 — TASK-1085 Nexa Knowledge Retrieval: mitad backend (Claude) · commits LOCAL · push held
+
+- **Excepción de rama:** instrucción explícita del operador de mantenerse en `develop`, sin worktree. División del programa Knowledge: **backend/contrato/engine = Claude · UI/wiring/primitives = Codex**.
+- **Tomada:** `docs/tasks/in-progress/TASK-1085-nexa-knowledge-retrieval-citations.md` (movida de to-do, Lifecycle `in-progress`). Es la **keystone** que conecta el contrato (1083) con la experiencia (1089/Answer Trace).
+- **Implementado (code complete LOCAL, behind flag `NEXA_KNOWLEDGE_RETRIEVAL_ENABLED` default OFF):**
+  - **Slice 1 (tool):** `search_knowledge` (function-calling) en `src/lib/nexa/nexa-tools.ts` → `searchKnowledge({ mode: 'agentic' })` (SSOT 1083). `isAvailable` = flag ON **y** grant agéntico del tenant (interno ∪ {EFEONCE_ADMIN, FINANCE_ADMIN, HR_MANAGER, EFEONCE_OPERATIONS}; cliente NUNCA). Packet completo en `result.raw.packet`. Flag en `src/lib/nexa/flags.ts`. Provider-agnóstico (swap Gemini→Claude no lo toca). Commit `26fd0c5f4`.
+  - **Slice 2 (reglas):** Answer Rules en el system prompt **solo con flag ON** (`buildSystemPrompt` → `...knowledgeRules`): citar, gap honesto en `confidence='none'`, declarar stale/deprecated, no inventar, validación humana en finance/payroll/legal/security. Mismo commit.
+  - **Slice 3 (señales backend iniciales):** 2 reliability signals (`src/lib/reliability/queries/nexa-knowledge-retrieval-signals.ts`, moduleKey `knowledge`) leídas del jsonb `nexa_messages.tool_invocations` **sin writes nuevos**: `knowledge.nexa.no_source_answer_rate` (cobertura) + `knowledge.nexa.stale_source_retrievals` (steady=0). Wired en `get-reliability-overview.ts`. Commit `6c43bcb9e`. Codex agregó arriba la señal answer-level `knowledge.retrieval.low_citation_rate`.
+- **ISSUE-092 (resuelta) — destapada por el smoke:** todo el tool-calling de Nexa estaba roto en producción (HTTP 400 `Unknown name "id" at function_response`; @google/genai inyecta un id huérfano que Gemini 2.5 rechaza). Fix raíz en `nexa-service.ts` (`{ name, response }` sin id). Doc `docs/issues/resolved/ISSUE-092-...md` + README.
+- **Verificado:** tsc full = 0, lint focal = 0, 6 tests del tool + 5 tests de señales verdes, smoke end-to-end live (Nexa cita "Motor ICO: métricas operativas [2]", sin inventar) + smoke de señales contra PG real (steady=ok, flag OFF).
+- **Mitad UI Codex:** aterrizada en la sección anterior (renderer `search_knowledge`, feedback compartido, GVC, `low_citation_rate`). Pendiente real: rollout/flag ON smoke staging/prod.
+- **Docs sincronizadas:** TASK-1085 (Delta implementación + Status real), `CLAUDE.md` (Nexa Knowledge Retrieval invariants), `GREENHOUSE_KNOWLEDGE_PLATFORM_ARCHITECTURE_V1.md`, `GREENHOUSE_RELIABILITY_CONTROL_PLANE_V1.md` (3 señales), `changelog.md`, ISSUE-092.
+- **Rollout pendiente:** no mover TASK-1085 a `complete` hasta smoke staging/prod con flag ON y activación gradual aprobada.
+
+## Sesion 2026-06-12 — TASK-1089 Nexa Knowledge Answer Surface (code complete local, develop)
+
+- **Excepción de rama:** el hook `pnpm codex:task-hook TASK-1089 --develop` confirmó instrucción de mantenerse en `develop`; no se cambió de rama ni se creó worktree.
+- **Task creada/tomada:** `docs/tasks/in-progress/TASK-1089-nexa-knowledge-answer-surface.md` + `docs/tasks/README.md` + `TASK_ID_REGISTRY.md`. Objetivo: convertir la opción visual 3 del product-design loop en una capability transversal para respuestas Nexa con evidencia.
+- **Implementado (code complete local):** nueva composition primitive `NexaKnowledgeAnswerSurface` + controller (`conversationTrace|overviewPanel`, kind inicial `knowledgeAnswerTrace`), export en barrel, test focal. Primer consumer: `/knowledge/mockup/answer-trace` ahora muestra pregunta como burbuja, respuesta Nexa verificable, composer glow descendido para follow-up y proof panel `Fuentes | Packet | Evals`.
+- **UX polish:** se quitó el dock flotante global en `/knowledge/mockup/answer-trace` y `/design-system/nexa-chat` para no competir con la surface embebida; se corrigió viewport mobile, overflow horizontal, warning responsive y headers/paneles mobile.
+- **Design System/GVC:** `/design-system/nexa-chat` suma specimen `nexa-knowledge-answer-surface-specimen`; scenario nuevo `knowledge-answer-trace` y scenario `design-system-nexa-chat` actualizado para capturar el specimen.
+- **Docs sincronizadas:** `ui-platform/PRIMITIVES.md`, `PATTERNS.md`, `HISTORIAL.md`, documentación funcional/manual de Knowledge, `project_context.md`, `changelog.md`.
+- **Boundary importante:** la primitive es props-only/mock data. NO consulta tablas ni endpoints y NO activa retrieval real. `TASK-1085` debe cablear `knowledge-search.v1` + feedback compartido.
+- **Verificado local:** ESLint focal, Vitest focal, `tsc`, `design:lint`, `task:lint --task TASK-1089`, `ops:lint --changed`, `docs:closure-check`; GVC final `knowledge-answer-trace` en `.captures/2026-06-12T09-08-26_knowledge-answer-trace` y lab `design-system-nexa-chat` en `.captures/2026-06-12T09-10-21_design-system-nexa-chat`.
+- **Pendiente inmediato:** feedback visual del operador antes de mover TASK-1089 a `complete` o commitear/pushear. No pushear a `develop` sin confirmación humana.
+
+## Sesion 2026-06-12 — Knowledge Search API COMPLETA (TASK-1083, develop)
+
+- **NexaComposer command variant aplicado.** La caja aprobada de Knowledge (glow + Nexa mark + `⌘ K`) quedó en primitive reusable: `src/components/greenhouse/primitives/NexaComposer.tsx` + controller `nexa-composer-controller.ts`, variants `chat|command`, kinds `floatingChat|knowledgeAsk|globalCommand`, test `NexaComposer.test.tsx`. Consumer actualizado: `/knowledge/mockup/answer-trace` usa `NexaComposer kind='knowledgeAsk'` + `NexaComposerInput kind='knowledgeAsk'` y mantiene la escritura funcional. Lab actualizado: `/design-system/nexa-chat` con specimen `nexa-composer-command-variant` + scenario GVC `design-system-nexa-chat` desktop/mobile. Evidencia: `.captures/2026-06-12T08-22-33_inline-knowledge-mockup-answer-trace`, `.captures/2026-06-12T08-22-44_inline-knowledge-mockup-answer-trace`, `.captures/2026-06-12T08-23-41_design-system-nexa-chat`. Smoke editable: `nexa composer command editable smoke OK`.
+
+- **GVC local/Turbopack reliability aplicado.** Diagnóstico arquitectónico: la opción robusta NO era depender de matar/relevantar el dev server como loop primario, sino mover `pnpm fe:capture` desde `page.goto(..., waitUntil: 'networkidle')` a `waitUntil: 'domcontentloaded'` y usar readiness visual declarativa. Implementado en `scripts/frontend/capture.ts`: flag inline nuevo `--ready='<selector>'`, guards ligeros de login/loading/skeletons y docs en README/manual/arquitectura (`GREENHOUSE_FRONTEND_CAPTURE_HELPER_V1` v1.6). Evidencia: desktop `.captures/2026-06-12T08-12-36_inline-knowledge-mockup-answer-trace` e iPhone 13 `.captures/2026-06-12T08-12-46_inline-knowledge-mockup-answer-trace`, ambos OK con readiness `[data-capture="knowledge-command-center"]`. Validación: `pnpm eslint scripts/frontend/capture.ts`, `pnpm design:lint`, `git diff --check`.
+
+- **TASK-1083 `complete`** en `develop` (sin branch, override del operador). 3 slices verdes. Search read-only sobre API Platform + golden questions.
+- **Slice 1 — reader SSOT + substrato:** `searchKnowledge({query,subject,mode})` lane-agnóstico, 2 modos (human ve `agent_excluded`; agentic NUNCA), pre-LLM filtering en SQL leyendo el doc vivo + `current_version_id`, packet `knowledge-search.v1`, `confidence='none'`→no-answer honesto, NO swallowea errores. Substrato `body_tsv` GENERATED vía función IMMUTABLE SSOT (weighted A/B, `'spanish'`, **unaccent**) + GIN. Migraciones `20260612072724451` + `20260612075236036`.
+- **Slice 2 — endpoints + lint:** 4 endpoints `app` (search/documents/documents:id/feedback) vía `runAppRoute` + `can()` + errores sanitizados (rutas finas, lógica en `resources/app-knowledge.ts`); read-detail con anti-oracle `notFound`. Lint rule `greenhouse/no-direct-knowledge-chunk-query` (warn, afinada a tablas de contenido + FROM/JOIN; exime data layer/ops/db.d.ts).
+- **Slice 3 — golden questions + eval:** 10 fixtures TS + structural test (CI) + eval harness live. Tuning eval-driven: OR-ify (recall) + piso de relevancia 0.10 (precisión/no-answer).
+- **Verificación:** 22/22 tests focales verdes contra el corpus real (263 chunks); 19/19 lint-rules; `pnpm build` Turbopack **compiló OK** (boundary server-only de las rutas ✓); tsc limpio en mi código. `pnpm test` full en curso.
+- **Coordinación Codex (importante):** el `pnpm build` local falla en el **type-check** por WIP **sin commitear** de Codex en `KnowledgeAnswerTraceMockupView.tsx:484` (`setSelectedQuestion` con literal type) — NO es mi código, NO está en mis commits, NO en origin/develop (la versión commiteada del mockup es estática y buildea). Mi push solo lleva mis commits → CI verde. Mis archivos no solapan con los de Codex.
+- **Desbloquea TASK-1085** (Nexa: consume `searchKnowledge` agentic + feedback; el signal `low_citation_rate` es suyo) **y TASK-1086** (MCP: envuelve el reader lane-agnóstico en `ecosystem` sin lógica nueva). El **read-detail** cierra el gap del blueprint de promoción de TASK-1084.
+
+## Sesion 2026-06-11 — Knowledge Answer Trace Studio mockup (TASK-1084 visual, con contratos 1083/1085/1086)
+
+- Se construyó la base visual elegida para Knowledge humano + agentes: **Answer Trace Studio** en `/knowledge/mockup/answer-trace` (runtime local, mock data tipado, sin access real ni API productiva). URL local mientras el dev server siga activo: `http://localhost:3000/knowledge/mockup/answer-trace`.
+- Archivos: `src/app/(dashboard)/knowledge/mockup/answer-trace/page.tsx`, `src/views/greenhouse/knowledge/mockup/answer-trace/KnowledgeAnswerTraceMockupView.tsx`, `src/views/greenhouse/knowledge/mockup/answer-trace/data.ts`, `src/lib/copy/knowledge.ts`, `design-qa.md`.
+- UX validada: pregunta -> trace rail -> respuesta verificable -> tabs `Fuentes | Packet | Evals`, modos `Humano | Nexa | MCP`, lector humano, packet para agentes, feedback y estados de gap/freshness. Se mantuvo route-local; no nace primitive nueva todavía.
+- Evidencia: GVC desktop `.captures/2026-06-11T23-31-10_inline-knowledge-mockup-answer-trace/frames/01-snapshot.png`; mobile `.captures/2026-06-11T23-31-11_inline-knowledge-mockup-answer-trace/frames/01-snapshot.png`; comparación source vs implementación `.captures/2026-06-11T23-31-10_inline-knowledge-mockup-answer-trace/comparison-source-vs-implementation.png`; `design-qa.md` `final result: passed`.
+- Validación: `pnpm exec tsc --noEmit --pretty false`, ESLint focal, `pnpm design:lint`, `pnpm ops:lint --changed`, `pnpm task:lint --task TASK-1083/1084/1085/1086`. `pnpm docs:closure-check` queda con warnings advisory por handoff/changelog/UI docs; handoff+changelog fueron actualizados, no se creó manual funcional porque no hay workflow productivo ni rollout.
+- Docs de task sincronizadas: `TASK-1084` como dueña del mockup; `TASK-1083`, `TASK-1085`, `TASK-1086` como contrato visual downstream. Pendiente real: implementar `TASK-1083` antes de conectar `/knowledge`, Nexa o MCP a datos reales.
+
+## Sesion 2026-06-11 — Knowledge ingestion COMPLETA (TASK-1082, develop)
+
+- **TASK-1082 `complete`** en `develop` (sin branch, override del operador). Pipeline de ingesta del corpus piloto a `greenhouse_knowledge`.
+- **Decisión de fuente:** el corpus piloto son **archivos markdown del repo** (no hay fuente Notion de knowledge ni secret) → connector `repo_docs` real; connector Notion **diferido a TASK-1088** (gated en secret a provisionar).
+- **Implementado:** pipeline source-agnostic (`src/lib/knowledge/ingestion/`): connector interface + manifest 14 docs + repo_docs connector + chunker markdown puro (heading_path + citation_anchor + checksum sha256) + sanitizer (`sanitization/detect.ts`: valores de secretos/PII/prompt-injection) + pipeline dry-run/apply idempotente por checksum + run audit + 2 reliability signals (módulo `knowledge` nuevo). CLI `scripts/knowledge/ingest.ts`.
+- **Verificado live (dev):** `--apply` publicó **11 docs + 263 chunks** (`periodos-de-nomina` `agent_excluded`); re-run idempotente (11 unchanged); **0 quarantine** (sanitizer sin falsos positivos en el corpus real). Signals = `ok`. 14 focal + 418 reliability tests verdes; `pnpm test` + `pnpm build` verdes.
+- **Desbloquea TASK-1083/1084** con contenido real en dev. Follow-up: **TASK-1088** (Notion connector).
+- **Nota multi-agente:** durante esta sesión había WIP de Codex sin commitear (intento abandonado de "Nexa Chat en Home") en el working tree. Se apartó a `stash@{0}` (recuperable) tras pausar Codex; mis commits TASK-1082 nunca lo incluyeron. Los 3 archivos `@menu` que Codex tocó se limpiaron al pausarlo.
+
+---
+
+## Sesion 2026-06-11 — Knowledge Platform foundation COMPLETA (TASK-1081, develop)
+
+- **TASK-1081 `complete`** en `develop` (sin branch, override del operador). 3 slices verdes. Foundation persistente de Knowledge Platform.
+- **Slice 2 DONE (core + capabilities):** `src/lib/knowledge/` (barrel puro + store server-only, patrón TASK-790) + 5 capabilities `knowledge.*` (catalog + `capabilities_registry` migración `20260611201441449` + grants en runtime.ts + CaptureDomain `knowledge`). Verificado **live contra PG**: parity catalog⇆registry + full lifecycle (publish, transition trigger, chunks denormalizados, feedback append-only).
+- **Slice 3 DONE (triple doc):** arquitectura Delta (schema materializado) + `docs/documentation/plataforma/knowledge-platform.md` + `docs/manual-de-uso/plataforma/knowledge-platform.md` + CLAUDE.md invariantes (sección "Knowledge Platform foundation invariants") + índices de docs.
+- **Desbloquea TASK-1082..1086.** Próximo: TASK-1082 (ingesta Notion del corpus piloto hacia las tablas ya materializadas).
+- (histórico in-progress abajo)
+- **Synergy check clave:** `greenhouse_knowledge` NO es identidad paralela de `greenhouse_context` (Structured Context Layer). SCL = sidecar JSONB de memoria de agente/replay sobre aggregates; Knowledge = corpus de documentos prosa + chunks con gobernanza editorial. Boundary confirmado por el propio doc SCL (§900-906). Schema separado correcto.
+- **Slice 1 DONE (DDL):** migración `20260611200140700_task-1081-knowledge-core-schema.sql` aplicada en dev compartida (Cloud SQL). Schema `greenhouse_knowledge` + 6 tablas: `knowledge_sources`, `knowledge_documents`, `knowledge_document_versions`, `knowledge_chunks`, `knowledge_publication_runs` (anti-DELETE), `knowledge_feedback` (append-only). Dos dimensiones ortogonales `publication_status` × `agentic_policy` (decisión TASK-1080). Transition trigger en documents + touch updated_at + anti pre-up-marker DO block. `db.d.ts` regenerado (6 tablas). tsc verde.
+- **Decisiones de ejecución (refinamientos documentados):** tsvector/GIN diferido a TASK-1083 (search); outbox events diferidos (sin consumidor, audit via publication_runs); viewCode `plataforma.knowledge` diferido a TASK-1084 (nace con la página); capabilities `knowledge.*` SÍ se siembran aquí (SSOT, Slice 2). Patrón módulo = `query()` raw tipado (espejo TASK-790), no Kysely.
+- **Pendiente:** Slice 2 (src/lib/knowledge/ core server-only + capabilities seed/grants + CaptureDomain 'knowledge'), Slice 3 (triple doc + CLAUDE.md + Delta arquitectura). Push a develop al cierre (aprobado).
+
+---
+
+## Sesion 2026-06-11 — Knowledge Platform acceptance cerrada (TASK-1080)
+
+- **TASK-1080 `complete`** (policy / decision-closure, con overlay `arch-architect`). Convierte el ADR Knowledge Platform de `Proposed` → **`Accepted (direction) — runtime gated per task`**.
+- Decisiones del operador (AskUserQuestion): surface **Knowledge** `/knowledge`; audiencia **solo interno**; ADR aceptado en dirección con runtime gated por task.
+- Taxonomía piloto fijada en `GREENHOUSE_KNOWLEDGE_PLATFORM_ARCHITECTURE_V1.md` → `## Delta 2026-06-11` (tablas A-G): capabilities `knowledge.*`, estados ortogonales `publication_status` × `agentic_policy`, corpus piloto (14 docs internos), approvers por dominio (`ROLE_CODES` reales), búsqueda full-text + metadata, rollout, disposición de las 12 Open Questions §18.
+- **Ajuste arquitectónico introducido:** se separó `agent_excluded` del enum de lifecycle → dos dimensiones ortogonales (`publication_status` vs `agentic_policy`). TASK-1081 lo materializa como dos columnas.
+- **Desbloquea TASK-1081..1086.** Cada una conserva su gate propio (flags default false, migraciones, aprobación de dominio). Esta aceptación NO autoriza ingesta masiva ni levanta esos gates.
+- Próximo paso ejecutable: **TASK-1081** (schema `greenhouse_knowledge` + source registry + capabilities + grants en `runtime.ts` mismo PR).
+- Docs tocados: ADR + arquitectura + `DECISIONS_INDEX` + `docs/tasks/README.md` + `changelog.md`. Sin runtime/migración/código.
+
+---
+
 ## Sesion 2026-06-11 — Knowledge Platform tasks creadas
 
 - Se creó la primera ola compacta de tasks ejecutables para Knowledge Platform:

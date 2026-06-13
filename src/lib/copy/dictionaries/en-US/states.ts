@@ -12,6 +12,7 @@ export const states: StatesCopy = {
   cancelled: 'Cancelled',
   archived: 'Archived',
   scheduled: 'Scheduled',
+  upcoming: 'Upcoming',
   paused: 'Paused',
   expired: 'Expired',
   blocked: 'Blocked',

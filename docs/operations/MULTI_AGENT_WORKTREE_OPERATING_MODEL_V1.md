@@ -1,5 +1,11 @@
 # MULTI_AGENT_WORKTREE_OPERATING_MODEL_V1.md
 
+## Delta 2026-06-12 — WIP untracked de otro agente es estado vivo, no scratch movible
+
+Sesión paralela TASK-1085 (Codex) + TASK-1086 (Claude) dejó una lección operativa crítica: en un checkout compartido, un archivo `untracked` de otro agente puede ser una ruta nueva en desarrollo activo. Apartarlo con `git stash -u` para "limpiar" el worktree antes de un push lo hace desaparecer del filesystem del otro agente y puede romper su loop aunque el cambio sea reversible.
+
+Regla nueva: **ningún agente puede stashear, limpiar, restaurar o mover WIP untracked/unstaged que no posee en un worktree compartido**. Si un hook o push propio queda bloqueado por WIP ajeno, la mitigación correcta es coordinar con el owner, pedirle que commitee/stashee su slice, mover el trabajo propio a un worktree aislado, o pedir autorización explícita para un bypass de hook ya verificado. No se debe usar `git stash -u` como herramienta de aislamiento sobre archivos de otro agente.
+
 ## Delta 2026-04-17 — patrones aprendidos en sesión paralela Claude + Codex
 
 Sesión simultánea de TASK-446 (Claude, Insights root cause narrative) y TASK-345 (Codex, quotation canonical bridge) materializó patrones operativos que el modelo original no cubría. Se agregan las secciones:
@@ -32,6 +38,7 @@ La regla canónica pasa a ser:
 
 - el primer agente activo conserva el workspace actual
 - todo agente adicional trabaja en un `git worktree` propio, en otra carpeta y otra rama
+- el WIP untracked/unstaged de otro agente se trata como estado vivo: no se stashea, limpia, restaura, mueve ni se usa como "scratch" para pasar hooks
 
 Esto evita que en VS Code cambie el branch visible del otro agente y reduce el riesgo de contaminar su `git status`.
 
@@ -199,6 +206,25 @@ Checklist corto:
 - `git worktree list`
 - leer `project_context.md`
 - leer `Handoff.md`
+
+## Protección de WIP ajeno en checkout compartido
+
+En un worktree compartido, `git status --short` puede mostrar archivos sin dueño obvio. La regla por defecto es conservadora: si no los creaste en esta sesión o no forman parte explícita de tu task, pertenecen al operador u otro agente.
+
+Prohibido sin coordinación explícita:
+
+- `git stash -u` o `git stash push -u` sobre paths ajenos o pathspecs amplios.
+- `git clean`, `git restore`, `git rm`, moves de task docs o cualquier operación que saque archivos untracked/unstaged del filesystem del otro agente.
+- "Limpiar el árbol" para que pase tu hook/push ocultando WIP de otro agente.
+
+Si tu commit ya fue validado pero el hook/push falla por WIP ajeno:
+
+1. Confirma el owner y coordina que ese agente commitee, stashee o pause.
+2. Si hay tiempo, mueve tu propio cierre a un worktree aislado y pushea desde ahí.
+3. Si el operador autoriza explícitamente un bypass de hook, documenta que el bypass se usa porque el hook del repo lee WIP ajeno y que tu set ya fue verificado proporcionalmente.
+4. Deja `Handoff.md` con el estado real y cualquier stash temporal que hayas creado.
+
+Los archivos commiteados sobreviven a churn del worktree; los untracked no. Cuando una slice nueva empieza a crear rutas, el owner debe commitear temprano o moverla a un worktree propio si habrá trabajo paralelo.
 
 ## Sincronización con `develop`
 

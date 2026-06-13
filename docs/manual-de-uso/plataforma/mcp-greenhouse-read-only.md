@@ -165,6 +165,25 @@ Sirven para:
 - listar deliveries
 - revisar el detalle de un delivery puntual
 
+### 7. Conocimiento (Knowledge)
+
+- `search_knowledge`
+- `get_knowledge_document`
+- resource `greenhouse://knowledge/document/{id}`
+
+Sirven para que un agente consulte el **corpus de conocimiento gobernado** de Greenhouse (manuales, SOPs, runbooks, definiciones) y responda con **citas** en vez de inventar:
+
+- `search_knowledge` recibe una pregunta (`query`, opcional `limit` ≤ 20) y devuelve el paquete `knowledge-search.v1`: los **fragmentos relevantes con su cita** (de qué documento y sección salen), un **nivel de confianza** y la **frescura** de las fuentes.
+- `get_knowledge_document` carga un documento puntual por id, con sus **secciones** (ruta de encabezado + ancla de cita + texto).
+- El resource `greenhouse://knowledge/document/{id}` es el mismo documento, direccionable por URI estable (read-only).
+
+Reglas que el agente debe respetar:
+
+- **Si la confianza es `none`, NO inventes.** Reporta que no hay guía publicada para esa pregunta. El paquete es la única fuente — no rellenes con conocimiento general.
+- **Solo bindings de scope `internal`** ven el corpus (es interno-only en esta versión). Un binding tenant-scoped (organización/cliente/space) recibe `403 scope_not_allowed`. No es un error tuyo: ese binding no tiene grant al corpus interno.
+- Un documento marcado como "no usado por agentes", borrador, deprecado o no-interno **no aparece** (responde `404` por id, o simplemente no entra en la búsqueda). Lo que queda fuera por política se **cuenta** sin mostrar su contenido.
+- Es **read-only**: estas tools nunca crean, editan ni publican conocimiento.
+
 ## Que no puede hacer
 
 Este MCP no hace lo siguiente:
@@ -290,3 +309,4 @@ Acción recomendada:
 - Gateway remoto: [src/app/api/mcp/greenhouse/route.ts](../../../src/app/api/mcp/greenhouse/route.ts)
 - Lane ecosystem: [docs/documentation/plataforma/api-platform-ecosystem.md](../../documentation/plataforma/api-platform-ecosystem.md)
 - Platform health: [docs/documentation/plataforma/platform-health-api.md](../../documentation/plataforma/platform-health-api.md)
+- Knowledge (Knowledge Platform): [docs/documentation/plataforma/knowledge-platform.md](../../documentation/plataforma/knowledge-platform.md) · builder ecosystem [src/lib/api-platform/resources/ecosystem-knowledge.ts](../../../src/lib/api-platform/resources/ecosystem-knowledge.ts) · TASK-1086

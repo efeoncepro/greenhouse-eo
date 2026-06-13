@@ -188,6 +188,13 @@ export const DECLARED_CHILD_ROUTES: readonly ChildRouteDeclaration[] = [
       'Breadcrumbs Lab — child surface del Design System para la primitive GreenhouseBreadcrumbs basada en AXIS Figma, alcanzable desde el catalogo canonico /design-system.'
   },
   {
+    route: '/design-system/roadmap-timeline',
+    parent: '/design-system',
+    via: 'inline-link',
+    reason:
+      'Roadmap Timeline Lab — child surface del Design System para la primitive GreenhouseRoadmapTimeline (roadmaps, release plans y horizontes de producto), alcanzable desde el catalogo canonico /design-system.'
+  },
+  {
     route: '/design-system/charts',
     parent: '/design-system',
     via: 'inline-link',
@@ -242,6 +249,48 @@ export const DECLARED_CHILD_ROUTES: readonly ChildRouteDeclaration[] = [
     via: 'inline-link',
     reason:
       'Elevation & Shadows Lab (TASK-1049) — child surface del Design System para los roles semánticos de elevación (theme.greenhouseElevation), alcanzable desde el catalogo canonico /design-system.'
+  },
+  {
+    route: '/design-system/gradients',
+    parent: '/design-system',
+    via: 'inline-link',
+    reason:
+      'Gradient Background Lab — child surface del Design System para la primitive GreenhouseGradientBackground y sus presets tokenizados, alcanzable desde el catalogo canonico /design-system.'
+  },
+  {
+    route: '/design-system/border-beam',
+    parent: '/design-system',
+    via: 'inline-link',
+    reason:
+      'Border Beam Lab — child surface del Design System para la primitive GreenhouseBorderBeam y sus variants/kinds de motion perimetral, alcanzable desde el catalogo canonico /design-system.'
+  },
+  {
+    route: '/design-system/nexa-provenance',
+    parent: '/design-system',
+    via: 'inline-link',
+    reason:
+      'Nexa Provenance Trace Lab (TASK-1103) — child surface del Design System para la primitive NexaProvenanceTrace (grounding canonico de Nexa: variants inline/expandable/panel + kinds knowledgeGrounded/signalPromoted/computed), alcanzable desde el catalogo canonico /design-system.'
+  },
+  {
+    route: '/design-system/nexa-response-toolbar',
+    parent: '/design-system',
+    via: 'inline-link',
+    reason:
+      'Nexa Response Toolbar Lab (TASK-1104) — child surface del Design System para la primitive NexaResponseToolbar (chrome de confianza canonico de una respuesta de Nexa: variants embedded/floating/docked + kinds responseSettle/chatMessage/surfaceBar), alcanzable desde el catalogo canonico /design-system.'
+  },
+  {
+    route: '/design-system/nexa-streaming-text',
+    parent: '/design-system',
+    via: 'inline-link',
+    reason:
+      'Nexa Streaming Text Lab (TASK-1105) — child surface del Design System para la primitive NexaStreamingText (revelado progresivo canonico de la respuesta de Nexa: modes value/stream + caret tokenizado + never-hidden/reduced-motion), alcanzable desde el catalogo canonico /design-system.'
+  },
+  {
+    route: '/design-system/nexa-moment-composition',
+    parent: '/design-system',
+    via: 'inline-link',
+    reason:
+      'Nexa Moment Composition Lab (TASK-1102 GAP A) — child surface del Design System para la primitive NexaMomentComposition (composicion in-place de Nexa Answers con un host: variants leadOverlay/anchoredAside/inlineExpand + morph View Transitions + anclaje cita->host + next-step gobernado + puente a la lente), alcanzable desde el catalogo canonico /design-system.'
   },
   {
     route: '/design-system/geometry',

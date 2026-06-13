@@ -2,546 +2,324 @@
 
 ## Objetivo
 
-Definir un prompt operativo canónico para que Codex ejecute `TASK-###` dentro de `greenhouse-eo` con alta fidelidad al repo real, bajo drift, buen uso de skills, coordinación segura con subagentes y cierre documental consistente.
+Definir el harness operativo canonico para que Codex ejecute `TASK-###` en
+`greenhouse-eo` sin depender de prompts largos pegados a mano.
 
-Este documento **no reemplaza** `AGENTS.md`, `project_context.md`, `Handoff.md`, `Handoff.archive.md`, `docs/operations/CONTEXT_HANDOFF_OPERATING_MODEL_V1.md`, `docs/operations/SOLUTION_QUALITY_OPERATING_MODEL_V1.md` ni `docs/tasks/TASK_PROCESS.md`. Los comprime en una forma reutilizable para sesiones de ejecución.
+Este documento no reemplaza las fuentes vivas del repo. Las apunta y comprime.
+Si hay conflicto, prevalecen en este orden:
+
+1. `AGENTS.md`
+2. task/spec activa
+3. arquitectura vigente + runtime/schema/codigo verificados
+4. `project_context.md` + `Handoff.md`
+5. este harness
 
 ## Cuándo usarlo
 
-- Cuando Codex va a implementar una `TASK-###`
-- Cuando el pedido del operador menciona explicitamente `TASK-###`, `[TASK-###]` o una ruta `docs/tasks/**/TASK-###-*.md`
-- Cuando el trabajo toca varios dominios o tiene blast radius medio/alto
-- Cuando se quiere un prompt único y robusto, en vez de instrucciones dispersas
+- El operador pide implementar o continuar una task formal `TASK-###`.
+- El pedido contiene `TASK-###`, `[TASK-###]` o una ruta
+  `docs/tasks/**/TASK-###-*.md`.
+- El operador usa alias slash-style de Codex:
+  - `/implement-task TASK-###`
+  - `/implement-task ###`
+  - `/task TASK-###`
+  - `/task ###`
+
+No se usa para brainstorming, reviews, mini-tasks, issues o cambios locales sin
+task formal, salvo pedido explicito del operador.
 
 ## Hook operativo TASK-*
 
-Este documento actua como **hook pre-ejecucion** para Codex sobre tasks formales:
+Antes de escribir codigo, Codex debe ejecutar:
 
-- Si el pedido del operador contiene `TASK-###`, `[TASK-###]` o apunta a un archivo `docs/tasks/**/TASK-###-*.md`, Codex debe ejecutar `pnpm codex:task-hook TASK-###` antes de escribir codigo y aplicar el prompt que imprime.
-- Si el operador dice `mantente en develop`, Codex debe usar `pnpm codex:task-hook TASK-### --develop`.
-- Es un hook **solo de Codex**. No define obligaciones automaticas para Claude, Cursor u otros agentes; esos agentes siguen sus propios entrypoints y solo deben conocer esta regla para coordinar convivencia.
-- El hook aplica solo a `TASK-*` formales. No se activa por preguntas generales, brainstorming, reviews, mini-tasks, issues o cambios locales sin `TASK-###`, salvo que el operador lo pida.
-- El hook no reemplaza el contexto vivo: primero se deben leer `AGENTS.md`, `project_context.md`, `Handoff.md`, `docs/tasks/TASK_PROCESS.md` y la task real.
-- El prompt se aplica con proporcionalidad, pero las fases de Discovery, Audit, Plan, verificacion y cierre no se omiten en tasks de implementacion.
-- Si el operador agrega una instruccion explicita como `mantente en develop`, esa instruccion overridea la branch convention del prompt. El agente debe documentar la excepcion en Audit/Plan/Handoff y no cambiar de rama.
-- Codex no debe crear `git worktree`/carpetas clon aisladas por defecto para ejecutar una task. Solo puede hacerlo si el operador lo pide o aprueba explicitamente en esa sesion. Si el checkout actual esta sucio o hay trabajo paralelo, reporta el estado y continua con cambios acotados en el checkout actual o pide confirmacion; no abras otro folder por iniciativa propia.
+```bash
+pnpm codex:task-hook TASK-###
+```
 
-Esto no es un Git hook ni un listener del runtime de Codex: el disparo sigue siendo responsabilidad del agente al detectar `TASK-###`. La parte mecanica es el comando `pnpm codex:task-hook`, que resuelve la task activa, bloquea tasks completas/bloqueadas y emite el prompt canonico ya sustituido.
+El hook tambien acepta ids numericos:
 
-## Cuándo NO usarlo literal
+```bash
+pnpm codex:task-hook 1109
+```
 
-- Tasks demasiado pequeñas y locales donde un prompt largo agregue más overhead que valor
-- Sesiones de brainstorming, diseño o revisión sin intención inmediata de implementar
+Si el operador dice `mantente en develop`, `stay on develop` o equivalente:
 
-En esos casos, usar este prompt de forma proporcional y breve.
+```bash
+pnpm codex:task-hook TASK-### --develop
+```
 
-## Mantenimiento y versionamiento
+La salida del hook sustituye el bloque `## Prompt canónico` de este documento
+con la ruta real de la task y, si aplica, la excepcion de rama.
 
-`CODEX_EXECUTION_PROMPT_V1.md` usa versionamiento por contrato operativo, no por
-cada ajuste de redacción.
+## Alias recomendado
 
-### Mantener en V1
+El operador puede escribir:
 
-Actualizar este mismo documento, sin crear una versión nueva, cuando el cambio sea
-compatible con el flujo actual:
+```text
+/implement-task 1109 mantente en develop
+```
 
-- Agregar o retirar skills recomendadas en la matriz de `SKILLS`.
-- Agregar ejemplos de lectura obligatoria o docs especializados.
-- Ajustar wording, claridad, comandos o checks sin cambiar el orden base de fases.
-- Agregar validaciones aditivas que refuercen Discovery, Audit, Plan,
-  Implementación, Verificación o Cierre.
-- Actualizar el hook mecánico `pnpm codex:task-hook` siempre que siga emitiendo el
-  prompt canónico y mantenga el mismo trigger `TASK-*` para Codex.
+Codex debe interpretarlo como:
 
-### Crear V2
-
-Crear `docs/operations/CODEX_EXECUTION_PROMPT_V2.md` y actualizar los entrypoints
-cuando cambie el contrato de ejecución de forma estructural:
-
-- Cambia el trigger del hook o deja de ser solo `TASK-*` para Codex.
-- Cambia el orden o la obligatoriedad de fases.
-- Cambia el formato requerido de Audit, Connections Map, Plan o cierre.
-- Cambia la política de branch/checkpoint/ownership/worktrees.
-- Cambia el modelo de skill routing o subagentes de manera no compatible.
-- Cambia qué documentos del repo prevalecen como source of truth.
-
-### Mantenimiento obligatorio
-
-Todo cambio a este prompt debe:
-
-- Actualizar `.codex/skills/greenhouse-task-execution-hook/SKILL.md` si cambia el
-  comando, trigger o comportamiento esperado del hook.
-- Actualizar `AGENTS.md`, `project_context.md`, `Handoff.md` y `changelog.md`
-  cuando el cambio afecte un contrato vigente para Codex.
-- Actualizar `CLAUDE.md` solo como awareness de convivencia cuando corresponda;
-  no convertir este hook en obligación de Claude/Cursor.
-- Correr `pnpm codex:task-hook TASK-### --prompt-only` contra una task activa como
-  smoke del prompt sustituido.
-- Correr `pnpm docs:closure-check`, `pnpm docs:context-check` y `git diff --check`.
+```bash
+pnpm codex:task-hook 1109 --develop
+```
 
 ## Prompt canónico
 
 ```md
 Vas a implementar la task **[TASK-###]** ubicada en `docs/tasks/{to-do,in-progress}/TASK-###-*.md` dentro del repo `greenhouse-eo`.
 
-Tu objetivo es ejecutar la task de forma **canónica, reusable, segura, resiliente y alineada con el estado real del repo**. No basta con “hacer que funcione”: debes respetar arquitectura, runtime, documentación viva, contratos existentes y blast radius del ecosistema Greenhouse.
+Objetivo: ejecutar la task de forma canónica, local-first, reusable, segura, resiliente y alineada con el estado real del repo. No basta con que "funcione"; debes respetar arquitectura, runtime, documentación viva, contratos existentes, blast radius y cierre operacional.
 
-Greenhouse no quiere parches fragiles por defecto. Debes aplicar `docs/operations/SOLUTION_QUALITY_OPERATING_MODEL_V1.md`: corrige causa raiz, reutiliza primitives canonicas, agrega defensa/regresion cuando aplique y documenta cualquier workaround como temporal, reversible y con condicion de retiro.
+FUENTES VIVAS
 
-No asumas que la spec está perfecta. Primero debes contrastarla contra:
-- el código real
-- la arquitectura vigente
-- el schema/runtime actual
-- la documentación viva
-
-Si la spec tiene `## Open Questions`, resuélvelas **antes de implementar** con la opción más robusta, segura, resiliente y escalable. No elijas bandaids. Documenta cada decisión y su rationale antes de FASE 1. Si alguna open question es bloqueante, detente y repórtalo.
-
--------------------------------------------------------------------------------
-SOURCE OF TRUTH
--------------------------------------------------------------------------------
-
-Si hay conflicto entre:
-1. la task
-2. la arquitectura/documentación vigente
-3. el runtime/código/schema real
-
-prevalece **arquitectura + runtime real**. Luego corrige la task o la documentación correspondiente.
-
--------------------------------------------------------------------------------
-ESTADO DE LA TASK
--------------------------------------------------------------------------------
-
-Si la task ya está en `in-progress/`:
-- lee el archivo
-- lee `Handoff.md`
-- busca branch/contexto existente
-- si Discovery / Audit / Plan ya fueron hechos y siguen vigentes, **no los repitas**
-- continúa desde el primer slice incompleto
-- solo rehace fases si detectas drift real desde la última sesión:
-  - commits nuevos relevantes
-  - schema/runtime cambiado
-  - docs actualizadas
-  - task movida o redefinida
-
-Si la task está en `to-do/`:
-- antes de cualquier implementación, verifica si alguien más la está trabajando
-- revisa PRs, branches y handoff
-- si está libre:
-  - mueve la task a `in-progress/`
-  - cambia `Lifecycle` a `in-progress`
-  - sincroniza `docs/tasks/README.md`
-  - crea branch `task/TASK-###-short-slug`, salvo instrucción explícita del operador de mantenerse en otra rama
-  - deja nota en `Handoff.md`
-
-Si el operador pide `mantente en develop` o una excepcion de rama equivalente:
-- no cambies de rama
-- verifica ownership y worktree con mas cuidado
-- registra la excepcion en Audit/Plan/Handoff
-- no hagas push a `develop` como cierre automatico sin confirmacion humana
-
-Regla anti-basura de filesystem:
-- no crees `git worktree` ni carpetas clon aisladas por iniciativa propia
-- solo usa worktree si el operador lo pide o aprueba explicitamente en esta sesion
-- si el checkout actual esta sucio, lista los cambios relevantes y trabaja alrededor de ellos sin revertirlos, o pide confirmacion si bloquean la task
-- si por excepcion aprobada creas un worktree, debes retirarlo y borrar su branch temporal antes de cerrar, salvo que el operador pida conservarlo
-
-No trabajes en paralelo sobre una task que ya tiene ownership activo no resuelto.
-
--------------------------------------------------------------------------------
-PRINCIPIOS OPERATIVOS
--------------------------------------------------------------------------------
-
-1. Reutiliza antes de crear.
-2. Corrige causa raiz antes que sintomas locales; no entregues workarounds permanentes.
-3. No implementes sobre supuestos no verificados.
-4. Si la spec está desactualizada:
-   - si el drift es bloqueante o cambia contrato, corrígela primero
-   - si no es bloqueante, documéntalo en Audit y sigue
-5. Si el cambio toca acceso, documenta explícitamente qué vive en:
-   - `routeGroups`
-   - `views` / `authorizedViews` / `view_code`
-   - `entitlements`
-   - `startup policy`
-6. Si el cambio toca UI visible, respeta `DESIGN.md`.
-7. Si el cambio toca backend/data/runtime, usa primitives canónicas del repo; no inventes paths paralelos.
-8. Si existe una auditoría relevante en `docs/audits/`, úsala como input, pero revalídala.
-9. Usa skills reales del entorno cuando el trabajo lo justifique.
-10. Usa subagentes solo cuando haya trabajo independiente, no bloqueante y con ownership claro.
-11. No mezcles refactor grande con fix funcional chico sin necesidad real.
-12. No reviertas cambios ajenos del worktree.
-
--------------------------------------------------------------------------------
-PROPORCIONALIDAD
--------------------------------------------------------------------------------
-
-Aplica este protocolo con intensidad proporcional al tamaño y riesgo de la task:
-
-- Task pequeña/local/bajo riesgo:
-  - Discovery, Audit y Plan pueden ser breves, pero no se omiten.
-- Task cross-domain, shared runtime, acceso, migraciones, observabilidad o UI visible:
-  - aplica el protocolo completo.
-- Task sensible (finance, payroll, auth, billing, cloud, data, production):
-  - asume rigor alto aunque el diff sea pequeño.
-
-No generes burocracia innecesaria, pero no saltes verificación esencial.
-
--------------------------------------------------------------------------------
-LECTURA OBLIGATORIA
--------------------------------------------------------------------------------
-
-Lee siempre:
+Lee primero, con proporcionalidad:
 - `AGENTS.md`
 - `project_context.md`
 - `Handoff.md`
 - `docs/operations/CONTEXT_HANDOFF_OPERATING_MODEL_V1.md`
-- `DESIGN.md`
 - `docs/tasks/TASK_PROCESS.md`
 - la spec completa de la task
-- `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
-- `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md`
+- arquitectura del dominio afectado
+- `DESIGN.md` si toca UI visible
+- `docs/context/00_INDEX.md` y docs aplicables si toca producto, copy, naming, métricas, onboarding, cliente, GTM, HubSpot/Account 360 o marca
 
-Además, lee toda arquitectura especializada aplicable al dominio.
+Si la task toca arquitectura compartida, schema, access, auth, finance/payroll/accounting, events/outbox, APIs externas, cloud/deploy/secrets, UI platform o runtime projections compartidas, identifica la ADR/doc canónica antes de implementar.
 
-Ejemplos frecuentes:
-- acceso / permisos / navegación:
-  - `docs/architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md`
-  - `docs/architecture/GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md`
-- datos / sync / postgres / bigquery:
-  - `docs/architecture/GREENHOUSE_DATA_MODEL_MASTER_V1.md`
-  - `docs/architecture/GREENHOUSE_POSTGRES_ACCESS_MODEL_V1.md`
-  - `docs/architecture/GREENHOUSE_POSTGRES_CANONICAL_360_V1.md`
-- cloud / reliability / billing / AI:
-  - `docs/architecture/GREENHOUSE_BILLING_EXPORT_OBSERVABILITY_V1.md`
-  - `docs/architecture/GREENHOUSE_RELIABILITY_CONTROL_PLANE_V1.md`
+SOURCE OF TRUTH
 
-Si la task toca schema o DDL, revisa también:
-- `docs/architecture/schema-snapshot-baseline.sql`
-- `migrations/`
-- `scripts/migrate.ts`
-- `scripts/pg-connect.sh`
+Si hay conflicto entre task/spec, documentación y runtime real, prevalece arquitectura vigente + código/schema/runtime verificados. Corrige o anota el drift antes de implementar si cambia contrato o bloquea.
 
--------------------------------------------------------------------------------
-SKILLS
--------------------------------------------------------------------------------
+MODO DE RAMA / WORKTREE
 
-Debes usar los skills reales disponibles en esta sesión cuando el trabajo claramente matchee su dominio.
+- No cambies de rama por iniciativa propia.
+- No crees `git worktree` ni carpetas clon por iniciativa propia.
+- Si el operador pide `mantente en develop`, no cambies de rama y documenta la excepción en Audit/Plan/Handoff.
+- Si la task declara otra branch o parece haber ownership activo, verifica `git status --short`, PRs/branches/handoff y decide con cuidado. Pide confirmación solo si el estado bloquea avanzar sin pisar trabajo ajeno.
+- No hagas push a `develop` ni a ramas remotas como cierre automático sin instrucción explícita.
 
-Reglas:
-- usa el conjunto mínimo de skills que cubra la task
-- no cargues skills porque sí
-- usa skills para escribir o decidir implementación, no para lectura superficial
-- si delegas, el subagente usa el skill al inicio de su subtarea relevante
+INTAKE DE TASK
 
-Guía práctica:
-- backend / TS / helpers / routes / dominio Greenhouse:
-  - `greenhouse-agent`
-- Next.js App Router / handlers / layouts / server components:
-  - `greenhouse-agent` + `vercel:nextjs`
-- UI / pages / views:
-  - `greenhouse-agent` + `greenhouse-ui-orchestrator`
-- UI compleja sobre Vuexy/MUI:
-  - sumar `greenhouse-vuexy-ui-expert` o `greenhouse-portal-ui-implementer`
-- copy user-facing:
-  - sumar `greenhouse-ux-content-accessibility`
-- task/spec/brief:
-  - `greenhouse-task-planner`
-- diseño estructural UI:
-  - `modern-ui-architect` si realmente aplica
-- seguridad:
-  - `codex-security:*` si la task es explícitamente de hardening/seguridad
+Si la task está en `in-progress/`:
+- Lee la task y `Handoff.md`.
+- Busca contexto previo en commits, PRs, branches y notas recientes.
+- No repitas Discovery/Audit/Plan si ya existen y siguen vigentes.
+- Continúa desde el primer slice incompleto.
+- Rehaz fases solo si detectas drift real: commits relevantes nuevos, schema/runtime cambiado, docs actualizadas o task redefinida.
 
-Si vas a usar un skill, dilo brevemente antes de aplicarlo.
+Si la task está en `to-do/`:
+- Verifica ownership activo antes de implementar.
+- Si está libre, mueve a `in-progress/`, ajusta `Lifecycle`, sincroniza `docs/tasks/README.md` y deja nota breve en `Handoff.md`.
+- Mantén la rama actual salvo instrucción explícita distinta.
 
--------------------------------------------------------------------------------
-SUBAGENTES
--------------------------------------------------------------------------------
+OPEN QUESTIONS
 
-Usa subagentes cuando haya trabajo independiente y paralelizable.
+Si la spec tiene `## Open Questions`, resuélvelas antes de implementar con la opción más robusta, segura, resiliente y escalable. Documenta resolución y rationale. Si una pregunta es bloqueante, detente y repórtalo.
 
-Úsalos para:
-- explorar varios módulos en paralelo
-- revisar schema/runtime mientras otro agente revisa docs
-- implementar slices con write-scope separado
-- verificar riesgos o tests mientras avanzas en otra parte
+DISCOVERY READ-ONLY
 
-No los uses para:
-- delegar el paso crítico inmediato del que depende tu siguiente acción
-- duplicar trabajo ya delegado
-- repartir los mismos archivos entre varios agentes
-- crear agentes vagos sin ownership claro
+Antes de escribir código:
+- Explora `src/`, `migrations/`, `scripts/`, `services/`, `docs/`, tests, lint rules, signals, capabilities, workers y components/views existentes.
+- Reutiliza primitives/helpers/readers/commands existentes antes de crear nuevos.
+- Si toca Postgres, revisa schema real y usa `pnpm pg:doctor` / `pnpm pg:connect` / `pnpm pg:connect:migrate` según aplique.
+- Si la causa raíz vive en Vercel, GCP, Azure, GitHub, Postgres operativo, HubSpot, Teams, Sentry u otra plataforma con CLI autenticada, usa el CLI con guardrails y verifica.
 
-Cada subagente debe tener:
-- objetivo exacto
-- alcance acotado
-- ownership de archivos o pregunta concreta
-- instrucción explícita de no revertir trabajo ajeno
+AUDIT
 
-Si la task es simple o altamente acoplada, trabaja secuencialmente.
-
--------------------------------------------------------------------------------
-BUDGET GUARDRAIL
--------------------------------------------------------------------------------
-
-Detente y reporta antes de seguir si ocurre cualquiera de estas condiciones:
-- llevas más de 3 slices sin commit del primero
-- rehiciste Discovery por segunda vez
-- 3+ subagentes fallaron consecutivamente sobre el mismo problema
-- sigues encontrando drift estructural que empuja scope creep
-
-Probable causa:
-- supuesto roto
-- scope creep
-- falta input humano
-- contrato upstream incompleto
-
-No sigas escribiendo código hasta resolverlo.
-
--------------------------------------------------------------------------------
-FASE 1 — DISCOVERY
--------------------------------------------------------------------------------
-
-No escribas código todavía.
-
-1. Lee la spec completa.
-2. Lee la lectura obligatoria.
-3. Explora `src/`, `migrations/`, `scripts/`, `services/` y `docs/` para encontrar:
-   - APIs
-   - helpers
-   - migrations
-   - tests
-   - lint rules
-   - signals
-   - capabilities
-   - workers
-   - components/views existentes
-4. Verifica schema/runtime real:
-   - revisa `schema-snapshot-baseline.sql`
-   - revisa `src/types/db.d.ts`
-   - si toca Postgres, corre `pnpm pg:doctor`
-   - si necesitas conectividad local, usa `pnpm pg:connect` / `pnpm pg:connect:migrate`
-5. Si hay remediation/backfill o incidentes runtime:
-   - verifica datos vivos cuando aplique
-   - usa `pnpm staging:request <path>` y/o herramientas DB/CLI canónicas
-6. Si el fix real vive fuera del código (GCP, Azure, Vercel, GitHub, Postgres operativo), usa las CLIs autenticadas disponibles cuando aplique.
-7. Resuelve `Open Questions` con la opción más robusta y documenta la decisión.
-8. Si una question es bloqueante, detente.
-
--------------------------------------------------------------------------------
-FASE 2 — AUDIT
--------------------------------------------------------------------------------
-
-Antes de seguir, presenta exactamente este bloque:
+Antes de implementar, presenta un bloque breve:
 
 === AUDIT: [TASK ID] ===
-
 SUPUESTOS CORRECTOS:
 - ...
-
 SUPUESTOS DESACTUALIZADOS:
-- spec dice X, realidad es Y (verificado en [path]) → acción
-
+- spec dice X, realidad Y (verificado en path/runtime) → acción
 ARQUITECTURA / DOCS OBLIGATORIOS:
-- [doc] → [por qué aplica]
-
+- doc → por qué aplica
 CÓDIGO EXISTENTE PARA REUTILIZAR:
-- [qué] → [path:linea si sirve]
-
+- path/helper/primitive → uso
 SCHEMA / RUNTIME REAL:
-- [tabla / helper / route / worker / view] → [path]
-
+- tabla/view/route/worker/signal → evidencia
 ACCESS MODEL:
-[solo si aplica]
-- routeGroups: ...
-- views: ...
-- entitlements: ...
-- startup policy: ...
-- decisión de diseño: ...
-
+- solo si aplica: routeGroups, views/view_code, entitlements/capabilities, startup policy
 SKILLS A USAR:
-- [skill] → [para qué]
-
+- skill → para qué
 SUBAGENTES:
-- [si/no] + [por qué]
-
-DEPENDENCIAS FALTANTES:
-- ...
-
+- sí/no + por qué
 RIESGOS / BLAST RADIUS:
 - ...
-
 OPEN QUESTIONS RESUELTAS:
-- [Q → resolución → rationale]
-
+- Q → resolución → rationale
 ===
 
-Reglas:
-- drift cosmético/no bloqueante: documenta y sigue
-- drift bloqueante o cambio de contrato: corrige la spec primero
-- bloqueo real: detente y reporta
+MAPA DE CONEXIONES
 
--------------------------------------------------------------------------------
-FASE 3 — MAPA DE CONEXIONES
--------------------------------------------------------------------------------
-
-Antes de implementar, levanta un mapa explícito de integración cuando la task no sea puramente local.
-
-Documenta lo que aplique:
-- eventos salientes: este módulo emite → quién consume
-- eventos entrantes: quién emite → este módulo consume
-- foreign keys / joins / views / projections compartidas
-- readers / helpers / services reutilizables
-- tablas / schemas / materializaciones relacionadas
-- rutas / views / guards / capabilities afectadas
-- jobs / cron / ops-worker / cloud run / webhooks relacionados
-- reliability signals impactados
+Si la task no es puramente local, documenta lo aplicable:
+- eventos salientes/entrantes
+- FKs, joins, views, projections, materializaciones
+- readers/helpers/services compartidos
+- rutas, guards, capabilities, view codes
+- jobs, cron, workers, webhooks, Cloud Run
+- reliability signals y observabilidad
 - surfaces UI consumidoras
-- tests transversales que debes extender o no romper
+- tests transversales que deben extenderse o no romperse
 
-Si hay más de dos módulos relevantes, puedes usar subagentes para levantar este mapa en paralelo.
+PLAN
 
--------------------------------------------------------------------------------
-FASE 4 — PLAN
--------------------------------------------------------------------------------
-
-Antes de implementar, presenta un plan ordenado slice por slice con esta estructura:
-
-1. Migraciones
+Antes de implementar, presenta un plan slice-by-slice proporcional. Orden sugerido:
+1. Migraciones / schema
 2. Tipos / contratos
-3. Queries / readers / helpers
+3. Readers / helpers / commands
 4. API routes / handlers / workers
 5. Events / publishers / consumers
-6. Reliability signals / observability / lint rules
+6. Reliability / observabilidad / lint rules
 7. UI / views / pages
 8. Docs / handoff / changelog / arquitectura
 9. Verificación
 
-Para cada item nuevo:
-- explica por qué no existe uno reutilizable
-- indica qué archivos toca
-- indica qué skill(s) usarás
-- indica dependencias
-- indica si requiere subagente o no
+Para cada slice nuevo, explica qué reutilizas, qué archivos toca, skills aplicables, dependencias y si requiere subagente. Para P0/P1 o blast radius alto, detente al final del plan para checkpoint humano si corresponde.
 
-Si la task toca acceso, agrega:
-ACCESS MODEL DECISION:
-- `routeGroups`: ...
-- `views`: ...
-- `entitlements`: ...
-- `startup policy`: ...
+SKILLS
 
-Si la task es P0/P1 o de blast radius alto, detente al final del plan para checkpoint humano si corresponde al flujo del equipo.
+Usa el conjunto mínimo de skills reales disponibles. Cárgalas antes de tomar decisiones de implementación del dominio, no como checklist decorativo.
 
--------------------------------------------------------------------------------
-FASE 5 — IMPLEMENTACIÓN
--------------------------------------------------------------------------------
+Guía Codex vigente:
+- Backend / TS / rutas / dominio Greenhouse: `greenhouse-agent`
+- Task/spec/planning: `greenhouse-task-planner`
+- UI visible o platform UI: `greenhouse-ui-orchestrator` +, según dominio, `greenhouse-product-ui-architect`, `greenhouse-portal-ui-implementer`, `greenhouse-vuexy-ui-expert`
+- Copy visible / aria / labels / empty states: `greenhouse-ux-content-accessibility`
+- Browser/runtime diagnostics de rutas: `greenhouse-browser-diagnostics`
+- QA final no trivial: `greenhouse-qa-release-auditor`
+- Cierre documental: `greenhouse-documentation-governor`
+- Finance/accounting: `greenhouse-finance-accounting-operator`
+- Payroll: `greenhouse-payroll-auditor`
+- Secrets: `greenhouse-secret-hygiene`
+- Release/production: `greenhouse-production-release`
+- Arquitectura estructural: `software-architect-2026`
+- Seguridad: skills `codex-security:*` solo si el trabajo realmente es security/hardening
 
-Implementa slice por slice.
+IMPLEMENTACIÓN
 
-Reglas críticas:
-- reutilizar > crear
-- no inventes helpers/readers/components/rutas si ya existe una primitive canónica
-- mantén tenant/scope isolation según el dominio real
-  - no fuerces `space_id` si el contrato usa `organization_id`, `client_id`, scope híbrido o `__platform__`
-- no calcules métricas inline si ya existe materialización o reader canónico
-- respeta schema-per-domain (`greenhouse_core`, `greenhouse_finance`, `greenhouse_payroll`, etc.)
-- `views` y `entitlements` no son lo mismo
-- si tocas archivos sensibles/globales, refléjalo en `Handoff.md`
-- no reviertas cambios ajenos
+- Reutiliza antes de crear.
+- Corrige causa raíz; workarounds solo temporales, reversibles, documentados y con condición de retiro.
+- No reviertas cambios ajenos.
+- No mezcles refactor grande con fix funcional chico sin necesidad real.
+- No inventes helpers/readers/components/routes paralelos si existe primitive canónica.
+- Mantén aislamiento tenant/scope según el dominio real.
+- No calcules métricas inline si existe materialización/reader canónico.
+- No crees `new Pool()`.
+- No leas secretos DB directo desde código nuevo.
+- Migraciones: crea con `pnpm migrate:create <slug>`; no fabriques nombres a mano.
+- Copy reusable vive en `src/lib/copy/*` o nomenclatura canónica; no hardcodees copy reutilizable en JSX.
+- UI visible: aplica `DESIGN.md`, primitive lookup, token mapping y GVC (`pnpm fe:capture`) con revisión visual real.
+- Acciones destructivas o blast radius alto: confirma antes.
 
-Reglas DB:
-- usa primitives canónicas del repo (`getDb`, `query`, `withTransaction`, Kysely o helper existente según la zona)
-- nunca crees `new Pool()`
-- nunca leas secrets DB directo desde código nuevo
-- migraciones:
-  - siempre crea con `pnpm migrate:create <slug>`
-  - nunca fabriques migraciones a mano
-- si necesitas DB local:
-  - usa `pnpm pg:doctor`
-  - usa `pnpm pg:connect`, `pnpm pg:connect:migrate` o `pnpm migrate:up` según corresponda
+VALIDACIÓN
 
-Reglas de métricas / reliability / events:
-- signals determinísticos primero, IA después
-- outbox events versionados y documentados si aplica
-- si agregas lint rules o reliability signals, define steady state, severity rule y evidence concreta
-
-Reglas UI:
-- usa `DESIGN.md` como contrato visual
-- baseline actual: `Poppins` + `Geist Sans`
-- no reintroduzcas `DM Sans` o `Inter` como baseline general
-- reutiliza shells, cards, tables, empty states y patterns existentes
-- copy visible debe pasar por criterio de `greenhouse-ux-content-accessibility`
-
-Si descubres que la causa raíz vive fuera del código, usa las CLIs autenticadas disponibles cuando aplique y verifica después.
-
-Por slice:
-- implementa atómicamente
-- valida el slice
-- commit
-- avanza al siguiente solo cuando esté sano
-
--------------------------------------------------------------------------------
-FASE 6 — VERIFICACIÓN
--------------------------------------------------------------------------------
-
-Antes de cerrar, ejecuta lo que aplique:
-
+Ejecuta lo proporcional al cambio:
+- Focal tests/lint del slice
+- `pnpm local:check`
 - `pnpm lint`
-- `pnpm tsc --noEmit`
+- `pnpm exec tsc --noEmit`
 - `pnpm test`
 - `pnpm build`
 - `pnpm pg:doctor`
-- validación manual o preview si hay UI
-- verificación específica de la task
-- comprobación de steady state si agregaste signals o remediaciones
+- `pnpm ops:lint --changed` si tocaste tasks/epics/mini-tasks
+- `pnpm qa:gates --changed` + skill `greenhouse-qa-release-auditor` antes de cerrar implementaciones no triviales
+- UI: `pnpm fe:capture ...` y revisar frames PNG
+- Docs/operating contracts: `pnpm docs:closure-check` y, si cambió contexto/handoff, `pnpm docs:context-check`
 
-Si hubo migraciones:
-- crea la migración con `pnpm migrate:create`
-- aplica/verifica con el flujo correcto
-- commitea juntos migración + tipos/regenerados si corresponde
+Si no puedes ejecutar una validación razonable, dilo con causa concreta y riesgo residual.
 
-Si hubo cambios visibles o contractuales:
-- actualiza docs vivas aplicables:
-  - `Handoff.md`
-  - `project_context.md` si cambió el contrato del repo
-  - `changelog.md` si cambió comportamiento/flujo/protocolo
-  - docs de arquitectura, documentación funcional o manuales si aplica
+CIERRE
 
--------------------------------------------------------------------------------
-CIERRE OBLIGATORIO
--------------------------------------------------------------------------------
+No declares la task completa si falta rollout real: flags/env vars, redeploy, migración aplicada, backfill, provisioning externo, cron/webhook/worker, secret, recuperación de datos o verificación runtime. Usa `code complete, rollout pendiente` u `operativamente bloqueado` cuando corresponda.
 
-No declares la task cerrada sin dejar explícito:
-- qué cambió
-- qué reutilizaste
-- qué validaste
-- qué no pudiste validar
-- riesgos o follow-ups
-- qué docs actualizaste
-- cualquier drift detectado entre spec y repo
-
-Si la task exige workflow completo:
-- sincroniza `Lifecycle`
-- mueve el archivo a la carpeta correcta
-- sincroniza `docs/tasks/README.md`
-- actualiza `Handoff.md`
-- crea PR o sigue el flujo acordado
-- no reportes “completada” mientras siga en `in-progress/`
-
--------------------------------------------------------------------------------
-FORMATO DE CIERRE
--------------------------------------------------------------------------------
-
-Al terminar, resume:
-1. slices entregados
-2. tests/validaciones ejecutadas
-3. migraciones / capabilities / events / signals nuevos
-4. docs actualizadas
-5. riesgos / follow-ups
-6. próximo paso
+Antes de cerrar:
+- Resume qué cambió y qué reutilizaste.
+- Lista validaciones ejecutadas y no ejecutadas.
+- Lista migrations/capabilities/events/signals nuevos si existen.
+- Lista docs actualizadas.
+- Documenta drift detectado, riesgos y follow-ups.
+- Sincroniza lifecycle/carpeta/README de la task solo si el estado real lo justifica.
+- Actualiza `Handoff.md` con continuidad útil.
 ```
 
-## Notas de uso
+## Protocolo de actualización continua
 
-- Este prompt es deliberadamente riguroso para tasks medianas/grandes.
-- En tasks pequeñas, aplicar el mismo flujo de forma proporcional.
-- El prompt presupone que `AGENTS.md`, `project_context.md`, `Handoff.md` y la spec de la task siguen siendo las fuentes primarias del repo; si cambian, este documento debe actualizarse.
+Este harness debe actualizarse como parte del mismo cambio cuando se modifique
+cualquier contrato que él menciona o comprime.
+
+### Triggers de actualización
+
+Revisar y, si aplica, actualizar este documento cuando cambie cualquiera de:
+
+- `AGENTS.md` o la sección TASK/hook de `CLAUDE.md`.
+- `.codex/skills/greenhouse-task-execution-hook/SKILL.md`.
+- `scripts/codex-task-hook.mjs`.
+- `.claude/commands/implement-task.md` cuando el cambio sea de convivencia
+  cross-agent.
+- `docs/tasks/TASK_PROCESS.md`.
+- `docs/operations/LOCAL_FIRST_DEVELOPMENT_WORKFLOW_V1.md`.
+- `docs/operations/SOLUTION_QUALITY_OPERATING_MODEL_V1.md`.
+- `docs/operations/DOCUMENTATION_OPERATING_MODEL_V1.md`.
+- package scripts usados como gates (`docs:closure-check`, `docs:context-check`,
+  `ops:lint`, `qa:gates`, `fe:capture`, `local:check`, `pg:doctor`, etc.).
+- Inventario o nombre de skills Greenhouse que este harness referencia.
+
+### Drift control mecánico
+
+Después de cambiar este harness, el hook, skills de task o entrypoints de agentes,
+correr:
+
+```bash
+pnpm codex:task-hook:check
+pnpm codex:task-hook 1109 --develop --prompt-only
+pnpm docs:closure-check
+pnpm docs:context-check
+git diff --check
+```
+
+El `TASK-1109` es solo un smoke estable mientras siga activo. Si se completa,
+usar cualquier task activa no bloqueada.
+
+### Versionamiento
+
+Mantener V1 cuando el cambio sea compatible:
+
+- alias nuevos que sigan resolviendo al mismo hook `TASK-*`
+- ajustes de redacción
+- matriz de skills
+- checks aditivos
+- protocolo de mantenimiento
+- mejoras del script de smoke
+
+Crear `CODEX_EXECUTION_PROMPT_V2.md` si cambia algo estructural:
+
+- orden u obligatoriedad de fases
+- source-of-truth precedence
+- política de branch/worktree/push
+- formato obligatorio de Audit/Plan/Cierre
+- trigger deja de ser `TASK-*`
+- modelo de ejecución deja de ser Codex-only
+
+### Regla de cierre documental
+
+Todo cambio a este harness debe sincronizar, con deltas breves:
+
+- `.codex/skills/greenhouse-task-execution-hook/SKILL.md` si cambia trigger,
+  comando o comportamiento pre-ejecución.
+- `AGENTS.md` y `project_context.md` si cambia una regla vigente para Codex.
+- `CLAUDE.md` solo como awareness de convivencia cuando corresponda.
+- `Handoff.md` y `changelog.md` si cambia el contrato operativo.
+
+No duplicar el prompt completo en otros archivos. Este documento es la fuente
+canónica del harness Codex; los demás entrypoints deben enlazar o resumir.
+
+## Notas
+
+- Este prompt es intencionalmente más corto que las reglas completas del repo.
+- La seguridad viene de leer las fuentes vivas, no de congelar todo en este
+  archivo.
+- En tasks pequeñas, aplica el flujo de forma breve; no omitas Discovery, Audit,
+  Plan, verificación ni cierre.

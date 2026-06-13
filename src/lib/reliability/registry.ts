@@ -523,6 +523,26 @@ export const STATIC_RELIABILITY_REGISTRY: ReliabilityModuleDefinition[] = [
     ],
     expectedSignalKinds: ['lag', 'drift', 'data_quality', 'incident'],
     incidentDomainTag: 'documents'
+  },
+  {
+    moduleKey: 'knowledge',
+    label: 'Knowledge Platform',
+    description:
+      'Corpus de conocimiento gobernado (TASK-1081 schema + TASK-1082 ingesta): documentos prosa + chunks para la capa humana + retrieval agéntico (Nexa/MCP) con citas. Notion = authoring; Greenhouse = runtime publicado/versionado. Ingesta source-agnostic (connector repo_docs; Notion diferido a TASK-1088) con sanitize→quarantine antes de chunkear. Dos dimensiones ortogonales: publication_status y agentic_policy.',
+    domain: 'platform',
+    routes: [{ path: '/knowledge', label: 'Knowledge Center (futuro, TASK-1084)' }],
+    apis: [{ path: '/api/platform/app/knowledge/search', label: 'Knowledge search (futuro, TASK-1083)' }],
+    dependencies: [
+      'greenhouse_knowledge.knowledge_sources',
+      'greenhouse_knowledge.knowledge_documents',
+      'greenhouse_knowledge.knowledge_document_versions',
+      'greenhouse_knowledge.knowledge_chunks',
+      'greenhouse_knowledge.knowledge_publication_runs'
+    ],
+    smokeTests: [],
+    filesOwned: ['src/lib/knowledge/**', 'src/lib/reliability/queries/knowledge-*.ts'],
+    expectedSignalKinds: ['data_quality', 'freshness', 'dead_letter', 'incident'],
+    incidentDomainTag: 'knowledge'
   }
 ]
 

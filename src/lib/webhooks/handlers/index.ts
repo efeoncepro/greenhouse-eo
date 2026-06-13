@@ -22,6 +22,9 @@ export async function ensureHandlersRegistered() {
   // Dispatch cascade: signature_requests aggregate (TASK-490) priority, MSA legacy fallback.
   // Replaces the removed one-off route src/app/api/webhooks/zapsign/route.ts.
   await import('./zapsign')
+  // TASK-1094 — Notion Knowledge auto-ingest webhook (endpoint /api/webhooks/notion-knowledge,
+  // secret propio, gated por kill-switch NOTION_KNOWLEDGE_WEBHOOK_ENABLED default OFF).
+  await import('./notion-knowledge')
 
   // Future handlers imported here
   registered = true

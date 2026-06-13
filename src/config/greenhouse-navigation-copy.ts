@@ -87,7 +87,8 @@ const enUS: NavigationCopy = {
     adminTalentReview: { label: 'Talent verification', subtitle: 'Skills, tools and certifications pending review' },
     adminTalentOps: { label: 'Talent health', subtitle: 'System metrics and maintenance' },
     adminIdentityAccess: { label: 'Identity and access', subtitle: 'Users, roles, views and accounts' },
-    adminTeamOps: { label: 'Team and operations', subtitle: 'Talent, business lines and instruments' }
+    adminTeamOps: { label: 'Team and operations', subtitle: 'Talent, business lines and instruments' },
+    knowledge: { label: 'Knowledge', subtitle: 'Guides, sources and operational memory' }
   },
   people: {
     people: { label: 'People', subtitle: 'Operational view of the Efeonce team' }

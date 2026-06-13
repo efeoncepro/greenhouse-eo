@@ -205,6 +205,10 @@ export const AGGREGATE_TYPES = {
   // payload.metadata.demo_mode boolean + payload.workspaceId.
   notionTask: 'notion_task',
 
+  // TASK-1094 — Knowledge auto-ingest desde webhook Notion. Aggregate identity =
+  // el page id Notion del artículo/página que cambió.
+  knowledgeNotionPage: 'knowledge_notion_page',
+
   // TASK-992 — Client Lifecycle Orchestrator (GREENHOUSE_CLIENT_LIFECYCLE_V1).
   // Aggregate identity = caseId ('clc-{uuid}').
   clientLifecycleCase: 'client_lifecycle_case',
@@ -983,6 +987,14 @@ export const EVENT_TYPES = {
   // el consumer productivo lo procesa (filtra !==true). Tablas físicamente
   // separadas (task_status_transitions vs task_status_transitions_demo).
   notionTaskPageChangeSignal: 'notion.task.page_change_signal',
+
+  // TASK-1094 — Knowledge auto-ingest. Trigger ligero emitido por el webhook
+  // `notion-knowledge` cuando un artículo/página de una Wiki declarada cambia o se
+  // borra. NO confiable como source of truth: el consumer `knowledge-notion-ingest`
+  // re-fetchea la página (gate de gobernanza + re-ingest idempotente | deprecación).
+  // payload v1: { schemaVersion, pageId, notionEventType, isDeletion, parentId,
+  // sourceEventId, occurredAt }.
+  knowledgeNotionPageChangeSignal: 'knowledge.notion.page_change_signal',
 
   // TASK-992 — Client Lifecycle Orchestrator (GREENHOUSE_CLIENT_LIFECYCLE_V1 §10).
   // aggregate_type = client_lifecycle_case, aggregate_id = caseId.

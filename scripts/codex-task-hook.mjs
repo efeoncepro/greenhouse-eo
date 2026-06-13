@@ -5,6 +5,7 @@ import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs'
 import { basename, join, relative, resolve } from 'node:path'
 
 const TASK_ID_PATTERN = /TASK-\d{3,}(?:\.\d+)?(?!\d)/
+const BARE_TASK_ID_PATTERN = /^\d{3,}(?:\.\d+)?$/
 const TASK_DIRS = ['to-do', 'in-progress', 'complete']
 
 const options = parseArgs(process.argv.slice(2))
@@ -103,6 +104,7 @@ function printHelp() {
 
 Usage:
   pnpm codex:task-hook TASK-1033
+  pnpm codex:task-hook 1033
   pnpm codex:task-hook docs/tasks/to-do/TASK-1033-greenhouse-floating-surface-primitive.md
   pnpm codex:task-hook TASK-1033 --develop
 
@@ -120,10 +122,11 @@ function resolveTask(repoRoot, taskRef) {
     return readTask(repoRoot, directPath)
   }
 
-  const idMatch = taskRef.match(TASK_ID_PATTERN)
+  const normalizedTaskRef = BARE_TASK_ID_PATTERN.test(taskRef) ? `TASK-${taskRef}` : taskRef
+  const idMatch = normalizedTaskRef.match(TASK_ID_PATTERN)
 
   if (!idMatch) {
-    throw new Error(`Invalid TASK ref "${taskRef}". Expected TASK-### or a task markdown path.`)
+    throw new Error(`Invalid TASK ref "${taskRef}". Expected TASK-###, bare ###, or a task markdown path.`)
   }
 
   const taskId = idMatch[0]

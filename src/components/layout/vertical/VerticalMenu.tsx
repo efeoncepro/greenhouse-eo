@@ -781,6 +781,15 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
     }
   }
 
+  // ── Knowledge (standalone — cross-cutting INTERNAL resource) ──
+  if (canSeeView('plataforma.knowledge', false)) {
+    menuData.push({
+      label: nl(GH_INTERNAL_NAV.knowledge),
+      href: '/knowledge',
+      icon: 'tabler-books'
+    })
+  }
+
   // ── Design System (standalone — cross-cutting INTERNAL resource) ──
   // Out of Admin Center (it is not an admin domain). Rendered for ANY staff with
   // the `plataforma.design_system` grant — all internal roles incl. `collaborator`

@@ -7,3 +7,27 @@
 export const isNexaFloatingExpandableEnabled = (): boolean =>
   process.env.NEXA_FLOATING_EXPANDABLE_ENABLED === 'true' ||
   process.env.NEXT_PUBLIC_NEXA_FLOATING_EXPANDABLE_ENABLED === 'true'
+
+// TASK-1085 — Nexa Knowledge Retrieval gate. Default OFF: el tool `search_knowledge`
+// (Nexa recupera del corpus gobernado vía searchKnowledge agentic + cita) solo aparece
+// con este flag ON. Con OFF, Nexa se comporta exactamente como antes (cero retrieval de
+// knowledge). NEXT_PUBLIC mirror para que la UI (Codex) pueda mostrar/ocultar afordances
+// de citas consistentemente. No levanta el gate por aceptación de TASK-1080.
+export const isNexaKnowledgeRetrievalEnabled = (): boolean =>
+  process.env.NEXA_KNOWLEDGE_RETRIEVAL_ENABLED === 'true' ||
+  process.env.NEXT_PUBLIC_NEXA_KNOWLEDGE_RETRIEVAL_ENABLED === 'true'
+
+// TASK-1091 — pin explícito del provider LLM de Nexa (`google` | `anthropic`). Gana
+// sobre el router. Default unset → router (si está ON) o Gemini (default). Server-only
+// (no NEXT_PUBLIC): la selección de provider es decisión de runtime, no de la UI.
+export const getNexaProviderOverride = (): 'google' | 'anthropic' | null => {
+  const raw = process.env.NEXA_PROVIDER?.trim().toLowerCase()
+
+  return raw === 'anthropic' || raw === 'google' ? raw : null
+}
+
+// TASK-1091 — router interno por intención + failover cross-provider. Default OFF:
+// con OFF, Nexa usa SIEMPRE Gemini (comportamiento idéntico al previo a TASK-1091).
+// Con ON, el router elige Anthropic para preguntas de conocimiento (cuando el retrieval
+// está activo) y Gemini para el resto, con failover al otro provider si el primario falla.
+export const isNexaAutoRouterEnabled = (): boolean => process.env.NEXA_AUTO_ROUTER_ENABLED === 'true'

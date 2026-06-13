@@ -32,6 +32,54 @@ export type {
   GreenhouseVerificationBadgeProps,
   GreenhouseVerificationBadgeSize
 } from './GreenhouseVerificationBadge'
+export { default as GreenhouseGradientBackground } from './gradient-background/GreenhouseGradientBackground'
+export type {
+  GreenhouseGradientBackgroundConfig,
+  GreenhouseGradientBackgroundIntensity,
+  GreenhouseGradientBackgroundKind,
+  GreenhouseGradientBackgroundProps,
+  GreenhouseGradientBackgroundVariant
+} from './gradient-background/greenhouse-gradient-background-types'
+export {
+  buildGreenhouseGradientBackgroundConfig,
+  buildGreenhouseGradientBackgroundCss,
+  GREENHOUSE_GRADIENT_BACKGROUND_KIND_CONFIG,
+  resolveGreenhouseGradientBackgroundKind,
+  resolveGreenhouseGradientBackgroundVariant
+} from './gradient-background/greenhouse-gradient-background-controller'
+export type { GreenhouseGradientBackgroundKindConfig } from './gradient-background/greenhouse-gradient-background-controller'
+export { default as GreenhouseBorderBeam } from './border-beam/GreenhouseBorderBeam'
+export { default as GreenhouseSpectrumBeam } from './border-beam/GreenhouseSpectrumBeam'
+export type { GreenhouseSpectrumBeamProps } from './border-beam/GreenhouseSpectrumBeam'
+export { default as GreenhouseShinyBorder } from './border-beam/GreenhouseShinyBorder'
+export type {
+  GreenhouseShinyBorderIntensity,
+  GreenhouseShinyBorderPalette,
+  GreenhouseShinyBorderProps
+} from './border-beam/GreenhouseShinyBorder'
+export { default as GreenhouseSpotlightCard } from './border-beam/GreenhouseSpotlightCard'
+export type {
+  GreenhouseSpotlightCardKind,
+  GreenhouseSpotlightCardProps,
+  GreenhouseSpotlightCardSize
+} from './border-beam/GreenhouseSpotlightCard'
+export type {
+  GreenhouseBorderBeamConfig,
+  GreenhouseBorderBeamEffect,
+  GreenhouseBorderBeamIntensity,
+  GreenhouseBorderBeamKind,
+  GreenhouseBorderBeamProps,
+  GreenhouseBorderBeamSpectrumPalette,
+  GreenhouseBorderBeamVariant
+} from './border-beam/greenhouse-border-beam-types'
+export {
+  buildGreenhouseBorderBeamConfig,
+  buildGreenhouseBorderBeamGradient,
+  GREENHOUSE_BORDER_BEAM_KIND_CONFIG,
+  resolveGreenhouseBorderBeamKind,
+  resolveGreenhouseBorderBeamVariant
+} from './border-beam/greenhouse-border-beam-controller'
+export type { GreenhouseBorderBeamKindConfig } from './border-beam/greenhouse-border-beam-controller'
 export { default as GreenhouseNexaBrandMark } from './GreenhouseNexaBrandMark'
 export { default as GreenhouseNexaAnimatedMark } from './GreenhouseNexaAnimatedMark'
 export type { GreenhouseNexaAnimatedMarkProps } from './GreenhouseNexaAnimatedMark'
@@ -44,12 +92,223 @@ export type {
   NexaComposerActionButtonProps,
   NexaComposerActionVariant
 } from './NexaComposer'
+export {
+  NEXA_COMPOSER_KIND_CONFIG,
+  NEXA_COMPOSER_VARIANT_CONFIG,
+  resolveNexaComposerKind,
+  resolveNexaComposerVariant
+} from './nexa-composer-controller'
+export type {
+  NexaComposerKind,
+  NexaComposerKindConfig,
+  NexaComposerVariant,
+  NexaComposerVariantConfig
+} from './nexa-composer-controller'
+export { default as NexaPromptDock } from './nexa-prompt-dock/NexaPromptDock'
+export type {
+  NexaPromptDockCopy,
+  NexaPromptDockKind,
+  NexaPromptDockProps,
+  NexaPromptDockSubmitState,
+  NexaPromptDockVariant
+} from './nexa-prompt-dock/nexa-prompt-dock-types'
+export {
+  NEXA_PROMPT_DOCK_KIND_CONFIG,
+  NEXA_PROMPT_DOCK_VARIANT_CONFIG,
+  resolveNexaPromptDockCopy,
+  resolveNexaPromptDockKind,
+  resolveNexaPromptDockVariant
+} from './nexa-prompt-dock/nexa-prompt-dock-controller'
+export type {
+  NexaPromptDockKindConfig,
+  NexaPromptDockVariantConfig
+} from './nexa-prompt-dock/nexa-prompt-dock-controller'
 export { default as NexaFace, NEXA_FACE_SRC } from './NexaFace'
 export type { NexaFaceProps, NexaFaceVariant } from './NexaFace'
 export { default as NexaPresenceMark } from './NexaPresenceMark'
 export type { NexaPresenceMarkProps } from './NexaPresenceMark'
 export { default as NexaSenderMark } from './NexaSenderMark'
 export type { NexaSenderMarkProps } from './NexaSenderMark'
+export {
+  default as NexaExpressiveText,
+  getNexaExpressiveTextPlainText,
+  hasExpressiveTextSegments
+} from './nexa-expressive-text/NexaExpressiveText'
+export type {
+  NexaCitationSource,
+  NexaExpressiveTextProps,
+  NexaExpressiveTextSegment,
+  NexaExpressiveTextStyle,
+  NexaExpressiveTextValue
+} from './nexa-expressive-text/nexa-expressive-text-types'
+export { default as NexaEvidencePanel } from './NexaEvidencePanel'
+export type { NexaEvidencePanelProps, NexaEvidencePanelVariant } from './NexaEvidencePanel'
+export { default as NexaProvenanceTrace } from './nexa-provenance-trace/NexaProvenanceTrace'
+export type {
+  NexaProvenanceProofTab,
+  NexaProvenanceProofTabBuiltin,
+  NexaProvenanceStep,
+  NexaProvenanceTone,
+  NexaProvenanceTraceKind,
+  NexaProvenanceTraceProps,
+  NexaProvenanceTraceVariant,
+  NexaProvenanceTrustCue
+} from './nexa-provenance-trace/nexa-provenance-trace-types'
+export {
+  NEXA_PROVENANCE_TRACE_KIND_CONFIG,
+  resolveNexaProvenanceTraceVariant
+} from './nexa-provenance-trace/nexa-provenance-trace-controller'
+export type { NexaProvenanceTraceKindConfig } from './nexa-provenance-trace/nexa-provenance-trace-controller'
+export { default as NexaResponseToolbar } from './nexa-response-toolbar/NexaResponseToolbar'
+export type {
+  NexaResponseToolbarControl,
+  NexaResponseToolbarKind,
+  NexaResponseToolbarLabels,
+  NexaResponseToolbarProps,
+  NexaResponseToolbarVariant
+} from './nexa-response-toolbar/nexa-response-toolbar-types'
+export {
+  NEXA_RESPONSE_TOOLBAR_KIND_CONFIG,
+  resolveNexaResponseToolbarVariant
+} from './nexa-response-toolbar/nexa-response-toolbar-controller'
+export type { NexaResponseToolbarKindConfig } from './nexa-response-toolbar/nexa-response-toolbar-controller'
+export { default as NexaStreamingText } from './nexa-streaming-text/NexaStreamingText'
+export type { NexaStreamingTextMode, NexaStreamingTextProps } from './nexa-streaming-text/nexa-streaming-text-types'
+export {
+  computeRevealedPlainText,
+  isRevealing,
+  NEXA_STREAMING_TEXT_DEFAULT_FRACTION,
+  NEXA_STREAMING_TEXT_DEFAULT_MIN_CHARS
+} from './nexa-streaming-text/nexa-streaming-text-controller'
+export { default as NexaKnowledgeAnswerSurface } from './NexaKnowledgeAnswerSurface'
+export type {
+  NexaKnowledgeAnswerModeOption,
+  NexaKnowledgeAnswerSource,
+  NexaKnowledgeAnswerSurfaceProps,
+  NexaKnowledgeAnswerTraceStep,
+  NexaKnowledgeAnswerTraceStepState
+} from './NexaKnowledgeAnswerSurface'
+export {
+  NEXA_KNOWLEDGE_ANSWER_SURFACE_KIND_CONFIG,
+  NEXA_KNOWLEDGE_ANSWER_SURFACE_VARIANT_CONFIG,
+  resolveNexaKnowledgeAnswerSurfaceKind,
+  resolveNexaKnowledgeAnswerSurfaceVariant
+} from './nexa-knowledge-answer-surface-controller'
+export type {
+  NexaKnowledgeAnswerSurfaceKind,
+  NexaKnowledgeAnswerSurfaceKindConfig,
+  NexaKnowledgeAnswerSurfaceVariant,
+  NexaKnowledgeAnswerSurfaceVariantConfig
+} from './nexa-knowledge-answer-surface-controller'
+export { default as NexaAnswerBubble, NexaCompactAnswerBubble } from './nexa-answer-bubble/NexaAnswerBubble'
+export type {
+  NexaAnswerAction,
+  NexaAnswerActionPlanRisk,
+  NexaAnswerActionPlanRiskSeverity,
+  NexaAnswerActionPlanSpec,
+  NexaAnswerActionPlanStep,
+  NexaAnswerActionPlanTradeOff,
+  NexaAnswerActionPlanTradeOffTone,
+  NexaAnswerBubbleKind,
+  NexaAnswerBubbleProps,
+  NexaAnswerBubbleVariant,
+  NexaAnswerChartCompositionPoint,
+  NexaAnswerChartMode,
+  NexaAnswerChartSeries,
+  NexaAnswerChartSeriesPoint,
+  NexaAnswerChartSpec,
+  NexaAnswerChartTone,
+  NexaAnswerMetricDeltaTone,
+  NexaAnswerMetricSummaryItem,
+  NexaAnswerMetricSummarySpec,
+  NexaAnswerMetricTrendPoint,
+  NexaAnswerPoint,
+  NexaAnswerTrustCue,
+  NexaCompactAnswerBubbleProps
+} from './nexa-answer-bubble/nexa-answer-bubble-types'
+export {
+  NEXA_ANSWER_BUBBLE_KIND_CONFIG,
+  NEXA_ANSWER_BUBBLE_VARIANT_CONFIG,
+  resolveNexaAnswerBubbleVariant
+} from './nexa-answer-bubble/nexa-answer-bubble-controller'
+export type {
+  NexaAnswerBubbleKindConfig,
+  NexaAnswerBubbleVariantConfig
+} from './nexa-answer-bubble/nexa-answer-bubble-controller'
+export { default as NexaConversationBubble } from './nexa-conversation-bubble/NexaConversationBubble'
+export type {
+  NexaConversationBubbleAction,
+  NexaConversationBubbleKind,
+  NexaConversationBubbleProps,
+  NexaConversationBubbleTone,
+  NexaConversationBubbleVariant
+} from './nexa-conversation-bubble/nexa-conversation-bubble-types'
+export {
+  NEXA_CONVERSATION_BUBBLE_KIND_CONFIG,
+  NEXA_CONVERSATION_BUBBLE_VARIANT_CONFIG,
+  resolveNexaConversationBubbleKind,
+  resolveNexaConversationBubbleVariant
+} from './nexa-conversation-bubble/nexa-conversation-bubble-controller'
+export type {
+  NexaConversationBubbleKindConfig,
+  NexaConversationBubbleVariantConfig
+} from './nexa-conversation-bubble/nexa-conversation-bubble-controller'
+export { default as NexaAnswersCanvas } from './nexa-answers-canvas/NexaAnswersCanvas'
+export type {
+  NexaAnswersAction,
+  NexaAnswersActionRiskLevel,
+  NexaAnswersAutonomyTier,
+  NexaAnswersBlockBase,
+  NexaAnswersBubbleBlock,
+  NexaAnswersCanvasCopy,
+  NexaAnswersCanvasDensity,
+  NexaAnswersCanvasKind,
+  NexaAnswersCanvasMode,
+  NexaAnswersCanvasProps,
+  NexaAnswersCanvasSlots,
+  NexaAnswersCanvasState,
+  NexaAnswersCanvasVariant,
+  NexaAnswersCompactAnswerBlock,
+  NexaAnswersConversationBubbleBlock,
+  NexaAnswersIntent,
+  NexaAnswersProofSpec,
+  NexaAnswersReasoningStep,
+  NexaAnswersRenderBlock,
+  NexaAnswersRendererKind,
+  NexaAnswersRenderPlan,
+  NexaAnswersResponseControl,
+  NexaAnswersSuggestedFollowUp,
+  NexaAnswersSurfaceContext
+} from './nexa-answers-canvas/nexa-answers-canvas-types'
+export {
+  assertNexaAnswersRenderPlanAllowed,
+  NEXA_ANSWERS_CANVAS_KIND_CONFIG,
+  NEXA_ANSWERS_CANVAS_VARIANT_CONFIG,
+  resolveNexaAnswersCanvasDensity,
+  resolveNexaAnswersCanvasVariant
+} from './nexa-answers-canvas/nexa-answers-canvas-controller'
+export type {
+  NexaAnswersCanvasKindConfig,
+  NexaAnswersCanvasVariantConfig
+} from './nexa-answers-canvas/nexa-answers-canvas-controller'
+export {
+  NEXA_ANSWERS_RENDERER_REGISTRY,
+  renderNexaAnswersBlock
+} from './nexa-answers-canvas/nexa-answers-canvas-renderers'
+export type { NexaAnswersBlockRenderContext } from './nexa-answers-canvas/nexa-answers-canvas-renderers'
+export { default as NexaMomentComposition } from './nexa-moment-composition/NexaMomentComposition'
+export type {
+  NexaMomentCompositionKind,
+  NexaMomentCompositionProps,
+  NexaMomentCompositionState,
+  NexaMomentCompositionVariant,
+  NexaMomentCompositionVariantConfig
+} from './nexa-moment-composition/nexa-moment-composition-types'
+export {
+  NEXA_MOMENT_COMPOSITION_VARIANT_CONFIG,
+  resolveNexaMomentCompositionConfig,
+  resolveNexaMomentCompositionVariant
+} from './nexa-moment-composition/nexa-moment-composition-controller'
 export { default as GreenhouseNexaAnimatedAskBadge } from './GreenhouseNexaAnimatedAskBadge'
 export type { GreenhouseNexaAnimatedAskBadgeProps } from './GreenhouseNexaAnimatedAskBadge'
 export { default as EfeonceOrbitalLogoMark } from './EfeonceOrbitalLogoMark'
@@ -210,6 +469,19 @@ export type {
   GreenhouseStepperProgressStep,
   GreenhouseStepperProgressVariant
 } from './GreenhouseStepperProgressMicro'
+export {
+  default as GreenhouseRoadmapTimeline,
+  normalizeGreenhouseRoadmapTimelineStatus,
+  resolveGreenhouseRoadmapTimelineVariant
+} from './GreenhouseRoadmapTimeline'
+export type {
+  GreenhouseRoadmapTimelineItem,
+  GreenhouseRoadmapTimelineKind,
+  GreenhouseRoadmapTimelineProps,
+  GreenhouseRoadmapTimelineStatus,
+  GreenhouseRoadmapTimelineStatusAlias,
+  GreenhouseRoadmapTimelineVariant
+} from './GreenhouseRoadmapTimeline'
 export { default as GreenhouseEvidenceAttachmentDropzone } from './GreenhouseEvidenceAttachmentDropzone'
 export type {
   GreenhouseEvidenceAttachmentDropzoneProps,

@@ -6,6 +6,234 @@
 
 ---
 
+## Delta 2026-06-13k — GreenhouseRoadmapTimeline primitive
+
+Se creó `GreenhouseRoadmapTimeline` para traer el patrón `RoadmapCard` del prompt al Design System como primitive Greenhouse, sin `/components/ui`, shadcn, Tailwind ni `class-variance-authority`.
+
+- Primitive nueva en `src/components/greenhouse/primitives/GreenhouseRoadmapTimeline.tsx`.
+- Variants oficiales: `horizontal`, `stacked`, `compact`.
+- Kinds iniciales: `productRoadmap`, `releasePlan`, `implementationPlan`, `clientOnboarding`, `custom`; el resolver `kind→variant` mantiene defaults idempotentes.
+- Estados canónicos: `complete`, `active`, `pending`, `blocked`; acepta aliases del prompt (`done`, `in-progress`, `upcoming`) vía `normalizeGreenhouseRoadmapTimelineStatus()`.
+- Frontera: no reemplaza `GreenhouseActivityTimeline` (eventos/auditoría/handoffs) ni `GreenhouseStepperProgressMicro` (progreso operativo compacto). Su uso es horizonte de producto, release plan o roadmap narrativo.
+- A11y/responsive: `section` con `role='region'`, ordered list, `aria-current='step'` en el item activo, status textual además de color, wrapping defensivo y reduced-motion.
+- Lab interno `/design-system/roadmap-timeline` + scenario GVC `design-system-roadmap-timeline`.
+
+## Delta 2026-06-13j — Nexa Answers: compactación de turno con View Transitions (TASK-1102)
+
+En multi-turno, `NexaAnswersCanvas` compacta el turno previo (`answerBubble`→`compactAnswer`) y lo **encoge hacia el historial** mientras entra el turno nuevo, vía View Transitions API (Tier 3, same-document) — spatial continuity, no un corte seco.
+
+- Reusa el helper canónico `startViewTransition` (`@/lib/motion/view-transition`, TASK-525): feature-detection (fallback sync) + `prefers-reduced-motion` (swap instantáneo) horneados.
+- El canvas asigna `view-transition-name` por turno (vivo + cada `previousTurns`) + `view-transition-class: nexa-turn` — inerte en reposo (frames byte-idénticos). Contrato: el host conserva el id del turno al pasar de vivo a historial; el turno nuevo usa id distinto (sin colisión de nombre); la mutación va dentro de `startViewTransition` + `flushSync`.
+- CSS `::view-transition-group(.nexa-turn)` (globals.css) con token scale (medium 300ms + emphasized), sin tocar el `root` (route transition TASK-525). reduced-motion cubierto por el guard `*` + el helper.
+- Mockup `/knowledge/mockup/nexa-answers` + scenario `nexa-answers-surface` extendidos (no nuevos). GVC 0 findings.
+
+## Delta 2026-06-13i — Nexa conversational feature-primitives (Provenance · ResponseToolbar · StreamingText) + contrato canónico
+
+Se extrajeron 3 mecanismos transversales del `NexaAnswersCanvas` a feature-primitives neutrales (P+V+K completo, migración byte-idéntica verificada en GVC), y se canonizó el contrato de la experiencia conversacional de Nexa.
+
+- **`NexaProvenanceTrace`** (TASK-1103) — grounding canónico (variants `inline`/`expandable`/`panel`; kinds `knowledgeGrounded`/`signalPromoted`/`computed`). El canvas migró su reasoning a `expandable`. Lab `/design-system/nexa-provenance`.
+- **`NexaResponseToolbar`** (TASK-1104) — chrome de confianza (variants `embedded`/`floating`/`docked`; kinds `responseSettle`/`chatMessage`/`surfaceBar`). El canvas migró su toolbar co-located a `embedded`. Lab `/design-system/nexa-response-toolbar`.
+- **`NexaStreamingText`** (TASK-1105) — revelado progresivo (modes `value`/`stream`; caret tokenizado; never-hidden + reduced-motion vía CSS-split; helper puro `computeRevealedPlainText`). El canvas migró su revelado inline. Lab `/design-system/nexa-streaming-text`.
+- **Contrato canónico** nuevo: [CONVERSATIONAL_EXPERIENCE.md](./CONVERSATIONAL_EXPERIENCE.md) (shell `NexaAnswersCanvas` domain-neutral + coreografía 11 estados + contratos SSOT `surfaceContext`/`renderPlan`/`nexa-evidence.v1`/`knowledge-search.v1` + garantía de transversalidad de 4 capas + receta para agregar un dominio + hard rules). Doc humano: `documentation/plataforma/nexa-conversational-experience.md`. Skill: `greenhouse-nexa-conversational`.
+- Knowledge = primer consumer, NO dueño. El answer-trace productivo (`NexaKnowledgeAnswerSurface`, Codex) converge hacia este contrato (pendiente coordinado).
+
+## Delta 2026-06-13h — Nexa FAB brand spectrum hover
+
+El FAB global de Nexa adopta el `GreenhouseSpectrumBeam` en paleta Nexa como affordance de hover/focus:
+
+- `NexaFloatingButton` reutiliza `GreenhouseSpectrumBeam` con `kind='promptDock'`, `variant='interactive'` y `spectrumPalette='nexa'` detrás del botón.
+- El efecto está oculto y con animación pausada en idle; solo aparece en `hover`/`focus-within` cuando el panel no está abierto.
+- Se preserva el mark animado del FAB en primer plano y la sombra navy del botón; el glow no se mueve al foreground.
+- Reduced-motion conserva el fade mínimo sin transición larga.
+- Scenario GVC actualizado: `nexa-floating-hover-glow`.
+
+## Delta 2026-06-13g — GreenhouseBorderBeam primitive
+
+Se creó `GreenhouseBorderBeam` para traer el patrón de borde perimetral animado al Design System sin copiar Tailwind/shadcn:
+
+- Primitive nueva en `src/components/greenhouse/primitives/border-beam/`.
+- `GreenhouseSpectrumBeam` extrae el efecto `spectrum` como primitive fina reutilizable (anillo completo + aura blur amplia) sin acoplarlo a un botón.
+- `GreenhouseShinyBorder` trae el patrón `shiny-borders-button` como surface/CTA tokenizada (highlight radial superior, glow inferior y contenido elevado), sin copiar Tailwind ni HEX locales.
+- `GreenhouseSpotlightCard` trae el patrón `spotlight-card` como card con spotlight atado al puntero; kinds iniciales `blue`, `purple`, `green`, `red`, `orange` y la familia Nexa `nexaBrand`, `nexaBrandCore`, `nexaBrandSignal`, `nexaBrandGlass`.
+- Variants oficiales: `ambient`, `interactive`, `progress`.
+- Kinds iniciales: `nexaSurface`, `promptDock`, `evidencePeek`, `approvalCard`, `asyncOperation`, `custom`.
+- Effects oficiales: `beam` para línea perimetral focal y `spectrum` para el equivalente gobernado del prompt "rainbow borders button" (anillo completo + gradiente desplazado + aura blur amplia).
+- Spectrum palettes oficiales: `axis` y `nexa`; `nexa` usa `GREENHOUSE_NEXA_BRAND_COLORS` para la variación con colores de marca.
+- Los colores se resuelven desde `theme.axis.*` / `theme.palette.*`; no hay HEX inline ni extensión de `tailwind.config`.
+- Motion: CSS `conic-gradient`/`linear-gradient` + `@property`/background-position con `prefers-reduced-motion` estático; el overlay es decorativo y respeta `border-radius: inherit`.
+- Lab interno `/design-system/border-beam` + scenario GVC `design-system-border-beam`; incluye CTA `button with border beam`, CTA `shiny realism`, cards `spotlight-card`, matriz de cards Nexa brand, caja `Nexa glow box · spectrum` y variación `Nexa glow box · brand spectrum`.
+- El specimen lab-only de la caja de envío Nexa vive en `/design-system/nexa-chat`, junto a `NexaComposer` y `NexaPromptDock`, porque el efecto spectrum ahí funciona como variación del composer y no como espécimen base del beam; inicia inactive/sin texto y cambia al estado activo cuando el usuario escribe.
+
+## Delta 2026-06-13f — GreenhouseGradientBackground primitive
+
+Se creó `GreenhouseGradientBackground` para traer fondos degradados al Design System sin copiar el componente shadcn/Tailwind:
+
+- Primitive nueva en `src/components/greenhouse/primitives/gradient-background/`.
+- Variants oficiales: `surfaceWash`, `heroAurora`, `brandField`.
+- Kinds iniciales: `axisSurface`, `nexaAurora`, `efeonceBrand`, `insightPanel`, `calmBackdrop`, `custom`.
+- Los colores se resuelven desde `theme.axis.*` / `theme.palette.*`; no hay HEX inline, OKLCH ni Tailwind.
+- Motion: CSS `background-position` con duración gobernada y `prefers-reduced-motion` estático; no se instala `framer-motion` ni se importa motion vendor directo.
+- Guardrail visual: usa bandas lineales tokenizadas, no blobs/orbs radiales.
+- Lab interno `/design-system/gradients` + scenario GVC `design-system-gradients`.
+
+## Delta 2026-06-13e — NexaPromptDock primitive
+
+Se creó `NexaPromptDock` como composition primitive para el patrón dock compacto → prompt contextual de Nexa:
+
+- Variants oficiales: `compactDock`, `inlinePanel`, `floatingPrompt`.
+- Kinds iniciales: `quickAsk`, `knowledgeAsk`, `surfaceFollowUp`, `contextualAction`, `custom`.
+- Reusa `GreenhouseNexaAnimatedMark`, `NexaComposer`, `NexaComposerInput` y `NexaComposerActionButton`; no copia shadcn/Tailwind/OKLCH/motion externo.
+- Contrato de interacción: open controlado/no-controlado, foco al abrir, Escape, click-outside, submit por botón y `Cmd/Ctrl + Enter`, con success feedback temporal.
+- Lab `/design-system/nexa-chat` suma specimen `data-capture='nexa-prompt-dock-specimen'` y el scenario GVC lo captura.
+
+## Delta 2026-06-13d — Nexa bubble entrance microinteractions (TASK-1096)
+
+Se agregó entrada suave a las bubbles de Nexa Answers:
+
+- `NexaConversationBubble` usa entrada CSS tokenizada por variant: usuario desde la derecha leve; Nexa desde abajo/izquierda; system notice desde abajo casi imperceptible.
+- `NexaAnswerBubble` usa entrada "settle" estable para superficies enriquecidas: `opacity + translate3d + scale(0.996)` con `motionCss.duration.long` y `motionCss.ease.emphasized`.
+- `NexaCompactAnswerBubble` usa entrada más corta (`motionCss.duration.medium`) para turnos compactados.
+- Motion budget: solo `opacity` y `transform`, sin blur, bounce, shadow pumping ni grandes desplazamientos.
+- Accesibilidad: `@media (prefers-reduced-motion: reduce)` elimina animación, transform y `will-change`.
+- Evidencia GVC: `.captures/2026-06-13T02-03-21_design-system-nexa-chat`.
+
+## Delta 2026-06-13c — Nexa expressive text segments (TASK-1096)
+
+Se agregó `NexaExpressiveText` como renderer compartido para que Nexa Answers pueda expresar énfasis tipográfico y emojis sin HTML libre ni estilos arbitrarios:
+
+- Contrato serializable: `NexaExpressiveTextValue = string | NexaExpressiveTextSegment[]`.
+- Segmentos oficiales: `plain`, `strong`, `emphasis`, `soft`, `metric`, `positive`, `warning`, `danger`, `emoji`, `break`.
+- A11y: emojis pueden declarar `label`; sin label quedan decorativos. `getNexaExpressiveTextPlainText()` convierte segmentos a texto para `aria-label`, status y keys.
+- Consumers: `NexaConversationBubble`, `NexaAnswerBubble`, `NexaCompactAnswerBubble` y `NexaAnswersCanvas` aceptan segmentos en `title`, `body`, `metaLabel`, points, trust cue, chart helper/title, metric summary y action plan copy.
+- Constraint: la primitive decide la apariencia desde tokens Greenhouse; Nexa no puede enviar font-size, familia, HEX, className ni HTML.
+- Evidencia GVC: `.captures/2026-06-13T01-55-30_design-system-nexa-chat`.
+
+## Delta 2026-06-13b — NexaConversationBubble base variants (TASK-1096)
+
+Se creó `NexaConversationBubble` como primitive hermana de `NexaAnswerBubble` para separar conversación base de respuestas enriquecidas:
+
+- Variants oficiales: `userQuestion`, `assistantThinking`, `assistantText`, `assistantFollowUp`, `systemNotice`.
+- Kinds iniciales: `surfaceUserQuestion`, `nexaThinking`, `nexaText`, `nexaFollowUp`, `contextLoaded`, `lowConfidence`, `staleData`, `policyFiltered`, `partialAnswer`, `custom`.
+- Propósito: cubrir el hilo conversacional esencial de Nexa Answers sin forzar cada mensaje a ser una respuesta enriquecida.
+- Reuso: las variantes assistant de `NexaConversationBubble` comparten la identidad aprobada de Nexa Chat (`NexaSenderMark` + wordmark inline Poppins); `assistantThinking` agrega `GreenhouseThinkingBeat kind='nexa' variant='inline' motion='wave' dotCount=5` alineado bajo la N del nombre; acciones usan `GreenhouseButton` por `kind`; tipografía usa variantes Greenhouse (`h6`, `body2`, `caption`).
+- `NexaAnswersCanvas` suma renderer `conversationBubble` para render plans transversales y preserva `GreenhouseButton.kind` al mapear acciones.
+- El lab `/design-system/nexa-chat` suma specimen `data-capture='nexa-conversation-bubble-specimen'`.
+- Contrato visual: bubbles no accionables usan chrome mínimo (sin sombra, borde suave y sin cola); la identidad de Nexa vive fuera del contenido para que `assistantThinking`, `assistantText` y `assistantFollowUp` no rendericen nombres con estilos divergentes. La presencia visual más fuerte queda reservada para `assistantFollowUp` u otras bubbles con CTA. Geometría de chat: Nexa usa esquina superior izquierda recta; usuario usa solo esquina inferior derecha recta; no se dibujan puntas/colas.
+- Evidencia GVC: `.captures/2026-06-13T01-45-02_design-system-nexa-chat`.
+
+## Delta 2026-06-13 — NexaAnswerBubble `actionPlan` variant (TASK-1096)
+
+Se extendió `NexaAnswerBubble` con la variante oficial `actionPlan`:
+
+- Propósito: recomendación accionable cuando Nexa no solo explica una señal, sino que propone el próximo movimiento dentro de la surface.
+- Kinds iniciales: `financeActionPlan`, `commercialActionPlan`, `agencyActionPlan`, `peopleActionPlan`, `surfaceActionPlan`.
+- Contrato de datos: `NexaAnswerActionPlanSpec` con decisión sugerida, pasos recomendados, trade-offs y riesgos a vigilar.
+- La variante mantiene answer-first: decisión clara arriba, plan operativo después, riesgos/trade-offs como contexto y proof bajo demanda en el trust row.
+- Las acciones quedan como CTA de producto/surface; la evidencia no se duplica como acción primaria porque vive en el trust/proof contract compartido.
+- El renderer de `NexaAnswersCanvas` puede recibir `actionPlan` en un bloque `answerBubble`, por lo que queda disponible para render plans transversales.
+- El lab `/design-system/nexa-chat` suma specimen `data-capture='nexa-answer-bubble-action-plan-specimen'`.
+- Contrato visual final: patrón **decision brief**. La tesis y la decisión sugerida viven arriba; el cuerpo se ordena en grupos neutros con rows, aire interno y divisores horizontales. Evitar barras laterales por aviso, alert cards tintadas, exceso de bordes o composición tipo dashboard comprimido.
+- Tipografía: headings/labels usan variantes Greenhouse (`h6`, `body2`, `caption`) con peso moderado; cuerpos operativos en `body2`; metadata en `caption`; sin `fontSize`/`fontFamily` inline.
+- Color: el color semántico aparece solo como dot/icono de señal. No se usa como stripe lateral ni como fondo dominante del aviso.
+- Acciones: `NexaAnswerAction` admite `kind`; los CTAs deben pasar `GreenhouseButton` canónico (`primaryAction`, `secondaryAction` o `inlineAction`) y no crear botones locales dentro del bubble.
+- Evidencia GVC final: `.captures/2026-06-13T00-30-32_design-system-nexa-chat`.
+
+## Delta 2026-06-12i — NexaAnswerBubble `metricSummary` variant (TASK-1096)
+
+Se extendió `NexaAnswerBubble` con la variante oficial `metricSummary`:
+
+- Propósito: lectura ejecutiva compacta para 2-4 KPIs cuando Nexa necesita decir "qué cambió y cuánto importa" sin abrir un chart grande.
+- Kinds iniciales: `financeMetricSummary`, `commercialMetricSummary`, `agencyMetricSummary`, `peopleMetricSummary`, `surfaceMetricSummary`.
+- Contrato de datos: `NexaAnswerMetricSummarySpec` con `metrics[]`, valor, helper, delta semántico (`success`/`warning`/`error`/`info`/`neutral`) y mini trend por métrica.
+- Color: sparklines y charts usan la paleta canónica `GH_COLORS.chart.categorical`/AXIS chart SoT; los tonos semánticos quedan reservados para la píldora de delta/estado, no para las series visualizadas.
+- La variante conserva el mismo contrato de trust/proof/actions que `chart` y `explanation`.
+- El renderer de `NexaAnswersCanvas` puede recibir `metricSummary` en un bloque `answerBubble`, por lo que la variante queda disponible para render plans transversales.
+- El lab `/design-system/nexa-chat` suma specimen `data-capture='nexa-answer-bubble-metric-summary-specimen'`.
+
+## Delta 2026-06-12h — NexaAnswersCanvas transversal (TASK-1096)
+
+Se creó `NexaAnswersCanvas` como primitive transversal para contener la experiencia Nexa Answers sin acoplarla a Knowledge:
+
+- Modos oficiales: `renderPlan` y `runtime`. `renderPlan` consume un plan tipado local (`nexa-answer-render-plan.v1`); `runtime` permite alojar un runtime headless/assistant-ui por slot sin pelear con el canvas visual.
+- Variants iniciales: `embedded`, `sidecar`, `inline`; kinds iniciales: `knowledgeEmbedded`, `financeChartEmbedded`, `agencyInsightEmbedded`, `peopleInsightEmbedded`, `commercialInsightEmbedded`, `custom`.
+- Estados iniciales: `idle`, `submitted`, `thinking`, `streaming`, `answered`, `proofOpen`, `followup`, `compacted`, `degraded`, `error`.
+- El `surfaceContext` del canvas declara domain, placement, data reality, sensitivity, renderers permitidos y acciones permitidas; el canvas valida que el render plan no use renderers fuera de la allowlist.
+- El renderer registry inicial soporta `answerBubble` y `compactAnswer`, delegando en `NexaAnswerBubble` y `NexaCompactAnswerBubble`.
+- El canvas centraliza la coreografía: idle composer glow → pregunta burbuja → identidad Nexa + thinking → answer block → proof bajo demanda → composer descendido → follow-up/turnos compactados.
+- `/knowledge/mockup/nexa-answers` consume el canvas en vez de ensamblar estados localmente; `/design-system/nexa-chat` suma specimen `data-capture='nexa-answers-canvas-specimen'`.
+
+## Delta 2026-06-12g — NexaAnswerBubble primitive + chart variant (TASK-1096)
+
+Se canonizó `NexaAnswerBubble` como primitive reusable de answer-turn para Nexa Answers:
+
+- Variants oficiales iniciales: `explanation` y `chart`.
+- Kinds iniciales: `knowledgeExplanationAnswer`, `knowledgeChartAnswer`, `financeChartAnswer`, `surfaceChartInsight`, `custom`.
+- La variante `chart` es chart-first y compacta: prioriza Recharts con modos `trend` / `comparison` / `composition`, conserva un insight corto, un trust cue compacto y proof bajo demanda para no desplazar el composer conversacional en laptop.
+- El contrato de chart queda genérico (`series[]`, `trend[]`, `composition[]`, `valueSuffix`) para que Knowledge no hardcodee métricas ICO dentro de la primitive y futuras surfaces puedan usar ARR, pipeline, tickets, personas o métricas operativas.
+- `/knowledge/mockup/nexa-answers` deja de ser owner del bubble; ahora consume la primitive desde `@/components/greenhouse/primitives`.
+- El lab `/design-system/nexa-chat` suma specimen `data-capture='nexa-answer-bubble-chart-specimen'`.
+
+## Delta 2026-06-12f — Conversational Experience V2 discovery (TASK-1095/TASK-1096)
+
+Se documentó el discovery profundo de la experiencia conversacional multi-surface:
+
+- TASK-1095 queda como soporte de plataforma: `surfaceContext`, adapters, answer-turn contract, provenance/trust/proof layers, observability/evals y compatibilidad con Knowledge.
+- TASK-1096 queda como experiencia producto/UI: **Nexa Answers** como surface contextual embebida, distinta de Nexa Chat y de un answer-turn aislado.
+- `PATTERNS.md` deja de describir el idle viejo con trace/proof visible antes de preguntar y explicita el target V2: trust cue compacto + proof bajo demanda.
+- Primer piloto real no-Knowledge recomendado: finance/chart explanation, después de fixtures/specimens y no dentro del foundation.
+
+## Delta 2026-06-12e — AnswerSurface idle contract (TASK-1090 follow-up)
+
+Se corrigió la promoción de Answer Trace para conservar el patrón tipo Google AI Mode:
+
+- `NexaKnowledgeAnswerSurface` en `conversationStarted=false` renderiza solo el composer glow/entrada; no muestra respuesta, proof panel ni trace rail antes de una pregunta.
+- Al preguntar, aparece la coreografía completa: pregunta-burbuja → identidad/avatar Nexa → respuesta → composer `inlineFollowUp` → proof panel.
+- `showTraceRail?: boolean` queda opt-in y default `false`; las cards de intento/retrieval no interrumpen la conversación y la trazabilidad vive en `NexaEvidencePanel`.
+- GVC `knowledge-answer-trace` ahora captura idle composer primero y conversation lane/proof panel solo después del submit.
+
+## Delta 2026-06-12d — Knowledge lenses coherence (TASK-1090)
+
+`/knowledge` adopta un shell común de lentes **Humano | Nexa | MCP** sin forkear AnswerSurface:
+
+- `NexaKnowledgeAnswerSurface` suma `showModeSelector?: boolean` con default `true`. Esto preserva el mockup `/knowledge/mockup/answer-trace`; `/knowledge` lo pasa en `false` porque el selector común vive en la surface madre.
+- `NexaEvidencePanel` y AnswerSurface endurecen mobile para títulos/fuentes largas: `minmax(0, 1fr)`, `minInlineSize: 0`, wrapping/truncation controlado y acciones responsive.
+- Scenario GVC nuevo `knowledge-lenses`: Humano default → Nexa pregunta → MCP packet. Baseline protegido `knowledge-answer-trace` sigue verde.
+
+Evidencia local: `.captures/2026-06-12T18-50-06_knowledge-lenses` y `.captures/2026-06-12T18-50-07_knowledge-answer-trace`.
+
+## Delta 2026-06-12c — Conversational Evidence V1 (TASK-1093)
+
+Se consolidó el gap real entre Nexa Chat y AnswerSurface sin crear una shell paralela:
+
+- Nuevo contrato `ConversationalEvidencePacket` (`nexa-evidence.v1`) en `src/lib/nexa/conversational-evidence.ts`, con adapters desde `knowledge-search.v1` y `NexaToolResult`.
+- Nueva primitive `NexaEvidencePanel` para renderizar trace, fuentes, confidence, freshness, filtered count y feedback desde el view-model común.
+- `NexaToolRenderers` deja de derivar/renderizar Knowledge evidence localmente y consume `NexaEvidencePanel`.
+- `NexaKnowledgeAnswerSurface` puede recibir `evidence` y renderizar el mismo panel en el proof slot; no consulta DB/API.
+- `NexaComposer` suma `kind='inlineFollowUp'`; `NexaKnowledgeAnswerSurface` suma `variant='toolResult'` y `kind='knowledgeToolResult'`.
+- `mapThreadMessagesToInitial()` rehidrata tool-calls persistidos para que threads históricos con `tool_invocations` recuperen evidence cards sin re-ejecutar tools; threads antiguos sin payload siguen como texto.
+
+La shell multi-surface (`floatingChat`/`embeddedChat`/`sidecarLane` sobre `AdaptiveSidecarLayout variant='assistant'`) y `aiOverviewPanel` quedan diferidos hasta que TASK-1084/TASK-1079 aterricen como consumidores reales.
+
+## Delta 2026-06-12b — NexaKnowledgeAnswerSurface (TASK-1089)
+
+Se creó `NexaKnowledgeAnswerSurface` como **composition primitive transversal** para respuestas Nexa con evidencia, usando Primitive+Variants+Kinds:
+
+- Variants: `conversationTrace` (pregunta-burbuja + respuesta Nexa + composer descendido + trace/proof) y `overviewPanel` (reservada para modo AI Overview compacto).
+- Kind inicial: `knowledgeAnswerTrace` → `conversationTrace`.
+- Primer consumer: `/knowledge/mockup/answer-trace`.
+
+La superficie reusa atoms de Nexa (`NexaComposer kind='knowledgeAsk'`, `NexaSenderMark`, `GreenhouseThinkingBeat`) y conserva `Fuentes | Packet | Evals` como proof panel para humanos/agentes. Es props-only: no consulta tablas ni llama endpoints; el wiring real queda para `TASK-1085` sobre `knowledge-search.v1`. El lab `/design-system/nexa-chat` suma specimen `data-capture='nexa-knowledge-answer-surface-specimen'` y GVC tiene scenario `knowledge-answer-trace`.
+
+## Delta 2026-06-12 — NexaComposer command variant + `knowledgeAsk` kind
+
+`NexaComposer` deja de ser solo el composer de chat y gana contrato Primitive+Variants+Kinds explícito:
+
+- Variant `chat`: mantiene el composer conversacional existente.
+- Variant `command`: caja compacta con `NexaGlowBorder`, `GreenhouseNexaAnimatedMark kind='inlineMark'` al inicio y shortcut al final.
+- Kinds oficiales: `floatingChat` → `chat`, `knowledgeAsk` → `command` con shortcut `↵` para preguntar sin chocar con el shell, `globalCommand` → `command` con shortcut `⌘ K`.
+
+Primer consumer: `/knowledge/mockup/answer-trace`, que deja de ensamblar a mano `NexaGlowBorder` + mark + shortcut y usa `NexaComposer kind='knowledgeAsk'` + `NexaComposerInput kind='knowledgeAsk'`. El lab `/design-system/nexa-chat` suma specimen `data-capture='nexa-composer-command-variant'`.
+
 ## Delta 2026-06-11 — Nexa Insights pattern redesign + disclosure `nexaMark` + ThinkingBeat `dotSize` (TASK-1075 follow-up)
 
 Iteración de producto sobre el pattern compuesto `NexaInsightsBlock` (`src/components/greenhouse/`), con dos extensiones a primitives y registro en el Design System.
@@ -147,8 +375,8 @@ y microinteracción, no como variantes locales por surface.
   `askBadgeVariant='animated'` para
   `GreenhouseNexaGreeting kind='funnelStageAdvisor'`.
 - El FAB global de Nexa usa `GreenhouseNexaAnimatedMark` con `autoBlink` +
-  `ambientMoments`; su aura hover/focus vive detrás del botón y no debe
-  lavarle el mark.
+  `ambientMoments`; su hover/focus usa `GreenhouseSpectrumBeam` en paleta Nexa
+  detrás del botón, pausado en idle, y no debe lavarle el mark.
 - Evidencia canónica: micro GVC del badge animado en lab Nexa
   `.captures/2026-06-09T20-52-25_micro-admin-design-system-nexa-brand-data-capture-nexa-brand-animated-ask-badge-hero`,
   micro GVC del consumer en charts

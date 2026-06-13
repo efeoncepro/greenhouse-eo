@@ -97,6 +97,7 @@ Use this matrix to choose the smallest complete update set.
 | UI visible change | `DESIGN.md` or UI architecture only if visual contract changed; functional/manual docs if user workflow changed; GVC evidence required before closure |
 | Access, roles, views, entitlements, capabilities, route groups | Access architecture/task/spec + both planes (`views` and `entitlements`) documented; migrations/grants/audit if applicable |
 | New or changed local skill | Update both `.codex/skills/<name>/SKILL.md` and `.claude/skills/<name>/SKILL.md` when the behavior must be shared; register in `project_context.md`, `Handoff.md`, `changelog.md`, and only update `AGENTS.md` / `CLAUDE.md` if it changes a standing agent rule |
+| New canonical gate, `pnpm` script/command, token/visual convention, or standing agent rule | Verify the task-implementation harness command `.claude/commands/implement-task.md` still names the right gates/commands/paths; update it if it drifted. It is a process harness, not a fact dump — only edit it when a gate/command/path/convention it references actually changed (the canonical rules stay in `CLAUDE.md`/skills, which the harness points to) |
 | Audit performed | Create/update dated `docs/audits/...`; link from task, handoff, or architecture only if it remains operationally relevant |
 | Docs-only clarification with no behavior change | Update the canonical doc; changelog only if workflow/contract changed |
 

@@ -4,6 +4,7 @@ export type NexaToolName =
   | 'check_emails'
   | 'get_capacity'
   | 'pending_invoices'
+  | 'search_knowledge'
 
 export type NexaToolMetricTone = 'default' | 'success' | 'warning' | 'error' | 'info'
 

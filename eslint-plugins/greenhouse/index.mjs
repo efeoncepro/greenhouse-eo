@@ -39,6 +39,7 @@ import noDirectGsapInViews from './rules/no-direct-gsap-in-views.mjs'
 import noHardcodedHexColor from './rules/no-hardcoded-hex-color.mjs'
 import noDirectMuiElevationInPrimitives from './rules/no-direct-mui-elevation-in-primitives.mjs'
 import noDynamicAppReactApexCharts from './rules/no-dynamic-app-react-apexcharts.mjs'
+import noDirectKnowledgeChunkQuery from './rules/no-direct-knowledge-chunk-query.mjs'
 
 const plugin = {
   meta: {
@@ -66,7 +67,8 @@ const plugin = {
     'no-direct-gsap-in-views': noDirectGsapInViews,
     'no-hardcoded-hex-color': noHardcodedHexColor,
     'no-direct-mui-elevation-in-primitives': noDirectMuiElevationInPrimitives,
-    'no-dynamic-app-react-apexcharts': noDynamicAppReactApexCharts
+    'no-dynamic-app-react-apexcharts': noDynamicAppReactApexCharts,
+    'no-direct-knowledge-chunk-query': noDirectKnowledgeChunkQuery
   }
 }
 

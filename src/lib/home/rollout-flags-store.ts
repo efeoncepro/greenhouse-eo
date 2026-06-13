@@ -19,12 +19,14 @@ export type HomeRolloutFlagKey =
   | 'home_v2_shell'
   | 'organization_workspace_shell_agency'
   | 'organization_workspace_shell_finance'
+  | 'knowledge_composition_lens'
 export type HomeRolloutScopeType = 'global' | 'tenant' | 'role' | 'user'
 
 const VALID_FLAG_KEYS: ReadonlySet<HomeRolloutFlagKey> = new Set([
   'home_v2_shell',
   'organization_workspace_shell_agency',
-  'organization_workspace_shell_finance'
+  'organization_workspace_shell_finance',
+  'knowledge_composition_lens'
 ])
 
 export interface HomeRolloutFlagRow {

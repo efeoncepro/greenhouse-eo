@@ -12,7 +12,11 @@ import { ensureFinanceInfrastructure } from '@/lib/finance/schema'
 import { getFinanceProjectId, roundCurrency, runFinanceQuery, toNumber as toFinanceNumber } from '@/lib/finance/shared'
 import { ensureMemberCapacityEconomicsSchema, readLatestMemberCapacityEconomicsSnapshot } from '@/lib/member-capacity-economics/store'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
+import { searchKnowledge } from '@/lib/knowledge/search/search-knowledge'
+import type { KnowledgeRetrievalPacket, KnowledgeSearchSubject } from '@/lib/knowledge/search'
+import { captureWithDomain } from '@/lib/observability/capture'
 
+import { isNexaKnowledgeRetrievalEnabled } from './flags'
 import type { NexaRuntimeContext, NexaToolInvocation, NexaToolName, NexaToolResult } from './nexa-contract'
 
 export interface NexaToolExecutionContext {
@@ -614,12 +618,150 @@ const pendingInvoicesTool: NexaToolDefinition = {
   }
 }
 
+// ── search_knowledge (TASK-1085) ────────────────────────────────────────────
+// Nexa recupera del corpus gobernado vía el reader SSOT searchKnowledge (modo
+// agentic): nunca toca las tablas, nunca retorna agent_excluded/restricted, y el
+// packet (con score/confidence/freshness/citas) viaja en `raw` para que la UI
+// (Answer Trace, TASK-1089) lo renderice. Provider-agnóstico: el LLM (Gemini hoy,
+// Claude mañana) invoca este tool por function-calling; el shape no cambia.
+
+// Mirror del grant knowledge.agentic.retrieve (runtime.ts): internal ∪ {EFEONCE_ADMIN,
+// FINANCE_ADMIN, HR_MANAGER, EFEONCE_OPERATIONS}.
+const hasKnowledgeAgenticAccess = (tenant: NexaRuntimeContext) =>
+  hasRouteGroup(tenant, 'internal') ||
+  hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN) ||
+  hasRoleCode(tenant, ROLE_CODES.FINANCE_ADMIN) ||
+  hasRoleCode(tenant, ROLE_CODES.HR_MANAGER) ||
+  hasRoleCode(tenant, ROLE_CODES.EFEONCE_OPERATIONS)
+
+const KNOWLEDGE_CHUNK_EXCERPT_LIMIT = 600
+
+// Texto de grounding que lee el LLM para componer la respuesta. Solo los chunks de
+// ESTE turno (acotado), nunca el corpus completo. Cuando confidence='none', instruye
+// gap honesto explícito (no-invención).
+const buildKnowledgeGroundingSummary = (packet: KnowledgeRetrievalPacket): string => {
+  if (packet.chunks.length === 0) {
+    return `No hay una guía publicada que responda "${packet.query}". Responde con gap honesto: di que no encontraste documentación publicada y NO inventes una respuesta.`
+  }
+
+  const lines = packet.chunks.map((chunk, index) => {
+    const excerpt =
+      chunk.text.length > KNOWLEDGE_CHUNK_EXCERPT_LIMIT
+        ? `${chunk.text.slice(0, KNOWLEDGE_CHUNK_EXCERPT_LIMIT)}…`
+        : chunk.text
+
+    return `[${index + 1}] ${chunk.citationLabel} (freshness: ${chunk.freshness}) — ${excerpt}`
+  })
+
+  const deniedNote =
+    packet.deniedOrFilteredCount > 0
+      ? `\n(${packet.deniedOrFilteredCount} fragmento(s) coinciden pero quedaron fuera por política de acceso; menciónalo si es relevante.)`
+      : ''
+
+  return [
+    `Fragmentos recuperados del corpus de conocimiento (confianza retrieval: ${packet.confidence}, freshness: ${packet.freshness}).`,
+    'Responde SOLO con lo respaldado por estos fragmentos. Usa el marcador [n] inline ligado al fragmento n (ej. "... [1]") y cierra con "Fuentes: [n] = citationLabel". Si alguna fuente es stale/deprecated, decláralo.',
+    'En temas sensibles (finanzas, nómina, legal, seguridad o compromisos contractuales), cita siempre con [n] y sugiere validación humana cuando corresponda.',
+    '',
+    ...lines,
+    deniedNote
+  ]
+    .join('\n')
+    .trim()
+}
+
+const buildKnowledgeMetrics = (packet: KnowledgeRetrievalPacket): NexaToolResult['metrics'] => {
+  const metrics: NexaToolResult['metrics'] = [
+    { label: 'Confianza retrieval', value: packet.confidence },
+    { label: 'Frescura', value: packet.freshness },
+    { label: 'Fuentes', value: String(packet.chunks.length) }
+  ]
+
+  if (packet.deniedOrFilteredCount > 0) {
+    metrics.push({ label: 'Filtrados por política', value: String(packet.deniedOrFilteredCount), tone: 'warning' })
+  }
+
+  return metrics
+}
+
+const searchKnowledgeTool: NexaToolDefinition = {
+  declaration: {
+    name: 'search_knowledge',
+    description:
+      'Busca en la base de conocimientos publicada de Greenhouse (manuales, guías, glosarios, runbooks, políticas) para responder preguntas de uso, procesos, definiciones o procedimientos. Devuelve fragmentos con su cita, confianza y frescura. Úsalo ANTES de responder cuando la pregunta es de documentación/proceso; NO lo uses para datos operativos en vivo (nómina, OTD, correos, capacidad, cuentas por cobrar tienen sus propios tools).',
+    parametersJsonSchema: {
+      type: 'object',
+      additionalProperties: false,
+      properties: {
+        query: {
+          type: 'string',
+          description: 'La pregunta o tema a buscar, en lenguaje natural (es-CL).'
+        },
+        limit: {
+          type: 'integer',
+          description: 'Máximo de fragmentos a recuperar (opcional, default 6, máx 12).'
+        }
+      },
+      required: ['query']
+    }
+  },
+  isAvailable: tenant => isNexaKnowledgeRetrievalEnabled() && hasKnowledgeAgenticAccess(tenant),
+  async execute(args, context) {
+    const tenant = context.tenant
+    const query = typeof args.query === 'string' ? args.query.trim() : ''
+
+    if (!query) {
+      return buildToolUnavailableResult('search_knowledge', 'Falta la consulta para buscar en la base de conocimientos.')
+    }
+
+    const limitRaw = typeof args.limit === 'number' ? args.limit : Number(args.limit)
+    const limit = Number.isFinite(limitRaw) && limitRaw > 0 ? Math.min(Math.floor(limitRaw), 12) : 6
+
+    const subject: KnowledgeSearchSubject = {
+      userId: tenant.userId,
+      tenantType: tenant.tenantType,
+      tenantId: tenant.clientId || null,
+      roleCodes: tenant.roleCodes,
+      routeGroups: tenant.routeGroups,
+      capabilities: ['knowledge.agentic.retrieve']
+    }
+
+    try {
+      const packet = await searchKnowledge({ query, subject, mode: 'agentic', limit })
+
+      return {
+        available: true,
+        summary: buildKnowledgeGroundingSummary(packet),
+        source: 'postgres',
+        scopeLabel: 'Base de conocimientos',
+        generatedAt: packet.generatedAt,
+        metrics: buildKnowledgeMetrics(packet),
+        notes: packet.notes,
+        // El packet completo (citas, score por chunk, confidence, freshness,
+        // deniedOrFilteredCount) viaja acá para que la UI renderice el Answer Trace.
+        raw: { packet }
+      }
+    } catch (error) {
+      captureWithDomain(error, 'knowledge', {
+        tags: { source: 'nexa_search_knowledge_tool' },
+        extra: { hasQuery: true, limit }
+      })
+
+      return buildToolUnavailableResult(
+        'search_knowledge',
+        'No pude buscar en la base de conocimientos en este momento. Intenta de nuevo más tarde.'
+      )
+    }
+  }
+}
+
 const NEXA_TOOLS: Record<NexaToolName, NexaToolDefinition> = {
   check_payroll: checkPayrollTool,
   get_otd: getOtdTool,
   check_emails: checkEmailsTool,
   get_capacity: getCapacityTool,
-  pending_invoices: pendingInvoicesTool
+  pending_invoices: pendingInvoicesTool,
+  search_knowledge: searchKnowledgeTool
 }
 
 export const getNexaToolDeclarations = (tenant: NexaRuntimeContext): FunctionDeclaration[] =>

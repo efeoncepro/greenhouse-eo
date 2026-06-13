@@ -66,6 +66,7 @@ export type CaptureDomain =
   | 'client_portal' // TASK-822 — Client Portal BFF / Anti-Corruption Layer (EPIC-015 child 1/8)
   | 'workforce' // TASK-1019 — Workforce Contracting Studio (offer letters + employment contracts, AI drafting)
   | 'documents' // TASK-490 — Signature orchestration + document vault (EPIC-001 signable pack)
+  | 'knowledge' // TASK-1081 — Knowledge Platform (corpus + chunks + retrieval agéntico)
 
 export interface CaptureOptions {
   /** Free-form structured context. Ends up in Sentry's `Additional Data`. */

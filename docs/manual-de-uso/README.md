@@ -56,6 +56,7 @@ _Pendiente._
 
 ### Plataforma
 
+- [Knowledge Platform (foundation)](plataforma/knowledge-platform.md) — operar la base del Knowledge Platform: aplicar la migración del schema `greenhouse_knowledge`, usar los helpers server-only de `src/lib/knowledge/` (registrar fuente, crear/publicar documento con chunks, transicionar lifecycle, feedback), qué significan los estados y qué no hacer.
 - [MCP Greenhouse Read-Only](plataforma/mcp-greenhouse-read-only.md) — cómo levantar el MCP local `stdio` o conectarse al gateway remoto HTTP privado, qué variables necesita, qué tools read-only existen hoy, qué límites de scope respeta y qué follow-ups siguen fuera de alcance.
 - [Validar el contrato visual DESIGN.md](plataforma/validar-contrato-visual-design-md.md) — paso a paso para validar localmente con `pnpm design:lint`, comparar versiones con `pnpm design:diff`, agregar tokens nuevos siguiendo el patrón canónico (sin atajos prohibidos), resolver warnings comunes, y verificar que el CI gate aprobó tu PR.
 - [Usar microcopy shared](plataforma/microcopy-shared-dictionary.md) — como usar `getMicrocopy` y `buildStatusMap` para botones, estados, meses, empty states y aria-labels sin duplicar strings ni romper el futuro i18n.

@@ -56,7 +56,8 @@ export const GH_INTERNAL_NAV = {
   adminTalentReview: { label: 'Verificación de talento', subtitle: 'Skills, herramientas y certificaciones por revisar' },
   adminTalentOps: { label: 'Salud del talento', subtitle: 'Metricas y mantenimiento del sistema' },
   adminIdentityAccess: { label: 'Identidad y acceso', subtitle: 'Usuarios, roles, vistas y cuentas' },
-  adminTeamOps: { label: 'Equipo y operaciones', subtitle: 'Talento, líneas de negocio e instrumentos' }
+  adminTeamOps: { label: 'Equipo y operaciones', subtitle: 'Talento, líneas de negocio e instrumentos' },
+  knowledge: { label: 'Knowledge', subtitle: 'Guías, fuentes y memoria operativa' }
 } as const
 
 export const GH_PLATFORM_UI = {

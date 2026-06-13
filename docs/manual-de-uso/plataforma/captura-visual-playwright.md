@@ -34,6 +34,7 @@ Cuando un agente o persona verifique UI visible de Greenhouse, la evidencia visu
 | Necesidad | Comando canónico |
 |---|---|
 | Ruta simple / sanity visual | `pnpm fe:capture --route=/ruta --env=staging --hold=3000` |
+| Ruta simple con readiness estable | `pnpm fe:capture --route=/ruta --env=local --ready='[data-capture="surface"]'` |
 | Flujo repetible o microinteraction | `pnpm fe:capture <scenario> --env=staging` |
 | Pantalla larga completa | Scenario con `{ kind: 'mark', label: 'full-page', fullPage: true }` |
 | Sección específica tras scroll | Scenario con `scroll selector` + `mark clipSelector` |
@@ -46,6 +47,8 @@ Cuando un agente o persona verifique UI visible de Greenhouse, la evidencia visu
 Playwright ad-hoc solo debe usarse como complemento cuando haga falta inspeccionar consola, network, payloads de API o un gesto que el DSL todavía no soporte. En ese caso, guardá artifacts bajo `.captures/`, explicá por qué no alcanzó el helper canónico y convertí el flujo en scenario si se va a repetir.
 
 Si la captura staging falla por configuración local, por ejemplo `VERCEL_AUTOMATION_BYPASS_SECRET ausente`, documentá ese bloqueo exacto y probá `--env=local` si la ruta puede validarse contra `pnpm dev`.
+
+GVC no usa `networkidle` como readiness de navegación. En Next/Turbopack puede haber HMR, chunks o requests persistentes aunque la UI ya esté lista, así que la señal canónica es un selector/guard de pantalla: en scenarios, `readiness`; en capturas inline, `--ready='[data-capture="..."]'`.
 
 ## Antes de empezar
 
@@ -236,6 +239,42 @@ Para capturar feedback de hover/focus/click con intención explícita:
 
 El video sigue siendo continuo, pero el manifest registra segmentos lógicos por interacción.
 
+### Caso 5.4 — Autorar un scenario observando la página viva (explore → promote)
+
+En vez de escribir selectores **a ciegas** (adivinar `[role="tab"]:nth-child(2)`, correr, mirar el PNG, re-correr), observá la página viva primero y dejá que GVC arme el scenario.
+
+```bash
+# 1. Observá la ruta viva (read-only): candidatos con su getByRole(...) sugerido,
+#    uniqueness validada, markers data-capture, + valida locators con --probe
+pnpm fe:capture:explore --route=/finance/cash-out --env=staging --probe='role=button[name="Registrar pago"]'
+
+# 2. Cristalizá la sesión en un .scenario.ts válido (readiness auto + marks)
+pnpm fe:capture:promote --route=/finance/cash-out --name=cash-out-overview --mark='[data-capture="timeline"]'
+
+# 3. Revisá selectores/readiness/marks del archivo generado y capturá
+pnpm fe:capture cash-out-overview --env=staging
+```
+
+`explore` persiste `.captures/_explore/<slug>/{session.json, aria.txt, snapshot.png}`. Leé `aria.txt` (el árbol de accesibilidad) y escribí `getByRole(...)` contra lo que **existe**, no contra un selector adivinado.
+
+⚠️ **Revisá la readiness del scenario generado.** Si la ruta no tiene markers `data-gvc-ready`/`data-capture`, `promote` ancla la readiness a un heading único — y si ese heading tiene copy dinámico (rota), la readiness falla al capturar. Preferí un marker estable.
+
+### Caso 5.5 — Medir microinteracciones reales (explore --interaction)
+
+`explore` puede **medir** los timings reales de una microinteracción (en vez de adivinar 0/150/300):
+
+```bash
+# Performa la acción (hover|focus|click — read-only) y MIDE feedback/settled por pixel-diff
+pnpm fe:capture:explore --route=/finance/cash-out --env=staging \
+  --interaction='hover:[role="tab"]' \
+  --interaction-window=1500   # subí la ventana para animaciones GSAP largas (default 1000ms)
+
+# promote auto-emite el step `interaction` con los timings MEDIDOS; ajustás intent y capturás
+pnpm fe:capture:promote --route=/finance/cash-out --name=cash-out-tabs
+```
+
+Funciona para cualquier tecnología de motion (CSS, framer-motion, GSAP) porque mide píxeles, no eventos. Si la acción no produce un cambio visible, lo reporta honesto (`measuredTimings:false`) en vez de inventar timings. El detalle del craft (locators, readiness, gotchas) vive en la skill `greenhouse-gvc-playwright`.
+
 ### Caso 6 — Capturar frames finos de una microinteracción
 
 Cuando necesitás revisar parpadeos, easing, rebotes o una animación pequeña que no alcanza con un `mark`, usá el sampler selector-scoped. Este modo no aplica determinismo de baseline porque su propósito es preservar la motion real.
@@ -385,6 +424,7 @@ Solo declaralos si **sabés** que poseés la capability vigente. El audit log re
 
 - **Spec canónica**: el helper fue diseñado vía `arch-architect` skill con 4-pillar scoring + 5-layer defense-in-depth Safety
 - **DSL types**: [scripts/frontend/lib/scenario.ts](../../../scripts/frontend/lib/scenario.ts)
+- **Explore → promote (autoría)**: [scripts/frontend/explore.ts](../../../scripts/frontend/explore.ts) + [scripts/frontend/promote.ts](../../../scripts/frontend/promote.ts) (TASK-1098/1099/1100). Craft de Playwright + gotchas: skill `greenhouse-gvc-playwright`.
 - **Auth canónico**: [scripts/playwright-auth-setup.mjs](../../../scripts/playwright-auth-setup.mjs)
 - **Convención storage state**: `.auth/storageState.<env>.json` (gitignored)
 - **CLAUDE.md** sección "Agent Auth": permisos + variables canónicas

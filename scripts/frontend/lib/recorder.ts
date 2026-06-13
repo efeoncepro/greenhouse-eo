@@ -14,7 +14,7 @@
  * alfabético = orden temporal.
  */
 
-import { mkdirSync } from 'node:fs'
+import { mkdirSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 
 import type { Page } from 'playwright'
@@ -88,6 +88,28 @@ export const runScenario = async ({
       await page.screenshot({ path: absPath, fullPage: options?.fullPage ?? false })
     }
 
+    // Capa 1 — Observación máquina-legible del árbol de accesibilidad de la región
+    // capturada. Técnica de microsoft/webwright (local_browser.py:
+    // `page.locator('body').aria_snapshot()`): en vez de que el agente mire el PNG y
+    // adivine el selector, lee el a11y tree y escribe `getByRole(...)` contra lo que
+    // existe de verdad. Best-effort + graceful degrade (patrón Webwright): nunca rompe
+    // el mark. clipSelector → snapshot del nodo; sino → snapshot del body.
+    let ariaSnapshotPath: string | undefined
+
+    try {
+      const ariaTarget = options?.clipSelector ? page.locator(options.clipSelector).first() : page.locator('body')
+      const ariaSnapshot = await ariaTarget.ariaSnapshot({ timeout: 5000 })
+
+      if (ariaSnapshot && ariaSnapshot.trim()) {
+        const ariaFileName = `${pad2(index)}-${safeLabel}.aria.txt`
+
+        writeFileSync(join(framesDir, ariaFileName), ariaSnapshot, 'utf8')
+        ariaSnapshotPath = `frames/${ariaFileName}`
+      }
+    } catch {
+      // a11y snapshot best-effort; su ausencia no degrada el frame ni la captura.
+    }
+
     const frameQualityFindings = await analyzeFrameQuality(page, {
       frameLabel: label,
       framePath: absPath,
@@ -132,7 +154,8 @@ export const runScenario = async ({
       note,
       interactionName: options?.interactionName,
       qualityFindings: frameQualityFindings.length ? frameQualityFindings : undefined,
-      maskRects
+      maskRects,
+      ariaSnapshotPath
     })
 
     log(`  ✓ mark[${index}] "${label}" (+${tMs}ms)`)

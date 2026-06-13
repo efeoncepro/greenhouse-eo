@@ -175,6 +175,8 @@ export const createGreenhouseMcpHandlers = (client: Pick<
   | 'getWebhookSubscription'
   | 'listWebhookDeliveries'
   | 'getWebhookDelivery'
+  | 'searchKnowledge'
+  | 'getKnowledgeDocument'
 >) => ({
   async getContext() {
     return callReadTool(
@@ -309,6 +311,37 @@ export const createGreenhouseMcpHandlers = (client: Pick<
         return `Loaded webhook delivery ${label} status=${String(data.status ?? 'unknown')} eventType=${String(data.eventType ?? 'unknown')} from Greenhouse (${result.requestId}).`
       },
       () => client.getWebhookDelivery(input)
+    )
+  },
+  // TASK-1086 — Knowledge (read-only). El packet `knowledge-search.v1` ya trae citas +
+  // confidence + freshness; si confidence='none' el agente NO debe inventar un documento.
+  async searchKnowledge(input: { query: string; limit?: number }) {
+    return callReadTool(
+      result => {
+        const data = result.data as { confidence?: string; chunks?: unknown[] }
+        const chunkCount = Array.isArray(data.chunks) ? data.chunks.length : 0
+
+        return `Knowledge search returned ${chunkCount} chunks (confidence=${String(data.confidence ?? 'unknown')}) (${result.requestId}).`
+      },
+      () => client.searchKnowledge(input)
+    )
+  },
+  async getKnowledgeDocument(input: { id: string }) {
+    return callReadTool(
+      result => {
+        const data = result.data as {
+          document?: { title?: string; publicationStatus?: string }
+          sections?: unknown[]
+        }
+
+        const label = data.document?.title ?? input.id
+        const sectionCount = Array.isArray(data.sections) ? data.sections.length : 0
+
+        return `Loaded knowledge document ${label} (status=${String(
+          data.document?.publicationStatus ?? 'unknown'
+        )}, ${sectionCount} sections) (${result.requestId}).`
+      },
+      () => client.getKnowledgeDocument(input)
     )
   }
 })

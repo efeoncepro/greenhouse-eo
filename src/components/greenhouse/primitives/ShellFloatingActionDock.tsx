@@ -2,6 +2,8 @@
 
 import type { ReactNode } from 'react'
 
+import { usePathname } from 'next/navigation'
+
 import Box from '@mui/material/Box'
 import GlobalStyles from '@mui/material/GlobalStyles'
 import Stack from '@mui/material/Stack'
@@ -15,6 +17,10 @@ const ShellFloatingActionDock = ({
   children,
   dataCapture = 'dashboard-floating-actions'
 }: ShellFloatingActionDockProps) => {
+  const pathname = usePathname()
+
+  if (pathname === '/design-system/nexa-chat') return null
+
   return (
     <>
       <GlobalStyles

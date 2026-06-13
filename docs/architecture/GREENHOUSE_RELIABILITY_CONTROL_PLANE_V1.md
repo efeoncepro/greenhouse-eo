@@ -2,12 +2,22 @@
 
 > Spec canónica del `Reliability Control Plane` de Greenhouse EO. Define el registry por módulo, el modelo unificado de señales, el contrato de evidencia y cómo `Admin Center`, `Ops Health` y `Cloud & Integrations` consumen la lectura consolidada sin duplicar fuentes.
 >
-> Versión: `1.9`
+> Versión: `1.10`
 > Estado: `vigente`
 > Creada: `2026-04-25` por TASK-600
-> Última actualización: `2026-06-01` por TASK-797 (contractor closed-with-open-payables signal)
+> Última actualización: `2026-06-12` por TASK-1085 (Nexa knowledge retrieval signals)
 
 ---
+
+## Delta 2026-06-12 — TASK-1085: Nexa Knowledge retrieval signals
+
+Tres signals canonical bajo `moduleKey='knowledge'` hacen observable el **retrieval de Nexa sobre Knowledge** (TASK-1085, behind flag `NEXA_KNOWLEDGE_RETRIEVAL_ENABLED`). Se leen de `greenhouse_ai.nexa_messages.tool_invocations` (jsonb) — el `KnowledgeRetrievalPacket` ya viaja en `result.raw.packet`, así que **no hay writes nuevos**; un solo scan `jsonb_array_elements` filtrando `toolName='search_knowledge'` produce las métricas de ventana 30 días. Reader: `src/lib/reliability/queries/nexa-knowledge-retrieval-signals.ts`.
+
+- `knowledge.nexa.no_source_answer_rate` (kind `data_quality`): tasa de búsquedas con `confidence='none'` (Nexa respondió gap honesto, sin documentación). Tasa alta sostenida = huecos de cobertura del corpus. Severity: `warning` si rate ≥ 30% **y** volumen ≥ 10 (muestra suficiente), `ok` en otro caso. Coverage metric (no steady=0).
+- `knowledge.nexa.stale_source_retrievals` (kind `drift`): búsquedas apoyadas en fuentes `stale`/`deprecated` — responder desde docs vencidos es un problema real. Steady state esperado = 0; `warning` si > 0.
+- `knowledge.retrieval.low_citation_rate` (kind `data_quality`): tasa de respuestas donde el packet no trae fragmentos/citationLabel renderizables para la UI. Severity: `warning` si rate ≥ 20% **y** volumen ≥ 10. Este signal se activó con la mitad UI porque la experiencia real ya renderiza evidencia desde `raw.packet`.
+
+Con el flag OFF no hay invocaciones → `total=0` → las tres señales quedan `ok` (steady). Degradación honesta a `unknown` si el query falla (`captureWithDomain(error, 'knowledge', ...)`). El scan protege filas legacy/no-array antes de expandir JSONB.
 
 ## Delta 2026-06-01 — TASK-797: signal `hr.contractor_engagement.closed_with_open_payables`
 

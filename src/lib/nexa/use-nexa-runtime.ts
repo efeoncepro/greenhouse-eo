@@ -18,9 +18,23 @@ export const NEXA_MODEL_STORAGE_KEY = 'greenhouse:nexa:model'
  * los consumers (rehidratación de thread) compongan `initialMessages` sin acoplar
  * tipos internos del SDK.
  */
+export interface NexaInitialTextPart {
+  type: 'text'
+  text: string
+}
+
+export interface NexaInitialToolCallPart {
+  type: 'tool-call'
+  toolCallId: string
+  toolName: string
+  args: ReadonlyJSONObject
+  argsText: string
+  result: ReadonlyJSONValue
+}
+
 export interface NexaInitialMessage {
   role: 'user' | 'assistant'
-  content: Array<{ type: 'text'; text: string }>
+  content: Array<NexaInitialTextPart | NexaInitialToolCallPart>
 }
 
 export const toJsonValue = (value: unknown): ReadonlyJSONValue => {
@@ -43,14 +57,28 @@ export const toJsonValue = (value: unknown): ReadonlyJSONValue => {
 
 /**
  * Mapea los mensajes persistidos de un thread Nexa a la forma `initialMessages`
- * del runtime. V1 rehidrata SOLO el texto (las tool-cards se re-renderan en turnos
- * vivos); preserva orden y rol. Usado al cambiar de conversación en el rail.
+ * del runtime. Rehidrata texto + tool-calls versionados ya persistidos; si un
+ * thread antiguo no trae `toolInvocations`, degrada honestamente a texto.
  */
 export const mapThreadMessagesToInitial = (messages: NexaThreadMessage[]): NexaInitialMessage[] =>
-  messages.map(message => ({
-    role: message.role,
-    content: [{ type: 'text' as const, text: message.content ?? '' }]
-  }))
+  messages.map(message => {
+    const toolParts: NexaInitialToolCallPart[] =
+      message.role === 'assistant'
+        ? (message.toolInvocations ?? []).map(invocation => ({
+            type: 'tool-call',
+            toolCallId: invocation.toolCallId,
+            toolName: invocation.toolName,
+            args: toJsonValue(invocation.args) as ReadonlyJSONObject,
+            argsText: JSON.stringify(invocation.args ?? {}),
+            result: toJsonValue(invocation.result)
+          }))
+        : []
+
+    return {
+      role: message.role,
+      content: [{ type: 'text' as const, text: message.content ?? '' }, ...toolParts]
+    }
+  })
 
 type NexaAdapterRefs = {
   selectedModelRef: MutableRefObject<NexaModelId>
@@ -126,7 +154,7 @@ export const createNexaChatAdapter = (refs: NexaAdapterRefs): ChatModelAdapter =
     }))
 
     return {
-      content: [...toolParts, { type: 'text' as const, text: data.content || '' }]
+      content: [{ type: 'text' as const, text: data.content || '' }, ...toolParts]
     }
   }
 })

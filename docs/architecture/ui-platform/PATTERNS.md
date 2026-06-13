@@ -235,7 +235,9 @@ La superficie **conversacional canónica de Nexa**. Es un **patrón compuesto** 
 | Pieza | Rol | Estado |
 |---|---|---|
 | `NexaGlowBorder` | Borde "línea de luz" del composer (dos capas + máscara + beam, reduced-motion horneado). | Primitive canónica ✅ |
-| `NexaComposer` | Input + botón enviar + glow como unidad reusable. | A extraer ⏳ (follow-up) |
+| `NexaComposer` | Input + botón enviar + glow como unidad reusable; variant `command` para cajas compactas con Nexa mark + shortcut. | Primitive canónica ✅ |
+| `NexaKnowledgeAnswerSurface` | Respuesta con evidencia: pregunta-burbuja, respuesta Nexa, composer descendido y proof panel lateral/inline. | Composition primitive ✅ |
+| `NexaEvidencePanel` | Renderer compartido de evidence packets versionados (`nexa-evidence.v1`): trace, fuentes, confidence, freshness, filtered count y feedback. | Primitive canónica ✅ |
 | `NexaPresenceMark` / `NexaPresenceHeader` | Cara/mark + nombre + dot "En línea" con ping. | A extraer ⏳ |
 | `NexaSenderMark` | Avatar por-mensaje (disco navy + glyph teal/sparkle blanco inline-SVG). | A extraer ⏳ |
 | `NexaConversationRail` | Rail de historial glass (search + grupos + items + estados). | Parte del patrón |
@@ -251,8 +253,40 @@ La superficie **conversacional canónica de Nexa**. Es un **patrón compuesto** 
 ### Reglas
 
 - ✓ Reusar este patrón + sus primitives en toda superficie de Nexa-como-chat.
+- ✓ Para respuestas con evidencia/citas, usar `NexaKnowledgeAnswerSurface kind='knowledgeAnswerTrace'` en vez de crear cards de respuesta locales.
 - ✓ Empty hero: saludo rotativo + prompts contextuales + firma Efeonce **solo** en empty state.
-- ✓ Composer siempre vía `NexaGlowBorder` (futuro `NexaComposer`); cero hardcode (tokens AXIS + brand Nexa SSOT + escala tipográfica SoT).
+- ✓ Composer siempre vía `NexaComposer` / `NexaComposerInput`; para cajas tipo "Pregúntale a Nexa" usar `kind='knowledgeAsk'` en vez de copiar `NexaGlowBorder` + mark + shortcut localmente.
 - ✗ No crear un chat de Nexa paralelo por pantalla ni reimplementar composer/rail.
 - ✗ No usar la firma Efeonce fuera del empty state ni la cara real per-mensaje (ahí va el mark).
 - ✗ Prompts: NUNCA hardcodear el set; derivar del contexto (Tier 1 frontend resolver, Tier 2 backend data-aware — ver TASK-1078 follow-ups).
+
+### Nexa Knowledge Answer Surface (TASK-1089)
+
+`NexaKnowledgeAnswerSurface` es la primera **composition primitive transversal** para respuestas de Nexa con evidencia. Resuelve el patrón elegido del product-design loop opción 3: la pregunta no desaparece ni se convierte en un campo readonly; sube a burbuja, Nexa responde debajo y el composer glow baja bajo la respuesta para continuar la conversación. El modo conversacional es condicional: antes de un submit válido mantiene un idle limpio con composer glow, sin respuesta falsa, proof panel ni trace rail prematuro; después del submit muestra la coreografía pregunta-burbuja → identidad Nexa → respuesta → composer de follow-up → proof/provenance disponible. En la implementación Knowledge actual el proof panel conserva `Fuentes | Cómo llegó | Paquete | Revisión`; TASK-1095/TASK-1096 deben evolucionar el default hacia trust cue compacto + proof bajo demanda.
+
+**Variants:**
+
+- `conversationTrace`: lane conversacional + trace steps + proof sidecar en desktop (inline en mobile).
+- `overviewPanel`: reservado para el modo tipo AI Overview compacto; sin trace rail completo.
+- `toolResult`: presentación compacta de una respuesta con evidencia de tool operacional, sin crear una shell nueva.
+
+**Kinds:**
+
+- `knowledgeAnswerTrace` → `conversationTrace`; primer consumer `/knowledge/mockup/answer-trace`.
+- `knowledgeToolResult` → `toolResult`; usa el mismo evidence renderer que el chat.
+
+**Reglas:**
+
+- La primitive es **props-only**: no consulta tablas, no llama APIs y no decide retrieval. Puede recibir un `ConversationalEvidencePacket` (`nexa-evidence.v1`) ya derivado desde `knowledge-search.v1` y renderizarlo con `NexaEvidencePanel`.
+- Reusar `NexaComposer kind='knowledgeAsk'`, `NexaSenderMark`, `GreenhouseThinkingBeat`, `GreenhouseChip` y `GreenhouseButton`.
+- Para follow-ups dentro de una conversación, usar `NexaComposer kind='inlineFollowUp'`; `knowledgeAsk` queda para la caja command superior.
+- Motion breve y semántica `aria-live` para el estado de thinking; reduced-motion desactiva entradas decorativas.
+- Mantener proof/provenance disponible y grounded; en V2 no debe desplazar la respuesta ni el follow-up por defecto. El default deseado es trust cue compacto y proof expandible bajo demanda.
+
+No usar el mockup como prueba de retrieval real: usa data tipada. Para evidencia del renderer real del packet, usar los specimens `nexa-knowledge-answer-surface-specimen` y `nexa-knowledge-tool-trace-specimen` del lab `/design-system/nexa-chat` y el scenario GVC `design-system-nexa-chat`.
+
+### Conversational Evidence V1 (TASK-1093)
+
+`ConversationalEvidencePacket` (`src/lib/nexa/conversational-evidence.ts`) es el view-model común para evidence conversacional. V1 deriva desde `knowledge-search.v1` y preserva query, confidence, freshness, denied/filtered count, source URLs/human URLs, citation labels, scores y target de feedback. La UI no re-lee tablas ni re-ejecuta tools: `NexaToolRenderers` y `NexaKnowledgeAnswerSurface` consumen el mismo packet y lo renderizan con `NexaEvidencePanel`.
+
+Los threads históricos rehidratados vuelven con tool-calls cuando `greenhouse_ai.nexa_messages.tool_invocations` trae payload seguro; si un thread antiguo no tiene evidence, el runtime conserva el texto y degrada sin romper la conversación.

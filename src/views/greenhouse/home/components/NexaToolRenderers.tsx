@@ -9,7 +9,9 @@ import Chip from '@mui/material/Chip'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
+import { NexaEvidencePanel } from '@/components/greenhouse/primitives'
 import type { NexaToolResult } from '@/lib/nexa/nexa-contract'
+import { nexaToolResultToConversationalEvidence } from '@/lib/nexa/conversational-evidence'
 
 const toneToColor = (tone?: string): 'default' | 'success' | 'warning' | 'error' | 'info' => {
   switch (tone) {
@@ -25,15 +27,15 @@ const toneToColor = (tone?: string): 'default' | 'success' | 'warning' | 'error'
 
 const ToolCard = ({ toolName, result }: { toolName: string; result: NexaToolResult }) => (
   <Box
-    sx={{
+    sx={theme => ({
       mt: 1.25,
       border: 1,
       borderColor: 'divider',
-      borderRadius: 3,
+      borderRadius: `${theme.shape.customBorderRadius.md}px`,
       bgcolor: 'action.hover',
       px: 2,
       py: 1.5
-    }}
+    })}
   >
     <Stack direction='row' spacing={1} alignItems='center' sx={{ mb: 1 }}>
       <Chip
@@ -47,19 +49,19 @@ const ToolCard = ({ toolName, result }: { toolName: string; result: NexaToolResu
       </Typography>
     </Stack>
 
-    {!result.available && (
+    {!result.available ? (
       <Alert severity='warning' sx={{ mb: 1.25 }}>
         {result.summary}
       </Alert>
-    )}
+    ) : null}
 
-    {result.available && (
+    {result.available ? (
       <>
         <Typography variant='body2' sx={{ color: 'text.primary', mb: result.metrics.length > 0 ? 1.25 : 0 }}>
           {result.summary}
         </Typography>
 
-        {result.metrics.length > 0 && (
+        {result.metrics.length > 0 ? (
           <Stack direction='row' spacing={1} useFlexGap flexWrap='wrap'>
             {result.metrics.map(metric => (
               <Chip
@@ -71,11 +73,27 @@ const ToolCard = ({ toolName, result }: { toolName: string; result: NexaToolResu
               />
             ))}
           </Stack>
-        )}
+        ) : null}
       </>
-    )}
+    ) : null}
   </Box>
 )
+
+export const NexaKnowledgeToolTraceCard = ({
+  result,
+  feedbackEnabled = true
+}: {
+  result: NexaToolResult
+  feedbackEnabled?: boolean
+}) => {
+  const evidence = nexaToolResultToConversationalEvidence(result)
+
+  if (!evidence) {
+    return <ToolCard toolName='search_knowledge' result={result} />
+  }
+
+  return <NexaEvidencePanel evidence={evidence} variant='traceCard' feedbackEnabled={feedbackEnabled} />
+}
 
 const createRenderer = (toolName: string) => {
   const Renderer = ({ result }: ToolCallMessagePartProps<Record<string, unknown>, NexaToolResult>) => {
@@ -115,6 +133,20 @@ const NexaToolRenderers = () => {
   useAssistantToolUI({
     toolName: 'pending_invoices',
     render: createRenderer('pending_invoices')
+  })
+  useAssistantToolUI({
+    toolName: 'search_knowledge',
+    render: ({ result }: ToolCallMessagePartProps<Record<string, unknown>, NexaToolResult>) => {
+      if (!result) {
+        return (
+          <Alert severity='info' sx={{ mt: 1.25 }}>
+            Consultando Knowledge...
+          </Alert>
+        )
+      }
+
+      return <NexaKnowledgeToolTraceCard result={result} />
+    }
   })
 
   return null

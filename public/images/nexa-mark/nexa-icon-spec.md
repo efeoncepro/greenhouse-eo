@@ -26,6 +26,7 @@ es el mark completo.
 | Archivo                | Uso                                                       |
 |------------------------|-----------------------------------------------------------|
 | `nexa-mark.svg`        | Mark a dos tintas. Inline en UI, headers, splash.         |
+| `nexa-mark-on-dark.svg`| Mark dos tintas para fondos OSCUROS: arco teal + chispa BLANCA (regla "chispa sobre navy = blanco"). Inline en CTAs/superficies navy o shiny. Kind `inlineMarkOnDark`. |
 | `nexa-mark-mono.svg`   | Una tinta (hereda color del contexto). Inline en UI.      |
 | `nexa-badge.svg`       | Contenedor squircle. App-launcher, avatar, entry point.   |
 

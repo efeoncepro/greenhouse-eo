@@ -14,21 +14,21 @@ export const scenario: CaptureScenario = {
     {
       kind: 'mark',
       label: 'idle',
-      note: 'FAB sin hover: no debe mostrar glow teal persistente.'
+      note: 'FAB sin hover: no debe mostrar spectrum beam persistente.'
     },
     { kind: 'hover', selector: '[data-capture="nexa-floating-trigger"]' },
     { kind: 'sleep', ms: 320 },
     {
       kind: 'mark',
       label: 'hover-glow',
-      note: 'Hover/focus affordance: glow teal aparece detrás del FAB.'
+      note: 'Hover/focus affordance: spectrum beam brand aparece detrás del FAB.'
     },
     { kind: 'hover', selector: '[data-capture="nexa-brand-primary-specimen"]' },
     { kind: 'sleep', ms: 850 },
     {
       kind: 'mark',
       label: 'after-hover-fade',
-      note: 'Mouse fuera: el glow debe apagarse con fade, sin quedar pegado.'
+      note: 'Mouse fuera: el spectrum beam debe apagarse con fade, sin quedar pegado.'
     }
   ]
 }

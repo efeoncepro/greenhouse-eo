@@ -152,6 +152,12 @@ import { getPayrollContractTaxonomyInvalidStatutoryApplicationSignal } from './q
 import { getProviderBqSyncDeadLetterSignal } from './queries/provider-bq-sync-dead-letter'
 import { getHubspotCompaniesIntakeDeadLetterSignal } from './queries/hubspot-companies-intake-dead-letter'
 import { getWorkforceUnlinkedInternalUsersSignal } from './queries/workforce-unlinked-internal-users'
+// TASK-1082 — Knowledge Platform ingestion signals (moduleKey 'knowledge').
+import { getKnowledgeNotionIngestDeadLetterSignal } from './queries/knowledge-notion-ingest-dead-letter'
+import { getKnowledgeQuarantineCountSignal } from './queries/knowledge-quarantine-count'
+import { getKnowledgeSyncFailedSourceSignal } from './queries/knowledge-sync-failed-source'
+// TASK-1085 — Nexa knowledge retrieval observability (moduleKey 'knowledge').
+import { getNexaKnowledgeRetrievalSignals } from './queries/nexa-knowledge-retrieval-signals'
 import { getServiceEngagementEngagementKindUnmappedSignal } from './queries/service-engagement-engagement-kind-unmapped'
 import { getServiceEngagementLifecycleStageUnknownSignal } from './queries/service-engagement-lifecycle-stage-unknown'
 import { getServiceEngagementLineageOrphanSignal } from './queries/service-engagement-lineage-orphan'
@@ -568,6 +574,13 @@ interface ReliabilityOverviewSources {
   hubspotCompaniesIntakeDeadLetter?: ReliabilitySignal | null
   workforceUnlinkedInternalUsers?: ReliabilitySignal | null
 
+  /** TASK-1082 — Knowledge ingestion signals (quarantine count + failed sync source). */
+  knowledgeQuarantineCount?: ReliabilitySignal | null
+  knowledgeSyncFailedSource?: ReliabilitySignal | null
+  knowledgeNotionIngestDeadLetter?: ReliabilitySignal | null
+  /** TASK-1085 — Nexa knowledge retrieval signals (no-source rate + stale-source). */
+  nexaKnowledgeRetrieval?: ReliabilitySignal[] | null
+
   /**
    * TASK-773 Slice 4 — Outbox publisher health. 2 readers:
    *   - sync.outbox.unpublished_lag (events pending/failed > 10 min)
@@ -960,6 +973,12 @@ export const buildReliabilityOverview = (
     ...(sources.hubspotCompaniesIntakeDeadLetter ? [sources.hubspotCompaniesIntakeDeadLetter] : []),
     // TASK-878 follow-up — Identity UX hardening: internal users sin member enlazado.
     ...(sources.workforceUnlinkedInternalUsers ? [sources.workforceUnlinkedInternalUsers] : []),
+    // TASK-1082 — Knowledge ingestion: quarantine count + failed sync source.
+    ...(sources.knowledgeQuarantineCount ? [sources.knowledgeQuarantineCount] : []),
+    ...(sources.knowledgeSyncFailedSource ? [sources.knowledgeSyncFailedSource] : []),
+    ...(sources.knowledgeNotionIngestDeadLetter ? [sources.knowledgeNotionIngestDeadLetter] : []),
+    // TASK-1085 — Nexa knowledge retrieval observability (no-source rate + stale-source).
+    ...(sources.nexaKnowledgeRetrieval ?? []),
     // TASK-773 Slice 4 — Outbox publisher health (lag + dead_letter).
     ...(sources.outboxHealth ?? []),
     // TASK-408 Slice 4 — Email render/template safety net.
@@ -1340,6 +1359,29 @@ export const getReliabilityOverview = async (
     preloadedSources.workforceUnlinkedInternalUsers !== undefined
       ? preloadedSources.workforceUnlinkedInternalUsers
       : await getWorkforceUnlinkedInternalUsersSignal().catch(() => null)
+
+  // TASK-1082 — Knowledge ingestion signals (moduleKey 'knowledge'). Degradan
+  // honestamente (severity='unknown') si su query falla.
+  const knowledgeQuarantineCount =
+    preloadedSources.knowledgeQuarantineCount !== undefined
+      ? preloadedSources.knowledgeQuarantineCount
+      : await getKnowledgeQuarantineCountSignal().catch(() => null)
+
+  const knowledgeSyncFailedSource =
+    preloadedSources.knowledgeSyncFailedSource !== undefined
+      ? preloadedSources.knowledgeSyncFailedSource
+      : await getKnowledgeSyncFailedSourceSignal().catch(() => null)
+
+  const knowledgeNotionIngestDeadLetter =
+    preloadedSources.knowledgeNotionIngestDeadLetter !== undefined
+      ? preloadedSources.knowledgeNotionIngestDeadLetter
+      : await getKnowledgeNotionIngestDeadLetterSignal().catch(() => null)
+
+  // TASK-1085 — Nexa knowledge retrieval signals (un solo scan jsonb → 2 señales).
+  const nexaKnowledgeRetrieval =
+    preloadedSources.nexaKnowledgeRetrieval !== undefined
+      ? preloadedSources.nexaKnowledgeRetrieval
+      : await getNexaKnowledgeRetrievalSignals().catch(() => null)
 
   // TASK-773 Slice 4 — Outbox publisher health (lag + dead_letter).
   // 2 readers en paralelo. Cada uno degrada honestamente si su query falla.
@@ -1979,6 +2021,10 @@ export const getReliabilityOverview = async (
     providerBqSyncDeadLetter,
     hubspotCompaniesIntakeDeadLetter,
     workforceUnlinkedInternalUsers,
+    knowledgeQuarantineCount,
+    knowledgeSyncFailedSource,
+    knowledgeNotionIngestDeadLetter,
+    nexaKnowledgeRetrieval,
     outboxHealth,
     emailRenderFailure,
     cronStagingDrift,
