@@ -1,5 +1,20 @@
 # Release 2026-06-10 #2 — develop→main `6c649b2a6` RELEASED
 
+## Sesion 2026-06-13 — GreenhouseGradientBackground primitive (Codex)
+
+- **Qué quedó:** se creó `GreenhouseGradientBackground` en `src/components/greenhouse/primitives/gradient-background/` para traer fondos degradados al Design System con presets gobernados.
+- **Contrato:** variants `surfaceWash`, `heroAurora`, `brandField`; kinds `axisSurface`, `nexaAurora`, `efeonceBrand`, `insightPanel`, `calmBackdrop`, `custom`; intensities `subtle|medium|strong`; props `animated`, `overlay`, `centerContent`. Colores desde `theme.axis.*`/`theme.palette.*`; sin Tailwind, sin OKLCH, sin framer directo.
+- **Guardrail visual:** usa bandas lineales tokenizadas, no blobs/orbs radiales. `prefers-reduced-motion` deja el fondo estático.
+- **Design System:** nueva ruta interna `/design-system/gradients`, entrada en catálogo, route-reachability y scenario `design-system-gradients`.
+- **Coordinación WT compartido:** se preserva WIP previo no mío en Motion/Nexa Answers; stagear selectivamente si se commitea.
+
+## Sesion 2026-06-13 — NexaPromptDock primitive (Codex)
+
+- **Qué quedó:** `NexaPromptDock` nace como composition primitive en `src/components/greenhouse/primitives/nexa-prompt-dock/` para el patrón dock compacto → prompt contextual de Nexa. Variants: `compactDock`, `inlinePanel`, `floatingPrompt`. Kinds: `quickAsk`, `knowledgeAsk`, `surfaceFollowUp`, `contextualAction`, `custom`.
+- **Contrato:** reusa `GreenhouseNexaAnimatedMark`, `NexaComposer`, `NexaComposerInput` y `NexaComposerActionButton`; controla open controlado/no-controlado, foco al abrir, Escape, click-outside, submit por botón y `Cmd/Ctrl + Enter`, y success feedback temporal. No copia shadcn/Tailwind/OKLCH/motion externo.
+- **Design System:** `/design-system/nexa-chat` suma specimen `nexa-prompt-dock-specimen`; scenario `design-system-nexa-chat` actualizado para capturarlo.
+- **Coordinación WT compartido:** había WIP previo no mío en `NexaAnswersCanvas`, el barrel y el mockup de Nexa Answers; se preserva. Stagear selectivamente si se commitea.
+
 ## Sesion 2026-06-13 — `/design-system/nexa-chat` structured lab polish (Codex)
 
 - **Qué quedó:** el lab interno `/design-system/nexa-chat` se reestructuró para revisar primitives de forma más ordenada: header tipo consola con estado/owner/evidencia, grids para clasificación/anatomía/composición, sección separada de átomos base, frame consistente para cada specimen vivo y reglas Hacer/Evitar más escaneables.

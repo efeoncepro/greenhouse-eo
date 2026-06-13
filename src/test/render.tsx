@@ -18,6 +18,7 @@ import { elevationTokens } from '@/components/theme/elevation-tokens'
 // EvidenceAttachmentDropzone, FieldProvenancePeek, MetricBreakdownChartCard) test
 // against the canonical values instead of crashing on an undefined token.
 import { greenhouseSemanticTokens } from '@/components/theme/greenhouse-semantic-tokens'
+import { axisTokens } from '@core/theme/axis-tokens'
 
 // Mirrors the Greenhouse shape tokens (GREENHOUSE_DESIGN_TOKENS_V1.md §5.1) so
 // primitives that consume `theme.shape.customBorderRadius.*` can be unit-tested
@@ -27,6 +28,7 @@ import { greenhouseSemanticTokens } from '@/components/theme/greenhouse-semantic
 // sin pull del Vuexy theme completo. TASK-1049 — extends with
 // `greenhouseElevation` (real SoT) for elevation-token consumers.
 const theme = createTheme({
+  axis: axisTokens,
   shape: {
     customBorderRadius: {
       xs: 2,

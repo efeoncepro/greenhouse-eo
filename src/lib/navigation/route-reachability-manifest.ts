@@ -244,6 +244,13 @@ export const DECLARED_CHILD_ROUTES: readonly ChildRouteDeclaration[] = [
       'Elevation & Shadows Lab (TASK-1049) — child surface del Design System para los roles semánticos de elevación (theme.greenhouseElevation), alcanzable desde el catalogo canonico /design-system.'
   },
   {
+    route: '/design-system/gradients',
+    parent: '/design-system',
+    via: 'inline-link',
+    reason:
+      'Gradient Background Lab — child surface del Design System para la primitive GreenhouseGradientBackground y sus presets tokenizados, alcanzable desde el catalogo canonico /design-system.'
+  },
+  {
     route: '/design-system/geometry',
     parent: '/design-system',
     via: 'inline-link',

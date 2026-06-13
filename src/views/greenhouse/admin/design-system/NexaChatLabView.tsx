@@ -25,6 +25,7 @@ import {
   NexaFace,
   NexaKnowledgeAnswerSurface,
   NexaPresenceMark,
+  NexaPromptDock,
   NexaSenderMark
 } from '@/components/greenhouse/primitives'
 import type {
@@ -1104,6 +1105,50 @@ const NexaChatLabView = () => (
             </NexaComposer>
           </Stack>
         </Stack>
+      </SpecimenFrame>
+    </Section>
+
+    <Section
+      eyebrow='Prompt dock'
+      title='Dock compacto → panel de pregunta'
+      description='El patrón del prompt externo vive como primitive Nexa: apertura contextual, foco, Escape/click-outside y submit con atajo.'
+    >
+      <SpecimenFrame
+        capture='nexa-prompt-dock-specimen'
+        eyebrow='Composition primitive'
+        title='NexaPromptDock'
+        description='Morfología compacta para pedirle algo a Nexa sin invadir el canvas principal; reusa NexaComposer y el mark animado.'
+      >
+        <Box
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: { xs: '1fr', lg: 'minmax(220px, 0.72fr) minmax(320px, 1fr)' },
+            gap: 4,
+            alignItems: 'start'
+          }}
+        >
+          <Stack spacing={2}>
+            <Typography variant='caption' color='text.secondary'>
+              <InlineCode>kind=&apos;quickAsk&apos;</InlineCode> · estado cerrado
+            </Typography>
+            <NexaPromptDock
+              kind='quickAsk'
+              helperText='Ideal para docks flotantes o entrypoints de asistencia rápida.'
+            />
+          </Stack>
+          <Stack spacing={2}>
+            <Typography variant='caption' color='text.secondary'>
+              <InlineCode>kind=&apos;knowledgeAsk&apos;</InlineCode> · panel abierto
+            </Typography>
+            <NexaPromptDock
+              kind='knowledgeAsk'
+              defaultOpen
+              defaultValue='¿Qué cambió en este corpus desde el último corte?'
+              helperText='Cmd/Ctrl + Enter envía; Escape cierra sin perder el contrato a11y.'
+              sx={{ maxInlineSize: 'none' }}
+            />
+          </Stack>
+        </Box>
       </SpecimenFrame>
     </Section>
 

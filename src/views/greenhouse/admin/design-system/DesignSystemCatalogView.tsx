@@ -115,6 +115,19 @@ const CATALOG_ITEMS: CatalogItem[] = [
     icon: 'tabler-stack-2'
   },
   {
+    id: 'gradients',
+    title: 'Gradient backgrounds',
+    description: 'Fondos degradados tokenizados: presets AXIS/Nexa/brand, intensidad y motion CSS con reduced-motion.',
+    route: '/design-system/gradients',
+    category: 'Foundations',
+    kind: 'Primitive',
+    status: 'Hardening',
+    owner: 'GreenhouseGradientBackground',
+    tags: ['gradient', 'background', 'surface', 'motion'],
+    searchAliases: ['gradiente', 'gradientes', 'background', 'fondos', 'degradado', 'aurora', 'hero'],
+    icon: 'tabler-brush'
+  },
+  {
     id: 'buttons',
     title: 'Buttons',
     description: 'Primitive para jerarquía de comandos, tono, iconos y estados async.',

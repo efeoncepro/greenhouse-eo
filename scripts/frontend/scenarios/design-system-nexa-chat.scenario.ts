@@ -46,6 +46,17 @@ export const scenario: CaptureScenario = {
     },
     {
       kind: 'scroll',
+      selector: '[data-capture="nexa-prompt-dock-specimen"]',
+      scrollBlock: 'center'
+    },
+    {
+      kind: 'mark',
+      label: 'nexa-prompt-dock-specimen',
+      clipSelector: '[data-capture="nexa-prompt-dock-specimen"]',
+      note: 'Composition primitive NexaPromptDock con dock compacto y panel contextual'
+    },
+    {
+      kind: 'scroll',
       selector: '[data-capture="nexa-knowledge-answer-surface-specimen"]',
       scrollBlock: 'center'
     },

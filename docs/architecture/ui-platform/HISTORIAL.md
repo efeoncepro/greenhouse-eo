@@ -6,6 +6,28 @@
 
 ---
 
+## Delta 2026-06-13f — GreenhouseGradientBackground primitive
+
+Se creó `GreenhouseGradientBackground` para traer fondos degradados al Design System sin copiar el componente shadcn/Tailwind:
+
+- Primitive nueva en `src/components/greenhouse/primitives/gradient-background/`.
+- Variants oficiales: `surfaceWash`, `heroAurora`, `brandField`.
+- Kinds iniciales: `axisSurface`, `nexaAurora`, `efeonceBrand`, `insightPanel`, `calmBackdrop`, `custom`.
+- Los colores se resuelven desde `theme.axis.*` / `theme.palette.*`; no hay HEX inline, OKLCH ni Tailwind.
+- Motion: CSS `background-position` con duración gobernada y `prefers-reduced-motion` estático; no se instala `framer-motion` ni se importa motion vendor directo.
+- Guardrail visual: usa bandas lineales tokenizadas, no blobs/orbs radiales.
+- Lab interno `/design-system/gradients` + scenario GVC `design-system-gradients`.
+
+## Delta 2026-06-13e — NexaPromptDock primitive
+
+Se creó `NexaPromptDock` como composition primitive para el patrón dock compacto → prompt contextual de Nexa:
+
+- Variants oficiales: `compactDock`, `inlinePanel`, `floatingPrompt`.
+- Kinds iniciales: `quickAsk`, `knowledgeAsk`, `surfaceFollowUp`, `contextualAction`, `custom`.
+- Reusa `GreenhouseNexaAnimatedMark`, `NexaComposer`, `NexaComposerInput` y `NexaComposerActionButton`; no copia shadcn/Tailwind/OKLCH/motion externo.
+- Contrato de interacción: open controlado/no-controlado, foco al abrir, Escape, click-outside, submit por botón y `Cmd/Ctrl + Enter`, con success feedback temporal.
+- Lab `/design-system/nexa-chat` suma specimen `data-capture='nexa-prompt-dock-specimen'` y el scenario GVC lo captura.
+
 ## Delta 2026-06-13d — Nexa bubble entrance microinteractions (TASK-1096)
 
 Se agregó entrada suave a las bubbles de Nexa Answers:

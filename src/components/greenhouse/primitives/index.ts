@@ -32,6 +32,22 @@ export type {
   GreenhouseVerificationBadgeProps,
   GreenhouseVerificationBadgeSize
 } from './GreenhouseVerificationBadge'
+export { default as GreenhouseGradientBackground } from './gradient-background/GreenhouseGradientBackground'
+export type {
+  GreenhouseGradientBackgroundConfig,
+  GreenhouseGradientBackgroundIntensity,
+  GreenhouseGradientBackgroundKind,
+  GreenhouseGradientBackgroundProps,
+  GreenhouseGradientBackgroundVariant
+} from './gradient-background/greenhouse-gradient-background-types'
+export {
+  buildGreenhouseGradientBackgroundConfig,
+  buildGreenhouseGradientBackgroundCss,
+  GREENHOUSE_GRADIENT_BACKGROUND_KIND_CONFIG,
+  resolveGreenhouseGradientBackgroundKind,
+  resolveGreenhouseGradientBackgroundVariant
+} from './gradient-background/greenhouse-gradient-background-controller'
+export type { GreenhouseGradientBackgroundKindConfig } from './gradient-background/greenhouse-gradient-background-controller'
 export { default as GreenhouseNexaBrandMark } from './GreenhouseNexaBrandMark'
 export { default as GreenhouseNexaAnimatedMark } from './GreenhouseNexaAnimatedMark'
 export type { GreenhouseNexaAnimatedMarkProps } from './GreenhouseNexaAnimatedMark'
@@ -56,6 +72,25 @@ export type {
   NexaComposerVariant,
   NexaComposerVariantConfig
 } from './nexa-composer-controller'
+export { default as NexaPromptDock } from './nexa-prompt-dock/NexaPromptDock'
+export type {
+  NexaPromptDockCopy,
+  NexaPromptDockKind,
+  NexaPromptDockProps,
+  NexaPromptDockSubmitState,
+  NexaPromptDockVariant
+} from './nexa-prompt-dock/nexa-prompt-dock-types'
+export {
+  NEXA_PROMPT_DOCK_KIND_CONFIG,
+  NEXA_PROMPT_DOCK_VARIANT_CONFIG,
+  resolveNexaPromptDockCopy,
+  resolveNexaPromptDockKind,
+  resolveNexaPromptDockVariant
+} from './nexa-prompt-dock/nexa-prompt-dock-controller'
+export type {
+  NexaPromptDockKindConfig,
+  NexaPromptDockVariantConfig
+} from './nexa-prompt-dock/nexa-prompt-dock-controller'
 export { default as NexaFace, NEXA_FACE_SRC } from './NexaFace'
 export type { NexaFaceProps, NexaFaceVariant } from './NexaFace'
 export { default as NexaPresenceMark } from './NexaPresenceMark'
