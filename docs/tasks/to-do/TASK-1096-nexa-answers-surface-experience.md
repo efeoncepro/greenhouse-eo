@@ -26,6 +26,24 @@
 
 Construir **Nexa Answers** como la surface contextual que transforma una UI existente en una experiencia conversacional embebida: idle limpio, pregunta como burbuja, Nexa pensando con contexto, respuesta answer-first, trust cue compacto, composer descendido, proof bajo demanda y follow-ups compactos. TASK-1095 provee el soporte de plataforma; esta task garantiza la coreografia producto/UI que el usuario debe experimentar.
 
+## Delta 2026-06-13 — experiencia (mockup) sustancialmente entregada; pendiente reconciliación + runtime + decisión de duplicación
+
+Revisión de necesidad pedida por el operador. Veredicto: **la EXPERIENCIA está entregada como mockup; la task NO está absorbida por 1089/1090, pero SÍ se solapa con ellas en la ruta Knowledge** y necesita una decisión de consolidación.
+
+**Entregado (mockup `/knowledge/mockup/nexa-answers`, sesión 2026-06-13, GVC 0 findings):**
+
+- Coreografía AI-Overview-grade: idle → **enviar dispara el despliegue** (razonando → streaming → settle), no salto seco (commit `9f7165fa7`).
+- **Citas inline span-level + evidence-peek** (`e8a8ef852`), **response toolbar settle** ¿útil?/copiar/compartir/regenerar (`78d30ee40`), **control "Detener"** (`4054a6014`), **test de contrato plain-text** (`d5532e777`), **portabilidad no-Knowledge** finance/chart + Insight promovido + mounted-guard del sparkline (`7beba65eb`).
+
+**Pendiente (NO entregado por esta sesión):**
+
+1. **Reconciliación Arch Gate A1/A2** — todo lo de arriba se construyó sobre el `NexaAnswersSurfaceContext` **local** + la máquina de 10 estados, forkeando el contrato de TASK-1095. Bloqueado por que 1095 aterrice el SSOT.
+2. **Runtime** (datos reales del retrieval) → **TASK-1101** (creada 2026-06-13, 6 slices: mapper packet→citas, toolbar→feedback real, stop→abort, streaming/reasoning reales, SSR hardening, cutover flag-gated).
+
+**⚠️ Flag de duplicación (decisión del operador/arquitectura, NO la tomo unilateralmente):** existen **dos mockups Knowledge en paralelo** — `/knowledge/mockup/nexa-answers` (esta task, usa `NexaAnswersCanvas`) y `/knowledge/mockup/answer-trace` (**TASK-1089/1090**, Codex, usa `KnowledgeAnswerTraceMockupView` propio). Es exactamente el "componente paralelo" que 1095 debía prevenir. Hay que decidir **cuál es la surface canónica de la lente Nexa en Knowledge** (o cómo convergen) antes de promover a runtime. Codex está activo en 1089/1090/1092 por override del operador.
+
+**Follow-ups next-level creados (2026-06-13, to-do):** TASK-1102 (multi-turno + View Transitions), TASK-1103 (`NexaProvenanceTrace` primitive SoT del grounding), TASK-1104 (promover `NexaResponseToolbar` a primitive), TASK-1105 (`NexaStreamingText` primitive).
+
 ## Arch Review Gate (2026-06-12)
 
 Review de arquitectura (`docs/architecture/GREENHOUSE_CONVERSATIONAL_EXPERIENCE_V2_ARCH_REVIEW.md` + Delta del ADR) detectó que esta task se construyó UI-first y forkeó contratos de TASK-1095. Antes de sumar más kinds/estados, reconciliar contra el contrato canónico:

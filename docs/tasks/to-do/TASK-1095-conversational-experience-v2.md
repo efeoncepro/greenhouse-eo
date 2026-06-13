@@ -26,6 +26,17 @@
 
 Consolidar la segunda version de la plataforma conversacional de Nexa como una base multi-surface consumible por Knowledge, Finance, charts, Agency, Personas, Commercial y futuros modulos operacionales: estado conversacional canonico, answer-turn reusable, contexto de superficie tipado, sustrato de evidencia/provenance detras de escena y reglas de placement para Home, floating panel, AnswerSurface y sidecars/overviews. El objetivo es evitar que `/knowledge` improvise un chat local o que cada surface vuelva a renderizar preguntas, respuestas, citas, acciones y proof panels con un lenguaje distinto, sin convertir la evidencia en protagonista de la conversacion.
 
+## Delta 2026-06-13 — sigue necesaria; la deuda de reconciliación CRECIÓ
+
+Revisión de necesidad pedida por el operador ("¿1095/1096 quedaron absorbidas?"). Veredicto: **TASK-1095 NO está absorbida — sigue siendo el contrato SSOT sin resolver**, y la deuda creció.
+
+- **Lo que YA estaba fuera de su scope (no es absorción de 1095):** el sustrato de evidencia/provenance (`ConversationalEvidencePacket`, `NexaEvidencePanel`, `inlineFollowUp`, rehidratación) lo entregó **TASK-1093 (complete)** — siempre fue scope de 1093, no de 1095.
+- **Lo que sigue vivo y es el corazón de 1095:** el `surfaceContext` + máquina de estados **SSOT en `src/lib/nexa/`** (A1/A2). Hoy NO existe → coexisten contratos forkeados.
+- **La sesión del 2026-06-13 (mockup de TASK-1096) AGRANDÓ el fork:** se sumaron **citas inline (`NexaCitationSource`/`NexaCitationMarker`), response toolbar (`onResponseControl`/`NexaAnswersResponseControl`), control "Detener" (`onStopGeneration`) y portabilidad (kinds finance/agency)** — todo sobre el `NexaAnswersSurfaceContext` **local** del canvas, no sobre el SSOT. El answer-trace de TASK-1089 mantiene su propio contrato en paralelo. ⇒ A1/A2 ahora deben reconciliar también estos contratos nuevos.
+- **TASK-1101 (runtime de Nexa Answers) está bloqueada por este SSOT** (su Slice 0 es justo "consumir el surfaceContext SSOT de 1095, mergear `allowedRenderers`/`allowedActions`").
+
+**Acción:** mantener `to-do`, scope intacto (es el contrato que desbloquea 1096/1089/1090/1101). El "shell multi-surface" (placements/sidecar/overview) ya estaba diferido por 1093 — esta task se enfoca primero en el contrato mínimo types-only (A1/A2/A3/A6) que el Arch Gate exige. Ver TASK-1096 (Delta 2026-06-13) por el flag de duplicación de surfaces Knowledge.
+
 ## Arch Review Gate (2026-06-12)
 
 Review de arquitectura (`docs/architecture/GREENHOUSE_CONVERSATIONAL_EXPERIENCE_V2_ARCH_REVIEW.md` + Delta del ADR) verificó que el diseño es sólido pero **TASK-1096 se está construyendo UI-first y ya forkeó contratos que esta task debe poseer**. Antes de seguir endureciendo 1096, esta task debe aterrizar el contrato mínimo (types-only basta):
