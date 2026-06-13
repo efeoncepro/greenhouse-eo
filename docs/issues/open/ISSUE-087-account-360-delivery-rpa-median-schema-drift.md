@@ -8,6 +8,26 @@ preview (`javascript-nextjs`, Sentry alert `JAVASCRIPT-NEXTJS-7H`). Riesgo laten
 
 2026-06-12 03:40:12 -04, Sentry email: `GET /api/organization/[id]/360` con excepción `column "rpa_median" does not exist`. Investigado por Codex el 2026-06-13.
 
+## Evidencia Sentry verificada
+
+Consulta read-only via Sentry API el 2026-06-13, usando `SENTRY_INCIDENTS_AUTH_TOKEN` local:
+
+- Issue short ID: `JAVASCRIPT-NEXTJS-7H`
+- Group ID: `7545900569`
+- Estado Sentry: `unresolved`, `substatus=new`, prioridad `high`
+- Ambiente: `preview`
+- Count: `30`
+- First seen: `2026-06-12T07:40:12Z` (`2026-06-12 03:40:12 -04`)
+- Last seen: `2026-06-12T23:54:42Z` (`2026-06-12 19:54:42 -04`)
+- Error title: `error: column "rpa_median" does not exist`
+- Tags relevantes: `domain=delivery`, `source=account360.delivery.ico_serving`, `handled=yes`, `turbopack=True`
+- First release: `f3be080bf330fe387a0506dfadaba40f3a99c555`
+- Last release observado: `11c64db0d051cce47160603e3c347ff4213d6037`
+- Releases intermedios con el mismo error en eventos muestreados: `adcde46d6e311edacfbacabe60aba52b86c9d0d9`, `e57bdbd2ca08e3ad257c40e008d7c06a0b96d79b`, `7788ff58abe4218a4d0701ce2d4c35467a7e3b1e`
+- Organización/ruta del caso vivo observado: `org-f6aa4e20-9dbb-467a-950d-61e5f085e9b0` en `https://greenhouse-eo-env-staging-efeonce-7670142f.vercel.app`
+
+El evento del email (`9c74783d68c84986a9a1a7b8b6dfbd60`) existe en Sentry y pertenece al mismo group. Sentry reporta source maps ausentes para los chunks server (`Source code was not found`) y releases sin commits asociados (`commitCount=0`), por lo que no identifica suspect commit automáticamente; el mapeo al commit roto se obtuvo por git + runtime schema.
+
 ## Síntoma
 
 Las llamadas a Account 360 que piden el facet `delivery` emiten error SQL:
@@ -16,7 +36,12 @@ Las llamadas a Account 360 que piden el facet `delivery` emiten error SQL:
 error: column "rpa_median" does not exist
 ```
 
-El stack apunta a `src_lib_account-360...` y la ruta afectada es `src/app/api/organization/[id]/360/route.ts`, que invoca `getAccountComplete360()` y luego el facet `delivery`.
+El stack apunta a `src_lib_account-360...`. Sentry confirmó dos transacciones afectadas:
+
+- `GET /api/organization/[id]/360`
+- `GET /api/organizations/[id]/workspace/compact-signals`
+
+Ambas rutas invocan lectura de Account 360 / compact signals que termina ejecutando el facet `delivery`.
 
 ## Causa raíz
 
@@ -65,7 +90,7 @@ Toda superficie que consuma `GET /api/organization/[id]/360` con `facets=deliver
 - `src/views/greenhouse/finance/FinanceClientsOrganizationWorkspaceClient.tsx`
 - `src/lib/organization-workspace/compact-signals.ts`
 
-El resolver de Account 360 puede devolver facet errors parciales, pero el error sigue siendo real: el contrato SQL está roto y Sentry lo captura en runtime.
+El resolver de Account 360 puede devolver facet errors parciales, y el path `compact-signals` también captura el mismo fallo como degradación observada. El tag Sentry `handled=yes` confirma que no fue un crash bruto, sino un error capturado por `observeAndDegrade()`; aun así el contrato SQL está roto y Sentry lo registra en runtime.
 
 ## Solución
 
@@ -85,6 +110,7 @@ Verificado durante investigación:
 - Cloud SQL confirma que `organization_operational_metrics` no tiene `rpa_median`, `pipeline_velocity` ni `stuck_asset_pct`.
 - Query ofensiva reproducida contra Cloud SQL con error `42703`, `column "rpa_median" does not exist`.
 - `ico_organization_metrics` sí contiene las columnas ricas.
+- Sentry API confirma `JAVASCRIPT-NEXTJS-7H` / group `7545900569`, 30 eventos en preview el 2026-06-12, impactando `360` y `workspace/compact-signals`.
 
 Verificación requerida para cerrar:
 

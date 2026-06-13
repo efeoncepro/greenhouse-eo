@@ -24,7 +24,7 @@
 
 ## Summary
 
-Resolver el Sentry `JAVASCRIPT-NEXTJS-7H` (`column "rpa_median" does not exist`) en `GET /api/organization/[id]/360` corrigiendo el contrato completo del facet `delivery`: schema, proyección, reader canónico y guardrails de drift. El cierre debe ser robusto, no un parche local sobre una query.
+Resolver el Sentry `JAVASCRIPT-NEXTJS-7H` (`column "rpa_median" does not exist`) en `GET /api/organization/[id]/360` y `GET /api/organizations/[id]/workspace/compact-signals` corrigiendo el contrato completo del facet `delivery`: schema, proyección, reader canónico y guardrails de drift. El cierre debe ser robusto, no un parche local sobre una query.
 
 ## Why This Task Exists
 
@@ -32,9 +32,12 @@ El facet `delivery` de Account 360 empezó a leer `rpa_median`, `pipeline_veloci
 
 El bug exacto se introdujo en `1f06d26a835d5ae07f94253fb3ead29a32bb7283` (2026-06-09, `feat(organizations): harden enterprise workspace runtime`). La causa de fondo es duplicación de readers y drift de contrato SQL, la misma clase de problema ya documentada en `ISSUE-078`.
 
+Sentry verificado el 2026-06-13 confirma que el bug no fue solo el correo inicial: group `7545900569`, 30 eventos en `preview` durante el 2026-06-12, `handled=yes`, `domain=delivery`, `source=account360.delivery.ico_serving`, primera aparición en release `f3be080bf330fe387a0506dfadaba40f3a99c555` y persistencia hasta `11c64db0d051cce47160603e3c347ff4213d6037`. Los eventos impactan tanto `/api/organization/[id]/360` como `/api/organizations/[id]/workspace/compact-signals`.
+
 ## Goal
 
 - `GET /api/organization/[id]/360?facets=delivery` responde sin error SQL ni `facetErrors` por columnas inexistentes.
+- `GET /api/organizations/[id]/workspace/compact-signals` responde sin capturar el mismo error desde `account360.delivery.ico_serving`.
 - El contrato de `greenhouse_serving.organization_operational_metrics` queda explícito y alineado entre DDL, migración, proyección, tipos y readers.
 - El facet `delivery` consume un reader canónico o una primitive compartida, sin reimplementar una UNION frágil con shapes divergentes.
 - Los guardrails de Account 360 detectan drift de schema contra PostgreSQL real antes de preview/staging.
@@ -82,6 +85,7 @@ Reglas obligatorias:
 ### Blocks / Impacts
 
 - Account 360 route: `src/app/api/organization/[id]/360/route.ts`
+- Compact signals route: `src/app/api/organizations/[id]/workspace/compact-signals/route.ts`
 - Organization workspace runtime and tabs.
 - Finance client organization workspace.
 - Compact organization signals.
@@ -107,6 +111,7 @@ Reglas obligatorias:
 - `ico_organization_metrics` has the richer columns (`rpa_median`, `pipeline_velocity`, `stuck_asset_pct`).
 - `getOrganizationOperationalServing()` already contains a safer fallback pattern for compact tables.
 - Account 360 has a live test scaffold, but it skips unless PostgreSQL env is present.
+- Sentry API now works locally via `SENTRY_INCIDENTS_AUTH_TOKEN`; issue `JAVASCRIPT-NEXTJS-7H` is confirmed as `unresolved`, group `7545900569`, 30 events, first seen `2026-06-12T07:40:12Z`, last seen `2026-06-12T23:54:42Z`.
 
 ### Gap
 
@@ -114,6 +119,7 @@ Reglas obligatorias:
 - Projection `organization-operational.ts` does not populate the rich columns.
 - Setup SQL does not define the rich columns.
 - No mandatory drift guard prevented the preview build from shipping a reader that references missing columns.
+- Sentry releases lack source maps/commit association for the server chunks (`Source code was not found`, `commitCount=0`), so suspect-commit mapping must currently be done by git/runtime analysis.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -149,9 +155,11 @@ Reglas obligatorias:
 ### Slice 3 — Regression guards
 
 - Fortalecer `src/lib/account-360/account-complete-360.live.test.ts` o agregar smoke dedicado para `facets=delivery`.
+- Agregar smoke específico para `workspace/compact-signals`, porque Sentry confirmó que ese endpoint también ejecuta el path roto.
 - Asegurar que el guard corre en el lane de preview/staging donde exista DB o que el pipeline falle con mensaje explícito si el smoke requerido se saltó.
 - Agregar test unitario del mapper para columnas ausentes/null y test de query builder si se extrae helper.
 - Documentar bug class como seguimiento de `ISSUE-078` si aparece un nuevo guard general de SQL schema drift.
+- Revisar source maps/release association de Sentry para server chunks como sub-tarea de observabilidad si sigue apareciendo `Source code was not found` / `commitCount=0`.
 
 ### Slice 4 — Rollout + verification
 
@@ -236,8 +244,9 @@ Sin flag. La migración es additive y nullable. El cutover debe ser compatible c
 3. Correr smoke SQL del reader `delivery` contra una organización real.
 4. Desplegar code fix.
 5. Ejecutar `GET /api/organization/[id]/360?facets=delivery` con auth/bypass correspondiente y confirmar sin `facetErrors`.
-6. Monitorear Sentry por `JAVASCRIPT-NEXTJS-7H`.
-7. Repetir en production si aplica.
+6. Ejecutar `GET /api/organizations/[id]/workspace/compact-signals` contra la misma organización staging observada por Sentry (`org-f6aa4e20-9dbb-467a-950d-61e5f085e9b0`) y confirmar sin captura `account360.delivery.ico_serving`.
+7. Monitorear Sentry por `JAVASCRIPT-NEXTJS-7H`.
+8. Repetir en production si aplica.
 
 ### Out-of-band coordination required
 
@@ -267,7 +276,14 @@ Luego verificar columnas, conteos y una consulta equivalente al facet `delivery`
 ## Investigation Appendix
 
 - Sentry event visible en email: `9c74783d68c84986a9a1a7b8b6dfbd60`.
-- Sentry API no se pudo consultar localmente durante la investigación inicial porque faltan `SENTRY_AUTH_TOKEN`, `SENTRY_ORG` y `SENTRY_PROJECT`.
+- Sentry API no se pudo consultar localmente durante la investigación inicial porque faltaban credenciales read-only. El 2026-06-13 se configuró `SENTRY_INCIDENTS_AUTH_TOKEN` local desde Secret Manager y se verificó el issue real.
+- Sentry issue: `JAVASCRIPT-NEXTJS-7H`, group `7545900569`, status `unresolved`, priority `high`, environment `preview`, count `30`.
+- Sentry timing: first seen `2026-06-12T07:40:12Z`, last seen `2026-06-12T23:54:42Z`.
+- Sentry tags: `domain=delivery`, `source=account360.delivery.ico_serving`, `handled=yes`, `turbopack=True`.
+- Sentry affected transactions: `GET /api/organization/[id]/360` and `GET /api/organizations/[id]/workspace/compact-signals`.
+- Sentry observed organization/URL: `org-f6aa4e20-9dbb-467a-950d-61e5f085e9b0` on `greenhouse-eo-env-staging-efeonce-7670142f.vercel.app`.
+- Sentry releases: first `f3be080bf330fe387a0506dfadaba40f3a99c555`, later events in `adcde46d6e311edacfbacabe60aba52b86c9d0d9`, `e57bdbd2ca08e3ad257c40e008d7c06a0b96d79b`, `7788ff58abe4218a4d0701ce2d4c35467a7e3b1e`, and last observed `11c64db0d051cce47160603e3c347ff4213d6037`.
+- Sentry source-map/release gap: event detail reports `Source code was not found` for server chunks and release `commitCount=0`; Sentry did not provide suspect commit automatically.
 - Reproducción Cloud SQL: query ofensiva falla con `42703`, `column "rpa_median" does not exist`.
 - `organization_operational_metrics` runtime tiene 8 filas y periodos 2026-03..2026-06.
 - `ico_organization_metrics` runtime tiene 8 filas y contiene las columnas ricas.
