@@ -15,7 +15,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `ui|platform|nexa|ai|content|knowledge`
-- Blocked by: `TASK-1095` (contrato surfaceContext/estado SSOT) · coordinar con `TASK-1092` (production readiness Knowledge retrieval, Codex) y `TASK-1090` (lentes `/knowledge`)
+- Blocked by: `none` (el contrato `surfaceContext` ya existe — ver Delta abajo) · coordinar con `TASK-1095` (refinamiento A2 de la máquina de estados, paralelo), `TASK-1092` (production readiness Knowledge retrieval, Codex) y `TASK-1090` (lentes `/knowledge` → converge a `NexaAnswersCanvas`)
 - Branch: `task/TASK-1101-nexa-answers-runtime-promotion`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -23,6 +23,14 @@
 ## Summary
 
 Promover a **runtime real** los enriquecimientos de Nexa Answers que hoy viven probados en el mockup `/knowledge/mockup/nexa-answers` (TASK-1096): **citas inline span-level + evidence-peek**, **response toolbar de la fase settle** (¿útil? + copiar/compartir/regenerar), **control "Detener"** durante streaming, y la **portabilidad** del `NexaAnswersCanvas` a dominios no-Knowledge (finance/chart + Insight promovido). El primitive ya está construido y GVC-verificado; esta task cablea sus contratos `opt-in` (`onResponseControl`, `onStopGeneration`, segmento `citation`) a **datos y handlers reales** del retrieval de Knowledge (`knowledge-search.v1`, TASK-1085) detrás de un flag, con cutover gradual.
+
+## Delta 2026-06-13 — desbloqueada: el contrato ya existe y es el canónico
+
+Corrección post-decisión del operador (ver TASK-1095/1096 Delta 2026-06-13). El framing original de esta task ("Blocked by TASK-1095" + Slice 0 "consumir el surfaceContext SSOT de 1095") era inexacto:
+
+- **El `surfaceContext` YA existe**: es `NexaAnswersSurfaceContext` (`nexa-answers-canvas-types.ts`), y por **decisión del operador es el contrato canónico** (`NexaAnswersCanvas` es la surface canónica de la lente Nexa; el answer-trace de TASK-1089/1090 ni siquiera lo modela). No hay un SSOT nuevo que esperar.
+- ⇒ Esta task **NO está bloqueada**: consume el contrato existente directo. El Slice 0 se reinterpreta como "**bendecir** `NexaAnswersSurfaceContext` como SSOT (blessing in-place u opcional promoción a `src/lib/nexa/`)", no "migrar a un contrato de 1095".
+- El refinamiento A2 de TASK-1095 (descomponer la máquina de 10 estados en lifecycle×disclosure×turn) es **paralelo** y no bloquea el cableado a datos reales.
 
 ## Why This Task Exists
 
