@@ -37,7 +37,7 @@ Running next.config.js provided runAfterProductionCompile ...
 
 ## Solución
 
-Code complete local (2026-06-13): se agregó un guardrail build-time alrededor del hook `compiler.runAfterProductionCompile` que inyecta `withSentryConfig`.
+Resuelto el 2026-06-13: se agregó un guardrail build-time alrededor del hook `compiler.runAfterProductionCompile` que inyecta `withSentryConfig`.
 
 - `next.config.ts` ya no exporta directamente el resultado de `withSentryConfig`; captura el hook generado y lo ejecuta a través de `runSentrySourcemapUploadWithTimeout()`.
 - `src/lib/sentry-build/sourcemap-upload-timeout.ts` aplica un presupuesto acotado al upload de source maps y, durante esa ventana, intercepta los subprocess `sentry-cli` para terminarlos con `SIGTERM` si exceden el presupuesto. Esto evita el falso `Promise.race` que "continúa" pero deja el proceso hijo vivo.
@@ -62,12 +62,16 @@ No se desactivó Sentry ni se movió el upload fuera del build en esta iteració
 - Build local:
   - `pnpm build` reprodujo el hang de Sentry local y el wrapper lo degradó en `60046ms`: `Source-map upload degraded ... Continuing deployment.` El build avanzó a TypeScript; luego falló por OOM local de Next worker con heap 4GB, un límite local posterior y distinto al incidente Vercel.
   - `NODE_OPTIONS=--max-old-space-size=8192 SENTRY_SOURCEMAP_UPLOAD_TIMEOUT_MS=5000 pnpm build` → pass. El hook degradó en `5028ms` y el build completo terminó exit 0.
+- Vercel evidencia post-fix:
+  - Primer push `d9a24f82a` falló rápido porque `src/lib/build/` era excluido por `.vercelignore` (`build`); fix-forward `a9dcb389c` movió el helper a `src/lib/sentry-build/`.
+  - `greenhouse-clbkbt7o6` (`develop`, commit `a9dcb389c`) compiló en 2.9 min, ejecutó `runAfterProductionCompile`, degradó errores explícitos de Sentry con warning `[sentry-build] ... Continuing deployment.`, completó el hook en `13686ms` y quedó `Ready` en 7m.
+  - Alias staging actualizado: `dev-greenhouse.efeoncepro.com` apunta a `greenhouse-clbkbt7o6`.
 
-Verificación remota pendiente: después de push/deploy a `develop`, confirmar que un staging build con Sentry lento no supera el presupuesto configurado y termina `Ready` con warning, no `Error` a los 45m.
+Nota residual: Sentry respondió `403 You do not have permission to perform this action` al crear la release/subir sourcemaps. El guardrail cumple su objetivo operativo (deploy no falla ni queda 45m colgado), pero source-map upload seguirá degradando hasta que `SENTRY_AUTH_TOKEN` tenga permisos de release/source-map adecuados. Ese follow-up pertenece a higiene de credenciales Sentry, no a disponibilidad del deploy.
 
 ## Estado
 
-code complete local / rollout pendiente
+resolved
 
 ## Relacionado
 

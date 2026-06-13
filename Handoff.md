@@ -1,12 +1,14 @@
 # Release 2026-06-10 #2 — develop→main `6c649b2a6` RELEASED
 
-## Sesion 2026-06-13 — ISSUE-093 Vercel/Sentry source-map upload timeout guard (Codex)
+## Sesion 2026-06-13 — ISSUE-093 Vercel/Sentry source-map upload timeout guard (Codex, resolved)
 
 - **Problema vivo confirmado:** Vercel staging reportó `greenhouse-bu3i14eap` (`develop`, commit `310ae87`) en `Error` tras 46m. Logs: Next compiló OK en 2.6m y quedó en `Running next.config.js provided runAfterProductionCompile ...`. Deployment vecino `greenhouse-456owabqd` (`606e07c`) completó ese mismo hook en 14.151s y terminó `Ready` en 7m. Causa = hang flaky de upload source maps Sentry, no build roto de producto.
 - **Fix code complete local:** `next.config.ts` ahora captura el hook `runAfterProductionCompile` generado por `withSentryConfig` y lo corre vía `runSentrySourcemapUploadWithTimeout()` (`src/lib/sentry-build/sourcemap-upload-timeout.ts`). Default 60s; env override `SENTRY_SOURCEMAP_UPLOAD_TIMEOUT_MS` clamp 5s-240s. Vercel `staging` quedó configurado con override `30000` ms. Mientras corre el hook, el helper intercepta subprocess `sentry-cli` y los termina con `SIGTERM` si exceden presupuesto. Si Sentry responde, source maps se suben como antes; si falla/cuelga, warning `[sentry-build] ... Continuing deployment.`
 - **Fix-forward Vercel packaging:** el primer push (`d9a24f82a`) puso el helper en `src/lib/build/`, pero Vercel excluye carpetas llamadas `build` por `.vercelignore`; se movió a `src/lib/sentry-build/` para que `next.config.ts` pueda resolverlo durante `vercel build`.
+- **Verificación remota:** `greenhouse-clbkbt7o6` (`develop`, commit `a9dcb389c`) quedó `Ready` en 7m y actualizó `dev-greenhouse.efeoncepro.com`. El hook `runAfterProductionCompile` completó en `13686ms` con warnings `[sentry-build] ... Continuing deployment.`; ya no hay timeout 45m.
+- **Residual separado:** Sentry respondió `403 You do not have permission to perform this action`; el build queda protegido, pero source maps no se subirán hasta corregir permisos de `SENTRY_AUTH_TOKEN`.
 - **Verificación local:** Vitest focal 4/4, ESLint focal y `tsc --noEmit` verdes. `pnpm build` reprodujo el hang de Sentry y el wrapper degradó en `60046ms`; después el build siguió a TypeScript y falló por OOM local 4GB, distinto al incidente Vercel. Reintento con `NODE_OPTIONS=--max-old-space-size=8192 SENTRY_SOURCEMAP_UPLOAD_TIMEOUT_MS=5000 pnpm build` pasó completo; el hook degradó en `5028ms` y Next terminó exit 0.
-- **Estado:** `code complete local / rollout pendiente`. No se hizo push a `develop`. Para cerrar `ISSUE-093`, empujar el cambio y verificar un deployment staging: si Sentry se cuelga, debe terminar `Ready` con warning antes del presupuesto, nunca `Error` a los 45m. Luego mover issue a `resolved/` y actualizar tracker.
+- **Estado:** `resolved`. Commits en `develop`: `d9a24f82a` + `a9dcb389c`. `ISSUE-093` movido a `docs/issues/resolved/`.
 
 ## Sesion 2026-06-13 — ADR Nexa core agentic platform + Moment Fabric (Codex)
 
