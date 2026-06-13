@@ -1,5 +1,12 @@
 # Release 2026-06-10 #2 — develop→main `6c649b2a6` RELEASED
 
+## Sesion 2026-06-13 — TASK-1109 Postgres dev pool self-healing creada (Codex)
+
+- **Task nueva:** `docs/tasks/to-do/TASK-1109-postgres-dev-pool-self-healing.md`.
+- **Por qué existe:** follow-up robusto de `ISSUE-094`; el workaround actual de reiniciar `pnpm dev` no basta como contrato para sesiones largas con HMR/GVC. El fix debe hacer que `src/lib/postgres/client.ts` no reuse un `Pool` cerrado (`Cannot use a pool after calling end on the pool`) y se autorecupere de forma controlada.
+- **Límite explícito:** no tocar Cloud SQL, PgBouncer, GCP, Vercel env vars ni secretos; el análisis con skills Google Cloud apuntó a lifecycle del cliente Node/PG, no a infraestructura.
+- **Cierre esperado:** tests focales en `src/lib/postgres/client.test.ts`, smoke local de ruta DB sin loop de retries, y `ISSUE-094` actualizado con el fix de fondo.
+
 ## Sesion 2026-06-13 — GreenhouseRoadmapTimeline primitive (Codex)
 
 - **Qué quedó:** se trajo el patrón `RoadmapCard` del prompt como primitive nativa `GreenhouseRoadmapTimeline` en `src/components/greenhouse/primitives/`, con variants `horizontal|stacked|compact`, kinds `productRoadmap|releasePlan|implementationPlan|clientOnboarding|custom` y estados `complete|active|pending|blocked`.
