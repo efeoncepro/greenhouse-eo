@@ -161,6 +161,10 @@ export const scenario: CaptureScenario = {
         name: 'play-deploy',
         intent: 'El despliegue completo estilo AI Overview se reproduce: razonar → streaming → respuesta que asienta.',
         action: { kind: 'click', selector: 'button:has-text("Reproducir despliegue")' },
+        // Prueba del contrato reduced-motion sobre la surface real: re-dispara el despliegue con
+        // prefers-reduced-motion → shimmer/caret estáticos y contenido visible (never-hidden),
+        // sin depender de animación para comunicar el estado.
+        reducedMotion: 'capture',
         keyboardEquivalent: {
           action: { kind: 'press', selector: 'button:has-text("Reproducir despliegue")', key: 'Enter' },
           expected: 'El despliegue se dispara por teclado (focus + Enter), no solo por click.'
