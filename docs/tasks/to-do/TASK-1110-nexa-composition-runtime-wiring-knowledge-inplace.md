@@ -47,7 +47,7 @@ Cablear `KnowledgeNexaCompositionLens` **dentro de la lente Humano** de `Knowled
 
 - Si el compose **falla** (degraded/error), el **workbench NUNCA se rompe** — el host sigue íntegro y usable; el Moment degrada honesto (ya horneado en el consumer).
 - **Focus routing** tras el morph `dormant→composed`: el foco va a la respuesta (la primitive/playbook lo exige; verificar a11y por teclado).
-- **Kill-switch (reconcile con "desplegado habilitado"):** ship **default ON** (no oculto), PERO con un gate revertible sin code-deploy si la superficie viva se rompe en prod. Preferir el **rollout-flag platform** (TASK-780, default ON) sobre un env binario. "No flag OFF" del operador = enabled-por-defecto, NO "sin red de seguridad". **Confirmar el mecanismo con el operador** antes de S1.
+- **Kill-switch (DECISIÓN CERRADA del operador 2026-06-13 — desplegar ON por defecto):** ship **default ON** vía el **rollout-flag platform** (TASK-780, fila DB default ON, scope precedence) — NO env binario. La feature está **habilitada de entrada** en todos los entornos; el flag existe solo como **reversa sin code-deploy** si la superficie viva se rompe en prod (flip a OFF → la lente Humano vuelve a su estado actual). NO nace OFF; NO es rollout gradual. "ON por defecto" confirmado.
 - **Non-regresión:** S1 NO debe romper las lentes existentes (`human`/`nexa`/`mcp`) ni el fallback answer-trace (`NexaKnowledgeAnswerSurface`). La lente `nexa` takeover (multi-turno) y la composición coexisten como dos placements.
 
 ### Slice 2 — GVC en staging (verlo funcionando)
