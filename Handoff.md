@@ -1,5 +1,12 @@
 # Release 2026-06-10 #2 — develop→main `6c649b2a6` RELEASED
 
+## Sesion 2026-06-13 — TASK-1110 composición Nexa in-place /knowledge — Slice 1 entregado MAL, en realineación (Claude)
+
+- **Qué se pusheó (develop):** Slice 1 (`098908cff`) wiring composición in-place en la lente Humano + kill-switch rollout-flag DB `knowledge_composition_lens` **ON por defecto** (migración `20260613210340667`, revertible sin deploy) + focus-routing a11y en `NexaMomentComposition`. Slice 2 (`02e31275d`) GVC scenario `knowledge-composition` + fix non-regresión `knowledge-lenses`. Gate local verde (tsc 0 · lint 0 · build 0 · tests focales 33/33).
+- **PROBLEMA (revisión operador):** el runtime **no se ve ni se comporta como el mockup aprobado** `NexaMomentCompositionSection`. Diverge en: (1) host = workbench 3-col en vez del **grid limpio "Documentos del corpus"** (pisé el `defaultHost` del consumer); (2) **falta el next-step gobernado** (pieza central del Moment); (3) respuesta más densa (renderPlan crudo vs enriquecido del mockup); (4) **no verifiqué paridad `fe:capture:diff` mockup↔runtime**. Causa de proceso: seguí el texto literal de la spec por encima del artefacto visual aprobado cuando se contradecían.
+- **Spec correctiva completa** (objetivo + qué salió mal + qué falta): `docs/tasks/in-progress/TASK-1110-...md` sección "Corrección 2026-06-13".
+- **Pendiente:** (a) confirmar con operador host=grid-limpio + manejo del next-step; (b) **rehacer Slice 1** con paridad al mockup + `fe:capture:diff`; (c) considerar apagar el kill-switch (`knowledge_composition_lens=FALSE`, sin deploy) hasta el redo para no mostrar la versión no-fiel en staging; (d) Slice 3 (DS page) + Slice 4 (Moment Fabric joint Codex TASK-1095/1096) + doc closure.
+
 ## Sesion 2026-06-13 — Codex TASK harness recalibrado + drift guard (Codex)
 
 - **Qué cambió:** `docs/operations/CODEX_EXECUTION_PROMPT_V1.md` dejó de ser un prompt largo/stale y quedó como harness vivo: local-first, sin cambio de rama/worktree por defecto, sin branch/commit obligatorio por slice, matriz de skills Codex real y cierre con QA/docs proporcionales.

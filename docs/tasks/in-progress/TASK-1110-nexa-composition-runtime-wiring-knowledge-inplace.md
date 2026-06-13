@@ -147,6 +147,58 @@ S1 es un cambio a una **superficie viva** (`KnowledgeCenterView`, 1368 líneas) 
 - **Doc closure bloqueado por orphan WIP:** `Handoff.md`, `changelog.md`, `CLAUDE.md`, `AGENTS.md`, `project_context.md` están modificados (uncommitted) por el workstream Codex-harness en el checkout compartido → NO se pueden editar sin entangle. Pendiente de coordinación / que el orphan aterrice.
 - **GVC staging** (opcional): el local ya mostró composición con datos reales; un frame en staging confirmaría en el deployment activo tras push.
 
+## Corrección 2026-06-13 — qué entregué MAL + qué falta para el objetivo
+
+> Escrito tras la revisión del operador: el Slice 1 que entregué (commit `098908cff`) **NO se ve ni se comporta como la composición diseñada/aprobada** (mockup `NexaMomentCompositionSection`). Esta sección es la spec correctiva. El código de S1 quedó pusheado pero **el kill-switch puede apagarse sin deploy** mientras se rehace (la fila DB `knowledge_composition_lens` → `enabled=FALSE` revierte la lente Humano a su estado actual).
+
+### El objetivo (intención + experiencia) — relectura de los docs canónicos
+
+Fuentes: `GREENHOUSE_NEXA_MOMENT_FABRIC_ARCHITECTURE_V1.md` + `GREENHOUSE_CONVERSATIONAL_EXPERIENCE_PLATFORM_V2.md` + `ui-platform/CONVERSATIONAL_EXPERIENCE.md` §13 (Gap A).
+
+- **Nexa Moment = `contexto + evidencia + permiso + intención + next-step`.** Si falta una pieza, **degradar honesto** (no fingir).
+- **Gap A = composición in-place** con **Google AI Mode / AI Overviews como NORTE (no copia):** un composer "con Nexa adentro" que, al preguntar, **transforma la superficie en modo conversacional SIN hacer desaparecer lo demás** — el host se **adapta/reflowea/persiste vivo** y la respuesta entra como **bloque protagonista**. NO es el takeover (lente Nexa actual). Es el placement `composed`.
+- **3 diferenciadores propios de Greenhouse:** (1) la evidencia **ancla al contenido operativo del host** (el doc real, no la web), (2) **next-step gobernado** (action boundary; solo "actionable" si existe command/capability real), (3) **el host queda vivo**.
+- **La experiencia aprobada (mockup `NexaMomentCompositionSection`):** dormant = composer spectrum + grid limpio "Documentos del corpus"; preguntar → morph (View Transitions) → composed = Momento Nexa **lidera** (respuesta enriquecida: titular + puntos numerados + pills de cita) + **"Fuentes ancladas"** (hover resalta el doc real) + **next-step gobernado** ("Acción sugerida · Requiere aprobación · Preparar borrador") + bridge "Seguir con Nexa" + el **grid de docs persiste condensado** con el doc citado anclado.
+
+### Qué hice MAL
+
+1. **Host equivocado.** Pasé el **workbench de 3 columnas** (rutas + resultados + inspector) como host. El diseño usa el **grid limpio "Documentos del corpus"** como contenido operativo anclable. El consumer YA traía ese grid como `defaultHost` y lo **pisé**.
+2. **Sin next-step gobernado.** Lo omití. Es **pieza central** del Moment (la "intención + next-step") y está en el mockup.
+3. **Respuesta más densa.** Usé el `renderPlan` del retrieval crudo en vez del layout **enriquecido** del mockup (titular + puntos numerados + pills de cita).
+4. **No verifiqué paridad mockup↔runtime** (`fe:capture:diff`) — me comparé contra mis propias expectativas. Por eso declaré "listo" algo que no lo estaba.
+5. **(proceso)** Cuando el **texto literal de la spec** ("usá el workbench real como host") **se contradijo con el artefacto visual aprobado** (grid limpio + next-step), seguí las palabras en vez de frenar a señalar la contradicción. Manda la imagen aprobada.
+
+### Qué quedó BIEN (no rehacer)
+
+- Kill-switch **rollout-flag DB ON** revertible sin deploy (migración `20260613210340667` + tipos `HomeRolloutFlagKey` + env fallback + wiring `page.tsx`).
+- **Focus routing a11y** horneado en `NexaMomentComposition` (foco al Momento en el morph).
+- **GVC scenario runtime** (`knowledge-composition.scenario.ts`) + fix non-regresión `knowledge-lenses.scenario.ts`.
+- La **mecánica** funciona: morph dormant↔composed, composer spectrum, anclaje cita↔host, bridge.
+
+### Qué FALTA para alcanzar el objetivo
+
+**A. Confirmaciones de alineación (operador) — pendientes:**
+
+1. **Host runtime = grid limpio "Documentos del corpus"** (no el workbench). Definir qué pasa con rutas de aprendizaje / inspector / búsqueda de texto del workbench actual cuando la composición está activa.
+2. **Next-step gobernado:** mostrarlo como **sugerencia honesta sin ejecutar** (advisory, sin botón que finja una acción inexistente) HOY, vs **dejarlo fuera** hasta la costura de Codex.
+
+**B. Rehacer Slice 1 (corregido), con paridad al mockup:**
+
+- Host = **grid limpio de docs reales anclables** (reusar el patrón del `defaultHost` del consumer / mockup, alimentado por `documents` reales, con `data-nexa-anchor`).
+- Momento con **layout enriquecido** (titular + puntos numerados + pills) — alinear el `renderPlan` del adapter `buildKnowledgeAnswerRenderPlan` al shape del mockup (`COMPOSITION_RENDER_PLAN`).
+- Next-step gobernado según **decisión A.2** (honesto; nunca vender actionable sin command/capability — hard rule Moment Fabric §6.3/§14).
+- **Verificar con `fe:capture:diff` mockup↔runtime** hasta paridad (la verificación canónica que me salté).
+
+**C. Slice 3** — DS showcase page "Nexa Answers Experience" (al final).
+
+**D. Slice 4 — Moment Fabric (joint Codex, TASK-1095/1096):** eligibility + context adapter + **action boundary real** (commands/capabilities) + señales `nexa.moment.*`. La costura es `surfaceContext` + `renderPlan`. El next-step 100% accionable depende de esto.
+
+**E. Doc closure** (tras el redo): `CONVERSATIONAL_EXPERIENCE.md` §13, el playbook de dominio, la skill `greenhouse-nexa-conversational`, `PRIMITIVES.md`, `HISTORIAL.md`.
+
+### La tensión real (la única que bloquea fidelidad 100% hoy)
+
+El next-step del mockup ("Preparar borrador") es un **fixture**. Hard rule Moment Fabric: *"NUNCA vender un moment como actionable si no existe capability/command/API path."* El **action boundary real** es de Codex (TASK-1095/1096). Hoy el runtime puede mostrar el next-step **advisory honesto** (sin ejecutar) o **omitirlo** — pero NO un botón que finja una acción que no existe.
+
 ## Verificación de cierre
 
 - `pnpm local:check` (lint + tsc) + `pnpm build` (Turbopack — el consumer es 'use client' importando primitives; el page es server).
