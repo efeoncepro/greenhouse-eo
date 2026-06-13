@@ -33,6 +33,7 @@ import {
 } from '@/components/greenhouse/primitives'
 import type { ConversationalEvidencePacket } from '@/lib/nexa/conversational-evidence'
 
+import NexaMomentCompositionSection from './NexaMomentCompositionSection'
 import { answerActions, answerPoints, icoChartSpec, trustCue } from './nexa-answer-bubble-fixtures'
 import {
   financeRenderPlan,
@@ -838,6 +839,8 @@ const NexaAnswersExperienceMockupView = () => {
       </Box>
 
       <PortabilityGallery />
+
+      <NexaMomentCompositionSection />
     </Stack>
   )
 }

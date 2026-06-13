@@ -296,6 +296,19 @@ export {
   renderNexaAnswersBlock
 } from './nexa-answers-canvas/nexa-answers-canvas-renderers'
 export type { NexaAnswersBlockRenderContext } from './nexa-answers-canvas/nexa-answers-canvas-renderers'
+export { default as NexaMomentComposition } from './nexa-moment-composition/NexaMomentComposition'
+export type {
+  NexaMomentCompositionKind,
+  NexaMomentCompositionProps,
+  NexaMomentCompositionState,
+  NexaMomentCompositionVariant,
+  NexaMomentCompositionVariantConfig
+} from './nexa-moment-composition/nexa-moment-composition-types'
+export {
+  NEXA_MOMENT_COMPOSITION_VARIANT_CONFIG,
+  resolveNexaMomentCompositionConfig,
+  resolveNexaMomentCompositionVariant
+} from './nexa-moment-composition/nexa-moment-composition-controller'
 export { default as GreenhouseNexaAnimatedAskBadge } from './GreenhouseNexaAnimatedAskBadge'
 export type { GreenhouseNexaAnimatedAskBadgeProps } from './GreenhouseNexaAnimatedAskBadge'
 export { default as EfeonceOrbitalLogoMark } from './EfeonceOrbitalLogoMark'

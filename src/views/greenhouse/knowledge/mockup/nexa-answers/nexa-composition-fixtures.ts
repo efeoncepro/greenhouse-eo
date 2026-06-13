@@ -70,6 +70,24 @@ export const HOST_KNOWLEDGE_DOCS: HostKnowledgeDoc[] = [
 
 export const COMPOSITION_QUESTION = '¿Cómo se interpreta Impacto dentro de las métricas ICO?'
 
+/**
+ * Anclas cita↔host: cada fuente citada del Momento mapea al `data-nexa-anchor` del documento real del host.
+ * El diferenciador propio vs Google: la evidencia ES el contenido operativo de TU superficie (al pasar por
+ * una fuente, se resalta el documento real abajo), no un link que te saca a la web.
+ */
+export interface CompositionSourceAnchor {
+  label: string
+  title: string
+  /** == `HostKnowledgeDoc.id` (el `data-nexa-anchor` del host). */
+  anchorId: string
+}
+
+export const COMPOSITION_SOURCE_ANCHORS: CompositionSourceAnchor[] = [
+  { label: '1', title: 'Manual: Métricas ICO', anchorId: 'ico-metrics' },
+  { label: '2', title: 'Guía: Lectura de desempeño', anchorId: 'ico-collaboration' },
+  { label: '3', title: 'SOP: Calibración ICO', anchorId: 'ico-calibration' }
+]
+
 export const COMPOSITION_SURFACE_CONTEXT: NexaAnswersSurfaceContext = {
   surfaceId: 'knowledge.nexa.composition',
   domain: 'knowledge',
