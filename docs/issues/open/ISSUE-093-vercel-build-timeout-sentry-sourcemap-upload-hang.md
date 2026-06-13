@@ -40,7 +40,7 @@ Running next.config.js provided runAfterProductionCompile ...
 Code complete local (2026-06-13): se agregó un guardrail build-time alrededor del hook `compiler.runAfterProductionCompile` que inyecta `withSentryConfig`.
 
 - `next.config.ts` ya no exporta directamente el resultado de `withSentryConfig`; captura el hook generado y lo ejecuta a través de `runSentrySourcemapUploadWithTimeout()`.
-- `src/lib/build/sentry-sourcemap-upload-timeout.ts` aplica un presupuesto acotado al upload de source maps y, durante esa ventana, intercepta los subprocess `sentry-cli` para terminarlos con `SIGTERM` si exceden el presupuesto. Esto evita el falso `Promise.race` que "continúa" pero deja el proceso hijo vivo.
+- `src/lib/sentry-build/sourcemap-upload-timeout.ts` aplica un presupuesto acotado al upload de source maps y, durante esa ventana, intercepta los subprocess `sentry-cli` para terminarlos con `SIGTERM` si exceden el presupuesto. Esto evita el falso `Promise.race` que "continúa" pero deja el proceso hijo vivo.
 - Timeout default: `60_000ms`.
 - Override: `SENTRY_SOURCEMAP_UPLOAD_TIMEOUT_MS`, clamp `5_000ms..240_000ms`.
 - Vercel `staging`: `SENTRY_SOURCEMAP_UPLOAD_TIMEOUT_MS=30000` configurado el 2026-06-13 para reducir el peor caso de cada build de staging mientras se mantiene el upload sano de source maps.
@@ -56,8 +56,8 @@ No se desactivó Sentry ni se movió el upload fuera del build en esta iteració
   - `greenhouse-bu3i14eap` (`develop`, commit `310ae87`) compiló en 2.6 min y quedó colgado en `Running next.config.js provided runAfterProductionCompile ...` hasta `Error` a los 46m.
   - `greenhouse-456owabqd` (`develop`, commit `606e07c`) completó el mismo hook en 14.151s y deployó `Ready` en 7m.
 - Tests locales:
-  - `pnpm exec vitest run src/lib/build/sentry-sourcemap-upload-timeout.test.ts` → 4/4 pass.
-  - `pnpm exec eslint next.config.ts src/lib/build/sentry-sourcemap-upload-timeout.ts src/lib/build/sentry-sourcemap-upload-timeout.test.ts` → pass.
+  - `pnpm exec vitest run src/lib/sentry-build/sourcemap-upload-timeout.test.ts` → 4/4 pass.
+  - `pnpm exec eslint next.config.ts src/lib/sentry-build/sourcemap-upload-timeout.ts src/lib/sentry-build/sourcemap-upload-timeout.test.ts` → pass.
   - `pnpm exec tsc --noEmit --pretty false` → pass.
 - Build local:
   - `pnpm build` reprodujo el hang de Sentry local y el wrapper lo degradó en `60046ms`: `Source-map upload degraded ... Continuing deployment.` El build avanzó a TypeScript; luego falló por OOM local de Next worker con heap 4GB, un límite local posterior y distinto al incidente Vercel.
@@ -72,7 +72,7 @@ code complete local / rollout pendiente
 ## Relacionado
 
 - `next.config.ts` (`withSentryConfig`, `sourcemapsReady`, `runAfterProductionCompile`).
-- `src/lib/build/sentry-sourcemap-upload-timeout.ts`.
+- `src/lib/sentry-build/sourcemap-upload-timeout.ts`.
 - Local-First Development Workflow (`docs/operations/LOCAL_FIRST_DEVELOPMENT_WORKFLOW_V1.md`) — reduce la frecuencia de builds de staging (menos exposición al hang) trabajando local-first.
 - Task Closing Quality Gate (CLAUDE.md) — `pnpm build` local como gate; nota: el build local **no** ejecuta el upload de source-maps a Sentry (sin tokens), por lo que este hang solo emerge en Vercel.
 - Detectado durante la sesión TASK-1104/1105 (push a `develop`); el `Ready` de `q32gd9r6c` (1104) confirma que el código compila — el Error es el hang de Sentry, no el cambio.

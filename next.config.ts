@@ -2,7 +2,7 @@ import type { NextConfig } from 'next'
 import createNextIntlPlugin from 'next-intl/plugin'
 import { withSentryConfig } from '@sentry/nextjs'
 
-import { runSentrySourcemapUploadWithTimeout } from './src/lib/build/sentry-sourcemap-upload-timeout'
+import { runSentrySourcemapUploadWithTimeout } from './src/lib/sentry-build/sourcemap-upload-timeout'
 
 type ProductionCompileContext = {
   distDir: string

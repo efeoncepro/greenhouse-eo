@@ -8,7 +8,7 @@ import { describe, expect, it, vi } from 'vitest'
 import {
   resolveSentrySourcemapUploadTimeoutMs,
   runSentrySourcemapUploadWithTimeout
-} from './sentry-sourcemap-upload-timeout'
+} from './sourcemap-upload-timeout'
 
 const require = createRequire(import.meta.url)
 
