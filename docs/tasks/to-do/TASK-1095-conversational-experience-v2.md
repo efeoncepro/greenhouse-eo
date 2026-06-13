@@ -26,6 +26,19 @@
 
 Consolidar la segunda version de la plataforma conversacional de Nexa como una base multi-surface consumible por Knowledge, Finance, charts, Agency, Personas, Commercial y futuros modulos operacionales: estado conversacional canonico, answer-turn reusable, contexto de superficie tipado, sustrato de evidencia/provenance detras de escena y reglas de placement para Home, floating panel, AnswerSurface y sidecars/overviews. El objetivo es evitar que `/knowledge` improvise un chat local o que cada surface vuelva a renderizar preguntas, respuestas, citas, acciones y proof panels con un lenguaje distinto, sin convertir la evidencia en protagonista de la conversacion.
 
+## Arch Review Gate (2026-06-12)
+
+Review de arquitectura (`docs/architecture/GREENHOUSE_CONVERSATIONAL_EXPERIENCE_V2_ARCH_REVIEW.md` + Delta del ADR) verificó que el diseño es sólido pero **TASK-1096 se está construyendo UI-first y ya forkeó contratos que esta task debe poseer**. Antes de seguir endureciendo 1096, esta task debe aterrizar el contrato mínimo (types-only basta):
+
+- **A1 — `surfaceContext` SSOT.** `NexaSurfaceContext` (§7) vive en `src/lib/nexa/` como única fuente; el `NexaAnswersCanvas` lo consume (hoy define un `NexaAnswersSurfaceContext` local divergente). **Mergear** el `allowedRenderers`/`allowedActions` del canvas (renderer-allowlist de seguridad) al contrato canónico.
+- **A2 — máquina de estados descompuesta.** Los 6 estados canónicos (`idle|composing|submitted|thinking|answered|degraded`) + `error` son **lifecycle puro**. `proofOpen` (disclosure) y `followup`/`compacted` (turn) son **dimensiones separadas**, no estados de lifecycle. El canvas (10 estados planos) debe reconciliar contra esta descomposición. Regla: nunca mezclar dimensiones ortogonales en un enum.
+- **A3 — `capabilities.action`/`scope` + sensitivity tiers mapeados a `can(subject, capability, action, scope)`** antes de cualquier piloto no-Knowledge.
+- **A6 — contrato a11y del answer-turn** (cross-surface, pertenece a esta task): `aria-live="polite"` sin robar foco al composer, landmarks/headings de la conversación, proof on-demand top-layer (`dialog`/`popover`), reduced-motion horneado.
+- **A4 — interface/stub server-side** del builder de `surfaceContext` + shape del endpoint embedded-answer, antes de endurecer fixtures (Full API Parity: el reader primero, la UI después).
+- **A7 — ≥1 reliability signal** de salud propia (ej. `nexa.conversation.surface_context_invalid`, steady=0), distinto de los analytics de producto del §15.
+
+A1/A2/A3/A6 son blocking pre-`Accepted` del ADR.
+
 ## Why This Task Exists
 
 `TASK-1093` entrego una V1 deliberadamente acotada: `ConversationalEvidencePacket`, `NexaEvidencePanel`, `inlineFollowUp` y rehidratacion segura de tool evidence. La plataforma completa quedo diferida hasta que existieran consumidores reales. Con `TASK-1090`, `/knowledge` ya es ese consumidor: necesita el patron tipo Google AI Mode aprobado, pero hoy la arquitectura sigue repartida entre `NexaThread`, `NexaFloatingPanel`, `NexaKnowledgeAnswerSurface`, `NexaEvidencePanel` y docs que aun describen un idle viejo con trace rail/respuesta visible.

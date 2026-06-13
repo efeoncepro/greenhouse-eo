@@ -26,6 +26,17 @@
 
 Construir **Nexa Answers** como la surface contextual que transforma una UI existente en una experiencia conversacional embebida: idle limpio, pregunta como burbuja, Nexa pensando con contexto, respuesta answer-first, trust cue compacto, composer descendido, proof bajo demanda y follow-ups compactos. TASK-1095 provee el soporte de plataforma; esta task garantiza la coreografia producto/UI que el usuario debe experimentar.
 
+## Arch Review Gate (2026-06-12)
+
+Review de arquitectura (`docs/architecture/GREENHOUSE_CONVERSATIONAL_EXPERIENCE_V2_ARCH_REVIEW.md` + Delta del ADR) detectó que esta task se construyó UI-first y forkeó contratos de TASK-1095. Antes de sumar más kinds/estados, reconciliar contra el contrato canónico:
+
+- **A1 — consumir el `surfaceContext` SSOT de TASK-1095** (`src/lib/nexa/`), no el `NexaAnswersSurfaceContext` local. El `allowedRenderers`/`allowedActions` del canvas (buena idea de seguridad) se **mergea** al contrato canónico, no se mantiene como shape paralelo.
+- **A2 — descomponer la máquina de estados del canvas.** Los 10 estados planos (`idle|submitted|thinking|streaming|answered|proofOpen|followup|compacted|degraded|error`) mezclan 3 dimensiones ortogonales: lifecycle (los 6 de 1095 + `error`, + restaurar `composing`), disclosure (`proofOpen`), turn (`followup`/`compacted`). Modelar el producto cartesiano, no un enum de 10. `streaming` se difiere hasta el follow-up de streaming (o se especifica su a11y ahí).
+- **A5 — colapsar la explosión de kinds.** `NexaAnswerBubble` ~15 kinds (`financeChartAnswer`, `financeMetricSummary`, `commercialMetricSummary`, …`surfaceActionPlan`) = 4 variants × ~5 dominios sin consumer real. Colapsar a **4 variants** (`explanation|chart|metricSummary|actionPlan`) + **dominio como dimensión del `surfaceContext`** + resolver `kind→variant`. Diferir los kinds per-dominio hasta que cada dominio sea consumer real.
+- **A6 — implementar el contrato a11y del answer-turn** que TASK-1095 define (live region sin robar foco al composer, proof top-layer, reduced-motion). GVC `quality.keyboard` cubre el proof disclosure + foco post-submit.
+
+Esta task sigue `Blocked by: TASK-1095` — A1/A2/A6 dependen de que 1095 aterrice el contrato mínimo (types-only) primero.
+
 ## Why This Task Exists
 
 TASK-1095 define la plataforma conversacional multi-surface: `surfaceContext`, adapters, runtime, provenance substrate y boundaries. Eso no garantiza por si solo la experiencia deseada. La experiencia que queremos lograr es una surface viva dentro de Knowledge, charts, Nexa Insights, Agency, Personas o Commercial que responde **ahi mismo**, sin convertir toda la app en chat y sin abrir un modal.

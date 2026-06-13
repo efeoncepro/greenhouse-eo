@@ -264,3 +264,19 @@ This ADR is `Proposed` while the team reviews the V2 contract and identifies gap
 - at least three fixture profiles are defined,
 - access/redaction invariants are accepted,
 - the first non-Knowledge child pilot candidate is selected or explicitly deferred.
+
+## Delta 2026-06-12 — Arch Review Gate (blocks `Accepted`)
+
+Architecture review (`GREENHOUSE_CONVERSATIONAL_EXPERIENCE_V2_ARCH_REVIEW.md`, lentes arch-architect + modern-web-guidance + greenhouse-product-ui-architect) verificó que el **diseño es sólido** pero la **secuencia se invirtió**: TASK-1096 (`NexaAnswersCanvas` + `NexaAnswerBubble`) ya está construido UI-first y definió de facto contratos que TASK-1095 debía definir primero. Esto es exactamente el failure mode HIGH del risk-matrix ("la plataforma nace acoplada / `surfaceContext` se vuelve loose bag"), ya ocurriendo en el plano del canvas.
+
+7 ajustes priorizados (detalle + acceptance en el review doc). **4 son blocking pre-`Accepted`**:
+
+- **A1 (P0, blocking) — `surfaceContext` forkeado.** `NexaSurfaceContext` (1095 §7) vs `NexaAnswersSurfaceContext` (canvas) divergieron (no superset/subset). Aterrizar el SSOT en `src/lib/nexa/` (types-only basta); el canvas lo consume; **mergear** su `allowedRenderers`/`allowedActions` (renderer-allowlist de seguridad) al contrato canónico.
+- **A2 (P0, blocking) — máquina de estados mezcla 3 dimensiones ortogonales.** Canvas de 10 estados colapsa lifecycle + disclosure (`proofOpen`) + turn (`followup`/`compacted`); dropea `composing`. Descomponer en lifecycle (6 canónicos + `error`) × disclosure × turn. Viola "NUNCA mezclar dimensiones ortogonales en un enum".
+- **A3 (P0, blocking) — `capabilities.action`/`scope`/sensitivity tiers sin mapeo al modelo real.** Reconciliar con `can(subject, capability, action, scope)` antes de cualquier piloto no-Knowledge. (Ya estaba como gate; se eleva a blocking.)
+- **A6 (P0, blocking) — contrato a11y del answer-turn ausente.** Pertenece a 1095 (cross-surface): `aria-live="polite"` sin robar foco al composer, landmarks/headings, proof on-demand top-layer (`dialog`/`popover`), reduced-motion horneado.
+- **A4 (P1) — falta contrato server-side** (Full API Parity al revés): definir el interface/stub del builder de `surfaceContext` + shape del endpoint embedded-answer en 1095 antes de endurecer fixtures.
+- **A5 (P1) — explosión prematura de kinds** (~15 en `NexaAnswerBubble` = 4 variants × ~5 dominios sin consumer real): colapsar a 4 variants + dominio como dimensión + resolver `kind→variant`.
+- **A7 (P2) — falta reliability signal de salud propia** (§15 lista analytics de producto, no signals steady=0): sumar ≥1 (ej. `nexa.conversation.surface_context_invalid`).
+
+**Secuencia recomendada:** aterrizar A1/A2/A6 (mínimo de 1095, types-only) → seguir endureciendo 1096 sobre ese contrato → A3/A4/A7 antes del piloto no-Knowledge → `Accepted` cuando A1/A2/A3/A6 estén resueltos.
