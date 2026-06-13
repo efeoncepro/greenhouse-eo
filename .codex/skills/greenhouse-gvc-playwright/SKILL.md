@@ -119,8 +119,8 @@ Webwright **ejecuta Python que el modelo escribe libremente** contra el browser.
 ⚠️ **Readiness auto puede ser flaky:** si la ruta no tiene markers `data-gvc-ready`/`data-capture`, promote ancla la readiness a un heading único — y si ese heading tiene copy dinámico (rota/cambia), la readiness falla al capturar. **Revisá la readiness del scenario generado** y preferí un marker estable.
 
 **Coreografía / microinteracciones (TASK-1099):** explore/promote SÍ cubren motion:
-- `pnpm fe:capture:explore --route=/x --interaction 'hover:<selector>'` (repetible; `hover`|`focus`|`click` — read-only, NUNCA fill/press) — performa la acción y observa `before`/`feedback`/`settled`.
-- `promote` auto-emite un step **`interaction` (V2)** por cada interacción observada (frames + keyboardEquivalent + `reducedMotion: 'capture'`); ajustás `intent`/timings.
+- `pnpm fe:capture:explore --route=/x --interaction 'hover:<selector>'` (repetible; `hover`|`focus`|`click` — read-only, NUNCA fill/press) — performa la acción y **mide los timings reales** del feedback por pixel-diff (TASK-1100): muestrea el clip del target y deriva `feedback`/`settled` (cualquier motion: CSS/framer-motion/GSAP). `--interaction-window=<ms>` (default 1000) para animaciones largas. Si no hay cambio visible → reporta honesto (`measuredTimings:false`).
+- `promote` auto-emite un step **`interaction` (V2)** por cada interacción observada con los `atMs` **medidos** (frames + keyboardEquivalent + `reducedMotion: 'capture'`); ajustás `intent`.
 - También podés autorar el step `interaction` a mano o usar `pnpm fe:capture:micro`.
 
 ---

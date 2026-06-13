@@ -2,13 +2,15 @@ import { describe, expect, it } from 'vitest'
 
 import {
   INTERACTIVE_ROLES,
+  detectInteractionTimings,
   interactionName,
   parseAriaSnapshot,
   parseInteractionSpec,
   slugifyRoute,
   suggestRoleLocator,
   type ExploreInteraction,
-  type ExploreSession
+  type ExploreSession,
+  type InteractionDiffSample
 } from './explore'
 import { buildInteractionStep, buildPromotedScenario, pickReadinessSelector, serializeScenario } from './promote'
 import { validateScenario } from './scenario'
@@ -221,5 +223,63 @@ describe('buildInteractionStep + scenario con interacciones (TASK-1099)', () => 
     )
 
     expect(scenario.steps.some(s => s.kind === 'interaction')).toBe(false)
+  })
+})
+
+describe('detectInteractionTimings (TASK-1100)', () => {
+  const mk = (rows: [atMs: number, diffVsBefore: number, diffVsPrev: number][]): InteractionDiffSample[] =>
+    rows.map(([atMs, diffVsBefore, diffVsPrev]) => ({ atMs, diffVsBefore, diffVsPrev }))
+
+  it('samples vacíos → sin cambio', () => {
+    expect(detectInteractionTimings([])).toEqual({ feedbackAtMs: 0, settledAtMs: 0, changed: false })
+  })
+
+  it('sin cambio observable → changed=false', () => {
+    const s = mk([
+      [50, 0.0001, 0.0001],
+      [100, 0.0002, 0.0001],
+      [150, 0.0001, 0.0001]
+    ])
+
+    expect(detectInteractionTimings(s).changed).toBe(false)
+  })
+
+  it('mide feedback (1er sample sobre threshold) y settled (inicio del tramo estable)', () => {
+    // El cambio arranca a 100ms, sigue animando hasta 250, se estabiliza desde 300.
+    const s = mk([
+      [50, 0.001, 0.001], // pre-feedback
+      [100, 0.02, 0.02], // feedback (>0.004)
+      [150, 0.05, 0.03], // animando
+      [200, 0.08, 0.03], // animando
+      [250, 0.09, 0.01], // casi
+      [300, 0.09, 0.0005], // estable
+      [350, 0.09, 0.0003] // estable (2 consecutivos)
+    ])
+
+    const t = detectInteractionTimings(s)
+
+    expect(t.changed).toBe(true)
+    expect(t.feedbackAtMs).toBe(100)
+    expect(t.settledAtMs).toBe(300) // inicio del tramo estable de 2
+  })
+
+  it('si nunca se estabiliza, settled = último sample', () => {
+    const s = mk([
+      [50, 0.02, 0.02],
+      [100, 0.05, 0.03],
+      [150, 0.08, 0.03]
+    ])
+
+    const t = detectInteractionTimings(s)
+
+    expect(t.feedbackAtMs).toBe(50)
+    expect(t.settledAtMs).toBe(150)
+  })
+
+  it('settledAtMs nunca es menor que feedbackAtMs', () => {
+    const s = mk([[50, 0.02, 0.02], [100, 0.02, 0.0001], [150, 0.02, 0.0001]])
+    const t = detectInteractionTimings(s)
+
+    expect(t.settledAtMs).toBeGreaterThanOrEqual(t.feedbackAtMs)
   })
 })

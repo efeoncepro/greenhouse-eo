@@ -169,7 +169,85 @@ export interface ExploreInteraction {
   /** ¿La acción resolvió a un nodo visible? (graceful degrade si no). */
   resolved: boolean
   frames: ExploreInteractionFrameObservation[]
+  /** ¿Los timings de los frames se MIDIERON (vs los defaults fijos)? TASK-1100. */
+  measuredTimings?: boolean
   error?: string
+}
+
+/** Un sample del muestreo de estabilidad visual post-acción (TASK-1100). */
+export interface InteractionDiffSample {
+  atMs: number
+  /** Ratio de píxeles distintos vs el frame `before` (0..1). */
+  diffVsBefore: number
+  /** Ratio de píxeles distintos vs el sample anterior (0..1). */
+  diffVsPrev: number
+}
+
+export interface DetectedInteractionTimings {
+  /** Cuándo arranca el cambio visual (vs before). */
+  feedbackAtMs: number
+  /** Cuándo se estabiliza (deja de cambiar vs el sample previo). */
+  settledAtMs: number
+  /** ¿Se observó algún cambio visual? Si no, la acción no tuvo feedback visible. */
+  changed: boolean
+}
+
+export interface DetectTimingsOptions {
+  /** Diff vs before para considerar que el feedback arrancó. Default 0.004 (0.4%). */
+  startThreshold?: number
+  /** Diff vs el sample previo para considerar estabilidad. Default 0.0015. */
+  settleThreshold?: number
+  /** Samples consecutivos estables para declarar settled. Default 2. */
+  stableSamples?: number
+}
+
+/**
+ * Deriva los timings reales de una microinteracción desde la serie de diff-ratios
+ * muestreada post-acción (TASK-1100). Puro: el CLI provee los samples (pixelmatch).
+ *
+ * - `feedbackAtMs`: primer sample cuyo cambio vs `before` supera `startThreshold`.
+ * - `settledAtMs`: inicio del primer tramo de `stableSamples` consecutivos cuyo
+ *   cambio vs el sample previo cae bajo `settleThreshold` (la animación frenó).
+ * - `changed=false` si nunca hubo cambio observable.
+ */
+export const detectInteractionTimings = (
+  samples: InteractionDiffSample[],
+  opts: DetectTimingsOptions = {}
+): DetectedInteractionTimings => {
+  const startThreshold = opts.startThreshold ?? 0.004
+  const settleThreshold = opts.settleThreshold ?? 0.0015
+  const stableSamples = opts.stableSamples ?? 2
+
+  if (samples.length === 0) return { feedbackAtMs: 0, settledAtMs: 0, changed: false }
+
+  const feedbackIdx = samples.findIndex(s => s.diffVsBefore >= startThreshold)
+  const changed = feedbackIdx >= 0
+
+  if (!changed) {
+    return { feedbackAtMs: 0, settledAtMs: 0, changed: false }
+  }
+
+  const feedbackAtMs = samples[feedbackIdx].atMs
+  let settledAtMs = samples[samples.length - 1].atMs
+  let stableRun = 0
+  let stableStart = -1
+
+  for (let i = feedbackIdx; i < samples.length; i++) {
+    if (samples[i].diffVsPrev < settleThreshold) {
+      if (stableRun === 0) stableStart = samples[i].atMs
+      stableRun++
+
+      if (stableRun >= stableSamples) {
+        settledAtMs = stableStart
+        break
+      }
+    } else {
+      stableRun = 0
+      stableStart = -1
+    }
+  }
+
+  return { feedbackAtMs, settledAtMs: Math.max(settledAtMs, feedbackAtMs), changed }
 }
 
 export interface ExploreSession {

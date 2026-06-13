@@ -13,7 +13,7 @@
  * `fe:capture:promote` la cristalice en un `.scenario.ts` determinístico.
  */
 
-import { mkdirSync, rmSync, writeFileSync } from 'node:fs'
+import { copyFileSync, mkdirSync, rmSync, writeFileSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { parseArgs } from 'node:util'
@@ -24,6 +24,7 @@ import { resolveActor } from './lib/audit'
 import { assertNotRedirectedToLogin, launchCaptureSession } from './lib/browser'
 import { isValidEnv, resolveEnvConfig, type CaptureEnv } from './lib/env'
 import {
+  detectInteractionTimings,
   interactionName,
   parseAriaSnapshot,
   parseInteractionSpec,
@@ -31,9 +32,11 @@ import {
   type ExploreCandidate,
   type ExploreInteraction,
   type ExploreProbeResult,
-  type ExploreSession
+  type ExploreSession,
+  type InteractionDiffSample
 } from './lib/explore'
 import { enforceProductionGate } from './lib/safety'
+import { compareImages, loadPng } from './lib/visual-diff'
 
 
 const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url))
@@ -55,8 +58,10 @@ Opciones:
   --ready=<selector> Selector de readiness a esperar antes de observar
   --probe=<selector> Valida un locator Playwright (role=button[name="X"], CSS, …). Repetible.
   --interaction=<kind>:<selector>  Observa una microinteracción (hover|focus|click — read-only):
-                     performa la acción y captura before/feedback/settled. Repetible.
-                     Ej: --interaction 'hover:[role="tab"]'  → promote emite un step interaction.
+                     performa la acción y MIDE los timings reales (before/feedback/settled vía
+                     pixel-diff). Repetible. Ej: --interaction 'hover:[role="tab"]'.
+  --interaction-window=<ms>  Ventana de muestreo para medir el motion (default 1000; subí a
+                     ~1500-2000 para animaciones GSAP largas). Clamp [200, 4000].
   --headed           Chromium visible para debug
   -h, --help
 
@@ -153,14 +158,40 @@ const runProbes = async (page: Page, specs: string[]): Promise<ExploreProbeResul
   return results
 }
 
+const EXPLORE_VIEWPORT = { width: 1440, height: 900 }
+const SAMPLE_INTERVAL_MS = 50
+const CLIP_PADDING = 24
+
+/** Clip fijo (bbox del target + padding, clampeado al viewport) para que todos los samples tengan las mismas dims → pixelmatch funciona. */
+const clipForBox = (box: { x: number; y: number; width: number; height: number }): { x: number; y: number; width: number; height: number } => {
+  const x = Math.max(0, Math.floor(box.x - CLIP_PADDING))
+  const y = Math.max(0, Math.floor(box.y - CLIP_PADDING))
+
+  return {
+    x,
+    y,
+    width: Math.max(1, Math.min(EXPLORE_VIEWPORT.width - x, Math.ceil(box.width + CLIP_PADDING * 2))),
+    height: Math.max(1, Math.min(EXPLORE_VIEWPORT.height - y, Math.ceil(box.height + CLIP_PADDING * 2)))
+  }
+}
+
 /**
- * Observa microinteracciones (TASK-1099): por cada spec, performa la acción
- * (read-only: hover/focus/click) y captura before → feedback → settled. NUNCA
- * fill/press (mutación). Graceful degrade: una interacción fallida no rompe el
- * explore.
+ * Observa microinteracciones (TASK-1099) midiendo los timings reales (TASK-1100).
+ * Performa la acción (read-only: hover/focus/click — NUNCA fill/press), muestrea
+ * el clip del target cada 50ms hasta `windowMs`, computa el diff de píxeles
+ * (`pixelmatch`) y deriva feedback/settled. Funciona para cualquier motion
+ * (CSS/framer-motion/GSAP) porque mide píxeles, no eventos. Graceful degrade.
  */
-const observeInteractions = async (page: Page, specs: string[], sessionDir: string): Promise<ExploreInteraction[]> => {
+const observeInteractions = async (
+  page: Page,
+  specs: string[],
+  sessionDir: string,
+  windowMs: number
+): Promise<ExploreInteraction[]> => {
   const out: ExploreInteraction[] = []
+  const tmpDir = resolve(sessionDir, '_interaction-tmp')
+
+  mkdirSync(tmpDir, { recursive: true })
 
   for (const spec of specs) {
     const { kind, selector } = parseInteractionSpec(spec)
@@ -172,24 +203,67 @@ const observeInteractions = async (page: Page, specs: string[], sessionDir: stri
 
       await locator.waitFor({ state: 'visible', timeout: 8000 })
 
-      const capture = async (label: string, atMs: number): Promise<void> => {
-        const file = `interaction-${name}-${label}.png`
+      const box = await locator.boundingBox()
+      const clip = box ? clipForBox(box) : undefined
 
-        await page.screenshot({ path: resolve(sessionDir, file), fullPage: false })
-        frames.push({ label, atMs, screenshotPath: file })
-      }
+      const beforePath = resolve(tmpDir, `${name}-before.png`)
 
-      // before → acción → feedback (150ms) → settled (300ms)
-      await capture('before', 0)
+      await page.screenshot({ path: beforePath, clip })
+
+      // Acción
       if (kind === 'hover') await locator.hover({ timeout: 8000 })
       else if (kind === 'focus') await locator.focus({ timeout: 8000 })
       else await locator.click({ timeout: 8000 })
-      await page.waitForTimeout(150)
-      await capture('feedback', 150)
-      await page.waitForTimeout(150)
-      await capture('settled', 300)
 
-      out.push({ name, action: { kind, selector }, resolved: true, frames })
+      // Muestreo de estabilidad visual
+      const sampleCount = Math.max(2, Math.ceil(windowMs / SAMPLE_INTERVAL_MS))
+      const samplePaths: { atMs: number; path: string }[] = []
+
+      for (let i = 1; i <= sampleCount; i++) {
+        await page.waitForTimeout(SAMPLE_INTERVAL_MS)
+        const path = resolve(tmpDir, `${name}-s${String(i).padStart(3, '0')}.png`)
+
+        await page.screenshot({ path, clip })
+        samplePaths.push({ atMs: i * SAMPLE_INTERVAL_MS, path })
+      }
+
+      const beforePng = loadPng(beforePath)
+      const samples: InteractionDiffSample[] = []
+      let prevPng = beforePng
+
+      for (const s of samplePaths) {
+        const png = loadPng(s.path)
+
+        samples.push({
+          atMs: s.atMs,
+          diffVsBefore: compareImages(beforePng, png).diffRatio,
+          diffVsPrev: compareImages(prevPng, png).diffRatio
+        })
+        prevPng = png
+      }
+
+      const timings = detectInteractionTimings(samples)
+
+      const persist = (label: string, atMs: number, srcPath: string): void => {
+        const file = `interaction-${name}-${label}.png`
+
+        copyFileSync(srcPath, resolve(sessionDir, file))
+        frames.push({ label, atMs, screenshotPath: file })
+      }
+
+      const sampleAt = (atMs: number): string => samplePaths.find(s => s.atMs === atMs)?.path ?? samplePaths[samplePaths.length - 1].path
+
+      persist('before', 0, beforePath)
+
+      if (timings.changed) {
+        persist('feedback', timings.feedbackAtMs, sampleAt(timings.feedbackAtMs))
+        persist('settled', timings.settledAtMs, sampleAt(timings.settledAtMs))
+      } else {
+        // Sin feedback visible: before + el frame final, sin inventar un 'feedback'.
+        persist('settled', samplePaths[samplePaths.length - 1].atMs, samplePaths[samplePaths.length - 1].path)
+      }
+
+      out.push({ name, action: { kind, selector }, resolved: true, frames, measuredTimings: timings.changed })
     } catch (err) {
       out.push({
         name,
@@ -200,6 +274,8 @@ const observeInteractions = async (page: Page, specs: string[], sessionDir: stri
       })
     }
   }
+
+  rmSync(tmpDir, { recursive: true, force: true })
 
   return out
 }
@@ -213,6 +289,7 @@ const main = async (): Promise<void> => {
       ready: { type: 'string' },
       probe: { type: 'string', multiple: true },
       interaction: { type: 'string', multiple: true },
+      'interaction-window': { type: 'string', default: '1000' },
       headed: { type: 'boolean', default: false },
       help: { type: 'boolean', short: 'h', default: false }
     }
@@ -289,8 +366,10 @@ const main = async (): Promise<void> => {
 
     // Las interacciones van AL FINAL: pueden mutar el estado visual (un click abre
     // un drawer) y la observación estática de arriba refleja el estado inicial.
+    const interactionWindowMs = Math.max(200, Math.min(4000, Number(values['interaction-window']) || 1000))
+
     const interactions = values.interaction?.length
-      ? await observeInteractions(session.page, values.interaction as string[], sessionDir)
+      ? await observeInteractions(session.page, values.interaction as string[], sessionDir, interactionWindowMs)
       : []
 
     const record: ExploreSession = {
@@ -332,7 +411,16 @@ const main = async (): Promise<void> => {
     }
 
     for (const i of interactions) {
-      PRINT(`Interacción "${i.name}" → ${i.resolved ? `${i.frames.length} frames (before/feedback/settled)` : `no resuelta (${i.error ?? 'sin selector visible'})`}`)
+      if (!i.resolved) {
+        PRINT(`Interacción "${i.name}" → no resuelta (${i.error ?? 'sin selector visible'})`)
+      } else if (i.measuredTimings) {
+        const fb = i.frames.find(f => f.label === 'feedback')?.atMs
+        const st = i.frames.find(f => f.label === 'settled')?.atMs
+
+        PRINT(`Interacción "${i.name}" → timings MEDIDOS: feedback ${fb}ms · settled ${st}ms`)
+      } else {
+        PRINT(`Interacción "${i.name}" → sin feedback visible observado (${i.frames.length} frames)`)
+      }
     }
 
     if (interactions.some(i => i.resolved)) {
