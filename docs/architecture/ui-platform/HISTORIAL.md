@@ -6,6 +6,16 @@
 
 ---
 
+## Delta 2026-06-13i — Nexa conversational feature-primitives (Provenance · ResponseToolbar · StreamingText) + contrato canónico
+
+Se extrajeron 3 mecanismos transversales del `NexaAnswersCanvas` a feature-primitives neutrales (P+V+K completo, migración byte-idéntica verificada en GVC), y se canonizó el contrato de la experiencia conversacional de Nexa.
+
+- **`NexaProvenanceTrace`** (TASK-1103) — grounding canónico (variants `inline`/`expandable`/`panel`; kinds `knowledgeGrounded`/`signalPromoted`/`computed`). El canvas migró su reasoning a `expandable`. Lab `/design-system/nexa-provenance`.
+- **`NexaResponseToolbar`** (TASK-1104) — chrome de confianza (variants `embedded`/`floating`/`docked`; kinds `responseSettle`/`chatMessage`/`surfaceBar`). El canvas migró su toolbar co-located a `embedded`. Lab `/design-system/nexa-response-toolbar`.
+- **`NexaStreamingText`** (TASK-1105) — revelado progresivo (modes `value`/`stream`; caret tokenizado; never-hidden + reduced-motion vía CSS-split; helper puro `computeRevealedPlainText`). El canvas migró su revelado inline. Lab `/design-system/nexa-streaming-text`.
+- **Contrato canónico** nuevo: [CONVERSATIONAL_EXPERIENCE.md](./CONVERSATIONAL_EXPERIENCE.md) (shell `NexaAnswersCanvas` domain-neutral + coreografía 11 estados + contratos SSOT `surfaceContext`/`renderPlan`/`nexa-evidence.v1`/`knowledge-search.v1` + garantía de transversalidad de 4 capas + receta para agregar un dominio + hard rules). Doc humano: `documentation/plataforma/nexa-conversational-experience.md`. Skill: `greenhouse-nexa-conversational`.
+- Knowledge = primer consumer, NO dueño. El answer-trace productivo (`NexaKnowledgeAnswerSurface`, Codex) converge hacia este contrato (pendiente coordinado).
+
 ## Delta 2026-06-13h — Nexa FAB brand spectrum hover
 
 El FAB global de Nexa adopta el `GreenhouseSpectrumBeam` en paleta Nexa como affordance de hover/focus:

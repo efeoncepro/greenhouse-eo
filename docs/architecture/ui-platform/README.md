@@ -34,6 +34,7 @@ Regla: cuando un doc temático difiera del runtime, **gana el runtime** y el doc
 | Stack, librerías disponibles, sistema de componentes Vuexy, convenciones, anti-patrones | [STACK.md](./STACK.md) |
 | Spacing/radius runtime contract y lab vivo | [GREENHOUSE_DESIGN_TOKENS_V1.md](../GREENHOUSE_DESIGN_TOKENS_V1.md) §4-§5 · `/admin/design-system/geometry` |
 | Metodología Primitive+Variants+Kinds + catálogo de primitives (Sidecar, Floating Surface, Buttons, Chips, Chart cards, Loading, Microinteraction, Timeline, Summary docks…) | [PRIMITIVES.md](./PRIMITIVES.md) |
+| Experiencia conversacional de Nexa (shell canónico + coreografía + contratos surfaceContext/renderPlan/evidence + feature-primitives + cómo agregar un dominio) | [CONVERSATIONAL_EXPERIENCE.md](./CONVERSATIONAL_EXPERIENCE.md) |
 | Estado de servidor (React Query) y de cliente | [STATE.md](./STATE.md) |
 | Formularios, calendario, fechas, rich text, drag&drop, file upload | [FORMS.md](./FORMS.md) |
 | Tablas operativas + densidad + TanStack | [TABLES.md](./TABLES.md) |
