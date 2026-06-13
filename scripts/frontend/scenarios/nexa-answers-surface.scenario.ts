@@ -392,6 +392,21 @@ export const scenario: CaptureScenario = {
       label: 'nexa-answers-idle',
       clipSelector: '[data-capture="nexa-answers-surface"]',
       note: 'Idle limpio: composer glow sin respuesta falsa ni proof prematuro.'
+    },
+    {
+      kind: 'interaction',
+      interaction: {
+        // El momento de enviar desde la caja glow ARRANCA la coreografía (no salta a la respuesta):
+        // razonando → streaming → settle. Es exactamente lo que el usuario espera al presionar enviar.
+        name: 'submit-from-idle',
+        intent: 'Enviar desde idle dispara el despliegue completo desde el composer glow (no un salto seco a la respuesta).',
+        action: { kind: 'press', selector: 'input[aria-label="Pregúntale a Nexa"]', key: 'Enter' },
+        frames: [
+          { label: 'idle-submit-reasoning', atMs: 700, clipSelector: '[data-capture="nexa-answers-canvas-conversation"]', note: 'Al enviar: la coreografía arranca en razonando (pasos + shimmer), no salta a la respuesta.' },
+          { label: 'idle-submit-streaming', atMs: 2900, clipSelector: '[data-capture="nexa-answers-canvas-conversation"]', note: 'Luego: la respuesta llega con caret (streaming).' },
+          { label: 'idle-submit-settled', atMs: 4200, clipSelector: '[data-capture="nexa-answers-surface"]', note: 'Y asienta (settle) con respuesta + trust + sugeridos.' }
+        ]
+      }
     }
   ]
 }

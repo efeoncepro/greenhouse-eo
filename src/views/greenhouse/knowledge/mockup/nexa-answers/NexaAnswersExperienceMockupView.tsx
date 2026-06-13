@@ -729,7 +729,9 @@ const NexaAnswersExperienceMockupView = () => {
                 surfaceContext={surfaceContext}
                 draft={draft}
                 onDraftChange={setDraft}
-                onSubmit={() => setStage('answered')}
+                // Enviar desde la caja glow ES el inicio de la coreografía: razonando → streaming → settle
+                // (no un salto seco a la respuesta). Es el momento que el usuario espera que "ocurra algo".
+                onSubmit={playDeploy}
                 copy={canvasCopy}
               />
             ) : (
