@@ -145,6 +145,8 @@ export { default as NexaEvidencePanel } from './NexaEvidencePanel'
 export type { NexaEvidencePanelProps, NexaEvidencePanelVariant } from './NexaEvidencePanel'
 export { default as NexaProvenanceTrace } from './nexa-provenance-trace/NexaProvenanceTrace'
 export type {
+  NexaProvenanceProofTab,
+  NexaProvenanceProofTabBuiltin,
   NexaProvenanceStep,
   NexaProvenanceTone,
   NexaProvenanceTraceKind,
@@ -181,7 +183,6 @@ export {
 export { default as NexaKnowledgeAnswerSurface } from './NexaKnowledgeAnswerSurface'
 export type {
   NexaKnowledgeAnswerModeOption,
-  NexaKnowledgeAnswerProofTab,
   NexaKnowledgeAnswerSource,
   NexaKnowledgeAnswerSurfaceProps,
   NexaKnowledgeAnswerTraceStep,

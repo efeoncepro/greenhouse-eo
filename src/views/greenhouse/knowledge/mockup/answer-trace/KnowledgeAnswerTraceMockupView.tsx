@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 
 import Alert from '@mui/material/Alert'
 import Box from '@mui/material/Box'
@@ -36,7 +36,6 @@ import {
   sourceExcerpts,
   traceSteps,
   type AnswerMode,
-  type ProofTab,
   type StatusTone
 } from './data'
 
@@ -470,9 +469,24 @@ const ManualReader = () => {
   )
 }
 
+// TASK-1108 — tab "Fuentes" como content slot del NexaProvenanceTrace panel tabbed (el mockup tiene
+// su proof bespoke; cada tab entra por content). El packet-driven built-in no aplica acá (sin evidence).
+const SourcesProofPanel = () => (
+  <Stack spacing={0} divider={<Divider />}>
+    {sourceExcerpts.map(source => (
+      <SourceCard key={source.id} source={source} />
+    ))}
+    <Stack direction='row' spacing={2} alignItems='center' sx={{ py: 3 }}>
+      <Typography variant='caption' color='text.secondary'>
+        Ver más fuentes filtradas (1)
+      </Typography>
+      <GreenhouseChip size='small' variant='label' tone='success' label='Nexa permitido' />
+    </Stack>
+  </Stack>
+)
+
 const KnowledgeAnswerTraceMockupView = () => {
   const theme = useTheme()
-  const [proofTab, setProofTab] = useState<ProofTab>('sources')
   const [mode, setMode] = useState<AnswerMode>('human')
   const [questionDraft, setQuestionDraft] = useState('')
   const [selectedQuestion, setSelectedQuestion] = useState<string>(GH_KNOWLEDGE_COPY.selectedQuestion)
@@ -496,31 +510,10 @@ const KnowledgeAnswerTraceMockupView = () => {
     setSelectedQuestion(nextQuestion)
     setQuestionDraft('')
     setHasAskedQuestion(true)
-    setProofTab('trace')
 
     setIsThinking(true)
     window.setTimeout(() => setIsThinking(false), 700)
   }
-
-  const proofContent = useMemo(() => {
-    if (proofTab === 'trace') return <TraceProofPanel />
-    if (proofTab === 'packet') return <PacketRows />
-    if (proofTab === 'evals') return <EvalsPanel />
-
-    return (
-      <Stack spacing={0} divider={<Divider />}>
-        {sourceExcerpts.map(source => (
-          <SourceCard key={source.id} source={source} />
-        ))}
-        <Stack direction='row' spacing={2} alignItems='center' sx={{ py: 3 }}>
-          <Typography variant='caption' color='text.secondary'>
-            Ver más fuentes filtradas (1)
-          </Typography>
-          <GreenhouseChip size='small' variant='label' tone='success' label='Nexa permitido' />
-        </Stack>
-      </Stack>
-    )
-  }, [proofTab])
 
   return (
     <Stack spacing={5} data-capture='knowledge-answer-trace-page'>
@@ -551,7 +544,7 @@ const KnowledgeAnswerTraceMockupView = () => {
         </Stack>
       </Stack>
 
-      <NexaKnowledgeAnswerSurface<AnswerMode, ProofTab>
+      <NexaKnowledgeAnswerSurface<AnswerMode>
         kind='knowledgeAnswerTrace'
         question={selectedQuestion}
         conversationStarted={hasAskedQuestion}
@@ -609,16 +602,13 @@ const KnowledgeAnswerTraceMockupView = () => {
           </Stack>
         }
         proofTitle={GH_KNOWLEDGE_COPY.proofTitle}
-        proofTab={proofTab}
         proofTabs={[
-          { value: 'sources', label: GH_KNOWLEDGE_COPY.evidenceTabs.sources },
-          { value: 'trace', label: GH_KNOWLEDGE_COPY.evidenceTabs.trace },
-          { value: 'packet', label: GH_KNOWLEDGE_COPY.evidenceTabs.packet },
-          { value: 'evals', label: GH_KNOWLEDGE_COPY.evidenceTabs.evals }
+          { id: 'sources', label: GH_KNOWLEDGE_COPY.evidenceTabs.sources, content: <SourcesProofPanel /> },
+          { id: 'trace', label: GH_KNOWLEDGE_COPY.evidenceTabs.trace, content: <TraceProofPanel /> },
+          { id: 'packet', label: GH_KNOWLEDGE_COPY.evidenceTabs.packet, content: <PacketRows /> },
+          { id: 'evals', label: GH_KNOWLEDGE_COPY.evidenceTabs.evals, content: <EvalsPanel /> }
         ]}
-        onProofTabChange={setProofTab}
         proofTabsAriaLabel={GH_KNOWLEDGE_COPY.aria.proofTabs}
-        proofContent={proofContent}
       />
 
       <Box

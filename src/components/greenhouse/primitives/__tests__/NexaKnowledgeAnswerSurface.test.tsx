@@ -46,10 +46,10 @@ describe('NexaKnowledgeAnswerSurface', () => {
     const modeOptions = [{ value: 'human' as const, label: 'Humano' }]
     const traceSteps = [{ id: 'answer', label: 'Respuesta', description: 'Con citas', metadata: '2 fuentes', state: 'active' as const }]
     const sources = [{ id: 'manual', title: 'Manual: Cómo usar Mi Desempeño' }]
-    const proofTabs = [{ value: 'sources' as const, label: 'Fuentes' }]
+    const proofTabs = [{ id: 'sources' as const, label: 'Fuentes', content: <p>Fuente revisada</p> }]
 
     const { container, getAllByText, getByRole, getByText, queryByText } = renderWithTheme(
-      <NexaKnowledgeAnswerSurface<'human', 'sources'>
+      <NexaKnowledgeAnswerSurface<'human'>
         kind='knowledgeAnswerTrace'
         question='¿Cómo reviso Mi Desempeño?'
         draft='Nueva pregunta'
@@ -74,11 +74,8 @@ describe('NexaKnowledgeAnswerSurface', () => {
         warningTitle='No consulté datos actuales'
         warningBody='Usa guías publicadas.'
         proofTitle='Prueba y trazabilidad'
-        proofTab='sources'
         proofTabs={proofTabs}
-        onProofTabChange={vi.fn()}
         proofTabsAriaLabel='Prueba'
-        proofContent={<p>Fuente revisada</p>}
       />
     )
 
@@ -104,10 +101,10 @@ describe('NexaKnowledgeAnswerSurface', () => {
     const modeOptions = [{ value: 'human' as const, label: 'Humano' }]
     const traceSteps = [{ id: 'answer', label: 'Respuesta', description: 'Con citas', metadata: '2 fuentes', state: 'active' as const }]
     const sources = [{ id: 'manual', title: 'Manual: Cómo usar Mi Desempeño' }]
-    const proofTabs = [{ value: 'sources' as const, label: 'Fuentes' }]
+    const proofTabs = [{ id: 'sources' as const, label: 'Fuentes', content: <p>Fuente revisada</p> }]
 
     const { container, getByLabelText, queryByLabelText, queryByText } = renderWithTheme(
-      <NexaKnowledgeAnswerSurface<'human', 'sources'>
+      <NexaKnowledgeAnswerSurface<'human'>
         kind='knowledgeAnswerTrace'
         question='¿Cómo reviso Mi Desempeño?'
         conversationStarted={false}
@@ -133,11 +130,8 @@ describe('NexaKnowledgeAnswerSurface', () => {
         warningTitle='No consulté datos actuales'
         warningBody='Usa guías publicadas.'
         proofTitle='Prueba y trazabilidad'
-        proofTab='sources'
         proofTabs={proofTabs}
-        onProofTabChange={vi.fn()}
         proofTabsAriaLabel='Prueba'
-        proofContent={<p>Fuente revisada</p>}
       />
     )
 
@@ -154,7 +148,7 @@ describe('NexaKnowledgeAnswerSurface', () => {
 
   it('renders a shared evidence packet inside the proof panel', () => {
     const { getAllByText, getByText } = renderWithTheme(
-      <NexaKnowledgeAnswerSurface<'human', 'sources'>
+      <NexaKnowledgeAnswerSurface<'human'>
         kind='knowledgeAnswerTrace'
         question='¿Qué significa Impacto?'
         draft=''
@@ -179,9 +173,7 @@ describe('NexaKnowledgeAnswerSurface', () => {
         warningTitle='No consulté datos actuales'
         warningBody='Usa guías publicadas.'
         proofTitle='Fuentes y trazabilidad'
-        proofTab='sources'
-        proofTabs={[{ value: 'sources', label: 'Fuentes' }]}
-        onProofTabChange={vi.fn()}
+        proofTabs={[{ id: 'sources', label: 'Fuentes', builtin: 'sources' }]}
         proofTabsAriaLabel='Prueba'
         evidence={{
           contractVersion: 'nexa-evidence.v1',

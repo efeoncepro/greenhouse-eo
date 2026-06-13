@@ -6,8 +6,6 @@ import Alert from '@mui/material/Alert'
 import Box from '@mui/material/Box'
 import Divider from '@mui/material/Divider'
 import Stack from '@mui/material/Stack'
-import Tab from '@mui/material/Tab'
-import Tabs from '@mui/material/Tabs'
 import ToggleButton from '@mui/material/ToggleButton'
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup'
 import Typography from '@mui/material/Typography'
@@ -17,7 +15,8 @@ import GreenhouseChip from './GreenhouseChip'
 import GreenhouseStatusDot from './GreenhouseStatusDot'
 import GreenhouseThinkingBeat from './GreenhouseThinkingBeat'
 import NexaComposer, { NexaComposerActionButton, NexaComposerInput } from './NexaComposer'
-import NexaEvidencePanel from './NexaEvidencePanel'
+import NexaProvenanceTrace from './nexa-provenance-trace/NexaProvenanceTrace'
+import type { NexaProvenanceProofTab } from './nexa-provenance-trace/nexa-provenance-trace-types'
 import NexaSenderMark from './NexaSenderMark'
 import {
   resolveNexaKnowledgeAnswerSurfaceKind,
@@ -47,12 +46,7 @@ export interface NexaKnowledgeAnswerModeOption<TMode extends string = string> {
   label: string
 }
 
-export interface NexaKnowledgeAnswerProofTab<TTab extends string = string> {
-  value: TTab
-  label: string
-}
-
-export interface NexaKnowledgeAnswerSurfaceProps<TMode extends string = string, TTab extends string = string> {
+export interface NexaKnowledgeAnswerSurfaceProps<TMode extends string = string> {
   variant?: NexaKnowledgeAnswerSurfaceVariant
   kind?: NexaKnowledgeAnswerSurfaceKind
   question: string
@@ -85,11 +79,13 @@ export interface NexaKnowledgeAnswerSurfaceProps<TMode extends string = string, 
   warningAction?: ReactNode
   responseActions?: ReactNode
   proofTitle: string
-  proofTab: TTab
-  proofTabs: readonly NexaKnowledgeAnswerProofTab<TTab>[]
-  onProofTabChange: (value: TTab) => void
+  /**
+   * TASK-1108 — el proof se delega a `NexaProvenanceTrace` panel tabbed. Cada tab es un built-in
+   * transversal (`sources`/`trace`/`packet`, packet-driven) o un `content` slot de dominio. La primitive
+   * es dueña del estado del tab activo (default primer tab) — el consumer ya no controla `proofTab`.
+   */
+  proofTabs: readonly NexaProvenanceProofTab[]
   proofTabsAriaLabel: string
-  proofContent?: ReactNode
   evidence?: ConversationalEvidencePacket
   evidenceFeedbackEnabled?: boolean
 }
@@ -417,7 +413,7 @@ const NexaAnswerBubble = ({
   )
 }
 
-const NexaKnowledgeAnswerSurface = <TMode extends string = string, TTab extends string = string>({
+const NexaKnowledgeAnswerSurface = <TMode extends string = string>({
   variant,
   kind,
   question,
@@ -450,14 +446,11 @@ const NexaKnowledgeAnswerSurface = <TMode extends string = string, TTab extends 
   warningAction,
   responseActions,
   proofTitle,
-  proofTab,
   proofTabs,
-  onProofTabChange,
   proofTabsAriaLabel,
-  proofContent,
   evidence,
   evidenceFeedbackEnabled = true
-}: NexaKnowledgeAnswerSurfaceProps<TMode, TTab>) => {
+}: NexaKnowledgeAnswerSurfaceProps<TMode>) => {
   const theme = useTheme()
   const kindConfig = resolveNexaKnowledgeAnswerSurfaceKind(kind)
   const variantConfig = resolveNexaKnowledgeAnswerSurfaceVariant(variant, kind)
@@ -628,40 +621,20 @@ const NexaKnowledgeAnswerSurface = <TMode extends string = string, TTab extends 
             </Box>
           </Stack>
 
-          <Box
-            data-capture='nexa-knowledge-proof-panel'
-            sx={{
-              minInlineSize: 0,
-              border: `1px solid ${theme.palette.divider}`,
-              borderRadius: `${theme.shape.customBorderRadius.lg}px`,
-              backgroundColor: theme.palette.background.paper,
-              boxShadow: `0 12px 34px ${alpha(theme.palette.common.black, 0.05)}`,
-              overflow: 'hidden'
-            }}
-          >
-            <Box sx={sectionHeaderSx}>
-              <Typography variant='h5'>{proofTitle}</Typography>
-              <Tabs
-                value={proofTab}
-                onChange={(_, value: TTab) => onProofTabChange(value)}
-                aria-label={proofTabsAriaLabel}
-                variant='scrollable'
-                allowScrollButtonsMobile
-                sx={{ minBlockSize: 36, '& .MuiTab-root': { minBlockSize: 36, minInlineSize: 72 } }}
-              >
-                {proofTabs.map(tab => (
-                  <Tab key={tab.value} value={tab.value} label={tab.label} />
-                ))}
-              </Tabs>
-            </Box>
-            <Divider />
-            <Box sx={{ px: { xs: 4, md: 5 }, py: 2 }}>
-              {evidence ? (
-                <NexaEvidencePanel evidence={evidence} variant='proofPanel' feedbackEnabled={evidenceFeedbackEnabled} />
-              ) : (
-                proofContent
-              )}
-            </Box>
+          {/* TASK-1108 — el proof se delega a la primitive canónica NexaProvenanceTrace (panel tabbed):
+              built-ins transversales packet-driven (sources/trace/packet) + tab de dominio por content slot.
+              El chrome bespoke (box + tabs + content) lo provee ahora la primitive; el data-capture se
+              preserva para los scenarios/tests existentes. */}
+          <Box data-capture='nexa-knowledge-proof-panel' sx={{ minInlineSize: 0 }}>
+            <NexaProvenanceTrace
+              variant='panel'
+              open
+              tabs={[...proofTabs]}
+              evidence={evidence}
+              panelTitle={proofTitle}
+              tabsAriaLabel={proofTabsAriaLabel}
+              feedbackEnabled={evidenceFeedbackEnabled}
+            />
           </Box>
         </Box>
       ) : null}

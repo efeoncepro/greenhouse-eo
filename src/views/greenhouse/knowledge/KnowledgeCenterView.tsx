@@ -38,7 +38,6 @@ import type { KnowledgeRetrievalChunk, KnowledgeRetrievalPacket, KnowledgeSearch
 import type { ConversationalEvidencePacket } from '@/lib/nexa/conversational-evidence'
 
 type KnowledgeLens = 'human' | 'nexa' | 'mcp'
-type KnowledgeProofTab = 'sources' | 'trace' | 'packet' | 'review'
 
 type ApiEnvelope<T> = {
   data?: T
@@ -93,13 +92,6 @@ const KNOWLEDGE_MODE_OPTIONS = [
   { value: 'human' as const, label: GH_KNOWLEDGE_COPY.mode.human },
   { value: 'nexa' as const, label: GH_KNOWLEDGE_COPY.mode.nexa },
   { value: 'mcp' as const, label: GH_KNOWLEDGE_COPY.mode.mcp }
-] as const
-
-const KNOWLEDGE_PROOF_TABS = [
-  { value: 'sources' as const, label: GH_KNOWLEDGE_COPY.evidenceTabs.sources },
-  { value: 'trace' as const, label: GH_KNOWLEDGE_COPY.evidenceTabs.trace },
-  { value: 'packet' as const, label: GH_KNOWLEDGE_COPY.evidenceTabs.packet },
-  { value: 'review' as const, label: GH_KNOWLEDGE_COPY.evidenceTabs.evals }
 ] as const
 
 const requestJson = async <T,>(url: string, init?: RequestInit): Promise<T> => {
@@ -292,7 +284,6 @@ const KnowledgeCenterView = () => {
   const [nexaQuestion, setNexaQuestion] = useState<string>(GH_KNOWLEDGE_COPY.selectedQuestion)
   const [nexaAsked, setNexaAsked] = useState(false)
   const [nexaThinking, setNexaThinking] = useState(false)
-  const [proofTab, setProofTab] = useState<KnowledgeProofTab>('sources')
   const [documents, setDocuments] = useState<KnowledgeDocumentSummary[]>([])
   const [packet, setPacket] = useState<KnowledgeRetrievalPacket | null>(null)
   const [selectedDocumentId, setSelectedDocumentId] = useState<string | null>(null)
@@ -451,7 +442,6 @@ const KnowledgeCenterView = () => {
     setNexaQuestion(trimmed)
     setNexaDraft('')
     setNexaAsked(true)
-    setProofTab('trace')
     setNexaThinking(true)
 
     await runKnowledgeSearch(trimmed, 'agentic')
@@ -604,7 +594,7 @@ const KnowledgeCenterView = () => {
       ) : null}
 
       {activeMode === 'nexa' ? (
-        <NexaKnowledgeAnswerSurface<KnowledgeLens, KnowledgeProofTab>
+        <NexaKnowledgeAnswerSurface<KnowledgeLens>
             kind='knowledgeAnswerTrace'
             question={nexaQuestion}
             conversationStarted={nexaAsked}
@@ -661,11 +651,13 @@ const KnowledgeCenterView = () => {
               </Stack>
             }
             proofTitle={GH_KNOWLEDGE_COPY.proofTitle}
-            proofTab={proofTab}
-            proofTabs={KNOWLEDGE_PROOF_TABS}
-            onProofTabChange={setProofTab}
+            proofTabs={[
+              { id: 'sources', label: GH_KNOWLEDGE_COPY.evidenceTabs.sources, builtin: 'sources' },
+              { id: 'trace', label: GH_KNOWLEDGE_COPY.evidenceTabs.trace, builtin: 'trace' },
+              { id: 'packet', label: GH_KNOWLEDGE_COPY.evidenceTabs.packet, builtin: 'packet' },
+              { id: 'review', label: GH_KNOWLEDGE_COPY.evidenceTabs.evals, content: <KnowledgeEvalsContent evidence={lensEvidence} /> }
+            ]}
             proofTabsAriaLabel={GH_KNOWLEDGE_COPY.aria.proofTabs}
-            proofContent={<KnowledgeProofContent evidence={lensEvidence} activeTab={proofTab} />}
           />
       ) : null}
 
@@ -963,15 +955,11 @@ const KnowledgeLensSwitcher = ({
   )
 }
 
-const KnowledgeProofContent = ({
-  evidence,
-  activeTab
-}: {
-  evidence: ConversationalEvidencePacket | null
-  activeTab: KnowledgeProofTab
-}) => {
-  const theme = useTheme()
-
+// TASK-1108 — tab de DOMINIO "Evals" (content slot del NexaProvenanceTrace panel tabbed). Los tabs
+// transversales (Fuentes/Razonamiento/Packet) los rinde la primitive desde el packet; este es el único
+// proof Knowledge-specific. Hoy es un resumen de respaldo; cuando el eval-harness real (TASK-1083)
+// alimente la surface, vive acá.
+const KnowledgeEvalsContent = ({ evidence }: { evidence: ConversationalEvidencePacket | null }) => {
   if (!evidence) {
     return (
       <EmptyState
@@ -983,59 +971,17 @@ const KnowledgeProofContent = ({
     )
   }
 
-  if (activeTab === 'packet') {
-    const rows = [
-      { label: 'contractVersion', value: evidence.sourceContractVersion },
-      { label: 'confidence', value: evidence.confidence },
-      { label: 'freshness', value: evidence.freshness },
-      { label: 'sources', value: String(evidence.citedDocumentCount) },
-      { label: 'filtered', value: String(evidence.deniedOrFilteredCount) },
-      { label: 'maxScore', value: evidence.maxScore == null ? 'null' : evidence.maxScore.toFixed(2) }
-    ]
-
-    return (
-      <Stack spacing={2} data-capture='knowledge-proof-packet'>
-        {rows.map(row => (
-          <Stack
-            key={row.label}
-            direction='row'
-            spacing={3}
-            justifyContent='space-between'
-            sx={{ py: 2, borderBlockEnd: `1px solid ${theme.palette.divider}` }}
-          >
-            <Typography variant='caption' color='text.secondary'>{row.label}</Typography>
-            <Typography variant='body2' sx={{ overflowWrap: 'anywhere', textAlign: 'end' }}>{row.value}</Typography>
-          </Stack>
-        ))}
-        <Typography variant='caption' color='text.secondary'>{GH_KNOWLEDGE_COPY.mcpNoMock}</Typography>
-      </Stack>
-    )
-  }
-
-  if (activeTab === 'review') {
-    return (
-      <Stack spacing={2} data-capture='knowledge-proof-review'>
-        <Alert severity={evidence.sources.length ? 'success' : 'warning'} variant='outlined'>
-          {evidence.sources.length
-            ? `Respuesta respaldada por ${evidence.sources.length} fuente${evidence.sources.length === 1 ? '' : 's'} recuperada${evidence.sources.length === 1 ? '' : 's'}.`
-            : 'No encontré fuentes publicadas para esta pregunta.'}
-        </Alert>
-        <Typography variant='body2' color='text.secondary'>
-          Confianza: {evidence.confidence} · Frescura: {evidence.freshness} · Filtrados por política: {evidence.deniedOrFilteredCount}
-        </Typography>
-      </Stack>
-    )
-  }
-
   return (
-    <NexaEvidencePanel
-      evidence={{
-        ...evidence,
-        traceSteps: activeTab === 'sources' ? evidence.traceSteps : evidence.traceSteps.map(step => ({ ...step, state: step.state }))
-      }}
-      variant='proofPanel'
-      feedbackEnabled={activeTab === 'sources'}
-    />
+    <Stack spacing={2} data-capture='knowledge-proof-review'>
+      <Alert severity={evidence.sources.length ? 'success' : 'warning'} variant='outlined'>
+        {evidence.sources.length
+          ? `Respuesta respaldada por ${evidence.sources.length} fuente${evidence.sources.length === 1 ? '' : 's'} recuperada${evidence.sources.length === 1 ? '' : 's'}.`
+          : 'No encontré fuentes publicadas para esta pregunta.'}
+      </Alert>
+      <Typography variant='body2' color='text.secondary'>
+        Confianza: {evidence.confidence} · Frescura: {evidence.freshness} · Filtrados por política: {evidence.deniedOrFilteredCount}
+      </Typography>
+    </Stack>
   )
 }
 

@@ -1,5 +1,6 @@
 'use client'
 
+import Alert from '@mui/material/Alert'
 import Box from '@mui/material/Box'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
@@ -125,6 +126,35 @@ const NexaProvenanceLabView = () => (
 
     <SpecimenCard title='Variant · panel' subtitle='Evidencia bajo demanda: compone NexaEvidencePanel (read-only). Es el proof colapsable del answer-first.'>
       <NexaProvenanceTrace variant='panel' evidence={EVIDENCE} open />
+    </SpecimenCard>
+
+    <SpecimenCard
+      title='Variant · panel (tabbed)'
+      subtitle='El panel puede ser tabbed. Los built-ins son TRANSVERSALES (packet-driven): Fuentes/Razonamiento componen NexaEvidencePanel, Packet muestra los campos crudos del nexa-evidence.v1. Un tab de dominio entra por content slot (la primitive queda neutral; los labels y qué tabs los pasa el consumer).'
+    >
+      <NexaProvenanceTrace
+        variant='panel'
+        open
+        evidence={EVIDENCE}
+        panelTitle='Base'
+        tabsAriaLabel='Pestañas de evidencia'
+        feedbackEnabled
+        tabs={[
+          { id: 'sources', label: 'Fuentes', builtin: 'sources' },
+          { id: 'trace', label: 'Razonamiento', builtin: 'trace' },
+          { id: 'packet', label: 'Packet', builtin: 'packet' },
+          {
+            id: 'domain-evals',
+            label: 'Evals',
+            content: (
+              <Alert severity='success' variant='outlined'>
+                Slot de dominio: el consumer (p.ej. Knowledge) llena este tab con su proof específico — aquí
+                viviría el eval-harness real. La primitive no conoce este contenido.
+              </Alert>
+            )
+          }
+        ]}
+      />
     </SpecimenCard>
 
     <SpecimenCard title='Kinds → variant' subtitle='El kind semántico resuelve a un variant funcional. Ningún dominio tiene chrome especial (transversal).'>

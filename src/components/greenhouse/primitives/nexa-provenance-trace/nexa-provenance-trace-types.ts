@@ -1,3 +1,5 @@
+import type { ReactNode } from 'react'
+
 import type { ConversationalEvidencePacket } from '@/lib/nexa/conversational-evidence'
 
 import type { NexaExpressiveTextValue } from '../nexa-expressive-text/nexa-expressive-text-types'
@@ -36,6 +38,28 @@ export interface NexaProvenanceStep {
   status: 'done' | 'active' | 'pending'
 }
 
+/**
+ * Renderers built-in del `panel` tabbed — TRANSVERSALES, packet-driven (cero acoplamiento a dominio):
+ * `sources`/`trace` componen `NexaEvidencePanel`; `packet` muestra los campos crudos del
+ * `nexa-evidence.v1`. Es la frontera: lo transversal vive horneado en la primitive.
+ */
+export type NexaProvenanceProofTabBuiltin = 'sources' | 'trace' | 'packet'
+
+/**
+ * Tab del `panel` tabbed. El consumer declara qué tabs + sus labels (i18n) — la primitive NO hardcodea
+ * copy. Cada tab renderiza un `builtin` packet-driven O un `content` slot (proof de dominio, p.ej. el
+ * eval-harness de Knowledge). Así la primitive queda neutral y el dominio entra por slot.
+ */
+export interface NexaProvenanceProofTab {
+  id: string
+  /** Label visible (lo provee el consumer — i18n por dominio). */
+  label: string
+  /** Renderer built-in transversal (packet-driven). Mutuamente excluyente con `content`. */
+  builtin?: NexaProvenanceProofTabBuiltin
+  /** Slot de dominio (ReactNode). Mutuamente excluyente con `builtin`. */
+  content?: ReactNode
+}
+
 export interface NexaProvenanceTraceProps {
   variant?: NexaProvenanceTraceVariant
   kind?: NexaProvenanceTraceKind
@@ -51,4 +75,15 @@ export interface NexaProvenanceTraceProps {
   panelId?: string
   /** `panel`: abierto/colapsado (default true cuando se renderiza el panel). */
   open?: boolean
+  /**
+   * `panel`: cuando se provee, el panel es TABBED (Box bordeado + título + Tabs + content del tab activo).
+   * Omitido → panel single actual (byte-idéntico). Cada tab es un `builtin` packet-driven o un `content` slot.
+   */
+  tabs?: NexaProvenanceProofTab[]
+  /** `panel` tabbed: título del panel (p.ej. "Base"). */
+  panelTitle?: string
+  /** `panel` tabbed: aria-label de la TabList. */
+  tabsAriaLabel?: string
+  /** `panel`: habilita el feedback ¿útil? en el built-in `sources` / el panel single. Default false. */
+  feedbackEnabled?: boolean
 }

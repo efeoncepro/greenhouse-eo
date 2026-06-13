@@ -140,16 +140,24 @@ No se crea un componente nuevo. Se compone el canvas con el contrato del dominio
 
 ---
 
-## 8. Convergencia del answer-trace (coordinado con Codex)
+## 8. Convergencia del answer-trace (TASK-1108)
 
-`NexaKnowledgeAnswerSurface` (Codex, TASK-1089/1090/1092) está **wired a producción** (`/knowledge` lens, retrieval real) pero es **Knowledge-scoped** y no modela `surfaceContext`. El plan canónico (operador): **conservar su data-path runtime**, y converger su presentación hacia el canvas + los feature-primitives neutrales. Pendiente coordinado (deferido):
+`NexaKnowledgeAnswerSurface` (Codex, TASK-1089/1090/1092) está **wired a producción** (`/knowledge` lens, retrieval real). El plan canónico (operador): **conservar su data-path runtime**, converger su presentación hacia el canvas + los feature-primitives neutrales.
 
-- Migrar el `proof` del answer-trace a `NexaProvenanceTrace` variant `panel` y el `inline` trust cue a la variant `inline`.
-- Que el answer-trace consuma el `surfaceContext` SSOT (hoy no lo hace).
-- ADR de plataforma "Nexa conversational surface" + hard-rule en CLAUDE.md (**NUNCA** answer-surface por dominio).
-- Slices A1/A2 de TASK-1095: promoción física de las definiciones del contrato a `src/lib/nexa/` + split dominio/UI de `allowedRenderers`/`allowedActions` (gateado por `fe:capture:diff`).
+**Hecho (TASK-1108):** el **proof del answer-trace migró a `NexaProvenanceTrace` variant `panel` tabbed** — byte-idéntico (GVC). La frontera transversal/dominio quedó **ratificada por skills arch + product-ui** y enforced por el shape de la primitive:
 
-Mientras converge, **ambas surfaces coexisten**: el canvas es la referencia rica + el laboratorio de los feature-primitives; el answer-trace es el runtime de Knowledge.
+- **Transversal (horneado en la primitive):** el chrome tabbed (a11y/teclado/ARIA) + los renderers built-in **packet-driven** (`sources`/`trace` componen `NexaEvidencePanel` · `packet` campos crudos del `nexa-evidence.v1`). Cero acoplamiento a dominio.
+- **Dominio (slot que llena la surface):** los labels (i18n) + qué tabs/orden + un tab extra con `content` ReactNode (p.ej. "Evals"/eval-harness de Knowledge). Así la primitive neutral **no** absorbe conceptos de Knowledge.
+- `NexaKnowledgeAnswerSurface.proofTabs` es ahora `NexaProvenanceProofTab[]`; la primitive es dueña del estado del tab activo (los consumers ya no controlan `proofTab`/`proofContent`). Consumers migrados: `KnowledgeCenterView` (prod, built-ins + slot Evals) + el Lab `nexa-chat` + el mockup `answer-trace` (slots bespoke).
+
+**Deferido (sin consumer real → no se construye, arch-correct):**
+
+- `surfaceContext` SSOT en el answer-trace — sería un **prop huérfano** (su sistema de variants `conversationTrace`/`overviewPanel`/`toolResult` no mapea a `allowedRenderers` todavía). Se adopta cuando tenga consumer real.
+- El `inline` trust cue del answer-trace → variant `inline` (cuando se toque esa zona).
+- ADR de plataforma + hard-rule absoluta en CLAUDE.md (**NUNCA** answer-surface por dominio) — **descriptiva por ahora** (el canvas es el shell canónico; grounding/proof vía `NexaProvenanceTrace`); la absoluta aterriza cuando el answer-trace converja del todo (consume `surfaceContext` + el canvas como shell).
+- Slices A1/A2 de TASK-1095: promoción física del contrato + split dominio/UI de `allowedRenderers`/`allowedActions`.
+
+Mientras converge el resto, **ambas surfaces coexisten**: el canvas es la referencia rica + el laboratorio de los feature-primitives; el answer-trace es el runtime de Knowledge — ahora compartiendo el **mismo grounding/proof canónico** (`NexaProvenanceTrace`).
 
 ---
 

@@ -570,7 +570,6 @@ const ANSWERS_CANVAS_COPY: NexaAnswersCanvasCopy = {
 const KnowledgeAnswerSurfaceSpecimen = () => {
   const [draft, setDraft] = useState('')
   const [mode, setMode] = useState<'human' | 'nexa' | 'mcp'>('human')
-  const [proofTab, setProofTab] = useState<'sources' | 'trace' | 'packet' | 'review'>('sources')
   const [question, setQuestion] = useState('¿Cómo reviso mis métricas ICO personales?')
   const [thinking, setThinking] = useState(false)
   const evidence = nexaToolResultToConversationalEvidence(KNOWLEDGE_TOOL_TRACE_SPECIMEN)
@@ -588,7 +587,7 @@ const KnowledgeAnswerSurfaceSpecimen = () => {
   }
 
   return (
-    <NexaKnowledgeAnswerSurface<'human' | 'nexa' | 'mcp', 'sources' | 'trace' | 'packet' | 'review'>
+    <NexaKnowledgeAnswerSurface<'human' | 'nexa' | 'mcp'>
       kind='knowledgeAnswerTrace'
       question={question}
       draft={draft}
@@ -630,27 +629,28 @@ const KnowledgeAnswerSurfaceSpecimen = () => {
       warningTitle='No consulté datos actuales'
       warningBody='Esta respuesta usa guías publicadas. Para ver tu estado real, consulta el módulo operativo.'
       proofTitle='Prueba y trazabilidad'
-      proofTab={proofTab}
       proofTabs={[
-        { value: 'sources', label: 'Fuentes' },
-        { value: 'trace', label: 'Cómo llegó' },
-        { value: 'packet', label: 'Paquete' },
-        { value: 'review', label: 'Revisión' }
+        { id: 'sources', label: 'Fuentes', builtin: 'sources' },
+        { id: 'trace', label: 'Cómo llegó', builtin: 'trace' },
+        { id: 'packet', label: 'Paquete', builtin: 'packet' },
+        {
+          id: 'review',
+          label: 'Revisión',
+          content: (
+            <Stack spacing={1.5}>
+              <Typography variant='body2' sx={{ fontWeight: 600 }}>
+                Golden question: passed
+              </Typography>
+              <Typography variant='caption' color='text.secondary'>
+                Specimen vivo de la primera kind transversal de respuestas Nexa para Knowledge.
+              </Typography>
+            </Stack>
+          )
+        }
       ]}
-      onProofTabChange={setProofTab}
       proofTabsAriaLabel='Prueba y trazabilidad'
-      evidence={proofTab === 'sources' || proofTab === 'trace' ? evidence ?? undefined : undefined}
+      evidence={evidence ?? undefined}
       evidenceFeedbackEnabled={false}
-      proofContent={
-        <Stack spacing={1.5}>
-          <Typography variant='body2' sx={{ fontWeight: 600 }}>
-            {proofTab === 'packet' ? 'knowledge-search.v1' : 'Golden question: passed'}
-          </Typography>
-          <Typography variant='caption' color='text.secondary'>
-            Specimen vivo de la primera kind transversal de respuestas Nexa para Knowledge.
-          </Typography>
-        </Stack>
-      }
     />
   )
 }
