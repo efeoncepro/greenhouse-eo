@@ -29,6 +29,12 @@ import {
 import type { ConversationalEvidencePacket } from '@/lib/nexa/conversational-evidence'
 
 import { answerActions, answerPoints, icoChartSpec, trustCue } from './nexa-answer-bubble-fixtures'
+import {
+  financeRenderPlan,
+  financeSurfaceContext,
+  insightRenderPlan,
+  insightSurfaceContext
+} from './nexa-answers-portability-fixtures'
 
 type VisualStage = 'idle' | 'thinking' | 'reasoning' | 'streaming' | 'answered' | 'proof' | 'followup' | 'degraded' | 'error'
 
@@ -484,6 +490,95 @@ const SurfaceContextRail = () => {
   )
 }
 
+const PORTABILITY_SPECIMENS = [
+  {
+    id: 'finance',
+    canvasKind: 'financeChartEmbedded' as const,
+    badge: { icon: 'tabler-report-money', tone: 'warning' as const, label: 'Finance · chart' },
+    title: 'El mismo canvas, dominio Finanzas',
+    question: '¿Por qué cayó el margen de contribución del cliente este trimestre?',
+    surfaceContext: financeSurfaceContext,
+    renderPlan: financeRenderPlan
+  },
+  {
+    id: 'insight',
+    canvasKind: 'agencyInsightEmbedded' as const,
+    badge: { icon: 'tabler-bolt', tone: 'info' as const, label: 'Insight promovido' },
+    title: 'Una señal de Nexa Insights, promovida a respuesta',
+    question: '¿Qué pasó con la entrega del equipo este sprint?',
+    surfaceContext: insightSurfaceContext,
+    renderPlan: insightRenderPlan
+  }
+]
+
+// Specimen de portabilidad: renderiza el MISMO NexaAnswersCanvas en otro dominio, en estado answered
+// y read-only (composer suprimido con un fragment vacío). Prueba que surfaceContext + renderPlan son
+// agnósticos del dominio sin re-plumbing del primitive.
+const PortabilitySpecimen = ({ specimen }: { specimen: (typeof PORTABILITY_SPECIMENS)[number] }) => {
+  const theme = useTheme()
+
+  return (
+    <Box
+      data-capture={`nexa-answers-portability-${specimen.id}`}
+      sx={{ ...panelSx(theme), p: { xs: 4, md: 5 }, display: 'flex', flexDirection: 'column', gap: 3 }}
+    >
+      <Stack direction='row' spacing={2} alignItems='center' justifyContent='space-between' flexWrap='wrap' useFlexGap>
+        <GreenhouseChip size='small' variant='label' tone={specimen.badge.tone} iconClassName={specimen.badge.icon} label={specimen.badge.label} />
+        <Typography variant='caption' color='text.secondary'>
+          {specimen.surfaceContext.surfaceId}
+        </Typography>
+      </Stack>
+      <Typography variant='h6'>{specimen.title}</Typography>
+      <Box sx={{ ...softPanelSx(theme), p: { xs: 3, md: 4 }, backgroundColor: alpha(theme.palette.primary.main, 0.012) }}>
+        <NexaAnswersCanvas
+          kind={specimen.canvasKind}
+          state='answered'
+          surfaceContext={specimen.surfaceContext}
+          renderPlan={specimen.renderPlan}
+          question={specimen.question}
+          draft=''
+          onDraftChange={() => undefined}
+          onSubmit={() => undefined}
+          // Ready label neutro: el copy compartido es de Knowledge; en otro dominio no debe decir "Knowledge".
+          copy={{ ...canvasCopy, readyLabel: 'Respuesta lista' }}
+          slots={{ composer: <></> }}
+        />
+      </Box>
+    </Box>
+  )
+}
+
+const PortabilityGallery = () => {
+  const theme = useTheme()
+
+  return (
+    <Box data-capture='nexa-answers-portability' sx={{ ...panelSx(theme), p: { xs: 4, md: 5 } }}>
+      <Stack spacing={4}>
+        <Stack spacing={1}>
+          <Typography variant='h5'>Portabilidad fuera de Knowledge</Typography>
+          <Typography variant='body2' color='text.secondary' sx={{ maxInlineSize: 820 }}>
+            El mismo NexaAnswersCanvas y el contrato surfaceContext/renderPlan renderizan otros dominios sin
+            re-plumbing: Finanzas con gráfica y una señal de Nexa Insights promovida a respuesta. Datos sintéticos.
+          </Typography>
+        </Stack>
+        <Box
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: { xs: '1fr', lg: 'repeat(2, minmax(0, 1fr))' },
+            gap: 4,
+            alignItems: 'start',
+            '& > *': { minInlineSize: 0 }
+          }}
+        >
+          {PORTABILITY_SPECIMENS.map(specimen => (
+            <PortabilitySpecimen key={specimen.id} specimen={specimen} />
+          ))}
+        </Box>
+      </Stack>
+    </Box>
+  )
+}
+
 const NexaAnswersExperienceMockupView = () => {
   const theme = useTheme()
   const [stage, setStage] = useState<VisualStage>('answered')
@@ -700,6 +795,8 @@ const NexaAnswersExperienceMockupView = () => {
           </Box>
         </Stack>
       </Box>
+
+      <PortabilityGallery />
     </Stack>
   )
 }

@@ -461,25 +461,35 @@ const AnswerChartBlock = ({ chart }: { chart: NonNullable<NexaAnswerBubbleProps[
 
 const MetricSparkline = ({ metric, color }: { metric: NexaAnswerMetricSummaryItem; color: string }) => {
   const prefersReducedMotion = useReducedMotion()
+  // Recharts mide su contenedor en cliente; renderizarlo en SSR produce un mismatch de hidratación.
+  // Diferimos el SVG hasta mount; el Box wrapper ya reserva el alto (blockSize 42) → sin CLS. Mismo
+  // patrón canónico que AnswerChartBlock (mounted guard).
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   return (
     <Box aria-hidden sx={{ inlineSize: '100%', blockSize: 42, minInlineSize: 0 }}>
-      <ResponsiveContainer width='100%' height='100%'>
-        <AreaChart data={metric.trend} margin={{ top: 8, right: 0, bottom: 2, left: 0 }}>
-          <Area
-            type='monotone'
-            dataKey='value'
-            stroke={color}
-            fill={color}
-            fillOpacity={0.08}
-            strokeWidth={2}
-            dot={false}
-            activeDot={false}
-            isAnimationActive={!prefersReducedMotion}
-            animationDuration={520}
-          />
-        </AreaChart>
-      </ResponsiveContainer>
+      {mounted ? (
+        <ResponsiveContainer width='100%' height='100%'>
+          <AreaChart data={metric.trend} margin={{ top: 8, right: 0, bottom: 2, left: 0 }}>
+            <Area
+              type='monotone'
+              dataKey='value'
+              stroke={color}
+              fill={color}
+              fillOpacity={0.08}
+              strokeWidth={2}
+              dot={false}
+              activeDot={false}
+              isAnimationActive={!prefersReducedMotion}
+              animationDuration={520}
+            />
+          </AreaChart>
+        </ResponsiveContainer>
+      ) : null}
     </Box>
   )
 }

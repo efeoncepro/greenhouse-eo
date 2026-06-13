@@ -98,6 +98,18 @@ export const scenario: CaptureScenario = {
       note: 'Fase settle: response toolbar — feedback ¿útil? + copiar/compartir/regenerar (chrome de confianza estilo AI Overview, distinto de las acciones de dominio).'
     },
     {
+      kind: 'mark',
+      label: 'nexa-answers-portability-finance',
+      clipSelector: '[data-capture="nexa-answers-portability-finance"]',
+      note: 'Portabilidad: el mismo NexaAnswersCanvas renderiza dominio Finanzas (chart de margen comprimido) — surfaceContext/renderPlan agnósticos del dominio.'
+    },
+    {
+      kind: 'mark',
+      label: 'nexa-answers-portability-insight',
+      clipSelector: '[data-capture="nexa-answers-portability-insight"]',
+      note: 'Portabilidad: una señal de Nexa Insights promovida a respuesta (metricSummary OTD/FTR/RpA) en el mismo canvas.'
+    },
+    {
       kind: 'interaction',
       interaction: {
         // El voto colapsa el cluster a un acuse (el botón se reemplaza), así que la operabilidad por
