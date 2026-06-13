@@ -167,6 +167,19 @@ const CATALOG_ITEMS: CatalogItem[] = [
     icon: 'tabler-thumb-up'
   },
   {
+    id: 'nexa-streaming-text',
+    title: 'Nexa streaming text',
+    description: 'Revelado progresivo de la respuesta de Nexa (el "feel" del asistente que escribe): modes value (revela fracción) / stream (chunks reales). Caret tokenizado, never-hidden + reduced-motion.',
+    route: '/design-system/nexa-streaming-text',
+    category: 'Primitives',
+    kind: 'Primitive',
+    status: 'Hardening',
+    owner: 'NexaStreamingText',
+    tags: ['nexa', 'streaming', 'revelado', 'caret', 'typing', 'tokens'],
+    searchAliases: ['streaming', 'revelado', 'caret', 'escribiendo', 'typing', 'stream', 'nexa streaming text'],
+    icon: 'tabler-cursor-text'
+  },
+  {
     id: 'buttons',
     title: 'Buttons',
     description: 'Primitive para jerarquía de comandos, tono, iconos y estados async.',

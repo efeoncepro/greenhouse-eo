@@ -20,6 +20,7 @@ import GreenhouseStatusDot from '../GreenhouseStatusDot'
 import GreenhouseThinkingBeat from '../GreenhouseThinkingBeat'
 import NexaSenderMark from '../NexaSenderMark'
 import NexaExpressiveText, { getNexaExpressiveTextPlainText } from '../nexa-expressive-text/NexaExpressiveText'
+import NexaStreamingText from '../nexa-streaming-text/NexaStreamingText'
 import {
   assertNexaAnswersRenderPlanAllowed,
   NEXA_ANSWERS_CANVAS_VARIANT_CONFIG,
@@ -239,25 +240,6 @@ const CanvasErrorState = ({ state, copy }: { state: NexaAnswersCanvasState; copy
 
 // Caret de redacción: barra que parpadea al final del texto que está llegando.
 // Reduced-motion → caret fijo (sin parpadeo), sigue comunicando "escribiendo".
-const StreamingCaret = () => (
-  <Box
-    component='span'
-    aria-hidden='true'
-    sx={theme => ({
-      display: 'inline-block',
-      inlineSize: '2px',
-      blockSize: '1.05em',
-      marginInlineStart: '3px',
-      verticalAlign: 'text-bottom',
-      borderRadius: '1px',
-      backgroundColor: theme.palette.primary.main,
-      '@keyframes nexa-stream-caret': { '0%,48%': { opacity: 1 }, '50%,100%': { opacity: 0 } },
-      animation: 'nexa-stream-caret 1.05s steps(1) infinite',
-      '@media (prefers-reduced-motion: reduce)': { animation: 'none', opacity: 1 }
-    })}
-  />
-)
-
 // Respuesta llegando: titular ya redactado + cuerpo a mitad con caret + (si es chart) el
 // gráfico todavía armándose. SIN trust cue ni acciones (llegan al cerrar). El live region
 // del status lo lleva la identidad Nexa (no duplicar aquí) → un solo anuncio.
@@ -271,8 +253,6 @@ const StreamingAnswerDraft = ({
   stopLabel?: string
 }) => {
   const theme = useTheme()
-  const bodyFull = getNexaExpressiveTextPlainText(block.body)
-  const bodyPartial = bodyFull.slice(0, Math.max(24, Math.ceil(bodyFull.length * 0.6))).trimEnd()
   const showChart = Boolean(block.chart)
 
   return (
@@ -324,10 +304,8 @@ const StreamingAnswerDraft = ({
           ) : null}
         </Stack>
         <NexaExpressiveText value={block.title} variant='h5' />
-        <Typography variant='body2' color='text.secondary'>
-          {bodyPartial}
-          <StreamingCaret />
-        </Typography>
+        <NexaStreamingText value={block.body} />
+
         {showChart ? (
           <Box
             aria-hidden='true'

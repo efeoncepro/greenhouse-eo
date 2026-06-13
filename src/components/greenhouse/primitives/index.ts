@@ -170,6 +170,14 @@ export {
   resolveNexaResponseToolbarVariant
 } from './nexa-response-toolbar/nexa-response-toolbar-controller'
 export type { NexaResponseToolbarKindConfig } from './nexa-response-toolbar/nexa-response-toolbar-controller'
+export { default as NexaStreamingText } from './nexa-streaming-text/NexaStreamingText'
+export type { NexaStreamingTextMode, NexaStreamingTextProps } from './nexa-streaming-text/nexa-streaming-text-types'
+export {
+  computeRevealedPlainText,
+  isRevealing,
+  NEXA_STREAMING_TEXT_DEFAULT_FRACTION,
+  NEXA_STREAMING_TEXT_DEFAULT_MIN_CHARS
+} from './nexa-streaming-text/nexa-streaming-text-controller'
 export { default as NexaKnowledgeAnswerSurface } from './NexaKnowledgeAnswerSurface'
 export type {
   NexaKnowledgeAnswerModeOption,

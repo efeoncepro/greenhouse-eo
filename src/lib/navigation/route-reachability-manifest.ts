@@ -272,6 +272,13 @@ export const DECLARED_CHILD_ROUTES: readonly ChildRouteDeclaration[] = [
       'Nexa Response Toolbar Lab (TASK-1104) — child surface del Design System para la primitive NexaResponseToolbar (chrome de confianza canonico de una respuesta de Nexa: variants embedded/floating/docked + kinds responseSettle/chatMessage/surfaceBar), alcanzable desde el catalogo canonico /design-system.'
   },
   {
+    route: '/design-system/nexa-streaming-text',
+    parent: '/design-system',
+    via: 'inline-link',
+    reason:
+      'Nexa Streaming Text Lab (TASK-1105) — child surface del Design System para la primitive NexaStreamingText (revelado progresivo canonico de la respuesta de Nexa: modes value/stream + caret tokenizado + never-hidden/reduced-motion), alcanzable desde el catalogo canonico /design-system.'
+  },
+  {
     route: '/design-system/geometry',
     parent: '/design-system',
     via: 'inline-link',

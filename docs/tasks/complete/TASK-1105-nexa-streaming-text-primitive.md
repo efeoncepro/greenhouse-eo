@@ -4,9 +4,21 @@
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-06-13 — COMPLETADA
+
+- Primitive `NexaStreamingText` creada en `src/components/greenhouse/primitives/nexa-streaming-text/` (component + types + controller con helper puro `computeRevealedPlainText`/`isRevealing` + 7 tests verde).
+- 2 modes: `value` (contenido completo → revela `revealedFraction` default 0.6/mín 24 chars + caret — la depiction del canvas) / `stream` (consume `AsyncIterable<string>` shape `NexaChatProvider`, acumula chunks, **abort-safe**: cancela en unmount/corte y asienta lo recibido, `onSettled` callback). Modes = eje funcional; sin kinds de dominio (el revelado es un mecanismo puro, transversal).
+- **never-hidden + reduced-motion horneados (CSS-split, sin JS de detección)**: value-mode renderiza vista "llegando" (fracción + caret, visible en motion normal) + vista "asentada" (texto completo, visible bajo `prefers-reduced-motion`) togglando por media query → el contenido NUNCA queda atrapado invisible; bajo reduced-motion colapsa al texto completo sin caret. Caret tokenizado (`primary.main`, `steps(1)`).
+- Helper puro `computeRevealedPlainText` = fórmula exacta del canvas (`slice(0, max(24, ceil(len*0.6))).trimEnd()`) + clamps defensivos (NaN→settled, negativo→minChars) → **migración byte-idéntica**.
+- Migración canvas: `StreamingAnswerDraft` consume `<NexaStreamingText value={block.body} />`; se borró `StreamingCaret` + el revelado inline (`bodyFull`/`bodyPartial`). **GVC `nexa-answers-surface` verificado visualmente byte-idéntico** (mismo texto ~60% + caret + chip/Detener/título/placeholder; el sha difería solo por la fase del caret parpadeante + el beam del composer — ruido de animación, sin `baseline` que congele); 0 findings nuevos.
+- Tier de motion: **CSS/JS de bajo costo** (slicing + caret CSS), NO GSAP — correcto, no es coreografía orquestada.
+- Lab `/design-system/nexa-streaming-text` (value@60% / value asentado / stream con replay / modos) + page (guard `plataforma.design_system`) + route-reachability strict (201 rutas, 0 orphans) + catálogo + scenario GVC `design-system-nexa-streaming-text` (0 findings: fullpage + mid-stream + settled). Entrada en `ui-platform/PRIMITIVES.md`.
+- **Scope honesto (Slice 3 segment-aware)**: la primitive acepta `NexaExpressiveTextValue` pero revela el **plain-text** (byte-idéntico al canvas, que stream-ea texto plano; las citas aparecen en el answer-bubble ASENTADO, no durante el stream). El revelado a nivel de segmento (citas apareciendo cuando su span se revela) queda como punto de extensión declarado-no-construido (YAGNI: cero consumer actual; el prop ya admite el value type para crecer sin breaking change cuando un stream real con citas inline lo requiera, junto al cableado de TASK-1101/1091).
+- Cierre: `local:check` (tsc + lint) verde; barrel `index.ts` exporta componente + types + helpers.
+
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P3`
 - Impact: `Medio`
 - Effort: `Medio`
