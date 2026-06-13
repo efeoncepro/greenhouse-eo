@@ -18,7 +18,8 @@ Se creó `GreenhouseBorderBeam` para traer el patrón de borde perimetral animad
 - Spectrum palettes oficiales: `axis` y `nexa`; `nexa` usa `GREENHOUSE_NEXA_BRAND_COLORS` para la variación con colores de marca.
 - Los colores se resuelven desde `theme.axis.*` / `theme.palette.*`; no hay HEX inline ni extensión de `tailwind.config`.
 - Motion: CSS `conic-gradient`/`linear-gradient` + `@property`/background-position con `prefers-reduced-motion` estático; el overlay es decorativo y respeta `border-radius: inherit`.
-- Lab interno `/design-system/border-beam` + scenario GVC `design-system-border-beam`; incluye CTA `button with border beam`, caja `Nexa glow box · spectrum`, variación `Nexa glow box · brand spectrum` y dos estados lab-only de la caja de envío Nexa (`inactive/sin texto` y `with text`).
+- Lab interno `/design-system/border-beam` + scenario GVC `design-system-border-beam`; incluye CTA `button with border beam`, caja `Nexa glow box · spectrum` y variación `Nexa glow box · brand spectrum`.
+- Los dos estados lab-only de la caja de envío Nexa (`inactive/sin texto` y `with text`) viven en `/design-system/nexa-chat`, junto a `NexaComposer` y `NexaPromptDock`, porque el efecto spectrum ahí funciona como variación del composer y no como espécimen base del beam.
 
 ## Delta 2026-06-13f — GreenhouseGradientBackground primitive
 

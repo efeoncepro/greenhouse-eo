@@ -80,18 +80,6 @@ export const scenario: CaptureScenario = {
     },
     {
       kind: 'mark',
-      label: 'border-beam-nexa-message-composer-inactive',
-      clipSelector: '[data-capture="border-beam-nexa-message-composer-inactive"]',
-      note: 'Variación lab-only inactive/sin texto de la caja de envío de Nexa con brand spectrum'
-    },
-    {
-      kind: 'mark',
-      label: 'border-beam-nexa-message-composer-with-text',
-      clipSelector: '[data-capture="border-beam-nexa-message-composer-with-text"]',
-      note: 'Variación lab-only con texto de la caja de envío de Nexa con brand spectrum'
-    },
-    {
-      kind: 'mark',
       label: 'border-beam-specimen-grid',
       clipSelector: '[data-capture="border-beam-specimen-grid"]',
       note: 'Grid de specimens oficiales para prompt, evidencia y progreso'

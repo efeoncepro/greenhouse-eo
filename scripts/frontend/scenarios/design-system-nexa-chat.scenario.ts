@@ -45,6 +45,18 @@ export const scenario: CaptureScenario = {
       note: 'Variant command del NexaComposer con kind knowledgeAsk'
     },
     {
+      kind: 'mark',
+      label: 'nexa-composer-spectrum-inactive',
+      clipSelector: '[data-capture="nexa-composer-spectrum-inactive"]',
+      note: 'Variación inactive/sin texto de la caja de envío Nexa con brand spectrum'
+    },
+    {
+      kind: 'mark',
+      label: 'nexa-composer-spectrum-with-text',
+      clipSelector: '[data-capture="nexa-composer-spectrum-with-text"]',
+      note: 'Variación con texto de la caja de envío Nexa con brand spectrum'
+    },
+    {
       kind: 'scroll',
       selector: '[data-capture="nexa-prompt-dock-specimen"]',
       scrollBlock: 'center'

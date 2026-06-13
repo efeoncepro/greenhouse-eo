@@ -1,11 +1,17 @@
 # Release 2026-06-10 #2 — develop→main `6c649b2a6` RELEASED
 
+## Sesion 2026-06-13 — Nexa composer spectrum states reubicados (Codex)
+
+- **Qué quedó:** las variaciones lab-only de la caja de envío de Nexa con `GreenhouseSpectrumBeam` (`inactive/sin texto` y `with text`) se movieron a `/design-system/nexa-chat`, dentro de la sección Composer junto a `NexaComposer`, `NexaComposerInput`, `NexaComposerActionButton` y `NexaPromptDock`.
+- **Alcance:** no se aplicó al runtime de Nexa Chat. `/design-system/border-beam` conserva sólo la primitive y sus specimens base (`button with border beam`, `Nexa glow box · spectrum`, `brand spectrum`).
+- **Verificación:** ESLint focal, `tsc --noEmit`, GVC `design-system-nexa-chat` verde en `.captures/2026-06-13T10-23-47_design-system-nexa-chat` y GVC `design-system-border-beam` verde en `.captures/2026-06-13T10-24-19_design-system-border-beam`.
+
 ## Sesion 2026-06-13 — GreenhouseBorderBeam primitive (Codex)
 
 - **Qué quedó:** se creó `GreenhouseBorderBeam` en `src/components/greenhouse/primitives/border-beam/` para traer el patrón Border Beam al Design System como overlay gobernado. `GreenhouseSpectrumBeam` extrae el efecto spectrum como primitive fina reutilizable (anillo completo + aura blur amplia) sin acoplarlo a un botón.
 - **Contrato:** effects `beam|spectrum`; spectrum palettes `axis|nexa`; variants `ambient`, `interactive`, `progress`; kinds `nexaSurface`, `promptDock`, `evidencePeek`, `approvalCard`, `asyncOperation`, `custom`; intensities `subtle|medium|strong`. Colores desde `theme.axis.*`/`theme.palette.*` y `GREENHOUSE_NEXA_BRAND_COLORS`; motion CSS con reduced-motion; sin Tailwind, sin `/components/ui`, sin HEX locales.
-- **Design System:** nueva ruta interna `/design-system/border-beam`, entrada en catálogo, route-reachability y scenario `design-system-border-beam`. El lab incluye el specimen explícito `button with border beam`: `GreenhouseButton` + `GreenhouseSpectrumBeam`, con anillo completo animado + aura blur amplia, la variación `Nexa glow box · spectrum`, la variación `Nexa glow box · brand spectrum` con colores de marca y dos estados lab-only para la caja de envío (`inactive/sin texto` y `with text`); no se aplicó a Nexa Chat runtime.
-- **Verificación:** Vitest focal, ESLint focal, `tsc --noEmit`, route reachability, design lint, ops lint y GVC verdes. Evidencia final con composer lab-only: `.captures/2026-06-13T10-16-39_design-system-border-beam`.
+- **Design System:** nueva ruta interna `/design-system/border-beam`, entrada en catálogo, route-reachability y scenario `design-system-border-beam`. El lab incluye el specimen explícito `button with border beam`: `GreenhouseButton` + `GreenhouseSpectrumBeam`, con anillo completo animado + aura blur amplia, la variación `Nexa glow box · spectrum` y la variación `Nexa glow box · brand spectrum` con colores de marca. Los dos estados lab-only de la caja de envío (`inactive/sin texto` y `with text`) se movieron a `/design-system/nexa-chat`, junto a los otros composer; no se aplicó a Nexa Chat runtime.
+- **Verificación:** Vitest focal, ESLint focal, `tsc --noEmit`, route reachability, design lint, ops lint y GVC verdes. Evidencia final previa de Border Beam: `.captures/2026-06-13T10-16-39_design-system-border-beam`; evidencia Nexa Chat actualizada en la sesión posterior.
 
 ## Sesion 2026-06-13 — GreenhouseGradientBackground primitive (Codex)
 

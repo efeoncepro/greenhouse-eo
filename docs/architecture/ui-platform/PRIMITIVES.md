@@ -122,7 +122,7 @@ Patrón aprobado — button with border beam:
 </Box>
 ```
 
-Specimens vivos: `/design-system/border-beam`, `data-capture='border-beam-button-specimen'`, `data-capture='border-beam-nexa-spectrum-box'`, `data-capture='border-beam-nexa-brand-spectrum-box'`, `data-capture='border-beam-nexa-message-composer-inactive'` y `data-capture='border-beam-nexa-message-composer-with-text'` (lab-only, no aplicado al chat runtime).
+Specimens vivos: `/design-system/border-beam`, `data-capture='border-beam-button-specimen'`, `data-capture='border-beam-nexa-spectrum-box'` y `data-capture='border-beam-nexa-brand-spectrum-box'`. Las variaciones lab-only de composer que usan `GreenhouseSpectrumBeam` viven con los otros composer en `/design-system/nexa-chat`: `data-capture='nexa-composer-spectrum-inactive'` y `data-capture='nexa-composer-spectrum-with-text'` (no aplicado al chat runtime).
 
 ## NexaConversationBubble
 

@@ -17,8 +17,6 @@ import {
   GreenhouseBorderBeam,
   GreenhouseButton,
   GreenhouseSpectrumBeam,
-  NexaComposerActionButton,
-  NexaComposerInput,
   type GreenhouseBorderBeamIntensity,
   type GreenhouseBorderBeamKind,
   type GreenhouseBorderBeamSpectrumPalette,
@@ -261,90 +259,6 @@ const NexaSpectrumGlowBoxSpecimen = ({
   </Box>
 )
 
-const NexaMessageComposerSpectrumSpecimen = ({
-  dataCapture,
-  defaultValue,
-  state,
-  title
-}: {
-  dataCapture: string
-  defaultValue?: string
-  state: 'inactive' | 'withText'
-  title: string
-}) => {
-  const hasText = state === 'withText'
-
-  return (
-    <Box
-      data-capture={dataCapture}
-      sx={theme => ({
-        position: 'relative',
-        overflow: 'visible',
-        isolation: 'isolate',
-        borderRadius: `${theme.shape.customBorderRadius.xxl}px`
-      })}
-    >
-      <GreenhouseSpectrumBeam
-        kind='promptDock'
-        variant='interactive'
-        spectrumPalette='nexa'
-        intensity={hasText ? 'strong' : 'subtle'}
-        borderWidth={2.5}
-        durationSec={hasText ? 18 : 24}
-        active={hasText}
-        contentSx={theme => ({
-          p: 1,
-          borderRadius: `${theme.shape.customBorderRadius.xxl}px`,
-          bgcolor: 'background.paper',
-          border: `1px solid ${alpha(theme.palette.divider, 0.72)}`,
-          boxShadow: `0 18px 44px ${alpha(theme.axis.ramp.primary[900], hasText ? 0.2 : 0.1)}`
-        })}
-      >
-        <Stack spacing={1.5}>
-          <Stack direction='row' spacing={1} alignItems='center' sx={{ px: 1.5, pt: 1, minInlineSize: 0 }}>
-            <Box
-              sx={theme => ({
-                display: 'grid',
-                flex: '0 0 auto',
-                placeItems: 'center',
-                inlineSize: 28,
-                blockSize: 28,
-                borderRadius: '50%',
-                color: theme.palette.common.white,
-                bgcolor: theme.axis.ramp.primary[900]
-              })}
-            >
-              <i className='tabler-sparkles' aria-hidden='true' />
-            </Box>
-            <Stack spacing={0} sx={{ minInlineSize: 0 }}>
-              <Typography variant='subtitle2' noWrap>
-                {title}
-              </Typography>
-              <Typography variant='caption' color='text.secondary' noWrap>
-                Lab-only: {hasText ? 'estado con texto listo para enviar.' : 'estado inactive sin texto escrito.'}
-              </Typography>
-            </Stack>
-          </Stack>
-
-          <NexaComposerInput
-            kind='knowledgeAsk'
-            defaultValue={defaultValue}
-            placeholder='Pregúntale a Nexa'
-            actionAdornment={<NexaComposerActionButton variant='send' aria-label='Enviar mensaje a Nexa' disabled={!hasText} />}
-            sx={theme => ({
-              '& .MuiInputBase-root, & .MuiFilledInput-root': {
-                minBlockSize: 54,
-                borderRadius: `${theme.shape.customBorderRadius.xl}px`,
-                color: hasText ? 'text.primary' : 'text.disabled'
-              }
-            })}
-          />
-        </Stack>
-      </GreenhouseSpectrumBeam>
-    </Box>
-  )
-}
-
 const BorderBeamLabView = () => {
   const [activeKind, setActiveKind] = useState<GreenhouseBorderBeamKind>('promptDock')
   const [activeVariant, setActiveVariant] = useState<GreenhouseBorderBeamVariant>('interactive')
@@ -516,19 +430,6 @@ const BorderBeamLabView = () => {
             palette='nexa'
             title='Nexa glow box · brand spectrum'
             description='La misma variación de caja, pero restringida a la marca Nexa: midnight navy, core blue, electric teal y blanco.'
-          />
-
-          <NexaMessageComposerSpectrumSpecimen
-            dataCapture='border-beam-nexa-message-composer-inactive'
-            state='inactive'
-            title='Nexa composer · inactive'
-          />
-
-          <NexaMessageComposerSpectrumSpecimen
-            dataCapture='border-beam-nexa-message-composer-with-text'
-            state='withText'
-            title='Nexa composer · with text'
-            defaultValue='Resume y sugiere un paso.'
           />
 
           <SpecimenSurface dataCapture='border-beam-prompt-dock' kind='promptDock' variant='interactive' active>
