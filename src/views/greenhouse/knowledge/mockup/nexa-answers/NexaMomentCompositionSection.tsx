@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, type ChangeEvent } from 'react'
 
 import { flushSync } from 'react-dom'
 
@@ -14,12 +14,11 @@ import { alpha, useTheme, type Theme } from '@mui/material/styles'
 import {
   GreenhouseButton,
   GreenhouseChip,
+  GreenhouseSpectrumBeam,
   NexaAnswersCanvas,
-  NexaComposer,
   NexaComposerActionButton,
   NexaComposerInput,
   NexaMomentComposition,
-  NexaSenderMark,
   type NexaAnswersCanvasCopy
 } from '@/components/greenhouse/primitives'
 import { startViewTransition } from '@/lib/motion/view-transition'
@@ -112,31 +111,69 @@ const NexaMomentCompositionSection = () => {
   const theme = useTheme()
   const [mode, setMode] = useState<'host' | 'composed'>('composed')
   const [activeAnchorId, setActiveAnchorId] = useState<string | null>(COMPOSITION_SOURCE_ANCHORS[0]?.anchorId ?? null)
+  const [prompt, setPrompt] = useState(COMPOSITION_QUESTION)
   const composed = mode === 'composed'
+  const hasText = prompt.trim().length > 0
+  const handlePromptChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => setPrompt(event.target.value)
 
   const setComposed = (next: boolean) => {
     if (next === composed) return
     void startViewTransition(() => flushSync(() => setMode(next ? 'composed' : 'host')))
   }
 
+  // Caja "spectrum" idéntica al specimen canónico del lab nexa-chat (NexaMessageComposerSpectrumSpecimen):
+  // estados con/sin texto ya resueltos (intensity/durationSec/active + boxShadow + color del texto por
+  // hasText). Una sola marca de Nexa (la interna de 'knowledgeAsk'). El send se habilita con texto.
   const composer = (
-    <Stack direction='row' spacing={3} alignItems='center' sx={{ ...panelSx(theme), p: { xs: 3, md: 4 }, backgroundColor: alpha(theme.palette.primary.main, 0.025) }}>
-      <NexaSenderMark size={40} />
-      <Box sx={{ flex: 1, minInlineSize: 0 }}>
-        <NexaComposer kind='knowledgeAsk'>
-          <NexaComposerInput
-            kind='knowledgeAsk'
-            fullWidth
-            defaultValue={COMPOSITION_QUESTION}
-            placeholder={COPY.composerPlaceholder}
-            inputProps={{ 'aria-label': COPY.composerPlaceholder }}
-            actionAdornment={
-              <NexaComposerActionButton variant='send' icon='search' aria-label={COPY.composerSubmit} onClick={() => setComposed(true)} />
+    <Box
+      sx={theme => ({
+        position: 'relative',
+        overflow: 'visible',
+        isolation: 'isolate',
+        borderRadius: `${theme.shape.customBorderRadius.xxl}px`
+      })}
+    >
+      <GreenhouseSpectrumBeam
+        kind='promptDock'
+        variant='interactive'
+        spectrumPalette='nexa'
+        intensity={hasText ? 'strong' : 'subtle'}
+        borderWidth={2.5}
+        durationSec={hasText ? 18 : 24}
+        active={hasText}
+        contentSx={theme => ({
+          p: 1,
+          borderRadius: `${theme.shape.customBorderRadius.xxl}px`,
+          bgcolor: 'background.paper',
+          border: `1px solid ${alpha(theme.palette.divider, 0.72)}`,
+          boxShadow: `0 18px 44px ${alpha(theme.axis.ramp.primary[900], hasText ? 0.2 : 0.1)}`
+        })}
+      >
+        <NexaComposerInput
+          kind='knowledgeAsk'
+          value={prompt}
+          onChange={handlePromptChange}
+          onKeyDown={event => {
+            if (event.key === 'Enter' && !event.shiftKey && hasText) {
+              event.preventDefault()
+              setComposed(true)
             }
-          />
-        </NexaComposer>
-      </Box>
-    </Stack>
+          }}
+          placeholder={COPY.composerPlaceholder}
+          inputProps={{ 'aria-label': COPY.composerPlaceholder }}
+          actionAdornment={
+            <NexaComposerActionButton variant='send' aria-label={COPY.composerSubmit} disabled={!hasText} onClick={() => setComposed(true)} />
+          }
+          sx={theme => ({
+            '& .MuiInputBase-root, & .MuiFilledInput-root': {
+              minBlockSize: 54,
+              borderRadius: `${theme.shape.customBorderRadius.xl}px`,
+              color: hasText ? 'text.primary' : 'text.disabled'
+            }
+          })}
+        />
+      </GreenhouseSpectrumBeam>
+    </Box>
   )
 
   // El Momento: el NexaAnswersCanvas REUSADO + las fuentes ancladas (al host real). El composer vive en la
