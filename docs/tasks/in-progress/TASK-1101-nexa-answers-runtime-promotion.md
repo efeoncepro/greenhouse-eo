@@ -186,3 +186,34 @@ Sin esta task, el primitive enriquecido queda "listo pero desconectado": la expe
 
 Primitive construido y GVC-verificado en TASK-1096 (sesión 2026-06-13), commits en `develop`:
 `e8a8ef852` (citas inline + evidence-peek), `78d30ee40` (response toolbar settle), `4054a6014` (control Detener), `d5532e777` (test de contrato plain-text), `7beba65eb` (specimens de portabilidad + mounted guard del sparkline). Mockup vivo: `/knowledge/mockup/nexa-answers`. Scenario GVC: `scripts/frontend/scenarios/nexa-answers-surface.scenario.ts`.
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+
+## Delta 2026-06-13 — GAP B (multi-turno) shipped + GAP A (composición con host) mockup+decisión
+
+Tras ver la lente rica viva en staging, el operador identificó los 2 gaps de §13 del contrato (`CONVERSATIONAL_EXPERIENCE.md`). Avance:
+
+### GAP B — Hilo multi-turno (SHIPPED, host-state)
+
+El runtime `KnowledgeNexaCanvasLens` dejó de ser single-turn-replace. Ahora mantiene `turns[]` (pregunta + renderPlan + packet + `blockId` por turno); el último turno respondido es el vivo, los anteriores se pasan a `previousTurns` compactados. Al enviar un follow-up, el turno vivo morfea a su `compactAnswer` en el historial con View Transitions (TASK-1102, `startViewTransition` + `flushSync`); el historial **persiste** durante el thinking/reasoning del nuevo turno. `onStopGeneration` vuelve al último turno respondido (no descarta el hilo); `regenerate` reemplaza el último turno (no apila). **La primitive NO cambió** — es wiring de estado en el host.
+
+- **Adapter** (`buildKnowledgeAnswerRenderPlan`): opción `turnId` → `blockId` único `knowledge-answer-<turnId>` (default `knowledge-answer` → single-turn intacto, 7 tests verdes). Necesario para que cada turno tenga `view-transition-name` único (sin colisión vivo↔compactado) y el morph conecte (el `compactAnswer` conserva el id del answerBubble vivo).
+- **Verificación:** tsc 0 · lint 0 · 7 tests adapter · GVC `knowledge-nexa-canvas-lens` extendido con un follow-up → frames mirados: el primer turno persiste compactado (chip "2 fuentes") arriba del segundo turno vivo grounded. Local tiene corpus real.
+- Archivos: `src/views/greenhouse/knowledge/KnowledgeNexaCanvasLens.tsx`, `src/lib/knowledge/nexa/knowledge-answer-render-plan.ts`, `scripts/frontend/scenarios/knowledge-nexa-canvas-lens.scenario.ts`.
+
+### GAP A — Composición con host (MOCKUP + decisión P+V+K; runtime pendiente de sign-off + Codex)
+
+Mockup-first (house rule). Ruta: **`/knowledge/mockup/nexa-composition`** (`src/views/greenhouse/knowledge/mockup/nexa-composition/`). Estilo AI Mode / AI Overviews: el composer "con Nexa adentro" transforma la superficie en conversacional SIN hacer desaparecer el host — la respuesta se inyecta como bloque **protagonista** y los documentos del corpus **persisten/reflowean** debajo. GVC desktop+mobile mirado (host mode + conversational settled: respuesta líder con citas + el host condensado vivo abajo); tsc 0 · lint 0 · design:lint 0.
+
+**Decisión P+V+K (a validar por el operador; coordinar boundary con Codex):**
+
+- **Primitive (nueva):** una **layout primitive de composición** — hermana de `AdaptiveSidecarLayout` — que **posee el GRID + el morph** (View Transitions same-document). El **host aporta su contenido por slot**; el `NexaAnswersCanvas` se **REUSA tal cual** para el bloque conversacional. NO es una variant nueva del canvas (meter contenido del host en el shell neutral = chrome creep, viola "el canvas nunca conoce el dominio"). NO es fork del canvas.
+- **Variants (funcionales):** `overlayLead` (AI Overviews: respuesta arriba, host condensado abajo — el del mockup) · `splitFocus` (AI Mode: host reflowea a región secundaria, conversación lidera la principal) · `inlineExpand` (composer compacto que expande in-place sin relocar el host).
+- **Kinds (semánticos→variant):** `knowledgeOverview`→overlayLead · `financeMetricExplain`/`agencyAccountBrief`→splitFocus · `listAssist`→inlineExpand · `custom`. Resolver `kind→variant` idempotente, NUNCA variant nuevo por dominio.
+- **Contrato (mínimo, aditivo):** **un** valor de placement `composed` a `surfaceContext.placement` (distinto de `embedded`=takeover). Two-way door; la lente `embedded` actual queda intacta.
+- **Boundary host/canvas:** la composition primitive posee el grid + el morph; el host pasa contenido por slot + conduce el lifecycle (patrón GAP B); el canvas renderiza la conversación en la celda "lead". El canvas NO cambia.
+- **Boundary con Codex (Moment Fabric, TASK-1095/1096):** yo (UI-platform) → la layout primitive + variants + kinds + morph + placement `composed` + grid/reflow/a11y/motion (pura presentación). Codex (Moment Fabric runtime) → eligibility (cuándo aparece un Moment), context adapter (refs seguras/permisos), action boundary, señales `nexa.moment.*`, promoción de surface. La costura es `surfaceContext` (SSOT) + `renderPlan`: el Fabric produce el dato, la composition primitive lo renderiza in-place. Ninguno es dueño del otro.
+- **Web (Chrome guidance):** View Transitions same-document (Baseline 2025-10-14); ≤1 elemento por `view-transition-name`; **focus routing mandatory** al heading de la respuesta tras el morph (`tabindex=-1`); reduced-motion + fallback ya horneados en el helper `startViewTransition`; container queries para el reflow del host en runtime.
+- **4 pilares (resumen):** *Safety* — aditivo (placement nuevo + primitive opt-in; cero cambio a la lente actual ni al canvas); *Robustness* — el morph degrada honesto (sin VT/reduced-motion → swap instantáneo), focus routing a11y; *Resilience* — el host persiste (no hay estado destruido en el morph); *Scalability* — cualquier dominio compone vía slot + surfaceContext, sin forkear (mismo invariante "consumer, no destino").
+
+**Próximo paso (NO en este turno):** sign-off del operador sobre el mockup → crear la layout primitive (P+V+K completo: barrel + resolver + Lab `/admin/design-system/<nombre>` + route-reachability + PRIMITIVES.md + GVC) + agregar placement `composed` al contrato, **coordinando la costura con Codex (TASK-1095/1096)**. Es TASK-derivada.
