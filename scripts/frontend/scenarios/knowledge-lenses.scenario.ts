@@ -26,8 +26,8 @@ export const scenario: CaptureScenario = {
     { kind: 'noErrorBoundary', reason: 'La captura no debe caer a error boundary.' },
     {
       kind: 'visible',
-      selector: '[data-capture="knowledge-command-surface"]',
-      reason: 'Humano es el default y muestra la búsqueda documental.'
+      selector: '[data-capture="knowledge-nexa-composition-lens"]',
+      reason: 'TASK-1110 — Humano default es la composición Nexa in-place; el composer del consumer es el único ask (la command-surface de búsqueda queda solo para MCP).'
     },
     {
       kind: 'visible',
