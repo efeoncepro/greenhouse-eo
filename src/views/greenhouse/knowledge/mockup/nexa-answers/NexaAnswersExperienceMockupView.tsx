@@ -233,7 +233,39 @@ const answerRenderPlan: NexaAnswersRenderPlan = {
       rendererVersion: 'v1',
       kind: 'knowledgeChartAnswer',
       title: 'Impacto sube sin aislarse de Colaboración y Cliente.',
-      body: 'La lectura útil está en la relación entre señales; abre la base solo si esta gráfica sostiene una decisión sensible.',
+      body: [
+        { text: 'La lectura útil está en la relación entre señales' },
+        {
+          type: 'citation',
+          source: {
+            id: 'chunk-impacto-01',
+            label: '1',
+            title: 'Manual: Métricas ICO',
+            headingPath: ['Métricas ICO', 'Impacto'],
+            excerpt:
+              'Impacto mide el efecto observable de una iniciativa sobre el resultado del cliente o del equipo, no solo la cantidad de actividad realizada.',
+            score: 0.92,
+            freshness: 'current',
+            href: '/knowledge/documents/knowledge-doc-ico-metrics'
+          }
+        },
+        { text: '; abre la base solo si esta gráfica sostiene una decisión sensible' },
+        {
+          type: 'citation',
+          source: {
+            id: 'chunk-calibration-01',
+            label: '3',
+            title: 'SOP: Calibración ICO',
+            headingPath: ['Calibración', 'Escala'],
+            excerpt:
+              'Una puntuación alta requiere evidencia de resultado y trazabilidad de la contribución, especialmente cuando la señal se usa para decisiones operativas.',
+            score: 0.81,
+            freshness: 'current',
+            href: '/knowledge/documents/knowledge-doc-ico-calibration'
+          }
+        },
+        { text: '.' }
+      ],
       metaLabel: 'Answer-first · proof bajo demanda',
       points: answerPoints,
       chart: icoChartSpec

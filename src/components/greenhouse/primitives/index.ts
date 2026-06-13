@@ -103,6 +103,7 @@ export {
   hasExpressiveTextSegments
 } from './nexa-expressive-text/NexaExpressiveText'
 export type {
+  NexaCitationSource,
   NexaExpressiveTextProps,
   NexaExpressiveTextSegment,
   NexaExpressiveTextStyle,

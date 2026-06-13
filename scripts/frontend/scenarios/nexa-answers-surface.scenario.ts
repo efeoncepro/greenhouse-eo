@@ -71,6 +71,27 @@ export const scenario: CaptureScenario = {
       note: 'Variante chart: tendencia Recharts dentro de la respuesta enriquecida.'
     },
     {
+      kind: 'mark',
+      label: 'nexa-answers-citations-inline',
+      clipSelector: '[data-capture="nexa-answers-rich-answer-card"]',
+      note: 'Citas inline [1] [3] span-level en la prosa (estilo Google AI Mode), no un sidebar.'
+    },
+    {
+      kind: 'interaction',
+      interaction: {
+        name: 'open-citation-peek',
+        intent: 'Tocar la cita inline abre el evidence-peek con la fuente: grounding nativo del texto.',
+        action: { kind: 'click', selector: '[data-capture="nexa-answers-citation-marker"]' },
+        keyboardEquivalent: {
+          action: { kind: 'press', selector: '[data-capture="nexa-answers-citation-marker"]', key: 'Enter' },
+          expected: 'La cita abre la fuente por teclado (focus + Enter), no solo por click.'
+        },
+        frames: [
+          { label: 'nexa-answers-citation-peek-open', atMs: 400, note: 'Evidence-peek: título de la fuente, fragmento citado, score y frescura + Abrir fuente.' }
+        ]
+      }
+    },
+    {
       kind: 'interaction',
       interaction: {
         name: 'show-nexa-answers-chart-comparison',

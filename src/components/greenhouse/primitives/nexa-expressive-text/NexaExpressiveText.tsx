@@ -6,6 +6,7 @@ import { alpha, type Theme } from '@mui/material/styles'
 
 import { axisChartDirectional, axisChartDirectionalDark } from '@core/theme/axis-chart'
 
+import NexaCitationMarker from './NexaCitationMarker'
 import type {
   NexaExpressiveTextProps,
   NexaExpressiveTextSegment,
@@ -90,6 +91,10 @@ const renderSegment = (segment: NexaExpressiveTextSegment, index: number) => {
     )
   }
 
+  if (segment.type === 'citation') {
+    return <NexaCitationMarker key={`citation-${index}-${segment.source.id}`} source={segment.source} />
+  }
+
   return (
     <Box key={`text-${index}-${segment.text}`} component='span' sx={theme => expressiveTextSx(theme, segment.style)}>
       {segment.text}
@@ -107,6 +112,7 @@ export const getNexaExpressiveTextPlainText = (value: NexaExpressiveTextValue) =
     .map(segment => {
       if (segment.type === 'break') return '\n'
       if (segment.type === 'emoji') return segment.label ?? segment.value
+      if (segment.type === 'citation') return ` [${segment.source.label}]`
 
       return segment.text
     })
