@@ -273,6 +273,32 @@ code {
   animation-timing-function: cubic-bezier(0.2, 0, 0, 1);
 }
 
+/* ───────────────────────────────────────────────────────────────────────
+   GAP A — NexaMomentComposition: entrada del Momento (lead) cuando la superficie
+   pasa a "con Nexa". `view-transition-class: nexa-moment-lead` (lo setea
+   NexaMomentComposition). El Momento es un elemento NUEVO (solo entra) → entrada
+   propia (fade + 8px rise · standard 200ms + emphasized) en vez del cross-fade del
+   root; composer + host PERSISTEN (FLIP). Sin soporte de `view-transition-class` →
+   morph default de la UA (degradación honesta); reduced-motion lo cubre el guard `*`.
+   ─────────────────────────────────────────────────────────────────────── */
+@keyframes greenhouse-moment-lead-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+::view-transition-group(.nexa-moment-lead) {
+  animation-duration: 200ms;
+  animation-timing-function: cubic-bezier(0.2, 0, 0, 1);
+}
+::view-transition-new(.nexa-moment-lead) {
+  animation: 200ms cubic-bezier(0.2, 0, 0, 1) both greenhouse-moment-lead-in;
+}
+
 @media (prefers-reduced-motion: reduce) {
   ::view-transition-old(root),
   ::view-transition-new(root),

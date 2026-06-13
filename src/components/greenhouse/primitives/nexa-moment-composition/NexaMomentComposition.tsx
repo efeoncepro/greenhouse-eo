@@ -1,10 +1,12 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useId, useRef } from 'react'
 
 import Box from '@mui/material/Box'
 import Stack from '@mui/material/Stack'
 import { alpha, useTheme, type Theme } from '@mui/material/styles'
+
+import { motionCss } from '@/components/greenhouse/motion'
 
 import { resolveNexaMomentCompositionConfig } from './nexa-moment-composition-controller'
 import type { NexaMomentCompositionProps } from './nexa-moment-composition-types'
@@ -24,10 +26,11 @@ const prefersReducedMotion = (): boolean =>
 // Anclaje: el ítem del host citado se resalta con un anillo suave (un solo acento, AXIS primary) — la
 // evidencia ES el contenido operativo. El borde hairline carga la separación bajo forced-colors.
 const hostAnchorSx = (theme: Theme) => ({
+  // Wayfinding "mirá acá": el ring aparece una vez (NO loop infinito) con easing emphasized tokenizado.
   '& [data-nexa-anchor]': {
     transition: prefersReducedMotion()
       ? 'none'
-      : theme.transitions.create(['box-shadow', 'background-color'], { duration: theme.transitions.duration.short }),
+      : `box-shadow ${motionCss.duration.standard} ${motionCss.ease.emphasized}, background-color ${motionCss.duration.standard} ${motionCss.ease.emphasized}`,
     borderRadius: `${theme.shape.customBorderRadius.sm}px`
   },
   '& [data-nexa-anchor-active="true"]': {
@@ -43,9 +46,6 @@ const momentRegionSx = (theme: Theme) => ({
   outline: 'none',
   minInlineSize: 0
 })
-
-const COMPOSER_VT = { viewTransitionName: 'nexa-moment-composer' }
-const HOST_VT = { viewTransitionName: 'nexa-moment-host' }
 
 const NexaMomentComposition = ({
   variant,
@@ -63,6 +63,14 @@ const NexaMomentComposition = ({
   const theme = useTheme()
   const config = resolveNexaMomentCompositionConfig({ variant, kind })
   const hostRef = useRef<HTMLDivElement | null>(null)
+
+  // Identidad de View Transition por instancia (única → sin colisión si hay 2 composiciones en la página).
+  // composer + host PERSISTEN (mismo nombre en old/new → FLIP del morph); el moment es NUEVO (solo entrada).
+  const vtId = useId().replace(/[^a-zA-Z0-9_-]/g, '')
+  const composerVt = { viewTransitionName: `nexa-moment-composer-${vtId}` }
+  const hostVt = { viewTransitionName: `nexa-moment-host-${vtId}` }
+  // `view-transition-class` (estable) tunea la entrada del Momento en globals.css; degrada honesto sin soporte.
+  const momentVt = { viewTransitionName: `nexa-moment-lead-${vtId}`, viewTransitionClass: 'nexa-moment-lead' }
 
   const showMoment = state !== 'dormant' && Boolean(moment)
   const split = config.layout === 'split' && showMoment
@@ -94,6 +102,7 @@ const NexaMomentComposition = ({
       aria-label={momentLabel}
       tabIndex={-1}
       data-capture='nexa-moment-region'
+      style={momentVt}
       sx={{ ...momentRegionSx(theme), p: { xs: 4, md: 5 }, display: 'flex', flexDirection: 'column', gap: 4 }}
     >
       <Box sx={{ minInlineSize: 0 }}>{moment}</Box>
@@ -108,7 +117,7 @@ const NexaMomentComposition = ({
     <Box
       ref={hostRef}
       data-capture='nexa-moment-host'
-      style={HOST_VT}
+      style={hostVt}
       sx={{
         ...hostAnchorSx(theme),
         minInlineSize: 0,
@@ -125,7 +134,7 @@ const NexaMomentComposition = ({
     <Box className={className} data-capture='nexa-moment-composition' data-state={state} data-variant={config.variant} sx={{ minInlineSize: 0 }}>
       <Stack spacing={5} sx={{ minInlineSize: 0 }}>
         {/* El composer queda arriba (refinar / nueva pregunta) — patrón AI Overviews. Persiste en el morph. */}
-        <Box data-capture='nexa-moment-composer' style={COMPOSER_VT} sx={{ minInlineSize: 0 }}>
+        <Box data-capture='nexa-moment-composer' style={composerVt} sx={{ minInlineSize: 0 }}>
           {composer}
         </Box>
 
