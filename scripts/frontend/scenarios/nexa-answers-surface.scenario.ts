@@ -100,12 +100,12 @@ export const scenario: CaptureScenario = {
     {
       kind: 'interaction',
       interaction: {
-        // El voto colapsa el cluster a un acuse (el botón se reemplaza), por eso es click-only:
-        // re-presionar por teclado el mismo selector apuntaría a un botón ya inexistente. Los
-        // controles son GreenhouseButton nativos → keyboard-operables por construcción.
+        // El voto colapsa el cluster a un acuse (el botón se reemplaza), así que la operabilidad por
+        // teclado se prueba como path PRIMARIO (press Enter sobre el botón enfocado) en vez de click +
+        // un segundo pase de teclado que apuntaría a un botón ya inexistente — más riguroso, sin warning.
         name: 'vote-response-helpful',
-        intent: 'Votar "Sí, me sirvió" colapsa el feedback a un acuse, como en AI Overview.',
-        action: { kind: 'click', selector: '[data-capture="nexa-answers-response-helpful"]' },
+        intent: 'Votar "Sí, me sirvió" por teclado (focus + Enter) colapsa el feedback a un acuse, como en AI Overview.',
+        action: { kind: 'press', selector: '[data-capture="nexa-answers-response-helpful"]', key: 'Enter' },
         frames: [
           {
             label: 'nexa-answers-response-feedback-ack',
@@ -199,7 +199,35 @@ export const scenario: CaptureScenario = {
       kind: 'mark',
       label: 'nexa-answers-streaming',
       clipSelector: '[data-capture="nexa-answers-canvas-conversation"]',
-      note: 'Streaming honesto: titular redactado + cuerpo a mitad con caret + gráfica armándose; sin trust cue todavía.'
+      note: 'Streaming honesto: titular redactado + cuerpo a mitad con caret + gráfica armándose + control "Detener" (estilo AI Mode); sin trust cue todavía.'
+    },
+    {
+      kind: 'interaction',
+      interaction: {
+        // "Detener" desmonta el card de streaming al asentar la respuesta (answered), así que la
+        // operabilidad por teclado se prueba como path PRIMARIO (press Enter sobre el botón enfocado):
+        // un segundo pase de teclado apuntaría a un selector ya inexistente.
+        name: 'stop-generation',
+        intent: 'Detener por teclado (focus + Enter) corta la generación y asienta lo recibido (answered), como en AI Mode/ChatGPT.',
+        action: { kind: 'press', selector: '[data-capture="nexa-answers-stop-generation"]', key: 'Enter' },
+        frames: [
+          {
+            label: 'nexa-answers-stopped-settled',
+            atMs: 350,
+            clipSelector: '[data-capture="nexa-answers-canvas-conversation"]',
+            note: 'Tras detener: la respuesta asienta (settle) en vez de quedar a medias.'
+          }
+        ]
+      }
+    },
+    {
+      kind: 'click',
+      selector: 'button:has-text("Streaming")'
+    },
+    {
+      kind: 'wait',
+      selector: '[data-capture="nexa-answers-canvas-streaming"]',
+      timeout: 5000
     },
     {
       kind: 'interaction',

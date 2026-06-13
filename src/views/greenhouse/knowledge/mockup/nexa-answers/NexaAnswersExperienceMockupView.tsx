@@ -343,11 +343,13 @@ const ContextStrip = () => (
 const ConversationSurface = ({
   stage,
   reasoningStepIndex,
-  onResponseControl
+  onResponseControl,
+  onStopGeneration
 }: {
   stage: VisualStage
   reasoningStepIndex: number
   onResponseControl: (control: NexaAnswersResponseControl) => void
+  onStopGeneration: () => void
 }) => {
   const [proofOpen, setProofOpen] = useState(stage === 'proof')
   const [followUpDraft, setFollowUpDraft] = useState('')
@@ -417,6 +419,7 @@ const ConversationSurface = ({
         setFollowUpDraft('')
       }}
       onResponseControl={onResponseControl}
+      onStopGeneration={onStopGeneration}
       copy={canvasCopy}
     />
   )
@@ -529,6 +532,13 @@ const NexaAnswersExperienceMockupView = () => {
     if (control === 'regenerate') playDeploy()
   }
 
+  // Detener la generación durante streaming: corta el despliegue y asienta lo recibido (answered).
+  const onStopGeneration = () => {
+    clearPlayTimers()
+    setIsPlaying(false)
+    setStage('answered')
+  }
+
   return (
     <Stack spacing={5} data-capture='nexa-answers-visual-page'>
       <GlobalStyles styles={{ '[data-nexa-floating-trigger="true"]': { display: 'none !important' } }} />
@@ -628,7 +638,12 @@ const NexaAnswersExperienceMockupView = () => {
                 copy={canvasCopy}
               />
             ) : (
-              <ConversationSurface stage={stage} reasoningStepIndex={reasoningStepIndex} onResponseControl={onResponseControl} />
+              <ConversationSurface
+                stage={stage}
+                reasoningStepIndex={reasoningStepIndex}
+                onResponseControl={onResponseControl}
+                onStopGeneration={onStopGeneration}
+              />
             )}
           </Box>
         </Box>

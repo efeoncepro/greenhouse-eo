@@ -356,7 +356,15 @@ const StreamingCaret = () => (
 // Respuesta llegando: titular ya redactado + cuerpo a mitad con caret + (si es chart) el
 // gráfico todavía armándose. SIN trust cue ni acciones (llegan al cerrar). El live region
 // del status lo lleva la identidad Nexa (no duplicar aquí) → un solo anuncio.
-const StreamingAnswerDraft = ({ block }: { block: NexaAnswersBubbleBlock }) => {
+const StreamingAnswerDraft = ({
+  block,
+  onStop,
+  stopLabel
+}: {
+  block: NexaAnswersBubbleBlock
+  onStop?: () => void
+  stopLabel?: string
+}) => {
   const theme = useTheme()
   const bodyFull = getNexaExpressiveTextPlainText(block.body)
   const bodyPartial = bodyFull.slice(0, Math.max(24, Math.ceil(bodyFull.length * 0.6))).trimEnd()
@@ -377,24 +385,39 @@ const StreamingAnswerDraft = ({ block }: { block: NexaAnswersBubbleBlock }) => {
       }}
     >
       <Stack spacing={2.5} sx={{ minInlineSize: 0 }}>
-        <Box
-          sx={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 1,
-            alignSelf: 'flex-start',
-            px: 1.5,
-            py: 0.75,
-            borderRadius: `${theme.shape.customBorderRadius.sm}px`,
-            color: theme.palette.primary.main,
-            backgroundColor: alpha(theme.palette.primary.main, 0.12)
-          }}
-        >
-          <i className='tabler-sparkles' aria-hidden='true' />
-          <Typography variant='body2' sx={{ fontWeight: 600, color: 'inherit' }}>
-            Redactando respuesta
-          </Typography>
-        </Box>
+        <Stack direction='row' spacing={2} alignItems='center' justifyContent='space-between' flexWrap='wrap' useFlexGap>
+          <Box
+            sx={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 1,
+              px: 1.5,
+              py: 0.75,
+              borderRadius: `${theme.shape.customBorderRadius.sm}px`,
+              color: theme.palette.primary.main,
+              backgroundColor: alpha(theme.palette.primary.main, 0.12)
+            }}
+          >
+            <i className='tabler-sparkles' aria-hidden='true' />
+            <Typography variant='body2' sx={{ fontWeight: 600, color: 'inherit' }}>
+              Redactando respuesta
+            </Typography>
+          </Box>
+          {/* Control de generación (estilo AI Mode/ChatGPT): permite detener mientras llega. */}
+          {onStop ? (
+            <GreenhouseButton
+              variant='outlined'
+              tone='secondary'
+              size='small'
+              leadingIconClassName='tabler-player-stop'
+              aria-label={stopLabel ?? 'Detener'}
+              dataCapture='nexa-answers-stop-generation'
+              onClick={onStop}
+            >
+              {stopLabel ?? 'Detener'}
+            </GreenhouseButton>
+          ) : null}
+        </Stack>
         <NexaExpressiveText value={block.title} variant='h5' />
         <Typography variant='body2' color='text.secondary'>
           {bodyPartial}
@@ -644,7 +667,8 @@ const NexaAnswersCanvas = ({
   copy,
   runtimeSlot,
   onAction,
-  onResponseControl
+  onResponseControl,
+  onStopGeneration
 }: NexaAnswersCanvasProps) => {
   const theme = useTheme()
   const [internalProofOpen, setInternalProofOpen] = useState(false)
@@ -723,7 +747,7 @@ const NexaAnswersCanvas = ({
             ) : preAnswer ? (
               isReasoning && reasoningSteps && reasoningSteps.length > 0 ? <NexaReasoningTrace steps={reasoningSteps} /> : null
             ) : isStreaming ? (
-              streamingBlock ? <StreamingAnswerDraft block={streamingBlock} /> : null
+              streamingBlock ? <StreamingAnswerDraft block={streamingBlock} onStop={onStopGeneration} stopLabel={copy.stopLabel} /> : null
             ) : (
               // Settle: la respuesta + proof + sugeridos asientan con stagger orquestado del
               // Motion primitive (fromTo + clearProps → nunca deja el contenido oculto aunque

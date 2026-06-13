@@ -193,6 +193,8 @@ export interface NexaAnswersCanvasCopy {
   copiedLabel?: string
   shareLabel?: string
   regenerateLabel?: string
+  /** Control de generación durante streaming ("Detener"). */
+  stopLabel?: string
 }
 
 export interface NexaAnswersCanvasSlots {
@@ -239,4 +241,10 @@ export interface NexaAnswersCanvasProps {
    * el control se emite acá para analítica / share real / regenerar del host.
    */
   onResponseControl?: (control: NexaAnswersResponseControl) => void
+  /**
+   * Detiene la generación durante el estado `streaming` (control "Detener", estilo AI Mode/ChatGPT).
+   * Opt-in: sin este callback no se monta el affordance. El host decide qué significa detener
+   * (cancelar el stream, asentar lo recibido, etc.).
+   */
+  onStopGeneration?: () => void
 }
