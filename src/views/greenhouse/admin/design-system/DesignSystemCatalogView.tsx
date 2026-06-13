@@ -180,6 +180,19 @@ const CATALOG_ITEMS: CatalogItem[] = [
     icon: 'tabler-cursor-text'
   },
   {
+    id: 'nexa-moment-composition',
+    title: 'Nexa moment composition',
+    description: 'Composición in-place de Nexa Answers con un host (GAP A): la respuesta lidera, el host persiste como contexto vivo + citas ancladas al ítem real + next-step gobernado + puente a la lente. Variants leadOverlay/anchoredAside/inlineExpand. Transversal por dominio.',
+    route: '/design-system/nexa-moment-composition',
+    category: 'Primitives',
+    kind: 'Primitive',
+    status: 'Hardening',
+    owner: 'NexaMomentComposition',
+    tags: ['nexa', 'composición', 'moment', 'host', 'AI overview', 'anclaje', 'next-step', 'view transitions'],
+    searchAliases: ['composicion', 'moment', 'overview', 'in-place', 'host', 'ai mode', 'ai overview', 'nexa moment composition', 'anclaje'],
+    icon: 'tabler-layers-subtract'
+  },
+  {
     id: 'buttons',
     title: 'Buttons',
     description: 'Primitive para jerarquía de comandos, tono, iconos y estados async.',

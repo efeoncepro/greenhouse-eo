@@ -69,7 +69,14 @@ export type NexaAnswersActionRiskLevel = 'low' | 'medium' | 'high'
 export interface NexaAnswersSurfaceContext {
   surfaceId: string
   domain: 'knowledge' | 'finance' | 'agency' | 'people' | 'commercial' | 'home' | 'custom'
-  placement: 'embedded' | 'chart' | 'sidecar' | 'floating' | 'inline'
+  /**
+   * Dónde vive la surface conversacional:
+   * - `embedded` = takeover (la conversación ES la superficie; el resto desaparece — la lente Nexa, GAP B).
+   * - `composed` = composición in-place con un host (la respuesta lidera, el host persiste como contexto
+   *   vivo + citas ancladas; ≈AI Overviews — GAP A, primitive `NexaMomentComposition`). NO reemplaza el host.
+   * - `chart`/`sidecar`/`floating`/`inline` = otras inserciones contextuales.
+   */
+  placement: 'embedded' | 'composed' | 'chart' | 'sidecar' | 'floating' | 'inline'
   density?: NexaAnswersCanvasDensity
   dataReality: 'mock' | 'synthetic' | 'partial' | 'strong'
   sensitivity: 'public' | 'tenant_internal' | 'confidential' | 'restricted'

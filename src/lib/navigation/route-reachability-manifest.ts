@@ -286,6 +286,13 @@ export const DECLARED_CHILD_ROUTES: readonly ChildRouteDeclaration[] = [
       'Nexa Streaming Text Lab (TASK-1105) — child surface del Design System para la primitive NexaStreamingText (revelado progresivo canonico de la respuesta de Nexa: modes value/stream + caret tokenizado + never-hidden/reduced-motion), alcanzable desde el catalogo canonico /design-system.'
   },
   {
+    route: '/design-system/nexa-moment-composition',
+    parent: '/design-system',
+    via: 'inline-link',
+    reason:
+      'Nexa Moment Composition Lab (TASK-1102 GAP A) — child surface del Design System para la primitive NexaMomentComposition (composicion in-place de Nexa Answers con un host: variants leadOverlay/anchoredAside/inlineExpand + morph View Transitions + anclaje cita->host + next-step gobernado + puente a la lente), alcanzable desde el catalogo canonico /design-system.'
+  },
+  {
     route: '/design-system/geometry',
     parent: '/design-system',
     via: 'inline-link',
