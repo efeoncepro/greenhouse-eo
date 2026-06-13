@@ -1,7 +1,7 @@
 # TASK-1110 — Nexa Composition runtime wiring (in-place en /knowledge) + Nexa Answers Experience
 
-> **Lifecycle:** to-do
-> **Creada:** 2026-06-13
+> **Lifecycle:** in-progress
+> **Creada:** 2026-06-13 · **In-progress:** 2026-06-13
 > **Type:** implementation · **P1** · **Effort:** Medio-Alto
 > **Domain:** ui | platform | nexa | content | knowledge
 > **Padre conceptual:** GAP A del Nexa Moment Fabric (CONVERSATIONAL_EXPERIENCE.md §13). Continúa TASK-1101 (runtime promotion) + TASK-1102 (multi-turno/composición primitive).
@@ -62,6 +62,30 @@ Idea del operador: canonizar `/knowledge/mockup/nexa-answers` como **page del De
 ### Slice 4 — Joint con Codex (Moment Fabric)
 
 `eligibility` (cuándo aparece el Moment) + `next-step gobernado` (action boundary: inform/recommend/draft/execute-with-approval) + señales `nexa.moment.*` = **Moment Fabric (TASK-1095/1096, Codex)**. El consumer hoy omite el next-step honesto (no inventa acción). Coser por `surfaceContext` + `renderPlan`. Coordinar con Codex.
+
+## Discovery (FASE 1-3, 2026-06-13) — scoping de S1 listo
+
+**Intake:** movida a `in-progress`, `Lifecycle: in-progress`. Libre (sin PR/branch). WIP ajeno presente en `.claude/skills/greenhouse-documentation-governor` + `.claude/commands/` → NO tocar (worktree compartido).
+
+**Mount point exacto (verificado en `src/views/greenhouse/knowledge/KnowledgeCenterView.tsx`):**
+
+- **El ask = la command surface de la lente Humano**, `KnowledgeCenterView.tsx:556-589` (`activeMode !== 'nexa'`): un `NexaComposer kind='knowledgeAsk'` con `query` / `setQuery` / `handleSearch` (form submit). Es el entry donde **preguntar → compone in-place**.
+- **El host = el workbench de docs** (results grid + detail, debajo de la línea 591). Estado ya en el view: `documents` (289), `results` (327, `buildResults`), `packet` (290), `selectedResult` (330). Hay que **agregar `data-nexa-anchor={documentId}`** a las cards de doc del grid.
+- **La lente takeover** (`activeMode === 'nexa'`, 598+) = `KnowledgeNexaCanvasLens` (si `canvasLensEnabled`) o `NexaKnowledgeAnswerSurface` fallback. **Coexiste**; el bridge `onContinueInNexaLens(query)` → `setActiveMode('nexa')` + sembrar la query.
+
+**AUDIT:**
+
+- SUPUESTOS CORRECTOS: el consumer `KnowledgeNexaCompositionLens` reusa el adapter real + canvas (verificado, tsc/lint 0). `documents` mapea a `KnowledgeCompositionHostDoc`. La command surface ya usa `NexaComposer`/`NexaComposerInput` (mismos átomos que el composer del consumer).
+- SUPUESTO A RESOLVER EN S1: la lente Humano YA tiene su propio `search→results` (`handleSearch` → `packet` → `results`). El consumer tiene su **propio** `runQuery` (agentic). **Decisión del modelo (ya fijada):** preguntar = compose; browse/filter/results = host. Reconciliar: el ask de la command surface dispara el compose del consumer (no duplicar dos asks). Opción limpia: el consumer **recibe el composer** o el view conecta su `query`/`handleSearch` al `onSubmit` del consumer. Evaluar al implementar (no duplicar el ask bar).
+- RIESGO BLAST: superficie viva 1368 líneas, ON por defecto. El host (results grid) NO debe romperse si el compose falla.
+
+**Mapa de conexiones (S1 = UI wiring, sin nuevo backend):**
+
+- Sin migración / capability / outbox / signal nuevos para S1 (es composición UI sobre readers existentes).
+- **Único infra nuevo = el rollout-flag default ON.** OJO Discovery: el flag de presentación actual de Knowledge es **ENV** (`src/lib/knowledge/nexa/canvas-lens-flag.ts`, `NEXA_ANSWERS_CANVAS_LENS_ENABLED`). El operador quiere **revertible sin code-deploy** → eso pide el **rollout-flag DB platform** (TASK-780), pero ése es `home_rollout_flags` (home-scoped). **Decisión S1:** ¿generalizar el rollout-flag platform a knowledge (revertible sin deploy, lo que pidió el operador) o ENV default-true (simple, flip = redeploy)? → resolver al inicio de S1. Recomendación arch: rollout-flag DB para cumplir "revertible sin deploy".
+- Non-regresión: `activeMode` switch (human/nexa/mcp) + answer-trace fallback intactos. Tests: smoke `/knowledge` + GVC.
+
+**Estado:** scoping completo. El refactor de código de S1 (envolver el workbench como host + `data-nexa-anchor` + conectar el ask al compose + rollout-flag) + GVC staging = **siguiente ventana** (no se inició código en superficie viva sin budget de verificación).
 
 ## Riesgo & 4 pilares (arch — review pre-inicio)
 
