@@ -6,6 +6,7 @@ import KnowledgeCenterView from '@/views/greenhouse/knowledge/KnowledgeCenterVie
 import { getTenantContext } from '@/lib/tenant/get-tenant-context'
 import { hasAuthorizedViewCode } from '@/lib/tenant/authorization'
 import { isKnowledgeCanvasLensEnabled } from '@/lib/knowledge/nexa/canvas-lens-flag'
+import { resolveHomeRolloutFlag } from '@/lib/home/rollout-flags'
 
 export const dynamic = 'force-dynamic'
 
@@ -34,5 +35,16 @@ export default async function KnowledgePage() {
     redirect('/401')
   }
 
-  return <KnowledgeCenterView canvasLensEnabled={isKnowledgeCanvasLensEnabled()} />
+  // TASK-1110 — kill-switch de la composición Nexa in-place (rollout-flag DB, TASK-780). ON por defecto
+  // (fila global seeded enabled=TRUE); revertible sin code-deploy. Si PG está caído el resolver degrada
+  // a disabled → la lente Humano vuelve a su estado legacy (host workbench intacto), nunca crashea.
+  const compositionLensEnabled = (
+    await resolveHomeRolloutFlag('knowledge_composition_lens', {
+      userId: tenant.userId,
+      tenantId: tenant.clientId ?? null,
+      roleCodes: tenant.roleCodes
+    }).catch(() => ({ enabled: false }))
+  ).enabled
+
+  return <KnowledgeCenterView canvasLensEnabled={isKnowledgeCanvasLensEnabled()} compositionLensEnabled={compositionLensEnabled} />
 }

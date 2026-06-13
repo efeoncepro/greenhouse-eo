@@ -63,6 +63,8 @@ const NexaMomentComposition = ({
   const theme = useTheme()
   const config = resolveNexaMomentCompositionConfig({ variant, kind })
   const hostRef = useRef<HTMLDivElement | null>(null)
+  const momentRef = useRef<HTMLElement | null>(null)
+  const wasComposedRef = useRef(false)
 
   // Identidad de View Transition por instancia (única → sin colisión si hay 2 composiciones en la página).
   // composer + host PERSISTEN (mismo nombre en old/new → FLIP del morph); el moment es NUEVO (solo entrada).
@@ -74,6 +76,17 @@ const NexaMomentComposition = ({
 
   const showMoment = state !== 'dormant' && Boolean(moment)
   const split = config.layout === 'split' && showMoment
+
+  // Focus routing (a11y): tras el morph dormant→composed, el foco va a la respuesta (la región del
+  // Momento, tabIndex={-1}). Solo en la transición de entrada (no en cada re-render del Momento ya vivo),
+  // para no robar el foco mientras el usuario interactúa. Degrada honesto si el nodo no existe.
+  useEffect(() => {
+    if (showMoment && !wasComposedRef.current) {
+      momentRef.current?.focus({ preventScroll: false })
+    }
+
+    wasComposedRef.current = showMoment
+  }, [showMoment])
 
   // Anclaje cita↔host: resalta el ítem del host marcado con `data-nexa-anchor` y lo trae a la vista.
   // Cliente-only (useEffect); degrada honesto si el navegador no soporta CSS.escape o el ítem no existe.
@@ -97,6 +110,7 @@ const NexaMomentComposition = ({
 
   const momentRegion = showMoment ? (
     <Box
+      ref={momentRef}
       component='section'
       role='region'
       aria-label={momentLabel}

@@ -37,6 +37,7 @@ export type HomeRolloutFlagKey =
   | 'home_v2_shell'
   | 'organization_workspace_shell_agency'
   | 'organization_workspace_shell_finance'
+  | 'knowledge_composition_lens'
 
 export interface HomeRolloutSubject {
   userId: string
@@ -104,10 +105,20 @@ export const __clearHomeRolloutFlagCache = (): void => {
 // Env fallback (graceful degradation)
 // ---------------------------------------------------------------------------
 
-const readEnvFallback = (flagKey: HomeRolloutFlagKey): boolean | null => {
-  if (flagKey !== 'home_v2_shell') return null
+const ENV_FALLBACK_BY_FLAG: Partial<Record<HomeRolloutFlagKey, string>> = {
+  home_v2_shell: 'HOME_V2_ENABLED',
+  // TASK-1110 — fallback de resiliencia: si PG está caído al renderizar /knowledge, este env
+  // preserva el estado del kill-switch. La fuente de verdad del ON-por-defecto es la fila DB
+  // (migración TASK-1110); sin env y con PG caído, el resolver degrada a disabled (legacy = seguro).
+  knowledge_composition_lens: 'KNOWLEDGE_COMPOSITION_LENS_ENABLED'
+}
 
-  const raw = (process.env.HOME_V2_ENABLED ?? '').trim().toLowerCase()
+const readEnvFallback = (flagKey: HomeRolloutFlagKey): boolean | null => {
+  const envVar = ENV_FALLBACK_BY_FLAG[flagKey]
+
+  if (!envVar) return null
+
+  const raw = (process.env[envVar] ?? '').trim().toLowerCase()
 
   if (raw === 'true' || raw === '1' || raw === 'on') return true
   if (raw === 'false' || raw === '0' || raw === 'off') return false

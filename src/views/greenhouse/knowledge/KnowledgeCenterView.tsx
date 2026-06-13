@@ -34,6 +34,7 @@ import { knowledgePacketToConversationalEvidence } from '@/lib/nexa/conversation
 import { NEXA_FLOATING_OPEN_EVENT } from '@/lib/nexa/floating-events'
 
 import KnowledgeNexaCanvasLens from './KnowledgeNexaCanvasLens'
+import KnowledgeNexaCompositionLens, { type KnowledgeCompositionHostDoc } from './KnowledgeNexaCompositionLens'
 
 import type { KnowledgeFeedbackKind, KnowledgeFreshness } from '@/lib/knowledge/types'
 import type { KnowledgeRetrievalChunk, KnowledgeRetrievalPacket, KnowledgeSearchMode } from '@/lib/knowledge/search'
@@ -276,7 +277,13 @@ const buildAnswerSources = (evidence: ConversationalEvidencePacket | null, selec
 const mcpDocumentUri = (document: KnowledgeDocumentSummary | null | undefined) =>
   document ? `greenhouse://knowledge/document/${document.publicId || document.documentId}` : 'greenhouse://knowledge/document/{id}'
 
-const KnowledgeCenterView = ({ canvasLensEnabled = false }: { canvasLensEnabled?: boolean }) => {
+const KnowledgeCenterView = ({
+  canvasLensEnabled = false,
+  compositionLensEnabled = false
+}: {
+  canvasLensEnabled?: boolean
+  compositionLensEnabled?: boolean
+}) => {
   const theme = useTheme()
   const reducedMotion = useReducedMotion()
   const [activeMode, setActiveMode] = useState<KnowledgeLens>('human')
@@ -516,6 +523,39 @@ const KnowledgeCenterView = ({ canvasLensEnabled = false }: { canvasLensEnabled?
   const answerSteps = buildAnswerSteps(lensEvidence, detail)
   const answerSources = buildAnswerSources(lensEvidence, selectedResult)
 
+  // TASK-1110 — composición Nexa in-place (placement 'composed'). El consumer recibe el índice de docs
+  // anclables; las cards reales del host llevan data-nexa-anchor para que las citas resalten el doc real.
+  const compositionHostDocs = useMemo<KnowledgeCompositionHostDoc[]>(
+    () =>
+      documents.map(doc => ({
+        documentId: doc.documentId,
+        title: doc.title,
+        kindLabel: sentence(doc.documentType) || doc.documentType,
+        kindTone: 'default',
+        kindIcon: 'tabler-file-description'
+      })),
+    [documents]
+  )
+
+  // Puente overview→takeover (secundario): siembra la pregunta en la lente Nexa multi-turno. Best-effort —
+  // alimenta el answer-trace fallback (nexaQuestion/nexaAsked + packet); la canvas lens es self-contained.
+  const handleContinueInNexa = (raw: string) => {
+    const trimmed = raw.trim()
+
+    if (!trimmed) return
+
+    setNexaQuestion(trimmed)
+    setNexaDraft('')
+    setNexaAsked(true)
+    setNexaThinking(true)
+    setActiveMode('nexa')
+    void runKnowledgeSearch(trimmed, 'agentic').finally(() => setNexaThinking(false))
+  }
+
+  // El composer del consumer es el ÚNICO ask en modo humano cuando la composición está activa → la
+  // command-surface de búsqueda solo se muestra para MCP (o humano legacy con el kill-switch en OFF).
+  const showCommandSurface = activeMode === 'mcp' || (activeMode === 'human' && !compositionLensEnabled)
+
   return (
     <>
       <NexaContextScope
@@ -553,7 +593,7 @@ const KnowledgeCenterView = ({ canvasLensEnabled = false }: { canvasLensEnabled?
 
       <KnowledgeLensSwitcher activeMode={activeMode} onModeChange={setActiveMode} />
 
-      {activeMode !== 'nexa' ? (
+      {showCommandSurface ? (
         <Box sx={panelSx} data-capture='knowledge-command-surface'>
           <Stack spacing={4} sx={{ p: { xs: 4, md: 5 } }}>
             <Stack component='form' onSubmit={event => void handleSearch(event)} direction={{ xs: 'column', lg: 'row' }} spacing={3} alignItems='stretch'>
@@ -678,7 +718,10 @@ const KnowledgeCenterView = ({ canvasLensEnabled = false }: { canvasLensEnabled?
         />
       ) : null}
 
-      {activeMode === 'human' ? (
+      {activeMode === 'human'
+        ? (() => {
+            // El workbench REAL (browse: rutas + resultados + inspector) es el host de la composición.
+            const workbench = (
         <Box
         sx={{
           display: 'grid',
@@ -915,7 +958,21 @@ const KnowledgeCenterView = ({ canvasLensEnabled = false }: { canvasLensEnabled?
           </AnimatePresence>
         </Box>
         </Box>
-      ) : null}
+            )
+
+            // browse/navegar = host; preguntar = compose (el composer del consumer es el único ask). Si el
+            // compose falla, el host queda íntegro (degradado horneado). Kill-switch OFF → lente Humano legacy.
+            return compositionLensEnabled ? (
+              <KnowledgeNexaCompositionLens
+                documents={compositionHostDocs}
+                host={workbench}
+                onContinueInNexaLens={handleContinueInNexa}
+              />
+            ) : (
+              workbench
+            )
+          })()
+        : null}
       </Stack>
     </>
   )
@@ -1203,6 +1260,7 @@ const ResultRow = ({
     <MotionBox
       layout
       data-capture='knowledge-result-row'
+      data-nexa-anchor={result.document.documentId}
       initial={reducedMotion ? false : { opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       exit={reducedMotion ? { opacity: 0 } : { opacity: 0, y: -8 }}
