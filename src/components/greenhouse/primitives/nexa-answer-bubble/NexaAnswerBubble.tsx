@@ -33,6 +33,7 @@ import { motionCss } from '@/components/greenhouse/motion'
 import GreenhouseButton from '../GreenhouseButton'
 import GreenhouseStatusDot from '../GreenhouseStatusDot'
 import NexaExpressiveText, { getNexaExpressiveTextPlainText } from '../nexa-expressive-text/NexaExpressiveText'
+import NexaProvenanceTrace from '../nexa-provenance-trace/NexaProvenanceTrace'
 
 import type {
   NexaAnswerAction,
@@ -879,13 +880,7 @@ const TrustCue = ({
       }}
     >
       <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems={{ xs: 'stretch', sm: 'center' }} justifyContent='space-between'>
-        <Stack direction='row' spacing={2.5} alignItems='center' sx={{ minInlineSize: 0 }}>
-          <GreenhouseStatusDot tone={cue.tone} ariaLabel={getNexaExpressiveTextPlainText(cue.label)} />
-          <Stack spacing={0.25} sx={{ minInlineSize: 0 }}>
-            <NexaExpressiveText value={cue.label} variant='body2' sx={{ color: theme.palette.text.primary, fontWeight: 600 }} />
-            <NexaExpressiveText value={cue.detail} variant='disclosureText' color='text.secondary' />
-          </Stack>
-        </Stack>
+        <NexaProvenanceTrace variant='inline' trustCue={cue} />
         <GreenhouseButton
           variant='text'
           tone='secondary'

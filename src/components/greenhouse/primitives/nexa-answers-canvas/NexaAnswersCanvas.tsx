@@ -12,7 +12,6 @@ import { visuallyHidden } from '@mui/utils'
 import { Motion } from '@/components/greenhouse/motion'
 
 import NexaComposer, { NexaComposerActionButton, NexaComposerInput } from '../NexaComposer'
-import NexaEvidencePanel from '../NexaEvidencePanel'
 import NexaProvenanceTrace from '../nexa-provenance-trace/NexaProvenanceTrace'
 import NexaResponseToolbar from '../nexa-response-toolbar/NexaResponseToolbar'
 import GreenhouseButton from '../GreenhouseButton'
@@ -204,7 +203,7 @@ const CanvasProof = ({
   return (
     <Collapse in={open} timeout={300} mountOnEnter unmountOnExit>
       <Box id={id} data-capture='nexa-answers-canvas-proof' sx={{ mt: 4 }}>
-        {slot ?? (proof?.evidence ? <NexaEvidencePanel evidence={proof.evidence} variant='proofPanel' feedbackEnabled={false} /> : null)}
+        {slot ?? (proof?.evidence ? <NexaProvenanceTrace variant='panel' kind='knowledgeGrounded' evidence={proof.evidence} feedbackEnabled={false} /> : null)}
       </Box>
     </Collapse>
   )
