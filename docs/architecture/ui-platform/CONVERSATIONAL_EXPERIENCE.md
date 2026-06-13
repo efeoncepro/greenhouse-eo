@@ -187,4 +187,12 @@ Mientras converge el resto, **ambas surfaces coexisten**: el canvas es la refere
 
 ## 11. Procedencia
 
-TASK-1096 (canvas + coreografía + feature-primitives co-located) · TASK-1095 (surfaceContext SSOT, A1) · TASK-1101 (citation mapper + runtime wiring) · TASK-1103 (NexaProvenanceTrace) · TASK-1104 (NexaResponseToolbar) · TASK-1105 (NexaStreamingText) · TASK-1089/1090/1092 (answer-trace productivo, Codex) · TASK-1091 (NexaChatProvider, stream real). HISTORIAL: [HISTORIAL.md](./HISTORIAL.md) Delta 2026-06-13.
+TASK-1096 (canvas + coreografía + feature-primitives co-located) · TASK-1095 (surfaceContext SSOT, A1) · **TASK-1101 (runtime promotion — domain adapter + lens host + flag cutover, primer consumer real: Knowledge)** · TASK-1103 (NexaProvenanceTrace) · TASK-1104 (NexaResponseToolbar) · TASK-1105 (NexaStreamingText) · TASK-1108 (frontera transversal/dominio del proof) · TASK-1089/1090/1092 (answer-trace + citation mapper, Codex) · TASK-1091 (NexaChatProvider, stream real). HISTORIAL: [HISTORIAL.md](./HISTORIAL.md) Delta 2026-06-13.
+
+---
+
+## 12. Delta 2026-06-13 — runtime construido (TASK-1101) + PLAYBOOK de dominio
+
+La experiencia rica del canvas YA vive en la **superficie viva** de `/knowledge` (lente Nexa), cableada al retrieval real (`knowledge-search.v1`), **flag-gated** (`NEXA_ANSWERS_CANVAS_LENS_ENABLED`, default OFF). El `NexaKnowledgeAnswerSurface` (answer-trace) queda de **fallback** mientras el flag está OFF; el rollout (flag ON staging→prod) es decisión del operador. GVC-verificado (idle→thinking→reasoning→answered con corpus real + citas inline + trust cue + response toolbar; 3 quality gates + enterpriseRubric pass).
+
+**La receta de "cómo traer esto a un dominio" se canonizó en un playbook dedicado:** [`CONVERSATIONAL_EXPERIENCE_DOMAIN_PLAYBOOK.md`](./CONVERSATIONAL_EXPERIENCE_DOMAIN_PLAYBOOK.md) — los 5 pasos (domain adapter `packet→renderPlan` puro + `surfaceContext` + lens host self-contained + flag de presentación + GVC) con Knowledge (TASK-1101) como ejemplo trabajado. Archivos de referencia: `src/lib/knowledge/nexa/knowledge-answer-render-plan.ts` (adapter), `src/views/greenhouse/knowledge/KnowledgeNexaCanvasLens.tsx` (host), `src/lib/knowledge/nexa/canvas-lens-flag.ts` (flag). **Cualquier dominio nuevo (finance/agency/people/commercial) sigue el playbook; el shell no se vuelve a diseñar.**

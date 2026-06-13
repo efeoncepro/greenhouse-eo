@@ -12,7 +12,8 @@ Es un **overlay de dominio**: compone con `greenhouse-product-ui-architect` (P+V
 ## Required reads (en orden)
 
 1. `docs/architecture/ui-platform/CONVERSATIONAL_EXPERIENCE.md` — **el contrato canónico** (shell + coreografía + contratos SSOT + transversalidad + receta + hard rules). Es la fuente de verdad de esta skill.
-2. `docs/architecture/ui-platform/PRIMITIVES.md` — fila "Nexa chat atoms / answer surfaces" (inventario de componentes).
+2. `docs/architecture/ui-platform/CONVERSATIONAL_EXPERIENCE_DOMAIN_PLAYBOOK.md` — **el PLAYBOOK** para traer la experiencia rica a un dominio (los 5 pasos: adapter `packet→renderPlan` + `surfaceContext` + lens host + flag de presentación + GVC), con Knowledge (TASK-1101) como ejemplo trabajado. Léelo ANTES de agregar/cablear un dominio nuevo.
+3. `docs/architecture/ui-platform/PRIMITIVES.md` — fila "Nexa chat atoms / answer surfaces" (inventario de componentes).
 3. `docs/documentation/plataforma/nexa-conversational-experience.md` — la versión humana (qué es / cómo se siente).
 4. `DESIGN.md` + tokens AXIS — el contrato visual (cero hardcode).
 
@@ -31,13 +32,13 @@ Si el contrato del runtime difiere del doc, **gana el runtime** (`src/components
 
 ## Receta: agregar un dominio/surface conversacional nuevo
 
-NO crear un componente nuevo. Componer el canvas con el contrato del dominio:
+**Seguí el PLAYBOOK** (`CONVERSATIONAL_EXPERIENCE_DOMAIN_PLAYBOOK.md`) — los 5 pasos con el ejemplo trabajado de Knowledge (TASK-1101). NO crear un componente nuevo; el dominio entra por **datos**, no por chrome. Resumen:
 
-1. Declarar `surfaceContext` con `domain: '<nuevo>'` + `placement` + `dataReality` + `sensitivity` + `allowedRenderers` (whitelist) + `allowedActions`. Import del SSOT `@/lib/nexa/nexa-answers-surface-context`.
-2. `kind→variant`: si hay kind de dominio, agregarlo a `NEXA_ANSWERS_CANVAS_KIND_CONFIG` resolviendo a un **variant existente** (`embedded`/`sidecar`/`inline`) — NUNCA un variant nuevo por dominio. Si no, `custom`.
-3. Producir el `renderPlan` (`nexa-answer-render-plan.v1`): blocks (`answerBubble`/`compactAnswer`/`conversationBubble`) + `proof` con `ConversationalEvidencePacket` si hay evidencia (mapeada desde el packet de dominio, p.ej. `knowledge-search.v1` → `nexa-evidence.v1`).
-4. Conducir la coreografía desde el host (los 11 estados) con degradación honesta (`degraded`/`error`, nunca `Auditar` falso).
-5. **Agregar un specimen de portabilidad** al scenario GVC `nexa-answers-surface` (mismo canvas, dominio nuevo) → el guard de transversalidad lo cubre.
+1. **Domain adapter** `packet → NexaAnswersRenderPlan` (puro, `src/lib/<dominio>/nexa/`): reusa el citation mapper + evidence converter canónicos; gap honesto sin datos; emite solo tus `allowedRenderers`. Ref: `src/lib/knowledge/nexa/knowledge-answer-render-plan.ts`.
+2. **`surfaceContext`** declarativo (`domain`/`placement`/`density`/`dataReality`/`sensitivity`/`allowedRenderers`/`allowedActions`). Si hay kind de dominio, resolvé a un variant existente — NUNCA un variant nuevo.
+3. **Lens host self-contained** (`src/views/greenhouse/<dominio>/`): posee draft/estado/packet, conduce la coreografía de 11 estados desde el lifecycle real, abort en `onStopGeneration`, `degraded`/`error` honestos. Ref: `KnowledgeNexaCanvasLens.tsx`.
+4. **Flag de PRESENTACIÓN** default OFF, ortogonal al de retrieval; la page (server) lo resuelve y hace el swap `flag ? <CanvasLens/> : <legacy/>`. Ref: `src/lib/knowledge/nexa/canvas-lens-flag.ts`.
+5. **GVC** con el flag ON (corpus real → staging; local prueba wiring + estados + gap honesto). Scenario que ejercita la interacción. Ref: `scripts/frontend/scenarios/knowledge-nexa-canvas-lens.scenario.ts`. Para portabilidad pura (estado answered, datos sintéticos) seguí usando el specimen del scenario `nexa-answers-surface`.
 
 ## Crear/extender un feature-primitive (P+V+K completo)
 
@@ -71,9 +72,11 @@ Si emerge un mecanismo transversal nuevo (o se extiende uno):
 - **NUNCA** hardcodear HEX/px/fontFamily/ms — tokens AXIS + escala SoT + motion tokens.
 - **SIEMPRE** agregar un specimen de portabilidad al scenario GVC al introducir una surface conversacional nueva.
 
-## Convergencia pendiente (coordinado con Codex)
+## Convergencia (runtime construido — TASK-1101)
 
-`NexaKnowledgeAnswerSurface` (answer-trace productivo, TASK-1089/1090/1092) está wired a `/knowledge` con retrieval real pero es Knowledge-scoped y no modela `surfaceContext`. Conserva su data-path runtime y **converge** hacia el canvas + los feature-primitives neutrales (migrar proof→`panel`, trust cue→`inline`, consumir el `surfaceContext` SSOT). + ADR de plataforma + hard-rule en CLAUDE.md (NUNCA answer-surface por dominio) + slices A1/A2 de TASK-1095 (promoción física del contrato + split dominio/UI), gateado por `fe:capture:diff`. Coordinar antes de tocar el answer-trace.
+La lente Nexa rica del canvas YA está cableada a `/knowledge` con retrieval real (`buildKnowledgeAnswerRenderPlan` → `NexaAnswersCanvas` runtime), **flag-gated** (`NEXA_ANSWERS_CANVAS_LENS_ENABLED`, default OFF) y GVC-verificada (idle→thinking→reasoning→answered con corpus real + citas inline + toolbar). El `NexaKnowledgeAnswerSurface` (answer-trace, TASK-1089/1090/1092) queda como **fallback** mientras el flag está OFF; el rollout (flag ON staging→prod) es decisión del operador. Cualquier dominio nuevo sigue el PLAYBOOK (no se vuelve a diseñar el shell).
+
+**Follow-ups abiertos:** (a) `unhelpful` → selector de motivo (stale/wrong_source/missing_doc) — hoy mapeo mínimo `wrong_source`; (b) `share` → permalink real (necesita sync de URL state cross-lens); (c) multi-turno con compactación (TASK-1102) en el runtime — hoy single-turn-replace; (d) routing por el provider stream (TASK-1091) para token-streaming real del answer en la lente (hoy retrieval-grounded con reveal). Ninguno toca la primitive.
 
 ## Mantenimiento de esta skill
 
@@ -81,4 +84,4 @@ Si cambia el contrato canónico (coreografía, contratos SSOT, feature-primitive
 
 ## Procedencia
 
-TASK-1096 (canvas + coreografía + feature-primitives) · TASK-1095 (surfaceContext SSOT) · TASK-1101 (citation mapper + runtime) · TASK-1103 (NexaProvenanceTrace) · TASK-1104 (NexaResponseToolbar) · TASK-1105 (NexaStreamingText) · TASK-1089/1090/1092 (answer-trace, Codex) · TASK-1091 (NexaChatProvider).
+TASK-1096 (canvas + coreografía + feature-primitives) · TASK-1095 (surfaceContext SSOT) · **TASK-1101 (runtime promotion — domain adapter + lens host + flag cutover + PLAYBOOK; primer consumer real: Knowledge)** · TASK-1103 (NexaProvenanceTrace) · TASK-1104 (NexaResponseToolbar) · TASK-1105 (NexaStreamingText) · TASK-1108 (frontera transversal/dominio del proof) · TASK-1089/1090/1092 (answer-trace + citation mapper, Codex) · TASK-1091 (NexaChatProvider).

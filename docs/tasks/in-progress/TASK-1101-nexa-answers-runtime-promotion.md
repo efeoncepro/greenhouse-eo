@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -31,6 +31,29 @@ Corrección post-decisión del operador (ver TASK-1095/1096 Delta 2026-06-13). E
 - **El `surfaceContext` YA existe**: es `NexaAnswersSurfaceContext` (`nexa-answers-canvas-types.ts`), y por **decisión del operador es el contrato canónico** (`NexaAnswersCanvas` es la surface canónica de la lente Nexa; el answer-trace de TASK-1089/1090 ni siquiera lo modela). No hay un SSOT nuevo que esperar.
 - ⇒ Esta task **NO está bloqueada**: consume el contrato existente directo. El Slice 0 se reinterpreta como "**bendecir** `NexaAnswersSurfaceContext` como SSOT (blessing in-place u opcional promoción a `src/lib/nexa/`)", no "migrar a un contrato de 1095".
 - El refinamiento A2 de TASK-1095 (descomponer la máquina de 10 estados en lifecycle×disclosure×turn) es **paralelo** y no bloquea el cableado a datos reales.
+
+## Delta 2026-06-13 (2) — el lens vivo migra al canvas; Knowledge es consumer #1, NO el destino
+
+Corrección de framing del operador. El trabajo NO es "mejorar el answer-trace": es **traer la riqueza ARRIBA a la superficie viva**, manteniendo la primitive transversal.
+
+- **Migración de superficie explícita**: el lens conversacional vivo de `/knowledge` (`KnowledgeCenterView`) pasa de `NexaKnowledgeAnswerSurface` (answer-trace pobre: `conversationTrace`/`overviewPanel`/`toolResult`, sin coreografía ni los 11 estados) → `<NexaAnswersCanvas variant='embedded' mode='runtime'>` (rico). El answer-trace queda como **fallback flag-gated**, no como destino. Coordinar con TASK-1090 qué ruta/lente lo monta.
+- **HARD RULE — "consumer, no destino"**: `NexaAnswersCanvas` es el **producto transversal**; Knowledge es el **consumer #1**, no el final. Todo lo domain-specific —el mapper `chunk→NexaCitationSource`, los handlers `helpful/unhelpful/regenerate/share`, el copy es-CL, el slot `Evals` del proof— vive en el **consumer Knowledge** (o `src/lib/knowledge/`), **NUNCA dentro de la primitive**. La frontera es la misma de TASK-1108: built-ins transversales (`sources/trace/packet`, driven por `nexa-evidence.v1`) vs slots de dominio (`content`). Cualquier consumer futuro (finance/agency) hereda el canvas wired a SU dominio sin tocar la primitive.
+- **Anti-regresión**: NUNCA bakear lógica de Knowledge en `NexaAnswersCanvas`/`nexa-answers-canvas-types.ts` ni en las feature-primitives (`NexaProvenanceTrace`/`NexaResponseToolbar`/`NexaStreamingText`). Si algo huele a Knowledge dentro de la primitive, va en el consumer.
+- Reconcilia el cuerpo: donde dice "Depende de TASK-1095 (contrato `surfaceContext` en `src/lib/nexa/`)" léase **el contrato ya existe** (`NexaAnswersSurfaceContext`, canónico por decisión del operador); 1095 es paralelo, no bloqueante.
+
+## Outcome 2026-06-13 — implementación completa, GVC verde; rollout (flag) pendiente
+
+**Shipped (en `develop`):**
+- **Slice 1** — domain adapter `buildKnowledgeAnswerRenderPlan` (`src/lib/knowledge/nexa/knowledge-answer-render-plan.ts`), puro, 7 tests; reusa el citation mapper (TASK-1092) + evidence converter canónicos; gap honesto sin datos; dedup de puntos por documento ("N fuentes" == N puntos).
+- **Slice 3** — `KnowledgeNexaCanvasLens` (`src/views/greenhouse/knowledge/`), el `NexaAnswersCanvas` runtime cableado al retrieval real, máquina de 11 estados desde el lifecycle, abort en stop, degradación honesta. Cutover flag-gated `NEXA_ANSWERS_CANVAS_LENS_ENABLED` (default OFF) resuelto por la page (server). **GVC verde con corpus real** (idle→thinking→reasoning→answered + citas inline + trust cue + response toolbar; 3 quality gates + enterpriseRubric pass). Scenario: `knowledge-nexa-canvas-lens`.
+- **Slice 2** — feedback (`helpful`/`unhelpful`→`/api/platform/app/knowledge/feedback`) + `regenerate`→re-retrieval + `copy` self-contained: plegados en Slice 3.
+- **Slice 5** — PLAYBOOK `CONVERSATIONAL_EXPERIENCE_DOMAIN_PLAYBOOK.md` + skill `greenhouse-nexa-conversational` actualizada (Claude + Codex mirror) + Delta en `CONVERSATIONAL_EXPERIENCE.md`.
+
+**Slice 4 — N/A para Knowledge:** el adapter emite solo `answerBubble explanation` (texto+citas, sin Recharts) → el `runtime_hydration_warning` de los answer-blocks con chart NO aplica a este consumer (es follow-up de la primitive para dominios con chart).
+
+**Rollout pendiente (operador):** flag ON staging → QA golden questions sobre corpus real → sign-off → prod gradual. El grounded-rico se verifica mejor en staging (corpus + pool estable, lección ISSUE-094). Rollback = flag OFF (answer-trace legacy intacto).
+
+**Follow-ups abiertos (ninguno toca la primitive):** (a) `unhelpful`→selector de motivo (hoy mapeo mínimo `wrong_source`); (b) `share`→permalink real (necesita sync de URL state cross-lens); (c) multi-turno con compactación TASK-1102 en runtime (hoy single-turn-replace); (d) routing por el provider stream (TASK-1091) para token-streaming real del answer.
 
 ## Why This Task Exists
 
