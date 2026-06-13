@@ -251,6 +251,13 @@ export const DECLARED_CHILD_ROUTES: readonly ChildRouteDeclaration[] = [
       'Gradient Background Lab — child surface del Design System para la primitive GreenhouseGradientBackground y sus presets tokenizados, alcanzable desde el catalogo canonico /design-system.'
   },
   {
+    route: '/design-system/border-beam',
+    parent: '/design-system',
+    via: 'inline-link',
+    reason:
+      'Border Beam Lab — child surface del Design System para la primitive GreenhouseBorderBeam y sus variants/kinds de motion perimetral, alcanzable desde el catalogo canonico /design-system.'
+  },
+  {
     route: '/design-system/geometry',
     parent: '/design-system',
     via: 'inline-link',

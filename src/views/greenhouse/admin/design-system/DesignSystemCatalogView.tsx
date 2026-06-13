@@ -128,6 +128,19 @@ const CATALOG_ITEMS: CatalogItem[] = [
     icon: 'tabler-brush'
   },
   {
+    id: 'border-beam',
+    title: 'Border beam',
+    description: 'Borde perimetral animado para surfaces Nexa, evidencia, aprobaciones y estados async.',
+    route: '/design-system/border-beam',
+    category: 'Foundations',
+    kind: 'Primitive',
+    status: 'Hardening',
+    owner: 'GreenhouseBorderBeam',
+    tags: ['border', 'beam', 'surface', 'motion'],
+    searchAliases: ['borde', 'beam', 'linea de luz', 'border beam', 'perimetral', 'motion'],
+    icon: 'tabler-border-corners'
+  },
+  {
     id: 'buttons',
     title: 'Buttons',
     description: 'Primitive para jerarquía de comandos, tono, iconos y estados async.',

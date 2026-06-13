@@ -28,6 +28,7 @@ Cada primitive tiene su contrato canónico en una ADR/spec dedicada o en su delt
 | **Floating Action Dock** (acciones persistentes ancladas al viewport) | `NexaFloatingButton`, `ScrollToTop` + safe-area CSS vars; Nexa FAB usa mark animado + aura hover detrás del botón | HISTORIAL Deltas 2026-06-06c / 2026-06-09h |
 | **Efeonce brand motion** | `EfeonceOrbitalLogoMark` (variants `static` / `orbitalSignature` / `ambient`, kinds `institutionalWordmark` / `motionSpecimen`) | HISTORIAL Delta 2026-06-09i · lab `/admin/design-system/efeonce-brand` · experimental asset copy `public/branding/experiments/efeonce-logo-full-orbit-motion-copy.svg` |
 | **Gradient backgrounds** | `GreenhouseGradientBackground` (variants `surfaceWash` / `heroAurora` / `brandField`; kinds `axisSurface` / `nexaAurora` / `efeonceBrand` / `insightPanel` / `calmBackdrop`; intensities `subtle` / `medium` / `strong`; tokenizado con `theme.axis.*` + `theme.palette.*`, motion CSS reduced-motion, bandas lineales — no blobs/orbs radiales, no Tailwind, no framer directo) | HISTORIAL Delta 2026-06-13f · lab `/design-system/gradients` |
+| **Border beam / spectrum aura** | `GreenhouseBorderBeam` (effects `beam` / `spectrum`) + `GreenhouseSpectrumBeam` (primitive fina del efecto spectrum); variants `ambient` / `interactive` / `progress`; spectrum palettes `axis` / `nexa`; kinds `nexaSurface` / `promptDock` / `evidencePeek` / `approvalCard` / `asyncOperation`; intensities `subtle` / `medium` / `strong`; overlay decorativo con radio heredado, colores AXIS/MUI/brand SSOT y reduced-motion; no Tailwind config ni HEX locales | HISTORIAL Delta 2026-06-13g · lab `/design-system/border-beam` |
 | **Nexa brand marks** | `GreenhouseNexaBrandMark` (kinds `askNexaBadge` / `badgeIcon` / `inlineMark` / `monoMark`) + `GreenhouseNexaAnimatedMark` (Rive/GSAP fallback) + `GreenhouseNexaAnimatedAskBadge` | HISTORIAL Deltas 2026-06-09d / 2026-06-09h · lab `/admin/design-system/nexa-brand` · assets `public/images/nexa-mark/*` |
 | **Nexa chat atoms / answer surfaces** (átomos del patrón Nexa Chat + respuestas trazables) | `NexaGlowBorder` (borde "línea de luz" del composer: 2 anillos enmascarados + beam + `focusRingColor`) + `NexaComposer` (unidad: glow + input + acción interna send/stop/disclaimer o command input; variants `chat` / `command`; kinds `floatingChat` / `knowledgeAsk` / `globalCommand` / `inlineFollowUp`; `knowledgeAsk` incluye Nexa mark + shortcut `↵` para preguntar sin chocar con el shell; `inlineFollowUp` es el composer conversacional descendido bajo una respuesta; `globalCommand` conserva `⌘ K`; partes `NexaComposerInput` —caja Vuexy anulada → el glow pinta todo; `actionAdornment` compone shortcut+acción dentro del glow— y `NexaComposerActionButton` variants `send` navy↔teal / `stop` navy↔gris + iconos semánticos `send`/`search`; presentacional, la consumer cablea assistant-ui vía `asChild`) + `NexaPromptDock` (composition primitive para dock compacto → panel de pregunta contextual; variants `compactDock` / `inlinePanel` / `floatingPrompt`; kinds `quickAsk` / `knowledgeAsk` / `surfaceFollowUp` / `contextualAction`; controla open/focus/Escape/click-outside/submit `Cmd/Ctrl+Enter`, reusa `NexaComposer` + `GreenhouseNexaAnimatedMark`, sin shadcn/Tailwind/OKLCH/motion externo) + `NexaKnowledgeAnswerSurface` (composition primitive transversal para respuestas con evidencia: variants `conversationTrace` / `overviewPanel` / `toolResult`, kinds `knowledgeAnswerTrace` / `knowledgeToolResult`; idle limpio estilo Google AI Mode con solo composer glow → pregunta-burbuja → respuesta Nexa → composer descendido → proof panel lateral/inline; puede consumir `ConversationalEvidencePacket`, sin DB/API; `showModeSelector` default `true` permite que una surface madre con lentes propios oculte el selector interno sin cambiar la coreografía; `showTraceRail` default `false`, porque trace/retrieval vive en proof panel salvo opt-in explícito) + `NexaAnswersCanvas` (primitive transversal de Nexa Answers: modes `renderPlan` / `runtime`; variants `embedded` / `sidecar` / `inline`; kinds `knowledgeEmbedded` / `financeChartEmbedded` / `agencyInsightEmbedded` / `peopleInsightEmbedded` / `commercialInsightEmbedded`; states `idle`→`thinking`→`answered`→`proofOpen`→`followup`; valida `surfaceContext.allowedRenderers`, renderiza blocks vía registry y conserva slots para assistant-ui/headless runtime, proof y composer) + `NexaExpressiveText` (renderer serializable para voz Nexa: `string | segments[]`; estilos cerrados `plain|strong|emphasis|soft|metric|positive|warning|danger`, `emoji` con label accesible y `break`; sin HTML/style/className/font-size/HEX) + `NexaConversationBubble` (primitive de conversación base; variants `userQuestion` / `assistantThinking` / `assistantText` / `assistantFollowUp` / `systemNotice`; kinds `surfaceUserQuestion` / `nexaThinking` / `nexaText` / `nexaFollowUp` / `contextLoaded` / `lowConfidence` / `staleData` / `policyFiltered` / `partialAnswer`; usa `NexaSenderMark`, `GreenhouseThinkingBeat`, `NexaExpressiveText` y `GreenhouseButton` canónico para no sobrecargar `NexaAnswerBubble`) + `NexaAnswerBubble` (primitive del answer-turn enriquecido; variants `explanation` / `chart` / `metricSummary` / `actionPlan`; kinds `knowledgeExplanationAnswer` / `knowledgeChartAnswer` / `financeChartAnswer` / `financeMetricSummary` / `commercialMetricSummary` / `agencyMetricSummary` / `peopleMetricSummary` / `surfaceMetricSummary` / `financeActionPlan` / `commercialActionPlan` / `agencyActionPlan` / `peopleActionPlan` / `surfaceActionPlan` / `surfaceChartInsight`; `chart` usa Recharts con modos `trend` / `comparison` / `composition`; `metricSummary` muestra 2-4 KPIs compactos con delta semántico, mini trend e interpretación ejecutiva; `actionPlan` muestra decisión sugerida, pasos, trade-offs, riesgos y CTAs de surface; las variantes mantienen trust/proof compacto y aceptan `NexaExpressiveTextValue` en títulos/cuerpo/copy para conservar conversación expresiva) + `NexaEvidencePanel` (renderer compartido de evidencia versionada `nexa-evidence.v1`: trace, fuentes, freshness, confidence, filtered count y feedback, usado por chat `search_knowledge` y AnswerSurface; mobile-safe con `minmax(0, 1fr)`/wrapping para títulos largos) + `NexaFace` (avatar cara real, variants `hero` 76 / `header` 44 borde teal / `message`; single source `NEXA_FACE_SRC`) + `NexaPresenceMark` (header "En línea" ↔ "Pensando…" crossfade + elipsis animada, reduced-motion horneado) + `NexaSenderMark` (avatar por-mensaje: disco navy + anillo teal + glyph arco teal/sparkle blanco inline; `size` escala disco+anillo+glyph; NO se sustituye por `tabler-sparkles` suelto). Tokens AXIS + brand Nexa SSOT (`GREENHOUSE_NEXA_BRAND_COLORS`) + escala SoT; cero hardcode. | HISTORIAL Delta 2026-06-11 (TASK-1078) + Delta 2026-06-12/13 (TASK-1089/TASK-1093/TASK-1090/TASK-1096) · lab `/design-system/nexa-chat` (specimen vivo) · patrón en [PATTERNS.md](./PATTERNS.md) "Nexa Chat Pattern" |
 | **Nexa greetings** | `GreenhouseNexaGreeting` (variants `hero` / `compactContextual`; kinds `homeOperatorGreeting` / `funnelStageAdvisor` / `custom`; compact badge variant via `askBadgeVariant`) | HISTORIAL Deltas 2026-06-09f / 2026-06-09h · labs `/admin/design-system/charts` + `/admin/design-system/nexa-brand` |
@@ -72,6 +73,56 @@ Contrato:
 - El submit solo entrega `onSubmit(value)`. La ejecución de negocio debe vivir en commands/readers/runtime gobernados, no en la UI.
 
 Specimen vivo: `/design-system/nexa-chat`, `data-capture='nexa-prompt-dock-specimen'`.
+
+## GreenhouseBorderBeam
+
+`GreenhouseBorderBeam` es la primitive canónica para patrones de borde perimetral animado inspirados en "border beam" y "rainbow borders button". `GreenhouseSpectrumBeam` es la primitive fina del efecto `spectrum`: anillo completo animado + aura blur amplia, sin poseer el botón, card o caja que lo usa. Toman la intención visual del prompt shadcn/Tailwind, pero la implementan como overlay decorativo Greenhouse: MUI `sx`, colores desde `theme.axis.*` / `theme.palette.*`, radio heredado, `prefers-reduced-motion` y sin extender Tailwind.
+
+Effects oficiales:
+
+- `beam`: línea perimetral focal que recorre el borde; útil para surfaces, evidencia y progreso.
+- `spectrum`: anillo completo con gradiente desplazado + aura blur amplia, equivalente gobernado del "rainbow borders button". Usar vía `GreenhouseSpectrumBeam` cuando solo se necesita el efecto. Reservar para CTAs especiales, milestones o entrypoints de alto énfasis.
+
+Spectrum palettes:
+
+- `axis`: paleta spectrum expresiva basada en AXIS + semánticos; default para specimens exploratorios.
+- `nexa`: variación restringida a marca Nexa (`GREENHOUSE_NEXA_BRAND_COLORS` + blanco) para cajas glow, CTAs o entrypoints de Nexa donde la marca debe sentirse más propia.
+
+Variants oficiales:
+
+- `ambient`: presencia suave siempre visible para una surface especial.
+- `interactive`: beam pensado para hover/focus/estado activo de una surface ya interactiva.
+- `progress`: beam más corto y explícito para operaciones breves en curso; no reemplaza loaders largos.
+
+Kinds iniciales:
+
+- `nexaSurface`: superficies asistidas por Nexa.
+- `promptDock`: entradas contextuales y prompt docks.
+- `evidencePeek`: peeks de evidencia, fuentes o trazabilidad.
+- `approvalCard`: cards donde el usuario revisa y decide.
+- `asyncOperation`: acción corta en proceso.
+
+Reglas:
+
+- Usar como overlay dentro de un host con `position: relative`, `overflow: hidden` y radio estable.
+- Para botones, componer `GreenhouseButton` dentro de un host inline y montar `GreenhouseBorderBeam` como overlay; no crear `RainbowButton`, `BeamButton` ni botones paralelos.
+- Para cajas tipo Nexa glow con aura spectrum, usar `GreenhouseSpectrumBeam` con children y `contentSx`; no forkear `NexaGlowBorder`.
+- No usarlo como única señal de estado; acompañar con texto, icono o progreso cuando comunica estado.
+- No pegar `keyframes`, gradientes ni colores locales en views. Si aparece una intención repetible, agregar un kind al resolver.
+- No reemplaza `NexaGlowBorder` para el composer/chat de Nexa ni `GreenhouseLoadingSurface` para procesos largos.
+
+Patrón aprobado — button with border beam:
+
+```tsx
+<Box sx={{ position: 'relative', display: 'inline-flex', overflow: 'hidden', borderRadius: '6px' }}>
+  <GreenhouseButton kind='primaryAction' leadingIconClassName='tabler-sparkles'>
+    Pregúntale a Nexa
+  </GreenhouseButton>
+  <GreenhouseSpectrumBeam kind='promptDock' variant='interactive' intensity='strong' active />
+</Box>
+```
+
+Specimens vivos: `/design-system/border-beam`, `data-capture='border-beam-button-specimen'`, `data-capture='border-beam-nexa-spectrum-box'`, `data-capture='border-beam-nexa-brand-spectrum-box'`, `data-capture='border-beam-nexa-message-composer-inactive'` y `data-capture='border-beam-nexa-message-composer-with-text'` (lab-only, no aplicado al chat runtime).
 
 ## NexaConversationBubble
 

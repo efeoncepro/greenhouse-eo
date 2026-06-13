@@ -48,6 +48,26 @@ export {
   resolveGreenhouseGradientBackgroundVariant
 } from './gradient-background/greenhouse-gradient-background-controller'
 export type { GreenhouseGradientBackgroundKindConfig } from './gradient-background/greenhouse-gradient-background-controller'
+export { default as GreenhouseBorderBeam } from './border-beam/GreenhouseBorderBeam'
+export { default as GreenhouseSpectrumBeam } from './border-beam/GreenhouseSpectrumBeam'
+export type { GreenhouseSpectrumBeamProps } from './border-beam/GreenhouseSpectrumBeam'
+export type {
+  GreenhouseBorderBeamConfig,
+  GreenhouseBorderBeamEffect,
+  GreenhouseBorderBeamIntensity,
+  GreenhouseBorderBeamKind,
+  GreenhouseBorderBeamProps,
+  GreenhouseBorderBeamSpectrumPalette,
+  GreenhouseBorderBeamVariant
+} from './border-beam/greenhouse-border-beam-types'
+export {
+  buildGreenhouseBorderBeamConfig,
+  buildGreenhouseBorderBeamGradient,
+  GREENHOUSE_BORDER_BEAM_KIND_CONFIG,
+  resolveGreenhouseBorderBeamKind,
+  resolveGreenhouseBorderBeamVariant
+} from './border-beam/greenhouse-border-beam-controller'
+export type { GreenhouseBorderBeamKindConfig } from './border-beam/greenhouse-border-beam-controller'
 export { default as GreenhouseNexaBrandMark } from './GreenhouseNexaBrandMark'
 export { default as GreenhouseNexaAnimatedMark } from './GreenhouseNexaAnimatedMark'
 export type { GreenhouseNexaAnimatedMarkProps } from './GreenhouseNexaAnimatedMark'

@@ -6,6 +6,20 @@
 
 ---
 
+## Delta 2026-06-13g — GreenhouseBorderBeam primitive
+
+Se creó `GreenhouseBorderBeam` para traer el patrón de borde perimetral animado al Design System sin copiar Tailwind/shadcn:
+
+- Primitive nueva en `src/components/greenhouse/primitives/border-beam/`.
+- `GreenhouseSpectrumBeam` extrae el efecto `spectrum` como primitive fina reutilizable (anillo completo + aura blur amplia) sin acoplarlo a un botón.
+- Variants oficiales: `ambient`, `interactive`, `progress`.
+- Kinds iniciales: `nexaSurface`, `promptDock`, `evidencePeek`, `approvalCard`, `asyncOperation`, `custom`.
+- Effects oficiales: `beam` para línea perimetral focal y `spectrum` para el equivalente gobernado del prompt "rainbow borders button" (anillo completo + gradiente desplazado + aura blur amplia).
+- Spectrum palettes oficiales: `axis` y `nexa`; `nexa` usa `GREENHOUSE_NEXA_BRAND_COLORS` para la variación con colores de marca.
+- Los colores se resuelven desde `theme.axis.*` / `theme.palette.*`; no hay HEX inline ni extensión de `tailwind.config`.
+- Motion: CSS `conic-gradient`/`linear-gradient` + `@property`/background-position con `prefers-reduced-motion` estático; el overlay es decorativo y respeta `border-radius: inherit`.
+- Lab interno `/design-system/border-beam` + scenario GVC `design-system-border-beam`; incluye CTA `button with border beam`, caja `Nexa glow box · spectrum`, variación `Nexa glow box · brand spectrum` y dos estados lab-only de la caja de envío Nexa (`inactive/sin texto` y `with text`).
+
 ## Delta 2026-06-13f — GreenhouseGradientBackground primitive
 
 Se creó `GreenhouseGradientBackground` para traer fondos degradados al Design System sin copiar el componente shadcn/Tailwind:
