@@ -141,6 +141,19 @@ const CATALOG_ITEMS: CatalogItem[] = [
     icon: 'tabler-border-corners'
   },
   {
+    id: 'nexa-provenance',
+    title: 'Nexa provenance trace',
+    description: 'Grounding canónico de Nexa: trust cue (inline), razonamiento (expandable) y evidencia bajo demanda (panel). Transversal por dominio.',
+    route: '/design-system/nexa-provenance',
+    category: 'Primitives',
+    kind: 'Primitive',
+    status: 'Hardening',
+    owner: 'NexaProvenanceTrace',
+    tags: ['nexa', 'grounding', 'trust cue', 'reasoning', 'proof', 'evidence', 'citas'],
+    searchAliases: ['procedencia', 'grounding', 'trust', 'razonamiento', 'evidencia', 'proof', 'nexa provenance'],
+    icon: 'tabler-shield-check'
+  },
+  {
     id: 'buttons',
     title: 'Buttons',
     description: 'Primitive para jerarquía de comandos, tono, iconos y estados async.',

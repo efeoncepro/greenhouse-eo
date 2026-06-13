@@ -189,7 +189,7 @@ export const scenario: CaptureScenario = {
     },
     {
       kind: 'wait',
-      selector: '[data-capture="nexa-answers-canvas-reasoning"]',
+      selector: '[data-capture="nexa-provenance-trace-expandable"]',
       timeout: 5000
     },
     {

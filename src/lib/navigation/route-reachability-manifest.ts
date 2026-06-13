@@ -258,6 +258,13 @@ export const DECLARED_CHILD_ROUTES: readonly ChildRouteDeclaration[] = [
       'Border Beam Lab — child surface del Design System para la primitive GreenhouseBorderBeam y sus variants/kinds de motion perimetral, alcanzable desde el catalogo canonico /design-system.'
   },
   {
+    route: '/design-system/nexa-provenance',
+    parent: '/design-system',
+    via: 'inline-link',
+    reason:
+      'Nexa Provenance Trace Lab (TASK-1103) — child surface del Design System para la primitive NexaProvenanceTrace (grounding canonico de Nexa: variants inline/expandable/panel + kinds knowledgeGrounded/signalPromoted/computed), alcanzable desde el catalogo canonico /design-system.'
+  },
+  {
     route: '/design-system/geometry',
     parent: '/design-system',
     via: 'inline-link',

@@ -143,6 +143,20 @@ export type {
 } from './nexa-expressive-text/nexa-expressive-text-types'
 export { default as NexaEvidencePanel } from './NexaEvidencePanel'
 export type { NexaEvidencePanelProps, NexaEvidencePanelVariant } from './NexaEvidencePanel'
+export { default as NexaProvenanceTrace } from './nexa-provenance-trace/NexaProvenanceTrace'
+export type {
+  NexaProvenanceStep,
+  NexaProvenanceTone,
+  NexaProvenanceTraceKind,
+  NexaProvenanceTraceProps,
+  NexaProvenanceTraceVariant,
+  NexaProvenanceTrustCue
+} from './nexa-provenance-trace/nexa-provenance-trace-types'
+export {
+  NEXA_PROVENANCE_TRACE_KIND_CONFIG,
+  resolveNexaProvenanceTraceVariant
+} from './nexa-provenance-trace/nexa-provenance-trace-controller'
+export type { NexaProvenanceTraceKindConfig } from './nexa-provenance-trace/nexa-provenance-trace-controller'
 export { default as NexaKnowledgeAnswerSurface } from './NexaKnowledgeAnswerSurface'
 export type {
   NexaKnowledgeAnswerModeOption,

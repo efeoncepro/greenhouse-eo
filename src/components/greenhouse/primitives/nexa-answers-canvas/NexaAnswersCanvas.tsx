@@ -13,6 +13,7 @@ import { Motion } from '@/components/greenhouse/motion'
 
 import NexaComposer, { NexaComposerActionButton, NexaComposerInput } from '../NexaComposer'
 import NexaEvidencePanel from '../NexaEvidencePanel'
+import NexaProvenanceTrace from '../nexa-provenance-trace/NexaProvenanceTrace'
 import GreenhouseButton from '../GreenhouseButton'
 import GreenhouseStatusDot from '../GreenhouseStatusDot'
 import GreenhouseThinkingBeat from '../GreenhouseThinkingBeat'
@@ -30,7 +31,6 @@ import type {
   NexaAnswersCanvasProps,
   NexaAnswersCanvasState,
   NexaAnswersCompactAnswerBlock,
-  NexaAnswersReasoningStep,
   NexaAnswersRenderPlan,
   NexaAnswersResponseControl,
   NexaAnswersSuggestedFollowUp
@@ -234,101 +234,6 @@ const CanvasErrorState = ({ state, copy }: { state: NexaAnswersCanvasState; copy
         </Typography>
       </Stack>
     </Box>
-  )
-}
-
-// Shimmer del footprint: ocupa el lugar donde aterrizará la respuesta mientras Nexa razona.
-// El barrido es decorativo → reduced-motion lo deja estático (sigue comunicando "viene acá").
-const AnswerFootprintShimmer = () => {
-  const theme = useTheme()
-
-  const sweep = `linear-gradient(100deg, ${alpha(theme.palette.primary.main, 0.05)} 30%, ${alpha(
-    theme.palette.primary.main,
-    0.13
-  )} 50%, ${alpha(theme.palette.primary.main, 0.05)} 70%)`
-
-  const bar = (inlineSize: string, blockSize = 12) => ({
-    inlineSize,
-    blockSize,
-    borderRadius: `${theme.shape.customBorderRadius.xs}px`,
-    background: sweep,
-    backgroundSize: '220% 100%',
-    '@keyframes nexa-answers-shimmer': {
-      '0%': { backgroundPosition: '180% 0' },
-      '100%': { backgroundPosition: '-80% 0' }
-    },
-    animation: 'nexa-answers-shimmer 1.5s linear infinite',
-    '@media (prefers-reduced-motion: reduce)': { animation: 'none', backgroundPosition: '50% 0' }
-  })
-
-  return (
-    <Box
-      aria-hidden='true'
-      data-capture='nexa-answers-canvas-shimmer'
-      sx={{
-        ml: { xs: 1.5, md: 2 },
-        border: `1px solid ${alpha(theme.palette.primary.main, 0.18)}`,
-        borderRadius: `${theme.shape.customBorderRadius.lg}px ${theme.shape.customBorderRadius.lg}px ${theme.shape.customBorderRadius.lg}px ${theme.shape.customBorderRadius.xs}px`,
-        backgroundColor: theme.palette.background.paper,
-        px: { xs: 4, md: 5 },
-        py: { xs: 4, md: 4.5 }
-      }}
-    >
-      <Stack spacing={2.25}>
-        <Box sx={bar('38%', 14)} />
-        <Box sx={bar('92%')} />
-        <Box sx={bar('80%')} />
-        <Box sx={{ ...bar('100%', 120), mt: 1 }} />
-      </Stack>
-    </Box>
-  )
-}
-
-// Razonamiento progresivo (fase 0 del despliegue, estilo AI Overview): pasos que avanzan
-// — done ✓ / active (beat) / pending — + el shimmer ocupando el footprint. El paso activo
-// se anuncia por un único live region (no duplicar con la identidad).
-const NexaReasoningTrace = ({ steps }: { steps: NexaAnswersReasoningStep[] }) => {
-  const theme = useTheme()
-  const activeStep = steps.find(step => step.status === 'active') ?? steps[steps.length - 1]
-
-  return (
-    <Stack spacing={3} data-capture='nexa-answers-canvas-reasoning'>
-      <Stack spacing={1.5} role='status' aria-live='polite'>
-        {steps.map(step => {
-          const done = step.status === 'done'
-          const active = step.status === 'active'
-
-          return (
-            <Stack key={step.id} direction='row' spacing={1.5} alignItems='center' sx={{ minInlineSize: 0 }}>
-              <Box sx={{ inlineSize: 20, display: 'grid', placeItems: 'center', flex: '0 0 auto' }}>
-                {done ? (
-                  <Box component='i' className='tabler-circle-check-filled' sx={{ color: theme.greenhouseSemantic.success.tonalText, fontSize: 18 }} />
-                ) : active ? (
-                  <GreenhouseThinkingBeat kind='nexa' variant='inline' motion='wave' dotCount={3} dotSize={5} />
-                ) : (
-                  <Box sx={{ inlineSize: 8, blockSize: 8, borderRadius: '50%', border: `1.5px solid ${alpha(theme.palette.text.disabled, 0.5)}` }} />
-                )}
-              </Box>
-              <Typography
-                variant='body2'
-                sx={{
-                  color: active ? 'text.primary' : 'text.secondary',
-                  fontWeight: active ? 600 : 400,
-                  opacity: step.status === 'pending' ? 0.6 : 1,
-                  transition: theme.transitions.create(['opacity', 'color'], { duration: theme.transitions.duration.shorter })
-                }}
-              >
-                {step.label}
-              </Typography>
-            </Stack>
-          )
-        })}
-        <Box component='span' data-gvc-ignore-layout='true' sx={visuallyHidden}>
-          {activeStep?.label}
-        </Box>
-      </Stack>
-      <AnswerFootprintShimmer />
-    </Stack>
   )
 }
 
@@ -745,7 +650,9 @@ const NexaAnswersCanvas = ({
             {isErrorState(state) ? (
               <CanvasErrorState state={state} copy={copy} />
             ) : preAnswer ? (
-              isReasoning && reasoningSteps && reasoningSteps.length > 0 ? <NexaReasoningTrace steps={reasoningSteps} /> : null
+              isReasoning && reasoningSteps && reasoningSteps.length > 0 ? (
+                <NexaProvenanceTrace variant='expandable' steps={reasoningSteps} showFootprint />
+              ) : null
             ) : isStreaming ? (
               streamingBlock ? <StreamingAnswerDraft block={streamingBlock} onStop={onStopGeneration} stopLabel={copy.stopLabel} /> : null
             ) : (
