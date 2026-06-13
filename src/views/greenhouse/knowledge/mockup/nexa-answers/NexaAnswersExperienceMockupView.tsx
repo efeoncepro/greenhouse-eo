@@ -2,6 +2,9 @@
 
 import { useEffect, useRef, useState } from 'react'
 
+import { flushSync } from 'react-dom'
+
+
 import Box from '@mui/material/Box'
 import Divider from '@mui/material/Divider'
 import GlobalStyles from '@mui/material/GlobalStyles'
@@ -12,6 +15,8 @@ import ToggleButtonGroup from '@mui/material/ToggleButtonGroup'
 import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 import { alpha, useTheme, type Theme } from '@mui/material/styles'
+
+import { startViewTransition } from '@/lib/motion/view-transition'
 
 import {
   GreenhouseBreadcrumbs,
@@ -280,8 +285,31 @@ const answerRenderPlan: NexaAnswersRenderPlan = {
   ]
 }
 
+// TASK-1102 — respuesta del SEGUNDO turno (el follow-up vivo). Es un turno DISTINTO del de Impacto:
+// id propio (`impact-followup`) → al avanzar, el Impacto se compacta al historial mientras este entra,
+// sin colisión de `view-transition-name`. Texto-only (sin chart) para mantener el mockup liviano.
+const followUpRenderPlan: NexaAnswersRenderPlan = {
+  ...answerRenderPlan,
+  id: 'knowledge-impact-followup-answer',
+  primaryBlockId: 'impact-followup',
+  blocks: [
+    {
+      id: 'impact-followup',
+      renderer: 'answerBubble',
+      rendererVersion: 'v1',
+      kind: 'knowledgeExplanationAnswer',
+      title: 'Por señal: el alza de Impacto viene de Cliente, no del volumen.',
+      body: 'Desglosado por señal, Cliente es la que más empuja Impacto en este período; Colaboración acompaña pero no lo explica por sí sola. Por eso el alza no es solo cantidad de actividad.',
+      metaLabel: 'Follow-up · answer-first',
+      points: answerPoints
+    }
+  ]
+}
+
+// El turno de Impacto, ya compactado en el historial. Su id ES el del turno vivo de `answerRenderPlan`
+// (`impact-chart`) → el browser morfea el answer vivo (grande) hacia esta versión compacta (chica, arriba).
 const previousImpactTurn: NexaAnswersCompactAnswerBlock = {
-  id: 'previous-impact-turn',
+  id: 'impact-chart',
   renderer: 'compactAnswer',
   rendererVersion: 'v1',
   title: 'Respuesta anterior: Impacto en ICO',
@@ -385,8 +413,15 @@ const ConversationSurface = ({
 
     if (!trimmed) return
 
-    setSubmittedFollowUp(trimmed)
-    setFollowUpDraft('')
+    // TASK-1102 — la compactación del turno previo morfea (View Transitions). `flushSync` fuerza
+    // el cambio de DOM dentro de la transición (setState async no actualiza a tiempo el snapshot).
+    // El helper degrada honesto sin soporte / reduced-motion (swap instantáneo).
+    void startViewTransition(() => {
+      flushSync(() => {
+        setSubmittedFollowUp(trimmed)
+        setFollowUpDraft('')
+      })
+    })
   }
 
   useEffect(() => {
@@ -409,7 +444,7 @@ const ConversationSurface = ({
       kind='knowledgeEmbedded'
       state={canvasState}
       surfaceContext={surfaceContext}
-      renderPlan={answerRenderPlan}
+      renderPlan={isFollowUp ? followUpRenderPlan : answerRenderPlan}
       question={mainQuestion}
       draft={followUpDraft}
       onDraftChange={setFollowUpDraft}
@@ -421,8 +456,12 @@ const ConversationSurface = ({
       reasoningSteps={buildReasoningSteps(reasoningStepIndex)}
       suggestedFollowUps={suggestedFollowUps}
       onSuggestedFollowUp={followUp => {
-        setSubmittedFollowUp(followUp.label)
-        setFollowUpDraft('')
+        void startViewTransition(() => {
+          flushSync(() => {
+            setSubmittedFollowUp(followUp.label)
+            setFollowUpDraft('')
+          })
+        })
       }}
       onResponseControl={onResponseControl}
       onStopGeneration={onStopGeneration}

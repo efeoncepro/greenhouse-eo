@@ -279,21 +279,37 @@ export const scenario: CaptureScenario = {
       note: 'Follow-ups sugeridos: pills de próxima pregunta tras la respuesta — la conversación sigue sin composer en blanco.'
     },
     {
+      kind: 'mark',
+      label: 'nexa-answers-compaction-before',
+      clipSelector: '[data-capture="nexa-answers-canvas-conversation"]',
+      note: 'TASK-1102 — ANTES: el turno de Impacto está vivo (answerBubble grande), sin historial.'
+    },
+    {
       kind: 'interaction',
       interaction: {
+        // TASK-1102 — al promover una sugerencia, el turno de Impacto se COMPACTA hacia el historial
+        // (View Transitions Tier 3: morph de tamaño+posición) mientras entra el turno nuevo de follow-up.
+        // reduced-motion: el helper degrada honesto a swap instantáneo (sin morph), contenido intacto.
         name: 'pick-suggested-followup',
-        intent: 'Tocar una pregunta sugerida la promueve a turno siguiente, sin escribir en el composer.',
+        intent: 'Tocar una sugerencia promueve el turno: el answer de Impacto se encoge hacia el historial (View Transitions) y entra el turno nuevo — spatial continuity, no un corte seco.',
         action: { kind: 'click', selector: '[data-capture="nexa-answers-canvas-suggested-followups"] button' },
+        reducedMotion: 'capture',
         keyboardEquivalent: {
           action: { kind: 'press', selector: '[data-capture="nexa-answers-canvas-suggested-followups"] button', key: 'Enter' },
           expected: 'Las preguntas sugeridas son operables por teclado (focus + Enter), no solo click.'
         },
         frames: [
           {
+            label: 'nexa-answers-compaction-during',
+            atMs: 150,
+            clipSelector: '[data-capture="nexa-answers-canvas-conversation"]',
+            note: 'DURANTE: el turno de Impacto morfea hacia su versión compactada (mid View Transition ~300ms).'
+          },
+          {
             label: 'nexa-answers-suggested-followup-promoted',
-            atMs: 300,
-            clipSelector: '[data-capture="nexa-answers-surface"]',
-            note: 'La sugerencia tocada sube como pregunta del turno siguiente.'
+            atMs: 700,
+            clipSelector: '[data-capture="nexa-answers-canvas-conversation"]',
+            note: 'ASENTADO: Impacto compactado en el historial (arriba) + el turno nuevo de follow-up vivo abajo.'
           }
         ]
       }

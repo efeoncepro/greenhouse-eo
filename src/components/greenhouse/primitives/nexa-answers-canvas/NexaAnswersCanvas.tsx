@@ -369,6 +369,24 @@ const renderPreviousTurn = (turn: NexaAnswersCompactAnswerBlock, renderPlan: Nex
     onProofToggle: () => undefined
   })
 
+// TASK-1102 — identidad de turno para View Transitions (Tier 3). Cada turno (vivo o compactado en
+// historial) lleva un `view-transition-name` estable derivado de su id → cuando el host avanza un
+// turno DENTRO de `startViewTransition`, el browser morfea el turno saliente (grande) hacia su
+// versión compactada (chica, arriba) = spatial continuity, sin reflow brusco. El nombre es inerte en
+// reposo (solo cuenta durante la transición) → no cambia el render estático. Contrato del host: para
+// que el morph conecte, un turno conserva su id al pasar de vivo (`primaryBlock`) a historial
+// (`previousTurns`); el turno NUEVO entrante usa un id distinto (sin colisión de nombre). El tuning
+// (duración/easing) + reduced-motion viven en `globals.css` (`.nexa-turn`), y el helper canónico
+// `startViewTransition` degrada honesto (sin soporte / reduced-motion → swap instantáneo).
+const NEXA_TURN_VIEW_TRANSITION_CLASS = 'nexa-turn'
+
+const nexaTurnViewTransitionName = (id: string): string => `nexa-turn-${id.replace(/[^a-zA-Z0-9_-]/g, '-')}`
+
+const turnViewTransitionStyle = (id: string) => ({
+  viewTransitionName: nexaTurnViewTransitionName(id),
+  viewTransitionClass: NEXA_TURN_VIEW_TRANSITION_CLASS
+})
+
 const NexaAnswersCanvas = ({
   mode = 'renderPlan',
   variant,
@@ -464,7 +482,12 @@ const NexaAnswersCanvas = ({
           <EmptyCanvas copy={copy} draft={draft} onDraftChange={onDraftChange} onSubmit={onSubmit} />
         ) : (
           <Stack spacing={4} data-capture='nexa-answers-canvas-conversation' sx={motionSx}>
-            {renderPlan && previousTurns.map(turn => <Box key={turn.id}>{renderPreviousTurn(turn, renderPlan, proofId)}</Box>)}
+            {renderPlan &&
+              previousTurns.map(turn => (
+                <Box key={turn.id} style={turnViewTransitionStyle(turn.id)}>
+                  {renderPreviousTurn(turn, renderPlan, proofId)}
+                </Box>
+              ))}
             {slots?.question ?? (question ? <QuestionBubble compact={state === 'followup'}>{question}</QuestionBubble> : null)}
             {slots?.identity ?? <NexaIdentity assistantName={copy.assistantName} status={identityStatus} label={identityLabel} />}
             {isErrorState(state) ? (
@@ -481,16 +504,20 @@ const NexaAnswersCanvas = ({
               // un hijo re-renderice; reduced-motion horneado).
               <Motion variant='stagger' as='div' style={{ display: 'flex', flexDirection: 'column', gap: '2rem', minInlineSize: 0 }}>
                 {slots?.answer ??
-                  (primaryBlock && renderPlan
-                    ? renderNexaAnswersBlock(primaryBlock, {
+                  (primaryBlock && renderPlan ? (
+                    // Turno vivo: nombre VT por `primaryBlock.id` → al avanzar el turno (host dentro de
+                    // `startViewTransition`) este bloque morfea hacia su versión compactada en historial.
+                    <Box style={turnViewTransitionStyle(primaryBlock.id)}>
+                      {renderNexaAnswersBlock(primaryBlock, {
                         proofOpen: isProofOpen,
                         thinking,
                         renderPlan,
                         proofPanelId: proofId,
                         onProofToggle: toggleProof,
                         onAction
-                      })
-                    : null)}
+                      })}
+                    </Box>
+                  ) : null)}
                 {onResponseControl ? (
                   <NexaResponseToolbar
                     variant='embedded'

@@ -6,6 +6,15 @@
 
 ---
 
+## Delta 2026-06-13j — Nexa Answers: compactación de turno con View Transitions (TASK-1102)
+
+En multi-turno, `NexaAnswersCanvas` compacta el turno previo (`answerBubble`→`compactAnswer`) y lo **encoge hacia el historial** mientras entra el turno nuevo, vía View Transitions API (Tier 3, same-document) — spatial continuity, no un corte seco.
+
+- Reusa el helper canónico `startViewTransition` (`@/lib/motion/view-transition`, TASK-525): feature-detection (fallback sync) + `prefers-reduced-motion` (swap instantáneo) horneados.
+- El canvas asigna `view-transition-name` por turno (vivo + cada `previousTurns`) + `view-transition-class: nexa-turn` — inerte en reposo (frames byte-idénticos). Contrato: el host conserva el id del turno al pasar de vivo a historial; el turno nuevo usa id distinto (sin colisión de nombre); la mutación va dentro de `startViewTransition` + `flushSync`.
+- CSS `::view-transition-group(.nexa-turn)` (globals.css) con token scale (medium 300ms + emphasized), sin tocar el `root` (route transition TASK-525). reduced-motion cubierto por el guard `*` + el helper.
+- Mockup `/knowledge/mockup/nexa-answers` + scenario `nexa-answers-surface` extendidos (no nuevos). GVC 0 findings.
+
 ## Delta 2026-06-13i — Nexa conversational feature-primitives (Provenance · ResponseToolbar · StreamingText) + contrato canónico
 
 Se extrajeron 3 mecanismos transversales del `NexaAnswersCanvas` a feature-primitives neutrales (P+V+K completo, migración byte-idéntica verificada en GVC), y se canonizó el contrato de la experiencia conversacional de Nexa.

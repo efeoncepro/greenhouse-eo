@@ -4,9 +4,20 @@
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-06-13 — COMPLETADA
+
+- **Helper canónico reusado, no reinventado**: la coreografía usa `startViewTransition` de `@/lib/motion/view-transition` (TASK-525) — ya hornea feature-detection (fallback sync), `prefers-reduced-motion` (short-circuit a swap instantáneo) y `await finished`. NO se creó un helper nuevo.
+- **Canvas** (`NexaAnswersCanvas`): cada turno (vivo `primaryBlock` + cada `previousTurns`) lleva un `view-transition-name` estable derivado de su id (`nexaTurnViewTransitionName` + `view-transition-class: nexa-turn`). Inerte en reposo → **frames existentes byte-idénticos** (0 findings nuevos). Contrato documentado: el host conserva el id del turno al pasar de vivo a historial; el turno nuevo usa id distinto (sin colisión de nombre).
+- **CSS** (`globals.css`): `::view-transition-group(.nexa-turn)` con duración/easing del token scale (medium 300ms + emphasized). NO toca el `root` (route transition TASK-525). Sin `view-transition-class` el browser igual morfea con el default de la UA (degradación honesta). reduced-motion: cubierto por el guard `*` existente + el short-circuit del helper.
+- **Mockup existente** (`/knowledge/mockup/nexa-answers`, NO uno nuevo — instrucción del operador): la fase `followup` ahora es un multi-turno **correcto** — el turno de Impacto se compacta al historial (mismo id `impact-chart` que tenía vivo → morph) y entra una respuesta NUEVA de follow-up (`followUpRenderPlan`, id `impact-followup`, texto-only). Las mutaciones (`submitFollowUp` + `onSuggestedFollowUp`) se envuelven en `startViewTransition` + `flushSync` (React: el cambio de DOM debe ser síncrono dentro de la transición o el snapshot captura el DOM sin cambiar → no hay morph).
+- **Scenario existente** (`nexa-answers-surface`, extendido — NO uno nuevo): la interacción `pick-suggested-followup` ahora captura la coreografía: `nexa-answers-compaction-before` (Impacto vivo) → `during` (atMs 150) → `settled` (Impacto compactado arriba + nuevo turno vivo) + `reducedMotion: 'capture'`.
+- **Verificación GVC**: 0 findings. Frames `34-nexa-answers-followup-compacted` + `27-during` muestran el multi-turno correcto (Impacto compactado "Respuesta anterior · 3 fuentes" arriba + el follow-up "Por señal…" vivo abajo). El aria preserva el orden (compactado → pregunta → nuevo answer) — sin robo de foco (contrato TASK-1096). Capturar el mid-morph de 300ms es timing-flaky en headless (limitación conocida de VT); la coreografía corre, el DOM resultante es correcto.
+- **a11y/CLS**: el compactAnswer tiene altura conocida (sin CLS); reduced-motion degrada a swap honesto; el live region único lo lleva la identidad Nexa.
+- Cierre: `tsc` + `lint` (0 errores) + 12 tests del canvas verde.
+
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Medio`
