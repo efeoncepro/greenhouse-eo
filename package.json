@@ -18,6 +18,7 @@
     "design:export:tailwind": "design.md export --format tailwind DESIGN.md",
     "codex:qa-hook:test": "node --check .codex/hooks/qa-release-stop-hook.mjs && node .codex/hooks/qa-release-stop-hook.mjs --self-test",
     "codex:task-hook": "node scripts/codex-task-hook.mjs",
+    "codex:task-hook:check": "node scripts/check-codex-task-harness.mjs",
     "epic:lint": "node scripts/ci/ops-artifact-lint.mjs --kind epic",
     "mini:lint": "node scripts/ci/ops-artifact-lint.mjs --kind mini",
     "ops:lint": "node scripts/ci/ops-lint.mjs",

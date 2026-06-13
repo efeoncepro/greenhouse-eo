@@ -1,6 +1,6 @@
 ---
 name: greenhouse-task-execution-hook
-description: Codex-only pre-execution hook for Greenhouse TASK-### implementation requests. Use when the operator asks Codex to implement or continue a TASK-###, references [TASK-###], or points to docs/tasks/**/TASK-###-*.md.
+description: Codex-only pre-execution hook for Greenhouse TASK-### implementation requests. Use when the operator asks Codex to implement or continue a TASK-###, uses slash-style aliases such as /implement-task or /task, references [TASK-###], or points to docs/tasks/**/TASK-###-*.md.
 ---
 
 # Greenhouse Task Execution Hook
@@ -14,6 +14,11 @@ Use this skill before implementing any formal Greenhouse `TASK-###`.
 
 Run this skill when the operator message includes any of:
 
+- `/implement-task TASK-###`
+- `/implement-task ###`
+- `/task TASK-###`
+- `/task ###`
+- `implement task TASK-###`
 - `TASK-###`
 - `[TASK-###]`
 - `docs/tasks/**/TASK-###-*.md`
@@ -27,6 +32,12 @@ Before writing code, run:
 
 ```bash
 pnpm codex:task-hook TASK-###
+```
+
+Bare numeric task ids are accepted too:
+
+```bash
+pnpm codex:task-hook ###
 ```
 
 If the operator says `mantente en develop`, `stay on develop`, or equivalent,
@@ -55,6 +66,8 @@ its temporary branch before closing unless the operator asks to keep it.
 - It blocks completed tasks and tasks with declared blockers.
 - It substitutes the canonical execution prompt from
   `docs/operations/CODEX_EXECUTION_PROMPT_V1.md`.
+- `pnpm codex:task-hook:check` verifies the hook, prompt, aliases, entrypoint
+  references, and a live active-task smoke.
 - This is not a Git hook or runtime listener; Codex must execute the command when
   this trigger matches.
 
@@ -66,3 +79,11 @@ When that prompt changes in a way that affects the trigger, command, branch
 override, or expected pre-execution behavior, update this skill in the same
 change. Do not create a Claude/Cursor counterpart for this hook unless the
 operator explicitly decides to make it cross-agent.
+
+After changing this skill, run:
+
+```bash
+pnpm codex:task-hook:check
+pnpm docs:closure-check
+pnpm docs:context-check
+```

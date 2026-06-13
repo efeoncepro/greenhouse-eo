@@ -1,11 +1,11 @@
 ---
 description: Implementa una TASK-### Greenhouse local-first (Discovery → Audit → Plan → Slices → Gates de cierre) con skills + GVC + reliability.
-argument-hint: TASK-### [notas opcionales, ej. "crea preview remoto" o "mantente en develop"]
+argument-hint: TASK-###|### [notas opcionales, ej. "crea preview remoto" o "mantente en develop"]
 ---
 
 # Implementar `$ARGUMENTS`
 
-Vas a implementar la task indicada en `$ARGUMENTS` (formato `TASK-###`; el resto son notas del operador). Por defecto **trabajas en `develop`, local-first, SIN push** (`local = taller`; el push remoto NO es cierre automático — espera instrucción explícita). Si toca UI, levanta `pnpm dev` y entrega la URL `localhost` exacta antes de pedir push.
+Vas a implementar la task indicada en `$ARGUMENTS` (formato `TASK-###` o número desnudo `###`; el resto son notas del operador). Por defecto **trabajas en `develop`, local-first, SIN push** (`local = taller`; el push remoto NO es cierre automático — espera instrucción explícita). Si toca UI, levanta `pnpm dev` y entrega la URL `localhost` exacta antes de pedir push.
 
 > **Fuente de verdad = `CLAUDE.md` + `AGENTS.md` (ya en tu contexto) + las skills + la spec de la task.** Este command es solo el **harness de proceso + checklist de gates**. NO re-declara reglas: aplica las canónicas vigentes de esos documentos. Si este harness contradice a `CLAUDE.md`, gana `CLAUDE.md` — y avísame para corregir el command (ver "Auto-mantenimiento" al final).
 
@@ -74,4 +74,4 @@ Resumen: slices, tests verdes, migrations, capabilities/events/signals, docs, KP
 ---
 
 ## Auto-mantenimiento de este command
-Si durante la task notás que este harness referencia un comando/gate/path/token **desactualizado** respecto a `CLAUDE.md`/`AGENTS.md`/skills/package.json, **flaggéalo al final** y propón el edit a este archivo (`.claude/commands/implement-task.md`). El governor documental lo trata como doc viva del repo.
+Si durante la task notás que este harness referencia un comando/gate/path/token **desactualizado** respecto a `CLAUDE.md`/`AGENTS.md`/skills/package.json, **flaggéalo al final** y propón el edit a este archivo (`.claude/commands/implement-task.md`). Si el drift toca la convivencia con Codex, correr también `pnpm codex:task-hook:check` y revisar `docs/operations/CODEX_EXECUTION_PROMPT_V1.md`. El governor documental lo trata como doc viva del repo.

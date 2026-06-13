@@ -1,5 +1,19 @@
 # Release 2026-06-10 #2 — develop→main `6c649b2a6` RELEASED
 
+## Sesion 2026-06-13 — Codex TASK harness recalibrado + drift guard (Codex)
+
+- **Qué cambió:** `docs/operations/CODEX_EXECUTION_PROMPT_V1.md` dejó de ser un prompt largo/stale y quedó como harness vivo: local-first, sin cambio de rama/worktree por defecto, sin branch/commit obligatorio por slice, matriz de skills Codex real y cierre con QA/docs proporcionales.
+- **Guardrail nuevo:** `pnpm codex:task-hook:check` (`scripts/check-codex-task-harness.mjs`) valida que el prompt tenga bloque extraíble, protocolo de actualización continua, aliases slash-style, entrypoints sincronizados y smoke del hook contra una task activa con `--develop`.
+- **Protocolo constante:** cualquier cambio a hook, prompt, skill TASK, entrypoints TASK, comandos/gates o inventario de skills referenciado debe correr `pnpm codex:task-hook:check` y actualizar `CODEX_EXECUTION_PROMPT_V1.md` en el mismo cambio si aplica.
+- **Docs/entrypoints sincronizados:** `.codex/skills/greenhouse-task-execution-hook/SKILL.md`, `AGENTS.md`, `CLAUDE.md`, `.claude/commands/implement-task.md`, `project_context.md`, `changelog.md`, `package.json`.
+
+## Sesion 2026-06-13 — Codex slash-style TASK aliases (Codex)
+
+- **Qué cambió:** el hook Codex de ejecución TASK ahora reconoce alias estilo slash: `/implement-task TASK-###`, `/implement-task ###`, `/task TASK-###` y `/task ###`.
+- **Runtime local:** `scripts/codex-task-hook.mjs` acepta ids numéricos desnudos (`1033`) y los normaliza a `TASK-1033`, además del formato previo `TASK-1033` y rutas `docs/tasks/**`.
+- **Docs/skill sincronizadas:** `docs/operations/CODEX_EXECUTION_PROMPT_V1.md`, `.codex/skills/greenhouse-task-execution-hook/SKILL.md`, `AGENTS.md`, `project_context.md` y `changelog.md`.
+- **Uso recomendado:** el operador puede escribir simplemente `/implement-task 1109 mantente en develop` o `/task TASK-1109`; Codex debe ejecutar `pnpm codex:task-hook 1109 --develop` cuando corresponda antes de implementar.
+
 ## Sesion 2026-06-13 — TASK-1109 Postgres dev pool self-healing creada (Codex)
 
 - **Task nueva:** `docs/tasks/to-do/TASK-1109-postgres-dev-pool-self-healing.md`.
