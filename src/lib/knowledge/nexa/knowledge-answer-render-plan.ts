@@ -128,9 +128,22 @@ const buildProofSpec = (
   return { ...base, evidence: knowledgePacketToConversationalEvidence(packet) }
 }
 
-/** Construye los puntos del answer bubble: cada pasaje citado lleva su marcador inline [n] (evidence-peek). */
-const buildGroundedPoints = (packet: KnowledgeRetrievalPacket, maxPoints: number): NexaAnswerPoint[] =>
-  packet.chunks.slice(0, maxPoints).map(chunk => {
+/**
+ * Construye los puntos del answer bubble: el MEJOR pasaje por documento (los chunks vienen score-ordered),
+ * cada uno con su marcador de cita inline [n] (evidence-peek). Dedup por documento → "N fuentes" == N puntos
+ * ("cada punto cita su origen"); el proof conserva TODOS los chunks (evidence completa).
+ */
+const buildGroundedPoints = (packet: KnowledgeRetrievalPacket, maxPoints: number): NexaAnswerPoint[] => {
+  const seenDocuments = new Set<string>()
+
+  const topChunkPerDocument = packet.chunks.filter(chunk => {
+    if (seenDocuments.has(chunk.documentId)) return false
+    seenDocuments.add(chunk.documentId)
+
+    return true
+  })
+
+  return topChunkPerDocument.slice(0, maxPoints).map(chunk => {
     const source = mapKnowledgeChunkToCitationSource(chunk)
     const title: NexaExpressiveTextValue = [{ text: chunk.title, style: 'strong' }]
 
@@ -142,6 +155,7 @@ const buildGroundedPoints = (packet: KnowledgeRetrievalPacket, maxPoints: number
 
     return { title, body }
   })
+}
 
 /**
  * Construye el `NexaAnswersRenderPlan` desde el packet de retrieval. SSOT de la presentación de Knowledge

@@ -131,6 +131,24 @@ describe('buildKnowledgeAnswerRenderPlan — domain adapter packet → renderPla
     expect(plan.proof.evidence?.sources).toHaveLength(3)
   })
 
+  it('deduplica puntos por documento: N fuentes == N puntos, proof conserva todos los chunks', () => {
+    const plan = buildKnowledgeAnswerRenderPlan(
+      packet({
+        chunks: [
+          chunk({ chunkId: 'c1', documentId: 'doc-1', score: 0.92 }),
+          chunk({ chunkId: 'c2', documentId: 'doc-1', score: 0.71 }), // mismo doc → no agrega punto
+          chunk({ chunkId: 'c3', documentId: 'doc-2', score: 0.66 })
+        ]
+      })
+    )
+
+    const block = plan.blocks[0]
+
+    if (block.renderer !== 'answerBubble') throw new Error('expected answerBubble')
+    expect(block.points).toHaveLength(2) // 2 documentos → 2 puntos
+    expect(plan.proof.evidence?.sources).toHaveLength(3) // proof conserva los 3 chunks
+  })
+
   it('el plan producido es montable en el canvas (allowlist answerBubble)', () => {
     const plan = buildKnowledgeAnswerRenderPlan(packet())
 
