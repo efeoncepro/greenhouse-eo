@@ -1,5 +1,13 @@
 # Release 2026-06-10 #2 — develop→main `6c649b2a6` RELEASED
 
+## Sesion 2026-06-13 — GreenhouseRoadmapTimeline primitive (Codex)
+
+- **Qué quedó:** se trajo el patrón `RoadmapCard` del prompt como primitive nativa `GreenhouseRoadmapTimeline` en `src/components/greenhouse/primitives/`, con variants `horizontal|stacked|compact`, kinds `productRoadmap|releasePlan|implementationPlan|clientOnboarding|custom` y estados `complete|active|pending|blocked`.
+- **Compatibilidad del prompt:** la primitive acepta aliases `done|in-progress|upcoming` y los normaliza a estados Greenhouse. No se agregó shadcn, Tailwind, `class-variance-authority` ni `/components/ui`.
+- **Design System:** nueva ruta interna `/design-system/roadmap-timeline`, entrada en catálogo, declaration en `route-reachability-manifest.ts` y scenario GVC `design-system-roadmap-timeline`.
+- **Frontera:** no reemplaza `GreenhouseActivityTimeline` (eventos/auditoría/handoffs) ni `GreenhouseStepperProgressMicro` (progreso operativo compacto). Es para roadmaps, release plans y horizontes de producto/onboarding.
+- **Verificación:** Vitest focal `GreenhouseRoadmapTimeline.test.tsx` verde; ESLint focal verde; `NODE_OPTIONS=--max-old-space-size=8192 pnpm exec tsc --noEmit --pretty false` verde; `pnpm design:lint`, `pnpm ops:lint --changed`, `pnpm route-reachability-gate` verdes. GVC canónico `design-system-roadmap-timeline` verde en `.captures/2026-06-13T18-59-36_design-system-roadmap-timeline` (desktop/mobile, `qualityFindings=[]`). Se corrigió el primer intento visual pesado: el specimen principal ahora usa el demo exacto del prompt (`Product Roadmap`, Q1-Q4 2023), con card compacta, rail fino, dots pequeños sobre la línea y badge por periodo; también se corrigió el solape en stacked/mobile separando el rail del contenido.
+
 ## Sesion 2026-06-13 — ISSUE-095 Sentry source-map token 403 documentado (Codex)
 
 - **Qué falta:** el guardrail de `ISSUE-093` evita deploys de 45m/failures, pero Sentry sigue rechazando `sentry-cli releases new` / source-map upload con `403 You do not have permission to perform this action`.

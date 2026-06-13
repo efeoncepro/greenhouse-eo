@@ -6,6 +6,18 @@
 
 ---
 
+## Delta 2026-06-13k — GreenhouseRoadmapTimeline primitive
+
+Se creó `GreenhouseRoadmapTimeline` para traer el patrón `RoadmapCard` del prompt al Design System como primitive Greenhouse, sin `/components/ui`, shadcn, Tailwind ni `class-variance-authority`.
+
+- Primitive nueva en `src/components/greenhouse/primitives/GreenhouseRoadmapTimeline.tsx`.
+- Variants oficiales: `horizontal`, `stacked`, `compact`.
+- Kinds iniciales: `productRoadmap`, `releasePlan`, `implementationPlan`, `clientOnboarding`, `custom`; el resolver `kind→variant` mantiene defaults idempotentes.
+- Estados canónicos: `complete`, `active`, `pending`, `blocked`; acepta aliases del prompt (`done`, `in-progress`, `upcoming`) vía `normalizeGreenhouseRoadmapTimelineStatus()`.
+- Frontera: no reemplaza `GreenhouseActivityTimeline` (eventos/auditoría/handoffs) ni `GreenhouseStepperProgressMicro` (progreso operativo compacto). Su uso es horizonte de producto, release plan o roadmap narrativo.
+- A11y/responsive: `section` con `role='region'`, ordered list, `aria-current='step'` en el item activo, status textual además de color, wrapping defensivo y reduced-motion.
+- Lab interno `/design-system/roadmap-timeline` + scenario GVC `design-system-roadmap-timeline`.
+
 ## Delta 2026-06-13j — Nexa Answers: compactación de turno con View Transitions (TASK-1102)
 
 En multi-turno, `NexaAnswersCanvas` compacta el turno previo (`answerBubble`→`compactAnswer`) y lo **encoge hacia el historial** mientras entra el turno nuevo, vía View Transitions API (Tier 3, same-document) — spatial continuity, no un corte seco.

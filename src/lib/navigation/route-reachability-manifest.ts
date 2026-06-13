@@ -188,6 +188,13 @@ export const DECLARED_CHILD_ROUTES: readonly ChildRouteDeclaration[] = [
       'Breadcrumbs Lab — child surface del Design System para la primitive GreenhouseBreadcrumbs basada en AXIS Figma, alcanzable desde el catalogo canonico /design-system.'
   },
   {
+    route: '/design-system/roadmap-timeline',
+    parent: '/design-system',
+    via: 'inline-link',
+    reason:
+      'Roadmap Timeline Lab — child surface del Design System para la primitive GreenhouseRoadmapTimeline (roadmaps, release plans y horizontes de producto), alcanzable desde el catalogo canonico /design-system.'
+  },
+  {
     route: '/design-system/charts',
     parent: '/design-system',
     via: 'inline-link',

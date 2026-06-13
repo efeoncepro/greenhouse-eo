@@ -205,6 +205,19 @@ const CATALOG_ITEMS: CatalogItem[] = [
     icon: 'tabler-slash'
   },
   {
+    id: 'roadmap-timeline',
+    title: 'Roadmap timeline',
+    description: 'Primitive para roadmaps, release plans y horizontes de producto con periodos, estados y kinds gobernados.',
+    route: '/design-system/roadmap-timeline',
+    category: 'Primitives',
+    kind: 'Primitive',
+    status: 'Hardening',
+    owner: 'GreenhouseRoadmapTimeline',
+    tags: ['roadmap', 'timeline', 'release', 'nexa'],
+    searchAliases: ['roadmap', 'roadmap card', 'release plan', 'timeline', 'momentos', 'nexa moments', 'q1', 'trimestre'],
+    icon: 'tabler-timeline-event'
+  },
+  {
     id: 'chips',
     title: 'Chips',
     description: 'Primitive para estados compactos, atributos, identidad, filtros y entradas removibles.',

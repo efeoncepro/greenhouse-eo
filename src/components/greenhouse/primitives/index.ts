@@ -469,6 +469,19 @@ export type {
   GreenhouseStepperProgressStep,
   GreenhouseStepperProgressVariant
 } from './GreenhouseStepperProgressMicro'
+export {
+  default as GreenhouseRoadmapTimeline,
+  normalizeGreenhouseRoadmapTimelineStatus,
+  resolveGreenhouseRoadmapTimelineVariant
+} from './GreenhouseRoadmapTimeline'
+export type {
+  GreenhouseRoadmapTimelineItem,
+  GreenhouseRoadmapTimelineKind,
+  GreenhouseRoadmapTimelineProps,
+  GreenhouseRoadmapTimelineStatus,
+  GreenhouseRoadmapTimelineStatusAlias,
+  GreenhouseRoadmapTimelineVariant
+} from './GreenhouseRoadmapTimeline'
 export { default as GreenhouseEvidenceAttachmentDropzone } from './GreenhouseEvidenceAttachmentDropzone'
 export type {
   GreenhouseEvidenceAttachmentDropzoneProps,

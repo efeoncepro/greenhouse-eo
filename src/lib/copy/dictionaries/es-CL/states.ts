@@ -20,6 +20,7 @@ export const states: StatesCopy = {
   cancelled: 'Cancelado',
   archived: 'Archivado',
   scheduled: 'Programado',
+  upcoming: 'Próximo',
   paused: 'Pausado',
   expired: 'Vencido',
   blocked: 'Bloqueado',
