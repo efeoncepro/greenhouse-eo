@@ -1,5 +1,13 @@
 # Release 2026-06-10 #2 — develop→main `6c649b2a6` RELEASED
 
+## Sesion 2026-06-13 — ISSUE-087 / TASK-1106 Account 360 delivery schema drift (Codex)
+
+- **Qué quedó documentado:** se creó `ISSUE-087` para el Sentry `JAVASCRIPT-NEXTJS-7H` (`GET /api/organization/[id]/360`, `column "rpa_median" does not exist`) y `TASK-1106` para resolverlo de fondo. Esta sesión documenta y planifica; no aplica el fix runtime.
+- **Causa raíz verificada:** `src/lib/account-360/facets/delivery.ts` lee `rpa_median`, `pipeline_velocity` y `stuck_asset_pct` desde `greenhouse_serving.organization_operational_metrics`, pero Cloud SQL confirma que esa tabla es compacta y no tiene esas columnas. La query ofensiva reproduce `42703 column "rpa_median" does not exist`; `ico_organization_metrics` sí tiene la forma rica.
+- **Dónde se rompió:** commit `1f06d26a835d5ae07f94253fb3ead29a32bb7283` (2026-06-09, `feat(organizations): harden enterprise workspace runtime`) cambió el facet para preferir `organization_operational_metrics` y UNION con `ico_organization_metrics`, copiando la forma rica sobre la tabla compacta. Históricamente, `7846de5a0` creó la tabla compacta y `72d22ccf` ya tenía un helper más defensivo (`getOrganizationOperationalServing`) con aliases/fallbacks.
+- **Plan canónico:** ejecutar `TASK-1106` con migración/proyección/reader/guardrails alineados. No cerrar con parche frágil de un solo `NULL AS rpa_median`; decidir y formalizar el contrato de `organization_operational_metrics`, agregar smoke live PostgreSQL para el facet `delivery` y resolver `ISSUE-087` solo con evidencia runtime + Sentry quiet.
+- **Coordinación:** había WIP ajeno en `src/components/greenhouse/primitives/index.ts` y `src/components/greenhouse/primitives/nexa-response-toolbar/`; no tocar ni stagear junto con este incidente.
+
 ## Sesion 2026-06-13 — Spotlight card Nexa brand variations (Codex)
 
 - **Qué quedó:** `GreenhouseSpotlightCard` suma tres kinds Nexa adicionales: `nexaBrandCore` (azul core más definido), `nexaBrandSignal` (teal más activo) y `nexaBrandGlass` (highlight blanco/teal más sobrio). No sustituyen `nexaBrand`; amplían la misma primitive.

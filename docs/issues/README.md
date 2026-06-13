@@ -64,7 +64,7 @@ Tasks, docs de arquitectura, o commits relacionados.
 
 ## Siguiente ID disponible
 
-`ISSUE-087`
+`ISSUE-088`
 
 ## Open
 
@@ -79,6 +79,7 @@ Tasks, docs de arquitectura, o commits relacionados.
 | `ISSUE-058` | [Teams Finance Alerts webhook not provisioned in GCP Secret Manager](open/ISSUE-058-teams-finance-alerts-webhook-not-provisioned.md) | staging + production | 2026-04-26 | open (mitigated via `pending_setup`, awaiting Azure Logic App deploy from TASK-669) |
 | `ISSUE-067` | [Vitest jsdom warning por Lottie en `ServicesListView` empty state](open/ISSUE-067-jsdom-canvas-warning-lottie-empty-state-fetch-mock.md) | local test suite + CI logs | 2026-05-07 | open |
 | `ISSUE-081` | ["Días de retraso" no congela tiempo no imputable (freeze roto: `frozenDays`=0) → penaliza OTD% y bonus](open/ISSUE-081-dias-retraso-freeze-roto-frozendays-cero-penaliza-otd-bonus.md) | production (Efeonce) | 2026-05-23 | open |
+| `ISSUE-087` | [Account 360 delivery facet falla por drift de columnas RpA en serving cache](open/ISSUE-087-account-360-delivery-rpa-median-schema-drift.md) | preview | 2026-06-12 | open |
 
 ## Resolved
 
