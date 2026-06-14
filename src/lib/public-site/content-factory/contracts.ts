@@ -78,6 +78,28 @@ export type ContentFactoryValidation = {
   summary?: Record<string, unknown>
 }
 
+export type GutenbergHeadingOutlineItem = {
+  level: number
+  text: string
+  index: number
+}
+
+export type GutenbergBlogpostCompositionProfile = {
+  contractVersion: 'gutenbergBlogpostCompositionProfile.v1'
+  key: 'efeonce_blogpost'
+  description: string
+  requiredBlocks: string[]
+  recommendedBlocks: string[]
+  tableOfContentsBlock: 'yoast-seo/table-of-contents'
+  minHeadingCount: number
+  minLevel2HeadingCount: number
+  minStructuredBlockCount: number
+  maxHeadingJump: number
+  disallowedGeneratedBlocks: string[]
+  mediaBlocks: string[]
+  enrichmentBlocks: string[]
+}
+
 export type ContentFactoryDraftSmokePlan = {
   contractVersion: 'contentFactoryDraftSmokePlan.v1'
   generatedAt: string

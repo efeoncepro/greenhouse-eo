@@ -1,13 +1,16 @@
 import type {
   ContentFactoryGeneratedDraft,
   ContentFactoryValidation,
-  ContentFactoryValidationFinding
+  ContentFactoryValidationFinding,
+  GutenbergBlogpostCompositionProfile,
+  GutenbergHeadingOutlineItem
 } from './contracts'
 import { resolveContentFactoryValidationStatus } from './contracts'
 
 export type GutenbergDraftValidationOptions = {
   allowedBlocks?: string[]
   allowFreeform?: boolean
+  compositionProfile?: GutenbergBlogpostCompositionProfile | false
 }
 
 export type ParsedGutenbergBlockComment = {
@@ -36,6 +39,23 @@ const DEFAULT_ALLOWED_GUTENBERG_BLOCKS = [
   'core/spacer',
   'yoast-seo/table-of-contents'
 ]
+
+export const EFEONCE_BLOGPOST_COMPOSITION_PROFILE: GutenbergBlogpostCompositionProfile = {
+  contractVersion: 'gutenbergBlogpostCompositionProfile.v1',
+  key: 'efeonce_blogpost',
+  description:
+    'Efeonce blog posts should be generated as structured Gutenberg editorial pieces, not plain paragraph dumps.',
+  requiredBlocks: ['core/heading', 'core/paragraph', 'core/list', 'yoast-seo/table-of-contents'],
+  recommendedBlocks: ['core/quote', 'core/separator', 'core/image', 'core/embed'],
+  tableOfContentsBlock: 'yoast-seo/table-of-contents',
+  minHeadingCount: 3,
+  minLevel2HeadingCount: 2,
+  minStructuredBlockCount: 5,
+  maxHeadingJump: 1,
+  disallowedGeneratedBlocks: ['core/freeform'],
+  mediaBlocks: ['core/image', 'core/embed'],
+  enrichmentBlocks: ['core/list', 'core/quote', 'core/separator', 'core/image', 'core/embed']
+}
 
 const BLOCK_COMMENT_PATTERN = /<!--\s*(\/)?wp:([A-Za-z0-9_-]+(?:\/[A-Za-z0-9_-]+)?)(?:\s+({[\s\S]*?}))?\s*(\/)?-->/gi
 
@@ -125,6 +145,47 @@ const collectAnchors = (blocks: ParsedGutenbergBlockComment[]) =>
     return [anchor, ...className.split(/\s+/)].filter((value): value is string => Boolean(value?.trim()))
   })
 
+const stripHtml = (value: string) =>
+  value
+    .replace(BLOCK_COMMENT_PATTERN, '')
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+
+const inferHeadingLevel = (block: ParsedGutenbergBlockComment, postContent: string, nextBlockIndex: number) => {
+  const attrLevel = typeof block.attrs.level === 'number' ? block.attrs.level : null
+
+  if (attrLevel) return attrLevel
+
+  const blockSlice = postContent.slice(block.index, nextBlockIndex)
+  const htmlLevel = blockSlice.match(/<h([1-6])\b/i)?.[1]
+
+  return htmlLevel ? Number(htmlLevel) : 2
+}
+
+const collectHeadingOutline = (
+  postContent: string,
+  blocks: ParsedGutenbergBlockComment[]
+): GutenbergHeadingOutlineItem[] => {
+  const headings: GutenbergHeadingOutlineItem[] = []
+
+  for (const [blockIndex, block] of blocks.entries()) {
+    if (block.closing || block.blockName !== 'core/heading') continue
+
+    const nextBlockIndex = blocks[blockIndex + 1]?.index ?? postContent.length
+    const blockSlice = postContent.slice(block.index, nextBlockIndex)
+    const text = stripHtml(blockSlice)
+
+    headings.push({
+      level: inferHeadingLevel(block, postContent, nextBlockIndex),
+      text,
+      index: block.index
+    })
+  }
+
+  return headings
+}
+
 const hasUnsafeMarkup = (postContent: string) =>
   /<\s*script\b/i.test(postContent) ||
   /<\s*iframe\b/i.test(postContent) ||
@@ -195,6 +256,116 @@ const validateMetadata = (draft: ContentFactoryGeneratedDraft, findings: Content
   }
 }
 
+const validateBlogpostCompositionProfile = ({
+  blockNames,
+  findings,
+  headingOutline,
+  profile
+}: {
+  blockNames: string[]
+  findings: ContentFactoryValidationFinding[]
+  headingOutline: GutenbergHeadingOutlineItem[]
+  profile: GutenbergBlogpostCompositionProfile
+}) => {
+  const blockNameSet = new Set(blockNames)
+
+  for (const blockName of profile.requiredBlocks) {
+    if (!blockNameSet.has(blockName)) {
+      findings.push({
+        severity: 'block',
+        code: 'blogpost_required_block_missing',
+        message: `Efeonce blogpost composition requires ${blockName}.`,
+        path: 'draft.postContent'
+      })
+    }
+  }
+
+  for (const blockName of profile.disallowedGeneratedBlocks) {
+    if (blockNameSet.has(blockName)) {
+      findings.push({
+        severity: 'warning',
+        code: 'blogpost_legacy_block_generated',
+        message: `${blockName} is observable in legacy posts but should not be generated for new Content Factory drafts.`,
+        path: 'draft.postContent'
+      })
+    }
+  }
+
+  if (headingOutline.length < profile.minHeadingCount) {
+    findings.push({
+      severity: 'block',
+      code: 'blogpost_heading_outline_too_thin',
+      message: `Efeonce blogposts require at least ${profile.minHeadingCount} content headings for a scannable outline.`,
+      path: 'draft.postContent'
+    })
+  }
+
+  const level2Count = headingOutline.filter(heading => heading.level === 2).length
+
+  if (level2Count < profile.minLevel2HeadingCount) {
+    findings.push({
+      severity: 'block',
+      code: 'blogpost_level2_headings_missing',
+      message: `Post content should include at least ${profile.minLevel2HeadingCount} H2 sections because the WordPress title is the page H1.`,
+      path: 'draft.postContent'
+    })
+  }
+
+  for (const heading of headingOutline) {
+    if (heading.level <= 1) {
+      findings.push({
+        severity: 'block',
+        code: 'blogpost_h1_inside_content',
+        message: 'Generated Gutenberg post content must not include H1 blocks; WordPress owns the post title H1.',
+        path: `draft.postContent[${heading.index}]`
+      })
+    }
+  }
+
+  for (let index = 1; index < headingOutline.length; index += 1) {
+    const previous = headingOutline[index - 1]
+    const current = headingOutline[index]
+
+    if (current.level - previous.level > profile.maxHeadingJump) {
+      findings.push({
+        severity: 'block',
+        code: 'blogpost_heading_hierarchy_jump',
+        message: `Heading hierarchy jumps from H${previous.level} to H${current.level}.`,
+        path: `draft.postContent[${current.index}]`
+      })
+    }
+  }
+
+  const structuredBlockCount = blockNames.filter(blockName => blockName !== 'core/paragraph').length
+
+  if (structuredBlockCount < profile.minStructuredBlockCount) {
+    findings.push({
+      severity: 'block',
+      code: 'blogpost_structured_blocks_too_thin',
+      message: `Generated post is too flat; expected at least ${profile.minStructuredBlockCount} non-paragraph structure blocks.`,
+      path: 'draft.postContent'
+    })
+  }
+
+  if (!profile.mediaBlocks.some(blockName => blockNameSet.has(blockName))) {
+    findings.push({
+      severity: 'info',
+      code: 'blogpost_media_slot_recommended',
+      message: 'Efeonce blogposts can include image or embed slots; resolve real media before write when the brief calls for visual proof.',
+      path: 'draft.postContent'
+    })
+  }
+
+  if (!profile.enrichmentBlocks.some(blockName => blockNameSet.has(blockName))) {
+    findings.push({
+      severity: 'block',
+      code: 'blogpost_enrichment_block_missing',
+      message: 'Generated post needs at least one enrichment block such as list, quote, separator, image or embed.',
+      path: 'draft.postContent'
+    })
+  }
+}
+
 export const validateGeneratedGutenbergDraft = (
   draft: ContentFactoryGeneratedDraft,
   options: GutenbergDraftValidationOptions = {}
@@ -217,6 +388,8 @@ export const validateGeneratedGutenbergDraft = (
   const allowedBlocks = new Set(options.allowedBlocks ?? DEFAULT_ALLOWED_GUTENBERG_BLOCKS)
   const blockNames = openingBlocks.map(block => block.blockName)
   const uniqueBlockNames = Array.from(new Set(blockNames)).sort()
+  const headingOutline = collectHeadingOutline(postContent, blocks)
+  const compositionProfile = options.compositionProfile ?? EFEONCE_BLOGPOST_COMPOSITION_PROFILE
 
   if (!postContent.trim()) {
     findings.push({
@@ -286,6 +459,15 @@ export const validateGeneratedGutenbergDraft = (
     })
   }
 
+  if (compositionProfile) {
+    validateBlogpostCompositionProfile({
+      blockNames,
+      findings,
+      headingOutline,
+      profile: compositionProfile
+    })
+  }
+
   if (postContent.length < 600) {
     findings.push({
       severity: 'warning',
@@ -327,6 +509,9 @@ export const validateGeneratedGutenbergDraft = (
     summary: {
       blockCount: openingBlocks.length,
       uniqueBlocks: uniqueBlockNames,
+      headingOutline,
+      hasTableOfContents: blockNames.includes('yoast-seo/table-of-contents'),
+      hasMedia: blockNames.some(blockName => compositionProfile && compositionProfile.mediaBlocks.includes(blockName)),
       greenhouseAnchors
     }
   }

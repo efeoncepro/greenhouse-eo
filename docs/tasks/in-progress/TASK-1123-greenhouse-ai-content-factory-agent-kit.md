@@ -302,6 +302,14 @@ Reglas obligatorias:
 #### Slice 4 implementation note — 2026-06-14
 
 - Estado: `in-progress`.
+- Correction from operator feedback: the draft smoke/send lane is premature unless the kit first understands how Efeonce blogposts are composed. Current priority is the Gutenberg blogpost composition model: TOC, H2/H3 hierarchy, paragraphs, lists, quotes, separators, media/embed slots and legacy `core/freeform` handling.
+- Live read-only WP-CLI sample of six latest posts confirmed recent Efeonce posts are Gutenberg and structurally rich:
+  - `249766`: 81 blocks, H2/H3 outline, 8 images, many legacy `core/freeform`.
+  - `249768`: 220 blocks, `yoast-seo/table-of-contents`, H2/H3/H4, gallery/image/quote/columns/buttons/groups.
+  - `249383`: 137 blocks, `yoast-seo/table-of-contents`, H2/H3, lists, separators.
+  - `249056`: 671 blocks, `yoast-seo/table-of-contents`, H2/H3, lists, quote, separators.
+  - `249111`: 860 blocks, `yoast-seo/table-of-contents`, H2/H3, quotes, lists, separators.
+  - `249114`: 449 blocks, `yoast-seo/table-of-contents`, H2/H3, lists, separators.
 - First primitive shipped:
   - `src/lib/public-site/content-factory/contracts.ts`
   - `src/lib/public-site/content-factory/gutenberg-validator.ts`
@@ -315,12 +323,15 @@ Reglas obligatorias:
 - Safety: non-mutating; validates local JSON artifacts only and never calls WordPress.
 - Current behavior:
   - Blocks non-Gutenberg lanes/kinds, invalid slugs, missing title/SEO, unsafe markup (`script`, `iframe`, inline event handlers, `javascript:` URLs), invalid block JSON attributes, unbalanced Gutenberg block comments and unsupported block names.
+  - Applies `EFEONCE_BLOGPOST_COMPOSITION_PROFILE`: requires TOC, H2/H3 outline depth, no H1 in body, no heading hierarchy jumps, minimum non-paragraph structure, and explicit enrichment blocks.
   - Warns on legacy `core/freeform`, missing heading/paragraph, short editorial content, observed block mismatch and missing `gh-*` anchors for refresh/fix drafts.
+  - Emits an informational media-slot finding when no real image/embed block is present, because assets must be resolved before write instead of invented.
 - Evidence:
-  - Vitest focal covers pass, unsafe markup block, unsupported block block and legacy freeform warning.
+  - Vitest focal covers pass, flat paragraph-only block, heading hierarchy jumps, unsafe markup block, unsupported block block and legacy freeform warning.
   - CLI smoke with local temp `contentFactoryGeneratedDraft.v1` returned `status=pass`.
   - Golden example validated with `status=pass`: `docs/documentation/public-site/content-factory-golden-examples/gutenberg-post-ai-revops-draft.json`.
   - Planner smoke from local `contentFactoryBrief.v1` produced a valid generated draft and validator returned `status=pass`.
+  - Recipe documented at `docs/documentation/public-site/gutenberg-post-authoring-recipes.md`.
 
 ### Slice 5 — CLI and Evidence Lane for Agents
 

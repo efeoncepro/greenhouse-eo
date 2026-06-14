@@ -36,7 +36,14 @@ describe('planGeneratedGutenbergPostDraft', () => {
       slug: 'ai-para-operaciones-comerciales',
       draft: {
         kind: 'gutenberg_post',
-        observedBlocks: ['core/heading', 'core/list', 'core/paragraph', 'core/quote']
+        observedBlocks: [
+          'core/heading',
+          'core/list',
+          'core/paragraph',
+          'core/quote',
+          'core/separator',
+          'yoast-seo/table-of-contents'
+        ]
       }
     })
     expect(validation.status).toBe('pass')

@@ -36,10 +36,6 @@ const buildPostContent = (brief: ContentFactoryBrief) => {
   const ctaTarget = sentence(brief.cta.target)
 
   return [
-    '<!-- wp:heading {"level":2} -->',
-    `<h2>${escapeHtml(objective)}</h2>`,
-    '<!-- /wp:heading -->',
-    '',
     '<!-- wp:paragraph -->',
     `<p>${escapeHtml(
       `Para ${audience}, ${keyword} no deberia partir desde una herramienta aislada. El punto de partida es entender que decision comercial queremos mejorar, que datos sostienen esa decision y que evidencia necesita revisar una persona antes de actuar.`
@@ -49,6 +45,33 @@ const buildPostContent = (brief: ContentFactoryBrief) => {
     '<!-- wp:paragraph -->',
     `<p>${escapeHtml(
       `El enfoque de Efeonce es tratar la AI como una capacidad operacional: contexto claro, contratos verificables, trazabilidad y una ruta de revision humana. Eso permite producir contenido, propuestas o acciones con velocidad sin perder gobierno.`
+    )}</p>`,
+    '<!-- /wp:paragraph -->',
+    '',
+    '<!-- wp:heading {"level":2} -->',
+    '<h2>TL;DR</h2>',
+    '<!-- /wp:heading -->',
+    '',
+    '<!-- wp:list -->',
+    '<ul>',
+    `<li>${escapeHtml(`Objetivo operativo: ${objective}.`)}</li>`,
+    `<li>${escapeHtml(`Publico prioritario: ${audience}.`)}</li>`,
+    `<li>${escapeHtml(`Oferta conectada: ${offer}.`)}</li>`,
+    `<li>${escapeHtml('El draft debe mantenerse en revision humana antes de cualquier publicacion.')}</li>`,
+    '</ul>',
+    '<!-- /wp:list -->',
+    '',
+    '<!-- wp:yoast-seo/table-of-contents -->',
+    '<div class="wp-block-yoast-seo-table-of-contents yoast-table-of-contents"><h2>Tabla de contenidos</h2></div>',
+    '<!-- /wp:yoast-seo/table-of-contents -->',
+    '',
+    '<!-- wp:heading {"level":2} -->',
+    `<h2>${escapeHtml(objective)}</h2>`,
+    '<!-- /wp:heading -->',
+    '',
+    '<!-- wp:paragraph -->',
+    `<p>${escapeHtml(
+      `Un blogpost de Efeonce debe ayudar a decidir, no solo explicar. Por eso la estructura importa tanto como el texto: cada seccion debe responder una pregunta, separar el contexto de la accion y dejar claro que evidencia se necesita para avanzar.`
     )}</p>`,
     '<!-- /wp:paragraph -->',
     '',
@@ -71,8 +94,8 @@ const buildPostContent = (brief: ContentFactoryBrief) => {
     )}</p>`,
     '<!-- /wp:paragraph -->',
     '',
-    '<!-- wp:heading {"level":3} -->',
-    '<h3>Senales que conviene revisar</h3>',
+    '<!-- wp:heading {"level":2} -->',
+    '<h2>Senales que conviene revisar</h2>',
     '<!-- /wp:heading -->',
     '',
     '<!-- wp:paragraph -->',
@@ -94,6 +117,10 @@ const buildPostContent = (brief: ContentFactoryBrief) => {
       'La AI aporta valor cuando trabaja con contexto, restricciones y evidencia, no cuando opera como una caja negra.'
     )}</p></blockquote>`,
     '<!-- /wp:quote -->',
+    '',
+    '<!-- wp:separator -->',
+    '<hr class="wp-block-separator has-alpha-channel-opacity"/>',
+    '<!-- /wp:separator -->',
     '',
     '<!-- wp:paragraph -->',
     `<p>${escapeHtml(
@@ -134,7 +161,14 @@ export const planGeneratedGutenbergPostDraft = (brief: ContentFactoryBrief): Con
     draft: {
       kind: 'gutenberg_post',
       postContent: buildPostContent(brief),
-      observedBlocks: ['core/heading', 'core/list', 'core/paragraph', 'core/quote']
+      observedBlocks: [
+        'core/heading',
+        'core/list',
+        'core/paragraph',
+        'core/quote',
+        'core/separator',
+        'yoast-seo/table-of-contents'
+      ]
     },
     attribution: {
       campaignId: brief.campaignId,

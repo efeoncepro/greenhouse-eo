@@ -10,6 +10,10 @@ Rules:
   `pnpm public-website:content-factory:validate -- --file <path>`.
 - Prefer Gutenberg block comments and governed blocks for posts.
 - Avoid `core/freeform` in new drafts, even though legacy posts use it.
+- Match the Efeonce blogpost composition profile: intro, TL;DR/list,
+  `yoast-seo/table-of-contents`, H2/H3 outline, enrichment blocks and governed
+  metadata. See `../gutenberg-post-authoring-recipes.md`.
+- Treat image/video as media slots until a real WordPress media ID or valid
+  source URL is resolved; do not invent asset IDs in golden examples.
 - Keep secrets, private client data and unpublished campaign details out of
   golden examples.
-

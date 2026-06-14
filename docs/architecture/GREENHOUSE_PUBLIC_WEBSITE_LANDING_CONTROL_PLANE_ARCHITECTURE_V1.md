@@ -317,6 +317,7 @@ Builder module vocabulary:
 - Gutenberg modules are `blockName` entries such as `core/paragraph`, `core/image`, `core/group`, `yoast-seo/table-of-contents` or third-party blocks.
 - Elementor modules are `widgetType` entries such as `ohio_heading`, `ohio_service_table`, `hubspot-form` or core Elementor widgets.
 - Greenhouse readers should normalize both as inspectable content modules, while preserving the native source field (`blockName` or `widgetType`) for precise patch planning.
+- Blogpost generation must use the governed `EFEONCE_BLOGPOST_COMPOSITION_PROFILE`: WordPress owns the post-title H1, generated post content starts at H2, long editorial drafts include a Yoast TOC, and agents must compose paragraphs, headings, lists, quotes, separators and real media/embed slots as distinct Gutenberg blocks. Legacy `core/freeform` is inspectable for existing content, not a default generated block.
 
 ## 7. Landing Manifest Contract
 

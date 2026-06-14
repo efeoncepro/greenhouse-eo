@@ -8760,6 +8760,11 @@ Validations: tsc 0 errors, lint 0 errors, 427 files / 2225 tests pass / 5 skippe
 - Finance / Quote edit: al reabrir una cotización el builder ahora rehidrata `businessLineCode` desde la quote canónica y re-simula usando la `quoteDate` original en vez de la fecha actual, reduciendo drift silencioso en pricing.
 - Finance API: los intentos de guardar líneas catalog-backed sin pricing resuelto ya no revientan como `500` vacío; las rutas de quotes devuelven error JSON `422` con mensaje explícito para create/edit/autosave.
 
+## 2026-06-14
+
+- Public Site / Content Factory: se agregó el perfil `EFEONCE_BLOGPOST_COMPOSITION_PROFILE` para validar posts Gutenberg estructurados con TOC, jerarquía H2/H3, listas, quotes/separadores y slots reales de media/embed, evitando drafts AI planos compuestos solo por párrafos.
+- Public Site / Agent Kit: se documentó la receta de composición de blogposts a partir de inspección WP-CLI read-only de posts recientes de `efeoncepro.com`, incluyendo manejo de `core/freeform` como deuda legacy observable y no como bloque generado por defecto.
+
 ## 2026-04-13
 
 - Nubox sync hardening: el raw sync ya no depende solo de la ventana reciente; ahora combina hot window configurable con historical sweep rotativo persistido, para que documentos tardíos o rectificaciones históricas no queden fuera indefinidamente.
