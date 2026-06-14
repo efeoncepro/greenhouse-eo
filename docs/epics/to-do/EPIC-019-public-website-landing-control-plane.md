@@ -54,7 +54,7 @@ Sin un epic, el trabajo tenderia a partir con un script o endpoint aislado que p
 
 | Task | Phase | Status | Purpose |
 | --- | --- | --- | --- |
-| `TASK-TBD` | `0` | `planned` | WordPress/Kinsta discovery + read-only inventory: inspect theme/builder/plugins, create server-side connectors, sync pages/posts/templates/plugins/backups/cache status without writes. |
+| `TASK-1111` | `0` | `in-progress` | WordPress/Kinsta discovery + read-only inventory: public REST/Abilities inventory shipped first; authenticated abilities/theme/plugins/SEO/Kinsta inspection remains blocked on technical credentials. |
 | `TASK-TBD` | `1` | `planned` | WordPress bridge plugin foundation: private namespace, Abilities API registrations, auth/signature verification, health endpoint, metadata contract and draft-only write path in safe target. |
 | `TASK-TBD` | `2` | `planned` | Landing manifest + template registry: canonical schema, revision model, SEO/CTA/HubSpot metadata, validation and audit records. |
 | `TASK-TBD` | `3` | `planned` | Greenhouse Landing Ops UI V1: internal surface for inventory, draft creation, review, preview status and operational states. |

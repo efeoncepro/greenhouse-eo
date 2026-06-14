@@ -34,6 +34,7 @@ La documentacion funcional no reemplaza el manual ni la arquitectura. Explica qu
 
 ### Plataforma interna y calidad
 
+- [Public Site WordPress — Layout Ohio + Elementor](public-site/wordpress-ohio-elementor-layout.md) — contrato funcional del sitio publico Efeonce en WordPress/Kinsta cuando Ohio + Elementor producen desfases de contenedor, con causa raiz del incidente `/blog` 2026-06-14 y guardrails para no romper el sidebar fijo ni el hero.
 - [Knowledge Platform (foundation)](plataforma/knowledge-platform.md) — qué es el corpus gobernado de conocimiento (manuales/SOP/runbooks/glosarios) para la capa humana + Nexa con citas, qué guarda el schema `greenhouse_knowledge`, y por qué el estado del documento y el permiso de Nexa son dos cosas separadas. Foundation TASK-1081 (sin UI/Notion/Nexa todavía).
 - [Experiencia Conversacional de Nexa](plataforma/nexa-conversational-experience.md) — cómo funciona la lente Nexa (preguntar y recibir respuesta-primero con grounding, evidencia bajo demanda y chrome de confianza): la coreografía paso a paso, las piezas que la componen, el modelo de confianza y por qué es una sola experiencia reutilizable en todo el portal (Knowledge primero, no único). Contrato técnico: `architecture/ui-platform/CONVERSATIONAL_EXPERIENCE.md`
 - [API Platform Ecosystem](plataforma/api-platform-ecosystem.md) — nueva lane ecosystem-facing de APIs machine-to-machine: cómo funciona hoy, qué expone, cómo convive con `/api/integrations/v1/*`, cómo sirve al MCP local/remoto y cuál es el camino correcto de hardening sin romper consumers actuales
