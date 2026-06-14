@@ -9,7 +9,7 @@
 - Reversibility: `Two-way-but-slow` (aditivo + opt-in + flag; revertir tras adopción de varias surfaces es costoso, pero el path `LayoutContent` legacy queda intacto para las que no opten)
 - Confidence: `Medium`
 - Blast radius: **Large** (toca el shell que usa cada superficie) → tratado como cuadrante STOP: ADR antes de código + rollout staged + instrumentación de reversibilidad
-- Companion architecture (post-aceptación): `docs/architecture/GREENHOUSE_COMPOSITION_SHELL_UI_PLATFORM_V1.md` (a redactar al aceptar)
+- Companion architecture: `docs/architecture/GREENHOUSE_COMPOSITION_SHELL_UI_PLATFORM_V1.md` (TASK-1114 Slice 1, 2026-06-13)
 - Implementation task: pendiente — generar vía `greenhouse-task-planner` al aceptar
 - Validated as of: `2026-06-13` (runtime: `LayoutContent`, `AdaptiveSidecarLayout`, `NexaMomentComposition` placement `composed`)
 

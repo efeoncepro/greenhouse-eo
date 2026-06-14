@@ -2,7 +2,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -93,7 +93,9 @@ Reglas obligatorias:
 
 ## Scope
 
-### Slice 1 — Companion architecture spec
+### Slice 1 — Companion architecture spec ✓ (2026-06-13)
+
+> Hecho: `docs/architecture/GREENHOUSE_COMPOSITION_SHELL_UI_PLATFORM_V1.md` — modelo de regiones/composiciones/estados + contrato de fluidez (A/B/C/D) + API consumer + breakpoints M3 + a11y + degradación + frontera V1/V2 + seam Adaptive Card + protocolo de primitive. Próximo: Slice 2 (primitive + controller).
 
 - Redactar `GREENHOUSE_COMPOSITION_SHELL_UI_PLATFORM_V1.md`: contrato de regiones + composiciones + máquina de estados + `min-inline-size` por región + tabla `kind → composición` + contrato a11y + degradación.
 - **Mapear las composiciones a "canonical layouts" estilo M3** + declarar el comportamiento por breakpoint (compact/medium/expanded): qué regiones colapsan/reflowean en cada size class (`aside` → `overlay`/`temporary` en compact).
