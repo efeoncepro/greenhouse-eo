@@ -67,6 +67,7 @@ Reglas obligatorias:
 
 - TASK-1110 (su `NexaMomentComposition` se migra al substrato como gate + piloto).
 - TASK-1115 (Adaptive Card — capacidad hermana del contenido; seam = container query; no bloquea el piloto).
+- Follow-ups del substrato: **TASK-1119** (hardening V1.1 — guards/baseline/lint/telemetry, aditivo, independiente) · **TASK-1117** (fluidity enrichment V1.2 — buttery/shared-element/stagger/drawer, gated al piloto) · **TASK-1118** (V2 cross-route).
 - `AdaptiveSidecarLayout` (TASK-1028) + `OrganizationWorkspaceShell` (TASK-611) — migración oportunista post-V1.
 
 ### Files owned
