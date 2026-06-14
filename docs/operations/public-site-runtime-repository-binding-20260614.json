@@ -1,0 +1,52 @@
+{
+  "contractVersion": "public-site-repository-binding.v1",
+  "createdAt": "2026-06-14T13:55:00Z",
+  "site": {
+    "url": "https://efeoncepro.com",
+    "runtime": "wordpress",
+    "hosting": "kinsta",
+    "wordpressPath": "/www/efeoncegroup_752/public"
+  },
+  "repository": {
+    "provider": "github",
+    "owner": "efeoncepro",
+    "name": "efeonce-public-site-runtime",
+    "url": "https://github.com/efeoncepro/efeonce-public-site-runtime",
+    "visibility": "private",
+    "defaultBranch": "main",
+    "baselineSha": "0fa6bfd",
+    "baselineTag": "baseline-2026-06-14-live"
+  },
+  "governedPaths": [
+    "wp-content/themes/ohio-child",
+    "wp-content/plugins/eo-headless-content",
+    "wp-content/plugins/eo-vibe-coding-api",
+    "wp-content/plugins/greenhouse-wp-bridge"
+  ],
+  "initialBaseline": {
+    "sourceExport": "tmp/public-site-code-baselines/2026-06-14T13-47-14-635Z/",
+    "repoManifest": "manifests/live-baseline-2026-06-14T134717Z.json",
+    "liveFilesObserved": 49,
+    "baselineFilesTracked": 47,
+    "excludedLiveFiles": [
+      "wp-content/themes/ohio-child/assets/css/blog-page-meta-backup-20260614015717.txt",
+      "wp-content/themes/ohio-child/assets/css/contacto-page-meta-backup-202606140-bg-continuity.json"
+    ]
+  },
+  "excludedByPolicy": [
+    "WordPress uploads/media",
+    "database dumps",
+    "Kinsta/environment config",
+    "secrets/.env/cookies/auth headers",
+    "Elementor generated CSS under wp-content/uploads/elementor/css",
+    "*.bak and *.bak-* emergency/session artifacts",
+    "*backup* live emergency/session artifacts"
+  ],
+  "pending": [
+    "Greenhouse data model/readers for repository binding and drift state",
+    "non-mutating deploy diff/dry-run lane from repo artifact to Kinsta target",
+    "branch protection/release policy for efeonce-public-site-runtime",
+    "cleanup decision for excluded live backup files on Kinsta",
+    "Kinsta API token for cache/backups operations"
+  ]
+}

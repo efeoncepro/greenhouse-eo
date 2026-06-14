@@ -8,16 +8,16 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio-Alto`
 - Type: `implementation`
 - Epic: `EPIC-019`
-- Status real: `Discovery inicial listo; helper read-only de export live code agregado y probado; falta reconciliar repo/path de deploy antes de construir el bridge`
+- Status real: `In progress; repo runtime privado creado, baseline live inicial pusheado y binding manifest registrado; faltan data model/readers Greenhouse y deploy dry-run`
 - Rank: `TBD`
 - Domain: `platform|commercial|marketing-ops|integrations|wordpress|release`
-- Blocked by: `TASK-1111 Kinsta API gap puede diferirse, pero la baseline live-vs-repo debe completarse antes de TASK-1116 write path`
+- Blocked by: `none`
 - Branch: `task/TASK-1122-public-site-code-baseline-gitops-binding`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -93,10 +93,11 @@ Reglas obligatorias:
 ### Files owned
 
 - `docs/operations/public-site-repository-control-plane-discovery-20260614.md`
-- `docs/tasks/to-do/TASK-1122-public-site-code-baseline-gitops-binding.md`
+- `docs/tasks/in-progress/TASK-1122-public-site-code-baseline-gitops-binding.md`
 - `docs/architecture/GREENHOUSE_PUBLIC_WEBSITE_LANDING_CONTROL_PLANE_ARCHITECTURE_V1.md`
 - `docs/epics/to-do/EPIC-019-public-website-landing-control-plane.md`
-- Future public-site runtime repo/path: `[to confirm]`
+- `docs/operations/public-site-runtime-repository-binding-20260614.json`
+- Runtime repo/path: `https://github.com/efeoncepro/efeonce-public-site-runtime`
 
 ## Current Repo State
 
@@ -106,12 +107,14 @@ Reglas obligatorias:
 - `/Users/jreye/Documents/efeonce-sp`: WordPress operational repo with child theme and custom plugins, remote `cesargrowth11/efeonce-sp`.
 - Live Kinsta WordPress active theme `ohio-child`; active custom plugins `eo-headless-content` and `eo-vibe-coding-api`.
 - Discovery doc with first repo/runtime comparison.
+- Governed runtime repo: `https://github.com/efeoncepro/efeonce-public-site-runtime` (private), baseline `0fa6bfd`, tag `baseline-2026-06-14-live`.
+- Binding manifest: `docs/operations/public-site-runtime-repository-binding-20260614.json`.
 
 ### Gap
 
-- No governed `efeoncepro/*` repo/path is confirmed as source of deployable WordPress runtime code.
-- Live Kinsta includes child-theme and plugin drift not guaranteed in local repos.
 - No Greenhouse data model exists for repo binding, baseline SHA, file manifest, deploy artifact or code drift.
+- No non-mutating deploy/diff dry-run lane exists yet from repo artifact to Kinsta target.
+- Branch protection/release policy for `efeonce-public-site-runtime` is not configured/documented yet.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -223,6 +226,11 @@ Greenhouse should show repo status to the operator, but direct GitHub interactio
 - Manifest exported 49 files from live Kinsta code candidates.
 - Found: `ohio-child`, `eo-headless-content`, `eo-vibe-coding-api`.
 - Missing: `eo-ohio-elementor-widgets`, `eo-ohio-gutenberg-blocks`, `ohio-hubspot-form-styler`.
+- 2026-06-14 follow-up export: `tmp/public-site-code-baselines/2026-06-14T13-47-14-635Z/`.
+- Created private repo `efeoncepro/efeonce-public-site-runtime`.
+- Initial runtime baseline commit pushed: `0fa6bfd`.
+- Initial baseline tag pushed: `baseline-2026-06-14-live`.
+- Baseline tracks 47 canonical files; excludes 2 live backup artifacts recorded in `manifests/live-baseline-2026-06-14T134717Z.json`.
 
 ### Risk matrix
 

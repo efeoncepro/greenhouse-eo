@@ -153,6 +153,18 @@ pnpm public-website:export-live-code
 
 The command exports only governed code candidates from Kinsta into ignored `tmp/public-site-code-baselines/<timestamp>/`, plus a SHA-256 `manifest.json`. The manifest is the first input for Greenhouse drift modeling; the exported files are not canonical until a governed `efeoncepro/*` runtime repo is chosen.
 
+Initial repository binding established on 2026-06-14:
+
+- Repository: `efeoncepro/efeonce-public-site-runtime`
+- URL: `https://github.com/efeoncepro/efeonce-public-site-runtime`
+- Visibility: private
+- Default branch: `main`
+- Initial baseline SHA: `0fa6bfd`
+- Initial baseline tag: `baseline-2026-06-14-live`
+- Binding manifest: `docs/operations/public-site-runtime-repository-binding-20260614.json`
+
+This binding is a code/versioning baseline only. It does not yet authorize automated deployment to Kinsta; deployment remains pending a dry-run/release task.
+
 Target posture:
 
 ```text

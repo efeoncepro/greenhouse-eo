@@ -138,7 +138,21 @@ GitHub remains necessary because WordPress code is filesystem code:
 
 Use a governed WordPress-runtime repository as the deploy source for Kinsta code, surfaced inside Greenhouse.
 
-Preferred path:
+Selected path as of 2026-06-14:
+
+1. Created private repository `efeoncepro/efeonce-public-site-runtime`.
+2. Imported canonical runtime code from the read-only Kinsta live export:
+   - `wp-content/themes/ohio-child`
+   - `wp-content/plugins/eo-headless-content`
+   - `wp-content/plugins/eo-vibe-coding-api`
+3. Excluded 2 live backup artifacts from the baseline:
+   - `wp-content/themes/ohio-child/assets/css/blog-page-meta-backup-20260614015717.txt`
+   - `wp-content/themes/ohio-child/assets/css/contacto-page-meta-backup-202606140-bg-continuity.json`
+4. Initial baseline commit: `0fa6bfd`
+5. Initial baseline tag: `baseline-2026-06-14-live`
+6. Binding manifest in Greenhouse repo: `docs/operations/public-site-runtime-repository-binding-20260614.json`
+
+The following was the decision path that led to it:
 
 1. Create or transfer a repository under `efeoncepro`, e.g. `efeonce-public-site-runtime`.
 2. Import only canonical runtime code:

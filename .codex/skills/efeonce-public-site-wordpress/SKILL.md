@@ -39,6 +39,7 @@ Pair with `wp-rest-api`, `wp-wpcli-and-ops`, `wp-abilities-api`, `wp-interactivi
 - Secret reference for the current Application Password: `public-website-wordpress-application-password`. Never print or commit the value. Rotate before production because the value was pasted during the working session.
 - Kinsta API token is still pending for cache/environment/backups automation. Do not claim cache-clear or backup automation is operational until verified.
 - Repository/control-plane discovery on 2026-06-14: `efeoncepro/efeonce-web` is an Astro/headless historical rebuild and is not the current live WordPress/Ohio/Elementor runtime source. The closest local WordPress operational repo is `/Users/jreye/Documents/efeonce-sp`, but its remote is `cesargrowth11/efeonce-sp` and it is not reconciled with Kinsta live. `TASK-1122` must establish a GitOps baseline/repo binding before `TASK-1116` implements `greenhouse-wp-bridge`.
+- Runtime repo binding established on 2026-06-14: private repo `efeoncepro/efeonce-public-site-runtime`, default branch `main`, baseline SHA `0fa6bfd`, tag `baseline-2026-06-14-live`, binding manifest `docs/operations/public-site-runtime-repository-binding-20260614.json`. The repo currently tracks canonical live `ohio-child`, `eo-headless-content`, and `eo-vibe-coding-api`; `greenhouse-wp-bridge` should be introduced there after `TASK-1122` finishes the Greenhouse drift/deploy contract.
 
 ## Safety Rules
 
