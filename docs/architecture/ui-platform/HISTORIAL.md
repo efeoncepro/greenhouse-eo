@@ -6,6 +6,17 @@
 
 ---
 
+## Delta 2026-06-14 (c) — Coreografía del cambio de densidad (reveal/unfold + rise + stagger) + frontera SSR
+
+La densidad ya se adaptaba (Delta b), pero el cambio entre modos **popeaba**. Ahora es una **coreografía escalonada** ("Transformer"), horneada en los card primitives — opt-in, SSR-safe, reduced-motion horneado, default byte-idéntico.
+
+- **Reveal/unfold por pieza** (`MetricSummaryCard`/`MetricTrendCard`): texto = unfold de altura (`height:0↔auto`), chart = fade + **rise** (`cardDensityRevealRisePx`); **stagger** en orden de lectura (`cardDensityRevealStaggerSec`) + desync caja(200ms)/contenido(300ms). Tokens en `card-density-motion.ts` (derivados del SoT).
+- **Frontera dura:** el chart va SIEMPRE en modo fade (`animateHeight=false`) — `height:auto` sobre el `ResponsiveContainer` de Recharts = loop infinito por su ResizeObserver. El texto (sin ResizeObserver) sí hace unfold.
+- **Fix distorsión:** `layout='position'` (no `'size'`) → framer no escala la caja, el texto no se estira en el morph de ancho. **Fix loop:** `useContainerDensity` solo hace `setState` al cruzar un breakpoint (anti-loop ResizeObserver↔framer).
+- **Contención de scroll horizontal (clase TASK-742/ISSUE-015), en la primitive:** sr-only del chart contenida con `position:relative`; `Box` padre del `ResponsiveContainer` con `minWidth:0`+`overflowX:'clip'`; `split` apila en xs.
+- **Hallazgo SSR:** la orquestación macro del shell vía `staggerChildren` de framer **NO es SSR-safe** (variant inheritance no SSR-renderiza estilos de hijos → hydration mismatch). Se descartó; la secuencia es dueña del shell pero SSR-safe (índice central + reveal explícito por región). Demo "secuencia macro" (cascada de varias cards) vive en el Lab vía `useAnimate`+`stagger` (client-only), **no es primitive** aún.
+- `pnpm build` exit 0 · vitest 44/44 · lint+tsc 0 · 0 `Maximum update depth` (carga + drag, desktop+mobile 390px). Docs: PRIMITIVES.md (fila Adaptive Card density) + ADR `GREENHOUSE_COMPOSITION_SHELL_DECISION_V1.md` Delta 2026-06-14 (d). Commit `e21bcb145`.
+
 ## Delta 2026-06-14 (b) — Adaptive Card density contract (TASK-1115, hermana del Composition Shell)
 
 Capacidad **compartida** (no un componente card nuevo): los cards se adaptan a SU propio ancho (container query) → cuando una región del Composition Shell condensa, el card muestra una versión real más chica en vez de clipear. Cierra la fluidez en el micro.

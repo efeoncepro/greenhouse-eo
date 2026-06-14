@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
@@ -11,6 +11,8 @@ import Typography from '@mui/material/Typography'
 import { CompositionShell, type CompositionShellComposition } from '@/components/greenhouse/primitives'
 import MetricSummaryCard from '@/components/greenhouse/primitives/MetricSummaryCard'
 import MetricTrendCard, { type MetricTrendPoint } from '@/components/greenhouse/primitives/MetricTrendCard'
+import { MOTION_DURATION_S, MOTION_EASE } from '@/components/greenhouse/motion/core/tokens'
+import { useAnimate, stagger } from '@/libs/FramerMotion'
 import { startViewTransition } from '@/lib/motion/view-transition'
 
 /**
@@ -78,6 +80,48 @@ const SpecimenRow = ({ title, render }: { title: string; render: (width: number)
 
 const modeForWidth = (w: number): string => (w < 200 ? 'peek' : w < 360 ? 'condensed' : 'full')
 
+/**
+ * Monta su contenido SOLO cuando entra al viewport (IntersectionObserver, `rootMargin` adelantado). El Lab
+ * acumula muchos charts pesados (Recharts × N); montarlos todos en el primer paint lo hace lento. Con lazy-mount
+ * el primer paint renderiza solo lo de arriba; cada sección monta al hacer scroll. Reserva alto para no saltar
+ * el layout. Compatible con GVC (al hacer scroll a un mark, la sección monta y se captura).
+ */
+const LazyMount = ({ children, minHeight = 360 }: { children: ReactNode; minHeight?: number }) => {
+  const ref = useRef<HTMLDivElement | null>(null)
+  const [shown, setShown] = useState(false)
+
+  useEffect(() => {
+    if (shown) return
+    const node = ref.current
+
+    if (!node || typeof IntersectionObserver === 'undefined') {
+      setShown(true)
+
+      return
+    }
+
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setShown(true)
+          io.disconnect()
+        }
+      },
+      { rootMargin: '300px' }
+    )
+
+    io.observe(node)
+
+    return () => io.disconnect()
+  }, [shown])
+
+  return (
+    <Box ref={ref} sx={{ minHeight: shown ? undefined : minHeight }}>
+      {shown ? children : null}
+    </Box>
+  )
+}
+
 const CardDensityLabView = () => {
   const [composition, setComposition] = useState<CompositionShellComposition>('split')
   // Driver continuo: el ancho del contenedor cambia gradualmente → la container query de las cards dispara
@@ -88,6 +132,24 @@ const CardDensityLabView = () => {
   const changeComposition = (next: CompositionShellComposition) => {
     if (next === composition) return
     void startViewTransition(() => setComposition(next))
+  }
+
+  // Secuencia MACRO: orquestación garantizada de varias cards como UNA coreografía escalonada (el "Transformer
+  // armándose"). Imperativo vía `useAnimate` → corre SOLO en el cliente al apretar el botón (post-mount) →
+  // SSR-safe (las cards renderizan en estado final; la animación no toca el primer paint). `stagger` garantiza
+  // el orden + el beat; no hay variant inheritance (lo que rompía SSR en el shell). Tokens canónicos.
+  const [seqScope, animateSeq] = useAnimate()
+  const emphasized = MOTION_EASE.emphasized.cubicBezier ?? undefined
+
+  const playSequence = () => {
+    // estado inicial (oculto) instantáneo, luego la cascada
+    void animateSeq('[data-seq-card]', { opacity: 0, y: 24 }, { duration: 0 }).then(() =>
+      animateSeq(
+        '[data-seq-card]',
+        { opacity: 1, y: 0 },
+        { delay: stagger(0.1), duration: MOTION_DURATION_S.medium, ease: emphasized }
+      )
+    )
   }
 
   return (
@@ -161,42 +223,116 @@ const CardDensityLabView = () => {
       </Box>
     </Stack>
 
-    <SpecimenRow
-      title='MetricSummaryCard (KPI)'
-      render={() => (
-        <MetricSummaryCard
-          density='auto'
-          title='RpA Global'
-          value='1.27'
-          subtitle='benchmark adaptado · dato confiable'
-          icon='tabler-target-arrow'
-          iconColor='primary'
-          tooltip='Rondas por aprobación'
-          statusLabel='Confiable'
-          statusTone='success'
-          statusIcon='tabler-circle-check'
-        />
-      )}
-    />
+    {/* Secuencia MACRO — apretá "Reproducir" y mirá la cascada escalonada: la coreografía orquestada. */}
+    <Stack spacing={4} data-capture='secuencia-macro-section'>
+      <Box>
+        <Typography variant='h5'>Secuencia macro — el Transformer armándose</Typography>
+        <Typography variant='body2' color='text.secondary' sx={{ mt: 1 }}>
+          Apretá <strong>Reproducir</strong>: las cards entran en <strong>secuencia escalonada</strong> — cada una
+          arranca un beat después de la anterior, no todas juntas. Es la coreografía orquestada y garantizada: el
+          orden y el ritmo los gobierna un solo dueño (<code>stagger</code>). Imperativo + client-only → SSR-safe.
+        </Typography>
+      </Box>
+      <Box>
+        <Button
+          variant='contained'
+          startIcon={<i className='tabler-player-play-filled' />}
+          onClick={playSequence}
+          data-capture='secuencia-macro-play'
+        >
+          Reproducir secuencia
+        </Button>
+      </Box>
+      <Box
+        ref={seqScope}
+        sx={{
+          display: 'grid',
+          gap: 4,
+          gridTemplateColumns: { xs: '1fr', sm: 'repeat(3, minmax(0, 1fr))' },
+          alignItems: 'start',
+          '& > *': { minWidth: 0 }
+        }}
+      >
+        <Box data-seq-card>
+          <MetricTrendCard
+            title='OTD%'
+            metricName='On-Time Delivery'
+            periodLabel='Mensual · May 2026'
+            value={87.4}
+            series={TREND_SERIES}
+            tone='success'
+            format='percentage'
+            deltaUnit='pts'
+          />
+        </Box>
+        <Box data-seq-card>
+          <MetricSummaryCard
+            title='RpA Global'
+            value='1.27'
+            subtitle='benchmark adaptado'
+            icon='tabler-target-arrow'
+            iconColor='primary'
+            statusLabel='Confiable'
+            statusTone='success'
+            statusIcon='tabler-circle-check'
+          />
+        </Box>
+        <Box data-seq-card>
+          <MetricTrendCard
+            title='RpA'
+            metricName='Rondas por aprobación'
+            periodLabel='Mensual · May 2026'
+            value={1.27}
+            series={RPA_SERIES}
+            tone='success'
+            format='decimal'
+            deltaUnit='pts'
+          />
+        </Box>
+      </Box>
+    </Stack>
 
-    <SpecimenRow
-      title='MetricTrendCard (KPI + tendencia)'
-      render={() => (
-        <MetricTrendCard
-          density='auto'
-          title='OTD%'
-          metricName='On-Time Delivery'
-          periodLabel='Mensual · May 2026'
-          value={87.4}
-          series={TREND_SERIES}
-          tone='success'
-          format='percentage'
-          deltaUnit='pts'
-        />
-      )}
-    />
+    <LazyMount>
+      <SpecimenRow
+        title='MetricSummaryCard (KPI)'
+        render={() => (
+          <MetricSummaryCard
+            density='auto'
+            title='RpA Global'
+            value='1.27'
+            subtitle='benchmark adaptado · dato confiable'
+            icon='tabler-target-arrow'
+            iconColor='primary'
+            tooltip='Rondas por aprobación'
+            statusLabel='Confiable'
+            statusTone='success'
+            statusIcon='tabler-circle-check'
+          />
+        )}
+      />
+    </LazyMount>
+
+    <LazyMount>
+      <SpecimenRow
+        title='MetricTrendCard (KPI + tendencia)'
+        render={() => (
+          <MetricTrendCard
+            density='auto'
+            title='OTD%'
+            metricName='On-Time Delivery'
+            periodLabel='Mensual · May 2026'
+            value={87.4}
+            series={TREND_SERIES}
+            tone='success'
+            format='percentage'
+            deltaUnit='pts'
+          />
+        )}
+      />
+    </LazyMount>
 
     {/* The Seam (La Costura) — las dos capacidades jugando juntas dentro de un shell real. */}
+    <LazyMount minHeight={520}>
     <Stack spacing={4} data-capture='the-seam-section'>
       <Box>
         <Typography variant='h5'>The Seam (La Costura) — Composition Shell × Adaptive Card</Typography>
@@ -277,6 +413,7 @@ const CardDensityLabView = () => {
         }}
       />
     </Stack>
+    </LazyMount>
   </Stack>
   )
 }
