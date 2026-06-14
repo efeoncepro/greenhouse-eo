@@ -351,6 +351,14 @@ Reglas obligatorias:
   - Reads local JSON only; does not call WordPress.
   - Validates target post id, source fingerprint, safe constraints (`preservePublishedSource=true`, `requireDraftClone=true`), per-block expected fingerprints, proposed text presence and candidate compatibility.
   - Evidence for `248398`: brief `docs/operations/public-site-content-factory/patch-brief-248398-guided-refresh-2026-06-14.json` and plan `docs/operations/public-site-content-factory/patch-plan-248398-2026-06-14T19-52-01-053Z.json` (`ready_for_draft_clone`, 4 ready operations, still `sendsWordPressWrite=false`).
+- Existing-post refresh draft plan shipped:
+  - `src/lib/public-site/content-factory/existing-post-refresh-draft-plan.ts`
+  - `contentFactoryExistingPostRefreshDraftPlan.v1`
+  - `pnpm public-website:content-factory:refresh-draft-plan -- --patch-plan <patch-plan.json>`
+  - Reads a local `contentFactoryPatchPlan.v1` only; does not call WordPress.
+  - Converts `ready_for_draft_clone` operations into a signed dry-run request for `POST /wp-json/greenhouse-wp-bridge/v1/drafts/from-existing-post`, with `sourcePostId`, `sourceFingerprint`, per-block `targetPath + expectedFingerprint`, proposed text, redacted HMAC headers, rollout preconditions and rollback by manifest id.
+  - Runtime counterpart implemented in `/Users/jreye/Documents/efeonce-public-site-runtime/wp-content/plugins/greenhouse-wp-bridge` v0.4.0, not deployed yet: server-side source/block fingerprint revalidation, `update_text` only on `safe_text_edit` blocks, Gutenberg serialization, draft/private clone creation and non-destructive source context copy.
+  - Evidence for `248398` factual pullquote test: `docs/operations/public-site-content-factory/refresh-draft-plan-248398-2026-06-14T20-44-17-868Z.json` (`sendsWordPressWrite=false`, `modifiesPublishedSource=false`, target status `private`).
 - Contract output: `contentFactoryValidation.v1`.
 - Safety: non-mutating; validates local JSON artifacts only and never calls WordPress.
 - Current behavior:

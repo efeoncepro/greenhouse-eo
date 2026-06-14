@@ -499,6 +499,54 @@ export type ContentFactoryDraftSmokePlan = {
   }
 }
 
+export type ContentFactoryExistingPostRefreshDraftPlan = {
+  contractVersion: 'contentFactoryExistingPostRefreshDraftPlan.v1'
+  generatedAt: string
+  mode: 'dry_run'
+  sendsWordPressWrite: false
+  modifiesPublishedSource: false
+  sourcePatchPlan: {
+    contractVersion: ContentFactoryPatchPlan['contractVersion']
+    generatedAt: string
+    wordpressPostId: number
+    sourceFingerprint: string
+    operationCount: number
+  }
+  bridgeRequest: {
+    contractVersion: 'greenhouse-wp-bridge-existing-post-refresh.v1'
+    method: 'POST'
+    route: '/greenhouse-wp-bridge/v1/drafts/from-existing-post'
+    status: 'draft' | 'private'
+    greenhouseManifestId: string
+    body: {
+      contractVersion: 'greenhouse-wp-bridge-existing-post-refresh.v1'
+      greenhouseManifestId: string
+      sourcePostId: number
+      sourceFingerprint: string
+      status: 'draft' | 'private'
+      slug: string
+      operations: Array<{
+        operation: 'update_text'
+        targetPath: string
+        expectedFingerprint: string
+        proposedText: string
+        rationale: string
+      }>
+    }
+    signedHeaders: Record<string, string>
+    canonicalRequestPreview: string
+  }
+  rolloutPreconditions: Array<{
+    code: string
+    status: 'pending' | 'satisfied'
+    notes: string
+  }>
+  rollback: {
+    strategy: 'trash_refresh_draft_by_manifest_id'
+    notes: string
+  }
+}
+
 export const resolveContentFactoryValidationStatus = (
   findings: ContentFactoryValidationFinding[]
 ): ContentFactoryValidation['status'] => {

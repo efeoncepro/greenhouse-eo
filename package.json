@@ -132,6 +132,7 @@
     "public-website:content-factory:patch-plan": "tsx scripts/public-website/content-factory-patch-plan.ts",
     "public-website:content-factory:patterns": "tsx scripts/public-website/content-factory-patterns.ts",
     "public-website:content-factory:plan": "tsx scripts/public-website/content-factory-plan.ts",
+    "public-website:content-factory:refresh-draft-plan": "tsx scripts/public-website/content-factory-refresh-draft-plan.ts",
     "public-website:content-factory:refresh-plan": "tsx scripts/public-website/content-factory-refresh-plan.ts",
     "public-website:content-factory:smoke-plan": "tsx scripts/public-website/content-factory-smoke-plan.ts",
     "public-website:content-factory:validate": "tsx scripts/public-website/content-factory-validate.ts",
