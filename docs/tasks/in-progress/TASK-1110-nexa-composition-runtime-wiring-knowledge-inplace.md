@@ -287,3 +287,19 @@ Decisión del operador: "todavía no quiero cablear Nexa real" → la experienci
 - **SIEMPRE** morph (estructura) y ensamble (contenido) son **dos beats secuenciados**, nunca paralelos sobre el mismo nodo.
 - **SIEMPRE** el ensamble es restraint (un acento decelerado), reduced-motion never-hidden, compositor-only, tokens canónicos.
 - **NUNCA** se cablea `/knowledge` vivo antes de clavar la experiencia + paridad en el Design System (Slice A+B).
+
+## Delta 2026-06-14 (b) — Slice A SHIPPED (canonización del ensamble en la card) + hallazgo para end-to-end
+
+**Slice A (`447ea61f7`) — la capacidad "al armarse" canonizada en la primitive:**
+
+- `AnimatedCounter animateFrom?` — conteo de entrada confiable (cuenta al MONTAR sin gate de `isInView` → sin la race del IO frío que hacía saltar el número). never-hidden + reduced-motion horneados (SSR/no-JS/reduced muestran el valor final; `suppressHydrationWarning` para el mismatch intencional; reduced leído síncrono con `matchMedia`).
+- `MetricTrendCard entrance?: 'none'|'assemble'` (default `'none'` byte-idéntico) — `'assemble'` = número cuenta 0→valor + chart se dibuja al montar.
+- `card-density-motion.ts` — tipo `CardEntrance` + tokens `cardAssembleRisePx`/`cardAssembleTransition`.
+- Lab `/design-system/card-density` consume `entrance='assemble'` y BORRA el drive externo (rAF/seqValues) — la card se arma sola.
+- `MetricSummaryCard` NO recibe el prop (su `value` es `ReactNode` estático; su armado es el fly-in del wrapper — sin no-op).
+- Verificado (Playwright): MOTION cuenta 0→87.4 confiable (play frío + replay, sin flash, no al revés); REDUCED-MOTION muestra el valor final de una. Lint 0, tsc 0, 313 tests primitives + 20 AnimatedCounter/consumers verdes.
+- Canonización doc: `PRIMITIVES.md` fila "Card entrance al armarse".
+
+**Hallazgo clave para el end-to-end (la conexión con el Moment):** `NexaAnswerBubble` (1332 líneas) **renderiza su chart/métrica con Recharts inline propio — NO reusa `MetricTrendCard`**. Por lo tanto, para que la **RESPUESTA del Moment se arme** (cuando contiene una metric card — moments de finance/agency/ICO; el de Knowledge es prosa+citas), hay que: (a) wirear el mismo ensamble (count + chart draw) dentro de `NexaAnswerBubble`, o (b) converger su rendering de chart/métrica a la primitive `MetricTrendCard` con `entrance='assemble'`. Es trabajo en el **stack de Nexa** (NexaAnswerBubble), no solo en la card. Decisión de approach (a vs b) + alcance = inicio del próximo bloque del Slice B.
+
+**Slice B (siguiente) — la experiencia como page DS "Nexa Answers Experience":** realizar el mockup aprobado `NexaMomentCompositionSection` (host↔composed morph + `NexaMomentComposition` + `NexaAnswersCanvas`) como page del Design System, incluyendo un moment cuya respuesta contenga una metric card que se arme (para mostrar la capacidad en el contexto del Moment) + paridad `fe:capture:diff`. NO toca `/knowledge` vivo.
