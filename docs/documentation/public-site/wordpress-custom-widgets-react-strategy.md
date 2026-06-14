@@ -7,7 +7,7 @@
 > **Sitio:** `https://efeoncepro.com`
 > **Runtime observado:** WordPress en Kinsta, Ohio `3.7.0`, `ohio-child`, Elementor `4.1.3`, Elementor Pro `4.1.1`, Ohio Extra `3.7.0`
 > **Repositorio runtime:** `efeoncepro/efeonce-public-site-runtime`
-> **Bridge runtime actual:** `wp-content/plugins/greenhouse-wp-bridge` v0.2.0 con endpoints read-only Elementor/Gutenberg/Ohio; desplegado/activo en Kinsta desde 2026-06-14.
+> **Bridge runtime repo actual:** `wp-content/plugins/greenhouse-wp-bridge` v0.3.0 foundation con endpoints read-only Elementor/Gutenberg/Ohio y contrato HMAC draft-only en codigo. Las rutas draft/private firmadas quedan default-disabled hasta provisionar shared secret, flag de writes, staging/preview y permisos minimos.
 > **Relacionados:** [Inventario Ohio + Elementor](./wordpress-ohio-elementor-widget-inventory.md), [Playbook de landings Ohio + Elementor](../../manual-de-uso/public-site/wordpress-ohio-elementor-landing-playbook.md), [Landing Control Plane](../../architecture/GREENHOUSE_PUBLIC_WEBSITE_LANDING_CONTROL_PLANE_ARCHITECTURE_V1.md)
 
 ## Objetivo
@@ -247,14 +247,14 @@ Greenhouse repo (`greenhouse-eo`) debe guardar:
 
 ## Arquitectura recomendada por etapas
 
-### Etapa 1 — Bridge skeleton read-only
+### Etapa 1 — Bridge foundation signed/draft-only
 
-Objetivo: inspeccionar el runtime real sin cambiar el modelo editorial ni tocar produccion.
+Objetivo: inspeccionar el runtime real y preparar el contrato draft-only sin cambiar el modelo editorial ni tocar produccion publicada.
 
-- Plugin `greenhouse-wp-bridge` creado en `efeoncepro/efeonce-public-site-runtime` y desplegado/activo en Kinsta en modo read-only.
-- Endpoints actuales: `health`, `inspection/elementor-document/{id}` y `inspection/ohio-widget-catalog`.
-- Todos requieren usuario autenticado con `edit_posts`; smoke productivo autenticado del 2026-06-14 retorna `200` para health, inspeccion Elementor del page `244079` y catalogo Ohio.
-- No hay writes, publish, cache clear, backups, HMAC/replay guard ni Abilities registration todavia.
+- Plugin `greenhouse-wp-bridge` creado en `efeoncepro/efeonce-public-site-runtime` y desplegado/activo en Kinsta primero en modo read-only.
+- Endpoints read-only actuales: `health`, `inspection/elementor-document/{id}`, `inspection/block-document/{id}` y `inspection/ohio-widget-catalog`.
+- Foundation v0.3.0 agrega contrato HMAC, body hash, timestamp window, replay guard y rutas `draft/private` default-disabled.
+- No hay writes operativos, publish, cache clear, backups ni Abilities registration todavia. El HMAC/replay guard y las rutas draft-only existen en codigo, pero no deben ejecutarse en runtime real hasta completar secret, flag y least-privilege.
 
 ### Etapa 2 — Widget custom PHP Elementor
 

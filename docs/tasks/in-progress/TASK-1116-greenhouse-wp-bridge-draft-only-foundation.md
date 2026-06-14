@@ -8,16 +8,17 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `implementation`
 - Epic: `EPIC-019`
-- Status real: `Partial live read-only foundation exists: plugin skeleton + authenticated read-only health/Elementor/Ohio inspection endpoints are deployed/active on Kinsta from efeonce-public-site-runtime; signed auth, Abilities registration and draft write path still pending`
+- Status real: `Partial foundation exists: plugin v0.3.0 in runtime repo has authenticated read-only health/Elementor/Gutenberg block/Ohio inspection plus signed HMAC/replay guarded draft-only routes in code; live write rollout still pending shared secret, write flag, staging/preview and least-privilege`
 - Rank: `TBD`
 - Domain: `platform|commercial|marketing-ops|integrations|wordpress`
-- Blocked by: `TASK-1111 Kinsta API gap bloquea cache/backups/publish operations; confirmar staging/preview target; provisionar shared secret/HMAC y reducir privilegios del usuario tecnico antes de writes`
+- Blocked by: `none`
+- Rollout blockers: `Kinsta API gap bloquea cache/backups/publish operations; confirmar staging/preview target; provisionar shared secret/HMAC y reducir privilegios del usuario tecnico antes de ejecutar writes reales`
 - Branch: `task/TASK-1116-greenhouse-wp-bridge-draft-only-foundation`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -101,7 +102,7 @@ Reglas obligatorias:
 - `docs/architecture/GREENHOUSE_PUBLIC_WEBSITE_LANDING_CONTROL_PLANE_ARCHITECTURE_V1.md`
 - `docs/architecture/GREENHOUSE_PUBLIC_WEBSITE_LANDING_CONTROL_PLANE_DECISION_V1.md`
 - `docs/epics/to-do/EPIC-019-public-website-landing-control-plane.md`
-- `docs/tasks/to-do/TASK-1116-greenhouse-wp-bridge-draft-only-foundation.md`
+- `docs/tasks/in-progress/TASK-1116-greenhouse-wp-bridge-draft-only-foundation.md`
 
 ## Current Repo State
 
@@ -120,18 +121,24 @@ Reglas obligatorias:
 
 ### Gap
 
-- `greenhouse-wp-bridge` v0.1.0 exists under `efeoncepro/efeonce-public-site-runtime:wp-content/plugins/greenhouse-wp-bridge` and is deployed/active on Kinsta in read-only inspection mode.
-- Current routes are read-only inspection only:
+- `greenhouse-wp-bridge` exists under `efeoncepro/efeonce-public-site-runtime:wp-content/plugins/greenhouse-wp-bridge` and is deployed/active on Kinsta in read-only inspection mode.
+- Current read-only inspection routes:
   - `GET /wp-json/greenhouse-wp-bridge/v1/health`
   - `GET /wp-json/greenhouse-wp-bridge/v1/inspection/elementor-document/{id}`
   - `GET /wp-json/greenhouse-wp-bridge/v1/inspection/ohio-widget-catalog`
-- Production smoke on 2026-06-14: anonymous health returns `401 ghwpb_auth_required`; authenticated health, Elementor inspection for page `244079`, and Ohio widget catalog return `200`. Health reports `writesEnabled=false`, `greenhouse_write_routes=false`, and Kinsta/cache/backup config false.
+- `greenhouse-wp-bridge` v0.2.0 adds read-only Gutenberg/block inspection: `GET /wp-json/greenhouse-wp-bridge/v1/inspection/block-document/{id}`. Recent Efeonce posts are Gutenberg/block-editor content (`hasBlocks=true`, no Elementor data), so draft write design must treat Gutenberg `blockName` and Elementor `widgetType` as separate native module dialects.
+- `greenhouse-wp-bridge` v0.3.0 adds code-only signed draft foundation:
+  - `POST /wp-json/greenhouse-wp-bridge/v1/drafts`
+  - `GET /wp-json/greenhouse-wp-bridge/v1/drafts/{greenhouse_manifest_id}`
+  - `PATCH /wp-json/greenhouse-wp-bridge/v1/drafts/{greenhouse_manifest_id}`
+  - HMAC canonical request `GHWPB-HMAC-SHA256`, `X-Greenhouse-*` headers, body SHA-256, timestamp window, replay guard, audit meta and `draft|private` only.
+  - Mutation routes are default-disabled by `GREENHOUSE_WP_BRIDGE_WRITES_ENABLED`; no live draft smoke until shared secret, staging/preview and least-privilege are ready.
+- Production smoke on 2026-06-14: anonymous health returns `401 ghwpb_auth_required`; authenticated health, Elementor inspection for page `244079`, Gutenberg block inspection for post `249766`, and Ohio widget catalog return `200`.
 - Greenhouse now has a reusable read-only inspection helper for the active bridge: `pnpm public-website:bridge-inspect -- --page-id <id> [--write]`. First evidence lives at `docs/operations/public-site-bridge-inspections/inspection-page-244079-2026-06-14T16-22-05-591Z.json`.
 - Greenhouse also has a read-only internal API lane for the active bridge: `GET /api/admin/public-site/bridge-inspection?pageId=<id>` backed by `src/lib/public-site/bridge-inspection.ts` and gated by `platform.public_site.bridge.inspect`. It is intentionally inspection-only and does not satisfy the signed draft write contract for this task.
-- `greenhouse-wp-bridge` v0.2.0 adds read-only Gutenberg/block inspection: `GET /wp-json/greenhouse-wp-bridge/v1/inspection/block-document/{id}`. Recent Efeonce posts are Gutenberg/block-editor content (`hasBlocks=true`, no Elementor data), so draft write design must treat Gutenberg `blockName` and Elementor `widgetType` as separate native module dialects.
 - PHP syntax lint passed locally for the new plugin.
-- No signed write contract exists.
-- No draft-only endpoint exists.
+- Signed write contract exists in code and Greenhouse signer tests.
+- Draft-only endpoints exist in code but are not operationally enabled.
 - No staging/preview/rollback baseline exists for Greenhouse-owned WordPress objects.
 - Kinsta API token remains missing; cache/backups/environment inventory is not automated.
 - No custom Elementor widget registry exists yet. If needed later, it belongs in the bridge/runtime plugin with `\Elementor\Widget_Base`, PHP render and Elementor native controls, not in Ohio parent.

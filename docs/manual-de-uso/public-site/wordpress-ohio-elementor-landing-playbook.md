@@ -16,7 +16,7 @@ Guiar a agentes y operadores para crear o ajustar landings de `efeoncepro.com` u
 
 1. Identificar `post_id`, slug, status y template.
 2. Leer `_elementor_data`, `_elementor_page_settings` y metas Ohio relevantes.
-   - `greenhouse-wp-bridge` v0.1.0 ya esta desplegado/activo en Kinsta en modo read-only; usar primero `GET /wp-json/greenhouse-wp-bridge/v1/inspection/elementor-document/{id}` con autenticacion WordPress para obtener resumen de estructura, widgets, anchors `gh-*` y metas Ohio.
+   - `greenhouse-wp-bridge` v0.3.0 es la foundation del bridge: usar primero los endpoints read-only de inspeccion (`elementor-document`, `block-document`, `ohio-widget-catalog`) con autenticacion WordPress para obtener resumen de estructura, widgets, anchors `gh-*`, bloques Gutenberg y metas Ohio. Las rutas draft-only firmadas existen en codigo, pero siguen apagadas hasta configurar shared secret, flag de writes y permisos minimos.
 3. Determinar si la zona usa `container` moderno o `section/column` legacy.
 4. Buscar anchors semanticos `gh-*`; si no existen, planear agregarlos en el patch.
 5. Verificar si el problema es:
@@ -211,7 +211,7 @@ La estrategia canonica vive en [Custom Elementor Widgets y React](../../document
 
 ## Posts Gutenberg vs landings Elementor
 
-No todo el Public Site usa Elementor. Los posts editoriales recientes de Efeonce usan Gutenberg blocks: el bridge `greenhouse-wp-bridge` v0.2.0 expone `GET /wp-json/greenhouse-wp-bridge/v1/inspection/block-document/{id}` para leer `post_content` con `parse_blocks()` y resumir `blockName`.
+No todo el Public Site usa Elementor. Los posts editoriales recientes de Efeonce usan Gutenberg blocks: el bridge `greenhouse-wp-bridge` expone `GET /wp-json/greenhouse-wp-bridge/v1/inspection/block-document/{id}` para leer `post_content` con `parse_blocks()` y resumir `blockName`.
 
 Regla operativa:
 

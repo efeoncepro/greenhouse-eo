@@ -1,5 +1,15 @@
 # Release 2026-06-10 #2 — develop→main `6c649b2a6` RELEASED
 
+## Sesion 2026-06-14 — Public Site bridge v0.3.0 signed draft foundation code (Codex)
+
+- **TASK-1116 tomada en `develop`:** el hook `pnpm codex:task-hook TASK-1116 --develop` paso tras mover la task a `in-progress` y separar blockers de rollout. Excepcion de rama documentada: se mantuvo `develop`, no se creo branch/worktree.
+- **Runtime repo code-only:** `/Users/jreye/Documents/efeonce-public-site-runtime/wp-content/plugins/greenhouse-wp-bridge` subio a v0.3.0 en codigo con `GHWPB_Config`, `GHWPB_Signature`, `GHWPB_Audit` y `GHWPB_Draft_Controller`. Rutas nuevas: `POST /drafts`, `GET /drafts/{greenhouse_manifest_id}`, `PATCH /drafts/{greenhouse_manifest_id}` bajo `/wp-json/greenhouse-wp-bridge/v1`.
+- **Contrato signed:** canonical request `GHWPB-HMAC-SHA256` firma metodo, REST route, body SHA-256, timestamp, request id, actor y environment. Headers requeridos: `X-Greenhouse-Timestamp`, `X-Greenhouse-Request-Id`, `X-Greenhouse-Actor`, `X-Greenhouse-Environment`, `X-Greenhouse-Body-Sha256`, `X-Greenhouse-Signature`. Replay guard por request id y ventana de 300s.
+- **Safety:** mutaciones default-disabled por `GREENHOUSE_WP_BRIDGE_WRITES_ENABLED`; ademas requieren shared secret, Application Password, `edit_posts`, firma valida y status `draft|private`. No publish, delete, cache clear ni backups. Updates solo buscan objetos Greenhouse-owned por `_greenhouse_manifest_id`.
+- **Greenhouse tooling:** nuevo signer `src/lib/public-site/bridge-signing.ts`, tests focales y CLI `pnpm public-website:bridge-draft-contract`. Por defecto el CLI es no-mutante y usa secret sintetico redacted; `--send` exige `PUBLIC_WEBSITE_WORDPRESS_BRIDGE_SHARED_SECRET_SECRET_REF`.
+- **Validacion corrida:** PHP lint del plugin completo OK; Vitest focal `bridge-signing` + `bridge-inspection-route` OK; ESLint focal OK; `NODE_OPTIONS=--max-old-space-size=8192 pnpm exec tsc --noEmit --pretty false` OK; `pnpm public-website:bridge-draft-contract` dry-run OK sin write.
+- **Estado honesto:** no se hizo live draft smoke ni se habilitaron writes. Queda rollout pendiente: provisionar shared secret en WordPress/Kinsta + Secret Manager, reducir privilegios del usuario tecnico, decidir staging/preview, y luego habilitar `GREENHOUSE_WP_BRIDGE_WRITES_ENABLED` para un smoke draft/private controlado.
+
 ## Sesion 2026-06-14 — Public Site bridge v0.2.0 Gutenberg/block inspection (Codex)
 
 - **Discovery antes de implementar:** se inspeccionaron los posts recientes de `efeoncepro.com` via WP-CLI con `parse_blocks()`. Los posts activos son Gutenberg (`post`, `hasBlocks=true`, sin `_elementor_data`), no Elementor. Ejemplo verificado: post `249766` (`glitch-02-noticias-ia-marketing-2026-03-03`) con 81 bloques: `core/freeform`, `core/paragraph`, `core/heading`, `core/image`, `core/separator`.

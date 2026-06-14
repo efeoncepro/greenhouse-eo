@@ -216,7 +216,7 @@ Not allowed:
 - Pushing arbitrary files over SSH without a Git-backed release record.
 - Versioning uploads, generated Elementor CSS, backups or secrets as canonical runtime code.
 
-### 6.4 Bridge Plugin Read-only Foundation
+### 6.4 Bridge Plugin Signed Draft-only Foundation
 
 `greenhouse-wp-bridge` has an initial runtime plugin under:
 
@@ -227,10 +227,11 @@ Not allowed:
 Current status:
 
 - implemented in the runtime repository clone and manually deployed/activated on Kinsta on 2026-06-14 via SSH/WP-CLI;
-- read-only inspection mode only;
+- read-only inspection mode is active in production;
+- v0.3.0 code adds signed draft/private routes, but they are default-disabled until shared secret, write flag, staging/preview and least-privilege are ready;
 - PHP syntax validated locally;
-- no draft write, publish, delete, cache clear, backup, plugin install or theme mutation endpoints;
-- no HMAC/shared-secret replay guard yet;
+- no publish, delete, cache clear, backup, plugin install or theme mutation endpoints;
+- HMAC/shared-secret replay guard exists in code for draft routes;
 - no Abilities registration yet.
 
 Production smoke evidence from 2026-06-14:
@@ -268,9 +269,34 @@ GET /wp-json/greenhouse-wp-bridge/v1/health
 GET /wp-json/greenhouse-wp-bridge/v1/inspection/elementor-document/{id}
 GET /wp-json/greenhouse-wp-bridge/v1/inspection/block-document/{id}
 GET /wp-json/greenhouse-wp-bridge/v1/inspection/ohio-widget-catalog
+POST /wp-json/greenhouse-wp-bridge/v1/drafts
+GET /wp-json/greenhouse-wp-bridge/v1/drafts/{greenhouse_manifest_id}
+PATCH /wp-json/greenhouse-wp-bridge/v1/drafts/{greenhouse_manifest_id}
 ```
 
-All current endpoints require an authenticated WordPress user with `edit_posts` and are designed for Application Password use. The Elementor endpoint reads `_elementor_data`, summarizes `container|section|column|widget`, reports widget usage, semantic `gh-*` anchors and selected Ohio page metas. The block endpoint reads raw `post_content` through WordPress `parse_blocks()`, summarizes Gutenberg `blockName` usage, detects `gh-*` classes/anchors, caps top-level block samples at 40 and is intended for blog posts and other block-editor content. The Ohio endpoint reads Elementor's registered widget catalog and identifies Ohio/HubSpot widgets. These endpoints are discovery/readiness primitives; they are not the draft-only write path.
+All endpoints require an authenticated WordPress user with `edit_posts` and are designed for Application Password use. Draft endpoints additionally require:
+
+- `X-Greenhouse-Timestamp` within a 300 second window;
+- `X-Greenhouse-Request-Id` with replay guard;
+- `X-Greenhouse-Actor`;
+- `X-Greenhouse-Environment`;
+- `X-Greenhouse-Body-Sha256`;
+- `X-Greenhouse-Signature` as `sha256=<hmac>`.
+
+The canonical request signed by Greenhouse is:
+
+```text
+GHWPB-HMAC-SHA256
+{METHOD}
+{REST_ROUTE}
+{BODY_SHA256}
+{TIMESTAMP}
+{REQUEST_ID}
+{ACTOR}
+{ENVIRONMENT}
+```
+
+The Elementor endpoint reads `_elementor_data`, summarizes `container|section|column|widget`, reports widget usage, semantic `gh-*` anchors and selected Ohio page metas. The block endpoint reads raw `post_content` through WordPress `parse_blocks()`, summarizes Gutenberg `blockName` usage, detects `gh-*` classes/anchors, caps top-level block samples at 40 and is intended for blog posts and other block-editor content. The Ohio endpoint reads Elementor's registered widget catalog and identifies Ohio/HubSpot widgets. The draft endpoints can only create/update `draft|private` Greenhouse-owned objects and are still rollout-pending in production.
 
 Builder module vocabulary:
 
