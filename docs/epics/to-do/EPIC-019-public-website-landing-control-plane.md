@@ -57,7 +57,8 @@ Sin un epic, el trabajo tenderia a partir con un script o endpoint aislado que p
 | Task | Phase | Status | Purpose |
 | --- | --- | --- | --- |
 | `TASK-1111` | `0` | `in-progress` | WordPress/Kinsta discovery + read-only inventory: public REST/Abilities inventory shipped; authenticated WordPress/Abilities/plugins and WP-CLI theme/plugins/post-types are repeatable. Kinsta API environment/cache/backups remains blocked on token or deferral. |
-| `TASK-1116` | `1` | `to-do` | WordPress bridge plugin foundation: private namespace, Abilities API registrations, auth/signature verification, health endpoint, metadata contract and draft-only write path in safe target. |
+| `TASK-1122` | `0.5` | `to-do` | Public Site code baseline + GitOps binding: reconcile live Kinsta `ohio-child`/custom plugins with a governed repo and expose GitHub as the behind-the-scenes version/deploy rail for Greenhouse. |
+| `TASK-1116` | `1` | `to-do` | WordPress bridge plugin foundation: private namespace, Abilities API registrations, auth/signature verification, health endpoint, metadata contract and draft-only write path in safe target. Depends on confirmed repo/path from `TASK-1122`. |
 | `TASK-TBD` | `2` | `planned` | Landing manifest + template registry: canonical schema, revision model, SEO/CTA/HubSpot metadata, validation and audit records. |
 | `TASK-TBD` | `3` | `planned` | Greenhouse Landing Ops UI V1: internal surface for inventory, draft creation, review, preview status and operational states. |
 | `TASK-TBD` | `4` | `planned` | Publish pipeline: approval gate, WordPress publish, Kinsta cache clear, smoke verification, rollback baseline and drift detection. |
@@ -105,3 +106,5 @@ Official WordPress Agent Skills from `WordPress/agent-skills` were vendored into
 ## Delta 2026-06-14
 
 Se documento la frontera React/Gutenberg/Interactivity API para este epic. Resultado: React es valido en WordPress para bloques, admin/editor tooling del bridge y microinteracciones frontend con Interactivity API, pero V1 no debe transformarse en una reescritura SPA ni depender de React 19 sin prueba de compatibilidad en el runtime Kinsta/WordPress activo.
+
+Discovery de repositorio/control plane: `efeoncepro/efeonce-web` existe, pero representa un rebuild Astro/headless historico y no el runtime live actual de `efeoncepro.com`. El codigo WordPress mas cercano vive en `/Users/jreye/Documents/efeonce-sp` con remote `cesargrowth11/efeonce-sp`, mientras Kinsta live ya tiene drift propio en `ohio-child` y plugins activos. Se agrego `TASK-1122` para crear una baseline GitOps gobernada antes de construir `greenhouse-wp-bridge`.

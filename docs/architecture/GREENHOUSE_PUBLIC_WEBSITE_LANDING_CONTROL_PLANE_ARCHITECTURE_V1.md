@@ -126,6 +126,57 @@ Default for existing institutional pages and blog content: `wordpress_owned` unt
 | Conversion CRM lifecycle | HubSpot | Forms, meetings, contacts, deals. |
 | Performance analytics | Analytics sources | Ingested/read by Greenhouse for reporting. |
 
+### 6.3 Code Repository and GitOps Binding
+
+The public-site control plane governs both content posture and runtime code posture.
+
+Greenhouse should be the operator surface, but GitHub remains the code/versioning rail for WordPress runtime artifacts:
+
+- `wp-content/themes/ohio-child`
+- custom plugins such as `eo-headless-content` and `eo-vibe-coding-api`
+- the future `greenhouse-wp-bridge`
+- release manifests, deploy artifacts and rollback history
+
+Current discovery on 2026-06-14 found:
+
+- `efeoncepro/efeonce-web` is an Astro/headless rebuild repo and not the source of the current live WordPress/Ohio/Elementor runtime.
+- `/Users/jreye/Documents/efeonce-sp` is the closest local WordPress operational repo, but its remote is `cesargrowth11/efeonce-sp` and it is not fully reconciled with Kinsta live.
+- Kinsta live has code drift in `ohio-child` and active custom plugins that must be baselined before the bridge plugin is implemented.
+
+Therefore `TASK-1122` must establish the code baseline and repo binding before `TASK-1116` writes the bridge plugin.
+
+Read-only baseline command:
+
+```bash
+pnpm public-website:export-live-code
+```
+
+The command exports only governed code candidates from Kinsta into ignored `tmp/public-site-code-baselines/<timestamp>/`, plus a SHA-256 `manifest.json`. The manifest is the first input for Greenhouse drift modeling; the exported files are not canonical until a governed `efeoncepro/*` runtime repo is chosen.
+
+Target posture:
+
+```text
+Greenhouse Public Site UI
+  -> Greenhouse commands/readers
+  -> GitHub repo binding + branch/commit/release artifact
+  -> Kinsta deploy/rollback lane
+  -> WordPress runtime
+```
+
+Operator experience:
+
+- The operator works in Greenhouse.
+- Greenhouse creates/reads branches, commits, PRs or release artifacts behind the scenes.
+- Greenhouse records baseline SHA, live hash, deploy status, drift state and rollback pointer.
+- Direct Kinsta edits are emergency-only and require a backport/reconciliation action.
+
+Not allowed:
+
+- Treating GitHub as a separate manual operating surface for normal public-site work.
+- Treating `efeonce-web` as deploy source without a new ADR to migrate the public runtime to headless Astro.
+- Pushing arbitrary files over SSH without a Git-backed release record.
+- Versioning uploads, generated Elementor CSS, backups or secrets as canonical runtime code.
+
 ## 7. Landing Manifest Contract
 
 The manifest is the durable Greenhouse artifact. It should be renderer-independent enough to survive a future WordPress replacement.

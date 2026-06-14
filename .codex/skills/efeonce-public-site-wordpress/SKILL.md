@@ -1,6 +1,6 @@
 ---
 name: efeonce-public-site-wordpress
-description: Operate and update the Efeonce public WordPress site knowledge base for efeoncepro.com. Use when working with the public site, Kinsta, WordPress REST/WP-CLI, WP Abilities, Ohio theme, Elementor, Greenhouse-to-WordPress landing pages, HubSpot attribution, public-site layout incidents, authenticated discovery, or docs/tasks for EPIC-019/TASK-1111/TASK-1116.
+description: Operate and update the Efeonce public WordPress site knowledge base for efeoncepro.com. Use when working with the public site, Kinsta, WordPress REST/WP-CLI, WP Abilities, Ohio theme, Elementor, Greenhouse-to-WordPress landing pages, HubSpot attribution, public-site layout incidents, authenticated discovery, repository/GitOps binding, or docs/tasks for EPIC-019/TASK-1111/TASK-1116/TASK-1122.
 ---
 
 # Efeonce Public Site WordPress
@@ -18,7 +18,8 @@ Before changing the site or Greenhouse bridge code, read the relevant sources:
 - `docs/documentation/public-site/wordpress-ohio-elementor-layout.md` and `docs/manual-de-uso/public-site/wordpress-ohio-elementor-layout.md` for Ohio/Elementor layout operations.
 - `docs/documentation/public-site/wordpress-ohio-elementor-widget-inventory.md` and `docs/manual-de-uso/public-site/wordpress-ohio-elementor-landing-playbook.md` before creating, cloning, or changing landing modules/widgets. These docs inventory Ohio Extra widgets, Elementor templates, plugin dependencies, page metas, and gaps for future Greenhouse-owned landings.
 - `docs/architecture/GREENHOUSE_PUBLIC_WEBSITE_LANDING_CONTROL_PLANE_ARCHITECTURE_V1.md` and `docs/architecture/GREENHOUSE_PUBLIC_WEBSITE_LANDING_CONTROL_PLANE_DECISION_V1.md` for the control-plane contract.
-- `docs/epics/to-do/EPIC-019-public-website-landing-control-plane.md`, `docs/tasks/in-progress/TASK-1111-public-website-read-only-discovery.md`, and `docs/tasks/to-do/TASK-1116-greenhouse-wp-bridge-draft-foundation.md`.
+- `docs/operations/public-site-repository-control-plane-discovery-20260614.md` before deciding where public-site WordPress code should live or where to implement the bridge plugin.
+- `docs/epics/to-do/EPIC-019-public-website-landing-control-plane.md`, `docs/tasks/in-progress/TASK-1111-public-website-read-only-discovery.md`, `docs/tasks/to-do/TASK-1122-public-site-code-baseline-gitops-binding.md`, and `docs/tasks/to-do/TASK-1116-greenhouse-wp-bridge-draft-only-foundation.md`.
 
 Pair with `wp-rest-api`, `wp-wpcli-and-ops`, `wp-abilities-api`, `wp-interactivity-api`, `wp-block-development`, `greenhouse-secret-hygiene`, `greenhouse-browser-diagnostics`, and `greenhouse-documentation-governor` when those domains apply.
 
@@ -37,6 +38,7 @@ Pair with `wp-rest-api`, `wp-wpcli-and-ops`, `wp-abilities-api`, `wp-interactivi
 - Visual foundation observed on 2026-06-14: effective Ohio runtime uses `--clb-color-primary=#023c70`, `--clb-color-link-hover=#024c8f`, body text `Inter`, headings/buttons `DM Sans`, grid gutter `1rem`, container width `86vw`, and footer background `#161519`. Elementor active kit is `7`, but its generated `post-7.css` still exposes Elementor defaults (`#6EC1E4`, `#61CE70`, Roboto), so never treat the kit CSS as brand source of truth without computed-style verification.
 - Secret reference for the current Application Password: `public-website-wordpress-application-password`. Never print or commit the value. Rotate before production because the value was pasted during the working session.
 - Kinsta API token is still pending for cache/environment/backups automation. Do not claim cache-clear or backup automation is operational until verified.
+- Repository/control-plane discovery on 2026-06-14: `efeoncepro/efeonce-web` is an Astro/headless historical rebuild and is not the current live WordPress/Ohio/Elementor runtime source. The closest local WordPress operational repo is `/Users/jreye/Documents/efeonce-sp`, but its remote is `cesargrowth11/efeonce-sp` and it is not reconciled with Kinsta live. `TASK-1122` must establish a GitOps baseline/repo binding before `TASK-1116` implements `greenhouse-wp-bridge`.
 
 ## Safety Rules
 
@@ -56,9 +58,12 @@ Use the repo script first:
 ```bash
 pnpm public-website:discover
 pnpm public-website:discover -- --authenticated --wpcli --write
+pnpm public-website:export-live-code
 ```
 
 The script auto-loads `.env.local` and then `.env` without overwriting shell/CI variables. Authenticated discovery requires the env/secret plumbing already configured by the repo, but agents should not need to `source .env.local` or paste long inline env commands. Do not paste secret values into the command line. When WP-CLI is needed directly, use the Kinsta SSH env vars and run read-only commands such as `wp option get`, `wp theme list`, `wp plugin list`, `wp post list`, and `wp post meta list`.
+
+Use `pnpm public-website:export-live-code` for `TASK-1122` live-code baseline exports. It downloads only governed code candidates into ignored `tmp/public-site-code-baselines/<timestamp>/` and writes a per-file SHA-256 manifest. It does not mutate Kinsta, WordPress or GitHub.
 
 ### Remote WP-CLI PHP Execution
 
@@ -129,6 +134,10 @@ Design guardrails:
 - Bridge direction: Abilities-first when available, REST fallback when needed.
 - Initial bridge work must be draft-only/private until staging, preview, audit trail, rollback, permissions, and cache behavior are proven.
 - Keep full API parity in mind: Greenhouse UI actions must map to command/read contracts, not one-off buttons.
+- Do not implement the bridge in an unconfirmed repository/path. First run the `TASK-1122` flow: reconcile live `ohio-child`/custom plugins, decide or create the governed `efeoncepro/*` repo, record baseline SHA/hashes, and define the GitHub->Kinsta deploy/rollback rail.
+- Operators should work from Greenhouse. GitHub remains the behind-the-scenes versioning/deployment rail, not a separate manual operating surface for normal public-site work.
+- Treat direct Kinsta filesystem edits as emergency-only; backport every live change to the repo baseline.
+- Do not use `efeonce-web` as the deploy source unless a new ADR explicitly moves the public site to Astro/headless.
 
 ### WordPress React Boundary
 
@@ -142,7 +151,7 @@ Update this skill when any of these change:
 
 - WordPress version, active theme, major plugin inventory, REST namespace inventory, or WP Abilities inventory.
 - Kinsta credentials/token availability, cache/backups/deploy procedure, or SSH/WP-CLI path.
-- Greenhouse public-site architecture, ADRs, EPIC-019, TASK-1111, TASK-1116, or follow-up tasks.
+- Greenhouse public-site architecture, ADRs, EPIC-019, TASK-1111, TASK-1122, TASK-1116, or follow-up tasks.
 - A new Ohio/Elementor incident teaches a layout rule, selector risk, backup path, or rollback pattern.
 - Elementor page structure, widget controls, template inventory, or bridge patch contracts are newly discovered.
 - WordPress official developer guidance changes the React/Interactivity/Abilities/agent skill strategy.

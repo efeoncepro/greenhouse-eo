@@ -14,10 +14,10 @@
 - Effort: `Alto`
 - Type: `implementation`
 - Epic: `EPIC-019`
-- Status real: `Diseno listo para execution planning; bloqueado por cierre de discovery autenticada TASK-1111 y decision de deployment path del plugin`
+- Status real: `Diseno listo para execution planning; bloqueado por cierre de discovery autenticada TASK-1111 y por baseline/repo binding de TASK-1122`
 - Rank: `TBD`
 - Domain: `platform|commercial|marketing-ops|integrations|wordpress`
-- Blocked by: `TASK-1111 Kinsta API gap; confirmar repositorio/path de plugin WordPress y staging/preview target`
+- Blocked by: `TASK-1111 Kinsta API gap; TASK-1122 debe confirmar repositorio/path de plugin WordPress y baseline GitOps; confirmar staging/preview target`
 - Branch: `task/TASK-1116-greenhouse-wp-bridge-draft-only-foundation`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -81,7 +81,7 @@ Reglas obligatorias:
 - Secret Manager refs:
   - `PUBLIC_WEBSITE_WORDPRESS_APPLICATION_PASSWORD_SECRET_REF`
   - `PUBLIC_WEBSITE_WORDPRESS_BRIDGE_SHARED_SECRET_SECRET_REF`
-- Confirmar deployment path del plugin WordPress: `[verificar]`.
+- Confirmar deployment path del plugin WordPress mediante `TASK-1122`.
 - Confirmar si el primer target es staging Kinsta, draft-only production con allowlist, o ambos: `[verificar]`.
 
 ### Blocks / Impacts
@@ -93,7 +93,7 @@ Reglas obligatorias:
 
 ### Files owned
 
-- `[verificar] WordPress plugin path/repository for greenhouse-wp-bridge`
+- `[verificar via TASK-1122] WordPress plugin path/repository for greenhouse-wp-bridge`
 - `scripts/public-website/discover-wordpress.ts`
 - `docs/operations/discovery-public-website-wordpress-*.md`
 - `docs/architecture/GREENHOUSE_PUBLIC_WEBSITE_LANDING_CONTROL_PLANE_ARCHITECTURE_V1.md`
