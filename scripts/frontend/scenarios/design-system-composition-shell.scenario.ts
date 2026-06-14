@@ -23,6 +23,14 @@ export const scenario: CaptureScenario = {
     postReadyDelayMs: 400,
     timeout: 15000
   },
+  // TASK-1119 Slice 2 — baseline durable committeado: regresión visual del specimen del substrato en cada
+  // cambio futuro. Degrada honesto a `baseline_stale` si falta el home durable. El morph live (View
+  // Transitions) se enmascara: el diff fija el estado asentado de cada composición, no el frame intermedio.
+  baseline: {
+    surfaceId: 'design-system.composition-shell',
+    maxDiffRatio: 0.02,
+    maskSelectors: ['[data-capture="composition-shell-telemetry-chip"]']
+  },
   assertions: [
     { kind: 'noLoginRedirect', reason: 'Lab interno autenticado vía GVC local actor.' },
     { kind: 'noErrorBoundary', reason: 'La captura no debe caer a error boundary.' }
