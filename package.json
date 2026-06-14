@@ -124,6 +124,7 @@
     "secrets:audit": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/secrets/audit.ts",
     "secrets:rotate": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/secrets/rotate.ts",
     "public-website:discover": "tsx scripts/public-website/discover-wordpress.ts",
+    "public-website:bridge-inspect": "tsx scripts/public-website/bridge-inspect.ts",
     "public-website:deploy-dry-run": "tsx scripts/public-website/deploy-dry-run.ts",
     "public-website:diff-runtime": "tsx scripts/public-website/diff-runtime-baseline.ts",
     "public-website:export-live-code": "tsx scripts/public-website/export-live-code-baseline.ts",

@@ -1248,6 +1248,14 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     actions: ['read'] as const,
     defaultScope: 'all'
   },
+  {
+    // Public Site WordPress bridge control plane: read-only inspection only.
+    // Writes/drafts/publish remain blocked until TASK-1116 signed auth lands.
+    key: 'platform.public_site.bridge.inspect',
+    module: 'platform',
+    actions: ['read'] as const,
+    defaultScope: 'all'
+  },
   // TASK-872 — SCIM Internal Collaborator Provisioning capabilities (4 nuevas).
   // 3 eligibility override (L4 admin allowlist/denylist + backfill execute) +
   // 1 workforce intake transition (pending_intake → completed).

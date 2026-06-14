@@ -7,7 +7,7 @@
 > **Sitio:** `https://efeoncepro.com`
 > **Runtime observado:** WordPress en Kinsta, Ohio `3.7.0`, `ohio-child`, Elementor `4.1.3`, Elementor Pro `4.1.1`, Ohio Extra `3.7.0`
 > **Repositorio runtime:** `efeoncepro/efeonce-public-site-runtime`
-> **Bridge repo-only actual:** `wp-content/plugins/greenhouse-wp-bridge` v0.1.0 con endpoints read-only; no desplegado/activado en Kinsta.
+> **Bridge runtime actual:** `wp-content/plugins/greenhouse-wp-bridge` v0.1.0 con endpoints read-only; desplegado/activo en Kinsta desde 2026-06-14.
 > **Relacionados:** [Inventario Ohio + Elementor](./wordpress-ohio-elementor-widget-inventory.md), [Playbook de landings Ohio + Elementor](../../manual-de-uso/public-site/wordpress-ohio-elementor-landing-playbook.md), [Landing Control Plane](../../architecture/GREENHOUSE_PUBLIC_WEBSITE_LANDING_CONTROL_PLANE_ARCHITECTURE_V1.md)
 
 ## Objetivo
@@ -238,9 +238,9 @@ Greenhouse repo (`greenhouse-eo`) debe guardar:
 
 Objetivo: inspeccionar el runtime real sin cambiar el modelo editorial ni tocar produccion.
 
-- Plugin repo-only `greenhouse-wp-bridge` creado en `efeoncepro/efeonce-public-site-runtime`.
+- Plugin `greenhouse-wp-bridge` creado en `efeoncepro/efeonce-public-site-runtime` y desplegado/activo en Kinsta en modo read-only.
 - Endpoints actuales: `health`, `inspection/elementor-document/{id}` y `inspection/ohio-widget-catalog`.
-- Todos requieren usuario autenticado con `edit_posts`.
+- Todos requieren usuario autenticado con `edit_posts`; smoke productivo autenticado del 2026-06-14 retorna `200` para health, inspeccion Elementor del page `244079` y catalogo Ohio.
 - No hay writes, publish, cache clear, backups, HMAC/replay guard ni Abilities registration todavia.
 
 ### Etapa 2 — Widget custom PHP Elementor

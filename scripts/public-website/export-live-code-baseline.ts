@@ -56,6 +56,11 @@ const TARGETS: Target[] = [
     required: false
   },
   {
+    label: 'Greenhouse WP bridge plugin',
+    remotePath: 'wp-content/plugins/greenhouse-wp-bridge',
+    required: false
+  },
+  {
     label: 'EO Ohio Elementor widgets plugin',
     remotePath: 'wp-content/plugins/eo-ohio-elementor-widgets',
     required: false

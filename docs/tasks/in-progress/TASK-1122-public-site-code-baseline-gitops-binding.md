@@ -14,7 +14,7 @@
 - Effort: `Medio-Alto`
 - Type: `implementation`
 - Epic: `EPIC-019`
-- Status real: `Code complete for repo binding/readers/drift/dry-run without Kinsta API; rollout/deploy apply remains blocked by Kinsta token, branch protection/release policy and explicit release task`
+- Status real: `Code complete for repo binding/readers/drift/dry-run; read-only greenhouse-wp-bridge manually deployed/activated via SSH/WP-CLI; automated deploy apply remains blocked by Kinsta token, branch protection/release policy and explicit release task`
 - Rank: `TBD`
 - Domain: `platform|commercial|marketing-ops|integrations|wordpress|release`
 - Blocked by: `none`
@@ -242,6 +242,17 @@ Greenhouse should show repo status to the operator, but direct GitHub interactio
   - `pnpm public-website:deploy-dry-run`
   - `pnpm public-website:deploy-dry-run -- --write`
 - Dry-run evidence written to `docs/operations/public-site-deploy-dry-runs/dry-run-2026-06-14T15-43-57-874Z.json`: `noop=47`, `ignored_live=2`, `would_create=7`, `would_update=0`, `would_not_delete_live_only=0`. The `would_create` rows are the repo-only `greenhouse-wp-bridge` skeleton files. It does not SSH, write to Kinsta, create backups, clear cache or delete files.
+- 2026-06-14 follow-up: `greenhouse-wp-bridge` v0.1.0 was uploaded and activated manually on Kinsta via SSH/WP-CLI as a read-only inspection plugin only. Smoke evidence: anonymous health returns `401 ghwpb_auth_required`; authenticated health, Elementor document inspection for page `244079`, and Ohio widget catalog all return `200`; health reports `writesEnabled=false`, no Kinsta/cache/backup config and no write routes.
+- Added `greenhouse-wp-bridge` to `pnpm public-website:export-live-code` governed targets so live exports match the binding manifest.
+- Fresh live export after activation: `tmp/public-site-code-baselines/2026-06-14T16-12-51-903Z/`, 56 files observed.
+- Fresh drift evidence written to `docs/operations/public-site-drift/drift-2026-06-14T16-13-03-406Z.json`: `in_sync=54`, `ignored_live=2`, `drifted=0`, `repo_missing=0`, `repo_extra=0`.
+- Fresh status evidence written to `docs/operations/public-site-runtime-status/status-2026-06-14T16-13-15-103Z.json`: runtime repo clean on `main`, head `f4c8a33`, latest drift linked, and Kinsta cache/backup/deploy apply still blocked.
+- Fresh dry-run evidence written to `docs/operations/public-site-deploy-dry-runs/dry-run-2026-06-14T16-13-03-124Z.json`: `noop=54`, `ignored_live=2`, `would_create=0`, `would_update=0`, `would_not_delete_live_only=0`. It remains a no-mutation report and does not SSH, write to Kinsta, create backups, clear cache or delete files.
+- Added reusable read-only bridge inspection helper:
+  - `pnpm public-website:bridge-inspect -- --page-id <id>`
+  - `pnpm public-website:bridge-inspect -- --page-id <id> --write`
+- First bridge inspection evidence written to `docs/operations/public-site-bridge-inspections/inspection-page-244079-2026-06-14T16-22-05-591Z.json`: health `200`, Elementor inspection `200`, Ohio catalog `200`, `writesEnabled=false`, 199 Elementor elements summarized and 3 semantic `gh-*` anchors found.
+- Added shared server-side reader `src/lib/public-site/bridge-inspection.ts` and internal API `GET /api/admin/public-site/bridge-inspection?pageId=<id>` for Greenhouse UI/API consumers. It is read-only, returns `public-site-bridge-inspection.v1`, uses capability `platform.public_site.bridge.inspect` (`read`, `all`) and does not introduce WordPress writes.
 
 ### Risk matrix
 

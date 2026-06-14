@@ -40,8 +40,9 @@ Pair with `wp-rest-api`, `wp-wpcli-and-ops`, `wp-abilities-api`, `wp-interactivi
 - Secret reference for the current Application Password: `public-website-wordpress-application-password`. Never print or commit the value. Rotate before production because the value was pasted during the working session.
 - Kinsta API token is still pending for cache/environment/backups automation. Do not claim cache-clear or backup automation is operational until verified.
 - Repository/control-plane discovery on 2026-06-14: `efeoncepro/efeonce-web` is an Astro/headless historical rebuild and is not the current live WordPress/Ohio/Elementor runtime source. The closest local WordPress operational repo is `/Users/jreye/Documents/efeonce-sp`, but its remote is `cesargrowth11/efeonce-sp` and it is not reconciled with Kinsta live. `TASK-1122` must establish a GitOps baseline/repo binding before `TASK-1116` implements `greenhouse-wp-bridge`.
-- Runtime repo binding established on 2026-06-14: private repo `efeoncepro/efeonce-public-site-runtime`, default branch `main`, baseline SHA `0fa6bfd`, tag `baseline-2026-06-14-live`, binding manifest `docs/operations/public-site-runtime-repository-binding-20260614.json`. The repo currently tracks canonical live `ohio-child`, `eo-headless-content`, `eo-vibe-coding-api`, and now contains repo-only `greenhouse-wp-bridge` skeleton code. Greenhouse status/dry-run commands exist, but deploy apply is still blocked by Kinsta token/cache/backups/release policy.
-- `greenhouse-wp-bridge` current repo-only state: `wp-content/plugins/greenhouse-wp-bridge`, version `0.1.0`, read-only inspection mode, PHP lint green, not deployed/activated on Kinsta. Current routes require authenticated `edit_posts`: `GET /wp-json/greenhouse-wp-bridge/v1/health`, `GET /wp-json/greenhouse-wp-bridge/v1/inspection/elementor-document/{id}`, and `GET /wp-json/greenhouse-wp-bridge/v1/inspection/ohio-widget-catalog`. No writes, no publish, no cache clear, no backups, no HMAC/shared-secret replay guard yet, no Abilities registration yet.
+- Runtime repo binding established on 2026-06-14: private repo `efeoncepro/efeonce-public-site-runtime`, default branch `main`, baseline SHA `0fa6bfd`, tag `baseline-2026-06-14-live`, binding manifest `docs/operations/public-site-runtime-repository-binding-20260614.json`. The repo tracks canonical live `ohio-child`, `eo-headless-content`, `eo-vibe-coding-api`, and `greenhouse-wp-bridge`. Greenhouse status/dry-run commands exist, but automated deploy apply is still blocked by Kinsta token/cache/backups/release policy.
+- `greenhouse-wp-bridge` current live state: `wp-content/plugins/greenhouse-wp-bridge`, version `0.1.0`, active on Kinsta as of 2026-06-14, read-only inspection mode. Current routes require authenticated `edit_posts` and were smoke-tested against production: anonymous health returns `401 ghwpb_auth_required`; authenticated `GET /wp-json/greenhouse-wp-bridge/v1/health`, `GET /wp-json/greenhouse-wp-bridge/v1/inspection/elementor-document/244079`, and `GET /wp-json/greenhouse-wp-bridge/v1/inspection/ohio-widget-catalog` return `200`. The bridge reports `writesEnabled=false`, `greenhouse_write_routes=false`, `kinsta_api_configured=false`, `cache_clear_configured=false`, and `backup_create_configured=false`. No writes, no publish, no cache clear, no backups, no HMAC/shared-secret replay guard yet, no Abilities registration yet.
+- Greenhouse now exposes a server-side read-only bridge inspection reader at `src/lib/public-site/bridge-inspection.ts`, reused by `pnpm public-website:bridge-inspect`, and admin API `GET /api/admin/public-site/bridge-inspection?pageId=<id>`. The API is gated by `requireAdminTenantContext()` and `platform.public_site.bridge.inspect` (`read`, `all`). It still only reads WordPress bridge health, Elementor document summary and optional Ohio catalog.
 
 ## Safety Rules
 
@@ -65,17 +66,22 @@ pnpm public-website:export-live-code
 pnpm public-website:diff-runtime
 pnpm public-website:runtime-status
 pnpm public-website:deploy-dry-run
+pnpm public-website:bridge-inspect -- --page-id 244079
 ```
 
 The script auto-loads `.env.local` and then `.env` without overwriting shell/CI variables. Authenticated discovery requires the env/secret plumbing already configured by the repo, but agents should not need to `source .env.local` or paste long inline env commands. Do not paste secret values into the command line. When WP-CLI is needed directly, use the Kinsta SSH env vars and run read-only commands such as `wp option get`, `wp theme list`, `wp plugin list`, `wp post list`, and `wp post meta list`.
 
-Use `pnpm public-website:export-live-code` for `TASK-1122` live-code baseline exports. It downloads only governed code candidates into ignored `tmp/public-site-code-baselines/<timestamp>/` and writes a per-file SHA-256 manifest. It does not mutate Kinsta, WordPress or GitHub.
+Use `pnpm public-website:export-live-code` for `TASK-1122` live-code baseline exports. It downloads only governed code candidates into ignored `tmp/public-site-code-baselines/<timestamp>/` and writes a per-file SHA-256 manifest. It now includes `greenhouse-wp-bridge` alongside `ohio-child`, `eo-headless-content`, and `eo-vibe-coding-api`. It does not mutate Kinsta, WordPress or GitHub.
 
 Use `pnpm public-website:diff-runtime` after a live export to compare the latest Kinsta manifest against `/Users/jreye/Documents/efeonce-public-site-runtime`. It is non-mutating and exits non-zero if a governed live file is missing or drifted in the repo.
 
 Use `pnpm public-website:runtime-status` to read the Greenhouse binding, local runtime repo head and latest drift report. `--write` stores `docs/operations/public-site-runtime-status/status-*.json`.
 
 Use `pnpm public-website:deploy-dry-run` to compare the runtime repo artifact against the latest live export manifest and produce a no-mutation deployment plan. `--write` stores `docs/operations/public-site-deploy-dry-runs/dry-run-*.json`. This command does not SSH, write files, clear cache, create backups or delete live-only files.
+
+Use `pnpm public-website:bridge-inspect -- --page-id <id>` to call the active `greenhouse-wp-bridge` read-only endpoints with Application Password auth from Secret Manager. `--write` stores `docs/operations/public-site-bridge-inspections/inspection-page-*.json`. The command calls health, Elementor document inspection and Ohio widget catalog, and never prints credentials or `Authorization` headers.
+
+Use `GET /api/admin/public-site/bridge-inspection?pageId=<id>` for Greenhouse UI/API read-only inspection. Add `includeCatalog=false` for a faster health + Elementor pass. The endpoint uses the same reader as the CLI, requires `platform.public_site.bridge.inspect`, and returns `503 public_site_bridge_auth_not_configured` when the current Greenhouse runtime lacks WordPress Application Password secret plumbing.
 
 ### Remote WP-CLI PHP Execution
 
@@ -146,7 +152,7 @@ Design guardrails:
 - Bridge direction: Abilities-first when available, REST fallback when needed.
 - Initial bridge work must be draft-only/private until staging, preview, audit trail, rollback, permissions, and cache behavior are proven.
 - Keep full API parity in mind: Greenhouse UI actions must map to command/read contracts, not one-off buttons.
-- Do not implement the bridge in an unconfirmed repository/path. The confirmed repo/path is `efeoncepro/efeonce-public-site-runtime:wp-content/plugins/greenhouse-wp-bridge`. Keep deploy/activation separate from repo changes until a release task explicitly approves it.
+- Do not implement the bridge in an unconfirmed repository/path. The confirmed repo/path is `efeoncepro/efeonce-public-site-runtime:wp-content/plugins/greenhouse-wp-bridge`. The initial read-only plugin is deployed/active on Kinsta, but any future deploy/activation that adds writes, Abilities, HMAC, cache, backup or publish behavior still requires an explicit release task and rollback plan.
 - Operators should work from Greenhouse. GitHub remains the behind-the-scenes versioning/deployment rail, not a separate manual operating surface for normal public-site work.
 - Treat direct Kinsta filesystem edits as emergency-only; backport every live change to the repo baseline.
 - Do not use `efeonce-web` as the deploy source unless a new ADR explicitly moves the public site to Astro/headless.

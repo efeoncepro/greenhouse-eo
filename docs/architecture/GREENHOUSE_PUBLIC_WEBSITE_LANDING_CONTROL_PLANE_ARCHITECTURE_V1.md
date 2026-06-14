@@ -163,7 +163,7 @@ Initial repository binding established on 2026-06-14:
 - Initial baseline tag: `baseline-2026-06-14-live`
 - Binding manifest: `docs/operations/public-site-runtime-repository-binding-20260614.json`
 
-This binding is a code/versioning baseline only. It does not yet authorize automated deployment to Kinsta; deployment apply remains pending Kinsta API token, cache/backup verification, branch/release policy and a future explicit release task.
+This binding is a code/versioning baseline. A one-time manual SSH/WP-CLI activation of the read-only `greenhouse-wp-bridge` plugin was completed on 2026-06-14, but automated deployment apply remains pending Kinsta API token, cache/backup verification, branch/release policy and a future explicit release task.
 
 Non-mutating drift command:
 
@@ -181,7 +181,7 @@ pnpm public-website:runtime-status
 pnpm public-website:runtime-status -- --write
 ```
 
-The command reads `docs/operations/public-site-runtime-repository-binding-20260614.json`, the latest drift report and the local runtime repo head. Current status report: `docs/operations/public-site-runtime-status/status-2026-06-14T15-43-17-969Z.json`, with repo branch `main`, head `0fa6bfd`, uncommitted repo-only `greenhouse-wp-bridge` files and Kinsta cache/backup/deploy apply blocked.
+The command reads `docs/operations/public-site-runtime-repository-binding-20260614.json`, the latest drift report and the local runtime repo head. Current status report after read-only bridge activation: `docs/operations/public-site-runtime-status/status-2026-06-14T16-13-15-103Z.json`, with repo branch `main`, head `f4c8a33`, live drift `in_sync=54`, `ignored_live=2`, and Kinsta cache/backup/deploy apply blocked.
 
 No-mutation deploy dry-run command:
 
@@ -190,7 +190,7 @@ pnpm public-website:deploy-dry-run
 pnpm public-website:deploy-dry-run -- --write
 ```
 
-The command compares the runtime repo artifact to the latest live Kinsta export manifest and writes an auditable file plan. It does not SSH, write files, delete live-only files, clear cache or create backups. Current report after adding the repo-only bridge skeleton: `docs/operations/public-site-deploy-dry-runs/dry-run-2026-06-14T15-43-57-874Z.json`, with `noop=47`, `ignored_live=2`, `would_create=7`, `would_update=0`, `would_not_delete_live_only=0`.
+The command compares the runtime repo artifact to the latest live Kinsta export manifest and writes an auditable file plan. It does not SSH, write files, delete live-only files, clear cache or create backups. Current report after manual read-only bridge activation: `docs/operations/public-site-deploy-dry-runs/dry-run-2026-06-14T16-13-03-124Z.json`, with `noop=54`, `ignored_live=2`, `would_create=0`, `would_update=0`, `would_not_delete_live_only=0`.
 
 Target posture:
 
@@ -218,7 +218,7 @@ Not allowed:
 
 ### 6.4 Bridge Plugin Read-only Foundation
 
-`greenhouse-wp-bridge` has an initial repo-only skeleton under:
+`greenhouse-wp-bridge` has an initial runtime plugin under:
 
 ```text
 /Users/jreye/Documents/efeonce-public-site-runtime/wp-content/plugins/greenhouse-wp-bridge/
@@ -226,12 +226,38 @@ Not allowed:
 
 Current status:
 
-- implemented in the runtime repository clone, not deployed/activated on Kinsta yet;
+- implemented in the runtime repository clone and manually deployed/activated on Kinsta on 2026-06-14 via SSH/WP-CLI;
 - read-only inspection mode only;
 - PHP syntax validated locally;
 - no draft write, publish, delete, cache clear, backup, plugin install or theme mutation endpoints;
 - no HMAC/shared-secret replay guard yet;
 - no Abilities registration yet.
+
+Production smoke evidence from 2026-06-14:
+
+- anonymous `GET /wp-json/greenhouse-wp-bridge/v1/health` returns `401 ghwpb_auth_required`;
+- authenticated health returns `200` with `mode=read_only_inspection`, `writesEnabled=false`, `greenhouse_write_routes=false`, and Kinsta/cache/backup flags false;
+- authenticated Elementor inspection for page `244079` returns `200` and summarizes 199 elements, including 14 legacy sections, 46 containers and 112 widgets;
+- authenticated Ohio widget catalog returns `200` with 253 Elementor widgets, 37 Ohio widgets and 2 HubSpot widgets.
+
+Reusable Greenhouse-side inspection command:
+
+```bash
+pnpm public-website:bridge-inspect -- --page-id 244079
+pnpm public-website:bridge-inspect -- --page-id 244079 --write
+```
+
+The command is read-only, resolves WordPress auth through Secret Manager, redacts credentials by construction and writes inspection evidence under `docs/operations/public-site-bridge-inspections/`.
+
+Greenhouse also exposes the same read-only inspection primitive through a server-side reader and internal admin API:
+
+```text
+src/lib/public-site/bridge-inspection.ts
+GET /api/admin/public-site/bridge-inspection?pageId={id}
+GET /api/admin/public-site/bridge-inspection?pageId={id}&includeCatalog=false
+```
+
+The API is gated by `requireAdminTenantContext()` plus capability `platform.public_site.bridge.inspect` (`read`, `all`). It returns the same `public-site-bridge-inspection.v1` report shape as the CLI, never returns WordPress credentials, and responds with `503 public_site_bridge_auth_not_configured` if the current Greenhouse runtime has not been provisioned with the WordPress Application Password secret plumbing. This is a read lane for the future Public Site UI; it is not a write/draft/publish lane.
 
 Current REST namespace and routes:
 

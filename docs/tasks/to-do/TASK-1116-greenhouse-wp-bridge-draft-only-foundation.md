@@ -14,7 +14,7 @@
 - Effort: `Alto`
 - Type: `implementation`
 - Epic: `EPIC-019`
-- Status real: `Partial repo-only foundation exists: plugin skeleton + authenticated read-only health/Elementor/Ohio inspection endpoints in efeonce-public-site-runtime; not deployed/activated on Kinsta; signed auth, Abilities registration and draft write path still pending`
+- Status real: `Partial live read-only foundation exists: plugin skeleton + authenticated read-only health/Elementor/Ohio inspection endpoints are deployed/active on Kinsta from efeonce-public-site-runtime; signed auth, Abilities registration and draft write path still pending`
 - Rank: `TBD`
 - Domain: `platform|commercial|marketing-ops|integrations|wordpress`
 - Blocked by: `TASK-1111 Kinsta API gap bloquea cache/backups/publish operations; confirmar staging/preview target; provisionar shared secret/HMAC y reducir privilegios del usuario tecnico antes de writes`
@@ -120,13 +120,15 @@ Reglas obligatorias:
 
 ### Gap
 
-- `greenhouse-wp-bridge` repo-only skeleton exists under `efeoncepro/efeonce-public-site-runtime:wp-content/plugins/greenhouse-wp-bridge`.
+- `greenhouse-wp-bridge` v0.1.0 exists under `efeoncepro/efeonce-public-site-runtime:wp-content/plugins/greenhouse-wp-bridge` and is deployed/active on Kinsta in read-only inspection mode.
 - Current routes are read-only inspection only:
   - `GET /wp-json/greenhouse-wp-bridge/v1/health`
   - `GET /wp-json/greenhouse-wp-bridge/v1/inspection/elementor-document/{id}`
   - `GET /wp-json/greenhouse-wp-bridge/v1/inspection/ohio-widget-catalog`
+- Production smoke on 2026-06-14: anonymous health returns `401 ghwpb_auth_required`; authenticated health, Elementor inspection for page `244079`, and Ohio widget catalog return `200`. Health reports `writesEnabled=false`, `greenhouse_write_routes=false`, and Kinsta/cache/backup config false.
+- Greenhouse now has a reusable read-only inspection helper for the active bridge: `pnpm public-website:bridge-inspect -- --page-id <id> [--write]`. First evidence lives at `docs/operations/public-site-bridge-inspections/inspection-page-244079-2026-06-14T16-22-05-591Z.json`.
+- Greenhouse also has a read-only internal API lane for the active bridge: `GET /api/admin/public-site/bridge-inspection?pageId=<id>` backed by `src/lib/public-site/bridge-inspection.ts` and gated by `platform.public_site.bridge.inspect`. It is intentionally inspection-only and does not satisfy the signed draft write contract for this task.
 - PHP syntax lint passed locally for the new plugin.
-- The plugin has not been deployed/activated on Kinsta yet.
 - No signed write contract exists.
 - No draft-only endpoint exists.
 - No staging/preview/rollback baseline exists for Greenhouse-owned WordPress objects.

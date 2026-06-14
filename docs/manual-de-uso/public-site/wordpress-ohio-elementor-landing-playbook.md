@@ -16,7 +16,7 @@ Guiar a agentes y operadores para crear o ajustar landings de `efeoncepro.com` u
 
 1. Identificar `post_id`, slug, status y template.
 2. Leer `_elementor_data`, `_elementor_page_settings` y metas Ohio relevantes.
-   - Cuando `greenhouse-wp-bridge` este desplegado/activo, usar primero `GET /wp-json/greenhouse-wp-bridge/v1/inspection/elementor-document/{id}` para obtener resumen read-only de estructura, widgets, anchors `gh-*` y metas Ohio.
+   - `greenhouse-wp-bridge` v0.1.0 ya esta desplegado/activo en Kinsta en modo read-only; usar primero `GET /wp-json/greenhouse-wp-bridge/v1/inspection/elementor-document/{id}` con autenticacion WordPress para obtener resumen de estructura, widgets, anchors `gh-*` y metas Ohio.
 3. Determinar si la zona usa `container` moderno o `section/column` legacy.
 4. Buscar anchors semanticos `gh-*`; si no existen, planear agregarlos en el patch.
 5. Verificar si el problema es:
@@ -193,8 +193,8 @@ No ejecutar writes si:
 
 ## Que falta para automatizar desde Greenhouse
 
-- Endpoint/ability `inspect-elementor-document`.
-- Endpoint/ability `inspect-ohio-widget-catalog`.
+- Ability `inspect-elementor-document` y contrato signed futuro; el endpoint REST read-only ya existe en `greenhouse-wp-bridge`.
+- Ability `inspect-ohio-widget-catalog` y contrato signed futuro; el endpoint REST read-only ya existe en `greenhouse-wp-bridge`.
 - Endpoint/ability `validate-elementor-patch`.
 - Endpoint/ability `duplicate-elementor-document`.
 - Endpoint/ability `patch-elementor-document` draft/private.

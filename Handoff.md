@@ -1,5 +1,22 @@
 # Release 2026-06-10 #2 — develop→main `6c649b2a6` RELEASED
 
+## Sesion 2026-06-14 — Public Site bridge inspection API read-only (Codex)
+
+- **Qué quedó:** `src/lib/public-site/bridge-inspection.ts` centraliza la inspección read-only del bridge activo y ahora la reutiliza tanto `pnpm public-website:bridge-inspect` como la nueva API interna `GET /api/admin/public-site/bridge-inspection?pageId=<id>`.
+- **API/control plane:** la ruta responde `public-site-bridge-inspection.v1`, acepta `includeCatalog=false`, está protegida por `requireAdminTenantContext()` + capability `platform.public_site.bridge.inspect` (`read`, `all`) y devuelve `503 public_site_bridge_auth_not_configured` si el runtime Greenhouse no tiene configurado el secret WordPress. No devuelve credenciales ni headers.
+- **Permisos:** se agregó capability catalog/runtime grant para `EFEONCE_ADMIN`; evita 403 latente en la futura UI Public Site.
+- **Verificación:** `pnpm public-website:bridge-inspect -- --page-id 244079 --no-catalog` consultó producción OK; Vitest focal de la ruta API 4/4; ESLint focal OK; `NODE_OPTIONS=--max-old-space-size=8192 pnpm exec tsc --noEmit --pretty false` OK.
+- **Estado honesto:** esto desbloquea una lane UI/API read-only para inspección, pero no cambia `TASK-1116`: siguen pendientes HMAC/shared secret, replay guard, Abilities registration, draft-only writes, staging/preview y least-privilege antes de cualquier mutación WordPress.
+
+## Sesion 2026-06-14 — Public Site bridge read-only deployed/active (Codex)
+
+- **Bridge activo en Kinsta:** `greenhouse-wp-bridge` v0.1.0 fue subido desde `/Users/jreye/Documents/efeonce-public-site-runtime` commit `f4c8a33` y activado via SSH/WP-CLI en `/www/efeoncegroup_752/public/wp-content/plugins/greenhouse-wp-bridge`. El runtime repo sigue limpio en `main`; Greenhouse sigue en `develop` y se preservaron sin tocar los WIP ajenos `src/libs/FramerMotion.tsx` y `src/views/greenhouse/admin/design-system/card-density/CardDensityLabView.tsx`.
+- **Smoke productivo:** anónimo `GET /wp-json/greenhouse-wp-bridge/v1/health` devuelve `401 ghwpb_auth_required`. Autenticado con Application Password desde Secret Manager: health `200` (`mode=read_only_inspection`, `writesEnabled=false`, `greenhouse_write_routes=false`, Kinsta/cache/backup flags false), inspección Elementor de page `244079` `200` (199 elements; 14 sections legacy, 46 containers, 112 widgets; 3 anchors `gh-*`) y catálogo Ohio `200` (`253` Elementor widgets, `37` Ohio, `2` HubSpot).
+- **Tooling corregido:** `pnpm public-website:export-live-code` ahora incluye `wp-content/plugins/greenhouse-wp-bridge` como target gobernado, alineado al binding manifest. Export live nuevo: `tmp/public-site-code-baselines/2026-06-14T16-12-51-903Z/` con 56 archivos.
+- **Inspector reusable:** nuevo `pnpm public-website:bridge-inspect -- --page-id <id> [--write]` para llamar health, inspeccion Elementor y catalogo Ohio del bridge activo con auth de Secret Manager y sin imprimir secretos. Primera evidencia: `docs/operations/public-site-bridge-inspections/inspection-page-244079-2026-06-14T16-22-05-591Z.json`.
+- **Evidencia nueva:** drift `docs/operations/public-site-drift/drift-2026-06-14T16-13-03-406Z.json` (`in_sync=54`, `ignored_live=2`, `drifted=0`, `repo_missing=0`, `repo_extra=0`); status `docs/operations/public-site-runtime-status/status-2026-06-14T16-13-15-103Z.json`; dry-run `docs/operations/public-site-deploy-dry-runs/dry-run-2026-06-14T16-13-03-124Z.json` (`noop=54`, `would_create=0`, `would_update=0`).
+- **Estado honesto:** `TASK-1122` queda code-complete para binding/readers/drift/dry-run + activación manual read-only; automated deploy apply sigue bloqueado por Kinsta API/cache/backups/release policy. `TASK-1116` sigue bloqueada para writes: falta HMAC/shared secret, replay guard, Abilities registration, staging/preview target y reducción de privilegios del usuario técnico antes de draft mutations.
+
 ## Sesion 2026-06-14 — Public Site repo/control-plane discovery (Codex)
 
 - **TASK-1122 tomada:** se movio a `in-progress` por instruccion del operador. Excepcion documentada: continuar sobre `develop` y no cambiar de rama/worktree, aunque la task declare branch `task/TASK-1122-public-site-code-baseline-gitops-binding`.
