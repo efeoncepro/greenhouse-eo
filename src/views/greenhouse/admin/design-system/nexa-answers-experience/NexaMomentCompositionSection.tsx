@@ -286,6 +286,7 @@ const NexaMomentCompositionSection = () => {
             <Stack direction='row' spacing={2} flexWrap='wrap' useFlexGap alignItems='center'>
               <GreenhouseChip size='small' variant='label' tone='primary' iconClassName='tabler-layers-subtract' label='Composición con host' />
               <GreenhouseChip size='small' variant='outlined' tone='default' iconClassName='tabler-eye' label='El host persiste' />
+              <GreenhouseChip size='small' variant='label' tone='info' iconClassName='tabler-book-2' label='Ejemplo: Knowledge' />
             </Stack>
             <Typography variant='h5'>Nexa compone con la superficie (no la reemplaza)</Typography>
             <Typography variant='body2' color='text.secondary' sx={{ maxInlineSize: 820 }}>

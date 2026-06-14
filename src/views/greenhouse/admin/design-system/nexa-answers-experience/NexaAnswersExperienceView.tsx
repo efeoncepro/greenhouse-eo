@@ -368,10 +368,10 @@ const StageSelector = ({ value, onChange }: { value: VisualStage; onChange: (sta
 
 const ContextStrip = () => (
   <Stack direction='row' spacing={2} flexWrap='wrap' useFlexGap data-capture='nexa-answers-context-strip'>
-    <GreenhouseChip size='small' variant='label' tone='primary' iconClassName='tabler-layout-dashboard' label='Knowledge' />
-    <GreenhouseChip size='small' variant='label' tone='success' iconClassName='tabler-shield-check' label='Bajo riesgo' />
-    <GreenhouseChip size='small' variant='label' tone='info' iconClassName='tabler-database' label='surfaceContext listo' />
-    <GreenhouseChip size='small' variant='outlined' tone='default' iconClassName='tabler-route' label='Humano | Nexa | MCP' />
+    <GreenhouseChip size='small' variant='label' tone='primary' iconClassName='tabler-affiliate' label='Experiencia transversal' />
+    <GreenhouseChip size='small' variant='label' tone='success' iconClassName='tabler-sparkles' label='La respuesta se arma' />
+    <GreenhouseChip size='small' variant='label' tone='info' iconClassName='tabler-eye' label='Host vivo' />
+    <GreenhouseChip size='small' variant='outlined' tone='default' iconClassName='tabler-link' label='Citas al dato real' />
   </Stack>
 )
 
@@ -522,7 +522,7 @@ const SurfaceContextRail = () => {
             <Typography variant='h6'>AI moment</Typography>
           </Stack>
           <Typography variant='body2' color='text.secondary'>
-            Nexa Answers vive dentro de Knowledge. Nexa Chat sigue siendo el shell global; MCP conserva la inspección técnica.
+            Nexa Answers se embebe en la superficie operativa — Knowledge es solo el primer ejemplo. Nexa Chat sigue siendo el shell global; MCP conserva la inspección técnica.
           </Typography>
         </Stack>
       </Box>
@@ -595,9 +595,9 @@ const PortabilityGallery = () => {
     <Box data-capture='nexa-answers-portability' sx={{ ...panelSx(theme), p: { xs: 4, md: 5 } }}>
       <Stack spacing={4}>
         <Stack spacing={1}>
-          <Typography variant='h5'>Portabilidad fuera de Knowledge</Typography>
+          <Typography variant='h5'>El mismo canvas, cualquier dominio</Typography>
           <Typography variant='body2' color='text.secondary' sx={{ maxInlineSize: 820 }}>
-            El mismo NexaAnswersCanvas y el contrato surfaceContext/renderPlan renderizan otros dominios sin
+            El mismo NexaAnswersCanvas y el contrato surfaceContext/renderPlan renderizan cualquier dominio sin
             re-plumbing: Finanzas con gráfica y una señal de Nexa Insights promovida a respuesta. Datos sintéticos.
           </Typography>
         </Stack>
@@ -690,10 +690,11 @@ const NexaAnswersExperienceView = () => {
           />
           <Stack spacing={1.5}>
             <ContextStrip />
-            <Typography variant='surfaceHeroTitle'>Nexa Answers sobre Knowledge</Typography>
+            <Typography variant='surfaceHeroTitle'>Nexa Answers Experience</Typography>
             <Typography variant='body2' color='text.secondary' sx={{ maxInlineSize: 780 }}>
-              Primera surface real de bajo riesgo para terminar la experiencia conversacional: respuesta útil primero,
-              confianza compacta y proof disponible sin romper el flujo.
+              La experiencia conversacional de Nexa, transversal a cualquier superficie: la respuesta lidera y se arma
+              frente a ti, el contexto que estabas viendo persiste vivo y las citas anclan al dato real. Knowledge,
+              Finanzas e Insight son ejemplos del mismo canvas.
             </Typography>
           </Stack>
         </Stack>
@@ -748,15 +749,15 @@ const NexaAnswersExperienceView = () => {
             }}
           >
             <Stack spacing={0.5}>
-              <Typography variant='h5'>Surface embebida</Typography>
+              <Typography variant='h5'>La respuesta lidera y se arma</Typography>
               <Typography variant='caption' color='text.secondary'>
-                Knowledge · answer-first · proof bajo demanda
+                Ejemplo: Knowledge · answer-first · proof bajo demanda
               </Typography>
             </Stack>
             <Stack direction='row' spacing={2} flexWrap='wrap' useFlexGap>
               <GreenhouseChip size='small' variant='label' tone='primary' label='Nexa' />
+              <GreenhouseChip size='small' variant='label' tone='info' label='Ejemplo: Knowledge' />
               <GreenhouseChip size='small' variant='label' tone='success' label='Fuentes actuales' />
-              <GreenhouseChip size='small' variant='outlined' tone='default' label='MCP inspecciona aparte' />
             </Stack>
           </Box>
           <Divider />
@@ -800,7 +801,7 @@ const NexaAnswersExperienceView = () => {
             <Stack spacing={1}>
               <Typography variant='h5'>Coreografía visible</Typography>
               <Typography variant='body2' color='text.secondary'>
-                La experiencia nace para Knowledge, pero la lectura de estados ya es portable a otras surfaces.
+                La misma lectura de estados aplica a cualquier superficie — no es específica de un dominio.
               </Typography>
             </Stack>
             <Tooltip title='El backend se cablea después sobre estos contratos visuales'>
