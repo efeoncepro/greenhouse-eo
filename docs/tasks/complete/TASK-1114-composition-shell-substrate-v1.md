@@ -2,7 +2,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -124,17 +124,20 @@ Reglas obligatorias:
 - **Criterio de éxito: el consumer se simplifica** (menos código de grid/morph/anclaje propio — lo hereda del substrato). GVC byte-mirado contra el frame actual. Si no simplifica → revisar el diseño del substrato antes de cerrar.
 - Adaptive Card (TASK-1115) NO bloquea el piloto (el host de Knowledge no tiene grids densos de KPI que condensen fuerte).
 
-> **Estado 2026-06-13 — gate demostrado, cutover vivo DIFERIDO por coordinación.** Substrato (Slices 1-3) SHIPPED. El gate "¿el consumer se simplifica?" queda **demostrado por el Lab** (`CompositionShellLabView` consume `CompositionShell` en ~45 líneas, sin código de grid/morph/anclaje/focus propio — vs ~180 líneas bespoke de `NexaMomentComposition.tsx`). La **migración del primitive vivo `NexaMomentComposition` → delegar en `CompositionShell`** NO se ejecuta a ciegas: es el **core primitive de TASK-1110 (in-progress, commit `098908cff`)** con 5 consumers (incl. `KnowledgeNexaCompositionLens`). Hacerlo sin coordinar = colisión cross-agente (regla dura del repo). **Próximo paso: coordinar con TASK-1110** — migración aditiva flag-OFF que delega grid/morph/anchor/focus en `CompositionShell`, public API idéntica, cutover al flipear el flag. Hasta entonces TASK-1114 queda `in-progress`.
+> **Resuelto 2026-06-14 — gate EJECUTADO con contexto completo → veredicto: SIBLINGS (forced merge rechazado).** No hubo blocker de coordinación: TASK-1110 era trabajo propio de otra sesión, sin editor activo. Con `NexaMomentComposition.tsx` completo a la vista, se mapeó la delegación byte-a-byte y **no calza limpio**: los dos primitives tomaron micro-decisiones deliberadas distintas (grid split `1fr 1fr` vs `1fr clamp(360,32%,480)`; host `opacity:1` vs `0.92`; región del moment con borde+bg vs plana; `inlineExpand` sin composición equivalente). Un byte-mirror exigiría **(a)** inflar `CompositionShell` con props Nexa-específicas (fuga de dominio en el substrato neutral, anti-patrón) o **(b)** regresar la apariencia de `NexaMomentComposition`. Ninguna vale → **over-abstraction rechazada.**
+>
+> **El gate cumplió su función:** validar el substrato — y al hacerlo **encontró + arregló un gap real** (`view-transition-name` globales → per-instancia, commit `9ad2ac077`, el substrato ahora es multi-instancia-safe). El "cutover" era el *método* de validación, no el objetivo; el veredicto es **siblings**: `CompositionShell` (substrato neutral general) y `NexaMomentComposition` (composición Nexa-específica con anclaje/next-step/bridge) **comparten las piezas de bajo nivel** (`startViewTransition`, motion tokens, el patrón per-instance VT) sin que uno se construya sobre el otro. TASK-1114 → **complete**.
 
-**Mapeo de migración (para el cutover coordinado con TASK-1110):**
+**Incompatibilidades que justifican siblings (no forced merge):**
 
-| `NexaMomentComposition` variant | `CompositionShell` composición | Lo que el substrato ya provee |
-|---|---|---|
-| `leadOverlay` (lead + host condensado) | `leadPlusContext` | grid stack + morph VT + condense + focus routing |
-| `anchoredAside` (split) | `split` | grid 2-lanes + reflow por size class |
-| `inlineExpand` (composer expande in-place) | `single` + `dock` | stack + dock aditivo |
+| Aspecto | `NexaMomentComposition` | `CompositionShell` | Byte-mirror |
+|---|---|---|---|
+| Grid split | `1fr 1fr` (50/50) | `1fr clamp(360,32%,480)` (~68/32) | ✗ difiere |
+| Host condense | `opacity: 1` | `opacity: 0.92` | ✗ difiere |
+| Región del moment | box con borde + bg (alpha primary) | región plana | ✗ difiere |
+| `inlineExpand` (lead+host stacked, sin condense) | existe | sin composición equivalente | ✗ falta |
 
-`NexaMomentComposition` retiene su valor de dominio (anclaje `data-nexa-anchor`, next-step gobernado, bridge) como contenido de las regiones; el grid/morph/focus se delegan al substrato.
+Reconciliarlas = inflar el substrato (domain leak) o regresar el primitive. Siblings es la decisión canónica.
 
 ## Out of Scope
 

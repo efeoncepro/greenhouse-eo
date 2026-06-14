@@ -239,3 +239,12 @@ Contrato compartido (consistencia) = generaliza el **Density Contract de TASK-74
 - **Piloto = la lente compuesta de Knowledge** (el consumer `NexaMomentComposition`, TASK-1110). Unifica el **gate de validación** (migrar `NexaMomentComposition` y que se simplifique) con el primer piloto real.
 - **Flag por-surface, default OFF.** Las UI legacy quedan exactamente como hoy (`LayoutContent` intacto). El flag se enciende **solo para la surface piloto**. Revert = flag OFF (sin migración). Patrón consistente con los flags de la lente conversacional (`NEXA_ANSWERS_CANVAS_LENS_ENABLED`).
 - **Adaptive Card NO bloquea el piloto**: el host de Knowledge no tiene grids densos de KPI que condensen fuerte; el piloto puede shippear con el shell morph y la Adaptive Card entra como follow-up (TASK-1115).
+
+## Delta 2026-06-14 — veredicto del gate: SIBLINGS (forced merge rechazado) + per-instance VT (TASK-1114 complete)
+
+El gate de validación (Slice 4: "¿un consumer real simplifica si delega en el substrato?") se ejecutó con contexto completo sobre `NexaMomentComposition`. **Resultado:**
+
+1. **Gap encontrado + arreglado:** `CompositionShell` usaba `view-transition-name` **globales** → colisión con 2+ instancias por página (el Lab de `NexaMomentComposition` renderiza 2). Fix: `regionViewTransitionName(region, instanceId)` + `useId` (nombre base estable por región, escopado por instancia). El substrato ahora es **multi-instancia-safe**. Commit `9ad2ac077`.
+2. **Forced merge RECHAZADO (over-abstraction):** `NexaMomentComposition` y `CompositionShell` tomaron micro-decisiones deliberadas distintas (grid split 50/50 vs ~68/32; host `opacity:1` vs `0.92`; región del moment con borde+bg vs plana; `inlineExpand` sin composición equivalente). Un byte-mirror exigiría inflar el substrato neutral con props Nexa-específicas (**domain leak**) o regresar la apariencia del primitive. Ninguna vale.
+
+**Decisión canónica: SIBLINGS.** `CompositionShell` (substrato de layout neutral, general) y `NexaMomentComposition` (composición Nexa-específica con anclaje/next-step/bridge + sus micro-decisiones) **coexisten como hermanos**, compartiendo las piezas de bajo nivel (`startViewTransition`, motion tokens, el patrón per-instance VT) — **NINGUNO se construye sobre el otro**. Forzar la fusión sería el anti-patrón "estirar un primitive hasta volverlo god-component" (mismo principio que el ADR del Adaptive Sidecar rechaza). El gate cumplió su propósito: validar el substrato (no fusionar). **TASK-1114 → complete.**
