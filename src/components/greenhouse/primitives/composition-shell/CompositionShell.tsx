@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useId, useRef, useState } from 'react'
 
 import Box from '@mui/material/Box'
 import Stack from '@mui/material/Stack'
@@ -8,6 +8,7 @@ import { useTheme, type Theme } from '@mui/material/styles'
 
 import {
   COMPOSITION_SHELL_REGION_META,
+  regionViewTransitionName,
   resolveComposition,
   resolveCompositionConfig,
   resolveCompositionLayout,
@@ -58,6 +59,8 @@ const CompositionShell = ({
   const rootRef = useRef<HTMLDivElement | null>(null)
   const leadingRegionRef = useRef<HTMLElement | null>(null)
   const prevCompositionRef = useRef<string | null>(null)
+  // VT names por-instancia: dos shells en la misma página no colisionan (constraint VT singleton).
+  const vtId = useId().replace(/[^a-zA-Z0-9_-]/g, '')
 
   const resolvedComposition = resolveComposition({ composition, kind })
   const config = resolveCompositionConfig({ composition, kind })
@@ -106,7 +109,6 @@ const CompositionShell = ({
 
     if (!content) return null
 
-    const meta = COMPOSITION_SHELL_REGION_META[region]
     const isLeading = region === leadingRegion
     const condense = region === 'primary' && config.condensesPrimary
 
@@ -126,7 +128,7 @@ const CompositionShell = ({
         tabIndex={isLeading ? -1 : undefined}
         data-capture={`composition-shell-region-${region}`}
         data-composition-region={region}
-        style={{ viewTransitionName: meta.viewTransitionName }}
+        style={{ viewTransitionName: regionViewTransitionName(region, vtId) }}
         sx={{ ...regionSx(theme, region, condense), outline: 'none' }}
       >
         {content}

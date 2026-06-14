@@ -25,6 +25,16 @@ export const COMPOSITION_SHELL_REGION_META: Record<CompositionShellRegion, Compo
   overlay: { region: 'overlay', viewTransitionName: 'gh-region-overlay', minInlineSize: 0 }
 }
 
+/**
+ * `view-transition-name` POR INSTANCIA. La metadata define el nombre BASE (`gh-region-primary`);
+ * el componente lo escopa con un id único de instancia (`useId`) → dos shells en la misma página NO
+ * colisionan (constraint VT: ≤1 elemento por nombre) y el morph entre composiciones de UNA instancia
+ * sigue funcionando (nombre estable por región dentro de esa instancia). Espeja el patrón de
+ * `NexaMomentComposition` (per-instance VT names). Surfaced por el gate de TASK-1114 (Lab = 2 instancias).
+ */
+export const regionViewTransitionName = (region: CompositionShellRegion, instanceId: string): string =>
+  `${COMPOSITION_SHELL_REGION_META[region].viewTransitionName}-${instanceId}`
+
 // ── Composition config (the canonical layouts) ───────────────────────────────
 export const COMPOSITION_SHELL_COMPOSITION_CONFIG: Record<
   CompositionShellComposition,

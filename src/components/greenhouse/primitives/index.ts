@@ -326,6 +326,7 @@ export {
   COMPOSITION_SHELL_REGION_META,
   initialCompositionShellState,
   reduceCompositionShellState,
+  regionViewTransitionName,
   resolveComposition,
   resolveCompositionConfig,
   resolveCompositionLayout,

@@ -5,6 +5,7 @@ import {
   COMPOSITION_SHELL_REGION_META,
   initialCompositionShellState,
   reduceCompositionShellState,
+  regionViewTransitionName,
   resolveComposition,
   resolveCompositionConfig,
   resolveCompositionLayout,
@@ -67,6 +68,17 @@ describe('config + region metadata', () => {
     for (const [key, meta] of Object.entries(COMPOSITION_SHELL_REGION_META)) {
       expect(meta.region).toBe(key as CompositionShellRegion)
     }
+  })
+
+  it('regionViewTransitionName es per-instancia: estable por región dentro de una instancia, distinto entre instancias', () => {
+    // Estable dentro de una instancia (morph entre composiciones de ESE shell funciona).
+    expect(regionViewTransitionName('primary', 'a')).toBe(regionViewTransitionName('primary', 'a'))
+    // Distinto entre instancias (2 shells en una página NO colisionan — constraint VT singleton).
+    expect(regionViewTransitionName('primary', 'a')).not.toBe(regionViewTransitionName('primary', 'b'))
+    // Distinto entre regiones de la misma instancia.
+    expect(regionViewTransitionName('primary', 'a')).not.toBe(regionViewTransitionName('aside', 'a'))
+    // Conserva el nombre base.
+    expect(regionViewTransitionName('lead', 'x')).toContain(COMPOSITION_SHELL_REGION_META.lead.viewTransitionName)
   })
 })
 
