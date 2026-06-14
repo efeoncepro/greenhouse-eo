@@ -1,5 +1,20 @@
 # Release 2026-06-10 #2 — develop→main `6c649b2a6` RELEASED
 
+## Sesion 2026-06-14 — Public Site discovery carga `.env.local` automatica (Codex)
+
+- **Qué quedó:** `scripts/public-website/discover-wordpress.ts` ahora carga `.env.local` y luego `.env` automaticamente antes de resolver `PUBLIC_WEBSITE_*`, sin sobrescribir variables ya exportadas por shell/CI.
+- **Por qué:** el primer intento autenticado fallaba como `enabled but not configured` si el agente no hacia `source .env.local` o no pegaba un prefijo inline largo. Eso iba a repetirse con otros agentes.
+- **Contrato nuevo:** usar directamente `pnpm public-website:discover -- --authenticated --wpcli` (y `--write` solo si se quiere regenerar reporte). No pegar secretos ni env vars inline.
+- **Docs/skills:** skill Public Site WordPress Codex/Claude, TASK-1111, discovery WordPress y `project_context.md` actualizados.
+
+## Sesion 2026-06-14 — Elementor structural discovery Public Site (Codex)
+
+- **Qué quedó:** nuevo reporte read-only `docs/operations/discovery-public-website-elementor-20260614.md` para entender Elementor desde el runtime real de `efeoncepro.com` antes de automatizar widgets/estructura desde Greenhouse.
+- **Hallazgo clave:** el sitio no tiene un unico modelo Elementor: home `2791` usa containers modernos; `/blog` `18456` mezcla sections/columns legacy + containers; `/contacto` `20729` usa legacy sections/columns. Cualquier tooling debe soportar los cuatro `elType`: `container`, `section`, `column`, `widget`.
+- **Contrato recomendado:** no editar DOM/CSS como fuente primaria ni hacer `update_post_meta('_elementor_data')` a ciegas. El bridge debe leer/parchear el arbol `_elementor_data`, validar `element.id + elType + widgetType + fingerprint`, y guardar con `\Elementor\Plugin::$instance->documents->get($postId)->save([ 'elements' => ..., 'settings' => ... ])`, porque eso dispara permisos, hooks, version/template save, borrado de CSS del post y cache del documento.
+- **Skills actualizadas:** `.codex/skills/efeonce-public-site-wordpress/SKILL.md` y `.claude/skills/efeonce-public-site-wordpress/SKILL.md` ahora apuntan al discovery y documentan la estrategia de manipulación estructural.
+- **Siguiente paso recomendado:** `TASK-1116` debe partir con abilities/endpoints read/draft-only: `inspect-elementor-document`, `validate-elementor-patch`, `duplicate-elementor-document` y `patch-elementor-document` solo sobre drafts/private Greenhouse-owned.
+
 ## Sesion 2026-06-14 — Skill actualizable Public Site WordPress creada (Codex)
 
 - **Qué quedó:** nueva skill local sincronizada para Codex y Claude con la memoria operativa de `efeoncepro.com`: `.codex/skills/efeonce-public-site-wordpress/SKILL.md` y `.claude/skills/efeonce-public-site-wordpress/SKILL.md`.

@@ -116,6 +116,7 @@ Reglas obligatorias:
 - Authenticated WordPress smoke is available.
 - Kinsta SSH/WP-CLI read-only access is available for operational inspection at `/www/efeoncegroup_752/public`; active theme/plugin/post-type inventory was collected manually on 2026-06-13.
 - Authenticated discovery ya tiene un Slice 3 repetible para WordPress/Abilities/plugins/theme/post-types usando Application Password + WP-CLI read-only.
+- `pnpm public-website:discover` carga `.env.local` y luego `.env` automaticamente sin sobreescribir variables ya exportadas; no hace falta `source .env.local` ni prefijos inline largos para otros agentes.
 - Kinsta environment/cache/backups discovery remains blocked until a Kinsta API token is provisioned, o hasta decidir formalmente que cache/backups pertenecen a una task posterior de publish.
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -173,6 +174,7 @@ El script debe:
 3. Capturar headers utiles (`x-kinsta-cache`, `ki-cache-type`, `ki-edge`, `cf-cache-status`, `x-wp-total`, `link`, etc.).
 4. Tratar `401/403` en `/wp-abilities/v1/abilities` como señal esperada de auth requerida, no como fallo del discovery publico.
 5. Escribir un reporte Markdown solo cuando se pasa `--write`.
+6. Cargar `.env.local` y luego `.env` automaticamente, sin sobrescribir variables de shell/CI y sin imprimir valores secretos.
 
 ## Rollout Plan & Risk Matrix
 
@@ -241,7 +243,7 @@ Sin flag — script local/documental, no runtime.
 
 - `pnpm public-website:discover`
 - `pnpm public-website:discover -- --write`
-- `PUBLIC_WEBSITE_WORDPRESS_USERNAME='Greenhouse INTEGRATION' PUBLIC_WEBSITE_WORDPRESS_APPLICATION_PASSWORD_SECRET_REF=public-website-wordpress-application-password PUBLIC_WEBSITE_KINSTA_SSH_HOST=161.153.204.166 PUBLIC_WEBSITE_KINSTA_SSH_PORT=64805 PUBLIC_WEBSITE_KINSTA_SSH_USER=efeoncegroup PUBLIC_WEBSITE_KINSTA_SSH_AUTH_METHOD=public-key PUBLIC_WEBSITE_KINSTA_SSH_KEY_PATH=/Users/jreye/.ssh/greenhouse_efeonce_kinsta_ed25519 PUBLIC_WEBSITE_KINSTA_WORDPRESS_PATH=/www/efeoncegroup_752/public pnpm public-website:discover -- --authenticated --wpcli --write`
+- `pnpm public-website:discover -- --authenticated --wpcli --write` (usa `.env.local` automaticamente; no requiere prefijo inline con env vars)
 - `pnpm ops:lint --changed`
 - `pnpm task:lint --changed`
 - `pnpm docs:closure-check`

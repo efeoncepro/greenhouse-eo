@@ -14,6 +14,7 @@ Use this skill as the living operational memory for `efeoncepro.com`: WordPress 
 Before changing the site or Greenhouse bridge code, read the relevant sources:
 
 - `docs/operations/discovery-public-website-wordpress-20260614.md` for the latest inventory and authenticated discovery results.
+- `docs/operations/discovery-public-website-elementor-20260614.md` when the task touches Elementor widgets, `_elementor_data`, page structure, templates, or Greenhouse-controlled landing-page generation.
 - `docs/documentation/public-site/wordpress-ohio-elementor-layout.md` and `docs/manual-de-uso/public-site/wordpress-ohio-elementor-layout.md` for Ohio/Elementor layout operations.
 - `docs/architecture/GREENHOUSE_PUBLIC_WEBSITE_LANDING_CONTROL_PLANE_ARCHITECTURE_V1.md` and `docs/architecture/GREENHOUSE_PUBLIC_WEBSITE_LANDING_CONTROL_PLANE_DECISION_V1.md` for the control-plane contract.
 - `docs/epics/to-do/EPIC-019-public-website-landing-control-plane.md`, `docs/tasks/in-progress/TASK-1111-public-website-read-only-discovery.md`, and `docs/tasks/to-do/TASK-1116-greenhouse-wp-bridge-draft-foundation.md`.
@@ -30,6 +31,7 @@ Pair with `wp-rest-api`, `wp-wpcli-and-ops`, `wp-abilities-api`, `wp-interactivi
 - Authenticated discovery currently resolves the integration account as user login `Greenhouse INTEGRATION`, slug `greenhouse-integration`, display `Greenhouse`. Its current role is `administrator`; reduce privileges before production bridge rollout.
 - Authenticated WP Abilities discovery returned 33 abilities.
 - Public inventory observed: 40 pages, 32 posts, private CPT `landing`.
+- Elementor facts observed on 2026-06-14: front page `page_id=2791` is `Home 2` and uses modern containers; `/blog` (`page_id=18456`) mixes legacy sections/columns with containers; `/contacto` (`page_id=20729`) uses legacy sections/columns. Do not assume a single Elementor structural model.
 - Secret reference for the current Application Password: `public-website-wordpress-application-password`. Never print or commit the value. Rotate before production because the value was pasted during the working session.
 - Kinsta API token is still pending for cache/environment/backups automation. Do not claim cache-clear or backup automation is operational until verified.
 
@@ -53,7 +55,7 @@ pnpm public-website:discover
 pnpm public-website:discover -- --authenticated --wpcli --write
 ```
 
-Authenticated discovery requires env/secret plumbing already configured by the repo. Do not paste secret values into the command line. When WP-CLI is needed directly, use the Kinsta SSH env vars and run read-only commands such as `wp option get`, `wp theme list`, `wp plugin list`, `wp post list`, and `wp post meta list`.
+The script auto-loads `.env.local` and then `.env` without overwriting shell/CI variables. Authenticated discovery requires the env/secret plumbing already configured by the repo, but agents should not need to `source .env.local` or paste long inline env commands. Do not paste secret values into the command line. When WP-CLI is needed directly, use the Kinsta SSH env vars and run read-only commands such as `wp option get`, `wp theme list`, `wp plugin list`, `wp post list`, and `wp post meta list`.
 
 ### Ohio + Elementor Layout Fixes
 
@@ -62,6 +64,17 @@ The most important lesson: several visual seams are Ohio page/meta issues, not g
 - Blog page: `page_id=18456`. The container width issue came from `page_full_width_margins_size` being out of sync with `--clb-grid-gutter`; the live fix set it to `16px`. Sidebar logo/hamburger regression was fixed with page-scoped CSS in `wp-content/themes/ohio-child/assets/css/global-fixes.css` for `body.page-id-18456.with-header-sidebar:not(.dark-scheme)`.
 - Contact page: `page_id=20729`. The background discontinuity came from Ohio `breadcrumb-holder` and `page-container.bottom-offset`; fix was page meta `page_breadcrumbs_visibility=0` and `page_add_top_padding=0`, not global background CSS.
 - Do not patch `#masthead`, footer, hero, or sidebar globally to hide a seam. That caused regressions in the sidebar logo/hamburger.
+
+### Elementor Structure Manipulation
+
+Use the Elementor discovery report before manipulating widgets. The editable source is the Elementor document tree in `_elementor_data`, not frontend DOM selectors.
+
+- Element shape: `id`, `elType`, optional `widgetType`, `settings`, and child `elements`.
+- Existing pages use mixed structure: support `container`, `section`, `column`, and `widget`.
+- Use `element.id` + `elType` + `widgetType` + a light fingerprint (`title`, `_css_classes`, `css_classes`, parent path) to find existing nodes. Treat `path` as diagnostic only because it changes when the tree is reordered.
+- For Greenhouse-owned landings, add semantic anchors in `settings.css_classes` / `settings._css_classes`, such as `gh-owned`, `gh-section-hero`, `gh-widget-primary-cta`, or `gh-slot-hubspot-form`.
+- Do not write `_elementor_data` directly as the normal path. A WordPress bridge should load `\Elementor\Plugin::$instance->documents->get($postId)` and call `Document::save([ 'elements' => $elements, 'settings' => $settings ])` so Elementor runs permissions, hooks, version/template saves, post CSS deletion, and document cache deletion.
+- Keep mutations draft/private first. For published pages, duplicate to a draft/private preview before patching.
 
 ### Greenhouse Bridge / Landing Pages
 
@@ -85,6 +98,7 @@ Update this skill when any of these change:
 - Kinsta credentials/token availability, cache/backups/deploy procedure, or SSH/WP-CLI path.
 - Greenhouse public-site architecture, ADRs, EPIC-019, TASK-1111, TASK-1116, or follow-up tasks.
 - A new Ohio/Elementor incident teaches a layout rule, selector risk, backup path, or rollback pattern.
+- Elementor page structure, widget controls, template inventory, or bridge patch contracts are newly discovered.
 - WordPress official developer guidance changes the React/Interactivity/Abilities/agent skill strategy.
 
 How to update:
