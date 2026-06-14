@@ -1,5 +1,7 @@
 'use client'
 
+import { memo } from 'react'
+
 import type { ToolCallMessagePartProps } from '@assistant-ui/react'
 import { useAssistantToolUI } from '@assistant-ui/react'
 
@@ -95,7 +97,14 @@ export const NexaKnowledgeToolTraceCard = ({
   return <NexaEvidencePanel evidence={evidence} variant='traceCard' feedbackEnabled={feedbackEnabled} />
 }
 
-const createRenderer = (toolName: string) => {
+/* ── Renderers ESTABLES por tool (TASK-1113) ──
+   `useAssistantToolUI` re-registra la tool UI cuando cambia la identidad de `render`
+   (dep `tool.render` del effect). Si el render se recrea en cada render del componente,
+   durante el revelado del texto (que re-renderiza el árbol por tick) el card de la tool
+   se desmonta+re-monta en cada tick → parpadeo visible justo cuando la respuesta usa
+   una tool. Por eso cada renderer vive a nivel de módulo (identidad estable) + memo, y
+   el effect de registro corre UNA sola vez por montaje. */
+const createToolRenderer = (toolName: string) => {
   const Renderer = ({ result }: ToolCallMessagePartProps<Record<string, unknown>, NexaToolResult>) => {
     if (!result) {
       return (
@@ -110,44 +119,38 @@ const createRenderer = (toolName: string) => {
 
   Renderer.displayName = `NexaToolRenderer(${toolName})`
 
-  return Renderer
+  return memo(Renderer)
 }
 
-const NexaToolRenderers = () => {
-  useAssistantToolUI({
-    toolName: 'check_payroll',
-    render: createRenderer('check_payroll')
-  })
-  useAssistantToolUI({
-    toolName: 'get_otd',
-    render: createRenderer('get_otd')
-  })
-  useAssistantToolUI({
-    toolName: 'check_emails',
-    render: createRenderer('check_emails')
-  })
-  useAssistantToolUI({
-    toolName: 'get_capacity',
-    render: createRenderer('get_capacity')
-  })
-  useAssistantToolUI({
-    toolName: 'pending_invoices',
-    render: createRenderer('pending_invoices')
-  })
-  useAssistantToolUI({
-    toolName: 'search_knowledge',
-    render: ({ result }: ToolCallMessagePartProps<Record<string, unknown>, NexaToolResult>) => {
-      if (!result) {
-        return (
-          <Alert severity='info' sx={{ mt: 1.25 }}>
-            Consultando Knowledge...
-          </Alert>
-        )
-      }
+const CheckPayrollRenderer = createToolRenderer('check_payroll')
+const GetOtdRenderer = createToolRenderer('get_otd')
+const CheckEmailsRenderer = createToolRenderer('check_emails')
+const GetCapacityRenderer = createToolRenderer('get_capacity')
+const PendingInvoicesRenderer = createToolRenderer('pending_invoices')
 
-      return <NexaKnowledgeToolTraceCard result={result} />
+const SearchKnowledgeRenderer = memo(
+  ({ result }: ToolCallMessagePartProps<Record<string, unknown>, NexaToolResult>) => {
+    if (!result) {
+      return (
+        <Alert severity='info' sx={{ mt: 1.25 }}>
+          Consultando Knowledge...
+        </Alert>
+      )
     }
-  })
+
+    return <NexaKnowledgeToolTraceCard result={result} />
+  }
+)
+
+SearchKnowledgeRenderer.displayName = 'NexaToolRenderer(search_knowledge)'
+
+const NexaToolRenderers = () => {
+  useAssistantToolUI({ toolName: 'check_payroll', render: CheckPayrollRenderer })
+  useAssistantToolUI({ toolName: 'get_otd', render: GetOtdRenderer })
+  useAssistantToolUI({ toolName: 'check_emails', render: CheckEmailsRenderer })
+  useAssistantToolUI({ toolName: 'get_capacity', render: GetCapacityRenderer })
+  useAssistantToolUI({ toolName: 'pending_invoices', render: PendingInvoicesRenderer })
+  useAssistantToolUI({ toolName: 'search_knowledge', render: SearchKnowledgeRenderer })
 
   return null
 }

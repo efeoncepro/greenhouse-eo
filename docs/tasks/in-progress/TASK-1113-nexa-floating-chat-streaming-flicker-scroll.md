@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Medio`
@@ -180,3 +180,32 @@ Discovery primero (Slice 1) — no asumir el componente exacto sin profiler. Hip
 ## Context (origen)
 
 Detectado por el operador el 2026-06-13 al activar Nexa knowledge retrieval + router Anthropic en producción (TASK-1085/1091/1094). La respuesta de Nexa es correcta (cita con fuente, score, freshness); el flicker + scroll trabado son de la capa de render del chat flotante. Explícitamente declarado por el operador como "bug separado para trabajar más en develop".
+
+## Resolución (2026-06-14, Claude)
+
+Componente real: `src/views/greenhouse/home/components/NexaThread.tsx` (thread assistant-ui compartido por Home inline + panel flotante) + `src/views/greenhouse/home/components/NexaToolRenderers.tsx`. **No es streaming real**: el adapter (`use-nexa-runtime.ts`) hace `await res.json()` y recibe el contenido completo; lo que se ve "stream" es el revelado typewriter de assistant-ui (`smooth=true`).
+
+### 3 causas raíz + fix (no parches)
+
+1. **Flicker de texto** — `MarkdownTextPrimitive` sin `components` memoizados → `ReactMarkdown` re-parsea y re-renderiza TODO el árbol en cada tick del revelado.
+   **Fix:** `unstable_memoizeMarkdownComponents` (memoiza cada bloque por su nodo `hast` → solo el último bloque, el que crece, re-renderiza).
+
+2. **Flicker de tools (el dominante, "cuando usa una tool")** — `NexaToolRenderers` registraba las tool UIs vía `useAssistantToolUI` **desde el `tools.Fallback`**. El Fallback solo se monta cuando una tool no tiene UI; registrar la UI ahí la vuelve "matched" → el Fallback se desmonta → el cleanup del effect des-registra → "unmatched" → re-monta → **loop infinito** (medido: ~630 remounts/s del card). Identidades de `render` inestables (`createRenderer(...)` recreado cada render) lo agravaban.
+   **Fix robusto:** sacar el registro del Fallback y montar `<NexaToolRenderer/>` **una sola vez** dentro del thread (siempre montado, registro persistente) + renderers a nivel de módulo (`React.memo`) + Fallback puro `() => null`.
+
+3. **Scroll trabado** — el viewport tenía CSS `scroll-behavior: smooth`; el auto-scroll-to-bottom de assistant-ui (`scrollTo({behavior:'auto'})`) se volvía animación suave que se re-disparaba en cada resize de contenido durante el revelado, peleaba con la rueda y mantenía `scrollingToBottomBehaviorRef` sin liberar (bloqueaba subir).
+   **Fix:** quitar el CSS smooth → sticky-bottom honesto de assistant-ui (se ancla si estás al fondo, **suelta** cuando subís). Reduced-motion satisfecho por construcción.
+
+### Evidencia objetiva (panel real `/knowledge`, Gemini local, Playwright)
+
+- **Flicker de tool:** MutationObserver sobre remounts del card de la tool durante ~6s de revelado: **3793 → 0** remounts.
+- **Scroll:** scroll-up programático a `scrollTop=80` durante el revelado activo; el contenido creció de ~80 → 1116px (14×) y el `scrollTop` **se quedó en 80** las 18 muestras (no fue arrastrado al fondo).
+- Frame mirado: respuesta con markdown + card `get_otd` (chips OTD/Activos/Spaces) + toolbar de feedback intactos.
+
+### Fuera de scope (issue separado)
+
+Error de hidratación `useId` en un `CustomTextField` (`@core/components/mui/TextField.tsx:257`) — es global y pre-existente (NO es el composer de Nexa, que tiene `id` explícito), ocurre una vez al cargar la página, no es el flicker repetitivo del streaming. Se trackea aparte, no se mezcla con esta task.
+
+### Estado
+
+`code-complete` en `develop` local; verificado objetivamente con streaming real local. Cutover inmediato al merge (fix de UI, sin flags/migraciones). Pendiente: confirmación visual del operador en staging tras deploy (paso 5 de la secuencia de verificación) + GVC mobile.
