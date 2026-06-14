@@ -1,0 +1,544 @@
+{
+  "contractVersion": "public-site-runtime-deploy-dry-run.v1",
+  "generatedAt": "2026-06-14T17:37:23.229Z",
+  "mode": "no_mutation",
+  "site": {
+    "url": "https://efeoncepro.com",
+    "runtime": "wordpress",
+    "hosting": "kinsta",
+    "wordpressPath": "/www/efeoncegroup_752/public"
+  },
+  "repository": {
+    "provider": "github",
+    "owner": "efeoncepro",
+    "name": "efeonce-public-site-runtime",
+    "url": "https://github.com/efeoncepro/efeonce-public-site-runtime",
+    "visibility": "private",
+    "defaultBranch": "main",
+    "baselineSha": "0fa6bfd",
+    "baselineTag": "baseline-2026-06-14-live"
+  },
+  "repoRoot": "/Users/jreye/Documents/efeonce-public-site-runtime",
+  "liveManifestPath": "/Users/jreye/Documents/greenhouse-eo/tmp/public-site-code-baselines/2026-06-14T17-37-14-060Z/manifest.json",
+  "liveGeneratedAt": "2026-06-14T17:37:17.323Z",
+  "governedPaths": [
+    "wp-content/themes/ohio-child",
+    "wp-content/plugins/eo-headless-content",
+    "wp-content/plugins/eo-vibe-coding-api",
+    "wp-content/plugins/greenhouse-wp-bridge"
+  ],
+  "deploymentBlockedBy": [
+    "kinsta_api_token_missing_for_cache_clear",
+    "kinsta_api_token_missing_for_backups",
+    "production_deploy_apply_requires_explicit_release_task"
+  ],
+  "safetyPolicy": {
+    "writesToKinsta": false,
+    "clearsCache": false,
+    "createsBackup": false,
+    "deletesLiveOnlyFiles": false
+  },
+  "counts": {
+    "ignored_live": 2,
+    "noop": 60,
+    "would_create": 0,
+    "would_not_delete_live_only": 0,
+    "would_update": 0
+  },
+  "rows": [
+    {
+      "path": "wp-content/themes/ohio-child/assets/css/blog-page-meta-backup-20260614015717.txt",
+      "action": "ignored_live",
+      "liveSha256": "252f3eb7a1b6096948f67afe76eecd4ff8ce4018cd47c55a2ba15f61360b9ea4",
+      "liveBytes": 121,
+      "reason": "Session/live backup artifact."
+    },
+    {
+      "path": "wp-content/themes/ohio-child/assets/css/contacto-page-meta-backup-202606140-bg-continuity.json",
+      "action": "ignored_live",
+      "liveSha256": "e254a10208ec466dd9d60554600d9e71d169f5517303c2232a9d0b17fdf03888",
+      "liveBytes": 302,
+      "reason": "Session/live backup artifact."
+    },
+    {
+      "path": "wp-content/plugins/eo-headless-content/eo-headless-content.php",
+      "action": "noop",
+      "liveSha256": "8072a43a4051b1f411a4ae817c73d77de4496cb5dc3a0423aa546dbc864b7fea",
+      "repoSha256": "8072a43a4051b1f411a4ae817c73d77de4496cb5dc3a0423aa546dbc864b7fea",
+      "liveBytes": 1414,
+      "repoBytes": 1414
+    },
+    {
+      "path": "wp-content/plugins/eo-headless-content/includes/acf/landing-fields.php",
+      "action": "noop",
+      "liveSha256": "f638ce677b38d3df6078bdf42d2ea42b7e9ff12a02b232105cfbd19afc767954",
+      "repoSha256": "f638ce677b38d3df6078bdf42d2ea42b7e9ff12a02b232105cfbd19afc767954",
+      "liveBytes": 19043,
+      "repoBytes": 19043
+    },
+    {
+      "path": "wp-content/plugins/eo-headless-content/includes/acf/site-settings-fields.php",
+      "action": "noop",
+      "liveSha256": "0440cc7e34ed07fc3944fa4c051168c7ae6c0dc1d1c18c810914be8dbb498174",
+      "repoSha256": "0440cc7e34ed07fc3944fa4c051168c7ae6c0dc1d1c18c810914be8dbb498174",
+      "liveBytes": 15115,
+      "repoBytes": 15115
+    },
+    {
+      "path": "wp-content/plugins/eo-headless-content/includes/class-eoh-acf-fields.php",
+      "action": "noop",
+      "liveSha256": "46ebc6423433ecde61c934f87243af02bbe81f2280f292bca7e97b8bc24c752d",
+      "repoSha256": "46ebc6423433ecde61c934f87243af02bbe81f2280f292bca7e97b8bc24c752d",
+      "liveBytes": 2116,
+      "repoBytes": 2116
+    },
+    {
+      "path": "wp-content/plugins/eo-headless-content/includes/class-eoh-cpt.php",
+      "action": "noop",
+      "liveSha256": "a5a882fd5cf69e57f645b46d57117069df4a38b7d331890f30d4b5d21797783e",
+      "repoSha256": "a5a882fd5cf69e57f645b46d57117069df4a38b7d331890f30d4b5d21797783e",
+      "liveBytes": 3367,
+      "repoBytes": 3367
+    },
+    {
+      "path": "wp-content/plugins/eo-headless-content/includes/class-eoh-plugin.php",
+      "action": "noop",
+      "liveSha256": "a76364b6223177eb3cab80338b9ab763be4cb64818d76759a5ab321ebdbbac31",
+      "repoSha256": "a76364b6223177eb3cab80338b9ab763be4cb64818d76759a5ab321ebdbbac31",
+      "liveBytes": 3715,
+      "repoBytes": 3715
+    },
+    {
+      "path": "wp-content/plugins/eo-headless-content/includes/class-eoh-preview.php",
+      "action": "noop",
+      "liveSha256": "54c1aadfac611257dbc3d3dda52f361018235e9ef8d22c69d2b5484544623066",
+      "repoSha256": "54c1aadfac611257dbc3d3dda52f361018235e9ef8d22c69d2b5484544623066",
+      "liveBytes": 2902,
+      "repoBytes": 2902
+    },
+    {
+      "path": "wp-content/plugins/eo-headless-content/includes/class-eoh-rest.php",
+      "action": "noop",
+      "liveSha256": "c4dd46bf0104453290a6651d3da85984a35b32e4819d840003986f0304958c40",
+      "repoSha256": "c4dd46bf0104453290a6651d3da85984a35b32e4819d840003986f0304958c40",
+      "liveBytes": 7036,
+      "repoBytes": 7036
+    },
+    {
+      "path": "wp-content/plugins/eo-headless-content/includes/class-eoh-settings.php",
+      "action": "noop",
+      "liveSha256": "b2d274af9c77eaae0a540cef344c35ad3bbaa00d3876f61acb1c1ced3c8464af",
+      "repoSha256": "b2d274af9c77eaae0a540cef344c35ad3bbaa00d3876f61acb1c1ced3c8464af",
+      "liveBytes": 10462,
+      "repoBytes": 10462
+    },
+    {
+      "path": "wp-content/plugins/eo-headless-content/includes/class-eoh-webhooks.php",
+      "action": "noop",
+      "liveSha256": "ff658ab9fc7181abeb889293ce276ab9e836c836c79ad8d5d261fb7ff95c08cd",
+      "repoSha256": "ff658ab9fc7181abeb889293ce276ab9e836c836c79ad8d5d261fb7ff95c08cd",
+      "liveBytes": 4196,
+      "repoBytes": 4196
+    },
+    {
+      "path": "wp-content/plugins/eo-headless-content/readme.txt",
+      "action": "noop",
+      "liveSha256": "4c2ddca3268a2bb1167d5466235fc4f31da975384ae7985e942417d5ce274031",
+      "repoSha256": "4c2ddca3268a2bb1167d5466235fc4f31da975384ae7985e942417d5ce274031",
+      "liveBytes": 4682,
+      "repoBytes": 4682
+    },
+    {
+      "path": "wp-content/plugins/eo-headless-content/uninstall.php",
+      "action": "noop",
+      "liveSha256": "f67e89c810ab67ce20dbe09eb7b23e0ebb37624b6b6d8d2dc9b701caaecfc3be",
+      "repoSha256": "f67e89c810ab67ce20dbe09eb7b23e0ebb37624b6b6d8d2dc9b701caaecfc3be",
+      "liveBytes": 602,
+      "repoBytes": 602
+    },
+    {
+      "path": "wp-content/plugins/eo-vibe-coding-api/eo-vibe-coding-api.php",
+      "action": "noop",
+      "liveSha256": "8943e593f33d67eccef1982854e9b63b42ebcb8d7061ee000243d7990e4b60ce",
+      "repoSha256": "8943e593f33d67eccef1982854e9b63b42ebcb8d7061ee000243d7990e4b60ce",
+      "liveBytes": 3493,
+      "repoBytes": 3493
+    },
+    {
+      "path": "wp-content/plugins/eo-vibe-coding-api/includes/class-eov-audit-log-service.php",
+      "action": "noop",
+      "liveSha256": "72c57add11d7c8534d10840379fae9cac376cee4051c86f6d5c45c17f2deb015",
+      "repoSha256": "72c57add11d7c8534d10840379fae9cac376cee4051c86f6d5c45c17f2deb015",
+      "liveBytes": 2592,
+      "repoBytes": 2592
+    },
+    {
+      "path": "wp-content/plugins/eo-vibe-coding-api/includes/class-eov-blueprint-catalog-service.php",
+      "action": "noop",
+      "liveSha256": "98bf3f9fbc1923be045ccc3e55fdcaa650c30f64c1a4d6fa485d41ea00ef650c",
+      "repoSha256": "98bf3f9fbc1923be045ccc3e55fdcaa650c30f64c1a4d6fa485d41ea00ef650c",
+      "liveBytes": 16032,
+      "repoBytes": 16032
+    },
+    {
+      "path": "wp-content/plugins/eo-vibe-coding-api/includes/class-eov-builder-plan-service.php",
+      "action": "noop",
+      "liveSha256": "e7e4d4775e99a111561ee69e2cead6e9dc7a04a499850ec534b9286ccb4e1557",
+      "repoSha256": "e7e4d4775e99a111561ee69e2cead6e9dc7a04a499850ec534b9286ccb4e1557",
+      "liveBytes": 20199,
+      "repoBytes": 20199
+    },
+    {
+      "path": "wp-content/plugins/eo-vibe-coding-api/includes/class-eov-document-write-service.php",
+      "action": "noop",
+      "liveSha256": "c9b639a7eca5421fc7228f3fe163839f310404000e18d87e282c439b9c9774ab",
+      "repoSha256": "c9b639a7eca5421fc7228f3fe163839f310404000e18d87e282c439b9c9774ab",
+      "liveBytes": 7969,
+      "repoBytes": 7969
+    },
+    {
+      "path": "wp-content/plugins/eo-vibe-coding-api/includes/class-eov-elementor-document-service.php",
+      "action": "noop",
+      "liveSha256": "351fd020ffe6ce9eab0082a9da8965b045bc603c2dde1966e403f422f85e15ad",
+      "repoSha256": "351fd020ffe6ce9eab0082a9da8965b045bc603c2dde1966e403f422f85e15ad",
+      "liveBytes": 12771,
+      "repoBytes": 12771
+    },
+    {
+      "path": "wp-content/plugins/eo-vibe-coding-api/includes/class-eov-elementor-mutation-service.php",
+      "action": "noop",
+      "liveSha256": "426c63f3f47f96cea86116d7c61e1393a5c0fdc24f8d90737c830e3d37740e6c",
+      "repoSha256": "426c63f3f47f96cea86116d7c61e1393a5c0fdc24f8d90737c830e3d37740e6c",
+      "liveBytes": 5459,
+      "repoBytes": 5459
+    },
+    {
+      "path": "wp-content/plugins/eo-vibe-coding-api/includes/class-eov-elementor-pattern-renderer.php",
+      "action": "noop",
+      "liveSha256": "5bdc55ad031592f512196e9f21ec8284dda10df490d2ebb26b2c6d801d26cc3f",
+      "repoSha256": "5bdc55ad031592f512196e9f21ec8284dda10df490d2ebb26b2c6d801d26cc3f",
+      "liveBytes": 7066,
+      "repoBytes": 7066
+    },
+    {
+      "path": "wp-content/plugins/eo-vibe-coding-api/includes/class-eov-elementor-tree-service.php",
+      "action": "noop",
+      "liveSha256": "3652beef7a99936c7e13b819f78e18bd038bd3bd6804ace299db70dcfd84724c",
+      "repoSha256": "3652beef7a99936c7e13b819f78e18bd038bd3bd6804ace299db70dcfd84724c",
+      "liveBytes": 7963,
+      "repoBytes": 7963
+    },
+    {
+      "path": "wp-content/plugins/eo-vibe-coding-api/includes/class-eov-landing-builder-rest-controller.php",
+      "action": "noop",
+      "liveSha256": "8339851fd83089bbf2c80f99d1e2321678114262128ed01c69cd670e247493ee",
+      "repoSha256": "8339851fd83089bbf2c80f99d1e2321678114262128ed01c69cd670e247493ee",
+      "liveBytes": 4969,
+      "repoBytes": 4969
+    },
+    {
+      "path": "wp-content/plugins/eo-vibe-coding-api/includes/class-eov-landing-composer-service.php",
+      "action": "noop",
+      "liveSha256": "037c58586c2f1081390c37c0e36460ceb02739d00f6bd0b8b2e243ae704fcdf3",
+      "repoSha256": "037c58586c2f1081390c37c0e36460ceb02739d00f6bd0b8b2e243ae704fcdf3",
+      "liveBytes": 34667,
+      "repoBytes": 34667
+    },
+    {
+      "path": "wp-content/plugins/eo-vibe-coding-api/includes/class-eov-native-ohio-pattern-renderer.php",
+      "action": "noop",
+      "liveSha256": "c3c3dfa38a3a61040f8880b862a07ebfb8a48261edcc4d71f5970ec85f0078ae",
+      "repoSha256": "c3c3dfa38a3a61040f8880b862a07ebfb8a48261edcc4d71f5970ec85f0078ae",
+      "liveBytes": 17866,
+      "repoBytes": 17866
+    },
+    {
+      "path": "wp-content/plugins/eo-vibe-coding-api/includes/class-eov-page-context-resolver.php",
+      "action": "noop",
+      "liveSha256": "347f92ee2d45420b802b0f627326c2484c6a52ec062dd86dcd9040cf95edeafa",
+      "repoSha256": "347f92ee2d45420b802b0f627326c2484c6a52ec062dd86dcd9040cf95edeafa",
+      "liveBytes": 5690,
+      "repoBytes": 5690
+    },
+    {
+      "path": "wp-content/plugins/eo-vibe-coding-api/includes/class-eov-plugin.php",
+      "action": "noop",
+      "liveSha256": "574f16965dfabef9542a8220017d0cc5acd39e3eeafaeda107a7be96060ac6f9",
+      "repoSha256": "574f16965dfabef9542a8220017d0cc5acd39e3eeafaeda107a7be96060ac6f9",
+      "liveBytes": 1605,
+      "repoBytes": 1605
+    },
+    {
+      "path": "wp-content/plugins/eo-vibe-coding-api/includes/class-eov-requirements.php",
+      "action": "noop",
+      "liveSha256": "5f0e34d2bc21f1bc65e2efcbcf21ff48b5a4339c877dde5ef1b621b0d689555f",
+      "repoSha256": "5f0e34d2bc21f1bc65e2efcbcf21ff48b5a4339c877dde5ef1b621b0d689555f",
+      "liveBytes": 2920,
+      "repoBytes": 2920
+    },
+    {
+      "path": "wp-content/plugins/eo-vibe-coding-api/includes/class-eov-rest-controller.php",
+      "action": "noop",
+      "liveSha256": "00247920461d45bd8e5d4611b75fc3ea19b7048c105b42b67ef81b1668847fc7",
+      "repoSha256": "00247920461d45bd8e5d4611b75fc3ea19b7048c105b42b67ef81b1668847fc7",
+      "liveBytes": 17691,
+      "repoBytes": 17691
+    },
+    {
+      "path": "wp-content/plugins/eo-vibe-coding-api/includes/class-eov-schema-native-pattern-renderer.php",
+      "action": "noop",
+      "liveSha256": "fca9883c58b7635806850933e7eec0f22e8fafc950794ae3e93aed586624c383",
+      "repoSha256": "fca9883c58b7635806850933e7eec0f22e8fafc950794ae3e93aed586624c383",
+      "liveBytes": 2469,
+      "repoBytes": 2469
+    },
+    {
+      "path": "wp-content/plugins/eo-vibe-coding-api/includes/class-eov-schema-native-recipe-service.php",
+      "action": "noop",
+      "liveSha256": "2bc61b539075eea9c8ec899fe2cd9e19d08bb4507e27fd4cea4c67b153d30256",
+      "repoSha256": "2bc61b539075eea9c8ec899fe2cd9e19d08bb4507e27fd4cea4c67b153d30256",
+      "liveBytes": 20616,
+      "repoBytes": 20616
+    },
+    {
+      "path": "wp-content/plugins/eo-vibe-coding-api/includes/class-eov-snapshot-service.php",
+      "action": "noop",
+      "liveSha256": "da3f19d86aad267efcadc47882c29b9676ab267fc348f594001dc485ac65d5b6",
+      "repoSha256": "da3f19d86aad267efcadc47882c29b9676ab267fc348f594001dc485ac65d5b6",
+      "liveBytes": 5227,
+      "repoBytes": 5227
+    },
+    {
+      "path": "wp-content/plugins/eo-vibe-coding-api/readme.txt",
+      "action": "noop",
+      "liveSha256": "274e5dc2440bd555d807eee884cfcfa00a03c76519927c94100691e758e4f9d0",
+      "repoSha256": "274e5dc2440bd555d807eee884cfcfa00a03c76519927c94100691e758e4f9d0",
+      "liveBytes": 4532,
+      "repoBytes": 4532
+    },
+    {
+      "path": "wp-content/plugins/eo-vibe-coding-api/uninstall.php",
+      "action": "noop",
+      "liveSha256": "3cfba246d1970f34b8697e6acacd976a52ba19c55b195e455afa5a021bc0439d",
+      "repoSha256": "3cfba246d1970f34b8697e6acacd976a52ba19c55b195e455afa5a021bc0439d",
+      "liveBytes": 168,
+      "repoBytes": 168
+    },
+    {
+      "path": "wp-content/plugins/greenhouse-wp-bridge/greenhouse-wp-bridge.php",
+      "action": "noop",
+      "liveSha256": "edcedb15d7fef5e9c7cde64a459fc25ada3e7a56cd6ddb8d715abcdc43263896",
+      "repoSha256": "edcedb15d7fef5e9c7cde64a459fc25ada3e7a56cd6ddb8d715abcdc43263896",
+      "liveBytes": 1415,
+      "repoBytes": 1415
+    },
+    {
+      "path": "wp-content/plugins/greenhouse-wp-bridge/includes/class-ghwpb-audit.php",
+      "action": "noop",
+      "liveSha256": "b7b5a398390b70747e50468964196260cf186753f08f476de0ed70477f85de17",
+      "repoSha256": "b7b5a398390b70747e50468964196260cf186753f08f476de0ed70477f85de17",
+      "liveBytes": 1070,
+      "repoBytes": 1070
+    },
+    {
+      "path": "wp-content/plugins/greenhouse-wp-bridge/includes/class-ghwpb-block-inspector.php",
+      "action": "noop",
+      "liveSha256": "f48bf69cce95b20961a9a9764b20826c31e81814d46b04f4f3b04c997d8cf22b",
+      "repoSha256": "f48bf69cce95b20961a9a9764b20826c31e81814d46b04f4f3b04c997d8cf22b",
+      "liveBytes": 8257,
+      "repoBytes": 8257
+    },
+    {
+      "path": "wp-content/plugins/greenhouse-wp-bridge/includes/class-ghwpb-cli-command.php",
+      "action": "noop",
+      "liveSha256": "a342aa6ce6455e0a1f75fead3ea2fc9d2c377ceebfa6cdf71d97878fc2326593",
+      "repoSha256": "a342aa6ce6455e0a1f75fead3ea2fc9d2c377ceebfa6cdf71d97878fc2326593",
+      "liveBytes": 3470,
+      "repoBytes": 3470
+    },
+    {
+      "path": "wp-content/plugins/greenhouse-wp-bridge/includes/class-ghwpb-config.php",
+      "action": "noop",
+      "liveSha256": "6930ebea1f7ad500e4b8a5743998f25c49988bb3df1404cb6c0248338684fdc8",
+      "repoSha256": "6930ebea1f7ad500e4b8a5743998f25c49988bb3df1404cb6c0248338684fdc8",
+      "liveBytes": 4238,
+      "repoBytes": 4238
+    },
+    {
+      "path": "wp-content/plugins/greenhouse-wp-bridge/includes/class-ghwpb-draft-controller.php",
+      "action": "noop",
+      "liveSha256": "8dc392a54a60a9be05f0329e612652aa1fe09b0fd761e90947e21be81c1239d3",
+      "repoSha256": "8dc392a54a60a9be05f0329e612652aa1fe09b0fd761e90947e21be81c1239d3",
+      "liveBytes": 13666,
+      "repoBytes": 13666
+    },
+    {
+      "path": "wp-content/plugins/greenhouse-wp-bridge/includes/class-ghwpb-elementor-inspector.php",
+      "action": "noop",
+      "liveSha256": "d13dbc4f921c2a660c47072e09eb697e8ed69d4c2a2bc53bf77ff75bd02b2f2f",
+      "repoSha256": "d13dbc4f921c2a660c47072e09eb697e8ed69d4c2a2bc53bf77ff75bd02b2f2f",
+      "liveBytes": 8177,
+      "repoBytes": 8177
+    },
+    {
+      "path": "wp-content/plugins/greenhouse-wp-bridge/includes/class-ghwpb-ohio-inspector.php",
+      "action": "noop",
+      "liveSha256": "0806d5079fba5f6d58a2e1551050fc63e2a01c811384a4c138b42e5c7f898d53",
+      "repoSha256": "0806d5079fba5f6d58a2e1551050fc63e2a01c811384a4c138b42e5c7f898d53",
+      "liveBytes": 3949,
+      "repoBytes": 3949
+    },
+    {
+      "path": "wp-content/plugins/greenhouse-wp-bridge/includes/class-ghwpb-plugin.php",
+      "action": "noop",
+      "liveSha256": "39958955c6ea621f73b0dd3344f21ccd1e04d18fd1f209108c3f457ef32f5456",
+      "repoSha256": "39958955c6ea621f73b0dd3344f21ccd1e04d18fd1f209108c3f457ef32f5456",
+      "liveBytes": 969,
+      "repoBytes": 969
+    },
+    {
+      "path": "wp-content/plugins/greenhouse-wp-bridge/includes/class-ghwpb-rest-controller.php",
+      "action": "noop",
+      "liveSha256": "40e48a3fa8850a73c1663b602e2ea2650e48f5f2b5ff13e850819b69ca1fa838",
+      "repoSha256": "40e48a3fa8850a73c1663b602e2ea2650e48f5f2b5ff13e850819b69ca1fa838",
+      "liveBytes": 6139,
+      "repoBytes": 6139
+    },
+    {
+      "path": "wp-content/plugins/greenhouse-wp-bridge/includes/class-ghwpb-signature.php",
+      "action": "noop",
+      "liveSha256": "13de64255c379df36e3f0ea4c232b5d13203d96777e65c7a28955d5ad5498dae",
+      "repoSha256": "13de64255c379df36e3f0ea4c232b5d13203d96777e65c7a28955d5ad5498dae",
+      "liveBytes": 5376,
+      "repoBytes": 5376
+    },
+    {
+      "path": "wp-content/plugins/greenhouse-wp-bridge/readme.txt",
+      "action": "noop",
+      "liveSha256": "d136f37719d175e87fc3c72f11de3fb90572d046614af2714872f14ab1150f6b",
+      "repoSha256": "d136f37719d175e87fc3c72f11de3fb90572d046614af2714872f14ab1150f6b",
+      "liveBytes": 2141,
+      "repoBytes": 2141
+    },
+    {
+      "path": "wp-content/plugins/greenhouse-wp-bridge/uninstall.php",
+      "action": "noop",
+      "liveSha256": "24de0f45065832534297621340062c82e9fa7a4cc466b2336cddc434838c28d9",
+      "repoSha256": "24de0f45065832534297621340062c82e9fa7a4cc466b2336cddc434838c28d9",
+      "liveBytes": 194,
+      "repoBytes": 194
+    },
+    {
+      "path": "wp-content/themes/ohio-child/assets/css/global-fixes.css",
+      "action": "noop",
+      "liveSha256": "9aa7b32790693f42459578758d07912618c44d22fcf3f7af47073a327760c9d2",
+      "repoSha256": "9aa7b32790693f42459578758d07912618c44d22fcf3f7af47073a327760c9d2",
+      "liveBytes": 10979,
+      "repoBytes": 10979
+    },
+    {
+      "path": "wp-content/themes/ohio-child/assets/css/global-header-mobile.css",
+      "action": "noop",
+      "liveSha256": "2d7c4bd751ba2d20d1e35ccf33a521830cec131624e9a75763b4e26b4f37039e",
+      "repoSha256": "2d7c4bd751ba2d20d1e35ccf33a521830cec131624e9a75763b4e26b4f37039e",
+      "liveBytes": 1439,
+      "repoBytes": 1439
+    },
+    {
+      "path": "wp-content/themes/ohio-child/assets/css/global-logo-size-fallback.css",
+      "action": "noop",
+      "liveSha256": "10dee3d5f4dc8ca9f4ac9f13043e6c0dbeeee8e0172ff6fd48dc4ba207224874",
+      "repoSha256": "10dee3d5f4dc8ca9f4ac9f13043e6c0dbeeee8e0172ff6fd48dc4ba207224874",
+      "liveBytes": 608,
+      "repoBytes": 608
+    },
+    {
+      "path": "wp-content/themes/ohio-child/assets/css/Landing Custom CSS.css",
+      "action": "noop",
+      "liveSha256": "54637c09783ba5be480c782436e74ab64505f20d0b99358386682f12ef7fa5da",
+      "repoSha256": "54637c09783ba5be480c782436e74ab64505f20d0b99358386682f12ef7fa5da",
+      "liveBytes": 29163,
+      "repoBytes": 29163
+    },
+    {
+      "path": "wp-content/themes/ohio-child/functions.php",
+      "action": "noop",
+      "liveSha256": "f127865ee7dfd179e8e3a4f9e25cbd4b0a19cbdc7428ff38eaae1bd34dc5c42c",
+      "repoSha256": "f127865ee7dfd179e8e3a4f9e25cbd4b0a19cbdc7428ff38eaae1bd34dc5c42c",
+      "liveBytes": 296,
+      "repoBytes": 296
+    },
+    {
+      "path": "wp-content/themes/ohio-child/HOME_CSS_INCIDENT_AND_GUARDRAILS.md",
+      "action": "noop",
+      "liveSha256": "3b19e21b863564ab246beb8cc39213fbfb6ede26545820dd4b1dc2160f80dd1d",
+      "repoSha256": "3b19e21b863564ab246beb8cc39213fbfb6ede26545820dd4b1dc2160f80dd1d",
+      "liveBytes": 2963,
+      "repoBytes": 2963
+    },
+    {
+      "path": "wp-content/themes/ohio-child/inc/acf-footer-options.php",
+      "action": "noop",
+      "liveSha256": "8261c72debd98a0248d15d41b1c69899e966c91b6495fababbd41713eb6e56b4",
+      "repoSha256": "8261c72debd98a0248d15d41b1c69899e966c91b6495fababbd41713eb6e56b4",
+      "liveBytes": 2138,
+      "repoBytes": 2138
+    },
+    {
+      "path": "wp-content/themes/ohio-child/inc/acf-logo-settings.php",
+      "action": "noop",
+      "liveSha256": "3747ad0ecedf49b23653bc18093b847cc6f33d1c596bb0109702bcc05374a38d",
+      "repoSha256": "3747ad0ecedf49b23653bc18093b847cc6f33d1c596bb0109702bcc05374a38d",
+      "liveBytes": 6849,
+      "repoBytes": 6849
+    },
+    {
+      "path": "wp-content/themes/ohio-child/inc/admin-guardrails.php",
+      "action": "noop",
+      "liveSha256": "521019d7f352f88910dcc80595a17d89a365293a343952c706189c560eb49b28",
+      "repoSha256": "521019d7f352f88910dcc80595a17d89a365293a343952c706189c560eb49b28",
+      "liveBytes": 1914,
+      "repoBytes": 1914
+    },
+    {
+      "path": "wp-content/themes/ohio-child/inc/enqueue-and-layout.php",
+      "action": "noop",
+      "liveSha256": "a7d0d9735ac4cf1792b19cbc4f5533a14c0b3a7b7fbdd1f6292d5b724d44a069",
+      "repoSha256": "a7d0d9735ac4cf1792b19cbc4f5533a14c0b3a7b7fbdd1f6292d5b724d44a069",
+      "liveBytes": 5194,
+      "repoBytes": 5194
+    },
+    {
+      "path": "wp-content/themes/ohio-child/parts/elements/footer.php",
+      "action": "noop",
+      "liveSha256": "8dea11de9d010e37f8f48aaeba4df35182492200df5b758269cb5571b4fda479",
+      "repoSha256": "8dea11de9d010e37f8f48aaeba4df35182492200df5b758269cb5571b4fda479",
+      "liveBytes": 12413,
+      "repoBytes": 12413
+    },
+    {
+      "path": "wp-content/themes/ohio-child/parts/elements/page_headline.php",
+      "action": "noop",
+      "liveSha256": "95027553f1d85ca32531e09fb0d354dd8ab50be69c2af346e485adad1921fdc1",
+      "repoSha256": "95027553f1d85ca32531e09fb0d354dd8ab50be69c2af346e485adad1921fdc1",
+      "liveBytes": 10768,
+      "repoBytes": 10768
+    },
+    {
+      "path": "wp-content/themes/ohio-child/screenshot.jpg",
+      "action": "noop",
+      "liveSha256": "ad4cad0ab83b8b119818bd9a517e55dc9dc81ce60044811bb5c246cbd02bda34",
+      "repoSha256": "ad4cad0ab83b8b119818bd9a517e55dc9dc81ce60044811bb5c246cbd02bda34",
+      "liveBytes": 147917,
+      "repoBytes": 147917
+    },
+    {
+      "path": "wp-content/themes/ohio-child/style.css",
+      "action": "noop",
+      "liveSha256": "7fd113a358f02a2cab7740c12075eec6850e63458e35333a4e90348ae89aa118",
+      "repoSha256": "7fd113a358f02a2cab7740c12075eec6850e63458e35333a4e90348ae89aa118",
+      "liveBytes": 809,
+      "repoBytes": 809
+    }
+  ]
+}

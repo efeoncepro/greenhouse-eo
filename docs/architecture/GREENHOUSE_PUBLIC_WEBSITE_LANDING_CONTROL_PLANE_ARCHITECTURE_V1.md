@@ -228,7 +228,7 @@ Current status:
 
 - implemented in the runtime repository clone and manually deployed/activated on Kinsta on 2026-06-14 via SSH/WP-CLI;
 - read-only inspection mode is active in production;
-- v0.3.0 code adds signed draft/private routes, but they are default-disabled until shared secret, write flag, staging/preview and least-privilege are ready;
+- v0.3.1 code adds signed draft/private routes plus a WP-CLI provisioning lane, but they are default-disabled until shared secret, write flag, staging/preview and least-privilege are ready;
 - PHP syntax validated locally;
 - no publish, delete, cache clear, backup, plugin install or theme mutation endpoints;
 - HMAC/shared-secret replay guard exists in code for draft routes;
@@ -297,6 +297,20 @@ GHWPB-HMAC-SHA256
 ```
 
 The Elementor endpoint reads `_elementor_data`, summarizes `container|section|column|widget`, reports widget usage, semantic `gh-*` anchors and selected Ohio page metas. The block endpoint reads raw `post_content` through WordPress `parse_blocks()`, summarizes Gutenberg `blockName` usage, detects `gh-*` classes/anchors, caps top-level block samples at 40 and is intended for blog posts and other block-editor content. The Ohio endpoint reads Elementor's registered widget catalog and identifies Ohio/HubSpot widgets. The draft endpoints can only create/update `draft|private` Greenhouse-owned objects and are still rollout-pending in production.
+
+Provisioning policy:
+
+- Do not edit `wp-config.php` as the first path for bridge config; a syntax error there can take down the public site.
+- Prefer Kinsta/PHP environment variables or constants when safely available.
+- If env vars are unavailable, use the v0.3.1 WP-CLI fallback, which stores values in `wp_options` with `autoload=no`:
+
+```bash
+wp greenhouse-bridge status
+wp greenhouse-bridge config set --environment=production --writes-enabled=0
+printf %s "$SECRET" | wp greenhouse-bridge secret set --stdin
+```
+
+The shared secret must be piped via stdin and never passed as a shell argument, printed, committed or embedded in a temporary PHP file. Constants/env vars override option values, so the option fallback is reversible and can later be retired.
 
 Builder module vocabulary:
 

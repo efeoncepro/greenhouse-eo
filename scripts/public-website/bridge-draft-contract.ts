@@ -23,6 +23,7 @@ type CliOptions = {
   manifestId: string
   title: string
   slug: string
+  method: 'GET' | 'POST' | 'PATCH'
   postType: 'page' | 'post' | 'landing'
   status: 'draft' | 'private'
   send: boolean
@@ -71,6 +72,7 @@ const parseArgs = (argv: string[]): CliOptions => {
     manifestId: 'greenhouse-contract-smoke',
     title: 'Greenhouse Contract Smoke',
     slug: 'greenhouse-contract-smoke',
+    method: 'POST',
     postType: 'page',
     status: 'draft',
     send: false,
@@ -111,6 +113,18 @@ const parseArgs = (argv: string[]): CliOptions => {
       continue
     }
 
+    if (arg === '--method') {
+      const method = normalizedArgv[i + 1]?.toUpperCase()
+
+      if (method !== 'GET' && method !== 'POST' && method !== 'PATCH') {
+        throw new Error('--method must be GET, POST or PATCH')
+      }
+
+      options.method = method
+      i += 1
+      continue
+    }
+
     if (arg === '--private') {
       options.status = 'private'
       continue
@@ -131,6 +145,7 @@ const printHelp = () => {
   console.log(`Usage:
   pnpm public-website:bridge-draft-contract
   pnpm public-website:bridge-draft-contract -- --manifest-id landing.demo --title "Demo" --slug demo
+  pnpm public-website:bridge-draft-contract -- --method GET --manifest-id greenhouse-contract-smoke --send
   pnpm public-website:bridge-draft-contract -- --send
 
 Default mode is non-mutating and prints redacted signed headers.
@@ -196,7 +211,7 @@ const main = async () => {
     throw new Error('PUBLIC_WEBSITE_WORDPRESS_BRIDGE_SHARED_SECRET_SECRET_REF is not configured or could not be resolved')
   }
 
-  const body = JSON.stringify({
+  const payload = {
     contractVersion: PUBLIC_SITE_BRIDGE_DRAFT_CONTRACT_VERSION,
     greenhouseManifestId: options.manifestId,
     postType: options.postType,
@@ -204,12 +219,17 @@ const main = async () => {
     title: options.title,
     slug: options.slug,
     content: '<!-- wp:paragraph --><p>Greenhouse draft contract smoke.</p><!-- /wp:paragraph -->'
-  })
+  }
 
-  const route = '/greenhouse-wp-bridge/v1/drafts'
+  const body = options.method === 'GET' ? '' : JSON.stringify(payload)
+
+  const route =
+    options.method === 'POST'
+      ? '/greenhouse-wp-bridge/v1/drafts'
+      : `/greenhouse-wp-bridge/v1/drafts/${encodeURIComponent(options.manifestId)}`
 
   const signed = signPublicSiteBridgeRequest({
-    method: 'POST',
+    method: options.method,
     route,
     body,
     secret: sharedSecret,
@@ -228,9 +248,10 @@ const main = async () => {
         {
           mode: 'dry_run',
           sendsWordPressWrite: false,
+          method: options.method,
           route,
           url: `${baseUrl}/wp-json${route}`,
-          body: JSON.parse(body),
+          body: body ? JSON.parse(body) : null,
           sharedSecretSource: resolvedSharedSecret ? 'secret_manager' : 'synthetic_dry_run',
           signedHeaders: redactHeaders(signed.headers),
           canonicalRequestPreview: signed.canonicalRequest
@@ -250,14 +271,14 @@ const main = async () => {
   }
 
   const response = await fetch(`${baseUrl}/wp-json${route}`, {
-    method: 'POST',
+    method: options.method,
     headers: {
       accept: 'application/json',
       authorization,
       'content-type': 'application/json',
       ...signed.headers
     },
-    body
+    body: body || undefined
   })
 
   const responseBody = await response.json().catch(() => null)

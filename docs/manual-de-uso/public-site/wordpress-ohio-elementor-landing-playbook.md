@@ -16,7 +16,7 @@ Guiar a agentes y operadores para crear o ajustar landings de `efeoncepro.com` u
 
 1. Identificar `post_id`, slug, status y template.
 2. Leer `_elementor_data`, `_elementor_page_settings` y metas Ohio relevantes.
-   - `greenhouse-wp-bridge` v0.3.0 es la foundation del bridge: usar primero los endpoints read-only de inspeccion (`elementor-document`, `block-document`, `ohio-widget-catalog`) con autenticacion WordPress para obtener resumen de estructura, widgets, anchors `gh-*`, bloques Gutenberg y metas Ohio. Las rutas draft-only firmadas existen en codigo, pero siguen apagadas hasta configurar shared secret, flag de writes y permisos minimos.
+   - `greenhouse-wp-bridge` v0.3.1 es la foundation del bridge: usar primero los endpoints read-only de inspeccion (`elementor-document`, `block-document`, `ohio-widget-catalog`) con autenticacion WordPress para obtener resumen de estructura, widgets, anchors `gh-*`, bloques Gutenberg y metas Ohio. Las rutas draft-only firmadas existen en codigo, pero siguen apagadas hasta configurar shared secret, flag de writes y permisos minimos. No editar `wp-config.php` como primera via; usar Kinsta/env vars o el comando WP-CLI del bridge.
 3. Determinar si la zona usa `container` moderno o `section/column` legacy.
 4. Buscar anchors semanticos `gh-*`; si no existen, planear agregarlos en el patch.
 5. Verificar si el problema es:

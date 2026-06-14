@@ -1,0 +1,516 @@
+{
+  "contractVersion": "public-site-bridge-inspection.v1",
+  "generatedAt": "2026-06-14T17:37:08.688Z",
+  "baseUrl": "https://efeoncepro.com",
+  "pageId": 249766,
+  "mode": "read_only",
+  "auth": {
+    "usernameConfigured": true,
+    "applicationPasswordSecretConfigured": true,
+    "secretResolved": true
+  },
+  "endpoints": {
+    "health": {
+      "status": 200,
+      "ok": true,
+      "summary": {
+        "plugin": {
+          "name": "greenhouse-wp-bridge",
+          "version": "0.3.1",
+          "mode": "read_only_inspection"
+        },
+        "site": {
+          "url": "https://efeoncepro.com",
+          "wordpressVersion": "7.0",
+          "phpVersion": "8.2.30"
+        },
+        "theme": {
+          "name": "Ohio-Child",
+          "stylesheet": "ohio-child",
+          "template": "ohio",
+          "version": "1.0.0",
+          "parent": {
+            "name": "Ohio",
+            "version": "3.7.0"
+          }
+        },
+        "capabilities": {
+          "elementor_loaded": true,
+          "elementor_pro_loaded": true,
+          "wp_abilities_api_loaded": true,
+          "greenhouse_write_routes": true,
+          "greenhouse_draft_routes": true,
+          "kinsta_api_configured": false,
+          "cache_clear_configured": false,
+          "backup_create_configured": false,
+          "authenticated_inspection": true
+        },
+        "security": {
+          "requiresCapability": "edit_posts",
+          "writesEnabled": false,
+          "draftWritesEnabled": false,
+          "signedRequestsRequired": true,
+          "sharedSecretConfigured": true,
+          "replayGuardEnabled": true,
+          "signatureWindowSeconds": 300,
+          "configSources": {
+            "sharedSecret": "option",
+            "writesEnabled": "option",
+            "environment": "option"
+          },
+          "publishesContent": false,
+          "cacheClearConfigured": false,
+          "backupCreateConfigured": false,
+          "bridgeEnvironment": "production"
+        }
+      }
+    },
+    "elementorDocument": {
+      "status": 200,
+      "ok": true,
+      "summary": {
+        "post": {
+          "id": 249766,
+          "type": "post",
+          "status": "publish",
+          "slug": "glitch-02-noticias-ia-marketing-2026-03-03",
+          "title": "GLITCH #02: Tu semana en AI, marketing y tecnología — sin anestesia",
+          "modified": "2026-03-03T17:05:52"
+        },
+        "elementor": {
+          "hasData": false,
+          "editMode": "",
+          "templateType": "wp-post",
+          "version": "3.35.5",
+          "documentType": "wp-post"
+        },
+        "elementsSummary": {
+          "totalElements": 0,
+          "byElType": [],
+          "byWidgetType": [],
+          "topLevelElements": [],
+          "legacySectionCount": 0,
+          "containerCount": 0,
+          "widgetCount": 0
+        },
+        "semanticAnchors": [],
+        "ohioMetaKeys": [
+          "page_add_wrapper",
+          "page_add_top_padding",
+          "page_breadcrumbs_visibility",
+          "page_header_title_background_type",
+          "page_header_menu_style",
+          "_thumbnail_id",
+          "featured_image"
+        ],
+        "inspectionWarning": "read_only_snapshot_no_mutation"
+      }
+    },
+    "blockDocument": {
+      "status": 200,
+      "ok": true,
+      "summary": {
+        "post": {
+          "id": 249766,
+          "type": "post",
+          "status": "publish",
+          "slug": "glitch-02-noticias-ia-marketing-2026-03-03",
+          "title": "GLITCH #02: Tu semana en AI, marketing y tecnología — sin anestesia",
+          "modified": "2026-03-03T17:05:52"
+        },
+        "editor": {
+          "model": "wordpress_blocks",
+          "hasBlocks": true,
+          "contentLength": 10789,
+          "elementorEditMode": "",
+          "elementorDataPresent": false
+        },
+        "blocksSummary": {
+          "totalBlocks": 81,
+          "topLevelBlockCount": 81,
+          "byBlockName": {
+            "core/freeform": 40,
+            "core/heading": 9,
+            "core/image": 8,
+            "core/paragraph": 23,
+            "core/separator": 1
+          },
+          "topLevelBlocks": [
+            {
+              "path": "0",
+              "blockName": "core/heading",
+              "attrs": [],
+              "anchor": null,
+              "classes": [],
+              "childCount": 0
+            },
+            {
+              "path": "1",
+              "blockName": "core/freeform",
+              "attrs": [],
+              "anchor": null,
+              "classes": [],
+              "childCount": 0
+            },
+            {
+              "path": "2",
+              "blockName": "core/paragraph",
+              "attrs": [],
+              "anchor": null,
+              "classes": [],
+              "childCount": 0
+            },
+            {
+              "path": "3",
+              "blockName": "core/freeform",
+              "attrs": [],
+              "anchor": null,
+              "classes": [],
+              "childCount": 0
+            },
+            {
+              "path": "4",
+              "blockName": "core/paragraph",
+              "attrs": [],
+              "anchor": null,
+              "classes": [],
+              "childCount": 0
+            },
+            {
+              "path": "5",
+              "blockName": "core/freeform",
+              "attrs": [],
+              "anchor": null,
+              "classes": [],
+              "childCount": 0
+            },
+            {
+              "path": "6",
+              "blockName": "core/image",
+              "attrs": [
+                "id",
+                "sizeSlug",
+                "linkDestination",
+                "align"
+              ],
+              "anchor": null,
+              "classes": [],
+              "childCount": 0
+            },
+            {
+              "path": "7",
+              "blockName": "core/freeform",
+              "attrs": [],
+              "anchor": null,
+              "classes": [],
+              "childCount": 0
+            },
+            {
+              "path": "8",
+              "blockName": "core/heading",
+              "attrs": [
+                "level"
+              ],
+              "anchor": null,
+              "classes": [],
+              "childCount": 0
+            },
+            {
+              "path": "9",
+              "blockName": "core/freeform",
+              "attrs": [],
+              "anchor": null,
+              "classes": [],
+              "childCount": 0
+            },
+            {
+              "path": "10",
+              "blockName": "core/paragraph",
+              "attrs": [],
+              "anchor": null,
+              "classes": [],
+              "childCount": 0
+            },
+            {
+              "path": "11",
+              "blockName": "core/freeform",
+              "attrs": [],
+              "anchor": null,
+              "classes": [],
+              "childCount": 0
+            },
+            {
+              "path": "12",
+              "blockName": "core/paragraph",
+              "attrs": [],
+              "anchor": null,
+              "classes": [],
+              "childCount": 0
+            },
+            {
+              "path": "13",
+              "blockName": "core/freeform",
+              "attrs": [],
+              "anchor": null,
+              "classes": [],
+              "childCount": 0
+            },
+            {
+              "path": "14",
+              "blockName": "core/image",
+              "attrs": [
+                "id",
+                "sizeSlug",
+                "linkDestination",
+                "align"
+              ],
+              "anchor": null,
+              "classes": [],
+              "childCount": 0
+            },
+            {
+              "path": "15",
+              "blockName": "core/freeform",
+              "attrs": [],
+              "anchor": null,
+              "classes": [],
+              "childCount": 0
+            },
+            {
+              "path": "16",
+              "blockName": "core/heading",
+              "attrs": [
+                "level"
+              ],
+              "anchor": null,
+              "classes": [],
+              "childCount": 0
+            },
+            {
+              "path": "17",
+              "blockName": "core/freeform",
+              "attrs": [],
+              "anchor": null,
+              "classes": [],
+              "childCount": 0
+            },
+            {
+              "path": "18",
+              "blockName": "core/paragraph",
+              "attrs": [],
+              "anchor": null,
+              "classes": [],
+              "childCount": 0
+            },
+            {
+              "path": "19",
+              "blockName": "core/freeform",
+              "attrs": [],
+              "anchor": null,
+              "classes": [],
+              "childCount": 0
+            },
+            {
+              "path": "20",
+              "blockName": "core/paragraph",
+              "attrs": [],
+              "anchor": null,
+              "classes": [],
+              "childCount": 0
+            },
+            {
+              "path": "21",
+              "blockName": "core/freeform",
+              "attrs": [],
+              "anchor": null,
+              "classes": [],
+              "childCount": 0
+            },
+            {
+              "path": "22",
+              "blockName": "core/image",
+              "attrs": [
+                "id",
+                "sizeSlug",
+                "linkDestination",
+                "align"
+              ],
+              "anchor": null,
+              "classes": [],
+              "childCount": 0
+            },
+            {
+              "path": "23",
+              "blockName": "core/freeform",
+              "attrs": [],
+              "anchor": null,
+              "classes": [],
+              "childCount": 0
+            },
+            {
+              "path": "24",
+              "blockName": "core/heading",
+              "attrs": [
+                "level"
+              ],
+              "anchor": null,
+              "classes": [],
+              "childCount": 0
+            },
+            {
+              "path": "25",
+              "blockName": "core/freeform",
+              "attrs": [],
+              "anchor": null,
+              "classes": [],
+              "childCount": 0
+            },
+            {
+              "path": "26",
+              "blockName": "core/paragraph",
+              "attrs": [],
+              "anchor": null,
+              "classes": [],
+              "childCount": 0
+            },
+            {
+              "path": "27",
+              "blockName": "core/freeform",
+              "attrs": [],
+              "anchor": null,
+              "classes": [],
+              "childCount": 0
+            },
+            {
+              "path": "28",
+              "blockName": "core/paragraph",
+              "attrs": [],
+              "anchor": null,
+              "classes": [],
+              "childCount": 0
+            },
+            {
+              "path": "29",
+              "blockName": "core/freeform",
+              "attrs": [],
+              "anchor": null,
+              "classes": [],
+              "childCount": 0
+            },
+            {
+              "path": "30",
+              "blockName": "core/image",
+              "attrs": [
+                "id",
+                "sizeSlug",
+                "linkDestination",
+                "align"
+              ],
+              "anchor": null,
+              "classes": [],
+              "childCount": 0
+            },
+            {
+              "path": "31",
+              "blockName": "core/freeform",
+              "attrs": [],
+              "anchor": null,
+              "classes": [],
+              "childCount": 0
+            },
+            {
+              "path": "32",
+              "blockName": "core/heading",
+              "attrs": [
+                "level"
+              ],
+              "anchor": null,
+              "classes": [],
+              "childCount": 0
+            },
+            {
+              "path": "33",
+              "blockName": "core/freeform",
+              "attrs": [],
+              "anchor": null,
+              "classes": [],
+              "childCount": 0
+            },
+            {
+              "path": "34",
+              "blockName": "core/paragraph",
+              "attrs": [],
+              "anchor": null,
+              "classes": [],
+              "childCount": 0
+            },
+            {
+              "path": "35",
+              "blockName": "core/freeform",
+              "attrs": [],
+              "anchor": null,
+              "classes": [],
+              "childCount": 0
+            },
+            {
+              "path": "36",
+              "blockName": "core/paragraph",
+              "attrs": [],
+              "anchor": null,
+              "classes": [],
+              "childCount": 0
+            },
+            {
+              "path": "37",
+              "blockName": "core/freeform",
+              "attrs": [],
+              "anchor": null,
+              "classes": [],
+              "childCount": 0
+            },
+            {
+              "path": "38",
+              "blockName": "core/image",
+              "attrs": [
+                "id",
+                "sizeSlug",
+                "linkDestination",
+                "align"
+              ],
+              "anchor": null,
+              "classes": [],
+              "childCount": 0
+            },
+            {
+              "path": "39",
+              "blockName": "core/freeform",
+              "attrs": [],
+              "anchor": null,
+              "classes": [],
+              "childCount": 0
+            }
+          ],
+          "topLevelBlocksTruncated": true,
+          "maxDepth": 0,
+          "freeformBlockCount": 40,
+          "reusableBlockCount": 0,
+          "thirdPartyBlockCount": 0,
+          "containerBlockCount": 0,
+          "mediaBlockCount": 8,
+          "textualBlockCount": 32,
+          "unknownBlockNameCount": 40
+        },
+        "semanticAnchors": [],
+        "inspectionWarning": "read_only_snapshot_no_mutation"
+      }
+    },
+    "ohioWidgetCatalog": null
+  },
+  "safetyPolicy": {
+    "writesWordPressContent": false,
+    "publishesContent": false,
+    "clearsCache": false,
+    "createsBackup": false,
+    "sendsSecretsToOutput": false
+  }
+}

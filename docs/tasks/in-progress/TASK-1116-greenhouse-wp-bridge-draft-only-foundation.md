@@ -14,7 +14,7 @@
 - Effort: `Alto`
 - Type: `implementation`
 - Epic: `EPIC-019`
-- Status real: `Partial foundation exists: plugin v0.3.0 in runtime repo has authenticated read-only health/Elementor/Gutenberg block/Ohio inspection plus signed HMAC/replay guarded draft-only routes in code; live write rollout still pending shared secret, write flag, staging/preview and least-privilege`
+- Status real: `Partial foundation deployed/provisioned: plugin v0.3.1 is live on Kinsta with authenticated read-only health/Elementor/Gutenberg block/Ohio inspection plus signed HMAC/replay guarded draft-only routes and WP-CLI option provisioning; shared secret is provisioned via GCP Secret Manager + WordPress option, writes remain disabled pending least-privilege and approved draft smoke`
 - Rank: `TBD`
 - Domain: `platform|commercial|marketing-ops|integrations|wordpress`
 - Blocked by: `none`
@@ -127,12 +127,14 @@ Reglas obligatorias:
   - `GET /wp-json/greenhouse-wp-bridge/v1/inspection/elementor-document/{id}`
   - `GET /wp-json/greenhouse-wp-bridge/v1/inspection/ohio-widget-catalog`
 - `greenhouse-wp-bridge` v0.2.0 adds read-only Gutenberg/block inspection: `GET /wp-json/greenhouse-wp-bridge/v1/inspection/block-document/{id}`. Recent Efeonce posts are Gutenberg/block-editor content (`hasBlocks=true`, no Elementor data), so draft write design must treat Gutenberg `blockName` and Elementor `widgetType` as separate native module dialects.
-- `greenhouse-wp-bridge` v0.3.0 adds code-only signed draft foundation:
+- `greenhouse-wp-bridge` v0.3.x adds code-only signed draft foundation:
   - `POST /wp-json/greenhouse-wp-bridge/v1/drafts`
   - `GET /wp-json/greenhouse-wp-bridge/v1/drafts/{greenhouse_manifest_id}`
   - `PATCH /wp-json/greenhouse-wp-bridge/v1/drafts/{greenhouse_manifest_id}`
   - HMAC canonical request `GHWPB-HMAC-SHA256`, `X-Greenhouse-*` headers, body SHA-256, timestamp window, replay guard, audit meta and `draft|private` only.
   - Mutation routes are default-disabled by `GREENHOUSE_WP_BRIDGE_WRITES_ENABLED`; no live draft smoke until shared secret, staging/preview and least-privilege are ready.
+  - v0.3.1 adds `wp greenhouse-bridge status`, `config` and `secret set --stdin` so provisioning can avoid direct `wp-config.php` edits. Option fallback uses `autoload=no`; constants/env vars remain higher priority.
+  - Live provisioning completed without `wp-config.php`: `public-website-wordpress-bridge-shared-secret-production` in GCP Secret Manager, WordPress option source reports `shared_secret_configured=true`, `environment=production`, `writes_enabled=false`.
 - Production smoke on 2026-06-14: anonymous health returns `401 ghwpb_auth_required`; authenticated health, Elementor inspection for page `244079`, Gutenberg block inspection for post `249766`, and Ohio widget catalog return `200`.
 - Greenhouse now has a reusable read-only inspection helper for the active bridge: `pnpm public-website:bridge-inspect -- --page-id <id> [--write]`. First evidence lives at `docs/operations/public-site-bridge-inspections/inspection-page-244079-2026-06-14T16-22-05-591Z.json`.
 - Greenhouse also has a read-only internal API lane for the active bridge: `GET /api/admin/public-site/bridge-inspection?pageId=<id>` backed by `src/lib/public-site/bridge-inspection.ts` and gated by `platform.public_site.bridge.inspect`. It is intentionally inspection-only and does not satisfy the signed draft write contract for this task.
