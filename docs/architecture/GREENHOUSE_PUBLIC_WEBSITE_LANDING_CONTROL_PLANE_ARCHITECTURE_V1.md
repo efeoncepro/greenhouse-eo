@@ -238,6 +238,7 @@ Production smoke evidence from 2026-06-14:
 - anonymous `GET /wp-json/greenhouse-wp-bridge/v1/health` returns `401 ghwpb_auth_required`;
 - authenticated health returns `200` with `mode=read_only_inspection`, `writesEnabled=false`, `greenhouse_write_routes=false`, and Kinsta/cache/backup flags false;
 - authenticated Elementor inspection for page `244079` returns `200` and summarizes 199 elements, including 14 legacy sections, 46 containers and 112 widgets;
+- authenticated block inspection for post `249766` returns `200`, confirms `model=wordpress_blocks`, `hasBlocks=true`, no Elementor data, 81 parsed blocks and a bounded top-level sample;
 - authenticated Ohio widget catalog returns `200` with 253 Elementor widgets, 37 Ohio widgets and 2 HubSpot widgets.
 
 Reusable Greenhouse-side inspection command:
@@ -255,19 +256,27 @@ Greenhouse also exposes the same read-only inspection primitive through a server
 src/lib/public-site/bridge-inspection.ts
 GET /api/admin/public-site/bridge-inspection?pageId={id}
 GET /api/admin/public-site/bridge-inspection?pageId={id}&includeCatalog=false
+GET /api/admin/public-site/bridge-inspection?pageId={id}&includeBlocks=false
 ```
 
-The API is gated by `requireAdminTenantContext()` plus capability `platform.public_site.bridge.inspect` (`read`, `all`). It returns the same `public-site-bridge-inspection.v1` report shape as the CLI, never returns WordPress credentials, and responds with `503 public_site_bridge_auth_not_configured` if the current Greenhouse runtime has not been provisioned with the WordPress Application Password secret plumbing. This is a read lane for the future Public Site UI; it is not a write/draft/publish lane.
+The API is gated by `requireAdminTenantContext()` plus capability `platform.public_site.bridge.inspect` (`read`, `all`). It returns the same `public-site-bridge-inspection.v1` report shape as the CLI, never returns WordPress credentials, adds a cache-buster to avoid stale inspection snapshots by post ID, and responds with `503 public_site_bridge_auth_not_configured` if the current Greenhouse runtime has not been provisioned with the WordPress Application Password secret plumbing. This is a read lane for the future Public Site UI; it is not a write/draft/publish lane.
 
 Current REST namespace and routes:
 
 ```text
 GET /wp-json/greenhouse-wp-bridge/v1/health
 GET /wp-json/greenhouse-wp-bridge/v1/inspection/elementor-document/{id}
+GET /wp-json/greenhouse-wp-bridge/v1/inspection/block-document/{id}
 GET /wp-json/greenhouse-wp-bridge/v1/inspection/ohio-widget-catalog
 ```
 
-All current endpoints require an authenticated WordPress user with `edit_posts` and are designed for Application Password use. The Elementor endpoint reads `_elementor_data`, summarizes `container|section|column|widget`, reports widget usage, semantic `gh-*` anchors and selected Ohio page metas. The Ohio endpoint reads Elementor's registered widget catalog and identifies Ohio/HubSpot widgets. These endpoints are discovery/readiness primitives; they are not the draft-only write path.
+All current endpoints require an authenticated WordPress user with `edit_posts` and are designed for Application Password use. The Elementor endpoint reads `_elementor_data`, summarizes `container|section|column|widget`, reports widget usage, semantic `gh-*` anchors and selected Ohio page metas. The block endpoint reads raw `post_content` through WordPress `parse_blocks()`, summarizes Gutenberg `blockName` usage, detects `gh-*` classes/anchors, caps top-level block samples at 40 and is intended for blog posts and other block-editor content. The Ohio endpoint reads Elementor's registered widget catalog and identifies Ohio/HubSpot widgets. These endpoints are discovery/readiness primitives; they are not the draft-only write path.
+
+Builder module vocabulary:
+
+- Gutenberg modules are `blockName` entries such as `core/paragraph`, `core/image`, `core/group`, `yoast-seo/table-of-contents` or third-party blocks.
+- Elementor modules are `widgetType` entries such as `ohio_heading`, `ohio_service_table`, `hubspot-form` or core Elementor widgets.
+- Greenhouse readers should normalize both as inspectable content modules, while preserving the native source field (`blockName` or `widgetType`) for precise patch planning.
 
 ## 7. Landing Manifest Contract
 

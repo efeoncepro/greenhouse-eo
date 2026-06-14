@@ -18,6 +18,7 @@ import {
 type CliOptions = {
   pageId: number | null
   includeCatalog: boolean
+  includeBlockDocument: boolean
   write: boolean
   help: boolean
 }
@@ -68,6 +69,7 @@ const parseArgs = (argv: string[]): CliOptions => {
   const options: CliOptions = {
     pageId: null,
     includeCatalog: true,
+    includeBlockDocument: true,
     write: false,
     help: false
   }
@@ -93,6 +95,11 @@ const parseArgs = (argv: string[]): CliOptions => {
       continue
     }
 
+    if (arg === '--no-blocks') {
+      options.includeBlockDocument = false
+      continue
+    }
+
     if (arg === '--write') {
       options.write = true
       continue
@@ -109,6 +116,7 @@ const printHelp = () => {
   pnpm public-website:bridge-inspect -- --page-id 244079
   pnpm public-website:bridge-inspect -- --page-id 244079 --write
   pnpm public-website:bridge-inspect -- --page-id 244079 --no-catalog
+  pnpm public-website:bridge-inspect -- --page-id 249766 --no-catalog
 
 Required env:
   PUBLIC_WEBSITE_WORDPRESS_BASE_URL (optional, defaults to ${DEFAULT_PUBLIC_SITE_WORDPRESS_BASE_URL})
@@ -133,7 +141,8 @@ const main = async () => {
 
   const report = await inspectPublicSiteBridge({
     pageId: options.pageId,
-    includeCatalog: options.includeCatalog
+    includeCatalog: options.includeCatalog,
+    includeBlockDocument: options.includeBlockDocument
   })
 
   if (options.write) {
@@ -167,6 +176,16 @@ const main = async () => {
           elementsSummary: report.endpoints.elementorDocument.summary.elementsSummary,
           semanticAnchorsCount: report.endpoints.elementorDocument.summary.semanticAnchors.length
         },
+        blockDocument: report.endpoints.blockDocument
+          ? {
+              status: report.endpoints.blockDocument.status,
+              ok: report.endpoints.blockDocument.ok,
+              post: report.endpoints.blockDocument.summary.post,
+              editor: report.endpoints.blockDocument.summary.editor,
+              blocksSummary: report.endpoints.blockDocument.summary.blocksSummary,
+              semanticAnchorsCount: report.endpoints.blockDocument.summary.semanticAnchors.length
+            }
+          : null,
         ohioWidgetCatalog: report.endpoints.ohioWidgetCatalog
           ? {
               status: report.endpoints.ohioWidgetCatalog.status,
@@ -185,6 +204,7 @@ const main = async () => {
   if (
     !report.endpoints.health.ok ||
     !report.endpoints.elementorDocument.ok ||
+    (report.endpoints.blockDocument && !report.endpoints.blockDocument.ok) ||
     (report.endpoints.ohioWidgetCatalog && !report.endpoints.ohioWidgetCatalog.ok)
   ) {
     process.exitCode = 2

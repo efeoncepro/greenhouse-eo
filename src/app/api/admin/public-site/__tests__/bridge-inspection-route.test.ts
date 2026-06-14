@@ -48,6 +48,7 @@ beforeEach(() => {
     endpoints: {
       health: { status: 200, ok: true, summary: {} },
       elementorDocument: { status: 200, ok: true, summary: {} },
+      blockDocument: { status: 200, ok: true, summary: {} },
       ohioWidgetCatalog: null
     }
   })
@@ -58,7 +59,9 @@ describe('GET /api/admin/public-site/bridge-inspection', () => {
     const { GET } = await import('../bridge-inspection/route')
 
     const response = await GET(
-      new Request('http://localhost/api/admin/public-site/bridge-inspection?pageId=244079&includeCatalog=false')
+      new Request(
+        'http://localhost/api/admin/public-site/bridge-inspection?pageId=244079&includeCatalog=false&includeBlocks=false'
+      )
     )
 
     expect(response.status).toBe(200)
@@ -70,7 +73,8 @@ describe('GET /api/admin/public-site/bridge-inspection', () => {
     )
     expect(mocks.inspectPublicSiteBridge).toHaveBeenCalledWith({
       pageId: 244079,
-      includeCatalog: false
+      includeCatalog: false,
+      includeBlockDocument: false
     })
 
     const json = await response.json()

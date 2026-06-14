@@ -7,7 +7,7 @@
 > **Sitio:** `https://efeoncepro.com`
 > **Runtime observado:** WordPress en Kinsta, Ohio `3.7.0`, `ohio-child`, Elementor `4.1.3`, Elementor Pro `4.1.1`, Ohio Extra `3.7.0`
 > **Repositorio runtime:** `efeoncepro/efeonce-public-site-runtime`
-> **Bridge runtime actual:** `wp-content/plugins/greenhouse-wp-bridge` v0.1.0 con endpoints read-only; desplegado/activo en Kinsta desde 2026-06-14.
+> **Bridge runtime actual:** `wp-content/plugins/greenhouse-wp-bridge` v0.2.0 con endpoints read-only Elementor/Gutenberg/Ohio; desplegado/activo en Kinsta desde 2026-06-14.
 > **Relacionados:** [Inventario Ohio + Elementor](./wordpress-ohio-elementor-widget-inventory.md), [Playbook de landings Ohio + Elementor](../../manual-de-uso/public-site/wordpress-ohio-elementor-landing-playbook.md), [Landing Control Plane](../../architecture/GREENHOUSE_PUBLIC_WEBSITE_LANDING_CONTROL_PLANE_ARCHITECTURE_V1.md)
 
 ## Objetivo
@@ -18,6 +18,19 @@ Este documento cubre dos vias:
 
 1. **Widgets custom de Elementor** para componentes visuales/operativos reutilizables dentro del builder actual.
 2. **React en WordPress** solo en carriles nativos de WordPress: editor/admin, bloques Gutenberg y frontend acotado mediante Interactivity API.
+
+## Modelo modular observado
+
+WordPress builders comparten una idea operativa: contenido compuesto por módulos. En Gutenberg el módulo inspeccionable es el `blockName`; en Elementor el equivalente práctico es el `widgetType` dentro de `_elementor_data`.
+
+Discovery read-only del 2026-06-14 contra los últimos posts publicados confirma que los posts editoriales de Efeonce no usan Elementor: `elementorDataPresent=false` y `hasBlocks=true`. Ejemplo: post `249766` (`GLITCH #02`) devuelve 81 bloques parseados por `parse_blocks()`: `core/paragraph`, `core/heading`, `core/image`, `core/separator` y muchos `core/freeform` heredados. Otros posts recientes usan además `core/group`, `core/columns`, `core/gallery`, `core/list`, `core/quote`, `yoast-seo/table-of-contents` y `essential-blocks/testimonial`.
+
+Contrato operativo:
+
+- posts/blog: inspeccionar primero `post_content` con `parse_blocks()` y modelar por `blockName`;
+- landings Ohio/Elementor: inspeccionar `_elementor_data` y modelar por `widgetType`;
+- Greenhouse puede normalizar ambos como "content modules", pero debe conservar el campo nativo (`blockName` o `widgetType`) para evitar patches ambiguos;
+- no asumir que una pagina sin bloques Gutenberg no tiene estructura: puede estar gobernada por Elementor widgets.
 
 ## Fuentes y postura oficial usada
 

@@ -27,9 +27,9 @@ const toBooleanFlag = (value: string | null, defaultValue: boolean) => {
  * GET /api/admin/public-site/bridge-inspection?pageId=244079
  *
  * Read-only control-plane lane for the active WordPress bridge. It inspects
- * authenticated health, Elementor document structure and the Ohio widget
- * catalog without mutating WordPress, publishing content, clearing cache or
- * creating backups.
+ * authenticated health, Elementor document structure, Gutenberg/block document
+ * structure and the Ohio widget catalog without mutating WordPress, publishing
+ * content, clearing cache or creating backups.
  */
 export async function GET(request: Request) {
   const { tenant, errorResponse } = await requireAdminTenantContext()
@@ -52,7 +52,8 @@ export async function GET(request: Request) {
   try {
     const report = await inspectPublicSiteBridge({
       pageId,
-      includeCatalog: toBooleanFlag(url.searchParams.get('includeCatalog'), true)
+      includeCatalog: toBooleanFlag(url.searchParams.get('includeCatalog'), true),
+      includeBlockDocument: toBooleanFlag(url.searchParams.get('includeBlocks'), true)
     })
 
     return NextResponse.json(report)

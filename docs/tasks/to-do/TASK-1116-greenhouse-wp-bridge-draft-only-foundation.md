@@ -128,6 +128,7 @@ Reglas obligatorias:
 - Production smoke on 2026-06-14: anonymous health returns `401 ghwpb_auth_required`; authenticated health, Elementor inspection for page `244079`, and Ohio widget catalog return `200`. Health reports `writesEnabled=false`, `greenhouse_write_routes=false`, and Kinsta/cache/backup config false.
 - Greenhouse now has a reusable read-only inspection helper for the active bridge: `pnpm public-website:bridge-inspect -- --page-id <id> [--write]`. First evidence lives at `docs/operations/public-site-bridge-inspections/inspection-page-244079-2026-06-14T16-22-05-591Z.json`.
 - Greenhouse also has a read-only internal API lane for the active bridge: `GET /api/admin/public-site/bridge-inspection?pageId=<id>` backed by `src/lib/public-site/bridge-inspection.ts` and gated by `platform.public_site.bridge.inspect`. It is intentionally inspection-only and does not satisfy the signed draft write contract for this task.
+- `greenhouse-wp-bridge` v0.2.0 adds read-only Gutenberg/block inspection: `GET /wp-json/greenhouse-wp-bridge/v1/inspection/block-document/{id}`. Recent Efeonce posts are Gutenberg/block-editor content (`hasBlocks=true`, no Elementor data), so draft write design must treat Gutenberg `blockName` and Elementor `widgetType` as separate native module dialects.
 - PHP syntax lint passed locally for the new plugin.
 - No signed write contract exists.
 - No draft-only endpoint exists.

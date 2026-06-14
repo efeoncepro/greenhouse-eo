@@ -208,3 +208,13 @@ No ejecutar writes si:
 Antes de crear un widget custom, confirmar que no basta con un widget Ohio maduro o con controles nativos de Elementor/Ohio. Si el modulo sera reutilizable, necesita tracking/props Greenhouse, o requiere un contrato estable de clases `gh-*`, usar un plugin propio versionado en `efeoncepro/efeonce-public-site-runtime`.
 
 La estrategia canonica vive en [Custom Elementor Widgets y React](../../documentation/public-site/wordpress-custom-widgets-react-strategy.md). Regla breve: widgets custom de Elementor para modulos visuales reutilizables; React solo para admin/editor/bloques o interacciones frontend acotadas con Interactivity API. No usar React ni CSS hardcodeado para resolver problemas de wrappers, margins, breadcrumbs o page headline.
+
+## Posts Gutenberg vs landings Elementor
+
+No todo el Public Site usa Elementor. Los posts editoriales recientes de Efeonce usan Gutenberg blocks: el bridge `greenhouse-wp-bridge` v0.2.0 expone `GET /wp-json/greenhouse-wp-bridge/v1/inspection/block-document/{id}` para leer `post_content` con `parse_blocks()` y resumir `blockName`.
+
+Regla operativa:
+
+- si el objeto es post/blog o `hasBlocks=true`, usar inspeccion de bloques;
+- si el objeto tiene `_elementor_data`/`_elementor_edit_mode=builder`, usar inspeccion Elementor;
+- tratar `blockName` y `widgetType` como dos dialectos del mismo concepto de modulo builder, sin mezclarlos al escribir patches.

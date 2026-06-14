@@ -1,5 +1,15 @@
 # Release 2026-06-10 #2 — develop→main `6c649b2a6` RELEASED
 
+## Sesion 2026-06-14 — Public Site bridge v0.2.0 Gutenberg/block inspection (Codex)
+
+- **Discovery antes de implementar:** se inspeccionaron los posts recientes de `efeoncepro.com` via WP-CLI con `parse_blocks()`. Los posts activos son Gutenberg (`post`, `hasBlocks=true`, sin `_elementor_data`), no Elementor. Ejemplo verificado: post `249766` (`glitch-02-noticias-ia-marketing-2026-03-03`) con 81 bloques: `core/freeform`, `core/paragraph`, `core/heading`, `core/image`, `core/separator`.
+- **Bridge desplegado en Kinsta:** `greenhouse-wp-bridge` subio a v0.2.0 y quedo actualizado manualmente via SSH/SCP en Kinsta. Nuevo endpoint read-only: `GET /wp-json/greenhouse-wp-bridge/v1/inspection/block-document/{id}`. Sigue sin endpoints de escritura.
+- **Modelo modular aprendido:** Gutenberg usa modulos `blockName`; Elementor usa modulos `widgetType`. Greenhouse debe normalizarlos como contenido inspeccionable, pero preservar el dialecto nativo para cualquier patch futuro.
+- **Greenhouse actualizado:** `src/lib/public-site/bridge-inspection.ts`, la API interna y `pnpm public-website:bridge-inspect` ahora leen `blockDocument` por defecto; agregan `includeBlocks=false` / `--no-blocks`; y anexan cache-buster `greenhouseInspection=<timestamp>` para evitar snapshots stale por ID en el runtime/capa cache.
+- **Smoke productivo:** `pnpm public-website:bridge-inspect -- --page-id 249766 --no-catalog` confirmo `editor.model=wordpress_blocks`, `hasBlocks=true`, `elementorDataPresent=false`, `blocksSummary.totalBlocks=81`. La page Elementor `244079` sigue reportando su arbol Elementor y ademas muestra `hasBlocks=false`/`elementorDataPresent=true`, como esperado.
+- **Evidencia final:** `docs/operations/public-site-bridge-inspections/inspection-page-249766-2026-06-14T16-46-47-906Z.json`, drift `docs/operations/public-site-drift/drift-2026-06-14T16-47-57-837Z.json` (`drifted=0`), dry-run `docs/operations/public-site-deploy-dry-runs/dry-run-2026-06-14T16-47-57-837Z.json` (`would_create=0`, `would_update=0`) y status `docs/operations/public-site-runtime-status/status-2026-06-14T16-48-04-143Z.json`.
+- **Estado honesto:** esto completa la inspeccion read-only Gutenberg/Elementor del bridge. `TASK-1116` sigue pendiente para writes: HMAC/shared secret, replay guard, Abilities registration, permisos minimos, staging/preview y mutaciones draft-only. Kinsta API sigue sin token, por lo que backups/cache clear/deploy apply automatizados siguen bloqueados.
+
 ## Sesion 2026-06-14 — Public Site bridge inspection API read-only (Codex)
 
 - **Qué quedó:** `src/lib/public-site/bridge-inspection.ts` centraliza la inspección read-only del bridge activo y ahora la reutiliza tanto `pnpm public-website:bridge-inspect` como la nueva API interna `GET /api/admin/public-site/bridge-inspection?pageId=<id>`.

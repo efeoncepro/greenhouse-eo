@@ -9,6 +9,7 @@ export type PublicSiteBridgeSecretRef = {
 export type PublicSiteBridgeInspectionOptions = {
   pageId: number
   includeCatalog?: boolean
+  includeBlockDocument?: boolean
   baseUrl?: string
 }
 
@@ -40,6 +41,11 @@ export type PublicSiteBridgeInspectionReport = {
       ok: boolean
       summary: ReturnType<typeof summarizeDocument>
     }
+    blockDocument: {
+      status: number
+      ok: boolean
+      summary: ReturnType<typeof summarizeBlockDocument>
+    } | null
     ohioWidgetCatalog: {
       status: number
       ok: boolean
@@ -60,6 +66,12 @@ export const DEFAULT_PUBLIC_SITE_WORDPRESS_BASE_URL = 'https://efeoncepro.com'
 const stripTrailingSlash = (value: string) => value.replace(/\/+$/, '')
 
 const buildUrl = (baseUrl: string, path: string) => `${stripTrailingSlash(baseUrl)}${path}`
+
+const withCacheBuster = (path: string, generatedAt: string) => {
+  const separator = path.includes('?') ? '&' : '?'
+
+  return `${path}${separator}greenhouseInspection=${encodeURIComponent(generatedAt)}`
+}
 
 export const parsePublicSiteBridgeSecretRef = (rawRef: string | undefined): PublicSiteBridgeSecretRef | null => {
   const value = rawRef?.trim()
@@ -181,6 +193,14 @@ export const summarizeDocument = (body: any) => ({
   inspectionWarning: body?.inspectionWarning ?? null
 })
 
+export const summarizeBlockDocument = (body: any) => ({
+  post: body?.post ?? null,
+  editor: body?.editor ?? null,
+  blocksSummary: body?.blocksSummary ?? null,
+  semanticAnchors: Array.isArray(body?.semanticAnchors) ? body.semanticAnchors : [],
+  inspectionWarning: body?.inspectionWarning ?? null
+})
+
 export const summarizeCatalog = (body: any) => ({
   elementorLoaded: Boolean(body?.elementorLoaded),
   totalWidgets: Number(body?.totalWidgets ?? 0),
@@ -214,16 +234,36 @@ export const inspectPublicSiteBridge = async (
   )
 
   const generatedAt = new Date().toISOString()
-  const health = await fetchJson(buildUrl(baseUrl, '/wp-json/greenhouse-wp-bridge/v1/health'), auth.header)
 
-  const documentInspection = await fetchJson(
-    buildUrl(baseUrl, `/wp-json/greenhouse-wp-bridge/v1/inspection/elementor-document/${options.pageId}`),
+  const health = await fetchJson(
+    buildUrl(baseUrl, withCacheBuster('/wp-json/greenhouse-wp-bridge/v1/health', generatedAt)),
     auth.header
   )
 
+  const documentInspection = await fetchJson(
+    buildUrl(
+      baseUrl,
+      withCacheBuster(`/wp-json/greenhouse-wp-bridge/v1/inspection/elementor-document/${options.pageId}`, generatedAt)
+    ),
+    auth.header
+  )
+
+  const blockInspection = options.includeBlockDocument === false
+    ? null
+    : await fetchJson(
+        buildUrl(
+          baseUrl,
+          withCacheBuster(`/wp-json/greenhouse-wp-bridge/v1/inspection/block-document/${options.pageId}`, generatedAt)
+        ),
+        auth.header
+      )
+
   const catalog = options.includeCatalog === false
     ? null
-    : await fetchJson(buildUrl(baseUrl, '/wp-json/greenhouse-wp-bridge/v1/inspection/ohio-widget-catalog'), auth.header)
+    : await fetchJson(
+        buildUrl(baseUrl, withCacheBuster('/wp-json/greenhouse-wp-bridge/v1/inspection/ohio-widget-catalog', generatedAt)),
+        auth.header
+      )
 
   return {
     contractVersion: 'public-site-bridge-inspection.v1',
@@ -249,6 +289,13 @@ export const inspectPublicSiteBridge = async (
         ok: documentInspection.ok,
         summary: summarizeDocument(documentInspection.body)
       },
+      blockDocument: blockInspection
+        ? {
+            status: blockInspection.status,
+            ok: blockInspection.ok,
+            summary: summarizeBlockDocument(blockInspection.body)
+          }
+        : null,
       ohioWidgetCatalog: catalog
         ? {
             status: catalog.status,
