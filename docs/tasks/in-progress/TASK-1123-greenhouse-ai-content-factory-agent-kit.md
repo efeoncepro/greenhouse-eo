@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
@@ -18,7 +18,7 @@
 - Rank: `TBD`
 - Domain: `platform|commercial|marketing-ops|integrations|wordpress|ai|content`
 - Blocked by: `none`
-- Branch: `task/TASK-1123-greenhouse-ai-content-factory-agent-kit`
+- Branch: `develop` (operator override; no worktree)
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
@@ -256,6 +256,24 @@ Reglas obligatorias:
 - Exponerlo como resources/JSON bajo `docs/operations/public-site-content-factory-catalogs/` y luego como reader `getPublicSiteContentIntelligenceMap`.
 - Incluir freshness metadata: scannedAt, source endpoint, bridge version, post modified date and hash/fingerprint.
 - Ningún refresh/fix puede usar un map stale sin re-inspection.
+
+#### Slice 3b implementation note — 2026-06-14
+
+- Estado: `in-progress`.
+- Owner: Codex on `develop` by explicit operator override; no task branch/worktree.
+- First MVP target: read-only `contentFactoryInspectionMap.v1` generated from live `greenhouse-wp-bridge` inspections.
+- Canonical samples:
+  - `249766` — Gutenberg post sample (`post`, `gutenberg_blocks`).
+  - `244079` — Elementor/Ohio landing sample (`page` normalized as `landing`, `elementor_document`).
+- Safety: no WordPress writes, no publish, no cache clear, no `wp-config.php`, no secrets in output.
+- Code shipped:
+  - `src/lib/public-site/content-factory/intelligence-map.ts`
+  - `scripts/public-website/content-factory-inspect.ts`
+  - `pnpm public-website:content-factory:inspect`
+- Evidence generated from versioned bridge inspections because local `gcloud` reauth was expired for direct Secret Manager reads:
+  - `docs/operations/public-site-content-factory-catalogs/content-intelligence-map-2026-06-14T18-38-09-337Z.json`
+  - `249766`: `gutenberg_blocks`, `81` blocks, `12` normalized modules, no access issues.
+  - `244079`: `elementor_document`, `199` Elementor elements, `31` normalized modules, no access issues.
 
 ### Slice 4 — API-First Content Factory Primitives
 

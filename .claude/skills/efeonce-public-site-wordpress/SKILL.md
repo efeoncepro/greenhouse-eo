@@ -1,6 +1,6 @@
 ---
 name: efeonce-public-site-wordpress
-description: Operate and update the Efeonce public WordPress site knowledge base for efeoncepro.com. Use when working with the public site, Kinsta, WordPress REST/WP-CLI, WP Abilities, Ohio theme, Elementor, Greenhouse-to-WordPress landing pages, HubSpot attribution, public-site layout incidents, authenticated discovery, repository/GitOps binding, or docs/tasks for EPIC-019/TASK-1111/TASK-1116/TASK-1122.
+description: Operate and update the Efeonce public WordPress site knowledge base for efeoncepro.com. Use when working with the public site, Kinsta, WordPress REST/WP-CLI, WP Abilities, Ohio theme, Elementor, Greenhouse-to-WordPress landing pages, HubSpot attribution, public-site layout incidents, authenticated discovery, repository/GitOps binding, AI Content Factory, or docs/tasks for EPIC-019/TASK-1111/TASK-1116/TASK-1122/TASK-1123.
 ---
 
 # Efeonce Public Site WordPress
@@ -20,7 +20,7 @@ Before changing the site or Greenhouse bridge code, read the relevant sources:
 - `docs/documentation/public-site/wordpress-custom-widgets-react-strategy.md` before proposing custom Elementor widgets, Gutenberg blocks, WordPress admin React, or Interactivity API work.
 - `docs/architecture/GREENHOUSE_PUBLIC_WEBSITE_LANDING_CONTROL_PLANE_ARCHITECTURE_V1.md` and `docs/architecture/GREENHOUSE_PUBLIC_WEBSITE_LANDING_CONTROL_PLANE_DECISION_V1.md` for the control-plane contract.
 - `docs/operations/public-site-repository-control-plane-discovery-20260614.md` before deciding where public-site WordPress code should live or where to implement the bridge plugin.
-- `docs/epics/to-do/EPIC-019-public-website-landing-control-plane.md`, `docs/tasks/in-progress/TASK-1111-public-website-read-only-discovery.md`, `docs/tasks/in-progress/TASK-1122-public-site-code-baseline-gitops-binding.md`, and `docs/tasks/in-progress/TASK-1116-greenhouse-wp-bridge-draft-only-foundation.md`.
+- `docs/epics/to-do/EPIC-019-public-website-landing-control-plane.md`, `docs/tasks/in-progress/TASK-1111-public-website-read-only-discovery.md`, `docs/tasks/in-progress/TASK-1122-public-site-code-baseline-gitops-binding.md`, `docs/tasks/in-progress/TASK-1116-greenhouse-wp-bridge-draft-only-foundation.md`, and `docs/tasks/in-progress/TASK-1123-greenhouse-ai-content-factory-agent-kit.md`.
 
 Pair with `wp-rest-api`, `wp-wpcli-and-ops`, `wp-abilities-api`, `wp-interactivity-api`, `wp-block-development`, `greenhouse-secret-hygiene`, `greenhouse-browser-diagnostics`, and `greenhouse-documentation-governor` when those domains apply.
 
@@ -46,6 +46,7 @@ Pair with `wp-rest-api`, `wp-wpcli-and-ops`, `wp-abilities-api`, `wp-interactivi
 - Public Site content module model: Gutenberg posts use `blockName` from `parse_blocks()`; Elementor landings use `widgetType` from `_elementor_data`. Recent Efeonce posts are Gutenberg (`hasBlocks=true`, `elementorDataPresent=false`) and often include `core/freeform` legacy chunks plus `core/paragraph`, `core/heading`, `core/image`, `core/list`, `core/group`, `core/columns`, `yoast-seo/table-of-contents` and occasional third-party blocks. Treat both `blockName` and `widgetType` as builder modules, but keep the native field for patch planning.
 - Content factory priority: for scaling production, treat posts and landings as two lanes. Posts should be Gutenberg/block-first (`post_draft_gutenberg`) because current Efeonce posts are already block-editor content. Landings should be constrained Elementor/Ohio modules (`landing_draft_elementor`) and only move to custom Elementor widgets when a module is reusable and fragile as raw Elementor structure.
 - Content factory edit/refresh requirement: Greenhouse AI Content Factory must support `create`, `refresh` and `fix`. Before any existing post/page/module is edited, agents must inspect the live object and build a Content Intelligence Map covering post/page id, editor model, blocks/widgets, Ohio/theme metas, Elementor settings, assets, SEO/Yoast, HubSpot/CTA, anchors, ownership, freshness and content fingerprint. Refresh/fix should clone or derive a draft/private object first; direct patches to published content require explicit task/release approval.
+- Content Intelligence Map MVP: `src/lib/public-site/content-factory/intelligence-map.ts` builds `contentFactoryInspectionMap.v1` from live bridge inspections. Use `pnpm public-website:content-factory:inspect -- --write` for the default samples (`249766` Gutenberg post and `244079` Elementor/Ohio landing). If local GCP auth/Secret Manager is unavailable, use `--from-bridge-inspection <path>` with versioned bridge reports. Evidence is stored in `docs/operations/public-site-content-factory-catalogs/content-intelligence-map-*.json`. The map is read-only and normalizes `blockName`, `widgetType`, `themeMeta` and `hubspot` modules with freshness/fingerprint metadata for agent refresh/fix planning.
 - Greenhouse now exposes a server-side read-only bridge inspection reader at `src/lib/public-site/bridge-inspection.ts`, reused by `pnpm public-website:bridge-inspect`, and admin API `GET /api/admin/public-site/bridge-inspection?pageId=<id>`. The API is gated by `requireAdminTenantContext()` and `platform.public_site.bridge.inspect` (`read`, `all`). It reads WordPress bridge health, Elementor document summary, Gutenberg/block document summary and optional Ohio catalog; the reader adds a cache-buster to avoid stale per-ID inspection responses.
 
 ## Safety Rules
@@ -71,6 +72,7 @@ pnpm public-website:diff-runtime
 pnpm public-website:runtime-status
 pnpm public-website:deploy-dry-run
 pnpm public-website:bridge-inspect -- --page-id 244079
+pnpm public-website:content-factory:inspect -- --write
 ```
 
 The script auto-loads `.env.local` and then `.env` without overwriting shell/CI variables. Authenticated discovery requires the env/secret plumbing already configured by the repo, but agents should not need to `source .env.local` or paste long inline env commands. Do not paste secret values into the command line. When WP-CLI is needed directly, use the Kinsta SSH env vars and run read-only commands such as `wp option get`, `wp theme list`, `wp plugin list`, `wp post list`, and `wp post meta list`.
@@ -84,6 +86,8 @@ Use `pnpm public-website:runtime-status` to read the Greenhouse binding, local r
 Use `pnpm public-website:deploy-dry-run` to compare the runtime repo artifact against the latest live export manifest and produce a no-mutation deployment plan. `--write` stores `docs/operations/public-site-deploy-dry-runs/dry-run-*.json`. This command does not SSH, write files, clear cache, create backups or delete live-only files.
 
 Use `pnpm public-website:bridge-inspect -- --page-id <id>` to call the active `greenhouse-wp-bridge` read-only endpoints with Application Password auth from Secret Manager. `--write` stores `docs/operations/public-site-bridge-inspections/inspection-page-*.json`. The command calls health, Elementor document inspection, Gutenberg/block document inspection and Ohio widget catalog, and never prints credentials or `Authorization` headers. Use `--no-catalog` for faster post inspections and `--no-blocks` only when checking older bridge compatibility.
+
+Use `pnpm public-website:content-factory:inspect` to build the agent-facing Content Intelligence Map from bridge reads. By default it inspects `249766` (Gutenberg post sample) and `244079` (Elementor/Ohio landing sample). Add `--target <id[:label]>` or `--targets <id,id>` for other objects. If Secret Manager cannot be reached, pass one or more `--from-bridge-inspection <path>` values to rebuild from versioned `public-site-bridge-inspection.v1` JSON evidence. `--write` stores `docs/operations/public-site-content-factory-catalogs/content-intelligence-map-*.json`. The command is read-only and produces no WordPress mutations.
 
 Use `pnpm public-website:bridge-draft-contract` to prepare a non-mutating signed draft contract dry-run. It prints payload shape, route, canonical request and redacted headers. It uses a synthetic dry-run secret unless `--send` is explicitly passed; `--send` requires `PUBLIC_WEBSITE_WORDPRESS_BRIDGE_SHARED_SECRET_SECRET_REF` and should not be used against production until writes are enabled intentionally.
 

@@ -1,5 +1,13 @@
 # Release 2026-06-10 #2 — develop→main `6c649b2a6` RELEASED
 
+## Sesion 2026-06-14 — TASK-1123 Content Intelligence Map MVP (Codex)
+
+- **TASK-1123 tomada en `develop`:** por instruccion del operador, sin branch/worktree. Lifecycle movido a `in-progress`; indices sincronizados en `docs/tasks/README.md`, `docs/tasks/TASK_ID_REGISTRY.md` y `EPIC-019`.
+- **MVP implementado:** nuevo primitive `src/lib/public-site/content-factory/intelligence-map.ts` genera `contentFactoryInspectionMap.v1` desde reportes reales del `greenhouse-wp-bridge`, normalizando Gutenberg `blockName`, Elementor/Ohio `widgetType`, metas Ohio/theme y HubSpot en modulos consumibles por agentes.
+- **CLI read-only:** nuevo `pnpm public-website:content-factory:inspect` inspecciona por defecto el post Gutenberg `249766` y la landing Elementor/Ohio `244079`; `--from-bridge-inspection <path>` permite construir el mapa desde inspecciones versionadas si Secret Manager/GCP auth no esta disponible; `--write` guarda evidencia en `docs/operations/public-site-content-factory-catalogs/content-intelligence-map-*.json`. No escribe WordPress, no publica, no limpia cache y no imprime secretos.
+- **Evidencia:** `docs/operations/public-site-content-factory-catalogs/content-intelligence-map-2026-06-14T18-38-09-337Z.json` generado desde inspecciones live previas porque el intento directo quedo bloqueado por `gcloud` local (`Reauthentication failed. cannot prompt during non-interactive execution`). Resultado: `249766` = `gutenberg_blocks` con 81 bloques; `244079` = `elementor_document` con 199 elementos; ambos sin access issues.
+- **Safety:** este slice solo lee endpoints autenticados existentes. Writes del bridge siguen deshabilitados; refresh/fix futuro debe usar este mapa fresco y luego clone/draft/private antes de cualquier patch.
+
 ## Sesion 2026-06-14 — TASK-1123 Greenhouse AI Content Factory Agent Kit creada (Codex)
 
 - **Decision de producto:** la Content Factory es AI-native, pero no chat-first. No se construye un chat nuevo; se crea un Agent Kit para que Codex, Claude Code, Nexa y futuros agentes sepan construir contenido WordPress con recursos gobernados.
