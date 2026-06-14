@@ -309,6 +309,33 @@ export {
   resolveNexaMomentCompositionConfig,
   resolveNexaMomentCompositionVariant
 } from './nexa-moment-composition/nexa-moment-composition-controller'
+export { default as CompositionShell } from './composition-shell/CompositionShell'
+export type {
+  CompositionShellComposition,
+  CompositionShellCompositionConfig,
+  CompositionShellKind,
+  CompositionShellProps,
+  CompositionShellRegion,
+  CompositionShellRegionMeta,
+  CompositionShellSizeClass,
+  CompositionShellState
+} from './composition-shell/composition-shell-types'
+export {
+  COMPOSITION_SHELL_BREAKPOINTS,
+  COMPOSITION_SHELL_COMPOSITION_CONFIG,
+  COMPOSITION_SHELL_REGION_META,
+  initialCompositionShellState,
+  reduceCompositionShellState,
+  resolveComposition,
+  resolveCompositionConfig,
+  resolveCompositionLayout,
+  resolveSizeClass
+} from './composition-shell/composition-shell-controller'
+export type {
+  CompositionShellControllerAction,
+  CompositionShellControllerState,
+  ResolvedCompositionLayout
+} from './composition-shell/composition-shell-controller'
 export { default as GreenhouseNexaAnimatedAskBadge } from './GreenhouseNexaAnimatedAskBadge'
 export type { GreenhouseNexaAnimatedAskBadgeProps } from './GreenhouseNexaAnimatedAskBadge'
 export { default as EfeonceOrbitalLogoMark } from './EfeonceOrbitalLogoMark'
