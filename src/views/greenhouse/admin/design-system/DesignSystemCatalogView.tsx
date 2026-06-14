@@ -206,6 +206,20 @@ const CATALOG_ITEMS: CatalogItem[] = [
     icon: 'tabler-layout-board-split'
   },
   {
+    id: 'card-density',
+    title: 'Adaptive card density',
+    description:
+      'Contrato de densidad de cards (TASK-1115): capacidad hermana del Composition Shell. El card se adapta a SU propio ancho (container query) con modos full/condensed/peek — condensación honesta (versión real más chica, nunca clip; el dato clave nunca desaparece). Generaliza el density contract de tablas (TASK-743). Adoptado por MetricSummaryCard / MetricTrendCard.',
+    route: '/design-system/card-density',
+    category: 'Primitives',
+    kind: 'Primitive',
+    status: 'Canonical',
+    owner: 'card-density',
+    tags: ['card', 'densidad', 'container query', 'condensación', 'adaptive', 'fit mode'],
+    searchAliases: ['adaptive card', 'card density', 'densidad', 'container query', 'condensacion', 'full condensed peek', 'fit mode'],
+    icon: 'tabler-layout-cards'
+  },
+  {
     id: 'buttons',
     title: 'Buttons',
     description: 'Primitive para jerarquía de comandos, tono, iconos y estados async.',

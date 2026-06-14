@@ -153,6 +153,13 @@ export const DECLARED_CHILD_ROUTES: readonly ChildRouteDeclaration[] = [
       'Composition Shell Lab (TASK-1114) — child surface del Design System para el substrato de coreografia de layout (regiones singleton + composiciones nombradas + morph View Transitions + reflow); alcanzable desde el catalogo canonico /design-system.'
   },
   {
+    route: '/design-system/card-density',
+    parent: '/design-system',
+    via: 'inline-link',
+    reason:
+      'Adaptive Card density Lab (TASK-1115) — child surface del Design System para el contrato de densidad de cards (full/condensed/peek por container query); capacidad hermana del Composition Shell; alcanzable desde el catalogo canonico /design-system.'
+  },
+  {
     route: '/design-system/loaders',
     parent: '/design-system',
     via: 'inline-link',
