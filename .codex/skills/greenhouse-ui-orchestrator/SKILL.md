@@ -7,6 +7,10 @@ description: Orchestrate Vuexy and MUI pattern selection for Greenhouse UI work.
 
 Use this skill when the task is to decide which Vuexy or MUI pattern Greenhouse should use.
 
+## Composition Shell — default base for every NEW interface (TASK-1114/1117/1119 · operator directive 2026-06-14)
+
+Every NEW Greenhouse surface/screen/view MUST **start from the Composition Shell** layout substrate: declare a composition (`single` / `leadPlusContext` / `split` / `focused`) and place content into singleton regions (`primary` / `aside` / `lead` / `dock` / `overlay`) — do NOT invent ad-hoc grids / morph / layout restructuring. It is the **architectural starting point, not one option among many**. Use `CompositionShell` + `composition-shell-controller` from `@/components/greenhouse/primitives`; opt into fluidity with `fluidity='rich'` (stagger entrance + interruptible framer-motion `layout` morph + temporary drawer in compact `split`). **Only carve-out** (not the rule): genuinely trivial one-offs with no region composition (an isolated form, a `Dialog`, a static text page) may stay on flat `LayoutContent` — but must consider the substrate FIRST and justify why it does not apply. NEVER build a parallel region/morph/layout-choreography system (that is exactly what the substrate absorbs). NEVER hand-wire the reserved `gh-region-*` view-transition-name namespace (lint `greenhouse/no-ad-hoc-layout-morph`). Coherent with the ADR: the substrate is additive (it does not rewrite `LayoutContent` by fiat) and legitimate siblings (`NexaMomentComposition`) coexist. Lab `/design-system/composition-shell`. ADR `docs/architecture/GREENHOUSE_COMPOSITION_SHELL_DECISION_V1.md` + companion `_UI_PLATFORM_V1.md`.
+
 ## Workspace detection
 
 - If the current workspace contains `starter-kit`, use `starter-kit` as the working repo.
