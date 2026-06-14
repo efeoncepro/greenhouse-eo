@@ -324,6 +324,12 @@ Reglas obligatorias:
   - `gutenbergBlockPatternCatalog.v1`
   - `pnpm public-website:content-factory:patterns`
   - Policies cover generated vs inspect-only blocks, media/source-asset requirements, refresh preservation, and safe examples for agent/MCP consumption.
+- Gutenberg block capability registry shipped:
+  - `src/lib/public-site/content-factory/gutenberg-capability-registry.ts`
+  - `gutenbergBlockCapabilityRegistry.v1`
+  - `pnpm public-website:content-factory:capabilities`
+  - The registry is the semantic layer above raw `path + fingerprint`: it maps real Gutenberg blocks to agent capabilities (`editorial_pullquote`, `editorial_heading`, `navigation_toc`, `media_asset`, `conversion_cta`, `legacy_html`), allowed semantic operations (`refresh_editorial_pullquote`, `preserve_or_regenerate_toc`, `review_image_asset`, etc.), required evidence, preview gates and the low-level refresh/patch operations they compile to.
+  - Operator decision captured: agent freedom belongs in semantic planning; determinism belongs in the final safety/apply layer. The patch plan remains the guardrail, not the primary way agents think.
 - Guided existing-post deep inspection shipped:
   - `src/lib/public-site/content-factory/post-deep-inspection.ts`
   - `contentFactoryPostDeepInspection.v1`

@@ -131,6 +131,82 @@ export type GutenbergBlockPatternCatalog = {
   entries: GutenbergBlockPatternCatalogEntry[]
 }
 
+export type GutenbergBlockSemanticKind =
+  | 'editorial_body'
+  | 'editorial_heading'
+  | 'editorial_list'
+  | 'editorial_quote'
+  | 'editorial_pullquote'
+  | 'navigation_toc'
+  | 'media_asset'
+  | 'media_embed'
+  | 'layout_group'
+  | 'layout_columns'
+  | 'conversion_cta'
+  | 'section_break'
+  | 'legacy_html'
+  | 'third_party_module'
+
+export type GutenbergBlockSemanticOperation =
+  | 'refresh_body_copy'
+  | 'rewrite_heading'
+  | 'adjust_heading_level'
+  | 'refresh_list_items'
+  | 'refresh_editorial_quote'
+  | 'refresh_editorial_pullquote'
+  | 'preserve_or_regenerate_toc'
+  | 'review_image_asset'
+  | 'review_embed_source'
+  | 'adjust_layout_settings'
+  | 'refresh_cta'
+  | 'preserve_legacy_html'
+  | 'preserve_third_party_module'
+
+export type GutenbergBlockCapabilityEntry = {
+  blockName: string
+  semanticKind: GutenbergBlockSemanticKind
+  agentRole: string
+  freedomLevel: 'open' | 'guided' | 'constrained' | 'preserve_only'
+  editableSurfaces: Array<'text' | 'attrs' | 'children' | 'media' | 'link' | 'structure'>
+  semanticOperations: GutenbergBlockSemanticOperation[]
+  compilesTo: ContentFactoryRefreshPlanChangeOperation[]
+  requiredEvidence: Array<
+    | 'fresh_deep_inspection'
+    | 'source_fingerprint'
+    | 'block_fingerprint'
+    | 'heading_outline'
+    | 'media_reconciliation'
+    | 'link_destination_review'
+    | 'cta_target'
+    | 'plugin_serialization_policy'
+  >
+  applyPolicy: {
+    directPublishedMutation: false
+    requiresDraftClone: boolean
+    requiresHumanReview: boolean
+    notes: string
+  }
+  previewPolicy: {
+    required: boolean
+    checks: string[]
+  }
+  guardrails: string[]
+  exampleIntent?: string
+}
+
+export type GutenbergBlockCapabilityRegistry = {
+  contractVersion: 'gutenbergBlockCapabilityRegistry.v1'
+  key: 'efeonce_gutenberg_blogpost_capabilities'
+  generatedAt?: string
+  source: {
+    patternCatalog: 'gutenbergBlockPatternCatalog.v1'
+    deepInspectionContract: 'contentFactoryPostDeepInspection.v1'
+    refreshPlanContract: 'contentFactoryRefreshPlan.v1'
+    observedRuntimeSample: string
+  }
+  entries: GutenbergBlockCapabilityEntry[]
+}
+
 export type ContentFactoryPostBlockEditability =
   | 'safe_text_edit'
   | 'safe_attrs_edit'
