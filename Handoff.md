@@ -9,6 +9,13 @@
 - **Evidencia live fresca tras reauth GCP:** `docs/operations/public-site-content-factory-catalogs/content-intelligence-map-2026-06-14T18-43-51-314Z.json` generado por `pnpm public-website:content-factory:inspect -- --write` directo contra WordPress/Secret Manager. Resultado: `249766` = `gutenberg_blocks` con 81 bloques; `244079` = `elementor_document` con 199 elementos y 1 bloque residual detectado; ambos sin access issues.
 - **Safety:** este slice solo lee endpoints autenticados existentes. Writes del bridge siguen deshabilitados; refresh/fix futuro debe usar este mapa fresco y luego clone/draft/private antes de cualquier patch.
 
+### Slice 4 — Gutenberg draft validator MVP
+
+- **Primitive API-first:** `src/lib/public-site/content-factory/contracts.ts` + `gutenberg-validator.ts` agregan `validateGeneratedGutenbergDraft()` y contrato de salida `contentFactoryValidation.v1`.
+- **CLI agent-facing:** `pnpm public-website:content-factory:validate -- --file <draft.json> [--write]` valida artifacts locales `contentFactoryGeneratedDraft.v1`; no llama WordPress ni escribe runtime.
+- **Guardrails actuales:** bloquea lanes/kinds no Gutenberg, slug/titulo/SEO faltantes, scripts/iframes/inline handlers/`javascript:`, JSON de atributos inválido, comentarios Gutenberg desbalanceados y bloques fuera del allowlist gobernado. Advierte `core/freeform` por ser legacy observado, pero no patrón de generación nueva.
+- **Evidencia:** Vitest focal 5/5; CLI smoke local `status=pass` con draft temporal. Queda pendiente ampliar recipes/golden examples y conectar el validator al primer `post_draft_gutenberg` plan antes de cualquier write smoke.
+
 ## Sesion 2026-06-14 — TASK-1123 Greenhouse AI Content Factory Agent Kit creada (Codex)
 
 - **Decision de producto:** la Content Factory es AI-native, pero no chat-first. No se construye un chat nuevo; se crea un Agent Kit para que Codex, Claude Code, Nexa y futuros agentes sepan construir contenido WordPress con recursos gobernados.

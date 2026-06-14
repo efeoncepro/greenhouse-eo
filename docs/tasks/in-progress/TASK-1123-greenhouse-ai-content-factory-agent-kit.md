@@ -299,6 +299,23 @@ Reglas obligatorias:
   - `requestContentReview`
 - Toda lógica reusable vive en primitives; scripts/API/MCP solo envuelven.
 
+#### Slice 4 implementation note — 2026-06-14
+
+- Estado: `in-progress`.
+- First primitive shipped:
+  - `src/lib/public-site/content-factory/contracts.ts`
+  - `src/lib/public-site/content-factory/gutenberg-validator.ts`
+  - `validateGeneratedGutenbergDraft()`
+  - `pnpm public-website:content-factory:validate`
+- Contract output: `contentFactoryValidation.v1`.
+- Safety: non-mutating; validates local JSON artifacts only and never calls WordPress.
+- Current behavior:
+  - Blocks non-Gutenberg lanes/kinds, invalid slugs, missing title/SEO, unsafe markup (`script`, `iframe`, inline event handlers, `javascript:` URLs), invalid block JSON attributes, unbalanced Gutenberg block comments and unsupported block names.
+  - Warns on legacy `core/freeform`, missing heading/paragraph, short editorial content, observed block mismatch and missing `gh-*` anchors for refresh/fix drafts.
+- Evidence:
+  - Vitest focal covers pass, unsafe markup block, unsupported block block and legacy freeform warning.
+  - CLI smoke with local temp `contentFactoryGeneratedDraft.v1` returned `status=pass`.
+
 ### Slice 5 — CLI and Evidence Lane for Agents
 
 - Agregar CLI no-mutante para que agentes generen/validen un draft artifact local:
