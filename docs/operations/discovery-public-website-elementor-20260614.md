@@ -14,6 +14,8 @@
 
 Esto implica que Greenhouse no debe asumir un unico layout model. La manipulacion segura debe operar sobre el arbol de Elementor (`_elementor_data`) con soporte para `container`, `section`, `column` y `widget`.
 
+Inventario ampliado: el catalogo completo de widgets Ohio, templates de `elementor_library`, plugins visuales y gaps para futuras landings quedo documentado en `docs/documentation/public-site/wordpress-ohio-elementor-widget-inventory.md`; el playbook operativo vive en `docs/manual-de-uso/public-site/wordpress-ohio-elementor-landing-playbook.md`.
+
 ## Comandos ejecutados
 
 Solo se ejecutaron comandos read-only:
@@ -276,6 +278,108 @@ Essential Addons agrega muchos controls globales `eael_*` a casi todos los nodos
 
 Los selectores visuales cambian por breakpoint, Elementor wrappers, Ohio theme y cache. El source of truth editable es el arbol `_elementor_data` + settings del documento + metas del theme.
 
+### Caso aplicado: `servicios-contratar-hubspot` partner section
+
+El 2026-06-14 se corrigio en runtime una seccion de `https://efeoncepro.com/servicios-contratar-hubspot/` que estaba demasiado pegada a los margenes. La pagina usa Elementor legacy en esa zona:
+
+- `page_id`: `244079`
+- titulo: `Empodera tu crecimiento con HubSpot + Efeonce`
+- slug: `servicios-contratar-hubspot`
+- `_elementor_data`: ~140 KB
+- modelo mixto observado: `section`, `column`, `widget` y `container`
+
+La zona visual "Efeonce tu Partner certificado / HubSpot x efeonce / cards de respaldo" no es un solo contenedor moderno, sino tres legacy sections consecutivas:
+
+| Path | ID | Tipo | Rol |
+| --- | --- | --- | --- |
+| `8` | `83d3781` | `section` | Intro dark, `layout=full_width`, fondo `#022A4E` |
+| `9` | `ebe0037` | `section` | Cards de respaldo, `structure=30`, `gap=narrow`, fondo `#022A4E` |
+| `10` | `5b75db1` | `section` | `Stack ampliado`, dark, `layout=full_width` |
+
+La solucion correcta no fue agregar CSS page-scoped ni tocar el DOM. El problema era que la section `ebe0037` no tenia control nativo de ancho aplicado, y el Elementor Kit activo tenia `container_width` en `initial`. Se uso el control nativo de legacy section:
+
+```json
+{
+  "id": "ebe0037",
+  "elType": "section",
+  "settings": {
+    "layout": "boxed",
+    "content_width": {
+      "unit": "px",
+      "size": 1560,
+      "sizes": []
+    }
+  }
+}
+```
+
+Esto mantiene el fondo de la section full-width y solo limita el `.elementor-container` interno. Elementor regenero `wp-content/uploads/elementor/css/post-244079.css` con:
+
+```css
+.elementor-244079 .elementor-element.elementor-element-ebe0037 > .elementor-container {
+  max-width: 1560px;
+}
+```
+
+Se aplico con `Document::save()` desde WP-CLI, no con `update_post_meta` crudo. Backup previo:
+
+```text
+/www/efeoncegroup_752/public/wp-content/uploads/greenhouse-backups/page-244079-elementor-before-partner-cards-width-20260614095038.json
+```
+
+Verificacion visual/cache-bypass:
+
+- URL usada: `https://efeoncepro.com/servicios-contratar-hubspot/?gh_check=partner_cards_width_20260614`
+- captura: `.captures/public-site-hubspot-section-20260614/servicios-contratar-hubspot-partner-section.png`
+- viewport 2048px: section `width=2048`; container `x=244`, `width=1560`, `right=1804`; cards `520px` cada una.
+
+Aprendizaje reutilizable: cuando el fondo de una seccion debe ser full-width pero sus widgets se ven pegados al borde, revisar primero los controles nativos de Elementor (`layout=boxed` + `content_width` para sections legacy, o width/content controls equivalentes para containers modernos). No resolver con padding CSS global ni con selectores de frontend si el control existe en el arbol editable.
+
+Iteracion posterior de product design:
+
+- Las tres sections `83d3781`, `ebe0037` y `5b75db1` quedaron como un modulo coherente mediante clases semanticas:
+  - `gh-section-hubspot-partner-proof`
+  - `gh-partner-proof-intro`
+  - `gh-partner-proof-cards`
+  - `gh-partner-proof-stack`
+- Las tres comparten `layout=boxed`, `content_width=1560px` y padding lateral `24px`.
+- La section de cards `ebe0037` usa padding vertical `32px/34px`.
+- Backup previo a esta iteracion:
+
+```text
+/www/efeoncegroup_752/public/wp-content/uploads/greenhouse-backups/page-244079-elementor-before-partner-proof-module-20260614100340.json
+```
+
+Verificacion con URL publica normal:
+
+- capturas:
+  - `.captures/public-site-hubspot-section-20260614/servicios-contratar-hubspot-partner-proof-desktop.png`
+  - `.captures/public-site-hubspot-section-20260614/servicios-contratar-hubspot-partner-proof-mobile.png`
+- metricas:
+  - desktop 2048px: secciones full-width `2048px`; contenedores internos `1560px`, `x=244`.
+  - mobile 390px: contenedores internos `342px`, `x=24`; cards apiladas a 1 columna.
+
+Nota operativa: `Document::save()` borra el CSS generado del post y cache del documento. No asumir que `wp-content/uploads/elementor/css/post-244079.css` existe inmediatamente despues de guardar. Primero renderizar la URL publica o usar cache APIs de Elementor, y luego verificar con navegador/captura.
+
+## WP-CLI Remote Tooling Lesson
+
+Durante esta discovery se repitio un problema operativo: ejecutar PHP multilinea por SSH inline es fragil por quoting y por diferencias entre flags `ssh`/`scp`. El repositorio ahora tiene wrapper canonico:
+
+```bash
+pnpm public-website:wpcli -- --eval-file ./tmp/patch.php --wp-user 12
+```
+
+Contrato:
+
+- carga `.env.local` y `.env`;
+- usa `PUBLIC_WEBSITE_KINSTA_SSH_*` y `PUBLIC_WEBSITE_KINSTA_WORDPRESS_PATH`;
+- sube el PHP local a `/tmp` por `scp` usando `-P`;
+- ejecuta `wp eval-file` remoto por `ssh` usando `-p`;
+- limpia el temporal remoto;
+- evita imprimir secretos.
+
+Usar este wrapper para inspecciones y mutaciones WordPress aprobadas. No volver a improvisar PHP heredoc dentro de comandos SSH largos.
+
 ### 2. Identificar nodos por contrato semantico
 
 Para contenido ya existente:
@@ -355,6 +459,36 @@ Antes de tocar paginas publish:
 - generar preview
 - validar visualmente
 - recien despues disenar flujo de publish con rollback/cache/audit
+
+## Delta 2026-06-14 — Fundaciones visuales Ohio + Elementor
+
+El inventario se amplio para cubrir no solo ancho/layout sino tambien color, tipografia, hover y motion.
+
+Artifacts read-only locales:
+
+```text
+.captures/public-site-ohio-inventory-20260614/design-foundations.json
+.captures/public-site-ohio-inventory-20260614/css-signals.json
+.captures/public-site-ohio-inventory-20260614/computed-design-samples.json
+.captures/public-site-ohio-inventory-20260614/button-hover-samples.json
+.captures/public-site-ohio-inventory-20260614/widget-design-control-summary.json
+```
+
+Hallazgos:
+
+- Elementor active kit es `7`, pero `post-7.css` conserva defaults de Elementor (`#6EC1E4`, `#61CE70`, Roboto). No debe tratarse como source of truth de marca sin computed-style.
+- Ohio global efectivo usa `--clb-color-primary=#023c70`, `--clb-color-link-hover=#024c8f`, footer `#161519`, `--clb-grid-gutter=1rem`, `--clb-container-width=86vw` y `--clb-container-side-gutter=1rem`.
+- Tipografia efectiva: body/parrafos `Inter`; titulos y botones Ohio `DM Sans`.
+- Los widgets Ohio exponen suficientes controles nativos para evitar CSS en la mayoria de ajustes visuales:
+  - `ohio_button`: 9 controles de color y 5 de hover/motion.
+  - `ohio_service_table`: 16 controles de color y 4 de motion/hover.
+  - `ohio_recent_projects`: 16 controles de color y 24 de motion/nav/pagination/filter.
+  - `ohio_recent_posts`: 13 controles de color y 13 de motion/pagination.
+  - `ohio_gallery`: 12 controles de color y 11 de motion/pagination.
+- Los hovers correctos observados son sutiles: azul marca estable o verde luz controlado, no saltos a colores electricos ni azul sobre negro.
+- No se encontro un contrato consistente de `prefers-reduced-motion` dentro de los widgets Ohio. Motion custom tipo aurora debe tener guardrail propio, performance check y QA visual.
+
+Regla nueva: para cualquier cambio visual de landing, inspeccionar primero widget/settings + Ohio globals + computed CSS. El CSS page-scoped queda como ultimo recurso.
 
 ## Riesgos
 

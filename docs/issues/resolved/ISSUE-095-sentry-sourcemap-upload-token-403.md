@@ -76,13 +76,21 @@ No cerrar eliminando permanentemente Sentry/source maps ni borrando credenciales
 - Verificacion API post-cambio: ambos entornos devuelven `org:read=HTTP 200` y exponen scope `project:releases`. Hash del token deployado == hash del token sano local (MATCH en staging y production).
 - **No hubo cambio de codigo.** `next.config.ts` ya degradaba con warning + guardrail de timeout de `ISSUE-093`; el problema era 100% credenciales.
 
-### Pendiente de verificacion (Runtime Rollout Completion Gate)
+### Verificacion de runtime (2026-06-14)
 
-El cambio de env var toma efecto en el **proximo build**. Falta confirmar contra un deployment nuevo:
-- `vercel inspect <nuevo-deployment> --logs --scope efeonce-7670142f` sin warning `403`.
-- Artifact bundle/source maps presentes en Sentry para la release del deployment.
+Build real `greenhouse-4wzmp4oj9` (target `staging`, release `7cb75d78...`):
 
-Hasta ese deploy de verificacion, el estado correcto es `fix aplicado, verificacion de runtime pendiente`.
+```text
+11:37:57  Running next.config.js provided runAfterProductionCompile ...
+11:38:37  ✓ Completed runAfterProductionCompile in 40764ms
+```
+
+El hook completo en **40.7s sin `403`, sin `permission denied` y sin warning `degraded`/`exceeded`**. Progresion observada:
+- token roto (read-only) → `403 You do not have permission` (fallaba rapido).
+- token correcto + timeout 30s → `Source-map upload degraded: exceeded 30000ms` (cortado por el guardrail de `ISSUE-093`).
+- token correcto + timeout 180000ms → **upload limpio en 40.7s**.
+
+Segundo paso del fix: se subio `SENTRY_SOURCEMAP_UPLOAD_TIMEOUT_MS` a `180000` en Vercel `staging` + `Production` (clamp permitido 5s-240s). El guardrail anti-hang de `ISSUE-093` queda intacto; solo se le dio presupuesto suficiente al upload legitimo.
 
 ### Deuda residual (no bloqueante)
 
@@ -90,7 +98,7 @@ El token sano es **personal** (`jreyes@efeoncepro.com`). Para robustez de largo 
 
 ## Estado
 
-fix aplicado, verificacion de runtime pendiente
+resolved (2026-06-14, verificado en build real `greenhouse-4wzmp4oj9`)
 
 ## Relacionado
 

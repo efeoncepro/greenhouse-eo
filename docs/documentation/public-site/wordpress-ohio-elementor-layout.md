@@ -8,6 +8,7 @@
 > **Sitio:** `https://efeoncepro.com`
 > **Runtime:** WordPress en Kinsta, theme `ohio-child` sobre `ohio`, Elementor / Elementor Pro
 > **Manual relacionado:** [Operar layout Ohio + Elementor](../../manual-de-uso/public-site/wordpress-ohio-elementor-layout.md)
+> **Inventario relacionado:** [Inventario Ohio + Elementor](./wordpress-ohio-elementor-widget-inventory.md)
 > **Arquitectura relacionada:** [Public Website Landing Control Plane](../../architecture/GREENHOUSE_PUBLIC_WEBSITE_LANDING_CONTROL_PLANE_ARCHITECTURE_V1.md)
 
 ## Para que sirve
@@ -134,6 +135,168 @@ Greenhouse puede operar este runtime por SSH/WP-CLI para discovery y fixes contr
 - HubSpot conserva atribucion CRM y formularios cuando aplique.
 
 Hasta que el bridge exista, cualquier fix en WordPress debe documentar comando, backup, rollback y verificacion visual.
+
+## Incidente 2026-06-14: hero HubSpot services
+
+### Sintomas
+
+En `https://efeoncepro.com/servicios-contratar-hubspot/`, el page headline de Ohio quedo visualmente blanco/sin hero. El texto del H1 seguia presente, pero el fondo no mostraba la imagen esperada.
+
+### Causa raiz operativa
+
+La pagina `page_id=244079` usa el headline nativo de Ohio con:
+
+```text
+page_header_title_background_type=featured
+```
+
+Por lo tanto, la imagen visible del hero depende de `_thumbnail_id` / `get_the_post_thumbnail_url()`, no de los widgets Elementor dentro de `_elementor_data`.
+
+Durante la correccion se cometio un falso positivo: el attachment `243106` (`Hubspot-headline-1.webp`) coincidia por nombre, pero era un logo inline de `221x65` usado dentro del modulo Elementor de partner proof, no un background hero. Al setearlo como featured image, la request respondia `200`, pero visualmente seguia pareciendo que la imagen no cargaba.
+
+El asset correcto para el headline era:
+
+```text
+attachment_id=248703
+url=https://efeoncepro.com/wp-content/uploads/2025/10/EO_Hubspot_Hiro2-2.webp
+dimensiones=2001x801
+```
+
+### Diagnostico correcto
+
+Antes de tocar un hero/page headline de Ohio:
+
+1. Inspeccionar `.page-headline .bg-image` en navegador y registrar `background-image`, `background-size`, `background-position` y status HTTP del asset.
+2. Leer `_thumbnail_id`, `get_the_post_thumbnail_url()`, `page_header_title_background_type` y metas `page_header_title_background_*` por WP-CLI.
+3. Validar dimensiones del attachment; un logo pequeno puede responder `200` pero no ser el hero esperado.
+4. Comparar con referencias Elementor solo como contexto: imagenes inline dentro de widgets no prueban el background del headline.
+
+### Cambio aplicado
+
+Se restauro el headline con controles nativos WordPress/Ohio:
+
+```text
+set_post_thumbnail(244079, 248703)
+page_header_title_background_type=featured
+page_header_title_background_size=cover
+page_header_title_background_position=center
+page_header_title_background_repeat=no_repeat
+```
+
+Backup runtime:
+
+```text
+wp-content/uploads/greenhouse-backups/page-244079-hero-real-image-before-20260614111638.json
+```
+
+Verificacion:
+
+```text
+.captures/public-site-hubspot-hero-incident-20260614/after-real-hero-image.png
+.captures/public-site-hubspot-hero-incident-20260614/after-real-hero-image-2048.png
+```
+
+### Leccion para backups
+
+Los backups de cambios Elementor que solo capturan `_elementor_data`, `_elementor_page_settings` y `ohio_meta` no bastan para rollback de page headline. Para cualquier pagina Ohio con headline `featured`, el backup debe incluir tambien:
+
+- `_thumbnail_id`
+- `get_the_post_thumbnail_url()`
+- metas `page_header_title_background_*`
+- dimensiones y URL del attachment objetivo
+
+## Incidente 2026-06-14: headline responsive HubSpot services
+
+### Sintomas
+
+En `https://efeoncepro.com/servicios-contratar-hubspot/`, el H1 del headline Ohio era demasiado largo para convivir con el asset visual del hero. En desktop/laptop invadia visualmente la zona de imagen; en mobile el texto se perdia por longitud y por el recorte del background.
+
+### Causa raiz
+
+Este hero no es un widget Elementor. Es el template de headline de Ohio:
+
+```text
+wp-content/themes/ohio/parts/elements/page_headline.php
+```
+
+Ohio usa `get_the_title()` como H1 visual y no trae un control nativo para definir un titulo editorial de display distinto del titulo WordPress. Cambiar el `post_title` resuelve el layout, pero altera la intencion editorial, breadcrumbs y contratos SEO/contenido. Cambiar solo Elementor no afecta este H1.
+
+### Cambio aplicado
+
+La correccion se hizo en el child theme, no en el parent:
+
+```text
+wp-content/themes/ohio-child/parts/elements/page_headline.php
+wp-content/themes/ohio-child/assets/css/global-fixes.css
+```
+
+El override del template agrega el meta opcional:
+
+```text
+gh_page_headline_display_title
+```
+
+Ese meta solo afecta el H1 visual del page headline y permite saltos editoriales de linea, preservando:
+
+- `post_title`;
+- slug;
+- breadcrumbs;
+- SEO/canonical metadata;
+- estructura Elementor.
+
+Para `page_id=244079`, el valor vigente es:
+
+```html
+Empodera tu crecimiento<br>con HubSpot <span class="gh-mobile-break"><br></span>+ Efeonce
+```
+
+La clase `gh-mobile-break` se oculta en desktop y se muestra en mobile para dividir la linea final sin cambiar el copy.
+
+El CTA del headline tambien queda scoped en `ohio-child/assets/css/global-fixes.css` para evitar el hover azul de Ohio que se perdia contra el hero:
+
+- reposo: `var(--clb-color-button)`, texto `var(--clb-color-white)`;
+- hover/focus: inversion neutral `var(--clb-color-white)` + `var(--clb-color-black)`, shadow leve;
+- active: blanco suavemente mezclado con `var(--clb-color-primary)`.
+
+Este estado es especifico del headline de `page_id=244079`; no debe convertirse en regla global de `.button` sin auditar el resto del sitio.
+
+### Regla de capas aprendida
+
+El borde moderno redondeado en mobile pertenece a la superficie blanca de contenido (`#content > .page-container`) que se monta sobre el hero, no al background del headline.
+
+No aplicar `border-radius` al `.page-headline` ni a `.page-headline .bg-image` para "hacer continuidad": eso mueve el radio a la capa equivocada y hace que el background parezca una tarjeta. La solucion correcta es:
+
+- headline/background recto;
+- overlay de legibilidad recto;
+- superficie blanca superpuesta con `border-radius: 16px 16px 0 0`;
+- regla scoped a `body.page-id-244079` en `ohio-child`.
+
+### Backups de rollback
+
+Backups live relevantes:
+
+```text
+wp-content/uploads/greenhouse-backups/ohio-child-page-headline-before-display-title-repair-20260614115009.php
+wp-content/uploads/greenhouse-backups/ohio-child-page-headline-before-display-title-br-repair-20260614115211.php
+wp-content/uploads/greenhouse-backups/ohio-child-global-fixes-before-hubspot-headline-mobile-20260614115646.css
+wp-content/uploads/greenhouse-backups/ohio-child-global-fixes-before-hubspot-mobile-radius-mask-20260614120504.css
+wp-content/uploads/greenhouse-backups/ohio-child-global-fixes-before-hubspot-mobile-white-surface-radius-20260614121020.css
+```
+
+Verificacion visual:
+
+```text
+.captures/public-site-hubspot-hero-design-pass-20260614/child-theme-css-final/
+.captures/public-site-hubspot-hero-design-pass-20260614/mobile-white-surface-radius/
+```
+
+### Que no hacer
+
+- No editar `wp-content/themes/ohio/parts/elements/page_headline.php`; cualquier update de Ohio lo pisa.
+- No resolver longitud del H1 cambiando el `post_title` si el problema es solo visual.
+- No confundir el headline Ohio con widgets `ohio_heading` de Elementor.
+- No mover el `border-radius` mobile desde la superficie blanca hacia el background del hero.
+- No introducir CSS global para page headline; el scope debe ser `body.page-id-244079` o una clase semantica controlada.
 
 ## React, Gutenberg e Interactivity API
 

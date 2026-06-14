@@ -1,5 +1,21 @@
 # Release 2026-06-10 #2 — develop→main `6c649b2a6` RELEASED
 
+## Sesion 2026-06-14 — Public Site HubSpot services hero restored (Codex)
+
+- **Fix live aplicado:** `efeoncepro.com/servicios-contratar-hubspot/` (`page_id=244079`) vuelve a usar el hero grande correcto en el page headline Ohio: attachment `248703` (`EO_Hubspot_Hiro2-2.webp`, `2001x801`) como featured image, con `page_header_title_background_size=cover`, `position=center`, `repeat=no_repeat`.
+- **Causa/learning:** el headline de Ohio usa `page_header_title_background_type=featured`, por lo que el fondo depende de `_thumbnail_id`. El attachment `243106` (`Hubspot-headline-1.webp`) es solo un logo inline de Elementor (`221x65`) y fue un falso positivo. Validar siempre dimensiones + computed `.page-headline .bg-image` antes de mutar.
+- **Headline responsive aplicado en child theme:** Ohio no tiene control nativo para titulo visual distinto del `post_title`; se agrego override en `wp-content/themes/ohio-child/parts/elements/page_headline.php` que lee `gh_page_headline_display_title` solo para el H1 visual. El `post_title` quedo restaurado a `Empodera tu crecimiento con HubSpot + Efeonce`; el meta visual permite saltos de linea y mantiene slug/breadcrumbs/SEO.
+- **Mobile layering corregido:** el CSS responsive quedo en `wp-content/themes/ohio-child/assets/css/global-fixes.css` scoped a `body.page-id-244079`. Regla aprendida: el radius moderno pertenece a la superficie blanca `#content > .page-container`, no al `.page-headline`/background. Hero/background rectos; panel blanco superpuesto con `border-radius:16px 16px 0 0`.
+- **Backups/evidencia:** backup live `/www/efeoncegroup_752/public/wp-content/uploads/greenhouse-backups/page-244079-hero-real-image-before-20260614111638.json`; capturas `.captures/public-site-hubspot-hero-incident-20260614/after-real-hero-image.png` y `after-real-hero-image-2048.png`.
+- **Backups/evidencia adicional:** `ohio-child-page-headline-before-display-title-*.php`, `ohio-child-global-fixes-before-hubspot-*.css` bajo `wp-content/uploads/greenhouse-backups/`; capturas `.captures/public-site-hubspot-hero-design-pass-20260614/child-theme-css-final/` y `.captures/public-site-hubspot-hero-design-pass-20260614/mobile-white-surface-radius/`.
+
+## Sesion 2026-06-14 — Public Site Ohio/Elementor visual foundations (Codex)
+
+- **Qué se amplio:** el inventario Public Site ya no cubre solo ancho/widgets; ahora documenta color, tipografia, hover, motion y orden de precedencia entre Elementor Kit, Ohio globals, page meta, widget settings, CSS generado y child theme.
+- **Hallazgos efectivos:** runtime computado usa azul Ohio `#023c70` como primario, link hover `#024c8f`, footer `#161519`, body `Inter`, headings/botones `DM Sans`, grid gutter `1rem`, container `86vw`. El Elementor active kit `7` existe, pero su CSS generado conserva defaults de Elementor (`#6EC1E4`, `#61CE70`, Roboto), por lo que no es source of truth confiable sin computed-style.
+- **Motion/hover:** los widgets Ohio ya exponen controles nativos para color, hover, border, shadow, radius y motion (`ohio_button`, `ohio_service_table`, `ohio_recent_projects`, `ohio_recent_posts`, `ohio_gallery`, `ohio_carousel`, `ohio_video`). No se encontro guardrail consistente de `prefers-reduced-motion` en Ohio; motion custom tipo aurora requiere fallback propio y QA visual.
+- **Docs/skills actualizadas:** `docs/documentation/public-site/wordpress-ohio-elementor-widget-inventory.md`, `docs/manual-de-uso/public-site/wordpress-ohio-elementor-landing-playbook.md`, `docs/operations/discovery-public-website-elementor-20260614.md`, y skills Public Site para Codex/Claude.
+
 ## Sesion 2026-06-14 — Public Site Ohio/Elementor widget inventory (Codex)
 
 - **Qué quedó documentado:** inventario funcional completo en `docs/documentation/public-site/wordpress-ohio-elementor-widget-inventory.md` y playbook operativo en `docs/manual-de-uso/public-site/wordpress-ohio-elementor-landing-playbook.md`.
@@ -138,7 +154,7 @@
 
 - **Causa raiz real (probe API read-only, sin exponer valores):** no faltaba "rotar" — en Vercel estaba el **token equivocado**. `SENTRY_AUTH_TOKEN` en `staging` Y `Production` (42d, mismo token) era un personal token read-only con scopes `event:read`+`project:read` → `org:read=HTTP 403`, sin `project:releases`. El token sano (scopes `org:read`+`project:read`+`project:releases`, `org:read=200`) ya vivía en `.env.vercel-staging` local. Blast radius: staging + production confirmados rotos (no "latente"). Preview no tiene el token (sourcemaps disabled, sin 403).
 - **Fix aplicado:** `printf %s "$TOK" | vercel env add SENTRY_AUTH_TOKEN <staging|production> --force --scope efeonce-7670142f` (atomico, sin newline). Verificado post-cambio: ambos entornos `org:read=200` + scope `project:releases` + hash MATCH vs token sano. Cero cambio de codigo (`next.config.ts` ya degradaba con el guardrail de ISSUE-093).
-- **Pendiente (Runtime Rollout Gate):** el env var toma efecto en el proximo build; falta confirmar `vercel inspect <nuevo-deploy> --logs` sin `403` + artifact bundles/source maps en Sentry. Estado del issue: `fix aplicado, verificacion de runtime pendiente`.
+- **Verificado en runtime (RESUELTO):** build real `greenhouse-4wzmp4oj9` (target staging) → `✓ Completed runAfterProductionCompile in 40764ms` sin `403`/`permission denied`/`exceeded`. Progresion: token roto→403 rapido; token bueno+timeout 30s→`exceeded 30000ms`; token bueno+timeout 180s→upload limpio 40.7s. Segundo paso del fix: `SENTRY_SOURCEMAP_UPLOAD_TIMEOUT_MS` subido a 180000ms en staging+production (guardrail anti-hang de ISSUE-093 intacto). Issue movido a `resolved/`.
 - **Deuda residual:** el token es personal de `jreyes@`; migrar a un Organization Auth Token dedicado (no user-bound) queda diferido al operador.
 - **Nota:** `TASK-1107` NO cubre este 403 (es otra cola Sentry: N+1, `role_view_fallback_used`, auth smoke, `rpa_median`). El 403 del sourcemap es exclusivo de ISSUE-095.
 
