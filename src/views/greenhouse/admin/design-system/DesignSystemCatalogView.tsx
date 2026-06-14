@@ -193,6 +193,19 @@ const CATALOG_ITEMS: CatalogItem[] = [
     icon: 'tabler-layers-subtract'
   },
   {
+    id: 'composition-shell',
+    title: 'Composition shell',
+    description: 'Substrato de coreografía de layout (TASK-1114): regiones singleton (primary/aside/lead/dock/overlay) + composiciones nombradas (single/leadPlusContext/split/focused) + morph in-place (View Transitions) + reflow por size class. Domain-neutral, opt-in; del que Adaptive Sidecar / NexaMomentComposition son consumers.',
+    route: '/design-system/composition-shell',
+    category: 'Primitives',
+    kind: 'Primitive',
+    status: 'Hardening',
+    owner: 'CompositionShell',
+    tags: ['shell', 'layout', 'composición', 'regiones', 'morph', 'view transitions', 'fluidez', 'breakpoints'],
+    searchAliases: ['composition shell', 'shell', 'layout', 'regiones', 'composicion', 'morph', 'coreografia', 'canonical layouts'],
+    icon: 'tabler-layout-board-split'
+  },
+  {
     id: 'buttons',
     title: 'Buttons',
     description: 'Primitive para jerarquía de comandos, tono, iconos y estados async.',

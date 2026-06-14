@@ -146,6 +146,13 @@ export const DECLARED_CHILD_ROUTES: readonly ChildRouteDeclaration[] = [
       'Nexa Chat Pattern (TASK-1078) — child surface del Design System para el patron compuesto de la superficie conversacional de Nexa (header de presencia, rail glass, cuerpo de conversacion, empty hero, composer con NexaGlowBorder); alcanzable desde el catalogo canonico /design-system.'
   },
   {
+    route: '/design-system/composition-shell',
+    parent: '/design-system',
+    via: 'inline-link',
+    reason:
+      'Composition Shell Lab (TASK-1114) — child surface del Design System para el substrato de coreografia de layout (regiones singleton + composiciones nombradas + morph View Transitions + reflow); alcanzable desde el catalogo canonico /design-system.'
+  },
+  {
     route: '/design-system/loaders',
     parent: '/design-system',
     via: 'inline-link',
