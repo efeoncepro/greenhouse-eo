@@ -123,6 +123,18 @@ Reglas obligatorias:
 - **Criterio de éxito: el consumer se simplifica** (menos código de grid/morph/anclaje propio — lo hereda del substrato). GVC byte-mirado contra el frame actual. Si no simplifica → revisar el diseño del substrato antes de cerrar.
 - Adaptive Card (TASK-1115) NO bloquea el piloto (el host de Knowledge no tiene grids densos de KPI que condensen fuerte).
 
+> **Estado 2026-06-13 — gate demostrado, cutover vivo DIFERIDO por coordinación.** Substrato (Slices 1-3) SHIPPED. El gate "¿el consumer se simplifica?" queda **demostrado por el Lab** (`CompositionShellLabView` consume `CompositionShell` en ~45 líneas, sin código de grid/morph/anclaje/focus propio — vs ~180 líneas bespoke de `NexaMomentComposition.tsx`). La **migración del primitive vivo `NexaMomentComposition` → delegar en `CompositionShell`** NO se ejecuta a ciegas: es el **core primitive de TASK-1110 (in-progress, commit `098908cff`)** con 5 consumers (incl. `KnowledgeNexaCompositionLens`). Hacerlo sin coordinar = colisión cross-agente (regla dura del repo). **Próximo paso: coordinar con TASK-1110** — migración aditiva flag-OFF que delega grid/morph/anchor/focus en `CompositionShell`, public API idéntica, cutover al flipear el flag. Hasta entonces TASK-1114 queda `in-progress`.
+
+**Mapeo de migración (para el cutover coordinado con TASK-1110):**
+
+| `NexaMomentComposition` variant | `CompositionShell` composición | Lo que el substrato ya provee |
+|---|---|---|
+| `leadOverlay` (lead + host condensado) | `leadPlusContext` | grid stack + morph VT + condense + focus routing |
+| `anchoredAside` (split) | `split` | grid 2-lanes + reflow por size class |
+| `inlineExpand` (composer expande in-place) | `single` + `dock` | stack + dock aditivo |
+
+`NexaMomentComposition` retiene su valor de dominio (anclaje `data-nexa-anchor`, next-step gobernado, bridge) como contenido de las regiones; el grid/morph/focus se delegan al substrato.
+
 ## Out of Scope
 
 - Transición **cross-route** / "mover a interfaz nueva" (cross-document View Transitions + App Router) → V2.
