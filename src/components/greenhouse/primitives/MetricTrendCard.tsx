@@ -30,7 +30,8 @@ import {
   cardDensityLayoutTransition,
   cardDensityRevealTransition,
   cardDensityRevealRisePx,
-  cardDensityRevealStaggerSec
+  cardDensityRevealStaggerSec,
+  type CardEntrance
 } from './card-density/card-density-motion'
 
 // ── Types ─────────────────────────────────────────────────────────────
@@ -86,6 +87,13 @@ export type MetricTrendCardProps = {
    * (honest condensation, never clips).
    */
   density?: CardDensityRequest
+  /**
+   * TASK-1110 — entrada "al armarse" (opt-in). `'none'` (default) = sin entrada, legacy byte-idéntico.
+   * `'assemble'` = el dato se construye frente al usuario: el número cuenta 0 → valor y el chart se dibuja solo
+   * al montar (para respuestas de Nexa moments que materializan en vivo). reduced-motion → valor final + chart
+   * estático (never-hidden). Es un enhancement client-side.
+   */
+  entrance?: CardEntrance
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────
@@ -215,7 +223,8 @@ const MetricTrendCard = ({
   menuOptions,
   menuTooltip,
   dataCapture,
-  density: densityRequest
+  density: densityRequest,
+  entrance = 'none'
 }: MetricTrendCardProps) => {
   const theme = useTheme()
   const prefersReduced = useReducedMotion()
@@ -474,7 +483,12 @@ const MetricTrendCard = ({
         <Stack direction='row' alignItems='baseline' spacing={2} flexWrap='wrap'>
           <Typography variant='kpiValue' color='text.primary' component='span'>
             {value !== null ? (
-              <AnimatedCounter value={value} formatter={valueFormatter(format)} duration={0.9} />
+              <AnimatedCounter
+                value={value}
+                formatter={valueFormatter(format)}
+                duration={0.9}
+                animateFrom={entrance === 'assemble' ? 0 : undefined}
+              />
             ) : (
               '—'
             )}

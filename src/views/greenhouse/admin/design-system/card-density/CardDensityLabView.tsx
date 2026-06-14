@@ -46,9 +46,6 @@ const RPA_SERIES: MetricTrendPoint[] = [
   { label: 'May', value: 1.27 }
 ]
 
-// Valores objetivo de las cards de la secuencia macro: el conteo sube de 0 → estos en cada Reproducir.
-const SEQ_TARGET_VALUES = { otd: 87.4, rpa: 1.27 } as const
-
 const SpecimenRow = ({ title, render }: { title: string; render: (width: number) => ReactNode }) => (
   <Stack spacing={3} data-capture={`card-density-row-${title.toLowerCase().replace(/\s+/g, '-')}`}>
     <Typography variant='subtitle2'>{title}</Typography>
@@ -142,45 +139,17 @@ const CardDensityLabView = () => {
   // SSR-safe (las cards renderizan en estado final; la animación no toca el primer paint). `stagger` garantiza
   // el orden + el beat; no hay variant inheritance (lo que rompía SSR en el shell). Tokens canónicos.
   const [seqScope, animateSeq] = useAnimate()
-  // `playToken` cambia en cada Reproducir → re-monta las cards de la secuencia (por su `key`) → el chart se
-  // dibuja solo (Recharts area draw-in re-corre en cada mount). Confiable e independiente del conteo.
+  // `playToken` cambia en cada Reproducir → re-monta las cards de la secuencia (por su `key`) → cada card
+  // re-corre SU entrada canónica `entrance='assemble'`: el chart se dibuja solo (Recharts area draw-in) y el
+  // número cuenta 0 → valor (AnimatedCounter `animateFrom`, conteo confiable al montar — sin la race del IO).
+  // El Lab YA NO maneja el conteo desde afuera: la capacidad vive en la card (TASK-1110 Slice A).
   const [playToken, setPlayToken] = useState(0)
-  // El conteo lo MANEJA el Lab (no el AnimatedCounter interno, que gatea en un IntersectionObserver asíncrono y
-  // al re-montar salta directo al objetivo). Una rampa rAF sube `seqValues` 0 → objetivo con easing; la card solo
-  // renderiza el número que recibe → sube sí o sí, sin depender del IO/spring interno. Determinista + replay-proof.
-  const [seqValues, setSeqValues] = useState<{ otd: number; rpa: number }>(SEQ_TARGET_VALUES)
-  const rampRafRef = useRef<number | null>(null)
 
-  useEffect(() => () => { if (rampRafRef.current !== null) cancelAnimationFrame(rampRafRef.current) }, [])
-
-  // Ensamble (nivel máximo "armándose"): la CAJA de cada card entra encogida + inclinada en 3D (rotateX) + abajo y
-  // se acomoda con rebote (easeOutBack), escalonada (`stagger`); a la vez el chart se dibuja solo (re-monte) y el
-  // número sube contando. Imperativo + client-only → SSR-safe. Replay confiable.
+  // Ensamble (nivel máximo "armándose"): la CAJA de cada card entra encogida + inclinada en 3D (rotateX) + abajo
+  // y se acomoda con rebote (easeOutBack), escalonada (`stagger`); a la vez, al re-montar, cada card se ARMA sola
+  // (chart + conteo) por su `entrance='assemble'`. Imperativo + client-only → SSR-safe. Replay confiable.
   const playSequence = () => {
-    setPlayToken(token => token + 1) // re-monta → el chart se redibuja
-    setSeqValues({ otd: 0, rpa: 0 }) // arranca el conteo desde 0
-
-    if (rampRafRef.current !== null) cancelAnimationFrame(rampRafRef.current)
-    // El número sube parejo con easeInOut (NO front-loaded) durante toda la ventana del ensamble, terminando
-    // junto/después del barrido del chart — nunca antes. Antes (easeOutCubic) terminaba temprano y el chart
-    // "entraba después de que el número ya estaba listo"; al no terminar temprano, esa sensación desaparece.
-    const COUNT_MS = 720
-    const easeInOutCubic = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2)
-    const start = performance.now()
-
-    const tick = (now: number) => {
-      const p = Math.min(1, (now - start) / COUNT_MS)
-      const k = easeInOutCubic(p)
-
-      setSeqValues({
-        otd: Math.round(SEQ_TARGET_VALUES.otd * k * 10) / 10,
-        rpa: Math.round(SEQ_TARGET_VALUES.rpa * k * 100) / 100
-      })
-      rampRafRef.current = p < 1 ? requestAnimationFrame(tick) : null
-    }
-
-    rampRafRef.current = requestAnimationFrame(tick)
-
+    setPlayToken(token => token + 1) // re-monta → cada card re-corre su entrada (chart se dibuja + número cuenta)
     void animateSeq(
       '[data-seq-card]',
       { opacity: [0, 1], scale: [0.82, 1], y: [44, 0], rotateX: [-14, 0] },
@@ -297,11 +266,12 @@ const CardDensityLabView = () => {
             title='OTD%'
             metricName='On-Time Delivery'
             periodLabel='Mensual · May 2026'
-            value={seqValues.otd}
+            value={87.4}
             series={TREND_SERIES}
             tone='success'
             format='percentage'
             deltaUnit='pts'
+            entrance='assemble'
           />
         </Box>
         <Box data-seq-card>
@@ -323,11 +293,12 @@ const CardDensityLabView = () => {
             title='RpA'
             metricName='Rondas por aprobación'
             periodLabel='Mensual · May 2026'
-            value={seqValues.rpa}
+            value={1.27}
             series={RPA_SERIES}
             tone='success'
             format='decimal'
             deltaUnit='pts'
+            entrance='assemble'
           />
         </Box>
       </Box>

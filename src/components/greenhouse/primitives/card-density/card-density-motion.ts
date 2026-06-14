@@ -55,3 +55,25 @@ export const cardDensityRevealStaggerSec = 0.06
 
 export const cardDensityRevealTransition = (reduced: boolean): { duration: number; ease?: EaseTuple } =>
   reduced ? { duration: 0 } : { duration: MOTION_DURATION_S.medium, ease: EMPHASIZED_EASE }
+
+/**
+ * TASK-1110 — capacidad de ENTRADA "al armarse" (sibling de la densidad). Cuando una card se materializa en
+ * una respuesta de Nexa moment, su contenido **se ARMA frente al usuario** en vez de aparecer de golpe:
+ * el número cuenta (0 → valor, vía `AnimatedCounter animateFrom`), el chart se dibuja (Recharts area draw-in),
+ * el contenido sube + aparece.
+ *
+ * - `'none'` (default) = sin entrada — **legacy byte-idéntico** (el contenido se monta en su estado final).
+ * - `'assemble'` = el dato se construye a la vista (enhancement client-side, opt-in).
+ *
+ * Es la ENTRADA del contenido (frontera de motion: distinta del morph estructural de regiones por View
+ * Transitions y del morph de densidad por framer `layout`). reduced-motion lo hornea cada consumer (valor final
+ * visible, chart estático, never-hidden). Solo propiedades de compositor (transform/opacity).
+ */
+export type CardEntrance = 'none' | 'assemble'
+
+/** Rise (px) del bloque de contenido que se materializa al armarse (transform de compositor — translateY). */
+export const cardAssembleRisePx = 8
+
+/** Transición de entrada "al armarse" — derivada de los motion tokens (`medium` = 300ms). Reduced-motion → snap. */
+export const cardAssembleTransition = (reduced: boolean): { duration: number; ease?: EaseTuple } =>
+  reduced ? { duration: 0 } : { duration: MOTION_DURATION_S.medium, ease: EMPHASIZED_EASE }
