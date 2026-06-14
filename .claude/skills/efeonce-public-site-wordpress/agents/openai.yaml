@@ -1,0 +1,4 @@
+interface:
+  display_name: "Efeonce Public Site WordPress"
+  short_description: "Operate the Efeonce public WordPress site safely."
+  default_prompt: "Use this skill when working on efeoncepro.com, WordPress, Kinsta, Ohio, Elementor, WP-CLI, WP REST, WP Abilities, or the Greenhouse public-site bridge."

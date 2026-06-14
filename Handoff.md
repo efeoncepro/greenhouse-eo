@@ -1,5 +1,11 @@
 # Release 2026-06-10 #2 — develop→main `6c649b2a6` RELEASED
 
+## Sesion 2026-06-14 — Skill actualizable Public Site WordPress creada (Codex)
+
+- **Qué quedó:** nueva skill local sincronizada para Codex y Claude con la memoria operativa de `efeoncepro.com`: `.codex/skills/efeonce-public-site-wordpress/SKILL.md` y `.claude/skills/efeonce-public-site-wordpress/SKILL.md`.
+- **Contenido:** fuentes canónicas a leer, facts vigentes de Kinsta/WordPress/WP-CLI/REST/WP Abilities, reglas de seguridad sin secretos, aprendizajes Ohio + Elementor (`/blog` y `/contacto`), frontera React/Interactivity y contrato draft-only para el bridge Greenhouse→WordPress.
+- **Cómo mantenerla:** actualizar ambas copias cuando cambien discovery, plugin/theme/runtime, Kinsta/cache/backups, EPIC-019/TASK-1111/TASK-1116, nuevos incidentes de layout o guidance oficial de WordPress. No incluir valores de Application Password, SSH password, private keys ni Authorization headers.
+
 ## Sesion 2026-06-14 — TASK-1111 discovery autenticada repetible + TASK-1116 bridge draft-only (Codex)
 
 - **Qué quedó:** `pnpm public-website:discover` ahora soporta `--authenticated` y `--wpcli` sin cambiar el modo público por defecto. El modo autenticado resuelve el Application Password desde Secret Manager, pero no imprime secretos ni `Authorization`; el modo WP-CLI usa SSH con llave local y comandos read-only.
