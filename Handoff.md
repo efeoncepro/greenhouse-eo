@@ -12,6 +12,13 @@
 - **Evidencia:** inspeccion `docs/operations/public-site-bridge-inspections/inspection-page-249766-2026-06-14T17-37-08-688Z.json`; drift `docs/operations/public-site-drift/drift-2026-06-14T17-37-22-651Z.json` (`drifted=0`, `in_sync=60`); dry-run `docs/operations/public-site-deploy-dry-runs/dry-run-2026-06-14T17-37-23-230Z.json` (`would_create=0`, `would_update=0`); status `docs/operations/public-site-runtime-status/status-2026-06-14T17-37-24-051Z.json` (`head=a84490b`, clean).
 - **Estado honesto:** writes siguen apagados. Queda rollout pendiente: reducir privilegios del usuario tecnico, decidir staging/preview, y solo entonces habilitar `GREENHOUSE_WP_BRIDGE_WRITES_ENABLED` para un smoke draft/private controlado.
 
+### Follow-up exploration — Kinsta staging + content factory priority
+
+- **Decision del operador:** no bajar privilegios del usuario WordPress tecnico ahora. Mantenerlo como riesgo conocido y diferido; no bloquear los siguientes slices por ese punto.
+- **Kinsta staging:** docs actuales de Kinsta indican Standard Staging incluido por WordPress install salvo restricciones de plan; Premium Staging es el add-on pagado de USD 20/mes por entorno. No se pudo confirmar disponibilidad real de la cuenta Efeonce sin MyKinsta/Kinsta API. Exploracion documentada en `docs/operations/public-site-kinsta-staging-priority-exploration-20260614.md`.
+- **Prioridad producto:** para escalar produccion de contenido, staging no es el principal cuello de botella. El siguiente trabajo debe formalizar una fabrica de contenido con dos carriles: `post_draft_gutenberg` para posts y `landing_draft_elementor` para landings. Posts primero porque Efeonce ya usa Gutenberg y el smoke es menos riesgoso que manipular Elementor.
+- **Siguiente paso recomendado:** crear/implementar spec del content factory + primer smoke draft/private disposable para Gutenberg post, con writes habilitados solo durante la ventana minima si no hay staging confirmado. Publish/cache/backups siguen fuera de scope hasta Kinsta API/release lane.
+
 ## Sesion 2026-06-14 — Public Site bridge v0.2.0 Gutenberg/block inspection (Codex)
 
 - **Discovery antes de implementar:** se inspeccionaron los posts recientes de `efeoncepro.com` via WP-CLI con `parse_blocks()`. Los posts activos son Gutenberg (`post`, `hasBlocks=true`, sin `_elementor_data`), no Elementor. Ejemplo verificado: post `249766` (`glitch-02-noticias-ia-marketing-2026-03-03`) con 81 bloques: `core/freeform`, `core/paragraph`, `core/heading`, `core/image`, `core/separator`.

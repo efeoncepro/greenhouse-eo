@@ -18,7 +18,7 @@
 - Rank: `TBD`
 - Domain: `platform|commercial|marketing-ops|integrations|wordpress`
 - Blocked by: `none`
-- Rollout blockers: `Kinsta API gap bloquea cache/backups/publish operations; confirmar staging/preview target; provisionar shared secret/HMAC y reducir privilegios del usuario tecnico antes de ejecutar writes reales`
+- Rollout blockers: `Kinsta API gap bloquea cache/backups/publish operations; confirmar Standard Staging en MyKinsta/API o aprobar production draft/private-only smoke; reducir privilegios del usuario tecnico queda recomendado pero diferido por decision del operador`
 - Branch: `task/TASK-1116-greenhouse-wp-bridge-draft-only-foundation`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -142,6 +142,7 @@ Reglas obligatorias:
 - Signed write contract exists in code and Greenhouse signer tests.
 - Draft-only endpoints exist in code but are not operationally enabled.
 - No staging/preview/rollback baseline exists for Greenhouse-owned WordPress objects.
+- Kinsta staging exploration on 2026-06-14 found that Standard Staging is documented as included per WordPress install unless the plan restricts it; Premium Staging is the paid add-on. Account-level availability remains unverified without MyKinsta/Kinsta API. See `docs/operations/public-site-kinsta-staging-priority-exploration-20260614.md`.
 - Kinsta API token remains missing; cache/backups/environment inventory is not automated.
 - No custom Elementor widget registry exists yet. If needed later, it belongs in the bridge/runtime plugin with `\Elementor\Widget_Base`, PHP render and Elementor native controls, not in Ohio parent.
 
