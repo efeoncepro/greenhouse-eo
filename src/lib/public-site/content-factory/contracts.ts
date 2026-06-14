@@ -78,6 +78,51 @@ export type ContentFactoryValidation = {
   summary?: Record<string, unknown>
 }
 
+export type ContentFactoryDraftSmokePlan = {
+  contractVersion: 'contentFactoryDraftSmokePlan.v1'
+  generatedAt: string
+  mode: 'dry_run'
+  sendsWordPressWrite: false
+  sourceDraft: {
+    title: string
+    slug: string
+    lane: ContentFactoryLane
+    draftKind: 'gutenberg_post' | 'elementor_landing'
+  }
+  validation: ContentFactoryValidation
+  bridgeRequest: {
+    contractVersion: 'greenhouse-wp-bridge-draft.v1'
+    method: 'POST'
+    route: '/greenhouse-wp-bridge/v1/drafts'
+    postType: 'post' | 'page' | 'landing'
+    status: 'draft' | 'private'
+    greenhouseManifestId: string
+    body: {
+      contractVersion: 'greenhouse-wp-bridge-draft.v1'
+      greenhouseManifestId: string
+      postType: 'post' | 'page' | 'landing'
+      status: 'draft' | 'private'
+      title: string
+      slug: string
+      content: string
+      excerpt?: string
+      seo?: ContentFactoryGeneratedDraft['seo']
+      attribution?: ContentFactoryGeneratedDraft['attribution']
+    }
+    signedHeaders: Record<string, string>
+    canonicalRequestPreview: string
+  }
+  rolloutPreconditions: Array<{
+    code: string
+    status: 'pending' | 'satisfied'
+    notes: string
+  }>
+  rollback: {
+    strategy: 'trash_smoke_draft_by_manifest_id'
+    notes: string
+  }
+}
+
 export const resolveContentFactoryValidationStatus = (
   findings: ContentFactoryValidationFinding[]
 ): ContentFactoryValidation['status'] => {

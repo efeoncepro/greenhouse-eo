@@ -1,0 +1,89 @@
+{
+  "contractVersion": "contentFactoryDraftSmokePlan.v1",
+  "generatedAt": "2026-06-14T19:00:28.113Z",
+  "mode": "dry_run",
+  "sendsWordPressWrite": false,
+  "sourceDraft": {
+    "title": "Como usar AI para acelerar operaciones comerciales sin perder gobierno",
+    "slug": "ai-para-operaciones-comerciales",
+    "lane": "post_draft_gutenberg",
+    "draftKind": "gutenberg_post"
+  },
+  "validation": {
+    "contractVersion": "contentFactoryValidation.v1",
+    "status": "pass",
+    "findings": [],
+    "summary": {
+      "blockCount": 10,
+      "uniqueBlocks": [
+        "core/heading",
+        "core/list",
+        "core/paragraph",
+        "core/quote"
+      ],
+      "greenhouseAnchors": []
+    }
+  },
+  "bridgeRequest": {
+    "contractVersion": "greenhouse-wp-bridge-draft.v1",
+    "method": "POST",
+    "route": "/greenhouse-wp-bridge/v1/drafts",
+    "postType": "post",
+    "status": "private",
+    "greenhouseManifestId": "greenhouse-smoke-ai-revops-golden",
+    "body": {
+      "contractVersion": "greenhouse-wp-bridge-draft.v1",
+      "greenhouseManifestId": "greenhouse-smoke-ai-revops-golden",
+      "postType": "post",
+      "status": "private",
+      "title": "Como usar AI para acelerar operaciones comerciales sin perder gobierno",
+      "slug": "ai-para-operaciones-comerciales",
+      "content": "<!-- wp:heading {\"level\":2} -->\n<h2>AI como sistema operativo comercial</h2>\n<!-- /wp:heading -->\n\n<!-- wp:paragraph -->\n<p>Para equipos comerciales B2B, la AI no deberia partir desde una herramienta aislada ni desde un prompt brillante. El punto de partida es entender que decision queremos mejorar, que datos sostienen esa decision y que evidencia necesita revisar una persona antes de actuar.</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:paragraph -->\n<p>El enfoque de Efeonce es tratar la AI como una capacidad operacional: contexto claro, contratos verificables, trazabilidad y una ruta de revision humana. Eso permite producir contenido, propuestas o acciones con velocidad sin perder gobierno.</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:heading {\"level\":3} -->\n<h3>Como aterrizar la idea</h3>\n<!-- /wp:heading -->\n\n<!-- wp:list -->\n<ul><li>Definir el objetivo comercial antes de generar contenido.</li><li>Alinear el mensaje con el publico y el momento del funnel.</li><li>Conectar la oferta con una accion concreta y medible.</li><li>Validar el resultado antes de publicarlo o enviarlo a un cliente.</li></ul>\n<!-- /wp:list -->\n\n<!-- wp:paragraph -->\n<p>La diferencia entre producir mas y producir mejor esta en la estructura. Un buen flujo separa la idea inicial, el borrador, la validacion, el review y la publicacion. Asi los agentes pueden acelerar el trabajo sin saltarse controles.</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:heading {\"level\":3} -->\n<h3>Senales que conviene revisar</h3>\n<!-- /wp:heading -->\n\n<!-- wp:paragraph -->\n<p>Antes de convertir este borrador en una pieza final, conviene revisar tono, claridad de la promesa, evidencia comercial, consistencia con la marca y el siguiente paso de conversion. Si una de esas senales no esta clara, el draft debe volver a planificacion.</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:quote -->\n<blockquote class=\"wp-block-quote\"><p>La AI aporta valor cuando trabaja con contexto, restricciones y evidencia, no cuando opera como una caja negra.</p></blockquote>\n<!-- /wp:quote -->\n\n<!-- wp:paragraph -->\n<p>Siguiente paso sugerido: agendar una evaluacion operacional con Efeonce. Este CTA debe mantenerse como draft o private hasta que Greenhouse complete validacion, review humano y aprobacion operacional.</p>\n<!-- /wp:paragraph -->",
+      "excerpt": "Una guia practica para equipos B2B que quieren usar AI en operaciones comerciales con contexto, revision y trazabilidad.",
+      "seo": {
+        "title": "AI para operaciones comerciales",
+        "description": "Guia practica para usar AI en operaciones comerciales con datos, procesos, revision humana y gobierno.",
+        "indexPolicy": "index"
+      },
+      "attribution": {
+        "campaignId": "golden-example-ai-revops",
+        "hubspotCampaignId": "golden-example"
+      }
+    },
+    "signedHeaders": {
+      "X-Greenhouse-Timestamp": "1781463628",
+      "X-Greenhouse-Request-Id": "gh-2450cf9b-b18f-4c9e-80e2-44baa5aa3e27",
+      "X-Greenhouse-Actor": "content-factory-smoke-plan",
+      "X-Greenhouse-Environment": "local-dry-run",
+      "X-Greenhouse-Body-Sha256": "4808d9bd6638974d774094c59791ce0739e16616fed21477fc11342e20892132",
+      "X-Greenhouse-Signature": "sha256=4db1a325ecc...redacted"
+    },
+    "canonicalRequestPreview": "GHWPB-HMAC-SHA256\nPOST\n/greenhouse-wp-bridge/v1/drafts\n4808d9bd6638974d774094c59791ce0739e16616fed21477fc11342e20892132\n1781463628\ngh-2450cf9b-b18f-4c9e-80e2-44baa5aa3e27\ncontent-factory-smoke-plan\nlocal-dry-run"
+  },
+  "rolloutPreconditions": [
+    {
+      "code": "bridge_writes_enabled_window",
+      "status": "pending",
+      "notes": "GREENHOUSE_WP_BRIDGE_WRITES_ENABLED must be enabled only for an approved short draft/private smoke window."
+    },
+    {
+      "code": "signed_request_secret_available",
+      "status": "pending",
+      "notes": "Use PUBLIC_WEBSITE_WORDPRESS_BRIDGE_SHARED_SECRET_SECRET_REF at send time; this dry-run uses a synthetic secret."
+    },
+    {
+      "code": "draft_private_only",
+      "status": "satisfied",
+      "notes": "Plan targets WordPress status draft/private and never publish."
+    },
+    {
+      "code": "human_review_required",
+      "status": "pending",
+      "notes": "A human must review the validation result and payload before any --send path is used."
+    }
+  ],
+  "rollback": {
+    "strategy": "trash_smoke_draft_by_manifest_id",
+    "notes": "If a future smoke creates this draft, rollback should trash only the Greenhouse-owned draft identified by greenhouse-smoke-ai-revops-golden."
+  }
+}

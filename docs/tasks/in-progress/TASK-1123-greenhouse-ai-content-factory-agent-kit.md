@@ -351,6 +351,21 @@ Reglas obligatorias:
   - leer preview/status y documentar rollback.
 - Preparar el primer `refresh_existing_elementor_landing` smoke solo como plan hasta que clone/duplicate draft semantics del bridge estén probadas.
 
+#### Slice 6 implementation note — 2026-06-14
+
+- Estado: `plan-only`.
+- First smoke plan primitive shipped:
+  - `src/lib/public-site/content-factory/draft-smoke-plan.ts`
+  - `prepareGutenbergDraftSmokePlan()`
+  - `pnpm public-website:content-factory:smoke-plan`
+- Contract output: `contentFactoryDraftSmokePlan.v1`.
+- Safety: non-mutating; validates a local `contentFactoryGeneratedDraft.v1`, builds the future signed `POST /wp-json/greenhouse-wp-bridge/v1/drafts` payload shape with redacted headers, and never calls WordPress.
+- Evidence:
+  - `docs/operations/public-site-content-factory/smoke-plan-2026-06-14T19-00-28-113Z.json`
+  - Source: golden example `docs/documentation/public-site/content-factory-golden-examples/gutenberg-post-ai-revops-draft.json`.
+  - Result: `sendsWordPressWrite=false`, target status `private`, manifest id `greenhouse-smoke-ai-revops-golden`, validation `pass`, signature redacted.
+- Runtime writes remain disabled. Actual send requires explicit approval, shortest write window, `PUBLIC_WEBSITE_WORDPRESS_BRIDGE_SHARED_SECRET_SECRET_REF`, bridge writes enabled, readback and rollback by manifest id.
+
 ### Slice 7 — MCP Adapter Design
 
 - Diseñar el futuro MCP adapter como downstream de API Platform/primitives.
