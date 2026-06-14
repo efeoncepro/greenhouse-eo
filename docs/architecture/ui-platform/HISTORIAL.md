@@ -6,6 +6,15 @@
 
 ---
 
+## Delta 2026-06-14 — Composition Shell: hardening V1.1 (TASK-1119) + fluidez V1.2 (TASK-1117)
+
+El substrato de coreografía de layout (`CompositionShell`, TASK-1114) cerró su trabajo pendiente real — **aditivo + opt-in**, default byte-idéntico a V1.
+
+- **Fluidez (TASK-1117, `fluidity='rich'`):** entrada orquestada con **stagger** (`composition-shell-motion`, motion tokens: 60 ms / ease emphasized / 200 ms) + **morph interrumpible** (`morphStrategy='interruptible'`, framer-motion `layout`) + **promoción shared-element** (card crece a `lead`) + **drawer temporal real** en compact `split` (MUI `Drawer`, focus trap). Frontera dura: VT = morph estructural, framer-motion `layout` = interrumpible, stagger = entrada — nunca la misma propiedad sobre el mismo nodo. reduced-motion horneado (never-hidden, compositor-only).
+- **Hardening (TASK-1119):** **guard dev-time** del singleton view-transition-name (`composition-shell-vt-guard`, detector puro + refcount, avisa del "morph silencioso") · **telemetry opt-in** (`onTelemetry`, `createCompositionShellEvent` — mirror del sidecar) · **lint rule `greenhouse/no-ad-hoc-layout-morph`** (warn-first; dueño del namespace reservado `gh-region-*`, NO flagea shared-element TASK-525) · **reducer property/concurrency tests** · **baseline GVC durable** (`scripts/frontend/baselines/design-system.composition-shell/`, 6 frames desktop+mobile).
+- Props aditivos del contrato público: `fluidity` · `morphStrategy` · `onTelemetry` · `telemetrySource`. Lab `/design-system/composition-shell` (toggles + demo shared-element + telemetry en vivo). Veredicto SIBLINGS con `NexaMomentComposition` intacto.
+- Evidencia GVC: baseline `scripts/frontend/baselines/design-system.composition-shell/`. Docs: ADR `GREENHOUSE_COMPOSITION_SHELL_DECISION_V1.md` Delta 2026-06-14 (b) + companion `GREENHOUSE_COMPOSITION_SHELL_UI_PLATFORM_V1.md` Delta 2026-06-14.
+
 ## Delta 2026-06-13k — GreenhouseRoadmapTimeline primitive
 
 Se creó `GreenhouseRoadmapTimeline` para traer el patrón `RoadmapCard` del prompt al Design System como primitive Greenhouse, sin `/components/ui`, shadcn, Tailwind ni `class-variance-authority`.

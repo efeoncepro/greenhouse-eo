@@ -235,12 +235,14 @@ La resolución es por **container** (no viewport) donde sea posible (container q
 - **NUNCA** acoplar el card al shell — el card se adapta a su ancho (container query), no al shell.
 - **NUNCA** declarar la primitive completa sin: un consumer existente re-expresado que **se simplifique** (gate) + GVC desktop+mobile + tests del controller + reducer.
 - **SIEMPRE** flag default OFF hasta GVC verde + sign-off; rollout staged (piloto → ampliar).
+- **NUNCA** hand-wirear el namespace reservado `gh-region-*` de view-transition-name en una view (lint `greenhouse/no-ad-hoc-layout-morph`, TASK-1119). El substrato es el único dueño. Para continuidad de objeto (card→detalle) usá TU namespace con `startViewTransition` (TASK-525), no `gh-region-*`.
+- **NUNCA** animar la misma propiedad sobre el mismo nodo con VT y framer-motion a la vez (TASK-1117). VT = morph estructural; framer-motion `layout` = interrumpible; stagger = entrada. Frontera dura.
 
 ## 14. Open questions (a resolver en Slice 2)
 
-- `min-inline-size` exacto por región (validar contra consumers + GVC).
+- ~~`min-inline-size` exacto por región~~ — **RESUELTO** (TASK-1119): `primary 480` / `aside 360` / `lead·dock·overlay 0`, validados contra overflow en GVC desktop+mobile (single/leadPlusContext/split, sin clip).
 - ¿`OrganizationWorkspaceShell` es consumer o queda separado? (depende de si su frontera mapea a `split`).
-- Mecánica exacta de la persistencia route-local (V1) vs broad (V2).
+- Mecánica exacta de la persistencia route-local (V1) vs broad (V2) — **diferido** (TASK-1119 Slice 6, opcional; cross-route → TASK-1118).
 
 ## 15. 4-pillar
 
@@ -251,3 +253,22 @@ Heredado del ADR (`GREENHOUSE_COMPOSITION_SHELL_DECISION_V1.md` §4-Pillar Score
 ## Procedencia
 
 TASK-1114 (substrato). Decisión: `GREENHOUSE_COMPOSITION_SHELL_DECISION_V1.md`. Precedentes: TASK-1028 (Adaptive Sidecar — `resolveAdaptiveSidecarMode` + `reduceAdaptiveSidecarState`), TASK-1045 (Motion primitive + tokens), TASK-525/1102 (`startViewTransition`), TASK-743 (container-query density precedent), TASK-1110 (`NexaMomentComposition` — gate/piloto), TASK-1115 (Adaptive Card — seam). Referencias de mercado: M3 Canonical Layouts, Google AI Overviews/AI Mode.
+
+## Delta 2026-06-14 — §5 (fluidez) + hardening IMPLEMENTADOS (TASK-1119 + TASK-1117)
+
+El contrato de fluidez §5 dejó de ser propuesta: el substrato lo hornea hoy (opt-in, default byte-idéntico a V1). Ver ADR `GREENHOUSE_COMPOSITION_SHELL_DECISION_V1.md` Delta 2026-06-14 (b) para el detalle completo. Resumen de lo que está vivo + dónde:
+
+**Capacidades shipped:**
+
+- §5.A Movimiento — morph FLIP (VT estructural, ya en V1) + **stagger de entrada** (`fluidity='rich'`) + **morph interrumpible** (`morphStrategy='interruptible'`, framer-motion `layout`) + **promoción shared-element** (card→lead).
+- §5.B Adaptación — regiones size-aware (container queries, V1) + **drawer temporal real** en compact `split` (MUI `Drawer`, focus trap).
+- §5.C Continuidad — focus routing tras morph (V1) + reduced-motion horneado (never-hidden).
+- §5.D Gobierno — máquina de estados (V1) + **telemetry opt-in** (`onTelemetry`) + dirty-guard endurecido (property/concurrency tests).
+
+**Drift-prevention + observabilidad (TASK-1119):**
+
+- Guard dev-time del singleton view-transition-name + lint rule `greenhouse/no-ad-hoc-layout-morph` (namespace reservado `gh-region-*`) + baseline GVC durable (`scripts/frontend/baselines/design-system.composition-shell/`).
+
+**Archivos canónicos:** `src/components/greenhouse/primitives/composition-shell/{CompositionShell.tsx, composition-shell-controller.ts, composition-shell-motion.ts, composition-shell-vt-guard.ts, composition-shell-types.ts}`. Props aditivos: `fluidity` · `morphStrategy` · `onTelemetry` · `telemetrySource`. Lab: `/design-system/composition-shell` (toggles fluidity/morph + demo shared-element + telemetry en vivo). Lint rule: `eslint-plugins/greenhouse/rules/no-ad-hoc-layout-morph.mjs`.
+
+**Tareas:** TASK-1119 (hardening V1.1) + TASK-1117 (fluidez V1.2). Veredicto SIBLINGS intacto (no se fusiona con `NexaMomentComposition`).
