@@ -20,6 +20,7 @@ const REPORTS_ROOT = 'docs/operations/public-site-content-factory-catalogs'
 
 const parseArgs = (argv: string[]): CliOptions => {
   const normalizedArgv = argv[0] === '--' ? argv.slice(1) : argv
+
   const options: CliOptions = {
     write: false,
     help: false
