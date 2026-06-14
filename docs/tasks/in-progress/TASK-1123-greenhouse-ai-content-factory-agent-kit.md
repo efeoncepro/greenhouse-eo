@@ -274,6 +274,10 @@ Reglas obligatorias:
   - `docs/operations/public-site-content-factory-catalogs/content-intelligence-map-2026-06-14T18-38-09-337Z.json`
   - `249766`: `gutenberg_blocks`, `81` blocks, `12` normalized modules, no access issues.
   - `244079`: `elementor_document`, `199` Elementor elements, `31` normalized modules, no access issues.
+- Fresh live evidence after canonical GCP reauth:
+  - `docs/operations/public-site-content-factory-catalogs/content-intelligence-map-2026-06-14T18-43-51-314Z.json`
+  - `249766`: `gutenberg_blocks`, `81` blocks, `12` normalized modules, no access issues.
+  - `244079`: `elementor_document`, `199` Elementor elements, `32` normalized modules, no access issues.
 
 ### Slice 4 — API-First Content Factory Primitives
 
