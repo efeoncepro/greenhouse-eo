@@ -4,8 +4,12 @@ import type {
   CompositionShellKind,
   CompositionShellRegion,
   CompositionShellRegionMeta,
-  CompositionShellSizeClass
+  CompositionShellSizeClass,
+  CompositionShellTelemetryEvent,
+  CompositionShellTelemetryEventName
 } from './composition-shell-types'
+
+export type { CompositionShellTelemetryEvent, CompositionShellTelemetryEventName } from './composition-shell-types'
 
 /**
  * Controller del CompositionShell — puro, idempotente, testeable sin DOM.
@@ -184,4 +188,48 @@ export const reduceCompositionShellState = (
   }
 
   return { composition: action.composition, phase: 'composing', dirty: false, lastAction: 'composing' }
+}
+
+// ── Telemetry (opt-in observability of composition changes) ──────────────────
+// A layout substrate has no runtime reliability signal (ADR §Resilience names this limit honestly).
+// Telemetry is the opt-in observability of REAL usage: which compositions surfaces actually morph between.
+// Pure factory mirror of `createAdaptiveSidecarEvent` (TASK-1028) — the consumer decides the sink.
+// The telemetry types live in `composition-shell-types` (public contract) and are re-exported above.
+
+export const createCompositionShellEvent = ({
+  name,
+  composition,
+  previousComposition,
+  sizeClass,
+  source,
+  timestamp = new Date().toISOString()
+}: Omit<CompositionShellTelemetryEvent, 'timestamp'> & { timestamp?: string }): CompositionShellTelemetryEvent => ({
+  name,
+  composition,
+  previousComposition,
+  sizeClass,
+  source,
+  timestamp
+})
+
+/**
+ * Maps a reducer `lastAction` to its telemetry event name, or `null` for non-emitting transitions
+ * (idle / no-op / dirty bookkeeping). The host emits only when this returns a name → no event spam on
+ * idempotent re-renders. Pure.
+ */
+export const compositionShellActionToTelemetryName = (
+  lastAction: CompositionShellControllerLastAction | undefined
+): CompositionShellTelemetryEventName | null => {
+  switch (lastAction) {
+    case 'composing':
+      return 'composition.compose'
+    case 'composed':
+      return 'composition.settle'
+    case 'reset':
+      return 'composition.reset'
+    case 'blocked_dirty_compose':
+      return 'composition.blocked_dirty'
+    default:
+      return null
+  }
 }

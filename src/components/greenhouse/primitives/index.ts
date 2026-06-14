@@ -324,6 +324,8 @@ export {
   COMPOSITION_SHELL_BREAKPOINTS,
   COMPOSITION_SHELL_COMPOSITION_CONFIG,
   COMPOSITION_SHELL_REGION_META,
+  compositionShellActionToTelemetryName,
+  createCompositionShellEvent,
   initialCompositionShellState,
   reduceCompositionShellState,
   regionViewTransitionName,
@@ -334,7 +336,10 @@ export {
 } from './composition-shell/composition-shell-controller'
 export type {
   CompositionShellControllerAction,
+  CompositionShellControllerLastAction,
   CompositionShellControllerState,
+  CompositionShellTelemetryEvent,
+  CompositionShellTelemetryEventName,
   ResolvedCompositionLayout
 } from './composition-shell/composition-shell-controller'
 export { default as GreenhouseNexaAnimatedAskBadge } from './GreenhouseNexaAnimatedAskBadge'

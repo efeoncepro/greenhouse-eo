@@ -3,6 +3,8 @@ import { describe, expect, it } from 'vitest'
 import {
   COMPOSITION_SHELL_COMPOSITION_CONFIG,
   COMPOSITION_SHELL_REGION_META,
+  compositionShellActionToTelemetryName,
+  createCompositionShellEvent,
   initialCompositionShellState,
   reduceCompositionShellState,
   regionViewTransitionName,
@@ -11,7 +13,11 @@ import {
   resolveCompositionLayout,
   resolveSizeClass
 } from './composition-shell-controller'
-import type { CompositionShellKind, CompositionShellRegion } from './composition-shell-types'
+import type {
+  CompositionShellControllerAction,
+  CompositionShellControllerState
+} from './composition-shell-controller'
+import type { CompositionShellComposition, CompositionShellKind, CompositionShellRegion } from './composition-shell-types'
 
 describe('resolveComposition', () => {
   it('precedencia: composition explícita gana sobre kind', () => {
@@ -165,5 +171,144 @@ describe('reduceCompositionShellState (morph lifecycle + dirty guard)', () => {
     const composed = { composition: 'split' as const, phase: 'composed' as const }
 
     expect(reduceCompositionShellState(composed, { type: 'compose', composition: 'split' })).toBe(composed)
+  })
+})
+
+describe('reduceCompositionShellState — hardening (property + concurrency, TASK-1119 Slice 5)', () => {
+  const COMPOSITIONS: CompositionShellComposition[] = ['single', 'leadPlusContext', 'split', 'focused']
+  const PHASES = ['dormant', 'composing', 'composed']
+
+  // PRNG determinístico (mulberry32) — reproducible, sin Math.random.
+  const makeRng = (seed: number) => () => {
+    seed |= 0
+    seed = (seed + 0x6d2b79f5) | 0
+    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed)
+
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t
+
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296
+  }
+
+  const pick = <T,>(arr: readonly T[], r: number): T => arr[Math.floor(r * arr.length)]
+
+  const randomAction = (rng: () => number): CompositionShellControllerAction => {
+    const r = rng()
+
+    if (r < 0.4) return { type: 'compose', composition: pick(COMPOSITIONS, rng()), force: rng() < 0.3 }
+    if (r < 0.6) return { type: 'settle' }
+    if (r < 0.8) return { type: 'reset', force: rng() < 0.3 }
+
+    return { type: 'markDirty', dirty: rng() < 0.5 }
+  }
+
+  const assertInvariant = (s: CompositionShellControllerState) => {
+    // El estado NUNCA sale del espacio cerrado de composiciones/fases/dirty, sin importar la secuencia.
+    // (markDirty es ortogonal a phase → dirty puede ser true en cualquier fase; eso es válido por diseño.)
+    expect(COMPOSITIONS).toContain(s.composition)
+    expect(PHASES).toContain(s.phase)
+    expect([true, false, undefined]).toContain(s.dirty)
+  }
+
+  it('cualquier secuencia aleatoria preserva los invariantes del estado (1k pasos × 20 seeds)', () => {
+    for (let seed = 1; seed <= 20; seed++) {
+      const rng = makeRng(seed)
+      let state: CompositionShellControllerState = initialCompositionShellState
+
+      for (let step = 0; step < 1000; step++) {
+        state = reduceCompositionShellState(state, randomAction(rng))
+        assertInvariant(state)
+      }
+    }
+  })
+
+  it('toda transición es pura: misma (state, action) → resultado idéntico (sin efectos ocultos)', () => {
+    const rng = makeRng(99)
+    let state: CompositionShellControllerState = initialCompositionShellState
+
+    for (let step = 0; step < 200; step++) {
+      const action = randomAction(rng)
+      const a = reduceCompositionShellState(state, action)
+      const b = reduceCompositionShellState(state, action)
+
+      expect(a).toEqual(b)
+      state = a
+    }
+  })
+
+  it('concurrencia: compose rápido a un target distinto mid-composing redirige (último gana, sin dirty)', () => {
+    let s: CompositionShellControllerState = reduceCompositionShellState(initialCompositionShellState, {
+      type: 'compose',
+      composition: 'split'
+    })
+
+    expect(s).toMatchObject({ composition: 'split', phase: 'composing' })
+
+    // Cambio de idea antes de asentar (no dirty) → redirige limpio.
+    s = reduceCompositionShellState(s, { type: 'compose', composition: 'focused' })
+
+    expect(s).toMatchObject({ composition: 'focused', phase: 'composing', dirty: false })
+  })
+
+  it('concurrencia: dirty mid-composing bloquea redirección salvo force, sin corromper estado', () => {
+    let s: CompositionShellControllerState = reduceCompositionShellState(initialCompositionShellState, {
+      type: 'compose',
+      composition: 'split'
+    })
+
+    s = reduceCompositionShellState(s, { type: 'markDirty', dirty: true })
+
+    const blocked = reduceCompositionShellState(s, { type: 'compose', composition: 'single' })
+
+    expect(blocked.lastAction).toBe('blocked_dirty_compose')
+    expect(blocked.composition).toBe('split')
+    expect(blocked.dirty).toBe(true)
+
+    const forced = reduceCompositionShellState(s, { type: 'compose', composition: 'single', force: true })
+
+    expect(forced).toMatchObject({ composition: 'single', phase: 'composing', dirty: false })
+  })
+
+  it('settle repetido es estable (idempotente tras asentar)', () => {
+    const composing = reduceCompositionShellState(initialCompositionShellState, {
+      type: 'compose',
+      composition: 'leadPlusContext'
+    })
+
+    const composed = reduceCompositionShellState(composing, { type: 'settle' })
+
+    expect(reduceCompositionShellState(composed, { type: 'settle' })).toBe(composed)
+  })
+})
+
+describe('composition telemetry (TASK-1119 Slice 4)', () => {
+  it('createCompositionShellEvent arma el evento con timestamp por default', () => {
+    const e = createCompositionShellEvent({ name: 'composition.compose', composition: 'split', previousComposition: 'single', sizeClass: 'expanded', source: 'lab' })
+
+    expect(e).toMatchObject({
+      name: 'composition.compose',
+      composition: 'split',
+      previousComposition: 'single',
+      sizeClass: 'expanded',
+      source: 'lab'
+    })
+    expect(typeof e.timestamp).toBe('string')
+    expect(e.timestamp.length).toBeGreaterThan(0)
+  })
+
+  it('createCompositionShellEvent respeta timestamp explícito', () => {
+    const e = createCompositionShellEvent({ name: 'composition.settle', composition: 'focused', timestamp: '2026-06-14T00:00:00.000Z' })
+
+    expect(e.timestamp).toBe('2026-06-14T00:00:00.000Z')
+  })
+
+  it('mapper: lastAction → telemetry name (no emite en no-ops)', () => {
+    expect(compositionShellActionToTelemetryName('composing')).toBe('composition.compose')
+    expect(compositionShellActionToTelemetryName('composed')).toBe('composition.settle')
+    expect(compositionShellActionToTelemetryName('reset')).toBe('composition.reset')
+    expect(compositionShellActionToTelemetryName('blocked_dirty_compose')).toBe('composition.blocked_dirty')
+    // no-ops / bookkeeping no emiten
+    expect(compositionShellActionToTelemetryName('idle')).toBeNull()
+    expect(compositionShellActionToTelemetryName('dirty_changed')).toBeNull()
+    expect(compositionShellActionToTelemetryName(undefined)).toBeNull()
   })
 })

@@ -34,6 +34,22 @@ export type CompositionShellState = 'dormant' | 'composing' | 'composed'
 /** Window size class (M3) — el shell resuelve el layout por el ancho de SU contenedor. */
 export type CompositionShellSizeClass = 'compact' | 'medium' | 'expanded'
 
+/** Telemetry opt-in de cambios de composición (observabilidad de uso real). Mirror del shape del sidecar. */
+export type CompositionShellTelemetryEventName =
+  | 'composition.compose'
+  | 'composition.settle'
+  | 'composition.reset'
+  | 'composition.blocked_dirty'
+
+export interface CompositionShellTelemetryEvent {
+  name: CompositionShellTelemetryEventName
+  composition: CompositionShellComposition
+  previousComposition?: CompositionShellComposition
+  sizeClass?: CompositionShellSizeClass
+  source?: string
+  timestamp: string
+}
+
 export interface CompositionShellCompositionConfig {
   composition: CompositionShellComposition
   /** Cómo se acomodan las regiones de contenido. `split` = 2 lanes; `stack` = apiladas. */
@@ -71,6 +87,28 @@ export interface CompositionShellProps {
   leadLabel?: string
   /** Label accesible de la región `aside` (a11y). */
   asideLabel?: string
+  /**
+   * Enriquecimiento de coreografía (TASK-1117). Opt-in:
+   * - `baseline` (default) = V1: morph estructural (View Transitions) + condense por opacidad.
+   * - `rich` = V1.2: entrada orquestada con stagger del contenido + (opcional) morph interrumpible.
+   * Default behavior byte-idéntico a V1 cuando se omite.
+   */
+  fluidity?: 'baseline' | 'rich'
+  /**
+   * Estrategia de morph (solo aplica con `fluidity='rich'`):
+   * - `viewTransition` (default) = morph estructural FLIP por View Transitions (el host dispara `startViewTransition`).
+   * - `interruptible` = framer-motion `layout` (redirigible a media animación: drag, cambio de idea). Las dos
+   *   capas NUNCA animan el mismo nodo a la vez — VT para lo estructural, framer-motion para lo interrumpible.
+   */
+  morphStrategy?: 'viewTransition' | 'interruptible'
+  /**
+   * Telemetry opt-in de cambios de composición (observabilidad de uso real). El substrato emite
+   * `composition.compose` al cambiar de composición y `composition.settle` al asentarse. Mirror del patrón
+   * `createAdaptiveSidecarEvent`. Sin sink declarado → no se emite nada (cero costo).
+   */
+  onTelemetry?: (event: CompositionShellTelemetryEvent) => void
+  /** Etiqueta de origen para los eventos de telemetry (qué surface). */
+  telemetrySource?: string
   /** sx passthrough opcional para el contenedor raíz. */
   className?: string
 }
