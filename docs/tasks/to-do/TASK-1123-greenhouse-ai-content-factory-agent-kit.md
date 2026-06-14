@@ -24,11 +24,17 @@
 
 ## Summary
 
-Formalizar **Greenhouse AI Content Factory** como un Agent Kit gobernado para que Codex, Claude Code, Nexa y futuros agentes produzcan contenido WordPress para `efeoncepro.com` usando el runtime real: Gutenberg para posts, Elementor/Ohio para landings, HubSpot/UTM para attribution y el bridge WordPress para drafts seguros. No crea un chat ni un editor nuevo; crea recursos, contratos, recipes, catálogos, ejemplos dorados, validators y primitives API-first consumibles por agentes y, más adelante, por MCP.
+Formalizar **Greenhouse AI Content Factory** como un Agent Kit gobernado para que Codex, Claude Code, Nexa y futuros agentes creen, refresquen y corrijan contenido WordPress para `efeoncepro.com` usando el runtime real: Gutenberg para posts, Elementor/Ohio para landings, HubSpot/UTM para attribution y el bridge WordPress para drafts seguros. No crea un chat ni un editor nuevo; crea recursos, contratos, recipes, catálogos, ejemplos dorados, validators y primitives API-first consumibles por agentes y, más adelante, por MCP.
 
 ## Why This Task Exists
 
-La capacidad buscada no es "un chatbot que escribe contenido". Codex y Claude ya pueden operar si tienen contexto fiable. El gap real es que el conocimiento del sitio vive disperso entre discovery docs, skills, inspecciones y memoria de sesión. Sin un Agent Kit, cada agente tendría que redescubrir cómo construir un bloque Gutenberg, cuándo usar un widget Ohio, cómo inspeccionar `_elementor_data`, cómo evitar CSS hardcodeado, cómo preparar un draft firmado y cómo respetar Full API Parity.
+La capacidad buscada no es "un chatbot que escribe contenido". Codex y Claude ya pueden operar si tienen contexto fiable. El gap real es que el conocimiento del sitio vive disperso entre discovery docs, skills, inspecciones y memoria de sesión. Sin un Agent Kit, cada agente tendría que redescubrir cómo construir un bloque Gutenberg, cuándo usar un widget Ohio, cómo inspeccionar `_elementor_data`, cómo entender settings de tema/Ohio/Elementor, cómo hacer un refresh de una página existente sin romperla, cómo evitar CSS hardcodeado, cómo preparar un draft firmado y cómo respetar Full API Parity.
+
+Además, la fábrica no puede limitarse a "crear desde cero". Debe soportar:
+
+- `create`: generar un post/landing nuevo desde una idea o brief.
+- `refresh`: actualizar/refinar una página, post o módulo existente aprovechando su estructura real.
+- `fix`: diagnosticar y corregir problemas existentes de layout, copy, SEO, CTA, blocks, widgets, settings o theme metas.
 
 El enfoque correcto es:
 
@@ -36,6 +42,7 @@ El enfoque correcto es:
 AI generates structured drafts.
 Greenhouse governs contracts, validation, review, audit and API parity.
 WordPress renders draft/private content.
+Existing content is inspected before it is edited.
 MCP is a downstream adapter, not the source of truth.
 ```
 
@@ -44,8 +51,12 @@ MCP is a downstream adapter, not the source of truth.
 - Definir `Greenhouse AI Content Factory` como capability platform, no como chat.
 - Crear contratos `contentFactory.*` API-first para briefs, generated drafts, validations, previews and review evidence.
 - Dotar a agentes de recipes, catálogos machine-readable y ejemplos dorados para Gutenberg posts y Elementor/Ohio landings.
+- Dotar a agentes de un `Content Intelligence Map` para conocer cada post/página/módulo existente: block/widget tree, settings, theme metas, assets, SEO/Yoast, HubSpot/CTA, anchors `gh-*`, ownership y riesgos de patch.
 - Hacer que toda capacidad nazca con Full API Parity: server-side primitives/readers/commands primero; UI/CLI/MCP después como clients/adapters.
-- Preparar el primer flujo ejecutable: AI-assisted `post_draft_gutenberg` que produce un draft/private WordPress Greenhouse-owned, nunca publish.
+- Preparar los primeros flujos ejecutables:
+  - AI-assisted `post_draft_gutenberg` que produce un draft/private WordPress Greenhouse-owned, nunca publish.
+  - AI-assisted `refresh_existing_gutenberg_post` que clona/deriva un draft privado desde un post existente antes de sugerir cambios.
+  - AI-assisted `refresh_existing_elementor_landing` que inspecciona y planifica patches sobre draft/private clone antes de mutar la página viva.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 1 — CONTEXT & CONSTRAINTS
@@ -75,6 +86,8 @@ Reglas obligatorias:
 - **Full API Parity primero:** cada capacidad debe tener primitive/readers/commands server-side o un path explícito antes de exponerla en UI, CLI, MCP o agent tool.
 - **MCP downstream:** si se diseña MCP, solo puede envolver contratos `api/platform/*` o primitives gobernadas; no puede llamar WordPress, SQL, helpers internos o scripts ad hoc directo.
 - **AI produces drafts, not publishes:** AI puede generar briefs, manifests, blocks, copy, SEO y review evidence; no puede publish, delete, clear cache o mutar contenido existente fuera de ownership Greenhouse.
+- **Inspect before edit:** ninguna edición/refinamiento/fix sobre contenido existente puede planificarse sin inspección actualizada de WordPress: post/page id, status, editor model, blocks/widgets, settings, theme metas, SEO, assets, CTA, HubSpot, ownership, preview and rollback path.
+- **Clone/draft before mutate:** refresh/fix de contenido existente debe trabajar primero sobre draft/private clone o revision Greenhouse-owned. Patches directos sobre published content requieren task/release explícita.
 - **Builder dialects separados:** posts usan Gutenberg `blockName`/`post_content`; landings usan Elementor/Ohio `widgetType`/`_elementor_data`. Normalizar para agentes, preservar el dialecto nativo al escribir.
 - **WordPress write path draft/private only:** cualquier smoke mutante debe usar `greenhouse-wp-bridge`, HMAC, Application Password, ownership metadata y status `draft|private`.
 - **No hardcode CSS/Elementor:** usar inspección, controles nativos, recipes y validators; CSS solo como child-theme/plugin gobernado cuando no exista control nativo.
@@ -112,6 +125,8 @@ Reglas obligatorias:
 ### Blocks / Impacts
 
 - First real `post_draft_gutenberg` write smoke.
+- First real `refresh_existing_gutenberg_post` draft/private clone + patch plan.
+- First real `refresh_existing_elementor_landing` draft/private clone + patch plan.
 - Future `landing_draft_elementor` manifest/template work.
 - Future Greenhouse Public Site UI/API lane.
 - Future MCP tools/resources for Content Factory.
@@ -153,9 +168,11 @@ Reglas obligatorias:
 - No canonical `Greenhouse AI Content Factory` task/spec exists.
 - No machine-readable catalog of allowed Gutenberg block patterns, Elementor/Ohio modules, HubSpot/UTM CTA patterns and SEO/Yoast expectations.
 - No golden examples for agents to imitate and validate against.
+- No `Content Intelligence Map` that lets an agent query how each current page/post/blog/landing is composed: Gutenberg blocks, Elementor widgets, Ohio/page metas, theme settings, assets, SEO and CTA state.
 - No server-side Content Factory primitives/readers/commands.
 - No typed `contentFactoryBrief.v1`, `contentFactoryGeneratedDraft.v1`, `contentFactoryValidation.v1` or `contentFactoryReview.v1`.
 - No validator that checks an AI-generated post/landing draft before it reaches WordPress.
+- No safe refresh/edit contract for existing content: clone, diff, patch plan, preview, review, rollback.
 - No MCP adapter plan grounded in API Platform contracts.
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -183,9 +200,14 @@ Reglas obligatorias:
   - `contentFactoryGeneratedDraft.v1`
   - `contentFactoryValidation.v1`
   - `contentFactoryReview.v1`
+  - `contentFactoryInspectionMap.v1`
+  - `contentFactoryRefreshPlan.v1`
 - Declarar lanes:
   - `post_draft_gutenberg`
   - `landing_draft_elementor`
+  - `refresh_existing_gutenberg_post`
+  - `refresh_existing_elementor_landing`
+  - `fix_existing_public_site_module`
 
 ### Slice 2 — Gutenberg Post Authoring Resources
 
@@ -201,6 +223,12 @@ Reglas obligatorias:
 - Crear catálogo machine-readable de blocks permitidos/observados y constraints.
 - Crear golden examples con `post_content` válido y metadata esperada.
 - Agregar validator inicial para blocks generados por AI.
+- Agregar recipes de refresh/fix para posts existentes:
+  - mejorar headline/excerpt/SEO sin romper bloques;
+  - reorganizar headings/listas;
+  - actualizar CTA/links;
+  - conservar embeds/media;
+  - manejar `core/freeform` legacy sin convertirlo agresivamente.
 
 ### Slice 3 — Elementor/Ohio Landing Authoring Resources
 
@@ -212,6 +240,22 @@ Reglas obligatorias:
   - HubSpot form/CTA
   - service tables/cards
 - Declarar constraints de patching: `Document::save()`, ownership metadata, semantic `gh-*` classes, no direct `_elementor_data` writes as default.
+- Agregar recipes de refresh/fix para landings existentes:
+  - diagnosticar un módulo por `element.id + elType + widgetType + fingerprint`;
+  - mapear settings nativos del widget antes de proponer CSS;
+  - comparar theme metas Ohio vs Elementor document settings;
+  - clonar/duplicar a draft/private antes de patch;
+  - generar diff humano revisable por módulo, no por DOM.
+
+### Slice 3b — Content Intelligence Map
+
+- Crear un inventario machine-readable y refrescable por objeto WordPress:
+  - posts/blogs: post id, slug, status, editor model, block tree summary, block usage, media refs, SEO/Yoast summary, CTA/links, anchors/classes, excerpt.
+  - pages/landings: post id, slug, status, Elementor tree summary, widget usage, Ohio/page metas, template, generated CSS status, assets, HubSpot widgets/forms/meetings, semantic `gh-*` anchors.
+  - theme/runtime: active theme, child-theme overrides, relevant CSS files, global Ohio variables, Elementor kit caveats.
+- Exponerlo como resources/JSON bajo `docs/operations/public-site-content-factory-catalogs/` y luego como reader `getPublicSiteContentIntelligenceMap`.
+- Incluir freshness metadata: scannedAt, source endpoint, bridge version, post modified date and hash/fingerprint.
+- Ningún refresh/fix puede usar un map stale sin re-inspection.
 
 ### Slice 4 — API-First Content Factory Primitives
 
@@ -219,11 +263,17 @@ Reglas obligatorias:
 - Definir readers:
   - `listPublicSiteContentPatterns`
   - `getPublicSiteGoldenExample`
+  - `getPublicSiteContentIntelligenceMap`
+  - `inspectPublicSiteObjectForRefresh`
   - `validateGeneratedGutenbergDraft`
   - `validateElementorLandingManifest`
+  - `validatePublicSiteRefreshPlan`
 - Definir commands as contracts, even if implemented as no-op/dry-run first:
   - `prepareGeneratedPostDraft`
   - `prepareGeneratedLandingDraft`
+  - `prepareExistingPostRefreshDraft`
+  - `prepareExistingLandingRefreshDraft`
+  - `preparePublicSiteFixPlan`
   - `requestContentReview`
 - Toda lógica reusable vive en primitives; scripts/API/MCP solo envuelven.
 
@@ -232,6 +282,8 @@ Reglas obligatorias:
 - Agregar CLI no-mutante para que agentes generen/validen un draft artifact local:
   - `pnpm public-website:content-factory:validate`
   - `pnpm public-website:content-factory:plan`
+  - `pnpm public-website:content-factory:inspect`
+  - `pnpm public-website:content-factory:refresh-plan`
 - Guardar evidencia en `docs/operations/public-site-content-factory/`.
 - No enviar writes WordPress en este slice salvo que `TASK-1116` esté listo para smoke controlado.
 
@@ -245,6 +297,14 @@ Reglas obligatorias:
   - preview/status readback
   - rollback by trashing/deleting the smoke draft only
 - Si no hay Kinsta Standard Staging confirmado, documentar production draft/private-only policy with shortest possible write window.
+- Preparar, no necesariamente ejecutar, el primer `refresh_existing_gutenberg_post` smoke:
+  - seleccionar un post existente;
+  - inspeccionar;
+  - generar refresh plan;
+  - crear draft/private clone o derivative;
+  - aplicar cambios al clone, nunca al published original;
+  - leer preview/status y documentar rollback.
+- Preparar el primer `refresh_existing_elementor_landing` smoke solo como plan hasta que clone/duplicate draft semantics del bridge estén probadas.
 
 ### Slice 7 — MCP Adapter Design
 
@@ -252,7 +312,9 @@ Reglas obligatorias:
 - Enumerar candidate resources/tools:
   - `content_factory_patterns`
   - `get_gutenberg_authoring_recipe`
+  - `get_public_site_content_intelligence_map`
   - `validate_generated_post_draft`
+  - `prepare_existing_content_refresh_plan`
   - `prepare_wordpress_draft`
   - `inspect_public_site_document`
 - No implementar MCP writes hasta que command idempotency, authz, audit and draft smoke estén probados.
@@ -264,6 +326,8 @@ Reglas obligatorias:
 - Limpiar cache Kinsta o crear backups Kinsta.
 - Bajar privilegios del usuario WordPress técnico en esta task.
 - Crear un editor visual de landings en Greenhouse.
+- Patch directo sobre páginas publicadas existentes.
+- Reescribir masivamente posts legacy o convertir `core/freeform` sin aprobación.
 - Convertir `efeoncepro.com` en SPA o reemplazar WordPress.
 - MCP-first tools que salten API Platform/primitives.
 - AI autonomous publish.
@@ -277,11 +341,12 @@ Reglas obligatorias:
 ```text
 Brand / commercial context
   + Public Site runtime knowledge
+  + Content Intelligence Map
   + Gutenberg / Elementor / Ohio recipes
   + Golden examples
   + Validators
   + Full API parity primitives
-  -> AI-generated structured drafts
+  -> AI-generated structured drafts or refresh/fix plans
   -> WordPress draft/private via bridge
   -> human review / approval
 ```
@@ -291,9 +356,21 @@ Brand / commercial context
 ```ts
 type ContentFactoryBriefV1 = {
   contractVersion: 'contentFactoryBrief.v1'
-  lane: 'post_draft_gutenberg' | 'landing_draft_elementor'
+  intent: 'create' | 'refresh' | 'fix'
+  lane:
+    | 'post_draft_gutenberg'
+    | 'landing_draft_elementor'
+    | 'refresh_existing_gutenberg_post'
+    | 'refresh_existing_elementor_landing'
+    | 'fix_existing_public_site_module'
   objective: string
   audience: string
+  target?: {
+    wordpressPostId?: number
+    url?: string
+    moduleId?: string
+    editorModel?: 'gutenberg_blocks' | 'elementor_document' | 'unknown'
+  }
   offer?: string
   serviceKey?: string
   campaignId?: string
@@ -310,8 +387,16 @@ type ContentFactoryBriefV1 = {
 
 type ContentFactoryGeneratedDraftV1 = {
   contractVersion: 'contentFactoryGeneratedDraft.v1'
-  lane: 'post_draft_gutenberg' | 'landing_draft_elementor'
+  intent: 'create' | 'refresh' | 'fix'
+  lane:
+    | 'post_draft_gutenberg'
+    | 'landing_draft_elementor'
+    | 'refresh_existing_gutenberg_post'
+    | 'refresh_existing_elementor_landing'
+    | 'fix_existing_public_site_module'
   sourceBriefId?: string
+  sourceInspectionId?: string
+  sourceWordPressPostId?: number
   title: string
   slug: string
   excerpt?: string
@@ -340,6 +425,52 @@ type ContentFactoryValidationV1 = {
     path?: string
   }>
 }
+
+type ContentFactoryInspectionMapV1 = {
+  contractVersion: 'contentFactoryInspectionMap.v1'
+  scannedAt: string
+  source: 'greenhouse_wp_bridge' | 'wp_cli' | 'manual_import'
+  bridgeVersion?: string
+  objects: Array<{
+    wordpressPostId: number
+    url?: string
+    slug: string
+    postType: 'post' | 'page' | 'landing'
+    status: string
+    editorModel: 'gutenberg_blocks' | 'elementor_document' | 'classic_or_unknown'
+    modifiedGmt?: string
+    contentFingerprint?: string
+    modules: Array<{
+      nativeKind: 'blockName' | 'widgetType' | 'themeMeta' | 'asset' | 'seo' | 'hubspot'
+      key: string
+      count?: number
+      settingsKeys?: string[]
+      anchors?: string[]
+      risk?: 'low' | 'medium' | 'high'
+    }>
+  }>
+}
+
+type ContentFactoryRefreshPlanV1 = {
+  contractVersion: 'contentFactoryRefreshPlan.v1'
+  target: {
+    wordpressPostId: number
+    editorModel: 'gutenberg_blocks' | 'elementor_document'
+    sourceFingerprint: string
+  }
+  mode: 'clone_to_draft' | 'patch_existing_draft' | 'plan_only'
+  changes: Array<{
+    operation: 'add' | 'update' | 'remove' | 'reorder' | 'settings_patch'
+    targetPath: string
+    nativeKind: 'blockName' | 'widgetType' | 'themeMeta' | 'seo' | 'hubspot'
+    rationale: string
+    risk: 'low' | 'medium' | 'high'
+  }>
+  rollback: {
+    strategy: 'trash_clone' | 'revert_patch' | 'manual_restore'
+    notes: string
+  }
+}
 ```
 
 ### Full API Parity contract
@@ -350,8 +481,12 @@ Every capability in this task must have a programmatic path:
 |---|---|---|
 | List content patterns | `listPublicSiteContentPatterns` | API/app + CLI + MCP resource |
 | Get authoring recipe | `getPublicSiteAuthoringRecipe` | API/app + CLI + MCP resource |
+| Inspect existing content | `inspectPublicSiteObjectForRefresh` | API/app + CLI + MCP resource |
+| Read intelligence map | `getPublicSiteContentIntelligenceMap` | API/app + CLI + MCP resource |
 | Validate generated post | `validateGeneratedGutenbergDraft` | API/app + CLI + MCP tool |
+| Validate refresh plan | `validatePublicSiteRefreshPlan` | API/app + CLI + MCP tool |
 | Prepare draft plan | `prepareGeneratedPostDraft` | API/app + CLI |
+| Prepare existing content refresh | `prepareExistingPostRefreshDraft` / `prepareExistingLandingRefreshDraft` | API/app + CLI; MCP only after write safety |
 | Send WordPress draft | `prepareWordPressDraft` / bridge command | API/app first, MCP only after write safety |
 
 UI is not required in this task. If added later, it must consume the same primitives.
@@ -362,6 +497,7 @@ UI is not required in this task. If added later, it must consume the same primit
 
 - Slice 1 (spec) -> Slice 2 (Gutenberg resources) -> Slice 4 (primitives validators) -> Slice 5 (CLI evidence) -> Slice 6 (smoke plan).
 - Slice 3 (Elementor resources) can run after Slice 1 and in parallel with Slice 2, but no Elementor write path may ship before validators and ownership constraints exist.
+- Slice 3b (Content Intelligence Map) MUST ship before any refresh/fix smoke against existing content.
 - Slice 7 (MCP design) must happen after Slice 4; MCP cannot precede primitives/API contracts.
 
 ### Risk matrix
@@ -370,6 +506,8 @@ UI is not required in this task. If added later, it must consume the same primit
 |---|---|---|---|---|
 | AI genera HTML/bloques inválidos y rompe preview | WordPress/Gutenberg | medium | validator + golden examples + draft/private only | validation `block` findings, bridge 4xx |
 | AI usa widget Elementor no disponible o control inexistente | WordPress/Elementor | medium | widget catalog + recipes + validation against bridge catalog | validation warning/block |
+| Refresh/fix toca el objeto publicado equivocado | WordPress public site | medium | inspect-before-edit + source fingerprint + clone/draft before mutate + ownership metadata | validation block, bridge audit mismatch |
+| Agent usa inspection stale y pisa cambios recientes de WordPress | WordPress content | medium | freshness metadata + modified date/fingerprint check before patch | stale inspection block |
 | Agents bypass Full API Parity with scripts ad hoc | Platform/API | medium | task hard rule + primitives first + docs/skills update | QA/docs closure finding |
 | MCP exposes writes before idempotency/audit | MCP/API/security | medium | MCP design-only until commands are stable | task acceptance blocks |
 | Content leaks private Greenhouse/client data into public copy | Security/brand | medium | brief schema + public-data-only rule + review checklist | validation block, human review |
@@ -398,9 +536,10 @@ UI is not required in this task. If added later, it must consume the same primit
 1. Verify docs/spec consistency: `pnpm docs:closure-check`, `pnpm docs:context-check`, `pnpm ops:lint --changed`.
 2. Verify catalogs/examples do not include secrets or raw Authorization headers.
 3. Verify Gutenberg golden examples parse through WordPress `parse_blocks()` or the bridge block inspector.
-4. Verify validators reject invalid block/widget/module shapes.
-5. Verify CLI dry-run produces evidence without WordPress writes.
-6. Only after explicit approval, run a disposable draft/private smoke and read it back through bridge inspection.
+4. Verify Content Intelligence Map includes post/page id, editor model, module summary, freshness and fingerprint.
+5. Verify validators reject invalid block/widget/module shapes and stale refresh plans.
+6. Verify CLI dry-run produces evidence without WordPress writes.
+7. Only after explicit approval, run a disposable draft/private smoke and read it back through bridge inspection.
 
 ### Out-of-band coordination required
 
@@ -417,13 +556,18 @@ UI is not required in this task. If added later, it must consume the same primit
 
 - [ ] `Greenhouse AI Content Factory` is documented as an Agent Kit/capability platform, not as a chat product.
 - [ ] Initial contracts `contentFactoryBrief.v1`, `contentFactoryGeneratedDraft.v1`, `contentFactoryValidation.v1` and `contentFactoryReview.v1` are documented and/or implemented as typed schemas.
+- [ ] Contracts for `contentFactoryInspectionMap.v1` and `contentFactoryRefreshPlan.v1` exist and require source freshness/fingerprint for edits.
 - [ ] Gutenberg post authoring recipes exist with at least three golden examples derived from inspected Efeonce posts.
 - [ ] Elementor/Ohio landing authoring recipes exist with widget/module constraints and at least two golden module examples.
 - [ ] Machine-readable catalogs exist for observed/allowed Gutenberg blocks and Elementor/Ohio widgets.
+- [ ] A Content Intelligence Map exists for inspected posts/pages/landings and includes editor model, blocks/widgets, theme metas, SEO/CTA/HubSpot and freshness metadata.
 - [ ] Validators reject invalid blocks/widgets, unknown modules, publish attempts and raw unreviewed scripts.
+- [ ] Validators reject stale refresh plans and any direct patch against published content without clone/draft policy.
 - [ ] Server-side primitives exist before any UI/MCP adapter.
 - [ ] CLI evidence lane can validate a generated draft without WordPress writes.
 - [ ] The first `post_draft_gutenberg` smoke plan is documented with rollback.
+- [ ] The first `refresh_existing_gutenberg_post` smoke plan is documented with clone/draft rollback.
+- [ ] `refresh_existing_elementor_landing` is documented as plan-only until clone/duplicate draft semantics are proven.
 - [ ] Skills for Codex and Claude are updated so agents know how to use the Content Factory resources.
 - [ ] MCP adapter design explicitly states it is downstream of API Platform/primitives and does not bypass them.
 
@@ -435,6 +579,7 @@ UI is not required in this task. If added later, it must consume the same primit
 - `pnpm exec tsc --noEmit --pretty false` when TypeScript primitives are added.
 - `pnpm exec vitest run src/lib/public-site/content-factory` when validators/primitives are added.
 - `pnpm public-website:bridge-inspect -- --page-id <postId> --no-catalog --write` for refreshed Gutenberg evidence.
+- `pnpm public-website:content-factory:inspect` once CLI exists.
 - `pnpm public-website:content-factory:validate` once CLI exists.
 
 ## Closing Protocol
@@ -456,3 +601,4 @@ UI is not required in this task. If added later, it must consume the same primit
 3. Should the first production smoke be a disposable Gutenberg post in production draft/private, or wait for confirmed Kinsta Standard Staging?
 4. How much HubSpot campaign metadata is required in V1 vs. deferred to attribution/reporting tasks?
 5. Do landings remain Elementor-first for V1, or should new Greenhouse-owned landings migrate gradually toward Gutenberg blocks/patterns?
+6. What is the first existing page/post to refresh as a safe smoke: a disposable blog post clone, the HubSpot services page clone, or a low-risk private page?
