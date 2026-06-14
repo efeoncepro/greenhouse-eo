@@ -1,0 +1,29 @@
+{
+  "contractVersion": "contentFactoryPatchBrief.v1",
+  "createdAt": "2026-06-14T20:34:30.000Z",
+  "objective": "Replace the inbound/Loop pullquote with a verified factual HubSpot highlight that supports Loop Marketing as an AI-era operating model, without changing the published post.",
+  "target": {
+    "wordpressPostId": 248398,
+    "sourceFingerprint": "c613e8ce9d991c289de7d7aef396a64b4b0fddcf8aa0563e7e17c6291a1289b5"
+  },
+  "constraints": {
+    "preservePublishedSource": true,
+    "requireDraftClone": true,
+    "preserveMedia": true,
+    "preserveStructure": true
+  },
+  "changes": [
+    {
+      "operation": "update_text",
+      "targetPath": "36",
+      "expectedFingerprint": "a8ff432ccd6d84260d116a9f5011f80357866f9927e88ed68a2a6b5fb721ab93",
+      "proposedText": "Según HubSpot, el 61 % de los marketers cree que el marketing vive su mayor disrupción en 20 años por la IA; el Loop convierte esa presión en ciclos cortos de aprendizaje, no en campañas más pesadas (HubSpot, State of Marketing 2026).",
+      "rationale": "Use a verified HubSpot factual highlight that supports the article's argument that Loop Marketing adds AI-era agility on top of inbound.",
+      "sourceEvidence": {
+        "label": "HubSpot State of Marketing 2026",
+        "url": "https://www.hubspot.com/state-of-marketing",
+        "fact": "61% of marketers believe marketing is experiencing its biggest disruption in 20 years due to AI."
+      }
+    }
+  ]
+}
