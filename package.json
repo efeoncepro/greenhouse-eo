@@ -128,6 +128,7 @@
     "public-website:bridge-draft-contract": "tsx scripts/public-website/bridge-draft-contract.ts",
     "public-website:content-factory:inspect": "tsx scripts/public-website/content-factory-inspect.ts",
     "public-website:content-factory:inspect-post-deep": "tsx scripts/public-website/content-factory-inspect-post-deep.ts",
+    "public-website:content-factory:patch-plan": "tsx scripts/public-website/content-factory-patch-plan.ts",
     "public-website:content-factory:patterns": "tsx scripts/public-website/content-factory-patterns.ts",
     "public-website:content-factory:plan": "tsx scripts/public-website/content-factory-plan.ts",
     "public-website:content-factory:refresh-plan": "tsx scripts/public-website/content-factory-refresh-plan.ts",

@@ -337,6 +337,14 @@ Reglas obligatorias:
   - Reads local inspection evidence only; does not call WordPress.
   - Output is `mode=plan_only`, `sendsWordPressWrite=false`, `modifiesPublishedSource=false`, source fingerprint, `path + fingerprint` candidates, preserve/reconcile gates for TOC/lists/separators/media, SEO/link review candidates and rollback `no_runtime_change_plan_only`.
   - Evidence for `248398`: `docs/operations/public-site-content-factory/refresh-plan-248398-2026-06-14T19-46-00-721Z.json` (`ready_for_brief`, warning expected because source is published).
+- Existing-post patch plan shipped:
+  - `src/lib/public-site/content-factory/patch-plan.ts`
+  - `contentFactoryPatchBrief.v1`
+  - `contentFactoryPatchPlan.v1`
+  - `pnpm public-website:content-factory:patch-plan -- --refresh-plan <refresh-plan.json> --brief <patch-brief.json>`
+  - Reads local JSON only; does not call WordPress.
+  - Validates target post id, source fingerprint, safe constraints (`preservePublishedSource=true`, `requireDraftClone=true`), per-block expected fingerprints, proposed text presence and candidate compatibility.
+  - Evidence for `248398`: brief `docs/operations/public-site-content-factory/patch-brief-248398-guided-refresh-2026-06-14.json` and plan `docs/operations/public-site-content-factory/patch-plan-248398-2026-06-14T19-52-01-053Z.json` (`ready_for_draft_clone`, 4 ready operations, still `sendsWordPressWrite=false`).
 - Contract output: `contentFactoryValidation.v1`.
 - Safety: non-mutating; validates local JSON artifacts only and never calls WordPress.
 - Current behavior:

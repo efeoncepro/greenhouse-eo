@@ -182,6 +182,12 @@ the source inspection.
   it records `sendsWordPressWrite=false`, `modifiesPublishedSource=false`,
   source fingerprint, candidates by `path + fingerprint`, preserve gates and
   media/link/SEO review gates.
+- When a concrete refresh brief exists, run
+  `pnpm public-website:content-factory:patch-plan -- --refresh-plan <refresh-plan.json> --brief <patch-brief.json>`
+  to produce `contentFactoryPatchPlan.v1`. The brief must require a draft clone,
+  preserve the published source and include source/block fingerprints for
+  proposed text changes. `ready_for_draft_clone` is not a write approval; it only
+  means the local artifact can feed a future draft/private clone command.
 - Preserve existing media/embed blocks unless the task explicitly asks to
   replace them.
 - Do not rewrite `core/freeform` aggressively. Mark it as legacy and patch

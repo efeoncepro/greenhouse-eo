@@ -1,0 +1,126 @@
+{
+  "contractVersion": "contentFactoryPatchPlan.v1",
+  "generatedAt": "2026-06-14T19:52:01.053Z",
+  "mode": "plan_only",
+  "sendsWordPressWrite": false,
+  "modifiesPublishedSource": false,
+  "objective": "Refresh the Loop Marketing opening and meta description for AI search/AEO clarity while preserving the published post, structure and media.",
+  "target": {
+    "wordpressPostId": 248398,
+    "url": "https://efeoncepro.com/loop-marketing/que-es-loop-marketing/",
+    "slug": "que-es-loop-marketing",
+    "status": "publish",
+    "editorModel": "gutenberg_blocks",
+    "sourceScannedAt": "2026-06-14T19:40:52+00:00",
+    "sourceModified": "2025-09-08T21:13:29+00:00",
+    "sourceFingerprint": "c613e8ce9d991c289de7d7aef396a64b4b0fddcf8aa0563e7e17c6291a1289b5"
+  },
+  "sourceRefreshPlan": {
+    "contractVersion": "contentFactoryRefreshPlan.v1",
+    "generatedAt": "2026-06-14T19:46:00.721Z",
+    "sourceFingerprint": "c613e8ce9d991c289de7d7aef396a64b4b0fddcf8aa0563e7e17c6291a1289b5"
+  },
+  "safetyPolicy": {
+    "writesWordPressContent": false,
+    "publishesContent": false,
+    "modifiesPublishedSource": false,
+    "clearsCache": false,
+    "createsBackup": false,
+    "sendsSecretsToOutput": false
+  },
+  "readiness": {
+    "status": "ready_for_draft_clone",
+    "blockers": [],
+    "warnings": []
+  },
+  "operations": [
+    {
+      "operation": "review_seo",
+      "targetPath": "seo.yoastDescription",
+      "nativeKind": "seo",
+      "key": "yoastDescription",
+      "currentText": "Descubre Loop Marketing: el bucle infinito que supera al funnel y al flywheel con agilidad, IA y humanidad para competir hoy.",
+      "proposedText": "Descubre que es Loop Marketing: un framework continuo para combinar IA, contenido, datos y aprendizaje rapido sin depender del funnel tradicional.",
+      "rationale": "Align the snippet with AI search/AEO intent while preserving the post's educational promise.",
+      "risk": "medium",
+      "status": "ready",
+      "blockers": [],
+      "warnings": [],
+      "guardrails": [
+        "Do not change index policy or canonical behavior in this plan-only lane.",
+        "Apply only to a draft/private clone after revalidating the source fingerprint.",
+        "Never patch the published source object from this plan."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "0",
+      "nativeKind": "blockName",
+      "key": "core/paragraph",
+      "fingerprint": "5e26c4e33db6d140d72f757adf034a41d2ae6a3d5182e5ef1929b410eeab1bde",
+      "currentText": "¿Te acuerdas cuando el funnel era la estrella? Todos felices dibujando embudos en pizarras como si los clientes avanzaran obedientes de Awareness a Decision. Luego vino el flywheel...",
+      "proposedText": "Durante anos, el funnel fue el mapa favorito del marketing: una ruta ordenada donde las personas avanzaban de awareness a decision casi sin desviarse. Luego aparecio el flywheel y puso al cliente al centro. Pero hoy, entre IA, busquedas sin clic y decisiones no lineales, ni el embudo ni la rueda explican por completo como se mueve un comprador real.",
+      "rationale": "Refresh the opening without changing the native paragraph block or the surrounding structure.",
+      "risk": "low",
+      "status": "ready",
+      "blockers": [],
+      "warnings": [],
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly.",
+        "Apply only to a draft/private clone after revalidating the source fingerprint.",
+        "Never patch the published source object from this plan."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "2",
+      "nativeKind": "blockName",
+      "key": "core/paragraph",
+      "fingerprint": "b770a9e8676a083216ec22c8d2a3472257f9f9a1ddb624d3c3171add52b3111e",
+      "currentText": "La verdad es que hoy los clientes no caminan en fila india. Saltan de streaming en YouTube a scrolling infinito en Instagram, buscan en Google o preguntan a un chatbot (searching) ...",
+      "proposedText": "Hoy una persona puede descubrir una idea en YouTube, comparar opciones en redes, preguntarle a un asistente de IA, volver a Google y terminar comprando desde el celular. Ese recorrido no es una linea: es un loop de senales, aprendizajes y microdecisiones.",
+      "rationale": "Make the buyer journey explanation more direct for the refreshed AEO angle.",
+      "risk": "low",
+      "status": "ready",
+      "blockers": [],
+      "warnings": [],
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly.",
+        "Apply only to a draft/private clone after revalidating the source fingerprint.",
+        "Never patch the published source object from this plan."
+      ]
+    },
+    {
+      "operation": "preserve",
+      "targetPath": "16",
+      "nativeKind": "media",
+      "key": "core/image",
+      "fingerprint": "87ae673ad44abdbb089e38c4b9c04ad448966da0c2d7f869b05cdbd37984f423",
+      "rationale": "Preserve the existing Loop-MKT.svg media block; no media replacement is requested.",
+      "risk": "medium",
+      "status": "ready",
+      "blockers": [],
+      "warnings": [],
+      "guardrails": [
+        "Do not invent or replace media IDs.",
+        "Preserve the existing asset unless the refresh brief explicitly requests a replacement.",
+        "If replaced later, upload/reconcile media first and patch only a draft/private clone.",
+        "Apply only to a draft/private clone after revalidating the source fingerprint.",
+        "Never patch the published source object from this plan."
+      ]
+    }
+  ],
+  "nextStep": {
+    "command": "prepare_existing_post_refresh_draft_clone",
+    "status": "not_implemented",
+    "notes": "The next command should create or prepare a draft/private clone plan. It is intentionally not implemented in this plan-only slice."
+  },
+  "rollback": {
+    "strategy": "no_runtime_change_plan_only",
+    "notes": "This patch plan is a local artifact only. It performs no WordPress mutation, so rollback is deleting the artifact."
+  }
+}

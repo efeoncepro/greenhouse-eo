@@ -283,6 +283,101 @@ export type ContentFactoryRefreshPlan = {
   }
 }
 
+export type ContentFactoryPatchBriefChangeOperation = 'update_text' | 'review_seo' | 'review_link' | 'preserve'
+
+export type ContentFactoryPatchBriefChange = {
+  operation: ContentFactoryPatchBriefChangeOperation
+  targetPath: string
+  expectedFingerprint?: string
+  proposedText?: string
+  proposedHref?: string
+  rationale: string
+}
+
+export type ContentFactoryPatchBrief = {
+  contractVersion: 'contentFactoryPatchBrief.v1'
+  createdAt?: string
+  objective: string
+  target: {
+    wordpressPostId: number
+    sourceFingerprint: string
+  }
+  constraints: {
+    preservePublishedSource: true
+    requireDraftClone: true
+    preserveMedia: boolean
+    preserveStructure: boolean
+  }
+  changes: ContentFactoryPatchBriefChange[]
+}
+
+export type ContentFactoryPatchPlanOperation = {
+  operation: ContentFactoryPatchBriefChangeOperation
+  targetPath: string
+  nativeKind: ContentFactoryRefreshPlanChangeCandidate['nativeKind']
+  key: string
+  fingerprint?: string
+  currentText?: string
+  proposedText?: string
+  proposedHref?: string
+  rationale: string
+  risk: 'low' | 'medium' | 'high'
+  status: 'ready' | 'needs_review' | 'blocked'
+  blockers: Array<{
+    code: string
+    message: string
+  }>
+  warnings: Array<{
+    code: string
+    message: string
+  }>
+  guardrails: string[]
+}
+
+export type ContentFactoryPatchPlan = {
+  contractVersion: 'contentFactoryPatchPlan.v1'
+  generatedAt: string
+  mode: 'plan_only'
+  sendsWordPressWrite: false
+  modifiesPublishedSource: false
+  objective: string
+  target: ContentFactoryRefreshPlan['target']
+  sourceRefreshPlan: {
+    contractVersion: ContentFactoryRefreshPlan['contractVersion']
+    generatedAt: string
+    sourceFingerprint: string
+  }
+  safetyPolicy: {
+    writesWordPressContent: false
+    publishesContent: false
+    modifiesPublishedSource: false
+    clearsCache: false
+    createsBackup: false
+    sendsSecretsToOutput: false
+  }
+  readiness: {
+    status: 'ready_for_draft_clone' | 'needs_review' | 'blocked'
+    blockers: Array<{
+      code: string
+      message: string
+    }>
+    warnings: Array<{
+      code: string
+      message: string
+    }>
+  }
+  operations: ContentFactoryPatchPlanOperation[]
+  nextStep: {
+    command: 'prepare_existing_post_refresh_draft_clone'
+    status: 'not_implemented'
+    notes: string
+  }
+  rollback: {
+    strategy: 'no_runtime_change_plan_only'
+    notes: string
+  }
+}
+
 export type ContentFactoryDraftSmokePlan = {
   contractVersion: 'contentFactoryDraftSmokePlan.v1'
   generatedAt: string
