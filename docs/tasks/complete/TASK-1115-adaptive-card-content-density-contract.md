@@ -2,7 +2,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Medio`
@@ -140,3 +140,18 @@ Reglas obligatorias:
 - GVC del card a full/condensed/peek desktop+mobile + condensación honesta (no clip) mirada.
 - Verificar boundary: el card NO importa nada de `composition-shell/**` (decoupled).
 - `greenhouse-documentation-governor` al cierre.
+
+## Cierre 2026-06-14 — COMPLETE
+
+**Construido (código real, aditivo opt-in, default `full` byte-idéntico):**
+- Slice 1 — `card-density/`: `card-density.ts` (contract `full`/`condensed`/`peek` + `resolveCardDensity(width)` + `resolveCardDensityRequest` override/auto/default-full + `isCardDensityAtLeast` + `compareCardDensity` + `isCardDensity`) — **generaliza TASK-743** + reusa el patrón `resolveAdaptiveSidecarMode`. `useContainerDensity.ts` (hook ResizeObserver SSR-safe, modo inicial `full` sin hydration mismatch, `container-type: inline-size` solo en `'auto'`). 8 tests del resolver verde. Export en el barrel.
+- Slice 2 — adopción en `MetricSummaryCard` (condensed oculta subtitle, mantiene status=señal; peek = title+value) + `MetricTrendCard` (condensed reduce chart 152→96 + oculta metricName/period; peek sin chart, value+delta). **Condensación honesta** (state-design): el value nunca desaparece, nunca clip. 313 tests de `primitives/` (0 regresión en `full`).
+- Slice 3 — Lab `/design-system/card-density` (el mismo card a 3 anchos) + page + catálogo DS + route-reachability (0 orphans) + scenario GVC + **baseline durable committeado** desktop+mobile (mirado: condensación honesta sin clip).
+
+**Boundary verificado:** ningún archivo de `card-density/` ni los cards importa de `composition-shell/**` — el seam es la container query (decoupled). No se creó componente `adaptive-card` paralelo ni se construyó sobre `AdaptiveSidecarLayout`.
+
+**No construido (deferido, explícito):** `GreenhouseChartCard` (otros chart variants) — adopción oportunista por card cuando viva en una región que condense (additive, un card no migrado sigue rígido sin regresión).
+
+**Evidencia:** 8 + 313 tests verde · tsc 0 · `pnpm build` (Turbopack) verde · GVC desktop+mobile mirado + baseline promovido.
+
+**Estado de rollout:** code-complete + operativamente completo (UI primitive opt-in, sin flags/env/migraciones/integración externa). NO se tocaron Handoff/changelog/project_context (WIP entangled EPIC-019 de Codex).

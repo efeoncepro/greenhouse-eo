@@ -268,3 +268,12 @@ Tras congelar el substrato (TASK-1114), se cerró el trabajo pendiente REAL decl
 - **reduced-motion horneado** (`useReducedMotion`): swap instantáneo, never-hidden, compositor-only (transform/opacity).
 
 **Evidencia:** 36 tests focales del substrato verde · 305 tests de `primitives/` verde · tsc 0 · lint rule RuleTester verde · GVC desktop+mobile mirado (single/leadPlusContext/split + drawer compact + telemetry en vivo) → baseline promovido. **TASK-1119 + TASK-1117 → complete.** El veredicto SIBLINGS se mantiene (no se fusiona con `NexaMomentComposition`).
+
+## Delta 2026-06-14 (c) — Adaptive Card density contract shipped (TASK-1115, la capacidad HERMANA)
+
+La capacidad hermana que el Delta 2026-06-13 (b) declaró ("el shell mueve el contenedor; sin cards adaptables la fluidez se rompe en el micro — clipean al condensar") está **shipped**. El boundary se respetó verbatim: **el card se adapta a su propio ancho (container query), NO hereda del shell — el seam es la container query.**
+
+- **`card-density`** (capacidad COMPARTIDA, no un componente card nuevo): `useContainerDensity` (ResizeObserver SSR-safe) + `resolveCardDensity`/`resolveCardDensityRequest` resuelven los modos `full`/`condensed`/`peek` por el ancho del propio card. Generaliza el density contract de tablas (TASK-743) + reusa el patrón `size→behavior` de `resolveAdaptiveSidecarMode` (un solo motor de adaptación en la plataforma).
+- **Condensación honesta** (state-design): cada modo es una versión real más chica; el dato clave (value) nunca desaparece; NUNCA clip/overflow/`$0`.
+- **Adopción aditiva opt-in** (`density?: CardDensityRequest`, default `full` byte-idéntico): `MetricSummaryCard` + `MetricTrendCard`. NUNCA fork paralelo ni construir sobre `AdaptiveSidecarLayout` (es panel, no card) — se extienden los card primitives existentes.
+- **Evidencia:** 8 tests del resolver + 313 tests de `primitives/` (0 regresión en `full`) · tsc 0 · Lab `/design-system/card-density` + baseline GVC durable desktop+mobile mirado (full/condensed/peek, condensación honesta sin clip). **TASK-1115 → complete.**

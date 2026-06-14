@@ -6,6 +6,15 @@
 
 ---
 
+## Delta 2026-06-14 (b) — Adaptive Card density contract (TASK-1115, hermana del Composition Shell)
+
+Capacidad **compartida** (no un componente card nuevo): los cards se adaptan a SU propio ancho (container query) → cuando una región del Composition Shell condensa, el card muestra una versión real más chica en vez de clipear. Cierra la fluidez en el micro.
+
+- **`card-density`** (`@/components/greenhouse/primitives`): `useContainerDensity` (ResizeObserver SSR-safe) + `resolveCardDensity`/`resolveCardDensityRequest` + `isCardDensityAtLeast`. Modos `full`/`condensed`/`peek` resueltos por el ancho del propio card. **Generaliza el density contract de tablas (TASK-743)** + reusa el patrón `size→behavior` de `resolveAdaptiveSidecarMode` (TASK-1028). El card NO hereda del shell — **el seam es la container query**.
+- **Condensación honesta** (state-design): versión real más chica, NUNCA clip/overflow/`$0`; el dato clave (value) nunca desaparece.
+- **Adopción aditiva opt-in** (`density?: CardDensityRequest`, default `full` byte-idéntico): `MetricSummaryCard` (condensed oculta subtitle, mantiene status; peek = title+value) + `MetricTrendCard` (condensed reduce el chart 152→96 + oculta metricName/period; peek sin chart, value+delta).
+- 8 tests del resolver verde · 313 tests de `primitives/` (0 regresión en `full`) · Lab `/design-system/card-density` + baseline GVC durable desktop+mobile mirado. NUNCA fork ni construir sobre `AdaptiveSidecarLayout`.
+
 ## Delta 2026-06-14 — Composition Shell: hardening V1.1 (TASK-1119) + fluidez V1.2 (TASK-1117)
 
 El substrato de coreografía de layout (`CompositionShell`, TASK-1114) cerró su trabajo pendiente real — **aditivo + opt-in**, default byte-idéntico a V1.
