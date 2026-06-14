@@ -46,6 +46,9 @@ const RPA_SERIES: MetricTrendPoint[] = [
   { label: 'May', value: 1.27 }
 ]
 
+// Valores objetivo de las cards de la secuencia macro: el conteo sube de 0 → estos en cada Reproducir.
+const SEQ_TARGET_VALUES = { otd: 87.4, rpa: 1.27 } as const
+
 const SpecimenRow = ({ title, render }: { title: string; render: (width: number) => ReactNode }) => (
   <Stack spacing={3} data-capture={`card-density-row-${title.toLowerCase().replace(/\s+/g, '-')}`}>
     <Typography variant='subtitle2'>{title}</Typography>
@@ -139,13 +142,42 @@ const CardDensityLabView = () => {
   // SSR-safe (las cards renderizan en estado final; la animación no toca el primer paint). `stagger` garantiza
   // el orden + el beat; no hay variant inheritance (lo que rompía SSR en el shell). Tokens canónicos.
   const [seqScope, animateSeq] = useAnimate()
+  // `playToken` cambia en cada Reproducir → re-monta las cards de la secuencia (por su `key`) → el chart se
+  // dibuja solo (Recharts area draw-in re-corre en cada mount). Confiable e independiente del conteo.
+  const [playToken, setPlayToken] = useState(0)
+  // El conteo lo MANEJA el Lab (no el AnimatedCounter interno, que gatea en un IntersectionObserver asíncrono y
+  // al re-montar salta directo al objetivo). Una rampa rAF sube `seqValues` 0 → objetivo con easing; la card solo
+  // renderiza el número que recibe → sube sí o sí, sin depender del IO/spring interno. Determinista + replay-proof.
+  const [seqValues, setSeqValues] = useState<{ otd: number; rpa: number }>(SEQ_TARGET_VALUES)
+  const rampRafRef = useRef<number | null>(null)
 
-  // Ensamble: cada card ENTRA armándose (no solo aparece) — encogida + inclinada en 3D (rotateX) + abajo, y
-  // se acomoda en su lugar con un rebote (easeOutBack = overshoot), escalonadas (`stagger`). Replay-proof:
-  // cada click resetea al estado oculto y vuelve a correr la cascada completa. Imperativo + client-only → SSR-safe.
+  useEffect(() => () => { if (rampRafRef.current !== null) cancelAnimationFrame(rampRafRef.current) }, [])
+
+  // Ensamble (nivel máximo "armándose"): la CAJA de cada card entra encogida + inclinada en 3D (rotateX) + abajo y
+  // se acomoda con rebote (easeOutBack), escalonada (`stagger`); a la vez el chart se dibuja solo (re-monte) y el
+  // número sube contando (rampa 0 → objetivo). Imperativo + client-only → SSR-safe. Replay confiable.
   const playSequence = () => {
-    // Keyframes `[desde, hasta]` → cada click ANIMA DESDE EL INICIO (oculto, encogido, inclinado) hasta su lugar,
-    // con rebote (easeOutBack) y escalonado. Replay confiable: no necesita reset previo, cada llamada reproduce.
+    setPlayToken(token => token + 1) // re-monta → el chart se redibuja
+    setSeqValues({ otd: 0, rpa: 0 }) // arranca el conteo desde 0
+
+    if (rampRafRef.current !== null) cancelAnimationFrame(rampRafRef.current)
+    const COUNT_MS = 900
+    const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3)
+    const start = performance.now()
+
+    const tick = (now: number) => {
+      const p = Math.min(1, (now - start) / COUNT_MS)
+      const k = easeOutCubic(p)
+
+      setSeqValues({
+        otd: Math.round(SEQ_TARGET_VALUES.otd * k * 10) / 10,
+        rpa: Math.round(SEQ_TARGET_VALUES.rpa * k * 100) / 100
+      })
+      rampRafRef.current = p < 1 ? requestAnimationFrame(tick) : null
+    }
+
+    rampRafRef.current = requestAnimationFrame(tick)
+
     void animateSeq(
       '[data-seq-card]',
       { opacity: [0, 1], scale: [0.82, 1], y: [44, 0], rotateX: [-14, 0] },
@@ -258,10 +290,11 @@ const CardDensityLabView = () => {
       >
         <Box data-seq-card>
           <MetricTrendCard
+            key={playToken}
             title='OTD%'
             metricName='On-Time Delivery'
             periodLabel='Mensual · May 2026'
-            value={87.4}
+            value={seqValues.otd}
             series={TREND_SERIES}
             tone='success'
             format='percentage'
@@ -270,6 +303,7 @@ const CardDensityLabView = () => {
         </Box>
         <Box data-seq-card>
           <MetricSummaryCard
+            key={playToken}
             title='RpA Global'
             value='1.27'
             subtitle='benchmark adaptado'
@@ -282,10 +316,11 @@ const CardDensityLabView = () => {
         </Box>
         <Box data-seq-card>
           <MetricTrendCard
+            key={playToken}
             title='RpA'
             metricName='Rondas por aprobación'
             periodLabel='Mensual · May 2026'
-            value={1.27}
+            value={seqValues.rpa}
             series={RPA_SERIES}
             tone='success'
             format='decimal'
