@@ -5,6 +5,32 @@ export type ContentFactoryLane =
   | 'refresh_existing_elementor_landing'
   | 'fix_existing_public_site_module'
 
+export type ContentFactoryBrief = {
+  contractVersion: 'contentFactoryBrief.v1'
+  intent: 'create' | 'refresh' | 'fix'
+  lane: ContentFactoryLane
+  objective: string
+  audience: string
+  target?: {
+    wordpressPostId?: number
+    url?: string
+    moduleId?: string
+    editorModel?: 'gutenberg_blocks' | 'elementor_document' | 'unknown'
+  }
+  offer?: string
+  serviceKey?: string
+  campaignId?: string
+  hubspotCampaignId?: string
+  primaryKeyword?: string
+  secondaryKeywords?: string[]
+  tone: 'efeonce_expert' | 'educational' | 'conversion' | 'thought_leadership'
+  locale: 'es-CL' | 'en-US' | 'pt-BR'
+  cta: {
+    kind: 'hubspot_form' | 'hubspot_meeting' | 'external_url' | 'greenhouse_capture'
+    target: string
+  }
+}
+
 export type ContentFactoryGeneratedDraft = {
   contractVersion: 'contentFactoryGeneratedDraft.v1'
   intent: 'create' | 'refresh' | 'fix'

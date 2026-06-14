@@ -307,6 +307,10 @@ Reglas obligatorias:
   - `src/lib/public-site/content-factory/gutenberg-validator.ts`
   - `validateGeneratedGutenbergDraft()`
   - `pnpm public-website:content-factory:validate`
+- Second primitive shipped:
+  - `src/lib/public-site/content-factory/gutenberg-planner.ts`
+  - `planGeneratedGutenbergPostDraft()`
+  - `pnpm public-website:content-factory:plan`
 - Contract output: `contentFactoryValidation.v1`.
 - Safety: non-mutating; validates local JSON artifacts only and never calls WordPress.
 - Current behavior:
@@ -315,6 +319,8 @@ Reglas obligatorias:
 - Evidence:
   - Vitest focal covers pass, unsafe markup block, unsupported block block and legacy freeform warning.
   - CLI smoke with local temp `contentFactoryGeneratedDraft.v1` returned `status=pass`.
+  - Golden example validated with `status=pass`: `docs/documentation/public-site/content-factory-golden-examples/gutenberg-post-ai-revops-draft.json`.
+  - Planner smoke from local `contentFactoryBrief.v1` produced a valid generated draft and validator returned `status=pass`.
 
 ### Slice 5 — CLI and Evidence Lane for Agents
 
