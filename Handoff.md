@@ -1,5 +1,13 @@
 # Release 2026-06-10 #2 — develop→main `6c649b2a6` RELEASED
 
+## Sesion 2026-06-14 — TASK-1123 Greenhouse AI Content Factory Agent Kit creada (Codex)
+
+- **Decision de producto:** la Content Factory es AI-native, pero no chat-first. No se construye un chat nuevo; se crea un Agent Kit para que Codex, Claude Code, Nexa y futuros agentes sepan construir contenido WordPress con recursos gobernados.
+- **Full API Parity:** toda capacidad de la Content Factory debe nacer como primitive/reader/command server-side o path programatico explicito. UI, CLI y MCP son clients/adapters; MCP queda downstream de API Platform/primitives, nunca como bypass.
+- **Task registrada:** `docs/tasks/to-do/TASK-1123-greenhouse-ai-content-factory-agent-kit.md`, P1/alto, EPIC-019. Scope: specs `contentFactory*.v1`, recipes Gutenberg, recipes Elementor/Ohio, catalogos machine-readable, golden examples, validators, CLI evidence lane, primer smoke plan `post_draft_gutenberg`, y diseño MCP posterior.
+- **Indices sincronizados:** `docs/tasks/README.md`, `docs/tasks/TASK_ID_REGISTRY.md`, `EPIC-019`, `project_context.md` y `changelog.md`.
+- **Cuidado multi-agente:** habia cambios ajenos sin tocar en `src/components/greenhouse/primitives/nexa-answer-bubble/NexaAnswerBubble.tsx` y `_nexa_count.mjs`; no fueron stageados ni modificados.
+
 ## Sesion 2026-06-14 — Public Site bridge v0.3.1 signed draft foundation deployed/provisioned (Codex)
 
 - **TASK-1116 tomada en `develop`:** el hook `pnpm codex:task-hook TASK-1116 --develop` paso tras mover la task a `in-progress` y separar blockers de rollout. Excepcion de rama documentada: se mantuvo `develop`, no se creo branch/worktree.
