@@ -155,19 +155,22 @@ const CardDensityLabView = () => {
 
   // Ensamble (nivel máximo "armándose"): la CAJA de cada card entra encogida + inclinada en 3D (rotateX) + abajo y
   // se acomoda con rebote (easeOutBack), escalonada (`stagger`); a la vez el chart se dibuja solo (re-monte) y el
-  // número sube contando (rampa 0 → objetivo). Imperativo + client-only → SSR-safe. Replay confiable.
+  // número sube contando. Imperativo + client-only → SSR-safe. Replay confiable.
   const playSequence = () => {
     setPlayToken(token => token + 1) // re-monta → el chart se redibuja
     setSeqValues({ otd: 0, rpa: 0 }) // arranca el conteo desde 0
 
     if (rampRafRef.current !== null) cancelAnimationFrame(rampRafRef.current)
-    const COUNT_MS = 900
-    const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3)
+    // El número sube parejo con easeInOut (NO front-loaded) durante toda la ventana del ensamble, terminando
+    // junto/después del barrido del chart — nunca antes. Antes (easeOutCubic) terminaba temprano y el chart
+    // "entraba después de que el número ya estaba listo"; al no terminar temprano, esa sensación desaparece.
+    const COUNT_MS = 720
+    const easeInOutCubic = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2)
     const start = performance.now()
 
     const tick = (now: number) => {
       const p = Math.min(1, (now - start) / COUNT_MS)
-      const k = easeOutCubic(p)
+      const k = easeInOutCubic(p)
 
       setSeqValues({
         otd: Math.round(SEQ_TARGET_VALUES.otd * k * 10) / 10,
