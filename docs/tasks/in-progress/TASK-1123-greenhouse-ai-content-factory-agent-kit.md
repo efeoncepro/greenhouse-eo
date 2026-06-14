@@ -319,6 +319,11 @@ Reglas obligatorias:
   - `src/lib/public-site/content-factory/gutenberg-planner.ts`
   - `planGeneratedGutenbergPostDraft()`
   - `pnpm public-website:content-factory:plan`
+- Block pattern catalog shipped:
+  - `src/lib/public-site/content-factory/gutenberg-pattern-catalog.ts`
+  - `gutenbergBlockPatternCatalog.v1`
+  - `pnpm public-website:content-factory:patterns`
+  - Policies cover generated vs inspect-only blocks, media/source-asset requirements, refresh preservation, and safe examples for agent/MCP consumption.
 - Contract output: `contentFactoryValidation.v1`.
 - Safety: non-mutating; validates local JSON artifacts only and never calls WordPress.
 - Current behavior:

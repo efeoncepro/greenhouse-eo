@@ -8,6 +8,8 @@ Rules:
 - Keep examples as local artifacts only; they do not publish or write WordPress.
 - Validate every `contentFactoryGeneratedDraft.v1` example with:
   `pnpm public-website:content-factory:validate -- --file <path>`.
+- Use `pnpm public-website:content-factory:patterns` to inspect the current
+  `gutenbergBlockPatternCatalog.v1` before creating or refreshing a post.
 - Prefer Gutenberg block comments and governed blocks for posts.
 - Avoid `core/freeform` in new drafts, even though legacy posts use it.
 - Match the Efeonce blogpost composition profile: intro, TL;DR/list,

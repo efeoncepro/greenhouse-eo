@@ -100,6 +100,37 @@ export type GutenbergBlogpostCompositionProfile = {
   enrichmentBlocks: string[]
 }
 
+export type GutenbergBlockPatternCatalogEntry = {
+  blockName: string
+  role:
+    | 'structure'
+    | 'body'
+    | 'navigation'
+    | 'media'
+    | 'conversion'
+    | 'layout'
+    | 'legacy'
+    | 'third_party'
+  generationPolicy: 'allowed' | 'recommended' | 'requires_source_asset' | 'inspect_only'
+  refreshPolicy: 'preserve' | 'patch_carefully' | 'replace_with_review' | 'inspect_only'
+  description: string
+  requires?: string[]
+  constraints: string[]
+  example?: string
+}
+
+export type GutenbergBlockPatternCatalog = {
+  contractVersion: 'gutenbergBlockPatternCatalog.v1'
+  key: 'efeonce_gutenberg_blogpost'
+  generatedAt?: string
+  source: {
+    recipePath: string
+    validatorProfile: 'EFEONCE_BLOGPOST_COMPOSITION_PROFILE'
+    observedRuntimeSample: string
+  }
+  entries: GutenbergBlockPatternCatalogEntry[]
+}
+
 export type ContentFactoryDraftSmokePlan = {
   contractVersion: 'contentFactoryDraftSmokePlan.v1'
   generatedAt: string

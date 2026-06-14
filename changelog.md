@@ -8763,6 +8763,7 @@ Validations: tsc 0 errors, lint 0 errors, 427 files / 2225 tests pass / 5 skippe
 ## 2026-06-14
 
 - Public Site / Content Factory: se agregó el perfil `EFEONCE_BLOGPOST_COMPOSITION_PROFILE` para validar posts Gutenberg estructurados con TOC, jerarquía H2/H3, listas, quotes/separadores y slots reales de media/embed, evitando drafts AI planos compuestos solo por párrafos.
+- Public Site / Content Factory: se agregó `gutenbergBlockPatternCatalog.v1` y el comando `pnpm public-website:content-factory:patterns` para que agentes/MCP futuros consulten políticas por bloque Gutenberg: generación, refresh, assets requeridos, legacy inspect-only y ejemplos seguros.
 - Public Site / Agent Kit: se documentó la receta de composición de blogposts a partir de inspección WP-CLI read-only de posts recientes de `efeoncepro.com`, incluyendo manejo de `core/freeform` como deuda legacy observable y no como bloque generado por defecto.
 
 ## 2026-04-13

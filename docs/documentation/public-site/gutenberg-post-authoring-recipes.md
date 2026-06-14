@@ -41,6 +41,13 @@ For new AI-generated Efeonce blogposts, use the code profile
 `EFEONCE_BLOGPOST_COMPOSITION_PROFILE` in
 `src/lib/public-site/content-factory/gutenberg-validator.ts`.
 
+For machine-readable block policy, use
+`pnpm public-website:content-factory:patterns`. It emits
+`gutenbergBlockPatternCatalog.v1` from
+`src/lib/public-site/content-factory/gutenberg-pattern-catalog.ts`, including
+generation policy, refresh policy, constraints and safe examples for each
+governed block.
+
 Minimum generated structure:
 
 - Intro paragraphs that frame the problem and promise.

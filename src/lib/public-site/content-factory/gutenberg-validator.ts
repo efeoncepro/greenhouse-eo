@@ -28,6 +28,7 @@ const DEFAULT_ALLOWED_GUTENBERG_BLOCKS = [
   'core/column',
   'core/columns',
   'core/embed',
+  'core/gallery',
   'core/group',
   'core/heading',
   'core/image',

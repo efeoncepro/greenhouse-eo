@@ -76,6 +76,7 @@ pnpm public-website:runtime-status
 pnpm public-website:deploy-dry-run
 pnpm public-website:bridge-inspect -- --page-id 244079
 pnpm public-website:content-factory:inspect -- --write
+pnpm public-website:content-factory:patterns
 pnpm public-website:content-factory:plan -- --file ./tmp/content-brief.json --out ./tmp/generated-post-draft.json
 pnpm public-website:content-factory:validate -- --file ./tmp/generated-post-draft.json
 pnpm public-website:content-factory:smoke-plan -- --file ./tmp/generated-post-draft.json --private --write
@@ -94,6 +95,8 @@ Use `pnpm public-website:deploy-dry-run` to compare the runtime repo artifact ag
 Use `pnpm public-website:bridge-inspect -- --page-id <id>` to call the active `greenhouse-wp-bridge` read-only endpoints with Application Password auth from Secret Manager. `--write` stores `docs/operations/public-site-bridge-inspections/inspection-page-*.json`. The command calls health, Elementor document inspection, Gutenberg/block document inspection and Ohio widget catalog, and never prints credentials or `Authorization` headers. Use `--no-catalog` for faster post inspections and `--no-blocks` only when checking older bridge compatibility.
 
 Use `pnpm public-website:content-factory:inspect` to build the agent-facing Content Intelligence Map from bridge reads. By default it inspects `249766` (Gutenberg post sample) and `244079` (Elementor/Ohio landing sample). Add `--target <id[:label]>` or `--targets <id,id>` for other objects. If Secret Manager cannot be reached, pass one or more `--from-bridge-inspection <path>` values to rebuild from versioned `public-site-bridge-inspection.v1` JSON evidence. `--write` stores `docs/operations/public-site-content-factory-catalogs/content-intelligence-map-*.json`. The command is read-only and produces no WordPress mutations.
+
+Use `pnpm public-website:content-factory:patterns` to print `gutenbergBlockPatternCatalog.v1`, the machine-readable block policy for Efeonce blogposts. It maps block names to roles, generation policy, refresh policy, constraints and safe examples. Add `--write` to store `block-pattern-catalog-*.json` under `docs/operations/public-site-content-factory-catalogs/`.
 
 Use `pnpm public-website:content-factory:plan -- --file <brief.json>` to turn a local `contentFactoryBrief.v1` into a generated Gutenberg draft artifact and validation result. Add `--out <draft.json>` to store only the `contentFactoryGeneratedDraft.v1` and `--write` to store a planning evidence bundle under `docs/operations/public-site-content-factory/`. This is deterministic starter scaffolding for agents, not autonomous publish and not a model call.
 
