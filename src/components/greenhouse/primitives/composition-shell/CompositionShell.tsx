@@ -86,7 +86,11 @@ const CompositionShell = ({
   sizeClass: sizeClassOverride,
   leadLabel = 'Respuesta',
   asideLabel = 'Panel contextual',
-  fluidity = 'baseline',
+  // Default `rich` (decisión del operador 2026-06-14): la coreografía rica (stagger de entrada) es el
+  // estándar — más moderna y atractiva. Reduced-motion horneado + el primer paint no se retrasa (el stagger
+  // solo anima al cambiar de composición / montar contenido nuevo). `baseline` queda como opt-out explícito.
+  // El morph interrumpible (framer-motion `layout`) sigue siendo opt-in vía `morphStrategy='interruptible'`.
+  fluidity = 'rich',
   morphStrategy = 'viewTransition',
   onTelemetry,
   telemetrySource,
@@ -231,6 +235,10 @@ const CompositionShell = ({
     }
 
     if (rich) {
+      // Secuencia DUEÑA del shell, SSR-safe: el shell asigna el `staggerIndex` central (orden de DOM: dock →
+      // contenido → overlay) y la región revela explícito con ese delay. Reveal explícito (no variant
+      // inheritance) → framer SSR-renderiza el estado final en server + cliente sin hydration mismatch.
+      // Antes de montar (SSR + primer paint) entra en estado final (`initial=false`) → matchea el HTML del server.
       const motionProps = compositionRegionReveal(staggerIndex, condense, reduced)
 
       return (
@@ -239,7 +247,6 @@ const CompositionShell = ({
           {...shared}
           component={motion.div}
           layout={interruptible ? true : undefined}
-          // Antes de montar (SSR + primer paint) entra en estado final → matchea el HTML del server.
           initial={hasMounted ? motionProps.initial : false}
           animate={motionProps.animate}
           transition={interruptible ? compositionInterruptibleLayoutTransition(reduced) : motionProps.transition}
@@ -260,7 +267,10 @@ const CompositionShell = ({
   // Regiones de contenido in-flow. Si el aside es drawer en compact, se separa del flujo (va al Drawer).
   const inFlowContentRegions = config.contentRegions.filter(r => regions[r] && !(r === 'aside' && asideAsDrawer))
 
-  // Índice de stagger compartido (orden visual de aparición): dock → contenido → overlay.
+  // Secuencia DUEÑA del shell (SSR-safe): el shell asigna el índice de stagger central en orden de DOM
+  // (dock → contenido → overlay) y cada región revela explícito con ese delay. NO usamos `staggerChildren` de
+  // framer (requiere variant inheritance, que NO SSR-renderiza los estilos de los hijos → hydration mismatch +
+  // viola never-hidden). El reveal explícito SSR-renderiza el estado final en server + cliente, sin mismatch.
   let staggerCursor = 0
   const nextIndex = () => staggerCursor++
 
@@ -272,7 +282,10 @@ const CompositionShell = ({
         sx={{
           display: 'grid',
           gap: 5,
-          gridTemplateColumns: 'minmax(0, 1fr) clamp(360px, 32%, 480px)',
+          // En xs (teléfono) `split` apila: el piso de 360px del aside no cabe en un viewport de ~390 y
+          // empujaría el scrollWidth de página (clase ISSUE-015). Desde sm el aside vuelve a su columna.
+          // Esto es CSS-level, complementario al colapso a drawer del size-class compact (asideAsDrawer).
+          gridTemplateColumns: { xs: '1fr', sm: 'minmax(0, 1fr) clamp(320px, 32%, 480px)' },
           alignItems: 'start',
           '& > *': { minInlineSize: 0 }
         }}

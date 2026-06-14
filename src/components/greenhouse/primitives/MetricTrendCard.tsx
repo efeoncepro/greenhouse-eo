@@ -1,7 +1,7 @@
 'use client'
 
 // React Imports
-import { useId, useMemo } from 'react'
+import { useEffect, useId, useMemo, useState, type CSSProperties, type ReactNode } from 'react'
 
 // MUI Imports
 import Box from '@mui/material/Box'
@@ -23,8 +23,15 @@ import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip as RTooltip
 // Greenhouse Imports
 import AnimatedCounter from '@/components/greenhouse/AnimatedCounter'
 import useReducedMotion from '@/hooks/useReducedMotion'
+import { motion, AnimatePresence } from '@/libs/FramerMotion'
 
 import { isCardDensityAtLeast, useContainerDensity, type CardDensityRequest } from './card-density'
+import {
+  cardDensityLayoutTransition,
+  cardDensityRevealTransition,
+  cardDensityRevealRisePx,
+  cardDensityRevealStaggerSec
+} from './card-density/card-density-motion'
 
 // ── Types ─────────────────────────────────────────────────────────────
 
@@ -220,6 +227,72 @@ const MetricTrendCard = ({
   const isPeek = density === 'peek'
   const hideSecondary = isCardDensityAtLeast(density, 'condensed') // condensed + peek
   const chartHeight = hideSecondary ? 96 : 152
+  // Card adaptable: el cambio de fit mode (resize + reflow del chart) se anima con framer `layout` →
+  // morph fluido. Mantiene la semántica `article`. El path legacy (density undefined) NO usa motion.
+  const adaptive = densityRequest !== undefined
+
+  // `layout='position'` (no `size`): framer NO escala la caja → el texto NO se estira a-desproporción durante el
+  // morph de ancho (distorsión clásica de `layout`). El ancho lo sigue el contenedor; layout coreografía posición.
+  const cardMotionProps = adaptive
+    ? {
+        component: motion.article,
+        layout: prefersReduced ? false : ('position' as const),
+        transition: cardDensityLayoutTransition(prefersReduced)
+      }
+    : { component: 'article' as const }
+
+  // SSR-safe: el reveal sólo activa su `initial` tras montar (sin hydration mismatch — patrón CompositionShell).
+  const [hasMounted, setHasMounted] = useState(false)
+
+  useEffect(() => setHasMounted(true), [])
+
+  // Reveal/unfold canónico (TASK-1115): el contenido que entra/sale entre densidades se DESPLIEGA desde altura
+  // 0 (`height: 0↔auto` + opacity, `overflow: hidden`) en vez de popear, mientras la caja morfea con `layout`.
+  // El desync caja(200ms)/contenido(300ms) da el efecto Transformer. Solo en el path adaptable; legacy idéntico.
+  //
+  // ⚠️ `animateHeight=false` (modo fade) es OBLIGATORIO para el chart: el `ResponsiveContainer` de Recharts mide
+  // su contenedor con un ResizeObserver; animar `height: auto` sobre él crea un loop infinito de medición
+  // (`Maximum update depth exceeded`). El chart se desvanece con opacity y su caja la morfea el `layout` del card.
+  const reveal = (
+    key: string,
+    show: boolean,
+    node: ReactNode,
+    opts?: { wrapperStyle?: CSSProperties; animateHeight?: boolean; staggerIndex?: number }
+  ): ReactNode => {
+    if (!adaptive) return show ? node : null
+
+    // Cascada: cada pieza arranca con un delay según su orden de lectura (staggerIndex). Reduced-motion → 0.
+    const delay = prefersReduced ? 0 : (opts?.staggerIndex ?? 0) * cardDensityRevealStaggerSec
+
+    const animateHeight = opts?.animateHeight ?? true
+
+    const variants = animateHeight
+      ? // Texto → UNFOLD: se despliega desde altura 0 (clipado por overflow:hidden).
+        { initial: { height: 0, opacity: 0 }, animate: { height: 'auto', opacity: 1 }, exit: { height: 0, opacity: 0 } }
+      : // Chart → RISE: sube desde +N px + opacity (trayectoria distinta del texto; transform de compositor).
+        {
+          initial: { opacity: 0, y: cardDensityRevealRisePx },
+          animate: { opacity: 1, y: 0 },
+          exit: { opacity: 0, y: cardDensityRevealRisePx }
+        }
+
+    return (
+      <AnimatePresence key={`reveal-${key}`} initial={false} mode={animateHeight ? 'sync' : 'popLayout'}>
+        {show ? (
+          <motion.div
+            key={key}
+            initial={hasMounted ? variants.initial : false}
+            animate={variants.animate}
+            exit={variants.exit}
+            transition={{ ...cardDensityRevealTransition(prefersReduced), delay }}
+            style={animateHeight ? { overflow: 'hidden', ...opts?.wrapperStyle } : opts?.wrapperStyle}
+          >
+            {node}
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
+    )
+  }
 
   const color: MetricTrendTone = tone ?? 'success'
   const fillColor = theme.palette[color].main
@@ -335,7 +408,7 @@ const MetricTrendCard = ({
   return (
     <Card
       ref={densityRef}
-      component='article'
+      {...cardMotionProps}
       aria-label={ariaSummary}
       data-capture={dataCapture}
       data-card-density={density}
@@ -368,11 +441,13 @@ const MetricTrendCard = ({
       <Stack direction='row' alignItems='flex-start' justifyContent='space-between' spacing={2} sx={{ pt: 6, px: 6 }}>
         <Stack direction='row' alignItems='baseline' spacing={1.5} sx={{ minWidth: 0 }}>
           <Typography variant='h5'>{title}</Typography>
-          {metricName && !hideSecondary ? (
+          {reveal(
+            'metricName',
+            Boolean(metricName) && !hideSecondary,
             <Typography variant='body2' color='text.secondary' noWrap sx={{ minWidth: 0 }}>
               {metricName}
             </Typography>
-          ) : null}
+          )}
         </Stack>
         {menuOptions && menuOptions.length > 0 ? (
           <Box sx={{ mt: -1, mr: -1 }}>
@@ -388,11 +463,14 @@ const MetricTrendCard = ({
 
       {/* Value block */}
       <Stack spacing={0.5} sx={{ px: 6, pt: 3, pb: 2 }}>
-        {!hideSecondary ? (
+        {reveal(
+          'period',
+          !hideSecondary,
           <Typography variant='body2' color='text.secondary'>
             {periodLabel}
-          </Typography>
-        ) : null}
+          </Typography>,
+          { staggerIndex: 1 }
+        )}
         <Stack direction='row' alignItems='baseline' spacing={2} flexWrap='wrap'>
           <Typography variant='kpiValue' color='text.primary' component='span'>
             {value !== null ? (
@@ -421,13 +499,22 @@ const MetricTrendCard = ({
         </Stack>
       </Stack>
 
-      {/* Trend chart — edge-to-edge line/area; shrinks in condensed, dropped entirely in peek. */}
-      {!isPeek ? (
-        <Box sx={{ mt: 'auto', pb: 4 }}>
+      {/* Trend chart — edge-to-edge line/area; shrinks in condensed, dropped entirely in peek.
+          `position: relative` contiene la tabla sr-only de abajo (visuallyHidden = position:absolute): sin un
+          ancestro posicionado escaparía al viewport y su contenido `whiteSpace: nowrap` empujaría el
+          scrollWidth de la página (clase TASK-742 / ISSUE-015). Acá queda clipada por su propio width:1px. */}
+      {reveal(
+        'chart',
+        !isPeek,
+        <Box sx={{ pb: 4, position: 'relative' }}>
           {canPlot ? (
           <>
             <AppRecharts>
-              <Box role='img' aria-label={ariaSummary}>
+              {/* `minWidth: 0` + `overflowX: clip` rompen el feedback de Recharts ResponsiveContainer: si el
+                  contenedor se estrecha más rápido de lo que el chart re-mide, el SVG queda con un ancho stale
+                  mayor y empujaría el scrollWidth de página (conocido en contenedores angostos). `clip` corta el
+                  desborde horizontal sin clipar el tooltip vertical (overflow-y queda visible). */}
+              <Box role='img' aria-label={ariaSummary} sx={{ width: '100%', minWidth: 0, overflowX: 'clip' }}>
                 <ResponsiveContainer width='100%' height={chartHeight}>
                   <AreaChart data={chartData} margin={{ top: 8, right: 0, bottom: 0, left: 0 }}>
                     <defs>
@@ -499,8 +586,9 @@ const MetricTrendCard = ({
             </Typography>
           </Box>
           )}
-        </Box>
-      ) : null}
+        </Box>,
+        { wrapperStyle: { marginTop: 'auto' }, animateHeight: false }
+      )}
     </Card>
   )
 }

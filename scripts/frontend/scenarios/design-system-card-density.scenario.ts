@@ -52,6 +52,25 @@ export const scenario: CaptureScenario = {
       label: 'card-density-full-condensed-peek',
       clipSelector: '[data-capture="card-density-lab"]',
       note: 'MetricSummaryCard + MetricTrendCard a full/condensed/peek. Condensación honesta: el value nunca desaparece, nunca clip.'
+    },
+    // The Seam (La Costura) — las dos capacidades jugando dentro de un shell real.
+    { kind: 'scroll', selector: '[data-capture="the-seam-section"]', scrollBlock: 'start' },
+    { kind: 'sleep', ms: 400 },
+    { kind: 'click', selector: '[data-capture="the-seam-control-single"]' },
+    { kind: 'sleep', ms: 700 },
+    {
+      kind: 'mark',
+      label: 'the-seam-single',
+      clipSelector: '[data-capture="the-seam-section"]',
+      note: 'The Seam · single: el primary es ancho → las cards (density=auto) están en modo full.'
+    },
+    { kind: 'click', selector: '[data-capture="the-seam-control-split"]' },
+    { kind: 'sleep', ms: 700 },
+    {
+      kind: 'mark',
+      label: 'the-seam-split',
+      clipSelector: '[data-capture="the-seam-section"]',
+      note: 'The Seam · split: el primary se estrecha (aparece el aside) → las MISMAS cards condensan solas. La costura es el ancho.'
     }
   ]
 }

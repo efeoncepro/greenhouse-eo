@@ -88,10 +88,12 @@ export interface CompositionShellProps {
   /** Label accesible de la región `aside` (a11y). */
   asideLabel?: string
   /**
-   * Enriquecimiento de coreografía (TASK-1117). Opt-in:
-   * - `baseline` (default) = V1: morph estructural (View Transitions) + condense por opacidad.
-   * - `rich` = V1.2: entrada orquestada con stagger del contenido + (opcional) morph interrumpible.
-   * Default behavior byte-idéntico a V1 cuando se omite.
+   * Enriquecimiento de coreografía (TASK-1117):
+   * - `rich` (DEFAULT desde 2026-06-14, decisión del operador) = entrada orquestada con stagger del contenido
+   *   + morph estructural (View Transitions) + (opcional) morph interrumpible. El estándar — coreografía
+   *   moderna; reduced-motion horneado; el primer paint NO se retrasa (el stagger anima al cambiar de
+   *   composición / montar contenido nuevo, no en el load inicial).
+   * - `baseline` = opt-out explícito: morph estructural + condense por opacidad, sin stagger (V1).
    */
   fluidity?: 'baseline' | 'rich'
   /**

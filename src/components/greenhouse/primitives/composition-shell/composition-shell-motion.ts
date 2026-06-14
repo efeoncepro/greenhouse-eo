@@ -60,6 +60,13 @@ export const compositionRegionReveal = (
   }
 }
 
+// Nota (TASK-1117 follow-up): se evaluó orquestar el stagger de regiones con el patrón framer
+// `parent variants + staggerChildren` (el shell como dueño único). Se descartó: `staggerChildren` exige
+// variant inheritance, que NO SSR-renderiza los estilos de los hijos → hydration mismatch + viola never-hidden.
+// La secuencia SÍ es dueña del shell, pero SSR-safe: el shell asigna el índice central (orden de DOM) y cada
+// región revela explícito con `compositionRegionReveal(index, …)`. El reveal explícito SSR-renderiza el estado
+// final en server + cliente sin mismatch. (Re-coreografiar en cada morph sería un trigger post-mount aparte.)
+
 /**
  * Transición del morph INTERRUMPIBLE (framer-motion `layout`): redirigible a media animación (drag, cambio
  * de idea). Solo se usa cuando `morphStrategy='interruptible'` — coexiste con VT, nunca sobre el mismo morph.

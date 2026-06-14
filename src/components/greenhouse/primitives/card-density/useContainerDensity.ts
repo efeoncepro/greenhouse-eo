@@ -45,7 +45,19 @@ export const useContainerDensity = (request?: CardDensityRequest): UseContainerD
     const observer = new ResizeObserver(entries => {
       const width = entries[0]?.contentRect.width
 
-      if (typeof width === 'number') setMeasuredWidth(width)
+      if (typeof width !== 'number') return
+
+      // ⚠️ Anti-loop: NO hacer setState en cada pixel. Solo cuando el width CRUZA un breakpoint (cambia el
+      // density bucket). En cualquier otro resize (sub-pixel, transform de framer `layout`, animación de
+      // reveal) devolvemos `prev` → React bail-out → sin re-render → sin loop. Sin esto, ResizeObserver +
+      // framer `layout` sobre el mismo nodo se retroalimentan → `Maximum update depth exceeded`.
+      setMeasuredWidth(prev => {
+        if (prev !== null && resolveCardDensityRequest('auto', prev) === resolveCardDensityRequest('auto', width)) {
+          return prev
+        }
+
+        return width
+      })
     })
 
     observer.observe(node)
