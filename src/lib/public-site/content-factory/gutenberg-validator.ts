@@ -35,6 +35,7 @@ const DEFAULT_ALLOWED_GUTENBERG_BLOCKS = [
   'core/list',
   'core/list-item',
   'core/paragraph',
+  'core/pullquote',
   'core/quote',
   'core/separator',
   'core/spacer',
@@ -47,7 +48,7 @@ export const EFEONCE_BLOGPOST_COMPOSITION_PROFILE: GutenbergBlogpostCompositionP
   description:
     'Efeonce blog posts should be generated as structured Gutenberg editorial pieces, not plain paragraph dumps.',
   requiredBlocks: ['core/heading', 'core/paragraph', 'core/list', 'yoast-seo/table-of-contents'],
-  recommendedBlocks: ['core/quote', 'core/separator', 'core/image', 'core/embed'],
+  recommendedBlocks: ['core/quote', 'core/pullquote', 'core/separator', 'core/image', 'core/embed'],
   tableOfContentsBlock: 'yoast-seo/table-of-contents',
   minHeadingCount: 3,
   minLevel2HeadingCount: 2,
@@ -55,7 +56,7 @@ export const EFEONCE_BLOGPOST_COMPOSITION_PROFILE: GutenbergBlogpostCompositionP
   maxHeadingJump: 1,
   disallowedGeneratedBlocks: ['core/freeform'],
   mediaBlocks: ['core/image', 'core/embed'],
-  enrichmentBlocks: ['core/list', 'core/quote', 'core/separator', 'core/image', 'core/embed']
+  enrichmentBlocks: ['core/list', 'core/quote', 'core/pullquote', 'core/separator', 'core/image', 'core/embed']
 }
 
 const BLOCK_COMMENT_PATTERN = /<!--\s*(\/)?wp:([A-Za-z0-9_-]+(?:\/[A-Za-z0-9_-]+)?)(?:\s+({[\s\S]*?}))?\s*(\/)?-->/gi

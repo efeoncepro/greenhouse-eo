@@ -21,6 +21,7 @@ posts on `efeoncepro.com`.
 | `249056` Express en Loop Marketing | 671 parsed blocks, `yoast-seo/table-of-contents`, H2/H3 hierarchy, lists, separators, quote. |
 | `249111` Ley 21.719 | 860 parsed blocks, `yoast-seo/table-of-contents`, H2/H3 hierarchy, quotes, lists, separators. |
 | `249114` UCP | 449 parsed blocks, `yoast-seo/table-of-contents`, H2/H3 hierarchy, lists, separators. |
+| `248398` Que es Loop Marketing | 400 parsed blocks, clean Gutenberg-only post, `yoast-seo/table-of-contents`, H2/H3/H4 outline, lists, quotes, pullquotes, separators, one reconciled SVG image, no non-empty freeform fragments. |
 
 Runtime implication:
 
@@ -64,6 +65,8 @@ Minimum generated structure:
 Recommended enrichment:
 
 - `core/quote` for a clear POV line, claim or principle.
+- `core/pullquote` for a short, high-signal editorial callout when the source
+  post already uses highlighted claims or stats.
 - `core/separator` to separate CTA/final reflection from the body.
 - `core/image`, `core/gallery` or `core/embed` only after resolving real
   WordPress media or a valid embed source from the brief/source material.
@@ -129,6 +132,18 @@ Use quote blocks for strong POV lines or principles, not decorative pull text.
 <!-- /wp:quote -->
 ```
 
+### Pullquotes
+
+Use pullquotes sparingly for claims, framing lines or evidence snippets that
+deserve visual emphasis. They are allowed in generated drafts and should be
+preserved during refresh unless the refresh explicitly changes that section.
+
+```html
+<!-- wp:pullquote -->
+<figure class="wp-block-pullquote"><blockquote><p>El loop no es una campaña: es un sistema que aprende en cada vuelta.</p></blockquote></figure>
+<!-- /wp:pullquote -->
+```
+
 ### Images
 
 Images need a real WordPress media ID and URL before any write. If the agent has
@@ -156,6 +171,11 @@ the source inspection.
 
 - Inspect the current post first with bridge/WP-CLI and record post ID, status,
   block counts, heading outline, media refs, links, SEO and CTA state.
+- For a guided refresh candidate, run
+  `pnpm public-website:content-factory:inspect-post-deep -- --post-id <id>`
+  before planning edits. The output is `contentFactoryPostDeepInspection.v1`
+  with block paths, fingerprints, native attrs, editability classes, risks,
+  links, media issues and Yoast metadata.
 - Preserve existing media/embed blocks unless the task explicitly asks to
   replace them.
 - Do not rewrite `core/freeform` aggressively. Mark it as legacy and patch

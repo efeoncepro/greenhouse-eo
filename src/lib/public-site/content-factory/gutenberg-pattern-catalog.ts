@@ -27,6 +27,12 @@ const quoteExample = [
   '<!-- /wp:quote -->'
 ].join('\n')
 
+const pullquoteExample = [
+  '<!-- wp:pullquote -->',
+  '<figure class="wp-block-pullquote"><blockquote><p>El loop no es una campana: es un sistema que aprende en cada vuelta.</p></blockquote></figure>',
+  '<!-- /wp:pullquote -->'
+].join('\n')
+
 const tocExample = [
   '<!-- wp:yoast-seo/table-of-contents -->',
   '<div class="wp-block-yoast-seo-table-of-contents yoast-table-of-contents"><h2>Tabla de contenidos</h2></div>',
@@ -100,6 +106,19 @@ export const EFEONCE_GUTENBERG_BLOCK_PATTERN_ENTRIES: GutenbergBlockPatternCatal
     description: 'POV or principle block for strong editorial claims.',
     constraints: ['Use for substantive POV, not decorative pull text.', 'Preserve attribution if present.'],
     example: quoteExample
+  },
+  {
+    blockName: 'core/pullquote',
+    role: 'structure',
+    generationPolicy: 'allowed',
+    refreshPolicy: 'preserve',
+    description: 'Highlighted editorial pullquote or evidence callout observed in strong Efeonce posts.',
+    constraints: [
+      'Use only when the claim deserves visual emphasis.',
+      'Keep it short and preserve surrounding section rhythm.',
+      'Do not use as a replacement for body explanation.'
+    ],
+    example: pullquoteExample
   },
   {
     blockName: 'core/separator',

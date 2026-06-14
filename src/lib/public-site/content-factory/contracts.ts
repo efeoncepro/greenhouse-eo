@@ -131,6 +131,89 @@ export type GutenbergBlockPatternCatalog = {
   entries: GutenbergBlockPatternCatalogEntry[]
 }
 
+export type ContentFactoryPostBlockEditability =
+  | 'safe_text_edit'
+  | 'safe_attrs_edit'
+  | 'media_requires_reconcile'
+  | 'preserve_structure'
+  | 'inspect_only'
+
+export type ContentFactoryPostDeepInspectionBlock = {
+  path: string
+  depth: number
+  blockName: string
+  attrs: Record<string, unknown>
+  text: string
+  innerBlockCount: number
+  fingerprint: string
+  editability: ContentFactoryPostBlockEditability
+  risks: string[]
+  media?: {
+    id?: number | null
+    attachmentUrl?: string | false | null
+    renderedSrc?: string | null
+    alt?: string
+    width?: number | string | null
+    height?: number | string | null
+  }
+  href?: string | null
+}
+
+export type ContentFactoryPostDeepInspection = {
+  contractVersion: 'contentFactoryPostDeepInspection.v1'
+  scannedAt: string
+  source: 'wp_cli_parse_blocks'
+  safetyPolicy: {
+    writesWordPressContent: false
+    publishesContent: false
+    clearsCache: false
+    createsBackup: false
+    sendsSecretsToOutput: false
+  }
+  post: {
+    id: number
+    type: string
+    status: string
+    slug: string
+    title: string
+    modified: string
+    permalink: string
+    contentLength: number
+  }
+  seo: {
+    yoastTitle: string
+    yoastDescription: string
+    primaryCategory: string
+  }
+  summary: {
+    totalBlocks: number
+    topLevelBlocks: number
+    counts: Record<string, number>
+    maxDepth: number
+    linkCount: number
+    nonEmptyFreeformCount: number
+    mediaIssueCount: number
+  }
+  headingOutline: Array<{
+    path: string
+    level: number
+    text: string
+  }>
+  blocks: ContentFactoryPostDeepInspectionBlock[]
+  links: Array<{
+    href: string
+    text: string
+    kind: 'internal_anchor' | 'internal_url' | 'external_url' | 'unknown'
+  }>
+  mediaIssues: Array<{
+    path: string
+    blockName: string
+    code: 'attachment_url_missing' | 'rendered_src_missing' | 'attachment_render_mismatch'
+    message: string
+  }>
+  editabilityLegend: Record<ContentFactoryPostBlockEditability, string>
+}
+
 export type ContentFactoryDraftSmokePlan = {
   contractVersion: 'contentFactoryDraftSmokePlan.v1'
   generatedAt: string

@@ -324,6 +324,12 @@ Reglas obligatorias:
   - `gutenbergBlockPatternCatalog.v1`
   - `pnpm public-website:content-factory:patterns`
   - Policies cover generated vs inspect-only blocks, media/source-asset requirements, refresh preservation, and safe examples for agent/MCP consumption.
+- Guided existing-post deep inspection shipped:
+  - `src/lib/public-site/content-factory/post-deep-inspection.ts`
+  - `contentFactoryPostDeepInspection.v1`
+  - `pnpm public-website:content-factory:inspect-post-deep -- --post-id <id>`
+  - Outputs post/Yoast metadata, heading outline, flattened Gutenberg block tree with `path`, selected attrs, stable fingerprint, editability class, risks, links and media issues.
+  - Smoke against `248398` (`que-es-loop-marketing`) confirmed a strong Gutenberg sample: 400 parsed blocks, TOC, H2/H3/H4 outline, lists, quotes, pullquotes, separators, one reconciled SVG image, 0 media issues and no non-empty freeform fragments.
 - Contract output: `contentFactoryValidation.v1`.
 - Safety: non-mutating; validates local JSON artifacts only and never calls WordPress.
 - Current behavior:
