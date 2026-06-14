@@ -1,0 +1,24 @@
+{
+  "contractVersion": "contentFactoryPatchBrief.v1",
+  "createdAt": "2026-06-14T20:10:00.000Z",
+  "objective": "Replace the cultural-change pullquote with an original quote that connects Loop Marketing to continuous learning, experimentation and operational culture, without changing the published post.",
+  "target": {
+    "wordpressPostId": 248398,
+    "sourceFingerprint": "c613e8ce9d991c289de7d7aef396a64b4b0fddcf8aa0563e7e17c6291a1289b5"
+  },
+  "constraints": {
+    "preservePublishedSource": true,
+    "requireDraftClone": true,
+    "preserveMedia": true,
+    "preserveStructure": true
+  },
+  "changes": [
+    {
+      "operation": "update_text",
+      "targetPath": "276",
+      "expectedFingerprint": "6986a031c74d6ab2e1e658ce5c21dc44bdd925e618a0e7cc122a4ad379644cd9",
+      "proposedText": "📌 El Loop Marketing no reemplaza la estrategia: reemplaza la espera. La ventaja ya no está en planear campañas perfectas, sino en aprender rápido, ajustar con datos y reinvertir cada señal en el próximo ciclo.",
+      "rationale": "Use an original content-aligned pullquote instead of a fragile external-stat citation, while preserving the Gutenberg pullquote block."
+    }
+  ]
+}

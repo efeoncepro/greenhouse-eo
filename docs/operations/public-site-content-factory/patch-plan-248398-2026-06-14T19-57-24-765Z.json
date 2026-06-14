@@ -1,0 +1,81 @@
+{
+  "contractVersion": "contentFactoryPatchPlan.v1",
+  "generatedAt": "2026-06-14T19:57:24.765Z",
+  "mode": "plan_only",
+  "sendsWordPressWrite": false,
+  "modifiesPublishedSource": false,
+  "objective": "Replace the cultural-change pullquote with an original quote that connects Loop Marketing to continuous learning, experimentation and operational culture, without changing the published post.",
+  "target": {
+    "wordpressPostId": 248398,
+    "url": "https://efeoncepro.com/loop-marketing/que-es-loop-marketing/",
+    "slug": "que-es-loop-marketing",
+    "status": "publish",
+    "editorModel": "gutenberg_blocks",
+    "sourceScannedAt": "2026-06-14T19:40:52+00:00",
+    "sourceModified": "2025-09-08T21:13:29+00:00",
+    "sourceFingerprint": "c613e8ce9d991c289de7d7aef396a64b4b0fddcf8aa0563e7e17c6291a1289b5"
+  },
+  "sourceRefreshPlan": {
+    "contractVersion": "contentFactoryRefreshPlan.v1",
+    "generatedAt": "2026-06-14T19:46:00.721Z",
+    "sourceFingerprint": "c613e8ce9d991c289de7d7aef396a64b4b0fddcf8aa0563e7e17c6291a1289b5"
+  },
+  "safetyPolicy": {
+    "writesWordPressContent": false,
+    "publishesContent": false,
+    "modifiesPublishedSource": false,
+    "clearsCache": false,
+    "createsBackup": false,
+    "sendsSecretsToOutput": false
+  },
+  "readiness": {
+    "status": "blocked",
+    "blockers": [
+      {
+        "code": "276.candidate_not_found",
+        "message": "No compatible refresh candidate exists for update_text at 276."
+      },
+      {
+        "code": "276.target_not_safe_text_edit",
+        "message": "update_text is only allowed for safe_text_edit candidates."
+      }
+    ],
+    "warnings": []
+  },
+  "operations": [
+    {
+      "operation": "update_text",
+      "targetPath": "276",
+      "nativeKind": "blockName",
+      "key": "unknown",
+      "proposedText": "📌 El Loop Marketing no reemplaza la estrategia: reemplaza la espera. La ventaja ya no está en planear campañas perfectas, sino en aprender rápido, ajustar con datos y reinvertir cada señal en el próximo ciclo.",
+      "rationale": "Use an original content-aligned pullquote instead of a fragile external-stat citation, while preserving the Gutenberg pullquote block.",
+      "risk": "high",
+      "status": "blocked",
+      "blockers": [
+        {
+          "code": "candidate_not_found",
+          "message": "No compatible refresh candidate exists for update_text at 276."
+        },
+        {
+          "code": "target_not_safe_text_edit",
+          "message": "update_text is only allowed for safe_text_edit candidates."
+        }
+      ],
+      "warnings": [],
+      "guardrails": [
+        "Apply only to a draft/private clone after revalidating the source fingerprint.",
+        "Never patch the published source object from this plan."
+      ]
+    }
+  ],
+  "nextStep": {
+    "command": "prepare_existing_post_refresh_draft_clone",
+    "status": "not_implemented",
+    "notes": "The next command should create or prepare a draft/private clone plan. It is intentionally not implemented in this plan-only slice."
+  },
+  "rollback": {
+    "strategy": "no_runtime_change_plan_only",
+    "notes": "This patch plan is a local artifact only. It performs no WordPress mutation, so rollback is deleting the artifact."
+  }
+}

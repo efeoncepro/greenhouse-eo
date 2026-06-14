@@ -1,0 +1,4006 @@
+{
+  "contractVersion": "contentFactoryRefreshPlan.v1",
+  "generatedAt": "2026-06-14T19:57:34.601Z",
+  "mode": "plan_only",
+  "sendsWordPressWrite": false,
+  "objective": "Plan guided refresh for the Loop Marketing pullquote without touching the published post",
+  "target": {
+    "wordpressPostId": 248398,
+    "url": "https://efeoncepro.com/loop-marketing/que-es-loop-marketing/",
+    "slug": "que-es-loop-marketing",
+    "status": "publish",
+    "editorModel": "gutenberg_blocks",
+    "sourceScannedAt": "2026-06-14T19:40:52+00:00",
+    "sourceModified": "2025-09-08T21:13:29+00:00",
+    "sourceFingerprint": "c613e8ce9d991c289de7d7aef396a64b4b0fddcf8aa0563e7e17c6291a1289b5"
+  },
+  "sourceInspection": {
+    "contractVersion": "contentFactoryPostDeepInspection.v1",
+    "summary": {
+      "totalBlocks": 400,
+      "topLevelBlocks": 337,
+      "counts": {
+        "core/freeform": 168,
+        "core/heading": 35,
+        "core/image": 1,
+        "core/list": 21,
+        "core/list-item": 53,
+        "core/paragraph": 78,
+        "core/pullquote": 5,
+        "core/quote": 9,
+        "core/separator": 29,
+        "yoast-seo/table-of-contents": 1
+      },
+      "maxDepth": 3,
+      "linkCount": 32,
+      "nonEmptyFreeformCount": 0,
+      "mediaIssueCount": 0
+    },
+    "headingOutlineCount": 35,
+    "mediaIssueCount": 0
+  },
+  "safetyPolicy": {
+    "writesWordPressContent": false,
+    "publishesContent": false,
+    "modifiesPublishedSource": false,
+    "clearsCache": false,
+    "createsBackup": false,
+    "sendsSecretsToOutput": false
+  },
+  "readiness": {
+    "status": "ready_for_brief",
+    "blockers": [],
+    "warnings": [
+      {
+        "code": "published_source_plan_only",
+        "message": "Source post is published. Future changes must target a draft/private clone, never the published source."
+      }
+    ]
+  },
+  "changeCandidates": [
+    {
+      "operation": "review_seo",
+      "targetPath": "seo.yoastTitle",
+      "nativeKind": "seo",
+      "key": "yoastTitle",
+      "currentText": "¿Qué es Loop Marketing? El framework que evoluciona el inbound %%page%% %%sep%% %%sitename%%",
+      "rationale": "SEO title may be refreshed after the new editorial angle is approved.",
+      "risk": "medium",
+      "guardrails": [
+        "Keep the current title unless a reviewed refresh brief improves keyword/positioning intent."
+      ]
+    },
+    {
+      "operation": "review_seo",
+      "targetPath": "seo.yoastDescription",
+      "nativeKind": "seo",
+      "key": "yoastDescription",
+      "currentText": "Descubre Loop Marketing: el bucle infinito que supera al funnel y al flywheel con agilidad, IA y humanidad para competir hoy.",
+      "rationale": "SEO description may be refreshed after validating the target search intent and CTA.",
+      "risk": "medium",
+      "guardrails": [
+        "Do not change index policy or canonical behavior in this plan-only lane."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "0",
+      "nativeKind": "blockName",
+      "key": "core/paragraph",
+      "fingerprint": "5e26c4e33db6d140d72f757adf034a41d2ae6a3d5182e5ef1929b410eeab1bde",
+      "editability": "safe_text_edit",
+      "currentText": "¿Te acuerdas cuando el funnel era la estrella? Todos felices dibujando embudos en pizarras como si los clientes avanzaran obedientes de Awareness a Decision. Luego vino el flywheel...",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "2",
+      "nativeKind": "blockName",
+      "key": "core/paragraph",
+      "fingerprint": "b770a9e8676a083216ec22c8d2a3472257f9f9a1ddb624d3c3171add52b3111e",
+      "editability": "safe_text_edit",
+      "currentText": "La verdad es que hoy los clientes no caminan en fila india. Saltan de streaming en YouTube a scrolling infinito en Instagram, buscan en Google o preguntan a un chatbot (searching) ...",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "4",
+      "nativeKind": "blockName",
+      "key": "core/paragraph",
+      "fingerprint": "9860116727a4dc937e7acba886375552ec6278bbbd64966be1b11faad89b8831",
+      "editability": "safe_text_edit",
+      "currentText": "Ahí es donde HubSpot mete la cuchara (otra vez) y lanza el Loop Marketing: un framework que convierte el desorden en un sistema vivo y ágil. Y ojo a este dato: según HubSpot, los e...",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "6",
+      "nativeKind": "blockName",
+      "key": "core/paragraph",
+      "fingerprint": "28b0f0c04583151699320da08dc68f31272835b48d5e28d3a095dadab89e886a",
+      "editability": "safe_text_edit",
+      "currentText": "Imagina un loop en forma de ∞ donde tu marca expresa su voz, personaliza interacciones, amplifica su alcance y evoluciona con cada aprendizaje. O dicho de otro modo: un ciclo que a...",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "8",
+      "nativeKind": "blockName",
+      "key": "core/paragraph",
+      "fingerprint": "29a00b216c90a6a72f32b8aec023b41fb9ef0c70516c751977940952b3916eae",
+      "editability": "safe_text_edit",
+      "currentText": "Y como acá en Marketing con Manzanitas no nos gusta complicar lo que se puede explicar fácil, te lo explico con manzanitas 🍏: qué es el Loop Marketing, cómo funciona, en qué se di...",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "12",
+      "nativeKind": "blockName",
+      "key": "core/heading",
+      "fingerprint": "60b24e4cbd792df8af784e191f9cf33b8d0ab8c9498cc4db0b8193b1f4208882",
+      "editability": "safe_text_edit",
+      "currentText": "¿Qué es Loop Marketing? ♾️",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "14",
+      "nativeKind": "blockName",
+      "key": "core/paragraph",
+      "fingerprint": "ab02b2492fde073b328df9902ddb11682f6aaa28a38f5257756fed2f1ff6c424",
+      "editability": "safe_text_edit",
+      "currentText": "El Loop Marketing es un framework creado por HubSpot que propone un cambio radical en la forma en que entendemos el marketing digital. No es un “truco nuevo” ni una moda pasajera: ...",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "18",
+      "nativeKind": "blockName",
+      "key": "core/heading",
+      "fingerprint": "1377642dda4ef8bf2fcb14aaaef88294d5734df077bf3fe878aeaf02dc02bbae",
+      "editability": "safe_text_edit",
+      "currentText": "📌 Definición simple:",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "20",
+      "nativeKind": "blockName",
+      "key": "core/paragraph",
+      "fingerprint": "d14a93780e9a63178acada614f27a09c9e0aff3af2dfac5522a0ff40cc42410a",
+      "editability": "safe_text_edit",
+      "currentText": "Loop Marketing es un bucle infinito (∞) en el que las marcas aprenden constantemente: expresan su voz, personalizan sus interacciones, amplifican su mensaje en distintos canales y ...",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "22",
+      "nativeKind": "blockName",
+      "key": "core/paragraph",
+      "fingerprint": "21534c6c09b6bd9c45999e46425f997ead6baa60275c94c8f3f987e335ccb7f0",
+      "editability": "safe_text_edit",
+      "currentText": "💡 HubSpot lo define así:",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "24.0",
+      "nativeKind": "blockName",
+      "key": "core/paragraph",
+      "fingerprint": "48012fd5002a6e4d660d030c808a22c4162cc2b50f8c1dea57d6cd410928a94a",
+      "editability": "safe_text_edit",
+      "currentText": "“Cuando las personas y la IA trabajan juntos, pueden definir un mensaje, adaptarlo a la audiencia, amplificarlo a través de los distintos canales y optimizarlo en tiempo real.” — H...",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "28",
+      "nativeKind": "blockName",
+      "key": "core/heading",
+      "fingerprint": "e2bb1d5f9054b7ef11fe562f4f84b6cad7425c26bd632a6b616592b8a7a8e297",
+      "editability": "safe_text_edit",
+      "currentText": "🌱 Filosofía de base: inbound + un marco operativo nuevo",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "30",
+      "nativeKind": "blockName",
+      "key": "core/paragraph",
+      "fingerprint": "6a9da0717b22f2ed5328ffbf0e4b315b5463a7cf773c8cb694de5a0f729e1fc8",
+      "editability": "safe_text_edit",
+      "currentText": "El Loop Marketing no “mata” al inbound. Al contrario: se construye sobre él.",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "32.0",
+      "nativeKind": "blockName",
+      "key": "core/list-item",
+      "fingerprint": "ac9985f2f6f9795b560d17c49eb7b587bf66fd9f23c937fdea4f24d00b709f7f",
+      "editability": "safe_text_edit",
+      "currentText": "El inbound nos enseñó que atraer con valor y construir confianza es mejor que interrumpir.",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "32.1",
+      "nativeKind": "blockName",
+      "key": "core/list-item",
+      "fingerprint": "e76a13150eefdd0ae73543868ed922e53a0d593aecdcb98ce1e39f0948364b03",
+      "editability": "safe_text_edit",
+      "currentText": "El Loop añade lo que hoy falta: agilidad, omnicanalidad y aprendizaje continuo impulsado por IA.",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "34",
+      "nativeKind": "blockName",
+      "key": "core/paragraph",
+      "fingerprint": "5d7c16599040318b522f2fc57311c1b9fbadd82cd5a4c1f47886446e11302376",
+      "editability": "safe_text_edit",
+      "currentText": "Es como si el inbound fuera la raíz 🌳 y el loop la savia que lo mantiene vivo en un entorno acelerado.",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "36",
+      "nativeKind": "blockName",
+      "key": "core/pullquote",
+      "fingerprint": "a8ff432ccd6d84260d116a9f5011f80357866f9927e88ed68a2a6b5fb721ab93",
+      "editability": "safe_text_edit",
+      "currentText": "Según HubSpot, el 82 % de los líderes de marketing reconocen que sus equipos pierden agilidad porque dependen de reportes trimestrales y campañas pesadas, en lugar de operar en cic...",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "40",
+      "nativeKind": "blockName",
+      "key": "core/heading",
+      "fingerprint": "6daa8d2336625e0f64772ca057f59aa2e3644c64819d3a629f8784edd5912fde",
+      "editability": "safe_text_edit",
+      "currentText": "📊 Una necesidad en cifras",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "42.0",
+      "nativeKind": "blockName",
+      "key": "core/list-item",
+      "fingerprint": "2c57cfd3d57dd682f25fbbdfb1c05334ad0ae0af72be819dc10ae49fb6946a1a",
+      "editability": "safe_text_edit",
+      "currentText": "El 94 % de los líderes de marketing admite que pierde hasta 10 horas semanales en tareas manuales de transferencia de datos (HubSpot, Data Disconnect Report 2025).",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "42.1",
+      "nativeKind": "blockName",
+      "key": "core/list-item",
+      "fingerprint": "7c29fe740269e43083e0a78726c86904f9408324a1f1c99d7560cc4ca4cbcb06",
+      "editability": "safe_text_edit",
+      "currentText": "Más de la mitad de las empresas ya experimenta caídas en clics orgánicos por el auge de las búsquedas con IA y respuestas sin clic (zero-click), lo que vuelve urgente optimizar par...",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "44",
+      "nativeKind": "blockName",
+      "key": "core/paragraph",
+      "fingerprint": "0d67bee94a41231baff3b656c38b1fdd23c9a3751b522acb6a55ae43f48dc0e1",
+      "editability": "safe_text_edit",
+      "currentText": "👉 En este contexto, Loop Marketing no es un lujo, es un sistema operativo de supervivencia.",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "48",
+      "nativeKind": "blockName",
+      "key": "core/paragraph",
+      "fingerprint": "857321c830e842b0ab6ae1f1c8c950de7586a758fbac8036afa6a342821f6362",
+      "editability": "safe_text_edit",
+      "currentText": "👀 Ahora bien… si el funnel y el flywheel ya no alcanzan, ¿qué los hace insuficientes?La respuesta está en entender cómo el funnel = linealidad muerta, el flywheel = relato útil, y...",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "50",
+      "nativeKind": "blockName",
+      "key": "core/heading",
+      "fingerprint": "1deef06e1f0991f480d1981645b7efaf0714530ed9cd0e638361167054ee98b5",
+      "editability": "safe_text_edit",
+      "currentText": "🔄 Funnel vs Flywheel vs Loop Marketing",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "52",
+      "nativeKind": "blockName",
+      "key": "core/paragraph",
+      "fingerprint": "8860d467521d96fd57be4bf3379e0942729ffe3d06bf28bf0a9d673e85847ec8",
+      "editability": "safe_text_edit",
+      "currentText": "Si el marketing fuera una serie de Netflix, el funnel sería la primera temporada: lineal, predecible y con un final que todos ya conocíamos. El cliente entraba por arriba (awarenes...",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "54",
+      "nativeKind": "blockName",
+      "key": "core/heading",
+      "fingerprint": "d6c81fb50a8df0cdabe0eaa1db396758acb4c2669df0adacaafc567de5bd76b4",
+      "editability": "safe_text_edit",
+      "currentText": "📉 El funnel = linealidad muerta",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "56.0",
+      "nativeKind": "blockName",
+      "key": "core/list-item",
+      "fingerprint": "bddec8f23dd7961d48cd38e3dd087761a8b85a2d0a88fd803774ef63d6a1ab4f",
+      "editability": "safe_text_edit",
+      "currentText": "El embudo de marketing fue útil para ordenar procesos, pero en un mundo donde los compradores saltan de canal en canal, se siente más como un mapa de carreteras de los 90 que como ...",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "58",
+      "nativeKind": "blockName",
+      "key": "core/pullquote",
+      "fingerprint": "cac96af095a07b1b78b9a3ce7baec691cf6d91d46ab0906f8c17e729c6077be0",
+      "editability": "safe_text_edit",
+      "currentText": "Según un estudio de Gartner, el 83 % de los compradores B2B investigan de forma no lineal, yendo adelante y atrás entre consideración, comparación y decisión (Gartner, 2023).",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "60",
+      "nativeKind": "blockName",
+      "key": "core/heading",
+      "fingerprint": "69f61965dfc3f835f8a898347ac494e5f554b68d77a35b4ed19ccfe988156c95",
+      "editability": "safe_text_edit",
+      "currentText": "⚙️ El flywheel = relato útil",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "62.0",
+      "nativeKind": "blockName",
+      "key": "core/list-item",
+      "fingerprint": "df72070caffe1782cd86629db975760e62db4261225da05940dfe5df04b3acfa",
+      "editability": "safe_text_edit",
+      "currentText": "En 2018, HubSpot propuso el modelo flywheel: una rueda que gira con la energía de atraer, interactuar y deleitar.",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "62.1",
+      "nativeKind": "blockName",
+      "key": "core/list-item",
+      "fingerprint": "0f8b90df28488f6aae8df4a80746529e93fa49b67290dd9d7aa54eb8bc68880e",
+      "editability": "safe_text_edit",
+      "currentText": "Fue un avance porque puso al cliente en el centro y habló de reducir fricciones.",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "64.0",
+      "nativeKind": "blockName",
+      "key": "core/paragraph",
+      "fingerprint": "3c5c6eabad8fdb9c03cf9ac893e22bf62efe650dea8fde8b4bdc50ced6db90b7",
+      "editability": "safe_text_edit",
+      "currentText": "Como dijo Brian Halligan, cofundador de HubSpot: “Las empresas que crecen más rápido son las que invierten en la experiencia del cliente, porque esa energía se multiplica en su fly...",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "66",
+      "nativeKind": "blockName",
+      "key": "core/paragraph",
+      "fingerprint": "0a5afd6d8da9583ec5900fddc3aaf73d7c98e4873943bc60d45d95db6e3d083b",
+      "editability": "safe_text_edit",
+      "currentText": "El flywheel inspiró, pero tenía un reto: se quedaba más en el relato que en la ejecución diaria.",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "68",
+      "nativeKind": "blockName",
+      "key": "core/heading",
+      "fingerprint": "93903e4b68d82694d78cbf728a17d86d882d44dfd8760dda6a8bec42e6b1fe2b",
+      "editability": "safe_text_edit",
+      "currentText": "♾️ El loop = acción continua",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "70.0",
+      "nativeKind": "blockName",
+      "key": "core/list-item",
+      "fingerprint": "e39eb6e1733996d2d4300e8049b637b7ada1893749799371898986613e67f3fb",
+      "editability": "safe_text_edit",
+      "currentText": "El Loop Marketing toma esa filosofía y la convierte en un sistema operativo de acción.",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "70.1",
+      "nativeKind": "blockName",
+      "key": "core/list-item",
+      "fingerprint": "8c2e8d6cab6ef281ebad1cfc4e907b97ab9b60eda7c99aa66fcd6c1b1d2de2d4",
+      "editability": "safe_text_edit",
+      "currentText": "No hay principio ni final: es un bucle donde expresas tu voz, personalizas interacciones, amplificas en todos los canales y aprendes de cada vuelta.",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "70.2",
+      "nativeKind": "blockName",
+      "key": "core/list-item",
+      "fingerprint": "f130a7cb8e03584c471880d61aae79eef4ca000dfc4606cce8a9f7d66d6be086",
+      "editability": "safe_text_edit",
+      "currentText": "Lo poderoso es la velocidad: optimización en días, no en trimestres.",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "72",
+      "nativeKind": "blockName",
+      "key": "core/pullquote",
+      "fingerprint": "209ac7c4d000167f0e5d0536936fa9abc5c74999615d89e32bc6d5a8f93363c9",
+      "editability": "safe_text_edit",
+      "currentText": "Un dato revelador: el 74 % de los líderes de marketing que adoptan IA y experimentación continua dicen que su equipo es más ágil para responder a cambios del mercado (McKinsey, Sta...",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "74",
+      "nativeKind": "blockName",
+      "key": "core/paragraph",
+      "fingerprint": "2692d34982fd05ecc0d8de1618379c86166a12a8b3aaf3730f72856703d1ab9b",
+      "editability": "safe_text_edit",
+      "currentText": "👉 Dicho de otra forma:",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "76.0",
+      "nativeKind": "blockName",
+      "key": "core/list-item",
+      "fingerprint": "0f2626df17074970174ad2cc1f20dde2249c1acf688703ebb56c1b8373557953",
+      "editability": "safe_text_edit",
+      "currentText": "El funnel describe un viaje que ya no existe.",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "76.1",
+      "nativeKind": "blockName",
+      "key": "core/list-item",
+      "fingerprint": "897fe26c8dfd134ce6d4af7d89759a16a807a9ae75e70d0b5fc125cf348aef63",
+      "editability": "safe_text_edit",
+      "currentText": "El flywheel cuenta una buena historia.",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "76.2",
+      "nativeKind": "blockName",
+      "key": "core/list-item",
+      "fingerprint": "09a74cbf0859589064c9b11e7e3d729e343d582cb98178ce9575f1cdd1d142a3",
+      "editability": "safe_text_edit",
+      "currentText": "El loop te da un motor que gira sin parar y aprende más rápido que tu competencia.",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "80",
+      "nativeKind": "blockName",
+      "key": "core/paragraph",
+      "fingerprint": "5603c0d5b520228972e107a9ca061caaa41a27349f30cde50a7550268571b1bf",
+      "editability": "safe_text_edit",
+      "currentText": "👀 Ahora bien, si el loop es acción, ¿cómo se ve en la práctica?¿Qué significa exactamente expresar, personalizar, amplificar y evolucionar?",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "84",
+      "nativeKind": "blockName",
+      "key": "core/heading",
+      "fingerprint": "de65730d743c361823ffc85bb7e70e91d01db8ea1841673fb9578f3073b45e5d",
+      "editability": "safe_text_edit",
+      "currentText": "🔍 Loop Marketing y las 4S de Google",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "86",
+      "nativeKind": "blockName",
+      "key": "core/paragraph",
+      "fingerprint": "0c26cb1acc01d7a75dae767afe94bc3c259c8b2d7d9681915d1ec4ded7386af5",
+      "editability": "safe_text_edit",
+      "currentText": "Si algo nos dejó claro Google en su más reciente estudio con BCG es que el recorrido del comprador ya no se parece a un camino recto. Hoy, los consumidores se mueven en cuatro comp...",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "90",
+      "nativeKind": "blockName",
+      "key": "core/heading",
+      "fingerprint": "d2b0bf2de5d468fa218f2ea459fae6a2e763faadadc24b9618769f4092dcca1d",
+      "editability": "safe_text_edit",
+      "currentText": "🎬 Streaming: la era del contenido continuo",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "92",
+      "nativeKind": "blockName",
+      "key": "core/paragraph",
+      "fingerprint": "5cf674c668a1a845af2a01254433be77e8328038b097329f91c22f643be4971c",
+      "editability": "safe_text_edit",
+      "currentText": "Los usuarios consumen video, audio y transmisiones en vivo como parte de su día a día. Desde YouTube hasta la TV conectada, este hábito no es solo entretenimiento: también influye ...",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "94.0",
+      "nativeKind": "blockName",
+      "key": "core/paragraph",
+      "fingerprint": "32ef8487473a7c1bdc702451a247cbe17d2a56a5ccb737808a6c1f5b2b05b16b",
+      "editability": "safe_text_edit",
+      "currentText": "Según Google, el 90 % de los consumidores dice que descubre nuevas marcas o productos mientras ve videos en YouTube (Think with Google).",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "96",
+      "nativeKind": "blockName",
+      "key": "core/paragraph",
+      "fingerprint": "f7274c4fbf78e09a27bed5725ac5a86c17be5b0ccc09f05721d465e4a3725b61",
+      "editability": "safe_text_edit",
+      "currentText": "🔗 Conexión con el Loop: aquí entra Express, porque es el momento ideal para que tu marca exprese su voz con claridad a través de historias y narrativas memorables.",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "100",
+      "nativeKind": "blockName",
+      "key": "core/heading",
+      "fingerprint": "ca01d1d2610bf54b3b876c3733b3cccc0712f1c271be4794e15e63d32a648510",
+      "editability": "safe_text_edit",
+      "currentText": "📱 Scrolling: exploración infinita en feeds",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "102",
+      "nativeKind": "blockName",
+      "key": "core/paragraph",
+      "fingerprint": "9204fbb1048344be62f982c3e76089a63950fbd1bf363d7f8fc29cb332cf9482",
+      "editability": "safe_text_edit",
+      "currentText": "El scroll se ha convertido en el nuevo “vitrineo digital”. La gente pasa minutos (u horas) desplazándose sin buscar nada en específico… hasta que un contenido los atrapa.",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "104.0",
+      "nativeKind": "blockName",
+      "key": "core/paragraph",
+      "fingerprint": "03a3c401c7136788ce304d37029276cc218949b166b63bbe5c62303c820fd390",
+      "editability": "safe_text_edit",
+      "currentText": "El 76 % de los usuarios de redes sociales ha comprado algo después de verlo mientras hacía scroll en un feed, aunque no lo estuviera buscando (Hootsuite Digital Report 2024).",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "106",
+      "nativeKind": "blockName",
+      "key": "core/paragraph",
+      "fingerprint": "688b21cf4fb589453ec3744cdb18cf051114c4872394fa6cfa28da74be4d8a13",
+      "editability": "safe_text_edit",
+      "currentText": "🔗 Conexión con el Loop: aquí brilla Tailor, porque la personalización es la clave para que tu contenido destaque en medio del ruido del scroll infinito.",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "110",
+      "nativeKind": "blockName",
+      "key": "core/heading",
+      "fingerprint": "74f97d834731cdae4177ce9f8054e4532fecb3019817ccb80b0616dd2a46233a",
+      "editability": "safe_text_edit",
+      "currentText": "🔎 Searching: búsquedas multimodales e IA-first",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "112",
+      "nativeKind": "blockName",
+      "key": "core/paragraph",
+      "fingerprint": "4e9c7484482727783b69ca9ec5a618a82d13b8b42300aa3ab9a170535d673ecf",
+      "editability": "safe_text_edit",
+      "currentText": "Buscar ya no es solo escribir en Google. Hoy usamos voz, imágenes, Lens, y hasta prompts en asistentes de IA. El consumidor quiere respuestas inmediatas y contextuales.",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "114.0",
+      "nativeKind": "blockName",
+      "key": "core/paragraph",
+      "fingerprint": "73649200dc638231b7595fff7402692ad4c9d75a8e0fd4885f7956c879b0d1db",
+      "editability": "safe_text_edit",
+      "currentText": "De hecho, Google reporta que el 40 % de los jóvenes ya usa TikTok o Instagram como motor de búsqueda principal para encontrar información local o de productos (Google I/O, 2022).",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "116",
+      "nativeKind": "blockName",
+      "key": "core/paragraph",
+      "fingerprint": "d4579ad61d73cdce5fbb7671ae007e01a9648cf34b406798091978383ca6c324",
+      "editability": "safe_text_edit",
+      "currentText": "🔗 Conexión con el Loop: este es terreno de Amplify, asegurando que tu marca esté optimizada para motores de búsqueda, respuestas de IA y formatos multimodales (AEO: Answer Engine ...",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "120",
+      "nativeKind": "blockName",
+      "key": "core/heading",
+      "fingerprint": "c040b06392c93433279ef0147b0b6e8e434623113d01a5ae27f416722076b9d3",
+      "editability": "safe_text_edit",
+      "currentText": "🛒 Shopping: compras sin fricciones",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "122",
+      "nativeKind": "blockName",
+      "key": "core/paragraph",
+      "fingerprint": "8e0b58e29d12e9249b34290456fa3e732c09e695e551fa0f4f042a022bcf6e0b",
+      "editability": "safe_text_edit",
+      "currentText": "El recorrido termina (o se reinicia) en la compra. Y cada vez ocurre más rápido: un clic en un anuncio shoppable, un checkout en un marketplace o incluso dentro de un live stream.",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "124.0",
+      "nativeKind": "blockName",
+      "key": "core/paragraph",
+      "fingerprint": "9ac140917201cbdecadce87f0330185ea16862d60fc74fe753d3382a011ee6c5",
+      "editability": "safe_text_edit",
+      "currentText": "Según eMarketer, el social commerce moverá más de 1,2 billones de dólares en 2025 a nivel global (eMarketer).",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "126",
+      "nativeKind": "blockName",
+      "key": "core/paragraph",
+      "fingerprint": "efea5581a900a3310f790bbe3ca39861ab388d6cab46d4e3ff1a8d3e9b59f8a0",
+      "editability": "safe_text_edit",
+      "currentText": "🔗 Conexión con el Loop: aquí entra Evolve, porque la optimización del journey (checkout ágil, recomendaciones personalizadas, programas de lealtad) es lo que marca la diferencia e...",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "130",
+      "nativeKind": "blockName",
+      "key": "core/heading",
+      "fingerprint": "676fa9768835ee37c7a00e2e0a68d133d076ffe0ffbcaf65d84aa1841c04b022",
+      "editability": "safe_text_edit",
+      "currentText": "🍏 Con manzanitas",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "132",
+      "nativeKind": "blockName",
+      "key": "core/paragraph",
+      "fingerprint": "b7fc564caf01f06173a83860db14799aae890a43134bac7ff3fdd8fffcfdf01e",
+      "editability": "safe_text_edit",
+      "currentText": "Piensa en las 4S como las estaciones de metro 🚇 donde el consumidor actual se sube y se baja sin orden ni aviso: hoy está en streaming, mañana en scrolling, luego busca (searching...",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "134",
+      "nativeKind": "blockName",
+      "key": "core/paragraph",
+      "fingerprint": "ee3a0140181cdebf6768e58beca04a43911d8ab8aa577c7b404f1877522546f3",
+      "editability": "safe_text_edit",
+      "currentText": "El Loop Marketing es la respuesta de la marca a ese comportamiento fragmentado: un tren que nunca se detiene, que pasa por todas esas estaciones, recoge insights en cada parada y v...",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "138",
+      "nativeKind": "blockName",
+      "key": "core/paragraph",
+      "fingerprint": "7f74f6fb2fbdf971b79a9a103f82fe3a2abf0d00a9a240ca00c599bcebd16451",
+      "editability": "safe_text_edit",
+      "currentText": "Ahora bien… ¿aplica igual para todos? 🤔El recorrido de un comprador B2B que necesita un software corporativo no se parece en nada al de un consumidor B2C que compra zapatillas en ...",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "140",
+      "nativeKind": "blockName",
+      "key": "core/paragraph",
+      "fingerprint": "8db1b2ea151fa9ca5d2c7096b68f51d1b65920671e419f66bfd72df87860b224",
+      "editability": "safe_text_edit",
+      "currentText": "⬇️ En la siguiente sección vamos a ver cómo se vive el Loop Marketing en B2B vs B2C, con diferencias claras, ejemplos prácticos y métricas que importan.",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "144",
+      "nativeKind": "blockName",
+      "key": "core/heading",
+      "fingerprint": "0bd08b30849a367f1ef14044e63645ae0d08530c59cc15c3ac847a3d79d565e2",
+      "editability": "safe_text_edit",
+      "currentText": "🏢 vs 🛍️ Loop Marketing en B2B vs B2C",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "146",
+      "nativeKind": "blockName",
+      "key": "core/paragraph",
+      "fingerprint": "8aaaff82c049d16d1337f939a06a75d92992650034a7db89b11e77cd71609477",
+      "editability": "safe_text_edit",
+      "currentText": "El Loop Marketing es como una coreografía: el marco es el mismo, pero el baile cambia según la pista. 💃🕺 No es lo mismo moverse en un congreso corporativo que en un festival de m...",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "148",
+      "nativeKind": "blockName",
+      "key": "core/heading",
+      "fingerprint": "01341f5fd97c2706dd18d06aeae13e12af482e7bf5553adf7e63780e265521be",
+      "editability": "safe_text_edit",
+      "currentText": "🏢 En B2B: relaciones largas, cuentas específicas",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "150",
+      "nativeKind": "blockName",
+      "key": "core/paragraph",
+      "fingerprint": "ee5539806e3ab884e71b7a9a64fadeffa3434853a9382f8bd34e1d6b473ef67e",
+      "editability": "safe_text_edit",
+      "currentText": "En el mundo B2B, el loop se apoya sobre todo en Searching y Streaming.",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "152.0",
+      "nativeKind": "blockName",
+      "key": "core/list-item",
+      "fingerprint": "39fda6b3c183a509baf6b5be454c233d6e28e638f6f96b9202f5b5ebce788fde",
+      "editability": "safe_text_edit",
+      "currentText": "Los decisores investigan en Google, leen comparativas, descargan whitepapers (Searching).",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "152.1",
+      "nativeKind": "blockName",
+      "key": "core/list-item",
+      "fingerprint": "9a578ea3e69ced211eb5c85b4748c6dfd9b8c2f3b5642a23b633947b1334424e",
+      "editability": "safe_text_edit",
+      "currentText": "Y consumen contenidos en formato webinar o demo en YouTube (Streaming).",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "154",
+      "nativeKind": "blockName",
+      "key": "core/paragraph",
+      "fingerprint": "ef4a8dc58b97746c08fa06e2acaf03e3200bd58cbf1e00974baeed486c373e37",
+      "editability": "safe_text_edit",
+      "currentText": "Aquí el Tailor se convierte en account based marketing (ABM): personalizar propuestas para industrias o incluso cuentas específicas.👉 Según Demand Gen Report, el 87 % de los marke...",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "156",
+      "nativeKind": "blockName",
+      "key": "core/paragraph",
+      "fingerprint": "26c61c6c70df3d034b64b4b3a5c66deffcceacd34af4cc599028a23d70233c00",
+      "editability": "safe_text_edit",
+      "currentText": "Ejemplo: Una empresa SaaS que ofrece un CRM puede usar Loop para:",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "158.0",
+      "nativeKind": "blockName",
+      "key": "core/list-item",
+      "fingerprint": "48073f7893656f3d6962b82130d92938229c88a244ac72053d9de612d8292cc8",
+      "editability": "safe_text_edit",
+      "currentText": "Express: crear POV claros para CFOs, CMOs y CTOs.",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "158.1",
+      "nativeKind": "blockName",
+      "key": "core/list-item",
+      "fingerprint": "8f634ccee1a900b156f959a157aceb2becd9a7fc3c191eaf8c90f63972c6af54",
+      "editability": "safe_text_edit",
+      "currentText": "Tailor: diseñar secuencias de correos y ofertas por rol y vertical.",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "158.2",
+      "nativeKind": "blockName",
+      "key": "core/list-item",
+      "fingerprint": "39302d502bdf8771564f7cc2ac0ecace854bceadb3bf6cebea167c023b0ac186",
+      "editability": "safe_text_edit",
+      "currentText": "Amplify: difundir contenido técnico en LinkedIn y foros especializados.",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "158.3",
+      "nativeKind": "blockName",
+      "key": "core/list-item",
+      "fingerprint": "65a7c76e38ad06367a20362ff690bac25d1089246e647b895015a63cb3723f30",
+      "editability": "safe_text_edit",
+      "currentText": "Evolve: optimizar la propuesta según métricas de pipeline y feedback de ventas.",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "162",
+      "nativeKind": "blockName",
+      "key": "core/heading",
+      "fingerprint": "2fe00ccbd986953d205bbef4dd3afbdbe69bcc16047279817ce04405f8694611",
+      "editability": "safe_text_edit",
+      "currentText": "🛍️ En B2C: velocidad y volumen",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "164",
+      "nativeKind": "blockName",
+      "key": "core/paragraph",
+      "fingerprint": "28b9725b7479683975a4a25d6b9070e7df36c92dd29485142a78599f82f299e7",
+      "editability": "safe_text_edit",
+      "currentText": "En el mundo B2C, el loop se activa sobre todo en Scrolling y Shopping.",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "166.0",
+      "nativeKind": "blockName",
+      "key": "core/list-item",
+      "fingerprint": "58dd06593d5e33d25e53664a1ab8a187d7acddeab5db8175174429cdf3eb50b7",
+      "editability": "safe_text_edit",
+      "currentText": "Los consumidores descubren productos en redes sociales sin buscarlos activamente (Scrolling).",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "166.1",
+      "nativeKind": "blockName",
+      "key": "core/list-item",
+      "fingerprint": "eacc196b5459fa15f00bf5c9f964ab2a5527eb449cc3508fc757417b7f8a6edd",
+      "editability": "safe_text_edit",
+      "currentText": "Y terminan comprando en un clic en un marketplace o dentro de un live shopping (Shopping).",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "168",
+      "nativeKind": "blockName",
+      "key": "core/paragraph",
+      "fingerprint": "7091ad35c810b3eb9955b18ca9287d605704784fa28900f7661d3ba41ae8058e",
+      "editability": "safe_text_edit",
+      "currentText": "Aquí Amplify y Evolve son críticos: lograr que el contenido destaque en feeds saturados y que la experiencia de compra sea fluida y sin fricciones.👉 Según Statista: en 2024, se es...",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "170",
+      "nativeKind": "blockName",
+      "key": "core/paragraph",
+      "fingerprint": "baeb1f5aff14992ae879f9525bb33f5cfb787331d651e47a57772c7c210a0bc0",
+      "editability": "safe_text_edit",
+      "currentText": "Ejemplo: Una marca de moda puede usar Loop para:",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "172.0",
+      "nativeKind": "blockName",
+      "key": "core/list-item",
+      "fingerprint": "99276689f780236ad7bac7edae88a801a46e408c5a8ce9301596e29bf25634e9",
+      "editability": "safe_text_edit",
+      "currentText": "Express: definir un tono cercano y aspiracional en redes.",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "172.1",
+      "nativeKind": "blockName",
+      "key": "core/list-item",
+      "fingerprint": "601019b893a2565ed035673db6ba4c72c4371f9d736ef8bd3adae1e22816552d",
+      "editability": "safe_text_edit",
+      "currentText": "Tailor: personalizar recomendaciones de outfits según el historial del cliente.",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "172.2",
+      "nativeKind": "blockName",
+      "key": "core/list-item",
+      "fingerprint": "4233eeb8163e7c8d74a418fc795eea257b1f93f7a03d1a58322b29aa3f8ff2f2",
+      "editability": "safe_text_edit",
+      "currentText": "Amplify: aprovechar reels shoppables y colaboraciones con creadores.",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "172.3",
+      "nativeKind": "blockName",
+      "key": "core/list-item",
+      "fingerprint": "93b5575fa4d3eb22c0022432b9cd66c963fb32c3b20c46425e7058125286af40",
+      "editability": "safe_text_edit",
+      "currentText": "Evolve: medir qué combinaciones generan más ventas y ajustar stock en tiempo real.",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "176",
+      "nativeKind": "blockName",
+      "key": "core/heading",
+      "fingerprint": "b4052f7b21df608f5cd268cf24dbe306e23eeeb4e19946421e70eeb55b4380ca",
+      "editability": "safe_text_edit",
+      "currentText": "🍏 Con manzanitas",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "178",
+      "nativeKind": "blockName",
+      "key": "core/paragraph",
+      "fingerprint": "bf572a171a413b04bc85b25751d8a5b3a3788549075f606bcbcfd88c90c3d0dd",
+      "editability": "safe_text_edit",
+      "currentText": "El B2B se parece a un matrimonio: largo, lleno de conversaciones, compromisos y negociaciones. Y ahí el Loop Marketing funciona como consejero matrimonial 💍: ayuda a expresar mejo...",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "180",
+      "nativeKind": "blockName",
+      "key": "core/paragraph",
+      "fingerprint": "c0ee44f29097067d938bd22042e38a2fc6f1299a110b95998a0e7de159e8e3fb",
+      "editability": "safe_text_edit",
+      "currentText": "En cambio, el B2C es más como un flechazo en Tinder ❤️: todo pasa en segundos. Si no convences al instante, el usuario hace swipe hacia otra marca. Aquí el Loop es tu “matchmaker d...",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "184",
+      "nativeKind": "blockName",
+      "key": "core/heading",
+      "fingerprint": "5793ca1fc39fd985a42776e988dcf76bec4f2dd4935105ad299ce9698b7166aa",
+      "editability": "safe_text_edit",
+      "currentText": "👀 Y ahora que vimos las diferencias…",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "186",
+      "nativeKind": "blockName",
+      "key": "core/paragraph",
+      "fingerprint": "0f8d569e919846ffc67eb05fb3d29ccad0893298394d3fb2c772a1cfa8c281a4",
+      "editability": "safe_text_edit",
+      "currentText": "La gran pregunta es: ¿cómo se traduce todo esto en números?¿De qué forma el Loop impacta realmente en CAC, LTV, ROI y Payback?",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "188",
+      "nativeKind": "blockName",
+      "key": "core/paragraph",
+      "fingerprint": "42222c8af14172bedb981d9925d650f646e11d75140e16ba6aedb2cff9e4cc1b",
+      "editability": "safe_text_edit",
+      "currentText": "⬇️ Eso es lo que exploraremos en la siguiente sección.",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "192",
+      "nativeKind": "blockName",
+      "key": "core/heading",
+      "fingerprint": "24fcee66f709af84109d4cdad8c294313f765b4e2e5c7c1fe5b9238c417d07d4",
+      "editability": "safe_text_edit",
+      "currentText": "💰 Impacto en métricas de negocio (CAC, LTV, ROI, Payback)",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "194",
+      "nativeKind": "blockName",
+      "key": "core/paragraph",
+      "fingerprint": "c0fdd7d81e51c79a1cdb97f079cabd7c5816fa30dcdeee524dd63dbf76b6079a",
+      "editability": "safe_text_edit",
+      "currentText": "Hablar de Loop Marketing sin mencionar métricas sería como hablar de fútbol sin goles ⚽. Al final, la pregunta clave es: ¿cómo impacta esto en coste de adquisición de clientes (CAC...",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "198",
+      "nativeKind": "blockName",
+      "key": "core/heading",
+      "fingerprint": "4c3439ec374b7c2fbaedb648854f4ba453ba90dbe340154fefe215f3e3680ea0",
+      "editability": "safe_text_edit",
+      "currentText": "📉 Reducción del CAC",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "200",
+      "nativeKind": "blockName",
+      "key": "core/paragraph",
+      "fingerprint": "f4c039c14eeeb84a270e027c38a5d660e4446bec6919e8bec914ae571402efa1",
+      "editability": "safe_text_edit",
+      "currentText": "El CAC baja porque el Loop elimina fricciones y mejora la conversión en cada giro.",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "202.0",
+      "nativeKind": "blockName",
+      "key": "core/list-item",
+      "fingerprint": "cfcf9f14a148f0094ffb3737c76d11506a78a4cc15a8ce79de471f53e8e07b71",
+      "editability": "safe_text_edit",
+      "currentText": "Forrester: “Las empresas que lideran en personalización logran entre 1,4 y 1,6 veces más ROI en marketing que las que no lo hacen” (Forrester, Business Impact of Personalization).",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "202.1",
+      "nativeKind": "blockName",
+      "key": "core/list-item",
+      "fingerprint": "e23763237465f1b937ce8e003f49755211bc6429032bfb01b661d2c8d29620fb",
+      "editability": "safe_text_edit",
+      "currentText": "BCG + Google: marcas que personalizan con datos de primera parte logran incrementos del 20 % en ingresos y reducen hasta un 30 % sus costes de adquisición (Think with Google).",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "206",
+      "nativeKind": "blockName",
+      "key": "core/heading",
+      "fingerprint": "63bddb25d4c2b812d017d4c0f0fce7795e5c5f24c538460f8380e66d7f944121",
+      "editability": "safe_text_edit",
+      "currentText": "📈 Aumento del LTV",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "208",
+      "nativeKind": "blockName",
+      "key": "core/paragraph",
+      "fingerprint": "f2b2c42921372089a83f83d343cdf5025d06e2d7a2ca5d4cb255b6adbe91158e",
+      "editability": "safe_text_edit",
+      "currentText": "El LTV crece porque el Loop permite nutrir relaciones con más relevancia y menos fricción.",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "210.0",
+      "nativeKind": "blockName",
+      "key": "core/paragraph",
+      "fingerprint": "69cd808be75eb1408fc642befca6da013318b31d759a0221d39c981de26e5717",
+      "editability": "safe_text_edit",
+      "currentText": "Según Bain & Company, un incremento del 5 % en la retención de clientes puede aumentar los beneficios entre 25 % y 95 % (Bain).",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "212.0",
+      "nativeKind": "blockName",
+      "key": "core/list-item",
+      "fingerprint": "ed284ff7c188b534fbe148d5114d764730fd08c69fddff84ad13dc4bbfa39c44",
+      "editability": "safe_text_edit",
+      "currentText": "Con Loop, cada ciclo es una oportunidad de retención porque la marca aprende del comportamiento del cliente y ajusta su experiencia en tiempo real.",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "216",
+      "nativeKind": "blockName",
+      "key": "core/heading",
+      "fingerprint": "a0104a0c847d9c94cbbaceb3f63aa105da4b7bf0de30cc008d038a3a01e8071d",
+      "editability": "safe_text_edit",
+      "currentText": "⏱️ Menor Payback y mejor ROI",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "218",
+      "nativeKind": "blockName",
+      "key": "core/paragraph",
+      "fingerprint": "c9b45b9f5e727ea973dfb00a4bde889db8ad645048602a07d1f572fef59cda64",
+      "editability": "safe_text_edit",
+      "currentText": "Un payback más corto significa recuperar la inversión más rápido, y un ROI más alto significa crecer con más eficiencia.",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "220.0",
+      "nativeKind": "blockName",
+      "key": "core/paragraph",
+      "fingerprint": "39f2312de08909d59de4b259025fd7493f86fb673cc7010134b4e9f64a792937",
+      "editability": "safe_text_edit",
+      "currentText": "McKinsey encontró que las compañías que usan IA para optimización de journeys reducen su payback en un 30–40 % frente a las que siguen operando con campañas lineales (McKinsey, Sta...",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "224",
+      "nativeKind": "blockName",
+      "key": "core/heading",
+      "fingerprint": "c8b53c2cca4cb5d2baf7ec70b0ecd5db25634db119573e0532e9f1e89c03f0c6",
+      "editability": "safe_text_edit",
+      "currentText": "🔢 Ejemplo numérico con manzanitas 🍏",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "226",
+      "nativeKind": "blockName",
+      "key": "core/paragraph",
+      "fingerprint": "a5d20c605ab674310c4e519a750a396a3a61133111b41fd5415dd72ba0de03be",
+      "editability": "safe_text_edit",
+      "currentText": "Supongamos que tu empresa tiene estos números base:",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "228.0",
+      "nativeKind": "blockName",
+      "key": "core/list-item",
+      "fingerprint": "9afaf55c1285fd50b2fae9303c11bfa6d1b61076c8ad2aa217fef04b90da0278",
+      "editability": "safe_text_edit",
+      "currentText": "CPC: $0,80",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "228.1",
+      "nativeKind": "blockName",
+      "key": "core/list-item",
+      "fingerprint": "e56a04bd03641c2281484e65c95d7d32d2d619b4b2ee509faa919e150d6be3b8",
+      "editability": "safe_text_edit",
+      "currentText": "Tasa de conversión (CVR): 2 %",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "228.2",
+      "nativeKind": "blockName",
+      "key": "core/list-item",
+      "fingerprint": "b9efa401e22f5059e3c0a0c785c6e6668a425d476be7e33d64a5e0817dc0ec80",
+      "editability": "safe_text_edit",
+      "currentText": "CAC actual = 50 clics × $0,80 = $40",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "230",
+      "nativeKind": "blockName",
+      "key": "core/paragraph",
+      "fingerprint": "8bd4f67fc507dfedc50de7db655ca20b25a4a79b7e07d5a7363594e394dc6dd7",
+      "editability": "safe_text_edit",
+      "currentText": "Ahora, con Loop Marketing (Express + Tailor):",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "232.0",
+      "nativeKind": "blockName",
+      "key": "core/list-item",
+      "fingerprint": "41a62fa7d509389002d31e7da19af8e84383c7d1a3cfe88ab3eacd6ba50e242a",
+      "editability": "safe_text_edit",
+      "currentText": "CVR sube a 3 % → solo necesitas 33 clics por venta.",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "232.1",
+      "nativeKind": "blockName",
+      "key": "core/list-item",
+      "fingerprint": "083568eb3d162a3c6c41b806053c68c1947ea32e9acb338b588cc2c500d98540",
+      "editability": "safe_text_edit",
+      "currentText": "CAC baja a $26,40 (una reducción del 34 %).",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "234",
+      "nativeKind": "blockName",
+      "key": "core/paragraph",
+      "fingerprint": "0b92387489d40e46365a50f89f70aec440b29293d622b7646637988b4a9bb24b",
+      "editability": "safe_text_edit",
+      "currentText": "Si tu ARPA (Average Revenue per Account) es $20/mes con margen del 70 %, tu contribución mensual es $14.",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "236.0",
+      "nativeKind": "blockName",
+      "key": "core/list-item",
+      "fingerprint": "1e261be51a4258ec049d1d22681243b1fb6395a5036736d52892db1470b92c7d",
+      "editability": "safe_text_edit",
+      "currentText": "Payback base: $40 / $14 = 2,8 meses",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "236.1",
+      "nativeKind": "blockName",
+      "key": "core/list-item",
+      "fingerprint": "6cfce02b5681bdbb641adfe2b9af58d66ad8270d446ecd4f685219da23a0b9c7",
+      "editability": "safe_text_edit",
+      "currentText": "Payback con Loop: $26,40 / $14 = 1,9 meses 🚀",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "238",
+      "nativeKind": "blockName",
+      "key": "core/paragraph",
+      "fingerprint": "a1e94824b221090b5cd3f0056f4033a7af78e27a2c9ffef0c026682505454e16",
+      "editability": "safe_text_edit",
+      "currentText": "Y si reduces churn del 5 % al 4 % gracias a Evolve:",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "240.0",
+      "nativeKind": "blockName",
+      "key": "core/list-item",
+      "fingerprint": "81b8cb4ece58e0deb05d441b669de0831f96dae897f973a852675f84c4743b38",
+      "editability": "safe_text_edit",
+      "currentText": "LTV base = $20 × 0,7 / 0,05 = $280",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "240.1",
+      "nativeKind": "blockName",
+      "key": "core/list-item",
+      "fingerprint": "9a7c47c26b34c7cc0b670c13b407bac0fda58ba8c2fc1399a49ae20ef2f30b26",
+      "editability": "safe_text_edit",
+      "currentText": "LTV con Loop = $20 × 0,7 / 0,04 = $350 (+25 %).",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "242",
+      "nativeKind": "blockName",
+      "key": "core/paragraph",
+      "fingerprint": "3b205bca1935c2f52d617e80e4faa4f73fe275e107ae2a0d12aadd5bb42c11d8",
+      "editability": "safe_text_edit",
+      "currentText": "En otras palabras: menos CAC, más LTV y un ROI más saludable.",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "246",
+      "nativeKind": "blockName",
+      "key": "core/heading",
+      "fingerprint": "58109b00a701aaeb3d14915bc1a17ef06421cfdb8741d17a40cdae1538974e59",
+      "editability": "safe_text_edit",
+      "currentText": "🍏 Con manzanitas",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "248",
+      "nativeKind": "blockName",
+      "key": "core/paragraph",
+      "fingerprint": "331f88d7e6f2bb9e0c143b9db5fc6d33dbadcfdd43f7dae29885658648b988f4",
+      "editability": "safe_text_edit",
+      "currentText": "El Loop es como exprimir una fruta 🍊: con cada vuelta sacas más jugo sin tener que comprar más naranjas. Menos coste por cliente, más valor de cada relación y un retorno más rápid...",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "252",
+      "nativeKind": "blockName",
+      "key": "core/paragraph",
+      "fingerprint": "5763de618727bd16caff438724b216a5c26e844502e9af32b87ccdc75f03b5cf",
+      "editability": "safe_text_edit",
+      "currentText": "👀 Ahora bien, ¿cómo se pasa de la teoría a la práctica?¿Cómo se integra el Loop en un stack con HubSpot, Salesforce, BigQuery, GA4 o incluso WordPress… y qué cambios culturales ex...",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "254",
+      "nativeKind": "blockName",
+      "key": "core/paragraph",
+      "fingerprint": "fbd838e53e7273dd2c1afee54e3f877f0b0ce8e1c4aef14b84f609eb49522e86",
+      "editability": "safe_text_edit",
+      "currentText": "⬇️ Lo exploramos en la próxima sección: “Implementación práctica: stack tecnológico y cultura”.",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "256",
+      "nativeKind": "blockName",
+      "key": "core/heading",
+      "fingerprint": "de260891b5013e744b1865e1af963c45b4ed0c4730573d686c5446a8f609e12b",
+      "editability": "safe_text_edit",
+      "currentText": "⚙️ Implementación práctica: stack tecnológico y cultura",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "258",
+      "nativeKind": "blockName",
+      "key": "core/paragraph",
+      "fingerprint": "1debbbee155339ee189c0353b96fb1bc7cf8ef1dc005647aa9726f33b3390d0a",
+      "editability": "safe_text_edit",
+      "currentText": "Una confusión común es pensar que el Loop Marketing depende de una herramienta específica. ❌ En realidad, el Loop es agnóstico al stack: no importa si trabajas con HubSpot, Salesfo...",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "260",
+      "nativeKind": "blockName",
+      "key": "core/heading",
+      "fingerprint": "e5d74c58783c0dc8e2ebee5bb1cc66ce07663a40d764c6ceccb14ba58b8a7383",
+      "editability": "safe_text_edit",
+      "currentText": "🔌 Stack tecnológico: cómo se integra el Loop",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "262.0",
+      "nativeKind": "blockName",
+      "key": "core/list-item",
+      "fingerprint": "4959bf7b74857816f350fe71fd2a52b7d52a58c86582f7048946cd8ff6d74a50",
+      "editability": "safe_text_edit",
+      "currentText": "HubSpot: el Loop puede orquestarse usando Content Hub (para Express), Data Hub + Workflows (para Tailor), Ads + Social + SEO (para Amplify) y Analytics (para Evolve).",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "262.1",
+      "nativeKind": "blockName",
+      "key": "core/list-item",
+      "fingerprint": "ba1398c0df24b72b9c24ffe8212965304942e0b13383fb877fc821f3eee9ebfa",
+      "editability": "safe_text_edit",
+      "currentText": "Salesforce: puedes activar Data Cloud y Journey Builder para personalización (Tailor), Marketing Cloud Intelligence para medir ROI (Evolve), y CMS/Commerce Cloud para conectar cont...",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "262.2",
+      "nativeKind": "blockName",
+      "key": "core/list-item",
+      "fingerprint": "4292938b0d4362d5abf3a97d1539e4b31379875bfb676d6a1f6cf67797b110d6",
+      "editability": "safe_text_edit",
+      "currentText": "WordPress u otros CMS: funcionan perfectamente como capa de Express + Amplify, mientras se conectan a GA4 y BigQuery para Evolve.",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "262.3",
+      "nativeKind": "blockName",
+      "key": "core/list-item",
+      "fingerprint": "04c4d856e85717b1ee290f238e8988ad73a106053580f2d05970b7183c2a93fa",
+      "editability": "safe_text_edit",
+      "currentText": "BigQuery + GA4: esenciales como cerebro analítico. Te permiten medir conversiones reales, calcular CAC/LTV, y alimentar modelos de propensión para acelerar el loop.",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "264",
+      "nativeKind": "blockName",
+      "key": "core/pullquote",
+      "fingerprint": "6551fa9f68cc36d063cd82ea0b3b11092b5beb2bde6d150d1e4fa0f8b7ff8b6f",
+      "editability": "safe_text_edit",
+      "currentText": "📊 Según Deloitte, las empresas que integran su data layer con marketing automation logran mejorar un 20–30 % la eficiencia en gasto publicitario (Deloitte Digital, The Power of Da...",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "268",
+      "nativeKind": "blockName",
+      "key": "core/heading",
+      "fingerprint": "d56beee8ebb974259dad310e7c61f889da358cb973cd528455adc9eb75ccb853",
+      "editability": "safe_text_edit",
+      "currentText": "🔄 Cambio cultural: de campañas a ciclos",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "270",
+      "nativeKind": "blockName",
+      "key": "core/paragraph",
+      "fingerprint": "3427b7e73be50a0cac56ef9910c1375049f55afd6b724be72ed8545a4fcdd7ef",
+      "editability": "safe_text_edit",
+      "currentText": "Aquí está el verdadero reto: no es técnico, es cultural.El marketing tradicional estaba organizado en campañas trimestrales: plan → producción → ejecución → reporte. El problema es...",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "272",
+      "nativeKind": "blockName",
+      "key": "core/paragraph",
+      "fingerprint": "9238df25426795ca7604eebbf716fa6a49b7edc6262230df22e005c6b5f1e61a",
+      "editability": "safe_text_edit",
+      "currentText": "Con el Loop la mentalidad cambia:",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "274.0",
+      "nativeKind": "blockName",
+      "key": "core/list-item",
+      "fingerprint": "61c205f95949c9231832be5cae6f8579e0e733e71d7659edd69d9ce0a1c70b32",
+      "editability": "safe_text_edit",
+      "currentText": "Pasas de planear meses a testear semanas o días.",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "274.1",
+      "nativeKind": "blockName",
+      "key": "core/list-item",
+      "fingerprint": "f0c885c73ff2ab0d8cf303d7d47579a40b34a3d4321715edba222c89b31c8168",
+      "editability": "safe_text_edit",
+      "currentText": "Los reportes ya no son retrospectivos: son input para el próximo ciclo.",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "274.2",
+      "nativeKind": "blockName",
+      "key": "core/list-item",
+      "fingerprint": "39f872754fdf3ed3fd0d5974f43155eeb35c7cfcd5be91c374e195474ab5d820",
+      "editability": "safe_text_edit",
+      "currentText": "El éxito no se mide en “cerramos la campaña”, sino en cuánto aprendimos y cómo lo reinvertimos.",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "276",
+      "nativeKind": "blockName",
+      "key": "core/pullquote",
+      "fingerprint": "6986a031c74d6ab2e1e658ce5c21dc44bdd925e618a0e7cc122a4ad379644cd9",
+      "editability": "safe_text_edit",
+      "currentText": "📌 Gartner advierte que el 70 % de los equipos de marketing que no adopten modelos ágiles seguirán perdiendo relevancia frente a competidores data-driven (Gartner, Future of Market...",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "280",
+      "nativeKind": "blockName",
+      "key": "core/heading",
+      "fingerprint": "58320ae17ccbf132af65414a28f77c382d3564a1db11d4272e7216bc49e6911e",
+      "editability": "safe_text_edit",
+      "currentText": "🍏 Con manzanitas",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "282",
+      "nativeKind": "blockName",
+      "key": "core/paragraph",
+      "fingerprint": "937a8421de0c2e43ec03e2553c7d9dea0ca102fc52ddf9be2d2ac5404b45461f",
+      "editability": "safe_text_edit",
+      "currentText": "Implementar el Loop es como cambiar la dieta de tu marketing: ya no comes 3 grandes comidas al día (campañas), sino que te alimentas con snacks constantes y nutritivos (ciclos de e...",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "286",
+      "nativeKind": "blockName",
+      "key": "core/paragraph",
+      "fingerprint": "0d822f59c1054a2dace3679d34844b1fca0a71208f027941502aaef4bb3d3ecc",
+      "editability": "safe_text_edit",
+      "currentText": "👀 Pero claro, tanta automatización y tanto dato también trae riesgos:¿Cómo asegurarte de que la IA no erosione la confianza del consumidor?¿Cómo poner límites éticos y mantener el...",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "288",
+      "nativeKind": "blockName",
+      "key": "core/heading",
+      "fingerprint": "09aba975150e99bc79aab012c4493979686e09fe9a939c1e0acf0ed3c2fc6cae",
+      "editability": "safe_text_edit",
+      "currentText": "🛡️ Riesgos y confianza: Human-in-the-Loop",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "290",
+      "nativeKind": "blockName",
+      "key": "core/paragraph",
+      "fingerprint": "dc0bd06458d520145c88808fb24032e037711ef64d68bc3a509ee1edd69da418",
+      "editability": "safe_text_edit",
+      "currentText": "Si todo en el Loop gira más rápido gracias a la IA, la pregunta obvia es: ¿cómo evitamos que la máquina se lleve puesta la confianza del consumidor? 🤔",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "292",
+      "nativeKind": "blockName",
+      "key": "core/paragraph",
+      "fingerprint": "2f0105846c8a5558f550c9c9fb14110349bc73e10a97ebfedcfa5629f78dd9a2",
+      "editability": "safe_text_edit",
+      "currentText": "Aquí entra el concepto de Human-in-the-Loop (HITL): la idea de que las decisiones críticas de marketing no pueden quedar solo en manos de algoritmos. Necesitamos humanos revisando,...",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "296",
+      "nativeKind": "blockName",
+      "key": "core/heading",
+      "fingerprint": "6231b1ff7ec877c5e2b63bbcfc331848e4e1710986189b2ba2dbe456d28e9ace",
+      "editability": "safe_text_edit",
+      "currentText": "⚖️ Ética y guardrails en acción",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "298.0",
+      "nativeKind": "blockName",
+      "key": "core/list-item",
+      "fingerprint": "d5d1f73effc58535cca333532f176073605e94ae815ed19abf068ee536046ecc",
+      "editability": "safe_text_edit",
+      "currentText": "Transparencia: los consumidores quieren saber cuándo están interactuando con IA. Un informe de PwC muestra que el 85 % de los usuarios considera la transparencia esencial para conf...",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "298.1",
+      "nativeKind": "blockName",
+      "key": "core/list-item",
+      "fingerprint": "3207496e0f1b8d0b2f07b426c54d4e81cbae243fe88afc4a2384739d887d72ce",
+      "editability": "safe_text_edit",
+      "currentText": "Protección de datos: no se trata de acumular información, sino de usarla con responsabilidad. Gartner predice que en 2026, el 75 % de las conversaciones de IA en marketing estarán ...",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "298.2",
+      "nativeKind": "blockName",
+      "key": "core/list-item",
+      "fingerprint": "c1729db1f1370b2526d23d04f05dc8d792736322618b0e1222c7af5ba338b503",
+      "editability": "safe_text_edit",
+      "currentText": "Consistencia de marca: un mensaje fuera de tono puede dañar más que mil bien ejecutados. Aquí los guardrails —listas de “do’s & don’ts”, banlists y prompts aprobados— son el cintur...",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "302",
+      "nativeKind": "blockName",
+      "key": "core/heading",
+      "fingerprint": "dff93cd59898ce5fff3ba9cdeb976d49218446a77c28d8ad0e0e8bf22fe9632f",
+      "editability": "safe_text_edit",
+      "currentText": "🤝 Trust by design",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "304",
+      "nativeKind": "blockName",
+      "key": "core/paragraph",
+      "fingerprint": "0d8ae3f6135e67f502e9e81875e18a09af6f2d4c454647b93ed42d5f2ac0e061",
+      "editability": "safe_text_edit",
+      "currentText": "Construir confianza no es algo que se repara al final, sino que se diseña desde el principio.",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "306.0",
+      "nativeKind": "blockName",
+      "key": "core/list-item",
+      "fingerprint": "fa2677ca8d892c03adcad92e1d8de82d5bc8127c34fd86e5f6b266354d19b396",
+      "editability": "safe_text_edit",
+      "currentText": "Diseñar journeys donde la personalización sea útil y no invasiva.",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "306.1",
+      "nativeKind": "blockName",
+      "key": "core/list-item",
+      "fingerprint": "acfdf061c06a03df5ec731bcc5a357f2dabbf01f24b4ea1a64a7ea9084a6b0ee",
+      "editability": "safe_text_edit",
+      "currentText": "Mantener siempre un “toque humano” visible en experiencias automatizadas: una firma real, una historia auténtica, una voz coherente.",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "306.2",
+      "nativeKind": "blockName",
+      "key": "core/list-item",
+      "fingerprint": "2c74e8c3d738f75e7173edc0b752d6b42ec93cdf57f0a623d5fd53093be4da61",
+      "editability": "safe_text_edit",
+      "currentText": "Establecer métricas de confianza junto a las métricas de conversión. Por ejemplo:",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "306.2.0.0",
+      "nativeKind": "blockName",
+      "key": "core/list-item",
+      "fingerprint": "c3d1de001bbc090cd60d753190cfcaa9ec01038c22e3a46d18d06bb6a72ea903",
+      "editability": "safe_text_edit",
+      "currentText": "% de campañas auditadas HITL.",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "306.2.0.1",
+      "nativeKind": "blockName",
+      "key": "core/list-item",
+      "fingerprint": "d1c42c905852c6fadd85a35a4003b8c063bbc54c4eb4b2acfa02f989c9b62e65",
+      "editability": "safe_text_edit",
+      "currentText": "Tasa de menciones positivas/negativas en social listening.",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "306.2.0.2",
+      "nativeKind": "blockName",
+      "key": "core/list-item",
+      "fingerprint": "a95e920c7bc21867b98db81aeed0abd5869f7708e2c13b17b11c8d36b8b85f47",
+      "editability": "safe_text_edit",
+      "currentText": "Percepción de transparencia en encuestas de NPS.",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "308",
+      "nativeKind": "blockName",
+      "key": "core/paragraph",
+      "fingerprint": "6010e1ea28bf0e31bf355d1a7da057f87136ebaedda83659139e5835c7eb893c",
+      "editability": "safe_text_edit",
+      "currentText": "Como dijo Satya Nadella, CEO de Microsoft:",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "310.0",
+      "nativeKind": "blockName",
+      "key": "core/paragraph",
+      "fingerprint": "ccb214779b65e0e4617a17c321ea0760a532b2af8393cd34b5e194466da81122",
+      "editability": "safe_text_edit",
+      "currentText": "“La confianza se convierte en la moneda más importante en la era de la IA.” (Microsoft Responsible AI)",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "314",
+      "nativeKind": "blockName",
+      "key": "core/heading",
+      "fingerprint": "56c8521f63972615f0fcf03f0f3a2ffe74cf0df01c41c13af5df021670e3b78e",
+      "editability": "safe_text_edit",
+      "currentText": "🍏 Con manzanitas",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "316",
+      "nativeKind": "blockName",
+      "key": "core/paragraph",
+      "fingerprint": "7da5bfbf81df299f718e99659f9cc2f8d4f527ff854d25547ebd293d3d4e1d26",
+      "editability": "safe_text_edit",
+      "currentText": "Imagina el Loop como un auto de Fórmula 1 🏎️. La IA es el motor que lo hace correr a toda velocidad, pero sin un piloto humano que controle la dirección y los frenos, tarde o temp...",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "320",
+      "nativeKind": "blockName",
+      "key": "core/heading",
+      "fingerprint": "23a5e13f8b76d05089071db116f571fcb4f243e5c8811c52c1993b55d08e6806",
+      "editability": "safe_text_edit",
+      "currentText": "👀 Y ahora que tenemos claro que la velocidad sin confianza no sirve…",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "322",
+      "nativeKind": "blockName",
+      "key": "core/paragraph",
+      "fingerprint": "7cbd58e6689cd7e233062a7d627afce4295162d8e2890e6bb894cbc17c8e9e5c",
+      "editability": "safe_text_edit",
+      "currentText": "¿Cómo cerramos este recorrido y aterrizamos todo lo aprendido sobre el Loop en una idea simple y poderosa que puedas llevarte a tu día a día?",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "324",
+      "nativeKind": "blockName",
+      "key": "core/heading",
+      "fingerprint": "2d9ef92f0c39cacf031de36f75c4c8d6e9ffda3b2d8390fbaf24e17b43d4ecc9",
+      "editability": "safe_text_edit",
+      "currentText": "De embudos y ruedas… a un bucle infinito 🚲♾️",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "326",
+      "nativeKind": "blockName",
+      "key": "core/paragraph",
+      "fingerprint": "f5860faea8740fcf1b18b409f40405413caf4361f00da7b389c921c4e9332d0c",
+      "editability": "safe_text_edit",
+      "currentText": "Durante años nos aferramos al funnel, como ese mapa viejo que todos sabíamos leer aunque ya no llevara a ninguna parte. Luego abrazamos el flywheel, que nos inspiró a girar en torn...",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "328",
+      "nativeKind": "blockName",
+      "key": "core/paragraph",
+      "fingerprint": "dd94c611791b000f7c902a3d06cde8e7578ce67fe7756a6194134fedd4b4b7e6",
+      "editability": "safe_text_edit",
+      "currentText": "El mercado cambió. Los clientes ya no caminan en línea recta ni giran en círculos perfectos. Saltan, brincan, abandonan y regresan. Y la única forma de estar a la altura es con un ...",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "330",
+      "nativeKind": "blockName",
+      "key": "core/paragraph",
+      "fingerprint": "5143f4fc08d3dafa89053b6fd6dadda821bbde943cf78d27e7146c65be2dcd3d",
+      "editability": "safe_text_edit",
+      "currentText": "Ese motor ya existe. No es magia, ni un nuevo juguete de moda. Es un framework que combina lo mejor del inbound, lo potencia con IA y lo mantiene bajo control humano.",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "332",
+      "nativeKind": "blockName",
+      "key": "core/paragraph",
+      "fingerprint": "f9f8d43341d602d8e84da11d8deb073d6f27c9ffaf35fffb93c76c1dbb96c900",
+      "editability": "safe_text_edit",
+      "currentText": "👉 Loop = sistema operativo de marketing ágil, humano y rentable.",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "update_text",
+      "targetPath": "334",
+      "nativeKind": "blockName",
+      "key": "core/paragraph",
+      "fingerprint": "4a5fe85275b5d27ff5a6f9f08fa12f9abb82bf14ed55eea59f2615669c89059d",
+      "editability": "safe_text_edit",
+      "currentText": "Y si quieres seguir bajando estas ideas a tierra, con historias, ejemplos y sí, también con manzanitas 🍏, suscríbete a Marketing con Manzanitas. Porque esto recién empieza… y el l...",
+      "rationale": "Text block can be refined after a human/agent brief while preserving the native Gutenberg block type.",
+      "risk": "low",
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly."
+      ]
+    },
+    {
+      "operation": "preserve",
+      "targetPath": "10",
+      "nativeKind": "blockName",
+      "key": "yoast-seo/table-of-contents",
+      "fingerprint": "72fc76aa9c2ebbea64d8b5b730247d556ee7d7aa6af05af11e66a94176b74ca3",
+      "editability": "preserve_structure",
+      "currentText": "Tabla de contenidos¿Qué es Loop Marketing? ♾️📌 Definición simple:🌱 Filosofía de base: inbound + un marco operativo nuevo📊 Una necesidad en cifras🔄 Funnel vs Flywheel vs Loop Ma...",
+      "rationale": "Structural/editor block should be preserved unless the refresh brief explicitly changes document structure.",
+      "risk": "medium",
+      "guardrails": [
+        "Do not remove or reorder without a reviewed structure diff.",
+        "Preserve child blocks unless the target path is explicitly listed in a future patch plan."
+      ]
+    },
+    {
+      "operation": "preserve",
+      "targetPath": "26",
+      "nativeKind": "blockName",
+      "key": "core/separator",
+      "fingerprint": "dbcd5bb7832abd805c9f040bf74e6628665ea2d32437ff0b14f32ea98e4e477f",
+      "editability": "preserve_structure",
+      "currentText": "",
+      "rationale": "Structural/editor block should be preserved unless the refresh brief explicitly changes document structure.",
+      "risk": "medium",
+      "guardrails": [
+        "Do not remove or reorder without a reviewed structure diff.",
+        "Preserve child blocks unless the target path is explicitly listed in a future patch plan."
+      ]
+    },
+    {
+      "operation": "preserve",
+      "targetPath": "32",
+      "nativeKind": "blockName",
+      "key": "core/list",
+      "fingerprint": "fb4f9b4ecbed259ef132db3f5bf53520cca3b6da437a7d3d7493239672cccef7",
+      "editability": "preserve_structure",
+      "currentText": "",
+      "rationale": "Structural/editor block should be preserved unless the refresh brief explicitly changes document structure.",
+      "risk": "medium",
+      "guardrails": [
+        "Do not remove or reorder without a reviewed structure diff.",
+        "Preserve child blocks unless the target path is explicitly listed in a future patch plan."
+      ]
+    },
+    {
+      "operation": "preserve",
+      "targetPath": "38",
+      "nativeKind": "blockName",
+      "key": "core/separator",
+      "fingerprint": "9de2116c98924db206a909d97ebe1c66cca4fa8bb147695a160ccb7cb06324ef",
+      "editability": "preserve_structure",
+      "currentText": "",
+      "rationale": "Structural/editor block should be preserved unless the refresh brief explicitly changes document structure.",
+      "risk": "medium",
+      "guardrails": [
+        "Do not remove or reorder without a reviewed structure diff.",
+        "Preserve child blocks unless the target path is explicitly listed in a future patch plan."
+      ]
+    },
+    {
+      "operation": "preserve",
+      "targetPath": "42",
+      "nativeKind": "blockName",
+      "key": "core/list",
+      "fingerprint": "40ebe9a1972aa23997cd1a926f4c951783915cdc5766058b02d42eafc858f6f8",
+      "editability": "preserve_structure",
+      "currentText": "",
+      "rationale": "Structural/editor block should be preserved unless the refresh brief explicitly changes document structure.",
+      "risk": "medium",
+      "guardrails": [
+        "Do not remove or reorder without a reviewed structure diff.",
+        "Preserve child blocks unless the target path is explicitly listed in a future patch plan."
+      ]
+    },
+    {
+      "operation": "preserve",
+      "targetPath": "46",
+      "nativeKind": "blockName",
+      "key": "core/separator",
+      "fingerprint": "f880857f3ff4a6af913b436c6895c76dde85f489ec80f237183e39c65383b87d",
+      "editability": "preserve_structure",
+      "currentText": "",
+      "rationale": "Structural/editor block should be preserved unless the refresh brief explicitly changes document structure.",
+      "risk": "medium",
+      "guardrails": [
+        "Do not remove or reorder without a reviewed structure diff.",
+        "Preserve child blocks unless the target path is explicitly listed in a future patch plan."
+      ]
+    },
+    {
+      "operation": "preserve",
+      "targetPath": "56",
+      "nativeKind": "blockName",
+      "key": "core/list",
+      "fingerprint": "24393aeb513c86d79e492457bfae87e81ffb3b4f0bb338efb996855cac42c4dc",
+      "editability": "preserve_structure",
+      "currentText": "",
+      "rationale": "Structural/editor block should be preserved unless the refresh brief explicitly changes document structure.",
+      "risk": "medium",
+      "guardrails": [
+        "Do not remove or reorder without a reviewed structure diff.",
+        "Preserve child blocks unless the target path is explicitly listed in a future patch plan."
+      ]
+    },
+    {
+      "operation": "preserve",
+      "targetPath": "62",
+      "nativeKind": "blockName",
+      "key": "core/list",
+      "fingerprint": "22a9b3b6602bed8065d03dacf51d75f32c847cc95939bcf6bf73bd85af25ac68",
+      "editability": "preserve_structure",
+      "currentText": "",
+      "rationale": "Structural/editor block should be preserved unless the refresh brief explicitly changes document structure.",
+      "risk": "medium",
+      "guardrails": [
+        "Do not remove or reorder without a reviewed structure diff.",
+        "Preserve child blocks unless the target path is explicitly listed in a future patch plan."
+      ]
+    },
+    {
+      "operation": "preserve",
+      "targetPath": "70",
+      "nativeKind": "blockName",
+      "key": "core/list",
+      "fingerprint": "b26f5ec793daaf28526b1e1668dcee8cddac57a0c7d4938d0f3e0c7156104ba4",
+      "editability": "preserve_structure",
+      "currentText": "",
+      "rationale": "Structural/editor block should be preserved unless the refresh brief explicitly changes document structure.",
+      "risk": "medium",
+      "guardrails": [
+        "Do not remove or reorder without a reviewed structure diff.",
+        "Preserve child blocks unless the target path is explicitly listed in a future patch plan."
+      ]
+    },
+    {
+      "operation": "preserve",
+      "targetPath": "76",
+      "nativeKind": "blockName",
+      "key": "core/list",
+      "fingerprint": "2f2b014e7780c6c10e97b98be398138a0a803ab02f61bab8ccd1091fe28c777c",
+      "editability": "preserve_structure",
+      "currentText": "",
+      "rationale": "Structural/editor block should be preserved unless the refresh brief explicitly changes document structure.",
+      "risk": "medium",
+      "guardrails": [
+        "Do not remove or reorder without a reviewed structure diff.",
+        "Preserve child blocks unless the target path is explicitly listed in a future patch plan."
+      ]
+    },
+    {
+      "operation": "preserve",
+      "targetPath": "78",
+      "nativeKind": "blockName",
+      "key": "core/separator",
+      "fingerprint": "7f0131f589da44085ebc680cb515d88d744547e08653fedff88176899e1ad330",
+      "editability": "preserve_structure",
+      "currentText": "",
+      "rationale": "Structural/editor block should be preserved unless the refresh brief explicitly changes document structure.",
+      "risk": "medium",
+      "guardrails": [
+        "Do not remove or reorder without a reviewed structure diff.",
+        "Preserve child blocks unless the target path is explicitly listed in a future patch plan."
+      ]
+    },
+    {
+      "operation": "preserve",
+      "targetPath": "82",
+      "nativeKind": "blockName",
+      "key": "core/separator",
+      "fingerprint": "9ce8da719f79003f1e47b294ea12ac964872e166e7a7d037b8eade294514445b",
+      "editability": "preserve_structure",
+      "currentText": "",
+      "rationale": "Structural/editor block should be preserved unless the refresh brief explicitly changes document structure.",
+      "risk": "medium",
+      "guardrails": [
+        "Do not remove or reorder without a reviewed structure diff.",
+        "Preserve child blocks unless the target path is explicitly listed in a future patch plan."
+      ]
+    },
+    {
+      "operation": "preserve",
+      "targetPath": "88",
+      "nativeKind": "blockName",
+      "key": "core/separator",
+      "fingerprint": "8d6f23154be1b019da59ffac9eb07a061aa1b668dc3cb9d3cbee2ca1d87e452f",
+      "editability": "preserve_structure",
+      "currentText": "",
+      "rationale": "Structural/editor block should be preserved unless the refresh brief explicitly changes document structure.",
+      "risk": "medium",
+      "guardrails": [
+        "Do not remove or reorder without a reviewed structure diff.",
+        "Preserve child blocks unless the target path is explicitly listed in a future patch plan."
+      ]
+    },
+    {
+      "operation": "preserve",
+      "targetPath": "98",
+      "nativeKind": "blockName",
+      "key": "core/separator",
+      "fingerprint": "0856bf892d15256893eea07ef7ee0f468e6d013cd02f6cc1ad2377ef601f663d",
+      "editability": "preserve_structure",
+      "currentText": "",
+      "rationale": "Structural/editor block should be preserved unless the refresh brief explicitly changes document structure.",
+      "risk": "medium",
+      "guardrails": [
+        "Do not remove or reorder without a reviewed structure diff.",
+        "Preserve child blocks unless the target path is explicitly listed in a future patch plan."
+      ]
+    },
+    {
+      "operation": "preserve",
+      "targetPath": "108",
+      "nativeKind": "blockName",
+      "key": "core/separator",
+      "fingerprint": "1a01d6b0f2fc585c1c3eaadfcc8da7ece0e470594dfd69c295678b9be85347d9",
+      "editability": "preserve_structure",
+      "currentText": "",
+      "rationale": "Structural/editor block should be preserved unless the refresh brief explicitly changes document structure.",
+      "risk": "medium",
+      "guardrails": [
+        "Do not remove or reorder without a reviewed structure diff.",
+        "Preserve child blocks unless the target path is explicitly listed in a future patch plan."
+      ]
+    },
+    {
+      "operation": "preserve",
+      "targetPath": "118",
+      "nativeKind": "blockName",
+      "key": "core/separator",
+      "fingerprint": "1f2148d14f747094f0580c7f90fc29acdd5b90830172cb211d7962baa4668703",
+      "editability": "preserve_structure",
+      "currentText": "",
+      "rationale": "Structural/editor block should be preserved unless the refresh brief explicitly changes document structure.",
+      "risk": "medium",
+      "guardrails": [
+        "Do not remove or reorder without a reviewed structure diff.",
+        "Preserve child blocks unless the target path is explicitly listed in a future patch plan."
+      ]
+    },
+    {
+      "operation": "preserve",
+      "targetPath": "128",
+      "nativeKind": "blockName",
+      "key": "core/separator",
+      "fingerprint": "7e8bcf9a764ca25228464b77b8c1fd4679ff0c5857df57ed8d67733e4c8056ad",
+      "editability": "preserve_structure",
+      "currentText": "",
+      "rationale": "Structural/editor block should be preserved unless the refresh brief explicitly changes document structure.",
+      "risk": "medium",
+      "guardrails": [
+        "Do not remove or reorder without a reviewed structure diff.",
+        "Preserve child blocks unless the target path is explicitly listed in a future patch plan."
+      ]
+    },
+    {
+      "operation": "preserve",
+      "targetPath": "136",
+      "nativeKind": "blockName",
+      "key": "core/separator",
+      "fingerprint": "5d18a97595a140f75a61fade2afa37bf062f368b3287b6f2f35c84aac4d1895a",
+      "editability": "preserve_structure",
+      "currentText": "",
+      "rationale": "Structural/editor block should be preserved unless the refresh brief explicitly changes document structure.",
+      "risk": "medium",
+      "guardrails": [
+        "Do not remove or reorder without a reviewed structure diff.",
+        "Preserve child blocks unless the target path is explicitly listed in a future patch plan."
+      ]
+    },
+    {
+      "operation": "preserve",
+      "targetPath": "142",
+      "nativeKind": "blockName",
+      "key": "core/separator",
+      "fingerprint": "f00f6575ef2e96e5b78fda1de4bf96b0a7bcdbbda5f751c6566046161783f3e7",
+      "editability": "preserve_structure",
+      "currentText": "",
+      "rationale": "Structural/editor block should be preserved unless the refresh brief explicitly changes document structure.",
+      "risk": "medium",
+      "guardrails": [
+        "Do not remove or reorder without a reviewed structure diff.",
+        "Preserve child blocks unless the target path is explicitly listed in a future patch plan."
+      ]
+    },
+    {
+      "operation": "preserve",
+      "targetPath": "152",
+      "nativeKind": "blockName",
+      "key": "core/list",
+      "fingerprint": "05385f314b7fd26837ab2e9d41f0dcc580f121efd3eaa84ca6cc297dc073f893",
+      "editability": "preserve_structure",
+      "currentText": "",
+      "rationale": "Structural/editor block should be preserved unless the refresh brief explicitly changes document structure.",
+      "risk": "medium",
+      "guardrails": [
+        "Do not remove or reorder without a reviewed structure diff.",
+        "Preserve child blocks unless the target path is explicitly listed in a future patch plan."
+      ]
+    },
+    {
+      "operation": "preserve",
+      "targetPath": "158",
+      "nativeKind": "blockName",
+      "key": "core/list",
+      "fingerprint": "5c09b4458f0abcd4172d9234babdc6f7a13c182180f221315254a98da59e9098",
+      "editability": "preserve_structure",
+      "currentText": "",
+      "rationale": "Structural/editor block should be preserved unless the refresh brief explicitly changes document structure.",
+      "risk": "medium",
+      "guardrails": [
+        "Do not remove or reorder without a reviewed structure diff.",
+        "Preserve child blocks unless the target path is explicitly listed in a future patch plan."
+      ]
+    },
+    {
+      "operation": "preserve",
+      "targetPath": "160",
+      "nativeKind": "blockName",
+      "key": "core/separator",
+      "fingerprint": "82bad7b3ae8617c00dc2b1a968ff37b0abbecdb1b8b8b137b4345056ec7e8624",
+      "editability": "preserve_structure",
+      "currentText": "",
+      "rationale": "Structural/editor block should be preserved unless the refresh brief explicitly changes document structure.",
+      "risk": "medium",
+      "guardrails": [
+        "Do not remove or reorder without a reviewed structure diff.",
+        "Preserve child blocks unless the target path is explicitly listed in a future patch plan."
+      ]
+    },
+    {
+      "operation": "preserve",
+      "targetPath": "166",
+      "nativeKind": "blockName",
+      "key": "core/list",
+      "fingerprint": "a738dbcced39fc8e05ec14c54ba07166c8bb34c9d7430cfd9f8ae1614f92c3f3",
+      "editability": "preserve_structure",
+      "currentText": "",
+      "rationale": "Structural/editor block should be preserved unless the refresh brief explicitly changes document structure.",
+      "risk": "medium",
+      "guardrails": [
+        "Do not remove or reorder without a reviewed structure diff.",
+        "Preserve child blocks unless the target path is explicitly listed in a future patch plan."
+      ]
+    },
+    {
+      "operation": "preserve",
+      "targetPath": "172",
+      "nativeKind": "blockName",
+      "key": "core/list",
+      "fingerprint": "35d2491ec214c2c5832c1b92bd590c8308bf7fc40f5d63d6168e4c767a8db989",
+      "editability": "preserve_structure",
+      "currentText": "",
+      "rationale": "Structural/editor block should be preserved unless the refresh brief explicitly changes document structure.",
+      "risk": "medium",
+      "guardrails": [
+        "Do not remove or reorder without a reviewed structure diff.",
+        "Preserve child blocks unless the target path is explicitly listed in a future patch plan."
+      ]
+    },
+    {
+      "operation": "preserve",
+      "targetPath": "174",
+      "nativeKind": "blockName",
+      "key": "core/separator",
+      "fingerprint": "d062f896309fc3aacb4f7bdfea420e854550b7b60bf88584979084c714c343ae",
+      "editability": "preserve_structure",
+      "currentText": "",
+      "rationale": "Structural/editor block should be preserved unless the refresh brief explicitly changes document structure.",
+      "risk": "medium",
+      "guardrails": [
+        "Do not remove or reorder without a reviewed structure diff.",
+        "Preserve child blocks unless the target path is explicitly listed in a future patch plan."
+      ]
+    },
+    {
+      "operation": "preserve",
+      "targetPath": "182",
+      "nativeKind": "blockName",
+      "key": "core/separator",
+      "fingerprint": "f629bf9757b4483d50e9db3470bfbc7641533f2f16fd5ecfc4a3fd88b4d40995",
+      "editability": "preserve_structure",
+      "currentText": "",
+      "rationale": "Structural/editor block should be preserved unless the refresh brief explicitly changes document structure.",
+      "risk": "medium",
+      "guardrails": [
+        "Do not remove or reorder without a reviewed structure diff.",
+        "Preserve child blocks unless the target path is explicitly listed in a future patch plan."
+      ]
+    },
+    {
+      "operation": "preserve",
+      "targetPath": "190",
+      "nativeKind": "blockName",
+      "key": "core/separator",
+      "fingerprint": "77c7d964b4fe9b1a0aebd63be9c873353065b926a855f22db6623573b3235673",
+      "editability": "preserve_structure",
+      "currentText": "",
+      "rationale": "Structural/editor block should be preserved unless the refresh brief explicitly changes document structure.",
+      "risk": "medium",
+      "guardrails": [
+        "Do not remove or reorder without a reviewed structure diff.",
+        "Preserve child blocks unless the target path is explicitly listed in a future patch plan."
+      ]
+    },
+    {
+      "operation": "preserve",
+      "targetPath": "196",
+      "nativeKind": "blockName",
+      "key": "core/separator",
+      "fingerprint": "feb5ada4d3e4984b2552ba2f49d4c027055ca93ce86d20dc81e4fdbce9cd1fbb",
+      "editability": "preserve_structure",
+      "currentText": "",
+      "rationale": "Structural/editor block should be preserved unless the refresh brief explicitly changes document structure.",
+      "risk": "medium",
+      "guardrails": [
+        "Do not remove or reorder without a reviewed structure diff.",
+        "Preserve child blocks unless the target path is explicitly listed in a future patch plan."
+      ]
+    },
+    {
+      "operation": "preserve",
+      "targetPath": "202",
+      "nativeKind": "blockName",
+      "key": "core/list",
+      "fingerprint": "d3b6bc0010e3edbe9f549ed412e90152637681eacb8e8ce5d6d6f6f8375138b9",
+      "editability": "preserve_structure",
+      "currentText": "",
+      "rationale": "Structural/editor block should be preserved unless the refresh brief explicitly changes document structure.",
+      "risk": "medium",
+      "guardrails": [
+        "Do not remove or reorder without a reviewed structure diff.",
+        "Preserve child blocks unless the target path is explicitly listed in a future patch plan."
+      ]
+    },
+    {
+      "operation": "preserve",
+      "targetPath": "204",
+      "nativeKind": "blockName",
+      "key": "core/separator",
+      "fingerprint": "0087fbb98fc2015fcee9b69c105bcc15fcad1d90bfab819f0de0865d38b817c5",
+      "editability": "preserve_structure",
+      "currentText": "",
+      "rationale": "Structural/editor block should be preserved unless the refresh brief explicitly changes document structure.",
+      "risk": "medium",
+      "guardrails": [
+        "Do not remove or reorder without a reviewed structure diff.",
+        "Preserve child blocks unless the target path is explicitly listed in a future patch plan."
+      ]
+    },
+    {
+      "operation": "preserve",
+      "targetPath": "212",
+      "nativeKind": "blockName",
+      "key": "core/list",
+      "fingerprint": "7d86dd2a86ccb9e90594dff004dab69b2fb0a4cdd5485bdf66979982e234cc8d",
+      "editability": "preserve_structure",
+      "currentText": "",
+      "rationale": "Structural/editor block should be preserved unless the refresh brief explicitly changes document structure.",
+      "risk": "medium",
+      "guardrails": [
+        "Do not remove or reorder without a reviewed structure diff.",
+        "Preserve child blocks unless the target path is explicitly listed in a future patch plan."
+      ]
+    },
+    {
+      "operation": "preserve",
+      "targetPath": "214",
+      "nativeKind": "blockName",
+      "key": "core/separator",
+      "fingerprint": "48edc250b27f3a4b12a43afa986b0f265e01c4ceec59ad97d242d9d3e6ef1389",
+      "editability": "preserve_structure",
+      "currentText": "",
+      "rationale": "Structural/editor block should be preserved unless the refresh brief explicitly changes document structure.",
+      "risk": "medium",
+      "guardrails": [
+        "Do not remove or reorder without a reviewed structure diff.",
+        "Preserve child blocks unless the target path is explicitly listed in a future patch plan."
+      ]
+    },
+    {
+      "operation": "preserve",
+      "targetPath": "222",
+      "nativeKind": "blockName",
+      "key": "core/separator",
+      "fingerprint": "58fd8cefebba28ce8ad1b0993be6859f5c8df1f185591db2a3b0edee25f1b081",
+      "editability": "preserve_structure",
+      "currentText": "",
+      "rationale": "Structural/editor block should be preserved unless the refresh brief explicitly changes document structure.",
+      "risk": "medium",
+      "guardrails": [
+        "Do not remove or reorder without a reviewed structure diff.",
+        "Preserve child blocks unless the target path is explicitly listed in a future patch plan."
+      ]
+    },
+    {
+      "operation": "preserve",
+      "targetPath": "228",
+      "nativeKind": "blockName",
+      "key": "core/list",
+      "fingerprint": "c7c3d7bcd95684cd41fd0638be8294eb8468aa2acb04eefcf89a1a4ffbc76cf8",
+      "editability": "preserve_structure",
+      "currentText": "",
+      "rationale": "Structural/editor block should be preserved unless the refresh brief explicitly changes document structure.",
+      "risk": "medium",
+      "guardrails": [
+        "Do not remove or reorder without a reviewed structure diff.",
+        "Preserve child blocks unless the target path is explicitly listed in a future patch plan."
+      ]
+    },
+    {
+      "operation": "preserve",
+      "targetPath": "232",
+      "nativeKind": "blockName",
+      "key": "core/list",
+      "fingerprint": "a581c1effaedb56a56d4e311786758f3e57d51314d5e921c4c8468d4b63ae36c",
+      "editability": "preserve_structure",
+      "currentText": "",
+      "rationale": "Structural/editor block should be preserved unless the refresh brief explicitly changes document structure.",
+      "risk": "medium",
+      "guardrails": [
+        "Do not remove or reorder without a reviewed structure diff.",
+        "Preserve child blocks unless the target path is explicitly listed in a future patch plan."
+      ]
+    },
+    {
+      "operation": "preserve",
+      "targetPath": "236",
+      "nativeKind": "blockName",
+      "key": "core/list",
+      "fingerprint": "71d060c287fc5be3b3b244f5962bae3a1930d9e6a01ebe3c13d8caf0202bdc54",
+      "editability": "preserve_structure",
+      "currentText": "",
+      "rationale": "Structural/editor block should be preserved unless the refresh brief explicitly changes document structure.",
+      "risk": "medium",
+      "guardrails": [
+        "Do not remove or reorder without a reviewed structure diff.",
+        "Preserve child blocks unless the target path is explicitly listed in a future patch plan."
+      ]
+    },
+    {
+      "operation": "preserve",
+      "targetPath": "240",
+      "nativeKind": "blockName",
+      "key": "core/list",
+      "fingerprint": "1a32ee736e3d52f995004648f5b88a1277fbffc1a9da52c29ad222f79138460d",
+      "editability": "preserve_structure",
+      "currentText": "",
+      "rationale": "Structural/editor block should be preserved unless the refresh brief explicitly changes document structure.",
+      "risk": "medium",
+      "guardrails": [
+        "Do not remove or reorder without a reviewed structure diff.",
+        "Preserve child blocks unless the target path is explicitly listed in a future patch plan."
+      ]
+    },
+    {
+      "operation": "preserve",
+      "targetPath": "244",
+      "nativeKind": "blockName",
+      "key": "core/separator",
+      "fingerprint": "b578ffa256129daa55b82af810eb67c72a651f468b493168a1cf35d729f7e900",
+      "editability": "preserve_structure",
+      "currentText": "",
+      "rationale": "Structural/editor block should be preserved unless the refresh brief explicitly changes document structure.",
+      "risk": "medium",
+      "guardrails": [
+        "Do not remove or reorder without a reviewed structure diff.",
+        "Preserve child blocks unless the target path is explicitly listed in a future patch plan."
+      ]
+    },
+    {
+      "operation": "preserve",
+      "targetPath": "250",
+      "nativeKind": "blockName",
+      "key": "core/separator",
+      "fingerprint": "ecd51c503c607063a4bfb36c81bfb097ee4e93c6f96f52626df548aa433ece68",
+      "editability": "preserve_structure",
+      "currentText": "",
+      "rationale": "Structural/editor block should be preserved unless the refresh brief explicitly changes document structure.",
+      "risk": "medium",
+      "guardrails": [
+        "Do not remove or reorder without a reviewed structure diff.",
+        "Preserve child blocks unless the target path is explicitly listed in a future patch plan."
+      ]
+    },
+    {
+      "operation": "preserve",
+      "targetPath": "262",
+      "nativeKind": "blockName",
+      "key": "core/list",
+      "fingerprint": "d0fe102c05d951a67913e7be0753618cb3258345b0c9b4c8a6a3231fdcbbfbf7",
+      "editability": "preserve_structure",
+      "currentText": "",
+      "rationale": "Structural/editor block should be preserved unless the refresh brief explicitly changes document structure.",
+      "risk": "medium",
+      "guardrails": [
+        "Do not remove or reorder without a reviewed structure diff.",
+        "Preserve child blocks unless the target path is explicitly listed in a future patch plan."
+      ]
+    },
+    {
+      "operation": "preserve",
+      "targetPath": "266",
+      "nativeKind": "blockName",
+      "key": "core/separator",
+      "fingerprint": "6d7cf859aae2cacc4164400c8449d8b49d873f1ea25cba1b01fb4cafc2337d32",
+      "editability": "preserve_structure",
+      "currentText": "",
+      "rationale": "Structural/editor block should be preserved unless the refresh brief explicitly changes document structure.",
+      "risk": "medium",
+      "guardrails": [
+        "Do not remove or reorder without a reviewed structure diff.",
+        "Preserve child blocks unless the target path is explicitly listed in a future patch plan."
+      ]
+    },
+    {
+      "operation": "preserve",
+      "targetPath": "274",
+      "nativeKind": "blockName",
+      "key": "core/list",
+      "fingerprint": "910309394d381f2a2ad53a62328393e94a300224cfcb71d88bf331aa1e2f3d75",
+      "editability": "preserve_structure",
+      "currentText": "",
+      "rationale": "Structural/editor block should be preserved unless the refresh brief explicitly changes document structure.",
+      "risk": "medium",
+      "guardrails": [
+        "Do not remove or reorder without a reviewed structure diff.",
+        "Preserve child blocks unless the target path is explicitly listed in a future patch plan."
+      ]
+    },
+    {
+      "operation": "preserve",
+      "targetPath": "278",
+      "nativeKind": "blockName",
+      "key": "core/separator",
+      "fingerprint": "a8b7fcbf74a53d9c33e03ee9162294c55e9df5b39670d1823906315b2dc5cd00",
+      "editability": "preserve_structure",
+      "currentText": "",
+      "rationale": "Structural/editor block should be preserved unless the refresh brief explicitly changes document structure.",
+      "risk": "medium",
+      "guardrails": [
+        "Do not remove or reorder without a reviewed structure diff.",
+        "Preserve child blocks unless the target path is explicitly listed in a future patch plan."
+      ]
+    },
+    {
+      "operation": "preserve",
+      "targetPath": "284",
+      "nativeKind": "blockName",
+      "key": "core/separator",
+      "fingerprint": "ec3a61fb1aa10ffdd10d0c2b400dace5746c415a8dd6d023ebbdb16d43de0539",
+      "editability": "preserve_structure",
+      "currentText": "",
+      "rationale": "Structural/editor block should be preserved unless the refresh brief explicitly changes document structure.",
+      "risk": "medium",
+      "guardrails": [
+        "Do not remove or reorder without a reviewed structure diff.",
+        "Preserve child blocks unless the target path is explicitly listed in a future patch plan."
+      ]
+    },
+    {
+      "operation": "preserve",
+      "targetPath": "294",
+      "nativeKind": "blockName",
+      "key": "core/separator",
+      "fingerprint": "0bc3546cf0937c902ebfd1616f2fd93d88c3f90deeb5ab72fbd724a447653b23",
+      "editability": "preserve_structure",
+      "currentText": "",
+      "rationale": "Structural/editor block should be preserved unless the refresh brief explicitly changes document structure.",
+      "risk": "medium",
+      "guardrails": [
+        "Do not remove or reorder without a reviewed structure diff.",
+        "Preserve child blocks unless the target path is explicitly listed in a future patch plan."
+      ]
+    },
+    {
+      "operation": "preserve",
+      "targetPath": "298",
+      "nativeKind": "blockName",
+      "key": "core/list",
+      "fingerprint": "0491c50c1d0dc633de0b2c7eaa34033922fa2f8e555855aada776a9e9e83a0b9",
+      "editability": "preserve_structure",
+      "currentText": "",
+      "rationale": "Structural/editor block should be preserved unless the refresh brief explicitly changes document structure.",
+      "risk": "medium",
+      "guardrails": [
+        "Do not remove or reorder without a reviewed structure diff.",
+        "Preserve child blocks unless the target path is explicitly listed in a future patch plan."
+      ]
+    },
+    {
+      "operation": "preserve",
+      "targetPath": "300",
+      "nativeKind": "blockName",
+      "key": "core/separator",
+      "fingerprint": "523c2ed8d088cca38aa887e3de7f0dcebde874c9bdf059f7b293b8e733dbb0eb",
+      "editability": "preserve_structure",
+      "currentText": "",
+      "rationale": "Structural/editor block should be preserved unless the refresh brief explicitly changes document structure.",
+      "risk": "medium",
+      "guardrails": [
+        "Do not remove or reorder without a reviewed structure diff.",
+        "Preserve child blocks unless the target path is explicitly listed in a future patch plan."
+      ]
+    },
+    {
+      "operation": "preserve",
+      "targetPath": "306",
+      "nativeKind": "blockName",
+      "key": "core/list",
+      "fingerprint": "927f6d033523983578ca253d44fcf2ad0a1edc24e883ce42da25cbce5d97752f",
+      "editability": "preserve_structure",
+      "currentText": "",
+      "rationale": "Structural/editor block should be preserved unless the refresh brief explicitly changes document structure.",
+      "risk": "medium",
+      "guardrails": [
+        "Do not remove or reorder without a reviewed structure diff.",
+        "Preserve child blocks unless the target path is explicitly listed in a future patch plan."
+      ]
+    },
+    {
+      "operation": "preserve",
+      "targetPath": "306.2.0",
+      "nativeKind": "blockName",
+      "key": "core/list",
+      "fingerprint": "7b913683180c6fc57bd890ce6244b19db95252542896465289207e31661900a5",
+      "editability": "preserve_structure",
+      "currentText": "",
+      "rationale": "Structural/editor block should be preserved unless the refresh brief explicitly changes document structure.",
+      "risk": "medium",
+      "guardrails": [
+        "Do not remove or reorder without a reviewed structure diff.",
+        "Preserve child blocks unless the target path is explicitly listed in a future patch plan."
+      ]
+    },
+    {
+      "operation": "preserve",
+      "targetPath": "312",
+      "nativeKind": "blockName",
+      "key": "core/separator",
+      "fingerprint": "418a18b9695e26e360b09cbc4c6d2694f144ff4b18a1a27d1fe586ce7647a9d8",
+      "editability": "preserve_structure",
+      "currentText": "",
+      "rationale": "Structural/editor block should be preserved unless the refresh brief explicitly changes document structure.",
+      "risk": "medium",
+      "guardrails": [
+        "Do not remove or reorder without a reviewed structure diff.",
+        "Preserve child blocks unless the target path is explicitly listed in a future patch plan."
+      ]
+    },
+    {
+      "operation": "preserve",
+      "targetPath": "318",
+      "nativeKind": "blockName",
+      "key": "core/separator",
+      "fingerprint": "0c276d5f64c27c151789deffbbd126b53f9aa2598d47d6845cf1dbe746989965",
+      "editability": "preserve_structure",
+      "currentText": "",
+      "rationale": "Structural/editor block should be preserved unless the refresh brief explicitly changes document structure.",
+      "risk": "medium",
+      "guardrails": [
+        "Do not remove or reorder without a reviewed structure diff.",
+        "Preserve child blocks unless the target path is explicitly listed in a future patch plan."
+      ]
+    },
+    {
+      "operation": "reconcile_media",
+      "targetPath": "16",
+      "nativeKind": "media",
+      "key": "core/image",
+      "fingerprint": "87ae673ad44abdbb089e38c4b9c04ad448966da0c2d7f869b05cdbd37984f423",
+      "editability": "media_requires_reconcile",
+      "rationale": "Media block must preserve or explicitly reconcile WordPress attachment id, rendered src, dimensions and alt text.",
+      "risk": "medium",
+      "guardrails": [
+        "Do not invent or replace media IDs.",
+        "Preserve the existing asset unless the refresh brief explicitly requests a replacement.",
+        "If replaced later, upload/reconcile media first and patch only a draft/private clone."
+      ]
+    },
+    {
+      "operation": "review_link",
+      "targetPath": "links.0",
+      "nativeKind": "link",
+      "key": "#h-que-es-loop-marketing",
+      "currentText": "¿Qué es Loop Marketing? ♾️",
+      "rationale": "Internal anchors should be preserved with the heading outline unless the section title changes.",
+      "risk": "low",
+      "guardrails": [
+        "Do not rewrite URLs without explicit source validation.",
+        "If heading text changes later, regenerate or validate matching internal anchors."
+      ]
+    },
+    {
+      "operation": "review_link",
+      "targetPath": "links.1",
+      "nativeKind": "link",
+      "key": "#h-definicion-simple",
+      "currentText": "📌 Definición simple:",
+      "rationale": "Internal anchors should be preserved with the heading outline unless the section title changes.",
+      "risk": "low",
+      "guardrails": [
+        "Do not rewrite URLs without explicit source validation.",
+        "If heading text changes later, regenerate or validate matching internal anchors."
+      ]
+    },
+    {
+      "operation": "review_link",
+      "targetPath": "links.2",
+      "nativeKind": "link",
+      "key": "#h-filosofia-de-base-inbound-un-marco-operativo-nuevo",
+      "currentText": "🌱 Filosofía de base: inbound + un marco operativo nuevo",
+      "rationale": "Internal anchors should be preserved with the heading outline unless the section title changes.",
+      "risk": "low",
+      "guardrails": [
+        "Do not rewrite URLs without explicit source validation.",
+        "If heading text changes later, regenerate or validate matching internal anchors."
+      ]
+    },
+    {
+      "operation": "review_link",
+      "targetPath": "links.3",
+      "nativeKind": "link",
+      "key": "#h-una-necesidad-en-cifras",
+      "currentText": "📊 Una necesidad en cifras",
+      "rationale": "Internal anchors should be preserved with the heading outline unless the section title changes.",
+      "risk": "low",
+      "guardrails": [
+        "Do not rewrite URLs without explicit source validation.",
+        "If heading text changes later, regenerate or validate matching internal anchors."
+      ]
+    },
+    {
+      "operation": "review_link",
+      "targetPath": "links.4",
+      "nativeKind": "link",
+      "key": "#h-funnel-vs-flywheel-vs-loop-marketing",
+      "currentText": "🔄 Funnel vs Flywheel vs Loop Marketing",
+      "rationale": "Internal anchors should be preserved with the heading outline unless the section title changes.",
+      "risk": "low",
+      "guardrails": [
+        "Do not rewrite URLs without explicit source validation.",
+        "If heading text changes later, regenerate or validate matching internal anchors."
+      ]
+    },
+    {
+      "operation": "review_link",
+      "targetPath": "links.5",
+      "nativeKind": "link",
+      "key": "#h-el-funnel-linealidad-muerta",
+      "currentText": "📉 El funnel = linealidad muerta",
+      "rationale": "Internal anchors should be preserved with the heading outline unless the section title changes.",
+      "risk": "low",
+      "guardrails": [
+        "Do not rewrite URLs without explicit source validation.",
+        "If heading text changes later, regenerate or validate matching internal anchors."
+      ]
+    },
+    {
+      "operation": "review_link",
+      "targetPath": "links.6",
+      "nativeKind": "link",
+      "key": "#h-el-flywheel-relato-util",
+      "currentText": "⚙️ El flywheel = relato útil",
+      "rationale": "Internal anchors should be preserved with the heading outline unless the section title changes.",
+      "risk": "low",
+      "guardrails": [
+        "Do not rewrite URLs without explicit source validation.",
+        "If heading text changes later, regenerate or validate matching internal anchors."
+      ]
+    },
+    {
+      "operation": "review_link",
+      "targetPath": "links.7",
+      "nativeKind": "link",
+      "key": "#h-el-loop-accion-continua",
+      "currentText": "♾️ El loop = acción continua",
+      "rationale": "Internal anchors should be preserved with the heading outline unless the section title changes.",
+      "risk": "low",
+      "guardrails": [
+        "Do not rewrite URLs without explicit source validation.",
+        "If heading text changes later, regenerate or validate matching internal anchors."
+      ]
+    },
+    {
+      "operation": "review_link",
+      "targetPath": "links.8",
+      "nativeKind": "link",
+      "key": "#h-loop-marketing-y-las-4s-de-google",
+      "currentText": "🔍 Loop Marketing y las 4S de Google",
+      "rationale": "Internal anchors should be preserved with the heading outline unless the section title changes.",
+      "risk": "low",
+      "guardrails": [
+        "Do not rewrite URLs without explicit source validation.",
+        "If heading text changes later, regenerate or validate matching internal anchors."
+      ]
+    },
+    {
+      "operation": "review_link",
+      "targetPath": "links.9",
+      "nativeKind": "link",
+      "key": "#h-streaming-la-era-del-contenido-continuo",
+      "currentText": "🎬 Streaming: la era del contenido continuo",
+      "rationale": "Internal anchors should be preserved with the heading outline unless the section title changes.",
+      "risk": "low",
+      "guardrails": [
+        "Do not rewrite URLs without explicit source validation.",
+        "If heading text changes later, regenerate or validate matching internal anchors."
+      ]
+    },
+    {
+      "operation": "review_link",
+      "targetPath": "links.10",
+      "nativeKind": "link",
+      "key": "#h-scrolling-exploracion-infinita-en-feeds",
+      "currentText": "📱 Scrolling: exploración infinita en feeds",
+      "rationale": "Internal anchors should be preserved with the heading outline unless the section title changes.",
+      "risk": "low",
+      "guardrails": [
+        "Do not rewrite URLs without explicit source validation.",
+        "If heading text changes later, regenerate or validate matching internal anchors."
+      ]
+    },
+    {
+      "operation": "review_link",
+      "targetPath": "links.11",
+      "nativeKind": "link",
+      "key": "#h-searching-busquedas-multimodales-e-ia-first",
+      "currentText": "🔎 Searching: búsquedas multimodales e IA-first",
+      "rationale": "Internal anchors should be preserved with the heading outline unless the section title changes.",
+      "risk": "low",
+      "guardrails": [
+        "Do not rewrite URLs without explicit source validation.",
+        "If heading text changes later, regenerate or validate matching internal anchors."
+      ]
+    },
+    {
+      "operation": "review_link",
+      "targetPath": "links.12",
+      "nativeKind": "link",
+      "key": "#h-shopping-compras-sin-fricciones",
+      "currentText": "🛒 Shopping: compras sin fricciones",
+      "rationale": "Internal anchors should be preserved with the heading outline unless the section title changes.",
+      "risk": "low",
+      "guardrails": [
+        "Do not rewrite URLs without explicit source validation.",
+        "If heading text changes later, regenerate or validate matching internal anchors."
+      ]
+    },
+    {
+      "operation": "review_link",
+      "targetPath": "links.13",
+      "nativeKind": "link",
+      "key": "#h-vs-loop-marketing-en-b2b-vs-b2c",
+      "currentText": "🏢 vs 🛍️ Loop Marketing en B2B vs B2C",
+      "rationale": "Internal anchors should be preserved with the heading outline unless the section title changes.",
+      "risk": "low",
+      "guardrails": [
+        "Do not rewrite URLs without explicit source validation.",
+        "If heading text changes later, regenerate or validate matching internal anchors."
+      ]
+    },
+    {
+      "operation": "review_link",
+      "targetPath": "links.14",
+      "nativeKind": "link",
+      "key": "#h-en-b2b-relaciones-largas-cuentas-especificas",
+      "currentText": "🏢 En B2B: relaciones largas, cuentas específicas",
+      "rationale": "Internal anchors should be preserved with the heading outline unless the section title changes.",
+      "risk": "low",
+      "guardrails": [
+        "Do not rewrite URLs without explicit source validation.",
+        "If heading text changes later, regenerate or validate matching internal anchors."
+      ]
+    },
+    {
+      "operation": "review_link",
+      "targetPath": "links.15",
+      "nativeKind": "link",
+      "key": "#h-en-b2c-velocidad-y-volumen",
+      "currentText": "🛍️ En B2C: velocidad y volumen",
+      "rationale": "Internal anchors should be preserved with the heading outline unless the section title changes.",
+      "risk": "low",
+      "guardrails": [
+        "Do not rewrite URLs without explicit source validation.",
+        "If heading text changes later, regenerate or validate matching internal anchors."
+      ]
+    },
+    {
+      "operation": "review_link",
+      "targetPath": "links.16",
+      "nativeKind": "link",
+      "key": "#h-impacto-en-metricas-de-negocio-cac-ltv-roi-payback",
+      "currentText": "💰 Impacto en métricas de negocio (CAC, LTV, ROI, Payback)",
+      "rationale": "Internal anchors should be preserved with the heading outline unless the section title changes.",
+      "risk": "low",
+      "guardrails": [
+        "Do not rewrite URLs without explicit source validation.",
+        "If heading text changes later, regenerate or validate matching internal anchors."
+      ]
+    },
+    {
+      "operation": "review_link",
+      "targetPath": "links.17",
+      "nativeKind": "link",
+      "key": "#h-reduccion-del-cac",
+      "currentText": "📉 Reducción del CAC",
+      "rationale": "Internal anchors should be preserved with the heading outline unless the section title changes.",
+      "risk": "low",
+      "guardrails": [
+        "Do not rewrite URLs without explicit source validation.",
+        "If heading text changes later, regenerate or validate matching internal anchors."
+      ]
+    },
+    {
+      "operation": "review_link",
+      "targetPath": "links.18",
+      "nativeKind": "link",
+      "key": "#h-aumento-del-ltv",
+      "currentText": "📈 Aumento del LTV",
+      "rationale": "Internal anchors should be preserved with the heading outline unless the section title changes.",
+      "risk": "low",
+      "guardrails": [
+        "Do not rewrite URLs without explicit source validation.",
+        "If heading text changes later, regenerate or validate matching internal anchors."
+      ]
+    },
+    {
+      "operation": "review_link",
+      "targetPath": "links.19",
+      "nativeKind": "link",
+      "key": "#h-menor-payback-y-mejor-roi",
+      "currentText": "⏱️ Menor Payback y mejor ROI",
+      "rationale": "Internal anchors should be preserved with the heading outline unless the section title changes.",
+      "risk": "low",
+      "guardrails": [
+        "Do not rewrite URLs without explicit source validation.",
+        "If heading text changes later, regenerate or validate matching internal anchors."
+      ]
+    },
+    {
+      "operation": "review_link",
+      "targetPath": "links.20",
+      "nativeKind": "link",
+      "key": "#h-implementacion-practica-stack-tecnologico-y-cultura",
+      "currentText": "⚙️ Implementación práctica: stack tecnológico y cultura",
+      "rationale": "Internal anchors should be preserved with the heading outline unless the section title changes.",
+      "risk": "low",
+      "guardrails": [
+        "Do not rewrite URLs without explicit source validation.",
+        "If heading text changes later, regenerate or validate matching internal anchors."
+      ]
+    },
+    {
+      "operation": "review_link",
+      "targetPath": "links.21",
+      "nativeKind": "link",
+      "key": "#h-stack-tecnologico-como-se-integra-el-loop",
+      "currentText": "🔌 Stack tecnológico: cómo se integra el Loop",
+      "rationale": "Internal anchors should be preserved with the heading outline unless the section title changes.",
+      "risk": "low",
+      "guardrails": [
+        "Do not rewrite URLs without explicit source validation.",
+        "If heading text changes later, regenerate or validate matching internal anchors."
+      ]
+    },
+    {
+      "operation": "review_link",
+      "targetPath": "links.22",
+      "nativeKind": "link",
+      "key": "#h-cambio-cultural-de-campanas-a-ciclos",
+      "currentText": "🔄 Cambio cultural: de campañas a ciclos",
+      "rationale": "Internal anchors should be preserved with the heading outline unless the section title changes.",
+      "risk": "low",
+      "guardrails": [
+        "Do not rewrite URLs without explicit source validation.",
+        "If heading text changes later, regenerate or validate matching internal anchors."
+      ]
+    },
+    {
+      "operation": "review_link",
+      "targetPath": "links.23",
+      "nativeKind": "link",
+      "key": "#h-riesgos-y-confianza-human-in-the-loop",
+      "currentText": "🛡️ Riesgos y confianza: Human-in-the-Loop",
+      "rationale": "Internal anchors should be preserved with the heading outline unless the section title changes.",
+      "risk": "low",
+      "guardrails": [
+        "Do not rewrite URLs without explicit source validation.",
+        "If heading text changes later, regenerate or validate matching internal anchors."
+      ]
+    },
+    {
+      "operation": "review_link",
+      "targetPath": "links.24",
+      "nativeKind": "link",
+      "key": "#h-etica-y-guardrails-en-accion",
+      "currentText": "⚖️ Ética y guardrails en acción",
+      "rationale": "Internal anchors should be preserved with the heading outline unless the section title changes.",
+      "risk": "low",
+      "guardrails": [
+        "Do not rewrite URLs without explicit source validation.",
+        "If heading text changes later, regenerate or validate matching internal anchors."
+      ]
+    },
+    {
+      "operation": "review_link",
+      "targetPath": "links.25",
+      "nativeKind": "link",
+      "key": "#h-trust-by-design",
+      "currentText": "🤝 Trust by design",
+      "rationale": "Internal anchors should be preserved with the heading outline unless the section title changes.",
+      "risk": "low",
+      "guardrails": [
+        "Do not rewrite URLs without explicit source validation.",
+        "If heading text changes later, regenerate or validate matching internal anchors."
+      ]
+    },
+    {
+      "operation": "review_link",
+      "targetPath": "links.26",
+      "nativeKind": "link",
+      "key": "#h-de-embudos-y-ruedas-a-un-bucle-infinito",
+      "currentText": "De embudos y ruedas… a un bucle infinito 🚲♾️",
+      "rationale": "Internal anchors should be preserved with the heading outline unless the section title changes.",
+      "risk": "low",
+      "guardrails": [
+        "Do not rewrite URLs without explicit source validation.",
+        "If heading text changes later, regenerate or validate matching internal anchors."
+      ]
+    },
+    {
+      "operation": "review_link",
+      "targetPath": "links.27",
+      "nativeKind": "link",
+      "key": "https://www.hubspot.es/loop-marketing?utm_source=chatgpt.com",
+      "currentText": "HubSpot, Loop Marketing",
+      "rationale": "External links should be reviewed for source quality, UTM hygiene and current destination before refresh.",
+      "risk": "medium",
+      "guardrails": [
+        "Do not rewrite URLs without explicit source validation.",
+        "If heading text changes later, regenerate or validate matching internal anchors."
+      ]
+    },
+    {
+      "operation": "review_link",
+      "targetPath": "links.28",
+      "nativeKind": "link",
+      "key": "https://www.hubspot.com/research",
+      "currentText": "HubSpot Research",
+      "rationale": "External links should be reviewed for source quality, UTM hygiene and current destination before refresh.",
+      "risk": "medium",
+      "guardrails": [
+        "Do not rewrite URLs without explicit source validation.",
+        "If heading text changes later, regenerate or validate matching internal anchors."
+      ]
+    },
+    {
+      "operation": "review_link",
+      "targetPath": "links.29",
+      "nativeKind": "link",
+      "key": "https://www.hubspot.com/data-disconnect-report",
+      "currentText": "HubSpot, Data Disconnect Report 2025",
+      "rationale": "External links should be reviewed for source quality, UTM hygiene and current destination before refresh.",
+      "risk": "medium",
+      "guardrails": [
+        "Do not rewrite URLs without explicit source validation.",
+        "If heading text changes later, regenerate or validate matching internal anchors."
+      ]
+    },
+    {
+      "operation": "review_link",
+      "targetPath": "links.30",
+      "nativeKind": "link",
+      "key": "https://www.thinkwithgoogle.com/consumer-insights/consumer-journey/new-consumer-decision-making-process/?utm_source=chatgpt.com",
+      "currentText": "Think with Google",
+      "rationale": "External links should be reviewed for source quality, UTM hygiene and current destination before refresh.",
+      "risk": "medium",
+      "guardrails": [
+        "Do not rewrite URLs without explicit source validation.",
+        "If heading text changes later, regenerate or validate matching internal anchors."
+      ]
+    },
+    {
+      "operation": "review_link",
+      "targetPath": "links.31",
+      "nativeKind": "link",
+      "key": "https://www.thinkwithgoogle.com/consumer-insights/consumer-journey/customer-journey-mapping/?utm_source=chatgpt.com",
+      "currentText": "Think with Google",
+      "rationale": "External links should be reviewed for source quality, UTM hygiene and current destination before refresh.",
+      "risk": "medium",
+      "guardrails": [
+        "Do not rewrite URLs without explicit source validation.",
+        "If heading text changes later, regenerate or validate matching internal anchors."
+      ]
+    }
+  ],
+  "rollback": {
+    "strategy": "no_runtime_change_plan_only",
+    "notes": "This refresh plan is a local artifact only. It performs no WordPress mutation, so rollback is deleting the artifact."
+  }
+}
