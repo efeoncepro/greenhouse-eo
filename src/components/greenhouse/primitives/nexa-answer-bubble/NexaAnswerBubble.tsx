@@ -29,6 +29,7 @@ import {
 import AppRecharts from '@/libs/styles/AppRecharts'
 import useReducedMotion from '@/hooks/useReducedMotion'
 import { GH_COLORS } from '@/config/greenhouse-nomenclature'
+import AnimatedCounter from '@/components/greenhouse/AnimatedCounter'
 import { motionCss } from '@/components/greenhouse/motion'
 import GreenhouseButton from '../GreenhouseButton'
 import GreenhouseStatusDot from '../GreenhouseStatusDot'
@@ -519,6 +520,47 @@ const MetricDeltaPill = ({ label, tone }: { label: NexaAnswerMetricSummaryItem['
   )
 }
 
+/**
+ * El número de una metric de la respuesta se ARMA con el contenido (Nexa moment): cuenta 0 → valor al aparecer,
+ * reusando `AnimatedCounter animateFrom` (conteo confiable + never-hidden + reduced-motion horneados). El valor
+ * viene como texto (`'68%'`, `'0.4'`, `'$1.2M'`); si se puede aislar un número limpio, cuenta preservando
+ * prefijo/sufijo; si no (texto rico, rango, no-numérico), cae a render estático — degradación honesta.
+ */
+const parseCountableMetricValue = (text: string): { value: number; format: (n: number) => string } | null => {
+  const match = text.trim().match(/^([^\d-]*)(-?\d+(?:[.,]\d+)?)(.*)$/)
+
+  if (!match) return null
+
+  const [, prefix, rawNumber, suffix] = match
+
+  // Si el sufijo trae otro dígito (rango '3-5', '2 de 4'…) NO es un número limpio → estático (no contar raro).
+  if (/\d/.test(suffix)) return null
+
+  const normalized = rawNumber.replace(',', '.')
+  const value = Number(normalized)
+
+  if (!Number.isFinite(value)) return null
+
+  const decimals = normalized.includes('.') ? (normalized.split('.')[1]?.length ?? 0) : 0
+
+  return { value, format: (n: number) => `${prefix}${n.toFixed(decimals)}${suffix}` }
+}
+
+const MetricValue = ({ value }: { value: NexaAnswerMetricSummaryItem['value'] }) => {
+  const countable = parseCountableMetricValue(getNexaExpressiveTextPlainText(value))
+
+  // Texto rico / rango / no-numérico → estático (honesto, never-hidden).
+  if (!countable) {
+    return <NexaExpressiveText value={value} variant='h5' sx={{ fontFeatureSettings: '"tnum" 1' }} />
+  }
+
+  return (
+    <Typography variant='h5' sx={{ fontFeatureSettings: '"tnum" 1' }}>
+      <AnimatedCounter value={countable.value} animateFrom={0} duration={0.9} formatter={countable.format} />
+    </Typography>
+  )
+}
+
 const MetricSummaryCard = ({ metric, chartColor }: { metric: NexaAnswerMetricSummaryItem; chartColor: string }) => {
   const theme = useTheme()
 
@@ -539,7 +581,7 @@ const MetricSummaryCard = ({ metric, chartColor }: { metric: NexaAnswerMetricSum
       <Stack direction='row' spacing={2} justifyContent='space-between' alignItems='flex-start' sx={{ minInlineSize: 0 }}>
         <Stack spacing={0.5} sx={{ minInlineSize: 0 }}>
           <NexaExpressiveText value={metric.label} variant='caption' color='text.secondary' />
-          <NexaExpressiveText value={metric.value} variant='h5' sx={{ fontFeatureSettings: '"tnum" 1' }} />
+          <MetricValue value={metric.value} />
         </Stack>
         <MetricDeltaPill label={metric.deltaLabel} tone={metric.deltaTone} />
       </Stack>
