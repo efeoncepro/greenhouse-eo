@@ -282,6 +282,20 @@ ENV_VARS="${ENV_VARS},ATTRIBUTABLE_LATENESS_OTD_ENABLED=${ATTRIBUTABLE_LATENESS_
 CONTRACTOR_PAYABLE_SETTLEMENT_ENABLED="${CONTRACTOR_PAYABLE_SETTLEMENT_ENABLED:-true}"
 ENV_VARS="${ENV_VARS},CONTRACTOR_PAYABLE_SETTLEMENT_ENABLED=${CONTRACTOR_PAYABLE_SETTLEMENT_ENABLED}"
 
+# TASK-1094 — auto-ingest de Knowledge por webhook Notion. El consumer reactivo
+# `knowledge_notion_ingest` re-fetchea la página cambiada y la re-ingiere/deprecia.
+# NOTION_KNOWLEDGE_TOKEN_SECRET_REF = nombre del secret del token de la integración
+# "Greenhouse KNOW" (scoped al teamspace de conocimiento), resuelto en runtime vía
+# resolveSecretByRef (accessor binding del SA garantizado abajo). NOTION_KNOWLEDGE_WEBHOOK_ENABLED
+# gatea el path. Declarativo acá para que `--set-env-vars` (destructivo) NO los borre en cada
+# redeploy (misma lección que NOTION_TOKEN / TASK-912). Activado 2026-06-13 (prod). Rollback (<5min):
+# `gcloud run services update ops-worker --update-env-vars NOTION_KNOWLEDGE_WEBHOOK_ENABLED=false`.
+NOTION_KNOWLEDGE_TOKEN_SECRET_REF="${NOTION_KNOWLEDGE_TOKEN_SECRET_REF:-notion-integration-token-greenhouse-knowledge}"
+NOTION_KNOWLEDGE_WEBHOOK_ENABLED="${NOTION_KNOWLEDGE_WEBHOOK_ENABLED:-true}"
+ENV_VARS="${ENV_VARS},NOTION_KNOWLEDGE_TOKEN_SECRET_REF=${NOTION_KNOWLEDGE_TOKEN_SECRET_REF}"
+ENV_VARS="${ENV_VARS},NOTION_KNOWLEDGE_WEBHOOK_ENABLED=${NOTION_KNOWLEDGE_WEBHOOK_ENABLED}"
+ensure_secret_accessor_binding "${NOTION_KNOWLEDGE_TOKEN_SECRET_REF}:latest"
+
 if [ -n "${RESEND_API_KEY_SECRET_REF}" ]; then
   ENV_VARS="${ENV_VARS},RESEND_API_KEY_SECRET_REF=${RESEND_API_KEY_SECRET_REF}"
 else
