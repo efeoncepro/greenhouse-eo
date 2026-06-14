@@ -11,7 +11,7 @@ import Typography from '@mui/material/Typography'
 import { CompositionShell, type CompositionShellComposition } from '@/components/greenhouse/primitives'
 import MetricSummaryCard from '@/components/greenhouse/primitives/MetricSummaryCard'
 import MetricTrendCard, { type MetricTrendPoint } from '@/components/greenhouse/primitives/MetricTrendCard'
-import { MOTION_DURATION_S, MOTION_EASE } from '@/components/greenhouse/motion/core/tokens'
+import { MOTION_DURATION_S } from '@/components/greenhouse/motion/core/tokens'
 import { useAnimate, stagger } from '@/libs/FramerMotion'
 import { startViewTransition } from '@/lib/motion/view-transition'
 
@@ -139,16 +139,17 @@ const CardDensityLabView = () => {
   // SSR-safe (las cards renderizan en estado final; la animación no toca el primer paint). `stagger` garantiza
   // el orden + el beat; no hay variant inheritance (lo que rompía SSR en el shell). Tokens canónicos.
   const [seqScope, animateSeq] = useAnimate()
-  const emphasized = MOTION_EASE.emphasized.cubicBezier ?? undefined
 
+  // Ensamble: cada card ENTRA armándose (no solo aparece) — encogida + inclinada en 3D (rotateX) + abajo, y
+  // se acomoda en su lugar con un rebote (easeOutBack = overshoot), escalonadas (`stagger`). Replay-proof:
+  // cada click resetea al estado oculto y vuelve a correr la cascada completa. Imperativo + client-only → SSR-safe.
   const playSequence = () => {
-    // estado inicial (oculto) instantáneo, luego la cascada
-    void animateSeq('[data-seq-card]', { opacity: 0, y: 24 }, { duration: 0 }).then(() =>
-      animateSeq(
-        '[data-seq-card]',
-        { opacity: 1, y: 0 },
-        { delay: stagger(0.1), duration: MOTION_DURATION_S.medium, ease: emphasized }
-      )
+    // Keyframes `[desde, hasta]` → cada click ANIMA DESDE EL INICIO (oculto, encogido, inclinado) hasta su lugar,
+    // con rebote (easeOutBack) y escalonado. Replay confiable: no necesita reset previo, cada llamada reproduce.
+    void animateSeq(
+      '[data-seq-card]',
+      { opacity: [0, 1], scale: [0.82, 1], y: [44, 0], rotateX: [-14, 0] },
+      { delay: stagger(0.12, { startDelay: 0.05 }), duration: MOTION_DURATION_S.extended, ease: [0.34, 1.56, 0.64, 1] }
     )
   }
 
@@ -250,6 +251,8 @@ const CardDensityLabView = () => {
           gap: 4,
           gridTemplateColumns: { xs: '1fr', sm: 'repeat(3, minmax(0, 1fr))' },
           alignItems: 'start',
+          // `perspective` da profundidad real al rotateX del ensamble (la inclinación 3D se ve, no es plana).
+          perspective: '1200px',
           '& > *': { minWidth: 0 }
         }}
       >
