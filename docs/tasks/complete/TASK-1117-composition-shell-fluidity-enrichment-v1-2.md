@@ -2,7 +2,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Medio`
@@ -94,3 +94,17 @@ Feature: enriquecimiento interno detrás del flag del piloto (default OFF) hasta
 - `pnpm local:check:ui` + GVC desktop+mobile mirado (morph buttery + shared-element + stagger + drawer).
 - Baseline GVC (de TASK-1119) actualizado intencionalmente con `--promote`.
 - `greenhouse-documentation-governor` al cierre.
+
+## Cierre 2026-06-14 — COMPLETE
+
+**Construido (código real, opt-in `fluidity='rich'`, default `baseline` byte-idéntico a V1):**
+- Slice 1 — morph interrumpible: `morphStrategy='interruptible'` (framer-motion `layout` vía `Box component={motion.div}`). Coexiste con VT; frontera dura (nunca la misma propiedad sobre el mismo nodo). `composition-shell-motion.ts` `compositionInterruptibleLayoutTransition`.
+- Slice 2 — promoción shared-element (card → lead): demo viva en el Lab (`SHARED_PROMOTE_NAME`, un nombre por snapshot → ≤1 elemento → el browser morfea la card creciendo al lead).
+- Slice 3 — entrada orquestada con stagger: `compositionRegionReveal` (motion tokens: stagger 60 ms, ease emphasized, 200 ms; reduced-motion → instantáneo, never-hidden).
+- Slice 4 — drawer temporal real en compact `split`: `aside` → MUI `Drawer` temporary (focus trap + aria-modal + Esc) con disclosure local (mecanismo, no dominio). Materializa el `asideAsDrawer` que el controller ya señalaba.
+
+**Decisión re-confirmada:** consumir el módulo motion canónico + `startViewTransition` + framer-motion `layout` (no fork, no librería nueva). El piloto Knowledge (TASK-1110, lane Codex) ejercerá el enriquecimiento con datos reales; el consumer que lo demuestra hoy es el Lab (specimen canónico). `prefers-reduced-motion` horneado vía `useReducedMotion`; compositor-only (transform/opacity).
+
+**Evidencia:** módulo motion con tests puros + GVC desktop+mobile mirado (single/leadPlusContext con condense, split lanes, drawer compact, telemetry contando compose/settle en vivo) → baseline promovido. tsc 0 · `pnpm build` (Turbopack) verde.
+
+**Estado de rollout:** code-complete + operativamente completo (substrato UI opt-in; sin flags/env/migraciones/integración externa). Commits locales en `develop` (sin push — multi-agente). NO se tocaron README/TASK_ID_REGISTRY/Handoff/changelog (WIP entangled EPIC-019 por instrucción del operador).

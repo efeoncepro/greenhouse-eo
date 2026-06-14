@@ -2,7 +2,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Medio`
@@ -95,3 +95,18 @@ N/A operationally safe — additive UI/governance, no production runtime impact,
 - `pnpm local:check` + tests del reducer + `pnpm test:lint-rules` (la rule nueva) verde.
 - GVC baseline diff `match` en el scenario.
 - `greenhouse-documentation-governor` al cierre.
+
+## Cierre 2026-06-14 — COMPLETE
+
+**Construido (código real):**
+- Slice 1 — `composition-shell-vt-guard.ts`: detector puro `detectViewTransitionNameCollisions` + registro refcount dev-only (`registerCompositionViewTransitionName`). Cableado en `CompositionShell.tsx` (effect por regiones in-flow). Avisa del "morph silencioso" en dev, non-blocking en prod.
+- Slice 3 — lint rule `greenhouse/no-ad-hoc-layout-morph` (warn-first) + register en `eslint-plugins/greenhouse/index.mjs` + `eslint.config.mjs` + RuleTester (`__tests__/no-ad-hoc-layout-morph.test.mjs`). Scope preciso: namespace reservado `gh-region-*`; NO flagea shared-element TASK-525.
+- Slice 4 — telemetry: `createCompositionShellEvent` + `compositionShellActionToTelemetryName` en el controller; prop `onTelemetry`/`telemetrySource` en el componente (emite compose/settle, no-op en idempotentes).
+- Slice 5 — reducer hardening: property/concurrency tests (1k pasos × 20 seeds, pureza, redirección mid-morph, dirty-guard) + tests del guard + del módulo motion. `min-inline-size` (480/360) validado contra overflow en GVC.
+- Slice 2 — baseline GVC durable committeado (`scripts/frontend/baselines/design-system.composition-shell/`, 6 frames desktop+mobile) + `baseline.surfaceId` en el scenario.
+
+**No construido (deferido, explícito):** Slice 6 (persistencia route-local) — opcional, no implementado.
+
+**Evidencia:** 36 tests focales + 305 tests de `primitives/` verde · tsc 0 · `pnpm build` (Turbopack) verde · 20 lint-rule tests verde · GVC desktop+mobile mirado (single/leadPlusContext/split + drawer compact + telemetry en vivo).
+
+**Estado de rollout:** code-complete + operativamente completo (UI substrato, sin flags/env/migraciones/integración externa). Commits locales en `develop` (sin push — multi-agente). NO se tocaron README/TASK_ID_REGISTRY/Handoff/changelog (WIP entangled EPIC-019 por instrucción del operador).
