@@ -165,6 +165,15 @@ Initial repository binding established on 2026-06-14:
 
 This binding is a code/versioning baseline only. It does not yet authorize automated deployment to Kinsta; deployment remains pending a dry-run/release task.
 
+Non-mutating drift command:
+
+```bash
+pnpm public-website:diff-runtime
+pnpm public-website:diff-runtime -- --write
+```
+
+The command compares the latest live Kinsta export manifest against the local clone of `efeonce-public-site-runtime`. It exits non-zero on drift or missing repo files. First report: `docs/operations/public-site-drift/drift-2026-06-14T14-13-37-068Z.json` with `47` files in sync, `2` ignored live backup artifacts, and no drift.
+
 Target posture:
 
 ```text

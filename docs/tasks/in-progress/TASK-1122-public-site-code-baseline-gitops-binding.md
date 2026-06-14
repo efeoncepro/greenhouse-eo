@@ -231,6 +231,8 @@ Greenhouse should show repo status to the operator, but direct GitHub interactio
 - Initial runtime baseline commit pushed: `0fa6bfd`.
 - Initial baseline tag pushed: `baseline-2026-06-14-live`.
 - Baseline tracks 47 canonical files; excludes 2 live backup artifacts recorded in `manifests/live-baseline-2026-06-14T134717Z.json`.
+- Added non-mutating drift helper `pnpm public-website:diff-runtime`.
+- Drift evidence written to `docs/operations/public-site-drift/drift-2026-06-14T14-13-37-068Z.json`: `in_sync=47`, `ignored_live=2`, `drifted=0`, `repo_missing=0`, `repo_extra=0`.
 
 ### Risk matrix
 

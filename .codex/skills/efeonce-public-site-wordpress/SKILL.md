@@ -60,11 +60,14 @@ Use the repo script first:
 pnpm public-website:discover
 pnpm public-website:discover -- --authenticated --wpcli --write
 pnpm public-website:export-live-code
+pnpm public-website:diff-runtime
 ```
 
 The script auto-loads `.env.local` and then `.env` without overwriting shell/CI variables. Authenticated discovery requires the env/secret plumbing already configured by the repo, but agents should not need to `source .env.local` or paste long inline env commands. Do not paste secret values into the command line. When WP-CLI is needed directly, use the Kinsta SSH env vars and run read-only commands such as `wp option get`, `wp theme list`, `wp plugin list`, `wp post list`, and `wp post meta list`.
 
 Use `pnpm public-website:export-live-code` for `TASK-1122` live-code baseline exports. It downloads only governed code candidates into ignored `tmp/public-site-code-baselines/<timestamp>/` and writes a per-file SHA-256 manifest. It does not mutate Kinsta, WordPress or GitHub.
+
+Use `pnpm public-website:diff-runtime` after a live export to compare the latest Kinsta manifest against `/Users/jreye/Documents/efeonce-public-site-runtime`. It is non-mutating and exits non-zero if a governed live file is missing or drifted in the repo.
 
 ### Remote WP-CLI PHP Execution
 
