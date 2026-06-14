@@ -9,6 +9,7 @@
 > **Runtime observado:** WordPress `7.0`, Kinsta, theme `ohio-child` `1.0.0` sobre Ohio `3.7.0`, Elementor `4.1.3`, Elementor Pro `4.1.1`, Ohio Extra `3.7.0`
 > **Manual relacionado:** [Playbook de landings Ohio + Elementor](../../manual-de-uso/public-site/wordpress-ohio-elementor-landing-playbook.md)
 > **Layout relacionado:** [Layout Ohio + Elementor](./wordpress-ohio-elementor-layout.md)
+> **Extensiones relacionadas:** [Custom Elementor Widgets y React](./wordpress-custom-widgets-react-strategy.md)
 > **Arquitectura relacionada:** [Public Website Landing Control Plane](../../architecture/GREENHOUSE_PUBLIC_WEBSITE_LANDING_CONTROL_PLANE_ARCHITECTURE_V1.md)
 
 ## Para que sirve
@@ -486,6 +487,7 @@ Advertencias:
 10. **Elementor library tiene duplicados.** Limpiar o al menos marcar templates canonicas antes de que agentes clonen fuentes equivocadas.
 11. **Widgets poco usados requieren prueba.** `ohio_marquee`, `ohio_vertical_slider`, `ohio_instagram`, `ohio_simple_products`, pricing y Woo no deben usarse en nuevas landings sin smoke previo.
 12. **UiChemy esta inactivo.** No prometer Figma -> Elementor automatico basado en ese plugin sin activacion/discovery.
+13. **Faltan widgets Greenhouse-owned.** Cuando Ohio/Elementor no cubran un patron reusable con controles seguros, el camino recomendado es crear widgets custom en plugin propio versionado en el repo runtime, no tocar Ohio parent ni acumular CSS page-scoped. Estrategia: [Custom Elementor Widgets y React](./wordpress-custom-widgets-react-strategy.md).
 
 ## Contrato recomendado para el bridge
 
@@ -500,6 +502,14 @@ El bridge Greenhouse -> WordPress debe operar sobre capacidades, no sobre CSS su
 7. `render-preview-and-smoke`: renderiza preview, mide layout y captura evidencia visual.
 
 No publicar, borrar, limpiar cache Kinsta ni tocar paginas publicadas desde el bridge hasta que existan audit log, rollback y cache control.
+
+## Extension strategy: widgets custom y React
+
+Ohio Extra cubre muchos patrones visuales, pero no todos los contratos operativos que Greenhouse necesita. Si un modulo sera reusable, requiere props/analytics/HubSpot/manifest versionado, o se vuelve fragil como combinacion de widgets sueltos, usar un **widget custom de Elementor en plugin propio** dentro de `efeoncepro/efeonce-public-site-runtime`.
+
+No copiar internals privados de Ohio Extra ni editar el parent theme. El widget debe extender `\Elementor\Widget_Base`, registrarse en categoria `Greenhouse`, renderizar en PHP, encolar assets solo cuando se usa, exponer controles nativos de Elementor y emitir anchors `gh-*`.
+
+React queda reservado para carriles WordPress-native: admin/editor con `@wordpress/element`, bloques Gutenberg y frontend acotado con Interactivity API. No usar React como parche para layout Ohio/Elementor ni como SPA publica sin ADR.
 
 ## Reglas anti-regresion
 

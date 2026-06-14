@@ -17,9 +17,10 @@ Before changing the site or Greenhouse bridge code, read the relevant sources:
 - `docs/operations/discovery-public-website-elementor-20260614.md` when the task touches Elementor widgets, `_elementor_data`, page structure, templates, or Greenhouse-controlled landing-page generation.
 - `docs/documentation/public-site/wordpress-ohio-elementor-layout.md` and `docs/manual-de-uso/public-site/wordpress-ohio-elementor-layout.md` for Ohio/Elementor layout operations.
 - `docs/documentation/public-site/wordpress-ohio-elementor-widget-inventory.md` and `docs/manual-de-uso/public-site/wordpress-ohio-elementor-landing-playbook.md` before creating, cloning, or changing landing modules/widgets. These docs inventory Ohio Extra widgets, Elementor templates, plugin dependencies, page metas, and gaps for future Greenhouse-owned landings.
+- `docs/documentation/public-site/wordpress-custom-widgets-react-strategy.md` before proposing custom Elementor widgets, Gutenberg blocks, WordPress admin React, or Interactivity API work.
 - `docs/architecture/GREENHOUSE_PUBLIC_WEBSITE_LANDING_CONTROL_PLANE_ARCHITECTURE_V1.md` and `docs/architecture/GREENHOUSE_PUBLIC_WEBSITE_LANDING_CONTROL_PLANE_DECISION_V1.md` for the control-plane contract.
 - `docs/operations/public-site-repository-control-plane-discovery-20260614.md` before deciding where public-site WordPress code should live or where to implement the bridge plugin.
-- `docs/epics/to-do/EPIC-019-public-website-landing-control-plane.md`, `docs/tasks/in-progress/TASK-1111-public-website-read-only-discovery.md`, `docs/tasks/to-do/TASK-1122-public-site-code-baseline-gitops-binding.md`, and `docs/tasks/to-do/TASK-1116-greenhouse-wp-bridge-draft-only-foundation.md`.
+- `docs/epics/to-do/EPIC-019-public-website-landing-control-plane.md`, `docs/tasks/in-progress/TASK-1111-public-website-read-only-discovery.md`, `docs/tasks/in-progress/TASK-1122-public-site-code-baseline-gitops-binding.md`, and `docs/tasks/to-do/TASK-1116-greenhouse-wp-bridge-draft-only-foundation.md`.
 
 Pair with `wp-rest-api`, `wp-wpcli-and-ops`, `wp-abilities-api`, `wp-interactivity-api`, `wp-block-development`, `greenhouse-secret-hygiene`, `greenhouse-browser-diagnostics`, and `greenhouse-documentation-governor` when those domains apply.
 
@@ -39,7 +40,8 @@ Pair with `wp-rest-api`, `wp-wpcli-and-ops`, `wp-abilities-api`, `wp-interactivi
 - Secret reference for the current Application Password: `public-website-wordpress-application-password`. Never print or commit the value. Rotate before production because the value was pasted during the working session.
 - Kinsta API token is still pending for cache/environment/backups automation. Do not claim cache-clear or backup automation is operational until verified.
 - Repository/control-plane discovery on 2026-06-14: `efeoncepro/efeonce-web` is an Astro/headless historical rebuild and is not the current live WordPress/Ohio/Elementor runtime source. The closest local WordPress operational repo is `/Users/jreye/Documents/efeonce-sp`, but its remote is `cesargrowth11/efeonce-sp` and it is not reconciled with Kinsta live. `TASK-1122` must establish a GitOps baseline/repo binding before `TASK-1116` implements `greenhouse-wp-bridge`.
-- Runtime repo binding established on 2026-06-14: private repo `efeoncepro/efeonce-public-site-runtime`, default branch `main`, baseline SHA `0fa6bfd`, tag `baseline-2026-06-14-live`, binding manifest `docs/operations/public-site-runtime-repository-binding-20260614.json`. The repo currently tracks canonical live `ohio-child`, `eo-headless-content`, and `eo-vibe-coding-api`; `greenhouse-wp-bridge` should be introduced there after `TASK-1122` finishes the Greenhouse drift/deploy contract.
+- Runtime repo binding established on 2026-06-14: private repo `efeoncepro/efeonce-public-site-runtime`, default branch `main`, baseline SHA `0fa6bfd`, tag `baseline-2026-06-14-live`, binding manifest `docs/operations/public-site-runtime-repository-binding-20260614.json`. The repo currently tracks canonical live `ohio-child`, `eo-headless-content`, `eo-vibe-coding-api`, and now contains repo-only `greenhouse-wp-bridge` skeleton code. Greenhouse status/dry-run commands exist, but deploy apply is still blocked by Kinsta token/cache/backups/release policy.
+- `greenhouse-wp-bridge` current repo-only state: `wp-content/plugins/greenhouse-wp-bridge`, version `0.1.0`, read-only inspection mode, PHP lint green, not deployed/activated on Kinsta. Current routes require authenticated `edit_posts`: `GET /wp-json/greenhouse-wp-bridge/v1/health`, `GET /wp-json/greenhouse-wp-bridge/v1/inspection/elementor-document/{id}`, and `GET /wp-json/greenhouse-wp-bridge/v1/inspection/ohio-widget-catalog`. No writes, no publish, no cache clear, no backups, no HMAC/shared-secret replay guard yet, no Abilities registration yet.
 
 ## Safety Rules
 
@@ -61,6 +63,8 @@ pnpm public-website:discover
 pnpm public-website:discover -- --authenticated --wpcli --write
 pnpm public-website:export-live-code
 pnpm public-website:diff-runtime
+pnpm public-website:runtime-status
+pnpm public-website:deploy-dry-run
 ```
 
 The script auto-loads `.env.local` and then `.env` without overwriting shell/CI variables. Authenticated discovery requires the env/secret plumbing already configured by the repo, but agents should not need to `source .env.local` or paste long inline env commands. Do not paste secret values into the command line. When WP-CLI is needed directly, use the Kinsta SSH env vars and run read-only commands such as `wp option get`, `wp theme list`, `wp plugin list`, `wp post list`, and `wp post meta list`.
@@ -68,6 +72,10 @@ The script auto-loads `.env.local` and then `.env` without overwriting shell/CI 
 Use `pnpm public-website:export-live-code` for `TASK-1122` live-code baseline exports. It downloads only governed code candidates into ignored `tmp/public-site-code-baselines/<timestamp>/` and writes a per-file SHA-256 manifest. It does not mutate Kinsta, WordPress or GitHub.
 
 Use `pnpm public-website:diff-runtime` after a live export to compare the latest Kinsta manifest against `/Users/jreye/Documents/efeonce-public-site-runtime`. It is non-mutating and exits non-zero if a governed live file is missing or drifted in the repo.
+
+Use `pnpm public-website:runtime-status` to read the Greenhouse binding, local runtime repo head and latest drift report. `--write` stores `docs/operations/public-site-runtime-status/status-*.json`.
+
+Use `pnpm public-website:deploy-dry-run` to compare the runtime repo artifact against the latest live export manifest and produce a no-mutation deployment plan. `--write` stores `docs/operations/public-site-deploy-dry-runs/dry-run-*.json`. This command does not SSH, write files, clear cache, create backups or delete live-only files.
 
 ### Remote WP-CLI PHP Execution
 
@@ -138,7 +146,7 @@ Design guardrails:
 - Bridge direction: Abilities-first when available, REST fallback when needed.
 - Initial bridge work must be draft-only/private until staging, preview, audit trail, rollback, permissions, and cache behavior are proven.
 - Keep full API parity in mind: Greenhouse UI actions must map to command/read contracts, not one-off buttons.
-- Do not implement the bridge in an unconfirmed repository/path. First run the `TASK-1122` flow: reconcile live `ohio-child`/custom plugins, decide or create the governed `efeoncepro/*` repo, record baseline SHA/hashes, and define the GitHub->Kinsta deploy/rollback rail.
+- Do not implement the bridge in an unconfirmed repository/path. The confirmed repo/path is `efeoncepro/efeonce-public-site-runtime:wp-content/plugins/greenhouse-wp-bridge`. Keep deploy/activation separate from repo changes until a release task explicitly approves it.
 - Operators should work from Greenhouse. GitHub remains the behind-the-scenes versioning/deployment rail, not a separate manual operating surface for normal public-site work.
 - Treat direct Kinsta filesystem edits as emergency-only; backport every live change to the repo baseline.
 - Do not use `efeonce-web` as the deploy source unless a new ADR explicitly moves the public site to Astro/headless.
@@ -148,6 +156,7 @@ Design guardrails:
 - WordPress can use React through its native developer stack, but EPIC-019 must not become a React SPA rewrite.
 - Prefer server-rendered blocks plus the Interactivity API for small frontend interactions.
 - Use `@wordpress/element`/Gutenberg packages for editor/admin UI. Watch React 19 compatibility with WordPress/Gutenberg/plugins before upgrading assumptions.
+- Custom Elementor widgets are allowed when Ohio/Elementor native widgets do not cover a reusable Greenhouse-owned module. Implement them in a plugin in `efeoncepro/efeonce-public-site-runtime`, not in Ohio parent or as freeform frontend React. First pilot candidate: `Greenhouse Partner Proof`.
 
 ## Update Protocol
 

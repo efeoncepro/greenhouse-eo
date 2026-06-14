@@ -14,7 +14,7 @@
 - Effort: `Medio-Alto`
 - Type: `implementation`
 - Epic: `EPIC-019`
-- Status real: `In progress; repo runtime privado creado, baseline live inicial pusheado y binding manifest registrado; faltan data model/readers Greenhouse y deploy dry-run`
+- Status real: `Code complete for repo binding/readers/drift/dry-run without Kinsta API; rollout/deploy apply remains blocked by Kinsta token, branch protection/release policy and explicit release task`
 - Rank: `TBD`
 - Domain: `platform|commercial|marketing-ops|integrations|wordpress|release`
 - Blocked by: `none`
@@ -112,8 +112,8 @@ Reglas obligatorias:
 
 ### Gap
 
-- No Greenhouse data model exists for repo binding, baseline SHA, file manifest, deploy artifact or code drift.
-- No non-mutating deploy/diff dry-run lane exists yet from repo artifact to Kinsta target.
+- Greenhouse file-based readers now exist for repo binding, baseline SHA, latest drift report and live manifest.
+- Non-mutating deploy/diff dry-run lane exists from repo artifact to latest Kinsta export manifest.
 - Branch protection/release policy for `efeonce-public-site-runtime` is not configured/documented yet.
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -233,6 +233,15 @@ Greenhouse should show repo status to the operator, but direct GitHub interactio
 - Baseline tracks 47 canonical files; excludes 2 live backup artifacts recorded in `manifests/live-baseline-2026-06-14T134717Z.json`.
 - Added non-mutating drift helper `pnpm public-website:diff-runtime`.
 - Drift evidence written to `docs/operations/public-site-drift/drift-2026-06-14T14-13-37-068Z.json`: `in_sync=47`, `ignored_live=2`, `drifted=0`, `repo_missing=0`, `repo_extra=0`.
+- Added Greenhouse reader/helper layer `src/lib/public-site/runtime-binding.ts`.
+- Added read-only runtime status helper:
+  - `pnpm public-website:runtime-status`
+  - `pnpm public-website:runtime-status -- --write`
+- Status evidence written to `docs/operations/public-site-runtime-status/status-2026-06-14T15-43-17-969Z.json`: runtime repo exists, branch `main`, head `0fa6bfd`, latest drift report linked, Kinsta cache/backup/deploy apply blocked, and local repo has uncommitted `greenhouse-wp-bridge` files.
+- Added no-mutation deploy dry-run helper:
+  - `pnpm public-website:deploy-dry-run`
+  - `pnpm public-website:deploy-dry-run -- --write`
+- Dry-run evidence written to `docs/operations/public-site-deploy-dry-runs/dry-run-2026-06-14T15-43-57-874Z.json`: `noop=47`, `ignored_live=2`, `would_create=7`, `would_update=0`, `would_not_delete_live_only=0`. The `would_create` rows are the repo-only `greenhouse-wp-bridge` skeleton files. It does not SSH, write to Kinsta, create backups, clear cache or delete files.
 
 ### Risk matrix
 
@@ -243,6 +252,7 @@ Greenhouse should show repo status to the operator, but direct GitHub interactio
 | Repo elegido no esta bajo control Efeonce | GitHub/access | medium | Transfer/mirror to `efeoncepro` or explicit access decision | remote owner not `efeoncepro` |
 | Greenhouse depende de GitHub UI manual | Product ops | medium | Greenhouse command/read model + repo binding | release action has no Greenhouse audit record |
 | Direct edit en Kinsta genera drift | WordPress/Kinsta | high | emergency-only policy + backport requirement | live hash != baseline hash |
+| Dry-run confundido con deploy real | Release ops | medium | dry-run report declares `mode=no_mutation` and `deploymentBlockedBy` | cache/backup/apply attempted without Kinsta token |
 
 ### Feature flags / cutover
 
@@ -266,3 +276,5 @@ Greenhouse should show repo status to the operator, but direct GitHub interactio
 3. Confirm repo baseline hash inventory.
 4. Confirm ignored/generated files are not deploy candidates.
 5. Confirm Greenhouse docs record baseline SHA and next bridge path.
+6. Confirm `pnpm public-website:runtime-status` reports repo clean and latest drift.
+7. Confirm `pnpm public-website:deploy-dry-run` reports no `would_update` / `would_create` before any release task.

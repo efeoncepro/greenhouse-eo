@@ -163,7 +163,7 @@ Initial repository binding established on 2026-06-14:
 - Initial baseline tag: `baseline-2026-06-14-live`
 - Binding manifest: `docs/operations/public-site-runtime-repository-binding-20260614.json`
 
-This binding is a code/versioning baseline only. It does not yet authorize automated deployment to Kinsta; deployment remains pending a dry-run/release task.
+This binding is a code/versioning baseline only. It does not yet authorize automated deployment to Kinsta; deployment apply remains pending Kinsta API token, cache/backup verification, branch/release policy and a future explicit release task.
 
 Non-mutating drift command:
 
@@ -173,6 +173,24 @@ pnpm public-website:diff-runtime -- --write
 ```
 
 The command compares the latest live Kinsta export manifest against the local clone of `efeonce-public-site-runtime`. It exits non-zero on drift or missing repo files. First report: `docs/operations/public-site-drift/drift-2026-06-14T14-13-37-068Z.json` with `47` files in sync, `2` ignored live backup artifacts, and no drift.
+
+Greenhouse binding/status command:
+
+```bash
+pnpm public-website:runtime-status
+pnpm public-website:runtime-status -- --write
+```
+
+The command reads `docs/operations/public-site-runtime-repository-binding-20260614.json`, the latest drift report and the local runtime repo head. Current status report: `docs/operations/public-site-runtime-status/status-2026-06-14T15-43-17-969Z.json`, with repo branch `main`, head `0fa6bfd`, uncommitted repo-only `greenhouse-wp-bridge` files and Kinsta cache/backup/deploy apply blocked.
+
+No-mutation deploy dry-run command:
+
+```bash
+pnpm public-website:deploy-dry-run
+pnpm public-website:deploy-dry-run -- --write
+```
+
+The command compares the runtime repo artifact to the latest live Kinsta export manifest and writes an auditable file plan. It does not SSH, write files, delete live-only files, clear cache or create backups. Current report after adding the repo-only bridge skeleton: `docs/operations/public-site-deploy-dry-runs/dry-run-2026-06-14T15-43-57-874Z.json`, with `noop=47`, `ignored_live=2`, `would_create=7`, `would_update=0`, `would_not_delete_live_only=0`.
 
 Target posture:
 
@@ -197,6 +215,33 @@ Not allowed:
 - Treating `efeonce-web` as deploy source without a new ADR to migrate the public runtime to headless Astro.
 - Pushing arbitrary files over SSH without a Git-backed release record.
 - Versioning uploads, generated Elementor CSS, backups or secrets as canonical runtime code.
+
+### 6.4 Bridge Plugin Read-only Foundation
+
+`greenhouse-wp-bridge` has an initial repo-only skeleton under:
+
+```text
+/Users/jreye/Documents/efeonce-public-site-runtime/wp-content/plugins/greenhouse-wp-bridge/
+```
+
+Current status:
+
+- implemented in the runtime repository clone, not deployed/activated on Kinsta yet;
+- read-only inspection mode only;
+- PHP syntax validated locally;
+- no draft write, publish, delete, cache clear, backup, plugin install or theme mutation endpoints;
+- no HMAC/shared-secret replay guard yet;
+- no Abilities registration yet.
+
+Current REST namespace and routes:
+
+```text
+GET /wp-json/greenhouse-wp-bridge/v1/health
+GET /wp-json/greenhouse-wp-bridge/v1/inspection/elementor-document/{id}
+GET /wp-json/greenhouse-wp-bridge/v1/inspection/ohio-widget-catalog
+```
+
+All current endpoints require an authenticated WordPress user with `edit_posts` and are designed for Application Password use. The Elementor endpoint reads `_elementor_data`, summarizes `container|section|column|widget`, reports widget usage, semantic `gh-*` anchors and selected Ohio page metas. The Ohio endpoint reads Elementor's registered widget catalog and identifies Ohio/HubSpot widgets. These endpoints are discovery/readiness primitives; they are not the draft-only write path.
 
 ## 7. Landing Manifest Contract
 
@@ -353,7 +398,38 @@ Any task implementing or auditing the bridge must load the official WordPress Ag
 - `wp-wpcli-and-ops` when WP-CLI/cache/staging/ops are involved
 - `wp-performance` before production publish paths are enabled
 
-### 9.3 React, Gutenberg and Interactivity Boundary
+### 9.3 Custom Elementor Widget Boundary
+
+The current live runtime is Ohio + Elementor, so Greenhouse can extend the site with custom Elementor widgets when native Ohio/Elementor controls are not enough. The approved extension point is a plugin in the governed runtime repo, not the Ohio parent theme.
+
+Recommended location:
+
+```text
+efeoncepro/efeonce-public-site-runtime
+  wp-content/plugins/greenhouse-wp-bridge/
+    includes/elementor-widgets/
+```
+
+Allowed in V1:
+
+- Widgets extending `\Elementor\Widget_Base`.
+- Registration through Elementor's widget registry hooks.
+- PHP server-side render.
+- Controls exposed through Elementor native controls.
+- Scoped assets loaded only when the widget is used.
+- Stable semantic classes such as `gh-owned`, `gh-widget-*`, `gh-section-*` and `gh-slot-*`.
+- Draft/private rollout first, with Greenhouse manifests and visual QA.
+
+Not allowed in V1:
+
+- Editing `wp-content/themes/ohio/` or copying private internals from Ohio Extra.
+- Using a custom widget to paper over page meta, wrapper, breadcrumb, hero or gutter issues that Ohio/Elementor already controls.
+- Mounting React apps inside Elementor widgets by default.
+- Publishing a custom widget live without repo baseline, dry-run deploy, rollback and cache plan.
+
+Good pilot candidate: `Greenhouse Partner Proof`, because the HubSpot partner proof module is real, repeatable, visual, and currently fragile as a set of legacy Elementor sections. Details: `docs/documentation/public-site/wordpress-custom-widgets-react-strategy.md`.
+
+### 9.4 React, Gutenberg and Interactivity Boundary
 
 WordPress can work with React, but the Greenhouse public-site strategy must use React in the WordPress-native lanes instead of turning `efeoncepro.com` into a second SPA.
 

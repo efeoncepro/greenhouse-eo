@@ -14,10 +14,10 @@
 - Effort: `Alto`
 - Type: `implementation`
 - Epic: `EPIC-019`
-- Status real: `Diseno listo para execution planning; repo/path baseline disponible via TASK-1122; rollout production sigue bloqueado por Kinsta API/cache/backups, deploy dry-run y staging/preview target`
+- Status real: `Partial repo-only foundation exists: plugin skeleton + authenticated read-only health/Elementor/Ohio inspection endpoints in efeonce-public-site-runtime; not deployed/activated on Kinsta; signed auth, Abilities registration and draft write path still pending`
 - Rank: `TBD`
 - Domain: `platform|commercial|marketing-ops|integrations|wordpress`
-- Blocked by: `TASK-1122 debe completar Greenhouse binding/drift/deploy dry-run; TASK-1111 Kinsta API gap bloquea cache/backups/publish operations; confirmar staging/preview target`
+- Blocked by: `TASK-1111 Kinsta API gap bloquea cache/backups/publish operations; confirmar staging/preview target; provisionar shared secret/HMAC y reducir privilegios del usuario tecnico antes de writes`
 - Branch: `task/TASK-1116-greenhouse-wp-bridge-draft-only-foundation`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -52,6 +52,7 @@ Revisar y respetar:
 - `docs/architecture/GREENHOUSE_ECOSYSTEM_ACCESS_CONTROL_PLANE_V1.md`
 - `docs/architecture/GREENHOUSE_WEBHOOKS_ARCHITECTURE_V1.md`
 - `docs/operations/discovery-public-website-wordpress-20260614.md`
+- `docs/documentation/public-site/wordpress-custom-widgets-react-strategy.md`
 
 Reglas obligatorias:
 
@@ -61,6 +62,7 @@ Reglas obligatorias:
 - Least privilege: el usuario actual `Greenhouse` esta como administrator y debe reducirse o encapsularse antes de producción; si no se reduce, documentar riesgo y mitigación.
 - Audit por construcción: cada mutación debe persistir `greenhouse_request_id`, `greenhouse_actor`, `greenhouse_manifest_id`, `greenhouse_environment`, timestamps y correlation id.
 - No secretos en frontend, docs, logs o responses.
+- El plugin puede ser el hogar futuro de widgets custom de Elementor, pero la foundation V1 no debe montar React frontend ni resolver layout con widgets nuevos antes de health/auth/audit/draft-only.
 
 ## Normative Docs
 
@@ -118,11 +120,18 @@ Reglas obligatorias:
 
 ### Gap
 
-- No `greenhouse-wp-bridge` plugin foundation exists yet.
+- `greenhouse-wp-bridge` repo-only skeleton exists under `efeoncepro/efeonce-public-site-runtime:wp-content/plugins/greenhouse-wp-bridge`.
+- Current routes are read-only inspection only:
+  - `GET /wp-json/greenhouse-wp-bridge/v1/health`
+  - `GET /wp-json/greenhouse-wp-bridge/v1/inspection/elementor-document/{id}`
+  - `GET /wp-json/greenhouse-wp-bridge/v1/inspection/ohio-widget-catalog`
+- PHP syntax lint passed locally for the new plugin.
+- The plugin has not been deployed/activated on Kinsta yet.
 - No signed write contract exists.
 - No draft-only endpoint exists.
 - No staging/preview/rollback baseline exists for Greenhouse-owned WordPress objects.
 - Kinsta API token remains missing; cache/backups/environment inventory is not automated.
+- No custom Elementor widget registry exists yet. If needed later, it belongs in the bridge/runtime plugin with `\Elementor\Widget_Base`, PHP render and Elementor native controls, not in Ohio parent.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -142,6 +151,7 @@ Reglas obligatorias:
 - Crear el skeleton del plugin en el path/repo confirmado.
 - Exponer health/readiness read-only con version, environment, capabilities registradas y modo operativo.
 - Registrar metadata del bridge sin depender de Elementor.
+- Preparar namespaces/carpetas para futuras extensiones sin registrar widgets custom aun.
 
 ### Slice 2 — Auth, signature and replay guard
 
@@ -180,7 +190,13 @@ Reglas obligatorias:
 
 ## Detailed Spec
 
-El bridge debe aceptar solo payloads tipados y firmados. El primer contrato puede ser minimo:
+El bridge debe aceptar solo payloads tipados y firmados. El contrato read-only ya implementado en repo runtime es:
+
+- `GET /wp-json/greenhouse-wp-bridge/v1/health`
+- `GET /wp-json/greenhouse-wp-bridge/v1/inspection/elementor-document/{id}`
+- `GET /wp-json/greenhouse-wp-bridge/v1/inspection/ohio-widget-catalog`
+
+El primer contrato mutante futuro puede ser minimo:
 
 - `GET /greenhouse-wp-bridge/v1/health`
 - `POST /greenhouse-wp-bridge/v1/drafts`
@@ -243,11 +259,12 @@ El plugin debe rechazar:
 
 1. `pnpm public-website:discover -- --authenticated --wpcli --write`
 2. `wp plugin list` read-only via SSH/WP-CLI to confirm bridge install/status.
-3. `GET bridge health` without secret -> expected fail/sanitized or public-safe health per design.
-4. Signed `GET bridge health` -> expected ok.
-5. Signed draft create in staging/preview target -> expected draft/private only.
-6. Verify preview URL, metadata and audit correlation.
-7. Verify no published object, no cache clear and no mutation to existing Elementor/Ohio pages.
+3. Authenticated `GET bridge health` -> expected ok and `writesEnabled=false` until signed writes ship.
+4. Authenticated `GET inspection/elementor-document/{id}` on a known draft/test page -> expected read-only summary.
+5. Authenticated `GET inspection/ohio-widget-catalog` -> expected Ohio/HubSpot widget inventory.
+6. Future signed draft create in staging/preview target -> expected draft/private only.
+7. Verify preview URL, metadata and audit correlation.
+8. Verify no published object, no cache clear and no mutation to existing Elementor/Ohio pages.
 
 ### Out-of-band coordination required
 

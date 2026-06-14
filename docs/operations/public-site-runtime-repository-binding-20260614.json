@@ -43,9 +43,8 @@
     "*backup* live emergency/session artifacts"
   ],
   "pending": [
-    "Greenhouse data model/readers for repository binding and drift state",
-    "non-mutating deploy diff/dry-run lane from repo artifact to Kinsta target",
     "branch protection/release policy for efeonce-public-site-runtime",
+    "Greenhouse UI/API surface for repository binding, drift and deploy dry-run reports",
     "cleanup decision for excluded live backup files on Kinsta",
     "Kinsta API token for cache/backups operations"
   ]

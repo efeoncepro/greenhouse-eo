@@ -6,6 +6,7 @@
 > **Dominio:** Public Site
 > **Inventario relacionado:** [Inventario Ohio + Elementor](../../documentation/public-site/wordpress-ohio-elementor-widget-inventory.md)
 > **Layout relacionado:** [Operar layout Ohio + Elementor](./wordpress-ohio-elementor-layout.md)
+> **Extensiones relacionadas:** [Custom Elementor Widgets y React](../../documentation/public-site/wordpress-custom-widgets-react-strategy.md)
 
 ## Objetivo
 
@@ -15,6 +16,7 @@ Guiar a agentes y operadores para crear o ajustar landings de `efeoncepro.com` u
 
 1. Identificar `post_id`, slug, status y template.
 2. Leer `_elementor_data`, `_elementor_page_settings` y metas Ohio relevantes.
+   - Cuando `greenhouse-wp-bridge` este desplegado/activo, usar primero `GET /wp-json/greenhouse-wp-bridge/v1/inspection/elementor-document/{id}` para obtener resumen read-only de estructura, widgets, anchors `gh-*` y metas Ohio.
 3. Determinar si la zona usa `container` moderno o `section/column` legacy.
 4. Buscar anchors semanticos `gh-*`; si no existen, planear agregarlos en el patch.
 5. Verificar si el problema es:
@@ -200,3 +202,9 @@ No ejecutar writes si:
 - Mapping HubSpot form/meeting/UTM.
 - Captura visual repetible para Public Site.
 - Kinsta cache/backups automation.
+
+## Cuando crear widgets custom
+
+Antes de crear un widget custom, confirmar que no basta con un widget Ohio maduro o con controles nativos de Elementor/Ohio. Si el modulo sera reutilizable, necesita tracking/props Greenhouse, o requiere un contrato estable de clases `gh-*`, usar un plugin propio versionado en `efeoncepro/efeonce-public-site-runtime`.
+
+La estrategia canonica vive en [Custom Elementor Widgets y React](../../documentation/public-site/wordpress-custom-widgets-react-strategy.md). Regla breve: widgets custom de Elementor para modulos visuales reutilizables; React solo para admin/editor/bloques o interacciones frontend acotadas con Interactivity API. No usar React ni CSS hardcodeado para resolver problemas de wrappers, margins, breadcrumbs o page headline.
