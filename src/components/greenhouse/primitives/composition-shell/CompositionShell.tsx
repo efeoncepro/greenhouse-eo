@@ -44,15 +44,19 @@ import type { CompositionShellProps, CompositionShellRegion, CompositionShellSiz
  *  - `split` en compact → `aside` como drawer temporal real (semántica modal, focus trap MUI).
  */
 
-const prefersReducedMotionStatic = (): boolean =>
-  typeof window !== 'undefined' && typeof window.matchMedia === 'function'
-    ? window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    : false
-
 // Cada región es query container + conserva su view-transition-name estable (morph FLIP gratis).
 // En modo `baseline` el sx gobierna opacity/transition (V1). En modo `rich` framer-motion es dueño del
 // opacity (entrada + condense) → el sx NO setea opacity para no pelear con el animate.
-const regionSx = (theme: Theme, region: CompositionShellRegion, condense: boolean, rich: boolean) => {
+// `reduced` viene del hook `useReducedMotion` (SSR-safe: false en SSR + primer paint, se actualiza
+// post-mount sin causar hydration mismatch) — NO leemos matchMedia en render (eso es un branch
+// server/client que rompe la hidratación).
+const regionSx = (
+  theme: Theme,
+  region: CompositionShellRegion,
+  condense: boolean,
+  rich: boolean,
+  reduced: boolean
+) => {
   const meta = COMPOSITION_SHELL_REGION_META[region]
 
   const base = {
@@ -67,7 +71,7 @@ const regionSx = (theme: Theme, region: CompositionShellRegion, condense: boolea
     ...base,
     // El morph estructural lo interpola el browser via view-transition-name. La transición de opacidad
     // cubre la condensación de `primary` cuando otra región lidera (degrada honesto sin reduced-motion).
-    transition: prefersReducedMotionStatic()
+    transition: reduced
       ? 'none'
       : theme.transitions.create(['opacity'], { duration: theme.transitions.duration.shorter }),
     opacity: condense ? 0.92 : 1
@@ -108,6 +112,13 @@ const CompositionShell = ({
 
   // `split` en compact → `aside` se vuelve drawer temporal (disclosure local, el resto apila).
   const [asideDrawerOpen, setAsideDrawerOpen] = useState(false)
+
+  // Gate de hidratación para el reveal de framer-motion: el SSR + primer paint montan en estado FINAL
+  // (`initial=false`) → el HTML del server matchea el cliente (sin hydration mismatch). El stagger de
+  // entrada anima recién cuando una región NUEVA monta por un cambio de composición (post-mount, client).
+  const [hasMounted, setHasMounted] = useState(false)
+
+  useEffect(() => setHasMounted(true), [])
 
   useEffect(() => {
     if (sizeClassOverride || typeof ResizeObserver === 'undefined') return
@@ -209,8 +220,8 @@ const CompositionShell = ({
           ? { component: 'aside' as const, role: 'complementary', 'aria-label': asideLabel }
           : {}
 
+    // `key` se pasa DIRECTO a JSX (nunca vía spread — React lo prohíbe).
     const shared = {
-      key: region,
       ...a11yProps,
       ref: isLeading ? (leadingRegionRef as React.Ref<HTMLDivElement>) : undefined,
       tabIndex: isLeading ? -1 : undefined,
@@ -224,13 +235,15 @@ const CompositionShell = ({
 
       return (
         <Box
+          key={region}
           {...shared}
           component={motion.div}
           layout={interruptible ? true : undefined}
-          initial={motionProps.initial}
+          // Antes de montar (SSR + primer paint) entra en estado final → matchea el HTML del server.
+          initial={hasMounted ? motionProps.initial : false}
           animate={motionProps.animate}
           transition={interruptible ? compositionInterruptibleLayoutTransition(reduced) : motionProps.transition}
-          sx={regionSx(theme, region, condense, true)}
+          sx={regionSx(theme, region, condense, true, reduced)}
         >
           {content}
         </Box>
@@ -238,7 +251,7 @@ const CompositionShell = ({
     }
 
     return (
-      <Box {...shared} sx={regionSx(theme, region, condense, false)}>
+      <Box key={region} {...shared} sx={regionSx(theme, region, condense, false, reduced)}>
         {content}
       </Box>
     )
