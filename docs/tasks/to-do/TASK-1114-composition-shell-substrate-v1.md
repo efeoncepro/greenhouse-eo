@@ -65,7 +65,8 @@ Reglas obligatorias:
 
 ### Blocks / Impacts
 
-- TASK-1110 (su `NexaMomentComposition` se migra al substrato como gate).
+- TASK-1110 (su `NexaMomentComposition` se migra al substrato como gate + piloto).
+- TASK-1115 (Adaptive Card — capacidad hermana del contenido; seam = container query; no bloquea el piloto).
 - `AdaptiveSidecarLayout` (TASK-1028) + `OrganizationWorkspaceShell` (TASK-611) — migración oportunista post-V1.
 
 ### Files owned
@@ -98,19 +99,27 @@ Reglas obligatorias:
 - **Mapear las composiciones a "canonical layouts" estilo M3** + declarar el comportamiento por breakpoint (compact/medium/expanded): qué regiones colapsan/reflowean en cada size class (`aside` → `overlay`/`temporary` en compact).
 - Declarar la frontera **V1 in-place (modelo AI Overviews)** vs **V2 cross-route (modelo AI Mode)** + el contrato del `bridge`.
 
-### Slice 2 — Primitive + controller (domain-neutral)
+### Slice 2 — Primitive + controller (domain-neutral) + contrato de fluidez
 
 - `composition-shell/` primitive (grid de regiones + `view-transition-name` ownership + container queries) + controller `kind→composición` + reducer de estado (`dormant/composing/composed`) + tests.
-- a11y: focus routing tras `transition.finished`, un solo live region, regiones `role="region"`/`complementary`, never-hidden, reduced-motion.
+- **Hornear el contrato de fluidez** (ADR §Delta 2026-06-13 (b) — más allá de nombrar zonas):
+  - **A Movimiento:** morph FLIP entre composiciones · promoción shared-element (card→`lead`) · orquestación enter/exit/reorder con stagger (motion tokens) · transiciones interrumpibles (mínimo V1; lo *buttery* vía framer-motion `layout`, no solo VT).
+  - **B Adaptación:** regiones size-aware (cada región es **query container válido**, `container-type: inline-size`) · condensación honesta · resolución por breakpoint M3 · scroll anchoring.
+  - **C Continuidad:** anchoring cita↔host · focus/announce routing tras `transition.finished` · skeleton-to-content (CLS=0).
+  - **D Gobierno:** máquina de estados · collision/arbitration (dirty-guard) · persistencia route-local.
+- **El card es dueño de su adaptación intrínseca** (Adaptive Card / TASK-1115) — el shell NO se la inyecta; solo garantiza que la región es query container. El seam es la container query.
+- a11y: focus routing, un solo live region, regiones `role="region"`/`complementary`, never-hidden, reduced-motion (swap instantáneo).
 
 ### Slice 3 — Lab + GVC
 
 - Lab `/admin/design-system/composition-shell` (gate `administracion.design_system`) + route-reachability + entrada en `DesignSystemCatalogView` + `PRIMITIVES.md`.
 - Scenarios GVC por composición desktop+mobile + TASK-1018 layout-integrity/keyboard gates.
 
-### Slice 4 — Gate de validación: migrar NexaMomentComposition
+### Slice 4 — Gate de validación + PILOTO (lente compuesta de Knowledge)
 
-- Re-expresar `NexaMomentComposition` (TASK-1110) sobre el substrato. **Criterio de éxito: el consumer se simplifica** (menos código de grid/morph/anclaje propio). GVC byte-mirado contra el frame actual. Si no simplifica → revisar el diseño del substrato antes de cerrar.
+- **El piloto ES el gate**: re-expresar `NexaMomentComposition` (TASK-1110, lente compuesta de Knowledge) sobre el substrato, detrás de un flag por-surface **default OFF** (legacy intacto), **ON solo para el piloto**.
+- **Criterio de éxito: el consumer se simplifica** (menos código de grid/morph/anclaje propio — lo hereda del substrato). GVC byte-mirado contra el frame actual. Si no simplifica → revisar el diseño del substrato antes de cerrar.
+- Adaptive Card (TASK-1115) NO bloquea el piloto (el host de Knowledge no tiene grids densos de KPI que condensen fuerte).
 
 ## Out of Scope
 
@@ -139,7 +148,7 @@ Reglas obligatorias:
 
 ### Feature flags / cutover
 
-- Flag de adopción por surface (default OFF). Una surface opta explícitamente; las demás quedan en `LayoutContent` legacy. Revert = flag OFF (no migración). Sin flag global que cambie defaults.
+- **Flag por-surface, default OFF.** Las UI legacy quedan exactamente como hoy (`LayoutContent` intacto) — el substrato es inerte hasta que una surface opta. El flag se enciende **SOLO para la surface piloto** (lente compuesta de Knowledge). Revert = flag OFF (sin migración). Sin flag global que cambie defaults. Patrón consistente con los flags de la lente conversacional (`NEXA_ANSWERS_CANVAS_LENS_ENABLED`).
 
 ### Rollback plan per slice
 

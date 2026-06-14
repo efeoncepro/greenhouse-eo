@@ -209,3 +209,33 @@ Evidencia nueva (no cambia la decisión; la afila). Investigación de cómo el m
 - Substrato V1 confirmado = **View Transitions API (Baseline 2025) + CSS grid + container queries (Baseline 2023)**; resize es capa aditiva posterior.
 
 Fuentes: [M3 Canonical Layouts](https://m3.material.io/foundations/adaptive-design/canonical-layouts) · [Android Canonical layouts](https://developer.android.com/develop/adaptive-apps/guides/canonical-layouts) · [AI Mode vs AI Overviews](https://www.evertune.ai/resources/insights-on-ai/google-ai-mode-vs-google-ai-overviews-whats-the-difference) · [AI Overviews → AI Mode](https://www.techbuzz.ai/articles/google-links-ai-overviews-to-conversational-ai-mode) · [Where should AI sit in your UI?](https://uxdesign.cc/where-should-ai-sit-in-your-ui-1710a258390e) · [Agentic Interfaces](https://insights.theinteractive.studio/beyond-the-chat-agentic-interfaces-inside-your-product) · [View Transitions API (MDN)](https://developer.mozilla.org/en-US/docs/Web/API/View_Transition_API) · [react-resizable-panels](https://github.com/bvaughn/react-resizable-panels) · [Atlassian Primitives](https://atlassian.design/foundations/primitives) · [Carbon 2x Grid](https://carbondesignsystem.com/elements/2x-grid/usage/)
+
+## Delta 2026-06-13 (b) — Contrato de fluidez + Adaptive Card + piloto
+
+### Contrato de fluidez (lo que el shell hornea más allá de nombrar zonas)
+
+Nombrar zonas es el esqueleto estático. La fluidez son **capacidades dinámicas neutrales** horneadas en el substrato. El consumer solo declara *qué composición + qué contenido*; el shell aporta:
+
+**A. Movimiento** (V1): morph FLIP entre composiciones (`view-transition-name` por región persistente) · promoción shared-element (un card crece a `lead`) · orquestación enter/exit/reorder con stagger (motion tokens) · transiciones interrumpibles (V1 mínimo).
+
+**B. Adaptación** (V1): regiones size-aware (container queries — el contenido reflowea a su espacio) · condensación honesta (condensa, no clipea) · resolución adaptativa por breakpoint (M3 compact/medium/expanded; `aside`→`overlay`/`temporary` en compact) · scroll anchoring + scroll-driven entrance.
+
+**C. Continuidad de atención** (V1): anchoring cita↔host (highlight + scrollIntoView) · focus/announce routing tras `transition.finished` (un solo live region) · skeleton-to-content (skeleton dimensionado al contenido final → CLS=0).
+
+**D. Gobierno del estado** (V1): máquina de estados de composición (transiciones enumeradas) · collision/arbitration (quién ocupa el `aside`, dirty-guard estilo sidecar reducer) · persistencia/restore sin flash (route-local V1; broad V2).
+
+**Tradeoff horneado**: View Transitions, si se dispara una nueva mientras corre otra, **salta-y-reinicia** (no redirige el interpolado). Para interrupción *buttery* (drag, cambio de idea a media animación) el tool es **framer-motion `layout`** → el substrato consume **ambas** capas de motion (VT para morph estructural + framer-motion para lo interrumpible), no solo VT. Disciplina anti-"juguete": motion tokens cortos + `prefers-reduced-motion` (swap instantáneo) + menos-es-más (enterprise sobrio).
+
+### Adaptive Card — capacidad HERMANA (el contenido, no el contenedor)
+
+El shell mueve el *contenedor*; sin cards adaptables la fluidez se rompe en el micro (clipean al condensar). **El card se adapta, pero NO hereda del shell (acoplamiento) — es intrínsecamente adaptable** vía container queries (`container-type: inline-size`): responde a **su propio ancho**, no al shell. Así compone en cualquier contenedor (región, drawer, dashboard grid, mobile) **sin conocer el shell**; cuando el shell reflowea la región, el ancho del card cambia → su query dispara sola. **Componen sin cablearse.**
+
+Contrato compartido (consistencia) = generaliza el **Density Contract de TASK-743** (tablas `compact/comfortable/expanded`) a cards: modos de fit canónicos (`full`/`condensed`/`peek`) + **condensación honesta** (state-design: versión real más chica, NUNCA clip/overflow/`$0` — KPI→value+label, chart→sparkline, list→menos filas + "+N"). El contrato define los modos; cada arquetipo de card implementa *qué* esconde por modo (diseño, no automático).
+
+**Boundary:** Composition Shell (TASK-1114) = contenedor (regiones/composiciones/morph). Adaptive Card (TASK-1115) = contenido (card se adapta a su ancho). **El seam es la container query.** TASK-1114 solo (a) garantiza que las regiones son *query containers válidos* y (b) documenta que el card es dueño de su adaptación intrínseca. Ambas son útiles por separado; no mezclar dimensiones (1 task cada una).
+
+### Piloto + rollout (flag OFF para legacy)
+
+- **Piloto = la lente compuesta de Knowledge** (el consumer `NexaMomentComposition`, TASK-1110). Unifica el **gate de validación** (migrar `NexaMomentComposition` y que se simplifique) con el primer piloto real.
+- **Flag por-surface, default OFF.** Las UI legacy quedan exactamente como hoy (`LayoutContent` intacto). El flag se enciende **solo para la surface piloto**. Revert = flag OFF (sin migración). Patrón consistente con los flags de la lente conversacional (`NEXA_ANSWERS_CANVAS_LENS_ENABLED`).
+- **Adaptive Card NO bloquea el piloto**: el host de Knowledge no tiene grids densos de KPI que condensen fuerte; el piloto puede shippear con el shell morph y la Adaptive Card entra como follow-up (TASK-1115).
