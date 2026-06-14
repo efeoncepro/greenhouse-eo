@@ -342,6 +342,16 @@ export type {
   CompositionShellTelemetryEventName,
   ResolvedCompositionLayout
 } from './composition-shell/composition-shell-controller'
+export {
+  CARD_DENSITY_BREAKPOINTS,
+  compareCardDensity,
+  isCardDensity,
+  isCardDensityAtLeast,
+  resolveCardDensity,
+  resolveCardDensityRequest,
+  useContainerDensity
+} from './card-density'
+export type { CardDensity, CardDensityRequest, UseContainerDensityResult } from './card-density'
 export { default as GreenhouseNexaAnimatedAskBadge } from './GreenhouseNexaAnimatedAskBadge'
 export type { GreenhouseNexaAnimatedAskBadgeProps } from './GreenhouseNexaAnimatedAskBadge'
 export { default as EfeonceOrbitalLogoMark } from './EfeonceOrbitalLogoMark'
