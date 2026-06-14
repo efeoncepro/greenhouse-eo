@@ -43,6 +43,9 @@ External vendor capability claims were validated against official sources:
 - WordPress Application Passwords: `https://developer.wordpress.org/advanced-administration/security/application-passwords/`
 - WordPress Abilities API handbook: `https://developer.wordpress.org/apis/abilities-api/`
 - WordPress MCP Adapter developer article: `https://developer.wordpress.org/news/2026/02/from-abilities-to-ai-agents-introducing-the-wordpress-mcp-adapter/`
+- WordPress Developer Blog, "What's new for developers? (June 2026)": `https://developer.wordpress.org/news/2026/06/whats-new-for-developers-june-2026/`
+- Make/Core, "React 19 upgrade temporarily reverted in Gutenberg": `https://make.wordpress.org/core/2026/06/05/react-19-upgrade-temporarily-reverted-in-gutenberg/`
+- WordPress Interactivity API reference: `https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/`
 - Official WordPress Agent Skills repo: `https://github.com/WordPress/agent-skills`
 - Kinsta API docs: `https://kinsta.com/docs/kinsta-api/`
 - Kinsta API reference for cache clear: `https://api-docs.kinsta.com/api-reference/wordpress-site-tools/clear-site-cache`
@@ -93,6 +96,14 @@ The bridge should be **Abilities-first where available**:
 - REST endpoints may still exist as transport and compatibility paths, but they should delegate to the same underlying bridge services as the abilities.
 - Abilities that can mutate public content must be narrow, permissioned and auditable.
 - The architecture should stay compatible with the WordPress MCP Adapter direction, where registered abilities can become discoverable tools/resources/prompts for external agents.
+
+The bridge and future templates may use WordPress-native React/Gutenberg surfaces, but that does **not** change the source-of-truth decision:
+
+- Greenhouse remains the control plane.
+- WordPress remains the public runtime.
+- React in WordPress is appropriate for block editor/admin tooling and scoped block interactivity.
+- Public frontend interactions should prefer the WordPress Interactivity API and server-rendered blocks over a full React SPA.
+- React 19 compatibility must be treated as a runtime watch item until the Kinsta WordPress/Gutenberg/plugin stack proves support.
 
 ## Runtime Contract
 

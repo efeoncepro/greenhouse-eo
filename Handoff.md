@@ -1,12 +1,31 @@
 # Release 2026-06-10 #2 — develop→main `6c649b2a6` RELEASED
 
+## Sesion 2026-06-14 — TASK-1111 discovery autenticada repetible + TASK-1116 bridge draft-only (Codex)
+
+- **Qué quedó:** `pnpm public-website:discover` ahora soporta `--authenticated` y `--wpcli` sin cambiar el modo público por defecto. El modo autenticado resuelve el Application Password desde Secret Manager, pero no imprime secretos ni `Authorization`; el modo WP-CLI usa SSH con llave local y comandos read-only.
+- **Reporte nuevo:** `docs/operations/discovery-public-website-wordpress-20260614.md` generado con REST público + WordPress autenticado + WP-CLI read-only. Resultado: `wp/v2` disponible, `wp-abilities/v1` anunciado, abilities autenticadas `200` con 33 abilities, plugins endpoint `200`, editable REST types `200`, pages edit inventory `200`, WP-CLI `ok`.
+- **Usuario técnico correcto:** el `user_login` real para el Application Password es `Greenhouse INTEGRATION`; con ese login `/wp-json/wp/v2/users/me?context=edit` responde `200` (`slug=greenhouse-integration`, display `Greenhouse`). Riesgo: el usuario sigue con rol `administrator`; reducir capabilities queda como requisito/riesgo de `TASK-1116` antes de producción.
+- **WP-CLI read-only:** confirmado contra `/www/efeoncegroup_752/public` con theme activo `ohio-child` parent `ohio`, Elementor/Elementor Pro, Yoast SEO/Premium, HubSpot/Leadin, plugins custom `eo-headless-content`/`eo-vibe-coding-api`, AI providers y CPT privado `landing`.
+- **Task nueva:** `docs/tasks/to-do/TASK-1116-greenhouse-wp-bridge-draft-only-foundation.md`. Scope: foundation del plugin `greenhouse-wp-bridge` con auth firmada, Abilities-first + REST fallback, health/readiness, metadata de audit y write path estrictamente `draft/private`. Fuera de scope: publish, cache clear, delete, mutaciones a Elementor/Ohio existentes sin ownership Greenhouse.
+- **Bloqueo restante TASK-1111:** falta token Kinsta API read-only para environment/cache/backups. Esto no debe bloquear `TASK-1116` si el bridge se mantiene draft-only y publish/cache clear queda para task posterior.
+- **Verificación corrida:** `pnpm public-website:discover`; `pnpm public-website:discover -- --authenticated --wpcli --write` con env locales/Secret Manager; grep de tokens pegados en chat contra script/reporte/env/task sin hallazgos.
+
 ## Sesion 2026-06-14 — Public Site `/blog` layout Ohio + Elementor documentado (Codex)
 
 - **Qué quedó en runtime WordPress:** se corrigio `efeoncepro.com/blog` (`page_id=18456`) alineando el meta Ohio `page_full_width_margins_size` de `20px` a `16px`, porque Elementor compensaba `-16px` y quedaba una linea residual de 4px. Se ejecuto `wp cache flush`.
 - **Regresion corregida:** durante la sesion se habia introducido una regresion en el sidebar fijo cerca del pre-footer/footer: Ohio agregaba `.light-typo` y lavaba hamburger/logo aunque el rail lateral era blanco. Se corrigio con CSS page-scoped en `wp-content/themes/ohio-child/assets/css/global-fixes.css`, solo para `body.page-id-18456.with-header-sidebar:not(.dark-scheme)`.
-- **Backups runtime:** `wp-content/themes/ohio-child/assets/css/blog-page-meta-backup-20260614015717.txt` y `wp-content/themes/ohio-child/assets/css/global-fixes.css.bak-20260614020413-before-blog-sidebar-header-fix`.
+- **Contacto corregido:** `efeoncepro.com/contacto` (`page_id=20729`) fue diagnosticado aparte: usa `with-header-3`; la discontinuidad venia del breadcrumb del theme y del `bottom-offset` automatico fuera de Elementor. Fix final: `page_breadcrumbs_visibility=0` y `page_add_top_padding=0`; se retiro el intento de CSS de fondo porque no resolvia la percepcion. Verificacion Playwright: `hasBreadcrumb=false`, no existe `.page-container.bottom-offset`, Elementor empieza justo al terminar el hero (`top=500`) y el footer empieza al terminar Elementor.
+- **Aprendizaje:** en Ohio + Elementor, no asumir que igualar colores resuelve continuidad. Si la banda viene de estructura del theme (`breadcrumb-holder`, `top-offset`, `bottom-offset`), corregir primero metas/settings Ohio y validar con captura visual; usar CSS page-scoped solo para presentacion cuando la estructura ya es correcta.
+- **Backups runtime:** `wp-content/themes/ohio-child/assets/css/blog-page-meta-backup-20260614015717.txt`, `wp-content/themes/ohio-child/assets/css/global-fixes.css.bak-20260614020413-before-blog-sidebar-header-fix`, `wp-content/themes/ohio-child/assets/css/contacto-page-meta-backup-202606140-bg-continuity.json` y `wp-content/themes/ohio-child/assets/css/global-fixes.css.bak-202606140-contacto-bg-continuity`.
 - **Docs nuevas:** `docs/documentation/public-site/wordpress-ohio-elementor-layout.md` y `docs/manual-de-uso/public-site/wordpress-ohio-elementor-layout.md`. Guardrail: no volver a resolver este tipo de desfase con CSS global sobre `#masthead`, footer, hero o fondos que pinten debajo del rail.
 - **Pendiente:** cuando EPIC-019 avance, convertir estos checks visuales en smoke repetible para Public Site/WordPress antes de permitir deploy de landings desde Greenhouse.
+
+## Sesion 2026-06-14 — Public Site WordPress React/Gutenberg boundary documentado (Codex)
+
+- **Qué se documento:** EPIC-019 ahora explicita que WordPress puede trabajar con React, pero Greenhouse no debe transformar `efeoncepro.com` en SPA. React queda autorizado solo en vias WordPress-native: Gutenberg/bloques, admin/editor tooling del bridge y frontend con WordPress Interactivity API para interacciones acotadas.
+- **Fuentes oficiales revisadas:** WordPress Developer Blog "What's new for developers? (June 2026)", Make/Core "React 19 upgrade temporarily reverted in Gutenberg" y WordPress Interactivity API reference.
+- **Contrato operativo:** Greenhouse sigue siendo source of truth/control plane para manifests, aprobaciones, versiones, publish, drift y audit; WordPress sigue siendo runtime publico. React 19 es watch item: no asumir compatibilidad hasta probar el stack real Kinsta/WordPress/Gutenberg/plugins.
+- **Docs tocadas:** `docs/architecture/GREENHOUSE_PUBLIC_WEBSITE_LANDING_CONTROL_PLANE_ARCHITECTURE_V1.md`, ADR propuesto, `EPIC-019`, doc funcional/runbook de Public Site, `project_context.md`, `changelog.md` y este handoff.
 
 ## Sesion 2026-06-13 — TASK-1111 Public Website read-only discovery (Codex)
 

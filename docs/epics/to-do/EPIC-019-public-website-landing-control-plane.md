@@ -19,6 +19,8 @@ Programa cross-domain para que Greenhouse gobierne el sitio publico de Efeonce c
 
 La meta no es reemplazar WordPress en V1. La meta es que Greenhouse sea el **control plane** de las landing pages que crea, mientras WordPress sigue sirviendo `efeoncepro.com` y Kinsta sigue operando el hosting. El bridge WordPress debe ser **Abilities-first** cuando la version runtime lo permita, para alinearse con la direccion oficial de WordPress hacia agentes/MCP.
 
+Actualizacion WordPress developers 2026-06-14: WordPress puede trabajar con React, pero en este epic React debe vivir en las vias nativas de WordPress: Gutenberg/bloques/admin del bridge y WordPress Interactivity API para interacciones frontend acotadas. No cambia la decision de source of truth: Greenhouse no debe convertir el sitio publico en una SPA ni publicar React arbitrario; React 19 sigue siendo un punto de compatibilidad a probar porque Gutenberg 23.3.2 revirtio temporalmente el upgrade.
+
 ## Why This Epic Exists
 
 El sitio publico de Efeonce es una superficie comercial, pero hoy vive fuera del loop operativo de Greenhouse. Eso crea drift entre campanas, CTAs, HubSpot, SEO/AEO, landing pages y aprendizaje comercial.
@@ -54,8 +56,8 @@ Sin un epic, el trabajo tenderia a partir con un script o endpoint aislado que p
 
 | Task | Phase | Status | Purpose |
 | --- | --- | --- | --- |
-| `TASK-1111` | `0` | `in-progress` | WordPress/Kinsta discovery + read-only inventory: public REST/Abilities inventory shipped first; authenticated abilities/theme/plugins/SEO/Kinsta inspection remains blocked on technical credentials. |
-| `TASK-TBD` | `1` | `planned` | WordPress bridge plugin foundation: private namespace, Abilities API registrations, auth/signature verification, health endpoint, metadata contract and draft-only write path in safe target. |
+| `TASK-1111` | `0` | `in-progress` | WordPress/Kinsta discovery + read-only inventory: public REST/Abilities inventory shipped; authenticated WordPress/Abilities/plugins and WP-CLI theme/plugins/post-types are repeatable. Kinsta API environment/cache/backups remains blocked on token or deferral. |
+| `TASK-1116` | `1` | `to-do` | WordPress bridge plugin foundation: private namespace, Abilities API registrations, auth/signature verification, health endpoint, metadata contract and draft-only write path in safe target. |
 | `TASK-TBD` | `2` | `planned` | Landing manifest + template registry: canonical schema, revision model, SEO/CTA/HubSpot metadata, validation and audit records. |
 | `TASK-TBD` | `3` | `planned` | Greenhouse Landing Ops UI V1: internal surface for inventory, draft creation, review, preview status and operational states. |
 | `TASK-TBD` | `4` | `planned` | Publish pipeline: approval gate, WordPress publish, Kinsta cache clear, smoke verification, rollback baseline and drift detection. |
@@ -99,3 +101,7 @@ Sin un epic, el trabajo tenderia a partir con un script o endpoint aislado que p
 Epic created from operator request: "capacidad tambien de desplegar landing pages desde Greenhouse a Wordpress". Initial architecture and ADR are proposed, not implemented.
 
 Official WordPress Agent Skills from `WordPress/agent-skills` were vendored into both `.codex/skills` and `.claude/skills`; future WordPress bridge tasks must load the relevant `wp-*` skills before implementation.
+
+## Delta 2026-06-14
+
+Se documento la frontera React/Gutenberg/Interactivity API para este epic. Resultado: React es valido en WordPress para bloques, admin/editor tooling del bridge y microinteracciones frontend con Interactivity API, pero V1 no debe transformarse en una reescritura SPA ni depender de React 19 sin prueba de compatibilidad en el runtime Kinsta/WordPress activo.

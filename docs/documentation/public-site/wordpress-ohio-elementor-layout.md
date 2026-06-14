@@ -23,7 +23,7 @@ El objetivo es evitar que Greenhouse o un agente corrija un sintoma visual del P
 
 ## Alcance
 
-Aplica al sitio publico `efeoncepro.com` y, en particular, al incidente corregido el 2026-06-14 en `/blog`.
+Aplica al sitio publico `efeoncepro.com` y, en particular, a los incidentes corregidos el 2026-06-14 en `/blog` y `/contacto`.
 
 No define todavia el bridge productivo Greenhouse -> WordPress para landings. Ese contrato vive en EPIC-019 y su arquitectura. Este documento es memoria operacional del runtime WordPress actual.
 
@@ -134,3 +134,91 @@ Greenhouse puede operar este runtime por SSH/WP-CLI para discovery y fixes contr
 - HubSpot conserva atribucion CRM y formularios cuando aplique.
 
 Hasta que el bridge exista, cualquier fix en WordPress debe documentar comando, backup, rollback y verificacion visual.
+
+## React, Gutenberg e Interactivity API
+
+WordPress si puede trabajar con React, pero para `efeoncepro.com` la regla vigente es usarlo dentro del modelo WordPress, no como reemplazo del sitio publico.
+
+Fuentes oficiales revisadas el 2026-06-14:
+
+- `https://developer.wordpress.org/news/2026/06/whats-new-for-developers-june-2026/`
+- `https://make.wordpress.org/core/2026/06/05/react-19-upgrade-temporarily-reverted-in-gutenberg/`
+- `https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/`
+
+Lectura operacional:
+
+- React es natural en Gutenberg, bloques, paneles admin/editor del bridge y tooling WordPress basado en `@wordpress/*`.
+- Para frontend publico, la via preferida es server-rendered blocks/templates + WordPress Interactivity API para interacciones acotadas.
+- React 19 no debe asumirse estable en el stack activo: Gutenberg 23.3.2 revirtio temporalmente el upgrade a React 19 por incompatibilidades con plugins construidos contra React 18.
+- Greenhouse sigue siendo el control plane de manifests, aprobaciones, versiones, publish, drift y audit; WordPress React no se convierte en source of truth de landing operations.
+- No se debe usar esta capacidad como excusa para reescribir `efeoncepro.com` como SPA ni para inyectar bundles React arbitrarios en paginas Ohio/Elementor existentes.
+
+## Incidente 2026-06-14: `/contacto`
+
+### Sintomas
+
+- En `https://efeoncepro.com/contacto`, el fondo se cortaba entre hero, breadcrumbs, contenido y footer.
+- El corte se leia como una banda de breadcrumbs entre hero y contenido, mas un espacio automatico antes del footer.
+
+### Causa raiz
+
+La pagina `/contacto` usa el template default de Ohio (`with-header-3`), no el header/sidebar de `/blog`.
+
+Elementor pinta la seccion principal con un gris suave (`rgba(150, 144, 162, 0.06)`), pero Ohio renderizaba fuera de esa seccion:
+
+- `breadcrumb-holder`, heredado de la opcion global de breadcrumbs;
+- `page-container bottom-offset`, creado por la opcion global `page_add_top_padding`.
+
+Por eso no era un problema del formulario HubSpot ni del hero. Era una interrupcion del theme entre la seccion hero y la seccion Elementor.
+
+### Cambio aplicado
+
+Se resolvio desde los metas de Ohio para la pagina, no con CSS global:
+
+```bash
+wp post meta update 20729 page_breadcrumbs_visibility 0
+wp post meta update 20729 page_add_top_padding 0
+wp cache flush
+```
+
+El efecto esperado es:
+
+- no se renderiza `breadcrumb-holder`;
+- no existe `.page-container.bottom-offset`;
+- la seccion Elementor empieza justo donde termina el hero;
+- el footer comienza justo donde termina la seccion Elementor.
+
+### Backups de rollback
+
+Antes del cambio se guardo:
+
+```text
+wp-content/themes/ohio-child/assets/css/contacto-page-meta-backup-202606140-bg-continuity.json
+```
+
+Tambien existe un backup previo del CSS de la sesion:
+
+```text
+wp-content/themes/ohio-child/assets/css/global-fixes.css.bak-202606140-contacto-bg-continuity
+```
+
+### Verificacion
+
+Despues del fix:
+
+- `hasBreadcrumb=false`;
+- `#content > .page-container` comienza en `top=500`, donde termina `.page-headline`;
+- `.elementor-section-stretched.elementor-section-full_width` comienza en `top=500`;
+- `.site-footer` comienza justo al terminar la seccion Elementor;
+- no existe `.page-container.bottom-offset`.
+
+### Aprendizaje operativo
+
+El primer intento de correccion fue igualar el fondo de `#content.site-content` con el gris de Elementor. Aunque el CSS cargaba y los valores computados coincidian, visualmente el problema seguia: la pagina aun conservaba la banda de breadcrumbs y el offset automatico del theme.
+
+La regla aprendida para Ohio + Elementor es:
+
+- si la discontinuidad proviene de una pieza estructural de Ohio (`breadcrumb-holder`, `top-offset`, `bottom-offset`), corregir primero el setting/meta de Ohio que la genera;
+- usar CSS page-scoped solo cuando el contenedor correcto ya existe y el problema es de presentacion, no de estructura;
+- no declarar resuelto un problema visual solo porque los valores computados cambiaron: debe validarse con captura visual y compararse contra el sintoma reportado por el operador;
+- si un fix no cambia la percepcion del problema, revertir o reemplazar el enfoque antes de acumular selectores mas fuertes.

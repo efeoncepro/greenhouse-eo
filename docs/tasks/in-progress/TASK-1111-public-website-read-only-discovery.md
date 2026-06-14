@@ -14,10 +14,10 @@
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `EPIC-019`
-- Status real: `Slice 1 public discovery listo; WordPress auth verificada; Kinsta SSH/WP-CLI read-only verificado; Kinsta API token pendiente`
+- Status real: `Public + authenticated WordPress discovery repetible listo; Kinsta SSH/WP-CLI read-only repetible listo; Kinsta API token pendiente`
 - Rank: `TBD`
 - Domain: `platform|commercial|marketing-ops|integrations`
-- Blocked by: `Kinsta API token para environment/cache/backups read-only`
+- Blocked by: `Kinsta API token para environment/cache/backups read-only; decision de si esto queda como blocker o follow-up de publish/cache`
 - Branch: `develop`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -32,7 +32,7 @@ Crear la primera conexion segura entre Greenhouse y el sitio publico `efeoncepro
 
 ## Goal
 
-- Proveer un script reusable `pnpm public-website:discover` que haga inventory read-only de `efeoncepro.com`.
+- Proveer un script reusable `pnpm public-website:discover` que haga inventory read-only publico, autenticado y WP-CLI de `efeoncepro.com`.
 - Guardar el primer reporte versionado de discovery bajo `docs/operations/`.
 - Documentar el contrato de env vars/Secret Manager para WordPress Application Passwords, Kinsta API y futuro bridge HMAC.
 - Mantener claro el limite operativo: sin escrituras hasta usuario tecnico, staging/preview, audit log y rollback baseline.
@@ -115,7 +115,8 @@ Reglas obligatorias:
 - No env contract existed for WordPress/Kinsta public website credentials.
 - Authenticated WordPress smoke is available.
 - Kinsta SSH/WP-CLI read-only access is available for operational inspection at `/www/efeoncegroup_752/public`; active theme/plugin/post-type inventory was collected manually on 2026-06-13.
-- Authenticated discovery still needs a scripted Slice 3 pass for repeatability. Kinsta environment/cache/backups discovery remains blocked until a Kinsta API token is provisioned.
+- Authenticated discovery ya tiene un Slice 3 repetible para WordPress/Abilities/plugins/theme/post-types usando Application Password + WP-CLI read-only.
+- Kinsta environment/cache/backups discovery remains blocked until a Kinsta API token is provisioned, o hasta decidir formalmente que cache/backups pertenecen a una task posterior de publish.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -144,9 +145,10 @@ Reglas obligatorias:
 
 ### Slice 3 — Authenticated read-only follow-up
 
-- Extender el discovery para listar abilities visibles, tema/builder/plugin/SEO surface y Kinsta environment/cache/backups sin writes.
-- Confirmar scope minimo del usuario tecnico y token Kinsta antes de bridge/publish tasks.
+- Extender el discovery para listar abilities visibles, tema/builder/plugin/SEO surface sin writes.
+- Confirmar scope minimo del usuario tecnico antes de bridge/publish tasks; el usuario actual `Greenhouse` autentica correctamente pero conserva rol `administrator`, por lo que la reduccion de privilegios queda como riesgo de TASK-1116.
 - Incorporar la via SSH/WP-CLI read-only como fallback auditado cuando la Kinsta API no cubra WordPress internals; comandos mutantes siguen fuera de scope.
+- Kinsta environment/cache/backups queda pendiente de token Kinsta API y no debe bloquear el bridge draft-only si publish/cache clear siguen fuera de scope.
 
 ## Out of Scope
 
@@ -179,7 +181,7 @@ Repo-only read-only change. No requiere migraciones, deploy ni credenciales para
 ### Slice ordering hard rule
 
 - Slice 1 (public discovery) -> Slice 2 (env/secret contract) -> Slice 3 (authenticated read-only).
-- Slice 3 repetible no puede cerrarse hasta provisionar Kinsta token con menor privilegio o declarar formalmente SSH/WP-CLI como fallback read-only para WordPress internals.
+- Slice 3 WordPress queda cerrado con Application Password + WP-CLI read-only; Kinsta API queda como blocker solo para environment/cache/backups/publish/cache clear.
 
 ### Risk matrix
 
@@ -231,12 +233,15 @@ Sin flag — script local/documental, no runtime.
 - [x] WordPress Abilities list autenticada responde 200.
 - [x] Kinsta SSH con clave publica dedicada registrado y smoke WP-CLI read-only verde.
 - [x] Inventario WP-CLI read-only manual de plugins, theme y post types ejecutado sin writes.
-- [ ] Discovery autenticada repetible de theme/builder/plugins/SEO/Kinsta automatizada con credenciales de menor privilegio.
+- [x] Discovery autenticada repetible de WordPress Abilities, editable REST types, pages y plugin endpoint automatizada sin writes.
+- [x] Discovery WP-CLI repetible de theme/plugins/post-types automatizada sin writes.
+- [ ] Discovery Kinsta API de environment/cache/backups automatizada con token de menor privilegio o formally deferred fuera del bridge draft-only.
 
 ## Verification
 
 - `pnpm public-website:discover`
 - `pnpm public-website:discover -- --write`
+- `PUBLIC_WEBSITE_WORDPRESS_USERNAME='Greenhouse INTEGRATION' PUBLIC_WEBSITE_WORDPRESS_APPLICATION_PASSWORD_SECRET_REF=public-website-wordpress-application-password PUBLIC_WEBSITE_KINSTA_SSH_HOST=161.153.204.166 PUBLIC_WEBSITE_KINSTA_SSH_PORT=64805 PUBLIC_WEBSITE_KINSTA_SSH_USER=efeoncegroup PUBLIC_WEBSITE_KINSTA_SSH_AUTH_METHOD=public-key PUBLIC_WEBSITE_KINSTA_SSH_KEY_PATH=/Users/jreye/.ssh/greenhouse_efeonce_kinsta_ed25519 PUBLIC_WEBSITE_KINSTA_WORDPRESS_PATH=/www/efeoncegroup_752/public pnpm public-website:discover -- --authenticated --wpcli --write`
 - `pnpm ops:lint --changed`
 - `pnpm task:lint --changed`
 - `pnpm docs:closure-check`
@@ -256,11 +261,11 @@ Sin flag — script local/documental, no runtime.
 
 ## Follow-ups
 
-- Crear child task para `greenhouse-wp-bridge` foundation cuando la discovery autenticada confirme tema/builder/plugins/SEO y version runtime.
+- `TASK-1116` — crear `greenhouse-wp-bridge` foundation draft-only con auth firmada, Abilities-first y audit metadata.
 - Crear child task para modelo de landing manifest/templates despues de conocer el rendering contract real del WordPress actual.
 
 ## Open Questions
 
-- Cual es el usuario tecnico WordPress correcto y que capabilities minimas necesita para crear drafts?
+- Que capabilities minimas necesita el usuario tecnico `Greenhouse` para crear drafts sin rol administrator?
 - Que scope exacto permite Kinsta para read-only site/environment/cache/backups?
 - El CPT publico `landing` existente debe tratarse como `wordpress_owned` observado o migrarse a `greenhouse_owned` bajo un bridge futuro?

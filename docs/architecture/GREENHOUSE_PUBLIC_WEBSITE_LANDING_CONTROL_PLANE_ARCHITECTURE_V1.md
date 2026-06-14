@@ -7,6 +7,7 @@
 > Owner: Product / Platform Architecture / Marketing Operations
 > ADR: `GREENHOUSE_PUBLIC_WEBSITE_LANDING_CONTROL_PLANE_DECISION_V1.md`
 > WordPress skills: official `WordPress/agent-skills` vendored under `.codex/skills/*` and `.claude/skills/*`
+> React/Interactivity update: WordPress Developer Blog / Make Core review on 2026-06-14
 
 ## 1. Purpose
 
@@ -279,6 +280,33 @@ Any task implementing or auditing the bridge must load the official WordPress Ag
 - `wp-block-development` when blocks/templates are involved
 - `wp-wpcli-and-ops` when WP-CLI/cache/staging/ops are involved
 - `wp-performance` before production publish paths are enabled
+
+### 9.3 React, Gutenberg and Interactivity Boundary
+
+WordPress can work with React, but the Greenhouse public-site strategy must use React in the WordPress-native lanes instead of turning `efeoncepro.com` into a second SPA.
+
+Validated official signals as of 2026-06-14:
+
+- WordPress Developer Blog, "What's new for developers? (June 2026)": WordPress 7.0 is out, Gutenberg 23.2/23.3 shipped developer-facing updates, React 19 compatibility is a watch item, Abilities API refinements continue, and Playground is the recommended test surface for current Gutenberg/WordPress behavior.
+- Make/Core, "React 19 upgrade temporarily reverted in Gutenberg" (2026-06-05): Gutenberg 23.3.0 briefly shipped the React 19 upgrade, then Gutenberg 23.3.2 reverted to React 18 because plugins built against the React 18 JSX runtime crashed under React 19. Core still intends to work toward React 19 for WordPress 7.1 through a more incremental strategy.
+- WordPress Interactivity API reference, updated 2026-06-11: the Interactivity API is bundled in WordPress Core from 6.5, uses `@wordpress/interactivity`, `viewScriptModule`, `data-wp-*` directives and block-level stores for frontend interactions in blocks.
+
+Implication for Greenhouse:
+
+| Layer | Recommended use | Not recommended in V1 |
+| --- | --- | --- |
+| Greenhouse control plane | Next.js/Greenhouse owns landing manifests, approvals, previews, publish commands, audit and drift. | Embedding WordPress admin React inside Greenhouse as the source of truth. |
+| WordPress bridge plugin admin/editor tooling | React via WordPress packages such as `@wordpress/element`, Gutenberg blocks, SlotFills/DataViews/DataForm when needed. | Bundling a separate React runtime that conflicts with Gutenberg/Core. |
+| WordPress public frontend | Server-rendered blocks/templates plus Interactivity API for scoped interactions, motion toggles, forms, filters, accordions or client-side navigation where safe. | A full React SPA rewrite of the public site or arbitrary React hydration across Elementor/Ohio pages. |
+| Landing templates | Dynamic/server-rendered blocks and constrained template sections that can be authored from Greenhouse manifests. | Freeform raw HTML/JS or ungoverned Elementor automation as the default publish model. |
+
+Hard rules:
+
+- Treat React 19 in WordPress as a compatibility watch item until the target runtime proves support with the active plugins/theme.
+- If the bridge ships compiled JSX, test it against the exact WordPress/Gutenberg runtime on Kinsta staging before production.
+- Prefer WordPress-provided React abstractions (`@wordpress/element`, block editor packages) over direct `react`/`react-dom` imports inside the plugin.
+- For public frontend interactivity, prefer the Interactivity API and server-rendered blocks over broad React hydration.
+- Greenhouse remains the control plane. WordPress React/Gutenberg is an implementation surface for the WordPress runtime, not a new product source of truth.
 
 ## 10. Publishing Lifecycle
 
