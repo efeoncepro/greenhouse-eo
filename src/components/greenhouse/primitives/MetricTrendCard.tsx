@@ -24,6 +24,8 @@ import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip as RTooltip
 import AnimatedCounter from '@/components/greenhouse/AnimatedCounter'
 import useReducedMotion from '@/hooks/useReducedMotion'
 
+import { isCardDensityAtLeast, useContainerDensity, type CardDensityRequest } from './card-density'
+
 // ── Types ─────────────────────────────────────────────────────────────
 
 export type MetricTrendPoint = {
@@ -70,6 +72,13 @@ export type MetricTrendCardProps = {
   menuTooltip?: string
   /** Optional `data-capture` hook for visual capture (GVC) targeting. */
   dataCapture?: string
+  /**
+   * TASK-1115 — adaptive density (opt-in). `undefined` = `full` (legacy, byte-identical). `'auto'` = the
+   * card adapts to its OWN width (container query): `condensed` drops metricName + period label and shrinks
+   * the chart; `peek` drops the chart and keeps title + value + delta. The hero value + delta never vanish
+   * (honest condensation, never clips).
+   */
+  density?: CardDensityRequest
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────
@@ -198,11 +207,19 @@ const MetricTrendCard = ({
   deltaUnit,
   menuOptions,
   menuTooltip,
-  dataCapture
+  dataCapture,
+  density: densityRequest
 }: MetricTrendCardProps) => {
   const theme = useTheme()
   const prefersReduced = useReducedMotion()
   const gradientId = useId().replace(/[:]/g, '')
+
+  // TASK-1115 — adaptive density. `full` (default) = legacy byte-identical. condensed drops the secondary
+  // context (metricName + period) and shrinks the chart; peek drops the chart (value + delta survive).
+  const { ref: densityRef, density, containerType } = useContainerDensity(densityRequest)
+  const isPeek = density === 'peek'
+  const hideSecondary = isCardDensityAtLeast(density, 'condensed') // condensed + peek
+  const chartHeight = hideSecondary ? 96 : 152
 
   const color: MetricTrendTone = tone ?? 'success'
   const fillColor = theme.palette[color].main
@@ -317,14 +334,17 @@ const MetricTrendCard = ({
 
   return (
     <Card
+      ref={densityRef}
       component='article'
       aria-label={ariaSummary}
       data-capture={dataCapture}
+      data-card-density={density}
       elevation={0}
       sx={{
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
+        containerType,
         border: t => `1px solid ${t.palette.divider}`,
         borderRadius: t => `${t.shape.customBorderRadius.md}px`,
         overflow: 'hidden',
@@ -348,7 +368,7 @@ const MetricTrendCard = ({
       <Stack direction='row' alignItems='flex-start' justifyContent='space-between' spacing={2} sx={{ pt: 6, px: 6 }}>
         <Stack direction='row' alignItems='baseline' spacing={1.5} sx={{ minWidth: 0 }}>
           <Typography variant='h5'>{title}</Typography>
-          {metricName ? (
+          {metricName && !hideSecondary ? (
             <Typography variant='body2' color='text.secondary' noWrap sx={{ minWidth: 0 }}>
               {metricName}
             </Typography>
@@ -368,9 +388,11 @@ const MetricTrendCard = ({
 
       {/* Value block */}
       <Stack spacing={0.5} sx={{ px: 6, pt: 3, pb: 2 }}>
-        <Typography variant='body2' color='text.secondary'>
-          {periodLabel}
-        </Typography>
+        {!hideSecondary ? (
+          <Typography variant='body2' color='text.secondary'>
+            {periodLabel}
+          </Typography>
+        ) : null}
         <Stack direction='row' alignItems='baseline' spacing={2} flexWrap='wrap'>
           <Typography variant='kpiValue' color='text.primary' component='span'>
             {value !== null ? (
@@ -399,13 +421,14 @@ const MetricTrendCard = ({
         </Stack>
       </Stack>
 
-      {/* Trend chart — edge-to-edge line/area, inset + aligned dots and labels */}
-      <Box sx={{ mt: 'auto', pb: 4 }}>
-        {canPlot ? (
+      {/* Trend chart — edge-to-edge line/area; shrinks in condensed, dropped entirely in peek. */}
+      {!isPeek ? (
+        <Box sx={{ mt: 'auto', pb: 4 }}>
+          {canPlot ? (
           <>
             <AppRecharts>
               <Box role='img' aria-label={ariaSummary}>
-                <ResponsiveContainer width='100%' height={152}>
+                <ResponsiveContainer width='100%' height={chartHeight}>
                   <AreaChart data={chartData} margin={{ top: 8, right: 0, bottom: 0, left: 0 }}>
                     <defs>
                       <linearGradient id={gradientId} x1='0' y1='0' x2='0' y2='1'>
@@ -414,6 +437,7 @@ const MetricTrendCard = ({
                       </linearGradient>
                     </defs>
                     <XAxis
+                      hide={hideSecondary}
                       type='number'
                       dataKey='x'
                       domain={[0, 1]}
@@ -474,8 +498,9 @@ const MetricTrendCard = ({
               Sin histórico suficiente para la tendencia.
             </Typography>
           </Box>
-        )}
-      </Box>
+          )}
+        </Box>
+      ) : null}
     </Card>
   )
 }
