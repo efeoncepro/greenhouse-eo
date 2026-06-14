@@ -307,6 +307,13 @@ export const DECLARED_CHILD_ROUTES: readonly ChildRouteDeclaration[] = [
       'Nexa Moment Composition Lab (TASK-1102 GAP A) — child surface del Design System para la primitive NexaMomentComposition (composicion in-place de Nexa Answers con un host: variants leadOverlay/anchoredAside/inlineExpand + morph View Transitions + anclaje cita->host + next-step gobernado + puente a la lente), alcanzable desde el catalogo canonico /design-system.'
   },
   {
+    route: '/design-system/nexa-answers-experience',
+    parent: '/design-system',
+    via: 'inline-link',
+    reason:
+      'Nexa Answers Experience (TASK-1110 Slice B) — child surface del Design System que agrega el flujo conversacional completo de Nexa Answers: la respuesta lidera y SE ARMA (chart draw + numero que cuenta), portabilidad cross-dominio (finance/insight) y la composicion in-place con host (NexaMomentComposition, GAP A: morph dormant<->composed + fuentes ancladas + next-step gobernado + puente). Promovida desde el mockup /knowledge/mockup/nexa-answers; alcanzable desde el catalogo canonico /design-system.'
+  },
+  {
     route: '/design-system/geometry',
     parent: '/design-system',
     via: 'inline-link',

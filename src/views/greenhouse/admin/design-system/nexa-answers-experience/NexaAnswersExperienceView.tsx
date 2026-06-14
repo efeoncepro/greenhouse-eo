@@ -71,8 +71,8 @@ const NEXA_ANSWERS_VISUAL_COPY = {
   },
   breadcrumbs: {
     home: 'Inicio',
-    knowledge: 'Knowledge',
-    nexaAnswers: 'Nexa Answers'
+    designSystem: 'Design System',
+    nexaAnswers: 'Nexa Answers Experience'
   }
 } as const
 
@@ -619,7 +619,7 @@ const PortabilityGallery = () => {
   )
 }
 
-const NexaAnswersExperienceMockupView = () => {
+const NexaAnswersExperienceView = () => {
   const theme = useTheme()
   const [stage, setStage] = useState<VisualStage>('answered')
   const [draft, setDraft] = useState('¿Cómo se interpreta Impacto dentro de las métricas ICO?')
@@ -684,7 +684,7 @@ const NexaAnswersExperienceMockupView = () => {
             kind='pageHierarchy'
             items={[
               { label: NEXA_ANSWERS_VISUAL_COPY.breadcrumbs.home, href: '/home' },
-              { label: NEXA_ANSWERS_VISUAL_COPY.breadcrumbs.knowledge, href: '/knowledge' },
+              { label: NEXA_ANSWERS_VISUAL_COPY.breadcrumbs.designSystem, href: '/design-system' },
               { label: NEXA_ANSWERS_VISUAL_COPY.breadcrumbs.nexaAnswers }
             ]}
           />
@@ -845,4 +845,4 @@ const NexaAnswersExperienceMockupView = () => {
   )
 }
 
-export default NexaAnswersExperienceMockupView
+export default NexaAnswersExperienceView

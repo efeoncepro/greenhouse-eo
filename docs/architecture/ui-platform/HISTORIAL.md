@@ -6,6 +6,10 @@
 
 ---
 
+## Delta 2026-06-14 (d) — "Nexa Answers Experience": primera page DS que agrega un flujo conversacional end-to-end (TASK-1110 Slice B)
+
+La experiencia conversacional completa de Nexa Answers dejó de ser mockup (`/knowledge/mockup/nexa-answers`) y se promovió a **page del Design System** `/design-system/nexa-answers-experience` (gate `plataforma.design_system`, INTERNAL ONLY). Es la primera page DS que **agrega un flujo end-to-end** (no un specimen de un solo componente): la respuesta lidera y **SE ARMA** frente al usuario (chart draw + número que cuenta 0→valor — capacidad canonizada en Slice A/A.2), portabilidad cross-dominio (Knowledge/Finance/Insight, mismo `NexaAnswersCanvas` + `surfaceContext`/`renderPlan` sin re-plumbing) y la **composición in-place con host** (`NexaMomentComposition`, GAP A: morph dormant↔composed + fuentes ancladas al doc real `data-nexa-anchor` + next-step gobernado advisory + puente "Seguir con Nexa"). Registrada en `DesignSystemCatalogView` (Pattern · Hardening) + `route-reachability-manifest` + `PRIMITIVES.md`. Promoción por copy-and-move (cero reescritura de la experiencia → paridad por construcción; única diferencia intencional = breadcrumb a jerarquía DS). NO toca `/knowledge` vivo (Slice 1). Verificado GVC desktop+mobile+composición; gate local tsc 0 · build 0 · 18/18 tests focales · reachability 0 orphans.
+
 ## Delta 2026-06-14 (c) — Coreografía del cambio de densidad (reveal/unfold + rise + stagger) + frontera SSR
 
 La densidad ya se adaptaba (Delta b), pero el cambio entre modos **popeaba**. Ahora es una **coreografía escalonada** ("Transformer"), horneada en los card primitives — opt-in, SSR-safe, reduced-motion horneado, default byte-idéntico.

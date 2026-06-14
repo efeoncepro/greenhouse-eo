@@ -193,6 +193,20 @@ const CATALOG_ITEMS: CatalogItem[] = [
     icon: 'tabler-layers-subtract'
   },
   {
+    id: 'nexa-answers-experience',
+    title: 'Nexa Answers Experience',
+    description:
+      'La experiencia conversacional completa de Nexa Answers (TASK-1110): la respuesta lidera y SE ARMA frente al usuario (el chart se dibuja + el número cuenta 0→valor), portabilidad cross-dominio (Knowledge/Finance/Insight) y la composición in-place con host (NexaMomentComposition, GAP A: morph dormant↔composed + fuentes ancladas al doc real + next-step gobernado + puente). Primera page del DS que agrega un flujo end-to-end.',
+    route: '/design-system/nexa-answers-experience',
+    category: 'Patterns',
+    kind: 'Pattern',
+    status: 'Hardening',
+    owner: 'NexaAnswersCanvas + NexaMomentComposition',
+    tags: ['nexa', 'answers', 'experiencia', 'conversacional', 'moment', 'se arma', 'chart draw', 'count', 'AI overview', 'in-place'],
+    searchAliases: ['nexa answers', 'experiencia conversacional', 'answers experience', 'se arma', 'armando', 'moment', 'conversational', 'overview', 'in-place'],
+    icon: 'tabler-message-chatbot'
+  },
+  {
     id: 'composition-shell',
     title: 'Composition shell',
     description: 'Substrato de coreografía de layout (TASK-1114): regiones singleton (primary/aside/lead/dock/overlay) + composiciones nombradas (single/leadPlusContext/split/focused) + morph in-place (View Transitions) + reflow por size class. Domain-neutral, opt-in; del que Adaptive Sidecar / NexaMomentComposition son consumers.',

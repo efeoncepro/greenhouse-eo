@@ -6,7 +6,7 @@ import type { CaptureScenario } from '../lib/scenario'
 
 export const scenario: CaptureScenario = {
   name: 'knowledge-nexa-moment-composition',
-  route: '/knowledge/mockup/nexa-answers',
+  route: '/design-system/nexa-answers-experience',
   mutating: true,
   safeForCapture: true,
   viewport: { width: 1440, height: 1024 },

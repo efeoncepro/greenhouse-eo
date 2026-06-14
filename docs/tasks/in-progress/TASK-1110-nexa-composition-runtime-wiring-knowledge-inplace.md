@@ -303,3 +303,25 @@ Decisión del operador: "todavía no quiero cablear Nexa real" → la experienci
 **Hallazgo clave para el end-to-end (la conexión con el Moment):** `NexaAnswerBubble` (1332 líneas) **renderiza su chart/métrica con Recharts inline propio — NO reusa `MetricTrendCard`**. Por lo tanto, para que la **RESPUESTA del Moment se arme** (cuando contiene una metric card — moments de finance/agency/ICO; el de Knowledge es prosa+citas), hay que: (a) wirear el mismo ensamble (count + chart draw) dentro de `NexaAnswerBubble`, o (b) converger su rendering de chart/métrica a la primitive `MetricTrendCard` con `entrance='assemble'`. Es trabajo en el **stack de Nexa** (NexaAnswerBubble), no solo en la card. Decisión de approach (a vs b) + alcance = inicio del próximo bloque del Slice B.
 
 **Slice B (siguiente) — la experiencia como page DS "Nexa Answers Experience":** realizar el mockup aprobado `NexaMomentCompositionSection` (host↔composed morph + `NexaMomentComposition` + `NexaAnswersCanvas`) como page del Design System, incluyendo un moment cuya respuesta contenga una metric card que se arme (para mostrar la capacidad en el contexto del Moment) + paridad `fe:capture:diff`. NO toca `/knowledge` vivo.
+
+## Delta 2026-06-14 (c) — Slice B SHIPPED (page DS "Nexa Answers Experience" + paridad GVC)
+
+**Decisión de approach (la tensión a vs b del Delta b → resuelta):** la respuesta-que-se-arma YA estaba presente en el mockup aprobado (el bloque `impact-chart`/`icoChartSpec` de la sección "Surface embebida"; tras Slice A.2 `NexaAnswerBubble` cuenta el número + dibuja el chart). La composición (`NexaMomentCompositionSection`) usa prosa+puntos+pills (la imagen aprobada). Por lo tanto Slice B se resolvió **promoviendo el mockup tal cual** (cero reescritura de la experiencia → paridad por construcción), sin forzar un chart dentro de la composición ni tocar `NexaAnswerBubble` de nuevo. "La imagen aprobada manda" (lección del Slice 1 fallido).
+
+**Lo hecho (local-first, sin push):**
+
+- **Promoción de ruta:** `git mv` `src/views/greenhouse/knowledge/mockup/nexa-answers/` → `src/views/greenhouse/admin/design-system/nexa-answers-experience/` (5 archivos; imports relativos intactos). Componente renombrado `NexaAnswersExperienceMockupView` → `NexaAnswersExperienceView` (deja de ser mockup). Breadcrumb a jerarquía DS (`Inicio → Design System → Nexa Answers Experience`, wayfinding correcto). **Borrada** la ruta vieja `src/app/(dashboard)/knowledge/mockup/nexa-answers/`.
+- **DS page nueva:** `src/app/(dashboard)/design-system/nexa-answers-experience/page.tsx` (gate `plataforma.design_system` + redirect cliente — espejo exacto de `nexa-moment-composition/page.tsx`).
+- **Registro DS:** entry en `DesignSystemCatalogView` (category `Patterns`, kind `Pattern`, status `Hardening`, icon `tabler-message-chatbot`) + `route-reachability-manifest` (child de `/design-system`, via inline-link) + `PRIMITIVES.md` (ref de ruta del `NexaMomentComposition` actualizada al ex-mockup → DS page).
+- **Scenarios:** `route` de `nexa-answers-surface.scenario.ts` + `knowledge-nexa-moment-composition.scenario.ts` actualizado a `/design-system/nexa-answers-experience` (las únicas 2 refs a la ruta vieja).
+
+**Gate de fidelidad (el que se saltó antes):**
+
+- **GVC capturado y MIRADO** (corpus/fixtures reales): `nexa-answers-surface` desktop+mobile (la experiencia completa: chart answer que se arma + coreografía + portabilidad + composición) + `knowledge-nexa-moment-composition` (el morph composed: Moment liderando + respuesta enriquecida 3 puntos + pills + "Fuentes ancladas" con Manual ICO resaltado + next-step gobernado "Preparar borrador · Requiere aprobación" + "Seguir con Nexa" + host condensado vivo). Capturas: `.captures/2026-06-14T19-24-02_nexa-answers-surface` + `.captures/2026-06-14T19-27-12_knowledge-nexa-moment-composition`.
+- **`fe:capture:diff`** baseline (ex-mockup) ↔ DS page: sin cambios materiales (mismo código movido; única diferencia intencional = el breadcrumb DS). Paridad por construcción.
+
+**Gate local:** tsc 0 · eslint 0 (mis archivos) · 18/18 tests focales (`route-reachability` + `DesignSystemCatalogView` + `nexa-answers-canvas-controller`) · `pnpm build` exit 0 (snapshot fresco referencia la ruta nueva, ausente la vieja) · `route-reachability-gate` 0 orphans. **Higiene:** se limpiaron 6 snapshots stale `.next-local/build-*` (gitignored, regenerables) que referenciaban la ruta borrada y ensuciaban tsc — no es `pnpm clean` sobre `.next`.
+
+**Convivencia Codex (no-regresión):** el único fallo de `pnpm lint` full es `scripts/public-website/content-factory-patterns.ts` (WIP TASK-1123 de Codex, off-limits) — NO es regresión mía. `Handoff.md` está modificado por Codex → el cierre en `Handoff.md` queda **pendiente de coordinación** (no se toca para no entangle el WIP ajeno). `changelog.md` + `HISTORIAL.md` (limpios) sí actualizados.
+
+**Pendiente:** Slice 1 (redo live en la lente Humano de `/knowledge`, fiel a esta experiencia ya clavada + kill-switch rollout-flag ON) · Slice C (GVC staging) · Slice D (Moment Fabric joint Codex, TASK-1095/1096). Doc closure en `Handoff.md` cuando aterrice/coordine el WIP de Codex.
