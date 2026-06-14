@@ -25,7 +25,20 @@ Evidencia:
 
 ## Causa raiz
 
-`SENTRY_AUTH_TOKEN`, `SENTRY_ORG` y `SENTRY_PROJECT` existen en Vercel `staging`, asi que el upload esta activo. El token autentica lo suficiente para invocar `sentry-cli`, pero no tiene permisos efectivos de release/source-map upload o no tiene acceso al proyecto configurado (`javascript-nextjs`).
+**Confirmada empiricamente el 2026-06-14 (probe read-only contra la API de Sentry, sin exponer valores).** No era "el token necesita rotarse": en Vercel estaba cargado el **token equivocado** — un token personal read-only (forma de token de lectura de incidentes) con scopes `event:read` + `project:read`. Le faltan justo `org:read` y `project:releases` que `sentry-cli` necesita para `releases new` + artifact bundle upload, por eso `403 You do not have permission`.
+
+Evidencia (hash de los primeros 16 hex del sha256, no el valor):
+
+| Donde | Scopes | `org:read` |
+|---|---|---|
+| Vercel `staging` (token previo, 42d) | `event:read`, `project:read` | **HTTP 403** |
+| Vercel `Production` (mismo token, 42d) | `event:read`, `project:read` | **HTTP 403** |
+| Vercel `Preview` | sin `SENTRY_AUTH_TOKEN` | n/a (sourcemaps disabled, sin 403) |
+| Token sano en `.env.vercel-staging` local | `org:read`, `project:read`, `project:releases` | HTTP 200 |
+
+**Blast radius real: `staging` Y `Production`** (mismo token). El issue lo marcaba como "production riesgo latente"; estaba confirmado roto, no latente.
+
+`SENTRY_ORG=efeonce-group-spa` y `SENTRY_PROJECT=javascript-nextjs` estaban correctos; el problema era exclusivamente el scope del `SENTRY_AUTH_TOKEN`.
 
 Segun la documentacion oficial de Sentry:
 
@@ -57,9 +70,27 @@ No cerrar eliminando permanentemente Sentry/source maps ni borrando credenciales
 - Artifact bundle/source maps aparecen en Sentry para la release del deployment.
 - Evento smoke o error controlado en Sentry se desminifica o deja de reportar source code faltante.
 
+## Fix aplicado (2026-06-14)
+
+- Se sobrescribio `SENTRY_AUTH_TOKEN` en Vercel `staging` y `Production` con el token correctamente scopeado (`org:read` + `project:read` + `project:releases`) via `printf %s "$TOK" | vercel env add SENTRY_AUTH_TOKEN <env> --force --scope efeonce-7670142f` (escritura atomica, sin newline, sin exponer valor).
+- Verificacion API post-cambio: ambos entornos devuelven `org:read=HTTP 200` y exponen scope `project:releases`. Hash del token deployado == hash del token sano local (MATCH en staging y production).
+- **No hubo cambio de codigo.** `next.config.ts` ya degradaba con warning + guardrail de timeout de `ISSUE-093`; el problema era 100% credenciales.
+
+### Pendiente de verificacion (Runtime Rollout Completion Gate)
+
+El cambio de env var toma efecto en el **proximo build**. Falta confirmar contra un deployment nuevo:
+- `vercel inspect <nuevo-deployment> --logs --scope efeonce-7670142f` sin warning `403`.
+- Artifact bundle/source maps presentes en Sentry para la release del deployment.
+
+Hasta ese deploy de verificacion, el estado correcto es `fix aplicado, verificacion de runtime pendiente`.
+
+### Deuda residual (no bloqueante)
+
+El token sano es **personal** (`jreyes@efeoncepro.com`). Para robustez de largo plazo conviene migrar a un **Organization Auth Token** dedicado de Sentry (no atado a usuario, sobrevive offboarding) con `org:read` + `project:releases`, y re-setearlo en los mismos entornos. Decision diferida por el operador.
+
 ## Estado
 
-open
+fix aplicado, verificacion de runtime pendiente
 
 ## Relacionado
 

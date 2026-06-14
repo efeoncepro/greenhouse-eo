@@ -1,5 +1,28 @@
 # Release 2026-06-10 #2 — develop→main `6c649b2a6` RELEASED
 
+## Sesion 2026-06-14 — Public Site Ohio/Elementor widget inventory (Codex)
+
+- **Qué quedó documentado:** inventario funcional completo en `docs/documentation/public-site/wordpress-ohio-elementor-widget-inventory.md` y playbook operativo en `docs/manual-de-uso/public-site/wordpress-ohio-elementor-landing-playbook.md`.
+- **Discovery read-only:** Kinsta/WP-CLI confirmo theme `ohio-child` sobre Ohio `3.7.0`, Elementor `4.1.3`, Elementor Pro `4.1.1`, Ohio Extra `3.7.0`, 253 widgets Elementor registrados, 37 widgets Ohio, 246 documentos Elementor con data y 67 templates en `elementor_library`.
+- **Aprendizaje clave:** Ohio gobierna wrappers/gutters/header/sidebar/breadcrumbs desde metas y dynamic CSS (`page_add_wrapper`, `page_full_width_margins_size`, `page_add_top_padding`, `page_header_menu_style`), mientras que `ohio-extra` provee los widgets. Las landings deben operar primero por controles nativos Elementor/Ohio, no por CSS hardcodeado.
+- **Paleta recomendada para landings:** usar como primera linea widgets maduros ya muy usados: `ohio_heading`, `ohio_service_table`, `ohio_icon_box`, `ohio_button`, `ohio_counter`, `ohio_clients_logo`, `ohio_testimonial`, `ohio_recent_posts`, `ohio_recent_projects`, HubSpot `hubspot-form`/`hubspot-meeting` cuando haya atribucion CRM clara.
+- **Gaps:** falta registry canonico de templates Greenhouse-owned, schema machine-readable de patches por widget, mapping HubSpot form/meeting/UTM, QA visual repetible del Public Site, Kinsta API token para cache/backups y reduccion de privilegios del usuario tecnico WordPress.
+
+## Sesion 2026-06-14 — Public Site WP-CLI remote wrapper + partner proof product design pass (Codex)
+
+- **Qué quedó en runtime WordPress:** en `https://efeoncepro.com/servicios-contratar-hubspot/` (`page_id=244079`) se amplio el fix de la fila de cards a todo el modulo "Efeonce tu Partner certificado". Las sections legacy `83d3781`, `ebe0037` y `5b75db1` ahora comparten `layout=boxed`, `content_width=1560px`, padding lateral `24px` y anchors semanticos `gh-section-hubspot-partner-proof` + `gh-partner-proof-intro/cards/stack`.
+- **Backup:** `/www/efeoncegroup_752/public/wp-content/uploads/greenhouse-backups/page-244079-elementor-before-partner-proof-module-20260614100340.json`.
+- **Verificacion visual:** capturas en `.captures/public-site-hubspot-section-20260614/servicios-contratar-hubspot-partner-proof-desktop.png` y `...-mobile.png`. URL publica normal: desktop 2048px con contenedores `1560px` (`x=244`), mobile 390px con contenedores `342px` (`x=24`) y cards apiladas.
+- **Problema recurrente resuelto:** se agrego `pnpm public-website:wpcli` (`scripts/public-website/wpcli-remote.ts`) para ejecutar PHP local via WP-CLI remoto sin heredocs/inline quoting frágil. Carga `.env.local`/`.env`, usa `scp -P` para subir a `/tmp`, ejecuta `wp eval-file` con `ssh -p`, limpia el temporal y evita imprimir secretos. Smoke read-only verde contra Kinsta: devolvio `home=https://efeoncepro.com`, `theme=ohio-child`.
+- **Leccion:** `Document::save()` borra CSS generado del post; no validar inmediatamente con `grep wp-content/uploads/elementor/css/post-<id>.css`. Renderizar la URL o usar cache APIs de Elementor y verificar con navegador/capturas.
+
+## Sesion 2026-06-14 — Public Site HubSpot services Elementor width fix (Codex)
+
+- **Qué quedó en runtime WordPress:** se corrigio `https://efeoncepro.com/servicios-contratar-hubspot/` (`page_id=244079`) en la seccion dark "Efeonce tu Partner certificado". La fila de tres cards ya no queda pegada a los margenes.
+- **Cómo se resolvio sin hardcodear CSS:** discovery Elementor mostro que la fila es una legacy section `id=ebe0037`, path `9`, con fondo `#022A4E`. Se aplicaron controles nativos de Elementor con `Document::save()`: `layout=boxed` y `content_width={unit:"px", size:1560, sizes:[]}`. Esto mantiene el fondo full-width y solo contiene el `.elementor-container` interno.
+- **Backup y verificacion:** backup previo en `/www/efeoncegroup_752/public/wp-content/uploads/greenhouse-backups/page-244079-elementor-before-partner-cards-width-20260614095038.json`. Elementor regenero `post-244079.css` con `max-width:1560px`. Captura Playwright: `.captures/public-site-hubspot-section-20260614/servicios-contratar-hubspot-partner-section.png`; viewport 2048px: section `2048px`, container `1560px`, cards `520px`.
+- **Aprendizaje:** para legacy sections donde el background debe ser full-width pero el contenido debe respirar, usar primero `layout=boxed` + `content_width` del arbol Elementor. No tocar hero/sidebar/footer ni agregar CSS global/page-scoped si el control existe.
+
 ## Sesion 2026-06-14 — Public Site discovery carga `.env.local` automatica (Codex)
 
 - **Qué quedó:** `scripts/public-website/discover-wordpress.ts` ahora carga `.env.local` y luego `.env` automaticamente antes de resolver `PUBLIC_WEBSITE_*`, sin sobrescribir variables ya exportadas por shell/CI.
@@ -110,6 +133,14 @@
 - **Issue abierto:** `docs/issues/open/ISSUE-095-sentry-sourcemap-upload-token-403.md`.
 - **Contrato de cierre:** rotar o corregir `SENTRY_AUTH_TOKEN` sin exponer valores; verificar permisos de release/source-map upload (`project:releases` + `org:read` para release management con `sentry-cli`, o Organization Token apto para CI/source maps); actualizar los Vercel environments aplicables; confirmar deployment `Ready` sin `403` y artifact bundle/source maps presentes en Sentry.
 - **No hacer:** no desactivar Sentry ni borrar credenciales como cierre permanente; el timeout defensivo de `ISSUE-093` queda aunque el token se arregle.
+
+## Sesion 2026-06-14 — ISSUE-095 root cause confirmado + fix aplicado (Claude)
+
+- **Causa raiz real (probe API read-only, sin exponer valores):** no faltaba "rotar" — en Vercel estaba el **token equivocado**. `SENTRY_AUTH_TOKEN` en `staging` Y `Production` (42d, mismo token) era un personal token read-only con scopes `event:read`+`project:read` → `org:read=HTTP 403`, sin `project:releases`. El token sano (scopes `org:read`+`project:read`+`project:releases`, `org:read=200`) ya vivía en `.env.vercel-staging` local. Blast radius: staging + production confirmados rotos (no "latente"). Preview no tiene el token (sourcemaps disabled, sin 403).
+- **Fix aplicado:** `printf %s "$TOK" | vercel env add SENTRY_AUTH_TOKEN <staging|production> --force --scope efeonce-7670142f` (atomico, sin newline). Verificado post-cambio: ambos entornos `org:read=200` + scope `project:releases` + hash MATCH vs token sano. Cero cambio de codigo (`next.config.ts` ya degradaba con el guardrail de ISSUE-093).
+- **Pendiente (Runtime Rollout Gate):** el env var toma efecto en el proximo build; falta confirmar `vercel inspect <nuevo-deploy> --logs` sin `403` + artifact bundles/source maps en Sentry. Estado del issue: `fix aplicado, verificacion de runtime pendiente`.
+- **Deuda residual:** el token es personal de `jreyes@`; migrar a un Organization Auth Token dedicado (no user-bound) queda diferido al operador.
+- **Nota:** `TASK-1107` NO cubre este 403 (es otra cola Sentry: N+1, `role_view_fallback_used`, auth smoke, `rpa_median`). El 403 del sourcemap es exclusivo de ISSUE-095.
 
 ## Sesion 2026-06-13 — ISSUE-093 Vercel/Sentry source-map upload timeout guard (Codex, resolved)
 
