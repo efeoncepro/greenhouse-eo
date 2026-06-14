@@ -192,3 +192,20 @@ Trade-offs / costos:
 - `docs/architecture/ui-platform/CONVERSATIONAL_EXPERIENCE.md` (§13 GAP A)
 - `docs/tasks/in-progress/TASK-1110-nexa-composition-runtime-wiring-knowledge-inplace.md`
 - `docs/operations/ARCHITECTURE_DECISION_RECORD_OPERATING_MODEL_V1.md`
+
+## Delta 2026-06-13 — Investigación de mercado + referencias canónicas
+
+Evidencia nueva (no cambia la decisión; la afila). Investigación de cómo el mercado resuelve la coreografía de layout a nivel shell → **3 patrones convergentes** que validan el diseño:
+
+1. **Los productos serios *nombran* sus layouts.** **Material 3 "Canonical Layouts"** ([m3.material.io](https://m3.material.io/foundations/adaptive-design/canonical-layouts)) define layouts nombrados (`list-detail`, `supporting-pane`, `feed`) que reflowean por *window size class* (compact/medium/expanded) con 1-2 paneles. **Carbon** nombra regiones de shell (UI Shell + content + dialogs); **Atlassian** trata el layout como *primitives* composables (Grid sobre CSS Grid API). → valida regiones + composiciones nombradas como primitive de shell, no layout por página.
+2. **Separan "augmentar in-place" de "modo dedicado", con un puente entre ambos.** **Google AI Overviews** inyecta la respuesta **in-place** en la página actual (lidera, el resto sigue) = nuestro `lead` / **V1 in-place**. **Google AI Mode** es un **modo separado que el usuario elige** = **V2 cross-route** (lente dedicada). Google ship el "saltar de Overviews a AI Mode" = el **bridge** first-class. → valida que **V1 (in-place) vs V2 (cross-route) es el sequencing correcto**, no una concesión.
+3. **"Adapt, not takeover" es el principio canónico de UI agéntica** (agentic-interfaces research: *inline microinteraction* / *side panel* / *proactive nudge*, host vivo + procedencia visible). → valida host-stays-alive + los placements `lead`/`aside`/inline.
+
+**Cómo afina la aplicación (vinculante para la companion spec + TASK-1114):**
+
+- **Adoptar el framing "canonical layouts" de M3**: las composiciones (`single/leadPlusContext/split/focused`) son los *canonical layouts de Greenhouse*, con su **disciplina de breakpoints** (compact/medium/expanded → el `aside` colapsa a `overlay`/`temporary` en compact — comportamiento que `AdaptiveSidecarLayout` ya hace). Mapear donde aplique: `split` ≈ list-detail / supporting-pane.
+- **V1 = modelo AI Overviews (in-place); V2 = modelo AI Mode (route)**; el **bridge** es first-class desde V1.
+- **`react-resizable-panels`** (bvaughn — resize + collapse + persistencia + a11y de teclado) queda para **V2** (regiones redimensionables/persistentes). V1 = regiones fijas + morph por View Transitions. NO mezclar resize con morph.
+- Substrato V1 confirmado = **View Transitions API (Baseline 2025) + CSS grid + container queries (Baseline 2023)**; resize es capa aditiva posterior.
+
+Fuentes: [M3 Canonical Layouts](https://m3.material.io/foundations/adaptive-design/canonical-layouts) · [Android Canonical layouts](https://developer.android.com/develop/adaptive-apps/guides/canonical-layouts) · [AI Mode vs AI Overviews](https://www.evertune.ai/resources/insights-on-ai/google-ai-mode-vs-google-ai-overviews-whats-the-difference) · [AI Overviews → AI Mode](https://www.techbuzz.ai/articles/google-links-ai-overviews-to-conversational-ai-mode) · [Where should AI sit in your UI?](https://uxdesign.cc/where-should-ai-sit-in-your-ui-1710a258390e) · [Agentic Interfaces](https://insights.theinteractive.studio/beyond-the-chat-agentic-interfaces-inside-your-product) · [View Transitions API (MDN)](https://developer.mozilla.org/en-US/docs/Web/API/View_Transition_API) · [react-resizable-panels](https://github.com/bvaughn/react-resizable-panels) · [Atlassian Primitives](https://atlassian.design/foundations/primitives) · [Carbon 2x Grid](https://carbondesignsystem.com/elements/2x-grid/usage/)

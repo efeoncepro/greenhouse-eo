@@ -42,6 +42,12 @@ Revisar y respetar:
 - `docs/architecture/ui-platform/PRIMITIVES.md` + `CONVERSATIONAL_EXPERIENCE.md` §13 (GAP A)
 - `DESIGN.md` + tokens AXIS + escala tipográfica SoT + motion tokens
 
+Referencia de mercado (ADR §Delta 2026-06-13 — vinculante):
+
+- **Material 3 "Canonical Layouts"** ([m3.material.io](https://m3.material.io/foundations/adaptive-design/canonical-layouts)) — adoptar el framing: las composiciones (`single/leadPlusContext/split/focused`) son los *canonical layouts de Greenhouse* + su disciplina de breakpoints (compact/medium/expanded → `aside` colapsa a `overlay`/`temporary` en compact). `split` ≈ list-detail / supporting-pane.
+- **Google AI Overviews (in-place) vs AI Mode (modo dedicado) + bridge** — V1 = modelo AI Overviews (in-place); V2 = modelo AI Mode (cross-route). El bridge ("Seguir con Nexa") es first-class desde V1.
+- **`react-resizable-panels`** (bvaughn) — resize/persistencia/a11y de teclado → **diferido a V2** (regiones redimensionables). V1 = regiones fijas + morph por View Transitions. NO mezclar resize con morph.
+
 Reglas obligatorias:
 
 - Mecanismo neutral, NUNCA dominio en el shell. La política (qué composición/contenido/dominio) vive en el consumer.
@@ -89,6 +95,8 @@ Reglas obligatorias:
 ### Slice 1 — Companion architecture spec
 
 - Redactar `GREENHOUSE_COMPOSITION_SHELL_UI_PLATFORM_V1.md`: contrato de regiones + composiciones + máquina de estados + `min-inline-size` por región + tabla `kind → composición` + contrato a11y + degradación.
+- **Mapear las composiciones a "canonical layouts" estilo M3** + declarar el comportamiento por breakpoint (compact/medium/expanded): qué regiones colapsan/reflowean en cada size class (`aside` → `overlay`/`temporary` en compact).
+- Declarar la frontera **V1 in-place (modelo AI Overviews)** vs **V2 cross-route (modelo AI Mode)** + el contrato del `bridge`.
 
 ### Slice 2 — Primitive + controller (domain-neutral)
 
@@ -110,7 +118,8 @@ Reglas obligatorias:
 - Reemplazar `LayoutContent`.
 - Migrar `AdaptiveSidecarLayout` / `OrganizationWorkspaceShell` (oportunista post-V1, tasks derivadas).
 - Convertir `FloatingSurface` en consumer de regiones.
-- Regiones user-resizable/pinned; estado shell-level/global (URL/history) — V1 route-local.
+- Regiones user-resizable/pinned (`react-resizable-panels` + persistencia) — V2.
+- Estado shell-level/global (URL/history) — V1 route-local.
 
 ## Rollout Plan & Risk Matrix
 
