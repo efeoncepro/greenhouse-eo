@@ -204,3 +204,86 @@ El next-step del mockup ("Preparar borrador") es un **fixture**. Hard rule Momen
 - `pnpm local:check` (lint + tsc) + `pnpm build` (Turbopack — el consumer es 'use client' importando primitives; el page es server).
 - GVC staging mirado (dormant → composed + anclaje).
 - Doc closure: actualizar CONVERSATIONAL_EXPERIENCE.md §13 (GAP A: de "primitive+demo" → "runtime in-place en Knowledge") + el playbook (agregar el placement `composed` + el patrón de consumer in-place) + la skill `greenhouse-nexa-conversational` + PRIMITIVES.md + HISTORIAL.
+
+## Delta 2026-06-14 — Garantizar la visión del operador: el Momento "se arma frente al usuario" + canonización del ensamble
+
+> Escrito tras la sesión del operador (Lab Adaptive Card density → Composition Shell → "el escenario real"). Lentes aplicadas: `motion-design`, `state-design`, `greenhouse-product-ui-architect`, `modern-ui`. **Este Delta extiende el scope de la task para que `/implement-task TASK-1110` garantice la visión completa** — no solo el morph, sino que **la RESPUESTA del Momento se arma frente al usuario** (cada metric card de la respuesta dibuja su chart + cuenta su número al materializarse) — y reordena los slices para empezar en superficie controlada (Design System), no en `/knowledge` vivo.
+
+### Por qué este Delta (los 2 gaps que la spec previa NO garantizaba)
+
+El escenario in-place (UI existente → pregunta → transforma in-place, host vivo) ya era el norte. Pero el operador pidió explícitamente, y la spec previa NO aseguraba:
+
+1. **El "armándose" de las cards de la RESPUESTA.** Cuando el Momento compone su respuesta enriquecida y esa respuesta contiene cards de métrica (chart + KPI), esas cards deben **construirse frente al usuario**: el chart se dibuja solo (Recharts area draw-in) y el número sube contando 0 → valor. Es la capacidad validada en el Lab `/design-system/card-density` (sección "Secuencia macro", commits `4911a8e6a` · `4a2a5104b` · `2f31e7fa0`). Hace que la respuesta **materialice**, no que **aparezca** — el corazón de un Nexa moment.
+2. **Canonizar esa capacidad** en `MetricSummaryCard`/`MetricTrendCard`. Hoy el conteo del `AnimatedCounter` está gateado por un `IntersectionObserver` asíncrono que, en flujos de entrada/re-monte, **salta al valor final** en vez de contar (race del IO frío — diagnosticada y peleada en el Lab; el Lab la sorteó manejando el conteo desde afuera). Sin la canonización, una card en la respuesta del Momento **podría saltar** en vez de armarse. El fix canónico (conteo confiable "al entrar") hace que **toda** card se arme bien, no solo el Lab.
+
+### La coreografía canónica (motion-design + modern-ui + state-design)
+
+**Frontera dura de motion (CLAUDE.md):** View Transitions = morph ESTRUCTURAL de regiones; framer-motion `layout` = INTERRUMPIBLE; el reveal con stagger = ENTRADA del contenido. **NUNCA** dos capas sobre la misma propiedad del mismo nodo a la vez. El morph del Momento (`NexaMomentComposition`, dormant↔composed) y el ensamble de las cards de la respuesta son **DOS BEATS SECUENCIADOS, NO paralelos** — así no compiten (la duda explícita del operador):
+
+```
+1. Pregunta (composer)                                    — acción del usuario
+2. Thinking / reasoning                                   — loading HONESTO (state-design; nunca finge)
+3. MORPH estructural dormant→composed                     — BEAT 1 (View Transitions, NexaMomentComposition)
+   · el host condensa + persiste vivo, la región de la respuesta aparece y LIDERA
+   · ~300–400 ms (token medium/long), ease emphasized [0.2,0,0,1]
+   ── el morph ASIENTA ──
+4. La respuesta REVELA su contenido, escalonado            — BEAT 2 (entrada del contenido)
+   · titular → puntos numerados → pills de cita → cards    — stagger ~60–80 ms entre piezas
+   · cada metric card de la respuesta SE ARMA:             — la capacidad: chart draw-in (~700 ms) + count 0→valor (~700 ms easeInOut)
+5. "Fuentes ancladas" + next-step gobernado                — cierran el Momento
+```
+
+**Reglas de la coreografía (no negociables):**
+
+- **Secuencia, no paralelo.** El BEAT 2 (contenido) arranca cuando el BEAT 1 (morph) asentó. El morph mueve la ESTRUCTURA; las cards arman el CONTENIDO. Nunca a la vez sobre el mismo nodo (frontera de motion).
+- **Restraint (modern-ui — "motion as accent, never the hook").** El count + el chart draw son el **acento** de "la respuesta se está materializando" — UN acento, decelerado, sin circo. El número que sube + el área que se dibuja **bastan**; cero flourish extra (sin glow, sin bounce gratuito, sin parallax).
+- **Jerarquía: la respuesta LIDERA.** La región de la respuesta es la protagonista; el host condensa pero **queda vivo** (state-design honest — el host NUNCA se rompe; si el compose falla, el host sigue íntegro y usable).
+- **El número sube parejo (easeInOut), NO front-loaded** — cierra junto/después del barrido del chart, nunca antes (lección del Lab: front-loaded → "el chart entra después de que el número ya estaba listo").
+- **Tokens canónicos** (`motion/core/tokens.ts`): `instant 75 · short 150 · standard 200 · medium 300 · long 400 · extended 600`; ease emphasized `[0.2,0,0,1]`. **Cero ms/curvas crudas.**
+- **Reduced-motion horneado (motion-design + state-design contract):** morph → cross-fade/instantáneo; card count → valor final visible de una; chart → estático; **el contenido NUNCA se oculta** (never-hidden). La respuesta sigue legible sin animación. No-bypassable.
+- **Solo propiedades de compositor** (transform/opacity) — nunca width/height/top/left/margin/padding.
+
+### Canonizar el ensamble en las metric cards (arch — P+V+K)
+
+**Primitive + Variants + Kinds.** La capacidad vive en las primitives existentes (NO fork, NO componente paralelo):
+
+- **Primitive** (`MetricSummaryCard` / `MetricTrendCard`) gana una **capacidad de entrada opt-in** — `entrance?: 'none' | 'assemble'` (default `'none'` = **byte-idéntico a hoy**; adopción aditiva, mismo patrón que `density?`). Cuando es `'assemble'` y se le da la señal de entrada, la card **dibuja su chart + cuenta su número 0 → valor**.
+- **Conteo confiable "al entrar" (el fix canónico).** Resolver la fragilidad del `AnimatedCounter` (`isInView` IO + first-mount jump) para que cuente 0→valor de forma confiable cuando la card ENTRA — sin el hack de re-monte/drive-externo del Lab. Es el fix que hace que **toda** card (en cualquier consumer) se arme bien. Evaluar al implementar: (a) un modo "count-on-entrance" del `AnimatedCounter` disparado por señal explícita (no por el IO), o (b) que la card exponga el trigger. **Decisión arch al inicio del slice de canonización** (el Lab probó que el drive-externo funciona; la canonización lo hace interno y confiable).
+- **Kind** = el contexto del consumer (la card de la respuesta de un Nexa moment) → resuelve a la variant `assemble`. La respuesta NO usa una card distinta: usa **la misma** `MetricSummaryCard`/`MetricTrendCard` con `entrance='assemble'`.
+- **Horneado:** SSR-safe (la entrada corre post-mount, client-only; el primer paint es el estado final — sin hydration mismatch, patrón `CompositionShell`/`hasMounted`); reduced-motion (valor final visible, chart estático, never-hidden); compositor-only.
+
+**El seam (cómo compone sin acoplarse):** el Momento (la región de la respuesta) **da la señal "ahora entrás"** a su contenido; las cards arman su entrada al recibirla. La card **NO hereda del shell** ni importa de `NexaMomentComposition` — expone su trigger de entrada y el Momento lo cuela. Espeja "La Costura" (el shell mueve el contenedor, la card adapta el contenido) pero para la ENTRADA. El **stagger del grupo** de cards de la respuesta lo orquesta el **Motion Primitive canónico** (`<Motion variant='stagger'>` / `useGreenhouseGSAP`, TASK-1045) — NO un stagger bespoke inline (reuse > create; una sola fuente de "hacer cosas en ola").
+
+### Invariantes de boundary (arch — no regresión)
+
+- **NUNCA** el ensamble de la respuesta corre **a la vez** que el morph estructural sobre el mismo nodo (frontera de motion). Secuencia: morph asienta → contenido arma.
+- **NUNCA** fork de las metric cards para la respuesta del Momento: es **la misma primitive** con `entrance='assemble'`. Default `'none'` = legacy byte-idéntico.
+- **NUNCA** la card hereda del shell ni de `NexaMomentComposition`. El seam es la **señal de entrada** (cue), no la herencia.
+- **NUNCA** un stagger nuevo: el de grupo es el Motion Primitive (`stagger`); el morph de regiones es de `NexaMomentComposition` (su namespace VT sancionado, **NO** `gh-region-*`). `NexaMomentComposition` y `CompositionShell` son **siblings** (coexisten; ninguno se construye sobre el otro — veredicto TASK-1114).
+- **NUNCA** el conteo salta en la respuesta: el fix canónico (count-on-entrance confiable) es prerequisito de que la respuesta se vea "armándose".
+- **NUNCA** declarar la experiencia lista sin **paridad mockup↔runtime** verificada con `fe:capture:diff` (la verificación que se saltó en el Slice 1 fallido).
+
+### Slices reordenados (empezar en superficie CONTROLADA, no en /knowledge vivo)
+
+Decisión del operador: "todavía no quiero cablear Nexa real" → la experiencia se clava primero en el Design System, con todo el craft, y recién después se re-cablea `/knowledge` vivo.
+
+- **Slice A — Canonizar el ensamble en las metric cards** (prerequisito de que la respuesta se arme bien).
+  `entrance?: 'none' | 'assemble'` en `MetricSummaryCard`/`MetricTrendCard` + conteo confiable "al entrar" (fix del `AnimatedCounter`) + reduced-motion + SSR-safe. Default `'none'` byte-idéntico. Lab `/design-system/card-density` consume `entrance='assemble'` (deja de manejar el conteo desde afuera — la card lo hace ella). GVC desktop+mobile + reduced-motion mirados. Doc: PRIMITIVES.md.
+- **Slice B — Realizar la experiencia aprobada como page del Design System "Nexa Answers Experience"** (era el viejo Slice 3, **adelantado**).
+  Mover `/knowledge/mockup/nexa-answers` → ruta DS real (p.ej. `/design-system/nexa-answers-experience`, gate `plataforma.design_system`) → registry + route-reachability + DesignSystemCatalog + PRIMITIVES + scenario GVC; deja de ser `/mockup`. La respuesta del Momento usa las cards con `entrance='assemble'` (Slice A). Coreografía de 2 beats (morph → contenido) horneada. Next-step gobernado **advisory honesto** (sin botón que finja una acción inexistente — tensión Moment Fabric §6.3). **Gate: paridad mockup↔runtime con `fe:capture:diff` hasta `match`.** NO toca `/knowledge` vivo.
+- **Slice 1 (redo, live) — Re-cablear la lente Humano de `/knowledge`** fiel a la experiencia ya clavada en Slice B (host = grid limpio de docs anclables, respuesta enriquecida con cards que se arman, next-step, `data-nexa-anchor`, kill-switch rollout-flag ON). Paridad mockup↔runtime verificada. **Después** de A+B.
+- **Slice C — GVC staging** del `/knowledge` real (lo que era Slice 2, sobre el redo correcto).
+- **Slice D — Joint Codex (Moment Fabric):** eligibility + next-step accionable real + señales `nexa.moment.*` (TASK-1095/1096).
+
+### Gate de fidelidad (el que se saltó antes)
+
+- **`fe:capture:diff` mockup↔runtime** hasta `match` (baseline `surfaceId` del mockup aprobado promovido) — **antes** de declarar cualquier slice de UI listo. La imagen aprobada manda sobre las palabras (lección del Slice 1 fallido).
+- GVC desktop + mobile + **reduced-motion** mirados por cada slice de UI.
+- `quality.layout` + `quality.runtime` + `quality.keyboard` (foco routea a la respuesta tras el morph) opt-in en los scenarios.
+
+### Hard rules nuevas (sumadas a las de arriba)
+
+- **SIEMPRE** la respuesta del Momento que contenga métricas usa `MetricSummaryCard`/`MetricTrendCard` con `entrance='assemble'` — la respuesta **se arma frente al usuario**, no aparece de golpe.
+- **SIEMPRE** morph (estructura) y ensamble (contenido) son **dos beats secuenciados**, nunca paralelos sobre el mismo nodo.
+- **SIEMPRE** el ensamble es restraint (un acento decelerado), reduced-motion never-hidden, compositor-only, tokens canónicos.
+- **NUNCA** se cablea `/knowledge` vivo antes de clavar la experiencia + paridad en el Design System (Slice A+B).
