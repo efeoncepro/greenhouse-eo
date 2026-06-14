@@ -196,6 +196,7 @@ La resolución es por **container** (no viewport) donde sea posible (container q
 - **Seam a Adaptive Card (TASK-1115):** el shell garantiza que las regiones son query containers; el card es dueño de su adaptación. No acoplar (el card responde a su ancho, no al shell).
 - **`LayoutContent`/`StyledMain` quedan intactos** — el substrato es opt-in. El `compactContentWidth: 1440` se respeta (no se flipea a `wide`).
 - **`GreenhouseFloatingSurface` NO es consumer de regiones** (anclado-transitorio); puede compartir motion tokens/VT, no entra al grid.
+- **Chrome del layout (navbar + footer) NO son regiones.** La estructura real es `VerticalLayout → StyledContentWrapper → [navbar · LayoutContent · footer]`: el navbar y el **footer institucional de Efeonce** son hermanos de `LayoutContent`, persistentes y globales, que **envuelven** el contenido. El Composition Shell compone SOLO el contenido de la página (lo que va dentro de `LayoutContent`/`children`); el navbar/footer quedan **intactos, afuera del substrato**. **Nunca** modelar el footer/navbar como una región. Distinción crítica: **`dock` ≠ footer** — `dock` es un composer/action dock *per-surface, dentro* del contenido (parte de la composición); el footer es el chrome global *afuera*.
 
 ---
 
@@ -226,6 +227,7 @@ La resolución es por **container** (no viewport) donde sea posible (container q
 - **NUNCA** composición nueva por dominio (kind → composición existente).
 - **NUNCA** forkear View Transitions ni motion (reusar `startViewTransition` + motion tokens).
 - **NUNCA** región repetible (singleton — constraint VT).
+- **NUNCA** modelar el navbar o el footer (chrome global del layout) como una región del Composition Shell. Viven en `VerticalLayout`, fuera de `LayoutContent`, persistentes; el substrato solo compone el contenido. `dock` (per-surface, dentro del contenido) ≠ footer (global, afuera).
 - **NUNCA** ocultar contenido durante el morph; degradar honesto a swap.
 - **NUNCA** flipear `compactContentWidth` a `wide` por una composición.
 - **NUNCA** acoplar el card al shell — el card se adapta a su ancho (container query), no al shell.
