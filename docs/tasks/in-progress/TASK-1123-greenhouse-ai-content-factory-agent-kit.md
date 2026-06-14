@@ -330,6 +330,13 @@ Reglas obligatorias:
   - `pnpm public-website:content-factory:inspect-post-deep -- --post-id <id>`
   - Outputs post/Yoast metadata, heading outline, flattened Gutenberg block tree with `path`, selected attrs, stable fingerprint, editability class, risks, links and media issues.
   - Smoke against `248398` (`que-es-loop-marketing`) confirmed a strong Gutenberg sample: 400 parsed blocks, TOC, H2/H3/H4 outline, lists, quotes, pullquotes, separators, one reconciled SVG image, 0 media issues and no non-empty freeform fragments.
+- Existing-post refresh plan shipped:
+  - `src/lib/public-site/content-factory/refresh-plan.ts`
+  - `contentFactoryRefreshPlan.v1`
+  - `pnpm public-website:content-factory:refresh-plan -- --inspection <post-deep-inspection.json>`
+  - Reads local inspection evidence only; does not call WordPress.
+  - Output is `mode=plan_only`, `sendsWordPressWrite=false`, `modifiesPublishedSource=false`, source fingerprint, `path + fingerprint` candidates, preserve/reconcile gates for TOC/lists/separators/media, SEO/link review candidates and rollback `no_runtime_change_plan_only`.
+  - Evidence for `248398`: `docs/operations/public-site-content-factory/refresh-plan-248398-2026-06-14T19-46-00-721Z.json` (`ready_for_brief`, warning expected because source is published).
 - Contract output: `contentFactoryValidation.v1`.
 - Safety: non-mutating; validates local JSON artifacts only and never calls WordPress.
 - Current behavior:

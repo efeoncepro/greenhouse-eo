@@ -176,6 +176,12 @@ the source inspection.
   before planning edits. The output is `contentFactoryPostDeepInspection.v1`
   with block paths, fingerprints, native attrs, editability classes, risks,
   links, media issues and Yoast metadata.
+- Then run
+  `pnpm public-website:content-factory:refresh-plan -- --inspection <post-deep-inspection.json>`
+  to produce `contentFactoryRefreshPlan.v1`. This stays local and plan-only:
+  it records `sendsWordPressWrite=false`, `modifiesPublishedSource=false`,
+  source fingerprint, candidates by `path + fingerprint`, preserve gates and
+  media/link/SEO review gates.
 - Preserve existing media/embed blocks unless the task explicitly asks to
   replace them.
 - Do not rewrite `core/freeform` aggressively. Mark it as legacy and patch

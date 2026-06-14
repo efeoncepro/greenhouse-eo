@@ -130,6 +130,7 @@
     "public-website:content-factory:inspect-post-deep": "tsx scripts/public-website/content-factory-inspect-post-deep.ts",
     "public-website:content-factory:patterns": "tsx scripts/public-website/content-factory-patterns.ts",
     "public-website:content-factory:plan": "tsx scripts/public-website/content-factory-plan.ts",
+    "public-website:content-factory:refresh-plan": "tsx scripts/public-website/content-factory-refresh-plan.ts",
     "public-website:content-factory:smoke-plan": "tsx scripts/public-website/content-factory-smoke-plan.ts",
     "public-website:content-factory:validate": "tsx scripts/public-website/content-factory-validate.ts",
     "public-website:deploy-dry-run": "tsx scripts/public-website/deploy-dry-run.ts",

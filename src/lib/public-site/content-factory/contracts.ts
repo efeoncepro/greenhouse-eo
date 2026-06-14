@@ -214,6 +214,75 @@ export type ContentFactoryPostDeepInspection = {
   editabilityLegend: Record<ContentFactoryPostBlockEditability, string>
 }
 
+export type ContentFactoryRefreshPlanChangeOperation =
+  | 'update_text'
+  | 'update_attrs'
+  | 'preserve'
+  | 'reconcile_media'
+  | 'review_link'
+  | 'review_seo'
+
+export type ContentFactoryRefreshPlanChangeCandidate = {
+  operation: ContentFactoryRefreshPlanChangeOperation
+  targetPath: string
+  nativeKind: 'blockName' | 'seo' | 'link' | 'media'
+  key: string
+  fingerprint?: string
+  editability?: ContentFactoryPostBlockEditability
+  currentText?: string
+  rationale: string
+  risk: 'low' | 'medium' | 'high'
+  guardrails: string[]
+}
+
+export type ContentFactoryRefreshPlan = {
+  contractVersion: 'contentFactoryRefreshPlan.v1'
+  generatedAt: string
+  mode: 'plan_only'
+  sendsWordPressWrite: false
+  objective: string
+  target: {
+    wordpressPostId: number
+    url: string
+    slug: string
+    status: string
+    editorModel: 'gutenberg_blocks'
+    sourceScannedAt: string
+    sourceModified: string
+    sourceFingerprint: string
+  }
+  sourceInspection: {
+    contractVersion: ContentFactoryPostDeepInspection['contractVersion']
+    summary: ContentFactoryPostDeepInspection['summary']
+    headingOutlineCount: number
+    mediaIssueCount: number
+  }
+  safetyPolicy: {
+    writesWordPressContent: false
+    publishesContent: false
+    modifiesPublishedSource: false
+    clearsCache: false
+    createsBackup: false
+    sendsSecretsToOutput: false
+  }
+  readiness: {
+    status: 'ready_for_brief' | 'blocked'
+    blockers: Array<{
+      code: string
+      message: string
+    }>
+    warnings: Array<{
+      code: string
+      message: string
+    }>
+  }
+  changeCandidates: ContentFactoryRefreshPlanChangeCandidate[]
+  rollback: {
+    strategy: 'no_runtime_change_plan_only'
+    notes: string
+  }
+}
+
 export type ContentFactoryDraftSmokePlan = {
   contractVersion: 'contentFactoryDraftSmokePlan.v1'
   generatedAt: string
