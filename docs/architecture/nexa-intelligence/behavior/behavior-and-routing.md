@@ -57,8 +57,24 @@ router-internal. Observabilidad: `NexaResponse.modelId` (persistido; provider de
 - Si piden el estado real y no se consultó un tool en vivo → lo dice.
 - Si un tool falla por permisos/datos → lo nombra + ofrece el camino real.
 
+## Contrato de error del endpoint (TASK-1131)
+
+`/api/home/nexa` (+ sus handlers hermanos `feedback/`, `threads/`, `threads/[threadId]`) es el backend
+compartido del chat (legacy embebido + flotante global). Todos sus errores que cruzan al cliente usan
+el **contrato de error canónico** (`canonicalErrorResponse`, es-CL + `code` + `actionable`):
+
+- Sin sesión → `unauthorized` (401). Sin prompt → `nexa_prompt_required` (422).
+- Fallo de generación → `nexa_generation_failed` (500, `actionable: true` — es transitorio; reintentar suele resolver).
+- Fallos de store (feedback/threads) → `internal_error` (500).
+
+Todo fallo se captura con `captureWithDomain(error, 'home', { tags: { source: 'nexa_*_endpoint' } })`
+→ se rolea al módulo **Home** del reliability dashboard. El detalle técnico se redacta
+(`redactErrorForResponse`) hacia Sentry, **NUNCA** al cliente. El cliente (`use-nexa-runtime`) lee
+`errorBody.error` → ahora es-CL canónico por construcción.
+
 ## Reglas duras
 
+- **NUNCA** devolver `error.message` crudo (ni prosa inglesa) al cliente desde un handler del chat. Usar `canonicalErrorResponse` + `captureWithDomain('home', …)`. (Bug-class cerrado en TASK-1131.)
 - **NUNCA** exponer la selección de modelo al usuario.
 - **NUNCA** instanciar un SDK LLM dentro de un dominio: Gemini vía `getGoogleGenAIClient`, Anthropic
   vía `getAnthropicClient` (`src/lib/ai/*`). Detalle: [`technical/llm-models.md`](../technical/llm-models.md).

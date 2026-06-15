@@ -2,7 +2,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P3`
 - Impact: `Medio`
 - Effort: `Bajo`
@@ -58,3 +58,14 @@ Dos problemas (bug-class canónico de Greenhouse):
 - Contrato: CLAUDE.md "Canonical API error response contract" + `src/lib/api/canonical-error-response.ts`.
 - Capa: `docs/architecture/nexa-intelligence/behavior/behavior-and-routing.md`.
 - Procedencia: TASK-1124 (revisión profunda del chat).
+
+## Resultado (2026-06-15, completo en `develop`)
+
+1. **Enum canónico** (+`nexa_generation_failed` 500 actionable, +`nexa_prompt_required` 422) en `src/lib/api/canonical-error-response.ts`.
+2. **`POST /api/home/nexa`**: 401→`unauthorized`, sin prompt→`nexa_prompt_required`, 500→`captureWithDomain(error, 'home', { tags: { source: 'nexa_chat_endpoint' }, extra: redactErrorForResponse })` + `canonicalErrorResponse('nexa_generation_failed')`. Cero `error.message` crudo al cliente.
+3. **Handlers hermanos** (`feedback/`, `threads/`, `threads/[threadId]`): 401→`unauthorized` + try/catch en cada store call → `captureWithDomain('home', { source: 'nexa_*_endpoint' })` + `internal_error`. Cierra el gap de fallo de store sin tag (antes: 500 desnudo de Next).
+4. **Cliente** (`use-nexa-runtime.ts:135`) lee `errorBody.error` → ahora es-CL canónico **por construcción** (sin cambiar el cliente; root-cause en el endpoint).
+5. **Test** `route.test.ts`: 401 / 422 / 500-canónico-sin-leak-captura-home / 200. Doc de capa `behavior/behavior-and-routing.md` actualizada.
+
+**Decisión de dominio:** `home` (el endpoint es `/api/home/nexa`, el módulo `home` declara `incidentDomainTag: 'home'` → el fallo se rolea al dashboard). No se creó un domain `nexa` (scope creep P3).
+**Frontera de scope:** los 400/404 de validación específica (`Missing responseId`, `Invalid sentiment`, `Missing threadId/title`, `Thread not found`) se dejaron como señales de contrato de API (no son el bug-class del leak; el cliente los mapea por status). Canonicalizarlos = follow-up opcional.

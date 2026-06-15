@@ -1,5 +1,16 @@
 # Release 2026-06-10 #2 — develop→main `6c649b2a6` RELEASED
 
+## Sesión 2026-06-15 — TASK-1131 Nexa chat endpoint: contrato de error canónico + captureWithDomain — Claude
+
+> **Estado:** **complete** en `develop` (local-first). Backend/reliability, sin migración/capability/UI. Follow-up de TASK-1124.
+
+- **Bug-class:** el `500` de `/api/home/nexa` devolvía `error.message` crudo en inglés al cliente es-CL + sin captura por dominio.
+- **Fix (5 handlers del backend compartido del chat):** todo error cruza por `canonicalErrorResponse` (es-CL + `code` + `actionable`) — `unauthorized`/`nexa_prompt_required`/`nexa_generation_failed`/`internal_error` — y se captura con `captureWithDomain(error, 'home', { tags: { source: 'nexa_*_endpoint' }, extra: redactErrorForResponse })`. 2 codes nuevos additive al enum.
+- **Root-cause:** el cliente (`use-nexa-runtime.ts:135`) hacía `throw new Error(errorBody?.error || fallback)` (anti-patrón) → al arreglar el endpoint, `errorBody.error` es es-CL por construcción, sin tocar el cliente.
+- **Dominio = `home`** (endpoint `/api/home/nexa` + módulo Home con `incidentDomainTag: 'home'`). No se creó domain `nexa` (scope creep P3).
+- **Frontera de scope:** los 400/404 de validación específica (`Missing X`, `Thread not found`) quedan como señales de contrato de API (no son el bug-class). Follow-up opcional canonicalizarlos.
+- **Gates:** lint 0 · tsc 0 · 136 focales (route.test nuevo + api + nexa) · doc-gate verde. Doc de capa `behavior/behavior-and-routing.md` §Contrato de error. Skill `greenhouse-nexa-conversational` actualizada (hardening abierto → TASK-1131 hecho).
+
 ## Sesión 2026-06-15 — TASK-1138 Nexa Chat: política de estructura/formato (prompt V2 → v2.1.0) — Claude
 
 > **Estado:** **complete** en `develop` (local-first). Aditivo bajo `NEXA_SYSTEM_PROMPT_V2_ENABLED` (ON local/staging, prod sigue V1 — flip = decisión separada del operador). GVC verificada.

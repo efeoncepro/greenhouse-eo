@@ -57,6 +57,9 @@ export type CanonicalErrorCode =
   // Design System Figma node linking (TASK-1072).
   | 'invalid_figma_url'
   | 'figma_node_not_axis'
+  // Nexa chat endpoint (TASK-1131).
+  | 'nexa_prompt_required'
+  | 'nexa_generation_failed'
   // Reserved for future canonical codes — extender aquí cuando emerjan
   // nuevos error paths estructurales. NUNCA usar strings ad-hoc.
 
@@ -126,6 +129,17 @@ const CANONICAL_ERRORS: Record<CanonicalErrorCode, CanonicalErrorDefinition> = {
   figma_node_not_axis: {
     status: 422,
     message: 'El nodo debe ser del archivo AXIS. Pega un enlace de un nodo del Design System en AXIS.',
+    actionable: true
+  },
+  nexa_prompt_required: {
+    status: 422,
+    message: 'Escribe una pregunta para Nexa antes de enviar.',
+    actionable: true
+  },
+  nexa_generation_failed: {
+    status: 500,
+    // Transitorio (hiccup del proveedor LLM / tool): reintentar suele resolver.
+    message: 'Nexa no pudo generar una respuesta. Inténtalo de nuevo en unos segundos.',
     actionable: true
   }
 }

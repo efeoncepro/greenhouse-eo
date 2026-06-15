@@ -1,12 +1,15 @@
 import { NextResponse } from 'next/server'
 
 import { resolveNexaModel } from '@/config/nexa-models'
+import { canonicalErrorResponse } from '@/lib/api/canonical-error-response'
 import { getServerAuthSession } from '@/lib/auth'
 import { buildHomeEntitlementsContext } from '@/lib/home/build-home-entitlements-context'
 import { getHomeFinanceStatus } from '@/lib/home/get-home-snapshot'
 import type { NexaRuntimeContext } from '@/lib/nexa/nexa-contract'
 import { NexaService } from '@/lib/nexa/nexa-service'
 import { persistNexaConversation } from '@/lib/nexa/store'
+import { captureWithDomain } from '@/lib/observability/capture'
+import { redactErrorForResponse } from '@/lib/observability/redact'
 import type { NexaMessage } from '@/types/home'
 
 export const dynamic = 'force-dynamic'
@@ -20,7 +23,7 @@ export async function POST(req: Request) {
   const session = await getServerAuthSession()
 
   if (!session?.user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    return canonicalErrorResponse('unauthorized')
   }
 
   const { user } = session
@@ -34,7 +37,7 @@ export async function POST(req: Request) {
   } = body as { prompt: string; history: NexaMessage[]; model?: string | null; threadId?: string | null }
 
   if (!prompt) {
-    return NextResponse.json({ error: 'Missing prompt' }, { status: 400 })
+    return canonicalErrorResponse('nexa_prompt_required')
   }
 
   try {
@@ -118,10 +121,13 @@ export async function POST(req: Request) {
       threadId: persistedThreadId
     })
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Unknown error'
+    // El fallo se rolea al módulo Home del reliability dashboard (incidentDomainTag: 'home').
+    // El detalle redactado va a Sentry, NUNCA al cliente: la respuesta es es-CL canónica.
+    captureWithDomain(error, 'home', {
+      tags: { source: 'nexa_chat_endpoint' },
+      extra: { detail: redactErrorForResponse(error), userId: user.userId }
+    })
 
-    console.error('Nexa API failed:', message, error)
-
-    return NextResponse.json({ error: message }, { status: 500 })
+    return canonicalErrorResponse('nexa_generation_failed')
   }
 }
