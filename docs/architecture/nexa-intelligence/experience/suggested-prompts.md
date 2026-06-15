@@ -93,6 +93,11 @@ NEXT_PUBLIC mirror para que el panel decida si hace el fetch; el endpoint tambi�
 
 - **Resolver `finance`** (`data-aware-finance-resolver.ts`, server-only) en el registry: arranca los prompts del dashboard `/finance` desde las anomalías del ledger (descuadre / saldos desactualizados / gastos sin anclar / chequeos degradados) reusando `getFinanceLedgerHealth` (cero recompute). `entityKind='finance_scope'`, `entityId='finance-global'` (sentinel — el scope es el tenant). **Anti-oracle:** gatea por el route_group `finance` del subject (no revela anomalías financieras a quien no las ve). Counts/estados, NUNCA montos. Distinto de la **ficha de cliente en Finanzas** (`/finance/clients/[id]`), que ya es data-aware vía contexto `client`.
 
+## Delta TASK-1144 — `personal` suma performance (ICO)
+
+- El resolver `personal` ahora compone también la **performance del colaborador** (métricas ICO propias) vía `readMemberMetrics(memberId, year, month)`: `context.overdueTasks > 0` → "Tienes N entregables atrasados" (anomaly); con actividad ICO sin atrasos → "¿Revisamos tu desempeño?" (kpi). Las 3 fuentes (vacaciones + ICO) corren con `Promise.allSettled` → **degradación independiente** (si el ICO en BigQuery falla, las vacaciones siguen).
+- **Pago/liquidación: follow-up.** El reader de histórico (`pgGetMemberPayrollEntries`) no distingue recencia ni expone el estado del período en la entry → una señal "liquidación del mes lista" honesta necesita una query nueva ("liquidación exportada del período actual", validada contra PG). El copy `personal_payslip_ready` queda stubbeado para ese follow-up. No se shippeó una señal always-on/imprecisa.
+
 ## Procedencia
 
-TASK-1078 (Tier 1/1.5 — floating chat + `NexaContextScope`) · **TASK-1087 (Tier 2 — data-aware)** · **TASK-1139 (Tier 2.1 — hint UI + entrypoint + cache)** · **TASK-1141 (registry + contexto `personal`)** · **TASK-1143 (contexto `finance`)**.
+TASK-1078 (Tier 1/1.5 — floating chat + `NexaContextScope`) · **TASK-1087 (Tier 2 — data-aware)** · **TASK-1139 (Tier 2.1 — hint UI + entrypoint + cache)** · **TASK-1141 (registry + contexto `personal`)** · **TASK-1143 (contexto `finance`)** · **TASK-1144 (`personal` + performance ICO)**.

@@ -456,6 +456,9 @@ export const GH_NEXA = {
       personal_leave_pending: 'Tienes {count} solicitud(es) de vacaciones en curso, ¿las vemos?',
       personal_approvals_pending: 'Tienes {count} aprobación(es) de tu equipo esperando, ¿las revisamos?',
       personal_payslip_ready: 'Tu liquidación del mes ya está lista, ¿la abrimos?',
+      // TASK-1144 — performance / métricas ICO propias (tuteo). `{count}` interpolado; NUNCA un monto.
+      personal_overdue_tasks: 'Tienes {count} entregable(s) atrasado(s), ¿los revisamos?',
+      personal_performance_review: '¿Revisamos tu desempeño de este mes?',
       // TASK-1143 — Finanzas global (dashboard). Nexa le habla al operador financiero (tuteo +
       // nosotros). `{count}` se interpola con el número real; NUNCA un monto.
       finance_ledger_drift: 'Hay {count} movimiento(s) con descuadre en el ledger, ¿los revisamos?',

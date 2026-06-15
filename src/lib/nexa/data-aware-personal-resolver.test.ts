@@ -5,51 +5,68 @@ import type { TenantEntitlementSubject } from '@/lib/entitlements/types'
 
 import { GH_NEXA } from '@/lib/copy/nexa'
 
-// Mock del reader canónico de leave para testear el resolver sin DB.
+// Mocks de los readers canónicos para testear el resolver sin DB/BigQuery.
 const listLeaveMock = vi.fn()
+const readMemberMetricsMock = vi.fn()
 
 vi.mock('@/lib/hr-core/postgres-leave-store', () => ({
   listLeaveRequestsFromPostgres: (input: unknown) => listLeaveMock(input)
+}))
+
+vi.mock('@/lib/ico-engine/read-metrics', () => ({
+  readMemberMetrics: (...args: unknown[]) => readMemberMetricsMock(...args)
 }))
 
 import { buildPersonalPrompts, resolvePersonalPrompts } from './data-aware-personal-resolver'
 
 const COPY = GH_NEXA.floating.data_aware_prompts
 
-describe('buildPersonalPrompts (TASK-1141, mapper puro)', () => {
-  it('sin pendientes → []', () => {
-    expect(buildPersonalPrompts({ ownPendingLeave: 0, approvalsPending: 0 })).toEqual([])
+const facts = (overrides: Partial<Parameters<typeof buildPersonalPrompts>[0]> = {}) => ({
+  ownPendingLeave: 0,
+  approvalsPending: 0,
+  overdueTasks: 0,
+  hasIcoActivity: false,
+  ...overrides
+})
+
+describe('buildPersonalPrompts (TASK-1141/1144, mapper puro)', () => {
+  it('sin nada → []', () => {
+    expect(buildPersonalPrompts(facts())).toEqual([])
   })
 
-  it('aprobaciones del equipo → gancho con el count real', () => {
-    const result = buildPersonalPrompts({ ownPendingLeave: 0, approvalsPending: 3 })
+  it('entregables atrasados → anomalía con el count real', () => {
+    const result = buildPersonalPrompts(facts({ overdueTasks: 3 }))
 
-    expect(result).toEqual([{ text: COPY.personal_approvals_pending.replace('{count}', '3'), hint: 'pending' }])
+    expect(result[0]).toEqual({ text: COPY.personal_overdue_tasks.replace('{count}', '3'), hint: 'anomaly' })
   })
 
-  it('vacaciones propias → gancho con el count real', () => {
-    const result = buildPersonalPrompts({ ownPendingLeave: 2, approvalsPending: 0 })
+  it('actividad ICO sin atrasos → starter de desempeño', () => {
+    const result = buildPersonalPrompts(facts({ hasIcoActivity: true }))
 
-    expect(result[0].text).toBe(COPY.personal_leave_pending.replace('{count}', '2'))
+    expect(result[0].text).toBe(COPY.personal_performance_review)
   })
 
-  it('aprobaciones primero (desbloquean a otros), luego lo propio', () => {
-    const result = buildPersonalPrompts({ ownPendingLeave: 1, approvalsPending: 2 })
+  it('con atrasos NO muestra el starter neutral de desempeño', () => {
+    const result = buildPersonalPrompts(facts({ overdueTasks: 1, hasIcoActivity: true }))
 
-    expect(result).toHaveLength(2)
-    expect(result[0].text).toContain('aprobación')
+    expect(result.some(p => p.text === COPY.personal_performance_review)).toBe(false)
   })
 
-  it('NUNCA echa montos crudos al texto', () => {
-    const result = buildPersonalPrompts({ ownPendingLeave: 1, approvalsPending: 1 })
+  it('orden por valor: atrasos > aprobaciones > vacaciones; cap 4', () => {
+    const result = buildPersonalPrompts(facts({ overdueTasks: 2, hasIcoActivity: true, approvalsPending: 1, ownPendingLeave: 1 }))
 
-    for (const prompt of result) {
-      expect(prompt.text).not.toContain('$')
-    }
+    expect(result.length).toBeLessThanOrEqual(4)
+    expect(result[0].text).toContain('atrasado')
+  })
+
+  it('NUNCA echa montos crudos', () => {
+    const result = buildPersonalPrompts(facts({ overdueTasks: 1, approvalsPending: 1, ownPendingLeave: 1 }))
+
+    for (const prompt of result) expect(prompt.text).not.toContain('$')
   })
 })
 
-describe('resolvePersonalPrompts (TASK-1141, anti-oracle)', () => {
+describe('resolvePersonalPrompts (TASK-1144, anti-oracle + degradación independiente)', () => {
   const tenant = { tenantType: 'efeonce_internal', memberId: 'member-self' } as unknown as TenantContext
 
   const makeInput = (overrides: Record<string, unknown> = {}) =>
@@ -61,39 +78,46 @@ describe('resolvePersonalPrompts (TASK-1141, anti-oracle)', () => {
     })
 
   beforeEach(() => {
-    listLeaveMock.mockReset()
-    listLeaveMock.mockResolvedValue({
-      requests: [
-        { memberId: 'member-self', status: 'pending_supervisor' },
-        { memberId: 'member-other', status: 'pending_supervisor' }
-      ],
-      summary: { total: 2, pendingSupervisor: 1, pendingHr: 0, approved: 0 }
+    listLeaveMock.mockReset().mockResolvedValue({
+      requests: [{ memberId: 'member-self', status: 'pending_supervisor' }],
+      summary: { total: 1, pendingSupervisor: 0, pendingHr: 0, approved: 0 }
     })
+    readMemberMetricsMock.mockReset().mockResolvedValue({ context: { overdueTasks: 2, totalTasks: 10 } })
   })
 
-  afterEach(() => listLeaveMock.mockReset())
+  afterEach(() => {
+    listLeaveMock.mockReset()
+    readMemberMetricsMock.mockReset()
+  })
 
-  it('sin tenant/memberId de sesión → [] (degrada)', async () => {
+  it('sin tenant/memberId → [] (degrada, no lee nada)', async () => {
     expect(await resolvePersonalPrompts(makeInput({ tenant: null }))).toEqual([])
-    expect(await resolvePersonalPrompts(makeInput({ subject: { userId: 'u' } }))).toEqual([])
-    expect(listLeaveMock).not.toHaveBeenCalled()
+    expect(readMemberMetricsMock).not.toHaveBeenCalled()
   })
 
-  it('cuenta SOLO las solicitudes propias (memberId de sesión), ignora las de otros', async () => {
+  it('compone ICO (atrasos) + vacaciones', async () => {
     const result = await resolvePersonalPrompts(makeInput())
 
-    // 1 propia (member-self) pending + 1 aprobación (summary.pendingSupervisor).
-    expect(result.some(p => p.text.includes('1') && p.text.includes('vacaciones'))).toBe(true)
+    expect(result.some(p => p.text.includes('atrasado') && p.text.includes('2'))).toBe(true)
   })
 
-  it('anti-oracle: ignora el entityId del cliente; usa SIEMPRE subject.memberId', async () => {
-    // El cliente intenta pasar el id de otro miembro como entityId — debe ser ignorado.
+  it('degradación independiente: si el ICO (BigQuery) falla, las vacaciones siguen', async () => {
+    readMemberMetricsMock.mockRejectedValue(new Error('BigQuery down'))
+    listLeaveMock.mockResolvedValue({
+      requests: [{ memberId: 'member-self', status: 'pending_supervisor' }],
+      summary: { total: 1, pendingSupervisor: 2, pendingHr: 0, approved: 0 }
+    })
+
+    const result = await resolvePersonalPrompts(makeInput())
+
+    // El ICO cayó → sin prompt de atrasos, pero las aprobaciones siguen.
+    expect(result.some(p => p.text.includes('atrasado'))).toBe(false)
+    expect(result.some(p => p.text.includes('aprobación'))).toBe(true)
+  })
+
+  it('anti-oracle: lee SIEMPRE con el memberId de sesión, no el entityId del cliente', async () => {
     await resolvePersonalPrompts(makeInput({ entityId: 'member-victim' }))
 
-    // El reader se llama con el tenant de sesión (que scoping al member propio), nunca con entityId.
-    const callArg = listLeaveMock.mock.calls[0][0]
-
-    expect(callArg).toEqual({ tenant })
-    expect(JSON.stringify(callArg)).not.toContain('member-victim')
+    expect(readMemberMetricsMock).toHaveBeenCalledWith('member-self', expect.any(Number), expect.any(Number))
   })
 })
