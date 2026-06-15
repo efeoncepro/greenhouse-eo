@@ -30,19 +30,25 @@ export const organizationOperationalProjection: ProjectionDefinition = {
     const organizationId = scope.entityId
 
     // Copy latest ICO metrics into organization_operational_metrics
+    // Populate the full operational contract including the rich delivery columns (TASK-1106:
+    // rpa_median / pipeline_velocity / stuck_asset_pct) so the compact serving cache stays at parity
+    // with `ico_organization_metrics` and the Account 360 delivery facet reader never hits a
+    // missing column (ISSUE-087).
     await runGreenhousePostgresQuery(
       `INSERT INTO greenhouse_serving.organization_operational_metrics (
         organization_id, period_year, period_month,
         tasks_completed, tasks_active, tasks_total,
-        rpa_avg, otd_pct, ftr_pct,
-        cycle_time_avg_days, throughput_count, stuck_asset_count,
+        rpa_avg, rpa_median, otd_pct, ftr_pct,
+        cycle_time_avg_days, throughput_count, pipeline_velocity,
+        stuck_asset_count, stuck_asset_pct,
         source, materialized_at
       )
       SELECT
         organization_id, period_year, period_month,
         COALESCE(completed_tasks, 0), COALESCE(active_tasks, 0), COALESCE(total_tasks, 0),
-        rpa_avg, otd_pct, ftr_pct,
-        cycle_time_avg_days, throughput_count, COALESCE(stuck_asset_count, 0),
+        rpa_avg, rpa_median, otd_pct, ftr_pct,
+        cycle_time_avg_days, throughput_count, pipeline_velocity,
+        COALESCE(stuck_asset_count, 0), stuck_asset_pct,
         'ico_organization_metrics', NOW()
       FROM greenhouse_serving.ico_organization_metrics
       WHERE organization_id = $1
@@ -53,11 +59,14 @@ export const organizationOperationalProjection: ProjectionDefinition = {
         tasks_active = EXCLUDED.tasks_active,
         tasks_total = EXCLUDED.tasks_total,
         rpa_avg = EXCLUDED.rpa_avg,
+        rpa_median = EXCLUDED.rpa_median,
         otd_pct = EXCLUDED.otd_pct,
         ftr_pct = EXCLUDED.ftr_pct,
         cycle_time_avg_days = EXCLUDED.cycle_time_avg_days,
         throughput_count = EXCLUDED.throughput_count,
+        pipeline_velocity = EXCLUDED.pipeline_velocity,
         stuck_asset_count = EXCLUDED.stuck_asset_count,
+        stuck_asset_pct = EXCLUDED.stuck_asset_pct,
         source = 'ico_organization_metrics',
         materialized_at = NOW()`,
       [organizationId]
