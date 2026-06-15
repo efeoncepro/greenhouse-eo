@@ -8543,9 +8543,12 @@ export interface GreenhouseServingOrganizationOperationalMetrics {
   otd_pct: Numeric | null;
   period_month: number;
   period_year: number;
+  pipeline_velocity: Numeric | null;
   rpa_avg: Numeric | null;
+  rpa_median: Numeric | null;
   source: Generated<string>;
   stuck_asset_count: Generated<number | null>;
+  stuck_asset_pct: Numeric | null;
   tasks_active: Generated<number>;
   tasks_completed: Generated<number>;
   tasks_total: Generated<number>;

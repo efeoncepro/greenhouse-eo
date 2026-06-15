@@ -51,14 +51,20 @@ CREATE TABLE IF NOT EXISTS greenhouse_serving.organization_operational_metrics (
   tasks_total         INT NOT NULL DEFAULT 0,
 
   -- Quality metrics
+  -- Parity with greenhouse_serving.ico_organization_metrics (TASK-1106): the Account 360 delivery
+  -- facet reads these rich columns from this serving cache; they must exist here, not only on the
+  -- ico mirror, or the UNION reader throws 42703 (ISSUE-087).
   rpa_avg             NUMERIC(6,2),
+  rpa_median          NUMERIC(6,2),
   otd_pct             NUMERIC(5,2),
   ftr_pct             NUMERIC(5,2),
 
   -- Delivery metrics
   cycle_time_avg_days NUMERIC(6,2),
   throughput_count    INT,
+  pipeline_velocity   NUMERIC(8,2),
   stuck_asset_count   INT DEFAULT 0,
+  stuck_asset_pct     NUMERIC(5,2),
 
   -- Metadata
   source              TEXT NOT NULL DEFAULT 'ico_organization_metrics',
