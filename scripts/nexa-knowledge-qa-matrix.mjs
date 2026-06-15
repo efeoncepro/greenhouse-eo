@@ -1,12 +1,18 @@
 #!/usr/bin/env node
 
 /**
- * TASK-1092 — Nexa Knowledge production-readiness QA matrix.
+ * TASK-1092 + TASK-1124 — Nexa Knowledge production-readiness QA matrix.
  *
  * Runs the governed 12-case matrix against /api/home/nexa with agent-session
  * auth. It validates routing (Knowledge vs operational tools), citation
  * visibility, honest no-answer behavior and the known maintenance-mode coverage
  * gap without tuning retrieval.
+ *
+ * TASK-1124 extiende cada caso con asserts de CALIDAD DE RESPUESTA sobre el texto
+ * crudo del modelo (no la capa de render): síntesis (no copia de fragmento), sin
+ * volcado "Fuentes:" anexado, sin encabezados Markdown crudos (regresión "##") y
+ * contrato de voz Efeonce (sin 🍏, sin voseo). El eval de retrieval (golden
+ * questions) vive aparte en `golden-questions.live.test.ts` (offline, complementario).
  *
  * Usage:
  *   pnpm qa:nexa-knowledge -- --env=staging
@@ -215,6 +221,13 @@ const askNexa = async ({ access, cookie, prompt }) => {
   return JSON.parse(text)
 }
 
+// TASK-1124 — patrones de calidad/voz sobre el texto crudo del modelo (no la capa UI).
+const RAW_MARKDOWN_HEADING = /^[ \t]{0,3}#{1,6}[ \t]+\S/mu
+const APPENDED_FUENTES_DUMP = /\n[ \t]*[*_]{0,2}Fuentes\b[\s\S]*\]\s*=/iu
+const FORBIDDEN_EMOJI = /🍏/u
+const VOSEO_TOKENS = /\b(pod[eé]s|quer[eé]s|ten[eé]s|hac[eé]s|decime|mir[aá]|fijate|laburo)\b/iu
+const MIN_SYNTHESIZED_ANSWER_CHARS = 80
+
 const evaluateCase = ({ qaCase, response }) => {
   const issues = []
   const warnings = []
@@ -226,6 +239,28 @@ const evaluateCase = ({ qaCase, response }) => {
   const grounded = Boolean(packet && packet.confidence !== 'none' && chunks.length > 0)
   const content = typeof response.content === 'string' ? response.content : ''
   const hasCitationMarker = /\[\d+\]/u.test(content)
+
+  // --- Calidad de respuesta (regresión "##" + síntesis + sin volcado Fuentes) ---
+  if (RAW_MARKDOWN_HEADING.test(content)) {
+    issues.push('answer contains raw Markdown heading (## regression — voice contract bans structural markers)')
+  }
+
+  if (APPENDED_FUENTES_DUMP.test(content)) {
+    issues.push('answer appends a "Fuentes:" dump (the UI owns evidence; sources must not be dumped in text)')
+  }
+
+  if (grounded && content.trim().length < MIN_SYNTHESIZED_ANSWER_CHARS) {
+    warnings.push(`grounded answer is very short (${content.trim().length} chars); review for synthesis vs chunk-copy`)
+  }
+
+  // --- Contrato de voz Efeonce ---
+  if (FORBIDDEN_EMOJI.test(content)) {
+    issues.push('answer uses forbidden 🍏 emoji (voice contract)')
+  }
+
+  if (VOSEO_TOKENS.test(content)) {
+    warnings.push('answer shows possible voseo; voice contract requires neutral es-CL tuteo')
+  }
 
   if (qaCase.expected.knowledge && !knowledgeInvocation) {
     issues.push('expected search_knowledge')
@@ -286,7 +321,7 @@ const main = async () => {
   const results = []
 
   for (const qaCase of selectedCases) {
-    process.stderr.write(`TASK-1092 QA ${qaCase.id}: ${qaCase.intent}... `)
+    process.stderr.write(`TASK-1124 QA ${qaCase.id}: ${qaCase.intent}... `)
 
     try {
       const response = await askNexa({ access, cookie, prompt: qaCase.prompt })
@@ -312,7 +347,7 @@ const main = async () => {
   }
 
   const summary = {
-    task: 'TASK-1092',
+    task: 'TASK-1124',
     env: options.env,
     baseUrl: access.baseUrl,
     generatedAt: new Date().toISOString(),

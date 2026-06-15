@@ -1,5 +1,40 @@
 # Release 2026-06-10 #2 — develop→main `6c649b2a6` RELEASED
 
+## Sesión 2026-06-14 — TASK-1124 Nexa Knowledge answer quality + system prompt V2 — Claude
+
+> **Estado:** code-complete en `develop`, 8 slices. Gates: tsc 0 · lint 0 · suite completa **6980 passed** · build. Flags ON en local + Vercel **staging**; **prod gated por sign-off del operador**. **Rollout pendiente de verificación viva en staging** (el dev server local servía V1 hasta el reinicio; la QA matrix viva confirma routing/no-answer pero el citado inline `[n]`/síntesis se valida con V2 activo en staging tras deploy).
+
+- **Qué cambió:** las respuestas de Knowledge ahora **sintetizan** (no copian un fragmento) y el system prompt es un **artefacto versionado** (V1 byte-equivalente = rollback; V2 modular con realidad de plataforma 2026, response modes y **contrato de voz Efeonce**). Hygiene de evidencia: cero "Fuentes:" anexado + cero `##` crudo (la UI es dueña de la evidencia, TASK-1112). Evidence brief (group/dedupe/parent context) + rerank conservador del top-N FTS (anti wrong-source por heading + diversidad, mismo set). Governance machine-readable + QA matrix extendida (síntesis/voz/regresión `##`).
+- **Flags** (3 nuevos, ON local + staging): `NEXA_SYSTEM_PROMPT_V2_ENABLED`, `NEXA_KNOWLEDGE_SYNTHESIS_BRIEF_ENABLED`, `KNOWLEDGE_SEARCH_RERANK_ENABLED`. Default OFF en código → cutover por env. Rollback = flag OFF.
+- **Archivos clave:** `src/lib/nexa/nexa-system-prompt.ts` (+ test + `NEXA_PROMPT_GOVERNANCE`), `nexa-service.ts` (consume builder, removido post-procesador Fuentes), `nexa-tools.ts` (`buildKnowledgeEvidenceBrief` + strip headings), `src/lib/knowledge/search/{rerank-knowledge-chunks,flags}.ts` (+ test) + `search-knowledge.ts`, `scripts/nexa-knowledge-qa-matrix.mjs`. Docs: `GREENHOUSE_NEXA_SYSTEM_PROMPT_GOVERNANCE_V1.md` + Delta arch Nexa + funcional v1.1 + DECISIONS_INDEX.
+- **Verificación viva V2 hecha en local (Gemini):** tras reload de `.env.local`, K2/K4 = grounded **sintetizado + `[n]` inline** (cross-doc), O1 = ruteo operacional (sin knowledge), G2 = no-answer honesto, P1 = policy filtering ✓. **Único residual K6** ("guía de nómina"): grounded + citado pero Gemini no anexa el cierre de "validación humana" pese a la instrucción V2 reforzada (obligatoria) → la QA matrix lo flaggea honestamente. Es variance de compliance del modelo; la ruta `/api/home/nexa` resuelve **Gemini** localmente, mientras en staging/prod el auto-router manda preguntas de conocimiento a **Claude**.
+- **Verificación viva pendiente (operador, en staging):** correr `pnpm qa:nexa-knowledge -- --env=staging` con V2 + auto-router (Claude) activo → confirmar K6 sensible con cierre de validación + el resto.
+- **Retomar:** `/implement-task TASK-1124`. Local-first.
+
+## Sesión 2026-06-14 — TASK-1113 Nexa floating chat: flicker + scroll (fix de raíz) — Claude
+
+> **Estado:** code-complete en `develop` local, **SIN push/commit** (checkout compartido con WIP de Codex; el commit espera tu OK). Verificado objetivamente con streaming real local. Pendiente: confirmación visual tuya en staging tras deploy.
+
+- **Causa raíz del flicker "cuando usa una tool" (la que reportaste):** `NexaToolRenderers` registraba las tool UIs desde el `tools.Fallback` → loop mount/unmount del card (~630 remounts/s). Fix: montar `NexaToolRenderer` UNA vez dentro del thread (registro persistente) + renderers a nivel de módulo (`React.memo`) + Fallback puro. Medido: **3793 → 0** remounts en 6s.
+- **Flicker de texto:** `MarkdownTextPrimitive` sin componentes memoizados → `unstable_memoizeMarkdownComponents` (solo el último bloque re-renderiza).
+- **Scroll trabado:** quitar CSS `scroll-behavior: smooth` del viewport → sticky-bottom honesto de assistant-ui. Medido: scrollTop se queda al subir mientras el contenido crece 14×.
+- **Archivos:** `src/views/greenhouse/home/components/NexaThread.tsx` + `NexaToolRenderers.tsx`. Aditivo, sin flags/migraciones.
+- **Fuera de scope (issue separado, NO parche):** error de hidratación `useId` en un `CustomTextField` global (NO el composer de Nexa) — una vez al cargar, no es el flicker repetitivo del streaming.
+- **Gates:** lint + tsc + design:lint + build + suite completa (6961 tests) verde. GVC mobile + confirmación staging pendientes.
+- **Retomar:** `/implement-task TASK-1113`. Local-first, sin push salvo pedido explícito.
+
+## Sesión 2026-06-14 — TASK-1110 Slices A + A.2 (la card y la respuesta "se arman") — Claude
+
+> **Estado honesto:** la CAPACIDAD funciona (la card y la respuesta se arman), pero **NO hay flujo live "escribir en la caja Nexa → compone in-place" todavía**. Lo que existe hoy es el **mockup** (toggle Host/Con Nexa) + la Lab. El live (escribir→compone) es el **Slice 1** (redo en `/knowledge`, estaba mal). NO crear task nueva — el vehículo es **TASK-1110** (in-progress, Delta 2026-06-14 en el `.md` encodea la visión + slices).
+
+**Visión del operador (norte):** una UI ya armada se **TRANSFORMA in-place** en experiencia conversacional al preguntar a Nexa (misma superficie, no navega); la respuesta **lidera**, el host persiste vivo, y la respuesta **SE ARMA** (chart dibuja + número cuenta = firma del Nexa moment).
+
+- **✅ Slice A (`447ea61f7`):** la card se arma sola — `entrance='assemble'` en `MetricTrendCard` + `AnimatedCounter animateFrom` (conteo confiable al montar, sin race del IntersectionObserver; never-hidden + reduced-motion horneados). Canonizado en `PRIMITIVES.md` (`176d84651`). Lab `/design-system/card-density` ("Secuencia macro").
+- **✅ Slice A.2 (`15a3563d6`):** la respuesta del Moment se arma — `MetricValue` en `NexaAnswerBubble` cuenta el número (parsea '68%'/'0.4'/'$1.2M'; el chart ya dibujaba con `isAnimationActive`). Verificado e2e: conteo 0→68% + morph host→composed capturados y mirados.
+- **Hallazgo:** `NexaAnswerBubble` (1332 líneas) renderiza su chart/métrica con Recharts inline propio (NO reusa `MetricTrendCard`) → el ensamble se wirea ahí reusando `AnimatedCounter`.
+- **Pendiente:** **Slice B** (empaquetar como page DS "Nexa Answers Experience" — el flujo completo en un solo lugar + paridad `fe:capture:diff`) → **Slice 1** (redo live `/knowledge`, default ON via rollout-flag) → Slice C/D (GVC staging · Moment Fabric joint Codex, TASK-1095/1096).
+- **Continuidad:** memoria guardada (auto-load) `project_conversational_experience_vision_task1110` + `gcloud-adc-expiry-blocks-gvc`. **Retomar:** `/implement-task TASK-1110`. Local-first, sin push salvo pedido explícito. Comunicación: español neutro (sin voseo), explicar simple, cuidar detalles con loop GVC.
+
 ## Sesion 2026-06-14 — TASK-1123 Content Intelligence Map MVP (Codex)
 
 - **TASK-1123 tomada en `develop`:** por instruccion del operador, sin branch/worktree. Lifecycle movido a `in-progress`; indices sincronizados en `docs/tasks/README.md`, `docs/tasks/TASK_ID_REGISTRY.md` y `EPIC-019`.

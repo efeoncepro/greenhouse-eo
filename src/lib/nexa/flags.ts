@@ -31,3 +31,14 @@ export const getNexaProviderOverride = (): 'google' | 'anthropic' | null => {
 // Con ON, el router elige Anthropic para preguntas de conocimiento (cuando el retrieval
 // está activo) y Gemini para el resto, con failover al otro provider si el primario falla.
 export const isNexaAutoRouterEnabled = (): boolean => process.env.NEXA_AUTO_ROUTER_ENABLED === 'true'
+
+// TASK-1124 — System Prompt V2 (prompt modular + contrato de voz Efeonce + response modes).
+// Default OFF en código (rollback); se habilita por env en local/staging para prueba temprana,
+// y en producción tras sign-off del operador. Con OFF, Nexa usa el prompt V1 byte-equivalente.
+export const isNexaSystemPromptV2Enabled = (): boolean => process.env.NEXA_SYSTEM_PROMPT_V2_ENABLED === 'true'
+
+// TASK-1124 — Evidence brief sintetizable para el grounding de Knowledge (in-memory, derivado
+// del packet). Default OFF en código; ON en local/staging para prueba temprana. Con OFF, el
+// grounding usa el resumen de excerpts saneado (sin headings crudos, sin lista "Fuentes:").
+export const isNexaKnowledgeSynthesisBriefEnabled = (): boolean =>
+  process.env.NEXA_KNOWLEDGE_SYNTHESIS_BRIEF_ENABLED === 'true'

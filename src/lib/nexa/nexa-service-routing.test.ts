@@ -31,7 +31,10 @@ const mockIsKnowledge = vi.fn(() => false)
 vi.mock('./flags', () => ({
   getNexaProviderOverride: () => mockGetNexaProviderOverride(),
   isNexaAutoRouterEnabled: () => mockIsAutoRouter(),
-  isNexaKnowledgeRetrievalEnabled: () => mockIsKnowledge()
+  isNexaKnowledgeRetrievalEnabled: () => mockIsKnowledge(),
+  // TASK-1124 — el builder de prompt lee estos flags; en routing tests quedan OFF (prompt V1).
+  isNexaSystemPromptV2Enabled: () => false,
+  isNexaKnowledgeSynthesisBriefEnabled: () => false
 }))
 
 vi.mock('@/lib/ai/google-genai', () => ({

@@ -182,7 +182,7 @@ describe('NexaService', () => {
     expect(response.toolInvocations?.[0]?.toolName).toBe('check_payroll')
   })
 
-  it('adds an honest sources block when grounded Knowledge text omits inline citation markers', async () => {
+  it('no anexa un bloque textual de "Fuentes:" cuando el modelo omite citas inline (la UI es dueña de la evidencia, TASK-1124)', async () => {
     vi.stubEnv('NEXA_KNOWLEDGE_RETRIEVAL_ENABLED', 'true')
 
     mockGenerateContent
@@ -283,9 +283,12 @@ describe('NexaService', () => {
       runtimeContext
     })
 
-    expect(response.content).toContain('Fuentes:')
-    expect(response.content).toContain('[1] = Manual: Cómo usar Mi Desempeño')
-    expect(response.content).toContain('[2] = Glosario: Métricas ICO personales')
+    // TASK-1124 — la respuesta NO se modifica: el modelo respondió sin [n], y ya NO se anexa un
+    // bloque textual de "Fuentes:" (la interfaz muestra las fuentes vía el packet de evidencia).
+    expect(response.content).toBe(
+      'Para revisar tus métricas ICO, entra a Mi Desempeño y revisa los indicadores por objetivo.'
+    )
+    expect(response.content).not.toContain('Fuentes:')
   })
 
   it('does not fabricate a sources block when Knowledge confidence is none', async () => {

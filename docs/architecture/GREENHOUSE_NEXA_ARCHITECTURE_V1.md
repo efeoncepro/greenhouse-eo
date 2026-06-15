@@ -4,6 +4,39 @@
 
 Definir el contrato arquitectonico de Nexa: el asistente IA conversacional de Greenhouse. Este documento es la fuente canonica de la capa de IA del portal — que es, como funciona, que puede hacer, y como se integra con el resto del sistema.
 
+## Delta 2026-06-14 — TASK-1124: calidad de respuesta de Knowledge + system prompt V2 versionado
+
+Las respuestas de Nexa respaldadas por Knowledge pasan de "pegar un fragmento" a **respuestas
+sintetizadas**, y el system prompt deja de ser prosa inline para volverse un **artefacto de
+producto versionado**.
+
+- **System prompt versionado** (`src/lib/nexa/nexa-system-prompt.ts`): builder modular con `V1`
+  (extracción byte-equivalente del prompt inline previo = rollback) + `V2` (módulos: identity,
+  realidad de plataforma 2026, tool routing, política de Knowledge/datos vivos, response modes,
+  **contrato de voz Efeonce** de `docs/context/05_voz-tono-estilo.md`). Dispatcher por flag
+  `NEXA_SYSTEM_PROMPT_V2_ENABLED` (default OFF → V1). `buildNexaSystemPrompt` devuelve
+  `{ text, version, family }`. Governance: `GREENHOUSE_NEXA_SYSTEM_PROMPT_GOVERNANCE_V1.md` +
+  `NEXA_PROMPT_GOVERNANCE` (clases de cambio + triggers + changelog machine-readable).
+- **Hygiene de evidencia**: se removió el post-procesador que anexaba "Fuentes: [n] = …" (la
+  interfaz es dueña de la evidencia, TASK-1112); el grounding del tool ya no instruye "cierra con
+  Fuentes:" y **saneamos encabezados Markdown crudos** (`##`) del contexto LLM-facing. Resuelve la
+  contradicción de política de fuentes (tres generadores de "Fuentes:" → cero).
+- **Evidence brief sintetizable** (`buildKnowledgeEvidenceBrief`, flag
+  `NEXA_KNOWLEDGE_SYNTHESIS_BRIEF_ENABLED`): agrupa los fragmentos por documento, deduplica
+  excerpts casi idénticos (preservando todos los marcadores `[n]`) y agrega contexto de sección
+  (`headingPath`) → el modelo sintetiza cruzando documentos en vez de copiar un trozo. El `[n]`
+  sigue ligado al índice del chunk (consistencia UI ↔ modelo).
+- **Rerank conservador** (`rerankKnowledgeChunks`, flag `KNOWLEDGE_SEARCH_RERANK_ENABLED`, capa
+  search SSOT): reordena el top-N ya recuperado por FTS (mismo set → `confidence`/`freshness`/
+  `deniedCount` intactos; default OFF byte-equivalente) mezclando rank FTS (dominante) + match de
+  encabezado (anti wrong-source) + freshness + diversidad por documento. No muta `chunk.score`.
+- **QA matrix extendida** (`pnpm qa:nexa-knowledge`): además de routing/citas/no-answer, asserta
+  síntesis, sin volcado "Fuentes:", **regresión `##`** y contrato de voz (🍏, voseo). El eval de
+  retrieval (golden questions) sigue aparte en `golden-questions.live.test.ts` (offline).
+- **Rollout**: flags `NEXA_SYSTEM_PROMPT_V2_ENABLED` + `NEXA_KNOWLEDGE_SYNTHESIS_BRIEF_ENABLED` +
+  `KNOWLEDGE_SEARCH_RERANK_ENABLED` ON en local + Vercel **staging** para prueba temprana;
+  **producción gated por sign-off del operador** (Runtime Rollout Completion Gate).
+
 ## Delta 2026-06-13 — Nexa como core agentic platform
 
 La dirección vigente de producto queda formalizada en:

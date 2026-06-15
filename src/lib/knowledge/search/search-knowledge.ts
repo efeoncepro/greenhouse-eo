@@ -4,6 +4,8 @@ import { query } from '@/lib/db'
 
 import { deriveKnowledgeChunkFreshness } from '../state-machine'
 import type { KnowledgeFreshness, KnowledgePublicationStatus, KnowledgeSensitivity } from '../types'
+import { isKnowledgeSearchRerankEnabled } from './flags'
+import { rerankKnowledgeChunks } from './rerank-knowledge-chunks'
 import {
   KNOWLEDGE_SEARCH_CONTRACT_VERSION,
   type KnowledgeRetrievalChunk,
@@ -254,5 +256,9 @@ export const searchKnowledge = async (
     notes.push('Algunas fuentes están marcadas como obsoletas.')
   }
 
-  return basePacket({ confidence, freshness, chunks, deniedOrFilteredCount, notes })
+  // TASK-1124 — rerank conservador del top-N ya recuperado (mismo set; solo cambia el
+  // orden → confidence/freshness/deniedCount intactos). Default OFF = orden FTS puro.
+  const orderedChunks = isKnowledgeSearchRerankEnabled() ? rerankKnowledgeChunks(chunks, trimmedQuery) : chunks
+
+  return basePacket({ confidence, freshness, chunks: orderedChunks, deniedOrFilteredCount, notes })
 }

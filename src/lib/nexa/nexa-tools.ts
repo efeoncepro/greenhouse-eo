@@ -16,7 +16,7 @@ import { searchKnowledge } from '@/lib/knowledge/search/search-knowledge'
 import type { KnowledgeRetrievalPacket, KnowledgeSearchSubject } from '@/lib/knowledge/search'
 import { captureWithDomain } from '@/lib/observability/capture'
 
-import { isNexaKnowledgeRetrievalEnabled } from './flags'
+import { isNexaKnowledgeRetrievalEnabled, isNexaKnowledgeSynthesisBriefEnabled } from './flags'
 import type { NexaRuntimeContext, NexaToolInvocation, NexaToolName, NexaToolResult } from './nexa-contract'
 
 export interface NexaToolExecutionContext {
@@ -639,18 +639,57 @@ const KNOWLEDGE_CHUNK_EXCERPT_LIMIT = 600
 // Texto de grounding que lee el LLM para componer la respuesta. Solo los chunks de
 // ESTE turno (acotado), nunca el corpus completo. Cuando confidence='none', instruye
 // gap honesto explícito (no-invención).
-const buildKnowledgeGroundingSummary = (packet: KnowledgeRetrievalPacket): string => {
-  if (packet.chunks.length === 0) {
-    return `No hay una guía publicada que responda "${packet.query}". Responde con gap honesto: di que no encontraste documentación publicada y NO inventes una respuesta.`
+// TASK-1124 — los encabezados Markdown estructurales (#, ##, ###) del cuerpo del chunk no son
+// prosa: son metadata (ya viaja en headingPath/citationLabel). Se quitan del excerpt enviado al
+// modelo para que no filtren como texto de respuesta.
+const stripMarkdownHeadings = (text: string): string =>
+  text
+    .replace(/^\s{0,3}#{1,6}\s+.*$/gm, '')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim()
+
+// TASK-1124 — Evidence brief sintetizable (in-memory, derivado del packet, sin schema nuevo).
+// Agrupa los fragmentos por documento, deduplica excerpts casi idénticos del mismo documento
+// (preservando todos los marcadores [n] para integridad de cita) y agrega contexto de sección
+// (headingPath) para que el modelo sintetice una respuesta completa en vez de copiar un trozo.
+const normalizeForDedupe = (text: string): string => text.toLowerCase().replace(/\s+/g, ' ').trim().slice(0, 200)
+
+const buildKnowledgeEvidenceBrief = (packet: KnowledgeRetrievalPacket): string => {
+  interface BriefItem {
+    markers: number[]
+    section: string
+    excerpt: string
+  }
+  interface BriefGroup {
+    title: string
+    items: BriefItem[]
   }
 
-  const lines = packet.chunks.map((chunk, index) => {
-    const excerpt =
-      chunk.text.length > KNOWLEDGE_CHUNK_EXCERPT_LIMIT
-        ? `${chunk.text.slice(0, KNOWLEDGE_CHUNK_EXCERPT_LIMIT)}…`
-        : chunk.text
+  const byDocument = new Map<string, BriefGroup>()
 
-    return `[${index + 1}] ${chunk.citationLabel} (freshness: ${chunk.freshness}) — ${excerpt}`
+  packet.chunks.forEach((chunk, index) => {
+    const marker = index + 1
+    const cleaned = stripMarkdownHeadings(chunk.text)
+    const excerpt = cleaned.length > KNOWLEDGE_CHUNK_EXCERPT_LIMIT ? `${cleaned.slice(0, KNOWLEDGE_CHUNK_EXCERPT_LIMIT)}…` : cleaned
+    const documentTitle = chunk.citationLabel.split(' › ')[0]?.trim() || chunk.citationLabel.trim()
+    const section = chunk.headingPath.length > 0 ? chunk.headingPath.join(' › ') : '(documento)'
+
+    const group = byDocument.get(chunk.documentId) ?? { title: documentTitle, items: [] }
+    const duplicate = group.items.find(item => normalizeForDedupe(item.excerpt) === normalizeForDedupe(excerpt))
+
+    if (duplicate) {
+      duplicate.markers.push(marker)
+    } else {
+      group.items.push({ markers: [marker], section, excerpt })
+    }
+
+    byDocument.set(chunk.documentId, group)
+  })
+
+  const groupBlocks = [...byDocument.values()].map(group => {
+    const lines = group.items.map(item => `  ${item.markers.map(marker => `[${marker}]`).join('')} ${item.section} — ${item.excerpt}`)
+
+    return [`Documento: ${group.title}`, ...lines].join('\n')
   })
 
   const deniedNote =
@@ -659,8 +698,47 @@ const buildKnowledgeGroundingSummary = (packet: KnowledgeRetrievalPacket): strin
       : ''
 
   return [
-    `Fragmentos recuperados del corpus de conocimiento (confianza retrieval: ${packet.confidence}, freshness: ${packet.freshness}).`,
-    'Responde SOLO con lo respaldado por estos fragmentos. Usa el marcador [n] inline ligado al fragmento n (ej. "... [1]") y cierra con "Fuentes: [n] = citationLabel". Si alguna fuente es stale/deprecated, decláralo.',
+    `Brief de evidencia del corpus (confianza retrieval: ${packet.confidence}, freshness: ${packet.freshness}). Pregunta: "${packet.query}".`,
+    'SINTETIZA una respuesta clara y completa cruzando la evidencia de estos documentos: NO copies un fragmento ni respondas con un solo pasaje. Cuando varios documentos aporten, intégralos.',
+    'Cita con marcadores [n] inline ligados al fragmento n (ej. "... [1]"). NO escribas una lista de "Fuentes:" al final: la interfaz ya muestra las fuentes. NO reproduzcas encabezados Markdown crudos (##, #) como texto.',
+    'Si la evidencia es insuficiente, dilo y señala qué falta. Si alguna fuente es stale/deprecated, decláralo. En temas sensibles, cita con [n] y sugiere validación humana.',
+    '',
+    ...groupBlocks,
+    deniedNote
+  ]
+    .join('\n')
+    .trim()
+}
+
+const buildKnowledgeGroundingSummary = (packet: KnowledgeRetrievalPacket): string => {
+  if (packet.chunks.length === 0) {
+    return `No hay una guía publicada que responda "${packet.query}". Responde con gap honesto: di que no encontraste documentación publicada y NO inventes una respuesta.`
+  }
+
+  // TASK-1124 — con el flag ON, el modelo recibe un brief sintetizable (agrupado por documento)
+  // en vez de líneas de excerpt sueltas. Default OFF preserva el grounding plano saneado.
+  if (isNexaKnowledgeSynthesisBriefEnabled()) {
+    return buildKnowledgeEvidenceBrief(packet)
+  }
+
+  const lines = packet.chunks.map((chunk, index) => {
+    const cleaned = stripMarkdownHeadings(chunk.text)
+    const excerpt = cleaned.length > KNOWLEDGE_CHUNK_EXCERPT_LIMIT ? `${cleaned.slice(0, KNOWLEDGE_CHUNK_EXCERPT_LIMIT)}…` : cleaned
+    const sectionContext = chunk.headingPath.length > 0 ? ` · ${chunk.headingPath.join(' › ')}` : ''
+
+    return `[${index + 1}] ${chunk.citationLabel} (freshness: ${chunk.freshness})${sectionContext}\n${excerpt}`
+  })
+
+  const deniedNote =
+    packet.deniedOrFilteredCount > 0
+      ? `\n(${packet.deniedOrFilteredCount} fragmento(s) coinciden pero quedaron fuera por política de acceso; menciónalo si es relevante.)`
+      : ''
+
+  return [
+    `Evidencia recuperada del corpus de conocimiento (confianza retrieval: ${packet.confidence}, freshness: ${packet.freshness}).`,
+    'SINTETIZA una respuesta clara y completa a partir de esta evidencia: cruza los fragmentos que aporten, no copies un trozo ni respondas con un solo pasaje.',
+    'Cita con marcadores [n] inline ligados al fragmento n (ej. "... [1]"). NO escribas una lista de "Fuentes:" al final: la interfaz ya muestra las fuentes y su trazabilidad. NO reproduzcas encabezados Markdown crudos (##, #) como texto de respuesta.',
+    'Si la evidencia es insuficiente, dilo y señala qué falta. Si alguna fuente es stale/deprecated, decláralo.',
     'En temas sensibles (finanzas, nómina, legal, seguridad o compromisos contractuales), cita siempre con [n] y sugiere validación humana cuando corresponda.',
     '',
     ...lines,
