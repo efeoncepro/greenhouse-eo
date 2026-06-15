@@ -1,5 +1,25 @@
 # Release 2026-06-10 #2 — develop→main `6c649b2a6` RELEASED
 
+## Sesión 2026-06-15 — TASK-1139 Nexa data-aware prompts enrichment (Tier 2.1) — Claude
+
+> **Estado:** code-complete en `develop` (local-first). Aditivo bajo el flag de TASK-1087 (ya ON en local + staging). Ejecuta las recomendaciones de cierre de TASK-1087.
+
+- **4 slices:** (1) **hint UI** — ícono Tabler por categoría (`anomaly/risk/pending/kpi`) en la card data-aware vía MUI palette (token); template = sin ícono (honesto). (2) **entrypoint** — `NexaContextScope` declara `entrypoint` (shell lo deriva de `projection.entrypointContext`), el hook lo manda, el composer lo pasa al reader → facets correctos finance vs agency. (3) **cache** de ruta TTL 30s en el composer, solo `data_aware`. (4) **reliability re-scope honesto** — signal de fallback-rate dedicado NO factible (`getCloudSentryIncidents` solo filtra por `domain`); las fallas ruedan al rollup `agency`; el signal de tasa de uso real es TASK-1129.
+- **Diseño:** revisado con `modern-ui` + `state-design` (ambos PASS). Out-of-scope: WebMCP (API experimental) + payroll data-aware (sin página de período).
+- **Gates:** tsc 0 · lint 0 · 14/14 tests focales · suite Nexa 82 passed · `pnpm nexa:doc-gate` verde · build.
+- **Pendiente (rollout):** GVC del ícono `hint` con una señal viva (mismo gate que TASK-1087). Retomar: `/implement-task TASK-1139`.
+
+## Sesion 2026-06-15 — Finance docs end-to-end para Nexa Knowledge — Codex
+
+> **Estado:** documentacion creada, ingestion NO ejecutada por instruccion del operador. `TASK-1140` queda en `to-do` como vehiculo formal para ingestar los manuales a Knowledge/Nexa.
+
+- **Hallazgo:** Nexa ya tiene `search_knowledge`, pero preguntas Finance pueden recuperar documentos generales no financieros con confianza alta si el corpus no tiene un paquete Finance end-to-end bien registrado.
+- **Correccion de alcance:** tras feedback del operador, se hizo auditoria real de codigo y DB read-only antes de completar los manuales. Se verificaron APIs/surfaces de cash-in, cash-out, Banco, Conciliacion, Payment Orders, instrumentos de pago, transferencias internas, settlement legs y tablas `greenhouse_finance`/serving relacionadas. Member Loaded Cost Model queda descrito como frontera forward-going, no como runtime completamente operable.
+- **Documentos nuevos/actualizados:** `docs/documentation/finance/operacion-finance-end-to-end.md` (mapa funcional completo reconciliado contra codigo/DB), `docs/manual-de-uso/finance/registrar-ingresos-egresos-y-ordenes-de-pago.md`, `docs/manual-de-uso/finance/caja-cobros-pagos-y-liquidaciones.md`, `docs/manual-de-uso/finance/conciliacion-bancaria-operacion.md` e `docs/manual-de-uso/finance/instrumentos-de-pago-y-banco.md`.
+- **Indices sincronizados:** `docs/documentation/README.md`, `docs/manual-de-uso/README.md`, `docs/tasks/README.md`, `docs/tasks/TASK_ID_REGISTRY.md`.
+- **Task creada:** `docs/tasks/to-do/TASK-1140-finance-manuals-nexa-knowledge-ingestion.md` — scope: registrar docs Finance en corpus Knowledge, agregar golden questions wrong-source para ingresos/egresos/caja/instrumentos/Banco/conciliacion/payment orders, validar local/staging y mantener fuera de alcance cualquier accion financiera desde Nexa.
+- **Gates:** pendiente re-ejecutar tras esta expansion documental. Advertencia conocida: `docs:closure-check` puede mantener warnings por cambios de codigo/Nexa preexistentes en el worktree (`missing_changelog`, `client_changelog_check`), no originados por esta documentacion Finance.
+
 ## Sesión 2026-06-15 — TASK-1087 Nexa prompts sugeridos data-aware (Tier 2) — Claude
 
 > **Estado:** code-complete en `develop` (local-first, SIN push). Aditivo + **flag `NEXA_SUGGESTED_PROMPTS_DATA_AWARE_ENABLED` default OFF** → cero efecto al merge. Cutover + GVC con anomalía viva = rollout-time (operador).

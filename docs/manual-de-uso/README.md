@@ -12,6 +12,10 @@ La diferencia con otras capas de documentacion:
 
 ### Finanzas
 
+- [Registrar ingresos, egresos, pagos y ordenes de pago](finance/registrar-ingresos-egresos-y-ordenes-de-pago.md) — guia operador end-to-end para crear documentos de ingreso/egreso, registrar cobros/pagos reales, decidir pago directo vs orden de pago, aprobar/enviar/marcar pagado y conciliar.
+- [Caja, cobros, pagos y liquidaciones](finance/caja-cobros-pagos-y-liquidaciones.md) — operacion de caja real: registrar cobros/pagos, asignar instrumentos, entender `amount` vs `amountClp`, transferencias internas y settlement legs.
+- [Conciliacion bancaria operativa](finance/conciliacion-bancaria-operacion.md) — crear periodos, importar cartolas, revisar candidatos, usar auto-match/AI suggestions, hacer match/unmatch/exclude y cerrar solo cuando el banco cuadra.
+- [Instrumentos de pago y Banco](finance/instrumentos-de-pago-y-banco.md) — administrar cuentas, tarjetas, fintechs, processors y cuentas internas; diferencia entre instrumento, processor y source account; manejo de datos sensibles y saldos materializados.
 - [Distribucion de costos para P&L operativo](finance/distribucion-costos-pnl.md) — como revisar, materializar y cerrar períodos sin inflar overhead de clientes con payroll, regulatorio, financiero o treasury transit.
 - [Sugerencias asistidas de conciliacion](finance/sugerencias-asistidas-conciliacion.md) — como generar, revisar, aceptar o descartar sugerencias AI sin alterar saldos automaticamente.
 - [Saldos bancarios FX drift](finance/saldos-bancarios-fx-drift-remediation.md) — como diagnosticar, auditar y remediar drift FX de saldos bancarios usando el control plane canonico sin SQL/backfills ad hoc.
