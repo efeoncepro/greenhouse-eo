@@ -12,6 +12,8 @@ import { ensureFinanceInfrastructure } from '@/lib/finance/schema'
 import { getFinanceProjectId, roundCurrency, runFinanceQuery, toNumber as toFinanceNumber } from '@/lib/finance/shared'
 import { ensureMemberCapacityEconomicsSchema, readLatestMemberCapacityEconomicsSnapshot } from '@/lib/member-capacity-economics/store'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
+import { pgGetMemberPayrollEntries } from '@/lib/payroll/postgres-store'
+import { buildReceiptPresentation, RECEIPT_REGIME_BADGES } from '@/lib/payroll/receipt-presenter'
 import { searchKnowledge } from '@/lib/knowledge/search/search-knowledge'
 import type { KnowledgeRetrievalPacket, KnowledgeSearchSubject } from '@/lib/knowledge/search'
 import { captureWithDomain } from '@/lib/observability/capture'
@@ -833,13 +835,94 @@ const searchKnowledgeTool: NexaToolDefinition = {
   }
 }
 
+// ── explain_my_pay (TASK-1146) ──────────────────────────────────────────────
+// Tool member-self: el colaborador pregunta por SU PROPIO pago. Anti-oracle: usa SIEMPRE
+// `context.tenant.memberId` de sesión, NUNCA un arg de identidad → un usuario jamás obtiene el
+// pago de otro. Reusa `pgGetMemberPayrollEntries` + `buildReceiptPresentation` (regime-aware,
+// SSOT, NUNCA recomputa). Acá el monto SÍ es la respuesta (es su propio pago, entitled — ya lo ve
+// en /my/payroll); el anti-oracle es la garantía. Distinto de `check_payroll` (operador, agregado).
+const explainMyPayTool: NexaToolDefinition = {
+  declaration: {
+    name: 'explain_my_pay',
+    description:
+      'Explica el PROPIO pago del colaborador en sesión: cuánto cobró (líquido) y por qué (haberes menos deducciones) de su liquidación más reciente. Regime-aware (Chile dependiente, honorarios, Deel/internacional). Úsalo cuando la persona pregunta por SU pago, sueldo, liquidación o descuentos. NO sirve para el pago de otra persona ni para el total de la nómina (eso es check_payroll, solo operadores).',
+    parametersJsonSchema: {
+      type: 'object',
+      additionalProperties: false,
+      properties: {}
+    }
+  },
+  // Disponible para cualquier colaborador con identidad de member (es su propia data).
+  isAvailable: tenant => Boolean(tenant.memberId),
+  async execute(args, context) {
+    void args
+
+    // Anti-oracle: SIEMPRE el memberId de sesión, NUNCA un id provisto por el modelo/cliente.
+    const memberId = context.tenant.memberId
+
+    if (!memberId) {
+      return buildToolUnavailableResult('explain_my_pay', 'Tu cuenta no está enlazada a un colaborador con nómina.')
+    }
+
+    const entries = await pgGetMemberPayrollEntries(memberId)
+    const entry = entries[0]
+
+    if (!entry) {
+      return buildToolUnavailableResult('explain_my_pay', 'Todavía no tienes una liquidación procesada que pueda explicarte.')
+    }
+
+    // Presentación canónica regime-aware (TASK-758) — NUNCA recomputa la nómina.
+    const presentation = buildReceiptPresentation(entry)
+    const regimeLabel = RECEIPT_REGIME_BADGES[presentation.regime]?.label ?? 'Nómina'
+    const liquido = presentation.hero.amount
+    const heroLabel = presentation.hero.label
+    const deductions = presentation.deductionSection?.totalAmount ?? null
+
+    const summary = [
+      `Tu ${heroLabel.toLowerCase()} fue ${liquido} (régimen: ${regimeLabel}).`,
+      `Bruto ${presentation.grossTotal}${deductions ? `, descuentos ${deductions}` : ''}.`,
+      presentation.hero.footnote ?? ''
+    ]
+      .filter(Boolean)
+      .join(' ')
+
+    const metrics: NexaToolResult['metrics'] = [
+      { label: heroLabel, value: liquido, tone: 'success' },
+      { label: 'Bruto', value: presentation.grossTotal },
+      ...(deductions ? [{ label: 'Descuentos', value: deductions } as const] : []),
+      { label: 'Régimen', value: regimeLabel }
+    ]
+
+    return {
+      available: true,
+      summary,
+      source: 'postgres',
+      scopeLabel: regimeLabel,
+      generatedAt: new Date().toISOString(),
+      metrics,
+      raw: {
+        regime: presentation.regime,
+        regimeLabel,
+        heroLabel,
+        liquido,
+        grossTotal: presentation.grossTotal,
+        deductionsTotal: deductions,
+        haberes: presentation.haberesRows.map(row => ({ label: row.label, amount: row.amount })),
+        deductions: presentation.deductionSection?.rows.map(row => ({ label: row.label, amount: row.amount })) ?? [],
+        footnote: presentation.hero.footnote ?? null
+      }
+    }
+  }
+}
+
 const NEXA_TOOLS: Record<NexaToolName, NexaToolDefinition> = {
   check_payroll: checkPayrollTool,
   get_otd: getOtdTool,
   check_emails: checkEmailsTool,
   get_capacity: getCapacityTool,
   pending_invoices: pendingInvoicesTool,
-  search_knowledge: searchKnowledgeTool
+  search_knowledge: searchKnowledgeTool,
+  explain_my_pay: explainMyPayTool
 }
 
 export const getNexaToolDeclarations = (tenant: NexaRuntimeContext): FunctionDeclaration[] =>

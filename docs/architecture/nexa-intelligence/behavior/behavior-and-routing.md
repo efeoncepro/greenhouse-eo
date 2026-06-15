@@ -22,8 +22,11 @@ prompt del usuario
 |---|---|
 | Proceso / política / guía / definición / "cómo se hace X" | `search_knowledge` ANTES de responder |
 | Dato operativo en vivo (su nómina, OTD, correos, capacidad, cuentas por cobrar) | tool operativo correspondiente; NUNCA desde Knowledge |
+| **"¿Cuánto cobré / por qué cobré eso?" (pago PROPIO del colaborador)** | **`explain_my_pay`** (TASK-1146) — líquido + desglose regime-aware del **propio** member (anti-oracle por `context.memberId`); NUNCA el pago de otro ni el agregado de la nómina (eso es `check_payroll`, operador) |
 | Conversación general / aclaración / siguiente paso | sin tool, responde directo |
 | Tool no disponible (permisos/datos) | lo dice con honestidad + ofrece el camino real |
+
+**Catálogo de tools operativos (member/operador):** `check_payroll` (operador, agregado del período), `explain_my_pay` (member-self, pago propio + por qué, TASK-1146), `get_otd`, `check_emails`, `get_capacity`, `pending_invoices`, `search_knowledge`. Cada uno gateado por `isAvailable`; `explain_my_pay` solo con `memberId` y reusa `buildReceiptPresentation` (regime-aware, NUNCA recomputa).
 
 ## Ruteo de provider (interno, NUNCA expuesto al usuario)
 

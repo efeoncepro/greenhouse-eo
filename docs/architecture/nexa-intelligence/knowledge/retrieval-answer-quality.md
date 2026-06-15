@@ -70,5 +70,6 @@ ON en local + Vercel **staging**; **producción gated por sign-off del operador*
 
 - ❌ NUNCA queryear el corpus directo; pasar por `searchKnowledge`.
 - ❌ NUNCA un LLM call sin retrieval para una respuesta de conocimiento.
+- ❌ NUNCA responder un **dato operativo en vivo** (nómina, pago propio, OTD, capacidad, cuentas) desde Knowledge — rutear a su **tool operativo**. El pago propio del colaborador ("cuánto cobré y por qué") → `explain_my_pay` (TASK-1146, member-self, regime-aware, anti-oracle por `context.memberId`), NUNCA `search_knowledge`.
 - ✅ El rerank reordena el set, no lo amplía; no muta `chunk.score`.
 - ✅ Corpus incorrecto → corregir el doc + re-ingestar, no parchear el prompt.
