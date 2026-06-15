@@ -1,5 +1,15 @@
 # Release 2026-06-10 #2 — develop→main `6c649b2a6` RELEASED
 
+## Sesión 2026-06-15 — TASK-1145 Nexa "Mi espacio": prompt "tu recibo de pago disponible" — Claude
+
+> **Estado:** code-complete en `develop` (local-first). Aditivo bajo el flag de TASK-1087 (`NEXA_SUGGESTED_PROMPTS_DATA_AWARE_ENABLED`, ya ON en local + staging). Cierra el follow-up de pago que TASK-1144 dejó stubbeado.
+
+- **Reader canónico nuevo** `pgMemberPayslipReadyForRecentPeriod(memberId)` en `src/lib/payroll/postgres-store.ts`: `EXISTS` de `payroll_entries` activo en período `status='exported'` cuyo (año, mes) cae en el mes operativo reciente (actual o anterior, `getOperationalPayrollMonth`). Read API thin: `{ ready }`, NUNCA el monto. **Validado contra PG real** (gate TASK-893): dummy→`ready:false`, member real con período exportado (`andres-carlosama`)→`ready:true`.
+- **Wire al resolver `personal`** (`data-aware-personal-resolver.ts`): 3ra fuente en el `Promise.allSettled` (degradación independiente); fact `payslipReady`; prompt **informativo sin `hint`**; orden atrasos > recibo > desempeño > aprobaciones > vacaciones.
+- **Copy regime-neutral** (`personal_payslip_ready`): "Tu recibo de pago más reciente ya está disponible" — "recibo", NUNCA "liquidación" (open question resuelta: el neutral cubre Chile dependiente + honorarios + Deel; el receipt destino ya es regime-aware, TASK-758).
+- **Gates:** tsc 0 · lint 0 · 14/14 focales · suite nexa+payroll **642 passed** · `pnpm nexa:doc-gate` verde. Doc de capa: Delta TASK-1145 en `experience/suggested-prompts.md`.
+- **Pendiente (rollout):** GVC del prompt en `/my` con un período exportado vivo (mismo gate que TASK-1087/1139).
+
 ## Sesion 2026-06-15 — Portal Cliente/Integraciones/Comunicaciones/AI Tooling/Admin Center docs end-to-end para Nexa Knowledge — Codex
 
 > **Estado:** documentacion creada, ingestion NO ejecutada por instruccion del operador. `TASK-1140` queda como vehiculo formal unico para ingestar manuales operativos multi-dominio a Knowledge/Nexa.

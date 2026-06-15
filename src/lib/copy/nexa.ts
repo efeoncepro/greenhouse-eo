@@ -455,7 +455,9 @@ export const GH_NEXA = {
       personal_intake_incomplete: 'Te falta completar tu ficha, ¿la terminamos?',
       personal_leave_pending: 'Tienes {count} solicitud(es) de vacaciones en curso, ¿las vemos?',
       personal_approvals_pending: 'Tienes {count} aprobación(es) de tu equipo esperando, ¿las revisamos?',
-      personal_payslip_ready: 'Tu liquidación del mes ya está lista, ¿la abrimos?',
+      // TASK-1145 — recibo de pago disponible. Regime-neutral ("recibo", NUNCA "liquidación":
+      // un colaborador Deel no recibe una liquidación chilena). NUNCA el monto en el texto.
+      personal_payslip_ready: 'Tu recibo de pago más reciente ya está disponible, ¿lo revisamos?',
       // TASK-1144 — performance / métricas ICO propias (tuteo). `{count}` interpolado; NUNCA un monto.
       personal_overdue_tasks: 'Tienes {count} entregable(s) atrasado(s), ¿los revisamos?',
       personal_performance_review: '¿Revisamos tu desempeño de este mes?',

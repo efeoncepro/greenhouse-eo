@@ -8,6 +8,7 @@ import { GH_NEXA } from '@/lib/copy/nexa'
 // Mocks de los readers canónicos para testear el resolver sin DB/BigQuery.
 const listLeaveMock = vi.fn()
 const readMemberMetricsMock = vi.fn()
+const payslipReadyMock = vi.fn()
 
 vi.mock('@/lib/hr-core/postgres-leave-store', () => ({
   listLeaveRequestsFromPostgres: (input: unknown) => listLeaveMock(input)
@@ -15,6 +16,10 @@ vi.mock('@/lib/hr-core/postgres-leave-store', () => ({
 
 vi.mock('@/lib/ico-engine/read-metrics', () => ({
   readMemberMetrics: (...args: unknown[]) => readMemberMetricsMock(...args)
+}))
+
+vi.mock('@/lib/payroll/postgres-store', () => ({
+  pgMemberPayslipReadyForRecentPeriod: (memberId: unknown) => payslipReadyMock(memberId)
 }))
 
 import { buildPersonalPrompts, resolvePersonalPrompts } from './data-aware-personal-resolver'
@@ -26,6 +31,7 @@ const facts = (overrides: Partial<Parameters<typeof buildPersonalPrompts>[0]> = 
   approvalsPending: 0,
   overdueTasks: 0,
   hasIcoActivity: false,
+  payslipReady: false,
   ...overrides
 })
 
@@ -60,9 +66,25 @@ describe('buildPersonalPrompts (TASK-1141/1144, mapper puro)', () => {
   })
 
   it('NUNCA echa montos crudos', () => {
-    const result = buildPersonalPrompts(facts({ overdueTasks: 1, approvalsPending: 1, ownPendingLeave: 1 }))
+    const result = buildPersonalPrompts(facts({ overdueTasks: 1, approvalsPending: 1, ownPendingLeave: 1, payslipReady: true }))
 
     for (const prompt of result) expect(prompt.text).not.toContain('$')
+  })
+
+  it('recibo de pago disponible → prompt informativo (sin hint), regime-neutral (NUNCA "liquidación")', () => {
+    const result = buildPersonalPrompts(facts({ payslipReady: true }))
+    const payslip = result.find(p => p.text === COPY.personal_payslip_ready)
+
+    expect(payslip).toBeDefined()
+    expect(payslip?.hint).toBeUndefined()
+    expect(payslip?.text.toLowerCase()).toContain('recibo')
+    expect(payslip?.text.toLowerCase()).not.toContain('liquidación')
+  })
+
+  it('recibo NO disponible → sin prompt de recibo', () => {
+    const result = buildPersonalPrompts(facts({ payslipReady: false, hasIcoActivity: true }))
+
+    expect(result.some(p => p.text === COPY.personal_payslip_ready)).toBe(false)
   })
 })
 
@@ -83,11 +105,13 @@ describe('resolvePersonalPrompts (TASK-1144, anti-oracle + degradación independ
       summary: { total: 1, pendingSupervisor: 0, pendingHr: 0, approved: 0 }
     })
     readMemberMetricsMock.mockReset().mockResolvedValue({ context: { overdueTasks: 2, totalTasks: 10 } })
+    payslipReadyMock.mockReset().mockResolvedValue({ ready: false })
   })
 
   afterEach(() => {
     listLeaveMock.mockReset()
     readMemberMetricsMock.mockReset()
+    payslipReadyMock.mockReset()
   })
 
   it('sin tenant/memberId → [] (degrada, no lee nada)', async () => {
@@ -119,5 +143,24 @@ describe('resolvePersonalPrompts (TASK-1144, anti-oracle + degradación independ
     await resolvePersonalPrompts(makeInput({ entityId: 'member-victim' }))
 
     expect(readMemberMetricsMock).toHaveBeenCalledWith('member-self', expect.any(Number), expect.any(Number))
+    expect(payslipReadyMock).toHaveBeenCalledWith('member-self')
+  })
+
+  it('recibo de pago listo → compone el prompt de recibo', async () => {
+    payslipReadyMock.mockResolvedValue({ ready: true })
+
+    const result = await resolvePersonalPrompts(makeInput())
+
+    expect(result.some(p => p.text === COPY.personal_payslip_ready)).toBe(true)
+  })
+
+  it('degradación independiente: si el reader de payroll falla, el resto sigue', async () => {
+    payslipReadyMock.mockRejectedValue(new Error('payroll down'))
+
+    const result = await resolvePersonalPrompts(makeInput())
+
+    // El payroll cayó → sin prompt de recibo, pero los atrasos del ICO siguen.
+    expect(result.some(p => p.text === COPY.personal_payslip_ready)).toBe(false)
+    expect(result.some(p => p.text.includes('atrasado'))).toBe(true)
   })
 })

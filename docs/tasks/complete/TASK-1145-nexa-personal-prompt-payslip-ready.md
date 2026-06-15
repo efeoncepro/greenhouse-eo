@@ -4,13 +4,13 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Bajo`
 - Type: `implementation`
 - Epic: `none`
-- Status real: `Diseño`
+- Status real: `complete`
 - Rank: `TBD`
 - Domain: `nexa|platform|ai|hr|payroll|ui`
 - Blocked by: `none` (TASK-1141 registry + resolver `personal` en `develop`)
@@ -93,13 +93,15 @@ Ninguna (read-only, sin migración).
 
 ## Acceptance Criteria
 
-- [ ] Con un período reciente **exportado** y entry activa del member, el prompt aparece; con período `approved`/`draft`/`reopened` o sin entry → no.
-- [ ] El prompt NUNCA muestra el `netTotal` (test allowlist) — el reader devuelve `{ready}` sin monto.
-- [ ] El reader usa el calendario operativo (mes actual/anterior), no `new Date()` naive.
-- [ ] Copy regime-neutral ("recibo de pago"), no "liquidación".
-- [ ] Anti-oracle: el reader se llama con el `subject.memberId` de sesión (test).
-- [ ] El reader fue **validado contra PG real** (smoke vía proxy) antes del wire.
-- [ ] `pnpm vitest run src/lib/payroll` verde (no-regresión) · `pnpm nexa:doc-gate` verde.
+- [x] Con un período reciente **exportado** y entry activa del member, el prompt aparece; con período `approved`/`draft`/`reopened` o sin entry → no. (query filtra `status='exported'` + recencia; test resolver).
+- [x] El prompt NUNCA muestra el `netTotal` (test allowlist) — el reader devuelve `{ready}` sin monto.
+- [x] El reader usa el calendario operativo (`getOperationalPayrollMonth`, mes actual/anterior), no `new Date()` naive para el mes.
+- [x] Copy regime-neutral ("recibo de pago"), no "liquidación" (test builder).
+- [x] Anti-oracle: el reader se llama con el `subject.memberId` de sesión (test `toHaveBeenCalledWith('member-self')`).
+- [x] El reader fue **validado contra PG real** (smoke vía proxy: dummy→`ready:false`, member real con período exportado→`ready:true`) antes del wire.
+- [x] `pnpm vitest run src/lib/payroll src/lib/nexa` verde (642 passed, no-regresión) · `pnpm nexa:doc-gate` verde.
+
+> **Decisión de copy (open question resuelta):** el neutral **"recibo de pago"** cubre Chile dependiente + honorarios + internacional en un solo string (el receipt destino ya es regime-aware, TASK-758). No se ramificó por régimen.
 
 ## Verification
 
