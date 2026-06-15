@@ -3,7 +3,7 @@
 > **Capa:** System prompt (contenido vigente). **Código:** [`src/lib/nexa/nexa-system-prompt.ts`](../../../../src/lib/nexa/nexa-system-prompt.ts) → `buildNexaSystemPromptV2`.
 > **Versionado:** [`01-system-prompt-versioning.md`](versioning.md).
 
-El prompt activo es **`nexa-system-prompt.v2.0`** (flag `NEXA_SYSTEM_PROMPT_V2_ENABLED`). Es
+El prompt activo es **`nexa-system-prompt.v2.1.0`** (flag `NEXA_SYSTEM_PROMPT_V2_ENABLED`). Es
 **modular**: un array de bloques que se compone por turno. La fecha runtime se inyecta
 determinista (`America/Santiago`). La política de Knowledge solo aparece con retrieval ON.
 
@@ -33,6 +33,12 @@ determinista (`America/Santiago`). La política de Knowledge solo aparece con re
 8. **`voiceContract`** — el contrato de voz Efeonce (detalle en [`04-voice-tone-style-personality.md`](../voice/voice-tone-style-personality.md)).
 9. **`placementPolicy`** — extensión/formato: panel Home/flotante conciso y escaneable, el largo
    justo (una pregunta de conocimiento puede necesitar más síntesis — no mutilarla); empezar por lo útil.
+10. **`answerFormatting`** (desde v2.1.0, clase `policy`) — política positiva de **estructura** de la
+    respuesta para que sea escaneable: párrafos cortos (una idea por bloque), viñetas (`-`) para
+    enumeraciones/pasos, **negrita** en el dato/concepto clave, emojis semánticos moderados (✓ ⚠ ✦),
+    el largo justo, y **sin headers** (`#`/`##`) en el panel. "Estructurar ≠ decorar": no contradice
+    `voiceContract` ("no decoras, no rellenas") ni la regla de Markdown crudo de `knowledgePolicy`
+    (que prohíbe **eco-pegar** Markdown de una fuente, no usar `**negrita**`/viñetas en la respuesta propia).
 
 Cierre: *"Recuerda: eres parte de Efeonce Group; Greenhouse materializa la operación real de sus
 proyectos. Estratégico, claro, con prueba."*
@@ -47,7 +53,9 @@ proyectos. Estratégico, claro, con prueba."*
 - El contenido vive en `buildNexaSystemPromptV2`. Para cambiarlo, seguí el checklist de
   [`01-system-prompt-versioning.md`](versioning.md) (clase de cambio + bump + changelog + tests).
 - Los snapshot tests (`nexa-system-prompt.test.ts`) asertan los anclajes de cada módulo (realidad de
-  plataforma, fecha, contrato de voz, política de knowledge, determinismo con `now` fijo).
+  plataforma, fecha, contrato de voz, política de knowledge, estructura/formato, determinismo con `now`
+  fijo) + un **golden snapshot** del prompt entero (`__snapshots__/`, TASK-1126): regeneralo con
+  `pnpm vitest run src/lib/nexa/nexa-system-prompt.test.ts -u` al cambiar el prompt.
 
 ## Nota V1 (rollback)
 

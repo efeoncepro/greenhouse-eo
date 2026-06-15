@@ -15,7 +15,7 @@ import { isNexaKnowledgeRetrievalEnabled, isNexaSystemPromptV2Enabled } from './
  */
 
 export const NEXA_SYSTEM_PROMPT_V1_VERSION = 'nexa-system-prompt.v1'
-export const NEXA_SYSTEM_PROMPT_V2_VERSION = 'nexa-system-prompt.v2.0'
+export const NEXA_SYSTEM_PROMPT_V2_VERSION = 'nexa-system-prompt.v2.1.0'
 export const NEXA_SYSTEM_PROMPT_FAMILY = 'home-chat'
 
 export interface NexaSystemPromptOptions {
@@ -184,6 +184,16 @@ export const buildNexaSystemPromptV2 = (context: HomeSnapshot, options?: NexaSys
     '- Evita prosa corporativa antes de la respuesta. Empieza por lo útil.'
   ]
 
+  const answerFormatting = [
+    'ESTRUCTURA DE LA RESPUESTA (estructurar ≠ decorar):',
+    '- Escaneable de un vistazo: párrafos cortos, una idea por bloque. Nunca un muro de texto corrido.',
+    '- Viñetas (-) para enumeraciones, pasos o listados; no encadenes todo en comas dentro de un párrafo.',
+    '- **Negrita** en el dato o concepto clave de cada bloque, para dirigir la mirada — lo importante, no todo.',
+    '- Emojis solo como marcador semántico ligero (✓ ⚠ ✦), raros, nunca el único significado (igual que el contrato de voz).',
+    '- El largo justo: un dato rápido es breve; una explicación puede tener 2-4 bloques. Ni muro ni relleno.',
+    '- No uses headers (#, ##) en tu respuesta: en este panel basta negrita + viñetas + párrafos cortos.'
+  ]
+
   return [
     ...identity,
     '',
@@ -201,6 +211,8 @@ export const buildNexaSystemPromptV2 = (context: HomeSnapshot, options?: NexaSys
     ...voiceContract,
     '',
     ...placementPolicy,
+    '',
+    ...answerFormatting,
     '',
     'Recuerda: eres parte de Efeonce Group; Greenhouse materializa la operación real de sus proyectos. Estratégico, claro, con prueba.'
   ].join('\n')
@@ -259,6 +271,15 @@ export const NEXA_PROMPT_GOVERNANCE: NexaPromptGovernance = {
   changelog: [
     {
       version: NEXA_SYSTEM_PROMPT_V2_VERSION,
+      date: '2026-06-15',
+      class: 'policy',
+      summary:
+        'Módulo answerFormatting: política positiva de estructura/formato de respuesta (párrafos cortos, viñetas en enumeraciones, negrita en el dato clave, emojis semánticos moderados, sin headers en el panel). Aditivo; no toca la regla de Markdown crudo de v2.0 ni el contrato de voz.'
+    },
+    {
+      // Congelada a literal al bumpear a v2.1.0 (freeze-on-bump): una entrada histórica del
+      // changelog no debe relabelarse cuando el const NEXA_SYSTEM_PROMPT_V2_VERSION avanza.
+      version: 'nexa-system-prompt.v2.0',
       date: '2026-06-14',
       class: 'structural',
       summary:

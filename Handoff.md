@@ -1,5 +1,15 @@
 # Release 2026-06-10 #2 — develop→main `6c649b2a6` RELEASED
 
+## Sesión 2026-06-15 — TASK-1138 Nexa Chat: política de estructura/formato (prompt V2 → v2.1.0) — Claude
+
+> **Estado:** code-complete en `develop` (local-first). **GVC del chat flotante = rollout-time** (Slice 3, pendiente: necesita dev server + Gemini vivo; output no-determinista). Aditivo bajo `NEXA_SYSTEM_PROMPT_V2_ENABLED` (ON local/staging, prod sigue V1). Task queda `in-progress` hasta el frame GVC mirado.
+
+- **Por qué:** el chat respondía en prosa corrida. El render Markdown del thread ya es capaz; el gap era que V2 pedía *conciso* sin pedir *estructura*. Fix = módulo de prompt nuevo, cero UI.
+- **Qué se hizo:** módulo `answerFormatting` en `buildNexaSystemPromptV2` (párrafos cortos + viñetas + negrita en el dato clave + emojis semánticos moderados + sin headers). Aditivo: no toca la regla de Markdown crudo de v2.0 ni el contrato de voz ("estructurar ≠ decorar").
+- **Primer pase real por el gate de TASK-1126** (la razón por la que el operador pidió esta task): bump `v2.0→v2.1.0` (clase `policy`) + **freeze-on-bump** del changelog (entrada v2.0 congelada a literal; la nueva v2.1.0 referencia el const) + golden regenerado. **Verificado live:** doc-gate `--changed` FALLÓ con el doc de capa sin actualizar, y PASÓ tras `current.md` + bump + changelog. El gate NO false-positivea sobre un bump legítimo.
+- **Gates:** lint 0 · tsc 0 · 15/15 focales (golden + anchor del módulo) · 111 nexa vitest · `pnpm nexa:doc-gate --changed` verde.
+- **Pendiente (rollout):** Slice 3 GVC — `pnpm fe:capture` del chat flotante con `NEXA_SYSTEM_PROMPT_V2_ENABLED=true` local, 2-3 preguntas, leer el frame → confirmar escaneable/enterprise. Follow-up: assert de estructura en la QA matrix live (ligado a TASK-1127; hoy es harness no-determinista contra `/api/home/nexa`).
+
 ## Sesión 2026-06-15 — TASK-1126 Nexa prompt governance hardening (golden snapshot + gate version/changelog) — Claude
 
 > **Estado:** completo en `develop` (local-first, sin push). DX/governance puro — sin migración / capability / outbox / UI / rollout runtime. Follow-up de TASK-1124.
