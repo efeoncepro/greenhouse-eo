@@ -4324,11 +4324,12 @@ El corpus de knowledge se mantiene al día **automáticamente** vía **webhook**
 
 ### Nexa Intelligence — documentación por capas + doc gate (TASK-1124, desde 2026-06-15)
 
-La inteligencia conversacional de Nexa está documentada por **capas de producto** en
-`docs/architecture/nexa-intelligence/` (índice `README.md`): `01` system-prompt versionado · `02`
-system-prompt vigente · `03` comportamiento+routing · `04` voz/tono/estilo/personalidad · `05`
-do's&don'ts · `06` evidencia+citas · `07` knowledge retrieval+calidad. Subcarpeta **`technical/`**:
-modelos LLM, pipeline RAG, técnicas, contratos de datos. Funcional (simple): `docs/documentation/plataforma/nexa-intelligence-capas.md`. Manual: `docs/manual-de-uso/plataforma/nexa-intelligence-mantener.md`.
+La inteligencia conversacional de Nexa está documentada por **capas de producto** (carpetas que
+crecen por dominio) en `docs/architecture/nexa-intelligence/` (índice `README.md`): `system-prompt/`
+(versionado + vigente) · `behavior/` (comportamiento + routing) · `voice/` (voz/tono/estilo/
+personalidad) · `knowledge/` (retrieval+calidad + evidencia/citas) · `experience/` (**Conversational
+Experience + Nexa Moments + Nexa Answers**) · `governance/` (do's&don'ts) · `technical/` (modelos LLM,
+pipeline RAG, técnicas, contratos de datos). Funcional (simple): `docs/documentation/plataforma/nexa-intelligence-capas.md`. Manual: `docs/manual-de-uso/plataforma/nexa-intelligence-mantener.md`.
 
 - **SSOT machine-readable** del mapeo dominio↔código↔docs: `docs/architecture/nexa-intelligence/manifest.json`.
 - **Gate canónico** `pnpm nexa:doc-gate` (`scripts/ci/nexa-intelligence-doc-gate.mjs`, en `ci.yml` modo `--changed`): si cambia código de un dominio Nexa pero **no** se actualizó ninguno de sus docs de capa → falla; un archivo Nexa nuevo fuera de `domains`/`codeAllowlist` → falla (dominio sin capa).

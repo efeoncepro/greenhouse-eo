@@ -21,28 +21,42 @@ NO reemplaza:
 
 Es la **vista por capas** que organiza esos contratos en planos de producto navegables.
 
-## Las capas
+## Las capas (organizadas en carpetas — crecen por dominio)
 
-| # | Capa | Qué gobierna | Doc |
-|---|---|---|---|
-| 01 | **System prompt — versionado** | Cómo se versiona el prompt, clases de cambio, triggers, rollback, changelog | [`01-system-prompt-versioning.md`](01-system-prompt-versioning.md) |
-| 02 | **System prompt — vigente** | Qué tiene HOY el prompt V2 (módulos, contenido, qué entra cuándo) | [`02-system-prompt-today.md`](02-system-prompt-today.md) |
-| 03 | **Comportamiento + routing** | Qué hace Nexa por turno: intención → provider, retrieval, response modes, gaps honestos | [`03-behavior-and-routing.md`](03-behavior-and-routing.md) |
-| 04 | **Voz, tono, estilo y personalidad** | Cómo suena Nexa (contrato de voz Efeonce) | [`04-voice-tone-style-personality.md`](04-voice-tone-style-personality.md) |
-| 05 | **Do's & Don'ts** | Las reglas duras consolidadas (qué SIEMPRE / qué NUNCA) | [`05-dos-and-donts.md`](05-dos-and-donts.md) |
-| 06 | **Evidencia + citas** | Cómo se respaldan las respuestas: `[n]` inline, panel de fuentes, hygiene del excerpt | [`06-evidence-and-citations.md`](06-evidence-and-citations.md) |
-| 07 | **Knowledge retrieval + calidad de respuesta** | Cómo se recupera del corpus y se sintetiza: SSOT de búsqueda, brief, rerank, QA matrix | [`07-knowledge-retrieval-answer-quality.md`](07-knowledge-retrieval-answer-quality.md) |
+### [`system-prompt/`](system-prompt/README.md) — el prompt como artefacto versionado
 
-## Documentación técnica ([`technical/`](technical/README.md))
+- [`versioning.md`](system-prompt/versioning.md) — versionado, clases de cambio, triggers, rollback, changelog.
+- [`current.md`](system-prompt/current.md) — qué tiene HOY el prompt V2.
 
-Cómo está **construida** la inteligencia (no qué decide):
+### [`behavior/`](behavior/README.md) — qué hace por turno
 
-| Doc | Cubre |
-|---|---|
-| [`technical/llm-models.md`](technical/llm-models.md) | Modelos LLM (Gemini, Claude), provider abstraction, model IDs, routing, failover, secrets |
-| [`technical/rag-pipeline.md`](technical/rag-pipeline.md) | RAG end-to-end: ingesta → FTS → rerank → brief → grounding → síntesis → citas |
-| [`technical/techniques.md`](technical/techniques.md) | Técnicas: 2-pass tool loop, reranking, synthesis brief, dedupe, gaps honestos, reveal |
-| [`technical/data-contracts.md`](technical/data-contracts.md) | Contratos versionados: `knowledge-search.v1`, `nexa-evidence.v1`, render plan, governance del prompt |
+- [`behavior-and-routing.md`](behavior/behavior-and-routing.md) — ruteo de tools + provider, response modes, gaps honestos.
+
+### [`voice/`](voice/README.md) — cómo suena
+
+- [`voice-tone-style-personality.md`](voice/voice-tone-style-personality.md) — contrato de voz Efeonce.
+
+### [`knowledge/`](knowledge/README.md) — recuperar + sintetizar + respaldar
+
+- [`retrieval-answer-quality.md`](knowledge/retrieval-answer-quality.md) — search SSOT, brief, rerank, QA matrix.
+- [`evidence-and-citations.md`](knowledge/evidence-and-citations.md) — `[n]` inline, panel de fuentes, excerpt hygiene.
+
+### [`experience/`](experience/README.md) — cómo se vive en pantalla
+
+- [`conversational-experience.md`](experience/conversational-experience.md) — el shell + coreografía + `surfaceContext`.
+- [`nexa-moments.md`](experience/nexa-moments.md) — la unidad de producto: context + evidence + permission + intent + next step.
+- [`nexa-answers.md`](experience/nexa-answers.md) — la respuesta que se arma (canvas, síntesis citada, render plan).
+
+### [`governance/`](governance/README.md) — reglas + evolución segura
+
+- [`dos-and-donts.md`](governance/dos-and-donts.md) — las reglas duras consolidadas.
+
+### [`technical/`](technical/README.md) — cómo está construida (no qué decide)
+
+- [`llm-models.md`](technical/llm-models.md) — modelos LLM (Gemini, Claude), provider abstraction, routing, failover, secrets.
+- [`rag-pipeline.md`](technical/rag-pipeline.md) — RAG end-to-end: ingesta → FTS → rerank → brief → grounding → síntesis → citas.
+- [`techniques.md`](technical/techniques.md) — 2-pass tool loop, reranking, synthesis brief, dedupe, gaps honestos, reveal.
+- [`data-contracts.md`](technical/data-contracts.md) — contratos versionados (`knowledge-search.v1`, `nexa-evidence.v1`, render plan).
 
 ## Cómo se mantiene (el gate)
 

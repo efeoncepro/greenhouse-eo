@@ -58,7 +58,7 @@ Nexa hace **RAG** sobre el corpus gobernado de Greenhouse Knowledge: recupera ev
 Sobre el top-N de FTS (no amplía el pool): rank FTS (dominante) × (1 + heading match boost +
 freshness adj) × diversity decay por documento. Determinista, no muta `chunk.score`. Anti
 wrong-source: un heading específico que matchea la pregunta gana a un heading genérico que matcheó
-por ruido del cuerpo. Detalle: [`../07-knowledge-retrieval-answer-quality.md`](../07-knowledge-retrieval-answer-quality.md).
+por ruido del cuerpo. Detalle: [`../07-knowledge-retrieval-answer-quality.md`](../knowledge/retrieval-answer-quality.md).
 
 ## Calidad / evaluación
 

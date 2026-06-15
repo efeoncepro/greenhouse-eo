@@ -5,7 +5,7 @@
 
 ## System prompt
 
-- ✅ Editar el prompt SOLO en [`nexa-system-prompt.ts`](../../../src/lib/nexa/nexa-system-prompt.ts), como módulos versionados.
+- ✅ Editar el prompt SOLO en [`nexa-system-prompt.ts`](../../../../src/lib/nexa/nexa-system-prompt.ts), como módulos versionados.
 - ✅ Toda edición: clase de cambio + bump de versión + entrada de changelog (`NEXA_PROMPT_GOVERNANCE`) + tests.
 - ❌ NUNCA prompt inline en `nexa-service.ts`.
 - ❌ NUNCA modificar V1 (es el rollback byte-equivalente).
@@ -56,5 +56,5 @@
 ## Documentación (este folder)
 
 - ✅ Al tocar un dominio Nexa, actualizar su(s) doc(s) de capa en el mismo cambio (gate `pnpm nexa:doc-gate`).
-- ✅ Dominio Nexa nuevo → agregarlo al [`manifest.json`](manifest.json) + crear/asignar su capa.
+- ✅ Dominio Nexa nuevo → agregarlo al [`manifest.json`](../manifest.json) + crear/asignar su capa.
 - ❌ NUNCA mergear "toqué Nexa pero no documenté" (el gate lo bloquea).

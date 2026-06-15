@@ -1,7 +1,7 @@
 # 06 — Evidencia + Citas
 
 > **Capa:** evidencia + citas (panel de fuentes, `[n]` inline, hygiene del excerpt).
-> **Código:** [`conversational-evidence.ts`](../../../src/lib/nexa/conversational-evidence.ts), [`nexa-answers-citation-mapper.ts`](../../../src/lib/nexa/nexa-answers-citation-mapper.ts), [`strip-markdown-excerpt.ts`](../../../src/lib/nexa/strip-markdown-excerpt.ts), `NexaEvidencePanel` / `NexaProvenanceTrace`.
+> **Código:** [`conversational-evidence.ts`](../../../../src/lib/nexa/conversational-evidence.ts), [`nexa-answers-citation-mapper.ts`](../../../../src/lib/nexa/nexa-answers-citation-mapper.ts), [`strip-markdown-excerpt.ts`](../../../../src/lib/nexa/strip-markdown-excerpt.ts), `NexaEvidencePanel` / `NexaProvenanceTrace`.
 
 ## Principio: la interfaz es dueña de la evidencia
 
@@ -40,7 +40,7 @@ un estado de confianza falso cuando la verdad es "no sé" — usar gap honesto /
 ## Contratos versionados
 
 - Evidencia: `nexa-evidence.v1` (`ConversationalEvidencePacket`).
-- Retrieval: `knowledge-search.v1` (el packet que alimenta la evidencia). Ver [`07`](07-knowledge-retrieval-answer-quality.md).
+- Retrieval: `knowledge-search.v1` (el packet que alimenta la evidencia). Ver [`07`](retrieval-answer-quality.md).
 
 ## Reglas duras
 

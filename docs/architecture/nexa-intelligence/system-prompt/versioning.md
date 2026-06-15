@@ -1,7 +1,7 @@
 # 01 — System Prompt: Versionado y Governance
 
-> **Capa:** System prompt (versionado). **Código:** [`src/lib/nexa/nexa-system-prompt.ts`](../../../src/lib/nexa/nexa-system-prompt.ts).
-> **Governance canónica:** [`GREENHOUSE_NEXA_SYSTEM_PROMPT_GOVERNANCE_V1.md`](../GREENHOUSE_NEXA_SYSTEM_PROMPT_GOVERNANCE_V1.md).
+> **Capa:** System prompt (versionado). **Código:** [`src/lib/nexa/nexa-system-prompt.ts`](../../../../src/lib/nexa/nexa-system-prompt.ts).
+> **Governance canónica:** [`GREENHOUSE_NEXA_SYSTEM_PROMPT_GOVERNANCE_V1.md`](../../GREENHOUSE_NEXA_SYSTEM_PROMPT_GOVERNANCE_V1.md).
 
 ## Principio
 
@@ -48,7 +48,7 @@ Metadata machine-readable: `NEXA_PROMPT_GOVERNANCE` (en el mismo módulo) con `c
 3. Agregá la entrada al `changelog` de `NEXA_PROMPT_GOVERNANCE` (más reciente primero).
 4. Corré los snapshot tests (`nexa-system-prompt.test.ts`) + (para `voice`/`policy`) la QA matrix
    (`pnpm qa:nexa-knowledge`).
-5. Actualizá [`02-system-prompt-today.md`](02-system-prompt-today.md) si cambió el contenido vigente.
+5. Actualizá [`02-system-prompt-today.md`](current.md) si cambió el contenido vigente.
 6. El gate `pnpm nexa:doc-gate` exige que estos docs cambien cuando cambia el módulo.
 
 ## Reglas duras

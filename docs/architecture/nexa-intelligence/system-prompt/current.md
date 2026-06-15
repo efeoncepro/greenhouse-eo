@@ -1,7 +1,7 @@
 # 02 — System Prompt: Qué tiene HOY (V2)
 
-> **Capa:** System prompt (contenido vigente). **Código:** [`src/lib/nexa/nexa-system-prompt.ts`](../../../src/lib/nexa/nexa-system-prompt.ts) → `buildNexaSystemPromptV2`.
-> **Versionado:** [`01-system-prompt-versioning.md`](01-system-prompt-versioning.md).
+> **Capa:** System prompt (contenido vigente). **Código:** [`src/lib/nexa/nexa-system-prompt.ts`](../../../../src/lib/nexa/nexa-system-prompt.ts) → `buildNexaSystemPromptV2`.
+> **Versionado:** [`01-system-prompt-versioning.md`](versioning.md).
 
 El prompt activo es **`nexa-system-prompt.v2.0`** (flag `NEXA_SYSTEM_PROMPT_V2_ENABLED`). Es
 **modular**: un array de bloques que se compone por turno. La fecha runtime se inyecta
@@ -30,7 +30,7 @@ determinista (`America/Santiago`). La política de Knowledge solo aparece con re
    consultó, decirlo; no inventar métricas/montos/estados.
 7. **`responseModes`** — elige el modo por intención: `definición` · `cómo-hacer` · `política` ·
    `troubleshooting` · `comparación` · `operativo en vivo` · `sin-respuesta`.
-8. **`voiceContract`** — el contrato de voz Efeonce (detalle en [`04-voice-tone-style-personality.md`](04-voice-tone-style-personality.md)).
+8. **`voiceContract`** — el contrato de voz Efeonce (detalle en [`04-voice-tone-style-personality.md`](../voice/voice-tone-style-personality.md)).
 9. **`placementPolicy`** — extensión/formato: panel Home/flotante conciso y escaneable, el largo
    justo (una pregunta de conocimiento puede necesitar más síntesis — no mutilarla); empezar por lo útil.
 
@@ -45,7 +45,7 @@ proyectos. Estratégico, claro, con prueba."*
 ## Cómo verlo / cambiarlo
 
 - El contenido vive en `buildNexaSystemPromptV2`. Para cambiarlo, seguí el checklist de
-  [`01-system-prompt-versioning.md`](01-system-prompt-versioning.md) (clase de cambio + bump + changelog + tests).
+  [`01-system-prompt-versioning.md`](versioning.md) (clase de cambio + bump + changelog + tests).
 - Los snapshot tests (`nexa-system-prompt.test.ts`) asertan los anclajes de cada módulo (realidad de
   plataforma, fecha, contrato de voz, política de knowledge, determinismo con `now` fijo).
 

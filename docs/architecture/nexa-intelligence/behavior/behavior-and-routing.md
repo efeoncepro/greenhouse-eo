@@ -1,7 +1,7 @@
 # 03 — Comportamiento + Routing
 
-> **Capa:** Comportamiento + routing de provider. **Código:** [`nexa-service.ts`](../../../src/lib/nexa/nexa-service.ts), [`nexa-model-router.ts`](../../../src/lib/nexa/nexa-model-router.ts), [`nexa-provider.ts`](../../../src/lib/nexa/nexa-provider.ts), [`providers/`](../../../src/lib/nexa/providers/).
-> **Detalle técnico de modelos:** [`technical/llm-models.md`](technical/llm-models.md).
+> **Capa:** Comportamiento + routing de provider. **Código:** [`nexa-service.ts`](../../../../src/lib/nexa/nexa-service.ts), [`nexa-model-router.ts`](../../../../src/lib/nexa/nexa-model-router.ts), [`nexa-provider.ts`](../../../../src/lib/nexa/nexa-provider.ts), [`providers/`](../../../../src/lib/nexa/providers).
+> **Detalle técnico de modelos:** [`technical/llm-models.md`](../technical/llm-models.md).
 
 ## Qué hace Nexa por turno
 
@@ -58,6 +58,6 @@ router-internal. Observabilidad: `NexaResponse.modelId` (persistido; provider de
 
 - **NUNCA** exponer la selección de modelo al usuario.
 - **NUNCA** instanciar un SDK LLM dentro de un dominio: Gemini vía `getGoogleGenAIClient`, Anthropic
-  vía `getAnthropicClient` (`src/lib/ai/*`). Detalle: [`technical/llm-models.md`](technical/llm-models.md).
+  vía `getAnthropicClient` (`src/lib/ai/*`). Detalle: [`technical/llm-models.md`](../technical/llm-models.md).
 - **NUNCA** responder un dato operativo en vivo desde Knowledge.
 - **NUNCA** acoplar el tool/Answer Rules a un SDK: el swap de provider NO debe tocar `search_knowledge`.

@@ -1,5 +1,16 @@
 # Release 2026-06-10 #2 — develop→main `6c649b2a6` RELEASED
 
+## Sesión 2026-06-15 — Nexa Intelligence: documentación por capas + doc gate (TASK-1124 follow-up) — Claude
+
+> **Estado:** shipped en `develop`. Documentación + gate, sin tocar runtime de Nexa.
+
+- **Carpeta `docs/architecture/nexa-intelligence/`** organizada en **carpetas por dominio** (crecen): `system-prompt/` · `behavior/` · `voice/` · `knowledge/` · **`experience/`** (Conversational Experience + Nexa Moments + Nexa Answers) · `governance/` · `technical/` (modelos LLM, RAG, técnicas, contratos). Índice `README.md` + `manifest.json` (SSOT dominio↔código↔docs, v2).
+- **Gate `pnpm nexa:doc-gate`** (`scripts/ci/nexa-intelligence-doc-gate.mjs`, en `ci.yml` `--changed`): tocar un dominio Nexa sin actualizar su doc de capa → falla; archivo Nexa nuevo sin registrar → falla. Audit: 9 dominios, 22 docs, 23 archivos Nexa cubiertos, 0 links rotos.
+- **Funcional + manual**: `docs/documentation/plataforma/nexa-intelligence-capas.md` + `docs/manual-de-uso/plataforma/nexa-intelligence-mantener.md`. Refs en CLAUDE.md + AGENTS.md.
+- **Corpus RpA (TASK-1124 follow-up)**: "Revisions per Asset" → "Rounds per Asset" en `motor-ico-metricas-operativas.md` + re-ingesta aplicada a `greenhouse-pg-dev` (local + **staging** ✓, chunk `published` verificado). **Prod**: `TASK-1125` (resolver si comparte la misma Cloud SQL).
+- **Tasks de follow-up creadas**: `TASK-1125` (corpus prod), `TASK-1126` (prompt governance hardening: golden snapshot + version/changelog gate), `TASK-1127` (QA nightly + eval wrong-source/cross-doc), `TASK-1128` (signal de drift de términos canónicos del corpus), `TASK-1129` (telemetría promptVersion por turno).
+- **Commits previos de TASK-1124**: `c709dfaaf` (8 slices), `9fb089002` (excerpt hygiene), `b9e119045` (RpA fix), `d532329b9` (docs por capas), `ab602ec3f` (TASK-1125).
+
 ## Sesión 2026-06-15 — TASK-1106 Account 360 delivery serving contract hardening — Claude
 
 > **Estado:** CODE-COMPLETE en `develop` (3 commits local, SIN push). Cierra la causa raíz de `ISSUE-087` / Sentry `JAVASCRIPT-NEXTJS-7H`. **ISSUE-087 sigue abierto** (gated por quiet period de Sentry per Acceptance Criteria) → la task se mantiene `in-progress`.

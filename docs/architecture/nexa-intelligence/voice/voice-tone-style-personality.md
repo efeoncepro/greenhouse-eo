@@ -1,7 +1,7 @@
 # 04 — Voz, Tono, Estilo y Personalidad
 
-> **Capa:** Voz, tono, estilo, personalidad. **Fuente de marca:** [`docs/context/05_voz-tono-estilo.md`](../../context/05_voz-tono-estilo.md).
-> **Encodado en:** el módulo `voiceContract` de [`nexa-system-prompt.ts`](../../../src/lib/nexa/nexa-system-prompt.ts) (V2).
+> **Capa:** Voz, tono, estilo, personalidad. **Fuente de marca:** [`docs/context/05_voz-tono-estilo.md`](../../../context/05_voz-tono-estilo.md).
+> **Encodado en:** el módulo `voiceContract` de [`nexa-system-prompt.ts`](../../../../src/lib/nexa/nexa-system-prompt.ts) (V2).
 
 ## Quién es Nexa (personalidad)
 
@@ -49,7 +49,7 @@ raros, nunca el único significado, nunca reemplazan un estado/etiqueta. Nada de
 ## Cómo cambiar la voz
 
 Un cambio de voz/tono/emoji es **clase de cambio `voice`** → bump MINOR del prompt + assert de voz
-en la QA matrix (`pnpm qa:nexa-knowledge` asserta 🍏 + voseo). Ver [`01-system-prompt-versioning.md`](01-system-prompt-versioning.md).
+en la QA matrix (`pnpm qa:nexa-knowledge` asserta 🍏 + voseo). Ver [`01-system-prompt-versioning.md`](../system-prompt/versioning.md).
 Si cambia la **fuente de marca** (`05_voz-tono-estilo.md`), reflejarlo acá + en el módulo `voiceContract`.
 
 ## Reglas duras

@@ -1,7 +1,7 @@
 # 07 — Knowledge Retrieval + Calidad de Respuesta
 
-> **Capa:** retrieval del corpus + calidad de respuesta. **Código:** [`nexa-tools.ts`](../../../src/lib/nexa/nexa-tools.ts), [`search-knowledge.ts`](../../../src/lib/knowledge/search/search-knowledge.ts), [`rerank-knowledge-chunks.ts`](../../../src/lib/knowledge/search/rerank-knowledge-chunks.ts), [`scripts/nexa-knowledge-qa-matrix.mjs`](../../../scripts/nexa-knowledge-qa-matrix.mjs).
-> **Detalle técnico del RAG:** [`technical/rag-pipeline.md`](technical/rag-pipeline.md).
+> **Capa:** retrieval del corpus + calidad de respuesta. **Código:** [`nexa-tools.ts`](../../../../src/lib/nexa/nexa-tools.ts), [`search-knowledge.ts`](../../../../src/lib/knowledge/search/search-knowledge.ts), [`rerank-knowledge-chunks.ts`](../../../../src/lib/knowledge/search/rerank-knowledge-chunks.ts), [`scripts/nexa-knowledge-qa-matrix.mjs`](../../../../scripts/nexa-knowledge-qa-matrix.mjs).
+> **Detalle técnico del RAG:** [`technical/rag-pipeline.md`](../technical/rag-pipeline.md).
 
 ## De "pegar un fragmento" a "respuesta sintetizada"
 
@@ -34,7 +34,7 @@ freshness + **diversidad por documento**. Determinista; NO muta `chunk.score`.
 ### 4. Hygiene de evidencia
 
 Se removió el post-procesador que anexaba "Fuentes: [n]=…"; el grounding del tool ya no pide "cierra
-con Fuentes:"; se sanean los `##` crudos. (Detalle en [`06-evidence-and-citations.md`](06-evidence-and-citations.md).)
+con Fuentes:"; se sanean los `##` crudos. (Detalle en [`06-evidence-and-citations.md`](evidence-and-citations.md).)
 
 ## QA de calidad de respuesta
 

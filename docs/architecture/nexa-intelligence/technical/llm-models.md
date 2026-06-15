@@ -1,6 +1,6 @@
 # Técnico — Modelos LLM, provider abstraction y routing
 
-> **Código:** [`src/config/nexa-models.ts`](../../../../src/config/nexa-models.ts), [`nexa-provider.ts`](../../../../src/lib/nexa/nexa-provider.ts), [`providers/`](../../../../src/lib/nexa/providers/), [`nexa-model-router.ts`](../../../../src/lib/nexa/nexa-model-router.ts), [`src/lib/ai/`](../../../../src/lib/ai/).
+> **Código:** [`src/config/nexa-models.ts`](../../../../src/config/nexa-models.ts), [`nexa-provider.ts`](../../../../src/lib/nexa/nexa-provider.ts), [`providers/`](../../../../src/lib/nexa/providers), [`nexa-model-router.ts`](../../../../src/lib/nexa/nexa-model-router.ts), [`src/lib/ai/`](../../../../src/lib/ai).
 
 ## Modelos en uso
 
@@ -34,7 +34,7 @@ Answer Rules son **provider-agnósticos** — el swap de provider NO los toca.
 `operational` | `general`) → `routeNexaProviderKey`: **Claude** solo cuando intent=`knowledge` AND
 `NEXA_KNOWLEDGE_RETRIEVAL_ENABLED`; resto → **Gemini**. `nexaProviderFailoverChain` define primario +
 respaldo (si el primario falla, failover al otro). Precedencia completa: modelo pedido > pin
-`NEXA_PROVIDER` > auto-router > default Gemini. Detalle de comportamiento: [`../03-behavior-and-routing.md`](../03-behavior-and-routing.md).
+`NEXA_PROVIDER` > auto-router > default Gemini. Detalle de comportamiento: [`../03-behavior-and-routing.md`](../behavior/behavior-and-routing.md).
 
 ## Caveats técnicos (no regresionar)
 
