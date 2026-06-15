@@ -9,6 +9,7 @@ import {
 import type { OrganizationWorkspaceCompactSignals } from '@/lib/organization-workspace/compact-signals-types'
 import type { EntrypointContext } from '@/lib/organization-workspace/projection-types'
 import type { TenantEntitlementSubject } from '@/lib/entitlements/types'
+import type { TenantContext } from '@/lib/tenant/get-tenant-context'
 
 import {
   NEXA_SUGGESTED_PROMPTS_CONTRACT_VERSION,
@@ -16,7 +17,8 @@ import {
   type NexaSuggestedPromptHint,
   type NexaSuggestedPromptsPayload
 } from './suggested-prompts-contract'
-import type { NexaPromptContextKey } from './suggested-prompts'
+import { resolvePersonalPrompts } from './data-aware-personal-resolver'
+import type { NexaPageEntityKind, NexaPromptContextKey } from './suggested-prompts'
 
 // TASK-1087 — Composer SERVER-ONLY de prompts sugeridos DATA-AWARE (Tier 2). Reusa el reader
 // canónico `readOrganizationWorkspaceCompactSignalsSafely` (ya compuesto, degradación-honesta,
@@ -32,9 +34,20 @@ export interface ResolveDataAwareSuggestedPromptsInput {
   subject: TenantEntitlementSubject
   context: NexaPromptContextKey
   entityId?: string | null
+  entityKind?: NexaPageEntityKind | null
   entityName?: string | null
   entrypointContext?: EntrypointContext
+  /** TenantContext completo (TASK-1141) — el resolver `personal` lo usa para leer pendientes del
+   *  propio colaborador (reusa readers que requieren tenant). Los demás resolvers lo ignoran. */
+  tenant?: TenantContext | null
 }
+
+/**
+ * Resolver de dominio (TASK-1141): dado el input, devuelve los prompts data-aware de su contexto
+ * (vacío = caer a `template_fallback`). Puede lanzar — el orquestador captura + degrada. El registry
+ * `DATA_AWARE_RESOLVERS` mapea `context → resolver`; agregar una superficie = agregar un resolver.
+ */
+export type DataAwareResolver = (input: ResolveDataAwareSuggestedPromptsInput) => Promise<NexaSuggestedPrompt[]>
 
 const DATA_AWARE_COPY = GH_NEXA.floating.data_aware_prompts
 const GENERIC_ENTITY = 'este cliente'
@@ -50,8 +63,9 @@ const DATA_AWARE_CACHE_TTL_MS = 30_000
 
 const dataAwareCache = new Map<string, { payload: NexaSuggestedPromptsPayload; expiresAt: number }>()
 
-const buildCacheKey = (subjectUserId: string, context: NexaPromptContextKey, entityId: string, entrypoint: EntrypointContext): string =>
-  `${subjectUserId}:${context}:${entityId}:${entrypoint}`
+const buildCacheKey = (input: ResolveDataAwareSuggestedPromptsInput): string =>
+  // subject.userId ancla el anti-oracle (un usuario nunca pega el cache de otro).
+  `${input.subject.userId}:${input.context}:${input.entityKind ?? '-'}:${input.entityId ?? '-'}:${input.entrypointContext ?? 'agency'}`
 
 /** Test helper — limpia el cache in-memory del composer. */
 export const __clearDataAwareSuggestedPromptsCache = (): void => dataAwareCache.clear()
@@ -137,11 +151,44 @@ export const buildDataAwarePromptsFromCompactSignals = (
 }
 
 /**
- * Orquestador SERVER-ONLY: resuelve los prompts data-aware para una entidad. V1 solo el contexto
- * `client` (org workspace) es genuinamente data-aware — el resto cae a `template_fallback` (Tier
- * 1/1.5) hasta que su página declare un `entityId` + se wiree su reader. Degradación honesta:
- * sin entityId / sin señal / reader degradado / NotFound → `template_fallback` (NUNCA rompe, NUNCA
- * inventa, NUNCA revela existencia de algo que el subject no puede ver).
+ * Resolver del contexto `client` (org workspace) — la lógica original de TASK-1087/1139, extraída
+ * sin cambio de comportamiento. Reusa `readOrganizationWorkspaceCompactSignalsSafely` (degradación-
+ * honesta, subject-gated/anti-oracle) + el mapper puro. NotFound (el subject no ve la org) → [].
+ */
+const resolveClientPrompts: DataAwareResolver = async input => {
+  if (!input.entityId) return []
+
+  try {
+    const signals = await readOrganizationWorkspaceCompactSignalsSafely({
+      subject: input.subject,
+      organizationId: input.entityId,
+      entrypointContext: input.entrypointContext ?? 'agency',
+      limits: { recentSignals: 8, nextActions: 6 }
+    })
+
+    return buildDataAwarePromptsFromCompactSignals(signals, input.entityName, input.entityId)
+  } catch (error) {
+    // NotFound = el subject no ve esa entidad → fallback honesto (no revela existencia, anti-oracle).
+    if (error instanceof OrganizationWorkspaceCompactSignalsNotFoundError) return []
+
+    throw error
+  }
+}
+
+/**
+ * Registry canónico `context → resolver` (TASK-1141). Agregar una superficie data-aware = agregar
+ * un resolver acá. Un contexto sin resolver cae a `template_fallback` (Tier 1/1.5). El resolver
+ * `personal` (Mi espacio) vive en su propio módulo server-only.
+ */
+const DATA_AWARE_RESOLVERS: Partial<Record<NexaPromptContextKey, DataAwareResolver>> = {
+  client: resolveClientPrompts,
+  personal: resolvePersonalPrompts
+}
+
+/**
+ * Orquestador SERVER-ONLY: despacha al resolver del contexto, cachea el resultado `data_aware`
+ * (TTL 30s) y degrada honesto a `template_fallback` (sin resolver / sin señal / reader degradado /
+ * error → Tier 1/1.5). NUNCA rompe, NUNCA inventa, NUNCA revela algo que el subject no puede ver.
  */
 export const resolveDataAwareSuggestedPrompts = async (
   input: ResolveDataAwareSuggestedPromptsInput
@@ -154,25 +201,17 @@ export const resolveDataAwareSuggestedPrompts = async (
     source: 'template_fallback'
   })
 
-  // V1: solo `client` con un entityId resuelve señales reales.
-  if (input.context !== 'client' || !input.entityId) return templateFallback()
+  const resolver = DATA_AWARE_RESOLVERS[input.context]
 
-  const entrypoint = input.entrypointContext ?? 'agency'
-  const cacheKey = buildCacheKey(input.subject.userId, input.context, input.entityId, entrypoint)
+  if (!resolver) return templateFallback()
 
+  const cacheKey = buildCacheKey(input)
   const cached = dataAwareCache.get(cacheKey)
 
   if (cached && cached.expiresAt > Date.now()) return cached.payload
 
   try {
-    const signals = await readOrganizationWorkspaceCompactSignalsSafely({
-      subject: input.subject,
-      organizationId: input.entityId,
-      entrypointContext: entrypoint,
-      limits: { recentSignals: 8, nextActions: 6 }
-    })
-
-    const prompts = buildDataAwarePromptsFromCompactSignals(signals, input.entityName, input.entityId)
+    const prompts = await resolver(input)
 
     if (prompts.length === 0) return templateFallback()
 
@@ -189,12 +228,9 @@ export const resolveDataAwareSuggestedPrompts = async (
 
     return payload
   } catch (error) {
-    // NotFound = el subject no ve esa entidad → fallback honesto (no revela existencia, anti-oracle).
-    if (error instanceof OrganizationWorkspaceCompactSignalsNotFoundError) return templateFallback()
-
     captureWithDomain(error, 'agency', {
       tags: { source: 'nexa_suggested_prompts_data_aware' },
-      extra: { context: input.context, entityId: input.entityId }
+      extra: { context: input.context, entityKind: input.entityKind, entityId: input.entityId }
     })
 
     return templateFallback()

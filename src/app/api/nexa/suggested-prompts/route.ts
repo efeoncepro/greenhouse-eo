@@ -6,7 +6,7 @@ import { ENTRYPOINT_CONTEXTS, type EntrypointContext } from '@/lib/organization-
 import { isNexaSuggestedPromptsDataAwareEnabled } from '@/lib/nexa/flags'
 import { resolveDataAwareSuggestedPrompts } from '@/lib/nexa/suggested-prompts-data-aware'
 import { NEXA_SUGGESTED_PROMPTS_CONTRACT_VERSION } from '@/lib/nexa/suggested-prompts-contract'
-import type { NexaPromptContextKey } from '@/lib/nexa/suggested-prompts'
+import type { NexaPageEntityKind, NexaPromptContextKey } from '@/lib/nexa/suggested-prompts'
 import { captureWithDomain } from '@/lib/observability/capture'
 
 // TASK-1087 — GET /api/nexa/suggested-prompts?context=<key>&entityId=<id>[&entrypoint=<ctx>]
@@ -16,10 +16,14 @@ import { captureWithDomain } from '@/lib/observability/capture'
 // la projection del workspace (anti-oracle). Gateo del flag también server-side (defense in depth).
 export const dynamic = 'force-dynamic'
 
-const VALID_CONTEXTS: NexaPromptContextKey[] = ['general', 'finance', 'client', 'payroll']
+const VALID_CONTEXTS: NexaPromptContextKey[] = ['general', 'finance', 'client', 'payroll', 'personal']
+const VALID_ENTITY_KINDS: NexaPageEntityKind[] = ['organization', 'member']
 
 const parseContext = (raw: string | null): NexaPromptContextKey =>
   raw && (VALID_CONTEXTS as string[]).includes(raw) ? (raw as NexaPromptContextKey) : 'general'
+
+const parseEntityKind = (raw: string | null): NexaPageEntityKind | null =>
+  raw && (VALID_ENTITY_KINDS as string[]).includes(raw) ? (raw as NexaPageEntityKind) : null
 
 const parseEntrypoint = (raw: string | null): EntrypointContext =>
   raw && (ENTRYPOINT_CONTEXTS as readonly string[]).includes(raw) ? (raw as EntrypointContext) : 'agency'
@@ -52,8 +56,12 @@ export async function GET(request: Request) {
       subject: buildOrganizationWorkspaceSubjectFromTenant(tenant),
       context,
       entityId,
+      entityKind: parseEntityKind(url.searchParams.get('entityKind')),
       entityName,
-      entrypointContext: parseEntrypoint(url.searchParams.get('entrypoint'))
+      entrypointContext: parseEntrypoint(url.searchParams.get('entrypoint')),
+      // TASK-1141 — el resolver `personal` necesita el TenantContext (pendientes del propio
+      // colaborador); el resto lo ignora. Anti-tamper: el tenant sale de la sesión, no del query.
+      tenant
     })
 
     return NextResponse.json(payload)

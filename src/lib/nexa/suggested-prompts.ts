@@ -6,7 +6,7 @@ import { GH_NEXA } from '@/lib/copy/nexa'
 // reales) y la interpolación del nombre de la entidad ("Cliente · Sky Airline") son
 // follow-ups (requieren readers de dominio / que la página declare su contexto).
 
-export type NexaPromptContextKey = 'general' | 'finance' | 'client' | 'payroll'
+export type NexaPromptContextKey = 'general' | 'finance' | 'client' | 'payroll' | 'personal'
 
 export interface NexaPromptContext {
   key: NexaPromptContextKey
@@ -15,9 +15,10 @@ export interface NexaPromptContext {
   prompts: string[]
 }
 
-/** Tipo de entidad que la página declara (TASK-1087). Hoy solo `organization` tiene readers
- *  data-aware wireados; el resto cae a Tier 1/1.5 hasta que su página declare entityId + resolver. */
-export type NexaPageEntityKind = 'organization'
+/** Tipo de entidad que la página declara (TASK-1087/1141). `organization` (ficha de cliente,
+ *  contexto `client`) y `member` (Mi espacio, contexto `personal`) tienen readers data-aware
+ *  wireados; el resto cae a Tier 1/1.5 hasta que su página declare entityId + resolver. */
+export type NexaPageEntityKind = 'organization' | 'member'
 
 /** Entrypoint del workspace que la página declara (TASK-1139). Determina la visibilidad de
  *  facets en la projection del reader data-aware (agency vs finance). Narrow a propósito —
@@ -46,6 +47,9 @@ const CONTEXTS = GH_NEXA.floating.prompt_contexts
 const GENERIC_ENTITY = 'este cliente'
 
 const routeContextKey = (path: string): NexaPromptContextKey => {
+  // Mi espacio (espacio personal del colaborador) → contexto Personal (TASK-1141).
+  if (path.startsWith('/my')) return 'personal'
+
   // Página de un cliente/organización específico (agency o finance) → contexto Cliente.
   if (/\/(agency|finance)\/(clients|organizations)\/[^/]+/.test(path)) return 'client'
 

@@ -37,12 +37,12 @@ export const useDataAwareSuggestedPrompts = (
     setDataAwarePrompts(null)
 
     if (!isNexaSuggestedPromptsDataAwareEnabled()) return
-    if (!entityId || entityKind !== 'organization') return
-    // V1: solo el contexto `client` (org workspace) es data-aware.
-    if (contextKey !== 'client') return
+    // La página declaró una entidad data-aware (org o member). El SERVER decide si hay resolver
+    // para ese contexto (registry) — el hook no gatea por contexto (TASK-1141).
+    if (!entityId || !entityKind) return
 
     const controller = new AbortController()
-    const params = new URLSearchParams({ context: contextKey, entityId })
+    const params = new URLSearchParams({ context: contextKey, entityId, entityKind })
 
     if (entityName) params.set('entityName', entityName)
     if (entrypoint) params.set('entrypoint', entrypoint)

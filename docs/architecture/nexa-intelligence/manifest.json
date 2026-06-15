@@ -101,6 +101,7 @@
       "code": [
         "src/lib/nexa/suggested-prompts-data-aware.ts",
         "src/lib/nexa/suggested-prompts-contract.ts",
+        "src/lib/nexa/data-aware-personal-resolver.ts",
         "src/app/api/nexa/suggested-prompts/route.ts"
       ],
       "docs": ["experience/suggested-prompts.md"]

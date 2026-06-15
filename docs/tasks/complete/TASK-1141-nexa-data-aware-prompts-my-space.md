@@ -2,7 +2,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -110,3 +110,13 @@ Ninguna. Sin migraciones/env/Azure/GCP.
 ## Follow-ups
 
 - TASK-1142 (Payroll) y TASK-1143 (Finance global) consumen el registry de esta task.
+
+## Closure 2026-06-15 — code-complete
+
+Registry de resolvers (foundational, lo consumen 1142/1143) + contexto `personal` (Mi espacio).
+- Composer = `DATA_AWARE_RESOLVERS[context]`; resolver `client` extraído byte-idéntico (14/14 anti-regresión).
+- Resolver `personal` (`data-aware-personal-resolver.ts`, server-only): vacaciones propias + aprobaciones del equipo vía `listLeaveRequestsFromPostgres` (cero SQL nuevo). **Anti-oracle**: usa SIEMPRE `subject.memberId`, ignora el `entityId` del cliente (test). `/my/layout` declara el contexto.
+- Copy es-CL revisado con `greenhouse-ux-writing` (corregido voseo "Tenés"→"Tienes").
+- Gates: tsc 0 · lint 0 · 22/22 tests focales (registry + personal + anti-oracle + allowlist) · suite Nexa 90 · doc gate verde · build exit 0.
+- **Pendiente (rollout):** GVC en `/my` con un pendiente real (mismo gate que 1087/1139; flag ON local+staging).
+- **Follow-ups:** ficha incompleta + payslip ready (copy ya existe, falta wirear su reader).

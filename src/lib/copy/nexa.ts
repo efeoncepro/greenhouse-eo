@@ -421,6 +421,18 @@ export const GH_NEXA = {
           'Costo laboral por equipo',
           'Pendientes antes del cierre'
         ]
+      },
+      personal: {
+        // Mi espacio (TASK-1141) — starters self-service. Cuando hay pendientes reales, el
+        // resolver data-aware los reemplaza; si no, estas plantillas.
+        label: 'Mi espacio',
+        icon: 'tabler-user',
+        prompts: [
+          '¿Qué tengo pendiente?',
+          '¿Cuántos días de vacaciones me quedan?',
+          'Muéstrame mi última liquidación',
+          '¿Cómo voy con mis objetivos?'
+        ]
       }
     } as Record<string, { label: string; icon: string; prompts: string[] }>,
     // Prompts DATA-AWARE (Tier 2, TASK-1087): plantillas de "gancho" por categoría de señal real
@@ -437,7 +449,13 @@ export const GH_NEXA = {
       lifecycle_blocked: 'El onboarding de {entity} está bloqueado, ¿lo destrabamos?',
       lifecycle_pending: '¿Qué falta para cerrar el onboarding de {entity}?',
       pending_review: '{entity} tiene pendientes por revisar, ¿los vemos?',
-      generic_watch: '¿Qué está pasando con {entity} este mes?'
+      generic_watch: '¿Qué está pasando con {entity} este mes?',
+      // TASK-1141 — Mi espacio (contexto personal). `{entity}` no se usa acá (es la data del
+      // propio colaborador); `{count}` se interpola con el número real cuando aplica.
+      personal_intake_incomplete: 'Te falta completar tu ficha, ¿la terminamos?',
+      personal_leave_pending: 'Tienes {count} solicitud(es) de vacaciones en curso, ¿las vemos?',
+      personal_approvals_pending: 'Tienes {count} aprobación(es) de tu equipo esperando, ¿las revisamos?',
+      personal_payslip_ready: 'Tu liquidación del mes ya está lista, ¿la abrimos?'
     } as Record<string, string>,
     // Saludo del empty hero — rota en cada nueva conversación. `{name}` se reemplaza
     // con el primer nombre del usuario en sesión; si no hay nombre, esas frases se
