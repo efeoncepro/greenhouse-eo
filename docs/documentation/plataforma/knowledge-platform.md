@@ -95,7 +95,7 @@ La búsqueda es **un solo contrato** que usan por igual las personas, Nexa y el 
 
 El conocimiento no se escribe a mano en Greenhouse: se **ingiere** desde una fuente autorizada. La ingesta toma cada documento, lo parte en pedazos (chunks) con su "ruta de títulos" para poder citarlo, lo **revisa** (sanitiza) y solo entonces lo publica.
 
-- **De dónde viene hoy:** los 15 documentos del corpus piloto son **archivos del repositorio** (manuales y docs que ya existen). Cuando se conecte un teamspace de Notion de conocimiento (TASK-1088), entrarán también desde ahí — pero el flujo es el mismo.
+- **De dónde viene hoy:** el corpus son **archivos del repositorio** (manuales y docs que ya existen). Empezó con 15 documentos piloto (TASK-1082) y se amplió a **82** al sumar el paquete de manuales operativos end-to-end (TASK-1140: Finance, People/Workforce/Payroll/Contractors, Comercial, Agency, Identity, My Space, Portal Cliente, Integraciones/Sync, Comunicaciones, AI Tooling, Admin Center, Public Site y UI Platform). Cuando se conecte un teamspace de Notion de conocimiento (TASK-1088), entrarán también desde ahí — pero el flujo es el mismo.
 - **La revisión de seguridad va primero:** si un documento trae un secreto, un dato personal o una instrucción que intente "controlar" a Nexa, se pone en **cuarentena** (no se publica ni Nexa lo puede usar) hasta limpiarlo.
 - **Es idempotente:** re-correr la ingesta no duplica nada; solo publica una versión nueva si el contenido cambió de verdad.
 - **Es auditada:** cada corrida queda registrada (qué se publicó, qué se puso en cuarentena, qué se omitió).

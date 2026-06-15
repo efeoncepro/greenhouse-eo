@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -526,16 +526,57 @@ Respuesta esperada:
 
 ## Acceptance Criteria
 
-- [ ] Los manuales/documentos Finance, People, Workforce, Payroll y Contractors normativos estan registrados en el corpus Knowledge.
-- [ ] Los manuales/documentos Comercial, Agency/Delivery, Identity/Admin Center, My Space, Public Site y UI Platform normativos estan registrados en el corpus Knowledge.
-- [ ] Los manuales/documentos Portal Cliente, Integraciones/Sync, Comunicaciones/Notificaciones, AI Tooling/Content/Assets y Admin Center residual normativos estan registrados en el corpus Knowledge.
-- [ ] `search_knowledge` recupera fuentes Finance para preguntas Finance y fuentes HR/Payroll/Contractors para preguntas People.
-- [ ] `search_knowledge` recupera fuentes Comercial/Agency/Identity/Personas/Public Site/UI Platform para preguntas de esos dominios.
-- [ ] `search_knowledge` recupera fuentes Portal Cliente/Integraciones/Comunicaciones/AI Tooling/Admin Center para preguntas de esos dominios.
-- [ ] Nexa responde preguntas de ingreso, egreso, cobro, pago directo, instrumento, Banco, transferencia interna, orden de pago, conciliacion, Workforce Activation, nomina, honorarios, Deel/internacional, contractors, employee-to-contractor, offboarding, finiquitos, quote-to-cash, Account 360, roles/vistas, My Space, Portal Cliente, Integraciones/Sync, Comunicaciones/Notificaciones, AI Tooling, Content Factory y UI Platform con citas correctas.
-- [ ] Los casos wrong-source quedan cubiertos por eval/QA.
-- [ ] Nexa no afirma que puede ejecutar acciones financieras, HR, Payroll, Contractors, Comerciales, Admin, Portal Cliente, Integraciones, Comunicaciones, AI Tooling, Public Site o UI Platform en esta task.
-- [ ] Production queda explicitamente sin cambios o validada con aprobacion humana.
+- [x] Los manuales/documentos Finance, People, Workforce, Payroll y Contractors normativos estan registrados en el corpus Knowledge.
+- [x] Los manuales/documentos Comercial, Agency/Delivery, Identity/Admin Center, My Space, Public Site y UI Platform normativos estan registrados en el corpus Knowledge.
+- [x] Los manuales/documentos Portal Cliente, Integraciones/Sync, Comunicaciones/Notificaciones, AI Tooling/Content/Assets y Admin Center residual normativos estan registrados en el corpus Knowledge.
+- [x] `search_knowledge` recupera fuentes Finance para preguntas Finance y fuentes HR/Payroll/Contractors para preguntas People. (golden questions 40/40)
+- [x] `search_knowledge` recupera fuentes Comercial/Agency/Identity/Personas/Public Site/UI Platform para preguntas de esos dominios.
+- [x] `search_knowledge` recupera fuentes Portal Cliente/Integraciones/Comunicaciones/AI Tooling/Admin Center para preguntas de esos dominios.
+- [x] Nexa responde preguntas de ingreso, egreso, cobro, pago directo, instrumento, Banco, transferencia interna, orden de pago, conciliacion, Workforce Activation, nomina, honorarios, Deel/internacional, contractors, employee-to-contractor, offboarding, finiquitos, quote-to-cash, Account 360, roles/vistas, My Space, Portal Cliente, Integraciones/Sync, Comunicaciones/Notificaciones, AI Tooling, Content Factory y UI Platform con citas correctas. (retrieval verde; ver caveat K6 abajo)
+- [x] Los casos wrong-source quedan cubiertos por eval/QA. (golden guards finance≠payroll, ICO≠payroll, no-answer, agentic-denied)
+- [x] Nexa no afirma que puede ejecutar acciones financieras, HR, Payroll, Contractors, Comerciales, Admin, Portal Cliente, Integraciones, Comunicaciones, AI Tooling, Public Site o UI Platform en esta task. (Answer Rules vigentes, dominio-agnósticas; QA O1/O2 verde)
+- [x] Production queda explicitamente sin cambios o validada con aprobacion humana. (prod NO tocado; ingesta solo dev/staging)
+
+## Closure — QA evidence + rollout (2026-06-15)
+
+**Decisión de gobernanza (operador, opción A):** los manuales operativos de TODOS los
+dominios — incluidos HR/Payroll/Contractors — se registran `agent_allowed` para que Nexa
+los cite en agentic; la seguridad legal/tributaria + no-acción se gobierna en la capa de
+respuesta (Answer Rules), no por exclusión. El único `agent_excluded`/`restricted` durable
+es la política de secretos. El MANUAL legacy `periodos-de-nomina` se deja `agent_excluded`
+sin tocar (el doc FUNCIONAL nuevo de nómina cubre el path agentic).
+
+**Slice 1 (corpus):** 67 manuales operativos registrados en `PILOT_CORPUS` (15→82). Ingesta
+`--apply` a la instancia dev/staging (`greenhouse-pg-dev`): **67 publicados (1087 chunks),
+0 quarantined, 0 failed**. Sanitizer cl_rut detectó el RUT de ejemplo del manual de
+finiquitos → redactado a placeholder (RUT público de Efeonce, no PII de terceros).
+
+**Slice 2 (retrieval QA):** golden questions por dominio + guards (wrong-source finance≠payroll
+/ ICO≠payroll, no-answer, agentic-denied). **40/40 golden questions verdes** contra el corpus
+real (`golden-questions.live.test.ts`). Live tests payroll re-targeteados a la nueva postura
+(funcional citable; manual legacy filtrado) — verdes. CI-clean (sin PG): suites knowledge+nexa
+243 passed / 53 skipped.
+
+**Slice 3 (safety):** **NO se cambió el prompt.** Las Answer Rules de Nexa ya son
+dominio-agnósticas y mandan, para temas sensibles (finanzas/nómina/legal/seguridad/contractual):
+citar con `[n]` + CERRAR con "valida con la persona/área responsable antes de actuar" + nunca
+afirmar estado en vivo ni ejecutar acciones. Hacer payroll/finance citable (A) es seguro porque
+la regla ya existe.
+
+**Slice 4 (validación):** `qa:nexa-knowledge --env=local` (answer layer, LLM): 8-9/12 pass.
+Retrieval correcto en TODOS los casos (chunks correctos, alta confianza). Fallos = compliance del
+LLM (no del corpus): K1 flaky (pasó en re-run); G1/K7 routing no-determinista del tool (preguntas
+nonsense/meta); **K6 consistente** = respuesta de nómina citada PERO sin el cierre de validación
+humana. El prompt YA lo manda (line 146); es no-compliance de Gemini con grounding fuerte, no un
+gap de corpus ni de regla.
+
+**⚠️ Rollout gate (producción):** antes de activar el corpus operativo (payroll/finance/legal
+citable) en PRODUCCIÓN, endurecer el compliance del cierre de validación humana para temas
+sensibles (prompt + assert en la QA matrix, ref TASK-1127). Hoy es no-determinista. Producción
+queda **sin cambios** (gateada); la ingesta corrió solo en dev/staging.
+
+**Rollback:** retirar las entradas del corpus de `PILOT_CORPUS` + re-ingestar (o deprecar los
+docs vía lifecycle); revertir golden questions. <30 min, reversible.
 
 ## Verification
 

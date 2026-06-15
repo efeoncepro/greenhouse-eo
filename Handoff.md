@@ -1,5 +1,16 @@
 # Release 2026-06-10 #2 — develop→main `6c649b2a6` RELEASED
 
+## Sesión 2026-06-15 — TASK-1140 Manuales operativos → corpus Knowledge/Nexa — Claude
+
+> **Estado:** **complete** en `develop` (local-first, sin push). Ingesta aplicada a **dev/staging** (`greenhouse-pg-dev`). **Producción sin cambios** (gateada).
+
+- **Qué resuelve:** Nexa tiene `search_knowledge` pero las preguntas operativas multi-dominio recuperaban docs generales/parciales. Se registran **67 manuales operativos end-to-end** (Finance, People/Workforce/Payroll/Contractors, Comercial, Agency, Identity, My Space, Portal Cliente, Integraciones/Sync, Comunicaciones, AI Tooling, Admin Center, Public Site, UI Platform) en `PILOT_CORPUS` (**15→82** docs).
+- **Decisión del operador (checkpoint, opción A):** todos los manuales operativos — incluidos HR/Payroll/Contractors — `agent_allowed` (citables por Nexa en agentic); la seguridad legal/tributaria + no-acción se gobierna en la capa de respuesta (Answer Rules), NO por exclusión. El único `agent_excluded`/`restricted` durable es la política de secretos. El manual legacy `periodos-de-nomina` se dejó `agent_excluded` sin tocar (el funcional nuevo cubre agentic).
+- **Validación:** golden questions por dominio **40/40 verdes** (retrieval offline, determinista). Ingesta `--apply` dev/staging: **67 publicados (1087 chunks), 0 quarantined, 0 failed**. Sanitizer cl_rut detectó el RUT de ejemplo del manual de finiquitos → redactado a placeholder (RUT público de Efeonce). `qa:nexa-knowledge --env=local` 8-9/12 (retrieval correcto en todos; fallos = compliance del LLM, no del corpus).
+- **⚠️ Rollout gate (producción):** **K6 consistente** = Nexa responde nómina citada PERO a veces SIN el cierre "valida con People/Finanzas antes de actuar" (el prompt ya lo manda, line 146; es no-compliance de Gemini con grounding fuerte). Antes de activar el corpus operativo (payroll/finance/legal citable) en PROD, **endurecer ese compliance** (prompt + assert en QA matrix, ref TASK-1127). Hoy es no-determinista.
+- **Archivos:** `pilot-corpus.ts` (+test length-pin 15→82 + guard agent_allowed), `golden-questions.ts` (+per-domain), `search-knowledge.live.test.ts` + `search-knowledge-tool.test.ts` (re-targeteados a la nueva postura), `docs/manual-de-uso/hr/finiquitos.md` (redacción RUT), `docs/documentation/plataforma/knowledge-platform.md` (15→82).
+- **Sin prompt change, sin migración, sin capability, sin UI.** Reversible (<30 min: retirar entradas + re-ingestar).
+
 ## Sesión 2026-06-15 — TASK-1137 Nexa governed action runtime + command bridge — Claude
 
 > **Estado:** **complete** en `develop` (pusheado, CI verde). Detrás de `NEXA_ACTION_RUNTIME_ENABLED` (default OFF). **Activado por el operador**: flag ON en local + Vercel staging + producción; auto-router ya estaba ON. **UI confirm-card incluida** (no quedó para Codex). Pendiente prod real = release `develop→main`.
