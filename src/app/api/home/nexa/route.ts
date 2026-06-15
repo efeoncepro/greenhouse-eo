@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 
-import { resolveNexaModel } from '@/config/nexa-models'
+import { resolveNexaRequestedModel, type NexaModelMode } from '@/config/nexa-models'
 import { canonicalErrorResponse } from '@/lib/api/canonical-error-response'
 import { getServerAuthSession } from '@/lib/auth'
 import { buildHomeEntitlementsContext } from '@/lib/home/build-home-entitlements-context'
@@ -33,8 +33,15 @@ export async function POST(req: Request) {
     prompt,
     history = [],
     model,
+    modelMode,
     threadId
-  } = body as { prompt: string; history: NexaMessage[]; model?: string | null; threadId?: string | null }
+  } = body as {
+    prompt: string
+    history: NexaMessage[]
+    model?: string | null
+    modelMode?: NexaModelMode | null
+    threadId?: string | null
+  }
 
   if (!prompt) {
     return canonicalErrorResponse('nexa_prompt_required')
@@ -96,7 +103,9 @@ export async function POST(req: Request) {
       history: history.slice(-10),
       context: lightContext,
       runtimeContext,
-      requestedModel: resolveNexaModel({ requestedModel: model })
+      // TASK-1134 — en modo `auto` (default) pasamos `null` para que buildProviderPlan decida
+      // (pin → auto-router → default Gemini). Solo un override `manual` fija un modelo del picker.
+      requestedModel: resolveNexaRequestedModel({ modelMode, model })
     })
 
     const persistedThreadId = await persistNexaConversation({

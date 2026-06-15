@@ -34,7 +34,9 @@ vi.mock('@/lib/home/get-home-snapshot', () => ({
 }))
 
 vi.mock('@/config/nexa-models', () => ({
-  resolveNexaModel: () => 'google/gemini-2.5-flash@default'
+  resolveNexaModel: () => 'google/gemini-2.5-flash@default',
+  // TASK-1134 — sin modelMode/model en el payload del test → auto → null (NexaService decide).
+  resolveNexaRequestedModel: () => null
 }))
 
 vi.mock('@/lib/observability/capture', () => ({

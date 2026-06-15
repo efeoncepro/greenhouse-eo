@@ -6,17 +6,18 @@ import Select from '@mui/material/Select'
 import Typography from '@mui/material/Typography'
 import type { SelectChangeEvent } from '@mui/material/Select'
 
-import { NEXA_MODEL_OPTIONS, type NexaModelId } from '@/config/nexa-models'
+import { NEXA_MODEL_OPTIONS } from '@/config/nexa-models'
+import type { NexaModelSelectorValue } from '@/lib/nexa/use-nexa-runtime'
 
 interface Props {
-  selectedModel: NexaModelId
-  onChange: (model: NexaModelId) => void
+  selectedModel: NexaModelSelectorValue
+  onChange: (value: NexaModelSelectorValue) => void
   compact?: boolean
 }
 
 const NexaModelSelector = ({ selectedModel, onChange, compact = false }: Props) => {
-  const handleChange = (event: SelectChangeEvent<NexaModelId>) => {
-    onChange(event.target.value as NexaModelId)
+  const handleChange = (event: SelectChangeEvent<NexaModelSelectorValue>) => {
+    onChange(event.target.value as NexaModelSelectorValue)
   }
 
   return (
@@ -27,7 +28,7 @@ const NexaModelSelector = ({ selectedModel, onChange, compact = false }: Props) 
         </Typography>
       )}
 
-      <Select<NexaModelId>
+      <Select<NexaModelSelectorValue>
         size='small'
         value={selectedModel}
         onChange={handleChange}
@@ -41,6 +42,15 @@ const NexaModelSelector = ({ selectedModel, onChange, compact = false }: Props) 
           }
         }}
       >
+        <MenuItem value='auto'>
+          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+            <Typography variant='body2'>Automático</Typography>
+            <Typography variant='caption' color='text.secondary'>
+              Nexa elige el modelo según tu pregunta · Recomendado
+            </Typography>
+          </Box>
+        </MenuItem>
+
         {NEXA_MODEL_OPTIONS.map(option => (
           <MenuItem key={option.id} value={option.id}>
             <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>

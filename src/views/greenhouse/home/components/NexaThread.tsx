@@ -27,7 +27,7 @@ import { GH_NEXA } from '@/lib/copy/nexa'
 import { GreenhouseThinkingBeat, NexaComposer, NexaComposerInput, NexaComposerActionButton, NexaSenderMark } from '@/components/greenhouse/primitives'
 import CustomTextField from '@core/components/mui/TextField'
 
-import type { NexaModelId } from '@/config/nexa-models'
+import type { NexaModelSelectorValue } from '@/lib/nexa/use-nexa-runtime'
 
 import { nexaThinScrollbarSx } from '@/views/greenhouse/nexa/floating-chat/nexa-scrollbar'
 
@@ -49,8 +49,8 @@ const GREENHOUSE_COPY = getMicrocopy()
 
 export interface NexaThreadProps {
   onBack?: () => void
-  selectedModel: NexaModelId
-  onModelChange: (model: NexaModelId) => void
+  selectedModel: NexaModelSelectorValue
+  onModelChange: (value: NexaModelSelectorValue) => void
   compact?: boolean
   suggestions?: string[]
   onHistoryToggle?: () => void

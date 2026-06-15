@@ -10,7 +10,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -190,4 +190,16 @@ N/A — repo/runtime flag change. Confirmar con operador antes de activar produc
 - `pnpm lint`
 - `pnpm exec tsc --noEmit --pretty false`
 - `pnpm nexa:doc-gate --changed`
+
+## Resultado (2026-06-15, completo en `develop`)
+
+1. **Contrato `modelMode` + SSOT puro** `resolveNexaRequestedModel({ modelMode, model })` en `nexa-models.ts`: `auto` → `null` (el plan decide), `manual` → modelo del picker, legacy (sin modelMode + modelo soportado) → manual (backward compat). `NexaModelMode` exportado.
+2. **`/api/home/nexa`** usa el helper en lugar de `resolveNexaModel` forzado → en `auto` pasa `null` → `buildProviderPlan` alcanza pin/router/default. **`nexa-service.ts` NO cambió** (ya manejaba `null`).
+3. **Cliente:** `use-nexa-runtime` + `NexaFloatingButton` (FAB global, adapter propio) mandan `modelMode` (default `auto`, persistido solo el override manual). El selector expone valor `'auto' | NexaModelId`.
+4. **UI:** `NexaModelSelector` agrega `Automático` (default) + Gemini como override; **Claude nunca visible**. Tipo `NexaModelSelectorValue` threaded por NexaThread/NexaHero/HomeView/FloatingButton/mockup.
+5. **Tests:** 5 de `resolveNexaRequestedModel` (precedencia: auto/manual/legacy/no-soportado/vacío) + los 6 de routing (TASK-1091) prueban el downstream (requestedModel null → pin/router/default/failover). Route test ajustado al nuevo helper.
+6. **Docs:** `technical/llm-models.md` + `behavior/behavior-and-routing.md` (caveat stale "siempre Gemini local" corregido a flag-driven) + arch Delta + skill (Claude+Codex).
+
+**Inerte con flags OFF** (default): `auto` → default Gemini = comportamiento idéntico al previo. El valor: el operador puede prender `NEXA_AUTO_ROUTER_ENABLED` y el chat **realmente** alcanza el router (antes quedaba clavado en Gemini). La activación productiva es decisión del operador (no activar sin sign-off). Telemetría TASK-1129 audita el provider mix/failover real.
+GVC: `/home` renderiza enterprise; el selector es un control avanzado (no prominente en el hero v2/flotante compacto), la opción `Automático` reusa el `MenuItem` tokenizado existente.
 

@@ -1,5 +1,9 @@
 # TASK-1127 — Nexa Knowledge QA nightly + eval offline ampliado
 
+## Delta 2026-06-15
+
+- **TASK-1134 (complete) destraba lo que esta task necesitaba saber:** el chat ahora manda `modelMode: 'auto'` → con `NEXA_AUTO_ROUTER_ENABLED` ON, las preguntas de conocimiento **sí** enrutan a Claude desde `/api/home/nexa` (antes quedaba clavado en Gemini). La QA nightly puede ejercitar el provider real; el provider/modelo resuelto + failover quedan auditables en el ledger `greenhouse_ai.nexa_turn_telemetry` (TASK-1129) y en la signal `nexa.turn.degraded_outcomes`. — por trabajo en TASK-1134 + TASK-1129.
+
 ## Status
 
 - Lifecycle: `to-do`

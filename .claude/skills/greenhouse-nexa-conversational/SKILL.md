@@ -37,7 +37,7 @@ Toda la inteligencia está documentada por capas en **`docs/architecture/nexa-in
 ## El endpoint + el modelo + la persistencia (hechos)
 
 - **Endpoint:** `src/app/api/home/nexa/route.ts` — `getServerAuthSession` → `NexaService.generateResponse({ prompt, history.slice(-10), context, runtimeContext, requestedModel: resolveNexaModel({ requestedModel: model }) })` → `persistNexaConversation`.
-- **Modelo:** el chat flotante **siempre resuelve Gemini** — `resolveNexaModel` siempre devuelve un modelo válido (del picker o `DEFAULT_NEXA_MODEL`) → `buildProviderPlan` paso 1 (modelo pedido soportado) gana → single, sin router. **El auto-router (Claude) NO se alcanza desde `/api/home/nexa`**; solo aplica en entrypoints que NO fuerzan `requestedModel`. NO asumas que el chat flotante usa Claude.
+- **Modelo (post-TASK-1134):** el chat manda `modelMode: 'auto'` por defecto → el endpoint pasa `requestedModel: null` (`resolveNexaRequestedModel`) → `buildProviderPlan` decide por **flags** (pin `NEXA_PROVIDER` → auto-router → default Gemini). **El auto-router SÍ se alcanza** cuando `NEXA_AUTO_ROUTER_ENABLED` está ON (en cualquier entorno; default OFF → Gemini). Un override `manual` del picker fija Gemini; Claude nunca es opción visible. (Antes el endpoint forzaba un modelo soportado → el chat quedaba clavado en Gemini — bug cerrado por TASK-1134.)
 - **Persistencia:** `persistNexaConversation` (`src/lib/nexa/store.ts`) → `greenhouse_ai.nexa_messages` (`content`, `tool_invocations` [el packet vive acá], `suggestions`, `model_id`) + `nexa_threads` + `nexa_feedback`. **Telemetría de turno** (TASK-1129): `promptVersion`/`promptFamily` + provider plan/resuelto + failover + latencias + tools + `outcome` viven en el ledger aditivo `greenhouse_ai.nexa_turn_telemetry` (best-effort post-commit; contrato `nexa-turn-telemetry.v1`; NO se devuelve al cliente). Las señales de reliability leen de `nexa_messages.tool_invocations` + `nexa_turn_telemetry`.
 
 ## Contratos versionados (SSOT — no romper sin bumpear versión)
@@ -106,9 +106,9 @@ Vive en `src/components/greenhouse/primitives/nexa-<x>/` + barrel + resolver `ki
 ## Estado del runtime + gaps de robustez conocidos
 
 - **Lente:** `NexaAnswersCanvas` cableado a `/knowledge` con retrieval real, flag-gated (`NEXA_ANSWERS_CANVAS_LENS_ENABLED`, default OFF), GVC-verificado. `NexaKnowledgeAnswerSurface` (answer-trace) = fallback mientras el flag está OFF. Rollout = decisión del operador.
-- **Chat flotante:** vivo (NexaThread + assistant-ui). Auto-router NO se alcanza acá (siempre Gemini).
-- **Hardening abierto (tasks):** TASK-1125 (corpus prod) · TASK-1127 (QA nightly + eval wrong-source/cross-doc) · TASK-1128 (signal de drift de términos del corpus) · TASK-1134 (auto-router + model selection truth — desbloqueada por TASK-1129).
-- **Hardening cerrado (reciente):** TASK-1126 (golden snapshot del prompt + gate de version/changelog) · TASK-1138 (módulo `answerFormatting` del prompt V2 → v2.1.0) · TASK-1131 (contrato de error canónico es-CL + `captureWithDomain('home')` en los 5 handlers del chat) · TASK-1129 (telemetría de turno: ledger `nexa_turn_telemetry` + signal `nexa.turn.degraded_outcomes`).
+- **Chat flotante:** vivo (NexaThread + assistant-ui). Manda `modelMode: 'auto'` → el auto-router SÍ se alcanza con `NEXA_AUTO_ROUTER_ENABLED` ON (default OFF → Gemini). TASK-1134.
+- **Hardening abierto (tasks):** TASK-1125 (corpus prod) · TASK-1127 (QA nightly + eval wrong-source/cross-doc) · TASK-1128 (signal de drift de términos del corpus).
+- **Hardening cerrado (reciente):** TASK-1126 (golden snapshot del prompt + gate de version/changelog) · TASK-1138 (módulo `answerFormatting` del prompt V2 → v2.1.0) · TASK-1131 (contrato de error canónico es-CL + `captureWithDomain('home')` en los 5 handlers del chat) · TASK-1129 (telemetría de turno: ledger `nexa_turn_telemetry` + signal `nexa.turn.degraded_outcomes`) · TASK-1134 (model selection truth: `modelMode` auto/manual → el auto-router se alcanza en el chat).
 - **Follow-ups de la lente:** `unhelpful` → selector de motivo; `share` → permalink real; multi-turno con compactación (TASK-1102); token-streaming real por el provider (TASK-1091). Ninguno toca la primitive.
 
 ## Required reads (en orden)

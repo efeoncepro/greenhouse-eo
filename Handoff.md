@@ -1,5 +1,16 @@
 # Release 2026-06-10 #2 — develop→main `6c649b2a6` RELEASED
 
+## Sesión 2026-06-15 — TASK-1134 Nexa Chat: auto-router + model selection truth — Claude
+
+> **Estado:** **complete** en `develop` (local-first). Backend contract + client + UI menor, sin migración. Desbloquea TASK-1127. Activación productiva del router = decisión del operador.
+
+- **Bug:** el chat (`/api/home/nexa`) forzaba un `requestedModel` soportado → `buildProviderPlan` step 1 ganaba → el auto-router nunca corría (la arquitectura prometía Claude para conocimiento, pero el chat quedaba clavado en Gemini).
+- **Fix:** contrato `modelMode: 'auto'|'manual'` + SSOT puro `resolveNexaRequestedModel` en `nexa-models.ts`. `auto` (default) → `requestedModel: null` → el plan decide (pin/router/default). **`nexa-service.ts` NO cambió** (ya manejaba null). Cliente (`use-nexa-runtime` + el FAB global `NexaFloatingButton`, que tiene adapter propio) manda `modelMode`.
+- **UI:** `NexaModelSelector` agrega `Automático` (default) + Gemini override; Claude nunca visible. Tipo `NexaModelSelectorValue` threaded por NexaThread/Hero/HomeView/FAB/mockup.
+- **Hallazgo:** hay DOS adapters de chat que pegan a `/api/home/nexa` — `useNexaPersistentRuntime` (home + NexaFloatingPanel) y `createFloatingAdapter` (NexaFloatingButton, el FAB global). Ambos necesitaban el contrato. Convergerlos en un solo runtime es tech-debt pre-existente (fuera de scope; el FAB no persiste threads).
+- **Inerte con flags OFF** (default) → sin regresión. Valor: prender `NEXA_AUTO_ROUTER_ENABLED` ahora **sí** alcanza el router; auditable vía telemetría TASK-1129.
+- **Gates:** lint 0 · tsc 0 · build ✓ · doc-gate verde · 5 tests del helper + routing + route test ajustado. GVC `/home` enterprise (el selector es control avanzado, no prominente). Docs: llm-models.md + behavior caveat corregido + arch Delta + skill (Claude+Codex).
+
 ## Sesión 2026-06-15 — TASK-1129 Telemetría de turno de Nexa (promptVersion + provider/runtime) — Claude
 
 > **Estado:** **complete** en `develop` (local-first, sin push aún). Backend/observabilidad, con migración. Follow-up de TASK-1124. **Desbloquea TASK-1134**.

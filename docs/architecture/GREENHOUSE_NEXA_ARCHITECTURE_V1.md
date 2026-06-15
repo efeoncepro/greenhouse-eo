@@ -4,6 +4,21 @@
 
 Definir el contrato arquitectonico de Nexa: el asistente IA conversacional de Greenhouse. Este documento es la fuente canonica de la capa de IA del portal — que es, como funciona, que puede hacer, y como se integra con el resto del sistema.
 
+## Delta 2026-06-15 — TASK-1134: model selection truth (el auto-router se alcanza en el chat)
+
+El chat (`/api/home/nexa`) resolvía SIEMPRE un modelo soportado (`resolveNexaModel`), así que el
+step 1 de `buildProviderPlan` ganaba y el **auto-router nunca corría** en la superficie viva. Se
+introduce el contrato `modelMode: 'auto' | 'manual'` (`NexaModelMode`): el endpoint resuelve el
+`requestedModel` con `resolveNexaRequestedModel({ modelMode, model })` (SSOT en `nexa-models.ts`).
+
+- `auto` (default real que manda el cliente) → `requestedModel: null` → el plan decide: pin
+  `NEXA_PROVIDER` → auto-router (`NEXA_AUTO_ROUTER_ENABLED`) → default Gemini. **Así el router se ALCANZA.**
+- `manual` → modelo del picker (override explícito, observable en la telemetría TASK-1129).
+- Cliente legacy (manda `model` sin `modelMode`) → manual (backward compat, sin regresión).
+- El selector (`NexaModelSelector`) ofrece `Automático` (default) + Gemini como override; **Claude
+  nunca es opción visible** (sigue router-internal). Con los flags OFF (default actual) el comportamiento
+  es idéntico al previo (Gemini). `nexa-service.ts` NO cambió: `buildProviderPlan` ya manejaba `null`.
+
 ## Delta 2026-06-14 — TASK-1124: calidad de respuesta de Knowledge + system prompt V2 versionado
 
 Las respuestas de Nexa respaldadas por Knowledge pasan de "pegar un fragmento" a **respuestas

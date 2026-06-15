@@ -36,6 +36,21 @@ Answer Rules son **provider-agnósticos** — el swap de provider NO los toca.
 respaldo (si el primario falla, failover al otro). Precedencia completa: modelo pedido > pin
 `NEXA_PROVIDER` > auto-router > default Gemini. Detalle de comportamiento: [`../03-behavior-and-routing.md`](../behavior/behavior-and-routing.md).
 
+### Model selection truth — `modelMode` (TASK-1134)
+
+El payload del chat lleva `modelMode: 'auto' | 'manual'` (`NexaModelMode`). El endpoint resuelve el
+`requestedModel` con `resolveNexaRequestedModel({ modelMode, model })` (SSOT en `nexa-models.ts`):
+
+- `auto` (default real, lo que manda el cliente por defecto) → `requestedModel: null` → `buildProviderPlan`
+  decide (pin → auto-router → default Gemini). **Así el auto-router se ALCANZA en el chat.**
+- `manual` → el modelo del picker (override explícito y observable).
+- Cliente legacy (manda `model` sin `modelMode`) → se respeta como manual (backward compat, sin regresión).
+
+Antes de TASK-1134 el endpoint resolvía SIEMPRE un modelo soportado → el step 1 ganaba y el router
+nunca corría en el chat. El **selector** (`NexaModelSelector`) ofrece `Automático` (default) + los Gemini
+como override; **Claude nunca es opción visible**. La telemetría de turno (TASK-1129) audita el provider
+plan/resuelto/failover real.
+
 ## Caveats técnicos (no regresionar)
 
 - **Gemini function-calling shape (ISSUE-092)**: el `functionResponse` del follow-up se construye
@@ -43,8 +58,11 @@ respaldo (si el primario falla, failover al otro). Precedencia completa: modelo 
   `id` huérfano que Gemini 2.5 rechaza → rompe el tool-calling. NO usarlo.
 - **Anthropic exige `tool_use_id`** en cada `tool_result` (correcto, no huérfano — distinto de Gemini).
   El workaround de Gemini es Gemini-específico.
-- **Local vs staging/prod**: `/api/home/nexa` resuelve **Gemini** localmente; en staging/prod el
-  auto-router manda conocimiento a **Claude**.
+- **Qué provider corre (post-TASK-1134)**: el chat manda `modelMode: 'auto'` por defecto → el provider
+  lo decide el plan server-side por **flags**, no por entorno. Con `NEXA_AUTO_ROUTER_ENABLED` OFF (default
+  hoy en todos los entornos) → Gemini. Con el router ON + `NEXA_KNOWLEDGE_RETRIEVAL_ENABLED` ON → las
+  preguntas de conocimiento van a **Claude** (en cualquier entorno, incl. local). Un override `manual`
+  fija Gemini. (Antes el chat quedaba clavado en Gemini por el bug del `requestedModel` forzado.)
 
 ## Secrets
 

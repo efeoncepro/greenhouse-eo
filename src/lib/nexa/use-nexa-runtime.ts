@@ -6,11 +6,18 @@ import { useLocalRuntime } from '@assistant-ui/react'
 import type { ChatModelAdapter, ChatModelRunResult } from '@assistant-ui/react'
 import type { ReadonlyJSONObject, ReadonlyJSONValue } from 'assistant-stream/utils'
 
-import { DEFAULT_NEXA_MODEL, resolveNexaModel, type NexaModelId } from '@/config/nexa-models'
+import { DEFAULT_NEXA_MODEL, resolveNexaModel, type NexaModelId, type NexaModelMode } from '@/config/nexa-models'
 
 import type { NexaResponse, NexaThreadMessage } from './nexa-contract'
 
 export const NEXA_MODEL_STORAGE_KEY = 'greenhouse:nexa:model'
+export const NEXA_MODEL_MODE_STORAGE_KEY = 'greenhouse:nexa:model-mode'
+
+/**
+ * TASK-1134 — valor visible del selector de modelo: `auto` (default real, el runtime decide
+ * server-side) o un modelo Gemini concreto (override manual explícito). Claude NUNCA es opción visible.
+ */
+export type NexaModelSelectorValue = 'auto' | NexaModelId
 
 /**
  * Forma canónica de un mensaje inicial del runtime de assistant-ui. Es la que
@@ -82,6 +89,7 @@ export const mapThreadMessagesToInitial = (messages: NexaThreadMessage[]): NexaI
 
 type NexaAdapterRefs = {
   selectedModelRef: MutableRefObject<NexaModelId>
+  modelModeRef: MutableRefObject<NexaModelMode>
   threadIdRef: MutableRefObject<string | null>
   onSuggestionsChange: (suggestions: string[]) => void
   onThreadIdChange: (threadId: string) => void
@@ -118,7 +126,10 @@ export const createNexaChatAdapter = (refs: NexaAdapterRefs): ChatModelAdapter =
         body: JSON.stringify({
           prompt,
           history,
+          // TASK-1134 — `modelMode` decide server-side: `auto` (default) deja correr el router;
+          // `manual` fija el modelo del picker. `model` viaja siempre (el server lo ignora en auto).
           model: refs.selectedModelRef.current,
+          modelMode: refs.modelModeRef.current,
           threadId: refs.threadIdRef.current
         }),
         signal: abortSignal
@@ -171,8 +182,9 @@ export interface UseNexaPersistentRuntimeOptions {
 
 export interface UseNexaPersistentRuntimeResult {
   runtime: ReturnType<typeof useLocalRuntime>
-  selectedModel: NexaModelId
-  handleModelChange: (model: NexaModelId) => void
+  /** TASK-1134 — valor visible del selector: `auto` (default) o el modelo manual elegido. */
+  selectedModel: NexaModelSelectorValue
+  handleModelChange: (value: NexaModelSelectorValue) => void
   suggestions: string[]
   threadId: string | null
 }
@@ -189,33 +201,59 @@ export const useNexaPersistentRuntime = (
 ): UseNexaPersistentRuntimeResult => {
   const { initialMessages, initialThreadId = null, onThreadIdResolved } = options
 
-  const [selectedModel, setSelectedModel] = useState<NexaModelId>(DEFAULT_NEXA_MODEL)
+  // TASK-1134 — `modelMode` 'auto' es el default real (el runtime decide server-side). El modelo
+  // manual solo aplica cuando el operador lo fija explícitamente (override). El valor visible del
+  // selector es `auto` o el modelo manual.
+  const [modelMode, setModelMode] = useState<NexaModelMode>('auto')
+  const [manualModel, setManualModel] = useState<NexaModelId>(DEFAULT_NEXA_MODEL)
   const [suggestions, setSuggestions] = useState<string[]>([])
   const [threadId, setThreadId] = useState<string | null>(initialThreadId)
 
   const selectedModelRef = useRef<NexaModelId>(DEFAULT_NEXA_MODEL)
+  const modelModeRef = useRef<NexaModelMode>('auto')
   const threadIdRef = useRef<string | null>(initialThreadId)
   const onThreadIdResolvedRef = useRef(onThreadIdResolved)
 
   onThreadIdResolvedRef.current = onThreadIdResolved
 
   useEffect(() => {
-    const storedModel = typeof window !== 'undefined' ? window.localStorage.getItem(NEXA_MODEL_STORAGE_KEY) : null
+    if (typeof window === 'undefined') return
 
-    const resolved = resolveNexaModel({ requestedModel: storedModel })
+    const storedModel = window.localStorage.getItem(NEXA_MODEL_STORAGE_KEY)
+    const resolvedModel = resolveNexaModel({ requestedModel: storedModel })
 
-    setSelectedModel(resolved)
-    selectedModelRef.current = resolved
+    setManualModel(resolvedModel)
+    selectedModelRef.current = resolvedModel
+
+    // Solo `manual` persistido reactiva el override; cualquier otro valor (incl. ausente) = auto.
+    const storedMode: NexaModelMode = window.localStorage.getItem(NEXA_MODEL_MODE_STORAGE_KEY) === 'manual' ? 'manual' : 'auto'
+
+    setModelMode(storedMode)
+    modelModeRef.current = storedMode
   }, [])
 
-  const handleModelChange = useCallback((model: NexaModelId) => {
-    const resolved = resolveNexaModel({ requestedModel: model })
+  const handleModelChange = useCallback((value: NexaModelSelectorValue) => {
+    if (value === 'auto') {
+      setModelMode('auto')
+      modelModeRef.current = 'auto'
 
-    setSelectedModel(resolved)
+      if (typeof window !== 'undefined') {
+        window.localStorage.setItem(NEXA_MODEL_MODE_STORAGE_KEY, 'auto')
+      }
+
+      return
+    }
+
+    const resolved = resolveNexaModel({ requestedModel: value })
+
+    setModelMode('manual')
+    setManualModel(resolved)
+    modelModeRef.current = 'manual'
     selectedModelRef.current = resolved
 
     if (typeof window !== 'undefined') {
       window.localStorage.setItem(NEXA_MODEL_STORAGE_KEY, resolved)
+      window.localStorage.setItem(NEXA_MODEL_MODE_STORAGE_KEY, 'manual')
     }
   }, [])
 
@@ -229,6 +267,7 @@ export const useNexaPersistentRuntime = (
     () =>
       createNexaChatAdapter({
         selectedModelRef,
+        modelModeRef,
         threadIdRef,
         onSuggestionsChange: setSuggestions,
         onThreadIdChange: handleThreadIdChange
@@ -242,7 +281,8 @@ export const useNexaPersistentRuntime = (
 
   return {
     runtime,
-    selectedModel,
+    // Valor visible del selector: `auto` salvo override manual explícito.
+    selectedModel: modelMode === 'auto' ? 'auto' : manualModel,
     handleModelChange,
     suggestions,
     threadId

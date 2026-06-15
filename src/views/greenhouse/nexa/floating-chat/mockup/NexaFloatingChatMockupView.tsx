@@ -23,7 +23,8 @@ import type { ChatModelAdapter, ChatModelRunResult } from '@assistant-ui/react'
 
 import CustomTextField from '@core/components/mui/TextField'
 
-import { DEFAULT_NEXA_MODEL, type NexaModelId } from '@/config/nexa-models'
+import { DEFAULT_NEXA_MODEL } from '@/config/nexa-models'
+import type { NexaModelSelectorValue } from '@/lib/nexa/use-nexa-runtime'
 import { GREENHOUSE_NEXA_BRAND_COLORS } from '@/components/greenhouse/primitives/greenhouse-nexa-brand-controller'
 
 import NexaThread from '@/views/greenhouse/home/components/NexaThread'
@@ -532,8 +533,8 @@ const NexaEmptyHero = ({ greeting, promptContext }: { greeting: string; promptCo
 interface NexaExpandablePanelProps {
   seeded: boolean
   expanded: boolean
-  selectedModel: NexaModelId
-  onModelChange: (model: NexaModelId) => void
+  selectedModel: NexaModelSelectorValue
+  onModelChange: (value: NexaModelSelectorValue) => void
   onToggleExpanded: () => void
   promptContext: NexaPromptContext
 }
@@ -548,8 +549,8 @@ const ConversationBody = ({
   promptContext
 }: {
   expanded: boolean
-  selectedModel: NexaModelId
-  onModelChange: (model: NexaModelId) => void
+  selectedModel: NexaModelSelectorValue
+  onModelChange: (value: NexaModelSelectorValue) => void
   greeting: string
   promptContext: NexaPromptContext
 }) => {
@@ -591,8 +592,8 @@ const ConversationArea = ({
 }: {
   initialEmpty: boolean
   expanded: boolean
-  selectedModel: NexaModelId
-  onModelChange: (model: NexaModelId) => void
+  selectedModel: NexaModelSelectorValue
+  onModelChange: (value: NexaModelSelectorValue) => void
   greeting: string
   promptContext: NexaPromptContext
 }) => {
@@ -789,7 +790,7 @@ const NexaFloatingChatMockupView = () => {
 
   const [seeded, setSeeded] = useState(initial.seeded)
   const [expanded, setExpanded] = useState(initial.expanded)
-  const [selectedModel, setSelectedModel] = useState<NexaModelId>(DEFAULT_NEXA_MODEL)
+  const [selectedModel, setSelectedModel] = useState<NexaModelSelectorValue>(DEFAULT_NEXA_MODEL)
   // Simula el contexto/pantalla desde donde se abre Nexa (en runtime: ruta + entidad + rol).
   const [promptContextKey, setPromptContextKey] = useState(NEXA_PROMPT_CONTEXTS[0].key)
   const promptContext = NEXA_PROMPT_CONTEXTS.find(c => c.key === promptContextKey) ?? NEXA_PROMPT_CONTEXTS[0]

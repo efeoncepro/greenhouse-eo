@@ -42,9 +42,12 @@ prompt del usuario
 La selección de modelo es **100% interna**. El picker visible sigue solo-Gemini; Claude es
 router-internal. Observabilidad: `NexaResponse.modelId` (persistido; provider derivable).
 
-> **Importante (local vs staging/prod):** la ruta del chat flotante/Home `/api/home/nexa` resuelve
-> **Gemini** localmente. En staging/prod con el auto-router ON, las preguntas de conocimiento van a
-> **Claude**. Por eso una compliance de prompt puede variar entre local y staging.
+> **Importante (post-TASK-1134 — el chat SÍ alcanza el router):** el chat manda `modelMode: 'auto'`
+> por defecto → `/api/home/nexa` pasa `requestedModel: null` y el provider lo decide el plan por
+> **flags**, NO por entorno. Router OFF (default actual) → Gemini en todos lados. Router ON +
+> `NEXA_KNOWLEDGE_RETRIEVAL_ENABLED` ON → conocimiento a **Claude** (incl. local). Antes el chat
+> quedaba clavado en Gemini porque el endpoint forzaba un `requestedModel` soportado. La selección
+> de modelo: `auto` (default) o `manual` (override del picker, solo Gemini); Claude nunca es opción visible.
 
 ## Response modes (elige por intención)
 

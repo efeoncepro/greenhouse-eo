@@ -21,8 +21,7 @@ import QuickAccess from './components/QuickAccess'
 import OperationStatus, { type StatusItem } from './components/OperationStatus'
 
 import NexaInsightsBlock, { type NexaInsightItem } from '@/components/greenhouse/NexaInsightsBlock'
-import { type NexaModelId } from '@/config/nexa-models'
-import { useNexaPersistentRuntime } from '@/lib/nexa/use-nexa-runtime'
+import { useNexaPersistentRuntime, type NexaModelSelectorValue } from '@/lib/nexa/use-nexa-runtime'
 import type { HomeSnapshot } from '@/types/home'
 import { getMicrocopy } from '@/lib/copy'
 
@@ -116,8 +115,8 @@ const HomeContent = ({
   snapshot: HomeSnapshot
   operationItems: StatusItem[]
   homeInsights: HomeInsightsPayload | null
-  selectedModel: NexaModelId
-  onModelChange: (model: NexaModelId) => void
+  selectedModel: NexaModelSelectorValue
+  onModelChange: (value: NexaModelSelectorValue) => void
   suggestions: string[]
   threadId: string | null
   onSelectThread: (threadId: string) => void
