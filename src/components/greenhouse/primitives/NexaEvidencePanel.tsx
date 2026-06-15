@@ -29,6 +29,12 @@ export interface NexaEvidencePanelProps {
   variant?: NexaEvidencePanelVariant
   feedbackEnabled?: boolean
   maxSources?: number
+  /**
+   * Solo fuentes (TASK-1112): omite el header "trazabilidad", los pasos de razonamiento y
+   * el chip "Puntaje". Para el CHAT — la trazabilidad/evidencia es del canvas/answer-trace,
+   * el chat solo necesita los documentos citados. Default false (canvas/answer-trace sin cambio).
+   */
+  sourcesOnly?: boolean
 }
 
 type KnowledgeFeedbackKind = 'useful' | 'not_useful' | 'wrong_source'
@@ -73,9 +79,9 @@ const EvidenceTraceStep = ({ step, index }: { step: ConversationalEvidenceTraceS
   )
 }
 
-const EvidenceSourceCard = ({ source }: { source: ConversationalEvidenceSource }) => {
+const EvidenceSourceCard = ({ source, hideScore = false }: { source: ConversationalEvidenceSource; hideScore?: boolean }) => {
   const theme = useTheme()
-  const scoreLabel = Number.isFinite(source.score) ? `Puntaje ${source.score?.toFixed(2)}` : null
+  const scoreLabel = !hideScore && Number.isFinite(source.score) ? `Puntaje ${source.score?.toFixed(2)}` : null
 
   return (
     <Box
@@ -225,7 +231,8 @@ const NexaEvidencePanel = ({
   evidence,
   variant = 'traceCard',
   feedbackEnabled = true,
-  maxSources = 3
+  maxSources = 3,
+  sourcesOnly = false
 }: NexaEvidencePanelProps) => {
   const theme = useTheme()
   const isTraceCard = variant === 'traceCard'
@@ -246,42 +253,48 @@ const NexaEvidencePanel = ({
         maxInlineSize: '100%'
       }}
     >
-      <Box sx={{ px: isTraceCard ? 3 : 0, py: isTraceCard ? 2.5 : 0 }}>
-        <Stack direction='row' spacing={2} alignItems='center' justifyContent='space-between' flexWrap='wrap' useFlexGap>
-          <Stack spacing={0.5} sx={{ minInlineSize: 0 }}>
-            <Typography variant={isTraceCard ? 'subtitle2' : 'body2'} sx={{ fontWeight: 700 }}>
-              Fuentes y trazabilidad
-            </Typography>
-            <Typography variant='caption' color='text.secondary'>
-              Evidencia versionada desde {evidence.sourceContractVersion}.
-            </Typography>
-          </Stack>
-          <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap sx={{ minInlineSize: 0, justifyContent: { xs: 'flex-start', sm: 'flex-end' } }}>
-            <GreenhouseChip size='small' variant='label' tone={evidence.confidence === 'none' ? 'warning' : 'primary'} label={`Confianza: ${evidenceConfidenceLabel(evidence.confidence)}`} />
-            <GreenhouseChip size='small' variant='label' tone={evidence.freshness === 'current' ? 'success' : 'warning'} label={evidenceFreshnessLabel(evidence.freshness)} />
-            <GreenhouseChip size='small' variant='label' tone='default' label={`${evidence.sources.length} fragmentos`} />
-          </Stack>
-        </Stack>
-      </Box>
+      {/* Header + pasos de trazabilidad: SOLO cuando no es sourcesOnly (el chat omite la
+          evidencia/razonamiento; canvas/answer-trace los conservan). */}
+      {!sourcesOnly ? (
+        <>
+          <Box sx={{ px: isTraceCard ? 3 : 0, py: isTraceCard ? 2.5 : 0 }}>
+            <Stack direction='row' spacing={2} alignItems='center' justifyContent='space-between' flexWrap='wrap' useFlexGap>
+              <Stack spacing={0.5} sx={{ minInlineSize: 0 }}>
+                <Typography variant={isTraceCard ? 'subtitle2' : 'body2'} sx={{ fontWeight: 700 }}>
+                  Fuentes y trazabilidad
+                </Typography>
+                <Typography variant='caption' color='text.secondary'>
+                  Evidencia versionada desde {evidence.sourceContractVersion}.
+                </Typography>
+              </Stack>
+              <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap sx={{ minInlineSize: 0, justifyContent: { xs: 'flex-start', sm: 'flex-end' } }}>
+                <GreenhouseChip size='small' variant='label' tone={evidence.confidence === 'none' ? 'warning' : 'primary'} label={`Confianza: ${evidenceConfidenceLabel(evidence.confidence)}`} />
+                <GreenhouseChip size='small' variant='label' tone={evidence.freshness === 'current' ? 'success' : 'warning'} label={evidenceFreshnessLabel(evidence.freshness)} />
+                <GreenhouseChip size='small' variant='label' tone='default' label={`${evidence.sources.length} fragmentos`} />
+              </Stack>
+            </Stack>
+          </Box>
 
-      {isTraceCard ? <Divider /> : null}
+          {isTraceCard ? <Divider /> : null}
 
-      <Box sx={{ px: isTraceCard ? 3 : 0, py: isTraceCard ? 1 : 0 }}>
-        {evidence.traceSteps.map((step, index) => (
-          <EvidenceTraceStep key={step.id} step={step} index={index} />
-        ))}
-      </Box>
+          <Box sx={{ px: isTraceCard ? 3 : 0, py: isTraceCard ? 1 : 0 }}>
+            {evidence.traceSteps.map((step, index) => (
+              <EvidenceTraceStep key={step.id} step={step} index={index} />
+            ))}
+          </Box>
+        </>
+      ) : null}
 
       {evidence.sources.length > 0 ? (
         <>
-          {isTraceCard ? <Divider /> : <Box sx={{ borderBlockStart: `1px solid ${theme.palette.divider}`, mt: 2 }} />}
-          <Stack spacing={2.5} sx={{ px: isTraceCard ? 3 : 0, py: isTraceCard ? 3 : 2.5 }}>
+          {isTraceCard ? <Divider /> : !sourcesOnly ? <Box sx={{ borderBlockStart: `1px solid ${theme.palette.divider}`, mt: 2 }} /> : null}
+          <Stack spacing={2.5} sx={{ px: isTraceCard ? 3 : 0, py: isTraceCard ? 3 : sourcesOnly ? 0 : 2.5 }}>
             <Typography variant='subtitle2'>
               {GH_KNOWLEDGE_COPY.sourcesLabel} ({evidence.citedDocumentCount})
             </Typography>
             <Stack spacing={2} sx={{ minInlineSize: 0 }}>
               {visibleSources.map(source => (
-                <EvidenceSourceCard key={source.id} source={source} />
+                <EvidenceSourceCard key={source.id} source={source} hideScore={sourcesOnly} />
               ))}
             </Stack>
             {hiddenSourceCount > 0 ? (

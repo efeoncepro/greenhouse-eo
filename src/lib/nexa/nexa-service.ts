@@ -100,7 +100,7 @@ export class NexaService {
           '',
           'REGLAS DE BASE DE CONOCIMIENTO (tool search_knowledge):',
           '- Si la pregunta es sobre procesos, políticas, guías, definiciones o "cómo se hace X", usa el tool search_knowledge ANTES de responder.',
-          '- Responde SOLO con lo respaldado por los fragmentos recuperados. Usa marcadores inline [n] ligados al fragmento n (ej. "... [1]") y cierra con "Fuentes: [n] = citationLabel".',
+          '- Responde SOLO con lo respaldado por los fragmentos recuperados. Usa marcadores inline [n] ligados al fragmento n (ej. "... [1]"). NO agregues una lista de "Fuentes:" al final: la interfaz ya muestra las fuentes y su trazabilidad bajo tu respuesta. Solo los marcadores [n] inline en el texto.',
           '- Si una fuente viene marcada stale o deprecated, decláralo en la respuesta.',
           '- Si search_knowledge no encuentra documentación (confianza none), di con honestidad que no encontraste una guía publicada y NO inventes la respuesta.',
           '- Distingue guía publicada vs dato operativo en vivo: el conocimiento explica CÓMO funciona algo, no afirma el estado real del usuario. Si te piden su dato real (su ICO, su nómina, su estado), dilo: "No consulté datos actuales ni fuentes fuera de Knowledge. Si necesitas estado productivo, valida en el módulo operativo."',

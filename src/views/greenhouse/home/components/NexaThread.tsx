@@ -153,10 +153,40 @@ const NEXA_MARKDOWN_COMPONENTS = unstable_memoizeMarkdownComponents(
   ) as Parameters<typeof unstable_memoizeMarkdownComponents>[0]
 )
 
+/* ── Limpieza DETERMINÍSTICA del answer (TASK-1112) ──
+   El cuerpo de la respuesta debe ser prosa limpia. Las fuentes son apoyo contextual y viven
+   SOLO en el desplegable de procedencia, no en el texto. El modelo, pese al prompt, a veces
+   escribe el volcado "Fuentes: [n] = …" y marcadores [n] inline (un LLM puede ignorar la
+   instrucción → NO es robusto). Por eso se sanea en el render (determinístico, no depende del
+   modelo), cubriendo respuestas nuevas Y threads viejos:
+     1) corta el bloque final "Fuentes …" cuando es la lista de citas ("] =").
+     2) quita los marcadores de cita inline numéricos ([1], [2, 4], [6]). */
+const cleanNexaAnswer = (text: string): string => {
+  let out = text
+
+  const match = out.match(/\n+\s*[*_]{0,2}Fuentes\b:?[*_]{0,2}/i)
+
+  if (match && match.index != null && /\]\s*=/.test(out.slice(match.index))) {
+    out = out.slice(0, match.index)
+  }
+
+  // Marcadores de cita inline completos: [1], [2, 4], [6] (con el espacio previo, sin huecos).
+  out = out.replace(/[ \t]*\[\d+(?:\s*,\s*\d+)*\]/g, '')
+
+  // Marcador incompleto al FINAL: durante el revelado typewriter el texto crece char a char,
+  // así que un "[", "[1", "[2, " todavía sin cerrar dejaría un corchete colgado. Lo quitamos.
+  out = out.replace(/[ \t]*\[[\d,\s]*$/g, '')
+
+  return out.trimEnd()
+}
+
 /* Wrapper del Text part del mensaje: MarkdownTextPrimitive lee el texto del contexto
    (ignora las props del part), así que el wrapper no recibe props. `smooth` se conserva
-   (el revelado sigue), `components` memoizados eliminan el flicker. */
-const NexaMarkdownText = () => <MarkdownTextPrimitive components={NEXA_MARKDOWN_COMPONENTS} />
+   (el revelado sigue), `components` memoizados eliminan el flicker, y `preprocess` sanea el
+   answer (sin volcado "Fuentes:" ni [n] inline) antes de parsear el markdown. */
+const NexaMarkdownText = () => (
+  <MarkdownTextPrimitive components={NEXA_MARKDOWN_COMPONENTS} preprocess={cleanNexaAnswer} />
+)
 
 /* Fallback PURO para tools sin UI registrada: no registra nada (las registra el
    <NexaToolRenderer/> montado al nivel del thread). Renderiza null → comportamiento previo

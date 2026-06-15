@@ -307,7 +307,8 @@ const NexaProvenanceTrace = ({
   tabs,
   panelTitle,
   tabsAriaLabel,
-  feedbackEnabled = false
+  feedbackEnabled = false,
+  sourcesOnly = false
 }: NexaProvenanceTraceProps) => {
   const resolvedVariant = resolveNexaProvenanceTraceVariant({ kind, variant })
 
@@ -332,7 +333,7 @@ const NexaProvenanceTrace = ({
               feedbackEnabled={feedbackEnabled}
             />
           ) : evidence ? (
-            <NexaEvidencePanel evidence={evidence} variant='proofPanel' feedbackEnabled={feedbackEnabled} />
+            <NexaEvidencePanel evidence={evidence} variant='proofPanel' feedbackEnabled={feedbackEnabled} sourcesOnly={sourcesOnly} />
           ) : null}
         </Box>
       </Collapse>
