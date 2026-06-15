@@ -1,5 +1,17 @@
 # Release 2026-06-10 #2 — develop→main `6c649b2a6` RELEASED
 
+## Sesion 2026-06-15 — Portal Cliente/Integraciones/Comunicaciones/AI Tooling/Admin Center docs end-to-end para Nexa Knowledge — Codex
+
+> **Estado:** documentacion creada, ingestion NO ejecutada por instruccion del operador. `TASK-1140` queda como vehiculo formal unico para ingestar manuales operativos multi-dominio a Knowledge/Nexa.
+
+- **Autenticacion GCP relanzada:** por instruccion del operador se ejecuto el flujo canonico completo: `gcloud auth login` y `gcloud auth application-default login`. CLI quedo autenticado como `julio.reyes@efeonce.org`, proyecto `efeonce-group`; ADC quedo OK con quota project `efeonce-group`.
+- **Auditoria runtime/DB:** despues de reauth, Postgres respondio desde DB `greenhouse_app` con usuario runtime `greenhouse_app`. Se consultaron solo agregados sin PII para Portal Cliente, Integraciones/Sync/Webhooks, Comunicaciones/Notificaciones/Teams, AI Tooling/Content/Assets y Admin Center residual.
+- **Snapshot agregado:** Portal Cliente tiene 10 modulos activos y 0 asignaciones activas/eventos; Integrations tiene 7 integraciones activas (6 ready/1 warning), runs recientes, 10.879 webhooks processed y 5 failed en 7 dias, 309 outbound deliveries succeeded y 5 dead_letter; Comunicaciones tiene 209 notificaciones in-app (81 read/128 unread), 53 emails sent en 30 dias, 3 canales Teams Bot ready y 8 conversation references; AI Tooling tiene 34 tools activas y 0 wallets/licencias/ledger; Admin Center tiene 104 vistas activas, 442 role-view grants, 0 user overrides y 0 Service SLAs.
+- **Documentos nuevos:** `docs/documentation/client-portal/portal-cliente-customer-experience-end-to-end.md`, `docs/manual-de-uso/client-portal/operar-portal-cliente-customer-experience.md`, `docs/documentation/operations/integraciones-y-sync-end-to-end.md`, `docs/manual-de-uso/operations/operar-integraciones-y-sync.md`, `docs/documentation/plataforma/comunicaciones-notificaciones-end-to-end.md`, `docs/manual-de-uso/plataforma/operar-comunicaciones-notificaciones.md`, `docs/documentation/ai-tooling/ai-tooling-content-assets-end-to-end.md`, `docs/manual-de-uso/ai-tooling/operar-ai-tooling-content-assets.md`, `docs/documentation/admin-center/admin-center-operacion-end-to-end.md`, `docs/manual-de-uso/admin-center/operar-admin-center.md`.
+- **Indices sincronizados:** `docs/documentation/README.md` y `docs/manual-de-uso/README.md`.
+- **Task ajustada:** `docs/tasks/to-do/TASK-1140-finance-manuals-nexa-knowledge-ingestion.md` — ahora incluye Portal Cliente, Integraciones/Sync, Comunicaciones/Notificaciones, AI Tooling/Content/Assets y Admin Center residual, con golden questions y reglas de no-accion para Nexa.
+- **Pendiente:** ejecutar gates documentales (`pnpm ops:lint --changed`, `pnpm docs:closure-check`) antes de commit. La ingestion de Knowledge/Nexa sigue fuera de esta sesion.
+
 ## Sesion 2026-06-15 — Comercial/Agency/Identity/My Space/Public Site/UI Platform docs end-to-end para Nexa Knowledge — Codex
 
 > **Estado:** documentacion creada, ingestion NO ejecutada por instruccion del operador. `TASK-1140` queda como vehiculo formal unico para ingestar manuales operativos multi-dominio a Knowledge/Nexa.

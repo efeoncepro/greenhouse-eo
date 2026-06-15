@@ -23,10 +23,12 @@ La documentacion funcional no reemplaza el manual ni la arquitectura. Explica qu
 
 ### Portal Cliente
 
+- [Portal Cliente y Customer Experience end-to-end](client-portal/portal-cliente-customer-experience-end-to-end.md) — mapa funcional completo del portal cliente como BFF: roles cliente, vistas, modulos activables, resolver server-side, estados normal/zero-state/not assigned/degraded/error, asignaciones auditables y frontera con Admin Center.
 - [Menu dinamico y acceso a modulos del Portal Cliente](client-portal/menu-dinamico-y-acceso-a-modulos.md) — como funciona el portal cliente compositivo desde TASK-827: catalogo de modulos vendibles (Globe, Wave, addons), resolver canonico server-side, 5 estados visuales canonicos (normal / zero-state recien activado / not_assigned con modulo no comprado / degraded parcial / error completo), page guards resolver-based en 9 rutas cliente, anatomia 5-elementos de empty states, glosario completo. Reemplaza el patron legacy de menu uniforme por business_line.
 
 ### Admin Center
 
+- [Admin Center end-to-end](admin-center/admin-center-operacion-end-to-end.md) — como opera Admin Center sin convertirse en bypass: tenants, usuarios, roles, vistas, permission sets, integraciones, email delivery, AI Tools, pricing catalog, SLAs, calendario operacional, responsabilidades, audit y capabilities.
 - [Commercial Parties](admin-center/commercial-parties.md) — tablero administrativo del lifecycle comercial: lista de parties, embudo, conflictos de sync, detalle por party, transiciones manuales y sweep operativo
 - [Product Sync Conflicts](admin-center/product-catalog-sync.md) — surface administrativa para detectar drift entre Greenhouse y HubSpot Products, revisar diffs y aplicar resoluciones auditables
 - [Catalogo de Productos — Full Sync HubSpot](admin-center/catalogo-productos-fullsync.md) — admin UI completo del product catalog con sync bidireccional de 16 campos contra HubSpot, drift detection 3-niveles inline, backfill masivo, reconcile semanal y governance de campos read-only
@@ -54,6 +56,7 @@ La documentacion funcional no reemplaza el manual ni la arquitectura. Explica qu
 - [Sister Platform Bindings](plataforma/sister-platform-bindings.md) — enlace formal entre scopes externos de apps hermanas y scopes internos de Greenhouse
 - [Sistema de Observabilidad de Tests](plataforma/sistema-observabilidad-de-tests.md) — inventario del suite, resultados, coverage, artifacts y como leer la ultima corrida sin abrir logs crudos
 - [Sistema de Email Templates](plataforma/sistema-email-templates.md) — inventario de templates (react-email + Resend), design tokens, assets de marca, workflow Figma ↔ codigo
+- [Comunicaciones y Notificaciones end-to-end](plataforma/comunicaciones-notificaciones-end-to-end.md) — como Greenhouse entrega mensajes por in-app, email/Resend y Teams Bot: delivery log, preferencias, kill switches, webhooks de bounce/complaint, Teams channels, estados y limites operativos.
 - [Microcopy shared y dictionary-ready](plataforma/microcopy-shared-dictionary.md) — contrato funcional para usar `src/lib/copy`, `getMicrocopy` y `buildStatusMap` sin reintroducir hardcodes de CTAs, estados, meses, empty states o aria-labels
 - [Runtime i18n de Greenhouse](plataforma/i18n-runtime.md) — runtime `next-intl` del App Router: locale por cookie/header, provider, shell `en-US`, sin prefijos privados y frontera con TASK-431
 - [Formateo locale-aware](plataforma/formateo-locale-aware.md) — capa canonica `src/lib/format` para fechas, monedas, numeros, porcentajes, plurales y textos relativos; separa locale, timezone operacional y copy traducible
@@ -119,6 +122,7 @@ La documentacion funcional no reemplaza el manual ni la arquitectura. Explica qu
 
 - [Agency, Delivery y Account 360 end-to-end](agency/agency-delivery-account-360-end-to-end.md) — mapa funcional de Account 360, Delivery, ICO, service attribution, economics y operaciones de agencia, con degradacion honesta por faceta y limites actuales de Service P&L.
 - [Account Complete 360](agency/cuenta-completa-360.md) — datos completos de una cuenta u organizacion: facetas, autorizacion, endpoint unificado
+- [Integraciones y Sync end-to-end](operations/integraciones-y-sync-end-to-end.md) — capa nativa de integraciones: integration registry, source sync runs, raw/conformed/projection, health/freshness, pause/resume, sync manual, webhooks inbound/outbound, data quality y replay/backfill.
 - [Ops Worker — Crons Reactivos en Cloud Run](operations/ops-worker-reactive-crons.md) — servicio Cloud Run que procesa eventos reactivos del outbox, corridas scheduladas, ESM/CJS shim pattern, monitoreo en Ops Health
 - [Commercial Cost Worker](operations/commercial-cost-worker.md) — worker Cloud Run dedicado para la base de costos comercial, su ledger de corridas por periodo/scope y la separacion respecto de `ops-worker`
 - [Postura Cloud GCP](operations/postura-cloud-gcp.md) — estado auditado de Cloud Run, Secret Manager, Cloud SQL, PostgreSQL y BigQuery; qué está sano, qué sigue riesgoso y cómo leer la topología compartida actual
@@ -134,6 +138,7 @@ La documentacion funcional no reemplaza el manual ni la arquitectura. Explica qu
 
 ### Herramientas IA
 
+- [AI Tooling, Content y Assets end-to-end](ai-tooling/ai-tooling-content-assets-end-to-end.md) — catalogo de herramientas IA, licencias, wallets, credit ledger y generacion interna de assets/contenido, con frontera clara frente a Public Site Content Factory y publicaciones.
 - [Generador Visual de Assets con IA](ai-tooling/generador-visual-assets.md) — generacion de imagenes (Imagen 4) y animaciones SVG (Gemini) para enriquecer interfaces, banners de perfil por categoria
 
 ---

@@ -16,7 +16,7 @@
 - Epic: `none`
 - Status real: `Diseno`
 - Rank: `TBD`
-- Domain: `finance|hr|payroll|workforce|contractor|commercial|agency|delivery|identity|admin|personas|public-site|ui-platform|nexa|knowledge|content|ai`
+- Domain: `finance|hr|payroll|workforce|contractor|commercial|agency|delivery|identity|admin|admin-center|personas|client-portal|integrations|sync|communications|notifications|public-site|ui-platform|ai-tooling|content|ai|nexa|knowledge`
 - Blocked by: `none`
 - Branch: `task/TASK-1140-finance-manuals-nexa-knowledge-ingestion`
 - Legacy ID: `none`
@@ -24,18 +24,18 @@
 
 ## Summary
 
-Ingestar el paquete documental operativo de Greenhouse al corpus Knowledge/Nexa para que Nexa pueda responder preguntas sobre Finance, People/Workforce/Payroll/Contractors, Comercial/Quote-to-Cash, Agency/Delivery/Account 360, Identity/Access/Admin Center, My Space/Self-Service, Public Site/Content Factory y UI Platform/Design System con fuentes correctas y citas gobernadas.
+Ingestar el paquete documental operativo de Greenhouse al corpus Knowledge/Nexa para que Nexa pueda responder preguntas sobre Finance, People/Workforce/Payroll/Contractors, Comercial/Quote-to-Cash, Agency/Delivery/Account 360, Identity/Access/Admin Center, My Space/Self-Service, Portal Cliente/Customer Experience, Integraciones/Sync, Comunicaciones/Notificaciones, AI Tooling/Content/Assets, Public Site/Content Factory y UI Platform/Design System con fuentes correctas y citas gobernadas.
 
 Esta task NO crea nueva capacidad de negocio ni ejecuta acciones desde Nexa. Solo hace disponible el conocimiento documentado para respuestas grounded.
 
 ## Why This Task Exists
 
-La revision local del 2026-06-15 mostro que Nexa ya tiene `search_knowledge`, pero las preguntas sobre dominios operativos pueden recuperar documentos generales o parciales con confianza alta. El gap no es solo de prompt: faltaba un paquete end-to-end listo para corpus y un set de golden questions que asegure que Nexa cite fuentes correctas cuando responde sobre caja/tesoreria, nomina, contractors, comercial, delivery, identidad, self-service, public site o plataforma UI.
+La revision local del 2026-06-15 mostro que Nexa ya tiene `search_knowledge`, pero las preguntas sobre dominios operativos pueden recuperar documentos generales o parciales con confianza alta. El gap no es solo de prompt: faltaba un paquete end-to-end listo para corpus y un set de golden questions que asegure que Nexa cite fuentes correctas cuando responde sobre caja/tesoreria, nomina, contractors, comercial, delivery, identidad, self-service, portal cliente, integraciones, comunicaciones, AI tooling, public site o plataforma UI.
 
 ## Goal
 
 - Registrar los manuales/documentos operativos recientes en el corpus Knowledge gobernado.
-- Asegurar que preguntas sobre Finance, People, Comercial, Agency, Identity, My Space, Public Site y UI Platform recuperen fuentes correctas.
+- Asegurar que preguntas sobre Finance, People, Comercial, Agency, Identity, My Space, Portal Cliente, Integraciones/Sync, Comunicaciones/Notificaciones, AI Tooling, Public Site y UI Platform recuperen fuentes correctas.
 - Agregar QA/evals de wrong-source por dominio antes de considerar activacion productiva.
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -64,6 +64,18 @@ Revisar y respetar:
 - `docs/architecture/GREENHOUSE_AGENCY_LAYER_V2.md`
 - `docs/architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md`
 - `docs/architecture/GREENHOUSE_MY_PERFORMANCE_SELF_SERVICE_ACTIVITY_V1.md`
+- `docs/architecture/GREENHOUSE_CLIENT_PORTAL_ARCHITECTURE_V1.md`
+- `docs/architecture/GREENHOUSE_CLIENT_PORTAL_DOMAIN_V1.md`
+- `docs/architecture/GREENHOUSE_NATIVE_INTEGRATIONS_LAYER_V1.md`
+- `docs/architecture/GREENHOUSE_SOURCE_SYNC_PIPELINES_V1.md`
+- `docs/architecture/GREENHOUSE_WEBHOOKS_ARCHITECTURE_V1.md`
+- `docs/architecture/GREENHOUSE_EMAIL_CATALOG_V1.md`
+- `docs/architecture/GREENHOUSE_NOTIFICATION_HUB_V1.md`
+- `docs/architecture/GREENHOUSE_TEAMS_NOTIFICATIONS_V1.md`
+- `docs/architecture/GREENHOUSE_TEAMS_BOT_INTERACTION_V1.md`
+- `docs/architecture/GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md`
+- `docs/architecture/GREENHOUSE_PORTAL_VIEWS_V1.md`
+- `docs/architecture/MULTITENANT_ARCHITECTURE.md`
 - `docs/architecture/GREENHOUSE_PUBLIC_WEBSITE_LANDING_CONTROL_PLANE_ARCHITECTURE_V1.md`
 - `docs/architecture/ui-platform/README.md`
 
@@ -82,6 +94,13 @@ Reglas obligatorias:
 - Mantener separado Contractor Engagement -> Contractor Payable -> Finance Payment Order.
 - Mantener separado Comercial/Quote-to-Cash de Finance/caja: una cotizacion emitida o contrato no equivale a ingreso cobrado ni conciliado.
 - Mantener separado Identity/Admin Center de bypass operativo: roles, vistas, entitlements y SCIM se gobiernan con auditoria.
+- Mantener separado Portal Cliente de Admin Center: cliente ve modulos/vistas asignadas; operador gobierna asignaciones.
+- Mantener separado sync triggered de sync completada: `triggered=true` no garantiza projection ni data quality.
+- Mantener separado webhook recibido de fuente final procesada: el webhook es aviso/evidencia, no necesariamente estado final.
+- Mantener separado email `sent` de `delivered` o leido.
+- Mantener separado TeamBot de Nexa: TeamBot no es bot conversacional general.
+- Mantener separado AI Tools catalog/credits de facturacion, caja o catalogo comercial.
+- Mantener separado asset generation de aprobacion de marca o publicacion.
 - Mantener separado Public Site read-only/draft-only de publicar o mutar produccion.
 - Mantener separado UI Platform guidance de implementacion automatica: Nexa puede explicar primitives/GVC/tokens, pero no debe modificar UI en esta task.
 
@@ -136,6 +155,24 @@ Reglas obligatorias:
 - `docs/manual-de-uso/public-site/operar-public-site-content-factory.md`
 - `docs/documentation/plataforma/ui-platform-design-system-end-to-end.md`
 - `docs/manual-de-uso/plataforma/operar-ui-platform-design-system.md`
+- `docs/documentation/client-portal/portal-cliente-customer-experience-end-to-end.md`
+- `docs/manual-de-uso/client-portal/operar-portal-cliente-customer-experience.md`
+- `docs/documentation/client-portal/menu-dinamico-y-acceso-a-modulos.md`
+- `docs/manual-de-uso/client-portal/menu-dinamico-y-empty-states.md`
+- `docs/documentation/operations/integraciones-y-sync-end-to-end.md`
+- `docs/manual-de-uso/operations/operar-integraciones-y-sync.md`
+- `docs/documentation/operations/notion-bigquery-sync.md`
+- `docs/manual-de-uso/operations/notion-bq-sync-operacion.md`
+- `docs/documentation/plataforma/comunicaciones-notificaciones-end-to-end.md`
+- `docs/manual-de-uso/plataforma/operar-comunicaciones-notificaciones.md`
+- `docs/documentation/plataforma/sistema-email-templates.md`
+- `docs/documentation/admin-center/preview-de-correos.md`
+- `docs/documentation/ai-tooling/ai-tooling-content-assets-end-to-end.md`
+- `docs/manual-de-uso/ai-tooling/operar-ai-tooling-content-assets.md`
+- `docs/documentation/ai-tooling/generador-visual-assets.md`
+- `docs/documentation/admin-center/admin-center-operacion-end-to-end.md`
+- `docs/manual-de-uso/admin-center/operar-admin-center.md`
+- `docs/documentation/admin-center/sets-de-permisos.md`
 
 ## Dependencies & Impact
 
@@ -169,6 +206,14 @@ Reglas obligatorias:
 - `docs/manual-de-uso/identity/**`
 - `docs/documentation/personas/**`
 - `docs/manual-de-uso/personas/**`
+- `docs/documentation/client-portal/**`
+- `docs/manual-de-uso/client-portal/**`
+- `docs/documentation/operations/**`
+- `docs/manual-de-uso/operations/**`
+- `docs/documentation/ai-tooling/**`
+- `docs/manual-de-uso/ai-tooling/**`
+- `docs/documentation/admin-center/**`
+- `docs/manual-de-uso/admin-center/**`
 - `docs/documentation/public-site/**`
 - `docs/manual-de-uso/public-site/**`
 - `docs/documentation/plataforma/**`
@@ -187,15 +232,20 @@ Reglas obligatorias:
 - El 2026-06-15 se agrego un documento funcional end-to-end y manual operador que conectan People/Workforce/Payroll/Contractors/Finance, reconciliados contra codigo y DB read-only.
 - Existen docs especializados de Comercial, Agency/Delivery, Identity, My Space, Public Site y UI Platform, pero estaban fragmentados por feature o arquitectura.
 - El 2026-06-15 se agregaron documentos funcionales end-to-end y manuales operador para Comercial/Quote-to-Cash, Agency/Delivery/Account 360, Identity/Access/Admin Center, My Space/Self-Service, Public Site/Content Factory y UI Platform/Design System, reconciliados contra codigo y DB read-only cuando el dominio tiene runtime relacional.
+- Existen docs especializados de Portal Cliente, Integraciones/Sync, email/templates, Teams, AI Visual Assets y Admin Center, pero estaban fragmentados por feature o arquitectura.
+- El 2026-06-15 se agregaron documentos funcionales end-to-end y manuales operador para Portal Cliente/Customer Experience, Integraciones/Sync, Comunicaciones/Notificaciones, AI Tooling/Content/Assets y Admin Center residual. Se reviso codigo/schema y DB viva agregada sin PII tras relanzar el flujo canonico de `gcloud auth login` + `gcloud auth application-default login`.
+- Snapshot DB agregado usado por los documentos nuevos: Portal Cliente tiene 10 modulos activos y 0 asignaciones activas; Integrations tiene 7 integraciones activas (6 ready/1 warning), runs recientes y webhooks procesando; Comunicaciones tiene 53 email deliveries `sent` en 30 dias, 209 notificaciones in-app y 3 canales Teams Bot ready; AI Tooling tiene 34 tools activas y sin wallets/licencias/ledger cargados; Admin Center tiene 104 vistas activas, 442 grants, 0 overrides y 0 Service SLAs en este ambiente.
 
 ### Gap
 
 - Los documentos Finance nuevos no estan registrados en el corpus Knowledge/Nexa.
 - Los documentos People/Workforce/Payroll/Contractors nuevos no estan registrados en el corpus Knowledge/Nexa.
 - Los documentos Comercial, Agency, Identity, My Space, Public Site y UI Platform nuevos no estan registrados en el corpus Knowledge/Nexa.
+- Los documentos Portal Cliente, Integraciones/Sync, Comunicaciones/Notificaciones, AI Tooling/Content/Assets y Admin Center nuevos no estan registrados en el corpus Knowledge/Nexa.
 - No existe set de golden questions Finance que bloquee wrong-source.
 - No existe set de golden questions People/Payroll/Contractors que fuerce a Nexa a distinguir regimenes laborales.
 - No existe set de golden questions Comercial/Agency/Identity/My Space/Public Site/UI Platform que fuerce respuestas con fuentes del dominio correcto.
+- No existe set de golden questions Portal Cliente/Integraciones/Comunicaciones/AI Tooling/Admin Center que fuerce respuestas con fuentes del dominio correcto.
 - Preguntas finance pueden recuperar docs generales de Greenhouse/Nexa con confianza alta.
 - Preguntas contractor pueden recuperar solo Finance o solo HR y omitir la cadena completa.
 - Preguntas comerciales pueden recuperar docs Finance legacy y confundir cotizacion/contrato con caja o ingreso reconocido.
@@ -203,6 +253,11 @@ Reglas obligatorias:
 - Preguntas de identidad pueden responder con conceptos generales de rol/permiso y no con el contrato real de view registry, entitlements, permission sets y SCIM.
 - Preguntas de Public Site pueden omitir la postura read-only/draft-only y sugerir publicar o mutar WordPress sin guardrails.
 - Preguntas de UI Platform pueden omitir Composition Shell, Primitive+Variants+Kinds, tokens, GVC o las restricciones contra imports directos.
+- Preguntas de Portal Cliente pueden confundir modulo comprado/asignado con permiso de vista, o zero-state con error.
+- Preguntas de Integraciones pueden confundir trigger manual con projection completada, o webhook recibido con dato final.
+- Preguntas de Comunicaciones pueden confundir `sent` con `delivered` o TeamBot con Nexa conversacional.
+- Preguntas de AI Tooling pueden confundir wallet/ledger de creditos con facturacion/caja o asset generation con publicacion.
+- Preguntas de Admin Center pueden proponer SQL/bypass en vez de view registry, capability y audit.
 - La sensibilidad de perfiles, cuentas e instrumentos ya quedo documentada; la ingestion debe conservar metadata/policy para no exponer datos sensibles.
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -222,8 +277,8 @@ Reglas obligatorias:
 
 ### Slice 1 — Corpus registration
 
-- Registrar los docs normativos Finance, People, Workforce, Payroll, Contractors, Comercial, Agency, Delivery, Identity, Admin Center, Personas/My Space, Public Site y UI Platform en el corpus Knowledge correspondiente.
-- Asignar metadata de dominio (`finance`, `hr`, `payroll`, `workforce`, `contractor`, `commercial`, `agency`, `delivery`, `identity`, `admin`, `personas`, `public-site`, `ui-platform`), tipo `documentation` o `manual`, sensitivity interna y policy `agent_allowed` solo para contenido operativo no sensible.
+- Registrar los docs normativos Finance, People, Workforce, Payroll, Contractors, Comercial, Agency, Delivery, Identity, Admin Center, Personas/My Space, Portal Cliente, Integraciones/Sync, Comunicaciones/Notificaciones, AI Tooling/Content/Assets, Public Site y UI Platform en el corpus Knowledge correspondiente.
+- Asignar metadata de dominio (`finance`, `hr`, `payroll`, `workforce`, `contractor`, `commercial`, `agency`, `delivery`, `identity`, `admin`, `personas`, `client-portal`, `integrations`, `sync`, `communications`, `notifications`, `ai-tooling`, `content`, `public-site`, `ui-platform`), tipo `documentation` o `manual`, sensitivity interna y policy `agent_allowed` solo para contenido operativo no sensible.
 - Evitar duplicar documentos ya ingestado; si existe fuente previa, actualizarla en lugar de crear una entrada paralela.
 
 ### Slice 2 — Retrieval and answer QA
@@ -276,6 +331,25 @@ Reglas obligatorias:
   - "como inspecciono un post del Public Site";
   - "que es refresh plan, patch plan y draft";
   - "puede Nexa publicar el sitio publico";
+  - "que ve un cliente en Portal Cliente";
+  - "como activo un modulo cliente";
+  - "por que un cliente no ve Analytics";
+  - "zero-state es un error";
+  - "que significa degraded en Portal Cliente";
+  - "como se si una integracion esta sana";
+  - "que es raw conformed projection";
+  - "puedo disparar una sync manual";
+  - "triggered significa que la sync termino";
+  - "un webhook recibido ya es dato final";
+  - "como reviso si un email fallo";
+  - "sent significa delivered";
+  - "TeamBot puede conversar como Nexa";
+  - "como apago un tipo de correo";
+  - "como registro una herramienta IA";
+  - "wallet de creditos IA es caja o factura";
+  - "AI Tooling puede publicar en WordPress";
+  - "que administra Admin Center";
+  - "responsibility da permiso automaticamente";
   - "como construyo una pantalla nueva en Greenhouse";
   - "cuando uso Composition Shell";
   - "que significa Primitive + Variants + Kinds";
@@ -293,6 +367,11 @@ Reglas obligatorias:
 - Asegurar que Nexa separa Account 360/Delivery/ICO de Service P&L cuando la proyeccion aun es parcial.
 - Asegurar que Nexa separa Identity/Admin Center de bypass manual y no sugiere editar DB para dar acceso.
 - Asegurar que Nexa separa My Space self-service de vistas admin y no acepta IDs arbitrarios de persona/miembro.
+- Asegurar que Nexa separa Portal Cliente de Admin Center: modulo/asignacion/empty state no es lo mismo que rol/vista/capability.
+- Asegurar que Nexa separa sync trigger, sync run, data quality, projection y webhook recibido.
+- Asegurar que Nexa separa email `sent`, `delivered`, bounce/complaint y lectura humana.
+- Asegurar que Nexa separa TeamBot de Nexa conversacional.
+- Asegurar que Nexa separa AI Tools catalog, licencias, wallets, credit ledger, asset generation y Public Site Content Factory.
 - Asegurar que Nexa separa Public Site read-only/draft-only de publish/cache/backups/productive writes.
 - Asegurar que Nexa separa UI Platform guidance de implementacion automatica y no recomienda patrones prohibidos.
 - Asegurar que Nexa no entrega datos sensibles de perfiles/cuentas ni instrucciones para bypass.
@@ -310,6 +389,10 @@ Reglas obligatorias:
 - Crear/activar contractors, aprobar entregas, generar payables o cerrar finiquitos desde Nexa.
 - Crear cotizaciones, aprobar descuentos, emitir contratos, sincronizar HubSpot o convertir Quote-to-Cash desde Nexa.
 - Modificar roles, vistas, permission sets, SCIM mappings, usuarios o entitlements desde Nexa.
+- Activar, pausar o deshabilitar modulos cliente desde Nexa.
+- Pausar/reanudar integraciones, disparar syncs, reprocesar webhooks o ejecutar backfills desde Nexa.
+- Enviar emails, mensajes Teams, anuncios, previews productivos o cambiar kill switches desde Nexa.
+- Crear herramientas IA, recargar wallets, consumir creditos o generar assets desde Nexa.
 - Ver datos personales de terceros desde My Space o saltarse el contexto de sesion.
 - Publicar, cache clear, backup, draft write o mutar WordPress/Kinsta desde Nexa.
 - Crear components, modificar JSX, promover primitives o ejecutar GVC desde Nexa como accion automatica.
@@ -352,6 +435,21 @@ Preguntas de QA minimas:
 | "Como funciona SCIM con Entra?" | `scim-entra-provisioning.md`, `identity-access-admin-center-end-to-end.md` |
 | "Como veo mi recibo o actualizo mi perfil de pago?" | `operar-mi-espacio-self-service.md`, `my-space-self-service-end-to-end.md` |
 | "Por que My Space no muestra datos de otra persona?" | `my-space-self-service-end-to-end.md`, `person-complete-360.md` |
+| "Que ve un cliente en Portal Cliente?" | `portal-cliente-customer-experience-end-to-end.md`, `menu-dinamico-y-acceso-a-modulos.md` |
+| "Como activo un modulo cliente?" | `operar-portal-cliente-customer-experience.md`, `menu-dinamico-y-empty-states.md` |
+| "Por que un cliente no ve Analytics?" | `portal-cliente-customer-experience-end-to-end.md`, `operar-portal-cliente-customer-experience.md` |
+| "Zero-state es un error?" | `portal-cliente-customer-experience-end-to-end.md`, `menu-dinamico-y-empty-states.md` |
+| "Como se si una integracion esta sana?" | `integraciones-y-sync-end-to-end.md`, `operar-integraciones-y-sync.md` |
+| "Triggered significa que la sync termino?" | `integraciones-y-sync-end-to-end.md`, `operar-integraciones-y-sync.md` |
+| "Un webhook recibido ya es dato final?" | `integraciones-y-sync-end-to-end.md`, `captura-transiciones-notion-rpa-demo.md` |
+| "Como reviso si un email fallo?" | `comunicaciones-notificaciones-end-to-end.md`, `operar-comunicaciones-notificaciones.md` |
+| "Sent significa delivered?" | `comunicaciones-notificaciones-end-to-end.md`, `operar-comunicaciones-notificaciones.md` |
+| "TeamBot puede conversar como Nexa?" | `comunicaciones-notificaciones-end-to-end.md`, `operar-comunicaciones-notificaciones.md` |
+| "Como registro una herramienta IA?" | `ai-tooling-content-assets-end-to-end.md`, `operar-ai-tooling-content-assets.md` |
+| "Wallet de creditos IA es caja o factura?" | `ai-tooling-content-assets-end-to-end.md`, `operar-ai-tooling-content-assets.md`, `operacion-finance-end-to-end.md` |
+| "AI Tooling puede publicar en WordPress?" | `ai-tooling-content-assets-end-to-end.md`, `operar-ai-tooling-content-assets.md`, `public-site-content-factory-end-to-end.md` |
+| "Que administra Admin Center?" | `admin-center-operacion-end-to-end.md`, `operar-admin-center.md`, `identity-access-admin-center-end-to-end.md` |
+| "Responsibilities dan permisos?" | `admin-center-operacion-end-to-end.md`, `operar-admin-center.md` |
 | "Como inspecciono un post del Public Site?" | `operar-public-site-content-factory.md`, `public-site-content-factory-end-to-end.md` |
 | "Nexa puede publicar el sitio publico?" | `public-site-content-factory-end-to-end.md`, `operar-public-site-content-factory.md` |
 | "Como construyo una pantalla nueva en Greenhouse?" | `operar-ui-platform-design-system.md`, `ui-platform-design-system-end-to-end.md` |
@@ -366,6 +464,7 @@ Respuesta esperada:
 - con citas/sources finance;
 - con citas/sources HR/Payroll/Contractors cuando la pregunta no sea solo Finance;
 - con citas/sources del dominio correcto para Comercial, Agency, Identity, My Space, Public Site y UI Platform;
+- con citas/sources del dominio correcto para Portal Cliente, Integraciones/Sync, Comunicaciones/Notificaciones, AI Tooling y Admin Center;
 - sin inventar datos de runtime;
 - sin prometer que Nexa puede ejecutar la accion.
 
@@ -429,11 +528,13 @@ Respuesta esperada:
 
 - [ ] Los manuales/documentos Finance, People, Workforce, Payroll y Contractors normativos estan registrados en el corpus Knowledge.
 - [ ] Los manuales/documentos Comercial, Agency/Delivery, Identity/Admin Center, My Space, Public Site y UI Platform normativos estan registrados en el corpus Knowledge.
+- [ ] Los manuales/documentos Portal Cliente, Integraciones/Sync, Comunicaciones/Notificaciones, AI Tooling/Content/Assets y Admin Center residual normativos estan registrados en el corpus Knowledge.
 - [ ] `search_knowledge` recupera fuentes Finance para preguntas Finance y fuentes HR/Payroll/Contractors para preguntas People.
 - [ ] `search_knowledge` recupera fuentes Comercial/Agency/Identity/Personas/Public Site/UI Platform para preguntas de esos dominios.
-- [ ] Nexa responde preguntas de ingreso, egreso, cobro, pago directo, instrumento, Banco, transferencia interna, orden de pago, conciliacion, Workforce Activation, nomina, honorarios, Deel/internacional, contractors, employee-to-contractor, offboarding, finiquitos, quote-to-cash, Account 360, roles/vistas, My Space, Content Factory y UI Platform con citas correctas.
+- [ ] `search_knowledge` recupera fuentes Portal Cliente/Integraciones/Comunicaciones/AI Tooling/Admin Center para preguntas de esos dominios.
+- [ ] Nexa responde preguntas de ingreso, egreso, cobro, pago directo, instrumento, Banco, transferencia interna, orden de pago, conciliacion, Workforce Activation, nomina, honorarios, Deel/internacional, contractors, employee-to-contractor, offboarding, finiquitos, quote-to-cash, Account 360, roles/vistas, My Space, Portal Cliente, Integraciones/Sync, Comunicaciones/Notificaciones, AI Tooling, Content Factory y UI Platform con citas correctas.
 - [ ] Los casos wrong-source quedan cubiertos por eval/QA.
-- [ ] Nexa no afirma que puede ejecutar acciones financieras, HR, Payroll, Contractors, Comerciales, Admin, Public Site o UI Platform en esta task.
+- [ ] Nexa no afirma que puede ejecutar acciones financieras, HR, Payroll, Contractors, Comerciales, Admin, Portal Cliente, Integraciones, Comunicaciones, AI Tooling, Public Site o UI Platform en esta task.
 - [ ] Production queda explicitamente sin cambios o validada con aprobacion humana.
 
 ## Verification

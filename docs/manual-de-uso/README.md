@@ -36,11 +36,12 @@ La diferencia con otras capas de documentacion:
 
 ### Portal Cliente
 
+- [Operar Portal Cliente y Customer Experience](client-portal/operar-portal-cliente-customer-experience.md) — guia operador para activar/pausar modulos, diagnosticar rutas cliente, distinguir vista/modulo/capability y resolver estados normal, zero-state, not assigned, degraded y error.
 - [Menu dinamico y empty states — operacion](client-portal/menu-dinamico-y-empty-states.md) — como activar/pausar/dar de baja modulos para clientes, verificar que esta viendo cada cliente, diagnosticar empty states reportados, atender warnings Sentry `role_view_fallback_used` (regla canonica view registry governance), validar visualmente con mockup `/cliente-portal-mockup`, troubleshooting de los 5 estados canonicos del 5-state contract.
 
 ### Admin Center
 
-_Pendiente._
+- [Operar Admin Center](admin-center/operar-admin-center.md) — guia transversal para operar acceso, tenants, permission sets, integraciones, email delivery, AI Tools, pricing catalog, SLAs, calendario y responsabilidades sin saltarse capabilities ni audit.
 
 ### HR y Nomina
 
@@ -64,6 +65,7 @@ _Pendiente._
 
 - [Operar Agency, Delivery y Account 360](agency/operar-agency-delivery-account-360.md) — como leer Account 360, Delivery, ICO, economics, sample sprints y service attribution con degradacion honesta por faceta.
 - [Monitorear Costos Cloud con FinOps](operations/monitorear-costos-cloud-finops.md) — como revisar gasto GCP, interpretar proyecciones y drivers, usar alertas tempranas y ejecutar diagnosticos seguros sin depender solo de la consola de Google Cloud.
+- [Operar Integraciones y Sync](operations/operar-integraciones-y-sync.md) — como revisar health/freshness, disparar sync manual, pausar/reanudar conectores, diagnosticar webhooks y no romper la cadena raw/conformed/projection.
 - [Operar el pipeline RpA V2 demo](operations/pipeline-rpa-v2-demo.md) — verificar que un cambio de estado en una tarea demo se captura y se refleja en la propiedad `RpA` de Notion; interpretar señales de confiabilidad; troubleshooting de captura y writeback.
 
 ### Plataforma
@@ -72,6 +74,7 @@ _Pendiente._
 - [Operar Public Site y Content Factory](public-site/operar-public-site-content-factory.md) — como inspeccionar contenido WordPress, generar mapas de inteligencia, revisar drift/dry-run y preparar drafts sin publicar ni mutar produccion fuera de una ventana aprobada.
 - [Knowledge Platform (foundation)](plataforma/knowledge-platform.md) — operar la base del Knowledge Platform: aplicar la migración del schema `greenhouse_knowledge`, usar los helpers server-only de `src/lib/knowledge/` (registrar fuente, crear/publicar documento con chunks, transicionar lifecycle, feedback), qué significan los estados y qué no hacer.
 - [MCP Greenhouse Read-Only](plataforma/mcp-greenhouse-read-only.md) — cómo levantar el MCP local `stdio` o conectarse al gateway remoto HTTP privado, qué variables necesita, qué tools read-only existen hoy, qué límites de scope respeta y qué follow-ups siguen fuera de alcance.
+- [Operar Comunicaciones y Notificaciones](plataforma/operar-comunicaciones-notificaciones.md) — revisar email delivery, previews, kill switches, preferencias, in-app notifications, Resend webhooks y Teams Bot sin enviar mensajes fuera de trazabilidad.
 - [Validar el contrato visual DESIGN.md](plataforma/validar-contrato-visual-design-md.md) — paso a paso para validar localmente con `pnpm design:lint`, comparar versiones con `pnpm design:diff`, agregar tokens nuevos siguiendo el patrón canónico (sin atajos prohibidos), resolver warnings comunes, y verificar que el CI gate aprobó tu PR.
 - [Usar microcopy shared](plataforma/microcopy-shared-dictionary.md) — como usar `getMicrocopy` y `buildStatusMap` para botones, estados, meses, empty states y aria-labels sin duplicar strings ni romper el futuro i18n.
 - [Verificar idioma del portal](plataforma/i18n-runtime.md) — como forzar `gh_locale=en-US`/`es-CL` para QA del runtime i18n sin cambiar URLs privadas ni APIs.
@@ -81,6 +84,10 @@ _Pendiente._
 - [Activar y desactivar el Modo Mantenimiento](plataforma/modo-mantenimiento.md) — paso a paso para poner el portal detrás de la página `/maintenance` durante una mantención planificada: setear `MAINTENANCE_MODE=true` (+ `MAINTENANCE_BYPASS_SECRET`) + redeploy, verificar con `?gh_bypass`, apagar, qué significan el 503/cookie/mensajes rotativos, qué no hacer y troubleshooting.
 - [Greenhouse Visual Capture](plataforma/captura-visual-playwright.md) — `pnpm fe:capture` para grabar `.webm` + frames PNG marker-based + GIF opcional de cualquier ruta del portal. Reemplaza el patrón de `_cap.mjs` ad-hoc. Scenario DSL declarativo, agent auth canónico, scroll robusto, captura full-page/por sección, 5 capas defense-in-depth Safety, GC de artifacts.
 - [Operar UI Platform y Design System](plataforma/operar-ui-platform-design-system.md) — runbook para diseñar/implementar superficies con primitives, tokens, Composition Shell, Adaptive Card Density, GVC, design-system catalog y gobernanza Figma.
+
+### Herramientas IA
+
+- [Operar AI Tooling, Content y Assets](ai-tooling/operar-ai-tooling-content-assets.md) — administrar catalogo de herramientas IA, licencias, wallets, credit ledger y generacion interna de imagenes/animaciones sin confundirlo con facturacion ni publicacion del Public Site.
 
 ## Plantilla recomendada
 
