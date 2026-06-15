@@ -423,6 +423,22 @@ export const GH_NEXA = {
         ]
       }
     } as Record<string, { label: string; icon: string; prompts: string[] }>,
+    // Prompts DATA-AWARE (Tier 2, TASK-1087): plantillas de "gancho" por categoría de señal real
+    // (anomalía/pendiente/riesgo/KPI). El composer (suggested-prompts-data-aware.ts) elige cuáles
+    // según las señales vivas de la entidad y reemplaza `{entity}` con su nombre. Es-CL tuteo.
+    // REGLA DURA: estas plantillas NUNCA llevan montos crudos ni PII — solo el gancho + el nombre
+    // (que el usuario ya ve en la página). El detalle lo resuelve Nexa con sus tools.
+    data_aware_prompts: {
+      health_risk: '¿Por qué {entity} está en riesgo este mes?',
+      health_blocked: 'Hay algo bloqueando a {entity}, ¿lo resolvemos?',
+      anomaly_delivery_error: 'El delivery de {entity} está en rojo, ¿lo revisamos?',
+      anomaly_delivery_warning: '{entity} tiene entregables trabados, ¿los vemos?',
+      anomaly_finance_warning: '{entity} tiene saldo pendiente por cobrar, ¿lo revisamos?',
+      lifecycle_blocked: 'El onboarding de {entity} está bloqueado, ¿lo destrabamos?',
+      lifecycle_pending: '¿Qué falta para cerrar el onboarding de {entity}?',
+      pending_review: '{entity} tiene pendientes por revisar, ¿los vemos?',
+      generic_watch: '¿Qué está pasando con {entity} este mes?'
+    } as Record<string, string>,
     // Saludo del empty hero — rota en cada nueva conversación. `{name}` se reemplaza
     // con el primer nombre del usuario en sesión; si no hay nombre, esas frases se
     // filtran (mismo patrón que agent_headline_rotation_*). Cortos (1 línea),

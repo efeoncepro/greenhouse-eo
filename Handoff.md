@@ -1,5 +1,17 @@
 # Release 2026-06-10 #2 — develop→main `6c649b2a6` RELEASED
 
+## Sesión 2026-06-15 — TASK-1087 Nexa prompts sugeridos data-aware (Tier 2) — Claude
+
+> **Estado:** code-complete en `develop` (local-first, SIN push). Aditivo + **flag `NEXA_SUGGESTED_PROMPTS_DATA_AWARE_ENABLED` default OFF** → cero efecto al merge. Cutover + GVC con anomalía viva = rollout-time (operador).
+
+- **Qué cambió:** los starters del empty hero del chat flotante de Nexa ahora pueden ser **data-aware** — arrancan desde la señal real de la entidad (anomalía/pendiente/KPI en rojo) en vez de la plantilla fija. Es el Tier 2 de TASK-1078 (Tier 1/1.5 siguen como fallback).
+- **Reuse-first:** el composer server-only `resolveDataAwareSuggestedPrompts` **reusa** `readOrganizationWorkspaceCompactSignalsSafely` (ya compuesto + degradación-honesta + subject-gated/anti-oracle vía `visibleFacets`). NO recompone readers sueltos. Mapper **puro** `buildDataAwarePromptsFromCompactSignals` con **allowlist categórica** (NUNCA `driver.value`/`signal.body` al texto — solo categoría + nombre + `entityRef`).
+- **Archivos:** `src/lib/nexa/suggested-prompts-data-aware.ts` (composer) · `suggested-prompts-contract.ts` (contrato puro `nexa-suggested-prompts.v1`) · `use-data-aware-suggested-prompts.ts` (hook cliente aditivo) · `src/app/api/nexa/suggested-prompts/route.ts` (NUNCA 5xx) · `flags.ts` · `copy/nexa.ts` (plantillas es-CL) · `nexa-page-context.tsx` + 2 páginas org (declaran `entityId`/`entityKind`) · `NexaFloatingPanel.tsx` (consume).
+- **V1 solo contexto `client`** (org workspace, único con `entityId`); `finance`/`payroll`/`general` → fallback hasta wirear su página + resolver (composer extensible).
+- **Doc gate:** doc de capa `docs/architecture/nexa-intelligence/experience/suggested-prompts.md` + `manifest.json` (nuevo dominio `suggested-prompts` + doc en dominio flags). `pnpm nexa:doc-gate` verde (10 dominios).
+- **Gates:** tsc 0 · lint 0 · 8/8 tests focales (degradación + allowlist anti-monto + anti-oracle + cap 4) · suite Nexa 76 passed · build.
+- **Pendiente (rollout):** flag ON en staging + validar con un cliente con señal viva (GVC: el primer prompt refleja la anomalía real) → recién entonces cutover. Retomar: `/implement-task TASK-1087`.
+
 ## Sesión 2026-06-15 — Nexa Intelligence: documentación por capas + doc gate (TASK-1124 follow-up) — Claude
 
 > **Estado:** shipped en `develop`. Documentación + gate, sin tocar runtime de Nexa.

@@ -24,6 +24,7 @@ import {
 } from '@/lib/nexa/use-nexa-runtime'
 import { useNexaThreadHistory } from '@/lib/nexa/use-nexa-thread-history'
 import { resolveNexaPromptContext, type NexaPromptContext } from '@/lib/nexa/suggested-prompts'
+import { useDataAwareSuggestedPrompts } from '@/lib/nexa/use-data-aware-suggested-prompts'
 import { useNexaPageContext } from '@/lib/nexa/nexa-page-context'
 import type { NexaThreadDetail } from '@/lib/nexa/nexa-contract'
 
@@ -373,7 +374,17 @@ const NexaFloatingPanel = ({ expanded, onToggleExpanded, onClose }: NexaFloating
   // real de la entidad, ej. "Cliente · Sky Airline"). Determinístico, cero datos/IA.
   const pathname = usePathname()
   const pageContext = useNexaPageContext()
-  const promptContext = useMemo(() => resolveNexaPromptContext(pathname, pageContext), [pathname, pageContext])
+  const basePromptContext = useMemo(() => resolveNexaPromptContext(pathname, pageContext), [pathname, pageContext])
+
+  // TASK-1087 Tier 2 — capa data-aware sobre Tier 1/1.5: si el flag está on, la entidad tiene
+  // `entityId` y hay señales reales, reemplaza los prompts por los data-aware; si no, devuelve los
+  // de plantilla intactos (aditivo, byte-idéntico al comportamiento previo).
+  const effectivePrompts = useDataAwareSuggestedPrompts(basePromptContext, pageContext)
+
+  const promptContext = useMemo<NexaPromptContext>(
+    () => (effectivePrompts === basePromptContext.prompts ? basePromptContext : { ...basePromptContext, prompts: effectivePrompts }),
+    [basePromptContext, effectivePrompts]
+  )
 
   return (
     <Box

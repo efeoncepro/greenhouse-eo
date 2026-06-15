@@ -42,3 +42,13 @@ export const isNexaSystemPromptV2Enabled = (): boolean => process.env.NEXA_SYSTE
 // grounding usa el resumen de excerpts saneado (sin headings crudos, sin lista "Fuentes:").
 export const isNexaKnowledgeSynthesisBriefEnabled = (): boolean =>
   process.env.NEXA_KNOWLEDGE_SYNTHESIS_BRIEF_ENABLED === 'true'
+
+// TASK-1087 — Prompts sugeridos data-aware (Tier 2). Default OFF: con OFF, los prompts del chat
+// flotante se quedan en Tier 1/1.5 (plantillas por ruta + nombre real de la entidad), byte-idéntico
+// al comportamiento previo. Con ON, el panel consulta `GET /api/nexa/suggested-prompts` y, si hay
+// señales reales para la entidad (anomalías/pendientes/KPIs en rojo), reemplaza los prompts por los
+// data-aware; si no hay señal o el reader degrada, cae a Tier 1/1.5. NEXT_PUBLIC mirror para que el
+// panel (client component) decida si hace el fetch; el endpoint también gatea server-side.
+export const isNexaSuggestedPromptsDataAwareEnabled = (): boolean =>
+  process.env.NEXA_SUGGESTED_PROMPTS_DATA_AWARE_ENABLED === 'true' ||
+  process.env.NEXT_PUBLIC_NEXA_SUGGESTED_PROMPTS_DATA_AWARE_ENABLED === 'true'

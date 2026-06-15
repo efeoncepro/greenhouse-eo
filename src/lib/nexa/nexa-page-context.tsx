@@ -32,14 +32,14 @@ export const useNexaPageContext = (): NexaPageContextValue | null => useContext(
  * declarativo — la página solo hace `<NexaContextScope entityName={cliente.name} />`. No
  * pinta nada. El setter es estable, así que el efecto solo corre si cambia entityName/key.
  */
-export const NexaContextScope = ({ entityName, contextKey }: NexaPageContextValue) => {
+export const NexaContextScope = ({ entityName, contextKey, entityId, entityKind }: NexaPageContextValue) => {
   const setContext = useContext(NexaSetContext)
 
   useEffect(() => {
-    setContext({ entityName, contextKey })
+    setContext({ entityName, contextKey, entityId, entityKind })
 
     return () => setContext(null)
-  }, [setContext, entityName, contextKey])
+  }, [setContext, entityName, contextKey, entityId, entityKind])
 
   return null
 }

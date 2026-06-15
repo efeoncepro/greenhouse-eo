@@ -6,6 +6,7 @@ Esta capa es la **vista Nexa Intelligence** de esos contratos — no los re-deri
 
 - [`conversational-experience.md`](conversational-experience.md) — el shell + coreografía + contratos SSOT (surfaceContext) de la lente conversacional.
 - [`nexa-moments.md`](nexa-moments.md) — la unidad de producto: `context + evidence + permission + intent + next step`.
+- [`suggested-prompts.md`](suggested-prompts.md) — los starters del chat flotante: Tier 1 (por ruta) / 1.5 (nombre real) / 2 (data-aware, flag-gated).
 - [`nexa-answers.md`](nexa-answers.md) — la respuesta que se arma (canvas, síntesis citada, render plan, lente runtime).
 
 Contratos canónicos (fuera de esta carpeta — esta capa los referencia):

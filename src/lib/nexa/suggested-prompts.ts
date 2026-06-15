@@ -15,14 +15,22 @@ export interface NexaPromptContext {
   prompts: string[]
 }
 
+/** Tipo de entidad que la página declara (TASK-1087). Hoy solo `organization` tiene readers
+ *  data-aware wireados; el resto cae a Tier 1/1.5 hasta que su página declare entityId + resolver. */
+export type NexaPageEntityKind = 'organization'
+
 /**
- * Contexto que una página declara para Nexa (Tier 1.5). `entityName` interpola el nombre
- * real en los prompts/label (ej. "Cliente · Sky Airline"); `contextKey` puede forzar la
- * familia si la ruta no la resuelve. Ambos opcionales — sin esto, se resuelve por ruta.
+ * Contexto que una página declara para Nexa (Tier 1.5 + Tier 2). `entityName` interpola el nombre
+ * real en los prompts/label (ej. "Cliente · Sky Airline"); `contextKey` puede forzar la familia si
+ * la ruta no la resuelve; `entityId`/`entityKind` (TASK-1087) habilitan los prompts DATA-AWARE — el
+ * panel consulta el endpoint server-side con ese id. Todos opcionales — sin esto, se resuelve por
+ * ruta y se queda en plantillas (Tier 1).
  */
 export interface NexaPageContextValue {
   entityName?: string
   contextKey?: NexaPromptContextKey
+  entityId?: string
+  entityKind?: NexaPageEntityKind
 }
 
 const CONTEXTS = GH_NEXA.floating.prompt_contexts

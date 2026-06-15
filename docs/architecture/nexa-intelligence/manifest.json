@@ -8,6 +8,7 @@
     "src/lib/nexa/floating-events.ts",
     "src/lib/nexa/store.ts",
     "src/lib/nexa/suggested-prompts.ts",
+    "src/lib/nexa/use-data-aware-suggested-prompts.ts",
     "src/lib/nexa/use-nexa-runtime.ts",
     "src/lib/nexa/use-nexa-thread-history.ts",
     "src/lib/nexa/nexa-page-context.tsx",
@@ -32,6 +33,7 @@
     "experience/conversational-experience.md",
     "experience/nexa-moments.md",
     "experience/nexa-answers.md",
+    "experience/suggested-prompts.md",
     "governance/README.md",
     "governance/dos-and-donts.md",
     "technical/README.md",
@@ -94,10 +96,20 @@
       "docs": ["experience/conversational-experience.md", "experience/nexa-answers.md", "experience/nexa-moments.md"]
     },
     {
+      "key": "suggested-prompts",
+      "label": "Prompts sugeridos contextuales (Tier 1/1.5/2 data-aware)",
+      "code": [
+        "src/lib/nexa/suggested-prompts-data-aware.ts",
+        "src/lib/nexa/suggested-prompts-contract.ts",
+        "src/app/api/nexa/suggested-prompts/route.ts"
+      ],
+      "docs": ["experience/suggested-prompts.md"]
+    },
+    {
       "key": "flags",
       "label": "Flags + rollout de Nexa/Knowledge",
       "code": ["src/lib/nexa/flags.ts", "src/lib/knowledge/search/flags.ts"],
-      "docs": ["system-prompt/versioning.md", "knowledge/retrieval-answer-quality.md"]
+      "docs": ["system-prompt/versioning.md", "knowledge/retrieval-answer-quality.md", "experience/suggested-prompts.md"]
     },
     {
       "key": "qa",

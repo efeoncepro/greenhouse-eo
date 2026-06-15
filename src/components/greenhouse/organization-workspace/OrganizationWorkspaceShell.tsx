@@ -134,9 +134,16 @@ const OrganizationWorkspaceShell = ({
 }: OrganizationWorkspaceShellProps) => {
   const copy = GH_ORGANIZATION_WORKSPACE.shell
 
-  // TASK-1078 Tier 1.5 — declara la entidad para Nexa (nombre real → prompts contextuales
-  // "Cliente · {nombre}"). Renderiza null; el panel flotante lo lee vía useNexaPageContext.
-  const nexaScope = <NexaContextScope entityName={organization.organizationName} />
+  // TASK-1078 Tier 1.5 + TASK-1087 Tier 2 — declara la entidad para Nexa (nombre real → prompts
+  // contextuales "Cliente · {nombre}"; `entityId`/`entityKind` → prompts DATA-AWARE). Renderiza
+  // null; el panel flotante lo lee vía useNexaPageContext.
+  const nexaScope = (
+    <NexaContextScope
+      entityName={organization.organizationName}
+      entityId={organization.organizationId}
+      entityKind='organization'
+    />
+  )
 
   const statusColor = STATUS_COLOR[organization.status] ?? 'secondary'
   const statusLabel = resolveStatusLabel(organization.status)

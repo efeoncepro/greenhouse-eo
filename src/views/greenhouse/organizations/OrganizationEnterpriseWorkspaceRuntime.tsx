@@ -607,9 +607,12 @@ const OrganizationEnterpriseWorkspaceRuntime = ({
     ]
   }, [activeLabel, activeTone, data360, detail, effectiveFacet, runtime.financeSummary])
 
-  // TASK-1078 Tier 1.5 — declara la entidad para Nexa (nombre real → prompts contextuales
-  // "Cliente · {nombre}"). Renderiza null; el panel flotante lo lee vía useNexaPageContext.
-  const nexaScope = <NexaContextScope entityName={detail.organizationName} />
+  // TASK-1078 Tier 1.5 + TASK-1087 Tier 2 — declara la entidad para Nexa (nombre real → prompts
+  // contextuales "Cliente · {nombre}"; `entityId`/`entityKind` → prompts DATA-AWARE). Renderiza
+  // null; el panel flotante lo lee vía useNexaPageContext.
+  const nexaScope = (
+    <NexaContextScope entityName={detail.organizationName} entityId={detail.organizationId} entityKind='organization' />
+  )
 
   if (projection.degradedMode) {
     return (

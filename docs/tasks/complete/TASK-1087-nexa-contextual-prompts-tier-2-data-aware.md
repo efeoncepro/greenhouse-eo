@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Medio`
@@ -62,3 +62,20 @@ Tier 1/1.5 (TASK-1078) cierran la capa **frontend determinística** (resolver po
 
 - Dirección futura (no en V1): alinear el contrato de contexto con **WebMCP `navigator.modelContext`** — la página expone su contexto al asistente y Nexa lo consume. Hoy basta el composer server-side + `NexaContextScope`.
 - Origen: follow-up Tier 2 de TASK-1078 (Nexa floating chat). Tier 1/1.5 ya cerrados.
+
+## Closure 2026-06-15 — code-complete (rollout pendiente)
+
+Implementado local-first en `develop` (sin push). **Aditivo + flag default OFF → cero efecto al merge.**
+
+**Entregado:**
+- Composer server-only `resolveDataAwareSuggestedPrompts` + mapper puro `buildDataAwarePromptsFromCompactSignals` (`src/lib/nexa/suggested-prompts-data-aware.ts`) — **reusa** `readOrganizationWorkspaceCompactSignalsSafely` (no recompone readers sueltos), **allowlist categórica** (nunca montos crudos/PII), **anti-oracle** (vía `visibleFacets`), **degradación honesta** a `template_fallback`.
+- Contrato puro `nexa-suggested-prompts.v1` (`suggested-prompts-contract.ts`) + endpoint `GET /api/nexa/suggested-prompts` (auth `requireTenantContext`, **NUNCA 5xx**).
+- Hook cliente aditivo `useDataAwareSuggestedPrompts` + `NexaContextScope` ahora declara `entityId`/`entityKind`; 2 páginas org lo pasan; `NexaFloatingPanel` consume.
+- Copy es-CL `GH_NEXA.floating.data_aware_prompts` + flag `isNexaSuggestedPromptsDataAwareEnabled()` (default OFF, NEXT_PUBLIC mirror).
+- Doc Nexa Intelligence `experience/suggested-prompts.md` + `manifest.json` (dominio `suggested-prompts`).
+
+**Verificación local:** `pnpm nexa:doc-gate` verde · 8/8 tests focales del mapper (degradación + allowlist anti-monto + anti-oracle + cap 4) · suite Nexa 76 passed · tsc 0 · lint 0 · build exit 0.
+
+**Verificación pendiente (rollout, decisión del operador):** flag ON en staging + abrir Nexa en una ficha de cliente con anomalía viva → GVC: el primer prompt refleja la anomalía real (no la plantilla). El "endpoint devuelve data-aware con señal real" está cubierto por los tests del mapper (que consume el reader live-tested); la prueba **viva end-to-end** requiere el flag ON.
+
+**V1:** solo el contexto `client` (org workspace) es data-aware; `finance`/`payroll`/`general` caen a Tier 1/1.5 hasta wirear su página con `entityId` + un resolver (composer extensible por contexto).
