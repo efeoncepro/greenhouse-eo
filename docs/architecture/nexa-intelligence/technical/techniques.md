@@ -57,3 +57,13 @@ El panel NO hace token-streaming real del provider; usa el **revelado typewriter
 
 El builder del prompt es determinista con `now` fijo (snapshot tests). El rerank es determinista
 (input fijo → output fijo). Esto hace testeable la inteligencia sin un LLM real en CI.
+
+## Tools no-retrieval: `propose_action` (TASK-1137)
+
+No todos los tools de Nexa recuperan conocimiento. `propose_action` es un tool **de acción gobernada**
+(no retrieval): el LLM pasa una `actionKey` registrada y el resolver determinístico
+(`resolveNexaActionProposal`) la valida y construye un preview read-only — NUNCA ejecuta ni inventa un
+endpoint. Convive con `search_knowledge` en el mismo registry de tools, pero su contrato y su loop
+(propose → confirm → execute) viven en [`../behavior/behavior-and-routing.md`](../behavior/behavior-and-routing.md)
+y [`data-contracts.md`](./data-contracts.md). La seguridad NO está en el schema del tool (un hint) sino
+en el **registry + resolver determinístico**: una key fuera del registry degrada a gap honesto.

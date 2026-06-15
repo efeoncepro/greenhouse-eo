@@ -94,8 +94,42 @@ Todo fallo se captura con `captureWithDomain(error, 'home', { tags: { source: 'n
 (`redactErrorForResponse`) hacia Sentry, **NUNCA** al cliente. El cliente (`use-nexa-runtime`) lee
 `errorBody.error` → ahora es-CL canónico por construcción.
 
+## Acciones gobernadas (TASK-1137)
+
+Nexa puede pasar de advisory a **acción gobernada** — el rung `execute_requires_confirmation` del
+Action Maturity Ladder (`GREENHOUSE_NEXA_CORE_AGENTIC_PLATFORM_DECISION_V1.md`). El LLM **NUNCA**
+ejecuta un write. El loop canónico es **propose → confirm → execute**:
+
+1. **Propose** — el LLM llama el tool `propose_action(actionKey)`. Es read-only: el resolver
+   determinístico (`resolveNexaActionProposal`, `src/lib/nexa/actions/registry.ts`) valida
+   enablement + permiso, construye un **preview con datos reales** y devuelve un `NexaActionProposal`
+   (contrato `nexa-action-proposal.v1`). El LLM **solo pasa una `actionKey` registrada** — NUNCA un
+   endpoint, URL ni SQL. Una key desconocida / deshabilitada / sin permiso → **gap honesto** (no se
+   propone nada). El orquestador eleva las propuestas a `NexaResponse.actionProposals`.
+2. **Confirm** — el humano confirma en la UI (la tarjeta de confirmación es follow-up de UI). La UI
+   hace `POST /api/nexa/actions/[actionKey]/confirm` echoando la `idempotencyKey` del proposal.
+3. **Execute** — el endpoint (user-session, capability `nexa.action.execute`) **re-valida** la acción
+   al momento de ejecutar y corre el command bound vía `executeApiPlatformCommand` (foundation
+   TASK-655, `principalKind='app_user'`, idempotente + auditado). Es el **ÚNICO ejecutor**; el LLM
+   nunca lo llama.
+
+**Gate**: `NEXA_ACTION_RUNTIME_ENABLED` (default OFF, server-only). Con OFF el tool `propose_action`
+no se ofrece → Nexa se comporta exactamente como antes (cero acciones). El tool + el endpoint se
+gatean además por audiencia (interno ∪ EFEONCE_ADMIN para el piloto). **Piloto V1**:
+`mark_notifications_read` (self-scoped, idempotente, dominio neutral — NUNCA finance/payroll/legal/
+security para el primer piloto).
+
+**Observabilidad**: ledger append-only `greenhouse_ai.nexa_action_events` (proposed / proposal_denied
+/ executed / failed / execution_denied / conflict / cancelled) + 2 reliability signals (módulo Home):
+`nexa.action.failure_rate` y `nexa.action.unauthorized_proposal_rate` (SECURITY — detecta al LLM
+inducido a proponer acciones prohibidas/inexistentes). Contrato: [`technical/data-contracts.md`](../technical/data-contracts.md).
+
 ## Reglas duras
 
+- **TASK-1137** — el LLM **NUNCA** ejecuta un write: solo propone una `actionKey` registrada vía
+  `propose_action`. La ejecución requiere **confirmación humana** + el endpoint determinístico de
+  confirmación (capability `nexa.action.execute` + idempotency foundation). Sin command canónico
+  bound → gap honesto/deep-link, NUNCA un endpoint inventado.
 - **NUNCA** devolver `error.message` crudo (ni prosa inglesa) al cliente desde un handler del chat. Usar `canonicalErrorResponse` + `captureWithDomain('home', …)`. (Bug-class cerrado en TASK-1131.)
 - **NUNCA** exponer la selección de modelo al usuario.
 - **NUNCA** instanciar un SDK LLM dentro de un dominio: Gemini vía `getGoogleGenAIClient`, Anthropic

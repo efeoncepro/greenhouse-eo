@@ -4382,6 +4382,27 @@ El "hablar con el modelo" de Nexa vive detrás de la interfaz **`NexaChatProvide
 
 **Spec canónica**: `docs/tasks/in-progress/TASK-1091-nexa-provider-abstraction-anthropic-adapter.md` + `GREENHOUSE_NEXA_ARCHITECTURE_V1.md` Delta 2026-06-12. Patrón fuente: TASK-1085 (tool + Answer Rules provider-agnósticos), TASK-1019 (cliente Anthropic canónico), ISSUE-092 (fragilidad del tool-shape de Gemini → justifica failover).
 
+### Nexa governed action runtime invariants (TASK-1137, desde 2026-06-15)
+
+Nexa pasa de advisory a **acción gobernada** — el rung `execute_requires_confirmation` del Action Maturity Ladder (`GREENHOUSE_NEXA_CORE_AGENTIC_PLATFORM_DECISION_V1.md`). El loop canónico es **propose → confirm → execute** y el LLM **NUNCA** ejecuta un write. Módulo: `src/lib/nexa/actions/` (registry + resolver + pilot + confirm + events-store; tipos client-safe). Detrás de `NEXA_ACTION_RUNTIME_ENABLED` (default OFF) → cero cambio de runtime al merge.
+
+- **El LLM solo PROPONE una `actionKey` registrada** vía el tool `propose_action` (read-only) — NUNCA un endpoint, URL ni SQL. La seguridad vive en el **registry + resolver determinístico** (`resolveNexaActionProposal`), NO en el schema del tool. Key desconocida / deshabilitada / sin permiso → **gap honesto** (deep-link/CTA), NUNCA un endpoint inventado. El proposal viaja en `NexaResponse.actionProposals` (contrato `nexa-action-proposal.v1`, `src/lib/nexa/actions/types.ts`); el proposal **NO es un write**.
+- **La ejecución es el ÚNICO punto que muta**: `POST /api/nexa/actions/[actionKey]/confirm` (user-session, capability `nexa.action.execute`) **re-valida** al ejecutar y corre el command bound vía `executeApiPlatformCommand` (foundation TASK-655, `principalKind='app_user'`, `idempotencyKeyOverride`). El LLM **NUNCA** llama este endpoint; solo el humano que confirma. La key de idempotencia es server-generada y bound al proposal (re-confirm = replay).
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** dejar que el LLM ejecute un write directo ni que el `propose_action.execute` mute. Proponer es read-only; ejecutar requiere confirmación humana + el endpoint determinístico.
+- **NUNCA** mapear un intent a un endpoint desde texto libre. El binding `actionKey → command` vive en el registry (`src/lib/nexa/actions/registry.ts`); agregar una acción = code change revisado por humano, NUNCA inferido. Si no hay command canónico → gap/deep-link.
+- **NUNCA** pilotar la primera acción en finance/payroll/legal/security/HR/commercial/client-portal (constraint del ADR). Piloto V1: `mark_notifications_read` (self-scoped, idempotente, dominio neutral). El `userId` viene SIEMPRE de la sesión (anti-oracle).
+- **NUNCA** seedear la capability `nexa.action.execute` sin grant en `runtime.ts` mismo PR (invariante TASK-873/935) + seed en `capabilities_registry` (migración). Grant: internal ∪ EFEONCE_ADMIN (audiencia del piloto; client excluido).
+- **NUNCA** `Sentry.captureException` directo ni `error.message` crudo al cliente — `captureWithDomain('home', …)` + `canonicalErrorResponse` es-CL (`nexa_action_*`).
+- **NUNCA** registrar un archivo nuevo bajo `src/lib/nexa/actions/**` sin agregarlo al dominio `governed-actions` del `manifest.json` (el `nexa:doc-gate` falla).
+- **SIEMPRE** que emerja una acción nueva: definirla en el registry (isEnabled/isPermitted/buildPreview read-only/execute bound) + extender el ledger/señales si aplica + actualizar `behavior/behavior-and-routing.md` + `technical/data-contracts.md`.
+
+**Observabilidad**: ledger append-only `greenhouse_ai.nexa_action_events` (proposed/proposal_denied/executed/failed/execution_denied/conflict/cancelled) + 2 reliability signals (módulo Home, steady=0): `nexa.action.failure_rate` + `nexa.action.unauthorized_proposal_rate` (**SECURITY** — detecta al LLM inducido a proponer acciones prohibidas/inexistentes).
+
+**Spec canónica**: `docs/tasks/in-progress/TASK-1137-nexa-governed-action-runtime-command-bridge.md` + arch Delta 2026-06-15 en `GREENHOUSE_NEXA_CORE_AGENTIC_PLATFORM_DECISION_V1.md` + capas `nexa-intelligence/behavior/behavior-and-routing.md` + `technical/data-contracts.md`. Migración: `20260615193917012`. Patrón fuente: TASK-655 (command/idempotency foundation), TASK-1085 (tool surface provider-agnóstico), TASK-873/935 (capability grant coverage), TASK-1129 (ledger de observabilidad best-effort).
+
 ### SQL Signal Reader Schema Validation Gate (TASK-893 hotfix #3, desde 2026-05-16)
 
 Toda query SQL embebida en TS que aparezca en code paths productivos — especialmente signal readers, reliability queries, materializers, audit scripts — **debe validar sus assumptions de schema contra PG real antes de mergear**. `db.d.ts` (Kysely codegen) NO es source of truth — infiere DATE columns como `Timestamp` TS, lo cual lleva al bug class `EXTRACT(EPOCH FROM (date - date))` que produce `function pg_catalog.extract(unknown, integer) does not exist` en runtime.

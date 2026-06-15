@@ -42,8 +42,32 @@
 `density`/`dataReality`/`sensitivity`/`allowedRenderers`/`allowedActions`. El dominio entra por
 DATOS, no por chrome especial.
 
+## `nexa-action-proposal.v1` — propuesta de acción gobernada (TASK-1137)
+
+SSOT: `@/lib/nexa/actions/types.ts`. **NO es un write** — es el artefacto read-only, permission-checked
+y con preview de datos reales que Nexa propone para que un humano confirme antes de mutar.
+
+- **Productor**: el tool `propose_action` (`nexa-tools.ts`) vía el resolver determinístico
+  `resolveNexaActionProposal` (`actions/registry.ts`). El LLM solo pasa una `actionKey` registrada.
+- **Transporte**: el orquestador (`nexa-service.ts`) eleva las propuestas a `NexaResponse.actionProposals`
+  (`extractNexaActionProposals`, validando el shape — un `raw` malformado nunca se vuelve propuesta).
+- **Consumidor**: la UI del chat (confirm-card, follow-up) → `POST /api/nexa/actions/[actionKey]/confirm`.
+
+Campos: `contractVersion` · `proposalId` (UUID, liga la idempotency key) · `actionKey` · `intent` ·
+`sensitivity` (`low|medium|high`) · `preview` (`title`/`summary`/`metrics[]`, datos frescos) ·
+`confirmation` (copy es-CL) · `execution` (`confirmEndpoint` + `idempotencyKey` server-generada) ·
+`expiresAt`. Cuando el resolver no puede proponer → `NexaActionGap` (`reason` ∈ `unknown_action |
+not_permitted | runtime_disabled | no_command_binding | unavailable` + `message` + `deepLink?`).
+
+**Ledger de eventos** (no es contrato de cliente): `greenhouse_ai.nexa_action_events` (append-only) —
+una fila por evento del ciclo de vida (`proposed | proposal_denied | executed | failed |
+execution_denied | conflict | cancelled`). Lo leen las reliability signals `nexa.action.failure_rate`
+y `nexa.action.unauthorized_proposal_rate`. NUNCA guarda contenido de conversación.
+
 ## Reglas duras
 
 - ❌ NUNCA romper el shape de un contrato versionado sin bumpear la versión.
 - ❌ NUNCA mapear/duplicar un packet con otra forma (el contrato es idéntico cross-lane).
+- ❌ NUNCA ejecutar un write desde el LLM: `nexa-action-proposal.v1` se PROPONE; ejecutar requiere
+  confirmación humana + el endpoint determinístico (idempotency foundation TASK-655).
 - ✅ Contrato nuevo → versionarlo (`*.v1`) + documentar productor + consumidores acá.

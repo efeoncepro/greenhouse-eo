@@ -51,6 +51,31 @@ The direction aligns with Greenhouse's ASaaS North Star, existing Nexa primitive
 
 No external vendor, model pricing, framework version or regulatory claim is introduced by this ADR.
 
+## Delta 2026-06-15 — First `execute_requires_confirmation` runtime lands (TASK-1137)
+
+The Action Maturity Ladder's middle rung (`execute_requires_confirmation`, see §Autonomy Boundary)
+now has a concrete, governed runtime. Nexa can move from advisory to **governed action** without the
+LLM ever executing a write:
+
+- **propose → confirm → execute.** The LLM calls a registry-bound tool `propose_action(actionKey)`
+  (read-only); a deterministic resolver (`src/lib/nexa/actions/registry.ts`) validates enablement +
+  permission and returns a `NexaActionProposal` (contract `nexa-action-proposal.v1`) — or an honest
+  gap. The human confirms in the UI; a deterministic endpoint
+  (`POST /api/nexa/actions/[actionKey]/confirm`) re-validates and runs the bound command through the
+  API Platform command/idempotency foundation (TASK-655, `principalKind='app_user'`). The endpoint is
+  the only executor; the LLM never reaches it.
+- **The LLM proposes an `actionKey`, never an endpoint/URL/SQL.** Security lives in the registry +
+  resolver, not in the tool schema. An unregistered/unpermitted/disabled key degrades to a gap.
+- **Gated** by `NEXA_ACTION_RUNTIME_ENABLED` (default OFF) + audience allowlist (internal pilot). First
+  pilot: `mark_notifications_read` (low-risk, self-scoped, idempotent — never finance/payroll/legal/
+  security, per the Revisit-When constraint).
+- **Observability**: append-only ledger `greenhouse_ai.nexa_action_events` + 2 reliability signals
+  (`nexa.action.failure_rate`, `nexa.action.unauthorized_proposal_rate` [security — detects an LLM
+  induced to propose forbidden actions]).
+
+This satisfies Core Principle #5 ("Actions are governed, not inferred"). The behavior contract lives in
+`nexa-intelligence/behavior/behavior-and-routing.md`; the data contract in `…/technical/data-contracts.md`.
+
 ## Context
 
 Greenhouse's business direction is ASaaS: the portal is the relationship, and each month of operation should build memory, transparency and switching cost. Nexa cannot remain a local chat affordance or a Knowledge-specific answer screen without weakening that thesis.

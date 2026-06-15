@@ -1,5 +1,17 @@
 # Release 2026-06-10 #2 — develop→main `6c649b2a6` RELEASED
 
+## Sesión 2026-06-15 — TASK-1137 Nexa governed action runtime + command bridge — Claude
+
+> **Estado:** **complete** en `develop` (local-first). Detrás de `NEXA_ACTION_RUNTIME_ENABLED=false` → cero cambio de runtime al merge. Activación + UI confirm-card = decisión/rollout del operador (+ Codex).
+
+- **Qué resuelve:** Nexa podía leer pero no actuar de forma gobernada. Ahora puede **proponer una acción, mostrar preview, pedir confirmación humana y ejecutar** un command idempotente/auditado — **sin que el LLM ejecute un write**. Es el rung `execute_requires_confirmation` del Action Maturity Ladder (desbloqueado por TASK-655).
+- **Loop canónico (propose → confirm → execute):** tool `propose_action(actionKey)` (read-only) → resolver determinístico (`actions/registry.ts`) → proposal `nexa-action-proposal.v1` o gap honesto → `NexaResponse.actionProposals` → `POST /api/nexa/actions/[id]/confirm` (capability `nexa.action.execute`) → `executeApiPlatformCommand` (`principalKind='app_user'`). El LLM solo pasa una `actionKey` registrada; jamás un endpoint. El endpoint es el ÚNICO ejecutor.
+- **Piloto:** `mark_notifications_read` (self-scoped, idempotente, neutral). El `userId` siempre de sesión (anti-oracle).
+- **Schema/grant:** capability `nexa.action.execute` (catalog + runtime grant internal∪EFEONCE_ADMIN + seed registry) + ledger `greenhouse_ai.nexa_action_events` + 2 signals (failure_rate + unauthorized_proposal_rate [security]). Migración `20260615193917012`.
+- **Decisiones del operador (checkpoint):** piloto = marcar notificaciones leídas · alcance = loop completo S1-S5 · UI confirm-card = follow-up Codex.
+- **Validación:** tsc 0 · lint 0 · 17 tests nuevos + suite nexa/entitlements/commands 161 · `nexa:doc-gate` verde · migración live. **`pnpm test` full + `pnpm build` = gate de cierre (corriendo).**
+- **Follow-ups:** UI confirm-card (Codex) · evento `cancelled` cuando la UI lo emita · acciones de dominio (Agency/Delivery) cuando existan sus commands · adopción del lane `app` del command helper.
+
 ## Sesión 2026-06-15 — TASK-655 API Platform Command & Idempotency Foundation — Claude
 
 > **Estado:** **complete** en `develop` (local-first, sin push). Foundation transversal. Desbloquea MCP write-safe tools + writes idempotentes de plataforma.

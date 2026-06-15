@@ -10,13 +10,13 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
 - Type: `implementation`
 - Epic: `optional`
-- Status real: `In progress (2026-06-15) — piloto: mark notifications read · alcance S1-S5 · UI confirm-card = follow-up Codex`
+- Status real: `Complete (2026-06-15) — code-complete local-first; runtime detrás de NEXA_ACTION_RUNTIME_ENABLED=false. UI confirm-card = follow-up Codex.`
 - Rank: `TBD`
 - Domain: `nexa|platform|api|agentic|ops|security`
 - Blocked by: `TASK-655`
@@ -195,11 +195,22 @@ Human approval required for the first pilot action and any sensitive-domain acti
 
 ## Acceptance Criteria
 
-- [ ] `NexaActionProposal` v1 exists and is documented.
-- [ ] Nexa cannot execute a write without deterministic command binding and human confirmation.
-- [ ] First pilot action executes through command/idempotency foundation.
-- [ ] Unauthorized or unsupported action requests degrade to CTA/gap honestos.
-- [ ] Audit/telemetry/reliability signals exist.
+- [x] `NexaActionProposal` v1 exists and is documented. → `src/lib/nexa/actions/types.ts` (`nexa-action-proposal.v1`) + `technical/data-contracts.md`.
+- [x] Nexa cannot execute a write without deterministic command binding and human confirmation. → el LLM solo propone una `actionKey` registrada (`propose_action`); ejecutar requiere `POST .../confirm` (capability `nexa.action.execute`) + `executeApiPlatformCommand`. Tests anti-freeform en `registry.test.ts` + `confirm.test.ts`.
+- [x] First pilot action executes through command/idempotency foundation. → `mark_notifications_read` vía `executeApiPlatformCommand` (`principalKind='app_user'`, `idempotencyKeyOverride`).
+- [x] Unauthorized or unsupported action requests degrade to CTA/gap honestos. → resolver devuelve gap (`unknown_action`/`not_permitted`/`runtime_disabled`) con `deepLink` opcional; tests lo cubren.
+- [x] Audit/telemetry/reliability signals exist. → ledger `greenhouse_ai.nexa_action_events` + signals `nexa.action.failure_rate` + `nexa.action.unauthorized_proposal_rate`.
+
+## Implementation Summary (2026-06-15)
+
+- **S1 Contract**: `NexaActionProposal`/`NexaActionGap` v1 (`actions/types.ts`) + `NexaResponse.actionProposals` + flag `NEXA_ACTION_RUNTIME_ENABLED` (default OFF).
+- **S2 Registry+resolver**: `actions/registry.ts` (registro determinístico + `resolveNexaActionProposal` → proposal|gap) + pilot (`pilot-mark-notifications-read.ts`).
+- **S3 Propose tool + confirm endpoint**: tool `propose_action` (nexa-tools.ts, registry-bound) + `extract-proposals.ts` (orquestador) + `confirm.ts` + `POST /api/nexa/actions/[actionKey]/confirm` + `executeApiPlatformCommand` `+idempotencyKeyOverride` + canonical errors es-CL.
+- **S4 Pilot**: `mark_notifications_read` cableado end-to-end (self-scoped, idempotente).
+- **S5 Observability+docs**: capability `nexa.action.execute` (catalog + grant + seed registry, migración `20260615193917012`) + ledger `nexa_action_events` + 2 signals + wire-up + arch Delta + capas behavior/data-contracts + manifest + CLAUDE.md + changelog/Handoff.
+- **Tests**: 17 nuevos (resolver anti-freeform / extracción / confirm helper). Gate full `pnpm test` + `pnpm build` verde.
+- **Decisión del operador (checkpoint P1)**: piloto = mark notifications read · alcance S1-S5 · UI confirm-card = follow-up Codex.
+- **Follow-ups**: UI confirm-card (Codex); evento `cancelled` cuando la UI lo emita; acciones de dominio (Agency/Delivery) cuando existan sus commands; adopción del lane `app` del command helper.
 
 ## Verification
 
