@@ -611,7 +611,12 @@ const OrganizationEnterpriseWorkspaceRuntime = ({
   // contextuales "Cliente · {nombre}"; `entityId`/`entityKind` → prompts DATA-AWARE). Renderiza
   // null; el panel flotante lo lee vía useNexaPageContext.
   const nexaScope = (
-    <NexaContextScope entityName={detail.organizationName} entityId={detail.organizationId} entityKind='organization' />
+    <NexaContextScope
+      entityName={detail.organizationName}
+      entityId={detail.organizationId}
+      entityKind='organization'
+      entrypoint='agency'
+    />
   )
 
   if (projection.degradedMode) {

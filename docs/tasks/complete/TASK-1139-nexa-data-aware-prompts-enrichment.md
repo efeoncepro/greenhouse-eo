@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Medio`
@@ -155,3 +155,19 @@ Ninguna. Sin migraciones, sin env nuevas, sin Azure/GCP.
 - **WebMCP `navigator.modelContext`** cuando sea Baseline: la página expone su contexto al asistente y Nexa lo consume; el `entityRef` ya está listo.
 - **Payroll data-aware**: requiere página de período entity-scoped + reader de pendientes de cierre.
 - **Telemetría `source` por turno** (TASK-1129): registrar `data_aware` vs `template_fallback` por mensaje para medir la tasa de uso real (mejor fuente para un signal de fallback-rate que el incidente de Slice 4).
+
+## Closure 2026-06-15 — code-complete (GVC del hint = rollout-time)
+
+Implementado local-first en `develop`. Aditivo bajo el flag de TASK-1087 (ya ON en local + staging).
+
+**Entregado (4 slices):**
+- **Slice 1 (hint UI):** `HINT_AFFORDANCE` en `NexaFloatingPanel` → ícono Tabler por categoría vía MUI palette (token, no HEX); el hook + cadena de componentes hilan `{ text, hint? }`. Template = sin ícono (honesto). Revisado con `modern-ui` + `state-design` (ambos PASS).
+- **Slice 2 (entrypoint):** `NexaPageContextValue.entrypoint` + `NexaContextScope` + shell (deriva de `projection.entrypointContext`) + runtime (`agency`) + hook (`?entrypoint=`) → composer pasa el entrypoint correcto al reader.
+- **Slice 3 (cache):** composer cachea in-memory TTL 30s, solo `data_aware`, keyed `subject:context:entity:entrypoint` + `__clearDataAwareSuggestedPromptsCache`.
+- **Slice 4 (re-scope honesto):** signal dedicado de fallback-rate NO factible (`getCloudSentryIncidents` solo filtra por `domain`); las fallas ruedan al rollup `agency`; el signal de tasa de uso real es TASK-1129. Documentado, no fabricado.
+
+**Verificación local:** tsc 0 · lint 0 · 14/14 tests focales (mapper + cache + entrypoint) · suite Nexa 82 passed · `pnpm nexa:doc-gate` verde · build exit 0.
+
+**Pendiente (rollout):** GVC del ícono `hint` con una entidad de señal viva (mismo gate que TASK-1087; el flag ya está ON en local + staging → capturable cuando un org tenga señal). Diseño ya revisado con las skills (modern-ui + state-design PASS).
+
+**Out of scope (forward-looking):** WebMCP `navigator.modelContext` (API experimental) · payroll data-aware (sin página de período entity-scoped).

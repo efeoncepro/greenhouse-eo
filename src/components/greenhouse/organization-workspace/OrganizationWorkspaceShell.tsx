@@ -142,6 +142,7 @@ const OrganizationWorkspaceShell = ({
       entityName={organization.organizationName}
       entityId={organization.organizationId}
       entityKind='organization'
+      entrypoint={projection.entrypointContext === 'finance' ? 'finance' : 'agency'}
     />
   )
 

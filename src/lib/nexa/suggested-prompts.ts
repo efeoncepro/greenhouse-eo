@@ -19,6 +19,11 @@ export interface NexaPromptContext {
  *  data-aware wireados; el resto cae a Tier 1/1.5 hasta que su página declare entityId + resolver. */
 export type NexaPageEntityKind = 'organization'
 
+/** Entrypoint del workspace que la página declara (TASK-1139). Determina la visibilidad de
+ *  facets en la projection del reader data-aware (agency vs finance). Narrow a propósito —
+ *  evita importar `EntrypointContext` (cuyo módulo arrastra deps server-only al bundle cliente). */
+export type NexaPageEntrypoint = 'agency' | 'finance'
+
 /**
  * Contexto que una página declara para Nexa (Tier 1.5 + Tier 2). `entityName` interpola el nombre
  * real en los prompts/label (ej. "Cliente · Sky Airline"); `contextKey` puede forzar la familia si
@@ -31,6 +36,8 @@ export interface NexaPageContextValue {
   contextKey?: NexaPromptContextKey
   entityId?: string
   entityKind?: NexaPageEntityKind
+  /** Entrypoint del workspace (TASK-1139) — propaga la visibilidad correcta de facets al composer. */
+  entrypoint?: NexaPageEntrypoint
 }
 
 const CONTEXTS = GH_NEXA.floating.prompt_contexts

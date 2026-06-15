@@ -25,6 +25,7 @@ import {
 import { useNexaThreadHistory } from '@/lib/nexa/use-nexa-thread-history'
 import { resolveNexaPromptContext, type NexaPromptContext } from '@/lib/nexa/suggested-prompts'
 import { useDataAwareSuggestedPrompts } from '@/lib/nexa/use-data-aware-suggested-prompts'
+import type { NexaSuggestedPrompt, NexaSuggestedPromptHint } from '@/lib/nexa/suggested-prompts-contract'
 import { useNexaPageContext } from '@/lib/nexa/nexa-page-context'
 import type { NexaThreadDetail } from '@/lib/nexa/nexa-contract'
 
@@ -33,6 +34,16 @@ import NexaThread from '@/views/greenhouse/home/components/NexaThread'
 import NexaHistoryRail from './NexaHistoryRail'
 
 const COPY = GH_NEXA.floating
+
+// TASK-1139 — Affordance por categoría de señal del prompt data-aware (`hint`). Ícono Tabler +
+// tono de la paleta (token, no HEX) → distingue "esto viene de una señal real" sin romper la
+// grilla aprobada. Los prompts de plantilla (Tier 1/1.5) no traen `hint` → cero ícono nuevo.
+const HINT_AFFORDANCE: Record<NexaSuggestedPromptHint, { icon: string; color: 'warning' | 'error' | 'info' | 'primary' }> = {
+  anomaly: { icon: 'tabler-alert-triangle', color: 'warning' },
+  risk: { icon: 'tabler-flame', color: 'error' },
+  pending: { icon: 'tabler-clock', color: 'info' },
+  kpi: { icon: 'tabler-chart-dots', color: 'primary' }
+}
 
 const resolveGreeting = (conversationKey: number, firstName: string): string => {
   const pool = firstName ? COPY.greetings : COPY.greetings.filter(g => !g.includes('{name}'))
@@ -44,7 +55,15 @@ const resolveGreeting = (conversationKey: number, firstName: string): string => 
 
 // ── Empty hero (cara real + saludo + grilla de prompts) — port verbatim del mockup ──
 
-const NexaEmptyHero = ({ greeting, promptContext }: { greeting: string; promptContext: NexaPromptContext }) => {
+const NexaEmptyHero = ({
+  greeting,
+  promptContext,
+  prompts
+}: {
+  greeting: string
+  promptContext: NexaPromptContext
+  prompts: NexaSuggestedPrompt[]
+}) => {
   const theme = useTheme()
   const aui = useAui()
 
@@ -91,55 +110,69 @@ const NexaEmptyHero = ({ greeting, promptContext }: { greeting: string; promptCo
           maxWidth: 460
         }}
       >
-        {promptContext.prompts.map(prompt => (
-          <Box
-            key={prompt}
-            role='button'
-            tabIndex={0}
-            onClick={() => send(prompt)}
-            onKeyDown={e => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault()
-                send(prompt)
-              }
-            }}
-            sx={{
-              border: '1px solid',
-              borderColor: 'divider',
-              borderRadius: `${theme.shape.customBorderRadius.lg}px`,
-              px: 2,
-              py: 1.5,
-              cursor: 'pointer',
-              bgcolor: 'background.paper',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              gap: 1.5,
-              transition: theme.transitions.create(['border-color', 'box-shadow', 'transform'], {
-                duration: theme.transitions.duration.shorter
-              }),
-              '& .nexa-hero-arrow': {
-                opacity: 0,
-                transform: 'translateX(-4px)',
-                transition: 'opacity 0.15s ease, transform 0.15s ease',
-                color: 'primary.main',
-                flexShrink: 0
-              },
-              '&:hover': {
-                borderColor: 'primary.main',
-                boxShadow: theme.greenhouseElevation.raised.boxShadow,
-                transform: 'translateY(-1px)'
-              },
-              '&:hover .nexa-hero-arrow': { opacity: 1, transform: 'translateX(0)' },
-              '&:focus-visible': { outline: '2px solid var(--mui-palette-primary-main)', outlineOffset: 2 },
-              '&:active': { transform: 'translateY(0)' },
-              '@media (prefers-reduced-motion: reduce)': { transition: 'none', '&:hover': { transform: 'none' } }
-            }}
-          >
-            <Typography variant='body2' sx={{ lineHeight: 1.4 }}>{prompt}</Typography>
-            <i className='tabler-arrow-up-right nexa-hero-arrow' style={{ fontSize: '0.9rem' }} />
-          </Box>
-        ))}
+        {prompts.map(({ text, hint }) => {
+          const affordance = hint ? HINT_AFFORDANCE[hint] : null
+
+          return (
+            <Box
+              key={text}
+              role='button'
+              tabIndex={0}
+              onClick={() => send(text)}
+              onKeyDown={e => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault()
+                  send(text)
+                }
+              }}
+              sx={{
+                border: '1px solid',
+                borderColor: 'divider',
+                borderRadius: `${theme.shape.customBorderRadius.lg}px`,
+                px: 2,
+                py: 1.5,
+                cursor: 'pointer',
+                bgcolor: 'background.paper',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: 1.5,
+                transition: theme.transitions.create(['border-color', 'box-shadow', 'transform'], {
+                  duration: theme.transitions.duration.shorter
+                }),
+                '& .nexa-hero-arrow': {
+                  opacity: 0,
+                  transform: 'translateX(-4px)',
+                  transition: 'opacity 0.15s ease, transform 0.15s ease',
+                  color: 'primary.main',
+                  flexShrink: 0
+                },
+                '&:hover': {
+                  borderColor: 'primary.main',
+                  boxShadow: theme.greenhouseElevation.raised.boxShadow,
+                  transform: 'translateY(-1px)'
+                },
+                '&:hover .nexa-hero-arrow': { opacity: 1, transform: 'translateX(0)' },
+                '&:focus-visible': { outline: '2px solid var(--mui-palette-primary-main)', outlineOffset: 2 },
+                '&:active': { transform: 'translateY(0)' },
+                '@media (prefers-reduced-motion: reduce)': { transition: 'none', '&:hover': { transform: 'none' } }
+              }}
+            >
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, minWidth: 0 }}>
+                {/* TASK-1139 — ícono de categoría solo para prompts data-aware (con `hint`). */}
+                {affordance ? (
+                  <i
+                    className={affordance.icon}
+                    aria-hidden
+                    style={{ fontSize: '0.95rem', color: theme.palette[affordance.color].main, flexShrink: 0 }}
+                  />
+                ) : null}
+                <Typography variant='body2' sx={{ lineHeight: 1.4 }}>{text}</Typography>
+              </Box>
+              <i className='tabler-arrow-up-right nexa-hero-arrow' style={{ fontSize: '0.9rem' }} />
+            </Box>
+          )
+        })}
       </Box>
 
       {/* Firma de marca Efeonce — SOLO en el empty state. Wordmark canónico recoloreado
@@ -175,6 +208,7 @@ const ConversationBody = ({
   suggestions,
   greeting,
   promptContext,
+  heroPrompts,
   onThinkingChange
 }: {
   expanded: boolean
@@ -183,6 +217,7 @@ const ConversationBody = ({
   suggestions: string[]
   greeting: string
   promptContext: NexaPromptContext
+  heroPrompts: NexaSuggestedPrompt[]
   onThinkingChange: (thinking: boolean) => void
 }) => {
   const isEmpty = useAuiState(s => s.thread.messages.length === 0)
@@ -216,7 +251,7 @@ const ConversationBody = ({
         '@media (prefers-reduced-motion: reduce)': { animation: 'none' }
       }}
     >
-      {isEmpty && <NexaEmptyHero greeting={greeting} promptContext={promptContext} />}
+      {isEmpty && <NexaEmptyHero greeting={greeting} promptContext={promptContext} prompts={heroPrompts} />}
       <NexaThread hideHeader compact={!expanded} selectedModel={selectedModel} onModelChange={onModelChange} suggestions={suggestions} />
     </Box>
   )
@@ -230,6 +265,7 @@ const NexaConversationArea = ({
   initialThreadId,
   greeting,
   promptContext,
+  heroPrompts,
   onThreadIdResolved,
   onThinkingChange
 }: {
@@ -238,6 +274,7 @@ const NexaConversationArea = ({
   initialThreadId: string | null
   greeting: string
   promptContext: NexaPromptContext
+  heroPrompts: NexaSuggestedPrompt[]
   onThreadIdResolved: (threadId: string) => void
   onThinkingChange: (thinking: boolean) => void
 }) => {
@@ -256,6 +293,7 @@ const NexaConversationArea = ({
         suggestions={suggestions}
         greeting={greeting}
         promptContext={promptContext}
+        heroPrompts={heroPrompts}
         onThinkingChange={onThinkingChange}
       />
     </AssistantRuntimeProvider>
@@ -374,17 +412,13 @@ const NexaFloatingPanel = ({ expanded, onToggleExpanded, onClose }: NexaFloating
   // real de la entidad, ej. "Cliente · Sky Airline"). Determinístico, cero datos/IA.
   const pathname = usePathname()
   const pageContext = useNexaPageContext()
-  const basePromptContext = useMemo(() => resolveNexaPromptContext(pathname, pageContext), [pathname, pageContext])
+  const promptContext = useMemo(() => resolveNexaPromptContext(pathname, pageContext), [pathname, pageContext])
 
-  // TASK-1087 Tier 2 — capa data-aware sobre Tier 1/1.5: si el flag está on, la entidad tiene
-  // `entityId` y hay señales reales, reemplaza los prompts por los data-aware; si no, devuelve los
-  // de plantilla intactos (aditivo, byte-idéntico al comportamiento previo).
-  const effectivePrompts = useDataAwareSuggestedPrompts(basePromptContext, pageContext)
-
-  const promptContext = useMemo<NexaPromptContext>(
-    () => (effectivePrompts === basePromptContext.prompts ? basePromptContext : { ...basePromptContext, prompts: effectivePrompts }),
-    [basePromptContext, effectivePrompts]
-  )
+  // TASK-1087/1139 Tier 2 — capa data-aware sobre Tier 1/1.5: si el flag está on, la entidad tiene
+  // `entityId` y hay señales reales, devuelve los prompts data-aware `{ text, hint }` (con su
+  // categoría para el ícono); si no, los de plantilla `{ text }` (aditivo, byte-idéntico al previo).
+  // `promptContext` sigue dando label/icon del chip; `heroPrompts` da la grilla.
+  const heroPrompts = useDataAwareSuggestedPrompts(promptContext, pageContext)
 
   return (
     <Box
@@ -485,6 +519,7 @@ const NexaFloatingPanel = ({ expanded, onToggleExpanded, onClose }: NexaFloating
           initialThreadId={activeThreadId}
           greeting={greeting}
           promptContext={promptContext}
+          heroPrompts={heroPrompts}
           onThreadIdResolved={handleThreadIdResolved}
           onThinkingChange={setIsThinking}
         />

@@ -42,6 +42,20 @@ const GENERIC_ENTITY = 'este cliente'
 // Tope de prompts data-aware (la grilla del empty hero muestra hasta 4).
 const MAX_DATA_AWARE_PROMPTS = 4
 
+// TASK-1139 — Cache in-memory corto (espejo de la projection cache). Solo cachea resultados
+// `data_aware` (los caros: re-leen account360/finance/projects). NO cachea `template_fallback`
+// (es barato + evita pegar fallback stale tras un flip del flag). Keyed por subject (anti-oracle)
+// + context + entity + entrypoint. TTL 30s: las señales no cambian por segundo.
+const DATA_AWARE_CACHE_TTL_MS = 30_000
+
+const dataAwareCache = new Map<string, { payload: NexaSuggestedPromptsPayload; expiresAt: number }>()
+
+const buildCacheKey = (subjectUserId: string, context: NexaPromptContextKey, entityId: string, entrypoint: EntrypointContext): string =>
+  `${subjectUserId}:${context}:${entityId}:${entrypoint}`
+
+/** Test helper — limpia el cache in-memory del composer. */
+export const __clearDataAwareSuggestedPromptsCache = (): void => dataAwareCache.clear()
+
 const fillEntity = (template: string, entity: string): string => template.replace(/\{entity\}/g, entity)
 
 /**
@@ -143,11 +157,18 @@ export const resolveDataAwareSuggestedPrompts = async (
   // V1: solo `client` con un entityId resuelve señales reales.
   if (input.context !== 'client' || !input.entityId) return templateFallback()
 
+  const entrypoint = input.entrypointContext ?? 'agency'
+  const cacheKey = buildCacheKey(input.subject.userId, input.context, input.entityId, entrypoint)
+
+  const cached = dataAwareCache.get(cacheKey)
+
+  if (cached && cached.expiresAt > Date.now()) return cached.payload
+
   try {
     const signals = await readOrganizationWorkspaceCompactSignalsSafely({
       subject: input.subject,
       organizationId: input.entityId,
-      entrypointContext: input.entrypointContext ?? 'agency',
+      entrypointContext: entrypoint,
       limits: { recentSignals: 8, nextActions: 6 }
     })
 
@@ -155,13 +176,18 @@ export const resolveDataAwareSuggestedPrompts = async (
 
     if (prompts.length === 0) return templateFallback()
 
-    return {
+    const payload: NexaSuggestedPromptsPayload = {
       contractVersion: NEXA_SUGGESTED_PROMPTS_CONTRACT_VERSION,
       context: input.context,
       entityName: input.entityName?.trim() || undefined,
       prompts,
       source: 'data_aware'
     }
+
+    // Solo cachea data_aware (caro). El template_fallback es barato y no se cachea.
+    dataAwareCache.set(cacheKey, { payload, expiresAt: Date.now() + DATA_AWARE_CACHE_TTL_MS })
+
+    return payload
   } catch (error) {
     // NotFound = el subject no ve esa entidad → fallback honesto (no revela existencia, anti-oracle).
     if (error instanceof OrganizationWorkspaceCompactSignalsNotFoundError) return templateFallback()
