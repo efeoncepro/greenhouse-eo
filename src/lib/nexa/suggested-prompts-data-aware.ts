@@ -18,6 +18,7 @@ import {
   type NexaSuggestedPromptsPayload
 } from './suggested-prompts-contract'
 import { resolvePersonalPrompts } from './data-aware-personal-resolver'
+import { resolveFinancePrompts } from './data-aware-finance-resolver'
 import type { NexaPageEntityKind, NexaPromptContextKey } from './suggested-prompts'
 
 // TASK-1087 — Composer SERVER-ONLY de prompts sugeridos DATA-AWARE (Tier 2). Reusa el reader
@@ -182,7 +183,8 @@ const resolveClientPrompts: DataAwareResolver = async input => {
  */
 const DATA_AWARE_RESOLVERS: Partial<Record<NexaPromptContextKey, DataAwareResolver>> = {
   client: resolveClientPrompts,
-  personal: resolvePersonalPrompts
+  personal: resolvePersonalPrompts,
+  finance: resolveFinancePrompts
 }
 
 /**

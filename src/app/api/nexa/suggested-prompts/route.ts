@@ -17,7 +17,7 @@ import { captureWithDomain } from '@/lib/observability/capture'
 export const dynamic = 'force-dynamic'
 
 const VALID_CONTEXTS: NexaPromptContextKey[] = ['general', 'finance', 'client', 'payroll', 'personal']
-const VALID_ENTITY_KINDS: NexaPageEntityKind[] = ['organization', 'member']
+const VALID_ENTITY_KINDS: NexaPageEntityKind[] = ['organization', 'member', 'finance_scope']
 
 const parseContext = (raw: string | null): NexaPromptContextKey =>
   raw && (VALID_CONTEXTS as string[]).includes(raw) ? (raw as NexaPromptContextKey) : 'general'

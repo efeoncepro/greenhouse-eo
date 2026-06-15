@@ -105,3 +105,7 @@ Ninguna.
 ## Follow-ups
 
 - Ninguno (cierra el contexto Nómina).
+
+## Nota 2026-06-15 — reader pendiente (no cableado aún)
+
+El payroll landing (`/hr/payroll`) NO expone un `periodId` server-side (dashboard client-driven) y NO existe un aggregate barato "finiquitos pendientes de ratificación tenant-wide". Esta task necesita PRIMERO un reader nuevo (tenant-level: count finiquitos pendientes + períodos en borrador) con SQL validado contra PG, declarado con `entityKind='payroll_scope'` (espejo del `finance_scope` de TASK-1143). El registry de resolvers (TASK-1141) ya está listo — solo falta el resolver + su reader. Se deja en `to-do` para no medio-construir el query al cierre de una sesión larga (riesgo de calidad).

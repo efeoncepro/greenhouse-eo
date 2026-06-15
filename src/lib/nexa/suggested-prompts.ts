@@ -15,10 +15,10 @@ export interface NexaPromptContext {
   prompts: string[]
 }
 
-/** Tipo de entidad que la página declara (TASK-1087/1141). `organization` (ficha de cliente,
- *  contexto `client`) y `member` (Mi espacio, contexto `personal`) tienen readers data-aware
- *  wireados; el resto cae a Tier 1/1.5 hasta que su página declare entityId + resolver. */
-export type NexaPageEntityKind = 'organization' | 'member'
+/** Tipo de entidad que la página declara (TASK-1087/1141/1143). `organization` (ficha de cliente,
+ *  contexto `client`), `member` (Mi espacio, contexto `personal`) y `finance_scope` (dashboard de
+ *  Finanzas, contexto `finance`) tienen readers data-aware wireados; el resto cae a Tier 1/1.5. */
+export type NexaPageEntityKind = 'organization' | 'member' | 'finance_scope'
 
 /** Entrypoint del workspace que la página declara (TASK-1139). Determina la visibilidad de
  *  facets en la projection del reader data-aware (agency vs finance). Narrow a propósito —

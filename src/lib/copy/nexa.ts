@@ -455,7 +455,13 @@ export const GH_NEXA = {
       personal_intake_incomplete: 'Te falta completar tu ficha, ¿la terminamos?',
       personal_leave_pending: 'Tienes {count} solicitud(es) de vacaciones en curso, ¿las vemos?',
       personal_approvals_pending: 'Tienes {count} aprobación(es) de tu equipo esperando, ¿las revisamos?',
-      personal_payslip_ready: 'Tu liquidación del mes ya está lista, ¿la abrimos?'
+      personal_payslip_ready: 'Tu liquidación del mes ya está lista, ¿la abrimos?',
+      // TASK-1143 — Finanzas global (dashboard). Nexa le habla al operador financiero (tuteo +
+      // nosotros). `{count}` se interpola con el número real; NUNCA un monto.
+      finance_ledger_drift: 'Hay {count} movimiento(s) con descuadre en el ledger, ¿los revisamos?',
+      finance_stale_balances: 'Hay {count} cuenta(s) con saldo desactualizado, ¿las revisamos?',
+      finance_unanchored: 'Hay {count} gasto(s) sin clasificar, ¿los vemos?',
+      finance_ledger_degraded: 'Hay chequeos del ledger que no pude verificar, ¿lo revisamos?'
     } as Record<string, string>,
     // Saludo del empty hero — rota en cada nueva conversación. `{name}` se reemplaza
     // con el primer nombre del usuario en sesión; si no hay nombre, esas frases se
