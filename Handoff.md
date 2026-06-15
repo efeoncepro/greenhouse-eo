@@ -1,5 +1,16 @@
 # Release 2026-06-10 #2 — develop→main `6c649b2a6` RELEASED
 
+## Sesion 2026-06-15 — People/Workforce/Payroll/Contractors docs end-to-end para Nexa Knowledge — Codex
+
+> **Estado:** documentacion creada, ingestion NO ejecutada por instruccion del operador. `TASK-1140` queda como vehiculo formal unico para ingestar Finance + People/Workforce/Payroll/Contractors a Knowledge/Nexa.
+
+- **Auditoria runtime:** se revisaron codigo y DB read-only de HR/Payroll/Workforce/Contractors: APIs `hr/payroll`, `admin/workforce`, `hr/contractors`, `finance/contractor-payables`; libs `src/lib/payroll/**`, `src/lib/workforce/**`, `src/lib/contractor-engagements/**`; schemas `greenhouse_payroll`, `greenhouse_hr`, `greenhouse_core` y `greenhouse_serving`.
+- **Hallazgos clave:** payroll tiene 4 periodos exportados, 21 entries, compensation versions, adjustments, receipts, export packages y compliance artifacts; Workforce tiene members en `pending_intake`, `in_review` y `completed`; Contractors tiene engagement/payable real enlazado a Finance (`payment_order_created`). Se documento la frontera critica: contractor no es nomina dependiente, honorarios no lleva AFP/salud/cesantia/IUSC, y payment order pagada no equivale a conciliacion.
+- **Documentos nuevos:** `docs/documentation/hr/people-workforce-payroll-contractors-end-to-end.md` y `docs/manual-de-uso/hr/operar-workforce-payroll-contractors-end-to-end.md`.
+- **Indices sincronizados:** `docs/documentation/README.md`, `docs/manual-de-uso/README.md`, `docs/tasks/README.md`, `docs/tasks/TASK_ID_REGISTRY.md`.
+- **Task ajustada:** `docs/tasks/to-do/TASK-1140-finance-manuals-nexa-knowledge-ingestion.md` — ahora incluye registrar docs People/Workforce/Payroll/Contractors en corpus Knowledge, agregar golden questions wrong-source por regimen/camino operativo y validar que Nexa mantenga fuera de alcance acciones HR/Payroll/Finance. No queda task separada de ingesta para People/Payroll.
+- **Gates:** `pnpm ops:lint --changed` verde, `git diff --check` verde, whitespace/path check de archivos nuevos verde. `pnpm docs:closure-check` exit 0 con warning advisory `task_lifecycle_check`; README/registry fueron verificados manualmente y ya reflejan `TASK-1140` como umbrella y `TASK-1144` como siguiente ID por las tasks 1141-1143 existentes en el checkout.
+
 ## Sesión 2026-06-15 — TASK-1139 Nexa data-aware prompts enrichment (Tier 2.1) — Claude
 
 > **Estado:** code-complete en `develop` (local-first). Aditivo bajo el flag de TASK-1087 (ya ON en local + staging). Ejecuta las recomendaciones de cierre de TASK-1087.

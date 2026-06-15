@@ -1,4 +1,4 @@
-# TASK-1140 — Finance manuals ingestion into Nexa Knowledge
+# TASK-1140 — Finance, People, Workforce, Payroll and Contractors manuals ingestion into Nexa Knowledge
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
@@ -16,7 +16,7 @@
 - Epic: `none`
 - Status real: `Diseno`
 - Rank: `TBD`
-- Domain: `finance|nexa|knowledge|content|ai`
+- Domain: `finance|hr|payroll|workforce|contractor|nexa|knowledge|content|ai`
 - Blocked by: `none`
 - Branch: `task/TASK-1140-finance-manuals-nexa-knowledge-ingestion`
 - Legacy ID: `none`
@@ -24,19 +24,19 @@
 
 ## Summary
 
-Ingestar el nuevo paquete documental de Finance al corpus Knowledge/Nexa para que Nexa pueda responder preguntas operativas sobre ingresos, egresos, cobros, pagos, caja, instrumentos de pago, Banco/Tesoreria, conciliacion, ordenes de pago, contractors, payroll y P&L con fuentes correctas y citas gobernadas.
+Ingestar el nuevo paquete documental de Finance + People/Workforce/Payroll/Contractors al corpus Knowledge/Nexa para que Nexa pueda responder preguntas operativas sobre ingresos, egresos, cobros, pagos, caja, instrumentos de pago, Banco/Tesoreria, conciliacion, ordenes de pago, habilitacion de colaboradores, readiness, nomina mensual, honorarios, Deel/internacional, contractors, payables, employee-to-contractor, offboarding, finiquitos y P&L con fuentes correctas y citas gobernadas.
 
-Esta task NO crea nueva capacidad financiera ni ejecuta acciones desde Nexa. Solo hace disponible el conocimiento documentado para respuestas grounded.
+Esta task NO crea nueva capacidad financiera, HR o Payroll ni ejecuta acciones desde Nexa. Solo hace disponible el conocimiento documentado para respuestas grounded.
 
 ## Why This Task Exists
 
-La revision local del 2026-06-15 mostro que Nexa ya tiene `search_knowledge`, pero las preguntas sobre Finance pueden recuperar documentos generales no financieros con confianza alta. El gap no es solo de prompt: faltaba un paquete Finance end-to-end listo para corpus y un set de golden questions que asegure que Nexa cite fuentes finance cuando responde sobre Finance.
+La revision local del 2026-06-15 mostro que Nexa ya tiene `search_knowledge`, pero las preguntas sobre Finance, Workforce, Payroll y Contractors pueden recuperar documentos generales o parciales con confianza alta. El gap no es solo de prompt: faltaba un paquete end-to-end listo para corpus y un set de golden questions que asegure que Nexa cite fuentes correctas cuando responde sobre caja/tesoreria, nomina, honorarios, contractors, finiquitos o puentes con Finance.
 
 ## Goal
 
-- Registrar los manuales/documentos Finance recientes en el corpus Knowledge gobernado.
-- Asegurar que preguntas sobre ingresos, egresos, cobros, pagos, instrumentos, Banco, conciliacion y ordenes de pago recuperen fuentes finance correctas.
-- Agregar QA/evals de wrong-source para Finance antes de considerar activacion productiva.
+- Registrar los manuales/documentos Finance, People, Workforce, Payroll y Contractors recientes en el corpus Knowledge gobernado.
+- Asegurar que preguntas sobre ingresos, egresos, cobros, pagos, instrumentos, Banco, conciliacion, ordenes de pago, Workforce Activation, nomina, honorarios, contractors, offboarding y finiquitos recuperen fuentes correctas.
+- Agregar QA/evals de wrong-source para Finance/People antes de considerar activacion productiva.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 1 — CONTEXT & CONSTRAINTS
@@ -50,19 +50,28 @@ La revision local del 2026-06-15 mostro que Nexa ya tiene `search_knowledge`, pe
 Revisar y respetar:
 
 - `docs/architecture/nexa-intelligence/README.md`
-- `docs/architecture/nexa-intelligence/NEXA_KNOWLEDGE_MANIFEST.md`
+- `docs/architecture/nexa-intelligence/manifest.json`
 - `docs/documentation/plataforma/knowledge-platform.md`
 - `docs/documentation/plataforma/nexa-conversational-experience.md`
 - `docs/architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`
 - `docs/architecture/GREENHOUSE_PAYMENT_ORDERS_ARCHITECTURE_V1.md`
+- `docs/architecture/GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md`
+- `docs/architecture/GREENHOUSE_UNIFIED_WORKFORCE_FOUNDATION_V1.md`
+- `docs/architecture/GREENHOUSE_CONTRACTOR_ENGAGEMENTS_PAYABLES_ARCHITECTURE_V1.md`
+- `docs/architecture/GREENHOUSE_WORKFORCE_PAYABLES_CONTROL_PLANE_V1.md`
+- `docs/architecture/GREENHOUSE_WORKFORCE_EXIT_PAYROLL_ELIGIBILITY_V1.md`
 
 Reglas obligatorias:
 
 - Nexa debe responder con grounding y citas; si falta evidencia, debe decirlo.
 - No activar acciones financieras desde Nexa en esta task.
+- No activar acciones HR/Payroll/Contractors desde Nexa en esta task.
 - No exponer datos sensibles de cuentas/perfiles de pago.
 - No promover Knowledge production sin QA y decision explicita.
 - Mantener separadas las capas documento, caja, banco, settlement, conciliacion, P&L y contabilidad legal.
+- Clasificar worker antes de responder calculo o pago.
+- No aplicar reglas Chile dependiente a honorarios, contractors, Deel/EOR o internacional.
+- Mantener separado Contractor Engagement -> Contractor Payable -> Finance Payment Order.
 
 ## Normative Docs
 
@@ -80,6 +89,29 @@ Reglas obligatorias:
 - `docs/manual-de-uso/finance/sugerencias-asistidas-conciliacion.md`
 - `docs/documentation/finance/distribucion-costos-pnl.md`
 - `docs/manual-de-uso/finance/distribucion-costos-pnl.md`
+- `docs/documentation/hr/people-workforce-payroll-contractors-end-to-end.md`
+- `docs/manual-de-uso/hr/operar-workforce-payroll-contractors-end-to-end.md`
+- `docs/documentation/hr/workforce-activation-readiness.md`
+- `docs/manual-de-uso/hr/habilitar-colaborador-workforce.md`
+- `docs/manual-de-uso/hr/completar-ficha-laboral.md`
+- `docs/documentation/hr/periodos-de-nomina.md`
+- `docs/manual-de-uso/hr/periodos-de-nomina.md`
+- `docs/documentation/hr/recibos-y-reporte-mensual.md`
+- `docs/manual-de-uso/hr/descargar-y-reconciliar-nomina.md`
+- `docs/documentation/hr/payroll-compliance-exports-chile.md`
+- `docs/manual-de-uso/hr/payroll-compliance-exports-chile.md`
+- `docs/documentation/hr/reliquidacion-de-nomina.md`
+- `docs/documentation/hr/ajustes-de-pago-en-nomina.md`
+- `docs/manual-de-uso/hr/ajustar-pago-de-nomina.md`
+- `docs/documentation/hr/finiquitos.md`
+- `docs/manual-de-uso/hr/finiquitos.md`
+- `docs/documentation/hr/offboarding.md`
+- `docs/manual-de-uso/hr/offboarding.md`
+- `docs/documentation/hr/contratistas-self-service.md`
+- `docs/documentation/hr/contratistas-engagement-ciclo-de-vida.md`
+- `docs/documentation/hr/contratistas-onboarding.md`
+- `docs/manual-de-uso/hr/contratistas.md`
+- `docs/documentation/hr/contratistas-flujo-de-pago-completo.md`
 
 ## Dependencies & Impact
 
@@ -92,8 +124,9 @@ Reglas obligatorias:
 ### Blocks / Impacts
 
 - Mejora futura de respuestas Finance en Nexa Chat.
-- QA de answer quality por dominio finance.
-- Futuras tasks de action runtime finance deben apoyarse en este conocimiento, pero no quedan desbloqueadas para ejecutar writes.
+- Mejora futura de respuestas People/HR/Payroll/Contractors en Nexa Chat.
+- QA de answer quality por dominio finance/hr/payroll/contractor.
+- Futuras tasks de action runtime finance/hr/payroll deben apoyarse en este conocimiento, pero no quedan desbloqueadas para ejecutar writes.
 
 ### Files owned
 
@@ -103,6 +136,8 @@ Reglas obligatorias:
 - `src/lib/nexa/**`
 - `docs/documentation/finance/**`
 - `docs/manual-de-uso/finance/**`
+- `docs/documentation/hr/**`
+- `docs/manual-de-uso/hr/**`
 - `docs/tasks/to-do/TASK-1140-finance-manuals-nexa-knowledge-ingestion.md`
 
 ## Current Repo State
@@ -113,12 +148,17 @@ Reglas obligatorias:
 - `NEXA_KNOWLEDGE_RETRIEVAL_ENABLED` esta activo en local/staging segun handoff vigente; produccion permanece gateada.
 - Existen docs finance especializados para caja, ordenes, conciliacion, contractors, P&L y perfiles.
 - El 2026-06-15 se agrego un documento funcional end-to-end reconciliado contra codigo/DB y manuales operador para ingresos/egresos/pagos/ordenes, caja/liquidaciones, conciliacion bancaria e instrumentos/Banco.
+- Existen manuales HR/Payroll/Contractors individuales para Workforce Activation, periodos de nomina, exports, pagos, adjustments, finiquitos y contractors.
+- El 2026-06-15 se agrego un documento funcional end-to-end y manual operador que conectan People/Workforce/Payroll/Contractors/Finance, reconciliados contra codigo y DB read-only.
 
 ### Gap
 
 - Los documentos Finance nuevos no estan registrados en el corpus Knowledge/Nexa.
+- Los documentos People/Workforce/Payroll/Contractors nuevos no estan registrados en el corpus Knowledge/Nexa.
 - No existe set de golden questions Finance que bloquee wrong-source.
+- No existe set de golden questions People/Payroll/Contractors que fuerce a Nexa a distinguir regimenes laborales.
 - Preguntas finance pueden recuperar docs generales de Greenhouse/Nexa con confianza alta.
+- Preguntas contractor pueden recuperar solo Finance o solo HR y omitir la cadena completa.
 - La sensibilidad de perfiles, cuentas e instrumentos ya quedo documentada; la ingestion debe conservar metadata/policy para no exponer datos sensibles.
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -136,10 +176,10 @@ Reglas obligatorias:
 
 ## Scope
 
-### Slice 1 — Finance corpus registration
+### Slice 1 — Corpus registration
 
-- Registrar los docs normativos Finance en el corpus Knowledge correspondiente.
-- Asignar metadata de dominio `finance`, tipo `documentation` o `manual`, sensitivity interna y policy `agent_allowed` solo para contenido operativo no sensible.
+- Registrar los docs normativos Finance, People, Workforce, Payroll y Contractors en el corpus Knowledge correspondiente.
+- Asignar metadata de dominio (`finance`, `hr`, `payroll`, `workforce`, `contractor`), tipo `documentation` o `manual`, sensitivity interna y policy `agent_allowed` solo para contenido operativo no sensible.
 - Evitar duplicar documentos ya ingestado; si existe fuente previa, actualizarla en lugar de crear una entrada paralela.
 
 ### Slice 2 — Retrieval and answer QA
@@ -158,14 +198,28 @@ Reglas obligatorias:
   - "como funciona conciliacion";
   - "como se pagan contractors";
   - "por que processor no es cuenta bancaria";
-  - "como llega esto al P&L".
-- Validar que `search_knowledge` recupera fuentes finance correctas y no docs generales.
-- Agregar caso negativo: si la pregunta pide accion financiera, Nexa debe explicar y no ejecutar.
+  - "como llega esto al P&L";
+  - "como habilito un colaborador en Workforce Activation";
+  - "que bloquea completar una ficha laboral";
+  - "como creo y calculo un periodo de nomina";
+  - "que hace automatico Greenhouse en payroll";
+  - "que debe revisar el operador antes de aprobar nomina";
+  - "como funciona honorarios";
+  - "por que honorarios no tiene AFP/salud/cesantia";
+  - "como funciona Deel/EOR o internacional";
+  - "aprobar una entrega contractor paga automaticamente";
+  - "como llega un contractor payable a Finance";
+  - "como hago employee to contractor";
+  - "cuando corresponde finiquito";
+  - "marcar pagado es lo mismo que conciliar".
+- Validar que `search_knowledge` recupera fuentes correctas de Finance/HR/Payroll/Contractors y no docs generales.
+- Agregar caso negativo: si la pregunta pide accion financiera, HR o Payroll, Nexa debe explicar y no ejecutar.
 
 ### Slice 3 — Nexa response safety
 
 - Ajustar prompts/evals solo si la ingestion no basta para evitar wrong-source.
 - Asegurar que Nexa separa documento, caja, banco, settlement, conciliacion y P&L.
+- Asegurar que Nexa separa Workforce Activation, Payroll, Contractor Engagement, Contractor Payable, Finance Payment Order, offboarding y finiquito.
 - Asegurar que Nexa no entrega datos sensibles de perfiles/cuentas ni instrucciones para bypass.
 
 ### Slice 4 — Staging validation and rollout note
@@ -177,8 +231,10 @@ Reglas obligatorias:
 ## Out of Scope
 
 - Ejecutar pagos, crear ingresos/egresos u operar Finance desde Nexa.
+- Calcular, aprobar, cerrar o pagar nomina desde Nexa.
+- Crear/activar contractors, aprobar entregas, generar payables o cerrar finiquitos desde Nexa.
 - Construir `NexaActionProposal` o command bridge financiero.
-- Cambiar modelos contables o schemas finance.
+- Cambiar modelos contables, schemas finance, formulas payroll, tax tables, compensation versions o contractor payables.
 - Activar Knowledge production automaticamente.
 - Crear UI nueva para Finance o Knowledge.
 
@@ -197,6 +253,14 @@ Preguntas de QA minimas:
 | "Como funciona conciliacion?" | `conciliacion-bancaria-operacion.md`, `conciliacion-bancaria.md` |
 | "Marcar pagada una orden significa conciliada?" | `operacion-finance-end-to-end.md`, `conciliacion-bancaria-operacion.md`, `sugerencias-asistidas-conciliacion.md` |
 | "Deel es la cuenta que se rebaja?" | `instrumentos-de-pago-y-banco.md`, `operacion-finance-end-to-end.md`, `ordenes-de-pago.md` |
+| "Nexa, como habilito un colaborador?" | `habilitar-colaborador-workforce.md`, `workforce-activation-readiness.md`, `people-workforce-payroll-contractors-end-to-end.md` |
+| "Que significa que una ficha este bloqueada?" | `habilitar-colaborador-workforce.md`, `workforce-activation-readiness.md` |
+| "Como calculo nomina mensual?" | `periodos-de-nomina.md`, `people-workforce-payroll-contractors-end-to-end.md` |
+| "Que hace automatico Greenhouse al calcular payroll?" | `people-workforce-payroll-contractors-end-to-end.md`, `periodos-de-nomina.md` |
+| "Honorarios tiene AFP y salud?" | `people-workforce-payroll-contractors-end-to-end.md`, `recibos-y-reporte-mensual.md` |
+| "Aprobar una entrega paga al contractor?" | `contratistas.md`, `contratistas-flujo-de-pago-completo.md`, `pagos-a-contractors.md` |
+| "Como paso un empleado a contractor?" | `contratistas-onboarding.md`, `people-workforce-payroll-contractors-end-to-end.md` |
+| "Finiquito es payroll adjustment?" | `finiquitos.md`, `offboarding.md`, `people-workforce-payroll-contractors-end-to-end.md` |
 
 Respuesta esperada:
 
@@ -204,6 +268,7 @@ Respuesta esperada:
 - paso a paso cuando el usuario pregunta "como";
 - con advertencias operativas cuando hay riesgo;
 - con citas/sources finance;
+- con citas/sources HR/Payroll/Contractors cuando la pregunta no sea solo Finance;
 - sin inventar datos de runtime;
 - sin prometer que Nexa puede ejecutar la accion.
 
@@ -218,6 +283,9 @@ Respuesta esperada:
 | Riesgo | Sistema | Probabilidad | Mitigation | Signal de alerta |
 |---|---|---|---|---|
 | Nexa responde Finance con fuentes generales no finance | knowledge/nexa | medium | golden questions + wrong-source checks | eval failure / qa report |
+| Nexa mezcla contractor con payroll dependiente | payroll/contractor | medium | golden questions por regimen | eval failure |
+| Nexa da consejo legal/tributario como definitivo | payroll/compliance | medium | safety answer policy | QA sensitive failure |
+| Nexa recupera solo Finance para contractor HR | knowledge | medium | cross-domain expected sources | wrong-source |
 | Documento sensible expone datos de pago | finance/security | low | revisar metadata y redactar contenido sensible | manual review |
 | Activacion prod accidental | release/knowledge | low | respetar flag prod OFF y rollout humano | env/config diff |
 | Prompt change degrada respuestas no Finance | nexa | medium | snapshot/eval antes y despues si se toca prompt | qa matrix |
@@ -258,11 +326,11 @@ Respuesta esperada:
 
 ## Acceptance Criteria
 
-- [ ] Los manuales/documentos Finance normativos estan registrados en el corpus Knowledge.
-- [ ] `search_knowledge` recupera fuentes Finance para preguntas Finance.
-- [ ] Nexa responde preguntas de ingreso, egreso, cobro, pago directo, instrumento, Banco, transferencia interna, orden de pago, conciliacion y contractors con citas correctas.
+- [ ] Los manuales/documentos Finance, People, Workforce, Payroll y Contractors normativos estan registrados en el corpus Knowledge.
+- [ ] `search_knowledge` recupera fuentes Finance para preguntas Finance y fuentes HR/Payroll/Contractors para preguntas People.
+- [ ] Nexa responde preguntas de ingreso, egreso, cobro, pago directo, instrumento, Banco, transferencia interna, orden de pago, conciliacion, Workforce Activation, nomina, honorarios, Deel/internacional, contractors, employee-to-contractor, offboarding y finiquitos con citas correctas.
 - [ ] Los casos wrong-source quedan cubiertos por eval/QA.
-- [ ] Nexa no afirma que puede ejecutar acciones financieras en esta task.
+- [ ] Nexa no afirma que puede ejecutar acciones financieras, HR, Payroll o Contractors en esta task.
 - [ ] Production queda explicitamente sin cambios o validada con aprobacion humana.
 
 ## Verification
