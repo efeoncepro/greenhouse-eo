@@ -4322,6 +4322,18 @@ El corpus de knowledge se mantiene al día **automáticamente** vía **webhook**
 
 **Spec canónica**: `docs/tasks/complete/TASK-1083-knowledge-search-api-golden-questions.md` + `GREENHOUSE_KNOWLEDGE_PLATFORM_ARCHITECTURE_V1.md` Delta 2026-06-12 + `GREENHOUSE_FULL_API_PARITY_DECISION_V1.md`. Migraciones `20260612072724451` (tsvector) + `20260612075236036` (unaccent). Patrón fuente: TASK-672 (contrato versionado + composer), TASK-571/766 (VIEW/helper SSOT + lint rule), TASK-822 (lint de boundary), TASK-873/935 (capability grant coverage), TASK-872 (anti-oracle notFound).
 
+### Nexa Intelligence — documentación por capas + doc gate (TASK-1124, desde 2026-06-15)
+
+La inteligencia conversacional de Nexa está documentada por **capas de producto** en
+`docs/architecture/nexa-intelligence/` (índice `README.md`): `01` system-prompt versionado · `02`
+system-prompt vigente · `03` comportamiento+routing · `04` voz/tono/estilo/personalidad · `05`
+do's&don'ts · `06` evidencia+citas · `07` knowledge retrieval+calidad. Subcarpeta **`technical/`**:
+modelos LLM, pipeline RAG, técnicas, contratos de datos. Funcional (simple): `docs/documentation/plataforma/nexa-intelligence-capas.md`. Manual: `docs/manual-de-uso/plataforma/nexa-intelligence-mantener.md`.
+
+- **SSOT machine-readable** del mapeo dominio↔código↔docs: `docs/architecture/nexa-intelligence/manifest.json`.
+- **Gate canónico** `pnpm nexa:doc-gate` (`scripts/ci/nexa-intelligence-doc-gate.mjs`, en `ci.yml` modo `--changed`): si cambia código de un dominio Nexa pero **no** se actualizó ninguno de sus docs de capa → falla; un archivo Nexa nuevo fuera de `domains`/`codeAllowlist` → falla (dominio sin capa).
+- **⚠️ Reglas duras:** **NUNCA** tocar un dominio Nexa (prompt, voz, behavior/routing, tool/knowledge, evidencia, flags, modelos LLM) sin actualizar su doc de capa en el mismo cambio (el gate lo bloquea). **NUNCA** agregar un archivo Nexa nuevo sin registrarlo en `manifest.json` (`domains` con su doc, o `codeAllowlist` si es plumbing). **SIEMPRE** que cambie el contrato canónico de una capa (prompt versioning, RAG, contratos, voz), mover juntos: el código + su doc de capa + (si aplica) `technical/`.
+
 ### Nexa Knowledge Retrieval invariants (TASK-1085, desde 2026-06-12)
 
 Nexa responde dudas de proceso/política/definición **recuperando del corpus gobernado y citando** — vía un tool de function-calling que consume el contrato `knowledge-search.v1` (TASK-1083), detrás del flag `NEXA_KNOWLEDGE_RETRIEVAL_ENABLED` (default OFF). Mitad backend = Claude (tool + reglas + señales); mitad UI/Answer-Trace = Codex (`NexaKnowledgeAnswerSurface` + wiring `@assistant-ui/react`). El tool es el **único punto de retrieval de Nexa**: `searchKnowledge({ mode: 'agentic' })`, NUNCA un LLM call sin retrieval ni un query directo a las tablas.

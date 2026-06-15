@@ -126,6 +126,14 @@ jobs:
         # nuevo BLOQUEA el build.
         run: pnpm route-reachability-gate --strict
 
+      - name: Nexa Intelligence doc gate (TASK-1124)
+        # Si cambia código de un dominio Nexa (system prompt, voz, behavior/routing,
+        # tool/knowledge, evidencia, flags, modelos LLM) pero NO se actualizó ninguno
+        # de sus docs de capa en docs/architecture/nexa-intelligence/, falla. También
+        # falla si un archivo Nexa nuevo no está registrado en el manifest (dominio sin
+        # capa). SSOT: docs/architecture/nexa-intelligence/manifest.json.
+        run: pnpm nexa:doc-gate --changed --base=origin/${{ github.base_ref || 'develop' }}
+
       - name: Migration marker gate (TASK-838 / ISSUE-068)
         # Bloquea PRs con migrations que tengan el patrón "Up Migration vacía +
         # DDL bajo Down Migration" — la clase de bug que causó ISSUE-068

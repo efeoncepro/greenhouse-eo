@@ -1,0 +1,95 @@
+{
+  "$comment": "SSOT machine-readable de las capas de producto de Nexa Intelligence. Lo lee el gate `pnpm nexa:doc-gate` (scripts/ci/nexa-intelligence-doc-gate.mjs): cuando cambia código de un dominio Nexa, su(s) doc(s) de capa DEBEN cambiar también; además valida cobertura (cada code path Nexa pertenece a un dominio, cada doc existe). Al agregar/mover un dominio Nexa o un doc de capa, actualizar este manifest en el mismo cambio.",
+  "version": "nexa-intelligence-manifest.v1",
+  "docsRoot": "docs/architecture/nexa-intelligence",
+  "$coverage": "El gate (modo --audit/--changed) chequea que cada archivo `src/lib/nexa/**/*.ts` (no-test) pertenezca a un `domains[].code` O esté en `codeAllowlist` (plumbing/infra sin capa de producto). Un archivo Nexa nuevo fuera de ambos = 'dominio Nexa sin capa' (registralo en domains o en codeAllowlist).",
+  "codeAllowlist": [
+    "src/lib/nexa/nexa-contract.ts",
+    "src/lib/nexa/nexa-answers-surface-context.ts",
+    "src/lib/nexa/floating-events.ts",
+    "src/lib/nexa/store.ts",
+    "src/lib/nexa/suggested-prompts.ts",
+    "src/lib/nexa/use-nexa-runtime.ts",
+    "src/lib/nexa/use-nexa-thread-history.ts",
+    "src/lib/nexa/nexa-page-context.tsx",
+    "src/lib/nexa/digest/build-weekly-digest.ts",
+    "src/lib/nexa/digest/index.ts",
+    "src/lib/nexa/digest/recipient-resolver.ts",
+    "src/lib/nexa/digest/types.ts"
+  ],
+  "layers": [
+    "README.md",
+    "01-system-prompt-versioning.md",
+    "02-system-prompt-today.md",
+    "03-behavior-and-routing.md",
+    "04-voice-tone-style-personality.md",
+    "05-dos-and-donts.md",
+    "06-evidence-and-citations.md",
+    "07-knowledge-retrieval-answer-quality.md",
+    "technical/README.md",
+    "technical/llm-models.md",
+    "technical/rag-pipeline.md",
+    "technical/techniques.md",
+    "technical/data-contracts.md"
+  ],
+  "domains": [
+    {
+      "key": "system-prompt",
+      "label": "System prompt (versionado + contenido vigente)",
+      "code": ["src/lib/nexa/nexa-system-prompt.ts"],
+      "docs": ["01-system-prompt-versioning.md", "02-system-prompt-today.md"]
+    },
+    {
+      "key": "voice",
+      "label": "Voz, tono, estilo y personalidad",
+      "code": ["docs/context/05_voz-tono-estilo.md"],
+      "docs": ["04-voice-tone-style-personality.md"]
+    },
+    {
+      "key": "behavior-routing",
+      "label": "Comportamiento + routing de provider",
+      "code": [
+        "src/lib/nexa/nexa-service.ts",
+        "src/lib/nexa/nexa-model-router.ts",
+        "src/lib/nexa/nexa-provider.ts",
+        "src/lib/nexa/providers/gemini.ts",
+        "src/lib/nexa/providers/anthropic.ts"
+      ],
+      "docs": ["03-behavior-and-routing.md", "technical/llm-models.md"]
+    },
+    {
+      "key": "llm-models",
+      "label": "Config de modelos LLM (IDs, picker, resolución de provider)",
+      "code": ["src/config/nexa-models.ts"],
+      "docs": ["technical/llm-models.md", "03-behavior-and-routing.md"]
+    },
+    {
+      "key": "tools-knowledge",
+      "label": "Tool search_knowledge + calidad de respuesta",
+      "code": ["src/lib/nexa/nexa-tools.ts", "src/lib/knowledge/search/search-knowledge.ts", "src/lib/knowledge/search/rerank-knowledge-chunks.ts"],
+      "docs": ["07-knowledge-retrieval-answer-quality.md", "technical/rag-pipeline.md", "technical/techniques.md"]
+    },
+    {
+      "key": "evidence",
+      "label": "Evidencia + citas (panel de fuentes, excerpt hygiene)",
+      "code": [
+        "src/lib/nexa/conversational-evidence.ts",
+        "src/lib/nexa/nexa-answers-citation-mapper.ts",
+        "src/lib/nexa/strip-markdown-excerpt.ts"
+      ],
+      "docs": ["06-evidence-and-citations.md", "technical/data-contracts.md"]
+    },
+    {
+      "key": "flags",
+      "label": "Flags + rollout de Nexa/Knowledge",
+      "code": ["src/lib/nexa/flags.ts", "src/lib/knowledge/search/flags.ts"],
+      "docs": ["01-system-prompt-versioning.md", "07-knowledge-retrieval-answer-quality.md"]
+    },
+    {
+      "key": "qa",
+      "label": "QA matrix de calidad de respuesta de Nexa Knowledge",
+      "code": ["scripts/nexa-knowledge-qa-matrix.mjs"],
+      "docs": ["07-knowledge-retrieval-answer-quality.md"]
+    }
+  ]
+}

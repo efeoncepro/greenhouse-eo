@@ -64,6 +64,7 @@
     "finance:e2e-gate": "node scripts/ci/finance-e2e-gate.mjs",
     "vercel-cron-gate": "node scripts/ci/vercel-cron-async-critical-gate.mjs",
     "route-reachability-gate": "node scripts/ci/route-reachability-gate.mjs",
+    "nexa:doc-gate": "node scripts/ci/nexa-intelligence-doc-gate.mjs",
     "migration-marker-gate": "node scripts/ci/migration-marker-gate.mjs",
     "migration-marker-gate:test": "node scripts/ci/__tests__/migration-marker-gate.test.mjs",
     "worker:runtime-deps-gate": "node scripts/ci/worker-runtime-deps-gate.mjs",
