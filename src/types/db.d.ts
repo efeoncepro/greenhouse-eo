@@ -1880,6 +1880,34 @@ export interface GreenhouseContextContextDocumentVersions {
   version_number: number;
 }
 
+export interface GreenhouseCoreApiPlatformCommandExecutions {
+  app_session_id: string | null;
+  client_id: string | null;
+  command_execution_id: string;
+  completed_at: Timestamp | null;
+  consumer_id: string | null;
+  created_at: Generated<Timestamp>;
+  error_code: string | null;
+  expires_at: Timestamp;
+  greenhouse_scope_type: string | null;
+  idempotency_key: string | null;
+  lane: string;
+  organization_id: string | null;
+  principal_id: string;
+  principal_kind: string;
+  replay_count: Generated<number>;
+  request_fingerprint: string | null;
+  request_method: string;
+  request_path: string;
+  response_body: Json | null;
+  response_status: number | null;
+  route_key: string;
+  space_id: string | null;
+  status: Generated<string>;
+  updated_at: Generated<Timestamp>;
+  user_id: string | null;
+}
+
 export interface GreenhouseCoreApiPlatformRequestLogs {
   api_platform_request_log_id: string;
   app_session_id: string | null;
@@ -10083,6 +10111,7 @@ export interface DB {
   "greenhouse_context.context_document_quarantine": GreenhouseContextContextDocumentQuarantine;
   "greenhouse_context.context_document_versions": GreenhouseContextContextDocumentVersions;
   "greenhouse_context.context_documents": GreenhouseContextContextDocuments;
+  "greenhouse_core.api_platform_command_executions": GreenhouseCoreApiPlatformCommandExecutions;
   "greenhouse_core.api_platform_request_logs": GreenhouseCoreApiPlatformRequestLogs;
   "greenhouse_core.asset_access_log": GreenhouseCoreAssetAccessLog;
   "greenhouse_core.assets": GreenhouseCoreAssets;
