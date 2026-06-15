@@ -208,9 +208,10 @@ Human approval required for the first pilot action and any sensitive-domain acti
 - **S3 Propose tool + confirm endpoint**: tool `propose_action` (nexa-tools.ts, registry-bound) + `extract-proposals.ts` (orquestador) + `confirm.ts` + `POST /api/nexa/actions/[actionKey]/confirm` + `executeApiPlatformCommand` `+idempotencyKeyOverride` + canonical errors es-CL.
 - **S4 Pilot**: `mark_notifications_read` cableado end-to-end (self-scoped, idempotente).
 - **S5 Observability+docs**: capability `nexa.action.execute` (catalog + grant + seed registry, migración `20260615193917012`) + ledger `nexa_action_events` + 2 signals + wire-up + arch Delta + capas behavior/data-contracts + manifest + CLAUDE.md + changelog/Handoff.
+- **S6 UI confirm-card** (en la misma task, no Codex): `NexaActionProposalCard` renderizada como el tool `propose_action` en `NexaToolRenderers` → cubre el chat flotante global + el home legacy. Preview + impacto + botones confirmar/cancelar; estados honestos (idle/ejecutando/ejecutado/falló/conflicto/cancelado/expirado); tokenizada (border/radius/colores del theme, sin HEX/px inline); a11y (`role=section`/`status`/`alert`) + reduced-motion. Al confirmar hace `POST /api/nexa/actions/[actionKey]/confirm` echoando la `idempotencyKey` del proposal. **GVC verificada desktop + mobile (390px sin overflow)** vía mockup `/nexa/action-proposal/mockup` + scenario `nexa-action-proposal-mockup`.
 - **Tests**: 17 nuevos (resolver anti-freeform / extracción / confirm helper). Gate full `pnpm test` + `pnpm build` verde.
-- **Decisión del operador (checkpoint P1)**: piloto = mark notifications read · alcance S1-S5 · UI confirm-card = follow-up Codex.
-- **Follow-ups**: UI confirm-card (Codex); evento `cancelled` cuando la UI lo emita; acciones de dominio (Agency/Delivery) cuando existan sus commands; adopción del lane `app` del command helper.
+- **Decisión del operador (checkpoint P1)**: piloto = mark notifications read · alcance S1-S5 + UI confirm-card · activación (flag ON) en local + Vercel staging + prod.
+- **Follow-ups**: evento `cancelled` cuando la UI lo persista (hoy es estado local de la card); acciones de dominio (Agency/Delivery) cuando existan sus commands; adopción del lane `app` del command helper.
 
 ## Verification
 

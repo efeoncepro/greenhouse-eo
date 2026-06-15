@@ -106,8 +106,10 @@ ejecuta un write. El loop canónico es **propose → confirm → execute**:
    (contrato `nexa-action-proposal.v1`). El LLM **solo pasa una `actionKey` registrada** — NUNCA un
    endpoint, URL ni SQL. Una key desconocida / deshabilitada / sin permiso → **gap honesto** (no se
    propone nada). El orquestador eleva las propuestas a `NexaResponse.actionProposals`.
-2. **Confirm** — el humano confirma en la UI (la tarjeta de confirmación es follow-up de UI). La UI
-   hace `POST /api/nexa/actions/[actionKey]/confirm` echoando la `idempotencyKey` del proposal.
+2. **Confirm** — el humano confirma en la UI. La **confirm-card** (`NexaActionProposalCard`, renderizada
+   como el tool `propose_action` en `NexaToolRenderers` → cubre el chat flotante + el home) muestra el
+   preview + impacto + botones; al confirmar hace `POST /api/nexa/actions/[actionKey]/confirm` echoando
+   la `idempotencyKey` del proposal, con estados honestos (idle/ejecutando/ejecutado/falló/conflicto).
 3. **Execute** — el endpoint (user-session, capability `nexa.action.execute`) **re-valida** la acción
    al momento de ejecutar y corre el command bound vía `executeApiPlatformCommand` (foundation
    TASK-655, `principalKind='app_user'`, idempotente + auditado). Es el **ÚNICO ejecutor**; el LLM

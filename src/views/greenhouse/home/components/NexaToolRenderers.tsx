@@ -13,7 +13,10 @@ import Typography from '@mui/material/Typography'
 import { alpha, useTheme } from '@mui/material/styles'
 
 import { NexaEvidencePanel, NexaProvenanceTrace } from '@/components/greenhouse/primitives'
+import { isNexaActionProposal } from '@/lib/nexa/actions/extract-proposals'
 import type { NexaToolResult } from '@/lib/nexa/nexa-contract'
+
+import { NexaActionProposalCard } from './NexaActionProposalCard'
 import {
   evidenceConfidenceLabel,
   evidenceFreshnessLabel,
@@ -243,6 +246,33 @@ const SearchKnowledgeRenderer = memo(
 
 SearchKnowledgeRenderer.displayName = 'NexaToolRenderer(search_knowledge)'
 
+/* ── propose_action (TASK-1137) ──
+   La acción gobernada se propone como un tool result; aquí el HUMANO la confirma. Un proposal
+   válido (raw.proposal) → la confirm-card interactiva; cualquier otra cosa (gap honesto: acción
+   desconocida / deshabilitada / sin permiso) → ToolCard con el mensaje (available=false → warning).
+   El LLM nunca ejecuta: el botón Confirmar llama al endpoint determinístico. */
+const ProposeActionRenderer = memo(
+  ({ result }: ToolCallMessagePartProps<Record<string, unknown>, NexaToolResult>) => {
+    if (!result) {
+      return (
+        <Alert severity='info' sx={{ mt: 1.25 }}>
+          Preparando acción...
+        </Alert>
+      )
+    }
+
+    const proposal = (result.raw as Record<string, unknown> | undefined)?.proposal
+
+    if (result.available && isNexaActionProposal(proposal)) {
+      return <NexaActionProposalCard proposal={proposal} />
+    }
+
+    return <ToolCard toolName='propose_action' result={result} />
+  }
+)
+
+ProposeActionRenderer.displayName = 'NexaToolRenderer(propose_action)'
+
 const NexaToolRenderers = () => {
   useAssistantToolUI({ toolName: 'check_payroll', render: CheckPayrollRenderer })
   useAssistantToolUI({ toolName: 'get_otd', render: GetOtdRenderer })
@@ -250,6 +280,7 @@ const NexaToolRenderers = () => {
   useAssistantToolUI({ toolName: 'get_capacity', render: GetCapacityRenderer })
   useAssistantToolUI({ toolName: 'pending_invoices', render: PendingInvoicesRenderer })
   useAssistantToolUI({ toolName: 'search_knowledge', render: SearchKnowledgeRenderer })
+  useAssistantToolUI({ toolName: 'propose_action', render: ProposeActionRenderer })
 
   return null
 }

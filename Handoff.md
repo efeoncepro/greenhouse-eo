@@ -2,7 +2,7 @@
 
 ## Sesión 2026-06-15 — TASK-1137 Nexa governed action runtime + command bridge — Claude
 
-> **Estado:** **complete** en `develop` (local-first). Detrás de `NEXA_ACTION_RUNTIME_ENABLED=false` → cero cambio de runtime al merge. Activación + UI confirm-card = decisión/rollout del operador (+ Codex).
+> **Estado:** **complete** en `develop` (pusheado, CI verde). Detrás de `NEXA_ACTION_RUNTIME_ENABLED` (default OFF). **Activado por el operador**: flag ON en local + Vercel staging + producción; auto-router ya estaba ON. **UI confirm-card incluida** (no quedó para Codex). Pendiente prod real = release `develop→main`.
 
 - **Qué resuelve:** Nexa podía leer pero no actuar de forma gobernada. Ahora puede **proponer una acción, mostrar preview, pedir confirmación humana y ejecutar** un command idempotente/auditado — **sin que el LLM ejecute un write**. Es el rung `execute_requires_confirmation` del Action Maturity Ladder (desbloqueado por TASK-655).
 - **Loop canónico (propose → confirm → execute):** tool `propose_action(actionKey)` (read-only) → resolver determinístico (`actions/registry.ts`) → proposal `nexa-action-proposal.v1` o gap honesto → `NexaResponse.actionProposals` → `POST /api/nexa/actions/[id]/confirm` (capability `nexa.action.execute`) → `executeApiPlatformCommand` (`principalKind='app_user'`). El LLM solo pasa una `actionKey` registrada; jamás un endpoint. El endpoint es el ÚNICO ejecutor.
@@ -10,7 +10,8 @@
 - **Schema/grant:** capability `nexa.action.execute` (catalog + runtime grant internal∪EFEONCE_ADMIN + seed registry) + ledger `greenhouse_ai.nexa_action_events` + 2 signals (failure_rate + unauthorized_proposal_rate [security]). Migración `20260615193917012`.
 - **Decisiones del operador (checkpoint):** piloto = marcar notificaciones leídas · alcance = loop completo S1-S5 · UI confirm-card = follow-up Codex.
 - **Validación:** tsc 0 · lint 0 · 17 tests nuevos + suite nexa/entitlements/commands 161 · `nexa:doc-gate` verde · migración live. **`pnpm test` full + `pnpm build` = gate de cierre (corriendo).**
-- **Follow-ups:** UI confirm-card (Codex) · evento `cancelled` cuando la UI lo emita · acciones de dominio (Agency/Delivery) cuando existan sus commands · adopción del lane `app` del command helper.
+- **UI confirm-card hecha (no Codex):** `NexaActionProposalCard` (renderer del tool `propose_action` en `NexaToolRenderers` → chat flotante + home), estados honestos, tokenizada, GVC desktop+mobile vía mockup `/nexa/action-proposal/mockup`.
+- **Follow-ups:** evento `cancelled` cuando la UI lo persista (hoy es estado local) · acciones de dominio (Agency/Delivery) cuando existan sus commands · adopción del lane `app` del command helper.
 
 ## Sesión 2026-06-15 — TASK-655 API Platform Command & Idempotency Foundation — Claude
 

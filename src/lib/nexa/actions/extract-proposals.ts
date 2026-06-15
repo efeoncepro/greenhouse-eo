@@ -5,7 +5,7 @@ import { NEXA_ACTION_PROPOSAL_CONTRACT_VERSION, type NexaActionProposal } from '
 // `propose_action` tool results onto `NexaResponse.actionProposals`. Validates the contract shape
 // so a malformed `raw` can never become a renderable proposal.
 
-const isNexaActionProposal = (value: unknown): value is NexaActionProposal => {
+export const isNexaActionProposal = (value: unknown): value is NexaActionProposal => {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return false
 
   const candidate = value as Record<string, unknown>

@@ -30,7 +30,7 @@ Es la **vista por capas** que organiza esos contratos en planos de producto nave
 
 ### [`behavior/`](behavior/README.md) — qué hace por turno
 
-- [`behavior-and-routing.md`](behavior/behavior-and-routing.md) — ruteo de tools + provider, response modes, gaps honestos.
+- [`behavior-and-routing.md`](behavior/behavior-and-routing.md) — ruteo de tools + provider, response modes, gaps honestos, **acciones gobernadas** (propose → confirm → execute; el LLM NUNCA ejecuta un write — TASK-1137).
 
 ### [`voice/`](voice/README.md) — cómo suena
 
@@ -56,7 +56,7 @@ Es la **vista por capas** que organiza esos contratos en planos de producto nave
 - [`llm-models.md`](technical/llm-models.md) — modelos LLM (Gemini, Claude), provider abstraction, routing, failover, secrets.
 - [`rag-pipeline.md`](technical/rag-pipeline.md) — RAG end-to-end: ingesta → FTS → rerank → brief → grounding → síntesis → citas.
 - [`techniques.md`](technical/techniques.md) — 2-pass tool loop, reranking, synthesis brief, dedupe, gaps honestos, reveal.
-- [`data-contracts.md`](technical/data-contracts.md) — contratos versionados (`knowledge-search.v1`, `nexa-evidence.v1`, render plan).
+- [`data-contracts.md`](technical/data-contracts.md) — contratos versionados (`knowledge-search.v1`, `nexa-evidence.v1`, render plan, `nexa-action-proposal.v1`).
 
 ## Cómo se mantiene (el gate)
 
@@ -77,3 +77,4 @@ Si agregás un dominio Nexa nuevo (un módulo, un provider, una surface), agrega
 TASK-1124 (calidad de respuesta de Knowledge + system prompt V2 versionado) + su follow-up
 (hygiene del excerpt de fuentes). Capas previas referenciadas: TASK-1085 (retrieval + citas),
 TASK-1091 (provider abstraction + router), TASK-1101 (lente conversacional), TASK-1083 (search SSOT).
+TASK-1137 (runtime de acciones gobernadas: dominio `governed-actions`, capa behavior + data-contracts).
