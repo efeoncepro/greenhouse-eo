@@ -1,4 +1,4 @@
-# TASK-1140 — Finance, People, Workforce, Payroll and Contractors manuals ingestion into Nexa Knowledge
+# TASK-1140 — Greenhouse operating manuals ingestion into Nexa Knowledge
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
@@ -16,7 +16,7 @@
 - Epic: `none`
 - Status real: `Diseno`
 - Rank: `TBD`
-- Domain: `finance|hr|payroll|workforce|contractor|nexa|knowledge|content|ai`
+- Domain: `finance|hr|payroll|workforce|contractor|commercial|agency|delivery|identity|admin|personas|public-site|ui-platform|nexa|knowledge|content|ai`
 - Blocked by: `none`
 - Branch: `task/TASK-1140-finance-manuals-nexa-knowledge-ingestion`
 - Legacy ID: `none`
@@ -24,19 +24,19 @@
 
 ## Summary
 
-Ingestar el nuevo paquete documental de Finance + People/Workforce/Payroll/Contractors al corpus Knowledge/Nexa para que Nexa pueda responder preguntas operativas sobre ingresos, egresos, cobros, pagos, caja, instrumentos de pago, Banco/Tesoreria, conciliacion, ordenes de pago, habilitacion de colaboradores, readiness, nomina mensual, honorarios, Deel/internacional, contractors, payables, employee-to-contractor, offboarding, finiquitos y P&L con fuentes correctas y citas gobernadas.
+Ingestar el paquete documental operativo de Greenhouse al corpus Knowledge/Nexa para que Nexa pueda responder preguntas sobre Finance, People/Workforce/Payroll/Contractors, Comercial/Quote-to-Cash, Agency/Delivery/Account 360, Identity/Access/Admin Center, My Space/Self-Service, Public Site/Content Factory y UI Platform/Design System con fuentes correctas y citas gobernadas.
 
-Esta task NO crea nueva capacidad financiera, HR o Payroll ni ejecuta acciones desde Nexa. Solo hace disponible el conocimiento documentado para respuestas grounded.
+Esta task NO crea nueva capacidad de negocio ni ejecuta acciones desde Nexa. Solo hace disponible el conocimiento documentado para respuestas grounded.
 
 ## Why This Task Exists
 
-La revision local del 2026-06-15 mostro que Nexa ya tiene `search_knowledge`, pero las preguntas sobre Finance, Workforce, Payroll y Contractors pueden recuperar documentos generales o parciales con confianza alta. El gap no es solo de prompt: faltaba un paquete end-to-end listo para corpus y un set de golden questions que asegure que Nexa cite fuentes correctas cuando responde sobre caja/tesoreria, nomina, honorarios, contractors, finiquitos o puentes con Finance.
+La revision local del 2026-06-15 mostro que Nexa ya tiene `search_knowledge`, pero las preguntas sobre dominios operativos pueden recuperar documentos generales o parciales con confianza alta. El gap no es solo de prompt: faltaba un paquete end-to-end listo para corpus y un set de golden questions que asegure que Nexa cite fuentes correctas cuando responde sobre caja/tesoreria, nomina, contractors, comercial, delivery, identidad, self-service, public site o plataforma UI.
 
 ## Goal
 
-- Registrar los manuales/documentos Finance, People, Workforce, Payroll y Contractors recientes en el corpus Knowledge gobernado.
-- Asegurar que preguntas sobre ingresos, egresos, cobros, pagos, instrumentos, Banco, conciliacion, ordenes de pago, Workforce Activation, nomina, honorarios, contractors, offboarding y finiquitos recuperen fuentes correctas.
-- Agregar QA/evals de wrong-source para Finance/People antes de considerar activacion productiva.
+- Registrar los manuales/documentos operativos recientes en el corpus Knowledge gobernado.
+- Asegurar que preguntas sobre Finance, People, Comercial, Agency, Identity, My Space, Public Site y UI Platform recuperen fuentes correctas.
+- Agregar QA/evals de wrong-source por dominio antes de considerar activacion productiva.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 1 — CONTEXT & CONSTRAINTS
@@ -60,18 +60,30 @@ Revisar y respetar:
 - `docs/architecture/GREENHOUSE_CONTRACTOR_ENGAGEMENTS_PAYABLES_ARCHITECTURE_V1.md`
 - `docs/architecture/GREENHOUSE_WORKFORCE_PAYABLES_CONTROL_PLANE_V1.md`
 - `docs/architecture/GREENHOUSE_WORKFORCE_EXIT_PAYROLL_ELIGIBILITY_V1.md`
+- `docs/architecture/GREENHOUSE_COMMERCIAL_QUOTATION_ARCHITECTURE_V1.md`
+- `docs/architecture/GREENHOUSE_AGENCY_LAYER_V2.md`
+- `docs/architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md`
+- `docs/architecture/GREENHOUSE_MY_PERFORMANCE_SELF_SERVICE_ACTIVITY_V1.md`
+- `docs/architecture/GREENHOUSE_PUBLIC_WEBSITE_LANDING_CONTROL_PLANE_ARCHITECTURE_V1.md`
+- `docs/architecture/ui-platform/README.md`
 
 Reglas obligatorias:
 
 - Nexa debe responder con grounding y citas; si falta evidencia, debe decirlo.
 - No activar acciones financieras desde Nexa en esta task.
 - No activar acciones HR/Payroll/Contractors desde Nexa en esta task.
+- No activar acciones comerciales, administrativas, Public Site, identidad o UI Platform desde Nexa en esta task.
 - No exponer datos sensibles de cuentas/perfiles de pago.
+- No exponer datos personales, permisos de otros usuarios, secretos WordPress/Kinsta/GCP, Application Passwords, tokens, client secrets ni endpoints internos sensibles.
 - No promover Knowledge production sin QA y decision explicita.
 - Mantener separadas las capas documento, caja, banco, settlement, conciliacion, P&L y contabilidad legal.
 - Clasificar worker antes de responder calculo o pago.
 - No aplicar reglas Chile dependiente a honorarios, contractors, Deel/EOR o internacional.
 - Mantener separado Contractor Engagement -> Contractor Payable -> Finance Payment Order.
+- Mantener separado Comercial/Quote-to-Cash de Finance/caja: una cotizacion emitida o contrato no equivale a ingreso cobrado ni conciliado.
+- Mantener separado Identity/Admin Center de bypass operativo: roles, vistas, entitlements y SCIM se gobiernan con auditoria.
+- Mantener separado Public Site read-only/draft-only de publicar o mutar produccion.
+- Mantener separado UI Platform guidance de implementacion automatica: Nexa puede explicar primitives/GVC/tokens, pero no debe modificar UI en esta task.
 
 ## Normative Docs
 
@@ -112,6 +124,18 @@ Reglas obligatorias:
 - `docs/documentation/hr/contratistas-onboarding.md`
 - `docs/manual-de-uso/hr/contratistas.md`
 - `docs/documentation/hr/contratistas-flujo-de-pago-completo.md`
+- `docs/documentation/comercial/quote-to-cash-comercial-end-to-end.md`
+- `docs/manual-de-uso/comercial/operar-quote-to-cash-comercial.md`
+- `docs/documentation/agency/agency-delivery-account-360-end-to-end.md`
+- `docs/manual-de-uso/agency/operar-agency-delivery-account-360.md`
+- `docs/documentation/identity/identity-access-admin-center-end-to-end.md`
+- `docs/manual-de-uso/identity/operar-identity-access-admin-center.md`
+- `docs/documentation/personas/my-space-self-service-end-to-end.md`
+- `docs/manual-de-uso/personas/operar-mi-espacio-self-service.md`
+- `docs/documentation/public-site/public-site-content-factory-end-to-end.md`
+- `docs/manual-de-uso/public-site/operar-public-site-content-factory.md`
+- `docs/documentation/plataforma/ui-platform-design-system-end-to-end.md`
+- `docs/manual-de-uso/plataforma/operar-ui-platform-design-system.md`
 
 ## Dependencies & Impact
 
@@ -123,10 +147,9 @@ Reglas obligatorias:
 
 ### Blocks / Impacts
 
-- Mejora futura de respuestas Finance en Nexa Chat.
-- Mejora futura de respuestas People/HR/Payroll/Contractors en Nexa Chat.
-- QA de answer quality por dominio finance/hr/payroll/contractor.
-- Futuras tasks de action runtime finance/hr/payroll deben apoyarse en este conocimiento, pero no quedan desbloqueadas para ejecutar writes.
+- Mejora futura de respuestas operativas multi-dominio en Nexa Chat.
+- QA de answer quality por dominio finance/hr/payroll/contractor/commercial/agency/identity/personas/public-site/ui-platform.
+- Futuras tasks de action runtime deben apoyarse en este conocimiento, pero no quedan desbloqueadas para ejecutar writes.
 
 ### Files owned
 
@@ -138,6 +161,18 @@ Reglas obligatorias:
 - `docs/manual-de-uso/finance/**`
 - `docs/documentation/hr/**`
 - `docs/manual-de-uso/hr/**`
+- `docs/documentation/comercial/**`
+- `docs/manual-de-uso/comercial/**`
+- `docs/documentation/agency/**`
+- `docs/manual-de-uso/agency/**`
+- `docs/documentation/identity/**`
+- `docs/manual-de-uso/identity/**`
+- `docs/documentation/personas/**`
+- `docs/manual-de-uso/personas/**`
+- `docs/documentation/public-site/**`
+- `docs/manual-de-uso/public-site/**`
+- `docs/documentation/plataforma/**`
+- `docs/manual-de-uso/plataforma/**`
 - `docs/tasks/to-do/TASK-1140-finance-manuals-nexa-knowledge-ingestion.md`
 
 ## Current Repo State
@@ -150,15 +185,24 @@ Reglas obligatorias:
 - El 2026-06-15 se agrego un documento funcional end-to-end reconciliado contra codigo/DB y manuales operador para ingresos/egresos/pagos/ordenes, caja/liquidaciones, conciliacion bancaria e instrumentos/Banco.
 - Existen manuales HR/Payroll/Contractors individuales para Workforce Activation, periodos de nomina, exports, pagos, adjustments, finiquitos y contractors.
 - El 2026-06-15 se agrego un documento funcional end-to-end y manual operador que conectan People/Workforce/Payroll/Contractors/Finance, reconciliados contra codigo y DB read-only.
+- Existen docs especializados de Comercial, Agency/Delivery, Identity, My Space, Public Site y UI Platform, pero estaban fragmentados por feature o arquitectura.
+- El 2026-06-15 se agregaron documentos funcionales end-to-end y manuales operador para Comercial/Quote-to-Cash, Agency/Delivery/Account 360, Identity/Access/Admin Center, My Space/Self-Service, Public Site/Content Factory y UI Platform/Design System, reconciliados contra codigo y DB read-only cuando el dominio tiene runtime relacional.
 
 ### Gap
 
 - Los documentos Finance nuevos no estan registrados en el corpus Knowledge/Nexa.
 - Los documentos People/Workforce/Payroll/Contractors nuevos no estan registrados en el corpus Knowledge/Nexa.
+- Los documentos Comercial, Agency, Identity, My Space, Public Site y UI Platform nuevos no estan registrados en el corpus Knowledge/Nexa.
 - No existe set de golden questions Finance que bloquee wrong-source.
 - No existe set de golden questions People/Payroll/Contractors que fuerce a Nexa a distinguir regimenes laborales.
+- No existe set de golden questions Comercial/Agency/Identity/My Space/Public Site/UI Platform que fuerce respuestas con fuentes del dominio correcto.
 - Preguntas finance pueden recuperar docs generales de Greenhouse/Nexa con confianza alta.
 - Preguntas contractor pueden recuperar solo Finance o solo HR y omitir la cadena completa.
+- Preguntas comerciales pueden recuperar docs Finance legacy y confundir cotizacion/contrato con caja o ingreso reconocido.
+- Preguntas de Agency/Account 360 pueden recuperar docs de cliente o delivery aislados y omitir degradacion por faceta.
+- Preguntas de identidad pueden responder con conceptos generales de rol/permiso y no con el contrato real de view registry, entitlements, permission sets y SCIM.
+- Preguntas de Public Site pueden omitir la postura read-only/draft-only y sugerir publicar o mutar WordPress sin guardrails.
+- Preguntas de UI Platform pueden omitir Composition Shell, Primitive+Variants+Kinds, tokens, GVC o las restricciones contra imports directos.
 - La sensibilidad de perfiles, cuentas e instrumentos ya quedo documentada; la ingestion debe conservar metadata/policy para no exponer datos sensibles.
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -178,8 +222,8 @@ Reglas obligatorias:
 
 ### Slice 1 — Corpus registration
 
-- Registrar los docs normativos Finance, People, Workforce, Payroll y Contractors en el corpus Knowledge correspondiente.
-- Asignar metadata de dominio (`finance`, `hr`, `payroll`, `workforce`, `contractor`), tipo `documentation` o `manual`, sensitivity interna y policy `agent_allowed` solo para contenido operativo no sensible.
+- Registrar los docs normativos Finance, People, Workforce, Payroll, Contractors, Comercial, Agency, Delivery, Identity, Admin Center, Personas/My Space, Public Site y UI Platform en el corpus Knowledge correspondiente.
+- Asignar metadata de dominio (`finance`, `hr`, `payroll`, `workforce`, `contractor`, `commercial`, `agency`, `delivery`, `identity`, `admin`, `personas`, `public-site`, `ui-platform`), tipo `documentation` o `manual`, sensitivity interna y policy `agent_allowed` solo para contenido operativo no sensible.
 - Evitar duplicar documentos ya ingestado; si existe fuente previa, actualizarla en lugar de crear una entrada paralela.
 
 ### Slice 2 — Retrieval and answer QA
@@ -211,15 +255,46 @@ Reglas obligatorias:
   - "como llega un contractor payable a Finance";
   - "como hago employee to contractor";
   - "cuando corresponde finiquito";
-  - "marcar pagado es lo mismo que conciliar".
-- Validar que `search_knowledge` recupera fuentes correctas de Finance/HR/Payroll/Contractors y no docs generales.
-- Agregar caso negativo: si la pregunta pide accion financiera, HR o Payroll, Nexa debe explicar y no ejecutar.
+  - "marcar pagado es lo mismo que conciliar";
+  - "como creo una cotizacion";
+  - "draft, issued y expired significan lo mismo";
+  - "cuando una cotizacion requiere aprobacion";
+  - "HubSpot es el source of truth de productos";
+  - "cotizacion emitida es ingreso cobrado";
+  - "como leo Account 360";
+  - "que significa una faceta degradada";
+  - "que es ICO y que no es";
+  - "service attribution es Service P&L completo";
+  - "como opero sample sprints";
+  - "rol, vista, entitlement y permission set son lo mismo";
+  - "como doy acceso a una ruta";
+  - "por que un usuario no ve una vista";
+  - "como funciona SCIM con Entra";
+  - "como veo mi recibo o mi perfil de pago";
+  - "por que no puedo ver datos de otra persona desde My Space";
+  - "como reviso performance self-service";
+  - "como inspecciono un post del Public Site";
+  - "que es refresh plan, patch plan y draft";
+  - "puede Nexa publicar el sitio publico";
+  - "como construyo una pantalla nueva en Greenhouse";
+  - "cuando uso Composition Shell";
+  - "que significa Primitive + Variants + Kinds";
+  - "cuando corro GVC";
+  - "puedo copiar colores de Figma directo al JSX".
+- Validar que `search_knowledge` recupera fuentes correctas por dominio y no docs generales.
+- Agregar caso negativo: si la pregunta pide accion financiera, HR, Payroll, Comercial, Admin, Public Site o UI, Nexa debe explicar y no ejecutar.
 
 ### Slice 3 — Nexa response safety
 
 - Ajustar prompts/evals solo si la ingestion no basta para evitar wrong-source.
 - Asegurar que Nexa separa documento, caja, banco, settlement, conciliacion y P&L.
 - Asegurar que Nexa separa Workforce Activation, Payroll, Contractor Engagement, Contractor Payable, Finance Payment Order, offboarding y finiquito.
+- Asegurar que Nexa separa Comercial/Quote-to-Cash de Finance/caja y no convierte quote/contract en cobro.
+- Asegurar que Nexa separa Account 360/Delivery/ICO de Service P&L cuando la proyeccion aun es parcial.
+- Asegurar que Nexa separa Identity/Admin Center de bypass manual y no sugiere editar DB para dar acceso.
+- Asegurar que Nexa separa My Space self-service de vistas admin y no acepta IDs arbitrarios de persona/miembro.
+- Asegurar que Nexa separa Public Site read-only/draft-only de publish/cache/backups/productive writes.
+- Asegurar que Nexa separa UI Platform guidance de implementacion automatica y no recomienda patrones prohibidos.
 - Asegurar que Nexa no entrega datos sensibles de perfiles/cuentas ni instrucciones para bypass.
 
 ### Slice 4 — Staging validation and rollout note
@@ -233,10 +308,15 @@ Reglas obligatorias:
 - Ejecutar pagos, crear ingresos/egresos u operar Finance desde Nexa.
 - Calcular, aprobar, cerrar o pagar nomina desde Nexa.
 - Crear/activar contractors, aprobar entregas, generar payables o cerrar finiquitos desde Nexa.
+- Crear cotizaciones, aprobar descuentos, emitir contratos, sincronizar HubSpot o convertir Quote-to-Cash desde Nexa.
+- Modificar roles, vistas, permission sets, SCIM mappings, usuarios o entitlements desde Nexa.
+- Ver datos personales de terceros desde My Space o saltarse el contexto de sesion.
+- Publicar, cache clear, backup, draft write o mutar WordPress/Kinsta desde Nexa.
+- Crear components, modificar JSX, promover primitives o ejecutar GVC desde Nexa como accion automatica.
 - Construir `NexaActionProposal` o command bridge financiero.
-- Cambiar modelos contables, schemas finance, formulas payroll, tax tables, compensation versions o contractor payables.
+- Cambiar modelos contables, schemas finance, formulas payroll, tax tables, compensation versions, contractor payables, pricing formulas, roles, view registry, Public Site runtime o UI platform contracts.
 - Activar Knowledge production automaticamente.
-- Crear UI nueva para Finance o Knowledge.
+- Crear UI nueva para cualquier dominio.
 
 ## Detailed Spec
 
@@ -261,6 +341,22 @@ Preguntas de QA minimas:
 | "Aprobar una entrega paga al contractor?" | `contratistas.md`, `contratistas-flujo-de-pago-completo.md`, `pagos-a-contractors.md` |
 | "Como paso un empleado a contractor?" | `contratistas-onboarding.md`, `people-workforce-payroll-contractors-end-to-end.md` |
 | "Finiquito es payroll adjustment?" | `finiquitos.md`, `offboarding.md`, `people-workforce-payroll-contractors-end-to-end.md` |
+| "Como creo una cotizacion comercial?" | `operar-quote-to-cash-comercial.md`, `quote-to-cash-comercial-end-to-end.md` |
+| "Una cotizacion emitida ya es ingreso cobrado?" | `quote-to-cash-comercial-end-to-end.md`, `operacion-finance-end-to-end.md` |
+| "HubSpot es el source of truth del catalogo?" | `quote-to-cash-comercial-end-to-end.md`, `catalogo-productos-sincronizacion.md` |
+| "Como leo Account 360?" | `operar-agency-delivery-account-360.md`, `agency-delivery-account-360-end-to-end.md`, `cuenta-completa-360.md` |
+| "Que significa una faceta degradada en Account 360?" | `agency-delivery-account-360-end-to-end.md`, `cuenta-completa-360.md` |
+| "Service attribution es Service P&L completo?" | `agency-delivery-account-360-end-to-end.md` |
+| "Como doy acceso a una vista?" | `operar-identity-access-admin-center.md`, `identity-access-admin-center-end-to-end.md`, `sets-de-permisos.md` |
+| "Rol y permission set son lo mismo?" | `identity-access-admin-center-end-to-end.md`, `sistema-identidad-roles-acceso.md` |
+| "Como funciona SCIM con Entra?" | `scim-entra-provisioning.md`, `identity-access-admin-center-end-to-end.md` |
+| "Como veo mi recibo o actualizo mi perfil de pago?" | `operar-mi-espacio-self-service.md`, `my-space-self-service-end-to-end.md` |
+| "Por que My Space no muestra datos de otra persona?" | `my-space-self-service-end-to-end.md`, `person-complete-360.md` |
+| "Como inspecciono un post del Public Site?" | `operar-public-site-content-factory.md`, `public-site-content-factory-end-to-end.md` |
+| "Nexa puede publicar el sitio publico?" | `public-site-content-factory-end-to-end.md`, `operar-public-site-content-factory.md` |
+| "Como construyo una pantalla nueva en Greenhouse?" | `operar-ui-platform-design-system.md`, `ui-platform-design-system-end-to-end.md` |
+| "Cuando uso Composition Shell o una primitive?" | `operar-ui-platform-design-system.md`, `ui-platform-design-system-end-to-end.md` |
+| "Puedo copiar colores de Figma directo?" | `ui-platform-design-system-end-to-end.md`, `operar-ui-platform-design-system.md` |
 
 Respuesta esperada:
 
@@ -269,6 +365,7 @@ Respuesta esperada:
 - con advertencias operativas cuando hay riesgo;
 - con citas/sources finance;
 - con citas/sources HR/Payroll/Contractors cuando la pregunta no sea solo Finance;
+- con citas/sources del dominio correcto para Comercial, Agency, Identity, My Space, Public Site y UI Platform;
 - sin inventar datos de runtime;
 - sin prometer que Nexa puede ejecutar la accion.
 
@@ -286,6 +383,10 @@ Respuesta esperada:
 | Nexa mezcla contractor con payroll dependiente | payroll/contractor | medium | golden questions por regimen | eval failure |
 | Nexa da consejo legal/tributario como definitivo | payroll/compliance | medium | safety answer policy | QA sensitive failure |
 | Nexa recupera solo Finance para contractor HR | knowledge | medium | cross-domain expected sources | wrong-source |
+| Nexa mezcla Comercial con Finance/caja | commercial/finance | medium | golden questions quote vs cash | wrong-source |
+| Nexa responde Admin Center como bypass de DB | identity/security | medium | negative cases + safety policy | QA sensitive failure |
+| Nexa sugiere publicar o mutar WordPress | public-site/release | medium | read-only/draft-only expected answer | QA sensitive failure |
+| Nexa recomienda UI fuera del platform contract | ui-platform | medium | golden questions UI Platform | eval failure |
 | Documento sensible expone datos de pago | finance/security | low | revisar metadata y redactar contenido sensible | manual review |
 | Activacion prod accidental | release/knowledge | low | respetar flag prod OFF y rollout humano | env/config diff |
 | Prompt change degrada respuestas no Finance | nexa | medium | snapshot/eval antes y despues si se toca prompt | qa matrix |
@@ -327,10 +428,12 @@ Respuesta esperada:
 ## Acceptance Criteria
 
 - [ ] Los manuales/documentos Finance, People, Workforce, Payroll y Contractors normativos estan registrados en el corpus Knowledge.
+- [ ] Los manuales/documentos Comercial, Agency/Delivery, Identity/Admin Center, My Space, Public Site y UI Platform normativos estan registrados en el corpus Knowledge.
 - [ ] `search_knowledge` recupera fuentes Finance para preguntas Finance y fuentes HR/Payroll/Contractors para preguntas People.
-- [ ] Nexa responde preguntas de ingreso, egreso, cobro, pago directo, instrumento, Banco, transferencia interna, orden de pago, conciliacion, Workforce Activation, nomina, honorarios, Deel/internacional, contractors, employee-to-contractor, offboarding y finiquitos con citas correctas.
+- [ ] `search_knowledge` recupera fuentes Comercial/Agency/Identity/Personas/Public Site/UI Platform para preguntas de esos dominios.
+- [ ] Nexa responde preguntas de ingreso, egreso, cobro, pago directo, instrumento, Banco, transferencia interna, orden de pago, conciliacion, Workforce Activation, nomina, honorarios, Deel/internacional, contractors, employee-to-contractor, offboarding, finiquitos, quote-to-cash, Account 360, roles/vistas, My Space, Content Factory y UI Platform con citas correctas.
 - [ ] Los casos wrong-source quedan cubiertos por eval/QA.
-- [ ] Nexa no afirma que puede ejecutar acciones financieras, HR, Payroll o Contractors en esta task.
+- [ ] Nexa no afirma que puede ejecutar acciones financieras, HR, Payroll, Contractors, Comerciales, Admin, Public Site o UI Platform en esta task.
 - [ ] Production queda explicitamente sin cambios o validada con aprobacion humana.
 
 ## Verification

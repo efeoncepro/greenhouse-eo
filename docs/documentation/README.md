@@ -16,6 +16,7 @@ La documentacion funcional no reemplaza el manual ni la arquitectura. Explica qu
 
 ### Identidad y acceso
 
+- [Identity, Access y Admin Center end-to-end](identity/identity-access-admin-center-end-to-end.md) — como Greenhouse resuelve identidad, sesion, roles, vistas, entitlements, permission sets, SCIM y troubleshooting de acceso sin convertir Admin Center en un bypass manual.
 - [Sistema de Identidad, Roles y Acceso](identity/sistema-identidad-roles-acceso.md) — roles, permisos, supervisoria, responsabilidades operativas, candados de seguridad
 - [Sistema de Autenticación Resiliente](identity/sistema-auth-resiliente.md) — 7 capas defensivas que protegen el flujo de login (secret hygiene, readiness contract, observability, schema integrity, magic-link self-recovery, smoke lane sintética, rotation playbook). Postmortem de ISSUE-061 y guía de diagnóstico
 - [Provisioning SCIM con Microsoft Entra](identity/scim-entra-provisioning.md) — lifecycle automatico de usuarios y grupos desde Entra, tenant interno Efeonce con `client_id=NULL`, validacion `provisionOnDemand` y manejo seguro de escrows
@@ -35,6 +36,7 @@ La documentacion funcional no reemplaza el manual ni la arquitectura. Explica qu
 ### Plataforma interna y calidad
 
 - [Public Site WordPress — Layout Ohio + Elementor](public-site/wordpress-ohio-elementor-layout.md) — contrato funcional del sitio publico Efeonce en WordPress/Kinsta cuando Ohio + Elementor producen desfases de contenedor, con causa raiz del incidente `/blog` 2026-06-14 y guardrails para no romper el sidebar fijo ni el hero.
+- [Public Site y Content Factory end-to-end](public-site/public-site-content-factory-end-to-end.md) — como opera el sitio publico WordPress/Kinsta desde Greenhouse: bridge read-only, inspeccion Gutenberg/Elementor, mapas de inteligencia, drift/dry-run, control plane draft-only y limites de publicacion.
 - [Knowledge Platform (foundation)](plataforma/knowledge-platform.md) — qué es el corpus gobernado de conocimiento (manuales/SOP/runbooks/glosarios) para la capa humana + Nexa con citas, qué guarda el schema `greenhouse_knowledge`, y por qué el estado del documento y el permiso de Nexa son dos cosas separadas. Foundation TASK-1081 (sin UI/Notion/Nexa todavía).
 - [Experiencia Conversacional de Nexa](plataforma/nexa-conversational-experience.md) — cómo funciona la lente Nexa (preguntar y recibir respuesta-primero con grounding, evidencia bajo demanda y chrome de confianza): la coreografía paso a paso, las piezas que la componen, el modelo de confianza y por qué es una sola experiencia reutilizable en todo el portal (Knowledge primero, no único). Contrato técnico: `architecture/ui-platform/CONVERSATIONAL_EXPERIENCE.md`
 - [API Platform Ecosystem](plataforma/api-platform-ecosystem.md) — nueva lane ecosystem-facing de APIs machine-to-machine: cómo funciona hoy, qué expone, cómo convive con `/api/integrations/v1/*`, cómo sirve al MCP local/remoto y cuál es el camino correcto de hardening sin romper consumers actuales
@@ -46,6 +48,7 @@ La documentacion funcional no reemplaza el manual ni la arquitectura. Explica qu
 - [Deep Link Platform](plataforma/deep-link-platform.md) — capa compartida para resolver referencias semánticas a links canónicos, URLs absolutas por ambiente, fallback y metadata de acceso sin repartir strings de ruta por todo el portal
 - [Capa de Contexto Estructurado](plataforma/capa-contexto-estructurado.md) — memoria estructurada sidecar para payloads normalizados, auditoría, replay operativo y trabajo asistido por agentes sin reemplazar la verdad relacional
 - [Greenhouse Visual Capture](plataforma/captura-visual.md) — herramienta `pnpm fe:capture` para grabar `.webm` + frames PNG + GIF opcional de cualquier ruta del portal usando agent auth canónico. Cubre evidencia visual, pantallas largas con scroll, captura por sección, full-page, review dossier, diff, health, 5 capas de safety y reemplazo del patrón `_cap.mjs` ad-hoc
+- [UI Platform y Design System end-to-end](plataforma/ui-platform-design-system-end-to-end.md) — contrato funcional para tokens AXIS, primitives, Composition Shell, Adaptive Card Density, Floating Surface, Motion Primitive, catalogo `/admin/design-system`, GVC y gobernanza Figma->codigo.
 - [Mi Perfil](plataforma/mi-perfil.md) — vista personal del colaborador: datos de identidad, equipos, proyectos, colegas y actividad reciente
 - [Saludo de Nexa — Hero del Home](plataforma/saludo-nexa-home.md) — la tarjeta de bienvenida de Nexa en el home: saludo dinámico (~100 variantes por hora/día/mes/estación/feriados Chile), campo de pregunta con placeholder rotativo, botón enviar con estado, accesos rápidos por rol, microinteracciones reduced-motion safe. Componente reutilizable `NexaGreetingsCard`
 - [Sister Platform Bindings](plataforma/sister-platform-bindings.md) — enlace formal entre scopes externos de apps hermanas y scopes internos de Greenhouse
@@ -82,6 +85,7 @@ La documentacion funcional no reemplaza el manual ni la arquitectura. Explica qu
 
 ### Comercial
 
+- [Quote-to-Cash Comercial end-to-end](comercial/quote-to-cash-comercial-end-to-end.md) — mapa funcional completo del dominio Comercial: organizations/parties, deals, catalogo, pricing engine, cotizaciones, aprobaciones, contratos, HubSpot sync y frontera con Finance.
 - [Pipeline comercial](finance/pipeline-comercial.md) — forecast comercial de deals, contratos standalone y pre-sales; lane dedicada en `/finance/intelligence/pipeline` con compat temporal desde Finanzas > Economía.
 - [Sample Sprints comerciales](comercial/sample-sprints.md) — pilotos, trials, POCs y discovery sobre `services.engagement_kind`, con approval, progreso, outcome, reportes y audit/outbox.
 - [Servicios engagement](comercial/servicios-engagement.md) — sincronizacion HubSpot p_services, materializacion de servicios y degradacion honesta
@@ -108,10 +112,12 @@ La documentacion funcional no reemplaza el manual ni la arquitectura. Explica qu
 
 ### Personas
 
+- [My Space y Self-Service end-to-end](personas/my-space-self-service-end-to-end.md) — como funciona el espacio personal: perfil, performance, recibos, payment profile, licencias, onboarding, legal docs y contractor self-service con identidad derivada de la sesion.
 - [Person Complete 360](personas/person-complete-360.md) — datos completos de una persona: facetas, autorizacion, cache, endpoint unificado
 
 ### Agencia y Operaciones
 
+- [Agency, Delivery y Account 360 end-to-end](agency/agency-delivery-account-360-end-to-end.md) — mapa funcional de Account 360, Delivery, ICO, service attribution, economics y operaciones de agencia, con degradacion honesta por faceta y limites actuales de Service P&L.
 - [Account Complete 360](agency/cuenta-completa-360.md) — datos completos de una cuenta u organizacion: facetas, autorizacion, endpoint unificado
 - [Ops Worker — Crons Reactivos en Cloud Run](operations/ops-worker-reactive-crons.md) — servicio Cloud Run que procesa eventos reactivos del outbox, corridas scheduladas, ESM/CJS shim pattern, monitoreo en Ops Health
 - [Commercial Cost Worker](operations/commercial-cost-worker.md) — worker Cloud Run dedicado para la base de costos comercial, su ledger de corridas por periodo/scope y la separacion respecto de `ops-worker`

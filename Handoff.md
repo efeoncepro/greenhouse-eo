@@ -1,5 +1,16 @@
 # Release 2026-06-10 #2 — develop→main `6c649b2a6` RELEASED
 
+## Sesion 2026-06-15 — Comercial/Agency/Identity/My Space/Public Site/UI Platform docs end-to-end para Nexa Knowledge — Codex
+
+> **Estado:** documentacion creada, ingestion NO ejecutada por instruccion del operador. `TASK-1140` queda como vehiculo formal unico para ingestar manuales operativos multi-dominio a Knowledge/Nexa.
+
+- **Auditoria runtime:** se revisaron codigo y DB read-only donde aplica para Comercial/Quote-to-Cash, Agency/Delivery/Account 360, Identity/Access/Admin Center, My Space/Self-Service, Public Site/Content Factory y UI Platform/Design System. Evidencia agregada en los documentos: tablas `greenhouse_commercial`, `greenhouse_core`, `greenhouse_serving`, `greenhouse_knowledge`; conteos agregados de quotes, contracts, deals, catalog, roles/views/assignments, knowledge docs y design-system nodes; Public Site no tiene schema relacional propio y opera por bridge/scripts/reports.
+- **Hallazgos clave:** Comercial conserva frontera Quote-to-Cash vs Finance/caja; Agency/Delivery tiene facetas y degradacion honesta, con service attribution parcial y no Service P&L completo; Identity separa rol/vista/entitlement/permission set y SCIM sin bypass; My Space deriva identidad desde sesion y no acepta IDs arbitrarios; Public Site sigue read-only/draft-only para control plane; UI Platform exige tokens/primitives/Composition Shell/GVC antes de crear UI.
+- **Documentos nuevos:** `docs/documentation/comercial/quote-to-cash-comercial-end-to-end.md`, `docs/manual-de-uso/comercial/operar-quote-to-cash-comercial.md`, `docs/documentation/agency/agency-delivery-account-360-end-to-end.md`, `docs/manual-de-uso/agency/operar-agency-delivery-account-360.md`, `docs/documentation/identity/identity-access-admin-center-end-to-end.md`, `docs/manual-de-uso/identity/operar-identity-access-admin-center.md`, `docs/documentation/personas/my-space-self-service-end-to-end.md`, `docs/manual-de-uso/personas/operar-mi-espacio-self-service.md`, `docs/documentation/public-site/public-site-content-factory-end-to-end.md`, `docs/manual-de-uso/public-site/operar-public-site-content-factory.md`, `docs/documentation/plataforma/ui-platform-design-system-end-to-end.md`, `docs/manual-de-uso/plataforma/operar-ui-platform-design-system.md`.
+- **Indices sincronizados:** `docs/documentation/README.md` y `docs/manual-de-uso/README.md`.
+- **Task ajustada:** `docs/tasks/to-do/TASK-1140-finance-manuals-nexa-knowledge-ingestion.md` — ahora es umbrella de ingesta para Finance, People/Workforce/Payroll/Contractors y estos seis dominios adicionales, con golden questions por wrong-source y restricciones de no-accion para Nexa.
+- **Nota multi-agente:** no tocar WIP ajeno actual de `TASK-1141`/Nexa suggested prompts (`docs/tasks/in-progress/TASK-1141-*`, `src/lib/nexa/**`, rutas `/my` y docs Nexa modificados por otro agente) al preparar commit de estos manuales.
+
 ## Sesion 2026-06-15 — People/Workforce/Payroll/Contractors docs end-to-end para Nexa Knowledge — Codex
 
 > **Estado:** documentacion creada, ingestion NO ejecutada por instruccion del operador. `TASK-1140` queda como vehiculo formal unico para ingestar Finance + People/Workforce/Payroll/Contractors a Knowledge/Nexa.
