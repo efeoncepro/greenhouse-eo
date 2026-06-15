@@ -1,5 +1,16 @@
 # Release 2026-06-10 #2 — develop→main `6c649b2a6` RELEASED
 
+## Sesión 2026-06-15 — TASK-1106 Account 360 delivery serving contract hardening — Claude
+
+> **Estado:** CODE-COMPLETE en `develop` (3 commits local, SIN push). Cierra la causa raíz de `ISSUE-087` / Sentry `JAVASCRIPT-NEXTJS-7H`. **ISSUE-087 sigue abierto** (gated por quiet period de Sentry per Acceptance Criteria) → la task se mantiene `in-progress`.
+
+- **Causa raíz (PG real):** `organization_operational_metrics` (cache compacto, SIN `rpa_median`/`pipeline_velocity`/`stuck_asset_pct`) vs el reader `facets/delivery.ts` que une con `ico_organization_metrics` (rica) y SELECTea las 3 ricas en AMBAS ramas del UNION → 42703, enmascarado como degradación a BigQuery (`observeAndDegrade`).
+- **Fix robusto (PARITY):** (1) migración additive `20260615064729116` + backfill 8/8 (aplicada al instance compartido `greenhouse-pg-dev` → root cause ya resuelto en runtime para staging/preview). (2) reader canónico único `organization-operational-metrics-reader.ts` consumido por `facets/delivery.ts` Y `getOrganizationOperationalServing` (mata la duplicación). (3) schema-drift se re-lanza (loud → `_meta.errors`), disponibilidad degrada a BQ, ausencia = `null` nunca `0`. Projection puebla las columnas ricas.
+- **Verificación:** tsc 0 · lint 0 · build · suite **6992 passed** · live drift guard (DB real) `_meta.errors=[]` · staging `org-f6aa4e20…` (ANAM): 360 delivery `cache=bypass` HTTP 200 `errors:[]` + compact-signals HTTP 200 `degradedSources:[]`.
+- **Nota gates:** un `pnpm test` con `source .env.local` da 19 falsos fallos (env-sensitive: resend/secret-manager/nexa-vertex/postgres-posture/email-baseline + live PG parity). El gate canónico es SIN sourcear `.env.local` → verde.
+- **Pendiente (rollout):** push develop + deploy del refactor; quiet period Sentry; marcar `JAVASCRIPT-NEXTJS-7H` resolved; mover `ISSUE-087` a `resolved/`; recién entonces `Lifecycle: complete`.
+- **Retomar:** `/implement-task TASK-1106`. Local-first.
+
 ## Sesión 2026-06-14 — TASK-1124 Nexa Knowledge answer quality + system prompt V2 — Claude
 
 > **Estado:** code-complete en `develop`, 8 slices. Gates: tsc 0 · lint 0 · suite completa **6980 passed** · build. Flags ON en local + Vercel **staging**; **prod gated por sign-off del operador**. **Rollout pendiente de verificación viva en staging** (el dev server local servía V1 hasta el reinicio; la QA matrix viva confirma routing/no-answer pero el citado inline `[n]`/síntesis se valida con V2 activo en staging tras deploy).

@@ -1,5 +1,9 @@
 # TASK-1107 — Current Sentry active errors closure
 
+## Delta 2026-06-15
+
+- `rpa_median` / `JAVASCRIPT-NEXTJS-7H` (Slice 5) — la causa raíz quedó **code-complete** en `TASK-1106` (ahora `in-progress`, spec en `docs/tasks/in-progress/TASK-1106-…`). Migración de parity + reader canónico aplicados; runtime staging verificado sin `facetErrors` ni captura `account360.delivery.ico_serving`. Sigue asignado a `TASK-1106` / `ISSUE-087`; el quiet period de Sentry para esa familia se cierra junto con `TASK-1106`. No duplicar.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"

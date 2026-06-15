@@ -119,9 +119,20 @@ Verificación requerida para cerrar:
 - smoke live PostgreSQL del facet `delivery` falla loud si falta una columna esperada;
 - Sentry queda sin nuevos eventos de `JAVASCRIPT-NEXTJS-7H` para esta causa en el ambiente afectado.
 
+## Fix landed (2026-06-15, TASK-1106 code-complete)
+
+Causa raíz resuelta en runtime. Migración additive `20260615064729116` agregó `rpa_median`/`pipeline_velocity`/`stuck_asset_pct` (nullable) a `greenhouse_serving.organization_operational_metrics` + backfill desde `ico_organization_metrics`, aplicada al instance compartido `greenhouse-pg-dev` que staging/preview leen → la query ofensiva ya NO produce 42703. Reader canónico único (`organization-operational-metrics-reader.ts`) elimina la UNION duplicada; schema-drift ahora se re-lanza (loud) en vez de degradar silencioso; live drift guard + unit test previenen regresión.
+
+Evidencia runtime (staging, 2026-06-15, `org-f6aa4e20-9dbb-467a-950d-61e5f085e9b0` = ANAM):
+
+- `GET /api/organization/[id]/360?facets=delivery&cache=bypass` → HTTP 200, `_meta.errors: []`.
+- `GET /api/organizations/[id]/workspace/compact-signals` → HTTP 200, `status: ready`, `degradedSources: []` (sin captura `account360.delivery.ico_serving`).
+
+**Pendiente para cerrar este issue:** quiet period de Sentry + marcar `JAVASCRIPT-NEXTJS-7H` resolved + deploy del refactor de código (develop). Recién entonces mover a `docs/issues/resolved/`.
+
 ## Estado
 
-open
+open (fix landed, pendiente quiet period de Sentry)
 
 ## Relacionado
 

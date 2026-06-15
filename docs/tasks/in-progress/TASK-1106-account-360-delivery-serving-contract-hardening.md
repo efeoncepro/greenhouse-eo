@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -25,6 +25,16 @@
 ## Summary
 
 Resolver el Sentry `JAVASCRIPT-NEXTJS-7H` (`column "rpa_median" does not exist`) en `GET /api/organization/[id]/360` y `GET /api/organizations/[id]/workspace/compact-signals` corrigiendo el contrato completo del facet `delivery`: schema, proyección, reader canónico y guardrails de drift. El cierre debe ser robusto, no un parche local sobre una query.
+
+## Delta 2026-06-15 — code-complete (Claude)
+
+Slices 1-3 implementados, verificados local (DB real) y en staging. **Estado: code-complete; ISSUE-087 sigue abierto** (gated por quiet period de Sentry per Acceptance Criteria) → la task se mantiene `in-progress`.
+
+- **Slice 1 (contrato + migración):** `migrations/20260615064729116` agrega `rpa_median NUMERIC(6,2)` / `pipeline_velocity NUMERIC(8,2)` / `stuck_asset_pct NUMERIC(5,2)` (additive nullable) a `greenhouse_serving.organization_operational_metrics` + backfill desde `ico_organization_metrics` (8/8 filas casadas). Setup SQL + `db.d.ts` alineados. Aplicada al instance compartido `greenhouse-pg-dev` vía `pnpm pg:connect:migrate` (registrada en `pgmigrations` → idempotente en deploy).
+- **Slice 2 (reader canónico + proyección):** nuevo `src/lib/account-360/organization-operational-metrics-reader.ts` (`readOrganizationOperationalMetricsRow`) resuelve operational ⊕ ico ⊕ BigQuery una sola vez; `facets/delivery.ts` y `getOrganizationOperationalServing` lo consumen (elimina la UNION duplicada divergente). `organization-operational.ts` puebla las columnas ricas. Schema-drift (42703/42P01) se captura **y re-lanza** (loud → `_meta.errors`); disponibilidad degrada a BigQuery; ausencia = `null`, nunca `0` silencioso.
+- **Slice 3 (guards):** unit test del reader (null preservado / BQ fallback / rethrow schema-drift / degrade disponibilidad) + live drift guard reforzada (`account-complete-360.live.test.ts`: `_meta.errors=[]` + shape rico, cubre ambas rutas vía `getAccountComplete360`).
+- **Verificación:** tsc 0 · lint 0 · build (Turbopack) exit 0 · suite completa **6992 passed / 0 failed** (canónica, sin `source .env.local`) · live drift guard contra PG real ✓ · staging `org-f6aa4e20…` (ANAM): `360?facets=delivery&cache=bypass` HTTP 200 `errors:[]`, `compact-signals` HTTP 200 `degradedSources:[]`.
+- **Pendiente (Slice 4 / rollout):** push develop + deploy del refactor de código; quiet period de Sentry; marcar `JAVASCRIPT-NEXTJS-7H` resolved; mover `ISSUE-087` a `resolved/`; recién entonces `Lifecycle: complete`. La causa raíz (42703) ya está resuelta en runtime porque la migración vive en el instance compartido que staging lee.
 
 ## Why This Task Exists
 
@@ -260,12 +270,12 @@ Sin flag. La migración es additive y nullable. El cutover debe ser compatible c
 
 ## Acceptance Criteria
 
-- [ ] `GET /api/organization/[id]/360?facets=delivery` responde sin error SQL ni `facetErrors` por columnas inexistentes.
-- [ ] `GET /api/organizations/[id]/workspace/compact-signals` responde sin capturar `account360.delivery.ico_serving` por `rpa_median`.
-- [ ] El contrato de `greenhouse_serving.organization_operational_metrics` queda alineado entre migración, setup SQL, proyección, tipos y reader canónico.
-- [ ] Existe guard/smoke contra PostgreSQL real que falla loud si el facet `delivery` vuelve a referenciar columnas inexistentes.
-- [ ] Sentry `JAVASCRIPT-NEXTJS-7H` / group `7545900569` queda sin recurrencia tras el quiet period definido y se marca como resolved en Sentry.
-- [ ] `ISSUE-087` se cierra/mueve a `docs/issues/resolved/` solo después de evidencia runtime + Sentry resolved; la task no puede pasar a `complete` si el issue sigue abierto.
+- [x] `GET /api/organization/[id]/360?facets=delivery` responde sin error SQL ni `facetErrors` por columnas inexistentes. — verificado en staging 2026-06-15 (`org-f6aa4e20…` ANAM, `cache=bypass` fresh): HTTP 200, `_meta.errors: []`.
+- [x] `GET /api/organizations/[id]/workspace/compact-signals` responde sin capturar `account360.delivery.ico_serving` por `rpa_median`. — verificado en staging 2026-06-15: HTTP 200, `status: ready`, `degradedSources: []`.
+- [x] El contrato de `greenhouse_serving.organization_operational_metrics` queda alineado entre migración, setup SQL, proyección, tipos y reader canónico. — migración `20260615064729116` + setup SQL + `organization-operational.ts` + `db.d.ts` + `organization-operational-metrics-reader.ts`.
+- [x] Existe guard/smoke contra PostgreSQL real que falla loud si el facet `delivery` vuelve a referenciar columnas inexistentes. — `account-complete-360.live.test.ts` (asserta `_meta.errors=[]` + shape rico) + el reader re-lanza schema-drift (42703/42P01); unit test `organization-operational-metrics-reader.test.ts` pinea el contrato.
+- [ ] Sentry `JAVASCRIPT-NEXTJS-7H` / group `7545900569` queda sin recurrencia tras el quiet period definido y se marca como resolved en Sentry. — **pendiente quiet period** (la causa raíz ya está resuelta en runtime; el last-seen previo al fix fue 2026-06-12).
+- [ ] `ISSUE-087` se cierra/mueve a `docs/issues/resolved/` solo después de evidencia runtime + Sentry resolved; la task no puede pasar a `complete` si el issue sigue abierto. — **pendiente** (gated por el quiet period de Sentry; ver Delta 2026-06-15).
 
 ## Verification
 
