@@ -1,5 +1,16 @@
 # Release 2026-06-10 #2 — develop→main `6c649b2a6` RELEASED
 
+## Sesión 2026-06-15 — TASK-1129 Telemetría de turno de Nexa (promptVersion + provider/runtime) — Claude
+
+> **Estado:** **complete** en `develop` (local-first, sin push aún). Backend/observabilidad, con migración. Follow-up de TASK-1124. **Desbloquea TASK-1134**.
+
+- **Qué:** cada respuesta del chat deja un rastro estructurado auditable: version/familia del prompt + provider plan/resuelto + failover + latencias + tools + outcome + sugerencias. Contrato `nexa-turn-telemetry.v1` + `NexaResponse.turnTelemetry?` (additive).
+- **Persistencia:** ledger aditivo `greenhouse_ai.nexa_turn_telemetry` (migración `20260615144556723`). **best-effort post-commit** en `store.ts` → la observabilidad NUNCA rompe la conversación (captura `home` + sobrevive a tabla ausente). El endpoint **stripea** `turnTelemetry` (no se devuelve al cliente).
+- **Gate TASK-893 atrapó un bug real:** `nexa_messages.message_id` es **text**, no uuid (el route inserta `crypto.randomUUID()` como string) — la FK falló al primer `migrate:up`, la corregí a `text`. La validación contra PG real fue clave.
+- **Signal** `nexa.turn.degraded_outcomes` (módulo Home, steady≈0): `graceful_fallback` + `did_failover` en 24h. Hard-fail cubiertos por TASK-1131.
+- **Scope diferido:** latencia por-tool (el provider no la expone → TASK-1135) + tokens/costo (SDK sin usage estable) = placeholders versionados.
+- **Gates:** lint 0 · tsc 0 · build ✓ · 8 focales nuevos + 429 reliability · doc-gate verde. Docs de capa: `behavior/behavior-and-routing.md` + `technical/data-contracts.md`. Skill `greenhouse-nexa-conversational` actualizada.
+
 ## Sesión 2026-06-15 — TASK-1131 Nexa chat endpoint: contrato de error canónico + captureWithDomain — Claude
 
 > **Estado:** **complete** en `develop` (local-first). Backend/reliability, sin migración/capability/UI. Follow-up de TASK-1124.

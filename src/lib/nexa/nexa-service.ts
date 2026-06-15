@@ -14,8 +14,14 @@ import type { NexaMessage, HomeSnapshot } from '@/types/home'
 import { getNexaProviderOverride, isNexaAutoRouterEnabled, isNexaKnowledgeRetrievalEnabled } from './flags'
 import { buildNexaSystemPrompt, type NexaSystemPromptResult } from './nexa-system-prompt'
 import { classifyNexaIntent, nexaProviderFailoverChain, routeNexaProviderKey } from './nexa-model-router'
-import type { NexaResponse, NexaRuntimeContext } from './nexa-contract'
+import type { NexaResponse, NexaRuntimeContext, NexaToolInvocation } from './nexa-contract'
 import type { NexaChatProvider } from './nexa-provider'
+import {
+  NEXA_TURN_TELEMETRY_CONTRACT_VERSION,
+  type NexaTurnOutcome,
+  type NexaTurnProviderStepTelemetry,
+  type NexaTurnTelemetry
+} from './nexa-turn-telemetry'
 import { AnthropicNexaProvider } from './providers/anthropic'
 import { GeminiNexaProvider } from './providers/gemini'
 
@@ -143,9 +149,61 @@ export class NexaService {
     return [{ providerKey: 'google', model: this.defaultModelForProvider('google', input) }]
   }
 
+  /**
+   * TASK-1129 — arma la telemetría de turno (observabilidad). Sin contenido sensible: versión/familia
+   * del prompt, provider plan + resuelto + failover, latencias, tools (nombre + availability), outcome
+   * y resultado de sugerencias. Tokens/costo = null hasta que el SDK exponga usage estable.
+   */
+  private static buildTurnTelemetry(args: {
+    systemPromptResult: NexaSystemPromptResult
+    plan: NexaProviderStep[]
+    primaryProvider: NexaProviderKey
+    providerSteps: NexaTurnProviderStepTelemetry[]
+    resolvedStepIndex: number
+    toolInvocations: NexaToolInvocation[]
+    suggestions: string[]
+    startTotal: number
+    gracefulFallback: boolean
+  }): NexaTurnTelemetry {
+    const { systemPromptResult, plan, primaryProvider, providerSteps, resolvedStepIndex, toolInvocations, suggestions, startTotal, gracefulFallback } = args
+
+    const resolvedStep = plan[resolvedStepIndex]
+    const didFailover = resolvedStepIndex > 0
+    const tools = toolInvocations.map(invocation => ({ toolName: invocation.toolName, available: invocation.result.available }))
+    const anyToolUnavailable = tools.some(tool => !tool.available)
+    const outcome: NexaTurnOutcome = gracefulFallback ? 'graceful_fallback' : anyToolUnavailable ? 'tool_degraded' : 'success'
+
+    return {
+      contractVersion: NEXA_TURN_TELEMETRY_CONTRACT_VERSION,
+      promptVersion: systemPromptResult.version,
+      promptFamily: systemPromptResult.family,
+      primaryProvider,
+      // En graceful fallback NINGÚN provider produjo la respuesta (texto canned) → resolved = null.
+      resolvedProvider: gracefulFallback ? null : resolvedStep.providerKey,
+      resolvedModel: gracefulFallback ? null : resolvedStep.model,
+      providerStepCount: plan.length,
+      didFailover,
+      failoverFrom: didFailover ? plan[resolvedStepIndex - 1].providerKey : null,
+      outcome,
+      totalLatencyMs: Date.now() - startTotal,
+      toolsUsed: tools.map(tool => tool.toolName),
+      toolCount: tools.length,
+      suggestionCount: suggestions.length,
+      suggestionOutcome: gracefulFallback ? null : suggestions.length > 0 ? 'generated' : 'empty',
+      detail: {
+        providerSteps,
+        tools,
+        usage: { tokens: null, costUsd: null }
+      }
+    }
+  }
+
   static async generateResponse(input: NexaServiceInput): Promise<NexaResponse> {
     const plan = this.buildProviderPlan(input)
     const systemPromptResult = this.buildSystemPrompt(input.context)
+    const startTotal = Date.now()
+    const primaryProvider = plan[0].providerKey
+    const providerSteps: NexaTurnProviderStepTelemetry[] = []
 
     let lastError: unknown
 
@@ -153,6 +211,7 @@ export class NexaService {
       const step = plan[index]
       const isLastStep = index === plan.length - 1
       const provider = createNexaProvider(step.providerKey)
+      const stepStart = Date.now()
 
       try {
         const turn = await provider.resolveTurn({
@@ -163,6 +222,8 @@ export class NexaService {
           context: input.context,
           model: step.model
         })
+
+        providerSteps.push({ providerKey: step.providerKey, model: step.model, latencyMs: Date.now() - stepStart, ok: true })
 
         const content = turn.text
 
@@ -179,9 +240,21 @@ export class NexaService {
           timestamp: this.getTimestamp(),
           suggestions,
           toolInvocations: turn.toolInvocations,
-          modelId: step.model
+          modelId: step.model,
+          turnTelemetry: this.buildTurnTelemetry({
+            systemPromptResult,
+            plan,
+            primaryProvider,
+            providerSteps,
+            resolvedStepIndex: index,
+            toolInvocations: turn.toolInvocations,
+            suggestions,
+            startTotal,
+            gracefulFallback: false
+          })
         }
       } catch (error) {
+        providerSteps.push({ providerKey: step.providerKey, model: step.model, latencyMs: Date.now() - stepStart, ok: false })
         lastError = error
 
         const errorMessage = this.extractErrorMessage(error)
@@ -197,7 +270,20 @@ export class NexaService {
         if (this.isVertexPermissionDenied(errorMessage)) {
           console.warn('Nexa AI permission denied on Vertex AI, serving graceful fallback response.')
 
-          return this.buildPermissionDeniedFallback(input.context, step.model)
+          return {
+            ...this.buildPermissionDeniedFallback(input.context, step.model),
+            turnTelemetry: this.buildTurnTelemetry({
+              systemPromptResult,
+              plan,
+              primaryProvider,
+              providerSteps,
+              resolvedStepIndex: index,
+              toolInvocations: [],
+              suggestions: [],
+              startTotal,
+              gracefulFallback: true
+            })
+          }
         }
 
         throw new Error(errorMessage)

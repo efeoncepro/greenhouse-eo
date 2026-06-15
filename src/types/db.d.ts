@@ -152,6 +152,31 @@ export interface GreenhouseAiNexaThreads {
   user_id: string;
 }
 
+export interface GreenhouseAiNexaTurnTelemetry {
+  client_id: string | null;
+  contract_version: string;
+  created_at: Generated<Timestamp>;
+  detail: Json | null;
+  did_failover: Generated<boolean>;
+  failover_from: string | null;
+  message_id: string;
+  outcome: string;
+  primary_provider: string;
+  prompt_family: string;
+  prompt_version: string;
+  provider_step_count: Generated<number>;
+  resolved_model: string | null;
+  resolved_provider: string | null;
+  suggestion_count: Generated<number>;
+  suggestion_outcome: string | null;
+  telemetry_id: Generated<string>;
+  thread_id: string;
+  tool_count: Generated<number>;
+  tools_used: Generated<string[]>;
+  total_latency_ms: Generated<number>;
+  user_id: string;
+}
+
 export interface GreenhouseAiReliabilityAiObservations {
   created_at: Generated<Timestamp>;
   fingerprint: string;
@@ -9981,6 +10006,7 @@ export interface DB {
   "greenhouse_ai.nexa_feedback": GreenhouseAiNexaFeedback;
   "greenhouse_ai.nexa_messages": GreenhouseAiNexaMessages;
   "greenhouse_ai.nexa_threads": GreenhouseAiNexaThreads;
+  "greenhouse_ai.nexa_turn_telemetry": GreenhouseAiNexaTurnTelemetry;
   "greenhouse_ai.reliability_ai_observations": GreenhouseAiReliabilityAiObservations;
   "greenhouse_ai.tool_catalog": GreenhouseAiToolCatalog;
   "greenhouse_client_portal.module_assignment_events": GreenhouseClientPortalModuleAssignmentEvents;

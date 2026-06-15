@@ -2,7 +2,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -52,3 +52,15 @@ esta respuesta y bajo que condiciones?".
   `src/lib/nexa/store.ts`, persistencia `nexa_messages`.
 - Relacionada: `TASK-1134` (routing truth), `TASK-1135` (runtime resilience).
 - Procedencia: TASK-1124.
+
+## Resultado (2026-06-15, completo en `develop`)
+
+1. **Contrato `nexa-turn-telemetry.v1`** (`src/lib/nexa/nexa-turn-telemetry.ts`, client-safe) + `NexaResponse.turnTelemetry?` (additive).
+2. **`NexaService.generateResponse` instrumentado**: promptVersion/family, provider plan + resolved + failover (didFailover/failoverFrom), latencia total + por step, tools (nombre + availability), outcome (`success`/`graceful_fallback`/`tool_degraded`), suggestionOutcome. Tokens/costo = `null` (placeholder versionado).
+3. **Ledger aditivo** `greenhouse_ai.nexa_turn_telemetry` (migración `20260615144556723`, FK→`nexa_messages.message_id` **text** — gate TASK-893: el PK es text, no uuid). `store.ts` inserta **best-effort post-commit** (observabilidad NUNCA rompe la conversación; captura `home` si falla). El endpoint **stripea** `turnTelemetry` del response al cliente.
+4. **Reliability signal** `nexa.turn.degraded_outcomes` (módulo Home, steady≈0): cuenta `graceful_fallback` + `did_failover` en 24h; el ledger habilita filtrado ad-hoc por prompt_version/provider/outcome. Hard-fail cubiertos por TASK-1131 (`captureWithDomain('home')`).
+5. **Sin contenido sensible** (criterio de aceptación): nunca prompt/respuesta/tool-results-crudos/secretos — test lo asserta.
+6. Tests: 3 en `nexa-service.test.ts` (success/graceful_fallback/tool_degraded + no-leak) + 5 en el signal reader. Docs de capa `behavior/behavior-and-routing.md` + `technical/data-contracts.md`.
+
+**Desbloquea TASK-1134** (routing truth): "TASK-1129 debe persistir provider plan/outcome" → satisfecho (`primaryProvider`/`resolvedProvider`/`didFailover`/`providerSteps` en el ledger).
+**Scope diferido:** latencia **por tool** (el provider no la expone — cambiar el interface = TASK-1135) y tokens/costo (SDK sin usage estable) → placeholders versionados.

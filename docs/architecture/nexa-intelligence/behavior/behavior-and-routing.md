@@ -57,6 +57,25 @@ router-internal. Observabilidad: `NexaResponse.modelId` (persistido; provider de
 - Si piden el estado real y no se consultó un tool en vivo → lo dice.
 - Si un tool falla por permisos/datos → lo nombra + ofrece el camino real.
 
+## Telemetría de turno (TASK-1129)
+
+Cada respuesta de Nexa adjunta una `turnTelemetry` (contrato `nexa-turn-telemetry.v1`, en
+[`nexa-turn-telemetry.ts`](../../../../src/lib/nexa/nexa-turn-telemetry.ts)) que el orquestador arma
+y el endpoint **persiste** en el ledger aditivo `greenhouse_ai.nexa_turn_telemetry` — NO se devuelve
+al cliente. Registra **observabilidad, no conversación**: versión/familia del prompt (TASK-1124),
+provider plan + provider/modelo resuelto + failover, latencias (total + por step), tools (nombre +
+availability), `outcome` (`success`/`graceful_fallback`/`tool_degraded`/`provider_failed`/`aborted`)
+y resultado de sugerencias. Tokens/costo = `null` hasta que el SDK exponga usage estable.
+
+- **Persistencia best-effort post-commit** (`store.ts`): un fallo del ledger (p.ej. tabla ausente en
+  un entorno) NUNCA tumba la persistencia de la conversación — se captura con `captureWithDomain('home')`.
+- **Sin contenido sensible:** nunca el prompt completo, el texto de respuesta, los tool results crudos
+  ni secretos.
+- **Hard-fail** (`provider_failed`/`aborted`) NO llegan al ledger (lanzan antes de persistir) → cubiertos
+  por el incident del endpoint (`captureWithDomain('home')`, TASK-1131).
+- **Reliability signal** `nexa.turn.degraded_outcomes` (módulo Home): cuenta `graceful_fallback` +
+  `did_failover` en 24h (steady≈0). El ledger habilita filtrado ad-hoc por `prompt_version`/`resolved_provider`/`outcome`.
+
 ## Contrato de error del endpoint (TASK-1131)
 
 `/api/home/nexa` (+ sus handlers hermanos `feedback/`, `threads/`, `threads/[threadId]`) es el backend

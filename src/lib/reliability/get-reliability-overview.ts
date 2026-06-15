@@ -78,6 +78,7 @@ import { getIdentityLegalProfileRevealAnomalySignal } from './queries/identity-l
 import { getIcoMaterializerSkippedSafetySignal } from './queries/ico-materializer-skipped-safety'
 import { getNexaInsightsFreshnessSignal } from './queries/nexa-insights-freshness'
 import { getNexaInsightsNoNewSignalsSignal } from './queries/nexa-insights-no-new-signals'
+import { getNexaTurnDegradedOutcomesSignal } from './queries/nexa-turn-degraded-outcomes'
 import { getNotionCorrectionTransitionsSourceAvailabilitySignal } from './queries/notion-correction-transitions-source-availability'
 import { getNotionMetricsOtdClassifierParitySignal } from './queries/notion-metrics-otd-classifier-parity'
 import {
@@ -509,6 +510,7 @@ interface ReliabilityOverviewSources {
    * error >48h, unknown si sin signals. Subsystem rollup 'delivery'.
    */
   nexaInsightsNoNewSignals?: ReliabilitySignal | null
+  nexaTurnDegradedOutcomes?: ReliabilitySignal | null
 
   /**
    * TASK-908 Slice 3.5 — Notion correction transitions source availability.
@@ -945,6 +947,7 @@ export const buildReliabilityOverview = (
     // generation. Complementario a nexaInsightsFreshness (que cruza BQ vs PG
     // serving) + icoMaterializerSkippedSafety (que detecta gate active).
     ...(sources.nexaInsightsNoNewSignals ? [sources.nexaInsightsNoNewSignals] : []),
+    ...(sources.nexaTurnDegradedOutcomes ? [sources.nexaTurnDegradedOutcomes] : []),
     // TASK-908 Slice 3.5 — Notion correction transitions source availability.
     // Pre-TASK-908b deployment: 100% unavailable esperado (tabla vacía).
     // Post-deployment + backfill: < 10% steady state. Visibiliza coverage del
@@ -1833,6 +1836,11 @@ export const getReliabilityOverview = async (
       ? preloadedSources.nexaInsightsNoNewSignals
       : await getNexaInsightsNoNewSignalsSignal().catch(() => null)
 
+  const nexaTurnDegradedOutcomes =
+    preloadedSources.nexaTurnDegradedOutcomes !== undefined
+      ? preloadedSources.nexaTurnDegradedOutcomes
+      : await getNexaTurnDegradedOutcomesSignal().catch(() => null)
+
   // TASK-908 Slice 3.5 — Notion correction transitions source availability.
   // Single reader; LEFT JOIN tasks completadas vs task_status_transitions.
   // Degrada honestamente a `unknown` si la query falla.
@@ -2082,6 +2090,7 @@ export const getReliabilityOverview = async (
     icoMaterializerSkippedSafety,
     nexaInsightsFreshness,
     nexaInsightsNoNewSignals,
+    nexaTurnDegradedOutcomes,
     notionCorrectionTransitionsSourceAvailability,
     notionMetricsOtdClassifierParity,
     notionMetricsDemo,

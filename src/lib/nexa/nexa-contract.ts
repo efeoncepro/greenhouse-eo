@@ -1,3 +1,5 @@
+import type { NexaTurnTelemetry } from './nexa-turn-telemetry'
+
 export type NexaToolName =
   | 'check_payroll'
   | 'get_otd'
@@ -89,4 +91,10 @@ export interface NexaResponse {
   toolInvocations?: NexaToolInvocation[]
   modelId?: string
   threadId?: string
+  /**
+   * TASK-1129 — telemetría de turno (observabilidad). El orquestador la adjunta; el endpoint la
+   * STRIPEA antes de responder al cliente y la persiste en el ledger `nexa_turn_telemetry`.
+   * NO es contenido de conversación y NO se rehidrata al leer un thread.
+   */
+  turnTelemetry?: NexaTurnTelemetry
 }

@@ -1,5 +1,9 @@
 # TASK-1134 — Nexa Chat auto-router + model selection truth
 
+## Delta 2026-06-15
+
+- **Prerequisito satisfecho:** TASK-1129 (telemetría de turno) está **complete**. El ledger `greenhouse_ai.nexa_turn_telemetry` ya persiste por turno el `primaryProvider`/`resolvedProvider`/`resolvedModel`/`didFailover`/`failoverFrom`/`providerStepCount` + `detail.providerSteps[]` (latencia + ok por step) + `outcome`. El gate de esta task ("TASK-1129 debe persistir provider plan/outcome" / "no activar producción sin telemetry mínima de TASK-1129") queda cubierto. La signal `nexa.turn.degraded_outcomes` (módulo Home) ya mide `did_failover` en 24h → al activar el auto-router, el provider mix / failover rate es auditable desde el ledger. — cerrado por trabajo en TASK-1129.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->

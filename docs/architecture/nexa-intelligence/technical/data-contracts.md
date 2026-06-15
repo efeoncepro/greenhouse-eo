@@ -28,6 +28,14 @@
 - Metadata machine-readable: `{ family, activeVersion, rollbackVersion, activationFlag, changeClasses, changelog[] }`.
 - `buildNexaSystemPrompt` devuelve `{ text, version, family }` (la metadata viaja con el turno).
 
+## `nexa-turn-telemetry.v1` — telemetría de turno (TASK-1129)
+
+- **Productor:** `NexaService.generateResponse` ([`nexa-service.ts`](../../../../src/lib/nexa/nexa-service.ts)); tipos en [`nexa-turn-telemetry.ts`](../../../../src/lib/nexa/nexa-turn-telemetry.ts).
+- **Shape:** `NexaTurnTelemetry { contractVersion, promptVersion, promptFamily, primaryProvider, resolvedProvider, resolvedModel, providerStepCount, didFailover, failoverFrom, outcome, totalLatencyMs, toolsUsed[], toolCount, suggestionCount, suggestionOutcome, detail{ providerSteps[], tools[], usage{tokens,costUsd} } }`.
+- **Persistencia:** ledger aditivo `greenhouse_ai.nexa_turn_telemetry` (best-effort post-commit, `store.ts`). NO se devuelve al cliente; NO se rehidrata al leer un thread.
+- **Consumidores:** reliability signal `nexa.turn.degraded_outcomes` (módulo Home) + lectura ad-hoc por `prompt_version`/`resolved_provider`/`outcome`.
+- **Observabilidad, NO conversación:** nunca el prompt, el texto de respuesta, los tool results crudos ni secretos. `usage` (tokens/costo) = `null` hasta que el SDK exponga usage estable.
+
 ## Surface context (lente conversacional)
 
 `surfaceContext` (SSOT `@/lib/nexa/nexa-answers-surface-context`) declara `domain`/`placement`/

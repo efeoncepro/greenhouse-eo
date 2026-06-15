@@ -3,6 +3,8 @@ import 'server-only'
 import type { PoolClient } from 'pg'
 
 import { runGreenhousePostgresQuery, withGreenhousePostgresTransaction } from '@/lib/postgres/client'
+import { captureWithDomain } from '@/lib/observability/capture'
+import { redactErrorForResponse } from '@/lib/observability/redact'
 
 import type {
   NexaFeedbackRequest,
@@ -11,6 +13,7 @@ import type {
   NexaThreadMessage,
   NexaToolInvocation
 } from './nexa-contract'
+import type { NexaTurnTelemetry } from './nexa-turn-telemetry'
 
 let readinessPromise: Promise<void> | null = null
 
@@ -203,6 +206,59 @@ const insertMessage = async (client: PoolClient, input: {
   )
 }
 
+/**
+ * TASK-1129 — inserta la telemetría de turno en el ledger aditivo. Best-effort: el caller la corre
+ * FUERA de la tx de la conversación, así un fallo (p.ej. tabla ausente en un entorno) NUNCA tumba la
+ * persistencia del mensaje. NO guarda contenido de conversación, solo metadata de observabilidad.
+ */
+const insertTurnTelemetry = async (input: {
+  messageId: string
+  threadId: string
+  userId: string
+  clientId: string
+  telemetry: NexaTurnTelemetry
+}) => {
+  const t = input.telemetry
+
+  await runGreenhousePostgresQuery(
+    `
+      INSERT INTO greenhouse_ai.nexa_turn_telemetry (
+        message_id, thread_id, user_id, client_id,
+        prompt_version, prompt_family,
+        primary_provider, resolved_provider, resolved_model, provider_step_count,
+        did_failover, failover_from, outcome, total_latency_ms,
+        tools_used, tool_count, suggestion_count, suggestion_outcome,
+        contract_version, detail
+      ) VALUES (
+        $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14,
+        $15::text[], $16, $17, $18, $19, $20::jsonb
+      )
+    `,
+    [
+      input.messageId,
+      input.threadId,
+      input.userId,
+      input.clientId || null,
+      t.promptVersion,
+      t.promptFamily,
+      t.primaryProvider,
+      t.resolvedProvider,
+      t.resolvedModel,
+      t.providerStepCount,
+      t.didFailover,
+      t.failoverFrom,
+      t.outcome,
+      t.totalLatencyMs,
+      t.toolsUsed,
+      t.toolCount,
+      t.suggestionCount,
+      t.suggestionOutcome,
+      t.contractVersion,
+      JSON.stringify(t.detail)
+    ]
+  )
+}
+
 export const persistNexaConversation = async (input: {
   userId: string
   clientId: string
@@ -214,11 +270,12 @@ export const persistNexaConversation = async (input: {
     suggestions?: string[]
     toolInvocations?: NexaToolInvocation[]
     modelId?: string
+    turnTelemetry?: NexaTurnTelemetry
   }
 }) => {
   await assertNexaRuntimeReady()
 
-  return withGreenhousePostgresTransaction(async client => {
+  const persistedThreadId = await withGreenhousePostgresTransaction(async client => {
     let threadId = input.threadId?.trim() || ''
 
     if (threadId) {
@@ -277,6 +334,26 @@ export const persistNexaConversation = async (input: {
 
     return threadId
   })
+
+  // TASK-1129 — telemetría best-effort POST-commit: la observabilidad NUNCA rompe la conversación.
+  if (input.response.turnTelemetry) {
+    try {
+      await insertTurnTelemetry({
+        messageId: input.response.messageId,
+        threadId: persistedThreadId,
+        userId: input.userId,
+        clientId: input.clientId,
+        telemetry: input.response.turnTelemetry
+      })
+    } catch (error) {
+      captureWithDomain(error, 'home', {
+        tags: { source: 'nexa_turn_telemetry_insert' },
+        extra: { detail: redactErrorForResponse(error) }
+      })
+    }
+  }
+
+  return persistedThreadId
 }
 
 export const listNexaThreads = async (input: {

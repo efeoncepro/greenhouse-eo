@@ -112,12 +112,18 @@ export async function POST(req: Request) {
         content: nexaResponse.content,
         suggestions: nexaResponse.suggestions,
         toolInvocations: nexaResponse.toolInvocations,
-        modelId: nexaResponse.modelId
+        modelId: nexaResponse.modelId,
+        turnTelemetry: nexaResponse.turnTelemetry
       }
     })
 
+    // TASK-1129 — la telemetría de turno es observabilidad interna: se persiste, NO se devuelve al cliente.
+    const clientResponse = { ...nexaResponse }
+
+    delete clientResponse.turnTelemetry
+
     return NextResponse.json({
-      ...nexaResponse,
+      ...clientResponse,
       threadId: persistedThreadId
     })
   } catch (error) {
