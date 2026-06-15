@@ -106,6 +106,24 @@ describe('buildNexaSystemPromptV2 (modular + voz + response modes)', () => {
   })
 })
 
+describe('golden snapshot del prompt completo (TASK-1126)', () => {
+  // Golden determinista del prompt ENTERO (no anclas/substrings): cualquier cambio de texto
+  // aparece en el diff del .snap committeado y exige revisión consciente. Para el prompt activo
+  // (V2) ese cambio además debe venir con bump de versión + entrada de changelog (lo exige el
+  // doc-gate `pnpm nexa:doc-gate --changed`). V1 se snapshotea como red de rollback byte-equivalente.
+  it('V2 completo (activo) es estable byte-a-byte', () => {
+    const prompt = buildNexaSystemPromptV2(baseContext(), { knowledgeEnabled: true, now: FIXED_NOW })
+
+    expect(prompt).toMatchSnapshot()
+  })
+
+  it('V1 completo (rollback byte-equivalente) es estable byte-a-byte', () => {
+    const prompt = buildNexaSystemPromptV1(baseContext(), { knowledgeEnabled: true })
+
+    expect(prompt).toMatchSnapshot()
+  })
+})
+
 describe('versiones de prompt', () => {
   it('expone versiones estables para governance', () => {
     expect(NEXA_SYSTEM_PROMPT_V1_VERSION).toBe('nexa-system-prompt.v1')

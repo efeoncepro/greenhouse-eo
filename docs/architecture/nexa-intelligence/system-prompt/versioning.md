@@ -45,17 +45,27 @@ Metadata machine-readable: `NEXA_PROMPT_GOVERNANCE` (en el mismo módulo) con `c
 
 1. Editá los módulos en `nexa-system-prompt.ts` (NUNCA el prompt inline en `nexa-service.ts` — ya no existe).
 2. Elegí la **clase de cambio** y bumpeá la versión según la tabla.
-3. Agregá la entrada al `changelog` de `NEXA_PROMPT_GOVERNANCE` (más reciente primero).
-4. Corré los snapshot tests (`nexa-system-prompt.test.ts`) + (para `voice`/`policy`) la QA matrix
-   (`pnpm qa:nexa-knowledge`).
-5. Actualizá [`02-system-prompt-today.md`](current.md) si cambió el contenido vigente.
-6. El gate `pnpm nexa:doc-gate` exige que estos docs cambien cuando cambia el módulo.
+3. Agregá la entrada al `changelog` de `NEXA_PROMPT_GOVERNANCE` (más reciente primero). Al bumpear:
+   **congelá** la entrada que pasa a ser histórica a su **versión literal** (ej. `version: 'nexa-system-prompt.v2.0'`)
+   y dejá que la **nueva** entrada activa referencie el const (`NEXA_SYSTEM_PROMPT_V2_VERSION`). Así el
+   changelog es append-only de verdad: bumpear el const no relabela retroactivamente una entrada vieja.
+4. Actualizá el **golden snapshot** del prompt: `pnpm vitest run src/lib/nexa/nexa-system-prompt.test.ts -u`.
+   El `.snap` committeado captura el prompt ENTERO (no anclas) → el cambio aparece en el diff y exige
+   revisión consciente. Corré también (para `voice`/`policy`) la QA matrix (`pnpm qa:nexa-knowledge`).
+5. Actualizá [`current.md`](current.md) si cambió el contenido vigente.
+6. El gate `pnpm nexa:doc-gate --changed` exige, cuando cambia el módulo: (a) que su(s) doc(s) de capa
+   cambien; **y** (b) que `NEXA_PROMPT_GOVERNANCE` tenga una entrada de changelog para la `activeVersion`
+   **y** que la `activeVersion` haya bumpeado vs base **o** que el changelog haya crecido. Cierra el caso
+   "cambié el prompt pero dejé la versión vieja sin tocar el changelog".
 
 ## Reglas duras
 
 - **NUNCA** editar el prompt inline en `nexa-service.ts`. El prompt vive en `nexa-system-prompt.ts`.
 - **NUNCA** cambiar V1: es el baseline de rollback byte-equivalente.
-- **NUNCA** mergear un cambio de prompt sin clase de cambio + bump + entrada de changelog + tests.
+- **NUNCA** mergear un cambio de prompt sin clase de cambio + bump + entrada de changelog + golden snapshot actualizado.
+- **NUNCA** romper la shape canónica de `NEXA_PROMPT_GOVERNANCE` (consts string `NEXA_SYSTEM_PROMPT_V*_VERSION`,
+  más el objeto con `activeVersion` y `changelog`): el doc-gate la **parsea por regex** (no importa el módulo TS).
+  Si cambiás cómo se expresa la versión, actualizá también el parser en `scripts/ci/nexa-intelligence-doc-gate.mjs`.
 
 ## Rollback
 

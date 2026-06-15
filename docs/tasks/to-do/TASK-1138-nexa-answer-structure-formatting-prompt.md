@@ -1,5 +1,9 @@
 # TASK-1138 — Nexa Chat Answer Structure & Formatting (prompt V2)
 
+## Delta 2026-06-15
+
+- Las "snapshot tests" + "doc gate" que esta task menciona ahora son concretas (TASK-1126): hay un **golden snapshot del prompt ENTERO** (`src/lib/nexa/nexa-system-prompt.test.ts` + `__snapshots__/`) que esta task **debe regenerar** (`pnpm vitest run src/lib/nexa/nexa-system-prompt.test.ts -u`) al agregar el módulo de formato, y el **doc-gate** (`pnpm nexa:doc-gate --changed`) ahora **exige** bump de `version` + entrada de `changelog` cuando cambia `nexa-system-prompt.ts`. Tu bump `v2.0 → v2.1.0` + entrada de changelog lo satisface. Al bumpear: **congelá** la entrada histórica del changelog a su versión literal (ver `nexa-intelligence/system-prompt/versioning.md` §"Cómo cambiar el prompt"). — por trabajo en TASK-1126.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"

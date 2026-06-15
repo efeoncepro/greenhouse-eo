@@ -1,5 +1,16 @@
 # Release 2026-06-10 #2 — develop→main `6c649b2a6` RELEASED
 
+## Sesión 2026-06-15 — TASK-1126 Nexa prompt governance hardening (golden snapshot + gate version/changelog) — Claude
+
+> **Estado:** completo en `develop` (local-first, sin push). DX/governance puro — sin migración / capability / outbox / UI / rollout runtime. Follow-up de TASK-1124.
+
+- **Golden snapshot del prompt** (`src/lib/nexa/nexa-system-prompt.test.ts` + `src/lib/nexa/__snapshots__/`): captura el prompt **ENTERO** de V2 (activo) y V1 (rollback) determinista (`FIXED_NOW` → fecha `America/Santiago` pineada) vía `toMatchSnapshot()` (convención del repo). Cierra el hueco "cambio de prompt se cuela sin diff visible". El `.snap` es committeable y se regenera con `-u`.
+- **Doc-gate extendido** (`scripts/ci/nexa-intelligence-doc-gate.mjs`, `--changed`): cuando cambia `nexa-system-prompt.ts`, parsea `NEXA_PROMPT_GOVERNANCE` por regex (resuelve consts `NEXA_SYSTEM_PROMPT_V*_VERSION`; el `.mjs` no importa TS) y exige (A) changelog con entrada == `activeVersion` **y** (B) `activeVersion` bumpeada vs base **o** changelog que creció. **Verificado live:** edit-sin-bump → FALLA (exit 1, mensaje claro); edit+changelog-grow → PASA; prompt intacto → skip (mi propio PR no toca el prompt → no se auto-trampea).
+- **Skills** `.claude/` + `.codex/` (byte-idénticas): el puntero a `nexa-intelligence/` ya existía (TASK-1131); reforcé el bullet del prompt para nombrar el gate + el golden + `versioning.md`.
+- **Doc de capa** `system-prompt/versioning.md`: checklist actualizado (golden snapshot + el gate de version/changelog) + **freeze-on-bump** del changelog (congelar la entrada histórica a su literal al bumpear el const, para que el changelog sea append-only de verdad) + la shape canónica que el gate parsea.
+- **Gates:** lint 0 · tsc 0 (`pnpm local:check` EXIT 0) · 14/14 focales (incl. 2 goldens) · `pnpm nexa:doc-gate` audit+changed verde. `pnpm test` full + `pnpm build` no corridos: el change set es 1 test + 1 CI `.mjs` + `.md` (sin app/runtime/registry/`'use client'`) → fuera de su blast radius.
+- **Decisión documentada:** sin entrada en CLAUDE.md (P3 narrow; la regla agent-facing vive en `versioning.md` + las skills, que ya son SSOT del layer).
+
 ## Sesión 2026-06-15 — TASK-1145 Nexa "Mi espacio": prompt "tu recibo de pago disponible" — Claude
 
 > **Estado:** code-complete en `develop` (local-first). Aditivo bajo el flag de TASK-1087 (`NEXA_SUGGESTED_PROMPTS_DATA_AWARE_ENABLED`, ya ON en local + staging). Cierra el follow-up de pago que TASK-1144 dejó stubbeado.

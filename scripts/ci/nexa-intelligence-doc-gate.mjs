@@ -53,6 +53,59 @@ const layers = new Set(manifest.layers)
 const domains = manifest.domains || []
 const codeAllowlist = new Set(manifest.codeAllowlist || [])
 
+// ── Prompt governance (TASK-1126): el system prompt es un artefacto versionado ─────────────────
+// El gate .mjs no puede importar el módulo TS, así que parsea NEXA_PROMPT_GOVERNANCE por regex
+// (resolviendo los consts string `export const NEXA_SYSTEM_PROMPT_V*_VERSION = '...'`). La SHAPE
+// canónica (activeVersion + changelog que referencian esos consts) es load-bearing para este
+// parseo: si la cambiás, actualizá el módulo Y este parser. SSOT humano + cómo bumpear:
+// `docs/architecture/nexa-intelligence/system-prompt/versioning.md`.
+const PROMPT_DOMAIN = domains.find(d => d.key === 'system-prompt')
+const PROMPT_SRC = PROMPT_DOMAIN?.code?.[0] || null
+
+const resolveConstStrings = src => {
+  const map = new Map()
+  const re = /export const (\w+)\s*=\s*'([^']+)'/g
+  let m
+
+  while ((m = re.exec(src))) map.set(m[1], m[2])
+
+
+return map
+}
+
+const resolveVersionToken = (token, consts) => {
+  const t = token.trim()
+
+  if (/^'[^']*'$/.test(t)) return t.slice(1, -1)
+
+
+return consts.get(t) ?? t
+}
+
+// Devuelve { activeVersion, changelogVersions[] } con los consts resueltos, o null si no parsea.
+const parsePromptGovernance = src => {
+  if (!src) return null
+  const govStart = src.indexOf('NEXA_PROMPT_GOVERNANCE:') // const literal (la interfaz usa NexaPromptGovernance)
+
+  if (govStart === -1) return null
+  const consts = resolveConstStrings(src)
+  const slice = src.slice(govStart)
+  const activeM = slice.match(/activeVersion:\s*([A-Za-z0-9_]+|'[^']+')/)
+  const activeVersion = activeM ? resolveVersionToken(activeM[1], consts) : null
+  const clIdx = slice.indexOf('changelog:')
+  const changelogVersions = []
+
+  if (clIdx !== -1) {
+    const re = /\bversion:\s*([A-Za-z0-9_]+|'[^']+')/g
+    let m
+
+    while ((m = re.exec(slice.slice(clIdx)))) changelogVersions.push(resolveVersionToken(m[1], consts))
+  }
+
+
+return { activeVersion, changelogVersions }
+}
+
 // ── Cobertura: todo archivo Nexa pertenece a un dominio o al allowlist ─────────
 const NEXA_LIB_DIR = join(REPO_ROOT, 'src', 'lib', 'nexa')
 
@@ -132,6 +185,49 @@ const resolveChangedFiles = () => {
 return set
 }
 
+const gitShow = ref => sh(`git show ${ref}`)
+
+// Si cambió el prompt: exigir (A) changelog con una entrada == activeVersion y (B) versión
+// bumpeada vs base O changelog que creció. Cierra "cambié el prompt pero no bumpeé la versión".
+const checkPromptGovernance = () => {
+  if (!PROMPT_SRC) {
+    fail.push('manifest sin domain "system-prompt" con code[0] = ruta del prompt — no puedo gobernar versión/changelog del prompt')
+
+    return
+  }
+
+  const cur = parsePromptGovernance(readFileSync(join(REPO_ROOT, PROMPT_SRC), 'utf8'))
+
+  if (!cur?.activeVersion) {
+    fail.push(`No pude parsear NEXA_PROMPT_GOVERNANCE en ${PROMPT_SRC} (activeVersion/changelog). Mantené la shape canónica (consts string + changelog).`)
+
+    return
+  }
+
+  // (A) el changelog debe tener una entrada para la versión activa
+  if (!cur.changelogVersions.includes(cur.activeVersion)) {
+    fail.push(
+      `NEXA_PROMPT_GOVERNANCE.changelog no tiene una entrada para activeVersion "${cur.activeVersion}" — agregá la entrada (más reciente primero).`
+    )
+  }
+
+  // (B) vs base: si el prompt cambió, la versión debe bumpear o el changelog crecer
+  const baseOk = sh(`git rev-parse --verify --quiet ${BASE}`)
+  const mergeBase = baseOk ? sh(`git merge-base HEAD ${BASE}`) || BASE : ''
+  const base = mergeBase ? parsePromptGovernance(gitShow(`${mergeBase}:${PROMPT_SRC}`)) : null
+
+  if (base?.activeVersion) {
+    const bumped = cur.activeVersion !== base.activeVersion
+    const grew = cur.changelogVersions.length > base.changelogVersions.length
+
+    if (!bumped && !grew) {
+      fail.push(
+        `Cambió ${PROMPT_SRC} pero NO se bumpeó la versión (sigue "${cur.activeVersion}") ni creció el changelog de NEXA_PROMPT_GOVERNANCE. Elegí la clase de cambio + bumpeá versión + agregá la entrada de changelog (ver ${docsRoot}/system-prompt/versioning.md).`
+      )
+    }
+  }
+}
+
 const runChanged = () => {
   const changed = resolveChangedFiles()
   const docChanged = doc => changed.has(toPosix(`${docsRoot}/${doc}`))
@@ -155,6 +251,9 @@ const runChanged = () => {
       fail.push(`Archivo Nexa "${f}" cambió pero no pertenece a ningún dominio ni al codeAllowlist — registralo en el manifest`)
     }
   }
+
+  // prompt governance: si cambió el system prompt, exigir bump de versión + entrada de changelog
+  if (PROMPT_SRC && changed.has(PROMPT_SRC)) checkPromptGovernance()
 
   if (changed.size === 0) warn.push('No detecté archivos cambiados (¿base inalcanzable?). Corré --audit para el chequeo estructural.')
 }

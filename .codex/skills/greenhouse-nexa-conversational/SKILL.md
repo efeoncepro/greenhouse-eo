@@ -92,7 +92,7 @@ Vive en `src/components/greenhouse/primitives/nexa-<x>/` + barrel + resolver `ki
 - **NUNCA** hardcodear HEX/px/fontFamily/ms — tokens AXIS + SoT + motion tokens.
 
 **Inteligencia (backend)**
-- **NUNCA** editar el prompt inline en `nexa-service.ts` — vive en `nexa-system-prompt.ts` (versionado).
+- **NUNCA** editar el prompt inline en `nexa-service.ts` — vive en `nexa-system-prompt.ts` (versionado). Al cambiarlo: bumpeá `version` + entrada de `changelog` + actualizá el **golden snapshot** (`nexa-system-prompt.test.ts -u`); el doc-gate (`pnpm nexa:doc-gate --changed`) lo exige. Cómo: `nexa-intelligence/system-prompt/versioning.md`.
 - **NUNCA** exponer la selección de modelo al usuario; el modelo Anthropic es router-internal.
 - **NUNCA** instanciar un SDK LLM dentro de un dominio — Gemini/Claude vía `src/lib/ai/*` (los providers ya lo hacen).
 - **NUNCA** responder un dato operativo en vivo desde Knowledge (rutear al tool operativo).
