@@ -9,6 +9,30 @@
 
 ---
 
+## Delta 2026-06-15 — Command & Idempotency Foundation (TASK-655)
+
+Aterriza la capability shared de idempotencia + command audit que §12 y §8.5/§24.3 declaraban como pendiente. Cierra la brecha "writes seguros, idempotentes y auditables" del objetivo RESTful — primer proving ground: el event control plane.
+
+- **Store + audit canónico**: `greenhouse_core.api_platform_command_executions` (migración `20260615181918477`). **Una sola tabla** sirve los dos propósitos (SSOT, no dos tablas que se desincronizan): toda ejecución de command = 1 fila (audit trail); las idempotentes comparten `(principal_id, idempotency_key)` vía partial UNIQUE index `WHERE idempotency_key IS NOT NULL`. State machine `processing → completed | failed`. CHECK `idempotency_key IS NULL OR request_fingerprint IS NOT NULL` (sin fingerprint no se puede detectar reuse con payload distinto). Lane-agnostic (`principal_kind` + `principal_id`): hoy lo adopta el lane `ecosystem` (principal = sister platform consumer); `app`/`internal` quedan como follow-up.
+- **Helpers** (`src/lib/api-platform/core/`):
+  - `idempotency.ts` — store + lógica **pura** testeable: `computeRequestFingerprint` (stable JSON: ordena keys recursivamente → un retry con distinto orden de keys NO false-triggerea conflict), `resolveIdempotencyDecision` (`replay | conflict | in_progress`), `parseIdempotencyKey` (opt-in; 400 si malformada, nunca downgrade silencioso a "sin key"). Claim atómico `INSERT … ON CONFLICT … DO UPDATE … WHERE status='failed' AND fingerprint match` (re-claim de fallidas) + `RETURNING`-empty ⇒ read + decide.
+  - `commands.ts` — `runEcosystemCommandRoute` = `runEcosystemReadRoute` (**reuse total** de auth + binding + rate-limit + request-log — cero auth paralela) con idempotencia + command audit envueltos alrededor del handler. Replay → response guardada + header `Idempotency-Replayed: true`. Conflict/in-progress → `ApiPlatformError` 409. Failure del handler → `failCommandExecution` (retry permitido) + rethrow.
+- **Error taxonomy**: `ApiPlatformErrorCode` suma `idempotency_conflict` (key reusada con payload distinto) y `idempotency_in_progress` (otra request corre la misma key) — ambos 409 (§14.3 + §23.3).
+- **Header contract**: `Idempotency-Key` (request, opcional, ≤255, scoped por principal, TTL 24h) + `Idempotency-Replayed: true` (response en replay). Documentados como parámetro reusable `IdempotencyKey` + respuesta 409 en los 3 commands del OpenAPI.
+- **Adopción (event control plane)**: `POST/PATCH /webhook-subscriptions` + `POST /webhook-deliveries/:id/retry` corren por `runEcosystemCommandRoute`. Verificado por `route-contract.test.ts` (los 3 routeKeys salen por el command harness, nunca el read harness).
+- **Observabilidad**: reliability signal `platform.command.stuck_processing` (kind=`drift`, moduleKey `platform`, steady=0) — detecta commands en `processing` pasado su TTL (un runtime crasheó entre claim y cierre → la key queda wedge / 409 in-progress perpetuo). Reader `src/lib/reliability/queries/api-platform-command-stuck-processing.ts`, wired en `getReliabilityOverview`.
+- **Out of scope / follow-ups**: writes amplios de dominio; adopción del lane `app` (su `runAppRoute` reusaría el mismo store cambiando `principalKind`); barrido/cleanup de keys expiradas (hoy el TTL es lógico — la fila persiste para forensic); MCP write-safe tools (downstream desbloqueado por esta foundation).
+
+**Reglas duras**:
+
+- **NUNCA** un command nuevo de `api/platform/*` se monta sobre `runEcosystemReadRoute` cuando muta estado — usa `runEcosystemCommandRoute` (o el equivalente por lane). El read helper no audita ni idempotiza.
+- **NUNCA** duplicar la pipeline de auth/binding/rate-limit para un command. El command helper la reusa por composición.
+- **NUNCA** persistir un `idempotency_key` sin `request_fingerprint` (CHECK lo bloquea) — sin fingerprint el conflict por payload-mismatch es indetectable.
+- **NUNCA** crear una segunda tabla de "command audit" separada del idempotency store. Es una sola tabla; el audit puro (sin key) es la misma fila con `idempotency_key IS NULL`.
+- **SIEMPRE** que emerja un command que pueda reintentarse o venga de integración/agente, aceptar `Idempotency-Key` (§12.2). El replay debe devolver el mismo resultado + `Idempotency-Replayed: true`.
+
+---
+
 ## Delta 2026-06-12 — Lane ecosystem de Knowledge (TASK-1086)
 
 El reader SSOT `searchKnowledge` (TASK-1083) ahora sirve **tres lanes** con cero lógica de dominio duplicada (Full API Parity en acción): `app` (UI/Nexa, session-authed), `ecosystem` (MCP, machine-authed) y, vía el tool de Nexa, el agente conversacional. TASK-1086 agregó el lane **ecosystem**:

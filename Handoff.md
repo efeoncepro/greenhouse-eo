@@ -1,5 +1,16 @@
 # Release 2026-06-10 #2 — develop→main `6c649b2a6` RELEASED
 
+## Sesión 2026-06-15 — TASK-655 API Platform Command & Idempotency Foundation — Claude
+
+> **Estado:** **complete** en `develop` (local-first, sin push). Foundation transversal. Desbloquea MCP write-safe tools + writes idempotentes de plataforma.
+
+- **Qué resuelve:** los commands mutativos del API Platform (event control plane) corrían por `runEcosystemReadRoute` — sin `Idempotency-Key`, sin command audit, sin replay/conflict. Un consumer que reintentaba tras timeout podía duplicar el recurso.
+- **Foundation (1 tabla SSOT):** `greenhouse_core.api_platform_command_executions` (migración `20260615181918477`) = command audit trail + idempotency store en una sola tabla (toda ejecución = 1 fila; las idempotentes comparten `(principal_id, idempotency_key)` vía partial UNIQUE). State machine `processing → completed|failed`. CHECK `key ⇒ fingerprint`. Lane-agnostic (`principal_kind`/`principal_id`).
+- **Helpers** (`src/lib/api-platform/core/`): `idempotency.ts` (store + pura: fingerprint stable, decisión replay|conflict|in_progress, parse key) + `commands.ts` (`runEcosystemCommandRoute` = read route **reusado entero** + idempotencia/audit alrededor del handler). Diferencia vs finance legacy: **detecta payload-mismatch** (`idempotency_conflict`).
+- **Adopción:** subscriptions create/update + delivery retry → command helper (contract test asserta los 3 routeKeys). Errores `+idempotency_conflict +idempotency_in_progress`. OpenAPI: header `IdempotencyKey` + 409. Reliability signal `platform.command.stuck_processing`.
+- **Validación:** tsc 0 · lint 0 · `commands.test.ts` 18 + `route-contract.test.ts` 27 · migración verificada live (25 cols / 4 índices / 4 CHECKs). **`pnpm test` full + `pnpm build` = gate de cierre pendiente de correr antes de declarar ship final** (ver más abajo).
+- **Out of scope / follow-ups:** writes amplios de dominio; adopción del lane `app` (mismo store, distinto `principalKind`); cleanup de keys expiradas (TTL hoy es lógico); MCP write-safe tools (desbloqueado).
+
 ## Sesión 2026-06-15 — TASK-1134 Nexa Chat: auto-router + model selection truth — Claude
 
 > **Estado:** **complete** en `develop` (local-first). Backend contract + client + UI menor, sin migración. Desbloquea TASK-1127. Activación productiva del router = decisión del operador.

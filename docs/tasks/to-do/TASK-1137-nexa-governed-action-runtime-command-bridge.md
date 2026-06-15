@@ -1,5 +1,9 @@
 # TASK-1137 — Nexa governed action runtime + command bridge
 
+## Delta 2026-06-15
+
+- **Desbloqueada**: el bloqueante TASK-655 (API Platform Command & Idempotency Foundation) quedó `complete`. Ya existe el bridge de ejecución gobernada: `runEcosystemCommandRoute` + `executeApiPlatformCommand` (`src/lib/api-platform/core/commands.ts`) con `Idempotency-Key` + command audit en `greenhouse_core.api_platform_command_executions`. La ejecución de `NexaActionProposal` debe montarse sobre esta foundation (no reinventar idempotencia/audit de commands).
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->

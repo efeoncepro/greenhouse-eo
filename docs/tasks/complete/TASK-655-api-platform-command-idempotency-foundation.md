@@ -2,13 +2,13 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
 - Type: `implementation`
 - Epic: `[optional EPIC-###]`
-- Status real: `Diseno`
+- Status real: `Complete (2026-06-15)`
 - Rank: `TBD`
 - Domain: `platform`
 - Blocked by: `none`
@@ -109,10 +109,19 @@ Reglas obligatorias:
 
 ## Acceptance Criteria
 
-- [ ] Platform command helper exists.
-- [ ] `Idempotency-Key` is supported for selected commands.
-- [ ] Event control plane commands use the new foundation.
-- [ ] Tests cover replay, conflict and failed retries.
+- [x] Platform command helper exists. → `runEcosystemCommandRoute` + `executeApiPlatformCommand` (`src/lib/api-platform/core/commands.ts`).
+- [x] `Idempotency-Key` is supported for selected commands. → header opt-in + `Idempotency-Replayed` response header; documentado en OpenAPI.
+- [x] Event control plane commands use the new foundation. → subscriptions create/update + delivery retry; aserción en `route-contract.test.ts`.
+- [x] Tests cover replay, conflict and failed retries. → `commands.test.ts` (18 tests: replay, conflict, in-progress, failed-retry, no-key, fingerprint, key-parse).
+
+## Implementation Summary (2026-06-15)
+
+- **Slice 1** — migración `20260615181918477` crea `greenhouse_core.api_platform_command_executions` (state machine + partial UNIQUE + CHECK `key ⇒ fingerprint`); verificada live (25 cols / 4 índices / 4 CHECKs) + `db.d.ts`.
+- **Slice 2** — `core/idempotency.ts` (store + lógica pura) + `core/commands.ts` (`runEcosystemCommandRoute` reusa `runEcosystemReadRoute`) + `core/errors.ts` (`+idempotency_conflict +idempotency_in_progress`).
+- **Slice 3** — adopción event control plane (3 routes) + contract test + reliability signal `platform.command.stuck_processing` (reader + wire-up).
+- **Slice 4** — `commands.test.ts` (18) + OpenAPI (`IdempotencyKey` param + 409) + arch Delta + funcional `api-platform-ecosystem.md` v1.5 + changelog + Handoff.
+- **Decisión SSOT**: una sola tabla sirve audit trail + idempotency store (no dos que se desincronizan). Lane-agnostic (`principal_kind`); hoy adopta `ecosystem`.
+- **Follow-ups** (no bloqueantes): adopción lane `app` (mismo store, distinto `principalKind`); cleanup/barrido de keys expiradas; MCP write-safe tools (desbloqueado).
 
 ## Verification
 
@@ -124,5 +133,5 @@ Reglas obligatorias:
 
 ## Closing Protocol
 
-- [ ] Migration and `src/types/db.d.ts` committed together.
-- [ ] README/Handoff updated.
+- [x] Migration and `src/types/db.d.ts` committed together. → commit Slice 1.
+- [x] README/Handoff updated. → README (Complete), Handoff (sesión 2026-06-15), changelog.
