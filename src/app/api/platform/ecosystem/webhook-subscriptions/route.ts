@@ -1,3 +1,4 @@
+import { runEcosystemCommandRoute } from '@/lib/api-platform/core/commands'
 import { buildApiPlatformPaginationMeta } from '@/lib/api-platform/core/pagination'
 import { runEcosystemReadRoute } from '@/lib/api-platform/core/ecosystem-auth'
 import { createWebhookSubscription, listWebhookSubscriptions } from '@/lib/api-platform/resources/events'
@@ -35,9 +36,10 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   const body = await request.json().catch(() => null)
 
-  return runEcosystemReadRoute({
+  return runEcosystemCommandRoute({
     request,
     routeKey: 'platform.ecosystem.webhook-subscriptions.create',
+    body,
     handler: async context => ({
       data: await createWebhookSubscription({
         context,

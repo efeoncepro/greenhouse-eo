@@ -5,6 +5,8 @@ export type ApiPlatformErrorCode =
   | 'consumer_expired'
   | 'consumer_not_active'
   | 'forbidden'
+  | 'idempotency_conflict'
+  | 'idempotency_in_progress'
   | 'internal_error'
   | 'invalid_identifier'
   | 'invalid_integration_keys'

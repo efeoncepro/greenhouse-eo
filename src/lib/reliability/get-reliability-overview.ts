@@ -185,6 +185,7 @@ import { getPostgresConnectionSaturationSignal } from './queries/postgres-connec
 import { getCriticalTablesMissingSignal } from './queries/critical-tables-missing'
 import { getOutboxUnpublishedLagSignal } from './queries/outbox-unpublished-lag'
 import { getOutboxDeadLetterSignal } from './queries/outbox-dead-letter'
+import { getApiPlatformCommandStuckProcessingSignal } from './queries/api-platform-command-stuck-processing'
 import { getReleaseDeployDurationSignal } from './queries/release-deploy-duration'
 import { getReleaseGithubWebhookUnmatchedSignal } from './queries/release-github-webhook-unmatched'
 import { getReleaseLastStatusSignal } from './queries/release-last-status'
@@ -594,6 +595,14 @@ interface ReliabilityOverviewSources {
   outboxHealth?: ReliabilitySignal[] | null
 
   /**
+   * TASK-655 Slice 3 — API Platform command idempotency health:
+   *   - platform.command.stuck_processing (commands en processing pasado su TTL)
+   * Steady state = 0. Si > 0, un runtime crasheó entre el claim y el cierre de un
+   * command idempotente y la Idempotency-Key quedó wedge (409 in-progress perpetuo).
+   */
+  apiPlatformCommandStuckProcessing?: ReliabilitySignal | null
+
+  /**
    * TASK-408 Slice 4 — Email render/template safety net:
    *   - notifications.email.render_failure_rate
    * Steady state = 0. Cuenta fallas de render/template en
@@ -984,6 +993,8 @@ export const buildReliabilityOverview = (
     ...(sources.nexaKnowledgeRetrieval ?? []),
     // TASK-773 Slice 4 — Outbox publisher health (lag + dead_letter).
     ...(sources.outboxHealth ?? []),
+    // TASK-655 Slice 3 — API Platform command idempotency health (stuck processing).
+    ...(sources.apiPlatformCommandStuckProcessing ? [sources.apiPlatformCommandStuckProcessing] : []),
     // TASK-408 Slice 4 — Email render/template safety net.
     ...(sources.emailRenderFailure ? [sources.emailRenderFailure] : []),
     // TASK-775 Slice 5 — Vercel ↔ Cloud Scheduler drift (async-critical crons).
@@ -1398,6 +1409,12 @@ export const getReliabilityOverview = async (
         ])
           .then(signals => signals.filter((s): s is NonNullable<typeof s> => s !== null))
           .catch(() => null)
+
+  // TASK-655 Slice 3 — API Platform command idempotency health (stuck processing).
+  const apiPlatformCommandStuckProcessing =
+    preloadedSources.apiPlatformCommandStuckProcessing !== undefined
+      ? preloadedSources.apiPlatformCommandStuckProcessing
+      : await getApiPlatformCommandStuckProcessingSignal().catch(() => null)
 
   // TASK-408 Slice 4 — Email render/template failures. Reader propio con
   // degradacion honesta para no envenenar todo el reliability overview.
@@ -2034,6 +2051,7 @@ export const getReliabilityOverview = async (
     knowledgeNotionIngestDeadLetter,
     nexaKnowledgeRetrieval,
     outboxHealth,
+    apiPlatformCommandStuckProcessing,
     emailRenderFailure,
     cronStagingDrift,
     accountBalancesFxDrift,
