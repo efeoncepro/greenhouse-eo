@@ -10,13 +10,13 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
 - Type: `implementation`
 - Epic: `optional`
-- Status real: `Diseno`
+- Status real: `In progress (2026-06-15) — piloto: mark notifications read · alcance S1-S5 · UI confirm-card = follow-up Codex`
 - Rank: `TBD`
 - Domain: `nexa|platform|api|agentic|ops|security`
 - Blocked by: `TASK-655`

@@ -79,6 +79,8 @@ import { getIcoMaterializerSkippedSafetySignal } from './queries/ico-materialize
 import { getNexaInsightsFreshnessSignal } from './queries/nexa-insights-freshness'
 import { getNexaInsightsNoNewSignalsSignal } from './queries/nexa-insights-no-new-signals'
 import { getNexaTurnDegradedOutcomesSignal } from './queries/nexa-turn-degraded-outcomes'
+import { getNexaActionFailureRateSignal } from './queries/nexa-action-failure-rate'
+import { getNexaActionUnauthorizedProposalRateSignal } from './queries/nexa-action-unauthorized-proposal-rate'
 import { getNotionCorrectionTransitionsSourceAvailabilitySignal } from './queries/notion-correction-transitions-source-availability'
 import { getNotionMetricsOtdClassifierParitySignal } from './queries/notion-metrics-otd-classifier-parity'
 import {
@@ -512,6 +514,14 @@ interface ReliabilityOverviewSources {
    */
   nexaInsightsNoNewSignals?: ReliabilitySignal | null
   nexaTurnDegradedOutcomes?: ReliabilitySignal | null
+  /**
+   * TASK-1137 — Nexa governed action runtime health:
+   *   - nexa.action.failure_rate (ejecución de acción falló)
+   *   - nexa.action.unauthorized_proposal_rate (SECURITY: LLM propuso una acción no permitida/inexistente)
+   * Steady = 0 ambos. Con el runtime de acciones OFF no hay eventos → siempre ok.
+   */
+  nexaActionFailureRate?: ReliabilitySignal | null
+  nexaActionUnauthorizedProposalRate?: ReliabilitySignal | null
 
   /**
    * TASK-908 Slice 3.5 — Notion correction transitions source availability.
@@ -957,6 +967,9 @@ export const buildReliabilityOverview = (
     // serving) + icoMaterializerSkippedSafety (que detecta gate active).
     ...(sources.nexaInsightsNoNewSignals ? [sources.nexaInsightsNoNewSignals] : []),
     ...(sources.nexaTurnDegradedOutcomes ? [sources.nexaTurnDegradedOutcomes] : []),
+    // TASK-1137 — Nexa governed action runtime health (failure rate + unauthorized proposal rate).
+    ...(sources.nexaActionFailureRate ? [sources.nexaActionFailureRate] : []),
+    ...(sources.nexaActionUnauthorizedProposalRate ? [sources.nexaActionUnauthorizedProposalRate] : []),
     // TASK-908 Slice 3.5 — Notion correction transitions source availability.
     // Pre-TASK-908b deployment: 100% unavailable esperado (tabla vacía).
     // Post-deployment + backfill: < 10% steady state. Visibiliza coverage del
@@ -1858,6 +1871,17 @@ export const getReliabilityOverview = async (
       ? preloadedSources.nexaTurnDegradedOutcomes
       : await getNexaTurnDegradedOutcomesSignal().catch(() => null)
 
+  // TASK-1137 — Nexa governed action runtime health (failure rate + unauthorized proposal rate).
+  const nexaActionFailureRate =
+    preloadedSources.nexaActionFailureRate !== undefined
+      ? preloadedSources.nexaActionFailureRate
+      : await getNexaActionFailureRateSignal().catch(() => null)
+
+  const nexaActionUnauthorizedProposalRate =
+    preloadedSources.nexaActionUnauthorizedProposalRate !== undefined
+      ? preloadedSources.nexaActionUnauthorizedProposalRate
+      : await getNexaActionUnauthorizedProposalRateSignal().catch(() => null)
+
   // TASK-908 Slice 3.5 — Notion correction transitions source availability.
   // Single reader; LEFT JOIN tasks completadas vs task_status_transitions.
   // Degrada honestamente a `unknown` si la query falla.
@@ -2109,6 +2133,8 @@ export const getReliabilityOverview = async (
     nexaInsightsFreshness,
     nexaInsightsNoNewSignals,
     nexaTurnDegradedOutcomes,
+    nexaActionFailureRate,
+    nexaActionUnauthorizedProposalRate,
     notionCorrectionTransitionsSourceAvailability,
     notionMetricsOtdClassifierParity,
     notionMetricsDemo,

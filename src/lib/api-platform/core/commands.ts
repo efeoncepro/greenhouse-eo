@@ -89,7 +89,8 @@ export const executeApiPlatformCommand = async <T>({
   routeKey,
   request,
   body,
-  run
+  run,
+  idempotencyKeyOverride
 }: {
   principal: CommandExecutionPrincipal
   scope: CommandExecutionScope
@@ -97,10 +98,18 @@ export const executeApiPlatformCommand = async <T>({
   request: Request
   body: unknown
   run: () => Promise<ApiPlatformSuccessResult<T>>
+  /**
+   * Idempotency key resolved server-side (e.g. the app/internal lane, where the key is bound to a
+   * prior server artifact — a Nexa action proposal — rather than sent as a request header). Takes
+   * precedence over the `Idempotency-Key` header when present. The ecosystem lane omits it and keeps
+   * reading the header (TASK-655 default, unchanged).
+   */
+  idempotencyKeyOverride?: string | null
 }): Promise<ApiPlatformSuccessResult<T>> => {
   const method = request.method.toUpperCase()
   const path = new URL(request.url).pathname
-  const idempotencyKey = parseIdempotencyKey(request)
+  const trimmedOverride = typeof idempotencyKeyOverride === 'string' ? idempotencyKeyOverride.trim() : ''
+  const idempotencyKey = trimmedOverride || parseIdempotencyKey(request)
   const expiresAt = new Date(Date.now() + IDEMPOTENCY_TTL_MS)
 
   if (!idempotencyKey) {

@@ -18,7 +18,9 @@ import { searchKnowledge } from '@/lib/knowledge/search/search-knowledge'
 import type { KnowledgeRetrievalPacket, KnowledgeSearchSubject } from '@/lib/knowledge/search'
 import { captureWithDomain } from '@/lib/observability/capture'
 
-import { isNexaKnowledgeRetrievalEnabled, isNexaKnowledgeSynthesisBriefEnabled } from './flags'
+import { recordNexaActionEvent } from './actions/events-store'
+import { buildNexaActionContext, canUseNexaActionRuntime, resolveNexaActionProposal } from './actions/registry'
+import { isNexaActionRuntimeEnabled, isNexaKnowledgeRetrievalEnabled, isNexaKnowledgeSynthesisBriefEnabled } from './flags'
 import type { NexaRuntimeContext, NexaToolInvocation, NexaToolName, NexaToolResult } from './nexa-contract'
 
 export interface NexaToolExecutionContext {
@@ -915,6 +917,83 @@ const explainMyPayTool: NexaToolDefinition = {
   }
 }
 
+// ── propose_action (TASK-1137) ──────────────────────────────────────────────
+// Governed action runtime: the LLM PROPOSES a registered actionKey; it never executes a write.
+// This tool resolves the key deterministically against the registry (resolveNexaActionProposal),
+// builds a read-only preview, and returns a NexaActionProposal in `raw.proposal`. The orchestrator
+// surfaces it on `NexaResponse.actionProposals`; the human confirms via the deterministic endpoint.
+// Unknown/disabled/unauthorized keys degrade to an honest gap (raw.gap) — never an endpoint.
+const proposeActionTool: NexaToolDefinition = {
+  declaration: {
+    name: 'propose_action',
+    description:
+      'PROPONE (no ejecuta) una acción gobernada para que el usuario la confirme antes de que ocurra cualquier cambio. Úsalo SOLO cuando el usuario pide explícitamente realizar una acción registrada. Pasa el `actionKey` exacto de una acción registrada — NUNCA inventes una acción, endpoint ni URL. Devuelve una previsualización con el impacto; tú debes pedirle al usuario que confirme. Acciones registradas: ' +
+      'mark_notifications_read (marcar todas tus notificaciones como leídas). Si la acción no existe o no está permitida, te lo diré y debes ofrecer una alternativa honesta, no inventar.',
+    parametersJsonSchema: {
+      type: 'object',
+      additionalProperties: false,
+      properties: {
+        actionKey: {
+          type: 'string',
+          description: 'La clave exacta de una acción registrada (p. ej. "mark_notifications_read").'
+        }
+      },
+      required: ['actionKey']
+    }
+  },
+  isAvailable: tenant => isNexaActionRuntimeEnabled() && canUseNexaActionRuntime(tenant),
+  async execute(args, context) {
+    const { tenant } = context
+    const actionKey = typeof args.actionKey === 'string' ? args.actionKey.trim() : ''
+
+    if (!actionKey) {
+      return buildToolUnavailableResult('propose_action', 'Falta la clave de la acción a proponer.')
+    }
+
+    const resolution = await resolveNexaActionProposal(actionKey, buildNexaActionContext(tenant))
+
+    if (resolution.kind === 'gap') {
+      // Gap honesto: la acción no existe / no está habilitada / sin permiso. NO se propone nada.
+      // `proposal_denied` con reason unknown_action/not_permitted alimenta la señal de seguridad
+      // `nexa.action.unauthorized_proposal_rate` (LLM inducido a proponer algo prohibido).
+      await recordNexaActionEvent({ userId: tenant.userId, actionKey, eventType: 'proposal_denied', reason: resolution.gap.reason })
+
+      return {
+        available: false,
+        summary: resolution.gap.message,
+        source: 'none',
+        scopeLabel: 'Acción no disponible',
+        generatedAt: new Date().toISOString(),
+        metrics: [],
+        notes: [resolution.gap.message],
+        raw: { gap: resolution.gap }
+      }
+    }
+
+    const { proposal, definition } = resolution
+
+    await recordNexaActionEvent({
+      userId: tenant.userId,
+      actionKey: definition.actionKey,
+      eventType: 'proposed',
+      sensitivity: definition.sensitivity,
+      idempotencyKey: proposal.execution.idempotencyKey
+    })
+
+    return {
+      available: true,
+      // Instrucción para el LLM: propuso la acción, NO la ejecutó. Debe pedir confirmación explícita.
+      summary: `Preparé la acción "${definition.intent}" para que el usuario la confirme. ${proposal.preview.summary} Pídele que confirme antes de ejecutar; NO afirmes que ya se hizo.`,
+      source: 'postgres',
+      scopeLabel: proposal.preview.title,
+      generatedAt: new Date().toISOString(),
+      metrics: proposal.preview.metrics,
+      // El proposal viaja acá para que el orquestador lo extraiga a NexaResponse.actionProposals.
+      raw: { proposal }
+    }
+  }
+}
+
 const NEXA_TOOLS: Record<NexaToolName, NexaToolDefinition> = {
   check_payroll: checkPayrollTool,
   get_otd: getOtdTool,
@@ -922,7 +1001,8 @@ const NEXA_TOOLS: Record<NexaToolName, NexaToolDefinition> = {
   get_capacity: getCapacityTool,
   pending_invoices: pendingInvoicesTool,
   search_knowledge: searchKnowledgeTool,
-  explain_my_pay: explainMyPayTool
+  explain_my_pay: explainMyPayTool,
+  propose_action: proposeActionTool
 }
 
 export const getNexaToolDeclarations = (tenant: NexaRuntimeContext): FunctionDeclaration[] =>

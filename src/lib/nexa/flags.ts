@@ -43,6 +43,14 @@ export const isNexaSystemPromptV2Enabled = (): boolean => process.env.NEXA_SYSTE
 export const isNexaKnowledgeSynthesisBriefEnabled = (): boolean =>
   process.env.NEXA_KNOWLEDGE_SYNTHESIS_BRIEF_ENABLED === 'true'
 
+// TASK-1137 — Nexa governed action runtime. Default OFF: con OFF, Nexa NO ofrece el tool
+// `propose_action` (cero proposals de acción) y el endpoint de confirmación rechaza con gap
+// honesto → comportamiento idéntico al previo (advisory/read-only). Server-only: que Nexa pueda
+// EJECUTAR una acción es decisión de runtime + capability, no de la UI. La acción nunca corre por
+// el LLM: el LLM propone una actionKey registrada, el humano confirma, el endpoint determinístico
+// ejecuta vía la foundation de command/idempotency (TASK-655).
+export const isNexaActionRuntimeEnabled = (): boolean => process.env.NEXA_ACTION_RUNTIME_ENABLED === 'true'
+
 // TASK-1087 — Prompts sugeridos data-aware (Tier 2). Default OFF: con OFF, los prompts del chat
 // flotante se quedan en Tier 1/1.5 (plantillas por ruta + nombre real de la entidad), byte-idéntico
 // al comportamiento previo. Con ON, el panel consulta `GET /api/nexa/suggested-prompts` y, si hay

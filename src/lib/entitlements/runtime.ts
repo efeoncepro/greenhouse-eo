@@ -1921,6 +1921,15 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
     addEntitlement(entries, { module: 'knowledge', capability: 'knowledge.source.admin', action: 'manage', scope: 'all', source: 'role' })
   }
 
+  // TASK-1137 — Nexa governed action runtime. Audiencia del piloto: usuarios internos ∪ EFEONCE_ADMIN
+  // (client users excluidos hasta que un piloto de dominio pruebe la frontera). Mirror exacto de
+  // `canUseNexaActionRuntime` (el gate síncrono del tool propose_action).
+  if (hasRouteGroup(subject, 'internal') || hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)) {
+    const source: TenantEntitlementSource = hasRouteGroup(subject, 'internal') ? 'route_group' : 'role'
+
+    addEntitlement(entries, { module: 'home', capability: 'nexa.action.execute', action: 'execute', scope: 'own', source })
+  }
+
   const resolvedEntries = Array.from(entries.values())
   const moduleKeys = Array.from(new Set(resolvedEntries.map(entry => entry.module)))
 

@@ -121,6 +121,19 @@ export interface GreenhouseAiMemberToolLicenses {
   updated_at: Generated<Timestamp>;
 }
 
+export interface GreenhouseAiNexaActionEvents {
+  action_key: string;
+  created_at: Generated<Timestamp>;
+  detail: Json | null;
+  event_id: Generated<string>;
+  event_type: string;
+  idempotency_key: string | null;
+  reason: string | null;
+  replayed: Generated<boolean>;
+  sensitivity: string | null;
+  user_id: string;
+}
+
 export interface GreenhouseAiNexaFeedback {
   client_id: string;
   comment: string | null;
@@ -10031,6 +10044,7 @@ export interface DB {
   "greenhouse_ai.credit_ledger": GreenhouseAiCreditLedger;
   "greenhouse_ai.credit_wallets": GreenhouseAiCreditWallets;
   "greenhouse_ai.member_tool_licenses": GreenhouseAiMemberToolLicenses;
+  "greenhouse_ai.nexa_action_events": GreenhouseAiNexaActionEvents;
   "greenhouse_ai.nexa_feedback": GreenhouseAiNexaFeedback;
   "greenhouse_ai.nexa_messages": GreenhouseAiNexaMessages;
   "greenhouse_ai.nexa_threads": GreenhouseAiNexaThreads;

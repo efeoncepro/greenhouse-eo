@@ -1475,6 +1475,16 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     actions: ['read'] as const,
     defaultScope: 'tenant'
   },
+  // TASK-1137 — Nexa governed action runtime. Gate de "este usuario puede CONFIRMAR/EJECUTAR una
+  // acción gobernada propuesta por Nexa". El LLM nunca ejecuta; el humano confirma vía el endpoint
+  // determinístico. Grant (runtime.ts): internal route_group ∪ EFEONCE_ADMIN (audiencia del piloto;
+  // client users excluidos). NUNCA seed sin grant mismo PR (invariant TASK-873/935).
+  {
+    key: 'nexa.action.execute',
+    module: 'home',
+    actions: ['execute'] as const,
+    defaultScope: 'own'
+  },
   // TASK-490 — Signature orchestration (EPIC-001 signable pack). Gate de las superficies
   // operador-facing de firma (enviar a firmar / cancelar / reconciliar). El render del
   // documento (TASK-1023) y el adapter ZapSign (TASK-491) viven detrás de este gate.

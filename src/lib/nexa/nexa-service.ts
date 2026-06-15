@@ -11,6 +11,7 @@ import {
 import { getGreenhouseAgentModel } from '@/lib/ai/google-genai'
 import type { NexaMessage, HomeSnapshot } from '@/types/home'
 
+import { extractNexaActionProposals } from './actions/extract-proposals'
 import { getNexaProviderOverride, isNexaAutoRouterEnabled, isNexaKnowledgeRetrievalEnabled } from './flags'
 import { buildNexaSystemPrompt, type NexaSystemPromptResult } from './nexa-system-prompt'
 import { classifyNexaIntent, nexaProviderFailoverChain, routeNexaProviderKey } from './nexa-model-router'
@@ -233,6 +234,10 @@ export class NexaService {
           responseText: content
         })
 
+        // TASK-1137 — eleva las propuestas de acción gobernadas del tool `propose_action` al
+        // contrato. Vacío cuando el runtime de acciones está OFF o el turno no propuso nada.
+        const actionProposals = extractNexaActionProposals(turn.toolInvocations)
+
         return {
           id: crypto.randomUUID(),
           role: 'assistant',
@@ -240,6 +245,7 @@ export class NexaService {
           timestamp: this.getTimestamp(),
           suggestions,
           toolInvocations: turn.toolInvocations,
+          ...(actionProposals.length > 0 ? { actionProposals } : {}),
           modelId: step.model,
           turnTelemetry: this.buildTurnTelemetry({
             systemPromptResult,

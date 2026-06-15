@@ -60,6 +60,10 @@ export type CanonicalErrorCode =
   // Nexa chat endpoint (TASK-1131).
   | 'nexa_prompt_required'
   | 'nexa_generation_failed'
+  // Nexa governed action runtime (TASK-1137).
+  | 'nexa_action_not_available'
+  | 'nexa_action_conflict'
+  | 'nexa_action_failed'
   // Reserved for future canonical codes — extender aquí cuando emerjan
   // nuevos error paths estructurales. NUNCA usar strings ad-hoc.
 
@@ -140,6 +144,24 @@ const CANONICAL_ERRORS: Record<CanonicalErrorCode, CanonicalErrorDefinition> = {
     status: 500,
     // Transitorio (hiccup del proveedor LLM / tool): reintentar suele resolver.
     message: 'Nexa no pudo generar una respuesta. Inténtalo de nuevo en unos segundos.',
+    actionable: true
+  },
+  // TASK-1137 — la acción propuesta ya no está disponible (no existe, deshabilitada o sin permiso).
+  nexa_action_not_available: {
+    status: 422,
+    message: 'Esta acción ya no está disponible para tu cuenta. Pídele a Nexa que la proponga de nuevo.',
+    actionable: false
+  },
+  // Idempotencia: la misma acción ya se está ejecutando, o el contexto cambió respecto a la propuesta.
+  nexa_action_conflict: {
+    status: 409,
+    message: 'Esta acción ya se está procesando o cambió desde que se propuso. Vuelve a pedirla si hace falta.',
+    actionable: false
+  },
+  // La ejecución del command falló (transitorio): reintentar suele resolver.
+  nexa_action_failed: {
+    status: 500,
+    message: 'No pude completar la acción en este momento. Inténtalo de nuevo en unos segundos.',
     actionable: true
   }
 }
