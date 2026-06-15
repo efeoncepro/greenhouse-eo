@@ -11,8 +11,16 @@
 
 ## Por qué existe
 
-Detectado en la revisión profunda del Nexa Chat (TASK-1124 follow-up). El endpoint del chat
-`src/app/api/home/nexa/route.ts` maneja el error así:
+Detectado en la revisión profunda del Nexa Chat (TASK-1124 follow-up).
+
+**Alcance — es el endpoint COMPARTIDO, no legacy-específico.** `/api/home/nexa` (el "home" del nombre
+es histórico) es el **único backend de chat de Nexa**: lo consumen (a) el **chat embebido del home
+legacy** (`HomeView.tsx` → `NexaThread` + `NexaThreadSidebar`), (b) el **chat flotante global**
+(`NexaFloatingButton` → `NexaFloatingPanel` → reusa `NexaThread`, montado en todo el dashboard,
+incl. el home v2 que NO embebe chat). Arreglar el contrato de error de este endpoint **beneficia a
+todos los consumidores a la vez** (legacy + flotante).
+
+El endpoint maneja el error así:
 
 ```ts
 } catch (error) {

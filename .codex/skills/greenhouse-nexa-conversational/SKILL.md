@@ -13,12 +13,12 @@ Es un **overlay de dominio**: compone con `greenhouse-product-ui-architect` (P+V
 
 | | **NexaThread** (chat) | **NexaAnswersCanvas** (lente) |
 |---|---|---|
-| Dónde | Panel **flotante** + Home inline (superficie viva, primaria hoy) | Surface answer-first rica, **flag-gated** `NEXA_ANSWERS_CANVAS_LENS_ENABLED`, hoy en `/knowledge` |
+| Dónde | Chat **flotante global** (`NexaFloatingButton`→`NexaFloatingPanel`, montado en TODO el dashboard) **+** chat **embebido del home legacy** (`HomeView`→`NexaThread`+`NexaThreadSidebar`). Es la superficie viva primaria. | Surface answer-first rica, **flag-gated** `NEXA_ANSWERS_CANVAS_LENS_ENABLED`, hoy en `/knowledge` |
 | Render | **assistant-ui** (`ThreadPrimitive` + `MarkdownTextPrimitive` + `NexaToolRenderers`) | `NexaAnswersCanvas` + coreografía de 11 estados |
-| Código | `src/views/greenhouse/home/components/NexaThread.tsx` + `NexaToolRenderers.tsx` | `src/components/greenhouse/primitives/nexa-answers-canvas/**` |
+| Código | `src/views/greenhouse/home/components/NexaThread.tsx` + `NexaToolRenderers.tsx` (reusado por el flotante `NexaFloatingPanel`) | `src/components/greenhouse/primitives/nexa-answers-canvas/**` |
 | Citas/fuentes | `cleanNexaAnswer` (strip al render) + `NexaProvenanceTrace` variant `panel` `sourcesOnly` | citas inline + `NexaProvenanceTrace`/`NexaEvidencePanel` |
 
-**Las dos consumen el MISMO backend** (`NexaService.generateResponse` → system prompt + router + providers + tools + evidencia) y las **mismas primitives de evidencia**. Difieren solo en el render. Cualquier trabajo de chat toca una de estas dos surfaces **y/o** el backend compartido.
+**Topología del chat (importante):** `NexaThread` es **el mismo componente** que monta (a) el **home legacy** (embebido) y (b) el **flotante global**. El **home v2 (`HomeShellV2`) NO embebe chat** → en v2 se usa el flotante. **Las dos surfaces (y todos los montajes de NexaThread) pegan a UN solo endpoint** `/api/home/nexa` ("home" es histórico = backend compartido de TODO el chat) → `NexaService.generateResponse` (system prompt + router + providers + tools + evidencia). Difieren solo en el render. Un arreglo del endpoint/backend impacta a todos a la vez.
 
 ## La inteligencia (backend) — SSOT = Nexa Intelligence
 
