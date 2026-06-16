@@ -1,5 +1,16 @@
 # Release 2026-06-10 #2 — develop→main `6c649b2a6` RELEASED
 
+## Sesión 2026-06-16 — TASK-1157 OOM del build de Vercel resuelto ($0) — Claude
+
+> **Estado:** complete en `develop` (commits `5d4bcf7c7` + `0900fc183`), deploy de staging verde verificado live. El OOM flaky que bloqueaba deploys quedó resuelto sin pagar Enhanced Builds.
+
+- **Síntoma:** `next build` (Turbopack) OOM-eaba flaky en el builder default de Vercel (~8 GB) — SIGKILL silencioso a los 45 min ("Creating an optimized production build"). Estructural: **1106 entrypoints**, no un cambio puntual. Bloqueaba cualquier deploy cuando caía.
+- **Fix (`next.config.ts`, gateado a Vercel, cero runtime):** `experimental.cpus: 4` (static-gen ~9→4 workers) + sourcemaps de Sentry solo en producción (`VERCEL_ENV==='production'`; off en staging/preview).
+- **`turbopackMemoryLimit` descartado — lección:** el 1er intento con 6 GiB quedó **bajo el working set** de Turbopack → thrashing (GC agresivo) → build colgado 25 min+, **peor** que el OOM. Sin un pico medido (el OOM mataba el reporte del Slice 1), el knob es contraproducente. La spec lo advirtió ("medir antes de asumir"). Quitarlo + las 2 palancas seguras resolvió.
+- **Verificación live:** deploy `lcgr9d6dv` **Ready en 7 min** ("✓ Compiled successfully in 3.1min") vs **3 deploys sin fix que OOM-earon a 45-46 min** en la misma ventana (`k4dy0gpyf`/`gvba866wa`/`j0o4fe73d`). Enhanced Builds = no-go.
+- **Determinismo:** 1er build con fix verde + contraste claro; se confirma con los próximos pushes a develop (cada uno buildea ya con el fix). Si el build vuelve a crecer → follow-up de disciplina de route-count.
+- **Convivencia:** se trabajó en paralelo con el sweep de tipografía de Codex (`monoId`) sobre los componentes del roadmap (commit `0c392cb38`); el drawer "Abrir task" (TASK-1153 follow-up) sobrevivió intacto (GVC mirado).
+
 ## Sesión 2026-06-16 — TASK-1159 Public Site Astro SEO foundation task — Codex
 
 > **Estado:** task creada en `docs/tasks/to-do/`; sin implementación runtime. Siguiente paso recomendado después de TASK-1158.

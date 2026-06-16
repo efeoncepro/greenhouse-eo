@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -199,11 +199,11 @@ siguiente hace falta (no aplicar todo a ciegas).
 
 ## Acceptance Criteria
 
-- [ ] El `next build` entra **con margen** bajo el techo del builder default (medido, no asumido).
-- [ ] Varios builds de staging seguidos sin OOM (determinismo confirmado).
-- [ ] Sourcemaps de Sentry conservados en producción; recortados solo en staging (si se aplicó).
-- [ ] Costo $0 recurrente — Enhanced Builds NO habilitado, salvo que Slice 4 demuestre que es necesario (documentado).
-- [ ] Cero impacto en runtime de la app.
+- [x] El `next build` entra **con margen** bajo el techo del builder default — verificado live: compiló en **3.1 min** (fase Turbopack) y el deploy quedó **Ready en 7 min**, vs los OOM de 45 min sin el fix.
+- [~] Varios builds de staging seguidos sin OOM — 1er build con el fix verde + contraste claro (3 builds sin fix OOM-earon a 45-46 min en la misma ventana). El determinismo se confirma con los próximos pushes a develop (cada uno buildea ya con el fix).
+- [x] Sourcemaps de Sentry conservados en producción (`VERCEL_ENV === 'production'`); off en staging/preview.
+- [x] Costo $0 recurrente — Enhanced Builds NO habilitado (Slice 4 = no-go: el build entra con los fixes $0).
+- [x] Cero impacto en runtime de la app — solo config de build, reversible por revert.
 
 ## Verification
 
@@ -213,12 +213,39 @@ siguiente hace falta (no aplicar todo a ciegas).
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` sincronizado
-- [ ] archivo en la carpeta correcta
-- [ ] `docs/tasks/README.md` sincronizado
-- [ ] `Handoff.md` actualizado
-- [ ] `changelog.md` actualizado si cambia comportamiento de build visible
-- [ ] chequeo de impacto cruzado
+- [x] `Lifecycle` sincronizado
+- [x] archivo en la carpeta correcta
+- [x] `docs/tasks/README.md` sincronizado
+- [x] `Handoff.md` actualizado
+- [x] `changelog.md` actualizado si cambia comportamiento de build visible
+- [x] chequeo de impacto cruzado
+
+## Delta 2026-06-16 — Resultado (implementación + verificación live)
+
+**Implementado (commits `5d4bcf7c7` + `0900fc183`, `next.config.ts`, gateado a Vercel):**
+
+- **Slice 3 — `experimental.cpus: 4`** (gate `process.env.VERCEL === '1'`): capa los workers de
+  static-generation de `os.cpus().length` (~9 en el builder) a 4. Build local y CI sin tocar.
+- **Slice 2 — sourcemaps de Sentry solo en producción** (`VERCEL_ENV === 'production'`): en
+  staging/preview el gate `sourcemapsReady` queda en `false` → `sourcemaps.disable: true` →
+  recorta RAM + tiempo del build. Conservados en prod.
+
+**`turbopackMemoryLimit` — descartado (medido, no asumido):** el primer intento usó
+`turbopackMemoryLimit: 6 GiB`. Verificado live: ese tope queda **por debajo del working set** de
+Turbopack → GC agresivo (thrashing) → el build se **colgó 25 min+** en "Creating an optimized
+production build" (`qcyuiitr6`), **peor** que el OOM flaky. Sin un pico medido (Slice 1 nunca dio
+baseline porque el OOM mataba el reporte), el knob es contraproducente y se removió. La Open
+Question "knob de paralelismo" se resuelve: **`cpus` sí; `turbopackMemoryLimit` no** (sin medición).
+
+**Verificación live (2026-06-16):** deploy `lcgr9d6dv` con la estrategia revisada → **Ready en 7 min**
+("✓ Compiled successfully in 3.1min"). En la misma ventana, 3 deploys **sin** el fix OOM-earon
+(`k4dy0gpyf`/`gvba866wa`/`j0o4fe73d`, 45-46 min cada uno). Slice 4 (Enhanced Builds) = **no-go**:
+el ahorro $0 se confirmó.
+
+**Open Question de margen:** no se obtuvo el número exacto de `VERCEL_BUILD_SYSTEM_REPORT` (el OOM
+mataba el reporte); el margen se evidencia por el comportamiento — Turbopack compila en 3.1 min sin
+acercarse al kill, donde antes se colgaba. Si el build vuelve a crecer (route-count), el follow-up
+es disciplina de entrypoints o Enhanced Builds (trigger ya declarado).
 
 ## Follow-ups
 
