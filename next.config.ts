@@ -14,30 +14,34 @@ type NextConfigWithProductionCompileHook = NextConfig & {
   }
 }
 
+// TASK-1157 Slice 2 — los sourcemaps de Sentry se procesan/suben DURANTE el build
+// y suman RAM + tiempo. En staging no hacen falta (debugging de prod). Solo
+// subimos sourcemaps en PRODUCCIÓN (`VERCEL_ENV === 'production'`); en staging el
+// gate queda en false → `sourcemaps.disable: true` → menos pico de RAM en el build.
+// El build local (sin VERCEL_ENV) también queda sin upload, como antes.
+const isProductionDeploy = process.env.VERCEL_ENV === 'production'
+
 const sourcemapsReady =
+  isProductionDeploy &&
   Boolean(process.env.SENTRY_AUTH_TOKEN?.trim()) &&
   Boolean(process.env.SENTRY_ORG?.trim()) &&
   Boolean(process.env.SENTRY_PROJECT?.trim())
 
 // TASK-1157 — el `next build` (Turbopack) OOM-ea de forma flaky en el builder
 // default de Vercel (~8 GB): el pico de RAM queda al borde del techo del container
-// y a veces se pasa → SIGKILL. Causa estructural (1106 entrypoints + dos picos:
-// compilación de Turbopack y los workers de static-generation = os.cpus().length).
-// Capamos AMBOS picos SOLO en el build de Vercel (`VERCEL=1`), para no ralentizar
-// el build local ni el de CI (que no OOM-ean). Costo $0, cero impacto en runtime.
+// y a veces se pasa → SIGKILL. Causa estructural (1106 entrypoints). Dos picos:
+// compilación de Turbopack y los workers de static-generation (= os.cpus().length).
+//
+// Slice 3 — capamos los workers de static-generation SOLO en Vercel (`VERCEL=1`):
+// de `os.cpus().length` (~9 en el builder) a 4 → baja ese pico ~2x con poca
+// penalidad de tiempo. NO usamos `turbopackMemoryLimit`: medido en Vercel, un tope
+// por debajo del working set de Turbopack fuerza GC agresivo (thrashing) y el build
+// se cuelga 25 min+ en "Creating an optimized production build" — peor que el OOM
+// flaky. Sin un valor medido del pico, el tope es contraproducente; la palanca real
+// $0 para la fase de compilación es recortar el trabajo de Sentry (Slice 2, arriba).
 const isVercelBuild = process.env.VERCEL === '1'
 
-const vercelBuildMemoryCaps = isVercelBuild
-  ? {
-      // Static-generation: de `os.cpus().length` (los "9 workers" del builder) a 2.
-      // Baja el pico de esa fase ~4.5x a cambio de algunos minutos de build.
-      cpus: 2,
-      // Presupuesto de memoria de Turbopack (en bytes, por el contrato de Next 16):
-      // 6 GiB en un container de ~8 GB → Turbopack hace GC antes del techo, dejando
-      // headroom para el resto del proceso. Ataca la fase que OOM-eó (compilación).
-      turbopackMemoryLimit: 6 * 1024 * 1024 * 1024
-    }
-  : {}
+const vercelBuildMemoryCaps = isVercelBuild ? { cpus: 4 } : {}
 
 const nextConfig: NextConfig = {
   basePath: process.env.BASEPATH,
@@ -71,7 +75,7 @@ const nextConfig: NextConfig = {
   // src/app/globals.css.
   experimental: {
     viewTransition: true,
-    // TASK-1157 — caps de memoria del build, solo en Vercel (ver arriba).
+    // TASK-1157 — cap de workers de static-generation, solo en Vercel (ver arriba).
     ...vercelBuildMemoryCaps
   }
 }
