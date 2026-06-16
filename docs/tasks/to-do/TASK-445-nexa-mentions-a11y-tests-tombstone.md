@@ -10,10 +10,13 @@
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Bajo`
-- Type: `hardening`
+- Type: `implementation`
+- Execution profile: `ui-ux`
+- UI impact: `primitive`
+- Backend impact: `none`
 - Status real: `Diseno`
 - Rank: `TBD`
-- Domain: `agency`
+- Domain: `nexa|ui|accessibility`
 - Blocked by: `TASK-441`
 - Branch: `task/TASK-445-nexa-mentions-a11y-tests-tombstone`
 - Legacy ID: `none`
@@ -25,7 +28,7 @@ Cierra las brechas de accesibilidad, test coverage e i18n del sistema de mencion
 
 ## Why This Task Exists
 
-El parser [NexaMentionText.tsx](src/components/greenhouse/NexaMentionText.tsx) se shipeó en TASK-240 sin tests, sin ARIA labels, sin tooltips, sin manejo de entidad eliminada y sin i18n. Para aspirar a una UI pulida sobre la que montar chat, autocomplete y push, este componente tiene que ser el ejemplo de rigor — hoy es el punto débil.
+El parser [NexaMentionText.tsx](src/components/greenhouse/NexaMentionText.tsx) ya tiene una prueba base (`src/components/greenhouse/NexaMentionText.test.tsx`) agregada después de TASK-240, pero todavía no cubre el contrato enterprise completo: ARIA labels por tipo, tooltips, estado tombstone, i18n y fixtures de chat/autocomplete. Para aspirar a una UI pulida sobre la que montar chat, autocomplete y push, este componente tiene que ser el ejemplo de rigor.
 
 ## Goal
 
@@ -52,13 +55,15 @@ Reglas obligatorias:
 
 - Cumplir WCAG 2.2 AA
 - Estados del chip: `active | disabled | tombstone | pending` (colores tokenizados)
-- i18n strings bajo `src/i18n/*` o diccionario canónico del repo
+- i18n/copy strings bajo `src/lib/copy/*` y/o la capa `next-intl` vigente; no hardcodear copy reusable.
 - No hardcodear strings en español en el renderer
+- Si se extrae `NexaMentionChip`, debe seguir P+V+K proporcional: reusable interno, a11y baked-in, sin primitive paralela.
 
 ## Normative Docs
 
 - `docs/tasks/complete/TASK-428-i18n-architecture-decision.md`
 - `docs/tasks/to-do/TASK-441-nexa-mentions-resolver-allowlist-sanitization.md`
+- `docs/tasks/to-do/TASK-443-nexa-thread-chat-mention-rendering.md`
 
 ## Dependencies & Impact
 
@@ -77,7 +82,7 @@ Reglas obligatorias:
 
 - `src/components/greenhouse/NexaMentionText.tsx` — modificar
 - `src/components/greenhouse/NexaMentionChip.tsx` — nuevo: extracción del chip (reusable)
-- `src/components/greenhouse/__tests__/NexaMentionText.test.tsx` — nuevo
+- `src/components/greenhouse/NexaMentionText.test.tsx` — ampliar cobertura existente
 - `src/lib/nexa/mentions/__tests__/*` — nuevos tests del resolver/sanitizer
 - `docs/operations/RUNBOOK_NEXA_MENTIONS_QA.md` — nuevo
 
@@ -85,17 +90,83 @@ Reglas obligatorias:
 
 ### Already exists
 
-- Parser funcional
+- Parser funcional `src/components/greenhouse/NexaMentionText.tsx`
+- Test base `src/components/greenhouse/NexaMentionText.test.tsx`
 - Vitest + Testing Library + jsdom en `src/test/`
 - `GH_COLORS` y tokens MUI v5
 
 ### Gap
 
-- Cero tests del parser
+- Tests actuales son mínimos; falta coverage de regex edge cases, aria, keyboard y tombstone.
 - ARIA vacío más allá de `aria-hidden` en el icono
 - No hay tombstone UI
 - No hay tooltip
 - Strings hardcoded en español
+
+## UI/UX Contract
+
+### Experience brief
+
+- UI rigor: `ui-platform`
+- Usuario / rol: usuarios que leen entidades mencionadas en Nexa; QA/a11y que valida releases.
+- Momento del flujo: lectura, foco, navegación y estado degradado de chips de mention.
+- Resultado perceptible esperado: chip reusable con estados claros, accesible por teclado y estable en mobile.
+- Friccion que debe reducir: menciones visualmente útiles pero frágiles/inaccesibles.
+- No-goals UX: hover previews, autocomplete y reverse index.
+
+### Surface & system decision
+
+- Surface: `NexaMentionText` + `NexaMentionChip` interno reusable.
+- Composition Shell: `no aplica` — primitive inline.
+- Primitive decision: `extend` — extraer chip reusable desde renderer existente; no agregar Design System global si no se usa fuera de Nexa.
+- Adaptive density / The Seam: `no aplica` — inline chip.
+- Floating/Sidecar/Dialog decision: no aplica.
+- Copy source: `src/lib/copy/*` para aria, tooltips y tombstone.
+- Access impact: `none` directo; hrefs heredan gates de rutas destino.
+
+### State inventory
+
+- Default: active/navigable.
+- Loading: pending si metadata de preview/validación no está lista.
+- Empty: texto sin mentions.
+- Error: malformed mention → texto plano.
+- Degraded / partial: disabled/no navigable.
+- Permission denied: no generar href o destino maneja denial.
+- Long content: truncado con tooltip accesible.
+- Mobile / compact: hit target adecuado y wrap-safe.
+- Keyboard / focus: Tab/Enter/Space, focus visible.
+- Reduced motion: no motion o instant.
+
+### Interaction contract
+
+- Primary interaction: navegación por chip válido.
+- Hover / focus / active: tooltip/focus ring tokenizados.
+- Pending / disabled: disabled/tombstone comunica estado sin prometer acción.
+- Escape / click-away: tooltip se cierra.
+- Focus restore: no aplica salvo tooltip/popover.
+- Latency feedback: pending local si aplica.
+- Toast / alert behavior: no toast.
+
+### Motion & microinteractions
+
+- Motion primitive: `CSS`
+- Enter / exit: tooltip estándar.
+- Layout morph: no aplica.
+- Stagger: no aplica.
+- Timing / easing token: MUI/default tokenizado.
+- Reduced-motion fallback: instant/no animation.
+- Non-goal motion: decoraciones.
+
+### Visual verification
+
+- GVC scenario: lab/fixture con active, disabled, tombstone, long name y mobile wrap.
+- Viewports: desktop y mobile 390px.
+- Required captures: todos los estados.
+- Required `data-capture` markers: mention chip specimen.
+- Scroll-width check: page + container.
+- Accessibility/focus checks: axe, keyboard nav, aria-labels.
+- Before/after evidence: chip legacy vs chip endurecido.
+- Known visual debt: si el chip se promueve a primitive global, abrir ADR/UI platform follow-up.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -188,6 +259,44 @@ interface NexaMentionChipProps {
 | active | `divider` | transparent | `text.primary` | pointer | tipo + name + meta |
 | disabled | `divider` | `action.disabledBackground` | `text.disabled` | default | tipo + name + `(sin perfil disponible)` |
 | tombstone | `error.light` | `error.lightBg` | `error.main` | default | `Esta {type} ya no está disponible` |
+
+## Rollout Plan & Risk Matrix
+
+### Slice ordering hard rule
+
+- Slice 1 (extract chip) -> Slice 2/3 (ARIA + tooltip) -> Slice 4 (tombstone) -> Slice 5 (copy/i18n) -> Slice 6/7 (tests + visual runbook).
+- No integrar el chip en chat/autocomplete hasta que los estados active/disabled/tombstone tengan tests.
+
+### Risk matrix
+
+| Riesgo | Sistema | Probabilidad | Mitigation | Signal de alerta |
+|---|---|---|---|---|
+| Extracción del chip cambia visualmente todos los Insights | UI | medium | snapshots/GVC antes-después | visual diff |
+| Tooltip/focus empeora a11y | accessibility | medium | axe + keyboard test | axe violation |
+| Tombstone se interpreta como acción disponible | UX | low | disabled/no href + copy clara | QA finding |
+
+### Feature flags / cutover
+
+- Sin flag si el chip es visualmente compatible y tests pasan.
+- Si la extracción toca muchas surfaces, Plan Mode puede aplicar adapter legacy temporal en `NexaMentionText`.
+
+### Rollback plan per slice
+
+| Slice | Rollback | Tiempo | Reversible? |
+|---|---|---|---|
+| Slice 1-5 | revert chip extraction/copy | <20 min | si |
+| Slice 6-7 | tests/runbook only; no runtime rollback | N/A | si |
+
+### Production verification sequence
+
+1. Tests unitarios del renderer/chip.
+2. GVC active/disabled/tombstone desktop/mobile.
+3. Axe/focus smoke en staging.
+4. Deploy prod y revisar Sentry UI errors.
+
+### Out-of-band coordination required
+
+N/A — UI/test/docs only.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 4 — VERIFICATION & CLOSING

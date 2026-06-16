@@ -11,9 +11,12 @@
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
+- Execution profile: `backend-data`
+- UI impact: `interaction`
+- Backend impact: `api`
 - Status real: `Diseno`
 - Rank: `TBD`
-- Domain: `agency`
+- Domain: `nexa|ui|api|agency`
 - Blocked by: `TASK-442`
 - Branch: `task/TASK-447-nexa-insights-mention-hover-preview-cards`
 - Legacy ID: `none`
@@ -57,11 +60,13 @@ Reglas obligatorias:
 - No romper performance: cada preview ≤ 300ms p95
 - Tenant isolation garantizada
 - Fallback: preview falla / entidad eliminada → chip sigue funcional con tooltip simple (no overlay roto)
+- Usar `GreenhouseFloatingSurface`/floating primitive si el patrón requiere popover rico; no importar `@floating-ui/react` directo en views.
 
 ## Normative Docs
 
 - `docs/tasks/to-do/TASK-442-nexa-mentions-registry-entity-expansion.md`
 - `docs/tasks/to-do/TASK-441-nexa-mentions-resolver-allowlist-sanitization.md`
+- `docs/tasks/to-do/TASK-445-nexa-mentions-a11y-tests-tombstone.md`
 
 ## Dependencies & Impact
 
@@ -97,6 +102,121 @@ Reglas obligatorias:
 - Ningún preview por hover
 - No hay endpoint consolidado de preview
 - Ningún loader parametrizable por tipo
+
+## UI/UX Contract
+
+### Experience brief
+
+- UI rigor: `ui-standard`
+- Usuario / rol: operador que lee un insight y necesita contexto rápido de una entidad.
+- Momento del flujo: hover/focus/tap sobre mention chip antes de decidir navegar.
+- Resultado perceptible esperado: preview breve, estable y accesible que no secuestra el flujo.
+- Friccion que debe reducir: abrir un 360 completo solo para corroborar contexto básico.
+- No-goals UX: dashboard completo, edición, acciones mutativas o reverse index.
+
+### Surface & system decision
+
+- Surface: `NexaMentionChip` en Insights/chat/Home consumers.
+- Composition Shell: `no aplica` — popover contextual.
+- Primitive decision: `extend` — `NexaMentionPreviewCard` consume chip/registry; no crear popover custom paralelo.
+- Adaptive density / The Seam: `no aplica`.
+- Floating/Sidecar/Dialog decision: floating surface/popover en desktop; bottom sheet/drawer ligero en mobile si Plan Mode lo confirma.
+- Copy source: `src/lib/copy/*` para loading/empty/error labels.
+- Access impact: `entitlements` — preview API respeta access del usuario.
+
+### State inventory
+
+- Default: hover/focus abre preview.
+- Loading: skeleton compacto.
+- Empty: preview no disponible con tooltip simple.
+- Error: degraded inline, chip conserva navegación.
+- Degraded / partial: KPIs incompletos con copy honesta.
+- Permission denied: no preview o denied state sin revelar existencia.
+- Long content: card truncada, max width y scroll interno si aplica.
+- Mobile / compact: tap/long press y sheet accesible.
+- Keyboard / focus: Enter/Space abre, Esc cierra, focus trap solo si sheet.
+- Reduced motion: instant/no animation.
+
+### Interaction contract
+
+- Primary interaction: hover ≥400ms o focus/Enter abre preview.
+- Hover / focus / active: anchor claro, no flicker.
+- Pending / disabled: chip disabled no abre preview.
+- Escape / click-away: cierra preview.
+- Focus restore: vuelve al chip.
+- Latency feedback: skeleton hasta 300ms p95 target.
+- Toast / alert behavior: ninguno.
+
+### Motion & microinteractions
+
+- Motion primitive: `CSS|framer layout`
+- Enter / exit: fade/scale tokenizado.
+- Layout morph: no aplica.
+- Stagger: no aplica.
+- Timing / easing token: tokens del floating surface.
+- Reduced-motion fallback: instant.
+- Non-goal motion: tarjetas decorativas pesadas.
+
+### Visual verification
+
+- GVC scenario: insight card con mention hover/focus y preview abierto.
+- Viewports: desktop y mobile 390px.
+- Required captures: loading, ready, degraded/error, mobile sheet.
+- Required `data-capture` markers: chip + preview card.
+- Scroll-width check: page/panel no overflow.
+- Accessibility/focus checks: Esc/click-away/focus restore/aria.
+- Before/after evidence: chip sin preview vs preview.
+- Known visual debt: si se vuelve platform pattern, documentar en UI Platform.
+
+## Backend/Data Contract
+
+### Backend/data brief
+
+- Backend rigor: `backend-standard`
+- Impacto principal: `api`
+- Source of truth afectado: preview readers bajo `src/lib/nexa/mentions/preview/*`.
+- Consumidores afectados: mention chips en UI y future chat/Home surfaces.
+- Runtime target: local + staging + production.
+
+### Contract surface
+
+- Contrato existente a respetar: registry de `TASK-442`.
+- Contrato nuevo o modificado: `GET /api/nexa/mentions/preview/[type]/[id]`.
+- Backward compatibility: `compatible` — chip funciona aunque preview falle.
+- Full API parity: preview consume reader/API; UI no queryea tablas.
+
+### Data model and invariants
+
+- Entidades/tablas/views afectadas: readers canónicos por type.
+- Invariantes que no se pueden romper:
+  - Preview no puede exponer datos fuera del access scope.
+  - Payload debe ser bounded y sin PII/sensitive innecesaria.
+- Tenant/space boundary: sesión + capability + loader tenant-aware.
+- Idempotency/concurrency: read-only con cache/dedupe.
+- Audit/outbox/history: no audit por hover; errores a logs/signal si aplica.
+
+### Migration, backfill and rollout
+
+- Migration posture: `none`
+- Default state: API + UI additive; puede gatearse si la card se activa en muchas surfaces.
+- Backfill plan: N/A.
+- Rollback path: deshabilitar preview client-side o revert PR.
+- External coordination: N/A.
+
+### Security and access
+
+- Auth/access gate: sesión y access checks por type.
+- Sensitive data posture: solo KPIs mínimos; nada de payroll/finance granular sin capability.
+- Error contract: 403/404 anti-oracle y degraded UI.
+- Abuse/rate-limit posture: cache 60s, rate limit por user/IP si endpoint recibe abuso.
+
+### Runtime evidence
+
+- Local checks: tests de loaders/API y component.
+- DB/runtime checks: staging smoke por type V1.
+- Integration checks: preview abre en Insights y chat.
+- Reliability signals/logs: preview failure/error rate si se agrega.
+- Production verification sequence: staging GVC → prod deploy → monitor endpoint errors.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -192,6 +312,45 @@ Reglas obligatorias:
 - Cache TTL: 60s
 - p95 server: ≤ 300ms
 - Animación open: 120ms ease-out
+
+## Rollout Plan & Risk Matrix
+
+### Slice ordering hard rule
+
+- Slice 1 (preview API) -> Slice 2 (loaders) -> Slice 3 (card) -> Slice 4 (chip integration) -> Slice 5/6 (cache + a11y).
+- UI preview no se activa hasta que API devuelva anti-oracle/permission-safe payloads.
+
+### Risk matrix
+
+| Riesgo | Sistema | Probabilidad | Mitigation | Signal de alerta |
+|---|---|---|---|---|
+| Preview filtra KPIs no autorizados | API/security | medium | capability-aware loaders + tests por rol | 403/security logs |
+| Hover genera demasiadas requests | API/performance | medium | delay, SWR cache, dedupe | endpoint p95/error rate |
+| Popover tapa contenido o falla mobile | UI | medium | GVC desktop/mobile + bottom sheet decision | GVC finding |
+
+### Feature flags / cutover
+
+- Recomendado: flag de presentación `NEXA_MENTION_PREVIEW_ENABLED=false` hasta staging GVC.
+- API puede desplegarse sin UI si queda access-gated.
+
+### Rollback plan per slice
+
+| Slice | Rollback | Tiempo | Reversible? |
+|---|---|---|---|
+| Slice 1-2 | endpoint queda unused o revert route | <15 min | si |
+| Slice 3-4 | flag off / revert chip preview wrapper | <15 min | si |
+| Slice 5-6 | revert cache/a11y refinements | <15 min | si |
+
+### Production verification sequence
+
+1. API tests por type/role en local.
+2. Staging smoke de preview allowed/denied.
+3. GVC desktop/mobile con preview abierto.
+4. Prod flag on gradual y monitoreo de p95/error rate.
+
+### Out-of-band coordination required
+
+N/A — repo/API only.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 4 — VERIFICATION & CLOSING

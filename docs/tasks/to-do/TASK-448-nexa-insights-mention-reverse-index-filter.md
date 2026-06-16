@@ -11,9 +11,12 @@
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
+- Execution profile: `backend-data`
+- UI impact: `flow`
+- Backend impact: `migration`
 - Status real: `Diseno`
 - Rank: `TBD`
-- Domain: `agency`
+- Domain: `nexa|agency|db|api|ui`
 - Blocked by: `TASK-441`
 - Branch: `task/TASK-448-nexa-insights-mention-reverse-index-filter`
 - Legacy ID: `none`
@@ -61,12 +64,14 @@ Reglas obligatorias:
 - Index tenant-aware
 - Lecturas respetan RBAC + `authorizedViews`
 - Recompute idempotente para poder reprocesar enrichment sin duplicar
+- Backfill histórico debe partir en dry-run y allowlist; no aplicar producción sin smoke staging.
 
 ## Normative Docs
 
 - `docs/tasks/to-do/TASK-441-nexa-mentions-resolver-allowlist-sanitization.md`
 - `docs/tasks/complete/TASK-242-nexa-insights-space-360.md`
 - `docs/tasks/complete/TASK-243-nexa-insights-person-360.md`
+- `docs/tasks/to-do/TASK-1150-nexa-attach-current-page-context.md`
 
 ## Dependencies & Impact
 
@@ -106,6 +111,121 @@ Reglas obligatorias:
 - Filtro por entidad en el feed no existe
 - Tabs 360 muestran insights del contexto directo, no insights donde la entidad aparece mencionada
 - No hay métrica de entity salience
+
+## UI/UX Contract
+
+### Experience brief
+
+- UI rigor: `ui-standard`
+- Usuario / rol: operador que investiga una entidad desde Insights, Space 360 o Person 360.
+- Momento del flujo: filtrar feed o abrir tab "Nexa menciona".
+- Resultado perceptible esperado: ver insights donde la entidad aparece mencionada sin leer todo el feed.
+- Friccion que debe reducir: búsqueda manual de menciones en narrativas.
+- No-goals UX: rediseñar Insight detail, hover previews o acciones mutativas.
+
+### Surface & system decision
+
+- Surface: `NexaInsightsBlock`, Space 360, Person 360 y endpoint de feed.
+- Composition Shell: `aplica` si se crea/ajusta una vista nueva de tab/flow; usar shell vigente de la surface.
+- Primitive decision: `reuse` — chips/filter/tabs existentes; no crear nueva familia de cards.
+- Adaptive density / The Seam: `aplica` si se agregan cards en regiones variables.
+- Floating/Sidecar/Dialog decision: no aplica.
+- Copy source: `src/lib/copy/*` para filtros, empty states y tab labels.
+- Access impact: `views|entitlements` — feed filtrado respeta acceso de la entidad y de los insights.
+
+### State inventory
+
+- Default: feed sin filtro.
+- Loading: skeleton/estado local del feed.
+- Empty: "Nexa no ha mencionado esta entidad..." positivo/honesto.
+- Error: degraded state con retry.
+- Degraded / partial: backfill incompleto se declara en UI o se oculta filtro hasta ready.
+- Permission denied: no mostrar tab/filtro si no hay access.
+- Long content: cards existentes con clamp.
+- Mobile / compact: filter chip wrap-safe.
+- Keyboard / focus: tab/filtro accesible.
+- Reduced motion: sin motion nueva.
+
+### Interaction contract
+
+- Primary interaction: seleccionar entidad/filtro o abrir tab 360.
+- Hover / focus / active: chips/tabs existentes.
+- Pending / disabled: filtro disabled si index no listo.
+- Escape / click-away: no aplica.
+- Focus restore: navegación normal.
+- Latency feedback: loading de feed.
+- Toast / alert behavior: errores inline, no toast.
+
+### Motion & microinteractions
+
+- Motion primitive: `none`
+- Enter / exit: no aplica salvo surface existente.
+- Layout morph: seguir primitive/shell si aplica.
+- Stagger: no aplica.
+- Timing / easing token: no aplica.
+- Reduced-motion fallback: no aplica.
+- Non-goal motion: animaciones decorativas.
+
+### Visual verification
+
+- GVC scenario: feed filtrado por entidad + tab 360.
+- Viewports: desktop y mobile 390px.
+- Required captures: ready, empty, degraded, permission/hidden si aplica.
+- Required `data-capture` markers: feed/filter/tab.
+- Scroll-width check: desktop/mobile.
+- Accessibility/focus checks: tab order y chip remove.
+- Before/after evidence: feed general vs filtrado.
+- Known visual debt: entity salience puede quedar fuera de MVP.
+
+## Backend/Data Contract
+
+### Backend/data brief
+
+- Backend rigor: `backend-critical`
+- Impacto principal: `migration`
+- Source of truth afectado: `greenhouse_core.nexa_insight_mentions`, enrichment writer, insights reader/API.
+- Consumidores afectados: API feed, UI Insights, Space 360, Person 360, future push/briefing.
+- Runtime target: staging + production DB.
+
+### Contract surface
+
+- Contrato existente a respetar: resolver output de `TASK-441`, insight readers vigentes.
+- Contrato nuevo o modificado: table/index, writer `insertMentionIndex`, `GET /api/nexa/insights?mentionedEntityId=...`.
+- Backward compatibility: `compatible` — feeds existentes siguen funcionando sin filtro.
+- Full API parity: UI consume reader/API; no query directa a table desde views.
+
+### Data model and invariants
+
+- Entidades/tablas/views afectadas: `greenhouse_core.nexa_insight_mentions`, enrichment/source tables.
+- Invariantes que no se pueden romper:
+  - Una fila del index siempre queda tenant-scoped y ligada a insight/enrichment existente.
+  - Reprocesar un insight borra/reinserta su set sin duplicados.
+- Tenant/space boundary: `tenant_id` + subject-aware filters en reader.
+- Idempotency/concurrency: unique key por `tenant_id + insight_id + field + mention_type + entity_id`; writer transaccional.
+- Audit/outbox/history: tabla index no reemplaza history; backfill deja reporte/versionado.
+
+### Migration, backfill and rollout
+
+- Migration posture: `additive|backfill`
+- Default state: reader puede ignorar index hasta que backfill/staging smoke estén listos.
+- Backfill plan: dry-run, sample allowlist, staging apply, production batched apply con resume.
+- Rollback path: disable reader filter / revert code; table aditiva puede quedar; backfill reversible por delete scoped si necesario.
+- External coordination: N/A, salvo aviso a operadores si aparece nuevo tab/filtro.
+
+### Security and access
+
+- Auth/access gate: session/capability/view gate del feed existente.
+- Sensitive data posture: menciones a entidades y insight ids; no payload narrativo adicional en index.
+- Error contract: canonical errors/degraded UI; no raw SQL.
+- Abuse/rate-limit posture: endpoint feed usa paginación/caps existentes.
+
+### Runtime evidence
+
+- Local checks: tests writer/reader/API.
+- DB/runtime checks: migration verify, dry-run count, sample query.
+- Integration checks: staging backfill sample + UI filter.
+- Reliability signals/logs: backfill report, query latency, index count drift.
+- Production verification sequence: migrate staging → dry-run → apply sample → UI smoke → migrate prod → backfill batched → monitor.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -209,6 +329,48 @@ LIMIT 50;
 2. Antes del commit del enrichment: `insertMentionIndex(enrichmentId, mentions, field)`
 3. Transaction commit
 4. En caso de reprocessamiento: `DELETE FROM nexa_insight_mentions WHERE insight_id = $1` + re-insert
+
+## Rollout Plan & Risk Matrix
+
+### Slice ordering hard rule
+
+- Slice 1 (migration) -> Slice 2 (writer) -> Slice 3 (reader API) -> Slice 4/5 (UI filters/tabs) -> Slice 6 (backfill) -> Slice 7 (salience optional).
+- Backfill histórico no corre en producción antes de staging dry-run + sample apply.
+- UI no muestra filtros/tabs si el index no tiene datos o si el reader está disabled.
+
+### Risk matrix
+
+| Riesgo | Sistema | Probabilidad | Mitigation | Signal de alerta |
+|---|---|---|---|---|
+| Backfill duplica o contamina index | DB/backfill | medium | unique key + delete/reinsert scoped + dry-run | count drift |
+| Reader filtra insights fuera de access scope | API/security | medium | subject-aware filters + tests | security logs/403 |
+| Query por entidad degrada performance | DB/API | medium | indexes tenant/entity/time + limit/pagination | p95 latency |
+
+### Feature flags / cutover
+
+- Reader/filter UI debe poder quedar disabled hasta que migration/backfill estén verificados.
+- Backfill script requiere `--dry-run` default y `--apply` explícito.
+
+### Rollback plan per slice
+
+| Slice | Rollback | Tiempo | Reversible? |
+|---|---|---|---|
+| Slice 1 | tabla aditiva queda sin uso o reverse migration si staging | <30 min | si |
+| Slice 2-3 | disable writer/reader flag or revert PR | <30 min | si |
+| Slice 4-5 | hide UI filter/tabs | <15 min | si |
+| Slice 6 | delete scoped backfill batch by run id/report | variable | parcial |
+
+### Production verification sequence
+
+1. Migration staging + verify indexes.
+2. Backfill dry-run staging; compare expected counts.
+3. Apply staging allowlist; query by entity and UI smoke.
+4. Deploy prod with UI disabled; run prod dry-run.
+5. Apply prod backfill in batches; enable UI after count/latency checks.
+
+### Out-of-band coordination required
+
+Avisar a operadores si aparece un nuevo tab/filtro visible en Space/Person 360; no requiere plataforma externa.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 4 — VERIFICATION & CLOSING

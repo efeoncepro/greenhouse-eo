@@ -11,9 +11,12 @@
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
+- Execution profile: `backend-data`
+- UI impact: `interaction`
+- Backend impact: `reader`
 - Status real: `Diseno`
 - Rank: `TBD`
-- Domain: `agency`
+- Domain: `nexa|agency|ai|ui|reader`
 - Blocked by: `TASK-441`
 - Branch: `task/TASK-442-nexa-mentions-registry-entity-expansion`
 - Legacy ID: `none`
@@ -53,18 +56,21 @@ Revisar y respetar:
 - `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md`
 - `docs/architecture/GREENHOUSE_BUSINESS_LINES_ARCHITECTURE_V1.md`
 - `docs/architecture/GREENHOUSE_PERSON_ORGANIZATION_MODEL_V1.md`
+- `docs/architecture/GREENHOUSE_MENTION_SYSTEM_V1.md`
 
 Reglas obligatorias:
 
 - Los tipos del registry respetan el modelo 360 canónico (no crear identidades paralelas)
-- Cada entidad se resuelve contra su tabla canónica (`greenhouse.clients`, `greenhouse_core.providers`, etc.)
+- Cada entidad se resuelve contra su tabla/reader canónico confirmado durante Discovery; si la tabla/ruta no existe, el tipo queda `navigable: false` o fuera de V1.
 - Un tipo con ruta aún no disponible se declara `navigable: false` (no se emite chip inert en UI — cae a texto)
 - Prompt instruction se genera desde el registry → cambio de tipos no requiere editar el prompt a mano
+- El registry no debe duplicar el contexto automático de `TASK-1150`: mentions son referencias explícitas del texto, `attachedContext` es contexto de turno.
 
 ## Normative Docs
 
 - `docs/tasks/to-do/TASK-441-nexa-mentions-resolver-allowlist-sanitization.md`
-- `docs/tasks/in-progress/TASK-440-nexa-project-label-resolution.md`
+- `docs/tasks/complete/TASK-440-nexa-project-label-resolution.md`
+- `docs/tasks/to-do/TASK-1150-nexa-attach-current-page-context.md`
 
 ## Dependencies & Impact
 
@@ -99,8 +105,7 @@ Reglas obligatorias:
 - Rutas existentes:
   - `/people/[memberId]`
   - `/agency/spaces/[id]`
-  - `/admin/providers/[id]` (verificar existencia)
-  - `/admin/clients/[id]` (verificar)
+  - rutas de provider/client/project deben confirmarse en Discovery antes de declararse `navigable: true`
   - `/agency` con tab ICO (anchor a anomaly posible)
 - Registry patterns en `src/config/` y `src/lib/*/registry.ts` ya se usan en Finance Metric Registry
 
@@ -110,6 +115,121 @@ Reglas obligatorias:
 - No existe `href` para `project`, `provider`, `client`, `business_line`, etc. en el contexto de menciones
 - Prompt instruction hardcoded en `llm-types.ts` — no refleja nuevos tipos
 - Icons y colores por tipo dispersos entre files
+
+## UI/UX Contract
+
+### Experience brief
+
+- UI rigor: `ui-standard`
+- Usuario / rol: usuarios que leen o navegan menciones en Insights, digest, chat y futuras superficies Nexa.
+- Momento del flujo: lectura de entidad mencionada y decisión de abrir contexto.
+- Resultado perceptible esperado: todos los tipos renderizan con tratamiento coherente, y los no navegables no prometen click.
+- Friccion que debe reducir: tipos inconsistentes entre UI/email/prompt y chips que parecen clickeables pero no tienen destino.
+- No-goals UX: autocomplete, hover preview y reverse index.
+
+### Surface & system decision
+
+- Surface: `NexaMentionText`, email digest y futuros renderers del chat.
+- Composition Shell: `no aplica` — renderer inline.
+- Primitive decision: `extend` — registry alimenta `NexaMentionText`/`NexaMentionChip`; no crear familias paralelas.
+- Adaptive density / The Seam: `no aplica`.
+- Floating/Sidecar/Dialog decision: no aplica.
+- Copy source: labels/tooltips en `src/lib/copy/*`; nomenclatura institucional solo si el tipo es producto/navegación.
+- Access impact: `entitlements` indirecto — cada href debe respetar el gate de su route.
+
+### State inventory
+
+- Default: tipo navegable con icono/label/href.
+- Loading: no aplica al render; loaders corren server-side para resolver.
+- Empty: sin mention → texto normal.
+- Error: tipo desconocido o loader falla → degradación a texto/tipo no navegable.
+- Degraded / partial: `navigable: false` con tooltip honesto.
+- Permission denied: no generar href si el tipo/destino no es visible para el sujeto.
+- Long content: nombre truncado/wrap-safe.
+- Mobile / compact: chips inline wrap-safe.
+- Keyboard / focus: solo tipos navegables son tab-focus.
+- Reduced motion: no motion.
+
+### Interaction contract
+
+- Primary interaction: click/Enter en chip navegable abre destino.
+- Hover / focus / active: feedback MUI consistente por chip.
+- Pending / disabled: tipos no navegables disabled/outlined.
+- Escape / click-away: no aplica.
+- Focus restore: navegación normal.
+- Latency feedback: no aplica.
+- Toast / alert behavior: ninguno.
+
+### Motion & microinteractions
+
+- Motion primitive: `none`
+- Enter / exit: no aplica.
+- Layout morph: no aplica.
+- Stagger: no aplica.
+- Timing / easing token: no aplica.
+- Reduced-motion fallback: no aplica.
+- Non-goal motion: hover cards quedan en `TASK-447`.
+
+### Visual verification
+
+- GVC scenario: fixture/lab o ruta con mentions de al menos 4 tipos.
+- Viewports: desktop y mobile 390px.
+- Required captures: navegable, no navegable, tipo desconocido, nombre largo.
+- Required `data-capture` markers: marker estable en el bloque/lab usado.
+- Scroll-width check: desktop y mobile.
+- Accessibility/focus checks: tab order solo chips navegables, aria-label por tipo.
+- Before/after evidence: captura comparativa de tipos.
+- Known visual debt: preview cards y autocomplete son tasks separadas.
+
+## Backend/Data Contract
+
+### Backend/data brief
+
+- Backend rigor: `backend-standard`
+- Impacto principal: `reader`
+- Source of truth afectado: registry `src/lib/nexa/mentions/registry.ts` + loaders canónicos por tipo.
+- Consumidores afectados: resolver, UI, email digest, prompt builder, future autocomplete.
+- Runtime target: local + staging + production.
+
+### Contract surface
+
+- Contrato existente a respetar: `@[Nombre](type:ID)` y `resolveNexaMentions()` de `TASK-441`.
+- Contrato nuevo o modificado: `MentionRegistryEntry`, loaders por tipo, prompt instruction generada.
+- Backward compatibility: `compatible` — `member|space|project` siguen existiendo.
+- Full API parity: UI/email/prompt consumen registry/helper compartido; no tablas/hrefs hardcodeados por surface.
+
+### Data model and invariants
+
+- Entidades/tablas/views afectadas: readers/tablas canónicas de member, space, project, client, provider y tipos aprobados.
+- Invariantes que no se pueden romper:
+  - Un tipo no confirmado como navegable no puede renderizar href.
+  - El prompt no puede instruir al LLM a emitir tipos que el resolver no valida.
+- Tenant/space boundary: cada loader recibe tenant/session context server-side.
+- Idempotency/concurrency: loaders read-only; sin writes.
+- Audit/outbox/history: usa eventos de `TASK-441`; registry no escribe audit.
+
+### Migration, backfill and rollout
+
+- Migration posture: `none`
+- Default state: registry se adopta behind-code, sin flag; tipos nuevos pueden habilitarse por allowlist interna.
+- Backfill plan: N/A — no muta datos.
+- Rollback path: revert PR; mantener parser legacy si falla registry.
+- External coordination: N/A — repo-only.
+
+### Security and access
+
+- Auth/access gate: loaders server-side con tenant/session/capability cuando aplique.
+- Sensitive data posture: metadata mínima de entidades; no incluir datos financieros/payroll crudos en labels.
+- Error contract: loader failure degrada a no navegable/texto, sin raw errors.
+- Abuse/rate-limit posture: no endpoint nuevo en esta task; futuros search/preview quedan en tasks propias.
+
+### Runtime evidence
+
+- Local checks: tests de registry, loaders mockeados y prompt instruction.
+- DB/runtime checks: smoke read-only para tipos V1 confirmados en staging.
+- Integration checks: render de UI/email usando registry.
+- Reliability signals/logs: N/A; usa telemetría de `TASK-441`.
+- Production verification sequence: staging smoke con tipos confirmados → deploy → grep/runtime check de ausencia de configs paralelas.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -215,6 +335,46 @@ Formato de menciones (obligatorio cuando refieras a entidades con ID):
 ...
 Si no tienes el ID de una entidad, menciona solo el nombre sin formato de mención.
 ```
+
+## Rollout Plan & Risk Matrix
+
+### Slice ordering hard rule
+
+- Slice 1 (registry contract) -> Slice 2 (loaders) -> Slice 3 (resolver consumes registry) -> Slice 4/5 (UI/email) -> Slice 6 (prompt instruction) -> Slice 7 (navigability decisions).
+- No agregar un tipo al prompt si el resolver no lo valida.
+- No marcar un tipo `navigable: true` sin ruta y access pattern confirmado.
+
+### Risk matrix
+
+| Riesgo | Sistema | Probabilidad | Mitigation | Signal de alerta |
+|---|---|---|---|---|
+| Prompt instruye tipos que el resolver no soporta | AI/API | medium | test contract registry -> prompt -> resolver | doc/test failure |
+| Href de tipo nuevo revela entidad sin access | identity/UI | medium | loaders/access-aware href, navigable false por defecto | 403/404 spikes |
+| Registry se vuelve un cajón de tipos sin owners | platform | low | owner por entry + docs | review/task gate |
+
+### Feature flags / cutover
+
+- Sin flag para el registry base.
+- Tipos nuevos pueden habilitarse en allowlist interna del registry por dominio hasta validar rutas/access.
+
+### Rollback plan per slice
+
+| Slice | Rollback | Tiempo | Reversible? |
+|---|---|---|---|
+| Slice 1-2 | revert registry/loaders | <30 min | si |
+| Slice 3-6 | revert consumers a configs legacy | <30 min | si |
+| Slice 7 | cambiar `navigable=false` para tipos dudosos | <10 min | si |
+
+### Production verification sequence
+
+1. Tests de registry y prompt instruction en local.
+2. Staging smoke con `member`, `space`, `project` y dos tipos nuevos confirmados.
+3. Verificar UI/email no tienen configs paralelas con grep.
+4. Deploy prod y revisar logs de resolver por tipo 24h.
+
+### Out-of-band coordination required
+
+N/A — repo-only/readers internos.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 4 — VERIFICATION & CLOSING

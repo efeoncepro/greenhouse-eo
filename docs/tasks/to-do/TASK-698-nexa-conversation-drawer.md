@@ -1,5 +1,19 @@
 # TASK-698 — Nexa Conversation Drawer (cierre del Hero AI)
 
+## Delta 2026-06-16 — Legacy/reference, no ejecutar tal cual
+
+Esta spec quedó superada por el runtime conversacional vigente: `NexaFloatingButton` + `NexaFloatingPanel` + `NexaThread` compartido en `src/views/greenhouse/home/components/` y endpoint único `/api/home/nexa`. No debe ejecutarse como creación de un drawer nuevo, endpoint `/api/ai/nexa/chat`, tabla `nexa_conversation_turns` o runtime paralelo.
+
+Si se reactiva esta intención, primero debe convertirse en un refresh/supersedence plan que:
+
+- preserve el floating rico actual y el retiro del adapter legacy definido en `TASK-1150`;
+- re-use `/api/home/nexa`, `useNexaPersistentRuntime`, `NexaThread`, `NexaToolRenderers` y la persistencia/telemetría existente;
+- mueva el handoff `?nexa=<prompt>` del Hero hacia el floating/panel vigente, no hacia un drawer paralelo;
+- delegue `@mentions live` al paquete `TASK-441` a `TASK-445` + `TASK-447`/`448`;
+- no introduzca un segundo sistema de capabilities, audit table, reliability module o provider dispatcher para Nexa.
+
+Mientras exista este delta, `TASK-698` funciona como referencia histórica de UX/intent, no como task ejecutable directa.
+
 ## Status
 
 - Lifecycle: `to-do`
@@ -7,15 +21,17 @@
 - Impact: `Alto`
 - Effort: `Medio` (~2 semanas, 1 dev senior)
 - Type: `implementation`
-- Status real: `Diseño cerrado, listo para Slice 1`
+- Status real: `Referencia legacy; requiere refresh/supersedence antes de ejecutar`
 - Rank: `TBD`
 - Domain: `platform / ai-tooling`
-- Blocked by: `none` (Vertex AI wiring necesario en Slice 2 — provisionable en paralelo a Slice 1)
+- Blocked by: `TASK-1150` + refresh contra runtime Nexa vigente
 - Branch: `task/TASK-698-nexa-conversation-drawer`
 
 ## Summary
 
 Cerrar el flow del Hero AI del Smart Home v2 (TASK-696) con un **right drawer overlay** que monta el chat real de Nexa al despachar la prompt. Hoy el composer del Hero hace `router.push('/home?nexa=<text>')` pero **nadie escucha el searchParam** — la prompt queda flotando en la URL y el user no recibe respuesta. El drawer cierra el loop manteniendo el contexto del Home (Pulse / Runway / Inbox visibles detrás), patrón Linear AI / Notion AI / Vercel v0.
+
+Nota vigente: el "chat real de Nexa" ya no debe nacer como drawer/endpoint nuevo. El cierre del loop debe reusar el floating/panel actual y el contrato de contexto de `TASK-1150`.
 
 ## Why This Task Exists
 
@@ -49,10 +65,12 @@ Revisar y respetar:
 - `docs/architecture/GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md` — versioned contracts
 - `docs/architecture/GREENHOUSE_RELIABILITY_CONTROL_PLANE_V1.md` — registrar módulo `ai.nexa`
 - `src/lib/home/registry.ts` — patrón composer + capability gate (TASK-696 Wave 6)
+- `docs/tasks/to-do/TASK-1150-nexa-attach-current-page-context.md` — contrato vigente para composer + contexto de página
 
 Reglas obligatorias:
 
 - Contract versionado `nexa-chat.v1` (additive, non-breaking)
+- Si esta task se reescribe, el contrato debe converger con `/api/home/nexa`; no crear `nexa-chat.v1` paralelo sin ADR.
 - Capability gate server-side antes de invocar Vertex AI
 - Tool registry per role bound a `entitlements`, NO a route groups
 - Streaming SSE con `Vary: x-tenant-id`
@@ -78,6 +96,8 @@ Reglas obligatorias:
 ### Files owned
 
 **NUEVOS**:
+
+Advertencia 2026-06-16: la lista siguiente es histórica. No crear estos módulos tal cual sin refresh; varios competirían con el runtime actual.
 
 - `src/components/greenhouse/nexa/NexaConversationDrawer.tsx` — surface
 - `src/components/greenhouse/nexa/NexaThread.tsx` — `<Thread>` wrapper sobre assistant-ui
@@ -119,13 +139,9 @@ Reglas obligatorias:
 
 ### Gap
 
-- Hero AI no tiene receiver del searchParam (causa raíz del bug "no se envía")
-- No existe `NexaConversationDrawer` ni surface conversacional
-- No existe endpoint `/api/ai/nexa/chat` con streaming
-- No existe tool registry tipado role-aware
-- No existe capability `home.nexa.chat` ni binding
-- No existe tabla `nexa_conversation_turns` para audit
-- No existe módulo `ai.nexa` en Reliability registry
+- Gap válido: el Hero/searchParam debe handoffear al runtime conversacional vigente.
+- Gap obsoleto: no crear `NexaConversationDrawer`, `/api/ai/nexa/chat`, `home.nexa.chat`, `nexa_conversation_turns` ni módulo `ai.nexa` como caminos paralelos sin ADR/refresh.
+- Gap relacionado: `@mentions live` pertenece al paquete formal `TASK-441` a `TASK-445`, `TASK-447` y `TASK-448`.
 
 ## Scope
 
