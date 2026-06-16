@@ -1,0 +1,73 @@
+name: Nexa Knowledge QA nightly
+
+# TASK-1127 — regresión nocturna de la calidad de respuesta de Nexa Knowledge contra
+# STAGING (provider real: auto-router → Claude). Reusa la QA matrix gobernada
+# (scripts/nexa-knowledge-qa-matrix.mjs). Es `tooling` per
+# GREENHOUSE_VERCEL_CRON_CLASSIFICATION_V1.md (NO async-critical, NO Vercel cron):
+# corre en GitHub Actions, no alimenta ningún pipeline async ni proyección.
+#
+# El umbral (--min-pass) tolera la flakiness conocida del LLM (tool-routing K4/G1/K7)
+# para no volverse ruidoso (lección del production-release-watchdog) — pero si varios
+# casos core caen, el job FALLA y eso es la alerta honesta.
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Nocturno, fuera del loop de iteración humana (09:30 UTC ≈ 05:30 America/Santiago).
+    - cron: '30 9 * * *'
+
+concurrency:
+  group: nexa-knowledge-qa-nightly
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  qa-matrix:
+    name: QA matrix contra staging
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      CI: true
+      NEXT_TELEMETRY_DISABLED: 1
+      AGENT_AUTH_SECRET: ${{ secrets.AGENT_AUTH_SECRET }}
+      AGENT_AUTH_EMAIL: ${{ secrets.AGENT_AUTH_EMAIL || 'agent@greenhouse.efeonce.org' }}
+      VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
+      STAGING_URL: ${{ secrets.STAGING_URL }}
+    steps:
+      - name: Guard — require staging auth secrets
+        run: |
+          if [ -z "$AGENT_AUTH_SECRET" ]; then
+            echo "::warning::AGENT_AUTH_SECRET missing. Skipping Nexa Knowledge QA nightly."
+            echo "skip_run=true" >> "$GITHUB_ENV"
+            exit 0
+          fi
+          if [ -z "$VERCEL_AUTOMATION_BYPASS_SECRET" ]; then
+            echo "::warning::VERCEL_AUTOMATION_BYPASS_SECRET missing. Skipping Nexa Knowledge QA nightly."
+            echo "skip_run=true" >> "$GITHUB_ENV"
+            exit 0
+          fi
+
+      - name: Checkout
+        if: env.skip_run != 'true'
+        uses: actions/checkout@v5
+
+      - name: Setup pnpm
+        if: env.skip_run != 'true'
+        uses: pnpm/action-setup@v6
+
+      - name: Setup Node 24
+        if: env.skip_run != 'true'
+        uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+          cache: pnpm
+
+      - name: Install dependencies
+        if: env.skip_run != 'true'
+        run: pnpm install --frozen-lockfile
+
+      - name: Run Nexa Knowledge QA matrix (staging, threshold 9/12)
+        if: env.skip_run != 'true'
+        run: pnpm qa:nexa-knowledge -- --env=staging --min-pass=9

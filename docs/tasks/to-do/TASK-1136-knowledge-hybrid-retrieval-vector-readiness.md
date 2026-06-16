@@ -1,5 +1,14 @@
 # TASK-1136 — Knowledge hybrid retrieval evaluation + vector readiness
 
+## Delta 2026-06-16
+
+- **Dependencia desbloqueada — TASK-1127 (complete).** El baseline de calidad que esta task necesita ya
+  existe: las golden questions se ampliaron con casos **wrong-source** (`expectFirstTitleIncludes`: el doc
+  específico debe rankear primero) y **cross-document** (`expectDistinctDocumentsAtLeast`: ≥2 documentos
+  distintos), validados 45/45 contra el corpus real, más un **nightly** de la QA matrix contra staging
+  (`nexa-knowledge-qa-nightly.yml`). Eso es la **regresión del retrieval FTS+rerank actual** contra la cual
+  TASK-1136 debe medir si vector/híbrido mejora. `Blocked by` puede cambiarse de `TASK-1127` a `none`.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->

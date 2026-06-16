@@ -1,5 +1,17 @@
 # Release 2026-06-10 #2 — develop→main `6c649b2a6` RELEASED
 
+## Sesión 2026-06-16 — TASK-1127 Nexa Knowledge QA nightly + baseline ampliado — Claude
+
+> **Estado:** **complete** en `develop` (local-first). Slice 1 validado local (45/45). El nightly se confirma al disparar `workflow_dispatch` post-push; el K6 en Anthropic se confirma al desplegar staging. **Desbloquea TASK-1136.**
+
+- **Por qué:** el usuario quería TASK-1136 (retrieval vector) pero está bloqueada por TASK-1127 (el baseline de evaluación para poder medir si el vector mejora). Eligió hacer TASK-1127 primero.
+- **Slice 1 (baseline, desbloquea 1136):** `KnowledgeGoldenQuestion` + `expectFirstTitleIncludes` (wrong-source: el doc específico rankea primero) + `expectDistinctDocumentsAtLeast` (cross-doc: ≥2 docs). 5 casos nuevos, **45/45 live verdes** contra el corpus real (necesité re-autenticar la ADC de gcloud — había vencido, `invalid_rapt`).
+- **Slice 2 (nightly):** `nexa-knowledge-qa-nightly.yml` (schedule + dispatch + skip honesto) + flag `--min-pass` en el QA matrix (umbral que tolera flakiness de routing sin volverse ruidoso — lección del watchdog). Es `tooling`.
+- **Bonus (el nightly probó su valor):** detectó que **K6 fallaba en staging** — el fix de TASK-1140 (maxOutputTokens) solo cubría Gemini (local); el provider Anthropic truncaba a 700 tokens. Subido a 1024 (`TURN_MAX_TOKENS`).
+- **Archivos:** `golden-questions.ts` (+test +live test), `scripts/nexa-knowledge-qa-matrix.mjs` (flag), `.github/workflows/nexa-knowledge-qa-nightly.yml` (nuevo), `src/lib/nexa/providers/anthropic.ts` (max_tokens), docs de capa nexa-intelligence.
+- **Pendiente post-push:** disparar el nightly (`gh workflow run nexa-knowledge-qa-nightly.yml`) para verificar end-to-end + confirmar K6 en staging tras el redeploy.
+- **TASK-1136** ya tiene su Delta (dependencia desbloqueada). Sin migración / capability / signal nuevo.
+
 ## Sesión 2026-06-15 — TASK-1140 Manuales operativos → corpus Knowledge/Nexa — Claude
 
 > **Estado:** **complete** en `develop` (local-first, sin push). Ingesta aplicada a **dev/staging** (`greenhouse-pg-dev`). **Producción sin cambios** (gateada).

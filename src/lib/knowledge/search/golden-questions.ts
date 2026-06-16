@@ -28,6 +28,18 @@ export interface KnowledgeGoldenQuestion {
   expectMinConfidence?: KnowledgeSearchConfidence
   /** deniedOrFilteredCount >= n (escalación sensible en modo agentic). */
   expectDeniedAtLeast?: number
+  /**
+   * Wrong-source / rerank: el PRIMER chunk (top tras el rerank) tiene este substring en el
+   * título. Regresión real del rerank — el doc correcto debe ganarle a un distractor genérico
+   * que matcheó por ruido del cuerpo (TASK-1127).
+   */
+  expectFirstTitleIncludes?: string
+  /**
+   * Cross-document synthesis: el packet trae al menos N documentos DISTINTOS (por `documentId`).
+   * Regresión de la diversidad del rerank — una respuesta que requiere cruzar ≥2 manuales no
+   * debe quedar monopolizada por un solo documento (TASK-1127).
+   */
+  expectDistinctDocumentsAtLeast?: number
 }
 
 export const KNOWLEDGE_CONFIDENCE_RANK: Record<KnowledgeSearchConfidence, number> = {
@@ -403,6 +415,60 @@ export const KNOWLEDGE_GOLDEN_QUESTIONS: KnowledgeGoldenQuestion[] = [
     query: '¿qué administra el Admin Center?',
     mode: 'agentic',
     expectAnyTitleIncludes: 'Admin Center',
+    expectMinConfidence: 'low'
+  },
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // TASK-1127 — baseline de evaluación para el retrieval (desbloquea TASK-1136).
+  // Dos clases que el set anterior no cubría: WRONG-SOURCE (el rerank debe poner el
+  // doc específico PRIMERO, no un end-to-end genérico que matcheó por ruido) y
+  // CROSS-DOCUMENT (una respuesta que cruza ≥2 manuales debe traer ≥2 docs distintos).
+  // ─────────────────────────────────────────────────────────────────────────
+
+  // ── Wrong-source (rerank: el específico gana al genérico) ─────────────────
+  {
+    id: 'wrong-source-conciliacion',
+    description: 'Wrong-source: un doc específico de conciliación debe rankear primero, no el end-to-end genérico de Finance.',
+    query: '¿cuáles son los pasos de la conciliación bancaria?',
+    mode: 'human',
+    // El rerank debe poner un doc de conciliación (específico) primero, no "Operación de
+    // Finance end-to-end" (genérico que menciona conciliación de paso). Substring del tema,
+    // no un título exacto — varios docs de conciliación son respuesta válida.
+    expectFirstTitleIncludes: 'onciliación',
+    expectMinConfidence: 'medium'
+  },
+  {
+    id: 'wrong-source-finiquito',
+    description: 'Wrong-source: un finiquito específico debe ganarle al People/Workforce/Payroll end-to-end.',
+    query: '¿cómo se calcula y emite un finiquito en Chile?',
+    mode: 'human',
+    expectFirstTitleIncludes: 'Finiquitos',
+    expectMinConfidence: 'medium'
+  },
+  {
+    id: 'wrong-source-reliquidacion',
+    description: 'Wrong-source: una reliquidación específica debe ganarle al People/Workforce/Payroll end-to-end genérico.',
+    query: '¿cómo hago una reliquidación de nómina?',
+    mode: 'human',
+    expectFirstTitleIncludes: 'Reliquidación',
+    expectMinConfidence: 'medium'
+  },
+
+  // ── Cross-document synthesis (≥2 documentos distintos) ────────────────────
+  {
+    id: 'cross-doc-contractor-pago',
+    description: 'Cross-doc: el pago de un contractor cruza HR (engagement) + Finance (pago) → ≥2 docs distintos.',
+    query: '¿cómo se paga a un contractor desde el engagement hasta que el banco se rebaja?',
+    mode: 'agentic',
+    expectDistinctDocumentsAtLeast: 2,
+    expectMinConfidence: 'low'
+  },
+  {
+    id: 'cross-doc-ingreso-pnl',
+    description: 'Cross-doc: registrar un ingreso + cómo llega al P&L cruza ≥2 manuales de Finance.',
+    query: '¿cómo registro un ingreso y cómo se refleja después en el P&L operativo?',
+    mode: 'agentic',
+    expectDistinctDocumentsAtLeast: 2,
     expectMinConfidence: 'low'
   }
 ]

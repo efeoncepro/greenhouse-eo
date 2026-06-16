@@ -32,7 +32,12 @@ import { executeNexaTool, getNexaToolDeclarations } from '../nexa-tools'
  * SÍ se incluye (es correcto, no huérfano).
  */
 
-const TURN_MAX_TOKENS = 700
+// 1024 (no 700): mismo gate K6 que el provider Gemini (TASK-1140 follow-up). Una respuesta
+// de conocimiento sintetizada larga (intro + estados/pasos + citas + cierre de validación
+// humana en temas sensibles) se truncaba ANTES del cierre — el nightly de TASK-1127 lo detectó
+// en staging (auto-router → Claude). El techo es un máximo, no un objetivo (el prompt sigue
+// pidiendo concisión). Consistente con `maxOutputTokens: 1024` de Gemini.
+const TURN_MAX_TOKENS = 1024
 const SUGGESTIONS_MAX_TOKENS = 200
 
 const toAnthropicTools = (input: NexaTurnInput): Anthropic.Messages.Tool[] =>

@@ -123,7 +123,7 @@ const parseEnvFile = async () => {
 
 const parseArgs = () => {
   const args = process.argv.slice(2)
-  const options = { env: 'staging', caseIds: null, json: false }
+  const options = { env: 'staging', caseIds: null, json: false, minPass: null }
 
   for (const arg of args) {
     if (arg.startsWith('--env=')) {
@@ -138,6 +138,13 @@ const parseArgs = () => {
       )
     } else if (arg === '--json') {
       options.json = true
+    } else if (arg.startsWith('--min-pass=')) {
+      // Umbral para el nightly (TASK-1127): exit 1 solo si pasan MENOS de N casos.
+      // Tolera la flakiness conocida del LLM (tool-routing K4/G1/K7) sin volverse ruidoso
+      // — pero una regresión real (varios casos core caen) sí dispara la alerta del workflow.
+      const parsed = Number.parseInt(arg.slice('--min-pass='.length), 10)
+
+      options.minPass = Number.isNaN(parsed) ? null : parsed
     }
   }
 
@@ -378,7 +385,18 @@ const main = async () => {
     )
   }
 
-  if (summary.failed > 0) {
+  // Umbral del nightly: con --min-pass=N, falla solo si pasan menos de N (tolera flakiness
+  // conocida). Sin el flag (uso on-demand), mantiene el contrato estricto: cualquier fallo → exit 1.
+  if (options.minPass !== null) {
+    if (summary.passed < options.minPass) {
+      console.error(
+        `::error::QA matrix bajo umbral: pasaron ${summary.passed}/${summary.total} (mínimo ${options.minPass}).`
+      )
+      process.exitCode = 1
+    } else {
+      console.log(`QA matrix OK: ${summary.passed}/${summary.total} >= umbral ${options.minPass}.`)
+    }
+  } else if (summary.failed > 0) {
     process.exitCode = 1
   }
 }

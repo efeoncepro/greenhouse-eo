@@ -34,6 +34,24 @@ describe.skipIf(!hasPgConfig)('knowledge golden questions — eval harness (TASK
 
       const titles = packet.chunks.map(chunk => chunk.title)
 
+      if (question.expectFirstTitleIncludes) {
+        const firstTitle = titles[0] ?? ''
+
+        expect(
+          firstTitle.toLowerCase().includes(question.expectFirstTitleIncludes.toLowerCase()),
+          `${question.id}: el PRIMER chunk debía contener ~"${question.expectFirstTitleIncludes}", got "${firstTitle}" (orden: [${titles.join(' | ')}])`
+        ).toBe(true)
+      }
+
+      if (typeof question.expectDistinctDocumentsAtLeast === 'number') {
+        const distinctDocs = new Set(packet.chunks.map(chunk => chunk.documentId)).size
+
+        expect(
+          distinctDocs,
+          `${question.id}: esperaba >= ${question.expectDistinctDocumentsAtLeast} documentos distintos, got ${distinctDocs} (titulos: [${titles.join(' | ')}])`
+        ).toBeGreaterThanOrEqual(question.expectDistinctDocumentsAtLeast)
+      }
+
       if (question.expectNoAnswer) {
         expect(packet.confidence, `${question.id}: expected no-answer`).toBe('none')
         expect(packet.chunks).toHaveLength(0)

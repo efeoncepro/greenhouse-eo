@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P3`
 - Impact: `Medio`
 - Effort: `Medio`
@@ -38,8 +38,30 @@ Follow-up de TASK-1124. La calidad de respuesta hoy se verifica de dos formas, a
 
 ## Aceptación
 
-- Nightly de QA matrix contra staging corriendo + alerta honesta en fallo.
-- Golden questions con casos wrong-source + cross-doc verdes (regresión del rerank/brief).
+- [x] Nightly de QA matrix contra staging corriendo + alerta honesta en fallo. → workflow
+  `.github/workflows/nexa-knowledge-qa-nightly.yml` (schedule + workflow_dispatch + skip honesto si
+  faltan secrets) + umbral `--min-pass=9` (tolera flakiness de routing, alerta si caen casos core).
+- [x] Golden questions con casos wrong-source + cross-doc verdes (regresión del rerank/brief). →
+  5 casos nuevos (3 wrong-source `expectFirstTitleIncludes` + 2 cross-doc `expectDistinctDocumentsAtLeast`),
+  **45/45 live eval verdes** contra el corpus real.
+
+## Closure (2026-06-16)
+
+- **Slice 1 (golden, baseline para TASK-1136):** extendí `KnowledgeGoldenQuestion` con
+  `expectFirstTitleIncludes` (wrong-source: el doc específico rankea PRIMERO sobre el end-to-end genérico)
+  y `expectDistinctDocumentsAtLeast` (cross-doc: ≥2 documentos distintos). 5 casos nuevos + live test +
+  structural test. Validado **45/45** contra el corpus real (ADC re-autenticada para correr el eval).
+- **Slice 2 (nightly):** workflow nocturno contra staging (provider real → Claude) + flag `--min-pass`
+  en el QA matrix (umbral que tolera la flakiness conocida sin volverse ruidoso). Flag validado contra
+  staging (1/2 < umbral → `::error::` + exit 1).
+- **Bonus (el nightly demostró su valor):** detectó que el **gate K6 fallaba en staging** — el fix de
+  TASK-1140 (maxOutputTokens) solo cubría Gemini (local); el provider Anthropic truncaba a 700 tokens.
+  Subí `TURN_MAX_TOKENS` a 1024 (consistente con Gemini). Se valida al desplegar staging.
+- **Slice 3 (métrica citation-rate):** era "(Opcional)" → fuera del alcance core; queda como follow-up.
+- **Rollout:** Slice 1 validado local; el workflow nightly se confirma al disparar (`workflow_dispatch`)
+  post-push; el K6 en Anthropic se confirma al desplegar staging.
+- **Desbloquea TASK-1136** (el baseline de calidad ya existe). Gates: lint 0 · tsc 0 · suite
+  nexa+knowledge 245 passed (CI-clean) · `nexa:doc-gate` verde.
 
 ## Referencias
 

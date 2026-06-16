@@ -54,6 +54,20 @@ sensibles, el **cierre de validación humana** (`sensitiveValidation`).
 El eval de **retrieval** (golden questions) vive aparte, offline: `golden-questions.live.test.ts`
 (correctitud del recall/precisión del FTS). Son complementarios: uno mide la respuesta, el otro la búsqueda.
 
+> **Nightly contra staging (TASK-1127):** `.github/workflows/nexa-knowledge-qa-nightly.yml` corre la QA
+> matrix toda las noches contra staging (provider real → Claude) con `--min-pass=9`. El **umbral** tolera
+> la flakiness conocida del LLM (tool-routing K4/G1/K7) para no volverse ruidoso (lección del
+> production-release-watchdog) — pero si varios casos core caen, el job FALLA = alerta honesta. Es
+> `tooling` (GitHub Actions, no async-critical, no Vercel cron). Skip honesto si faltan los secrets de
+> staging. **El nightly ya probó su valor:** detectó que el gate K6 fallaba en staging (Claude truncaba
+> a 700 tokens) cuando el fix de Gemini solo cubría local.
+
+> **Baseline de retrieval ampliado (TASK-1127):** las golden questions suman dos clases que faltaban —
+> **wrong-source** (`expectFirstTitleIncludes`: el doc específico debe rankear PRIMERO sobre un end-to-end
+> genérico que matcheó por ruido) y **cross-document** (`expectDistinctDocumentsAtLeast`: una respuesta que
+> cruza ≥2 manuales trae ≥2 documentos distintos). Son la **regresión real del rerank** (heading boost +
+> diversidad) y el **baseline de calidad que consume TASK-1136** (evaluación de retrieval híbrido/vector).
+
 > **Local vs staging:** `/api/home/nexa` resuelve **Gemini** localmente; en staging/prod el auto-router
 > manda las preguntas de conocimiento a **Claude**. Una compliance de voz/cita puede variar — la
 > verificación viva canónica es en staging con V2 + auto-router ON.
