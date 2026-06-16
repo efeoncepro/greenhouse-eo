@@ -40,7 +40,12 @@ export const ENTITLEMENT_MODULES = [
   // (control plane release) y de greenhouse_context/SCL (sidecar JSONB de memoria de agente).
   // 5 capabilities: knowledge.{document.read,document.publish,source.admin,agentic.retrieve,
   // feedback.submit}. Aún no can()-checked (los consumen TASK-1083/1084).
-  'knowledge'
+  'knowledge',
+  // TASK-1152 — namespace del Roadmap (índice derivado del backlog Markdown:
+  // epics/tasks/mini-tasks/issues). Read-only V1; capability `roadmap.work_items.read`
+  // consumida por el reader server-side + la futura UI cockpit (TASK-1153). Distinto de
+  // `platform` (control plane release) y `admin` (governance).
+  'roadmap'
 ] as const
 
 export type GreenhouseEntitlementModule = (typeof ENTITLEMENT_MODULES)[number]
@@ -1539,6 +1544,15 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     key: 'knowledge.feedback.submit',
     module: 'knowledge',
     actions: ['create'] as const,
+    defaultScope: 'tenant'
+  },
+  // TASK-1152 — Roadmap work item index reader (Markdown SSOT, read-only).
+  // can()-checked en GET /api/roadmap/work-items. Grant en runtime.ts (internal ∪ admin)
+  // en el mismo PR (guard capability-grant-coverage). Future-proof TASK-1153.
+  {
+    key: 'roadmap.work_items.read',
+    module: 'roadmap',
+    actions: ['read'] as const,
     defaultScope: 'tenant'
   }
 ] as const

@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -298,12 +298,29 @@ N/A — repo-only change.
 
 ## Acceptance Criteria
 
-- [ ] `docs/epics/**`, `docs/tasks/**`, `docs/mini-tasks/**` y `docs/issues/**` permanecen como SSOT y no se agregan writes/lifecycle moves desde runtime.
-- [ ] El reader devuelve `roadmap-work-item-index.v1` con metadata suficiente para construir el cockpit de `TASK-1153`.
-- [ ] El parser soporta epics, tasks, mini-tasks e issues con degradacion honesta.
-- [ ] El endpoint esta protegido por acceso interno/capability y no expone rutas absolutas ni raw errors.
-- [ ] Filtros/paginacion cubren kind, lifecycle/status, domain, execution profile, UI/backend impact, blocked state, health, environment y texto.
-- [ ] Tests focales cubren parser, health classifier, cache/reader y route.
+- [x] `docs/epics/**`, `docs/tasks/**`, `docs/mini-tasks/**` y `docs/issues/**` permanecen como SSOT y no se agregan writes/lifecycle moves desde runtime. (reader read-only; `import 'server-only'` solo lectura)
+- [x] El reader devuelve `roadmap-work-item-index.v1` con metadata suficiente para construir el cockpit de `TASK-1153`. (`src/lib/roadmap/work-item-index/types.ts` + ejemplos en `docs/documentation/plataforma/roadmap-cockpit.md`)
+- [x] El parser soporta epics, tasks, mini-tasks e issues con degradacion honesta. (`parser.ts` + 27 tests; smoke real: 19/1223/4/97, 0 degraded)
+- [x] El endpoint esta protegido por acceso interno/capability y no expone rutas absolutas ni raw errors. (`requireInternalTenantContext` + `can(roadmap.work_items.read)`; paths siempre relativos; `canonicalErrorResponse`)
+- [x] Filtros/paginacion cubren kind, lifecycle/status, domain, execution profile, UI/backend impact, blocked state, health, readiness, parentEpic y texto. (`WorkItemFilters` + route)
+- [x] Tests focales cubren parser, health classifier, cache/reader y route. (`parser.test.ts`, `health.test.ts`, `reader.test.ts` — 27 tests verdes)
+
+## Implementation Delta (2026-06-16)
+
+Implementada local-first en `develop`. Archivos:
+
+- `src/lib/roadmap/work-item-index/{types,parser,health,cache,reader}.ts` + `*.test.ts` (27 tests).
+- `src/app/api/roadmap/work-items/route.ts` (`GET`, dual-gate internal + capability).
+- `src/config/entitlements-catalog.ts` (módulo `roadmap` + capability `roadmap.work_items.read`).
+- `src/lib/entitlements/runtime.ts` (grant internal ∪ admin).
+- `src/lib/observability/capture.ts` (dominio `roadmap`).
+- `next.config.ts` (`outputFileTracingIncludes` para `docs/**` en runtime Vercel).
+- `migrations/20260616133046114_task-1152-roadmap-work-items-read-capability.sql` (seed `capabilities_registry`, aplicada).
+- `docs/documentation/plataforma/roadmap-cockpit.md`.
+
+Decisión de la **Open Question**: se creó el módulo dedicado `roadmap` con capability `roadmap.work_items.read` (action `read`, scope `tenant`), espejando los módulos dedicados `organization`/`design_system`/`knowledge`. Future-proof para capabilities de escritura de `TASK-1153` sin re-namespacing.
+
+Gates: `pnpm test` (7151 passed) · `pnpm tsc --noEmit` (0) · `pnpm lint` (0 en surface tocada) · grant-coverage guard verde · migración aplicada (anti pre-up-marker OK). Smoke real del reader verde.
 
 ## Verification
 
@@ -330,4 +347,4 @@ N/A — repo-only change.
 
 ## Open Questions
 
-- Definir durante Plan Mode si la capability final sera `roadmap.work_items.read` o si se reusa una capability interna existente.
+- ~~Definir durante Plan Mode si la capability final sera `roadmap.work_items.read` o si se reusa una capability interna existente.~~ **Resuelto (2026-06-16):** módulo dedicado `roadmap` + capability `roadmap.work_items.read`. Ver Implementation Delta.

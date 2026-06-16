@@ -23,6 +23,20 @@ const nextConfig: NextConfig = {
   basePath: process.env.BASEPATH,
   distDir: process.env.NEXT_DIST_DIR || '.next',
 
+  // TASK-1152 — el Roadmap work item index reader lee el backlog Markdown
+  // (`docs/{epics,tasks,mini-tasks,issues}/**`) en runtime. Next.js solo bundlea
+  // archivos importados; estos `.md` no se importan, así que se incluyen
+  // explícitamente en el trace de la serverless function de la ruta del reader.
+  // Sin esto, el reader rompería en Vercel (los docs no existirían en runtime).
+  outputFileTracingIncludes: {
+    '/api/roadmap/work-items': [
+      './docs/epics/**/*.md',
+      './docs/tasks/**/*.md',
+      './docs/mini-tasks/**/*.md',
+      './docs/issues/**/*.md'
+    ]
+  },
+
   // TASK-525: enable native browser View Transitions for App Router same-document
   // navigation. Requires Chrome 111+ / Safari 18+; Firefox falls back to instant
   // navigation. Reduced-motion is honored via the global keyframes guard in

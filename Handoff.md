@@ -1,5 +1,40 @@
 # Release 2026-06-10 #2 — develop→main `6c649b2a6` RELEASED
 
+## Sesión 2026-06-16 — TASK-1152 Roadmap work item index reader (Markdown SSOT) — Claude
+
+> **Estado:** **complete** en `develop` (local-first, SIN push). Foundation backend/read-only del Roadmap. Aditivo + read-only → cero riesgo de runtime productivo. **Desbloquea TASK-1153.**
+
+- **Qué se construyó:** módulo `src/lib/roadmap/work-item-index/` (`types` contrato puro `roadmap-work-item-index.v1` · `parser` que **espeja** la semántica de `task-lint`/`ops-artifact-lint` en TS con tests de paridad · `health` clasificador puro template/canonical/legacy + readiness · `cache` singleton por proceso fingerprint mtime/size · `reader` walk+filtros+paginación+facets, server-only) + endpoint `GET /api/roadmap/work-items`.
+- **Auth:** dual-gate `requireInternalTenantContext` (clientes excluidos por construcción) + capability nueva `roadmap.work_items.read` (módulo dedicado `roadmap` en catalog + grant `runtime.ts` internal ∪ admin + seed `capabilities_registry` migración `20260616133046114` aplicada). Dominio Sentry nuevo `roadmap`.
+- **Decisión Open Question:** módulo dedicado `roadmap` (no reuso de `platform`/`admin`) — espeja `organization`/`design_system`/`knowledge`, future-proof para write caps de TASK-1153.
+- **Runtime Vercel:** `docs/**` se bundlea en la función vía `outputFileTracingIncludes` en `next.config.ts` (sin eso el reader no vería los archivos en prod). El reader resuelve root con `process.cwd()`.
+- **Degradación honesta:** un item legacy/ilegible → `legacy`/`needs_grooming` con `findings`, nunca rompe la respuesta. Smoke real: 19 epics / 1223 tasks / 4 mini / 97 issues, 0 degradados (la mayoría de tasks completas son `legacy` honesto — pre-template, igual que el skip pre-adoption de los linters).
+- **Gates:** 27 tests focales · `pnpm test` 7151 passed · `pnpm tsc --noEmit` 0 · `pnpm lint` 0 (surface tocada) · `pnpm build` exit 0 · grant-coverage guard verde · migración anti pre-up-marker OK.
+- **Docs:** funcional `docs/documentation/plataforma/roadmap-cockpit.md` (con ejemplos de payload para TASK-1153) + task `complete/` + README/registry sync + changelog.
+- **Pendiente / próximo paso:** ninguno bloqueante. TASK-1153 (cockpit UI) consume este contrato server-side — NO debe parsear Markdown client-side. Si la UI necesita un campo extra, extender `WorkItem`/`types.ts` (bump a `v2` si rompe shape).
+
+## Sesión 2026-06-16 — Public Site content marketing service page layout polish — Codex
+
+> **Estado:** production optimizado en `https://efeoncepro.com/servicio-marketing-de-contenidos/`. Cambio aplicado directamente en Kinsta/WordPress con backups runtime; sin cambios de código del portal Greenhouse.
+
+- **Skills/criterio usado:** `efeonce-public-site-wordpress`, `modern-ui-architect` + overlay Greenhouse, `greenhouse-product-ui-architect`, `greenhouse-ui-enterprise-review`. Decisión: landing WordPress existente → usar controles nativos Elementor/Ohio y evitar CSS global/hardcode.
+- **Cambios aplicados:** `post_title` limpio `Servicio de Marketing de Contenidos`; H1 visual preservado vía `gh_page_headline_display_title=Servicio de Marketing<br>de Contenidos`; `page_breadcrumbs_visibility=0`; primer section `d33dd85` con padding responsive; containers full-width `1c7659d`, `a06aca7`, `816d257` normalizados a `100%`; widths inválidos `>100%` clamp a `100%`; testimonial carousel contenido con `overflow=hidden` nativo en sections `7c9eb66`/`35b8e2b` + clase `gh-content-service-testimonials`; primer row rebalanceado `50/4/23/23`; H2 principal con salto visual intencional en el widget `1443e40`.
+- **Backups Kinsta:** `wp-content/uploads/greenhouse-backups/page-242603-content-service-layout-before-20260616T130713Z.json`, `page-242603-content-service-carousel-overflow-before-20260616T131110Z.json`, `page-242603-content-service-first-row-balance-before-20260616T131247Z.json`, `page-242603-content-service-first-row-balance-before-20260616T131347Z.json`, `page-242603-content-service-heading-type-before-20260616T131525Z.json`, `page-242603-content-service-heading-linebreak-before-20260616T131637Z.json`.
+- **GVC/Playwright evidence:** before GVC `.captures/2026-06-16T13-03-43_inline-servicio-marketing-de-contenidos`; final GVC `.captures/2026-06-16T13-16-56_inline-servicio-marketing-de-contenidos-gh-layout-review-final`; mobile frame `.captures/public-site-content-service-final-mobile-2026-06-16T1317Z/mobile-first.png`.
+- **Final checks:** desktop `scrollWidth=1440/clientWidth=1440`; mobile `390/390`; no breadcrumb node; no literal `<br>` in body text; H1 visual remains two lines; first claim no longer breaks words awkwardly. GVC final passed.
+- **Pendiente:** no Kinsta API backup/cache automation yet; changes were live Elementor document saves. If this page is later brought into GitOps/control-plane, reconcile `_elementor_data`/page meta from live.
+
+## Sesión 2026-06-16 — Public Site WordPress maintenance lock cleared — Codex
+
+> **Estado:** production recuperado. Incidente operativo acotado en `https://efeoncepro.com` durante updates de plugins WordPress.
+
+- **Síntoma:** el home público devolvía `503` con el template nativo de WordPress: "Briefly unavailable for scheduled maintenance. Check back in a minute."
+- **Root cause verificado:** archivo `.maintenance` presente en Kinsta docroot `/www/efeoncegroup_752/public`, creado `2026-06-16 12:25:42 UTC`; no había proceso de update activo visible por SSH. `wp-content/upgrade` estaba vacío.
+- **Acción aplicada:** se movió `.maintenance` fuera de la raíz a `wp-content/uploads/greenhouse-backups/root-maintenance-cleared-20260616T123025Z.php` en vez de borrarlo sin rastro.
+- **Estado plugins revisado:** `crm-perks-forms` active `1.1.8`, `microsoft-clarity` active `0.10.24`, `uichemy` inactive `4.10.2`; ninguno reportaba update pendiente en `wp plugin list`.
+- **Verificación:** `curl https://efeoncepro.com/` volvió `HTTP/2 200`, título `Efeonce | Agencia de Marketing, CRM, contenido e IA aplicada`; `https://efeoncepro.com/wp-json/` volvió `200`; Playwright anónimo confirmó `status=200`, sin texto de maintenance, captura en `.captures/public-site-maintenance-recovery-2026-06-16T1230Z/home.png`.
+- **Pendiente:** si vuelve a quedar en maintenance al reintentar updates, revisar logs/errores del plugin específico antes de volver a ejecutar updates masivos. Kinsta API token sigue pendiente para cache/backups automatizados.
+
 ## Sesión 2026-06-16 — TASK-1151 Knowledge hybrid (FTS + pgvector) gated implementation — Claude
 
 > **Estado:** **in-progress** en `develop` (local-first, SIN push). Foundation construida + segura (flag OFF) + validada → **NO-GO al flip** (gates de flip no se cumplen). Cero cambio de runtime productivo (flag default OFF byte-equivalente).

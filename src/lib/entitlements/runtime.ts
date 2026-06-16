@@ -124,6 +124,19 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
       scope: 'tenant',
       source: hasRouteGroup(subject, 'admin') ? 'role' : 'route_group'
     })
+
+    // TASK-1152 — Roadmap work item index (backlog operativo interno repo-native).
+    // Read-only para usuarios internos (route_group internal ∪ admin). El backlog
+    // es operación interna del repo; los clientes (`client_*`) NO lo ven por
+    // construcción del grant. Gated en GET /api/roadmap/work-items + future cockpit
+    // (TASK-1153, "main menu, non-admin" → internal collaborators incluidos).
+    addEntitlement(entries, {
+      module: 'roadmap',
+      capability: 'roadmap.work_items.read',
+      action: 'read',
+      scope: 'tenant',
+      source: hasRouteGroup(subject, 'admin') ? 'role' : 'route_group'
+    })
   }
 
   if (hasRouteGroup(subject, 'people') || hasAuthorizedView(subject, 'equipo.personas')) {

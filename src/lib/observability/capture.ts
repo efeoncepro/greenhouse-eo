@@ -67,6 +67,7 @@ export type CaptureDomain =
   | 'workforce' // TASK-1019 — Workforce Contracting Studio (offer letters + employment contracts, AI drafting)
   | 'documents' // TASK-490 — Signature orchestration + document vault (EPIC-001 signable pack)
   | 'knowledge' // TASK-1081 — Knowledge Platform (corpus + chunks + retrieval agéntico)
+  | 'roadmap' // TASK-1152 — Roadmap work item index reader (Markdown SSOT, read-only)
 
 export interface CaptureOptions {
   /** Free-form structured context. Ends up in Sentry's `Additional Data`. */
