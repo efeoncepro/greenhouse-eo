@@ -49,15 +49,17 @@ const RoadmapSummary = ({ counts }: { counts: RoadmapSummaryCounts }) => (
           }}
         >
           <Box
-            sx={{
-              width: 30,
-              height: 30,
-              borderRadius: theme => `${theme.shape.customBorderRadius.md}px`,
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              ...toneSx(tile.tone)
-            }}
+            sx={[
+              toneSx(tile.tone),
+              {
+                width: 30,
+                height: 30,
+                borderRadius: theme => `${theme.shape.customBorderRadius.md}px`,
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }
+            ]}
           >
             <i className={tile.icon} aria-hidden='true' style={{ fontSize: 16, lineHeight: 0 }} />
           </Box>
@@ -72,7 +74,7 @@ const RoadmapSummary = ({ counts }: { counts: RoadmapSummaryCounts }) => (
             <Typography component='span' variant='body2' sx={{ fontWeight: 600, color: 'text.primary' }}>
               {copy.label}
             </Typography>
-            <Typography component='span' variant='caption' sx={{ color: 'text.disabled' }}>
+            <Typography component='span' variant='caption' sx={{ color: 'text.secondary' }}>
               {copy.context}
             </Typography>
           </Box>

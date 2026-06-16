@@ -60,10 +60,10 @@ const KindPill = ({
       py: 0.75,
       borderRadius: '9999px',
       cursor: 'pointer',
-      fontSize: '0.8125rem',
       fontWeight: 600,
       border: '1px solid',
       transition: theme => theme.transitions.create(['background-color', 'border-color', 'color']),
+      typography: 'caption',
       backgroundColor: active ? 'primary.main' : 'background.paper',
       color: active ? 'primary.contrastText' : 'text.secondary',
       borderColor: active ? 'primary.main' : 'divider',
@@ -76,7 +76,7 @@ const KindPill = ({
       component='span'
       sx={{
         fontFeatureSettings: "'tnum' 1",
-        fontSize: 11,
+        typography: 'caption',
         fontWeight: 700,
         minWidth: 18,
         height: 18,
@@ -146,7 +146,7 @@ const RoadmapFilters = ({
       placeholder={GH_ROADMAP.searchPlaceholder}
       aria-label={GH_ROADMAP.searchAria}
       size='small'
-      sx={{ flex: '1 1 220px', minWidth: 200 }}
+      sx={{ flex: { xs: '1 1 100%', md: '0 1 320px' }, minWidth: { xs: '100%', md: 240 } }}
       InputProps={{
         startAdornment: (
           <InputAdornment position='start'>
@@ -161,8 +161,9 @@ const RoadmapFilters = ({
       size='small'
       value={priority ?? ''}
       onChange={event => onPriorityChange((event.target.value || null) as RoadmapPriority)}
-      sx={{ width: 168 }}
+      sx={{ width: { xs: '100%', sm: 156 } }}
       aria-label={GH_ROADMAP.priorityFilterAll}
+      SelectProps={{ displayEmpty: true }}
     >
       <MenuItem value=''>{GH_ROADMAP.priorityFilterAll}</MenuItem>
       {GH_ROADMAP.priorityOptions.map(option => (
@@ -177,8 +178,9 @@ const RoadmapFilters = ({
       size='small'
       value={domain}
       onChange={event => onDomainChange(event.target.value)}
-      sx={{ width: 168 }}
+      sx={{ width: { xs: '100%', sm: 156 } }}
       aria-label={GH_ROADMAP.domainFilterAll}
+      SelectProps={{ displayEmpty: true }}
     >
       <MenuItem value=''>{GH_ROADMAP.domainFilterAll}</MenuItem>
       {domains.map(option => (
@@ -193,8 +195,9 @@ const RoadmapFilters = ({
       size='small'
       value={health}
       onChange={event => onHealthChange(event.target.value as WorkItemHealthLevel | '')}
-      sx={{ width: 180 }}
+      sx={{ width: { xs: '100%', sm: 148 } }}
       aria-label={GH_ROADMAP.healthFilterAll}
+      SelectProps={{ displayEmpty: true }}
     >
       <MenuItem value=''>{GH_ROADMAP.healthFilterAll}</MenuItem>
       {GH_ROADMAP.healthOptions.map(option => (

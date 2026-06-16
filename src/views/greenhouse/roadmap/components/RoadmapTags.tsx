@@ -4,10 +4,11 @@
  * TASK-1153 — Micro-chips tonales del cockpit (kind, prioridad, salud).
  *
  * One-off tokenizado del cockpit (no va al registry de primitives): replica el
- * lenguaje de chips del diseño AXIS con tonos de `theme.palette.*` vía `toneSx`,
- * sin HEX inline. Iconos Tabler decorativos (`aria-hidden`).
+ * lenguaje de chips del diseño AXIS con tonos semánticos vía `toneSx`, sin HEX
+ * inline. Iconos Tabler decorativos (`aria-hidden`).
  */
 import Box from '@mui/material/Box'
+import Typography from '@mui/material/Typography'
 
 import type { RoadmapPriority } from '@/lib/roadmap/cockpit/types'
 import type { WorkItemHealthLevel, WorkItemKind } from '@/lib/roadmap/work-item-index/types'
@@ -24,26 +25,28 @@ interface ToneTagProps {
 
 /** Badge tonal genérico (fondo suave + ink AA). */
 export const ToneTag = ({ tone, label, icon, radius = 'sm', numeric }: ToneTagProps) => (
-  <Box
+  <Typography
     component='span'
-    sx={{
-      display: 'inline-flex',
-      alignItems: 'center',
-      gap: 0.625,
-      ...toneSx(tone),
-      px: radius === 'full' ? 1.125 : 0.875,
-      py: 0.375,
-      borderRadius: radius === 'full' ? '9999px' : theme => `${theme.shape.customBorderRadius.sm}px`,
-      fontSize: '0.6875rem',
-      fontWeight: 600,
-      lineHeight: 1.3,
-      whiteSpace: 'nowrap',
-      ...(numeric ? { fontFamily: theme => theme.typography.fontFamily, fontFeatureSettings: "'tnum' 1" } : {})
-    }}
+    variant='caption'
+    sx={[
+      toneSx(tone),
+      {
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: 0.625,
+        px: radius === 'full' ? 1.125 : 0.875,
+        py: 0.375,
+        borderRadius: radius === 'full' ? '9999px' : theme => `${theme.shape.customBorderRadius.sm}px`,
+        fontWeight: 600,
+        lineHeight: 1.3,
+        whiteSpace: 'nowrap',
+        ...(numeric ? { fontFeatureSettings: "'tnum' 1" } : {})
+      }
+    ]}
   >
     {icon ? <i className={icon} aria-hidden='true' style={{ fontSize: 12, lineHeight: 0 }} /> : null}
     {label}
-  </Box>
+  </Typography>
 )
 
 export const KindTag = ({ kind }: { kind: WorkItemKind }) => {

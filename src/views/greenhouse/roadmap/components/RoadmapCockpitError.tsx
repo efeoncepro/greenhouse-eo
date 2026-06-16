@@ -17,13 +17,15 @@ const RoadmapCockpitError = () => (
         kind='pageHierarchy'
         items={[{ label: GH_ROADMAP.breadcrumbRoot, href: '/home' }, { label: GH_ROADMAP.breadcrumbCurrent }]}
       />
-      <Typography variant='h3' sx={{ fontWeight: 600 }}>
+      <Typography variant='h4'>
         {GH_ROADMAP.pageTitle}
       </Typography>
     </Box>
     <Alert severity='error' variant='standard'>
-      <AlertTitle sx={{ fontWeight: 600 }}>{GH_ROADMAP.errorTitle}</AlertTitle>
-      {GH_ROADMAP.errorBody}
+      <AlertTitle sx={{ fontWeight: 600, typography: 'body2' }}>{GH_ROADMAP.errorTitle}</AlertTitle>
+      <Typography variant='body2' sx={{ color: 'error.dark' }}>
+        {GH_ROADMAP.errorBody}
+      </Typography>
     </Alert>
   </Box>
 )

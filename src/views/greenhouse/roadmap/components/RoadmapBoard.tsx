@@ -11,9 +11,10 @@ import { keyframes } from '@mui/system'
 import { GH_ROADMAP } from '@/lib/copy/roadmap'
 import type { RoadmapLaneId, RoadmapWorkItemVM } from '@/lib/roadmap/cockpit/types'
 import { MOTION_DURATION_MS, MOTION_EASE, cssCubicBezier } from '@/components/greenhouse/motion/core/tokens'
+import { isCardDensityAtLeast, useContainerDensity } from '@/components/greenhouse/primitives'
 
-import { KIND_VISUAL, LANE_VISUAL, metaIcon, toneAccent } from '../cockpit-tokens'
-import { HealthIcon, KindTag, PriorityTag } from './RoadmapTags'
+import { HEALTH_VISUAL, KIND_VISUAL, LANE_VISUAL, metaIcon, toneAccent, toneSx } from '../cockpit-tokens'
+import { PriorityTag, ToneTag } from './RoadmapTags'
 
 export interface RoadmapLane {
   id: RoadmapLaneId
@@ -42,72 +43,173 @@ const RoadmapCard = ({
   selected: boolean
   onSelect: (id: string) => void
   index: number
-}) => (
-  <Box
-    component='button'
-    type='button'
-    aria-pressed={selected}
-    onClick={() => onSelect(item.id)}
-    sx={{
-      display: 'flex',
-      flexDirection: 'column',
-      gap: 1,
-      width: '100%',
-      textAlign: 'left',
-      cursor: 'pointer',
-      backgroundColor: 'background.paper',
-      border: '1px solid',
-      borderColor: selected ? 'primary.main' : 'divider',
-      borderLeft: `3px solid ${toneAccent(KIND_VISUAL[item.kind].tone)}`,
-      borderRadius: theme => `${theme.shape.customBorderRadius.md}px`,
-      p: theme => `${theme.spacing(3.25)} ${theme.spacing(3.5)}`,
-      boxShadow: selected ? theme => `0 0 0 2px ${theme.palette.primary.main}` : 'none',
-      transition: theme => theme.transitions.create(['box-shadow', 'border-color']),
-      animation: `${cardEnter} ${MOTION_DURATION_MS.medium}ms ${cssCubicBezier(MOTION_EASE.emphasized.cubicBezier)} both`,
-      animationDelay: `${Math.min(index, STAGGER_MAX_STEPS) * STAGGER_STEP_MS}ms`,
-      '&:hover': { borderColor: 'primary.main' },
-      '&:focus-visible': { outline: theme => `2px solid ${theme.palette.primary.main}`, outlineOffset: 2 },
-      '@media (prefers-reduced-motion: reduce)': { animation: 'none' }
-    }}
-  >
-    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-      <KindTag kind={item.kind} />
-      <Box sx={{ ml: 'auto', display: 'inline-flex', alignItems: 'center', gap: 1.5 }}>
-        <PriorityTag priority={item.priority} />
-        <HealthIcon health={item.healthLevel} />
-      </Box>
-    </Box>
-    <Typography component='span' variant='body2' sx={{ fontWeight: 600, lineHeight: 1.35, color: 'text.primary' }}>
-      {item.title}
-    </Typography>
-    <Box
-      sx={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: 1,
-        fontSize: '0.75rem',
-        color: 'text.secondary',
-        minWidth: 0
-      }}
-    >
-      <Box component='span' sx={{ fontWeight: 600, fontFeatureSettings: "'tnum' 1", color: 'text.primary' }}>
-        {item.id}
-      </Box>
-      <Box component='span' sx={{ color: 'text.disabled' }}>
-        ·
-      </Box>
+}) => {
+  const { ref: densityRef, density, containerType } = useContainerDensity('auto')
+  const kindVisual = KIND_VISUAL[item.kind]
+  const healthVisual = HEALTH_VISUAL[item.healthLevel]
+  const isCondensed = isCardDensityAtLeast(density, 'condensed')
+  const isPeek = isCardDensityAtLeast(density, 'peek')
+  const primaryDomain = item.domains[0] ?? null
+  const extraDomainCount = Math.max(0, item.domains.length - 1)
+  const showDomain = Boolean(primaryDomain) && item.kind !== 'epic'
+
+  return (
+    <Box ref={densityRef} data-card-density={density} data-work-item-id={item.id} sx={{ containerType }}>
       <Box
-        component='span'
-        sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5, overflow: 'hidden', minWidth: 0 }}
+        component='button'
+        type='button'
+        aria-pressed={selected}
+        aria-label={GH_ROADMAP.card.openAria(item.id)}
+        onClick={() => onSelect(item.id)}
+        sx={{
+          position: 'relative',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 1.75,
+          width: '100%',
+          minWidth: 0,
+          textAlign: 'left',
+          cursor: 'pointer',
+          backgroundColor: selected ? 'primary.lightOpacity' : 'background.paper',
+          border: '1px solid',
+          borderColor: selected ? 'primary.main' : 'divider',
+          borderLeft: `3px solid ${toneAccent(kindVisual.tone)}`,
+          borderRadius: theme => `${theme.shape.customBorderRadius.md}px`,
+          p: theme => `${theme.spacing(isCondensed ? 2.75 : 3.25)} ${theme.spacing(isCondensed ? 3 : 3.5)}`,
+          transition: theme => theme.transitions.create(['background-color', 'border-color', 'box-shadow', 'transform']),
+          animation: `${cardEnter} ${MOTION_DURATION_MS.medium}ms ${cssCubicBezier(MOTION_EASE.emphasized.cubicBezier)} both`,
+          animationDelay: `${Math.min(index, STAGGER_MAX_STEPS) * STAGGER_STEP_MS}ms`,
+          '&:hover': {
+            borderColor: 'primary.main',
+            backgroundColor: selected ? 'primary.lightOpacity' : 'action.hover',
+            transform: 'translateY(-1px)',
+            '& .gh-roadmap-card-action': { opacity: 1, transform: 'translateX(0)' }
+          },
+          '&:focus-visible': {
+            outline: theme => `2px solid ${theme.palette.primary.main}`,
+            outlineOffset: 2,
+            '& .gh-roadmap-card-action': { opacity: 1, transform: 'translateX(0)' }
+          },
+          '@media (prefers-reduced-motion: reduce)': {
+            animation: 'none',
+            transform: 'none',
+            '&:hover': { transform: 'none' }
+          }
+        }}
       >
-        <i className={metaIcon(item.lane, item.kind)} aria-hidden='true' style={{ fontSize: 13, lineHeight: 0, flex: '0 0 auto' }} />
-        <Box component='span' sx={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-          {item.meta}
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, minWidth: 0 }}>
+          <Box
+            component='span'
+            aria-hidden='true'
+            sx={[
+              toneSx(kindVisual.tone),
+              {
+                width: 22,
+                height: 22,
+                borderRadius: theme => `${theme.shape.customBorderRadius.sm}px`,
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flex: '0 0 auto'
+              }
+            ]}
+          >
+            <i className={kindVisual.icon} style={{ fontSize: 13, lineHeight: 0 }} />
+          </Box>
+          <Typography component='span' variant='monoId' sx={{ color: 'text.primary', minWidth: 0 }}>
+            {item.id}
+          </Typography>
+          {!isCondensed ? <ToneTag tone={kindVisual.tone} label={kindVisual.label} /> : null}
+          <Box sx={{ ml: 'auto', display: 'inline-flex', alignItems: 'center', gap: 0.75, flex: '0 0 auto' }}>
+            <PriorityTag priority={item.priority} radius='full' />
+            <Box
+              component='span'
+              role='img'
+              aria-label={healthVisual.label}
+              title={healthVisual.label}
+              sx={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 0.5,
+                color: `${healthVisual.tone}.main`,
+                typography: 'caption',
+                fontWeight: 600
+              }}
+            >
+              <i className={healthVisual.icon} aria-hidden='true' style={{ fontSize: 14, lineHeight: 0 }} />
+              {!isCondensed ? healthVisual.label : null}
+            </Box>
+          </Box>
         </Box>
+
+        <Typography
+          component='span'
+          variant='body2'
+          sx={{
+            display: '-webkit-box',
+            minHeight: isPeek ? 'auto' : '2.7em',
+            overflow: 'hidden',
+            color: 'text.primary',
+            fontWeight: 600,
+            lineHeight: 1.35,
+            WebkitBoxOrient: 'vertical',
+            WebkitLineClamp: isPeek ? 1 : 2
+          }}
+        >
+          {item.title}
+        </Typography>
+
+        {!isPeek ? (
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, minWidth: 0, pt: 0.25 }}>
+            <Box
+              component='span'
+              sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5, minWidth: 0, color: 'text.secondary' }}
+            >
+              <i className={metaIcon(item.lane, item.kind)} aria-hidden='true' style={{ fontSize: 13, lineHeight: 0, flex: '0 0 auto' }} />
+              <Typography component='span' variant='caption' sx={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                {item.meta}
+              </Typography>
+            </Box>
+            {showDomain ? (
+              <>
+                <Typography component='span' variant='caption' sx={{ color: 'text.disabled', flex: '0 0 auto' }}>
+                  ·
+                </Typography>
+                <Typography
+                  component='span'
+                  variant='caption'
+                  sx={{ color: 'text.secondary', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}
+                >
+                  {primaryDomain}
+                  {extraDomainCount > 0 ? ` ${GH_ROADMAP.card.extraDomains(extraDomainCount)}` : ''}
+                </Typography>
+              </>
+            ) : null}
+            <Typography
+              component='span'
+              variant='caption'
+              className='gh-roadmap-card-action'
+              sx={{
+                ml: 'auto',
+                display: { xs: 'none', md: 'inline-flex' },
+                alignItems: 'center',
+                gap: 0.25,
+                color: selected ? 'primary.main' : 'text.secondary',
+                fontWeight: 600,
+                opacity: selected ? 1 : 0,
+                transform: selected ? 'translateX(0)' : 'translateX(-4px)',
+                transition: theme => theme.transitions.create(['opacity', 'transform', 'color'])
+              }}
+            >
+              {GH_ROADMAP.card.open}
+              <i className='tabler-arrow-right' aria-hidden='true' style={{ fontSize: 13, lineHeight: 0 }} />
+            </Typography>
+          </Box>
+        ) : null}
       </Box>
     </Box>
-  </Box>
-)
+  )
+}
 
 const RoadmapBoard = ({
   lanes,
@@ -148,7 +250,7 @@ const RoadmapBoard = ({
           <Box
             key={lane.id}
             role='listitem'
-            sx={{ flex: '0 0 286px', width: 286, display: 'flex', flexDirection: 'column', minHeight: 0, maxHeight: '100%' }}
+            sx={{ flex: '0 0 304px', width: 304, display: 'flex', flexDirection: 'column', minHeight: 0, maxHeight: '100%' }}
           >
             <Box
               sx={{
@@ -163,15 +265,15 @@ const RoadmapBoard = ({
               }}
             >
               <Box component='i' className={visual.icon} aria-hidden='true' sx={{ fontSize: 16, lineHeight: 0, color: visual.tone === 'neutral' ? 'text.disabled' : `${visual.tone}.main` }} />
-              <Box component='span' sx={{ fontSize: '0.8125rem', fontWeight: 600, color: 'text.primary' }}>
+              <Typography component='span' variant='body2' sx={{ fontWeight: 600, color: 'text.primary' }}>
                 {visual.title}
-              </Box>
-              <Box
+              </Typography>
+              <Typography
                 component='span'
+                variant='caption'
                 sx={{
                   ml: 'auto',
                   fontFeatureSettings: "'tnum' 1",
-                  fontSize: 11,
                   fontWeight: 700,
                   minWidth: 20,
                   height: 20,
@@ -185,7 +287,7 @@ const RoadmapBoard = ({
                 }}
               >
                 {lane.totalCount}
-              </Box>
+              </Typography>
             </Box>
 
             {/* Área de cards con scroll vertical interno (la lane no estira la página). */}
@@ -212,34 +314,36 @@ const RoadmapBoard = ({
               ))}
 
               {lane.totalCount > lane.items.length ? (
-              <Box
+              <Typography
+                component='span'
+                variant='caption'
                 sx={{
                   px: 1,
                   py: 1.5,
                   textAlign: 'center',
-                  fontSize: '0.75rem',
                   fontWeight: 600,
                   color: 'text.secondary'
                 }}
               >
                 {GH_ROADMAP.laneMore(lane.totalCount - lane.items.length)}
-              </Box>
+              </Typography>
             ) : null}
 
             {lane.totalCount === 0 ? (
-              <Box
+              <Typography
+                component='span'
+                variant='caption'
                 sx={{
                   border: '1px dashed',
                   borderColor: 'divider',
                   borderRadius: theme => `${theme.shape.customBorderRadius.md}px`,
                   p: 3.5,
                   textAlign: 'center',
-                  fontSize: '0.75rem',
                   color: 'text.disabled'
                 }}
               >
                 {GH_ROADMAP.laneEmpty}
-              </Box>
+              </Typography>
             ) : null}
             </Box>
           </Box>

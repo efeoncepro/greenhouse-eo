@@ -234,7 +234,7 @@ const RoadmapCockpitView = ({ data }: { data: RoadmapCockpitData }) => {
             kind='pageHierarchy'
             items={[{ label: GH_ROADMAP.breadcrumbRoot, href: '/home' }, { label: GH_ROADMAP.breadcrumbCurrent }]}
           />
-          <Typography variant='h3' sx={{ fontWeight: 600, lineHeight: 1.15 }}>
+          <Typography variant='h4'>
             {GH_ROADMAP.pageTitle}
           </Typography>
           <Typography variant='body1' sx={{ color: 'text.secondary', maxWidth: 660, lineHeight: 1.5 }}>
@@ -243,10 +243,10 @@ const RoadmapCockpitView = ({ data }: { data: RoadmapCockpitData }) => {
         </Box>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 3, flexShrink: 0 }}>
           {ageLabel ? (
-            <Box component='span' sx={{ display: 'inline-flex', alignItems: 'center', gap: 1, fontSize: '0.8125rem', color: 'text.secondary', whiteSpace: 'nowrap' }}>
+            <Typography component='span' variant='caption' sx={{ display: 'inline-flex', alignItems: 'center', gap: 1, color: 'text.secondary', whiteSpace: 'nowrap' }}>
               <Box component='span' sx={{ width: 7, height: 7, borderRadius: '50%', backgroundColor: 'success.main' }} />
               {GH_ROADMAP.syncedLabel(ageLabel)}
-            </Box>
+            </Typography>
           ) : null}
           <Button
             variant='outlined'
@@ -261,9 +261,22 @@ const RoadmapCockpitView = ({ data }: { data: RoadmapCockpitData }) => {
 
       {/* Banner degradado */}
       {data.degradedCount > 0 ? (
-        <Alert severity='warning' variant='standard' icon={<i className='tabler-alert-triangle' />}>
-          <AlertTitle sx={{ fontWeight: 600 }}>{GH_ROADMAP.degradedTitle(data.degradedCount)}</AlertTitle>
-          {GH_ROADMAP.degradedBody}
+        <Alert
+          severity='warning'
+          variant='standard'
+          icon={<i className='tabler-alert-triangle' />}
+          sx={{
+            alignItems: 'flex-start',
+            '& .MuiAlert-icon': { mt: 0.25 },
+            '& .MuiAlert-message': { width: '100%', minWidth: 0 }
+          }}
+        >
+          <AlertTitle sx={{ fontWeight: 600, typography: 'body2', mb: 0.5 }}>
+            {GH_ROADMAP.degradedTitle(data.degradedCount)}
+          </AlertTitle>
+          <Typography variant='body2' sx={{ color: 'warning.dark', lineHeight: 1.5 }}>
+            {GH_ROADMAP.degradedBody}
+          </Typography>
         </Alert>
       ) : null}
 

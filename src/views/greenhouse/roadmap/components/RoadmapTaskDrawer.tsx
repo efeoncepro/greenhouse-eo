@@ -166,23 +166,24 @@ const IdLink = ({ id, onNavigate }: { id: string; onNavigate: (id: string) => vo
     component='button'
     type='button'
     onClick={() => onNavigate(id)}
-    sx={{
-      display: 'inline-flex',
-      alignItems: 'center',
-      gap: 0.375,
-      ...toneSx('info'),
-      border: '1px solid transparent',
-      borderRadius: theme => `${theme.shape.customBorderRadius.xs}px`,
-      px: 0.625,
-      py: 0.125,
-      fontSize: '0.8125rem',
-      fontWeight: 600,
-      fontFeatureSettings: "'tnum' 1",
-      cursor: 'pointer',
-      verticalAlign: 'baseline',
-      '&:hover': { borderColor: 'info.main' },
-      '&:focus-visible': { outline: theme => `2px solid ${theme.palette.info.main}`, outlineOffset: 1 }
-    }}
+    sx={[
+      toneSx('info'),
+      {
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: 0.375,
+        border: '1px solid transparent',
+        borderRadius: theme => `${theme.shape.customBorderRadius.xs}px`,
+        px: 0.625,
+        py: 0.125,
+        typography: 'monoId',
+        fontFeatureSettings: "'tnum' 1",
+        cursor: 'pointer',
+        verticalAlign: 'baseline',
+        '&:hover': { borderColor: 'info.main' },
+        '&:focus-visible': { outline: theme => `2px solid ${theme.palette.info.main}`, outlineOffset: 1 }
+      }
+    ]}
   >
     <i className='tabler-arrow-up-right' aria-hidden='true' style={{ fontSize: 11, lineHeight: 0 }} />
     {id}
@@ -233,27 +234,21 @@ const PreBlock = ({ children }: { children?: ReactNode }) => {
 
 /** Prose tokenizado para documento técnico denso. */
 const proseSx: SxProps<Theme> = theme => ({
+  ...theme.typography.body2,
   color: 'text.primary',
-  fontSize: '0.875rem',
   lineHeight: 1.7,
   wordBreak: 'break-word',
   minWidth: 0,
   '& > *:first-of-type': { mt: 0 },
   '& > *:last-child': { mb: 0 },
   '& h1': {
-    fontFamily: theme.typography.h4.fontFamily,
-    fontSize: '1.375rem',
-    fontWeight: 600,
-    lineHeight: 1.25,
+    ...theme.typography.h4,
     mt: 0,
     mb: 2,
     scrollMarginTop: theme.spacing(3)
   },
   '& h2': {
-    fontFamily: theme.typography.h5.fontFamily,
-    fontSize: '1.0625rem',
-    fontWeight: 600,
-    lineHeight: 1.3,
+    ...theme.typography.h5,
     mt: 5,
     mb: 1.75,
     pb: 1,
@@ -261,8 +256,8 @@ const proseSx: SxProps<Theme> = theme => ({
     borderColor: 'divider',
     scrollMarginTop: theme.spacing(3)
   },
-  '& h3': { fontSize: '0.9375rem', fontWeight: 600, mt: 3.5, mb: 1, scrollMarginTop: theme.spacing(3) },
-  '& h4, & h5, & h6': { fontSize: '0.8125rem', fontWeight: 600, letterSpacing: '0.01em', mt: 3, mb: 0.75, color: 'text.secondary' },
+  '& h3': { ...theme.typography.body2, fontWeight: 600, mt: 3.5, mb: 1, scrollMarginTop: theme.spacing(3) },
+  '& h4, & h5, & h6': { ...theme.typography.caption, fontWeight: 600, mt: 3, mb: 0.75, color: 'text.secondary' },
   '& p': { my: 1.5 },
   '& strong': { fontWeight: 700, color: 'text.primary' },
   '& em': { fontStyle: 'italic' },
@@ -280,7 +275,7 @@ const proseSx: SxProps<Theme> = theme => ({
     // literales del repo, no IDs ni montos. Es el caso documentado de la regla.
     // eslint-disable-next-line greenhouse/no-hardcoded-fontfamily
     fontFamily: 'monospace',
-    fontSize: '0.8125rem',
+    fontSize: theme.typography.caption.fontSize,
     bgcolor: 'action.selected',
     px: 0.75,
     py: 0.25,
@@ -323,7 +318,7 @@ const proseSx: SxProps<Theme> = theme => ({
     '& p': { my: 0.5 }
   },
   '& hr': { my: 4, border: 'none', borderTop: '1px solid', borderColor: 'divider' },
-  '& table': { borderCollapse: 'collapse', width: '100%', fontSize: '0.8125rem' },
+  '& table': { borderCollapse: 'collapse', width: '100%', typography: 'caption' },
   '& thead': { bgcolor: 'action.hover' },
   '& th, & td': { border: '1px solid', borderColor: 'divider', px: 1.5, py: 1, textAlign: 'left', verticalAlign: 'top' },
   '& th': { fontWeight: 600 },
@@ -519,9 +514,9 @@ const RoadmapTaskDrawer = ({ item, onClose, onCopy }: RoadmapTaskDrawerProps) =>
                   {GH_ROADMAP.taskDrawer.back}
                 </Button>
               ) : (
-                <Box component='span' sx={{ fontSize: '0.6875rem', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'text.disabled' }}>
+                <Typography component='span' variant='overline' sx={{ color: 'text.disabled' }}>
                   {GH_ROADMAP.taskDrawer.eyebrow}
-                </Box>
+                </Typography>
               )}
               <Box sx={{ ml: 'auto', display: 'inline-flex', alignItems: 'center', gap: 1 }}>
                 <Button
@@ -541,22 +536,24 @@ const RoadmapTaskDrawer = ({ item, onClose, onCopy }: RoadmapTaskDrawerProps) =>
             </Box>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               {kindVisual ? <ToneTag tone={kindVisual.tone} icon={kindVisual.icon} label={kindVisual.label} /> : null}
-              <Box component='span' sx={{ fontWeight: 600, fontSize: '0.875rem', fontFeatureSettings: "'tnum' 1", color: 'text.secondary' }}>
+              <Typography component='span' variant='monoId' sx={{ color: 'text.secondary' }}>
                 {meta.id}
-              </Box>
+              </Typography>
             </Box>
-            <Box
+            <Typography
               component='h2'
-              sx={{ m: 0, fontFamily: theme => theme.typography.h4.fontFamily, fontSize: '1.25rem', fontWeight: 600, lineHeight: 1.3, color: 'text.primary' }}
+              variant='h4'
+              sx={{ m: 0 }}
             >
               {meta.title}
-            </Box>
-            <Box
+            </Typography>
+            <Typography
               component='span'
-              sx={{ fontSize: '0.75rem', color: 'text.disabled', fontFeatureSettings: "'tnum' 1", overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', direction: 'rtl', textAlign: 'left' }}
+              variant='caption'
+              sx={{ color: 'text.disabled', fontFeatureSettings: "'tnum' 1", overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', direction: 'rtl', textAlign: 'left' }}
             >
               {meta.path}
-            </Box>
+            </Typography>
           </Box>
 
           {/* Body */}
@@ -572,20 +569,22 @@ const RoadmapTaskDrawer = ({ item, onClose, onCopy }: RoadmapTaskDrawerProps) =>
 
             {state.status === 'error' ? (
               <Box
-                sx={{
-                  ...toneSx('error'),
-                  borderRadius: theme => `${theme.shape.customBorderRadius.md}px`,
-                  p: 4,
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'flex-start',
-                  gap: 2
-                }}
+                sx={[
+                  toneSx('error'),
+                  {
+                    borderRadius: theme => `${theme.shape.customBorderRadius.md}px`,
+                    p: 4,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'flex-start',
+                    gap: 2
+                  }
+                ]}
               >
-                <Box component='span' sx={{ display: 'inline-flex', alignItems: 'center', gap: 1.5, fontWeight: 600 }}>
+                <Typography component='span' variant='body2' sx={{ display: 'inline-flex', alignItems: 'center', gap: 1.5, fontWeight: 600 }}>
                   <i className='tabler-alert-circle' aria-hidden='true' style={{ fontSize: 18, lineHeight: 0 }} />
                   {GH_ROADMAP.taskDrawer.errorTitle}
-                </Box>
+                </Typography>
                 <Typography variant='body2' sx={{ color: 'text.secondary' }}>
                   {GH_ROADMAP.taskDrawer.errorBody}
                 </Typography>
@@ -627,12 +626,12 @@ const RoadmapTaskDrawer = ({ item, onClose, onCopy }: RoadmapTaskDrawerProps) =>
                           py: 0.625
                         }}
                       >
-                        <Box component='span' sx={{ fontSize: '0.6875rem', fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase', color: 'text.disabled' }}>
+                        <Typography component='span' variant='overline' sx={{ color: 'text.disabled' }}>
                           {field.key}
-                        </Box>
-                        <Box component='span' sx={{ fontSize: '0.8125rem', fontWeight: 600, color: 'text.primary', fontFeatureSettings: "'tnum' 1" }}>
+                        </Typography>
+                        <Typography component='span' variant='monoId' sx={{ color: 'text.primary' }}>
                           {field.value}
-                        </Box>
+                        </Typography>
                       </Box>
                     ))}
                   </Box>
@@ -647,19 +646,21 @@ const RoadmapTaskDrawer = ({ item, onClose, onCopy }: RoadmapTaskDrawerProps) =>
                         component='button'
                         type='button'
                         onClick={() => handleScrollToSection(section.slug)}
-                        sx={{
-                          ...toneSx('neutral'),
-                          border: '1px solid',
-                          borderColor: 'divider',
-                          borderRadius: theme => `${theme.shape.customBorderRadius.sm}px`,
-                          px: 1.125,
-                          py: 0.5,
-                          fontSize: '0.75rem',
-                          fontWeight: 600,
-                          cursor: 'pointer',
-                          '&:hover': { borderColor: 'primary.main', color: 'primary.main' },
-                          '&:focus-visible': { outline: theme => `2px solid ${theme.palette.primary.main}`, outlineOffset: 2 }
-                        }}
+                        sx={[
+                          toneSx('neutral'),
+                          {
+                            border: '1px solid',
+                            borderColor: 'divider',
+                            borderRadius: theme => `${theme.shape.customBorderRadius.sm}px`,
+                            px: 1.125,
+                            py: 0.5,
+                            typography: 'caption',
+                            fontWeight: 600,
+                            cursor: 'pointer',
+                            '&:hover': { borderColor: 'primary.main', color: 'primary.main' },
+                            '&:focus-visible': { outline: theme => `2px solid ${theme.palette.primary.main}`, outlineOffset: 2 }
+                          }
+                        ]}
                       >
                         {section.title}
                       </Box>
@@ -676,13 +677,14 @@ const RoadmapTaskDrawer = ({ item, onClose, onCopy }: RoadmapTaskDrawerProps) =>
                     {body}
                   </Markdown>
                 </Box>
-                <Box
+                <Typography
                   component='p'
-                  sx={{ mt: 5, pt: 3, borderTop: '1px solid', borderColor: 'divider', fontSize: '0.75rem', color: 'text.disabled', display: 'flex', alignItems: 'center', gap: 1 }}
+                  variant='caption'
+                  sx={{ mt: 5, pt: 3, borderTop: '1px solid', borderColor: 'divider', color: 'text.disabled', display: 'flex', alignItems: 'center', gap: 1 }}
                 >
                   <i className='tabler-lock' aria-hidden='true' style={{ fontSize: 13, lineHeight: 0 }} />
                   {GH_ROADMAP.taskDrawer.readOnlyNote}
-                </Box>
+                </Typography>
               </>
             ) : null}
           </Box>

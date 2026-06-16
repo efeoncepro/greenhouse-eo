@@ -4,7 +4,7 @@
  * TASK-1153 — Inspector aside: detalle del work item seleccionado. Read-only;
  * solo acciones seguras (copiar ID, copiar comando para tasks, copiar path).
  */
-import type { ReactNode } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
@@ -18,18 +18,30 @@ import { HEALTH_VISUAL, KIND_VISUAL, PRIORITY_TONE, toneSx } from '../cockpit-to
 import InlineMarkdown from './InlineMarkdown'
 import { ToneTag } from './RoadmapTags'
 
+const FILE_PREVIEW_LIMIT = 5
+const RELATION_PREVIEW_LIMIT = 8
+const DEPENDENCY_PREVIEW_LIMIT = 6
+
 const Overline = ({ children }: { children: ReactNode }) => (
-  <Box
+  <Typography
     component='span'
+    variant='overline'
     sx={{
-      fontSize: '0.6875rem',
-      fontWeight: 600,
-      letterSpacing: '0.08em',
-      textTransform: 'uppercase',
       color: 'text.disabled'
     }}
   >
     {children}
+  </Typography>
+)
+
+const SectionHeading = ({ label, count }: { label: string; count?: number }) => (
+  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 2, minWidth: 0 }}>
+    <Overline>{label}</Overline>
+    {typeof count === 'number' ? (
+      <Typography component='span' variant='caption' sx={{ color: 'text.disabled', fontFeatureSettings: "'tnum' 1" }}>
+        {count}
+      </Typography>
+    ) : null}
   </Box>
 )
 
@@ -45,27 +57,51 @@ const RelatedChip = ({ id, icon, onClick }: { id: string; icon: string; onClick?
     type='button'
     onClick={onClick}
     disabled={!onClick}
-    sx={{
-      display: 'inline-flex',
-      alignItems: 'center',
-      gap: 0.625,
-      ...toneSx('neutral'),
-      border: '1px solid',
-      borderColor: 'divider',
-      borderRadius: theme => `${theme.shape.customBorderRadius.sm}px`,
-      px: 1.125,
-      py: 0.5,
-      fontSize: '0.75rem',
-      fontWeight: 600,
-      fontFeatureSettings: "'tnum' 1",
-      cursor: onClick ? 'pointer' : 'default',
-      opacity: onClick ? 1 : 0.55,
-      '&:hover': onClick ? { borderColor: 'primary.main', color: 'primary.main' } : {},
-      '&:focus-visible': { outline: theme => `2px solid ${theme.palette.primary.main}`, outlineOffset: 2 }
-    }}
+    sx={[
+      toneSx('neutral'),
+      {
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: 0.625,
+        border: '1px solid',
+        borderColor: 'divider',
+        borderRadius: theme => `${theme.shape.customBorderRadius.sm}px`,
+        px: 1.125,
+        py: 0.5,
+        typography: 'caption',
+        fontWeight: 600,
+        fontFeatureSettings: "'tnum' 1",
+        cursor: onClick ? 'pointer' : 'default',
+        opacity: onClick ? 1 : 0.55,
+        '&:hover': onClick ? { borderColor: 'primary.main', color: 'primary.main' } : {},
+        '&:focus-visible': { outline: theme => `2px solid ${theme.palette.primary.main}`, outlineOffset: 2 }
+      }
+    ]}
   >
     <i className={icon} aria-hidden='true' style={{ fontSize: 12, lineHeight: 0 }} />
     {id}
+  </Box>
+)
+
+const FileRow = ({ file }: { file: string }) => (
+  <Box
+    sx={{
+      display: 'flex',
+      alignItems: 'center',
+      gap: 1,
+      typography: 'caption',
+      color: 'text.secondary',
+      fontFeatureSettings: "'tnum' 1",
+      p: theme => `${theme.spacing(1.75)} ${theme.spacing(2.25)}`,
+      backgroundColor: 'action.hover',
+      borderRadius: theme => `${theme.shape.customBorderRadius.sm}px`,
+      minWidth: 0
+    }}
+  >
+    <i className='tabler-file-code' aria-hidden='true' style={{ fontSize: 14, lineHeight: 0, flex: '0 0 auto' }} />
+    <Box component='span' sx={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', direction: 'rtl', textAlign: 'left' }}>
+      {file}
+    </Box>
   </Box>
 )
 
@@ -79,6 +115,16 @@ export interface RoadmapInspectorProps {
 }
 
 const RoadmapInspector = ({ item, presentIds, onClose, onSelectRelated, onCopy, onOpenTask }: RoadmapInspectorProps) => {
+  const [showAllFiles, setShowAllFiles] = useState(false)
+  const [showAllRelated, setShowAllRelated] = useState(false)
+  const [showAllDependencies, setShowAllDependencies] = useState(false)
+
+  useEffect(() => {
+    setShowAllFiles(false)
+    setShowAllRelated(false)
+    setShowAllDependencies(false)
+  }, [item?.id])
+
   if (!item) {
     return (
       <Box
@@ -127,6 +173,12 @@ const RoadmapInspector = ({ item, presentIds, onClose, onSelectRelated, onCopy, 
   const isIssue = item.kind === 'issue'
   const hasFindings = item.findings.length > 0
   const blockedBy = item.blockedBy[0]
+  const visibleFiles = showAllFiles ? item.filesOwned : item.filesOwned.slice(0, FILE_PREVIEW_LIMIT)
+  const visibleRelated = showAllRelated ? item.related : item.related.slice(0, RELATION_PREVIEW_LIMIT)
+  const visibleDependsOn = showAllDependencies ? item.dependsOn : item.dependsOn.slice(0, DEPENDENCY_PREVIEW_LIMIT)
+  const hiddenFiles = Math.max(0, item.filesOwned.length - visibleFiles.length)
+  const hiddenRelated = Math.max(0, item.related.length - visibleRelated.length)
+  const hiddenDependsOn = Math.max(0, item.dependsOn.length - visibleDependsOn.length)
 
   return (
     <Box
@@ -137,27 +189,28 @@ const RoadmapInspector = ({ item, presentIds, onClose, onSelectRelated, onCopy, 
         borderColor: 'divider',
         borderRadius: theme => `${theme.shape.customBorderRadius.md}px`,
         boxShadow: theme => theme.greenhouseElevation.raised.boxShadow,
-        overflow: 'hidden'
+        overflow: 'hidden',
+        display: 'flex',
+        flexDirection: 'column',
+        maxHeight: { xs: '100dvh', md: 'calc(100vh - 22rem)' },
+        minHeight: { md: 360 }
       }}
     >
       {/* Header */}
-      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5, p: 4.5, borderBottom: '1px solid', borderColor: 'action.hover' }}>
+      <Box sx={{ flexShrink: 0, display: 'flex', flexDirection: 'column', gap: 1.5, p: 4.5, borderBottom: '1px solid', borderColor: 'action.hover' }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <ToneTag tone={kindVisual.tone} icon={kindVisual.icon} label={kindVisual.label} />
-          <Box component='span' sx={{ fontWeight: 600, fontSize: '0.875rem', fontFeatureSettings: "'tnum' 1", color: 'text.secondary' }}>
+          <Typography component='span' variant='monoId' sx={{ color: 'text.secondary' }}>
             {item.id}
-          </Box>
+          </Typography>
           <Box sx={{ ml: 'auto' }} />
           <IconButton size='small' onClick={onClose} aria-label={GH_ROADMAP.closeInspectorAria}>
             <i className='tabler-x' style={{ fontSize: 18 }} />
           </IconButton>
         </Box>
-        <Box
-          component='h2'
-          sx={{ m: 0, fontFamily: theme => theme.typography.h4.fontFamily, fontSize: '1.25rem', fontWeight: 600, lineHeight: 1.3, color: 'text.primary' }}
-        >
+        <Typography component='h2' variant='h4' sx={{ m: 0 }}>
           {item.title}
-        </Box>
+        </Typography>
         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.75 }}>
           {item.priority ? <ToneTag tone={PRIORITY_TONE[item.priority]} label={item.priority} radius='full' /> : null}
           <ToneTag tone={healthVisual.tone} icon={healthVisual.icon} label={healthVisual.label} radius='full' />
@@ -168,41 +221,43 @@ const RoadmapInspector = ({ item, presentIds, onClose, onSelectRelated, onCopy, 
       </Box>
 
       {/* Body */}
-      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4.5, p: 4.5 }}>
+      <Box sx={{ flex: 1, minHeight: 0, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 4.5, p: 4.5, scrollbarWidth: 'thin' }}>
         {item.summary ? (
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-            <Overline>{isIssue ? GH_ROADMAP.inspector.symptom : GH_ROADMAP.inspector.summary}</Overline>
+            <SectionHeading label={isIssue ? GH_ROADMAP.inspector.symptom : GH_ROADMAP.inspector.summary} />
             <Prose><InlineMarkdown text={item.summary} /></Prose>
           </Box>
         ) : null}
 
         {hasFindings ? (
           <Box
-            sx={{
-              ...toneSx('warning'),
-              borderRadius: theme => `${theme.shape.customBorderRadius.md}px`,
-              p: theme => `${theme.spacing(3)} ${theme.spacing(3.5)}`,
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 2
-            }}
+            sx={[
+              toneSx('warning'),
+              {
+                borderRadius: theme => `${theme.shape.customBorderRadius.md}px`,
+                p: theme => `${theme.spacing(3)} ${theme.spacing(3.5)}`,
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 2
+              }
+            ]}
           >
-            <Box component='span' sx={{ display: 'inline-flex', alignItems: 'center', gap: 1.75, fontSize: '0.8125rem', fontWeight: 600 }}>
+            <Typography component='span' variant='body2' sx={{ display: 'inline-flex', alignItems: 'center', gap: 1.75, fontWeight: 600 }}>
               <i className='tabler-alert-triangle' aria-hidden='true' style={{ fontSize: 15, lineHeight: 0 }} />
               {GH_ROADMAP.inspector.groomingTitle}
-            </Box>
+            </Typography>
             {item.findings.map((finding, idx) => (
-              <Box key={idx} component='span' sx={{ display: 'flex', gap: 1.75, fontSize: '0.8125rem', lineHeight: 1.45 }}>
+              <Typography key={idx} component='span' variant='body2' sx={{ display: 'flex', gap: 1.75, lineHeight: 1.45 }}>
                 <span aria-hidden='true'>•</span>
                 {finding}
-              </Box>
+              </Typography>
             ))}
           </Box>
         ) : null}
 
         {item.why && !isIssue ? (
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-            <Overline>{GH_ROADMAP.inspector.why}</Overline>
+            <SectionHeading label={GH_ROADMAP.inspector.why} />
             <Prose muted><InlineMarkdown text={item.why} /></Prose>
           </Box>
         ) : null}
@@ -211,7 +266,7 @@ const RoadmapInspector = ({ item, presentIds, onClose, onSelectRelated, onCopy, 
           <>
             {item.rootCause ? (
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-                <Overline>{GH_ROADMAP.inspector.rootCause}</Overline>
+                <SectionHeading label={GH_ROADMAP.inspector.rootCause} />
                 <Prose muted><InlineMarkdown text={item.rootCause} /></Prose>
               </Box>
             ) : null}
@@ -226,7 +281,7 @@ const RoadmapInspector = ({ item, presentIds, onClose, onSelectRelated, onCopy, 
 
         {item.blockedBy.length > 0 ? (
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.75 }}>
-            <Overline>{GH_ROADMAP.inspector.blockedBy}</Overline>
+            <SectionHeading label={GH_ROADMAP.inspector.blockedBy} count={item.blockedBy.length} />
             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.75 }}>
               {item.blockedBy.map(id => (
                 <Box
@@ -235,21 +290,23 @@ const RoadmapInspector = ({ item, presentIds, onClose, onSelectRelated, onCopy, 
                   type='button'
                   onClick={presentIds.has(id) ? () => onSelectRelated(id) : undefined}
                   disabled={!presentIds.has(id)}
-                  sx={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: 0.625,
-                    ...toneSx('error'),
-                    border: '1px solid transparent',
-                    borderRadius: theme => `${theme.shape.customBorderRadius.sm}px`,
-                    px: 1.125,
-                    py: 0.5,
-                    fontSize: '0.75rem',
-                    fontWeight: 600,
-                    fontFeatureSettings: "'tnum' 1",
-                    cursor: presentIds.has(id) ? 'pointer' : 'default',
-                    '&:focus-visible': { outline: theme => `2px solid ${theme.palette.error.main}`, outlineOffset: 2 }
-                  }}
+                  sx={[
+                    toneSx('error'),
+                    {
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 0.625,
+                      border: '1px solid transparent',
+                      borderRadius: theme => `${theme.shape.customBorderRadius.sm}px`,
+                      px: 1.125,
+                      py: 0.5,
+                      typography: 'caption',
+                      fontWeight: 600,
+                      fontFeatureSettings: "'tnum' 1",
+                      cursor: presentIds.has(id) ? 'pointer' : 'default',
+                      '&:focus-visible': { outline: theme => `2px solid ${theme.palette.error.main}`, outlineOffset: 2 }
+                    }
+                  ]}
                 >
                   <i className='tabler-lock' aria-hidden='true' style={{ fontSize: 12, lineHeight: 0 }} />
                   {id}
@@ -261,114 +318,122 @@ const RoadmapInspector = ({ item, presentIds, onClose, onSelectRelated, onCopy, 
 
         {item.dependsOn.length > 0 ? (
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.75 }}>
-            <Overline>{GH_ROADMAP.inspector.dependsOn}</Overline>
+            <SectionHeading label={GH_ROADMAP.inspector.dependsOn} count={item.dependsOn.length} />
             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.75 }}>
-              {item.dependsOn.map(id => (
+              {visibleDependsOn.map(id => (
                 <RelatedChip key={id} id={id} icon='tabler-arrow-right' onClick={presentIds.has(id) ? () => onSelectRelated(id) : undefined} />
               ))}
+              {hiddenDependsOn > 0 || showAllDependencies ? (
+                <Button size='small' variant='text' color='secondary' onClick={() => setShowAllDependencies(value => !value)}>
+                  {showAllDependencies ? GH_ROADMAP.inspector.showLess : GH_ROADMAP.inspector.showMore(hiddenDependsOn)}
+                </Button>
+              ) : null}
             </Box>
           </Box>
         ) : null}
 
         {item.filesOwned.length > 0 ? (
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.75 }}>
-            <Overline>{GH_ROADMAP.inspector.files}</Overline>
-            {item.filesOwned.map(file => (
-              <Box
-                key={file}
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 1,
-                  fontSize: '0.8125rem',
-                  color: 'text.secondary',
-                  fontFeatureSettings: "'tnum' 1",
-                  p: theme => `${theme.spacing(1.75)} ${theme.spacing(2.25)}`,
-                  backgroundColor: 'action.hover',
-                  borderRadius: theme => `${theme.shape.customBorderRadius.sm}px`,
-                  minWidth: 0
-                }}
-              >
-                <i className='tabler-file-code' aria-hidden='true' style={{ fontSize: 14, lineHeight: 0, flex: '0 0 auto' }} />
-                <Box component='span' sx={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', direction: 'rtl', textAlign: 'left' }}>
-                  {file}
-                </Box>
-              </Box>
-            ))}
+            <SectionHeading label={GH_ROADMAP.inspector.files} count={item.filesOwned.length} />
+            {visibleFiles.map(file => <FileRow key={file} file={file} />)}
+            {hiddenFiles > 0 || showAllFiles ? (
+              <Button size='small' variant='text' color='secondary' onClick={() => setShowAllFiles(value => !value)}>
+                {showAllFiles ? GH_ROADMAP.inspector.showLess : GH_ROADMAP.inspector.showMore(hiddenFiles)}
+              </Button>
+            ) : null}
           </Box>
         ) : null}
 
         {item.related.length > 0 ? (
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.75 }}>
-            <Overline>{GH_ROADMAP.inspector.related}</Overline>
+            <SectionHeading label={GH_ROADMAP.inspector.related} count={item.related.length} />
             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.75 }}>
-              {item.related.map(id => (
+              {visibleRelated.map(id => (
                 <RelatedChip key={id} id={id} icon='tabler-link' onClick={presentIds.has(id) ? () => onSelectRelated(id) : undefined} />
               ))}
+              {hiddenRelated > 0 || showAllRelated ? (
+                <Button size='small' variant='text' color='secondary' onClick={() => setShowAllRelated(value => !value)}>
+                  {showAllRelated ? GH_ROADMAP.inspector.showLess : GH_ROADMAP.inspector.showMore(hiddenRelated)}
+                </Button>
+              ) : null}
             </Box>
           </Box>
         ) : null}
+      </Box>
 
-        {/* Actions */}
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5, pt: 1, borderTop: '1px solid', borderColor: 'action.hover' }}>
-          {item.isExecutableTask ? (
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 3.5 }}>
-              <Overline>{GH_ROADMAP.inspector.command}</Overline>
-              <Box
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 1,
-                  backgroundColor: 'action.hover',
-                  border: '1px solid',
-                  borderColor: 'divider',
-                  borderRadius: theme => `${theme.shape.customBorderRadius.md}px`,
-                  p: theme => `${theme.spacing(2)} ${theme.spacing(2.5)}`,
-                  minWidth: 0
-                }}
-              >
-                <i className='tabler-terminal-2' aria-hidden='true' style={{ fontSize: 15, lineHeight: 0 }} />
-                <Box component='span' sx={{ fontSize: '0.8125rem', fontFeatureSettings: "'tnum' 1", color: 'text.primary', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                  {GH_ROADMAP.implementTaskCommand(item.id)}
-                </Box>
-              </Box>
-              {blockedBy ? (
-                <Box component='span' sx={{ display: 'inline-flex', alignItems: 'center', gap: 1, fontSize: '0.8125rem', color: 'warning.main' }}>
-                  <i className='tabler-info-circle' aria-hidden='true' style={{ fontSize: 14, lineHeight: 0 }} />
-                  {GH_ROADMAP.inspector.blockedNote(blockedBy)}
-                </Box>
-              ) : null}
-              <Button
-                variant='contained'
-                fullWidth
-                startIcon={<i className='tabler-clipboard' />}
-                onClick={() => onCopy(GH_ROADMAP.implementTaskCommand(item.id))}
-              >
-                {GH_ROADMAP.inspector.copyCommand}
-              </Button>
-            </Box>
-          ) : null}
-          <Box sx={{ display: 'flex', gap: 1, pt: 3.5 }}>
-            <Button
-              variant='outlined'
-              size='small'
-              data-capture='roadmap-open-task'
-              startIcon={<i className='tabler-file-text' />}
-              onClick={() => onOpenTask(item.id)}
+      {/* Action dock */}
+      <Box
+        sx={{
+          flexShrink: 0,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 2,
+          p: theme => `${theme.spacing(3)} ${theme.spacing(4.5)}`,
+          borderTop: '1px solid',
+          borderColor: 'divider',
+          backgroundColor: 'background.paper',
+          boxShadow: theme => `0 -10px 28px ${theme.palette.background.paper}`
+        }}
+      >
+        {item.isExecutableTask ? (
+          <>
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 1,
+                backgroundColor: 'action.hover',
+                border: '1px solid',
+                borderColor: 'divider',
+                borderRadius: theme => `${theme.shape.customBorderRadius.md}px`,
+                p: theme => `${theme.spacing(1.75)} ${theme.spacing(2.25)}`,
+                minWidth: 0
+              }}
             >
-              {GH_ROADMAP.inspector.openTask}
-            </Button>
-            <Button variant='text' size='small' color='secondary' startIcon={<i className='tabler-copy' />} onClick={() => onCopy(item.id)}>
-              {GH_ROADMAP.inspector.copyId}
-            </Button>
-          </Box>
-          <Box
-            component='span'
-            sx={{ fontSize: '0.75rem', color: 'text.disabled', fontFeatureSettings: "'tnum' 1", overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', direction: 'rtl', textAlign: 'left' }}
+              <i className='tabler-terminal-2' aria-hidden='true' style={{ fontSize: 15, lineHeight: 0 }} />
+              <Typography component='span' variant='monoId' sx={{ color: 'text.primary', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                {GH_ROADMAP.implementTaskCommand(item.id)}
+              </Typography>
+            </Box>
+            {blockedBy ? (
+              <Typography component='span' variant='caption' sx={{ display: 'inline-flex', alignItems: 'center', gap: 1, color: 'warning.main' }}>
+                <i className='tabler-info-circle' aria-hidden='true' style={{ fontSize: 14, lineHeight: 0 }} />
+                {GH_ROADMAP.inspector.blockedNote(blockedBy)}
+              </Typography>
+            ) : null}
+          </>
+        ) : null}
+        <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+          <Button
+            variant='outlined'
+            size='small'
+            data-capture='roadmap-open-task'
+            startIcon={<i className='tabler-file-text' />}
+            onClick={() => onOpenTask(item.id)}
           >
-            {item.path}
-          </Box>
+            {GH_ROADMAP.inspector.openTask}
+          </Button>
+          {item.isExecutableTask ? (
+            <Button
+              variant='contained'
+              size='small'
+              startIcon={<i className='tabler-clipboard' />}
+              onClick={() => onCopy(GH_ROADMAP.implementTaskCommand(item.id))}
+            >
+              {GH_ROADMAP.inspector.copyCommand}
+            </Button>
+          ) : null}
+          <Button variant='text' size='small' color='secondary' startIcon={<i className='tabler-copy' />} onClick={() => onCopy(item.id)}>
+            {GH_ROADMAP.inspector.copyId}
+          </Button>
         </Box>
+        <Typography
+          component='span'
+          variant='caption'
+          sx={{ color: 'text.disabled', fontFeatureSettings: "'tnum' 1", overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', direction: 'rtl', textAlign: 'left' }}
+        >
+          {item.path}
+        </Typography>
       </Box>
     </Box>
   )

@@ -1,11 +1,13 @@
 /**
  * TASK-1153 — Tokens visuales del cockpit de Roadmap (mapeo semántico → theme).
  *
- * Mapea kind / lane / prioridad / salud a un rol de paleta (`primary`, `info`,
- * `error`, …) + un icono Tabler. La resolución a color real ocurre vía sx
- * (`<role>.lightOpacity` para el fondo tonal, `<role>.main` para el ink) — NUNCA
- * HEX inline. Espeja el lenguaje del diseño AXIS aprobado.
+ * Mapea kind / lane / prioridad / salud a un rol semántico (`primary`, `info`,
+ * `error`, …) + un icono Tabler. La resolución a color real ocurre vía sx:
+ * feedback tones consumen `theme.greenhouseSemantic.*` y brand tones consumen
+ * palette tokens MUI/Vuexy. NUNCA HEX inline.
  */
+import type { Theme } from '@mui/material/styles'
+
 import { GH_ROADMAP } from '@/lib/copy/roadmap'
 import type { RoadmapLaneId, RoadmapPriority } from '@/lib/roadmap/cockpit/types'
 import type { WorkItemHealthLevel, WorkItemKind } from '@/lib/roadmap/work-item-index/types'
@@ -13,11 +15,38 @@ import type { WorkItemHealthLevel, WorkItemKind } from '@/lib/roadmap/work-item-
 /** Rol de paleta MUI/Vuexy + `neutral` (gris) para tonos sin semántica fuerte. */
 export type TonePalette = 'primary' | 'secondary' | 'info' | 'error' | 'warning' | 'success' | 'neutral'
 
+const FEEDBACK_TONES = ['info', 'error', 'warning', 'success'] as const
+
+const isFeedbackTone = (tone: TonePalette): tone is (typeof FEEDBACK_TONES)[number] =>
+  (FEEDBACK_TONES as readonly TonePalette[]).includes(tone)
+
+type ToneSxObject = {
+  backgroundColor: string
+  borderColor?: string
+  color: string
+}
+
 /** sx canónico para un chip/badge tonal: fondo suave + ink AA. */
-export const toneSx = (tone: TonePalette): { backgroundColor: string; color: string } =>
-  tone === 'neutral'
-    ? { backgroundColor: 'action.hover', color: 'text.secondary' }
-    : { backgroundColor: `${tone}.lightOpacity`, color: `${tone}.main` }
+export const toneSx = (tone: TonePalette): ((theme: Theme) => ToneSxObject) => theme => {
+  if (tone === 'neutral') {
+    return { backgroundColor: theme.palette.action.hover, color: theme.palette.text.secondary }
+  }
+
+  if (isFeedbackTone(tone)) {
+    const semantic = theme.greenhouseSemantic[tone]
+
+    return {
+      backgroundColor: semantic.tonalSurface,
+      borderColor: semantic.tonalBorder,
+      color: semantic.tonalText
+    }
+  }
+
+  return {
+    backgroundColor: theme.palette[tone].lightOpacity ?? `var(--mui-palette-${tone}-lightOpacity)`,
+    color: theme.palette[tone].main
+  }
+}
 
 /** Color de acento (border-left de la card, punto de lane). */
 export const toneAccent = (tone: TonePalette): string =>

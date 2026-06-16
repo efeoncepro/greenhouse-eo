@@ -1,5 +1,14 @@
 # Release 2026-06-10 #2 — develop→main `6c649b2a6` RELEASED
 
+## Sesión 2026-06-16 — TASK-1159 Public Site Astro SEO foundation task — Codex
+
+> **Estado:** task creada en `docs/tasks/to-do/`; sin implementación runtime. Siguiente paso recomendado después de TASK-1158.
+
+- **Entregable:** `docs/tasks/to-do/TASK-1159-public-site-astro-seo-foundation-service-landing-shell.md`.
+- **Scope:** preparar `efeonce-web` como rail Astro/Vercel ejecutable para landings reales: limpiar rutas demo/scaffold, centralizar SEO/canonical/sitemap/robots/OG, tokenizar Ohio/Figma contra Brand Guideline Efeonce y construir shell reusable de landing de servicio con microinteracciones, responsive, GVC/Lighthouse y no-cutover posture.
+- **Corte deliberado:** no mezcla el backend/control-plane Greenhouse↔Vercel/GitHub. Ese follow-up queda como TASK-1160 candidata (`backend-data`, integration) para reader/binding desde Greenhouse.
+- **Validación esperada al crear:** `pnpm task:lint --task TASK-1159`, `pnpm ops:lint --changed`, `pnpm docs:closure-check`.
+
 ## Sesión 2026-06-16 — TASK-1158 Public Site Astro runtime decision — Codex
 
 > **Estado:** complete en `develop`; push solicitado por el operador en esta sesión. Se decidió y documentó que `efeonce-web`/Astro pasa a ser el frontend público objetivo para `efeoncepro.com` bajo dominio principal, sin mutar WordPress/Kinsta/Vercel/DNS.

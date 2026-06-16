@@ -25,7 +25,7 @@ export const GH_ROADMAP = {
   // ── Página ──
   pageTitle: 'Roadmap',
   pageSubtitle:
-    'Prioriza el backlog operativo completo —epics, tasks, mini-tasks e incidentes— sin abandonar los Markdown que usan los agentes. Esta superficie lee el índice; no edita tasks.',
+    'Prioriza epics, tasks, mini-tasks e incidentes desde el índice vivo del repo. Solo lectura: el Markdown sigue siendo la fuente de verdad.',
   breadcrumbRoot: 'Greenhouse',
   breadcrumbCurrent: 'Roadmap',
 
@@ -37,25 +37,25 @@ export const GH_ROADMAP = {
 
   // ── Banner degradado ──
   degradedTitle: (count: number) =>
-    count === 1 ? '1 work item con metadata incompleta' : `${count} work items con metadata incompleta`,
+    count === 1 ? '1 archivo con metadata pendiente' : `${count} archivos con metadata pendiente`,
   degradedBody:
-    'Les falta el bloque «## Status» o la forma canónica del template; se muestran en «Necesitan grooming» con sus warnings. El resto del backlog se lee bien — revisa el front-matter para completarlos.',
+    'Falta «## Status» o el template canónico. Los agrupamos en «Necesitan grooming»; el resto del backlog está disponible.',
 
   // ── KPI tiles (summary band) ──
   tiles: {
-    total: { label: 'Work items', context: 'en el backlog' },
-    programs: { label: 'Epics activos', context: 'programas' },
+    total: { label: 'Items del backlog', context: 'índice completo' },
+    programs: { label: 'Programas activos', context: 'epics abiertos' },
     ready: { label: 'Listas para ejecutar', context: 'sin bloqueos' },
     blocked: { label: 'Bloqueadas', context: 'esperan dependencia' },
     issues: { label: 'Incidentes abiertos', context: 'deuda runtime' },
-    grooming: { label: 'Necesitan grooming', context: 'warnings de parseo' },
+    grooming: { label: 'Necesitan grooming', context: 'metadata pendiente' },
     progress: { label: 'En progreso', context: 'activas ahora' }
   },
 
   // ── Filtros ──
   filtersAria: 'Filtros del backlog',
   searchPlaceholder: 'Buscar por ID o título…',
-  searchAria: 'Buscar work items por ID o título',
+  searchAria: 'Buscar items por ID o título',
   clearFilters: 'Limpiar',
   clearFiltersAria: 'Limpiar todos los filtros',
   kindTabs: {
@@ -65,15 +65,15 @@ export const GH_ROADMAP = {
     mini_task: 'Mini-tasks',
     issue: 'Issues'
   } satisfies Record<'all' | WorkItemKind, string>,
-  priorityFilterAll: 'Prioridad · todas',
+  priorityFilterAll: 'Prioridad',
   priorityOptions: [
     { value: 'P0', label: 'P0 · crítica' },
     { value: 'P1', label: 'P1 · alta' },
     { value: 'P2', label: 'P2 · media' },
     { value: 'P3', label: 'P3 · baja' }
   ] as const,
-  domainFilterAll: 'Dominio · todos',
-  healthFilterAll: 'Salud · toda',
+  domainFilterAll: 'Dominio',
+  healthFilterAll: 'Salud',
   healthOptions: [
     { value: 'ok', label: 'Saludable' },
     { value: 'needs_grooming', label: 'Necesita atención' },
@@ -82,6 +82,12 @@ export const GH_ROADMAP = {
 
   // ── Board / lanes ──
   boardAria: 'Tablero del backlog por estado',
+  card: {
+    open: 'Abrir',
+    openAria: (id: string) => `Abrir detalle de ${id}`,
+    domainFallback: 'Sin dominio',
+    extraDomains: (count: number) => `+${count}`
+  },
   lanes: {
     programs: { title: 'Programas' },
     ready: { title: 'Listas para ejecutar' },
@@ -91,11 +97,11 @@ export const GH_ROADMAP = {
     progress: { title: 'En progreso' },
     done: { title: 'Resueltas hace poco' }
   } satisfies Record<RoadmapLaneId, { title: string }>,
-  laneEmpty: 'Sin items',
+  laneEmpty: 'Sin items por ahora',
   laneMore: (count: number) => (count === 1 ? '+1 más — filtra para acotar' : `+${count} más — filtra para acotar`),
 
   // ── Estados del board ──
-  noResultsTitle: 'No hay work items con estos filtros',
+  noResultsTitle: 'No hay items con estos filtros',
   noResultsBody: 'Ajusta los filtros o limpia la búsqueda para volver a ver el backlog completo.',
   noResultsCta: 'Limpiar filtros',
   loadingLabel: 'Cargando el backlog…',
@@ -133,17 +139,19 @@ export const GH_ROADMAP = {
     copyCommand: 'Copiar comando',
     copyId: 'Copiar ID',
     openTask: 'Abrir task',
+    showMore: (count: number) => `Ver ${count} más`,
+    showLess: 'Mostrar menos',
     blockedNote: (blockerId: string) => `Disponible cuando se desbloquee ${blockerId}`
   },
 
   // ── Drawer "Abrir task" (contenido Markdown renderizado, read-only) ──
   taskDrawer: {
-    aria: 'Contenido del work item',
-    closeAria: 'Cerrar el detalle del work item',
+    aria: 'Contenido del item',
+    closeAria: 'Cerrar el detalle del item',
     eyebrow: 'Contenido del Markdown',
     loadingLabel: 'Cargando el contenido…',
     errorTitle: 'No pudimos cargar el contenido',
-    errorBody: 'El work item puede haberse movido o renombrado. Intenta de nuevo en unos segundos.',
+    errorBody: 'El item puede haberse movido o renombrado. Intenta de nuevo en unos segundos.',
     retry: 'Reintentar',
     back: 'Volver',
     copyPath: 'Copiar ruta',
@@ -151,8 +159,8 @@ export const GH_ROADMAP = {
     copyCodeAria: 'Copiar el bloque de código',
     readOnlyNote: 'Solo lectura — el Markdown del repo es la fuente de verdad.'
   },
-  inspectorEmptyTitle: 'Selecciona un work item',
-  inspectorEmptyBody: 'Abre cualquier card del tablero para ver su detalle, dependencias y acciones seguras.',
+  inspectorEmptyTitle: 'Selecciona un item',
+  inspectorEmptyBody: 'Abre cualquier tarjeta del tablero para ver detalle, dependencias y acciones seguras.',
 
   // ── Comando ──
   implementTaskCommand: (taskId: string) => `/implement-task ${taskId}`,

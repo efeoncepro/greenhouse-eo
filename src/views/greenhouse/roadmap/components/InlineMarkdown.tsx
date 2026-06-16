@@ -38,7 +38,7 @@ const InlineMarkdown = ({ text }: InlineMarkdownProps) => (
         // repo, no IDs ni montos (mismo caso documentado que el drawer/NexaThread).
         // eslint-disable-next-line greenhouse/no-hardcoded-fontfamily
         fontFamily: 'monospace',
-        fontSize: '0.8125em',
+        fontSize: theme => theme.typography.caption.fontSize,
         bgcolor: 'action.selected',
         px: 0.5,
         py: 0.125,

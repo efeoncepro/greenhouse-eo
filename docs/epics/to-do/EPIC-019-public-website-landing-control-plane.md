@@ -56,6 +56,7 @@ Sin un epic, el trabajo tenderia a partir con un script o endpoint aislado que p
 
 | Task | Phase | Status | Purpose |
 | --- | --- | --- | --- |
+| `TASK-1159` | `0.9` | `to-do` | Astro SEO foundation + service landing shell: cleans `efeonce-web` scaffold/demo routes, centralizes SEO/canonical/sitemap/robots/OG, tokenizes Ohio/Figma against Efeonce brand and creates the reusable service landing shell with visual evidence, without cutover. |
 | `TASK-1158` | `0.75` | `complete` | Public Site Astro runtime control-plane decision: recalibrates EPIC-019 so Astro/Vercel becomes target frontend rail for `efeoncepro.com`, WordPress/Kinsta remains CMS/admin/origin and live legacy rail, and no primary SEO landings ship on a subdomain. |
 | `TASK-1111` | `0` | `in-progress` | WordPress/Kinsta discovery + read-only inventory: public REST/Abilities inventory shipped; authenticated WordPress/Abilities/plugins and WP-CLI theme/plugins/post-types are repeatable. Kinsta API environment/cache/backups remains blocked on token or deferral. |
 | `TASK-1122` | `0.5` | `in-progress` | Public Site code baseline + GitOps binding: private repo `efeoncepro/efeonce-public-site-runtime` created with live baseline `0fa6bfd` / tag `baseline-2026-06-14-live`; Greenhouse drift/deploy dry-run still pending. |
