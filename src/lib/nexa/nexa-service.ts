@@ -25,6 +25,7 @@ import {
 } from './nexa-turn-telemetry'
 import { AnthropicNexaProvider } from './providers/anthropic'
 import { GeminiNexaProvider } from './providers/gemini'
+import { downgradeStructuralHeadings } from './strip-markdown-excerpt'
 
 interface NexaServiceInput {
   prompt: string
@@ -226,7 +227,11 @@ export class NexaService {
 
         providerSteps.push({ providerKey: step.providerKey, model: step.model, latencyMs: Date.now() - stepStart, ok: true })
 
-        const content = turn.text
+        // TASK-1149 — capa determinística: baja los headers ATX (`##`) a **negrita** antes de
+        // devolver/persistir. El contrato de voz prohíbe headers en el panel del chat y el prompt
+        // no lo garantiza (LLM probabilístico — Claude los pone pese al prompt; lo detectó el
+        // nightly de TASK-1127). Cubre todos los providers; el endpoint sale limpio para el QA matrix.
+        const content = downgradeStructuralHeadings(turn.text)
 
         const suggestions = await provider.generateSuggestions({
           model: step.model,

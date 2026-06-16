@@ -32,6 +32,17 @@ Conserva el texto; solo quita la sintaxis. La respuesta del modelo y las citas `
 > **Bug class fuente:** el operador veía `## Las 7 fases…` en la tarjeta de Fuentes. NO era la
 > respuesta (esa ya se saneaba) sino el **preview del excerpt**, que renderizaba `chunk.text` verbatim.
 
+### Dos helpers, dos propósitos (no confundir)
+
+`strip-markdown-excerpt.ts` exporta **dos** helpers puros con destinos distintos:
+
+- **`toPlainExcerpt`** — APLANA todo el Markdown a prosa (sin headings/énfasis/listas/links). Para el
+  **preview del excerpt** de la tarjeta de Fuentes (no es renderizable, es un resumen).
+- **`downgradeStructuralHeadings`** (TASK-1149) — baja solo los **headers** ATX a `**negrita**`,
+  **preservando** viñetas/negritas/links/code fences. Para la **respuesta del chat** (que SÍ renderiza
+  Markdown), aplicado en `NexaService` (ver `behavior/behavior-and-routing.md` §Higiene de formato del
+  output). NO aplanar la respuesta con `toPlainExcerpt` — perdería la jerarquía renderizable.
+
 ## Estados honestos
 
 El panel de fuentes / la respuesta distinguen `loading | answered | empty | degraded`. NUNCA pintar

@@ -54,6 +54,17 @@ router-internal. Observabilidad: `NexaResponse.modelId` (persistido; provider de
 `definición` · `cómo-hacer` · `política` · `troubleshooting` · `comparación` · `operativo en vivo` ·
 `sin-respuesta`. (Definidos en el módulo `responseModes` del prompt V2.)
 
+## Higiene de formato del output (TASK-1149)
+
+`NexaService.generateResponse` aplica una **capa determinística** sobre el texto del turno antes de
+devolverlo/persistirlo: `downgradeStructuralHeadings` (`strip-markdown-excerpt.ts`) baja los headers
+ATX (`#`/`##`/`###`) a **negrita** en su propia línea, preservando viñetas/negritas/links y los bloques
+de código. **Por qué:** el contrato de voz prohíbe headers en el panel del chat (módulo `answerFormatting`),
+pero el cumplimiento del LLM es **probabilístico** — Claude (auto-router) los pone pese al prompt; lo
+detectó el nightly de TASK-1127 (caso K6 en staging). Defense-in-depth: el prompt reduce la frecuencia,
+esta capa lo **garantiza** en TODOS los providers. NO se toca el prompt para esto. (El `cleanNexaAnswer`
+del cliente sigue manejando aparte el `[n]` colgante del streaming typewriter.)
+
 ## Honestidad (gaps + degradación)
 
 - Si la evidencia de Knowledge es insuficiente → gap honesto ("no encontré una guía publicada…"), no inventa.

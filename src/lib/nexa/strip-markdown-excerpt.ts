@@ -35,3 +35,63 @@ export const toPlainExcerpt = (text: string): string => {
       .trim()
   )
 }
+
+const FENCE_RE = /^[ \t]{0,3}(?:```|~~~)/
+// Encabezado ATX: indent (0-3) + `#`..`######` + espacio + contenido (+ cierre `#` opcional).
+const ATX_HEADING_RE = /^([ \t]{0,3})#{1,6}[ \t]+(.+?)[ \t]*#*[ \t]*$/
+
+/**
+ * Baja los encabezados ATX (`#`, `##`, `###`…) a **negrita** en su propia línea, para la
+ * RESPUESTA del chat de Nexa (TASK-1149).
+ *
+ * El contrato de voz prohíbe headers en el panel del chat (TASK-1138 `answerFormatting`): en
+ * un panel denso de producto un H2 es demasiado pesado; la jerarquía va con **negrita** +
+ * viñetas + párrafos cortos. Algunos providers (Claude vía auto-router) generan `## Título`
+ * pese al prompt → esta capa determinística lo GARANTIZA en TODOS los providers, sin depender
+ * del compliance probabilístico del LLM (defense-in-depth: el prompt reduce la frecuencia,
+ * esto cierra el caso). El nightly de TASK-1127 lo detectó en staging (caso K6).
+ *
+ * A diferencia de `toPlainExcerpt` (que aplana TODO el Markdown para los previews), acá solo
+ * se downgradean los HEADERS a negrita: viñetas, negritas, links y énfasis se preservan
+ * (es la respuesta renderizable del chat). Preserva los bloques de código (no toca `##`
+ * dentro de ``` ``` para no romper un ejemplo citado). Idempotente, pura, client-safe.
+ */
+export const downgradeStructuralHeadings = (text: string): string => {
+  if (!text) {
+    return ''
+  }
+
+  let inFence = false
+
+  return text
+    .split('\n')
+    .map(line => {
+      // Las líneas de fence (``` / ~~~) togglean el bloque de código y se preservan tal cual.
+      if (FENCE_RE.test(line)) {
+        inFence = !inFence
+
+        return line
+      }
+
+      if (inFence) {
+        return line
+      }
+
+      const match = line.match(ATX_HEADING_RE)
+
+      if (!match) {
+        return line
+      }
+
+      const indent = match[1] ?? ''
+      const content = match[2].trim()
+
+      // Idempotencia / no doble-envolver si el contenido del header ya es negrita completa.
+      if (/^\*\*[\s\S]*\*\*$/.test(content)) {
+        return `${indent}${content}`
+      }
+
+      return `${indent}**${content}**`
+    })
+    .join('\n')
+}

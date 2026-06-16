@@ -6,14 +6,14 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P3`
-- Impact: `Bajo`
+- Impact: `Medio`
 - Effort: `Bajo`
 - Type: `implementation`
-- Execution profile: `standard`
-- UI impact: `indirect` (cambia cómo se ve la respuesta del chat; no toca componentes)
-- Backend impact: `light` (helper puro + aplicación en `NexaService`; sin DB/API/migrations)
+- Execution profile: `backend-data`
+- UI impact: `copy`
+- Backend impact: `api`
 - Epic: `none`
 - Status real: `Diseno`
 - Rank: `TBD`
@@ -105,6 +105,113 @@ Reglas obligatorias:
 
 - La respuesta del chat NO tiene un downgrade determinístico de headers → cuando Claude genera `## Título`, el render lo muestra como un H2 pesado y el QA matrix lo marca.
 - El strip de formato vive solo en el cliente (`cleanNexaAnswer`) y no cubre headers; el endpoint devuelve el raw.
+
+## UI/UX Contract
+
+### Experience brief
+
+- UI rigor: `ui-lite`
+- Usuario / rol: usuarios internos que leen respuestas de Nexa en el chat flotante o superficies conversacionales.
+- Momento del flujo: lectura de una respuesta Knowledge con secciones.
+- Problema de experiencia: los headers Markdown crudos (`##`) se renderizan como H2 pesados dentro de un panel denso; la respuesta debe mantener jerarquía sin parecer un documento/landing.
+- Resultado esperado: los títulos estructurales se muestran como negrita en línea propia, preservando viñetas, links y énfasis.
+
+### Surface/system decision
+
+- Primitive/pattern: reuse del render existente `MarkdownTextPrimitive` / `NEXA_MARKDOWN_COMPONENTS`; no se crea primitive nueva.
+- Composition/layout: N/A — no cambia layout ni shell.
+- Copy source: salida generada por Nexa post-procesada server-side; no introduce microcopy reusable nueva.
+- Visual density: respuesta compacta de chat; se elimina el peso visual de H1/H2/H3 sin aplanar todo el Markdown.
+
+### State inventory
+
+- Respuesta con `#`, `##`, `###` al inicio de línea.
+- Respuesta sin headers estructurales.
+- Respuesta con code fence que contiene `##` y debe preservarse.
+- Streaming/render cliente con `cleanNexaAnswer` intacto.
+
+### Interaction contract
+
+- No hay interacción nueva.
+- Keyboard/focus/click-away: N/A.
+- Loading/pending/error: sin cambios.
+
+### Motion and microinteractions
+
+- Motion rigor: `none`.
+- No agrega animaciones ni transiciones.
+- Reduced motion: N/A.
+
+### Visual verification
+
+- GVC requerido: sí, evidencia `ui-lite` del chat con una respuesta Knowledge que contenga secciones.
+- Viewports: desktop y mobile si el scenario ya existe o se puede capturar sin setup adicional; mínimo desktop para esta task P3/Bajo.
+- Check de scroll horizontal: no aplica layout nuevo, pero la captura debe verificar que la respuesta no introduce overflow evidente.
+- Acceptance visual: negrita en lugar de H2/H3; ningún `##` visible como heading en el panel.
+
+## Backend/Data Contract
+
+### Backend/data brief
+
+- Backend rigor: `backend-lite`
+- Impacto principal: `api`
+- Source of truth afectado: `src/lib/nexa/nexa-service.ts` como capa server-side que construye `NexaResponse.content`.
+- Consumidores afectados: `/api/home/nexa`, persistencia del turno, QA matrix, UI del chat.
+- Runtime target: `staging` para K6 + local tests.
+
+### Contract surface
+
+- Contrato existente a respetar: `NexaResponse.content` sigue siendo Markdown renderizable.
+- Contrato nuevo o modificado: el `content` sale normalizado para no contener headings estructurales `# / ## / ###` fuera de code fences.
+- Backward compatibility: `compatible` — preserva Markdown útil, solo baja headings estructurales a negrita.
+- Full API parity: la UI consume el mismo response server-side; no se agrega bypass cliente ni endpoint paralelo.
+
+### Data model and invariants
+
+- Entidades/tablas/views afectadas: ninguna.
+- Invariantes que no se pueden romper:
+  - No modificar texto dentro de code fences.
+  - No aplanar viñetas, links, negritas ni citas.
+  - El helper debe ser idempotente.
+- Tenant/space boundary: N/A — no introduce lookup ni acceso por tenant.
+- Idempotency/concurrency: helper puro determinístico, sin estado compartido.
+- Audit/outbox/history: N/A — no introduce writes nuevos; solo normaliza contenido antes de respuesta/persistencia existente.
+
+### Migration, backfill and rollout
+
+- Migration posture: `none`.
+- Default state: always-on sin flag nuevo, por ser normalización determinística benigna.
+- Backfill plan: N/A — no reescribe mensajes históricos.
+- Rollback path: revertir la aplicación del helper en `NexaService`.
+- External coordination: N/A.
+
+### Security and access
+
+- Auth/access gate: sin cambios; conserva gates existentes del endpoint.
+- Sensitive data posture: no introduce datos nuevos ni logs de contenido.
+- Error contract: sin cambios; el helper no debe lanzar para input string válido.
+- Abuse/rate-limit posture: sin cambios.
+
+### Runtime evidence
+
+- Local checks: `pnpm vitest run src/lib/nexa`.
+- DB/runtime checks: N/A — sin DB/migration.
+- Integration checks: `pnpm qa:nexa-knowledge -- --env=staging --case=K6`.
+- Reliability signals/logs: nightly de TASK-1127 cubre regresión posterior.
+- Production verification sequence: staging K6 + GVC antes de cerrar; prod queda cubierto por release normal.
+
+### Acceptance criteria additions
+
+- [ ] Source of truth y contract surface quedan nombrados con paths reales.
+- [ ] Invariantes de formato, code fences e idempotencia quedan cubiertas por tests.
+- [ ] No hay migración/backfill/DB ni writes externos.
+- [ ] Staging K6 valida que el endpoint ya no expone headings crudos.
+
+<!-- ═══════════════════════════════════════════════════════════
+     ZONE 2 — PLAN MODE
+     El agente que toma esta task ejecuta Discovery y produce
+     plan.md segun TASK_PROCESS.md. No llenar al crear la task.
+     ═══════════════════════════════════════════════════════════ -->
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 3 — EXECUTION SPEC
@@ -213,7 +320,7 @@ Defense-in-depth (3 capas, ninguna sola decide):
 - `changelog.md` + `Handoff.md` con la entrada de cierre.
 - Si se documenta como caveat de provider, `technical/llm-models.md`.
 
-## closing protocol
+## Closing Protocol
 
 - `Lifecycle: complete` + mover a `complete/` + sync `README.md` + `TASK_ID_REGISTRY.md`.
 - Evidencia: K6 limpio en staging + GVC del chat (negrita, no H2).
