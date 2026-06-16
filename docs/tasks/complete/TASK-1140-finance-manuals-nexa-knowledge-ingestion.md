@@ -575,6 +575,15 @@ citable) en PRODUCCIÓN, endurecer el compliance del cierre de validación human
 sensibles (prompt + assert en la QA matrix, ref TASK-1127). Hoy es no-determinista. Producción
 queda **sin cambios** (gateada); la ingesta corrió solo en dev/staging.
 
+**[Delta 2026-06-15 — follow-up, K6 RESUELTO]** El compliance K6 se resolvió de raíz el mismo día.
+El root cause **NO era el prompt** sino **TRUNCAMIENTO**: `maxOutputTokens: 500` en el provider Gemini
+(`src/lib/nexa/providers/gemini.ts`) cortaba la respuesta de nómina a ~500 tokens ANTES del cierre.
+Fix: `maxOutputTokens: 1024` (root cause) + regex del assert robusto al tuteo imperativo "valida con"
+(era falso negativo: solo aceptaba el infinitivo) + prompt V2 **v2.2.0** (refuerzo complementario de la
+política sensible). K6 pasa **3/3** en V2 (local/staging); evidencia viva: respuesta completa (2993
+chars) que cierra con "Antes de actuar, valida con People y Finanzas." Queda solo la **decisión humana**
+de activar V2 + corpus en producción (sign-off). Ver changelog 2026-06-15 (TASK-1140 follow-up).
+
 **Rollback:** retirar las entradas del corpus de `PILOT_CORPUS` + re-ingestar (o deprecar los
 docs vía lifecycle); revertir golden questions. <30 min, reversible.
 

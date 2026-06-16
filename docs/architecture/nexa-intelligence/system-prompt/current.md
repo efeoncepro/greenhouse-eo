@@ -3,7 +3,7 @@
 > **Capa:** System prompt (contenido vigente). **Código:** [`src/lib/nexa/nexa-system-prompt.ts`](../../../../src/lib/nexa/nexa-system-prompt.ts) → `buildNexaSystemPromptV2`.
 > **Versionado:** [`01-system-prompt-versioning.md`](versioning.md).
 
-El prompt activo es **`nexa-system-prompt.v2.1.0`** (flag `NEXA_SYSTEM_PROMPT_V2_ENABLED`). Es
+El prompt activo es **`nexa-system-prompt.v2.2.0`** (flag `NEXA_SYSTEM_PROMPT_V2_ENABLED`). Es
 **modular**: un array de bloques que se compone por turno. La fecha runtime se inyecta
 determinista (`America/Santiago`). La política de Knowledge solo aparece con retrieval ON.
 
@@ -24,8 +24,10 @@ determinista (`America/Santiago`). La política de Knowledge solo aparece con re
 5. **`knowledgePolicy`** (solo con retrieval ON) — **sintetizar** (no copiar un fragmento); citar
    `[n]` inline; **sin lista "Fuentes:"** (la UI es dueña); **nunca** Markdown estructural crudo
    (`##`, `#`, frontmatter); evidencia insuficiente → gap honesto; fuente stale/deprecated → declararlo;
-   **temas sensibles** (finanzas/nómina/legal/seguridad/contractual) → citar `[n]` + cerrar con una
-   línea **obligatoria** recomendando validar con la persona/área responsable.
+   **temas sensibles** (finanzas/nómina/pagos/finiquitos/contractors/tributario/seguridad/accesos/
+   contractual, ampliado en v2.2.0) → citar `[n]` + **criterio de completitud**: la respuesta NO está
+   completa sin una **línea FINAL** de validación humana, **aunque** la guía sea clara y la evidencia
+   fuerte (reforzado para el modo de fallo donde el modelo la omite — gate K6 de TASK-1140).
 6. **`operationalPolicy`** — no inferir el estado real desde manuales; si piden su dato real y no se
    consultó, decirlo; no inventar métricas/montos/estados.
 7. **`responseModes`** — elige el modo por intención: `definición` · `cómo-hacer` · `política` ·

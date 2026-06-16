@@ -63,6 +63,13 @@ plan/resuelto/failover real.
   hoy en todos los entornos) → Gemini. Con el router ON + `NEXA_KNOWLEDGE_RETRIEVAL_ENABLED` ON → las
   preguntas de conocimiento van a **Claude** (en cualquier entorno, incl. local). Un override `manual`
   fija Gemini. (Antes el chat quedaba clavado en Gemini por el bug del `requestedModel` forzado.)
+- **`maxOutputTokens` del provider Gemini = 1024 (TASK-1140 follow-up, gate K6)**: el `firstPass` y el
+  pass de **síntesis** (`followUp`) usan `maxOutputTokens: 1024` (antes 500). Con 500, una respuesta de
+  conocimiento sintetizada larga (intro + estados/pasos + citas + **cierre de validación humana en temas
+  sensibles**) se truncaba a ~500 tokens ANTES del cierre → el gate K6 fallaba por TRUNCAMIENTO, no por el
+  prompt. El techo es un máximo, no un objetivo (el `placementPolicy` sigue pidiendo concisión); solo evita
+  mutilar respuestas legítimamente largas. NO bajarlo sin medir K6. (Las `generateSuggestions` quedan en 200
+  por diseño — son 3 líneas cortas.)
 
 ## Secrets
 

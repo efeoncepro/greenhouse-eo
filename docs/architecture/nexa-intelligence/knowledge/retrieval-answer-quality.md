@@ -40,7 +40,16 @@ con Fuentes:"; se sanean los `##` crudos. (Detalle en [`06-evidence-and-citation
 
 `pnpm qa:nexa-knowledge -- --env=local|staging` corre la matriz gobernada contra `/api/home/nexa`
 con agent-session. Además de routing/citas/no-answer, asserta sobre el texto crudo del modelo:
-**síntesis** (no copia), **sin volcado "Fuentes:"**, **regresión `##`** y **voz** (🍏, voseo).
+**síntesis** (no copia), **sin volcado "Fuentes:"**, **regresión `##`**, **voz** (🍏, voseo) y, en temas
+sensibles, el **cierre de validación humana** (`sensitiveValidation`).
+
+> **Gate K6 — cierre de validación en temas sensibles (TASK-1140 follow-up):** el caso K6 (nómina)
+> fallaba consistente, pero el root cause **no era el prompt** (la regla ya existía): la respuesta se
+> **truncaba** a ~500 tokens ANTES del cierre (fix → `maxOutputTokens: 1024` en el provider Gemini, ver
+> [`../technical/llm-models.md`](../technical/llm-models.md)). Además el regex del assert solo aceptaba el
+> **infinitivo** ("validar con") y la voz de Nexa usa el **tuteo imperativo** ("valida con People") → falso
+> negativo; ahora acepta ambos + "antes de actuar, valida …". Con los dos fixes K6 pasa 3/3 y la respuesta
+> cierra con "Antes de actuar, valida con People y Finanzas." (evidencia viva, 2993 chars completos).
 
 El eval de **retrieval** (golden questions) vive aparte, offline: `golden-questions.live.test.ts`
 (correctitud del recall/precisión del FTS). Son complementarios: uno mide la respuesta, el otro la búsqueda.

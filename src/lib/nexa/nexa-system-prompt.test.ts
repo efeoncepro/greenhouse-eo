@@ -97,6 +97,14 @@ describe('buildNexaSystemPromptV2 (modular + voz + response modes)', () => {
     expect(prompt).toContain('NUNCA muestres marcadores de Markdown estructural crudos')
   })
 
+  it('refuerza el cierre de validación humana en temas sensibles (TASK-1140 gate K6)', () => {
+    const prompt = v2(true)
+
+    expect(prompt).toContain('TEMAS SENSIBLES')
+    expect(prompt).toContain('tu respuesta NO está completa sin una línea FINAL')
+    expect(prompt).toContain('AUNQUE la guía sea clara y tengas evidencia fuerte')
+  })
+
   it('incluye la política de estructura/formato de respuesta (TASK-1138)', () => {
     const prompt = v2(true)
 
@@ -136,7 +144,7 @@ describe('golden snapshot del prompt completo (TASK-1126)', () => {
 describe('versiones de prompt', () => {
   it('expone versiones estables para governance', () => {
     expect(NEXA_SYSTEM_PROMPT_V1_VERSION).toBe('nexa-system-prompt.v1')
-    expect(NEXA_SYSTEM_PROMPT_V2_VERSION).toBe('nexa-system-prompt.v2.1.0')
+    expect(NEXA_SYSTEM_PROMPT_V2_VERSION).toBe('nexa-system-prompt.v2.2.0')
   })
 })
 

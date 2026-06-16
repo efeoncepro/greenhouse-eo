@@ -15,7 +15,7 @@ import { isNexaKnowledgeRetrievalEnabled, isNexaSystemPromptV2Enabled } from './
  */
 
 export const NEXA_SYSTEM_PROMPT_V1_VERSION = 'nexa-system-prompt.v1'
-export const NEXA_SYSTEM_PROMPT_V2_VERSION = 'nexa-system-prompt.v2.1.0'
+export const NEXA_SYSTEM_PROMPT_V2_VERSION = 'nexa-system-prompt.v2.2.0'
 export const NEXA_SYSTEM_PROMPT_FAMILY = 'home-chat'
 
 export interface NexaSystemPromptOptions {
@@ -143,7 +143,7 @@ export const buildNexaSystemPromptV2 = (context: HomeSnapshot, options?: NexaSys
         '- NUNCA muestres marcadores de Markdown estructural crudos (##, #, frontmatter, boilerplate) como texto de respuesta, salvo que sean parte real de un ejemplo citado.',
         '- Si la evidencia es insuficiente o la confianza es none, dilo con honestidad ("no encontré una guía publicada que cubra esto") y di qué falta. NO inventes.',
         '- Si una fuente viene stale o deprecated, decláralo.',
-        '- En temas sensibles (finanzas, nómina, legal, seguridad, compromisos contractuales), cita siempre con [n] y CIERRA con una línea explícita recomendando validar con la persona/área responsable antes de actuar (ej. "Antes de actuar, valida con Finanzas/People."). Esta recomendación de validación humana es obligatoria en estos temas.'
+        '- TEMAS SENSIBLES (finanzas, nómina, pagos, finiquitos, contractors, legal/tributario, seguridad, accesos, compromisos contractuales): además de citar con [n], tu respuesta NO está completa sin una línea FINAL que recomiende validar con la persona/área responsable antes de actuar (ej. "Antes de actuar, valida con Finanzas/People."). Es OBLIGATORIA y va SIEMPRE al cierre, AUNQUE la guía sea clara y tengas evidencia fuerte — es justo ahí donde más se olvida; nunca la omitas en estos temas.'
       ]
     : []
 
@@ -271,6 +271,15 @@ export const NEXA_PROMPT_GOVERNANCE: NexaPromptGovernance = {
   changelog: [
     {
       version: NEXA_SYSTEM_PROMPT_V2_VERSION,
+      date: '2026-06-15',
+      class: 'policy',
+      summary:
+        'Hardening de la regla de validación humana en TEMAS SENSIBLES (TASK-1140 follow-up, gate K6): la lista se amplía a pagos/finiquitos/contractors/tributario/accesos; la línea de cierre pasa de "obligatoria" a criterio de completitud ("tu respuesta NO está completa sin la línea FINAL de validación"), reforzada justo para el modo de fallo donde el modelo la omite (guía clara + evidencia fuerte). Solo refuerza la política sensible existente; no toca voz/formato/Markdown.'
+    },
+    {
+      // Congelada a literal al bumpear a v2.2.0 (freeze-on-bump): una entrada histórica del
+      // changelog no debe relabelarse cuando el const NEXA_SYSTEM_PROMPT_V2_VERSION avanza.
+      version: 'nexa-system-prompt.v2.1.0',
       date: '2026-06-15',
       class: 'policy',
       summary:

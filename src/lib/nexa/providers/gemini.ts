@@ -48,7 +48,11 @@ export class GeminiNexaProvider implements NexaChatProvider {
       config: {
         systemInstruction: input.systemPrompt,
         temperature: 0.2,
-        maxOutputTokens: 500,
+        // 1024 (no 500): una respuesta de conocimiento sintetizada (intro + pasos/estados +
+        // citas + cierre de validación en temas sensibles) se truncaba a ~500 tokens ANTES del
+        // cierre — el gate K6 de TASK-1140 fallaba por truncamiento, no por el prompt. El techo
+        // no anima verbosidad (el prompt sigue pidiendo concisión); solo evita mutilar.
+        maxOutputTokens: 1024,
         tools: [{ functionDeclarations: getNexaToolDeclarations(input.runtimeContext) }],
         toolConfig: {
           functionCallingConfig: {
@@ -102,7 +106,9 @@ export class GeminiNexaProvider implements NexaChatProvider {
       config: {
         systemInstruction: input.systemPrompt,
         temperature: 0.2,
-        maxOutputTokens: 500
+        // Pass de SÍNTESIS desde Knowledge: el que truncaba la respuesta de nómina del gate K6
+        // (TASK-1140). 1024 deja completar la síntesis con citas + cierre de validación humana.
+        maxOutputTokens: 1024
       }
     })
 
