@@ -19,6 +19,26 @@ const sourcemapsReady =
   Boolean(process.env.SENTRY_ORG?.trim()) &&
   Boolean(process.env.SENTRY_PROJECT?.trim())
 
+// TASK-1157 — el `next build` (Turbopack) OOM-ea de forma flaky en el builder
+// default de Vercel (~8 GB): el pico de RAM queda al borde del techo del container
+// y a veces se pasa → SIGKILL. Causa estructural (1106 entrypoints + dos picos:
+// compilación de Turbopack y los workers de static-generation = os.cpus().length).
+// Capamos AMBOS picos SOLO en el build de Vercel (`VERCEL=1`), para no ralentizar
+// el build local ni el de CI (que no OOM-ean). Costo $0, cero impacto en runtime.
+const isVercelBuild = process.env.VERCEL === '1'
+
+const vercelBuildMemoryCaps = isVercelBuild
+  ? {
+      // Static-generation: de `os.cpus().length` (los "9 workers" del builder) a 2.
+      // Baja el pico de esa fase ~4.5x a cambio de algunos minutos de build.
+      cpus: 2,
+      // Presupuesto de memoria de Turbopack (en bytes, por el contrato de Next 16):
+      // 6 GiB en un container de ~8 GB → Turbopack hace GC antes del techo, dejando
+      // headroom para el resto del proceso. Ataca la fase que OOM-eó (compilación).
+      turbopackMemoryLimit: 6 * 1024 * 1024 * 1024
+    }
+  : {}
+
 const nextConfig: NextConfig = {
   basePath: process.env.BASEPATH,
   distDir: process.env.NEXT_DIST_DIR || '.next',
@@ -50,7 +70,9 @@ const nextConfig: NextConfig = {
   // navigation. Reduced-motion is honored via the global keyframes guard in
   // src/app/globals.css.
   experimental: {
-    viewTransition: true
+    viewTransition: true,
+    // TASK-1157 — caps de memoria del build, solo en Vercel (ver arriba).
+    ...vercelBuildMemoryCaps
   }
 }
 
