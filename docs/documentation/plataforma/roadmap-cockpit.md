@@ -1,10 +1,18 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-06-16 por Claude (TASK-1152)
-> **Ultima actualizacion:** 2026-06-16 por Claude (TASK-1152)
-> **Documentacion tecnica:** `docs/tasks/complete/TASK-1152-roadmap-task-index-reader-markdown-ssot.md`, `src/lib/roadmap/work-item-index/*`
+> **Ultima actualizacion:** 2026-06-16 por Claude (TASK-1153 — capa visual)
+> **Documentacion tecnica:** `docs/tasks/complete/TASK-1152-roadmap-task-index-reader-markdown-ssot.md`, `docs/tasks/complete/TASK-1153-roadmap-cockpit-ui-main-menu.md`, `src/lib/roadmap/work-item-index/*`, `src/lib/roadmap/cockpit/*`, `src/views/greenhouse/roadmap/*`
 
 # Roadmap — Indice de Work Items (lectura del backlog Markdown)
+
+> **Capa visual (TASK-1153):** el índice ya tiene su cockpit humano en `/roadmap`
+> (item de menú **Roadmap**, fuera de Admin, solo interno). Muestra el backlog como
+> banda de KPIs + filtros + un tablero de 7 lanes (Programas · Listas para ejecutar ·
+> Bloqueadas · Incidentes abiertos · Necesitan grooming · En progreso · Resueltas) +
+> un inspector por work item. La UI consume `buildRoadmapCockpitData` (server-side)
+> sobre el reader de abajo; **no edita Markdown**. Cómo operarlo:
+> `docs/manual-de-uso/plataforma/roadmap-cockpit.md`.
 
 ## Que es
 

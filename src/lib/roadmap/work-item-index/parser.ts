@@ -330,6 +330,11 @@ export const parseWorkItem = ({
             )
           : null,
       severity,
+      rootCause: (() => {
+        const raw = sectionContent(sections, 'causa raíz', 'causa raiz')
+
+        return raw ? truncate(raw) : null
+      })(),
       parseWarnings,
       summary: summary ? truncate(summary) : null,
       why: null,
@@ -418,6 +423,7 @@ export const parseWorkItem = ({
     detectedAt: null,
     resolvedAt: null,
     severity: null,
+    rootCause: null,
     parseWarnings,
     summary: summary ? truncate(summary) : null,
     why: why ? truncate(why) : null,

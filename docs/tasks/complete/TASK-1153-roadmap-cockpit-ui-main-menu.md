@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -295,15 +295,27 @@ N/A — repo-only change unless access capability requires production seed/entit
 
 ## Acceptance Criteria
 
-- [ ] `Roadmap` existe como item principal del menu, no bajo Admin.
-- [ ] `/roadmap` usa `CompositionShell` y primitive decisions canonicas.
-- [ ] La UI consume el contrato de `TASK-1152`; no parsea Markdown client-side ni crea writes.
-- [ ] La UI distingue epics, tasks, mini-tasks e issues con acciones y copy apropiados por kind.
-- [ ] Copy reusable vive en `src/lib/copy/roadmap.ts` o config canonica.
-- [ ] Loading, empty, error, degraded, permission denied, long content, mobile and keyboard states are covered.
-- [ ] GVC desktop + mobile fue capturado y mirado.
-- [ ] No existe scroll horizontal de pagina en desktop ni mobile 390px.
-- [ ] Unauthorized users cannot see/open the Roadmap surface.
+- [x] `Roadmap` existe como item principal del menu, no bajo Admin.
+- [x] `/roadmap` usa `CompositionShell` y primitive decisions canonicas.
+- [x] La UI consume el contrato de `TASK-1152`; no parsea Markdown client-side ni crea writes.
+- [x] La UI distingue epics, tasks, mini-tasks e issues con acciones y copy apropiados por kind.
+- [x] Copy reusable vive en `src/lib/copy/roadmap.ts` o config canonica.
+- [x] Loading, empty, error, degraded, permission denied, long content, mobile and keyboard states are covered.
+- [x] GVC desktop + mobile fue capturado y mirado.
+- [x] No existe scroll horizontal de pagina en desktop ni mobile 390px.
+- [x] Unauthorized users cannot see/open the Roadmap surface.
+
+
+## Implementation Delta (2026-06-16)
+
+Implementada local-first en `develop`, **fiel al diseno Claude Design `RoadmapCockpit.dc.html`** del operador (bundle traido por WebFetch -> gunzip -> tar; recreado 1:1 en React con primitives + tokens del repo, sin HEX literales, con datos reales del reader de TASK-1152).
+
+- Datos: `getAllWorkItems()` (export aditivo en el reader de TASK-1152) + `rootCause` para issues; projection server `src/lib/roadmap/cockpit/{types,lanes,build-cockpit-data}.ts` (7 lanes derivadas + tiles + dominios; backlog activo + muestra reciente de resueltas; limite 50 cards/lane con "+N mas").
+- UI: `src/views/greenhouse/roadmap/` (RoadmapCockpitView + components RoadmapSummary/RoadmapFilters/RoadmapBoard/RoadmapInspector/RoadmapTags/RoadmapCockpitError + cockpit-tokens). CompositionShell split (desktop) / board + MUI Drawer (mobile compact). `app/(dashboard)/roadmap/{page,loading}.tsx`.
+- Acceso: viewCode `plataforma.roadmap` (catalog TS + migracion seed `20260616141635832`, 11 roles internos, aplicada) + item de menu (junto a Knowledge/Design System) + page guard dual (redirect cliente->/401 + viewCode).
+- GVC: `scripts/frontend/scenarios/roadmap-cockpit.scenario.ts` (desktop 1440 + mobile 390). Scroll-width 1440=1440 / 390=390 OK; capturas miradas y ajustadas (limite por lane + drawer mobile).
+
+Gates: lint 0 - tsc 0 - tests focales (9 lanes + 27 reader 1152) verdes - GVC mirado. Open Question resuelta: board + inspector con list-density por lane; en mobile el inspector es Drawer real (UX correcta). Diferencias honestas vs el mock: sidebar/topbar = shell real del repo, KPIs/cards = datos reales (no seed).
 
 ## Verification
 

@@ -158,6 +158,7 @@ const buildDegradedItem = (file: DiscoveredFile, root: string): WorkItem => {
     detectedAt: null,
     resolvedAt: null,
     severity: null,
+    rootCause: null,
     health: {
       templateStatus: 'unknown',
       lintErrors: 0,
@@ -314,6 +315,22 @@ export const getWorkItemIndex = async (
     degradedItemCount,
     generatedAt
   }
+}
+
+/**
+ * Devuelve el índice COMPLETO sin paginar — para consumidores server-side que
+ * necesitan el universo (ej. el cockpit de TASK-1153, que agrupa todo el backlog
+ * en lanes). Read-only; reusa el cache por fingerprint.
+ */
+export const getAllWorkItems = async (): Promise<{
+  items: WorkItem[]
+  generatedAt: string
+  degradedItemCount: number
+}> => {
+  const { items, generatedAt } = await buildIndex()
+  const degradedItemCount = items.filter(item => item.parseWarnings.includes('unreadable_file')).length
+
+  return { items, generatedAt, degradedItemCount }
 }
 
 /** Helpers de validación de query params (para el route). */

@@ -781,6 +781,19 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
     }
   }
 
+  // ── Roadmap (standalone — cross-cutting INTERNAL resource, TASK-1153) ──
+  // Cockpit del backlog operativo (epics/tasks/mini-tasks/issues) leído del índice
+  // Markdown read-only (TASK-1152). FUERA de Admin — es capacidad de producto/operación
+  // con presencia propia. Gated por `plataforma.roadmap` (solo roles internos, nunca
+  // client_*). Precedente cross-cutting: Design System / Knowledge.
+  if (canSeeView('plataforma.roadmap', false)) {
+    menuData.push({
+      label: nl(GH_INTERNAL_NAV.roadmap),
+      href: '/roadmap',
+      icon: 'tabler-map-2'
+    })
+  }
+
   // ── Knowledge (standalone — cross-cutting INTERNAL resource) ──
   if (canSeeView('plataforma.knowledge', false)) {
     menuData.push({

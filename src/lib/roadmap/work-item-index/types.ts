@@ -147,6 +147,8 @@ export interface WorkItem {
   detectedAt: string | null
   resolvedAt: string | null
   severity: string | null
+  /** Causa raíz declarada en `## Causa raíz` (solo issues; TASK-1153 inspector). */
+  rootCause: string | null
 
   // --- salud ---
   health: WorkItemHealth

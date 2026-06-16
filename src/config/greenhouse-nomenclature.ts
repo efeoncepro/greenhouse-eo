@@ -57,7 +57,8 @@ export const GH_INTERNAL_NAV = {
   adminTalentOps: { label: 'Salud del talento', subtitle: 'Metricas y mantenimiento del sistema' },
   adminIdentityAccess: { label: 'Identidad y acceso', subtitle: 'Usuarios, roles, vistas y cuentas' },
   adminTeamOps: { label: 'Equipo y operaciones', subtitle: 'Talento, líneas de negocio e instrumentos' },
-  knowledge: { label: 'Knowledge', subtitle: 'Guías, fuentes y memoria operativa' }
+  knowledge: { label: 'Knowledge', subtitle: 'Guías, fuentes y memoria operativa' },
+  roadmap: { label: 'Roadmap', subtitle: 'Backlog operativo: epics, tasks, mini-tasks e incidentes' }
 } as const
 
 export const GH_PLATFORM_UI = {
