@@ -50,8 +50,18 @@ Nexa hace **RAG** sobre el corpus gobernado de Greenhouse Knowledge: recupera ev
 - **OR-ify de la query**: las preguntas naturales traen verbos/ruido que no están en el chunk; con
   AND (default de `websearch`) ningún chunk tiene TODOS los términos → recall pobre. Con OR cualquier
   término matchea y `ts_rank` prioriza. El no-answer honesto sigue siendo 0 resultados.
-- **Vector / embeddings**: **diferido** (TASK-1080). Hoy el RAG es FTS + rerank léxico/estructural.
-  Cuando se necesite, el vector entra como substrato aditivo detrás del mismo SSOT.
+- **Vector / embeddings (híbrido)**: **construido y gated (TASK-1151)** sobre la evaluación de TASK-1136.
+  Brazo vector aditivo DENTRO del SSOT `searchKnowledge` (`KNOWLEDGE_SEARCH_HYBRID_ENABLED`, **default OFF** =
+  byte-equivalente al FTS+rerank). `embedding vector(768)` en `knowledge_chunks` + índice HNSW cosine en el
+  Cloud SQL existente (**NO** managed Vertex Vector Search/RAG Engine — corpus chico); embeddings Vertex
+  `text-multilingual-embedding-002` como **paso de ingesta idempotente por checksum** (`embed-corpus.ts`), NUNCA
+  en el request path. Runtime: **mode-scope a agéntico** (la latencia del embedding de la query ~600ms se
+  absorbe en el stream del LLM; el search humano queda FTS puro) + **FTS-signal-gate** (vector solo si el FTS
+  encontró algo → no-answer honesto intacto) + **fusión de dos niveles `hybridFuse`** (protege hits FUERTES del
+  FTS = golden-safe; compite los débiles vs vector-only = recall de paráfrasis) + degradación honesta a FTS.
+  **Source-agnostic:** opera sobre `knowledge_chunks` → idéntico para repo-docs y wikis Notion. Validado VERDE
+  golden-safe (golden 45/45 + paráfrasis 4/8, cero regresión); el salto a 7/8 sin tocar golden = **reranker de
+  relevancia** (follow-up). Decisión/evidencia/cost-model/thresholds: [`GREENHOUSE_KNOWLEDGE_HYBRID_RETRIEVAL_DECISION_V1.md`](../../GREENHOUSE_KNOWLEDGE_HYBRID_RETRIEVAL_DECISION_V1.md). Flip a prod = decisión del operador.
 
 ## Reranking (señales)
 

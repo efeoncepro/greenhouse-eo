@@ -1,5 +1,31 @@
 # Release 2026-06-10 #2 — develop→main `6c649b2a6` RELEASED
 
+## Sesión 2026-06-16 — TASK-1151 Knowledge hybrid (FTS + pgvector) gated implementation — Claude
+
+> **Estado:** **in-progress** en `develop` (local-first, SIN push). Foundation construida + segura (flag OFF) + validada → **NO-GO al flip** (gates de flip no se cumplen). Cero cambio de runtime productivo (flag default OFF byte-equivalente).
+
+- **Qué se construyó (gated, OFF=byte-equivalente):** Slice 1 migración pgvector (`20260616105246838`: extensión + `embedding vector(768)` + HNSW cosine + checksum) aplicada en dev; Slice 2 helper Vertex + paso de ingesta idempotente por checksum (`embed-corpus.ts` + CLI) → **1471/1471 chunks embebidos** en dev; Slice 3 brazo vector gateado DENTRO de `searchKnowledge` (`KNOWLEDGE_SEARCH_HYBRID_ENABLED` default OFF, RRF + FTS-signal-gate por confianza + degradación honesta), fusión pura extraída a `retrieval-fusion.ts`; Slice 4 harness `hybrid-runtime-validate.ts`.
+- **Validación runtime (honesta):** ✅ recall paráfrasis **7/8 vs 3/8** (el valor es real) · ✅ wrong-source 0 · ✅ no-answer golden 2/2. ❌ **latencia p95 ~920ms** (hallazgo: el cuello es el **embedding de la query = round-trip Vertex ~600ms**, NO pgvector; el ≤400ms del decision packet contó solo pgvector → corregido) · ❌ golden 44/45 (1 democión por fusión) · ❌ off-corpus 3/4 (1 probe comparte vocab con el corpus).
+- **Veredicto:** flag se queda OFF; el híbrido NO se flipea. Refinamiento pendiente antes de cualquier flip de operador: (1) cache de query-embeddings + budget de latencia revisado, (2) fusión que preserve los top hits del FTS, (3) recalibrar piso FTS / off-corpus probes.
+- **Gates de código:** tsc 0 · lint 0 · vitest knowledge+nexa 269 · build OK · task:lint TASK-1151 template=1/errors=0/warnings=0. SSOT `searchKnowledge` + contrato `knowledge-search.v1` intactos.
+- **Próximo paso:** decisión del operador — (a) hacer el refinamiento (latencia/fusión/gate) para llegar a flip-ready, o (b) dejar la base lista y diferir. Push pendiente de instrucción. La migración pgvector ya está aplicada SOLO en dev (no en staging/prod).
+
+## Sesión 2026-06-16 — TASK-1136 Knowledge hybrid retrieval evaluation + vector readiness — Claude
+
+> **Estado:** **complete** en `develop` (local-first, SIN push — espera instrucción del operador). Evaluación pura: **cero cambio de runtime productivo**.
+
+- **Qué es:** decidir, con evidencia real, si el RAG de Knowledge/Nexa necesita vector/embeddings además del FTS+rerank actual. **Veredicto: GO condicional a un piloto gated.**
+- **Evidencia (embeddings Vertex reales sobre el corpus real: 105 docs / 1471 chunks):**
+  - Baseline FTS+rerank **saturado**: 45/45 golden, MRR 0.90, recall/precision@1/cross-doc 100%, no-answer 2/2, p95 ~328ms.
+  - Híbrido **ingenuo regresa** (43/45 — rompe el no-answer honesto 0/2; el vector siempre devuelve vecinos).
+  - Híbrido **gana en paráfrasis** (mismatch de vocabulario): FTS 3/8 vs híbrido **7/8** — ahí está el valor real.
+  - No-answer risk cuantificado: off-corpus rozan cosine ~0.56 → un piso fijo no basta; el gate correcto es **FTS-signal-gate** (el vector solo refuerza cuando el FTS ya tiene señal).
+- **Costo:** corpus chico → embeddings = centavos one-time; pgvector vive en el Cloud SQL actual (sin infra managed). **Managed Vertex Vector Search/RAG Engine rechazado** (costo always-on injustificado para ~1471 chunks).
+- **Entregables:** core puro `retrieval-eval.ts` (+15 tests) · read helper `list-chunks-for-embedding.ts` · runners `scripts/knowledge/{retrieval-eval,hybrid-shadow-eval}.ts` · decision packet `GREENHOUSE_KNOWLEDGE_HYBRID_RETRIEVAL_DECISION_V1.md` · task hija gated **TASK-1151**.
+- **SSOT/contrato intactos:** `searchKnowledge` + `knowledge-search.v1` sin tocar; pgvector queda disponible-no-instalado (lo instala TASK-1151).
+- **Gates:** vitest knowledge/search 29 · full `pnpm test` **7115** · `pnpm build` ✓ · tsc 0 · lint 0 · `nexa:doc-gate` ✓ · `task:lint TASK-1151` template=1/errors=0/warnings=0.
+- **Próximo paso:** si el operador aprueba, tomar **TASK-1151** (pgvector + ingesta de embeddings + brazo vector gateado + validación contra thresholds §6 del decision packet). Push de esta sesión: pendiente de instrucción explícita.
+
 ## Sesión 2026-06-16 — TASK-1149 Nexa: downgrade determinístico de headers — Claude
 
 > **Estado:** **complete** en `develop` (local-first, empujado). El K6 en staging se confirma al desplegar (nightly de TASK-1127).

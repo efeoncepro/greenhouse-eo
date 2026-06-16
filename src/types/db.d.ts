@@ -6963,6 +6963,10 @@ export interface GreenhouseKnowledgeKnowledgeChunks {
   created_at: Generated<Timestamp>;
   document_id: string;
   document_version_id: string;
+  embedding: string | null;
+  embedding_checksum: string | null;
+  embedding_model: string | null;
+  embedding_updated_at: Timestamp | null;
   freshness: Generated<string>;
   heading_path: Generated<string[]>;
   sensitivity: string;

@@ -15,16 +15,16 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `implementation`
 - Epic: `optional`
-- Status real: `Diseno`
+- Status real: `Complete`
 - Rank: `TBD`
 - Domain: `knowledge|nexa|ai|data|reliability`
-- Blocked by: `TASK-1127`
+- Blocked by: `none` (TASK-1127 complete — baseline desbloqueado)
 - Branch: `task/TASK-1136-knowledge-hybrid-retrieval-vector-readiness`
 - Legacy ID: `none`
 - GitHub Issue: `optional`
@@ -205,18 +205,34 @@ decision packet recomienda managed Vertex.
 
 ## Acceptance Criteria
 
-- [ ] Existe baseline comparativo FTS/rerank/hybrid sobre golden questions.
-- [ ] El prototipo usa Vertex embeddings o documenta por que no pudo usarlos.
-- [ ] Existe decision packet go/no-go con costo, latencia, privacy y calidad.
-- [ ] El decision packet separa costo de embeddings, storage/vector DB, infraestructura administrada y
-      LLM final.
-- [ ] La ruta barata (`FTS + Vertex embeddings + storage propio/pgvector`) se compara contra
-      `Vertex Vector Search`/`Vertex RAG Engine` antes de recomendar managed runtime.
-- [ ] `searchKnowledge` permanece como SSOT.
-- [ ] No hay cambio productivo sin flag ni task hija.
+- [x] Existe baseline comparativo FTS/rerank/hybrid sobre golden questions.
+- [x] El prototipo usa Vertex embeddings o documenta por que no pudo usarlos. (Vertex `text-multilingual-embedding-002`, 1471 chunks reales embebidos.)
+- [x] Existe decision packet go/no-go con costo, latencia, privacy y calidad. (`GREENHOUSE_KNOWLEDGE_HYBRID_RETRIEVAL_DECISION_V1.md`.)
+- [x] El decision packet separa costo de embeddings, storage/vector DB, infraestructura administrada y
+      LLM final. (§4 cost model.)
+- [x] La ruta barata (`FTS + Vertex embeddings + storage propio/pgvector`) se compara contra
+      `Vertex Vector Search`/`Vertex RAG Engine` antes de recomendar managed runtime. (§5.)
+- [x] `searchKnowledge` permanece como SSOT. (Sin cambio al SSOT ni al contrato `knowledge-search.v1`.)
+- [x] No hay cambio productivo sin flag ni task hija. (Cero runtime; task hija gated TASK-1151.)
 
 ## Verification
 
 - `pnpm vitest run src/lib/knowledge/search`
 - `pnpm qa:nexa-knowledge` si el ambiente lo permite
 - `pnpm nexa:doc-gate --changed`
+
+## Delta 2026-06-16 — CLOSURE (complete)
+
+Evaluación cerrada. **Veredicto: GO condicional a un piloto gated** (no se hizo cambio productivo en esta task).
+
+**Entregables (todos los slices):**
+- **Slice 1 (baseline + taxonomía):** core puro `src/lib/knowledge/search/retrieval-eval.ts` (RRF, cosine, MRR, métricas, taxonomía de fallas) + tests (`retrieval-eval.test.ts`, 15) + runner `scripts/knowledge/retrieval-eval.ts`. Medido contra el corpus real (105 docs / 1471 chunks): **FTS+rerank 45/45, MRR 0.90, recall/precision@1/cross-doc 100%, no-answer 2/2, p95 ~328ms** (baseline saturado).
+- **Slice 2 (shadow híbrido con Vertex real):** read helper `src/lib/knowledge/search/list-chunks-for-embedding.ts` + runner `scripts/knowledge/hybrid-shadow-eval.ts` (embeddings Vertex `text-multilingual-embedding-002`, RRF k=60, cache efímero gitignored). Evidencia: híbrido **ingenuo regresa** (43/45, **rompe no-answer 0/2**); en **paráfrasis** gana (FTS 3/8 vs híbrido **7/8**); no-answer risk cuantificado (off-corpus rozan cosine ~0.56 → piso fijo insuficiente).
+- **Slice 3 (decision packet):** `docs/architecture/GREENHOUSE_KNOWLEDGE_HYBRID_RETRIEVAL_DECISION_V1.md` (cost model 4-componentes, comparación 3 rutas, thresholds go/no-go, privacy, rollout/rollback, 4-pilar, reglas duras). Ruta recomendada: `FTS + Vertex embeddings + pgvector` en el Cloud SQL existente; **managed Vertex rechazado** para este volumen.
+- **Slice 4 (scaffold gated):** task hija **TASK-1151** (to-do, gated) para la implementación productiva.
+
+**Sin runtime productivo:** SSOT `searchKnowledge` + contrato `knowledge-search.v1` intactos. pgvector queda *disponible pero no instalado* (lo instala TASK-1151).
+
+**Gates:** `pnpm vitest run src/lib/knowledge/search` ✓ (29) · full `pnpm test` ✓ (7115) · `pnpm build` ✓ · `pnpm tsc --noEmit` ✓ · `pnpm lint` ✓ · `pnpm nexa:doc-gate --changed` ✓ · `pnpm task:lint --task TASK-1151` ✓ (template=1, errors=0, warnings=0).
+
+**Docs:** `rag-pipeline.md` Delta · `DECISIONS_INDEX.md` entry · decision packet nuevo · `changelog.md` · `Handoff.md`.

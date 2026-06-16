@@ -1,11 +1,14 @@
 import 'server-only'
 
 import { query } from '@/lib/db'
+import { captureWithDomain } from '@/lib/observability/capture'
 
 import { deriveKnowledgeChunkFreshness } from '../state-machine'
 import type { KnowledgeFreshness, KnowledgePublicationStatus, KnowledgeSensitivity } from '../types'
-import { isKnowledgeSearchRerankEnabled } from './flags'
+import { isKnowledgeSearchHybridEnabled, isKnowledgeSearchRerankEnabled } from './flags'
+import { embedKnowledgeQuery, toPgVectorLiteral } from './knowledge-embeddings'
 import { rerankKnowledgeChunks } from './rerank-knowledge-chunks'
+import { hybridFuse } from './retrieval-fusion'
 import {
   KNOWLEDGE_SEARCH_CONTRACT_VERSION,
   type KnowledgeRetrievalChunk,
@@ -30,6 +33,21 @@ const RANK_MEDIUM = 0.05
 // (medido contra el corpus). El piso 0.10 rechaza el ruido (no-answer honesto) sin
 // tocar los matches reales. Tunable (igual que RANK_HIGH/MEDIUM); el eval harness lo valida.
 const MIN_RANK_FLOOR = 0.1
+
+// TASK-1151 — brazo vector híbrido (gated). Candidatos vector por turno + piso de cosine.
+// El piso es defensa secundaria; la primaria es el FTS-signal-gate (el vector solo corre
+// si el FTS ya encontró algo → off-corpus = no-answer preservado). Tunables; el eval harness valida.
+const VECTOR_CANDIDATES = 20
+const VECTOR_COSINE_FLOOR = 0.5
+// Umbral de ts_rank que separa un hit léxico FUERTE (protegido en la fusión, golden-safe) de
+// uno incidental DÉBIL (compite contra los vector-only). Perilla canónica de la fusión de dos
+// niveles (hybridFuse). Más alto = protege solo los matches muy fuertes (heading) → más slots de
+// cola para el vector (más recall de paráfrasis) sin perder golden (la respuesta golden es heading).
+// Override por env para tuning del eval harness; default validado golden-safe (0.15: 45/45 +
+// paráfrasis 4/8, cero regresión). Umbrales más altos (≥0.3) dan paráfrasis 7/8 PERO regresan
+// 1 caso golden — ese último tramo necesita un reranker de relevancia (TASK-1151 follow-up), no
+// un umbral. La curva del trade-off está documentada en la Delta de la task.
+const STRONG_FTS_RANK = Number(process.env.KNOWLEDGE_HYBRID_STRONG_FTS_RANK) || 0.15
 
 // publication_status visible por modo (envelope). 'quarantined'/'draft'/'review'
 // NUNCA aparecen. 'agentic' excluye 'deprecated' (solo bajo pregunta explícita, 1085).
@@ -74,6 +92,28 @@ const deriveConfidence = (topRank: number, resultCount: number): KnowledgeSearch
   }
 
   return 'low'
+}
+
+// Peor freshness de un set de chunks ya mapeados (deprecated > stale > current).
+// Usado tras la fusión híbrida, que puede traer chunks vector-only con freshness propia.
+const aggregateChunkFreshness = (chunks: KnowledgeRetrievalChunk[]): KnowledgeFreshness => {
+  if (chunks.length === 0) {
+    return 'unknown'
+  }
+
+  if (chunks.some(c => c.freshness === 'deprecated')) {
+    return 'deprecated'
+  }
+
+  if (chunks.some(c => c.freshness === 'stale')) {
+    return 'stale'
+  }
+
+  if (chunks.some(c => c.freshness === 'current')) {
+    return 'current'
+  }
+
+  return 'unknown'
 }
 
 // Peor freshness del set retornado (deprecated > stale > current).
@@ -123,6 +163,77 @@ const mapChunk = (row: SearchRow): KnowledgeRetrievalChunk => {
     updatedAt: toIso(row.last_reviewed_at),
     freshness: deriveKnowledgeChunkFreshness(status),
     sensitivity: row.sensitivity as KnowledgeSensitivity
+  }
+}
+
+/**
+ * TASK-1151 — brazo vector híbrido (gated). Recupera vecinos por cosine (pgvector) dentro
+ * del MISMO envelope pre-LLM que el FTS y FUSIONA (RRF) con la lista FTS. Solo se invoca
+ * cuando el FTS ya tiene señal (FTS-signal-gate en el caller → preserva no-answer honesto).
+ * Degrada honesto a la lista FTS si el embedding de la query o la búsqueda vector fallan.
+ * Puede traer chunks que el FTS perdió por léxico (la recuperación de paráfrasis del packet).
+ */
+const runVectorArm = async (
+  trimmedQuery: string,
+  ftsChunks: KnowledgeRetrievalChunk[],
+  statuses: KnowledgePublicationStatus[],
+  audiences: string[],
+  agenticPolicyClause: string,
+  limit: number
+): Promise<KnowledgeRetrievalChunk[]> => {
+  try {
+    const queryVector = await embedKnowledgeQuery(trimmedQuery)
+
+    if (queryVector.length === 0) {
+      return ftsChunks
+    }
+
+    const vectorRows = await query<SearchRow>(
+      `SELECT kc.chunk_id, kc.document_id, kc.document_version_id, kc.heading_path,
+              kc.body_text, kc.citation_anchor,
+              kd.title, kd.slug, kd.human_url, kd.publication_status, kd.sensitivity,
+              kd.last_reviewed_at, kdv.source_url,
+              (1 - (kc.embedding <=> $1::vector)) AS rank
+       FROM greenhouse_knowledge.knowledge_chunks kc
+       JOIN greenhouse_knowledge.knowledge_documents kd ON kd.document_id = kc.document_id
+       JOIN greenhouse_knowledge.knowledge_document_versions kdv ON kdv.version_id = kc.document_version_id
+       WHERE kc.embedding IS NOT NULL
+         AND (1 - (kc.embedding <=> $1::vector)) >= $5
+         AND kc.document_version_id = kd.current_version_id
+         AND kd.publication_status = ANY($2::text[])
+         AND kd.audience = ANY($3::text[])
+         ${agenticPolicyClause}
+       ORDER BY kc.embedding <=> $1::vector
+       LIMIT $4`,
+      [toPgVectorLiteral(queryVector), statuses, audiences, VECTOR_CANDIDATES, VECTOR_COSINE_FLOOR]
+    )
+
+    if (vectorRows.length === 0) {
+      return ftsChunks
+    }
+
+    const vectorChunks = vectorRows.map(mapChunk)
+    const byId = new Map<string, KnowledgeRetrievalChunk>()
+
+    for (const chunk of [...ftsChunks, ...vectorChunks]) {
+      byId.set(chunk.chunkId, chunk)
+    }
+
+    // Fusión de DOS NIVELES: protege los hits FUERTES del FTS (golden-safe) y compite los
+    // débiles contra los vector-only por relevancia (recupera paráfrasis). Resuelve la tensión
+    // que un peso RRF único no puede (TASK-1151). `vectorChunks` viene ordenado por cosine desc.
+    const fusedIds = hybridFuse(
+      ftsChunks.map(c => ({ id: c.chunkId, score: c.score })),
+      vectorChunks.map(c => c.chunkId),
+      { strongFtsRank: STRONG_FTS_RANK, limit }
+    )
+
+    return fusedIds.map(id => byId.get(id)).filter((c): c is KnowledgeRetrievalChunk => Boolean(c))
+  } catch (err) {
+    // Degradación honesta: el híbrido nunca rompe el retrieval; cae a FTS.
+    captureWithDomain(err, 'knowledge', { tags: { source: 'hybrid_vector_arm', stage: 'vector_search' } })
+
+    return ftsChunks
   }
 }
 
@@ -258,7 +369,30 @@ export const searchKnowledge = async (
 
   // TASK-1124 — rerank conservador del top-N ya recuperado (mismo set; solo cambia el
   // orden → confidence/freshness/deniedCount intactos). Default OFF = orden FTS puro.
-  const orderedChunks = isKnowledgeSearchRerankEnabled() ? rerankKnowledgeChunks(chunks, trimmedQuery) : chunks
+  let orderedChunks = isKnowledgeSearchRerankEnabled() ? rerankKnowledgeChunks(chunks, trimmedQuery) : chunks
 
-  return basePacket({ confidence, freshness, chunks: orderedChunks, deniedOrFilteredCount, notes })
+  // TASK-1151 — brazo vector híbrido (gated, default OFF byte-equivalente). FTS-signal-gate
+  // por CONFIANZA: SOLO cuando el FTS tiene señal sólida (confidence high|medium). Un match
+  // léxico incidental débil (confidence low) NO abre el gate → una pregunta off-corpus (que a
+  // lo sumo roza un verbo del corpus) NUNCA llega al vector → el no-answer honesto se preserva
+  // (el vector siempre devuelve vecinos; el gate es lo que impide que manufacture respuestas).
+  // El vector refuerza recall y puede traer chunks que el FTS perdió por léxico; confidence/
+  // denied se derivan del FTS, freshness se reagrega sobre el set fusionado.
+  let finalFreshness = freshness
+  // FTS-signal-gate: el vector SOLO corre si el FTS encontró algo (`rows.length > 0`). Una
+  // pregunta off-corpus pura (FTS no-answer, 0 filas) NUNCA llega al vector → el no-answer
+  // honesto se preserva. (Un gate por confianza media/alta probó ser PEOR: mata el recall de
+  // paráfrasis —que nace justo cuando el FTS es débil— sin cerrar el off-corpus; TASK-1151.)
+  // Mode-scope a AGÉNTICO (Nexa): ahí el +~600ms del embedding de la query es invisible (la
+  // respuesta del LLM ya stremea en segundos — progressive disclosure) y el recall de paráfrasis
+  // es el más valioso. El search humano (Knowledge Center) queda FTS puro (sub-segundo).
+  const hybridApplies = isKnowledgeSearchHybridEnabled() && mode === 'agentic' && rows.length > 0
+
+  if (hybridApplies) {
+    orderedChunks = await runVectorArm(trimmedQuery, orderedChunks, statuses, audiences, agenticPolicyClause, limit)
+    // El híbrido puede traer chunks vector-only con otra freshness → reagregar sobre el set final.
+    finalFreshness = aggregateChunkFreshness(orderedChunks)
+  }
+
+  return basePacket({ confidence, freshness: finalFreshness, chunks: orderedChunks, deniedOrFilteredCount, notes })
 }

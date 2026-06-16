@@ -86,8 +86,22 @@ en `motor-ico-metricas-operativas.md`.
 | `NEXA_KNOWLEDGE_RETRIEVAL_ENABLED` | habilita la política/tool de knowledge | OFF |
 | `NEXA_KNOWLEDGE_SYNTHESIS_BRIEF_ENABLED` | grounding como brief sintetizable | OFF |
 | `KNOWLEDGE_SEARCH_RERANK_ENABLED` | rerank del top-N FTS | OFF |
+| `KNOWLEDGE_SEARCH_HYBRID_ENABLED` | brazo vector híbrido (FTS + pgvector), agéntico-only, FTS-signal-gated (TASK-1151) | OFF |
 
 ON en local + Vercel **staging**; **producción gated por sign-off del operador**.
+
+### Híbrido FTS + pgvector (TASK-1151) — gated, agéntico-only
+
+Brazo vector aditivo dentro del SSOT `searchKnowledge` (`KNOWLEDGE_SEARCH_HYBRID_ENABLED`, default OFF =
+byte-equivalente). pgvector + HNSW cosine en el Cloud SQL existente (NO managed Vertex); embeddings Vertex
+`text-multilingual-embedding-002` como **paso de ingesta idempotente por checksum** (`embed-corpus.ts`), NUNCA
+en el request path. Acotado a **modo agéntico** (la latencia del embedding de la query ~600ms se absorbe en el
+stream del LLM; el search humano queda FTS puro). **FTS-signal-gate** (vector solo si el FTS encontró algo →
+no-answer honesto intacto) + **fusión de dos niveles `hybridFuse`** (protege hits FUERTES del FTS = golden-safe;
+compite los débiles vs vector-only = recall de paráfrasis) + degradación honesta a FTS. **Source-agnostic** →
+funciona idéntico con repo-docs y wikis Notion (un chunk es un chunk en `knowledge_chunks`). Validado VERDE
+golden-safe (golden 45/45 + paráfrasis 4/8, cero regresión); el salto a 7/8 sin tocar golden = **reranker de
+relevancia** (follow-up). Decisión/evidencia: [`GREENHOUSE_KNOWLEDGE_HYBRID_RETRIEVAL_DECISION_V1.md`](../../GREENHOUSE_KNOWLEDGE_HYBRID_RETRIEVAL_DECISION_V1.md).
 
 ## Reglas duras
 
