@@ -36,6 +36,7 @@ import RoadmapBoard, { type RoadmapLane } from './components/RoadmapBoard'
 import RoadmapFilters, { type KindTabKey } from './components/RoadmapFilters'
 import RoadmapInspector from './components/RoadmapInspector'
 import RoadmapSummary, { type RoadmapSummaryCounts } from './components/RoadmapSummary'
+import RoadmapTaskDrawer from './components/RoadmapTaskDrawer'
 
 /** Máximo de cards renderizadas por lane (el header muestra el total real). */
 const LANE_CARD_LIMIT = 50
@@ -65,6 +66,7 @@ const RoadmapCockpitView = ({ data }: { data: RoadmapCockpitData }) => {
   const [domain, setDomain] = useState('')
   const [health, setHealth] = useState<WorkItemHealthLevel | ''>('')
   const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [openTaskId, setOpenTaskId] = useState<string | null>(null)
   const [toastOpen, setToastOpen] = useState(false)
   const [ageLabel, setAgeLabel] = useState('')
 
@@ -146,6 +148,11 @@ const RoadmapCockpitView = ({ data }: { data: RoadmapCockpitData }) => {
     [selectedId, data.items]
   )
 
+  const openTaskItem = useMemo(
+    () => (openTaskId ? data.items.find(item => item.id === openTaskId) ?? null : null),
+    [openTaskId, data.items]
+  )
+
   const handleSelect = useCallback((id: string) => {
     lastTriggerRef.current = (document.activeElement as HTMLElement) ?? null
     setSelectedId(id)
@@ -169,6 +176,9 @@ const RoadmapCockpitView = ({ data }: { data: RoadmapCockpitData }) => {
     if (navigator.clipboard) navigator.clipboard.writeText(text).catch(() => {})
     setToastOpen(true)
   }, [])
+
+  const handleOpenTask = useCallback((id: string) => setOpenTaskId(id), [])
+  const handleCloseTask = useCallback(() => setOpenTaskId(null), [])
 
   const primaryContent = hasResults ? (
     <RoadmapBoard lanes={lanes} selectedId={selectedId} onSelect={handleSelect} />
@@ -211,6 +221,7 @@ const RoadmapCockpitView = ({ data }: { data: RoadmapCockpitData }) => {
       onClose={handleClose}
       onSelectRelated={handleSelect}
       onCopy={handleCopy}
+      onOpenTask={handleOpenTask}
     />
   )
 
@@ -299,6 +310,9 @@ const RoadmapCockpitView = ({ data }: { data: RoadmapCockpitData }) => {
           regions={{ primary: primaryContent, aside: inspectorContent }}
         />
       )}
+
+      {/* "Abrir task" — drawer ancho con el Markdown renderizado (read-only) */}
+      <RoadmapTaskDrawer item={openTaskItem} onClose={handleCloseTask} onCopy={handleCopy} />
 
       <Snackbar
         open={toastOpen}

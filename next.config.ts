@@ -34,6 +34,14 @@ const nextConfig: NextConfig = {
       './docs/tasks/**/*.md',
       './docs/mini-tasks/**/*.md',
       './docs/issues/**/*.md'
+    ],
+    // TASK-1153 follow-up — el endpoint dinámico "Abrir task" lee el Markdown
+    // crudo por id; necesita los mismos docs bundleados en su propia función.
+    '/api/roadmap/work-items/[id]': [
+      './docs/epics/**/*.md',
+      './docs/tasks/**/*.md',
+      './docs/mini-tasks/**/*.md',
+      './docs/issues/**/*.md'
     ]
   },
 

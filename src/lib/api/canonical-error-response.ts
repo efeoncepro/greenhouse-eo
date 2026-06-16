@@ -64,6 +64,8 @@ export type CanonicalErrorCode =
   | 'nexa_action_not_available'
   | 'nexa_action_conflict'
   | 'nexa_action_failed'
+  // Roadmap cockpit — work item Markdown lookup (TASK-1153 follow-up).
+  | 'roadmap_work_item_not_found'
   // Reserved for future canonical codes — extender aquí cuando emerjan
   // nuevos error paths estructurales. NUNCA usar strings ad-hoc.
 
@@ -163,6 +165,12 @@ const CANONICAL_ERRORS: Record<CanonicalErrorCode, CanonicalErrorDefinition> = {
     status: 500,
     message: 'No pude completar la acción en este momento. Inténtalo de nuevo en unos segundos.',
     actionable: true
+  },
+  // TASK-1153 — el work item solicitado no existe (o no es legible) en el índice del backlog.
+  roadmap_work_item_not_found: {
+    status: 404,
+    message: 'No encontramos ese work item en el backlog. Puede que se haya movido o renombrado.',
+    actionable: false
   }
 }
 

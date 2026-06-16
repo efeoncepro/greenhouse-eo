@@ -28,6 +28,7 @@ Lo usas para: planificar la semana, hacer grooming, elegir la próxima task, ver
    - "Limpiar" resetea todos los filtros.
 5. El **tablero** organiza el backlog en lanes: Programas, Listas para ejecutar, Bloqueadas, Incidentes abiertos, Necesitan grooming, En progreso y Resueltas hace poco. Si una lane tiene muchas, muestra las primeras y un "+N más — filtra para acotar".
 6. Haz clic en cualquier **card** para abrir el **inspector** (a la derecha en desktop, como panel deslizante en móvil): ahí ves el resumen, por qué existe, archivos, dependencias, relacionadas y —solo para tasks ejecutables— el comando `/implement-task`.
+7. Desde el inspector, **Abrir task** despliega un **panel ancho** con el **contenido completo del Markdown renderizado** (títulos, listas, código, tablas) sin salir del cockpit. Sigue siendo solo lectura: el archivo en el repo es la fuente de verdad.
 
 ## Qué significan las señales
 
@@ -38,9 +39,10 @@ Lo usas para: planificar la semana, hacer grooming, elegir la próxima task, ver
 
 ## Acciones seguras
 
+- **Abrir task**: abre el panel ancho con el contenido del Markdown renderizado (solo lectura).
 - **Copiar ID**: copia el ID del work item.
 - **Copiar comando**: copia `/implement-task TASK-###` (solo para tasks; si está bloqueada, te avisa por cuál).
-- **Abrir Markdown**: copia la ruta del archivo en el repo.
+- **Copiar ruta** (dentro del panel "Abrir task"): copia la ruta del archivo en el repo.
 
 ## Qué no hacer
 

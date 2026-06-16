@@ -74,9 +74,10 @@ export interface RoadmapInspectorProps {
   onClose: () => void
   onSelectRelated: (id: string) => void
   onCopy: (text: string) => void
+  onOpenTask: (id: string) => void
 }
 
-const RoadmapInspector = ({ item, presentIds, onClose, onSelectRelated, onCopy }: RoadmapInspectorProps) => {
+const RoadmapInspector = ({ item, presentIds, onClose, onSelectRelated, onCopy, onOpenTask }: RoadmapInspectorProps) => {
   if (!item) {
     return (
       <Box
@@ -347,11 +348,17 @@ const RoadmapInspector = ({ item, presentIds, onClose, onSelectRelated, onCopy }
             </Box>
           ) : null}
           <Box sx={{ display: 'flex', gap: 1, pt: 3.5 }}>
-            <Button variant='outlined' size='small' startIcon={<i className='tabler-copy' />} onClick={() => onCopy(item.id)}>
-              {GH_ROADMAP.inspector.copyId}
+            <Button
+              variant='outlined'
+              size='small'
+              data-capture='roadmap-open-task'
+              startIcon={<i className='tabler-file-text' />}
+              onClick={() => onOpenTask(item.id)}
+            >
+              {GH_ROADMAP.inspector.openTask}
             </Button>
-            <Button variant='text' size='small' color='secondary' startIcon={<i className='tabler-file-text' />} onClick={() => onCopy(item.path)}>
-              {GH_ROADMAP.inspector.openMarkdown}
+            <Button variant='text' size='small' color='secondary' startIcon={<i className='tabler-copy' />} onClick={() => onCopy(item.id)}>
+              {GH_ROADMAP.inspector.copyId}
             </Button>
           </Box>
           <Box

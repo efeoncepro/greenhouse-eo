@@ -32,6 +32,10 @@ export const scenario: CaptureScenario = {
     { kind: 'mark', label: 'roadmap-filters', clipSelector: '[data-capture="roadmap-filters"]', note: 'Toolbar de filtros: pills por kind + búsqueda + selects' },
     { kind: 'click', selector: '[data-capture="roadmap-board"] button[aria-pressed]', timeout: 8000 },
     { kind: 'wait', selector: '[data-capture="roadmap-inspector"]', timeout: 8000 },
-    { kind: 'mark', label: 'roadmap-inspector', note: 'Inspector abierto sobre un work item seleccionado' }
+    { kind: 'mark', label: 'roadmap-inspector', note: 'Inspector abierto sobre un work item seleccionado' },
+    { kind: 'click', selector: '[data-capture="roadmap-open-task"]', timeout: 8000 },
+    { kind: 'wait', selector: '[data-capture="roadmap-task-drawer"]', timeout: 8000 },
+    { kind: 'wait', selector: '[data-capture="roadmap-task-markdown"]', timeout: 12000 },
+    { kind: 'mark', label: 'roadmap-task-drawer', clipSelector: '[data-capture="roadmap-task-drawer"]', note: 'Drawer "Abrir task" con el Markdown renderizado (headings, listas, code, tablas)' }
   ]
 }

@@ -132,8 +132,22 @@ export const GH_ROADMAP = {
     command: 'Comando',
     copyCommand: 'Copiar comando',
     copyId: 'Copiar ID',
-    openMarkdown: 'Abrir Markdown',
+    openTask: 'Abrir task',
     blockedNote: (blockerId: string) => `Disponible cuando se desbloquee ${blockerId}`
+  },
+
+  // ── Drawer "Abrir task" (contenido Markdown renderizado, read-only) ──
+  taskDrawer: {
+    aria: 'Contenido del work item',
+    closeAria: 'Cerrar el detalle del work item',
+    eyebrow: 'Contenido del Markdown',
+    loadingLabel: 'Cargando el contenido…',
+    errorTitle: 'No pudimos cargar el contenido',
+    errorBody: 'El work item puede haberse movido o renombrado. Intenta de nuevo en unos segundos.',
+    retry: 'Reintentar',
+    copyPath: 'Copiar ruta',
+    copyPathAria: 'Copiar la ruta del archivo en el repo',
+    readOnlyNote: 'Solo lectura — el Markdown del repo es la fuente de verdad.'
   },
   inspectorEmptyTitle: 'Selecciona un work item',
   inspectorEmptyBody: 'Abre cualquier card del tablero para ver su detalle, dependencias y acciones seguras.',

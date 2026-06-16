@@ -333,6 +333,40 @@ export const getAllWorkItems = async (): Promise<{
   return { items, generatedAt, degradedItemCount }
 }
 
+/**
+ * Markdown crudo de un work item por su ID canónico (ej. `TASK-1153`).
+ *
+ * Resuelve el path SIEMPRE desde el índice construido del filesystem (paths
+ * confiables); el `id` del cliente solo se usa para un `find` exacto contra ese
+ * índice — NUNCA se compone un path con input del cliente (cero path traversal).
+ * Devuelve `null` cuando el id no existe o el archivo no es legible (anti-oracle:
+ * el route lo mapea a 404, sin filtrar existencia). Read-only; reusa el cache.
+ */
+export const getWorkItemMarkdownById = async (
+  id: string
+): Promise<{ id: string; kind: WorkItemKind; title: string; path: string; content: string } | null> => {
+  const trimmed = id.trim()
+
+  if (!trimmed) return null
+
+  const { items } = await buildIndex()
+  const item = items.find(candidate => candidate.id === trimmed)
+
+  if (!item) return null
+
+  const root = resolveRepoRoot()
+  const absolute = join(root, ...item.path.split('/'))
+
+  try {
+    const content = await readFile(absolute, 'utf8')
+
+    return { id: item.id, kind: item.kind, title: item.title, path: item.path, content }
+  } catch {
+    // Archivo desaparecido entre el index y la lectura → degradación honesta.
+    return null
+  }
+}
+
 /** Helpers de validación de query params (para el route). */
 export const isWorkItemKind = (value: string): value is WorkItemKind =>
   (WORK_ITEM_KINDS as readonly string[]).includes(value)
