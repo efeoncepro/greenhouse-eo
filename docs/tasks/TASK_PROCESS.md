@@ -3,6 +3,8 @@
 Documento de referencia para el protocolo completo de tasks del proyecto. Define Plan Mode, Skill Protocol, Subagent Protocol, matrices de derivacion, Lightweight Mode y reglas de migracion.
 
 Para la plantilla copiable, ver [`TASK_TEMPLATE.md`](TASK_TEMPLATE.md).
+Para tasks con impacto UI/UX visible, ver [`TASK_UI_UX_ADDENDUM.md`](TASK_UI_UX_ADDENDUM.md).
+Para tasks con impacto backend/data, ver [`TASK_BACKEND_DATA_ADDENDUM.md`](TASK_BACKEND_DATA_ADDENDUM.md).
 
 > **Convivencia de formatos:** solo las tasks creadas a partir de ahora usan esta estructura. En el backlog existen tasks con el formato anterior — tanto `CODEX_TASK_*` como `TASK-###` ya creadas — que siguen vigentes con su estructura original hasta su cierre.
 
@@ -26,6 +28,8 @@ Para la plantilla copiable, ver [`TASK_TEMPLATE.md`](TASK_TEMPLATE.md).
 - Consultar `docs/tasks/TASK_ID_REGISTRY.md` para reservar el siguiente ID disponible antes de crear una task nueva
 - Si la task pertenece a un programa mayor, declarar `Epic: EPIC-###` dentro de `## Status` y sincronizarla con `docs/epics/`
 - Branch convention: `task/TASK-###-short-slug` (e.g., `task/TASK-003-finance-dashboard-fix`)
+- Las tasks con UI visible usan el mismo `TASK-###`, pero declaran `Execution profile: ui-ux`, `UI impact` y completan `## UI/UX Contract`.
+- Las tasks con backend/data usan el mismo `TASK-###`, pero declaran `Execution profile: backend-data`, `Backend impact` y completan `## Backend/Data Contract`.
 
 ---
 
@@ -38,6 +42,42 @@ Para la plantilla copiable, ver [`TASK_TEMPLATE.md`](TASK_TEMPLATE.md).
 | `policy` | Decisiones formalizadas, documentacion | Zone 0-1, Acceptance Criteria | No — verificacion es revision manual contra arquitectura |
 
 El campo `Type` en Zone 0 determina que zonas y pasos aplican. Cuando hay duda, usar `implementation`.
+
+## Perfiles de ejecucion
+
+`Execution profile` no reemplaza `Type`: define el rigor operativo adicional.
+
+| Execution profile | Cuando usar | Contrato adicional |
+|---|---|---|
+| `standard` | Docs, tooling o cambios sin superficie visible ni contrato runtime/data relevante | Template base |
+| `ui-ux` | Cualquier cambio visible, copy, layout, estados, interaccion, motion, primitive, flujo o GVC | `## UI/UX Contract` desde `TASK_UI_UX_ADDENDUM.md` |
+| `backend-data` | API, DB, readers, commands, migrations, sync, cron, webhook, integration o source-of-truth/data contract | `## Backend/Data Contract` desde `TASK_BACKEND_DATA_ADDENDUM.md` |
+
+`UI impact` ayuda a clasificar el alcance visible:
+
+- `none` — no hay cambio visible.
+- `copy` — labels, CTAs, empty states, alerts, tooltips, aria-labels o errores.
+- `layout` — estructura visual, responsive, density, cards, tables, shell.
+- `interaction` — hover/focus/keyboard/click-away/pending/feedback.
+- `motion` — entrance/exit/layout morph/stagger/scroll reveal/GSAP.
+- `primitive` — primitive, variant, kind, pattern reusable o Design System lab.
+- `flow` — journey multi-step, onboarding, wizard, queue+inspector o experiencia conversacional.
+
+`Backend impact` ayuda a clasificar el alcance runtime/data:
+
+- `none` — no hay cambio backend/data.
+- `api` — route handler, endpoint, OpenAPI, API Platform o contrato programatico.
+- `db` — schema, view, reader SQL, persistence helper o query shared.
+- `migration` — migration, seed, backfill, destructive change o data repair.
+- `command` — write path, command, idempotency, audit, capability mutante.
+- `reader` — read surface compartida, serving projection o DTO consumido por UI/agentes.
+- `sync` — consumer, materializer, outbox projection o integration sync.
+- `cron` — scheduled job, worker periodic, watchdog o batch.
+- `webhook` — inbound/outbound webhook, HMAC, replay, subscription o delivery.
+- `integration` — provider externo, cloud, HubSpot, Notion, Teams, WordPress/Kinsta, AI provider u otro sistema fuera del repo.
+
+Regla de migracion: no convertir masivamente backlog historico. `complete/` queda como historia;
+`in-progress/` y `to-do/` agregan el contrato UI/UX o Backend/Data cuando se editan, se rankean o se toman.
 
 ## Calidad de solucion obligatoria
 
@@ -91,6 +131,9 @@ Usar estos campos dentro de `## Status`:
 - `Impact`: `Muy alto`, `Alto`, `Medio`
 - `Effort`: `Bajo`, `Medio`, `Alto`
 - `Type`: `implementation`, `umbrella`, `policy`
+- `Execution profile`: `standard`, `ui-ux`, `backend-data`
+- `UI impact`: `none`, `copy`, `layout`, `interaction`, `motion`, `primitive`, `flow`
+- `Backend impact`: `none`, `api`, `db`, `migration`, `command`, `reader`, `sync`, `cron`, `webhook`, `integration`
 - `Epic`: `EPIC-###` cuando la task pertenece a un programa cross-domain; `optional` cuando es standalone
 - `Status real`: `Diseno`, `Parcial`, `Avanzada`, `Cerrada`, `Referencia`
 - `Rank`: posicion actual en backlog operativo
@@ -136,6 +179,9 @@ Reglas V1:
   se revisan con `--task TASK-###` / `--changed` y el agente debe normalizarlas si corresponde.
 - Paridad contra `TASK_ID_REGISTRY.md` y marcador "siguiente ID disponible" nacen como
   `warning` para rollout warn-first; no deben bloquear hasta que el registry este saneado.
+- Tasks template con impacto UI/UX sin `## UI/UX Contract` y tasks template con impacto backend/data sin
+  `## Backend/Data Contract` generan `warning` en rollout warn-first; no bloquean hasta que el backlog
+  nuevo demuestre adopcion estable.
 
 CI corre `.github/workflows/task-contract.yml` en modo `--changed` warn-first. No usar el
 linter para reescribir backlog legacy ni para auto-mover archivos; reporta drift y el agente
@@ -227,6 +273,20 @@ El agente DEBE hacer estas acciones antes de producir un plan:
    Si la task cambia source of truth, schema compartido, access model, auth/session, finance/payroll/accounting semantics, events/outbox/webhooks, APIs externas, cloud/deploy/secrets, UI platform o runtime projections compartidas, el ADR check es obligatorio.
 8. **Skill scan** — consultar skills disponibles en el entorno del agente a nivel global o de repo. Leer cada skill relevante antes de escribir codigo que la necesite. Registrar en Discovery summary que skills se usaran y para que slice.
 9. **Subagent assessment** — evaluar si la task se beneficia de delegacion a subagentes (ver protocolo abajo). Registrar la decision en el plan: ejecucion secuencial por el agente principal, o fork con coordinacion.
+10. **UI/UX profile check** — si `Execution profile: ui-ux` o `UI impact != none`, completar `## UI/UX Contract` antes de escribir JSX/copy visible:
+   - decidir reuse / extend / new primitive + variant/kind;
+   - resolver Composition Shell, Adaptive Card density, Floating Surface/Sidecar/Dialog si aplica;
+   - declarar estados visuales obligatorios;
+   - declarar copy source;
+   - declarar motion/microinteracciones y reduced-motion fallback;
+   - declarar GVC scenario/viewports y check de scroll horizontal.
+11. **Backend/Data profile check** — si `Execution profile: backend-data` o `Backend impact != none`, completar `## Backend/Data Contract` antes de escribir backend/data:
+   - nombrar source of truth, contrato programatico y consumidores;
+   - declarar invariantes de datos, tenant/space boundary y access/capability gates;
+   - declarar idempotency, concurrencia, transaction boundary, audit/outbox/history si aplica;
+   - declarar migration/backfill/seed posture, default state, flags/cutover y rollback;
+   - declarar error contract, sensitive data posture, rate-limit/replay/circuit breaker cuando aplique;
+   - declarar evidencia runtime/DB/integracion y production verification sequence proporcional al riesgo.
 
 **Output de Discovery:** un bloque de texto (o seccion en `plan.md`) que lista:
 - Archivos encontrados vs. esperados
@@ -238,6 +298,8 @@ El agente DEBE hacer estas acciones antes de producir un plan:
 - **ADR resolution** — ADR existente, ADR nuevo/propuesto o razon explicita para no requerir ADR
 - **Skills identificadas** — cuales se usaran y para que slice
 - **Subagent decision** — secuencial o fork, y justificacion
+- **UI/UX decision** — si aplica: nivel `ui-lite|ui-standard|ui-platform`, primitive/pattern elegido, estados, motion/copy/GVC y deuda visual conocida
+- **Backend/Data decision** — si aplica: nivel `backend-lite|backend-standard|backend-critical`, source of truth, contract surface, invariantes, migracion/rollback, seguridad/acceso y evidencia runtime requerida
 
 ### Phase 2 — Plan
 
@@ -263,6 +325,9 @@ Con el output de Discovery, el agente produce un `plan.md` que incluye:
 - ADR nuevo/propuesto:
 - Status requerido antes de implementar:
 - Razon si no aplica:
+
+## Backend/data contract
+[Si aplica: source of truth, contract surface, data invariants, access/auth, idempotency/concurrency, migration/backfill/rollback, external coordination y runtime evidence]
 
 ## Skills
 [Que skills se usan y en que slice]

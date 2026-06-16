@@ -1,5 +1,27 @@
 # Release 2026-06-10 #2 — develop→main `6c649b2a6` RELEASED
 
+## Sesión 2026-06-16 — TASK-1148 Backend/Data Task Execution Profile — Codex
+
+> **Estado:** **complete** local-first, sin cambio runtime. Contrato documental/tooling cerrado y lifecycle sincronizado.
+
+- **Qué cambió:** nuevo addendum `docs/tasks/TASK_BACKEND_DATA_ADDENDUM.md`; `TASK_TEMPLATE.md` agrega `Backend impact`; `TASK_PROCESS.md` documenta perfil `backend-data`, valores de impacto, migración gradual y Discovery check antes de escribir API/DB/commands/readers/migrations/sync/cron/webhooks/integrations.
+- **Guardrail:** `task-lint` parsea `Backend impact` y agrega regla `backend-data-contract` warning-first para tasks template con perfil/impacto/dominio backend-data sin `## Backend/Data Contract`. La detección evita `platform`/`ops` solos para no generar ruido en tareas documentales.
+- **Skills actualizadas:** `.codex/skills/greenhouse-task-planner/SKILL.md` y `.claude/skills/greenhouse-task-planner/skill.md` cargan `TASK_BACKEND_DATA_ADDENDUM.md`, detectan `Execution profile`/`Backend impact`, piden rigor `backend-lite|backend-standard|backend-critical` cuando falte y generan `## Backend/Data Contract` para trabajo runtime/data.
+- **Task formal:** `docs/tasks/complete/TASK-1148-backend-data-task-execution-profile.md`; registry y README sincronizados (`siguiente ID disponible: TASK-1149`).
+- **Verificación:** `pnpm task:lint:test` · `pnpm task:lint --task TASK-1148` · `pnpm ops:lint --changed` · `pnpm docs:closure-check`.
+- **Siguiente paso sugerido:** usar el addendum como piloto cuando se tome una task de Knowledge/vector, API Platform, finance/payroll, sync, cron o integration; mantener `backend-data-contract` en warning hasta que varias tasks nuevas lo usen sin ruido.
+
+## Sesión 2026-06-16 — TASK-1147 UI/UX Task Execution Profile — Codex
+
+> **Estado:** **complete** local-first, sin cambio runtime. Contrato documental/tooling cerrado y lifecycle sincronizado.
+
+- **Qué cambió:** nuevo addendum `docs/tasks/TASK_UI_UX_ADDENDUM.md`; `TASK_TEMPLATE.md` agrega `Execution profile` + `UI impact`; `TASK_PROCESS.md` documenta perfil `ui-ux`, valores de impacto, migración gradual y Discovery check antes de escribir JSX/copy visible.
+- **Guardrail:** `task-lint` parsea los campos nuevos y agrega regla `ui-ux-contract` warning-first para tasks template con dominio/impacto UI sin `## UI/UX Contract`. Legacy/backlog historico no se migra masivamente.
+- **Skills actualizadas:** `.codex/skills/greenhouse-task-planner/SKILL.md` y `.claude/skills/greenhouse-task-planner/skill.md` cargan `TASK_UI_UX_ADDENDUM.md`, detectan `Execution profile`/`UI impact`, piden rigor `ui-lite|ui-standard|ui-platform` cuando falte y generan `## UI/UX Contract` para trabajo visible.
+- **Task formal:** `docs/tasks/complete/TASK-1147-ui-ux-task-execution-profile.md`; registry y README sincronizados (`siguiente ID disponible: TASK-1148`).
+- **Verificación:** `pnpm task:lint:test` 14/14 · `pnpm task:lint --task TASK-1147` 0 errors/0 warnings · `pnpm ops:lint --changed` 0 errors/0 warnings. `docs:closure-check` inicialmente pidio changelog/handoff; ambos actualizados.
+- **Siguiente paso sugerido:** aplicar el addendum como piloto cuando se tome `TASK-1118`, `TASK-1095` o `TASK-1132`; mantener `ui-ux-contract` en warning hasta que varias tasks nuevas lo usen sin ruido.
+
 ## Sesión 2026-06-16 — TASK-1127 Nexa Knowledge QA nightly + baseline ampliado — Claude
 
 > **Estado:** **complete** en `develop` (local-first). Slice 1 validado local (45/45). El nightly se confirma al disparar `workflow_dispatch` post-push; el K6 en Anthropic se confirma al desplegar staging. **Desbloquea TASK-1136.**

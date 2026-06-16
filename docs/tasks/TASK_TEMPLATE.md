@@ -1,6 +1,7 @@
 # Task Template
 
 Plantilla copiable para crear tasks nuevas. Para el protocolo completo (Plan Mode, Skill, Subagent, derivacion de Checkpoint/Mode, Lightweight Mode), ver [`TASK_PROCESS.md`](TASK_PROCESS.md).
+Para tasks con impacto backend/data, ver [`TASK_BACKEND_DATA_ADDENDUM.md`](TASK_BACKEND_DATA_ADDENDUM.md).
 
 > **Convivencia de formatos:** solo las tasks creadas a partir de ahora usan esta plantilla. En el backlog existen tasks con el formato anterior — tanto `CODEX_TASK_*` como `TASK-###` ya creadas — que siguen vigentes con su estructura original hasta su cierre.
 
@@ -13,8 +14,10 @@ Plantilla copiable para crear tasks nuevas. Para el protocolo completo (Plan Mod
 3. Llenar Zone 0 y Zone 1 completas
 4. Zone 2 no se llena al crear la task — es responsabilidad del agente que la toma
 5. Llenar Zone 3 y Zone 4 con el detalle que tengas disponible
-6. Para tasks `umbrella` o `policy`: Zone 3 (Detailed Spec) puede omitirse; Verification es revision manual
-7. El cierre de una task no termina cuando el codigo "ya funciona": termina solo cuando el agente actualiza `Lifecycle`, mueve el archivo a la carpeta correcta y sincroniza `docs/tasks/README.md`
+6. Si la task toca UI visible, copy, layout, estados, interaccion, motion, primitive o GVC, declarar `Execution profile: ui-ux`, completar `UI impact` y copiar el bloque de [`TASK_UI_UX_ADDENDUM.md`](TASK_UI_UX_ADDENDUM.md)
+7. Si la task toca backend, datos, DB, API, commands, readers, migrations, sync, cron, webhooks o integraciones, declarar `Execution profile: backend-data`, completar `Backend impact` y copiar el bloque de [`TASK_BACKEND_DATA_ADDENDUM.md`](TASK_BACKEND_DATA_ADDENDUM.md)
+8. Para tasks `umbrella` o `policy`: Zone 3 (Detailed Spec) puede omitirse; Verification es revision manual
+9. El cierre de una task no termina cuando el codigo "ya funciona": termina solo cuando el agente actualiza `Lifecycle`, mueve el archivo a la carpeta correcta y sincroniza `docs/tasks/README.md`
 
 ---
 
@@ -36,6 +39,9 @@ Plantilla copiable para crear tasks nuevas. Para el protocolo completo (Plan Mod
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
+- Execution profile: `standard`
+- UI impact: `none`
+- Backend impact: `none`
 - Epic: `[optional EPIC-###]`
 - Status real: `Diseno`
 - Rank: `TBD`
@@ -109,6 +115,18 @@ Reglas obligatorias:
 ### Gap
 
 - [que sigue roto, faltante o ambiguo]
+
+## UI/UX Contract
+
+[Condicional. Omitir si `Execution profile: standard` y `UI impact: none`.
+Si `Execution profile: ui-ux` o `UI impact` no es `none`, copiar y completar
+el bloque de `docs/tasks/TASK_UI_UX_ADDENDUM.md`.]
+
+## Backend/Data Contract
+
+[Condicional. Omitir si `Execution profile: standard` y `Backend impact: none`.
+Si `Execution profile: backend-data` o `Backend impact` no es `none`, copiar
+y completar el bloque de `docs/tasks/TASK_BACKEND_DATA_ADDENDUM.md`.]
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE

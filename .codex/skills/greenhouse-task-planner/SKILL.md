@@ -13,6 +13,8 @@ You do not implement code, do not run builds for the feature itself, and do not 
 
 - `docs/tasks/TASK_TEMPLATE.md`
 - `docs/tasks/TASK_PROCESS.md`
+- `docs/tasks/TASK_UI_UX_ADDENDUM.md` when the task touches visible UI, copy, layout, interaction, motion, primitives, flows, or GVC
+- `docs/tasks/TASK_BACKEND_DATA_ADDENDUM.md` when the task touches backend, data, DB, API, commands, readers, migrations, sync, cron, webhooks, or integrations
 - `docs/tasks/TASK_ID_REGISTRY.md`
 - `docs/tasks/README.md`
 - `project_context.md`
@@ -30,6 +32,9 @@ Extract from the user's request:
 - why it matters
 - where it lives in the system
 - task type: `implementation`, `umbrella`, or `policy`
+- execution profile: `standard`, `ui-ux`, or `backend-data`
+- UI impact: `none`, `copy`, `layout`, `interaction`, `motion`, `primitive`, or `flow`
+- Backend impact: `none`, `api`, `db`, `migration`, `command`, `reader`, `sync`, `cron`, `webhook`, or `integration`
 - likely priority, impact, and effort
 - likely branch slug
 
@@ -45,6 +50,8 @@ Before writing:
 4. Identify the real gap.
 5. Identify dependent tasks or overlapping owned files.
 6. Confirm whether a legacy brief or existing task already covers part of the scope.
+7. If the task touches UI/UX, read `docs/tasks/TASK_UI_UX_ADDENDUM.md` and identify the required rigor: `ui-lite`, `ui-standard`, or `ui-platform`.
+8. If the task touches backend/data, read `docs/tasks/TASK_BACKEND_DATA_ADDENDUM.md` and identify the required rigor: `backend-lite`, `backend-standard`, or `backend-critical`.
 
 If a path or object cannot be confirmed, mark it with `[verificar]`.
 
@@ -56,6 +63,8 @@ Prefer questions like:
 
 - Is this meant to be `implementation` or `policy`?
 - Does the scope include UI, backend, or both?
+- If it touches UI, is this `ui-lite`, `ui-standard`, or `ui-platform`?
+- If it touches backend/data, is this `backend-lite`, `backend-standard`, or `backend-critical`?
 - Is this replacing an older task or creating a new follow-on?
 
 ### Step 4 — Produce the task
@@ -67,10 +76,15 @@ Rules:
 - fill Zones 0, 1, 3, and 4
 - do not fill Zone 2
 - do not write `Checkpoint` or `Mode` in Status
+- always write `Execution profile`, `UI impact`, and `Backend impact` in Status
+- if `Execution profile = ui-ux` or `UI impact != none`, include a completed `## UI/UX Contract` section copied from `docs/tasks/TASK_UI_UX_ADDENDUM.md`
+- if `Execution profile = backend-data` or `Backend impact != none`, include a completed `## Backend/Data Contract` section copied from `docs/tasks/TASK_BACKEND_DATA_ADDENDUM.md`
 - use real repo paths only
 - keep slices executable and committable
 - make `Out of Scope` explicit
 - make acceptance criteria binary and testable
+- for UI/UX tasks, include binary acceptance criteria for primitive decision, copy source, state coverage, motion/reduced-motion, GVC evidence when applicable, and page-level horizontal scroll checks when layout changes
+- for backend/data tasks, include binary acceptance criteria for source of truth, contract surface, data invariants, tenant/access boundary, idempotency/concurrency, migration/backfill/rollback posture, canonical errors, audit/signal posture, and runtime evidence
 
 ### Step 5 — Present and confirm
 
@@ -79,11 +93,15 @@ Before writing files, present:
 - reserved `TASK-###`
 - proposed title
 - assigned type and why
+- execution profile and UI impact
+- backend impact
 - inferred priority/effort if applicable
 - derived branch: `task/TASK-###-short-slug`
 - any open questions
 - any `[verificar]` items
 - any collision with active tasks
+- for UI/UX tasks, highlight UI rigor, primitive decision, and GVC plan
+- for backend/data tasks, highlight backend rigor, source of truth, migration/rollback posture, access/security posture, and runtime evidence plan
 
 Wait for confirmation before registering the task in the repo.
 
@@ -104,6 +122,12 @@ After confirmation:
 - Do not duplicate architecture text when a reference is enough.
 - Slices must describe deliverables, not investigation.
 - If the task is `umbrella` or `policy`, keep verification manual and documentary.
+- If the task touches UI/UX, do not create a generic implementation task. Set `Execution profile: ui-ux`, classify `UI impact`, and complete `## UI/UX Contract`.
+- UI/UX tasks must specify experience brief, surface/system decision, state inventory, interaction contract, motion/microinteractions, and visual verification.
+- Do not make GVC optional for `ui-standard` or `ui-platform` unless the task explicitly explains why runtime visual evidence does not apply.
+- If the task touches backend/data, do not leave it as a generic implementation task. Set `Execution profile: backend-data`, classify `Backend impact`, and complete `## Backend/Data Contract`.
+- Backend/data tasks must specify source of truth, contract surface, data invariants, tenant/access boundary, idempotency/concurrency, migration/backfill/rollback posture, sensitive data/error posture, audit/signal posture, and runtime evidence.
+- Do not make DB/runtime/integration evidence optional for `backend-standard` or `backend-critical` unless the task explicitly explains why the change is repo-only.
 - If the user only wants a draft, stop before writing files.
 
 ## Output Contract
@@ -114,4 +138,6 @@ When presenting a draft in chat:
 
 - keep the explanation short
 - highlight ID, type, branch, and open questions
+- for UI/UX tasks, highlight execution profile, UI impact, UI rigor, primitive decision, and GVC plan
+- for backend/data tasks, highlight execution profile, backend impact, backend rigor, source of truth, migration/rollback posture, and runtime evidence
 - do not implement the task

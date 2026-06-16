@@ -110,6 +110,22 @@ pnpm docs:closure-check # cierre documental advisory
 
 V1 valida estructura, lifecycle/carpeta, registry, next ID y checkboxes. No reemplaza verification real, GVC, flags/env vars, rollout, migraciones ni juicio humano de checkpoint.
 
+### Task Authoring Contract (Claude)
+
+Cuando Claude crea o edita una task formal `TASK-###`, debe recargar la skill vigente
+`.claude/skills/greenhouse-task-planner/skill.md` completa y no usar memoria previa del
+formato. La task solo se puede entregar como lista si `pnpm task:lint --task TASK-###`
+reporta `template=1`, `errors=0`, `warnings=0`.
+
+Reglas duras:
+
+- Incluir todos los markers `ZONE 0` a `ZONE 4`; Zone 2 queda como marker/comentario, no se llena al crear la task.
+- Usar solo enums vigentes: `Execution profile: standard|ui-ux|backend-data`, `UI impact: none|copy|layout|interaction|motion|primitive|flow`, `Backend impact: none|api|db|migration|command|reader|sync|cron|webhook|integration`.
+- Si `UI impact != none`, agregar `## UI/UX Contract` desde `docs/tasks/TASK_UI_UX_ADDENDUM.md`.
+- Si `Backend impact != none`, agregar `## Backend/Data Contract` desde `docs/tasks/TASK_BACKEND_DATA_ADDENDUM.md`.
+- Sincronizar `docs/tasks/README.md` y `docs/tasks/TASK_ID_REGISTRY.md` al registrar o cambiar lifecycle.
+- Correr `pnpm task:lint --task TASK-###` y `pnpm ops:lint --changed`; si la task sale como `legacy=1`, corregir el markdown antes de responder.
+
 Prompt operativo recomendado:
 
 ```text

@@ -17,6 +17,32 @@ const REQUIRED_SECTIONS = [
 const REQUIRED_IMPLEMENTATION_SECTIONS = ['detailed spec']
 const POLICY_TYPES = new Set(['umbrella', 'policy'])
 const SENSITIVE_DOMAINS = ['finance', 'payroll', 'auth', 'identity', 'billing', 'cloud', 'data', 'production']
+const UI_DOMAINS = ['ui', 'design-system', 'motion', 'accessibility']
+const UI_IMPACTS = new Set(['copy', 'layout', 'interaction', 'motion', 'primitive', 'flow'])
+
+const BACKEND_DATA_DOMAINS = [
+  'api',
+  'data',
+  'db',
+  'database',
+  'migration',
+  'migrations',
+  'sync',
+  'cron',
+  'webhook',
+  'webhooks',
+  'integration',
+  'integrations',
+  'finance',
+  'payroll',
+  'auth',
+  'identity',
+  'billing',
+  'cloud',
+  'reliability'
+]
+
+const BACKEND_DATA_IMPACTS = new Set(['api', 'db', 'migration', 'command', 'reader', 'sync', 'cron', 'webhook', 'integration'])
 
 const hasSection = (task, section) => task.sections.has(section)
 
@@ -39,6 +65,24 @@ const finding = ({ task, rule, severity, message, line }) => ({
 })
 
 const blockingSeverity = context => (context.enforceErrors ? 'error' : 'warning')
+
+const isUiUxImpacted = task => {
+  if (task.executionProfile === 'ui-ux') return true
+  if (task.uiImpact && UI_IMPACTS.has(task.uiImpact)) return true
+
+  const lowerDomain = task.domain ?? ''
+
+  return UI_DOMAINS.some(domain => lowerDomain.includes(domain))
+}
+
+const isBackendDataImpacted = task => {
+  if (task.executionProfile === 'backend-data') return true
+  if (task.backendImpact && BACKEND_DATA_IMPACTS.has(task.backendImpact)) return true
+
+  const lowerDomain = task.domain ?? ''
+
+  return BACKEND_DATA_DOMAINS.some(domain => lowerDomain.includes(domain))
+}
 
 const checkRequiredSections = (task, context) => {
   const findings = []
@@ -236,6 +280,36 @@ const checkNextIdMarker = (_task, context) => {
   ]
 }
 
+const checkUiUxContract = task => {
+  if (!isUiUxImpacted(task)) return []
+  if (hasSection(task, 'ui/ux contract')) return []
+
+  return [
+    finding({
+      task,
+      rule: 'ui-ux-contract',
+      severity: 'warning',
+      message:
+        'Task appears to touch UI/UX but is missing "## UI/UX Contract". Add TASK_UI_UX_ADDENDUM.md or set UI impact to none with rationale.'
+    })
+  ]
+}
+
+const checkBackendDataContract = task => {
+  if (!isBackendDataImpacted(task)) return []
+  if (hasSection(task, 'backend/data contract')) return []
+
+  return [
+    finding({
+      task,
+      rule: 'backend-data-contract',
+      severity: 'warning',
+      message:
+        'Task appears to touch backend/data but is missing "## Backend/Data Contract". Add TASK_BACKEND_DATA_ADDENDUM.md or set Backend impact to none with rationale.'
+    })
+  ]
+}
+
 export const RULES = [
   {
     id: 'required-sections',
@@ -271,6 +345,16 @@ export const RULES = [
     id: 'next-id-marker',
     appliesTo: (_task, context) => context.isLastTask,
     check: checkNextIdMarker
+  },
+  {
+    id: 'ui-ux-contract',
+    appliesTo: task => task.kind === 'template',
+    check: checkUiUxContract
+  },
+  {
+    id: 'backend-data-contract',
+    appliesTo: task => task.kind === 'template',
+    check: checkBackendDataContract
   }
 ]
 

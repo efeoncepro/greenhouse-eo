@@ -13,7 +13,17 @@ import {
 
 const write = (path, source) => writeFileSync(path, source, 'utf8')
 
-const taskFixture = ({ lifecycle = 'to-do', id = 'TASK-999', title = 'fixture task' } = {}) => `# ${id} — ${title}
+const taskFixture = ({
+  lifecycle = 'to-do',
+  id = 'TASK-999',
+  title = 'fixture task',
+  domain = 'ops',
+  executionProfile = 'standard',
+  uiImpact = 'none',
+  uiUxContract = '',
+  backendImpact = 'none',
+  backendDataContract = ''
+} = {}) => `# ${id} — ${title}
 
 <!-- ZONE 0 — IDENTITY & TRIAGE -->
 
@@ -24,10 +34,13 @@ const taskFixture = ({ lifecycle = 'to-do', id = 'TASK-999', title = 'fixture ta
 - Impact: \`Medio\`
 - Effort: \`Medio\`
 - Type: \`implementation\`
+- Execution profile: \`${executionProfile}\`
+- UI impact: \`${uiImpact}\`
+- Backend impact: \`${backendImpact}\`
 - Epic: \`none\`
 - Status real: \`Diseno\`
 - Rank: \`TBD\`
-- Domain: \`ops\`
+- Domain: \`${domain}\`
 - Blocked by: \`TASK-100\`
   reason continues on a second line with \`inline code\`
   and a third line that should stay attached to Blocked by
@@ -80,6 +93,9 @@ Fixture.
 ### Gap
 
 - Fixture.
+
+${uiUxContract}
+${backendDataContract}
 
 <!-- ZONE 2 — PLAN MODE -->
 
@@ -344,6 +360,92 @@ const cases = [
       assert.equal(result.summary.preAdoptionActiveTasks, 1)
       assert.equal(result.warnings.length, 0)
       assert.equal(result.errors.length, 0)
+      rmSync(root, { recursive: true, force: true })
+    }
+  },
+  {
+    name: 'warns when a UI task is missing the UI/UX contract',
+    run: () => {
+      const root = createRepo()
+
+      write(join(root, 'docs', 'tasks', 'to-do', 'TASK-999-fixture.md'), taskFixture({
+        domain: 'ui|platform',
+        executionProfile: 'ui-ux',
+        uiImpact: 'layout'
+      }))
+
+      const result = lintTasks({ repoRoot: root, options: { format: 'json', strict: false, changed: false, task: 'TASK-999' } })
+
+      assert.equal(result.errors.length, 0)
+      assert.equal(result.warnings.some(item => item.rule === 'ui-ux-contract'), true)
+      rmSync(root, { recursive: true, force: true })
+    }
+  },
+  {
+    name: 'accepts a UI task with the UI/UX contract',
+    run: () => {
+      const root = createRepo()
+
+      write(join(root, 'docs', 'tasks', 'to-do', 'TASK-999-fixture.md'), taskFixture({
+        domain: 'ui|platform',
+        executionProfile: 'ui-ux',
+        uiImpact: 'interaction',
+        uiUxContract: [
+          '## UI/UX Contract',
+          '',
+          '### Experience brief',
+          '',
+          '- UI rigor: `ui-standard`',
+          '- Usuario / rol: operador interno'
+        ].join('\n')
+      }))
+
+      const result = lintTasks({ repoRoot: root, options: { format: 'json', strict: false, changed: false, task: 'TASK-999' } })
+
+      assert.equal(result.warnings.some(item => item.rule === 'ui-ux-contract'), false)
+      rmSync(root, { recursive: true, force: true })
+    }
+  },
+  {
+    name: 'warns when a backend/data task is missing the Backend/Data contract',
+    run: () => {
+      const root = createRepo()
+
+      write(join(root, 'docs', 'tasks', 'to-do', 'TASK-999-fixture.md'), taskFixture({
+        domain: 'data|reliability',
+        executionProfile: 'backend-data',
+        backendImpact: 'migration'
+      }))
+
+      const result = lintTasks({ repoRoot: root, options: { format: 'json', strict: false, changed: false, task: 'TASK-999' } })
+
+      assert.equal(result.errors.length, 0)
+      assert.equal(result.warnings.some(item => item.rule === 'backend-data-contract'), true)
+      rmSync(root, { recursive: true, force: true })
+    }
+  },
+  {
+    name: 'accepts a backend/data task with the Backend/Data contract',
+    run: () => {
+      const root = createRepo()
+
+      write(join(root, 'docs', 'tasks', 'to-do', 'TASK-999-fixture.md'), taskFixture({
+        domain: 'api|data',
+        executionProfile: 'backend-data',
+        backendImpact: 'api',
+        backendDataContract: [
+          '## Backend/Data Contract',
+          '',
+          '### Backend/data brief',
+          '',
+          '- Backend rigor: `backend-standard`',
+          '- Impacto principal: `api`'
+        ].join('\n')
+      }))
+
+      const result = lintTasks({ repoRoot: root, options: { format: 'json', strict: false, changed: false, task: 'TASK-999' } })
+
+      assert.equal(result.warnings.some(item => item.rule === 'backend-data-contract'), false)
       rmSync(root, { recursive: true, force: true })
     }
   }
