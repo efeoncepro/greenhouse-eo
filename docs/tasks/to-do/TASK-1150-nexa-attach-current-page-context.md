@@ -29,13 +29,13 @@
 
 Agregar a Nexa la opcion explicita de adjuntar el contexto de la pantalla actual al turno del chat, similar al contexto que Codex recibe desde el IDE. La solucion debe reutilizar `NexaContextScope` como fuente declarativa, mostrar un affordance claro en el composer y enviar un contrato versionado y revalidado al backend de `/api/home/nexa`.
 
-Incluye una decision de higiene previa: el adapter legacy del floating (`createFloatingAdapter` dentro de `NexaFloatingButton.tsx`) no debe recibir features nuevas como camino separado. Debe retirarse o converger al runtime canonico antes de shippear el contexto adjunto.
+Incluye una decision de higiene previa: el adapter legacy del floating (`createFloatingAdapter` dentro de `NexaFloatingButton.tsx`) no debe recibir features nuevas ni mantenerse como camino alternativo. Debe retirarse antes de shippear el contexto adjunto, preservando el FAB/shell que monta la experiencia rica actual.
 
 ## Why This Task Exists
 
 Nexa ya tiene contexto de pagina para prompts sugeridos: `NexaContextScope` declara `entityName`, `entityId`, `entityKind`, `contextKey` y `entrypoint`, y `NexaFloatingPanel` lo usa para el empty hero/data-aware prompts. Pero el POST real del mensaje a `/api/home/nexa` solo manda `prompt`, `history`, `model`, `modelMode` y `threadId`; el backend reconstruye un contexto liviano de Home desde la sesion y no recibe la pantalla donde estaba parado el usuario.
 
-El resultado es una experiencia partida: Nexa sugiere preguntas contextualizadas, pero al enviar un prompt no tiene un "contexto adjunto" explicito de esa superficie. Ademas, `NexaFloatingButton.tsx` conserva un adapter legacy efimero detras del fallback del flag expandible; si se agregan capacidades al runtime nuevo sin consolidar ese camino, el producto queda con dos Nexas visibles con contratos distintos.
+El resultado es una experiencia partida: Nexa sugiere preguntas contextualizadas, pero al enviar un prompt no tiene un "contexto adjunto" explicito de esa superficie. Ademas, `NexaFloatingButton.tsx` conserva un adapter legacy efimero detras del fallback del flag expandible; como la experiencia nueva ya es la experiencia rica vigente, mantener ese fallback como superficie funcional prolonga deuda y arriesga dos Nexas visibles con contratos distintos.
 
 ## Goal
 
@@ -43,7 +43,7 @@ El resultado es una experiencia partida: Nexa sugiere preguntas contextualizadas
 - Transportar ese contexto como contrato estructurado, acotado y versionado hacia `/api/home/nexa`.
 - Revalidar server-side el contexto adjunto antes de inyectarlo en el turno; el cliente solo aporta una pista, nunca autoridad.
 - Inyectar el contexto en `NexaService`/system prompt como contexto de turno, sin convertirlo en datos operativos no verificados.
-- Retirar o converger el adapter legacy del floating para que el chat global tenga un solo runtime/conducto de mensajes.
+- Retirar el adapter legacy del floating para que el chat global tenga un solo runtime/conducto de mensajes.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 1 — CONTEXT & CONSTRAINTS
@@ -94,7 +94,7 @@ Reglas obligatorias:
 - `src/app/api/home/nexa/route.ts` — endpoint compartido del chat.
 - `src/lib/nexa/nexa-service.ts` — orquestador provider-agnostico.
 - `src/lib/nexa/nexa-system-prompt.ts` — builder versionado del prompt.
-- `src/components/greenhouse/NexaFloatingButton.tsx` — FAB global que conserva el fallback legacy `createFloatingAdapter`.
+- `src/components/greenhouse/NexaFloatingButton.tsx` — FAB global que conserva el fallback legacy `createFloatingAdapter` y debe quedar como shell del panel nuevo.
 
 ### Blocks / Impacts
 
@@ -131,7 +131,7 @@ Reglas obligatorias:
 - `NexaFloatingPanel` resuelve `promptContext` y `heroPrompts` desde `pageContext`.
 - `useNexaPersistentRuntime` es el adapter canonico para Home/floating expandible: persiste `threadId`, suggestions y modelo.
 - `/api/home/nexa` ya arma `runtimeContext` confiable desde sesion (`userId`, `clientId`, `routeGroups`, `organizationId`, `memberId`, etc.).
-- `NexaFloatingButton.tsx` conserva `createFloatingAdapter` y `panelContent` legacy detras del fallback de `NEXA_FLOATING_EXPANDABLE_ENABLED`.
+- `NexaFloatingButton.tsx` conserva `createFloatingAdapter` y `panelContent` legacy detras del fallback de `NEXA_FLOATING_EXPANDABLE_ENABLED`, aunque la experiencia expandible nueva ya es la ruta rica vigente.
 
 ### Gap
 
@@ -139,7 +139,7 @@ Reglas obligatorias:
 - El backend no tiene contrato `attachedContext`/`turnContext`, ni revalidacion por entidad/superficie.
 - El system prompt solo recibe "CONTEXTO DEL USUARIO" y contexto Home-lite; no recibe "CONTEXTO ADJUNTO DE LA PANTALLA".
 - El composer no tiene affordance para incluir/excluir contexto ni feedback de que se adjuntara.
-- El adapter legacy del floating puede seguir respondiendo sin historial/contexto si el flag se apaga o si un entorno drifted queda en fallback.
+- El adapter legacy del floating puede seguir respondiendo sin historial/contexto mientras exista codigo de fallback, especialmente si un entorno drifted queda con el flag apagado.
 
 ## UI/UX Contract
 
@@ -280,11 +280,12 @@ Reglas obligatorias:
 
 ## Scope
 
-### Slice 1 — Floating legacy adapter consolidation
+### Slice 1 — Floating legacy adapter retirement
 
-- Verificar el estado real de `NEXA_FLOATING_EXPANDABLE_ENABLED`/`NEXT_PUBLIC_NEXA_FLOATING_EXPANDABLE_ENABLED` y el uso actual de `panelContent` legacy.
-- Retirar `createFloatingAdapter` + `panelContent` legacy si el panel expandible ya es el unico camino operativo, o converger el fallback para que use el runtime canonico y el mismo contrato de request.
-- Criterio duro: no implementar contexto adjunto en un adapter mientras otro sigue enviando un payload distinto a `/api/home/nexa`.
+- Verificar el estado real de `NEXA_FLOATING_EXPANDABLE_ENABLED`/`NEXT_PUBLIC_NEXA_FLOATING_EXPANDABLE_ENABLED` y documentar que el flag ya representa la experiencia rica vigente, no un experimento visual activo.
+- Retirar `createFloatingAdapter`, `useLocalRuntime`, `panelContent` legacy, imports asociados y fallback `Drawer/Card` del panel viejo.
+- Preservar intactos el FAB, dock positioning, ocultamiento en `/home`, `NEXA_FLOATING_OPEN_EVENT`, open/close, Escape, click-away y return-focus.
+- Criterio duro: no implementar contexto adjunto mientras exista otro adapter del floating enviando un payload distinto a `/api/home/nexa`.
 
 ### Slice 2 — Attached context contract
 
@@ -328,7 +329,7 @@ Reglas obligatorias:
 - Crear tools operativos nuevos para cada dominio.
 - Resolver `TASK-1118` cross-route composition; esta task solo deja un contrato reutilizable por ese puente.
 - Rediseñar completo del chat o moverlo a sidecar C (`TASK-1079`).
-- Mantener el adapter legacy como camino con capacidades divergentes.
+- Mantener el adapter legacy como camino funcional o intentar convergerlo feature-by-feature.
 
 ## Detailed Spec
 
@@ -363,19 +364,20 @@ El shape final se decide en Plan Mode, pero debe preservar estas propiedades:
 
 ### Decision sobre floating legacy
 
-El adapter legacy en `src/components/greenhouse/NexaFloatingButton.tsx` existe porque `TASK-1078` dejo el panel expandible detras de flag. El Handoff indica que el flag fue encendido en entornos; por lo tanto, el camino legacy ya no debe recibir nuevas capacidades.
+El adapter legacy en `src/components/greenhouse/NexaFloatingButton.tsx` existe porque `TASK-1078` dejo el panel expandible detras de flag. El operador confirmo que el flag existe porque la nueva experiencia es mas rica y debe ser la superficie vigente; por lo tanto, el camino legacy ya no debe recibir nuevas capacidades ni conservarse como fallback funcional de producto.
 
 Decision operativa de esta task:
 
-- Preferido: eliminar `createFloatingAdapter`, el `useLocalRuntime` efimero y `panelContent` fallback, dejando `NexaFloatingPanel` como unico panel del FAB.
-- Alternativa aceptable si se requiere rollback del flag: hacer que el fallback use el mismo adapter canonico/contrato que `useNexaPersistentRuntime`, sin duplicar request body.
+- Eliminar `createFloatingAdapter`, el `useLocalRuntime` efimero, `panelContent` fallback, `Drawer/Card` legacy e imports asociados, dejando `NexaFloatingPanel` como unico panel del FAB.
+- Preservar el shell valioso de `NexaFloatingButton`: trigger, dock, posicionamiento, open state, click-away, Escape, return-focus y evento global de apertura.
+- Si se necesita rollback, usar revert/flag de rollout del cambio nuevo; no mantener un segundo chat operativo como rollback permanente.
 - No aceptable: agregar `attachedContext` solo a `useNexaPersistentRuntime` y dejar `createFloatingAdapter` enviando payload viejo.
 
 ## Rollout Plan & Risk Matrix
 
 ### Slice ordering hard rule
 
-- Slice 1 (legacy adapter consolidation) debe completarse antes de Slice 3/4.
+- Slice 1 (legacy adapter retirement) debe completarse antes de Slice 3/4.
 - Slice 2 (contrato puro) debe completarse antes de UI/backend integration.
 - Slice 4 (server revalidation) debe existir antes de encender cualquier UI que envie contexto.
 - Slice 5 (prompt integration) debe shippear con docs/golden/doc-gate si toca prompt.
@@ -386,7 +388,7 @@ Decision operativa de esta task:
 |---|---|---|---|---|
 | Contexto de entidad no autorizada induce respuesta sobre cuenta/persona ajena | identity/api | medium | server revalidation + anti-oracle degrade to null | logs/captureWithDomain, tests permission denied |
 | Payload de contexto filtra datos sensibles | nexa/security | medium | allowlist estricta, truncado, sin metricas/montos crudos | test snapshots del payload |
-| Dos adapters del floating quedan con comportamiento distinto | UI/API | medium | Slice 1 bloqueante: retirar/converger legacy | GVC/runtime smoke en rutas con flag on/off si aplica |
+| Dos adapters del floating quedan con comportamiento distinto | UI/API | medium | Slice 1 bloqueante: retirar legacy, no converger feature-by-feature | GVC/runtime smoke del floating nuevo |
 | Prompt se vuelve demasiado largo o confunde tools vs contexto | ai/runtime | low | seccion breve + regla "contexto orienta, tools verifican" + QA focal | QA manual/staging |
 | Chip del composer rompe layout mobile | UI | medium | GVC mobile 390 + scrollWidth check | GVC finding / scrollWidth > clientWidth |
 
@@ -400,7 +402,7 @@ Decision operativa de esta task:
 
 | Slice | Rollback | Tiempo | Reversible? |
 |---|---|---|---|
-| Slice 1 | revert PR o reactivar fallback solo si se dejo detras de flag | <30 min | si |
+| Slice 1 | revert PR; no reactivar fallback legacy como estado permanente | <30 min | si |
 | Slice 2 | revert contrato puro | <15 min | si |
 | Slice 3 | ocultar control por flag/copy or revert UI | <15 min | si |
 | Slice 4 | ignorar `attachedContext` server-side | <15 min | si |
@@ -427,7 +429,7 @@ Decision operativa de esta task:
 
 ## Acceptance Criteria
 
-- [ ] `NexaFloatingButton.tsx` no conserva un adapter legacy divergente para el panel flotante, o el fallback usa el mismo contrato canonico que el panel nuevo.
+- [ ] `NexaFloatingButton.tsx` no conserva `createFloatingAdapter`, `useLocalRuntime` efimero ni `panelContent` legacy para el panel flotante.
 - [ ] Existe un contrato versionado para contexto adjunto del turno y esta documentado en Nexa Intelligence.
 - [ ] El composer muestra un control accesible para incluir/excluir contexto cuando la pagina declara `NexaContextScope`.
 - [ ] El request de `useNexaPersistentRuntime` envia contexto solo cuando corresponde y mantiene backward compatibility.
