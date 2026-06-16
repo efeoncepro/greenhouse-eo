@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
@@ -137,7 +137,7 @@ Reglas obligatorias:
 - `/Users/jreye/Documents/efeonce-web/astro.config.mjs`
 - `/Users/jreye/Documents/efeonce-web/e2e/*.spec.ts`
 - `scripts/frontend/scenarios/public-site-astro-foundation.scenario.ts` `[verificar/crear si GVC se ejecuta desde greenhouse-eo]`
-- `docs/tasks/to-do/TASK-1159-public-site-astro-seo-foundation-service-landing-shell.md`
+- `docs/tasks/in-progress/TASK-1159-public-site-astro-seo-foundation-service-landing-shell.md`
 - `docs/tasks/README.md`
 - `docs/tasks/TASK_ID_REGISTRY.md`
 - `docs/epics/to-do/EPIC-019-public-website-landing-control-plane.md`
