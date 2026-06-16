@@ -15,6 +15,7 @@ import { GH_ROADMAP } from '@/lib/copy/roadmap'
 import type { RoadmapWorkItemVM } from '@/lib/roadmap/cockpit/types'
 
 import { HEALTH_VISUAL, KIND_VISUAL, PRIORITY_TONE, toneSx } from '../cockpit-tokens'
+import InlineMarkdown from './InlineMarkdown'
 import { ToneTag } from './RoadmapTags'
 
 const Overline = ({ children }: { children: ReactNode }) => (
@@ -171,7 +172,7 @@ const RoadmapInspector = ({ item, presentIds, onClose, onSelectRelated, onCopy, 
         {item.summary ? (
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
             <Overline>{isIssue ? GH_ROADMAP.inspector.symptom : GH_ROADMAP.inspector.summary}</Overline>
-            <Prose>{item.summary}</Prose>
+            <Prose><InlineMarkdown text={item.summary} /></Prose>
           </Box>
         ) : null}
 
@@ -202,7 +203,7 @@ const RoadmapInspector = ({ item, presentIds, onClose, onSelectRelated, onCopy, 
         {item.why && !isIssue ? (
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
             <Overline>{GH_ROADMAP.inspector.why}</Overline>
-            <Prose muted>{item.why}</Prose>
+            <Prose muted><InlineMarkdown text={item.why} /></Prose>
           </Box>
         ) : null}
 
@@ -211,7 +212,7 @@ const RoadmapInspector = ({ item, presentIds, onClose, onSelectRelated, onCopy, 
             {item.rootCause ? (
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
                 <Overline>{GH_ROADMAP.inspector.rootCause}</Overline>
-                <Prose muted>{item.rootCause}</Prose>
+                <Prose muted><InlineMarkdown text={item.rootCause} /></Prose>
               </Box>
             ) : null}
             {item.environment ? (

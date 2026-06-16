@@ -6,11 +6,21 @@
  * estilizado, in-context, sin abandonar el cockpit. Read-only: el Markdown del
  * repo sigue siendo la fuente de verdad.
  *
- * Render: `react-markdown` + `remark-gfm` (tablas/strikethrough). El HTML crudo
- * NO se interpreta (sin `rehype-raw`) → un `<script>` embebido se escapa. Los
- * estilos son prose tokenizado (theme.palette / customBorderRadius), nunca HEX.
+ * Render: `react-markdown` + `remark-gfm` (tablas/strikethrough/checkboxes). El
+ * HTML crudo NO se interpreta (sin `rehype-raw`) → un `<script>` embebido se
+ * escapa. Estilos prose tokenizados (theme.palette / customBorderRadius), sin HEX.
+ *
+ * Enriquecimientos de lectura:
+ * - **IDs clicables** (`TASK-027`, `ISSUE-042`, …) → navegan a ese work item
+ *   dentro del mismo drawer (stack interno con "volver").
+ * - **Callouts**: blockquotes y los ítems de "reglas duras" (NUNCA/SIEMPRE) se
+ *   pintan tonales en vez de texto plano.
+ * - **Checkboxes** de tarea (`- [ ]`) como casillas reales (solo lectura).
+ * - **Copiar** por bloque de código.
+ * - **Secciones**: chips de los `## headings` para saltar dentro del documento.
+ * - **Status** del front-matter como tarjeta de chips arriba del contenido.
  */
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
@@ -21,17 +31,19 @@ import Typography from '@mui/material/Typography'
 import type { SxProps, Theme } from '@mui/material/styles'
 
 import Markdown, { type Components } from 'react-markdown'
+import rehypeHighlight from 'rehype-highlight'
 import remarkGfm from 'remark-gfm'
 
 import { GH_ROADMAP } from '@/lib/copy/roadmap'
 import type { RoadmapWorkItemVM } from '@/lib/roadmap/cockpit/types'
+import type { WorkItemKind } from '@/lib/roadmap/work-item-index/types'
 
 import { KIND_VISUAL, toneSx } from '../cockpit-tokens'
 import { ToneTag } from './RoadmapTags'
 
 interface TaskMarkdownPayload {
   id: string
-  kind: string
+  kind: WorkItemKind
   title: string
   path: string
   content: string
@@ -42,7 +54,184 @@ type FetchState =
   | { status: 'error' }
   | { status: 'ready'; content: string }
 
-/** Prose tokenizado para documento técnico denso (headings, listas, code, tablas GFM). */
+interface HeaderMeta {
+  id: string
+  kind: WorkItemKind
+  title: string
+  path: string
+}
+
+/** Patrón canónico de IDs del backlog (para hacerlos clicables). */
+const WORK_ITEM_ID_RE = /^(TASK|ISSUE|EPIC|MINI)-\d+$/
+
+/** Prefijos que marcan un ítem de "regla dura" (callout tonal). */
+const RULE_NEGATIVE_RE = /^(nunca|never|prohibido|no\b)/i
+const RULE_POSITIVE_RE = /^(siempre|always)/i
+
+const slugify = (text: string): string =>
+  text
+    .normalize('NFD') // descompone tildes (á → a + diacrítico)
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, '') // quita diacríticos + puntuación sin dejar guion
+    .trim()
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 64)
+
+/** Extrae texto plano de un árbol de children React (para detectar reglas / copiar). */
+const extractText = (node: ReactNode): string => {
+  if (node == null || node === false) return ''
+  if (typeof node === 'string' || typeof node === 'number') return String(node)
+  if (Array.isArray(node)) return node.map(extractText).join('')
+
+  if (typeof node === 'object' && 'props' in node) {
+    return extractText((node as { props?: { children?: ReactNode } }).props?.children)
+  }
+
+  return ''
+}
+
+interface SectionLink {
+  title: string
+  slug: string
+}
+
+/** Secciones (`## headings`) del documento, para la barra de saltos. */
+const extractSections = (content: string): SectionLink[] => {
+  const out: SectionLink[] = []
+  const seen = new Set<string>()
+
+  for (const line of content.split('\n')) {
+    const match = line.match(/^##\s+(.+?)\s*$/)
+
+    if (!match) continue
+
+    const title = match[1].replace(/[`*_]/g, '').trim()
+    let slug = slugify(title)
+
+    if (!slug) continue
+    while (seen.has(slug)) slug = `${slug}-x`
+    seen.add(slug)
+    out.push({ title, slug })
+  }
+
+  return out
+}
+
+interface StatusField {
+  key: string
+  value: string
+}
+
+/** Campos del bloque `## Status` (front-matter) como pares key/value. */
+const extractStatusFields = (content: string): StatusField[] => {
+  const lines = content.split('\n')
+  const start = lines.findIndex(line => /^##\s+Status\s*$/i.test(line))
+
+  if (start === -1) return []
+
+  const out: StatusField[] = []
+
+  for (let i = start + 1; i < lines.length; i++) {
+    const line = lines[i]
+
+    if (/^##\s+/.test(line)) break
+
+    const match = line.match(/^[-*]\s+([A-Za-z][\w /]*?):\s*`?([^`\n]+?)`?\s*$/)
+
+    if (match) out.push({ key: match[1].trim(), value: match[2].trim() })
+  }
+
+  return out
+}
+
+/** Quita el bloque `## Status` del cuerpo (ya se muestra como tarjeta de chips). */
+const stripStatusBlock = (content: string): string => {
+  const lines = content.split('\n')
+  const start = lines.findIndex(line => /^##\s+Status\s*$/i.test(line))
+
+  if (start === -1) return content
+
+  let end = start + 1
+
+  while (end < lines.length && !/^##\s+/.test(lines[end])) end++
+
+  return [...lines.slice(0, start), ...lines.slice(end)].join('\n').replace(/\n{3,}/g, '\n\n')
+}
+
+/** Chip clicable de un ID del backlog (navega dentro del drawer). */
+const IdLink = ({ id, onNavigate }: { id: string; onNavigate: (id: string) => void }) => (
+  <Box
+    component='button'
+    type='button'
+    onClick={() => onNavigate(id)}
+    sx={{
+      display: 'inline-flex',
+      alignItems: 'center',
+      gap: 0.375,
+      ...toneSx('info'),
+      border: '1px solid transparent',
+      borderRadius: theme => `${theme.shape.customBorderRadius.xs}px`,
+      px: 0.625,
+      py: 0.125,
+      fontSize: '0.8125rem',
+      fontWeight: 600,
+      fontFeatureSettings: "'tnum' 1",
+      cursor: 'pointer',
+      verticalAlign: 'baseline',
+      '&:hover': { borderColor: 'info.main' },
+      '&:focus-visible': { outline: theme => `2px solid ${theme.palette.info.main}`, outlineOffset: 1 }
+    }}
+  >
+    <i className='tabler-arrow-up-right' aria-hidden='true' style={{ fontSize: 11, lineHeight: 0 }} />
+    {id}
+  </Box>
+)
+
+/** Bloque de código con botón de copiar. */
+const PreBlock = ({ children }: { children?: ReactNode }) => {
+  const ref = useRef<HTMLPreElement>(null)
+  const [copied, setCopied] = useState(false)
+
+  const handleCopy = useCallback(() => {
+    const text = ref.current?.textContent ?? ''
+
+    if (navigator.clipboard) navigator.clipboard.writeText(text).catch(() => {})
+    setCopied(true)
+    window.setTimeout(() => setCopied(false), 1400)
+  }, [])
+
+  return (
+    <Box sx={{ position: 'relative', my: 2, '&:hover .gh-code-copy': { opacity: 1 } }}>
+      <IconButton
+        size='small'
+        className='gh-code-copy'
+        onClick={handleCopy}
+        aria-label={GH_ROADMAP.taskDrawer.copyCodeAria}
+        sx={{
+          position: 'absolute',
+          top: 6,
+          right: 6,
+          opacity: { xs: 1, md: 0 },
+          transition: 'opacity 0.15s ease',
+          backgroundColor: 'background.paper',
+          border: '1px solid',
+          borderColor: 'divider',
+          color: copied ? 'success.main' : 'text.secondary',
+          '&:hover': { backgroundColor: 'background.paper', color: 'text.primary' }
+        }}
+      >
+        <i className={copied ? 'tabler-check' : 'tabler-copy'} style={{ fontSize: 14 }} />
+      </IconButton>
+      <Box component='pre' ref={ref}>
+        {children}
+      </Box>
+    </Box>
+  )
+}
+
+/** Prose tokenizado para documento técnico denso. */
 const proseSx: SxProps<Theme> = theme => ({
   color: 'text.primary',
   fontSize: '0.875rem',
@@ -57,7 +246,8 @@ const proseSx: SxProps<Theme> = theme => ({
     fontWeight: 600,
     lineHeight: 1.25,
     mt: 0,
-    mb: 2
+    mb: 2,
+    scrollMarginTop: theme.spacing(3)
   },
   '& h2': {
     fontFamily: theme.typography.h5.fontFamily,
@@ -68,9 +258,10 @@ const proseSx: SxProps<Theme> = theme => ({
     mb: 1.75,
     pb: 1,
     borderBottom: '1px solid',
-    borderColor: 'divider'
+    borderColor: 'divider',
+    scrollMarginTop: theme.spacing(3)
   },
-  '& h3': { fontSize: '0.9375rem', fontWeight: 600, mt: 3.5, mb: 1 },
+  '& h3': { fontSize: '0.9375rem', fontWeight: 600, mt: 3.5, mb: 1, scrollMarginTop: theme.spacing(3) },
   '& h4, & h5, & h6': { fontSize: '0.8125rem', fontWeight: 600, letterSpacing: '0.01em', mt: 3, mb: 0.75, color: 'text.secondary' },
   '& p': { my: 1.5 },
   '& strong': { fontWeight: 700, color: 'text.primary' },
@@ -79,6 +270,11 @@ const proseSx: SxProps<Theme> = theme => ({
   '& ul, & ol': { my: 1.5, pl: 3, display: 'flex', flexDirection: 'column', gap: 0.625 },
   '& li': { lineHeight: 1.6, '& > ul, & > ol': { mt: 0.625, mb: 0 } },
   '& li::marker': { color: 'text.disabled' },
+  // Checkboxes de tarea (remark-gfm): sin bullet, casilla real read-only.
+  '& ul.contains-task-list': { pl: 1.5, listStyle: 'none' },
+  '& li.task-list-item': { display: 'flex', alignItems: 'flex-start', gap: 1 },
+  '& li.task-list-item::marker': { content: '""' },
+  '& input[type="checkbox"]': { mt: 0.375, accentColor: theme.palette.primary.main, flex: '0 0 auto' },
   '& code': {
     // Excepción justificada (mirror NexaThread): <code> muestra código/paths
     // literales del repo, no IDs ni montos. Es el caso documentado de la regla.
@@ -93,21 +289,36 @@ const proseSx: SxProps<Theme> = theme => ({
     borderColor: 'divider'
   },
   '& pre': {
-    my: 2,
+    m: 0,
     p: 2.5,
     bgcolor: 'action.hover',
     border: '1px solid',
     borderColor: 'divider',
     borderRadius: `${theme.shape.customBorderRadius.md}px`,
     overflowX: 'auto',
-    '& code': { bgcolor: 'transparent', border: 'none', p: 0, lineHeight: 1.6 }
+    '& code': { bgcolor: 'transparent', border: 'none', p: 0, lineHeight: 1.6 },
+    // Syntax highlighting (rehype-highlight → clases hljs-*) tokenizado + dark-aware.
+    '& .hljs-comment, & .hljs-quote': { color: 'text.disabled', fontStyle: 'italic' },
+    '& .hljs-keyword, & .hljs-selector-tag, & .hljs-literal, & .hljs-built_in': { color: 'info.main' },
+    '& .hljs-string, & .hljs-regexp, & .hljs-meta-string': { color: 'success.main' },
+    '& .hljs-number, & .hljs-type, & .hljs-class .hljs-title': { color: 'warning.main' },
+    '& .hljs-title, & .hljs-section, & .hljs-name, & .hljs-selector-id, & .hljs-selector-class': { color: 'primary.main' },
+    '& .hljs-attr, & .hljs-attribute, & .hljs-property, & .hljs-variable, & .hljs-template-variable': { color: 'info.main' },
+    '& .hljs-meta, & .hljs-symbol, & .hljs-bullet, & .hljs-link': { color: 'text.secondary' },
+    '& .hljs-deletion': { color: 'error.main' },
+    '& .hljs-addition': { color: 'success.main' },
+    '& .hljs-emphasis': { fontStyle: 'italic' },
+    '& .hljs-strong': { fontWeight: 700 }
   },
   '& blockquote': {
     my: 2,
     pl: 2.5,
-    py: 0.5,
+    pr: 2,
+    py: 1.25,
     borderLeft: '3px solid',
     borderColor: 'primary.main',
+    bgcolor: 'primary.lightOpacity',
+    borderRadius: theme => `0 ${theme.shape.customBorderRadius.sm}px ${theme.shape.customBorderRadius.sm}px 0`,
     color: 'text.secondary',
     '& p': { my: 0.5 }
   },
@@ -119,16 +330,75 @@ const proseSx: SxProps<Theme> = theme => ({
   '& img': { maxWidth: '100%' }
 })
 
-/** Las tablas anchas scrollean en su propio contenedor; nunca empujan el drawer. */
-const MARKDOWN_COMPONENTS: Components = {
-  // `node` (AST hast) no se pasa al <table> del DOM; se descarta.
+/** Factory de los component overrides (depende de `onNavigate` para los IDs). */
+const buildMarkdownComponents = (onNavigate: (id: string) => void): Components => ({
+  // Headings con id (anclas para la barra de secciones).
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  h2: ({ node, children, ...props }) => (
+    <Box component='h2' id={slugify(extractText(children))} {...props}>
+      {children}
+    </Box>
+  ),
+  // Bloque de código con copy.
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  pre: ({ node, children }) => <PreBlock>{children}</PreBlock>,
+  // Code inline: si es un ID del backlog → chip clicable; si no, code normal.
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  code: ({ node, className, children, ...props }) => {
+    const text = extractText(children).trim()
+    const isBlock = Boolean(className) || text.includes('\n')
+
+    if (!isBlock && WORK_ITEM_ID_RE.test(text)) {
+      return <IdLink id={text} onNavigate={onNavigate} />
+    }
+
+    return (
+      <code className={className} {...props}>
+        {children}
+      </code>
+    )
+  },
+  // Ítems de "reglas duras" (NUNCA/SIEMPRE) → tinte tonal honesto.
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  li: ({ node, className, children, ...props }) => {
+    const head = extractText(children).replace(/^[\s•*-]+/, '').trim()
+    const isRule = !(className ?? '').includes('task-list-item')
+    const tone = isRule && RULE_NEGATIVE_RE.test(head) ? 'error' : isRule && RULE_POSITIVE_RE.test(head) ? 'success' : null
+
+    if (!tone) {
+      return (
+        <li className={className} {...props}>
+          {children}
+        </li>
+      )
+    }
+
+    return (
+      <Box
+        component='li'
+        className={className}
+        sx={{
+          listStyle: 'none',
+          ml: -1.5,
+          pl: 1.5,
+          borderLeft: '2px solid',
+          borderColor: `${tone}.main`,
+          '&::marker': { content: '""' }
+        }}
+        {...props}
+      >
+        {children}
+      </Box>
+    )
+  },
+  // Las tablas anchas scrollean en su propio contenedor; nunca empujan el drawer.
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   table: ({ node, ...props }) => (
     <Box sx={{ overflowX: 'auto', my: 2, minWidth: 0 }}>
       <table {...props} />
     </Box>
   )
-}
+})
 
 export interface RoadmapTaskDrawerProps {
   /** Item seleccionado para abrir (su id dispara el fetch). `null` = cerrado. */
@@ -138,31 +408,45 @@ export interface RoadmapTaskDrawerProps {
 }
 
 const RoadmapTaskDrawer = ({ item, onClose, onCopy }: RoadmapTaskDrawerProps) => {
-  // Retiene el último item mientras el drawer anima su cierre (evita flash vacío).
-  const [shown, setShown] = useState<RoadmapWorkItemVM | null>(item)
+  // Stack de navegación interno (IDs visitados) + metadata del header actual.
+  const [stack, setStack] = useState<string[]>(item ? [item.id] : [])
+
+  const [meta, setMeta] = useState<HeaderMeta | null>(
+    item ? { id: item.id, kind: item.kind, title: item.title, path: item.path } : null
+  )
+
   const [state, setState] = useState<FetchState>({ status: 'loading' })
   const [reloadKey, setReloadKey] = useState(0)
 
-  useEffect(() => {
-    if (item) setShown(item)
-  }, [item])
+  const bodyRef = useRef<HTMLDivElement>(null)
 
-  const openId = item?.id ?? null
+  // Item nuevo (o reabierto) desde el inspector → reset del stack + header.
+  useEffect(() => {
+    if (item) {
+      setStack([item.id])
+      setMeta({ id: item.id, kind: item.kind, title: item.title, path: item.path })
+    }
+    // item → null (cierre): no reseteamos para retener el contenido durante la animación.
+  }, [item?.id]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  const currentId = stack.length > 0 ? stack[stack.length - 1] : null
 
   useEffect(() => {
-    if (!openId) return
+    if (!currentId) return
 
     const controller = new AbortController()
 
     setState({ status: 'loading' })
 
-    fetch(`/api/roadmap/work-items/${encodeURIComponent(openId)}`, { signal: controller.signal })
+    fetch(`/api/roadmap/work-items/${encodeURIComponent(currentId)}`, { signal: controller.signal })
       .then(async response => {
         if (!response.ok) throw new Error('fetch_failed')
 
         const payload = (await response.json()) as TaskMarkdownPayload
 
+        setMeta({ id: payload.id, kind: payload.kind, title: payload.title, path: payload.path })
         setState({ status: 'ready', content: payload.content })
+        bodyRef.current?.scrollTo({ top: 0 })
       })
       .catch((error: unknown) => {
         if (error instanceof DOMException && error.name === 'AbortError') return
@@ -170,9 +454,42 @@ const RoadmapTaskDrawer = ({ item, onClose, onCopy }: RoadmapTaskDrawerProps) =>
       })
 
     return () => controller.abort()
-  }, [openId, reloadKey])
+  }, [currentId, reloadKey])
 
-  const kindVisual = shown ? KIND_VISUAL[shown.kind] : null
+  const handleNavigate = useCallback(
+    (id: string) => {
+      setStack(prev => (prev[prev.length - 1] === id ? prev : [...prev, id]))
+    },
+    []
+  )
+
+  const handleBack = useCallback(() => setStack(prev => (prev.length > 1 ? prev.slice(0, -1) : prev)), [])
+
+  const handleScrollToSection = useCallback((slug: string) => {
+    const target = bodyRef.current?.querySelector(`#${CSS.escape(slug)}`)
+
+    if (target instanceof HTMLElement) target.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }, [])
+
+  const markdownComponents = useMemo(() => buildMarkdownComponents(handleNavigate), [handleNavigate])
+
+  const sections = useMemo(
+    () => (state.status === 'ready' ? extractSections(state.content) : []),
+    [state]
+  )
+
+  const statusFields = useMemo(
+    () => (state.status === 'ready' ? extractStatusFields(state.content) : []),
+    [state]
+  )
+
+  const body = useMemo(
+    () => (state.status === 'ready' ? stripStatusBlock(state.content) : ''),
+    [state]
+  )
+
+  const kindVisual = meta ? KIND_VISUAL[meta.kind] : null
+  const canGoBack = stack.length > 1
 
   return (
     <Drawer
@@ -181,9 +498,9 @@ const RoadmapTaskDrawer = ({ item, onClose, onCopy }: RoadmapTaskDrawerProps) =>
       onClose={onClose}
       slotProps={{ paper: { sx: { width: '100%', maxWidth: { xs: '100%', md: 'min(820px, 92vw)' } }, 'aria-label': GH_ROADMAP.taskDrawer.aria } }}
     >
-      {shown ? (
+      {meta ? (
         <Box data-capture='roadmap-task-drawer' sx={{ display: 'flex', flexDirection: 'column', height: '100%', minWidth: 0 }}>
-          {/* Header — instantáneo desde el VM, no espera al fetch */}
+          {/* Header */}
           <Box
             sx={{
               flexShrink: 0,
@@ -197,16 +514,22 @@ const RoadmapTaskDrawer = ({ item, onClose, onCopy }: RoadmapTaskDrawerProps) =>
             }}
           >
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-              <Box component='span' sx={{ fontSize: '0.6875rem', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'text.disabled' }}>
-                {GH_ROADMAP.taskDrawer.eyebrow}
-              </Box>
+              {canGoBack ? (
+                <Button variant='text' size='small' color='secondary' startIcon={<i className='tabler-arrow-left' />} onClick={handleBack}>
+                  {GH_ROADMAP.taskDrawer.back}
+                </Button>
+              ) : (
+                <Box component='span' sx={{ fontSize: '0.6875rem', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'text.disabled' }}>
+                  {GH_ROADMAP.taskDrawer.eyebrow}
+                </Box>
+              )}
               <Box sx={{ ml: 'auto', display: 'inline-flex', alignItems: 'center', gap: 1 }}>
                 <Button
                   variant='text'
                   size='small'
                   color='secondary'
                   startIcon={<i className='tabler-copy' />}
-                  onClick={() => onCopy(shown.path)}
+                  onClick={() => onCopy(meta.path)}
                   aria-label={GH_ROADMAP.taskDrawer.copyPathAria}
                 >
                   {GH_ROADMAP.taskDrawer.copyPath}
@@ -219,25 +542,25 @@ const RoadmapTaskDrawer = ({ item, onClose, onCopy }: RoadmapTaskDrawerProps) =>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               {kindVisual ? <ToneTag tone={kindVisual.tone} icon={kindVisual.icon} label={kindVisual.label} /> : null}
               <Box component='span' sx={{ fontWeight: 600, fontSize: '0.875rem', fontFeatureSettings: "'tnum' 1", color: 'text.secondary' }}>
-                {shown.id}
+                {meta.id}
               </Box>
             </Box>
             <Box
               component='h2'
               sx={{ m: 0, fontFamily: theme => theme.typography.h4.fontFamily, fontSize: '1.25rem', fontWeight: 600, lineHeight: 1.3, color: 'text.primary' }}
             >
-              {shown.title}
+              {meta.title}
             </Box>
             <Box
               component='span'
               sx={{ fontSize: '0.75rem', color: 'text.disabled', fontFeatureSettings: "'tnum' 1", overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', direction: 'rtl', textAlign: 'left' }}
             >
-              {shown.path}
+              {meta.path}
             </Box>
           </Box>
 
-          {/* Body — loading / error / content */}
-          <Box sx={{ flex: 1, minHeight: 0, minWidth: 0, overflowY: 'auto', p: 4.5, scrollbarWidth: 'thin' }}>
+          {/* Body */}
+          <Box ref={bodyRef} sx={{ flex: 1, minHeight: 0, minWidth: 0, overflowY: 'auto', p: 4.5, scrollbarWidth: 'thin' }}>
             {state.status === 'loading' ? (
               <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2, minHeight: 240, color: 'text.secondary' }}>
                 <CircularProgress size={26} />
@@ -274,9 +597,83 @@ const RoadmapTaskDrawer = ({ item, onClose, onCopy }: RoadmapTaskDrawerProps) =>
 
             {state.status === 'ready' ? (
               <>
+                {/* Status — front-matter como tarjeta de chips */}
+                {statusFields.length > 0 ? (
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      flexWrap: 'wrap',
+                      gap: 1,
+                      mb: 4,
+                      p: 2.5,
+                      backgroundColor: 'action.hover',
+                      border: '1px solid',
+                      borderColor: 'divider',
+                      borderRadius: theme => `${theme.shape.customBorderRadius.md}px`
+                    }}
+                  >
+                    {statusFields.map(field => (
+                      <Box
+                        key={field.key}
+                        sx={{
+                          display: 'inline-flex',
+                          alignItems: 'baseline',
+                          gap: 0.75,
+                          backgroundColor: 'background.paper',
+                          border: '1px solid',
+                          borderColor: 'divider',
+                          borderRadius: theme => `${theme.shape.customBorderRadius.sm}px`,
+                          px: 1.25,
+                          py: 0.625
+                        }}
+                      >
+                        <Box component='span' sx={{ fontSize: '0.6875rem', fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase', color: 'text.disabled' }}>
+                          {field.key}
+                        </Box>
+                        <Box component='span' sx={{ fontSize: '0.8125rem', fontWeight: 600, color: 'text.primary', fontFeatureSettings: "'tnum' 1" }}>
+                          {field.value}
+                        </Box>
+                      </Box>
+                    ))}
+                  </Box>
+                ) : null}
+
+                {/* Secciones — barra de saltos */}
+                {sections.length > 1 ? (
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.75, mb: 4, pb: 3, borderBottom: '1px solid', borderColor: 'divider' }}>
+                    {sections.map(section => (
+                      <Box
+                        key={section.slug}
+                        component='button'
+                        type='button'
+                        onClick={() => handleScrollToSection(section.slug)}
+                        sx={{
+                          ...toneSx('neutral'),
+                          border: '1px solid',
+                          borderColor: 'divider',
+                          borderRadius: theme => `${theme.shape.customBorderRadius.sm}px`,
+                          px: 1.125,
+                          py: 0.5,
+                          fontSize: '0.75rem',
+                          fontWeight: 600,
+                          cursor: 'pointer',
+                          '&:hover': { borderColor: 'primary.main', color: 'primary.main' },
+                          '&:focus-visible': { outline: theme => `2px solid ${theme.palette.primary.main}`, outlineOffset: 2 }
+                        }}
+                      >
+                        {section.title}
+                      </Box>
+                    ))}
+                  </Box>
+                ) : null}
+
                 <Box data-capture='roadmap-task-markdown' sx={proseSx}>
-                  <Markdown remarkPlugins={[remarkGfm]} components={MARKDOWN_COMPONENTS}>
-                    {state.content}
+                  <Markdown
+                    remarkPlugins={[remarkGfm]}
+                    rehypePlugins={[[rehypeHighlight, { detect: true, ignoreMissing: true }]]}
+                    components={markdownComponents}
+                  >
+                    {body}
                   </Markdown>
                 </Box>
                 <Box

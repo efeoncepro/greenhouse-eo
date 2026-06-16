@@ -145,8 +145,10 @@ export const GH_ROADMAP = {
     errorTitle: 'No pudimos cargar el contenido',
     errorBody: 'El work item puede haberse movido o renombrado. Intenta de nuevo en unos segundos.',
     retry: 'Reintentar',
+    back: 'Volver',
     copyPath: 'Copiar ruta',
     copyPathAria: 'Copiar la ruta del archivo en el repo',
+    copyCodeAria: 'Copiar el bloque de código',
     readOnlyNote: 'Solo lectura — el Markdown del repo es la fuente de verdad.'
   },
   inspectorEmptyTitle: 'Selecciona un work item',
