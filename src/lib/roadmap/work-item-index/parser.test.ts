@@ -144,6 +144,24 @@ describe('parseWorkItem — task (legacy / missing fields / malformed)', () => {
     expect(base.parseWarnings.some(w => w.includes('Lifecycle declarado'))).toBe(true)
   })
 
+  it('normaliza el Lifecycle declarado con notas parentéticas (no falso mismatch)', () => {
+    const source = TEMPLATE_TASK.replace(
+      'Lifecycle: `in-progress`',
+      'Lifecycle: `to-do` (revertida 2026-05-05 — re-triage)'
+    )
+
+    const { base } = parseWorkItem({
+      kind: 'task',
+      filePath: fixturePath('task', 'to-do', 'TASK-999-sample-task.md'),
+      repoRoot: REPO,
+      source
+    })
+
+    expect(base.declaredLifecycle).toBe('to-do')
+    expect(base.lifecycle).toBe('to-do')
+    expect(base.parseWarnings.some(w => w.includes('Lifecycle declarado'))).toBe(false)
+  })
+
   it('does not throw on malformed markdown', () => {
     expect(() =>
       parseWorkItem({

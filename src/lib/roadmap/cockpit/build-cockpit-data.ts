@@ -96,18 +96,40 @@ export const buildRoadmapCockpitData = async (): Promise<RoadmapCockpitData> => 
 
   // Conteo de children por epic (sobre el universo completo, no solo activos).
   const childCountByEpic = new Map<string, number>()
+  const byId = new Map<string, WorkItem>()
 
   for (const item of all) {
+    byId.set(item.id, item)
+
     if (item.parentEpic) {
       childCountByEpic.set(item.parentEpic, (childCountByEpic.get(item.parentEpic) ?? 0) + 1)
     }
   }
 
+  // Una task está «bloqueada» solo si tiene >=1 bloqueador INDEXADO y aún ABIERTO.
+  // Bloqueador ya complete/resolved (o inexistente en el índice) NO bloquea —
+  // la task vuelve a su lane natural (lista/grooming).
+  const hasOpenBlocker = (item: WorkItem): boolean =>
+    item.blockedBy.some(blockerId => {
+      const blocker = byId.get(blockerId)
+
+      return Boolean(blocker) && blocker!.lifecycle !== 'complete' && blocker!.lifecycle !== 'resolved'
+    })
+
+  const laneOf = (item: WorkItem): RoadmapLaneId => assignLane(item, { hasOpenBlocker: hasOpenBlocker(item) })
+
   const active: WorkItem[] = []
   const done: WorkItem[] = []
 
   for (const item of all) {
-    const lane = assignLane(item)
+    // El cockpit muestra el backlog VIVO: solo carpetas de lifecycle canónico
+    // (to-do · in-progress · complete · open · resolved). Los artefactos en
+    // `briefs/`, `plans/`, `cancelled/` (lifecycle 'unknown') NO son backlog
+    // ejecutable — se excluyen (el reader de TASK-1152 sí los indexa, su contrato
+    // es completo; el cockpit los filtra).
+    if (item.lifecycle === 'unknown') continue
+
+    const lane = laneOf(item)
 
     if (lane === 'done') done.push(item)
     else active.push(item)
@@ -119,7 +141,7 @@ export const buildRoadmapCockpitData = async (): Promise<RoadmapCockpitData> => 
   const selected = [...active, ...doneSample]
 
   const items = selected.map(item =>
-    toViewModel(item, assignLane(item), item.kind === 'epic' ? (childCountByEpic.get(item.id) ?? 0) : 0)
+    toViewModel(item, laneOf(item), item.kind === 'epic' ? (childCountByEpic.get(item.id) ?? 0) : 0)
   )
 
   const domains = Array.from(new Set(items.flatMap(item => item.domains))).sort((a, b) => a.localeCompare(b))

@@ -128,11 +128,16 @@ const RoadmapBoard = ({
       sx={{
         display: 'flex',
         gap: 3.5,
+        // El board scrollea horizontal (lanes) DENTRO de su contenedor; la altura
+        // está acotada y cada lane scrollea vertical — la página no se hace
+        // kilométrica con backlogs de cientos de items (kanban).
         overflowX: 'auto',
-        pb: 3,
-        alignItems: 'flex-start',
+        overflowY: 'hidden',
+        alignItems: 'stretch',
+        maxHeight: { xs: '72vh', md: 'calc(100vh - 22rem)' },
+        minHeight: 360,
+        pb: 1,
         minWidth: 0,
-        // Scroll-container accesible (la página no desborda; el board sí scrollea).
         scrollbarWidth: 'thin'
       }}
     >
@@ -143,19 +148,18 @@ const RoadmapBoard = ({
           <Box
             key={lane.id}
             role='listitem'
-            sx={{ flex: '0 0 286px', width: 286, display: 'flex', flexDirection: 'column', gap: 2.5 }}
+            sx={{ flex: '0 0 286px', width: 286, display: 'flex', flexDirection: 'column', minHeight: 0, maxHeight: '100%' }}
           >
             <Box
               sx={{
-                position: 'sticky',
-                top: 0,
-                zIndex: 1,
+                flexShrink: 0,
                 backgroundColor: 'background.default',
                 display: 'flex',
                 alignItems: 'center',
                 gap: 1,
                 px: 0.5,
-                py: 0.5
+                py: 0.5,
+                mb: 1.5
               }}
             >
               <Box component='i' className={visual.icon} aria-hidden='true' sx={{ fontSize: 16, lineHeight: 0, color: visual.tone === 'neutral' ? 'text.disabled' : `${visual.tone}.main` }} />
@@ -184,17 +188,30 @@ const RoadmapBoard = ({
               </Box>
             </Box>
 
-            {lane.items.map(item => (
-              <RoadmapCard
-                key={item.id}
-                item={item}
-                selected={item.id === selectedId}
-                onSelect={onSelect}
-                index={cardIndex++}
-              />
-            ))}
+            {/* Área de cards con scroll vertical interno (la lane no estira la página). */}
+            <Box
+              sx={{
+                flex: 1,
+                minHeight: 0,
+                overflowY: 'auto',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 2.5,
+                pr: 0.5,
+                scrollbarWidth: 'thin'
+              }}
+            >
+              {lane.items.map(item => (
+                <RoadmapCard
+                  key={item.id}
+                  item={item}
+                  selected={item.id === selectedId}
+                  onSelect={onSelect}
+                  index={cardIndex++}
+                />
+              ))}
 
-            {lane.totalCount > lane.items.length ? (
+              {lane.totalCount > lane.items.length ? (
               <Box
                 sx={{
                   px: 1,
@@ -224,6 +241,7 @@ const RoadmapBoard = ({
                 {GH_ROADMAP.laneEmpty}
               </Box>
             ) : null}
+            </Box>
           </Box>
         )
       })}

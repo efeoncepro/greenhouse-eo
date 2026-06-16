@@ -86,6 +86,13 @@ describe('assignLane', () => {
     expect(assignLane(baseItem({ lifecycle: 'in-progress', blockedBy: ['TASK-2'] }))).toBe('progress')
   })
 
+  it('hasOpenBlocker=false → no blocked aunque declare blockedBy (bloqueador ya cerrado)', () => {
+    const item = baseItem({ blockedBy: ['TASK-100'] })
+
+    expect(assignLane(item, { hasOpenBlocker: true })).toBe('blocked')
+    expect(assignLane(item, { hasOpenBlocker: false })).toBe('ready')
+  })
+
   it('mini-tasks follow the task rules', () => {
     expect(assignLane(baseItem({ kind: 'mini_task', lifecycle: 'to-do' }))).toBe('ready')
     expect(assignLane(baseItem({ kind: 'mini_task', blockedBy: ['MINI-1'] }))).toBe('blocked')

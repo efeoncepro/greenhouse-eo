@@ -226,6 +226,21 @@ const statusField = (fields: Record<string, string>, ...names: string[]): string
   return null
 }
 
+const LIFECYCLE_TOKEN_RE = /\b(to-do|in-progress|complete|open|resolved)\b/i
+
+/**
+ * Normaliza el valor declarado de `Lifecycle`: extrae el token canónico aunque
+ * venga con notas parentéticas o backticks parciales (ej. `` `to-do` (revertida…) ``
+ * → `to-do`). Evita falsos «lifecycle mismatch» por anotaciones del operador.
+ */
+const normalizeDeclaredLifecycle = (raw: string | null): string | null => {
+  if (!raw) return null
+
+  const match = raw.match(LIFECYCLE_TOKEN_RE)
+
+  return match ? match[1].toLowerCase() : stripInlineCode(raw)
+}
+
 /** Lista de IDs declarada en un Status field (`Blocked by: TASK-1, TASK-2` o `none`). */
 const idListFromField = (value: string | null): string[] => {
   if (!value) return []
@@ -350,7 +365,7 @@ export const parseWorkItem = ({
 
   // --- epic / task / mini_task: Status block driven ---
   const fields = status.fields
-  const declaredLifecycle = statusField(fields, 'Lifecycle')
+  const declaredLifecycle = normalizeDeclaredLifecycle(statusField(fields, 'Lifecycle'))
 
   if (!status.hasStatus) parseWarnings.push('Falta el bloque ## Status')
 
@@ -440,7 +455,8 @@ export const parseWorkItem = ({
       statusFieldKeys,
       sectionKeys,
       folderLifecycle,
-      declaredLifecycle: kind === 'issue' ? base.declaredLifecycle : statusField(status.fields, 'Lifecycle'),
+      declaredLifecycle:
+        kind === 'issue' ? base.declaredLifecycle : normalizeDeclaredLifecycle(statusField(status.fields, 'Lifecycle')),
       hasCanonicalFilename,
       hasTemplateShape
     }

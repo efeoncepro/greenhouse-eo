@@ -26,8 +26,12 @@ export const normalizePriority = (raw: string | null): RoadmapPriority => {
  * - issue → issues (o done si resuelto): incidente reactivo, no task ejecutable.
  * - task/mini: complete → done · in-progress → progress · bloqueada → blocked ·
  *   con findings de salud → grooming · si no → ready.
+ *
+ * `hasOpenBlocker` (opcional): una task está «bloqueada» SOLO si su bloqueador
+ * sigue abierto. Si no se pasa, se deriva de `blockedBy.length > 0` (un bloqueador
+ * ya cerrado no debería dejar la task en «Bloqueadas» — la projection lo resuelve).
  */
-export const assignLane = (item: WorkItem): RoadmapLaneId => {
+export const assignLane = (item: WorkItem, opts?: { hasOpenBlocker?: boolean }): RoadmapLaneId => {
   if (item.kind === 'epic') {
     return item.lifecycle === 'complete' ? 'done' : 'programs'
   }
@@ -39,7 +43,10 @@ export const assignLane = (item: WorkItem): RoadmapLaneId => {
   // task / mini_task
   if (item.lifecycle === 'complete') return 'done'
   if (item.lifecycle === 'in-progress') return 'progress'
-  if (item.blockedBy.length > 0) return 'blocked'
+
+  const isBlocked = opts?.hasOpenBlocker ?? item.blockedBy.length > 0
+
+  if (isBlocked) return 'blocked'
   if (item.health.level !== 'ok') return 'grooming'
 
   return 'ready'

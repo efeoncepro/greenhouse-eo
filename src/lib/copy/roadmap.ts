@@ -37,9 +37,9 @@ export const GH_ROADMAP = {
 
   // ── Banner degradado ──
   degradedTitle: (count: number) =>
-    count === 1 ? '1 work item no parsea del todo' : `${count} work items no parsean del todo`,
+    count === 1 ? '1 work item con metadata incompleta' : `${count} work items con metadata incompleta`,
   degradedBody:
-    'Se muestran en «Necesitan grooming» con sus warnings; el resto del backlog sigue siendo legible. Revisa el front-matter para reincorporarlos.',
+    'Les falta el bloque «## Status» o la forma canónica del template; se muestran en «Necesitan grooming» con sus warnings. El resto del backlog se lee bien — revisa el front-matter para completarlos.',
 
   // ── KPI tiles (summary band) ──
   tiles: {
