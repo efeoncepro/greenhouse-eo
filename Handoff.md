@@ -1,5 +1,16 @@
 # Release 2026-06-10 #2 — develop→main `6c649b2a6` RELEASED
 
+## Sesión 2026-06-16 — TASK-1149 Nexa: downgrade determinístico de headers — Claude
+
+> **Estado:** **complete** en `develop` (local-first, empujado). El K6 en staging se confirma al desplegar (nightly de TASK-1127).
+
+- **Por qué:** el nightly de TASK-1127 detectó que el gate K6 fallaba en staging por una razón NUEVA: el truncamiento ya estaba resuelto (el cierre de validación aparece), pero **Claude (auto-router)** generaba headers `## Título` que el contrato de voz prohíbe en el panel del chat. El prompt lo pide pero no lo garantiza (LLM probabilístico).
+- **Fix (defense-in-depth):** helper puro nuevo `downgradeStructuralHeadings` (`src/lib/nexa/strip-markdown-excerpt.ts`) baja headers ATX (`#`/`##`/`###`) a `**negrita**` preservando viñetas/links/**code fences**; idempotente. Aplicado en `NexaService.generateResponse` sobre el texto del turno antes de devolver/persistir → garantiza el contrato en TODOS los providers sin tocar el prompt (Nexa NO pierde personalidad — solo baja el peso visual del encabezado). Distinto de `toPlainExcerpt` (que aplana para previews); acá la respuesta SÍ renderiza Markdown.
+- **Sin** migración/capability/outbox/flag (aditivo, reversible con revert).
+- **Verificación:** 15/15 tests del helper · suite nexa+knowledge **254 passed** · tsc 0 · lint 0 · `nexa:doc-gate` verde. La verificación end-to-end por chat **local** quedó bloqueada (dev server con pool PG zombie tras re-auth ADC, "Tenant lookup failed" — no es del cambio); la verificación real contra staging la confirma el nightly de TASK-1127.
+- **Docs de capa:** `behavior/behavior-and-routing.md` (§Higiene de formato del output) + `knowledge/evidence-and-citations.md` (distinción de los dos helpers).
+- **Push:** `develop` ✓ (3 commits: creación spec + Slice 1+2 código + commit documental de Codex). CLAUDE.md NO tocado (no hay invariante duro nuevo — es higiene de output, ya documentada en la capa Nexa).
+
 ## Sesión 2026-06-16 — TASK-1148 Backend/Data Task Execution Profile — Codex
 
 > **Estado:** **complete** local-first, sin cambio runtime. Contrato documental/tooling cerrado y lifecycle sincronizado.
