@@ -1,5 +1,14 @@
 # Release 2026-06-10 #2 — develop→main `6c649b2a6` RELEASED
 
+## Sesión 2026-06-16 — TASK-1158 Public Site Astro runtime decision — Codex
+
+> **Estado:** complete en `develop`; push solicitado por el operador en esta sesión. Se decidió y documentó que `efeonce-web`/Astro pasa a ser el frontend público objetivo para `efeoncepro.com` bajo dominio principal, sin mutar WordPress/Kinsta/Vercel/DNS.
+
+- **Entregables:** ADR `docs/architecture/GREENHOUSE_PUBLIC_SITE_ASTRO_RUNTIME_STRATEGY_DECISION_V1.md`; matriz `docs/operations/public-site-route-ownership-matrix-20260616.md`; binding `docs/operations/public-site-astro-runtime-binding-20260616.json`; updates a `EPIC-019`, Public Website control-plane docs, `DECISIONS_INDEX`, `project_context.md`, `changelog.md` y task lifecycle.
+- **Regla operativa:** no usar `landing.efeoncepro.com` como carril SEO primario; cualquier implementación futura debe ir por dominio principal, con Greenhouse como control plane y commands/readers server-side. WordPress/Kinsta sigue live hasta cutover y CMS/admin/origen despues.
+- **Validación:** `jq` binding JSON OK; `pnpm task:lint --task TASK-1158`; `pnpm ops:lint --changed`; `pnpm docs:closure-check`; `pnpm docs:context-check`; `pnpm lint`; `NODE_OPTIONS=--max-old-space-size=8192 pnpm exec tsc --noEmit` (`tsc` sin heap ampliado OOM-ea en este repo).
+- **Pendiente inmediato:** crear/tomar la siguiente task de implementación: Astro SEO foundation + demo route cleanup en `efeonce-web`, luego Greenhouse Astro/Vercel binding reader MVP, front-door/cutover task y primer piloto de landing de servicio.
+
 ## Sesión 2026-06-16 — TASK-1153 Roadmap cockpit UI (menú principal) — Claude
 
 > **Estado:** **complete** en `develop` (local-first, SIN push). UI del cockpit `/roadmap` fiel al diseño Claude Design del operador, con datos reales del reader de TASK-1152. Desbloqueado por TASK-1152.

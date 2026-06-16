@@ -180,6 +180,23 @@ Not recommended:
 - Continuing direct child-theme/plugin edits on Kinsta without repository reconciliation.
 - Making Greenhouse write arbitrary WordPress files over SSH without a Git-backed release record.
 
+## Delta 2026-06-16 — Astro frontend direction accepted, no cutover yet
+
+`TASK-1158` produced and accepted `docs/architecture/GREENHOUSE_PUBLIC_SITE_ASTRO_RUNTIME_STRATEGY_DECISION_V1.md`.
+
+Updated interpretation:
+
+- `efeonce-web` is still not the current live runtime source for `efeoncepro.com`.
+- `efeonce-web` is now the accepted target frontend rail for the future same-domain Astro/Vercel runtime, after readiness gates.
+- WordPress/Kinsta remains the production runtime until a future cutover task with operator approval.
+- WordPress/Kinsta also remains the CMS/admin/origin and bridge/content-factory rail after frontend cutover.
+- `landing.efeoncepro.com` remains rejected as the primary SEO lane for service landings.
+
+New binding and route docs:
+
+- `docs/operations/public-site-astro-runtime-binding-20260616.json`
+- `docs/operations/public-site-route-ownership-matrix-20260616.md`
+
 ## Greenhouse Product Implication
 
 The Greenhouse `Public Site` module should manage both content and code posture:

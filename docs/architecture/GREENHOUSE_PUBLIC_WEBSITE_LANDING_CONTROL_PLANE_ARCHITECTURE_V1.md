@@ -1,7 +1,7 @@
 # Greenhouse Public Website Landing Control Plane Architecture V1
 
 > Tipo de documento: arquitectura de producto/plataforma
-> Status: Proposed; implementation gated per `EPIC-019`
+> Status: Proposed for WordPress bridge/content-factory rail; frontend runtime target recalibrated by `GREENHOUSE_PUBLIC_SITE_ASTRO_RUNTIME_STRATEGY_DECISION_V1.md`
 > Version: V1
 > Fecha: 2026-06-13
 > Owner: Product / Platform Architecture / Marketing Operations
@@ -30,6 +30,8 @@ compose -> review -> preview -> approve -> publish -> verify -> measure -> learn
 ```
 
 Greenhouse should not become a freeform website builder in V1. It should become a governed landing operations control plane.
+
+> Delta 2026-06-16: `TASK-1158` accepted Astro/Vercel as the target public frontend runtime for `efeoncepro.com`, while WordPress/Kinsta remains CMS/admin/origin and live legacy runtime until cutover. This document still governs the WordPress bridge/content-factory rail; the target frontend rail is governed by `GREENHOUSE_PUBLIC_SITE_ASTRO_RUNTIME_STRATEGY_DECISION_V1.md`.
 
 ## 3. Archetype
 
@@ -779,6 +781,9 @@ Minimum signals:
 ## 22. Related Docs
 
 - `GREENHOUSE_PUBLIC_WEBSITE_LANDING_CONTROL_PLANE_DECISION_V1.md`
+- `GREENHOUSE_PUBLIC_SITE_ASTRO_RUNTIME_STRATEGY_DECISION_V1.md`
+- `docs/operations/public-site-route-ownership-matrix-20260616.md`
+- `docs/operations/public-site-astro-runtime-binding-20260616.json`
 - `GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md`
 - `GREENHOUSE_ECOSYSTEM_ACCESS_CONTROL_PLANE_V1.md`
 - `GREENHOUSE_SISTER_PLATFORMS_INTEGRATION_CONTRACT_V1.md`

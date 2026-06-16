@@ -2,7 +2,9 @@
 
 ## Status
 
-Proposed. Implementation is gated by `EPIC-019` child tasks and explicit operator acceptance.
+Partially superseded for frontend runtime strategy by `GREENHOUSE_PUBLIC_SITE_ASTRO_RUNTIME_STRATEGY_DECISION_V1.md`.
+
+The WordPress/Kinsta bridge and content-factory portions remain valid as the CMS/admin/origin and legacy-runtime rail. The target public frontend direction for SEO landings is now Astro/Vercel under the main domain, gated by `TASK-1158` follow-ups and explicit cutover approval.
 
 ## Date
 
@@ -314,9 +316,22 @@ Landing forms and tracking may collect personal data. Implementation must align 
 - Greenhouse begins hosting any public pages directly.
 - Nexa moves from drafting suggestions to autonomous publishing.
 
+## Delta 2026-06-16 — TASK-1158 Astro frontend direction
+
+`TASK-1158` accepted a new direction for the public frontend: Astro/Vercel is the target runtime for `efeoncepro.com` when production readiness gates pass; WordPress/Kinsta remains the live runtime until cutover and continues as CMS/admin/origin plus bridge/content-factory rail.
+
+This means Alternative C ("Make Greenhouse host the landing pages directly on Vercel") is no longer rejected as a long-term direction. It is accepted for the public frontend target, but still blocked for production until route parity, SEO preflight, GVC/Lighthouse evidence, HubSpot attribution and operator cutover approval exist.
+
+Canonical docs:
+
+- `GREENHOUSE_PUBLIC_SITE_ASTRO_RUNTIME_STRATEGY_DECISION_V1.md`
+- `docs/operations/public-site-route-ownership-matrix-20260616.md`
+- `docs/operations/public-site-astro-runtime-binding-20260616.json`
+
 ## Related Docs
 
 - `GREENHOUSE_PUBLIC_WEBSITE_LANDING_CONTROL_PLANE_ARCHITECTURE_V1.md`
+- `GREENHOUSE_PUBLIC_SITE_ASTRO_RUNTIME_STRATEGY_DECISION_V1.md`
 - `GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md`
 - `GREENHOUSE_ECOSYSTEM_ACCESS_CONTROL_PLANE_V1.md`
 - `GREENHOUSE_SISTER_PLATFORMS_INTEGRATION_CONTRACT_V1.md`

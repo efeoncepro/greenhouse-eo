@@ -56,6 +56,7 @@ Sin un epic, el trabajo tenderia a partir con un script o endpoint aislado que p
 
 | Task | Phase | Status | Purpose |
 | --- | --- | --- | --- |
+| `TASK-1158` | `0.75` | `complete` | Public Site Astro runtime control-plane decision: recalibrates EPIC-019 so Astro/Vercel becomes target frontend rail for `efeoncepro.com`, WordPress/Kinsta remains CMS/admin/origin and live legacy rail, and no primary SEO landings ship on a subdomain. |
 | `TASK-1111` | `0` | `in-progress` | WordPress/Kinsta discovery + read-only inventory: public REST/Abilities inventory shipped; authenticated WordPress/Abilities/plugins and WP-CLI theme/plugins/post-types are repeatable. Kinsta API environment/cache/backups remains blocked on token or deferral. |
 | `TASK-1122` | `0.5` | `in-progress` | Public Site code baseline + GitOps binding: private repo `efeoncepro/efeonce-public-site-runtime` created with live baseline `0fa6bfd` / tag `baseline-2026-06-14-live`; Greenhouse drift/deploy dry-run still pending. |
 | `TASK-1116` | `1` | `in-progress` | WordPress bridge plugin foundation: private namespace, Abilities API registrations, auth/signature verification, health endpoint, metadata contract and draft-only write path in `efeonce-public-site-runtime:wp-content/plugins/greenhouse-wp-bridge`. Current execution is code-only; live write rollout remains blocked by staging/preview, shared secret, least-privilege and Kinsta API backup/cache gap. |
@@ -90,7 +91,7 @@ Sin un epic, el trabajo tenderia a partir con un script o endpoint aislado que p
 
 ## Non-goals
 
-- Replacing WordPress or migrating `efeoncepro.com` off Kinsta.
+- Immediate DNS/front-door cutover without a future task and explicit operator approval.
 - Building a full freeform page builder in Greenhouse.
 - Allowing clients to create public landing pages.
 - Publishing arbitrary HTML/scripts from Greenhouse.
@@ -109,3 +110,15 @@ Official WordPress Agent Skills from `WordPress/agent-skills` were vendored into
 Se documento la frontera React/Gutenberg/Interactivity API para este epic. Resultado: React es valido en WordPress para bloques, admin/editor tooling del bridge y microinteracciones frontend con Interactivity API, pero V1 no debe transformarse en una reescritura SPA ni depender de React 19 sin prueba de compatibilidad en el runtime Kinsta/WordPress activo.
 
 Discovery de repositorio/control plane: `efeoncepro/efeonce-web` existe, pero representa un rebuild Astro/headless historico y no el runtime live actual de `efeoncepro.com`. El codigo WordPress mas cercano vivia en `/Users/jreye/Documents/efeonce-sp` con remote `cesargrowth11/efeonce-sp`, mientras Kinsta live ya tenia drift propio en `ohio-child` y plugins activos. `TASK-1122` creo el repo privado `efeoncepro/efeonce-public-site-runtime`, baseline `0fa6bfd`, tag `baseline-2026-06-14-live`, y binding `docs/operations/public-site-runtime-repository-binding-20260614.json`. Queda pendiente modelar drift/deploy dry-run en Greenhouse antes del bridge.
+
+## Delta 2026-06-16
+
+`TASK-1158` recalibra el epic: Astro/Vercel es la direccion aceptada para el frontend publico objetivo de `efeoncepro.com`, mientras WordPress/Kinsta sigue como runtime live hasta cutover y como CMS/admin/origen editorial despues del cutover. El epic ya no debe interpretarse como "WordPress sera siempre el runtime publico"; el rail WordPress sigue siendo necesario para bridge, Content Factory, editorial, admin y legacy operations.
+
+Docs canonicos nuevos:
+
+- `docs/architecture/GREENHOUSE_PUBLIC_SITE_ASTRO_RUNTIME_STRATEGY_DECISION_V1.md`
+- `docs/operations/public-site-route-ownership-matrix-20260616.md`
+- `docs/operations/public-site-astro-runtime-binding-20260616.json`
+
+Regla nueva: landings SEO primarias no se publican en `landing.efeoncepro.com`; el target es dominio principal con Astro/Vercel despues de gates de route parity, canonicals, redirects, sitemap, HubSpot attribution, GVC/Lighthouse y aprobacion humana.
