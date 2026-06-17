@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Medio`
@@ -15,11 +15,11 @@
 - UI impact: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-019`
-- Status real: `Diseno`
+- Status real: `staging verified, production rollout pendiente`
 - Rank: `TBD`
 - Domain: `platform|public-site|marketing-ops|integrations|ops`
 - Blocked by: `none`
-- Branch: `task/TASK-1161-public-site-binding-reader`
+- Branch: `develop`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
@@ -183,6 +183,129 @@ Reglas obligatorias:
      plan.md segun TASK_PROCESS.md. No llenar al crear la task.
      ═══════════════════════════════════════════════════════════ -->
 
+## Discovery — 2026-06-17 — Codex
+
+### Intake / ownership
+
+- Hook ejecutado: `pnpm codex:task-hook TASK-1161`.
+- Branch actual: `develop` (`ahead 1`), sin cambio de rama ni worktree por regla local-first/multi-agente.
+- Ownership activo verificado: no hay rama local `*1161*` ni PR abierto con `TASK-1161` (`gh pr list --search "TASK-1161"` retorna `[]`).
+- Checkpoint derivado por proceso: `human` (P1 + Effort Medio). Este plan requiere confirmacion humana antes de escribir runtime code.
+
+### AUDIT: TASK-1161
+
+SUPUESTOS CORRECTOS:
+- El rail WordPress/Kinsta ya existe bajo `src/lib/public-site/` y es distinto del rail Astro/Vercel; el reader nuevo debe vivir bajo `src/lib/public-site/astro/`.
+- `docs/operations/public-site-astro-runtime-binding-20260616.json` existe y contiene repo `efeoncepro/efeonce-web`, Vercel project `efeonce-web` / `prj_i52CnPvaoNB0Lweqk7L7cLimv7W9`, team slug `efeonce-7670142f`.
+- La route ownership matrix existe en `docs/operations/public-site-route-ownership-matrix-20260616.md`.
+- `withSourceTimeout` existe en `src/lib/platform-health/with-source-timeout.ts` y es el molde canonico para degradacion honesta.
+- `src/lib/release/github-helpers.ts` resuelve token GitHub por GH App/PAT fallback y expone `githubFetchJson`, `fetchGithubWithTimeout`, `buildGithubAuthHeaders`.
+- `src/lib/release/preflight/checks/vercel-readiness.ts` contiene el patron de auth/fetch Vercel y timeout de 6s.
+
+SUPUESTOS DESACTUALIZADOS:
+- La task menciona en algunos indices `public-site-binding.v1`; la spec completa corrigio el contrato a `public-site-astro-binding.v1`. Accion: usar el nombre corregido en tipos/docs/indices.
+- El manifest conserva `readiness.knownBlockers` stale heredados de 2026-06-16; el reader debe exponer estado live y notas honestas, no copiar esos blockers como verdad runtime.
+- `vercel-readiness.ts` no exporta hoy su fetch interno de deployments. Accion: hacer refactor/export aditivo reutilizable o crear helper vecino minimo que preserve el mismo patron, evitando duplicacion opaca.
+
+ARQUITECTURA / DOCS OBLIGATORIOS:
+- `docs/architecture/GREENHOUSE_PUBLIC_SITE_ASTRO_RUNTIME_STRATEGY_DECISION_V1.md` — fuente del rail target, capabilities y observability contract.
+- `docs/epics/to-do/EPIC-019-public-website-landing-control-plane.md` — programa de control-plane Public Site; actualizar estado de la pieza read.
+- `docs/architecture/GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md` + `docs/architecture/GREENHOUSE_FULL_API_PARITY_DECISION_V1.md` — reader server-side como SSOT programatico.
+- `docs/architecture/GREENHOUSE_RELIABILITY_CONTROL_PLANE_V1.md` — signal `public_site.astro_deploy_failed` rollup en `platform/cloud` por MVP.
+- `docs/operations/public-site-astro-runtime-binding-20260616.json` + `docs/operations/public-site-route-ownership-matrix-20260616.md` — inputs estaticos.
+
+CÓDIGO EXISTENTE PARA REUTILIZAR:
+- `src/lib/release/github-helpers.ts` → token + fetch GitHub.
+- `src/lib/release/preflight/checks/vercel-readiness.ts` → patron Vercel API (`/v6/deployments`, `VERCEL_TOKEN`, `VERCEL_TEAM_ID`) via export/refactor aditivo.
+- `src/lib/platform-health/with-source-timeout.ts` → per-source timeout/degradacion.
+- `src/lib/kortex/github-control-plane/reader.ts` + `composer.ts` → molde reciente de reader GitHub con fuentes, warnings, confidence y tests.
+- `src/app/api/admin/public-site/bridge-inspection/route.ts` + tests → molde de endpoint admin Public Site con `requireAdminTenantContext`, `can`, captura/redaccion.
+- `migrations/20260616133046114_task-1152-roadmap-work-items-read-capability.sql` → seed additive + down migration deprecate.
+
+SCHEMA / RUNTIME REAL:
+- Sin tablas nuevas de datos. Solo seed additive en `greenhouse_core.capabilities_registry`.
+- Access plane: `entitlements` via `src/config/entitlements-catalog.ts`, `src/lib/entitlements/runtime.ts`, migracion de registry y gate route handler.
+- Reliability plane: `src/lib/reliability/get-reliability-overview.ts` consume readers preloaded y signals `ReliabilitySignal`; ejemplo reciente `src/lib/reliability/queries/kortex-github-ci-last-status.ts`.
+
+ACCESS MODEL:
+- Endpoint app-lane/admin: `requireAdminTenantContext()` + `can(tenant, 'public_site.runtime_binding.read', 'read', 'tenant')` y `can(tenant, 'public_site.route_ownership.read', 'read', 'tenant')`.
+- Grants MVP: `EFEONCE_ADMIN` y route group interno/admin si el runtime pattern lo permite; mantener scope `tenant` segun spec.
+- No agrega `views`/menu/UI en esta task.
+
+SKILLS A USAR:
+- `greenhouse-task-execution-hook` — aplicado por hook Codex TASK.
+- `greenhouse-agent` — contexto Greenhouse/Next.js; aplica aunque no haya UI visible por route/server boundary.
+- `greenhouse-task-planner` — aplicado para protocolo de task/lifecycle/backend-data.
+- `greenhouse-qa-release-auditor` — usar antes de cierre por implementacion no trivial con integration/access/reliability.
+- `greenhouse-documentation-governor` — usar en cierre por docs/architecture/changelog/handoff.
+
+SUBAGENTES:
+- Si. Cicero explora helpers GitHub/Vercel/Platform Health; Laplace explora capabilities/endpoint/reliability; Erdos revisa docs de cierre. No tienen ownership de escritura en runtime code durante discovery.
+
+RIESGOS / BLAST RADIUS:
+- Token GitHub/Vercel sin scope o ausente: debe degradar a `degradedSources[]`/confidence baja, no 5xx.
+- Capability catalog sin grant/registry: 403 latente; cubrir con migration + runtime grant + tests.
+- Mezclar rail Astro con WordPress/Kinsta: evitar reutilizar `runtime-binding.ts`; namespace `astro/`.
+- Vercel deploy "antiguo" no es error: solo `ERROR` en latest production dispara signal.
+- Exponer tokens o errores crudos: usar server-only y `redactErrorForResponse`.
+
+OPEN QUESTIONS RESUELTAS:
+- Reliability subsystem: MVP rollup en `platform/cloud`, no subsystem nuevo, hasta que haya varias signals Public Site.
+- Binding estatico: config tipado en `src/config/public-site-astro-binding.ts`, no tabla.
+- Sentry/capture domain: usar `cloud` con tag `source=public_site_binding`.
+
+### Mapa De Conexiones
+
+- Inputs estaticos: manifest Astro runtime binding + route ownership matrix.
+- Fuentes live: GitHub REST commits/branches para `efeoncepro/efeonce-web`; Vercel REST deployments por project/team.
+- Readers/helpers compartidos: release GitHub helpers, Vercel readiness helper refactor, with-source-timeout.
+- Endpoint consumidor: `GET /api/admin/public-site/binding`.
+- Access: entitlements catalog/runtime grants + `capabilities_registry`.
+- Observabilidad: reliability signal `public_site.astro_deploy_failed` wired a overview.
+- Consumidores futuros: Public Site Ops UI, commands deploy/rollback/seo-preflight, TASK-1167 repo/CI control plane.
+
+## Plan — 2026-06-17 — Codex
+
+1. Lifecycle/documental intake.
+   - Mover task a `in-progress`, actualizar `docs/tasks/README.md`, `docs/tasks/TASK_ID_REGISTRY.md` y `Handoff.md`.
+   - Verificacion: `pnpm task:lint --task TASK-1161` y `pnpm ops:lint --changed` despues de cambios documentales.
+
+2. Contrato + binding estatico.
+   - Crear `src/lib/public-site/astro/binding-types.ts` con `public-site-astro-binding.v1`, source status, confidence, repo/deploy/route ownership y notes.
+   - Crear `src/config/public-site-astro-binding.ts` tipado desde el manifest JSON; incluir `currentProductionRuntime`, `isTargetFrontendRail` y coordenadas GitHub/Vercel.
+   - Crear reader base `src/lib/public-site/astro/binding-reader.ts` para static binding + route ownership sin live sources.
+   - Tests focales parser/shape en `src/lib/public-site/astro/*.test.ts`.
+
+3. Fuentes live GitHub + Vercel.
+   - GitHub: usar `resolveGithubToken` + `githubFetchJson` para commits/branches `main` y `develop` de `efeoncepro/efeonce-web`; si falta token, marcar fuente `not_configured`.
+   - Vercel: extraer/exportar helper reusable desde `vercel-readiness.ts` o helper vecino con el mismo contrato (`VERCEL_TOKEN`, `teamId`, `projectId`, `/v6/deployments`, timeout).
+   - Envolver cada fuente con `withSourceTimeout` (~6s) y computar `degradedSources[]`, `confidence`, `status: ok|degraded|empty`.
+   - Tests: source caida/timeout/token ausente no lanza 5xx ni estado falso-sano.
+
+4. Capabilities + endpoint.
+   - Agregar `public_site.runtime_binding.read` y `public_site.route_ownership.read` en `src/config/entitlements-catalog.ts`.
+   - Agregar grants en `src/lib/entitlements/runtime.ts`.
+   - Crear migration con `pnpm migrate:create task-1161-public-site-binding-capabilities` y seed additive/deprecate-down.
+   - Crear `src/app/api/admin/public-site/binding/route.ts` con `requireAdminTenantContext`, `can`, reader y errores sanitizados.
+   - Tests route: 200, 403 sin capability, sanitizacion error.
+
+5. Reliability signal.
+   - Crear `src/lib/reliability/queries/public-site-astro-deploy-failed.ts` que consume el reader y emite `public_site.astro_deploy_failed`.
+   - Wire en `src/lib/reliability/get-reliability-overview.ts` junto a signals platform/cloud recientes.
+   - Tests: latest production deploy `ERROR` => `error`; `READY` o `empty/degraded` => `ok|unknown` honesto segun contrato.
+
+6. Docs/spec cierre.
+   - Crear `docs/architecture/GREENHOUSE_PUBLIC_SITE_ASTRO_BINDING_READER_V1.md`.
+   - Actualizar EPIC-019 child task/state, `project_context.md` si el estado vigente cambia, `changelog.md`, `Handoff.md`, README/registry/task lifecycle.
+   - No tocar WordPress/Kinsta runtime ni DNS/cutover.
+
+7. Verificacion.
+   - Focal: `pnpm test src/lib/public-site src/app/api/admin/public-site src/lib/reliability/queries/public-site-astro-deploy-failed.test.ts` (ajustar paths reales).
+   - Access: capability grant coverage/parity tests focales.
+   - Types/lint: `pnpm lint`, `NODE_OPTIONS=--max-old-space-size=8192 pnpm exec tsc --noEmit --pretty false`.
+   - Docs/tasks: `pnpm task:lint --task TASK-1161`, `pnpm ops:lint --changed`, `pnpm docs:closure-check`.
+   - Runtime smoke si secrets disponibles: `GET /api/admin/public-site/binding` con admin agent session; si faltan tokens/scopes, documentar degradacion honesta como rollout pendiente.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 3 — EXECUTION SPEC
      ═══════════════════════════════════════════════════════════ -->
@@ -280,33 +403,40 @@ Sin flag — aditivo, read-only, gateado por capability desde el nacimiento. Cut
 
 ## Acceptance Criteria
 
-- [ ] Existe `src/lib/public-site/astro/binding-reader.ts` que devuelve el contrato `public-site-astro-binding.v1` (binding + estado live repo/deploy + route ownership).
-- [ ] El reader reusa `release/github-helpers.ts` + los helpers Vercel de `preflight/checks/vercel-readiness.ts` + `with-source-timeout` (no reinventa).
-- [ ] Degradación honesta: una fuente caída/timeout → `degradedSources[]` + `confidence` baja, NUNCA 5xx ni estado falso-sano (test).
-- [ ] `public_site.runtime_binding.read` + `public_site.route_ownership.read` seedeadas (catalog + `capabilities_registry`) + grant en `runtime.ts`; `capability-grant-coverage.test.ts` verde.
-- [ ] `GET /api/admin/public-site/binding` gateado por `requireAdminTenantContext` + `can(...)`, errores sanitizados, tokens nunca en la respuesta.
-- [ ] `public_site.astro_deploy_failed` wired a `get-reliability-overview` (steady=0).
-- [ ] Smoke real: el endpoint devuelve estado live correcto (main SHA + prod deploy `Ready` del proyecto `efeonce-web`).
-- [ ] Cero write a GitHub/Vercel; cero deploy/rollback.
+- [x] Existe `src/lib/public-site/astro/binding-reader.ts` que devuelve el contrato `public-site-astro-binding.v1` (binding + estado live repo/deploy + route ownership).
+- [x] El reader reusa `release/github-helpers.ts` + los helpers Vercel de `preflight/checks/vercel-readiness.ts` + `with-source-timeout` (no reinventa).
+- [x] Degradación honesta: una fuente caída/timeout → `degradedSources[]` + `confidence` baja, NUNCA 5xx ni estado falso-sano (test).
+- [x] `public_site.runtime_binding.read` + `public_site.route_ownership.read` seedeadas (catalog + `capabilities_registry`) + grant en `runtime.ts`; `capability-grant-coverage.test.ts` verde.
+- [x] `GET /api/admin/public-site/binding` gateado por `requireAdminTenantContext` + `can(...)`, errores sanitizados, tokens nunca en la respuesta.
+- [x] `public_site.astro_deploy_failed` wired a `get-reliability-overview` (steady=0 en tests; Vercel smoke real production/staging READY).
+- [x] Smoke runtime del endpoint deployado con sesión admin en Vercel `staging`: deploy `greenhouse-3jckt2aq4-efeonce-7670142f.vercel.app` (`dpl_6r6aKuS6P8eBWYrzJRR6thppmquw`) `Ready`; `GET /api/admin/public-site/binding` → HTTP 200, `status=ok`, `confidence=high`, `degradedSources=[]`.
+- [x] Smoke real de fuentes: Vercel production/staging `READY` y GitHub `main`/`develop` confirmados en SHA `4d050fb`; el reader degradó GitHub en local por falta de token app/PAT, como diseño.
+- [x] Cero write a GitHub/Vercel; cero deploy/rollback.
 
 ## Verification
 
-- `pnpm lint`
-- `pnpm tsc --noEmit`
-- `pnpm test src/lib/public-site` + `capability-grant-coverage.test.ts`
-- `pnpm migrate:up` + verify capabilities en `capabilities_registry`
-- Smoke real: `GET /api/admin/public-site/binding` (agent session) → estado live de `efeonce-web`
-- `pnpm docs:closure-check`
+- `pnpm test src/lib/public-site/astro/binding-reader.test.ts src/app/api/admin/public-site/__tests__/binding-route.test.ts src/lib/reliability/queries/public-site-astro-deploy-failed.test.ts src/lib/entitlements/capability-grant-coverage.test.ts src/lib/capabilities-registry/parity.test.ts` → 5 files / 17 tests passed.
+- `pnpm exec eslint src/lib/public-site/astro/binding-reader.ts src/lib/public-site/astro/binding-types.ts src/config/public-site-astro-binding.ts src/app/api/admin/public-site/binding/route.ts src/lib/reliability/queries/public-site-astro-deploy-failed.ts` → exit 0.
+- `NODE_OPTIONS=--max-old-space-size=8192 pnpm exec tsc --noEmit --pretty false` → exit 0.
+- `pnpm pg:connect:migrate` → migration applied; Kysely types regenerated.
+- Smoke reader local with real Vercel: production/staging deployments `READY`, SHA `4d050fb`.
+- `gh api repos/efeoncepro/efeonce-web/commits/main` and `develop` → both SHA `4d050fb`.
+- Reader local degraded GitHub via its own resolver because no GitHub app/PAT token was configured in the shell; this is expected degraded behavior and not a false-green state.
+- `vercel deploy --target=staging --scope efeonce-7670142f --yes` → deploy `https://greenhouse-3jckt2aq4-efeonce-7670142f.vercel.app`, id `dpl_6r6aKuS6P8eBWYrzJRR6thppmquw`, target `staging`, status `Ready`, aliases `dev-greenhouse.efeoncepro.com` / `greenhouse-eo-env-staging-efeonce-7670142f.vercel.app`.
+- `STAGING_URL=https://greenhouse-3jckt2aq4-efeonce-7670142f.vercel.app pnpm staging:request /api/admin/public-site/binding --pretty` → HTTP 200, `contractVersion=public-site-astro-binding.v1`, `status=ok`, `confidence=high`, GitHub `main`/`develop` at `4d050fb`, Vercel production/staging `READY`, `degradedSources=[]`.
+- `/api/admin/reliability` staging incluye `public_site.astro_deploy_failed` con `severity=ok`, `production_status=READY` y deployment uid `dpl_8toLsToDdf4UPGVx1L3s5CkxemfB`.
+- `vercel logs greenhouse-3jckt2aq4-efeonce-7670142f.vercel.app --no-follow --since 30m --level error --expand --scope efeonce-7670142f` → no error logs found.
+- Pending before full operational closure: repetir smoke en `production` despues de release/promocion aprobada; no se hizo production deploy ni cutover.
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` sincronizado
-- [ ] el archivo vive en la carpeta correcta
-- [ ] `docs/tasks/README.md` sincronizado
-- [ ] `Handoff.md` actualizado
-- [ ] `changelog.md` actualizado
-- [ ] chequeo de impacto cruzado (EPIC-019 — marcar la pieza read; manifest readiness stale)
-- [ ] spec `GREENHOUSE_PUBLIC_SITE_ASTRO_BINDING_READER_V1.md` creada y enlazada desde EPIC-019
+- [x] `Lifecycle` sincronizado como `in-progress` hasta production rollout smoke.
+- [x] el archivo vive en la carpeta correcta (`docs/tasks/in-progress/`) para `staging verified, production rollout pendiente`.
+- [x] `docs/tasks/README.md` sincronizado.
+- [x] `Handoff.md` actualizado.
+- [x] `changelog.md` actualizado.
+- [x] chequeo de impacto cruzado (EPIC-019 — marcar la pieza read; manifest readiness stale).
+- [x] spec `GREENHOUSE_PUBLIC_SITE_ASTRO_BINDING_READER_V1.md` creada y enlazada desde EPIC-019.
 
 ## Follow-ups
 

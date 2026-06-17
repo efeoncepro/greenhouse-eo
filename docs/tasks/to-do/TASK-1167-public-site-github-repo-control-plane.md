@@ -54,7 +54,7 @@ Revisar y respetar:
 
 - `docs/architecture/GREENHOUSE_PUBLIC_SITE_ASTRO_RUNTIME_STRATEGY_DECISION_V1.md` — la decisión que nombra el control-plane contract `public_site.*` + el observability contract (`public_site.astro_deploy_failed`, …). Source of truth de los nombres.
 - `docs/epics/to-do/EPIC-019-public-website-landing-control-plane.md` — el programa; esta es la pieza repo/CI + comandos del control-plane.
-- `docs/tasks/to-do/TASK-1161-public-site-greenhouse-binding-reader.md` — pieza hermana (binding/deploy reader). Esta task la **complementa** con la dimensión repo/CI + comandos, igual que TASK-1166 complementa a TASK-1162 en Kortex.
+- `docs/tasks/in-progress/TASK-1161-public-site-greenhouse-binding-reader.md` — pieza hermana (binding/deploy reader). Esta task la **complementa** con la dimensión repo/CI + comandos, igual que TASK-1166 complementa a TASK-1162 en Kortex.
 - `docs/tasks/to-do/TASK-1166-kortex-github-repo-control-plane.md` — el molde directo (reader GitHub dedicado + command adapter allowlisted/default OFF). Replicar el patrón, no reinventar.
 - `docs/architecture/GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md` — lanes app/ecosystem + command execution foundation.
 - `docs/architecture/GREENHOUSE_FULL_API_PARITY_DECISION_V1.md` — read/API-first: el reader/command es el SSOT, la UI/agente/MCP son clientes.

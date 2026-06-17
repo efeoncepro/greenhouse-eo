@@ -1,5 +1,18 @@
 # Release 2026-06-10 #2 — develop→main `6c649b2a6` RELEASED
 
+## Sesión 2026-06-17 — TASK-1161 Public Site Astro binding reader staging verified — Codex
+
+> **Estado:** staging verified, production rollout pendiente en `develop`; sin branch/worktree nuevo. Cero production deploy/cutover y cero writes a GitHub/WordPress/Kinsta.
+
+- **Hook/subagentes:** `pnpm codex:task-hook TASK-1161`; Cicero (GitHub/Vercel helpers), Laplace (capabilities/API/reliability) y Erdos (docs cierre).
+- **Implementado:** reader server-only `src/lib/public-site/astro/**`, config tipado `src/config/public-site-astro-binding.ts`, endpoint `GET /api/admin/public-site/binding`, capabilities `public_site.runtime_binding.read`/`public_site.route_ownership.read`, migración `20260617185349908_task-1161-public-site-binding-capabilities.sql`, y signal `public_site.astro_deploy_failed`.
+- **Runtime evidence:** `pnpm pg:connect:migrate` aplicó la migración y regeneró Kysely types. Smoke local del reader: Vercel production/staging `READY`, SHA `4d050fb`; GitHub degradó por falta de token app/PAT local, y `gh api` confirmó `main`/`develop` en el mismo SHA que Vercel.
+- **Rollout staging:** `vercel deploy --target=staging --scope efeonce-7670142f --yes` creó `https://greenhouse-3jckt2aq4-efeonce-7670142f.vercel.app` (`dpl_6r6aKuS6P8eBWYrzJRR6thppmquw`), target `staging`, `Ready`, con aliases `dev-greenhouse.efeoncepro.com` y `greenhouse-eo-env-staging-efeonce-7670142f.vercel.app`.
+- **Smokes staging:** `GET /api/admin/public-site/binding` con agent session → HTTP `200`, `contractVersion=public-site-astro-binding.v1`, `status=ok`, `confidence=high`, `degradedSources=[]`, GitHub `main`/`develop` en `4d050fb`, Vercel production/staging `READY`. `/api/admin/reliability` incluye `public_site.astro_deploy_failed` con `severity=ok`. Logs de error del deployment en últimos 30m: none.
+- **Validación:** Vitest focal 5 files / 17 tests passed; eslint focal; `tsc --noEmit` con heap ampliado; `pnpm build` verde con warning preexistente de Roadmap dynamic pattern; task/ops/docs/QA gates verdes. QA verdict operativo: staging verified / production rollout pendiente.
+- **Docs:** nuevo `docs/architecture/GREENHOUSE_PUBLIC_SITE_ASTRO_BINDING_READER_V1.md`, updates en Runtime Strategy, Reliability, EPIC-019, manifest, docs funcional/manual, `project_context.md`, changelog y task lifecycle.
+- **Pendiente operacional:** repetir smoke en `production` después de release/promoción aprobada; no hay command de deploy/rollback todavía.
+
 ## Sesión 2026-06-17 — Kortex GitHub commands staging ON — Codex
 
 > **Estado:** staging queda con GitHub commands de Kortex prendidos para pruebas gobernadas. Production no fue tocado.
@@ -10,7 +23,7 @@
 - **Smoke guardrail global:** `kortex.github.workflow.rerun_failed` contra run exitoso `27681588991` -> HTTP `409`, code `kortex_github_command_not_allowed`, details `conclusion=success`; confirma que el flag global ya no bloquea y que no se re-runnea un CI exitoso.
 - **Smoke guardrail dispatch:** `kortex.github.workflow.dispatch` sobre `CI/main` sin frase humana -> HTTP `409`, code `kortex_github_confirmation_required`; confirma que dispatch esta habilitado por flag pero sigue exigiendo `DISPATCH KORTEX WORKFLOW`.
 - **Producción:** GitHub commands siguen apagados por diseño; cualquier flip productivo requiere aprobacion separada, allowlist revisada, frase humana y smoke productivo dedicado.
-- **Nota:** sigue existiendo un cambio local previo en `docs/tasks/to-do/TASK-1161-public-site-greenhouse-binding-reader.md`; no pertenece a este rollout.
+- **Nota:** TASK-1161 ya vive en `docs/tasks/in-progress/TASK-1161-public-site-greenhouse-binding-reader.md` como staging verified / production rollout pendiente; no queda task sibling en `to-do/`.
 
 ## Sesión 2026-06-17 — TASK-1166 Kortex GitHub Repo Control Plane complete — Codex
 
@@ -25,7 +38,7 @@
 - **Smokes staging:** `GET /api/admin/kortex/github-control-plane` -> HTTP `200`, `confidence=high`, repo `efeoncepro/kortex`, latest CI run `27681588991` success, correlation `matched`, warnings `[]`; `POST /api/admin/kortex/github-commands` con flags OFF -> HTTP `409`, code `kortex_github_command_disabled`; `/api/admin/reliability` incluye `platform.kortex.github.ci_last_status` severity `ok`.
 - **Validacion local/cierre:** Vitest focal TASK-1166 -> 5 files / 15 tests passed; `tsc --noEmit`, `pnpm lint`, `pnpm build`, `pnpm task:lint --task TASK-1166`, `pnpm ops:lint --changed`, `pnpm docs:closure-check`, `git diff --check` verdes. Build local/remoto emitio warning preexistente de Roadmap dynamic pattern, no relacionado.
 - **Pendiente operacional:** production commands siguen OFF por diseño; no prender `KORTEX_GITHUB_COMMANDS_ENABLED` ni `KORTEX_GITHUB_WORKFLOW_DISPATCH_ENABLED` sin aprobacion explicita, workflow/ref allowlisted y runbook de release/deploy Kortex.
-- **Nota:** habia cambios locales previos en `docs/tasks/to-do/TASK-1161-public-site-greenhouse-binding-reader.md`; se dejaron intactos y fuera del scope de TASK-1166.
+- **Nota:** TASK-1161 ya fue tomado en su propia sesión y vive en `docs/tasks/in-progress/TASK-1161-public-site-greenhouse-binding-reader.md`.
 
 ## Sesión 2026-06-17 — Kortex live/admin staging flags ON — Codex
 

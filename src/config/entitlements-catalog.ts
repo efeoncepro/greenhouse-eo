@@ -45,7 +45,10 @@ export const ENTITLEMENT_MODULES = [
   // epics/tasks/mini-tasks/issues). Read-only V1; capability `roadmap.work_items.read`
   // consumida por el reader server-side + la futura UI cockpit (TASK-1153). Distinto de
   // `platform` (control plane release) y `admin` (governance).
-  'roadmap'
+  'roadmap',
+  // TASK-1161 — namespace Public Site control plane. V1 read-only para observar
+  // el rail Astro/Vercel target desde Greenhouse sin deploy/cutover.
+  'public_site'
 ] as const
 
 export type GreenhouseEntitlementModule = (typeof ENTITLEMENT_MODULES)[number]
@@ -1260,6 +1263,18 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     module: 'platform',
     actions: ['read'] as const,
     defaultScope: 'all'
+  },
+  {
+    key: 'public_site.runtime_binding.read',
+    module: 'public_site',
+    actions: ['read'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'public_site.route_ownership.read',
+    module: 'public_site',
+    actions: ['read'] as const,
+    defaultScope: 'tenant'
   },
   // TASK-872 — SCIM Internal Collaborator Provisioning capabilities (4 nuevas).
   // 3 eligibility override (L4 admin allowlist/denylist + backfill execute) +

@@ -56,7 +56,8 @@ Sin un epic, el trabajo tenderia a partir con un script o endpoint aislado que p
 
 | Task | Phase | Status | Purpose |
 | --- | --- | --- | --- |
-| `TASK-1159` | `0.9` | `to-do` | Astro SEO foundation + service landing shell: cleans `efeonce-web` scaffold/demo routes, centralizes SEO/canonical/sitemap/robots/OG, tokenizes Ohio/Figma against Efeonce brand and creates the reusable service landing shell with visual evidence, without cutover. |
+| `TASK-1159` | `0.9` | `complete` | Astro SEO foundation + service landing shell: cleans `efeonce-web` scaffold/demo routes, centralizes SEO/canonical/sitemap/robots/OG, tokenizes Ohio/Figma against Efeonce brand and creates the reusable service landing shell with visual evidence, without cutover. |
+| `TASK-1161` | `1.0` | `staging verified / production pendiente` | Greenhouse binding reader read-only: `public-site-astro-binding.v1`, endpoint `GET /api/admin/public-site/binding`, capabilities `public_site.runtime_binding.read`/`public_site.route_ownership.read`, and signal `public_site.astro_deploy_failed`; staging deploy/smoke OK, zero production deploy/rollback/cutover. |
 | `TASK-1158` | `0.75` | `complete` | Public Site Astro runtime control-plane decision: recalibrates EPIC-019 so Astro/Vercel becomes target frontend rail for `efeoncepro.com`, WordPress/Kinsta remains CMS/admin/origin and live legacy rail, and no primary SEO landings ship on a subdomain. |
 | `TASK-1111` | `0` | `in-progress` | WordPress/Kinsta discovery + read-only inventory: public REST/Abilities inventory shipped; authenticated WordPress/Abilities/plugins and WP-CLI theme/plugins/post-types are repeatable. Kinsta API environment/cache/backups remains blocked on token or deferral. |
 | `TASK-1122` | `0.5` | `in-progress` | Public Site code baseline + GitOps binding: private repo `efeoncepro/efeonce-public-site-runtime` created with live baseline `0fa6bfd` / tag `baseline-2026-06-14-live`; Greenhouse drift/deploy dry-run still pending. |
@@ -123,3 +124,7 @@ Docs canonicos nuevos:
 - `docs/operations/public-site-astro-runtime-binding-20260616.json`
 
 Regla nueva: landings SEO primarias no se publican en `landing.efeoncepro.com`; el target es dominio principal con Astro/Vercel despues de gates de route parity, canonicals, redirects, sitemap, HubSpot attribution, GVC/Lighthouse y aprobacion humana.
+
+## Delta 2026-06-17
+
+`TASK-1161` aterriza la primera pieza runtime read-first del rail Astro: Greenhouse puede observar binding repo↔Vercel, deploy production/staging, HEAD GitHub y route ownership mediante `public-site-astro-binding.v1`. El endpoint esta gobernado por capabilities y la signal `public_site.astro_deploy_failed` queda disponible para Reliability. Staging quedo verificado en `greenhouse-3jckt2aq4` con `status=ok`, `confidence=high` y signal `ok`; no se agregan comandos ni se cambia el runtime live.

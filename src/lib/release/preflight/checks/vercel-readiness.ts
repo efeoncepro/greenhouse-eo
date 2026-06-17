@@ -18,7 +18,7 @@ import type { PreflightInput } from '../runner'
 const VERCEL_API_BASE = 'https://api.vercel.com'
 const VERCEL_TIMEOUT_MS = 6_000
 
-interface VercelDeployment {
+export interface VercelDeployment {
   readonly uid: string
   readonly url: string
   readonly state: 'READY' | 'BUILDING' | 'ERROR' | 'CANCELED' | 'QUEUED'
@@ -27,11 +27,11 @@ interface VercelDeployment {
   readonly meta?: { readonly githubCommitSha?: string }
 }
 
-interface VercelDeploymentsResponse {
+export interface VercelDeploymentsResponse {
   readonly deployments: readonly VercelDeployment[]
 }
 
-const fetchVercelDeployments = async (
+export const fetchVercelDeployments = async (
   token: string,
   teamId: string | null,
   projectId: string,

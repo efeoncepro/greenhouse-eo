@@ -55,6 +55,14 @@ External docs checked:
 - Google canonical docs: `https://developers.google.com/search/docs/crawling-indexing/consolidate-duplicate-urls`
 - Google site move docs: `https://developers.google.com/search/docs/crawling-indexing/site-move-with-url-changes`
 
+## Delta 2026-06-17 — TASK-1161 materializa el reader read-only
+
+Greenhouse ya tiene la primera pieza runtime de observabilidad para esta decisión: el contrato `public-site-astro-binding.v1`, implementado en `src/lib/public-site/astro/` y expuesto por `GET /api/admin/public-site/binding`.
+
+El reader compone binding estático, route ownership, GitHub HEAD y Vercel deployments con degradación honesta por fuente. También siembra las capabilities `public_site.runtime_binding.read` y `public_site.route_ownership.read`, y agrega la signal `public_site.astro_deploy_failed` al Reliability Control Plane.
+
+Esto **no** cambia el cutover: WordPress/Kinsta sigue siendo el runtime live y Astro/Vercel sigue siendo el rail objetivo hasta completar route parity, SEO/canonical/redirect gates y aprobación humana.
+
 ## Context
 
 Efeonce needs to update service landing pages, business cases and acquisition assets much faster than WordPress + Ohio + Elementor currently allows. The operator explicitly wants those assets controlled from Greenhouse and generated with the speed of VIBE Coding, using the existing Ohio/Figma design assets as a basis for tokenized production.

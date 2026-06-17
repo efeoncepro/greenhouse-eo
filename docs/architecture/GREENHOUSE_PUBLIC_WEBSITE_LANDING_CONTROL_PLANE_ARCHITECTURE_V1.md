@@ -32,6 +32,8 @@ compose -> review -> preview -> approve -> publish -> verify -> measure -> learn
 Greenhouse should not become a freeform website builder in V1. It should become a governed landing operations control plane.
 
 > Delta 2026-06-16: `TASK-1158` accepted Astro/Vercel as the target public frontend runtime for `efeoncepro.com`, while WordPress/Kinsta remains CMS/admin/origin and live legacy runtime until cutover. This document still governs the WordPress bridge/content-factory rail; the target frontend rail is governed by `GREENHOUSE_PUBLIC_SITE_ASTRO_RUNTIME_STRATEGY_DECISION_V1.md`.
+>
+> Delta 2026-06-17: `TASK-1161` adds the read-only Greenhouse binding reader for that Astro/Vercel rail: `public-site-astro-binding.v1` via `GET /api/admin/public-site/binding`. This is observability only; deploy/rollback/cutover commands remain future tasks.
 
 ## 3. Archetype
 
@@ -214,7 +216,7 @@ Operator experience:
 Not allowed:
 
 - Treating GitHub as a separate manual operating surface for normal public-site work.
-- Treating `efeonce-web` as deploy source without a new ADR to migrate the public runtime to headless Astro.
+- Treating `efeonce-web` as deploy source without the Astro strategy gates, the Greenhouse binding reader/control-plane evidence, and a future cutover approval task.
 - Pushing arbitrary files over SSH without a Git-backed release record.
 - Versioning uploads, generated Elementor CSS, backups or secrets as canonical runtime code.
 

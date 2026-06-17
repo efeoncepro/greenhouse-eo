@@ -5,9 +5,29 @@
 > Versión: `1.10`
 > Estado: `vigente`
 > Creada: `2026-04-25` por TASK-600
-> Última actualización: `2026-06-12` por TASK-1085 (Nexa knowledge retrieval signals)
+> Última actualización: `2026-06-17` por TASK-1161 (Public Site Astro deploy signal)
 
 ---
+
+## Delta 2026-06-17 — TASK-1161: signal `public_site.astro_deploy_failed`
+
+Nuevo signal canonical de observabilidad para el rail objetivo Astro/Vercel del sitio público Efeonce.
+
+- `signalKey`: `public_site.astro_deploy_failed`
+- `moduleKey`: `platform` en V1, rollup operativo Cloud/Public Site hasta que el dominio acumule más signals.
+- `kind`: `incident`
+- Reader: `src/lib/reliability/queries/public-site-astro-deploy-failed.ts`
+- Fuente: `readPublicSiteAstroBinding()` (`public-site-astro-binding.v1`) y último deployment production de Vercel para `efeonce-web`.
+
+Severidad:
+
+- latest production deployment `READY` -> `ok`;
+- latest production deployment `ERROR` -> `error`;
+- `BUILDING`/`QUEUED` -> `unknown` honesto;
+- sin deployment -> awaiting-data style note, no falso error;
+- error del reader -> `unknown` + `captureWithDomain(error, 'cloud', ...)`.
+
+Steady state esperado = production deploy listo y sin error. La signal no ejecuta deploy, rollback ni cutover.
 
 ## Delta 2026-06-12 — TASK-1085: Nexa Knowledge retrieval signals
 

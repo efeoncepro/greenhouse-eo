@@ -137,6 +137,24 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
       scope: 'tenant',
       source: hasRouteGroup(subject, 'admin') ? 'role' : 'route_group'
     })
+
+    // TASK-1161 — Public Site Astro/Vercel binding reader. Read-only, internal
+    // control-plane visibility; no deploy/rollback/cutover rights.
+    addEntitlement(entries, {
+      module: 'public_site',
+      capability: 'public_site.runtime_binding.read',
+      action: 'read',
+      scope: 'tenant',
+      source: hasRouteGroup(subject, 'admin') ? 'role' : 'route_group'
+    })
+
+    addEntitlement(entries, {
+      module: 'public_site',
+      capability: 'public_site.route_ownership.read',
+      action: 'read',
+      scope: 'tenant',
+      source: hasRouteGroup(subject, 'admin') ? 'role' : 'route_group'
+    })
   }
 
   if (hasRouteGroup(subject, 'people') || hasAuthorizedView(subject, 'equipo.personas')) {

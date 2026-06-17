@@ -46,11 +46,10 @@
     "knownBlockers": [
       "home route is scaffold placeholder with noindex",
       "internal demo routes exist and must be removed or excluded",
-      "landing route TASK-010 is not implemented",
-      "SEO foundation TASK-011 is not implemented",
+      "TASK-1159 SEO foundation and first service landing shell are code-complete local-first; remote preview/push remains operator-gated",
       "blog route parity is not implemented",
       "route ownership and redirect map must be verified before apex cutover",
-      "Greenhouse binding reader/commands do not exist yet"
+      "Greenhouse binding reader exists read-only; deploy, rollback and SEO preflight commands remain future tasks"
     ],
     "minimumCutoverGates": [
       "core routes implemented",
@@ -65,6 +64,7 @@
   },
   "relatedContracts": [
     "docs/architecture/GREENHOUSE_PUBLIC_SITE_ASTRO_RUNTIME_STRATEGY_DECISION_V1.md",
+    "docs/architecture/GREENHOUSE_PUBLIC_SITE_ASTRO_BINDING_READER_V1.md",
     "docs/operations/public-site-route-ownership-matrix-20260616.md",
     "docs/operations/public-site-runtime-repository-binding-20260614.json"
   ],

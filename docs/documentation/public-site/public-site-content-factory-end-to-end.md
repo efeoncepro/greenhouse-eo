@@ -1,20 +1,23 @@
 # Public Site y Content Factory end-to-end
 
 > **Tipo de documento:** Documentacion funcional
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-06-15 por Codex
-> **Modulo:** Public Site / WordPress / Content Factory
-> **Rutas/scripts principales:** `/admin/public-site`, `pnpm public-website:*`, `docs/operations/public-site-*`
-> **Arquitectura relacionada:** `docs/architecture/GREENHOUSE_PUBLIC_WEBSITE_LANDING_CONTROL_PLANE_ARCHITECTURE_V1.md`, `docs/architecture/GREENHOUSE_PUBLIC_WEBSITE_LANDING_CONTROL_PLANE_DECISION_V1.md`
+> **Modulo:** Public Site / WordPress / Astro / Content Factory
+> **Rutas/scripts principales:** `/admin/public-site`, `GET /api/admin/public-site/binding`, `pnpm public-website:*`, `docs/operations/public-site-*`
+> **Arquitectura relacionada:** `docs/architecture/GREENHOUSE_PUBLIC_WEBSITE_LANDING_CONTROL_PLANE_ARCHITECTURE_V1.md`, `docs/architecture/GREENHOUSE_PUBLIC_SITE_ASTRO_RUNTIME_STRATEGY_DECISION_V1.md`, `docs/architecture/GREENHOUSE_PUBLIC_SITE_ASTRO_BINDING_READER_V1.md`
 
 ## Para que sirve
 
 Public Site conecta Greenhouse con `efeoncepro.com` en WordPress/Kinsta. Content Factory ayuda a inspeccionar, planificar y preparar drafts o patches gobernados sin mutar el sitio publico por accidente.
 
+Desde TASK-1161, Public Site tambien tiene una lectura gobernada del rail objetivo Astro/Vercel. Ese reader no reemplaza WordPress live: permite ver desde Greenhouse el binding `efeoncepro/efeonce-web` ↔ Vercel, el estado live de deploy y la matriz de ownership de rutas antes de cualquier comando de deploy/cutover.
+
 La postura actual es conservadora:
 
 - Greenhouse observa, planifica y prepara drafts.
 - WordPress/Kinsta sirven el sitio publico.
+- Astro/Vercel es el rail frontend objetivo y se observa read-only desde Greenhouse.
 - GitHub/runtime repo gobierna codigo.
 - Writes/publicacion siguen gated por tareas de rollout y aprobacion humana.
 
@@ -39,6 +42,7 @@ DB agregada:
 |---|---|---|
 | Discovery | scripts read-only | Inventaria WordPress, theme, plugins, posts/pages |
 | Runtime binding | docs/operations + repo runtime | Declara repo y baseline live |
+| Astro binding reader | `GET /api/admin/public-site/binding` | Observa repo `efeonce-web`, Vercel deployments y route ownership sin writes |
 | Content Factory | planners/validators | Genera planes y drafts, no publica por defecto |
 | Bridge plugin | foundation draft-only | Health/readiness y writes limitados cuando este habilitado |
 | Kinsta/GitOps | target | Deploy/rollback futuro gobernado |
@@ -71,6 +75,7 @@ DB agregada:
 ## Fronteras importantes
 
 - `efeonce-web` no es source of truth del WordPress live actual.
+- `efeonce-web` si es el rail frontend objetivo Astro/Vercel; observarlo no autoriza deploy, rollback ni cutover.
 - No editar Elementor/Ohio por HTML crudo sin ownership.
 - No publicar ni limpiar cache como parte de un plan read-only.
 - No tratar drafts como contenido publicado.
@@ -82,12 +87,14 @@ DB agregada:
 - Como preparo un draft sin tocar el publicado?
 - Que diferencia hay entre refresh plan, patch plan y draft clone?
 - Que comandos son read-only?
+- Como veo el estado Astro/Vercel sin abrir GitHub/Vercel?
 - Por que no puedo publicar desde Nexa todavia?
 - Que evidencia necesito antes de tocar el sitio publico?
 
 ## Documentacion relacionada
 
 - `docs/documentation/public-site/gutenberg-post-authoring-recipes.md`
+- `docs/architecture/GREENHOUSE_PUBLIC_SITE_ASTRO_BINDING_READER_V1.md`
 - `docs/documentation/public-site/wordpress-ohio-elementor-layout.md`
 - `docs/manual-de-uso/public-site/wordpress-ohio-elementor-layout.md`
 - `docs/manual-de-uso/public-site/wordpress-ohio-elementor-landing-playbook.md`
