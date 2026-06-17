@@ -247,3 +247,28 @@ props `nodeThumbnailUrl` + `thumbnailStatus: idle|loading|ready|unavailable`). F
 3. **Grano** → **por-página** (`surface_key` = ruta), mismo grano que el registro actual. Múltiples nodos por página (variants/specimens) = futuro.
 4. **¿Restringir `plataforma.design_system` a `designer` y revocar a `collaborator`?** → **NO en V1.** Ver el DS sigue abierto a todo interno (incl colaboradores, TASK-1070); solo **vincular** es exclusivo del diseñador. La restricción de *ver* es una decisión separada del operador (flip de grant), no se acopla a esta task.
 5. **Módulo de la capability** → recomendado nuevo módulo `design_system` (future-proof); alternativa `platform`. Decidir al implementar Slice 2.
+
+---
+
+## Invariantes operativos para agentes (relocados de CLAUDE.md — TASK-1160)
+
+> **Relocados de `CLAUDE.md` por TASK-1160 (2026-06-16), verbatim — cero cambio semántico.** Espejo operativo (NUNCA/SIEMPRE) que un agente carga al tocar este dominio; el contrato técnico vive en su spec. Dedup = TASK-1160 Slice 4.
+
+### Design System Figma node linking — ver ≠ vincular (TASK-1072, desde 2026-06-10)
+
+El mapeo superficie↔nodo AXIS del Design System es **data-driven** desde la DB, no hardcodeado. SSOT runtime: `greenhouse_core.design_system_figma_nodes` (+ `_events` append-only). El TS `src/views/greenhouse/admin/design-system/design-system-figma-nodes.ts` quedó **seed-only** (NO source of truth runtime). El shell (`DesignSystemBreadcrumbShell`) lee el map server-side vía `getDesignSystemFigmaNodeMap()` y lo recibe como prop; un diseñador lo llena desde la UI (affordance "+" → `POST /api/design-system/figma-nodes`).
+
+**Separación de planos canónica**: **ver** el Design System = plano **views** (`plataforma.design_system`, abierto a todo interno incl. `collaborator`). **Vincular** un nodo = plano **entitlements** (`design_system.figma_node.link`, módulo `design_system`, solo `designer` ∪ `efeonce_admin`). Un colaborador no-diseñador ve el DS + el botón disabled, pero no ve el affordance de vincular.
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** resolver el mapeo ruta→nodo desde el TS hardcodeado en runtime. El TS es seed; `greenhouse_core.design_system_figma_nodes` es SSOT. Toda lectura pasa por `getDesignSystemFigmaNodeMap()`.
+- **NUNCA** persistir un vínculo cuyo `file_key` no sea AXIS (`yyMksCoijfMaIoYplXKZaR`) — allowlist CHECK fail-closed (DB) + validación en el command (TS). No dejar entrar un Figma externo arbitrario al DS.
+- **NUNCA** `DELETE` de un vínculo ni de las filas de audit. Re-link = UPDATE in-place del current + evento append-only (`design_system.figma_node.{linked,relinked}`); soft-unlink = `superseded_at`.
+- **NUNCA** mostrar el affordance de vincular a quien no tenga la capability `design_system.figma_node.link` (capability, NO viewCode). Ver el DS ≠ poder vincular.
+- **NUNCA** mutar/escribir el vínculo desde un componente cliente — el command `linkDesignSystemFigmaNode` es server-only y pasa por la API gateada. El shell client solo importa el TYPE del store (`import type`, sin leak server-only — verificado build Turbopack).
+- **SIEMPRE** la layout (server) inyecta el map + `canLink` (resuelto por `can()`) al shell; el cliente no decide acceso.
+- El rol `designer` se asigna **aditivo** vía `user_role_assignments` (lifecycle-aware TASK-987), sin quitar roles existentes.
+- **Render real del nodo (Slice 4, code-complete)**: cliente server-only `figma-render.ts` (Figma REST `/v1/images` + `/v1/files/nodes`) + API `GET /api/design-system/figma-nodes/preview` → el editor muestra el render real del nodo AXIS, con fallback de identidad AXIS honesto. Token vía `resolveSecret('FIGMA_API_TOKEN')` → secret `greenhouse-figma-api-token` (**provisionado y funcional**: PAT Figma read-only; el render real del nodo opera. El fallback de identidad AXIS sigue como degradación honesta si el token faltara). NUNCA exponer el token al cliente; el link NUNCA depende de Figma (enrichment degradable). El allowlist AXIS-only es para las **primitivas/tokens** del DS; el handoff de **páginas de producto** (archivos Figma de producto + lifecycle) vive en su propio aggregate — ver [[TASK-1120]] (`design_handoff_entries`, allowlist gobernado de producto), que NO toca este linking AXIS.
+
+**Spec canónica**: `docs/tasks/complete/TASK-1072-designer-role-figma-node-linking.md`. Helpers: `src/lib/design-system/figma-nodes/{store,parse-figma-url}.ts`. Migraciones: `20260610131435833` (rol), `20260610131826746` (tabla+trio), `20260610132434509` (capability), `20260610133821108` (rollout 3 usuarios). Patrón fuente: TASK-790 (audit trio), TASK-721 (evidence SSOT), TASK-873/935 (capability grant coverage), TASK-987 (route-group parity TS↔DB + lifecycle).
