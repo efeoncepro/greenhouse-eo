@@ -1,15 +1,18 @@
 # Release 2026-06-10 #2 — develop→main `6c649b2a6` RELEASED
 
-## Sesión 2026-06-16 — TASK-1160 CLAUDE.md Router Refactor: Slice 1+2 + checkpoint — Claude
+## Sesión 2026-06-16 — TASK-1160 CLAUDE.md Router Refactor: Slice 1+2 + red de seguridad + 2 tandas — Claude
 
-> **Estado:** `in-progress` en `develop` (local, sin push). Slices 1 y 2 ✅. **Bloqueado en checkpoint del operador** antes del move masivo (Slices 3-5). Cero cambio a `CLAUDE.md` todavía (relocación pendiente de sign-off).
+> **Estado:** `in-progress` en `develop` (local, sin push). Slices 1+2 ✅ + auditor de no-pérdida ✅ + **Slice 3 tandas 1-2 ✅** (contractor + release). Checkpoint operador resuelto (budget 30-35k, spec-first, review-first). **CLAUDE.md: 190.5k → 156.5k tokens (−34k, −18%)** con prueba mecánica de cero pérdida. Quedan ~26 dominios + Vercel split + keep-list résumés + dedup + router + governance.
 
-- **Diagnóstico medido:** `CLAUDE.md` = 6.191 líneas / **~190.551 tokens** (chars/4) / 195 secciones H3 (= 99% del archivo) / 1.024 `NUNCA` / 211 `SIEMPRE`. **117 de los bloques ya declaran su `Spec canónica`** y la spec existe → el bloque en `CLAUDE.md` es mayormente el espejo redundante. Hallazgo estructural: la sección `Vercel Deployment Protection` (5.990 tokens, la más grande) es un cajón con ~20 contratos de UI Platform appendeados → hay que partirla.
-- **Slice 1 ✅ (inventario + mapa):** `scripts/ci/claude-md-inventory.mjs` (+ `pnpm claude-md:inventory`) enumera cada H3 con tokens/NUNCA/SIEMPRE. Entregable: `docs/operations/CLAUDE_MD_REFACTOR_MAP_2026-06-16.md` (clasificación de las 195 secciones: KEEP 57 / MOVE→spec 36 / MOVE→spec/task 74 / MOVE→needs-dest 28; keep-list propuesto ~20-25k tokens; 6 patrones canónicos a deduplicar).
-- **Slice 2 ✅ (gate):** `scripts/ci/claude-md-token-budget.mjs` (+ `pnpm claude-md:budget`), warn-first @ budget 200k (target final 25k), wired en `.github/workflows/ci.yml` en modo warn (sin `--strict`). Verificado: 190.5k < 200k → verde. Flip a `--strict` queda para Slice 5.
-- **Hallazgo crítico para el plan (decisión del operador):** las skills "naturales" de dominio (`greenhouse-finance-accounting-operator`, `greenhouse-ico`, `greenhouse-postgres`, `greenhouse-backend`, `greenhouse-ux`, etc.) **son GLOBALES** (`~/.claude/skills/`) → fuera del repo + no compartidas con Codex. **Recomendación: destino canónico = la spec repo-tracked en `docs/architecture/**`** (donde ya apuntan 117 bloques), no la skill global.
-- **Checkpoint pendiente (3 decisiones):** (1) confirmar "spec-first" como destino por defecto; (2) budget target final 25k vs 40k; (3) validar el keep-list. Sin esto NO arranca el move masivo (regla del task + STOP de P1/alto blast).
-- **Reversible:** todo es docs + 2 scripts + 2 líneas en CI. `git revert` por commit. Cero cambio semántico de invariantes aún.
+- **Diagnóstico medido:** `CLAUDE.md` = 6.191 líneas / **~190.551 tokens** / 195 H3 (= 99% del archivo) / 1.024 `NUNCA`. **117 bloques ya declaran `Spec canónica`** → el bloque es el espejo redundante. Cajón roto: `Vercel Deployment Protection` (5.990 tok) tiene ~20 contratos de UI Platform appendeados → split pendiente.
+- **Slice 1 ✅:** `pnpm claude-md:inventory` + mapa `docs/operations/CLAUDE_MD_REFACTOR_MAP_2026-06-16.md` (195 secciones clasificadas; §0 = batch log vivo).
+- **Slice 2 ✅:** `pnpm claude-md:budget` warn-first @200k (target banda 30-35k, gate enforce 35k), wired en `ci.yml` warn.
+- **🔑 Red de seguridad ✅ (lo que pidió el operador — "no perder comportamiento"):** `pnpm claude-md:rule-audit` (`scripts/ci/claude-md-rule-audit.mjs`, wired en `ci.yml` warn) compara cada línea `NUNCA`/`SIEMPRE` del **baseline congelado `27ce06a11:CLAUDE.md`** (1152 reglas distintas) contra el corpus vivo (CLAUDE.md ∪ docs/ ∪ skills). **Target 0 huérfanas, verificado tras cada tanda.** Prueba mecánica de que ninguna regla load-bearing se pierde.
+- **Slice 3 tanda 1 ✅ (contractor):** 19 bloques (TASK-790…981, 474 líneas, 153 NUNCA + 28 SIEMPRE) → verbatim a `GREENHOUSE_CONTRACTOR_ENGAGEMENTS_PAYABLES_ARCHITECTURE_V1.md` §"Invariantes operativos para agentes"; CLAUDE.md → 1 pointer que preserva inline el boundary payroll/finiquito. 0 huérfanas. −20k tokens.
+- **Slice 3 tanda 2 ✅ (release):** 7 bloques (TASK-848…871, 552 líneas, 74 NUNCA + 16 SIEMPRE) → `GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md`; pointer preserva concurrency-fix + append-only inline + invoca skill MANDATORIA `greenhouse-production-release`. 0 huérfanas. −13.8k tokens.
+- **Patrón probado (reusable):** cluster contiguo por título H3 → verbatim a §"Invariantes operativos para agentes" de la spec → pointer con reglas peligrosas inline → `rule-audit --strict` = 0 → `budget` baja → commit. Mover ≠ encoger bytes totales: el contenido pasa de "cargado cada turno" (CLAUDE.md) a "load-on-demand" (spec) — ese es el win (el budget que importa es CLAUDE.md × cada turno × cada subagente).
+- **Decisión destino fijada:** spec-first híbrido (default = spec repo-tracked en `docs/architecture/**`; skills repo-tracked → pointer; NO skills globales — rompen paridad Codex).
+- **Reversible:** docs + 3 scripts + CI wiring. `git revert` por tanda. Cero cambio semántico (relocación verbatim, probada por el auditor).
 
 ## Sesión 2026-06-17 — TASK-1162 Kortex control-plane reader task — Codex
 

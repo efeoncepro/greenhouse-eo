@@ -5,6 +5,20 @@
 > **Estado al generar:** `CLAUDE.md` = 6.191 líneas / ~190.551 tokens (chars/4) / 195 secciones H3 / 1.024 `NUNCA` / 211 `SIEMPRE`.
 > **Regla del task:** relocación, NO edición. Move-then-pointer. Cero regla load-bearing perdida.
 
+## 0. Progreso (batch log)
+
+> **Red de seguridad de no-pérdida:** `pnpm claude-md:rule-audit` (`scripts/ci/claude-md-rule-audit.mjs`) compara cada línea `NUNCA`/`SIEMPRE` del baseline congelado (`27ce06a11:CLAUDE.md`, 1152 reglas distintas) contra el corpus vivo (CLAUDE.md ∪ docs/ ∪ skills). **Target 0 huérfanas, verificado tras cada tanda.** Wired en `ci.yml` (warn).
+
+| Tanda | Dominio | Bloques | Líneas | NUNCA/SIEMPRE | Destino | Tokens (post) | Huérfanas |
+|---|---|---|---|---|---|---|---|
+| — | baseline | 195 H3 | 6.191 | 1024/211 | — | ~190.551 | 0 |
+| 1 | Contractor (EPIC-013) | 19 | 474 | 153/28 | `GREENHOUSE_CONTRACTOR_ENGAGEMENTS_PAYABLES_ARCHITECTURE_V1.md` | ~170.301 | 0 ✅ |
+| 2 | Production Release | 7 | 552 | 74/16 | `GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md` | ~156.525 | 0 ✅ |
+
+**Patrón por tanda (probado):** identificar cluster contiguo por título H3 → mover verbatim a §"Invariantes operativos para agentes" de la spec destino → reemplazar en CLAUDE.md por 1 pointer que preserva inline las reglas más peligrosas/cross-cutting → `pnpm claude-md:rule-audit --strict` = 0 huérfanas → `pnpm claude-md:budget` (tokens bajan) → commit verificable.
+
+**Tandas siguientes (orden):** Knowledge+Nexa (2 destinos) · ICO/RpA/Notion-metrics · Finance (2 regiones: 1959-2310 + 3040-3270) · Notion/HubSpot sync · Identity/Workforce · UI-Platform **split del cajón Vercel** (5.990 tok → `ui-platform/*`) · keep-list résumés (Task Closing Gate, Capability grant, API error, Agent Auth) · Slice 4 dedup (`GREENHOUSE_CANONICAL_PATTERNS_V1.md`) · Slice 5 router + flip gate a `--strict` · Slice 6 governance fix.
+
 ## 1. Diagnóstico medido
 
 - Las 195 secciones **H3 son el 99% del archivo** (~187.925 tokens). El scaffolding H2 es ~1%.
