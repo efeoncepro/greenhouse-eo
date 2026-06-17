@@ -2621,3 +2621,612 @@ El page server component es responsable de:
 2. Activar para pilot users (efeonce admins) via `POST /api/admin/home/rollout-flags` con `scope_type='user'`.
 3. Validar en staging E2E, luego flip global cuando reliability signals estén en steady state.
 4. Cleanup de `<ClientDetailView />` legacy queda como follow-up post 100% rollout (>= 90 días sin reverts).
+
+---
+
+## Invariantes operativos para agentes — Finance ledger/bank/payments (TASK-700…765)
+
+> **Relocados de `CLAUDE.md` por TASK-1160 (2026-06-16), verbatim — cero cambio semántico.** Espejo operativo (NUNCA/SIEMPRE) que un agente carga al tocar este dominio; el contrato técnico vive en su spec. Dedup = TASK-1160 Slice 4.
+
+### Finance — Internal Account Number Allocator (TASK-700)
+
+Algoritmo canónico para asignar números de cuenta internos a CCAs hoy y wallets/loans/factoring mañana. **Toda cuenta interna que necesite identificador legible debe pasar por este allocator** — no se generan números en consumers.
+
+Formato v1: `TT-XX-D-NNNN`
+- `TT` = `greenhouse_core.spaces.numeric_code` (2-digit, NOT NULL UNIQUE)
+- `XX` = `greenhouse_finance.internal_account_type_catalog.type_code` (`90` = shareholder hoy)
+- `D` = Luhn mod-10 sobre payload `TT‖XX‖NNNN`
+- `NNNN` = secuencial monotónico zero-padded por `(space, type)` — los últimos 4 chars del rendering son siempre dígitos puros, por lo que `slice(-4)` produce un mask `•••• 0001` distintivo
+
+Allocator atómico:
+- SQL: `greenhouse_finance.allocate_account_number(space_id, type_code, target_table, target_id)` — advisory lock per `(space, type)`, computa Luhn, persiste en `account_number_registry`
+- TS: `allocateAccountNumber(...)` en `src/lib/finance/internal-account-number/` — wrapper Kysely de la SQL function. Acepta `client?: Kysely | Transaction` para compartir transacción con el INSERT del consumer.
+
+Helpers TS exportados: `luhnCheckDigit`, `formatAccountNumber`, `parseAccountNumber`, `validateAccountNumber`, `maskAccountNumber`. Hay test de paridad TS↔SQL contra el número del backfill (`01-90-7-0001`).
+
+Catálogo de type codes (extender insertando filas — no requiere migrar generador):
+- `90` shareholder_account (CCA — implementado)
+- Rangos reservados (no materializados): `10-19` wallets de usuario, `20-29` wallets de cliente, `30-39` wallets de proveedor, `70-79` intercompany loans, `80-89` factoring/structured.
+
+**Reglas duras**:
+- **NUNCA** componer un internal account number manualmente en un consumer. Siempre `allocateAccountNumber(...)` o la SQL function.
+- **NUNCA** alterar el formato inline. Para evolucionar, bumpear `format_version` en BOTH la SQL function y el módulo TS — los emitidos coexisten.
+- **NUNCA** bypass del registry escribiendo directo a `accounts.account_number` para una categoría que usa el registry. El registry es la fuente de verdad audit.
+- **NUNCA** desincronizar TS y SQL del Luhn — el test `luhn-parity` rompe build si pasa.
+- Cuando se cree el módulo de wallets, agregar fila al catalog y reusar el allocator. Cero código nuevo de generación.
+
+### Finance — Payment order ↔ bank settlement invariants (TASK-765)
+
+Toda transición de `payment_orders` a `state='paid'` debe rebajar el banco en la cuenta origen, atómicamente. El path canónico end-to-end es:
+
+```text
+payroll_period.exported
+  → finance_expense_reactive_intake (materializa expenses)
+    → payment_obligations.generated (TASK-748)
+      → payment_orders.draft → pending_approval → approved → submitted (TASK-750)
+        → markPaymentOrderPaidAtomic (TASK-765 Slice 5):
+          1. SELECT FOR UPDATE
+          2. assertSourceAccountForPaid (Slice 1 hard-gate)
+          3. UPDATE state='paid' (anti-zombie trigger Slice 6 valida)
+          4. recordPaymentOrderStateTransition (audit log Slice 6 append-only)
+          5. Per line: recordExpensePayment(input, client) → expense_payment + settlement_leg
+          6. publishOutboxEvent('finance.payment_order.paid')
+          7. ROLLBACK completo si CUALQUIER step falla
+        → account_balances rematerialization
+        → BANCO REBAJADO
+```
+
+**Reglas duras:**
+
+- **NUNCA** marcar `state='paid'` con `source_account_id IS NULL`. Hard-gate triple: CHECK constraint `payment_orders_source_account_required_when_paid` (DB) + `assertSourceAccountForPaid` (TS) + UI Tooltip + trigger `payment_orders_anti_zombie_trigger` (defense in depth).
+- **NUNCA** dejar `state='paid'` sin downstream completo. El path atómico `markPaymentOrderPaidAtomic` (`src/lib/finance/payment-orders/mark-paid-atomic.ts`) corre TODO en una sola tx. Si rollback ocurre, la order vuelve a `submitted` — nunca queda zombie. El proyector reactivo `record_expense_payment_from_order` queda como **safety net read-only** (idempotencia preservada por partial unique index).
+- **NUNCA** skipear silencioso desde el resolver. `recordPaymentForOrder` (`record-payment-from-order.ts`) ahora throw + outbox `finance.payment_order.settlement_blocked` cuando: (a) `expense_not_found` después de invocar materializer sincrono, (b) `out_of_scope_v1` (lines no-payroll), (c) `recordExpensePayment` falla.
+- **NUNCA** modificar el INSERT de `expenses` / `income` / `income_payments` / `expense_payments` sin verificar paridad column-count vs expression-count. El test `expense-insert-column-parity.test.ts` valida 14 INSERT sites canónicos en CI; cualquier drift rompe build (mismo bug que dejó dead-letter el materializer 2026-05-01).
+- **NUNCA** transicionar estados fuera del matrix canónico (`draft → pending_approval → approved → submitted → paid → settled → closed` + cancellation paths). El trigger PG `payment_orders_anti_zombie_trigger` enforce a nivel DB; el TS helper `assertValidPaymentOrderStateTransition` enforce en código.
+- **NUNCA** modificar `payment_order_state_transitions` (audit log). Es append-only enforced por trigger PG `payment_order_state_transitions_no_update/no_delete_trigger`. Para correcciones, insertar nueva fila con `metadata_json.correction_of=<transition_id>`.
+- **Reliability signals** (`/admin/operations`): `paid_orders_without_expense_payment` (drift), `payment_orders_dead_letter` (dead_letter), `payroll_expense_materialization_lag` (lag). Steady state = 0. Cualquier valor > 0 indica un breakage en el path canónico.
+- **Capabilities granulares** (least privilege): `finance.payroll.rematerialize` (admin endpoint rerun materializer) y `finance.payment_orders.recover` (recovery endpoint para órdenes zombie). Reservadas FINANCE_ADMIN + EFEONCE_ADMIN.
+
+**Helpers canónicos:**
+
+- `markPaymentOrderPaidAtomic({orderId, paidBy, paidAt?, externalReference?})` — path atómico canónico.
+- `assertSourceAccountForPaid(orderId, sourceAccountId, targetState)` — hard-gate Slice 1.
+- `recordPaymentOrderStateTransition({...}, client)` — append-only audit log writer (slice 6).
+- `recordExpensePayment(input, client?)` — extiende firma con `client?` opcional (post-Slice 5).
+- `materializePayrollExpensesForExportedPeriod({periodId, year, month})` — idempotente, invocable sincrono dentro de tx atómica.
+- `checkInsertParity(sql)` — anti-regresión universal para INSERTs SQL embebidos.
+- `POST /api/admin/finance/payroll-expense-rematerialize` — admin endpoint rerun materializer (capability `finance.payroll.rematerialize`).
+- `POST /api/admin/finance/payment-orders/[orderId]/recover` — recovery endpoint para zombies (capability `finance.payment_orders.recover`).
+
+**Outbox events nuevos:** `finance.payment_order.settlement_blocked` (v1, 5 reasons) + `finance.payroll_expenses.rematerialized` (v1, audit-only). Documentados en `docs/architecture/GREENHOUSE_EVENT_CATALOG_V1.md` Delta 2026-05-02.
+
+**Spec canónica:** `docs/tasks/complete/TASK-765-payment-order-bank-settlement-resilience.md`.
+
+### Finance — Payment Provider Catalog + category provider rules (TASK-701)
+
+Toda cuenta operativa (banco, tarjeta, fintech, CCA, wallet futura) declara un proveedor que opera el ledger. El catálogo y las reglas son canónicos: el form admin y el readiness contract leen de aquí, no hay branching por categoría en consumers.
+
+**Tablas**:
+- `greenhouse_finance.payment_provider_catalog` — FK desde `accounts.provider_slug`. `provider_type` ∈ `bank`, `card_network`, `card_issuer`, `fintech`, `payment_platform`, `payroll_processor`, **`platform_operator`**. Cada fila declara `applicable_to TEXT[]` con las categorías que puede servir.
+- `greenhouse_finance.instrument_category_provider_rules` — regla por `instrument_category` (`requires_provider`, `provider_label`, `provider_types_allowed`, `default_provider_slug`, `requires_counterparty`, `counterparty_kind`, `counterparty_label`).
+
+**Greenhouse-as-platform_operator**: el provider con slug `greenhouse` es first-class. Representa que la plataforma misma opera ledger internos (CCA hoy, wallets/loans/factoring mañana). Para shareholder_account (y futuras categorías internas), `default_provider_slug='greenhouse'` → form lo pre-asigna read-only.
+
+**Helper canónico**: `getCategoryProviderRule(category)` en `src/lib/finance/payment-instruments/category-rules.ts` mirror del seed SQL.
+
+**Reglas duras**:
+- **NUNCA** escribir un `provider_slug` inventado. Solo slugs presentes en el catálogo (FK lo bloquea).
+- **NUNCA** branchear UI/readiness por `instrument_category` para decidir qué campos mostrar. Leer la rule.
+- **NUNCA** mezclar dimensiones: el `provider_slug` es "quién opera el ledger". El counterparty (cuando aplica) es "quién es el otro lado del wallet" — vive en `metadata_json` para shareholder hoy, columna dedicada cuando se materialicen futuras wallets.
+- Cuando ship una categoría nueva (`employee_wallet`, `client_wallet`, `intercompany_loan`, `escrow_account`):
+  1. INSERT row en `internal_account_type_catalog` (TASK-700)
+  2. UPDATE `payment_provider_catalog` para agregar la categoría al `applicable_to` de `greenhouse`
+  3. INSERT row en `instrument_category_provider_rules` con la regla
+  4. Agregar entrada en `getCategoryProviderRule` (mirror TS)
+  El form admin se adapta solo. Cero refactor de UI.
+
+### Finance — Bank ↔ Reconciliation synergy (TASK-722)
+
+`/finance/bank` y `/finance/reconciliation` son ahora un solo flujo operativo. Banco es el tablero (cuentas + saldos + snapshots + drift + evidencia); Conciliación es el workbench transaccional (importar extractos, matching, cierre de periodo).
+
+**Bridge contract** (read-only): `getReconciliationFullContext({periodId | accountId+year+month})` en `src/lib/finance/reconciliation/full-context.ts` retorna `{ account, period?, latestSnapshot?, evidenceAsset?, statementRows, difference, nextAction }` con state machine `nextAction: declare_snapshot → create_period → import_statement → resolve_matches → mark_reconciled → close_period → closed → archived`.
+
+**Period creation desde snapshot** (atomic): `createOrLinkPeriodFromSnapshot({snapshotId, actorUserId})` en `src/lib/finance/reconciliation/period-from-snapshot.ts`. Idempotente (re-llamar devuelve `alreadyLinked=true`), atomic (insert period + UPDATE snapshot.reconciliation_period_id en misma tx), race-safe (UNIQUE (account_id, year, month) constraint).
+
+**API**:
+- `POST /api/finance/reconciliation/from-snapshot` — gated por `finance.reconciliation.declare_snapshot`
+- `GET /api/finance/reconciliation?year=&month=` retorna `orphanSnapshots[]` adicional cuando se piden
+- `GET /api/finance/reconciliation/[id]` retorna campo `bridge` con full context
+
+**Capabilities** (TASK-403 motor, no DB tabla):
+- `finance.reconciliation.read` — finance route_group / FINANCE_ADMIN / EFEONCE_ADMIN
+- `finance.reconciliation.match` — mismo set
+- `finance.reconciliation.import` — mismo set
+- `finance.reconciliation.declare_snapshot` — mismo set
+- `finance.reconciliation.close` — solo FINANCE_ADMIN / EFEONCE_ADMIN (acción terminal)
+
+Guards `can()` agregados a 11 endpoints de mutación. `requireFinanceTenantContext` se mantiene como guard transversal.
+
+**Reglas duras**:
+
+- **NUNCA** sumar reconciliation logic inline en views. Toda composición pasa por `getReconciliationFullContext`.
+- **NUNCA** crear periodo concurrent sin pasar por `createOrLinkPeriodFromSnapshot` o `createReconciliationPeriodInPostgres`. Ambas usan idempotency: la UNIQUE (account_id, year, month) constraint detecta race conditions a nivel DB.
+- **NUNCA** mostrar match status sin distinguir `matched_settlement_leg_id` (canal canónico TASK-708) vs `matched_payment_id` (legacy). UI usa chip diferenciado "Canónico" vs "Legacy".
+- **NUNCA** disable "Marcar conciliado" sin explicación clara en tooltip + alert. Operador debe saber qué falta.
+- Banco es read-only sobre el modelo de conciliación; toda mutación va por endpoints del workbench. El botón "Abrir workbench" en BankView no muta — solo navega.
+- Cuando emerja una nueva surface (e.g. cierre de período Q4 dashboard), reusa el bridge. Cero composición ad-hoc.
+
+### Finance — Evidence canonical uploader (TASK-721)
+
+Toda evidencia que respalde un snapshot de conciliación (cartola, screenshot OfficeBanking, statement PDF) o futura declaración de OTB / loan / factoring **debe** subirse via el uploader canónico de assets, NO declararse como text-input libre.
+
+**Flow canónico**:
+1. UI usa `<GreenhouseFileUploader contextType='finance_reconciliation_evidence_draft'>`. PDF/JPG/PNG/WEBP, max 10MB.
+2. POST `/api/assets/private` calcula SHA-256, dedup por `content_hash` (mismo hash + mismo context → reuse asset existente, sin duplicar bucket object).
+3. `createPrivatePendingAsset` sube a bucket `greenhouse-private-assets-{env}` con prefijo `finance-reconciliation-evidence/{assetId}/...` y persiste fila en `greenhouse_core.assets` con `retention_class='finance_reconciliation_evidence'`.
+4. UI envía `evidenceAssetId` al endpoint `/api/finance/reconciliation/snapshots`.
+5. `declareReconciliationSnapshot` en una sola transacción: insert snapshot con `evidence_asset_id` FK + `attachAssetToAggregate` (status pending → attached, owner_aggregate_id = snapshotId, owner_aggregate_type = 'finance_reconciliation_evidence').
+
+**Reglas duras**:
+
+- **NUNCA** aceptar `source_evidence_ref` como text libre en flujos nuevos. La columna existe solo para audit histórico pre-TASK-721.
+- **NUNCA** subir directo al bucket público `greenhouse-public-media` para finance evidence. Bucket privado por seguridad (IAM restringida).
+- **NUNCA** persistir `evidence_asset_id` apuntando a un asset que no existe — el FK con `ON DELETE SET NULL` cubre el delete, pero el detector `task721.reconciliationSnapshotsWithBrokenEvidence` flag-ea cualquier inconsistencia.
+- **Permisos**: solo route group `finance` o `efeonce_admin` puede subir `finance_reconciliation_evidence_draft`. NO se acepta member-only.
+- **Dedup**: `findAssetByContentHash` reusa asset existente si SHA-256 + context coinciden y status='pending'. Idempotente — el operador puede re-subir el mismo PDF y NO se duplica.
+- **Reusable**: cuando emerjan loans / factoring / OTB declarations / period closings, agregar nuevos contexts (`finance_loan_evidence_draft`, etc.) al type union + dictionaries en `greenhouse-assets.ts`. El uploader, dedup y detector son transversales.
+
+### Finance — Bank KPI aggregation policy-driven (TASK-720)
+
+Los KPIs del módulo Banco (`Saldo CLP`, `Saldo USD`, `Equivalente CLP`) se computan a partir de la tabla declarativa `greenhouse_finance.instrument_category_kpi_rules`. Cada `instrument_category` (bank_account, fintech, payment_platform, payroll_processor, credit_card, shareholder_account + reservadas employee_wallet, intercompany_loan, factoring_advance, escrow_account) declara cómo contribuye a cada KPI: `contributes_to_cash`, `contributes_to_consolidated_clp`, `contributes_to_net_worth`, `net_worth_sign` (+1 asset / -1 liability), `display_group` (cash / credit / platform_internal).
+
+**Helper canónico**: `aggregateBankKpis(accounts, rules)` en `src/lib/finance/instrument-kpi-rules.ts`. Es la única fuente de los KPIs en `getBankOverview`. Si una cuenta tiene `instrument_category` sin rule → `MissingKpiRuleError` (fail-fast).
+
+**Detector**: `task720.instrumentCategoriesWithoutKpiRule` en `getFinanceLedgerHealth`. Steady state = 0. Si > 0, agregar fila al catálogo antes de activar cuentas en esa categoría.
+
+**FK enforcement**: `accounts.instrument_category` → `instrument_category_kpi_rules.instrument_category`. Cualquier INSERT con categoría unknown falla con FK violation.
+
+**Reglas duras**:
+
+- **NUNCA** sumar `closingBalance` de cuentas Banco inline para computar KPIs. Toda agregación pasa por `aggregateBankKpis`.
+- **NUNCA** activar una cuenta con `instrument_category` que no tenga fila en `instrument_category_kpi_rules`. Agregar la rule primero (1 INSERT con `display_label`, `display_group`, `rationale`).
+- **NUNCA** mezclar asset + liability sin signo en cálculos de Banco. La sign convention TASK-703 está embebida en `net_worth_sign`.
+- Cuando emerja una categoría nueva (wallets, loans, factoring), seed la rule + el detector ledger-health pasa solo. Cero refactor de agregador.
+
+### Finance — OTB cascade-supersede (TASK-703b)
+
+Cuando una cuenta liability/asset necesita re-anclar su Opening Trial Balance (porque el anchor inicial fue mal interpretado, porque emerge bank statement authoritative más reciente, o porque hay phantom pre-OTB data en chain), el mecanismo canónico es **cascade-supersede**.
+
+**Ecuación canónica del anchor**:
+
+- `OTB.genesisDate` = SOD (start of day). `OTB.openingBalance` representa el balance al INICIO del día genesis (= EOD del día anterior).
+- Movements ON `genesisDate` son **post-anchor**, se cuentan en el chain.
+- Movements `< genesisDate` son **pre-anchor**, son cascade-superseded por el OTB.
+
+**Convención de signo para liability** (credit_card, shareholder_account, futuros loans/wallets):
+
+- `closing_balance > 0` = deuda activa con la contraparte = "Cupo utilizado" en bank UI.
+- `closing_balance < 0` = sobrepago / crédito a favor del cliente.
+- `closing = opening + outflows − inflows` (inverso a asset).
+- En UI de credit_card: `consumed = max(0, closingBalance)` (se clampa a 0 porque banco no muestra "deuda negativa", muestra crédito por separado).
+
+**Cómo re-anclar** (patrón reusable):
+
+1. Identificar el bank statement authoritative más reciente (PDF cycle close, cartola con saldo running, OfficeBanking screenshot con timestamp).
+2. Editar `scripts/finance/declare-opening-trial-balances.ts` con: nueva `genesisDate` (SOD), nueva `openingBalance` (= bank reality), `auditStatus='reconciled'`, `evidenceRefs` apuntando al PDF/cartola.
+3. Ejecutar `pnpm finance:declare-otbs`. El helper `declareOpeningTrialBalance` automáticamente:
+   - INSERT new OTB row.
+   - UPDATE old active OTB → `superseded_by = new.obtb_id`.
+   - SQL function `cascade_supersede_pre_otb_transactions` marca settlement_legs/income_payments/expense_payments con `transaction_date < genesisDate` como `superseded_by_otb_id = new.obtb_id` (audit-preserved, anti-DELETE).
+   - DELETE account_balances rows con `balance_date < genesisDate` (proyecciones derivadas, no audit data).
+   - Outbox event `finance.account.opening_trial_balance.declared` con `cascadeCounts`.
+4. Ejecutar `pnpm tsx --require ./scripts/lib/server-only-shim.cjs scripts/finance/rematerialize-account.ts <accountId>` para limpiar y reconstruir el chain desde el nuevo anchor.
+5. Verificar que `account_balances` última row closing ≈ bank reality. Drift residual aceptable < 5-10% suele venir de: refunds pendientes de capturar como income_payment, FX rate diff entre nuestro mid-day y settlement banco, holds bancarios (authorizations no posteadas que reducen disponible pero no deuda).
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** declarar OTB con `openingBalance` cuyo signo no haya sido validado contra la convención liability/asset. Para liability: positivo = deuda (cupo utilizado). Para asset: positivo = saldo a favor (caja). El PDF de tarjeta puede mostrar valores con signo invertido respecto a esta convención (banco usa "saldo adeudado" donde negativo = crédito a favor del cliente).
+- **NUNCA** hardcodear el opening_balance en código. Vive en `account_opening_trial_balance` con `evidenceRefs` apuntando al artefacto bank source-of-truth.
+- **NUNCA** DELETE manual de `account_balances` o `expense_payments` para "limpiar" un chain. Usar `cascade_supersede_pre_otb_transactions` o la declaración de nueva OTB que dispara el cascade automáticamente.
+- **NUNCA** computar "Consumido" / "Cupo utilizado" en UI a partir de `periodOutflows` para cuentas revolving. Use `closingBalance` (running cumulative debt). El periodOutflows es solo "cargos del mes seleccionado" — semánticamente distinto.
+- **NUNCA** filtrar transacciones a mano en queries de finance. Aplicar siempre `superseded_by_payment_id IS NULL AND superseded_by_otb_id IS NULL` (las dos columnas están coordinadas — una es payment-chain, la otra es anchor-chain).
+- Cuando aparezca un nuevo tipo de transaction primitive (ej. `treasury_movement`, `loan_principal_repayment`), **debe nacer con `superseded_by_otb_id`** desde su migration y respetar el cascade pattern.
+
+**Tests** (en TASK-703b followup): paridad TS↔SQL del cascade function (assert idempotency + correct counts), liability sign convention smoke test, OTB supersede chain integrity.
+
+**Spec canónica**: `docs/tasks/complete/TASK-703-canonical-opening-trial-balance-and-liability-accounting.md` (Delta 2026-04-28 sección).
+
+### Finance — Labor allocation consolidada (TASK-709) — invariante anti double-counting
+
+`greenhouse_serving.client_labor_cost_allocation` es una VIEW que emite **1 row por (payroll_entry × client_team_assignment)**. Si en un mismo mes hay múltiples payroll entries para un miembro (e.g. nómina mes anterior + mes corriente posteadas en el mismo mes calendario), la VIEW emite N rows por (member, year, month, client_id) — cada una con la misma `fte_contribution` pero distinto `allocated_labor_clp`.
+
+**Eso es semánticamente válido** para consumers que necesitan granularidad por payroll_entry (e.g. P&L close-period detail, audit del materializer payroll). **Pero es un bug** para consumers comerciales que JOIN-ean con expenses prorrateados — el JOIN multiplica los expenses N veces por la cardinalidad de payroll entries del período.
+
+**Solución canónica**: VIEW consolidada `greenhouse_serving.client_labor_cost_allocation_consolidated` que agrupa por `(period_year, period_month, member_id, client_id)` con `SUM(allocated_labor_clp)` y `MAX(fte_contribution)`. Una row por miembro × cliente × período. Expone `source_payroll_entry_count` para drift detection.
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** JOIN-ar `client_labor_cost_allocation` (cla cruda) con `expenses` o cualquier tabla con `payment_date` para attribution comercial. Eso causa double-counting determinístico cuando hay > 1 payroll entry por (member, period). Usa siempre `client_labor_cost_allocation_consolidated`.
+- **USAR** la cla cruda solo cuando el caso de uso requiere granularidad por payroll_entry (audit, debug, payroll engine internal).
+- **NO** modificar la VIEW cla cruda — rompe consumers que dependen de la granularidad por entry. La consolidación vive en una VIEW separada.
+- **Reliability signal**: VIEW `labor_allocation_saturation_drift` detecta `SUM(fte_contribution) > 1.0` por (member, period) — imposible en realidad. Si emite rows, hay bug en `client_team_assignments` upstream (overlapping assignments mal partitionados por date range). El subsystem `Finance Data Quality` rolls up esta métrica como `labor_allocation_saturation_drift`. Cuando > 0 → status warning + plataforma degradada.
+- Helper TS canónico: `readConsolidatedLaborAllocationForPeriod` y `getLaborAllocationSaturationDrift` en `src/lib/commercial-cost-attribution/labor-allocation-reader.ts`.
+- Tests: 6 tests en `labor-allocation-reader.test.ts` cubren consolidation parsing + drift detection.
+
+**Spec canónica**: migration `20260428110246262_task-709-labor-allocation-uniqueness-and-quality.sql` + migration `20260428110726148_task-709b-v2-attribution-uses-consolidated.sql`. La VIEW `commercial_cost_attribution_v2` (TASK-708) y `member-period-attribution.ts` ambos consumers fueron refactorizados para usar consolidada.
+
+**Caso de prueba real (Sky Airline marzo 2026)**:
+- Pre-fix: `expense_direct_member_via_fte` = $5,122,256 (2x duplicado)
+- Post-fix: `expense_direct_member_via_fte` = $2,561,128 ✓
+- `source_payroll_entry_count` = 2 documenta que cada miembro consolidó 2 entries (nómina febrero + marzo posteadas en marzo)
+
+---
+
+## Invariantes operativos para agentes — Finance reconciliación/CLP/FX/economic-category (TASK-766…929)
+
+> **Relocados de `CLAUDE.md` por TASK-1160 (2026-06-16), verbatim — cero cambio semántico.** Espejo operativo (NUNCA/SIEMPRE) que un agente carga al tocar este dominio; el contrato técnico vive en su spec. Dedup = TASK-1160 Slice 4.
+
+### Finance — reconciliación de income.amount_paid (factoring + withholdings)
+
+Una factura (`greenhouse_finance.income`) puede saldarse por **3 mecanismos** distintos, y `amount_paid` es el total saldado independiente de cuál cerró cada porción:
+
+1. **Pagos en efectivo** → `income_payments.amount`
+2. **Fees de factoring** → `factoring_operations.fee_amount` cuando `status='active'`. La factura ESTÁ saldada por esa porción aunque la fee nunca llegue como cash — se vendió el riesgo AR al factoring provider. (Componente: `interest_amount` + `advisory_fee_amount`).
+3. **Retenciones tributarias** → `income.withholding_amount`. El cliente retuvo parte y la paga al SII directo. La factura ESTÁ saldada por esa porción aunque nunca llegue a Greenhouse.
+
+**Ecuación canónica**:
+
+```text
+amount_paid == SUM(income_payments.amount)
+             + SUM(factoring_operations.fee_amount WHERE status='active')
+             + COALESCE(withholding_amount, 0)
+```
+
+Cualquier diferencia es **`drift`** — un problema real de integridad de ledger que requiere humano.
+
+**Reglas duras**:
+
+- **NUNCA** computar drift como `amount_paid - SUM(income_payments)` solo. Eso ignora factoring + withholdings y produce drift falso para cada factura factorada.
+- **Usar siempre** la VIEW canónica `greenhouse_finance.income_settlement_reconciliation` o el helper `src/lib/finance/income-settlement.ts` (`countIncomesWithSettlementDrift`, `getIncomeSettlementBreakdown`, `listIncomesWithSettlementDrift`).
+- Cuando aparezca un nuevo mecanismo de settlement (notas de crédito, write-offs parciales, retenciones extranjeras, etc.), extender **ambos**: la VIEW (migración nueva con `CREATE OR REPLACE VIEW`) y el helper TypeScript. Nunca branchear la lógica en un consumer.
+- El Reliability Control Plane (`Finance Data Quality > drift de ledger`) lee desde esta VIEW. Bypass = dashboards inconsistentes.
+
+### Finance — Ledger drift detection: superseded exclusion + honest degradation (TASK-929, desde 2026-05-24)
+
+Dos invariantes canónicos descubiertos/canonizados live al remediar `JAVASCRIPT-NEXTJS-4Q`:
+
+**1. La VIEW `income_settlement_reconciliation` DEBE excluir pagos superseded en `payments_total`.** El subquery de pagos filtra `superseded_by_payment_id IS NULL AND superseded_by_otb_id IS NULL AND superseded_at IS NULL` — mirror EXACTO de `fn_recompute_income_amount_paid`. Antes de TASK-929 la VIEW sumaba TODOS los `income_payments` (incluyendo superseded) mientras el `fn` los excluía → **dos definiciones de la misma ecuación desalineadas** → falsos positivos de drift en facturas factorizadas (el pago NUBOX original superseded por el modelo factoring se contaba doble). Con el ledger churning (Nubox re-sync supersede/re-add constante), la VIEW vieja **flickeaba** drift.
+- **NUNCA** modificar `income_settlement_reconciliation` (ni `fn_recompute_income_amount_paid`) sin actualizar el otro en paralelo. Son la MISMA ecuación canónica — settlement = `SUM(pagos activos) + factoring_fee (active) + withholding`. Drift entre ambos = falsos positivos/negativos de drift.
+- **NUNCA** sumar `income_payments` sin filtrar las 3 cadenas de supersede (`superseded_by_payment_id`, `superseded_by_otb_id`, `superseded_at`) cuando el propósito es reconciliación de `amount_paid`.
+
+**2. `getFinanceLedgerHealth` NO debe colapsar un error de query a "0 drift" (false-healthy).** Cada check va envuelto en `tracked(name, promise, fallback)` que registra el check en `degradedChecks: string[]` cuando su query falla. `healthy` exige `degradedChecks` sin ningún check `DECISION_CRITICAL` degradado — no se puede declarar el ledger sano estando ciego a un check. Bug class ISSUE-071 / Pillar 3: verificado live 2026-05-24 (un probe con blip de proxy devolvió `healthy=true` mientras la VIEW tenía 4 drift rows).
+- **NUNCA** envolver un check de `getFinanceLedgerHealth` en `.catch(() => [])` plano. Usar `tracked(...)` para que el fallo sea visible en `degradedChecks`, no silencioso.
+- **NUNCA** agregar un check decision-critical nuevo sin añadirlo al set `DECISION_CRITICAL_CHECKS`. Los checks `*_sample`/informacionales degradados se surfacing pero NO flipean `healthy`.
+- El `driftSignature` del cron ops-worker (`buildFinanceLedgerDriftSignature`) incluye `degradedChecks` → un check degradado cambia la firma y dispara alerta Sentry distinta del drift normal.
+
+**Signal canónico**: `finance.ledger.unresolved_drift_items` (`src/lib/reliability/queries/ledger-unresolved-drift-items.ts`, subsystem Finance Data Quality). Severidad tiered: settlement drift > 0 → `error` (integridad); solo unanchored > 0 → `warning` (data-completeness — los gastos sin FK-anchor que tienen `economic_category` no rompen P&L); ambos 0 → `ok`.
+
+**Inventory read-only** (control surface, NO muta): `getLedgerDriftInventory()` + `pnpm tsx --require ./scripts/lib/server-only-shim.cjs scripts/finance/ledger-drift-inventory.ts`. Clasifica drift por tipo + rutea unanchored por materialidad ($50k CLP default, `LEDGER_DRIFT_UNANCHORED_MATERIALITY_CLP` env). La materialidad gobierna **routing**, NUNCA detección (la VIEW detecta todo a tolerancia 0.01).
+
+**Spec canónica**: `docs/tasks/in-progress/TASK-929-finance-ledger-drift-remediation-control.md`.
+
+### Finance — Unanchored paid expense acknowledgment (TASK-934, desde 2026-05-25)
+
+Un gasto pagado sin FK-anchor (todos `payroll_entry_id`/`tool_catalog_id`/`supplier_id`/`tax_type`/`loan_account_id`/`linked_income_id` NULL) pero CON `economic_category` es **data-completeness, no integridad**. Dos resoluciones canónicas:
+
+- **Anclar** (vendor real, ej. Vercel/Beeconta): reuse del PUT existente `/api/finance/expenses/[id]` con `supplierId`. NO endpoint nuevo.
+- **Aceptar como deuda conocida** (labor a personas — contratistas internacionales, staff interno — + regulatory/bank fees, donde un `supplier_id` sería category error): helper canónico `acknowledgeUnanchoredExpense` (`src/lib/finance/ledger-drift/acknowledge-unanchored.ts`) + `POST /api/admin/finance/expenses/[id]/acknowledge-unanchored` (capability `finance.expenses.acknowledge_unanchored`).
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** modelar la "cola de revisión" de unanchored como tabla-cola paralela con state machine. El acknowledgment vive ON the expense (columnas `unanchored_acknowledged_at/by/reason`), single source of truth — espejo de `dismiss-phantom.ts` (que usa `superseded_at` en la fila). Una tabla-cola duplicaría el estado del expense → sync risk.
+- **NUNCA** usar las columnas `unanchored_acknowledged_*` para VOID/supersede. El gasto se queda íntegro en P&L; acknowledgment solo registra "aceptado, clasificado por economic_category, sin supplier apropiado". NO confundir con `dismiss-phantom` (que sí anula un payment phantom).
+- **NUNCA** acknowledgear un gasto que tenga cualquier FK-anchor o que no esté `paid`. El helper hace guards defensivos (throw 422 `ACKNOWLEDGE_ALREADY_ANCHORED` / `ACKNOWLEDGE_NOT_PAID`).
+- **NUNCA** mutar `unanchored_acknowledged_*` por SQL directo. Toda aceptación pasa por `acknowledgeUnanchoredExpense` (idempotente, reason >= 10 chars, outbox `finance.expense.unanchored_acknowledged v1`).
+- **SIEMPRE** que un consumer lea "unanchored pendiente" (health/inventory/signal), filtrar `AND unanchored_acknowledged_at IS NULL`. Los acknowledged se exponen separados (`acknowledgedDebt` en health, sección `acknowledged` en inventory) — SUM-of-unadjusted, visible pero fuera de pendientes; NO afectan `healthy`.
+
+**Spec canónica**: `docs/tasks/in-progress/TASK-934-unanchored-paid-expense-anchoring-review-queue.md`. Capability: `finance.expenses.acknowledge_unanchored` (FINANCE_ADMIN + EFEONCE_ADMIN). Evento: `finance.expense.unanchored_acknowledged v1`.
+
+### Finance — FX P&L canónico para tesorería (Banco "Resultado cambiario")
+
+El "Resultado cambiario" del Banco se compone de **3 fuentes legítimas** y debe leerse SIEMPRE desde la VIEW canónica + helper, no re-derivar:
+
+1. **Realized FX en settlement** — diferencia entre rate documento (issuance) y rate pago para invoices/expenses no-CLP. Persistido en `income_payments.fx_gain_loss_clp` + `expense_payments.fx_gain_loss_clp`, agregado por día en `account_balances.fx_gain_loss_realized_clp`.
+2. **Translation FX** — revaluación mark-to-market diaria de saldos no-CLP cuando se mueve el tipo de cambio. Computado en `materializeAccountBalance` como `closing_balance_clp − previous_closing_balance_clp − (period_inflows − period_outflows) × rate_today`. Persistido en `account_balances.fx_gain_loss_translation_clp`.
+3. **Realized FX en transferencias internas** — placeholder = 0 hoy. Se activa cuando una TASK derivada introduzca `greenhouse_finance.internal_transfers` con rate spread vs mercado.
+
+**Read API canónico**: VIEW `greenhouse_finance.fx_pnl_breakdown` + helper `src/lib/finance/fx-pnl.ts` (`getBankFxPnlBreakdown`).
+
+**UI honesta — NO mostrar `$0` silencioso**: la card debe distinguir tres estados:
+- `hasExposure === false` → "Sin exposición FX" con stat `—` (caso Efeonce hoy: 100% CLP)
+- `hasExposure && !isDegraded` → total + breakdown "Realizado X · Translación Y" + tooltip canónico
+- `isDegraded === true` → "Pendiente" + warning rojo (rate ausente para alguna cuenta no-CLP)
+
+**Reglas duras**:
+
+- **NUNCA** sumar FX P&L desde `income_payments`/`expense_payments` directo en un nuevo query. Toda lectura cruza la VIEW o el helper.
+- **NUNCA** dejar `$0` literal cuando `hasExposure === false`. Es un cero ambiguo que confunde "sin exposición" con "cálculo roto".
+- **NUNCA** branchear la ecuación en un consumer. Cuando aparezca una fuente nueva (notas de crédito en moneda extranjera, forward contracts, etc.), extender **ambos**: la VIEW (migración con `CREATE OR REPLACE VIEW`) y el helper TS.
+- **NUNCA** loggear silenciosamente cuando `resolveExchangeRateToClp` falla. Usar `captureWithDomain(err, 'finance', { tags: { source: 'fx_pnl_translation' } })` y degradar a `translation = 0` — degradación honesta, nunca bloquear la materialización del snapshot diario.
+- Patrón canónico replicado de `income_settlement_reconciliation` (TASK-571 / TASK-699). Cuando se necesite "una columna compuesta de N mecanismos legítimos", aplicar este shape: VIEW + helper TS + comments anti re-derive + UI con estados honestos.
+
+### Finance — CLP currency reader invariants (TASK-766)
+
+Toda lectura de `expense_payments` o `income_payments` que necesite saldos en CLP **debe** ir por la VIEW canónica + helper TS. NUNCA recomputar `monto_clp = ep.amount × exchange_rate_to_clp` en SQL embebido.
+
+**Por qué**: el campo `exchange_rate_to_clp` vive en el documento original (`expenses` / `income`). Cuando un expense en USD se paga en CLP (caso CCA shareholder reimbursable TASK-714c), multiplicar el monto CLP nativo del payment por el rate USD del documento infla los KPIs en mil millones por payment. Incidente real 2026-05-02: `/finance/cash-out` mostraba $1.017.803.262 vs real $11.546.493 (88× inflado), todo por **un** payment HubSpot CCA.
+
+**Read API canónico**:
+- VIEW: `greenhouse_finance.expense_payments_normalized` y `greenhouse_finance.income_payments_normalized`. Exponen `payment_amount_clp` (COALESCE chain: `amount_clp` first → CLP-trivial fallback `WHEN currency='CLP' THEN amount` → `NULL` + `has_clp_drift=TRUE`). Aplican filtro 3-axis supersede inline.
+- Helpers TS: `src/lib/finance/expense-payments-reader.ts` y `src/lib/finance/income-payments-reader.ts`.
+  - `sumExpensePaymentsClpForPeriod({fromDate, toDate, expenseType?, supplierId?, isReconciled?})` → `{totalClp, totalPayments, unreconciledCount, supplierClp, payrollClp, fiscalClp, driftCount}`
+  - `sumIncomePaymentsClpForPeriod({fromDate, toDate, clientProfileId?, isReconciled?})` → `{totalClp, totalPayments, unreconciledCount, driftCount}`
+  - `listExpensePaymentsNormalized({...})` y `listIncomePaymentsNormalized({...})` para detalle paginado
+  - `getExpensePaymentsClpDriftCount()` y `getIncomePaymentsClpDriftCount()` para reliability signals
+
+**Backfill + drift defense (Slice 2)**:
+- `expense_payments` y `income_payments` tienen columna `requires_fx_repair BOOLEAN` que marca filas con `currency != 'CLP' AND amount_clp IS NULL`.
+- CHECK constraint `payments_amount_clp_required_after_cutover` (NOT VALID + VALIDATE atomic, mirror del patrón TASK-708/728 con cutover 2026-05-03): rechaza INSERT/UPDATE post-cutover sin `amount_clp` para non-CLP, salvo supersede activo.
+- Reliability signals canónicos: `finance.expense_payments.clp_drift` + `finance.income_payments.clp_drift` (kind=drift, severity=error si count>0, steady=0). Subsystem rollup: `Finance Data Quality`.
+
+**Lint rule mecánica (Slice 3)**:
+- `eslint-plugins/greenhouse/rules/no-untokenized-fx-math.mjs` modo `error`. Detecta SQL embedido con 4 patrones (expense + income, con/sin COALESCE) — `ep.amount * exchange_rate_to_clp`, `ep.amount * COALESCE(e.exchange_rate_to_clp, 1)`, idem `ip.amount`. Bloquea el commit.
+- Override block en `eslint.config.mjs` exime los readers canónicos (`src/lib/finance/expense-payments-reader.ts`, `src/lib/finance/income-payments-reader.ts`) — son la única fuente legítima de la VIEW.
+
+**Repair admin endpoint (Slice 5)**:
+- `POST /api/admin/finance/payments-clp-repair` (capability `finance.payments.repair_clp`, FINANCE_ADMIN + EFEONCE_ADMIN). Body: `{kind: 'expense_payments'|'income_payments', paymentIds?, fromDate?, toDate?, batchSize?, dryRun?}`. Resuelve rate histórico al `payment_date` desde `greenhouse_finance.exchange_rates` (rate vigente al pago, NO el actual) y poblá `amount_clp + exchange_rate_at_payment + requires_fx_repair=FALSE` per-row atomic. Idempotente. Outbox audit `finance.payments.clp_repaired` v1.
+
+**⚠️ Reglas duras**:
+- **NUNCA** escribir `SUM(ep.amount * exchange_rate_to_clp)`, `SUM(ep.amount * COALESCE(e.exchange_rate_to_clp, 1))` ni variantes con `ip.amount`. Lint rule `greenhouse/no-untokenized-fx-math` rompe build.
+- **NUNCA** sumar `payment.amount` directo y luego multiplicar por rate del documento en código TS — el rate del documento puede ser de issuance USD pero el payment puede ser CLP nativo. La VIEW resuelve esto correctamente.
+- **NUNCA** crear un nuevo callsite de KPIs CLP sin pasar por `sumExpensePaymentsClpForPeriod` / `sumIncomePaymentsClpForPeriod`. Si el caso de uso pide breakdown nuevo (e.g. por supplier_id), extender el helper, NO duplicar SQL.
+- **NUNCA** ignorar `driftCount` en surfaces que ya lo exponen. UI debe banner anomalies cuando `driftCount > 0` para que el operador invoque `/api/admin/finance/payments-clp-repair`.
+- **NUNCA** hacer DELETE manual de filas con `requires_fx_repair=TRUE` para "limpiar" el dashboard. Usar el endpoint de repair (idempotente, audit trail completo).
+- **NUNCA** modificar la VIEW sin actualizar también: helpers TS, tests anti-regresión KPI, lint rule (si emerge un nuevo anti-patrón), reliability signals.
+- Cuando emerja una nueva primitiva de payment (e.g. `treasury_movement`, `intercompany_transfer`), debe nacer con `amount_clp` desde el INSERT (la helper canónica `recordExpensePayment` / `recordIncomePayment` ya resuelven rate histórico al insert) y CHECK constraint anti-NULL desde el day-1.
+
+**Spec canónica**: `docs/tasks/complete/TASK-766-finance-clp-currency-reader-contract.md`. Replica los patrones de TASK-571 (settlement reconciliation), TASK-699 (FX P&L breakdown), TASK-721 (canonical helper enforcement), TASK-708/728 (CHECK NOT VALID + VALIDATE atomic).
+
+### Finance — Account balances FX consistency (TASK-774, extiende TASK-766)
+
+`materializeAccountBalance` (`src/lib/finance/account-balances.ts`) **debe** consumir las VIEWs canónicas TASK-766 (`expense_payments_normalized`, `income_payments_normalized`) + COALESCE(`settlement_legs.amount_clp`, ...) para computar `period_inflows`/`period_outflows`. NUNCA `SUM(payment.amount)` directo.
+
+**Por qué**: bug Figma EXP-202604-008 (2026-05-03). Payment USD $92.9 desde TC Santander Corp (cuenta CLP) sumaba +$92.9 nativo en lugar de +$83,773.5 CLP equivalente. Mismo anti-patrón sistémico que TASK-766 cerró para cash-out KPIs, quedó vivo en path account_balances.
+
+**Read API canónico** (extiende TASK-766):
+
+- En `getDailyMovementSummary` (helper privado del materializer):
+  - `income_payments`: lee `income_payments_normalized.payment_amount_clp` (VIEW canónica TASK-766).
+  - `expense_payments`: lee `expense_payments_normalized.payment_amount_clp` (VIEW canónica TASK-766).
+  - `settlement_legs`: COALESCE inline `COALESCE(sl.amount_clp, CASE WHEN sl.currency = 'CLP' THEN sl.amount END)`. Settlement_legs no tiene VIEW propia (1 callsite, YAGNI; promover a VIEW si emerge segundo callsite).
+- Toda agregación SUM se hace sobre el alias resultante del subselect (`SUM(amount)`), NO sobre `SUM(ep.amount)` / `SUM(ip.amount)` / `SUM(sl.amount)` directo.
+
+**Reliability signal canónico**:
+
+- `finance.account_balances.fx_drift` (kind=`drift`, severity=`error` si count>0, steady=0). Recompute expected delta desde VIEWs canónicas + COALESCE settlement_legs y compara contra persisted (`period_inflows - period_outflows`). Tolerancia $1 CLP (anti FP-noise). Ventana 90 días. Reader: `src/lib/reliability/queries/account-balances-fx-drift.ts`. Subsystem rollup: `Finance Data Quality`.
+
+**Lint rule mecánica** (extiende TASK-766):
+
+- `eslint-plugins/greenhouse/rules/no-untokenized-fx-math.mjs` modo `error`. Nuevos patrones TASK-774:
+  - `SUM(ep.amount)` → usar `payment_amount_clp` via `expense_payments_normalized`
+  - `SUM(ip.amount)` → usar `payment_amount_clp` via `income_payments_normalized`
+  - `SUM(sl.amount)` → usar `COALESCE(sl.amount_clp, CASE WHEN currency='CLP' THEN amount END)`
+
+**Backfill defensivo**:
+
+- Cron diario `ops-finance-rematerialize-balances` rematerializa últimos 7 días automáticamente — el fix se propaga sin script para casos recientes (incluye Figma 2026-05-03).
+- Para histórico > 7 días: `pnpm tsx --require ./scripts/lib/server-only-shim.cjs scripts/finance/backfill-account-balances-fx-fix.ts --account-id=<id> --from-date=<YYYY-MM-DD>` (idempotente, dry-run mode).
+
+**⚠️ Reglas duras** (sumadas a las de TASK-766):
+
+- **NUNCA** leer `expense_payments` / `income_payments` directo en `account-balances.ts` ni en cualquier materializer downstream. Use VIEWs canónicas TASK-766.
+- **NUNCA** sumar `settlement_legs.amount` sin COALESCE con `amount_clp`. Settlement_legs tiene columna `amount_clp` opcional desde migration `20260408103211338`.
+- **NUNCA** crear materializer nuevo (e.g. `account_balances_monthly`, `treasury_position`, `cashflow_summary`) sin pasar por estas VIEWs. Si emerge necesidad de nueva VIEW (ej. `treasury_movements_normalized` para una nueva primitiva), aplicar el mismo patrón TASK-766 (CTE COALESCE + filtro 3-axis supersede inline + `payment_amount_clp` column).
+- Cuando emerja un nuevo callsite que necesite CLP-equivalent, agregar a la VIEW canónica un campo nuevo (e.g. `payment_amount_clp_excluding_fx_gain`) — NO recompute inline.
+
+**Spec canónica**: `docs/tasks/complete/TASK-774-account-balance-clp-native-reader-contract.md`. Patrón aplicado al path account_balances después de TASK-766 que cubrió cash-out.
+
+### Finance — Rolling rematerialize anchor contract (TASK-871, supersedes ISSUE-069, 2026-05-13)
+
+Todo callsite que invoque `rematerializeAccountBalanceRange` desde un cron rolling o el remediation control plane **debe** pasar por las dos primitives canónicas:
+
+1. `computeRollingRematerializationWindow(today, lookbackDays)` → `{ targetStartDate, seedDate, materializeStartDate, materializeEndDate, lookbackDays, policy: 'rolling_window_repair' }` ([services/ops-worker/finance-rematerialize-seed.ts](services/ops-worker/finance-rematerialize-seed.ts)).
+2. `resolveCleanSeedDate({ client, accountId, candidateSeedDate, maxExpandDays=30 })` → `{ ok: true, cleanSeed, ... }` o `{ ok: false, reason: 'exceeded_max_expand', ... }` ([src/lib/finance/account-balances-clean-seed-resolver.ts](src/lib/finance/account-balances-clean-seed-resolver.ts)).
+
+**Por qué**: el contrato canónico de `rematerializeAccountBalanceRange` ([src/lib/finance/account-balances-rematerialize.ts:258](src/lib/finance/account-balances-rematerialize.ts#L258)) **NO materializa el día seed** — itera desde `seedDate + 1`. El día seed se inserta como ancla muda para preservar reconciliation snapshots TASK-721 y respetar el OTB anchor TASK-703.
+
+**Bug class** (ISSUE-069 partial → TASK-871 complete): el fix de ISSUE-069 cambió `today − lookbackDays` → `today − (lookbackDays + 1)`, moviendo el día ciego un día atrás pero NO eliminando la clase estructural. Si en el `seedDate` resultante existen movements canonicos (`settlement_legs`, `income_payments_normalized`, `expense_payments_normalized`), esos movements quedan invisibles. La clase recurrió el 2026-05-13 con 3 cuentas afectadas en `2026-05-05`.
+
+**Fix canónico** (TASK-871, defense-in-depth):
+
+- El cron handler (services/ops-worker/server.ts) compone window + integrity check per-account:
+  - Si protected snapshot en window → anchor on it (skip integrity check; operator-accepted closing IS truth).
+  - Si no → `resolveCleanSeedDate(window.seedDate)`. Walks backward hasta clean anchor o devuelve `exceeded_max_expand` para escalar.
+- El remediator (`src/lib/finance/account-balances-fx-drift-remediation.ts`) tiene 5to policy value `rolling_window_repair`:
+  - classifier: matches seed-blind-spot signature + open period + no protected snapshot en día exacto → `auto_remediable, reason='rolling_window_repair_eligible'`.
+  - executor: `seedMode='explicit'` (preserves OTB cache) + `evidenceGuard='block_on_reconciled_drift'` (canonical, no restate over reconciled).
+- `computeRematerializeSeedDate` permanece como wrapper back-compat que devuelve `window.seedDate` — tests ISSUE-069 siguen verdes.
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** pasar a `rematerializeAccountBalanceRange` un `seedDate` que tenga `settlement_legs` / `income_payments_normalized` / `expense_payments_normalized` con `transaction_date = seedDate`. La primitive seed = ancla muda; movements ahí desaparecen del materialized. El integrity check `resolveCleanSeedDate` es la única forma canónica de garantizarlo.
+- **NUNCA** modificar el contrato de `rematerializeAccountBalanceRange` (seed no se materializa). Es load-bearing para reconciliation snapshots TASK-721 + OTB anchor TASK-703.
+- **NUNCA** (TASK-938) materializar `account_balances` con `balance_date < genesis_date` del OTB activo de la cuenta. El `rematerializeAccountBalanceRange` aplica un **genesis floor** vía `applyGenesisFloor` (pura): si el seed resuelto cae antes del genesis, clampea al genesis + opening del OTB. Sin ese floor, un rematerialize en modo `explicit` seedeado < genesis re-crea filas pre-anchor que el cascade TASK-703b prunea (regresión real: global66-clp quedó con filas stale 03-06/04-04 re-creadas ~22h después del cascade). Cualquier callsite nuevo que invoque el rematerializer hereda el floor — NO lo bypasees. Espejo en el detector: `finance.account_balances.fx_drift` ignora fechas `< genesis` (son pre-anchor; el OTB las absorbe), evitando drift artificial. Si emerge necesidad de limpiar filas pre-genesis stale ya existentes, hacerlo vía `cascade_supersede_pre_otb_transactions` (gated, dry-run, ojo con transferencias internas que superseden un solo lado) — NUNCA con DELETE manual.
+- **NUNCA** modificar `computeRollingRematerializationWindow` para devolver `seedDate = targetStartDate`. El contracto `seedDate = materializeStartDate − 1` es invariante canónico.
+- **NUNCA** usar `seedMode='active_otb'` en un cron rolling. Mutaría `accounts.opening_balance` cache para drift transitorio. Reservado para audited backfills / full replays.
+- **NUNCA** usar `evidenceGuard: 'warn_only'` en rolling repair. `warn_only` se reserva para `known_bug_class_restatement` con intent operador explícito.
+- **NUNCA** silenciar el escalation cuando `resolveCleanSeedDate` devuelve `ok=false`. El caller DEBE emitir `captureWithDomain('finance', ...)` + skip + permitir escalación humana a `historical_restatement`.
+- **NUNCA** crear nuevo callsite que invoque rematerialize sin pasar por las dos primitives. Si emerge un cron nuevo (e.g. `rematerialize-monthly-balances`), extender o componer las primitives; nunca duplicar date math inline.
+- **NUNCA** modificar el SQL de `resolveCleanSeedDate` para reducir scope sin extender el reliability signal `finance.account_balances.fx_drift` en paralelo. Drift detection y prevention deben moverse juntos.
+- **SIEMPRE** que emerja un nuevo movement primitive (e.g. `treasury_movement`, `intercompany_transfer`, `factoring_leg`), debe ser detectado por `resolveCleanSeedDate` — extender el SQL del helper, NO duplicar lógica inline.
+- **SIEMPRE** que se modifique el state machine del rolling repair (window primitive, resolver, classifier, executor), correr el test suite anti-regresión `services/ops-worker/finance-rematerialize-invariants.test.ts` (4 invariantes pin-eados: shape, cleanSeed semantics, escalation, composition).
+
+**Helpers canónicos**:
+
+- Window: [services/ops-worker/finance-rematerialize-seed.ts](services/ops-worker/finance-rematerialize-seed.ts)
+- Integrity check: [src/lib/finance/account-balances-clean-seed-resolver.ts](src/lib/finance/account-balances-clean-seed-resolver.ts)
+- Remediation policy: [src/lib/finance/account-balances-fx-drift-remediation.ts](src/lib/finance/account-balances-fx-drift-remediation.ts) (`rolling_window_repair` value)
+- Cron handler wire-up: [services/ops-worker/server.ts](services/ops-worker/server.ts) `handleFinanceRematerializeBalances`
+
+**Tests anti-regresión**:
+
+- [services/ops-worker/finance-rematerialize-seed.test.ts](services/ops-worker/finance-rematerialize-seed.test.ts) (20 tests: shape, invariants, edge cases, back-compat)
+- [src/lib/finance/account-balances-clean-seed-resolver.test.ts](src/lib/finance/account-balances-clean-seed-resolver.test.ts) (11 tests: clean/dirty days, max expand, incident shape)
+- [src/lib/finance/account-balances-fx-drift-remediation.test.ts](src/lib/finance/account-balances-fx-drift-remediation.test.ts) (6 new tests: classify, executor, telemetry, skip)
+- [services/ops-worker/finance-rematerialize-invariants.test.ts](services/ops-worker/finance-rematerialize-invariants.test.ts) (7 tests: 4 structural invariants + 30-iter property check)
+
+**Diagnostic operator tool**: [scripts/finance/diagnose-fx-drift.ts](scripts/finance/diagnose-fx-drift.ts) — lista detalle por (account, fecha) con drift activo. Útil para verificar qué cuentas necesitan recovery antes de invocar el remediator con policy=`rolling_window_repair`.
+
+**Spec canónica**: `docs/tasks/complete/TASK-871-account-balance-rolling-anchor-contract.md`. Predecesor (parcial): `docs/issues/resolved/ISSUE-069-finance-cron-rematerialize-seed-day-blind-spot.md` (actualizado 2026-05-13 con nota "fix parcial; TASK-871 cierra contrato completo").
+
+### Finance — Account drawer temporal modes contract (TASK-776)
+
+Todo drawer/dashboard de finance que muestre agregaciones temporales DEBE declarar `temporalMode: 'snapshot' | 'period' | 'audit'` (declarado en `instrument-presentation.ts` per categoría) y resolver su ventana via helper canónico `resolveTemporalWindow`. NUNCA calcular `fromDate`/`toDate` inline en consumers.
+
+**Por qué**: el `AccountDetailDrawer` mezclaba 4 surfaces con 4 ventanas temporales independientes sin contract declarado (KPIs acumulados + chart 12m + lista filtrada por mes + banner OTB). Caso real 2026-05-03: balance Santander Corp $1.225.047 correcto post-fix TASK-774, pero lista "Movimientos" vacía porque filtraba Mayo 2026 mientras el cargo Figma fue 29/04. Operador veía "balance bajó pero no veo el cargo" → confusión + ticket.
+
+**Contract canónico** (`src/lib/finance/instrument-presentation.ts` + `src/lib/finance/temporal-window.ts`):
+
+- `TemporalMode = 'snapshot' | 'period' | 'audit'` enum cerrado.
+- `TemporalDefaults = { mode: TemporalMode; windowDays?: number }` declarado per profile.
+- Helper `resolveTemporalWindow({mode, year?, month?, anchorDate?, windowDays?, today?})` retorna `{fromDate, toDate, modeResolved, label, spanDays}`.
+- Degradación honesta: input incompleto (e.g. `mode='period'` sin year/month) cae a snapshot, NO throw silente.
+
+**Defaults declarativos por categoría**:
+
+- `bank_account` / `credit_card` / `fintech` → `snapshot` (windowDays=30) — caso de uso "qué pasa hoy".
+- `shareholder_account` (CCA) → `audit` — auditoría completa desde anchor.
+- `processor_transit` (Deel/Stripe/etc.) → `period` — cierre mensual comisiones.
+
+**Endpoint** `/api/finance/bank/[accountId]`:
+
+- Query params: `?mode=snapshot|period|audit&windowDays=30&year=2026&month=5&anchorDate=2026-04-07`. Todos opcionales.
+- Backward compat 100%: si solo viene `year+month` sin `mode`, comportamiento legacy intacto (`mode='period'` implícito).
+- Response incluye `movementsWindow: {fromDate, toDate, mode, label}` para chip header del drawer.
+
+**Drawer**:
+
+- Selector inline `ToggleButtonGroup` con 3 modos (Reciente | Período | Histórico) + tooltips MUI.
+- Chip header: "Mostrando: Últimos 30 días" / "Mostrando: Mayo 2026" / "Mostrando: Desde 07/04/2026".
+- Banner OTB condicional: SOLO en `mode='audit'` o `'period'` pre-anchor. En `'snapshot'` sin movimientos, hint para cambiar a Histórico.
+- `useEffect` resetea `temporalMode` cuando cambia `accountId` (nueva cuenta hereda su default declarativo via primera carga sin override).
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** calcular `fromDate`/`toDate` inline en un drawer/dashboard de finance. Toda resolución pasa por `resolveTemporalWindow`.
+- **NUNCA** mezclar modos en surfaces del mismo render (e.g. KPIs `period` + lista `snapshot` simultáneamente). Los 3 modos son atómicos por surface temporal.
+- **NUNCA** crear un drawer/dashboard nuevo de finance que muestre agregaciones temporales sin declarar `temporalDefaults` en su `InstrumentDetailProfile`. Default fallback `period` (legacy) solo cubre back-compat — explicitar siempre.
+- **NUNCA** hardcodear el `mode` en el componente UI. Default viene del profile (declarativo, extensible). Operator override via selector inline.
+- Cuando emerja un nuevo modo (`quarter`, `ytd`, `last_n_months`), agregar al enum `TemporalMode` + extender helper. NO branchear en consumers.
+
+**Spec canónica**: `docs/tasks/in-progress/TASK-776-account-detail-drawer-temporal-modes-contract.md`. Doc funcional: `docs/documentation/finance/drawer-vista-temporal.md`.
+
+### Finance — Economic Category Dimension Invariants (TASK-768)
+
+**`expense_type` y `income_type` son taxonomía FISCAL/SII** (legacy `accounting_type` alias). Para análisis económico (KPIs, ICO, P&L gerencial, Member Loaded Cost, Budget Engine, Cost Attribution) se usa la dimension separada **`economic_category`** persistida en `greenhouse_finance.expenses.economic_category` y `income.economic_category`.
+
+**Por qué**: el bank reconciler defaultea `expense_type='supplier'` cuando crea expenses desde transacciones bancarias sin metadata rica. Eso sesga KPIs Nómina/Proveedores en mil-millones cuando un payment económicamente-payroll cae en bucket fiscal-supplier (caso real abril 2026: ~$3M en pagos a Daniela España, Andrés Colombia, Valentina, Humberly, Previred clasificados como Proveedor cuando económicamente son Nómina).
+
+**Decision tree para nuevo código**:
+
+- ¿Es lectura para SII / VAT / IVA / regulatory? → usa `expense_type` / `income_type`.
+- ¿Es lectura para KPIs / dashboards / P&L gerencial / ICO / cost attribution? → usa `economic_category`.
+
+**API canónico**:
+
+- VIEW `expense_payments_normalized` y `income_payments_normalized` (TASK-766 + TASK-768 extendidas) exponen ambas dimensiones via JOIN.
+- Helpers `sumExpensePaymentsClpForPeriod` / `sumIncomePaymentsClpForPeriod` retornan `byEconomicCategory` breakdown (11 keys expense, 8 keys income) + `economicCategoryUnresolvedCount` + campos legacy preservados (backwards-compat TASK-766).
+- Resolver canónico `resolveExpenseEconomicCategory(...)` / `resolveIncomeEconomicCategory(...)` (`src/lib/finance/economic-category/resolver.ts`) — único helper que mapea inputs a categoría con rules engine declarativo.
+- Reclassification endpoints: `PATCH /api/admin/finance/expenses/[id]/economic-category` + mirror income (capability granular `finance.expenses.reclassify_economic_category` / `finance.income.reclassify_economic_category`, FINANCE_ADMIN + EFEONCE_ADMIN, audit log + outbox `finance.expense.economic_category_changed` v1).
+- Manual queue: `greenhouse_finance.economic_category_manual_queue` para filas con confidence low/manual_required pendientes de operador.
+- Audit log append-only: `economic_category_resolution_log` (trigger anti-update/delete).
+
+**Defensa-en-profundidad**:
+
+- Trigger PG `populate_expense_economic_category_default_trigger` BEFORE INSERT — poblar default desde transparent map de `expense_type` (cero invasivo a 12 canonical writers existentes).
+- Trigger mirror `populate_income_economic_category_default_trigger`.
+- CHECK constraint `expenses_economic_category_required_after_cutover` (NOT VALID; VALIDATE post-resolución manual queue).
+- CHECK constraint `expenses_economic_category_canonical_values` (VALIDATED — 11 valores enumerados; 8 income).
+- Lint rule `greenhouse/no-untokenized-expense-type-for-analytics` modo `error` — bloquea `e.expense_type =`, `GROUP BY e.expense_type`, `FILTER (WHERE i.income_type ...)` en código nuevo. Override block exime SII/VAT/operacional/resolver.
+- Reliability signals canónicos: `finance.expenses.economic_category_unresolved` + `finance.income.economic_category_unresolved` (kind=drift, severity=error si count>0, steady=0 post-cleanup, subsystem `finance_data_quality`).
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** filtres/agrupes por `expense_type` / `income_type` en consumers analíticos. Lint rule rompe build.
+- **NUNCA** modifiques `expense_type` legacy histórico — está reservado para SII/VAT y blast radius enorme.
+- **NUNCA** poblar `economic_category` con string libre — solo valores del enum canónico (CHECK constraint `canonical_values` lo bloquea).
+- **NUNCA** computes `economic_category` en read-time (lente derivada). Es columna persistida; consumers la leen directo.
+- **NUNCA** bypass del resolver canónico. Si emerge un nuevo path de payments (ej. wallets, intercompany), debe llamar `resolveExpenseEconomicCategory` / `resolveIncomeEconomicCategory` o agregar regla nueva al rules engine.
+- Cuando emerja un nuevo proveedor regulador chileno (otra Isapre, AFP nueva) o vendor de payroll internacional (Multiplier++, etc.), agregar fila a `greenhouse_finance.known_regulators` o `known_payroll_vendors` (seed declarativo) — NO código nuevo.
+
+**Spec canónica**: `docs/tasks/complete/TASK-768-finance-expense-economic-category-dimension.md`. Patrones reusados: TASK-571/699/721/708/728/766 (mismo shape: VIEW canónica + helper + reliability + lint + CHECK + trigger).
+
+### Finance — Reactive projections en lugar de sync inline a BQ (TASK-771)
+
+Post-cutover PG-first, **toda proyección a BigQuery debe correr async vía consumer reactivo del outbox**, NUNCA inline en el request handler. La regla canónica es:
+
+```text
+tx PG (write + emit outbox event)  →  outbox event        →  reactive consumer (ops-worker)
+        ↓ commitea atómico                ↓ pending             ↓ cron 5 min Cloud Scheduler
+        respond 201/200 al cliente        ↓ published           MERGE BQ idempotente
+                                                                retry+dead-letter automático
+                                                                reliability signal cubre drift
+```
+
+**Por qué**: el incidente 2026-05-03 ("Error al crear proveedor" silencioso) ocurrió porque `syncProviderFromFinanceSupplier` ([src/lib/providers/canonical.ts](../src/lib/providers/canonical.ts)) ejecutaba MERGE BQ + UPDATE BQ + DDL inline en el POST/PUT supplier handler. Cualquier falla BQ devolvía 500 al cliente aunque PG ya hubiese commiteado, dejando 3 suppliers persistidos silenciosamente sin que el operador lo supiera (figma-inc, microsoft-inc, notion-inc).
+
+**Helpers canónicos**:
+
+- **Projection registration**: `registerProjection(...)` en `src/lib/sync/projections/index.ts`. Cada projection es un `ProjectionDefinition` ([src/lib/sync/projection-registry.ts](../src/lib/sync/projection-registry.ts)) con `triggerEvents`, `extractScope`, `refresh`, `maxRetries`. El dispatcher V2 (`src/lib/sync/reactive-consumer.ts`) hace el fetch/grouping/dead-letter/circuit-breaker automáticamente.
+- **Re-leer de PG en `refresh`**: NUNCA confiar en payload del outbox event como source of truth. Usar el `entityId` del scope para re-leer la fila desde su tabla canónica (e.g. `getFinanceSupplierFromPostgres(entityId)`). Esto garantiza consistencia ante updates posteriores al evento o backfills con payloads stale.
+- **Idempotencia**: el `refresh` debe ser safe re-run. MERGE por PK natural + UPDATE filtrado con `COALESCE diff` son los patrones más comunes.
+- **Reliability signal**: cada projection crítica debe tener su signal `dead_letter` en `src/lib/reliability/queries/<projection>-dead-letter.ts` (clonar de `provider-bq-sync-dead-letter.ts` o `payment-orders-dead-letter.ts`). Wire-up en `get-reliability-overview.ts`. Steady=0; >0 indica que la projection está en dead-letter y un consumer downstream verá datos stale.
+- **Backfill script one-shot**: `scripts/finance/backfill-<projection>.ts` (clonar de `scripts/finance/backfill-provider-bq-sync.ts`) para recovery manual. Idempotente. NO se corre LIVE desde local; el ops-worker auto-drena post-deploy.
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** ejecutar `bigQuery.query({MERGE INTO ...})`, `UPDATE`, o `INSERT` BigQuery dentro de un route handler `route.ts`. La proyección va a una projection registrada.
+- **NUNCA** llamar `ensureFinanceInfrastructure()` / `ensureAiToolingInfrastructure()` desde un route handler en hot path. Bootstrap BQ vive en startup del worker o en migration explícita BigQuery.
+- **NUNCA** propagar una falla BQ como 500 cuando la primary store (PG) commiteó. Si BQ falla y la operación es síncrona inevitable, envolver en try/catch + `captureWithDomain(err, 'finance', { tags: { source: '<sync_name>', stage: '<...>' } })` y devolver el response basado en datos PG.
+- **NUNCA** usar `Sentry.captureException()` directo en code paths con dominio claro. Usar `captureWithDomain(err, '<domain>', ...)` desde `src/lib/observability/capture.ts` para que reliability dashboards roleen el incidente al subsystem correcto.
+- Cuando emerja una nueva proyección downstream (Snowflake mart, search index, AI tooling cache, etc.), debe nacer como `ProjectionDefinition` consumiendo el outbox event relevante. NUNCA acoplada al request path.
+- El BQ-fallback path en finance routes (cuando PG está caído) sí puede mantener sync inline porque ahí el outbox no es accesible — pero envuelto en try/catch para no bloquear el response degraded.
+
+**Spec canónica**: `docs/tasks/complete/TASK-771-finance-supplier-write-decoupling-bq-projection.md`. Patrón reusable end-to-end: para futuras projections finance, clonar la estructura de `provider_bq_sync` (projection + reliability signal + backfill script).
+
+### Finance — Expense display contract (TASK-772)
+
+Toda lectura de `greenhouse_finance.expenses` que vaya a UI o exports **debe** consumir el contract canónico extendido de `FinanceExpenseRecord`. Resuelve identidad del proveedor, fecha de orden y monto pendiente sin que el consumer tenga que recomputar joins ni semántica financiera.
+
+**Campos derivados canónicos** (resueltos server-side via LEFT JOIN suppliers + LEFT JOIN LATERAL aggregate desde VIEW canónica TASK-766 `expense_payments_normalized`):
+
+- **`supplierDisplayName`** — `COALESCE(NULLIF(TRIM(expenses.supplier_name), ''), suppliers.trade_name, suppliers.legal_name)`. Display canónico que tolera datos legacy con `supplier_name=NULL`.
+- **`sortDate`** — `COALESCE(document_date, payment_date, created_at::date)`. Una obligación se identifica primero por su emisión, luego por cuándo se va a pagar, finalmente por cuándo se creó.
+- **`amountPaidClp`** — `SUM(payment_amount_clp)` desde la VIEW. CLP-safe sin importar mix de monedas en payments.
+- **`amountPaid`** — moneda original del documento. Best-effort:
+  - `currency='CLP'` → igual a amountPaidClp (1:1)
+  - `currency != 'CLP'` + payments homogéneos → `SUM(payment_amount_native)`
+  - mix de monedas (caso CCA TASK-714c) → **null + `amountPaidIsHomogeneous=false`**
+- **`pendingAmountClp`** = `total_amount_clp - amountPaidClp` (clamp ≥0). Siempre confiable.
+- **`pendingAmount`** = `total_amount - amountPaid` (null cuando heterogéneo).
+
+**Defense-in-depth supplier snapshot**:
+
+- **Reader fallback** (lectura): el LEFT JOIN suppliers resuelve `supplierDisplayName` para datos legacy. Inmediato sin migration.
+- **Writer snapshot** (escritura): POST `/api/finance/expenses` resuelve `supplier_name` desde la tabla suppliers cuando viene `supplierId` sin name. FinanceValidationError 400 si supplierId no existe. Garantiza que registros nuevos no nazcan con FK válida pero `supplier_name=NULL`.
+
+**CTE en INSERT/UPDATE para outbox payload completo**:
+
+`createFinanceExpenseInPostgres` y `updateFinanceExpenseInPostgres` envuelven el `RETURNING *` en un `WITH inserted/updated AS (...)` + LEFT JOIN suppliers + LEFT JOIN LATERAL aggregate, garantizando que el outbox event payload (`finance.expense.created/updated`) tenga el contract completo desde la misma transacción. Sin esto, los consumers del outbox recibirían `supplierDisplayName=null` y `pendingAmountClp=0` aunque la fila tuviera datos correctos en lecturas posteriores.
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** lee `expenses.supplier_name` directo en consumers UI. Usar siempre `supplierDisplayName` del contract.
+- **NUNCA** recomputa `pendingAmount = totalAmountClp - amountPaid` en consumers (mezcla CLP con currency original — root cause del bug Cash-Out 2026-05-03 que mostraba `USD 83.773,50` en lugar de `USD 92,90`). Usar `pendingAmount` (moneda original) o `pendingAmountClp` (CLP) según el contexto.
+- **NUNCA** invente conversiones FX cuando `amountPaid=null` (mix de monedas heterogéneo). Caer a `amountPaidClp` con disclaimer "(equiv. CLP)" — es honesto y respeta TASK-766 contract.
+- **NUNCA** agrupe documentos en UI por `supplierName || 'Sin proveedor'`. Use `supplierKey = supplierId || supplierDisplayName || supplierName || '__unassigned__'` (estable e idempotente). El label visible es `supplierDisplayName ?? supplierName ?? 'Sin proveedor'`. "Sin proveedor" solo aplica cuando NO hay supplierId Y NO hay display name.
+- **NUNCA** sortear obligaciones client-side por `paymentDate` solo. Usar `sortDate` (server-side) o respetar el orden natural del backend.
+- **NUNCA** crear expense con `supplierId` que no existe en la tabla. El POST handler valida y devuelve 400 con error claro.
+- Cuando emerja un nuevo entity con problema análogo (ej. `income.client_name` snapshot vs `clients` tabla), replicar el patrón: extender reader con LEFT JOIN canónico + writer snapshot hydration + tests regresión.
+
+**Spec canónica**: `docs/tasks/complete/TASK-772-finance-expense-supplier-hydration-cash-out-selection.md`. Patrón replicable a `income`, `payment_orders` y futuros agregados que mezclen identidad referenciada + amounts en moneda mixta.

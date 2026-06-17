@@ -19,6 +19,7 @@ import { fileURLToPath } from 'node:url'
 import nextCoreWebVitals from 'eslint-config-next/core-web-vitals'
 import tseslint from 'typescript-eslint'
 import prettierConfig from 'eslint-config-prettier'
+import importPlugin from 'eslint-plugin-import'
 
 import greenhousePlugin from './eslint-plugins/greenhouse/index.mjs'
 
@@ -88,6 +89,9 @@ export default [
     coordinacion separada.
   */
   {
+    plugins: {
+      import: importPlugin
+    },
     languageOptions: {
       ecmaVersion: 2024,
       sourceType: 'module'
@@ -352,7 +356,14 @@ export default [
       // TASK-1084/1085 (cuando los consumers reales existan y estén migrados).
       // El data layer (src/lib/knowledge/**), migrations y el plugin están exentos
       // por path dentro de la propia rule.
-      'greenhouse/no-direct-knowledge-chunk-query': 'warn'
+      'greenhouse/no-direct-knowledge-chunk-query': 'warn',
+      // TASK-1119 Slice 3 — modo warn (warn-first). El substrato Composition Shell
+      // es dueño del namespace reservado de view-transition-name `gh-region-*` para
+      // el morph de regiones de layout. Prohibe hand-wirearlo en views/app/components
+      // (re-introduce la colisión singleton — "morph silencioso"). NO flagea las
+      // transiciones shared-element TASK-525 (otro namespace). Promote a `error`
+      // tras un sweep. Exentos por path: el substrato, el motion family y el Lab.
+      'greenhouse/no-ad-hoc-layout-morph': 'warn'
     }
   },
   {

@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation'
 
 import { hasAnyAuthorizedViewCode } from '@/lib/tenant/authorization'
 import { getTenantContext } from '@/lib/tenant/get-tenant-context'
+import { NexaContextScope } from '@/lib/nexa/nexa-page-context'
 
 export default async function MyLayout({ children }: { children: ReactNode }) {
   const tenant = await getTenantContext()
@@ -33,5 +34,15 @@ export default async function MyLayout({ children }: { children: ReactNode }) {
     redirect('/401')
   }
 
-  return children
+  // TASK-1141 — declara el contexto `personal` para Nexa (el chat flotante global lo lee → prompts
+  // data-aware de los pendientes del propio colaborador). El `entityId` es el memberId de sesión;
+  // el resolver server-side igual usa `subject.memberId` (anti-oracle). Sin memberId → Tier 1/1.5.
+  return (
+    <>
+      {tenant.memberId ? (
+        <NexaContextScope entityKind='member' entityId={tenant.memberId} contextKey='personal' />
+      ) : null}
+      {children}
+    </>
+  )
 }

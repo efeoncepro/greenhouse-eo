@@ -92,3 +92,37 @@ export const resolveNexaModel = ({
 
   return DEFAULT_NEXA_MODEL
 }
+
+/**
+ * TASK-1134 — modo de selección de modelo del chat de Nexa.
+ * - `auto`: el runtime decide server-side (pin `NEXA_PROVIDER` → auto-router → default Gemini). Es el modo real por defecto.
+ * - `manual`: el operador fijó un modelo del picker (override explícito y observable).
+ */
+export type NexaModelMode = 'auto' | 'manual'
+
+/**
+ * TASK-1134 — decide qué `requestedModel` recibe `NexaService` desde el payload del chat. Es el
+ * contrato que destraba el auto-router: hoy el endpoint resolvía SIEMPRE un modelo soportado, así
+ * que `buildProviderPlan` step 1 ganaba y el router nunca se alcanzaba.
+ *
+ * - `manual` (o cliente legacy que manda un modelo soportado SIN `modelMode`) → ese modelo (override explícito).
+ * - `auto` (o sin modelo) → `null`: `buildProviderPlan` decide (pin `NEXA_PROVIDER` → auto-router → default Gemini).
+ *
+ * Backward compat: los clientes viejos mandan `model` sin `modelMode` → se respeta como manual (sin regresión).
+ * Con los flags de router OFF, `auto` cae al default Gemini → comportamiento idéntico al previo.
+ */
+export const resolveNexaRequestedModel = ({
+  modelMode,
+  model
+}: {
+  modelMode?: NexaModelMode | null
+  model?: string | null
+}): NexaModelId | null => {
+  const isManual = modelMode === 'manual' || (modelMode == null && isSupportedNexaModel(model))
+
+  if (isManual && isSupportedNexaModel(model)) {
+    return model
+  }
+
+  return null
+}

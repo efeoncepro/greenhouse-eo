@@ -6,6 +6,39 @@
 
 ---
 
+## Delta 2026-06-14 (d) — "Nexa Answers Experience": primera page DS que agrega un flujo conversacional end-to-end (TASK-1110 Slice B)
+
+La experiencia conversacional completa de Nexa Answers dejó de ser mockup (`/knowledge/mockup/nexa-answers`) y se promovió a **page del Design System** `/design-system/nexa-answers-experience` (gate `plataforma.design_system`, INTERNAL ONLY). Es la primera page DS que **agrega un flujo end-to-end** (no un specimen de un solo componente): la respuesta lidera y **SE ARMA** frente al usuario (chart draw + número que cuenta 0→valor — capacidad canonizada en Slice A/A.2), portabilidad cross-dominio (Knowledge/Finance/Insight, mismo `NexaAnswersCanvas` + `surfaceContext`/`renderPlan` sin re-plumbing) y la **composición in-place con host** (`NexaMomentComposition`, GAP A: morph dormant↔composed + fuentes ancladas al doc real `data-nexa-anchor` + next-step gobernado advisory + puente "Seguir con Nexa"). Registrada en `DesignSystemCatalogView` (Pattern · Hardening) + `route-reachability-manifest` + `PRIMITIVES.md`. Promoción por copy-and-move (cero reescritura de la experiencia → paridad por construcción; única diferencia intencional = breadcrumb a jerarquía DS). NO toca `/knowledge` vivo (Slice 1). Verificado GVC desktop+mobile+composición; gate local tsc 0 · build 0 · 18/18 tests focales · reachability 0 orphans.
+
+## Delta 2026-06-14 (c) — Coreografía del cambio de densidad (reveal/unfold + rise + stagger) + frontera SSR
+
+La densidad ya se adaptaba (Delta b), pero el cambio entre modos **popeaba**. Ahora es una **coreografía escalonada** ("Transformer"), horneada en los card primitives — opt-in, SSR-safe, reduced-motion horneado, default byte-idéntico.
+
+- **Reveal/unfold por pieza** (`MetricSummaryCard`/`MetricTrendCard`): texto = unfold de altura (`height:0↔auto`), chart = fade + **rise** (`cardDensityRevealRisePx`); **stagger** en orden de lectura (`cardDensityRevealStaggerSec`) + desync caja(200ms)/contenido(300ms). Tokens en `card-density-motion.ts` (derivados del SoT).
+- **Frontera dura:** el chart va SIEMPRE en modo fade (`animateHeight=false`) — `height:auto` sobre el `ResponsiveContainer` de Recharts = loop infinito por su ResizeObserver. El texto (sin ResizeObserver) sí hace unfold.
+- **Fix distorsión:** `layout='position'` (no `'size'`) → framer no escala la caja, el texto no se estira en el morph de ancho. **Fix loop:** `useContainerDensity` solo hace `setState` al cruzar un breakpoint (anti-loop ResizeObserver↔framer).
+- **Contención de scroll horizontal (clase TASK-742/ISSUE-015), en la primitive:** sr-only del chart contenida con `position:relative`; `Box` padre del `ResponsiveContainer` con `minWidth:0`+`overflowX:'clip'`; `split` apila en xs.
+- **Hallazgo SSR:** la orquestación macro del shell vía `staggerChildren` de framer **NO es SSR-safe** (variant inheritance no SSR-renderiza estilos de hijos → hydration mismatch). Se descartó; la secuencia es dueña del shell pero SSR-safe (índice central + reveal explícito por región). Demo "secuencia macro" (cascada de varias cards) vive en el Lab vía `useAnimate`+`stagger` (client-only), **no es primitive** aún.
+- `pnpm build` exit 0 · vitest 44/44 · lint+tsc 0 · 0 `Maximum update depth` (carga + drag, desktop+mobile 390px). Docs: PRIMITIVES.md (fila Adaptive Card density) + ADR `GREENHOUSE_COMPOSITION_SHELL_DECISION_V1.md` Delta 2026-06-14 (d). Commit `e21bcb145`.
+
+## Delta 2026-06-14 (b) — Adaptive Card density contract (TASK-1115, hermana del Composition Shell)
+
+Capacidad **compartida** (no un componente card nuevo): los cards se adaptan a SU propio ancho (container query) → cuando una región del Composition Shell condensa, el card muestra una versión real más chica en vez de clipear. Cierra la fluidez en el micro.
+
+- **`card-density`** (`@/components/greenhouse/primitives`): `useContainerDensity` (ResizeObserver SSR-safe) + `resolveCardDensity`/`resolveCardDensityRequest` + `isCardDensityAtLeast`. Modos `full`/`condensed`/`peek` resueltos por el ancho del propio card. **Generaliza el density contract de tablas (TASK-743)** + reusa el patrón `size→behavior` de `resolveAdaptiveSidecarMode` (TASK-1028). El card NO hereda del shell — **el seam es la container query**.
+- **Condensación honesta** (state-design): versión real más chica, NUNCA clip/overflow/`$0`; el dato clave (value) nunca desaparece.
+- **Adopción aditiva opt-in** (`density?: CardDensityRequest`, default `full` byte-idéntico): `MetricSummaryCard` (condensed oculta subtitle, mantiene status; peek = title+value) + `MetricTrendCard` (condensed reduce el chart 152→96 + oculta metricName/period; peek sin chart, value+delta).
+- 8 tests del resolver verde · 313 tests de `primitives/` (0 regresión en `full`) · Lab `/design-system/card-density` + baseline GVC durable desktop+mobile mirado. NUNCA fork ni construir sobre `AdaptiveSidecarLayout`.
+
+## Delta 2026-06-14 — Composition Shell: hardening V1.1 (TASK-1119) + fluidez V1.2 (TASK-1117)
+
+El substrato de coreografía de layout (`CompositionShell`, TASK-1114) cerró su trabajo pendiente real — **aditivo + opt-in**, default byte-idéntico a V1.
+
+- **Fluidez (TASK-1117, `fluidity='rich'`):** entrada orquestada con **stagger** (`composition-shell-motion`, motion tokens: 60 ms / ease emphasized / 200 ms) + **morph interrumpible** (`morphStrategy='interruptible'`, framer-motion `layout`) + **promoción shared-element** (card crece a `lead`) + **drawer temporal real** en compact `split` (MUI `Drawer`, focus trap). Frontera dura: VT = morph estructural, framer-motion `layout` = interrumpible, stagger = entrada — nunca la misma propiedad sobre el mismo nodo. reduced-motion horneado (never-hidden, compositor-only).
+- **Hardening (TASK-1119):** **guard dev-time** del singleton view-transition-name (`composition-shell-vt-guard`, detector puro + refcount, avisa del "morph silencioso") · **telemetry opt-in** (`onTelemetry`, `createCompositionShellEvent` — mirror del sidecar) · **lint rule `greenhouse/no-ad-hoc-layout-morph`** (warn-first; dueño del namespace reservado `gh-region-*`, NO flagea shared-element TASK-525) · **reducer property/concurrency tests** · **baseline GVC durable** (`scripts/frontend/baselines/design-system.composition-shell/`, 6 frames desktop+mobile).
+- Props aditivos del contrato público: `fluidity` · `morphStrategy` · `onTelemetry` · `telemetrySource`. Lab `/design-system/composition-shell` (toggles + demo shared-element + telemetry en vivo). Veredicto SIBLINGS con `NexaMomentComposition` intacto.
+- Evidencia GVC: baseline `scripts/frontend/baselines/design-system.composition-shell/`. Docs: ADR `GREENHOUSE_COMPOSITION_SHELL_DECISION_V1.md` Delta 2026-06-14 (b) + companion `GREENHOUSE_COMPOSITION_SHELL_UI_PLATFORM_V1.md` Delta 2026-06-14.
+
 ## Delta 2026-06-13k — GreenhouseRoadmapTimeline primitive
 
 Se creó `GreenhouseRoadmapTimeline` para traer el patrón `RoadmapCard` del prompt al Design System como primitive Greenhouse, sin `/components/ui`, shadcn, Tailwind ni `class-variance-authority`.

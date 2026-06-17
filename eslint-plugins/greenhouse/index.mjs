@@ -40,6 +40,7 @@ import noHardcodedHexColor from './rules/no-hardcoded-hex-color.mjs'
 import noDirectMuiElevationInPrimitives from './rules/no-direct-mui-elevation-in-primitives.mjs'
 import noDynamicAppReactApexCharts from './rules/no-dynamic-app-react-apexcharts.mjs'
 import noDirectKnowledgeChunkQuery from './rules/no-direct-knowledge-chunk-query.mjs'
+import noAdHocLayoutMorph from './rules/no-ad-hoc-layout-morph.mjs'
 
 const plugin = {
   meta: {
@@ -68,7 +69,8 @@ const plugin = {
     'no-hardcoded-hex-color': noHardcodedHexColor,
     'no-direct-mui-elevation-in-primitives': noDirectMuiElevationInPrimitives,
     'no-dynamic-app-react-apexcharts': noDynamicAppReactApexCharts,
-    'no-direct-knowledge-chunk-query': noDirectKnowledgeChunkQuery
+    'no-direct-knowledge-chunk-query': noDirectKnowledgeChunkQuery,
+    'no-ad-hoc-layout-morph': noAdHocLayoutMorph
   }
 }
 

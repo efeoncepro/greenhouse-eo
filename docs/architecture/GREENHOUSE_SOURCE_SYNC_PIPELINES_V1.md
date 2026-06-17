@@ -1284,3 +1284,254 @@ The first implementation slice after this document should be:
   - `crm_deals`
 
 That is the minimum foundation needed before moving more calculations out of direct source reads.
+
+---
+
+## Invariantes operativos para agentes — Notion sync/integrations (TASK-998…1003)
+
+> **Relocados de `CLAUDE.md` por TASK-1160 (2026-06-16), verbatim — cero cambio semántico.** Espejo operativo (NUNCA/SIEMPRE) que un agente carga al tocar este dominio; el contrato técnico vive en su spec. Dedup = TASK-1160 Slice 4.
+
+### Notion Integrations Registry — token ↔ servicio ↔ scope canónico (desde 2026-05-22)
+
+Existen **3 integraciones Notion productivas/no-productivas** + **1 dedicada al sandbox demo**. Cada una mapea a un secret GCP distinto, la usa un consumer distinto y tiene un scope de acceso (qué teamspaces puede ver) estrictamente delimitado. Conectar la integración equivocada a un teamspace es una violación de aislamiento (root cause investigado 2026-05-22: el sandbox demo quedó compartido con *BigQuery Sync*; no hubo fuga porque el demo nunca se registró en el mirror BQ del sync, pero fue mina latente).
+
+| Integración Notion | Secret GCP / env var | Consumer | Scope permitido | Entorno |
+|---|---|---|---|---|
+| **BigQuery Sync** | `notion-token` (2026-03-08) | Cloud Run `notion-bq-sync` (sync legacy Notion → BigQuery, daily 03:00 Santiago) | SOLO teamspaces productivos registrados en `space_notion_sources WHERE sync_enabled=TRUE` (Efeonce + Sky) | Productivo |
+| **Greenhouse** | env `NOTION_TOKEN` (staging/dev) | Runtime no-productivo (`dev-greenhouse`, preview, local) | Efeonce + Sky (staging/dev) | **Staging/Dev** |
+| **Greenhouse PRD** | `notion-integration-token-greenhouse-prd` (2026-05-21) → env `NOTION_TOKEN` | Runtime Vercel prod + `ops-worker` (re-fetch status transitions TASK-912 + writeback `[GH]` properties TASK-916) | Efeonce + Sky (productivo) | Producción |
+| **(dedicada demo)** | `notion-integration-token-greenhouse-metrics-demo` (2026-05-19) → `NOTION_METRICS_DEMO_TOKEN_SECRET_REF` | `ops-worker` compute/writeback demo (TASK-913) | **SOLO** teamspace `Demo Greenhouse` (`36339c2f-…`) | Sandbox demo |
+| **Por cliente (scoped, TASK-998)** | `notion-integration-token-greenhouse-<slug>` → `space_notion_sources.notion_token_secret_ref` (ej. `notion-integration-token-greenhouse-berel`, 2026-06-03) | sync per-space (pendiente en `notion-bigquery`) + checklist onboarding | **SOLO** el teamspace de ESE cliente (el token ES el scope) | Producción (clientes nuevos) |
+| **Knowledge (TASK-1088)** | `notion-integration-token-greenhouse-knowledge` → env `NOTION_KNOWLEDGE_TOKEN_SECRET_REF` | `NotionKnowledgeConnector` (ingesta operada por script/ops del corpus de conocimiento → `greenhouse_knowledge`; NO runtime del portal ni Notion live para una respuesta) | **SOLO** el teamspace Notion de conocimiento (compartido con esta integración) | Ops (ingesta de knowledge) |
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** conectar **BigQuery Sync** ni **Greenhouse PRD** al teamspace `Demo Greenhouse`. El demo se conecta **SOLO** a la integración dedicada demo (`notion-integration-token-greenhouse-metrics-demo`), con permisos restringidos exclusivamente a ese teamspace. Esa es la integración canónica del demo (TASK-913) — ni BigQuery Sync, ni Greenhouse, ni Greenhouse PRD.
+- **NUNCA** conectar **BigQuery Sync** a un teamspace que no deba llegar a BigQuery. Su endpoint `/discover` enumera **TODO lo que la integración puede ver** vía Notion search, bypassando `space_notion_sources` por completo — cualquier teamspace compartido con esta integración es contaminación potencial de BQ con un solo `/discover` o un flip de `sync_enabled`.
+- **NUNCA** usar la integración **Greenhouse** (staging/dev) en producción ni **Greenhouse PRD** en staging/dev. El sufijo `PRD` separa los entornos; cruzarlos rompe el aislamiento prod/staging.
+- **NUNCA** flipear `sync_enabled=TRUE` para el space demo en `space_notion_sources`. Está sembrado `FALSE` (migración `20260519120713456`) y ausente del mirror BQ — doble defensa que evita que el sync legacy lo procese aunque BigQuery Sync tuviera acceso.
+- **NUNCA** "conectar todas las integraciones por las dudas" al crear un teamspace/database nuevo en Notion. Conectar **solo** la integración cuyo dominio corresponde al propósito del teamspace.
+- **NUNCA** usar el secret `notion-token` (BigQuery Sync) ni `notion-integration-token-greenhouse-prd` (Greenhouse PRD) como fuente del token del pipeline demo. El demo resuelve su token exclusivamente vía `NOTION_METRICS_DEMO_TOKEN_SECRET_REF` ([notion-demo-client.ts](src/lib/notion-metrics/notion-demo-client.ts)).
+- **NUNCA** reusar el token de **Knowledge** (`notion-integration-token-greenhouse-knowledge`) para sync/discover/demo, ni reusar otro token para la ingesta de knowledge. El `NotionKnowledgeConnector` (TASK-1088) resuelve su token **solo** vía `NOTION_KNOWLEDGE_TOKEN_SECRET_REF` ([notion-knowledge-client.ts](src/lib/knowledge/notion/notion-knowledge-client.ts)); el token está scoped al teamspace de conocimiento y NO debe compartirse con la integración de BigQuery Sync (su `/discover` enumera todo lo que ve → contaminación potencial del mirror BQ).
+- **SIEMPRE** que emerja una integración Notion nueva (e.g. otro cliente, otro pipeline), agregarla a este registry con su secret + consumer + scope + entorno antes del primer uso, y enumerar a qué teamspaces se le concede acceso.
+
+**Verificación operador-side** (no es código — son settings de Notion): la lista de integraciones conectadas a un teamspace se ve en Notion → teamspace → Settings → Connections. Para auditar fuga a BQ: `bq query 'SELECT source_database_id, space_id, COUNT(*) FROM efeonce-group.notion_ops.raw_pages_snapshot GROUP BY 1,2'` — todo `source_database_id` debe pertenecer a Efeonce (`spc-c0cf6478-…`) o Sky (`spc-ae463d9f-…`); cualquier `36339c2f…` (demo) es fuga.
+
+### Notion teamspace linking — token POR teamspace + cómo enumerar DBs (TASK-998, desde 2026-06-03)
+
+Para vincular el teamspace Notion de un **cliente nuevo** (Berel, ANAM, …) a Greenhouse, el modelo canónico es **una integración interna scoped SOLO al teamspace de ese cliente**, cuyo token **es el scope**. La integración compartida `notion-token` (BigQuery Sync) queda **solo para Efeonce/Sky legacy** — los clientes nuevos NO se agregan a ella (aislamiento duro; mismo principio que el token dedicado del demo, TASK-913).
+
+**Hechos verificados live (2026-06-03, Grupo Berel) — qué NO funciona para enumerar teamspaces**:
+
+- **La API REST de Notion NO enumera teamspaces.** `GET /v1/teams` → `400 invalid_request_url` (no existe). `POST /v1/search` devuelve data_sources cuyo `parent` es `database_id`, no teamspace → el nombre del teamspace **no está en REST**. Las DBs de un teamspace **NO comparten prefijo de id** (Berel: Tareas/Proyectos/Sprints=`35c39c2f`, "Wiki de Berel"=`98239c2f`, "Content Hub"=`35f39c2f`) → cualquier heurístico de prefijo es **inválido**.
+- **El MCP claude.ai (`notion-get-teams`) SÍ enumera** teamspaces por nombre — pero usa el **OAuth personal interactivo** del operador (dueño del workspace, ve todo) y **NO es runtime-available** (absent en headless/cron, CLAUDE.md). Sirve para que un **agente** obtenga IDs durante el onboarding, NUNCA como dependencia del runtime.
+- **El Cloud Run `notion-bq-sync` v3.0.0 `/discover` devuelve config snapshot, no discovery en vivo.** No se puede usar para enumerar el teamspace de un cliente nuevo.
+
+**El gate real NO es discovery — es el ACCESO de la integración.** El token compartido `notion-token` da `404 object_not_found` en las DBs de Berel porque la integración no tiene acceso a ese teamspace. Ningún camino (REST, MCP, Cloud Run) puede leer un teamspace que no esté compartido con su credencial — por diseño de seguridad.
+
+**Modelo canónico — token-por-teamspace (el token ES el scope)**:
+
+1. El operador crea en Notion una **integración interna** (Settings → Developers → New connection) scoped al teamspace del cliente (capacidades: Leer/Actualizar/Insertar contenido) + copia el token `ntn_…`. Ej. live: conexión **"Greenhouse - Berel"** sobre el teamspace `Grupo Berel` (`35c39c2f-…`).
+2. En el **checklist de onboarding** (item `provision_notion_workspace`, NO el wizard de nacimiento — separación de concerns), el operador pega el token. `discoverNotionDatabasesForToken(token)` ([src/lib/client-onboarding/notion-token-connect.ts](src/lib/client-onboarding/notion-token-connect.ts)) hace `POST /v1/search` (filter data_source, Notion-Version `2026-03-11`) → como el token está acotado, devuelve **SOLO las DBs de ese cliente** (cero cross-tenant) → auto-clasifica Tareas/Proyectos/Sprints por título (tolerante a espacio final/acentos/mayúsculas vía `classifyNotionDatabaseTitle`) → sugiere los 3 ids; el operador confirma/ajusta.
+3. Al confirmar: el token se guarda en **GCP Secret Manager** (`notion-integration-token-greenhouse-<slug>`, ej. `notion-integration-token-greenhouse-berel`) con `printf %s` (sin newline) + se persiste el **`*_SECRET_REF`** en `greenhouse_core.space_notion_sources.notion_token_secret_ref` (columna TASK-998). **NUNCA el token crudo en PG/logs/Notion.** `notion_token_secret_ref` NULL = usar el `notion-token` compartido legacy (Efeonce/Sky).
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** enumerar teamspaces Notion con `/v1/search` crudo + heurística de prefijo de id. La API no enumera teamspaces; las DBs de un teamspace no comparten prefijo. Usar el **token scoped por cliente** (el token = el scope) + clasificación por título.
+- **NUNCA** cablear el MCP claude.ai (`notion-get-teams`) a un backend (Cloud Run, Vercel, ops-worker). Es OAuth interactivo, absent en headless. Solo un agente lo usa para obtener IDs durante onboarding.
+- **NUNCA** agregar un teamspace de cliente nuevo a la integración compartida `notion-token` (BigQuery Sync) "para que el discover lo vea". Rompe el aislamiento duro. Cada cliente nuevo = su propia integración scoped + su propio token.
+- **NUNCA** persistir el token Notion crudo en `space_notion_sources`, PG, logs ni el payload de un evento. Solo el `*_SECRET_REF`. El token va a Secret Manager con `printf %s` (Secret Manager Hygiene).
+- **NUNCA** vincular el teamspace en el **wizard de nacimiento** del cliente. El vínculo vive en el **checklist de provisioning** (nacimiento ≠ provisioning de tooling — separación de concerns TASK-992/997).
+- **SIEMPRE** que un token Notion se pegue en texto plano (chat, form sin enmascarar), tratarlo como expuesto: guardarlo en Secret Manager + recomendar rotación. El campo del form debe ser `type=password`, el POST server-side directo, sin echo.
+- **SIEMPRE** que emerja una integración Notion nueva de cliente, agregarla al **Notion Integrations Registry** (arriba) con secret + consumer + scope + entorno antes del primer uso.
+
+**Teams channel linking (lado Teams del mismo checklist)**: el bot Graph (`greenhouse-teams-bot-client-credentials`) **YA puede** listar teams + canales con los permisos actuales — verificado live: `GET /v1.0/teams` (vio "Berel - Efeonce") + `GET /v1.0/teams/{id}/channels` (vio "Squad Berel"). Sin permisos Azure nuevos. (Los chats 1:1 `/v1.0/chats` requieren `Chat.ReadBasic.All`, no concedido — fuera de scope; los canales son el target del registry `teams_notification_channels`.) El reader self-serve reusa `src/lib/integrations/teams/bot-framework/token-cache.ts`.
+
+**Sync end-to-end por cliente nuevo — RESUELTO (TASK-1000 + TASK-1003, 2026-06-04)**: el Cloud Run `notion-bq-sync` ya **resuelve el token POR space** (`notion_token_secret_ref` → Secret Manager; TASK-1000) Y **queryea el endpoint canónico `/v1/data_sources/{id}/query` + Notion-Version `2026-03-11`** (TASK-1003, mata el deprecado `/v1/databases/{id}/query`). Un cliente nuevo registrado por el wizard (data_source ids + token scoped) con `sync_enabled=TRUE` drena nativo a diario. Verificado live con Grupo Berel (3/3 tables, token scoped). Ver §"Notion data_sources endpoint canónico (TASK-1003)" abajo.
+
+### Notion data_sources endpoint canónico — extractor notion-bq-sync (TASK-1003, desde 2026-06-04)
+
+El extractor `notion-bq-sync` (repo hermano `efeoncepro/notion-bigquery`, Cloud Run `us-central1`) queryea Notion **SIEMPRE por el endpoint canónico `POST /v1/data_sources/{id}/query` + Notion-Version `2026-03-11`** (revisión live `00021-wkl`, flag `NOTION_DATA_SOURCES_ENDPOINT_ENABLED=true`). El endpoint legacy `/v1/databases/{id}/query` (deprecado por Notion 2025-09-03) queda muerto.
+
+- **Resolver runtime canónico** `resolve_data_source_id(configured_id)` (`main.py`): acepta AMBOS tipos de id por construcción — `GET /v1/data_sources/{id}`→200 (ya es data_source: Berel/clientes nuevos del wizard) o fallback `GET /v1/databases/{id}`→`data_sources[0].id` (Efeonce/Sky con database ids legacy en el BQ mirror). Multi-data-source (>1) → fail-fast (nunca adivinar). Hereda el token per-space (TASK-1000) vía `_notion_headers`. Cache estable por mapping.
+- **`database_id` configurado se conserva como identidad** para snapshot/binding (`source_database_id`, `_resolve_space_context`); SOLO la URL de query usa el id resuelto. NO mezclar.
+- **`in_trash` (no `archived`)**: bajo 2026-03-11 el campo page-level de borrado es `in_trash`. El write usa `page.get("in_trash", page.get("archived", False))` (safe ambas versiones; la columna BQ sigue `archived`). NO volver a `page.get("archived", False)` solo.
+- **404 NO transitorio**: `_is_transient_sync_error` clasifica 4xx (salvo 429) como NO transitorio (mata el reintento 3x inútil). NO revertir a "cualquier RequestException → transient".
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** reintroducir `/v1/databases/{id}/query` ni Notion-Version `2022-06-28` en el extractor. El endpoint legacy está deprecado; toda query nueva usa data_sources + 2026-03-11.
+- **NUNCA** guardar parent database ids de un cliente nuevo para meterlo por el endpoint viejo (anti-patrón rechazado en TASK-1003; viola Solution Quality Contract). El resolver runtime maneja ambos id-types.
+- **NUNCA** desplegar `notion-bq-sync` con `bash deploy.sh` a secas: usa `--env-vars-file`/`--set-secrets` (REPLACE) y borraría las vars per-space + el secret `GREENHOUSE_POSTGRES_PASSWORD` que viven manuales en la revisión (no en `.env.yaml`, que es gitignored). Deploy canónico: `gcloud run deploy notion-bq-sync --source --function=notion_bq_sync --update-env-vars=... --update-secrets=...` (MERGE, preserva per-space+PG+secrets). Re-aseverar explícitamente `NOTION_PER_SPACE_TOKEN_ENABLED=true` + `GREENHOUSE_POSTGRES_{INSTANCE_CONNECTION_NAME,DB,USER}` + ambos secrets.
+- **NUNCA** flipear `NOTION_DATA_SOURCES_ENDPOINT_ENABLED` ni bumpear `NOTION_VERSION` sin correr el gate de paridad `parity_check_task1003.py` (read-only, no escribe BQ) sobre Efeonce/Sky → PARIDAD TOTAL. Rollback <5 min: flag OFF + `gcloud run services update --update-env-vars` o traffic a revisión previa.
+- **SIEMPRE** que emerja un cliente nuevo: el wizard guarda data_source ids + token scoped → con `sync_enabled=TRUE` sincroniza nativo, cero casos especiales (proceso idempotente/escalable, NO repetir el cutover por cliente).
+
+**Spec canónica**: `docs/tasks/complete/TASK-1003-notion-bq-sync-data-sources-endpoint-migration.md`. Skill `notion-platform` §0 (estado canónico). Gate: `parity_check_task1003.py` (repo hermano).
+
+### Notion sync canónico — Cloud Run + Cloud Scheduler (NO usar el script manual ni reintroducir un PG-projection separado)
+
+**El daily Notion sync es un SOLO ciclo de DOS pasos en `ops-worker` Cloud Run**, schedulado por Cloud Scheduler. No hay otro path scheduled.
+
+- **Trigger**: Cloud Scheduler `ops-notion-conformed-sync @ 20 7 * * * America/Santiago` → `POST /notion-conformed/sync` en ops-worker. Definido en `services/ops-worker/deploy.sh` (idempotente, re-run del deploy script lo upsertea).
+- **Step 1 — `runNotionSyncOrchestration`**: notion_ops (BQ raw) → `greenhouse_conformed.delivery_*` (BQ). Si BQ conformed ya está fresh contra raw, hace skip ("Conformed sync already current; write skipped"). Esto NO es bug — es comportamiento intencional.
+- **Step 2 — `syncBqConformedToPostgres` (UNCONDICIONAL)**: lee BQ `greenhouse_conformed.delivery_*` y escribe `greenhouse_delivery.{projects,tasks,sprints}` en PG vía `projectNotionDeliveryToPostgres`. **Este step DEBE correr siempre**, regardless del skip de Step 1, porque BQ puede estar fresh y PG stale (que es exactamente el bug que llevó 24 días sin detectar antes).
+
+**⚠️ NO HACER**:
+
+- NO mover el PG step adentro del path no-skip de Step 1. Antes vivía ahí (`runNotionConformedCycle` → bloque "Identity reconciliation — non-blocking tail step" precedente) y dejaba PG stale cuando BQ estaba current.
+- NO crear un cron Vercel scheduled para `/api/cron/sync-conformed`. La ruta existe como fallback manual, pero el trigger automático canónico vive en Cloud Scheduler. Vercel cron es frágil para syncs largos (timeout 800s vs 60min Cloud Run, sin retry exponencial nativo, no co-located con Cloud SQL).
+- NO depender del script manual `pnpm sync:source-runtime-projections` para escribir PG. Sirve para developer ad-hoc, NO para producción. Antes era el único path PG (24 días stale en abril 2026 = root cause del incidente que parió esta arquitectura).
+- NO inyectar sentinels (`'sin nombre'`, `'⚠️ Sin título'`, etc.) en `*_name` columns. TASK-588 lo prohíbe vía CHECK constraints. NULL = unknown. Para mostrar fallback amigable usar el helper `displayTaskName/displayProjectName/displaySprintName` de `src/lib/delivery/task-display.ts` o el componente `<TaskNameLabel/ProjectNameLabel/SprintNameLabel>`.
+- NO castear directo `Number(value)` para escribir BQ-formula columns a PG INTEGER (e.g. `days_late`). BQ formulas pueden devolver fraccionales (`0.117...`) y PG INT los rechaza. Usar `toInteger()` (con `Math.trunc`) que vive en `src/lib/sync/sync-bq-conformed-to-postgres.ts`.
+
+**Helpers canónicos (orden de uso)**:
+
+- `runNotionSyncOrchestration({ executionSource })` — wrapper completo BQ raw → conformed (solo lo invoca el endpoint Cloud Run y el endpoint admin manual).
+- `syncBqConformedToPostgres({ syncRunId?, targetSpaceIds?, replaceMissingForSpaces? })` — drena BQ conformed → PG. Reusable desde cualquier admin endpoint o script de recovery. Default: todos los spaces activos, `replaceMissingForSpaces=true`.
+- `projectNotionDeliveryToPostgres({ ... })` — primitiva más baja: UPSERT por `notion_*_id` directo a PG. Usado por `syncBqConformedToPostgres` y por la wiring inline dentro de `runNotionConformedCycle`. Idempotente, per-row, no table locks.
+
+**Manual triggers / recovery**:
+
+- Cloud Scheduler manual: `gcloud scheduler jobs run ops-notion-conformed-sync --location=us-east4 --project=efeonce-group`
+- Admin endpoint Vercel (auth via agent session, sin cron secret): `POST /api/admin/integrations/notion/trigger-conformed-sync` — corre los 2 steps secuencialmente (`runNotionSyncOrchestration` + `syncBqConformedToPostgres`).
+- Vercel cron `/api/cron/sync-conformed` (CRON_SECRET) — fallback histórico, queda activo pero no se debe usar como path principal.
+
+**Kill-switch defensivo**: env var `GREENHOUSE_NOTION_PG_PROJECTION_ENABLED=false` revierte el step PG dentro de `runNotionConformedCycle` sin requerir deploy. **NO** afecta el step PG del endpoint Cloud Run (que vive en `services/ops-worker/server.ts`), ese es UNCONDICIONAL.
+
+**Defensas anti-tenant-cross-contamination** (Sky no rompe Efeonce ni viceversa):
+
+- `replaceMissingForSpaces` filtra `WHERE space_id = ANY(targetSpaceIds)` — nunca toca rows fuera del cycle.
+- UPSERT por `notion_*_id` (PK natural Notion) es idempotente y no depende del orden.
+- Cascade de title `nombre_de_tarea` / `nombre_de_la_tarea` resuelve correctamente para ambos tenants (Efeonce usa la primera columna, Sky la segunda — verificado en vivo via Notion REST API + Notion MCP).
+
+**Schema constraints relevantes**:
+
+- BQ `delivery_*.{task_name,project_name,sprint_name}` están NULLABLE (alineado con TASK-588 PG decision). Helper `ensureDeliveryTitleColumnsNullable` en `sync-notion-conformed.ts` aplica `ALTER COLUMN ... DROP NOT NULL` idempotente al startup.
+- PG `greenhouse_delivery.*` tiene CHECK constraints anti-sentinel desde TASK-588 (migration `20260424082917533_project-title-nullable-sentinel-cleanup.sql`). Cualquier sentinel string los va a rechazar.
+- DB functions `greenhouse_delivery.{task,project,sprint}_display_name` (migration `20260426144105255`) producen el fallback display data-derived al READ time. Mirror exacto en TS via `src/lib/delivery/task-display.ts` (paridad regression-tested).
+
+**Admin queue de hygiene**: `/admin/data-quality/notion-titles` lista las pages con `*_name IS NULL` agrupadas por space, con CTA "Editar en Notion" → page_url. Cuando el usuario edita el title en Notion, el next sync drena el cambio y la row sale del queue.
+
+### Canonical task status vocabulary V1 — single source of truth cross-tenant (2026-05-18)
+
+Toda comparación de `task_status` / `estado` en TS o SQL embebido **debe** pasar por el módulo canonical `src/lib/delivery/task-status-canonical.ts`. Single source of truth para los 11 estados V1 del lifecycle de tareas Greenhouse + alias map cubriendo Efeonce legacy + Sky legacy + English/accent variants.
+
+**Módulo canonical**: `src/lib/delivery/task-status-canonical.ts` (NOT server-only — safe en client + server).
+
+- `TASK_STATUS_CANONICAL` — 11 estados V1: `Sin empezar`, `Brief listo`, `Pendiente aprobación interna`, `En pausa`, `Bloqueado`, `En curso`, `Listo para revisión`, `Cambios solicitados`, `Aprobado`, `Cancelado`, `Archivado`.
+- `TASK_STATUS_ALIASES` — frozen map: 11 canonical self-maps + 7 Efeonce legacy (`Listo→Aprobado`, `Cancelada→Cancelado`, `Archivadas→Archivado`, `Detenido→En pausa`, `Listo para diseñar→Brief listo`, `Pendiente Dir. Arte→Pendiente aprobación interna`, `Cambios Solicitados→Cambios solicitados` con S→s) + 3 Sky legacy (`Tomado→Brief listo`, `Pendiente→Pendiente aprobación interna`, `En feedback→Cambios solicitados`) + 8 English/accent variants (Done/Finalizado/Completado→Aprobado, Cancelled/Canceled→Cancelado, sin tilde, capital case, Backlog→Sin empezar, Archivada singular).
+- `TASK_STATUS_GROUPS` — semantic groups: `BRIEFING`, `ACTIVE`, `BLOCKED`, `COMPLETED`, `EXCLUDED`, `READY_FOR_REVIEW`, `CLIENT_CHANGES`.
+
+**Helpers puros** (client + server):
+
+- `normalizeTaskStatus(raw)` → canonical V1 string o null.
+- `isCanonicalStatus(raw, canonical)` → boolean predicate.
+- `isCanonicalStatusInGroup(raw, group)` → boolean predicate.
+- `allVariantsForCanonical(canonical)` → string[] con TODAS las variantes (legacy + canonical).
+- `allVariantsForGroup(group)` → string[] expandido.
+
+**SQL builders** (server-side):
+
+- `taskStatusSql(canonical)` → `'A','B','C'` SQL-safe IN list para un canonical.
+- `taskStatusGroupSql(group)` → group expandido con todas las variantes.
+- `buildTaskStatusToCscPhaseSql(column)` → CASE WHEN canonical mapeando a CSC phase (briefing / produccion / revision_interna / cambios_cliente / aprobado / bloqueado / excluido / unknown).
+
+**Pattern canónico**:
+
+```ts
+// TS predicate (client + server)
+if (isCanonicalStatusInGroup(row.task_status, TASK_STATUS_GROUPS.COMPLETED)) { ... }
+
+// SQL embebido (server)
+const sql = `
+  COUNTIF(task_status IN (${taskStatusGroupSql(TASK_STATUS_GROUPS.COMPLETED)})) AS done
+`
+
+// UNNEST(@param) pattern para BQ parameterized
+const params = { completedStatuses: allVariantsForGroup(TASK_STATUS_GROUPS.COMPLETED) }
+const sql = `COUNTIF(estado IN UNNEST(@completedStatuses)) AS done`
+```
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** hardcodear un literal de status en TS/SQL/BQ (`if (status === 'Cambios Solicitados')`, `WHERE estado = 'Listo'`, etc.). Toda comparación pasa por canonical helpers + constants.
+- **NUNCA** comparar status con `===` contra un nombre canonical sin normalizar el lado raw antes. Pre-rename data tiene variantes case-mismatched (`'Cambios Solicitados'` capital S vs canonical `'Cambios solicitados'`) — la comparación directa falla silente. Usar `isCanonicalStatus(raw, canonical)` o `normalizeTaskStatus(raw)` primero.
+- **NUNCA** modificar `TASK_STATUS_ALIASES` para REMOVER un legacy alias sin verificar que BQ/PG no tiene rows residuales con ese nombre. La eliminación es decisión coordinada cuando TASK-908 ship + 0% data en BQ con el nombre viejo.
+- **NUNCA** agregar aliases para nombres custom de cliente nuevo. Si entra cliente con custom status names, **enforce canonical template L1** en Notion antes del onboarding (eso es lo escalable). Los aliases son SOLO para legacy transition window.
+- **NUNCA** importar este módulo desde código que tenga `import 'server-only'` directive en un componente cliente — el módulo en sí NO es server-only (sin directive), pero los SQL builders solo tienen sentido server-side.
+- **NUNCA** usar el output de `taskStatusGroupSql` / `taskStatusSql` en un endpoint que acepte user input para el group/canonical (potencial SQL injection). Los inputs DEBEN ser constants `TASK_STATUS_GROUPS.*` o `TASK_STATUS_CANONICAL.*`, no strings runtime.
+- **SIEMPRE** que emerja un nuevo callsite que necesite comparar/filtrar status, usar canonical helpers. NO replicar inline arrays como `['Listo', 'Done', 'Finalizado', 'Completado']`.
+- **SIEMPRE** que emerja un cliente nuevo con custom status names en Notion, NO agregar aliases. Migrar el template Notion del cliente al canonical V1 ANTES del onboarding. L1 universalización es la única solución escalable.
+
+**Pattern fuente**: TASK-742 (single source of truth + frozen maps + helper canonical pattern). Migration path: Plan B (TASK-908) introduce `status_code` enum persistido en PG al boundary del sync — código matchea por código estable, no por nombre. Cuando shipee, los aliases legacy se eliminan en cleanup PR.
+
+**Spec canónica**: commit `1525e51c` en `develop` 2026-05-18. Tests anti-regresión: 68 asserts en `src/lib/delivery/task-status-canonical.test.ts`.
+
+### Notion delivery PG projection — robust integer cast + per-row resilience (2026-05-18)
+
+`projectNotionDeliveryToPostgres` (`src/lib/sync/project-notion-delivery-to-postgres.ts`) es el writer canónico de `greenhouse_delivery.{projects,tasks,sprints}` PG desde BQ conformed. Toda INSERT de una columna INTEGER pasa por **SQL-boundary cast** + **per-row try/catch** + **Sentry diagnostic capture** + **result shape con skipped counters**. Defense in depth de 4 capas.
+
+**Helpers canónicos** (`src/lib/sync/project-notion-delivery-to-postgres.ts`):
+
+- `intArg(value)` → `sql\`(${value})::numeric::integer\``. Cast doble que acepta string (`"0.44"`), number (`0.44`), null, undefined → coerce a INTEGER truncando fraccional. Belt-and-suspenders con TS `toInteger` upstream.
+- `arrayArg(value)` → `sql\`COALESCE(${value}::text[], ARRAY[]::text[])\``. Mirror del `intArg` pattern para ARRAY NOT NULL columns. BQ runtime puede devolver `null` para repeated-string properties sin valores (e.g. task sin Subtareas relation). PG ARRAY NOT NULL DEFAULT '{}' rechaza ese null. Helper coerce `null → []` en SQL boundary. Aplica a las 4 columnas ARRAY NOT NULL canónicas (`assignee_member_ids`, `project_source_ids`, `subtareas_ids`, `tarea_principal_ids`) + cualquier columna ARRAY NOT NULL futura.
+- `summarizePgError(err)` → extrae `{message, code, position, column, constraint}` de un PG error sin row-level data.
+
+**Pattern canónico per upsert helper**:
+
+```typescript
+for (const row of rows) {
+  if (!row.entity_source_id) continue
+  try {
+    await sql`INSERT INTO greenhouse_delivery.X (...)
+              VALUES (...,
+                ${intArg(row.integer_col)},
+                ${arrayArg(row.array_col)},
+                ...)
+              ON CONFLICT (...) DO UPDATE SET ...`.execute(db)
+    written += 1
+  } catch (err) {
+    skipped += 1
+    const summary = summarizePgError(err)
+    captureWithDomain(err, 'integrations.notion', {
+      tags: { source: 'delivery_projection', entity: '<project|sprint|task>' },
+      extra: { syncRunId, entityId: row.entity_source_id, ...summary }
+    })
+    if (failures.length < 20) failures.push({ entityType, entityId, error: summary })
+  }
+}
+```
+
+**Result shape canónico** (extendido a `ProjectNotionDeliveryToPostgresResult`):
+
+- `projectsSkipped` / `sprintsSkipped` / `tasksSkipped` — real counters per entity (no capped).
+- `failureSamples[]` — capped a 20 samples para audit payload bounded.
+
+**Bug class disparadores (2026-05-18)**:
+
+- **INTEGER NOT NULL** (commit `ca465ac0`): BQ formula columns emiten valores fraccionales como string `"0.44"`. El TS contract `<col>: number | null` PASSED tsc, pero runtime podía leak strings. PG INTEGER rechazaba con `invalid input syntax for type integer: "0.44"`. Solución: `intArg`.
+- **ARRAY NOT NULL** (commit `550c0e67`): BQ devuelve `null` para repeated-string properties sin valores (e.g. task sin Subtareas). PG `ARRAY NOT NULL DEFAULT '{}'` rechaza con `null value in column "tarea_principal_ids" of relation "tasks" violates not-null constraint`. Detected en vivo durante Efeonce canonical rename cascade (1322 rows skipped en Step 1, Sentry alert JAVASCRIPT-NEXTJS-64). Solución: `arrayArg`.
+
+Sin per-row try/catch, una sola row mala fallaba el batch entero. Sin diagnostic capture, RCA requería deep grep post-facto. La per-row resilience + diagnostic capture hicieron que el bug class ARRAY fuera SURFACEABLE inmediatamente (Sentry alert clara con `column: "tarea_principal_ids"`) sin bloquear la cascada (Step 2 UNCONDITIONAL drain bypaseó el bug y dejó PG canonical).
+
+**Columnas protegidas actualmente**:
+
+- INTEGER (10): `days_late`, `rescheduled_days`, `client_change_round_final`, `frame_versions`, `frame_comments`, `open_frame_comments`, `blocker_count`, `workflow_change_round`, `completed_tasks_count`, `total_tasks_count`.
+- ARRAY NOT NULL (4): `assignee_member_ids`, `project_source_ids`, `subtareas_ids`, `tarea_principal_ids`.
+
+Cualquier columna nueva (INTEGER o ARRAY NOT NULL) queda automáticamente protegida por la primitiva canonical cuando se envuelve con el helper apropiado.
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** pasar una columna INTEGER a un INSERT sin envolver el valor en `intArg(...)`. Aunque el TS contract diga `number | null`, el runtime puede leak strings desde BQ formulas.
+- **NUNCA** pasar una columna ARRAY NOT NULL a un INSERT sin envolver el valor en `arrayArg(...)`. Aunque el TS contract diga `string[] | null`, BQ runtime puede devolver `null` cuando la repeated property Notion no tiene valores.
+- **NUNCA** envolver un upsert helper (`upsertProjects/Sprints/Tasks`) sin per-row try/catch. Resilience canónica: una row mala no debe bloquear el batch.
+- **NUNCA** invocar `Sentry.captureException` directo en este path. Usar `captureWithDomain(err, 'integrations.notion', { tags: { source: 'delivery_projection', entity: '<project|sprint|task>' }, extra: { syncRunId, entityId, ...summary } })`.
+- **NUNCA** loggear el row completo en el catch (puede contener PII). Solo `entityId` + `summarizePgError(err)` output (campos estructurales sin user data).
+- **NUNCA** modificar el shape `ProjectNotionDeliveryToPostgresResult` removiendo campos. Adding-only es safe; removing rompe consumers.
+- **SIEMPRE** que emerja una columna INTEGER nueva en el schema, agregarla al INSERT con `intArg(...)`. Lint rule no la enforce hoy — code review humano.
+- **SIEMPRE** que emerja una columna ARRAY NOT NULL nueva en el schema, agregarla al INSERT con `arrayArg(...)`. Mismo enforcement humano.
+- **SIEMPRE** que emerja un nuevo upsert helper (e.g. para `revisions` o cualquier delivery entity nueva), seguir el mismo pattern: try/catch + intArg + arrayArg + captureWithDomain + skipped/failures wiring.
+- **SIEMPRE** caller del helper debe loggear `pgResult.{projectsSkipped, sprintsSkipped, tasksSkipped}` en cron summary line + first `failureSamples[0]` si totalSkipped > 0. Cron visibility canónica.
+
+**Spec canónica**: commits `ca465ac0` (intArg + per-row resilience) + `550c0e67` (arrayArg) en `develop` 2026-05-18. Pattern fuente: TASK-742 7-layer auth resilience (per-row try/catch + diagnostic capture + Sentry domain), TASK-571/766/774 (VIEW canónica + helper + signal + lint).

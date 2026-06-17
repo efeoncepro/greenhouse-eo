@@ -41,7 +41,11 @@ verdict. Codex and Claude skill names are not assumed to match.
 
 1. Identify the real diff.
    - Run `git status --short`.
-   - Run `pnpm qa:gates --changed` as the mechanical first pass.
+   - Run `pnpm qa:gates --changed --agent codex` as the mechanical first pass.
+     Always pass `--agent codex` when running as Codex: the CLI defaults to
+     `both` and would print Claude-only skill names (e.g. `arch-architect`,
+     `modern-ui`, `state-design`, `forms-ux`, `design-system-governance`) that
+     do not exist as Codex skills.
    - Add explicit flags when the diff is incomplete or intent matters:
      `--ui`, `--runtime`, `--auth`, `--data`, `--finance`, `--payroll`,
      `--integration`, `--release`, `--security`, `--docs`, `--production`.
@@ -118,12 +122,18 @@ verdict. Codex and Claude skill names are not assumed to match.
 
 ## CLI
 
-Use the repo helper:
+Use the repo helper. Running as Codex, always scope skill output with
+`--agent codex` (the CLI default is `both`):
 
 ```bash
-pnpm qa:gates --changed
-pnpm qa:gates --changed --task TASK-1107 --ui --runtime
-pnpm qa:gates --staged --json
+pnpm qa:gates --changed --agent codex
+pnpm qa:gates --changed --agent codex --task TASK-1107 --ui --runtime
+pnpm qa:gates --staged --agent codex --json
 ```
 
 The CLI is advisory. This skill owns the final verdict.
+
+Note: the Stop hook (`.codex/hooks/qa-release-stop-hook.mjs`) is a Codex-only
+guardrail that is opt-in/deregistered by default to avoid out-of-band prompts.
+It does not replace the manual QA Release Auditor Gate rule in `AGENTS.md` /
+`CLAUDE.md`; invoke this skill explicitly for non-trivial closures.

@@ -22,7 +22,7 @@ La firma digital del representante legal del empleador se pre-imprime en el bloq
    {RUT_sin_puntos_ni_espacios}.png
    ```
 
-   Ejemplo Efeonce SpA (RUT 77.357.182-1): `77357182-1.png`.
+   Ejemplo Efeonce SpA: el RUT de la operating entity, normalizado sin puntos ni espacios, da el archivo `77357182-1.png`.
 
 4. Copia el archivo a la carpeta canónica del repo:
 

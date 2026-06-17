@@ -5,6 +5,10 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 vi.mock('server-only', () => ({}))
 
 const mockRunEcosystemReadRoute = vi.fn()
+const mockRunEcosystemCommandRoute = vi.fn()
+const mockCreateWebhookSubscription = vi.fn()
+const mockUpdateWebhookSubscription = vi.fn()
+const mockRetryWebhookDelivery = vi.fn()
 const mockListEcosystemOrganizations = vi.fn()
 const mockGetEcosystemOrganizationDetail = vi.fn()
 const mockListEcosystemCapabilities = vi.fn()
@@ -18,6 +22,10 @@ const mockGetWebhookDelivery = vi.fn()
 
 vi.mock('@/lib/api-platform/core/ecosystem-auth', () => ({
   runEcosystemReadRoute: (...args: unknown[]) => mockRunEcosystemReadRoute(...args)
+}))
+
+vi.mock('@/lib/api-platform/core/commands', () => ({
+  runEcosystemCommandRoute: (...args: unknown[]) => mockRunEcosystemCommandRoute(...args)
 }))
 
 vi.mock('@/lib/api-platform/resources/organizations', () => ({
@@ -42,7 +50,10 @@ vi.mock('@/lib/api-platform/resources/events', () => ({
   listWebhookSubscriptions: (...args: unknown[]) => mockListWebhookSubscriptions(...args),
   getWebhookSubscription: (...args: unknown[]) => mockGetWebhookSubscription(...args),
   listWebhookDeliveries: (...args: unknown[]) => mockListWebhookDeliveries(...args),
-  getWebhookDelivery: (...args: unknown[]) => mockGetWebhookDelivery(...args)
+  getWebhookDelivery: (...args: unknown[]) => mockGetWebhookDelivery(...args),
+  createWebhookSubscription: (...args: unknown[]) => mockCreateWebhookSubscription(...args),
+  updateWebhookSubscription: (...args: unknown[]) => mockUpdateWebhookSubscription(...args),
+  retryWebhookDelivery: (...args: unknown[]) => mockRetryWebhookDelivery(...args)
 }))
 
 const organizationsRoute = await import('./organizations/route')
@@ -55,6 +66,7 @@ const webhookSubscriptionsRoute = await import('./webhook-subscriptions/route')
 const webhookSubscriptionDetailRoute = await import('./webhook-subscriptions/[id]/route')
 const webhookDeliveriesRoute = await import('./webhook-deliveries/route')
 const webhookDeliveryDetailRoute = await import('./webhook-deliveries/[id]/route')
+const webhookDeliveryDetailRetryRoute = await import('./webhook-deliveries/[id]/retry/route')
 
 describe('api platform ecosystem route contracts', () => {
   beforeEach(() => {
@@ -77,6 +89,29 @@ describe('api platform ecosystem route contracts', () => {
       return NextResponse.json({
         routeKey,
         requestUrl: request.url,
+        result
+      })
+    })
+
+    mockRunEcosystemCommandRoute.mockImplementation(async ({ request, routeKey, body, handler }) => {
+      const result = await handler({
+        requestId: 'req-test',
+        routeKey,
+        version: '2026-04-25',
+        consumer: { consumerId: 'consumer-test' },
+        binding: {
+          greenhouseScopeType: 'internal'
+        },
+        rateLimit: {
+          limitPerMinute: 60,
+          limitPerHour: 1000
+        }
+      })
+
+      return NextResponse.json({
+        routeKey,
+        requestUrl: request.url,
+        body,
         result
       })
     })
@@ -180,5 +215,52 @@ describe('api platform ecosystem route contracts', () => {
       context: expect.any(Object),
       deliveryId: 'del-1'
     })
+  })
+
+  it('routes event control plane commands through the idempotent command harness (TASK-655)', async () => {
+    mockCreateWebhookSubscription.mockResolvedValue({ subscriptionId: 'sub-1' })
+    mockUpdateWebhookSubscription.mockResolvedValue({ subscriptionId: 'sub-1' })
+    mockRetryWebhookDelivery.mockResolvedValue({ deliveryId: 'del-1' })
+
+    const createResponse = await webhookSubscriptionsRoute.POST(
+      new Request('https://example.com/api/platform/ecosystem/webhook-subscriptions', {
+        method: 'POST',
+        body: JSON.stringify({ targetUrl: 'https://hooks.example.com' })
+      })
+    )
+
+    const createBody = await createResponse.json()
+
+    await webhookSubscriptionDetailRoute.PATCH(
+      new Request('https://example.com/api/platform/ecosystem/webhook-subscriptions/sub-1', {
+        method: 'PATCH',
+        body: JSON.stringify({ active: false })
+      }),
+      { params: Promise.resolve({ id: 'sub-1' }) }
+    )
+
+    await webhookDeliveryDetailRetryRoute.POST(
+      new Request('https://example.com/api/platform/ecosystem/webhook-deliveries/del-1/retry', { method: 'POST' }),
+      { params: Promise.resolve({ id: 'del-1' }) }
+    )
+
+    // All three mutative routes flow through the command harness, never the read harness.
+    expect(mockRunEcosystemCommandRoute).toHaveBeenCalledTimes(3)
+    expect(createBody.routeKey).toBe('platform.ecosystem.webhook-subscriptions.create')
+    expect(createBody.result.status).toBe(201)
+    expect(mockCreateWebhookSubscription).toHaveBeenCalledTimes(1)
+    expect(mockUpdateWebhookSubscription).toHaveBeenCalledTimes(1)
+    expect(mockRetryWebhookDelivery).toHaveBeenCalledWith({
+      context: expect.any(Object),
+      deliveryId: 'del-1'
+    })
+
+    const commandRouteKeys = mockRunEcosystemCommandRoute.mock.calls.map(([args]) => args.routeKey)
+
+    expect(commandRouteKeys).toEqual([
+      'platform.ecosystem.webhook-subscriptions.create',
+      'platform.ecosystem.webhook-subscriptions.update',
+      'platform.ecosystem.webhook-deliveries.retry'
+    ])
   })
 })

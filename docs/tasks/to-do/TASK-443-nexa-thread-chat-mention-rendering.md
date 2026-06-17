@@ -11,9 +11,12 @@
 - Impact: `Alto`
 - Effort: `Bajo`
 - Type: `implementation`
+- Execution profile: `ui-ux`
+- UI impact: `interaction`
+- Backend impact: `none`
 - Status real: `Diseno`
 - Rank: `QUICK-WIN`
-- Domain: `agency`
+- Domain: `nexa|ui|ai`
 - Blocked by: `none`
 - Branch: `task/TASK-443-nexa-thread-chat-mention-rendering`
 - Legacy ID: `none`
@@ -25,7 +28,7 @@ Integra el parser `NexaMentionText` en el chat de Nexa (`NexaThread`) para que l
 
 ## Why This Task Exists
 
-El LLM ya emite menciones en sus respuestas de chat (mismo prompt-family que Insights), pero `NexaThread` usa `MarkdownTextPrimitive` sin pasar por el parser ([NexaThread.tsx:259-265](src/components/greenhouse/NexaThread.tsx#L259-L265)). Resultado: el usuario ve `"El proyecto @[Campaña Q1](project:abc) está atrasado"` como texto literal, con los corchetes y todo. La inversión de TASK-240 queda visible solo en un bloque mientras la superficie estrella de Nexa sigue rota.
+El LLM ya emite menciones en sus respuestas de chat (mismo prompt-family que Insights), pero el `NexaThread` vivo (`src/views/greenhouse/home/components/NexaThread.tsx`) usa `MarkdownTextPrimitive` sin pasar por el parser. Resultado: el usuario puede ver `"El proyecto @[Campaña Q1](project:abc) está atrasado"` como texto literal, con los corchetes y todo. La inversión de TASK-240 queda visible en Insights mientras la superficie estrella de Nexa todavía no renderiza mentions como entidad.
 
 Es el Quick Win de mayor ratio impact/effort del programa: una superficie muy usada, un componente ya existente, integración de pocas líneas.
 
@@ -53,19 +56,21 @@ Reglas obligatorias:
 - No reemplazar el markdown renderer — extenderlo con un mention-aware middleware
 - Mantener el streaming del chat (no bloquear el render hasta que termine la respuesta)
 - Si TASK-441 todavía no está mergeado, el fallback es el parser frontend actual (validación solo por regex)
+- No crear otro `NexaThread`, drawer ni endpoint; el chat vigente comparte `/api/home/nexa`.
 
 ## Normative Docs
 
 - `docs/tasks/complete/TASK-240-nexa-insights-entity-mentions.md`
 - `docs/tasks/to-do/TASK-441-nexa-mentions-resolver-allowlist-sanitization.md`
 - `docs/tasks/to-do/TASK-442-nexa-mentions-registry-entity-expansion.md`
+- `docs/tasks/to-do/TASK-1150-nexa-attach-current-page-context.md`
 
 ## Dependencies & Impact
 
 ### Depends on
 
 - `src/components/greenhouse/NexaMentionText.tsx` — existe y funciona
-- `src/components/greenhouse/NexaThread.tsx` — surface de chat
+- `src/views/greenhouse/home/components/NexaThread.tsx` — surface viva de chat
 - Markdown renderer actual (`MarkdownTextPrimitive`)
 
 ### Blocks / Impacts
@@ -75,7 +80,7 @@ Reglas obligatorias:
 
 ### Files owned
 
-- `src/components/greenhouse/NexaThread.tsx` — modificar: interceptar render con mention parser
+- `src/views/greenhouse/home/components/NexaThread.tsx` — modificar: interceptar render con mention parser sin romper assistant-ui
 - `src/components/greenhouse/NexaMentionMarkdown.tsx` — nuevo: wrapper de Markdown + mention
 - Tests E2E en staging
 
@@ -84,7 +89,7 @@ Reglas obligatorias:
 ### Already exists
 
 - `NexaMentionText` reutilizable ([NexaMentionText.tsx](src/components/greenhouse/NexaMentionText.tsx))
-- `NexaThread` con markdown streaming
+- `NexaThread` vivo en `src/views/greenhouse/home/components/NexaThread.tsx`, compartido por Home/floating.
 - `NexaInsightsBlock` ya usa el parser — patrón de referencia
 
 ### Gap
@@ -92,6 +97,71 @@ Reglas obligatorias:
 - `NexaThread` no pasa texto por el parser
 - Parser `NexaMentionText` opera sobre string plano, no sobre árbol markdown — si se inyecta tal cual rompe formato
 - No hay componente `NexaMentionMarkdown` que combine ambos
+
+## UI/UX Contract
+
+### Experience brief
+
+- UI rigor: `ui-standard`
+- Usuario / rol: cualquier usuario que conversa con Nexa en el floating/Home chat.
+- Momento del flujo: lectura de una respuesta que referencia una entidad.
+- Resultado perceptible esperado: menciones aparecen como chips clickeables dentro de Markdown sin perder listas, bold, code ni citas.
+- Friccion que debe reducir: texto crudo `@[...](...)` en la respuesta del chat.
+- No-goals UX: autocomplete de input, hover preview, sidecar/drawer nuevo o reescritura del chat.
+
+### Surface & system decision
+
+- Surface: `NexaThread` en `src/views/greenhouse/home/components/NexaThread.tsx`.
+- Composition Shell: `no aplica` — renderer inline dentro del thread existente.
+- Primitive decision: `extend` — reutilizar `NexaMentionText`/`NexaMentionChip`; nuevo wrapper markdown solo si es necesario.
+- Adaptive density / The Seam: `no aplica`.
+- Floating/Sidecar/Dialog decision: preservar `NexaFloatingPanel`/floating shell existente; no crear drawer paralelo.
+- Copy source: copy reusable de aria/tooltips en `src/lib/copy/*`; sin copy nuevo si solo renderiza chips.
+- Access impact: `none` directo; navegación de chip hereda access de la ruta destino.
+
+### State inventory
+
+- Default: respuesta Markdown con chips válidos.
+- Loading: stream/typing actual sin cambio.
+- Empty: sin mentions → Markdown actual.
+- Error: mention malformada → texto literal/sanitizado, no crash.
+- Degraded / partial: tipo no navegable/tombstone según `TASK-441/445`.
+- Permission denied: destino maneja denial; renderer no debe filtrar datos adicionales.
+- Long content: chips wrap-safe dentro de bullets/parrafos.
+- Mobile / compact: no overflow horizontal en el panel flotante.
+- Keyboard / focus: chip tab-focus si navegable, Enter/Space activa.
+- Reduced motion: sin motion nueva.
+
+### Interaction contract
+
+- Primary interaction: click/keyboard en chip abre destino.
+- Hover / focus / active: feedback del chip existente.
+- Pending / disabled: no aplica salvo tombstone.
+- Escape / click-away: preservar comportamiento actual del floating/thread.
+- Focus restore: preservar focus management del floating.
+- Latency feedback: no cambia streaming.
+- Toast / alert behavior: ninguno.
+
+### Motion & microinteractions
+
+- Motion primitive: `none`
+- Enter / exit: no aplica.
+- Layout morph: no aplica.
+- Stagger: no aplica.
+- Timing / easing token: no aplica.
+- Reduced-motion fallback: no aplica.
+- Non-goal motion: preview popovers quedan en `TASK-447`.
+
+### Visual verification
+
+- GVC scenario: chat flotante en una ruta que no oculte el FAB, con respuesta fixture/real que incluya mentions en parrafo y bullet.
+- Viewports: desktop y mobile 390px.
+- Required captures: mention dentro de bold/bullet, mention malformada, texto sin mentions.
+- Required `data-capture` markers: wrapper del thread/floating si existe; agregar marker estable si falta.
+- Scroll-width check: medir panel y página.
+- Accessibility/focus checks: navegación por teclado a chips y Escape del floating intacto.
+- Before/after evidence: frame antes con texto crudo y después con chip.
+- Known visual debt: renderer markdown debe respetar invariantes de assistant-ui descritos en la skill Nexa.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -179,6 +249,45 @@ export const remarkNexaMentions: Plugin = () => (tree) => {
 - Mención dentro de **bold** y _italic_
 - Varias menciones contiguas
 - Mención en streaming parcial (no se debe romper el render antes de cerrar el paréntesis)
+
+## Rollout Plan & Risk Matrix
+
+### Slice ordering hard rule
+
+- Slice 1 (renderer mention-aware) -> Slice 2 (integración en `NexaThread`) -> Slice 3 (telemetría no-op/real) -> Slice 4 (GVC).
+- No reemplazar `MarkdownTextPrimitive` si eso rompe los invariantes de assistant-ui; Plan Mode debe validar streaming y tools.
+
+### Risk matrix
+
+| Riesgo | Sistema | Probabilidad | Mitigation | Signal de alerta |
+|---|---|---|---|---|
+| Markdown pierde bold/list/code por parser de mentions | UI | medium | tests de Markdown + fixture visual | snapshot/GVC diff |
+| Streaming remount/flicker por renderer nuevo | UI/runtime | medium | preservar memoization de markdown components | manual/GVC chat smoke |
+| Chip genera overflow en floating mobile | UI | medium | wrap-safe + scrollWidth check 390px | scrollWidth > clientWidth |
+
+### Feature flags / cutover
+
+- Sin flag si el renderer es drop-in y tests/GVC pasan.
+- Si Plan Mode detecta riesgo de streaming, gatear el renderer mention-aware con flag local/env de presentación.
+
+### Rollback plan per slice
+
+| Slice | Rollback | Tiempo | Reversible? |
+|---|---|---|---|
+| Slice 1-2 | revert renderer/integration a MarkdownTextPrimitive | <15 min | si |
+| Slice 3 | no-op telemetry o revert import | <10 min | si |
+| Slice 4 | N/A evidencia | N/A | si |
+
+### Production verification sequence
+
+1. Tests de renderer/Markdown local.
+2. GVC desktop/mobile del floating con mention en respuesta.
+3. Smoke manual de streaming + tool card en staging.
+4. Deploy prod y revisar errores de chat/render durante 24h.
+
+### Out-of-band coordination required
+
+N/A — UI/runtime repo-only.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 4 — VERIFICATION & CLOSING

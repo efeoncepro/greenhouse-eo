@@ -36,6 +36,11 @@ import {
   type MetricTrustMap,
   type MetricTrustRowLike
 } from './metric-trust-policy'
+import {
+  evaluateMemberMetricFreshness,
+  isCurrentPeriod,
+  type MaterializedFreshnessDecision
+} from './materialized-freshness'
 
 // ─── Row Types (match BigQuery columns) ─────────────────────────────────────
 
@@ -757,6 +762,10 @@ interface MemberMetricRow {
   materialized_at: unknown
 }
 
+interface MemberMetricSourceFreshnessRow {
+  source_freshness_at: unknown
+}
+
 const hasIncompleteMemberMaterialization = (row: MemberMetricRow): boolean => {
   const totalTasks = toNumber(row.total_tasks)
   const completedTasks = toNumber(row.completed_tasks)
@@ -780,6 +789,59 @@ const hasIncompleteMemberMaterialization = (row: MemberMetricRow): boolean => {
   )
 }
 
+const readCurrentPeriodMemberMetricSourceFreshness = async (
+  periodYear: number,
+  periodMonth: number
+): Promise<string | null> => {
+  if (!isCurrentPeriod({ periodYear, periodMonth })) {
+    return null
+  }
+
+  const projectId = getIcoEngineProjectId()
+
+  const rows = await runIcoEngineQuery<MemberMetricSourceFreshnessRow>(`
+    SELECT MAX(source_freshness_at) AS source_freshness_at
+    FROM (
+      SELECT MAX(materialized_at) AS source_freshness_at
+      FROM \`${projectId}.${ICO_DATASET}.delivery_task_monthly_snapshots\`
+      WHERE period_year = @periodYear
+        AND period_month = @periodMonth
+
+      UNION ALL
+
+      SELECT MAX(computed_at) AS source_freshness_at
+      FROM \`${projectId}.${ICO_DATASET}.metric_snapshots_monthly\`
+      WHERE period_year = @periodYear
+        AND period_month = @periodMonth
+    )
+  `, { periodYear, periodMonth })
+
+  return toTimestampString(rows[0]?.source_freshness_at as string | { value?: string } | null)
+}
+
+const evaluateMemberRowFreshness = (
+  row: MemberMetricRow,
+  periodYear: number,
+  periodMonth: number,
+  sourceFreshnessAt: string | null
+): MaterializedFreshnessDecision => {
+  if (hasIncompleteMemberMaterialization(row)) {
+    return {
+      status: 'stale',
+      reason: 'incomplete_materialization',
+      materializedAt: toTimestampString(row.materialized_at as string | { value?: string } | null),
+      sourceFreshnessAt
+    }
+  }
+
+  return evaluateMemberMetricFreshness({
+    periodYear,
+    periodMonth,
+    materializedAt: row.materialized_at as string | { value?: string } | null,
+    sourceFreshnessAt
+  })
+}
+
 export const readMemberMetrics = async (
   memberId: string,
   periodYear: number,
@@ -787,7 +849,7 @@ export const readMemberMetrics = async (
 ): Promise<IcoMetricSnapshot | null> => {
   const projectId = getIcoEngineProjectId()
 
-  const [rows, cscRows] = await Promise.all([
+  const [rows, cscRows, sourceFreshnessAt] = await Promise.all([
     runIcoEngineQuery<MemberMetricRow>(`
       SELECT *
       FROM \`${projectId}.${ICO_DATASET}.metrics_by_member\`
@@ -808,17 +870,20 @@ export const readMemberMetrics = async (
         AND (${buildPeriodFilterSQL()})
       GROUP BY space_id, fase_csc
       ORDER BY fase_csc
-    `, { memberId, periodYear, periodMonth })
+    `, { memberId, periodYear, periodMonth }),
+
+    readCurrentPeriodMemberMetricSourceFreshness(periodYear, periodMonth)
   ])
 
   if (rows.length === 0) return null
 
   const row = rows[0]
 
-  // Some early TASK-189 rows were materialized before the period buckets were
-  // fully persisted. In that case prefer a live compute over returning stale
-  // member context that makes the period look empty/incomplete.
-  if (hasIncompleteMemberMaterialization(row)) {
+  // Some rows can be structurally complete but operationally stale (for example
+  // current-period metrics_by_member frozen while delivery snapshots keep
+  // advancing). In that case prefer canonical live compute over returning a
+  // false KPI that can affect self-service and payroll bonus.
+  if (evaluateMemberRowFreshness(row, periodYear, periodMonth, sourceFreshnessAt).status === 'stale') {
     return computeMetricsByContext('member', memberId, periodYear, periodMonth)
   }
 
@@ -870,13 +935,17 @@ export const readMemberMetricsBatch = async (
 
   const projectId = getIcoEngineProjectId()
 
-  const rows = await runIcoEngineQuery<MemberMetricRow>(`
-    SELECT *
-    FROM \`${projectId}.${ICO_DATASET}.metrics_by_member\`
-    WHERE member_id IN UNNEST(@memberIds)
-      AND period_year = @periodYear
-      AND period_month = @periodMonth
-  `, { memberIds: normalizedMemberIds, periodYear, periodMonth })
+  const [rows, sourceFreshnessAt] = await Promise.all([
+    runIcoEngineQuery<MemberMetricRow>(`
+      SELECT *
+      FROM \`${projectId}.${ICO_DATASET}.metrics_by_member\`
+      WHERE member_id IN UNNEST(@memberIds)
+        AND period_year = @periodYear
+        AND period_month = @periodMonth
+    `, { memberIds: normalizedMemberIds, periodYear, periodMonth }),
+
+    readCurrentPeriodMemberMetricSourceFreshness(periodYear, periodMonth)
+  ])
 
   const snapshots = new Map<string, IcoMetricSnapshot>()
   const staleMemberIds: string[] = []
@@ -888,7 +957,7 @@ export const readMemberMetricsBatch = async (
       continue
     }
 
-    if (hasIncompleteMemberMaterialization(row)) {
+    if (evaluateMemberRowFreshness(row, periodYear, periodMonth, sourceFreshnessAt).status === 'stale') {
       staleMemberIds.push(memberId)
       continue
     }

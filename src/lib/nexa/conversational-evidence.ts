@@ -1,6 +1,7 @@
 import type { KnowledgeRetrievalChunk, KnowledgeRetrievalPacket } from '@/lib/knowledge/search'
 
 import type { NexaToolResult } from './nexa-contract'
+import { toPlainExcerpt } from './strip-markdown-excerpt'
 
 export type ConversationalEvidenceContractVersion = 'nexa-evidence.v1'
 export type ConversationalEvidenceKind = 'knowledge'
@@ -126,7 +127,7 @@ export const knowledgePacketToConversationalEvidence = (
       title: chunk.title,
       citationLabel: chunk.citationLabel,
       headingPath: chunk.headingPath,
-      excerpt: chunk.text,
+      excerpt: toPlainExcerpt(chunk.text),
       humanUrl: chunk.humanUrl,
       sourceUrl: chunk.sourceUrl,
       score: chunk.score,

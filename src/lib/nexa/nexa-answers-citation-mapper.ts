@@ -14,6 +14,8 @@ import type { NexaCitationSource } from '@/components/greenhouse/primitives'
 import type { KnowledgeFreshness } from '@/lib/knowledge/types'
 import type { KnowledgeRetrievalChunk, KnowledgeRetrievalPacket } from '@/lib/knowledge/search/types'
 
+import { toPlainExcerpt } from './strip-markdown-excerpt'
+
 /** Excerpt máximo del peek (caracteres). El chunk completo puede ser largo; el peek muestra un fragmento. */
 const DEFAULT_MAX_EXCERPT_LENGTH = 280
 
@@ -32,9 +34,9 @@ export const normalizeCitationLabel = (citationLabel: string): string => {
   return stripped.length > 0 ? stripped : citationLabel.trim()
 }
 
-/** Recorta a un excerpt legible en frontera de palabra, con elipsis, colapsando whitespace. */
+/** Recorta a un excerpt legible en frontera de palabra, con elipsis, sin Markdown crudo (TASK-1124). */
 export const truncateCitationExcerpt = (text: string, maxLength = DEFAULT_MAX_EXCERPT_LENGTH): string => {
-  const clean = text.trim().replace(/\s+/g, ' ')
+  const clean = toPlainExcerpt(text)
 
   if (clean.length <= maxLength) return clean
 

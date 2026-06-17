@@ -15,8 +15,8 @@ const ROLE_VALUES = new Set<string>(Object.values(ROLE_CODES))
 const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
 
 describe('pilot corpus manifest (TASK-1082)', () => {
-  it('has the 15 canonical pilot docs', () => {
-    expect(PILOT_CORPUS).toHaveLength(15)
+  it('has the 15 base pilot docs + 67 TASK-1140 operating manuals', () => {
+    expect(PILOT_CORPUS).toHaveLength(82)
   })
 
   it('slugs are unique kebab-case', () => {
@@ -59,6 +59,27 @@ describe('pilot corpus manifest (TASK-1082)', () => {
     expect(payroll?.agenticPolicy).toBe('agent_excluded')
     expect(secrets?.agenticPolicy).toBe('agent_excluded')
     expect(secrets?.sensitivity).toBe('restricted')
+  })
+
+  it('TASK-1140 operating manuals (HR/Payroll/Contractors incl.) are agent_allowed + internal', () => {
+    // Operator decision (governance, opción A): los manuales operativos nuevos
+    // nacen agent_allowed para que Nexa los cite; el único agent_excluded durable
+    // es la política de secretos (restricted). Guard contra un flip silencioso.
+    const newSlugs = ['payroll-finiquitos-chile', 'contractor-flujo-de-pago-completo', 'finance-operacion-end-to-end']
+
+    for (const slug of newSlugs) {
+      const entry = PILOT_CORPUS.find(e => e.slug === slug)
+
+      expect(entry, slug).toBeDefined()
+      expect(entry?.agenticPolicy, slug).toBe('agent_allowed')
+      expect(entry?.audience, slug).toBe('internal')
+      expect(entry?.sensitivity, slug).toBe('internal')
+    }
+
+    // El único restricted del corpus sigue siendo la política de secretos.
+    const restricted = PILOT_CORPUS.filter(e => e.sensitivity === 'restricted')
+
+    expect(restricted.map(e => e.slug)).toEqual(['politica-secretos-acceso'])
   })
 
   it('maintenance mode is agent-allowed for production-readiness QA', () => {

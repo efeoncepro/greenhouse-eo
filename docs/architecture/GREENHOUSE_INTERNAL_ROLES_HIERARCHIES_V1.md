@@ -600,3 +600,96 @@ Estado actual: **0 legacy role codes en runtime**. 13 role codes canónicos. Big
 - `TASK-031` — performance evaluations ya dependen de `reports_to_member_id`
 - follow-on futuro recomendado:
   - registry scoped de responsabilidades operativas
+
+---
+
+## Invariantes operativos para agentes — Capability grant coverage + ROLE_CODES (TASK-873/935)
+
+> **Relocados de `CLAUDE.md` por TASK-1160 (2026-06-16), verbatim — incluye el snapshot completo de ROLE_CODES y la matriz de roles fantasma.** Dedup = Slice 4.
+
+### Capability runtime grant invariant (TASK-873, desde 2026-05-14)
+
+Cuando una task seed-ea una capability nueva en `greenhouse_core.capabilities_registry` (DB) Y en `src/config/entitlements-catalog.ts` (TS), **debe también granteear esa capability a algún subject en `src/lib/entitlements/runtime.ts`** en el mismo PR. Sin el grant en runtime, el endpoint protegido por `can(subject, '<capability>', ...)` retorna 403 incluso para EFEONCE_ADMIN — la capability existe en el registry pero ningún subject la posee.
+
+**Bug class canonizada live 2026-05-14**: TASK-872 Slice 1.5 seedeó `workforce.member.complete_intake` en TS catalog + DB capabilities_registry pero olvidó el grant en runtime.ts. El endpoint `POST /api/admin/workforce/members/[memberId]/complete-intake` quedó shipped pero inaccesible para cualquier rol durante todo el periodo desde TASK-872 SHIPPED (2026-05-13) hasta TASK-873 Slice 1 fix (2026-05-14, commit `00730a82`).
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** agregar entry al `ENTITLEMENT_CAPABILITY_CATALOG` en `src/config/entitlements-catalog.ts` que se chequee vía `can()` sin agregar grant correspondiente en `src/lib/entitlements/runtime.ts` en el mismo PR. **Enforcement mecánico desde TASK-935**: el guard `src/lib/entitlements/capability-grant-coverage.test.ts` (puro, no-DB, corre en CI) parsea todos los `can()` usages en `src/app`+`src/lib` y asserta que toda capability del catalog chequeada vía `can()` está granteada a ≥1 rol. Si agregás un `can()` sobre una capability sin grant, este test rompe el build. (La parity test live `parity.live.test.ts` es complementaria: valida TS↔DB shape/module parity, NO grant coverage.)
+- **NUNCA** agregar grant en runtime.ts sin un comentario `// TASK-XXX — <descripción del fix>` que documente la decisión + el set canónico de roles. El comentario es lo que permite al próximo agente entender el alcance del gate.
+- **NUNCA** asumir que "la capability ya está en DB" significa "los usuarios tienen acceso". DB registry es **gobernanza** (qué capabilities existen + auditoría); runtime.ts es **policy** (qué subjects las tienen). Son ortogonales.
+- **NUNCA** branchear `roleCodes.includes(...)` inline en route handlers o views. Toda autorización pasa por `can(subject, capability, action, scope)`. Los grants en runtime son la única fuente.
+- **SIEMPRE** que un endpoint nuevo proteja recursos sensibles vía `can(...)`, smoke-test localmente con un usuario real del role objetivo (e.g. agent auth + Playwright + un member con el rol intended) ANTES de mergear. Sin smoke, el bug class del 2026-05-13→05-14 se repite.
+- **SIEMPRE** que emerja una task que cubra Slice "Capabilities Registry Seed" (canonical pattern TASK-839/840/848/849/850/872), el slice **debe** incluir tanto la migration DB como el grant runtime.ts. NO scope-creep al slice anterior ni posterior; mismo commit.
+
+**Defense in depth**: cuando una capability es operacionalmente crítica (e.g. transición state machine, mutación HR/Finance, reveal sensitive), agregar smoke test E2E en `tests/e2e/smoke/` que verifique el flow con un usuario del rol esperado. Sin smoke, el endpoint queda en "shipped pero inaccesible" hasta que un usuario real lo reporta.
+
+**Spec canónica**: `docs/tasks/complete/TASK-873-workforce-intake-ui.md` (Slice 1 fix). Pattern fuente: `src/lib/entitlements/runtime.ts` líneas con grant `workforce.member.complete_intake` (matriz `hr ∪ EFEONCE_ADMIN ∪ FINANCE_ADMIN`).
+
+**TASK-935 (2026-05-25) — reconciliación sistémica + guard mecánico**: el bug class TASK-873 había recurrido 13 veces (capabilities can()-checked en endpoints `/api/admin/*` sin runtime grant → 403 para todos). Causa raíz: specs documentaron roles intended (`DEVOPS_OPERATOR`, `commercial_admin`, `operations`) que **nunca existieron como `ROLE_CODES`**, así que el grant nunca se escribió. TASK-935 agregó los 13 grants (colapsando a `EFEONCE_ADMIN` + `FINANCE_ADMIN`, el set real que pasa `requireAdminTenantContext`) + el guard `capability-grant-coverage.test.ts` que **previene la recurrencia mecánicamente**. **NUNCA** documentar un rol intended en una spec/capability sin verificar que existe en `src/config/role-codes.ts`; si no existe, el grant colapsa al rol real más cercano (típicamente `EFEONCE_ADMIN`). Spec: `docs/tasks/complete/TASK-935-capability-governance-reconciliation.md`.
+
+**Reflejo canonical antes de citar cualquier rol** (TASK-947 follow-up 2026-05-29): cuando un agente o spec mencione un rol, DEBE verificarlo primero contra el snapshot canonical de abajo (single source of truth: `src/config/role-codes.ts`, `ROLE_CODES` const). El guard `capability-grant-coverage.test.ts` atrapa el bug en CI cuando hay capability sin grant, pero el daño documental (specs/CLAUDE.md/AGENTS.md confusos) NO lo atrapa el guard. Esta regla cubre el lado documental.
+
+#### ROLE_CODES vigentes (snapshot 2026-06-10, V1.1 canonical)
+
+**14 roles reales** — son los ÚNICOS valores legítimos para `roleCodes`/`primaryRoleCode` en `TenantContext` / `TenantEntitlementSubject`. Cualquier mención fuera de esta tabla es bug documental. Fuente: `src/config/role-codes.ts` + `docs/architecture/GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md` §"Role codes internos actuales" + `docs/architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md`. (TASK-1072 agregó `designer` → 13→14.)
+
+**Internos Efeonce (11)**:
+
+| `role_code` | Nombre visible | Para qué sirve | Route groups típicos |
+|---|---|---|---|
+| `efeonce_admin` | Superadministrador | Control total de Greenhouse (usuarios, roles, settings, vistas). Override global. Pasa `requireAdminTenantContext`. Es el colapso canonical de roles fantasma (DEVOPS_OPERATOR, commercial_admin). | `internal`, `admin` + acceso transversal |
+| `finance_admin` | Administrador de Finanzas | Configuración + operaciones financieras sensibles. Pasa `requireFinanceTenantContext`. Co-grant canonical para observabilidad financiera. | `internal`, `finance` |
+| `finance_analyst` | Analista de Finanzas | Operación financiera del día a día (read-write acotado, no settings sensibles). | `internal`, `finance` |
+| `hr_payroll` | Nómina | Gestión de payroll, compensaciones y períodos. | `internal`, `hr` |
+| `hr_manager` | Gestión HR | Gestión HR de personas, estructura y approvals de dominio. **NO confundir con `HR_ADMIN` (fantasma).** | `internal`, `hr` |
+| `efeonce_operations` | Operaciones | Visibilidad operativa cross-space y cross-tenant. **NO confundir con `operations` (fantasma — no es rol, es término genérico).** | `internal` |
+| `efeonce_account` | Líder de Cuenta | Responsabilidad comercial y salud de cuentas. | `internal` |
+| `people_viewer` | Lectura de Personas | Lectura de People, capacidad, assignments y memberships. | `internal`, `people` |
+| `ai_tooling_admin` | Administrador de Herramientas AI | Gobierno de catálogo, licencias y wallets AI. | `internal`, `ai_tooling` |
+| `designer` | Diseñador | Opera el Design System interno (AXIS): vincula nodos Figma a las superficies del DS (capability `design_system.figma_node.link`), a futuro gobierna tokens/specimens. Ver el DS es view abierto a todo interno; **vincular** es exclusivo de este rol ∪ admin (TASK-1072). | `internal`, `my` |
+| `collaborator` | Colaborador | Experiencia personal del miembro en Greenhouse (Mi Ficha, Mi Nómina). Lo tiene todo colaborador interno además de su rol funcional. | `my` |
+
+**Externos cliente (3)**:
+
+| `role_code` | Nombre visible | Para qué sirve | Route groups |
+|---|---|---|---|
+| `client_executive` | Cliente Ejecutivo | CMO/VP-level. Dashboard ejecutivo, KPIs alto nivel, overview de equipo. | `client` |
+| `client_manager` | Cliente Manager | Marketing manager. Contexto operativo profundo, drilldowns de proyecto, detalle de sprint. | `client` |
+| `client_specialist` | Cliente Specialist | Coordinador externo. Restringido a proyectos o campañas específicas via scope filters. | `client` |
+
+**Helpers TS canonical para citar roles** (no escribir strings literales):
+
+```ts
+import { ROLE_CODES, type RoleCode, isRoleCode, isSuperadmin } from '@/config/role-codes'
+
+// CORRECTO
+hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)
+addEntitlement(entries, { source: 'role', ... }) // donde tenant.roleCodes.includes(ROLE_CODES.FINANCE_ADMIN)
+
+// PROHIBIDO
+subject.roleCodes.includes('devops_operator') // fantasma — no existe
+subject.roleCodes.includes('hr_admin') // fantasma — el real es hr_manager
+subject.roleCodes.includes('commercial_admin') // fantasma — colapsa a efeonce_admin
+```
+
+**Mapping route_groups (NO son roles, no confundir)**: `internal`, `admin`, `client`, `finance`, `hr`, `people`, `my`, `ai_tooling`. Son derivados del rol según `src/lib/tenant/access.ts`. Un rol puede pertenecer a múltiples route_groups.
+
+#### Bug class — roles fantasma que han contaminado specs
+
+Estos NO existen en `ROLE_CODES` pero se siguen citando incorrectamente. Cuando emerjan en draft de task / spec / análisis, colapsar inmediatamente al rol real más cercano:
+
+| Rol fantasma | Origen del bug | Colapso canonical |
+|---|---|---|
+| `DEVOPS_OPERATOR` / `devops_operator` | TASK-848/849/850/854/872/908 specs (release/SCIM/delivery). | `EFEONCE_ADMIN` solo (release ops + SCIM admin), opcional `+ FINANCE_ADMIN` para observabilidad. |
+| `HR_ADMIN` / `hr_admin` | TASK-908 spec (ICO status transitions). | `HR_MANAGER`. |
+| `commercial_admin` / `COMMERCIAL_ADMIN` | Drafts comerciales pre-TASK-935. | `EFEONCE_ADMIN`. |
+| `operations` (como rol) | Confusión con route_group `internal` / con `efeonce_operations`. | `EFEONCE_OPERATIONS` si el intent es el rol; `internal` como route_group si el intent era acceso broad. |
+
+**Protocolo obligatorio cuando un agente vaya a citar un rol** (nuevo draft, capability matrix, grant analysis, doc nueva, edit a CLAUDE.md/AGENTS.md):
+
+1. Leer `src/config/role-codes.ts` (`ROLE_CODES` const) — los 14 valores arriba.
+2. Listar los roles que el draft/análisis menciona.
+3. Flag cualquier rol que no esté en la tabla.
+4. Proponer colapso canonical (típicamente `EFEONCE_ADMIN` para admin/release, `+ FINANCE_ADMIN` para finance observability, `HR_MANAGER` para HR governance).
+5. Documentar el colapso con marcador inline si la spec original tiene valor histórico (patrón: `<!-- spec original menciona X — colapsado a Y por TASK-935 -->`).

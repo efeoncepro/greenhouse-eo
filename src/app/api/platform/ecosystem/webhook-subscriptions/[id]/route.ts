@@ -1,3 +1,4 @@
+import { runEcosystemCommandRoute } from '@/lib/api-platform/core/commands'
 import { runEcosystemReadRoute } from '@/lib/api-platform/core/ecosystem-auth'
 import { getWebhookSubscription, updateWebhookSubscription } from '@/lib/api-platform/resources/events'
 
@@ -26,9 +27,10 @@ export async function PATCH(request: Request, context: RouteContext) {
   const { id } = await context.params
   const body = await request.json().catch(() => null)
 
-  return runEcosystemReadRoute({
+  return runEcosystemCommandRoute({
     request,
     routeKey: 'platform.ecosystem.webhook-subscriptions.update',
+    body,
     handler: async platformContext => ({
       data: await updateWebhookSubscription({
         context: platformContext,

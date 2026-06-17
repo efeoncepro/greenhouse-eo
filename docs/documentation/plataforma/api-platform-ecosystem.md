@@ -1,9 +1,9 @@
 # API Platform Ecosystem
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.4
+> **Version:** 1.5
 > **Creado:** 2026-04-25 por Codex (TASK-616 follow-up)
-> **Ultima actualizacion:** 2026-05-01 por Codex (TASK-741 remote MCP gateway)
+> **Ultima actualizacion:** 2026-06-15 por Claude (TASK-655 command & idempotency foundation)
 > **Documentacion tecnica:** [GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md)
 
 ---
@@ -389,7 +389,6 @@ Además, este primer corte ya fue verificado con:
 Todavía no hace estas cosas:
 
 - writes ecosystem-facing amplios de dominio
-- idempotencia runtime de commands
 - generacion automatica de OpenAPI desde schemas runtime
 - MCP write-safe o surfaces MCP más amplias que el slice read-only V1
 - una API pública abierta
@@ -494,6 +493,31 @@ No usarla todavía cuando:
 - el caso es puramente interno del portal
 - el recurso todavía está demasiado acoplado a UI o a backend híbrido inestable
 - el caso requiere un command mutativo que aún no tiene contrato idempotente y auditable
+
+## Commands idempotentes (TASK-655)
+
+Los commands del event control plane (crear/editar una subscription, reprogramar un retry)
+ahora son **idempotentes y auditables**. Esto resuelve un problema concreto: cuando un
+consumer reintenta una llamada que falló por timeout de red, antes podía crear dos veces el
+mismo recurso. Ahora no.
+
+Cómo funciona, en simple:
+
+- El consumer manda un header opcional `Idempotency-Key` con un valor único por operación.
+- **Primera llamada** con esa key → se ejecuta normal y se guarda la respuesta.
+- **Reintento** con la misma key y el mismo cuerpo → Greenhouse devuelve la **misma respuesta
+  guardada**, sin volver a ejecutar, y agrega el header `Idempotency-Replayed: true`.
+- **Misma key, cuerpo distinto** → `409` (`idempotency_conflict`): la key se reusó para otra
+  cosa. Es un error del consumer, no se ejecuta.
+- **Misma key mientras la primera todavía corre** → `409` (`idempotency_in_progress`).
+- Las keys son por-consumer y expiran a las 24 horas.
+
+Además, **toda** ejecución de un command queda registrada (con o sin key) para auditoría. Si
+algún command queda colgado por un crash del runtime, una señal en `/admin/operations`
+(`platform.command.stuck_processing`) lo hace visible para que un operador lo resuelva.
+
+Pasar la `Idempotency-Key` es opcional, pero recomendado para cualquier integración o agente
+que pueda reintentar.
 
 ## Resumen corto
 

@@ -21,7 +21,9 @@ describe('knowledge golden questions — structure (TASK-1083)', () => {
         Boolean(question.expectAnyTitleIncludes) ||
         Boolean(question.mustNotReturnTitleIncludes) ||
         question.expectNoAnswer === true ||
-        typeof question.expectDeniedAtLeast === 'number'
+        typeof question.expectDeniedAtLeast === 'number' ||
+        Boolean(question.expectFirstTitleIncludes) ||
+        typeof question.expectDistinctDocumentsAtLeast === 'number'
 
       expect(hasExpectation, `${question.id} has no expectation`).toBe(true)
     }
@@ -38,5 +40,10 @@ describe('knowledge golden questions — structure (TASK-1083)', () => {
     expect(KNOWLEDGE_GOLDEN_QUESTIONS.some(q => q.mustNotReturnTitleIncludes)).toBe(true)
     expect(KNOWLEDGE_GOLDEN_QUESTIONS.some(q => q.expectNoAnswer)).toBe(true)
     expect(KNOWLEDGE_GOLDEN_QUESTIONS.some(q => q.mode === 'agentic' && q.expectDeniedAtLeast)).toBe(true)
+  })
+
+  it('cubre regresión de rerank: wrong-source (first) + cross-document (distinct docs) — TASK-1127', () => {
+    expect(KNOWLEDGE_GOLDEN_QUESTIONS.some(q => q.expectFirstTitleIncludes)).toBe(true)
+    expect(KNOWLEDGE_GOLDEN_QUESTIONS.some(q => (q.expectDistinctDocumentsAtLeast ?? 0) >= 2)).toBe(true)
   })
 })

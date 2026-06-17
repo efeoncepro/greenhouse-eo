@@ -421,8 +421,53 @@ export const GH_NEXA = {
           'Costo laboral por equipo',
           'Pendientes antes del cierre'
         ]
+      },
+      personal: {
+        // Mi espacio (TASK-1141) — starters self-service. Cuando hay pendientes reales, el
+        // resolver data-aware los reemplaza; si no, estas plantillas.
+        label: 'Mi espacio',
+        icon: 'tabler-user',
+        prompts: [
+          '¿Qué tengo pendiente?',
+          '¿Cuántos días de vacaciones me quedan?',
+          'Muéstrame mi última liquidación',
+          '¿Cómo voy con mis objetivos?'
+        ]
       }
     } as Record<string, { label: string; icon: string; prompts: string[] }>,
+    // Prompts DATA-AWARE (Tier 2, TASK-1087): plantillas de "gancho" por categoría de señal real
+    // (anomalía/pendiente/riesgo/KPI). El composer (suggested-prompts-data-aware.ts) elige cuáles
+    // según las señales vivas de la entidad y reemplaza `{entity}` con su nombre. Es-CL tuteo.
+    // REGLA DURA: estas plantillas NUNCA llevan montos crudos ni PII — solo el gancho + el nombre
+    // (que el usuario ya ve en la página). El detalle lo resuelve Nexa con sus tools.
+    data_aware_prompts: {
+      health_risk: '¿Por qué {entity} está en riesgo este mes?',
+      health_blocked: 'Hay algo bloqueando a {entity}, ¿lo resolvemos?',
+      anomaly_delivery_error: 'El delivery de {entity} está en rojo, ¿lo revisamos?',
+      anomaly_delivery_warning: '{entity} tiene entregables trabados, ¿los vemos?',
+      anomaly_finance_warning: '{entity} tiene saldo pendiente por cobrar, ¿lo revisamos?',
+      lifecycle_blocked: 'El onboarding de {entity} está bloqueado, ¿lo destrabamos?',
+      lifecycle_pending: '¿Qué falta para cerrar el onboarding de {entity}?',
+      pending_review: '{entity} tiene pendientes por revisar, ¿los vemos?',
+      generic_watch: '¿Qué está pasando con {entity} este mes?',
+      // TASK-1141 — Mi espacio (contexto personal). `{entity}` no se usa acá (es la data del
+      // propio colaborador); `{count}` se interpola con el número real cuando aplica.
+      personal_intake_incomplete: 'Te falta completar tu ficha, ¿la terminamos?',
+      personal_leave_pending: 'Tienes {count} solicitud(es) de vacaciones en curso, ¿las vemos?',
+      personal_approvals_pending: 'Tienes {count} aprobación(es) de tu equipo esperando, ¿las revisamos?',
+      // TASK-1145 — recibo de pago disponible. Regime-neutral ("recibo", NUNCA "liquidación":
+      // un colaborador Deel no recibe una liquidación chilena). NUNCA el monto en el texto.
+      personal_payslip_ready: 'Tu recibo de pago más reciente ya está disponible, ¿lo revisamos?',
+      // TASK-1144 — performance / métricas ICO propias (tuteo). `{count}` interpolado; NUNCA un monto.
+      personal_overdue_tasks: 'Tienes {count} entregable(s) atrasado(s), ¿los revisamos?',
+      personal_performance_review: '¿Revisamos tu desempeño de este mes?',
+      // TASK-1143 — Finanzas global (dashboard). Nexa le habla al operador financiero (tuteo +
+      // nosotros). `{count}` se interpola con el número real; NUNCA un monto.
+      finance_ledger_drift: 'Hay {count} movimiento(s) con descuadre en el ledger, ¿los revisamos?',
+      finance_stale_balances: 'Hay {count} cuenta(s) con saldo desactualizado, ¿las revisamos?',
+      finance_unanchored: 'Hay {count} gasto(s) sin clasificar, ¿los vemos?',
+      finance_ledger_degraded: 'Hay chequeos del ledger que no pude verificar, ¿lo revisamos?'
+    } as Record<string, string>,
     // Saludo del empty hero — rota en cada nueva conversación. `{name}` se reemplaza
     // con el primer nombre del usuario en sesión; si no hay nombre, esas frases se
     // filtran (mismo patrón que agent_headline_rotation_*). Cortos (1 línea),

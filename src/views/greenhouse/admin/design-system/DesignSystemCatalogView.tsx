@@ -193,6 +193,47 @@ const CATALOG_ITEMS: CatalogItem[] = [
     icon: 'tabler-layers-subtract'
   },
   {
+    id: 'nexa-answers-experience',
+    title: 'Nexa Answers Experience',
+    description:
+      'La experiencia conversacional completa de Nexa Answers (TASK-1110): la respuesta lidera y SE ARMA frente al usuario (el chart se dibuja + el número cuenta 0→valor), portabilidad cross-dominio (Knowledge/Finance/Insight) y la composición in-place con host (NexaMomentComposition, GAP A: morph dormant↔composed + fuentes ancladas al doc real + next-step gobernado + puente). Primera page del DS que agrega un flujo end-to-end.',
+    route: '/design-system/nexa-answers-experience',
+    category: 'Patterns',
+    kind: 'Pattern',
+    status: 'Hardening',
+    owner: 'NexaAnswersCanvas + NexaMomentComposition',
+    tags: ['nexa', 'answers', 'experiencia', 'conversacional', 'moment', 'se arma', 'chart draw', 'count', 'AI overview', 'in-place'],
+    searchAliases: ['nexa answers', 'experiencia conversacional', 'answers experience', 'se arma', 'armando', 'moment', 'conversational', 'overview', 'in-place'],
+    icon: 'tabler-message-chatbot'
+  },
+  {
+    id: 'composition-shell',
+    title: 'Composition shell',
+    description: 'Substrato de coreografía de layout (TASK-1114): regiones singleton (primary/aside/lead/dock/overlay) + composiciones nombradas (single/leadPlusContext/split/focused) + morph in-place (View Transitions) + reflow por size class. Domain-neutral, opt-in; del que Adaptive Sidecar / NexaMomentComposition son consumers.',
+    route: '/design-system/composition-shell',
+    category: 'Primitives',
+    kind: 'Primitive',
+    status: 'Hardening',
+    owner: 'CompositionShell',
+    tags: ['shell', 'layout', 'composición', 'regiones', 'morph', 'view transitions', 'fluidez', 'breakpoints'],
+    searchAliases: ['composition shell', 'shell', 'layout', 'regiones', 'composicion', 'morph', 'coreografia', 'canonical layouts'],
+    icon: 'tabler-layout-board-split'
+  },
+  {
+    id: 'card-density',
+    title: 'Adaptive card density',
+    description:
+      'Contrato de densidad de cards (TASK-1115): capacidad hermana del Composition Shell. El card se adapta a SU propio ancho (container query) con modos full/condensed/peek — condensación honesta (versión real más chica, nunca clip; el dato clave nunca desaparece). Generaliza el density contract de tablas (TASK-743). Adoptado por MetricSummaryCard / MetricTrendCard.',
+    route: '/design-system/card-density',
+    category: 'Primitives',
+    kind: 'Primitive',
+    status: 'Canonical',
+    owner: 'card-density',
+    tags: ['card', 'densidad', 'container query', 'condensación', 'adaptive', 'fit mode'],
+    searchAliases: ['adaptive card', 'card density', 'densidad', 'container query', 'condensacion', 'full condensed peek', 'fit mode'],
+    icon: 'tabler-layout-cards'
+  },
+  {
     id: 'buttons',
     title: 'Buttons',
     description: 'Primitive para jerarquía de comandos, tono, iconos y estados async.',

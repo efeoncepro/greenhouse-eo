@@ -15,11 +15,17 @@ import { getAccountComplete360 } from './account-complete-360'
  * This guard exercises the readers against the richest live org and asserts:
  *   1. ZERO `_meta.errors` — if a future migration drifts a referenced column, the hardened reader
  *      now throws → the resolver records it here → this test fails loud (instead of a silently
- *      blank tab shipping to production).
+ *      blank tab shipping to production). This is the canonical guard for ISSUE-087 (the delivery
+ *      facet's `rpa_median` 42703): the unified operational reader (TASK-1106) re-throws schema-drift
+ *      (42703 / 42P01) so re-introducing a missing column surfaces here, not as Sentry-only noise.
+ *      The same `getAccountComplete360` path backs BOTH `GET /api/organization/[id]/360?facets=delivery`
+ *      and `GET /api/organizations/[id]/workspace/compact-signals`, so this one guard covers both routes.
  *   2. The Team facet returns members for an org that has active memberships (the NULL-start_date
  *      temporal fix — HubSpot contacts carry NULL start_date and must not be filtered out).
- *   3. The Delivery facet, when present, returns coherent numeric task counts (the canonical
- *      task_status vocabulary + project_record_id join + BigQuery ICO fallback).
+ *   3. The Delivery facet, when present, returns coherent numeric task counts AND a structurally
+ *      complete ICO contract (rpaMedian / pipelineVelocity / stuckAssetPct present as number|null,
+ *      never `undefined`) — the canonical task_status vocabulary + project_record_id join + the
+ *      unified operational serving ⊕ ico ⊕ BigQuery reader.
  *
  * Skips automatically when no DB is connected (CI without pg:connect, lint runs). The schema/shape
  * contract is also covered structurally by the silent-catch hardening itself.
@@ -100,6 +106,18 @@ describe.runIf(requiresLiveDb())('Account 360 facet readers — live drift guard
       expect(Number.isFinite(counts.total)).toBe(true)
       expect(Number.isFinite(counts.completed)).toBe(true)
       expect(counts.completed).toBeLessThanOrEqual(counts.total)
+
+      // ISSUE-087 contract: the rich ICO columns the delivery facet reads (rpa_median /
+      // pipeline_velocity / stuck_asset_pct) must resolve as number|null, never `undefined`. A
+      // missing serving column would have surfaced as a non-empty `_meta.errors` above, but this
+      // pins the shape so the parity contract can't silently drift back to a partial read.
+      const ico = result.delivery.icoMetrics
+
+      if (ico) {
+        for (const value of [ico.rpaMedian, ico.pipelineVelocity, ico.stuckAssetPct]) {
+          expect(value === null || Number.isFinite(value)).toBe(true)
+        }
+      }
     }
   })
 })

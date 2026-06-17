@@ -1,0 +1,68 @@
+{
+  "contractVersion": "contentFactoryPatchPlan.v1",
+  "generatedAt": "2026-06-14T19:58:22.123Z",
+  "mode": "plan_only",
+  "sendsWordPressWrite": false,
+  "modifiesPublishedSource": false,
+  "objective": "Replace the cultural-change pullquote with an original quote that connects Loop Marketing to continuous learning, experimentation and operational culture, without changing the published post.",
+  "target": {
+    "wordpressPostId": 248398,
+    "url": "https://efeoncepro.com/loop-marketing/que-es-loop-marketing/",
+    "slug": "que-es-loop-marketing",
+    "status": "publish",
+    "editorModel": "gutenberg_blocks",
+    "sourceScannedAt": "2026-06-14T19:40:52+00:00",
+    "sourceModified": "2025-09-08T21:13:29+00:00",
+    "sourceFingerprint": "c613e8ce9d991c289de7d7aef396a64b4b0fddcf8aa0563e7e17c6291a1289b5"
+  },
+  "sourceRefreshPlan": {
+    "contractVersion": "contentFactoryRefreshPlan.v1",
+    "generatedAt": "2026-06-14T19:57:34.601Z",
+    "sourceFingerprint": "c613e8ce9d991c289de7d7aef396a64b4b0fddcf8aa0563e7e17c6291a1289b5"
+  },
+  "safetyPolicy": {
+    "writesWordPressContent": false,
+    "publishesContent": false,
+    "modifiesPublishedSource": false,
+    "clearsCache": false,
+    "createsBackup": false,
+    "sendsSecretsToOutput": false
+  },
+  "readiness": {
+    "status": "ready_for_draft_clone",
+    "blockers": [],
+    "warnings": []
+  },
+  "operations": [
+    {
+      "operation": "update_text",
+      "targetPath": "276",
+      "nativeKind": "blockName",
+      "key": "core/pullquote",
+      "fingerprint": "6986a031c74d6ab2e1e658ce5c21dc44bdd925e618a0e7cc122a4ad379644cd9",
+      "currentText": "📌 Gartner advierte que el 70 % de los equipos de marketing que no adopten modelos ágiles seguirán perdiendo relevancia frente a competidores data-driven (Gartner, Future of Market...",
+      "proposedText": "📌 El Loop Marketing no reemplaza la estrategia: reemplaza la espera. La ventaja ya no está en planear campañas perfectas, sino en aprender rápido, ajustar con datos y reinvertir cada señal en el próximo ciclo.",
+      "rationale": "Use an original content-aligned pullquote instead of a fragile external-stat citation, while preserving the Gutenberg pullquote block.",
+      "risk": "low",
+      "status": "ready",
+      "blockers": [],
+      "warnings": [],
+      "guardrails": [
+        "Match both path and fingerprint before applying a future patch.",
+        "Preserve blockName and surrounding structure.",
+        "Patch a draft/private clone first; never patch the published source directly.",
+        "Apply only to a draft/private clone after revalidating the source fingerprint.",
+        "Never patch the published source object from this plan."
+      ]
+    }
+  ],
+  "nextStep": {
+    "command": "prepare_existing_post_refresh_draft_clone",
+    "status": "not_implemented",
+    "notes": "The next command should create or prepare a draft/private clone plan. It is intentionally not implemented in this plan-only slice."
+  },
+  "rollback": {
+    "strategy": "no_runtime_change_plan_only",
+    "notes": "This patch plan is a local artifact only. It performs no WordPress mutation, so rollback is deleting the artifact."
+  }
+}

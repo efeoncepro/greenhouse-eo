@@ -32,7 +32,8 @@ Registro canónico de asignación de IDs `EPIC-###` para evitar colisiones y ren
 | `EPIC-016` | `to-do` | `docs/epics/to-do/EPIC-016-revenue-first-sequencing-program.md` |
 | `EPIC-017` | `to-do` | `docs/epics/to-do/EPIC-017-unified-workforce-foundation-iterative-program.md` |
 | `EPIC-018` | `to-do` | `docs/epics/to-do/EPIC-018-performance-dashboard-storytelling-platform.md` |
+| `EPIC-019` | `to-do` | `docs/epics/to-do/EPIC-019-public-website-landing-control-plane.md` |
 
 ## Siguiente ID disponible
 
-- `EPIC-019`
+- `EPIC-020`

@@ -7,6 +7,16 @@ out
 coverage
 build
 .vercel
+.captures
+.codex
+.claude
+.agents
+.tmp
+tmp
+artifacts
+videos
+test-results
+tsconfig.tsbuildinfo
 .env
 .env*.local
 full-version

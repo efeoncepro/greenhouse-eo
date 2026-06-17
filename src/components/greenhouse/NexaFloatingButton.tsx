@@ -23,7 +23,8 @@ import {
 import type { ChatModelAdapter, ChatModelRunResult } from '@assistant-ui/react'
 import type { ReadonlyJSONObject, ReadonlyJSONValue } from 'assistant-stream/utils'
 
-import { DEFAULT_NEXA_MODEL, resolveNexaModel, type NexaModelId } from '@/config/nexa-models'
+import { DEFAULT_NEXA_MODEL, resolveNexaModel, type NexaModelId, type NexaModelMode } from '@/config/nexa-models'
+import type { NexaModelSelectorValue } from '@/lib/nexa/use-nexa-runtime'
 import type { NexaResponse } from '@/lib/nexa/nexa-contract'
 import { isNexaFloatingExpandableEnabled } from '@/lib/nexa/flags'
 import { NEXA_FLOATING_OPEN_EVENT } from '@/lib/nexa/floating-events'
@@ -48,7 +49,10 @@ const toJsonValue = (value: unknown): ReadonlyJSONValue => {
   return null
 }
 
-const createFloatingAdapter = (modelRef: React.MutableRefObject<NexaModelId>): ChatModelAdapter => ({
+const createFloatingAdapter = (
+  modelRef: React.MutableRefObject<NexaModelId>,
+  modelModeRef: React.MutableRefObject<NexaModelMode>
+): ChatModelAdapter => ({
   async run({ messages, abortSignal }): Promise<ChatModelRunResult> {
     const lastMessage = messages[messages.length - 1]
 
@@ -65,7 +69,8 @@ const createFloatingAdapter = (modelRef: React.MutableRefObject<NexaModelId>): C
     const res = await fetch('/api/home/nexa', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ prompt, history, model: modelRef.current }),
+      // TASK-1134 — `modelMode` auto (default) deja correr el router; manual fija el modelo del picker.
+      body: JSON.stringify({ prompt, history, model: modelRef.current, modelMode: modelModeRef.current }),
       signal: abortSignal
     })
 
@@ -153,17 +158,32 @@ const NexaFloatingButton = ({ docked = false }: NexaFloatingButtonProps) => {
     return () => window.removeEventListener(NEXA_FLOATING_OPEN_EVENT, onOpen)
   }, [expandableEnabled])
 
-  const [selectedModel, setSelectedModel] = useState<NexaModelId>(DEFAULT_NEXA_MODEL)
+  // TASK-1134 — auto es el default real (el runtime decide server-side); el picker fija un override
+  // manual. El FAB no persiste (estado efímero por montaje), a diferencia de useNexaPersistentRuntime.
+  const [modelMode, setModelMode] = useState<NexaModelMode>('auto')
+  const [manualModel, setManualModel] = useState<NexaModelId>(DEFAULT_NEXA_MODEL)
   const modelRef = useRef<NexaModelId>(DEFAULT_NEXA_MODEL)
+  const modelModeRef = useRef<NexaModelMode>('auto')
 
-  const handleModelChange = useCallback((model: NexaModelId) => {
-    const resolved = resolveNexaModel({ requestedModel: model })
+  const handleModelChange = useCallback((value: NexaModelSelectorValue) => {
+    if (value === 'auto') {
+      setModelMode('auto')
+      modelModeRef.current = 'auto'
 
-    setSelectedModel(resolved)
+      return
+    }
+
+    const resolved = resolveNexaModel({ requestedModel: value })
+
+    setModelMode('manual')
+    setManualModel(resolved)
+    modelModeRef.current = 'manual'
     modelRef.current = resolved
   }, [])
 
-  const adapter = useMemo(() => createFloatingAdapter(modelRef), [])
+  const selectedModel: NexaModelSelectorValue = modelMode === 'auto' ? 'auto' : manualModel
+
+  const adapter = useMemo(() => createFloatingAdapter(modelRef, modelModeRef), [])
 
   const runtime = useLocalRuntime(adapter, {
     initialMessages: [

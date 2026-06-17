@@ -1,0 +1,521 @@
+{
+  "contractVersion": "public-site-bridge-inspection.v1",
+  "generatedAt": "2026-06-14T16:22:05.591Z",
+  "baseUrl": "https://efeoncepro.com",
+  "pageId": 244079,
+  "mode": "read_only",
+  "auth": {
+    "usernameConfigured": true,
+    "applicationPasswordSecretConfigured": true,
+    "secretResolved": true
+  },
+  "endpoints": {
+    "health": {
+      "status": 200,
+      "ok": true,
+      "summary": {
+        "plugin": {
+          "name": "greenhouse-wp-bridge",
+          "version": "0.1.0",
+          "mode": "read_only_inspection"
+        },
+        "site": {
+          "url": "https://efeoncepro.com",
+          "wordpressVersion": "7.0",
+          "phpVersion": "8.2.30"
+        },
+        "theme": {
+          "name": "Ohio-Child",
+          "stylesheet": "ohio-child",
+          "template": "ohio",
+          "version": "1.0.0",
+          "parent": {
+            "name": "Ohio",
+            "version": "3.7.0"
+          }
+        },
+        "capabilities": {
+          "elementor_loaded": true,
+          "elementor_pro_loaded": true,
+          "wp_abilities_api_loaded": true,
+          "greenhouse_write_routes": false,
+          "kinsta_api_configured": false,
+          "cache_clear_configured": false,
+          "backup_create_configured": false,
+          "authenticated_inspection": true
+        },
+        "security": {
+          "requiresCapability": "edit_posts",
+          "writesEnabled": false
+        }
+      }
+    },
+    "elementorDocument": {
+      "status": 200,
+      "ok": true,
+      "summary": {
+        "post": {
+          "id": 244079,
+          "type": "page",
+          "status": "publish",
+          "slug": "servicios-contratar-hubspot",
+          "title": "Empodera tu crecimiento con HubSpot + Efeonce",
+          "modified": "2026-06-14T11:50:10"
+        },
+        "elementor": {
+          "hasData": true,
+          "editMode": "builder",
+          "templateType": "wp-page",
+          "version": "4.1.3",
+          "documentType": "wp-page"
+        },
+        "elementsSummary": {
+          "totalElements": 199,
+          "byElType": {
+            "column": 27,
+            "container": 46,
+            "section": 14,
+            "widget": 112
+          },
+          "byWidgetType": {
+            "divider": 1,
+            "eael-adv-accordion": 1,
+            "hubspot-form": 1,
+            "icon": 1,
+            "image": 3,
+            "ohio_accordion": 1,
+            "ohio_badge": 2,
+            "ohio_button": 2,
+            "ohio_carousel": 1,
+            "ohio_circle_progress_bar": 2,
+            "ohio_counter": 2,
+            "ohio_dynamic_text": 2,
+            "ohio_heading": 17,
+            "ohio_icon_box": 16,
+            "ohio_service_table": 12,
+            "ohio_team_members": 1,
+            "spacer": 38,
+            "text-editor": 9
+          },
+          "topLevelElements": [
+            {
+              "id": "9afb1d3",
+              "path": "0",
+              "elType": "section",
+              "widgetType": null,
+              "cssClasses": [],
+              "childCount": 4
+            },
+            {
+              "id": "7887dc5",
+              "path": "1",
+              "elType": "section",
+              "widgetType": null,
+              "cssClasses": [
+                "clb__dark_section"
+              ],
+              "childCount": 1
+            },
+            {
+              "id": "d53821a",
+              "path": "2",
+              "elType": "container",
+              "widgetType": null,
+              "cssClasses": [
+                "clb__light_section",
+                "clb__dark_mode_light"
+              ],
+              "childCount": 2
+            },
+            {
+              "id": "3935836",
+              "path": "3",
+              "elType": "container",
+              "widgetType": null,
+              "cssClasses": [],
+              "childCount": 2
+            },
+            {
+              "id": "30c53a9",
+              "path": "4",
+              "elType": "container",
+              "widgetType": null,
+              "cssClasses": [
+                "clb__light_section"
+              ],
+              "childCount": 2
+            },
+            {
+              "id": "b912cc6",
+              "path": "5",
+              "elType": "container",
+              "widgetType": null,
+              "cssClasses": [],
+              "childCount": 0
+            },
+            {
+              "id": "3747b08",
+              "path": "6",
+              "elType": "container",
+              "widgetType": null,
+              "cssClasses": [],
+              "childCount": 2
+            },
+            {
+              "id": "303764c",
+              "path": "7",
+              "elType": "section",
+              "widgetType": null,
+              "cssClasses": [],
+              "childCount": 1
+            },
+            {
+              "id": "83d3781",
+              "path": "8",
+              "elType": "section",
+              "widgetType": null,
+              "cssClasses": [
+                "clb__dark_section",
+                "gh-section-hubspot-partner-proof",
+                "gh-partner-proof-intro"
+              ],
+              "childCount": 1
+            },
+            {
+              "id": "ebe0037",
+              "path": "9",
+              "elType": "section",
+              "widgetType": null,
+              "cssClasses": [
+                "clb__dark_section",
+                "gh-section-hubspot-partner-proof",
+                "gh-partner-proof-cards"
+              ],
+              "childCount": 3
+            },
+            {
+              "id": "5b75db1",
+              "path": "10",
+              "elType": "section",
+              "widgetType": null,
+              "cssClasses": [
+                "clb__dark_section",
+                "gh-section-hubspot-partner-proof",
+                "gh-partner-proof-stack"
+              ],
+              "childCount": 1
+            },
+            {
+              "id": "f71128d",
+              "path": "11",
+              "elType": "section",
+              "widgetType": null,
+              "cssClasses": [],
+              "childCount": 1
+            },
+            {
+              "id": "16bad52",
+              "path": "12",
+              "elType": "section",
+              "widgetType": null,
+              "cssClasses": [],
+              "childCount": 1
+            },
+            {
+              "id": "c2b05d1",
+              "path": "13",
+              "elType": "section",
+              "widgetType": null,
+              "cssClasses": [
+                "clb__dark_section"
+              ],
+              "childCount": 1
+            },
+            {
+              "id": "7a31158",
+              "path": "14",
+              "elType": "container",
+              "widgetType": null,
+              "cssClasses": [],
+              "childCount": 1
+            },
+            {
+              "id": "e7f7266",
+              "path": "15",
+              "elType": "container",
+              "widgetType": null,
+              "cssClasses": [],
+              "childCount": 4
+            },
+            {
+              "id": "cac5d5e",
+              "path": "16",
+              "elType": "section",
+              "widgetType": null,
+              "cssClasses": [
+                "clb__dark_section"
+              ],
+              "childCount": 1
+            },
+            {
+              "id": "96cd69f",
+              "path": "17",
+              "elType": "container",
+              "widgetType": null,
+              "cssClasses": [],
+              "childCount": 1
+            },
+            {
+              "id": "f50481c",
+              "path": "18",
+              "elType": "container",
+              "widgetType": null,
+              "cssClasses": [],
+              "childCount": 1
+            },
+            {
+              "id": "8da872b",
+              "path": "19",
+              "elType": "container",
+              "widgetType": null,
+              "cssClasses": [],
+              "childCount": 1
+            },
+            {
+              "id": "cd309b2",
+              "path": "20",
+              "elType": "container",
+              "widgetType": null,
+              "cssClasses": [],
+              "childCount": 1
+            }
+          ],
+          "legacySectionCount": 14,
+          "containerCount": 46,
+          "widgetCount": 112
+        },
+        "semanticAnchors": [
+          {
+            "id": "83d3781",
+            "elType": "section",
+            "widgetType": null,
+            "classes": [
+              "gh-section-hubspot-partner-proof",
+              "gh-partner-proof-intro"
+            ]
+          },
+          {
+            "id": "ebe0037",
+            "elType": "section",
+            "widgetType": null,
+            "classes": [
+              "gh-section-hubspot-partner-proof",
+              "gh-partner-proof-cards"
+            ]
+          },
+          {
+            "id": "5b75db1",
+            "elType": "section",
+            "widgetType": null,
+            "classes": [
+              "gh-section-hubspot-partner-proof",
+              "gh-partner-proof-stack"
+            ]
+          }
+        ],
+        "ohioMetaKeys": [
+          "page_add_wrapper",
+          "page_add_top_padding",
+          "page_breadcrumbs_visibility",
+          "page_header_title_background_type",
+          "page_header_title_background_size",
+          "page_header_title_background_position",
+          "page_header_title_background_repeat",
+          "page_header_menu_style",
+          "page_header_menu_text_typo",
+          "gh_page_headline_display_title",
+          "_thumbnail_id",
+          "featured_image"
+        ],
+        "inspectionWarning": "read_only_snapshot_no_mutation"
+      }
+    },
+    "ohioWidgetCatalog": {
+      "status": 200,
+      "ok": true,
+      "summary": {
+        "elementorLoaded": true,
+        "totalWidgets": 253,
+        "ohioCount": 37,
+        "hubspotCount": 2,
+        "ohioWidgets": [
+          {
+            "name": "ohio_accordion",
+            "title": "Accordion"
+          },
+          {
+            "name": "ohio_accordion_horizontal",
+            "title": "Horizontal Accordion"
+          },
+          {
+            "name": "ohio_badge",
+            "title": "Badge"
+          },
+          {
+            "name": "ohio_banner",
+            "title": "Banner"
+          },
+          {
+            "name": "ohio_button",
+            "title": "Button"
+          },
+          {
+            "name": "ohio_call_to_action",
+            "title": "Call To Action"
+          },
+          {
+            "name": "ohio_carousel",
+            "title": "Carousel"
+          },
+          {
+            "name": "ohio_circle_progress_bar",
+            "title": "Circular Progress"
+          },
+          {
+            "name": "ohio_clients_logo",
+            "title": "Clients Logo"
+          },
+          {
+            "name": "ohio_compare",
+            "title": "Compare"
+          },
+          {
+            "name": "ohio_contact_form",
+            "title": "Contact Form 7"
+          },
+          {
+            "name": "ohio_countdown",
+            "title": "Countdown"
+          },
+          {
+            "name": "ohio_counter",
+            "title": "Counter"
+          },
+          {
+            "name": "ohio_dynamic_text",
+            "title": "Dynamic Text"
+          },
+          {
+            "name": "ohio_gallery",
+            "title": "Gallery"
+          },
+          {
+            "name": "ohio_google_maps",
+            "title": "Google Maps"
+          },
+          {
+            "name": "ohio_heading",
+            "title": "Heading"
+          },
+          {
+            "name": "ohio_icon_box",
+            "title": "Icon Box"
+          },
+          {
+            "name": "ohio_instagram",
+            "title": "Instagram Feed"
+          },
+          {
+            "name": "ohio_marquee",
+            "title": "Marquee"
+          },
+          {
+            "name": "ohio_message",
+            "title": "Message"
+          },
+          {
+            "name": "ohio_pricing_list",
+            "title": "Pricing List"
+          },
+          {
+            "name": "ohio_pricing_table",
+            "title": "Pricing Table"
+          },
+          {
+            "name": "ohio_process",
+            "title": "Process"
+          },
+          {
+            "name": "ohio_progress_bar",
+            "title": "Linear Progress"
+          },
+          {
+            "name": "ohio_recent_posts",
+            "title": "Blog Posts"
+          },
+          {
+            "name": "ohio_recent_projects",
+            "title": "Portfolio Projects"
+          },
+          {
+            "name": "ohio_service_table",
+            "title": "Service Table"
+          },
+          {
+            "name": "ohio_simple_products",
+            "title": "Products"
+          },
+          {
+            "name": "ohio_social_networks",
+            "title": "Social Networks"
+          },
+          {
+            "name": "ohio_tabs",
+            "title": "Tabs"
+          },
+          {
+            "name": "ohio_team_member",
+            "title": "Team Member"
+          },
+          {
+            "name": "ohio_team_members",
+            "title": "Team Members Group"
+          },
+          {
+            "name": "ohio_testimonial",
+            "title": "Testimonial"
+          },
+          {
+            "name": "ohio_vertical_slider",
+            "title": "Vertical Slider"
+          },
+          {
+            "name": "ohio_video",
+            "title": "Video"
+          },
+          {
+            "name": "ohio_woo_categories",
+            "title": "Woo Categories"
+          }
+        ],
+        "hubspotWidgets": [
+          {
+            "name": "hubspot-form",
+            "title": "HubSpot Form"
+          },
+          {
+            "name": "hubspot-meeting",
+            "title": "HubSpot Meeting"
+          }
+        ]
+      }
+    }
+  },
+  "safetyPolicy": {
+    "writesWordPressContent": false,
+    "publishesContent": false,
+    "clearsCache": false,
+    "createsBackup": false,
+    "sendsSecretsToOutput": false
+  }
+}

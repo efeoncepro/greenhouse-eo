@@ -7,9 +7,10 @@ const hasPgConfig =
   Boolean(process.env.GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME) ||
   Boolean(process.env.GREENHOUSE_POSTGRES_HOST)
 
-// Read-only contra el corpus piloto ingerido por TASK-1082 (11 docs / 263 chunks).
-// El doc "Períodos de nómina" está sembrado `agent_excluded` → es el caso canónico
-// de las dos dimensiones ortogonales. Skipped en CI (no PG) — local-only smoke.
+// Read-only contra el corpus gobernado (TASK-1082 base + TASK-1140 manuales
+// operativos). El MANUAL legacy "Períodos de nómina" sigue `agent_excluded` → es el
+// caso canónico de las dos dimensiones ortogonales; el doc FUNCIONAL de nómina
+// (TASK-1140, agent_allowed) SÍ es citable en agentic. Skipped en CI (no PG) — local.
 const internalSubject: KnowledgeSearchSubject = {
   userId: 'user-agent-e2e-001',
   tenantType: 'efeonce_internal',
@@ -52,19 +53,22 @@ describe.skipIf(!hasPgConfig)('searchKnowledge — live PG (TASK-1083)', () => {
       expect(chunk.score).toBeGreaterThan(0)
     }
 
-    // Chunks vienen ordenados por score desc (el packet renderiza el trace así).
-    const scores = packet.chunks.map(c => c.score)
-
-    expect([...scores].sort((a, b) => b - a)).toEqual(scores)
+    // NOTA (TASK-1140): el packet NO está ordenado por `chunk.score` desc cuando el
+    // rerank (TASK-1124) está activo — el rerank reordena por un score compuesto
+    // (heading + freshness + diversidad) y NO muta `chunk.score` (sigue siendo el
+    // ts_rank que la UI muestra). Por eso solo aseveramos que cada chunk trae un
+    // score positivo (arriba), no un orden monotónico del FTS rank.
   })
 
-  it('agentic mode NEVER returns the agent_excluded payroll doc, and counts it as denied', async () => {
+  it('agentic returns the agent_allowed payroll doc and FILTERS the agent_excluded manual', async () => {
     const packet = await searchKnowledge({ query: PAYROLL_QUERY, subject: internalSubject, mode: 'agentic' })
 
-    expect(hasPayrollDoc(packet.chunks.map(c => c.title))).toBe(false)
+    // TASK-1140 (operador, opción A): el doc FUNCIONAL de nómina (agent_allowed) SÍ
+    // se retorna en agentic; el MANUAL legacy (agent_excluded) se filtra → cuenta
+    // como denegado. El contenido denegado NUNCA entra al packet.
+    expect(hasPayrollDoc(packet.chunks.map(c => c.title))).toBe(true)
     expect(packet.deniedOrFilteredCount).toBeGreaterThanOrEqual(1)
 
-    // No denied content ever leaks into the packet.
     for (const chunk of packet.chunks) {
       expect(chunk.sensitivity).toBe('internal')
     }

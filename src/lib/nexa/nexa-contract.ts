@@ -1,3 +1,6 @@
+import type { NexaActionProposal } from './actions/types'
+import type { NexaTurnTelemetry } from './nexa-turn-telemetry'
+
 export type NexaToolName =
   | 'check_payroll'
   | 'get_otd'
@@ -5,6 +8,8 @@ export type NexaToolName =
   | 'get_capacity'
   | 'pending_invoices'
   | 'search_knowledge'
+  | 'explain_my_pay'
+  | 'propose_action'
 
 export type NexaToolMetricTone = 'default' | 'success' | 'warning' | 'error' | 'info'
 
@@ -88,4 +93,18 @@ export interface NexaResponse {
   toolInvocations?: NexaToolInvocation[]
   modelId?: string
   threadId?: string
+  /**
+   * TASK-1137 — propuestas de acción gobernadas (governed action runtime). El LLM propone una
+   * `actionKey` registrada vía el tool `propose_action`; el orquestador extrae las propuestas acá
+   * para que la UI renderice un confirm-card. NO es un write: ejecutar requiere confirmación humana
+   * vía el endpoint determinístico de confirmación (idempotency foundation TASK-655). Solo aparece
+   * con `NEXA_ACTION_RUNTIME_ENABLED=true`.
+   */
+  actionProposals?: NexaActionProposal[]
+  /**
+   * TASK-1129 — telemetría de turno (observabilidad). El orquestador la adjunta; el endpoint la
+   * STRIPEA antes de responder al cliente y la persiste en el ledger `nexa_turn_telemetry`.
+   * NO es contenido de conversación y NO se rehidrata al leer un thread.
+   */
+  turnTelemetry?: NexaTurnTelemetry
 }

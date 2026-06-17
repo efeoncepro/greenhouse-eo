@@ -326,3 +326,11 @@ psql -c "SELECT count(*) FROM greenhouse_finance.client_profiles WHERE organizat
 | `src/views/greenhouse/people/PersonView.tsx` | +EditPersonMembershipDrawer state, +AddPersonMembershipDrawer (P4) |
 | `src/views/greenhouse/organizations/tabs/OrganizationPeopleTab.tsx` | TYPE_CONFIG with "Equipo Efeonce" + color differentiation (P4) |
 | `src/views/greenhouse/organizations/drawers/AddMembershipDrawer.tsx` | Labels synced: "Equipo Efeonce", reordered (P4) |
+
+## Delta 2026-06-15 — TASK-1106 delivery serving contract hardening
+
+El facet `delivery` y el helper ejecutivo `getOrganizationOperationalServing` dejan de duplicar una UNION frágil con shapes divergentes. Ambos consumen ahora el **reader canónico único** `src/lib/account-360/organization-operational-metrics-reader.ts` (`readOrganizationOperationalMetricsRow`), que resuelve `greenhouse_serving.organization_operational_metrics` ⊕ `ico_organization_metrics` ⊕ BigQuery una sola vez.
+
+- **Causa raíz (ISSUE-087 / Sentry `JAVASCRIPT-NEXTJS-7H`):** la tabla compacta `organization_operational_metrics` nunca tuvo `rpa_median` / `pipeline_velocity` / `stuck_asset_pct`; el reader de `facets/delivery.ts` las SELECTeaba en ambas ramas del UNION → `column "rpa_median" does not exist` (42703), enmascarado como degradación a BigQuery por `observeAndDegrade`.
+- **Contrato (PARITY):** migración additive `20260615064729116` agrega las 3 columnas (nullable) a la tabla compacta + backfill desde `ico_organization_metrics`; setup SQL, proyección `organization-operational.ts`, tipos (`db.d.ts`) y reader quedan alineados. BigQuery `ico_engine.metrics_by_organization` sigue siendo el source of truth analítico.
+- **Degradación honesta + guard:** schema-drift (42703 / 42P01) se captura **y re-lanza** → surface en `_meta.errors` y la live drift guard (`account-complete-360.live.test.ts`) falla loud; errores de disponibilidad degradan a BigQuery; métrica ausente = `null`, nunca `0` silencioso. Cubre ambas rutas (`/api/organization/[id]/360?facets=delivery` y `/api/organizations/[id]/workspace/compact-signals`, mismo path `getAccountComplete360`).

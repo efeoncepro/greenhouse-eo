@@ -6,7 +6,7 @@ import { GH_NEXA } from '@/lib/copy/nexa'
 // reales) y la interpolación del nombre de la entidad ("Cliente · Sky Airline") son
 // follow-ups (requieren readers de dominio / que la página declare su contexto).
 
-export type NexaPromptContextKey = 'general' | 'finance' | 'client' | 'payroll'
+export type NexaPromptContextKey = 'general' | 'finance' | 'client' | 'payroll' | 'personal'
 
 export interface NexaPromptContext {
   key: NexaPromptContextKey
@@ -15,14 +15,30 @@ export interface NexaPromptContext {
   prompts: string[]
 }
 
+/** Tipo de entidad que la página declara (TASK-1087/1141/1143). `organization` (ficha de cliente,
+ *  contexto `client`), `member` (Mi espacio, contexto `personal`) y `finance_scope` (dashboard de
+ *  Finanzas, contexto `finance`) tienen readers data-aware wireados; el resto cae a Tier 1/1.5. */
+export type NexaPageEntityKind = 'organization' | 'member' | 'finance_scope'
+
+/** Entrypoint del workspace que la página declara (TASK-1139). Determina la visibilidad de
+ *  facets en la projection del reader data-aware (agency vs finance). Narrow a propósito —
+ *  evita importar `EntrypointContext` (cuyo módulo arrastra deps server-only al bundle cliente). */
+export type NexaPageEntrypoint = 'agency' | 'finance'
+
 /**
- * Contexto que una página declara para Nexa (Tier 1.5). `entityName` interpola el nombre
- * real en los prompts/label (ej. "Cliente · Sky Airline"); `contextKey` puede forzar la
- * familia si la ruta no la resuelve. Ambos opcionales — sin esto, se resuelve por ruta.
+ * Contexto que una página declara para Nexa (Tier 1.5 + Tier 2). `entityName` interpola el nombre
+ * real en los prompts/label (ej. "Cliente · Sky Airline"); `contextKey` puede forzar la familia si
+ * la ruta no la resuelve; `entityId`/`entityKind` (TASK-1087) habilitan los prompts DATA-AWARE — el
+ * panel consulta el endpoint server-side con ese id. Todos opcionales — sin esto, se resuelve por
+ * ruta y se queda en plantillas (Tier 1).
  */
 export interface NexaPageContextValue {
   entityName?: string
   contextKey?: NexaPromptContextKey
+  entityId?: string
+  entityKind?: NexaPageEntityKind
+  /** Entrypoint del workspace (TASK-1139) — propaga la visibilidad correcta de facets al composer. */
+  entrypoint?: NexaPageEntrypoint
 }
 
 const CONTEXTS = GH_NEXA.floating.prompt_contexts
@@ -31,6 +47,9 @@ const CONTEXTS = GH_NEXA.floating.prompt_contexts
 const GENERIC_ENTITY = 'este cliente'
 
 const routeContextKey = (path: string): NexaPromptContextKey => {
+  // Mi espacio (espacio personal del colaborador) → contexto Personal (TASK-1141).
+  if (path.startsWith('/my')) return 'personal'
+
   // Página de un cliente/organización específico (agency o finance) → contexto Cliente.
   if (/\/(agency|finance)\/(clients|organizations)\/[^/]+/.test(path)) return 'client'
 

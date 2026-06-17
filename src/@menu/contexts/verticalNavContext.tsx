@@ -6,6 +6,9 @@ import { createContext, useCallback, useMemo, useState } from 'react'
 // Type Imports
 import type { ChildrenType } from '../types'
 
+// Config Imports
+import { verticalNavToggleDuration } from '../defaultConfigs'
+
 export type VerticalNavState = {
   width?: number
   collapsedWidth?: number
@@ -31,7 +34,9 @@ const VerticalNavContext = createContext({} as VerticalNavContextProps)
 
 export const VerticalNavProvider = ({ children }: ChildrenType) => {
   // States
-  const [verticalNavState, setVerticalNavState] = useState<VerticalNavState>()
+  const [verticalNavState, setVerticalNavState] = useState<VerticalNavState>({
+    transitionDuration: verticalNavToggleDuration
+  })
 
   // Hooks
   const updateVerticalNavState = useCallback((values: Partial<VerticalNavState>) => {

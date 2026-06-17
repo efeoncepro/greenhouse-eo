@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-06-13 por Claude (sesión TASK-1104/1105 + capstone)
-> **Ultima actualizacion:** 2026-06-13 por Claude
+> **Ultima actualizacion:** 2026-06-14 por Claude (TASK-1124 — calidad de respuesta de Knowledge)
 > **Documentacion tecnica:** [docs/architecture/ui-platform/CONVERSATIONAL_EXPERIENCE.md](../../architecture/ui-platform/CONVERSATIONAL_EXPERIENCE.md)
 
 # Experiencia Conversacional de Nexa — cómo funciona
@@ -61,6 +61,21 @@ Esto es a propósito: una respuesta sin fuentes o sin frescura no genera la mism
 - **El área entra por datos, no por "skin".** Finanzas no tiene colores ni botones especiales metidos a la fuerza: aporta su **contexto** y sus **fuentes**, y el armazón hace el resto.
 - **Honestidad antes que relleno.** Si falta un dato, se dice; no se inventa.
 - **Accesible por defecto.** Funciona con teclado, respeta "reducir movimiento" y anuncia los cambios de estado una sola vez (para lectores de pantalla).
+
+## Cómo responde cuando se apoya en la base de conocimiento (mejora 2026-06-14)
+
+Cuando le preguntas algo de proceso, política o "¿qué significa X?", Nexa busca en la base de
+conocimiento publicada y **arma una respuesta propia cruzando los documentos** — no te pega un
+pedazo de un manual. Lo que cambió:
+
+- **Respuesta sintetizada, no copia.** Si dos guías aportan, las integra en una sola explicación clara.
+- **Las fuentes viven en el desplegable, no en el texto.** La respuesta ya no termina con una lista
+  cruda de "Fuentes:" ni muestra símbolos de formato sueltos. Las fuentes que la respaldan están en
+  el panel desplegable bajo la respuesta (para dar confianza), y solo ahí.
+- **La mejor fuente primero.** Internamente reordena la evidencia para que la sección que de verdad
+  responde tu pregunta lidere, y para no apoyarse en un solo documento cuando hay más.
+- **Voz Efeonce.** Tono claro y directo (te trata de "tú"), datos primero, sin relleno.
+- **Honesta cuando no sabe.** Si no hay una guía publicada, te lo dice y no inventa.
 
 ## Dónde verla viva
 

@@ -160,6 +160,17 @@ Complementario a `identity.notion_bridge.coverage_drift` — cuando el gate aler
 
 Subsystem rollup: `delivery` module (`incidentDomainTag='delivery'`). NO subsystem nuevo.
 
+## 5.1 — Reader-side freshness guard (TASK-1163)
+
+El hardening del materializer protege el write path, pero los consumidores sensibles tambien deben defenderse cuando una fila stale ya existe. Desde TASK-1163, `readMemberMetrics` y `readMemberMetricsBatch` aplican un guard read-side para `metrics_by_member` del periodo corriente:
+
+- comparan `metrics_by_member.materialized_at` contra `delivery_task_monthly_snapshots.materialized_at` y `metric_snapshots_monthly.computed_at`;
+- rechazan filas current-period mas viejas que la fuente base o demasiado antiguas para el periodo corriente;
+- caen a `computeMetricsByContext('member', ...)` / `computeMemberMetricsBatch(...)` para devolver el valor live canonical;
+- exponen la deteccion operativa read-only via `scripts/check-ico-member-metrics-freshness.ts`.
+
+Este guard no reemplaza el cron/materializer: evita que Payroll, My Performance y otros readers crean una mentira operacional mientras el cache se repara.
+
 ## 6 — 4-Pillar Score
 
 ### Safety

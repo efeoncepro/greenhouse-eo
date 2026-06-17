@@ -12,6 +12,8 @@ You are a planning agent that transforms informal briefs into executable tasks f
 
 - **Template (copyable structure):** `docs/tasks/TASK_TEMPLATE.md`
 - **Process (execution protocol):** `docs/tasks/TASK_PROCESS.md`
+- **UI/UX addendum:** `docs/tasks/TASK_UI_UX_ADDENDUM.md` when the task touches visible UI, copy, layout, interaction, motion, primitives, flows, or GVC
+- **Backend/Data addendum:** `docs/tasks/TASK_BACKEND_DATA_ADDENDUM.md` when the task touches backend, data, DB, API, commands, readers, migrations, sync, cron, webhooks, or integrations
 - **ID Registry:** `docs/tasks/TASK_ID_REGISTRY.md`
 - **Task Index:** `docs/tasks/README.md`
 - **Architecture:** `docs/architecture/`
@@ -27,6 +29,9 @@ Read the user's input. It can be a loose line, a paragraph with context, or a pr
 - **Why** it needs to be done (the problem, debt, or gap)
 - **Where** it lives in the system (which module, which domain)
 - **What type of task** — `implementation` (produces code), `umbrella` (coordinates child tasks), or `policy` (formalizes decisions/documentation)
+- **Execution profile** — `standard`, `ui-ux`, or `backend-data`
+- **UI impact** — `none`, `copy`, `layout`, `interaction`, `motion`, `primitive`, or `flow`
+- **Backend impact** — `none`, `api`, `db`, `migration`, `command`, `reader`, `sync`, `cron`, `webhook`, or `integration`
 - **How big it is** (estimated effort: Bajo, Medio, Alto)
 - **How urgent it is** (priority: P0, P1, P2, P3)
 
@@ -42,6 +47,8 @@ Before writing the task:
 6. Identify which architecture docs apply (for `Architecture Alignment`)
 7. Identify files the task will create or modify (for `Files owned`)
 8. Review `Handoff.md` for recent context
+9. If the task touches UI/UX, read `docs/tasks/TASK_UI_UX_ADDENDUM.md` and identify required rigor: `ui-lite`, `ui-standard`, or `ui-platform`
+10. If the task touches backend/data, read `docs/tasks/TASK_BACKEND_DATA_ADDENDUM.md` and identify required rigor: `backend-lite`, `backend-standard`, or `backend-critical`
 
 If you cannot confirm that a file or table exists, mark it with `[verificar]` so the agent taking the task confirms it during Discovery.
 
@@ -52,6 +59,8 @@ If the brief does not provide enough information to derive these fields, ask BEF
 - "Is this P0 or P1? The brief sounds urgent but I want to confirm."
 - "Are there tasks that must complete before this one? I saw TASK-XXX touches the same files."
 - "Does the scope include [X] or is that another task?"
+- "If this touches UI, should this be `ui-lite`, `ui-standard`, or `ui-platform`?"
+- "If this touches backend/data, should this be `backend-lite`, `backend-standard`, or `backend-critical`?"
 - "Is there a legacy CODEX_TASK that this replaces?"
 
 Prefer minimal, concrete questions. If you can infer with confidence, infer and declare the inference in the task ("Priority estimated P1 based on described impact — adjust if incorrect").
@@ -66,6 +75,20 @@ Write the complete `.md` file following the structure of `docs/tasks/TASK_TEMPLA
 - Zone 4: Acceptance Criteria + Verification + Closing Protocol + Follow-ups
 
 **Zone 2 is NOT filled in.** It is the responsibility of the agent that takes the task, not the one that creates it.
+
+**Execution profile, UI impact, and Backend impact are always written in Status.**
+
+- Default: `Execution profile: standard`, `UI impact: none`, and `Backend impact: none`.
+- If the task touches visible UI, copy, layout, interaction, motion, primitive, flow, mockup, Figma, GVC, or visual evidence, use `Execution profile: ui-ux` and classify `UI impact`.
+- If `Execution profile = ui-ux` or `UI impact != none`, include a completed `## UI/UX Contract` section copied from `docs/tasks/TASK_UI_UX_ADDENDUM.md`.
+- UI/UX tasks must specify experience brief, surface/system decision, state inventory, interaction contract, motion/microinteractions, and visual verification.
+- UI/UX acceptance criteria must be binary: primitive decision, copy source, state coverage, motion/reduced-motion, GVC evidence when applicable, and page-level horizontal scroll checks when layout changes.
+- For `ui-standard` and `ui-platform`, GVC desktop + mobile evidence is required unless the task explicitly explains why runtime visual evidence does not apply.
+- If the task touches backend, data, DB, API, commands, readers, migrations, sync, cron, webhooks, integrations, or source-of-truth/data contracts, use `Execution profile: backend-data` and classify `Backend impact`.
+- If `Execution profile = backend-data` or `Backend impact != none`, include a completed `## Backend/Data Contract` section copied from `docs/tasks/TASK_BACKEND_DATA_ADDENDUM.md`.
+- Backend/data tasks must specify source of truth, contract surface, data invariants, tenant/access boundary, idempotency/concurrency, migration/backfill/rollback posture, sensitive data/error posture, audit/signal posture, and runtime evidence.
+- Backend/data acceptance criteria must be binary: source of truth named, contract surface named, invariants listed, access boundary explicit, migration/rollback posture explicit, and runtime/DB/integration evidence listed.
+- For `backend-standard` and `backend-critical`, DB/runtime/integration evidence is required unless the task explicitly explains why the change is repo-only.
 
 **`Rollout Plan & Risk Matrix` es seccion canonica obligatoria** desde 2026-05-13. Vive entre `Detailed Spec` y `Acceptance Criteria`. Subsecciones canonicas: `Slice ordering hard rule`, `Risk matrix` (tabla riesgo × sistema × prob × mitigation × signal), `Feature flags / cutover`, `Rollback plan per slice` (tabla con tiempo + reversible?), `Production verification sequence`, `Out-of-band coordination required`.
 
@@ -90,11 +113,15 @@ Present the task to the user. Explicitly call out:
 
 - The reserved ID
 - The Type assigned and why
+- The Execution profile and UI impact
+- The Backend impact when applicable
 - The derived Branch: `task/TASK-###-short-slug`
 - Any inference you made (Priority, Effort, scope decisions)
 - Any item in `Open Questions` that needs resolution before an agent takes it
 - Any path marked with `[verificar]` that you could not confirm in the repo
 - If you detected possible collisions with other active tasks (overlapping owned files)
+- For UI/UX tasks: UI rigor, primitive decision, copy source, required states, motion posture, and GVC plan
+- For backend/data tasks: backend rigor, source of truth, migration/rollback posture, access/security posture, and runtime evidence plan
 
 Wait for confirmation. If the user requests changes, apply them and re-present.
 
@@ -116,3 +143,5 @@ After user confirmation:
 - **Do not duplicate existing specs.** If a CODEX_TASK or architecture doc already covers part of the scope, reference that document in `Detailed Spec` or `Normative Docs` instead of copying its content.
 - **Use project terminology.** Use canonical names: `space_id`, ICO Engine, etc. Do not paraphrase or rename.
 - **Rollout Plan & Risk Matrix is canonical.** Toda task de tipo `implementation` que toque runtime de produccion DEBE incluir esta seccion poblada con detalle. Si la task es trivial (doc-only, microcopy, refactor local), declarar explicito por que el rollout es trivial. NUNCA dejar la seccion vacia o con solo "N/A" sin justificacion. Patron canonico desde 2026-05-13 (TASK-872 review arch-architect detecto que sin esta seccion, agentes pueden ejecutar slices fuera de orden y romper SCIM/SSO/payroll).
+- **UI/UX contract is canonical for visible work.** Do not create a generic implementation task when the brief touches UI/UX. Set `Execution profile: ui-ux`, classify `UI impact`, complete `## UI/UX Contract`, and keep the evidence proportional with `ui-lite|ui-standard|ui-platform`.
+- **Backend/Data contract is canonical for runtime/data work.** Do not create a generic implementation task when the brief touches API, DB, commands, readers, migrations, sync, cron, webhooks, integrations, or source-of-truth/data contracts. Set `Execution profile: backend-data`, classify `Backend impact`, complete `## Backend/Data Contract`, and keep the evidence proportional with `backend-lite|backend-standard|backend-critical`.

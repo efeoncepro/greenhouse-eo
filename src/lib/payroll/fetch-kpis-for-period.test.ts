@@ -190,6 +190,51 @@ describe('fetchKpisForPeriod', () => {
     expect(result.diagnostics.liveComputedMembers).toBe(0)
   })
 
+  it('preserves live sourceMode when the ICO reader already replaced a stale materialized row', async () => {
+    readMemberMetricsBatch.mockResolvedValue(
+      new Map([
+        [
+          'daniela-ferreira',
+          buildIcoSnapshot({
+            memberId: 'daniela-ferreira',
+            rpa: 1.13,
+            otd: 99.1,
+            completedTasks: 109,
+            source: 'live',
+            rpaDataStatus: 'low_confidence',
+            rpaConfidenceLevel: 'medium',
+            rpaEvidence: {
+              completedTasks: 109,
+              eligibleTasks: 8,
+              missingTasks: 0,
+              nonPositiveTasks: 101
+            }
+          })
+        ]
+      ])
+    )
+
+    const result = await fetchKpisForPeriod({
+      memberIds: ['daniela-ferreira'],
+      periodYear: 2026,
+      periodMonth: 6
+    })
+
+    expect(computeMemberMetricsBatch).not.toHaveBeenCalled()
+    expect(result.snapshots.get('daniela-ferreira')).toMatchObject({
+      memberId: 'daniela-ferreira',
+      otdPercent: 99.1,
+      rpaAvg: 1.13,
+      tasksCompleted: 109,
+      sourceMode: 'live'
+    })
+    expect(result.diagnostics).toMatchObject({
+      materializedMembers: 0,
+      liveComputedMembers: 1,
+      missingMembers: 0
+    })
+  })
+
   it('ignores null and blank member ids instead of failing the whole batch', async () => {
     readMemberMetricsBatch.mockResolvedValue(
       new Map([

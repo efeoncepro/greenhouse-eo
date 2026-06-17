@@ -309,6 +309,49 @@ export {
   resolveNexaMomentCompositionConfig,
   resolveNexaMomentCompositionVariant
 } from './nexa-moment-composition/nexa-moment-composition-controller'
+export { default as CompositionShell } from './composition-shell/CompositionShell'
+export type {
+  CompositionShellComposition,
+  CompositionShellCompositionConfig,
+  CompositionShellKind,
+  CompositionShellProps,
+  CompositionShellRegion,
+  CompositionShellRegionMeta,
+  CompositionShellSizeClass,
+  CompositionShellState
+} from './composition-shell/composition-shell-types'
+export {
+  COMPOSITION_SHELL_BREAKPOINTS,
+  COMPOSITION_SHELL_COMPOSITION_CONFIG,
+  COMPOSITION_SHELL_REGION_META,
+  compositionShellActionToTelemetryName,
+  createCompositionShellEvent,
+  initialCompositionShellState,
+  reduceCompositionShellState,
+  regionViewTransitionName,
+  resolveComposition,
+  resolveCompositionConfig,
+  resolveCompositionLayout,
+  resolveSizeClass
+} from './composition-shell/composition-shell-controller'
+export type {
+  CompositionShellControllerAction,
+  CompositionShellControllerLastAction,
+  CompositionShellControllerState,
+  CompositionShellTelemetryEvent,
+  CompositionShellTelemetryEventName,
+  ResolvedCompositionLayout
+} from './composition-shell/composition-shell-controller'
+export {
+  CARD_DENSITY_BREAKPOINTS,
+  compareCardDensity,
+  isCardDensity,
+  isCardDensityAtLeast,
+  resolveCardDensity,
+  resolveCardDensityRequest,
+  useContainerDensity
+} from './card-density'
+export type { CardDensity, CardDensityRequest, UseContainerDensityResult } from './card-density'
 export { default as GreenhouseNexaAnimatedAskBadge } from './GreenhouseNexaAnimatedAskBadge'
 export type { GreenhouseNexaAnimatedAskBadgeProps } from './GreenhouseNexaAnimatedAskBadge'
 export { default as EfeonceOrbitalLogoMark } from './EfeonceOrbitalLogoMark'

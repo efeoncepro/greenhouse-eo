@@ -15,14 +15,14 @@ import CustomTextField from '@core/components/mui/TextField'
 
 import { NEXA_SUGGESTIONS } from '@/config/home-suggestions'
 import { HOME_SUBTITLE, HOME_DISCLAIMER } from '@/config/home-greetings'
-import type { NexaModelId } from '@/config/nexa-models'
+import type { NexaModelSelectorValue } from '@/lib/nexa/use-nexa-runtime'
 
 import NexaModelSelector from './NexaModelSelector'
 
 interface Props {
   greeting: string
-  selectedModel: NexaModelId
-  onModelChange: (model: NexaModelId) => void
+  selectedModel: NexaModelSelectorValue
+  onModelChange: (value: NexaModelSelectorValue) => void
 }
 
 const NexaHero = ({ greeting, selectedModel, onModelChange }: Props) => {

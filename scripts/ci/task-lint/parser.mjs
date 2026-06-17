@@ -176,6 +176,9 @@ export const parseTaskMarkdown = ({ filePath, repoRoot, source }) => {
   const sections = extractSections(normalizedSource, headings)
   const lifecycle = status.fields.Lifecycle ?? status.fields.lifecycle ?? null
   const type = status.fields.Type ?? status.fields.type ?? null
+  const executionProfile = status.fields['Execution profile'] ?? status.fields['execution profile'] ?? null
+  const uiImpact = status.fields['UI impact'] ?? status.fields['ui impact'] ?? null
+  const backendImpact = status.fields['Backend impact'] ?? status.fields['backend impact'] ?? null
   const effort = status.fields.Effort ?? status.fields.effort ?? null
   const domain = status.fields.Domain ?? status.fields.domain ?? null
 
@@ -203,6 +206,9 @@ export const parseTaskMarkdown = ({ filePath, repoRoot, source }) => {
     status,
     lifecycle: lifecycle ? stripInlineCode(lifecycle) : null,
     type: type ? stripInlineCode(type).toLowerCase() : null,
+    executionProfile: executionProfile ? stripInlineCode(executionProfile).toLowerCase() : null,
+    uiImpact: uiImpact ? stripInlineCode(uiImpact).toLowerCase() : null,
+    backendImpact: backendImpact ? stripInlineCode(backendImpact).toLowerCase() : null,
     effort: effort ? stripInlineCode(effort).toLowerCase() : null,
     domain: domain ? stripInlineCode(domain).toLowerCase() : null,
     headings,

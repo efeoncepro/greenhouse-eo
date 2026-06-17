@@ -124,6 +124,37 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
       scope: 'tenant',
       source: hasRouteGroup(subject, 'admin') ? 'role' : 'route_group'
     })
+
+    // TASK-1152 — Roadmap work item index (backlog operativo interno repo-native).
+    // Read-only para usuarios internos (route_group internal ∪ admin). El backlog
+    // es operación interna del repo; los clientes (`client_*`) NO lo ven por
+    // construcción del grant. Gated en GET /api/roadmap/work-items + future cockpit
+    // (TASK-1153, "main menu, non-admin" → internal collaborators incluidos).
+    addEntitlement(entries, {
+      module: 'roadmap',
+      capability: 'roadmap.work_items.read',
+      action: 'read',
+      scope: 'tenant',
+      source: hasRouteGroup(subject, 'admin') ? 'role' : 'route_group'
+    })
+
+    // TASK-1161 — Public Site Astro/Vercel binding reader. Read-only, internal
+    // control-plane visibility; no deploy/rollback/cutover rights.
+    addEntitlement(entries, {
+      module: 'public_site',
+      capability: 'public_site.runtime_binding.read',
+      action: 'read',
+      scope: 'tenant',
+      source: hasRouteGroup(subject, 'admin') ? 'role' : 'route_group'
+    })
+
+    addEntitlement(entries, {
+      module: 'public_site',
+      capability: 'public_site.route_ownership.read',
+      action: 'read',
+      scope: 'tenant',
+      source: hasRouteGroup(subject, 'admin') ? 'role' : 'route_group'
+    })
   }
 
   if (hasRouteGroup(subject, 'people') || hasAuthorizedView(subject, 'equipo.personas')) {
@@ -1059,6 +1090,14 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
     })
 
     addEntitlement(entries, {
+      module: 'platform',
+      capability: 'platform.public_site.bridge.inspect',
+      action: 'read',
+      scope: 'all',
+      source: 'role'
+    })
+
+    addEntitlement(entries, {
       module: 'client_portal',
       capability: 'client_portal.catalog.manage',
       action: 'read',
@@ -1911,6 +1950,15 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
 
   if (hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)) {
     addEntitlement(entries, { module: 'knowledge', capability: 'knowledge.source.admin', action: 'manage', scope: 'all', source: 'role' })
+  }
+
+  // TASK-1137 — Nexa governed action runtime. Audiencia del piloto: usuarios internos ∪ EFEONCE_ADMIN
+  // (client users excluidos hasta que un piloto de dominio pruebe la frontera). Mirror exacto de
+  // `canUseNexaActionRuntime` (el gate síncrono del tool propose_action).
+  if (hasRouteGroup(subject, 'internal') || hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)) {
+    const source: TenantEntitlementSource = hasRouteGroup(subject, 'internal') ? 'route_group' : 'role'
+
+    addEntitlement(entries, { module: 'home', capability: 'nexa.action.execute', action: 'execute', scope: 'own', source })
   }
 
   const resolvedEntries = Array.from(entries.values())

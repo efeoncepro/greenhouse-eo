@@ -40,7 +40,15 @@ export const ENTITLEMENT_MODULES = [
   // (control plane release) y de greenhouse_context/SCL (sidecar JSONB de memoria de agente).
   // 5 capabilities: knowledge.{document.read,document.publish,source.admin,agentic.retrieve,
   // feedback.submit}. Aún no can()-checked (los consumen TASK-1083/1084).
-  'knowledge'
+  'knowledge',
+  // TASK-1152 — namespace del Roadmap (índice derivado del backlog Markdown:
+  // epics/tasks/mini-tasks/issues). Read-only V1; capability `roadmap.work_items.read`
+  // consumida por el reader server-side + la futura UI cockpit (TASK-1153). Distinto de
+  // `platform` (control plane release) y `admin` (governance).
+  'roadmap',
+  // TASK-1161 — namespace Public Site control plane. V1 read-only para observar
+  // el rail Astro/Vercel target desde Greenhouse sin deploy/cutover.
+  'public_site'
 ] as const
 
 export type GreenhouseEntitlementModule = (typeof ENTITLEMENT_MODULES)[number]
@@ -1248,6 +1256,26 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     actions: ['read'] as const,
     defaultScope: 'all'
   },
+  {
+    // Public Site WordPress bridge control plane: read-only inspection only.
+    // Writes/drafts/publish remain blocked until TASK-1116 signed auth lands.
+    key: 'platform.public_site.bridge.inspect',
+    module: 'platform',
+    actions: ['read'] as const,
+    defaultScope: 'all'
+  },
+  {
+    key: 'public_site.runtime_binding.read',
+    module: 'public_site',
+    actions: ['read'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'public_site.route_ownership.read',
+    module: 'public_site',
+    actions: ['read'] as const,
+    defaultScope: 'tenant'
+  },
   // TASK-872 — SCIM Internal Collaborator Provisioning capabilities (4 nuevas).
   // 3 eligibility override (L4 admin allowlist/denylist + backfill execute) +
   // 1 workforce intake transition (pending_intake → completed).
@@ -1467,6 +1495,16 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     actions: ['read'] as const,
     defaultScope: 'tenant'
   },
+  // TASK-1137 — Nexa governed action runtime. Gate de "este usuario puede CONFIRMAR/EJECUTAR una
+  // acción gobernada propuesta por Nexa". El LLM nunca ejecuta; el humano confirma vía el endpoint
+  // determinístico. Grant (runtime.ts): internal route_group ∪ EFEONCE_ADMIN (audiencia del piloto;
+  // client users excluidos). NUNCA seed sin grant mismo PR (invariant TASK-873/935).
+  {
+    key: 'nexa.action.execute',
+    module: 'home',
+    actions: ['execute'] as const,
+    defaultScope: 'own'
+  },
   // TASK-490 — Signature orchestration (EPIC-001 signable pack). Gate de las superficies
   // operador-facing de firma (enviar a firmar / cancelar / reconciliar). El render del
   // documento (TASK-1023) y el adapter ZapSign (TASK-491) viven detrás de este gate.
@@ -1521,6 +1559,15 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     key: 'knowledge.feedback.submit',
     module: 'knowledge',
     actions: ['create'] as const,
+    defaultScope: 'tenant'
+  },
+  // TASK-1152 — Roadmap work item index reader (Markdown SSOT, read-only).
+  // can()-checked en GET /api/roadmap/work-items. Grant en runtime.ts (internal ∪ admin)
+  // en el mismo PR (guard capability-grant-coverage). Future-proof TASK-1153.
+  {
+    key: 'roadmap.work_items.read',
+    module: 'roadmap',
+    actions: ['read'] as const,
     defaultScope: 'tenant'
   }
 ] as const

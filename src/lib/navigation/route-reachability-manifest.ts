@@ -146,6 +146,20 @@ export const DECLARED_CHILD_ROUTES: readonly ChildRouteDeclaration[] = [
       'Nexa Chat Pattern (TASK-1078) — child surface del Design System para el patron compuesto de la superficie conversacional de Nexa (header de presencia, rail glass, cuerpo de conversacion, empty hero, composer con NexaGlowBorder); alcanzable desde el catalogo canonico /design-system.'
   },
   {
+    route: '/design-system/composition-shell',
+    parent: '/design-system',
+    via: 'inline-link',
+    reason:
+      'Composition Shell Lab (TASK-1114) — child surface del Design System para el substrato de coreografia de layout (regiones singleton + composiciones nombradas + morph View Transitions + reflow); alcanzable desde el catalogo canonico /design-system.'
+  },
+  {
+    route: '/design-system/card-density',
+    parent: '/design-system',
+    via: 'inline-link',
+    reason:
+      'Adaptive Card density Lab (TASK-1115) — child surface del Design System para el contrato de densidad de cards (full/condensed/peek por container query); capacidad hermana del Composition Shell; alcanzable desde el catalogo canonico /design-system.'
+  },
+  {
     route: '/design-system/loaders',
     parent: '/design-system',
     via: 'inline-link',
@@ -291,6 +305,13 @@ export const DECLARED_CHILD_ROUTES: readonly ChildRouteDeclaration[] = [
     via: 'inline-link',
     reason:
       'Nexa Moment Composition Lab (TASK-1102 GAP A) — child surface del Design System para la primitive NexaMomentComposition (composicion in-place de Nexa Answers con un host: variants leadOverlay/anchoredAside/inlineExpand + morph View Transitions + anclaje cita->host + next-step gobernado + puente a la lente), alcanzable desde el catalogo canonico /design-system.'
+  },
+  {
+    route: '/design-system/nexa-answers-experience',
+    parent: '/design-system',
+    via: 'inline-link',
+    reason:
+      'Nexa Answers Experience (TASK-1110 Slice B) — child surface del Design System que agrega el flujo conversacional completo de Nexa Answers: la respuesta lidera y SE ARMA (chart draw + numero que cuenta), portabilidad cross-dominio (finance/insight) y la composicion in-place con host (NexaMomentComposition, GAP A: morph dormant<->composed + fuentes ancladas + next-step gobernado + puente). Promovida desde el mockup /knowledge/mockup/nexa-answers; alcanzable desde el catalogo canonico /design-system.'
   },
   {
     route: '/design-system/geometry',

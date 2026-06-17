@@ -182,7 +182,7 @@ describe('NexaService', () => {
     expect(response.toolInvocations?.[0]?.toolName).toBe('check_payroll')
   })
 
-  it('adds an honest sources block when grounded Knowledge text omits inline citation markers', async () => {
+  it('no anexa un bloque textual de "Fuentes:" cuando el modelo omite citas inline (la UI es dueña de la evidencia, TASK-1124)', async () => {
     vi.stubEnv('NEXA_KNOWLEDGE_RETRIEVAL_ENABLED', 'true')
 
     mockGenerateContent
@@ -283,9 +283,12 @@ describe('NexaService', () => {
       runtimeContext
     })
 
-    expect(response.content).toContain('Fuentes:')
-    expect(response.content).toContain('[1] = Manual: Cómo usar Mi Desempeño')
-    expect(response.content).toContain('[2] = Glosario: Métricas ICO personales')
+    // TASK-1124 — la respuesta NO se modifica: el modelo respondió sin [n], y ya NO se anexa un
+    // bloque textual de "Fuentes:" (la interfaz muestra las fuentes vía el packet de evidencia).
+    expect(response.content).toBe(
+      'Para revisar tus métricas ICO, entra a Mi Desempeño y revisa los indicadores por objetivo.'
+    )
+    expect(response.content).not.toContain('Fuentes:')
   })
 
   it('does not fabricate a sources block when Knowledge confidence is none', async () => {
@@ -385,5 +388,98 @@ describe('NexaService', () => {
     expect(systemInstruction).toContain('Usa marcadores inline [n]')
     expect(systemInstruction).toContain('cita siempre con [n]')
     expect(systemInstruction).toContain('validación humana')
+  })
+
+  // TASK-1129 — telemetría de turno (observabilidad, sin contenido sensible).
+  const minimalContext = {
+    user: { firstName: 'Julio', lastName: null, role: 'admin' },
+    greeting: { title: '', subtitle: '' },
+    modules: [],
+    tasks: [],
+    nexaIntro: '',
+    computedAt: '2026-06-15T00:00:00.000Z'
+  }
+
+  it('adjunta telemetría de turno en éxito (version/family + provider + outcome), sin contenido sensible', async () => {
+    mockGenerateContent.mockResolvedValue({ text: 'Respuesta-secreta-del-modelo' })
+
+    const response = await NexaService.generateResponse({
+      prompt: 'Pregunta-del-usuario',
+      history: [],
+      context: minimalContext,
+      runtimeContext
+    })
+
+    const tel = response.turnTelemetry
+
+    expect(tel).toBeDefined()
+    expect(tel?.contractVersion).toBe('nexa-turn-telemetry.v1')
+    expect(tel?.promptFamily).toBe('home-chat')
+    expect(tel?.promptVersion).toMatch(/^nexa-system-prompt/)
+    expect(tel?.primaryProvider).toBe('google')
+    expect(tel?.resolvedProvider).toBe('google')
+    expect(tel?.outcome).toBe('success')
+    expect(tel?.providerStepCount).toBe(1)
+    expect(tel?.didFailover).toBe(false)
+    expect(tel?.detail.usage).toEqual({ tokens: null, costUsd: null })
+
+    // NUNCA contenido de conversación en la telemetría.
+    const serialized = JSON.stringify(tel)
+
+    expect(serialized).not.toContain('Respuesta-secreta-del-modelo')
+    expect(serialized).not.toContain('Pregunta-del-usuario')
+  })
+
+  it('telemetría outcome=graceful_fallback (resolvedProvider null) cuando Vertex niega permiso', async () => {
+    mockGenerateContent.mockRejectedValue(
+      new Error("Permission 'aiplatform.endpoints.predict' denied on resource '//aiplatform.googleapis.com'")
+    )
+
+    const response = await NexaService.generateResponse({
+      prompt: 'Hola',
+      history: [],
+      context: minimalContext,
+      runtimeContext
+    })
+
+    expect(response.turnTelemetry?.outcome).toBe('graceful_fallback')
+    expect(response.turnTelemetry?.resolvedProvider).toBeNull()
+    expect(response.turnTelemetry?.resolvedModel).toBeNull()
+  })
+
+  it('telemetría outcome=tool_degraded + toolsUsed cuando un tool invocado viene no disponible', async () => {
+    mockGenerateContent
+      .mockResolvedValueOnce({
+        text: '',
+        functionCalls: [{ id: 'tool-1', name: 'check_payroll', args: {} }]
+      })
+      .mockResolvedValueOnce({ text: 'No pude leer la nómina ahora mismo.' })
+      .mockResolvedValueOnce({ text: '{"suggestions":["a","b","c"]}' })
+
+    mockExecuteNexaTool.mockResolvedValue({
+      toolCallId: 'tool-1',
+      toolName: 'check_payroll',
+      args: {},
+      result: {
+        available: false,
+        summary: 'Nómina no disponible.',
+        source: 'none',
+        scopeLabel: 'Payroll',
+        generatedAt: '2026-06-15T12:00:00.000Z',
+        metrics: []
+      }
+    })
+
+    const response = await NexaService.generateResponse({
+      prompt: '¿Cómo va la nómina?',
+      history: [],
+      context: minimalContext,
+      runtimeContext
+    })
+
+    expect(response.turnTelemetry?.outcome).toBe('tool_degraded')
+    expect(response.turnTelemetry?.toolsUsed).toEqual(['check_payroll'])
+    expect(response.turnTelemetry?.toolCount).toBe(1)
+    expect(response.turnTelemetry?.detail.tools[0]).toEqual({ toolName: 'check_payroll', available: false })
   })
 })

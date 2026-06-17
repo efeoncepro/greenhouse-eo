@@ -79,7 +79,10 @@ describe.skipIf(!hasPgConfig)('search_knowledge tool — execute (live PG, TASK-
     expect(invocation.result.metrics.some(m => m.label === 'Confianza retrieval')).toBe(true)
   })
 
-  it('agentic mode: the agent_excluded payroll doc never reaches Nexa', async () => {
+  it('agentic mode: Nexa receives the agent_allowed payroll doc; the agent_excluded manual is filtered', async () => {
+    // TASK-1140 (operador, opción A): el doc FUNCIONAL de nómina (agent_allowed) SÍ
+    // llega a Nexa en agentic y se cita; el MANUAL legacy (agent_excluded) NUNCA
+    // llega y se cuenta como denegado.
     vi.stubEnv('NEXA_KNOWLEDGE_RETRIEVAL_ENABLED', 'true')
 
     const invocation = await executeNexaTool({
@@ -89,10 +92,16 @@ describe.skipIf(!hasPgConfig)('search_knowledge tool — execute (live PG, TASK-
       context: internalTenant
     })
 
-    const packet = (invocation.result.raw as { packet?: { chunks?: { title: string }[] } }).packet
+    const packet = (
+      invocation.result.raw as {
+        packet?: { chunks?: { title: string }[]; deniedOrFilteredCount?: number }
+      }
+    ).packet
+
     const titles = (packet?.chunks ?? []).map(c => c.title.toLowerCase())
 
-    expect(titles.some(t => t.includes('nómina') || t.includes('nomina'))).toBe(false)
+    expect(titles.some(t => t.includes('nómina') || t.includes('nomina'))).toBe(true)
+    expect(packet?.deniedOrFilteredCount ?? 0).toBeGreaterThanOrEqual(1)
   })
 
   it('empty query degrades honestly (available=false)', async () => {

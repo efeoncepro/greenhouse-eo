@@ -1,7 +1,7 @@
 'use client'
 
 import '@assistant-ui/react-markdown/styles/dot.css'
-import { useCallback, useEffect, useRef, useState, type RefObject } from 'react'
+import { createElement, useCallback, useEffect, useRef, useState, type RefObject } from 'react'
 
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
@@ -17,7 +17,7 @@ import {
   MessagePrimitive,
   ActionBarPrimitive
 } from '@assistant-ui/react'
-import { MarkdownTextPrimitive } from '@assistant-ui/react-markdown'
+import { MarkdownTextPrimitive, unstable_memoizeMarkdownComponents } from '@assistant-ui/react-markdown'
 
 import { alpha, type Theme } from '@mui/material/styles'
 
@@ -27,7 +27,7 @@ import { GH_NEXA } from '@/lib/copy/nexa'
 import { GreenhouseThinkingBeat, NexaComposer, NexaComposerInput, NexaComposerActionButton, NexaSenderMark } from '@/components/greenhouse/primitives'
 import CustomTextField from '@core/components/mui/TextField'
 
-import type { NexaModelId } from '@/config/nexa-models'
+import type { NexaModelSelectorValue } from '@/lib/nexa/use-nexa-runtime'
 
 import { nexaThinScrollbarSx } from '@/views/greenhouse/nexa/floating-chat/nexa-scrollbar'
 
@@ -49,8 +49,8 @@ const GREENHOUSE_COPY = getMicrocopy()
 
 export interface NexaThreadProps {
   onBack?: () => void
-  selectedModel: NexaModelId
-  onModelChange: (model: NexaModelId) => void
+  selectedModel: NexaModelSelectorValue
+  onModelChange: (value: NexaModelSelectorValue) => void
   compact?: boolean
   suggestions?: string[]
   onHistoryToggle?: () => void
@@ -125,6 +125,73 @@ const proseSx = {
   '& h1, & h2, & h3': { fontWeight: 700, mt: 2, mb: 1 },
   '& hr': { borderColor: 'divider', my: 2 }
 }
+
+/* ── Bloques de markdown memoizados (anti-flicker durante el revelado, TASK-1113) ──
+   assistant-ui revela la respuesta con un typewriter (`smooth=true` por defecto) que hace
+   crecer el texto en cada tick → ReactMarkdown re-parsea TODO el string cada vez. Sin
+   componentes memoizados, el árbol entero re-renderiza por tick → reflow → parpadeo.
+   `unstable_memoizeMarkdownComponents` envuelve cada bloque en React.memo comparando su
+   nodo `hast`: los bloques ya revelados quedan congelados y solo el último (el que crece)
+   re-renderiza. Cero cambio visual — se rinden los mismos tags (<p>/<ul>/<a>/…) que estiliza
+   `proseSx` por CSS descendente. `code`/`pre` quedan en los defaults del primitive (que los
+   gobierna aparte), por eso NO se memoizan acá. */
+const intrinsicMarkdownComponent = (tag: string) => {
+  const Comp = (props: Record<string, unknown>) => createElement(tag, props)
+
+  Comp.displayName = `NexaMd_${tag}`
+
+  return Comp
+}
+
+const NEXA_MARKDOWN_COMPONENTS = unstable_memoizeMarkdownComponents(
+  Object.fromEntries(
+    [
+      'p', 'ul', 'ol', 'li', 'a', 'strong', 'em', 'del',
+      'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+      'blockquote', 'hr', 'table', 'thead', 'tbody', 'tr', 'th', 'td', 'br', 'img'
+    ].map(tag => [tag, intrinsicMarkdownComponent(tag)])
+  ) as Parameters<typeof unstable_memoizeMarkdownComponents>[0]
+)
+
+/* ── Limpieza DETERMINÍSTICA del answer (TASK-1112) ──
+   El cuerpo de la respuesta debe ser prosa limpia. Las fuentes son apoyo contextual y viven
+   SOLO en el desplegable de procedencia, no en el texto. El modelo, pese al prompt, a veces
+   escribe el volcado "Fuentes: [n] = …" y marcadores [n] inline (un LLM puede ignorar la
+   instrucción → NO es robusto). Por eso se sanea en el render (determinístico, no depende del
+   modelo), cubriendo respuestas nuevas Y threads viejos:
+     1) corta el bloque final "Fuentes …" cuando es la lista de citas ("] =").
+     2) quita los marcadores de cita inline numéricos ([1], [2, 4], [6]). */
+const cleanNexaAnswer = (text: string): string => {
+  let out = text
+
+  const match = out.match(/\n+\s*[*_]{0,2}Fuentes\b:?[*_]{0,2}/i)
+
+  if (match && match.index != null && /\]\s*=/.test(out.slice(match.index))) {
+    out = out.slice(0, match.index)
+  }
+
+  // Marcadores de cita inline completos: [1], [2, 4], [6] (con el espacio previo, sin huecos).
+  out = out.replace(/[ \t]*\[\d+(?:\s*,\s*\d+)*\]/g, '')
+
+  // Marcador incompleto al FINAL: durante el revelado typewriter el texto crece char a char,
+  // así que un "[", "[1", "[2, " todavía sin cerrar dejaría un corchete colgado. Lo quitamos.
+  out = out.replace(/[ \t]*\[[\d,\s]*$/g, '')
+
+  return out.trimEnd()
+}
+
+/* Wrapper del Text part del mensaje: MarkdownTextPrimitive lee el texto del contexto
+   (ignora las props del part), así que el wrapper no recibe props. `smooth` se conserva
+   (el revelado sigue), `components` memoizados eliminan el flicker, y `preprocess` sanea el
+   answer (sin volcado "Fuentes:" ni [n] inline) antes de parsear el markdown. */
+const NexaMarkdownText = () => (
+  <MarkdownTextPrimitive components={NEXA_MARKDOWN_COMPONENTS} preprocess={cleanNexaAnswer} />
+)
+
+/* Fallback PURO para tools sin UI registrada: no registra nada (las registra el
+   <NexaToolRenderer/> montado al nivel del thread). Renderiza null → comportamiento previo
+   para tools desconocidas, sin el loop mount/unmount (TASK-1113). */
+const NexaToolFallback = () => null
 
 /* ── User message — subtle query, not a chat bubble ── */
 const UserMessage = () => (
@@ -326,8 +393,13 @@ const AssistantMessage = () => {
         <Box sx={{ '& .aui-md': proseSx }}>
           <MessagePrimitive.Content
             components={{
-              Text: MarkdownTextPrimitive as any,
-              tools: { Fallback: NexaToolRenderer }
+              Text: NexaMarkdownText as any,
+              // Las tools se registran UNA vez vía <NexaToolRenderer/> montado al nivel del
+              // thread (abajo). El Fallback NO debe registrar: si registra acá, la tool queda
+              // "matched" → este Fallback se desmonta → el cleanup des-registra → "unmatched"
+              // → re-monta → loop infinito (≈630 remounts/s = el parpadeo, TASK-1113). Para
+              // tools sin UI registrada, no renderizamos nada (comportamiento previo).
+              tools: { Fallback: NexaToolFallback }
             }}
           />
         </Box>
@@ -649,6 +721,9 @@ const NexaThread = ({ onBack, selectedModel, onModelChange, compact, suggestions
 
     {/* Thread */}
     <ThreadPrimitive.Root style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, position: 'relative' }}>
+      {/* Registro de tool UIs UNA sola vez (siempre montado dentro del runtime) → las 6 tools
+          quedan registradas de forma persistente, sin el loop del Fallback (TASK-1113). Renderiza null. */}
+      <NexaToolRenderer />
       {/* Sombra de separación bajo el header — SOLO cuando el shell provee su propio header
           (panel flotante, `hideHeader`) y SOLO si hay contenido scrolleado debajo
           (data-scrolled, gobernado por el wrapper). Da profundidad del canvas del chat respecto al header, minimalista
@@ -690,11 +765,13 @@ const NexaThread = ({ onBack, selectedModel, onModelChange, compact, suggestions
             minHeight: 0,
             overflowY: 'auto',
             overscrollBehavior: 'contain',
-            // Smooth scroll: SOLO afecta el scroll PROGRAMÁTICO (el auto-scroll-to-bottom de
-            // assistant-ui), NO el wheel/trackpad del usuario (siempre nativo). El bug del
-            // up-scroll era el MutationObserver sobre este elemento (ya resuelto: los atributos
-            // viven en el wrapper) — no el smooth. reduced-motion lo apaga abajo.
-            scrollBehavior: 'smooth',
+            // Scroll instantáneo (sin CSS smooth): el auto-scroll-to-bottom de assistant-ui
+            // llama scrollTo({behavior:'auto'}), y con `scroll-behavior: smooth` eso se vuelve
+            // una animación suave que se re-dispara en CADA resize de contenido durante el
+            // streaming → pelea físicamente con la rueda del usuario y mantiene el lock al
+            // fondo (no se puede subir). Sin smooth, el sticky-bottom honesto de assistant-ui
+            // se ancla si estás al fondo y SUELTA cuando subís (TASK-1113). Reduced-motion
+            // queda satisfecho por construcción (no hay motion de scroll).
             maxWidth: compact ? undefined : 720,
             mx: 'auto',
             width: '100%',
@@ -706,7 +783,6 @@ const NexaThread = ({ onBack, selectedModel, onModelChange, compact, suggestions
             // (`[data-scrolling]`); acá solo base + hover/focus (pseudo-clases seguras).
             ...nexaThinScrollbarSx(theme),
             '@media (prefers-reduced-motion: reduce)': {
-              scrollBehavior: 'auto',
               '&::-webkit-scrollbar-thumb': { transition: 'none' }
             }
           })}

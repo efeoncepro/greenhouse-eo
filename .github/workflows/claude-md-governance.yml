@@ -1,0 +1,60 @@
+name: CLAUDE.md governance
+
+# TASK-1160 — anti re-accretion gate for CLAUDE.md.
+#
+# The main `ci.yml` ignores `**/*.md` and `docs/**` in its triggers, so a PR that
+# only edits CLAUDE.md (the most common re-accretion vector) would never run the
+# budget/audit gates there. This dedicated workflow fires exactly on the paths
+# that matter:
+#   - CLAUDE.md itself (size + rules)
+#   - docs/architecture/** (where relocated invariants live — moving a rule out of
+#     a spec would orphan it)
+#   - the gate scripts
+#
+# It runs without `pnpm install`: the scripts use only Node builtins + `git`.
+
+on:
+  pull_request:
+    paths:
+      - 'CLAUDE.md'
+      - 'docs/architecture/**'
+      - 'scripts/ci/claude-md*.mjs'
+      - '.github/workflows/claude-md-governance.yml'
+  push:
+    branches:
+      - main
+      - develop
+    paths:
+      - 'CLAUDE.md'
+      - 'docs/architecture/**'
+      - 'scripts/ci/claude-md*.mjs'
+      - '.github/workflows/claude-md-governance.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  claude-md:
+    name: CLAUDE.md budget + content-loss audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout (full history — rule-audit reads the frozen baseline via `git show`)
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Token budget gate (STRICT — fails if CLAUDE.md > 35k tokens)
+        # Anti-re-accretion: domain invariants go to their spec/companion + a pointer
+        # (router model), never a full inline block. CLAUDE.md is loaded every turn
+        # and inherited by every subagent.
+        run: node scripts/ci/claude-md.mjs budget --strict
+
+      - name: Content-loss audit (STRICT — fails if any original line became unreachable)
+        # Safety net (two tiers): every NUNCA/SIEMPRE rule line (tier 1) AND every
+        # meaningful content line — prose, code, paths, tables (tier 2) — of the frozen
+        # original CLAUDE.md must stay reachable in the live corpus (CLAUDE.md ∪ docs ∪
+        # skills). STRICT is safe because legitimate evolution (a reworded companion
+        # line, a deliberately-retired rule) has a reviewed, append-only escape hatch:
+        # scripts/ci/claude-md-content-allowlist.txt. Accidental drops hard-fail.
+        run: node scripts/ci/claude-md.mjs audit --strict

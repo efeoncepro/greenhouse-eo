@@ -16,16 +16,19 @@ La documentacion funcional no reemplaza el manual ni la arquitectura. Explica qu
 
 ### Identidad y acceso
 
+- [Identity, Access y Admin Center end-to-end](identity/identity-access-admin-center-end-to-end.md) — como Greenhouse resuelve identidad, sesion, roles, vistas, entitlements, permission sets, SCIM y troubleshooting de acceso sin convertir Admin Center en un bypass manual.
 - [Sistema de Identidad, Roles y Acceso](identity/sistema-identidad-roles-acceso.md) — roles, permisos, supervisoria, responsabilidades operativas, candados de seguridad
 - [Sistema de Autenticación Resiliente](identity/sistema-auth-resiliente.md) — 7 capas defensivas que protegen el flujo de login (secret hygiene, readiness contract, observability, schema integrity, magic-link self-recovery, smoke lane sintética, rotation playbook). Postmortem de ISSUE-061 y guía de diagnóstico
 - [Provisioning SCIM con Microsoft Entra](identity/scim-entra-provisioning.md) — lifecycle automatico de usuarios y grupos desde Entra, tenant interno Efeonce con `client_id=NULL`, validacion `provisionOnDemand` y manejo seguro de escrows
 
 ### Portal Cliente
 
+- [Portal Cliente y Customer Experience end-to-end](client-portal/portal-cliente-customer-experience-end-to-end.md) — mapa funcional completo del portal cliente como BFF: roles cliente, vistas, modulos activables, resolver server-side, estados normal/zero-state/not assigned/degraded/error, asignaciones auditables y frontera con Admin Center.
 - [Menu dinamico y acceso a modulos del Portal Cliente](client-portal/menu-dinamico-y-acceso-a-modulos.md) — como funciona el portal cliente compositivo desde TASK-827: catalogo de modulos vendibles (Globe, Wave, addons), resolver canonico server-side, 5 estados visuales canonicos (normal / zero-state recien activado / not_assigned con modulo no comprado / degraded parcial / error completo), page guards resolver-based en 9 rutas cliente, anatomia 5-elementos de empty states, glosario completo. Reemplaza el patron legacy de menu uniforme por business_line.
 
 ### Admin Center
 
+- [Admin Center end-to-end](admin-center/admin-center-operacion-end-to-end.md) — como opera Admin Center sin convertirse en bypass: tenants, usuarios, roles, vistas, permission sets, integraciones, email delivery, AI Tools, pricing catalog, SLAs, calendario operacional, responsabilidades, audit y capabilities.
 - [Commercial Parties](admin-center/commercial-parties.md) — tablero administrativo del lifecycle comercial: lista de parties, embudo, conflictos de sync, detalle por party, transiciones manuales y sweep operativo
 - [Product Sync Conflicts](admin-center/product-catalog-sync.md) — surface administrativa para detectar drift entre Greenhouse y HubSpot Products, revisar diffs y aplicar resoluciones auditables
 - [Catalogo de Productos — Full Sync HubSpot](admin-center/catalogo-productos-fullsync.md) — admin UI completo del product catalog con sync bidireccional de 16 campos contra HubSpot, drift detection 3-niveles inline, backfill masivo, reconcile semanal y governance de campos read-only
@@ -34,9 +37,13 @@ La documentacion funcional no reemplaza el manual ni la arquitectura. Explica qu
 
 ### Plataforma interna y calidad
 
+- [Public Site WordPress — Layout Ohio + Elementor](public-site/wordpress-ohio-elementor-layout.md) — contrato funcional del sitio publico Efeonce en WordPress/Kinsta cuando Ohio + Elementor producen desfases de contenedor, con causa raiz del incidente `/blog` 2026-06-14 y guardrails para no romper el sidebar fijo ni el hero.
+- [Public Site y Content Factory end-to-end](public-site/public-site-content-factory-end-to-end.md) — como opera el sitio publico WordPress/Kinsta desde Greenhouse: bridge read-only, inspeccion Gutenberg/Elementor, mapas de inteligencia, drift/dry-run, control plane draft-only y limites de publicacion.
 - [Knowledge Platform (foundation)](plataforma/knowledge-platform.md) — qué es el corpus gobernado de conocimiento (manuales/SOP/runbooks/glosarios) para la capa humana + Nexa con citas, qué guarda el schema `greenhouse_knowledge`, y por qué el estado del documento y el permiso de Nexa son dos cosas separadas. Foundation TASK-1081 (sin UI/Notion/Nexa todavía).
 - [Experiencia Conversacional de Nexa](plataforma/nexa-conversational-experience.md) — cómo funciona la lente Nexa (preguntar y recibir respuesta-primero con grounding, evidencia bajo demanda y chrome de confianza): la coreografía paso a paso, las piezas que la componen, el modelo de confianza y por qué es una sola experiencia reutilizable en todo el portal (Knowledge primero, no único). Contrato técnico: `architecture/ui-platform/CONVERSATIONAL_EXPERIENCE.md`
+- [Roadmap — Índice de Work Items](plataforma/roadmap-cockpit.md) — vista read-only del backlog operativo (epics/tasks/mini-tasks/issues) como contrato tipado `roadmap-work-item-index.v1` vía `GET /api/roadmap/work-items`: el Markdown sigue siendo SSOT (el reader no edita nada), salud template/legacy + readiness espejando los linters, filtros/facets, acceso interno por capability. Foundation TASK-1152 (la UI cockpit es TASK-1153)
 - [API Platform Ecosystem](plataforma/api-platform-ecosystem.md) — nueva lane ecosystem-facing de APIs machine-to-machine: cómo funciona hoy, qué expone, cómo convive con `/api/integrations/v1/*`, cómo sirve al MCP local/remoto y cuál es el camino correcto de hardening sin romper consumers actuales
+- [Kortex Command Adapter](plataforma/kortex-command-adapter.md) — contrato `greenhouse-kortex-command-adapter.v1` para solicitar desde Greenhouse auditorias, compilacion, dry-run y execute de Kortex con binding preflight, idempotencia, audit trail y live execute gated.
 - [Platform Health API](plataforma/platform-health-api.md) — contrato `platform-health.v1` para preflight programático de agentes (MCP, Teams bot, CI): estado global, safe modes determinísticos, fuentes consultadas, recomendaciones accionables, redacción agresiva de secretos
 - [Feature Flags y Rollouts Graduales](plataforma/feature-flags-rollout.md) — plataforma canónica para activar variantes de UI sin redeploy: tabla `home_rollout_flags` con scope precedence user/role/tenant/global, resolver con cache + fallback graceful, reliability signal `home.rollout.drift`, endpoint admin REST. Reemplaza el patrón frágil de env vars `*_ENABLED` que no escalaba
 - [Página "En mantenimiento" + Modo Mantenimiento](plataforma/pagina-mantenimiento.md) — la página institucional `/maintenance` (familia 404/401/coming-soon, 5 mensajes rotativos, ilustración Efeonce) + el gate de mantenimiento env-driven (`MAINTENANCE_MODE`, default OFF, fail-open) aplicado por `src/proxy.ts`: 503 honesto, allowlist, bypass de operador `?gh_bypass`
@@ -45,11 +52,13 @@ La documentacion funcional no reemplaza el manual ni la arquitectura. Explica qu
 - [Deep Link Platform](plataforma/deep-link-platform.md) — capa compartida para resolver referencias semánticas a links canónicos, URLs absolutas por ambiente, fallback y metadata de acceso sin repartir strings de ruta por todo el portal
 - [Capa de Contexto Estructurado](plataforma/capa-contexto-estructurado.md) — memoria estructurada sidecar para payloads normalizados, auditoría, replay operativo y trabajo asistido por agentes sin reemplazar la verdad relacional
 - [Greenhouse Visual Capture](plataforma/captura-visual.md) — herramienta `pnpm fe:capture` para grabar `.webm` + frames PNG + GIF opcional de cualquier ruta del portal usando agent auth canónico. Cubre evidencia visual, pantallas largas con scroll, captura por sección, full-page, review dossier, diff, health, 5 capas de safety y reemplazo del patrón `_cap.mjs` ad-hoc
+- [UI Platform y Design System end-to-end](plataforma/ui-platform-design-system-end-to-end.md) — contrato funcional para tokens AXIS, primitives, Composition Shell, Adaptive Card Density, Floating Surface, Motion Primitive, catalogo `/admin/design-system`, GVC y gobernanza Figma->codigo.
 - [Mi Perfil](plataforma/mi-perfil.md) — vista personal del colaborador: datos de identidad, equipos, proyectos, colegas y actividad reciente
 - [Saludo de Nexa — Hero del Home](plataforma/saludo-nexa-home.md) — la tarjeta de bienvenida de Nexa en el home: saludo dinámico (~100 variantes por hora/día/mes/estación/feriados Chile), campo de pregunta con placeholder rotativo, botón enviar con estado, accesos rápidos por rol, microinteracciones reduced-motion safe. Componente reutilizable `NexaGreetingsCard`
 - [Sister Platform Bindings](plataforma/sister-platform-bindings.md) — enlace formal entre scopes externos de apps hermanas y scopes internos de Greenhouse
 - [Sistema de Observabilidad de Tests](plataforma/sistema-observabilidad-de-tests.md) — inventario del suite, resultados, coverage, artifacts y como leer la ultima corrida sin abrir logs crudos
 - [Sistema de Email Templates](plataforma/sistema-email-templates.md) — inventario de templates (react-email + Resend), design tokens, assets de marca, workflow Figma ↔ codigo
+- [Comunicaciones y Notificaciones end-to-end](plataforma/comunicaciones-notificaciones-end-to-end.md) — como Greenhouse entrega mensajes por in-app, email/Resend y Teams Bot: delivery log, preferencias, kill switches, webhooks de bounce/complaint, Teams channels, estados y limites operativos.
 - [Microcopy shared y dictionary-ready](plataforma/microcopy-shared-dictionary.md) — contrato funcional para usar `src/lib/copy`, `getMicrocopy` y `buildStatusMap` sin reintroducir hardcodes de CTAs, estados, meses, empty states o aria-labels
 - [Runtime i18n de Greenhouse](plataforma/i18n-runtime.md) — runtime `next-intl` del App Router: locale por cookie/header, provider, shell `en-US`, sin prefijos privados y frontera con TASK-431
 - [Formateo locale-aware](plataforma/formateo-locale-aware.md) — capa canonica `src/lib/format` para fechas, monedas, numeros, porcentajes, plurales y textos relativos; separa locale, timezone operacional y copy traducible
@@ -74,12 +83,14 @@ La documentacion funcional no reemplaza el manual ni la arquitectura. Explica qu
 - [HES — Recepción y validación de servicio](finance/hes-recepcion-y-validacion.md) — hoja de entrada de servicio como respaldo recibido del cliente, estados visibles y herencia documental desde la OC
 - [PDF de Cotización — Documento Enterprise](finance/pdf-cotizacion-enterprise.md) — PDF rediseñado nivel enterprise con 8 secciones modulares (5 always + 3 conditional), branding Efeonce + sub-brand identification, fonts DM Sans + Poppins, QR signed para verificación de autenticidad y endpoint público que valida contra DB. Adaptativo: 2-3 páginas para quotes chicas / 6-7 páginas para enterprise. Shipped en TASK-629.
 - [Modulos de Caja — Cobros, Pagos, Banco, Cuenta Accionista y Posicion de Caja](finance/modulos-caja-cobros-pagos.md) — cobros (cash in), pagos (cash out), tesoreria por instrumento, cuenta corriente accionista y diferencia devengado vs caja
+- [Operacion Finance end-to-end](finance/operacion-finance-end-to-end.md) — mapa funcional completo de Finance reconciliado contra codigo y DB: ingresos, egresos, caja, instrumentos, banco, conciliacion, payment orders, contractors, payroll, P&L operativo y separacion entre automatico vs operador.
 - [Distribución de costos para P&L operativo](finance/distribucion-costos-pnl.md) — contrato funcional TASK-777 para separar labor/provider payroll, regulatorio, financiero y overhead operacional antes de materializar márgenes por cliente
 - [Finance Movement Feed](finance/finance-movement-feed.md) — primitive reusable para mostrar movimientos financieros con identidad visual, instrumento, estado, subtotales y virtualizacion sin mezclar UI con calculos de saldo
 - [Pagos a Contractors — Workbench de Finanzas](finance/pagos-a-contractors.md) — superficie operador `/finance/contractor-payments` (Tesorería) para preparar, revisar y autorizar pagos a contractors: estados del payable, breakdown bruto/retención/neto leído verbatim, readiness con responsable, crear desde envío/off-cycle, corrida mensual, órdenes de pago y frontera end-to-end validada el 2026-06-02 hasta pago/comprobante. Shipped en TASK-974.
 
 ### Comercial
 
+- [Quote-to-Cash Comercial end-to-end](comercial/quote-to-cash-comercial-end-to-end.md) — mapa funcional completo del dominio Comercial: organizations/parties, deals, catalogo, pricing engine, cotizaciones, aprobaciones, contratos, HubSpot sync y frontera con Finance.
 - [Pipeline comercial](finance/pipeline-comercial.md) — forecast comercial de deals, contratos standalone y pre-sales; lane dedicada en `/finance/intelligence/pipeline` con compat temporal desde Finanzas > Economía.
 - [Sample Sprints comerciales](comercial/sample-sprints.md) — pilotos, trials, POCs y discovery sobre `services.engagement_kind`, con approval, progreso, outcome, reportes y audit/outbox.
 - [Servicios engagement](comercial/servicios-engagement.md) — sincronizacion HubSpot p_services, materializacion de servicios y degradacion honesta
@@ -87,6 +98,7 @@ La documentacion funcional no reemplaza el manual ni la arquitectura. Explica qu
 
 ### HR y Nomina
 
+- [People, Workforce, Payroll y Contractors end-to-end](hr/people-workforce-payroll-contractors-end-to-end.md) — mapa funcional completo reconciliado contra codigo y DB: Workforce Activation, HR Core, Payroll, honorarios, Deel/internacional, Contractors, payables, offboarding/finiquitos y puente con Finance; separa automatico vs operador y evita mezclar contractors con nomina dependiente.
 - [Sistema de Permisos y Licencias](hr/sistema-permisos-leave.md) — tipos de permiso, medio dia (AM/PM), calculo de dias habiles, flujo de aprobacion, saldo y acumulacion
 - [Workforce Activation Readiness](hr/workforce-activation-readiness.md) — resolver canónico y workspace HR para habilitar colaboradores antes de cerrar intake, con lanes, blockers, guard y override auditado
 - [Checklists de Onboarding y Offboarding](hr/onboarding-offboarding-checklists.md) — plantillas e instancias operativas HRIS, self-service del colaborador y frontera con el caso formal de offboarding
@@ -105,11 +117,14 @@ La documentacion funcional no reemplaza el manual ni la arquitectura. Explica qu
 
 ### Personas
 
+- [My Space y Self-Service end-to-end](personas/my-space-self-service-end-to-end.md) — como funciona el espacio personal: perfil, performance, recibos, payment profile, licencias, onboarding, legal docs y contractor self-service con identidad derivada de la sesion.
 - [Person Complete 360](personas/person-complete-360.md) — datos completos de una persona: facetas, autorizacion, cache, endpoint unificado
 
 ### Agencia y Operaciones
 
+- [Agency, Delivery y Account 360 end-to-end](agency/agency-delivery-account-360-end-to-end.md) — mapa funcional de Account 360, Delivery, ICO, service attribution, economics y operaciones de agencia, con degradacion honesta por faceta y limites actuales de Service P&L.
 - [Account Complete 360](agency/cuenta-completa-360.md) — datos completos de una cuenta u organizacion: facetas, autorizacion, endpoint unificado
+- [Integraciones y Sync end-to-end](operations/integraciones-y-sync-end-to-end.md) — capa nativa de integraciones: integration registry, source sync runs, raw/conformed/projection, health/freshness, pause/resume, sync manual, webhooks inbound/outbound, data quality y replay/backfill.
 - [Ops Worker — Crons Reactivos en Cloud Run](operations/ops-worker-reactive-crons.md) — servicio Cloud Run que procesa eventos reactivos del outbox, corridas scheduladas, ESM/CJS shim pattern, monitoreo en Ops Health
 - [Commercial Cost Worker](operations/commercial-cost-worker.md) — worker Cloud Run dedicado para la base de costos comercial, su ledger de corridas por periodo/scope y la separacion respecto de `ops-worker`
 - [Postura Cloud GCP](operations/postura-cloud-gcp.md) — estado auditado de Cloud Run, Secret Manager, Cloud SQL, PostgreSQL y BigQuery; qué está sano, qué sigue riesgoso y cómo leer la topología compartida actual
@@ -125,6 +140,7 @@ La documentacion funcional no reemplaza el manual ni la arquitectura. Explica qu
 
 ### Herramientas IA
 
+- [AI Tooling, Content y Assets end-to-end](ai-tooling/ai-tooling-content-assets-end-to-end.md) — catalogo de herramientas IA, licencias, wallets, credit ledger y generacion interna de assets/contenido, con frontera clara frente a Public Site Content Factory y publicaciones.
 - [Generador Visual de Assets con IA](ai-tooling/generador-visual-assets.md) — generacion de imagenes (Imagen 4) y animaciones SVG (Gemini) para enriquecer interfaces, banners de perfil por categoria
 
 ---

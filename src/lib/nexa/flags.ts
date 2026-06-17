@@ -31,3 +31,32 @@ export const getNexaProviderOverride = (): 'google' | 'anthropic' | null => {
 // Con ON, el router elige Anthropic para preguntas de conocimiento (cuando el retrieval
 // está activo) y Gemini para el resto, con failover al otro provider si el primario falla.
 export const isNexaAutoRouterEnabled = (): boolean => process.env.NEXA_AUTO_ROUTER_ENABLED === 'true'
+
+// TASK-1124 — System Prompt V2 (prompt modular + contrato de voz Efeonce + response modes).
+// Default OFF en código (rollback); se habilita por env en local/staging para prueba temprana,
+// y en producción tras sign-off del operador. Con OFF, Nexa usa el prompt V1 byte-equivalente.
+export const isNexaSystemPromptV2Enabled = (): boolean => process.env.NEXA_SYSTEM_PROMPT_V2_ENABLED === 'true'
+
+// TASK-1124 — Evidence brief sintetizable para el grounding de Knowledge (in-memory, derivado
+// del packet). Default OFF en código; ON en local/staging para prueba temprana. Con OFF, el
+// grounding usa el resumen de excerpts saneado (sin headings crudos, sin lista "Fuentes:").
+export const isNexaKnowledgeSynthesisBriefEnabled = (): boolean =>
+  process.env.NEXA_KNOWLEDGE_SYNTHESIS_BRIEF_ENABLED === 'true'
+
+// TASK-1137 — Nexa governed action runtime. Default OFF: con OFF, Nexa NO ofrece el tool
+// `propose_action` (cero proposals de acción) y el endpoint de confirmación rechaza con gap
+// honesto → comportamiento idéntico al previo (advisory/read-only). Server-only: que Nexa pueda
+// EJECUTAR una acción es decisión de runtime + capability, no de la UI. La acción nunca corre por
+// el LLM: el LLM propone una actionKey registrada, el humano confirma, el endpoint determinístico
+// ejecuta vía la foundation de command/idempotency (TASK-655).
+export const isNexaActionRuntimeEnabled = (): boolean => process.env.NEXA_ACTION_RUNTIME_ENABLED === 'true'
+
+// TASK-1087 — Prompts sugeridos data-aware (Tier 2). Default OFF: con OFF, los prompts del chat
+// flotante se quedan en Tier 1/1.5 (plantillas por ruta + nombre real de la entidad), byte-idéntico
+// al comportamiento previo. Con ON, el panel consulta `GET /api/nexa/suggested-prompts` y, si hay
+// señales reales para la entidad (anomalías/pendientes/KPIs en rojo), reemplaza los prompts por los
+// data-aware; si no hay señal o el reader degrada, cae a Tier 1/1.5. NEXT_PUBLIC mirror para que el
+// panel (client component) decida si hace el fetch; el endpoint también gatea server-side.
+export const isNexaSuggestedPromptsDataAwareEnabled = (): boolean =>
+  process.env.NEXA_SUGGESTED_PROMPTS_DATA_AWARE_ENABLED === 'true' ||
+  process.env.NEXT_PUBLIC_NEXA_SUGGESTED_PROMPTS_DATA_AWARE_ENABLED === 'true'

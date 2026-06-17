@@ -86,4 +86,6 @@ export interface NexaProvenanceTraceProps {
   tabsAriaLabel?: string
   /** `panel`: habilita el feedback ¿útil? en el built-in `sources` / el panel single. Default false. */
   feedbackEnabled?: boolean
+  /** `panel` single (sin tabs): solo fuentes, sin trazabilidad/pasos/score (chat, TASK-1112). Default false. */
+  sourcesOnly?: boolean
 }

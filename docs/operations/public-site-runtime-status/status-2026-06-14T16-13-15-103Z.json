@@ -1,0 +1,70 @@
+{
+  "contractVersion": "public-site-runtime-status.v1",
+  "generatedAt": "2026-06-14T16:13:15.099Z",
+  "bindingPath": "/Users/jreye/Documents/greenhouse-eo/docs/operations/public-site-runtime-repository-binding-20260614.json",
+  "site": {
+    "url": "https://efeoncepro.com",
+    "runtime": "wordpress",
+    "hosting": "kinsta",
+    "wordpressPath": "/www/efeoncegroup_752/public"
+  },
+  "repository": {
+    "provider": "github",
+    "owner": "efeoncepro",
+    "name": "efeonce-public-site-runtime",
+    "url": "https://github.com/efeoncepro/efeonce-public-site-runtime",
+    "visibility": "private",
+    "defaultBranch": "main",
+    "baselineSha": "0fa6bfd",
+    "baselineTag": "baseline-2026-06-14-live"
+  },
+  "governedPaths": [
+    "wp-content/themes/ohio-child",
+    "wp-content/plugins/eo-headless-content",
+    "wp-content/plugins/eo-vibe-coding-api",
+    "wp-content/plugins/greenhouse-wp-bridge"
+  ],
+  "runtimeRepo": {
+    "repoRoot": "/Users/jreye/Documents/efeonce-public-site-runtime",
+    "exists": true,
+    "branch": "main",
+    "head": "f4c8a33",
+    "isClean": true,
+    "statusShort": ""
+  },
+  "latestDrift": {
+    "reportPath": "/Users/jreye/Documents/greenhouse-eo/docs/operations/public-site-drift/drift-2026-06-14T16-13-03-406Z.json",
+    "generatedAt": "2026-06-14T16:13:03.404Z",
+    "liveGeneratedAt": "2026-06-14T16:12:55.464Z",
+    "counts": {
+      "drifted": 0,
+      "ignored_live": 2,
+      "in_sync": 54,
+      "repo_extra": 0,
+      "repo_missing": 0
+    }
+  },
+  "blockedCapabilities": [
+    {
+      "capability": "kinsta_cache_clear",
+      "status": "blocked",
+      "reason": "Kinsta API token is not configured yet."
+    },
+    {
+      "capability": "kinsta_backup_create",
+      "status": "blocked",
+      "reason": "Kinsta API token is not configured yet."
+    },
+    {
+      "capability": "production_deploy_apply",
+      "status": "blocked",
+      "reason": "Only no-mutation dry-run is allowed until Kinsta deploy/cache/backup controls are verified."
+    }
+  ],
+  "pending": [
+    "branch protection/release policy for efeonce-public-site-runtime",
+    "Greenhouse UI/API surface for repository binding, drift and deploy dry-run reports",
+    "cleanup decision for excluded live backup files on Kinsta",
+    "Kinsta API token for cache/backups operations"
+  ]
+}

@@ -1,0 +1,75 @@
+{
+  "contractVersion": "public-site-astro-runtime-binding.v1",
+  "createdAt": "2026-06-16T00:00:00Z",
+  "status": "accepted_direction_runtime_not_cut_over",
+  "site": {
+    "canonicalUrl": "https://efeoncepro.com",
+    "currentProductionRuntime": "wordpress-kinsta",
+    "targetFrontendRuntime": "astro-vercel",
+    "cmsOriginTarget": "https://cms.efeoncepro.com",
+    "primarySeoSurface": "https://efeoncepro.com"
+  },
+  "repository": {
+    "provider": "github",
+    "owner": "efeoncepro",
+    "name": "efeonce-web",
+    "url": "https://github.com/efeoncepro/efeonce-web",
+    "visibility": "private",
+    "defaultBranch": "main",
+    "localPath": "/Users/jreye/Documents/efeonce-web",
+    "observedLocalBranch": "develop",
+    "observedLocalSha": "389ab0ab45aeeab83c2e385e78e8eda34234eadb",
+    "lastObservedPushedAt": "2026-04-12T23:24:13Z"
+  },
+  "vercel": {
+    "teamSlug": "efeonce-7670142f",
+    "projectName": "efeonce-web",
+    "projectId": "prj_i52CnPvaoNB0Lweqk7L7cLimv7W9",
+    "projectOrgId": "team_gmNiF4YCHmc1wqsHUTCvqjmN",
+    "observedNodeVersion": "24.x",
+    "observedDeploymentPosture": "ready_and_error_deployments_65d_old",
+    "productionDomainCutover": "blocked_until_future_task_and_operator_approval"
+  },
+  "stack": {
+    "framework": "astro",
+    "frameworkVersionRange": "^6.1.5",
+    "adapter": "@astrojs/vercel",
+    "adapterVersionRange": "^10.0.4",
+    "renderingMode": "static_with_selective_server_routes_possible",
+    "styling": "tailwindcss",
+    "reactIslands": true,
+    "contentOrigin": "wordpress_headless"
+  },
+  "readiness": {
+    "isCurrentLiveSourceOfTruth": false,
+    "isTargetFrontendRail": true,
+    "knownBlockers": [
+      "home route is scaffold placeholder with noindex",
+      "internal demo routes exist and must be removed or excluded",
+      "TASK-1159 SEO foundation and first service landing shell are code-complete local-first; remote preview/push remains operator-gated",
+      "blog route parity is not implemented",
+      "route ownership and redirect map must be verified before apex cutover",
+      "Greenhouse binding reader exists read-only; deploy, rollback and SEO preflight commands remain future tasks"
+    ],
+    "minimumCutoverGates": [
+      "core routes implemented",
+      "blog listing and representative post implemented or explicitly deferred with proxy plan",
+      "canonical and sitemap strategy verified",
+      "redirect map verified",
+      "HubSpot attribution smoke verified",
+      "GVC desktop and mobile reviewed",
+      "Lighthouse SEO/performance/accessibility smoke reviewed",
+      "operator approves DNS/front-door cutover"
+    ]
+  },
+  "relatedContracts": [
+    "docs/architecture/GREENHOUSE_PUBLIC_SITE_ASTRO_RUNTIME_STRATEGY_DECISION_V1.md",
+    "docs/architecture/GREENHOUSE_PUBLIC_SITE_ASTRO_BINDING_READER_V1.md",
+    "docs/operations/public-site-route-ownership-matrix-20260616.md",
+    "docs/operations/public-site-runtime-repository-binding-20260614.json"
+  ],
+  "secretsPolicy": {
+    "containsSecrets": false,
+    "rule": "Only IDs and public metadata are stored here. Vercel tokens, GitHub tokens, WordPress application passwords, Kinsta credentials and HMAC secrets must remain in the approved secret stores."
+  }
+}

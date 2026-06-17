@@ -96,3 +96,7 @@ src/assets/iconify-icons/generated-icons.css
 venv/
 **/.venv/
 **/venv/
+
+# TASK-1136 — ephemeral embedding/eval artifacts (offline shadow prototype, NOT runtime)
+scripts/knowledge/.cache/
+.captures/knowledge-eval/

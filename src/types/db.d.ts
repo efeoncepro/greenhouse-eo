@@ -121,6 +121,19 @@ export interface GreenhouseAiMemberToolLicenses {
   updated_at: Generated<Timestamp>;
 }
 
+export interface GreenhouseAiNexaActionEvents {
+  action_key: string;
+  created_at: Generated<Timestamp>;
+  detail: Json | null;
+  event_id: Generated<string>;
+  event_type: string;
+  idempotency_key: string | null;
+  reason: string | null;
+  replayed: Generated<boolean>;
+  sensitivity: string | null;
+  user_id: string;
+}
+
 export interface GreenhouseAiNexaFeedback {
   client_id: string;
   comment: string | null;
@@ -149,6 +162,31 @@ export interface GreenhouseAiNexaThreads {
   last_message_at: Generated<Timestamp>;
   thread_id: Generated<string>;
   title: Generated<string>;
+  user_id: string;
+}
+
+export interface GreenhouseAiNexaTurnTelemetry {
+  client_id: string | null;
+  contract_version: string;
+  created_at: Generated<Timestamp>;
+  detail: Json | null;
+  did_failover: Generated<boolean>;
+  failover_from: string | null;
+  message_id: string;
+  outcome: string;
+  primary_provider: string;
+  prompt_family: string;
+  prompt_version: string;
+  provider_step_count: Generated<number>;
+  resolved_model: string | null;
+  resolved_provider: string | null;
+  suggestion_count: Generated<number>;
+  suggestion_outcome: string | null;
+  telemetry_id: Generated<string>;
+  thread_id: string;
+  tool_count: Generated<number>;
+  tools_used: Generated<string[]>;
+  total_latency_ms: Generated<number>;
   user_id: string;
 }
 
@@ -1853,6 +1891,34 @@ export interface GreenhouseContextContextDocumentVersions {
   document_jsonb: Generated<Json>;
   schema_version: string;
   version_number: number;
+}
+
+export interface GreenhouseCoreApiPlatformCommandExecutions {
+  app_session_id: string | null;
+  client_id: string | null;
+  command_execution_id: string;
+  completed_at: Timestamp | null;
+  consumer_id: string | null;
+  created_at: Generated<Timestamp>;
+  error_code: string | null;
+  expires_at: Timestamp;
+  greenhouse_scope_type: string | null;
+  idempotency_key: string | null;
+  lane: string;
+  organization_id: string | null;
+  principal_id: string;
+  principal_kind: string;
+  replay_count: Generated<number>;
+  request_fingerprint: string | null;
+  request_method: string;
+  request_path: string;
+  response_body: Json | null;
+  response_status: number | null;
+  route_key: string;
+  space_id: string | null;
+  status: Generated<string>;
+  updated_at: Generated<Timestamp>;
+  user_id: string | null;
 }
 
 export interface GreenhouseCoreApiPlatformRequestLogs {
@@ -6897,6 +6963,10 @@ export interface GreenhouseKnowledgeKnowledgeChunks {
   created_at: Generated<Timestamp>;
   document_id: string;
   document_version_id: string;
+  embedding: string | null;
+  embedding_checksum: string | null;
+  embedding_model: string | null;
+  embedding_updated_at: Timestamp | null;
   freshness: Generated<string>;
   heading_path: Generated<string[]>;
   sensitivity: string;
@@ -8543,9 +8613,12 @@ export interface GreenhouseServingOrganizationOperationalMetrics {
   otd_pct: Numeric | null;
   period_month: number;
   period_year: number;
+  pipeline_velocity: Numeric | null;
   rpa_avg: Numeric | null;
+  rpa_median: Numeric | null;
   source: Generated<string>;
   stuck_asset_count: Generated<number | null>;
+  stuck_asset_pct: Numeric | null;
   tasks_active: Generated<number>;
   tasks_completed: Generated<number>;
   tasks_total: Generated<number>;
@@ -9975,9 +10048,11 @@ export interface DB {
   "greenhouse_ai.credit_ledger": GreenhouseAiCreditLedger;
   "greenhouse_ai.credit_wallets": GreenhouseAiCreditWallets;
   "greenhouse_ai.member_tool_licenses": GreenhouseAiMemberToolLicenses;
+  "greenhouse_ai.nexa_action_events": GreenhouseAiNexaActionEvents;
   "greenhouse_ai.nexa_feedback": GreenhouseAiNexaFeedback;
   "greenhouse_ai.nexa_messages": GreenhouseAiNexaMessages;
   "greenhouse_ai.nexa_threads": GreenhouseAiNexaThreads;
+  "greenhouse_ai.nexa_turn_telemetry": GreenhouseAiNexaTurnTelemetry;
   "greenhouse_ai.reliability_ai_observations": GreenhouseAiReliabilityAiObservations;
   "greenhouse_ai.tool_catalog": GreenhouseAiToolCatalog;
   "greenhouse_client_portal.module_assignment_events": GreenhouseClientPortalModuleAssignmentEvents;
@@ -10054,6 +10129,7 @@ export interface DB {
   "greenhouse_context.context_document_quarantine": GreenhouseContextContextDocumentQuarantine;
   "greenhouse_context.context_document_versions": GreenhouseContextContextDocumentVersions;
   "greenhouse_context.context_documents": GreenhouseContextContextDocuments;
+  "greenhouse_core.api_platform_command_executions": GreenhouseCoreApiPlatformCommandExecutions;
   "greenhouse_core.api_platform_request_logs": GreenhouseCoreApiPlatformRequestLogs;
   "greenhouse_core.asset_access_log": GreenhouseCoreAssetAccessLog;
   "greenhouse_core.assets": GreenhouseCoreAssets;

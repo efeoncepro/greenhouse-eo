@@ -26,6 +26,7 @@ import {
 } from '@/types/hr-contracts'
 
 import { captureWithDomain } from '@/lib/observability/capture'
+import { getOperationalPayrollMonth } from '@/lib/calendar/operational-calendar'
 import { formatISODateKey } from '@/lib/format'
 import {
   isGreenhousePostgresConfigured,
@@ -2271,6 +2272,40 @@ export const pgGetMemberPayrollEntries = async (memberId: string) => {
   )
 
   return rows.map(mapEntry)
+}
+
+// TASK-1145 — ¿el colaborador tiene su recibo de pago del período RECIENTE ya emitido?
+// "Reciente" = mes operativo actual o el inmediatamente anterior (calendario operativo canónico,
+// America/Santiago — NUNCA `new Date()` naive para decidir el mes). "Emitido/listo" = el período
+// está en `exported`. Member-scoped (data propia → tenant-safe). Read API thin: devuelve solo
+// `{ ready }`, NUNCA el monto. Lo consume el resolver `personal` de Nexa (prompt "tu recibo ya está
+// disponible") sin recomputar nada.
+export const pgMemberPayslipReadyForRecentPeriod = async (
+  memberId: string,
+  referenceDate: Date = new Date()
+): Promise<{ ready: boolean }> => {
+  await assertPayrollPostgresReady()
+
+  const { operationalYear, operationalMonth } = getOperationalPayrollMonth(referenceDate)
+  const prevMonth = operationalMonth === 1 ? 12 : operationalMonth - 1
+  const prevYear = operationalMonth === 1 ? operationalYear - 1 : operationalYear
+
+  const rows = await runGreenhousePostgresQuery<{ ready: boolean }>(
+    `
+      SELECT EXISTS (
+        SELECT 1
+        FROM greenhouse_payroll.payroll_entries AS e
+        INNER JOIN greenhouse_payroll.payroll_periods AS p ON p.period_id = e.period_id
+        WHERE e.member_id = $1
+          AND e.is_active = TRUE
+          AND p.status = 'exported'
+          AND ((p.year = $2 AND p.month = $3) OR (p.year = $4 AND p.month = $5))
+      ) AS ready
+    `,
+    [memberId, operationalYear, operationalMonth, prevYear, prevMonth]
+  )
+
+  return { ready: Boolean(rows[0]?.ready) }
 }
 
 // TASK-410 — metadata for every version of an entry (for admin history

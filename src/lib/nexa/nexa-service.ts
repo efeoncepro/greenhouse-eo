@@ -9,15 +9,23 @@ import {
   type NexaProviderKey
 } from '@/config/nexa-models'
 import { getGreenhouseAgentModel } from '@/lib/ai/google-genai'
-import { KNOWLEDGE_SEARCH_CONTRACT_VERSION, type KnowledgeRetrievalPacket } from '@/lib/knowledge/search'
 import type { NexaMessage, HomeSnapshot } from '@/types/home'
 
+import { extractNexaActionProposals } from './actions/extract-proposals'
 import { getNexaProviderOverride, isNexaAutoRouterEnabled, isNexaKnowledgeRetrievalEnabled } from './flags'
+import { buildNexaSystemPrompt, type NexaSystemPromptResult } from './nexa-system-prompt'
 import { classifyNexaIntent, nexaProviderFailoverChain, routeNexaProviderKey } from './nexa-model-router'
 import type { NexaResponse, NexaRuntimeContext, NexaToolInvocation } from './nexa-contract'
 import type { NexaChatProvider } from './nexa-provider'
+import {
+  NEXA_TURN_TELEMETRY_CONTRACT_VERSION,
+  type NexaTurnOutcome,
+  type NexaTurnProviderStepTelemetry,
+  type NexaTurnTelemetry
+} from './nexa-turn-telemetry'
 import { AnthropicNexaProvider } from './providers/anthropic'
 import { GeminiNexaProvider } from './providers/gemini'
+import { downgradeStructuralHeadings } from './strip-markdown-excerpt'
 
 interface NexaServiceInput {
   prompt: string
@@ -90,105 +98,15 @@ export class NexaService {
     }
   }
 
-  private static buildSystemPrompt(context: HomeSnapshot): string {
-    const { user, modules, tasks } = context
-
-    // TASK-1085 — reglas de knowledge SOLO cuando el tool está activo (flag ON);
-    // si no, no mencionar un tool que no existe (evita que el modelo lo "alucine").
-    const knowledgeRules = isNexaKnowledgeRetrievalEnabled()
-      ? [
-          '',
-          'REGLAS DE BASE DE CONOCIMIENTO (tool search_knowledge):',
-          '- Si la pregunta es sobre procesos, políticas, guías, definiciones o "cómo se hace X", usa el tool search_knowledge ANTES de responder.',
-          '- Responde SOLO con lo respaldado por los fragmentos recuperados. Usa marcadores inline [n] ligados al fragmento n (ej. "... [1]") y cierra con "Fuentes: [n] = citationLabel".',
-          '- Si una fuente viene marcada stale o deprecated, decláralo en la respuesta.',
-          '- Si search_knowledge no encuentra documentación (confianza none), di con honestidad que no encontraste una guía publicada y NO inventes la respuesta.',
-          '- Distingue guía publicada vs dato operativo en vivo: el conocimiento explica CÓMO funciona algo, no afirma el estado real del usuario. Si te piden su dato real (su ICO, su nómina, su estado), dilo: "No consulté datos actuales ni fuentes fuera de Knowledge. Si necesitas estado productivo, valida en el módulo operativo."',
-          '- En temas sensibles (finanzas, nómina, legal, seguridad, compromisos contractuales), responde solo con fuente aprobada, cita siempre con [n] y sugiere validación humana cuando corresponda.'
-        ]
-      : []
-
-    const financeContext = context.financeStatus
-      ? [
-          '',
-          'SEÑAL FINANCIERA DISPONIBLE:',
-          `- Período: ${context.financeStatus.periodLabel}`,
-          `- Estado de cierre: ${context.financeStatus.closureStatus || 'provisional'}`,
-          `- Readiness: ${context.financeStatus.readinessPct != null ? `${context.financeStatus.readinessPct}%` : 'sin dato'}`,
-          `- Margen operativo reciente: ${context.financeStatus.latestMarginPct != null ? `${context.financeStatus.latestMarginPct}% (${context.financeStatus.latestMarginPeriodLabel || 'último período'})` : 'sin dato'}`
-        ]
-      : []
-
-    return [
-      'Eres Nexa, el asistente inteligente de Greenhouse.',
-      'Tu misión es ayudar a navegar la operación real del portal y resolver dudas rápidas con contexto confiable.',
-      '',
-      'CONTEXTO DEL USUARIO:',
-      `- Nombre: ${user.firstName} ${user.lastName || ''}`,
-      `- Rol: ${user.role}`,
-      '',
-      'OPERACIÓN ACTIVA:',
-      `- Módulos disponibles: ${modules.map(m => m.title).join(', ')}`,
-      `- Tareas pendientes: ${tasks.length} identificadas (OTD, FTR, RPA, etc.)`,
-      ...financeContext,
-      '',
-      'REGLAS DE RESPUESTA:',
-      '- Sé conciso, profesional y humano.',
-      '- Usa un tono operativo, claro y grounded; no inventes métricas ni estados.',
-      '- Si el usuario pregunta por nómina, OTD, correos operativos, capacidad o cuentas por cobrar, usa los tools disponibles antes de responder.',
-      '- Si un tool no está disponible por permisos o por falta de datos, dilo con honestidad.',
-      '- Si el usuario pregunta por algo que está en sus tareas pendientes, menciónalo directamente.',
-      '- Si el usuario pregunta por cierre de período, margen o estado financiero y ya hay señal en contexto, úsala antes de responder con generalidades.',
-      '- Mantén las respuestas breves para que quepan bien en el panel de Home.',
-      ...knowledgeRules,
-      '',
-      'Recuerda: Eres parte de Efeonce Group y Greenhouse es la plataforma que materializa la visión de sus proyectos.'
-    ].join('\n')
+  // TASK-1124 — el system prompt vive como artefacto versionado en `nexa-system-prompt.ts`
+  // (V1 byte-equivalente + V2 modular detrás de flag). Devuelve metadata de governance.
+  private static buildSystemPrompt(context: HomeSnapshot): NexaSystemPromptResult {
+    return buildNexaSystemPrompt(context)
   }
 
-  private static getKnowledgePackets(toolInvocations: NexaToolInvocation[]): KnowledgeRetrievalPacket[] {
-    return toolInvocations
-      .filter(invocation => invocation.toolName === 'search_knowledge')
-      .map(invocation => invocation.result.raw?.packet)
-      .filter((packet): packet is KnowledgeRetrievalPacket => {
-        if (!packet || typeof packet !== 'object') {
-          return false
-        }
-
-        const candidate = packet as Partial<KnowledgeRetrievalPacket>
-
-        return candidate.contractVersion === KNOWLEDGE_SEARCH_CONTRACT_VERSION && Array.isArray(candidate.chunks)
-      })
-  }
-
-  private static buildKnowledgeSourcesBlock(toolInvocations: NexaToolInvocation[]): string | null {
-    const citationLabels = this.getKnowledgePackets(toolInvocations)
-      .filter(packet => packet.confidence !== 'none' && packet.chunks.length > 0)
-      .flatMap(packet => packet.chunks.map(chunk => chunk.citationLabel.trim()))
-      .filter(Boolean)
-
-    const uniqueLabels = Array.from(new Set(citationLabels))
-
-    if (uniqueLabels.length === 0) {
-      return null
-    }
-
-    return ['Fuentes:', ...uniqueLabels.map((label, index) => `[${index + 1}] = ${label}`)].join('\n')
-  }
-
-  private static ensureKnowledgeSourcesVisible(text: string, toolInvocations: NexaToolInvocation[]): string {
-    if (/\[\d+\]/u.test(text)) {
-      return text
-    }
-
-    const sourcesBlock = this.buildKnowledgeSourcesBlock(toolInvocations)
-
-    if (!sourcesBlock) {
-      return text
-    }
-
-    return `${text.trim()}\n\n${sourcesBlock}`
-  }
+  // TASK-1124 — el post-procesador que anexaba "Fuentes: [n] = …" cuando el modelo no citaba
+  // inline se removió: la interfaz es dueña de la evidencia (panel de procedencia, packet-driven),
+  // así que un volcado textual de fuentes es redundante y contradice la política de citas inline.
 
   /** Modelo por defecto de cada provider. Gemini preserva la resolución actual (agente). */
   private static defaultModelForProvider(providerKey: NexaProviderKey, input: NexaServiceInput): NexaModelId {
@@ -233,9 +151,61 @@ export class NexaService {
     return [{ providerKey: 'google', model: this.defaultModelForProvider('google', input) }]
   }
 
+  /**
+   * TASK-1129 — arma la telemetría de turno (observabilidad). Sin contenido sensible: versión/familia
+   * del prompt, provider plan + resuelto + failover, latencias, tools (nombre + availability), outcome
+   * y resultado de sugerencias. Tokens/costo = null hasta que el SDK exponga usage estable.
+   */
+  private static buildTurnTelemetry(args: {
+    systemPromptResult: NexaSystemPromptResult
+    plan: NexaProviderStep[]
+    primaryProvider: NexaProviderKey
+    providerSteps: NexaTurnProviderStepTelemetry[]
+    resolvedStepIndex: number
+    toolInvocations: NexaToolInvocation[]
+    suggestions: string[]
+    startTotal: number
+    gracefulFallback: boolean
+  }): NexaTurnTelemetry {
+    const { systemPromptResult, plan, primaryProvider, providerSteps, resolvedStepIndex, toolInvocations, suggestions, startTotal, gracefulFallback } = args
+
+    const resolvedStep = plan[resolvedStepIndex]
+    const didFailover = resolvedStepIndex > 0
+    const tools = toolInvocations.map(invocation => ({ toolName: invocation.toolName, available: invocation.result.available }))
+    const anyToolUnavailable = tools.some(tool => !tool.available)
+    const outcome: NexaTurnOutcome = gracefulFallback ? 'graceful_fallback' : anyToolUnavailable ? 'tool_degraded' : 'success'
+
+    return {
+      contractVersion: NEXA_TURN_TELEMETRY_CONTRACT_VERSION,
+      promptVersion: systemPromptResult.version,
+      promptFamily: systemPromptResult.family,
+      primaryProvider,
+      // En graceful fallback NINGÚN provider produjo la respuesta (texto canned) → resolved = null.
+      resolvedProvider: gracefulFallback ? null : resolvedStep.providerKey,
+      resolvedModel: gracefulFallback ? null : resolvedStep.model,
+      providerStepCount: plan.length,
+      didFailover,
+      failoverFrom: didFailover ? plan[resolvedStepIndex - 1].providerKey : null,
+      outcome,
+      totalLatencyMs: Date.now() - startTotal,
+      toolsUsed: tools.map(tool => tool.toolName),
+      toolCount: tools.length,
+      suggestionCount: suggestions.length,
+      suggestionOutcome: gracefulFallback ? null : suggestions.length > 0 ? 'generated' : 'empty',
+      detail: {
+        providerSteps,
+        tools,
+        usage: { tokens: null, costUsd: null }
+      }
+    }
+  }
+
   static async generateResponse(input: NexaServiceInput): Promise<NexaResponse> {
     const plan = this.buildProviderPlan(input)
-    const systemPrompt = this.buildSystemPrompt(input.context)
+    const systemPromptResult = this.buildSystemPrompt(input.context)
+    const startTotal = Date.now()
+    const primaryProvider = plan[0].providerKey
+    const providerSteps: NexaTurnProviderStepTelemetry[] = []
 
     let lastError: unknown
 
@@ -243,10 +213,11 @@ export class NexaService {
       const step = plan[index]
       const isLastStep = index === plan.length - 1
       const provider = createNexaProvider(step.providerKey)
+      const stepStart = Date.now()
 
       try {
         const turn = await provider.resolveTurn({
-          systemPrompt,
+          systemPrompt: systemPromptResult.text,
           history: input.history,
           prompt: input.prompt,
           runtimeContext: input.runtimeContext,
@@ -254,13 +225,23 @@ export class NexaService {
           model: step.model
         })
 
-        const content = this.ensureKnowledgeSourcesVisible(turn.text, turn.toolInvocations)
+        providerSteps.push({ providerKey: step.providerKey, model: step.model, latencyMs: Date.now() - stepStart, ok: true })
+
+        // TASK-1149 — capa determinística: baja los headers ATX (`##`) a **negrita** antes de
+        // devolver/persistir. El contrato de voz prohíbe headers en el panel del chat y el prompt
+        // no lo garantiza (LLM probabilístico — Claude los pone pese al prompt; lo detectó el
+        // nightly de TASK-1127). Cubre todos los providers; el endpoint sale limpio para el QA matrix.
+        const content = downgradeStructuralHeadings(turn.text)
 
         const suggestions = await provider.generateSuggestions({
           model: step.model,
           prompt: input.prompt,
           responseText: content
         })
+
+        // TASK-1137 — eleva las propuestas de acción gobernadas del tool `propose_action` al
+        // contrato. Vacío cuando el runtime de acciones está OFF o el turno no propuso nada.
+        const actionProposals = extractNexaActionProposals(turn.toolInvocations)
 
         return {
           id: crypto.randomUUID(),
@@ -269,9 +250,22 @@ export class NexaService {
           timestamp: this.getTimestamp(),
           suggestions,
           toolInvocations: turn.toolInvocations,
-          modelId: step.model
+          ...(actionProposals.length > 0 ? { actionProposals } : {}),
+          modelId: step.model,
+          turnTelemetry: this.buildTurnTelemetry({
+            systemPromptResult,
+            plan,
+            primaryProvider,
+            providerSteps,
+            resolvedStepIndex: index,
+            toolInvocations: turn.toolInvocations,
+            suggestions,
+            startTotal,
+            gracefulFallback: false
+          })
         }
       } catch (error) {
+        providerSteps.push({ providerKey: step.providerKey, model: step.model, latencyMs: Date.now() - stepStart, ok: false })
         lastError = error
 
         const errorMessage = this.extractErrorMessage(error)
@@ -287,7 +281,20 @@ export class NexaService {
         if (this.isVertexPermissionDenied(errorMessage)) {
           console.warn('Nexa AI permission denied on Vertex AI, serving graceful fallback response.')
 
-          return this.buildPermissionDeniedFallback(input.context, step.model)
+          return {
+            ...this.buildPermissionDeniedFallback(input.context, step.model),
+            turnTelemetry: this.buildTurnTelemetry({
+              systemPromptResult,
+              plan,
+              primaryProvider,
+              providerSteps,
+              resolvedStepIndex: index,
+              toolInvocations: [],
+              suggestions: [],
+              startTotal,
+              gracefulFallback: true
+            })
+          }
         }
 
         throw new Error(errorMessage)

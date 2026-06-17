@@ -1,0 +1,4873 @@
+{
+  "contractVersion": "contentFactoryPostDeepInspection.v1",
+  "scannedAt": "2026-06-14T19:40:52+00:00",
+  "source": "wp_cli_parse_blocks",
+  "safetyPolicy": {
+    "writesWordPressContent": false,
+    "publishesContent": false,
+    "clearsCache": false,
+    "createsBackup": false,
+    "sendsSecretsToOutput": false
+  },
+  "post": {
+    "id": 248398,
+    "type": "post",
+    "status": "publish",
+    "slug": "que-es-loop-marketing",
+    "title": "¿Qué es Loop Marketing? El framework que reemplaza al funnel y evoluciona el inbound",
+    "modified": "2025-09-08T21:13:29+00:00",
+    "permalink": "https://efeoncepro.com/loop-marketing/que-es-loop-marketing/",
+    "contentLength": 46737
+  },
+  "seo": {
+    "yoastTitle": "¿Qué es Loop Marketing? El framework que evoluciona el inbound %%page%% %%sep%% %%sitename%%",
+    "yoastDescription": "Descubre Loop Marketing: el bucle infinito que supera al funnel y al flywheel con agilidad, IA y humanidad para competir hoy.",
+    "primaryCategory": "155"
+  },
+  "summary": {
+    "totalBlocks": 400,
+    "topLevelBlocks": 337,
+    "counts": {
+      "core/freeform": 168,
+      "core/heading": 35,
+      "core/image": 1,
+      "core/list": 21,
+      "core/list-item": 53,
+      "core/paragraph": 78,
+      "core/pullquote": 5,
+      "core/quote": 9,
+      "core/separator": 29,
+      "yoast-seo/table-of-contents": 1
+    },
+    "maxDepth": 3,
+    "linkCount": 32,
+    "nonEmptyFreeformCount": 0,
+    "mediaIssueCount": 0
+  },
+  "headingOutline": [
+    {
+      "path": "12",
+      "level": 2,
+      "text": "¿Qué es Loop Marketing? ♾️"
+    },
+    {
+      "path": "18",
+      "level": 3,
+      "text": "📌 Definición simple:"
+    },
+    {
+      "path": "28",
+      "level": 3,
+      "text": "🌱 Filosofía de base: inbound + un marco operativo nuevo"
+    },
+    {
+      "path": "40",
+      "level": 3,
+      "text": "📊 Una necesidad en cifras"
+    },
+    {
+      "path": "50",
+      "level": 2,
+      "text": "🔄 Funnel vs Flywheel vs Loop Marketing"
+    },
+    {
+      "path": "54",
+      "level": 3,
+      "text": "📉 El funnel = linealidad muerta"
+    },
+    {
+      "path": "60",
+      "level": 3,
+      "text": "⚙️ El flywheel = relato útil"
+    },
+    {
+      "path": "68",
+      "level": 3,
+      "text": "♾️ El loop = acción continua"
+    },
+    {
+      "path": "84",
+      "level": 2,
+      "text": "🔍 Loop Marketing y las 4S de Google"
+    },
+    {
+      "path": "90",
+      "level": 3,
+      "text": "🎬 Streaming: la era del contenido continuo"
+    },
+    {
+      "path": "100",
+      "level": 3,
+      "text": "📱 Scrolling: exploración infinita en feeds"
+    },
+    {
+      "path": "110",
+      "level": 3,
+      "text": "🔎 Searching: búsquedas multimodales e IA-first"
+    },
+    {
+      "path": "120",
+      "level": 3,
+      "text": "🛒 Shopping: compras sin fricciones"
+    },
+    {
+      "path": "130",
+      "level": 3,
+      "text": "🍏 Con manzanitas"
+    },
+    {
+      "path": "144",
+      "level": 2,
+      "text": "🏢 vs 🛍️ Loop Marketing en B2B vs B2C"
+    },
+    {
+      "path": "148",
+      "level": 3,
+      "text": "🏢 En B2B: relaciones largas, cuentas específicas"
+    },
+    {
+      "path": "162",
+      "level": 3,
+      "text": "🛍️ En B2C: velocidad y volumen"
+    },
+    {
+      "path": "176",
+      "level": 4,
+      "text": "🍏 Con manzanitas"
+    },
+    {
+      "path": "184",
+      "level": 3,
+      "text": "👀 Y ahora que vimos las diferencias…"
+    },
+    {
+      "path": "192",
+      "level": 2,
+      "text": "💰 Impacto en métricas de negocio (CAC, LTV, ROI, Payback)"
+    },
+    {
+      "path": "198",
+      "level": 3,
+      "text": "📉 Reducción del CAC"
+    },
+    {
+      "path": "206",
+      "level": 3,
+      "text": "📈 Aumento del LTV"
+    },
+    {
+      "path": "216",
+      "level": 3,
+      "text": "⏱️ Menor Payback y mejor ROI"
+    },
+    {
+      "path": "224",
+      "level": 4,
+      "text": "🔢 Ejemplo numérico con manzanitas 🍏"
+    },
+    {
+      "path": "246",
+      "level": 3,
+      "text": "🍏 Con manzanitas"
+    },
+    {
+      "path": "256",
+      "level": 2,
+      "text": "⚙️ Implementación práctica: stack tecnológico y cultura"
+    },
+    {
+      "path": "260",
+      "level": 3,
+      "text": "🔌 Stack tecnológico: cómo se integra el Loop"
+    },
+    {
+      "path": "268",
+      "level": 3,
+      "text": "🔄 Cambio cultural: de campañas a ciclos"
+    },
+    {
+      "path": "280",
+      "level": 4,
+      "text": "🍏 Con manzanitas"
+    },
+    {
+      "path": "288",
+      "level": 2,
+      "text": "🛡️ Riesgos y confianza: Human-in-the-Loop"
+    },
+    {
+      "path": "296",
+      "level": 3,
+      "text": "⚖️ Ética y guardrails en acción"
+    },
+    {
+      "path": "302",
+      "level": 3,
+      "text": "🤝 Trust by design"
+    },
+    {
+      "path": "314",
+      "level": 3,
+      "text": "🍏 Con manzanitas"
+    },
+    {
+      "path": "320",
+      "level": 3,
+      "text": "👀 Y ahora que tenemos claro que la velocidad sin confianza no sirve…"
+    },
+    {
+      "path": "324",
+      "level": 2,
+      "text": "De embudos y ruedas… a un bucle infinito 🚲♾️"
+    }
+  ],
+  "blocks": [
+    {
+      "path": "0",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "¿Te acuerdas cuando el funnel era la estrella? Todos felices dibujando embudos en pizarras como si los clientes avanzaran obedientes de Awareness a Decision. Luego vino el flywheel, y HubSpot nos dijo: “Oigan, el crecimiento gira alrededor del cliente”. Y sí, …",
+      "innerBlockCount": 0,
+      "fingerprint": "5e26c4e33db6d140d72f757adf034a41d2ae6a3d5182e5ef1929b410eeab1bde",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "1",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "2da24f92367f7c2b0e4f76ad392b66fce9027bfa35a81485910e5d0ae882d5b9",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "2",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "La verdad es que hoy los clientes no caminan en fila india. Saltan de streaming en YouTube a scrolling infinito en Instagram, buscan en Google o preguntan a un chatbot (searching) y terminan comprando en dos clics desde el celular (shopping). Todo esto en cues…",
+      "innerBlockCount": 0,
+      "fingerprint": "b770a9e8676a083216ec22c8d2a3472257f9f9a1ddb624d3c3171add52b3111e",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "3",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "4b5c99f6fafba03d9973d68018f691c628527b5b6e25c9e4fe26fedf312548a7",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "4",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Ahí es donde HubSpot mete la cuchara (otra vez) y lanza el Loop Marketing: un framework que convierte el desorden en un sistema vivo y ágil. Y ojo a este dato: según HubSpot, los equipos que trabajan con IA y loops de optimización logran reducir su CAC hasta e…",
+      "innerBlockCount": 0,
+      "fingerprint": "9860116727a4dc937e7acba886375552ec6278bbbd64966be1b11faad89b8831",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "5",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "62db42a028e487a080771dcb8308c877e830521c7e072b6dbfb3206756272e1f",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "6",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Imagina un loop en forma de ∞ donde tu marca expresa su voz, personaliza interacciones, amplifica su alcance y evoluciona con cada aprendizaje. O dicho de otro modo: un ciclo que aprende más rápido de lo que tu competencia puede reaccionar.",
+      "innerBlockCount": 0,
+      "fingerprint": "28b0f0c04583151699320da08dc68f31272835b48d5e28d3a095dadab89e886a",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "7",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "c284c4c12aefa43352f47d5ae193ebd4c3db1e74bc665ace910fdbfd6b7ca2b5",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "8",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Y como acá en Marketing con Manzanitas no nos gusta complicar lo que se puede explicar fácil, te lo explico con manzanitas 🍏: qué es el Loop Marketing, cómo funciona, en qué se diferencia del inbound y el flywheel, y cómo puede ayudarte a ganar velocidad, rele…",
+      "innerBlockCount": 0,
+      "fingerprint": "29a00b216c90a6a72f32b8aec023b41fb9ef0c70516c751977940952b3916eae",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "9",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "83858823bfd43358305f10f00874c21d546e0764e53e599d4a1bd2a8983cbaf5",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "10",
+      "depth": 0,
+      "blockName": "yoast-seo/table-of-contents",
+      "attrs": {},
+      "text": "Tabla de contenidos¿Qué es Loop Marketing? ♾️📌 Definición simple:🌱 Filosofía de base: inbound + un marco operativo nuevo📊 Una necesidad en cifras🔄 Funnel vs Flywheel vs Loop Marketing📉 El funnel = linealidad muerta⚙️ El flywheel = relato útil♾️ El loop = acció…",
+      "innerBlockCount": 0,
+      "fingerprint": "72fc76aa9c2ebbea64d8b5b730247d556ee7d7aa6af05af11e66a94176b74ca3",
+      "editability": "preserve_structure",
+      "risks": [],
+      "href": "#h-que-es-loop-marketing"
+    },
+    {
+      "path": "11",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "4dca91fafb9af976b35ddc2b0ddb37e1f98fde38c886593c5707d32d12d69ea5",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "12",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {},
+      "text": "¿Qué es Loop Marketing? ♾️",
+      "innerBlockCount": 0,
+      "fingerprint": "60b24e4cbd792df8af784e191f9cf33b8d0ab8c9498cc4db0b8193b1f4208882",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "13",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "e84eb997543a7dd41514d773b9cbe2137fd6e32c2a54cbfc9ac8bcce9e94bbd1",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "14",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "El Loop Marketing es un framework creado por HubSpot que propone un cambio radical en la forma en que entendemos el marketing digital. No es un “truco nuevo” ni una moda pasajera: es una metodología de marketing diseñada para un buyer journey moderno, donde lo…",
+      "innerBlockCount": 0,
+      "fingerprint": "ab02b2492fde073b328df9902ddb11682f6aaa28a38f5257756fed2f1ff6c424",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "15",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "661e12f5c6529bc71e7e349b071d9e1cb7932b3ca81965ead12f9a6463eb2414",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "16",
+      "depth": 0,
+      "blockName": "core/image",
+      "attrs": {
+        "id": 248439,
+        "sizeSlug": "large",
+        "linkDestination": "none",
+        "width": "772px",
+        "height": "auto",
+        "align": "center"
+      },
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "87ae673ad44abdbb089e38c4b9c04ad448966da0c2d7f869b05cdbd37984f423",
+      "editability": "media_requires_reconcile",
+      "risks": [
+        "media_refs_must_be_reconciled_before_write"
+      ],
+      "media": {
+        "id": 248439,
+        "attachmentUrl": "https://efeoncepro.com/wp-content/uploads/2025/09/Loop-MKT.svg",
+        "renderedSrc": "https://efeoncepro.com/wp-content/uploads/2025/09/Loop-MKT.svg",
+        "alt": "",
+        "width": "772px",
+        "height": "auto"
+      }
+    },
+    {
+      "path": "17",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "c423d4f29c415e75245bec0f0485223b01d85f2f11644b45cb4ac281d90df4a9",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "18",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {
+        "level": 3
+      },
+      "text": "📌 Definición simple:",
+      "innerBlockCount": 0,
+      "fingerprint": "1377642dda4ef8bf2fcb14aaaef88294d5734df077bf3fe878aeaf02dc02bbae",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "19",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "dd6e2c3c76a82830321d48de818f635d83749645c0a63b252f31832eb9b0e432",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "20",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Loop Marketing es un bucle infinito (∞) en el que las marcas aprenden constantemente: expresan su voz, personalizan sus interacciones, amplifican su mensaje en distintos canales y evolucionan con cada aprendizaje.",
+      "innerBlockCount": 0,
+      "fingerprint": "d14a93780e9a63178acada614f27a09c9e0aff3af2dfac5522a0ff40cc42410a",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "21",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "657f90f2163e0fe357d624219a016dabec7eba7d57a79f1d2f960c7347b2f9c0",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "22",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "💡 HubSpot lo define así:",
+      "innerBlockCount": 0,
+      "fingerprint": "21534c6c09b6bd9c45999e46425f997ead6baa60275c94c8f3f987e335ccb7f0",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "23",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "7d6d371d4dbfcfb1428409fff1c4c0037a77055eea9e723c3624f004292b3ab9",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "24",
+      "depth": 0,
+      "blockName": "core/quote",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 1,
+      "fingerprint": "ac84aa615a8782cb892c636dd321b5abd06a6dded5e3efbd92cf7ea99e3fdad0",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "24.0",
+      "depth": 1,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "“Cuando las personas y la IA trabajan juntos, pueden definir un mensaje, adaptarlo a la audiencia, amplificarlo a través de los distintos canales y optimizarlo en tiempo real.” — HubSpot, Loop Marketing",
+      "innerBlockCount": 0,
+      "fingerprint": "48012fd5002a6e4d660d030c808a22c4162cc2b50f8c1dea57d6cd410928a94a",
+      "editability": "safe_text_edit",
+      "risks": [],
+      "href": "https://www.hubspot.es/loop-marketing?utm_source=chatgpt.com"
+    },
+    {
+      "path": "25",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "ac173ffb8869f6666f0831d325010b26566cbc77a3518c6dd8636efafccb6d9f",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "26",
+      "depth": 0,
+      "blockName": "core/separator",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "dbcd5bb7832abd805c9f040bf74e6628665ea2d32437ff0b14f32ea98e4e477f",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "27",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "34b63d36ab5e5d57165076da458251645e23ae7836216c9ccd095ad047698b78",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "28",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {
+        "level": 3
+      },
+      "text": "🌱 Filosofía de base: inbound + un marco operativo nuevo",
+      "innerBlockCount": 0,
+      "fingerprint": "e2bb1d5f9054b7ef11fe562f4f84b6cad7425c26bd632a6b616592b8a7a8e297",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "29",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "2c9b09a2ebe532e3b49c51beea30f1663a68278c4920f7d960e01431c62b5ad5",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "30",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "El Loop Marketing no “mata” al inbound. Al contrario: se construye sobre él.",
+      "innerBlockCount": 0,
+      "fingerprint": "6a9da0717b22f2ed5328ffbf0e4b315b5463a7cf773c8cb694de5a0f729e1fc8",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "31",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "c50c720347dfe52776431315bb77275805c25a8c8e5cf37883a52413c5ae9cf5",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "32",
+      "depth": 0,
+      "blockName": "core/list",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 2,
+      "fingerprint": "fb4f9b4ecbed259ef132db3f5bf53520cca3b6da437a7d3d7493239672cccef7",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "32.0",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "El inbound nos enseñó que atraer con valor y construir confianza es mejor que interrumpir.",
+      "innerBlockCount": 0,
+      "fingerprint": "ac9985f2f6f9795b560d17c49eb7b587bf66fd9f23c937fdea4f24d00b709f7f",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "32.1",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "El Loop añade lo que hoy falta: agilidad, omnicanalidad y aprendizaje continuo impulsado por IA.",
+      "innerBlockCount": 0,
+      "fingerprint": "e76a13150eefdd0ae73543868ed922e53a0d593aecdcb98ce1e39f0948364b03",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "33",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "0ea2bb7516e325cff7952d2b45196e71af3c6fb7d59bbe5d55cbea5e58566194",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "34",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Es como si el inbound fuera la raíz 🌳 y el loop la savia que lo mantiene vivo en un entorno acelerado.",
+      "innerBlockCount": 0,
+      "fingerprint": "5d7c16599040318b522f2fc57311c1b9fbadd82cd5a4c1f47886446e11302376",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "35",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "e26d65395fc27b4cdb43da753a28c83ff1ed8e1720f59373d9f081535d704e9b",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "36",
+      "depth": 0,
+      "blockName": "core/pullquote",
+      "attrs": {},
+      "text": "Según HubSpot, el 82 % de los líderes de marketing reconocen que sus equipos pierden agilidad porque dependen de reportes trimestrales y campañas pesadas, en lugar de operar en ciclos cortos que aprenden sobre la marcha (HubSpot Research).",
+      "innerBlockCount": 0,
+      "fingerprint": "a8ff432ccd6d84260d116a9f5011f80357866f9927e88ed68a2a6b5fb721ab93",
+      "editability": "safe_text_edit",
+      "risks": [],
+      "href": "https://www.hubspot.com/research"
+    },
+    {
+      "path": "37",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "9a41c767a763d456d376dc318669e5ccca6a466b5acc4b23642d9b763fa2e27b",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "38",
+      "depth": 0,
+      "blockName": "core/separator",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "9de2116c98924db206a909d97ebe1c66cca4fa8bb147695a160ccb7cb06324ef",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "39",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "2afbc9c9b8b1f9a4db9b0885d7a6a3c499d8d7c426782fa741759d88ba945d32",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "40",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {
+        "level": 3
+      },
+      "text": "📊 Una necesidad en cifras",
+      "innerBlockCount": 0,
+      "fingerprint": "6daa8d2336625e0f64772ca057f59aa2e3644c64819d3a629f8784edd5912fde",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "41",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "2aefea39ecf1a11ef2f202e026852cabf742c3f2d9ea99480c5d5e3e7c11600a",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "42",
+      "depth": 0,
+      "blockName": "core/list",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 2,
+      "fingerprint": "40ebe9a1972aa23997cd1a926f4c951783915cdc5766058b02d42eafc858f6f8",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "42.0",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "El 94 % de los líderes de marketing admite que pierde hasta 10 horas semanales en tareas manuales de transferencia de datos (HubSpot, Data Disconnect Report 2025).",
+      "innerBlockCount": 0,
+      "fingerprint": "2c57cfd3d57dd682f25fbbdfb1c05334ad0ae0af72be819dc10ae49fb6946a1a",
+      "editability": "safe_text_edit",
+      "risks": [],
+      "href": "https://www.hubspot.com/data-disconnect-report"
+    },
+    {
+      "path": "42.1",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Más de la mitad de las empresas ya experimenta caídas en clics orgánicos por el auge de las búsquedas con IA y respuestas sin clic (zero-click), lo que vuelve urgente optimizar para motores de IA (fuente: Search Engine Journal).",
+      "innerBlockCount": 0,
+      "fingerprint": "7c29fe740269e43083e0a78726c86904f9408324a1f1c99d7560cc4ca4cbcb06",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "43",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "053abf8768233eaab98513ddafe75724ac6e5a9754b362a36113ff86ff23aa9c",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "44",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "👉 En este contexto, Loop Marketing no es un lujo, es un sistema operativo de supervivencia.",
+      "innerBlockCount": 0,
+      "fingerprint": "0d67bee94a41231baff3b656c38b1fdd23c9a3751b522acb6a55ae43f48dc0e1",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "45",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "68a75eb3f45f83dd0fe0c8e79b4d72535a63bf009602dcfaf8963630ec2959fd",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "46",
+      "depth": 0,
+      "blockName": "core/separator",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "f880857f3ff4a6af913b436c6895c76dde85f489ec80f237183e39c65383b87d",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "47",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "dd8802fd51e15ee6daa5843253bfee36601c7e5d5c167c34afb0e54024ba8074",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "48",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "👀 Ahora bien… si el funnel y el flywheel ya no alcanzan, ¿qué los hace insuficientes?La respuesta está en entender cómo el funnel = linealidad muerta, el flywheel = relato útil, y el loop = acción continua.",
+      "innerBlockCount": 0,
+      "fingerprint": "857321c830e842b0ab6ae1f1c8c950de7586a758fbac8036afa6a342821f6362",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "49",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "51d2e1d1ec468a4a30e27f807594cf18daf531538b5a74412f461defc02da878",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "50",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {},
+      "text": "🔄 Funnel vs Flywheel vs Loop Marketing",
+      "innerBlockCount": 0,
+      "fingerprint": "1deef06e1f0991f480d1981645b7efaf0714530ed9cd0e638361167054ee98b5",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "51",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "7ba90849d64f044316abde25f63291386e97caf3d0b2f4bc32e552b379c84d6e",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "52",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Si el marketing fuera una serie de Netflix, el funnel sería la primera temporada: lineal, predecible y con un final que todos ya conocíamos. El cliente entraba por arriba (awareness) y salía por abajo (purchase). Fin de la historia. El problema es que hoy nadi…",
+      "innerBlockCount": 0,
+      "fingerprint": "8860d467521d96fd57be4bf3379e0942729ffe3d06bf28bf0a9d673e85847ec8",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "53",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "b119eb48acea4a3b75f200a5ef0ca220944809eb1d1e82d6e4522038affe3534",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "54",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {
+        "level": 3
+      },
+      "text": "📉 El funnel = linealidad muerta",
+      "innerBlockCount": 0,
+      "fingerprint": "d6c81fb50a8df0cdabe0eaa1db396758acb4c2669df0adacaafc567de5bd76b4",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "55",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "a6da1b32f6ea8e7fd1c94a558978854bfa24ac0739e981e4cc06507499a05ec1",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "56",
+      "depth": 0,
+      "blockName": "core/list",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 1,
+      "fingerprint": "24393aeb513c86d79e492457bfae87e81ffb3b4f0bb338efb996855cac42c4dc",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "56.0",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "El embudo de marketing fue útil para ordenar procesos, pero en un mundo donde los compradores saltan de canal en canal, se siente más como un mapa de carreteras de los 90 que como Waze.",
+      "innerBlockCount": 0,
+      "fingerprint": "bddec8f23dd7961d48cd38e3dd087761a8b85a2d0a88fd803774ef63d6a1ab4f",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "57",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "75037fef1c327667189dd5ef37d294d327bade37501c34cce9bcc52874496345",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "58",
+      "depth": 0,
+      "blockName": "core/pullquote",
+      "attrs": {},
+      "text": "Según un estudio de Gartner, el 83 % de los compradores B2B investigan de forma no lineal, yendo adelante y atrás entre consideración, comparación y decisión (Gartner, 2023).",
+      "innerBlockCount": 0,
+      "fingerprint": "cac96af095a07b1b78b9a3ce7baec691cf6d91d46ab0906f8c17e729c6077be0",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "59",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "e6a500b950175889a31e84bef00f32729137a3e72a0ae1cf00247d3fe075d19e",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "60",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {
+        "level": 3
+      },
+      "text": "⚙️ El flywheel = relato útil",
+      "innerBlockCount": 0,
+      "fingerprint": "69f61965dfc3f835f8a898347ac494e5f554b68d77a35b4ed19ccfe988156c95",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "61",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "46f36295e3cbaa7c9e9ad0514540c3421360fd75423cf1ea4fe33e95b0faa19e",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "62",
+      "depth": 0,
+      "blockName": "core/list",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 2,
+      "fingerprint": "22a9b3b6602bed8065d03dacf51d75f32c847cc95939bcf6bf73bd85af25ac68",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "62.0",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "En 2018, HubSpot propuso el modelo flywheel: una rueda que gira con la energía de atraer, interactuar y deleitar.",
+      "innerBlockCount": 0,
+      "fingerprint": "df72070caffe1782cd86629db975760e62db4261225da05940dfe5df04b3acfa",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "62.1",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Fue un avance porque puso al cliente en el centro y habló de reducir fricciones.",
+      "innerBlockCount": 0,
+      "fingerprint": "0f8b90df28488f6aae8df4a80746529e93fa49b67290dd9d7aa54eb8bc68880e",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "63",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "5503c0d261d1094800218d8e78d04fb56062b8419231c2207c9ffbe69e5804dd",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "64",
+      "depth": 0,
+      "blockName": "core/quote",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 1,
+      "fingerprint": "0a88b1d10c1a4a468b122ea48528ae7ba5c2ed9a08230f815db6b0d54964fc3f",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "64.0",
+      "depth": 1,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Como dijo Brian Halligan, cofundador de HubSpot: “Las empresas que crecen más rápido son las que invierten en la experiencia del cliente, porque esa energía se multiplica en su flywheel.” — HubSpot Blog",
+      "innerBlockCount": 0,
+      "fingerprint": "3c5c6eabad8fdb9c03cf9ac893e22bf62efe650dea8fde8b4bdc50ced6db90b7",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "65",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "a5f8311ec9417dccecf2995f705067795727f7edef69c275364ed0defcc1ddef",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "66",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "El flywheel inspiró, pero tenía un reto: se quedaba más en el relato que en la ejecución diaria.",
+      "innerBlockCount": 0,
+      "fingerprint": "0a5afd6d8da9583ec5900fddc3aaf73d7c98e4873943bc60d45d95db6e3d083b",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "67",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "af5e91bed563afbeea9b1cddea107c5d64754d0a04856862e6fab84195a380a2",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "68",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {
+        "level": 3
+      },
+      "text": "♾️ El loop = acción continua",
+      "innerBlockCount": 0,
+      "fingerprint": "93903e4b68d82694d78cbf728a17d86d882d44dfd8760dda6a8bec42e6b1fe2b",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "69",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "ca60a7609bbfb11d8627a3d860f2a22668122c737494981d54b2a242342d3c40",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "70",
+      "depth": 0,
+      "blockName": "core/list",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 3,
+      "fingerprint": "b26f5ec793daaf28526b1e1668dcee8cddac57a0c7d4938d0f3e0c7156104ba4",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "70.0",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "El Loop Marketing toma esa filosofía y la convierte en un sistema operativo de acción.",
+      "innerBlockCount": 0,
+      "fingerprint": "e39eb6e1733996d2d4300e8049b637b7ada1893749799371898986613e67f3fb",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "70.1",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "No hay principio ni final: es un bucle donde expresas tu voz, personalizas interacciones, amplificas en todos los canales y aprendes de cada vuelta.",
+      "innerBlockCount": 0,
+      "fingerprint": "8c2e8d6cab6ef281ebad1cfc4e907b97ab9b60eda7c99aa66fcd6c1b1d2de2d4",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "70.2",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Lo poderoso es la velocidad: optimización en días, no en trimestres.",
+      "innerBlockCount": 0,
+      "fingerprint": "f130a7cb8e03584c471880d61aae79eef4ca000dfc4606cce8a9f7d66d6be086",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "71",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "105166651fb600bf3c74595e4f3f53ff5313c12bd32f55b2f008e23c26c97583",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "72",
+      "depth": 0,
+      "blockName": "core/pullquote",
+      "attrs": {},
+      "text": "Un dato revelador: el 74 % de los líderes de marketing que adoptan IA y experimentación continua dicen que su equipo es más ágil para responder a cambios del mercado (McKinsey, State of AI in 2024).",
+      "innerBlockCount": 0,
+      "fingerprint": "209ac7c4d000167f0e5d0536936fa9abc5c74999615d89e32bc6d5a8f93363c9",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "73",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "d6367186a13e4adf1313064870ec2f9d5efbcf34905718193c8bafc772658859",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "74",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "👉 Dicho de otra forma:",
+      "innerBlockCount": 0,
+      "fingerprint": "2692d34982fd05ecc0d8de1618379c86166a12a8b3aaf3730f72856703d1ab9b",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "75",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "21d5b1cde23c059d575b599a99f6b62c70c799468fe8461ce8b71605710aef0e",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "76",
+      "depth": 0,
+      "blockName": "core/list",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 3,
+      "fingerprint": "2f2b014e7780c6c10e97b98be398138a0a803ab02f61bab8ccd1091fe28c777c",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "76.0",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "El funnel describe un viaje que ya no existe.",
+      "innerBlockCount": 0,
+      "fingerprint": "0f2626df17074970174ad2cc1f20dde2249c1acf688703ebb56c1b8373557953",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "76.1",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "El flywheel cuenta una buena historia.",
+      "innerBlockCount": 0,
+      "fingerprint": "897fe26c8dfd134ce6d4af7d89759a16a807a9ae75e70d0b5fc125cf348aef63",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "76.2",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "El loop te da un motor que gira sin parar y aprende más rápido que tu competencia.",
+      "innerBlockCount": 0,
+      "fingerprint": "09a74cbf0859589064c9b11e7e3d729e343d582cb98178ce9575f1cdd1d142a3",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "77",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "30bd06b0c23989fc42cec59b28bf9d88f3bd5114f51c7bdf3666368594a25612",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "78",
+      "depth": 0,
+      "blockName": "core/separator",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "7f0131f589da44085ebc680cb515d88d744547e08653fedff88176899e1ad330",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "79",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "531cc3f2648ef4e2beed396e1be6521a6ee1e794405a59b6466133fda5d9f05a",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "80",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "👀 Ahora bien, si el loop es acción, ¿cómo se ve en la práctica?¿Qué significa exactamente expresar, personalizar, amplificar y evolucionar?",
+      "innerBlockCount": 0,
+      "fingerprint": "5603c0d5b520228972e107a9ca061caaa41a27349f30cde50a7550268571b1bf",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "81",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "edf656e8ae68f518cb6260d407b80f346334dc715042fa2ba07031b95b6b4659",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "82",
+      "depth": 0,
+      "blockName": "core/separator",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "9ce8da719f79003f1e47b294ea12ac964872e166e7a7d037b8eade294514445b",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "83",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "4d895cca29deb52cf5cc39c09167eeefe4a1b73c382911c8c0246b8e59ac92f6",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "84",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {},
+      "text": "🔍 Loop Marketing y las 4S de Google",
+      "innerBlockCount": 0,
+      "fingerprint": "de65730d743c361823ffc85bb7e70e91d01db8ea1841673fb9578f3073b45e5d",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "85",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "e52f8a52551e6ae5e34e99987696aa1dbcd9a5954928292d8c03ebacb72215c5",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "86",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Si algo nos dejó claro Google en su más reciente estudio con BCG es que el recorrido del comprador ya no se parece a un camino recto. Hoy, los consumidores se mueven en cuatro comportamientos clave que Google llama las 4S: Streaming, Scrolling, Searching y Sho…",
+      "innerBlockCount": 0,
+      "fingerprint": "0c26cb1acc01d7a75dae767afe94bc3c259c8b2d7d9681915d1ec4ded7386af5",
+      "editability": "safe_text_edit",
+      "risks": [],
+      "href": "https://www.thinkwithgoogle.com/consumer-insights/consumer-journey/new-consumer-decision-making-process/?utm_source=chatgpt.com"
+    },
+    {
+      "path": "87",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "36cf66906e25b0a6dfc7c1e530ac775708d129ab1b67eafc44c250585befb53f",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "88",
+      "depth": 0,
+      "blockName": "core/separator",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "8d6f23154be1b019da59ffac9eb07a061aa1b668dc3cb9d3cbee2ca1d87e452f",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "89",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "287605b0d2f91e486ba16b88b418797425d607bc5d7a34631202951d8b40e187",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "90",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {
+        "level": 3
+      },
+      "text": "🎬 Streaming: la era del contenido continuo",
+      "innerBlockCount": 0,
+      "fingerprint": "d2b0bf2de5d468fa218f2ea459fae6a2e763faadadc24b9618769f4092dcca1d",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "91",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "9c6d7b896a27b18208a07cbac18aa839f6278ce7b773532190a8fff22aa914cb",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "92",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Los usuarios consumen video, audio y transmisiones en vivo como parte de su día a día. Desde YouTube hasta la TV conectada, este hábito no es solo entretenimiento: también influye en las decisiones de compra.",
+      "innerBlockCount": 0,
+      "fingerprint": "5cf674c668a1a845af2a01254433be77e8328038b097329f91c22f643be4971c",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "93",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "ed3fc775d6bb7ad3db99d75e8c04e6f24fa56c04d9760d4e6cecf0d97e12e945",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "94",
+      "depth": 0,
+      "blockName": "core/quote",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 1,
+      "fingerprint": "a3c0288319f8264ac0ec914219048f0d16395313ee286e37933eff81336e69b1",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "94.0",
+      "depth": 1,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Según Google, el 90 % de los consumidores dice que descubre nuevas marcas o productos mientras ve videos en YouTube (Think with Google).",
+      "innerBlockCount": 0,
+      "fingerprint": "32ef8487473a7c1bdc702451a247cbe17d2a56a5ccb737808a6c1f5b2b05b16b",
+      "editability": "safe_text_edit",
+      "risks": [],
+      "href": "https://www.thinkwithgoogle.com/consumer-insights/consumer-journey/customer-journey-mapping/?utm_source=chatgpt.com"
+    },
+    {
+      "path": "95",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "1ddea7324634514aa124d436a81cf3e415d0fd7360be45ffde752f239d2e584b",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "96",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "🔗 Conexión con el Loop: aquí entra Express, porque es el momento ideal para que tu marca exprese su voz con claridad a través de historias y narrativas memorables.",
+      "innerBlockCount": 0,
+      "fingerprint": "f7274c4fbf78e09a27bed5725ac5a86c17be5b0ccc09f05721d465e4a3725b61",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "97",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "17e26bb627e0497b9be3bcaac2a3f7e56f1365f0c71328adaa2b00fc39fc93fb",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "98",
+      "depth": 0,
+      "blockName": "core/separator",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "0856bf892d15256893eea07ef7ee0f468e6d013cd02f6cc1ad2377ef601f663d",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "99",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "a46f77a24f2314e2fd5bf7725c605caa94c3d9150085a29b1aa0f18e3743274a",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "100",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {
+        "level": 3
+      },
+      "text": "📱 Scrolling: exploración infinita en feeds",
+      "innerBlockCount": 0,
+      "fingerprint": "ca01d1d2610bf54b3b876c3733b3cccc0712f1c271be4794e15e63d32a648510",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "101",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "db7925d6b513298e9ea46e69f85b5845985facfab1aa040002acc371f5a2b9e6",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "102",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "El scroll se ha convertido en el nuevo “vitrineo digital”. La gente pasa minutos (u horas) desplazándose sin buscar nada en específico… hasta que un contenido los atrapa.",
+      "innerBlockCount": 0,
+      "fingerprint": "9204fbb1048344be62f982c3e76089a63950fbd1bf363d7f8fc29cb332cf9482",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "103",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "1959bf9e19c1edd11f2267ce3b54644c6ba4c12aa8f4ab41e8deb0025330d067",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "104",
+      "depth": 0,
+      "blockName": "core/quote",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 1,
+      "fingerprint": "dc444a7863c759bf7ec65cd2e9c1c7aba5ea17eda7a62df2e54a512aed83ad0c",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "104.0",
+      "depth": 1,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "El 76 % de los usuarios de redes sociales ha comprado algo después de verlo mientras hacía scroll en un feed, aunque no lo estuviera buscando (Hootsuite Digital Report 2024).",
+      "innerBlockCount": 0,
+      "fingerprint": "03a3c401c7136788ce304d37029276cc218949b166b63bbe5c62303c820fd390",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "105",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "0ced5d98af983eb64e922fdd84692386306703c12f3f1d5cf40820c5602bebaf",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "106",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "🔗 Conexión con el Loop: aquí brilla Tailor, porque la personalización es la clave para que tu contenido destaque en medio del ruido del scroll infinito.",
+      "innerBlockCount": 0,
+      "fingerprint": "688b21cf4fb589453ec3744cdb18cf051114c4872394fa6cfa28da74be4d8a13",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "107",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "87f0142c5e3df57803f7f74b79e46f3248ccbaacac9b26151406b05336b84bbd",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "108",
+      "depth": 0,
+      "blockName": "core/separator",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "1a01d6b0f2fc585c1c3eaadfcc8da7ece0e470594dfd69c295678b9be85347d9",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "109",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "e1b837899b752aeeb8cd013957906ad6fbbaf1c724bbdf66cb10bc914bd0c36f",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "110",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {
+        "level": 3
+      },
+      "text": "🔎 Searching: búsquedas multimodales e IA-first",
+      "innerBlockCount": 0,
+      "fingerprint": "74f97d834731cdae4177ce9f8054e4532fecb3019817ccb80b0616dd2a46233a",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "111",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "9cf788d29fec49f8018b7d53e14c3fc1c7bb2af271d22775a0a0ff9c73ff4ec3",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "112",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Buscar ya no es solo escribir en Google. Hoy usamos voz, imágenes, Lens, y hasta prompts en asistentes de IA. El consumidor quiere respuestas inmediatas y contextuales.",
+      "innerBlockCount": 0,
+      "fingerprint": "4e9c7484482727783b69ca9ec5a618a82d13b8b42300aa3ab9a170535d673ecf",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "113",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "95cb33b8bebf19d5c934600164126ebf6728802a2624e38101c49fe3cc8105c2",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "114",
+      "depth": 0,
+      "blockName": "core/quote",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 1,
+      "fingerprint": "77ef3fc08b3d395b3cf98c8d1a9386d4c6c83e057037ab4b857b8c055243700d",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "114.0",
+      "depth": 1,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "De hecho, Google reporta que el 40 % de los jóvenes ya usa TikTok o Instagram como motor de búsqueda principal para encontrar información local o de productos (Google I/O, 2022).",
+      "innerBlockCount": 0,
+      "fingerprint": "73649200dc638231b7595fff7402692ad4c9d75a8e0fd4885f7956c879b0d1db",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "115",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "7c5479807141885b2c36596d125591d304e01f0a310426b9837ae9d479f9af82",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "116",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "🔗 Conexión con el Loop: este es terreno de Amplify, asegurando que tu marca esté optimizada para motores de búsqueda, respuestas de IA y formatos multimodales (AEO: Answer Engine Optimization).",
+      "innerBlockCount": 0,
+      "fingerprint": "d4579ad61d73cdce5fbb7671ae007e01a9648cf34b406798091978383ca6c324",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "117",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "6622ba2ebe1cf9fe53fd8e10ce2f57552747e2cf74d1d6b70be576b9711f106c",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "118",
+      "depth": 0,
+      "blockName": "core/separator",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "1f2148d14f747094f0580c7f90fc29acdd5b90830172cb211d7962baa4668703",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "119",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "3ca2b238e216764b7f46b31a9322ff950a2dc80d81fc6b29f46c49d09cc37ae8",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "120",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {
+        "level": 3
+      },
+      "text": "🛒 Shopping: compras sin fricciones",
+      "innerBlockCount": 0,
+      "fingerprint": "c040b06392c93433279ef0147b0b6e8e434623113d01a5ae27f416722076b9d3",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "121",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "009639836dc483ec5c02bb5e9898398a96830d008e8d82501c9a16e359a91df9",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "122",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "El recorrido termina (o se reinicia) en la compra. Y cada vez ocurre más rápido: un clic en un anuncio shoppable, un checkout en un marketplace o incluso dentro de un live stream.",
+      "innerBlockCount": 0,
+      "fingerprint": "8e0b58e29d12e9249b34290456fa3e732c09e695e551fa0f4f042a022bcf6e0b",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "123",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "3881fd435acf85c67ae5b3a334de9d356bcdc0da442f9e8e886a8d885e5e8246",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "124",
+      "depth": 0,
+      "blockName": "core/quote",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 1,
+      "fingerprint": "eed903aa2ca0fd0ef356dc5ffd75b3cf4ac26d41c2a78433a121eac25b009dc3",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "124.0",
+      "depth": 1,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Según eMarketer, el social commerce moverá más de 1,2 billones de dólares en 2025 a nivel global (eMarketer).",
+      "innerBlockCount": 0,
+      "fingerprint": "9ac140917201cbdecadce87f0330185ea16862d60fc74fe753d3382a011ee6c5",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "125",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "1b0c539d38d5ec2644dac80d0619c8448f39d709a8fd52772a758df4d3fbd5ac",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "126",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "🔗 Conexión con el Loop: aquí entra Evolve, porque la optimización del journey (checkout ágil, recomendaciones personalizadas, programas de lealtad) es lo que marca la diferencia entre una compra y un carrito abandonado.",
+      "innerBlockCount": 0,
+      "fingerprint": "efea5581a900a3310f790bbe3ca39861ab388d6cab46d4e3ff1a8d3e9b59f8a0",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "127",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "6b680ddb15dc40099b3c99799ecbe4e2d028a327d564cd6f7900c203bbc09f2d",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "128",
+      "depth": 0,
+      "blockName": "core/separator",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "7e8bcf9a764ca25228464b77b8c1fd4679ff0c5857df57ed8d67733e4c8056ad",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "129",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "da5d3241cb2c536a1be47a54db49d9e3bc6478765dc712651867f323d2c164e0",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "130",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {
+        "level": 3
+      },
+      "text": "🍏 Con manzanitas",
+      "innerBlockCount": 0,
+      "fingerprint": "676fa9768835ee37c7a00e2e0a68d133d076ffe0ffbcaf65d84aa1841c04b022",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "131",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "7fef66948211ecbada4de13e162bbba23d3a1adc739239b3c5dd5b00b0b8c28f",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "132",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Piensa en las 4S como las estaciones de metro 🚇 donde el consumidor actual se sube y se baja sin orden ni aviso: hoy está en streaming, mañana en scrolling, luego busca (searching) y finalmente compra (shopping).",
+      "innerBlockCount": 0,
+      "fingerprint": "b7fc564caf01f06173a83860db14799aae890a43134bac7ff3fdd8fffcfdf01e",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "133",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "9a0637bbada41357a6850030ebcbce8af4913f2e33a38f6f782c27f7047ce496",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "134",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "El Loop Marketing es la respuesta de la marca a ese comportamiento fragmentado: un tren que nunca se detiene, que pasa por todas esas estaciones, recoge insights en cada parada y vuelve a girar más rápido y más inteligente en cada vuelta.",
+      "innerBlockCount": 0,
+      "fingerprint": "ee3a0140181cdebf6768e58beca04a43911d8ab8aa577c7b404f1877522546f3",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "135",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "15f118194aa682ad05207926a72fd00b64a43e15ee33f6c2d0b2b33067b84f6d",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "136",
+      "depth": 0,
+      "blockName": "core/separator",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "5d18a97595a140f75a61fade2afa37bf062f368b3287b6f2f35c84aac4d1895a",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "137",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "32a95ae48e3d9252220f0ddc2faa1741c07518eeb2ef56e5c6ef96f2eb1a6b05",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "138",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Ahora bien… ¿aplica igual para todos? 🤔El recorrido de un comprador B2B que necesita un software corporativo no se parece en nada al de un consumidor B2C que compra zapatillas en Instagram.",
+      "innerBlockCount": 0,
+      "fingerprint": "7f74f6fb2fbdf971b79a9a103f82fe3a2abf0d00a9a240ca00c599bcebd16451",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "139",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "9b9c3a65a2df3a5cb7cf7ccb2169bc4f219252abe0b305cdcc17db3b4354a24e",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "140",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "⬇️ En la siguiente sección vamos a ver cómo se vive el Loop Marketing en B2B vs B2C, con diferencias claras, ejemplos prácticos y métricas que importan.",
+      "innerBlockCount": 0,
+      "fingerprint": "8db1b2ea151fa9ca5d2c7096b68f51d1b65920671e419f66bfd72df87860b224",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "141",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "6e7d637f57e683b96f493a2f0ad3d26f56840948b6bcb47aed3c6a0447be7726",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "142",
+      "depth": 0,
+      "blockName": "core/separator",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "f00f6575ef2e96e5b78fda1de4bf96b0a7bcdbbda5f751c6566046161783f3e7",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "143",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "41b0089c4c96bc1e59cf38c2b12a8870d533ed9211c0e0762fd42db8faa31d12",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "144",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {},
+      "text": "🏢 vs 🛍️ Loop Marketing en B2B vs B2C",
+      "innerBlockCount": 0,
+      "fingerprint": "0bd08b30849a367f1ef14044e63645ae0d08530c59cc15c3ac847a3d79d565e2",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "145",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "cbd6f54bc110dc810e2b8ae8dfb7c77a17cbbbf49ee90578cdea9928e586b4d5",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "146",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "El Loop Marketing es como una coreografía: el marco es el mismo, pero el baile cambia según la pista. 💃🕺 No es lo mismo moverse en un congreso corporativo que en un festival de música. En B2B, el ritmo es más largo, lleno de pasos medidos y varios bailarines (…",
+      "innerBlockCount": 0,
+      "fingerprint": "8aaaff82c049d16d1337f939a06a75d92992650034a7db89b11e77cd71609477",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "147",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "d75b590cb7556b082384145305e5dddca92e6cdc619599ee7f10bf53b94ce5c7",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "148",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {
+        "level": 3
+      },
+      "text": "🏢 En B2B: relaciones largas, cuentas específicas",
+      "innerBlockCount": 0,
+      "fingerprint": "01341f5fd97c2706dd18d06aeae13e12af482e7bf5553adf7e63780e265521be",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "149",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "521bc0a7adc61e03aaf6b5e7080eeb206faa8751b3b896eabde7beb110a08c35",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "150",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "En el mundo B2B, el loop se apoya sobre todo en Searching y Streaming.",
+      "innerBlockCount": 0,
+      "fingerprint": "ee5539806e3ab884e71b7a9a64fadeffa3434853a9382f8bd34e1d6b473ef67e",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "151",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "bc14d10da8f146e862ddcc728896dc12367678986cc6c73d8aa8e339046a9ebc",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "152",
+      "depth": 0,
+      "blockName": "core/list",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 2,
+      "fingerprint": "05385f314b7fd26837ab2e9d41f0dcc580f121efd3eaa84ca6cc297dc073f893",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "152.0",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Los decisores investigan en Google, leen comparativas, descargan whitepapers (Searching).",
+      "innerBlockCount": 0,
+      "fingerprint": "39fda6b3c183a509baf6b5be454c233d6e28e638f6f96b9202f5b5ebce788fde",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "152.1",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Y consumen contenidos en formato webinar o demo en YouTube (Streaming).",
+      "innerBlockCount": 0,
+      "fingerprint": "9a578ea3e69ced211eb5c85b4748c6dfd9b8c2f3b5642a23b633947b1334424e",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "153",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "69f20b3131d645c056e00882206f24e09e41e28da49e860c16265be56f218cd5",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "154",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Aquí el Tailor se convierte en account based marketing (ABM): personalizar propuestas para industrias o incluso cuentas específicas.👉 Según Demand Gen Report, el 87 % de los marketers B2B afirma que las campañas de ABM generan un ROI más alto que las estrategi…",
+      "innerBlockCount": 0,
+      "fingerprint": "ef4a8dc58b97746c08fa06e2acaf03e3200bd58cbf1e00974baeed486c373e37",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "155",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "eb2daf953c2ec62283a593c100d293851988124394a4c23f06a0ef47effd8619",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "156",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Ejemplo: Una empresa SaaS que ofrece un CRM puede usar Loop para:",
+      "innerBlockCount": 0,
+      "fingerprint": "26c61c6c70df3d034b64b4b3a5c66deffcceacd34af4cc599028a23d70233c00",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "157",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "e2c0d23f0f9bf103e3abc39054d38418e186c6cdc116ca027ead1af85ce073ac",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "158",
+      "depth": 0,
+      "blockName": "core/list",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 4,
+      "fingerprint": "5c09b4458f0abcd4172d9234babdc6f7a13c182180f221315254a98da59e9098",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "158.0",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Express: crear POV claros para CFOs, CMOs y CTOs.",
+      "innerBlockCount": 0,
+      "fingerprint": "48073f7893656f3d6962b82130d92938229c88a244ac72053d9de612d8292cc8",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "158.1",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Tailor: diseñar secuencias de correos y ofertas por rol y vertical.",
+      "innerBlockCount": 0,
+      "fingerprint": "8f634ccee1a900b156f959a157aceb2becd9a7fc3c191eaf8c90f63972c6af54",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "158.2",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Amplify: difundir contenido técnico en LinkedIn y foros especializados.",
+      "innerBlockCount": 0,
+      "fingerprint": "39302d502bdf8771564f7cc2ac0ecace854bceadb3bf6cebea167c023b0ac186",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "158.3",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Evolve: optimizar la propuesta según métricas de pipeline y feedback de ventas.",
+      "innerBlockCount": 0,
+      "fingerprint": "65a7c76e38ad06367a20362ff690bac25d1089246e647b895015a63cb3723f30",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "159",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "ffc95905b9883d101f588ce46aa9b274976931b345af7aad4c06dfe2e7c83e49",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "160",
+      "depth": 0,
+      "blockName": "core/separator",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "82bad7b3ae8617c00dc2b1a968ff37b0abbecdb1b8b8b137b4345056ec7e8624",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "161",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "02d56a21a10524525b1d41e74d1466ca6d25e675a85ed32f85a987d45060c6e9",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "162",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {
+        "level": 3
+      },
+      "text": "🛍️ En B2C: velocidad y volumen",
+      "innerBlockCount": 0,
+      "fingerprint": "2fe00ccbd986953d205bbef4dd3afbdbe69bcc16047279817ce04405f8694611",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "163",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "0299399a422e6558dbe987753bdd46e025543e34e8dddfd2bfb6fd8c2c417512",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "164",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "En el mundo B2C, el loop se activa sobre todo en Scrolling y Shopping.",
+      "innerBlockCount": 0,
+      "fingerprint": "28b9725b7479683975a4a25d6b9070e7df36c92dd29485142a78599f82f299e7",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "165",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "0c31b73f5141f4b7c20509437d2c273383fd3712744c54c462e917e4f7b3888c",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "166",
+      "depth": 0,
+      "blockName": "core/list",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 2,
+      "fingerprint": "a738dbcced39fc8e05ec14c54ba07166c8bb34c9d7430cfd9f8ae1614f92c3f3",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "166.0",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Los consumidores descubren productos en redes sociales sin buscarlos activamente (Scrolling).",
+      "innerBlockCount": 0,
+      "fingerprint": "58dd06593d5e33d25e53664a1ab8a187d7acddeab5db8175174429cdf3eb50b7",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "166.1",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Y terminan comprando en un clic en un marketplace o dentro de un live shopping (Shopping).",
+      "innerBlockCount": 0,
+      "fingerprint": "eacc196b5459fa15f00bf5c9f964ab2a5527eb449cc3508fc757417b7f8a6edd",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "167",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "64da2dc65d80c38f3eae39e4e88b56930336e69638990589418b765dbd24f4da",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "168",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Aquí Amplify y Evolve son críticos: lograr que el contenido destaque en feeds saturados y que la experiencia de compra sea fluida y sin fricciones.👉 Según Statista: en 2024, se estima que más del 60 % de los compradores online ya realiza compras directamente d…",
+      "innerBlockCount": 0,
+      "fingerprint": "7091ad35c810b3eb9955b18ca9287d605704784fa28900f7661d3ba41ae8058e",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "169",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "e93ca3e048e5d4e2c8e5102e19dadf806759335dfa4381897a23c0e3a5183f66",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "170",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Ejemplo: Una marca de moda puede usar Loop para:",
+      "innerBlockCount": 0,
+      "fingerprint": "baeb1f5aff14992ae879f9525bb33f5cfb787331d651e47a57772c7c210a0bc0",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "171",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "d738bc9f05e2f3e14d5aa101abd28e2263da41caef8c7d9fc66e77b580b7236c",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "172",
+      "depth": 0,
+      "blockName": "core/list",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 4,
+      "fingerprint": "35d2491ec214c2c5832c1b92bd590c8308bf7fc40f5d63d6168e4c767a8db989",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "172.0",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Express: definir un tono cercano y aspiracional en redes.",
+      "innerBlockCount": 0,
+      "fingerprint": "99276689f780236ad7bac7edae88a801a46e408c5a8ce9301596e29bf25634e9",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "172.1",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Tailor: personalizar recomendaciones de outfits según el historial del cliente.",
+      "innerBlockCount": 0,
+      "fingerprint": "601019b893a2565ed035673db6ba4c72c4371f9d736ef8bd3adae1e22816552d",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "172.2",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Amplify: aprovechar reels shoppables y colaboraciones con creadores.",
+      "innerBlockCount": 0,
+      "fingerprint": "4233eeb8163e7c8d74a418fc795eea257b1f93f7a03d1a58322b29aa3f8ff2f2",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "172.3",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Evolve: medir qué combinaciones generan más ventas y ajustar stock en tiempo real.",
+      "innerBlockCount": 0,
+      "fingerprint": "93b5575fa4d3eb22c0022432b9cd66c963fb32c3b20c46425e7058125286af40",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "173",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "05c0c2e56395d04375de2abc889414ae44d64fe1334f008fd1157523cb6307b8",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "174",
+      "depth": 0,
+      "blockName": "core/separator",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "d062f896309fc3aacb4f7bdfea420e854550b7b60bf88584979084c714c343ae",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "175",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "9c213d587166d347133b7879881c8e4a9c8ec278b50c1fec8cad97861524938f",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "176",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {
+        "level": 4
+      },
+      "text": "🍏 Con manzanitas",
+      "innerBlockCount": 0,
+      "fingerprint": "b4052f7b21df608f5cd268cf24dbe306e23eeeb4e19946421e70eeb55b4380ca",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "177",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "dda9be2f07d28edfe71022796d240a0b562fad5d407713c3d8f0cebbfb6ea3ff",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "178",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "El B2B se parece a un matrimonio: largo, lleno de conversaciones, compromisos y negociaciones. Y ahí el Loop Marketing funciona como consejero matrimonial 💍: ayuda a expresar mejor tu propuesta (Express), personalizar interacciones con cada decisor (Tailor), a…",
+      "innerBlockCount": 0,
+      "fingerprint": "bf572a171a413b04bc85b25751d8a5b3a3788549075f606bcbcfd88c90c3d0dd",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "179",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "20c228daf7c972ee6a18c8d810ae9351f1c36d1b82b9d877c2328000e3179011",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "180",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "En cambio, el B2C es más como un flechazo en Tinder ❤️: todo pasa en segundos. Si no convences al instante, el usuario hace swipe hacia otra marca. Aquí el Loop es tu “matchmaker digital”: te da la agilidad para mostrar el contenido correcto en el momento just…",
+      "innerBlockCount": 0,
+      "fingerprint": "c0ee44f29097067d938bd22042e38a2fc6f1299a110b95998a0e7de159e8e3fb",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "181",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "1b7ad09ce50d1d59cdc461d4433a63209a38725778c1afd7b0ba5d63e7b70533",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "182",
+      "depth": 0,
+      "blockName": "core/separator",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "f629bf9757b4483d50e9db3470bfbc7641533f2f16fd5ecfc4a3fd88b4d40995",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "183",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "8dc68400d767be958d1ae88d43305378c5fa3828d162feb80d364ccc7ad6b3d7",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "184",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {
+        "level": 3
+      },
+      "text": "👀 Y ahora que vimos las diferencias…",
+      "innerBlockCount": 0,
+      "fingerprint": "5793ca1fc39fd985a42776e988dcf76bec4f2dd4935105ad299ce9698b7166aa",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "185",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "53b6001c270f82b054fbba177e5bbea9aec2e6a585a7a6b1e1f57b4f085895f4",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "186",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "La gran pregunta es: ¿cómo se traduce todo esto en números?¿De qué forma el Loop impacta realmente en CAC, LTV, ROI y Payback?",
+      "innerBlockCount": 0,
+      "fingerprint": "0f8d569e919846ffc67eb05fb3d29ccad0893298394d3fb2c772a1cfa8c281a4",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "187",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "77103d287a1ef7a689b77335e0f88335c9147ba4962b0713a13fe226dbb2c675",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "188",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "⬇️ Eso es lo que exploraremos en la siguiente sección.",
+      "innerBlockCount": 0,
+      "fingerprint": "42222c8af14172bedb981d9925d650f646e11d75140e16ba6aedb2cff9e4cc1b",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "189",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "cd4d942c145e423361b48260f9795a168d162b4f51a20fb323d44fb4c9c673ab",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "190",
+      "depth": 0,
+      "blockName": "core/separator",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "77c7d964b4fe9b1a0aebd63be9c873353065b926a855f22db6623573b3235673",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "191",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "b72086421a42db763c62af947996b5499b6c6e4657eb982b42fb485ace922883",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "192",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {},
+      "text": "💰 Impacto en métricas de negocio (CAC, LTV, ROI, Payback)",
+      "innerBlockCount": 0,
+      "fingerprint": "24fcee66f709af84109d4cdad8c294313f765b4e2e5c7c1fe5b9238c417d07d4",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "193",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "7f9a2b5f235c4ce2db5d3b750c836a1984527076488f865bbc649dd2c322e65f",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "194",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Hablar de Loop Marketing sin mencionar métricas sería como hablar de fútbol sin goles ⚽. Al final, la pregunta clave es: ¿cómo impacta esto en coste de adquisición de clientes (CAC), lifetime value (LTV), retorno de inversión (ROI) y payback?",
+      "innerBlockCount": 0,
+      "fingerprint": "c0fdd7d81e51c79a1cdb97f079cabd7c5816fa30dcdeee524dd63dbf76b6079a",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "195",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "0a946544ca833faf1aee127c32dbd7d186d20b78b8b6da12a4192b54222414dc",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "196",
+      "depth": 0,
+      "blockName": "core/separator",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "feb5ada4d3e4984b2552ba2f49d4c027055ca93ce86d20dc81e4fdbce9cd1fbb",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "197",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "15c81da7bb7ef8a8860a0f2593720758af1a0666b6466e4aea0f603019a67195",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "198",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {
+        "level": 3
+      },
+      "text": "📉 Reducción del CAC",
+      "innerBlockCount": 0,
+      "fingerprint": "4c3439ec374b7c2fbaedb648854f4ba453ba90dbe340154fefe215f3e3680ea0",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "199",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "9598c7c14252537506d2c80e24e82898da9ffd5a33b7b9fff5cf8a788578659b",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "200",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "El CAC baja porque el Loop elimina fricciones y mejora la conversión en cada giro.",
+      "innerBlockCount": 0,
+      "fingerprint": "f4c039c14eeeb84a270e027c38a5d660e4446bec6919e8bec914ae571402efa1",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "201",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "bbafb267b9b03117ab17391cdc1e147468809d8d78a22d46f41a12ff6d29a8a2",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "202",
+      "depth": 0,
+      "blockName": "core/list",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 2,
+      "fingerprint": "d3b6bc0010e3edbe9f549ed412e90152637681eacb8e8ce5d6d6f6f8375138b9",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "202.0",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Forrester: “Las empresas que lideran en personalización logran entre 1,4 y 1,6 veces más ROI en marketing que las que no lo hacen” (Forrester, Business Impact of Personalization).",
+      "innerBlockCount": 0,
+      "fingerprint": "cfcf9f14a148f0094ffb3737c76d11506a78a4cc15a8ce79de471f53e8e07b71",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "202.1",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "BCG + Google: marcas que personalizan con datos de primera parte logran incrementos del 20 % en ingresos y reducen hasta un 30 % sus costes de adquisición (Think with Google).",
+      "innerBlockCount": 0,
+      "fingerprint": "e23763237465f1b937ce8e003f49755211bc6429032bfb01b661d2c8d29620fb",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "203",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "fa77ab60d4363d95b1d02c1a05d3ccc25976ce10788f14ae8a0b8bd8c381ca10",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "204",
+      "depth": 0,
+      "blockName": "core/separator",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "0087fbb98fc2015fcee9b69c105bcc15fcad1d90bfab819f0de0865d38b817c5",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "205",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "b4acaae53991c580bc9fb2e1e5fc48ba9b9bb889b8320bb3462aadc830e59955",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "206",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {
+        "level": 3
+      },
+      "text": "📈 Aumento del LTV",
+      "innerBlockCount": 0,
+      "fingerprint": "63bddb25d4c2b812d017d4c0f0fce7795e5c5f24c538460f8380e66d7f944121",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "207",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "6646a56de4c9aecba76a7f9629f3dc3c55ec3cfccb58760608ff302b2cc4b2c6",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "208",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "El LTV crece porque el Loop permite nutrir relaciones con más relevancia y menos fricción.",
+      "innerBlockCount": 0,
+      "fingerprint": "f2b2c42921372089a83f83d343cdf5025d06e2d7a2ca5d4cb255b6adbe91158e",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "209",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "accc57a308ddb739200dc548b2b63b0f0f7b174bdb23749ebf1b6c4856e8a392",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "210",
+      "depth": 0,
+      "blockName": "core/quote",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 1,
+      "fingerprint": "53270658285535b7599162026da681c801c02de458abffe552c0313d0e9ac39b",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "210.0",
+      "depth": 1,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Según Bain & Company, un incremento del 5 % en la retención de clientes puede aumentar los beneficios entre 25 % y 95 % (Bain).",
+      "innerBlockCount": 0,
+      "fingerprint": "69cd808be75eb1408fc642befca6da013318b31d759a0221d39c981de26e5717",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "211",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "de6cb3f3fc394a4ddd8236f4cef424a78e885d37fd023ead99002110e6144773",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "212",
+      "depth": 0,
+      "blockName": "core/list",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 1,
+      "fingerprint": "7d86dd2a86ccb9e90594dff004dab69b2fb0a4cdd5485bdf66979982e234cc8d",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "212.0",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Con Loop, cada ciclo es una oportunidad de retención porque la marca aprende del comportamiento del cliente y ajusta su experiencia en tiempo real.",
+      "innerBlockCount": 0,
+      "fingerprint": "ed284ff7c188b534fbe148d5114d764730fd08c69fddff84ad13dc4bbfa39c44",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "213",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "a3e042bf523ce176cb4461d1fdc501d93659be2455aa033e6a897b53bb2d4b7d",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "214",
+      "depth": 0,
+      "blockName": "core/separator",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "48edc250b27f3a4b12a43afa986b0f265e01c4ceec59ad97d242d9d3e6ef1389",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "215",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "06f4e175ff00817e2c0dfc2cf81b7d006c7a9cf425941fbd5148b2ffb1f96dc3",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "216",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {
+        "level": 3
+      },
+      "text": "⏱️ Menor Payback y mejor ROI",
+      "innerBlockCount": 0,
+      "fingerprint": "a0104a0c847d9c94cbbaceb3f63aa105da4b7bf0de30cc008d038a3a01e8071d",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "217",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "47170f5dfeff9e455afa195331b0f83c84e548596df9d07e6173b4c0314b2080",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "218",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Un payback más corto significa recuperar la inversión más rápido, y un ROI más alto significa crecer con más eficiencia.",
+      "innerBlockCount": 0,
+      "fingerprint": "c9b45b9f5e727ea973dfb00a4bde889db8ad645048602a07d1f572fef59cda64",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "219",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "7378d841a08238d91cbbf370c685de2bbb697f47481ca62fdc511989580dcb5e",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "220",
+      "depth": 0,
+      "blockName": "core/quote",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 1,
+      "fingerprint": "e8398e4962e8dbdc1924d08bd1588dd2d52b6a706261ac0ff512ebb0a4ab3b91",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "220.0",
+      "depth": 1,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "McKinsey encontró que las compañías que usan IA para optimización de journeys reducen su payback en un 30–40 % frente a las que siguen operando con campañas lineales (McKinsey, State of AI in 2024).",
+      "innerBlockCount": 0,
+      "fingerprint": "39f2312de08909d59de4b259025fd7493f86fb673cc7010134b4e9f64a792937",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "221",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "a1a36f2bb7f906f686abecbad5c03bbe23c63a606d8130bf5b2d15938028e5cb",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "222",
+      "depth": 0,
+      "blockName": "core/separator",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "58fd8cefebba28ce8ad1b0993be6859f5c8df1f185591db2a3b0edee25f1b081",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "223",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "3e0271bf3b1fca7c9c389a133c375e7c77ccc57a6c48a30277a4adff2508ee2d",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "224",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {
+        "level": 4
+      },
+      "text": "🔢 Ejemplo numérico con manzanitas 🍏",
+      "innerBlockCount": 0,
+      "fingerprint": "c8b53c2cca4cb5d2baf7ec70b0ecd5db25634db119573e0532e9f1e89c03f0c6",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "225",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "c12ae0a8a458a64ddf94c5c5eeb14f27ef2c0f23b7715b6d945b425b3eb7a8cb",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "226",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Supongamos que tu empresa tiene estos números base:",
+      "innerBlockCount": 0,
+      "fingerprint": "a5d20c605ab674310c4e519a750a396a3a61133111b41fd5415dd72ba0de03be",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "227",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "df76e2e53a645d813ec273ad4a40df9c6ce38f2def4c8d2bff8ea00f418d665f",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "228",
+      "depth": 0,
+      "blockName": "core/list",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 3,
+      "fingerprint": "c7c3d7bcd95684cd41fd0638be8294eb8468aa2acb04eefcf89a1a4ffbc76cf8",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "228.0",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "CPC: $0,80",
+      "innerBlockCount": 0,
+      "fingerprint": "9afaf55c1285fd50b2fae9303c11bfa6d1b61076c8ad2aa217fef04b90da0278",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "228.1",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Tasa de conversión (CVR): 2 %",
+      "innerBlockCount": 0,
+      "fingerprint": "e56a04bd03641c2281484e65c95d7d32d2d619b4b2ee509faa919e150d6be3b8",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "228.2",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "CAC actual = 50 clics × $0,80 = $40",
+      "innerBlockCount": 0,
+      "fingerprint": "b9efa401e22f5059e3c0a0c785c6e6668a425d476be7e33d64a5e0817dc0ec80",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "229",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "80e20f2021b4db23040d1c5c79cd7ec86f38761200fdd02acd0ea034bb870bc3",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "230",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Ahora, con Loop Marketing (Express + Tailor):",
+      "innerBlockCount": 0,
+      "fingerprint": "8bd4f67fc507dfedc50de7db655ca20b25a4a79b7e07d5a7363594e394dc6dd7",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "231",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "b7036ba71cb1d3ec6179aa26a1820705c12c680b223623382dd0b3106776a942",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "232",
+      "depth": 0,
+      "blockName": "core/list",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 2,
+      "fingerprint": "a581c1effaedb56a56d4e311786758f3e57d51314d5e921c4c8468d4b63ae36c",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "232.0",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "CVR sube a 3 % → solo necesitas 33 clics por venta.",
+      "innerBlockCount": 0,
+      "fingerprint": "41a62fa7d509389002d31e7da19af8e84383c7d1a3cfe88ab3eacd6ba50e242a",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "232.1",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "CAC baja a $26,40 (una reducción del 34 %).",
+      "innerBlockCount": 0,
+      "fingerprint": "083568eb3d162a3c6c41b806053c68c1947ea32e9acb338b588cc2c500d98540",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "233",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "9d0c68814defd3bf306ede7db3913ad35669b606cd460124a92e43c245f47149",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "234",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Si tu ARPA (Average Revenue per Account) es $20/mes con margen del 70 %, tu contribución mensual es $14.",
+      "innerBlockCount": 0,
+      "fingerprint": "0b92387489d40e46365a50f89f70aec440b29293d622b7646637988b4a9bb24b",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "235",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "8020474ee3500eee2bc067ff9291a1b217ddad73bd69f260fc65886b7b170ccb",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "236",
+      "depth": 0,
+      "blockName": "core/list",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 2,
+      "fingerprint": "71d060c287fc5be3b3b244f5962bae3a1930d9e6a01ebe3c13d8caf0202bdc54",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "236.0",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Payback base: $40 / $14 = 2,8 meses",
+      "innerBlockCount": 0,
+      "fingerprint": "1e261be51a4258ec049d1d22681243b1fb6395a5036736d52892db1470b92c7d",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "236.1",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Payback con Loop: $26,40 / $14 = 1,9 meses 🚀",
+      "innerBlockCount": 0,
+      "fingerprint": "6cfce02b5681bdbb641adfe2b9af58d66ad8270d446ecd4f685219da23a0b9c7",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "237",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "55232fa383a288dc876b9cb999d61b371f6daa676a54ddf0e2e24e79b1603c3e",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "238",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Y si reduces churn del 5 % al 4 % gracias a Evolve:",
+      "innerBlockCount": 0,
+      "fingerprint": "a1e94824b221090b5cd3f0056f4033a7af78e27a2c9ffef0c026682505454e16",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "239",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "a000f4a48393ebeb75a5fe76e079328ecfedac54c734b5d2830ad3fbda8115f0",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "240",
+      "depth": 0,
+      "blockName": "core/list",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 2,
+      "fingerprint": "1a32ee736e3d52f995004648f5b88a1277fbffc1a9da52c29ad222f79138460d",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "240.0",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "LTV base = $20 × 0,7 / 0,05 = $280",
+      "innerBlockCount": 0,
+      "fingerprint": "81b8cb4ece58e0deb05d441b669de0831f96dae897f973a852675f84c4743b38",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "240.1",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "LTV con Loop = $20 × 0,7 / 0,04 = $350 (+25 %).",
+      "innerBlockCount": 0,
+      "fingerprint": "9a7c47c26b34c7cc0b670c13b407bac0fda58ba8c2fc1399a49ae20ef2f30b26",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "241",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "7b11dee112fd42a1724493f8942b65b2995b4a3b67db57b9d3b080dfe4a32a85",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "242",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "En otras palabras: menos CAC, más LTV y un ROI más saludable.",
+      "innerBlockCount": 0,
+      "fingerprint": "3b205bca1935c2f52d617e80e4faa4f73fe275e107ae2a0d12aadd5bb42c11d8",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "243",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "6f0270065cf2d5db6b4cab75de68712bd338415bd179f632a47fe2c439301c8c",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "244",
+      "depth": 0,
+      "blockName": "core/separator",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "b578ffa256129daa55b82af810eb67c72a651f468b493168a1cf35d729f7e900",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "245",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "ee65c066f33f63ceb0d9c327b49052bb539ec94664eb8273d3774542e04f0cec",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "246",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {
+        "level": 3
+      },
+      "text": "🍏 Con manzanitas",
+      "innerBlockCount": 0,
+      "fingerprint": "58109b00a701aaeb3d14915bc1a17ef06421cfdb8741d17a40cdae1538974e59",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "247",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "5fa7bc530fc669932cf3f139e982c4fc06ac45974ae3b92932e8cb503776ad3f",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "248",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "El Loop es como exprimir una fruta 🍊: con cada vuelta sacas más jugo sin tener que comprar más naranjas. Menos coste por cliente, más valor de cada relación y un retorno más rápido.",
+      "innerBlockCount": 0,
+      "fingerprint": "331f88d7e6f2bb9e0c143b9db5fc6d33dbadcfdd43f7dae29885658648b988f4",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "249",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "b9629e32b869bba2ecea810b59e4584f1e59d63ba2fcc1159342fd429608cfaf",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "250",
+      "depth": 0,
+      "blockName": "core/separator",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "ecd51c503c607063a4bfb36c81bfb097ee4e93c6f96f52626df548aa433ece68",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "251",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "d58889037ee7f2782f40dad667effb286cdbdaa49a034a02fa3d37702a60136d",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "252",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "👀 Ahora bien, ¿cómo se pasa de la teoría a la práctica?¿Cómo se integra el Loop en un stack con HubSpot, Salesforce, BigQuery, GA4 o incluso WordPress… y qué cambios culturales exige para dejar atrás las campañas lentas y abrazar ciclos vivos?",
+      "innerBlockCount": 0,
+      "fingerprint": "5763de618727bd16caff438724b216a5c26e844502e9af32b87ccdc75f03b5cf",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "253",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "02813756531cfa7af89d609992c2d6b74bb486bbd31d16e9e79fc240597c3e49",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "254",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "⬇️ Lo exploramos en la próxima sección: “Implementación práctica: stack tecnológico y cultura”.",
+      "innerBlockCount": 0,
+      "fingerprint": "fbd838e53e7273dd2c1afee54e3f877f0b0ce8e1c4aef14b84f609eb49522e86",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "255",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "698ccac54a8a712cc3216d6b8aaf25b1f410170753bc9ba877ca157f834ee174",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "256",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {},
+      "text": "⚙️ Implementación práctica: stack tecnológico y cultura",
+      "innerBlockCount": 0,
+      "fingerprint": "de260891b5013e744b1865e1af963c45b4ed0c4730573d686c5446a8f609e12b",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "257",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "c3d094a1caf339462f0dac1e963ff6dfb78dbab2f569b64fff56d1df845cbcdb",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "258",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Una confusión común es pensar que el Loop Marketing depende de una herramienta específica. ❌ En realidad, el Loop es agnóstico al stack: no importa si trabajas con HubSpot, Salesforce, WordPress, BigQuery, GA4 u otra combinación de CRM, CMS y analítica. Lo imp…",
+      "innerBlockCount": 0,
+      "fingerprint": "1debbbee155339ee189c0353b96fb1bc7cf8ef1dc005647aa9726f33b3390d0a",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "259",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "aa583e83091b8eb18a4d535de77ca590ce966ce7e4994d0d33bc52674adec953",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "260",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {
+        "level": 3
+      },
+      "text": "🔌 Stack tecnológico: cómo se integra el Loop",
+      "innerBlockCount": 0,
+      "fingerprint": "e5d74c58783c0dc8e2ebee5bb1cc66ce07663a40d764c6ceccb14ba58b8a7383",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "261",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "1b17627e51e6c5730aa919bba8736f1e84b26a169d14565926f9df0e1db41d19",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "262",
+      "depth": 0,
+      "blockName": "core/list",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 4,
+      "fingerprint": "d0fe102c05d951a67913e7be0753618cb3258345b0c9b4c8a6a3231fdcbbfbf7",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "262.0",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "HubSpot: el Loop puede orquestarse usando Content Hub (para Express), Data Hub + Workflows (para Tailor), Ads + Social + SEO (para Amplify) y Analytics (para Evolve).",
+      "innerBlockCount": 0,
+      "fingerprint": "4959bf7b74857816f350fe71fd2a52b7d52a58c86582f7048946cd8ff6d74a50",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "262.1",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Salesforce: puedes activar Data Cloud y Journey Builder para personalización (Tailor), Marketing Cloud Intelligence para medir ROI (Evolve), y CMS/Commerce Cloud para conectar contenido y ventas.",
+      "innerBlockCount": 0,
+      "fingerprint": "ba1398c0df24b72b9c24ffe8212965304942e0b13383fb877fc821f3eee9ebfa",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "262.2",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "WordPress u otros CMS: funcionan perfectamente como capa de Express + Amplify, mientras se conectan a GA4 y BigQuery para Evolve.",
+      "innerBlockCount": 0,
+      "fingerprint": "4292938b0d4362d5abf3a97d1539e4b31379875bfb676d6a1f6cf67797b110d6",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "262.3",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "BigQuery + GA4: esenciales como cerebro analítico. Te permiten medir conversiones reales, calcular CAC/LTV, y alimentar modelos de propensión para acelerar el loop.",
+      "innerBlockCount": 0,
+      "fingerprint": "04c4d856e85717b1ee290f238e8988ad73a106053580f2d05970b7183c2a93fa",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "263",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "baf83f73393caf7a528ae7927fe8a2f016139e298e382a31bd604f9d06fe7ae2",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "264",
+      "depth": 0,
+      "blockName": "core/pullquote",
+      "attrs": {},
+      "text": "📊 Según Deloitte, las empresas que integran su data layer con marketing automation logran mejorar un 20–30 % la eficiencia en gasto publicitario (Deloitte Digital, The Power of Data-Driven Marketing).",
+      "innerBlockCount": 0,
+      "fingerprint": "6551fa9f68cc36d063cd82ea0b3b11092b5beb2bde6d150d1e4fa0f8b7ff8b6f",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "265",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "a71e036412f4825aad51501b219d339dd56891a4be0c06d7b42e96d1a9dd6fb2",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "266",
+      "depth": 0,
+      "blockName": "core/separator",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "6d7cf859aae2cacc4164400c8449d8b49d873f1ea25cba1b01fb4cafc2337d32",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "267",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "b3005a5310bf43708ad0c26631f82c8739a9f3d748ba6d2c1e51a84740ed31c9",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "268",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {
+        "level": 3
+      },
+      "text": "🔄 Cambio cultural: de campañas a ciclos",
+      "innerBlockCount": 0,
+      "fingerprint": "d56beee8ebb974259dad310e7c61f889da358cb973cd528455adc9eb75ccb853",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "269",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "60ac83464ce56a4c9541e419d37cbb1f74ecb429ae4cdad5ea0e11f5aa8d6848",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "270",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Aquí está el verdadero reto: no es técnico, es cultural.El marketing tradicional estaba organizado en campañas trimestrales: plan → producción → ejecución → reporte. El problema es que el consumidor ya no espera tanto.",
+      "innerBlockCount": 0,
+      "fingerprint": "3427b7e73be50a0cac56ef9910c1375049f55afd6b724be72ed8545a4fcdd7ef",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "271",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "57cae875a34b83f2cfb29e6da353f27ee21753e937d27e0c2988537d1df7463a",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "272",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Con el Loop la mentalidad cambia:",
+      "innerBlockCount": 0,
+      "fingerprint": "9238df25426795ca7604eebbf716fa6a49b7edc6262230df22e005c6b5f1e61a",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "273",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "f5eb997ce6f7b9737bfdb697933fffb289342acd2b8312a6f6b0f783942f925b",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "274",
+      "depth": 0,
+      "blockName": "core/list",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 3,
+      "fingerprint": "910309394d381f2a2ad53a62328393e94a300224cfcb71d88bf331aa1e2f3d75",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "274.0",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Pasas de planear meses a testear semanas o días.",
+      "innerBlockCount": 0,
+      "fingerprint": "61c205f95949c9231832be5cae6f8579e0e733e71d7659edd69d9ce0a1c70b32",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "274.1",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Los reportes ya no son retrospectivos: son input para el próximo ciclo.",
+      "innerBlockCount": 0,
+      "fingerprint": "f0c885c73ff2ab0d8cf303d7d47579a40b34a3d4321715edba222c89b31c8168",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "274.2",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "El éxito no se mide en “cerramos la campaña”, sino en cuánto aprendimos y cómo lo reinvertimos.",
+      "innerBlockCount": 0,
+      "fingerprint": "39f872754fdf3ed3fd0d5974f43155eeb35c7cfcd5be91c374e195474ab5d820",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "275",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "3bc5c75b4c172d2b9e764cf1fd0fa3a2ad1c96f1c160bc69735093a6bbe96b41",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "276",
+      "depth": 0,
+      "blockName": "core/pullquote",
+      "attrs": {},
+      "text": "📌 Gartner advierte que el 70 % de los equipos de marketing que no adopten modelos ágiles seguirán perdiendo relevancia frente a competidores data-driven (Gartner, Future of Marketing Agility).",
+      "innerBlockCount": 0,
+      "fingerprint": "6986a031c74d6ab2e1e658ce5c21dc44bdd925e618a0e7cc122a4ad379644cd9",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "277",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "dde02a5aff2c6eed58e0b6a53bfcca8fa77359f592b0c98fbff9bd7dc15ae58d",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "278",
+      "depth": 0,
+      "blockName": "core/separator",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "a8b7fcbf74a53d9c33e03ee9162294c55e9df5b39670d1823906315b2dc5cd00",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "279",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "fe2a7280ed26ddc7dd3c0e060689aa2c92fd1d0ca3f81ac3c4e6cdda68a4cdd2",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "280",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {
+        "level": 4
+      },
+      "text": "🍏 Con manzanitas",
+      "innerBlockCount": 0,
+      "fingerprint": "58320ae17ccbf132af65414a28f77c382d3564a1db11d4272e7216bc49e6911e",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "281",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "e5ad043fd9dc911953ae55fe71c43af3fe69d87f3cc794c52f6d17827b99c159",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "282",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Implementar el Loop es como cambiar la dieta de tu marketing: ya no comes 3 grandes comidas al día (campañas), sino que te alimentas con snacks constantes y nutritivos (ciclos de experimentación). Es más ligero, más ágil y te mantiene siempre en forma 💪.",
+      "innerBlockCount": 0,
+      "fingerprint": "937a8421de0c2e43ec03e2553c7d9dea0ca102fc52ddf9be2d2ac5404b45461f",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "283",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "9bda6e0df517a23674971495ecde1fbe2d2099cc2f390947784014e618b1ca74",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "284",
+      "depth": 0,
+      "blockName": "core/separator",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "ec3a61fb1aa10ffdd10d0c2b400dace5746c415a8dd6d023ebbdb16d43de0539",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "285",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "680f0cee6e0318ad35eb65d9fcf161d64e95568489a898ad1085b60d9f45547b",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "286",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "👀 Pero claro, tanta automatización y tanto dato también trae riesgos:¿Cómo asegurarte de que la IA no erosione la confianza del consumidor?¿Cómo poner límites éticos y mantener el toque humano en medio de la escala? ⬇️ Eso lo exploramos en la próxima parte.",
+      "innerBlockCount": 0,
+      "fingerprint": "0d822f59c1054a2dace3679d34844b1fca0a71208f027941502aaef4bb3d3ecc",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "287",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "dda7dbc7f36f58d06f377ad25e7520c2ce5b565de284a6dd690b27bf6d927efe",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "288",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {},
+      "text": "🛡️ Riesgos y confianza: Human-in-the-Loop",
+      "innerBlockCount": 0,
+      "fingerprint": "09aba975150e99bc79aab012c4493979686e09fe9a939c1e0acf0ed3c2fc6cae",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "289",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "1a5e05f6f1e803df3841f770655daf1153752a0d146c295066e7b74927781168",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "290",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Si todo en el Loop gira más rápido gracias a la IA, la pregunta obvia es: ¿cómo evitamos que la máquina se lleve puesta la confianza del consumidor? 🤔",
+      "innerBlockCount": 0,
+      "fingerprint": "dc0bd06458d520145c88808fb24032e037711ef64d68bc3a509ee1edd69da418",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "291",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "9b2c66ce8bfdb520a9d099bca591929dd105196ad2b53d600293825c0e9a884e",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "292",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Aquí entra el concepto de Human-in-the-Loop (HITL): la idea de que las decisiones críticas de marketing no pueden quedar solo en manos de algoritmos. Necesitamos humanos revisando, aprobando y guiando lo que la IA produce.",
+      "innerBlockCount": 0,
+      "fingerprint": "2f0105846c8a5558f550c9c9fb14110349bc73e10a97ebfedcfa5629f78dd9a2",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "293",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "ca3843e18b3798afa2086b63236c9ee95b49119ef0aa7f36adcb7fb08e5659ae",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "294",
+      "depth": 0,
+      "blockName": "core/separator",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "0bc3546cf0937c902ebfd1616f2fd93d88c3f90deeb5ab72fbd724a447653b23",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "295",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "7f96bd9d1b78b0aab37e7c0d4d79992a0d7c6c68e9cf13626a8aaec97125b384",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "296",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {
+        "level": 3
+      },
+      "text": "⚖️ Ética y guardrails en acción",
+      "innerBlockCount": 0,
+      "fingerprint": "6231b1ff7ec877c5e2b63bbcfc331848e4e1710986189b2ba2dbe456d28e9ace",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "297",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "cdf54a14a72c17e5ffa963691688595d8ad1f4496989c13ae312cf376ba10b63",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "298",
+      "depth": 0,
+      "blockName": "core/list",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 3,
+      "fingerprint": "0491c50c1d0dc633de0b2c7eaa34033922fa2f8e555855aada776a9e9e83a0b9",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "298.0",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Transparencia: los consumidores quieren saber cuándo están interactuando con IA. Un informe de PwC muestra que el 85 % de los usuarios considera la transparencia esencial para confiar en una marca que usa inteligencia artificial (PwC, Responsible AI).",
+      "innerBlockCount": 0,
+      "fingerprint": "d5d1f73effc58535cca333532f176073605e94ae815ed19abf068ee536046ecc",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "298.1",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Protección de datos: no se trata de acumular información, sino de usarla con responsabilidad. Gartner predice que en 2026, el 75 % de las conversaciones de IA en marketing estarán reguladas bajo frameworks de privacidad reforzada (Gartner Research).",
+      "innerBlockCount": 0,
+      "fingerprint": "3207496e0f1b8d0b2f07b426c54d4e81cbae243fe88afc4a2384739d887d72ce",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "298.2",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Consistencia de marca: un mensaje fuera de tono puede dañar más que mil bien ejecutados. Aquí los guardrails —listas de “do’s & don’ts”, banlists y prompts aprobados— son el cinturón de seguridad del Loop.",
+      "innerBlockCount": 0,
+      "fingerprint": "c1729db1f1370b2526d23d04f05dc8d792736322618b0e1222c7af5ba338b503",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "299",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "35aebbc92c2b425bfa9336a406740e411131fe62e41aec38eccf3d80cc30bf4c",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "300",
+      "depth": 0,
+      "blockName": "core/separator",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "523c2ed8d088cca38aa887e3de7f0dcebde874c9bdf059f7b293b8e733dbb0eb",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "301",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "529e112564aec902265e7ec533b1b299543f89d4ef3c25d555e4f39d87e67d6f",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "302",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {
+        "level": 3
+      },
+      "text": "🤝 Trust by design",
+      "innerBlockCount": 0,
+      "fingerprint": "dff93cd59898ce5fff3ba9cdeb976d49218446a77c28d8ad0e0e8bf22fe9632f",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "303",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "21ef417d953493b1d626843da0085fedd91b4dd928ae2e455808166b454373f5",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "304",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Construir confianza no es algo que se repara al final, sino que se diseña desde el principio.",
+      "innerBlockCount": 0,
+      "fingerprint": "0d8ae3f6135e67f502e9e81875e18a09af6f2d4c454647b93ed42d5f2ac0e061",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "305",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "4ccad6b91838855efe5b1cb653ce1edcb9761e9c3999a5851dac88716caf1494",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "306",
+      "depth": 0,
+      "blockName": "core/list",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 3,
+      "fingerprint": "927f6d033523983578ca253d44fcf2ad0a1edc24e883ce42da25cbce5d97752f",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "306.0",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Diseñar journeys donde la personalización sea útil y no invasiva.",
+      "innerBlockCount": 0,
+      "fingerprint": "fa2677ca8d892c03adcad92e1d8de82d5bc8127c34fd86e5f6b266354d19b396",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "306.1",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Mantener siempre un “toque humano” visible en experiencias automatizadas: una firma real, una historia auténtica, una voz coherente.",
+      "innerBlockCount": 0,
+      "fingerprint": "acfdf061c06a03df5ec731bcc5a357f2dabbf01f24b4ea1a64a7ea9084a6b0ee",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "306.2",
+      "depth": 1,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Establecer métricas de confianza junto a las métricas de conversión. Por ejemplo:",
+      "innerBlockCount": 1,
+      "fingerprint": "2c74e8c3d738f75e7173edc0b752d6b42ec93cdf57f0a623d5fd53093be4da61",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "306.2.0",
+      "depth": 2,
+      "blockName": "core/list",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 3,
+      "fingerprint": "7b913683180c6fc57bd890ce6244b19db95252542896465289207e31661900a5",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "306.2.0.0",
+      "depth": 3,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "% de campañas auditadas HITL.",
+      "innerBlockCount": 0,
+      "fingerprint": "c3d1de001bbc090cd60d753190cfcaa9ec01038c22e3a46d18d06bb6a72ea903",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "306.2.0.1",
+      "depth": 3,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Tasa de menciones positivas/negativas en social listening.",
+      "innerBlockCount": 0,
+      "fingerprint": "d1c42c905852c6fadd85a35a4003b8c063bbc54c4eb4b2acfa02f989c9b62e65",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "306.2.0.2",
+      "depth": 3,
+      "blockName": "core/list-item",
+      "attrs": {},
+      "text": "Percepción de transparencia en encuestas de NPS.",
+      "innerBlockCount": 0,
+      "fingerprint": "a95e920c7bc21867b98db81aeed0abd5869f7708e2c13b17b11c8d36b8b85f47",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "307",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "d091fc34cdc5acd62b24af77777564be13da42ae4baa97e8f35e363fc0832180",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "308",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Como dijo Satya Nadella, CEO de Microsoft:",
+      "innerBlockCount": 0,
+      "fingerprint": "6010e1ea28bf0e31bf355d1a7da057f87136ebaedda83659139e5835c7eb893c",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "309",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "8e9a46b510ff29714b3dfc9a170801a8e91e9cf9c28227781a9780f01cf098d1",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "310",
+      "depth": 0,
+      "blockName": "core/quote",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 1,
+      "fingerprint": "4711a19ecba77d4503b95e3789a887e407ecad5dd2056afe2c8a8bb531d3019f",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "310.0",
+      "depth": 1,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "“La confianza se convierte en la moneda más importante en la era de la IA.” (Microsoft Responsible AI)",
+      "innerBlockCount": 0,
+      "fingerprint": "ccb214779b65e0e4617a17c321ea0760a532b2af8393cd34b5e194466da81122",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "311",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "7b16c0451df10ba540d00f6177f3e69b0773c9d72fa3d5c7694ab8dc4e0cbf10",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "312",
+      "depth": 0,
+      "blockName": "core/separator",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "418a18b9695e26e360b09cbc4c6d2694f144ff4b18a1a27d1fe586ce7647a9d8",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "313",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "cf5d81a1e51bd74343d6c13a82c1946e67b166a81a4933c03f32ab061d45950f",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "314",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {
+        "level": 3
+      },
+      "text": "🍏 Con manzanitas",
+      "innerBlockCount": 0,
+      "fingerprint": "56c8521f63972615f0fcf03f0f3a2ffe74cf0df01c41c13af5df021670e3b78e",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "315",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "54696d8e4014636b9a3b1adee7a9cebac0b146ff5cc5084cbbeab1d54b5c3c1d",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "316",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Imagina el Loop como un auto de Fórmula 1 🏎️. La IA es el motor que lo hace correr a toda velocidad, pero sin un piloto humano que controle la dirección y los frenos, tarde o temprano se sale de la pista. El Human-in-the-Loop es ese piloto: garantiza que la ve…",
+      "innerBlockCount": 0,
+      "fingerprint": "7da5bfbf81df299f718e99659f9cc2f8d4f527ff854d25547ebd293d3d4e1d26",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "317",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "b6ec89af4fb7cd516e954166bd386a79467e51aa2d7e817c1b6dbf5b953e3d32",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "318",
+      "depth": 0,
+      "blockName": "core/separator",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "0c276d5f64c27c151789deffbbd126b53f9aa2598d47d6845cf1dbe746989965",
+      "editability": "preserve_structure",
+      "risks": []
+    },
+    {
+      "path": "319",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "0644bfbe132985b5efe1f3c42517bc14ffc5153cfeb5ee52e8dd6fe88c756106",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "320",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {
+        "level": 3
+      },
+      "text": "👀 Y ahora que tenemos claro que la velocidad sin confianza no sirve…",
+      "innerBlockCount": 0,
+      "fingerprint": "23a5e13f8b76d05089071db116f571fcb4f243e5c8811c52c1993b55d08e6806",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "321",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "7ebc6ee7aa42f5a77073e09373a195fc2bc0abbb98f9d68b805ada6e7b56b04a",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "322",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "¿Cómo cerramos este recorrido y aterrizamos todo lo aprendido sobre el Loop en una idea simple y poderosa que puedas llevarte a tu día a día?",
+      "innerBlockCount": 0,
+      "fingerprint": "7cbd58e6689cd7e233062a7d627afce4295162d8e2890e6bb894cbc17c8e9e5c",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "323",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "ad4a61c46ecd1889db55439c79d3b6cd565528cfa71295016b40ac7ec3174566",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "324",
+      "depth": 0,
+      "blockName": "core/heading",
+      "attrs": {},
+      "text": "De embudos y ruedas… a un bucle infinito 🚲♾️",
+      "innerBlockCount": 0,
+      "fingerprint": "2d9ef92f0c39cacf031de36f75c4c8d6e9ffda3b2d8390fbaf24e17b43d4ecc9",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "325",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "322ed311b5da4b4d88c08a8cc33604b8c6b1926951beb382df8e17e6352152f5",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "326",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Durante años nos aferramos al funnel, como ese mapa viejo que todos sabíamos leer aunque ya no llevara a ninguna parte. Luego abrazamos el flywheel, que nos inspiró a girar en torno al cliente, pero muchas veces se sintió como pedalear en una bicicleta fija: m…",
+      "innerBlockCount": 0,
+      "fingerprint": "f5860faea8740fcf1b18b409f40405413caf4361f00da7b389c921c4e9332d0c",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "327",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "db664d66fb909863de8ab9cfa860eb4346cc848b083295e07587ee40813caf65",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "328",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "El mercado cambió. Los clientes ya no caminan en línea recta ni giran en círculos perfectos. Saltan, brincan, abandonan y regresan. Y la única forma de estar a la altura es con un motor que nunca se apaga, que aprende en cada giro y responde con la misma veloc…",
+      "innerBlockCount": 0,
+      "fingerprint": "dd94c611791b000f7c902a3d06cde8e7578ce67fe7756a6194134fedd4b4b7e6",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "329",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "f10110282eee47ce0c6d0ece62d2b115fd8f4591f385b4dc0b6fc214fa75a889",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "330",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Ese motor ya existe. No es magia, ni un nuevo juguete de moda. Es un framework que combina lo mejor del inbound, lo potencia con IA y lo mantiene bajo control humano.",
+      "innerBlockCount": 0,
+      "fingerprint": "5143f4fc08d3dafa89053b6fd6dadda821bbde943cf78d27e7146c65be2dcd3d",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "331",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "6dde8281647322b5a612a7c91ec51bb6eff009a22c037950b88c7a4c933b41a5",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "332",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "👉 Loop = sistema operativo de marketing ágil, humano y rentable.",
+      "innerBlockCount": 0,
+      "fingerprint": "f9f8d43341d602d8e84da11d8deb073d6f27c9ffaf35fffb93c76c1dbb96c900",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "333",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "bc56f4f68cf0d3de304ed6c6f904a26a3a2113c2272342941c4526bce1ecd8e1",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "334",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "Y si quieres seguir bajando estas ideas a tierra, con historias, ejemplos y sí, también con manzanitas 🍏, suscríbete a Marketing con Manzanitas. Porque esto recién empieza… y el loop no se detiene.",
+      "innerBlockCount": 0,
+      "fingerprint": "4a5fe85275b5d27ff5a6f9f08fa12f9abb82bf14ed55eea59f2615669c89059d",
+      "editability": "safe_text_edit",
+      "risks": []
+    },
+    {
+      "path": "335",
+      "depth": 0,
+      "blockName": "core/freeform",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "e3722c596f6d003bc811915bb2e5120acfaf7f993e00e85ce9c9a502767e73d7",
+      "editability": "inspect_only",
+      "risks": []
+    },
+    {
+      "path": "336",
+      "depth": 0,
+      "blockName": "core/paragraph",
+      "attrs": {},
+      "text": "",
+      "innerBlockCount": 0,
+      "fingerprint": "1de431b3ea5e450eb253ecb0cf5dc7b7ccec21f3cc5444c91fe2ad324aa64971",
+      "editability": "safe_text_edit",
+      "risks": []
+    }
+  ],
+  "links": [
+    {
+      "href": "#h-que-es-loop-marketing",
+      "text": "¿Qué es Loop Marketing? ♾️",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-definicion-simple",
+      "text": "📌 Definición simple:",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-filosofia-de-base-inbound-un-marco-operativo-nuevo",
+      "text": "🌱 Filosofía de base: inbound + un marco operativo nuevo",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-una-necesidad-en-cifras",
+      "text": "📊 Una necesidad en cifras",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-funnel-vs-flywheel-vs-loop-marketing",
+      "text": "🔄 Funnel vs Flywheel vs Loop Marketing",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-el-funnel-linealidad-muerta",
+      "text": "📉 El funnel = linealidad muerta",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-el-flywheel-relato-util",
+      "text": "⚙️ El flywheel = relato útil",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-el-loop-accion-continua",
+      "text": "♾️ El loop = acción continua",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-loop-marketing-y-las-4s-de-google",
+      "text": "🔍 Loop Marketing y las 4S de Google",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-streaming-la-era-del-contenido-continuo",
+      "text": "🎬 Streaming: la era del contenido continuo",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-scrolling-exploracion-infinita-en-feeds",
+      "text": "📱 Scrolling: exploración infinita en feeds",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-searching-busquedas-multimodales-e-ia-first",
+      "text": "🔎 Searching: búsquedas multimodales e IA-first",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-shopping-compras-sin-fricciones",
+      "text": "🛒 Shopping: compras sin fricciones",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-vs-loop-marketing-en-b2b-vs-b2c",
+      "text": "🏢 vs 🛍️ Loop Marketing en B2B vs B2C",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-en-b2b-relaciones-largas-cuentas-especificas",
+      "text": "🏢 En B2B: relaciones largas, cuentas específicas",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-en-b2c-velocidad-y-volumen",
+      "text": "🛍️ En B2C: velocidad y volumen",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-impacto-en-metricas-de-negocio-cac-ltv-roi-payback",
+      "text": "💰 Impacto en métricas de negocio (CAC, LTV, ROI, Payback)",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-reduccion-del-cac",
+      "text": "📉 Reducción del CAC",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-aumento-del-ltv",
+      "text": "📈 Aumento del LTV",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-menor-payback-y-mejor-roi",
+      "text": "⏱️ Menor Payback y mejor ROI",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-implementacion-practica-stack-tecnologico-y-cultura",
+      "text": "⚙️ Implementación práctica: stack tecnológico y cultura",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-stack-tecnologico-como-se-integra-el-loop",
+      "text": "🔌 Stack tecnológico: cómo se integra el Loop",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-cambio-cultural-de-campanas-a-ciclos",
+      "text": "🔄 Cambio cultural: de campañas a ciclos",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-riesgos-y-confianza-human-in-the-loop",
+      "text": "🛡️ Riesgos y confianza: Human-in-the-Loop",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-etica-y-guardrails-en-accion",
+      "text": "⚖️ Ética y guardrails en acción",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-trust-by-design",
+      "text": "🤝 Trust by design",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "#h-de-embudos-y-ruedas-a-un-bucle-infinito",
+      "text": "De embudos y ruedas… a un bucle infinito 🚲♾️",
+      "kind": "internal_anchor"
+    },
+    {
+      "href": "https://www.hubspot.es/loop-marketing?utm_source=chatgpt.com",
+      "text": "HubSpot, Loop Marketing",
+      "kind": "external_url"
+    },
+    {
+      "href": "https://www.hubspot.com/research",
+      "text": "HubSpot Research",
+      "kind": "external_url"
+    },
+    {
+      "href": "https://www.hubspot.com/data-disconnect-report",
+      "text": "HubSpot, Data Disconnect Report 2025",
+      "kind": "external_url"
+    },
+    {
+      "href": "https://www.thinkwithgoogle.com/consumer-insights/consumer-journey/new-consumer-decision-making-process/?utm_source=chatgpt.com",
+      "text": "Think with Google",
+      "kind": "external_url"
+    },
+    {
+      "href": "https://www.thinkwithgoogle.com/consumer-insights/consumer-journey/customer-journey-mapping/?utm_source=chatgpt.com",
+      "text": "Think with Google",
+      "kind": "external_url"
+    }
+  ],
+  "mediaIssues": [],
+  "editabilityLegend": {
+    "safe_text_edit": "Agent may propose text changes while preserving block type, path and surrounding structure.",
+    "safe_attrs_edit": "Agent may propose constrained attribute changes after validating the native block setting.",
+    "media_requires_reconcile": "Agent must reconcile WordPress media id, rendered src, alt text and source brief before write.",
+    "preserve_structure": "Agent should preserve structure and patch child blocks or attrs only with explicit intent.",
+    "inspect_only": "Agent should preserve by default until serialization/plugin behavior is understood."
+  }
+}

@@ -1,8 +1,11 @@
 import 'server-only'
 
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
-import { observeAndDegrade, observeAndRethrow } from '@/lib/account-360/facet-observability'
-import { readOrganizationIcoMetricsFromBigQuery } from '@/lib/account-360/organization-ico-metrics-source'
+import { observeAndRethrow } from '@/lib/account-360/facet-observability'
+import {
+  readOrganizationOperationalMetricsRow,
+  type OrganizationOperationalMetricsRow
+} from '@/lib/account-360/organization-operational-metrics-reader'
 import { TASK_STATUS_GROUPS, taskStatusGroupSql } from '@/lib/delivery/task-status-canonical'
 import type {
   AccountScope,
@@ -12,20 +15,6 @@ import type {
 } from '@/types/account-complete-360'
 
 // ── Postgres row types ──
-
-interface IcoMetricsRow extends Record<string, unknown> {
-  period_year: string | number | null
-  period_month: string | number | null
-  rpa_avg: string | number | null
-  rpa_median: string | number | null
-  otd_pct: string | number | null
-  ftr_pct: string | number | null
-  throughput_count: string | number | null
-  cycle_time_avg_days: string | number | null
-  pipeline_velocity: string | number | null
-  stuck_asset_count: string | number | null
-  stuck_asset_pct: string | number | null
-}
 
 interface ProjectCountRow extends Record<string, unknown> {
   project_count: string | number
@@ -49,21 +38,13 @@ interface SprintCountRow extends Record<string, unknown> {
 const toNum = (v: unknown): number => {
   if (typeof v === 'number') return v
 
-  if (typeof v === 'string') { const n = Number(v);
+  if (typeof v === 'string') {
+    const n = Number(v)
 
- 
+    return Number.isFinite(n) ? n : 0
+  }
 
-return Number.isFinite(n) ? n : 0 }
-  
-return 0
-}
-
-const toNullNum = (v: unknown): number | null => {
-  if (v === null || v === undefined) return null
-  const n = toNum(v)
-
-  
-return n === 0 && v !== 0 && v !== '0' ? null : n
+  return 0
 }
 
 // ── Period resolution ──
@@ -79,106 +60,10 @@ const resolvePeriod = (asOf: string | null): { year: number; month: number } => 
 
   const now = new Date()
 
-  
-return { year: now.getFullYear(), month: now.getMonth() + 1 }
+  return { year: now.getFullYear(), month: now.getMonth() + 1 }
 }
 
 // ── Sub-queries ──
-
-const queryIcoMetrics = async (
-  organizationId: string,
-  year: number,
-  month: number
-): Promise<IcoMetricsRow | null> => {
-  const rows = await runGreenhousePostgresQuery<IcoMetricsRow>(`
-    WITH materialized AS (
-      SELECT
-        rpa_avg,
-        rpa_median,
-        otd_pct,
-        ftr_pct,
-        throughput_count,
-        cycle_time_avg_days,
-        pipeline_velocity,
-        stuck_asset_count,
-        stuck_asset_pct,
-        period_year,
-        period_month,
-        0 AS source_rank
-      FROM greenhouse_serving.organization_operational_metrics
-      WHERE organization_id = $1
-        AND (period_year < $2 OR (period_year = $2 AND period_month <= $3))
-
-      UNION ALL
-
-      SELECT
-        rpa_avg,
-        rpa_median,
-        otd_pct,
-        ftr_pct,
-        throughput_count,
-        cycle_time_avg_days,
-        pipeline_velocity,
-        stuck_asset_count,
-        stuck_asset_pct,
-        period_year,
-        period_month,
-        1 AS source_rank
-      FROM greenhouse_serving.ico_organization_metrics
-      WHERE organization_id = $1
-        AND (period_year < $2 OR (period_year = $2 AND period_month <= $3))
-    )
-    SELECT
-      period_year,
-      period_month,
-      rpa_avg,
-      rpa_median,
-      otd_pct,
-      ftr_pct,
-      throughput_count,
-      cycle_time_avg_days,
-      pipeline_velocity,
-      stuck_asset_count,
-      stuck_asset_pct
-    FROM materialized
-    ORDER BY period_year DESC, period_month DESC, source_rank ASC
-    LIMIT 1
-  `, [organizationId, year, month]).catch(
-    // PG serving tables (organization_operational_metrics / ico_organization_metrics) are a
-    // projection that is frequently empty for client orgs. Degrade to the canonical BigQuery
-    // source below rather than failing the whole delivery facet — but still observe a genuine error.
-    observeAndDegrade('delivery', 'account360.delivery.ico_serving', [] as IcoMetricsRow[])
-  )
-
-  if (rows[0]) return rows[0]
-
-  // Canonical source-of-truth fallback: the ICO materializer (TASK-900) writes
-  // `ico_engine.metrics_by_organization` in BigQuery, keyed by the space client_id. The PG serving
-  // tables above are only an (often-unpopulated) mirror. ICO null is an honest "not materialized
-  // yet" state, so degrade rather than throw if BigQuery is unreachable.
-  const bigQueryRow = await readOrganizationIcoMetricsFromBigQuery({
-    organizationId,
-    periodYear: year,
-    periodMonth: month,
-    mode: 'latest_at_or_before'
-  }).catch(observeAndDegrade('delivery', 'account360.delivery.ico_bigquery', null))
-
-  if (!bigQueryRow) return null
-
-  return {
-    period_year: bigQueryRow.period_year as IcoMetricsRow['period_year'],
-    period_month: bigQueryRow.period_month as IcoMetricsRow['period_month'],
-    rpa_avg: bigQueryRow.rpa_avg as IcoMetricsRow['rpa_avg'],
-    rpa_median: bigQueryRow.rpa_median as IcoMetricsRow['rpa_median'],
-    otd_pct: bigQueryRow.otd_pct as IcoMetricsRow['otd_pct'],
-    ftr_pct: bigQueryRow.ftr_pct as IcoMetricsRow['ftr_pct'],
-    throughput_count: bigQueryRow.throughput_count as IcoMetricsRow['throughput_count'],
-    cycle_time_avg_days: bigQueryRow.cycle_time_avg_days as IcoMetricsRow['cycle_time_avg_days'],
-    pipeline_velocity: bigQueryRow.pipeline_velocity as IcoMetricsRow['pipeline_velocity'],
-    stuck_asset_count: bigQueryRow.stuck_asset_count as IcoMetricsRow['stuck_asset_count'],
-    stuck_asset_pct: bigQueryRow.stuck_asset_pct as IcoMetricsRow['stuck_asset_pct']
-  }
-}
 
 const queryProjectCounts = async (
   spaceIds: string[]
@@ -248,18 +133,20 @@ const querySprintCount = async (
 
 // ── Mappers ──
 
-const mapIcoMetrics = (row: IcoMetricsRow): AccountDeliveryIcoMetrics => ({
-  periodYear: toNum(row.period_year),
-  periodMonth: toNum(row.period_month),
-  rpaAvg: toNullNum(row.rpa_avg),
-  rpaMedian: toNullNum(row.rpa_median),
-  otdPct: toNullNum(row.otd_pct),
-  ftrPct: toNullNum(row.ftr_pct),
-  throughputCount: toNum(row.throughput_count),
-  cycleTimeAvg: toNullNum(row.cycle_time_avg_days),
-  pipelineVelocity: toNullNum(row.pipeline_velocity),
-  stuckAssetCount: toNum(row.stuck_asset_count),
-  stuckAssetPct: toNullNum(row.stuck_asset_pct)
+// The ICO metrics now flow through the canonical reader (TASK-1106) which resolves
+// operational serving ⊕ ico mirror ⊕ BigQuery once and returns normalized number|null fields.
+const mapToDeliveryIco = (row: OrganizationOperationalMetricsRow): AccountDeliveryIcoMetrics => ({
+  periodYear: row.periodYear,
+  periodMonth: row.periodMonth,
+  rpaAvg: row.rpaAvg,
+  rpaMedian: row.rpaMedian,
+  otdPct: row.otdPct,
+  ftrPct: row.ftrPct,
+  throughputCount: row.throughputCount ?? 0,
+  cycleTimeAvg: row.cycleTimeAvgDays,
+  pipelineVelocity: row.pipelineVelocity,
+  stuckAssetCount: row.stuckAssetCount,
+  stuckAssetPct: row.stuckAssetPct
 })
 
 const previousPeriod = (year: number, month: number) => {
@@ -268,12 +155,15 @@ const previousPeriod = (year: number, month: number) => {
   return { year: year - 1, month: 12 }
 }
 
-const sameIcoPeriod = (a: IcoMetricsRow | null, b: IcoMetricsRow | null) =>
+const sameIcoPeriod = (
+  a: OrganizationOperationalMetricsRow | null,
+  b: OrganizationOperationalMetricsRow | null
+) =>
   Boolean(
     a &&
     b &&
-    toNum(a.period_year) === toNum(b.period_year) &&
-    toNum(a.period_month) === toNum(b.period_month)
+    a.periodYear === b.periodYear &&
+    a.periodMonth === b.periodMonth
   )
 
 // ── Public facet fetcher ──
@@ -287,20 +177,25 @@ export const fetchDeliveryFacet = async (
   const { year, month } = resolvePeriod(ctx.asOf)
 
   const [icoRow, projectRow, taskRow, sprintCount] = await Promise.all([
-    queryIcoMetrics(scope.organizationId, year, month),
+    readOrganizationOperationalMetricsRow(scope.organizationId, { periodYear: year, periodMonth: month }),
     queryProjectCounts(scope.spaceIds),
     queryTaskCounts(scope.spaceIds),
     querySprintCount(scope.spaceIds)
   ])
 
-  const prior = icoRow ? previousPeriod(toNum(icoRow.period_year) || year, toNum(icoRow.period_month) || month) : previousPeriod(year, month)
+  const prior = icoRow
+    ? previousPeriod(icoRow.periodYear || year, icoRow.periodMonth || month)
+    : previousPeriod(year, month)
 
   const previousIcoRow = icoRow
-    ? await queryIcoMetrics(scope.organizationId, prior.year, prior.month)
+    ? await readOrganizationOperationalMetricsRow(scope.organizationId, {
+        periodYear: prior.year,
+        periodMonth: prior.month
+      })
     : null
 
-  const icoMetrics = icoRow ? mapIcoMetrics(icoRow) : null
-  const previousIcoMetrics = previousIcoRow && !sameIcoPeriod(icoRow, previousIcoRow) ? mapIcoMetrics(previousIcoRow) : null
+  const icoMetrics = icoRow ? mapToDeliveryIco(icoRow) : null
+  const previousIcoMetrics = previousIcoRow && !sameIcoPeriod(icoRow, previousIcoRow) ? mapToDeliveryIco(previousIcoRow) : null
   const projectCount = projectRow ? toNum(projectRow.project_count) : 0
   const activeProjectCount = projectRow ? toNum(projectRow.active_project_count) : 0
 

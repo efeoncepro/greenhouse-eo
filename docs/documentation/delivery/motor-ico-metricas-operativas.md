@@ -15,7 +15,7 @@ El ICO Engine es el motor de metricas operativas de Greenhouse. Calcula indicado
 | Metrica | Que significa | Como se calcula |
 |---------|---------------|-----------------|
 | OTD% (On-Time Delivery) | Porcentaje de tareas entregadas a tiempo | Tareas completadas antes o el dia de su due_date / total de tareas del periodo |
-| RpA (Revisions per Asset) | Cuantas rondas de cambios del cliente tuvo cada entregable | Promedio de `rpa_value` de tareas completadas con valor > 0 |
+| RpA (Rounds per Asset) | Cuantas rondas de cambios del cliente tuvo cada entregable | Promedio de `rpa_value` de tareas completadas con valor > 0 |
 | FTR% (First Time Right) | Porcentaje de tareas aprobadas sin cambios del cliente | Tareas completadas con `client_change_round_final = 0` / total completadas |
 | Cycle Time | Dias promedio desde creacion hasta cierre de una tarea | Promedio de `cycle_time_days` de tareas completadas |
 | Throughput | Cantidad de tareas completadas en el periodo | Conteo de tareas on-time + late-drop |

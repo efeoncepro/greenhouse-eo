@@ -88,7 +88,8 @@ const enUS: NavigationCopy = {
     adminTalentOps: { label: 'Talent health', subtitle: 'System metrics and maintenance' },
     adminIdentityAccess: { label: 'Identity and access', subtitle: 'Users, roles, views and accounts' },
     adminTeamOps: { label: 'Team and operations', subtitle: 'Talent, business lines and instruments' },
-    knowledge: { label: 'Knowledge', subtitle: 'Guides, sources and operational memory' }
+    knowledge: { label: 'Knowledge', subtitle: 'Guides, sources and operational memory' },
+    roadmap: { label: 'Roadmap', subtitle: 'Operational backlog: epics, tasks, mini-tasks and incidents' }
   },
   people: {
     people: { label: 'People', subtitle: 'Operational view of the Efeonce team' }

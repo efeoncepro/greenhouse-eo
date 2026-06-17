@@ -12,6 +12,10 @@ La diferencia con otras capas de documentacion:
 
 ### Finanzas
 
+- [Registrar ingresos, egresos, pagos y ordenes de pago](finance/registrar-ingresos-egresos-y-ordenes-de-pago.md) — guia operador end-to-end para crear documentos de ingreso/egreso, registrar cobros/pagos reales, decidir pago directo vs orden de pago, aprobar/enviar/marcar pagado y conciliar.
+- [Caja, cobros, pagos y liquidaciones](finance/caja-cobros-pagos-y-liquidaciones.md) — operacion de caja real: registrar cobros/pagos, asignar instrumentos, entender `amount` vs `amountClp`, transferencias internas y settlement legs.
+- [Conciliacion bancaria operativa](finance/conciliacion-bancaria-operacion.md) — crear periodos, importar cartolas, revisar candidatos, usar auto-match/AI suggestions, hacer match/unmatch/exclude y cerrar solo cuando el banco cuadra.
+- [Instrumentos de pago y Banco](finance/instrumentos-de-pago-y-banco.md) — administrar cuentas, tarjetas, fintechs, processors y cuentas internas; diferencia entre instrumento, processor y source account; manejo de datos sensibles y saldos materializados.
 - [Distribucion de costos para P&L operativo](finance/distribucion-costos-pnl.md) — como revisar, materializar y cerrar períodos sin inflar overhead de clientes con payroll, regulatorio, financiero o treasury transit.
 - [Sugerencias asistidas de conciliacion](finance/sugerencias-asistidas-conciliacion.md) — como generar, revisar, aceptar o descartar sugerencias AI sin alterar saldos automaticamente.
 - [Saldos bancarios FX drift](finance/saldos-bancarios-fx-drift-remediation.md) — como diagnosticar, auditar y remediar drift FX de saldos bancarios usando el control plane canonico sin SQL/backfills ad hoc.
@@ -20,24 +24,28 @@ La diferencia con otras capas de documentacion:
 
 ### Comercial
 
+- [Operar Quote-to-Cash Comercial](comercial/operar-quote-to-cash-comercial.md) — como revisar una oportunidad, elegir party/deal/productos, construir una cotizacion, manejar aprobaciones, emitir, sincronizar HubSpot y entender cuando pasa a contrato/Finance.
 - [Pipeline comercial](comercial/pipeline-comercial.md) — como usar la lane dedicada de forecast comercial sin confundirla con revenue reconocido ni cierre financiero.
 - [Sample Sprints](comercial/sample-sprints.md) — como declarar, aprobar, registrar progreso y cerrar outcomes de pilotos/trials/POCs/discovery.
 
 ### Identidad y acceso
 
+- [Operar Identity, Access y Admin Center](identity/operar-identity-access-admin-center.md) — guia para crear/revisar usuarios, roles, vistas, permission sets, SCIM, reconciliacion y diagnostico de acceso sin aplicar bypasses inseguros.
 - [SCIM con Microsoft Entra](identity/scim-entra-provisioning.md) — como verificar provisioning, usar `provisionOnDemand`, interpretar `countEscrowed` y evitar fixes manuales inseguros sobre usuarios o mappings.
 - [Organization Workspace Projection — operación](identity/organization-workspace-projection.md) — como supervisar las 2 nuevas reliability signals (`facet_view_drift`, `unresolved_relations`), interpretar las 5 relaciones canónicas subject↔organización, las 11 capabilities `organization.*` y la disciplina TS↔DB para agregar capabilities nuevas.
 
 ### Portal Cliente
 
+- [Operar Portal Cliente y Customer Experience](client-portal/operar-portal-cliente-customer-experience.md) — guia operador para activar/pausar modulos, diagnosticar rutas cliente, distinguir vista/modulo/capability y resolver estados normal, zero-state, not assigned, degraded y error.
 - [Menu dinamico y empty states — operacion](client-portal/menu-dinamico-y-empty-states.md) — como activar/pausar/dar de baja modulos para clientes, verificar que esta viendo cada cliente, diagnosticar empty states reportados, atender warnings Sentry `role_view_fallback_used` (regla canonica view registry governance), validar visualmente con mockup `/cliente-portal-mockup`, troubleshooting de los 5 estados canonicos del 5-state contract.
 
 ### Admin Center
 
-_Pendiente._
+- [Operar Admin Center](admin-center/operar-admin-center.md) — guia transversal para operar acceso, tenants, permission sets, integraciones, email delivery, AI Tools, pricing catalog, SLAs, calendario y responsabilidades sin saltarse capabilities ni audit.
 
 ### HR y Nomina
 
+- [Operar Workforce, Payroll y Contractors end-to-end](hr/operar-workforce-payroll-contractors-end-to-end.md) — guia operador para decidir el camino correcto entre Workforce Activation, nomina mensual, honorarios, contractors, employee-to-contractor, finiquitos y pagos en Finance sin duplicar obligaciones.
 - [Habilitar colaborador en Workforce Activation](hr/habilitar-colaborador-workforce.md) — como resolver blockers de readiness desde `/hr/workforce/activation` antes de completar ficha.
 - [Completar ficha laboral de un colaborador](hr/completar-ficha-laboral.md) — como cerrar el workflow workforce intake desde la UI; desde TASK-874 el cierre consulta readiness automático y bloquea fichas incompletas.
 - [Offboarding](hr/offboarding.md) — como abrir, revisar y avanzar casos canonicos de salida sin confundirlos con desactivacion de acceso ni finiquito.
@@ -49,15 +57,25 @@ _Pendiente._
 - [Exportar Previred y LRE](hr/payroll-compliance-exports-chile.md) — como descargar los artefactos compliance Chile desde periodos cerrados, permisos requeridos y cuidados de upload externo manual.
 - [Contratistas — Self-Service y revision HR](hr/contratistas.md) — como un contratista sube boleta/factura + evidencia, envia entregas y responde observaciones; y como HR revisa soportes, aprueba/observa/rechaza y deriva el caso a Finanzas sin confundir aprobar con crear payable o pagar.
 
+### Personas
+
+- [Operar Mi Espacio y Self-Service](personas/operar-mi-espacio-self-service.md) — guia para que una persona revise su perfil, performance, recibos, payment profile, permisos, onboarding, documentos legales y contractor self-service sin acceder a datos de otras personas.
+
 ### Agencia y Operaciones
 
+- [Operar Agency, Delivery y Account 360](agency/operar-agency-delivery-account-360.md) — como leer Account 360, Delivery, ICO, economics, sample sprints y service attribution con degradacion honesta por faceta.
 - [Monitorear Costos Cloud con FinOps](operations/monitorear-costos-cloud-finops.md) — como revisar gasto GCP, interpretar proyecciones y drivers, usar alertas tempranas y ejecutar diagnosticos seguros sin depender solo de la consola de Google Cloud.
+- [Operar Integraciones y Sync](operations/operar-integraciones-y-sync.md) — como revisar health/freshness, disparar sync manual, pausar/reanudar conectores, diagnosticar webhooks y no romper la cadena raw/conformed/projection.
 - [Operar el pipeline RpA V2 demo](operations/pipeline-rpa-v2-demo.md) — verificar que un cambio de estado en una tarea demo se captura y se refleja en la propiedad `RpA` de Notion; interpretar señales de confiabilidad; troubleshooting de captura y writeback.
 
 ### Plataforma
 
+- [Operar layout Ohio + Elementor en el Public Site](public-site/wordpress-ohio-elementor-layout.md) — runbook para diagnosticar, corregir y revertir desfases de contenedor/sidebar en `efeoncepro.com` WordPress/Kinsta, incluyendo `/blog` y el fix page-scoped de Ohio `.light-typo`.
+- [Operar Public Site y Content Factory](public-site/operar-public-site-content-factory.md) — como inspeccionar contenido WordPress, generar mapas de inteligencia, revisar drift/dry-run y preparar drafts sin publicar ni mutar produccion fuera de una ventana aprobada.
 - [Knowledge Platform (foundation)](plataforma/knowledge-platform.md) — operar la base del Knowledge Platform: aplicar la migración del schema `greenhouse_knowledge`, usar los helpers server-only de `src/lib/knowledge/` (registrar fuente, crear/publicar documento con chunks, transicionar lifecycle, feedback), qué significan los estados y qué no hacer.
 - [MCP Greenhouse Read-Only](plataforma/mcp-greenhouse-read-only.md) — cómo levantar el MCP local `stdio` o conectarse al gateway remoto HTTP privado, qué variables necesita, qué tools read-only existen hoy, qué límites de scope respeta y qué follow-ups siguen fuera de alcance.
+- [Operar Kortex Command Adapter](plataforma/kortex-command-adapter.md) — como ejecutar comandos Kortex gobernados desde Greenhouse con `Idempotency-Key`, binding preflight, dry-run obligatorio y live execute apagado por defecto.
+- [Operar Comunicaciones y Notificaciones](plataforma/operar-comunicaciones-notificaciones.md) — revisar email delivery, previews, kill switches, preferencias, in-app notifications, Resend webhooks y Teams Bot sin enviar mensajes fuera de trazabilidad.
 - [Validar el contrato visual DESIGN.md](plataforma/validar-contrato-visual-design-md.md) — paso a paso para validar localmente con `pnpm design:lint`, comparar versiones con `pnpm design:diff`, agregar tokens nuevos siguiendo el patrón canónico (sin atajos prohibidos), resolver warnings comunes, y verificar que el CI gate aprobó tu PR.
 - [Usar microcopy shared](plataforma/microcopy-shared-dictionary.md) — como usar `getMicrocopy` y `buildStatusMap` para botones, estados, meses, empty states y aria-labels sin duplicar strings ni romper el futuro i18n.
 - [Verificar idioma del portal](plataforma/i18n-runtime.md) — como forzar `gh_locale=en-US`/`es-CL` para QA del runtime i18n sin cambiar URLs privadas ni APIs.
@@ -66,6 +84,11 @@ _Pendiente._
 - [Skills de Product Design](plataforma/skills-product-design.md) — qué cambió cuando se incorporó la suite de 17 skills (a11y, motion, performance, forms, state, dataviz, IA, frontend-architect, design-system-governance), cuándo se invoca cada una, cómo se componen, cuándo correr `greenhouse-ui-review` antes de commit y cómo extender el sistema sin romperlo.
 - [Activar y desactivar el Modo Mantenimiento](plataforma/modo-mantenimiento.md) — paso a paso para poner el portal detrás de la página `/maintenance` durante una mantención planificada: setear `MAINTENANCE_MODE=true` (+ `MAINTENANCE_BYPASS_SECRET`) + redeploy, verificar con `?gh_bypass`, apagar, qué significan el 503/cookie/mensajes rotativos, qué no hacer y troubleshooting.
 - [Greenhouse Visual Capture](plataforma/captura-visual-playwright.md) — `pnpm fe:capture` para grabar `.webm` + frames PNG marker-based + GIF opcional de cualquier ruta del portal. Reemplaza el patrón de `_cap.mjs` ad-hoc. Scenario DSL declarativo, agent auth canónico, scroll robusto, captura full-page/por sección, 5 capas defense-in-depth Safety, GC de artifacts.
+- [Operar UI Platform y Design System](plataforma/operar-ui-platform-design-system.md) — runbook para diseñar/implementar superficies con primitives, tokens, Composition Shell, Adaptive Card Density, GVC, design-system catalog y gobernanza Figma.
+
+### Herramientas IA
+
+- [Operar AI Tooling, Content y Assets](ai-tooling/operar-ai-tooling-content-assets.md) — administrar catalogo de herramientas IA, licencias, wallets, credit ledger y generacion interna de imagenes/animaciones sin confundirlo con facturacion ni publicacion del Public Site.
 
 ## Plantilla recomendada
 

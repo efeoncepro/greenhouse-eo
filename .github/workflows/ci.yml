@@ -126,6 +126,14 @@ jobs:
         # nuevo BLOQUEA el build.
         run: pnpm route-reachability-gate --strict
 
+      - name: Nexa Intelligence doc gate (TASK-1124)
+        # Si cambia código de un dominio Nexa (system prompt, voz, behavior/routing,
+        # tool/knowledge, evidencia, flags, modelos LLM) pero NO se actualizó ninguno
+        # de sus docs de capa en docs/architecture/nexa-intelligence/, falla. También
+        # falla si un archivo Nexa nuevo no está registrado en el manifest (dominio sin
+        # capa). SSOT: docs/architecture/nexa-intelligence/manifest.json.
+        run: pnpm nexa:doc-gate --changed --base=origin/${{ github.base_ref || 'develop' }}
+
       - name: Migration marker gate (TASK-838 / ISSUE-068)
         # Bloquea PRs con migrations que tengan el patrón "Up Migration vacía +
         # DDL bajo Down Migration" — la clase de bug que causó ISSUE-068
@@ -143,6 +151,13 @@ jobs:
         # el paquete externalizado no existe → ERR_MODULE_NOT_FOUND al arrancar →
         # no escucha en 8080 → deploy failed. Convierte ese crash en CI-fail.
         run: pnpm worker:runtime-deps-gate
+
+      # NOTA (TASK-1160): los gates de CLAUDE.md (budget + rule-audit) viven en su
+      # workflow dedicado `claude-md-governance.yml`, porque ESTE workflow ignora
+      # `**/*.md` y `docs/**` en sus triggers — un PR que solo edita CLAUDE.md NO
+      # dispararía este job, que es justo el vector de re-acreción que el gate debe
+      # cazar. El workflow dedicado dispara en CLAUDE.md + docs/architecture/** + los
+      # scripts del gate.
 
       - name: Test inventory
         run: pnpm test:inventory
@@ -179,4 +194,6 @@ jobs:
         # main and manual checkpoint gate to avoid paying for duplicate develop
         # builds while preserving pre-release evidence.
         if: ${{ github.event_name == 'pull_request' || github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch' }}
+        env:
+          NODE_OPTIONS: --max-old-space-size=6144
         run: pnpm build

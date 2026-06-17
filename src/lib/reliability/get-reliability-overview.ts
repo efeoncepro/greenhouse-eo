@@ -78,6 +78,9 @@ import { getIdentityLegalProfileRevealAnomalySignal } from './queries/identity-l
 import { getIcoMaterializerSkippedSafetySignal } from './queries/ico-materializer-skipped-safety'
 import { getNexaInsightsFreshnessSignal } from './queries/nexa-insights-freshness'
 import { getNexaInsightsNoNewSignalsSignal } from './queries/nexa-insights-no-new-signals'
+import { getNexaTurnDegradedOutcomesSignal } from './queries/nexa-turn-degraded-outcomes'
+import { getNexaActionFailureRateSignal } from './queries/nexa-action-failure-rate'
+import { getNexaActionUnauthorizedProposalRateSignal } from './queries/nexa-action-unauthorized-proposal-rate'
 import { getNotionCorrectionTransitionsSourceAvailabilitySignal } from './queries/notion-correction-transitions-source-availability'
 import { getNotionMetricsOtdClassifierParitySignal } from './queries/notion-metrics-otd-classifier-parity'
 import {
@@ -184,12 +187,15 @@ import { getPostgresConnectionSaturationSignal } from './queries/postgres-connec
 import { getCriticalTablesMissingSignal } from './queries/critical-tables-missing'
 import { getOutboxUnpublishedLagSignal } from './queries/outbox-unpublished-lag'
 import { getOutboxDeadLetterSignal } from './queries/outbox-dead-letter'
+import { getApiPlatformCommandStuckProcessingSignal } from './queries/api-platform-command-stuck-processing'
 import { getReleaseDeployDurationSignal } from './queries/release-deploy-duration'
 import { getReleaseGithubWebhookUnmatchedSignal } from './queries/release-github-webhook-unmatched'
 import { getReleaseLastStatusSignal } from './queries/release-last-status'
 import { getReleasePendingWithoutJobsSignal } from './queries/release-pending-without-jobs'
 import { getReleaseStaleApprovalSignal } from './queries/release-stale-approval'
 import { getReleaseWorkerRevisionDriftSignal } from './queries/release-worker-revision-drift'
+import { getKortexGithubCiLastStatusSignal } from './queries/kortex-github-ci-last-status'
+import { getPublicSiteAstroDeployFailedSignal } from './queries/public-site-astro-deploy-failed'
 import { getEmailRenderFailureSignal } from './queries/email-render-failure'
 import { getNuboxSourceFreshnessSignal } from './queries/nubox-source-freshness'
 import { getNotionConformedDrainFreshnessSignal } from './queries/notion-conformed-drain-freshness'
@@ -509,6 +515,15 @@ interface ReliabilityOverviewSources {
    * error >48h, unknown si sin signals. Subsystem rollup 'delivery'.
    */
   nexaInsightsNoNewSignals?: ReliabilitySignal | null
+  nexaTurnDegradedOutcomes?: ReliabilitySignal | null
+  /**
+   * TASK-1137 — Nexa governed action runtime health:
+   *   - nexa.action.failure_rate (ejecución de acción falló)
+   *   - nexa.action.unauthorized_proposal_rate (SECURITY: LLM propuso una acción no permitida/inexistente)
+   * Steady = 0 ambos. Con el runtime de acciones OFF no hay eventos → siempre ok.
+   */
+  nexaActionFailureRate?: ReliabilitySignal | null
+  nexaActionUnauthorizedProposalRate?: ReliabilitySignal | null
 
   /**
    * TASK-908 Slice 3.5 — Notion correction transitions source availability.
@@ -590,6 +605,14 @@ interface ReliabilityOverviewSources {
    * incidente Figma 2026-05-03 cuando Vercel cron no corría en staging).
    */
   outboxHealth?: ReliabilitySignal[] | null
+
+  /**
+   * TASK-655 Slice 3 — API Platform command idempotency health:
+   *   - platform.command.stuck_processing (commands en processing pasado su TTL)
+   * Steady state = 0. Si > 0, un runtime crasheó entre el claim y el cierre de un
+   * command idempotente y la Idempotency-Key quedó wedge (409 in-progress perpetuo).
+   */
+  apiPlatformCommandStuckProcessing?: ReliabilitySignal | null
 
   /**
    * TASK-408 Slice 4 — Email render/template safety net:
@@ -850,6 +873,20 @@ interface ReliabilityOverviewSources {
   productionRelease?: ReliabilitySignal[] | null
 
   /**
+   * TASK-1166 — Kortex GitHub repo control plane runtime signal.
+   *   - platform.kortex.github.ci_last_status (runtime)
+   * Roll up bajo moduleKey='platform' hasta que exista un subsystem Kortex dedicado.
+   */
+  kortexGithubCiLastStatus?: ReliabilitySignal | null
+
+  /**
+   * TASK-1161 — Public Site Astro/Vercel binding reader signal.
+   *   - public_site.astro_deploy_failed (incident)
+   * Roll up bajo moduleKey='platform' hasta que exista subsystem Public Site dedicado.
+   */
+  publicSiteAstroDeployFailed?: ReliabilitySignal | null
+
+  /**
    * TASK-910 Slice 4 — Notion Demo Teamspace Sandbox signals (6 canonical):
    *   - notion.metrics.shadow_paridad_rpa_demo (drift)
    *   - notion.metrics.echo_loop_detected_demo (drift)
@@ -945,6 +982,10 @@ export const buildReliabilityOverview = (
     // generation. Complementario a nexaInsightsFreshness (que cruza BQ vs PG
     // serving) + icoMaterializerSkippedSafety (que detecta gate active).
     ...(sources.nexaInsightsNoNewSignals ? [sources.nexaInsightsNoNewSignals] : []),
+    ...(sources.nexaTurnDegradedOutcomes ? [sources.nexaTurnDegradedOutcomes] : []),
+    // TASK-1137 — Nexa governed action runtime health (failure rate + unauthorized proposal rate).
+    ...(sources.nexaActionFailureRate ? [sources.nexaActionFailureRate] : []),
+    ...(sources.nexaActionUnauthorizedProposalRate ? [sources.nexaActionUnauthorizedProposalRate] : []),
     // TASK-908 Slice 3.5 — Notion correction transitions source availability.
     // Pre-TASK-908b deployment: 100% unavailable esperado (tabla vacía).
     // Post-deployment + backfill: < 10% steady state. Visibiliza coverage del
@@ -981,6 +1022,8 @@ export const buildReliabilityOverview = (
     ...(sources.nexaKnowledgeRetrieval ?? []),
     // TASK-773 Slice 4 — Outbox publisher health (lag + dead_letter).
     ...(sources.outboxHealth ?? []),
+    // TASK-655 Slice 3 — API Platform command idempotency health (stuck processing).
+    ...(sources.apiPlatformCommandStuckProcessing ? [sources.apiPlatformCommandStuckProcessing] : []),
     // TASK-408 Slice 4 — Email render/template safety net.
     ...(sources.emailRenderFailure ? [sources.emailRenderFailure] : []),
     // TASK-775 Slice 5 — Vercel ↔ Cloud Scheduler drift (async-critical crons).
@@ -1076,6 +1119,10 @@ export const buildReliabilityOverview = (
     ...(sources.commercialHealth ?? []),
     // TASK-848 Slice 7 — Production Release Control Plane signals (2 of 4 V1).
     ...(sources.productionRelease ?? []),
+    // TASK-1166 — Kortex GitHub repository control plane runtime signal.
+    ...(sources.kortexGithubCiLastStatus ? [sources.kortexGithubCiLastStatus] : []),
+    // TASK-1161 — Public Site Astro/Vercel production deploy failure.
+    ...(sources.publicSiteAstroDeployFailed ? [sources.publicSiteAstroDeployFailed] : []),
     // TASK-910 Slice 4 — Notion Demo Teamspace Sandbox signals (6 canonical).
     // 5 bajo moduleKey 'delivery' + 1 CRITICAL bajo moduleKey 'payroll'.
     ...(sources.notionMetricsDemo ?? []),
@@ -1395,6 +1442,12 @@ export const getReliabilityOverview = async (
         ])
           .then(signals => signals.filter((s): s is NonNullable<typeof s> => s !== null))
           .catch(() => null)
+
+  // TASK-655 Slice 3 — API Platform command idempotency health (stuck processing).
+  const apiPlatformCommandStuckProcessing =
+    preloadedSources.apiPlatformCommandStuckProcessing !== undefined
+      ? preloadedSources.apiPlatformCommandStuckProcessing
+      : await getApiPlatformCommandStuckProcessingSignal().catch(() => null)
 
   // TASK-408 Slice 4 — Email render/template failures. Reader propio con
   // degradacion honesta para no envenenar todo el reliability overview.
@@ -1833,6 +1886,22 @@ export const getReliabilityOverview = async (
       ? preloadedSources.nexaInsightsNoNewSignals
       : await getNexaInsightsNoNewSignalsSignal().catch(() => null)
 
+  const nexaTurnDegradedOutcomes =
+    preloadedSources.nexaTurnDegradedOutcomes !== undefined
+      ? preloadedSources.nexaTurnDegradedOutcomes
+      : await getNexaTurnDegradedOutcomesSignal().catch(() => null)
+
+  // TASK-1137 — Nexa governed action runtime health (failure rate + unauthorized proposal rate).
+  const nexaActionFailureRate =
+    preloadedSources.nexaActionFailureRate !== undefined
+      ? preloadedSources.nexaActionFailureRate
+      : await getNexaActionFailureRateSignal().catch(() => null)
+
+  const nexaActionUnauthorizedProposalRate =
+    preloadedSources.nexaActionUnauthorizedProposalRate !== undefined
+      ? preloadedSources.nexaActionUnauthorizedProposalRate
+      : await getNexaActionUnauthorizedProposalRateSignal().catch(() => null)
+
   // TASK-908 Slice 3.5 — Notion correction transitions source availability.
   // Single reader; LEFT JOIN tasks completadas vs task_status_transitions.
   // Degrada honestamente a `unknown` si la query falla.
@@ -1864,6 +1933,16 @@ export const getReliabilityOverview = async (
         ])
           .then(signals => signals.filter((s): s is NonNullable<typeof s> => s !== null))
           .catch(() => null)
+
+  const kortexGithubCiLastStatus =
+    preloadedSources.kortexGithubCiLastStatus !== undefined
+      ? preloadedSources.kortexGithubCiLastStatus
+      : await getKortexGithubCiLastStatusSignal().catch(() => null)
+
+  const publicSiteAstroDeployFailed =
+    preloadedSources.publicSiteAstroDeployFailed !== undefined
+      ? preloadedSources.publicSiteAstroDeployFailed
+      : await getPublicSiteAstroDeployFailedSignal().catch(() => null)
 
   // TASK-807 — Commercial Health readers (6). Cada reader degrada
   // honestamente a `unknown` si su query falla. Incluye stale_progress de
@@ -2026,6 +2105,7 @@ export const getReliabilityOverview = async (
     knowledgeNotionIngestDeadLetter,
     nexaKnowledgeRetrieval,
     outboxHealth,
+    apiPlatformCommandStuckProcessing,
     emailRenderFailure,
     cronStagingDrift,
     accountBalancesFxDrift,
@@ -2079,9 +2159,14 @@ export const getReliabilityOverview = async (
     servicesEngagement,
     commercialHealth,
     productionRelease,
+    kortexGithubCiLastStatus,
+    publicSiteAstroDeployFailed,
     icoMaterializerSkippedSafety,
     nexaInsightsFreshness,
     nexaInsightsNoNewSignals,
+    nexaTurnDegradedOutcomes,
+    nexaActionFailureRate,
+    nexaActionUnauthorizedProposalRate,
     notionCorrectionTransitionsSourceAvailability,
     notionMetricsOtdClassifierParity,
     notionMetricsDemo,

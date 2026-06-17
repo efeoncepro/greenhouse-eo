@@ -1,0 +1,83 @@
+{
+  "contractVersion": "contentFactoryExistingPostRefreshDraftPlan.v1",
+  "generatedAt": "2026-06-14T20:44:17.868Z",
+  "mode": "dry_run",
+  "sendsWordPressWrite": false,
+  "modifiesPublishedSource": false,
+  "sourcePatchPlan": {
+    "contractVersion": "contentFactoryPatchPlan.v1",
+    "generatedAt": "2026-06-14T20:34:34.777Z",
+    "wordpressPostId": 248398,
+    "sourceFingerprint": "c613e8ce9d991c289de7d7aef396a64b4b0fddcf8aa0563e7e17c6291a1289b5",
+    "operationCount": 1
+  },
+  "bridgeRequest": {
+    "contractVersion": "greenhouse-wp-bridge-existing-post-refresh.v1",
+    "method": "POST",
+    "route": "/greenhouse-wp-bridge/v1/drafts/from-existing-post",
+    "status": "private",
+    "greenhouseManifestId": "content-factory.refresh.post-248398.que-es-loop-marketing.20260614204417",
+    "body": {
+      "contractVersion": "greenhouse-wp-bridge-existing-post-refresh.v1",
+      "greenhouseManifestId": "content-factory.refresh.post-248398.que-es-loop-marketing.20260614204417",
+      "sourcePostId": 248398,
+      "sourceFingerprint": "c613e8ce9d991c289de7d7aef396a64b4b0fddcf8aa0563e7e17c6291a1289b5",
+      "status": "private",
+      "slug": "que-es-loop-marketing-gh-refresh-20260614204417",
+      "operations": [
+        {
+          "operation": "update_text",
+          "targetPath": "36",
+          "expectedFingerprint": "a8ff432ccd6d84260d116a9f5011f80357866f9927e88ed68a2a6b5fb721ab93",
+          "proposedText": "Según HubSpot, el 61 % de los marketers cree que el marketing vive su mayor disrupción en 20 años por la IA; el Loop convierte esa presión en ciclos cortos de aprendizaje, no en campañas más pesadas (HubSpot, State of Marketing 2026).",
+          "rationale": "Use a verified HubSpot factual highlight that supports the article's argument that Loop Marketing adds AI-era agility on top of inbound."
+        }
+      ]
+    },
+    "signedHeaders": {
+      "X-Greenhouse-Timestamp": "1781469857",
+      "X-Greenhouse-Request-Id": "gh-4e23e005-eea0-4f48-bc0d-b47bc7bf32bf",
+      "X-Greenhouse-Actor": "content-factory-refresh-draft-plan",
+      "X-Greenhouse-Environment": "local-dry-run",
+      "X-Greenhouse-Body-Sha256": "eadf96a1ba4b9305feada5a93f5e9c299349af767545984f7f77102fadd8e578",
+      "X-Greenhouse-Signature": "sha256=4b64de42fb0...redacted"
+    },
+    "canonicalRequestPreview": "GHWPB-HMAC-SHA256\nPOST\n/greenhouse-wp-bridge/v1/drafts/from-existing-post\neadf96a1ba4b9305feada5a93f5e9c299349af767545984f7f77102fadd8e578\n1781469857\ngh-4e23e005-eea0-4f48-bc0d-b47bc7bf32bf\ncontent-factory-refresh-draft-plan\nlocal-dry-run"
+  },
+  "rolloutPreconditions": [
+    {
+      "code": "bridge_endpoint_deployed",
+      "status": "pending",
+      "notes": "greenhouse-wp-bridge must expose the from-existing-post draft refresh endpoint before send."
+    },
+    {
+      "code": "bridge_writes_enabled_window",
+      "status": "pending",
+      "notes": "GREENHOUSE_WP_BRIDGE_WRITES_ENABLED must be enabled only for an approved short draft/private refresh window."
+    },
+    {
+      "code": "signed_request_secret_available",
+      "status": "pending",
+      "notes": "Use PUBLIC_WEBSITE_WORDPRESS_BRIDGE_SHARED_SECRET_SECRET_REF at send time; this dry-run uses a synthetic secret."
+    },
+    {
+      "code": "source_revalidation_required",
+      "status": "satisfied",
+      "notes": "The bridge request carries sourceFingerprint plus per-operation block fingerprints and must revalidate both before creating a clone."
+    },
+    {
+      "code": "draft_private_only",
+      "status": "satisfied",
+      "notes": "Plan targets WordPress status draft/private and never publish."
+    },
+    {
+      "code": "human_review_required",
+      "status": "pending",
+      "notes": "A human must review the generated draft preview before any publish path exists."
+    }
+  ],
+  "rollback": {
+    "strategy": "trash_refresh_draft_by_manifest_id",
+    "notes": "If a future send creates this draft, rollback should trash only the Greenhouse-owned draft identified by content-factory.refresh.post-248398.que-es-loop-marketing.20260614204417."
+  }
+}

@@ -1,0 +1,80 @@
+{
+  "ok": true,
+  "contractVersion": "publicSiteEditorialPostTool.v1",
+  "generatedAt": "2026-06-14T21:10:23+00:00",
+  "mode": "apply_private_clone",
+  "modifiesPublishedSource": false,
+  "operation": "edit_pullquote",
+  "source": {
+    "postId": 248398,
+    "title": "¿Qué es Loop Marketing? El framework que reemplaza al funnel y evoluciona el inbound",
+    "status": "publish",
+    "slug": "que-es-loop-marketing",
+    "permalink": "https://efeoncepro.com/loop-marketing/que-es-loop-marketing/"
+  },
+  "selection": {
+    "path": "58",
+    "text": "Según un estudio de Gartner, el 83 % de los compradores B2B investigan de forma no lineal, yendo adelante y atrás entre consideración, comparación y decisión (Gartner, 2023).",
+    "nearHeading": {
+      "path": "54",
+      "text": "📉 El funnel = linealidad muerta"
+    },
+    "matchesNearHeading": true
+  },
+  "replacement": "Según Gartner, el 61 % de los compradores B2B prefiere una experiencia sin vendedor, mientras el journey real avanza en looping entre tareas de compra y no en una línea recta (Gartner, B2B Buying Journey).",
+  "draft": {
+    "postId": 250136,
+    "status": "private",
+    "slug": "que-es-loop-marketing-gh-quote-test-20260614-v2",
+    "editUrl": "https://efeoncepro.com/wp-admin/post.php?post=250136&action=edit",
+    "previewUrl": "https://efeonce-web.vercel.app/api/preview?id=250136&type=post&token=577d61e10f91e156684d57db458f38b3dc34a465d60372584c03a0fac506b2a7&ts=1781471423",
+    "manifestId": "content-factoryeditorialquote-test24839820260614v2"
+  },
+  "candidates": [
+    {
+      "path": "36",
+      "text": "Según HubSpot, el 82 % de los líderes de marketing reconocen que sus equipos pierden agilidad porque dependen de reportes trimestrales y campañas pesadas, en lugar de operar en ciclos cortos que aprenden sobre la marcha (HubSpot Research).",
+      "nearHeading": {
+        "path": "28",
+        "text": "🌱 Filosofía de base: inbound + un marco operativo nuevo"
+      },
+      "matchesNearHeading": false
+    },
+    {
+      "path": "58",
+      "text": "Según un estudio de Gartner, el 83 % de los compradores B2B investigan de forma no lineal, yendo adelante y atrás entre consideración, comparación y decisión (Gartner, 2023).",
+      "nearHeading": {
+        "path": "54",
+        "text": "📉 El funnel = linealidad muerta"
+      },
+      "matchesNearHeading": true
+    },
+    {
+      "path": "72",
+      "text": "Un dato revelador: el 74 % de los líderes de marketing que adoptan IA y experimentación continua dicen que su equipo es más ágil para responder a cambios del mercado (McKinsey, State of AI in 2024).",
+      "nearHeading": {
+        "path": "68",
+        "text": "♾️ El loop = acción continua"
+      },
+      "matchesNearHeading": false
+    },
+    {
+      "path": "264",
+      "text": "📊 Según Deloitte, las empresas que integran su data layer con marketing automation logran mejorar un 20–30 % la eficiencia en gasto publicitario (Deloitte Digital, The Power of Data-Driven Marketing).",
+      "nearHeading": {
+        "path": "260",
+        "text": "🔌 Stack tecnológico: cómo se integra el Loop"
+      },
+      "matchesNearHeading": false
+    },
+    {
+      "path": "276",
+      "text": "📌 Gartner advierte que el 70 % de los equipos de marketing que no adopten modelos ágiles seguirán perdiendo relevancia frente a competidores data-driven (Gartner, Future of Marketing Agility).",
+      "nearHeading": {
+        "path": "268",
+        "text": "🔄 Cambio cultural: de campañas a ciclos"
+      },
+      "matchesNearHeading": false
+    }
+  ]
+}

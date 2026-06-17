@@ -1,5 +1,743 @@
 # Release 2026-06-10 #2 — develop→main `6c649b2a6` RELEASED
 
+## Sesión 2026-06-17 — TASK-1161 Public Site Astro binding reader staging verified — Codex
+
+> **Estado:** staging verified, production rollout pendiente en `develop`; sin branch/worktree nuevo. Cero production deploy/cutover y cero writes a GitHub/WordPress/Kinsta.
+
+- **Hook/subagentes:** `pnpm codex:task-hook TASK-1161`; Cicero (GitHub/Vercel helpers), Laplace (capabilities/API/reliability) y Erdos (docs cierre).
+- **Implementado:** reader server-only `src/lib/public-site/astro/**`, config tipado `src/config/public-site-astro-binding.ts`, endpoint `GET /api/admin/public-site/binding`, capabilities `public_site.runtime_binding.read`/`public_site.route_ownership.read`, migración `20260617185349908_task-1161-public-site-binding-capabilities.sql`, y signal `public_site.astro_deploy_failed`.
+- **Runtime evidence:** `pnpm pg:connect:migrate` aplicó la migración y regeneró Kysely types. Smoke local del reader: Vercel production/staging `READY`, SHA `4d050fb`; GitHub degradó por falta de token app/PAT local, y `gh api` confirmó `main`/`develop` en el mismo SHA que Vercel.
+- **Rollout staging:** `vercel deploy --target=staging --scope efeonce-7670142f --yes` creó `https://greenhouse-3jckt2aq4-efeonce-7670142f.vercel.app` (`dpl_6r6aKuS6P8eBWYrzJRR6thppmquw`), target `staging`, `Ready`, con aliases `dev-greenhouse.efeoncepro.com` y `greenhouse-eo-env-staging-efeonce-7670142f.vercel.app`.
+- **Smokes staging:** `GET /api/admin/public-site/binding` con agent session → HTTP `200`, `contractVersion=public-site-astro-binding.v1`, `status=ok`, `confidence=high`, `degradedSources=[]`, GitHub `main`/`develop` en `4d050fb`, Vercel production/staging `READY`. `/api/admin/reliability` incluye `public_site.astro_deploy_failed` con `severity=ok`. Logs de error del deployment en últimos 30m: none.
+- **Validación:** Vitest focal 5 files / 17 tests passed; eslint focal; `tsc --noEmit` con heap ampliado; `pnpm build` verde con warning preexistente de Roadmap dynamic pattern; task/ops/docs/QA gates verdes. QA verdict operativo: staging verified / production rollout pendiente.
+- **Docs:** nuevo `docs/architecture/GREENHOUSE_PUBLIC_SITE_ASTRO_BINDING_READER_V1.md`, updates en Runtime Strategy, Reliability, EPIC-019, manifest, docs funcional/manual, `project_context.md`, changelog y task lifecycle.
+- **Pendiente operacional:** repetir smoke en `production` después de release/promoción aprobada; no hay command de deploy/rollback todavía.
+
+## Sesión 2026-06-17 — Kortex GitHub commands staging ON — Codex
+
+> **Estado:** staging queda con GitHub commands de Kortex prendidos para pruebas gobernadas. Production no fue tocado.
+
+- **Flags staging aplicados:** `KORTEX_GITHUB_COMMANDS_ENABLED=true`, `KORTEX_GITHUB_WORKFLOW_DISPATCH_ENABLED=true`, `KORTEX_GITHUB_ALLOWED_WORKFLOWS=CI`, `KORTEX_GITHUB_ALLOWED_REFS=main,develop`.
+- **Redeploy staging:** `https://greenhouse-9j6rau39c-efeonce-7670142f.vercel.app`, id `dpl_4cha9fkbXZSPc6QqjhABYMaovMN7`, target `staging`, status `Ready`; aliases `https://dev-greenhouse.efeoncepro.com` y `https://greenhouse-eo-env-staging-efeonce-7670142f.vercel.app`.
+- **Smoke reader:** `GET /api/admin/kortex/github-control-plane` -> HTTP `200`, `confidence=high`, repo `efeoncepro/kortex`, workflow `CI`, latest run `27681588991` success, correlation `matched`.
+- **Smoke guardrail global:** `kortex.github.workflow.rerun_failed` contra run exitoso `27681588991` -> HTTP `409`, code `kortex_github_command_not_allowed`, details `conclusion=success`; confirma que el flag global ya no bloquea y que no se re-runnea un CI exitoso.
+- **Smoke guardrail dispatch:** `kortex.github.workflow.dispatch` sobre `CI/main` sin frase humana -> HTTP `409`, code `kortex_github_confirmation_required`; confirma que dispatch esta habilitado por flag pero sigue exigiendo `DISPATCH KORTEX WORKFLOW`.
+- **Producción:** GitHub commands siguen apagados por diseño; cualquier flip productivo requiere aprobacion separada, allowlist revisada, frase humana y smoke productivo dedicado.
+- **Nota:** TASK-1161 ya vive en `docs/tasks/in-progress/TASK-1161-public-site-greenhouse-binding-reader.md` como staging verified / production rollout pendiente; no queda task sibling en `to-do/`.
+
+## Sesión 2026-06-17 — TASK-1166 Kortex GitHub Repo Control Plane complete — Codex
+
+> **Estado:** complete en `develop`; staging deploy + smokes verdes. Sin cambio de rama/worktree.
+
+- **Entregable:** `docs/tasks/complete/TASK-1166-kortex-github-repo-control-plane.md`.
+- **Implementado:** reader server-only `src/lib/kortex/github-control-plane/**`, endpoint admin `GET /api/admin/kortex/github-control-plane`, command adapter GitHub `POST /api/admin/kortex/github-commands`, registry allowlisted `kortex.github.workflow.rerun_failed` / `kortex.github.workflow.dispatch`, y signal `platform.kortex.github.ci_last_status`.
+- **Guardrails:** repo hardcoded `efeoncepro/kortex`; commands default OFF (`KORTEX_GITHUB_COMMANDS_ENABLED=false`, `KORTEX_GITHUB_WORKFLOW_DISPATCH_ENABLED=false`), `Idempotency-Key`, `executeApiPlatformCommand`, workflow/ref allowlists y frase `DISPATCH KORTEX WORKFLOW` para dispatch.
+- **Docs:** nuevo ADR `docs/architecture/GREENHOUSE_KORTEX_GITHUB_CONTROL_PLANE_V1.md` + updates en `docs/architecture/kortex/**`, task, handoff y changelog.
+- **Evidencia `gh`:** repo privado `efeoncepro/kortex`, default branch `main`, ramas `main`/`develop`/`feat/efeonce-visual-identity`, workflow `CI` activo, ultimo run `main` `7266902` success.
+- **Rollout staging:** Vercel deploy `https://greenhouse-bfym2m5lx-efeonce-7670142f.vercel.app`, id `dpl_3dbr9qmtmZPYwxmyLQQhZmxXEMJ2`, target `staging`, `Ready`; aliases `dev-greenhouse.efeoncepro.com` y `greenhouse-eo-env-staging-efeonce-7670142f.vercel.app`.
+- **Smokes staging:** `GET /api/admin/kortex/github-control-plane` -> HTTP `200`, `confidence=high`, repo `efeoncepro/kortex`, latest CI run `27681588991` success, correlation `matched`, warnings `[]`; `POST /api/admin/kortex/github-commands` con flags OFF -> HTTP `409`, code `kortex_github_command_disabled`; `/api/admin/reliability` incluye `platform.kortex.github.ci_last_status` severity `ok`.
+- **Validacion local/cierre:** Vitest focal TASK-1166 -> 5 files / 15 tests passed; `tsc --noEmit`, `pnpm lint`, `pnpm build`, `pnpm task:lint --task TASK-1166`, `pnpm ops:lint --changed`, `pnpm docs:closure-check`, `git diff --check` verdes. Build local/remoto emitio warning preexistente de Roadmap dynamic pattern, no relacionado.
+- **Pendiente operacional:** production commands siguen OFF por diseño; no prender `KORTEX_GITHUB_COMMANDS_ENABLED` ni `KORTEX_GITHUB_WORKFLOW_DISPATCH_ENABLED` sin aprobacion explicita, workflow/ref allowlisted y runbook de release/deploy Kortex.
+- **Nota:** TASK-1161 ya fue tomado en su propia sesión y vive en `docs/tasks/in-progress/TASK-1161-public-site-greenhouse-binding-reader.md`.
+
+## Sesión 2026-06-17 — Kortex live/admin staging flags ON — Codex
+
+> **Estado:** staging queda con adapter, live execute y admin/breakglass prendidos para pruebas. Production sigue sin cambios.
+
+- **Flags staging aplicados:** `KORTEX_COMMAND_ADAPTER_ENABLED=true`, `KORTEX_COMMAND_LIVE_EXECUTE_ENABLED=true`, `KORTEX_COMMAND_ADMIN_ENABLED=true`, `KORTEX_COMMAND_ALLOWED_PORTALS=51183921,48713323,9b0a6e91-0e08-4642-bc42-54a4b5c83ad8`.
+- **Secret admin staging:** `KORTEX_COMMAND_ADMIN_TOKEN` provisionado desde Secret Manager `efeonce-kortex-dev/kortex-admin-bootstrap-token` como env var sensitive en Vercel; no exponer el valor.
+- **Redeploy staging final:** `https://greenhouse-dnr2e8c04-efeonce-7670142f.vercel.app` (`target=staging`, `Ready`), aliased a `https://dev-greenhouse.efeoncepro.com` y `https://greenhouse-eo-env-staging-efeonce-7670142f.vercel.app`.
+- **Smoke seguro:** `kortex.strategy.normalize` -> HTTP `200`, `status=completed`, `commandExecutionId=EO-APC-86281ABC`.
+- **Smoke live flag:** `kortex.strategy.release_candidate.execute_workflows` con release candidate dummy + frase humana -> HTTP `409` `kortex_preview_required`, confirmando que ya no bloquea por `live_execute_disabled`; live real sigue requiriendo dry-run vigente y release candidate real.
+- **Smoke admin token/flag:** `kortex.admin.users.bootstrap_e2e_agent` -> HTTP `200`, `status=completed`, `commandExecutionId=EO-APC-E138ACF4`; valida flag admin + token bootstrap sin tocar HubSpot.
+
+## Sesión 2026-06-17 — Kortex staging flags enabled for testing — Codex
+
+> **Estado:** staging operativo para pruebas seguras. Live external writes y admin/breakglass siguen apagados por diseño.
+
+- **Flags staging aplicados:** `KORTEX_COMMAND_ADAPTER_ENABLED=true`, `KORTEX_COMMAND_LIVE_EXECUTE_ENABLED=false`, `KORTEX_COMMAND_ADMIN_ENABLED=false`, `KORTEX_COMMAND_ALLOWED_PORTALS=51183921,48713323,9b0a6e91-0e08-4642-bc42-54a4b5c83ad8`.
+- **Redeploy staging:** `https://greenhouse-3w4uzzc5f-efeonce-7670142f.vercel.app` (`target=staging`, `Ready`), aliased a `https://dev-greenhouse.efeoncepro.com` y `https://greenhouse-eo-env-staging-efeonce-7670142f.vercel.app`.
+- **Smoke reader:** `GET /api/admin/kortex/control-plane?hubspot_portal_id=48713323` -> HTTP `200`, binding `EO-SPB-0002`, repo `efeoncepro/kortex`, latest Kortex commit `7266902`.
+- **Smoke command seguro:** `kortex.strategy.normalize` -> HTTP `200`, `status=completed`, `commandExecutionId=EO-APC-24E6F7A0`.
+- **Guardrails verificados:** `kortex.strategy.release_candidate.execute_workflows` -> HTTP `409` `Kortex live execute is disabled in this environment`; `kortex.admin.snapshots.trigger` -> HTTP `409` `Kortex admin commands are disabled in this environment`.
+
+## Sesión 2026-06-17 — Kortex architecture docs by layer — Codex
+
+> **Estado:** docs complete, pendiente commit/push si el operador lo pide.
+
+- **Entregado:** nueva carpeta `docs/architecture/kortex/` siguiendo el patron por capas de Nexa: `connection/`, `capabilities/`, `commands/`, `governance/`, `operations/`.
+- **Contenido:** conexion Greenhouse -> Kortex (`EO-SPB-0002`, portal HubSpot `48713323`), capacidades logradas, catalogo completo de comandos, guardrails/flags/confirmaciones, runbook de smokes y rollout.
+- **Enlaces:** ADR del command adapter, documentacion funcional, manual de uso y `project_context.md` apuntan al mapa por capas.
+- **Nota operativa:** Kortex puede tener Cloud Run y Vercel; la capa `connection/` documenta que el adapter actual usa Cloud Run control-plane, pero futuras superficies Kortex en Vercel deben entrar como capabilities/commands explicitos.
+
+## Sesión 2026-06-17 — TASK-1165 Kortex full command surface — Codex
+
+> **Estado:** complete. Código, docs, staging deploy y smoke externo cerrados; production live/admin sigue apagado por diseño.
+
+- **Objetivo:** habilitar todos los comandos mutativos reales de Kortex desde Greenhouse sin abrir proxy arbitrario.
+- **Implementado:** registry declarativo `src/lib/kortex/commands/registry.ts` con 21 comandos, metodo HTTP, upstream path, required payload keys, operation kind y tiers `safe|stateful|external_write|admin_breakglass`.
+- **Comandos cubiertos:** hub profile, admin snapshots/auth/users/bootstrap, audit, normalize/intake/seed-from-audit, workspace update/compilation/compile/approval, release execute/dry-run/workflows/custom objects, conversations/chat/extract e internal operation execute.
+- **Guardrails nuevos:** unknown command reject; allowlist de paths derivada del registry; `external_write` requiere `KORTEX_COMMAND_LIVE_EXECUTE_ENABLED`, frase `EXECUTE KORTEX RELEASE` y dry-run reciente cuando aplica; `admin_breakglass` requiere `KORTEX_COMMAND_ADMIN_ENABLED`, frase `EXECUTE KORTEX ADMIN COMMAND` y header server-only `X-Kortex-Admin-Token` desde `KORTEX_COMMAND_ADMIN_TOKEN`/`KORTEX_ADMIN_BOOTSTRAP_TOKEN`.
+- **Compatibilidad:** se mantienen los cuatro comandos de TASK-1164: `kortex.audit.run`, `kortex.strategy.compile`, `kortex.strategy.release_candidate.dry_run`, `kortex.strategy.release_candidate.execute`.
+- **Vercel package hygiene:** el primer `vercel deploy --archive=tgz` subio `7.2GB` porque `.captures` (`7.4GB`), `.codex`, `.claude`, videos y artefactos locales no estaban ignorados. Se corrigio `.vercelignore`; el redeploy limpio subio `57MB`. Deployment inflado `greenhouse-hyqnb6n6k` fue removido con scope explicito `efeonce-7670142f`.
+- **Rollout staging:** `KORTEX_COMMAND_ADMIN_ENABLED=false` agregado; deploy limpio `https://greenhouse-s63g4vzwt-efeonce-7670142f.vercel.app` Ready y aliased a staging.
+- **Smokes staging:** control-plane `GET ...hubspot_portal_id=48713323` -> `200`; `kortex.audit.run` -> `200 completed`, `EO-APC-F75FD63E`, `d8b4b769-4c33-4193-bb15-9545253ac521`; `kortex.strategy.normalize` -> `200 completed`, `EO-APC-0D842212`; `kortex.strategy.release_candidate.execute_workflows` -> `409 kortex_live_execute_disabled`; `kortex.admin.snapshots.trigger` -> `409 kortex_admin_command_disabled`.
+- **Docs actualizados:** ADR `GREENHOUSE_KORTEX_COMMAND_ADAPTER_V1.md`, documentacion funcional, manual de uso y task complete listan catalogo/tier/flags/evidencia.
+- **Validación local:** `pnpm test src/lib/kortex/commands/adapter.test.ts src/lib/kortex/commands/client.test.ts src/app/api/admin/kortex/commands/route.test.ts` -> 17 tests verdes; `NODE_OPTIONS=--max-old-space-size=8192 pnpm exec tsc --noEmit --pretty false` verde.
+- **Pendiente operacional:** habilitar production live/admin solo con aprobacion explicita del operador, dry-run previo valido y owner humano presente.
+
+## Sesión 2026-06-17 — TASK-1164 Kortex command adapter — Codex
+
+> **Estado:** complete. Staging redeployed y smoke externo Greenhouse → Kortex → HubSpot runtime OK contra portal HubSpot `48713323`.
+
+- **Objetivo:** habilitar desde Greenhouse comandos gobernados hacia Kortex para auditoria, compile, dry-run/preview y execute de release candidates aprobados, preservando que Kortex sea el owner runtime de las mutaciones HubSpot.
+- **Implementado:** `POST /api/admin/kortex/commands`; `src/lib/kortex/commands/**`; contrato `greenhouse-kortex-command-adapter.v1`; ADR `docs/architecture/GREENHOUSE_KORTEX_COMMAND_ADAPTER_V1.md`; documentacion funcional y manual operativo.
+- **Guardrails activos:** usa `executeApiPlatformCommand` / `greenhouse_core.api_platform_command_executions`; exige `Idempotency-Key`; resuelve binding via TASK-1162; no muta HubSpot directo desde Greenhouse; live execute default OFF; no agrega `kortex.*` a entitlements internos; staging-first.
+- **Discovery inicial:** TASK-1162 reader existe y es read-only; Kortex expone `POST /api/v1/audits/run`, `POST /api/v1/strategy/workspaces/{id}/compile` y `POST /api/v1/strategy/release-candidates/{id}/execute`, pero el OpenAPI actual no declara auth/idempotency dedicado para Greenhouse.
+- **Rollout externo aplicado:** commit `076d31f99` pusheado a `origin/develop`; Vercel staging inicial `https://greenhouse-h4py587vz-efeonce-7670142f.vercel.app` quedó `Ready` con branch `develop`/commit `076d31f`; env staging iniciales: `KORTEX_COMMAND_ADAPTER_ENABLED=true`, `KORTEX_COMMAND_LIVE_EXECUTE_ENABLED=false`, `KORTEX_COMMAND_ALLOWED_PORTALS=51183921`, `KORTEX_COMMAND_API_BASE_URL=https://kortex-control-plane-758246035804.us-central1.run.app`.
+- **Smoke staging inicial:** `GET /api/admin/kortex/control-plane?hubspot_portal_id=51183921` -> `200`; `POST /api/admin/kortex/commands` live execute -> `409 kortex_live_execute_disabled` esperado; `POST /api/admin/kortex/commands` `kortex.audit.run` -> `400 kortex_preflight_failed` porque Kortex upstream devolvia HubSpot refresh `403 BAD_SCOPES / missing or invalid scopes`.
+- **Diagnóstico externo Kortex:** Cloud Run `kortex-control-plane` vive en project `efeonce-kortex-dev`; DB `integration.hubspot_app_installations` mostraba portal `51183921`, app_role `runtime`, `install_status='reconnect_required'`; los refresh-token secrets runtime/legacy tenian el mismo hash y ambos fallaban refresh; el secret embedded refrescaba pero era low-scope y no servia para runtime broad-scope.
+- **Scopefix Kortex aplicado (2026-06-17):** siguiendo la documentacion oficial de HubSpot para `requiredScopes`/`conditionallyRequiredScopes`/`optionalScopes`, Kortex dejo de enviar opcionales en el install base. En `efeoncepro/kortex` commit `d664be9`, `crm.schemas.custom.write` quedo condicional, `tax_rates.read` opcional, `settings.currencies.*` y `settings.billing.write` fuera del runtime install, y `/hubspot/oauth/authorize` solo envia `optional_scope` con `include_optional_scopes=true`. Cloud Run `kortex-control-plane-00103-pw6` sirve 100%; verificacion del URL para portal `51183921`: `optional_scope=false`, `required_count=68`, sin custom-write/tax-rates/currencies/billing en required. Follow-up commit Kortex `7266902` desplegado en `kortex-control-plane-00104-4dh`: el install base ahora usa el selector generico `https://app.hubspot.com/oauth/authorize` y no guarda `hubspot_portal_id` esperado en el state, para permitir conectar otro portal.
+- **Cierre externo:** el operador completo el re-consent en portal HubSpot `48713323` (`www.efeoncepro.com`). Kortex DB: runtime `active`, `scope_count=68`, `reconnect_required=false`. Greenhouse binding creado: `EO-SPB-0002` para Kortex portal `9b0a6e91-0e08-4642-bc42-54a4b5c83ad8`, status `active`, scope `internal`. Vercel staging allowlist actualizado a `51183921,48713323,9b0a6e91-0e08-4642-bc42-54a4b5c83ad8` y redeploy remoto Ready en `https://greenhouse-mq9uqn9hz-efeonce-7670142f.vercel.app`.
+- **Smoke final:** `POST /api/admin/kortex/commands` `kortex.audit.run` con `hubspotPortalId=48713323` -> `200`, `commandExecutionId=EO-APC-9D220439`, `kortexOperationId=025a960d-576f-48e3-ab16-e6183c6bb0ae`, summary `audit_run/completed`.
+- **Validación local:** tests focales route/adapter verdes (10 tests); `pnpm task:lint --task TASK-1164`; `pnpm ops:lint --changed`; `NODE_OPTIONS=--max-old-space-size=8192 pnpm exec tsc --noEmit --pretty false`; `pnpm docs:closure-check`; `git diff --check`; `pnpm route-reachability-gate`; `NODE_OPTIONS=--max-old-space-size=8192 pnpm build` verde. Build emitio warning preexistente de Roadmap dynamic file pattern, no relacionado.
+
+## Sesión 2026-06-17 — TASK-1163 ICO member metrics freshness guard + Daniela OTD/RpA — Codex
+
+> **Estado:** complete en `develop`; código + reparación BQ aplicada; commit incluido en `origin/develop`.
+
+- **Incidente:** Daniela Ferreira veía OTD ~`5%` porque `ico_engine.metrics_by_member` para junio 2026 estaba congelada en `2026-06-01T07:15:41Z` (`otd_pct=4.8`, `1` on-time, `20` overdue). El live compute del ICO registry daba OTD `99.1`.
+- **Fix de código:** `src/lib/ico-engine/materialized-freshness.ts` agrega decisión pura de frescura current-period; `readMemberMetrics` y `readMemberMetricsBatch` comparan `metrics_by_member.materialized_at` contra snapshots base (`delivery_task_monthly_snapshots` / `metric_snapshots_monthly`) y hacen fallback live si el cache está stale. `fetchKpisForPeriod` ahora respeta `snapshot.source` para que payroll marque fallback interno como `sourceMode='live'`, no `materialized`.
+- **Detección:** nuevo script read-only `scripts/check-ico-member-metrics-freshness.ts`. Antes de repair: `memberRows=5`, member cache `2026-06-01`, source freshness `2026-06-16`, `lagHours=359`, `status=stale`.
+- **Repair aplicado:** ejecución acotada del materializador canónico member-only para junio 2026 con `ICO_MATERIALIZER_MERGE_PATTERN_ENABLED=true`, `ICO_MATERIALIZER_INCREMENTAL_DELTA_ENABLED=false`, `ICO_MATERIALIZER_FRESHNESS_GATE_ENABLED=false`; resultado `memberRowsWritten=7`. Post-check: `memberRows=7`, `memberMaterializedAt=2026-06-17T01:49:04Z`, `status=ok`.
+- **Smoke Daniela post-fix:** `readMemberMetrics('daniela-ferreira', 2026, 6)` ahora retorna `source='materialized'`, OTD `99.1`, RpA `1.14`, `completedTasks=105`, `onTimeTasks=105`, `overdueTasks=1`. Payroll `fetchKpisForPeriod` retorna `materializedMembers=1`, `liveComputedMembers=0`, OTD `99.1`, RpA `1.14`, `sourceMode='materialized'`.
+- **RpA V1/V2:** V2 permanece shadow/no-bonus. Se agregó test de divergencia V1>0/V2=0 para bloquear inferencias desde legacy cuando no hay transición canónica `Listo para revisión -> Cambios solicitados`.
+- **Validación:** `pnpm test -- --run ...` corrió suite completa `7170 passed`; ESLint focal verde; `NODE_OPTIONS=--max-old-space-size=8192 pnpm exec tsc --noEmit` verde; `pnpm task:lint --task TASK-1163` y `pnpm ops:lint --changed` verdes al crear.
+
+## Sesión 2026-06-16 — TASK-1160 CLAUDE.md Router Refactor: COMPLETO (Slices 1,2,3,5,6) + hallazgo MCP — Claude
+
+> **Estado:** `in-progress` en `develop` (local, sin push). **Slices 1, 2, 3 (23 tandas), 5 (router + flip gate `--strict`) y 6 (governance) cerrados.** **CLAUDE.md: 190.551 → 32.901 tokens (−83%, 6.191 → 1.360 líneas, 195 → ~85 H3)**, con **0 huérfanas** verificadas mecánicamente tras cada tanda. Slice 4 (dedup) = follow-up (no afecta budget per-turn). **⚠️ Hallazgo crítico:** el spawn de subagentes **NO** lo arregla este refactor — el binding constraint es el tamaño de las **definiciones de tools MCP (~170k)**, no CLAUDE.md (ver §0.1 del mapa). Pendiente de cierre: correr `pnpm test`/`pnpm build` como gate + decisión operador sobre Slice 4.
+
+- **Resultado final:** `CLAUDE.md` es ahora un **router** (tabla "dominio → skill + invariantes doc" al inicio) + reglas cross-cutting; cada dominio dejó un pointer de 1-2 líneas (con sus reglas más peligrosas inline) y sus invariantes verbatim viven load-on-demand en `docs/architecture/**` + 7 companions nuevos bajo `docs/architecture/agent-invariants/`. Gate `pnpm claude-md:budget --strict` (35k) wired en `ci.yml` bloquea la re-acreción. Governor (Claude + Codex) actualizado: invariantes de dominio → spec/companion + pointer, NUNCA bloque inline.
+- **⚠️ Hallazgo (premisa parcial del task):** spawnear un Explore **post-refactor sigue fallando a ~204.879 tokens**. El error desglosa "system prompt, **tool definitions**, attachment content" → el peso son las MCP tools (Adobe ~60, Higgsfield ~50, Vercel ~25, Figma ~20, HubSpot ~18, Notion ~16, Semrush ~12, Spotify, Calendar…), ~170k. CLAUDE.md a 33k ya NO es el binding constraint. **El refactor SÍ logró:** −83% del costo per-turn del main-loop, mejor cache, legibilidad, router, anti-re-acreción. **NO logró** "restaurar subagentes" → **follow-up de infra/harness:** desconectar MCP servers no usados o cargarlos deferred (fuera de scope de TASK-1160).
+
+- **Diagnóstico medido:** `CLAUDE.md` = 6.191 líneas / **~190.551 tokens** / 195 H3 (= 99% del archivo) / 1.024 `NUNCA`. **117 bloques ya declaran `Spec canónica`** → el bloque es el espejo redundante. Cajón roto: `Vercel Deployment Protection` (5.990 tok) tiene ~20 contratos de UI Platform appendeados → split pendiente.
+- **Slice 1 ✅:** `pnpm claude-md:inventory` + mapa `docs/operations/CLAUDE_MD_REFACTOR_MAP_2026-06-16.md` (195 secciones clasificadas; §0 = batch log vivo).
+- **Slice 2 ✅:** `pnpm claude-md:budget` warn-first @200k (target banda 30-35k, gate enforce 35k), wired en `ci.yml` warn.
+- **🔑 Red de seguridad ✅ (lo que pidió el operador — "no perder comportamiento"):** `pnpm claude-md:rule-audit` (`scripts/ci/claude-md-rule-audit.mjs`, wired en `ci.yml` warn) compara cada línea `NUNCA`/`SIEMPRE` del **baseline congelado `27ce06a11:CLAUDE.md`** (1152 reglas distintas) contra el corpus vivo (CLAUDE.md ∪ docs/ ∪ skills). **Target 0 huérfanas, verificado tras cada tanda.** Prueba mecánica de que ninguna regla load-bearing se pierde.
+- **Slice 3 tanda 1 ✅ (contractor):** 19 bloques (TASK-790…981, 474 líneas, 153 NUNCA + 28 SIEMPRE) → verbatim a `GREENHOUSE_CONTRACTOR_ENGAGEMENTS_PAYABLES_ARCHITECTURE_V1.md` §"Invariantes operativos para agentes"; CLAUDE.md → 1 pointer que preserva inline el boundary payroll/finiquito. 0 huérfanas. −20k tokens.
+- **Slice 3 tanda 2 ✅ (release):** 7 bloques (TASK-848…871, 552 líneas, 74 NUNCA + 16 SIEMPRE) → `GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md`; pointer preserva concurrency-fix + append-only inline + invoca skill MANDATORIA `greenhouse-production-release`. 0 huérfanas. −13.8k tokens.
+- **Patrón probado (reusable):** cluster contiguo por título H3 → verbatim a §"Invariantes operativos para agentes" de la spec → pointer con reglas peligrosas inline → `rule-audit --strict` = 0 → `budget` baja → commit. Mover ≠ encoger bytes totales: el contenido pasa de "cargado cada turno" (CLAUDE.md) a "load-on-demand" (spec) — ese es el win (el budget que importa es CLAUDE.md × cada turno × cada subagente).
+- **Decisión destino fijada:** spec-first híbrido (default = spec repo-tracked en `docs/architecture/**`; skills repo-tracked → pointer; NO skills globales — rompen paridad Codex).
+- **Reversible:** docs + 3 scripts + CI wiring. `git revert` por tanda. Cero cambio semántico (relocación verbatim, probada por el auditor).
+
+## Sesión 2026-06-17 — TASK-1162 Kortex control-plane reader MVP — Codex
+
+> **Estado:** complete en `develop`; push + deploy staging Ready + smoke real verificado. Sin cambio de rama/worktree por instrucción operativa vigente; branch declarada en la task queda como referencia.
+
+- **Ownership:** `docs/tasks/complete/TASK-1162-kortex-greenhouse-control-plane-reader-mvp.md`.
+- **Implementado:** `src/lib/kortex/control-plane/**` + `GET /api/admin/kortex/control-plane`, contrato `greenhouse-kortex-control-plane-reader.v1`, Sentry domain `integrations.kortex`, ADR `GREENHOUSE_KORTEX_CONTROL_PLANE_READER_V1.md`.
+- **Boundary:** CERO writes Kortex/HubSpot/GitHub. Allowlist GET solamente; tests bloquean `/api/v1/audits/run`, strategy compile y release execute.
+- **Runtime smoke local/external:** GitHub repo OK (`main`, 2 issues, 1 PR); Kortex OpenAPI/context/overview/audit OK; binding real `EO-SPB-0001` leído desde `sister_platform_bindings` para portal `0c0af3a3-627e-4e05-96f3-557712a2e06a`; `deployment-summary` y `adoption-kpis` responden 401 sin token dedicado y degradan honestamente.
+- **Rollout staging:** commit `8ad7b22` deployado en `https://greenhouse-p1hsxma5x-efeonce-7670142f.vercel.app` (Ready). Se agregó `GITHUB_RELEASE_OBSERVER_TOKEN` en Vercel `staging` como fallback server-only porque el resolver GitHub App existente seguía degradando; valor no expuesto.
+- **Smoke staging:** `pnpm staging:request '/api/admin/kortex/control-plane'` HTTP 200, confidence `high`, repo `efeoncepro/kortex`, branch `main`, open issues `2`, open PRs `1`, OpenAPI available. `pnpm staging:request '/api/admin/kortex/control-plane?hubspot_portal_id=51183921'` HTTP 200, confidence `medium`, portal `0c0af3a3-627e-4e05-96f3-557712a2e06a`, binding `EO-SPB-0001` active, portal runtime active, latest audit completed, findings `3`, score `88`; optional `deployment-summary`/`adoption-kpis` siguen 401 y degradan honestamente.
+- **Validación:** Vitest focal 10/10; ESLint focal verde; `NODE_OPTIONS=--max-old-space-size=8192 pnpm exec tsc --noEmit --pretty false` verde; `pnpm task:lint --task TASK-1162` verde; `pnpm ops:lint --changed` verde; `pnpm docs:closure-check` verde; `pnpm qa:gates --changed --agent codex --task TASK-1162 --integration --runtime --auth --docs` ejecutado; `pnpm route-reachability-gate` verde; `NODE_OPTIONS=--max-old-space-size=8192 pnpm build` verde e incluye `/api/admin/kortex/control-plane`; pre-push `pnpm local:check` verde al push de `8ad7b22`.
+
+## Sesión 2026-06-17 — TASK-1162 Kortex control-plane reader task — Codex
+
+> **Estado:** task creada; sin implementacion runtime. Reemplazada por la entrada in-progress superior cuando Codex tomo la task.
+
+- **Entregable:** `docs/tasks/to-do/TASK-1162-kortex-greenhouse-control-plane-reader-mvp.md`; registry y README sincronizados (`siguiente ID disponible: TASK-1163`).
+- **Scope:** primer reader read-only para controlar Kortex desde Greenhouse: repo status `efeoncepro/kortex` via GitHub, runtime/OpenAPI Kortex, resumen por `portal_id`/`hubspot_portal_id`, capabilities observadas y degradacion honesta bajo contrato `kortex-control-plane-reader.v1`.
+- **Boundary duro:** no ejecutar writes Kortex desde Greenhouse en esta task. `run-audit`, `compile`, `approve`, `deploy` y `execute release candidate` quedan para follow-up con adapter Kortex Greenhouse-safe, auth, idempotencia, audit y confirmacion humana.
+- **Contexto verificado:** Kortex existe en GitHub y localmente en `/Users/jreye/Documents/dev/kortex`; ya tiene bridge Kortex -> Greenhouse (`/api/v1/greenhouse/context`) y endpoints runtime, pero su OpenAPI actual no declara security schemes, por lo que el MVP debe tratar mutaciones como bloqueadas.
+
+## Sesión 2026-06-16 — TASK-1159 Public Site Astro: SEO foundation + service landing shell — Claude
+
+> **Estado:** complete + **deployado** (decisión del operador en sesión 2026-06-16). Implementado en el repo sibling `efeonce-web` (rama `feature/task-1159-...`, 7 commits) y **promovido `feature → develop → main`** (fast-forward, ambos builds Vercel `Ready`). **Live en `https://efeonce-web.vercel.app/servicios/wave`** (producción del PROYECTO Vercel `efeonce-web`, `noindex`, públicamente alcanzable por URL). **NO es cutover del apex:** `efeoncepro.com` sigue en WordPress/Kinsta (sin DNS). **NO es control desde Greenhouse:** esto se gestiona por código+git+Vercel; el control-plane de Greenhouse (binding reader / EPIC-019) sigue sin construir.
+
+- **Qué se construyó (5 slices):** (1) route hygiene **block-not-delete** — las 5 preview pages (`primitives`/`blocks`/`forms-test`/`header-*`) quedan `noindex` + excluidas de sitemap/robots, no se borran. (2) **SEO foundation:** `src/lib/seo.ts` SSOT typed (`generateMeta` + JSON-LD Organization/WebPage/Breadcrumb/FAQ), `BaseLayout` lo consume, **canonical arreglado a `Astro.site` (apex)** (antes `localhost` en preview), sitemap `filter` + `robots.txt`, `og-default.png` 1200×630, 29 tests. (3) **Tokens:** auditados/maduros; provenance→v1.1; **drift de palette capability (Wave azul/cyan vs v1.1 indigo/violeta/verde) documentado como follow-up** — NO swap a ciegas (alto blast radius). (4) **Gate de primitives:** vocabulario real de la ref `efeonce-sp/.../service-web` → `Icon.astro` **lucide zero-JS** + `DifferentiatorRows` (S4) + `LeadForm` (S12); **Pricing descartado** (no existe en el landing web). (5) **Shell coded-first:** `servicios/[slug].astro` (getStaticPaths) + `service-landings.ts` (typed, **source-agnostic**) + `SectionRenderer` (switch con exhaustividad `never`) + **piloto Wave `/servicios/wave`**; `AGENTS.md` de efeonce-web actualizado (supersede la dirección ACF CPT de su TASK-010).
+- **Evidencia:** `npm run ci` verde (lint/prettier/astro check 0/0/29 tests/build). Playwright 1440+390: **el scrollWidth check atrapó un overflow mobile real** (hero h1 fijo 72px, 521>390) → fix a nivel token: **`--text-display-xl/-lg` fluidos con `clamp()`**. Re-verificado: 0 overflow ambos viewports/rutas. Lighthouse Wave: **a11y 95**; SEO 69 / perf 68 / BP 57 **deprimidos por el entorno** (noindex del piloto + http.server local + form sin env), no por el código.
+- **Decisiones del operador:** piloto = **Desarrollo Web → Wave**; **palette v1.1 diferida**; commits **sin push**.
+- **Follow-ups:** TASK-1160 (binding reader Greenhouse, **read-API-first** / Full API Parity), TASK-1161/1162 (landings finales + pipeline `<Image>` + assets), reconciliación palette v1.1, cutover front-door. `efeonce-web` necesita push del operador para tener preview remoto.
+
+## Sesión 2026-06-16 — TASK-1157 OOM del build de Vercel resuelto ($0) — Claude
+
+> **Estado:** complete en `develop` (commits `5d4bcf7c7` + `0900fc183`), deploy de staging verde verificado live. El OOM flaky que bloqueaba deploys quedó resuelto sin pagar Enhanced Builds.
+
+- **Síntoma:** `next build` (Turbopack) OOM-eaba flaky en el builder default de Vercel (~8 GB) — SIGKILL silencioso a los 45 min ("Creating an optimized production build"). Estructural: **1106 entrypoints**, no un cambio puntual. Bloqueaba cualquier deploy cuando caía.
+- **Fix (`next.config.ts`, gateado a Vercel, cero runtime):** `experimental.cpus: 4` (static-gen ~9→4 workers) + sourcemaps de Sentry solo en producción (`VERCEL_ENV==='production'`; off en staging/preview).
+- **`turbopackMemoryLimit` descartado — lección:** el 1er intento con 6 GiB quedó **bajo el working set** de Turbopack → thrashing (GC agresivo) → build colgado 25 min+, **peor** que el OOM. Sin un pico medido (el OOM mataba el reporte del Slice 1), el knob es contraproducente. La spec lo advirtió ("medir antes de asumir"). Quitarlo + las 2 palancas seguras resolvió.
+- **Verificación live:** deploy `lcgr9d6dv` **Ready en 7 min** ("✓ Compiled successfully in 3.1min") vs **3 deploys sin fix que OOM-earon a 45-46 min** en la misma ventana (`k4dy0gpyf`/`gvba866wa`/`j0o4fe73d`). Enhanced Builds = no-go.
+- **Determinismo:** 1er build con fix verde + contraste claro; se confirma con los próximos pushes a develop (cada uno buildea ya con el fix). Si el build vuelve a crecer → follow-up de disciplina de route-count.
+- **Convivencia:** se trabajó en paralelo con el sweep de tipografía de Codex (`monoId`) sobre los componentes del roadmap (commit `0c392cb38`); el drawer "Abrir task" (TASK-1153 follow-up) sobrevivió intacto (GVC mirado).
+
+## Sesión 2026-06-16 — Roadmap cockpit enterprise polish + TASK-1159 state sync — Codex
+
+> **Estado:** `/roadmap` optimizado en local con skills de Product Design/enterprise UI + GVC loop verde. TASK-1159 queda sincronizada como `in-progress`; no se ejecutó aún el repo Astro `efeonce-web`.
+
+- **Superficie UI:** `/roadmap` quedó más denso y enterprise: KPI tiles compactos, filter toolbar en una sola línea desktop, lanes/cards menos infladas con selección/hover más claros, inspector con acciones alcanzables y drawer mobile estable full-width.
+- **Scenario GVC:** `scripts/frontend/scenarios/roadmap-cockpit.scenario.ts` ahora abre un item estable (`TASK-025`) y espera la transición antes de capturar inspector/drawer, evitando falsos positivos de auth y frames mid-animation.
+- **Evidencia:** GVC final `.captures/2026-06-16T20-59-19_roadmap-cockpit` pasó desktop+mobile con `0` findings; frames revisados manualmente.
+- **Validación:** ESLint focal 0; `NODE_OPTIONS=--max-old-space-size=8192 pnpm exec tsc --noEmit` 0; `pnpm design:lint` 0 warnings; `git diff --check` 0; `pnpm qa:gates --changed --agent codex` revisado.
+- **Cierre documental:** registry de TASK-1159 sincronizado a `in-progress`. Queda pendiente ejecutar la task real en `/Users/jreye/Documents/efeonce-web` antes de moverla a complete.
+
+## Sesión 2026-06-16 — TASK-1159 Public Site Astro SEO foundation task — Codex
+
+> **Estado:** task creada y luego tomada como `in-progress`; sin implementación runtime. Siguiente paso recomendado después de TASK-1158.
+
+- **Entregable:** `docs/tasks/in-progress/TASK-1159-public-site-astro-seo-foundation-service-landing-shell.md`.
+- **Scope:** preparar `efeonce-web` como rail Astro/Vercel ejecutable para landings reales: limpiar rutas demo/scaffold, centralizar SEO/canonical/sitemap/robots/OG, tokenizar Ohio/Figma contra Brand Guideline Efeonce y construir shell reusable de landing de servicio con microinteracciones, responsive, GVC/Lighthouse y no-cutover posture.
+- **Corte deliberado:** no mezcla el backend/control-plane Greenhouse↔Vercel/GitHub. Ese follow-up queda como TASK-1160 candidata (`backend-data`, integration) para reader/binding desde Greenhouse.
+- **Validación esperada al crear:** `pnpm task:lint --task TASK-1159`, `pnpm ops:lint --changed`, `pnpm docs:closure-check`.
+
+## Sesión 2026-06-16 — TASK-1158 Public Site Astro runtime decision — Codex
+
+> **Estado:** complete en `develop`; push solicitado por el operador en esta sesión. Se decidió y documentó que `efeonce-web`/Astro pasa a ser el frontend público objetivo para `efeoncepro.com` bajo dominio principal, sin mutar WordPress/Kinsta/Vercel/DNS.
+
+- **Entregables:** ADR `docs/architecture/GREENHOUSE_PUBLIC_SITE_ASTRO_RUNTIME_STRATEGY_DECISION_V1.md`; matriz `docs/operations/public-site-route-ownership-matrix-20260616.md`; binding `docs/operations/public-site-astro-runtime-binding-20260616.json`; updates a `EPIC-019`, Public Website control-plane docs, `DECISIONS_INDEX`, `project_context.md`, `changelog.md` y task lifecycle.
+- **Regla operativa:** no usar `landing.efeoncepro.com` como carril SEO primario; cualquier implementación futura debe ir por dominio principal, con Greenhouse como control plane y commands/readers server-side. WordPress/Kinsta sigue live hasta cutover y CMS/admin/origen despues.
+- **Validación:** `jq` binding JSON OK; `pnpm task:lint --task TASK-1158`; `pnpm ops:lint --changed`; `pnpm docs:closure-check`; `pnpm docs:context-check`; `pnpm lint`; `NODE_OPTIONS=--max-old-space-size=8192 pnpm exec tsc --noEmit` (`tsc` sin heap ampliado OOM-ea en este repo).
+- **Pendiente inmediato:** crear/tomar la siguiente task de implementación: Astro SEO foundation + demo route cleanup en `efeonce-web`, luego Greenhouse Astro/Vercel binding reader MVP, front-door/cutover task y primer piloto de landing de servicio.
+
+## Sesión 2026-06-16 — TASK-1153 Roadmap cockpit UI (menú principal) — Claude
+
+> **Estado:** **complete** en `develop` (local-first, SIN push). UI del cockpit `/roadmap` fiel al diseño Claude Design del operador, con datos reales del reader de TASK-1152. Desbloqueado por TASK-1152.
+
+- **Diseño:** el operador pasó el comando de Claude Design (`api.anthropic.com/v1/design/h/RsqqcNtzplgw7eZP18d6hA?open_file=RoadmapCockpit.dc.html`). La 1ª URL dio 404; la 2ª devolvió un `.gz` (72KB) que WebFetch guardó en disco → gunzip→tar → leí el `RoadmapCockpit.dc.html` (603 líneas) + el README del bundle. Recreado **1:1 en React** con primitives + tokens del repo (NO transcripción de HEX; mapeo AXIS→`theme.palette.*`).
+- **Qué se construyó:** `/roadmap` (item de menú top-level Roadmap, fuera de Admin) = header (breadcrumbs + sync + Actualizar índice) + banner degradado + 7 KPIs + filter toolbar (pills kind + búsqueda + Prioridad/Dominio/Salud) + CompositionShell split board(7 lanes, scroll-x interno)+inspector + cards por kind + comando `/implement-task` (solo tasks). Mobile: board single + Drawer inspector.
+- **Datos:** `getAllWorkItems()` (export aditivo en reader 1152) + `rootCause` issues; projection server `src/lib/roadmap/cockpit/{types,lanes,build-cockpit-data}.ts` (7 lanes determinísticas + tiles + dominios; backlog activo + muestra resueltas; límite 50/lane). Read-only, no edita Markdown.
+- **Acceso:** viewCode `plataforma.roadmap` (catalog + migración seed `20260616141635832`, 11 roles internos, **aplicada en dev**) + page guard dual + menú gated. Verificado runtime: item aparece, acceso OK.
+- **Gates:** lint 0 · tsc 0 · `pnpm test` 7160 passed · `pnpm build` exit 0 (`/roadmap` + `/api/roadmap/work-items` en manifest) · 9 tests lanes + 27 reader · **GVC desktop+mobile mirado** · scroll-width 1440=1440/390=390 (Playwright). Capturas en `.captures/2026-06-16T14-38-29_roadmap-cockpit`.
+- **Decisiones / diferencias honestas vs el mock:** sidebar/topbar = shell real del repo (no recreados); KPIs/cards = datos reales (no seed) → counts altos reales (566 work items, 249 bloqueadas, 184 grooming, 53 degradados); en mobile el inspector es Drawer real (UX correcta) en vez del aside. `rootCause` agregado al WorkItem de TASK-1152 (aditivo, no breaking).
+- **Pendiente / próximo paso:** ninguno bloqueante. Rollout: viewCode seed aplicado en dev; en producción la migración corre por el pipeline normal (la sesión del usuario debe refrescarse para ver el item). Follow-ups del task: comandos gobernados de rank/lifecycle (futuro), modos de planificación por quarter (futuro).
+
+## Sesión 2026-06-16 — TASK-1152 Roadmap work item index reader (Markdown SSOT) — Claude
+
+> **Estado:** **complete** en `develop` (local-first, SIN push). Foundation backend/read-only del Roadmap. Aditivo + read-only → cero riesgo de runtime productivo. **Desbloquea TASK-1153.**
+
+- **Qué se construyó:** módulo `src/lib/roadmap/work-item-index/` (`types` contrato puro `roadmap-work-item-index.v1` · `parser` que **espeja** la semántica de `task-lint`/`ops-artifact-lint` en TS con tests de paridad · `health` clasificador puro template/canonical/legacy + readiness · `cache` singleton por proceso fingerprint mtime/size · `reader` walk+filtros+paginación+facets, server-only) + endpoint `GET /api/roadmap/work-items`.
+- **Auth:** dual-gate `requireInternalTenantContext` (clientes excluidos por construcción) + capability nueva `roadmap.work_items.read` (módulo dedicado `roadmap` en catalog + grant `runtime.ts` internal ∪ admin + seed `capabilities_registry` migración `20260616133046114` aplicada). Dominio Sentry nuevo `roadmap`.
+- **Decisión Open Question:** módulo dedicado `roadmap` (no reuso de `platform`/`admin`) — espeja `organization`/`design_system`/`knowledge`, future-proof para write caps de TASK-1153.
+- **Runtime Vercel:** `docs/**` se bundlea en la función vía `outputFileTracingIncludes` en `next.config.ts` (sin eso el reader no vería los archivos en prod). El reader resuelve root con `process.cwd()`.
+- **Degradación honesta:** un item legacy/ilegible → `legacy`/`needs_grooming` con `findings`, nunca rompe la respuesta. Smoke real: 19 epics / 1223 tasks / 4 mini / 97 issues, 0 degradados (la mayoría de tasks completas son `legacy` honesto — pre-template, igual que el skip pre-adoption de los linters).
+- **Gates:** 27 tests focales · `pnpm test` 7151 passed · `pnpm tsc --noEmit` 0 · `pnpm lint` 0 (surface tocada) · `pnpm build` exit 0 · grant-coverage guard verde · migración anti pre-up-marker OK.
+- **Docs:** funcional `docs/documentation/plataforma/roadmap-cockpit.md` (con ejemplos de payload para TASK-1153) + task `complete/` + README/registry sync + changelog.
+- **Pendiente / próximo paso:** ninguno bloqueante. TASK-1153 (cockpit UI) consume este contrato server-side — NO debe parsear Markdown client-side. Si la UI necesita un campo extra, extender `WorkItem`/`types.ts` (bump a `v2` si rompe shape).
+
+## Sesión 2026-06-16 — Public Site content marketing service page layout polish — Codex
+
+> **Estado:** production optimizado en `https://efeoncepro.com/servicio-marketing-de-contenidos/`. Cambio aplicado directamente en Kinsta/WordPress con backups runtime; sin cambios de código del portal Greenhouse.
+
+- **Skills/criterio usado:** `efeonce-public-site-wordpress`, `modern-ui-architect` + overlay Greenhouse, `greenhouse-product-ui-architect`, `greenhouse-ui-enterprise-review`, `greenhouse-microinteractions-auditor` tras feedback del operador. Decisión: landing WordPress existente → usar controles nativos Elementor/Ohio y evitar CSS global/hardcode; preservar widgets laterales (`Dark/Light`, social/follow, search, back arrow) y microinteracciones de scroll.
+- **Cambios aplicados:** `post_title` limpio `Servicio de Marketing de Contenidos`; H1 visual preservado vía `gh_page_headline_display_title=Servicio de Marketing<br>de Contenidos`; `page_breadcrumbs_visibility=0`; primer section `d33dd85` con padding responsive; containers full-width `1c7659d`, `a06aca7`, `816d257` normalizados a `100%`; widths inválidos `>100%` clamp a `100%`; primer row rebalanceado `50/4/23/23`; H2 principal con salto visual intencional en el widget `1443e40`.
+- **Scroll completo y secciones bajas:** servicios (`1c7659d`/`816d257`) compactados sin romper el stack mobile y con `fadeInUp`/stagger restaurado; metodología 3C (`a59049b`/`859bbd6`) conserva fondo morado full-bleed, cards dentro de contenedor `1320px`, padding `24px` desktop / `18px` mobile; testimonios (`7c9eb66`/`35b8e2b`) y CTA (`a78c166`) contenidos a `1320px` con padding responsive, sin remover carousel, flechas, paginación ni socialbar.
+- **Backups Kinsta:** `wp-content/uploads/greenhouse-backups/page-242603-content-service-layout-before-20260616T130713Z.json`, `page-242603-content-service-carousel-overflow-before-20260616T131110Z.json`, `page-242603-content-service-first-row-balance-before-20260616T131247Z.json`, `page-242603-content-service-first-row-balance-before-20260616T131347Z.json`, `page-242603-content-service-heading-type-before-20260616T131525Z.json`, `page-242603-content-service-heading-linebreak-before-20260616T131637Z.json`, `page-242603-content-service-services-grid-before-20260616T132312Z.json`, `page-242603-content-service-services-stack-before-20260616T132610Z.json`, `page-242603-content-service-microinteractions-restore-before-20260616T133024Z.json`, `page-242603-content-service-methodology-container-before-20260616T133558Z.json`, `page-242603-content-service-testimonials-cta-container-before-20260616T134314Z.json`, `page-242603-content-service-tighten-containers-before-20260616T134557Z.json`.
+- **GVC/Playwright evidence:** before GVC `.captures/2026-06-16T13-03-43_inline-servicio-marketing-de-contenidos`; first-fold final `.captures/2026-06-16T13-16-56_inline-servicio-marketing-de-contenidos-gh-layout-review-final`; full-page scenario nuevo `scripts/frontend/scenarios/public-site-content-service.scenario.ts`; full-page GVC `.captures/2026-06-16T13-46-23_public-site-content-service`; focused final frames `.captures/tight-after-desktop-methodology.png`, `.captures/tight-after-desktop-testimonials.png`, `.captures/tight-after-desktop-cta.png`, `.captures/tight-after-mobile-methodology.png`, `.captures/tight-after-mobile-testimonials.png`, `.captures/tight-after-mobile-cta.png`.
+- **Final checks:** desktop `scrollWidth=1440/clientWidth=1440`; mobile `390/390`; contenedores metodología/testimonios/CTA `x=60,w=1320` en desktop y `x=18,w=354` en mobile; no breadcrumb node; no literal `<br>` en body text; H1 visual remains two lines; GVC full-page pasó con `0` findings.
+- **Pendiente:** no Kinsta API backup/cache automation yet; changes were live Elementor document saves. If this page is later brought into GitOps/control-plane, reconcile `_elementor_data`/page meta from live.
+
+## Sesión 2026-06-16 — Public Site WordPress maintenance lock cleared — Codex
+
+> **Estado:** production recuperado. Incidente operativo acotado en `https://efeoncepro.com` durante updates de plugins WordPress.
+
+- **Síntoma:** el home público devolvía `503` con el template nativo de WordPress: "Briefly unavailable for scheduled maintenance. Check back in a minute."
+- **Root cause verificado:** archivo `.maintenance` presente en Kinsta docroot `/www/efeoncegroup_752/public`, creado `2026-06-16 12:25:42 UTC`; no había proceso de update activo visible por SSH. `wp-content/upgrade` estaba vacío.
+- **Acción aplicada:** se movió `.maintenance` fuera de la raíz a `wp-content/uploads/greenhouse-backups/root-maintenance-cleared-20260616T123025Z.php` en vez de borrarlo sin rastro.
+- **Estado plugins revisado:** `crm-perks-forms` active `1.1.8`, `microsoft-clarity` active `0.10.24`, `uichemy` inactive `4.10.2`; ninguno reportaba update pendiente en `wp plugin list`.
+- **Verificación:** `curl https://efeoncepro.com/` volvió `HTTP/2 200`, título `Efeonce | Agencia de Marketing, CRM, contenido e IA aplicada`; `https://efeoncepro.com/wp-json/` volvió `200`; Playwright anónimo confirmó `status=200`, sin texto de maintenance, captura en `.captures/public-site-maintenance-recovery-2026-06-16T1230Z/home.png`.
+- **Pendiente:** si vuelve a quedar en maintenance al reintentar updates, revisar logs/errores del plugin específico antes de volver a ejecutar updates masivos. Kinsta API token sigue pendiente para cache/backups automatizados.
+
+## Sesión 2026-06-16 — TASK-1151 Knowledge hybrid (FTS + pgvector) gated implementation — Claude
+
+> **Estado:** **in-progress** en `develop` (local-first, SIN push). Foundation construida + segura (flag OFF) + validada → **NO-GO al flip** (gates de flip no se cumplen). Cero cambio de runtime productivo (flag default OFF byte-equivalente).
+
+- **Qué se construyó (gated, OFF=byte-equivalente):** Slice 1 migración pgvector (`20260616105246838`: extensión + `embedding vector(768)` + HNSW cosine + checksum) aplicada en dev; Slice 2 helper Vertex + paso de ingesta idempotente por checksum (`embed-corpus.ts` + CLI) → **1471/1471 chunks embebidos** en dev; Slice 3 brazo vector gateado DENTRO de `searchKnowledge` (`KNOWLEDGE_SEARCH_HYBRID_ENABLED` default OFF, RRF + FTS-signal-gate por confianza + degradación honesta), fusión pura extraída a `retrieval-fusion.ts`; Slice 4 harness `hybrid-runtime-validate.ts`.
+- **Validación runtime (honesta):** ✅ recall paráfrasis **7/8 vs 3/8** (el valor es real) · ✅ wrong-source 0 · ✅ no-answer golden 2/2. ❌ **latencia p95 ~920ms** (hallazgo: el cuello es el **embedding de la query = round-trip Vertex ~600ms**, NO pgvector; el ≤400ms del decision packet contó solo pgvector → corregido) · ❌ golden 44/45 (1 democión por fusión) · ❌ off-corpus 3/4 (1 probe comparte vocab con el corpus).
+- **Veredicto:** flag se queda OFF; el híbrido NO se flipea. Refinamiento pendiente antes de cualquier flip de operador: (1) cache de query-embeddings + budget de latencia revisado, (2) fusión que preserve los top hits del FTS, (3) recalibrar piso FTS / off-corpus probes.
+- **Gates de código:** tsc 0 · lint 0 · vitest knowledge+nexa 269 · build OK · task:lint TASK-1151 template=1/errors=0/warnings=0. SSOT `searchKnowledge` + contrato `knowledge-search.v1` intactos.
+- **Próximo paso:** decisión del operador — (a) hacer el refinamiento (latencia/fusión/gate) para llegar a flip-ready, o (b) dejar la base lista y diferir. Push pendiente de instrucción. La migración pgvector ya está aplicada SOLO en dev (no en staging/prod).
+
+## Sesión 2026-06-16 — TASK-1136 Knowledge hybrid retrieval evaluation + vector readiness — Claude
+
+> **Estado:** **complete** en `develop` (local-first, SIN push — espera instrucción del operador). Evaluación pura: **cero cambio de runtime productivo**.
+
+- **Qué es:** decidir, con evidencia real, si el RAG de Knowledge/Nexa necesita vector/embeddings además del FTS+rerank actual. **Veredicto: GO condicional a un piloto gated.**
+- **Evidencia (embeddings Vertex reales sobre el corpus real: 105 docs / 1471 chunks):**
+  - Baseline FTS+rerank **saturado**: 45/45 golden, MRR 0.90, recall/precision@1/cross-doc 100%, no-answer 2/2, p95 ~328ms.
+  - Híbrido **ingenuo regresa** (43/45 — rompe el no-answer honesto 0/2; el vector siempre devuelve vecinos).
+  - Híbrido **gana en paráfrasis** (mismatch de vocabulario): FTS 3/8 vs híbrido **7/8** — ahí está el valor real.
+  - No-answer risk cuantificado: off-corpus rozan cosine ~0.56 → un piso fijo no basta; el gate correcto es **FTS-signal-gate** (el vector solo refuerza cuando el FTS ya tiene señal).
+- **Costo:** corpus chico → embeddings = centavos one-time; pgvector vive en el Cloud SQL actual (sin infra managed). **Managed Vertex Vector Search/RAG Engine rechazado** (costo always-on injustificado para ~1471 chunks).
+- **Entregables:** core puro `retrieval-eval.ts` (+15 tests) · read helper `list-chunks-for-embedding.ts` · runners `scripts/knowledge/{retrieval-eval,hybrid-shadow-eval}.ts` · decision packet `GREENHOUSE_KNOWLEDGE_HYBRID_RETRIEVAL_DECISION_V1.md` · task hija gated **TASK-1151**.
+- **SSOT/contrato intactos:** `searchKnowledge` + `knowledge-search.v1` sin tocar; pgvector queda disponible-no-instalado (lo instala TASK-1151).
+- **Gates:** vitest knowledge/search 29 · full `pnpm test` **7115** · `pnpm build` ✓ · tsc 0 · lint 0 · `nexa:doc-gate` ✓ · `task:lint TASK-1151` template=1/errors=0/warnings=0.
+- **Próximo paso:** si el operador aprueba, tomar **TASK-1151** (pgvector + ingesta de embeddings + brazo vector gateado + validación contra thresholds §6 del decision packet). Push de esta sesión: pendiente de instrucción explícita.
+
+## Sesión 2026-06-16 — TASK-1149 Nexa: downgrade determinístico de headers — Claude
+
+> **Estado:** **complete** en `develop` (local-first, empujado). El K6 en staging se confirma al desplegar (nightly de TASK-1127).
+
+- **Por qué:** el nightly de TASK-1127 detectó que el gate K6 fallaba en staging por una razón NUEVA: el truncamiento ya estaba resuelto (el cierre de validación aparece), pero **Claude (auto-router)** generaba headers `## Título` que el contrato de voz prohíbe en el panel del chat. El prompt lo pide pero no lo garantiza (LLM probabilístico).
+- **Fix (defense-in-depth):** helper puro nuevo `downgradeStructuralHeadings` (`src/lib/nexa/strip-markdown-excerpt.ts`) baja headers ATX (`#`/`##`/`###`) a `**negrita**` preservando viñetas/links/**code fences**; idempotente. Aplicado en `NexaService.generateResponse` sobre el texto del turno antes de devolver/persistir → garantiza el contrato en TODOS los providers sin tocar el prompt (Nexa NO pierde personalidad — solo baja el peso visual del encabezado). Distinto de `toPlainExcerpt` (que aplana para previews); acá la respuesta SÍ renderiza Markdown.
+- **Sin** migración/capability/outbox/flag (aditivo, reversible con revert).
+- **Verificación:** 15/15 tests del helper · suite nexa+knowledge **254 passed** · tsc 0 · lint 0 · `nexa:doc-gate` verde. La verificación end-to-end por chat **local** quedó bloqueada (dev server con pool PG zombie tras re-auth ADC, "Tenant lookup failed" — no es del cambio); la verificación real contra staging la confirma el nightly de TASK-1127.
+- **Docs de capa:** `behavior/behavior-and-routing.md` (§Higiene de formato del output) + `knowledge/evidence-and-citations.md` (distinción de los dos helpers).
+- **Push:** `develop` ✓ (3 commits: creación spec + Slice 1+2 código + commit documental de Codex). CLAUDE.md NO tocado (no hay invariante duro nuevo — es higiene de output, ya documentada en la capa Nexa).
+
+## Sesión 2026-06-16 — TASK-1148 Backend/Data Task Execution Profile — Codex
+
+> **Estado:** **complete** local-first, sin cambio runtime. Contrato documental/tooling cerrado y lifecycle sincronizado.
+
+- **Qué cambió:** nuevo addendum `docs/tasks/TASK_BACKEND_DATA_ADDENDUM.md`; `TASK_TEMPLATE.md` agrega `Backend impact`; `TASK_PROCESS.md` documenta perfil `backend-data`, valores de impacto, migración gradual y Discovery check antes de escribir API/DB/commands/readers/migrations/sync/cron/webhooks/integrations.
+- **Guardrail:** `task-lint` parsea `Backend impact` y agrega regla `backend-data-contract` warning-first para tasks template con perfil/impacto/dominio backend-data sin `## Backend/Data Contract`. La detección evita `platform`/`ops` solos para no generar ruido en tareas documentales.
+- **Skills actualizadas:** `.codex/skills/greenhouse-task-planner/SKILL.md` y `.claude/skills/greenhouse-task-planner/skill.md` cargan `TASK_BACKEND_DATA_ADDENDUM.md`, detectan `Execution profile`/`Backend impact`, piden rigor `backend-lite|backend-standard|backend-critical` cuando falte y generan `## Backend/Data Contract` para trabajo runtime/data.
+- **Task formal:** `docs/tasks/complete/TASK-1148-backend-data-task-execution-profile.md`; registry y README sincronizados (`siguiente ID disponible: TASK-1149`).
+- **Verificación:** `pnpm task:lint:test` · `pnpm task:lint --task TASK-1148` · `pnpm ops:lint --changed` · `pnpm docs:closure-check`.
+- **Siguiente paso sugerido:** usar el addendum como piloto cuando se tome una task de Knowledge/vector, API Platform, finance/payroll, sync, cron o integration; mantener `backend-data-contract` en warning hasta que varias tasks nuevas lo usen sin ruido.
+
+## Sesión 2026-06-16 — TASK-1147 UI/UX Task Execution Profile — Codex
+
+> **Estado:** **complete** local-first, sin cambio runtime. Contrato documental/tooling cerrado y lifecycle sincronizado.
+
+- **Qué cambió:** nuevo addendum `docs/tasks/TASK_UI_UX_ADDENDUM.md`; `TASK_TEMPLATE.md` agrega `Execution profile` + `UI impact`; `TASK_PROCESS.md` documenta perfil `ui-ux`, valores de impacto, migración gradual y Discovery check antes de escribir JSX/copy visible.
+- **Guardrail:** `task-lint` parsea los campos nuevos y agrega regla `ui-ux-contract` warning-first para tasks template con dominio/impacto UI sin `## UI/UX Contract`. Legacy/backlog historico no se migra masivamente.
+- **Skills actualizadas:** `.codex/skills/greenhouse-task-planner/SKILL.md` y `.claude/skills/greenhouse-task-planner/skill.md` cargan `TASK_UI_UX_ADDENDUM.md`, detectan `Execution profile`/`UI impact`, piden rigor `ui-lite|ui-standard|ui-platform` cuando falte y generan `## UI/UX Contract` para trabajo visible.
+- **Task formal:** `docs/tasks/complete/TASK-1147-ui-ux-task-execution-profile.md`; registry y README sincronizados (`siguiente ID disponible: TASK-1148`).
+- **Verificación:** `pnpm task:lint:test` 14/14 · `pnpm task:lint --task TASK-1147` 0 errors/0 warnings · `pnpm ops:lint --changed` 0 errors/0 warnings. `docs:closure-check` inicialmente pidio changelog/handoff; ambos actualizados.
+- **Siguiente paso sugerido:** aplicar el addendum como piloto cuando se tome `TASK-1118`, `TASK-1095` o `TASK-1132`; mantener `ui-ux-contract` en warning hasta que varias tasks nuevas lo usen sin ruido.
+
+## Sesión 2026-06-16 — TASK-1127 Nexa Knowledge QA nightly + baseline ampliado — Claude
+
+> **Estado:** **complete** en `develop` (local-first). Slice 1 validado local (45/45). El nightly se confirma al disparar `workflow_dispatch` post-push; el K6 en Anthropic se confirma al desplegar staging. **Desbloquea TASK-1136.**
+
+- **Por qué:** el usuario quería TASK-1136 (retrieval vector) pero está bloqueada por TASK-1127 (el baseline de evaluación para poder medir si el vector mejora). Eligió hacer TASK-1127 primero.
+- **Slice 1 (baseline, desbloquea 1136):** `KnowledgeGoldenQuestion` + `expectFirstTitleIncludes` (wrong-source: el doc específico rankea primero) + `expectDistinctDocumentsAtLeast` (cross-doc: ≥2 docs). 5 casos nuevos, **45/45 live verdes** contra el corpus real (necesité re-autenticar la ADC de gcloud — había vencido, `invalid_rapt`).
+- **Slice 2 (nightly):** `nexa-knowledge-qa-nightly.yml` (schedule + dispatch + skip honesto) + flag `--min-pass` en el QA matrix (umbral que tolera flakiness de routing sin volverse ruidoso — lección del watchdog). Es `tooling`.
+- **Bonus (el nightly probó su valor):** detectó que **K6 fallaba en staging** — el fix de TASK-1140 (maxOutputTokens) solo cubría Gemini (local); el provider Anthropic truncaba a 700 tokens. Subido a 1024 (`TURN_MAX_TOKENS`).
+- **Archivos:** `golden-questions.ts` (+test +live test), `scripts/nexa-knowledge-qa-matrix.mjs` (flag), `.github/workflows/nexa-knowledge-qa-nightly.yml` (nuevo), `src/lib/nexa/providers/anthropic.ts` (max_tokens), docs de capa nexa-intelligence.
+- **Pendiente post-push:** disparar el nightly (`gh workflow run nexa-knowledge-qa-nightly.yml`) para verificar end-to-end + confirmar K6 en staging tras el redeploy.
+- **TASK-1136** ya tiene su Delta (dependencia desbloqueada). Sin migración / capability / signal nuevo.
+
+## Sesión 2026-06-15 — TASK-1140 Manuales operativos → corpus Knowledge/Nexa — Claude
+
+> **Estado:** **complete** en `develop` (local-first, sin push). Ingesta aplicada a **dev/staging** (`greenhouse-pg-dev`). **Producción sin cambios** (gateada).
+
+- **Qué resuelve:** Nexa tiene `search_knowledge` pero las preguntas operativas multi-dominio recuperaban docs generales/parciales. Se registran **67 manuales operativos end-to-end** (Finance, People/Workforce/Payroll/Contractors, Comercial, Agency, Identity, My Space, Portal Cliente, Integraciones/Sync, Comunicaciones, AI Tooling, Admin Center, Public Site, UI Platform) en `PILOT_CORPUS` (**15→82** docs).
+- **Decisión del operador (checkpoint, opción A):** todos los manuales operativos — incluidos HR/Payroll/Contractors — `agent_allowed` (citables por Nexa en agentic); la seguridad legal/tributaria + no-acción se gobierna en la capa de respuesta (Answer Rules), NO por exclusión. El único `agent_excluded`/`restricted` durable es la política de secretos. El manual legacy `periodos-de-nomina` se dejó `agent_excluded` sin tocar (el funcional nuevo cubre agentic).
+- **Validación:** golden questions por dominio **40/40 verdes** (retrieval offline, determinista). Ingesta `--apply` dev/staging: **67 publicados (1087 chunks), 0 quarantined, 0 failed**. Sanitizer cl_rut detectó el RUT de ejemplo del manual de finiquitos → redactado a placeholder (RUT público de Efeonce). `qa:nexa-knowledge --env=local` 8-9/12 (retrieval correcto en todos; fallos = compliance del LLM, no del corpus).
+- **⚠️ Rollout gate (producción):** **K6 consistente** = Nexa responde nómina citada PERO a veces SIN el cierre "valida con People/Finanzas antes de actuar" (el prompt ya lo manda, line 146; es no-compliance de Gemini con grounding fuerte). Antes de activar el corpus operativo (payroll/finance/legal citable) en PROD, **endurecer ese compliance** (prompt + assert en QA matrix, ref TASK-1127). Hoy es no-determinista.
+- **Archivos:** `pilot-corpus.ts` (+test length-pin 15→82 + guard agent_allowed), `golden-questions.ts` (+per-domain), `search-knowledge.live.test.ts` + `search-knowledge-tool.test.ts` (re-targeteados a la nueva postura), `docs/manual-de-uso/hr/finiquitos.md` (redacción RUT), `docs/documentation/plataforma/knowledge-platform.md` (15→82).
+- **Sin prompt change, sin migración, sin capability, sin UI.** Reversible (<30 min: retirar entradas + re-ingestar).
+
+## Sesión 2026-06-15 — TASK-1137 Nexa governed action runtime + command bridge — Claude
+
+> **Estado:** **complete** en `develop` (pusheado, CI verde). Detrás de `NEXA_ACTION_RUNTIME_ENABLED` (default OFF). **Activado por el operador**: flag ON en local + Vercel staging + producción; auto-router ya estaba ON. **UI confirm-card incluida** (no quedó para Codex). Pendiente prod real = release `develop→main`.
+
+- **Qué resuelve:** Nexa podía leer pero no actuar de forma gobernada. Ahora puede **proponer una acción, mostrar preview, pedir confirmación humana y ejecutar** un command idempotente/auditado — **sin que el LLM ejecute un write**. Es el rung `execute_requires_confirmation` del Action Maturity Ladder (desbloqueado por TASK-655).
+- **Loop canónico (propose → confirm → execute):** tool `propose_action(actionKey)` (read-only) → resolver determinístico (`actions/registry.ts`) → proposal `nexa-action-proposal.v1` o gap honesto → `NexaResponse.actionProposals` → `POST /api/nexa/actions/[id]/confirm` (capability `nexa.action.execute`) → `executeApiPlatformCommand` (`principalKind='app_user'`). El LLM solo pasa una `actionKey` registrada; jamás un endpoint. El endpoint es el ÚNICO ejecutor.
+- **Piloto:** `mark_notifications_read` (self-scoped, idempotente, neutral). El `userId` siempre de sesión (anti-oracle).
+- **Schema/grant:** capability `nexa.action.execute` (catalog + runtime grant internal∪EFEONCE_ADMIN + seed registry) + ledger `greenhouse_ai.nexa_action_events` + 2 signals (failure_rate + unauthorized_proposal_rate [security]). Migración `20260615193917012`.
+- **Decisiones del operador (checkpoint):** piloto = marcar notificaciones leídas · alcance = loop completo S1-S5 · UI confirm-card = follow-up Codex.
+- **Validación:** tsc 0 · lint 0 · 17 tests nuevos + suite nexa/entitlements/commands 161 · `nexa:doc-gate` verde · migración live. **`pnpm test` full + `pnpm build` = gate de cierre (corriendo).**
+- **UI confirm-card hecha (no Codex):** `NexaActionProposalCard` (renderer del tool `propose_action` en `NexaToolRenderers` → chat flotante + home), estados honestos, tokenizada, GVC desktop+mobile vía mockup `/nexa/action-proposal/mockup`.
+- **Follow-ups:** evento `cancelled` cuando la UI lo persista (hoy es estado local) · acciones de dominio (Agency/Delivery) cuando existan sus commands · adopción del lane `app` del command helper.
+
+## Sesión 2026-06-15 — TASK-655 API Platform Command & Idempotency Foundation — Claude
+
+> **Estado:** **complete** en `develop` (local-first, sin push). Foundation transversal. Desbloquea MCP write-safe tools + writes idempotentes de plataforma.
+
+- **Qué resuelve:** los commands mutativos del API Platform (event control plane) corrían por `runEcosystemReadRoute` — sin `Idempotency-Key`, sin command audit, sin replay/conflict. Un consumer que reintentaba tras timeout podía duplicar el recurso.
+- **Foundation (1 tabla SSOT):** `greenhouse_core.api_platform_command_executions` (migración `20260615181918477`) = command audit trail + idempotency store en una sola tabla (toda ejecución = 1 fila; las idempotentes comparten `(principal_id, idempotency_key)` vía partial UNIQUE). State machine `processing → completed|failed`. CHECK `key ⇒ fingerprint`. Lane-agnostic (`principal_kind`/`principal_id`).
+- **Helpers** (`src/lib/api-platform/core/`): `idempotency.ts` (store + pura: fingerprint stable, decisión replay|conflict|in_progress, parse key) + `commands.ts` (`runEcosystemCommandRoute` = read route **reusado entero** + idempotencia/audit alrededor del handler). Diferencia vs finance legacy: **detecta payload-mismatch** (`idempotency_conflict`).
+- **Adopción:** subscriptions create/update + delivery retry → command helper (contract test asserta los 3 routeKeys). Errores `+idempotency_conflict +idempotency_in_progress`. OpenAPI: header `IdempotencyKey` + 409. Reliability signal `platform.command.stuck_processing`.
+- **Validación:** tsc 0 · lint 0 · `commands.test.ts` 18 + `route-contract.test.ts` 27 · migración verificada live (25 cols / 4 índices / 4 CHECKs). **`pnpm test` full + `pnpm build` = gate de cierre pendiente de correr antes de declarar ship final** (ver más abajo).
+- **Out of scope / follow-ups:** writes amplios de dominio; adopción del lane `app` (mismo store, distinto `principalKind`); cleanup de keys expiradas (TTL hoy es lógico); MCP write-safe tools (desbloqueado).
+
+## Sesión 2026-06-15 — TASK-1134 Nexa Chat: auto-router + model selection truth — Claude
+
+> **Estado:** **complete** en `develop` (local-first). Backend contract + client + UI menor, sin migración. Desbloquea TASK-1127. Activación productiva del router = decisión del operador.
+
+- **Bug:** el chat (`/api/home/nexa`) forzaba un `requestedModel` soportado → `buildProviderPlan` step 1 ganaba → el auto-router nunca corría (la arquitectura prometía Claude para conocimiento, pero el chat quedaba clavado en Gemini).
+- **Fix:** contrato `modelMode: 'auto'|'manual'` + SSOT puro `resolveNexaRequestedModel` en `nexa-models.ts`. `auto` (default) → `requestedModel: null` → el plan decide (pin/router/default). **`nexa-service.ts` NO cambió** (ya manejaba null). Cliente (`use-nexa-runtime` + el FAB global `NexaFloatingButton`, que tiene adapter propio) manda `modelMode`.
+- **UI:** `NexaModelSelector` agrega `Automático` (default) + Gemini override; Claude nunca visible. Tipo `NexaModelSelectorValue` threaded por NexaThread/Hero/HomeView/FAB/mockup.
+- **Hallazgo:** hay DOS adapters de chat que pegan a `/api/home/nexa` — `useNexaPersistentRuntime` (home + NexaFloatingPanel) y `createFloatingAdapter` (NexaFloatingButton, el FAB global). Ambos necesitaban el contrato. Convergerlos en un solo runtime es tech-debt pre-existente (fuera de scope; el FAB no persiste threads).
+- **Inerte con flags OFF** (default) → sin regresión. Valor: prender `NEXA_AUTO_ROUTER_ENABLED` ahora **sí** alcanza el router; auditable vía telemetría TASK-1129.
+- **Gates:** lint 0 · tsc 0 · build ✓ · doc-gate verde · 5 tests del helper + routing + route test ajustado. GVC `/home` enterprise (el selector es control avanzado, no prominente). Docs: llm-models.md + behavior caveat corregido + arch Delta + skill (Claude+Codex).
+
+## Sesión 2026-06-15 — TASK-1129 Telemetría de turno de Nexa (promptVersion + provider/runtime) — Claude
+
+> **Estado:** **complete** en `develop` (local-first, sin push aún). Backend/observabilidad, con migración. Follow-up de TASK-1124. **Desbloquea TASK-1134**.
+
+- **Qué:** cada respuesta del chat deja un rastro estructurado auditable: version/familia del prompt + provider plan/resuelto + failover + latencias + tools + outcome + sugerencias. Contrato `nexa-turn-telemetry.v1` + `NexaResponse.turnTelemetry?` (additive).
+- **Persistencia:** ledger aditivo `greenhouse_ai.nexa_turn_telemetry` (migración `20260615144556723`). **best-effort post-commit** en `store.ts` → la observabilidad NUNCA rompe la conversación (captura `home` + sobrevive a tabla ausente). El endpoint **stripea** `turnTelemetry` (no se devuelve al cliente).
+- **Gate TASK-893 atrapó un bug real:** `nexa_messages.message_id` es **text**, no uuid (el route inserta `crypto.randomUUID()` como string) — la FK falló al primer `migrate:up`, la corregí a `text`. La validación contra PG real fue clave.
+- **Signal** `nexa.turn.degraded_outcomes` (módulo Home, steady≈0): `graceful_fallback` + `did_failover` en 24h. Hard-fail cubiertos por TASK-1131.
+- **Scope diferido:** latencia por-tool (el provider no la expone → TASK-1135) + tokens/costo (SDK sin usage estable) = placeholders versionados.
+- **Gates:** lint 0 · tsc 0 · build ✓ · 8 focales nuevos + 429 reliability · doc-gate verde. Docs de capa: `behavior/behavior-and-routing.md` + `technical/data-contracts.md`. Skill `greenhouse-nexa-conversational` actualizada.
+
+## Sesión 2026-06-15 — TASK-1131 Nexa chat endpoint: contrato de error canónico + captureWithDomain — Claude
+
+> **Estado:** **complete** en `develop` (local-first). Backend/reliability, sin migración/capability/UI. Follow-up de TASK-1124.
+
+- **Bug-class:** el `500` de `/api/home/nexa` devolvía `error.message` crudo en inglés al cliente es-CL + sin captura por dominio.
+- **Fix (5 handlers del backend compartido del chat):** todo error cruza por `canonicalErrorResponse` (es-CL + `code` + `actionable`) — `unauthorized`/`nexa_prompt_required`/`nexa_generation_failed`/`internal_error` — y se captura con `captureWithDomain(error, 'home', { tags: { source: 'nexa_*_endpoint' }, extra: redactErrorForResponse })`. 2 codes nuevos additive al enum.
+- **Root-cause:** el cliente (`use-nexa-runtime.ts:135`) hacía `throw new Error(errorBody?.error || fallback)` (anti-patrón) → al arreglar el endpoint, `errorBody.error` es es-CL por construcción, sin tocar el cliente.
+- **Dominio = `home`** (endpoint `/api/home/nexa` + módulo Home con `incidentDomainTag: 'home'`). No se creó domain `nexa` (scope creep P3).
+- **Frontera de scope:** los 400/404 de validación específica (`Missing X`, `Thread not found`) quedan como señales de contrato de API (no son el bug-class). Follow-up opcional canonicalizarlos.
+- **Gates:** lint 0 · tsc 0 · 136 focales (route.test nuevo + api + nexa) · doc-gate verde. Doc de capa `behavior/behavior-and-routing.md` §Contrato de error. Skill `greenhouse-nexa-conversational` actualizada (hardening abierto → TASK-1131 hecho).
+
+## Sesión 2026-06-15 — TASK-1138 Nexa Chat: política de estructura/formato (prompt V2 → v2.1.0) — Claude
+
+> **Estado:** **complete** en `develop` (local-first). Aditivo bajo `NEXA_SYSTEM_PROMPT_V2_ENABLED` (ON local/staging, prod sigue V1 — flip = decisión separada del operador). GVC verificada.
+
+- **Por qué:** el chat respondía en prosa corrida. El render Markdown del thread ya es capaz; el gap era que V2 pedía *conciso* sin pedir *estructura*. Fix = módulo de prompt nuevo, cero UI.
+- **Qué se hizo:** módulo `answerFormatting` en `buildNexaSystemPromptV2` (párrafos cortos + viñetas + negrita en el dato clave + emojis semánticos moderados + sin headers). Aditivo: no toca la regla de Markdown crudo de v2.0 ni el contrato de voz ("estructurar ≠ decorar").
+- **Primer pase real por el gate de TASK-1126** (la razón por la que el operador pidió esta task): bump `v2.0→v2.1.0` (clase `policy`) + **freeze-on-bump** del changelog (entrada v2.0 congelada a literal; la nueva v2.1.0 referencia el const) + golden regenerado. **Verificado live:** doc-gate `--changed` FALLÓ con el doc de capa sin actualizar, y PASÓ tras `current.md` + bump + changelog. El gate NO false-positivea sobre un bump legítimo.
+- **Gates:** lint 0 · tsc 0 · 15/15 focales (golden + anchor del módulo) · 111 nexa vitest · `pnpm nexa:doc-gate --changed` verde.
+- **Slice 3 GVC — HECHO:** scenario nuevo `scripts/frontend/scenarios/nexa-floating-chat-formatting.scenario.ts` (LIVE/manual, no-CI) maneja el FAB real (el FAB se autosuprime en `/home` → ruta `/people`), envía una pregunta y captura la respuesta real de Gemini. Frame mirado: viñetas anidadas + **negrita** en el dato clave + bloques cortos (antes: prosa corrida). Nota: el output es no-determinista (una corrida dio el error-contract honesto de TASK-1131; el retry dio la respuesta estructurada).
+- **Pendiente (no bloqueante):** flip de V2 en prod (decisión del operador) + assert de estructura en la QA matrix live (follow-up ligado a TASK-1127; hoy es harness no-determinista contra `/api/home/nexa`).
+
+## Sesión 2026-06-15 — TASK-1126 Nexa prompt governance hardening (golden snapshot + gate version/changelog) — Claude
+
+> **Estado:** completo en `develop` (local-first, sin push). DX/governance puro — sin migración / capability / outbox / UI / rollout runtime. Follow-up de TASK-1124.
+
+- **Golden snapshot del prompt** (`src/lib/nexa/nexa-system-prompt.test.ts` + `src/lib/nexa/__snapshots__/`): captura el prompt **ENTERO** de V2 (activo) y V1 (rollback) determinista (`FIXED_NOW` → fecha `America/Santiago` pineada) vía `toMatchSnapshot()` (convención del repo). Cierra el hueco "cambio de prompt se cuela sin diff visible". El `.snap` es committeable y se regenera con `-u`.
+- **Doc-gate extendido** (`scripts/ci/nexa-intelligence-doc-gate.mjs`, `--changed`): cuando cambia `nexa-system-prompt.ts`, parsea `NEXA_PROMPT_GOVERNANCE` por regex (resuelve consts `NEXA_SYSTEM_PROMPT_V*_VERSION`; el `.mjs` no importa TS) y exige (A) changelog con entrada == `activeVersion` **y** (B) `activeVersion` bumpeada vs base **o** changelog que creció. **Verificado live:** edit-sin-bump → FALLA (exit 1, mensaje claro); edit+changelog-grow → PASA; prompt intacto → skip (mi propio PR no toca el prompt → no se auto-trampea).
+- **Skills** `.claude/` + `.codex/` (byte-idénticas): el puntero a `nexa-intelligence/` ya existía (TASK-1131); reforcé el bullet del prompt para nombrar el gate + el golden + `versioning.md`.
+- **Doc de capa** `system-prompt/versioning.md`: checklist actualizado (golden snapshot + el gate de version/changelog) + **freeze-on-bump** del changelog (congelar la entrada histórica a su literal al bumpear el const, para que el changelog sea append-only de verdad) + la shape canónica que el gate parsea.
+- **Gates:** lint 0 · tsc 0 (`pnpm local:check` EXIT 0) · 14/14 focales (incl. 2 goldens) · `pnpm nexa:doc-gate` audit+changed verde. `pnpm test` full + `pnpm build` no corridos: el change set es 1 test + 1 CI `.mjs` + `.md` (sin app/runtime/registry/`'use client'`) → fuera de su blast radius.
+- **Decisión documentada:** sin entrada en CLAUDE.md (P3 narrow; la regla agent-facing vive en `versioning.md` + las skills, que ya son SSOT del layer).
+
+## Sesión 2026-06-15 — TASK-1145 Nexa "Mi espacio": prompt "tu recibo de pago disponible" — Claude
+
+> **Estado:** code-complete en `develop` (local-first). Aditivo bajo el flag de TASK-1087 (`NEXA_SUGGESTED_PROMPTS_DATA_AWARE_ENABLED`, ya ON en local + staging). Cierra el follow-up de pago que TASK-1144 dejó stubbeado.
+
+- **Reader canónico nuevo** `pgMemberPayslipReadyForRecentPeriod(memberId)` en `src/lib/payroll/postgres-store.ts`: `EXISTS` de `payroll_entries` activo en período `status='exported'` cuyo (año, mes) cae en el mes operativo reciente (actual o anterior, `getOperationalPayrollMonth`). Read API thin: `{ ready }`, NUNCA el monto. **Validado contra PG real** (gate TASK-893): dummy→`ready:false`, member real con período exportado (`andres-carlosama`)→`ready:true`.
+- **Wire al resolver `personal`** (`data-aware-personal-resolver.ts`): 3ra fuente en el `Promise.allSettled` (degradación independiente); fact `payslipReady`; prompt **informativo sin `hint`**; orden atrasos > recibo > desempeño > aprobaciones > vacaciones.
+- **Copy regime-neutral** (`personal_payslip_ready`): "Tu recibo de pago más reciente ya está disponible" — "recibo", NUNCA "liquidación" (open question resuelta: el neutral cubre Chile dependiente + honorarios + Deel; el receipt destino ya es regime-aware, TASK-758).
+- **Gates:** tsc 0 · lint 0 · 14/14 focales · suite nexa+payroll **642 passed** · `pnpm nexa:doc-gate` verde. Doc de capa: Delta TASK-1145 en `experience/suggested-prompts.md`.
+- **Pendiente (rollout):** GVC del prompt en `/my` con un período exportado vivo (mismo gate que TASK-1087/1139).
+
+## Sesion 2026-06-15 — Portal Cliente/Integraciones/Comunicaciones/AI Tooling/Admin Center docs end-to-end para Nexa Knowledge — Codex
+
+> **Estado:** documentacion creada, ingestion NO ejecutada por instruccion del operador. `TASK-1140` queda como vehiculo formal unico para ingestar manuales operativos multi-dominio a Knowledge/Nexa.
+
+- **Autenticacion GCP relanzada:** por instruccion del operador se ejecuto el flujo canonico completo: `gcloud auth login` y `gcloud auth application-default login`. CLI quedo autenticado como `julio.reyes@efeonce.org`, proyecto `efeonce-group`; ADC quedo OK con quota project `efeonce-group`.
+- **Auditoria runtime/DB:** despues de reauth, Postgres respondio desde DB `greenhouse_app` con usuario runtime `greenhouse_app`. Se consultaron solo agregados sin PII para Portal Cliente, Integraciones/Sync/Webhooks, Comunicaciones/Notificaciones/Teams, AI Tooling/Content/Assets y Admin Center residual.
+- **Snapshot agregado:** Portal Cliente tiene 10 modulos activos y 0 asignaciones activas/eventos; Integrations tiene 7 integraciones activas (6 ready/1 warning), runs recientes, 10.879 webhooks processed y 5 failed en 7 dias, 309 outbound deliveries succeeded y 5 dead_letter; Comunicaciones tiene 209 notificaciones in-app (81 read/128 unread), 53 emails sent en 30 dias, 3 canales Teams Bot ready y 8 conversation references; AI Tooling tiene 34 tools activas y 0 wallets/licencias/ledger; Admin Center tiene 104 vistas activas, 442 role-view grants, 0 user overrides y 0 Service SLAs.
+- **Documentos nuevos:** `docs/documentation/client-portal/portal-cliente-customer-experience-end-to-end.md`, `docs/manual-de-uso/client-portal/operar-portal-cliente-customer-experience.md`, `docs/documentation/operations/integraciones-y-sync-end-to-end.md`, `docs/manual-de-uso/operations/operar-integraciones-y-sync.md`, `docs/documentation/plataforma/comunicaciones-notificaciones-end-to-end.md`, `docs/manual-de-uso/plataforma/operar-comunicaciones-notificaciones.md`, `docs/documentation/ai-tooling/ai-tooling-content-assets-end-to-end.md`, `docs/manual-de-uso/ai-tooling/operar-ai-tooling-content-assets.md`, `docs/documentation/admin-center/admin-center-operacion-end-to-end.md`, `docs/manual-de-uso/admin-center/operar-admin-center.md`.
+- **Indices sincronizados:** `docs/documentation/README.md` y `docs/manual-de-uso/README.md`.
+- **Task ajustada:** `docs/tasks/to-do/TASK-1140-finance-manuals-nexa-knowledge-ingestion.md` — ahora incluye Portal Cliente, Integraciones/Sync, Comunicaciones/Notificaciones, AI Tooling/Content/Assets y Admin Center residual, con golden questions y reglas de no-accion para Nexa.
+- **Pendiente:** ejecutar gates documentales (`pnpm ops:lint --changed`, `pnpm docs:closure-check`) antes de commit. La ingestion de Knowledge/Nexa sigue fuera de esta sesion.
+
+## Sesion 2026-06-15 — Comercial/Agency/Identity/My Space/Public Site/UI Platform docs end-to-end para Nexa Knowledge — Codex
+
+> **Estado:** documentacion creada, ingestion NO ejecutada por instruccion del operador. `TASK-1140` queda como vehiculo formal unico para ingestar manuales operativos multi-dominio a Knowledge/Nexa.
+
+- **Auditoria runtime:** se revisaron codigo y DB read-only donde aplica para Comercial/Quote-to-Cash, Agency/Delivery/Account 360, Identity/Access/Admin Center, My Space/Self-Service, Public Site/Content Factory y UI Platform/Design System. Evidencia agregada en los documentos: tablas `greenhouse_commercial`, `greenhouse_core`, `greenhouse_serving`, `greenhouse_knowledge`; conteos agregados de quotes, contracts, deals, catalog, roles/views/assignments, knowledge docs y design-system nodes; Public Site no tiene schema relacional propio y opera por bridge/scripts/reports.
+- **Hallazgos clave:** Comercial conserva frontera Quote-to-Cash vs Finance/caja; Agency/Delivery tiene facetas y degradacion honesta, con service attribution parcial y no Service P&L completo; Identity separa rol/vista/entitlement/permission set y SCIM sin bypass; My Space deriva identidad desde sesion y no acepta IDs arbitrarios; Public Site sigue read-only/draft-only para control plane; UI Platform exige tokens/primitives/Composition Shell/GVC antes de crear UI.
+- **Documentos nuevos:** `docs/documentation/comercial/quote-to-cash-comercial-end-to-end.md`, `docs/manual-de-uso/comercial/operar-quote-to-cash-comercial.md`, `docs/documentation/agency/agency-delivery-account-360-end-to-end.md`, `docs/manual-de-uso/agency/operar-agency-delivery-account-360.md`, `docs/documentation/identity/identity-access-admin-center-end-to-end.md`, `docs/manual-de-uso/identity/operar-identity-access-admin-center.md`, `docs/documentation/personas/my-space-self-service-end-to-end.md`, `docs/manual-de-uso/personas/operar-mi-espacio-self-service.md`, `docs/documentation/public-site/public-site-content-factory-end-to-end.md`, `docs/manual-de-uso/public-site/operar-public-site-content-factory.md`, `docs/documentation/plataforma/ui-platform-design-system-end-to-end.md`, `docs/manual-de-uso/plataforma/operar-ui-platform-design-system.md`.
+- **Indices sincronizados:** `docs/documentation/README.md` y `docs/manual-de-uso/README.md`.
+- **Task ajustada:** `docs/tasks/to-do/TASK-1140-finance-manuals-nexa-knowledge-ingestion.md` — ahora es umbrella de ingesta para Finance, People/Workforce/Payroll/Contractors y estos seis dominios adicionales, con golden questions por wrong-source y restricciones de no-accion para Nexa.
+- **Nota multi-agente:** no tocar WIP ajeno actual de `TASK-1141`/Nexa suggested prompts (`docs/tasks/in-progress/TASK-1141-*`, `src/lib/nexa/**`, rutas `/my` y docs Nexa modificados por otro agente) al preparar commit de estos manuales.
+
+## Sesion 2026-06-15 — People/Workforce/Payroll/Contractors docs end-to-end para Nexa Knowledge — Codex
+
+> **Estado:** documentacion creada, ingestion NO ejecutada por instruccion del operador. `TASK-1140` queda como vehiculo formal unico para ingestar Finance + People/Workforce/Payroll/Contractors a Knowledge/Nexa.
+
+- **Auditoria runtime:** se revisaron codigo y DB read-only de HR/Payroll/Workforce/Contractors: APIs `hr/payroll`, `admin/workforce`, `hr/contractors`, `finance/contractor-payables`; libs `src/lib/payroll/**`, `src/lib/workforce/**`, `src/lib/contractor-engagements/**`; schemas `greenhouse_payroll`, `greenhouse_hr`, `greenhouse_core` y `greenhouse_serving`.
+- **Hallazgos clave:** payroll tiene 4 periodos exportados, 21 entries, compensation versions, adjustments, receipts, export packages y compliance artifacts; Workforce tiene members en `pending_intake`, `in_review` y `completed`; Contractors tiene engagement/payable real enlazado a Finance (`payment_order_created`). Se documento la frontera critica: contractor no es nomina dependiente, honorarios no lleva AFP/salud/cesantia/IUSC, y payment order pagada no equivale a conciliacion.
+- **Documentos nuevos:** `docs/documentation/hr/people-workforce-payroll-contractors-end-to-end.md` y `docs/manual-de-uso/hr/operar-workforce-payroll-contractors-end-to-end.md`.
+- **Indices sincronizados:** `docs/documentation/README.md`, `docs/manual-de-uso/README.md`, `docs/tasks/README.md`, `docs/tasks/TASK_ID_REGISTRY.md`.
+- **Task ajustada:** `docs/tasks/to-do/TASK-1140-finance-manuals-nexa-knowledge-ingestion.md` — ahora incluye registrar docs People/Workforce/Payroll/Contractors en corpus Knowledge, agregar golden questions wrong-source por regimen/camino operativo y validar que Nexa mantenga fuera de alcance acciones HR/Payroll/Finance. No queda task separada de ingesta para People/Payroll.
+- **Gates:** `pnpm ops:lint --changed` verde, `git diff --check` verde, whitespace/path check de archivos nuevos verde. `pnpm docs:closure-check` exit 0 con warning advisory `task_lifecycle_check`; README/registry fueron verificados manualmente y ya reflejan `TASK-1140` como umbrella y `TASK-1144` como siguiente ID por las tasks 1141-1143 existentes en el checkout.
+
+## Sesión 2026-06-15 — TASK-1139 Nexa data-aware prompts enrichment (Tier 2.1) — Claude
+
+> **Estado:** code-complete en `develop` (local-first). Aditivo bajo el flag de TASK-1087 (ya ON en local + staging). Ejecuta las recomendaciones de cierre de TASK-1087.
+
+- **4 slices:** (1) **hint UI** — ícono Tabler por categoría (`anomaly/risk/pending/kpi`) en la card data-aware vía MUI palette (token); template = sin ícono (honesto). (2) **entrypoint** — `NexaContextScope` declara `entrypoint` (shell lo deriva de `projection.entrypointContext`), el hook lo manda, el composer lo pasa al reader → facets correctos finance vs agency. (3) **cache** de ruta TTL 30s en el composer, solo `data_aware`. (4) **reliability re-scope honesto** — signal de fallback-rate dedicado NO factible (`getCloudSentryIncidents` solo filtra por `domain`); las fallas ruedan al rollup `agency`; el signal de tasa de uso real es TASK-1129.
+- **Diseño:** revisado con `modern-ui` + `state-design` (ambos PASS). Out-of-scope: WebMCP (API experimental) + payroll data-aware (sin página de período).
+- **Gates:** tsc 0 · lint 0 · 14/14 tests focales · suite Nexa 82 passed · `pnpm nexa:doc-gate` verde · build.
+- **Pendiente (rollout):** GVC del ícono `hint` con una señal viva (mismo gate que TASK-1087). Retomar: `/implement-task TASK-1139`.
+
+## Sesion 2026-06-15 — Finance docs end-to-end para Nexa Knowledge — Codex
+
+> **Estado:** documentacion creada, ingestion NO ejecutada por instruccion del operador. `TASK-1140` queda en `to-do` como vehiculo formal para ingestar los manuales a Knowledge/Nexa.
+
+- **Hallazgo:** Nexa ya tiene `search_knowledge`, pero preguntas Finance pueden recuperar documentos generales no financieros con confianza alta si el corpus no tiene un paquete Finance end-to-end bien registrado.
+- **Correccion de alcance:** tras feedback del operador, se hizo auditoria real de codigo y DB read-only antes de completar los manuales. Se verificaron APIs/surfaces de cash-in, cash-out, Banco, Conciliacion, Payment Orders, instrumentos de pago, transferencias internas, settlement legs y tablas `greenhouse_finance`/serving relacionadas. Member Loaded Cost Model queda descrito como frontera forward-going, no como runtime completamente operable.
+- **Documentos nuevos/actualizados:** `docs/documentation/finance/operacion-finance-end-to-end.md` (mapa funcional completo reconciliado contra codigo/DB), `docs/manual-de-uso/finance/registrar-ingresos-egresos-y-ordenes-de-pago.md`, `docs/manual-de-uso/finance/caja-cobros-pagos-y-liquidaciones.md`, `docs/manual-de-uso/finance/conciliacion-bancaria-operacion.md` e `docs/manual-de-uso/finance/instrumentos-de-pago-y-banco.md`.
+- **Indices sincronizados:** `docs/documentation/README.md`, `docs/manual-de-uso/README.md`, `docs/tasks/README.md`, `docs/tasks/TASK_ID_REGISTRY.md`.
+- **Task creada:** `docs/tasks/to-do/TASK-1140-finance-manuals-nexa-knowledge-ingestion.md` — scope: registrar docs Finance en corpus Knowledge, agregar golden questions wrong-source para ingresos/egresos/caja/instrumentos/Banco/conciliacion/payment orders, validar local/staging y mantener fuera de alcance cualquier accion financiera desde Nexa.
+- **Gates:** pendiente re-ejecutar tras esta expansion documental. Advertencia conocida: `docs:closure-check` puede mantener warnings por cambios de codigo/Nexa preexistentes en el worktree (`missing_changelog`, `client_changelog_check`), no originados por esta documentacion Finance.
+
+## Sesión 2026-06-15 — TASK-1087 Nexa prompts sugeridos data-aware (Tier 2) — Claude
+
+> **Estado:** code-complete en `develop` (local-first, SIN push). Aditivo + **flag `NEXA_SUGGESTED_PROMPTS_DATA_AWARE_ENABLED` default OFF** → cero efecto al merge. Cutover + GVC con anomalía viva = rollout-time (operador).
+
+- **Qué cambió:** los starters del empty hero del chat flotante de Nexa ahora pueden ser **data-aware** — arrancan desde la señal real de la entidad (anomalía/pendiente/KPI en rojo) en vez de la plantilla fija. Es el Tier 2 de TASK-1078 (Tier 1/1.5 siguen como fallback).
+- **Reuse-first:** el composer server-only `resolveDataAwareSuggestedPrompts` **reusa** `readOrganizationWorkspaceCompactSignalsSafely` (ya compuesto + degradación-honesta + subject-gated/anti-oracle vía `visibleFacets`). NO recompone readers sueltos. Mapper **puro** `buildDataAwarePromptsFromCompactSignals` con **allowlist categórica** (NUNCA `driver.value`/`signal.body` al texto — solo categoría + nombre + `entityRef`).
+- **Archivos:** `src/lib/nexa/suggested-prompts-data-aware.ts` (composer) · `suggested-prompts-contract.ts` (contrato puro `nexa-suggested-prompts.v1`) · `use-data-aware-suggested-prompts.ts` (hook cliente aditivo) · `src/app/api/nexa/suggested-prompts/route.ts` (NUNCA 5xx) · `flags.ts` · `copy/nexa.ts` (plantillas es-CL) · `nexa-page-context.tsx` + 2 páginas org (declaran `entityId`/`entityKind`) · `NexaFloatingPanel.tsx` (consume).
+- **V1 solo contexto `client`** (org workspace, único con `entityId`); `finance`/`payroll`/`general` → fallback hasta wirear su página + resolver (composer extensible).
+- **Doc gate:** doc de capa `docs/architecture/nexa-intelligence/experience/suggested-prompts.md` + `manifest.json` (nuevo dominio `suggested-prompts` + doc en dominio flags). `pnpm nexa:doc-gate` verde (10 dominios).
+- **Gates:** tsc 0 · lint 0 · 8/8 tests focales (degradación + allowlist anti-monto + anti-oracle + cap 4) · suite Nexa 76 passed · build.
+- **Pendiente (rollout):** flag ON en staging + validar con un cliente con señal viva (GVC: el primer prompt refleja la anomalía real) → recién entonces cutover. Retomar: `/implement-task TASK-1087`.
+
+## Sesión 2026-06-15 — Nexa Intelligence: documentación por capas + doc gate (TASK-1124 follow-up) — Claude
+
+> **Estado:** shipped en `develop`. Documentación + gate, sin tocar runtime de Nexa.
+
+- **Carpeta `docs/architecture/nexa-intelligence/`** organizada en **carpetas por dominio** (crecen): `system-prompt/` · `behavior/` · `voice/` · `knowledge/` · **`experience/`** (Conversational Experience + Nexa Moments + Nexa Answers) · `governance/` · `technical/` (modelos LLM, RAG, técnicas, contratos). Índice `README.md` + `manifest.json` (SSOT dominio↔código↔docs, v2).
+- **Gate `pnpm nexa:doc-gate`** (`scripts/ci/nexa-intelligence-doc-gate.mjs`, en `ci.yml` `--changed`): tocar un dominio Nexa sin actualizar su doc de capa → falla; archivo Nexa nuevo sin registrar → falla. Audit: 9 dominios, 22 docs, 23 archivos Nexa cubiertos, 0 links rotos.
+- **Funcional + manual**: `docs/documentation/plataforma/nexa-intelligence-capas.md` + `docs/manual-de-uso/plataforma/nexa-intelligence-mantener.md`. Refs en CLAUDE.md + AGENTS.md.
+- **Corpus RpA (TASK-1124 follow-up)**: "Revisions per Asset" → "Rounds per Asset" en `motor-ico-metricas-operativas.md` + re-ingesta aplicada a `greenhouse-pg-dev` (local + **staging** ✓, chunk `published` verificado). **Prod**: `TASK-1125` (resolver si comparte la misma Cloud SQL).
+- **Tasks de follow-up creadas**: `TASK-1125` (corpus prod), `TASK-1126` (prompt governance hardening: golden snapshot + version/changelog gate), `TASK-1127` (QA nightly + eval wrong-source/cross-doc), `TASK-1128` (signal de drift de términos canónicos del corpus), `TASK-1129` (telemetría promptVersion por turno).
+- **Commits previos de TASK-1124**: `c709dfaaf` (8 slices), `9fb089002` (excerpt hygiene), `b9e119045` (RpA fix), `d532329b9` (docs por capas), `ab602ec3f` (TASK-1125).
+
+## Sesión 2026-06-15 — TASK-1106 Account 360 delivery serving contract hardening — Claude
+
+> **Estado:** CODE-COMPLETE en `develop` (3 commits local, SIN push). Cierra la causa raíz de `ISSUE-087` / Sentry `JAVASCRIPT-NEXTJS-7H`. **ISSUE-087 sigue abierto** (gated por quiet period de Sentry per Acceptance Criteria) → la task se mantiene `in-progress`.
+
+- **Causa raíz (PG real):** `organization_operational_metrics` (cache compacto, SIN `rpa_median`/`pipeline_velocity`/`stuck_asset_pct`) vs el reader `facets/delivery.ts` que une con `ico_organization_metrics` (rica) y SELECTea las 3 ricas en AMBAS ramas del UNION → 42703, enmascarado como degradación a BigQuery (`observeAndDegrade`).
+- **Fix robusto (PARITY):** (1) migración additive `20260615064729116` + backfill 8/8 (aplicada al instance compartido `greenhouse-pg-dev` → root cause ya resuelto en runtime para staging/preview). (2) reader canónico único `organization-operational-metrics-reader.ts` consumido por `facets/delivery.ts` Y `getOrganizationOperationalServing` (mata la duplicación). (3) schema-drift se re-lanza (loud → `_meta.errors`), disponibilidad degrada a BQ, ausencia = `null` nunca `0`. Projection puebla las columnas ricas.
+- **Verificación:** tsc 0 · lint 0 · build · suite **6992 passed** · live drift guard (DB real) `_meta.errors=[]` · staging `org-f6aa4e20…` (ANAM): 360 delivery `cache=bypass` HTTP 200 `errors:[]` + compact-signals HTTP 200 `degradedSources:[]`.
+- **Nota gates:** un `pnpm test` con `source .env.local` da 19 falsos fallos (env-sensitive: resend/secret-manager/nexa-vertex/postgres-posture/email-baseline + live PG parity). El gate canónico es SIN sourcear `.env.local` → verde.
+- **Pendiente (rollout):** push develop + deploy del refactor; quiet period Sentry; marcar `JAVASCRIPT-NEXTJS-7H` resolved; mover `ISSUE-087` a `resolved/`; recién entonces `Lifecycle: complete`.
+- **Retomar:** `/implement-task TASK-1106`. Local-first.
+
+## Sesión 2026-06-14 — TASK-1124 Nexa Knowledge answer quality + system prompt V2 — Claude
+
+> **Estado:** code-complete en `develop`, 8 slices. Gates: tsc 0 · lint 0 · suite completa **6980 passed** · build. Flags ON en local + Vercel **staging**; **prod gated por sign-off del operador**. **Rollout pendiente de verificación viva en staging** (el dev server local servía V1 hasta el reinicio; la QA matrix viva confirma routing/no-answer pero el citado inline `[n]`/síntesis se valida con V2 activo en staging tras deploy).
+
+- **Qué cambió:** las respuestas de Knowledge ahora **sintetizan** (no copian un fragmento) y el system prompt es un **artefacto versionado** (V1 byte-equivalente = rollback; V2 modular con realidad de plataforma 2026, response modes y **contrato de voz Efeonce**). Hygiene de evidencia: cero "Fuentes:" anexado + cero `##` crudo (la UI es dueña de la evidencia, TASK-1112). Evidence brief (group/dedupe/parent context) + rerank conservador del top-N FTS (anti wrong-source por heading + diversidad, mismo set). Governance machine-readable + QA matrix extendida (síntesis/voz/regresión `##`).
+- **Flags** (3 nuevos, ON local + staging): `NEXA_SYSTEM_PROMPT_V2_ENABLED`, `NEXA_KNOWLEDGE_SYNTHESIS_BRIEF_ENABLED`, `KNOWLEDGE_SEARCH_RERANK_ENABLED`. Default OFF en código → cutover por env. Rollback = flag OFF.
+- **Archivos clave:** `src/lib/nexa/nexa-system-prompt.ts` (+ test + `NEXA_PROMPT_GOVERNANCE`), `nexa-service.ts` (consume builder, removido post-procesador Fuentes), `nexa-tools.ts` (`buildKnowledgeEvidenceBrief` + strip headings), `src/lib/knowledge/search/{rerank-knowledge-chunks,flags}.ts` (+ test) + `search-knowledge.ts`, `scripts/nexa-knowledge-qa-matrix.mjs`. Docs: `GREENHOUSE_NEXA_SYSTEM_PROMPT_GOVERNANCE_V1.md` + Delta arch Nexa + funcional v1.1 + DECISIONS_INDEX.
+- **Verificación viva V2 hecha en local (Gemini):** tras reload de `.env.local`, K2/K4 = grounded **sintetizado + `[n]` inline** (cross-doc), O1 = ruteo operacional (sin knowledge), G2 = no-answer honesto, P1 = policy filtering ✓. **Único residual K6** ("guía de nómina"): grounded + citado pero Gemini no anexa el cierre de "validación humana" pese a la instrucción V2 reforzada (obligatoria) → la QA matrix lo flaggea honestamente. Es variance de compliance del modelo; la ruta `/api/home/nexa` resuelve **Gemini** localmente, mientras en staging/prod el auto-router manda preguntas de conocimiento a **Claude**.
+- **Verificación viva pendiente (operador, en staging):** correr `pnpm qa:nexa-knowledge -- --env=staging` con V2 + auto-router (Claude) activo → confirmar K6 sensible con cierre de validación + el resto.
+- **Retomar:** `/implement-task TASK-1124`. Local-first.
+
+## Sesión 2026-06-14 — TASK-1113 Nexa floating chat: flicker + scroll (fix de raíz) — Claude
+
+> **Estado:** code-complete en `develop` local, **SIN push/commit** (checkout compartido con WIP de Codex; el commit espera tu OK). Verificado objetivamente con streaming real local. Pendiente: confirmación visual tuya en staging tras deploy.
+
+- **Causa raíz del flicker "cuando usa una tool" (la que reportaste):** `NexaToolRenderers` registraba las tool UIs desde el `tools.Fallback` → loop mount/unmount del card (~630 remounts/s). Fix: montar `NexaToolRenderer` UNA vez dentro del thread (registro persistente) + renderers a nivel de módulo (`React.memo`) + Fallback puro. Medido: **3793 → 0** remounts en 6s.
+- **Flicker de texto:** `MarkdownTextPrimitive` sin componentes memoizados → `unstable_memoizeMarkdownComponents` (solo el último bloque re-renderiza).
+- **Scroll trabado:** quitar CSS `scroll-behavior: smooth` del viewport → sticky-bottom honesto de assistant-ui. Medido: scrollTop se queda al subir mientras el contenido crece 14×.
+- **Archivos:** `src/views/greenhouse/home/components/NexaThread.tsx` + `NexaToolRenderers.tsx`. Aditivo, sin flags/migraciones.
+- **Fuera de scope (issue separado, NO parche):** error de hidratación `useId` en un `CustomTextField` global (NO el composer de Nexa) — una vez al cargar, no es el flicker repetitivo del streaming.
+- **Gates:** lint + tsc + design:lint + build + suite completa (6961 tests) verde. GVC mobile + confirmación staging pendientes.
+- **Retomar:** `/implement-task TASK-1113`. Local-first, sin push salvo pedido explícito.
+
+## Sesión 2026-06-14 — TASK-1110 Slices A + A.2 (la card y la respuesta "se arman") — Claude
+
+> **Estado honesto:** la CAPACIDAD funciona (la card y la respuesta se arman), pero **NO hay flujo live "escribir en la caja Nexa → compone in-place" todavía**. Lo que existe hoy es el **mockup** (toggle Host/Con Nexa) + la Lab. El live (escribir→compone) es el **Slice 1** (redo en `/knowledge`, estaba mal). NO crear task nueva — el vehículo es **TASK-1110** (in-progress, Delta 2026-06-14 en el `.md` encodea la visión + slices).
+
+**Visión del operador (norte):** una UI ya armada se **TRANSFORMA in-place** en experiencia conversacional al preguntar a Nexa (misma superficie, no navega); la respuesta **lidera**, el host persiste vivo, y la respuesta **SE ARMA** (chart dibuja + número cuenta = firma del Nexa moment).
+
+- **✅ Slice A (`447ea61f7`):** la card se arma sola — `entrance='assemble'` en `MetricTrendCard` + `AnimatedCounter animateFrom` (conteo confiable al montar, sin race del IntersectionObserver; never-hidden + reduced-motion horneados). Canonizado en `PRIMITIVES.md` (`176d84651`). Lab `/design-system/card-density` ("Secuencia macro").
+- **✅ Slice A.2 (`15a3563d6`):** la respuesta del Moment se arma — `MetricValue` en `NexaAnswerBubble` cuenta el número (parsea '68%'/'0.4'/'$1.2M'; el chart ya dibujaba con `isAnimationActive`). Verificado e2e: conteo 0→68% + morph host→composed capturados y mirados.
+- **Hallazgo:** `NexaAnswerBubble` (1332 líneas) renderiza su chart/métrica con Recharts inline propio (NO reusa `MetricTrendCard`) → el ensamble se wirea ahí reusando `AnimatedCounter`.
+- **Pendiente:** **Slice B** (empaquetar como page DS "Nexa Answers Experience" — el flujo completo en un solo lugar + paridad `fe:capture:diff`) → **Slice 1** (redo live `/knowledge`, default ON via rollout-flag) → Slice C/D (GVC staging · Moment Fabric joint Codex, TASK-1095/1096).
+- **Continuidad:** memoria guardada (auto-load) `project_conversational_experience_vision_task1110` + `gcloud-adc-expiry-blocks-gvc`. **Retomar:** `/implement-task TASK-1110`. Local-first, sin push salvo pedido explícito. Comunicación: español neutro (sin voseo), explicar simple, cuidar detalles con loop GVC.
+
+## Sesion 2026-06-14 — TASK-1123 Content Intelligence Map MVP (Codex)
+
+- **TASK-1123 tomada en `develop`:** por instruccion del operador, sin branch/worktree. Lifecycle movido a `in-progress`; indices sincronizados en `docs/tasks/README.md`, `docs/tasks/TASK_ID_REGISTRY.md` y `EPIC-019`.
+- **MVP implementado:** nuevo primitive `src/lib/public-site/content-factory/intelligence-map.ts` genera `contentFactoryInspectionMap.v1` desde reportes reales del `greenhouse-wp-bridge`, normalizando Gutenberg `blockName`, Elementor/Ohio `widgetType`, metas Ohio/theme y HubSpot en modulos consumibles por agentes.
+- **CLI read-only:** nuevo `pnpm public-website:content-factory:inspect` inspecciona por defecto el post Gutenberg `249766` y la landing Elementor/Ohio `244079`; `--from-bridge-inspection <path>` permite construir el mapa desde inspecciones versionadas si Secret Manager/GCP auth no esta disponible; `--write` guarda evidencia en `docs/operations/public-site-content-factory-catalogs/content-intelligence-map-*.json`. No escribe WordPress, no publica, no limpia cache y no imprime secretos.
+- **Evidencia:** `docs/operations/public-site-content-factory-catalogs/content-intelligence-map-2026-06-14T18-38-09-337Z.json` generado desde inspecciones live previas porque el intento directo quedo bloqueado por `gcloud` local (`Reauthentication failed. cannot prompt during non-interactive execution`). Resultado: `249766` = `gutenberg_blocks` con 81 bloques; `244079` = `elementor_document` con 199 elementos; ambos sin access issues.
+- **Evidencia live fresca tras reauth GCP:** `docs/operations/public-site-content-factory-catalogs/content-intelligence-map-2026-06-14T18-43-51-314Z.json` generado por `pnpm public-website:content-factory:inspect -- --write` directo contra WordPress/Secret Manager. Resultado: `249766` = `gutenberg_blocks` con 81 bloques; `244079` = `elementor_document` con 199 elementos y 1 bloque residual detectado; ambos sin access issues.
+- **Safety:** este slice solo lee endpoints autenticados existentes. Writes del bridge siguen deshabilitados; refresh/fix futuro debe usar este mapa fresco y luego clone/draft/private antes de cualquier patch.
+
+### Slice 4 — Gutenberg draft validator MVP
+
+- **Primitive API-first:** `src/lib/public-site/content-factory/contracts.ts` + `gutenberg-validator.ts` agregan `validateGeneratedGutenbergDraft()` y contrato de salida `contentFactoryValidation.v1`.
+- **CLI agent-facing:** `pnpm public-website:content-factory:validate -- --file <draft.json> [--write]` valida artifacts locales `contentFactoryGeneratedDraft.v1`; no llama WordPress ni escribe runtime.
+- **Guardrails actuales:** bloquea lanes/kinds no Gutenberg, slug/titulo/SEO faltantes, scripts/iframes/inline handlers/`javascript:`, JSON de atributos inválido, comentarios Gutenberg desbalanceados y bloques fuera del allowlist gobernado. Advierte `core/freeform` por ser legacy observado, pero no patrón de generación nueva.
+- **Evidencia:** Vitest focal 5/5; CLI smoke local `status=pass` con draft temporal. Queda pendiente ampliar recipes/golden examples y conectar el validator al primer `post_draft_gutenberg` plan antes de cualquier write smoke.
+- **Planner + golden example:** `gutenberg-planner.ts` agrega `planGeneratedGutenbergPostDraft()` y `pnpm public-website:content-factory:plan -- --file <brief.json> [--out <draft.json>] [--write]` para convertir un `contentFactoryBrief.v1` local en `contentFactoryGeneratedDraft.v1` validado. Golden example nuevo: `docs/documentation/public-site/content-factory-golden-examples/gutenberg-post-ai-revops-draft.json`, validado con `status=pass`.
+- **Blogpost composition correction:** por feedback del operador, se priorizo entender la composicion real del blog antes de avanzar con send gates. WP-CLI read-only inspecciono 6 posts recientes: Efeonce usa Gutenberg estructurado con intro, TOC Yoast en posts largos, H2/H3/H4, listas, quotes, separadores, imagenes/galleries y `core/freeform` legacy. Se agrego `EFEONCE_BLOGPOST_COMPOSITION_PROFILE`, receta `docs/documentation/public-site/gutenberg-post-authoring-recipes.md`, golden example enriquecido y tests para bloquear posts planos/jerarquia rota. Writes siguen apagados; no se toco WordPress.
+
+## Sesion 2026-06-14 — TASK-1123 Greenhouse AI Content Factory Agent Kit creada (Codex)
+
+- **Decision de producto:** la Content Factory es AI-native, pero no chat-first. No se construye un chat nuevo; se crea un Agent Kit para que Codex, Claude Code, Nexa y futuros agentes sepan construir contenido WordPress con recursos gobernados.
+- **Full API Parity:** toda capacidad de la Content Factory debe nacer como primitive/reader/command server-side o path programatico explicito. UI, CLI y MCP son clients/adapters; MCP queda downstream de API Platform/primitives, nunca como bypass.
+- **Task registrada:** `docs/tasks/to-do/TASK-1123-greenhouse-ai-content-factory-agent-kit.md`, P1/alto, EPIC-019. Scope: specs `contentFactory*.v1`, recipes Gutenberg, recipes Elementor/Ohio, catalogos machine-readable, golden examples, validators, CLI evidence lane, primer smoke plan `post_draft_gutenberg`, y diseño MCP posterior.
+- **Scope ampliado por operador:** la fabrica debe poder crear, refrescar y fixear contenido existente. Se agregó `Content Intelligence Map` obligatorio antes de editar: post/page id, editor model, blocks/widgets, Ohio/theme metas, Elementor settings, assets, SEO/Yoast, HubSpot/CTA, anchors, ownership, freshness y fingerprint. Refresh/fix opera sobre clone/draft/private; patch directo published queda fuera salvo task/release explícita.
+- **Indices sincronizados:** `docs/tasks/README.md`, `docs/tasks/TASK_ID_REGISTRY.md`, `EPIC-019`, `project_context.md` y `changelog.md`.
+- **Cuidado multi-agente:** habia cambios ajenos sin tocar en `src/components/greenhouse/primitives/nexa-answer-bubble/NexaAnswerBubble.tsx` y `_nexa_count.mjs`; no fueron stageados ni modificados.
+
+## Sesion 2026-06-14 — Public Site bridge v0.3.1 signed draft foundation deployed/provisioned (Codex)
+
+- **TASK-1116 tomada en `develop`:** el hook `pnpm codex:task-hook TASK-1116 --develop` paso tras mover la task a `in-progress` y separar blockers de rollout. Excepcion de rama documentada: se mantuvo `develop`, no se creo branch/worktree.
+- **Runtime repo + live:** `/Users/jreye/Documents/efeonce-public-site-runtime/wp-content/plugins/greenhouse-wp-bridge` subio a v0.3.1 con `GHWPB_Config`, `GHWPB_Signature`, `GHWPB_Audit`, `GHWPB_Draft_Controller` y `GHWPB_CLI_Command`; commit runtime `a84490b`. El plugin v0.3.1 fue desplegado manualmente via SSH/SCP a Kinsta sin tocar `wp-config.php`.
+- **Contrato signed:** canonical request `GHWPB-HMAC-SHA256` firma metodo, REST route, body SHA-256, timestamp, request id, actor y environment. Headers requeridos: `X-Greenhouse-Timestamp`, `X-Greenhouse-Request-Id`, `X-Greenhouse-Actor`, `X-Greenhouse-Environment`, `X-Greenhouse-Body-Sha256`, `X-Greenhouse-Signature`. Replay guard por request id y ventana de 300s.
+- **Safety:** mutaciones default-disabled por `GREENHOUSE_WP_BRIDGE_WRITES_ENABLED`; ademas requieren shared secret, Application Password, `edit_posts`, firma valida y status `draft|private`. No publish, delete, cache clear ni backups. Updates solo buscan objetos Greenhouse-owned por `_greenhouse_manifest_id`.
+- **Provisioning robusto:** no se toco `wp-config.php`. v0.3.1 lee constants/env primero y luego options WP (`autoload=no`). Se creo GCP Secret Manager `public-website-wordpress-bridge-shared-secret-production` y se provisiono WordPress por stdin con `wp greenhouse-bridge secret set --stdin`; config live: `environment=production (option)`, `writes_enabled=false (option)`, `shared_secret_configured=true (option)`.
+- **Greenhouse tooling:** nuevo signer `src/lib/public-site/bridge-signing.ts`, tests focales y CLI `pnpm public-website:bridge-draft-contract`. Por defecto el CLI es no-mutante y usa secret sintetico redacted; `--send` exige `PUBLIC_WEBSITE_WORDPRESS_BRIDGE_SHARED_SECRET_SECRET_REF`.
+- **Validacion corrida:** PHP lint del plugin completo OK; Vitest focal `bridge-signing` + `bridge-inspection-route` OK; ESLint focal OK; `NODE_OPTIONS=--max-old-space-size=8192 pnpm exec tsc --noEmit --pretty false` OK; `pnpm public-website:bridge-draft-contract -- --method GET --send` contra produccion devolvio `404 ghwpb_draft_not_found` (firma valida, no mutante); `POST --send` devolvio `503 ghwpb_writes_disabled` (sin draft creado).
+- **Evidencia:** inspeccion `docs/operations/public-site-bridge-inspections/inspection-page-249766-2026-06-14T17-37-08-688Z.json`; drift `docs/operations/public-site-drift/drift-2026-06-14T17-37-22-651Z.json` (`drifted=0`, `in_sync=60`); dry-run `docs/operations/public-site-deploy-dry-runs/dry-run-2026-06-14T17-37-23-230Z.json` (`would_create=0`, `would_update=0`); status `docs/operations/public-site-runtime-status/status-2026-06-14T17-37-24-051Z.json` (`head=a84490b`, clean).
+- **Estado honesto:** writes siguen apagados. Queda rollout pendiente: reducir privilegios del usuario tecnico, decidir staging/preview, y solo entonces habilitar `GREENHOUSE_WP_BRIDGE_WRITES_ENABLED` para un smoke draft/private controlado.
+
+### Follow-up exploration — Kinsta staging + content factory priority
+
+- **Decision del operador:** no bajar privilegios del usuario WordPress tecnico ahora. Mantenerlo como riesgo conocido y diferido; no bloquear los siguientes slices por ese punto.
+- **Kinsta staging:** docs actuales de Kinsta indican Standard Staging incluido por WordPress install salvo restricciones de plan; Premium Staging es el add-on pagado de USD 20/mes por entorno. No se pudo confirmar disponibilidad real de la cuenta Efeonce sin MyKinsta/Kinsta API. Exploracion documentada en `docs/operations/public-site-kinsta-staging-priority-exploration-20260614.md`.
+- **Prioridad producto:** para escalar produccion de contenido, staging no es el principal cuello de botella. El siguiente trabajo debe formalizar una fabrica de contenido con dos carriles: `post_draft_gutenberg` para posts y `landing_draft_elementor` para landings. Posts primero porque Efeonce ya usa Gutenberg y el smoke es menos riesgoso que manipular Elementor.
+- **Siguiente paso recomendado:** crear/implementar spec del content factory + primer smoke draft/private disposable para Gutenberg post, con writes habilitados solo durante la ventana minima si no hay staging confirmado. Publish/cache/backups siguen fuera de scope hasta Kinsta API/release lane.
+
+## Sesion 2026-06-14 — Public Site bridge v0.2.0 Gutenberg/block inspection (Codex)
+
+- **Discovery antes de implementar:** se inspeccionaron los posts recientes de `efeoncepro.com` via WP-CLI con `parse_blocks()`. Los posts activos son Gutenberg (`post`, `hasBlocks=true`, sin `_elementor_data`), no Elementor. Ejemplo verificado: post `249766` (`glitch-02-noticias-ia-marketing-2026-03-03`) con 81 bloques: `core/freeform`, `core/paragraph`, `core/heading`, `core/image`, `core/separator`.
+- **Bridge desplegado en Kinsta:** `greenhouse-wp-bridge` subio a v0.2.0 y quedo actualizado manualmente via SSH/SCP en Kinsta. Nuevo endpoint read-only: `GET /wp-json/greenhouse-wp-bridge/v1/inspection/block-document/{id}`. Sigue sin endpoints de escritura.
+- **Modelo modular aprendido:** Gutenberg usa modulos `blockName`; Elementor usa modulos `widgetType`. Greenhouse debe normalizarlos como contenido inspeccionable, pero preservar el dialecto nativo para cualquier patch futuro.
+- **Greenhouse actualizado:** `src/lib/public-site/bridge-inspection.ts`, la API interna y `pnpm public-website:bridge-inspect` ahora leen `blockDocument` por defecto; agregan `includeBlocks=false` / `--no-blocks`; y anexan cache-buster `greenhouseInspection=<timestamp>` para evitar snapshots stale por ID en el runtime/capa cache.
+- **Smoke productivo:** `pnpm public-website:bridge-inspect -- --page-id 249766 --no-catalog` confirmo `editor.model=wordpress_blocks`, `hasBlocks=true`, `elementorDataPresent=false`, `blocksSummary.totalBlocks=81`. La page Elementor `244079` sigue reportando su arbol Elementor y ademas muestra `hasBlocks=false`/`elementorDataPresent=true`, como esperado.
+- **Evidencia final:** `docs/operations/public-site-bridge-inspections/inspection-page-249766-2026-06-14T16-46-47-906Z.json`, drift `docs/operations/public-site-drift/drift-2026-06-14T16-47-57-837Z.json` (`drifted=0`), dry-run `docs/operations/public-site-deploy-dry-runs/dry-run-2026-06-14T16-47-57-837Z.json` (`would_create=0`, `would_update=0`) y status `docs/operations/public-site-runtime-status/status-2026-06-14T16-48-04-143Z.json`.
+- **Estado honesto:** esto completa la inspeccion read-only Gutenberg/Elementor del bridge. `TASK-1116` sigue pendiente para writes: HMAC/shared secret, replay guard, Abilities registration, permisos minimos, staging/preview y mutaciones draft-only. Kinsta API sigue sin token, por lo que backups/cache clear/deploy apply automatizados siguen bloqueados.
+
+## Sesion 2026-06-14 — Public Site bridge inspection API read-only (Codex)
+
+- **Qué quedó:** `src/lib/public-site/bridge-inspection.ts` centraliza la inspección read-only del bridge activo y ahora la reutiliza tanto `pnpm public-website:bridge-inspect` como la nueva API interna `GET /api/admin/public-site/bridge-inspection?pageId=<id>`.
+- **API/control plane:** la ruta responde `public-site-bridge-inspection.v1`, acepta `includeCatalog=false`, está protegida por `requireAdminTenantContext()` + capability `platform.public_site.bridge.inspect` (`read`, `all`) y devuelve `503 public_site_bridge_auth_not_configured` si el runtime Greenhouse no tiene configurado el secret WordPress. No devuelve credenciales ni headers.
+- **Permisos:** se agregó capability catalog/runtime grant para `EFEONCE_ADMIN`; evita 403 latente en la futura UI Public Site.
+- **Verificación:** `pnpm public-website:bridge-inspect -- --page-id 244079 --no-catalog` consultó producción OK; Vitest focal de la ruta API 4/4; ESLint focal OK; `NODE_OPTIONS=--max-old-space-size=8192 pnpm exec tsc --noEmit --pretty false` OK.
+- **Estado honesto:** esto desbloquea una lane UI/API read-only para inspección, pero no cambia `TASK-1116`: siguen pendientes HMAC/shared secret, replay guard, Abilities registration, draft-only writes, staging/preview y least-privilege antes de cualquier mutación WordPress.
+
+## Sesion 2026-06-14 — Public Site bridge read-only deployed/active (Codex)
+
+- **Bridge activo en Kinsta:** `greenhouse-wp-bridge` v0.1.0 fue subido desde `/Users/jreye/Documents/efeonce-public-site-runtime` commit `f4c8a33` y activado via SSH/WP-CLI en `/www/efeoncegroup_752/public/wp-content/plugins/greenhouse-wp-bridge`. El runtime repo sigue limpio en `main`; Greenhouse sigue en `develop` y se preservaron sin tocar los WIP ajenos `src/libs/FramerMotion.tsx` y `src/views/greenhouse/admin/design-system/card-density/CardDensityLabView.tsx`.
+- **Smoke productivo:** anónimo `GET /wp-json/greenhouse-wp-bridge/v1/health` devuelve `401 ghwpb_auth_required`. Autenticado con Application Password desde Secret Manager: health `200` (`mode=read_only_inspection`, `writesEnabled=false`, `greenhouse_write_routes=false`, Kinsta/cache/backup flags false), inspección Elementor de page `244079` `200` (199 elements; 14 sections legacy, 46 containers, 112 widgets; 3 anchors `gh-*`) y catálogo Ohio `200` (`253` Elementor widgets, `37` Ohio, `2` HubSpot).
+- **Tooling corregido:** `pnpm public-website:export-live-code` ahora incluye `wp-content/plugins/greenhouse-wp-bridge` como target gobernado, alineado al binding manifest. Export live nuevo: `tmp/public-site-code-baselines/2026-06-14T16-12-51-903Z/` con 56 archivos.
+- **Inspector reusable:** nuevo `pnpm public-website:bridge-inspect -- --page-id <id> [--write]` para llamar health, inspeccion Elementor y catalogo Ohio del bridge activo con auth de Secret Manager y sin imprimir secretos. Primera evidencia: `docs/operations/public-site-bridge-inspections/inspection-page-244079-2026-06-14T16-22-05-591Z.json`.
+- **Evidencia nueva:** drift `docs/operations/public-site-drift/drift-2026-06-14T16-13-03-406Z.json` (`in_sync=54`, `ignored_live=2`, `drifted=0`, `repo_missing=0`, `repo_extra=0`); status `docs/operations/public-site-runtime-status/status-2026-06-14T16-13-15-103Z.json`; dry-run `docs/operations/public-site-deploy-dry-runs/dry-run-2026-06-14T16-13-03-124Z.json` (`noop=54`, `would_create=0`, `would_update=0`).
+- **Estado honesto:** `TASK-1122` queda code-complete para binding/readers/drift/dry-run + activación manual read-only; automated deploy apply sigue bloqueado por Kinsta API/cache/backups/release policy. `TASK-1116` sigue bloqueada para writes: falta HMAC/shared secret, replay guard, Abilities registration, staging/preview target y reducción de privilegios del usuario técnico antes de draft mutations.
+
+## Sesion 2026-06-14 — Public Site repo/control-plane discovery (Codex)
+
+- **TASK-1122 tomada:** se movio a `in-progress` por instruccion del operador. Excepcion documentada: continuar sobre `develop` y no cambiar de rama/worktree, aunque la task declare branch `task/TASK-1122-public-site-code-baseline-gitops-binding`.
+- **Discovery ejecutado:** GitHub org `efeoncepro` muestra `efeonce-web` como repo privado del sitio publico, pero el repo local `/Users/jreye/Documents/efeonce-web` es un rebuild Astro/headless que consume WordPress desde `cms.efeoncepro.com`; no representa el runtime live actual de `efeoncepro.com`.
+- **Repo WordPress mas cercano:** `/Users/jreye/Documents/efeonce-sp` contiene `wp-content/themes/ohio-child` y plugins propios (`eo-headless-content`, `eo-vibe-coding-api`, `eo-ohio-*`, `ohio-hubspot-form-styler`), pero su remote es `git@github.com:cesargrowth11/efeonce-sp.git` y esta en branch `feat/ohio-widget-orchestration-and-builder-services`; no debe tratarse como source of truth sin reconciliacion.
+- **Inventario live read-only:** WP-CLI contra Kinsta confirmo WordPress `7.0`, site `https://efeoncepro.com`, active theme `ohio-child` parent `ohio`, y custom code live en `wp-content/themes/ohio-child`, `wp-content/plugins/eo-headless-content`, `wp-content/plugins/eo-vibe-coding-api`. Live no tiene instalados `eo-ohio-elementor-widgets`, `eo-ohio-gutenberg-blocks` ni `ohio-hubspot-form-styler`.
+- **Drift importante:** live `ohio-child` incluye `parts/elements/page_headline.php`, que no estaba en el copy local `efeonce-sp/wp-content/themes/ohio-child`; live tambien tiene backups temporales `*.bak-*` que deben excluirse de baseline canonica. Hay diferencias potenciales en plugins (`eo-headless-content` con `includes/acf/*`; `eo-vibe-coding-api` local con archivo no visto live).
+- **Docs/task:** nuevo discovery `docs/operations/public-site-repository-control-plane-discovery-20260614.md`; nueva `TASK-1122` para crear baseline GitOps y binding Greenhouse->GitHub->Kinsta; EPIC-019 y `TASK-1116` actualizados para que el bridge dependa de repo/path confirmado.
+- **Helper agregado/probado:** `pnpm public-website:export-live-code` (`scripts/public-website/export-live-code-baseline.ts`) exporta read-only los candidatos gobernables desde Kinsta a `tmp/public-site-code-baselines/<timestamp>/` + `manifest.json` SHA-256. Primer baseline local ignorado: `tmp/public-site-code-baselines/2026-06-14T13-18-16-257Z/`, 49 archivos, targets found `ohio-child`, `eo-headless-content`, `eo-vibe-coding-api`; missing `eo-ohio-elementor-widgets`, `eo-ohio-gutenberg-blocks`, `ohio-hubspot-form-styler`.
+- **Repo runtime creado:** `https://github.com/efeoncepro/efeonce-public-site-runtime` privado. Baseline inicial live WordPress pusheado en `main` con SHA `0fa6bfd` y tag `baseline-2026-06-14-live`. Contiene 47 archivos canonicos (`ohio-child`, `eo-headless-content`, `eo-vibe-coding-api`) y excluye 2 backups live `*backup*` como cleanup candidates. Binding registrado en `docs/operations/public-site-runtime-repository-binding-20260614.json`.
+- **Drift helper:** `pnpm public-website:diff-runtime` compara ultimo export live contra `/Users/jreye/Documents/efeonce-public-site-runtime`. Primer reporte versionado `docs/operations/public-site-drift/drift-2026-06-14T14-13-37-068Z.json`: `in_sync=47`, `ignored_live=2`, `drifted=0`, `repo_missing=0`, `repo_extra=0`.
+- **Custom widgets + React documentado:** nuevo doc `docs/documentation/public-site/wordpress-custom-widgets-react-strategy.md`. Decision: widgets custom de Elementor solo en plugin propio versionado en el repo runtime cuando Ohio/Elementor no cubran un modulo reusable; React solo en carriles WordPress-native (`@wordpress/element` admin/editor, Gutenberg blocks, Interactivity API frontend acotado), no como SPA o parche de layout.
+- **Binding/status/dry-run completados sin Kinsta API:** `src/lib/public-site/runtime-binding.ts` agrega lector tipado de binding/drift/live manifest; `pnpm public-website:runtime-status` reporta binding + repo head + ultimo drift; `pnpm public-website:deploy-dry-run` genera plan no-mutante repo artifact -> ultimo manifest live. Evidencia actual: `docs/operations/public-site-runtime-status/status-2026-06-14T15-43-17-969Z.json` y `docs/operations/public-site-deploy-dry-runs/dry-run-2026-06-14T15-43-57-874Z.json` (`noop=47`, `ignored_live=2`, `would_create=7` por skeleton repo-only `greenhouse-wp-bridge`, `would_update=0`). No hace SSH/write/cache/backup/delete.
+- **Bridge skeleton repo-only:** creado `/Users/jreye/Documents/efeonce-public-site-runtime/wp-content/plugins/greenhouse-wp-bridge` v0.1.0 con REST read-only autenticado: health, inspeccion de documento Elementor y catalogo Ohio/HubSpot. PHP lint verde local. No esta desplegado/activado en Kinsta; aun faltan HMAC/replay guard, Abilities registration, draft writes, staging/preview target y release task.
+- **Siguiente paso recomendado:** decidir si se commitea/pushea el runtime repo con `greenhouse-wp-bridge`; luego provisionar shared secret, reducir privilegios del usuario WordPress tecnico y planificar deploy/activation con Kinsta token o carril manual aprobado. Branch protection/release policy del repo runtime sigue pendiente.
+
+## Sesion 2026-06-14 — Public Site HubSpot services hero restored (Codex)
+
+- **Fix live aplicado:** `efeoncepro.com/servicios-contratar-hubspot/` (`page_id=244079`) vuelve a usar el hero grande correcto en el page headline Ohio: attachment `248703` (`EO_Hubspot_Hiro2-2.webp`, `2001x801`) como featured image, con `page_header_title_background_size=cover`, `position=center`, `repeat=no_repeat`.
+- **Causa/learning:** el headline de Ohio usa `page_header_title_background_type=featured`, por lo que el fondo depende de `_thumbnail_id`. El attachment `243106` (`Hubspot-headline-1.webp`) es solo un logo inline de Elementor (`221x65`) y fue un falso positivo. Validar siempre dimensiones + computed `.page-headline .bg-image` antes de mutar.
+- **Headline responsive aplicado en child theme:** Ohio no tiene control nativo para titulo visual distinto del `post_title`; se agrego override en `wp-content/themes/ohio-child/parts/elements/page_headline.php` que lee `gh_page_headline_display_title` solo para el H1 visual. El `post_title` quedo restaurado a `Empodera tu crecimiento con HubSpot + Efeonce`; el meta visual permite saltos de linea y mantiene slug/breadcrumbs/SEO.
+- **Mobile layering corregido:** el CSS responsive quedo en `wp-content/themes/ohio-child/assets/css/global-fixes.css` scoped a `body.page-id-244079`. Regla aprendida: el radius moderno pertenece a la superficie blanca `#content > .page-container`, no al `.page-headline`/background. Hero/background rectos; panel blanco superpuesto con `border-radius:16px 16px 0 0`.
+- **Backups/evidencia:** backup live `/www/efeoncegroup_752/public/wp-content/uploads/greenhouse-backups/page-244079-hero-real-image-before-20260614111638.json`; capturas `.captures/public-site-hubspot-hero-incident-20260614/after-real-hero-image.png` y `after-real-hero-image-2048.png`.
+- **Backups/evidencia adicional:** `ohio-child-page-headline-before-display-title-*.php`, `ohio-child-global-fixes-before-hubspot-*.css` bajo `wp-content/uploads/greenhouse-backups/`; capturas `.captures/public-site-hubspot-hero-design-pass-20260614/child-theme-css-final/` y `.captures/public-site-hubspot-hero-design-pass-20260614/mobile-white-surface-radius/`.
+
+## Sesion 2026-06-14 — Public Site Ohio/Elementor visual foundations (Codex)
+
+- **Qué se amplio:** el inventario Public Site ya no cubre solo ancho/widgets; ahora documenta color, tipografia, hover, motion y orden de precedencia entre Elementor Kit, Ohio globals, page meta, widget settings, CSS generado y child theme.
+- **Hallazgos efectivos:** runtime computado usa azul Ohio `#023c70` como primario, link hover `#024c8f`, footer `#161519`, body `Inter`, headings/botones `DM Sans`, grid gutter `1rem`, container `86vw`. El Elementor active kit `7` existe, pero su CSS generado conserva defaults de Elementor (`#6EC1E4`, `#61CE70`, Roboto), por lo que no es source of truth confiable sin computed-style.
+- **Motion/hover:** los widgets Ohio ya exponen controles nativos para color, hover, border, shadow, radius y motion (`ohio_button`, `ohio_service_table`, `ohio_recent_projects`, `ohio_recent_posts`, `ohio_gallery`, `ohio_carousel`, `ohio_video`). No se encontro guardrail consistente de `prefers-reduced-motion` en Ohio; motion custom tipo aurora requiere fallback propio y QA visual.
+- **Docs/skills actualizadas:** `docs/documentation/public-site/wordpress-ohio-elementor-widget-inventory.md`, `docs/manual-de-uso/public-site/wordpress-ohio-elementor-landing-playbook.md`, `docs/operations/discovery-public-website-elementor-20260614.md`, y skills Public Site para Codex/Claude.
+
+## Sesion 2026-06-14 — Public Site Ohio/Elementor widget inventory (Codex)
+
+- **Qué quedó documentado:** inventario funcional completo en `docs/documentation/public-site/wordpress-ohio-elementor-widget-inventory.md` y playbook operativo en `docs/manual-de-uso/public-site/wordpress-ohio-elementor-landing-playbook.md`.
+- **Discovery read-only:** Kinsta/WP-CLI confirmo theme `ohio-child` sobre Ohio `3.7.0`, Elementor `4.1.3`, Elementor Pro `4.1.1`, Ohio Extra `3.7.0`, 253 widgets Elementor registrados, 37 widgets Ohio, 246 documentos Elementor con data y 67 templates en `elementor_library`.
+- **Aprendizaje clave:** Ohio gobierna wrappers/gutters/header/sidebar/breadcrumbs desde metas y dynamic CSS (`page_add_wrapper`, `page_full_width_margins_size`, `page_add_top_padding`, `page_header_menu_style`), mientras que `ohio-extra` provee los widgets. Las landings deben operar primero por controles nativos Elementor/Ohio, no por CSS hardcodeado.
+- **Paleta recomendada para landings:** usar como primera linea widgets maduros ya muy usados: `ohio_heading`, `ohio_service_table`, `ohio_icon_box`, `ohio_button`, `ohio_counter`, `ohio_clients_logo`, `ohio_testimonial`, `ohio_recent_posts`, `ohio_recent_projects`, HubSpot `hubspot-form`/`hubspot-meeting` cuando haya atribucion CRM clara.
+- **Gaps:** falta registry canonico de templates Greenhouse-owned, schema machine-readable de patches por widget, mapping HubSpot form/meeting/UTM, QA visual repetible del Public Site, Kinsta API token para cache/backups y reduccion de privilegios del usuario tecnico WordPress.
+
+## Sesion 2026-06-14 — Public Site WP-CLI remote wrapper + partner proof product design pass (Codex)
+
+- **Qué quedó en runtime WordPress:** en `https://efeoncepro.com/servicios-contratar-hubspot/` (`page_id=244079`) se amplio el fix de la fila de cards a todo el modulo "Efeonce tu Partner certificado". Las sections legacy `83d3781`, `ebe0037` y `5b75db1` ahora comparten `layout=boxed`, `content_width=1560px`, padding lateral `24px` y anchors semanticos `gh-section-hubspot-partner-proof` + `gh-partner-proof-intro/cards/stack`.
+- **Backup:** `/www/efeoncegroup_752/public/wp-content/uploads/greenhouse-backups/page-244079-elementor-before-partner-proof-module-20260614100340.json`.
+- **Verificacion visual:** capturas en `.captures/public-site-hubspot-section-20260614/servicios-contratar-hubspot-partner-proof-desktop.png` y `...-mobile.png`. URL publica normal: desktop 2048px con contenedores `1560px` (`x=244`), mobile 390px con contenedores `342px` (`x=24`) y cards apiladas.
+- **Problema recurrente resuelto:** se agrego `pnpm public-website:wpcli` (`scripts/public-website/wpcli-remote.ts`) para ejecutar PHP local via WP-CLI remoto sin heredocs/inline quoting frágil. Carga `.env.local`/`.env`, usa `scp -P` para subir a `/tmp`, ejecuta `wp eval-file` con `ssh -p`, limpia el temporal y evita imprimir secretos. Smoke read-only verde contra Kinsta: devolvio `home=https://efeoncepro.com`, `theme=ohio-child`.
+- **Leccion:** `Document::save()` borra CSS generado del post; no validar inmediatamente con `grep wp-content/uploads/elementor/css/post-<id>.css`. Renderizar la URL o usar cache APIs de Elementor y verificar con navegador/capturas.
+
+## Sesion 2026-06-14 — Public Site HubSpot services Elementor width fix (Codex)
+
+- **Qué quedó en runtime WordPress:** se corrigio `https://efeoncepro.com/servicios-contratar-hubspot/` (`page_id=244079`) en la seccion dark "Efeonce tu Partner certificado". La fila de tres cards ya no queda pegada a los margenes.
+- **Cómo se resolvio sin hardcodear CSS:** discovery Elementor mostro que la fila es una legacy section `id=ebe0037`, path `9`, con fondo `#022A4E`. Se aplicaron controles nativos de Elementor con `Document::save()`: `layout=boxed` y `content_width={unit:"px", size:1560, sizes:[]}`. Esto mantiene el fondo full-width y solo contiene el `.elementor-container` interno.
+- **Backup y verificacion:** backup previo en `/www/efeoncegroup_752/public/wp-content/uploads/greenhouse-backups/page-244079-elementor-before-partner-cards-width-20260614095038.json`. Elementor regenero `post-244079.css` con `max-width:1560px`. Captura Playwright: `.captures/public-site-hubspot-section-20260614/servicios-contratar-hubspot-partner-section.png`; viewport 2048px: section `2048px`, container `1560px`, cards `520px`.
+- **Aprendizaje:** para legacy sections donde el background debe ser full-width pero el contenido debe respirar, usar primero `layout=boxed` + `content_width` del arbol Elementor. No tocar hero/sidebar/footer ni agregar CSS global/page-scoped si el control existe.
+
+## Sesion 2026-06-14 — Public Site discovery carga `.env.local` automatica (Codex)
+
+- **Qué quedó:** `scripts/public-website/discover-wordpress.ts` ahora carga `.env.local` y luego `.env` automaticamente antes de resolver `PUBLIC_WEBSITE_*`, sin sobrescribir variables ya exportadas por shell/CI.
+- **Por qué:** el primer intento autenticado fallaba como `enabled but not configured` si el agente no hacia `source .env.local` o no pegaba un prefijo inline largo. Eso iba a repetirse con otros agentes.
+- **Contrato nuevo:** usar directamente `pnpm public-website:discover -- --authenticated --wpcli` (y `--write` solo si se quiere regenerar reporte). No pegar secretos ni env vars inline.
+- **Docs/skills:** skill Public Site WordPress Codex/Claude, TASK-1111, discovery WordPress y `project_context.md` actualizados.
+
+## Sesion 2026-06-14 — Elementor structural discovery Public Site (Codex)
+
+- **Qué quedó:** nuevo reporte read-only `docs/operations/discovery-public-website-elementor-20260614.md` para entender Elementor desde el runtime real de `efeoncepro.com` antes de automatizar widgets/estructura desde Greenhouse.
+- **Hallazgo clave:** el sitio no tiene un unico modelo Elementor: home `2791` usa containers modernos; `/blog` `18456` mezcla sections/columns legacy + containers; `/contacto` `20729` usa legacy sections/columns. Cualquier tooling debe soportar los cuatro `elType`: `container`, `section`, `column`, `widget`.
+- **Contrato recomendado:** no editar DOM/CSS como fuente primaria ni hacer `update_post_meta('_elementor_data')` a ciegas. El bridge debe leer/parchear el arbol `_elementor_data`, validar `element.id + elType + widgetType + fingerprint`, y guardar con `\Elementor\Plugin::$instance->documents->get($postId)->save([ 'elements' => ..., 'settings' => ... ])`, porque eso dispara permisos, hooks, version/template save, borrado de CSS del post y cache del documento.
+- **Skills actualizadas:** `.codex/skills/efeonce-public-site-wordpress/SKILL.md` y `.claude/skills/efeonce-public-site-wordpress/SKILL.md` ahora apuntan al discovery y documentan la estrategia de manipulación estructural.
+- **Siguiente paso recomendado:** `TASK-1116` debe partir con abilities/endpoints read/draft-only: `inspect-elementor-document`, `validate-elementor-patch`, `duplicate-elementor-document` y `patch-elementor-document` solo sobre drafts/private Greenhouse-owned.
+
+## Sesion 2026-06-14 — Skill actualizable Public Site WordPress creada (Codex)
+
+- **Qué quedó:** nueva skill local sincronizada para Codex y Claude con la memoria operativa de `efeoncepro.com`: `.codex/skills/efeonce-public-site-wordpress/SKILL.md` y `.claude/skills/efeonce-public-site-wordpress/SKILL.md`.
+- **Contenido:** fuentes canónicas a leer, facts vigentes de Kinsta/WordPress/WP-CLI/REST/WP Abilities, reglas de seguridad sin secretos, aprendizajes Ohio + Elementor (`/blog` y `/contacto`), frontera React/Interactivity y contrato draft-only para el bridge Greenhouse→WordPress.
+- **Cómo mantenerla:** actualizar ambas copias cuando cambien discovery, plugin/theme/runtime, Kinsta/cache/backups, EPIC-019/TASK-1111/TASK-1116, nuevos incidentes de layout o guidance oficial de WordPress. No incluir valores de Application Password, SSH password, private keys ni Authorization headers.
+
+## Sesion 2026-06-14 — TASK-1111 discovery autenticada repetible + TASK-1116 bridge draft-only (Codex)
+
+- **Qué quedó:** `pnpm public-website:discover` ahora soporta `--authenticated` y `--wpcli` sin cambiar el modo público por defecto. El modo autenticado resuelve el Application Password desde Secret Manager, pero no imprime secretos ni `Authorization`; el modo WP-CLI usa SSH con llave local y comandos read-only.
+- **Reporte nuevo:** `docs/operations/discovery-public-website-wordpress-20260614.md` generado con REST público + WordPress autenticado + WP-CLI read-only. Resultado: `wp/v2` disponible, `wp-abilities/v1` anunciado, abilities autenticadas `200` con 33 abilities, plugins endpoint `200`, editable REST types `200`, pages edit inventory `200`, WP-CLI `ok`.
+- **Usuario técnico correcto:** el `user_login` real para el Application Password es `Greenhouse INTEGRATION`; con ese login `/wp-json/wp/v2/users/me?context=edit` responde `200` (`slug=greenhouse-integration`, display `Greenhouse`). Riesgo: el usuario sigue con rol `administrator`; reducir capabilities queda como requisito/riesgo de `TASK-1116` antes de producción.
+- **WP-CLI read-only:** confirmado contra `/www/efeoncegroup_752/public` con theme activo `ohio-child` parent `ohio`, Elementor/Elementor Pro, Yoast SEO/Premium, HubSpot/Leadin, plugins custom `eo-headless-content`/`eo-vibe-coding-api`, AI providers y CPT privado `landing`.
+- **Task nueva:** `docs/tasks/to-do/TASK-1116-greenhouse-wp-bridge-draft-only-foundation.md`. Scope: foundation del plugin `greenhouse-wp-bridge` con auth firmada, Abilities-first + REST fallback, health/readiness, metadata de audit y write path estrictamente `draft/private`. Fuera de scope: publish, cache clear, delete, mutaciones a Elementor/Ohio existentes sin ownership Greenhouse.
+- **Bloqueo restante TASK-1111:** falta token Kinsta API read-only para environment/cache/backups. Esto no debe bloquear `TASK-1116` si el bridge se mantiene draft-only y publish/cache clear queda para task posterior.
+- **Verificación corrida:** `pnpm public-website:discover`; `pnpm public-website:discover -- --authenticated --wpcli --write` con env locales/Secret Manager; grep de tokens pegados en chat contra script/reporte/env/task sin hallazgos.
+
+## Sesion 2026-06-14 — Public Site `/blog` layout Ohio + Elementor documentado (Codex)
+
+- **Qué quedó en runtime WordPress:** se corrigio `efeoncepro.com/blog` (`page_id=18456`) alineando el meta Ohio `page_full_width_margins_size` de `20px` a `16px`, porque Elementor compensaba `-16px` y quedaba una linea residual de 4px. Se ejecuto `wp cache flush`.
+- **Regresion corregida:** durante la sesion se habia introducido una regresion en el sidebar fijo cerca del pre-footer/footer: Ohio agregaba `.light-typo` y lavaba hamburger/logo aunque el rail lateral era blanco. Se corrigio con CSS page-scoped en `wp-content/themes/ohio-child/assets/css/global-fixes.css`, solo para `body.page-id-18456.with-header-sidebar:not(.dark-scheme)`.
+- **Contacto corregido:** `efeoncepro.com/contacto` (`page_id=20729`) fue diagnosticado aparte: usa `with-header-3`; la discontinuidad venia del breadcrumb del theme y del `bottom-offset` automatico fuera de Elementor. Fix final: `page_breadcrumbs_visibility=0` y `page_add_top_padding=0`; se retiro el intento de CSS de fondo porque no resolvia la percepcion. Verificacion Playwright: `hasBreadcrumb=false`, no existe `.page-container.bottom-offset`, Elementor empieza justo al terminar el hero (`top=500`) y el footer empieza al terminar Elementor.
+- **Aprendizaje:** en Ohio + Elementor, no asumir que igualar colores resuelve continuidad. Si la banda viene de estructura del theme (`breadcrumb-holder`, `top-offset`, `bottom-offset`), corregir primero metas/settings Ohio y validar con captura visual; usar CSS page-scoped solo para presentacion cuando la estructura ya es correcta.
+- **Backups runtime:** `wp-content/themes/ohio-child/assets/css/blog-page-meta-backup-20260614015717.txt`, `wp-content/themes/ohio-child/assets/css/global-fixes.css.bak-20260614020413-before-blog-sidebar-header-fix`, `wp-content/themes/ohio-child/assets/css/contacto-page-meta-backup-202606140-bg-continuity.json` y `wp-content/themes/ohio-child/assets/css/global-fixes.css.bak-202606140-contacto-bg-continuity`.
+- **Docs nuevas:** `docs/documentation/public-site/wordpress-ohio-elementor-layout.md` y `docs/manual-de-uso/public-site/wordpress-ohio-elementor-layout.md`. Guardrail: no volver a resolver este tipo de desfase con CSS global sobre `#masthead`, footer, hero o fondos que pinten debajo del rail.
+- **Pendiente:** cuando EPIC-019 avance, convertir estos checks visuales en smoke repetible para Public Site/WordPress antes de permitir deploy de landings desde Greenhouse.
+
+## Sesion 2026-06-14 — Public Site WordPress React/Gutenberg boundary documentado (Codex)
+
+- **Qué se documento:** EPIC-019 ahora explicita que WordPress puede trabajar con React, pero Greenhouse no debe transformar `efeoncepro.com` en SPA. React queda autorizado solo en vias WordPress-native: Gutenberg/bloques, admin/editor tooling del bridge y frontend con WordPress Interactivity API para interacciones acotadas.
+- **Fuentes oficiales revisadas:** WordPress Developer Blog "What's new for developers? (June 2026)", Make/Core "React 19 upgrade temporarily reverted in Gutenberg" y WordPress Interactivity API reference.
+- **Contrato operativo:** Greenhouse sigue siendo source of truth/control plane para manifests, aprobaciones, versiones, publish, drift y audit; WordPress sigue siendo runtime publico. React 19 es watch item: no asumir compatibilidad hasta probar el stack real Kinsta/WordPress/Gutenberg/plugins.
+- **Docs tocadas:** `docs/architecture/GREENHOUSE_PUBLIC_WEBSITE_LANDING_CONTROL_PLANE_ARCHITECTURE_V1.md`, ADR propuesto, `EPIC-019`, doc funcional/runbook de Public Site, `project_context.md`, `changelog.md` y este handoff.
+
+## Sesion 2026-06-13 — TASK-1111 Public Website read-only discovery (Codex)
+
+- **Qué quedó:** nueva task hija de `EPIC-019`: `docs/tasks/in-progress/TASK-1111-public-website-read-only-discovery.md`. Queda en `in-progress` porque la discovery publica esta lista, pero la discovery autenticada WordPress/Kinsta depende de credenciales.
+- **Script nuevo:** `pnpm public-website:discover` (`scripts/public-website/discover-wordpress.ts`). Solo hace `GET` contra endpoints publicos, no envia Authorization, no resuelve secretos y no imprime valores sensibles. Con `-- --write` genera reporte Markdown versionado.
+- **Reporte generado:** `docs/operations/discovery-public-website-wordpress-20260613.md` (`scannedAt=2026-06-13T23:23:42.847Z`).
+- **Hallazgos:** `efeoncepro.com/wp-json/` responde 200; namespaces incluyen `wp/v2`, `wp-abilities/v1`, `yoast/v1`, `elementor/v1`, `elementor-pro/v1`, `leadin/v1`, `google-site-kit/v1`, `eo-headless/v1`, `eo-vibe/v1`; auth anuncia `application-passwords`. Inventario publico: 40 pages, 32 posts, REST type `landing` (`rest_base=landings`), Elementor library/snippets, WP templates, Jetpack forms y feedback. Headers observados: Cloudflare + Kinsta (`x-kinsta-cache=MISS`, `ki-edge=v=28.3.1;mv=99.9.9`, `ki-cache-type=None`).
+- **Abilities:** namespace `wp-abilities/v1` existe y su route index responde 200; `/wp-json/wp-abilities/v1/abilities?per_page=10` responde 401 sin credenciales. Interpretacion: Abilities-first es viable, pero listar/ejecutar abilities requiere usuario tecnico/application password.
+- **Env contract agregado:** `.env.example` ahora declara `PUBLIC_WEBSITE_WORDPRESS_BASE_URL`, `PUBLIC_WEBSITE_WORDPRESS_USERNAME`, `PUBLIC_WEBSITE_WORDPRESS_APPLICATION_PASSWORD_SECRET_REF`, `PUBLIC_WEBSITE_WORDPRESS_BRIDGE_SHARED_SECRET_SECRET_REF`, `PUBLIC_WEBSITE_KINSTA_API_TOKEN_SECRET_REF`.
+- **Credencial WordPress provisionada:** application password del usuario tecnico `Greenhouse INTEGRATION` guardado en GCP Secret Manager como `public-website-wordpress-application-password` (version 1). Smoke autenticado verde sin exponer secreto: `GET /wp-json/wp/v2/users/me?context=edit` respondio 200 (`id=12`, `slug=greenhouse-integration`, `roles=[administrator]`); `/wp-json/wp-abilities/v1/abilities?per_page=20` respondio 200 con abilities core/wpcode/jetpack-forms. Como el valor fue pegado en chat, rotar antes de produccion/bridge final si se quiere maxima higiene.
+- **Kinsta SSH/WP-CLI verificado:** se agrego en MyKinsta una clave publica dedicada con etiqueta `Greenhouse Codex local` para el usuario `efeoncegroup` (`161.153.204.166:64805`). Smoke read-only verde con clave local: entra por SSH, `cd /www/efeoncegroup_752/public`, `wp --info` (`WP-CLI 2.12.0`, PHP CLI 8.2.30), `wp option get home/siteurl` -> `https://efeoncepro.com`. Inventario WP-CLI read-only ejecutado: theme activo `ohio-child` (parent `ohio`), Elementor/Elementor Pro, Yoast SEO/Premium, HubSpot/Leadin, custom plugins `eo-headless-content` y `eo-vibe-coding-api`, AI provider plugins, CPT privado `landing` con descripcion de landings consumidas via REST. No se ejecutaron writes, drafts, publishes ni cache clears.
+- **Bloqueo operativo restante:** falta token Kinsta read-only o scope minimo equivalente para ambiente/cache/backups; los smokes autenticados deben convertirse en discovery repetible antes de cerrar TASK-1111. No crear drafts/publish/cache clear hasta tener discovery autenticada completa, staging/preview, audit log y rollback baseline.
+
+## Sesion 2026-06-13 — Public Website Landing Control Plane docs + EPIC-019 creado (Codex)
+
+- **Qué quedó:** arquitectura propuesta para que Greenhouse despliegue landing pages al sitio publico Efeonce (`efeoncepro.com`) manteniendo WordPress como runtime publico y Kinsta como hosting provider. Docs: `docs/architecture/GREENHOUSE_PUBLIC_WEBSITE_LANDING_CONTROL_PLANE_DECISION_V1.md` (ADR `Proposed`) + `docs/architecture/GREENHOUSE_PUBLIC_WEBSITE_LANDING_CONTROL_PLANE_ARCHITECTURE_V1.md`.
+- **Epic nuevo:** `docs/epics/to-do/EPIC-019-public-website-landing-control-plane.md`, registrado en `EPIC_ID_REGISTRY.md` y `docs/epics/README.md`. Siguiente ID disponible: `EPIC-020`.
+- **Contrato recomendado:** Greenhouse-owned landing manifests/versiones/aprobaciones/deployments/drift viven en Greenhouse; WordPress publica/sirve la pagina; Kinsta limpia cache y reporta estado/backups; HubSpot conserva campanas/forms/meetings/deals. V1 debe partir read-only/draft-only antes de publicar en produccion. Update Abilities-first: el bridge WordPress debe registrar abilities (`wp_register_ability`) con schema/permisos/audit cuando el runtime lo soporte, manteniendo REST como transport/compat y degradando honestamente si WordPress no soporta Abilities API.
+- **Skills WordPress oficiales:** se vendorearon las 17 skills oficiales de `https://github.com/WordPress/agent-skills` (HEAD `aa735ea7111c7924ee988306bcef70439e17dec9`) en `.codex/skills/` y `.claude/skills/`: `blueprint`, `wordpress-router`, `wp-abilities-api`, `wp-abilities-audit`, `wp-abilities-verify`, `wp-block-development`, `wp-block-themes`, `wp-interactivity-api`, `wp-performance`, `wp-phpstan`, `wp-playground`, `wp-plugin-development`, `wp-plugin-directory-guidelines`, `wp-project-triage`, `wp-rest-api`, `wp-wpcli-and-ops`, `wpds`.
+- **No runtime:** no se crearon credenciales, plugin, endpoints, migrations ni UI. Proximo paso seguro: task hija de discovery WordPress/Kinsta read-only para inspeccionar theme/builder/plugins/SEO/forms/staging y confirmar el render target antes de aceptar el ADR o escribir bridge.
+
 ## Sesion 2026-06-13 — TASK-1110 composición Nexa in-place /knowledge — Slice 1 entregado MAL, en realineación (Claude)
 
 - **Qué se pusheó (develop):** Slice 1 (`098908cff`) wiring composición in-place en la lente Humano + kill-switch rollout-flag DB `knowledge_composition_lens` **ON por defecto** (migración `20260613210340667`, revertible sin deploy) + focus-routing a11y en `NexaMomentComposition`. Slice 2 (`02e31275d`) GVC scenario `knowledge-composition` + fix non-regresión `knowledge-lenses`. Gate local verde (tsc 0 · lint 0 · build 0 · tests focales 33/33).
@@ -42,6 +780,14 @@
 - **Issue abierto:** `docs/issues/open/ISSUE-095-sentry-sourcemap-upload-token-403.md`.
 - **Contrato de cierre:** rotar o corregir `SENTRY_AUTH_TOKEN` sin exponer valores; verificar permisos de release/source-map upload (`project:releases` + `org:read` para release management con `sentry-cli`, o Organization Token apto para CI/source maps); actualizar los Vercel environments aplicables; confirmar deployment `Ready` sin `403` y artifact bundle/source maps presentes en Sentry.
 - **No hacer:** no desactivar Sentry ni borrar credenciales como cierre permanente; el timeout defensivo de `ISSUE-093` queda aunque el token se arregle.
+
+## Sesion 2026-06-14 — ISSUE-095 root cause confirmado + fix aplicado (Claude)
+
+- **Causa raiz real (probe API read-only, sin exponer valores):** no faltaba "rotar" — en Vercel estaba el **token equivocado**. `SENTRY_AUTH_TOKEN` en `staging` Y `Production` (42d, mismo token) era un personal token read-only con scopes `event:read`+`project:read` → `org:read=HTTP 403`, sin `project:releases`. El token sano (scopes `org:read`+`project:read`+`project:releases`, `org:read=200`) ya vivía en `.env.vercel-staging` local. Blast radius: staging + production confirmados rotos (no "latente"). Preview no tiene el token (sourcemaps disabled, sin 403).
+- **Fix aplicado:** `printf %s "$TOK" | vercel env add SENTRY_AUTH_TOKEN <staging|production> --force --scope efeonce-7670142f` (atomico, sin newline). Verificado post-cambio: ambos entornos `org:read=200` + scope `project:releases` + hash MATCH vs token sano. Cero cambio de codigo (`next.config.ts` ya degradaba con el guardrail de ISSUE-093).
+- **Verificado en runtime (RESUELTO):** build real `greenhouse-4wzmp4oj9` (target staging) → `✓ Completed runAfterProductionCompile in 40764ms` sin `403`/`permission denied`/`exceeded`. Progresion: token roto→403 rapido; token bueno+timeout 30s→`exceeded 30000ms`; token bueno+timeout 180s→upload limpio 40.7s. Segundo paso del fix: `SENTRY_SOURCEMAP_UPLOAD_TIMEOUT_MS` subido a 180000ms en staging+production (guardrail anti-hang de ISSUE-093 intacto). Issue movido a `resolved/`.
+- **Deuda residual:** el token es personal de `jreyes@`; migrar a un Organization Auth Token dedicado (no user-bound) queda diferido al operador.
+- **Nota:** `TASK-1107` NO cubre este 403 (es otra cola Sentry: N+1, `role_view_fallback_used`, auth smoke, `rpa_median`). El 403 del sourcemap es exclusivo de ISSUE-095.
 
 ## Sesion 2026-06-13 — ISSUE-093 Vercel/Sentry source-map upload timeout guard (Codex, resolved)
 
