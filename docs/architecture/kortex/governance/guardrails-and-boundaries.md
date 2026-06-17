@@ -9,6 +9,7 @@
 - Todo comando requiere `Idempotency-Key`.
 - Todo comando pasa por `executeApiPlatformCommand()` y queda auditado en `greenhouse_core.api_platform_command_executions`.
 - Los errores upstream se redacted antes de respuesta/persistencia.
+- Los comandos GitHub de Kortex no aceptan `owner`, `repo`, method ni path desde request; `efeoncepro/kortex` queda fijado server-side.
 
 ## Flags
 
@@ -19,6 +20,10 @@
 | `KORTEX_COMMAND_ADMIN_ENABLED` | `false` | Habilita `admin_breakglass`. |
 | `KORTEX_COMMAND_ALLOWED_PORTALS` | allowlist acotada | Restringe portal/binding autorizado. |
 | `KORTEX_COMMAND_ADMIN_TOKEN` / `KORTEX_ADMIN_BOOTSTRAP_TOKEN` | server-only | Se envia como `X-Kortex-Admin-Token` solo para admin/breakglass. |
+| `KORTEX_GITHUB_COMMANDS_ENABLED` | `false` | Habilita comandos GitHub de Kortex. |
+| `KORTEX_GITHUB_WORKFLOW_DISPATCH_ENABLED` | `false` | Habilita `workflow_dispatch` sobre Kortex. |
+| `KORTEX_GITHUB_ALLOWED_WORKFLOWS` | `CI` | Allowlist de workflows GitHub permitidos. |
+| `KORTEX_GITHUB_ALLOWED_REFS` | `main,develop` | Allowlist de refs permitidos para dispatch. |
 
 ## Estado de flags por ambiente — 2026-06-17
 
@@ -26,6 +31,8 @@
 |---|---|
 | `staging` | `adapter=true`, `live_execute=true`, `admin_breakglass=true`, `KORTEX_COMMAND_ADMIN_TOKEN` provisionado como Vercel sensitive env. Habilitado por aprobacion explicita del operador para pruebas controladas. |
 | `production` | Live/admin no habilitados por este rollout. Cualquier flip productivo requiere aprobacion explicita separada, dry-run cuando aplique, frase humana y smoke productivo dedicado. |
+
+GitHub commands TASK-1166 quedan **OFF por default** en todos los ambientes hasta rollout especifico. El reader `GET /api/admin/kortex/github-control-plane` es read-only y puede operar con GitHub Actions read.
 
 Pruebas staging vigentes:
 
@@ -51,6 +58,15 @@ Admin/breakglass:
 {
   "confirmed": true,
   "phrase": "EXECUTE KORTEX ADMIN COMMAND"
+}
+```
+
+GitHub workflow dispatch:
+
+```json
+{
+  "confirmed": true,
+  "phrase": "DISPATCH KORTEX WORKFLOW"
 }
 ```
 

@@ -3,7 +3,7 @@
 > **Tipo:** Arquitectura / governance de integracion (agent-facing)
 > **Creado:** 2026-06-17 (TASK-1164/TASK-1165)
 > **Contrato principal:** `greenhouse-kortex-command-adapter.v1`
-> **Source of truth runtime:** Kortex control-plane + command registry Greenhouse
+> **Source of truth runtime:** Kortex control-plane + command registry Greenhouse + GitHub control-plane Kortex
 
 ## Que es esto
 
@@ -14,6 +14,7 @@ No reemplaza los ADRs existentes:
 - [`GREENHOUSE_KORTEX_INTEGRATION_ARCHITECTURE_V1.md`](../GREENHOUSE_KORTEX_INTEGRATION_ARCHITECTURE_V1.md)
 - [`GREENHOUSE_KORTEX_CONTROL_PLANE_READER_V1.md`](../GREENHOUSE_KORTEX_CONTROL_PLANE_READER_V1.md)
 - [`GREENHOUSE_KORTEX_COMMAND_ADAPTER_V1.md`](../GREENHOUSE_KORTEX_COMMAND_ADAPTER_V1.md)
+- [`GREENHOUSE_KORTEX_GITHUB_CONTROL_PLANE_V1.md`](../GREENHOUSE_KORTEX_GITHUB_CONTROL_PLANE_V1.md)
 
 Esta carpeta es el mapa navegable que explica como usar esas piezas juntas.
 
@@ -22,6 +23,7 @@ Esta carpeta es el mapa navegable que explica como usar esas piezas juntas.
 ### [`connection/`](connection/README.md) — como Greenhouse ve y alcanza Kortex
 
 - [`greenhouse-kortex-connection.md`](connection/greenhouse-kortex-connection.md): binding, control-plane reader, OAuth/HubSpot portal conectado y ruta de comunicacion Greenhouse -> Kortex.
+- GitHub repo control-plane: `GET /api/admin/kortex/github-control-plane` para `efeoncepro/kortex`, workflow `CI`, branches, runs, PRs/issues/releases y correlation `main`/CI.
 
 ### [`capabilities/`](capabilities/README.md) — que podemos hacer ya
 
@@ -30,6 +32,7 @@ Esta carpeta es el mapa navegable que explica como usar esas piezas juntas.
 ### [`commands/`](commands/README.md) — catalogo gobernado de comandos
 
 - [`command-catalog.md`](commands/command-catalog.md): lista completa de comandos, tiers y superficies Kortex cubiertas.
+- GitHub commands V1: `POST /api/admin/kortex/github-commands`, default OFF, registry allowlisted `kortex.github.workflow.rerun_failed` y `kortex.github.workflow.dispatch`.
 
 ### [`governance/`](governance/README.md) — guardrails de seguridad
 
@@ -48,6 +51,7 @@ Esta carpeta es el mapa navegable que explica como usar esas piezas juntas.
 - Binding Greenhouse/Kortex: `EO-SPB-0002`
 - Staging live/admin: prendidos por aprobacion explicita del operador para pruebas (`KORTEX_COMMAND_LIVE_EXECUTE_ENABLED=true`, `KORTEX_COMMAND_ADMIN_ENABLED=true`, `KORTEX_COMMAND_ADMIN_TOKEN` sensitive provisionado).
 - Production live/admin: deshabilitado hasta aprobacion explicita.
+- Kortex GitHub commands: deshabilitados por default en todos los ambientes hasta rollout/smoke especifico (`KORTEX_GITHUB_COMMANDS_ENABLED=false`, `KORTEX_GITHUB_WORKFLOW_DISPATCH_ENABLED=false`).
 
 ## Regla de mantenimiento
 

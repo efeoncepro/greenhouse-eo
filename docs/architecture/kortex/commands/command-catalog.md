@@ -57,3 +57,19 @@ Los comandos de TASK-1164 se mantienen:
 - `kortex.strategy.release_candidate.execute`
 
 TASK-1165 solo agrego catalogo y gates; no rompio esos nombres.
+
+## GitHub repo commands (TASK-1166)
+
+Estos comandos viven en `src/lib/kortex/github-control-plane/commands/**`, separados del adapter runtime Kortex. No aceptan repo/path arbitrario; el repo esta fijado server-side como `efeoncepro/kortex`.
+
+| Command | Tier | GitHub endpoint | Gate |
+|---|---|---|---|
+| `kortex.github.workflow.rerun_failed` | `workflow_rerun` | `POST /repos/efeoncepro/kortex/actions/runs/{run_id}/rerun-failed-jobs` | `KORTEX_GITHUB_COMMANDS_ENABLED=true`, `Idempotency-Key`, workflow allowlisted, run con conclusion fallida/cancelada/timed out. |
+| `kortex.github.workflow.dispatch` | `workflow_dispatch` | `POST /repos/efeoncepro/kortex/actions/workflows/{workflow_id}/dispatches` | `KORTEX_GITHUB_COMMANDS_ENABLED=true`, `KORTEX_GITHUB_WORKFLOW_DISPATCH_ENABLED=true`, ref/workflow allowlisted, frase `DISPATCH KORTEX WORKFLOW`. |
+
+Defaults V1:
+
+- `KORTEX_GITHUB_COMMANDS_ENABLED=false`
+- `KORTEX_GITHUB_WORKFLOW_DISPATCH_ENABLED=false`
+- `KORTEX_GITHUB_ALLOWED_WORKFLOWS=CI`
+- `KORTEX_GITHUB_ALLOWED_REFS=main,develop`

@@ -194,6 +194,7 @@ import { getReleaseLastStatusSignal } from './queries/release-last-status'
 import { getReleasePendingWithoutJobsSignal } from './queries/release-pending-without-jobs'
 import { getReleaseStaleApprovalSignal } from './queries/release-stale-approval'
 import { getReleaseWorkerRevisionDriftSignal } from './queries/release-worker-revision-drift'
+import { getKortexGithubCiLastStatusSignal } from './queries/kortex-github-ci-last-status'
 import { getEmailRenderFailureSignal } from './queries/email-render-failure'
 import { getNuboxSourceFreshnessSignal } from './queries/nubox-source-freshness'
 import { getNotionConformedDrainFreshnessSignal } from './queries/notion-conformed-drain-freshness'
@@ -871,6 +872,13 @@ interface ReliabilityOverviewSources {
   productionRelease?: ReliabilitySignal[] | null
 
   /**
+   * TASK-1166 — Kortex GitHub repo control plane runtime signal.
+   *   - platform.kortex.github.ci_last_status (runtime)
+   * Roll up bajo moduleKey='platform' hasta que exista un subsystem Kortex dedicado.
+   */
+  kortexGithubCiLastStatus?: ReliabilitySignal | null
+
+  /**
    * TASK-910 Slice 4 — Notion Demo Teamspace Sandbox signals (6 canonical):
    *   - notion.metrics.shadow_paridad_rpa_demo (drift)
    *   - notion.metrics.echo_loop_detected_demo (drift)
@@ -1103,6 +1111,8 @@ export const buildReliabilityOverview = (
     ...(sources.commercialHealth ?? []),
     // TASK-848 Slice 7 — Production Release Control Plane signals (2 of 4 V1).
     ...(sources.productionRelease ?? []),
+    // TASK-1166 — Kortex GitHub repository control plane runtime signal.
+    ...(sources.kortexGithubCiLastStatus ? [sources.kortexGithubCiLastStatus] : []),
     // TASK-910 Slice 4 — Notion Demo Teamspace Sandbox signals (6 canonical).
     // 5 bajo moduleKey 'delivery' + 1 CRITICAL bajo moduleKey 'payroll'.
     ...(sources.notionMetricsDemo ?? []),
@@ -1914,6 +1924,11 @@ export const getReliabilityOverview = async (
           .then(signals => signals.filter((s): s is NonNullable<typeof s> => s !== null))
           .catch(() => null)
 
+  const kortexGithubCiLastStatus =
+    preloadedSources.kortexGithubCiLastStatus !== undefined
+      ? preloadedSources.kortexGithubCiLastStatus
+      : await getKortexGithubCiLastStatusSignal().catch(() => null)
+
   // TASK-807 — Commercial Health readers (6). Cada reader degrada
   // honestamente a `unknown` si su query falla. Incluye stale_progress de
   // TASK-805 como primitive reutilizada, no recreada.
@@ -2129,6 +2144,7 @@ export const getReliabilityOverview = async (
     servicesEngagement,
     commercialHealth,
     productionRelease,
+    kortexGithubCiLastStatus,
     icoMaterializerSkippedSafety,
     nexaInsightsFreshness,
     nexaInsightsNoNewSignals,

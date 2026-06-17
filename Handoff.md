@@ -1,5 +1,20 @@
 # Release 2026-06-10 #2 — develop→main `6c649b2a6` RELEASED
 
+## Sesión 2026-06-17 — TASK-1166 Kortex GitHub Repo Control Plane complete — Codex
+
+> **Estado:** complete en `develop`; staging deploy + smokes verdes. Sin cambio de rama/worktree.
+
+- **Entregable:** `docs/tasks/complete/TASK-1166-kortex-github-repo-control-plane.md`.
+- **Implementado:** reader server-only `src/lib/kortex/github-control-plane/**`, endpoint admin `GET /api/admin/kortex/github-control-plane`, command adapter GitHub `POST /api/admin/kortex/github-commands`, registry allowlisted `kortex.github.workflow.rerun_failed` / `kortex.github.workflow.dispatch`, y signal `platform.kortex.github.ci_last_status`.
+- **Guardrails:** repo hardcoded `efeoncepro/kortex`; commands default OFF (`KORTEX_GITHUB_COMMANDS_ENABLED=false`, `KORTEX_GITHUB_WORKFLOW_DISPATCH_ENABLED=false`), `Idempotency-Key`, `executeApiPlatformCommand`, workflow/ref allowlists y frase `DISPATCH KORTEX WORKFLOW` para dispatch.
+- **Docs:** nuevo ADR `docs/architecture/GREENHOUSE_KORTEX_GITHUB_CONTROL_PLANE_V1.md` + updates en `docs/architecture/kortex/**`, task, handoff y changelog.
+- **Evidencia `gh`:** repo privado `efeoncepro/kortex`, default branch `main`, ramas `main`/`develop`/`feat/efeonce-visual-identity`, workflow `CI` activo, ultimo run `main` `7266902` success.
+- **Rollout staging:** Vercel deploy `https://greenhouse-bfym2m5lx-efeonce-7670142f.vercel.app`, id `dpl_3dbr9qmtmZPYwxmyLQQhZmxXEMJ2`, target `staging`, `Ready`; aliases `dev-greenhouse.efeoncepro.com` y `greenhouse-eo-env-staging-efeonce-7670142f.vercel.app`.
+- **Smokes staging:** `GET /api/admin/kortex/github-control-plane` -> HTTP `200`, `confidence=high`, repo `efeoncepro/kortex`, latest CI run `27681588991` success, correlation `matched`, warnings `[]`; `POST /api/admin/kortex/github-commands` con flags OFF -> HTTP `409`, code `kortex_github_command_disabled`; `/api/admin/reliability` incluye `platform.kortex.github.ci_last_status` severity `ok`.
+- **Validacion local/cierre:** Vitest focal TASK-1166 -> 5 files / 15 tests passed; `tsc --noEmit`, `pnpm lint`, `pnpm build`, `pnpm task:lint --task TASK-1166`, `pnpm ops:lint --changed`, `pnpm docs:closure-check`, `git diff --check` verdes. Build local/remoto emitio warning preexistente de Roadmap dynamic pattern, no relacionado.
+- **Pendiente operacional:** production commands siguen OFF por diseño; no prender `KORTEX_GITHUB_COMMANDS_ENABLED` ni `KORTEX_GITHUB_WORKFLOW_DISPATCH_ENABLED` sin aprobacion explicita, workflow/ref allowlisted y runbook de release/deploy Kortex.
+- **Nota:** habia cambios locales previos en `docs/tasks/to-do/TASK-1161-public-site-greenhouse-binding-reader.md`; se dejaron intactos y fuera del scope de TASK-1166.
+
 ## Sesión 2026-06-17 — Kortex live/admin staging flags ON — Codex
 
 > **Estado:** staging queda con adapter, live execute y admin/breakglass prendidos para pruebas. Production sigue sin cambios.

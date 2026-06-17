@@ -2,12 +2,14 @@
 
 ## Estado staging validado
 
-- Greenhouse deploy: `greenhouse-dnr2e8c04-efeonce-7670142f.vercel.app`
+- Greenhouse deploy TASK-1166: `greenhouse-bfym2m5lx-efeonce-7670142f.vercel.app`
+- Previous Kortex runtime command rollout deploy: `greenhouse-dnr2e8c04-efeonce-7670142f.vercel.app`
 - Alias: `dev-greenhouse.efeoncepro.com`
 - Package Vercel corregido: upload `57MB` despues de excluir artefactos locales.
 - Deployment inflado removido: `greenhouse-hyqnb6n6k-efeonce-7670142f.vercel.app`
 - Flags vigentes por aprobacion del operador: `KORTEX_COMMAND_ADAPTER_ENABLED=true`, `KORTEX_COMMAND_LIVE_EXECUTE_ENABLED=true`, `KORTEX_COMMAND_ADMIN_ENABLED=true`.
 - Secret admin vigente: `KORTEX_COMMAND_ADMIN_TOKEN` en Vercel staging como sensitive env, provisionado desde GCP Secret Manager `efeonce-kortex-dev/kortex-admin-bootstrap-token`.
+- GitHub repo commands TASK-1166 siguen default OFF: `KORTEX_GITHUB_COMMANDS_ENABLED=false`, `KORTEX_GITHUB_WORKFLOW_DISPATCH_ENABLED=false`.
 
 ## Smokes ejecutados
 
@@ -57,6 +59,55 @@ Ejemplo safe:
 }
 ```
 
+## Kortex GitHub control-plane
+
+Endpoint read-only:
+
+```bash
+pnpm staging:request GET '/api/admin/kortex/github-control-plane'
+```
+
+Resultado esperado post-rollout TASK-1166:
+
+- HTTP `200`
+- `contractVersion='greenhouse-kortex-github-control-plane.v1'`
+- `repository.nameWithOwner='efeoncepro/kortex'`
+- workflow `CI` visible
+- latest run `main` con `status=completed` y `conclusion=success` si GitHub esta sano
+
+Smoke validado 2026-06-17:
+
+- HTTP `200`
+- `confidence='high'`
+- latest CI run `27681588991`, `status='completed'`, `conclusion='success'`
+- `runtimeCorrelation.status='matched'`
+- `warnings=[]`
+- reliability signal `platform.kortex.github.ci_last_status` con severity `ok`
+
+Endpoint commands GitHub:
+
+```http
+POST /api/admin/kortex/github-commands
+Idempotency-Key: <stable-key>
+Content-Type: application/json
+```
+
+Con flags OFF, debe fallar cerrado:
+
+```json
+{
+  "commandName": "kortex.github.workflow.rerun_failed",
+  "reason": "Verify GitHub command gate from Greenhouse",
+  "payload": { "runId": 27681588991 }
+}
+```
+
+Respuesta esperada antes de habilitar flags: `409 kortex_github_command_disabled`.
+
+Smoke validado 2026-06-17: `409 kortex_github_command_disabled`.
+
+No habilitar `KORTEX_GITHUB_WORKFLOW_DISPATCH_ENABLED=true` sin owner humano, workflow/ref allowlisted y runbook de release/deploy Kortex.
+
 ## Antes de ejecutar live/admin real
 
 Checklist live:
@@ -91,6 +142,11 @@ Checklist admin:
 | `kortex_admin_confirmation_required` | Falta frase admin. |
 | `kortex_preview_required` | Falta dry-run vigente. |
 | `kortex_preflight_failed` | Kortex rechazo o fallo upstream; revisar sources/logs redacted. |
+| `kortex_github_command_disabled` | GitHub commands de Kortex apagados por flag. |
+| `kortex_github_command_not_allowed` | Workflow/ref/run no permitido por allowlist o estado. |
+| `kortex_github_confirmation_required` | Falta frase humana para dispatch. |
+| `kortex_github_preflight_failed` | No se pudo verificar workflow/run antes del write. |
+| `kortex_github_upstream_failed` | GitHub Actions API rechazo el command; revisar logs redacted. |
 
 ## Higiene Vercel
 
