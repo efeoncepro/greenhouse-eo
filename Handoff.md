@@ -2,7 +2,7 @@
 
 ## Sesión 2026-06-17 — TASK-1163 ICO member metrics freshness guard + Daniela OTD/RpA — Codex
 
-> **Estado:** complete local-first en `develop`; código + reparación BQ aplicada. No push.
+> **Estado:** complete en `develop`; código + reparación BQ aplicada; commit incluido en `origin/develop`.
 
 - **Incidente:** Daniela Ferreira veía OTD ~`5%` porque `ico_engine.metrics_by_member` para junio 2026 estaba congelada en `2026-06-01T07:15:41Z` (`otd_pct=4.8`, `1` on-time, `20` overdue). El live compute del ICO registry daba OTD `99.1`.
 - **Fix de código:** `src/lib/ico-engine/materialized-freshness.ts` agrega decisión pura de frescura current-period; `readMemberMetrics` y `readMemberMetricsBatch` comparan `metrics_by_member.materialized_at` contra snapshots base (`delivery_task_monthly_snapshots` / `metric_snapshots_monthly`) y hacen fallback live si el cache está stale. `fetchKpisForPeriod` ahora respeta `snapshot.source` para que payroll marque fallback interno como `sourceMode='live'`, no `materialized`.
@@ -31,14 +31,15 @@
 
 ## Sesión 2026-06-17 — TASK-1162 Kortex control-plane reader MVP — Codex
 
-> **Estado:** code complete local-first en `develop`; rollout/staging endpoint smoke pendiente. Sin cambio de rama/worktree por instrucción operativa vigente; branch declarada en la task queda como referencia.
+> **Estado:** complete en `develop`; push + deploy staging Ready + smoke real verificado. Sin cambio de rama/worktree por instrucción operativa vigente; branch declarada en la task queda como referencia.
 
-- **Ownership:** `docs/tasks/in-progress/TASK-1162-kortex-greenhouse-control-plane-reader-mvp.md`.
+- **Ownership:** `docs/tasks/complete/TASK-1162-kortex-greenhouse-control-plane-reader-mvp.md`.
 - **Implementado:** `src/lib/kortex/control-plane/**` + `GET /api/admin/kortex/control-plane`, contrato `greenhouse-kortex-control-plane-reader.v1`, Sentry domain `integrations.kortex`, ADR `GREENHOUSE_KORTEX_CONTROL_PLANE_READER_V1.md`.
 - **Boundary:** CERO writes Kortex/HubSpot/GitHub. Allowlist GET solamente; tests bloquean `/api/v1/audits/run`, strategy compile y release execute.
 - **Runtime smoke local/external:** GitHub repo OK (`main`, 2 issues, 1 PR); Kortex OpenAPI/context/overview/audit OK; binding real `EO-SPB-0001` leído desde `sister_platform_bindings` para portal `0c0af3a3-627e-4e05-96f3-557712a2e06a`; `deployment-summary` y `adoption-kpis` responden 401 sin token dedicado y degradan honestamente.
-- **Validación:** Vitest focal 10/10; ESLint focal verde; `NODE_OPTIONS=--max-old-space-size=8192 pnpm exec tsc --noEmit --pretty false` verde; `pnpm task:lint --task TASK-1162` verde; `pnpm ops:lint --changed` verde; `pnpm docs:closure-check` verde; `pnpm qa:gates --changed --agent codex --task TASK-1162 --integration --runtime --auth --docs` ejecutado; `pnpm route-reachability-gate` verde; `NODE_OPTIONS=--max-old-space-size=8192 pnpm build` verde e incluye `/api/admin/kortex/control-plane`.
-- **QA verdict:** `CONDITIONAL PASS`; closure state `code complete, rollout pendiente`. Falta push/deploy y smoke de `GET /api/admin/kortex/control-plane` en staging con/sin `hubspot_portal_id=51183921` para mover lifecycle a `complete`.
+- **Rollout staging:** commit `8ad7b22` deployado en `https://greenhouse-p1hsxma5x-efeonce-7670142f.vercel.app` (Ready). Se agregó `GITHUB_RELEASE_OBSERVER_TOKEN` en Vercel `staging` como fallback server-only porque el resolver GitHub App existente seguía degradando; valor no expuesto.
+- **Smoke staging:** `pnpm staging:request '/api/admin/kortex/control-plane'` HTTP 200, confidence `high`, repo `efeoncepro/kortex`, branch `main`, open issues `2`, open PRs `1`, OpenAPI available. `pnpm staging:request '/api/admin/kortex/control-plane?hubspot_portal_id=51183921'` HTTP 200, confidence `medium`, portal `0c0af3a3-627e-4e05-96f3-557712a2e06a`, binding `EO-SPB-0001` active, portal runtime active, latest audit completed, findings `3`, score `88`; optional `deployment-summary`/`adoption-kpis` siguen 401 y degradan honestamente.
+- **Validación:** Vitest focal 10/10; ESLint focal verde; `NODE_OPTIONS=--max-old-space-size=8192 pnpm exec tsc --noEmit --pretty false` verde; `pnpm task:lint --task TASK-1162` verde; `pnpm ops:lint --changed` verde; `pnpm docs:closure-check` verde; `pnpm qa:gates --changed --agent codex --task TASK-1162 --integration --runtime --auth --docs` ejecutado; `pnpm route-reachability-gate` verde; `NODE_OPTIONS=--max-old-space-size=8192 pnpm build` verde e incluye `/api/admin/kortex/control-plane`; pre-push `pnpm local:check` verde al push de `8ad7b22`.
 
 ## Sesión 2026-06-17 — TASK-1162 Kortex control-plane reader task — Codex
 

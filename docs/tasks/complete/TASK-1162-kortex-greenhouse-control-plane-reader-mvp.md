@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Medio`
@@ -15,7 +15,7 @@
 - UI impact: `none`
 - Backend impact: `integration`
 - Epic: `none`
-- Status real: `Code complete local-first; rollout/staging endpoint smoke pendiente`
+- Status real: `Complete; staging endpoint smoke verified`
 - Rank: `TBD`
 - Domain: `platform|crm|integrations|ops|ecosystem`
 - Blocked by: `none`
@@ -412,7 +412,10 @@ No feature flag for the read-only endpoint if it is admin-gated and additive. If
 - Kortex portal overview smoke: environment `staging`, installation `active`, latest deployment `failed`, live schema unavailable.
 - Kortex latest audit smoke: status `completed`, finding count `3`, score `88`.
 - Kortex `deployment-summary` and `adoption-kpis` returned `401 Unauthorized` without a dedicated read token; V1 degrades those optional sources and still surfaces deployment basics from `portal-runtime/overview`.
-- Greenhouse staging endpoint smoke is pending until code is pushed/deployed.
+- Greenhouse staging deploy `greenhouse-p1hsxma5x-efeonce-7670142f.vercel.app` is Ready for commit `8ad7b22`.
+- Staging global endpoint smoke via `pnpm staging:request '/api/admin/kortex/control-plane'`: HTTP 200, confidence `high`, repo `efeoncepro/kortex`, default branch `main`, open issues `2`, open PRs `1`, OpenAPI available.
+- Staging portal endpoint smoke via `pnpm staging:request '/api/admin/kortex/control-plane?hubspot_portal_id=51183921'`: HTTP 200, confidence `medium`, resolves portal `0c0af3a3-627e-4e05-96f3-557712a2e06a`, binding `EO-SPB-0001` active, portal runtime status active, latest audit completed with finding count `3` and score `88`.
+- Staging uses `GITHUB_RELEASE_OBSERVER_TOKEN` fallback because the existing GitHub App env still resolved as unavailable in the reader; token value was not exposed.
 
 ## Verification
 
@@ -426,17 +429,17 @@ No feature flag for the read-only endpoint if it is admin-gated and additive. If
 - [x] `pnpm task:lint --task TASK-1162`
 - [x] `pnpm ops:lint --changed`
 - [x] `pnpm docs:closure-check`
-- [ ] Staging smoke of deployed `GET /api/admin/kortex/control-plane` with and without portal params.
+- [x] Staging smoke of deployed `GET /api/admin/kortex/control-plane` with and without portal params.
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla).
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`).
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre.
-- [ ] `Handoff.md` quedo actualizado con el split Greenhouse vs Kortex.
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento runtime.
-- [ ] se ejecuto chequeo de impacto cruzado sobre TASK-377, TASK-885..889 y docs de arquitectura Kortex.
-- [ ] Si se toco el repo Kortex, su `handoff.md` y task lifecycle quedaron actualizados tambien.
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`complete`).
+- [x] el archivo vive en la carpeta correcta (`complete/`).
+- [x] `docs/tasks/README.md` quedo sincronizado con el cierre.
+- [x] `Handoff.md` quedo actualizado con el split Greenhouse vs Kortex.
+- [x] `changelog.md` quedo actualizado si cambio comportamiento runtime.
+- [x] se ejecuto chequeo de impacto cruzado sobre TASK-377, TASK-885..889 y docs de arquitectura Kortex.
+- [x] No se toco el repo Kortex; no aplica actualizar su handoff/task lifecycle.
 
 ## Follow-ups
 

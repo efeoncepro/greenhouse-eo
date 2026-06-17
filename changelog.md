@@ -3373,7 +3373,7 @@ Validations: tsc 0 errors, lint 0 errors, 427 files / 2225 tests pass / 5 skippe
 
 # 2026-06-17
 
-- Platform / Kortex: TASK-1162 agregó el reader read-only `greenhouse-kortex-control-plane-reader.v1` para observar Kortex desde Greenhouse como peer system: GitHub repo status, Kortex runtime summaries, binding via `sister_platform_bindings` y endpoint admin `GET /api/admin/kortex/control-plane`. Los endpoints mutativos de Kortex quedan bloqueados por allowlist y tests; `kortex.*` no se agregó a entitlements internos. Code complete local-first; staging endpoint smoke queda pendiente de deploy.
+- Platform / Kortex: TASK-1162 agregó y cerró el reader read-only `greenhouse-kortex-control-plane-reader.v1` para observar Kortex desde Greenhouse como peer system: GitHub repo status, Kortex runtime summaries, binding via `sister_platform_bindings` y endpoint admin `GET /api/admin/kortex/control-plane`. Los endpoints mutativos de Kortex quedan bloqueados por allowlist y tests; `kortex.*` no se agregó a entitlements internos. Staging quedó verificado en `greenhouse-p1hsxma5x`: global HTTP 200 confidence `high`; portal HubSpot `51183921` HTTP 200 confidence `medium`, binding `EO-SPB-0001` activo, latest audit completed score `88`; `deployment-summary`/`adoption-kpis` degradan honestamente por 401.
 
 ## 2026-04-13
 
