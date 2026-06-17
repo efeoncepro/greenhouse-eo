@@ -564,3 +564,148 @@ migrations/
 - Columna `parent_service_id TEXT NULL` FK self con `ON DELETE RESTRICT`.
 - Trigger `services_lineage_protection_trigger` (BEFORE INSERT OR UPDATE) bloquea: chain regular→regular, auto-referencia, parent missing, parent legacy_seed_archived.
 - Bloque DO post-DDL anti pre-up-marker bug (verifica los 6 cambios).
+
+---
+
+## Invariantes operativos para agentes — HubSpot bridge/intake (TASK-574…837)
+
+> **Relocados de `CLAUDE.md` por TASK-1160 (2026-06-16), verbatim — cero cambio semántico.** Espejo operativo (NUNCA/SIEMPRE) que un agente carga al tocar este dominio; el contrato técnico vive en su spec. Dedup = TASK-1160 Slice 4.
+
+### Cloud Run hubspot-greenhouse-integration (HubSpot write bridge + webhooks) — TASK-574
+
+- Servicio Cloud Run Python/Flask en `us-central1` (NO `us-east4` — region bloqueada para preservar URL pública).
+- Expone 23 rutas HTTP + webhook handler inbound. URL: `https://hubspot-greenhouse-integration-y6egnifl6a-uc.a.run.app`.
+- Ubicación canónica post TASK-574 (2026-04-24): `services/hubspot_greenhouse_integration/` en este monorepo. Antes vivía en el sibling `cesargrowth11/hubspot-bigquery`.
+- Deploy: `.github/workflows/hubspot-greenhouse-integration-deploy.yml` (WIF, pytest → Cloud Build → Cloud Run deploy → smoke `/health` + `/contract`).
+- Manual: `ENV=staging|production bash services/hubspot_greenhouse_integration/deploy.sh`.
+- 3 secretos: `hubspot-access-token`, `greenhouse-integration-api-token`, `hubspot-app-client-secret` (Secret Manager project `efeonce-group`).
+- Si el cambio toca rutas del bridge, webhooks HubSpot inbound, o secretos → invocar skill `hubspot-greenhouse-bridge`.
+- Consumer principal: `src/lib/integrations/hubspot-greenhouse-service.ts` (no cambia pre/post cutover — mismo contract HTTP).
+- **Sibling `cesargrowth11/hubspot-bigquery` ya no es owner del bridge**: conserva solo el Cloud Function HubSpot→BigQuery (`main.py` + `greenhouse_bridge.py` batch bridge) + app HubSpot Developer Platform (`hsproject.json`).
+
+### HubSpot inbound webhook — p_services (0-162) auto-sync (TASK-813)
+
+Cuando alguien crea o actualiza un service en HubSpot custom object `p_services` (objectTypeId `0-162`), Greenhouse lo refleja automáticamente en `greenhouse_core.services` via webhook + handler canónico. Ningún sync manual ni cron requerido para el flow normal.
+
+**Pipeline canónico (mismo patrón TASK-706 hubspot-companies)**:
+
+1. **HubSpot Developer Portal** → suscripción a `p_services.creation`, `p_services.propertyChange`. Target URL: `https://greenhouse.efeoncepro.com/api/webhooks/hubspot-services`. Signature method: v3.
+2. **Endpoint genérico** `/api/webhooks/hubspot-services` recibe POST.
+3. **Handler `hubspot-services`** (`src/lib/webhooks/handlers/hubspot-services.ts`) valida firma v3 (HMAC-SHA256, secret `HUBSPOT_APP_CLIENT_SECRET`, timestamp expiry < 5 min, timing-safe compare).
+4. Extrae service IDs (subscriptionType `p_services.*`).
+5. Batch read de service properties via `fetchServicesForCompany` helper (`src/lib/hubspot/list-services-for-company.ts`).
+6. Per service: resuelve `hubspot_company_id` via association lookup, resuelve space en GH via `clients.hubspot_company_id`, UPSERT en `services`.
+7. Outbox event `commercial.service_engagement.materialized` v1.
+8. Failures individuales loggeadas en Sentry `domain='integrations.hubspot'`.
+
+**Mapping unmapped pattern**: si `ef_linea_de_servicio` está NULL en HubSpot, la fila se materializa con `hubspot_sync_status='unmapped'`. Downstream consumers (P&L, ICO, attribution) **deben filtrar por** `WHERE active=TRUE AND status != 'legacy_seed_archived' AND hubspot_sync_status != 'unmapped'` para excluir filas sin clasificación. Operador resuelve via Slice 7 UI (futuro).
+
+**Backfill operacional** (one-shot post setup):
+
+```bash
+HUBSPOT_ACCESS_TOKEN=$(gcloud secrets versions access latest \
+  --secret=hubspot-access-token --project=efeonce-group) \
+pnpm tsx --require ./scripts/lib/server-only-shim.cjs \
+  scripts/services/backfill-from-hubspot.ts --apply --create-missing-spaces
+```
+
+Idempotente: re-correr es safe, UPSERT por `hubspot_service_id` UNIQUE.
+
+**Helper canónico para escapar el bridge bug**: `src/lib/hubspot/list-services-for-company.ts` (`fetchServicesForCompany`, `batchReadServices`, `listServiceIdsForCompany`) llama HubSpot API directo via `HUBSPOT_ACCESS_TOKEN` env o secret `gcp:hubspot-access-token`. Bypass del bridge Cloud Run que usa `p_services` en URLs en lugar de `0-162` (HubSpot rechaza con 400 "Unable to infer object type"). Bridge fix queda como follow-up task separada.
+
+**Reliability signals (subsystem `commercial`)**:
+
+- `commercial.service_engagement.sync_lag` — kind=lag, severity=warning si count > 0. Cuenta services con `hubspot_service_id` poblado pero `hubspot_last_synced_at NULL` o > 24h. Detecta webhook caído o sync stale. Steady state = 0.
+- `commercial.service_engagement.organization_unresolved` — kind=drift, severity=error si > 7 días. Cuenta `webhook_inbox_events.status='failed'` con `error_message LIKE 'organization_unresolved:%'` y antiguedad > 7d. Operador comercial resuelve creando client en Greenhouse o archivando service en HubSpot.
+- `commercial.service_engagement.legacy_residual_reads` — kind=drift, severity=error si > 0. Cuenta filas archived (`status='legacy_seed_archived'`) que tienen `service_attribution_facts` con `created_at > services.updated_at` (consumer no respeta filtro). Steady state = 0.
+
+**Hard rules**:
+
+- **NUNCA** crear fila en `core.services` con `hubspot_service_id IS NULL` y `engagement_kind != 'discovery'`. Solo discovery legítimo + legacy_seed pueden carecer del bridge.
+- **NUNCA** sincronizar Greenhouse → HubSpot `0-162`. Solo back-fill de propiedades `ef_*` (TASK-813 follow-up V1.1, default OFF).
+- **NUNCA** matchear services por nombre (colisión real demostrada en audit 2026-05-06: SSilva tiene 3 services HubSpot vs 4 GH con naming distinto).
+- **NUNCA** borrar las 30 filas legacy. Solo archivar (script `scripts/services/archive-legacy-seed.ts` con `--apply`).
+- **NUNCA** invocar `Sentry.captureException` directo en code path commercial. Usar `captureWithDomain(err, 'integrations.hubspot', ...)`.
+- **SIEMPRE** que un consumer Finance/Delivery necesite "el servicio del cliente X período Y", filtrar `WHERE active=TRUE AND status != 'legacy_seed_archived' AND hubspot_sync_status != 'unmapped'`.
+
+### HubSpot Service Pipeline lifecycle invariants (TASK-836)
+
+`upsertServiceFromHubSpot()` consume el mapper canónico `service-lifecycle-mapper.ts` y la cascade canónica `engagement-kind-cascade.ts` para resolver `pipeline_stage|status|active|engagement_kind` desde HubSpot. Reemplaza el hardcode que tratba a TODOS los services como `active`.
+
+**HubSpot Service Pipeline (`0-162`) stage IDs canónicos** (verificados 2026-05-09 + stage validation creada):
+
+| Greenhouse pipeline_stage | HubSpot label | HubSpot stage ID | Active | Status |
+|---|---|---|---|---|
+| `validation` | Validación / Sample Sprint | `1357763256` | TRUE | active |
+| `onboarding` | Onboarding | `8e2b21d0-7a90-4968-8f8c-a8525cc49c70` | TRUE | active |
+| `active` | Activo | `600b692d-a3fe-4052-9cd7-278b134d7941` | TRUE | active |
+| `renewal_pending` | En renovación | `de53e7d9-6b57-4701-b576-92de01c9ed65` | TRUE | active |
+| `renewed` | Renovado | `1324827222` | TRUE | active (transitorio) |
+| `closed` | Closed | `1324827223` | FALSE | closed |
+| `paused` | Pausado | `1324827224` | FALSE | paused |
+
+**Property HubSpot canónica** (creada 2026-05-09 vía API):
+- internal name: `ef_engagement_kind` (label visible: `Tipo de servicio`)
+- type: `enumeration` / fieldType: `select`
+- options: `regular|pilot|trial|poc|discovery` (labels: Contratado/Piloto/Trial/POC/Discovery)
+
+**Outbox event canónico granular**:
+- `commercial.service_engagement.lifecycle_changed v1` emitido SOLO cuando hay diff real en `pipeline_stage|active|status|engagement_kind`. Refresh idempotente sin diff NO emite.
+- `commercial.service_engagement.materialized v1` (TASK-813) sigue emitiéndose en cada UPSERT — son complementarios.
+
+**4 reliability signals nuevos bajo subsystem `commercial`**:
+- `commercial.service_engagement.lifecycle_stage_unknown` (kind=drift, severity=error si > 0).
+- `commercial.service_engagement.engagement_kind_unmapped` (kind=drift, severity=warning).
+- `commercial.service_engagement.renewed_stuck` (kind=drift, severity=warning si > 60 días).
+- `commercial.service_engagement.lineage_orphan` (kind=data_quality, severity=error).
+
+**Schema delta** (migration `20260509125228920`):
+- CHECK `pipeline_stage` extendido con `'validation'`.
+- CHECK structural a `status` (`active|closed|paused|legacy_seed_archived`).
+- CHECK structural a `hubspot_sync_status` (`pending|synced|unmapped`).
+- Columna `unmapped_reason TEXT NULL` con CHECK enum cerrado (`unknown_pipeline_stage|missing_classification`).
+- Columna `parent_service_id TEXT NULL` FK self con `ON DELETE RESTRICT`.
+- Trigger `services_lineage_protection_trigger` (BEFORE INSERT OR UPDATE).
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** hardcodear `pipeline_stage='active'`, `status='active'` ni `active=TRUE` en INSERT/UPDATE de `services` cuando la fuente es HubSpot. Toda mutación pasa por el mapper canónico.
+- **NUNCA** depender del label visible HubSpot (`Tipo de servicio`, `Activo`, `Closed`, etc.) en código. Solo internal names + stage IDs. Labels son traducibles y mutables.
+- **NUNCA** sobrescribir `engagement_kind` con NULL desde un UPSERT inbound. La cascade canónica preserva PG cuando HubSpot devuelve NULL (casos 3-4 de la cascade).
+- **NUNCA** asumir un default de `engagement_kind` para services nuevos en stage `validation`. Sin clasificación explícita, queda `unmapped` y reliability signal alerta.
+- **NUNCA** crear servicio con `engagement_kind='regular'` AND `parent_service_id IS NOT NULL` cuyo parent tenga `engagement_kind='regular'`. Trigger PG lo bloquea; signal `lineage_orphan` lo detecta defense-in-depth.
+- **NUNCA** mutar `pipeline_stage`, `status` o `active` directo via SQL en producción. Toda mutación pasa por `upsertServiceFromHubSpot()` o revert canónico via outbox.
+- **NUNCA** filtrar "servicios operativos del periodo" con `WHERE pipeline_stage = 'active'` solo. `renewed` y `renewal_pending` también son operativos. Usar `WHERE active=TRUE` o whitelist explícita.
+- **NUNCA** promover unilateralmente desde Greenhouse `pipeline_stage='renewed'` a `'active'`. HubSpot es source of truth de stage; signal `renewed_stuck` escala drift.
+- **NUNCA** agregar stage HubSpot nuevo sin extender el mapper + agregar tests + actualizar `docs/architecture/GREENHOUSE_HUBSPOT_SERVICES_INTAKE_V1.md`. Default unknown stage al fail-safe `unmapped`, NUNCA a `active`.
+- **NUNCA** ejecutar backfill sin pre/post snapshot documentado y plan de revert via outbox `lifecycle_changed`.
+- **NUNCA** invocar `Sentry.captureException` directo en este path. Usar `captureWithDomain(err, 'commercial', ...)`.
+- **SIEMPRE** que ocurra una transición de `pipeline_stage`, `active`, `status` o `engagement_kind`, emitir `commercial.service_engagement.lifecycle_changed v1` en la misma transacción. Refresh idempotente sin diff NO emite.
+- **SIEMPRE** validar `engagement_kind` contra el enum cerrado `regular|pilot|trial|poc|discovery`. Valores fuera del enum → `hubspot_sync_status='unmapped'` + `unmapped_reason='missing_classification'`, NUNCA cast silencioso.
+- **SIEMPRE** que un Sample Sprint convierta a service regular, el child hereda `parent_service_id` apuntando al Sample Sprint padre. Trigger enforce; signal `lineage_orphan` defense-in-depth.
+
+### HubSpot webhook events — dual-format invariant (TASK-836 follow-up)
+
+HubSpot Developer Platform 2025.2 cambió el shape del payload de webhooks. **Ambos formatos coexisten** y el handler debe soportar ambos via clasificador canónico — NUNCA branch por prefix de `subscriptionType` solo.
+
+| Format | `subscriptionType` | Discriminador |
+|---|---|---|
+| Legacy (apps OAuth tradicionales) | `company.creation`, `contact.propertyChange`, `service.creation`, `p_services.creation`, `0-162.creation` | Single field encapsula objeto + acción |
+| Developer Platform 2025.2 (Build #24+, deploy 2026-05-06) | `object.creation`, `object.propertyChange` (genérico) | `objectTypeId` separate (`0-1` contact, `0-2` company, `0-162` service) o `objectType` (`contact`, `company`, `service`, `p_services`) |
+
+**Helper canónico** — `classifyHubSpotEvent(event) → 'company' | 'contact' | 'service' | 'unknown'`:
+
+- En `src/lib/webhooks/handlers/hubspot-companies.ts` (TASK-706 handler — companies + contacts intake)
+- En `src/lib/webhooks/handlers/hubspot-services.ts` (TASK-813 handler — p_services intake) — equivalente `isHubSpotServiceEvent`
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** filtrar events con `subscriptionType.startsWith('company.')` / `startsWith('p_services.')` / equivalentes solo. **DEBE** pasar por `classifyHubSpotEvent()` o `isHubSpotServiceEvent()`. Lint manual durante review — la regresión silente del 2026-05-06 es la prueba.
+- **NUNCA** asumir que el formato del próximo Build HubSpot va a ser legacy. La app puede flippear silenciosamente al formato 2025.2 sin notice. Defense in depth: classifier soporta ambos siempre.
+- **NUNCA** ignorar events con `objectTypeId` desconocido (e.g. `0-999`). Devolver `'unknown'` y log silente — NO crashear el handler completo (puede haber events legítimos de objects que no nos interesan en el mismo batch).
+- **SIEMPRE** que emerja un nuevo handler de webhook HubSpot (deals `0-3`, tickets, custom objects), reusar el pattern dual-format desde el day-1. Single source of truth en TS, helper compartido.
+- **SIEMPRE** validar tests anti-regresión que cubran legacy + 2025.2 + mixed formats antes de mergear cambios al handler.
+
+**Tests anti-regresión**: `src/lib/webhooks/handlers/hubspot-companies.test.ts` describe block `classifyHubSpotEvent dual-format (TASK-836 follow-up)` — 4 tests cubren formato 2025.2 puro, mixed legacy+2025.2 dedup, contact event con `associatedObjectId`, y `objectTypeId` desconocido ignorado.
+
+**Spec canónica**: `docs/tasks/in-progress/TASK-836-hubspot-services-lifecycle-stage-sync-hardening.md`. Runbook config HubSpot: `docs/operations/runbooks/hubspot-service-pipeline-config.md`.
