@@ -26,12 +26,12 @@ workflow, not a sequence of ad hoc deploy commands.
 > paso. Si este espejo y el de Claude divergen, es un bug: reconciliarlos en el
 > mismo change set (ver `## Skill Maintenance Contract`).
 
-Note 2026-05-24: `production-release-watchdog.yml` is manual-only in repo
-until TASK-920 fixes false-positive/failure semantics. The GitHub workflow is
-also `disabled_manually` as an emergency stop while `main` still has the old
-schedule. Use `pnpm release:watchdog --json` until the no-schedule workflow
-reaches `main` and the workflow is re-enabled. Do not reactivate `schedule`
-without TASK-920 or an explicit incident rationale.
+Current watchdog posture as of 2026-05-24: `.github/workflows/production-release-watchdog.yml`
+is manual-only in repo until TASK-920 repairs the false-positive signal. The
+GitHub workflow is also `disabled_manually` as an emergency stop while `main`
+still has the old schedule. Use `pnpm release:watchdog --json` until the
+no-schedule workflow reaches `main` and the workflow is re-enabled. Do not
+re-enable a schedule without TASK-920 or an explicit incident rationale.
 
 ## First Reads
 
