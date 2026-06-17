@@ -194,4 +194,6 @@ jobs:
         # main and manual checkpoint gate to avoid paying for duplicate develop
         # builds while preserving pre-release evidence.
         if: ${{ github.event_name == 'pull_request' || github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch' }}
+        env:
+          NODE_OPTIONS: --max-old-space-size=6144
         run: pnpm build
