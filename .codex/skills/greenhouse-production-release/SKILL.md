@@ -13,6 +13,19 @@ production".
 This skill is intentionally conservative. Production release is a control-plane
 workflow, not a sequence of ad hoc deploy commands.
 
+> **Espejo de la skill Claude — paridad obligatoria.** Este SKILL.md es el espejo
+> Codex de `.claude/skills/greenhouse-production-release/SKILL.md`. El control
+> plane de release es **el mismo para todos los agentes**: Codex sigue
+> EXACTAMENTE los mismos pasos, hard rules y gates que sigue Claude. Antes de
+> cualquier promoción, preflight, approval, rollback o drift recovery, Codex DEBE
+> **re-revisar el playbook de paso a producción** (`docs/operations/PRODUCTION_RELEASE_INCIDENT_PLAYBOOK_V1.md`),
+> el runbook (`docs/operations/runbooks/production-release.md`) y la spec del
+> control plane (`docs/architecture/GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md`) en
+> cada paso a producción, y **NO operar de memoria**. La secuencia canónica
+> completa está en `## Canonical Release Path` más abajo; recórrela paso por
+> paso. Si este espejo y el de Claude divergen, es un bug: reconciliarlos en el
+> mismo change set (ver `## Skill Maintenance Contract`).
+
 Note 2026-05-24: `production-release-watchdog.yml` is manual-only in repo
 until TASK-920 fixes false-positive/failure semantics. The GitHub workflow is
 also `disabled_manually` as an emergency stop while `main` still has the old
@@ -28,7 +41,7 @@ Read only what the task needs, in this order:
 - `CLAUDE.md`
 - `project_context.md`
 - `Handoff.md`
-- **`docs/operations/PRODUCTION_RELEASE_INCIDENT_PLAYBOOK_V1.md` — OBLIGATORIO si el orchestrator falló (no chasees el gate; lee el JSON output como diagnóstico)**
+- **`docs/operations/PRODUCTION_RELEASE_INCIDENT_PLAYBOOK_V1.md` — re-revisar OBLIGATORIO en cada paso a producción, no operar de memoria. Si el orchestrator falló, leer el JSON output como diagnóstico — no chasees el gate.**
 - `docs/architecture/GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md`
 - `docs/operations/runbooks/production-release.md`
 - `docs/manual-de-uso/plataforma/release-orchestrator.md`
