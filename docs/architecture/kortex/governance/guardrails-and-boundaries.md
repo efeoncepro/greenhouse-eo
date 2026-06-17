@@ -20,6 +20,19 @@
 | `KORTEX_COMMAND_ALLOWED_PORTALS` | allowlist acotada | Restringe portal/binding autorizado. |
 | `KORTEX_COMMAND_ADMIN_TOKEN` / `KORTEX_ADMIN_BOOTSTRAP_TOKEN` | server-only | Se envia como `X-Kortex-Admin-Token` solo para admin/breakglass. |
 
+## Estado de flags por ambiente — 2026-06-17
+
+| Ambiente | Estado |
+|---|---|
+| `staging` | `adapter=true`, `live_execute=true`, `admin_breakglass=true`, `KORTEX_COMMAND_ADMIN_TOKEN` provisionado como Vercel sensitive env. Habilitado por aprobacion explicita del operador para pruebas controladas. |
+| `production` | Live/admin no habilitados por este rollout. Cualquier flip productivo requiere aprobacion explicita separada, dry-run cuando aplique, frase humana y smoke productivo dedicado. |
+
+Pruebas staging vigentes:
+
+- `kortex.strategy.normalize` -> `200 completed`, `EO-APC-86281ABC`.
+- `kortex.strategy.release_candidate.execute_workflows` con release candidate dummy -> `409 kortex_preview_required`; valida que live ya no bloquea por flag y que el guard de dry-run sigue activo.
+- `kortex.admin.users.bootstrap_e2e_agent` -> `200 completed`, `EO-APC-E138ACF4`; valida flag admin + token bootstrap sin tocar HubSpot.
+
 ## Confirmaciones humanas
 
 Live execute:

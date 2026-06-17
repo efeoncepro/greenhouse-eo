@@ -41,11 +41,12 @@ Esta carpeta es el mapa navegable que explica como usar esas piezas juntas.
 
 ## Estado operativo vigente
 
-- Greenhouse staging actual: `https://greenhouse-s63g4vzwt-efeonce-7670142f.vercel.app`
+- Greenhouse staging actual: `https://greenhouse-dnr2e8c04-efeonce-7670142f.vercel.app`
 - Alias staging: `https://dev-greenhouse.efeoncepro.com`
 - Kortex control-plane usado por Greenhouse: `https://kortex-control-plane-758246035804.us-central1.run.app`
 - HubSpot portal conectado para Kortex runtime: `48713323`
 - Binding Greenhouse/Kortex: `EO-SPB-0002`
+- Staging live/admin: prendidos por aprobacion explicita del operador para pruebas (`KORTEX_COMMAND_LIVE_EXECUTE_ENABLED=true`, `KORTEX_COMMAND_ADMIN_ENABLED=true`, `KORTEX_COMMAND_ADMIN_TOKEN` sensitive provisionado).
 - Production live/admin: deshabilitado hasta aprobacion explicita.
 
 ## Regla de mantenimiento

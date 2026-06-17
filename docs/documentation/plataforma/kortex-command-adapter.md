@@ -1,7 +1,7 @@
 # Kortex Command Adapter
 
 > **Tipo de documento:** Documentacion funcional
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-06-17 por Codex
 > **Modulo:** Plataforma / Integraciones / Kortex / HubSpot
 > **Contrato runtime:** `greenhouse-kortex-command-adapter.v1`
@@ -54,7 +54,23 @@ El source of truth del catalogo es `src/lib/kortex/commands/registry.ts`; el ada
 
 ## Estado operativo
 
-Al 2026-06-17, Greenhouse staging tiene el adapter base desplegado, Kortex esta conectado al portal HubSpot `48713323` y el smoke `kortex.audit.run` completo `200 completed`. TASK-1165 amplia el catalogo completo con live/admin apagados por defecto.
+Al 2026-06-17, Greenhouse staging tiene el adapter completo desplegado contra Kortex/HubSpot portal `48713323`.
+
+Estado de staging:
+
+- Deploy activo: `greenhouse-dnr2e8c04-efeonce-7670142f.vercel.app`, aliased a `dev-greenhouse.efeoncepro.com`.
+- `KORTEX_COMMAND_ADAPTER_ENABLED=true`.
+- `KORTEX_COMMAND_LIVE_EXECUTE_ENABLED=true`.
+- `KORTEX_COMMAND_ADMIN_ENABLED=true`.
+- `KORTEX_COMMAND_ADMIN_TOKEN` provisionado como secret server-only.
+
+Smokes vigentes:
+
+- `kortex.strategy.normalize` -> `200 completed`, `EO-APC-86281ABC`.
+- `kortex.strategy.release_candidate.execute_workflows` con release candidate dummy -> `409 kortex_preview_required`; esto confirma que live ya no bloquea por flag y que el dry-run sigue siendo obligatorio antes de un write real.
+- `kortex.admin.users.bootstrap_e2e_agent` -> `200 completed`, `EO-APC-E138ACF4`; esto confirma admin flag + token sin tocar HubSpot.
+
+Production no fue modificado por este rollout.
 
 ## Que no hace
 

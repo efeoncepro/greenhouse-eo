@@ -92,7 +92,7 @@ Greenhouse does not:
 
 ## Rollout
 
-Recommended staging flags:
+Baseline safe staging flags:
 
 ```env
 KORTEX_COMMAND_ADAPTER_ENABLED=true
@@ -101,16 +101,46 @@ KORTEX_COMMAND_ADMIN_ENABLED=false
 KORTEX_COMMAND_ALLOWED_PORTALS=48713323,9b0a6e91-0e08-4642-bc42-54a4b5c83ad8
 ```
 
-Production live execute and admin breakglass remain disabled until staging evidence and explicit operator approval.
+Operator-approved full staging flags as of 2026-06-17:
 
-## Rollout Evidence — 2026-06-17
+```env
+KORTEX_COMMAND_ADAPTER_ENABLED=true
+KORTEX_COMMAND_LIVE_EXECUTE_ENABLED=true
+KORTEX_COMMAND_ADMIN_ENABLED=true
+KORTEX_COMMAND_ALLOWED_PORTALS=51183921,48713323,9b0a6e91-0e08-4642-bc42-54a4b5c83ad8
+KORTEX_COMMAND_ADMIN_TOKEN=<server-only sensitive env, from Secret Manager kortex-admin-bootstrap-token>
+```
+
+Production live execute and admin breakglass remain disabled until explicit operator approval for production, production-scoped env changes, dry-run evidence when applicable and a dedicated production smoke.
+
+## Initial Rollout Evidence — 2026-06-17
 
 Greenhouse staging deploy `greenhouse-mq9uqn9hz-efeonce-7670142f.vercel.app` is `Ready` for TASK-1164 command adapter rollout.
+
+This was the initial safe rollout. It was superseded later the same day by the operator-approved full staging enablement below.
 
 Verified:
 
 - Kortex OAuth runtime is active for HubSpot portal `48713323`;
 - Greenhouse binding `EO-SPB-0002` is active;
 - control-plane reader returns `200` for HubSpot portal `48713323`;
-- live execute remains blocked with `kortex_live_execute_disabled`;
+- live execute initially remained blocked with `kortex_live_execute_disabled`;
 - `kortex.audit.run` returns `200 completed` with `commandExecutionId=EO-APC-9D220439`, `kortexOperationId=025a960d-576f-48e3-ab16-e6183c6bb0ae`.
+
+## Rollout Evidence — 2026-06-17 Full Staging Enablement
+
+Greenhouse staging deploy `greenhouse-dnr2e8c04-efeonce-7670142f.vercel.app` is `Ready`, aliased to `dev-greenhouse.efeoncepro.com` and `greenhouse-eo-env-staging-efeonce-7670142f.vercel.app`.
+
+Applied:
+
+- `KORTEX_COMMAND_ADAPTER_ENABLED=true`;
+- `KORTEX_COMMAND_LIVE_EXECUTE_ENABLED=true`;
+- `KORTEX_COMMAND_ADMIN_ENABLED=true`;
+- `KORTEX_COMMAND_ALLOWED_PORTALS=51183921,48713323,9b0a6e91-0e08-4642-bc42-54a4b5c83ad8`;
+- `KORTEX_COMMAND_ADMIN_TOKEN` provisioned as a sensitive Vercel staging env var from GCP Secret Manager `efeonce-kortex-dev/kortex-admin-bootstrap-token`.
+
+Verified:
+
+- `kortex.strategy.normalize` returns `200 completed` with `commandExecutionId=EO-APC-86281ABC`;
+- live execute no longer fails at the environment flag; dummy `kortex.strategy.release_candidate.execute_workflows` returns `409 kortex_preview_required`, proving the next guard is the required dry-run preview;
+- admin/breakglass no longer fails at the environment flag or missing token; idempotent `kortex.admin.users.bootstrap_e2e_agent` returns `200 completed` with `commandExecutionId=EO-APC-E138ACF4`.

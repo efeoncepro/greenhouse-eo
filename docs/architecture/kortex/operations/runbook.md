@@ -2,10 +2,12 @@
 
 ## Estado staging validado
 
-- Greenhouse deploy: `greenhouse-s63g4vzwt-efeonce-7670142f.vercel.app`
+- Greenhouse deploy: `greenhouse-dnr2e8c04-efeonce-7670142f.vercel.app`
 - Alias: `dev-greenhouse.efeoncepro.com`
 - Package Vercel corregido: upload `57MB` despues de excluir artefactos locales.
 - Deployment inflado removido: `greenhouse-hyqnb6n6k-efeonce-7670142f.vercel.app`
+- Flags vigentes por aprobacion del operador: `KORTEX_COMMAND_ADAPTER_ENABLED=true`, `KORTEX_COMMAND_LIVE_EXECUTE_ENABLED=true`, `KORTEX_COMMAND_ADMIN_ENABLED=true`.
+- Secret admin vigente: `KORTEX_COMMAND_ADMIN_TOKEN` en Vercel staging como sensitive env, provisionado desde GCP Secret Manager `efeonce-kortex-dev/kortex-admin-bootstrap-token`.
 
 ## Smokes ejecutados
 
@@ -26,9 +28,9 @@ Command smokes:
 | Smoke | Resultado |
 |---|---|
 | `kortex.audit.run` | `200 completed`, `EO-APC-F75FD63E`, `d8b4b769-4c33-4193-bb15-9545253ac521` |
-| `kortex.strategy.normalize` | `200 completed`, `EO-APC-0D842212` |
-| `kortex.strategy.release_candidate.execute_workflows` | `409 kortex_live_execute_disabled` |
-| `kortex.admin.snapshots.trigger` | `409 kortex_admin_command_disabled` |
+| `kortex.strategy.normalize` | `200 completed`, `EO-APC-86281ABC` |
+| `kortex.strategy.release_candidate.execute_workflows` con release candidate dummy | `409 kortex_preview_required`; live ya no bloquea por flag y el guard de dry-run sigue activo. |
+| `kortex.admin.users.bootstrap_e2e_agent` | `200 completed`, `EO-APC-E138ACF4`; valida admin flag + token bootstrap sin tocar HubSpot. |
 
 ## Como ejecutar un comando
 
@@ -55,7 +57,7 @@ Ejemplo safe:
 }
 ```
 
-## Antes de habilitar live/admin
+## Antes de ejecutar live/admin real
 
 Checklist live:
 
@@ -63,7 +65,7 @@ Checklist live:
 2. Binding Greenhouse/Kortex activo.
 3. `KORTEX_COMMAND_ALLOWED_PORTALS` incluye solo portal/scope esperado.
 4. Dry-run ejecutado y revisado.
-5. `KORTEX_COMMAND_LIVE_EXECUTE_ENABLED=true` solo en el target aprobado.
+5. `KORTEX_COMMAND_LIVE_EXECUTE_ENABLED=true` solo en el target aprobado; en staging esta prendido para pruebas desde 2026-06-17.
 6. Confirmacion humana con `EXECUTE KORTEX RELEASE`.
 7. Monitoreo de command execution y logs Kortex.
 
@@ -71,8 +73,8 @@ Checklist admin:
 
 1. Owner humano presente.
 2. Razon operacional concreta.
-3. `KORTEX_COMMAND_ADMIN_ENABLED=true` solo en el target aprobado.
-4. `KORTEX_COMMAND_ADMIN_TOKEN` o `KORTEX_ADMIN_BOOTSTRAP_TOKEN` provisionado server-only.
+3. `KORTEX_COMMAND_ADMIN_ENABLED=true` solo en el target aprobado; en staging esta prendido para pruebas desde 2026-06-17.
+4. `KORTEX_COMMAND_ADMIN_TOKEN` o `KORTEX_ADMIN_BOOTSTRAP_TOKEN` provisionado server-only; en staging usa `KORTEX_COMMAND_ADMIN_TOKEN` desde Secret Manager `kortex-admin-bootstrap-token`.
 5. Confirmacion humana con `EXECUTE KORTEX ADMIN COMMAND`.
 6. Apagar flag despues de la operacion si era breakglass temporal.
 

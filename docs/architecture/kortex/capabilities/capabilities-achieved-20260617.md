@@ -65,9 +65,10 @@ Greenhouse puede ejecutar dry-runs de release candidates y tiene los comandos pa
 
 Pero los comandos live quedan bloqueados hasta que el operador apruebe activar el flag live y exista confirmacion humana.
 
-Guardrail validado:
+Estado staging vigente:
 
-- `kortex.strategy.release_candidate.execute_workflows` -> `409 kortex_live_execute_disabled`
+- `KORTEX_COMMAND_LIVE_EXECUTE_ENABLED=true` por aprobacion del operador.
+- `kortex.strategy.release_candidate.execute_workflows` con release candidate dummy -> `409 kortex_preview_required`; esto valida que el bloqueo por flag ya no aplica y que el guard de dry-run sigue activo antes de cualquier write real.
 
 ### 5. Operar hub profile
 
@@ -89,13 +90,15 @@ Greenhouse tiene el contrato para comandos admin Kortex:
 
 Quedan bloqueados por defecto y requieren flag admin + frase + token server-only.
 
-Guardrail validado:
+Estado staging vigente:
 
-- `kortex.admin.snapshots.trigger` -> `409 kortex_admin_command_disabled`
+- `KORTEX_COMMAND_ADMIN_ENABLED=true` por aprobacion del operador.
+- `KORTEX_COMMAND_ADMIN_TOKEN` provisionado server-only.
+- `kortex.admin.users.bootstrap_e2e_agent` -> `200 completed`, `commandExecutionId=EO-APC-E138ACF4`; valida admin flag + token bootstrap sin tocar HubSpot.
 
 ## Que todavia no significa
 
-Esto no significa que production live/admin este abierto. Significa que el contrato esta listo y probado en staging, con compuertas cerradas por defecto.
+Esto no significa que production live/admin este abierto. Significa que el contrato esta listo y probado en staging, donde live/admin quedaron prendidos para pruebas controladas por aprobacion explicita del operador. Production sigue cerrado.
 
 Para habilitar escrituras reales en production hace falta:
 

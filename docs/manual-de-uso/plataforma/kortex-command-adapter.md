@@ -1,7 +1,7 @@
 # Operar Kortex Command Adapter
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-06-17 por Codex
 > **Modulo:** Plataforma / Integraciones / Kortex
 > **Ruta en portal:** API interna `POST /api/admin/kortex/commands`
@@ -110,7 +110,24 @@ Admin/breakglass:
 
 ## Estado rollout 2026-06-17
 
-Staging Greenhouse esta desplegado y el adapter responde. Kortex esta instalado en HubSpot portal `48713323`; el smoke `kortex.audit.run` completo `200 completed`. TASK-1165 agrega el catalogo completo en codigo con `external_write` y `admin_breakglass` apagados por defecto hasta aprobacion explicita.
+Staging Greenhouse esta desplegado y el adapter responde con el catalogo completo. Kortex esta instalado en HubSpot portal `48713323`.
+
+Estado vigente de staging:
+
+- Deploy: `greenhouse-dnr2e8c04-efeonce-7670142f.vercel.app`.
+- Alias: `dev-greenhouse.efeoncepro.com`.
+- `KORTEX_COMMAND_ADAPTER_ENABLED=true`.
+- `KORTEX_COMMAND_LIVE_EXECUTE_ENABLED=true`.
+- `KORTEX_COMMAND_ADMIN_ENABLED=true`.
+- `KORTEX_COMMAND_ADMIN_TOKEN` provisionado como secret server-only desde `kortex-admin-bootstrap-token`.
+
+Smokes vigentes:
+
+- Safe: `kortex.strategy.normalize` -> `200 completed`, `EO-APC-86281ABC`.
+- Live flag: `kortex.strategy.release_candidate.execute_workflows` con release candidate dummy -> `409 kortex_preview_required`; no ejecuto HubSpot y confirma que el bloqueo ya no es el flag.
+- Admin: `kortex.admin.users.bootstrap_e2e_agent` -> `200 completed`, `EO-APC-E138ACF4`; idempotente, valida admin flag + token sin tocar HubSpot.
+
+Production no fue modificado por este rollout.
 
 ## Que no hacer
 
@@ -118,4 +135,5 @@ Staging Greenhouse esta desplegado y el adapter responde. Kortex esta instalado 
 - No escribir HubSpot directo desde Greenhouse.
 - No reutilizar un `Idempotency-Key` con payload distinto.
 - No habilitar live execute en production sin staging smoke y aprobacion.
+- No ejecutar live real en staging sin dry-run vigente, release candidate real y frase `EXECUTE KORTEX RELEASE`.
 - No habilitar admin/breakglass sin owner humano presente y razon operacional concreta.
