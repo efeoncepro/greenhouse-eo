@@ -253,9 +253,18 @@ N/A — repo-only change. Recomendado: validar el keep-list con el operador ante
 
 ## Follow-ups
 
+- **⚠️ TASK derivada (infra/harness) — el REAL fix del spawn de subagentes:** la verificación empírica (2026-06-16) mostró que un Explore **sigue fallando a ~204.879 tokens** con CLAUDE.md ya en 32.9k. El binding constraint son las **definiciones de tools MCP (~170k)** (Adobe Firefly ~60, Higgsfield ~50, Vercel ~25, Figma ~20, HubSpot ~18, Notion ~16, Semrush ~12, Spotify, Calendar, Metricool, GoDaddy, WordPress, Crossbeam…), NO CLAUDE.md. Para restaurar el spawn: desconectar los MCP servers no usados en el repo o que el harness los cargue diferidos (deferred). Fuera de scope de TASK-1160 (que es sobre CLAUDE.md). Ver §0.1 de `docs/operations/CLAUDE_MD_REFACTOR_MAP_2026-06-16.md`.
+- **Slice 4 (dedup de patrones) — pendiente:** consolidar los 6 patrones canónicos repetidos (VIEW+helper+signal+lint; state-machine+CHECK+audit; outbox+reactive+dead-letter; defense-in-depth; capability⇒grant+coverage; flag default-OFF+shadow+flip) en `GREENHOUSE_CANONICAL_PATTERNS_V1.md` + pointers en los companions. NO afecta el budget per-turn de CLAUDE.md (los patrones ya están load-on-demand en los companions); es higiene de los companion docs.
 - TASK derivada: aplicar el mismo router-refactor a `AGENTS.md` (1.830 líneas).
 - TASK derivada: aplicar el mismo patrón a `project_context.md` (5.991 líneas).
 - Evaluar un tokenizer real (no chars/4) para el gate si la estimación diverge mucho.
+
+## Resultado (2026-06-16)
+
+- **CLAUDE.md: 190.551 → 32.901 tokens (−83%)**, 6.191 → 1.360 líneas, 195 → ~85 secciones H3. Bajo la banda objetivo 30-35k.
+- **0 reglas perdidas:** `pnpm claude-md:rule-audit` verificó 0 huérfanas (1.152 reglas `NUNCA`/`SIEMPRE` del baseline) tras cada una de las 23 tandas. Relocación verbatim, cero cambio semántico.
+- Slices 1, 2, 3 (23 tandas), 5 (router + gate `--strict` @35k), 6 (governance fix Claude+Codex) cerrados. Slice 4 (dedup) = follow-up.
+- 7 companions nuevos bajo `docs/architecture/agent-invariants/` + relocaciones a las specs canónicas existentes.
 
 ## Open Questions
 
