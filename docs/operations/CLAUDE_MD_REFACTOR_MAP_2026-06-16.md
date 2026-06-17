@@ -43,6 +43,16 @@
 - **Lo que NO logró (premisa parcialmente equivocada del task):** "restaurar el spawn de subagentes". El binding constraint es el **tamaño de las definiciones de tools MCP**, no `CLAUDE.md`. Reducir CLAUDE.md de 190k→33k bajó la sobrepasada de ~+160k a ~+5k, pero los tools solos (~170k) + system prompt aún exceden 200k.
 - **Follow-up real para arreglar el spawn:** desconectar los MCP servers no usados en el repo (Adobe/Higgsfield/Semrush/Spotify/Metricool/GoDaddy/WordPress/Crossbeam/Legal-Data-Hunter…) o que el harness los cargue diferidos (deferred). Eso es **fuera de scope de TASK-1160** (que es sobre `CLAUDE.md`) → task derivada de infra/harness.
 
+### 0.1.1 Confirmación por la documentación oficial de Anthropic (2026-06-17)
+
+Verificado contra `code.claude.com/docs/{memory,sub-agents,mcp}`:
+
+- **El doc CONFIRMA la premisa equivocada al 100%:** *"**Explore and Plan skip your CLAUDE.md files** and the parent session's git status to keep research fast and inexpensive."* → el Explore que falló "live 2026-06-16" **nunca cargó CLAUDE.md**; reducir CLAUDE.md **no podía** arreglar ese spawn. El valor real del refactor es el costo per-turn del **main loop** + los subagentes `general-purpose`/custom (que SÍ cargan CLAUDE.md) + adherencia + gobernanza.
+- **El doc valida 2 decisiones nuestras:** (a) *"imported files still load and enter the context window at launch... does not reduce context"* → no usar `@imports` fue correcto; (b) *"target under 200 lines... Longer files consume more context and reduce adherence"* + *"CLAUDE.md files are loaded into the context window at the start of every session, consuming tokens"* → la premisa de costo per-turn es correcta (aunque a 1.360 líneas seguimos ~7× sobre la guía de 200).
+- **2 mecanismos nativos que adoptamos (2026-06-17):**
+  1. **Path-scoped rules** (`.claude/rules/<dominio>.md` con frontmatter `paths:`) — el doc lo recomienda explícito para "CLAUDE.md too large": *"Use path-scoped rules to load instructions only when Claude works with matching files."* Creados 8 (contractor, finance, ico, payroll/workforce, knowledge/nexa, release, entitlements, migrations) que **auto-cargan** el pointer al companion al tocar `src/lib/<dominio>/**`. No cuentan al budget de CLAUDE.md (cargan solo al tocar el path). Híbrido: los companions `docs/` siguen siendo el canónico portable (Codex no lee `.claude/rules/`).
+  2. **Custom subagent con tools restringidos** (`.claude/agents/explore-lite.md`, `tools: Read, Grep, Glob, Bash`) — el doc: *"Subagents receive only this system prompt... not the full Claude Code system prompt"* + `tools:` es allowlist → carga solo 4 tools, **sin los ~170k de MCP** → spawnea siempre. Es el fix real del spawn, repo-level y quirúrgico (vs desconectar MCP account-wide). **Requiere reiniciar la sesión** para que el harness lo cargue (agentes en disco se cargan al startup).
+
 ## 1. Diagnóstico medido
 
 - Las 195 secciones **H3 son el 99% del archivo** (~187.925 tokens). El scaffolding H2 es ~1%.
