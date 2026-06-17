@@ -1,7 +1,7 @@
 # Greenhouse Kortex GitHub Control Plane V1
 
 > Tipo: Arquitectura / integration control plane
-> Estado: V1 code complete local; rollout staging pendiente
+> Estado: V1 deployed en staging; GitHub commands ON en staging por aprobacion del operador
 > Fecha: 2026-06-17
 > Task: TASK-1166
 > Contratos: `greenhouse-kortex-github-control-plane.v1`, `greenhouse-kortex-github-command-adapter.v1`
@@ -55,8 +55,8 @@ Registry V1:
 
 | Command | Tier | GitHub action | Default |
 |---|---|---|---|
-| `kortex.github.workflow.rerun_failed` | `workflow_rerun` | `POST /repos/efeoncepro/kortex/actions/runs/{run_id}/rerun-failed-jobs` | OFF por `KORTEX_GITHUB_COMMANDS_ENABLED=false` |
-| `kortex.github.workflow.dispatch` | `workflow_dispatch` | `POST /repos/efeoncepro/kortex/actions/workflows/{workflow_id}/dispatches` | OFF por `KORTEX_GITHUB_COMMANDS_ENABLED=false` y `KORTEX_GITHUB_WORKFLOW_DISPATCH_ENABLED=false` |
+| `kortex.github.workflow.rerun_failed` | `workflow_rerun` | `POST /repos/efeoncepro/kortex/actions/runs/{run_id}/rerun-failed-jobs` | ON en staging por `KORTEX_GITHUB_COMMANDS_ENABLED=true`; production OFF |
+| `kortex.github.workflow.dispatch` | `workflow_dispatch` | `POST /repos/efeoncepro/kortex/actions/workflows/{workflow_id}/dispatches` | ON en staging por `KORTEX_GITHUB_COMMANDS_ENABLED=true` y `KORTEX_GITHUB_WORKFLOW_DISPATCH_ENABLED=true`; production OFF |
 
 Guardrails:
 
@@ -97,14 +97,15 @@ Estados:
 
 ## Rollout
 
-V1 queda local/code-complete hasta que se ejecute rollout:
+V1 fue desplegado y validado en staging el 2026-06-17:
 
-1. Deploy staging de Greenhouse.
-2. Smoke read-only: `pnpm staging:request GET '/api/admin/kortex/github-control-plane'`.
-3. Verificar packet: `repository.nameWithOwner='efeoncepro/kortex'`, workflow `CI`, latest main run success.
-4. Smoke command-deny: `POST /api/admin/kortex/github-commands` sin flags debe devolver `409 kortex_github_command_disabled`.
-5. Solo con aprobacion explicita, prender `KORTEX_GITHUB_COMMANDS_ENABLED=true` en staging para probar `rerun_failed` contra un run fallido real allowlisted.
-6. No prender dispatch en production sin workflow/release runbook dedicado.
+1. Deploy staging de Greenhouse `greenhouse-bfym2m5lx` valido reader y command-deny.
+2. Flip autorizado por operador: `KORTEX_GITHUB_COMMANDS_ENABLED=true`, `KORTEX_GITHUB_WORKFLOW_DISPATCH_ENABLED=true`, `KORTEX_GITHUB_ALLOWED_WORKFLOWS=CI`, `KORTEX_GITHUB_ALLOWED_REFS=main,develop`.
+3. Redeploy staging `greenhouse-9j6rau39c`, id `dpl_4cha9fkbXZSPc6QqjhABYMaovMN7`, target `staging`, `Ready`, alias `dev-greenhouse.efeoncepro.com`.
+4. Smoke read-only: `GET /api/admin/kortex/github-control-plane` -> HTTP `200`, `confidence=high`, latest main run success.
+5. Smoke global flag sin write: `rerun_failed` contra run exitoso `27681588991` -> `409 kortex_github_command_not_allowed`, conclusion `success`.
+6. Smoke dispatch flag sin write: `workflow.dispatch` sobre `CI/main` sin frase -> `409 kortex_github_confirmation_required`.
+7. Production sigue OFF; no prender dispatch en production sin workflow/release runbook dedicado.
 
 ## Evidence 2026-06-17
 

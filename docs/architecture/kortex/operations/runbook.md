@@ -9,7 +9,7 @@
 - Deployment inflado removido: `greenhouse-hyqnb6n6k-efeonce-7670142f.vercel.app`
 - Flags vigentes por aprobacion del operador: `KORTEX_COMMAND_ADAPTER_ENABLED=true`, `KORTEX_COMMAND_LIVE_EXECUTE_ENABLED=true`, `KORTEX_COMMAND_ADMIN_ENABLED=true`.
 - Secret admin vigente: `KORTEX_COMMAND_ADMIN_TOKEN` en Vercel staging como sensitive env, provisionado desde GCP Secret Manager `efeonce-kortex-dev/kortex-admin-bootstrap-token`.
-- GitHub repo commands TASK-1166 siguen default OFF: `KORTEX_GITHUB_COMMANDS_ENABLED=false`, `KORTEX_GITHUB_WORKFLOW_DISPATCH_ENABLED=false`.
+- GitHub repo commands TASK-1166 estan ON en staging por aprobacion del operador: `KORTEX_GITHUB_COMMANDS_ENABLED=true`, `KORTEX_GITHUB_WORKFLOW_DISPATCH_ENABLED=true`, `KORTEX_GITHUB_ALLOWED_WORKFLOWS=CI`, `KORTEX_GITHUB_ALLOWED_REFS=main,develop`. Production sigue OFF.
 
 ## Smokes ejecutados
 
@@ -104,9 +104,16 @@ Con flags OFF, debe fallar cerrado:
 
 Respuesta esperada antes de habilitar flags: `409 kortex_github_command_disabled`.
 
-Smoke validado 2026-06-17: `409 kortex_github_command_disabled`.
+Smoke validado 2026-06-17 antes del flip: `409 kortex_github_command_disabled`.
 
-No habilitar `KORTEX_GITHUB_WORKFLOW_DISPATCH_ENABLED=true` sin owner humano, workflow/ref allowlisted y runbook de release/deploy Kortex.
+Post-flip staging 2026-06-17:
+
+- Redeploy: `https://greenhouse-9j6rau39c-efeonce-7670142f.vercel.app`, id `dpl_4cha9fkbXZSPc6QqjhABYMaovMN7`, target `staging`, `Ready`, alias `dev-greenhouse.efeoncepro.com`.
+- Reader: `GET /api/admin/kortex/github-control-plane` -> HTTP `200`, `confidence=high`, latest CI run `27681588991` success.
+- Global flag smoke sin write: `kortex.github.workflow.rerun_failed` contra run exitoso `27681588991` -> `409 kortex_github_command_not_allowed` con `conclusion=success`.
+- Dispatch flag smoke sin write: `kortex.github.workflow.dispatch` sobre `CI/main` sin frase humana -> `409 kortex_github_confirmation_required`.
+
+No ejecutar `workflow.dispatch` real sin owner humano, workflow/ref allowlisted, frase `DISPATCH KORTEX WORKFLOW` y proposito operacional claro.
 
 ## Antes de ejecutar live/admin real
 

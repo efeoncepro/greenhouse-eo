@@ -44,14 +44,14 @@ Esta carpeta es el mapa navegable que explica como usar esas piezas juntas.
 
 ## Estado operativo vigente
 
-- Greenhouse staging actual: `https://greenhouse-dnr2e8c04-efeonce-7670142f.vercel.app`
+- Greenhouse staging actual: `https://greenhouse-9j6rau39c-efeonce-7670142f.vercel.app`
 - Alias staging: `https://dev-greenhouse.efeoncepro.com`
 - Kortex control-plane usado por Greenhouse: `https://kortex-control-plane-758246035804.us-central1.run.app`
 - HubSpot portal conectado para Kortex runtime: `48713323`
 - Binding Greenhouse/Kortex: `EO-SPB-0002`
 - Staging live/admin: prendidos por aprobacion explicita del operador para pruebas (`KORTEX_COMMAND_LIVE_EXECUTE_ENABLED=true`, `KORTEX_COMMAND_ADMIN_ENABLED=true`, `KORTEX_COMMAND_ADMIN_TOKEN` sensitive provisionado).
 - Production live/admin: deshabilitado hasta aprobacion explicita.
-- Kortex GitHub commands: deshabilitados por default en todos los ambientes hasta rollout/smoke especifico (`KORTEX_GITHUB_COMMANDS_ENABLED=false`, `KORTEX_GITHUB_WORKFLOW_DISPATCH_ENABLED=false`).
+- Kortex GitHub commands: habilitados en staging para pruebas gobernadas (`KORTEX_GITHUB_COMMANDS_ENABLED=true`, `KORTEX_GITHUB_WORKFLOW_DISPATCH_ENABLED=true`, `KORTEX_GITHUB_ALLOWED_WORKFLOWS=CI`, `KORTEX_GITHUB_ALLOWED_REFS=main,develop`); production sigue OFF.
 
 ## Regla de mantenimiento
 

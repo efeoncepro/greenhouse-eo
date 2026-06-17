@@ -29,16 +29,18 @@
 
 | Ambiente | Estado |
 |---|---|
-| `staging` | `adapter=true`, `live_execute=true`, `admin_breakglass=true`, `KORTEX_COMMAND_ADMIN_TOKEN` provisionado como Vercel sensitive env. Habilitado por aprobacion explicita del operador para pruebas controladas. |
-| `production` | Live/admin no habilitados por este rollout. Cualquier flip productivo requiere aprobacion explicita separada, dry-run cuando aplique, frase humana y smoke productivo dedicado. |
+| `staging` | `adapter=true`, `live_execute=true`, `admin_breakglass=true`, `KORTEX_COMMAND_ADMIN_TOKEN` provisionado como Vercel sensitive env. GitHub commands ON: `KORTEX_GITHUB_COMMANDS_ENABLED=true`, `KORTEX_GITHUB_WORKFLOW_DISPATCH_ENABLED=true`, `KORTEX_GITHUB_ALLOWED_WORKFLOWS=CI`, `KORTEX_GITHUB_ALLOWED_REFS=main,develop`. Habilitado por aprobacion explicita del operador para pruebas controladas. |
+| `production` | Live/admin/GitHub commands no habilitados por este rollout. Cualquier flip productivo requiere aprobacion explicita separada, dry-run cuando aplique, frase humana y smoke productivo dedicado. |
 
-GitHub commands TASK-1166 quedan **OFF por default** en todos los ambientes hasta rollout especifico. El reader `GET /api/admin/kortex/github-control-plane` es read-only y puede operar con GitHub Actions read.
+GitHub commands TASK-1166 quedan **OFF por default** salvo rollout especifico. En staging quedaron ON el 2026-06-17; el reader `GET /api/admin/kortex/github-control-plane` sigue siendo read-only y puede operar con GitHub Actions read.
 
 Pruebas staging vigentes:
 
 - `kortex.strategy.normalize` -> `200 completed`, `EO-APC-86281ABC`.
 - `kortex.strategy.release_candidate.execute_workflows` con release candidate dummy -> `409 kortex_preview_required`; valida que live ya no bloquea por flag y que el guard de dry-run sigue activo.
 - `kortex.admin.users.bootstrap_e2e_agent` -> `200 completed`, `EO-APC-E138ACF4`; valida flag admin + token bootstrap sin tocar HubSpot.
+- `kortex.github.workflow.rerun_failed` contra run exitoso `27681588991` -> `409 kortex_github_command_not_allowed`; valida flag GitHub global ON sin ejecutar write.
+- `kortex.github.workflow.dispatch` sobre `CI/main` sin frase humana -> `409 kortex_github_confirmation_required`; valida dispatch flag ON y confirmacion humana requerida.
 
 ## Confirmaciones humanas
 

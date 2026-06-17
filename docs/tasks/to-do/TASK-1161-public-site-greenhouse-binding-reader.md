@@ -25,7 +25,7 @@
 
 ## Summary
 
-Primera pieza del control-plane de EPIC-019: un **reader read-only gobernado** que expone, **desde Greenhouse**, el estado del rail público Astro/Vercel — binding repo↔Vercel, estado de deploy (GitHub HEAD + Vercel deployments) y route ownership — como un contrato versionado `public-site-binding.v1`. Reusa los readers de GitHub/Vercel del Release Control Plane + el composer de Platform Health (TASK-672) con timeout por fuente y degradación honesta. **Solo lectura**: nada de deploy/rollback/asset writes (esos son tasks posteriores del epic).
+Primera pieza del control-plane de EPIC-019: un **reader read-only gobernado** que expone, **desde Greenhouse**, el estado del rail público Astro/Vercel — binding repo↔Vercel, estado de deploy (GitHub HEAD + Vercel deployments) y route ownership — como un contrato versionado `public-site-astro-binding.v1`. Reusa los readers de GitHub/Vercel del Release Control Plane + el composer de Platform Health (TASK-672) con timeout por fuente y degradación honesta. **Solo lectura**: nada de deploy/rollback/asset writes (esos son tasks posteriores del epic).
 
 ## Why This Task Exists
 
@@ -35,7 +35,7 @@ La decisión `GREENHOUSE_PUBLIC_SITE_ASTRO_RUNTIME_STRATEGY_DECISION_V1` ya nomb
 
 ## Goal
 
-- Reader canónico server-only que compone el estado del rail público Astro/Vercel en un contrato versionado `public-site-binding.v1` (binding estático + estado live de repo/deploy + route ownership).
+- Reader canónico server-only que compone el estado del rail público Astro/Vercel en un contrato versionado `public-site-astro-binding.v1` (binding estático + estado live de repo/deploy + route ownership).
 - Reusar los readers existentes de GitHub (`src/lib/release/github-helpers.ts`) y Vercel (`src/lib/release/preflight/checks/vercel-readiness.ts`) + el composer con timeout/degradación de Platform Health — no reinventar.
 - Capabilities `public_site.runtime_binding.read` + `public_site.route_ownership.read` (catalog + DB registry seed + grant en runtime, mismo PR).
 - Endpoint app-lane `GET /api/admin/public-site/binding` gobernado (auth + capability + errores sanitizados).
@@ -57,6 +57,7 @@ Revisar y respetar:
 - `docs/architecture/GREENHOUSE_RELIABILITY_CONTROL_PLANE_V1.md` — registro de la signal nueva.
 - `docs/operations/public-site-astro-runtime-binding-20260616.json` — el binding manifest `v1` (repo/vercel coords). Fuente del binding estático.
 - `docs/operations/public-site-route-ownership-matrix-20260616.md` — la route ownership matrix.
+- `src/lib/public-site/runtime-binding.ts` + `docs/operations/public-site-runtime-repository-binding-20260614.json` — el binding **WordPress/Kinsta** preexistente (rail distinto). Awareness para NO colisionar: el reader Astro es independiente y vive bajo `src/lib/public-site/astro/`.
 
 Reglas obligatorias:
 
@@ -86,16 +87,16 @@ Reglas obligatorias:
 
 ### Files owned
 
-- `src/config/public-site-binding.ts` `[verificar/crear]` (binding estático tipado, derivado del manifest)
-- `src/lib/public-site/binding-reader.ts` `[verificar/crear]` (reader canónico server-only)
-- `src/lib/public-site/binding-types.ts` `[verificar/crear]` (contrato `public-site-binding.v1`)
+- `src/config/public-site-astro-binding.ts` `[verificar/crear]` (binding estático tipado, derivado del manifest `public-site-astro-runtime-binding-20260616.json`)
+- `src/lib/public-site/astro/binding-reader.ts` `[verificar/crear]` (reader canónico server-only; namespace `astro/` para desambiguar del dominio WordPress preexistente en `src/lib/public-site/`)
+- `src/lib/public-site/astro/binding-types.ts` `[verificar/crear]` (contrato `public-site-astro-binding.v1`)
 - `src/app/api/admin/public-site/binding/route.ts` `[verificar/crear]`
 - `src/config/entitlements-catalog.ts` (agregar las 2 capabilities)
 - `src/lib/entitlements/runtime.ts` (grants)
 - `migrations/<ts>_task-1161-public-site-binding-capabilities.sql` `[verificar/crear]`
 - `src/lib/reliability/queries/public-site-astro-deploy-failed.ts` `[verificar/crear]`
 - `src/lib/reliability/get-reliability-overview.ts` (wire de la signal)
-- `docs/architecture/GREENHOUSE_PUBLIC_SITE_BINDING_READER_V1.md` `[verificar/crear]` (spec del contrato)
+- `docs/architecture/GREENHOUSE_PUBLIC_SITE_ASTRO_BINDING_READER_V1.md` `[verificar/crear]` (spec del contrato)
 - `docs/tasks/README.md`, `docs/tasks/TASK_ID_REGISTRY.md`, `Handoff.md`, `changelog.md`, `docs/epics/to-do/EPIC-019-...md`
 
 ## Current Repo State
@@ -107,11 +108,13 @@ Reglas obligatorias:
 - Reader Vercel: `src/lib/release/preflight/checks/vercel-readiness.ts` (lee deployments + readiness) + `src/lib/cloud/vercel-billing.ts` (patrón de auth Vercel API).
 - Composer pattern: `src/lib/platform-health/composer.ts` + `with-source-timeout.ts` (TASK-672) — el molde de "N fuentes en paralelo + timeout + degradación".
 - Entitlements: `src/config/entitlements-catalog.ts` + `src/lib/entitlements/runtime.ts` + el guard `capability-grant-coverage.test.ts`.
+- **Dominio `public_site` WordPress ya poblado en `src/lib/public-site/`** (trabajo previo, ~2026-06-14): `runtime-binding.ts` (drift-detector filesystem del sitio **WordPress/Kinsta**, contratos `public-site-repository-binding.v1` + `public-site-runtime-drift-report.v1`, manifest `...20260614.json`), `bridge-inspection.ts`/`bridge-signing.ts` (bridge headless WP, `public-site-bridge-inspection.v1`) y `content-factory/` (authoring Gutenberg). Consumido por `scripts/public-website/{runtime-status,deploy-dry-run}.ts`. **Es un rail distinto** (WordPress live) del rail Astro/Vercel que esta task modela (target no-cutover); coexisten durante la ventana de migración.
 
 ### Gap
 
-- No existe ningún reader/contrato `public_site.*` en `src/lib/**` (la decisión nombró las capabilities pero no se materializaron).
-- El binding manifest es un JSON estático en `docs/operations/`; no hay un config tipado ni un reader que lo componga con estado live.
+- **No existe ningún reader/contrato del rail Astro/Vercel** en `src/lib/public-site/`. El dominio `public_site` existente (ver "Already exists") modela **WordPress/Kinsta** (drift filesystem + bridge headless + content-factory), NO el deploy state GitHub/Vercel del rail Astro. Las capabilities `public_site.runtime_binding.read` / `public_site.route_ownership.read` de la decisión no se materializaron.
+- El reader Astro **NO reusa ni mezcla** `runtime-binding.ts` (WordPress) — son rails distintos. Nace bajo el namespace `src/lib/public-site/astro/` con contrato propio `public-site-astro-binding.v1`.
+- El binding manifest Astro es un JSON estático en `docs/operations/`; no hay un config tipado ni un reader que lo componga con estado live de GitHub/Vercel.
 - No hay endpoint, capabilities seedeadas, ni signal del subsystem público.
 - La `readiness.knownBlockers` del manifest está **stale** (lista TASK-010/011 como no implementadas; TASK-1159 ya cerró SEO foundation + demo routes + landing shell). El reader debe leer **estado live**, no la readiness estática del manifest.
 
@@ -121,14 +124,14 @@ Reglas obligatorias:
 
 - Backend rigor: `backend-standard`
 - Impacto principal: `integration` (+ `reader`, `api`)
-- Source of truth afectado: binding manifest (estático) + GitHub API + Vercel API (live); contrato nuevo `public-site-binding.v1`
+- Source of truth afectado: binding manifest (estático) + GitHub API + Vercel API (live); contrato nuevo `public-site-astro-binding.v1`
 - Consumidores afectados: UI admin futura, agentes, MCP, commands posteriores del epic
 - Runtime target: `production` (reads on-demand; sin worker/cron en MVP)
 
 ### Contract surface
 
 - Contrato existente a respetar: Platform Health V1 (`with-source-timeout`, shape `degradedSources[]`/`confidence`), Full API Parity, capability catalog.
-- Contrato nuevo: `public-site-binding.v1` (reader + endpoint) + capabilities `public_site.runtime_binding.read` / `public_site.route_ownership.read`.
+- Contrato nuevo: `public-site-astro-binding.v1` (reader + endpoint) + capabilities `public_site.runtime_binding.read` / `public_site.route_ownership.read`.
 - Backward compatibility: `not applicable` (todo nuevo, aditivo).
 - Full API parity: la UI/agente/MCP consume `GET /api/admin/public-site/binding` (o el reader); NUNCA GitHub/Vercel directo.
 
@@ -137,7 +140,7 @@ Reglas obligatorias:
 - Entidades: ninguna tabla nueva de datos (el binding estático vive en config tipado; el estado live es read-through de GitHub/Vercel). Capabilities en `greenhouse_core.capabilities_registry`.
 - Invariantes:
   - El reader NUNCA escribe ni a GitHub ni a Vercel (read-only).
-  - El contrato versionado `contractVersion: "public-site-binding.v1"` es estable; cambios breaking → `v2`.
+  - El contrato versionado `contractVersion: "public-site-astro-binding.v1"` es estable; cambios breaking → `v2`.
   - Una fuente caída/timeout NUNCA produce un estado falso-sano: degrada (`degradedSources[]` + `confidence` baja).
 - Tenant/space boundary: capability de tenant admin (no per-space); el sitio público es global de Efeonce.
 - Idempotency/concurrency: read-only, sin estado mutable; cache in-process opcional TTL ~30s (patrón Platform Health).
@@ -188,9 +191,9 @@ Reglas obligatorias:
 
 ### Slice 1 — Contrato + binding estático + composer skeleton
 
-- `src/lib/public-site/binding-types.ts`: el contrato `public-site-binding.v1` (binding repo/vercel, estado live placeholder, route ownership, `degradedSources[]`, `confidence`, `contractVersion`).
-- `src/config/public-site-binding.ts`: binding estático tipado derivado del manifest JSON (repo coords, vercel coords, stack, canonical URL).
-- `src/lib/public-site/binding-reader.ts`: skeleton del reader que compone el binding estático + route ownership (de la matrix), con el shape del composer (sin fuentes live todavía). Unit tests del parser + shape.
+- `src/lib/public-site/astro/binding-types.ts`: el contrato `public-site-astro-binding.v1` (binding repo/vercel, estado live placeholder, route ownership, `degradedSources[]`, `confidence`, `contractVersion`).
+- `src/config/public-site-astro-binding.ts`: binding estático tipado derivado del manifest JSON (repo coords, vercel coords, stack, canonical URL).
+- `src/lib/public-site/astro/binding-reader.ts`: skeleton del reader que compone el binding estático + route ownership (de la matrix), con el shape del composer (sin fuentes live todavía). Unit tests del parser + shape.
 
 ### Slice 2 — Fuentes live (GitHub + Vercel) con timeout/degradación
 
@@ -206,7 +209,7 @@ Reglas obligatorias:
 ### Slice 4 — Reliability signal + spec doc
 
 - `public_site.astro_deploy_failed` (kind=`incident`/`drift`, severity=error si el último deploy prod del proyecto es `Error`, steady=0); reader en `src/lib/reliability/queries/` + wire a `get-reliability-overview.ts` (subsystem nuevo `Public Site` o rollup `cloud`).
-- `docs/architecture/GREENHOUSE_PUBLIC_SITE_BINDING_READER_V1.md`: spec del contrato + reuse map; actualizar EPIC-019 (esta pieza read = done) + la `readiness.knownBlockers` stale del manifest.
+- `docs/architecture/GREENHOUSE_PUBLIC_SITE_ASTRO_BINDING_READER_V1.md`: spec del contrato + reuse map; actualizar EPIC-019 (esta pieza read = done) + la `readiness.knownBlockers` stale del manifest.
 
 ## Out of Scope
 
@@ -222,6 +225,8 @@ Reglas obligatorias:
 - **Estado live de Vercel:** reusar el patrón de `vercel-readiness.ts` para listar deployments del proyecto `efeonce-web` (team `efeonce-7670142f`), filtrar el último `Production` y el último `staging`, devolver `{ status, url, sha, age, environment }`. Verificado live 2026-06-16: prod `Ready` en `efeonce-web.vercel.app`.
 - **Estado live de GitHub:** reusar `release/github-helpers.ts` para `GET /repos/efeoncepro/efeonce-web/commits/{main,develop}` → `{ sha, message, committedAt }`. El token via el resolver GH App existente.
 - **Drift hint (read-only):** el contrato puede exponer un `notes[]` cuando el SHA del último deploy prod ≠ HEAD de `main` (sin actuar — solo visibilidad; el command de deploy es otra task).
+- **Predicado de la signal `public_site.astro_deploy_failed`:** dispara cuando el **último deploy `Production` del proyecto está en estado `Error`**, NO por staleness/antigüedad. El rail Astro es target no-cutover: el apex `efeoncepro.com` aún sirve WordPress/Kinsta (`isCurrentLiveSourceOfTruth: false`) y el manifest reporta `observedDeploymentPosture: ready_and_error_deployments_65d_old` — un rail target legítimamente no deploya seguido, así que "no hubo deploy reciente" NO es una falla. El reader expone `currentProductionRuntime`/`isTargetFrontendRail` en el contrato para que el consumidor entienda el estado de migración sin inferirlo.
+- **Estados del contrato:** distinguir explícitamente `ok` / `degraded` (fuente con timeout/caída) / `empty` (proyecto sin deployments todavía) — nunca colapsar a un estado ambiguo (`forms-ux`/`state-design` aplican aunque sea read API: el consumidor necesita saber por qué falta data).
 
 ## Rollout Plan & Risk Matrix
 
@@ -275,7 +280,7 @@ Sin flag — aditivo, read-only, gateado por capability desde el nacimiento. Cut
 
 ## Acceptance Criteria
 
-- [ ] Existe `src/lib/public-site/binding-reader.ts` que devuelve el contrato `public-site-binding.v1` (binding + estado live repo/deploy + route ownership).
+- [ ] Existe `src/lib/public-site/astro/binding-reader.ts` que devuelve el contrato `public-site-astro-binding.v1` (binding + estado live repo/deploy + route ownership).
 - [ ] El reader reusa `release/github-helpers.ts` + los helpers Vercel de `preflight/checks/vercel-readiness.ts` + `with-source-timeout` (no reinventa).
 - [ ] Degradación honesta: una fuente caída/timeout → `degradedSources[]` + `confidence` baja, NUNCA 5xx ni estado falso-sano (test).
 - [ ] `public_site.runtime_binding.read` + `public_site.route_ownership.read` seedeadas (catalog + `capabilities_registry`) + grant en `runtime.ts`; `capability-grant-coverage.test.ts` verde.
@@ -301,7 +306,7 @@ Sin flag — aditivo, read-only, gateado por capability desde el nacimiento. Cut
 - [ ] `Handoff.md` actualizado
 - [ ] `changelog.md` actualizado
 - [ ] chequeo de impacto cruzado (EPIC-019 — marcar la pieza read; manifest readiness stale)
-- [ ] spec `GREENHOUSE_PUBLIC_SITE_BINDING_READER_V1.md` creada y enlazada desde EPIC-019
+- [ ] spec `GREENHOUSE_PUBLIC_SITE_ASTRO_BINDING_READER_V1.md` creada y enlazada desde EPIC-019
 
 ## Follow-ups
 
@@ -313,6 +318,12 @@ Sin flag — aditivo, read-only, gateado por capability desde el nacimiento. Cut
 
 ## Open Questions
 
-- ¿Subsystem de reliability propio (`Public Site`) o rollup en `cloud`? Decidir en Plan Mode según cuántas signals emerjan.
+- ¿Subsystem de reliability propio (`Public Site`) o rollup en `cloud`? **Recomendación MVP: rollup en `cloud`.** Promover a subsystem propio cuando emerjan ≥3 signals (la decisión nombra 7 futuras). YAGNI ahora.
 - ¿El binding estático se queda como config tipado en `src/config/` o se promueve a una tabla `greenhouse_core` cuando haya >1 sitio? MVP: config tipado (YAGNI tabla).
-- ¿Dominio Sentry `public_site` nuevo o reusar `cloud`? Si emergen varias signals/incidents propios, agregar el dominio al union de `captureWithDomain`.
+- ¿Dominio Sentry `public_site` nuevo o reusar `cloud`? **Verificado: el union `CaptureDomain` (`src/lib/observability/capture.ts`) NO tiene `public_site`; sí tiene `cloud`.** MVP: usar `cloud` con `tags: { source: 'public_site_binding' }`. Agregar `public_site` al union solo si emergen incidents propios recurrentes.
+
+### Resuelto en análisis arquitectónico (2026-06-17)
+
+- **Naming/colisión:** el contrato es `public-site-astro-binding.v1` y los archivos viven bajo `src/lib/public-site/astro/` (+ `src/config/public-site-astro-binding.ts`). Esto desambigua del binding WordPress preexistente (`public-site-repository-binding.v1` en `runtime-binding.ts`) y sobrevive al cutover. El reader Astro NO reusa ni mezcla el dominio WordPress.
+- **"Gap" corregido:** `src/lib/public-site/` ya está poblado por el dominio WordPress/Kinsta (drift filesystem + bridge headless + content-factory). El gap real es la ausencia del reader del rail **Astro/Vercel**, no del dominio entero.
+- **Endpoint:** se mantiene `/api/admin/public-site/binding` (sin colisión HTTP — el rail WordPress es script-driven, no expone endpoint).

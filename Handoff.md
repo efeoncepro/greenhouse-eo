@@ -1,5 +1,17 @@
 # Release 2026-06-10 #2 — develop→main `6c649b2a6` RELEASED
 
+## Sesión 2026-06-17 — Kortex GitHub commands staging ON — Codex
+
+> **Estado:** staging queda con GitHub commands de Kortex prendidos para pruebas gobernadas. Production no fue tocado.
+
+- **Flags staging aplicados:** `KORTEX_GITHUB_COMMANDS_ENABLED=true`, `KORTEX_GITHUB_WORKFLOW_DISPATCH_ENABLED=true`, `KORTEX_GITHUB_ALLOWED_WORKFLOWS=CI`, `KORTEX_GITHUB_ALLOWED_REFS=main,develop`.
+- **Redeploy staging:** `https://greenhouse-9j6rau39c-efeonce-7670142f.vercel.app`, id `dpl_4cha9fkbXZSPc6QqjhABYMaovMN7`, target `staging`, status `Ready`; aliases `https://dev-greenhouse.efeoncepro.com` y `https://greenhouse-eo-env-staging-efeonce-7670142f.vercel.app`.
+- **Smoke reader:** `GET /api/admin/kortex/github-control-plane` -> HTTP `200`, `confidence=high`, repo `efeoncepro/kortex`, workflow `CI`, latest run `27681588991` success, correlation `matched`.
+- **Smoke guardrail global:** `kortex.github.workflow.rerun_failed` contra run exitoso `27681588991` -> HTTP `409`, code `kortex_github_command_not_allowed`, details `conclusion=success`; confirma que el flag global ya no bloquea y que no se re-runnea un CI exitoso.
+- **Smoke guardrail dispatch:** `kortex.github.workflow.dispatch` sobre `CI/main` sin frase humana -> HTTP `409`, code `kortex_github_confirmation_required`; confirma que dispatch esta habilitado por flag pero sigue exigiendo `DISPATCH KORTEX WORKFLOW`.
+- **Producción:** GitHub commands siguen apagados por diseño; cualquier flip productivo requiere aprobacion separada, allowlist revisada, frase humana y smoke productivo dedicado.
+- **Nota:** sigue existiendo un cambio local previo en `docs/tasks/to-do/TASK-1161-public-site-greenhouse-binding-reader.md`; no pertenece a este rollout.
+
 ## Sesión 2026-06-17 — TASK-1166 Kortex GitHub Repo Control Plane complete — Codex
 
 > **Estado:** complete en `develop`; staging deploy + smokes verdes. Sin cambio de rama/worktree.
