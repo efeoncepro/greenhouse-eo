@@ -9,15 +9,39 @@
 
 > **Red de seguridad de no-pérdida:** `pnpm claude-md:rule-audit` (`scripts/ci/claude-md-rule-audit.mjs`) compara cada línea `NUNCA`/`SIEMPRE` del baseline congelado (`27ce06a11:CLAUDE.md`, 1152 reglas distintas) contra el corpus vivo (CLAUDE.md ∪ docs/ ∪ skills). **Target 0 huérfanas, verificado tras cada tanda.** Wired en `ci.yml` (warn).
 
-| Tanda | Dominio | Bloques | Líneas | NUNCA/SIEMPRE | Destino | Tokens (post) | Huérfanas |
-|---|---|---|---|---|---|---|---|
-| — | baseline | 195 H3 | 6.191 | 1024/211 | — | ~190.551 | 0 |
-| 1 | Contractor (EPIC-013) | 19 | 474 | 153/28 | `GREENHOUSE_CONTRACTOR_ENGAGEMENTS_PAYABLES_ARCHITECTURE_V1.md` | ~170.301 | 0 ✅ |
-| 2 | Production Release | 7 | 552 | 74/16 | `GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md` | ~156.525 | 0 ✅ |
+**Resultado final: `CLAUDE.md` 190.551 → ~32.901 tokens (−83%, 6.191 → 1.360 líneas, 195 → ~85 H3). 0 huérfanas en todo el camino.** Slices 1, 2, 3 (23 tandas), 5 (router + flip gate `--strict` @35k) y 6 (governance fix) cerrados. Slice 4 (dedup de patrones) = follow-up (no afecta el budget per-turn; los patrones ya están load-on-demand en companions).
 
-**Patrón por tanda (probado):** identificar cluster contiguo por título H3 → mover verbatim a §"Invariantes operativos para agentes" de la spec destino → reemplazar en CLAUDE.md por 1 pointer que preserva inline las reglas más peligrosas/cross-cutting → `pnpm claude-md:rule-audit --strict` = 0 huérfanas → `pnpm claude-md:budget` (tokens bajan) → commit verificable.
+| Tanda | Dominio | Destino | Tokens post |
+|---|---|---|---|
+| — | baseline (195 H3) | — | ~190.551 |
+| 1 | Contractor (EPIC-013, 19) | `GREENHOUSE_CONTRACTOR_ENGAGEMENTS_PAYABLES_ARCHITECTURE_V1.md` | ~170.301 |
+| 2 | Production Release (7) | `GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md` | ~156.525 |
+| 3 | Finance ledger/bank (8) | `GREENHOUSE_FINANCE_ARCHITECTURE_V1.md` | ~150.984 |
+| 4 | ICO/delivery-metrics (13) | `metrics/ICO_DELIVERY_METRICS_AGENT_INVARIANTS.md` | ~131.651 |
+| 5 | Finance reconc/CLP/FX (11) | `GREENHOUSE_FINANCE_ARCHITECTURE_V1.md` | ~121.285 |
+| 6 | Knowledge+Nexa (9) | `agent-invariants/KNOWLEDGE_NEXA_AGENT_INVARIANTS.md` | ~112.885 |
+| 7 | Payroll/Workforce participation (5) | `agent-invariants/PAYROLL_WORKFORCE_AGENT_INVARIANTS.md` | ~105.164 |
+| 8-9 | Notion sync (6) + HubSpot (4) | sync + hubspot specs | ~94.583 |
+| 10 | Integraciones/infra (5) | `agent-invariants/INTEGRATIONS_INFRA_AGENT_INVARIANTS.md` | ~87.266 |
+| 11-12 | Org/Client (3) + Payroll/Legal/Finiquito (4) | 2 companions | ~80.247 |
+| 13-14 | Identity/Workforce (3) + capability-grant + design-system | roles spec + companions | ~73.332 |
+| 15 | UI/feature platforms (9) | `agent-invariants/UI_FEATURE_AGENT_INVARIANTS.md` | ~63.002 |
+| 16 | Client lifecycle (5) + nav + identity-bridge | lifecycle spec + companions | ~55.608 |
+| 17-18 | Ops/reliability (6) + **Vercel cajón split** (UI platform) | `OPS_RELIABILITY_*` + `UI_PLATFORM_*` | ~45.021 |
+| 19-21 | Entitlements gov (3) + AI (2) + WC (1) + typography/brand (2) | specs + companion | ~35.915 |
+| 22 | Access singles (894/987/1020) | companions | ~33.983 |
+| 23 | Task Closing Gate résumé | `TASK_CLOSING_QUALITY_GATE_V1.md` | ~31.885 |
+| Slice 5 | + router table | — | ~32.901 |
 
-**Tandas siguientes (orden):** Knowledge+Nexa (2 destinos) · ICO/RpA/Notion-metrics · Finance (2 regiones: 1959-2310 + 3040-3270) · Notion/HubSpot sync · Identity/Workforce · UI-Platform **split del cajón Vercel** (5.990 tok → `ui-platform/*`) · keep-list résumés (Task Closing Gate, Capability grant, API error, Agent Auth) · Slice 4 dedup (`GREENHOUSE_CANONICAL_PATTERNS_V1.md`) · Slice 5 router + flip gate a `--strict` · Slice 6 governance fix.
+**Patrón por tanda (probado, 0 huérfanas en las 23):** cluster contiguo por título H3 → mover verbatim a §"Invariantes operativos para agentes" del destino → reemplazar en CLAUDE.md por 1 pointer que preserva inline las reglas más peligrosas/cross-cutting → `pnpm claude-md:rule-audit --strict` = 0 huérfanas → `pnpm claude-md:budget` → commit. Helper de relocación: `/tmp/relocate.mjs` (throwaway). Companions creados bajo `docs/architecture/agent-invariants/`.
+
+## 0.1 ⚠️ Hallazgo crítico — el spawn de subagentes NO lo arregla este refactor
+
+**Verificación empírica (2026-06-16):** spawnear un subagente Explore tras el refactor **sigue fallando a ~204.879 tokens** (límite 200k), con CLAUDE.md ya en 32.9k. El desglose del error ("the rest is system prompt, **tool definitions**, and attachment content") muestra que **el cuello de botella real son las definiciones de tools MCP (~170k)** — Adobe Firefly (~60 tools), Figma (~20), Higgsfield (~50), HubSpot (~18), Notion (~16), Semrush (~12), Vercel (~25), Spotify, Google Calendar, etc. — NO `CLAUDE.md`.
+
+- **Lo que SÍ logró el refactor (real y valioso):** −83% del costo de `CLAUDE.md` **por turno del main-loop** (cada turno + cada subagente que lo herede paga ~158k tokens menos), mejor prompt cache, legibilidad (las ~20 reglas cross-cutting ya no están enterradas bajo 1.024 `NUNCA`), router navegable, y **gate + governance que impiden la re-acreción**.
+- **Lo que NO logró (premisa parcialmente equivocada del task):** "restaurar el spawn de subagentes". El binding constraint es el **tamaño de las definiciones de tools MCP**, no `CLAUDE.md`. Reducir CLAUDE.md de 190k→33k bajó la sobrepasada de ~+160k a ~+5k, pero los tools solos (~170k) + system prompt aún exceden 200k.
+- **Follow-up real para arreglar el spawn:** desconectar los MCP servers no usados en el repo (Adobe/Higgsfield/Semrush/Spotify/Metricool/GoDaddy/WordPress/Crossbeam/Legal-Data-Hunter…) o que el harness los cargue diferidos (deferred). Eso es **fuera de scope de TASK-1160** (que es sobre `CLAUDE.md`) → task derivada de infra/harness.
 
 ## 1. Diagnóstico medido
 
