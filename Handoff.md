@@ -1,5 +1,15 @@
 # Release 2026-06-10 #2 — develop→main `6c649b2a6` RELEASED
 
+## Sesión 2026-06-17 — Kortex staging flags enabled for testing — Codex
+
+> **Estado:** staging operativo para pruebas seguras. Live external writes y admin/breakglass siguen apagados por diseño.
+
+- **Flags staging aplicados:** `KORTEX_COMMAND_ADAPTER_ENABLED=true`, `KORTEX_COMMAND_LIVE_EXECUTE_ENABLED=false`, `KORTEX_COMMAND_ADMIN_ENABLED=false`, `KORTEX_COMMAND_ALLOWED_PORTALS=51183921,48713323,9b0a6e91-0e08-4642-bc42-54a4b5c83ad8`.
+- **Redeploy staging:** `https://greenhouse-3w4uzzc5f-efeonce-7670142f.vercel.app` (`target=staging`, `Ready`), aliased a `https://dev-greenhouse.efeoncepro.com` y `https://greenhouse-eo-env-staging-efeonce-7670142f.vercel.app`.
+- **Smoke reader:** `GET /api/admin/kortex/control-plane?hubspot_portal_id=48713323` -> HTTP `200`, binding `EO-SPB-0002`, repo `efeoncepro/kortex`, latest Kortex commit `7266902`.
+- **Smoke command seguro:** `kortex.strategy.normalize` -> HTTP `200`, `status=completed`, `commandExecutionId=EO-APC-24E6F7A0`.
+- **Guardrails verificados:** `kortex.strategy.release_candidate.execute_workflows` -> HTTP `409` `Kortex live execute is disabled in this environment`; `kortex.admin.snapshots.trigger` -> HTTP `409` `Kortex admin commands are disabled in this environment`.
+
 ## Sesión 2026-06-17 — Kortex architecture docs by layer — Codex
 
 > **Estado:** docs complete, pendiente commit/push si el operador lo pide.
