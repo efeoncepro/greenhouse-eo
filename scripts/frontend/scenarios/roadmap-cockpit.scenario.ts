@@ -32,12 +32,14 @@ export const scenario: CaptureScenario = {
     { kind: 'mark', label: 'roadmap-filters', clipSelector: '[data-capture="roadmap-filters"]', note: 'Toolbar de filtros: pills por kind + búsqueda + selects' },
     { kind: 'scroll', selector: '[data-capture="roadmap-board"]', scrollBlock: 'center', scrollInline: 'nearest' },
     { kind: 'mark', label: 'roadmap-board-cards', clipSelector: '[data-capture="roadmap-board"]', note: 'Cards operativas del backlog con ID, estado, dominio y affordance de apertura' },
-    { kind: 'click', selector: '[data-capture="roadmap-board"] button[aria-pressed]', timeout: 8000 },
+    { kind: 'click', selector: '[aria-label="Abrir detalle de TASK-025"]', timeout: 8000 },
     { kind: 'wait', selector: '[data-capture="roadmap-inspector"]', timeout: 8000 },
+    { kind: 'sleep', ms: 350 },
     { kind: 'mark', label: 'roadmap-inspector', note: 'Inspector abierto sobre un work item seleccionado' },
     { kind: 'click', selector: '[data-capture="roadmap-open-task"]', timeout: 8000 },
     { kind: 'wait', selector: '[data-capture="roadmap-task-drawer"]', timeout: 8000 },
     { kind: 'wait', selector: '[data-capture="roadmap-task-markdown"]', timeout: 12000 },
+    { kind: 'sleep', ms: 250 },
     { kind: 'mark', label: 'roadmap-task-drawer', clipSelector: '[data-capture="roadmap-task-drawer"]', note: 'Drawer "Abrir task" con el Markdown renderizado (headings, listas, code, tablas)' }
   ]
 }

@@ -89,6 +89,9 @@ const VerticalNav = (props: VerticalNavProps) => {
     isPopoutWhenCollapsed: isPopoutWhenCollapsedContext
   } = useVerticalNav()
 
+  const resolvedTransitionDuration = transitionDurationContext ?? transitionDuration
+  const resolvedWidth = widthContext ?? width
+
   // Find the breakpoint from which screen size responsive behavior should enable and if its reached or not
   const breakpointReached = useMediaQuery(customBreakpoint ?? (breakpoint ? mergedBreakpoints[breakpoint] : breakpoint))
 
@@ -172,7 +175,7 @@ const VerticalNav = (props: VerticalNavProps) => {
       expanding={expandingContext}
       customStyles={customStyles}
       scrollWithContent={isScrollWithContentContext}
-      transitionDuration={transitionDurationContext}
+      transitionDuration={resolvedTransitionDuration}
       className={classnames(
         verticalNavClasses.root,
         {
@@ -190,9 +193,9 @@ const VerticalNav = (props: VerticalNavProps) => {
     >
       {/* VerticalNav Container for hover effect when verticalNav is collapsed */}
       <StyledVerticalNavContainer
-        width={widthContext}
+        width={resolvedWidth}
         className={verticalNavClasses.container}
-        transitionDuration={transitionDurationContext}
+        transitionDuration={resolvedTransitionDuration}
         {
            
           /* Toggle verticalNav on hover only when isPopoutWhenCollapsedContext(default false) is false */

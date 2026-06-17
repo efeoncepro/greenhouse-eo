@@ -192,15 +192,16 @@ const RoadmapInspector = ({ item, presentIds, onClose, onSelectRelated, onCopy, 
         overflow: 'hidden',
         display: 'flex',
         flexDirection: 'column',
+        minWidth: 0,
         maxHeight: { xs: '100dvh', md: 'calc(100vh - 22rem)' },
         minHeight: { md: 360 }
       }}
     >
       {/* Header */}
-      <Box sx={{ flexShrink: 0, display: 'flex', flexDirection: 'column', gap: 1.5, p: 4.5, borderBottom: '1px solid', borderColor: 'action.hover' }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+      <Box sx={{ flexShrink: 0, display: 'flex', flexDirection: 'column', gap: 1.25, p: { xs: 3.25, md: 4 }, borderBottom: '1px solid', borderColor: 'action.hover', minWidth: 0 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, minWidth: 0 }}>
           <ToneTag tone={kindVisual.tone} icon={kindVisual.icon} label={kindVisual.label} />
-          <Typography component='span' variant='monoId' sx={{ color: 'text.secondary' }}>
+          <Typography component='span' variant='monoId' sx={{ color: 'text.secondary', minWidth: 0 }}>
             {item.id}
           </Typography>
           <Box sx={{ ml: 'auto' }} />
@@ -208,10 +209,10 @@ const RoadmapInspector = ({ item, presentIds, onClose, onSelectRelated, onCopy, 
             <i className='tabler-x' style={{ fontSize: 18 }} />
           </IconButton>
         </Box>
-        <Typography component='h2' variant='h4' sx={{ m: 0 }}>
+        <Typography component='h2' variant='h4' sx={{ m: 0, overflowWrap: 'anywhere' }}>
           {item.title}
         </Typography>
-        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.75 }}>
+        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.75, minWidth: 0 }}>
           {item.priority ? <ToneTag tone={PRIORITY_TONE[item.priority]} label={item.priority} radius='full' /> : null}
           <ToneTag tone={healthVisual.tone} icon={healthVisual.icon} label={healthVisual.label} radius='full' />
           {item.domains.length > 0 ? (
@@ -221,7 +222,7 @@ const RoadmapInspector = ({ item, presentIds, onClose, onSelectRelated, onCopy, 
       </Box>
 
       {/* Body */}
-      <Box sx={{ flex: 1, minHeight: 0, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 4.5, p: 4.5, scrollbarWidth: 'thin' }}>
+      <Box sx={{ flex: 1, minHeight: 0, overflowY: 'auto', overflowX: 'hidden', display: 'flex', flexDirection: 'column', gap: 3.5, p: { xs: 3.25, md: 4 }, scrollbarWidth: 'thin' }}>
         {item.summary ? (
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
             <SectionHeading label={isIssue ? GH_ROADMAP.inspector.symptom : GH_ROADMAP.inspector.summary} />
@@ -368,7 +369,7 @@ const RoadmapInspector = ({ item, presentIds, onClose, onSelectRelated, onCopy, 
           display: 'flex',
           flexDirection: 'column',
           gap: 2,
-          p: theme => `${theme.spacing(3)} ${theme.spacing(4.5)}`,
+          p: { xs: 3.25, md: 4 },
           borderTop: '1px solid',
           borderColor: 'divider',
           backgroundColor: 'background.paper',

@@ -65,7 +65,7 @@ const RoadmapCard = ({
           position: 'relative',
           display: 'flex',
           flexDirection: 'column',
-          gap: 1.75,
+          gap: 1.5,
           width: '100%',
           minWidth: 0,
           textAlign: 'left',
@@ -75,13 +75,15 @@ const RoadmapCard = ({
           borderColor: selected ? 'primary.main' : 'divider',
           borderLeft: `3px solid ${toneAccent(kindVisual.tone)}`,
           borderRadius: theme => `${theme.shape.customBorderRadius.md}px`,
-          p: theme => `${theme.spacing(isCondensed ? 2.75 : 3.25)} ${theme.spacing(isCondensed ? 3 : 3.5)}`,
+          p: theme => `${theme.spacing(isCondensed ? 2.5 : 2.875)} ${theme.spacing(isCondensed ? 2.75 : 3.125)}`,
+          boxShadow: selected ? theme => `0 0 0 2px ${theme.palette.primary.main}` : '0 1px 2px rgb(var(--mui-mainColorChannels-light) / 0.05)',
           transition: theme => theme.transitions.create(['background-color', 'border-color', 'box-shadow', 'transform']),
           animation: `${cardEnter} ${MOTION_DURATION_MS.medium}ms ${cssCubicBezier(MOTION_EASE.emphasized.cubicBezier)} both`,
           animationDelay: `${Math.min(index, STAGGER_MAX_STEPS) * STAGGER_STEP_MS}ms`,
           '&:hover': {
             borderColor: 'primary.main',
-            backgroundColor: selected ? 'primary.lightOpacity' : 'action.hover',
+            backgroundColor: selected ? 'primary.lightOpacity' : 'background.paper',
+            boxShadow: '0 10px 24px rgb(var(--mui-mainColorChannels-light) / 0.10)',
             transform: 'translateY(-1px)',
             '& .gh-roadmap-card-action': { opacity: 1, transform: 'translateX(0)' }
           },
@@ -229,14 +231,14 @@ const RoadmapBoard = ({
       aria-label={GH_ROADMAP.boardAria}
       sx={{
         display: 'flex',
-        gap: 3.5,
+        gap: 2.5,
         // El board scrollea horizontal (lanes) DENTRO de su contenedor; la altura
         // está acotada y cada lane scrollea vertical — la página no se hace
         // kilométrica con backlogs de cientos de items (kanban).
         overflowX: 'auto',
         overflowY: 'hidden',
         alignItems: 'stretch',
-        maxHeight: { xs: '72vh', md: 'calc(100vh - 22rem)' },
+        maxHeight: { xs: '72vh', md: 'calc(100vh - 19rem)' },
         minHeight: 360,
         pb: 1,
         minWidth: 0,
@@ -250,7 +252,7 @@ const RoadmapBoard = ({
           <Box
             key={lane.id}
             role='listitem'
-            sx={{ flex: '0 0 304px', width: 304, display: 'flex', flexDirection: 'column', minHeight: 0, maxHeight: '100%' }}
+            sx={{ flex: '0 0 292px', width: 292, display: 'flex', flexDirection: 'column', minHeight: 0, maxHeight: '100%' }}
           >
             <Box
               sx={{
@@ -261,7 +263,7 @@ const RoadmapBoard = ({
                 gap: 1,
                 px: 0.5,
                 py: 0.5,
-                mb: 1.5
+                mb: 1.25
               }}
             >
               <Box component='i' className={visual.icon} aria-hidden='true' sx={{ fontSize: 16, lineHeight: 0, color: visual.tone === 'neutral' ? 'text.disabled' : `${visual.tone}.main` }} />
@@ -298,7 +300,7 @@ const RoadmapBoard = ({
                 overflowY: 'auto',
                 display: 'flex',
                 flexDirection: 'column',
-                gap: 2.5,
+                gap: 1.75,
                 pr: 0.5,
                 scrollbarWidth: 'thin'
               }}

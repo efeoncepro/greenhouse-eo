@@ -88,6 +88,11 @@ export interface CompositionShellProps {
   /** Label accesible de la región `aside` (a11y). */
   asideLabel?: string
   /**
+   * ID estable opcional para escopar view-transition-name por instancia sin depender de `useId`.
+   * Útil en surfaces SSR donde el árbol puede montar widgets de terceros/MUI con IDs propios.
+   */
+  instanceId?: string
+  /**
    * Enriquecimiento de coreografía (TASK-1117):
    * - `rich` (DEFAULT desde 2026-06-14, decisión del operador) = entrada orquestada con stagger del contenido
    *   + morph estructural (View Transitions) + (opcional) morph interrumpible. El estándar — coreografía

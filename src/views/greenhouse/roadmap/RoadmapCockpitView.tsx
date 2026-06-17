@@ -205,7 +205,7 @@ const RoadmapCockpitView = ({ data }: { data: RoadmapCockpitData }) => {
       <Typography variant='h5' sx={{ fontWeight: 600 }}>
         {GH_ROADMAP.noResultsTitle}
       </Typography>
-      <Typography variant='body1' sx={{ color: 'text.secondary', maxWidth: 360, lineHeight: 1.5 }}>
+      <Typography component='div' variant='body1' sx={{ color: 'text.secondary', maxWidth: 360, lineHeight: 1.5 }}>
         {GH_ROADMAP.noResultsBody}
       </Typography>
       <Button variant='outlined' startIcon={<i className='tabler-filter-off' />} onClick={clearFilters}>
@@ -237,7 +237,7 @@ const RoadmapCockpitView = ({ data }: { data: RoadmapCockpitData }) => {
           <Typography variant='h4'>
             {GH_ROADMAP.pageTitle}
           </Typography>
-          <Typography variant='body1' sx={{ color: 'text.secondary', maxWidth: 660, lineHeight: 1.5 }}>
+          <Typography component='div' variant='body1' sx={{ color: 'text.secondary', maxWidth: 660, lineHeight: 1.5 }}>
             {GH_ROADMAP.pageSubtitle}
           </Typography>
         </Box>
@@ -310,7 +310,17 @@ const RoadmapCockpitView = ({ data }: { data: RoadmapCockpitData }) => {
             anchor='right'
             open={Boolean(selected)}
             onClose={handleClose}
-            slotProps={{ paper: { sx: { width: '100%', maxWidth: 420 } } }}
+            slotProps={{
+              paper: {
+                sx: {
+                  width: { xs: '100vw', sm: 420 },
+                  maxWidth: '100vw',
+                  overflowX: 'hidden',
+                  borderTopLeftRadius: { xs: 0, sm: theme => `${theme.shape.customBorderRadius.lg}px` },
+                  borderBottomLeftRadius: { xs: 0, sm: theme => `${theme.shape.customBorderRadius.lg}px` }
+                }
+              }
+            }}
           >
             {inspectorContent}
           </Drawer>
@@ -319,6 +329,7 @@ const RoadmapCockpitView = ({ data }: { data: RoadmapCockpitData }) => {
         <CompositionShell
           composition='split'
           fluidity='baseline'
+          instanceId='roadmap-cockpit'
           asideLabel={GH_ROADMAP.inspectorAria}
           regions={{ primary: primaryContent, aside: inspectorContent }}
         />

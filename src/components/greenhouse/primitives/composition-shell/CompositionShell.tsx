@@ -86,6 +86,7 @@ const CompositionShell = ({
   sizeClass: sizeClassOverride,
   leadLabel = 'Respuesta',
   asideLabel = 'Panel contextual',
+  instanceId,
   // Default `rich` (decisión del operador 2026-06-14): la coreografía rica (stagger de entrada) es el
   // estándar — más moderna y atractiva. Reduced-motion horneado + el primer paint no se retrasa (el stagger
   // solo anima al cambiar de composición / montar contenido nuevo). `baseline` queda como opt-out explícito.
@@ -102,7 +103,8 @@ const CompositionShell = ({
   const leadingRegionRef = useRef<HTMLElement | null>(null)
   const prevCompositionRef = useRef<string | null>(null)
   // VT names por-instancia: dos shells en la misma página no colisionan (constraint VT singleton).
-  const vtId = useId().replace(/[^a-zA-Z0-9_-]/g, '')
+  const generatedVtId = useId().replace(/[^a-zA-Z0-9_-]/g, '')
+  const vtId = (instanceId ?? generatedVtId).replace(/[^a-zA-Z0-9_-]/g, '')
 
   const resolvedComposition = resolveComposition({ composition, kind })
   const config = resolveCompositionConfig({ composition, kind })

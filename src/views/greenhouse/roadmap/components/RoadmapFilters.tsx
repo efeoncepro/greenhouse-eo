@@ -55,8 +55,8 @@ const KindPill = ({
     sx={{
       display: 'inline-flex',
       alignItems: 'center',
-      gap: 0.875,
-      px: 1.5,
+      gap: 0.625,
+      px: 1.125,
       py: 0.75,
       borderRadius: '9999px',
       cursor: 'pointer',
@@ -78,9 +78,9 @@ const KindPill = ({
         fontFeatureSettings: "'tnum' 1",
         typography: 'caption',
         fontWeight: 700,
-        minWidth: 18,
+        minWidth: 16,
         height: 18,
-        px: 0.625,
+        px: 0.5,
         borderRadius: '9999px',
         display: 'inline-flex',
         alignItems: 'center',
@@ -118,15 +118,16 @@ const RoadmapFilters = ({
       display: 'flex',
       flexWrap: 'wrap',
       alignItems: 'center',
-      gap: 3,
-      p: theme => `${theme.spacing(3.5)} ${theme.spacing(4)}`,
+      columnGap: 2,
+      rowGap: 2,
+      p: theme => `${theme.spacing(2.5)} ${theme.spacing(3)}`,
       backgroundColor: 'background.paper',
       border: '1px solid',
       borderColor: 'divider',
       borderRadius: theme => `${theme.shape.customBorderRadius.md}px`
     }}
   >
-    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, flexWrap: 'wrap' }}>
+    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap', minWidth: 0 }}>
       {KIND_TAB_ORDER.map(key => (
         <KindPill
           key={key}
@@ -141,12 +142,13 @@ const RoadmapFilters = ({
     <Box sx={{ width: '1px', height: 28, backgroundColor: 'divider', display: { xs: 'none', md: 'block' } }} />
 
     <CustomTextField
+      id='roadmap-filter-search'
       value={search}
       onChange={event => onSearchChange(event.target.value)}
       placeholder={GH_ROADMAP.searchPlaceholder}
-      aria-label={GH_ROADMAP.searchAria}
+      inputProps={{ 'aria-label': GH_ROADMAP.searchAria }}
       size='small'
-      sx={{ flex: { xs: '1 1 100%', md: '0 1 320px' }, minWidth: { xs: '100%', md: 240 } }}
+      sx={{ flex: { xs: '1 1 100%', md: '0 1 250px' }, minWidth: { xs: '100%', md: 210 } }}
       InputProps={{
         startAdornment: (
           <InputAdornment position='start'>
@@ -157,11 +159,12 @@ const RoadmapFilters = ({
     />
 
     <CustomTextField
+      id='roadmap-filter-priority'
       select
       size='small'
       value={priority ?? ''}
       onChange={event => onPriorityChange((event.target.value || null) as RoadmapPriority)}
-      sx={{ width: { xs: '100%', sm: 156 } }}
+      sx={{ width: { xs: '100%', sm: 144, md: 120 } }}
       aria-label={GH_ROADMAP.priorityFilterAll}
       SelectProps={{ displayEmpty: true }}
     >
@@ -174,11 +177,12 @@ const RoadmapFilters = ({
     </CustomTextField>
 
     <CustomTextField
+      id='roadmap-filter-domain'
       select
       size='small'
       value={domain}
       onChange={event => onDomainChange(event.target.value)}
-      sx={{ width: { xs: '100%', sm: 156 } }}
+      sx={{ width: { xs: '100%', sm: 156, md: 124 } }}
       aria-label={GH_ROADMAP.domainFilterAll}
       SelectProps={{ displayEmpty: true }}
     >
@@ -191,11 +195,12 @@ const RoadmapFilters = ({
     </CustomTextField>
 
     <CustomTextField
+      id='roadmap-filter-health'
       select
       size='small'
       value={health}
       onChange={event => onHealthChange(event.target.value as WorkItemHealthLevel | '')}
-      sx={{ width: { xs: '100%', sm: 148 } }}
+      sx={{ width: { xs: '100%', sm: 148, md: 120 } }}
       aria-label={GH_ROADMAP.healthFilterAll}
       SelectProps={{ displayEmpty: true }}
     >
