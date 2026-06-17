@@ -122,6 +122,7 @@ Si el cambio toca UI visible, levantar `pnpm dev` y entregar la URL `localhost` 
 **Spec canonica:** `docs/operations/GREENHOUSE_OPERATING_LOOP_V1.md`.
 
 Todo trabajo formal debe respetar el ciclo `intake -> taxonomy -> plan -> execution -> verification -> closure -> handoff`.
+El uso de `project_context.md`, `Handoff.md` y `Handoff.archive.md` se rige por `docs/operations/CONTEXT_HANDOFF_OPERATING_MODEL_V1.md`.
 
 Comandos canonicos:
 

@@ -5,6 +5,7 @@
 > **Creado:** 2026-06-17 por Codex
 > **Modulo:** Plataforma / Integraciones / Kortex
 > **Ruta en portal:** API interna `POST /api/admin/kortex/commands`
+> **Mapa por capas:** [`docs/architecture/kortex/README.md`](../../architecture/kortex/README.md)
 
 ## Para que sirve
 

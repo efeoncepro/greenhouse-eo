@@ -1,5 +1,14 @@
 # Release 2026-06-10 #2 — develop→main `6c649b2a6` RELEASED
 
+## Sesión 2026-06-17 — Kortex architecture docs by layer — Codex
+
+> **Estado:** docs complete, pendiente commit/push si el operador lo pide.
+
+- **Entregado:** nueva carpeta `docs/architecture/kortex/` siguiendo el patron por capas de Nexa: `connection/`, `capabilities/`, `commands/`, `governance/`, `operations/`.
+- **Contenido:** conexion Greenhouse -> Kortex (`EO-SPB-0002`, portal HubSpot `48713323`), capacidades logradas, catalogo completo de comandos, guardrails/flags/confirmaciones, runbook de smokes y rollout.
+- **Enlaces:** ADR del command adapter, documentacion funcional, manual de uso y `project_context.md` apuntan al mapa por capas.
+- **Nota operativa:** Kortex puede tener Cloud Run y Vercel; la capa `connection/` documenta que el adapter actual usa Cloud Run control-plane, pero futuras superficies Kortex en Vercel deben entrar como capabilities/commands explicitos.
+
 ## Sesión 2026-06-17 — TASK-1165 Kortex full command surface — Codex
 
 > **Estado:** complete. Código, docs, staging deploy y smoke externo cerrados; production live/admin sigue apagado por diseño.

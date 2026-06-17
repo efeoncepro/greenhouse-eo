@@ -15,6 +15,8 @@ Allowed commands are now registry-driven in `src/lib/kortex/commands/registry.ts
 
 Kortex remains the system that talks to HubSpot. Greenhouse adds admin access, binding preflight, idempotency, audit persistence, redacted responses, explicit live confirmation and environment flags.
 
+Layered operating docs for the full capability live under [`kortex/`](kortex/README.md).
+
 ## API Surface
 
 - `POST /api/admin/kortex/commands`

@@ -6,6 +6,8 @@
 > **Modulo:** Plataforma / Integraciones / Kortex / HubSpot
 > **Contrato runtime:** `greenhouse-kortex-command-adapter.v1`
 
+> **Mapa por capas:** [`docs/architecture/kortex/README.md`](../../architecture/kortex/README.md)
+
 ## Para que sirve
 
 Permite que Greenhouse solicite a Kortex operaciones de auditoria, estrategia, conversaciones, hub profile, releases y admin/breakglass con trazabilidad. Kortex sigue siendo el runtime que modifica HubSpot.
