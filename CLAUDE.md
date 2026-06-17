@@ -373,6 +373,7 @@ Los invariantes del sistema de tipografía (SoT `typography-tokens.ts` + drift-g
 ### Architecture Docs (los más críticos)
 
 - `DECISIONS_INDEX.md` — indice maestro de ADRs y decisiones aceptadas
+- `GREENHOUSE_CANONICAL_PATTERNS_V1.md` — los 6 patrones de implementación transversales (VIEW+helper+signal+lint · state-machine+CHECK+audit trio · outbox+reactive+dead-letter · defense-in-depth · capability⇒grant+coverage · flag default-OFF+shadow+flip). Leer antes de inventar una forma propia para algo que ya tiene patrón.
 - `GREENHOUSE_ARCHITECTURE_V1.md` — documento maestro de arquitectura
 - `GREENHOUSE_360_OBJECT_MODEL_V1.md` — modelo canónico 360
 - `GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md` — contrato completo de Payroll
