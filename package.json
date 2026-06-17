@@ -68,6 +68,8 @@
     "migration-marker-gate": "node scripts/ci/migration-marker-gate.mjs",
     "migration-marker-gate:test": "node scripts/ci/__tests__/migration-marker-gate.test.mjs",
     "worker:runtime-deps-gate": "node scripts/ci/worker-runtime-deps-gate.mjs",
+    "claude-md:budget": "node scripts/ci/claude-md-token-budget.mjs",
+    "claude-md:inventory": "node scripts/ci/claude-md-inventory.mjs",
     "finance:rematerialize-balances": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/finance/rematerialize-account-balances.ts",
     "finance:conciliate-mar-apr": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/finance/conciliate-march-april-2026.ts",
     "finance:fix-factoring": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/finance/fix-factoring-inflows-mar-apr.ts",

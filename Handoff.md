@@ -1,5 +1,25 @@
 # Release 2026-06-10 #2 — develop→main `6c649b2a6` RELEASED
 
+## Sesión 2026-06-16 — TASK-1160 CLAUDE.md Router Refactor: Slice 1+2 + checkpoint — Claude
+
+> **Estado:** `in-progress` en `develop` (local, sin push). Slices 1 y 2 ✅. **Bloqueado en checkpoint del operador** antes del move masivo (Slices 3-5). Cero cambio a `CLAUDE.md` todavía (relocación pendiente de sign-off).
+
+- **Diagnóstico medido:** `CLAUDE.md` = 6.191 líneas / **~190.551 tokens** (chars/4) / 195 secciones H3 (= 99% del archivo) / 1.024 `NUNCA` / 211 `SIEMPRE`. **117 de los bloques ya declaran su `Spec canónica`** y la spec existe → el bloque en `CLAUDE.md` es mayormente el espejo redundante. Hallazgo estructural: la sección `Vercel Deployment Protection` (5.990 tokens, la más grande) es un cajón con ~20 contratos de UI Platform appendeados → hay que partirla.
+- **Slice 1 ✅ (inventario + mapa):** `scripts/ci/claude-md-inventory.mjs` (+ `pnpm claude-md:inventory`) enumera cada H3 con tokens/NUNCA/SIEMPRE. Entregable: `docs/operations/CLAUDE_MD_REFACTOR_MAP_2026-06-16.md` (clasificación de las 195 secciones: KEEP 57 / MOVE→spec 36 / MOVE→spec/task 74 / MOVE→needs-dest 28; keep-list propuesto ~20-25k tokens; 6 patrones canónicos a deduplicar).
+- **Slice 2 ✅ (gate):** `scripts/ci/claude-md-token-budget.mjs` (+ `pnpm claude-md:budget`), warn-first @ budget 200k (target final 25k), wired en `.github/workflows/ci.yml` en modo warn (sin `--strict`). Verificado: 190.5k < 200k → verde. Flip a `--strict` queda para Slice 5.
+- **Hallazgo crítico para el plan (decisión del operador):** las skills "naturales" de dominio (`greenhouse-finance-accounting-operator`, `greenhouse-ico`, `greenhouse-postgres`, `greenhouse-backend`, `greenhouse-ux`, etc.) **son GLOBALES** (`~/.claude/skills/`) → fuera del repo + no compartidas con Codex. **Recomendación: destino canónico = la spec repo-tracked en `docs/architecture/**`** (donde ya apuntan 117 bloques), no la skill global.
+- **Checkpoint pendiente (3 decisiones):** (1) confirmar "spec-first" como destino por defecto; (2) budget target final 25k vs 40k; (3) validar el keep-list. Sin esto NO arranca el move masivo (regla del task + STOP de P1/alto blast).
+- **Reversible:** todo es docs + 2 scripts + 2 líneas en CI. `git revert` por commit. Cero cambio semántico de invariantes aún.
+
+## Sesión 2026-06-17 — TASK-1162 Kortex control-plane reader task — Codex
+
+> **Estado:** task creada; sin implementacion runtime.
+
+- **Entregable:** `docs/tasks/to-do/TASK-1162-kortex-greenhouse-control-plane-reader-mvp.md`; registry y README sincronizados (`siguiente ID disponible: TASK-1163`).
+- **Scope:** primer reader read-only para controlar Kortex desde Greenhouse: repo status `efeoncepro/kortex` via GitHub, runtime/OpenAPI Kortex, resumen por `portal_id`/`hubspot_portal_id`, capabilities observadas y degradacion honesta bajo contrato `kortex-control-plane-reader.v1`.
+- **Boundary duro:** no ejecutar writes Kortex desde Greenhouse en esta task. `run-audit`, `compile`, `approve`, `deploy` y `execute release candidate` quedan para follow-up con adapter Kortex Greenhouse-safe, auth, idempotencia, audit y confirmacion humana.
+- **Contexto verificado:** Kortex existe en GitHub y localmente en `/Users/jreye/Documents/dev/kortex`; ya tiene bridge Kortex -> Greenhouse (`/api/v1/greenhouse/context`) y endpoints runtime, pero su OpenAPI actual no declara security schemes, por lo que el MVP debe tratar mutaciones como bloqueadas.
+
 ## Sesión 2026-06-16 — TASK-1159 Public Site Astro: SEO foundation + service landing shell — Claude
 
 > **Estado:** complete + **deployado** (decisión del operador en sesión 2026-06-16). Implementado en el repo sibling `efeonce-web` (rama `feature/task-1159-...`, 7 commits) y **promovido `feature → develop → main`** (fast-forward, ambos builds Vercel `Ready`). **Live en `https://efeonce-web.vercel.app/servicios/wave`** (producción del PROYECTO Vercel `efeonce-web`, `noindex`, públicamente alcanzable por URL). **NO es cutover del apex:** `efeoncepro.com` sigue en WordPress/Kinsta (sin DNS). **NO es control desde Greenhouse:** esto se gestiona por código+git+Vercel; el control-plane de Greenhouse (binding reader / EPIC-019) sigue sin construir.
