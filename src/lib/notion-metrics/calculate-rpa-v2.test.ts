@@ -218,4 +218,19 @@ describe('calculateRpaV2 — TASK-901 Slice 1 canonical V2 (strangler carril par
       expect(r.sourceMode).toBe('canonical')
     })
   })
+
+  describe('V1/V2 bonus cutover guard', () => {
+    it('does not infer legacy V1 correction rounds when canonical transition count is zero', async () => {
+      mocks.countCorrectionTransitions.mockResolvedValueOnce(transitionsResult(0, 'canonical'))
+
+      const legacyV1RpaValue = 2
+      const r = await calculateRpaV2({ taskSourceId: TASK_ID })
+
+      expect(legacyV1RpaValue).toBeGreaterThan(0)
+      expect(r.value).toBe(0)
+      expect(r.sourceMode).toBe('canonical')
+      expect(r.inputsUsed.correctionTransitionsCount).toBe(0)
+      expect(r.formulaVersion).toBe('rpa_v2.0')
+    })
+  })
 })

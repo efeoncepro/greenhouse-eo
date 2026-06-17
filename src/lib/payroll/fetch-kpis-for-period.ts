@@ -153,6 +153,7 @@ export const fetchKpisForPeriod = async ({
 
   for (const [memberId, snapshot] of materializedSnapshots.entries()) {
     const rpaMetric = getMetric(snapshot, 'rpa')
+    const sourceMode = snapshot.source === 'live' ? 'live' : 'materialized'
 
     snapshots.set(memberId, {
       memberId,
@@ -164,11 +165,15 @@ export const fetchKpisForPeriod = async ({
       rpaEvidence: rpaMetric?.evidence ?? null,
       tasksCompleted: snapshot.context.completedTasks,
       dataSource: 'ico',
-      sourceMode: 'materialized'
+      sourceMode
     })
-  }
 
-  diagnostics.materializedMembers = snapshots.size
+    if (sourceMode === 'live') {
+      diagnostics.liveComputedMembers += 1
+    } else {
+      diagnostics.materializedMembers += 1
+    }
+  }
 
   const missingMemberIds = filteredMemberIds.filter(memberId => !snapshots.has(memberId))
 

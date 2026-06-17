@@ -188,17 +188,28 @@ DEFAULT_BONUS_PRORATION_CONFIG: BonusProrationConfig = {
 
 ## 6. Bridge canonical ICO → Payroll
 
-### 6.1 `fetchKpisForPeriod` — strategy `materialized_first_with_live_fallback`
+### 6.1 `fetchKpisForPeriod` — strategy `materialized_fresh_first_with_live_fallback`
 
 **File**: `src/lib/payroll/fetch-kpis-for-period.ts:33-129`.
 
 **Algoritmo canonical**:
 
 1. Dedup `memberIds` input.
-2. Llamar `readMemberMetricsBatch(memberIds, year, month)` → lectura BQ materializada (rápido).
-3. Para members presentes → `sourceMode: 'materialized'`.
-4. Para members ausentes → fallback `computeMetricsByContext('member', memberId, year, month)` live (lento).
-5. Para members ausentes en live también → `diagnostics.missingMembers++`, snapshot NO se crea.
+2. Llamar `readMemberMetricsBatch(memberIds, year, month)` → lectura BQ materializada con guard de frescura (rápido cuando está sana).
+3. Para members presentes con materialización fresca → `sourceMode: 'materialized'`.
+4. Para members presentes pero stale/incompletos → el reader ICO cae a compute live canonical y Payroll conserva `sourceMode: 'live'`.
+5. Para members ausentes → fallback `computeMetricsByContext('member', memberId, year, month)` live (lento).
+6. Para members ausentes en live también → `diagnostics.missingMembers++`, snapshot NO se crea.
+
+**Freshness guard canonical (TASK-1163)**:
+
+- El periodo corriente usa `America/Santiago`.
+- Una fila de `metrics_by_member` del periodo corriente se considera stale si:
+  - `materialized_at` falta;
+  - los snapshots base (`delivery_task_monthly_snapshots` / `metric_snapshots_monthly`) son mas frescos que `metrics_by_member` por mas de la tolerancia; o
+  - el cache current-period supera la edad maxima segura aun si no hay source freshness disponible.
+- Cuando la fila es stale, el fallback live debe usar `computeMetricsByContext` / `computeMemberMetricsBatch` del ICO Engine. Payroll nunca escribe SQL paralelo para OTD/RpA.
+- El detector operativo read-only es `scripts/check-ico-member-metrics-freshness.ts`.
 
 **Diagnostics canonical**:
 
@@ -318,6 +329,7 @@ Sin pasos 1-7 cubiertos, **NO agregar bonus nuevo inline en código** — viola 
 ## 11. Hard rules canonical
 
 - **NUNCA** recomputar `otd_pct` ni `rpa` en código Payroll. Toda lectura pasa por `fetchKpisForPeriod()` que consume agregados ICO Engine canonical. Drift cross-domain = bug arquitectónico.
+- **NUNCA** aceptar `metrics_by_member` current-period como source bonus si el reader ICO la clasifico stale. Una fila materializada existente no es suficiente: debe estar fresca.
 - **NUNCA** hardcodear thresholds en código (e.g. `if (otd >= 89) ...`). Toda comparación pasa por `bonusConfig` que viene de `payroll_bonus_config` BQ + defaults.
 - **NUNCA** invocar `calculateOtdBonus` / `calculateRpaBonus` directamente desde UI / API route handler. La invocación canonical es vía `buildPayrollEntry` que orquesta KPI fetch + compensation + attendance + bonus en transacción única.
 - **NUNCA** persistir `bonus_otd_amount` o `bonus_rpa_amount` sin el `proration_factor` correspondiente. Auditabilidad requiere ambos para reproducir el cálculo.
