@@ -152,23 +152,12 @@ jobs:
         # no escucha en 8080 → deploy failed. Convierte ese crash en CI-fail.
         run: pnpm worker:runtime-deps-gate
 
-      - name: CLAUDE.md token budget gate (TASK-1160)
-        # CLAUDE.md se carga en cada turno y lo hereda cada subagente. Cuando creció
-        # a ~190k tokens rompió el spawn de subagentes (system prompt + CLAUDE.md >
-        # 200k) y ~5× el costo/turno. El gate topa su tamaño para que el refactor
-        # router (TASK-1160) no se re-acrete. **STRICT desde Slice 5 (2026-06-16):**
-        # el tamaño real bajó a ~33k (banda 30-35k); exceder 35k BLOQUEA el build.
-        # Los invariantes de dominio van a su spec/companion (router en CLAUDE.md),
-        # no inline.
-        run: pnpm claude-md:budget --strict
-
-      - name: CLAUDE.md rule-loss audit (TASK-1160)
-        # Red de seguridad del router-refactor: garantiza que cada línea NUNCA/SIEMPRE
-        # del CLAUDE.md original (baseline congelado) sigue alcanzable en el corpus vivo
-        # (CLAUDE.md ∪ docs/ ∪ skills). Si un bloque se trim-eó sin mover su regla al
-        # destino, aparece como huérfana. Run en modo warn durante la migración (Slice 3);
-        # el cierre de TASK-1160 exige 0 huérfanas.
-        run: pnpm claude-md:rule-audit
+      # NOTA (TASK-1160): los gates de CLAUDE.md (budget + rule-audit) viven en su
+      # workflow dedicado `claude-md-governance.yml`, porque ESTE workflow ignora
+      # `**/*.md` y `docs/**` en sus triggers — un PR que solo edita CLAUDE.md NO
+      # dispararía este job, que es justo el vector de re-acreción que el gate debe
+      # cazar. El workflow dedicado dispara en CLAUDE.md + docs/architecture/** + los
+      # scripts del gate.
 
       - name: Test inventory
         run: pnpm test:inventory

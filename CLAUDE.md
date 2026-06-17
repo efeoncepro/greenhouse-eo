@@ -6,7 +6,7 @@ Greenhouse — plataforma operativa/subproducto de Efeonce Group dentro del mode
 
 ## Router de dominios (TASK-1160)
 
-> **`CLAUDE.md` es un ROUTER, no un spec-store.** Lo que se queda inline es cross-cutting (aplica a casi toda task). Los **invariantes operativos por dominio** (`NUNCA`/`SIEMPRE` específicos de un subsistema) viven **load-on-demand** en su spec/companion — esta tabla dice dónde. Al tocar un dominio: cargar su skill **y** su doc de invariantes. Cada dominio también tiene un pointer inline (con sus reglas más peligrosas) más abajo. Red de seguridad de no-pérdida: `pnpm claude-md:rule-audit`. Mapa completo del refactor: `docs/operations/CLAUDE_MD_REFACTOR_MAP_2026-06-16.md`.
+> **`CLAUDE.md` es un ROUTER, no un spec-store.** Lo que se queda inline es cross-cutting (aplica a casi toda task). Los **invariantes operativos por dominio** (`NUNCA`/`SIEMPRE` específicos de un subsistema) viven **load-on-demand** en su spec/companion — esta tabla dice dónde. Al tocar un dominio: cargar su skill **y** su doc de invariantes. Cada dominio también tiene un pointer inline (con sus reglas más peligrosas) más abajo. CLI de gobernanza: `pnpm claude-md {inventory\|budget\|audit\|check}` (`check` = budget `--strict` + rule-audit; gate de no-pérdida + anti-re-acreción @35k, workflow `claude-md-governance.yml`). Mapa completo del refactor: `docs/operations/CLAUDE_MD_REFACTOR_MAP_2026-06-16.md`.
 
 | Dominio / disparador | Skill a invocar | Invariantes (cargar al tocar) |
 |---|---|---|

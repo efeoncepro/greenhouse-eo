@@ -97,7 +97,7 @@ Use this matrix to choose the smallest complete update set.
 | Access, roles, views, entitlements, capabilities, route groups | Access architecture/task/spec + both planes (`views` and `entitlements`) documented; migrations/grants/audit if applicable |
 | New or changed local skill | Update both `.codex/skills/<name>/SKILL.md` and `.claude/skills/<name>/SKILL.md` when the behavior must be shared; register in `project_context.md`, `Handoff.md`, `changelog.md`, and only update `AGENTS.md` / `CLAUDE.md` if it changes a standing agent rule |
 | New canonical gate, `pnpm` script/command, token/visual convention, or standing agent rule | Verify the task-implementation harness command `.claude/commands/implement-task.md` still names the right gates/commands/paths; update it if it drifted. It is a process harness, not a fact dump — only edit it when a gate/command/path/convention it references actually changed (the canonical rules stay in `CLAUDE.md`/skills, which the harness points to) |
-| **Domain-specific invariant** (`NUNCA`/`SIEMPRE` of one subsystem: payroll, finance, ICO, contractor, notion, hubspot, identity, knowledge, a UI primitive, etc.) | Canonize it in **that domain's spec or its `docs/architecture/agent-invariants/<DOMAIN>_AGENT_INVARIANTS.md` companion** (§"Invariantes operativos para agentes"), and in `AGENTS.md`/`CLAUDE.md` add **at most a 1-2 line pointer** (+ the router-table row) — **NEVER a full inline block.** `CLAUDE.md` is a router (TASK-1160), not a spec-store: it loads every turn and every subagent inherits it, so domain invariants must be load-on-demand. After editing, run `pnpm claude-md:budget --strict` (hard ceiling 35k tokens; CI fails if breached) and `pnpm claude-md:rule-audit` (no original rule must become unreachable). Same discipline applies to `AGENTS.md` (its router refactor is the TASK-1160 follow-up) |
+| **Domain-specific invariant** (`NUNCA`/`SIEMPRE` of one subsystem: payroll, finance, ICO, contractor, notion, hubspot, identity, knowledge, a UI primitive, etc.) | Canonize it in **that domain's spec or its `docs/architecture/agent-invariants/<DOMAIN>_AGENT_INVARIANTS.md` companion** (§"Invariantes operativos para agentes"), and in `AGENTS.md`/`CLAUDE.md` add **at most a 1-2 line pointer** (+ the router-table row) — **NEVER a full inline block.** `CLAUDE.md` is a router (TASK-1160), not a spec-store: it loads every turn and every subagent inherits it, so domain invariants must be load-on-demand. After editing, run `pnpm claude-md check` (= budget `--strict` + rule-audit; hard ceiling 35k tokens, CI fails if breached + alerts if a rule became unreachable). CLI: `pnpm claude-md {inventory\|budget\|audit\|check}`. Same discipline applies to `AGENTS.md` (its router refactor is the TASK-1160 follow-up) |
 | Audit performed | Create/update dated `docs/audits/...`; link from task, handoff, or architecture only if it remains operationally relevant |
 | Docs-only clarification with no behavior change | Update the canonical doc; changelog only if workflow/contract changed |
 
@@ -134,8 +134,8 @@ Use this matrix to choose the smallest complete update set.
 - Never canonize a domain-specific invariant as a full inline block in `CLAUDE.md`
   or `AGENTS.md` (TASK-1160 router model). Relocate it to the domain's spec /
   `docs/architecture/agent-invariants/*` companion + a 1-2 line pointer; then run
-  `pnpm claude-md:budget --strict` + `pnpm claude-md:rule-audit`. The router (not
-  re-accretion) is how `CLAUDE.md` stays loadable by subagents.
+  `pnpm claude-md check`. The router (not re-accretion) is how `CLAUDE.md` stays
+  loadable by subagents.
 - Never use `Handoff.md` as the canonical architecture source.
 - Never move a task to `complete/` without acceptance evidence and proportional
   verification.
