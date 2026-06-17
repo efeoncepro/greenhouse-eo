@@ -392,83 +392,11 @@ gh workflow run <workflow>.yml --ref develop -f environment=staging -f expected_
 
 **Excepcion legitima** (documentar): hotfix critico bajo incident response real (ej. ISSUE-### activo, production down) puede saltar este gate priorizando velocidad. En ese caso, post-push correr ambos comandos remoto via CI (`gh run watch`) y reportar verde como cierre.
 
-### Admin Center Entitlement Governance (TASK-839, desde 2026-05-11)
+### Entitlements governance — invariantes (Admin Center TASK-839, deprecated capabilities TASK-840, view registry TASK-827)
 
-- Surface canónica: `/admin/views`, Admin Users > `[usuario]` > Acceso y APIs `/api/admin/entitlements/**`. No crear rutas paralelas `/api/admin/governance/access/**`.
-- Todo write de role defaults, user overrides o startup policy debe pasar por `src/lib/admin/entitlements-governance.ts` para mantener transacción única: governance table + audit append-only + outbox.
-- Cada endpoint debe hacer doble gate: `requireAdminTenantContext()` para entrada broad y `can(tenant, 'access.governance.*', action, 'tenant')` para least privilege granular.
-- Antes de persistir una capability, validar que exista en `greenhouse_core.capabilities_registry` y `deprecated_at IS NULL`. Nunca bypassar el registry ni escribir grants con strings ad hoc.
-- Grants sensibles (`*_sensitive`, `.reveal_sensitive`, `.export_snapshot`) quedan `pending_approval` y requieren segunda firma con actor distinto. Pending grants no se aplican al acceso efectivo.
-- Outbox governance debe incluir `schemaVersion: 1` y `affectedUserIds` cuando el cambio impacte usuarios; `organizationWorkspaceCacheInvalidationProjection` soporta fan-out vía `extractScopes`.
-- Signals canónicos: `identity.governance.audit_log_write_failures` y `identity.governance.pending_approval_overdue`. Steady state esperado: 0.
+Los invariantes de admin center entitlement governance, deprecated capabilities discipline y view registry governance pattern viven en **`docs/architecture/GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md` → §`Invariantes operativos para agentes — Entitlements governance`**.
 
-### Deprecated Capabilities Discipline (TASK-840, desde 2026-05-11)
-
-- Cuando una capability se remueve del TS catalog (`src/config/entitlements-catalog.ts`), acompañar el cambio con una migration que marque `greenhouse_core.capabilities_registry.deprecated_at`; nunca borrar rows del registry.
-- No deprecar una capability que todavía existe en el TS catalog. Eso es drift inverso y se corrige seedeando/actualizando `capabilities_registry`.
-- Usar `markCapabilityDeprecated()` o el endpoint canónico `/api/admin/entitlements/capabilities/[capabilityKey]/deprecate`; no escribir `deprecated_at` a mano desde rutas nuevas.
-- Antes de deprecar, verificar grants activos en `role_entitlement_defaults` y `user_entitlement_overrides`. Si existen, migrar/documentar esos grants primero.
-- El reporter one-shot `scripts/governance/find-deprecated-candidates.ts` lista candidates en CSV; no auto-depreca ni reemplaza revisión de operador.
-
-### View Registry Governance Pattern (TASK-827, desde 2026-05-13)
-
-Cualquier `viewCode` agregado a `VIEW_REGISTRY` en `src/lib/admin/view-access-catalog.ts` **debe acompañarse en el MISMO PR** de una migration que:
-
-1. INSERT en `greenhouse_core.view_registry` (gobernanza persistida)
-2. INSERT en `greenhouse_core.role_view_assignments` con `granted=TRUE` para CADA role que deba acceder ese viewCode
-
-**Por qué**: el helper `roleCanAccessViewFallback()` en `src/lib/admin/view-access-store.ts:99-125` opera como signal de gobernanza pendiente. Cuando un viewCode NO tiene fila explícita en `role_view_assignments`, el fallback heurístico resuelve `granted=true` por route_group match Y emite WARNING `role_view_fallback_used` (Sentry domain=identity) — funciona correctamente operacionalmente, pero es ruido de gobernanza incompleta.
-
-**Bug class detectado live (TASK-827 Slice 0, 2026-05-13)**: agregué 11 viewCodes nuevos al TS registry sin migration acompañante → Sentry emitió 10 warnings en sesión cliente real (alert JAVASCRIPT-NEXTJS-4X). Causa raíz: gap entre TS source-of-truth y DB seed. Solución canónica: migration de seed (44 filas: 11 viewCodes × 4 roles), NO patch del fallback ni desactivar telemetría.
-
-**Pattern canónico** (mirror TASK-750/749/827):
-
-```sql
--- Up Migration
-INSERT INTO greenhouse_core.view_registry
-  (view_code, section, label, description, route_group, route_path, icon, display_order, active, updated_by)
-VALUES
-  ('<section>.<view_code>', '<section>', '<Label>', '<Description>', '<route_group>', '/<path>', 'tabler-<icon>', <N>, TRUE, 'migration:TASK-XXX')
-ON CONFLICT (view_code) DO UPDATE SET
-  label = EXCLUDED.label, description = EXCLUDED.description, route_path = EXCLUDED.route_path,
-  icon = EXCLUDED.icon, active = TRUE, updated_at = NOW(), updated_by = 'migration:TASK-XXX';
-
-INSERT INTO greenhouse_core.role_view_assignments
-  (role_code, view_code, granted, granted_by, granted_at, updated_at, updated_by)
-VALUES
-  ('<role_code>', '<section>.<view_code>', true, 'migration:TASK-XXX', NOW(), NOW(), 'migration:TASK-XXX')
-ON CONFLICT (role_code, view_code) DO UPDATE SET
-  granted = EXCLUDED.granted, updated_at = NOW(), updated_by = 'migration:TASK-XXX';
-
--- Anti pre-up-marker check (CLAUDE.md regla migration markers)
-DO $$
-DECLARE registered_count INTEGER; granted_count INTEGER;
-BEGIN
-  SELECT COUNT(*) INTO registered_count FROM greenhouse_core.view_registry WHERE view_code IN (...);
-  IF registered_count < <N> THEN
-    RAISE EXCEPTION 'TASK-XXX anti pre-up-marker: expected <N> view_registry rows, got %', registered_count;
-  END IF;
-  -- repeat para role_view_assignments
-END $$;
-
--- Down Migration (idempotent, append-only audit)
-UPDATE greenhouse_core.role_view_assignments
-SET granted = FALSE, updated_at = NOW(), updated_by = 'migration:TASK-XXX:revert'
-WHERE updated_by = 'migration:TASK-XXX';
-```
-
-**⚠️ Reglas duras**:
-
-- **NUNCA** agregar entry a `VIEW_REGISTRY` TS sin migration acompañante en el mismo PR. La telemetría `role_view_fallback_used` lo detectará en producción y genera ruido Sentry.
-- **NUNCA** desactivar el helper `roleCanAccessViewFallback` ni la captureMessageWithDomain del path. ES la señal canonical de drift gobernanza — load-bearing.
-- **NUNCA** parchear el fallback heurístico para "evitar" el warning. La solución canonical es seed migration; el warning ES el detector.
-- **NUNCA** borrar filas de `role_view_assignments` (append-only governance). Down migration marca `granted=FALSE` preservando audit trail.
-- **NUNCA** definir un viewCode sin `routePath` válido (incluso si la página es placeholder forward-looking — declara el path canonical, page se crea en TASK derivada).
-- **SIEMPRE** que un viewCode se vuelva accesible para más roles (e.g. nuevo addon), migration nueva con INSERT ON CONFLICT DO UPDATE para los grants adicionales. NO modificar la migration original.
-- **SIEMPRE** usar `migration:TASK-XXX` como `granted_by`/`updated_by` audit marker — preserva trazabilidad cross-migration.
-- **SIEMPRE** incluir DO block anti pre-up-marker check (TASK-838 pattern) en migrations que seedean view_registry/role_view_assignments, validando COUNT esperado post-INSERT.
-
-**Spec canónica**: `docs/tasks/complete/TASK-827-client-portal-composition-layer-ui.md` Slice 0 + incident hardening commit `2fd8a60c` (seed 44 filas, 11 viewCodes × 4 roles client_executive/client_manager/client_specialist/efeonce_admin).
+**Reglas duras (resumen):** **NUNCA** escribir role defaults / user overrides / startup policy fuera de `src/lib/admin/entitlements-governance.ts` (tx única: governance table + audit + outbox). **NUNCA** persistir una capability que no exista en `capabilities_registry` o esté `deprecated_at`. **NUNCA** deprecar una capability que aún existe en el TS catalog (drift inverso). **NUNCA** agregar entry a `VIEW_REGISTRY` TS sin migration seed acompañante en el mismo PR (la telemetría `role_view_fallback_used` lo detecta); **NUNCA** borrar filas de `role_view_assignments` (append-only).
 
 ### Secret Manager Hygiene
 
@@ -483,70 +411,13 @@ WHERE updated_by = 'migration:TASK-XXX';
   - PostgreSQL: `pnpm pg:doctor` o conexión real
 - Rotar `NEXTAUTH_SECRET` puede invalidar sesiones activas y forzar re-login.
 
-### AI Visual Asset Generator
+### AI image generation + LLM providers — invariantes
 
-- Skill canonica para pedir, promptear, generar y QA assets visuales con IA: `.claude/skills/greenhouse-ai-image-generator/SKILL.md` (Codex mirror: `.codex/skills/greenhouse-ai-image-generator/SKILL.md`). Usarla cuando el usuario pida iconos, UI elements, empty states, banners, assets transparentes, OpenAI/GPT Image/Imagen/Nano Banana o mejora de prompts para imagenes.
-- La skill no solo opera el provider: debe actuar como direccion de arte, con brief visual, composicion, materiales/acabados, iluminacion, paleta, iteracion single-change y rubric de QA profesional. Guia compartida: `docs/operations/GREENHOUSE_AI_IMAGE_GENERATION_AGENT_SKILL_V1.md`.
-- Entry point canonico para assets visuales generados por agentes: `src/lib/ai/image-generator.ts`.
-- `generateImage()` soporta providers `google-imagen` y `openai-image`; no llamar APIs de imagen desde scripts paralelos si el helper cubre el caso.
-- **CLI canonica de generacion `pnpm ai:image` (gpt-image-2, desde 2026-06-10):** wrapper operativo del fn canonico `generateOpenAIImage` (`src/lib/ai/openai-image.ts`) para generar imagenes desde la terminal — conceptos del `product-design-loop`, fixtures de mockup, batches de iconos/assets. **NO crear scripts de generacion ad-hoc** (`scripts/_gen-*.ts`): usar esta CLI. Self-contained (carga `.env.local` solo; resuelve `OPENAI_API_KEY_SECRET_REF` server-side, nunca imprime el secreto). Default `gpt-image-2 · 1536x1024 · quality high · opaque · out-dir public/images/generated`. Timeout default **280s** (gpt-image-2 `high` supera los 125s del helper runtime `generateImage`, que NO pasa-through `timeoutMs` — por eso la CLI usa el fn de bajo nivel). Uso: `pnpm ai:image --prompt "<texto>" [--out <path>] [--size 1024x1024|1536x1024|1024x1536|2048x...] [--quality low|medium|high|auto] [--background opaque|transparent] [--model gpt-image-2] [--count N] [--timeout ms] [--open]`; `--prompt-file <path>` (prompts largos); `--batch <json>` (`[{ filename, prompt }, …]`, varios). `--background transparent` cae a `gpt-image-1.5` (gpt-image-2 no soporta alpha). **Sigue siendo raster** (PNG/WebP) — para vectores reales, Higgsfield + Recraft V4.1 (abajo). Para assets repo-bound que el runtime sirve, preferir el helper `generateImage()`; la CLI es para generacion operada por agente/operador. **Direccion de arte = invocar la skill `greenhouse-ai-image-generator`** (la CLI opera el modelo; la skill aporta brief/composicion/QA).
-- `GREENHOUSE_IMAGE_PROVIDER` controla el default runtime, pero cada llamada puede pasar `provider`.
-- OpenAI usa `src/lib/ai/openai-image.ts` y resuelve la key solo server-side con `OPENAI_API_KEY` / `OPENAI_API_KEY_SECRET_REF`; el secreto canonico es `greenhouse-openai-api-key` en GCP Secret Manager. Nunca hardcodear `sk-*` en repo, Vercel env directo, logs, tests ni docs.
-- Para PNG transparente, pedir `format: 'png'` + `background: 'transparent'`; `gpt-image-2` no soporta transparencia y el helper aplica fallback seguro a `gpt-image-1.5`, dejando `requestedModel` y `modelFallbackReason`.
-- Modos OpenAI disponibles: `generateOpenAIImage()` para text-to-image, `editOpenAIImage()` para imagenes de referencia/mascara, y `runOpenAIImageTool()` para Responses API multi-turn con `image_generation`.
-- **`gpt-image-*` es RASTER** (PNG/WebP/JPEG) — **NO genera SVG**. Si se necesita vector, vectorizar el raster como paso aparte (no hay helper canonico de vectorizacion hoy) o aceptar un SVG real via upload (el uploader hoy acepta PNG/JPG/WebP, no SVG).
-- **Vectores para implementacion de UI vía Higgsfield CLI + Recraft V4.1 (desde 2026-06-09):** la CLI `higgsfield` (binario en `~/.local/bin`, alias `hf`, cuenta `mkt@efeoncepro.com` plan Ultra, autenticada via `higgsfield auth login`) + el MCP Higgsfield exponen **Recraft V4.1** (`job_set_type: recraft_v4_1`) con `--model_type vector` → **salida vectorial real**, justo el hueco que `gpt-image` (raster-only) deja abierto. Es la herramienta para **producir assets vectoriales de UI/marca** (iconos, logos, ilustraciones de design-system, empty states) con **paleta controlada** (`--colors`, p.ej. pinear tonos AXIS) + `--background_color`, `--aspect_ratio`, `--resolution {1k,2k}`. Comando canonico: `higgsfield generate create recraft_v4_1 --prompt "…" --model_type vector --aspect_ratio 1:1 --resolution 2k --wait`. **Caveats duros:** (1) Higgsfield es **producción de assets out-of-band** (se generan acá y se SUBEN al portal vía el uploader canonico), **NO** el path runtime — el entrypoint runtime canonico sigue siendo `src/lib/ai/image-generator.ts` (OpenAI/Imagen); NUNCA cablear Higgsfield a un flujo runtime del producto. (2) Las skills (`higgsfield-generate`, `-product-photoshoot`, `-soul-id`, `-marketplace-cards`) aportan el craft (modelo correcto por tarea, modos, art direction); usarlas. (3) Verificar el **formato del archivo entregado (SVG)** en el primer uso real antes de asumirlo. (4) Aplica el contrato visual Greenhouse igual (tokens AXIS, no inventar hex) + revisar el asset producido con las skills de diseño antes de integrarlo.
-- **OpenAI requiere `OPENAI_API_KEY_SECRET_REF=greenhouse-openai-api-key` en CADA entorno** (local `.env.local`, Vercel staging/prod, workers). Sin ese ref el resolver no sabe de que secret sacar la key y todo flujo OpenAI devuelve "not configured". Runtime Rollout Completion Gate: confirmar la env var en Vercel antes de declarar operativo un flujo OpenAI en deployado.
-- **Generacion de logo de organizacion con IA (TASK-999, desde 2026-06-09):** command server-only `generateOrganizationLogoDraft` (`src/lib/account-360/organization-logo-generation.ts`) → `POST /api/organizations/[id]/brand-assets/logo/generate`. Usa `gpt-image-2` fondo opaco, persiste como `organization_logo_draft` y reusa `attachOrganizationLogoAsset` (gate `organization.brand_asset` + fail-fast `is_operating_entity` ANTES de la llamada paga). **Excepcion canonizada al default de la skill** `greenhouse-ai-image-generator` ("nunca reproducir un trademark"): por decision explicita del operador, el prompt **recrea el logo real** del cliente desde el conocimiento del modelo (es aproximacion; el logo exacto va por upload/URL). NUNCA generar logos de operating-entity (Efeonce/legal). Fuente: ADR `GREENHOUSE_ORGANIZATION_BRAND_ASSET_DECISION_V1.md` Delta 2026-06-09.
-- Fuente canonica: `docs/architecture/GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md`.
+Los invariantes de generación de assets visuales con IA (CLI `pnpm ai:image`, `generateImage()`, OpenAI/Imagen/Higgsfield-Recraft vectores, secret `greenhouse-openai-api-key`) y de los providers de texto/LLM (Gemini/Vertex, Anthropic, OpenAI — `src/lib/ai/`) viven en **`docs/architecture/GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md` → §`Invariantes operativos para agentes — AI image + LLM providers`**. **Skill `greenhouse-ai-image-generator` para dirección de arte.** **NUNCA** crear un cliente/SDK LLM paralelo dentro de un módulo de dominio (extender el cliente canónico de `src/lib/ai/`); **NUNCA** hardcodear `sk-*`/`sk-ant-*` (resolver server-side via `*_SECRET_REF`); **NUNCA** crear scripts de generación ad-hoc (usar `pnpm ai:image`).
 
-### AI providers — texto/LLM (Gemini, Anthropic, OpenAI) — desde 2026-06-05
+### Workforce Contracting Studio — invariantes (TASK-1019)
 
-Los providers de IA conviven en `src/lib/ai/`. **NUNCA** crear un cliente/SDK paralelo dentro de un módulo de dominio: extender el cliente canónico de `src/lib/ai/`.
-
-- **Gemini / Vertex** (path de texto canónico): `src/lib/ai/google-genai.ts` (`getGoogleGenAIClient`, `@google/genai` vía Vertex/ADC) + `src/lib/ai/greenhouse-agent.ts`. Modelos en `src/config/nexa-models.ts` (shape de id `provider/model@version`, ej. `google/gemini-2.5-flash@default`). Lo usa Nexa + el AI Observer (`src/lib/reliability/ai/runner.ts`).
-- **OpenAI** (imágenes): `src/lib/ai/openai-image.ts`, secret `greenhouse-openai-api-key` (`OPENAI_API_KEY_SECRET_REF`).
-- **Anthropic / Claude** (drafting de documentos HR/legal — Workforce Contracting Studio, TASK-1019): secret canónico **`greenhouse-anthropic-api-key`** en GCP Secret Manager (project `efeonce-group`, creado 2026-06-05), ref `ANTHROPIC_API_KEY_SECRET_REF=greenhouse-anthropic-api-key`. El cliente canónico **debe vivir en `src/lib/ai/anthropic.ts`** (lo crea TASK-1019 Slice 3, consumido por `src/lib/workforce/contracting/` detrás del flag `WORKFORCE_CONTRACTING_AI_ENABLED=false`). Modelos Anthropic se agregan al shape `anthropic/claude-*@default`. **NUNCA** hardcodear `sk-ant-*` en repo, Vercel env directo, logs, tests ni docs; resolver server-side vía `resolveSecretByRef`. NO instanciar el SDK Anthropic dentro de un módulo de dominio.
-
-**⚠️ Reglas duras (canonical secret resolution, arch-architect verdict 2026-05-10)**:
-
-- **NUNCA** componer `projects/{id}/secrets/{name}/versions/{ver}` inline en TS/JS. Toda resolución pasa por `resolveSecret()` / `resolveSecretByRef()` / `getCachedResolvedSecret()` en `src/lib/secrets/secret-manager.ts`. Inline composition es la causa raíz del bug class detectado en run 25634673015 (path inválido `<name>:latest/versions/latest` por doble suffix).
-- **NUNCA** duplicar `normalizeSecretRef` ni `normalizeSecretRefValue` en scripts. `scripts/` puede importar directo del canónico — el archivo canónico NO tiene `import 'server-only'`, sin shim. Mirror duplicado se desincroniza inevitablemente (caso real: `scripts/pg-doctor.ts` consolidado a canónico 2026-05-10 después de detectar bug por mirror divergente).
-- **SIEMPRE** soportar tres formas de `*_SECRET_REF` en consumers (el normalizador canónico las acepta):
-  - `<name>` (bare, default `latest`)
-  - `<name>:<version>` (shorthand Vercel display + gcloud convention)
-  - `projects/.../versions/<version>` (full path)
-- **PREFERIR** la forma bare `<name>` en workflows YAML committeados. La shorthand `<name>:latest` es para humanos copiando del UI Vercel/gcloud — no para configuración estática (defense-in-depth: no normalizar garbage si no hace falta).
-
-**⚠️ Reglas duras V2 (TASK-870 — normalizer hardening + active drift detection 2026-05-12)**:
-
-- **NUNCA** registrar un env var `*_SECRET_REF` desde shell usando `echo "valor" | vercel env add` ni equivalentes que appendean newline. Usar siempre `printf %s "<valor>" | vercel env add <NAME> production --force` para escritura atómica sin newline trailing (`--force` overwrite es atomic; rm+add tiene gap-window).
-- **NUNCA** duplicar la lógica `stripEnvVarContamination` ni `SECRET_REF_SHAPE` regex en scripts/consumers. Toda higiene de env var values pasa por `normalizeSecretValue` / `normalizeSecretRefValue` en `src/lib/secrets/secret-manager.ts`. Para auditores externos, usar el predicate `isCanonicalSecretRefShape(value)` exportado del mismo módulo.
-- **NUNCA** loggear el VALOR sanitizado de un `*_SECRET_REF` rechazado por shape validation (puede contener PII, tokens, leak info). Solo length + first/last char class si se requiere observability local. El reliability signal `secrets.env_ref_format_drift` reporta NOMBRES de env vars afectadas, no valores.
-- **NUNCA** swallow Sentry capture en code paths donde `resolveSecretByRef` retornó null. Diferenciar:
-  - `resolveSecretByRef` → null = **ref env var corrupto o secret no existe**. Degradar silente a fallback (PAT / cache / unconfigured). NO capturar a Sentry — el reliability signal `secrets.env_ref_format_drift` ya cubre detección upstream.
-  - Secret resuelto pero CONTENIDO inválido (e.g. PEM sin `-----BEGIN`) = **falla real de configuración del secret content**. Throw + `captureWithDomain('<domain>', ...)` legítimo, requiere intervención humana.
-- **SIEMPRE** que emerja un consumer nuevo de `resolveSecretByRef`, aplicar el patrón canónico de TASK-870: validar return value, diferenciar "ref corruption" (silent degrade) de "content corruption" (Sentry alert). Patrón fuente: `src/lib/release/github-app-token-resolver.ts` (líneas 174-195).
-- **Reliability signal canónico** `secrets.env_ref_format_drift` (kind=drift, severity=error si count>0, subsystem `cloud`, steady=0). Detecta env vars `*_SECRET_REF` cuyo valor falla `isCanonicalSecretRefShape` post-strip. Cuando alerta: re-set la env var ofensora con `printf %s "<clean-value>" | vercel env add <NAME> production --force` + redeploy.
-- **Bug class canonizada (2026-05-12)**: `GREENHOUSE_GITHUB_APP_PRIVATE_KEY_SECRET_REF` quedó persistida en Vercel production como `"greenhouse-github-app-private-key\n"` (bytes hex `... 6b 65 79 5c 6e 22`). El normalizer legacy NO stripaba quotes envolventes (solo `\n`/`\r` literales + `.trim()`) → resource name resultante con quotes embebidos → GCP NOT_FOUND silencioso → `resolveGithubAppInstallationToken` lanzaba "is not valid PEM" + `captureWithDomain` cada ~3min → preflight check `sentry_critical_issues` bloqueaba production release orchestrator. Fix V2: `stripEnvVarContamination` single-source-of-truth + `SECRET_REF_SHAPE` regex en boundary + signal `secrets.env_ref_format_drift` upstream + resolver `github-app-token` diferencia ref/content corruption.
-
-### Workforce Contracting Studio invariants (TASK-1019, foundation desde 2026-06-05)
-
-Dominio canónico de **cartas oferta + contratos laborales** (aggregate `greenhouse_hr.workforce_contracting_cases`, hermanos `offer_letter`/`employment_contract`), bajo **HR/Workforce — NO Payroll**. Módulo: `src/lib/workforce/contracting/` (barrel pure-only: types + state-machine + jurisdiction-packs; `store`/`commands`/`ai` son server-only, importados directo — TASK-827). Foundation: sin UI runtime, sin PDF/firma/email (esos consumen EPIC-001 + tasks de viewer). Spec: `GREENHOUSE_WORKFORCE_CONTRACTING_STUDIO_V1.md`.
-
-**Bilingüe obligatorio**: toda carta oferta y contrato tiene `es-CL` + `en-US` (CHECK DB `required_languages` ⊇ {es-CL,en-US}). Para Chile, `es-CL` es la versión legal prevalente. La aprobación es sobre el **par bilingüe completo** (nunca un idioma suelto); requiere paridad estructural (mismos `sectionCode`) + sin divergencia material.
-
-**State machine + CHECK + audit trio** (patrón TASK-700/765): `status` único con CHECK condicional por `case_kind` (offer 11 estados / contract 19); transiciones enforced en TS (`assertCaseTransition`, 2 matrices) **y** en el trigger DB `workforce_contracting_case_transition_check` (espejo exacto — mover juntos). `workforce_contracting_case_events` append-only (triggers anti-UPDATE/DELETE). Commands dual-mode (`client?: PoolClient`), atómicos, outbox v1 + audit in-tx.
-
-**⚠️ Reglas duras**:
-- **NUNCA** escribir/mutar `payroll_entries`, `compensation_versions`, `final_settlements` ni recalcular payroll/compensation desde este dominio. Valida contra la tupla `(contract_type, pay_regime, payroll_via)`, no la recalcula. Gate de cierre: `pnpm vitest run src/lib/payroll` verde.
-- **NUNCA** usar `members.contract_type` como verdad única de estado laboral vigente; usar snapshots del caso o `resolveCurrentWorkClassification` (TASK-957).
-- **NUNCA** dejar que Claude apruebe, genere PDF, envíe email o firme. El adapter (`ai/`) es **advisory-only** detrás del flag `WORKFORCE_CONTRACTING_AI_ENABLED` (default OFF). El cliente Claude canónico vive en `src/lib/ai/anthropic.ts` (NO instanciar el SDK en el módulo de dominio). El input packet usa **allowlist** (`ALLOWED_FACT_CODES`): nunca secrets/tokens/bank/salary-history al prompt (arch §11).
-- **NUNCA** crear un vault/firma/document-manager paralelo. PDF/render/firma consumen **EPIC-001** (`TASK-489/490/491/493`); ZapSign acepta PDF **y** DOCX por upload directo (`base64_*`, NO el template feature que prohíbe imágenes/tablas). El formato firmable es la dimensión `cases.signable_format` (`pdf`|`docx`, default `pdf` Chile V1). La firma legal del representante va pre-estampada vía `@/lib/legal-signatures` (TASK-863).
-- **NUNCA** aprobar `international_internal` o extranjero-en-Chile sin `legalReviewReference` (>=10 chars, fail-closed en el validator; CHECK DB; invariante TASK-894). NUNCA loggear el valor crudo.
-- **NUNCA** sembrar una capability `workforce.contracting.*` sin grant en `runtime.ts` (mismo PR; guard `capability-grant-coverage.test`). Aprobación V0 = `EFEONCE_ADMIN` unilateral (no existe rol `legal`).
-- **NUNCA** `Sentry.captureException` directo — usar `captureWithDomain(err, 'workforce', ...)` (dominio + moduleKey `workforce` nuevos). 3 signals steady=0: `workforce.contracting.{ai_draft_failed, validation_blocked_overdue, approved_without_pdf}`.
-- **SIEMPRE** que un consumer downstream necesite "el detalle/estado de un caso", consumir los readers product-shaped (`readers.ts` + `projection.ts`), no recomputar en JSX.
+Los invariantes del Workforce Contracting Studio (cartas oferta + contratos laborales bilingües, bajo HR/Workforce — NO Payroll) viven en **`docs/architecture/GREENHOUSE_WORKFORCE_CONTRACTING_STUDIO_V1.md` → §`Invariantes operativos para agentes`**. **NUNCA** escribir/mutar `payroll_entries`/`compensation_versions`/`final_settlements` desde este dominio; **NUNCA** dejar que Claude apruebe/genere PDF/envíe email/firme (adapter advisory-only detrás de `WORKFORCE_CONTRACTING_AI_ENABLED`); **NUNCA** aprobar un idioma suelto (par bilingüe es-CL + en-US completo).
 
 ### GitHub Actions workflows — pnpm + Node setup ordering
 
@@ -578,86 +449,9 @@ Dominio canónico de **cartas oferta + contratos laborales** (aggregate `greenho
 - `DESIGN.md` — contrato visual compacto agent-facing en formato `@google/design.md`; leerlo cuando el cambio toque UI, UX, tipografía, color, spacing o selección de componentes. **CI gate activo** (TASK-764): `.github/workflows/design-contract.yml` corre `pnpm design:lint --format json` strict (errors + warnings block) en cada PR que toca DESIGN.md / V1 spec / package.json. Agregar/modificar tokens requiere actualizar también el contrato de componente que los referencia (anti-bandaid: NO namespace `palette.*`). Validar local con `pnpm design:lint` antes de commitear.
 - **Design System catalog canónico — `/admin/design-system` (INTERNA, los clientes NUNCA la ven)**: esta es la home navegable de AXIS/Design System. **Claude debe agregar aquí toda nueva incorporación del Design System** (token, primitive, patrón, lab o governance) en `DesignSystemCatalogView`, con ruta real, SoT/owner y link funcional; además debe declarar la child route en `route-reachability-manifest.ts`, crear/actualizar scenario GVC cuando la surface sea visual/repetible, y enlazar la documentación correspondiente (`ui-platform/*`, ADR/doc de tokens o `project_context.md` si cambia un contrato). La paleta AXIS vive como child route `/admin/design-system/colors` (TASK-1034): renderiza los ramps AXIS live (100→900 + opacity + neutrales light/dark) desde `theme.axis.*` / `src/@core/theme/axis-tokens.ts` (SoT 1:1 con AXIS Figma, fileKey `yyMksCoijfMaIoYplXKZaR` nodo `11205:5341`). Gateada por viewCode `administracion.design_system` (routeGroup `internal`, sembrado solo a roles internos — **NUNCA `client_*`**) + redirect defensivo si `tenantType==='client'`. `DESIGN.md` sigue siendo el contrato agent-facing; los HEX se resuelven desde `theme.palette.*` / `theme.axis.*`, NUNCA inline. El `AxisWordmark` es **solo del design system** (NUNCA en UI de producto, login, emails, PDFs ni portal cliente). NUNCA agregar un viewCode nuevo a `VIEW_REGISTRY` sin la migración seed acompañante en el mismo PR (gobernanza TASK-827) ni una ruta `(dashboard)` sin hacerla alcanzable por nav (TASK-982).
 
-### Typography System — SoT + drift-guard + escala (TASK-1036 / TASK-1038)
+### Typography system + Efeonce brand — invariantes (TASK-1036/1038)
 
-Mapa canónico para cualquier agente que toque texto/tipografía (espejo del patrón AXIS de color):
-
-- **Fuente de verdad (valores):** `src/components/theme/typography-tokens.ts` — primitivos (`fontFamilies`/`fontWeights`/`fontSizes`/`letterSpacings`/`fontFeatures`) → `typographyScale` (tokens compuestos por rol) → `TYPOGRAPHY_VARIANT_BRIDGE` (contrato semántico ↔ variante MUI, **1:1 como código**) + `SECONDARY_VARIANT_TOKENS` (h6→label-md, subtitle2→body-sm) + `controlText` ramp.
-- **Runtime:** `src/components/theme/mergedTheme.ts` deriva cada variante del SoT (cero `fontSize`/`fontWeight`/familia hardcodeados). Overrides de componente (Button large, Tab, DialogTitle) consumen el SoT vía el bloque `components`.
-- **Drift-guard (enforcement):** `src/components/theme/typography-drift.test.ts` falla CI si `runtime ≡ SoT ≡ DESIGN.md` divergen. Cobertura (TASK-1042): runtime ≡ SoT ≡ DESIGN.md **front-matter + prosa §Typography** ≡ **V1 §15.1** — todo `Npx`/`Nrem` literal en la prosa y en la tabla V1 debe ser un tamaño vigente del SoT (derivado de los tokens activos, no de los primitivos huérfanos 15/18). Si cambiás un valor del SoT, **DEBÉS** actualizar DESIGN.md front-matter + V1 §3.2/§15.1 en el mismo PR o el guard rompe (parity 3 capas).
-- **Contrato agente:** `DESIGN.md` §Typography (compacto, el que leés primero) + `docs/architecture/GREENHOUSE_DESIGN_TOKENS_V1.md` §3 (extendido: type scale, mapa de aplicación, políticas transversales, versioning).
-- **Skill invocable de tipografía (creada 2026-06-07):** para CUALQUIER decisión o auditoría de tipografía (peso, variante, contraste, interlineado, medida, numerales, optical sizing, variable fonts, OpenType, fluid type, carga de fuentes, i18n/RTL, pairing) invocar `typography-design`. Patrón dual espejo de `modern-ui`/`a11y-architect`: skill global portable `~/.claude/skills/typography-design/` (el *craft* + 5 references: weights-variants, contrast-accessibility, font-technology, rhythm-measure, i18n-typography) + overlay Greenhouse `.claude/skills/typography-design/SKILL.md` que **gana** y pinea Poppins/Geist reales, pesos {400,600,700,800} (500 won't-do TASK-1039), la escala fija, SoT/drift-guard/lint, adapters charts/PDF/email y las reglas NUNCA. Mirror Codex: `.codex/skills/greenhouse-typography-accessibility/`. **Decide el valor; `design-system-governance` lo shippea** (3-layer parity). Compone con `modern-ui`/`a11y-architect`/`dataviz-design`/`forms-ux`/`greenhouse-ux-writing`.
-- **Referencia visual viva (INTERNA):** `/admin/design-system/typography/mockup` — documento canónico que renderiza el SoT en vivo (primitivas → escala → aplicaciones → bridge → propuesta → transversales → gobernanza), drift-guarded. Es el "museo"; las reglas que un agente aplica viven en DESIGN.md/V1, NO en el mockup (un agente no renderiza React para aprender reglas).
-- **Escala vigente (TASK-1038 redesign aprobado 2026-06-06):** display Poppins 32/24/20; **page-title 20** (h4 — arregló la inversión: page-title ≥ section-title); **section-title 16** (h5); subheader/subtitle1 14; **label-md/button 14**; body-lg 16 / body-md 14 / body-sm·caption 13; overline 12; numeric-id 14 / numeric-amount 13 / kpi-value 28. Control: Button sm/md 14, **lg 16** · Tab 14 · Dialog title = section-title 16.
-- **⚠️ Reglas duras:** NUNCA `fontSize` inline en texto (usar variante/token); NUNCA monospace (numéricos = Geist + `tabular-nums`); NUNCA editar `src/@core/theme/*` (override en mergedTheme); NUNCA token sin consumidor; SIEMPRE mover juntos SoT + mergedTheme + DESIGN.md + V1 + drift-guard.
-- **Políticas transversales canonizadas (TASK-1038, con product-design + arch skills):** i18n Latin-first (es-CL/en-US/pt) + RTL-ready vía CSS logical properties, CJK diferido; tipo **fijo en producto**, `clamp()` solo marketing; **no display tier** sin consumidor real; **PDF/email = un SSOT semántico + adapter por medio** (web→variant, PDF→react-pdf, email→inline+fallback — espeja el precedente de color axisSemanticHex); truncation (1-línea ellipsis en slots fijos + valor completo / 2-líneas clamp / wrap en body·labels·errores); charts derivan del SoT; body de lectura larga ~65ch.
-- **Charts derivan del SoT (TASK-1041, ✓):** los 43 charts del portal (Apex 33 + Recharts 10; **ECharts no se usa hoy**) consumen familia+tamaño del SoT **desde un solo lugar** — los wrappers `AppReactApexCharts` + `AppRecharts` (`src/libs/styles/`) gobiernan el texto SVG con CSS `!important` leyendo `theme.typography.{fontFamily,caption}` (100% cobertura, 0 bypass). Cambiar el SoT propaga a los 43 sin tocar cada chart. **NUNCA** poner `fontSize`/`fontFamily` de texto de chart inline en un chart — el wrapper lo gobierna. Para **ECharts (canvas, política de dashboards nuevos de alto impacto)** el CSS NO llega: esos charts DEBEN consumir el helper `getChartTypographyFromTheme(theme)` (`src/components/theme/chart-typography.ts`) en `option.textStyle`/`axisLabel`.
-- **ApexCharts runtime boundary (ISSUE-085):** `AppReactApexCharts` es además el único owner del `dynamic(..., { ssr:false })` hacia `react-apexcharts`; consumers importan el wrapper directo, sin otro `dynamic()`, y `@/libs/ApexCharts` quedó retirado. Guardrail: `greenhouse/no-dynamic-app-react-apexcharts`.
-- **Follow-ups tipografía:** (1) [abierto] rol semántico para el peso **500** — **evaluado y descartado** (TASK-1039 won't-do): a 14px 400→500 es imperceptible + el 500 ya rinde vía Vuexy/MUI → un 4º tier mete ambigüedad (beneficio marginal < claridad); (2) [abierto] adapter **PDF** Geist 600/800: `register-fonts.ts` registra por **nombre de familia** (no por peso); TASK-1040 ya sumó las familias `Geist SemiBold`(600)+`Geist ExtraBold`(800) → falta solo migrar componentes PDF a usarlas (refinamiento, el web no tiene gap); (3) [✓ TASK-1041] charts gobernados centralmente (ver arriba); (4) [✓ TASK-1038] lint rule `greenhouse/no-fontsize-inline-typography` (scopeada a `<Typography>`, warn) + rule tests en CI (`pnpm test:lint-rules`). Spec: `docs/tasks/complete/TASK-1038-typography-scale-redesign.md`.
-
-### Efeonce brand assets (SSOT `src/config/efeonce-brand.ts`)
-
-Hechos de marca canónicos — NO hardcodear en otro lado, importar del SSOT. Documentados también en `DESIGN.md` (sección "Brand assets — Efeonce").
-
-- **Arquitectura de marca — Efeonce (paraguas) vs Greenhouse (plataforma)**: **EFEONCE** es la marca paraguas/institucional; **Greenhouse** es la plataforma/app de Efeonce. Los dos logos **coexisten** (no intercambiables): logo **Greenhouse** en todo lo de la **app** (navegación, dashboards, surfaces in-app); logo + eslogan **Efeonce** en lo **institucional/externo** (recibos/comprobantes, reportes, finiquitos, contratos, emails transaccionales, PDFs institucionales). Un documento institucional lleva marca **Efeonce**, no Greenhouse.
-- **URL pública**: `efeoncepro.com` (`EFEONCE_URL`). Ya usada en el footer del PDF de payroll + emails transaccionales.
-- **Dirección legal (fallback)**: `Dr. Manuel Barros Borgoño 71 Of 1105, Providencia, RM — Chile` (`EFEONCE_LEGAL_ADDRESS_FALLBACK`). Preferir el `legalAddress` de la operating entity runtime (`getOperatingEntityIdentity()`); el constante es fallback.
-- **Entidad legal (fallback)**: `Efeonce Group SpA` (`EFEONCE_LEGAL_NAME_FALLBACK`).
-- **Eslogan "Empower your Growth"** — elemento de **brand-zone** (header/masthead), **NUNCA** el footer legal. Tipografía Poppins: `Empower` = ExtraBold Italic (800 italic), `your` = ExtraBold (800), `Growth` = Black Italic (900 italic). **Color canónico gris `#848484`** (= token `text-disabled`; `EFEONCE_SLOGAN_COLOR` en el SSOT, es el default de ambos componentes — override solo sobre fondo oscuro). Fuentes en `src/assets/fonts/Poppins-{ExtraBold,ExtraBoldItalic,Black,BlackItalic}.ttf` (Google Fonts v24 Latin, SIL OFL 1.1), registradas en `src/lib/finance/pdf/register-fonts.ts`. Render canónico: web `src/components/greenhouse/brand/EfeonceSlogan.tsx`, PDF `src/lib/finance/pdf/efeonce-slogan-pdf.tsx` — NUNCA re-implementar inline.
-  - **Logo y eslogan son elementos SEPARADOS** — se usan solos o compuestos, **nunca fusionados en un único asset**. En un lockup (logo + eslogan): el eslogan es **subordinado** (claramente más pequeño, NO compite ni iguala el ancho del logo) y va **centrado** debajo del logo con separación mínima. El **tamaño del eslogan es contextual** (depende del tamaño del logo en esa superficie) — elige un `fontSize` que lo mantenga visiblemente menor; NO hay un pt fijo (el reporte de contractors usa ~7.5pt contra logo ~116pt como ejemplo de la **proporción**, no como regla). Detalle en `DESIGN.md` → "Slogan".
-- **Footer PDF reusable**: `src/lib/finance/pdf/efeonce-pdf-footer.tsx` (`EfeoncePdfFooter`) — footer institucional canónico de **todos** los PDFs Efeonce (entidad · RUT + dirección + `efeoncepro.com` + generado/página). Lleva **solo identidad legal/contacto**; el eslogan va en la brand-zone, no acá. PDFs nuevos reusan este footer, no rollean uno propio.
-- `project_context.md` — estado vigente del repo, stack, decisiones y restricciones; leer primero su sección "Estado vigente para agentes"
-- `Handoff.md` — cabina de mando activa: trabajo en curso, riesgos y próximos pasos
-- `Handoff.archive.md` — caja negra histórica; usar para auditoría de resoluciones sin tratar entradas antiguas como contrato vigente
-- `docs/operations/CONTEXT_HANDOFF_OPERATING_MODEL_V1.md` — regla canónica para navegar `project_context.md`, `Handoff.md` y `Handoff.archive.md` sin perder auditoría ni inflar el handoff activo
-- `docs/tasks/README.md` — pipeline de tareas `TASK-###` y legacy `CODEX_TASK_*`
-- `docs/issues/README.md` — pipeline de incidentes operativos `ISSUE-###`
-- `docs/architecture/` — specs de arquitectura canónicas (30+ documentos)
-- `docs/documentation/` — documentación funcional de la plataforma en lenguaje simple, organizada por dominio (identity, finance, hr, etc.). Cada documento enlaza a su spec técnica en `docs/architecture/`
-- `docs/manual-de-uso/` — manuales prácticos por dominio para usar capacidades concretas del portal paso a paso, con permisos, cuidados y troubleshooting
-- `docs/audits/` — auditorías técnicas y operativas reutilizables. Úsalas frecuentemente cuando trabajes una zona auditada, pero antes de confiar en ellas verifica si sus hallazgos siguen vigentes o si el sistema requiere una auditoría nueva/refresh.
-- `docs/operations/` — modelos operativos (documentación, GitHub Project, data model, repo ecosystem)
-- `docs/operations/ARCHITECTURE_DECISION_RECORD_OPERATING_MODEL_V1.md` — politica canonica de ADRs: cuando una decision requiere ADR, donde vive, lifecycle append-only y gate para tasks.
-- `docs/architecture/DECISIONS_INDEX.md` — indice maestro de decisiones arquitectonicas aceptadas; buscar aqui antes de proponer o cambiar contratos compartidos.
-- Fuente canónica para higiene y rotación segura de secretos:
-  - `docs/operations/GREENHOUSE_CLOUD_GOVERNANCE_OPERATING_MODEL_V1.md`
-  - `docs/architecture/GREENHOUSE_CLOUD_SECURITY_POSTURE_V1.md`
-  - `docs/architecture/GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md`
-- Fuente canónica para trabajo multi-agente (Claude + Codex en paralelo):
-  - `docs/operations/MULTI_AGENT_WORKTREE_OPERATING_MODEL_V1.md` — incluye higiene de worktrees, `rebase --onto`, `force-push-with-lease`, CI como gate compartido, squash merge policy, background watcher pattern para auto-merge sin branch protection
-- Regla dura de convivencia: en un checkout compartido, el WIP `untracked`/unstaged de otro agente es estado vivo. No usar `git stash -u`, `git clean`, `git restore`, moves ni pathspecs amplios para apartarlo y pasar hooks. Si bloquea tu push, coordina con el owner, usa worktree propio o pide bypass explícito ya verificado.
-- Fuente canonica para calidad de solucion:
-  - `docs/operations/SOLUTION_QUALITY_OPERATING_MODEL_V1.md` — regla anti-parche: causa raiz, primitives canonicas, resiliencia, seguridad, escalabilidad y workaround solo temporal/documentado
-- Convenciones de skills locales:
-  - Claude: `.claude/skills/<skill-name>/SKILL.md` (convencion oficial vigente; existen skills legacy en `skill.md` minuscula)
-  - Codex: `.codex/skills/<skill-name>/SKILL.md` (mayuscula)
-- Mockups Greenhouse: invocar `greenhouse-mockup-builder` para cualquier mockup/prototipo visual. Por defecto deben ser rutas reales del portal con mock data tipada (`src/app/(dashboard)/.../mockup/page.tsx` + `src/views/greenhouse/.../mockup/*`), usando Vuexy/MUI wrappers y primitives del repo; no HTML/CSS aparte salvo pedido explicito de artefacto estatico.
-
-## Skill obligatoria: greenhouse-finance-accounting-operator
-
-**INVOCAR SIEMPRE** la skill `greenhouse-finance-accounting-operator` (ubicada en `.claude/skills/greenhouse-finance-accounting-operator/SKILL.md` + global `~/.claude/skills/`) ANTES de:
-
-- Tocar cualquier módulo de **finanzas** (`/finance/*`, `src/lib/finance/`, `src/app/api/finance/*`, `greenhouse_finance.*` schema): bank, cash-out, cash-in, expenses, income, suppliers, payment_orders, reconciliation, account_balances, settlement_legs, OTB declaration.
-- Tocar cualquier módulo de **costos / cost intelligence** (`src/lib/commercial-cost-attribution/`, `src/lib/finance/postgres-store-intelligence.ts`, member-period attribution, client_economics, labor allocation, CCA shareholder accounts, loaded cost models, ICO economics).
-- Tocar cualquier flujo **fiscal/tributario** (Chile SII, DTE, IVA débito/crédito, F22/F29, retenciones honorarios 14.5%, gastos rechazados Art 21, Capital Propio Tributario, ProPyme/14A regime, gratificación legal, indemnización años servicio).
-- Tocar cualquier flujo de **payments / treasury** (cashflow forecast, working capital, FX hedging, payment rails ACH/SEPA/SWIFT/PIX, factoring, invoice discounting, internal_transfers, fx_pnl_breakdown, account_balance materialization).
-- Tocar **P&L / reporting / KPIs financieros** (revenue recognition ASC 606/IFRS 15, EBITDA quality, gross margin, contribution margin, unit economics CAC/LTV, variance analysis, budget vs actual, FP&A).
-- Tocar **cierre mensual / period close / reconciliation** (trial balance, accruals, deferrals, bank rec, intercompany matching, audit trail).
-- Tocar **internal controls / audit / compliance** (COSO, SOX, segregation of duties, materiality ISA 320, fraud detection, going concern, Ley 20.393 MPD, UAF reporting, gobierno corporativo).
-- Tocar **economic_category** (TASK-768), **expense_payments_normalized** (TASK-766), **account_balances FX** (TASK-774), **OTB cascade** (TASK-703), **payment orders bank settlement** (TASK-765), **fx_pnl_breakdown** (TASK-699), **internal_account_number** (TASK-700).
-
-**Triggers léxicos** que disparan la invocación: "audit", "audita", "P&L", "EBITDA", "cashflow", "balance", "cierre", "conciliación", "IVA", "DTE", "factura", "boleta", "honorarios", "gratificación", "indemnización", "SII", "F22", "F29", "PPM", "retención", "gasto rechazado", "leasing", "depreciación", "amortización", "provisión", "deferred", "accrual", "revenue recognition", "5 pasos", "ASC 606", "IFRS 15", "IFRS 16", "IAS 7", "COSO", "SOX", "segregation of duties", "materiality", "going concern", "fraud triangle", "Benford", "ABC costing", "throughput", "standard costing", "absorption", "direct costing", "variance", "DSO", "DPO", "DIO", "CCC", "working capital", "13-week forecast", "hedge", "forward", "natural hedging", "factoring", "supply chain finance", "letter of credit", "cost-plus", "value-based", "retainer", "fixed-fee", "T&M", "loaded cost", "utilization rate", "realization rate", "CAC", "LTV", "payback", "unit economics", "ROIC", "ROE", "FCF", "CFO", "EBIT", "NOPAT", "WACC", "due diligence", "transfer pricing", "TP", "MPD", "PEP", "lavado activos", "cohecho", "auditor externo", "CPA", "Big-4", "qualified opinion", "adverse opinion", "going concern", "restatement", "impairment", "fair value", "mark-to-market", "MTM", "hedge effectiveness", "OCI", "comprehensive income".
-
-**Razón**: la skill combina IFRS / US GAAP / Chile NIIF / COSO / ISA / AICPA con runtime Greenhouse (helpers canónicos, VIEWs, reliability signals). Sin invocarla: alto riesgo de violar contratos canónicos (TASK-766/768/774/703), recomendar tratamientos contables incorrectos, perder material de framework, o no escalar a CPA/auditor cuando corresponde.
-
-**Cuándo NO invocarla**: tareas de plumbing puramente técnico sin razonamiento contable (ej. "qué endpoint usa esta vista" → `greenhouse-backend`; "ajusta este chart de Apex" → `greenhouse-ux`). Si la pregunta combina técnico + contable, invocar AMBAS.
-
-**Sinergia con otras skills**:
-
-- Si toca **payroll** (cálculo nómina, AFP/Salud/SIS, indemnizaciones runtime): combinar con `greenhouse-payroll-auditor`.
-- Si toca **HubSpot bridge** (CCA, products, deals): combinar con `hubspot-greenhouse-bridge`.
-- Si toca **PostgreSQL** queries finance: combinar con `greenhouse-postgres`.
-- Si toca **Cloud Run** ops-worker (reactive consumers finance, projection refresh): combinar con `greenhouse-cron-sync-ops`.
+Los invariantes del sistema de tipografía (SoT `typography-tokens.ts` + drift-guard + escala + variant bridge) y de los Efeonce brand assets (SSOT `src/config/efeonce-brand.ts`: arquitectura de marca Efeonce vs Greenhouse, eslogan, footer PDF) viven en **`docs/architecture/agent-invariants/DESIGN_TOKENS_BRAND_AGENT_INVARIANTS.md`** (contrato en `GREENHOUSE_DESIGN_TOKENS_V1.md` §3, `DESIGN.md`). **Skill `typography-design` para cualquier decisión de tipografía.** **NUNCA** `fontSize` inline en texto (usar variante/token); **NUNCA** monospace (numéricos = Geist + `tabular-nums`); **NUNCA** hardcodear los brand assets (importar del SSOT).
 
 ### Architecture Docs (los más críticos)
 
