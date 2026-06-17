@@ -1,12 +1,10 @@
 import type { TenantContext } from '@/lib/tenant/get-tenant-context'
 
+import type { KortexCommandHttpMethod, KortexCommandName, KortexCommandTier } from './registry'
+
 export const KORTEX_COMMAND_CONTRACT_VERSION = 'greenhouse-kortex-command-adapter.v1'
 
-export type KortexCommandName =
-  | 'kortex.audit.run'
-  | 'kortex.strategy.compile'
-  | 'kortex.strategy.release_candidate.dry_run'
-  | 'kortex.strategy.release_candidate.execute'
+export type { KortexCommandHttpMethod, KortexCommandName, KortexCommandTier }
 
 export type KortexCommandStatus = 'accepted' | 'completed' | 'failed' | 'replayed' | 'blocked'
 
@@ -49,9 +47,11 @@ export type KortexCommandSummary = {
   commandName: KortexCommandName
   operationId: string | null
   operationKind: string
+  tier: KortexCommandTier
   portalId: string | null
   hubspotPortalId: string | null
   workspaceId: string | null
+  conversationId: string | null
   releaseCandidateId: string | null
   deploymentMode: 'dry_run' | 'execute' | null
   status: string | null
@@ -78,10 +78,13 @@ export type KortexCommandExecutionInput = {
 }
 
 export type KortexUpstreamCommand = {
+  method: KortexCommandHttpMethod
   path: string
   body: Record<string, unknown>
   operationKind: KortexCommandSummary['operationKind']
+  tier: KortexCommandTier
   deploymentMode: KortexCommandSummary['deploymentMode']
   workspaceId: string | null
+  conversationId: string | null
   releaseCandidateId: string | null
 }

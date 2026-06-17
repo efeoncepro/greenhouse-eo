@@ -8,6 +8,7 @@ const mocks = vi.hoisted(() => ({
   executeApiPlatformCommand: vi.fn(),
   parseIdempotencyKey: vi.fn(),
   fetchKortexCommandJson: vi.fn(),
+  isKortexCommandAdminEnabled: vi.fn(),
   isKortexCommandAdapterEnabled: vi.fn(),
   isKortexCommandLiveExecuteEnabled: vi.fn(),
   resolveKortexCommandScope: vi.fn(),
@@ -32,6 +33,7 @@ vi.mock('./client', () => ({
 }))
 
 vi.mock('./flags', () => ({
+  isKortexCommandAdminEnabled: () => mocks.isKortexCommandAdminEnabled(),
   isKortexCommandAdapterEnabled: () => mocks.isKortexCommandAdapterEnabled(),
   isKortexCommandLiveExecuteEnabled: () => mocks.isKortexCommandLiveExecuteEnabled()
 }))
@@ -79,6 +81,7 @@ const PREFLIGHT = {
 
 beforeEach(() => {
   vi.clearAllMocks()
+  mocks.isKortexCommandAdminEnabled.mockReturnValue(false)
   mocks.isKortexCommandAdapterEnabled.mockReturnValue(true)
   mocks.isKortexCommandLiveExecuteEnabled.mockReturnValue(false)
   mocks.parseIdempotencyKey.mockReturnValue('idem-1')
@@ -100,14 +103,17 @@ beforeEach(() => {
 })
 
 describe('Kortex command adapter', () => {
-  it('parses only supported command names with an auditable reason', async () => {
+  it('parses every registry command name with an auditable reason', async () => {
     const { parseKortexCommandRequest } = await import('./adapter')
+    const { KORTEX_COMMAND_NAMES } = await import('./registry')
 
-    expect(parseKortexCommandRequest({
-      commandName: 'kortex.audit.run',
-      reason: 'Run a complete portal audit',
-      payload: { auditType: 'readiness' }
-    }).commandName).toBe('kortex.audit.run')
+    for (const commandName of KORTEX_COMMAND_NAMES) {
+      expect(parseKortexCommandRequest({
+        commandName,
+        reason: `Run governed Kortex command ${commandName}`,
+        payload: { auditType: 'readiness' }
+      }).commandName).toBe(commandName)
+    }
 
     expect(() => parseKortexCommandRequest({
       commandName: 'kortex.unknown',
@@ -180,6 +186,7 @@ describe('Kortex command adapter', () => {
       request: REQUEST
     }))
     expect(mocks.fetchKortexCommandJson).toHaveBeenCalledWith(expect.objectContaining({
+      method: 'POST',
       path: '/api/v1/strategy/release-candidates/rc-1/execute',
       idempotencyKey: 'idem-1',
       body: expect.objectContaining({ deployment_mode: 'dry_run' })
@@ -209,6 +216,28 @@ describe('Kortex command adapter', () => {
     expect(mocks.fetchKortexCommandJson).not.toHaveBeenCalled()
   })
 
+  it('blocks all external-write release variants unless live execute is enabled', async () => {
+    const { runKortexAdminCommand } = await import('./adapter')
+
+    await expect(runKortexAdminCommand({
+      request: REQUEST,
+      tenant: TENANT,
+      body: {
+        commandName: 'kortex.strategy.release_candidate.execute_workflows',
+        hubspotPortalId: '51183921',
+        reason: 'Execute approved Kortex workflow candidates',
+        payload: { releaseCandidateId: 'rc-1' },
+        confirmation: {
+          confirmed: true,
+          phrase: 'EXECUTE KORTEX RELEASE',
+          previewCommandExecutionId: 'cmd-preview-1'
+        }
+      }
+    })).rejects.toMatchObject({ errorCode: 'kortex_live_execute_disabled' })
+
+    expect(mocks.fetchKortexCommandJson).not.toHaveBeenCalled()
+  })
+
   it('requires a matching dry-run preview before live execute', async () => {
     mocks.isKortexCommandLiveExecuteEnabled.mockReturnValueOnce(true)
 
@@ -235,7 +264,112 @@ describe('Kortex command adapter', () => {
       releaseCandidateId: 'rc-1'
     })
     expect(mocks.fetchKortexCommandJson).toHaveBeenCalledWith(expect.objectContaining({
+      path: '/api/v1/strategy/release-candidates/rc-1/execute',
       body: expect.objectContaining({ deployment_mode: 'execute' })
     }))
   })
+
+  it('maps a newly enabled strategy stateful command through the registry', async () => {
+    const { runKortexAdminCommand } = await import('./adapter')
+
+    await runKortexAdminCommand({
+      request: REQUEST,
+      tenant: TENANT,
+      body: {
+        commandName: 'kortex.strategy.conversation.create',
+        hubspotPortalId: '51183921',
+        reason: 'Create a Kortex strategy conversation from Greenhouse',
+        payload: { title: 'Portal strategy', defaultModelEngine: 'claude' }
+      }
+    })
+
+    expect(mocks.fetchKortexCommandJson).toHaveBeenCalledWith(expect.objectContaining({
+      method: 'POST',
+      path: '/api/v1/strategy/conversations',
+      body: expect.objectContaining({
+        hubspot_portal_id: 51183921,
+        title: 'Portal strategy',
+        default_model_engine: 'claude'
+      })
+    }))
+  })
+
+  it('maps the hub profile command with PUT and required hubs payload', async () => {
+    const { runKortexAdminCommand } = await import('./adapter')
+
+    await runKortexAdminCommand({
+      request: REQUEST,
+      tenant: TENANT,
+      body: {
+        commandName: 'kortex.portal.hub_profile.put',
+        hubspotPortalId: '51183921',
+        reason: 'Update Kortex hub profile for this portal',
+        payload: { hubs: [{ hub_code: 'crm', tier: 'enterprise' }] }
+      }
+    })
+
+    expect(mocks.fetchKortexCommandJson).toHaveBeenCalledWith(expect.objectContaining({
+      method: 'PUT',
+      path: '/api/v1/portals/51183921/hub-profile',
+      body: { hubs: [{ hub_code: 'crm', tier: 'enterprise' }] }
+    }))
+  })
+
+  it('blocks admin breakglass commands unless the admin flag and phrase are present', async () => {
+    const { runKortexAdminCommand } = await import('./adapter')
+
+    await expect(runKortexAdminCommand({
+      request: REQUEST,
+      tenant: TENANT,
+      body: {
+        commandName: 'kortex.admin.snapshots.trigger',
+        hubspotPortalId: '51183921',
+        reason: 'Trigger Kortex snapshots from Greenhouse',
+        payload: {}
+      }
+    })).rejects.toMatchObject({ errorCode: 'kortex_admin_command_disabled' })
+
+    mocks.isKortexCommandAdminEnabled.mockReturnValueOnce(true)
+
+    await expect(runKortexAdminCommand({
+      request: REQUEST,
+      tenant: TENANT,
+      body: {
+        commandName: 'kortex.admin.snapshots.trigger',
+        hubspotPortalId: '51183921',
+        reason: 'Trigger Kortex snapshots from Greenhouse',
+        payload: {},
+        confirmation: { confirmed: true, phrase: 'WRONG PHRASE' }
+      }
+    })).rejects.toMatchObject({ errorCode: 'kortex_admin_confirmation_required' })
+
+    expect(mocks.fetchKortexCommandJson).not.toHaveBeenCalled()
+  })
+
+  it('allows admin breakglass commands with the admin flag and phrase', async () => {
+    mocks.isKortexCommandAdminEnabled.mockReturnValueOnce(true)
+
+    const { runKortexAdminCommand } = await import('./adapter')
+
+    await runKortexAdminCommand({
+      request: REQUEST,
+      tenant: TENANT,
+      body: {
+        commandName: 'kortex.admin.snapshots.trigger',
+        hubspotPortalId: '51183921',
+        reason: 'Trigger Kortex snapshots from Greenhouse',
+        payload: {},
+        confirmation: {
+          confirmed: true,
+          phrase: 'EXECUTE KORTEX ADMIN COMMAND'
+        }
+      }
+    })
+
+    expect(mocks.fetchKortexCommandJson).toHaveBeenCalledWith(expect.objectContaining({
+      path: '/api/v1/admin/snapshots/trigger',
+      body: expect.objectContaining({ hubspot_portal_id: 51183921 })
+    }))
+  })
+
 })

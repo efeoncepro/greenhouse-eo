@@ -6,6 +6,8 @@ export const isKortexCommandAdapterEnabled = () => truthy(process.env.KORTEX_COM
 
 export const isKortexCommandLiveExecuteEnabled = () => truthy(process.env.KORTEX_COMMAND_LIVE_EXECUTE_ENABLED)
 
+export const isKortexCommandAdminEnabled = () => truthy(process.env.KORTEX_COMMAND_ADMIN_ENABLED)
+
 export const resolveKortexCommandAllowedPortals = () =>
   (process.env.KORTEX_COMMAND_ALLOWED_PORTALS ?? '')
     .split(',')

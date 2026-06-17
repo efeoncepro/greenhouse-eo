@@ -3,19 +3,14 @@ import 'server-only'
 import { ApiPlatformError } from '@/lib/api-platform/core/errors'
 import { redactErrorForResponse } from '@/lib/observability/redact'
 
+import { getKortexCommandDefinition, KORTEX_COMMAND_PATH_PATTERNS } from './registry'
 import type { KortexCommandName } from './types'
 
 const DEFAULT_KORTEX_COMMAND_BASE_URL = 'https://kortex-control-plane-758246035804.us-central1.run.app'
 const KORTEX_COMMAND_TIMEOUT_MS = 120_000
 
-const ALLOWED_COMMAND_PATH_PATTERNS = [
-  /^\/api\/v1\/audits\/run$/,
-  /^\/api\/v1\/strategy\/workspaces\/[^/]+\/compile$/,
-  /^\/api\/v1\/strategy\/release-candidates\/[^/]+\/execute$/
-]
-
 export const isAllowedKortexCommandPath = (path: string) =>
-  ALLOWED_COMMAND_PATH_PATTERNS.some(pattern => pattern.test(path))
+  KORTEX_COMMAND_PATH_PATTERNS.some(pattern => pattern.test(path))
 
 export const resolveKortexCommandBaseUrl = () =>
   (
@@ -30,8 +25,14 @@ const resolveKortexCommandToken = () =>
   process.env.KORTEX_CONTROL_PLANE_TOKEN?.trim() ||
   ''
 
+const resolveKortexAdminBootstrapToken = () =>
+  process.env.KORTEX_COMMAND_ADMIN_TOKEN?.trim() ||
+  process.env.KORTEX_ADMIN_BOOTSTRAP_TOKEN?.trim() ||
+  ''
+
 export const fetchKortexCommandJson = async <T>({
   path,
+  method,
   body,
   commandName,
   idempotencyKey,
@@ -39,6 +40,7 @@ export const fetchKortexCommandJson = async <T>({
   timeoutMs = KORTEX_COMMAND_TIMEOUT_MS
 }: {
   path: string
+  method: 'POST' | 'PUT' | 'PATCH'
   body: Record<string, unknown>
   commandName: KortexCommandName
   idempotencyKey: string | null
@@ -56,11 +58,16 @@ export const fetchKortexCommandJson = async <T>({
   const controller = new AbortController()
   const timeout = setTimeout(() => controller.abort(), timeoutMs)
   const token = resolveKortexCommandToken()
+
+  const adminToken = getKortexCommandDefinition(commandName).tier === 'admin_breakglass'
+    ? resolveKortexAdminBootstrapToken()
+    : ''
+
   const url = `${resolveKortexCommandBaseUrl()}${path}`
 
   try {
     const response = await fetch(url, {
-      method: 'POST',
+      method,
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',
@@ -68,6 +75,7 @@ export const fetchKortexCommandJson = async <T>({
         'X-Greenhouse-Command-Name': commandName,
         ...(idempotencyKey ? { 'X-Greenhouse-Idempotency-Key': idempotencyKey } : {}),
         ...(actorUserId ? { 'X-Greenhouse-Actor-Id': actorUserId } : {}),
+        ...(adminToken ? { 'X-Kortex-Admin-Token': adminToken } : {}),
         ...(token ? { Authorization: `Bearer ${token}` } : {})
       },
       body: JSON.stringify(body),

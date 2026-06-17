@@ -14,6 +14,8 @@ export type ApiPlatformErrorCode =
   | 'invalid_session'
   | 'invalid_token'
   | 'kortex_binding_missing'
+  | 'kortex_admin_command_disabled'
+  | 'kortex_admin_confirmation_required'
   | 'kortex_command_adapter_disabled'
   | 'kortex_confirmation_required'
   | 'kortex_live_execute_disabled'

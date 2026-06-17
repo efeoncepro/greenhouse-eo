@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
@@ -15,7 +15,7 @@
 - UI impact: `none`
 - Backend impact: `command`
 - Epic: `none`
-- Status real: `Rollout externo en ejecucion`
+- Status real: `Complete; staging smoke passed end-to-end against Kortex runtime portal 48713323`
 - Rank: `TBD`
 - Domain: `platform|crm|integrations|ops|ecosystem|hubspot`
 - Blocked by: `none`
@@ -89,7 +89,7 @@ Reglas obligatorias:
 - `docs/architecture/GREENHOUSE_KORTEX_COMMAND_ADAPTER_V1.md`
 - `docs/documentation/plataforma/kortex-command-adapter.md`
 - `docs/manual-de-uso/plataforma/kortex-command-adapter.md`
-- `docs/tasks/in-progress/TASK-1164-kortex-greenhouse-command-adapter-hubspot-strategy-ops.md`
+- `docs/tasks/complete/TASK-1164-kortex-greenhouse-command-adapter-hubspot-strategy-ops.md`
 
 ## Current Repo State
 
@@ -101,7 +101,16 @@ Reglas obligatorias:
 
 ### Gap
 
-- Staging smoke real pendiente porque requiere configurar flags/secrets externos y validar Kortex mutative path con portal allowlist.
+- Greenhouse staging deploy esta activo y los flags externos quedaron configurados.
+- El smoke real llega a Kortex, pero `kortex.audit.run` queda bloqueado por el runtime externo de Kortex: la instalacion HubSpot `runtime` para portal `51183921` esta `reconnect_required` y el refresh token devuelve `BAD_SCOPES / missing or invalid scopes`.
+- La solucion no era cambiar el adapter ni inventar tokens: el app runtime de Kortex estaba pidiendo scopes de cuenta/tier como required o como optional_scope masivo durante el install base.
+- Fix externo aplicado en Kortex: `crm.schemas.custom.write` movido a `conditionallyRequiredScopes`; `tax_rates.read` movido a optional; `settings.currencies.*` y `settings.billing.write` removidos del install runtime; `/hubspot/oauth/authorize` ya no envia `optional_scope` por defecto y solo lo incluye con opt-in explicito. Commit Kortex: `d664be9`.
+- Cloud Run Kortex desplegado con la correccion de scopes en `kortex-control-plane-00103-pw6`; verificacion runtime del URL de re-consent: `optional_scope` ausente, `required_count=68`, sin `crm.schemas.custom.write`, `tax_rates.read`, `settings.currencies.*` ni `settings.billing.write` en required.
+- Follow-up OAuth selector aplicado en Kortex commit `7266902` y Cloud Run `kortex-control-plane-00104-4dh`: el install base ahora usa `https://app.hubspot.com/oauth/authorize` y guarda `hubspot_portal_id=null` en state, permitiendo seleccionar otro portal durante OAuth. El lock anterior solo queda disponible bajo opt-in explicito `lock_hubspot_portal=true`.
+- Re-consent completado por el operador en portal HubSpot `48713323` (`www.efeoncepro.com`). Kortex DB confirma runtime install `active`, `scope_count=68`, `reconnect_required=false`.
+- Binding Greenhouse creado para el portal Kortex `9b0a6e91-0e08-4642-bc42-54a4b5c83ad8` / HubSpot `48713323`: `EO-SPB-0002`, `binding_status=active`, `greenhouse_scope_type=internal`.
+- Staging allowlist actualizado: `KORTEX_COMMAND_ALLOWED_PORTALS=51183921,48713323,9b0a6e91-0e08-4642-bc42-54a4b5c83ad8`.
+- Redeploy staging Ready: `https://greenhouse-mq9uqn9hz-efeonce-7670142f.vercel.app`.
 
 ## Backend/Data Contract
 
@@ -230,8 +239,9 @@ Response minimo:
 
 ### Out-of-band coordination required
 
-- Configurar env/secrets staging en Vercel/GCP/Kortex.
-- Validar token server-to-server si Kortex exige auth para POST.
+- Re-consent OAuth completado para portal HubSpot `48713323`.
+- Smoke `POST /api/admin/kortex/commands` ejecutado contra staging y Kortex runtime real.
+- Mantener `KORTEX_COMMAND_LIVE_EXECUTE_ENABLED=false` hasta aprobacion explicita de live execute.
 
 ## Acceptance Criteria
 
@@ -242,7 +252,7 @@ Response minimo:
 - [x] `execute` live no corre sin dry-run/preview vigente, confirmacion humana, reason e idempotency key.
 - [x] Greenhouse no muta HubSpot directo ni almacena tokens HubSpot/Kortex.
 - [x] Tests focales cubren parser, idempotency missing, flag disabled, dry-run dispatch, live flag y preview.
-- [ ] Staging smoke deja evidencia de command execution row y Kortex operation/status redacted.
+- [x] Staging smoke deja evidencia de command execution row y Kortex operation/status redacted.
 - [x] Production queda deployable con live execute disabled por default.
 
 ## Verification
@@ -255,15 +265,74 @@ NODE_OPTIONS=--max-old-space-size=8192 pnpm exec tsc --noEmit --pretty false
 pnpm docs:closure-check
 ```
 
+### Staging Rollout Evidence — 2026-06-17
+
+- Commit desplegado: `076d31f99` en `origin/develop`.
+- Deployment Vercel staging: `https://greenhouse-h4py587vz-efeonce-7670142f.vercel.app`, status `Ready`, branch `develop`, commit `076d31f`.
+- Flags Vercel staging configuradas:
+  - `KORTEX_COMMAND_ADAPTER_ENABLED=true`
+  - `KORTEX_COMMAND_LIVE_EXECUTE_ENABLED=false`
+  - `KORTEX_COMMAND_ALLOWED_PORTALS=51183921`
+  - `KORTEX_COMMAND_API_BASE_URL=https://kortex-control-plane-758246035804.us-central1.run.app`
+- Smoke Greenhouse:
+  - `GET /api/admin/kortex/control-plane?hubspot_portal_id=51183921` -> `200`, contract `greenhouse-kortex-control-plane-reader.v1`, capabilities Kortex observadas.
+  - `POST /api/admin/kortex/commands` con `kortex.strategy.release_candidate.execute` -> `409`, code `kortex_live_execute_disabled`, esperado por guardrail.
+  - `POST /api/admin/kortex/commands` con `kortex.audit.run` -> `400`, code `kortex_preflight_failed`; upstream Kortex devuelve HubSpot token refresh `403 BAD_SCOPES / missing or invalid scopes`.
+- Diagnostico Kortex externo:
+  - Cloud Run `kortex-control-plane` vive en GCP project `efeonce-kortex-dev`.
+  - Instalacion `integration.hubspot_app_installations` para portal `51183921`, app_role `runtime`, esta en `reconnect_required`.
+  - Los secrets runtime disponibles (`kortex-hubspot-refresh-token-runtime-51183921` y legacy `kortex-hubspot-refresh-token-51183921`) tienen el mismo hash y ambos fallan refresh con HubSpot `403 access_denied`.
+  - El secret embedded refresca, pero solo corresponde al app low-scope y no desbloquea el runtime broad-scope.
+
+### External OAuth Fix + Final Smoke Evidence — 2026-06-17
+
+- Kortex scopefix commit: `d664be9`.
+- Kortex generic portal selector commit: `7266902`.
+- Kortex Cloud Run final revision: `kortex-control-plane-00104-4dh`.
+- HubSpot OAuth selected portal: `48713323` / `www.efeoncepro.com`.
+- Kortex runtime install verification: `install_status=active`, `scope_count=68`, `reconnect_required=false`.
+- Greenhouse binding created: `EO-SPB-0002`, external `portal:9b0a6e91-0e08-4642-bc42-54a4b5c83ad8`, status `active`.
+- Vercel staging allowlist updated and redeployed:
+  - URL: `https://greenhouse-mq9uqn9hz-efeonce-7670142f.vercel.app`
+  - Deployment status: `Ready`
+  - `KORTEX_COMMAND_ALLOWED_PORTALS=51183921,48713323,9b0a6e91-0e08-4642-bc42-54a4b5c83ad8`
+- Final smoke:
+  - `POST /api/admin/kortex/commands` with `kortex.audit.run`, `hubspotPortalId=48713323` -> `200`.
+  - `commandExecutionId=EO-APC-9D220439`.
+  - `kortexOperationId=025a960d-576f-48e3-ab16-e6183c6bb0ae`.
+  - Summary: `operationKind=audit_run`, `status=completed`, observed keys `audit_run`, `findings`, `heuristics_report`, `objective_links`, `portal`, `scorecard`, `snapshot`.
+
+### QA Release Audit — 2026-06-17
+
+- Verdict: `PASS`
+- Closure state: `complete`
+- Risk classification: external integration + env/flag/deploy + security-sensitive secret boundary.
+- Evidence passed:
+  - Greenhouse code, build and deploy staging OK.
+  - Vercel staging env flags configured.
+  - Control-plane reader smoke OK.
+  - Live execute guardrail smoke OK (`kortex_live_execute_disabled`).
+  - Kortex runtime OAuth re-consent completed for portal `48713323`.
+  - Binding `EO-SPB-0002` active.
+  - Final command adapter smoke OK (`kortex.audit.run` -> `200`, `completed`).
+  - Documentation/task lifecycle gates OK.
+- Blocker:
+  - none.
+- False-closure traps checked:
+  - Tests green do not prove Kortex runtime OAuth health.
+  - Greenhouse staging env vars are present and were redeployed before final smoke.
+  - Embedded low-scope token cannot be substituted for runtime broad-scope commands.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 4 — DELIVERY, VERIFICATION & CLOSURE
      ═══════════════════════════════════════════════════════════ -->
 
 ## Closing Protocol
 
-- Mantener `in-progress` hasta staging smoke externo.
-- Documentar flags/env y evidencia en `Handoff.md`.
-- Mover a `complete/` solo con smoke staging o con decision explicita de cerrar como rollout pendiente.
+- Re-consent OAuth Kortex runtime completado.
+- Smoke staging externo completado.
+- Flags/env y evidencia documentados en `Handoff.md`.
+- Movido a `complete/` con live execute production aun disabled por guardrail.
 
 ## Operational Notes
 
