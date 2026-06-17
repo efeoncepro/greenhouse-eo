@@ -1,0 +1,19 @@
+# claude-md content-loss audit — accepted removal/reword allowlist (TASK-1160)
+#
+# Each non-comment line is a normalized line from the ORIGINAL CLAUDE.md
+# (baseline 27ce06a11) that no longer exists verbatim in the live corpus for a
+# LEGITIMATE reason — a companion doc reworded it, or a rule was DELIBERATELY
+# retired — NOT because it was accidentally dropped. Adding a line here tells the
+# audit "this evolved on purpose; stop flagging it as lost". Applies to BOTH tiers.
+#
+# Rules of the road:
+#   - Append-only, reviewed in PR. Each entry should be obvious-on-read (or carry
+#     a `#` comment above it) why the original phrasing no longer exists verbatim.
+#   - Retiring a tier-1 rule (NUNCA/SIEMPRE) is a governance act: always add a
+#     justifying comment so the reason survives. Prefer restoring over retiring.
+#   - Paste the line exactly as the audit prints it under "orphan ... lines"
+#     (whitespace already normalized). Leading/trailing spaces are trimmed.
+#
+# As of the extension commit: EMPTY — the refactor relocated every block verbatim,
+# so all 1152 rule lines + 4190 content lines are reachable (0 orphans). New
+# entries appear only when content legitimately evolves away from the original.

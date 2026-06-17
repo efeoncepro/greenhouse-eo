@@ -7,12 +7,14 @@
  *
  *   pnpm claude-md inventory [--top=N] [--json]   # enumerate sections by size
  *   pnpm claude-md budget    [--strict]           # token-budget gate (35k ceiling)
- *   pnpm claude-md audit     [--strict] [--list]  # rule-loss safety net (0 orphans)
+ *   pnpm claude-md audit     [--strict] [--list]  # content-loss safety net (0 orphans)
  *   pnpm claude-md check                          # budget --strict + audit --strict
  *   pnpm claude-md help
  *
  * `check` is the closing gate the documentation-governor references: it proves
- * the file is under budget AND no original NUNCA/SIEMPRE rule became unreachable.
+ * the file is under budget AND no original content from the pre-refactor
+ * CLAUDE.md became unreachable — tier 1 (NUNCA/SIEMPRE rules) AND tier 2 (every
+ * meaningful line: prose, code, paths, tables).
  */
 
 import { spawnSync } from 'node:child_process'
@@ -35,7 +37,7 @@ Usage:
 Commands:
   inventory [--top=N] [--json]    Enumerate CLAUDE.md sections by token weight + NUNCA/SIEMPRE.
   budget    [--strict]            Token-budget gate (35k ceiling). --strict fails (exit 1) if over.
-  audit     [--strict] [--list]   Rule-loss safety net: every original rule still reachable (0 orphans).
+  audit     [--strict] [--list]   Content-loss safety net: every original rule (tier 1) AND content line (tier 2) still reachable (0 orphans).
   check                           Closing gate = budget --strict + audit --strict.
   help                            Show this help.
 `

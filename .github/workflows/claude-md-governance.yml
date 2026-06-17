@@ -35,7 +35,7 @@ permissions:
 
 jobs:
   claude-md:
-    name: CLAUDE.md budget + rule-loss audit
+    name: CLAUDE.md budget + content-loss audit
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -50,8 +50,11 @@ jobs:
         # and inherited by every subagent.
         run: node scripts/ci/claude-md.mjs budget --strict
 
-      - name: Rule-loss audit (WARN — surfaces any original rule that became unreachable)
-        # Safety net: every NUNCA/SIEMPRE line of the frozen original CLAUDE.md must
-        # stay reachable in the live corpus (CLAUDE.md ∪ docs ∪ skills). Kept in WARN
-        # so a legitimately-retired rule does not hard-block, but the drift is visible.
-        run: node scripts/ci/claude-md.mjs audit
+      - name: Content-loss audit (STRICT — fails if any original line became unreachable)
+        # Safety net (two tiers): every NUNCA/SIEMPRE rule line (tier 1) AND every
+        # meaningful content line — prose, code, paths, tables (tier 2) — of the frozen
+        # original CLAUDE.md must stay reachable in the live corpus (CLAUDE.md ∪ docs ∪
+        # skills). STRICT is safe because legitimate evolution (a reworded companion
+        # line, a deliberately-retired rule) has a reviewed, append-only escape hatch:
+        # scripts/ci/claude-md-content-allowlist.txt. Accidental drops hard-fail.
+        run: node scripts/ci/claude-md.mjs audit --strict
