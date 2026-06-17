@@ -1,5 +1,14 @@
 # Release 2026-06-10 #2 — develop→main `6c649b2a6` RELEASED
 
+## Sesión 2026-06-16 — TASK-1159 Public Site Astro: SEO foundation + service landing shell — Claude
+
+> **Estado:** complete (implementación). Trabajo **local-first en el repo sibling `efeonce-web`** (`/Users/jreye/Documents/efeonce-web`, rama `feature/task-1159-public-site-astro-seo-foundation`, **7 commits sin push**). **No cutover por diseño**; push a `develop` (que dispara un preview Vercel **noindex**) queda como decisión del operador.
+
+- **Qué se construyó (5 slices):** (1) route hygiene **block-not-delete** — las 5 preview pages (`primitives`/`blocks`/`forms-test`/`header-*`) quedan `noindex` + excluidas de sitemap/robots, no se borran. (2) **SEO foundation:** `src/lib/seo.ts` SSOT typed (`generateMeta` + JSON-LD Organization/WebPage/Breadcrumb/FAQ), `BaseLayout` lo consume, **canonical arreglado a `Astro.site` (apex)** (antes `localhost` en preview), sitemap `filter` + `robots.txt`, `og-default.png` 1200×630, 29 tests. (3) **Tokens:** auditados/maduros; provenance→v1.1; **drift de palette capability (Wave azul/cyan vs v1.1 indigo/violeta/verde) documentado como follow-up** — NO swap a ciegas (alto blast radius). (4) **Gate de primitives:** vocabulario real de la ref `efeonce-sp/.../service-web` → `Icon.astro` **lucide zero-JS** + `DifferentiatorRows` (S4) + `LeadForm` (S12); **Pricing descartado** (no existe en el landing web). (5) **Shell coded-first:** `servicios/[slug].astro` (getStaticPaths) + `service-landings.ts` (typed, **source-agnostic**) + `SectionRenderer` (switch con exhaustividad `never`) + **piloto Wave `/servicios/wave`**; `AGENTS.md` de efeonce-web actualizado (supersede la dirección ACF CPT de su TASK-010).
+- **Evidencia:** `npm run ci` verde (lint/prettier/astro check 0/0/29 tests/build). Playwright 1440+390: **el scrollWidth check atrapó un overflow mobile real** (hero h1 fijo 72px, 521>390) → fix a nivel token: **`--text-display-xl/-lg` fluidos con `clamp()`**. Re-verificado: 0 overflow ambos viewports/rutas. Lighthouse Wave: **a11y 95**; SEO 69 / perf 68 / BP 57 **deprimidos por el entorno** (noindex del piloto + http.server local + form sin env), no por el código.
+- **Decisiones del operador:** piloto = **Desarrollo Web → Wave**; **palette v1.1 diferida**; commits **sin push**.
+- **Follow-ups:** TASK-1160 (binding reader Greenhouse, **read-API-first** / Full API Parity), TASK-1161/1162 (landings finales + pipeline `<Image>` + assets), reconciliación palette v1.1, cutover front-door. `efeonce-web` necesita push del operador para tener preview remoto.
+
 ## Sesión 2026-06-16 — TASK-1157 OOM del build de Vercel resuelto ($0) — Claude
 
 > **Estado:** complete en `develop` (commits `5d4bcf7c7` + `0900fc183`), deploy de staging verde verificado live. El OOM flaky que bloqueaba deploys quedó resuelto sin pagar Enhanced Builds.
@@ -11,11 +20,21 @@
 - **Determinismo:** 1er build con fix verde + contraste claro; se confirma con los próximos pushes a develop (cada uno buildea ya con el fix). Si el build vuelve a crecer → follow-up de disciplina de route-count.
 - **Convivencia:** se trabajó en paralelo con el sweep de tipografía de Codex (`monoId`) sobre los componentes del roadmap (commit `0c392cb38`); el drawer "Abrir task" (TASK-1153 follow-up) sobrevivió intacto (GVC mirado).
 
+## Sesión 2026-06-16 — Roadmap cockpit enterprise polish + TASK-1159 state sync — Codex
+
+> **Estado:** `/roadmap` optimizado en local con skills de Product Design/enterprise UI + GVC loop verde. TASK-1159 queda sincronizada como `in-progress`; no se ejecutó aún el repo Astro `efeonce-web`.
+
+- **Superficie UI:** `/roadmap` quedó más denso y enterprise: KPI tiles compactos, filter toolbar en una sola línea desktop, lanes/cards menos infladas con selección/hover más claros, inspector con acciones alcanzables y drawer mobile estable full-width.
+- **Scenario GVC:** `scripts/frontend/scenarios/roadmap-cockpit.scenario.ts` ahora abre un item estable (`TASK-025`) y espera la transición antes de capturar inspector/drawer, evitando falsos positivos de auth y frames mid-animation.
+- **Evidencia:** GVC final `.captures/2026-06-16T20-59-19_roadmap-cockpit` pasó desktop+mobile con `0` findings; frames revisados manualmente.
+- **Validación:** ESLint focal 0; `NODE_OPTIONS=--max-old-space-size=8192 pnpm exec tsc --noEmit` 0; `pnpm design:lint` 0 warnings; `git diff --check` 0; `pnpm qa:gates --changed --agent codex` revisado.
+- **Cierre documental:** registry de TASK-1159 sincronizado a `in-progress`. Queda pendiente ejecutar la task real en `/Users/jreye/Documents/efeonce-web` antes de moverla a complete.
+
 ## Sesión 2026-06-16 — TASK-1159 Public Site Astro SEO foundation task — Codex
 
-> **Estado:** task creada en `docs/tasks/to-do/`; sin implementación runtime. Siguiente paso recomendado después de TASK-1158.
+> **Estado:** task creada y luego tomada como `in-progress`; sin implementación runtime. Siguiente paso recomendado después de TASK-1158.
 
-- **Entregable:** `docs/tasks/to-do/TASK-1159-public-site-astro-seo-foundation-service-landing-shell.md`.
+- **Entregable:** `docs/tasks/in-progress/TASK-1159-public-site-astro-seo-foundation-service-landing-shell.md`.
 - **Scope:** preparar `efeonce-web` como rail Astro/Vercel ejecutable para landings reales: limpiar rutas demo/scaffold, centralizar SEO/canonical/sitemap/robots/OG, tokenizar Ohio/Figma contra Brand Guideline Efeonce y construir shell reusable de landing de servicio con microinteracciones, responsive, GVC/Lighthouse y no-cutover posture.
 - **Corte deliberado:** no mezcla el backend/control-plane Greenhouse↔Vercel/GitHub. Ese follow-up queda como TASK-1160 candidata (`backend-data`, integration) para reader/binding desde Greenhouse.
 - **Validación esperada al crear:** `pnpm task:lint --task TASK-1159`, `pnpm ops:lint --changed`, `pnpm docs:closure-check`.
