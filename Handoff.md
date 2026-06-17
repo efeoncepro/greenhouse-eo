@@ -1,3 +1,17 @@
+# Release 2026-06-17 — develop→main `37e09a9c2` RELEASED
+
+> **Estado:** `released` (manifest transicionó a released, post-release health check verde). Orchestrator run [`27721723752`](https://github.com/efeoncepro/greenhouse-eo/actions/runs/27721723752) `completed/success`. Conducido por Claude tras pedido del operador ("paso a producción que Codex dejó preparado").
+
+- **Target SHA:** `37e09a9c2ad9a93723725804a00f78a3710c7dc6` (merge `--no-ff` de `origin/develop` `e230597161`; 202 commits / 840 archivos acumulados desde el release del 06-13).
+- **Contenido mayor:** Nexa Intelligence conversational experience (TASK-1110/1124/1131/1134/1137/1138/1139/1141-1149), Knowledge hybrid retrieval (TASK-1136/1140/1151), UI Composition Shell + Adaptive Card density (TASK-1114-1119), Roadmap cockpit (TASK-1152/1153), Public Site Astro/WordPress content factory (TASK-1159/1161/1167, EPIC-019), CLAUDE.md router refactor (TASK-1160), Kortex GitHub control plane (TASK-1162/1166), account-360 parity (TASK-1106), API platform command executions (TASK-655), Vercel build OOM fix (TASK-1157, ISSUE-095/096).
+- **Batch policy:** decision `requires_break_glass` (dominios irreversibles independientes: payroll + auth_access + db_migrations + cloud_release). Resuelto con marker `[release-coupled: …]` en el body del merge + `bypass_preflight_reason` en el dispatch (override scopeado SOLO al check 4 — Sentry/CI/migrations/Vercel siguieron evaluándose). Mismo camino que el release del 06-13.
+- **Preflight:** local read-only diagnóstico (readyToDeploy=false esperado por tokens ausentes en local + 2 blockers reales). Orchestrator preflight (con tokens) `success`.
+- **Vercel prod:** build git-integration de `37e09a9c2` → `Ready` en 4m (`greenhouse-jq0gex8p7-efeonce-7670142f.vercel.app`), superó los 2 deploys errados por OOM de `vercel --prod` manuales del 06-16 (resolvió blocker `vercel_readiness`).
+- **Gates:** `production` aprobado 2 veces (1ª para el orchestrator, 2ª para los jobs Azure Teams gated del mismo run).
+- **Workers Cloud Run:** ops-worker, commercial-cost-worker, ico-batch-worker (us-east4), hubspot-greenhouse-integration (us-central1) → todos `success`. ops-worker `GIT_SHA=37e09a9c2` (revision `ops-worker-00358-vpf`). Azure Teams Bot/Notifications: gated, sin diff Bicep → deploy skipped (correcto, `force_infra_deploy=false`).
+- **Watchdog:** `pnpm release:watchdog --json` → `aggregateSeverity=ok`, `exitCode=0`, sin `worker_revision_drift` (signal `stale_approval` quedó `unknown` solo por falta de `GITHUB_RELEASE_OBSERVER_TOKEN` local — degradación de reader, no drift real).
+- **No validado:** smoke funcional E2E productivo manual (health check automático del orchestrator sí pasó).
+
 # Release 2026-06-10 #2 — develop→main `6c649b2a6` RELEASED
 
 ## Sesión 2026-06-17 — TASK-1161 Public Site Astro binding reader staging verified — Codex
