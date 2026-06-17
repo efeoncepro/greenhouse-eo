@@ -161,6 +161,14 @@ jobs:
         # tamaño real baje del target (~25-40k tokens).
         run: pnpm claude-md:budget
 
+      - name: CLAUDE.md rule-loss audit (TASK-1160)
+        # Red de seguridad del router-refactor: garantiza que cada línea NUNCA/SIEMPRE
+        # del CLAUDE.md original (baseline congelado) sigue alcanzable en el corpus vivo
+        # (CLAUDE.md ∪ docs/ ∪ skills). Si un bloque se trim-eó sin mover su regla al
+        # destino, aparece como huérfana. Run en modo warn durante la migración (Slice 3);
+        # el cierre de TASK-1160 exige 0 huérfanas.
+        run: pnpm claude-md:rule-audit
+
       - name: Test inventory
         run: pnpm test:inventory
 
