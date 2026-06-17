@@ -3371,6 +3371,10 @@ Validations: tsc 0 errors, lint 0 errors, 427 files / 2225 tests pass / 5 skippe
 - `/api/admin/email-deliveries` y la UI admin ya distinguen `sent` vs `delivered` vs `bounced` vs `complained`, evitando que un correo “aceptado por Resend” parezca automáticamente “entregado”.
 - `/api/cron/email-deliverability-monitor` deja de usar la query rota basada en `source_entity` y pasa a medir rebotes/complaints desde los timestamps reales del webhook.
 
+# 2026-06-17
+
+- Platform / Kortex: TASK-1162 agregó el reader read-only `greenhouse-kortex-control-plane-reader.v1` para observar Kortex desde Greenhouse como peer system: GitHub repo status, Kortex runtime summaries, binding via `sister_platform_bindings` y endpoint admin `GET /api/admin/kortex/control-plane`. Los endpoints mutativos de Kortex quedan bloqueados por allowlist y tests; `kortex.*` no se agregó a entitlements internos. Code complete local-first; staging endpoint smoke queda pendiente de deploy.
+
 ## 2026-04-13
 
 ### 2026-04-13 — TASK-392: Management Accounting Reliable Actual Foundation Program cerrado como entrega documental

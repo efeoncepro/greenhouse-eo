@@ -29,9 +29,20 @@
 - **Decisión destino fijada:** spec-first híbrido (default = spec repo-tracked en `docs/architecture/**`; skills repo-tracked → pointer; NO skills globales — rompen paridad Codex).
 - **Reversible:** docs + 3 scripts + CI wiring. `git revert` por tanda. Cero cambio semántico (relocación verbatim, probada por el auditor).
 
+## Sesión 2026-06-17 — TASK-1162 Kortex control-plane reader MVP — Codex
+
+> **Estado:** code complete local-first en `develop`; rollout/staging endpoint smoke pendiente. Sin cambio de rama/worktree por instrucción operativa vigente; branch declarada en la task queda como referencia.
+
+- **Ownership:** `docs/tasks/in-progress/TASK-1162-kortex-greenhouse-control-plane-reader-mvp.md`.
+- **Implementado:** `src/lib/kortex/control-plane/**` + `GET /api/admin/kortex/control-plane`, contrato `greenhouse-kortex-control-plane-reader.v1`, Sentry domain `integrations.kortex`, ADR `GREENHOUSE_KORTEX_CONTROL_PLANE_READER_V1.md`.
+- **Boundary:** CERO writes Kortex/HubSpot/GitHub. Allowlist GET solamente; tests bloquean `/api/v1/audits/run`, strategy compile y release execute.
+- **Runtime smoke local/external:** GitHub repo OK (`main`, 2 issues, 1 PR); Kortex OpenAPI/context/overview/audit OK; binding real `EO-SPB-0001` leído desde `sister_platform_bindings` para portal `0c0af3a3-627e-4e05-96f3-557712a2e06a`; `deployment-summary` y `adoption-kpis` responden 401 sin token dedicado y degradan honestamente.
+- **Validación:** Vitest focal 10/10; ESLint focal verde; `NODE_OPTIONS=--max-old-space-size=8192 pnpm exec tsc --noEmit --pretty false` verde; `pnpm task:lint --task TASK-1162` verde; `pnpm ops:lint --changed` verde; `pnpm docs:closure-check` verde; `pnpm qa:gates --changed --agent codex --task TASK-1162 --integration --runtime --auth --docs` ejecutado; `pnpm route-reachability-gate` verde; `NODE_OPTIONS=--max-old-space-size=8192 pnpm build` verde e incluye `/api/admin/kortex/control-plane`.
+- **QA verdict:** `CONDITIONAL PASS`; closure state `code complete, rollout pendiente`. Falta push/deploy y smoke de `GET /api/admin/kortex/control-plane` en staging con/sin `hubspot_portal_id=51183921` para mover lifecycle a `complete`.
+
 ## Sesión 2026-06-17 — TASK-1162 Kortex control-plane reader task — Codex
 
-> **Estado:** task creada; sin implementacion runtime.
+> **Estado:** task creada; sin implementacion runtime. Reemplazada por la entrada in-progress superior cuando Codex tomo la task.
 
 - **Entregable:** `docs/tasks/to-do/TASK-1162-kortex-greenhouse-control-plane-reader-mvp.md`; registry y README sincronizados (`siguiente ID disponible: TASK-1163`).
 - **Scope:** primer reader read-only para controlar Kortex desde Greenhouse: repo status `efeoncepro/kortex` via GitHub, runtime/OpenAPI Kortex, resumen por `portal_id`/`hubspot_portal_id`, capabilities observadas y degradacion honesta bajo contrato `kortex-control-plane-reader.v1`.

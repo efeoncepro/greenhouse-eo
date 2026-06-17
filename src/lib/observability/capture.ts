@@ -55,6 +55,7 @@ export type CaptureDomain =
   | 'identity'
   | 'integrations.notion'
   | 'integrations.hubspot'
+  | 'integrations.kortex'
   | 'integrations.nubox'
   | 'integrations.teams'
   | 'commercial'

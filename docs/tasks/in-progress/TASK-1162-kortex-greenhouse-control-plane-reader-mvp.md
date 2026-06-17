@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Medio`
@@ -15,7 +15,7 @@
 - UI impact: `none`
 - Backend impact: `integration`
 - Epic: `none`
-- Status real: `Diseno`
+- Status real: `Code complete local-first; rollout/staging endpoint smoke pendiente`
 - Rank: `TBD`
 - Domain: `platform|crm|integrations|ops|ecosystem`
 - Blocked by: `none`
@@ -109,7 +109,7 @@ Reglas obligatorias:
 - `src/lib/kortex/control-plane/composer.ts` `[crear]`
 - `src/app/api/admin/kortex/control-plane/route.ts` `[crear]`
 - `src/lib/reliability/queries/kortex-control-plane-health.ts` `[crear si aplica]`
-- `docs/architecture/GREENHOUSE_KORTEX_CONTROL_PLANE_READER_V1.md` `[crear]`
+- `docs/architecture/GREENHOUSE_KORTEX_CONTROL_PLANE_READER_V1.md`
 - `docs/tasks/README.md`
 - `docs/tasks/TASK_ID_REGISTRY.md`
 - `Handoff.md`
@@ -383,24 +383,50 @@ No feature flag for the read-only endpoint if it is admin-gated and additive. If
 
 ## Acceptance Criteria
 
-- [ ] `kortex-control-plane-reader.v1` is documented and typed.
-- [ ] Greenhouse can read `efeoncepro/kortex` repo status through a server-only reader with degraded-source handling.
-- [ ] Greenhouse can compose safe Kortex runtime read summaries without calling mutative endpoints.
-- [ ] Binding resolution uses `sister_platform_bindings` or returns a safe degraded/anti-oracle response.
-- [ ] `GET /api/admin/kortex/control-plane` returns the composed packet behind admin/internal access.
-- [ ] The task does not add `kortex.*` entries to Greenhouse internal entitlements.
-- [ ] Future command surfaces are explicitly deferred to follow-up task(s) with command/idempotency/audit/human-confirmation posture.
-- [ ] Runtime evidence includes at least one staging smoke against GitHub and Kortex runtime or a documented operational block.
+- [x] `kortex-control-plane-reader.v1` is documented and typed.
+- [x] Greenhouse can read `efeoncepro/kortex` repo status through a server-only reader with degraded-source handling.
+- [x] Greenhouse can compose safe Kortex runtime read summaries without calling mutative endpoints.
+- [x] Binding resolution uses `sister_platform_bindings` or returns a safe degraded/anti-oracle response.
+- [x] `GET /api/admin/kortex/control-plane` returns the composed packet behind admin/internal access.
+- [x] The task does not add `kortex.*` entries to Greenhouse internal entitlements.
+- [x] Future command surfaces are explicitly deferred to follow-up task(s) with command/idempotency/audit/human-confirmation posture.
+- [x] Runtime evidence includes at least one staging smoke against GitHub and Kortex runtime or a documented operational block.
+
+## Execution Notes
+
+- Implemented `src/lib/kortex/control-plane/**` with repository, runtime, binding and composer readers.
+- Added `GET /api/admin/kortex/control-plane`, guarded by `requireAdminTenantContext`.
+- Added allowlist tests that reject Kortex mutative paths including `/api/v1/audits/run`, `/api/v1/strategy/workspaces/*/compile` and `/api/v1/strategy/release-candidates/*/execute`.
+- Added route tests for admin gating, scoped query params and redacted unexpected failures.
+- Added architecture doc `docs/architecture/GREENHOUSE_KORTEX_CONTROL_PLANE_READER_V1.md` and decision index entry.
+- Added Sentry capture domain `integrations.kortex`.
+- No Kortex repo changes were required.
+- No `kortex.*` entries were added to Greenhouse internal entitlements.
+
+### Runtime Evidence 2026-06-17
+
+- GitHub smoke via reader: `efeoncepro/kortex`, default branch `main`, open issues `2`, open PRs `1`.
+- Kortex OpenAPI smoke via reader: title `Kortex OAuth Service`, current OpenAPI has no declared security scheme; reader remains allowlist/read-only.
+- Kortex context smoke for HubSpot portal `51183921`: resolves portal `0c0af3a3-627e-4e05-96f3-557712a2e06a`, status `active`, Greenhouse bridge binding `EO-SPB-0001`.
+- Greenhouse binding smoke with `.env.local` + Cloud SQL proxy: `sister_platform_bindings` resolves `EO-SPB-0001`, status `active`, greenhouse scope `internal`.
+- Kortex portal overview smoke: environment `staging`, installation `active`, latest deployment `failed`, live schema unavailable.
+- Kortex latest audit smoke: status `completed`, finding count `3`, score `88`.
+- Kortex `deployment-summary` and `adoption-kpis` returned `401 Unauthorized` without a dedicated read token; V1 degrades those optional sources and still surfaces deployment basics from `portal-runtime/overview`.
+- Greenhouse staging endpoint smoke is pending until code is pushed/deployed.
 
 ## Verification
 
-- `pnpm task:lint --task TASK-1162`
-- `pnpm ops:lint --changed`
-- Focused unit tests for `src/lib/kortex/control-plane/**`
-- Focused route tests for `src/app/api/admin/kortex/control-plane/route.ts`
-- `pnpm lint`
-- `NODE_OPTIONS=--max-old-space-size=8192 pnpm exec tsc --noEmit`
-- Staging smoke of the endpoint with and without portal params
+- [x] `pnpm exec vitest run src/lib/kortex/control-plane/runtime-reader.test.ts src/lib/kortex/control-plane/composer.test.ts src/app/api/admin/kortex/control-plane/route.test.ts`
+- [x] `pnpm exec eslint src/lib/kortex/control-plane/types.ts src/lib/kortex/control-plane/runtime-reader.ts src/lib/kortex/control-plane/repository-reader.ts src/lib/kortex/control-plane/binding-reader.ts src/lib/kortex/control-plane/composer.ts src/lib/kortex/control-plane/index.ts src/lib/kortex/control-plane/runtime-reader.test.ts src/lib/kortex/control-plane/composer.test.ts src/app/api/admin/kortex/control-plane/route.ts src/app/api/admin/kortex/control-plane/route.test.ts src/lib/observability/capture.ts`
+- [x] `NODE_OPTIONS=--max-old-space-size=8192 pnpm exec tsc --noEmit --pretty false`
+- [x] Local/external composer smoke with GitHub + Kortex + Greenhouse binding via Cloud SQL proxy.
+- [x] `pnpm qa:gates --changed --agent codex --task TASK-1162 --integration --runtime --auth --docs`
+- [x] `pnpm route-reachability-gate`
+- [x] `NODE_OPTIONS=--max-old-space-size=8192 pnpm build` (endpoint included in build manifest; unrelated existing roadmap reader broad-pattern warning observed)
+- [x] `pnpm task:lint --task TASK-1162`
+- [x] `pnpm ops:lint --changed`
+- [x] `pnpm docs:closure-check`
+- [ ] Staging smoke of deployed `GET /api/admin/kortex/control-plane` with and without portal params.
 
 ## Closing Protocol
 
@@ -422,6 +448,7 @@ No feature flag for the read-only endpoint if it is admin-gated and additive. If
 
 ## Open Questions
 
-- Should the MVP create a dedicated Kortex-side Greenhouse read adapter immediately, or can it consume existing read endpoints in staging while the adapter is built as follow-up?
+- Resolved for V1: consume existing safe read endpoints with an allowlist; create dedicated adapter/token as follow-up if production requires authenticated `deployment-summary`/`adoption-kpis`.
 - Should repo status be global internal-only, or also visible to client-scoped users in a trimmed form later?
-- Should Kortex runtime source freshness become its own reliability signal in V1, or wait until observed snapshots in TASK-887?
+- Resolved for V1: repo status is admin-only through `GET /api/admin/kortex/control-plane`.
+- Resolved for V1: Kortex runtime source freshness waits until observed snapshots / reliability signal work; this task only emits per-source health in the packet.
