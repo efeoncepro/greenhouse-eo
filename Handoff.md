@@ -1,5 +1,16 @@
 # Release 2026-06-10 #2 — develop→main `6c649b2a6` RELEASED
 
+## Sesión 2026-06-17 — Kortex live/admin staging flags ON — Codex
+
+> **Estado:** staging queda con adapter, live execute y admin/breakglass prendidos para pruebas. Production sigue sin cambios.
+
+- **Flags staging aplicados:** `KORTEX_COMMAND_ADAPTER_ENABLED=true`, `KORTEX_COMMAND_LIVE_EXECUTE_ENABLED=true`, `KORTEX_COMMAND_ADMIN_ENABLED=true`, `KORTEX_COMMAND_ALLOWED_PORTALS=51183921,48713323,9b0a6e91-0e08-4642-bc42-54a4b5c83ad8`.
+- **Secret admin staging:** `KORTEX_COMMAND_ADMIN_TOKEN` provisionado desde Secret Manager `efeonce-kortex-dev/kortex-admin-bootstrap-token` como env var sensitive en Vercel; no exponer el valor.
+- **Redeploy staging final:** `https://greenhouse-dnr2e8c04-efeonce-7670142f.vercel.app` (`target=staging`, `Ready`), aliased a `https://dev-greenhouse.efeoncepro.com` y `https://greenhouse-eo-env-staging-efeonce-7670142f.vercel.app`.
+- **Smoke seguro:** `kortex.strategy.normalize` -> HTTP `200`, `status=completed`, `commandExecutionId=EO-APC-86281ABC`.
+- **Smoke live flag:** `kortex.strategy.release_candidate.execute_workflows` con release candidate dummy + frase humana -> HTTP `409` `kortex_preview_required`, confirmando que ya no bloquea por `live_execute_disabled`; live real sigue requiriendo dry-run vigente y release candidate real.
+- **Smoke admin token/flag:** `kortex.admin.users.bootstrap_e2e_agent` -> HTTP `200`, `status=completed`, `commandExecutionId=EO-APC-E138ACF4`; valida flag admin + token bootstrap sin tocar HubSpot.
+
 ## Sesión 2026-06-17 — Kortex staging flags enabled for testing — Codex
 
 > **Estado:** staging operativo para pruebas seguras. Live external writes y admin/breakglass siguen apagados por diseño.
