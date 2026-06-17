@@ -45,8 +45,14 @@ Acordado vs spec §Detailed Spec + protocolo de lifecycle/docs que routea cada a
 ## 5. Budget target propuesto
 
 - **Arranque del gate (warn):** 200.000 tokens (tamaño actual, no rompe CI).
-- **Escalones sugeridos:** 120k (post tanda 1) → 70k (post tanda mitad) → **40k (flip a error, Slice 5)**.
-- **Target final recomendado:** **25.000 tokens** (decisión del operador: 25k agresivo vs 40k holgado). Con KEEP real ~20k + router + résumés, 25k es alcanzable sin perder nada cross-cutting.
+- **Escalones sugeridos:** 120k (post tanda 1) → 70k (post tanda mitad) → **40k → 35k (flip a error, Slice 5)**.
+- **Target final (decisión operador 2026-06-16): banda 30-35k tokens.** El gate enforce **35k** (techo de la banda, conservador). Recorte ~5.4×. Con KEEP real ~20k + router + résumés moderados, deja margen para conservar detalle operativo en gates de cierre y contratos transversales sin perder matices load-bearing.
+
+## 5.1 Decisiones del operador (2026-06-16)
+
+- **Budget final:** banda **30-35k**, gate enforce 35k (techo). ✅
+- **Ejecución:** **revisar el mapa completo primero** (sección por sección) antes de empezar el move masivo. El move arranca con el mapa ya firmado. ✅
+- **Estrategia de destino:** pendiente — el operador pidió recomendación. **Recomendación de Claude: Spec-first híbrido** (ver §3): default = spec repo-tracked en `docs/architecture/**`; needs-dest → spec existente donde haya (la mayoría), KEEP para los genuinamente cross-cutting, spec nueva SOLO para un contrato de dominio sin hogar; los 6 patrones repetidos → un `GREENHOUSE_CANONICAL_PATTERNS_V1.md` nuevo (Slice 4); **NO** profundizar skills globales (no repo-tracked, rompe paridad Codex); skills repo-tracked existentes reciben pointer, no el contenido.
 
 ## 6. Casos `needs-dest` a resolver (28 bloques)
 

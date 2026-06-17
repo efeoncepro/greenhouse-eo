@@ -31,10 +31,11 @@ const CLAUDE_MD = join(REPO_ROOT, 'CLAUDE.md')
 // ── Budget ceiling (lower this as TASK-1160 Slice 3 moves blocks out) ──────────
 // Warm start = current size so the gate ships green. Escalation plan in
 // docs/operations/CLAUDE_MD_REFACTOR_MAP_2026-06-16.md §5:
-//   200k (warn, now) → 120k → 70k → 40k → 25k (final target, flip to error).
+//   200k (warn, now) → 120k → 70k → 40k → 35k (final target, flip to error).
 const BUDGET_TOKENS = 200_000
 // Final target the refactor is steering toward (informational only).
-const TARGET_TOKENS = 25_000
+// Operator decision 2026-06-16: final band 30-35k; gate enforces 35k (band ceiling).
+const TARGET_TOKENS = 35_000
 
 const STRICT = process.argv.includes('--strict')
 
