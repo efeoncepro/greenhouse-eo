@@ -248,3 +248,51 @@ El bug class observado live 2026-05-15 con María Camila Hoyos: case `executed` 
 **Reusable cross-flow**: el patrón "`pendingSteps[]` decide el primaryAction" se replica para Onboarding work queue (TASK-875), hiring pipeline, workforce activation (TASK-874), contractor closure (TASK-797 futuro), final settlement document lifecycle (TASK-863). Cuando emerja una surface con `primaryAction` derivado de una sola dimensión pero realidad operativa multi-capa, replicar: pure function + STEP_PRIORITY + state machine cerrado + signal de cierre parcial.
 
 **Spec canónica**: `docs/architecture/GREENHOUSE_WORKFORCE_OFFBOARDING_ARCHITECTURE_V1.md` (Delta 2026-05-15). Task: `docs/tasks/in-progress/TASK-892-offboarding-closure-completeness-aggregate.md`. Reliability signal: `hr.offboarding.completeness_partial` (kind=drift, severity warning >0, steady=0, subsystem Identity & Access). Patrones fuente: TASK-742 (4-pillar checklist), TASK-672 (composer + degraded honest), TASK-880 (decision tree por capability + audience), TASK-873 (capability triple-layer canonical).
+
+---
+
+## Invariantes operativos para agentes — International Internal contract type (TASK-894)
+
+> **Relocados de `CLAUDE.md` por TASK-1160 (2026-06-16), verbatim — cero cambio semántico.** Espejo operativo (NUNCA/SIEMPRE) que un agente carga al tocar este dominio; el contrato técnico vive en su spec. Dedup = TASK-1160 Slice 4.
+
+### International Internal Contract Type Invariants (TASK-894)
+
+- `international_internal` es un `ContractType` canónico: `payRegime='international'` + `payrollVia='internal'`. No es Deel, no es EOR y no se degrada automáticamente a `contractor`.
+- Efeonce SpA actúa como operational payer, no como employer of record/local-country legal employer en V1. No aplicar AFP, salud, cesantía, SIS, mutual, APV, IUSC ni retención SII a este perfil.
+- Writes reales requieren capability `payroll.contract.use_international_internal` y `legalReviewReference` >= 10 caracteres. No loggear ni publicar el valor crudo en outbox/Sentry; el evento usa solo `hasLegalReviewReference`.
+- Toda mutación de `contract_type`/`pay_regime`/`payroll_via` debe pasar por los helpers canónicos y emitir `member.contract_type.changed v1` + audit row append-only en la misma transacción.
+- La DB protege la matriz contractual: miembros validan la tupla completa `(contract_type, pay_regime, payroll_via)` y `compensation_versions` valida `(contract_type, pay_regime)` para nuevas/actualizadas rows. No bypass por SQL directo.
+- Los consumers downstream deben detectar `international_internal` por `contractType`, no por heurísticas compuestas de régimen/vía.
+
+---
+
+## Invariantes operativos para agentes — Approval Authority Delegation (TASK-1020)
+
+> **Relocados de `CLAUDE.md` por TASK-1160 (2026-06-16), verbatim — cero cambio semántico.** Espejo operativo (NUNCA/SIEMPRE) que un agente carga al tocar este dominio; el contrato técnico vive en su spec. Dedup = TASK-1160 Slice 4.
+
+### Approval Authority Delegation invariants (TASK-1020, desde 2026-06-07)
+
+El `operational_responsibilities.responsibility_type='approval_delegate'` **genérico** NO confiere ni **autoridad de aprobación** ni **scope de supervisor** para las superficies de aprobación. Cierra el drift donde una responsabilidad genérica (Valentina delegada, `scope_id=daniela`) congeló a la delegada como `effective_approver_member_id` del permiso de Andrés, bloqueando a la supervisora formal Daniela. Causa raíz = drift de autorización (no "falta un botón"). Decisiones canónicas D1-D4 confirmadas por el operador/CEO el 2026-06-07.
+
+**Dos planos** consumen hoy el mismo delegate genérico (decidir ambos, no asumir que arreglar uno arregla el otro):
+1. **Autoridad** — `resolver.ts` → `getEffectiveSupervisor` (`readers.ts`) → snapshot → `leave-review-policy.ts`. Lo consumen los TRES stages `effective_supervisor` (`leave`, `expense_report`, `performance_evaluation`).
+2. **Visibilidad/scope** — `access.ts` (`getSupervisorScopeForTenant`).
+
+**Mecánica canónica**:
+- Flag declarativo per-stage `ApprovalStageDefinition.honorGenericApprovalDelegate` (`src/lib/approval-authority/config.ts`, default tratado como `false`). El resolver pasa `delegationPolicy: honor ? 'generic' : 'ignore'` a `getEffectiveSupervisor(memberId, { delegationPolicy })`. Con `'ignore'` → `effectiveApproverMemberId === formalApproverMemberId` y `authoritySource='reporting_hierarchy'` (NUNCA `'delegation'`).
+- `getEffectiveSupervisor` default `'generic'` (preserva el contrato del reader para callers explícitos); el cambio NO es global ciego — cada caller declara su política.
+- `getSupervisorScopeForTenant` (D3) ya NO cuenta el `approval_delegate` genérico hacia `canAccessSupervisorLeave`/`visibleMemberIds`/`hasDelegatedAuthority`. El scope deriva de la línea formal (`hasDirectReports` + subárbol propio).
+- Recovery auditado `src/lib/hr-core/leave-approval-authority-recovery.ts` (CLI `pnpm hr:leave-approval-authority:recover`): dry-run default; `--apply` requiere filtro explícito (allowlist anti revoke global); recompute SIEMPRE vía `resolveApprovalAuthorityForStage` (SSOT — runtime y recovery no divergen); revoke global D4 (append-only); outbox `leave_request.approval_authority_recovered` v1; idempotente; solo snapshots `pending_supervisor`.
+- Guardrail fail-closed: `assignApprovalDelegation*` (`src/lib/reporting-hierarchy/admin.ts`) rechaza (422) — la delegación genérica ya no confiere nada → recrearla es un primitivo inerte/engañoso. `revoke`/`list` siguen disponibles para limpiar/auditar. La UI (`HrHierarchyView`) muestra el panel de delegaciones **solo lectura** con Alert honesto.
+
+**⚠️ Reglas duras**:
+- **NUNCA** un `approval_delegate` genérico cambia el `effective_approver_member_id` de un stage con `honorGenericApprovalDelegate=false`. El default es `false`; setear `true` requiere decisión documentada por stage.
+- **NUNCA** resolver un caso de over-exposure de aprobación dando HR/admin broad al supervisor formal ni tocando `route_groups`/`views`/grants de `session_360`. El supervisor formal aprueba porque es supervisor formal (`reporting_lines`).
+- **NUNCA** el delegate genérico confiere `canAccessSupervisorLeave`/`visibleMemberIds`/scope. Conferir visibilidad-sin-autoridad sobre un artefacto no validado es over-exposure (principio TASK-987/ISSUE-083: el predicado de validez se mueve junto para TODO lo derivado).
+- **NUNCA** remediar snapshots/responsabilidades con SQL manual de mutación. Usar el recovery command auditado (read-only SQL solo para diagnóstico/verificación).
+- **NUNCA** recomputar la autoridad dentro del recovery (ni en ningún consumer): pasar SIEMPRE por `resolveApprovalAuthorityForStage`. NUNCA borrar filas históricas de `operational_responsibilities` (revoke con lifecycle/audit).
+- **NUNCA** crear una delegación genérica de aprobaciones nueva vía API/UI (guardrail 422). La delegación REAL de aprobación de permisos (cobertura por vacaciones) renace como contrato domain-scoped separado (ADR follow-up, opt-in por dimensión `confersApprovalAuthority`/`confersVisibilityScope`); el interín es el override HR/admin.
+- **SIEMPRE** que emerja un stage `effective_supervisor` nuevo, declarar su `honorGenericApprovalDelegate` explícito (default `false`) — el contrato per-stage escala sin código nuevo.
+- **SIEMPRE** que se cambie la política de un stage, mover juntos: config flag + signal parametrizado + tests. El signal `hr.leave.invalid_delegated_approval_snapshots` (moduleKey `identity`, kind `drift`, steady=0) lee la política de `config.ts` y cuenta snapshots PENDIENTES con autoridad delegada inválida en stages que no honran delegate.
+
+**Spec canónica**: `docs/tasks/complete/TASK-1020-leave-approval-authority-delegation-drift-hardening.md` + `GREENHOUSE_IDENTITY_ACCESS_V2.md` Delta 2026-06-07 + `DECISIONS_INDEX.md`. Runbook: `docs/operations/runbooks/leave-approval-authority-recovery.md`. Patrones fuente: TASK-987/ISSUE-083 (over-exposure de acceso), TASK-571/766 (VIEW/helper + signal + lint), TASK-742 (defense-in-depth).
