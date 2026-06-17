@@ -19,6 +19,7 @@ import { fileURLToPath } from 'node:url'
 import nextCoreWebVitals from 'eslint-config-next/core-web-vitals'
 import tseslint from 'typescript-eslint'
 import prettierConfig from 'eslint-config-prettier'
+import importPlugin from 'eslint-plugin-import'
 
 import greenhousePlugin from './eslint-plugins/greenhouse/index.mjs'
 
@@ -88,6 +89,9 @@ export default [
     coordinacion separada.
   */
   {
+    plugins: {
+      import: importPlugin
+    },
     languageOptions: {
       ecmaVersion: 2024,
       sourceType: 'module'
