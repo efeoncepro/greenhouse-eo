@@ -32,12 +32,12 @@ const runOwnedExecution = async <T>({
   run
 }: {
   commandExecutionId: string
-  run: () => Promise<ApiPlatformSuccessResult<T>>
+  run: (execution?: { commandExecutionId: string }) => Promise<ApiPlatformSuccessResult<T>>
 }): Promise<ApiPlatformSuccessResult<T>> => {
   let result: ApiPlatformSuccessResult<T>
 
   try {
-    result = await run()
+    result = await run({ commandExecutionId })
   } catch (error) {
     const normalized = normalizeApiPlatformError(error)
 
@@ -97,7 +97,7 @@ export const executeApiPlatformCommand = async <T>({
   routeKey: string
   request: Request
   body: unknown
-  run: () => Promise<ApiPlatformSuccessResult<T>>
+  run: (execution?: { commandExecutionId: string }) => Promise<ApiPlatformSuccessResult<T>>
   /**
    * Idempotency key resolved server-side (e.g. the app/internal lane, where the key is bound to a
    * prior server artifact — a Nexa action proposal — rather than sent as a request header). Takes

@@ -2,6 +2,8 @@
 
 ## 2026-06-17
 
+- **TASK-1164 — Kortex Command Adapter (code complete, rollout pendiente).** Se implementó el contrato `greenhouse-kortex-command-adapter.v1` para solicitar desde Greenhouse comandos Kortex gobernados (`audit.run`, `strategy.compile`, `release_candidate.dry_run`, `release_candidate.execute`) sin escribir HubSpot directo. Nuevo endpoint admin `POST /api/admin/kortex/commands`, reusando `executeApiPlatformCommand`/`greenhouse_core.api_platform_command_executions` para idempotencia y audit; preflight por binding TASK-1162; allowlist por portal; respuestas redacted; live execute bloqueado por default y exige flag, frase `EXECUTE KORTEX RELEASE` y dry-run reciente. Tests focales cubren route/adapter/guardrails. Staging/live quedan pendientes de flags/secrets/deploy externo.
+
 - **TASK-1163 — ICO member metrics freshness guard + Daniela OTD/RpA repair.** Se cerró el incidente donde Daniela Ferreira veía OTD ~`5%`: la causa era `ico_engine.metrics_by_member` stale desde `2026-06-01` (`otd_pct=4.8`) mientras el compute live del ICO registry daba `99.1`. Se agregó un guard de frescura current-period en `readMemberMetrics`/`readMemberMetricsBatch` que compara el agregado per-member contra snapshots base y cae a compute live canonical si el cache está viejo; payroll ahora conserva `sourceMode` real cuando el reader devuelve fallback live. Nuevo script `scripts/check-ico-member-metrics-freshness.ts` detecta lag entre `metrics_by_member` y las fuentes base. Se rematerializó BigQuery member-only para junio 2026 con MERGE full-period: 7 filas, freshness `ok`, Daniela materialized OTD `99.1`, RpA `1.14` low-confidence. RpA V2 permanece shadow/no-bonus y se agregó test de divergencia V1>0/V2=0.
 
 ## 2026-06-16

@@ -1,5 +1,16 @@
 # Release 2026-06-10 #2 — develop→main `6c649b2a6` RELEASED
 
+## Sesión 2026-06-17 — TASK-1164 Kortex command adapter — Codex
+
+> **Estado:** code complete, rollout pendiente en `develop`; task tomada desde `to-do` sin cambio de rama/worktree. Branch declarada `task/TASK-1164-kortex-command-adapter` queda como referencia. No se movió a `complete` porque falta staging smoke real con flags/secrets/deploy externo.
+
+- **Objetivo:** habilitar desde Greenhouse comandos gobernados hacia Kortex para auditoria, compile, dry-run/preview y execute de release candidates aprobados, preservando que Kortex sea el owner runtime de las mutaciones HubSpot.
+- **Implementado:** `POST /api/admin/kortex/commands`; `src/lib/kortex/commands/**`; contrato `greenhouse-kortex-command-adapter.v1`; ADR `docs/architecture/GREENHOUSE_KORTEX_COMMAND_ADAPTER_V1.md`; documentacion funcional y manual operativo.
+- **Guardrails activos:** usa `executeApiPlatformCommand` / `greenhouse_core.api_platform_command_executions`; exige `Idempotency-Key`; resuelve binding via TASK-1162; no muta HubSpot directo desde Greenhouse; live execute default OFF; no agrega `kortex.*` a entitlements internos; staging-first.
+- **Discovery inicial:** TASK-1162 reader existe y es read-only; Kortex expone `POST /api/v1/audits/run`, `POST /api/v1/strategy/workspaces/{id}/compile` y `POST /api/v1/strategy/release-candidates/{id}/execute`, pero el OpenAPI actual no declara auth/idempotency dedicado para Greenhouse.
+- **Flags/env pendientes para rollout:** `KORTEX_COMMAND_ADAPTER_ENABLED=true`, `KORTEX_COMMAND_LIVE_EXECUTE_ENABLED=false`, `KORTEX_COMMAND_ALLOWED_PORTALS=51183921`, `KORTEX_COMMAND_API_BASE_URL`, y token server-side si Kortex lo requiere.
+- **Validación local:** tests focales route/adapter verdes (10 tests); `pnpm task:lint --task TASK-1164`; `pnpm ops:lint --changed`; `NODE_OPTIONS=--max-old-space-size=8192 pnpm exec tsc --noEmit --pretty false`; `pnpm docs:closure-check`; `git diff --check`; `pnpm route-reachability-gate`; `NODE_OPTIONS=--max-old-space-size=8192 pnpm build` verde. Build emitio warning preexistente de Roadmap dynamic file pattern, no relacionado.
+
 ## Sesión 2026-06-17 — TASK-1163 ICO member metrics freshness guard + Daniela OTD/RpA — Codex
 
 > **Estado:** complete en `develop`; código + reparación BQ aplicada; commit incluido en `origin/develop`.
