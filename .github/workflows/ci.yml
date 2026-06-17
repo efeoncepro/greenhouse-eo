@@ -156,10 +156,11 @@ jobs:
         # CLAUDE.md se carga en cada turno y lo hereda cada subagente. Cuando creció
         # a ~190k tokens rompió el spawn de subagentes (system prompt + CLAUDE.md >
         # 200k) y ~5× el costo/turno. El gate topa su tamaño para que el refactor
-        # router (TASK-1160) no se re-acrete. Run en modo `--warn` (sin --strict)
-        # durante la migración Slices 3-4; promueve a strict en Slice 5 cuando el
-        # tamaño real baje del target (~25-40k tokens).
-        run: pnpm claude-md:budget
+        # router (TASK-1160) no se re-acrete. **STRICT desde Slice 5 (2026-06-16):**
+        # el tamaño real bajó a ~33k (banda 30-35k); exceder 35k BLOQUEA el build.
+        # Los invariantes de dominio van a su spec/companion (router en CLAUDE.md),
+        # no inline.
+        run: pnpm claude-md:budget --strict
 
       - name: CLAUDE.md rule-loss audit (TASK-1160)
         # Red de seguridad del router-refactor: garantiza que cada línea NUNCA/SIEMPRE

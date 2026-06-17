@@ -4,6 +4,36 @@
 
 Greenhouse — plataforma operativa/subproducto de Efeonce Group dentro del modelo ASaaS. Next.js 16 App Router + MUI 7.x + Vuexy starter-kit + TypeScript 5.9. Deploy en Vercel. "EO" es solo abreviatura del repo, no nombre de producto ni copy visible.
 
+## Router de dominios (TASK-1160)
+
+> **`CLAUDE.md` es un ROUTER, no un spec-store.** Lo que se queda inline es cross-cutting (aplica a casi toda task). Los **invariantes operativos por dominio** (`NUNCA`/`SIEMPRE` específicos de un subsistema) viven **load-on-demand** en su spec/companion — esta tabla dice dónde. Al tocar un dominio: cargar su skill **y** su doc de invariantes. Cada dominio también tiene un pointer inline (con sus reglas más peligrosas) más abajo. Red de seguridad de no-pérdida: `pnpm claude-md:rule-audit`. Mapa completo del refactor: `docs/operations/CLAUDE_MD_REFACTOR_MAP_2026-06-16.md`.
+
+| Dominio / disparador | Skill a invocar | Invariantes (cargar al tocar) |
+|---|---|---|
+| Contractor engagements/payables/honorarios | `greenhouse-finance-accounting-operator` (+payroll) | `architecture/GREENHOUSE_CONTRACTOR_ENGAGEMENTS_PAYABLES_ARCHITECTURE_V1.md` |
+| Production release / promoción develop→main | `greenhouse-production-release` | `architecture/GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md` |
+| Finance ledger/bank/CLP/FX/economic-category | `greenhouse-finance-accounting-operator` | `architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md` |
+| ICO / delivery metrics / RpA / OTD / Notion-metrics | `greenhouse-ico` | `architecture/metrics/ICO_DELIVERY_METRICS_AGENT_INVARIANTS.md` |
+| Knowledge platform + Nexa | `greenhouse-nexa-conversational` | `architecture/agent-invariants/KNOWLEDGE_NEXA_AGENT_INVARIANTS.md` |
+| Payroll/Workforce participation/exit/leave/contract-type/approval | `greenhouse-payroll-auditor` | `architecture/agent-invariants/PAYROLL_WORKFORCE_AGENT_INVARIANTS.md` |
+| Payroll receipts + Legal docs/Finiquito | `greenhouse-payroll-auditor` | `architecture/agent-invariants/PAYROLL_LEGAL_DOCS_AGENT_INVARIANTS.md` |
+| Notion sync / integrations | `notion-platform` | `architecture/GREENHOUSE_SOURCE_SYNC_PIPELINES_V1.md` |
+| HubSpot bridge / services intake | `hubspot-greenhouse-bridge` | `architecture/GREENHOUSE_HUBSPOT_SERVICES_INTAKE_V1.md` |
+| Integraciones/infra (signature/observability/postgres-pooling) | — | `architecture/agent-invariants/INTEGRATIONS_INFRA_AGENT_INVARIANTS.md` |
+| Identity/Workforce (legal profile/role-title/SCIM/session-access/bridge-cutover) | — | `architecture/agent-invariants/IDENTITY_WORKFORCE_AGENT_INVARIANTS.md` |
+| Org workspace + Client portal | — | `architecture/agent-invariants/ORG_CLIENT_AGENT_INVARIANTS.md` |
+| Client lifecycle / onboarding | — | `architecture/GREENHOUSE_CLIENT_LIFECYCLE_V1.md` |
+| UI/feature platforms (home-rollout/nexa-insights/shortcuts/table-density/sample-sprints/account-360) | `greenhouse-ux` + product-design | `architecture/agent-invariants/UI_FEATURE_AGENT_INVARIANTS.md` |
+| UI Platform (Composition Shell/Adaptive Card/Floating Surface/Motion/Elevation/Figma) | `greenhouse-ux` `modern-ui` `state-design` | `architecture/agent-invariants/UI_PLATFORM_AGENT_INVARIANTS.md` + `architecture/ui-platform/*` |
+| Ops/Reliability/Platform (Teams Bot/ops-worker/Vercel cron/reliability/platform-health) | `greenhouse-cron-sync-ops` `teams-bot-platform` | `architecture/agent-invariants/OPS_RELIABILITY_AGENT_INVARIANTS.md` |
+| Entitlements governance + capability grants + ROLE_CODES | — | `architecture/GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md` · `architecture/GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md` |
+| Typography + Efeonce brand | `typography-design` | `architecture/agent-invariants/DESIGN_TOKENS_BRAND_AGENT_INVARIANTS.md` |
+| AI image + LLM providers | `greenhouse-ai-image-generator` | `architecture/GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md` |
+| Workforce Contracting Studio | — | `architecture/GREENHOUSE_WORKFORCE_CONTRACTING_STUDIO_V1.md` |
+| PostgreSQL (conexión/migraciones/SQL readers) | `greenhouse-postgres` | inline (PostgreSQL Access + Migration markers + SQL gate) |
+| Backend (API routes/stores/outbox/reactive) | `greenhouse-backend` | inline (Full API Parity + canonical error contract + auth helpers) |
+| Secret hygiene / rotación | `greenhouse-secret-hygiene` | inline (Secret Manager Hygiene) |
+
 ### Business Context Pack
 
 - `docs/context/` es el context pack de negocio, marca, GTM, producto y experiencia cliente de Efeonce/Greenhouse. Empezar por `docs/context/00_INDEX.md`.

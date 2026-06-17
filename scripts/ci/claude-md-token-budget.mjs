@@ -31,11 +31,15 @@ const CLAUDE_MD = join(REPO_ROOT, 'CLAUDE.md')
 // ── Budget ceiling (lower this as TASK-1160 Slice 3 moves blocks out) ──────────
 // Warm start = current size so the gate ships green. Escalation plan in
 // docs/operations/CLAUDE_MD_REFACTOR_MAP_2026-06-16.md §5:
-//   200k (warn, now) → 120k → 70k → 40k → 35k (final target, flip to error).
-const BUDGET_TOKENS = 200_000
-// Final target the refactor is steering toward (informational only).
+//   200k (warn) → … → 35k (final, flipped to error in Slice 5, 2026-06-16).
 // Operator decision 2026-06-16: final band 30-35k; gate enforces 35k (band ceiling).
-const TARGET_TOKENS = 35_000
+// CI runs this gate with --strict (see ci.yml) — exceeding 35k FAILS the build.
+// Re-accretion is now blocked: domain invariants go to their spec/companion (router
+// table at the top of CLAUDE.md), not inline. To raise this, you must justify why a
+// new rule is genuinely cross-cutting (every-task) rather than domain-specific.
+const BUDGET_TOKENS = 35_000
+// Stretch target (informational only) — headroom goal below the hard ceiling.
+const TARGET_TOKENS = 30_000
 
 const STRICT = process.argv.includes('--strict')
 
