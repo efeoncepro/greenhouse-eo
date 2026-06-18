@@ -561,6 +561,7 @@ const NexaLaneSidecarMockupView = () => {
         minHeight='calc(100dvh - 160px)'
         mainMinWidth={520}
         temporaryPlacement='right'
+        panelEntrance='slide'
         dataCapture='nexa-lane-adaptive-layout'
         source='nexa-lane-mockup'
         sidecar={<NexaLaneSidecar onClose={() => setOpen(false)} />}

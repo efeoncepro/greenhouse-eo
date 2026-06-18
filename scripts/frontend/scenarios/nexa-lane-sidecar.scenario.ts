@@ -56,6 +56,34 @@ export const scenario: CaptureScenario = {
         ]
       }
     },
-    { kind: 'mark', label: 'lane-final', note: 'Estado final tras nueva conversación + toggle de rail (desktop lane / mobile Drawer)' }
+    {
+      kind: 'interaction',
+      interaction: {
+        name: 'collapse-lane',
+        intent: 'Cerrar el lane → sale deslizándose hacia el borde derecho (panelEntrance=slide)',
+        action: { kind: 'click', selector: '[data-capture="nexa-lane-sidecar"] button[aria-label="Cerrar Nexa"]' },
+        frames: [
+          { label: 'collapse-mid', atMs: 150 },
+          { label: 'collapsed', atMs: 500 }
+        ],
+        reducedMotion: 'skip'
+      }
+    },
+    {
+      kind: 'interaction',
+      interaction: {
+        name: 'reopen-lane-slide',
+        intent: 'Reabrir → el lane entra deslizándose desde el borde derecho y empuja el contenido',
+        action: { kind: 'click', selector: 'button:has-text("Abrir Nexa")' },
+        frames: [
+          { label: 'slide-0ms', atMs: 0 },
+          { label: 'slide-150ms', atMs: 150 },
+          { label: 'slide-350ms', atMs: 350 },
+          { label: 'slide-settled', atMs: 650 }
+        ],
+        reducedMotion: 'skip'
+      }
+    },
+    { kind: 'mark', label: 'lane-final', note: 'Estado final tras nueva conversación + toggle de rail + slide demo (desktop lane / mobile Drawer)' }
   ]
 }

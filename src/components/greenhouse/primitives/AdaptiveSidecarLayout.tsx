@@ -47,6 +47,12 @@ export interface AdaptiveSidecarLayoutProps {
   mainMinWidth?: number
   temporaryBreakpoint?: Breakpoint
   temporaryPlacement?: 'left' | 'right' | 'bottom'
+  /**
+   * Animación de entrada del panel inline.
+   * - `appear` (default): aparece en su lugar (fade + nudge + scale + blur). Comportamiento histórico.
+   * - `slide`: entra deslizándose desde el borde (x 100%→0) empujando el contenido; sin scale/blur.
+   */
+  panelEntrance?: 'appear' | 'slide'
   dirty?: boolean
   onDirtyCloseAttempt?: () => void
   restoreFocusRef?: RefObject<HTMLElement | null>
@@ -107,6 +113,7 @@ const AdaptiveSidecarLayout = ({
   mainMinWidth = DEFAULT_MAIN_MIN_WIDTH,
   temporaryBreakpoint = 'md',
   temporaryPlacement,
+  panelEntrance = 'appear',
   dirty = false,
   onDirtyCloseAttempt,
   restoreFocusRef,
@@ -273,33 +280,44 @@ const AdaptiveSidecarLayout = ({
   const drawerAnchor = temporaryPlacement ?? (side === 'left' ? 'left' : 'right')
   const numericEffectiveSidecarWidth = toNumericWidth(effectiveSidecarWidth)
 
+  // `slide`: el panel entra/sale deslizándose desde el borde (x 100%→0) empujando el
+  // contenido — sin scale/blur. `appear` (default): aparece en su lugar (histórico).
+  const slideEntrance = panelEntrance === 'slide'
+  const slideOffEdge = side === 'right' ? '100%' : '-100%'
+
   const inlinePanelInitial = prefersReducedMotion
     ? false
-    : {
-        opacity: 0,
-        x: side === 'right' ? 22 : -22,
-        scale: 0.992,
-        filter: 'blur(3px)'
-      }
+    : slideEntrance
+      ? { x: slideOffEdge }
+      : {
+          opacity: 0,
+          x: side === 'right' ? 22 : -22,
+          scale: 0.992,
+          filter: 'blur(3px)'
+        }
 
   const inlinePanelAnimate = prefersReducedMotion
     ? undefined
-    : {
-        opacity: 1,
-        x: 0,
-        scale: 1,
-        filter: 'blur(0px)'
-      }
+    : slideEntrance
+      ? { x: 0 }
+      : {
+          opacity: 1,
+          x: 0,
+          scale: 1,
+          filter: 'blur(0px)'
+        }
 
   const inlinePanelExit = prefersReducedMotion
     ? undefined
-    : {
-        opacity: 0,
-        x: side === 'right' ? 10 : -10,
-        scale: 0.998,
-        filter: 'blur(1px)',
-        transition: SIDECAR_PANEL_EXIT_TRANSITION
-      }
+    : slideEntrance
+      ? { x: slideOffEdge, transition: SIDECAR_PANEL_EXIT_TRANSITION }
+      : {
+          opacity: 0,
+          x: side === 'right' ? 10 : -10,
+          scale: 0.998,
+          filter: 'blur(1px)',
+          transition: SIDECAR_PANEL_EXIT_TRANSITION
+        }
 
   useEffect(() => {
     if (inlineOpen) {

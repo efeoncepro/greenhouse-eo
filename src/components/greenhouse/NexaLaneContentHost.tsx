@@ -39,6 +39,7 @@ const NexaLaneContentHost = ({ children }: { children: ReactNode }) => {
       viewportShellReflow='greenhouse-vertical-navbar'
       mainMinWidth={520}
       temporaryPlacement='right'
+      panelEntrance='slide'
       dataCapture='nexa-lane-content-host'
       source='nexa-interaction-mode-lane'
       sidecar={<NexaLanePanel onCollapse={() => setLaneOpen(false)} />}
