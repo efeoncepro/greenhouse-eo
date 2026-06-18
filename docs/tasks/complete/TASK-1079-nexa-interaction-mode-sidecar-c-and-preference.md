@@ -6,16 +6,16 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P3`
 - Impact: `Medio`
 - Effort: `Alto`
 - Type: `implementation`
 - Epic: `none`
-- Status real: `In-progress (develop local-first). Blocker TASK-1078 resuelto en código (flag NEXA_FLOATING_EXPANDABLE_ENABLED + useNexaPersistentRuntime + NexaFloatingPanel + cutover commit 93036c3b2). Slice 1 (mockup lane C) en curso.`
+- Status real: `Complete (develop local-first, sin push). S1 mockup lane C + GVC (d9df5e366); S3a migración+API (40154d099); S2+3 modo lane productivo + preferencia per-usuario (aee8737dc). 3 modos comparten runtime/persistencia/historial (cero fork). Lane C detrás de NEXA_INTERACTION_LANE_ENABLED default-OFF; verificado en runtime local (/finance split + default-safe). Gates verdes (test full 7279, build, lint, tsc, doc-gate Nexa). Push + flip de flag staging/prod = decisión del operador.`
 - Rank: `TBD`
 - Domain: `ui|delivery|identity`
-- Blocked by: `TASK-1078 (satisfecho en código; su doc quedó stale en in-progress/)`
+- Blocked by: `TASK-1078 (satisfecho en código; doc/lifecycle de 1078 quedaron stale en in-progress/ — sincronizar aparte)`
 - Branch: `task/TASK-1079-nexa-interaction-mode`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -115,6 +115,22 @@ Reglas obligatorias:
 
 Concepto C: lane derecho full-height junto al dashboard **que queda 100% visible** (split, no atenuado), header de lane con presencia + selector de modelo + pin/close, thread a toda altura, composer pinned abajo. Referencia: `concept-c-sidecar-lane.png` (intención). Primitive: `AdaptiveSidecarLayout` + `ContextualSidecar`.
 
+## UI/UX Contract
+
+- **UI impact:** `interaction` + `layout`. Tres form-factors del chat de Nexa (dock A / expandible B / lane C) + selector de modo persistido.
+- **Primitive lookup:** reuse de `AdaptiveSidecarLayout` (lane host: reflow + `role=complementary` + non-modal + desktop-lane/mobile-Drawer), `NexaThread`, `NexaHistoryRail`, `NexaModelSelector`, `NexaFace`/`NexaPresenceMark`. Primitive nueva ninguna; `NexaModeMenu` + `NexaLaneContentHost` + `NexaLanePanel` componen primitives existentes. **Recalibración:** `ContextualSidecar` (body padded+scroll, chrome inspector) no se usa como contenedor del chat full-bleed; el lane usa `AdaptiveSidecarLayout` + el cuerpo assistant de Nexa.
+- **Tokens:** color SoT (`GREENHOUSE_NEXA_BRAND_COLORS` navy/teal) + `theme.palette.*` + `theme.shape.customBorderRadius.*` + motion tokens; cero HEX/px/fontSize inline. Reduced-motion horneado.
+- **Copy:** es-CL tuteo en `GH_NEXA.interactionMode` (`src/lib/copy/nexa.ts`); labels Compacto/Panel/Lateral + descripciones, validado con `greenhouse-ux-writing`.
+- **GVC:** scenario `nexa-lane-sidecar` (desktop 1440 + mobile 414) + runtime real `/finance` mirado. Default-safe verificado (pref NULL → dashboard full-width + flotante).
+
+## Backend/Data Contract
+
+- **Backend impact:** `db` (migración) + `api`. Sin outbox/cron/webhook/sync; sin capability nueva (self-preference, igual que `ui_density`).
+- **Migración:** `client_users.nexa_interaction_mode TEXT NULL` + CHECK `dock|expandible|lane` (additive, DO block anti pre-up-marker, `db.d.ts` regenerado). Idempotente (`IF NOT EXISTS`). Rollback: DROP columna+constraint.
+- **API:** extiende `/api/home/preferences` (GET expone `nexaInteractionMode`; PATCH valida contra el mismo enum y persiste). Auth = sesión propia (el usuario escribe su propia fila).
+- **SSOT + readers:** `interaction-mode.ts` (puro, gating default-safe, test 11/11); `interaction-mode.server.ts` (reader server-side, degradación honesta al default). Flag de disponibilidad del lane: `NEXA_INTERACTION_LANE_ENABLED` (default OFF).
+- **Tenant isolation:** lectura/escritura scopeada por `user_id` de la sesión.
+
 ## Rollout Plan & Risk Matrix
 
 ### Slice ordering hard rule
@@ -154,10 +170,10 @@ Concepto C: lane derecho full-height junto al dashboard **que queda 100% visible
 
 ## Acceptance Criteria
 
-- [ ] El lane C usa `AdaptiveSidecarLayout`+`ContextualSidecar` (no un panel flotante ni `Dialog`); desktop lane `role=complementary`, mobile Drawer.
-- [ ] Las 3 modalidades (A/B/C) comparten runtime, persistencia, historial y selector de modelo — cero lógica de chat duplicada.
-- [ ] La preferencia de modo persiste por usuario, con default sensato y degradación honesta.
-- [ ] Evidencia GVC desktop+mobile del lane mirada.
+- [x] El lane C usa `AdaptiveSidecarLayout` (no un panel flotante ni `Dialog`); desktop lane `role=complementary`, mobile Drawer. **Recalibración:** el cuerpo padded+scroll de `ContextualSidecar` (chrome inspector) pelea con un chat full-bleed + composer pinned; el lane usa el primitive load-bearing `AdaptiveSidecarLayout` (que entrega reflow + `role=complementary` + non-modal + desktop-lane/mobile-Drawer) hospedando el cuerpo assistant de Nexa. Documentado en el commit S1 y en `experience/conversational-experience.md`.
+- [x] Las 3 modalidades (A/B/C) comparten runtime (`useNexaPersistentRuntime`), persistencia/historial (`nexa_threads`/`nexa_messages` + `NexaHistoryRail`) y selector de modelo (`NexaThread`/`NexaModelSelector`) — cero lógica de chat duplicada (solo cambia el chrome).
+- [x] La preferencia persiste por usuario (`client_users.nexa_interaction_mode` vía `/api/home/preferences`), con default sensato (preserva el comportamiento vigente; nunca `lane` por default) y degradación honesta (reader server-side cae al default en error).
+- [x] Evidencia GVC desktop+mobile del lane mirada (mockup `nexa-lane-sidecar` + runtime real `/finance`).
 
 ## Verification
 

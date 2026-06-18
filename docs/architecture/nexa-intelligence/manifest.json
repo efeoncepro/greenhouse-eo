@@ -12,6 +12,9 @@
     "src/lib/nexa/use-nexa-runtime.ts",
     "src/lib/nexa/use-nexa-thread-history.ts",
     "src/lib/nexa/nexa-page-context.tsx",
+    "src/lib/nexa/interaction-mode.ts",
+    "src/lib/nexa/interaction-mode.server.ts",
+    "src/lib/nexa/nexa-interaction-mode-context.tsx",
     "src/lib/nexa/digest/build-weekly-digest.ts",
     "src/lib/nexa/digest/index.ts",
     "src/lib/nexa/digest/recipient-resolver.ts",
@@ -126,7 +129,7 @@
       "key": "flags",
       "label": "Flags + rollout de Nexa/Knowledge",
       "code": ["src/lib/nexa/flags.ts", "src/lib/knowledge/search/flags.ts"],
-      "docs": ["system-prompt/versioning.md", "knowledge/retrieval-answer-quality.md", "experience/suggested-prompts.md", "behavior/behavior-and-routing.md"]
+      "docs": ["system-prompt/versioning.md", "knowledge/retrieval-answer-quality.md", "experience/suggested-prompts.md", "experience/conversational-experience.md", "behavior/behavior-and-routing.md"]
     },
     {
       "key": "qa",

@@ -2,6 +2,17 @@
 
 > **Estado:** `released` (manifest transicionó a released, post-release health check verde). Orchestrator run [`27721723752`](https://github.com/efeoncepro/greenhouse-eo/actions/runs/27721723752) `completed/success`. Conducido por Claude tras pedido del operador ("paso a producción que Codex dejó preparado").
 
+## Sesión 2026-06-18 — TASK-1079 Nexa interaction-mode (lane C + preferencia) — Claude
+
+> **Estado:** code complete + verificado en runtime local; en `develop` local-first, **sin push**. Lifecycle → complete. Lane C detrás de flag default-OFF (rollout staging/prod = decisión del operador).
+
+- **Qué:** el usuario final elige cómo conversar con Nexa — `dock` (compacto A) / `expandible` (panel B, TASK-1078) / `lane` (sidecar full-height C). Las 3 comparten runtime persistente (`useNexaPersistentRuntime`), historial (`nexa_threads`), rail y selector de modelo (cero fork). Preferencia persistida per-usuario.
+- **Blocker resuelto:** TASK-1078 estaba implementado en código (flag + `useNexaPersistentRuntime` + `NexaFloatingPanel` + cutover `93036c3b2`) aunque su doc/lifecycle quedaron stale en `in-progress/`. ⚠️ **Pendiente ajeno:** sincronizar el lifecycle de TASK-1078 (cerrarlo) — no lo toqué por ser task ajena.
+- **Slices:** S1 mockup `/nexa/lane-sidecar/mockup` + GVC (`d9df5e366`); S3a migración `client_users.nexa_interaction_mode` + API (`40154d099`); S2+3 modo lane productivo + preferencia + selector + layout wiring (`aee8737dc`).
+- **SSOT/gating default-safe:** `interaction-mode.ts` (puro, test 11/11) — NULL preserva comportamiento vigente, nunca `lane` por default; lane gated por `NEXA_INTERACTION_LANE_ENABLED` (default OFF). Reader server-side con degradación honesta. Host `NexaLaneContentHost` = passthrough byte-idéntico salvo modo lane.
+- **Validación:** lint + tsc + `pnpm test` full (7279 passed / 0 fail) + `pnpm build` (boundary server-only OK) + `pnpm nexa:doc-gate` OK. GVC mockup desktop+mobile. Runtime real `/finance`: con flag ON + pref=lane → split con dashboard visible; con pref NULL → full-width + flotante (default-safe). Pref del usuario agente reseteada a NULL post-verificación.
+- **Pendiente / rollout:** push a develop + flip de `NEXA_INTERACTION_LANE_ENABLED` en staging/prod + redeploy = decisión del operador. El flag local `NEXT_PUBLIC_NEXA_INTERACTION_LANE_ENABLED=true` quedó en `.env.local` (gitignored) para que el operador pruebe "Lateral" en el menú.
+
 ## Sesión 2026-06-18 — Person 360 Activity current-period trend semantics — Codex
 
 > **Estado:** code complete local; UI visible verificada con GVC local. Sin branch/worktree nuevo.

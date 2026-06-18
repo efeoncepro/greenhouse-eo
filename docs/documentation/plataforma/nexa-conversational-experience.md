@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-06-13 por Claude (sesión TASK-1104/1105 + capstone)
-> **Ultima actualizacion:** 2026-06-18 por Codex (TASK-1132 — capa de expresión visual de Nexa)
+> **Ultima actualizacion:** 2026-06-18 por Claude (TASK-1079 — modo de interacción dock/expandible/lane)
 > **Documentacion tecnica:** [docs/architecture/ui-platform/CONVERSATIONAL_EXPERIENCE.md](../../architecture/ui-platform/CONVERSATIONAL_EXPERIENCE.md)
 
 # Experiencia Conversacional de Nexa — cómo funciona
@@ -84,6 +84,23 @@ pedazo de un manual. Lo que cambió:
   responde tu pregunta lidere, y para no apoyarse en un solo documento cuando hay más.
 - **Voz Efeonce.** Tono claro y directo (te trata de "tú"), datos primero, sin relleno.
 - **Honesta cuando no sabe.** Si no hay una guía publicada, te lo dice y no inventa.
+
+## Cómo eliges ver a Nexa (modo de interacción)
+
+Nexa se adapta a cómo trabajas. Puedes elegir entre tres formas de tenerla a mano, y tu elección
+**se guarda en tu cuenta** (te sigue aunque cambies de computador):
+
+- **Compacto** — una burbuja flotante para preguntas rápidas.
+- **Panel** — un panel que se amplía y muestra tu historial de conversaciones.
+- **Lateral** — una columna fija a la derecha que se queda abierta junto a tu pantalla, para
+  trabajar **con el dashboard a la vista** mientras conversas (la pantalla se acomoda al lado, no se tapa).
+
+Cambias el modo desde el propio chat de Nexa (botón de modo en la cabecera). Las tres formas comparten
+**la misma conversación, el mismo historial y el mismo Nexa** — solo cambia cómo se ve.
+
+> Detalle técnico: el modo "Lateral" llega de forma gradual (controlado por el equipo); por defecto verás
+> Compacto o Panel. La fuente de verdad del modo vive en `greenhouse_core.client_users.nexa_interaction_mode`.
+> Para operarlo paso a paso: [manual de uso](../../manual-de-uso/plataforma/nexa-modo-de-interaccion.md).
 
 ## Dónde verla viva
 
