@@ -6,16 +6,16 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P3`
 - Impact: `Medio`
 - Effort: `Alto`
 - Type: `implementation`
 - Epic: `none`
-- Status real: `Deferred-but-committed`
+- Status real: `In-progress (develop local-first). Blocker TASK-1078 resuelto en código (flag NEXA_FLOATING_EXPANDABLE_ENABLED + useNexaPersistentRuntime + NexaFloatingPanel + cutover commit 93036c3b2). Slice 1 (mockup lane C) en curso.`
 - Rank: `TBD`
 - Domain: `ui|delivery|identity`
-- Blocked by: `TASK-1078`
+- Blocked by: `TASK-1078 (satisfecho en código; su doc quedó stale en in-progress/)`
 - Branch: `task/TASK-1079-nexa-interaction-mode`
 - Legacy ID: `none`
 - GitHub Issue: `none`
