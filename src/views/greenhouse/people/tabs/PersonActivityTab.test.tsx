@@ -46,8 +46,31 @@ vi.mock('@/components/greenhouse/NexaInsightsBlock', () => ({
   )
 }))
 
+vi.mock('@/libs/styles/AppReactApexCharts', () => ({
+  default: () => <div data-testid='apex-chart' />
+}))
+
+vi.mock('@/components/greenhouse/primitives', () => ({
+  MetricTrendCard: ({ title, periodLabel, value, series }: {
+    title: string
+    periodLabel: string
+    value: number | null
+    series: Array<{ label: string; value: number | null }>
+  }) => (
+    <div
+      data-testid={`trend-${title}`}
+      data-period-label={periodLabel}
+      data-value={String(value)}
+      data-series={series.map(point => `${point.label}:${point.value ?? 'null'}`).join('|')}
+    >
+      {`${title}:${periodLabel}:${value ?? 'null'}`}
+    </div>
+  )
+}))
+
 describe('PersonActivityTab', () => {
   afterEach(() => {
+    vi.useRealTimers()
     cleanup()
   })
 
@@ -109,5 +132,81 @@ describe('PersonActivityTab', () => {
     expect(block).toHaveAttribute('data-default-expanded', 'true')
     expect(gridContainer?.firstElementChild?.querySelector('[data-testid="nexa-insights-block"]')).toBe(block)
     expect(screen.getByText('Salud operativa')).toBeInTheDocument()
+  })
+
+  it('anchors trend cards to the selected in-progress month as a partial operational read', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true })
+    vi.setSystemTime(new Date('2026-06-18T16:00:00.000Z'))
+
+    server.use(
+      http.get('*/api/ico-engine/context', () =>
+        HttpResponse.json({
+          context: {
+            totalTasks: 145,
+            completedTasks: 117,
+            activeTasks: 28,
+            carryOverTasks: 19
+          },
+          metrics: [
+            { metricId: 'rpa', value: 1.13, zone: null },
+            { metricId: 'otd_pct', value: 99.1, zone: null },
+            { metricId: 'ftr_pct', value: 93.3, zone: null },
+            { metricId: 'throughput', value: 117, zone: null },
+            { metricId: 'cycle_time', value: 1.7, zone: null },
+            { metricId: 'stuck_assets', value: 19, zone: null },
+            { metricId: 'pipeline_velocity', value: 1, zone: null }
+          ],
+          cscDistribution: []
+        })
+      ),
+      http.get('*/api/people/:memberId/intelligence', () =>
+        HttpResponse.json({
+          nexaInsights: null,
+          trend: [
+            {
+              memberId: 'daniela-ferreira',
+              period: { year: 2026, month: 5 },
+              deliveryMetrics: [
+                { metricId: 'otd_pct', value: 100, zone: null },
+                { metricId: 'ftr_pct', value: 44.6, zone: null }
+              ],
+              derivedMetrics: [],
+              capacity: {},
+              cost: {},
+              health: 'green',
+              materializedAt: '2026-06-18T07:22:09.283Z',
+              engineVersion: 'test',
+              source: 'person_intelligence'
+            },
+            {
+              memberId: 'daniela-ferreira',
+              period: { year: 2026, month: 6 },
+              deliveryMetrics: [
+                { metricId: 'otd_pct', value: 99.1, zone: null },
+                { metricId: 'ftr_pct', value: 93.3, zone: null }
+              ],
+              derivedMetrics: [],
+              capacity: {},
+              cost: {},
+              health: 'green',
+              materializedAt: '2026-06-18T14:02:04.209Z',
+              engineVersion: 'test',
+              source: 'person_intelligence'
+            }
+          ]
+        })
+      )
+    )
+
+    renderWithTheme(<PersonActivityTab memberId='daniela-ferreira' />)
+
+    await waitFor(() => {
+      expect(screen.getByTestId('trend-OTD%')).toHaveAttribute('data-period-label', 'Mensual · Jun 2026 · parcial al 18/06')
+    })
+
+    expect(screen.getByTestId('trend-OTD%')).toHaveAttribute('data-value', '99.1')
+    expect(screen.getByTestId('trend-FTR%')).toHaveAttribute('data-period-label', 'Mensual · Jun 2026 · parcial al 18/06')
+    expect(screen.getByTestId('trend-FTR%')).toHaveAttribute('data-value', '93.3')
+    expect(screen.getByTestId('trend-OTD%')).toHaveAttribute('data-series', 'May:100|Jun:99.1')
   })
 })

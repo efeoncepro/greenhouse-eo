@@ -2,6 +2,15 @@
 
 > **Estado:** `released` (manifest transicionó a released, post-release health check verde). Orchestrator run [`27721723752`](https://github.com/efeoncepro/greenhouse-eo/actions/runs/27721723752) `completed/success`. Conducido por Claude tras pedido del operador ("paso a producción que Codex dejó preparado").
 
+## Sesión 2026-06-18 — Person 360 Activity current-period trend semantics — Codex
+
+> **Estado:** code complete local; UI visible verificada con GVC local. Sin branch/worktree nuevo.
+
+- **Problema:** en `/people/daniela-ferreira?tab=activity`, el selector mostraba `Jun 2026` pero los cards grandes OTD%/FTR% headlineaban `May 2026` por la política anterior de usar solo meses cerrados en tendencias. Semánticamente era confuso para una superficie operacional de actividad del período.
+- **Cambio:** `PersonActivityTab` ahora incluye el mes seleccionado cuando es el período en curso, lo rotula como `Mensual · Jun 2026 · parcial al 18/06` y usa el valor del contexto ICO del período si la serie `person_intelligence` todavía no trae el punto actual. Las superficies formales de cierre/payroll no se tocaron.
+- **Validación:** ESLint focal, vitest focal `PersonActivityTab` 2/2, `tsc --noEmit`, `pnpm design:lint`, GVC `pnpm fe:capture person-activity-otd-trend --env=local --hold=3000` OK desktop/laptop/mobile (`.captures/2026-06-18T17-10-32_person-activity-otd-trend`). Frames revisados: OTD/FTR muestran `Jun 2026 · parcial al 18/06`; medición Playwright `scrollWidth == clientWidth` en desktop 1440 y mobile 390.
+- **Pendiente:** no deployado; entrará al runtime cuando el próximo deploy de la rama correspondiente promueva estos cambios.
+
 ## Sesión 2026-06-18 — Ops Worker deploy drift guard / documentation — Codex
 
 > **Estado:** guardrail de control-plane en `develop`; runtime del `ops-worker` no fue modificado.
