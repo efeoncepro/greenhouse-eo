@@ -6,6 +6,10 @@ El segundo hijo del umbrella (TASK-916 — compute + writeback productivos) est�
 
 Delta 2026-05-26: el eco raw BigQuery de la propiedad Notion `[GH] RpA v2` es `notion_ops.tareas.gh_rpa_v2`. Usarlo solo para auditoría/paridad; el cutover de bono debe seguir leyendo el agregado canónico V2, no la tabla raw.
 
+## Delta 2026-06-18 — Lectura temprana de paridad (forward-accumulation validado): gate ≥95% alcanzable
+
+Shadow-compare exploratorio contra runtime prod (sin tocar código): pipeline V2 vivo desde 21/05 (captura + compute acumulando ambos workspaces; writeback/bono aún OFF → Flip A/B NO ejecutados). Paridad per-tarea V2 vs legacy en la **cohorte fully-covered** (1ra transición ≥ 01/06) ya pasa el gate: **Efeonce 98.1%, Sky 95.5%**; la cohorte pre-captura arrastra sesgo negativo (V2 subcuenta correcciones previas a la captura) → confirma empíricamente por qué el Flip B solo aplica a períodos enteramente cubiertos. Detalle + tablas + caveats en `to-do/TASK-917-...md` → Delta 2026-06-18. Próximo paso: TASK-917 Slice 1 (signal `shadow_paridad_rpa` oficial a grano member-mes).
+
 <!-- ZONE 0 — IDENTITY & TRIAGE -->
 
 ## Status

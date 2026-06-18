@@ -13,6 +13,38 @@ Delta 2026-05-26: cuando esta task valide paridad contra el eco de Notion en Big
 
 El signal `shadow_paridad_rpa` (V2 vs legacy) se materializa en este task (TASK-917) — `task_rpa_snapshots` ya tiene el índice `paridad` listo. Spec TASK-916: `complete/TASK-916-rpa-v2-productive-compute-writeback.md`.
 
+## Delta 2026-06-18 — Shadow-compare exploratorio (pre-Slice 1): forward-accumulation validado empíricamente, gate ≥95% alcanzable
+
+Comparativo ad-hoc contra runtime productivo real (sin tocar código de prod) para tener lectura temprana de paridad antes del cierre de junio. Evidencia del pipeline V2 vivo: captura (`greenhouse_delivery.task_status_transitions`) acumulando desde **2026-05-21 16:25 UTC**, última transición al momento del check **2026-06-18 18:05 UTC**, 928 transiciones (efeonce + sky); compute V2 (`task_rpa_snapshots`) 926 snapshots, ambos workspaces, última hoy. Writeback (`NOTION_RPA_WRITEBACK_ENABLED`) y bono (`BONUS_USE_RPA_V2`) **siguen OFF** (no presentes en env prod) → Flip A y Flip B aún NO ejecutados (cronograma 01/06 corrido).
+
+**Método**: último snapshot V2 por tarea (`task_rpa_snapshots.rpa_value`) vs RpA legacy por-tarea (`greenhouse_delivery.tasks.rpa_value`), join `task_source_id = notion_task_id`. Cobertura casi total: efeonce 169/171, sky 370/373.
+
+**Paridad global (incluye tareas pre-captura):**
+
+| Workspace | Comparables | Paridad exacta | Sesgo (V2−V1) |
+|---|---|---|---|
+| efeonce | 169 | **95.9%** | −0.018 |
+| sky | 370 | **92.2%** | −0.097 |
+
+Desajustes casi todos por **V2 subcontando correcciones** (34 tareas V2<V1, solo 2 V2>V1) — firma exacta del forward-accumulation: correcciones previas al 21/05 no fueron capturadas.
+
+**Segmentado por cohorte (la prueba limpia):**
+
+| Cohorte | efeonce | sky |
+|---|---|---|
+| **Fully-covered** (1ra transición ≥ 01/06, historia V2 completa) | **98.1%** (n=154, sesgo +0.006) | **95.5%** (n=244, sesgo −0.057) |
+| Pre-captura (1ra transición < 01/06, historia incompleta) | 73.3% (n=15, sesgo −0.267) | 85.7% (n=126, sesgo −0.175) |
+
+**Conclusiones:**
+
+1. El diseño forward-accumulation queda **validado empíricamente**: la cohorte con historia completa converge (≥95% ambos clientes, sesgo ~0); las pre-captura arrastran sesgo negativo claro. El número global lo deprimen justo las tareas que el gate del Flip B excluye.
+2. La cohorte elegible **ya pasa el gate ≥95%** (Efeonce 98.1%, Sky 95.5%) con junio parcial + ~4 semanas acumuladas → al 01/07 (junio cerrado, enteramente cubierto) debería aterrizar cómodo sobre el umbral, Efeonce con holgura.
+3. El sesgo negativo confirma el riesgo del risk matrix (V2 incompleto → subcuenta → infla bono); el gate forward-accumulation protege exactamente contra eso. Sky justo en la línea (95.5%, más cola legacy del incidente TASK-877) → bien justificado el orden Efeonce-primero.
+
+**Caveats**: esto es per-tarea (último snapshot) vs legacy *vivo*, NO el `rpa_avg` por member-mes que usa el bono — es **leading indicator fuerte, no el gate oficial**. El `shadow_paridad_rpa` real (Slice 1) debe agregar a member-mes sobre el período cerrado. `tasks.rpa_value` es editable por operadores; el shadow oficial compara snapshots de período. n aún modesto (junio completo lo engorda).
+
+**Implicación para esta task**: TASK-917 está des-riesgada — el motor V2 produce el número correcto cuando tiene data completa y el gate de paridad es alcanzable. Slice 1 (materializar `rpa_avg_v2` + signal `shadow_paridad_rpa` a grano member-mes) sigue siendo el siguiente paso para tener el número oficial monitoreado hasta el cierre de junio.
+
 <!-- ZONE 0 -->
 
 ## Status
