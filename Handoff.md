@@ -14,6 +14,19 @@
 
 # Release 2026-06-10 #2 — develop→main `6c649b2a6` RELEASED
 
+## Sesión 2026-06-17 — TASK-1167 Public Site GitHub repo control plane — Codex
+
+> **Estado:** complete / staging verified en `develop`; sin branch/worktree nuevo. El operador pidió usar subagentes para paralelizar.
+
+- **Hook/subagentes:** `pnpm codex:task-hook TASK-1167`; subagentes de discovery para patrón TASK-1166/Kortex, binding Astro TASK-1161 y foundations command/reliability. Notion spec-to-implementation fue invocada, pero solo está disponible `Notion:fetch`; sin `Notion:search/create/update`, el plan se ejecuta contra la task Markdown local.
+- **Implementado:** reader `src/lib/public-site/astro/github-control-plane/**`, endpoint `GET /api/admin/public-site/github-control-plane`, adapter `POST /api/admin/public-site/github-commands`, registry allowlisted/default OFF para `public_site.github.workflow.rerun_failed` y `public_site.github.workflow.dispatch`, errores canónicos `public_site_github_*`, y signal `public_site.astro_ci_failed` wired en `getReliabilityOverview`.
+- **Guardrails:** repo hardcoded `efeoncepro/efeonce-web`; no owner/repo/path/method desde request; commands requieren `Idempotency-Key` + `executeApiPlatformCommand`; flags `PUBLIC_SITE_GITHUB_COMMANDS_ENABLED=false`, `PUBLIC_SITE_GITHUB_WORKFLOW_DISPATCH_ENABLED=false`, allowlists `CI` y `main,develop`; dispatch exige frase `EXECUTE PUBLIC SITE GITHUB WORKFLOW`. Cero deploy/rollback/cutover.
+- **Evidencia GitHub real:** repo privado, default `main`, ramas `main`/`develop`, workflow `CI` activo (`259783595`). Último run `main` `27657858751` está `completed/failure` en SHA `4d050fbf7baf4097684f131d4ac31e1d6148ff02`; la nueva signal debe reportar `error`, no falso-verde.
+- **Validación local:** tests focales reader/composer/routes/commands 5 files / 16 tests passed; reliability 2 files / 5 tests passed; `tsc --noEmit`, `pnpm lint`, `pnpm build`, task/ops/docs gates verdes. Docs canonicos creados/actualizados: `GREENHOUSE_PUBLIC_SITE_ASTRO_GITHUB_CONTROL_PLANE_V1.md`, documentación funcional/manual (`astro-github-control-plane.md`, `operar-astro-github-control-plane.md`), DECISIONS_INDEX, Runtime Strategy, Reliability, EPIC-019, changelog y project_context.
+- **Rollout staging:** `https://greenhouse-8arcw12v5-efeonce-7670142f.vercel.app`, id `dpl_8sbZd3thkxFhaXSY79oS3RByFAn8`, target `staging`, status `Ready`; aliases `dev-greenhouse.efeoncepro.com` y `greenhouse-eo-env-staging-efeonce-7670142f.vercel.app`.
+- **Smokes staging:** reader `GET /api/admin/public-site/github-control-plane` -> HTTP 200, `confidence=high`, workflow `CI`, latest main run `27657858751` `completed/failure`, correlation `matched`, sources `ok`, warnings `[]`; reliability `public_site.astro_ci_failed` -> `severity=error`; command-deny `POST /api/admin/public-site/github-commands` -> HTTP 409 `public_site_github_command_disabled`; Vercel error logs 30m -> none.
+- **Pendiente operacional:** production commands siguen OFF por diseño. No prender `PUBLIC_SITE_GITHUB_COMMANDS_ENABLED` ni `PUBLIC_SITE_GITHUB_WORKFLOW_DISPATCH_ENABLED` sin aprobación explícita, allowlists revisadas, `Idempotency-Key`, frase humana para dispatch y evidencia en `api_platform_command_executions`. El CI rojo vive en el repo hermano `efeonce-web`; esta task lo observa/no lo corrige.
+
 ## Sesión 2026-06-17 — TASK-1161 Public Site Astro binding reader staging verified — Codex
 
 > **Estado:** staging verified, production rollout pendiente en `develop`; sin branch/worktree nuevo. Cero production deploy/cutover y cero writes a GitHub/WordPress/Kinsta.

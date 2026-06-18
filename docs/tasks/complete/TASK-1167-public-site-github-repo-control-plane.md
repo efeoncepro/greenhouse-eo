@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
@@ -15,11 +15,11 @@
 - UI impact: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-019`
-- Status real: `Diseno`
+- Status real: `Staging verified; production commands OFF`
 - Rank: `TBD`
 - Domain: `platform|public-site|astro|integrations|ops|github`
 - Blocked by: `none`
-- Branch: `task/TASK-1167-public-site-github-repo-control-plane`
+- Branch: `develop`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
@@ -308,37 +308,44 @@ Cambio aditivo backend/API. Reader read-only primero, commands apagados por defa
 
 ## Acceptance Criteria
 
-- [ ] Existe contrato `public-site-github-control-plane.v1` con reader dedicado y tests bajo `src/lib/public-site/astro/github-control-plane/`.
-- [ ] `GET /api/admin/public-site/github-control-plane` devuelve estado real de `efeoncepro/efeonce-web` con workflow `CI`, runs recientes y degradación honesta.
-- [ ] Repo owner/name quedan hardcoded server-side; payloads no pueden apuntar a otros repos.
-- [ ] Si se implementan commands, viven en registry allowlisted, default OFF, con `Idempotency-Key`, audit y confirmación humana cuando aplica.
-- [ ] `public_site.astro_ci_failed` wired a `get-reliability-overview` y reporta el CI rojo real (sin falso-verde).
-- [ ] Staging evidence documenta reader 200, command disabled 409 y cualquier command aprobado con audit.
-- [ ] Cero deploy/rollback del sitio; cero write destructivo (force-push, delete branch, secrets, workflow files).
-- [ ] Spec `GREENHOUSE_PUBLIC_SITE_ASTRO_GITHUB_CONTROL_PLANE_V1.md` y EPIC-019 sincronizados.
+- [x] Existe contrato `public-site-github-control-plane.v1` con reader dedicado y tests bajo `src/lib/public-site/astro/github-control-plane/`.
+- [x] `GET /api/admin/public-site/github-control-plane` devuelve estado real de `efeoncepro/efeonce-web` con workflow `CI`, runs recientes y degradación honesta.
+- [x] Repo owner/name quedan hardcoded server-side; payloads no pueden apuntar a otros repos.
+- [x] Si se implementan commands, viven en registry allowlisted, default OFF, con `Idempotency-Key`, audit y confirmación humana cuando aplica.
+- [x] `public_site.astro_ci_failed` wired a `get-reliability-overview` y reporta el CI rojo real (sin falso-verde).
+- [x] Staging evidence documenta reader 200, command disabled 409 y cualquier command aprobado con audit.
+- [x] Cero deploy/rollback del sitio; cero write destructivo (force-push, delete branch, secrets, workflow files).
+- [x] Spec `GREENHOUSE_PUBLIC_SITE_ASTRO_GITHUB_CONTROL_PLANE_V1.md` y EPIC-019 sincronizados.
 
 ## Verification
 
-- `pnpm test src/lib/public-site/astro/github-control-plane`
-- `pnpm test src/app/api/admin/public-site/github-control-plane/route.test.ts`
-- `pnpm test src/app/api/admin/public-site/github-commands/route.test.ts` si se implementan commands
-- `NODE_OPTIONS=--max-old-space-size=8192 pnpm exec tsc --noEmit --pretty false`
-- `pnpm lint`
-- `pnpm docs:closure-check`
-- `pnpm task:lint --task TASK-1167`
-- `pnpm ops:lint --changed`
-- Staging smoke con `pnpm staging:request GET '/api/admin/public-site/github-control-plane'`
+- `pnpm test src/lib/public-site/astro/github-control-plane/reader.test.ts src/lib/public-site/astro/github-control-plane/composer.test.ts src/app/api/admin/public-site/github-control-plane/route.test.ts src/lib/public-site/astro/github-control-plane/commands/adapter.test.ts src/app/api/admin/public-site/github-commands/route.test.ts` -> passed, 5 files / 16 tests.
+- `pnpm test src/lib/reliability/queries/public-site-astro-ci-failed.test.ts src/lib/reliability/queries/public-site-astro-deploy-failed.test.ts` -> passed, 2 files / 5 tests.
+- `NODE_OPTIONS=--max-old-space-size=8192 pnpm exec tsc --noEmit --pretty false` -> passed.
+- `gh` smoke 2026-06-17 -> repo `efeoncepro/efeonce-web`, default `main`, branches `main`/`develop`, workflow `CI` active id `259783595`, latest main run `27657858751` `completed/failure` at SHA `4d050fbf7baf4097684f131d4ac31e1d6148ff02`.
+- `pnpm lint` -> passed.
+- `NODE_OPTIONS=--max-old-space-size=8192 pnpm build` -> passed; warning preexistente de Roadmap dynamic pattern.
+- `pnpm docs:closure-check` -> warnings=0.
+- `pnpm task:lint --task TASK-1167` -> errors=0, warnings=0.
+- `pnpm ops:lint --changed` -> errors=0, warnings=0.
+- `pnpm qa:gates --changed --agent codex --task TASK-1167 --integration --runtime --docs` -> advisory: runtime/integration evidence required; satisfied by staging smokes below.
+- Vercel staging deploy `https://greenhouse-8arcw12v5-efeonce-7670142f.vercel.app`, id `dpl_8sbZd3thkxFhaXSY79oS3RByFAn8`, target `staging`, status `Ready`, aliases `dev-greenhouse.efeoncepro.com` and `greenhouse-eo-env-staging-efeonce-7670142f.vercel.app`.
+- Staging reader smoke: `STAGING_URL=https://greenhouse-8arcw12v5-efeonce-7670142f.vercel.app node scripts/staging-request.mjs /api/admin/public-site/github-control-plane` -> HTTP 200, `contractVersion=public-site-github-control-plane.v1`, `confidence=high`, repo `efeoncepro/efeonce-web`, workflow `CI`, latest main run `27657858751` `completed/failure`, correlation `matched`, all sources `ok`, warnings `[]`.
+- Staging Reliability smoke: `/api/admin/reliability` -> HTTP 200, signal `public_site.astro_ci_failed`, `severity=error`, summary `run 27657858751, status=completed, conclusion=failure, correlation=matched`.
+- Staging command-deny smoke: `POST /api/admin/public-site/github-commands` with `public_site.github.workflow.rerun_failed` -> HTTP 409, code `public_site_github_command_disabled`; no GitHub write.
+- Vercel error logs: `vercel logs greenhouse-8arcw12v5-efeonce-7670142f.vercel.app --scope efeonce-7670142f --no-follow --level error --since 30m --limit 20` -> no logs found.
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedó sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedó sincronizado con el cierre
-- [ ] `Handoff.md` quedó actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedó actualizado si cambió comportamiento, estructura o protocolo visible
-- [ ] se ejecutó chequeo de impacto cruzado sobre otras tasks afectadas (TASK-1161, EPIC-019)
-- [ ] spec `GREENHOUSE_PUBLIC_SITE_ASTRO_GITHUB_CONTROL_PLANE_V1.md` creada y enlazada desde EPIC-019
-- [ ] si se habilitó algún command, Vercel env/flags y evidence staging quedaron documentados
+- [x] `Lifecycle` del markdown quedó sincronizado con el estado real (`complete` despues de staging smoke)
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [x] `docs/tasks/README.md` quedó sincronizado con el cierre parcial
+- [x] `Handoff.md` quedó actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
+- [x] `changelog.md` quedó actualizado si cambió comportamiento, estructura o protocolo visible
+- [x] se ejecutó chequeo de impacto cruzado sobre otras tasks afectadas (TASK-1161, EPIC-019)
+- [x] spec `GREENHOUSE_PUBLIC_SITE_ASTRO_GITHUB_CONTROL_PLANE_V1.md` creada y enlazada desde EPIC-019
+- [x] documentación funcional y manual operativo creados para el control-plane (`docs/documentation/public-site/astro-github-control-plane.md`, `docs/manual-de-uso/public-site/operar-astro-github-control-plane.md`)
+- [x] si se habilitó algún command, Vercel env/flags y evidence staging quedaron documentados (no se habilitaron commands; command OFF verificado por staging smoke)
 
 ## Follow-ups
 

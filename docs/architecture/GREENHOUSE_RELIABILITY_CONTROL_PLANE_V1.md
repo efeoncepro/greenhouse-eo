@@ -5,9 +5,28 @@
 > Versión: `1.10`
 > Estado: `vigente`
 > Creada: `2026-04-25` por TASK-600
-> Última actualización: `2026-06-17` por TASK-1161 (Public Site Astro deploy signal)
+> Última actualización: `2026-06-17` por TASK-1167 (Public Site Astro GitHub CI signal)
 
 ---
+
+## Delta 2026-06-17 — TASK-1167: signal `public_site.astro_ci_failed`
+
+Nuevo signal canonical de observabilidad para el repo GitHub del rail objetivo Astro del sitio publico Efeonce.
+
+- `signalKey`: `public_site.astro_ci_failed`
+- `moduleKey`: `platform` en V1, rollup operativo Cloud/Public Site hasta que el dominio acumule mas signals.
+- `kind`: `runtime`
+- Reader: `src/lib/reliability/queries/public-site-astro-ci-failed.ts`
+- Fuente: `composePublicSiteGithubControlPlanePacket()` (`public-site-github-control-plane.v1`) y ultimo run `CI` en `main` de `efeoncepro/efeonce-web`.
+
+Severidad:
+
+- latest `CI` en `main` `success` + correlation matched -> `ok`;
+- latest `CI` `success` pero deploy va detras/mismatch -> `warning`;
+- latest `CI` `failure`/`cancelled`/`timed_out`/`action_required` -> `error`;
+- run en progreso, token ausente o GitHub degradado -> `unknown` honesto.
+
+Estado real 2026-06-17: el repo `efeoncepro/efeonce-web` tiene `CI` rojo en `main` (`run_id=27657858751`, SHA `4d050fbf7baf4097684f131d4ac31e1d6148ff02`, `conclusion=failure`). El steady-state del control-plane es reportar `error` hasta que ese CI se corrija fuera de Greenhouse. La signal no ejecuta deploy, rollback ni cutover.
 
 ## Delta 2026-06-17 — TASK-1161: signal `public_site.astro_deploy_failed`
 

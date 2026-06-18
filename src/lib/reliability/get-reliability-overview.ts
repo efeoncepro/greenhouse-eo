@@ -196,6 +196,7 @@ import { getReleaseStaleApprovalSignal } from './queries/release-stale-approval'
 import { getReleaseWorkerRevisionDriftSignal } from './queries/release-worker-revision-drift'
 import { getKortexGithubCiLastStatusSignal } from './queries/kortex-github-ci-last-status'
 import { getPublicSiteAstroDeployFailedSignal } from './queries/public-site-astro-deploy-failed'
+import { getPublicSiteAstroCiFailedSignal } from './queries/public-site-astro-ci-failed'
 import { getEmailRenderFailureSignal } from './queries/email-render-failure'
 import { getNuboxSourceFreshnessSignal } from './queries/nubox-source-freshness'
 import { getNotionConformedDrainFreshnessSignal } from './queries/notion-conformed-drain-freshness'
@@ -885,6 +886,7 @@ interface ReliabilityOverviewSources {
    * Roll up bajo moduleKey='platform' hasta que exista subsystem Public Site dedicado.
    */
   publicSiteAstroDeployFailed?: ReliabilitySignal | null
+  publicSiteAstroCiFailed?: ReliabilitySignal | null
 
   /**
    * TASK-910 Slice 4 — Notion Demo Teamspace Sandbox signals (6 canonical):
@@ -1123,6 +1125,8 @@ export const buildReliabilityOverview = (
     ...(sources.kortexGithubCiLastStatus ? [sources.kortexGithubCiLastStatus] : []),
     // TASK-1161 — Public Site Astro/Vercel production deploy failure.
     ...(sources.publicSiteAstroDeployFailed ? [sources.publicSiteAstroDeployFailed] : []),
+    // TASK-1167 — Public Site Astro GitHub repository CI runtime signal.
+    ...(sources.publicSiteAstroCiFailed ? [sources.publicSiteAstroCiFailed] : []),
     // TASK-910 Slice 4 — Notion Demo Teamspace Sandbox signals (6 canonical).
     // 5 bajo moduleKey 'delivery' + 1 CRITICAL bajo moduleKey 'payroll'.
     ...(sources.notionMetricsDemo ?? []),
@@ -1944,6 +1948,11 @@ export const getReliabilityOverview = async (
       ? preloadedSources.publicSiteAstroDeployFailed
       : await getPublicSiteAstroDeployFailedSignal().catch(() => null)
 
+  const publicSiteAstroCiFailed =
+    preloadedSources.publicSiteAstroCiFailed !== undefined
+      ? preloadedSources.publicSiteAstroCiFailed
+      : await getPublicSiteAstroCiFailedSignal().catch(() => null)
+
   // TASK-807 — Commercial Health readers (6). Cada reader degrada
   // honestamente a `unknown` si su query falla. Incluye stale_progress de
   // TASK-805 como primitive reutilizada, no recreada.
@@ -2161,6 +2170,7 @@ export const getReliabilityOverview = async (
     productionRelease,
     kortexGithubCiLastStatus,
     publicSiteAstroDeployFailed,
+    publicSiteAstroCiFailed,
     icoMaterializerSkippedSafety,
     nexaInsightsFreshness,
     nexaInsightsNoNewSignals,
