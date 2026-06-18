@@ -14,6 +14,7 @@ const REQUIRED_SECTIONS = [
   'closing protocol'
 ]
 
+const ACTIVE_TASK_LIFECYCLES = new Set(['to-do', 'in-progress'])
 const REQUIRED_IMPLEMENTATION_SECTIONS = ['detailed spec']
 const POLICY_TYPES = new Set(['umbrella', 'policy'])
 const SENSITIVE_DOMAINS = ['finance', 'payroll', 'auth', 'identity', 'billing', 'cloud', 'data', 'production']
@@ -310,6 +311,25 @@ const checkBackendDataContract = task => {
   ]
 }
 
+const isHybridProfileTask = task => {
+  return task.uiImpact && task.uiImpact !== 'none' && task.backendImpact && task.backendImpact !== 'none'
+}
+
+const checkHybridProfileJustification = task => {
+  if (!isHybridProfileTask(task)) return []
+  if (hasSection(task, 'hybrid execution justification')) return []
+
+  return [
+    finding({
+      task,
+      rule: 'hybrid-profile-justification',
+      severity: 'warning',
+      message:
+        'Task mixes UI impact and Backend impact but is missing "## Hybrid Execution Justification". Prefer split into a backend-data foundation plus ui-ux consumer, or justify the intentional hybrid scope.'
+    })
+  ]
+}
+
 export const RULES = [
   {
     id: 'required-sections',
@@ -355,6 +375,11 @@ export const RULES = [
     id: 'backend-data-contract',
     appliesTo: task => task.kind === 'template',
     check: checkBackendDataContract
+  },
+  {
+    id: 'hybrid-profile-justification',
+    appliesTo: task => task.kind === 'template' && ACTIVE_TASK_LIFECYCLES.has(task.folderLifecycle),
+    check: checkHybridProfileJustification
   }
 ]
 

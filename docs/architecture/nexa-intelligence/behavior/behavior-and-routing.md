@@ -10,13 +10,21 @@ prompt del usuario
   → NexaService.generateResponse (orquestador provider-agnóstico)
     → buildProviderPlan (elige provider primario + cadena de failover)
     → buildSystemPrompt (artefacto versionado V1/V2)
-    → provider.resolveTurn (2-pass tool loop: el modelo decide tool → se ejecuta → 2da pasada compone)
-      → tool search_knowledge (si aplica) → packet knowledge-search.v1
+    → provider.resolveTurn (2-pass tool loop: tool AUTO por defecto → se ejecuta → 2da pasada compone)
+      → tool search_knowledge (AUTO o forced first-pass si aplica) → packet knowledge-search.v1
     → generateSuggestions
   → NexaResponse { content, toolInvocations, suggestions, modelId }
 ```
 
-## Ruteo de tools (decidido por el prompt)
+## Ruteo de tools
+
+Por defecto, el ruteo de tools sigue en modo **AUTO**: el provider recibe las tool declarations y
+el modelo decide si llama una tool en el primer pase. TASK-1156 agrega un unico override
+deterministico: si `NEXA_FORCE_KNOWLEDGE_RETRIEVAL_ENABLED=true`,
+`NEXA_KNOWLEDGE_RETRIEVAL_ENABLED=true` y `classifyNexaIntent(prompt) === 'knowledge'`, el
+orquestador pasa `forcedToolName: 'search_knowledge'` al provider para el primer pase. El provider
+mantiene el loop de 2 pases existente y la segunda pasada compone con la misma voz. No cambia el
+system prompt ni los modulos de composicion/voz.
 
 | Intención | Acción |
 |---|---|

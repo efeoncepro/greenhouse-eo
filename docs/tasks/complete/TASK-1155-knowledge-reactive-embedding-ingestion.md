@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Medio`
@@ -15,10 +15,10 @@
 - UI impact: `none`
 - Backend impact: `sync`
 - Epic: `optional`
-- Status real: `Diseno`
+- Status real: `Completado`
 - Rank: `TBD`
 - Domain: `knowledge|nexa|ai|data`
-- Blocked by: `none` (TASK-1151 construyó el substrato + el embed step)
+- Blocked by: `none`
 - Branch: `task/TASK-1155-knowledge-reactive-embedding-ingestion`
 - Legacy ID: `none`
 - GitHub Issue: `optional`
@@ -76,7 +76,7 @@ Reglas obligatorias:
 
 ### Depends on
 
-- `TASK-1151` — columna `embedding`, helper `knowledge-embeddings.ts`, `embed-corpus.ts`.
+- `TASK-1151` — columna `embedding`, helper `knowledge-embeddings.ts`, `embed-corpus.ts` (substrato y embed step ya construidos).
 - `src/lib/knowledge/ingestion/pipeline.ts` (`ingestOne` / `runKnowledgeIngestion`).
 - `src/lib/sync/projections/*` (patrón reactivo si se hace por outbox).
 
@@ -101,6 +101,13 @@ Reglas obligatorias:
 ### Gap
 
 - El embed solo corre manual (CLI). No hay re-embed automático al publicar/sincronizar.
+
+### Implementation decision (2026-06-18)
+
+- Se eligió hook post-publish en `ingestOne`, no un consumer outbox nuevo.
+- Motivo: repo docs y Notion auto-ingest ya convergen en `ingestOne`; Notion ya está desacoplado del webhook por `knowledge.notion.page_change_signal`/projection (TASK-1094). Crear un segundo evento `knowledge.document.published` habría agregado contrato, catálogo y consumer sin reducir el riesgo inmediato.
+- El hook corre después de `publishKnowledgeDocumentVersion` (transacción ya committeada), espera el embed para que CLI/worker no maten el proceso, pero captura errores de Vertex con `captureWithDomain` y no convierte el publish en fallo.
+- Rollback operativo: `KNOWLEDGE_REACTIVE_EMBEDDING_ENABLED=false` vuelve al comportamiento manual/backfill.
 
 ## Backend/Data Contract
 
@@ -130,9 +137,9 @@ Reglas obligatorias:
 ### Migration, backfill and rollout
 
 - Migration posture: `none` (la columna ya existe por TASK-1151)
-- Default state: el embed reactivo puede nacer detrás de flag si se prefiere gradual
+- Default state: embed reactivo ON por defecto; `KNOWLEDGE_REACTIVE_EMBEDDING_ENABLED=false` lo apaga
 - Backfill plan: `embed-corpus --apply` cubre el histórico (ya corrido en dev)
-- Rollback path: desactivar el hook/consumer (vuelve al embed manual)
+- Rollback path: setear `KNOWLEDGE_REACTIVE_EMBEDDING_ENABLED=false` (vuelve al embed manual)
 - External coordination: ADC/Vertex (ya disponible)
 
 ### Security and access
@@ -144,11 +151,25 @@ Reglas obligatorias:
 
 ### Runtime evidence
 
-- Local checks: `pnpm vitest run src/lib/knowledge`
-- DB/runtime checks: publicar/editar un doc → verificar que sus chunks quedan con `embedding` poblado
-- Integration checks: editar un wiki Notion (auto-ingest) → verificar embed automático
-- Reliability signals/logs: signal opcional `knowledge.embedding.stale_chunks` (chunks vigentes sin embedding)
-- Production verification sequence: dev → staging; verificar embed automático tras un sync Notion
+- Local checks:
+  - `pnpm vitest run src/lib/knowledge/search/embed-corpus.test.ts src/lib/knowledge/ingestion/pipeline.test.ts` → 6/6.
+  - `NODE_OPTIONS=--max-old-space-size=8192 pnpm exec tsc --noEmit` → 0.
+  - `pnpm exec eslint src/lib/knowledge/search/embed-corpus.ts src/lib/knowledge/search/embed-corpus.test.ts src/lib/knowledge/ingestion/pipeline.ts src/lib/knowledge/ingestion/pipeline.test.ts src/lib/knowledge/ingestion/flags.ts` → 0.
+- DB/runtime checks:
+  - `set -a; source .env.local; set +a; pnpm tsx --require ./scripts/lib/server-only-shim.cjs scripts/knowledge/ingest.ts --apply` → 82 candidates, 2 published, 77 unchanged, 3 skipped, 0 failed, 20 chunks.
+  - Publicados: `public-site-content-factory-end-to-end v2` (10 chunks) y `public-site-operar-content-factory v2` (10 chunks).
+  - Query directa a Postgres: ambos documentos quedaron con `chunks=10`, `embedded=10`.
+  - `embed-corpus` posterior dry-run: 1472 chunks vigentes, `a embeber: 0`, `ya al día: 1472`.
+- Integration checks:
+  - Vercel staging desplegado: `vercel deploy --target=staging --yes` → `dpl_42Uh8pi9qmTdVCd8KgawrChMjjWN`, status `Ready`, aliases `dev-greenhouse.efeoncepro.com` y `greenhouse-eo-env-staging-efeonce-7670142f.vercel.app`.
+  - Smoke staging: `pnpm staging:request GET /api/internal/health` → HTTP 200, `overallStatus=ok`.
+  - Notion real por CLI: `scripts/knowledge/ingest.ts --source=notion --only=guia-automatizaciones --apply` → 1 published, `guia-automatizaciones v1`, 14 chunks.
+  - Query directa a Postgres: `guia-automatizaciones v1` quedó con `chunks=14`, `embedded=14`.
+  - `embed-corpus` posterior dry-run: 1486 chunks vigentes, `a embeber: 0`, `ya al día: 1486`.
+  - `scripts/knowledge/reconcile.ts` dry-run se interrumpió tras varios minutos sin output; no se usó como gate de cierre.
+  - Webhook Notion live no se disparó en esta sesión. El path de webhook/projection usa el mismo `ingestOne`, pero el `ops-worker` Cloud Run compartido no fue redeployado desde este working tree sucio; validar evento webhook live queda pendiente de deploy gobernado del worker.
+- Reliability signals/logs:
+  - Señal `knowledge.embedding.stale_chunks` quedó fuera de scope por ser opcional; el guardrail operativo inmediato sigue siendo `embed-corpus` dry-run/`--apply`.
 
 <!-- ZONE 2 — PLAN MODE: no llenar al crear la task -->
 
@@ -221,34 +242,43 @@ N/A — repo + ADC/Vertex ya disponibles.
 
 ## Acceptance Criteria
 
-- [ ] Al publicar/sincronizar un doc, sus chunks nuevos/cambiados quedan embebidos automáticamente.
-- [ ] Funciona igual para repo docs y wikis Notion (auto-ingest webhook).
-- [ ] Embed fuera del request path; el publish/webhook NO falla si Vertex falla.
-- [ ] Idempotente por checksum (no re-embebe lo que no cambió).
-- [ ] (Opcional) señal `knowledge.embedding.stale_chunks` en steady=0.
+- [x] Al publicar/sincronizar un doc, sus chunks nuevos/cambiados quedan embebidos automáticamente.
+- [x] Funciona igual para repo docs y wikis Notion porque ambos convergen en `ingestOne`; live repo-docs verificado y Notion real verificado por CLI con `guia-automatizaciones v1` (14/14 chunks embebidos). El evento webhook live queda como verificación operacional post-deploy del `ops-worker`.
+- [x] Embed fuera del request path; el publish/webhook NO falla si Vertex falla.
+- [x] Idempotente por checksum (no re-embebe lo que no cambió).
+- [x] (Opcional) señal `knowledge.embedding.stale_chunks` en steady=0 — no implementada; se conserva `embed-corpus` dry-run como guardrail operativo.
 
 ## Verification
 
-- `pnpm vitest run src/lib/knowledge`
-- `pnpm tsc --noEmit`
-- `pnpm lint`
-- `pnpm nexa:doc-gate --changed`
+- `pnpm vitest run src/lib/knowledge/search/embed-corpus.test.ts src/lib/knowledge/ingestion/pipeline.test.ts` → pass (6 tests).
+- `NODE_OPTIONS=--max-old-space-size=8192 pnpm exec tsc --noEmit` → pass.
+- `pnpm exec eslint src/lib/knowledge/search/embed-corpus.ts src/lib/knowledge/search/embed-corpus.test.ts src/lib/knowledge/ingestion/pipeline.ts src/lib/knowledge/ingestion/pipeline.test.ts src/lib/knowledge/ingestion/flags.ts` → pass.
+- `NODE_OPTIONS=--max-old-space-size=8192 pnpm build` → pass; warning preexistente de Roadmap dynamic file pattern, no relacionado.
+- `pnpm task:lint --task TASK-1155` → pass (`template=1`, `errors=0`, `warnings=0`).
+- `set -a; source .env.local; set +a; pnpm tsx --require ./scripts/lib/server-only-shim.cjs scripts/knowledge/ingest.ts --apply` → pass, 2 docs published, 20 chunks.
+- SQL verification → `public-site-content-factory-end-to-end v2` 10/10 chunks embedded; `public-site-operar-content-factory v2` 10/10 chunks embedded.
+- `vercel deploy --target=staging --yes` → pass, deployment `dpl_42Uh8pi9qmTdVCd8KgawrChMjjWN` `Ready`, aliases staging actualizados.
+- `pnpm staging:request GET /api/internal/health` → pass, HTTP 200, `overallStatus=ok`.
+- `set -a; source .env.local; set +a; pnpm tsx --require ./scripts/lib/server-only-shim.cjs scripts/knowledge/ingest.ts --source=notion --only=guia-automatizaciones --apply` → pass, 1 Notion doc published, 14 chunks.
+- SQL verification → `guia-automatizaciones v1` 14/14 chunks embedded.
+- `set -a; source .env.local; set +a; pnpm tsx --require ./scripts/lib/server-only-shim.cjs scripts/knowledge/embed-corpus.ts` → pass, `a embeber: 0` tras repo docs y luego tras Notion (`1486` chunks vigentes).
+- No ejecutado como cierre automático: deploy directo del `ops-worker` Cloud Run compartido. El worker procesa el webhook/projection live y debe redeployarse por workflow/commit gobernado o por aprobación explícita para deploy compartido.
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` sincronizado (`in-progress` → `complete`)
-- [ ] archivo en la carpeta correcta
-- [ ] `docs/tasks/README.md` sincronizado
-- [ ] `Handoff.md` actualizado
-- [ ] `changelog.md` actualizado si cambia comportamiento visible
-- [ ] chequeo de impacto cruzado
-- [ ] Delta en `rag-pipeline.md` (embed reactivo) + cerrar el gap anotado en TASK-1151
+- [x] `Lifecycle` sincronizado (`in-progress` → `complete`)
+- [x] archivo en la carpeta correcta
+- [x] `docs/tasks/README.md` sincronizado
+- [x] `Handoff.md` actualizado
+- [x] `changelog.md` actualizado si cambia comportamiento visible
+- [x] chequeo de impacto cruzado
+- [x] Delta en `rag-pipeline.md` (embed reactivo) + cerrar el gap anotado en TASK-1151
 
 ## Follow-ups
 
 - Reranker de relevancia (el OTRO follow-up de TASK-1151, para 7/8 golden-safe) — task separada.
+- Verificación operacional de webhook Notion live después de redeploy gobernado del `ops-worker`: disparar cambio real en wiki autorizada, confirmar projection y `embedded = chunks` para la nueva versión.
 
 ## Open Questions
 
-- ¿Inline-async al final de `ingestOne` vs consumer reactivo por outbox? Resolver en Discovery según si ya
-  existe un evento de publish reutilizable.
+- Resuelto 2026-06-18: hook post-publish en `ingestOne`. No había evento de publish reutilizable; Notion ya llega a `ingestOne` desde su projection outbox, así que el hook evita duplicar eventos/consumers.

@@ -110,12 +110,18 @@ export class AnthropicNexaProvider implements NexaChatProvider {
     const tools = toAnthropicTools(input)
     const messages = buildMessages(input)
 
+    const forcedToolName =
+      input.forcedToolName && tools.some(tool => tool.name === input.forcedToolName) ? input.forcedToolName : null
+
     const firstPass = await client.messages.create({
       model,
       max_tokens: TURN_MAX_TOKENS,
       temperature: 0.2,
       system: input.systemPrompt,
       tools,
+      ...(forcedToolName
+        ? { tool_choice: { type: 'tool' as const, name: forcedToolName, disable_parallel_tool_use: true } }
+        : {}),
       messages
     })
 

@@ -79,6 +79,8 @@ Rules:
 - always write `Execution profile`, `UI impact`, and `Backend impact` in Status
 - if `Execution profile = ui-ux` or `UI impact != none`, include a completed `## UI/UX Contract` section copied from `docs/tasks/TASK_UI_UX_ADDENDUM.md`
 - if `Execution profile = backend-data` or `Backend impact != none`, include a completed `## Backend/Data Contract` section copied from `docs/tasks/TASK_BACKEND_DATA_ADDENDUM.md`
+- if `UI impact != none` and `Backend impact != none`, prefer split into two linked tasks: a `backend-data` foundation first, then a `ui-ux` consumer blocked by that foundation
+- if an intentional hybrid task is kept, include `## Hybrid Execution Justification` with `Why not split`, `Primary execution profile`, `Contract boundary`, and `Risk controls`
 - use real repo paths only
 - keep slices executable and committable
 - make `Out of Scope` explicit
@@ -100,6 +102,7 @@ Before writing files, present:
 - any open questions
 - any `[verificar]` items
 - any collision with active tasks
+- for hybrid tasks, highlight whether you split into `backend-data` + `ui-ux` tasks or kept one task with `## Hybrid Execution Justification`
 - for UI/UX tasks, highlight UI rigor, primitive decision, and GVC plan
 - for backend/data tasks, highlight backend rigor, source of truth, migration/rollback posture, access/security posture, and runtime evidence plan
 
@@ -128,6 +131,7 @@ After confirmation:
 - If the task touches backend/data, do not leave it as a generic implementation task. Set `Execution profile: backend-data`, classify `Backend impact`, and complete `## Backend/Data Contract`.
 - Backend/data tasks must specify source of truth, contract surface, data invariants, tenant/access boundary, idempotency/concurrency, migration/backfill/rollback posture, sensitive data/error posture, audit/signal posture, and runtime evidence.
 - Do not make DB/runtime/integration evidence optional for `backend-standard` or `backend-critical` unless the task explicitly explains why the change is repo-only.
+- If a capability combines backend/data reusable work and visible UI, do not default to one broad task. Create a `backend-data` foundation task for schema/API/reader/command/migration/sync/contract work and a separate `ui-ux` consumer task for route/layout/interaction/copy/GVC work. A vertical hybrid task is acceptable only when the change is small, reversible, does not introduce risky migration/schema work, and includes `## Hybrid Execution Justification` plus explicit slice order.
 - If the user only wants a draft, stop before writing files.
 
 ## Output Contract

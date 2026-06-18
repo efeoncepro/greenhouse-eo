@@ -28,6 +28,15 @@
 Rules de knowledge, y delega el "hablar con el modelo" al adapter. El tool `search_knowledge` y las
 Answer Rules son **provider-agnósticos** — el swap de provider NO los toca.
 
+TASK-1156 agrega `forcedToolName` al input del provider, sin cambiar el contrato de salida. El
+comportamiento default del primer pase sigue siendo tool routing **AUTO**. Solo cuando
+`NEXA_FORCE_KNOWLEDGE_RETRIEVAL_ENABLED` y `NEXA_KNOWLEDGE_RETRIEVAL_ENABLED` estan ON, y
+`classifyNexaIntent(prompt) === 'knowledge'`, el orquestador fuerza `search_knowledge` en el
+primer pase. Gemini lo expresa como `FunctionCallingConfigMode.ANY` con
+`allowedFunctionNames=['search_knowledge']`; Anthropic lo expresa como `tool_choice` del tool.
+Despues de ese primer pase, ambos providers conservan el loop de 2 pases existente y la
+composicion/voz permanece intacta. No hay cambios al prompt.
+
 ## Routing interno (auto-router)
 
 `NEXA_AUTO_ROUTER_ENABLED` activa: `classifyNexaIntent(prompt)` → `NexaIntent` (`knowledge` |

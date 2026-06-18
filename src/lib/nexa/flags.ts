@@ -17,6 +17,13 @@ export const isNexaKnowledgeRetrievalEnabled = (): boolean =>
   process.env.NEXA_KNOWLEDGE_RETRIEVAL_ENABLED === 'true' ||
   process.env.NEXT_PUBLIC_NEXA_KNOWLEDGE_RETRIEVAL_ENABLED === 'true'
 
+// TASK-1156 — forced Knowledge retrieval routing. Default OFF: with OFF, the
+// LLM keeps deciding whether to call `search_knowledge`. With ON, the service
+// forces the first-pass tool when deterministic intent routing says `knowledge`
+// and Knowledge retrieval is enabled.
+export const isNexaForceKnowledgeRetrievalEnabled = (): boolean =>
+  process.env.NEXA_FORCE_KNOWLEDGE_RETRIEVAL_ENABLED === 'true'
+
 // TASK-1091 — pin explícito del provider LLM de Nexa (`google` | `anthropic`). Gana
 // sobre el router. Default unset → router (si está ON) o Gemini (default). Server-only
 // (no NEXT_PUBLIC): la selección de provider es decisión de runtime, no de la UI.

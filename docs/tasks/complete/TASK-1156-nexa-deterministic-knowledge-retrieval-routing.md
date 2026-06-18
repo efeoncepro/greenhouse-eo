@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Medio`
@@ -15,7 +15,7 @@
 - UI impact: `none`
 - Backend impact: `command`
 - Epic: `optional`
-- Status real: `Diseno`
+- Status real: `Staging verified`
 - Rank: `TBD`
 - Domain: `nexa|ai|knowledge`
 - Blocked by: `none`
@@ -255,15 +255,25 @@ N/A — repo + ADC/Vertex ya disponibles.
 - `pnpm qa:nexa-knowledge -- --env=local`
 - `pnpm nexa:doc-gate --changed`
 
+### Execution Evidence — 2026-06-18
+
+- Code complete in `develop`; staging rollout verified on `2026-06-18`.
+- Implemented default-OFF `NEXA_FORCE_KNOWLEDGE_RETRIEVAL_ENABLED`; when enabled with `NEXA_KNOWLEDGE_RETRIEVAL_ENABLED=true`, `knowledge` intent forces first-pass `search_knowledge` through Gemini/Anthropic tool choice. `nexa-system-prompt.ts` and `searchKnowledge` were not changed.
+- Local validation passed: focal Nexa/Knowledge vitest `59 passed / 3 skipped`, `tsc --noEmit`, ESLint focal, `pnpm lint`, `pnpm build`, `pnpm nexa:doc-gate --changed`, `pnpm task:lint --task TASK-1156`, `pnpm ops:lint --changed`, `pnpm qa:gates --changed --agent codex --task TASK-1156 --runtime --integration --docs`, `pnpm docs:closure-check`, `git diff --check`.
+- Runtime QA local with flags ON passed: K4/G1/K7 `3/3` and full `pnpm qa:nexa-knowledge -- --env=local --json` `12/12`; K4/G1/K7 invoked `search_knowledge`.
+- Staging rollout: `NEXA_FORCE_KNOWLEDGE_RETRIEVAL_ENABLED=true` added to Vercel `staging` with `NEXA_KNOWLEDGE_RETRIEVAL_ENABLED=true`; redeployed `https://greenhouse-16fdbud5s-efeonce-7670142f.vercel.app` (`dpl_41GbySqdw4cRGxPaWuFnXR3dB16d`, target `staging`, status `Ready`, aliases `dev-greenhouse.efeoncepro.com` and `greenhouse-eo-env-staging-efeonce-7670142f.vercel.app`).
+- Staging QA passed: `pnpm qa:nexa-knowledge -- --env=staging --case=K4,G1,K7 --json` `3/3`; full `pnpm qa:nexa-knowledge -- --env=staging --json` `12/12`. K4/G1/K7 invoked `search_knowledge`; O1/O2 continued using operational tools (`check_payroll`, `pending_invoices`).
+- Production force-flag flip remains a separate operator/release decision; do not deploy/flip production from this task without explicit release approval.
+
 ## Closing Protocol
 
-- [ ] `Lifecycle` sincronizado (`in-progress` → `complete`)
-- [ ] archivo en la carpeta correcta
-- [ ] `docs/tasks/README.md` sincronizado
-- [ ] `Handoff.md` actualizado
-- [ ] `changelog.md` actualizado si cambia comportamiento visible
-- [ ] chequeo de impacto cruzado
-- [ ] Delta en `behavior-and-routing.md`
+- [x] `Lifecycle` sincronizado (`in-progress` → `complete`)
+- [x] archivo en la carpeta correcta
+- [x] `docs/tasks/README.md` sincronizado
+- [x] `Handoff.md` actualizado
+- [x] `changelog.md` actualizado si cambia comportamiento visible
+- [x] chequeo de impacto cruzado
+- [x] Delta en `behavior-and-routing.md`
 
 ## Follow-ups
 

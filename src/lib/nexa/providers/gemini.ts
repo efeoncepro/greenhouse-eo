@@ -41,6 +41,12 @@ export class GeminiNexaProvider implements NexaChatProvider {
   async resolveTurn(input: NexaTurnInput): Promise<NexaTurnResult> {
     const client = await getGoogleGenAIClient()
     const contents = buildContents(input)
+    const toolDeclarations = getNexaToolDeclarations(input.runtimeContext)
+
+    const forcedToolName =
+      input.forcedToolName && toolDeclarations.some(declaration => declaration.name === input.forcedToolName)
+        ? input.forcedToolName
+        : null
 
     const firstPass = await client.models.generateContent({
       model: input.model,
@@ -53,10 +59,11 @@ export class GeminiNexaProvider implements NexaChatProvider {
         // cierre — el gate K6 de TASK-1140 fallaba por truncamiento, no por el prompt. El techo
         // no anima verbosidad (el prompt sigue pidiendo concisión); solo evita mutilar.
         maxOutputTokens: 1024,
-        tools: [{ functionDeclarations: getNexaToolDeclarations(input.runtimeContext) }],
+        tools: [{ functionDeclarations: toolDeclarations }],
         toolConfig: {
           functionCallingConfig: {
-            mode: FunctionCallingConfigMode.AUTO
+            mode: forcedToolName ? FunctionCallingConfigMode.ANY : FunctionCallingConfigMode.AUTO,
+            ...(forcedToolName ? { allowedFunctionNames: [forcedToolName] } : {})
           }
         }
       }

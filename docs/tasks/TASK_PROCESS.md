@@ -76,6 +76,46 @@ El campo `Type` en Zone 0 determina que zonas y pasos aplican. Cuando hay duda, 
 - `webhook` — inbound/outbound webhook, HMAC, replay, subscription o delivery.
 - `integration` — provider externo, cloud, HubSpot, Notion, Teams, WordPress/Kinsta, AI provider u otro sistema fuera del repo.
 
+### Hybrid Execution Profile Discipline
+
+Una task puede tener solo un `Execution profile` principal, pero puede declarar impacto UI y backend al mismo tiempo. Ese caso es una task hibrida intencional y debe tratarse como excepcion controlada, no como default.
+
+Regla canonica: cuando una capacidad combine backend/data reusable con UI visible significativa, preferir dividirla en dos tasks dependientes:
+
+1. `backend-data` foundation primero: schema/API/reader/command/migration/sync/cron/webhook/integration, source of truth, contrato programatico, invariantes, access, idempotencia, migration/backfill/rollback y evidencia runtime.
+2. `ui-ux` consumer despues: ruta visible, layout, primitive/pattern, estados, copy, interaccion, motion/reduced-motion, GVC y scroll-width cuando aplique.
+
+Triggers fuertes de split:
+
+- nueva ruta visible + nuevo reader/API;
+- migracion/backfill + UI visible;
+- nueva primitive/pattern UI + backend reusable;
+- backend/data contract consumible por UI, agentes, API Platform o futuros modulos;
+- command/write path gobernado + superficie humana para ejecutarlo;
+- integracion externa nueva + experiencia visible que depende de su estado real.
+
+Excepcion valida: una task `ui-ux` discovery/mockup/prototipo puede ir primero cuando el contrato de producto todavia esta borroso, por ejemplo si hay que validar board/list/inspector, el problema es mas de flujo que de data, o conviene que el backend se disene alrededor de una experiencia aprobada. En ese caso usar datos mockeados o fixtures, declarar la task `backend-data` que cableara el contrato real y no presentar el prototipo como runtime completo.
+
+Casos hibridos aceptables:
+
+- cambio vertical pequeno sobre un contrato existente;
+- ajuste de copy/estado UI con tweak local de DTO/read ya existente;
+- bugfix local donde dividir agregaria ceremonia sin reducir riesgo;
+- tool/doc/linter que toca metadata de ambos perfiles pero no crea runtime UI/backend.
+
+Si se mantiene una task vertical hibrida, debe incluir una seccion parseable:
+
+```md
+## Hybrid Execution Justification
+
+- Why not split:
+- Primary execution profile:
+- Contract boundary:
+- Risk controls:
+```
+
+El linter valida presencia, no calidad del prose. La revision humana/agente debe comprobar que la justificacion realmente sea pequena, reversible, sin migracion/schema riesgoso y con orden interno de slices explicito.
+
 Regla de migracion: no convertir masivamente backlog historico. `complete/` queda como historia;
 `in-progress/` y `to-do/` agregan el contrato UI/UX o Backend/Data cuando se editan, se rankean o se toman.
 
@@ -182,6 +222,10 @@ Reglas V1:
 - Tasks template con impacto UI/UX sin `## UI/UX Contract` y tasks template con impacto backend/data sin
   `## Backend/Data Contract` generan `warning` en rollout warn-first; no bloquean hasta que el backlog
   nuevo demuestre adopcion estable.
+- Tasks template activas con `UI impact != none` y `Backend impact != none` sin
+  `## Hybrid Execution Justification` generan `warning` en rollout warn-first; no bloquean backlog
+  historico ni tasks completas. Si una task hibrida esta justificada, la seccion debe explicar por que
+  no se dividio, perfil primario, frontera de contrato y controles de riesgo.
 
 CI corre `.github/workflows/task-contract.yml` en modo `--changed` warn-first. No usar el
 linter para reescribir backlog legacy ni para auto-mover archivos; reporta drift y el agente
@@ -287,6 +331,11 @@ El agente DEBE hacer estas acciones antes de producir un plan:
    - declarar migration/backfill/seed posture, default state, flags/cutover y rollback;
    - declarar error contract, sensitive data posture, rate-limit/replay/circuit breaker cuando aplique;
    - declarar evidencia runtime/DB/integracion y production verification sequence proporcional al riesgo.
+12. **Hybrid profile check** — si `UI impact != none` y `Backend impact != none`, resolver antes de implementar:
+   - preferir split en dos tasks dependientes (`backend-data` foundation + `ui-ux` consumer);
+   - si se mantiene una task hibrida, confirmar que existe `## Hybrid Execution Justification`;
+   - declarar el perfil primario, frontera de contrato, orden interno de slices y controles de riesgo;
+   - si la task actual esta mal clasificada y el split reduce riesgo, corregir la spec o crear/relacionar la task dependiente antes de seguir.
 
 **Output de Discovery:** un bloque de texto (o seccion en `plan.md`) que lista:
 - Archivos encontrados vs. esperados
@@ -300,6 +349,7 @@ El agente DEBE hacer estas acciones antes de producir un plan:
 - **Subagent decision** — secuencial o fork, y justificacion
 - **UI/UX decision** — si aplica: nivel `ui-lite|ui-standard|ui-platform`, primitive/pattern elegido, estados, motion/copy/GVC y deuda visual conocida
 - **Backend/Data decision** — si aplica: nivel `backend-lite|backend-standard|backend-critical`, source of truth, contract surface, invariantes, migracion/rollback, seguridad/acceso y evidencia runtime requerida
+- **Hybrid decision** — si aplica: split en dos tasks o `## Hybrid Execution Justification` con rationale y orden interno de slices
 
 ### Phase 2 — Plan
 
@@ -552,12 +602,14 @@ Crear una task nueva si:
 - necesita su propio bloque `Dependencies & Impact`
 - tiene archivos owned diferenciables
 - tiene criterios de aceptacion propios
+- separa una foundation `backend-data` de un consumer `ui-ux` para reducir riesgo o blast radius
 
 Actualizar una task existente si:
 
 - el trabajo es un slice mas de la misma lane
 - el objetivo sigue siendo el mismo
 - los archivos owned y dependencias no cambian de manera material
+- el alcance hibrido es pequeno, reversible, sin migracion/schema riesgoso y tiene `## Hybrid Execution Justification`
 
 Reclasificar a spec y no dejarlo como task si:
 

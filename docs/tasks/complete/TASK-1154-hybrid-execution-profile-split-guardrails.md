@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -17,7 +17,7 @@
 - UI impact: `none`
 - Backend impact: `none`
 - Epic: `none`
-- Status real: `Diseno`
+- Status real: `Cerrada`
 - Rank: `TBD`
 - Domain: `ops|platform|quality|agent-governance`
 - Blocked by: `none`
@@ -240,32 +240,33 @@ N/A — repo-only tooling/documentation change.
 
 ## Acceptance Criteria
 
-- [ ] `docs/tasks/TASK_PROCESS.md` defines split triggers, allowed hybrid cases and `## Hybrid Execution Justification`.
-- [ ] `docs/tasks/TASK_TEMPLATE.md` documents the optional conditional hybrid section.
-- [ ] Codex and Claude task-planner skills recommend split and require justification when keeping a hybrid task.
-- [ ] `task:lint` emits warning `hybrid-profile-justification` for template tasks with `UI impact != none` and `Backend impact != none` without the section.
-- [ ] `task:lint` tests cover no-warning split-safe cases, warning hybrid without justification, and no warning hybrid with justification.
-- [ ] `AGENTS.md` and `CLAUDE.md` summarize the rule and link to `TASK_PROCESS.md`.
-- [ ] Existing legacy/pre-adoption tasks are not converted or blocked by default.
+- [x] `docs/tasks/TASK_PROCESS.md` defines split triggers, allowed hybrid cases and `## Hybrid Execution Justification`.
+- [x] `docs/tasks/TASK_TEMPLATE.md` documents the optional conditional hybrid section.
+- [x] Codex and Claude task-planner skills recommend split and require justification when keeping a hybrid task.
+- [x] `task:lint` emits warning `hybrid-profile-justification` for template tasks with `UI impact != none` and `Backend impact != none` without the section.
+- [x] `task:lint` tests cover no-warning split-safe cases, warning hybrid without justification, and no warning hybrid with justification.
+- [x] `AGENTS.md` and `CLAUDE.md` summarize the rule and link to `TASK_PROCESS.md`.
+- [x] Existing legacy/pre-adoption tasks are not converted or blocked by default.
 
 ## Verification
 
-- `pnpm task:lint:test`
-- `pnpm task:lint --task TASK-1154`
-- `pnpm task:lint --changed`
-- `pnpm ops:lint --changed`
-- Manual diff review of `.codex/skills/greenhouse-task-planner/SKILL.md` and `.claude/skills/greenhouse-task-planner/skill.md`
+- `pnpm task:lint:test` — passed, 20/20.
+- `pnpm task:lint --task TASK-1154` — passed, 0 errors / 0 warnings.
+- `pnpm task:lint --changed` — passed, 0 errors / 0 warnings.
+- `pnpm ops:lint --changed` — passed, 0 errors / 0 warnings.
+- `pnpm lint` — passed.
+- Manual diff review of `.codex/skills/greenhouse-task-planner/SKILL.md` and `.claude/skills/greenhouse-task-planner/skill.md` — completed.
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
-- [ ] `pnpm task:lint:test` covers the new warning rule
-- [ ] unrelated WIP blocking `ops:lint --changed` was not modified to force a green check
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [x] `docs/tasks/README.md` quedo sincronizado con el cierre
+- [x] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
+- [x] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
+- [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
+- [x] `pnpm task:lint:test` covers the new warning rule
+- [x] unrelated WIP blocking `ops:lint --changed` was not modified to force a green check
 
 ## Follow-ups
 
@@ -273,4 +274,4 @@ N/A — repo-only tooling/documentation change.
 
 ## Open Questions
 
-- During implementation, decide whether `Hybrid Execution Justification` should be required for `UI impact != none && Backend impact != none` only, or also for suspicious combinations such as `Execution profile: ui-ux` with `Backend impact: reader`.
+- Resolved: V1 requires `## Hybrid Execution Justification` only when `UI impact != none && Backend impact != none`. Suspicious combinations such as `Execution profile: ui-ux` with `Backend impact: reader` remain documented split-review signals in `TASK_PROCESS.md`, but do not emit a dedicated warning until adoption stabilizes.

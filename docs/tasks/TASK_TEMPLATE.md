@@ -16,8 +16,9 @@ Para tasks con impacto backend/data, ver [`TASK_BACKEND_DATA_ADDENDUM.md`](TASK_
 5. Llenar Zone 3 y Zone 4 con el detalle que tengas disponible
 6. Si la task toca UI visible, copy, layout, estados, interaccion, motion, primitive o GVC, declarar `Execution profile: ui-ux`, completar `UI impact` y copiar el bloque de [`TASK_UI_UX_ADDENDUM.md`](TASK_UI_UX_ADDENDUM.md)
 7. Si la task toca backend, datos, DB, API, commands, readers, migrations, sync, cron, webhooks o integraciones, declarar `Execution profile: backend-data`, completar `Backend impact` y copiar el bloque de [`TASK_BACKEND_DATA_ADDENDUM.md`](TASK_BACKEND_DATA_ADDENDUM.md)
-8. Para tasks `umbrella` o `policy`: Zone 3 (Detailed Spec) puede omitirse; Verification es revision manual
-9. El cierre de una task no termina cuando el codigo "ya funciona": termina solo cuando el agente actualiza `Lifecycle`, mueve el archivo a la carpeta correcta y sincroniza `docs/tasks/README.md`
+8. Si `UI impact != none` y `Backend impact != none`, preferir split en dos tasks (`backend-data` foundation + `ui-ux` consumer). Si se conserva una task hibrida, agregar `## Hybrid Execution Justification`.
+9. Para tasks `umbrella` o `policy`: Zone 3 (Detailed Spec) puede omitirse; Verification es revision manual
+10. El cierre de una task no termina cuando el codigo "ya funciona": termina solo cuando el agente actualiza `Lifecycle`, mueve el archivo a la carpeta correcta y sincroniza `docs/tasks/README.md`
 
 ---
 
@@ -127,6 +128,18 @@ el bloque de `docs/tasks/TASK_UI_UX_ADDENDUM.md`.]
 [Condicional. Omitir si `Execution profile: standard` y `Backend impact: none`.
 Si `Execution profile: backend-data` o `Backend impact` no es `none`, copiar
 y completar el bloque de `docs/tasks/TASK_BACKEND_DATA_ADDENDUM.md`.]
+
+## Hybrid Execution Justification
+
+[Condicional. Omitir si `UI impact: none` o `Backend impact: none`.
+Si ambos impactos son distintos de `none`, primero evaluar split en dos tasks:
+`backend-data` foundation y `ui-ux` consumer. Mantener una task hibrida solo
+si es pequena/reversible o reduce riesgo operacional, y completar:]
+
+- Why not split:
+- Primary execution profile:
+- Contract boundary:
+- Risk controls:
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE

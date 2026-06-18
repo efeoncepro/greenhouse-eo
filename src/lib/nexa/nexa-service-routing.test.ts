@@ -27,10 +27,12 @@ vi.mock('./providers/anthropic', () => ({
 const mockGetNexaProviderOverride = vi.fn<() => 'google' | 'anthropic' | null>(() => null)
 const mockIsAutoRouter = vi.fn(() => false)
 const mockIsKnowledge = vi.fn(() => false)
+const mockIsForceKnowledge = vi.fn(() => false)
 
 vi.mock('./flags', () => ({
   getNexaProviderOverride: () => mockGetNexaProviderOverride(),
   isNexaAutoRouterEnabled: () => mockIsAutoRouter(),
+  isNexaForceKnowledgeRetrievalEnabled: () => mockIsForceKnowledge(),
   isNexaKnowledgeRetrievalEnabled: () => mockIsKnowledge(),
   // TASK-1124 — el builder de prompt lee estos flags; en routing tests quedan OFF (prompt V1).
   isNexaSystemPromptV2Enabled: () => false,
@@ -72,6 +74,7 @@ describe('NexaService provider routing (TASK-1091)', () => {
     mockGetNexaProviderOverride.mockReturnValue(null)
     mockIsAutoRouter.mockReturnValue(false)
     mockIsKnowledge.mockReturnValue(false)
+    mockIsForceKnowledge.mockReturnValue(false)
     geminiResolveTurn.mockResolvedValue({ text: 'respuesta gemini', toolInvocations: [] })
     anthropicResolveTurn.mockResolvedValue({ text: 'respuesta claude', toolInvocations: [] })
   })
@@ -139,5 +142,23 @@ describe('NexaService provider routing (TASK-1091)', () => {
     expect(response.modelId).toBe('google/gemini-2.5-flash@default')
     expect(geminiResolveTurn).toHaveBeenCalledTimes(1)
     expect(anthropicResolveTurn).not.toHaveBeenCalled()
+  })
+
+  it('pasa search_knowledge como forced tool para intención knowledge cuando el rollout está ON', async () => {
+    mockIsKnowledge.mockReturnValue(true)
+    mockIsForceKnowledge.mockReturnValue(true)
+
+    await runWith('¿Cuál es la diferencia entre Efeonce, Greenhouse y Nexa?')
+
+    expect(geminiResolveTurn).toHaveBeenCalledWith(expect.objectContaining({ forcedToolName: 'search_knowledge' }))
+  })
+
+  it('no fuerza search_knowledge para una pregunta operativa aunque el rollout esté ON', async () => {
+    mockIsKnowledge.mockReturnValue(true)
+    mockIsForceKnowledge.mockReturnValue(true)
+
+    await runWith('¿Cómo va la nómina este mes?')
+
+    expect(geminiResolveTurn).toHaveBeenCalledWith(expect.objectContaining({ forcedToolName: null }))
   })
 })

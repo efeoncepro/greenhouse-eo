@@ -22,7 +22,8 @@ const taskFixture = ({
   uiImpact = 'none',
   uiUxContract = '',
   backendImpact = 'none',
-  backendDataContract = ''
+  backendDataContract = '',
+  hybridExecutionJustification = ''
 } = {}) => `# ${id} — ${title}
 
 <!-- ZONE 0 — IDENTITY & TRIAGE -->
@@ -96,6 +97,7 @@ Fixture.
 
 ${uiUxContract}
 ${backendDataContract}
+${hybridExecutionJustification}
 
 <!-- ZONE 2 — PLAN MODE -->
 
@@ -446,6 +448,141 @@ const cases = [
       const result = lintTasks({ repoRoot: root, options: { format: 'json', strict: false, changed: false, task: 'TASK-999' } })
 
       assert.equal(result.warnings.some(item => item.rule === 'backend-data-contract'), false)
+      rmSync(root, { recursive: true, force: true })
+    }
+  },
+  {
+    name: 'warns when an active hybrid UI/backend task is missing justification',
+    run: () => {
+      const root = createRepo()
+
+      write(join(root, 'docs', 'tasks', 'to-do', 'TASK-999-fixture.md'), taskFixture({
+        domain: 'ui|api',
+        executionProfile: 'backend-data',
+        uiImpact: 'flow',
+        backendImpact: 'api',
+        uiUxContract: [
+          '## UI/UX Contract',
+          '',
+          '### Experience brief',
+          '',
+          '- UI rigor: `ui-standard`',
+          '- Usuario / rol: operador interno'
+        ].join('\n'),
+        backendDataContract: [
+          '## Backend/Data Contract',
+          '',
+          '### Backend/data brief',
+          '',
+          '- Backend rigor: `backend-standard`',
+          '- Impacto principal: `api`'
+        ].join('\n')
+      }))
+
+      const result = lintTasks({ repoRoot: root, options: { format: 'json', strict: false, changed: false, task: 'TASK-999' } })
+
+      assert.equal(result.errors.length, 0)
+      assert.equal(result.warnings.some(item => item.rule === 'hybrid-profile-justification'), true)
+      rmSync(root, { recursive: true, force: true })
+    }
+  },
+  {
+    name: 'accepts an active hybrid UI/backend task with justification',
+    run: () => {
+      const root = createRepo()
+
+      write(join(root, 'docs', 'tasks', 'to-do', 'TASK-999-fixture.md'), taskFixture({
+        domain: 'ui|api',
+        executionProfile: 'backend-data',
+        uiImpact: 'flow',
+        backendImpact: 'api',
+        uiUxContract: [
+          '## UI/UX Contract',
+          '',
+          '### Experience brief',
+          '',
+          '- UI rigor: `ui-standard`',
+          '- Usuario / rol: operador interno'
+        ].join('\n'),
+        backendDataContract: [
+          '## Backend/Data Contract',
+          '',
+          '### Backend/data brief',
+          '',
+          '- Backend rigor: `backend-standard`',
+          '- Impacto principal: `api`'
+        ].join('\n'),
+        hybridExecutionJustification: [
+          '## Hybrid Execution Justification',
+          '',
+          '- Why not split: small vertical change on an existing contract.',
+          '- Primary execution profile: backend-data.',
+          '- Contract boundary: existing reader DTO.',
+          '- Risk controls: focal tests and no migration.'
+        ].join('\n')
+      }))
+
+      const result = lintTasks({ repoRoot: root, options: { format: 'json', strict: false, changed: false, task: 'TASK-999' } })
+
+      assert.equal(result.warnings.some(item => item.rule === 'hybrid-profile-justification'), false)
+      rmSync(root, { recursive: true, force: true })
+    }
+  },
+  {
+    name: 'does not warn for non-hybrid profile tasks',
+    run: () => {
+      const root = createRepo()
+
+      write(join(root, 'docs', 'tasks', 'to-do', 'TASK-999-fixture.md'), taskFixture({
+        domain: 'ui|platform',
+        executionProfile: 'ui-ux',
+        uiImpact: 'layout',
+        backendImpact: 'none',
+        uiUxContract: [
+          '## UI/UX Contract',
+          '',
+          '### Experience brief',
+          '',
+          '- UI rigor: `ui-standard`'
+        ].join('\n')
+      }))
+
+      const result = lintTasks({ repoRoot: root, options: { format: 'json', strict: false, changed: false, task: 'TASK-999' } })
+
+      assert.equal(result.warnings.some(item => item.rule === 'hybrid-profile-justification'), false)
+      rmSync(root, { recursive: true, force: true })
+    }
+  },
+  {
+    name: 'does not warn for completed hybrid historical tasks',
+    run: () => {
+      const root = createRepo()
+
+      write(join(root, 'docs', 'tasks', 'complete', 'TASK-999-fixture.md'), taskFixture({
+        lifecycle: 'complete',
+        domain: 'ui|api',
+        executionProfile: 'backend-data',
+        uiImpact: 'flow',
+        backendImpact: 'api',
+        uiUxContract: [
+          '## UI/UX Contract',
+          '',
+          '### Experience brief',
+          '',
+          '- UI rigor: `ui-standard`'
+        ].join('\n'),
+        backendDataContract: [
+          '## Backend/Data Contract',
+          '',
+          '### Backend/data brief',
+          '',
+          '- Backend rigor: `backend-standard`'
+        ].join('\n')
+      }))
+
+      const result = lintTasks({ repoRoot: root, options: { format: 'json', strict: false, changed: false, task: 'TASK-999' } })
+
+      assert.equal(result.warnings.some(item => item.rule === 'hybrid-profile-justification'), false)
       rmSync(root, { recursive: true, force: true })
     }
   }

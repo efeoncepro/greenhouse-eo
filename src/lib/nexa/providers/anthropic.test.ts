@@ -10,7 +10,7 @@ vi.mock('@/lib/ai/anthropic', () => ({
 }))
 
 const mockExecuteNexaTool = vi.fn()
-const mockGetNexaToolDeclarations = vi.fn(() => [])
+const mockGetNexaToolDeclarations = vi.fn((): Array<Record<string, unknown>> => [])
 
 vi.mock('../nexa-tools', () => ({
   executeNexaTool: (...args: unknown[]) => mockExecuteNexaTool(...args),
@@ -116,6 +116,73 @@ describe('AnthropicNexaProvider', () => {
 
     expect(toolResultMessage.role).toBe('user')
     expect(toolResultMessage.content[0]).toMatchObject({ type: 'tool_result', tool_use_id: 'toolu_123' })
+  })
+
+  it('fuerza search_knowledge en el primer pase cuando el tool está mapeado', async () => {
+    mockGetNexaToolDeclarations.mockReturnValue([
+      {
+        name: 'search_knowledge',
+        description: 'Busca conocimiento documentado.',
+        parametersJsonSchema: { type: 'object', properties: {} }
+      }
+    ])
+    mockMessagesCreate
+      .mockResolvedValueOnce({
+        stop_reason: 'tool_use',
+        content: [
+          {
+            type: 'tool_use',
+            id: 'toolu_search',
+            name: 'search_knowledge',
+            input: { query: 'Greenhouse' }
+          }
+        ]
+      })
+      .mockResolvedValueOnce({
+        stop_reason: 'end_turn',
+        content: [{ type: 'text', text: 'Encontré la guía publicada [1].' }]
+      })
+
+    mockExecuteNexaTool.mockResolvedValue({
+      toolCallId: 'toolu_search',
+      toolName: 'search_knowledge',
+      args: { query: 'Greenhouse' },
+      result: { available: true, summary: 'Guía encontrada', source: 'knowledge', metrics: [], raw: {} }
+    })
+
+    const result = await new AnthropicNexaProvider().resolveTurn({
+      ...baseTurnInput,
+      forcedToolName: 'search_knowledge'
+    })
+
+    expect(result.text).toBe('Encontré la guía publicada [1].')
+    expect(mockMessagesCreate.mock.calls[0][0]).toMatchObject({
+      tool_choice: { type: 'tool', name: 'search_knowledge', disable_parallel_tool_use: true }
+    })
+    expect(mockExecuteNexaTool).toHaveBeenCalledWith(
+      expect.objectContaining({ toolCallId: 'toolu_search', toolName: 'search_knowledge' })
+    )
+  })
+
+  it('preserva el comportamiento por defecto si el tool forzado no está disponible', async () => {
+    mockGetNexaToolDeclarations.mockReturnValue([
+      {
+        name: 'check_payroll',
+        description: 'Revisa nómina.',
+        parametersJsonSchema: { type: 'object', properties: {} }
+      }
+    ])
+    mockMessagesCreate.mockResolvedValue({
+      stop_reason: 'end_turn',
+      content: [{ type: 'text', text: 'Respuesta directa.' }]
+    })
+
+    await new AnthropicNexaProvider().resolveTurn({
+      ...baseTurnInput,
+      forcedToolName: 'search_knowledge'
+    })
+
+    expect(mockMessagesCreate.mock.calls[0][0]).not.toHaveProperty('tool_choice')
   })
 
   it('usa el fallback honesto cuando el follow-up no sintetiza pero hubo señal de tools', async () => {

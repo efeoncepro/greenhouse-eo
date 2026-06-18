@@ -13,12 +13,14 @@ import {
   transitionKnowledgeDocumentStatus
 } from '../store'
 import { sanitizeKnowledgeContent, type SanitizationFinding } from '../sanitization/detect'
+import { embedKnowledgeDocumentVersion } from '../search/embed-corpus'
 
 import type {
   KnowledgeDocCandidate,
   KnowledgeSourceConnector,
   KnowledgeSourceDescriptor
 } from './connector'
+import { isKnowledgeReactiveEmbeddingEnabled } from './flags'
 import { checksumMarkdown, chunkMarkdown } from './markdown'
 import { beginKnowledgeRun, completeKnowledgeRun } from './run-tracking'
 
@@ -166,6 +168,22 @@ export const ingestOne = async (
     })),
     actorUserId: actor
   })
+
+  if (isKnowledgeReactiveEmbeddingEnabled()) {
+    try {
+      await embedKnowledgeDocumentVersion({ documentVersionId: version.versionId, apply: true })
+    } catch (err) {
+      captureWithDomain(err, 'knowledge', {
+        tags: { source: 'ingestion_pipeline', stage: 'reactive_embedding' },
+        extra: {
+          slug: candidate.slug,
+          documentId: doc.documentId,
+          documentVersionId: version.versionId,
+          versionNumber: version.versionNumber
+        }
+      })
+    }
+  }
 
   return {
     slug: candidate.slug,

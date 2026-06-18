@@ -42,6 +42,8 @@ const KNOWLEDGE_INTENT_PATTERNS: RegExp[] = [
   /\bdefinici[óo]n/i,
   /\bsignifica\b/i,
   /\bdocumentaci[óo]n/i,
+  /\bknowledge\b/i,
+  /\bbase de conocimientos\b/i,
   /\bpasos?\b/i,
   /\bdiferencia entre\b/i,
   /\bpara qu[ée] sirve\b/i,

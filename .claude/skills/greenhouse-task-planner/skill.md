@@ -89,6 +89,8 @@ Write the complete `.md` file following the structure of `docs/tasks/TASK_TEMPLA
 - Backend/data tasks must specify source of truth, contract surface, data invariants, tenant/access boundary, idempotency/concurrency, migration/backfill/rollback posture, sensitive data/error posture, audit/signal posture, and runtime evidence.
 - Backend/data acceptance criteria must be binary: source of truth named, contract surface named, invariants listed, access boundary explicit, migration/rollback posture explicit, and runtime/DB/integration evidence listed.
 - For `backend-standard` and `backend-critical`, DB/runtime/integration evidence is required unless the task explicitly explains why the change is repo-only.
+- If `UI impact != none` and `Backend impact != none`, prefer two linked tasks: a `backend-data` foundation first for schema/API/reader/command/migration/sync/contract work, then a `ui-ux` consumer blocked by that foundation for route/layout/interaction/copy/GVC work.
+- If an intentional vertical hybrid task is kept, include `## Hybrid Execution Justification` with `Why not split`, `Primary execution profile`, `Contract boundary`, and `Risk controls`, and make the internal slice order explicit.
 
 **`Rollout Plan & Risk Matrix` es seccion canonica obligatoria** desde 2026-05-13. Vive entre `Detailed Spec` y `Acceptance Criteria`. Subsecciones canonicas: `Slice ordering hard rule`, `Risk matrix` (tabla riesgo × sistema × prob × mitigation × signal), `Feature flags / cutover`, `Rollback plan per slice` (tabla con tiempo + reversible?), `Production verification sequence`, `Out-of-band coordination required`.
 
@@ -120,6 +122,7 @@ Present the task to the user. Explicitly call out:
 - Any item in `Open Questions` that needs resolution before an agent takes it
 - Any path marked with `[verificar]` that you could not confirm in the repo
 - If you detected possible collisions with other active tasks (overlapping owned files)
+- For hybrid UI/backend work: whether you split into `backend-data` + `ui-ux` tasks or kept one justified hybrid task
 - For UI/UX tasks: UI rigor, primitive decision, copy source, required states, motion posture, and GVC plan
 - For backend/data tasks: backend rigor, source of truth, migration/rollback posture, access/security posture, and runtime evidence plan
 
@@ -145,3 +148,4 @@ After user confirmation:
 - **Rollout Plan & Risk Matrix is canonical.** Toda task de tipo `implementation` que toque runtime de produccion DEBE incluir esta seccion poblada con detalle. Si la task es trivial (doc-only, microcopy, refactor local), declarar explicito por que el rollout es trivial. NUNCA dejar la seccion vacia o con solo "N/A" sin justificacion. Patron canonico desde 2026-05-13 (TASK-872 review arch-architect detecto que sin esta seccion, agentes pueden ejecutar slices fuera de orden y romper SCIM/SSO/payroll).
 - **UI/UX contract is canonical for visible work.** Do not create a generic implementation task when the brief touches UI/UX. Set `Execution profile: ui-ux`, classify `UI impact`, complete `## UI/UX Contract`, and keep the evidence proportional with `ui-lite|ui-standard|ui-platform`.
 - **Backend/Data contract is canonical for runtime/data work.** Do not create a generic implementation task when the brief touches API, DB, commands, readers, migrations, sync, cron, webhooks, integrations, or source-of-truth/data contracts. Set `Execution profile: backend-data`, classify `Backend impact`, complete `## Backend/Data Contract`, and keep the evidence proportional with `backend-lite|backend-standard|backend-critical`.
+- **Hybrid UI/backend work splits by default.** When a capability combines reusable backend/data work with visible UI, create a `backend-data` foundation task and a dependent `ui-ux` consumer task. Keep one vertical hybrid task only when it is small, reversible, avoids risky migration/schema work, and includes `## Hybrid Execution Justification` plus explicit slice order.
