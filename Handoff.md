@@ -2,6 +2,16 @@
 
 > **Estado:** `released` (manifest transicionó a released, post-release health check verde). Orchestrator run [`27721723752`](https://github.com/efeoncepro/greenhouse-eo/actions/runs/27721723752) `completed/success`. Conducido por Claude tras pedido del operador ("paso a producción que Codex dejó preparado").
 
+## Sesión 2026-06-18 — Ops Worker deploy drift guard / documentation — Codex
+
+> **Estado:** guardrail de control-plane en `develop`; runtime del `ops-worker` no fue modificado.
+
+- **Respuesta corta al riesgo:** no hay evidencia de daño al `ops-worker`. El último deploy real del worker fue `Ops Worker Deploy` run `27753918151`, terminó `success`, dejó `ops-worker-00363-kd6` `Ready=True`, 100% tráfico y `GIT_SHA=9703ae5d19225fd06ed75ab04d6244244f41a738`. Después, el commit workflow-only `dfd85612d` pasó CI `27754869996` y no disparó un nuevo `Ops Worker Deploy`.
+- **Qué cambió:** solo `.github/workflows/ops-worker-deploy.yml`. El workflow ahora resuelve SHA operativo del worker para dispatch manual sin `expected_sha`, lee la revisión Cloud Run actual por `GIT_SHA` y salta build/deploy si `git diff` prueba que los paths runtime son equivalentes. Si hay drift real, mantiene el camino anterior: Cloud Build + Cloud Run + health + Ready polling.
+- **Qué NO cambió:** no se tocó `services/ops-worker/server.ts`, Dockerfile, `deploy.sh`, Cloud Scheduler jobs, handlers ni código de crons/projections. El cambio evita redeploys innecesarios cuando solo cambia documentación/control-plane.
+- **Docs sincronizadas:** `docs/architecture/GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md`, `docs/architecture/agent-invariants/OPS_RELIABILITY_AGENT_INVARIANTS.md`, `project_context.md`, `changelog.md` y este handoff.
+- **Caveat operativo:** `gcloud` local quedó pidiendo reauth no interactiva para lecturas directas de Cloud Run; no invalida la evidencia de Actions porque el workflow usa WIF. Si se necesita una nueva lectura local, correr ambos flujos requeridos por AGENTS (`gcloud auth login` y `gcloud auth application-default login`).
+
 ## Sesión 2026-06-18 — TASK-1155 Knowledge reactive embedding on ingestion — Codex
 
 > **Estado:** complete en `develop`; sin branch/worktree nuevo. El operador pidió investigación profunda + subagentes.
