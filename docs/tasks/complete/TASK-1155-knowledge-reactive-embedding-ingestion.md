@@ -167,7 +167,9 @@ Reglas obligatorias:
   - Query directa a Postgres: `guia-automatizaciones v1` quedó con `chunks=14`, `embedded=14`.
   - `embed-corpus` posterior dry-run: 1486 chunks vigentes, `a embeber: 0`, `ya al día: 1486`.
   - `scripts/knowledge/reconcile.ts` dry-run se interrumpió tras varios minutos sin output; no se usó como gate de cierre.
-  - Webhook Notion live no se disparó en esta sesión. El path de webhook/projection usa el mismo `ingestOne`, pero el `ops-worker` Cloud Run compartido no fue redeployado desde este working tree sucio; validar evento webhook live queda pendiente de deploy gobernado del worker.
+  - Vercel staging final post-push: `dpl_HxsAx3pfYpaHs17LJUh8zVnAuPjb` (`greenhouse-e7hpdfrn2`, SHA `8d60bb0`) `Ready`; `pnpm staging:request GET /api/internal/health` → HTTP 200, Postgres/BigQuery/Sentry OK.
+  - Ops worker staging final: `Ops Worker Deploy` run `27752682834` → success; Cloud Run `ops-worker-00361-2vs` `Ready`, 100% traffic, `GIT_SHA=8d60bb09f838522b233595c6bcf09c3a4ba42550`.
+  - Webhook Notion live no se disparó en esta sesión. El path de webhook/projection usa el mismo `ingestOne` y el worker ya fue redeployado; validar evento live requiere editar una wiki autorizada y observar `knowledge_notion_ingest`.
 - Reliability signals/logs:
   - Señal `knowledge.embedding.stale_chunks` quedó fuera de scope por ser opcional; el guardrail operativo inmediato sigue siendo `embed-corpus` dry-run/`--apply`.
 
@@ -262,7 +264,11 @@ N/A — repo + ADC/Vertex ya disponibles.
 - `set -a; source .env.local; set +a; pnpm tsx --require ./scripts/lib/server-only-shim.cjs scripts/knowledge/ingest.ts --source=notion --only=guia-automatizaciones --apply` → pass, 1 Notion doc published, 14 chunks.
 - SQL verification → `guia-automatizaciones v1` 14/14 chunks embedded.
 - `set -a; source .env.local; set +a; pnpm tsx --require ./scripts/lib/server-only-shim.cjs scripts/knowledge/embed-corpus.ts` → pass, `a embeber: 0` tras repo docs y luego tras Notion (`1486` chunks vigentes).
-- No ejecutado como cierre automático: deploy directo del `ops-worker` Cloud Run compartido. El worker procesa el webhook/projection live y debe redeployarse por workflow/commit gobernado o por aprobación explícita para deploy compartido.
+- `vercel inspect https://greenhouse-e7hpdfrn2-efeonce-7670142f.vercel.app --scope efeonce-7670142f` → final staging `dpl_HxsAx3pfYpaHs17LJUh8zVnAuPjb` `Ready`, aliases staging actualizados.
+- `pnpm staging:request GET /api/internal/health` → pass final, version `8d60bb0`, HTTP 200, `overallStatus=ok`.
+- `gh workflow run "Ops Worker Deploy" --ref develop -f environment=staging -f expected_sha=8d60bb09f838522b233595c6bcf09c3a4ba42550` → run `27752682834` success.
+- `gcloud run services describe ops-worker --project=efeonce-group --region=us-east4` → `ops-worker-00361-2vs`, Ready, 100% traffic, `GIT_SHA=8d60bb09f838522b233595c6bcf09c3a4ba42550`.
+- No disparado: edición real de wiki Notion para observar un evento webhook/projection live. El worker ya está redeployado; falta solo ese estímulo externo si se quiere evidencia de evento real.
 
 ## Closing Protocol
 
@@ -277,7 +283,7 @@ N/A — repo + ADC/Vertex ya disponibles.
 ## Follow-ups
 
 - Reranker de relevancia (el OTRO follow-up de TASK-1151, para 7/8 golden-safe) — task separada.
-- Verificación operacional de webhook Notion live después de redeploy gobernado del `ops-worker`: disparar cambio real en wiki autorizada, confirmar projection y `embedded = chunks` para la nueva versión.
+- Verificación operacional de webhook Notion live: disparar cambio real en wiki autorizada, confirmar projection `knowledge_notion_ingest` y `embedded = chunks` para la nueva versión.
 
 ## Open Questions
 
