@@ -12,17 +12,20 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
+- Execution profile: `ui-ux`
+- UI impact: `primitive`
+- Backend impact: `none`
 - Epic: `optional`
-- Status real: `Diseno`
+- Status real: `Complete`
 - Rank: `TBD`
 - Domain: `ui|platform|nexa|design-system|content`
 - Blocked by: `none`
-- Branch: `task/TASK-1132-nexa-expression-layer-fluent-visual-cues`
+- Branch: `develop`
 - Legacy ID: `none`
 - GitHub Issue: `optional`
 
@@ -76,6 +79,71 @@ Reglas obligatorias:
 - `docs/context/09_marca-agencia.md`
 - `docs/documentation/plataforma/nexa-conversational-experience.md`
 - `public/images/nexa-mark/nexa-icon-spec.md`
+
+## UI/UX Contract
+
+### Experience brief
+
+- UI rigor: `ui-platform`
+- Usuario / rol: equipos Efeonce que consumen Nexa en chat, labs y futuras answer surfaces.
+- Momento del flujo: cuando Nexa necesita reforzar estado, evidencia, riesgo, idea o siguiente paso sin delegar significado a emojis libres.
+- Resultado perceptible esperado: Nexa se siente mas expresiva y propia, con cues sobrios, accesibles y degradados en contextos sensibles.
+- Friccion que debe reducir: inconsistencia entre marca Nexa, emojis gobernados y señales visuales de respuesta.
+- No-goals UX: no crear picker de emojis, no permitir assets/URLs desde el LLM, no cambiar runtime fuera del Lab sin flag.
+
+### Surface & system decision
+
+- Surface: `/design-system/nexa-chat` Lab y primitive reusable `NexaExpressionCue`.
+- Composition Shell: `no aplica` — primitive atomica inline/badge/standalone, no pantalla con regiones.
+- Primitive decision: `new` — `NexaExpressionCue` como primitive UI Platform con registry `cue -> treatment`.
+- Adaptive density / The Seam: `no aplica` — cue atomico de texto/chip, sin card ni contenedor condensable.
+- Floating/Sidecar/Dialog decision: no aplica.
+- Copy source: registry tipado local de la primitive; labels son parte del contrato semantico del cue.
+- Access impact: `none`.
+
+### State inventory
+
+- Default: cues no sensibles resuelven `nexaMark`, `fluentAsset`, `tablerIcon`, `statusDot` o `textOnly` segun contexto.
+- Loading: fuera de scope; `reviewing` cubre revision visual sin spinner nuevo.
+- Empty: `missing_context` cubre falta de contexto y se muestra en Lab.
+- Error: `blocked` y `risk` usan tratamientos sobrios.
+- Degraded / partial: dominios sensibles y sensitivity alta degradan a iconografia sobria, texto o nada.
+- Permission denied: fuera de scope.
+- Long content: labels cortos y `white-space: nowrap`; el texto principal sigue fuera del cue.
+- Mobile / compact: Lab GVC valida el specimen en viewport compacto.
+- Keyboard / focus: primitive no introduce focus target ni interaccion propia.
+- Reduced motion: no agrega motion nueva; reusa marks existentes con su fallback.
+
+### Interaction contract
+
+- Primary interaction: presentacional, sin acciones.
+- Hover / focus / active: sin affordance interactivo.
+- Pending / disabled: fuera de scope.
+- Escape / click-away: no aplica.
+- Focus restore: no aplica.
+- Latency feedback: fuera de scope.
+- Toast / alert behavior: fuera de scope.
+
+### Motion & microinteractions
+
+- Motion primitive: `none`
+- Enter / exit: sin animacion nueva.
+- Layout morph: sin morph.
+- Stagger: sin stagger.
+- Timing / easing token: no aplica.
+- Reduced-motion fallback: no aplica.
+- Non-goal motion: no introducir sticker-like motion ni loops decorativos.
+
+### Visual verification
+
+- GVC scenario: `design-system-nexa-chat`
+- Viewports: desktop y mobile/compact.
+- Required captures: `nexa-expression-cue-specimen`.
+- Required `data-capture` markers: `nexa-expression-cue-specimen`.
+- Scroll-width check: medir `scrollWidth <= clientWidth` desktop y 390px cuando el Lab este levantado.
+- Accessibility/focus checks: resolver plain text/aria en tests focales; no agregar focus targets.
+- Before/after evidence: captura GVC del Lab.
+- Known visual debt: la adoption runtime de answer turns queda como follow-up.
 
 ## Dependencies & Impact
 
@@ -298,13 +366,23 @@ El resultado debe sentirse como una agencia creativa con sistema operativo propi
 
 ## Acceptance Criteria
 
-- [ ] Existe un registry tipado de cues visuales de Nexa con fallback por contexto y sensibilidad.
-- [ ] Existe una decision documentada de Fluent visual assets: vendoring/package/CDN, licencia, atribucion, peso y fallback.
-- [ ] `NexaExpressionCue` o equivalente renderiza cues accesibles sin HTML libre, sin estilos arbitrarios y sin que el LLM controle assets.
-- [ ] `NexaExpressiveText` preserva plain text/aria estable cuando use cues.
-- [ ] El Lab de Nexa muestra buenos usos y anti-patrones; GVC desktop + mobile revisado visualmente.
-- [ ] Las docs vivas (`PRIMITIVES.md`, `HISTORIAL.md`, doc humano si aplica) quedan sincronizadas.
-- [ ] No hay regresion en contexts sensibles: finanzas/nomina/legal/seguridad degradan a iconografia sobria o texto.
+- [x] Existe un registry tipado de cues visuales de Nexa con fallback por contexto y sensibilidad.
+- [x] Existe una decision documentada de Fluent visual assets: vendoring/package/CDN, licencia, atribucion, peso y fallback.
+- [x] `NexaExpressionCue` o equivalente renderiza cues accesibles sin HTML libre, sin estilos arbitrarios y sin que el LLM controle assets.
+- [x] `NexaExpressiveText` preserva plain text/aria estable cuando use cues.
+- [x] El Lab de Nexa muestra buenos usos y anti-patrones; GVC desktop + mobile revisado visualmente.
+- [x] Las docs vivas (`PRIMITIVES.md`, `HISTORIAL.md`, doc humano si aplica) quedan sincronizadas.
+- [x] No hay regresion en contexts sensibles: finanzas/nomina/legal/seguridad degradan a iconografia sobria o texto.
+
+## Evidence 2026-06-18
+
+- Implementacion: `NexaExpressionCue`, registry/controller/tests, assets Fluent curados vendoreados, notice MIT y export en primitives.
+- Integracion: `NexaExpressiveText` acepta segmento `type: 'cue'` y `getNexaExpressiveTextPlainText()` conserva texto estable.
+- Lab: `/design-system/nexa-chat` incluye specimen `nexa-expression-cue-specimen` con buenos usos, degradacion sensible y anti-patron.
+- GVC: `.captures/2026-06-18T01-17-53_design-system-nexa-chat`, desktop + mobile, marker `06-nexa-expression-cue-specimen.png` revisado visualmente.
+- Browser plugin: `http://localhost:3001/design-system/nexa-chat` abre como `Nexa Chat — Design System`, sin console errors.
+- Overflow: desktop limpio (`scrollWidth=1280`, `clientWidth=1280`). Mobile reporta overflow global preexistente del shell Design System (`scrollWidth=676`, `clientWidth=390`); el marker `nexa-expression-cue-specimen` no desborda internamente (`scrollWidth=310`, `clientWidth=310`). Queda documentado en handoff como deuda del shell, no blocker de la primitive.
+- Build: `NODE_OPTIONS=--max-old-space-size=8192 pnpm build` verde; solo warning preexistente de Roadmap dynamic pattern.
 
 ## Verification
 
@@ -320,21 +398,22 @@ El resultado debe sentirse como una agencia creativa con sistema operativo propi
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
-- [ ] se verifico que la capa no introduce un emoji pack abierto ni un picker de emojis fuera de scope
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [x] `docs/tasks/README.md` quedo sincronizado con el cierre
+- [x] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
+- [x] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
+- [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
+- [x] se verifico que la capa no introduce un emoji pack abierto ni un picker de emojis fuera de scope
 
 ## Follow-ups
 
 - Evaluar si el prompt V3 debe permitir emitir intenciones estructuradas de cue dentro del render plan, no como texto libre.
 - Evaluar si `TASK-1112` debe consumir cues en el chat runtime cuando unifique answer-turns.
+- Corregir overflow horizontal mobile preexistente del shell Design System si se abre una task de layout global; no viene de `NexaExpressionCue`.
 
 ## Open Questions
 
-- ¿Se vendorean assets Fluent como SVG/PNG curados o se construye una version propia inspirada en su lenguaje visual?
-- ¿El cue `opportunity` debe usar Fluent-style sparkle o preferir siempre el Nexa mark para evitar confundir con IA generica?
-- ¿La capa debe vivir solo en `NexaExpressiveText` o tambien como primitive standalone para chips/cards fuera del texto?
+- Resuelto: se vendorea un subset SVG Flat curado de Microsoft Fluent Emoji bajo `public/images/nexa-expression-cues/`, con notice MIT y manifest local.
+- Resuelto: `opportunity` usa `nexaMark` por defecto y degrada a `textOnly` en dominios sensibles.
+- Resuelto: la capa vive como primitive standalone `NexaExpressionCue` y como segmento gobernado de `NexaExpressiveText`.

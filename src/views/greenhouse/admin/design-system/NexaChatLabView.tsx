@@ -23,6 +23,7 @@ import {
   NexaComposerInput,
   NexaComposerActionButton,
   NexaConversationBubble,
+  NexaExpressionCue,
   NexaFace,
   NexaKnowledgeAnswerSurface,
   NexaPresenceMark,
@@ -566,6 +567,108 @@ const ANSWERS_CANVAS_COPY: NexaAnswersCanvasCopy = {
   errorTitle: 'No pudimos completar la respuesta',
   errorBody: 'Intenta de nuevo o revisa la base directamente.'
 }
+
+const EXPRESSION_CUE_GOOD = [
+  { cue: 'ready', context: 'stateChip', label: 'Respuesta lista' },
+  { cue: 'reviewing', context: 'chatText', label: 'Revisando contexto' },
+  { cue: 'idea', context: 'answerSurface', label: 'Idea creativa' },
+  { cue: 'source', context: 'answerSurface', label: 'Fuente disponible' },
+  { cue: 'next_step', context: 'promptDock', label: 'Siguiente paso' },
+  { cue: 'missing_context', context: 'emptyState', label: 'Falta contexto' }
+] as const
+
+const EXPRESSION_CUE_SENSITIVE = [
+  { cue: 'idea', domain: 'finance', label: 'Finanzas' },
+  { cue: 'opportunity', domain: 'payroll', label: 'Nómina' },
+  { cue: 'source', domain: 'legal', label: 'Legal' },
+  { cue: 'blocked', domain: 'security', label: 'Seguridad' }
+] as const
+
+const NexaExpressionCueSpecimen = () => (
+  <Stack spacing={4}>
+    <Box
+      sx={{
+        display: 'grid',
+        gridTemplateColumns: { xs: '1fr', md: 'minmax(0, 1fr) minmax(0, 1fr)' },
+        gap: 3
+      }}
+    >
+      <Card density='compact'>
+        <Stack spacing={2.5}>
+          <Stack spacing={0.5}>
+            <Typography variant='h5'>Uso sobrio</Typography>
+            <Typography variant='body2' color='text.secondary'>
+              La intención visual acompaña texto y evidencia; no reemplaza significado.
+            </Typography>
+          </Stack>
+          <Stack direction='row' spacing={1.25} flexWrap='wrap' useFlexGap>
+            {EXPRESSION_CUE_GOOD.map(item => (
+              <NexaExpressionCue
+                key={`${item.cue}-${item.context}`}
+                cue={item.cue}
+                context={item.context}
+                variant='badge'
+                size='medium'
+                showLabel
+                label={item.label}
+              />
+            ))}
+          </Stack>
+          <NexaConversationBubble
+            kind='nexaText'
+            title={expressiveText([
+              { type: 'cue', cue: 'ready', context: 'chatText', label: 'Listo' },
+              { text: ' La lectura está lista.', style: 'strong' }
+            ])}
+            body={expressiveText([
+              { text: 'Nexa puede usar cues semánticos cuando ayudan a escanear, pero el contenido sigue diciendo ', style: 'soft' },
+              { text: 'qué cambió', style: 'strong' },
+              { text: ' y qué revisar después.' },
+              { type: 'cue', cue: 'source', context: 'chatText', label: 'Fuente' }
+            ])}
+            metaLabel='Cue en NexaExpressiveText · clipboard estable'
+          />
+        </Stack>
+      </Card>
+
+      <Card density='compact'>
+        <Stack spacing={2.5}>
+          <Stack spacing={0.5}>
+            <Typography variant='h5'>Degradación sensible</Typography>
+            <Typography variant='body2' color='text.secondary'>
+              Finanzas, nómina, legal y seguridad degradan a iconografía sobria o texto.
+            </Typography>
+          </Stack>
+          <Stack spacing={1.5}>
+            {EXPRESSION_CUE_SENSITIVE.map(item => (
+              <Stack key={`${item.cue}-${item.domain}`} direction='row' spacing={1.5} alignItems='center' justifyContent='space-between'>
+                <Typography variant='body2' color='text.secondary'>
+                  {item.label}
+                </Typography>
+                <NexaExpressionCue cue={item.cue} domain={item.domain} context='answerSurface' variant='badge' size='medium' showLabel />
+              </Stack>
+            ))}
+          </Stack>
+          <Box
+            sx={theme => ({
+              p: 3,
+              borderRadius: `${theme.shape.customBorderRadius.md}px`,
+              border: `1px dashed ${alpha(theme.palette.warning.main, 0.38)}`,
+              bgcolor: alpha(theme.palette.warning.main, 0.08)
+            })}
+          >
+            <Stack direction='row' spacing={1.5} alignItems='flex-start'>
+              <NexaExpressionCue cue='sensitive' context='answerSurface' domain='legal' showLabel />
+              <Typography variant='body2' color='text.secondary'>
+                Anti-patrón: no usar assets juguetones para decisiones contractuales, financieras o de seguridad.
+              </Typography>
+            </Stack>
+          </Box>
+        </Stack>
+      </Card>
+    </Box>
+  </Stack>
+)
 
 const KnowledgeAnswerSurfaceSpecimen = () => {
   const [draft, setDraft] = useState('')
@@ -1219,6 +1322,15 @@ const NexaChatLabView = () => (
       description='Cada specimen queda dentro de un frame con propósito explícito; así el reviewer puede mirar una primitive a la vez.'
     >
       <Stack spacing={3}>
+        <SpecimenFrame
+          capture='nexa-expression-cue-specimen'
+          eyebrow='Primitive · expression layer'
+          title='NexaExpressionCue'
+          description='Registry gobernado de cues semánticos: Fluent-style cuando suma, Nexa mark como identidad primaria y degradación sobria en dominios sensibles.'
+        >
+          <NexaExpressionCueSpecimen />
+        </SpecimenFrame>
+
         <SpecimenFrame
           capture='nexa-knowledge-answer-surface-specimen'
           eyebrow='Composition primitive'

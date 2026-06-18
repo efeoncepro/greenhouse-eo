@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
 > **Version:** 1.1
 > **Creado:** 2026-06-13 por Claude (sesión TASK-1104/1105 + capstone)
-> **Ultima actualizacion:** 2026-06-14 por Claude (TASK-1124 — calidad de respuesta de Knowledge)
+> **Ultima actualizacion:** 2026-06-18 por Codex (TASK-1132 — capa de expresión visual de Nexa)
 > **Documentacion tecnica:** [docs/architecture/ui-platform/CONVERSATIONAL_EXPERIENCE.md](../../architecture/ui-platform/CONVERSATIONAL_EXPERIENCE.md)
 
 # Experiencia Conversacional de Nexa — cómo funciona
@@ -61,6 +61,14 @@ Esto es a propósito: una respuesta sin fuentes o sin frescura no genera la mism
 - **El área entra por datos, no por "skin".** Finanzas no tiene colores ni botones especiales metidos a la fuerza: aporta su **contexto** y sus **fuentes**, y el armazón hace el resto.
 - **Honestidad antes que relleno.** Si falta un dato, se dice; no se inventa.
 - **Accesible por defecto.** Funciona con teclado, respeta "reducir movimiento" y anuncia los cambios de estado una sola vez (para lectores de pantalla).
+
+## Capa de expresión visual de Nexa
+
+Nexa ya tiene presencia propia: mark, avatar, glow, texto expresivo, bubbles y answers. La **Nexa Expression Layer** agrega un registry gobernado que traduce intenciones como `ready`, `reviewing`, `risk`, `idea`, `source`, `next_step` o `missing_context` en señales visuales consistentes.
+
+Esto no es un emoji pack abierto ni una licencia para que el modelo elija assets. El contenido seguirá liderando con texto, evidencia y siguiente paso; la UI resolverá el tratamiento visual según contexto y sensibilidad. En temas sensibles —finanzas, nómina, legal, seguridad o compromisos contractuales— la capa deberá degradar a iconografía sobria, texto o nada decorativo.
+
+Estado actual: primitive `NexaExpressionCue`, segmento `type: 'cue'` en `NexaExpressiveText`, assets curados vendoreados con atribución MIT y specimen en `/design-system/nexa-chat` (`data-capture='nexa-expression-cue-specimen'`). La capa queda disponible para consumers futuros, pero no cambia el comportamiento productivo del chat fuera del Lab.
 
 ## Cómo responde cuando se apoya en la base de conocimiento (mejora 2026-06-14)
 

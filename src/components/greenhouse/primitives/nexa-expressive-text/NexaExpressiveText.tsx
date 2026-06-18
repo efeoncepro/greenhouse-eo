@@ -6,6 +6,8 @@ import { alpha, type Theme } from '@mui/material/styles'
 
 import { axisChartDirectional, axisChartDirectionalDark } from '@core/theme/axis-chart'
 
+import NexaExpressionCue from '../nexa-expression-cue/NexaExpressionCue'
+import { getNexaExpressionCuePlainText } from '../nexa-expression-cue/nexa-expression-cue-controller'
 import NexaCitationMarker from './NexaCitationMarker'
 import type {
   NexaExpressiveTextProps,
@@ -95,6 +97,21 @@ const renderSegment = (segment: NexaExpressiveTextSegment, index: number) => {
     return <NexaCitationMarker key={`citation-${index}-${segment.source.id}`} source={segment.source} />
   }
 
+  if (segment.type === 'cue') {
+    return (
+      <NexaExpressionCue
+        key={`cue-${index}-${segment.cue}`}
+        cue={segment.cue}
+        context={segment.context}
+        domain={segment.domain}
+        sensitivity={segment.sensitivity}
+        label={segment.label}
+        decorative={segment.decorative}
+        sx={{ mx: 0.4 }}
+      />
+    )
+  }
+
   return (
     <Box key={`text-${index}-${segment.text}`} component='span' sx={theme => expressiveTextSx(theme, segment.style)}>
       {segment.text}
@@ -113,6 +130,7 @@ export const getNexaExpressiveTextPlainText = (value: NexaExpressiveTextValue) =
       if (segment.type === 'break') return '\n'
       if (segment.type === 'emoji') return segment.label ?? segment.value
       if (segment.type === 'citation') return ` [${segment.source.label}]`
+      if (segment.type === 'cue') return getNexaExpressionCuePlainText(segment)
 
       return segment.text
     })

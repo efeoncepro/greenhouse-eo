@@ -12,6 +12,18 @@
 - **Watchdog:** `pnpm release:watchdog --json` → `aggregateSeverity=ok`, `exitCode=0`, sin `worker_revision_drift` (signal `stale_approval` quedó `unknown` solo por falta de `GITHUB_RELEASE_OBSERVER_TOKEN` local — degradación de reader, no drift real).
 - **No validado:** smoke funcional E2E productivo manual (health check automático del orchestrator sí pasó).
 
+## Sesión 2026-06-18 — TASK-1132 Nexa Expression Layer + Fluent Visual Cues — Codex
+
+> **Estado:** complete en `develop`; sin branch/worktree nuevo. El operador pidió usar subagentes para paralelizar.
+
+- **Hook/subagentes:** `pnpm codex:task-hook 1132`; subagentes de discovery/doc/assets/codigo ayudaron a partir contexto UI/Nexa, estrategia Fluent y cierre documental.
+- **Implementado:** primitive UI Platform `src/components/greenhouse/primitives/nexa-expression-cue/**` con registry `cue -> treatment`, controller `resolveNexaExpressionCue()`, `NexaExpressionCue`, tests y export barrel. `NexaExpressiveText` acepta segmento `type: 'cue'` y `getNexaExpressiveTextPlainText()` mantiene texto estable.
+- **Assets/licencia:** subset SVG Flat curado de Microsoft Fluent Emoji vendoreado en `public/images/nexa-expression-cues/` (`ready`, `idea`, `source`, `next_step`, `missing_context`) con `manifest.json` y `THIRD_PARTY_NOTICES.md` MIT. Sin CDN ni picker de emojis.
+- **Sensibilidad:** finance/payroll/legal/security/contractual degradan a iconografia sobria, texto o nada; `opportunity` usa `nexaMark` por defecto y `textOnly` en sensible.
+- **Lab/GVC:** `/design-system/nexa-chat` agrega specimen `nexa-expression-cue-specimen` con buenos usos, degradacion sensible y anti-patron. GVC local desktop+mobile OK: `.captures/2026-06-18T01-17-53_design-system-nexa-chat`; frame `06-nexa-expression-cue-specimen.png` revisado. Browser plugin abrio `http://localhost:3001/design-system/nexa-chat` sin console errors.
+- **Validacion:** Vitest focal 3 files / 23 tests, ESLint focal, `pnpm lint`, `tsc --noEmit`, `pnpm build` (warning preexistente Roadmap dynamic pattern), `pnpm task:lint --task TASK-1132`, `pnpm ops:lint --changed`, `pnpm design:lint`, `pnpm nexa:doc-gate --changed`, `pnpm docs:closure-check`, `pnpm qa:gates --changed --agent codex --task TASK-1132 --ui --docs`, `git diff --check`, GVC desktop+mobile.
+- **Deuda no bloqueante:** el check mobile de `scrollWidth` detecta overflow global preexistente del shell Design System (`676 > 390`), originado fuera de `nexa-expression-cue-specimen`; el marker nuevo no desborda internamente (`310 == 310`). Si se abre cleanup de shell mobile, empezar por header/footer/main layout del Design System.
+
 # Release 2026-06-10 #2 — develop→main `6c649b2a6` RELEASED
 
 ## Sesión 2026-06-17 — TASK-1167 Public Site GitHub repo control plane — Codex

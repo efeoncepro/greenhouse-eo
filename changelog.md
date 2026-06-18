@@ -1,5 +1,9 @@
 # changelog.md
 
+## 2026-06-18
+
+- **TASK-1132 — Nexa Expression Layer + Fluent Visual Cues.** Greenhouse agrega la primitive UI Platform `NexaExpressionCue` y el registry gobernado `cue -> treatment` para intenciones visuales de Nexa (`ready`, `reviewing`, `risk`, `idea`, `source`, `next_step`, `opportunity`, `missing_context`, `blocked`, `sensitive`). `NexaExpressiveText` ahora acepta segmento `type: 'cue'` con plain text accesible; el Lab `/design-system/nexa-chat` muestra buenos usos, degradacion sensible y anti-patron. Se vendorea un subset SVG Flat curado de Microsoft Fluent Emoji bajo `public/images/nexa-expression-cues/` con manifest y notice MIT; dominios sensibles finance/payroll/legal/security/contractual degradan a iconografia sobria, texto o nada. Evidencia GVC local desktop+mobile: `.captures/2026-06-18T01-17-53_design-system-nexa-chat`.
+
 ## 2026-06-17
 
 - **TASK-1167 — Public Site GitHub repo control plane complete / staging verified.** Greenhouse agrega el control-plane GitHub del rail Astro `efeoncepro/efeonce-web`: reader server-only `public-site-github-control-plane.v1`, endpoint admin `GET /api/admin/public-site/github-control-plane`, adapter `public-site-github-command-adapter.v1` en `POST /api/admin/public-site/github-commands`, registry allowlisted/default OFF para `public_site.github.workflow.rerun_failed` y `public_site.github.workflow.dispatch`, `Idempotency-Key`, `executeApiPlatformCommand`, repo hardcoded y errores redacted. Se agrega la signal `public_site.astro_ci_failed` al Reliability Control Plane; staging deploy `greenhouse-8arcw12v5` (`dpl_8sbZd3thkxFhaXSY79oS3RByFAn8`) Ready: reader HTTP 200 `confidence=high`, repo `efeoncepro/efeonce-web`, latest `CI` main run `27657858751` `failure`, correlation `matched`; command OFF HTTP 409 `public_site_github_command_disabled`; reliability severity `error`; logs Vercel error 30m vacios. Sin deploy/rollback/cutover; production commands OFF por diseño.

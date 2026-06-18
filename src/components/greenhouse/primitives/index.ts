@@ -141,6 +141,26 @@ export type {
   NexaExpressiveTextStyle,
   NexaExpressiveTextValue
 } from './nexa-expressive-text/nexa-expressive-text-types'
+export {
+  NexaExpressionCue,
+  getNexaExpressionCuePlainText,
+  isNexaExpressionCueSensitive,
+  NEXA_EXPRESSION_CUE_REGISTRY,
+  resolveNexaExpressionCue
+} from './nexa-expression-cue'
+export type {
+  NexaExpressionCueConfig,
+  NexaExpressionCueContext,
+  NexaExpressionCueDomain,
+  NexaExpressionCueKey,
+  NexaExpressionCueProps,
+  NexaExpressionCueResolveInput,
+  NexaExpressionCueSensitivity,
+  NexaExpressionCueTone,
+  NexaExpressionCueTreatment,
+  NexaExpressionCueVariant,
+  ResolvedNexaExpressionCue
+} from './nexa-expression-cue'
 export { default as NexaEvidencePanel } from './NexaEvidencePanel'
 export type { NexaEvidencePanelProps, NexaEvidencePanelVariant } from './NexaEvidencePanel'
 export { default as NexaProvenanceTrace } from './nexa-provenance-trace/NexaProvenanceTrace'
