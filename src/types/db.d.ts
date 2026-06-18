@@ -2259,6 +2259,10 @@ export interface GreenhouseCoreClientUsers {
   microsoft_email: string | null;
   microsoft_oid: string | null;
   microsoft_tenant_id: string | null;
+  /**
+   * TASK-1079 — Nexa interaction mode preference: dock (compacto), expandible (panel), lane (sidecar full-height). NULL = system default (dock). Las 3 modalidades comparten runtime/persistencia/historial (greenhouse_ai.nexa_threads/nexa_messages).
+   */
+  nexa_interaction_mode: string | null;
   password_hash: string | null;
   password_hash_algorithm: string | null;
   /**
