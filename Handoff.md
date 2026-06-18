@@ -23,6 +23,7 @@
 - **Lab/GVC:** `/design-system/nexa-chat` agrega specimen `nexa-expression-cue-specimen` con buenos usos, degradacion sensible y anti-patron. GVC local desktop+mobile OK: `.captures/2026-06-18T01-17-53_design-system-nexa-chat`; frame `06-nexa-expression-cue-specimen.png` revisado. Browser plugin abrio `http://localhost:3001/design-system/nexa-chat` sin console errors.
 - **Validacion:** Vitest focal 3 files / 23 tests, ESLint focal, `pnpm lint`, `tsc --noEmit`, `pnpm build` (warning preexistente Roadmap dynamic pattern), `pnpm task:lint --task TASK-1132`, `pnpm ops:lint --changed`, `pnpm design:lint`, `pnpm nexa:doc-gate --changed`, `pnpm docs:closure-check`, `pnpm qa:gates --changed --agent codex --task TASK-1132 --ui --docs`, `git diff --check`, GVC desktop+mobile.
 - **Deuda no bloqueante:** el check mobile de `scrollWidth` detecta overflow global preexistente del shell Design System (`676 > 390`), originado fuera de `nexa-expression-cue-specimen`; el marker nuevo no desborda internamente (`310 == 310`). Si se abre cleanup de shell mobile, empezar por header/footer/main layout del Design System.
+- **Follow-up formalizado:** `TASK-1168` queda en `docs/tasks/to-do/TASK-1168-design-system-mobile-shell-overflow-containment.md` para aislar owner real del overflow mobile del shell Design System, aplicar containment root-cause y cerrar con GVC desktop/mobile + medicion `scrollWidth <= clientWidth`.
 
 # Release 2026-06-10 #2 — develop→main `6c649b2a6` RELEASED
 
