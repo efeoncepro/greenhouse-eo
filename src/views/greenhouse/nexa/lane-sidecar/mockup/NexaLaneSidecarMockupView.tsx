@@ -352,7 +352,13 @@ const ConversationBody = ({
   const isEmpty = useAuiState(s => s.thread.messages.length === 0)
   const isRunning = useAuiState(s => s.thread.isRunning)
 
-  onThinkingChange(isRunning)
+  // Reportar el estado "pensando" al padre en un efecto, NO durante el render
+  // (setState del padre durante el render del hijo dispara el warning de React).
+  useEffect(() => {
+    onThinkingChange(isRunning)
+
+    return () => onThinkingChange(false)
+  }, [isRunning, onThinkingChange])
 
   return (
     <Box
