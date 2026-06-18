@@ -510,5 +510,21 @@ export const GH_NEXA = {
     // composer
     composer_placeholder: 'Pregúntale a Nexa sobre tu operación…',
     composer_disclaimer: 'Nexa analiza tus datos en tiempo real. Verifica antes de una decisión crítica.'
+  },
+
+  // ── TASK-1079 — Modo de interacción (dock A / expandible B / lane C) ──
+  interactionMode: {
+    menu_title: 'Modo de Nexa',
+    menu_trigger_aria: 'Cambiar cómo ves a Nexa',
+    lane_aria: 'Nexa AI',
+    // Toggle del rail de historial dentro del lane.
+    history_toggle_aria: 'Mostrar u ocultar historial',
+    // Colapsar el lane (la burbuja sigue disponible para reabrirlo).
+    collapse_lane_aria: 'Contraer Nexa',
+    options: {
+      dock: { label: 'Compacto', description: 'Burbuja flotante para preguntas rápidas' },
+      expandible: { label: 'Panel', description: 'Panel ampliable con historial' },
+      lane: { label: 'Lateral', description: 'Columna fija junto a tu pantalla' }
+    } as Record<'dock' | 'expandible' | 'lane', { label: string; description: string }>
   }
 } as const

@@ -18,7 +18,10 @@ import VerticalFooter from '@components/layout/vertical/Footer'
 import HorizontalFooter from '@components/layout/horizontal/Footer'
 import ScrollToTop from '@core/components/scroll-to-top'
 import NexaFloatingButton from '@/components/greenhouse/NexaFloatingButton'
+import NexaLaneContentHost from '@/components/greenhouse/NexaLaneContentHost'
 import { NexaContextProvider } from '@/lib/nexa/nexa-page-context'
+import { NexaInteractionModeProvider } from '@/lib/nexa/nexa-interaction-mode-context'
+import { resolveNexaInteractionModeForUser } from '@/lib/nexa/interaction-mode.server'
 import RecentsTracker from '@/components/greenhouse/RecentsTracker'
 import ChunkRecoveryClear from '@/components/ChunkRecoveryClear'
 import { AdaptiveSidecarShellProvider, ShellFloatingActionDock } from '@/components/greenhouse/primitives'
@@ -50,23 +53,29 @@ const Layout = async (props: ChildrenType) => {
     console.error('[DashboardLayout] getMode/getSystemMode failed:', error)
   }
 
+  // TASK-1079 — modo de interacción con Nexa (dock A / expandible B / lane C). Resuelto
+  // server-side con degradación honesta (default = comportamiento vigente del flotante).
+  const nexaInteractionMode = await resolveNexaInteractionModeForUser(session.user.userId)
+
   return (
     <Providers direction={direction} session={session}>
       {/* NexaContextProvider envuelve las páginas (que declaran su entidad vía
           NexaContextScope) y el NexaFloatingButton (que la lee) → prompts contextuales
           con el nombre real (Tier 1.5). */}
       <NexaContextProvider>
+        <NexaInteractionModeProvider initialMode={nexaInteractionMode}>
         <AdaptiveSidecarShellProvider>
           <LayoutWrapper
             systemMode={systemMode}
             verticalLayout={
               <VerticalLayout navigation={<Navigation mode={mode} />} navbar={<Navbar />} footer={<VerticalFooter />}>
-                {children}
+                {/* TASK-1079 — host del modo lane: passthrough byte-idéntico salvo modo lane. */}
+                <NexaLaneContentHost>{children}</NexaLaneContentHost>
               </VerticalLayout>
             }
             horizontalLayout={
               <HorizontalLayout header={<Header />} footer={<HorizontalFooter />}>
-                {children}
+                <NexaLaneContentHost>{children}</NexaLaneContentHost>
               </HorizontalLayout>
             }
           />
@@ -81,6 +90,7 @@ const Layout = async (props: ChildrenType) => {
         </ShellFloatingActionDock>
         <RecentsTracker />
         <ChunkRecoveryClear />
+        </NexaInteractionModeProvider>
       </NexaContextProvider>
     </Providers>
   )

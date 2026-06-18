@@ -8,6 +8,15 @@ export const isNexaFloatingExpandableEnabled = (): boolean =>
   process.env.NEXA_FLOATING_EXPANDABLE_ENABLED === 'true' ||
   process.env.NEXT_PUBLIC_NEXA_FLOATING_EXPANDABLE_ENABLED === 'true'
 
+// TASK-1079 — Nexa interaction-mode lane (concepto C) availability gate. Default OFF:
+// el lane reflowea el contenido del dashboard (split full-height), cambio de hot-path;
+// con OFF, el modo `lane` no se ofrece en el selector y cualquier preferencia `lane`
+// degrada al default (panel B / dock) → comportamiento idéntico al previo. NEXT_PUBLIC
+// mirror para que el provider client (selector + host) puedan gatear consistentemente.
+export const isNexaInteractionLaneEnabled = (): boolean =>
+  process.env.NEXA_INTERACTION_LANE_ENABLED === 'true' ||
+  process.env.NEXT_PUBLIC_NEXA_INTERACTION_LANE_ENABLED === 'true'
+
 // TASK-1085 — Nexa Knowledge Retrieval gate. Default OFF: el tool `search_knowledge`
 // (Nexa recupera del corpus gobernado vía searchKnowledge agentic + cita) solo aparece
 // con este flag ON. Con OFF, Nexa se comporta exactamente como antes (cero retrieval de

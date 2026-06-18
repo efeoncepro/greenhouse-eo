@@ -28,8 +28,10 @@ import type { NexaModelSelectorValue } from '@/lib/nexa/use-nexa-runtime'
 import type { NexaResponse } from '@/lib/nexa/nexa-contract'
 import { isNexaFloatingExpandableEnabled } from '@/lib/nexa/flags'
 import { NEXA_FLOATING_OPEN_EVENT } from '@/lib/nexa/floating-events'
+import { useNexaInteractionMode } from '@/lib/nexa/nexa-interaction-mode-context'
 import { GreenhouseNexaAnimatedMark, GreenhouseNexaBrandMark, GreenhouseSpectrumBeam } from '@/components/greenhouse/primitives'
 import { GREENHOUSE_NEXA_BRAND_COLORS } from '@/components/greenhouse/primitives/greenhouse-nexa-brand-controller'
+import NexaModeMenu from '@/components/greenhouse/NexaModeMenu'
 
 import NexaThread from '@/views/greenhouse/home/components/NexaThread'
 import NexaFloatingPanel from '@/views/greenhouse/nexa/floating-chat/NexaFloatingPanel'
@@ -108,7 +110,28 @@ const NexaFloatingButton = ({ docked = false }: NexaFloatingButtonProps) => {
   const [open, setOpen] = useState(false)
   const [expanded, setExpanded] = useState(false)
   const fabRef = useRef<HTMLButtonElement>(null)
-  const expandableEnabled = isNexaFloatingExpandableEnabled()
+
+  // TASK-1079 — el modo de interacción decide el form-factor del flotante:
+  // - lane (C): la burbuja togglea el lane (no abre panel flotante); el lane lo monta
+  //   NexaLaneContentHost en el contenido.
+  // - expandible (B): panel ampliable (requiere además el flag de plataforma).
+  // - dock (A): panel compacto (Drawer mobile / Card desktop).
+  const { mode, laneOpen, setLaneOpen } = useNexaInteractionMode()
+  const isLaneMode = mode === 'lane'
+  const expandableEnabled = mode === 'expandible' && isNexaFloatingExpandableEnabled()
+
+  // Estado de apertura visible de la burbuja según el modo.
+  const fabOpen = isLaneMode ? laneOpen : open
+
+  const handleFabClick = useCallback(() => {
+    if (isLaneMode) {
+      setLaneOpen(!laneOpen)
+
+      return
+    }
+
+    setOpen(prev => !prev)
+  }, [isLaneMode, laneOpen, setLaneOpen])
 
   const closePanel = useCallback(() => {
     setOpen(false)
@@ -149,6 +172,12 @@ const NexaFloatingButton = ({ docked = false }: NexaFloatingButtonProps) => {
 
   useEffect(() => {
     const onOpen = () => {
+      if (isLaneMode) {
+        setLaneOpen(true)
+
+        return
+      }
+
       setOpen(true)
       if (expandableEnabled) setExpanded(true)
     }
@@ -156,7 +185,7 @@ const NexaFloatingButton = ({ docked = false }: NexaFloatingButtonProps) => {
     window.addEventListener(NEXA_FLOATING_OPEN_EVENT, onOpen)
 
     return () => window.removeEventListener(NEXA_FLOATING_OPEN_EVENT, onOpen)
-  }, [expandableEnabled])
+  }, [expandableEnabled, isLaneMode, setLaneOpen])
 
   // TASK-1134 — auto es el default real (el runtime decide server-side); el picker fija un override
   // manual. El FAB no persiste (estado efímero por montaje), a diferencia de useNexaPersistentRuntime.
@@ -191,9 +220,9 @@ const NexaFloatingButton = ({ docked = false }: NexaFloatingButtonProps) => {
     ]
   })
 
-  const nexaFabRestShadow = open ? 'none' : `0 12px 30px ${alpha(GREENHOUSE_NEXA_BRAND_COLORS.midnightNavy, 0.28)}`
+  const nexaFabRestShadow = fabOpen ? 'none' : `0 12px 30px ${alpha(GREENHOUSE_NEXA_BRAND_COLORS.midnightNavy, 0.28)}`
 
-  const nexaFabHoverShadow = open ? 'none' : `0 14px 34px ${alpha(GREENHOUSE_NEXA_BRAND_COLORS.midnightNavy, 0.34)}`
+  const nexaFabHoverShadow = fabOpen ? 'none' : `0 14px 34px ${alpha(GREENHOUSE_NEXA_BRAND_COLORS.midnightNavy, 0.34)}`
 
   const nexaFabAuraSx = {
     position: docked ? 'relative' : 'fixed',
@@ -227,12 +256,12 @@ const NexaFloatingButton = ({ docked = false }: NexaFloatingButtonProps) => {
       animationPlayState: 'paused'
     },
     '&:hover [data-nexa-floating-spectrum="true"], &:focus-within [data-nexa-floating-spectrum="true"]': {
-      opacity: open ? 0 : 1,
+      opacity: fabOpen ? 0 : 1,
       transform: 'scale(1)',
       transitionDuration: '180ms'
     },
     '&:hover [data-nexa-floating-spectrum="true"] [data-gh-border-beam], &:focus-within [data-nexa-floating-spectrum="true"] [data-gh-border-beam], &:hover [data-nexa-floating-spectrum="true"] [data-gh-border-beam-glow], &:focus-within [data-nexa-floating-spectrum="true"] [data-gh-border-beam-glow]': {
-      animationPlayState: open ? 'paused' : 'running'
+      animationPlayState: fabOpen ? 'paused' : 'running'
     },
     '& > .MuiFab-root': {
       position: 'relative',
@@ -267,9 +296,12 @@ const NexaFloatingButton = ({ docked = false }: NexaFloatingButtonProps) => {
               Nexa AI
             </Box>
           </Stack>
-          <IconButton size='small' onClick={() => setOpen(false)} aria-label={TASK407_ARIA_CERRAR_NEXA}>
-            <i className='tabler-x' style={{ fontSize: '1rem' }} />
-          </IconButton>
+          <Stack direction='row' spacing={0.5} alignItems='center'>
+            <NexaModeMenu />
+            <IconButton size='small' onClick={() => setOpen(false)} aria-label={TASK407_ARIA_CERRAR_NEXA}>
+              <i className='tabler-x' style={{ fontSize: '1rem' }} />
+            </IconButton>
+          </Stack>
         </Stack>
 
         {/* Thread */}
@@ -309,8 +341,8 @@ const NexaFloatingButton = ({ docked = false }: NexaFloatingButtonProps) => {
           color='primary'
           size='medium'
           aria-label={TASK407_ARIA_ABRIR_NEXA_AI}
-          aria-expanded={open}
-          onClick={() => setOpen(prev => !prev)}
+          aria-expanded={fabOpen}
+          onClick={handleFabClick}
           sx={{
             position: 'static',
             zIndex: 'inherit',
@@ -328,7 +360,7 @@ const NexaFloatingButton = ({ docked = false }: NexaFloatingButtonProps) => {
             }
           }}
         >
-          {open ? (
+          {fabOpen ? (
             <i className='tabler-x' style={{ fontSize: '1.25rem' }} />
           ) : (
             <GreenhouseNexaAnimatedMark
@@ -345,8 +377,10 @@ const NexaFloatingButton = ({ docked = false }: NexaFloatingButtonProps) => {
       </Box>
 
       {/* Panel expandible persistido (TASK-1078) detrás del flag; con flag OFF, el
-          panel efímero histórico (Drawer mobile / Card desktop) bit-for-bit. */}
-      {expandableEnabled ? (
+          panel efímero histórico (Drawer mobile / Card desktop) bit-for-bit.
+          En modo lane (C) la burbuja no abre panel: solo togglea el lane (lo monta
+          NexaLaneContentHost en el contenido). */}
+      {isLaneMode ? null : expandableEnabled ? (
         <Fade in={open} unmountOnExit>
           <Box
             sx={{
