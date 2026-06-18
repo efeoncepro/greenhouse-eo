@@ -17,3 +17,9 @@
 # As of the extension commit: EMPTY — the refactor relocated every block verbatim,
 # so all 1152 rule lines + 4190 content lines are reachable (0 orphans). New
 # entries appear only when content legitimately evolves away from the original.
+
+# TASK-1154 formalized this pre-refactor hybrid-task guidance in
+# docs/tasks/TASK_PROCESS.md as "Hybrid Execution Profile Discipline"; the
+# legacy one-line pointer mentioned "formalizacion pendiente: TASK-1154", which
+# is no longer true after TASK-1154 completed.
+- Si una capacidad combina backend/data y UI visible, preferir dos tasks secuenciadas por `Execution profile`: primero `backend-data` para schema/API/reader/command/migration/sync/contrato de datos, despues `ui-ux` para ruta visible, layout, interaccion, copy y GVC. Excepcion valida: `ui-ux` discovery/mockup/prototipo primero cuando el contrato de producto todavia esta borroso, por ejemplo si no sabemos que layout humano funciona mejor, hay que validar board/list/inspector, el problema es mas de flujo que de data, o conviene que el backend se disene alrededor de una experiencia aprobada; en ese caso usar datos mockeados y declarar la task `backend-data` que cableara el contrato real. Mantener una task vertical hibrida solo si es pequena, reversible, sin migracion/schema riesgoso y declara justificacion + orden interno de ejecucion. Fuente canonica: `docs/tasks/TASK_PROCESS.md`; formalizacion pendiente: `TASK-1154`.

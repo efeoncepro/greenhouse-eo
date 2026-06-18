@@ -33,6 +33,7 @@
 - **Tooling:** `scripts/ci/task-lint/rules.mjs` agrega warning-first `hybrid-profile-justification` solo para tasks template activas con `UI impact != none` y `Backend impact != none` sin justificación; tests cubren warning/no-warning/completas históricas.
 - **Docs/agentes:** `TASK_TEMPLATE.md`, skills task-planner Codex/Claude, `AGENTS.md`, `CLAUDE.md`, `changelog.md`, README/registry y task lifecycle sincronizados.
 - **Validación:** `pnpm task:lint:test`, `pnpm task:lint --task TASK-1154`, `pnpm task:lint --changed`, `pnpm ops:lint --changed`, `pnpm lint` verdes.
+- **Governance fix post-push:** `scripts/ci/claude-md-content-allowlist.txt` acepta una línea legacy de `CLAUDE.md` que decía `formalizacion pendiente: TASK-1154`; TASK-1154 ya formalizó la regla en `docs/tasks/TASK_PROCESS.md`. `node scripts/ci/claude-md.mjs check` verde (0 orphans, +1 accepted via allowlist).
 - **Subagentes:** Darwin revisó `task-lint`/tests; Banach revisó proceso/template/skills/entrypoints; Codex integró y validó.
 
 - **Target SHA:** `37e09a9c2ad9a93723725804a00f78a3710c7dc6` (merge `--no-ff` de `origin/develop` `e230597161`; 202 commits / 840 archivos acumulados desde el release del 06-13).
