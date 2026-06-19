@@ -37,6 +37,7 @@ Es **encontrable** desde: `CLAUDE.md` (Runtime Rollout Completion Gate), `AGENTS
 | Flag | Owner | Estado actual | Acción pendiente | Nota |
 |---|---|---|---|---|
 | `NEXA_INTERACTION_LANE_ENABLED` + `NEXT_PUBLIC_NEXA_INTERACTION_LANE_ENABLED` | TASK-1079 | **staging:** env vars SET (2026-06-18), **redeploy pendiente** · prod: OFF | (1) redeploy de staging con **build fresco** (NEXT_PUBLIC se hornea en build) → habilita "Lateral" en el menú de modo de Nexa. (2) prod = decisión del operador tras sign-off | Lane sidecar de Nexa (concepto C). Default-safe: solo habilita la opción, el default sigue siendo el flotante. |
+| `NOTION_DUE_DATE_CAPTURE_ENABLED` (M0) + `ATTRIBUTABLE_LATENESS_OTD_ENABLED` (M2) | TASK-921/922 (consumido por TASK-1169 → TASK-1170) | OFF/default por environment (verdad live: `vercel env ls`) | **NO bloquea TASK-1169** (su materializador/reconciliación/signal corren sin flag, shadow). Pero el OTD-imputable member×month tiene cobertura de freeze casi nula sobre la cohorte productiva hasta que estos flags estén ON + se backfillee el M2 shadow sobre la cohorte. Prender + backfill es prerequisito del reloj ≥30d y del cutover **TASK-1170**, no de esta task. | Dependencia de rollout documentada en ADR `GREENHOUSE_ATTRIBUTABLE_LATENESS_V1` §16.11 + Handoff. El flip productivo del bono es TASK-1170 (gateado, ≥30d shadow + sign-off). |
 
 _(Agregá acá cualquier flag que dejes code-complete sin prender. Si está vacío, ¡no hay deuda pendiente!)_
 
