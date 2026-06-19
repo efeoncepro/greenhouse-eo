@@ -87,6 +87,45 @@ describe('GreenhouseBrandLogoMark', () => {
     expect(queryByText('Gemini')).not.toBeInTheDocument()
   })
 
+  it('maps the GPT logotype specimen to a lockup SVG kind', () => {
+    const { container, getByRole, queryByText } = renderWithTheme(<GreenhouseBrandLogoMark kind='gptLogotype' />)
+    const asset = readFileSync(join(process.cwd(), 'public/images/logos/axis/gpt-logotype.svg'), 'utf8')
+
+    const mark = getByRole('img', { name: 'ChatGPT' })
+
+    expect(mark).toHaveAttribute('data-kind', 'gptLogotype')
+    expect(mark).toHaveAttribute('data-variant', 'lockup')
+    expect(container.querySelector('img')?.getAttribute('src')).toContain('/images/logos/axis/gpt-logotype.svg')
+    expect(asset).toContain('viewBox="0 0 339.3982238769531 91.0694580078125"')
+    expect(asset).toContain('#15A17F')
+    expect(asset).toContain('#0E100F')
+    expect(asset).not.toContain('data:image')
+    expect(asset).not.toContain('<image')
+    expect(queryByText('ChatGPT')).not.toBeInTheDocument()
+  })
+
+  it('keeps GPT compact marks as pure SVG assets', () => {
+    const { container, getByRole, queryByText } = renderWithTheme(<GreenhouseBrandLogoMark kind='gptOnBlack' />)
+
+    const compactAssets = ['gpt-isotype.svg', 'gpt-on-black.svg', 'gpt-on-neutral.svg'].map(fileName =>
+      readFileSync(join(process.cwd(), `public/images/logos/axis/${fileName}`), 'utf8')
+    )
+
+    const mark = getByRole('img', { name: 'ChatGPT' })
+
+    expect(mark).toHaveAttribute('data-kind', 'gptOnBlack')
+    expect(mark).toHaveAttribute('data-variant', 'contained')
+    expect(container.querySelector('img')?.getAttribute('src')).toContain('/images/logos/axis/gpt-on-black.svg')
+
+    for (const asset of compactAssets) {
+      expect(asset).not.toContain('data:image')
+      expect(asset).not.toContain('<image')
+      expect(asset).not.toContain('.png')
+    }
+
+    expect(queryByText('ChatGPT')).not.toBeInTheDocument()
+  })
+
   it('requires every brand-logo kind to be asset-backed with no local label fallback', () => {
     for (const [kind, config] of Object.entries(GREENHOUSE_BRAND_LOGO_KIND_CONFIG)) {
       expect(config.assetSrc, kind).toBeTruthy()
@@ -361,8 +400,162 @@ describe('GreenhouseBrandLogoMark', () => {
     expect(queryByText('ElevenLabs')).not.toBeInTheDocument()
   })
 
+  it('maps the Claude logotype specimen to a lockup SVG kind', () => {
+    const { container, getByRole, queryByText } = renderWithTheme(<GreenhouseBrandLogoMark kind='claudeLogotype' />)
+    const asset = readFileSync(join(process.cwd(), 'public/images/logos/axis/claude-logotype.svg'), 'utf8')
+
+    const mark = getByRole('img', { name: 'Claude' })
+
+    expect(mark).toHaveAttribute('data-kind', 'claudeLogotype')
+    expect(mark).toHaveAttribute('data-variant', 'lockup')
+    expect(container.querySelector('img')?.getAttribute('src')).toContain('/images/logos/axis/claude-logotype.svg')
+    expect(asset).toContain('viewBox="0 0 233.005 50.0053"')
+    expect(asset).toContain('#D97757')
+    expect(asset).toContain('fill="var(--fill-0, black)"')
+    expect(queryByText('Claude')).not.toBeInTheDocument()
+  })
+
+  it('keeps Claude compact marks as SVG assets', () => {
+    const { container, getByRole, queryByText } = renderWithTheme(<GreenhouseBrandLogoMark kind='claudeOnDarkOrange' />)
+
+    const mark = getByRole('img', { name: 'Claude' })
+
+    expect(mark).toHaveAttribute('data-kind', 'claudeOnDarkOrange')
+    expect(mark).toHaveAttribute('data-variant', 'contained')
+    expect(container.querySelector('img')?.getAttribute('src')).toContain(
+      '/images/logos/axis/claude-on-dark-orange.svg'
+    )
+    expect(queryByText('Claude')).not.toBeInTheDocument()
+  })
+
+  it('maps the Microsoft Teams logotype specimen to a lockup SVG kind', () => {
+    const { container, getByRole, queryByText } = renderWithTheme(<GreenhouseBrandLogoMark kind='teamsLogotype' />)
+    const asset = readFileSync(join(process.cwd(), 'public/images/logos/axis/teams-logotype.svg'), 'utf8')
+
+    const mark = getByRole('img', { name: 'Microsoft Teams' })
+
+    expect(mark).toHaveAttribute('data-kind', 'teamsLogotype')
+    expect(mark).toHaveAttribute('data-variant', 'lockup')
+    expect(container.querySelector('img')?.getAttribute('src')).toContain('/images/logos/axis/teams-logotype.svg')
+    expect(asset).toContain('viewBox="0 0 251 50"')
+    expect(asset).toContain('#4B59CC')
+    expect(asset).toContain('#515AC8')
+    expect(asset).not.toContain('data:image')
+    expect(asset).not.toContain('<image')
+    expect(queryByText('Microsoft Teams')).not.toBeInTheDocument()
+  })
+
+  it('keeps Microsoft Teams compact marks as pure SVG assets', () => {
+    const { container, getByRole, queryByText } = renderWithTheme(<GreenhouseBrandLogoMark kind='teamsOnDarkPurple' />)
+
+    const compactAssets = [
+      'teams-isotype.svg',
+      'teams-on-dark-purple.svg',
+      'teams-on-neutral.svg',
+      'teams-on-light-purple.svg'
+    ].map(fileName => readFileSync(join(process.cwd(), `public/images/logos/axis/${fileName}`), 'utf8'))
+
+    const mark = getByRole('img', { name: 'Microsoft Teams' })
+
+    expect(mark).toHaveAttribute('data-kind', 'teamsOnDarkPurple')
+    expect(mark).toHaveAttribute('data-variant', 'contained')
+    expect(container.querySelector('img')?.getAttribute('src')).toContain('/images/logos/axis/teams-on-dark-purple.svg')
+
+    for (const asset of compactAssets) {
+      expect(asset).toContain('<svg')
+      expect(asset).not.toContain('data:image')
+      expect(asset).not.toContain('<image')
+      expect(asset).not.toContain('.png')
+    }
+
+    expect(queryByText('Microsoft Teams')).not.toBeInTheDocument()
+  })
+
+  it('maps the Notion logotype specimen to a lockup SVG kind', () => {
+    const { container, getByRole, queryByText } = renderWithTheme(<GreenhouseBrandLogoMark kind='notionLogotype' />)
+    const asset = readFileSync(join(process.cwd(), 'public/images/logos/axis/notion-logotype.svg'), 'utf8')
+
+    const mark = getByRole('img', { name: 'Notion' })
+
+    expect(mark).toHaveAttribute('data-kind', 'notionLogotype')
+    expect(mark).toHaveAttribute('data-variant', 'lockup')
+    expect(container.querySelector('img')?.getAttribute('src')).toContain('/images/logos/axis/notion-logotype.svg')
+    expect(asset).toContain('viewBox="0 0 172 50"')
+    expect(asset).toContain('fill="#040404"')
+    expect(asset).toContain('fill="black"')
+    expect(asset).not.toContain('data:image')
+    expect(asset).not.toContain('<image')
+    expect(queryByText('Notion')).not.toBeInTheDocument()
+  })
+
+  it('keeps Notion compact marks as pure SVG assets', () => {
+    const { container, getByRole, queryByText } = renderWithTheme(<GreenhouseBrandLogoMark kind='notionOnBlack' />)
+
+    const compactAssets = ['notion-isotype.svg', 'notion-on-black.svg', 'notion-on-neutral.svg'].map(fileName =>
+      readFileSync(join(process.cwd(), `public/images/logos/axis/${fileName}`), 'utf8')
+    )
+
+    const mark = getByRole('img', { name: 'Notion' })
+
+    expect(mark).toHaveAttribute('data-kind', 'notionOnBlack')
+    expect(mark).toHaveAttribute('data-variant', 'contained')
+    expect(container.querySelector('img')?.getAttribute('src')).toContain('/images/logos/axis/notion-on-black.svg')
+
+    for (const asset of compactAssets) {
+      expect(asset).toContain('<svg')
+      expect(asset).not.toContain('data:image')
+      expect(asset).not.toContain('<image')
+      expect(asset).not.toContain('.png')
+    }
+
+    expect(queryByText('Notion')).not.toBeInTheDocument()
+  })
+
+  it('maps the HubSpot logotype specimen to a lockup SVG kind', () => {
+    const { container, getByRole, queryByText } = renderWithTheme(<GreenhouseBrandLogoMark kind='hubspotLogotype' />)
+    const asset = readFileSync(join(process.cwd(), 'public/images/logos/axis/hubspot-logotype.svg'), 'utf8')
+
+    const mark = getByRole('img', { name: 'HubSpot' })
+
+    expect(mark).toHaveAttribute('data-kind', 'hubspotLogotype')
+    expect(mark).toHaveAttribute('data-variant', 'lockup')
+    expect(container.querySelector('img')?.getAttribute('src')).toContain('/images/logos/axis/hubspot-logotype.svg')
+    expect(asset).toContain('viewBox="0 0 177 50"')
+    expect(asset).toContain('#FF5C35')
+    expect(asset).not.toContain('data:image')
+    expect(asset).not.toContain('<image')
+    expect(queryByText('HubSpot')).not.toBeInTheDocument()
+  })
+
+  it('keeps HubSpot compact marks as pure SVG assets', () => {
+    const { container, getByRole, queryByText } = renderWithTheme(<GreenhouseBrandLogoMark kind='hubspotOnOrange' />)
+
+    const compactAssets = [
+      'hubspot-isotype.svg',
+      'hubspot-on-orange.svg',
+      'hubspot-on-neutral.svg',
+      'hubspot-on-light-orange.svg'
+    ].map(fileName => readFileSync(join(process.cwd(), `public/images/logos/axis/${fileName}`), 'utf8'))
+
+    const mark = getByRole('img', { name: 'HubSpot' })
+
+    expect(mark).toHaveAttribute('data-kind', 'hubspotOnOrange')
+    expect(mark).toHaveAttribute('data-variant', 'contained')
+    expect(container.querySelector('img')?.getAttribute('src')).toContain('/images/logos/axis/hubspot-on-orange.svg')
+
+    for (const asset of compactAssets) {
+      expect(asset).toContain('<svg')
+      expect(asset).not.toContain('data:image')
+      expect(asset).not.toContain('<image')
+      expect(asset).not.toContain('.png')
+    }
+
+    expect(queryByText('HubSpot')).not.toBeInTheDocument()
+  })
+
   it('resolves kind defaults through the controller', () => {
     expect(resolveGreenhouseBrandLogoKind('geminiOnNeutral')).toBe(GREENHOUSE_BRAND_LOGO_KIND_CONFIG.geminiOnNeutral)
+    expect(resolveGreenhouseBrandLogoKind('gptOnNeutral')).toBe(GREENHOUSE_BRAND_LOGO_KIND_CONFIG.gptOnNeutral)
     expect(resolveGreenhouseBrandLogoKind('adobeOnPink')).toBe(GREENHOUSE_BRAND_LOGO_KIND_CONFIG.adobeOnPink)
     expect(resolveGreenhouseBrandLogoKind('expressOnNeutral')).toBe(GREENHOUSE_BRAND_LOGO_KIND_CONFIG.expressOnNeutral)
     expect(resolveGreenhouseBrandLogoKind('expressFullColorOnBlack')).toBe(
@@ -396,7 +589,18 @@ describe('GreenhouseBrandLogoMark', () => {
     expect(resolveGreenhouseBrandLogoKind('elevenLabsOnNeutral')).toBe(
       GREENHOUSE_BRAND_LOGO_KIND_CONFIG.elevenLabsOnNeutral
     )
+    expect(resolveGreenhouseBrandLogoKind('claudeOnLightOrange')).toBe(
+      GREENHOUSE_BRAND_LOGO_KIND_CONFIG.claudeOnLightOrange
+    )
+    expect(resolveGreenhouseBrandLogoKind('teamsOnLightPurple')).toBe(
+      GREENHOUSE_BRAND_LOGO_KIND_CONFIG.teamsOnLightPurple
+    )
+    expect(resolveGreenhouseBrandLogoKind('notionOnNeutral')).toBe(GREENHOUSE_BRAND_LOGO_KIND_CONFIG.notionOnNeutral)
+    expect(resolveGreenhouseBrandLogoKind('hubspotOnLightOrange')).toBe(
+      GREENHOUSE_BRAND_LOGO_KIND_CONFIG.hubspotOnLightOrange
+    )
     expect(resolveGreenhouseBrandLogoVariant({ kind: 'geminiIsotype' })).toBe('isotype')
+    expect(resolveGreenhouseBrandLogoVariant({ kind: 'gptOnBlack' })).toBe('contained')
     expect(resolveGreenhouseBrandLogoVariant({ kind: 'adobeOnRed' })).toBe('contained')
     expect(resolveGreenhouseBrandLogoVariant({ kind: 'expressOnBlack' })).toBe('contained')
     expect(resolveGreenhouseBrandLogoVariant({ kind: 'expressFullColorOnBlack' })).toBe('contained')
@@ -410,6 +614,12 @@ describe('GreenhouseBrandLogoMark', () => {
     expect(resolveGreenhouseBrandLogoVariant({ kind: 'higgsfieldOnGreen' })).toBe('contained')
     expect(resolveGreenhouseBrandLogoVariant({ kind: 'magnificOnBlack' })).toBe('contained')
     expect(resolveGreenhouseBrandLogoVariant({ kind: 'elevenLabsOnBlack' })).toBe('contained')
+    expect(resolveGreenhouseBrandLogoVariant({ kind: 'claudeOnDarkOrange' })).toBe('contained')
+    expect(resolveGreenhouseBrandLogoVariant({ kind: 'teamsOnDarkPurple' })).toBe('contained')
+    expect(resolveGreenhouseBrandLogoVariant({ kind: 'notionOnBlack' })).toBe('contained')
+    expect(resolveGreenhouseBrandLogoVariant({ kind: 'notionLogotype' })).toBe('lockup')
+    expect(resolveGreenhouseBrandLogoVariant({ kind: 'hubspotOnOrange' })).toBe('contained')
+    expect(resolveGreenhouseBrandLogoVariant({ kind: 'hubspotLogotype' })).toBe('lockup')
     expect(resolveGreenhouseBrandLogoVariant({ kind: 'geminiIsotype', variant: 'lockup' })).toBe('lockup')
   })
 })

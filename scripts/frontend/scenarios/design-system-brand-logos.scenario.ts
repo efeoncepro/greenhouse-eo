@@ -34,13 +34,19 @@ export const scenario: CaptureScenario = {
       kind: 'mark',
       label: 'brand-logo-hero',
       clipSelector: '[data-capture="brand-logo-hero"]',
-      note: 'Specimens principales de Gemini, Adobe, Adobe Express, Adobe Firefly, Adobe Photoshop, Adobe Premiere Pro, Adobe Illustrator, Adobe After Effects, Envato, Shutterstock, Higgsfield, Magnific y ElevenLabs portados desde AXIS Figma.'
+      note: 'Specimens principales de Gemini, ChatGPT, Adobe, Adobe Express, Adobe Firefly, Adobe Photoshop, Adobe Premiere Pro, Adobe Illustrator, Adobe After Effects, Envato, Shutterstock, Higgsfield, Magnific, ElevenLabs, Claude, Microsoft Teams, Notion y HubSpot portados desde AXIS Figma.'
     },
     {
       kind: 'mark',
       label: 'brand-logo-gemini-kind-matrix',
       clipSelector: '[data-capture="brand-logo-gemini-kind-matrix"]',
       note: 'Matriz de kinds geminiIsotype, geminiOnBlue, geminiOnNeutral y geminiLogotype.'
+    },
+    {
+      kind: 'mark',
+      label: 'brand-logo-gpt-kind-matrix',
+      clipSelector: '[data-capture="brand-logo-gpt-kind-matrix"]',
+      note: 'Matriz de kinds gptIsotype, gptOnBlack, gptOnNeutral y gptLogotype.'
     },
     {
       kind: 'mark',
@@ -113,6 +119,30 @@ export const scenario: CaptureScenario = {
       label: 'brand-logo-elevenlabs-kind-matrix',
       clipSelector: '[data-capture="brand-logo-elevenlabs-kind-matrix"]',
       note: 'Matriz de kinds elevenLabsIsotype, elevenLabsOnBlack, elevenLabsOnNeutral y elevenLabsLogotype.'
+    },
+    {
+      kind: 'mark',
+      label: 'brand-logo-claude-kind-matrix',
+      clipSelector: '[data-capture="brand-logo-claude-kind-matrix"]',
+      note: 'Matriz de kinds claudeIsologo, claudeOnDarkOrange, claudeOnNeutral, claudeOnLightOrange y claudeLogotype.'
+    },
+    {
+      kind: 'mark',
+      label: 'brand-logo-teams-kind-matrix',
+      clipSelector: '[data-capture="brand-logo-teams-kind-matrix"]',
+      note: 'Matriz de kinds teamsIsotype, teamsOnDarkPurple, teamsOnNeutral, teamsOnLightPurple y teamsLogotype.'
+    },
+    {
+      kind: 'mark',
+      label: 'brand-logo-notion-kind-matrix',
+      clipSelector: '[data-capture="brand-logo-notion-kind-matrix"]',
+      note: 'Matriz de kinds notionIsotype, notionOnBlack, notionOnNeutral y notionLogotype.'
+    },
+    {
+      kind: 'mark',
+      label: 'brand-logo-hubspot-kind-matrix',
+      clipSelector: '[data-capture="brand-logo-hubspot-kind-matrix"]',
+      note: 'Matriz de kinds hubspotIsotype, hubspotOnOrange, hubspotOnNeutral, hubspotOnLightOrange y hubspotLogotype.'
     }
   ]
 }

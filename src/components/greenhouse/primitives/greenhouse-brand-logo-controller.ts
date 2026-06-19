@@ -2,6 +2,7 @@ export type GreenhouseBrandLogoVariant = 'isotype' | 'contained' | 'lockup'
 
 export type GreenhouseBrandLogoFamily =
   | 'gemini'
+  | 'gpt'
   | 'adobe'
   | 'express'
   | 'firefly'
@@ -14,12 +15,20 @@ export type GreenhouseBrandLogoFamily =
   | 'higgsfield'
   | 'magnific'
   | 'elevenLabs'
+  | 'claude'
+  | 'teams'
+  | 'notion'
+  | 'hubspot'
 
 export type GreenhouseBrandLogoKind =
   | 'geminiIsotype'
   | 'geminiOnBlue'
   | 'geminiOnNeutral'
   | 'geminiLogotype'
+  | 'gptIsotype'
+  | 'gptOnBlack'
+  | 'gptOnNeutral'
+  | 'gptLogotype'
   | 'adobeIsotype'
   | 'adobeOnRed'
   | 'adobeOnNeutral'
@@ -77,6 +86,25 @@ export type GreenhouseBrandLogoKind =
   | 'elevenLabsOnBlack'
   | 'elevenLabsOnNeutral'
   | 'elevenLabsLogotype'
+  | 'claudeIsologo'
+  | 'claudeOnDarkOrange'
+  | 'claudeOnNeutral'
+  | 'claudeOnLightOrange'
+  | 'claudeLogotype'
+  | 'teamsIsotype'
+  | 'teamsOnDarkPurple'
+  | 'teamsOnNeutral'
+  | 'teamsOnLightPurple'
+  | 'teamsLogotype'
+  | 'notionIsotype'
+  | 'notionOnBlack'
+  | 'notionOnNeutral'
+  | 'notionLogotype'
+  | 'hubspotIsotype'
+  | 'hubspotOnOrange'
+  | 'hubspotOnNeutral'
+  | 'hubspotOnLightOrange'
+  | 'hubspotLogotype'
 
 export type GreenhouseBrandLogoSize = 'small' | 'medium' | 'large'
 
@@ -91,6 +119,9 @@ export interface GreenhouseBrandLogoKindConfig {
     | 'geminiFullColor'
     | 'geminiOnBlue'
     | 'geminiOnNeutral'
+    | 'gptGreen'
+    | 'gptOnBlack'
+    | 'gptOnNeutral'
     | 'adobeRed'
     | 'adobeOnRed'
     | 'adobeOnNeutral'
@@ -136,10 +167,25 @@ export interface GreenhouseBrandLogoKindConfig {
     | 'elevenLabsBlack'
     | 'elevenLabsOnBlack'
     | 'elevenLabsOnNeutral'
+    | 'claudeOrange'
+    | 'claudeOnDarkOrange'
+    | 'claudeOnNeutral'
+    | 'claudeOnLightOrange'
+    | 'teamsPurple'
+    | 'teamsOnDarkPurple'
+    | 'teamsOnNeutral'
+    | 'teamsOnLightPurple'
+    | 'notionBlack'
+    | 'notionOnBlack'
+    | 'notionOnNeutral'
+    | 'hubspotOrange'
+    | 'hubspotOnOrange'
+    | 'hubspotOnNeutral'
+    | 'hubspotOnLightOrange'
 }
 
 const AXIS_BRAND_LOGO_ASSET_BASE = '/images/logos/axis'
-const AXIS_BRAND_LOGO_ASSET_VERSION = '20260619-svg-fit-16'
+const AXIS_BRAND_LOGO_ASSET_VERSION = '20260619-svg-fit-21'
 
 const createAxisBrandLogoAssetSrc = (fileName: string) =>
   `${AXIS_BRAND_LOGO_ASSET_BASE}/${fileName}?v=${AXIS_BRAND_LOGO_ASSET_VERSION}`
@@ -150,6 +196,9 @@ export const GREENHOUSE_BRAND_LOGO_ASSET_COLORS = {
   geminiRed: 'rgb(249 69 68)',
   geminiYellow: 'rgb(245 187 25)',
   geminiGreen: 'rgb(36 185 112)',
+  gptGreen: 'rgb(21 161 127)',
+  gptBlack: 'rgb(14 16 15)',
+  gptNeutralSurface: 'rgb(243 243 244)',
   adobeRed: 'rgb(226 6 19)',
   adobePinkSurface: 'rgb(255 232 230)',
   expressNavy: 'rgb(0 11 29)',
@@ -185,7 +234,19 @@ export const GREENHOUSE_BRAND_LOGO_ASSET_COLORS = {
   magnificBlack: 'rgb(0 0 0)',
   magnificNeutralSurface: 'rgb(243 243 244)',
   elevenLabsBlack: 'rgb(0 0 0)',
-  elevenLabsNeutralSurface: 'rgb(243 243 244)'
+  elevenLabsNeutralSurface: 'rgb(243 243 244)',
+  claudeOrange: 'rgb(217 119 87)',
+  claudeNeutralSurface: 'rgb(243 243 244)',
+  claudeLightOrangeSurface: 'rgb(255 228 220)',
+  teamsPurple: 'rgb(75 89 204)',
+  teamsDarkPurple: 'rgb(40 25 156)',
+  teamsNeutralSurface: 'rgb(243 243 244)',
+  teamsLightPurpleSurface: 'rgb(199 192 255)',
+  notionBlack: 'rgb(0 0 0)',
+  notionNeutralSurface: 'rgb(243 243 244)',
+  hubspotOrange: 'rgb(255 92 53)',
+  hubspotNeutralSurface: 'rgb(243 243 244)',
+  hubspotLightOrangeSurface: 'rgb(255 223 216)'
 } as const
 
 export const GREENHOUSE_BRAND_LOGO_KIND_CONFIG = {
@@ -217,6 +278,36 @@ export const GREENHOUSE_BRAND_LOGO_KIND_CONFIG = {
     assetSrc: createAxisBrandLogoAssetSrc('gemini-logotype.svg'),
     assetAspectRatio: 301 / 63.016353607177734,
     tone: 'geminiFullColor'
+  },
+  gptIsotype: {
+    family: 'gpt',
+    variant: 'isotype',
+    ariaLabel: 'ChatGPT',
+    assetSrc: createAxisBrandLogoAssetSrc('gpt-isotype.svg'),
+    assetAspectRatio: 45.9894 / 47.0006,
+    tone: 'gptGreen'
+  },
+  gptOnBlack: {
+    family: 'gpt',
+    variant: 'contained',
+    ariaLabel: 'ChatGPT',
+    assetSrc: createAxisBrandLogoAssetSrc('gpt-on-black.svg'),
+    tone: 'gptOnBlack'
+  },
+  gptOnNeutral: {
+    family: 'gpt',
+    variant: 'contained',
+    ariaLabel: 'ChatGPT',
+    assetSrc: createAxisBrandLogoAssetSrc('gpt-on-neutral.svg'),
+    tone: 'gptOnNeutral'
+  },
+  gptLogotype: {
+    family: 'gpt',
+    variant: 'lockup',
+    ariaLabel: 'ChatGPT',
+    assetSrc: createAxisBrandLogoAssetSrc('gpt-logotype.svg'),
+    assetAspectRatio: 339.3982238769531 / 91.0694580078125,
+    tone: 'gptGreen'
   },
   adobeIsotype: {
     family: 'adobe',
@@ -640,6 +731,146 @@ export const GREENHOUSE_BRAND_LOGO_KIND_CONFIG = {
     assetSrc: createAxisBrandLogoAssetSrc('elevenlabs-logotype.svg'),
     assetAspectRatio: 297 / 40,
     tone: 'elevenLabsBlack'
+  },
+  claudeIsologo: {
+    family: 'claude',
+    variant: 'isotype',
+    ariaLabel: 'Claude',
+    assetSrc: createAxisBrandLogoAssetSrc('claude-isologo.svg'),
+    tone: 'claudeOrange'
+  },
+  claudeOnDarkOrange: {
+    family: 'claude',
+    variant: 'contained',
+    ariaLabel: 'Claude',
+    assetSrc: createAxisBrandLogoAssetSrc('claude-on-dark-orange.svg'),
+    tone: 'claudeOnDarkOrange'
+  },
+  claudeOnNeutral: {
+    family: 'claude',
+    variant: 'contained',
+    ariaLabel: 'Claude',
+    assetSrc: createAxisBrandLogoAssetSrc('claude-on-neutral.svg'),
+    tone: 'claudeOnNeutral'
+  },
+  claudeOnLightOrange: {
+    family: 'claude',
+    variant: 'contained',
+    ariaLabel: 'Claude',
+    assetSrc: createAxisBrandLogoAssetSrc('claude-on-light-orange.svg'),
+    tone: 'claudeOnLightOrange'
+  },
+  claudeLogotype: {
+    family: 'claude',
+    variant: 'lockup',
+    ariaLabel: 'Claude',
+    assetSrc: createAxisBrandLogoAssetSrc('claude-logotype.svg'),
+    assetAspectRatio: 233.005 / 50.0053,
+    tone: 'claudeOrange'
+  },
+  teamsIsotype: {
+    family: 'teams',
+    variant: 'isotype',
+    ariaLabel: 'Microsoft Teams',
+    assetSrc: createAxisBrandLogoAssetSrc('teams-isotype.svg'),
+    assetAspectRatio: 50 / 46.75,
+    tone: 'teamsPurple'
+  },
+  teamsOnDarkPurple: {
+    family: 'teams',
+    variant: 'contained',
+    ariaLabel: 'Microsoft Teams',
+    assetSrc: createAxisBrandLogoAssetSrc('teams-on-dark-purple.svg'),
+    tone: 'teamsOnDarkPurple'
+  },
+  teamsOnNeutral: {
+    family: 'teams',
+    variant: 'contained',
+    ariaLabel: 'Microsoft Teams',
+    assetSrc: createAxisBrandLogoAssetSrc('teams-on-neutral.svg'),
+    tone: 'teamsOnNeutral'
+  },
+  teamsOnLightPurple: {
+    family: 'teams',
+    variant: 'contained',
+    ariaLabel: 'Microsoft Teams',
+    assetSrc: createAxisBrandLogoAssetSrc('teams-on-light-purple.svg'),
+    tone: 'teamsOnLightPurple'
+  },
+  teamsLogotype: {
+    family: 'teams',
+    variant: 'lockup',
+    ariaLabel: 'Microsoft Teams',
+    assetSrc: createAxisBrandLogoAssetSrc('teams-logotype.svg'),
+    assetAspectRatio: 251 / 50,
+    tone: 'teamsPurple'
+  },
+  notionIsotype: {
+    family: 'notion',
+    variant: 'isotype',
+    ariaLabel: 'Notion',
+    assetSrc: createAxisBrandLogoAssetSrc('notion-isotype.svg'),
+    assetAspectRatio: 50 / 47,
+    tone: 'notionBlack'
+  },
+  notionOnBlack: {
+    family: 'notion',
+    variant: 'contained',
+    ariaLabel: 'Notion',
+    assetSrc: createAxisBrandLogoAssetSrc('notion-on-black.svg'),
+    tone: 'notionOnBlack'
+  },
+  notionOnNeutral: {
+    family: 'notion',
+    variant: 'contained',
+    ariaLabel: 'Notion',
+    assetSrc: createAxisBrandLogoAssetSrc('notion-on-neutral.svg'),
+    tone: 'notionOnNeutral'
+  },
+  notionLogotype: {
+    family: 'notion',
+    variant: 'lockup',
+    ariaLabel: 'Notion',
+    assetSrc: createAxisBrandLogoAssetSrc('notion-logotype.svg'),
+    assetAspectRatio: 171.62033081054688 / 50,
+    tone: 'notionBlack'
+  },
+  hubspotIsotype: {
+    family: 'hubspot',
+    variant: 'isotype',
+    ariaLabel: 'HubSpot',
+    assetSrc: createAxisBrandLogoAssetSrc('hubspot-isotype.svg'),
+    assetAspectRatio: 50 / 47,
+    tone: 'hubspotOrange'
+  },
+  hubspotOnOrange: {
+    family: 'hubspot',
+    variant: 'contained',
+    ariaLabel: 'HubSpot',
+    assetSrc: createAxisBrandLogoAssetSrc('hubspot-on-orange.svg'),
+    tone: 'hubspotOnOrange'
+  },
+  hubspotOnNeutral: {
+    family: 'hubspot',
+    variant: 'contained',
+    ariaLabel: 'HubSpot',
+    assetSrc: createAxisBrandLogoAssetSrc('hubspot-on-neutral.svg'),
+    tone: 'hubspotOnNeutral'
+  },
+  hubspotOnLightOrange: {
+    family: 'hubspot',
+    variant: 'contained',
+    ariaLabel: 'HubSpot',
+    assetSrc: createAxisBrandLogoAssetSrc('hubspot-on-light-orange.svg'),
+    tone: 'hubspotOnLightOrange'
+  },
+  hubspotLogotype: {
+    family: 'hubspot',
+    variant: 'lockup',
+    ariaLabel: 'HubSpot',
+    assetSrc: createAxisBrandLogoAssetSrc('hubspot-logotype.svg'),
+    assetAspectRatio: 176.5553436279297 / 50,
+    tone: 'hubspotOrange'
   }
 } as const satisfies Record<GreenhouseBrandLogoKind, GreenhouseBrandLogoKindConfig>
 

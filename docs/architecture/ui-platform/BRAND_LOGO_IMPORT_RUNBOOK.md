@@ -6,7 +6,7 @@
 > **Contrato base:** [BRAND_LOGO_VARIATIONS.md](./BRAND_LOGO_VARIATIONS.md)
 > **Lab/GVC:** `/design-system/brand-logos` · `design-system-brand-logos`
 
-Este runbook documenta lo aprendido al portar los logos Gemini, Adobe, Adobe Express, Firefly, Photoshop, Premiere, Illustrator, After Effects, Envato, Shutterstock, Higgsfield, Magnific y ElevenLabs desde AXIS Figma. Su objetivo es que una sesión nueva no tenga que redescubrir por qué ciertos logos se pixelan, se cortan, pierden color o terminan como texto local.
+Este runbook documenta lo aprendido al portar los logos Gemini, ChatGPT/GPT, Adobe, Adobe Express, Firefly, Photoshop, Premiere, Illustrator, After Effects, Envato, Shutterstock, Higgsfield, Magnific, ElevenLabs, Claude, Microsoft Teams, Notion y HubSpot desde AXIS Figma. Su objetivo es que una sesión nueva no tenga que redescubrir por qué ciertos logos se pixelan, se cortan, pierden color o terminan como texto local.
 
 ## Principio
 
@@ -89,6 +89,18 @@ Solución:
 - El asset `adobe-on-red` debe contener el badge completo de Figma: fondo rojo + A blanca.
 - No pintar el círculo en CSS y montar otro símbolo encima salvo que se valide como asset final único.
 
+### ChatGPT / GPT
+
+Resultado observado: el nodo `12274:92` entrega SVG fiel para `Isotipo`, `Fondo-Negro` y `Fondo-Gris`. El `Logotipo` llega desde MCP descompuesto en sub-vectores Figma, no como raíz SVG única.
+
+Solución:
+
+- Exportar `gptIsotype`, `gptOnBlack` y `gptOnNeutral` como SVG locales directos.
+- Componer `gptLogotype` como un solo SVG local desde los sub-vectores Figma, usando el viewBox raíz `339.3982238769531 x 91.0694580078125` y las posiciones relativas del nodo.
+- Mantener el wordmark ChatGPT como asset vectorial; no reconstruirlo con texto local ni tipografía del portal.
+- Conservar los kinds `gpt*` porque el componente Figma se llama `Gpt`; usar `ChatGPT` como nombre visible y `ariaLabel`.
+- Verificar que los SVG GPT no contengan `<image>`, `data:image` ni referencias `.png`; en este nodo los assets quedaron vectoriales puros.
+
 ### Adobe Express
 
 Problemas observados:
@@ -164,6 +176,52 @@ Solución:
 - Exportar `elevenLabsIsotype`, `elevenLabsOnBlack`, `elevenLabsOnNeutral` y `elevenLabsLogotype` como SVG locales.
 - Mantener el wordmark `ElevenLabs` como asset vectorial; no reconstruirlo con texto local.
 - Las variantes `Fondo-Negro` y `Fondo-Gris` incluyen fondo circular + barras en el mismo asset; no separar fondo y marca en CSS.
+
+### Claude
+
+Resultado observado: el nodo `12274:110` entrega SVG fiel para sus cinco variantes, incluido el logotipo completo. Figma nombra la variante suelta como `Isologo`, no `Isotipo`; conservar ese matiz en el kind runtime.
+
+Solución:
+
+- Exportar `claudeIsologo`, `claudeOnDarkOrange`, `claudeOnNeutral`, `claudeOnLightOrange` y `claudeLogotype` como SVG locales.
+- Mantener el wordmark `Claude` como asset vectorial; no reconstruirlo con texto local.
+- Las variantes `Fondo-NaranjaOscuro`, `Fondo-Gris` y `Fondo-NaranjaClaro` incluyen fondo circular + marca en el mismo asset; no separar fondo y marca en CSS.
+
+### Microsoft Teams
+
+Resultado observado: el nodo `12271:524` entrega SVG fiel para sus cinco variantes, incluido el logotipo completo. Los compactos descargados desde el asset endpoint llegaron con raíz `preserveAspectRatio="none"`, lo que puede deformar o cortar marcas cuando la primitive los escala dentro de un box cuadrado.
+
+Solución:
+
+- Exportar `teamsIsotype`, `teamsOnDarkPurple`, `teamsOnNeutral`, `teamsOnLightPurple` y `teamsLogotype` como SVG locales.
+- Mantener el wordmark `Microsoft Teams` como asset vectorial; no reconstruirlo con texto local.
+- Normalizar todos los compactos Teams a `preserveAspectRatio="xMidYMid meet"` antes de validar visualmente.
+- En el card del lab, renderizar `teamsLogotype` en tamaño `large` para respetar la altura nativa de 50px del nodo Figma; en `small` el lockup se ve demasiado chico frente al specimen AXIS.
+- Las variantes `Fondo-MoradoOscuro`, `Fondo-Gris` y `Fondo-MoradoClaro` incluyen fondo circular + marca en el mismo asset; no separar fondo y marca en CSS.
+
+### Notion
+
+Resultado observado: el nodo `12274:2` entrega SVG fiel para sus cuatro variantes, incluido el logotipo completo. El wordmark puede verse "distinto" si el lab lo presenta demasiado pequeño, porque el downscale comprime los trazos del wordmark y se confunde con tipografía local.
+
+Solución:
+
+- Exportar `notionIsotype`, `notionOnBlack`, `notionOnNeutral` y `notionLogotype` como SVG locales.
+- Mantener el wordmark `Notion` como asset vectorial; no reconstruirlo con texto local ni tipografía del portal.
+- Usar el ratio real del nodo `12344:16` (`171.62033081054688 / 50`) para el lockup.
+- En el card del lab, renderizar `notionLogotype` en tamaño `large` para respetar la altura nativa de 50px del nodo Figma y evitar que el downscale sugiera letras incorrectas.
+- Las variantes `Fondo-Negro` y `Fondo-Gris` incluyen fondo circular + marca en el mismo asset; no separar fondo y marca en CSS.
+
+### HubSpot
+
+Resultado observado: el nodo `12274:82` entrega SVG fiel para sus cinco variantes, incluido el logotipo completo. El lockup tiene altura de 50px en Figma y debe presentarse a esa escala en el specimen para que el wordmark sea comparable al nodo AXIS.
+
+Solución:
+
+- Exportar `hubspotIsotype`, `hubspotOnOrange`, `hubspotOnNeutral`, `hubspotOnLightOrange` y `hubspotLogotype` como SVG locales.
+- Mantener el wordmark `HubSpot` como asset vectorial; no reconstruirlo con texto local ni tipografía del portal.
+- Usar el ratio real del nodo `12344:2` (`176.5553436279297 / 50`) para el lockup.
+- En el card del lab, renderizar `hubspotLogotype` en tamaño `large` para respetar la altura nativa de 50px del nodo Figma.
+- Las variantes `Fondo-Naranja`, `Fondo-Gris` y `Fondo-NaranjaClaro` incluyen fondo circular + marca en el mismo asset; no separar fondo y marca en CSS.
 
 ## Pruebas Visuales Que Sí Sirven
 

@@ -2,6 +2,18 @@
 
 ## 2026-06-19
 
+- **Design System — HubSpot desde AXIS Figma.** Se incorporó el nodo AXIS `12274:82` (`Hubspot`) a `GreenhouseBrandLogoMark` con kinds `hubspotIsotype`, `hubspotOnOrange`, `hubspotOnNeutral`, `hubspotOnLightOrange` y `hubspotLogotype`. Los cinco assets entran como SVG locales puros, incluido el wordmark completo, sin texto local del portal; el lockup usa el ratio real del nodo `12344:2` y se muestra grande en su specimen para respetar la altura Figma de 50px.
+
+- **Design System — Notion desde AXIS Figma.** Se incorporó el nodo AXIS `12274:2` (`Notion`) a `GreenhouseBrandLogoMark` con kinds `notionIsotype`, `notionOnBlack`, `notionOnNeutral` y `notionLogotype`. Los cuatro assets entran como SVG locales puros, incluido el wordmark completo, sin texto local del portal; el lockup usa el ratio real del nodo `12344:16` y se muestra grande en su specimen para evitar que el downscale haga parecer incorrectas las letras.
+
+- **Design System — Microsoft Teams desde AXIS Figma.** Se incorporó el nodo AXIS `12271:524` (`Teams`) a `GreenhouseBrandLogoMark` con kinds `teamsIsotype`, `teamsOnDarkPurple`, `teamsOnNeutral`, `teamsOnLightPurple` y `teamsLogotype`. Los cinco assets entran como SVG locales, incluido el wordmark completo, sin texto local del portal; los compactos se normalizaron a `preserveAspectRatio="xMidYMid meet"` para evitar deformación/corte.
+
+- **Design System — ChatGPT/GPT desde AXIS Figma.** Se incorporó el nodo AXIS `12274:92` (`Gpt` en Figma, wordmark visible `ChatGPT`) a `GreenhouseBrandLogoMark` con kinds `gptIsotype`, `gptOnBlack`, `gptOnNeutral` y `gptLogotype`. Los compactos entran como SVG directos y el logotipo como SVG local compuesto desde sub-vectores Figma, sin PNG ni texto local del portal.
+
+- **Design System — Claude desde AXIS Figma.** Se incorporó el nodo AXIS `12274:110` (`Claude`) a `GreenhouseBrandLogoMark` con kinds `claudeIsologo`, `claudeOnDarkOrange`, `claudeOnNeutral`, `claudeOnLightOrange` y `claudeLogotype`. Los cinco assets entran como SVG exportados desde Figma, incluido el wordmark completo, sin texto local del portal.
+
+- **Docs — compresión de historial UI Platform.** `docs/architecture/ui-platform/HISTORIAL.md` queda como índice cronológico corto: los deltas deben enlazar al contrato vivo en docs temáticos, runbooks o ADRs en vez de repetir matrices largas de kinds/assets. La entrada Brand Logo Variations ahora delega detalle a `BRAND_LOGO_VARIATIONS.md` y `BRAND_LOGO_IMPORT_RUNBOOK.md`; `Handoff.md` se compactó con el mismo criterio.
+
 - **Design System — ElevenLabs desde AXIS Figma.** Se incorporó el nodo AXIS `12274:74` (`ElevenLabs`) a `GreenhouseBrandLogoMark` con kinds `elevenLabsIsotype`, `elevenLabsOnBlack`, `elevenLabsOnNeutral` y `elevenLabsLogotype`. Los cuatro assets entran como SVG exportados desde Figma, incluido el wordmark completo, sin texto local del portal.
 
 - **Design System — Magnific desde AXIS Figma.** Se incorporó el nodo AXIS `12274:16` (`Magnific`) a `GreenhouseBrandLogoMark` con kinds `magnificIsotype`, `magnificOnBlack`, `magnificOnNeutral` y `magnificLogotype`. Los cuatro assets entran como SVG exportados desde Figma, incluido el wordmark completo, sin texto local del portal.

@@ -16,13 +16,14 @@
 
 La primitive gobierna tamaño, a11y, `data-capture`, `kind -> variant`, placement y asset selection. No reinterpreta colores de marca como tokens semánticos Greenhouse; los colores de logos externos viven dentro del asset o en `GREENHOUSE_BRAND_LOGO_ASSET_COLORS` como constantes de marca de terceros. Cada `kind` debe estar respaldado por un asset real; la primitive no dibuja isotipos ni wordmarks con SVG inline, MUI Typography ni texto local.
 
-Antes de importar una familia nueva o corregir un asset existente, cargar el [runbook de importación](./BRAND_LOGO_IMPORT_RUNBOOK.md). Ahí viven los errores ya encontrados con Gemini, Adobe Express, Adobe, Firefly, Photoshop, Illustrator, After Effects, Premiere, Envato, Shutterstock, Higgsfield, Magnific y ElevenLabs, además del checklist de verificación para futuras sesiones de Codex/Claude.
+Antes de importar una familia nueva o corregir un asset existente, cargar el [runbook de importación](./BRAND_LOGO_IMPORT_RUNBOOK.md). Ahí viven los errores ya encontrados con Gemini, ChatGPT/GPT, Adobe Express, Adobe, Firefly, Photoshop, Illustrator, After Effects, Premiere, Envato, Shutterstock, Higgsfield, Magnific, ElevenLabs, Claude, Microsoft Teams, Notion y HubSpot, además del checklist de verificación para futuras sesiones de Codex/Claude.
 
 ## Figma Source
 
 | Familia             |   Nodo AXIS | Kinds runtime                                                                                                                   |
 | ------------------- | ----------: | ------------------------------------------------------------------------------------------------------------------------------- |
 | Gemini              |  `12267:95` | `geminiIsotype`, `geminiOnBlue`, `geminiOnNeutral`, `geminiLogotype`                                                            |
+| ChatGPT / GPT       |  `12274:92` | `gptIsotype`, `gptOnBlack`, `gptOnNeutral`, `gptLogotype`                                                                       |
 | Adobe               |  `12273:32` | `adobeIsotype`, `adobeOnRed`, `adobeOnNeutral`, `adobeOnPink`, `adobeLogotype`                                                  |
 | Adobe Express       |  `12274:44` | `expressIsotype`, `expressOnBlack`, `expressFullColorOnBlack`, `expressOnNeutral`, `expressLogotype`                            |
 | Adobe Firefly       | `12267:441` | `fireflyIsotype`, `fireflyOnRed`, `fireflyOnNeutral`, `fireflyOnPink`, `fireflyLogotype`                                        |
@@ -35,6 +36,10 @@ Antes de importar una familia nueva o corregir un asset existente, cargar el [ru
 | Higgsfield          |  `12274:98` | `higgsfieldIsotype`, `higgsfieldOnGreen`, `higgsfieldOnNeutral`, `higgsfieldLogotype`                                           |
 | Magnific            |  `12274:16` | `magnificIsotype`, `magnificOnBlack`, `magnificOnNeutral`, `magnificLogotype`                                                    |
 | ElevenLabs          |  `12274:74` | `elevenLabsIsotype`, `elevenLabsOnBlack`, `elevenLabsOnNeutral`, `elevenLabsLogotype`                                           |
+| Claude              | `12274:110` | `claudeIsologo`, `claudeOnDarkOrange`, `claudeOnNeutral`, `claudeOnLightOrange`, `claudeLogotype`                               |
+| Microsoft Teams     | `12271:524` | `teamsIsotype`, `teamsOnDarkPurple`, `teamsOnNeutral`, `teamsOnLightPurple`, `teamsLogotype`                                    |
+| Notion              |   `12274:2` | `notionIsotype`, `notionOnBlack`, `notionOnNeutral`, `notionLogotype`                                                           |
+| HubSpot             |  `12274:82` | `hubspotIsotype`, `hubspotOnOrange`, `hubspotOnNeutral`, `hubspotOnLightOrange`, `hubspotLogotype`                              |
 
 Figma no expuso variables en estos nodos y Code Connect quedó bloqueado por seat/plan. La implementación toma Figma como intención visual y conserva el contrato runtime en la primitive.
 
@@ -56,6 +61,7 @@ Correcciones conocidas del primer port:
 - `geminiLogotype` debe usar `gemini-logotype.svg`; no texto MUI ni `theme.typography`.
 - El wordmark dentro de `geminiLogotype` debe mantenerse en negro real y con viewBox suficientemente holgado para no cortar la última `i`.
 - El cromatismo Gemini debe venir del export Figma por capas/máscaras (`#5495FB`, `#24B970`, `#F94544`, `#F5BB19`), no de un `linearGradient` manual simplificado.
+- `gptLogotype` usa SVG local compuesto desde sub-vectores Figma del lockup. El wordmark ChatGPT viene del asset vectorial, no de texto local ni tipografía del portal.
 - `expressIsotype`, `expressOnNeutral` y `expressLogotype` usan textura cromática exportada desde Figma recortada por máscara vectorial. No reemplazar por un `linearGradient` manual: cambia los colores de marca.
 - `expressFullColorOnBlack` es el isotipo cromático completo dentro del círculo negro de marca. No reemplazarlo por `expressOnBlack`: ese kind mantiene el A blanco sobre negro.
 - `expressLogotype` debe permanecer como SVG de lockup completo. El wordmark `Adobe Express` viene del asset vectorial, no de texto local del portal.
@@ -65,6 +71,10 @@ Correcciones conocidas del primer port:
 - `higgsfieldLogotype` usa SVG local exportado desde Figma. El wordmark `Higgsfield` viene del asset vectorial, no de texto local ni tipografía del portal.
 - `magnificLogotype` usa SVG local exportado desde Figma. El wordmark `Magnific` viene del asset vectorial, no de texto local ni tipografía del portal.
 - `elevenLabsLogotype` usa SVG local exportado desde Figma. El wordmark `ElevenLabs` viene del asset vectorial, no de texto local ni tipografía del portal.
+- `claudeLogotype` usa SVG local exportado desde Figma. El wordmark `Claude` viene del asset vectorial, no de texto local ni tipografía del portal.
+- `teamsLogotype` usa SVG local exportado desde Figma. El wordmark `Microsoft Teams` viene del asset vectorial, no de texto local ni tipografía del portal. Los compactos Teams llegaron con `preserveAspectRatio="none"` desde el MCP y deben normalizarse a `xMidYMid meet`.
+- `notionLogotype` usa SVG local exportado desde Figma. El wordmark `Notion` viene del asset vectorial, no de texto local ni tipografía del portal. En el lab se muestra en tamaño `large` dentro de su specimen para respetar la altura nativa de 50px del nodo Figma y evitar una lectura falsa por downscale.
+- `hubspotLogotype` usa SVG local exportado desde Figma. El wordmark `HubSpot` viene del asset vectorial, no de texto local ni tipografía del portal. En el lab se muestra en tamaño `large` dentro de su specimen para respetar la altura nativa de 50px del nodo Figma.
 - Los lockups Adobe Firefly, Photoshop, Illustrator y After Effects permanecen PNG porque el MCP los entregó como subnodos compuestos sin SVG raíz único.
 
 ## Lab Contract

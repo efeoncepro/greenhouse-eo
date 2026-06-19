@@ -21,6 +21,9 @@ import { DESIGN_SYSTEM_LAB_TOKENS } from './design-system-lab-tokens'
 const GEMINI_FIGMA_NODE_URL =
   'https://www.figma.com/design/yyMksCoijfMaIoYplXKZaR/Design-System-%7C-AXIS?node-id=12267-95&m=dev'
 
+const GPT_FIGMA_NODE_URL =
+  'https://www.figma.com/design/yyMksCoijfMaIoYplXKZaR/Design-System-%7C-AXIS?node-id=12274-92&m=dev'
+
 const ADOBE_FIGMA_NODE_URL =
   'https://www.figma.com/design/yyMksCoijfMaIoYplXKZaR/Design-System-%7C-AXIS?node-id=12273-32&m=dev'
 
@@ -56,6 +59,18 @@ const MAGNIFIC_FIGMA_NODE_URL =
 
 const ELEVEN_LABS_FIGMA_NODE_URL =
   'https://www.figma.com/design/yyMksCoijfMaIoYplXKZaR/Design-System-%7C-AXIS?node-id=12274-74&m=dev'
+
+const CLAUDE_FIGMA_NODE_URL =
+  'https://www.figma.com/design/yyMksCoijfMaIoYplXKZaR/Design-System-%7C-AXIS?node-id=12274-110&m=dev'
+
+const TEAMS_FIGMA_NODE_URL =
+  'https://www.figma.com/design/yyMksCoijfMaIoYplXKZaR/Design-System-%7C-AXIS?node-id=12271-524&m=dev'
+
+const NOTION_FIGMA_NODE_URL =
+  'https://www.figma.com/design/yyMksCoijfMaIoYplXKZaR/Design-System-%7C-AXIS?node-id=12274-2&m=dev'
+
+const HUBSPOT_FIGMA_NODE_URL =
+  'https://www.figma.com/design/yyMksCoijfMaIoYplXKZaR/Design-System-%7C-AXIS?node-id=12274-82&m=dev'
 
 const InlineCode = ({ children }: { children: string }) => (
   <Box
@@ -105,6 +120,33 @@ const GEMINI_KIND_SPECIMENS: KindSpecimen[] = [
     title: 'Logotipo',
     figmaProperty: 'Property 1=Logotipo',
     description: 'Lockup completo para referencias de proveedor, integración o documentación interna.'
+  }
+]
+
+const GPT_KIND_SPECIMENS: KindSpecimen[] = [
+  {
+    kind: 'gptIsotype',
+    title: 'Isotipo',
+    figmaProperty: 'Property 1=Isotipo',
+    description: 'Marca simple para menciones donde ChatGPT ya está nombrado cerca.'
+  },
+  {
+    kind: 'gptOnBlack',
+    title: 'Fondo negro',
+    figmaProperty: 'Property 1=Fondo-Negro',
+    description: 'Badge de alto contraste para matrices compactas y estados sobre superficies claras.'
+  },
+  {
+    kind: 'gptOnNeutral',
+    title: 'Fondo gris',
+    figmaProperty: 'Property 1=Fondo-Gris',
+    description: 'Badge sobre superficies neutras cuando el fondo negro pesa demasiado.'
+  },
+  {
+    kind: 'gptLogotype',
+    title: 'Logotipo',
+    figmaProperty: 'Property 1=Logotipo',
+    description: 'Lockup completo para referencias de proveedor, integración o biblioteca de marca.'
   }
 ]
 
@@ -486,9 +528,147 @@ const ELEVEN_LABS_KIND_SPECIMENS: KindSpecimen[] = [
   }
 ]
 
+const CLAUDE_KIND_SPECIMENS: KindSpecimen[] = [
+  {
+    kind: 'claudeIsologo',
+    title: 'Isologo',
+    figmaProperty: 'Property 1=Isologo',
+    description: 'Marca simple para menciones donde Claude ya está nombrado cerca.'
+  },
+  {
+    kind: 'claudeOnDarkOrange',
+    title: 'Fondo naranja oscuro',
+    figmaProperty: 'Property 1=Fondo-NaranjaOscuro',
+    description: 'Badge de alto contraste para matrices compactas y estados sobre superficies claras.'
+  },
+  {
+    kind: 'claudeOnNeutral',
+    title: 'Fondo gris',
+    figmaProperty: 'Property 1=Fondo-Gris',
+    description: 'Badge sobre superficies neutras cuando el naranja sólido pesa demasiado.'
+  },
+  {
+    kind: 'claudeOnLightOrange',
+    title: 'Fondo naranja claro',
+    figmaProperty: 'Property 1=Fondo-NaranjaClaro',
+    description: 'Badge suave para documentación, comparativas y referencias menos prominentes.'
+  },
+  {
+    kind: 'claudeLogotype',
+    title: 'Logotipo',
+    figmaProperty: 'Property 1=Logotipo',
+    description: 'Lockup completo para referencias de proveedor, integración o biblioteca de marca.'
+  }
+]
+
+const TEAMS_KIND_SPECIMENS: KindSpecimen[] = [
+  {
+    kind: 'teamsIsotype',
+    title: 'Isotipo',
+    figmaProperty: 'Property 1=Isotipo',
+    description: 'Marca simple para menciones donde Microsoft Teams ya está nombrado cerca.'
+  },
+  {
+    kind: 'teamsOnDarkPurple',
+    title: 'Fondo morado oscuro',
+    figmaProperty: 'Property 1=Fondo-MoradoOscuro',
+    description: 'Badge de alto contraste para matrices compactas y estados sobre superficies claras.'
+  },
+  {
+    kind: 'teamsOnNeutral',
+    title: 'Fondo gris',
+    figmaProperty: 'Property 1=Fondo-Gris',
+    description: 'Badge sobre superficies neutras cuando el morado sólido pesa demasiado.'
+  },
+  {
+    kind: 'teamsOnLightPurple',
+    title: 'Fondo morado claro',
+    figmaProperty: 'Property 1=Fondo-MoradoClaro',
+    description: 'Badge suave para documentación, comparativas y referencias menos prominentes.'
+  },
+  {
+    kind: 'teamsLogotype',
+    title: 'Logotipo',
+    figmaProperty: 'Property 1=Logotipo',
+    description: 'Lockup completo para referencias de proveedor, integración o biblioteca de marca.'
+  }
+]
+
+const NOTION_KIND_SPECIMENS: KindSpecimen[] = [
+  {
+    kind: 'notionIsotype',
+    title: 'Isotipo',
+    figmaProperty: 'Property 1=Isotipo',
+    description: 'Marca simple para menciones donde Notion ya está nombrado cerca.'
+  },
+  {
+    kind: 'notionOnBlack',
+    title: 'Fondo negro',
+    figmaProperty: 'Property 1=Fondo-Negro',
+    description: 'Badge de alto contraste para matrices compactas y estados sobre superficies claras.'
+  },
+  {
+    kind: 'notionOnNeutral',
+    title: 'Fondo gris',
+    figmaProperty: 'Property 1=Fondo-Gris',
+    description: 'Badge sobre superficies neutras cuando el negro sólido pesa demasiado.'
+  },
+  {
+    kind: 'notionLogotype',
+    title: 'Logotipo',
+    figmaProperty: 'Property 1=Logotipo',
+    description: 'Lockup completo para referencias de proveedor, integración o biblioteca de marca.'
+  }
+]
+
+const HUBSPOT_KIND_SPECIMENS: KindSpecimen[] = [
+  {
+    kind: 'hubspotIsotype',
+    title: 'Isotipo',
+    figmaProperty: 'Property 1=Isotipo',
+    description: 'Marca simple para menciones donde HubSpot ya está nombrado cerca.'
+  },
+  {
+    kind: 'hubspotOnOrange',
+    title: 'Fondo naranja',
+    figmaProperty: 'Property 1=Fondo-Naranja',
+    description: 'Badge de alto contraste para matrices compactas y estados sobre superficies claras.'
+  },
+  {
+    kind: 'hubspotOnNeutral',
+    title: 'Fondo gris',
+    figmaProperty: 'Property 1=Fondo-Gris',
+    description: 'Badge sobre superficies neutras cuando el naranja sólido pesa demasiado.'
+  },
+  {
+    kind: 'hubspotOnLightOrange',
+    title: 'Fondo naranja claro',
+    figmaProperty: 'Property 1=Fondo-NaranjaClaro',
+    description: 'Badge suave para documentación, comparativas y referencias menos prominentes.'
+  },
+  {
+    kind: 'hubspotLogotype',
+    title: 'Logotipo',
+    figmaProperty: 'Property 1=Logotipo',
+    description: 'Lockup completo para referencias de proveedor, integración o biblioteca de marca.'
+  }
+]
+
 const SIZES: GreenhouseBrandLogoSize[] = ['small', 'medium', 'large']
 
 const BRAND_LOGO_FAMILY_CARD_QUERY = '@container (min-width: 760px)'
+
+const resolveBrandLogoSpecimenSize = (kind: GreenhouseBrandLogoKind): GreenhouseBrandLogoSize => {
+  if (kind === 'teamsLogotype' || kind === 'notionLogotype' || kind === 'hubspotLogotype') {
+    return 'large'
+  }
+
+  if (kind.endsWith('Logotype')) {
+    return 'small'
+  }
+
+  return 'medium'
+}
 
 const BRAND_LOGO_FAMILIES = [
   {
@@ -497,6 +677,13 @@ const BRAND_LOGO_FAMILIES = [
     figmaUrl: GEMINI_FIGMA_NODE_URL,
     dataCapture: 'brand-logo-gemini-kind-matrix',
     specimens: GEMINI_KIND_SPECIMENS
+  },
+  {
+    title: 'ChatGPT',
+    nodeId: '12274:92',
+    figmaUrl: GPT_FIGMA_NODE_URL,
+    dataCapture: 'brand-logo-gpt-kind-matrix',
+    specimens: GPT_KIND_SPECIMENS
   },
   {
     title: 'Adobe',
@@ -581,6 +768,34 @@ const BRAND_LOGO_FAMILIES = [
     figmaUrl: ELEVEN_LABS_FIGMA_NODE_URL,
     dataCapture: 'brand-logo-elevenlabs-kind-matrix',
     specimens: ELEVEN_LABS_KIND_SPECIMENS
+  },
+  {
+    title: 'Claude',
+    nodeId: '12274:110',
+    figmaUrl: CLAUDE_FIGMA_NODE_URL,
+    dataCapture: 'brand-logo-claude-kind-matrix',
+    specimens: CLAUDE_KIND_SPECIMENS
+  },
+  {
+    title: 'Microsoft Teams',
+    nodeId: '12271:524',
+    figmaUrl: TEAMS_FIGMA_NODE_URL,
+    dataCapture: 'brand-logo-teams-kind-matrix',
+    specimens: TEAMS_KIND_SPECIMENS
+  },
+  {
+    title: 'Notion',
+    nodeId: '12274:2',
+    figmaUrl: NOTION_FIGMA_NODE_URL,
+    dataCapture: 'brand-logo-notion-kind-matrix',
+    specimens: NOTION_KIND_SPECIMENS
+  },
+  {
+    title: 'HubSpot',
+    nodeId: '12274:82',
+    figmaUrl: HUBSPOT_FIGMA_NODE_URL,
+    dataCapture: 'brand-logo-hubspot-kind-matrix',
+    specimens: HUBSPOT_KIND_SPECIMENS
   }
 ] as const satisfies ReadonlyArray<{
   title: string
@@ -619,6 +834,7 @@ const BrandLogoHero = () => (
       <Stack spacing={2.5} alignItems='center' justifyContent='center' sx={{ minWidth: 0 }}>
         <Stack direction='row' spacing={3} alignItems='center' justifyContent='center' flexWrap='wrap' useFlexGap>
           <GreenhouseBrandLogoMark kind='geminiIsotype' size='large' dataCapture='brand-logo-gemini-isotype-hero' />
+          <GreenhouseBrandLogoMark kind='gptOnBlack' size='large' dataCapture='brand-logo-gpt-logotype-hero' />
           <GreenhouseBrandLogoMark kind='adobeOnRed' size='large' dataCapture='brand-logo-adobe-logotype-hero' />
           <GreenhouseBrandLogoMark
             kind='expressFullColorOnBlack'
@@ -667,10 +883,23 @@ const BrandLogoHero = () => (
             size='large'
             dataCapture='brand-logo-elevenlabs-logotype-hero'
           />
+          <GreenhouseBrandLogoMark
+            kind='claudeOnDarkOrange'
+            size='large'
+            dataCapture='brand-logo-claude-logotype-hero'
+          />
+          <GreenhouseBrandLogoMark
+            kind='teamsOnDarkPurple'
+            size='large'
+            dataCapture='brand-logo-teams-logotype-hero'
+          />
+          <GreenhouseBrandLogoMark kind='notionOnBlack' size='large' dataCapture='brand-logo-notion-logotype-hero' />
+          <GreenhouseBrandLogoMark kind='hubspotOnOrange' size='large' dataCapture='brand-logo-hubspot-logotype-hero' />
         </Stack>
         <Typography variant='caption' color='text.secondary'>
-          Gemini / Adobe / Adobe Express / Adobe Firefly / Adobe Photoshop / Adobe Premiere Pro / Adobe Illustrator /
-          Adobe After Effects / Envato / Shutterstock / Higgsfield / Magnific / ElevenLabs
+          Gemini / ChatGPT / Adobe / Adobe Express / Adobe Firefly / Adobe Photoshop / Adobe Premiere Pro / Adobe
+          Illustrator / Adobe After Effects / Envato / Shutterstock / Higgsfield / Magnific / ElevenLabs / Claude /
+          Microsoft Teams / Notion / HubSpot
         </Typography>
       </Stack>
     </Box>
@@ -705,6 +934,16 @@ const BrandLogoHero = () => (
           sx={{ width: { xs: '100%', sm: 'auto' } }}
         >
           Nodo Gemini
+        </GreenhouseButton>
+        <GreenhouseButton
+          href={GPT_FIGMA_NODE_URL}
+          kind='secondaryAction'
+          variant='outlined'
+          tone='primary'
+          leadingIcon={<i className='tabler-brand-figma' />}
+          sx={{ width: { xs: '100%', sm: 'auto' } }}
+        >
+          Nodo ChatGPT
         </GreenhouseButton>
         <GreenhouseButton
           href={ADOBE_FIGMA_NODE_URL}
@@ -826,6 +1065,46 @@ const BrandLogoHero = () => (
         >
           Nodo ElevenLabs
         </GreenhouseButton>
+        <GreenhouseButton
+          href={CLAUDE_FIGMA_NODE_URL}
+          kind='secondaryAction'
+          variant='outlined'
+          tone='primary'
+          leadingIcon={<i className='tabler-brand-figma' />}
+          sx={{ width: { xs: '100%', sm: 'auto' } }}
+        >
+          Nodo Claude
+        </GreenhouseButton>
+        <GreenhouseButton
+          href={TEAMS_FIGMA_NODE_URL}
+          kind='secondaryAction'
+          variant='outlined'
+          tone='primary'
+          leadingIcon={<i className='tabler-brand-figma' />}
+          sx={{ width: { xs: '100%', sm: 'auto' } }}
+        >
+          Nodo Teams
+        </GreenhouseButton>
+        <GreenhouseButton
+          href={NOTION_FIGMA_NODE_URL}
+          kind='secondaryAction'
+          variant='outlined'
+          tone='primary'
+          leadingIcon={<i className='tabler-brand-figma' />}
+          sx={{ width: { xs: '100%', sm: 'auto' } }}
+        >
+          Nodo Notion
+        </GreenhouseButton>
+        <GreenhouseButton
+          href={HUBSPOT_FIGMA_NODE_URL}
+          kind='secondaryAction'
+          variant='outlined'
+          tone='primary'
+          leadingIcon={<i className='tabler-brand-figma' />}
+          sx={{ width: { xs: '100%', sm: 'auto' } }}
+        >
+          Nodo HubSpot
+        </GreenhouseButton>
       </Stack>
     </Stack>
   </Box>
@@ -864,7 +1143,7 @@ const BrandLogoVariantTile = ({ item }: { item: KindSpecimen }) => (
     >
       <GreenhouseBrandLogoMark
         kind={item.kind}
-        size={item.kind.endsWith('Logotype') ? 'small' : 'medium'}
+        size={resolveBrandLogoSpecimenSize(item.kind)}
         sx={{ maxInlineSize: '100%' }}
       />
     </Box>
@@ -1030,6 +1309,10 @@ const BrandLogoSizeSpecimens = () => (
             <GreenhouseBrandLogoMark kind='geminiOnBlue' size={size} />
             <GreenhouseBrandLogoMark kind='geminiOnNeutral' size={size} />
             <GreenhouseBrandLogoMark kind='geminiLogotype' size='small' />
+            <GreenhouseBrandLogoMark kind='gptIsotype' size={size} />
+            <GreenhouseBrandLogoMark kind='gptOnBlack' size={size} />
+            <GreenhouseBrandLogoMark kind='gptOnNeutral' size={size} />
+            <GreenhouseBrandLogoMark kind='gptLogotype' size='small' />
             <GreenhouseBrandLogoMark kind='adobeIsotype' size={size} />
             <GreenhouseBrandLogoMark kind='adobeOnRed' size={size} />
             <GreenhouseBrandLogoMark kind='adobeOnNeutral' size={size} />
@@ -1087,6 +1370,25 @@ const BrandLogoSizeSpecimens = () => (
             <GreenhouseBrandLogoMark kind='elevenLabsOnBlack' size={size} />
             <GreenhouseBrandLogoMark kind='elevenLabsOnNeutral' size={size} />
             <GreenhouseBrandLogoMark kind='elevenLabsLogotype' size='small' />
+            <GreenhouseBrandLogoMark kind='claudeIsologo' size={size} />
+            <GreenhouseBrandLogoMark kind='claudeOnDarkOrange' size={size} />
+            <GreenhouseBrandLogoMark kind='claudeOnNeutral' size={size} />
+            <GreenhouseBrandLogoMark kind='claudeOnLightOrange' size={size} />
+            <GreenhouseBrandLogoMark kind='claudeLogotype' size='small' />
+            <GreenhouseBrandLogoMark kind='teamsIsotype' size={size} />
+            <GreenhouseBrandLogoMark kind='teamsOnDarkPurple' size={size} />
+            <GreenhouseBrandLogoMark kind='teamsOnNeutral' size={size} />
+            <GreenhouseBrandLogoMark kind='teamsOnLightPurple' size={size} />
+            <GreenhouseBrandLogoMark kind='teamsLogotype' size='small' />
+            <GreenhouseBrandLogoMark kind='notionIsotype' size={size} />
+            <GreenhouseBrandLogoMark kind='notionOnBlack' size={size} />
+            <GreenhouseBrandLogoMark kind='notionOnNeutral' size={size} />
+            <GreenhouseBrandLogoMark kind='notionLogotype' size='small' />
+            <GreenhouseBrandLogoMark kind='hubspotIsotype' size={size} />
+            <GreenhouseBrandLogoMark kind='hubspotOnOrange' size={size} />
+            <GreenhouseBrandLogoMark kind='hubspotOnNeutral' size={size} />
+            <GreenhouseBrandLogoMark kind='hubspotOnLightOrange' size={size} />
+            <GreenhouseBrandLogoMark kind='hubspotLogotype' size='small' />
           </Stack>
         ))}
       </Stack>
@@ -1113,12 +1415,14 @@ const ContractAside = () => (
     <Stack spacing={DESIGN_SYSTEM_LAB_TOKENS.spacing.tight}>
       <Typography variant='h6'>Contrato Figma</Typography>
       <Typography variant='body2' color='text.secondary'>
-        Nodos AXIS <InlineCode>12267:95</InlineCode>, <InlineCode>12273:32</InlineCode>,{' '}
-        <InlineCode>12274:44</InlineCode>, <InlineCode>12267:441</InlineCode>, <InlineCode>12270:452</InlineCode>,{' '}
-        <InlineCode>12273:5</InlineCode>, <InlineCode>12270:481</InlineCode>, <InlineCode>12271:506</InlineCode>,{' '}
-        <InlineCode>12274:35</InlineCode>, <InlineCode>12274:62</InlineCode>, <InlineCode>12274:98</InlineCode>,{' '}
-        <InlineCode>12274:16</InlineCode> y <InlineCode>12274:74</InlineCode>. Variables de nodo: vacío. Code
-        Connect: bloqueado por seat/plan de Figma.
+        Nodos AXIS <InlineCode>12267:95</InlineCode>, <InlineCode>12274:92</InlineCode>,{' '}
+        <InlineCode>12273:32</InlineCode>, <InlineCode>12274:44</InlineCode>, <InlineCode>12267:441</InlineCode>,{' '}
+        <InlineCode>12270:452</InlineCode>, <InlineCode>12273:5</InlineCode>, <InlineCode>12270:481</InlineCode>,{' '}
+        <InlineCode>12271:506</InlineCode>, <InlineCode>12274:35</InlineCode>, <InlineCode>12274:62</InlineCode>,{' '}
+        <InlineCode>12274:98</InlineCode>, <InlineCode>12274:16</InlineCode>, <InlineCode>12274:74</InlineCode> y{' '}
+        <InlineCode>12274:110</InlineCode>, <InlineCode>12271:524</InlineCode>, <InlineCode>12274:2</InlineCode> y{' '}
+        <InlineCode>12274:82</InlineCode>.
+        Variables de nodo: vacío. Code Connect: bloqueado por seat/plan de Figma.
       </Typography>
     </Stack>
     <Stack spacing={DESIGN_SYSTEM_LAB_TOKENS.spacing.tight}>
