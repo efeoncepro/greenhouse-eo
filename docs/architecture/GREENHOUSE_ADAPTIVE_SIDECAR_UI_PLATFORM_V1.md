@@ -581,3 +581,12 @@ Preferred scenario metadata:
 - Should temporary mobile mode be right Drawer or bottom sheet for assistant usage?
 - Which workbench should be the first non-Nexa adoption after the pilot?
 - Should `OrganizationWorkspaceShell.drawerSlot` become a compatibility adapter or remain separate until V2?
+
+## Delta 2026-06-18 — `panelEntrance` (animación de entrada canónica, TASK-1079)
+
+`AdaptiveSidecarLayout` expone `panelEntrance?: 'appear' | 'slide'` (default `appear`) como prop **aditivo y default-safe** — los consumers existentes (platform mockup, Organization Workspace) quedan byte-idénticos al no pasarlo.
+
+- **`appear`** (default, histórico): el panel inline aparece **en su lugar** — fade (`opacity 0→1`) + nudge (`x ±22px→0`) + scale (`0.992→1`) + blur (`3px→0`), con el spring `SIDECAR_PANEL_TRANSITION`.
+- **`slide`**: el panel **entra/sale deslizándose** desde el borde — traslación pura `x: side==='right' ? '100%' : '-100%' → 0` (sin scale/blur). El contenido reflowea en paralelo por la transición del grid (`grid-template-columns`), produciendo el efecto "se desliza y empuja". Reduced-motion: ambas variantes degradan a sin-animación (igual que antes).
+
+Implementación: las constantes `inlinePanelInitial/Animate/Exit` ramifican por `panelEntrance`. El **lab `/platform/adaptive-sidecar/mockup`** trae un toggle `Appear/Slide` para comparar ambas en vivo. **Primer consumer de `slide`:** el Nexa interaction-mode lane (TASK-1079, `NexaLaneContentHost`). **Regla:** `slide` es para lanes que entran desde un borde empujando el contexto; `appear` para paneles que se materializan en su lugar — elegir por intención, no por gusto.

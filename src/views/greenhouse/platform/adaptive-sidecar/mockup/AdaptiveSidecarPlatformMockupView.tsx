@@ -129,11 +129,18 @@ const MODE_LABELS: Record<AdaptiveSidecarPreferredMode, string> = {
   temporary: 'Drawer'
 }
 
+// TASK-1079 — animación de entrada canónica del panel inline.
+const ENTRANCE_LABELS: Record<'appear' | 'slide', string> = {
+  appear: 'Appear',
+  slide: 'Slide'
+}
+
 const GREENHOUSE_COPY = getMicrocopy()
 
 const MOCKUP_ARIA = {
   modeSelector: 'Modo del sidecar',
-  kindSelector: 'Tipo de panel contextual'
+  kindSelector: 'Tipo de panel contextual',
+  entranceSelector: 'Animación de entrada'
 }
 
 const STATUS_META: Record<MockCaseStatus, { label: string; color: 'error' | 'warning' | 'success'; icon: string }> = {
@@ -601,6 +608,7 @@ const AdaptiveSidecarPlatformMockupView = () => {
   const [open, setOpen] = useState(true)
   const [kind, setKind] = useState<AdaptiveSidecarKind>('reconciler')
   const [mode, setMode] = useState<AdaptiveSidecarPreferredMode>('push')
+  const [entrance, setEntrance] = useState<'appear' | 'slide'>('appear')
   const [selectedCaseId, setSelectedCaseId] = useState(CASES[0].id)
   const [dirty, setDirty] = useState(false)
   const [dirtyWarning, setDirtyWarning] = useState(false)
@@ -850,6 +858,7 @@ const AdaptiveSidecarPlatformMockupView = () => {
         open={open}
         onOpenChange={setOpen}
         preferredMode={mode}
+        panelEntrance={entrance}
         kind={kind}
         dirty={dirty}
         onDirtyCloseAttempt={() => setDirtyWarning(true)}
@@ -926,6 +935,21 @@ const AdaptiveSidecarPlatformMockupView = () => {
                 {(Object.keys(MODE_LABELS) as AdaptiveSidecarPreferredMode[]).map(item => (
                   <ToggleButton key={item} value={item} aria-label={MODE_LABELS[item]}>
                     {MODE_LABELS[item]}
+                  </ToggleButton>
+                ))}
+              </ToggleButtonGroup>
+              <ToggleButtonGroup
+                exclusive
+                size='small'
+                value={entrance}
+                onChange={(_event, next: 'appear' | 'slide' | null) => {
+                  if (next) setEntrance(next)
+                }}
+                aria-label={MOCKUP_ARIA.entranceSelector}
+              >
+                {(Object.keys(ENTRANCE_LABELS) as Array<'appear' | 'slide'>).map(item => (
+                  <ToggleButton key={item} value={item} aria-label={ENTRANCE_LABELS[item]}>
+                    {ENTRANCE_LABELS[item]}
                   </ToggleButton>
                 ))}
               </ToggleButtonGroup>
