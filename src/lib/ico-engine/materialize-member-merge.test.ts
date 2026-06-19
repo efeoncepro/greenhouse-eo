@@ -535,6 +535,53 @@ describe('TASK-900 Slice 2 — materializeMemberMetrics flag matrix', () => {
     )
   })
 
+  it('TASK-1171: período EN CURSO → FULL (delta skipped) aunque ambos flags ON + previous run', async () => {
+    process.env.ICO_MATERIALIZER_MERGE_PATTERN_ENABLED = 'true'
+    process.env.ICO_MATERIALIZER_INCREMENTAL_DELTA_ENABLED = 'true'
+
+    // Hay un run previo exitoso → SIN el guard, esto activaría el delta filter.
+    mocks.getLastSuccessfulMaterializationAt.mockResolvedValueOnce(
+      new Date('2026-05-17T03:15:00.000Z')
+    )
+
+    const mod = await importMaterializer()
+
+    const fn = (
+      mod as unknown as {
+        __test_materializeMemberMetrics?: (
+          projectId: string,
+          periodYear: number,
+          periodMonth: number
+        ) => Promise<number>
+      }
+    ).__test_materializeMemberMetrics
+
+    if (typeof fn !== 'function') {
+      expect(typeof fn).toBe('function')
+
+      return
+    }
+
+    // Período = mes EN CURSO (no time-fragile: se construye con el reloj real).
+    const now = new Date()
+    const result = await fn(FAKE_PROJECT_ID, now.getFullYear(), now.getMonth() + 1)
+
+    expect(result).toBe(5)
+    const mergeCall = findIcoCall('MERGE INTO')
+
+    expect(mergeCall).toBeDefined()
+    // El mes vigente SIEMPRE se materializa full → sin delta filter (anti-staleness).
+    expect(mergeCall![0]).not.toContain('entity_last_edited >= TIMESTAMP')
+
+    const params = mergeCall![1] as Record<string, unknown>
+
+    expect(params.deltaCutoff).toBeUndefined()
+
+    expect(mocks.completeIcoMaterializationRun).toHaveBeenCalledWith(
+      expect.objectContaining({ notes: 'full period' })
+    )
+  })
+
   it('INCREMENTAL DELTA: lookup failure → degrada graceful a full period + captureWithDomain', async () => {
     process.env.ICO_MATERIALIZER_MERGE_PATTERN_ENABLED = 'true'
     process.env.ICO_MATERIALIZER_INCREMENTAL_DELTA_ENABLED = 'true'
