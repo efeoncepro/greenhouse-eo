@@ -1906,6 +1906,25 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
     })
   }
 
+  // TASK-1171 Slice 3 — Activar el sync Notion->ICO de un cliente (Full API Parity).
+  // Acción de onboarding gobernada/idempotente/auditada (command enableClientIcoSync).
+  // Grant: EFEONCE_ADMIN (admin) ∪ EFEONCE_OPERATIONS (corre syncs) ∪ EFEONCE_ACCOUNT
+  // (Director de Cuenta — onboarding del cliente). Invariant TASK-873/935 (grant +
+  // seed capabilities_registry en el mismo PR; guard capability-grant-coverage.test.ts).
+  if (
+    hasRole(subject, ROLE_CODES.EFEONCE_ADMIN) ||
+    hasRole(subject, ROLE_CODES.EFEONCE_OPERATIONS) ||
+    hasRole(subject, ROLE_CODES.EFEONCE_ACCOUNT)
+  ) {
+    addEntitlement(entries, {
+      module: 'delivery',
+      capability: 'delivery.ico.sync.enable',
+      action: 'update',
+      scope: 'tenant',
+      source: 'role'
+    })
+  }
+
   // TASK-1072 — Design System Figma node linking. Primera capability real del rol
   // `designer`. Ver el Design System es plano views (plataforma.design_system, abierto a
   // todo interno); VINCULAR un nodo AXIS es este entitlement, exclusivo de DESIGNER ∪

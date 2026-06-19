@@ -66,6 +66,9 @@ export type CanonicalErrorCode =
   | 'nexa_action_failed'
   // Roadmap cockpit — work item Markdown lookup (TASK-1153 follow-up).
   | 'roadmap_work_item_not_found'
+  // ICO sync activation gobernada (TASK-1171 Slice 3).
+  | 'ico_sync_client_not_found'
+  | 'ico_sync_source_not_connected'
   // Reserved for future canonical codes — extender aquí cuando emerjan
   // nuevos error paths estructurales. NUNCA usar strings ad-hoc.
 
@@ -170,6 +173,17 @@ const CANONICAL_ERRORS: Record<CanonicalErrorCode, CanonicalErrorDefinition> = {
   roadmap_work_item_not_found: {
     status: 404,
     message: 'No encontramos ese work item en el backlog. Puede que se haya movido o renombrado.',
+    actionable: false
+  },
+  ico_sync_client_not_found: {
+    status: 404,
+    message: 'No encontramos un espacio para ese cliente. Verifica que el cliente exista y tenga un espacio activo.',
+    actionable: false
+  },
+  ico_sync_source_not_connected: {
+    status: 422,
+    // Reintentar no resuelve: hay que conectar Notion primero (wizard de onboarding).
+    message: 'Este cliente aún no tiene Notion conectado, así que no se puede activar su sync de ICO. Conéctalo primero desde el onboarding.',
     actionable: false
   }
 }

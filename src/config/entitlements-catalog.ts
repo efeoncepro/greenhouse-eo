@@ -1495,6 +1495,17 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     actions: ['read'] as const,
     defaultScope: 'tenant'
   },
+  // TASK-1171 Slice 3 — Activar el sync Notion->ICO de un cliente (Full API Parity).
+  // Grant matriz (runtime.ts mismo PR): EFEONCE_ADMIN + EFEONCE_OPERATIONS +
+  // EFEONCE_ACCOUNT. Seed en capabilities_registry mismo PR (invariant TASK-873/935;
+  // guard capability-grant-coverage.test.ts). can()-checked en el command
+  // enableClientIcoSync + endpoint POST /api/delivery/ico/enable-sync.
+  {
+    key: 'delivery.ico.sync.enable',
+    module: 'delivery',
+    actions: ['update'] as const,
+    defaultScope: 'tenant'
+  },
   // TASK-1137 — Nexa governed action runtime. Gate de "este usuario puede CONFIRMAR/EJECUTAR una
   // acción gobernada propuesta por Nexa". El LLM nunca ejecuta; el humano confirma vía el endpoint
   // determinístico. Grant (runtime.ts): internal route_group ∪ EFEONCE_ADMIN (audiencia del piloto;

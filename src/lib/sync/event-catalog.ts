@@ -221,7 +221,11 @@ export const AGGREGATE_TYPES = {
 
   // TASK-1072 — Design System ↔ AXIS Figma node link (SSOT runtime del vínculo
   // superficie↔nodo). Aggregate identity = surface_key (ruta normalizada del DS).
-  designSystemFigmaNode: 'design_system_figma_node'
+  designSystemFigmaNode: 'design_system_figma_node',
+
+  // TASK-1171 Slice 3 — Activación gobernada del sync Notion->ICO de un cliente.
+  // Aggregate identity = source_id ('sns-{uuid}') de greenhouse_core.space_notion_sources.
+  spaceNotionSource: 'space_notion_source'
 } as const
 
 export type AggregateType = (typeof AGGREGATE_TYPES)[keyof typeof AGGREGATE_TYPES]
@@ -1039,7 +1043,12 @@ export const EVENT_TYPES = {
   // `relinked` = cambio del nodo (supersede del anterior, audit append-only).
   // Sin consumer reactivo en V1 (audit/observabilidad). Enrichment (node render) = Slice 4 diferido.
   designSystemFigmaNodeLinked: 'design_system.figma_node.linked',
-  designSystemFigmaNodeRelinked: 'design_system.figma_node.relinked'
+  designSystemFigmaNodeRelinked: 'design_system.figma_node.relinked',
+
+  // TASK-1171 Slice 3 — Sync Notion->ICO de un cliente activado vía command gobernado.
+  // aggregate_type = space_notion_source, aggregate_id = source_id. Sin consumer
+  // reactivo en V1 (audit/observabilidad del onboarding ICO).
+  spaceNotionSourceIcoSyncEnabled: 'space_notion_source.ico_sync_enabled'
 } as const
 
 export type EventType = (typeof EVENT_TYPES)[keyof typeof EVENT_TYPES]
