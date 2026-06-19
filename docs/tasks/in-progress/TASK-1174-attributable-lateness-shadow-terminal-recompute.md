@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -264,5 +264,5 @@ N/A — repo-only change (shadow / runtime interno). Ninguna coordinación que t
 
 ## Open Questions
 
-- ¿El barrido se programa periódico (Cloud Scheduler/ops-worker) o queda como recovery on-demand? (decisión de Plan, según frecuencia de la carrera estado↔`completed_at`).
-- ¿La degradación honesta (no fijar bucket terminal sin `completed_at`) requiere un valor de `data_status` nuevo (p.ej. `pending_completion`) → migración additive? (evaluar en Discovery).
+- ¿El barrido se programa periódico o queda recovery on-demand? — **RESUELTA: on-demand (script)** por ahora. El fix de Slice 1 (estado/completed_at efectivo desde la última transición) elimina la carrera en el compute event-driven para transiciones capturadas, así que el barrido es para (a) backfill de las 252 filas ya congeladas y (b) backstop de capture-gaps raros. Programar periódico se difiere salvo que el signal `shadow_terminal_open` muestre recurrencia (follow-up).
+- ¿La degradación honesta requiere un `data_status` nuevo / migración? — **RESUELTA: NO, sin migración.** La causa raíz exacta (confirmada en código 2026-06-19) es que el consumer lee `tasks.task_status`/`completed_at` (pipeline de row sync que laggea), mientras `task_status_transitions` (que dispara el compute) ya tiene la transición terminal. Fix sin migración: derivar el estado efectivo de la **última transición** (event log autoritativo) y usar su `transitioned_at` como `completed_at` de respaldo (la transición `→Aprobado` ES el momento de completado). El classifier produce un bucket terminal correcto → no se necesita un `data_status` nuevo.

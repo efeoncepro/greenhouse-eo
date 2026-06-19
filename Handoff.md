@@ -32380,3 +32380,13 @@ Trabajo directo en `develop` por instrucción del operador (sin branch). P3, dom
 **Hallazgo clave (Q2 spec):** el freeze capturado hoy **NO mueve la cohorte productiva del bono** (2026-04/05/06: cohorte reproducida=20, cohort_mismatch=0, **0 cambios de tier de bono**) → **TASK-1170 (cutover) sin urgencia material por ahora**. Hallazgo secundario: el `metrics_by_member` materializado de períodos cerrados está stale (candidato a follow-up de re-materialización; no afecta el pago vigente).
 
 **Rollout pendiente (no bloquea; shadow / flag OFF — NO toca el bono):** correr el materializador periódicamente para acumular el reloj ≥30d; ampliar cobertura del M2 shadow sobre la cohorte (flags M0/M2 + backfill) — gateado a TASK-1170.
+
+---
+
+## TASK-1174 — Recompute robusto del atraso imputable en tareas terminales (in-progress, develop local-first)
+
+**Rama**: develop (local-first, sin push). **Objetivo**: fix ISSUE-098 — el compute M2 por-tarea (`task_attributable_lateness_shadow`) congela un bucket abierto en el 75% de tareas ya completadas. **Causa raíz confirmada en código**: el consumer lee `tasks.task_status`/`completed_at` (row sync que laggea) mientras `task_status_transitions` (que dispara el compute) ya tiene la transición terminal; estado terminal → sin recompute futuro.
+
+**Fix (sin migración, Open Questions resueltas)**: derivar estado/completed_at efectivo de la **última transición** (event log autoritativo; su `transitioned_at` = momento de completado) + barrido idempotente on-demand para backfillear las 252 filas + signal `delivery.attributable_lateness.shadow_terminal_open` (steady=0) como gate del writeback (TASK-927). Todo shadow / no toca el bono.
+
+**Pendiente**: Slice 1 (compute robusto + tests) · Slice 2 (barrido + backfill) · Slice 3 (signal) · Slice 4 (docs + cerrar ISSUE-098).
