@@ -251,6 +251,16 @@ Recomendación inicial (a validar en Slice 0 con `arch-architect`), **actualizad
 
 Método: misma cohorte de tareas, misma fórmula `otd_pct`, solo cambia el bucket (`bucket_legacy` vs `bucket_attributable`), por colaborador-mes; aplicar thresholds de `calculateOtdBonus` (full ≥89%, proración lineal ≥70%, 0 bajo 70%). **Hallazgo 2026-06-19 (corregido):** el primer intento de reconciliación cruzó contra la tabla equivocada (`task_status_transitions`, assignee 0%) y dio todo `UNASSIGNED` — fue un **error de análisis**, no falta de data. Con la llave correcta (`notion_task_id → greenhouse_delivery.tasks.assignee_member_id`), **172/334 (~51%) de las filas shadow son atribuibles hoy**, y el resto es investigable (demo / sin asignar / sin proyectar a `tasks`) + reconstruible desde los logs de eventos. El blast-radius member-level real se corre en Slice 0 con esta llave. A nivel tarea, el freeze mueve 29/334 buckets (`overdue`→`carry_over`), dirección que **mejora** el OTD del colaborador (descuenta atraso no imputable).
 
+### Insumos para Slice 0 — verificación con caso real (Daniela Ferreira, 2026-06-19)
+
+Se validó el detalle por colaborador contra data viva (read-only) para `daniela-ferreira` (activa, no demo). Confirma que la atribución es recuperable y el freeze funciona, y deja 3 reglas duras para la reconciliación member-level del Slice 0:
+
+1. **Atribución OK y freeze real:** sus tareas se atribuyeron vía `notion_task_id → tasks.assignee_member_id`. ~6 tareas que el legacy marca `overdue` pasan a `carry_over` al descontar 1.6–1.9 días congelados (`attributable_days_late=0`). El fix opera en su favor.
+2. **El snapshot crudo NO es el OTD mensual.** Su OTD agregado da 0.0% legacy y 0.0% corregido — no por falla de la corrección, sino porque (a) casi no tiene tareas `on_time` *completadas* en la ventana y (b) el shadow es foto de estado actual dominada por `carry_over` abierto (excluido del denominador OTD). **Slice 0 DEBE acotar por período + foco en tareas COMPLETADAS del mes**, no leer el snapshot crudo. (Conecta con el incidente TASK-1163: su OTD salía 4.8% por caché stale.)
+3. **Dedup obligatorio antes de agregar.** El join `tasks.notion_task_id` abre múltiples filas por tarea (subtareas/sprints en `greenhouse_delivery.tasks`): ej. una misma tarea aparece ×4. La reconciliación member-level **debe deduplicar por tarea** (un bucket por `task_source_id`) o las cuentas se inflan. Definir la regla de dedup canónica en Slice 0.
+
+Estas 3 reglas (atribución por `notion_task_id`, scoping período+completadas, dedup por tarea) son precondición de cualquier número de bono confiable.
+
 ## Rollout Plan & Risk Matrix
 
 ### Slice ordering hard rule
