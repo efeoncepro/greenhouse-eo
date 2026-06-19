@@ -179,7 +179,7 @@ Load only what's needed for the current task. Do not pre-load all references.
 
 If the user's context indicates Efeonce Group (Greenhouse, Kortex, Verk, IDD methodology, TASK system, ICO Engine, Nexa, etc.), activate the overlay in `efeonce-overlay/`. The overlay:
 
-- Reuses Efeonce conventions (domain-per-schema, `@/lib/db`, reuse-before-create, ICO Engine as sole metrics source)
+- Reuses Efeonce conventions (domain-per-schema, `@/lib/db`, reuse-before-create, ICO Engine as sole metrics source, **Full API Parity + Nexa total operability + canonical consumers** — `efeonce-overlay/conventions.md` §13)
 - Defaults stack picks to Efeonce stack (Next.js 16/PostgreSQL/BigQuery/Vercel/Vertex AI for Greenhouse, Anthropic API for Kortex, etc.)
 - Outputs component specs in TASK_TEMPLATE_v2 format compatible with Claude Code and Codex agents
 - Maps the architecture work to IDD's Strategy phase

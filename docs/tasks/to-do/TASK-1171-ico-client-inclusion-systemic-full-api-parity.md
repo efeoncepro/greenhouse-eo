@@ -43,7 +43,7 @@ Es deuda sistémica: cada cliente nuevo repite el problema. Hay que cerrarlo en 
 
 - `metrics_by_organization` + `performance_report_monthly` + CVR/account-360 **data-driven por `client_id`** (cero allowlist efeonce/sky).
 - **Reliability signal** `delivery.ico.client_in_snapshot_absent_from_rollup` (o equivalente): cliente con tareas en snapshot pero sin fila en el rollup → nunca más silencioso.
-- **Capability + endpoint gobernado** para habilitar/verificar inclusión ICO de un cliente (no admin-coarse), consumible por API y por la UI del wizard/lifecycle.
+- **Capability + endpoint gobernado** para habilitar/verificar inclusión ICO de un cliente (no admin-coarse), **Nexa-operable**: consumible por UI (wizard/lifecycle), **Nexa** (enable-sync vía `propose → confirm → execute`; verify-ICO read directo), API Platform (app/ecosystem → MCP), CLI/runbook. Mismo command canónico para todos los consumers (ver `GREENHOUSE_FULL_API_PARITY_DECISION_V1.md` §North Star + §Canonical consumers).
 - **Preflight + checklist de lifecycle** extendidos: `verify_ico_calculating` (configurado ≠ fluyendo hasta ICO).
 - **Backfill data-driven** de clientes existentes (Berel) — re-materializar, sin script ad-hoc por cliente.
 - **NO tocar el bono** (ya incluye a todos los clientes por colaborador).
@@ -126,7 +126,7 @@ Reglas obligatorias:
 - Backend rigor: `backend-standard` (additive + data-driven; NO toca el bono)
 - Impacto principal: `api` (capability+endpoint) + `reader`/materializer (data-driven) + `migration` (checklist seed)
 - Source of truth afectado: `metrics_by_organization` / `performance_report_monthly` (vista de cliente) + `space_notion_sources.sync_enabled`
-- Consumidores afectados: dashboard/CVR de cliente, account-360, reporte de agencia
+- Consumidores afectados: dashboard/CVR de cliente, account-360, reporte de agencia, **Nexa** (read del ICO de cliente + enable-sync gobernado), MCP/app lanes, CLI/runbook
 - Runtime target: `production` (additive, sin tocar nómina)
 
 ### Contract surface
@@ -176,6 +176,7 @@ Reglas obligatorias:
 - [ ] Rollup de cliente + reporte de agencia + CVR data-driven (Berel y cualquier cliente aparecen).
 - [ ] Signal anti-exclusión-silenciosa wired, steady=0.
 - [ ] Capability+endpoint gobernado enable-sync/verify-ICO (full-api-parity) + grant coverage.
+- [ ] **Nexa-operable verificado:** Nexa puede leer el ICO de cliente y accionar enable-sync vía `propose→confirm→execute` por el MISMO command canónico (no lógica duplicada para la UI). North Star del mandato.
 - [ ] Preflight/lifecycle extendidos a ICO.
 - [ ] Backfill Berel verificado; bono intacto (verificado).
 
@@ -197,7 +198,7 @@ Generalizar `performance_report_monthly` (`WHERE segment_key IN ('efeonce','sky'
 
 ### Slice 3 — Capability + endpoint gobernado (full-api-parity)
 
-Capability fina `integration.notion.sync.enable` (o `client.lifecycle.enable_ico`) + endpoint que habilita el sync de un cliente + verifica inclusión ICO, idempotente, auditado. Grant a ≥1 rol + coverage test. Reemplaza el admin-coarse del `register`.
+Capability fina `integration.notion.sync.enable` (o `client.lifecycle.enable_ico`) + endpoint que habilita el sync de un cliente + verifica inclusión ICO, idempotente, auditado. Grant a ≥1 rol + coverage test. Reemplaza el admin-coarse del `register`. **Nexa-operable por contrato (mandato North Star):** el command se modela como aggregate/command canónico reutilizable por TODOS los consumers (UI, Nexa con `propose→confirm→execute`, MCP/app/ecosystem, CLI) — no un click-handler de la UI del wizard. Declarar el tool/contrato que Nexa invoca.
 
 ### Slice 4 — Preflight + lifecycle hasta ICO
 

@@ -125,6 +125,20 @@ Format:
 
 **Implication for handoff**: skill output produces acceptance criteria in this format for any feature spec.
 
+### 13. Full API Parity + Nexa total operability + canonical consumers
+
+Every capability doable inside Greenhouse must be doable — or have a planned path to be doable — through a **governed programmatic contract**. The UI is **not** the source of truth of a capability: it is a client of canonical server-side commands/readers/projections.
+
+**North Star (CEO directive 2026-06-19):** **Nexa Agent must eventually operate the ENTIRE portal from the Conversational Experience.** So every **new UI** and every **new capability/entitlement** must be born with a governed contract Nexa's action runtime can invoke — reads direct, writes via the governed-action loop `propose → confirm → execute` (the LLM never executes a write directly; mutation only at the human confirmation endpoint). Mandatory design-time question: **"can Nexa do this end-to-end through a contract?"** If no, it is not complete. UI-only or capability-only delivery without its Nexa-invokable contract is incomplete.
+
+**Canonical consumers (all clients of the SAME primitive, never parallel impls):** (1) UI web portal, (2) Nexa Agent, (3) MCP / downstream agents (`api/platform/ecosystem`), (4) first-party apps (`api/platform/app`), (5) ecosystem / sister platforms (Kortex, `efeonce-web`, `notion-bigquery`), (6) inbound integrations/webhooks (HubSpot/Notion/Teams/ZapSign/Entra-SCIM → command), (7) Teams Bot, (8) async runtime (ops-worker/Cloud Scheduler/outbox/reactive/materializers/recovery), (9) CLI/runbooks/scripts, (10) E2E/verification harness. If a behavior is reachable by ANY consumer, the logic lives in the canonical primitive and is exposed via a governed contract — never duplicated per consumer; a new consumer class inherits the contract automatically.
+
+**Why**: agent-ready, auditable, recoverable; UI-only business logic cannot be automated by Nexa/MCP, integrated, retried, or governed.
+
+**Implication for design**: model the aggregate/command/reader FIRST, the UI second; declare the programmatic path (Product API / `api/platform/app|ecosystem` / MCP / CLI / deferred task) and validate Nexa-operability as part of "done". Writes get command semantics + tenant-safe authz + audit/outbox + idempotency + sanitized errors.
+
+**Source**: `docs/architecture/GREENHOUSE_FULL_API_PARITY_DECISION_V1.md` (§North Star + §Canonical consumers), `GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md`, CLAUDE.md §"Full API Parity Principle".
+
 ## Per-repo notes
 
 ### Greenhouse (`greenhouse-eo`)
