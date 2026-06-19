@@ -9,7 +9,7 @@
 
 ## Delta 2026-06-18 — Brand logo variations desde AXIS Figma
 
-Se agregó `GreenhouseBrandLogoMark` como primitive gobernada para portar logos externos desde AXIS Figma sin crear SVGs sueltos por surface. La primitive conserva `variant` para los modos funcionales (`isotype`, `contained`, `lockup`) y modela las variantes de marca como `kind`. El set vigente cubre Gemini, ChatGPT/GPT, Adobe, Adobe Express, Adobe Firefly, Adobe Photoshop, Adobe Premiere Pro, Adobe Illustrator, Adobe After Effects, Envato, Shutterstock, Higgsfield, Magnific, ElevenLabs, Claude, Microsoft Teams, Notion y HubSpot.
+Se agregó `GreenhouseBrandLogoMark` como primitive gobernada para portar logos externos desde AXIS Figma sin crear SVGs sueltos por surface. La primitive conserva `variant` para los modos funcionales (`isotype`, `contained`, `lockup`) y modela las variantes de marca como `kind`. El set vigente cubre Gemini, ChatGPT/GPT, Adobe, Adobe Express, Adobe Firefly, Adobe Photoshop, Adobe Premiere Pro, Adobe Illustrator, Adobe After Effects, Envato, Shutterstock, Higgsfield, Magnific, ElevenLabs, Claude, Microsoft Teams, Notion, HubSpot, Semrush, Ahrefs y Metricool.
 
 La matriz completa de nodes/kinds, la política SVG/PNG, los pitfalls de importación (Gemini, Adobe Express, lockups, clipping) y el checklist GVC viven en [`BRAND_LOGO_VARIATIONS.md`](./BRAND_LOGO_VARIATIONS.md) y [`BRAND_LOGO_IMPORT_RUNBOOK.md`](./BRAND_LOGO_IMPORT_RUNBOOK.md). Lab vivo: `/design-system/brand-logos`; scenario GVC: `design-system-brand-logos`; catálogo: [`PRIMITIVES.md`](./PRIMITIVES.md).
 

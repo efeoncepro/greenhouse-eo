@@ -553,6 +553,135 @@ describe('GreenhouseBrandLogoMark', () => {
     expect(queryByText('HubSpot')).not.toBeInTheDocument()
   })
 
+  it('maps the Semrush logotype specimen to a lockup SVG kind', () => {
+    const { container, getByRole, queryByText } = renderWithTheme(<GreenhouseBrandLogoMark kind='semrushLogotype' />)
+    const asset = readFileSync(join(process.cwd(), 'public/images/logos/axis/semrush-logotype.svg'), 'utf8')
+
+    const mark = getByRole('img', { name: 'Semrush' })
+
+    expect(mark).toHaveAttribute('data-kind', 'semrushLogotype')
+    expect(mark).toHaveAttribute('data-variant', 'lockup')
+    expect(container.querySelector('img')?.getAttribute('src')).toContain('/images/logos/axis/semrush-logotype.svg')
+    expect(asset).toContain('viewBox="0 0 363 44"')
+    expect(asset).toContain('#1C2219')
+    expect(asset).not.toContain('data:image')
+    expect(asset).not.toContain('<image')
+    expect(queryByText('Semrush')).not.toBeInTheDocument()
+  })
+
+  it('keeps Semrush compact marks as pure SVG assets', () => {
+    const { container, getByRole, queryByText } = renderWithTheme(
+      <GreenhouseBrandLogoMark kind='semrushOnDarkPurple' />
+    )
+
+    const compactAssets = [
+      'semrush-isotype.svg',
+      'semrush-on-dark-purple.svg',
+      'semrush-on-neutral.svg',
+      'semrush-on-light-purple.svg'
+    ].map(fileName => readFileSync(join(process.cwd(), `public/images/logos/axis/${fileName}`), 'utf8'))
+
+    const mark = getByRole('img', { name: 'Semrush' })
+
+    expect(mark).toHaveAttribute('data-kind', 'semrushOnDarkPurple')
+    expect(mark).toHaveAttribute('data-variant', 'contained')
+    expect(container.querySelector('img')?.getAttribute('src')).toContain(
+      '/images/logos/axis/semrush-on-dark-purple.svg'
+    )
+
+    for (const asset of compactAssets) {
+      expect(asset).toContain('<svg')
+      expect(asset).not.toContain('data:image')
+      expect(asset).not.toContain('<image')
+      expect(asset).not.toContain('.png')
+    }
+
+    expect(queryByText('Semrush')).not.toBeInTheDocument()
+  })
+
+  it('maps the Ahrefs logotype specimen to a lockup SVG kind', () => {
+    const { container, getByRole, queryByText } = renderWithTheme(<GreenhouseBrandLogoMark kind='ahrefsLogotype' />)
+    const asset = readFileSync(join(process.cwd(), 'public/images/logos/axis/ahrefs-logotype.svg'), 'utf8')
+
+    const mark = getByRole('img', { name: 'Ahrefs' })
+
+    expect(mark).toHaveAttribute('data-kind', 'ahrefsLogotype')
+    expect(mark).toHaveAttribute('data-variant', 'lockup')
+    expect(container.querySelector('img')?.getAttribute('src')).toContain('/images/logos/axis/ahrefs-logotype.svg')
+    expect(asset).toContain('viewBox="0 0 157 44"')
+    expect(asset).toContain('#3C54FC')
+    expect(asset).toContain('#FE8B01')
+    expect(asset).not.toContain('data:image')
+    expect(asset).not.toContain('<image')
+    expect(queryByText('Ahrefs')).not.toBeInTheDocument()
+  })
+
+  it('keeps Ahrefs compact marks as pure SVG assets', () => {
+    const { container, getByRole, queryByText } = renderWithTheme(<GreenhouseBrandLogoMark kind='ahrefsOnDarkBlue' />)
+
+    const compactAssets = [
+      'ahrefs-isotype.svg',
+      'ahrefs-on-dark-blue.svg',
+      'ahrefs-on-neutral.svg',
+      'ahrefs-on-light-blue.svg'
+    ].map(fileName => readFileSync(join(process.cwd(), `public/images/logos/axis/${fileName}`), 'utf8'))
+
+    const mark = getByRole('img', { name: 'Ahrefs' })
+
+    expect(mark).toHaveAttribute('data-kind', 'ahrefsOnDarkBlue')
+    expect(mark).toHaveAttribute('data-variant', 'contained')
+    expect(container.querySelector('img')?.getAttribute('src')).toContain('/images/logos/axis/ahrefs-on-dark-blue.svg')
+
+    for (const asset of compactAssets) {
+      expect(asset).toContain('<svg')
+      expect(asset).not.toContain('data:image')
+      expect(asset).not.toContain('<image')
+      expect(asset).not.toContain('.png')
+    }
+
+    expect(queryByText('Ahrefs')).not.toBeInTheDocument()
+  })
+
+  it('maps the Metricool logotype specimen to a lockup SVG kind', () => {
+    const { container, getByRole, queryByText } = renderWithTheme(<GreenhouseBrandLogoMark kind='metricoolLogotype' />)
+    const asset = readFileSync(join(process.cwd(), 'public/images/logos/axis/metricool-logotype.svg'), 'utf8')
+
+    const mark = getByRole('img', { name: 'Metricool' })
+
+    expect(mark).toHaveAttribute('data-kind', 'metricoolLogotype')
+    expect(mark).toHaveAttribute('data-variant', 'lockup')
+    expect(container.querySelector('img')?.getAttribute('src')).toContain('/images/logos/axis/metricool-logotype.svg')
+    expect(asset).toContain('viewBox="0 0 249 40"')
+    expect(asset).toContain('#2C1929')
+    expect(asset).not.toContain('data:image')
+    expect(asset).not.toContain('<image')
+    expect(queryByText('Metricool')).not.toBeInTheDocument()
+  })
+
+  it('keeps Metricool compact marks as pure SVG assets', () => {
+    const { container, getByRole, queryByText } = renderWithTheme(<GreenhouseBrandLogoMark kind='metricoolOnBlack' />)
+
+    const compactAssets = ['metricool-isotype.svg', 'metricool-on-black.svg', 'metricool-on-neutral.svg'].map(fileName =>
+      readFileSync(join(process.cwd(), `public/images/logos/axis/${fileName}`), 'utf8')
+    )
+
+    const mark = getByRole('img', { name: 'Metricool' })
+
+    expect(mark).toHaveAttribute('data-kind', 'metricoolOnBlack')
+    expect(mark).toHaveAttribute('data-variant', 'contained')
+    expect(container.querySelector('img')?.getAttribute('src')).toContain('/images/logos/axis/metricool-on-black.svg')
+
+    for (const asset of compactAssets) {
+      expect(asset).toContain('<svg')
+      expect(asset).not.toContain('data:image')
+      expect(asset).not.toContain('<image')
+      expect(asset).not.toContain('.png')
+    }
+
+    expect(compactAssets[0]).toContain('#E9FE57')
+    expect(queryByText('Metricool')).not.toBeInTheDocument()
+  })
+
   it('resolves kind defaults through the controller', () => {
     expect(resolveGreenhouseBrandLogoKind('geminiOnNeutral')).toBe(GREENHOUSE_BRAND_LOGO_KIND_CONFIG.geminiOnNeutral)
     expect(resolveGreenhouseBrandLogoKind('gptOnNeutral')).toBe(GREENHOUSE_BRAND_LOGO_KIND_CONFIG.gptOnNeutral)
@@ -599,6 +728,15 @@ describe('GreenhouseBrandLogoMark', () => {
     expect(resolveGreenhouseBrandLogoKind('hubspotOnLightOrange')).toBe(
       GREENHOUSE_BRAND_LOGO_KIND_CONFIG.hubspotOnLightOrange
     )
+    expect(resolveGreenhouseBrandLogoKind('semrushOnLightPurple')).toBe(
+      GREENHOUSE_BRAND_LOGO_KIND_CONFIG.semrushOnLightPurple
+    )
+    expect(resolveGreenhouseBrandLogoKind('ahrefsOnLightBlue')).toBe(
+      GREENHOUSE_BRAND_LOGO_KIND_CONFIG.ahrefsOnLightBlue
+    )
+    expect(resolveGreenhouseBrandLogoKind('metricoolOnNeutral')).toBe(
+      GREENHOUSE_BRAND_LOGO_KIND_CONFIG.metricoolOnNeutral
+    )
     expect(resolveGreenhouseBrandLogoVariant({ kind: 'geminiIsotype' })).toBe('isotype')
     expect(resolveGreenhouseBrandLogoVariant({ kind: 'gptOnBlack' })).toBe('contained')
     expect(resolveGreenhouseBrandLogoVariant({ kind: 'adobeOnRed' })).toBe('contained')
@@ -620,6 +758,12 @@ describe('GreenhouseBrandLogoMark', () => {
     expect(resolveGreenhouseBrandLogoVariant({ kind: 'notionLogotype' })).toBe('lockup')
     expect(resolveGreenhouseBrandLogoVariant({ kind: 'hubspotOnOrange' })).toBe('contained')
     expect(resolveGreenhouseBrandLogoVariant({ kind: 'hubspotLogotype' })).toBe('lockup')
+    expect(resolveGreenhouseBrandLogoVariant({ kind: 'semrushOnDarkPurple' })).toBe('contained')
+    expect(resolveGreenhouseBrandLogoVariant({ kind: 'semrushLogotype' })).toBe('lockup')
+    expect(resolveGreenhouseBrandLogoVariant({ kind: 'ahrefsOnDarkBlue' })).toBe('contained')
+    expect(resolveGreenhouseBrandLogoVariant({ kind: 'ahrefsLogotype' })).toBe('lockup')
+    expect(resolveGreenhouseBrandLogoVariant({ kind: 'metricoolOnBlack' })).toBe('contained')
+    expect(resolveGreenhouseBrandLogoVariant({ kind: 'metricoolLogotype' })).toBe('lockup')
     expect(resolveGreenhouseBrandLogoVariant({ kind: 'geminiIsotype', variant: 'lockup' })).toBe('lockup')
   })
 })

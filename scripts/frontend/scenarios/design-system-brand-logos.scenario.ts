@@ -34,7 +34,7 @@ export const scenario: CaptureScenario = {
       kind: 'mark',
       label: 'brand-logo-hero',
       clipSelector: '[data-capture="brand-logo-hero"]',
-      note: 'Specimens principales de Gemini, ChatGPT, Adobe, Adobe Express, Adobe Firefly, Adobe Photoshop, Adobe Premiere Pro, Adobe Illustrator, Adobe After Effects, Envato, Shutterstock, Higgsfield, Magnific, ElevenLabs, Claude, Microsoft Teams, Notion y HubSpot portados desde AXIS Figma.'
+      note: 'Specimens principales de Gemini, ChatGPT, Adobe, Adobe Express, Adobe Firefly, Adobe Photoshop, Adobe Premiere Pro, Adobe Illustrator, Adobe After Effects, Envato, Shutterstock, Higgsfield, Magnific, ElevenLabs, Claude, Microsoft Teams, Notion, HubSpot, Semrush, Ahrefs y Metricool portados desde AXIS Figma.'
     },
     {
       kind: 'mark',
@@ -143,6 +143,24 @@ export const scenario: CaptureScenario = {
       label: 'brand-logo-hubspot-kind-matrix',
       clipSelector: '[data-capture="brand-logo-hubspot-kind-matrix"]',
       note: 'Matriz de kinds hubspotIsotype, hubspotOnOrange, hubspotOnNeutral, hubspotOnLightOrange y hubspotLogotype.'
+    },
+    {
+      kind: 'mark',
+      label: 'brand-logo-semrush-kind-matrix',
+      clipSelector: '[data-capture="brand-logo-semrush-kind-matrix"]',
+      note: 'Matriz de kinds semrushIsotype, semrushOnDarkPurple, semrushOnNeutral, semrushOnLightPurple y semrushLogotype.'
+    },
+    {
+      kind: 'mark',
+      label: 'brand-logo-ahrefs-kind-matrix',
+      clipSelector: '[data-capture="brand-logo-ahrefs-kind-matrix"]',
+      note: 'Matriz de kinds ahrefsIsotype, ahrefsOnDarkBlue, ahrefsOnNeutral, ahrefsOnLightBlue y ahrefsLogotype.'
+    },
+    {
+      kind: 'mark',
+      label: 'brand-logo-metricool-kind-matrix',
+      clipSelector: '[data-capture="brand-logo-metricool-kind-matrix"]',
+      note: 'Matriz de kinds metricoolIsotype, metricoolOnBlack, metricoolOnNeutral y metricoolLogotype.'
     }
   ]
 }

@@ -19,6 +19,9 @@ export type GreenhouseBrandLogoFamily =
   | 'teams'
   | 'notion'
   | 'hubspot'
+  | 'semrush'
+  | 'ahrefs'
+  | 'metricool'
 
 export type GreenhouseBrandLogoKind =
   | 'geminiIsotype'
@@ -105,6 +108,20 @@ export type GreenhouseBrandLogoKind =
   | 'hubspotOnNeutral'
   | 'hubspotOnLightOrange'
   | 'hubspotLogotype'
+  | 'semrushIsotype'
+  | 'semrushOnDarkPurple'
+  | 'semrushOnNeutral'
+  | 'semrushOnLightPurple'
+  | 'semrushLogotype'
+  | 'ahrefsIsotype'
+  | 'ahrefsOnDarkBlue'
+  | 'ahrefsOnNeutral'
+  | 'ahrefsOnLightBlue'
+  | 'ahrefsLogotype'
+  | 'metricoolIsotype'
+  | 'metricoolOnBlack'
+  | 'metricoolOnNeutral'
+  | 'metricoolLogotype'
 
 export type GreenhouseBrandLogoSize = 'small' | 'medium' | 'large'
 
@@ -182,10 +199,21 @@ export interface GreenhouseBrandLogoKindConfig {
     | 'hubspotOnOrange'
     | 'hubspotOnNeutral'
     | 'hubspotOnLightOrange'
+    | 'semrushPurple'
+    | 'semrushOnDarkPurple'
+    | 'semrushOnNeutral'
+    | 'semrushOnLightPurple'
+    | 'ahrefsBlue'
+    | 'ahrefsOnDarkBlue'
+    | 'ahrefsOnNeutral'
+    | 'ahrefsOnLightBlue'
+    | 'metricoolGreen'
+    | 'metricoolOnBlack'
+    | 'metricoolOnNeutral'
 }
 
 const AXIS_BRAND_LOGO_ASSET_BASE = '/images/logos/axis'
-const AXIS_BRAND_LOGO_ASSET_VERSION = '20260619-svg-fit-21'
+const AXIS_BRAND_LOGO_ASSET_VERSION = '20260619-svg-fit-24'
 
 const createAxisBrandLogoAssetSrc = (fileName: string) =>
   `${AXIS_BRAND_LOGO_ASSET_BASE}/${fileName}?v=${AXIS_BRAND_LOGO_ASSET_VERSION}`
@@ -246,7 +274,20 @@ export const GREENHOUSE_BRAND_LOGO_ASSET_COLORS = {
   notionNeutralSurface: 'rgb(243 243 244)',
   hubspotOrange: 'rgb(255 92 53)',
   hubspotNeutralSurface: 'rgb(243 243 244)',
-  hubspotLightOrangeSurface: 'rgb(255 223 216)'
+  hubspotLightOrangeSurface: 'rgb(255 223 216)',
+  semrushPurple: 'rgb(99 63 147)',
+  semrushLightPurple: 'rgb(193 144 255)',
+  semrushNeutralSurface: 'rgb(243 243 244)',
+  semrushLightPurpleSurface: 'rgb(199 192 255)',
+  semrushLogotypeBlack: 'rgb(28 34 25)',
+  ahrefsBlue: 'rgb(5 74 218)',
+  ahrefsOrange: 'rgb(251 133 1)',
+  ahrefsNeutralSurface: 'rgb(243 243 244)',
+  ahrefsLightBlueSurface: 'rgb(186 208 255)',
+  metricoolGreen: 'rgb(233 254 87)',
+  metricoolBlack: 'rgb(0 0 0)',
+  metricoolNeutralSurface: 'rgb(243 243 244)',
+  metricoolLogotypeBlack: 'rgb(44 25 41)'
 } as const
 
 export const GREENHOUSE_BRAND_LOGO_KIND_CONFIG = {
@@ -871,6 +912,110 @@ export const GREENHOUSE_BRAND_LOGO_KIND_CONFIG = {
     assetSrc: createAxisBrandLogoAssetSrc('hubspot-logotype.svg'),
     assetAspectRatio: 176.5553436279297 / 50,
     tone: 'hubspotOrange'
+  },
+  semrushIsotype: {
+    family: 'semrush',
+    variant: 'isotype',
+    ariaLabel: 'Semrush',
+    assetSrc: createAxisBrandLogoAssetSrc('semrush-isotype.svg'),
+    assetAspectRatio: 50 / 47,
+    tone: 'semrushPurple'
+  },
+  semrushOnDarkPurple: {
+    family: 'semrush',
+    variant: 'contained',
+    ariaLabel: 'Semrush',
+    assetSrc: createAxisBrandLogoAssetSrc('semrush-on-dark-purple.svg'),
+    tone: 'semrushOnDarkPurple'
+  },
+  semrushOnNeutral: {
+    family: 'semrush',
+    variant: 'contained',
+    ariaLabel: 'Semrush',
+    assetSrc: createAxisBrandLogoAssetSrc('semrush-on-neutral.svg'),
+    tone: 'semrushOnNeutral'
+  },
+  semrushOnLightPurple: {
+    family: 'semrush',
+    variant: 'contained',
+    ariaLabel: 'Semrush',
+    assetSrc: createAxisBrandLogoAssetSrc('semrush-on-light-purple.svg'),
+    tone: 'semrushOnLightPurple'
+  },
+  semrushLogotype: {
+    family: 'semrush',
+    variant: 'lockup',
+    ariaLabel: 'Semrush',
+    assetSrc: createAxisBrandLogoAssetSrc('semrush-logotype.svg'),
+    assetAspectRatio: 362.27386474609375 / 44,
+    tone: 'semrushPurple'
+  },
+  ahrefsIsotype: {
+    family: 'ahrefs',
+    variant: 'isotype',
+    ariaLabel: 'Ahrefs',
+    assetSrc: createAxisBrandLogoAssetSrc('ahrefs-isotype.svg'),
+    assetAspectRatio: 50 / 47,
+    tone: 'ahrefsBlue'
+  },
+  ahrefsOnDarkBlue: {
+    family: 'ahrefs',
+    variant: 'contained',
+    ariaLabel: 'Ahrefs',
+    assetSrc: createAxisBrandLogoAssetSrc('ahrefs-on-dark-blue.svg'),
+    tone: 'ahrefsOnDarkBlue'
+  },
+  ahrefsOnNeutral: {
+    family: 'ahrefs',
+    variant: 'contained',
+    ariaLabel: 'Ahrefs',
+    assetSrc: createAxisBrandLogoAssetSrc('ahrefs-on-neutral.svg'),
+    tone: 'ahrefsOnNeutral'
+  },
+  ahrefsOnLightBlue: {
+    family: 'ahrefs',
+    variant: 'contained',
+    ariaLabel: 'Ahrefs',
+    assetSrc: createAxisBrandLogoAssetSrc('ahrefs-on-light-blue.svg'),
+    tone: 'ahrefsOnLightBlue'
+  },
+  ahrefsLogotype: {
+    family: 'ahrefs',
+    variant: 'lockup',
+    ariaLabel: 'Ahrefs',
+    assetSrc: createAxisBrandLogoAssetSrc('ahrefs-logotype.svg'),
+    assetAspectRatio: 156.93002319335938 / 44,
+    tone: 'ahrefsBlue'
+  },
+  metricoolIsotype: {
+    family: 'metricool',
+    variant: 'isotype',
+    ariaLabel: 'Metricool',
+    assetSrc: createAxisBrandLogoAssetSrc('metricool-isotype.svg'),
+    assetAspectRatio: 50 / 46.75,
+    tone: 'metricoolGreen'
+  },
+  metricoolOnBlack: {
+    family: 'metricool',
+    variant: 'contained',
+    ariaLabel: 'Metricool',
+    assetSrc: createAxisBrandLogoAssetSrc('metricool-on-black.svg'),
+    tone: 'metricoolOnBlack'
+  },
+  metricoolOnNeutral: {
+    family: 'metricool',
+    variant: 'contained',
+    ariaLabel: 'Metricool',
+    assetSrc: createAxisBrandLogoAssetSrc('metricool-on-neutral.svg'),
+    tone: 'metricoolOnNeutral'
+  },
+  metricoolLogotype: {
+    family: 'metricool',
+    variant: 'lockup',
+    ariaLabel: 'Metricool',
+    assetSrc: createAxisBrandLogoAssetSrc('metricool-logotype.svg'),
+    assetAspectRatio: 248.4613037109375 / 39.99998474121094,
+    tone: 'metricoolGreen'
   }
 } as const satisfies Record<GreenhouseBrandLogoKind, GreenhouseBrandLogoKindConfig>
 

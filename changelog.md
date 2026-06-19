@@ -2,6 +2,12 @@
 
 ## 2026-06-19
 
+- **Design System — Metricool desde AXIS Figma.** Se incorporó el nodo AXIS `12274:22` (`Metricool`) a `GreenhouseBrandLogoMark` con kinds `metricoolIsotype`, `metricoolOnBlack`, `metricoolOnNeutral` y `metricoolLogotype`. Los cuatro assets entran como SVG locales puros, incluido el wordmark completo, sin texto local del portal; el lockup usa el ratio real del nodo `12344:17` y se muestra grande en su specimen para respetar la altura Figma de 40px.
+
+- **Design System — Ahrefs desde AXIS Figma.** Se incorporó el nodo AXIS `12274:7` (`Ahrefs`) a `GreenhouseBrandLogoMark` con kinds `ahrefsIsotype`, `ahrefsOnDarkBlue`, `ahrefsOnNeutral`, `ahrefsOnLightBlue` y `ahrefsLogotype`. Los cinco assets entran como SVG locales puros, incluido el wordmark completo, sin texto local del portal; el lockup usa el ratio real del nodo `12344:18` y se muestra grande en su specimen para respetar la altura Figma de 44px.
+
+- **Design System — Semrush desde AXIS Figma.** Se incorporó el nodo AXIS `12271:516` (`Semrush`) a `GreenhouseBrandLogoMark` con kinds `semrushIsotype`, `semrushOnDarkPurple`, `semrushOnNeutral`, `semrushOnLightPurple` y `semrushLogotype`. Los cinco assets entran como SVG locales puros, incluido el wordmark completo, sin texto local del portal; el lockup usa el ratio real del nodo `12344:19` y se muestra grande en su specimen para respetar la altura Figma de 44px.
+
 - **Design System — HubSpot desde AXIS Figma.** Se incorporó el nodo AXIS `12274:82` (`Hubspot`) a `GreenhouseBrandLogoMark` con kinds `hubspotIsotype`, `hubspotOnOrange`, `hubspotOnNeutral`, `hubspotOnLightOrange` y `hubspotLogotype`. Los cinco assets entran como SVG locales puros, incluido el wordmark completo, sin texto local del portal; el lockup usa el ratio real del nodo `12344:2` y se muestra grande en su specimen para respetar la altura Figma de 50px.
 
 - **Design System — Notion desde AXIS Figma.** Se incorporó el nodo AXIS `12274:2` (`Notion`) a `GreenhouseBrandLogoMark` con kinds `notionIsotype`, `notionOnBlack`, `notionOnNeutral` y `notionLogotype`. Los cuatro assets entran como SVG locales puros, incluido el wordmark completo, sin texto local del portal; el lockup usa el ratio real del nodo `12344:16` y se muestra grande en su specimen para evitar que el downscale haga parecer incorrectas las letras.

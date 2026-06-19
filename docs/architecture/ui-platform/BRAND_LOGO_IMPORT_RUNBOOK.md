@@ -6,7 +6,7 @@
 > **Contrato base:** [BRAND_LOGO_VARIATIONS.md](./BRAND_LOGO_VARIATIONS.md)
 > **Lab/GVC:** `/design-system/brand-logos` · `design-system-brand-logos`
 
-Este runbook documenta lo aprendido al portar los logos Gemini, ChatGPT/GPT, Adobe, Adobe Express, Firefly, Photoshop, Premiere, Illustrator, After Effects, Envato, Shutterstock, Higgsfield, Magnific, ElevenLabs, Claude, Microsoft Teams, Notion y HubSpot desde AXIS Figma. Su objetivo es que una sesión nueva no tenga que redescubrir por qué ciertos logos se pixelan, se cortan, pierden color o terminan como texto local.
+Este runbook documenta lo aprendido al portar los logos Gemini, ChatGPT/GPT, Adobe, Adobe Express, Firefly, Photoshop, Premiere, Illustrator, After Effects, Envato, Shutterstock, Higgsfield, Magnific, ElevenLabs, Claude, Microsoft Teams, Notion, HubSpot, Semrush, Ahrefs y Metricool desde AXIS Figma. Su objetivo es que una sesión nueva no tenga que redescubrir por qué ciertos logos se pixelan, se cortan, pierden color o terminan como texto local.
 
 ## Principio
 
@@ -222,6 +222,42 @@ Solución:
 - Usar el ratio real del nodo `12344:2` (`176.5553436279297 / 50`) para el lockup.
 - En el card del lab, renderizar `hubspotLogotype` en tamaño `large` para respetar la altura nativa de 50px del nodo Figma.
 - Las variantes `Fondo-Naranja`, `Fondo-Gris` y `Fondo-NaranjaClaro` incluyen fondo circular + marca en el mismo asset; no separar fondo y marca en CSS.
+
+### Semrush
+
+Resultado observado: el nodo `12271:516` entrega SVG fiel para sus cinco variantes, incluido el logotipo completo. El lockup tiene altura de 44px en Figma y debe presentarse grande en el specimen para que el wordmark sea comparable al nodo AXIS.
+
+Solución:
+
+- Exportar `semrushIsotype`, `semrushOnDarkPurple`, `semrushOnNeutral`, `semrushOnLightPurple` y `semrushLogotype` como SVG locales.
+- Mantener el wordmark `Semrush` como asset vectorial; no reconstruirlo con texto local ni tipografía del portal.
+- Usar el ratio real del nodo `12344:19` (`362.27386474609375 / 44`) para el lockup.
+- En el card del lab, renderizar `semrushLogotype` en tamaño `large` para respetar la altura nativa de 44px del nodo Figma.
+- Las variantes `Fondo-MoradoOscuro`, `Fondo-Gris` y `Fondo-MoradoClaro` incluyen fondo circular + marca en el mismo asset; no separar fondo y marca en CSS.
+
+### Ahrefs
+
+Resultado observado: el nodo `12274:7` entrega SVG fiel para sus cinco variantes, incluido el logotipo completo. En Figma los badges usan `Property 1=Ahref` y `Property 2` para el fondo; en runtime se canonizan como kinds explícitos por fondo.
+
+Solución:
+
+- Exportar `ahrefsIsotype`, `ahrefsOnDarkBlue`, `ahrefsOnNeutral`, `ahrefsOnLightBlue` y `ahrefsLogotype` como SVG locales.
+- Mantener el wordmark `Ahrefs` como asset vectorial; no reconstruirlo con texto local ni tipografía del portal.
+- Usar el ratio real del nodo `12344:18` (`156.93002319335938 / 44`) para el lockup.
+- En el card del lab, renderizar `ahrefsLogotype` en tamaño `large` para respetar la altura nativa de 44px del nodo Figma.
+- Las variantes `Fondo-AzulOscuro`, `Fondo-Gris` y `Fondo-AzulClaro` incluyen fondo circular + marca en el mismo asset; no separar fondo y marca en CSS.
+
+### Metricool
+
+Resultado observado: el nodo `12274:22` entrega SVG fiel para sus cuatro variantes, incluido el logotipo completo. Los SVG salen vectoriales puros, sin `<image>`, `data:image` ni texto.
+
+Solución:
+
+- Exportar `metricoolIsotype`, `metricoolOnBlack`, `metricoolOnNeutral` y `metricoolLogotype` como SVG locales.
+- Mantener el wordmark `Metricool` como asset vectorial; no reconstruirlo con texto local ni tipografía del portal.
+- Usar el ratio real del nodo `12344:17` (`248.4613037109375 / 39.99998474121094`) para el lockup.
+- En el card del lab, renderizar `metricoolLogotype` en tamaño `large` para respetar la altura nativa de 40px del nodo Figma.
+- Las variantes `Fondo-Negro` y `Fondo-Gris` incluyen fondo circular + marca en el mismo asset; no separar fondo y marca en CSS.
 
 ## Pruebas Visuales Que Sí Sirven
 

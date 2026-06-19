@@ -16,7 +16,7 @@
 
 La primitive gobierna tamaño, a11y, `data-capture`, `kind -> variant`, placement y asset selection. No reinterpreta colores de marca como tokens semánticos Greenhouse; los colores de logos externos viven dentro del asset o en `GREENHOUSE_BRAND_LOGO_ASSET_COLORS` como constantes de marca de terceros. Cada `kind` debe estar respaldado por un asset real; la primitive no dibuja isotipos ni wordmarks con SVG inline, MUI Typography ni texto local.
 
-Antes de importar una familia nueva o corregir un asset existente, cargar el [runbook de importación](./BRAND_LOGO_IMPORT_RUNBOOK.md). Ahí viven los errores ya encontrados con Gemini, ChatGPT/GPT, Adobe Express, Adobe, Firefly, Photoshop, Illustrator, After Effects, Premiere, Envato, Shutterstock, Higgsfield, Magnific, ElevenLabs, Claude, Microsoft Teams, Notion y HubSpot, además del checklist de verificación para futuras sesiones de Codex/Claude.
+Antes de importar una familia nueva o corregir un asset existente, cargar el [runbook de importación](./BRAND_LOGO_IMPORT_RUNBOOK.md). Ahí viven los errores ya encontrados con Gemini, ChatGPT/GPT, Adobe Express, Adobe, Firefly, Photoshop, Illustrator, After Effects, Premiere, Envato, Shutterstock, Higgsfield, Magnific, ElevenLabs, Claude, Microsoft Teams, Notion, HubSpot, Semrush, Ahrefs y Metricool, además del checklist de verificación para futuras sesiones de Codex/Claude.
 
 ## Figma Source
 
@@ -40,6 +40,9 @@ Antes de importar una familia nueva o corregir un asset existente, cargar el [ru
 | Microsoft Teams     | `12271:524` | `teamsIsotype`, `teamsOnDarkPurple`, `teamsOnNeutral`, `teamsOnLightPurple`, `teamsLogotype`                                    |
 | Notion              |   `12274:2` | `notionIsotype`, `notionOnBlack`, `notionOnNeutral`, `notionLogotype`                                                           |
 | HubSpot             |  `12274:82` | `hubspotIsotype`, `hubspotOnOrange`, `hubspotOnNeutral`, `hubspotOnLightOrange`, `hubspotLogotype`                              |
+| Semrush             | `12271:516` | `semrushIsotype`, `semrushOnDarkPurple`, `semrushOnNeutral`, `semrushOnLightPurple`, `semrushLogotype`                          |
+| Ahrefs              |   `12274:7` | `ahrefsIsotype`, `ahrefsOnDarkBlue`, `ahrefsOnNeutral`, `ahrefsOnLightBlue`, `ahrefsLogotype`                                   |
+| Metricool           |  `12274:22` | `metricoolIsotype`, `metricoolOnBlack`, `metricoolOnNeutral`, `metricoolLogotype`                                                |
 
 Figma no expuso variables en estos nodos y Code Connect quedó bloqueado por seat/plan. La implementación toma Figma como intención visual y conserva el contrato runtime en la primitive.
 
@@ -75,6 +78,9 @@ Correcciones conocidas del primer port:
 - `teamsLogotype` usa SVG local exportado desde Figma. El wordmark `Microsoft Teams` viene del asset vectorial, no de texto local ni tipografía del portal. Los compactos Teams llegaron con `preserveAspectRatio="none"` desde el MCP y deben normalizarse a `xMidYMid meet`.
 - `notionLogotype` usa SVG local exportado desde Figma. El wordmark `Notion` viene del asset vectorial, no de texto local ni tipografía del portal. En el lab se muestra en tamaño `large` dentro de su specimen para respetar la altura nativa de 50px del nodo Figma y evitar una lectura falsa por downscale.
 - `hubspotLogotype` usa SVG local exportado desde Figma. El wordmark `HubSpot` viene del asset vectorial, no de texto local ni tipografía del portal. En el lab se muestra en tamaño `large` dentro de su specimen para respetar la altura nativa de 50px del nodo Figma.
+- `semrushLogotype` usa SVG local exportado desde Figma. El wordmark `Semrush` viene del asset vectorial, no de texto local ni tipografía del portal. En el lab se muestra en tamaño `large` dentro de su specimen para respetar la altura nativa de 44px del nodo Figma.
+- `ahrefsLogotype` usa SVG local exportado desde Figma. El wordmark `Ahrefs` viene del asset vectorial, no de texto local ni tipografía del portal. En el lab se muestra en tamaño `large` dentro de su specimen para respetar la altura nativa de 44px del nodo Figma.
+- `metricoolLogotype` usa SVG local exportado desde Figma. El wordmark `Metricool` viene del asset vectorial, no de texto local ni tipografía del portal. En el lab se muestra en tamaño `large` dentro de su specimen para respetar la altura nativa de 40px del nodo Figma.
 - Los lockups Adobe Firefly, Photoshop, Illustrator y After Effects permanecen PNG porque el MCP los entregó como subnodos compuestos sin SVG raíz único.
 
 ## Lab Contract

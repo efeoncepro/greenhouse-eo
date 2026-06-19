@@ -72,6 +72,15 @@ const NOTION_FIGMA_NODE_URL =
 const HUBSPOT_FIGMA_NODE_URL =
   'https://www.figma.com/design/yyMksCoijfMaIoYplXKZaR/Design-System-%7C-AXIS?node-id=12274-82&m=dev'
 
+const SEMRUSH_FIGMA_NODE_URL =
+  'https://www.figma.com/design/yyMksCoijfMaIoYplXKZaR/Design-System-%7C-AXIS?node-id=12271-516&m=dev'
+
+const AHREFS_FIGMA_NODE_URL =
+  'https://www.figma.com/design/yyMksCoijfMaIoYplXKZaR/Design-System-%7C-AXIS?node-id=12274-7&m=dev'
+
+const METRICOOL_FIGMA_NODE_URL =
+  'https://www.figma.com/design/yyMksCoijfMaIoYplXKZaR/Design-System-%7C-AXIS?node-id=12274-22&m=dev'
+
 const InlineCode = ({ children }: { children: string }) => (
   <Box
     component='span'
@@ -654,12 +663,112 @@ const HUBSPOT_KIND_SPECIMENS: KindSpecimen[] = [
   }
 ]
 
+const SEMRUSH_KIND_SPECIMENS: KindSpecimen[] = [
+  {
+    kind: 'semrushIsotype',
+    title: 'Isotipo',
+    figmaProperty: 'Property 1=Isotipo',
+    description: 'Marca simple para menciones donde Semrush ya está nombrado cerca.'
+  },
+  {
+    kind: 'semrushOnDarkPurple',
+    title: 'Fondo morado oscuro',
+    figmaProperty: 'Property 1=Fondo-MoradoOscuro',
+    description: 'Badge de alto contraste para matrices compactas y estados sobre superficies claras.'
+  },
+  {
+    kind: 'semrushOnNeutral',
+    title: 'Fondo gris',
+    figmaProperty: 'Property 1=Fondo-Gris',
+    description: 'Badge sobre superficies neutras cuando el morado sólido pesa demasiado.'
+  },
+  {
+    kind: 'semrushOnLightPurple',
+    title: 'Fondo morado claro',
+    figmaProperty: 'Property 1=Fondo-MoradoClaro',
+    description: 'Badge suave para documentación, comparativas y referencias menos prominentes.'
+  },
+  {
+    kind: 'semrushLogotype',
+    title: 'Logotipo',
+    figmaProperty: 'Property 1=Logotipo',
+    description: 'Lockup completo para referencias de proveedor, integración o biblioteca de marca.'
+  }
+]
+
+const AHREFS_KIND_SPECIMENS: KindSpecimen[] = [
+  {
+    kind: 'ahrefsIsotype',
+    title: 'Isotipo',
+    figmaProperty: 'Property 1=Isotipo',
+    description: 'Marca simple para menciones donde Ahrefs ya está nombrado cerca.'
+  },
+  {
+    kind: 'ahrefsOnDarkBlue',
+    title: 'Fondo azul oscuro',
+    figmaProperty: 'Property 1=Ahref, Property 2=Fondo-AzulOscuro',
+    description: 'Badge de alto contraste para matrices compactas y estados sobre superficies claras.'
+  },
+  {
+    kind: 'ahrefsOnNeutral',
+    title: 'Fondo gris',
+    figmaProperty: 'Property 1=Ahref, Property 2=Fondo-Gris',
+    description: 'Badge sobre superficies neutras cuando el azul sólido pesa demasiado.'
+  },
+  {
+    kind: 'ahrefsOnLightBlue',
+    title: 'Fondo azul claro',
+    figmaProperty: 'Property 1=Ahref, Property 2=Fondo-AzulClaro',
+    description: 'Badge suave para documentación, comparativas y referencias menos prominentes.'
+  },
+  {
+    kind: 'ahrefsLogotype',
+    title: 'Logotipo',
+    figmaProperty: 'Property 1=Logotipo',
+    description: 'Lockup completo para referencias de proveedor, integración o biblioteca de marca.'
+  }
+]
+
+const METRICOOL_KIND_SPECIMENS: KindSpecimen[] = [
+  {
+    kind: 'metricoolIsotype',
+    title: 'Isotipo',
+    figmaProperty: 'Property 1=Isotipo',
+    description: 'Marca simple para menciones donde Metricool ya está nombrado cerca.'
+  },
+  {
+    kind: 'metricoolOnBlack',
+    title: 'Fondo negro',
+    figmaProperty: 'Property 1=Fondo-Negro',
+    description: 'Badge de alto contraste para matrices compactas y estados sobre superficies claras.'
+  },
+  {
+    kind: 'metricoolOnNeutral',
+    title: 'Fondo gris',
+    figmaProperty: 'Property 1=Fondo-Gris',
+    description: 'Badge sobre superficies neutras cuando el fondo negro pesa demasiado.'
+  },
+  {
+    kind: 'metricoolLogotype',
+    title: 'Logotipo',
+    figmaProperty: 'Property 1=Logotipo',
+    description: 'Lockup completo para referencias de proveedor, integración o biblioteca de marca.'
+  }
+]
+
 const SIZES: GreenhouseBrandLogoSize[] = ['small', 'medium', 'large']
 
 const BRAND_LOGO_FAMILY_CARD_QUERY = '@container (min-width: 760px)'
 
 const resolveBrandLogoSpecimenSize = (kind: GreenhouseBrandLogoKind): GreenhouseBrandLogoSize => {
-  if (kind === 'teamsLogotype' || kind === 'notionLogotype' || kind === 'hubspotLogotype') {
+  if (
+    kind === 'teamsLogotype' ||
+    kind === 'notionLogotype' ||
+    kind === 'hubspotLogotype' ||
+    kind === 'semrushLogotype' ||
+    kind === 'ahrefsLogotype' ||
+    kind === 'metricoolLogotype'
+  ) {
     return 'large'
   }
 
@@ -796,6 +905,27 @@ const BRAND_LOGO_FAMILIES = [
     figmaUrl: HUBSPOT_FIGMA_NODE_URL,
     dataCapture: 'brand-logo-hubspot-kind-matrix',
     specimens: HUBSPOT_KIND_SPECIMENS
+  },
+  {
+    title: 'Semrush',
+    nodeId: '12271:516',
+    figmaUrl: SEMRUSH_FIGMA_NODE_URL,
+    dataCapture: 'brand-logo-semrush-kind-matrix',
+    specimens: SEMRUSH_KIND_SPECIMENS
+  },
+  {
+    title: 'Ahrefs',
+    nodeId: '12274:7',
+    figmaUrl: AHREFS_FIGMA_NODE_URL,
+    dataCapture: 'brand-logo-ahrefs-kind-matrix',
+    specimens: AHREFS_KIND_SPECIMENS
+  },
+  {
+    title: 'Metricool',
+    nodeId: '12274:22',
+    figmaUrl: METRICOOL_FIGMA_NODE_URL,
+    dataCapture: 'brand-logo-metricool-kind-matrix',
+    specimens: METRICOOL_KIND_SPECIMENS
   }
 ] as const satisfies ReadonlyArray<{
   title: string
@@ -895,11 +1025,26 @@ const BrandLogoHero = () => (
           />
           <GreenhouseBrandLogoMark kind='notionOnBlack' size='large' dataCapture='brand-logo-notion-logotype-hero' />
           <GreenhouseBrandLogoMark kind='hubspotOnOrange' size='large' dataCapture='brand-logo-hubspot-logotype-hero' />
+          <GreenhouseBrandLogoMark
+            kind='semrushOnDarkPurple'
+            size='large'
+            dataCapture='brand-logo-semrush-logotype-hero'
+          />
+          <GreenhouseBrandLogoMark
+            kind='ahrefsOnDarkBlue'
+            size='large'
+            dataCapture='brand-logo-ahrefs-logotype-hero'
+          />
+          <GreenhouseBrandLogoMark
+            kind='metricoolOnBlack'
+            size='large'
+            dataCapture='brand-logo-metricool-logotype-hero'
+          />
         </Stack>
         <Typography variant='caption' color='text.secondary'>
           Gemini / ChatGPT / Adobe / Adobe Express / Adobe Firefly / Adobe Photoshop / Adobe Premiere Pro / Adobe
           Illustrator / Adobe After Effects / Envato / Shutterstock / Higgsfield / Magnific / ElevenLabs / Claude /
-          Microsoft Teams / Notion / HubSpot
+          Microsoft Teams / Notion / HubSpot / Semrush / Ahrefs / Metricool
         </Typography>
       </Stack>
     </Box>
@@ -1104,6 +1249,36 @@ const BrandLogoHero = () => (
           sx={{ width: { xs: '100%', sm: 'auto' } }}
         >
           Nodo HubSpot
+        </GreenhouseButton>
+        <GreenhouseButton
+          href={SEMRUSH_FIGMA_NODE_URL}
+          kind='secondaryAction'
+          variant='outlined'
+          tone='primary'
+          leadingIcon={<i className='tabler-brand-figma' />}
+          sx={{ width: { xs: '100%', sm: 'auto' } }}
+        >
+          Nodo Semrush
+        </GreenhouseButton>
+        <GreenhouseButton
+          href={AHREFS_FIGMA_NODE_URL}
+          kind='secondaryAction'
+          variant='outlined'
+          tone='primary'
+          leadingIcon={<i className='tabler-brand-figma' />}
+          sx={{ width: { xs: '100%', sm: 'auto' } }}
+        >
+          Nodo Ahrefs
+        </GreenhouseButton>
+        <GreenhouseButton
+          href={METRICOOL_FIGMA_NODE_URL}
+          kind='secondaryAction'
+          variant='outlined'
+          tone='primary'
+          leadingIcon={<i className='tabler-brand-figma' />}
+          sx={{ width: { xs: '100%', sm: 'auto' } }}
+        >
+          Nodo Metricool
         </GreenhouseButton>
       </Stack>
     </Stack>
@@ -1389,6 +1564,20 @@ const BrandLogoSizeSpecimens = () => (
             <GreenhouseBrandLogoMark kind='hubspotOnNeutral' size={size} />
             <GreenhouseBrandLogoMark kind='hubspotOnLightOrange' size={size} />
             <GreenhouseBrandLogoMark kind='hubspotLogotype' size='small' />
+            <GreenhouseBrandLogoMark kind='semrushIsotype' size={size} />
+            <GreenhouseBrandLogoMark kind='semrushOnDarkPurple' size={size} />
+            <GreenhouseBrandLogoMark kind='semrushOnNeutral' size={size} />
+            <GreenhouseBrandLogoMark kind='semrushOnLightPurple' size={size} />
+            <GreenhouseBrandLogoMark kind='semrushLogotype' size='small' />
+            <GreenhouseBrandLogoMark kind='ahrefsIsotype' size={size} />
+            <GreenhouseBrandLogoMark kind='ahrefsOnDarkBlue' size={size} />
+            <GreenhouseBrandLogoMark kind='ahrefsOnNeutral' size={size} />
+            <GreenhouseBrandLogoMark kind='ahrefsOnLightBlue' size={size} />
+            <GreenhouseBrandLogoMark kind='ahrefsLogotype' size='small' />
+            <GreenhouseBrandLogoMark kind='metricoolIsotype' size={size} />
+            <GreenhouseBrandLogoMark kind='metricoolOnBlack' size={size} />
+            <GreenhouseBrandLogoMark kind='metricoolOnNeutral' size={size} />
+            <GreenhouseBrandLogoMark kind='metricoolLogotype' size='small' />
           </Stack>
         ))}
       </Stack>
