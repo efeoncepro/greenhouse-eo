@@ -34,7 +34,7 @@ export const scenario: CaptureScenario = {
       kind: 'mark',
       label: 'brand-logo-hero',
       clipSelector: '[data-capture="brand-logo-hero"]',
-      note: 'Specimens principales de Gemini, Adobe, Adobe Express, Adobe Firefly, Adobe Photoshop, Adobe Premiere Pro, Adobe Illustrator, Adobe After Effects, Envato y Shutterstock portados desde AXIS Figma.'
+      note: 'Specimens principales de Gemini, Adobe, Adobe Express, Adobe Firefly, Adobe Photoshop, Adobe Premiere Pro, Adobe Illustrator, Adobe After Effects, Envato, Shutterstock, Higgsfield, Magnific y ElevenLabs portados desde AXIS Figma.'
     },
     {
       kind: 'mark',
@@ -95,6 +95,24 @@ export const scenario: CaptureScenario = {
       label: 'brand-logo-shutterstock-kind-matrix',
       clipSelector: '[data-capture="brand-logo-shutterstock-kind-matrix"]',
       note: 'Matriz de kinds shutterstockIsotype, shutterstockOnNeutral, shutterstockOnRed, shutterstockOnPink y shutterstockLogotype.'
+    },
+    {
+      kind: 'mark',
+      label: 'brand-logo-higgsfield-kind-matrix',
+      clipSelector: '[data-capture="brand-logo-higgsfield-kind-matrix"]',
+      note: 'Matriz de kinds higgsfieldIsotype, higgsfieldOnGreen, higgsfieldOnNeutral y higgsfieldLogotype.'
+    },
+    {
+      kind: 'mark',
+      label: 'brand-logo-magnific-kind-matrix',
+      clipSelector: '[data-capture="brand-logo-magnific-kind-matrix"]',
+      note: 'Matriz de kinds magnificIsotype, magnificOnBlack, magnificOnNeutral y magnificLogotype.'
+    },
+    {
+      kind: 'mark',
+      label: 'brand-logo-elevenlabs-kind-matrix',
+      clipSelector: '[data-capture="brand-logo-elevenlabs-kind-matrix"]',
+      note: 'Matriz de kinds elevenLabsIsotype, elevenLabsOnBlack, elevenLabsOnNeutral y elevenLabsLogotype.'
     }
   ]
 }

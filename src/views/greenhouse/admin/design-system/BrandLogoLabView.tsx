@@ -48,6 +48,15 @@ const ENVATO_FIGMA_NODE_URL =
 const SHUTTERSTOCK_FIGMA_NODE_URL =
   'https://www.figma.com/design/yyMksCoijfMaIoYplXKZaR/Design-System-%7C-AXIS?node-id=12274-62&m=dev'
 
+const HIGGSFIELD_FIGMA_NODE_URL =
+  'https://www.figma.com/design/yyMksCoijfMaIoYplXKZaR/Design-System-%7C-AXIS?node-id=12274-98&m=dev'
+
+const MAGNIFIC_FIGMA_NODE_URL =
+  'https://www.figma.com/design/yyMksCoijfMaIoYplXKZaR/Design-System-%7C-AXIS?node-id=12274-16&m=dev'
+
+const ELEVEN_LABS_FIGMA_NODE_URL =
+  'https://www.figma.com/design/yyMksCoijfMaIoYplXKZaR/Design-System-%7C-AXIS?node-id=12274-74&m=dev'
+
 const InlineCode = ({ children }: { children: string }) => (
   <Box
     component='span'
@@ -396,6 +405,87 @@ const SHUTTERSTOCK_KIND_SPECIMENS: KindSpecimen[] = [
   }
 ]
 
+const HIGGSFIELD_KIND_SPECIMENS: KindSpecimen[] = [
+  {
+    kind: 'higgsfieldIsotype',
+    title: 'Isotipo',
+    figmaProperty: 'Property 1=Isotipo',
+    description: 'Marca simple para menciones donde Higgsfield ya está nombrado cerca.'
+  },
+  {
+    kind: 'higgsfieldOnGreen',
+    title: 'Fondo verde',
+    figmaProperty: 'Property 1=Fondo-Verde',
+    description: 'Badge de alto contraste para matrices compactas y estados visuales.'
+  },
+  {
+    kind: 'higgsfieldOnNeutral',
+    title: 'Fondo gris',
+    figmaProperty: 'Property 1=Fondo-Gris',
+    description: 'Badge sobre superficies neutras cuando el verde sólido compite con el contenido.'
+  },
+  {
+    kind: 'higgsfieldLogotype',
+    title: 'Logotipo',
+    figmaProperty: 'Property 1=Logotipo',
+    description: 'Lockup completo para referencias de proveedor, integración o biblioteca de marca.'
+  }
+]
+
+const MAGNIFIC_KIND_SPECIMENS: KindSpecimen[] = [
+  {
+    kind: 'magnificIsotype',
+    title: 'Isotipo',
+    figmaProperty: 'Property 1=Isotipo',
+    description: 'Marca simple para menciones donde Magnific ya está nombrado cerca.'
+  },
+  {
+    kind: 'magnificOnBlack',
+    title: 'Fondo negro',
+    figmaProperty: 'Property 1=Fondo-Negro',
+    description: 'Badge de alto contraste para matrices compactas y estados sobre superficies claras.'
+  },
+  {
+    kind: 'magnificOnNeutral',
+    title: 'Fondo gris',
+    figmaProperty: 'Property 1=Fondo-Gris',
+    description: 'Badge sobre superficies neutras cuando el negro sólido pesa demasiado.'
+  },
+  {
+    kind: 'magnificLogotype',
+    title: 'Logotipo',
+    figmaProperty: 'Property 1=Logotipo',
+    description: 'Lockup completo para referencias de proveedor, integración o biblioteca de marca.'
+  }
+]
+
+const ELEVEN_LABS_KIND_SPECIMENS: KindSpecimen[] = [
+  {
+    kind: 'elevenLabsIsotype',
+    title: 'Isotipo',
+    figmaProperty: 'Property 1=Isotipo',
+    description: 'Marca simple para menciones donde ElevenLabs ya está nombrado cerca.'
+  },
+  {
+    kind: 'elevenLabsOnBlack',
+    title: 'Fondo negro',
+    figmaProperty: 'Property 1=Fondo-Negro',
+    description: 'Badge de alto contraste para matrices compactas y estados sobre superficies claras.'
+  },
+  {
+    kind: 'elevenLabsOnNeutral',
+    title: 'Fondo gris',
+    figmaProperty: 'Property 1=Fondo-Gris',
+    description: 'Badge sobre superficies neutras cuando el negro sólido pesa demasiado.'
+  },
+  {
+    kind: 'elevenLabsLogotype',
+    title: 'Logotipo',
+    figmaProperty: 'Property 1=Logotipo',
+    description: 'Lockup completo para referencias de proveedor, integración o biblioteca de marca.'
+  }
+]
+
 const SIZES: GreenhouseBrandLogoSize[] = ['small', 'medium', 'large']
 
 const BRAND_LOGO_FAMILY_CARD_QUERY = '@container (min-width: 760px)'
@@ -470,6 +560,27 @@ const BRAND_LOGO_FAMILIES = [
     figmaUrl: SHUTTERSTOCK_FIGMA_NODE_URL,
     dataCapture: 'brand-logo-shutterstock-kind-matrix',
     specimens: SHUTTERSTOCK_KIND_SPECIMENS
+  },
+  {
+    title: 'Higgsfield',
+    nodeId: '12274:98',
+    figmaUrl: HIGGSFIELD_FIGMA_NODE_URL,
+    dataCapture: 'brand-logo-higgsfield-kind-matrix',
+    specimens: HIGGSFIELD_KIND_SPECIMENS
+  },
+  {
+    title: 'Magnific',
+    nodeId: '12274:16',
+    figmaUrl: MAGNIFIC_FIGMA_NODE_URL,
+    dataCapture: 'brand-logo-magnific-kind-matrix',
+    specimens: MAGNIFIC_KIND_SPECIMENS
+  },
+  {
+    title: 'ElevenLabs',
+    nodeId: '12274:74',
+    figmaUrl: ELEVEN_LABS_FIGMA_NODE_URL,
+    dataCapture: 'brand-logo-elevenlabs-kind-matrix',
+    specimens: ELEVEN_LABS_KIND_SPECIMENS
   }
 ] as const satisfies ReadonlyArray<{
   title: string
@@ -541,10 +652,25 @@ const BrandLogoHero = () => (
             size='large'
             dataCapture='brand-logo-shutterstock-logotype-hero'
           />
+          <GreenhouseBrandLogoMark
+            kind='higgsfieldOnGreen'
+            size='large'
+            dataCapture='brand-logo-higgsfield-logotype-hero'
+          />
+          <GreenhouseBrandLogoMark
+            kind='magnificOnBlack'
+            size='large'
+            dataCapture='brand-logo-magnific-logotype-hero'
+          />
+          <GreenhouseBrandLogoMark
+            kind='elevenLabsOnBlack'
+            size='large'
+            dataCapture='brand-logo-elevenlabs-logotype-hero'
+          />
         </Stack>
         <Typography variant='caption' color='text.secondary'>
           Gemini / Adobe / Adobe Express / Adobe Firefly / Adobe Photoshop / Adobe Premiere Pro / Adobe Illustrator /
-          Adobe After Effects / Envato / Shutterstock
+          Adobe After Effects / Envato / Shutterstock / Higgsfield / Magnific / ElevenLabs
         </Typography>
       </Stack>
     </Box>
@@ -669,6 +795,36 @@ const BrandLogoHero = () => (
           sx={{ width: { xs: '100%', sm: 'auto' } }}
         >
           Nodo Shutterstock
+        </GreenhouseButton>
+        <GreenhouseButton
+          href={HIGGSFIELD_FIGMA_NODE_URL}
+          kind='secondaryAction'
+          variant='outlined'
+          tone='primary'
+          leadingIcon={<i className='tabler-brand-figma' />}
+          sx={{ width: { xs: '100%', sm: 'auto' } }}
+        >
+          Nodo Higgsfield
+        </GreenhouseButton>
+        <GreenhouseButton
+          href={MAGNIFIC_FIGMA_NODE_URL}
+          kind='secondaryAction'
+          variant='outlined'
+          tone='primary'
+          leadingIcon={<i className='tabler-brand-figma' />}
+          sx={{ width: { xs: '100%', sm: 'auto' } }}
+        >
+          Nodo Magnific
+        </GreenhouseButton>
+        <GreenhouseButton
+          href={ELEVEN_LABS_FIGMA_NODE_URL}
+          kind='secondaryAction'
+          variant='outlined'
+          tone='primary'
+          leadingIcon={<i className='tabler-brand-figma' />}
+          sx={{ width: { xs: '100%', sm: 'auto' } }}
+        >
+          Nodo ElevenLabs
         </GreenhouseButton>
       </Stack>
     </Stack>
@@ -919,6 +1075,18 @@ const BrandLogoSizeSpecimens = () => (
             <GreenhouseBrandLogoMark kind='shutterstockOnRed' size={size} />
             <GreenhouseBrandLogoMark kind='shutterstockOnPink' size={size} />
             <GreenhouseBrandLogoMark kind='shutterstockLogotype' size='small' />
+            <GreenhouseBrandLogoMark kind='higgsfieldIsotype' size={size} />
+            <GreenhouseBrandLogoMark kind='higgsfieldOnGreen' size={size} />
+            <GreenhouseBrandLogoMark kind='higgsfieldOnNeutral' size={size} />
+            <GreenhouseBrandLogoMark kind='higgsfieldLogotype' size='small' />
+            <GreenhouseBrandLogoMark kind='magnificIsotype' size={size} />
+            <GreenhouseBrandLogoMark kind='magnificOnBlack' size={size} />
+            <GreenhouseBrandLogoMark kind='magnificOnNeutral' size={size} />
+            <GreenhouseBrandLogoMark kind='magnificLogotype' size='small' />
+            <GreenhouseBrandLogoMark kind='elevenLabsIsotype' size={size} />
+            <GreenhouseBrandLogoMark kind='elevenLabsOnBlack' size={size} />
+            <GreenhouseBrandLogoMark kind='elevenLabsOnNeutral' size={size} />
+            <GreenhouseBrandLogoMark kind='elevenLabsLogotype' size='small' />
           </Stack>
         ))}
       </Stack>
@@ -948,8 +1116,9 @@ const ContractAside = () => (
         Nodos AXIS <InlineCode>12267:95</InlineCode>, <InlineCode>12273:32</InlineCode>,{' '}
         <InlineCode>12274:44</InlineCode>, <InlineCode>12267:441</InlineCode>, <InlineCode>12270:452</InlineCode>,{' '}
         <InlineCode>12273:5</InlineCode>, <InlineCode>12270:481</InlineCode>, <InlineCode>12271:506</InlineCode>,{' '}
-        <InlineCode>12274:35</InlineCode> y <InlineCode>12274:62</InlineCode>. Variables de nodo: vacío. Code Connect:
-        bloqueado por seat/plan de Figma.
+        <InlineCode>12274:35</InlineCode>, <InlineCode>12274:62</InlineCode>, <InlineCode>12274:98</InlineCode>,{' '}
+        <InlineCode>12274:16</InlineCode> y <InlineCode>12274:74</InlineCode>. Variables de nodo: vacío. Code
+        Connect: bloqueado por seat/plan de Figma.
       </Typography>
     </Stack>
     <Stack spacing={DESIGN_SYSTEM_LAB_TOKENS.spacing.tight}>

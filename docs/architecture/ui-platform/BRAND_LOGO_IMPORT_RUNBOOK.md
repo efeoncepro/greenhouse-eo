@@ -6,7 +6,7 @@
 > **Contrato base:** [BRAND_LOGO_VARIATIONS.md](./BRAND_LOGO_VARIATIONS.md)
 > **Lab/GVC:** `/design-system/brand-logos` · `design-system-brand-logos`
 
-Este runbook documenta lo aprendido al portar los logos Gemini, Adobe, Adobe Express, Firefly, Photoshop, Premiere, Illustrator, After Effects, Envato y Shutterstock desde AXIS Figma. Su objetivo es que una sesión nueva no tenga que redescubrir por qué ciertos logos se pixelan, se cortan, pierden color o terminan como texto local.
+Este runbook documenta lo aprendido al portar los logos Gemini, Adobe, Adobe Express, Firefly, Photoshop, Premiere, Illustrator, After Effects, Envato, Shutterstock, Higgsfield, Magnific y ElevenLabs desde AXIS Figma. Su objetivo es que una sesión nueva no tenga que redescubrir por qué ciertos logos se pixelan, se cortan, pierden color o terminan como texto local.
 
 ## Principio
 
@@ -70,11 +70,14 @@ Normalización recomendada:
 
 Problema observado: el wordmark se veía con tipografía incorrecta, gris oscuro y la última `i` cortada/delgada.
 
+Problema observado después: el isotipo cromático y el lockup se simplificaron a un `linearGradient` manual tipo Google (`#4285F4`, `#34A853`, `#FBBC04`, `#EA4335`), cambiando el degradado real del nodo AXIS.
+
 Solución:
 
 - `geminiIsotype` es el isotipo cromático solo.
 - `geminiLogotype` es otro asset: incluye isotipo + wordmark.
-- El wordmark se sirve como SVG local, negro real, con viewBox holgado.
+- Los assets Gemini se exportan completos desde los subnodos Figma (`12237:505`, `12267:94`, `12267:93`, `12344:8`). No reconstruir el cromatismo como gradiente único: Figma usa capas sólidas (`#5495FB`, `#24B970`, `#F94544`, `#F5BB19`) recortadas por máscaras luminance.
+- El wordmark se sirve como SVG local exportado desde Figma, negro real, con viewBox holgado.
 - No usar texto local `Gemini`, ni `fontWeight`, ni `theme.typography` para el lockup.
 
 ### Adobe
@@ -131,6 +134,36 @@ Solución:
 - Exportar `shutterstockIsotype`, `shutterstockOnNeutral`, `shutterstockOnRed`, `shutterstockOnPink` y `shutterstockLogotype` como SVG locales.
 - Mantener el wordmark `shutterstock` como asset vectorial; no reconstruirlo con texto local.
 - Si el MCP devuelve el SVG pero copiarlo a mano sería frágil, usar la Figma REST API con el token del secret `greenhouse-figma-api-token` para exportar `format=svg` por node id y descargar los assets sin imprimir el token.
+
+### Higgsfield
+
+Resultado observado: el nodo `12274:98` entrega SVG fiel para sus cuatro variantes, incluido el logotipo completo.
+
+Solución:
+
+- Exportar `higgsfieldIsotype`, `higgsfieldOnGreen`, `higgsfieldOnNeutral` y `higgsfieldLogotype` como SVG locales.
+- Mantener el wordmark `Higgsfield` como asset vectorial; no reconstruirlo con texto local.
+- La variante `Fondo-Verde` incluye círculo verde lima + símbolo negro en el mismo asset; no separar fondo y marca en CSS.
+
+### Magnific
+
+Resultado observado: el nodo `12274:16` entrega SVG fiel para sus cuatro variantes, incluido el logotipo completo.
+
+Solución:
+
+- Exportar `magnificIsotype`, `magnificOnBlack`, `magnificOnNeutral` y `magnificLogotype` como SVG locales.
+- Mantener el wordmark `Magnific` como asset vectorial; no reconstruirlo con texto local.
+- Las variantes `Fondo-Negro` y `Fondo-Gris` incluyen fondo circular + símbolo en el mismo asset; no separar fondo y marca en CSS.
+
+### ElevenLabs
+
+Resultado observado: el nodo `12274:74` entrega SVG fiel para sus cuatro variantes, incluido el logotipo completo.
+
+Solución:
+
+- Exportar `elevenLabsIsotype`, `elevenLabsOnBlack`, `elevenLabsOnNeutral` y `elevenLabsLogotype` como SVG locales.
+- Mantener el wordmark `ElevenLabs` como asset vectorial; no reconstruirlo con texto local.
+- Las variantes `Fondo-Negro` y `Fondo-Gris` incluyen fondo circular + barras en el mismo asset; no separar fondo y marca en CSS.
 
 ## Pruebas Visuales Que Sí Sirven
 

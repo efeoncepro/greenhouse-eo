@@ -2,6 +2,14 @@
 
 ## 2026-06-19
 
+- **Design System — ElevenLabs desde AXIS Figma.** Se incorporó el nodo AXIS `12274:74` (`ElevenLabs`) a `GreenhouseBrandLogoMark` con kinds `elevenLabsIsotype`, `elevenLabsOnBlack`, `elevenLabsOnNeutral` y `elevenLabsLogotype`. Los cuatro assets entran como SVG exportados desde Figma, incluido el wordmark completo, sin texto local del portal.
+
+- **Design System — Magnific desde AXIS Figma.** Se incorporó el nodo AXIS `12274:16` (`Magnific`) a `GreenhouseBrandLogoMark` con kinds `magnificIsotype`, `magnificOnBlack`, `magnificOnNeutral` y `magnificLogotype`. Los cuatro assets entran como SVG exportados desde Figma, incluido el wordmark completo, sin texto local del portal.
+
+- **Design System — Higgsfield desde AXIS Figma.** Se incorporó el nodo AXIS `12274:98` (`Higgsfield`) a `GreenhouseBrandLogoMark` con kinds `higgsfieldIsotype`, `higgsfieldOnGreen`, `higgsfieldOnNeutral` y `higgsfieldLogotype`. Los cuatro assets entran como SVG exportados desde Figma, incluido el wordmark completo, sin texto local del portal.
+
+- **Design System — corrección de degradado Gemini desde AXIS Figma.** Se reemplazaron los assets `gemini-isotype`, `gemini-on-blue`, `gemini-on-neutral` y `gemini-logotype` por exports SVG directos del nodo AXIS `12267:95` y sus variantes (`12237:505`, `12267:94`, `12267:93`, `12344:8`). La corrección elimina el `linearGradient` manual simplificado y conserva la composición real Figma por capas/máscaras (`#5495FB`, `#24B970`, `#F94544`, `#F5BB19`) con wordmark negro de asset.
+
 - **Design System — Shutterstock desde AXIS Figma.** Se incorporó el nodo AXIS `12274:62` (`Shutterstock`) a `GreenhouseBrandLogoMark` con kinds `shutterstockIsotype`, `shutterstockOnNeutral`, `shutterstockOnRed`, `shutterstockOnPink` y `shutterstockLogotype`. Los cinco assets entran como SVG exportados desde Figma, incluido el wordmark completo, sin texto local del portal.
 
 - **Design System — Runbook para importar logos AXIS Figma.** Se agregó `docs/architecture/ui-platform/BRAND_LOGO_IMPORT_RUNBOOK.md` y se enlazó desde UI Platform para documentar el flujo completo de importación/corrección de logos: política SVG/PNG, canonización `kind`, pitfalls de Gemini/Adobe/Adobe Express/Firefly/Photoshop/Illustrator/After Effects/Premiere/Envato, verificación por GVC y checklist para futuras sesiones Codex/Claude.

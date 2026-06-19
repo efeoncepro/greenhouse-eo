@@ -429,7 +429,19 @@ const CATALOG_ITEMS: CatalogItem[] = [
     kind: 'Primitive',
     status: 'Hardening',
     owner: 'GreenhouseBrandLogoMark',
-    tags: ['brand', 'logo', 'figma', 'gemini', 'adobe', 'envato', 'shutterstock', 'kind'],
+    tags: [
+      'brand',
+      'logo',
+      'figma',
+      'gemini',
+      'adobe',
+      'envato',
+      'shutterstock',
+      'higgsfield',
+      'magnific',
+      'elevenlabs',
+      'kind'
+    ],
     searchAliases: [
       'logo',
       'logos',
@@ -444,6 +456,10 @@ const CATALOG_ITEMS: CatalogItem[] = [
       'after effects',
       'envato',
       'shutterstock',
+      'higgsfield',
+      'magnific',
+      'elevenlabs',
+      'eleven labs',
       'figma',
       'brand logo',
       'variaciones de logo'

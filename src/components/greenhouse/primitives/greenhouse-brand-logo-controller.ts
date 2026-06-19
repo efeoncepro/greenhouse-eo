@@ -11,6 +11,9 @@ export type GreenhouseBrandLogoFamily =
   | 'afterEffects'
   | 'envato'
   | 'shutterstock'
+  | 'higgsfield'
+  | 'magnific'
+  | 'elevenLabs'
 
 export type GreenhouseBrandLogoKind =
   | 'geminiIsotype'
@@ -62,6 +65,18 @@ export type GreenhouseBrandLogoKind =
   | 'shutterstockOnNeutral'
   | 'shutterstockOnPink'
   | 'shutterstockLogotype'
+  | 'higgsfieldIsotype'
+  | 'higgsfieldOnGreen'
+  | 'higgsfieldOnNeutral'
+  | 'higgsfieldLogotype'
+  | 'magnificIsotype'
+  | 'magnificOnBlack'
+  | 'magnificOnNeutral'
+  | 'magnificLogotype'
+  | 'elevenLabsIsotype'
+  | 'elevenLabsOnBlack'
+  | 'elevenLabsOnNeutral'
+  | 'elevenLabsLogotype'
 
 export type GreenhouseBrandLogoSize = 'small' | 'medium' | 'large'
 
@@ -112,20 +127,29 @@ export interface GreenhouseBrandLogoKindConfig {
     | 'shutterstockOnRed'
     | 'shutterstockOnNeutral'
     | 'shutterstockOnPink'
+    | 'higgsfieldGreen'
+    | 'higgsfieldOnGreen'
+    | 'higgsfieldOnNeutral'
+    | 'magnificBlack'
+    | 'magnificOnBlack'
+    | 'magnificOnNeutral'
+    | 'elevenLabsBlack'
+    | 'elevenLabsOnBlack'
+    | 'elevenLabsOnNeutral'
 }
 
 const AXIS_BRAND_LOGO_ASSET_BASE = '/images/logos/axis'
-const AXIS_BRAND_LOGO_ASSET_VERSION = '20260619-svg-fit-12'
+const AXIS_BRAND_LOGO_ASSET_VERSION = '20260619-svg-fit-16'
 
 const createAxisBrandLogoAssetSrc = (fileName: string) =>
   `${AXIS_BRAND_LOGO_ASSET_BASE}/${fileName}?v=${AXIS_BRAND_LOGO_ASSET_VERSION}`
 
 export const GREENHOUSE_BRAND_LOGO_ASSET_COLORS = {
   // Third-party logo asset colors from the AXIS Figma specimen. These are not semantic UI tokens.
-  geminiBlue: 'rgb(66 133 244)',
-  geminiRed: 'rgb(234 67 53)',
-  geminiYellow: 'rgb(251 188 4)',
-  geminiGreen: 'rgb(52 168 83)',
+  geminiBlue: 'rgb(84 149 251)',
+  geminiRed: 'rgb(249 69 68)',
+  geminiYellow: 'rgb(245 187 25)',
+  geminiGreen: 'rgb(36 185 112)',
   adobeRed: 'rgb(226 6 19)',
   adobePinkSurface: 'rgb(255 232 230)',
   expressNavy: 'rgb(0 11 29)',
@@ -154,7 +178,14 @@ export const GREENHOUSE_BRAND_LOGO_ASSET_COLORS = {
   shutterstockRed: 'rgb(255 26 3)',
   shutterstockLogotypeRed: 'rgb(255 41 23)',
   shutterstockNeutralSurface: 'rgb(243 243 244)',
-  shutterstockPinkSurface: 'rgb(255 232 230)'
+  shutterstockPinkSurface: 'rgb(255 232 230)',
+  higgsfieldGreen: 'rgb(209 254 23)',
+  higgsfieldBlack: 'rgb(19 19 19)',
+  higgsfieldNeutralSurface: 'rgb(243 243 244)',
+  magnificBlack: 'rgb(0 0 0)',
+  magnificNeutralSurface: 'rgb(243 243 244)',
+  elevenLabsBlack: 'rgb(0 0 0)',
+  elevenLabsNeutralSurface: 'rgb(243 243 244)'
 } as const
 
 export const GREENHOUSE_BRAND_LOGO_KIND_CONFIG = {
@@ -519,6 +550,96 @@ export const GREENHOUSE_BRAND_LOGO_KIND_CONFIG = {
     assetSrc: createAxisBrandLogoAssetSrc('shutterstock-logotype.svg'),
     assetAspectRatio: 270 / 38,
     tone: 'shutterstockRed'
+  },
+  higgsfieldIsotype: {
+    family: 'higgsfield',
+    variant: 'isotype',
+    ariaLabel: 'Higgsfield',
+    assetSrc: createAxisBrandLogoAssetSrc('higgsfield-isotype.svg'),
+    assetAspectRatio: 50 / 46.75,
+    tone: 'higgsfieldGreen'
+  },
+  higgsfieldOnGreen: {
+    family: 'higgsfield',
+    variant: 'contained',
+    ariaLabel: 'Higgsfield',
+    assetSrc: createAxisBrandLogoAssetSrc('higgsfield-on-green.svg'),
+    tone: 'higgsfieldOnGreen'
+  },
+  higgsfieldOnNeutral: {
+    family: 'higgsfield',
+    variant: 'contained',
+    ariaLabel: 'Higgsfield',
+    assetSrc: createAxisBrandLogoAssetSrc('higgsfield-on-neutral.svg'),
+    tone: 'higgsfieldOnNeutral'
+  },
+  higgsfieldLogotype: {
+    family: 'higgsfield',
+    variant: 'lockup',
+    ariaLabel: 'Higgsfield',
+    assetSrc: createAxisBrandLogoAssetSrc('higgsfield-logotype.svg'),
+    assetAspectRatio: 223 / 44,
+    tone: 'higgsfieldGreen'
+  },
+  magnificIsotype: {
+    family: 'magnific',
+    variant: 'isotype',
+    ariaLabel: 'Magnific',
+    assetSrc: createAxisBrandLogoAssetSrc('magnific-isotype.svg'),
+    assetAspectRatio: 50 / 47,
+    tone: 'magnificBlack'
+  },
+  magnificOnBlack: {
+    family: 'magnific',
+    variant: 'contained',
+    ariaLabel: 'Magnific',
+    assetSrc: createAxisBrandLogoAssetSrc('magnific-on-black.svg'),
+    tone: 'magnificOnBlack'
+  },
+  magnificOnNeutral: {
+    family: 'magnific',
+    variant: 'contained',
+    ariaLabel: 'Magnific',
+    assetSrc: createAxisBrandLogoAssetSrc('magnific-on-neutral.svg'),
+    tone: 'magnificOnNeutral'
+  },
+  magnificLogotype: {
+    family: 'magnific',
+    variant: 'lockup',
+    ariaLabel: 'Magnific',
+    assetSrc: createAxisBrandLogoAssetSrc('magnific-logotype.svg'),
+    assetAspectRatio: 267 / 44,
+    tone: 'magnificBlack'
+  },
+  elevenLabsIsotype: {
+    family: 'elevenLabs',
+    variant: 'isotype',
+    ariaLabel: 'ElevenLabs',
+    assetSrc: createAxisBrandLogoAssetSrc('elevenlabs-isotype.svg'),
+    assetAspectRatio: 50 / 47,
+    tone: 'elevenLabsBlack'
+  },
+  elevenLabsOnBlack: {
+    family: 'elevenLabs',
+    variant: 'contained',
+    ariaLabel: 'ElevenLabs',
+    assetSrc: createAxisBrandLogoAssetSrc('elevenlabs-on-black.svg'),
+    tone: 'elevenLabsOnBlack'
+  },
+  elevenLabsOnNeutral: {
+    family: 'elevenLabs',
+    variant: 'contained',
+    ariaLabel: 'ElevenLabs',
+    assetSrc: createAxisBrandLogoAssetSrc('elevenlabs-on-neutral.svg'),
+    tone: 'elevenLabsOnNeutral'
+  },
+  elevenLabsLogotype: {
+    family: 'elevenLabs',
+    variant: 'lockup',
+    ariaLabel: 'ElevenLabs',
+    assetSrc: createAxisBrandLogoAssetSrc('elevenlabs-logotype.svg'),
+    assetAspectRatio: 297 / 40,
+    tone: 'elevenLabsBlack'
   }
 } as const satisfies Record<GreenhouseBrandLogoKind, GreenhouseBrandLogoKindConfig>
 

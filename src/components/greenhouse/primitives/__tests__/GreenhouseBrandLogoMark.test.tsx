@@ -34,14 +34,34 @@ describe('GreenhouseBrandLogoMark', () => {
     expect(queryByText('Gemini')).not.toBeInTheDocument()
   })
 
-  it('keeps the Gemini wordmark asset black and unclipped', () => {
+  it('keeps the Gemini logotype as the exact Figma SVG export', () => {
     const asset = readFileSync(join(process.cwd(), 'public/images/logos/axis/gemini-logotype.svg'), 'utf8')
 
-    expect(asset).toContain('viewBox="0 0 301 63.0164"')
-    expect(asset).toContain('<g fill="#000000">')
-    expect(asset).toContain('<svg x="290.07" y="21.898" width="7.716" height="35.849"')
-    expect(asset).not.toContain('<rect x="291.01"')
+    expect(asset).toContain('viewBox="0 0 220 46"')
+    expect(asset).toContain('fill="url(#pattern0_12344_8)"')
+    expect(asset).toContain('data:image/png;base64')
+    expect(asset).toContain('fill="black"')
+    expect(asset).not.toContain('#4285F4')
     expect(asset).not.toContain('#44414D')
+  })
+
+  it('keeps the Gemini chromatic marks as layered Figma exports instead of a simplified gradient', () => {
+    const isotype = readFileSync(join(process.cwd(), 'public/images/logos/axis/gemini-isotype.svg'), 'utf8')
+    const onBlue = readFileSync(join(process.cwd(), 'public/images/logos/axis/gemini-on-blue.svg'), 'utf8')
+    const onNeutral = readFileSync(join(process.cwd(), 'public/images/logos/axis/gemini-on-neutral.svg'), 'utf8')
+
+    for (const [name, asset] of [
+      ['isotype', isotype],
+      ['onBlue', onBlue],
+      ['onNeutral', onNeutral]
+    ] as const) {
+      expect(asset, name).toContain('mask-type:luminance')
+      expect(asset, name).toContain('#5495FB')
+      expect(asset, name).toContain('#24B970')
+      expect(asset, name).toContain('#F94544')
+      expect(asset, name).toContain('#F5BB19')
+      expect(asset, name).not.toContain('gemini-isotype-gradient')
+    }
   })
 
   it('keeps contained Gemini kinds as mark-only images', () => {
@@ -264,6 +284,83 @@ describe('GreenhouseBrandLogoMark', () => {
     expect(queryByText('Shutterstock')).not.toBeInTheDocument()
   })
 
+  it('maps the Higgsfield logotype specimen to a lockup SVG kind', () => {
+    const { container, getByRole, queryByText } = renderWithTheme(<GreenhouseBrandLogoMark kind='higgsfieldLogotype' />)
+    const asset = readFileSync(join(process.cwd(), 'public/images/logos/axis/higgsfield-logotype.svg'), 'utf8')
+
+    const mark = getByRole('img', { name: 'Higgsfield' })
+
+    expect(mark).toHaveAttribute('data-kind', 'higgsfieldLogotype')
+    expect(mark).toHaveAttribute('data-variant', 'lockup')
+    expect(container.querySelector('img')?.getAttribute('src')).toContain(
+      '/images/logos/axis/higgsfield-logotype.svg'
+    )
+    expect(asset).toContain('viewBox="0 0 223 44"')
+    expect(asset).toContain('fill="black"')
+    expect(queryByText('Higgsfield')).not.toBeInTheDocument()
+  })
+
+  it('keeps Higgsfield compact marks as SVG assets', () => {
+    const { container, getByRole, queryByText } = renderWithTheme(<GreenhouseBrandLogoMark kind='higgsfieldOnGreen' />)
+
+    const mark = getByRole('img', { name: 'Higgsfield' })
+
+    expect(mark).toHaveAttribute('data-kind', 'higgsfieldOnGreen')
+    expect(mark).toHaveAttribute('data-variant', 'contained')
+    expect(container.querySelector('img')?.getAttribute('src')).toContain('/images/logos/axis/higgsfield-on-green.svg')
+    expect(queryByText('Higgsfield')).not.toBeInTheDocument()
+  })
+
+  it('maps the Magnific logotype specimen to a lockup SVG kind', () => {
+    const { container, getByRole, queryByText } = renderWithTheme(<GreenhouseBrandLogoMark kind='magnificLogotype' />)
+    const asset = readFileSync(join(process.cwd(), 'public/images/logos/axis/magnific-logotype.svg'), 'utf8')
+
+    const mark = getByRole('img', { name: 'Magnific' })
+
+    expect(mark).toHaveAttribute('data-kind', 'magnificLogotype')
+    expect(mark).toHaveAttribute('data-variant', 'lockup')
+    expect(container.querySelector('img')?.getAttribute('src')).toContain('/images/logos/axis/magnific-logotype.svg')
+    expect(asset).toContain('viewBox="0 0 267 44"')
+    expect(asset).toContain('fill="black"')
+    expect(queryByText('Magnific')).not.toBeInTheDocument()
+  })
+
+  it('keeps Magnific compact marks as SVG assets', () => {
+    const { container, getByRole, queryByText } = renderWithTheme(<GreenhouseBrandLogoMark kind='magnificOnBlack' />)
+
+    const mark = getByRole('img', { name: 'Magnific' })
+
+    expect(mark).toHaveAttribute('data-kind', 'magnificOnBlack')
+    expect(mark).toHaveAttribute('data-variant', 'contained')
+    expect(container.querySelector('img')?.getAttribute('src')).toContain('/images/logos/axis/magnific-on-black.svg')
+    expect(queryByText('Magnific')).not.toBeInTheDocument()
+  })
+
+  it('maps the ElevenLabs logotype specimen to a lockup SVG kind', () => {
+    const { container, getByRole, queryByText } = renderWithTheme(<GreenhouseBrandLogoMark kind='elevenLabsLogotype' />)
+    const asset = readFileSync(join(process.cwd(), 'public/images/logos/axis/elevenlabs-logotype.svg'), 'utf8')
+
+    const mark = getByRole('img', { name: 'ElevenLabs' })
+
+    expect(mark).toHaveAttribute('data-kind', 'elevenLabsLogotype')
+    expect(mark).toHaveAttribute('data-variant', 'lockup')
+    expect(container.querySelector('img')?.getAttribute('src')).toContain('/images/logos/axis/elevenlabs-logotype.svg')
+    expect(asset).toContain('viewBox="0 0 297 40"')
+    expect(asset).toContain('fill="black"')
+    expect(queryByText('ElevenLabs')).not.toBeInTheDocument()
+  })
+
+  it('keeps ElevenLabs compact marks as SVG assets', () => {
+    const { container, getByRole, queryByText } = renderWithTheme(<GreenhouseBrandLogoMark kind='elevenLabsOnBlack' />)
+
+    const mark = getByRole('img', { name: 'ElevenLabs' })
+
+    expect(mark).toHaveAttribute('data-kind', 'elevenLabsOnBlack')
+    expect(mark).toHaveAttribute('data-variant', 'contained')
+    expect(container.querySelector('img')?.getAttribute('src')).toContain('/images/logos/axis/elevenlabs-on-black.svg')
+    expect(queryByText('ElevenLabs')).not.toBeInTheDocument()
+  })
+
   it('resolves kind defaults through the controller', () => {
     expect(resolveGreenhouseBrandLogoKind('geminiOnNeutral')).toBe(GREENHOUSE_BRAND_LOGO_KIND_CONFIG.geminiOnNeutral)
     expect(resolveGreenhouseBrandLogoKind('adobeOnPink')).toBe(GREENHOUSE_BRAND_LOGO_KIND_CONFIG.adobeOnPink)
@@ -290,6 +387,15 @@ describe('GreenhouseBrandLogoMark', () => {
     expect(resolveGreenhouseBrandLogoKind('shutterstockOnPink')).toBe(
       GREENHOUSE_BRAND_LOGO_KIND_CONFIG.shutterstockOnPink
     )
+    expect(resolveGreenhouseBrandLogoKind('higgsfieldOnNeutral')).toBe(
+      GREENHOUSE_BRAND_LOGO_KIND_CONFIG.higgsfieldOnNeutral
+    )
+    expect(resolveGreenhouseBrandLogoKind('magnificOnNeutral')).toBe(
+      GREENHOUSE_BRAND_LOGO_KIND_CONFIG.magnificOnNeutral
+    )
+    expect(resolveGreenhouseBrandLogoKind('elevenLabsOnNeutral')).toBe(
+      GREENHOUSE_BRAND_LOGO_KIND_CONFIG.elevenLabsOnNeutral
+    )
     expect(resolveGreenhouseBrandLogoVariant({ kind: 'geminiIsotype' })).toBe('isotype')
     expect(resolveGreenhouseBrandLogoVariant({ kind: 'adobeOnRed' })).toBe('contained')
     expect(resolveGreenhouseBrandLogoVariant({ kind: 'expressOnBlack' })).toBe('contained')
@@ -301,6 +407,9 @@ describe('GreenhouseBrandLogoMark', () => {
     expect(resolveGreenhouseBrandLogoVariant({ kind: 'afterEffectsOnDarkPurple' })).toBe('contained')
     expect(resolveGreenhouseBrandLogoVariant({ kind: 'envatoOnGreen' })).toBe('contained')
     expect(resolveGreenhouseBrandLogoVariant({ kind: 'shutterstockOnRed' })).toBe('contained')
+    expect(resolveGreenhouseBrandLogoVariant({ kind: 'higgsfieldOnGreen' })).toBe('contained')
+    expect(resolveGreenhouseBrandLogoVariant({ kind: 'magnificOnBlack' })).toBe('contained')
+    expect(resolveGreenhouseBrandLogoVariant({ kind: 'elevenLabsOnBlack' })).toBe('contained')
     expect(resolveGreenhouseBrandLogoVariant({ kind: 'geminiIsotype', variant: 'lockup' })).toBe('lockup')
   })
 })

@@ -16,7 +16,7 @@
 
 La primitive gobierna tamaño, a11y, `data-capture`, `kind -> variant`, placement y asset selection. No reinterpreta colores de marca como tokens semánticos Greenhouse; los colores de logos externos viven dentro del asset o en `GREENHOUSE_BRAND_LOGO_ASSET_COLORS` como constantes de marca de terceros. Cada `kind` debe estar respaldado por un asset real; la primitive no dibuja isotipos ni wordmarks con SVG inline, MUI Typography ni texto local.
 
-Antes de importar una familia nueva o corregir un asset existente, cargar el [runbook de importación](./BRAND_LOGO_IMPORT_RUNBOOK.md). Ahí viven los errores ya encontrados con Gemini, Adobe Express, Adobe, Firefly, Photoshop, Illustrator, After Effects, Premiere y Envato, además del checklist de verificación para futuras sesiones de Codex/Claude.
+Antes de importar una familia nueva o corregir un asset existente, cargar el [runbook de importación](./BRAND_LOGO_IMPORT_RUNBOOK.md). Ahí viven los errores ya encontrados con Gemini, Adobe Express, Adobe, Firefly, Photoshop, Illustrator, After Effects, Premiere, Envato, Shutterstock, Higgsfield, Magnific y ElevenLabs, además del checklist de verificación para futuras sesiones de Codex/Claude.
 
 ## Figma Source
 
@@ -32,6 +32,9 @@ Antes de importar una familia nueva o corregir un asset existente, cargar el [ru
 | Adobe After Effects | `12271:506` | `afterEffectsIsotype`, `afterEffectsOnDarkPurple`, `afterEffectsOnNeutral`, `afterEffectsOnLightPurple`, `afterEffectsLogotype` |
 | Envato              |  `12274:35` | `envatoIsotype`, `envatoOnGreen`, `envatoOnNeutral`, `envatoOnLightGreen`, `envatoLogotype`                                     |
 | Shutterstock        |  `12274:62` | `shutterstockIsotype`, `shutterstockOnNeutral`, `shutterstockOnRed`, `shutterstockOnPink`, `shutterstockLogotype`               |
+| Higgsfield          |  `12274:98` | `higgsfieldIsotype`, `higgsfieldOnGreen`, `higgsfieldOnNeutral`, `higgsfieldLogotype`                                           |
+| Magnific            |  `12274:16` | `magnificIsotype`, `magnificOnBlack`, `magnificOnNeutral`, `magnificLogotype`                                                    |
+| ElevenLabs          |  `12274:74` | `elevenLabsIsotype`, `elevenLabsOnBlack`, `elevenLabsOnNeutral`, `elevenLabsLogotype`                                           |
 
 Figma no expuso variables en estos nodos y Code Connect quedó bloqueado por seat/plan. La implementación toma Figma como intención visual y conserva el contrato runtime en la primitive.
 
@@ -52,12 +55,16 @@ Correcciones conocidas del primer port:
 - `geminiIsotype` debe ser el isotipo cromático independiente de Figma; el lockup completo vive separado en `geminiLogotype`.
 - `geminiLogotype` debe usar `gemini-logotype.svg`; no texto MUI ni `theme.typography`.
 - El wordmark dentro de `geminiLogotype` debe mantenerse en negro real y con viewBox suficientemente holgado para no cortar la última `i`.
+- El cromatismo Gemini debe venir del export Figma por capas/máscaras (`#5495FB`, `#24B970`, `#F94544`, `#F5BB19`), no de un `linearGradient` manual simplificado.
 - `expressIsotype`, `expressOnNeutral` y `expressLogotype` usan textura cromática exportada desde Figma recortada por máscara vectorial. No reemplazar por un `linearGradient` manual: cambia los colores de marca.
 - `expressFullColorOnBlack` es el isotipo cromático completo dentro del círculo negro de marca. No reemplazarlo por `expressOnBlack`: ese kind mantiene el A blanco sobre negro.
 - `expressLogotype` debe permanecer como SVG de lockup completo. El wordmark `Adobe Express` viene del asset vectorial, no de texto local del portal.
 - `premiereLogotype` usa SVG local compuesto desde los sub-vectores Figma del lockup; no debe reconstruirse con texto local. El asset corrige el cierre de marca a `Adobe Premiere` con glifo vectorial reutilizado del mismo SVG.
 - `envatoLogotype` usa SVG local compuesto desde sub-vectores Figma del lockup. El wordmark `envato` viene del asset vectorial, no de texto local ni tipografía del portal.
 - `shutterstockLogotype` usa SVG local exportado desde Figma. El wordmark `shutterstock` viene del asset vectorial, no de texto local ni tipografía del portal.
+- `higgsfieldLogotype` usa SVG local exportado desde Figma. El wordmark `Higgsfield` viene del asset vectorial, no de texto local ni tipografía del portal.
+- `magnificLogotype` usa SVG local exportado desde Figma. El wordmark `Magnific` viene del asset vectorial, no de texto local ni tipografía del portal.
+- `elevenLabsLogotype` usa SVG local exportado desde Figma. El wordmark `ElevenLabs` viene del asset vectorial, no de texto local ni tipografía del portal.
 - Los lockups Adobe Firefly, Photoshop, Illustrator y After Effects permanecen PNG porque el MCP los entregó como subnodos compuestos sin SVG raíz único.
 
 ## Lab Contract
