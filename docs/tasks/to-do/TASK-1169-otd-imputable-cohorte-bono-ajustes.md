@@ -63,6 +63,9 @@ Reglas obligatorias:
 
 - **NUNCA** esta task cambia un número que el bono lee. Todo en shadow / flag OFF. El flip es TASK-1170.
 - **NUNCA** reconciliar leyendo el shadow crudo como si fuera el OTD mensual (error fuente 2026-06-19): aplicar dedup + período + atribución alineados al path BQ del bono.
+- **SIEMPRE harness auto-validante (anti-repetición del error 2026-06-19):** la reconciliación DEBE primero **reproducir el OTD legacy** por colaborador-mes y matchear `metrics_by_member` (baseline conocido-bueno) ANTES de confiar el número corregido. Si la reconstrucción del legacy no matchea, el harness está mal → abortar, no reportar. Es el contrato eval-driven del repo (baseline + regresión).
+- **SIEMPRE degradación honesta:** donde falte data o no sea comparable, retornar `null` + `dataStatus`, **NUNCA 0** ni vacío (regla ICO "honest degradation always"; el 0% del 2026-06-19 fue exactamente esta violación).
+- **SIEMPRE reusar el materializador/patrón ICO canónico** (`runIcoMaterializerCycle` / shape `metrics_by_member`; patrón `calculateCycleTime` = helper-TS-SSOT + mirror + paridad). **NUNCA** inventar una tabla mensual paralela que duplique `metrics_by_member` (viola SSOT).
 - **NUNCA** `Sentry.captureException` directo — `captureWithDomain(err, 'delivery'|'integrations.notion', ...)`.
 - **SIEMPRE** comparar contra la cohorte real del bono (`metrics_by_member` / `v_tasks_enriched`), no contra el snapshot event-driven de PG.
 
@@ -184,7 +187,7 @@ Decidir cómo producir la corrección de freeze sobre la **cohorte mensual/por-c
 - **A (round-trip Notion vía TASK-927):** escribir el bucket corregido a `[GH] OTD` → sync → BQ (ya atribuido + mensual). Resuelve cohorte + atribución de un golpe; costo: round-trip + dependencia de TASK-927 + slice de ingestión en el sync.
 - **B″ (PG mensual nuevo):** materialización mensual de completadas con corrección + atribución en PG. Evita el round-trip; duplica lo que BQ ya hace.
 
-Entrega: ADR chico con la decisión + score 5-pilar.
+**Recomendación de la revisión arquitectónica (a confirmar en Slice 0):** **B′ implementada como helper TS canónico que materializa una tabla/columna mensual member-atribuida corregida** (patrón `calculateCycleTime`: helper TS = SSOT + mirror + test de paridad + signal), **NO** como CASE en BQ (M2 ya lo rechazó por inmantenible). **A** queda como fallback (mete Notion en el camino del bono = acoplamiento frágil + latencia; solo si la atribución no se pudiera hacer PG/BQ-side, que sí se puede). **B″** rechazada como default (duplicaría `metrics_by_member` → viola SSOT). Entrega: ADR chico con la decisión + score 5-pilar.
 
 ### Slice 1 — Materialización corregida alineada a cohorte (shadow, flag OFF)
 
@@ -194,9 +197,9 @@ Implementar la ruta elegida: el bucket corregido disponible **por colaborador-me
 
 Reader/script read-only que compara, por colaborador-mes, el OTD legacy (`metrics_by_member`) vs el OTD corregido (Slice 1), con **dedup por tarea + scoping de período + atribución `primary_owner_member_id`**. Entrega el blast radius real (cuántos colaboradores mueven, cuánto, quién cruza umbral de bono).
 
-### Slice 3 — Signal de paridad member-month + reloj ≥30d
+### Slice 3 — Signal de paridad member-month (detector upstream) + reloj ≥30d
 
-Signal que mide la divergencia legacy↔corregido a nivel member-month (no por-tarea). Inicia el conteo de ≥30 días verdes sobre data comparable (prerequisito del cutover en TASK-1170).
+Signal canónico a nivel **member-month** (no por-tarea) que mide: (a) la divergencia legacy↔corregido y (b) la **comparabilidad de cohorte** — que la población del corregido matchee la del bono. El bug class de 2026-06-19 (shadow ≠ cohorte del bono) se encontró a mano; debe tener signal antes de que lo encuentre una UI/decisión rota (regla ICO "reliability signal upstream"). Inicia el conteo de ≥30 días verdes sobre data comparable (prerequisito del cutover en TASK-1170).
 
 ### Slice 4 — Propagar docs
 
@@ -216,6 +219,18 @@ Ver §Why + §Scope. El corazón es Slice 0 (decisión B′/A/B″) y Slice 2 (r
 - Bono: `metrics_by_member` (BQ), cohorte `due_date` en período, atribución `primary_owner_member_id`, denominador `on_time+late_drop+overdue` (excluye carry_over).
 - M2 shadow: PG, por-tarea, estado-actual, sin mes/miembro, solo tareas que transicionan con flag ON, clasificado por `now()` vs fecha justa.
 - Mismatch confirmado: OTD shadow 0-50% vs OTD bono 66-100% (mismos colaboradores) → cohortes distintas.
+
+## Revisión arquitectónica (skills `greenhouse-ico` + `arch-architect`, 2026-06-19)
+
+Revisión profunda contra los contratos canónicos. Decisión recomendada: **ruta B′ como helper TS canónico** (ver §Scope Slice 0). Scoring 5-pilar (ICO) / 4-pilar (arch):
+
+- **Safety:** flag OFF + shadow → no toca el bono. El riesgo real NO es el flip (no ocurre acá) sino **medir mal** (ya pasó el 2026-06-19) → mitigado por el harness auto-validante (reproducir legacy antes de confiar el corregido) + degradación honesta.
+- **Robustness:** dedup por tarea + scoping de período + atribución `primary_owner_member_id` alineados al path del bono; partición disjunta freeze/fecha-justa (anti-doble-descuento); `null`+`dataStatus` donde no compare (nunca 0).
+- **Resilience:** signal member-month como **detector upstream** del bug class de cohorte (hoy hallado a mano); reconciliación reproducible desde snapshot.
+- **Scalability:** reusar el materializador ICO (`runIcoMaterializerCycle`, MERGE + freshness) → absorbe N colaboradores/meses sin rediseño; sin tabla paralela (SSOT).
+- **Auditability (ICO):** cada bucket corregido trazable a su fecha justa + motivo, y la reconciliación reproducible desde snapshot — sin esto no es evidencia válida para el cutover (TASK-1170).
+
+Patrones canónicos reusados: VIEW/helper/signal canónico · helper-TS-SSOT + mirror BQ + test de paridad (`calculateCycleTime`) · eval-driven (baseline legacy + regresión) · honest degradation · reliability-signal-upstream. Anti-patrón evitado: tabla paralela que duplique `metrics_by_member`.
 
 ## Rollout Plan & Risk Matrix
 
@@ -261,9 +276,10 @@ N/A productivo (shadow). La verificación es la reconciliación member-level rea
 ## Acceptance Criteria
 
 - [ ] ADR chico Slice 0 con la decisión B′/A/B″ + score 5-pilar.
-- [ ] Corrección freeze-ON disponible por colaborador-mes, misma cohorte que el bono, en shadow (flag OFF).
-- [ ] Reconciliación member-level confiable (dedup + período + atribución) con blast radius por colaborador-mes.
-- [ ] Signal de paridad member-month wired; reloj ≥30d iniciado sobre data comparable.
+- [ ] Corrección freeze-ON disponible por colaborador-mes, misma cohorte que el bono, en shadow (flag OFF), reusando el patrón del materializador ICO (sin tabla paralela).
+- [ ] **Harness auto-validante:** la reconciliación reproduce el OTD legacy y matchea `metrics_by_member` por colaborador-mes (baseline) ANTES de reportar el corregido. Documentado el match.
+- [ ] Reconciliación member-level confiable (dedup + período + atribución) con blast radius por colaborador-mes; degradación honesta (null+dataStatus, nunca 0 donde no compare).
+- [ ] Signal member-month (divergencia + comparabilidad de cohorte) wired como detector upstream; reloj ≥30d iniciado sobre data comparable.
 - [ ] ADR §16 + `ATTRIBUTABLE_LATENESS_V1.md` actualizados con el hallazgo de cohorte.
 - [ ] Verificado: nada de esta task altera `otd_pct` ni el bono.
 - [ ] `pnpm test` (focales) + `pnpm build` verdes.
