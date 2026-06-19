@@ -184,8 +184,12 @@ export const buildMergeSql = (
   // queda byte-idéntico. Aplica a los 5 rollups (cierra el mismo bug latente para
   // un colaborador nuevo en metrics_by_member). Self-healing: el próximo run inserta
   // la entidad faltante sin backfill ad-hoc.
+  // Correlación calificada con el alias `grp` de la subquery agrupada externa.
+  // Sin calificar (`cov.<col> = <col>`), BigQuery resuelve el RHS a la tabla
+  // INTERNA `cov` (que también tiene esa columna) → `cov.x = cov.x` siempre true
+  // → NOT EXISTS siempre false → coverage-gap no-op. Bug class de correlación SQL.
   const coverageGapConditionsSql = cfg.keyColumns
-    .map(col => `cov.${col} = ${col}`)
+    .map(col => `cov.${col} = grp.${col}`)
     .join('\n            AND ')
 
   const deltaFilterSql = hasDeltaFilter
@@ -219,7 +223,7 @@ export const buildMergeSql = (
         FROM ${buildDeliveryPeriodSourceSql(projectId)} te
         WHERE ${cfg.whereClauseSql}
         GROUP BY ${cfg.groupBySql}
-      )
+      ) AS grp
       ${deltaFilterSql}
       QUALIFY ROW_NUMBER() OVER (
         PARTITION BY ${cfg.partitionBySql}

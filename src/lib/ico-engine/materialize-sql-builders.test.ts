@@ -133,25 +133,27 @@ describe('buildMergeSql', () => {
     // al source igual (se inserta vía WHEN NOT MATCHED) → no más exclusión silenciosa.
     expect(sql).toContain('OR NOT EXISTS')
     expect(sql).toContain('FROM `efeonce-test.ico_engine.metrics_by_member` cov')
-    expect(sql).toContain('cov.member_id = member_id')
+    // Correlación CALIFICADA con el alias `grp` de la subquery externa — sin
+    // calificar, BQ resuelve el RHS a la tabla interna cov → no-op (bug class).
+    expect(sql).toContain('cov.member_id = grp.member_id')
     expect(sql).toContain('cov.period_year = @periodYear')
     expect(sql).toContain('cov.period_month = @periodMonth')
+    // La subquery agrupada externa debe estar aliaseada como grp para la correlación.
+    expect(sql).toContain(') AS grp')
   })
 
   it('MERGE con delta + key compuesto correlaciona TODAS las keys en coverage-gap (project)', () => {
     const sql = buildMergeSql(PROJECT_CFG, FAKE_PROJECT, true)
 
-    expect(sql).toContain('cov.project_source_id = project_source_id')
-    expect(sql).toContain('cov.space_id = space_id')
+    expect(sql).toContain('cov.project_source_id = grp.project_source_id')
+    expect(sql).toContain('cov.space_id = grp.space_id')
   })
 
   it('MERGE sin delta NO incluye coverage-gap (path full-period byte-idéntico)', () => {
     const sql = buildMergeSql(MEMBER_CFG, FAKE_PROJECT, false)
 
-    // El coverage-gap (correlación cov.<key>) solo existe en el path delta.
-    // (El NOT EXISTS genérico de buildDeliveryPeriodSourceSql — fallback de
-    // snapshots — sí está siempre, por eso chequeamos el marcador específico.)
-    expect(sql).not.toContain('cov.member_id = member_id')
+    // El coverage-gap (correlación cov.<key> = grp.<key>) solo existe en el path delta.
+    expect(sql).not.toContain('cov.member_id = grp.member_id')
     expect(sql).not.toContain('cov.period_year = @periodYear')
   })
 
