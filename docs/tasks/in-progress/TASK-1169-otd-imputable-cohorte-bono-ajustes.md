@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -172,6 +172,20 @@ Reglas obligatorias:
 - [ ] Nada de esta task altera el bono (verificado: flag OFF / shadow).
 
 <!-- ZONE 2 — PLAN MODE: lo llena el agente que tome la task -->
+
+## Plan (2026-06-19, ejecución develop local-first)
+
+**Slice 0 — DONE.** ADR chico = `GREENHOUSE_ATTRIBUTABLE_LATENESS_V1` §16.10: decisión **B′-PG** (helper TS SSOT + tabla shadow PG enfocada member×month, reusa patrón ICO, sin round-trip Notion) + score 5-pilar + hallazgo de cohorte que invalida "M3 = solo flip". Delta también en `metrics/ATTRIBUTABLE_LATENESS_V1.md`. Confirmado por CEO (AskUserQuestion 2026-06-19).
+
+**Slice 1** — migration additive `greenhouse_delivery.otd_attributable_member_month_shadow` (PK member_id+period+workspace; otd legacy-reproducido + corregido + counts + data_status) + helper TS agregador (cohorte del bono desde PG, freeze-OFF legacy via `classifyOtdBucket` + freeze-ON corregido via `calculateAttributableLateness`, atribución `assignee_member_id`, dedup por tarea) + materializer idempotente (UPSERT). Flag OFF.
+
+**Slice 2** — reconciliación member-level read-only con harness auto-validante: lee `metrics_by_member` (BQ, baseline) + reproduce legacy desde Slice 1, exige match por colaborador-mes ANTES de reportar corregido; degradación honesta (null+dataStatus). Script `scripts/`.
+
+**Slice 3** — reliability signal member-month (divergencia legacy↔corregido + comparabilidad de cohorte), wire 5 touchpoints en `get-reliability-overview.ts`, inicia reloj ≥30d.
+
+**Slice 4** — docs Delta (ADR §16 + metric spec ya hechos en Slice 0; cross-ref TASK-1170) + closing protocol.
+
+Regla dura transversal: nada toca el bono (shadow / flag OFF). El flip es TASK-1170.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 3 — EXECUTION SPEC

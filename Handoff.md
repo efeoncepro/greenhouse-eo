@@ -32362,3 +32362,13 @@ Trabajo directo en `develop` por instrucción del operador (sin branch). P3, dom
 **Validación**: `pnpm exec tsc --noEmit` exit 0 · `pnpm exec vitest run src/lib/finance/pdf src/lib/contractor-engagements/remittance` 68/68 · eslint OK archivos tocados · render real comprobante before/after sin regresión.
 
 **Estado**: task **in-progress** — foundation (adapter) + proof consumer entregados; migración de PDFs densos/legales remanente. **TASK-1040 Slice 2** ya tiene consumidor canónico de sus familias 600/800 vía `pdfFamilyName` (su cierre formal puede hacerse ahora). Pendiente decisión del operador: ¿continúo Slice 3 (loop real-case) o se trackea aparte?
+
+---
+
+## TASK-1169 — OTD imputable alineado a cohorte del bono (in-progress, develop local-first)
+
+**Rama**: develop (local-first, sin push). **Objetivo**: producir la corrección de freeze (M2) sobre la cohorte member×month del bono, reconciliar honestamente y dejar signal + reloj ≥30d. **Todo shadow / flag OFF — NUNCA toca el bono** (el cutover es TASK-1170).
+
+**Slice 0 DONE (2026-06-19)**: decisión arquitectónica **B′-PG** confirmada por CEO. ADR chico = `GREENHOUSE_ATTRIBUTABLE_LATENESS_V1` §16.10 (hallazgo de cohorte que invalida "M3 = solo flip" + score 5-pilar + hard rules) + Delta en `metrics/ATTRIBUTABLE_LATENESS_V1.md`. Helper TS SSOT + tabla shadow PG enfocada member×month, reusa patrón ICO, sin round-trip Notion.
+
+**Pendiente**: Slice 1 (migration + helper agregador + materializer) · Slice 2 (reconciliación auto-validante) · Slice 3 (signal member-month + reloj) · Slice 4 (cierre).

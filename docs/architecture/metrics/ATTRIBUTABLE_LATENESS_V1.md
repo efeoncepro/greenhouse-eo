@@ -82,6 +82,10 @@ Shadow V1: `task_attributable_lateness_shadow` (PG), flag `ATTRIBUTABLE_LATENESS
 
 Helper + classifyOtdBucket reason-aware (applyMonthGate) + shadow table + consumer reactivo + 2 signals. Flag OFF. Reusa el patrón RpA V2 (helper + snapshot + consumer) en vez de mirror BQ (freeze demasiado complejo para paridad SQL mantenible).
 
+### 2026-06-19 — Delta cohorte (TASK-1169, shadow / flag OFF)
+
+El shadow V1 es **por-tarea / estado-actual / sin mes ni miembro** (PK `task_source_id`); el bono OTD lee **member×month** (BQ `metrics_by_member`, cohorte `due_date` en período, atribución `primary_owner_member_id`, denominador `on_time+late_drop+overdue` excl `carry_over`). **No son comparables**: leer el shadow crudo como OTD mensual da 0-50% vs el bono 66-100% para los mismos colaboradores (cohorte distinta, no divergencia del freeze). TASK-1169 produce la corrección de freeze sobre la cohorte member×month del bono en una tabla shadow **enfocada** PG (`otd_attributable_member_month_shadow`: solo OTD legacy-reproducido + corregido + counts, **no** duplica `metrics_by_member`), con **harness auto-validante** (reproduce el legacy y matchea `metrics_by_member` antes de confiar el corregido) + signal member-month. Decisión **B′-PG** (ADR `GREENHOUSE_ATTRIBUTABLE_LATENESS_V1` §16.10). **Nada de esto toca el bono** — el cutover es TASK-1170.
+
 ## 11. Cross-refs
 
 ADR `GREENHOUSE_ATTRIBUTABLE_LATENESS_V1` · OTD_V1 (Delta bucket reason-aware) · CYCLE_TIME_V1 §4.1 · RPA_V1 (patrón writeback) · TASK-921/908/912/923.

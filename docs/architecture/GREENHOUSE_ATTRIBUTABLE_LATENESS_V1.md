@@ -301,3 +301,34 @@ M2 cerró en `develop` (directo, sin branch, override operador). El cómputo de 
 **Verificación**: 53 tests focales nuevos (helper 16 + classify +5 + consumer 11 + … ) + lint + tsc verdes; signals verificados live contra PG (steady 0). NO toca el bono (shadow).
 
 **Camino restante para cerrar ISSUE-081**: M3 (cutover bono) — task futura gated (8 stop-gates + sign-off HR + ≥30d shadow verde + activación de captura M0/M1). Para que el shadow acumule datos: el operador activa `NOTION_DUE_DATE_CAPTURE_ENABLED` (M0) + `ATTRIBUTABLE_LATENESS_OTD_ENABLED` (M2).
+
+### 16.10 Delta 2026-06-19 — Hallazgo de cohorte + decisión B′-PG (TASK-1169, ADR chico Slice 0)
+
+**El supuesto de §16.2 ("M3 = solo flip de fuente `otd_pct` → columna GH") quedó invalidado** por el discovery profundo 2026-06-19 (verificado contra código + data real). M2 (`task_attributable_lateness_shadow`) vive **por-tarea / estado-actual / sin columna de mes ni de colaborador** (PK `task_source_id`), poblado solo cuando una tarea transiciona con flag ON. El bono, en cambio, lee **member×month** desde BQ `metrics_by_member` (cohorte = `due_date` en período vía `REPORT_PERIOD_SCOPE_SQL`, atribución `primary_owner_member_id` = `assignee_member_id`, denominador `on_time+late_drop+overdue` excl `carry_over`). **Son universos distintos: el shadow crudo NO es comparable como OTD mensual.** Evidencia: la reconciliación member-level ad-hoc del 2026-06-19 leyó el shadow crudo y dio OTD 0-50% mientras producción daba 66-100% para los mismos colaboradores — no por divergencia del freeze sino por **cohorte distinta** (violación además de "honest degradation": el 0% era data faltante, no "todas fallaron").
+
+Por eso M3 NO es un flip simple: **falta producir la corrección de freeze sobre la MISMA cohorte member×month del bono y reconciliarla honestamente** antes de cualquier cutover. Ese trabajo (shadow / flag OFF, **nunca toca el bono**) es **TASK-1169**; el cutover productivo (toca nómina) es **TASK-1170**.
+
+**Decisión (Slice 0, `arch-architect` + `greenhouse-ico` + confirmación CEO 2026-06-19): ruta B′-PG.**
+
+- **B′-PG (elegida):** un **helper TS canónico** (reusa `calculateAttributableLateness` como SSOT del freeze) agrega la corrección a una tabla shadow **enfocada** member×month en PG, sobre la cohorte del bono, junto al M2 shadow que ya vive en PG. Materializa **solo el OTD corregido + sus counts** (legacy-reproducido y corregido) — **NO** duplica las 22 métricas de `metrics_by_member` (respeta SSOT). Reusa el **patrón** ICO (helper-TS-SSOT + materializer idempotente + parity test + reliability signal), **NO** `runIcoMaterializerCycle` literal (ese es BQ; los inputs del freeze son PG-native). Sin round-trip Notion. Migración additive PG.
+- **B′-BQ (rechazada):** el freeze multi-ciclo no es un CASE BQ mantenible (ya rechazado por M2, §16.9). Empujar buckets corregidos por-tarea a BQ + agregar ahí = side-table + sync extra para cero beneficio en shadow.
+- **A / round-trip Notion vía TASK-927 (fallback, no default):** acopla Notion al camino del bono + dependencia TASK-927 + slice de ingestión `[GH] OTD`→BQ no construido. La atribución ya es PG-native (`assignee_member_id`), así que el round-trip no aporta.
+- **B″ / tabla PG mensual full (rechazada):** duplicaría `metrics_by_member` → viola SSOT.
+
+**Score 5-pilar ICO:**
+
+- **Safety:** flag OFF + shadow → no toca el bono (el flip es TASK-1170). El riesgo real NO es el flip sino **medir mal** (ya pasó 2026-06-19) → mitigado por el **harness auto-validante** (reproducir el OTD legacy por colaborador-mes y matchear `metrics_by_member` como baseline conocido-bueno **ANTES** de confiar el corregido; si no matchea, el harness está mal → abortar, no reportar) + degradación honesta (`null`+`dataStatus`, nunca 0).
+- **Robustness:** dedup por tarea + scoping de período + atribución `primary_owner_member_id` alineados al path del bono; partición disjunta freeze/fecha-justa (anti-doble-descuento, §5); `null`+`dataStatus` donde no compare.
+- **Resilience:** signal **member-month** como detector upstream del bug class de cohorte (hoy hallado a mano); materialización idempotente (UPSERT por clave canónica) reproducible desde inputs.
+- **Scalability:** reusa el patrón del materializador ICO (idempotente, additive) → absorbe N colaboradores/meses sin rediseño; sin tabla paralela que duplique `metrics_by_member` (SSOT).
+- **Auditability (ICO):** cada bucket corregido trazable a su `fair_deadline` + motivo (vía M2 helper) y la reconciliación reproducible — sin esto no hay evidencia válida para el cutover (TASK-1170).
+
+**Hard rules (TASK-1169):**
+
+- **NUNCA** esta task cambia un número que el bono lee (todo shadow / flag OFF; el flip es TASK-1170).
+- **NUNCA** reconciliar leyendo el shadow crudo como OTD mensual (error fuente 2026-06-19): aplicar dedup + período + atribución alineados al path BQ del bono.
+- **SIEMPRE** el harness reproduce el legacy y matchea `metrics_by_member` antes de confiar el corregido.
+- **SIEMPRE** degradación honesta (`null`+`dataStatus`, nunca 0 donde no compare).
+- **NUNCA** inventar una tabla mensual paralela que duplique `metrics_by_member` (la tabla shadow es enfocada: solo OTD corregido + counts).
+
+**Bloquea:** TASK-1170 (cutover bono). **No impacta:** bono ni `otd_pct` (shadow / flag OFF).
