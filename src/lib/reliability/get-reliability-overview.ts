@@ -106,7 +106,8 @@ import {
 } from './queries/reschedule-signals'
 import {
   getAttributableLatenessShadowParidadSignal,
-  getAttributableLatenessOverlapSignal
+  getAttributableLatenessOverlapSignal,
+  getAttributableLatenessTerminalOpenSignal
 } from './queries/attributable-lateness-signals'
 import {
   getNotionMetricsWritebackDeadLetterSignal,
@@ -2098,7 +2099,8 @@ export const getReliabilityOverview = async (
       ? preloadedSources.attributableLateness
       : await Promise.all([
           getAttributableLatenessShadowParidadSignal().catch(() => null),
-          getAttributableLatenessOverlapSignal().catch(() => null)
+          getAttributableLatenessOverlapSignal().catch(() => null),
+          getAttributableLatenessTerminalOpenSignal().catch(() => null)
         ])
           .then(signals => signals.filter((s): s is NonNullable<typeof s> => s !== null))
           .catch(() => null)
