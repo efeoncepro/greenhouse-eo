@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -22,9 +22,19 @@
 - Legacy ID: `none`
 - GitHub Issue: `optional`
 
+## Delta 2026-06-19 — Slice 1 implementado + recalibración de root cause (Discovery verificado)
+
+**Corrección del root cause** (la spec asumía mal): `metrics_by_organization` **NO está hardcodeado a `{efeonce, sky}`** — es data-driven (`whereClause client_id IS NOT NULL`, GROUP BY client_id). El hardcode efeonce/sky existe **solo** en el **reporte de agencia** (`performance_report_monthly`, `materialize.ts:798`) — eso queda para Slice 2. La causa real de la ausencia de Berel en `metrics_by_organization`: el materializador corre **MERGE + incremental-delta** y el delta filter (`entity_last_edited >= deltaCutoff`) **excluye a una entidad nunca-materializada** (cliente nuevo cuya última edición quedó detrás del cutoff que avanza cada noche); como el MERGE no tiene WHEN NOT MATCHED BY SOURCE (correcto), tampoco hay nada que la inserte → exclusión **silenciosa y permanente**. Verificado contra BQ real: el SOURCE produce 3 clientes (Berel incluido), pero el rollup emite `rows_merged=2`.
+
+**Slice 1 implementado (local-first, sin push):**
+- **Fix de causa raíz (aditivo)** en `buildMergeSql` (`materialize-sql-builders.ts`): el delta source incluye también entidades **ausentes del target** para el período (`OR NOT EXISTS (cov …)`) → se insertan vía WHEN NOT MATCHED. Estrictamente aditivo (solo agrega la entidad que el bug saltaba; full-period byte-idéntico; ya-materializadas sin edición reciente preservadas). Aplica a los 5 rollups → cierra el mismo bug latente para un colaborador nuevo en `metrics_by_member`. **Self-healing**: el próximo run inserta a Berel, sin backfill ad-hoc. 27/27 tests verdes + validado contra BQ real (TASK-893): con cutoff que excluiría a Berel, el coverage-gap lo rescata (`entra_con_fix=true`).
+- **Reliability signal** `delivery.ico.client_absent_from_org_rollup` (`ico-organization-rollup-coverage.ts`, kind `data_quality`, moduleKey `delivery`, steady=0) — defense-in-depth anti-exclusión-silenciosa. Verificado contra PG real: hoy detecta a Berel (`absent_count=1`); tras el fix → `ok`.
+
+**Pendiente:** Slice 2 (agency report data-driven), Slice 3 (capability+endpoint gobernado Nexa-operable), Slice 4 (preflight/lifecycle a ICO), Slice 5 (UI). Rollout: deploy del fix → próximo run del materializador inserta a Berel → la proyección PG sincroniza → signal a `ok`.
+
 ## Summary
 
-Hacer que **cualquier cliente — nuevo o existente — quede ICO-completo automáticamente**, sin parche por-cliente, resoluble por **API o UI** (Full API Parity). Hoy el rollup de cliente `metrics_by_organization` (y el reporte de agencia + CVR) está **hardcodeado a `{efeonce, sky}`** y excluye **silenciosamente** a todo otro cliente, aunque su data llegue sana hasta el snapshot. Además, el wizard deja `sync_enabled=FALSE` sin una vía gobernada para prenderlo, y el lifecycle/preflight de onboarding **no verifica que ICO calcule** (para en la capa portal).
+Hacer que **cualquier cliente — nuevo o existente — quede ICO-completo automáticamente**, sin parche por-cliente, resoluble por **API o UI** (Full API Parity). El rollup de cliente `metrics_by_organization` excluía **silenciosamente** a clientes nuevos por el coverage-gap del incremental-delta (ver Delta 2026-06-19; **NO** era hardcode — eso es solo el reporte de agencia). Además, el wizard deja `sync_enabled=FALSE` sin una vía gobernada para prenderlo, y el lifecycle/preflight de onboarding **no verifica que ICO calcule** (para en la capa portal).
 
 Esta task: (1) vuelve **data-driven** el rollup de cliente + reporte de agencia (sin allowlist), (2) agrega un **reliability signal** anti-exclusión-silenciosa, (3) expone una **capability + endpoint (+ affordance UI)** gobernada para habilitar el sync de un cliente, (4) extiende el **preflight/lifecycle** con "ICO calculando" (configurado ≠ fluyendo), y (5) hace **backfill data-driven** de clientes ya onboardeados (Berel). NO toca el bono (ya incluye a todos los clientes por colaborador — verificado).
 

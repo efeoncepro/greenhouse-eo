@@ -170,8 +170,33 @@ export const buildMergeSql = (
   const insertColumnsSql = allColumns.join(', ')
   const insertValuesSql = allColumns.map(col => `s.${col}`).join(', ')
 
+  // TASK-1171 — coverage-gap guard. El delta filter (`entity_last_edited >=
+  // @deltaCutoff`) optimiza re-materializando solo entidades editadas tras el
+  // último run. PERO una entidad NUNCA-materializada (cliente/colaborador nuevo)
+  // cuya última edición quedó detrás del cutoff que avanza cada noche jamás entra
+  // al MERGE source → como el MERGE no tiene WHEN NOT MATCHED BY SOURCE (correcto),
+  // tampoco hay nada que la inserte → exclusión SILENCIOSA y permanente del rollup
+  // (caso Grupo Berel 2026-06-19: presente en el source con 84 tareas, ausente de
+  // metrics_by_organization). Fix estrictamente ADITIVO: incluir también las
+  // entidades ausentes del target para el período (NOT EXISTS) → se insertan vía
+  // WHEN NOT MATCHED. Las ya-materializadas sin edición reciente siguen preservadas
+  // (no entran al source, el MERGE no las borra). El path full-period (delta off)
+  // queda byte-idéntico. Aplica a los 5 rollups (cierra el mismo bug latente para
+  // un colaborador nuevo en metrics_by_member). Self-healing: el próximo run inserta
+  // la entidad faltante sin backfill ad-hoc.
+  const coverageGapConditionsSql = cfg.keyColumns
+    .map(col => `cov.${col} = ${col}`)
+    .join('\n            AND ')
+
   const deltaFilterSql = hasDeltaFilter
-    ? `WHERE entity_last_edited >= TIMESTAMP(@deltaCutoff)`
+    ? `WHERE entity_last_edited >= TIMESTAMP(@deltaCutoff)
+        OR NOT EXISTS (
+          SELECT 1
+          FROM \`${projectId}.${ICO_DATASET}.${cfg.tableName}\` cov
+          WHERE ${coverageGapConditionsSql}
+            AND cov.period_year = @periodYear
+            AND cov.period_month = @periodMonth
+        )`
     : ''
 
   return `

@@ -116,6 +116,7 @@ import {
   getNotionMetricsFtrWritebackLagSignal
 } from './queries/notion-metrics-ftr-signals'
 import { getIdentityNotionBridgeCoverageSignal } from './queries/identity-notion-bridge-coverage'
+import { getIcoOrganizationRollupCoverageSignal } from './queries/ico-organization-rollup-coverage'
 import { getIdentitySessionRouteGroupDriftSignal } from './queries/identity-session-route-group-drift'
 import { getLeaveInvalidDelegatedApprovalSnapshotsSignal } from './queries/leave-invalid-delegated-approval-snapshots'
 import { getIdentityRelationshipMemberContractDriftSignal } from './queries/identity-relationship-member-contract-drift'
@@ -1660,6 +1661,10 @@ export const getReliabilityOverview = async (
           // Notion-user-id → member-id (caso fuente: incidente 2026-05-16
           // post-TASK-877 dejó coverage en 3.7%, colapsando OTD/RpA bonuses).
           getIdentityNotionBridgeCoverageSignal().catch(() => null),
+          // TASK-1171 — cliente con actividad de delivery ausente del rollup ICO
+          // de organización (exclusión silenciosa por coverage-gap del
+          // incremental-delta; caso fuente Grupo Berel 2026-06-19).
+          getIcoOrganizationRollupCoverageSignal().catch(() => null),
           // TASK-790 — contractor engagements con riesgo de clasificación
           // bloqueante (legal_review_required|blocked) y no terminales.
           getContractorEngagementClassificationRiskOpenSignal().catch(() => null),
