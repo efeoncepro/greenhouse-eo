@@ -111,6 +111,8 @@ Antes de cerrar, verificar explicitamente:
 
 Si falta alguno de esos pasos, el cierre debe decir `code complete, rollout pendiente` o `operativamente bloqueado`, y dejar owner/proximo paso en `Handoff.md`. Caso fuente: el flujo SCIM → Workforce Activation existia en codigo (TASK-872/874/876), pero sin `SCIM_INTERNAL_COLLABORATOR_PRIMITIVE_ENABLED`, `PAYROLL_WORKFORCE_INTAKE_GATE_ENABLED`, redeploy y backfill, Entra seguia creando solo `client_users` y no `members`.
 
+Los env-var flags (`*_ENABLED`) code-complete pendientes de prender y su estado por environment se registran en `docs/operations/FEATURE_FLAG_STATE_LEDGER.md` (ledger humano anti deuda cognitiva; verdad live = `vercel env ls`). Al declarar un flag nuevo, agregarlo al inventario; si queda sin prender, agregar fila a "§ Pendientes de acción".
+
 ### 1. Antes de cambiar codigo
 
 - Leer `project_context.md`.
