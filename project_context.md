@@ -5996,3 +5996,10 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Regla operativa:
   - si una property HubSpot nueva pertenece al contrato Greenhouse, debe declararse primero en el manifest canónico y no en un script ad-hoc
   - cuando HubSpot no refleje un atributo de metadata de forma confiable (ej. `readOnlyValue`), el manifiesto debe converger contra el estado verificable live y la restricción queda documentada como policy operativa
+
+## Delta 2026-06-19 — TASK-1171 inclusión ICO de clientes data-driven + onboarding gobernado
+
+- **Contrato operativo:** la inclusión de un cliente en ICO (cálculo, reportes, activación, verificación) es **data-driven y gobernada — cero código por cliente nuevo**. Prohibido hardcodear listas de clientes en rollups / agency report / consumers ICO; el período vigente nunca se materializa con incremental-delta (full siempre).
+- **Activar ICO de un cliente** = acción gobernada `POST /api/delivery/ico/enable-sync` (capability `delivery.ico.sync.enable`, command `enableClientIcoSync`, outbox `space_notion_source.ico_sync_enabled` → reactive consumer en ops-worker propaga a BigQuery; Vercel es BQ read-only). Reemplaza el path admin-coarse `/api/integrations/notion/register` (queda solo backward-compat).
+- **Verificar ICO de un cliente** = `GET /api/delivery/ico/sync-status` (capability `delivery.ico.sync.read`, escalera `not_connected→connected_not_enabled→enabled_not_calculating→calculating`).
+- Nexa-operable por construcción (Full API Parity). Spec: `docs/architecture/metrics/ICO_DELIVERY_METRICS_AGENT_INVARIANTS.md` § ICO Client Inclusion. Pendiente: UI affordance interna.

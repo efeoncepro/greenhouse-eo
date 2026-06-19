@@ -67,6 +67,7 @@ La diferencia con otras capas de documentacion:
 - [Monitorear Costos Cloud con FinOps](operations/monitorear-costos-cloud-finops.md) — como revisar gasto GCP, interpretar proyecciones y drivers, usar alertas tempranas y ejecutar diagnosticos seguros sin depender solo de la consola de Google Cloud.
 - [Operar Integraciones y Sync](operations/operar-integraciones-y-sync.md) — como revisar health/freshness, disparar sync manual, pausar/reanudar conectores, diagnosticar webhooks y no romper la cadena raw/conformed/projection.
 - [Operar el pipeline RpA V2 demo](operations/pipeline-rpa-v2-demo.md) — verificar que un cambio de estado en una tarea demo se captura y se refleja en la propiedad `RpA` de Notion; interpretar señales de confiabilidad; troubleshooting de captura y writeback.
+- [Activar ICO de un cliente y verificar el estado](operations/activar-ico-cliente.md) — como hacer que un cliente nuevo aparezca en ICO sin tocar codigo: activar el sync con `POST /api/delivery/ico/enable-sync` (permisos requeridos, idempotencia, respuesta), verificar la etapa real con `GET /api/delivery/ico/sync-status`, interpretar la escalera de `stage`, que hacer ante cada error/estado y por que nunca se activa el teamspace demo.
 
 ### Plataforma
 

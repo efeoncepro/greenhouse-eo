@@ -191,6 +191,8 @@ Internal endpoints for ICO metrics. Auth: `requireAgencyTenantContext()` or `req
 | GET | `/api/ico-engine/health` | Materialization freshness | — |
 | GET | `/api/people/[memberId]/ico` | Person-level ICO metrics (convenience) | `year`, `month` |
 | GET | `/api/organizations/[id]/ico` | Organization ICO metrics (all active spaces) | `year`, `month` |
+| POST | `/api/delivery/ico/enable-sync` | Enable Notion→ICO sync for a client already connected to Notion (data-driven inclusion, idempotent). Capability `delivery.ico.sync.enable` (EFEONCE_ADMIN, EFEONCE_OPERATIONS, EFEONCE_ACCOUNT). Body `{ clientId? , spaceId? , reason? }` (clientId or spaceId). Errors es-CL: `ico_sync_client_not_found`, `ico_sync_source_not_connected`, `forbidden` | body: `clientId` \| `spaceId`, `reason` |
+| GET | `/api/delivery/ico/sync-status` | Preflight of real ICO state ("configured ≠ flowing"). Capability `delivery.ico.sync.read` (internal route_group ∪ EFEONCE_ADMIN). Returns `stage` (`not_connected` → `connected_not_enabled` → `enabled_not_calculating` → `calculating`), `connected`, `enabled`, `calculating` (null = BigQuery unreachable), `lastSyncedAt`, `currentPeriod`, `currentTotalTasks`, `currentOtdPct`, `lastCalculatedPeriodKey` | `clientId` \| `spaceId` |
 
 **Context endpoint** (`/api/ico-engine/context`) is the preferred generic entry point for new consumers. It validates dimension against `ICO_DIMENSIONS` allowlist, tries materialized cache first, and falls back to live compute.
 

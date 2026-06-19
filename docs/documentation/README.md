@@ -134,6 +134,7 @@ La documentacion funcional no reemplaza el manual ni la arquitectura. Explica qu
 ### Delivery
 
 - [Motor ICO — Metricas Operativas](delivery/motor-ico-metricas-operativas.md) — metricas operativas, materializacion diaria, cadena de fallback (Postgres/BQ/live), diagnostico
+- [Inclusion ICO de clientes](delivery/inclusion-ico-clientes.md) — como un cliente entra al motor ICO sin tocar codigo (data-driven): conectar Notion → activar el sync (accion gobernada por API) → propagacion a BigQuery → materializacion. Explica la escalera de estados del preflight (`not_connected` → `connected_not_enabled` → `enabled_not_calculating` → `calculating`), por que "configurado" no es lo mismo que "calculando" y la regla de no activar el teamspace demo. TASK-1171
 - [Captura de transiciones Notion → RpA (carril demo)](delivery/captura-transiciones-notion-rpa-demo.md) — como Greenhouse captura cambios de estado de Notion via webhook + re-fetch y los convierte en RpA; por que el webhook es solo un aviso y no la fuente de verdad
 - [Nexa Insights — Digest semanal para liderazgo](delivery/nexa-insights-digest-semanal.md) — resumen semanal interno por email con top insights ICO-first, audiencias, schedule, links al portal y limites del corte actual
 - [Nexa Insights — Bloque en Agency, Home y 360](delivery/nexa-insights-bloque-agency.md) — superficie dentro del portal con KPIs, lista de senales recientes y modo Historial (timeline cross-period). Explica el toggle, causa raiz colapsable y menciones clickeables

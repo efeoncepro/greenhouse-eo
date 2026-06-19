@@ -1039,3 +1039,11 @@ Spec: `docs/tasks/complete/TASK-1072-designer-role-figma-node-linking.md`.
 | `knowledge.notion.page_change_signal` | v1 | `knowledge_notion_page` (page id) | webhook `notion-knowledge` (HMAC, gated `NOTION_KNOWLEDGE_WEBHOOK_ENABLED`) | projection `knowledge_notion_ingest` (ops-worker) |
 
 **Payload v1**: `{ schemaVersion: 1, pageId, notionEventType, isDeletion, parentId, sourceEventId, occurredAt }`. Trigger ligero (NO confiable como source of truth) — el consumer re-fetchea la página, aplica el gate de gobernanza (parent data_source ∈ corpus declarado) y re-ingiere idempotente o deprecia (borrado). Mismo patrón re-fetch que `notion.task.page_change_signal` (TASK-912).
+
+## Delta 2026-06-19 — TASK-1171: `space_notion_source.ico_sync_enabled` (activación ICO gobernada)
+
+| Evento | Versión | Aggregate | Emisor | Consumer |
+| --- | --- | --- | --- | --- |
+| `space_notion_source.ico_sync_enabled` | v1 | `space_notion_source` (source_id `sns-{uuid}`) | command `enableClientIcoSync` (`src/lib/ico-engine/enable-client-ico-sync.ts`), on-transition FALSE→TRUE | projection `space_notion_source_ico_sync_bq` (ops-worker, domain `delivery`) |
+
+**Payload v1**: `{ sourceId, spaceId, clientId, enabledByUserId, reason }`. Se emite SOLO en la transición real (`sync_enabled` FALSE→TRUE); re-ejecutar sobre un cliente ya activo es no-op (no emite). El consumer re-lee PG por `source_id` (no confía el payload) y MERGEa `greenhouse.space_notion_sources` en BigQuery (idempotente por `space_id`) — el command corre en Vercel (BQ read-only), la propagación a BQ va por este outbox→reactive desde ops-worker (BQ write). Detalle: `metrics/ICO_DELIVERY_METRICS_AGENT_INVARIANTS.md` § ICO Client Inclusion.

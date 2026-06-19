@@ -2,6 +2,18 @@
 
 > **Estado:** `released` (manifest transicionó a released, post-release health check verde). Orchestrator run [`27721723752`](https://github.com/efeoncepro/greenhouse-eo/actions/runs/27721723752) `completed/success`. Conducido por Claude tras pedido del operador ("paso a producción que Codex dejó preparado").
 
+## Sesión 2026-06-19 — TASK-1171 ICO client inclusion data-driven + onboarding gobernado — Claude
+
+> **Estado:** Slices 1→5 code-complete; Slices 1/1b/2 verificados en prod; Slice 3 endpoint verificado live staging; Slice 4 ops-worker deployado; Slice 5 reader verificado E2E (endpoint pendiente de promoción del build Vercel — cola atrasada, patrón thin idéntico al de Slice 3 ya live). Docs sincronizadas. TASK sigue `in-progress` (falta UI affordance).
+
+- **Qué:** la inclusión de un cliente en ICO (cálculo + reportes + activación + verificación) pasó de "fix por código por cliente" a **100% data-driven + gobernada + escalable, cero código**. Causa raíz: Grupo Berel afuera de ICO + hardcode `{efeonce,sky}` en el agency report. Resuelto vía Full API Parity.
+- **Entregado:** (1) coverage-gap materializer + período vigente full (Slices 1/1b); (2) agency report data-driven (Slice 2: jun 610→694, Berel incluido); (3) command+capability+endpoint `POST /api/delivery/ico/enable-sync` (`delivery.ico.sync.enable`) + outbox `space_notion_source.ico_sync_enabled` (Slice 3); (4) reactive consumer `space_notion_source_ico_sync_bq` (ops-worker, BQ write) (Slice 4); (5) verify-ICO preflight `GET /api/delivery/ico/sync-status` (`delivery.ico.sync.read`) (Slice 5).
+- **Verificado:** Berel en metrics_by_organization (77.3%) + agency 694/3-seg + reader E2E (Berel→calculating, Demo→connected_not_enabled). Señal `delivery.ico.client_absent_from_org_rollup` absent_count=0.
+- **Migrations aplicadas a dev DB:** `20260619122238123` (enable cap), `20260619133753393` (read cap).
+- **Pendiente (rollout):** endpoint sync-status promoverá con el próximo build Vercel (no-código, solo cola). Transición live del reactive consumer se ejecuta en el próximo onboarding real (único FALSE hoy = Demo, prohibido activar).
+- **Pendiente (scope):** UI affordance interna (lista estado ICO por cliente + botón activar; consume los 2 endpoints) — requiere GVC loop. Follow-up cosmético: label Berel en task_mix (BQ `greenhouse.clients` no resuelve client_name).
+- **Docs:** `ICO_DELIVERY_METRICS_AGENT_INVARIANTS.md` §ICO Client Inclusion · `GREENHOUSE_EVENT_CATALOG_V1.md` Delta · skill ICO (3 hard rules) · `docs/documentation/delivery/inclusion-ico-clientes.md` · `docs/manual-de-uso/operations/activar-ico-cliente.md` · `GREENHOUSE_API_REFERENCE_V1.md` · changelog · project_context. Full API Parity ya canonizado (sesión previa): `GREENHOUSE_FULL_API_PARITY_DECISION_V1.md` + skills arch.
+
 ## Sesión 2026-06-19 — Design System Brand Logo Variations desde Figma — Codex
 
 > **Estado:** code complete local; UI visible verificada con GVC local. Sin branch/worktree nuevo.
