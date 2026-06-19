@@ -236,3 +236,19 @@ Cambios aplicados: fuente del writeback = PG shadow `bucket_attributable` (M2, T
 - Nombre/labels de la propiedad: `[GH] OTD` con codes `on_time/...` vs labels es-CL ("A tiempo", "Tardío", "Vencido", "Arrastre", "N/A"). Definir en plan con `greenhouse-ux-writing`.
 - Tipo de propiedad: `select` (recomendado, enum cerrado) vs `status` vs `rich_text`. Plan decide.
 - Batch dedicado (Cloud Scheduler nuevo) vs rides en `ops-reactive-delivery` existente.
+
+## Delta 2026-06-19 — reposicionamiento: de "display ortogonal" a **puente del camino crítico de M3**
+
+Auditoría read-only a pedido del CEO (revisar runtime + planear el cutover). **No se tocó código ni runtime.** Dos cambios de contexto que reposicionan esta task:
+
+**1. El freeze ya genera divergencia visible (vs el supuesto del Delta 2026-05-27).** Aquel Delta observó `freeze_changed_bucket=0` y concluyó "`[GH] OTD` ≈ legacy hoy". **Ya no es cierto:** al 2026-06-18 el shadow tiene 334 filas y el freeze **flipea 29 tareas `overdue`→`carry_over`**. O sea el writeback YA mostraría divergencia real (el motor rescatando tareas cuyo atraso bruto era tiempo en revisión/bloqueo/pausa). El argumento de valor de display subió.
+
+**2. ⚠️ Esta task (o un equivalente de atribución) es PREREQUISITO DURO de M3, no ortogonal.** El Out-of-Scope y el Blocks/Impacts dicen "no bloquea M3 — display paralelo". La auditoría mostró que eso **subestima su rol**: el bucket freeze-corregido vive solo en PG (`task_attributable_lateness_shadow.bucket_attributable`) **sin `assignee_member_id` ni período**, y `task_status_transitions.assignee_member_id` está 0% poblado. El `otd_pct` por miembro que consume el bono se computa en **BigQuery** vía el bridge assignee Notion→member (`v_tasks_enriched`). Por lo tanto, para que la corrección llegue al bono por colaborador hace falta re-meterla en ese agregado BQ atribuido — y el round-trip **`[GH] OTD` → sync Notion→BQ → columna atribuida** que construye esta task es justamente ese puente. M3 (TASK-1169) lista esto como su prerequisito de atribución **ruta A**. (Ruta B alternativa: agregar `assignee_member_id`+período al shadow + agregación member-aware en PG, evitando el round-trip — decisión abierta en TASK-1169.)
+
+**Consecuencia operativa:** si se elige la ruta A para el cutover, esta task gana prioridad (es bloqueante de M3) y requiere un paso extra no listado hoy: **configurar el sync Notion→BQ para ingerir `[GH] OTD`** como columna de `v_tasks_enriched` (sin eso, escribir a Notion no alcanza al agregado del bono). Agregar ese slice si M3 confirma ruta A.
+
+**3. Motivos confirmados siguen en 0** (735 capturas, 100% inferred — ver TASK-921 Delta 2026-06-19). Mientras siga así, el `bucket_attributable` corrige solo por freeze (no por extensión de fecha justa), así que `[GH] OTD` reflejará exactamente eso. No cambia el diseño de esta task; sí es contexto para la comms al operador.
+
+### Corrección 2026-06-19 — esta task NO es prerequisito duro de M3 (es una de dos rutas)
+
+El punto 2 de arriba afirmó que esta task (o su equivalente) es "prerequisito duro de M3" porque la corrección no podía atribuirse por miembro sin el round-trip a Notion. **Sobreestimé el rol por un error de análisis** (crucé la tabla equivocada para medir atribución). Verificado: la atribución ya existe en `greenhouse_delivery.tasks.assignee_member_id` (join `notion_task_id`, ~51% directo + reconstruible desde logs). Por lo tanto el cutover M3 puede atribuir **sin** este writeback, vía **ruta B (PG-native)**. Esta task sigue siendo valiosa (transparencia del bucket corregido en Notion + ruta A de atribución si se prefiere reusar el agregado BQ legacy), pero **no bloquea M3**. La decisión ruta A vs B vive en TASK-1169 §Detailed Spec.

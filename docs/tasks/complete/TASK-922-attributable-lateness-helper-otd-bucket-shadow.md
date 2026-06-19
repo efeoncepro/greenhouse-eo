@@ -123,3 +123,22 @@ Los 53 tests unitarios mockean `runGreenhousePostgresQuery` → prueban el ALGOR
 - Para que el shadow acumule datos: operador activa `NOTION_DUE_DATE_CAPTURE_ENABLED` (M0) + `ATTRIBUTABLE_LATENESS_OTD_ENABLED` (M2).
 - Superficies de severidad/retro (ADR §8).
 - ADR convención naming `[GH]`.
+
+## Delta 2026-06-19 — verificación runtime + **blocker de atribución por miembro** (pre-planeación M3)
+
+Sesión de auditoría a pedido del CEO ("revisar si lo construido funciona hoy + qué falta para el cutover"). **No se tocó código ni runtime** — solo verificación read-only contra PG/Cloud Run + documentación. Hallazgos:
+
+**1. El shadow SÍ está vivo y corriendo en producción (más prendido de lo que decía esta task al cerrar).** El `deploy.sh` del ops-worker fue actualizado el 2026-05-24 para defaultear los flags a `true` ("activado por etapas") — verificado en la revisión viva de Cloud Run: `NOTION_DUE_DATE_CAPTURE_ENABLED=true` + `ATTRIBUTABLE_LATENESS_OTD_ENABLED=true`. La tabla `task_attributable_lateness_shadow` tiene **334 filas (290 valid / 40 unavailable / 4 legacy_unknown), último compute 2026-06-18** (fresco). El freeze **ya flipea 29 tareas `overdue`→`carry_over`** (vs `freeze_changed_bucket=0` el 2026-05-27 — evolucionó; son tareas cuyo atraso bruto se explica por tiempo en revisión/bloqueo/pausa). El invariante anti-doble-descuento se sostiene en data real (el freeze solo mueve en la dirección correcta).
+
+**2. ⚠️ BLOCKER DURO PARA M3 — la corrección no tiene atribución por miembro ni por período.** El bono es por-colaborador-por-mes, pero:
+   - `task_attributable_lateness_shadow` **no tiene columna `assignee_member_id` ni de período** — solo `task_source_id` + buckets.
+   - `task_status_transitions.assignee_member_id` = **0 de 932 filas pobladas** (la captura nunca resuelve el colaborador).
+   - Las 334 filas shadow matchean transiciones, pero **0 tienen assignee**.
+   
+   Consecuencia: el `bucket_attributable` freeze-corregido (PG) **no puede llegar al `otd_pct` por miembro** que consume el bono. El camino legacy sí atribuye, pero porque lo hace en BigQuery vía el bridge assignee Notion→member (`v_tasks_enriched`), y la corrección **no está en ese camino**. **M3 es matemáticamente imposible hasta resolver esto.** Es el prerequisito #1 del cutover (ver TASK-1169 → §Prerequisitos / decisión de atribución). Las dos rutas candidatas: (A) round-trip Notion vía TASK-927 (`[GH] OTD` → sync → columna BQ atribuida) o (B) agregar `assignee_member_id`+período al shadow + agregación member-aware en PG.
+
+**3. La extensión de fecha justa sigue inerte.** 735 capturas de cambio de fecha, **100% `inferred`, 0 `operator_confirmed`** → `fairDeadline = original` siempre → la dimensión cliente/scope no acredita nada hoy (solo funciona el freeze por estados). Ver TASK-921 Delta 2026-06-19.
+
+### Corrección 2026-06-19 — el punto 2 ("blocker duro de atribución") estuvo MAL planteado
+
+El punto 2 de arriba concluyó "0% atribuible / M3 matemáticamente imposible" por un **error de análisis**: crucé el shadow contra `task_status_transitions` (assignee 0%) en vez de la tabla correcta. Verificado después: la llave es `notion_task_id → greenhouse_delivery.tasks.assignee_member_id`, y **172/334 (~51%) de las filas shadow son atribuibles HOY**, sin reconstruir nada. La atribución **nunca se perdió** — vive en `greenhouse_delivery.tasks`; lo que faltó es que el consumer del shadow no la denormalizó a su propia fila. El 49% restante es investigable (demo / sin asignar / sin proyectar) y, además, **todo es reconstruible desde los logs append-only** (`task_status_transitions` 932 + `task_due_date_changes` 735, timestamped → replay de estado en cualquier fecha). Los días de atraso por tarea (`attributable_days_late`, `frozen_days_excluded`, `fair_deadline`) **ya están guardados** en este shadow. Conclusión correcta: M3 **no** está bloqueado por data perdida; el prereq real es **cablear** la atribución al agregado de `otd_pct` (plumbing), no recuperarla. Ver TASK-1169 §Prerequisitos (corregido).
