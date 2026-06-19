@@ -1925,6 +1925,18 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
     })
   }
 
+  // TASK-1171 Slice 5 — Lectura del estado de sync ICO (verify-ICO preflight).
+  // Visibilidad interna amplia: route_group internal ∪ EFEONCE_ADMIN.
+  if (hasRouteGroup(subject, 'internal') || hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)) {
+    addEntitlement(entries, {
+      module: 'delivery',
+      capability: 'delivery.ico.sync.read',
+      action: 'read',
+      scope: 'tenant',
+      source: hasRouteGroup(subject, 'internal') ? 'route_group' : 'role'
+    })
+  }
+
   // TASK-1072 — Design System Figma node linking. Primera capability real del rol
   // `designer`. Ver el Design System es plano views (plataforma.design_system, abierto a
   // todo interno); VINCULAR un nodo AXIS es este entitlement, exclusivo de DESIGNER ∪

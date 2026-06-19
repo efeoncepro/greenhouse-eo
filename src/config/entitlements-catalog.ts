@@ -1506,6 +1506,15 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     actions: ['update'] as const,
     defaultScope: 'tenant'
   },
+  // TASK-1171 Slice 5 — Leer el estado de sync ICO de un cliente (verify-ICO
+  // preflight "configurado != fluyendo"). Grant matriz (runtime.ts mismo PR):
+  // route_group internal ∪ EFEONCE_ADMIN. Seed capabilities_registry mismo PR.
+  {
+    key: 'delivery.ico.sync.read',
+    module: 'delivery',
+    actions: ['read'] as const,
+    defaultScope: 'tenant'
+  },
   // TASK-1137 — Nexa governed action runtime. Gate de "este usuario puede CONFIRMAR/EJECUTAR una
   // acción gobernada propuesta por Nexa". El LLM nunca ejecuta; el humano confirma vía el endpoint
   // determinístico. Grant (runtime.ts): internal route_group ∪ EFEONCE_ADMIN (audiencia del piloto;
