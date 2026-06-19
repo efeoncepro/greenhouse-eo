@@ -88,7 +88,7 @@ El shadow V1 es **por-tarea / estado-actual / sin mes ni miembro** (PK `task_sou
 
 ## 11. Cross-refs
 
-ADR `GREENHOUSE_ATTRIBUTABLE_LATENESS_V1` · OTD_V1 (Delta bucket reason-aware) · CYCLE_TIME_V1 §4.1 · RPA_V1 (patrón writeback) · TASK-921/908/912/923.
+ADR `GREENHOUSE_ATTRIBUTABLE_LATENESS_V1` (§16.10-16.11 cohorte + B′-PG) · OTD_V1 (Delta bucket reason-aware) · CYCLE_TIME_V1 §4.1 · RPA_V1 (patrón writeback) · TASK-921/908/912/923 · **TASK-1169** (cohorte member×month shadow: helper `otd-attributable-member-month.ts`, tabla `otd_attributable_member_month_shadow`, signal `delivery.attributable_lateness.member_month_paridad`) · **TASK-1170** (cutover bono).
 
 ## 12. Open questions deliberadamente NO resueltas en V1
 

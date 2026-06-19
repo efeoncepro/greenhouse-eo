@@ -332,3 +332,22 @@ Por eso M3 NO es un flip simple: **falta producir la corrección de freeze sobre
 - **NUNCA** inventar una tabla mensual paralela que duplique `metrics_by_member` (la tabla shadow es enfocada: solo OTD corregido + counts).
 
 **Bloquea:** TASK-1170 (cutover bono). **No impacta:** bono ni `otd_pct` (shadow / flag OFF).
+
+### 16.11 Delta 2026-06-19 — TASK-1169 implementado (shadow / flag OFF)
+
+Ruta B′-PG construida y verificada contra PG/BQ real. Artefactos:
+
+- **Tabla shadow** `greenhouse_delivery.otd_attributable_member_month_shadow` (migration `20260619164015435`, grano member×month idéntico a `metrics_by_member`; enfocada: solo OTD legacy + corregido + counts, NO duplica las 22 métricas → SSOT).
+- **Helper canónico** `src/lib/notion-metrics/otd-attributable-member-month.ts`: `buildMemberMonthOtdRow` (aggregator puro SSOT, 9 tests) + `computeOtdAttributableMemberMonth` (read-only) + `materializeOtdAttributableMemberMonth` (UPSERT idempotente).
+- **Reconciliación** read-only `scripts/reconcile-otd-attributable-member-month.ts` (blast radius por colaborador-mes + cambio de tier de bono).
+- **Reliability signal** `delivery.attributable_lateness.member_month_paridad` (comparabilidad de cohorte, steady=0 cohort_mismatch; detector upstream del bug class 2026-06-19).
+
+**Decisiones de implementación clave (verificadas con data real):**
+
+1. **El baseline legacy se computa LIVE** (`computeMemberMetricsBatch`), NO desde el `metrics_by_member` materializado crudo. Probe 2026-06-19: el materializado de períodos cerrados está **stale** (ej. valentina 2026-04 stored `on_time=1/late_drop=1`=50% vs live `19/19/overdue=12`=38%; materializado el 19-may, completados-tarde posteriores no re-materializados). El bono recomputa live vía freshness guard cuando está stale, y el cutover (TASK-1170) re-materializa de todas formas → el live es el baseline relevante y es consistente con la enumeración de candidatos (también live). *(La staleness del materializado en períodos cerrados es un hallazgo separado, candidato a follow-up de re-materialización; no afecta esta task ni el pago vigente.)*
+
+2. **El freeze mejora el OTD por DOS mecanismos**, no uno: numerador (`late_drop → on_time`) **y** denominador (`overdue → carry_over`, que sale del denominador OTD). El modelo inicial solo contemplaba el primero.
+
+3. **Hallazgo (responde §Open Questions Q2): el freeze capturado hoy NO mueve la cohorte productiva del bono.** Reconciliación 2026-04/05/06: cohorte reproducida=20, `cohort_mismatch=0`, **0 member-months cambian tier de bono**. Los 29 divergence del M2 shadow (`overdue→carry_over`) caen en tasks NULL-atribuidos en BQ (gap de atribución PG↔conformed) o no-overdue por la clasificación canónica → fuera de la cohorte. Cobertura M2 sobre la cohorte: 1%/31%/61% por mes. **Conclusión: el cutover TASK-1170 no tiene urgencia material por ahora.**
+
+**Rollout pendiente (no bloquea esta task, shadow):** para acumular el reloj ≥30d sobre data comparable, el materializador debe correr periódicamente (hoy es helper/script invocable, sin cron). Mejorar la cobertura del corregido requiere ampliar el M2 shadow sobre la cohorte (flags M0 `NOTION_DUE_DATE_CAPTURE_ENABLED` + M2 `ATTRIBUTABLE_LATENESS_OTD_ENABLED` ON + backfill), que es decisión del operador gateada a TASK-1170.
