@@ -50,12 +50,12 @@ Parity is evaluated at the **business capability** level, not at the UI componen
 
 ### North Star: Nexa total operability (CEO directive, 2026-06-19)
 
-The driving purpose of full API parity is that **Nexa Agent must eventually be able to operate the ENTIRE portal from the Conversational Experience** — every business capability reachable through Nexa, not only through screens. This elevates parity from "agent-ready as a benefit" to a **hard product mandate**:
+**Full API parity is the base requirement; Nexa total operability is its consequence and North Star.** The hard requirement is the governed contract at the capability level. Because that contract exists, **Nexa Agent can eventually operate the ENTIRE portal from the Conversational Experience** — every business capability reachable through Nexa, not only through screens — *by construction*, without anything Nexa-specific being built. This elevates parity from "agent-ready as a benefit" to a **hard product mandate**:
 
 - Every **new UI** and every **new capability/entitlement** must be born with its governed programmatic contract that Nexa's action runtime can invoke.
 - Reads are consumed directly; **writes go through the governed-action loop `propose → confirm → execute`** — the LLM never executes a write directly; mutation happens only at the human confirmation endpoint (see `docs/architecture/agent-invariants/KNOWLEDGE_NEXA_AGENT_INVARIANTS.md` + `GREENHOUSE_NEXA_ARCHITECTURE_V1.md`).
 - UI and Nexa are **two clients of the same canonical primitive**, never two implementations of the same logic.
-- Mandatory design-time question for any feature: **"can Nexa do this end-to-end through a contract?"** If no, the feature is not complete.
+- Mandatory design-time question for any feature: **"does this capability have a governed contract at the capability level?"** If yes, Nexa (and every consumer) can operate it end-to-end by construction; if no, the feature is not complete.
 
 This does not grant Nexa raw write power: parity guarantees the *contract path exists and is governed*; the confirm step and capability/authorization gates still apply.
 

@@ -176,7 +176,7 @@ Reglas obligatorias:
 - [ ] Rollup de cliente + reporte de agencia + CVR data-driven (Berel y cualquier cliente aparecen).
 - [ ] Signal anti-exclusión-silenciosa wired, steady=0.
 - [ ] Capability+endpoint gobernado enable-sync/verify-ICO (full-api-parity) + grant coverage.
-- [ ] **Nexa-operable verificado:** Nexa puede leer el ICO de cliente y accionar enable-sync vía `propose→confirm→execute` por el MISMO command canónico (no lógica duplicada para la UI). North Star del mandato.
+- [ ] **Full API Parity verificado (base):** enable-sync/verify-ICO + el read de ICO de cliente existen como contrato gobernado a nivel capability (un command/reader canónico, sin lógica duplicada para la UI). Como consecuencia, Nexa y todos los consumers lo operan por construcción (enable-sync write vía `propose→confirm→execute`) — sin integración Nexa-específica.
 - [ ] Preflight/lifecycle extendidos a ICO.
 - [ ] Backfill Berel verificado; bono intacto (verificado).
 
