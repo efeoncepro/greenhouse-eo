@@ -102,6 +102,7 @@ Declarar el nivel dentro de `## UI/UX Contract`.
 Agregar criterios binarios como corresponda:
 
 - [ ] Se declaro `Execution profile: ui-ux` y `UI impact` segun el alcance real.
+- [ ] **Full API Parity:** si la UI expone una **acción de negocio** (capability que afecta estado/permisos/datos/aprobaciones/exports/recoveries/reportes/config), la lógica vive en un contrato gobernado server-side, NO en el componente; entonces `Backend impact != none` y aplica el **Capability Definition of Done** de `TASK_BACKEND_DATA_ADDENDUM.md` (preferir dos tasks: `backend-data` el contrato + `ui-ux` el cliente). La UI es cliente del primitive, igual que Nexa/MCP — no una segunda implementación.
 - [ ] La task declara si reusa, extiende o crea primitive; no nace un componente paralelo sin razon.
 - [ ] El copy visible reusable vive en `src/lib/copy/*` o nomenclatura canonica.
 - [ ] Los estados loading/empty/error/degraded/permission/mobile quedan cubiertos o explicitamente fuera de scope.
