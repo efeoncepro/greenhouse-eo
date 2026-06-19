@@ -185,7 +185,7 @@ Reglas obligatorias:
 
 Estos 3 prerequisitos son anteriores a cualquier slice de implementación del flip. Sin ellos, el cutover es imposible o corrige a medias:
 
-1. **Cablear la atribución por miembro/período del bucket corregido.** Decidir e implementar ruta A o B (ver §Detailed Spec). La atribución **ya existe en PG** (`greenhouse_delivery.tasks.assignee_member_id`, join por `notion_task_id` — ~51% de las filas shadow matchean hoy + el resto es reconstruible desde los logs append-only); lo que falta es **llevarla al agregado que computa `otd_pct`** (hoy el shadow no denormaliza el assignee). No es un blocker de data perdida — es trabajo de plumbing de atribución. Sin él, el flip no puede atribuir el número corregido por colaborador.
+1. **Producir el bucket corregido sobre la MISMA cohorte mensual de completadas que usa el bono** (bloqueante #1 real, ver §⚠️ HALLAZGO CRÍTICO Slice 0). La reconciliación 2026-06-19 demostró que el shadow M2 (PG, event-driven, abierto-pesado) da OTD 0-50% mientras el bono real (`ico_member_metrics`, BQ, mensual completadas) da 66-100% — **son cohortes distintas**. Flipear el bono a leer el shadow tal cual **colapsaría el OTD de todos a ~0%**. El cutover requiere primero aplicar la corrección de freeze dentro del path mensual del bono (opciones B′/A/B″ en §HALLAZGO CRÍTICO), decidido con `arch-architect`. La atribución por miembro **NO** es el blocker (ya resuelta: `tasks.assignee_member_id` por `notion_task_id`, ~51% + recuperable).
 2. **Motivos `operator_confirmed` fluyendo.** Habilitar el writeback-de-sugerencia de motivo (follow-up de TASK-921) y/o adopción operativa, de modo que `fairDeadline` empiece a reflejar extensiones de cliente/scope. Sin esto, M3 corrige solo por freeze (sigue siendo mejor que legacy, pero incompleto — decisión del CEO si se acepta lanzar "freeze-only" en V1).
 3. **≥30 días de shadow verde + 8 stop-gates.** El shadow arrancó ~2026-05-24; el reloj de 30d se cuenta desde que la atribución (prereq 1) esté lista y midiéndose member-level, no desde hoy.
 
@@ -260,6 +260,30 @@ Se validó el detalle por colaborador contra data viva (read-only) para `daniela
 3. **Dedup obligatorio antes de agregar.** El join `tasks.notion_task_id` abre múltiples filas por tarea (subtareas/sprints en `greenhouse_delivery.tasks`): ej. una misma tarea aparece ×4. La reconciliación member-level **debe deduplicar por tarea** (un bucket por `task_source_id`) o las cuentas se inflan. Definir la regla de dedup canónica en Slice 0.
 
 Estas 3 reglas (atribución por `notion_task_id`, scoping período+completadas, dedup por tarea) son precondición de cualquier número de bono confiable.
+
+### ⚠️ HALLAZGO CRÍTICO Slice 0 — el shadow M2 NO representa la cohorte del bono (reconciliación 2026-06-19)
+
+Se corrió la reconciliación member-level deduped + atribuida (7 colaboradores no-demo) y se contrastó contra el OTD de producción que realmente alimenta el bono (`greenhouse_serving.ico_member_metrics.otd_pct`). **El resultado invalida usar el shadow M2 actual como fuente del cutover:**
+
+| Colaborador | OTD shadow M2 (PG) | OTD producción bono (BQ, junio) |
+|---|---|---|
+| Daniela Ferreira | 0% | 99.1% |
+| Melkin Hernandez | 0% | 100% |
+| Andres Carlosama | 50% (33% corregido) | 92.9% |
+| Valentina Hoyos | 0% | 75% |
+| Maggie Borralles | 0% (12.5% corregido) | 66.7% |
+
+**Causa:** `ico_member_metrics` se computa en BQ sobre la cohorte **mensual de tareas COMPLETADAS** (`period_month`, `on_time_count/completed_tasks`). El shadow M2 (`task_attributable_lateness_shadow`) es una foto de **estado actual event-driven dominada por tareas ABIERTAS** (`carry_over`/`overdue`), con denominadores chicos y casi sin `on_time`. Son poblaciones distintas → el OTD del shadow (0-50%) no es comparable al del bono (66-100%).
+
+**Riesgo evitado:** flipear el bono para leer el shadow M2 tal como está hoy **colapsaría el OTD de todos a ~0% → todos pierden el bono**. La reconciliación contra data real previno exactamente ese desastre (valor del gate 3.5 / Real-Artifact Verification Loop).
+
+**Reframe del cutover (cambia el diseño):** la decisión central del Slice 0 **ya no es "ruta A vs B de atribución"** — la atribución está resuelta (~51% join directo + recuperable). El problema real es **dónde y cómo se aplica la corrección de freeze para que cubra la MISMA cohorte mensual de completadas que usa `ico_member_metrics`**. M2 puso la corrección en un PG event-snapshot que no alinea con la materialización mensual BQ del bono. Opciones a evaluar en Slice 0 con `arch-architect`:
+
+- **B′ (BQ-native, ≈ hint original ADR §16):** aplicar la corrección de freeze dentro del path que materializa `ico_member_metrics` (columna/CASE corregido en la cohorte mensual de completadas). Es lo más alineado con el bono, pero el freeze multi-ciclo no era un CASE BQ mantenible (razón por la que M2 fue a PG) → requiere repensar (¿helper TS que materializa a una tabla mensual member-atribuida?).
+- **A (round-trip Notion vía TASK-927):** escribir el bucket corregido a `[GH] OTD` → sync → BQ → entra a la cohorte mensual ya atribuida. Resuelve cohorte + atribución de un golpe, a costa del round-trip + la dependencia de TASK-927.
+- **B″ (PG mensual nuevo):** construir en PG una materialización mensual de completadas con la corrección + atribución que reemplace/alimente el `otd_pct` del bono. Duplica lo que BQ ya hace.
+
+**Conclusión:** el M2 shadow tal cual sirve para detalle por-tarea (días de atraso, freeze) y para el writeback de transparencia (TASK-927), **pero NO como fuente directa del `otd_pct` del bono**. El cutover necesita primero resolver la cohorte mensual corregida. Esto es ahora el bloqueante #1 real (reemplaza al "blocker de atribución" que se descartó).
 
 ## Rollout Plan & Risk Matrix
 
