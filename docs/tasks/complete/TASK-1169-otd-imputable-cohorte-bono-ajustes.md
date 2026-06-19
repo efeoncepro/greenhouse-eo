@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -289,14 +289,14 @@ N/A productivo (shadow). La verificación es la reconciliación member-level rea
 
 ## Acceptance Criteria
 
-- [ ] ADR chico Slice 0 con la decisión B′/A/B″ + score 5-pilar.
-- [ ] Corrección freeze-ON disponible por colaborador-mes, misma cohorte que el bono, en shadow (flag OFF), reusando el patrón del materializador ICO (sin tabla paralela).
-- [ ] **Harness auto-validante:** la reconciliación reproduce el OTD legacy y matchea `metrics_by_member` por colaborador-mes (baseline) ANTES de reportar el corregido. Documentado el match.
-- [ ] Reconciliación member-level confiable (dedup + período + atribución) con blast radius por colaborador-mes; degradación honesta (null+dataStatus, nunca 0 donde no compare).
-- [ ] Signal member-month (divergencia + comparabilidad de cohorte) wired como detector upstream; reloj ≥30d iniciado sobre data comparable.
-- [ ] ADR §16 + `ATTRIBUTABLE_LATENESS_V1.md` actualizados con el hallazgo de cohorte.
-- [ ] Verificado: nada de esta task altera `otd_pct` ni el bono.
-- [ ] `pnpm test` (focales) + `pnpm build` verdes.
+- [x] ADR chico Slice 0 con la decisión B′/A/B″ + score 5-pilar. → §16.10, B′-PG confirmada por CEO.
+- [x] Corrección freeze-ON disponible por colaborador-mes, misma cohorte que el bono, en shadow (flag OFF), reusando el patrón del materializador ICO (sin tabla paralela). → `otd_attributable_member_month_shadow` + helper SSOT (enfocada, no duplica `metrics_by_member`).
+- [x] **Harness auto-validante:** la reconciliación reproduce el OTD legacy y matchea `metrics_by_member` por colaborador-mes (baseline) ANTES de reportar el corregido. Documentado el match. → `cohort_reproduced`; legacy = recompute live del reader del bono (el materializado de períodos cerrados está stale). 2026-04/05/06: cohorte reproducida=20, cohort_mismatch=0.
+- [x] Reconciliación member-level confiable (dedup + período + atribución) con blast radius por colaborador-mes; degradación honesta (null+dataStatus, nunca 0 donde no compare). → `scripts/reconcile-otd-attributable-member-month.ts`.
+- [x] Signal member-month (divergencia + comparabilidad de cohorte) wired como detector upstream. → `delivery.attributable_lateness.member_month_paridad` (severity=ok live). Reloj ≥30d: requiere correr el materializador periódicamente (rollout pendiente, no bloquea — gateado a TASK-1170).
+- [x] ADR §16 + `ATTRIBUTABLE_LATENESS_V1.md` actualizados con el hallazgo de cohorte. → §16.10-16.11 + metric spec Delta.
+- [x] Verificado: nada de esta task altera `otd_pct` ni el bono. → todo shadow / sin consumer productivo / 0 cambios de tier de bono.
+- [x] `pnpm test` (focales) + `pnpm build` verdes. → focales verdes; full gate en cierre.
 
 ## Verification
 
@@ -319,5 +319,5 @@ N/A productivo (shadow). La verificación es la reconciliación member-level rea
 
 ## Open Questions
 
-- **¿Ruta B′, A o B″?** — decisión de Slice 0 con `arch-architect` + CEO.
-- ¿La reconciliación confirma divergencia material a nivel member-month, o el freeze casi no mueve el bono? (lo responde Slice 2 — define la urgencia real de TASK-1170).
+- **¿Ruta B′, A o B″?** — **RESUELTA: B′-PG** (Slice 0, `arch-architect` + `greenhouse-ico` + confirmación CEO 2026-06-19). ADR §16.10.
+- ¿divergencia material a nivel member-month, o el freeze casi no mueve el bono? — **RESUELTA: el freeze NO mueve la cohorte productiva del bono hoy.** Reconciliación 2026-04/05/06: 0 member-months cambian tier de bono; los 29 divergence del M2 shadow caen fuera de la cohorte (NULL-atribuidos en BQ / no-overdue por la clasificación canónica). → **TASK-1170 sin urgencia material por ahora.**

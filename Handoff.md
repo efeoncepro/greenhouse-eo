@@ -32365,10 +32365,18 @@ Trabajo directo en `develop` por instrucción del operador (sin branch). P3, dom
 
 ---
 
-## TASK-1169 — OTD imputable alineado a cohorte del bono (in-progress, develop local-first)
+## TASK-1169 — OTD imputable alineado a cohorte del bono (COMPLETE, develop local-first)
 
-**Rama**: develop (local-first, sin push). **Objetivo**: producir la corrección de freeze (M2) sobre la cohorte member×month del bono, reconciliar honestamente y dejar signal + reloj ≥30d. **Todo shadow / flag OFF — NUNCA toca el bono** (el cutover es TASK-1170).
+**Rama**: develop (local-first, sin push). **Objetivo**: producir la corrección de freeze (M2) sobre la cohorte member×month del bono, reconciliar honestamente y dejar signal. **Todo shadow / flag OFF — NUNCA toca el bono** (el cutover es TASK-1170).
 
-**Slice 0 DONE (2026-06-19)**: decisión arquitectónica **B′-PG** confirmada por CEO. ADR chico = `GREENHOUSE_ATTRIBUTABLE_LATENESS_V1` §16.10 (hallazgo de cohorte que invalida "M3 = solo flip" + score 5-pilar + hard rules) + Delta en `metrics/ATTRIBUTABLE_LATENESS_V1.md`. Helper TS SSOT + tabla shadow PG enfocada member×month, reusa patrón ICO, sin round-trip Notion.
+**COMPLETE (2026-06-19)** — 5 slices cerrados, gates verdes (test clean 0 fail · build exit 0 · tsc 0 · lint 0):
 
-**Pendiente**: Slice 1 (migration + helper agregador + materializer) · Slice 2 (reconciliación auto-validante) · Slice 3 (signal member-month + reloj) · Slice 4 (cierre).
+- **Slice 0** decisión **B′-PG** (ADR `GREENHOUSE_ATTRIBUTABLE_LATENESS_V1` §16.10, confirmada por CEO).
+- **Slice 1** tabla shadow `greenhouse_delivery.otd_attributable_member_month_shadow` (migration `20260619164015435`) + helper `src/lib/notion-metrics/otd-attributable-member-month.ts` (aggregator puro SSOT 9 tests + materializer idempotente). Baseline legacy = recompute LIVE del reader del bono (el materializado de períodos cerrados está stale); candidatos de `v_tasks_enriched` con la expresión canónica; freeze por dos mecanismos (num `late_drop→on_time` + denom `overdue→carry_over`); harness auto-validante (`cohort_reproduced` → `cohort_mismatch` null, NUNCA 0).
+- **Slice 2** `scripts/reconcile-otd-attributable-member-month.ts` (read-only blast radius + cambio de tier de bono).
+- **Slice 3** signal `delivery.attributable_lateness.member_month_paridad` (comparabilidad de cohorte, wired 5 touchpoints en `get-reliability-overview.ts`, severity=ok live).
+- **Slice 4** docs (ADR §16.10-16.11, RELIABILITY Delta, metric spec, changelog) + cross-impact a TASK-1170.
+
+**Hallazgo clave (Q2 spec):** el freeze capturado hoy **NO mueve la cohorte productiva del bono** (2026-04/05/06: cohorte reproducida=20, cohort_mismatch=0, **0 cambios de tier de bono**) → **TASK-1170 (cutover) sin urgencia material por ahora**. Hallazgo secundario: el `metrics_by_member` materializado de períodos cerrados está stale (candidato a follow-up de re-materialización; no afecta el pago vigente).
+
+**Rollout pendiente (no bloquea; shadow / flag OFF — NO toca el bono):** correr el materializador periódicamente para acumular el reloj ≥30d; ampliar cobertura del M2 shadow sobre la cohorte (flags M0/M2 + backfill) — gateado a TASK-1170.

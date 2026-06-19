@@ -1,5 +1,21 @@
 # TASK-1170 — Cutover del bono OTD a atraso imputable (flip gateado, post-nómina)
 
+## Delta 2026-06-19 — prerequisito TASK-1169 COMPLETE (shadow)
+
+TASK-1169 cerró (ruta **B′-PG**, ADR `GREENHOUSE_ATTRIBUTABLE_LATENESS_V1` §16.10-16.11). Disponible para consumir:
+
+- **Tabla shadow** `greenhouse_delivery.otd_attributable_member_month_shadow` (member×month, OTD legacy + corregido + counts + `data_status`).
+- **Helper** `computeOtdAttributableMemberMonth` / `materializeOtdAttributableMemberMonth` (`src/lib/notion-metrics/otd-attributable-member-month.ts`).
+- **Reconciliación** `scripts/reconcile-otd-attributable-member-month.ts` (blast radius).
+- **Signal** `delivery.attributable_lateness.member_month_paridad` (comparabilidad de cohorte, steady=0; usar como stop-gate del flip).
+
+**Hallazgos que recalibran la urgencia de esta task:**
+
+1. **El freeze capturado hoy NO mueve la cohorte productiva del bono** (reconciliación 2026-04/05/06: 0 member-months cambian tier de bono). → **el cutover no tiene urgencia material por ahora**; antes de flipear conviene esperar a que el freeze tenga impacto real (o decidir que no lo tendrá).
+2. **El baseline legacy del bono se computa LIVE** (el `metrics_by_member` materializado de períodos cerrados está stale). El flip debe re-materializar con la lógica corregida; no asumir que el materializado vigente es el baseline.
+3. **El freeze mejora el OTD por DOS mecanismos** (numerador `late_drop→on_time` + denominador `overdue→carry_over`), no solo el primero.
+4. **Pendiente de rollout antes del flip:** correr el materializador periódicamente para acumular el reloj ≥30d sobre data comparable, y ampliar la cobertura del M2 shadow sobre la cohorte (flags M0/M2 + backfill).
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
