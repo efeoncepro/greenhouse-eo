@@ -3937,6 +3937,27 @@ export interface GreenhouseCrmDeals {
   updated_at: Generated<Timestamp>;
 }
 
+export interface GreenhouseDeliveryOtdAttributableMemberMonthShadow {
+  cohort_reproduced: Generated<boolean>;
+  computed_at: Generated<Timestamp>;
+  created_at: Generated<Timestamp>;
+  data_status: string;
+  denominator_drop_count: Generated<number>;
+  eligible_task_count: Generated<number>;
+  formula_version: string;
+  freeze_covered_count: Generated<number>;
+  improvable_candidate_count: Generated<number>;
+  late_drop_count: Generated<number>;
+  member_id: string;
+  numerator_flip_count: Generated<number>;
+  on_time_count: Generated<number>;
+  otd_pct_corrected: Numeric | null;
+  otd_pct_legacy: Numeric | null;
+  overdue_count: Generated<number>;
+  period_month: number;
+  period_year: number;
+}
+
 export interface GreenhouseDeliveryProjects {
   active: Generated<boolean>;
   avg_rpa_source: Numeric | null;
@@ -10236,6 +10257,7 @@ export interface DB {
   "greenhouse_crm.companies": GreenhouseCrmCompanies;
   "greenhouse_crm.contacts": GreenhouseCrmContacts;
   "greenhouse_crm.deals": GreenhouseCrmDeals;
+  "greenhouse_delivery.otd_attributable_member_month_shadow": GreenhouseDeliveryOtdAttributableMemberMonthShadow;
   "greenhouse_delivery.projects": GreenhouseDeliveryProjects;
   "greenhouse_delivery.space_property_mappings": GreenhouseDeliverySpacePropertyMappings;
   "greenhouse_delivery.sprints": GreenhouseDeliverySprints;
