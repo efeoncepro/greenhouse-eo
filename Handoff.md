@@ -32390,3 +32390,17 @@ Trabajo directo en `develop` por instrucción del operador (sin branch). P3, dom
 **Fix (sin migración, Open Questions resueltas)**: derivar estado/completed_at efectivo de la **última transición** (event log autoritativo; su `transitioned_at` = momento de completado) + barrido idempotente on-demand para backfillear las 252 filas + signal `delivery.attributable_lateness.shadow_terminal_open` (steady=0) como gate del writeback (TASK-927). Todo shadow / no toca el bono.
 
 **Pendiente**: Slice 1 (compute robusto + tests) · Slice 2 (barrido + backfill) · Slice 3 (signal) · Slice 4 (docs + cerrar ISSUE-098).
+
+---
+
+## TASK-1174 — Fix staleness terminal del atraso imputable (COMPLETE, develop local-first)
+
+**COMPLETE (2026-06-19)** — 4 slices, gates verdes (test clean 0 fail · build exit 0 · tsc 0 · lint 0 · pg:doctor healthy). Cierra **ISSUE-098**, **desbloquea TASK-927**.
+
+- **Causa raíz** (confirmada en código): el consumer M2 event-driven re-leía `tasks.task_status`/`completed_at` (row sync que laggea la transición terminal que lo dispara) → bucket abierto congelado en 250/337 filas (tareas `Aprobado`). No tocaba el bono; bloqueaba el writeback `[GH] OTD`.
+- **Slice 1** `resolveEffectiveTaskState` (estado efectivo desde el log de transiciones, autoritativo; `completed_at` de respaldo = `transitioned_at` terminal) + core extraído `computeAttributableLatenessForTask`. 6 tests nuevos (17 total).
+- **Slice 2** barrido `scripts/recompute-attributable-lateness-terminal-open.ts` (dry-run/apply). Backfill real: **250 corregidas → 0 terminal-open**. Target = status terminal (no `completed_at`, que es proxy impreciso).
+- **Slice 3** signal `delivery.attributable_lateness.shadow_terminal_open` (data_quality, steady=0; gate del writeback). Live: ok/count=0.
+- **Slice 4** docs (ADR §16.12, metric spec, RELIABILITY, changelog) + ISSUE-098 → resolved + cross-impact Delta a TASK-927.
+
+**Sin migración. Shadow / no toca el bono.** Próximo paso: TASK-927 (writeback) ya puede levantar su gate, con el signal en steady=0 como precondición.

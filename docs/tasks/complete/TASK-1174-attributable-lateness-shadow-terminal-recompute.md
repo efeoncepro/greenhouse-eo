@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -233,13 +233,13 @@ N/A — repo-only change (shadow / runtime interno). Ninguna coordinación que t
 
 ## Acceptance Criteria
 
-- [ ] El compute nunca persiste bucket abierto definitivo para una tarea en estado terminal (testeado).
-- [ ] Barrido idempotente recompone las filas terminales con shadow abierto; dry-run + apply + verify.
-- [ ] `shadow_open_but_task_done` (PG real) tiende a 0 post-backfill.
-- [ ] Signal `delivery.attributable_lateness.shadow_terminal_open` wired, steady=0.
-- [ ] Verificado: nada de esta task altera `otd_pct` ni el bono.
-- [ ] ISSUE-098 movido a `resolved/` con verificación documentada.
-- [ ] `pnpm test` (focales) + `pnpm build` verdes.
+- [x] El compute nunca persiste bucket abierto definitivo para una tarea en estado terminal (testeado). → `resolveEffectiveTaskState` + 6 tests.
+- [x] Barrido idempotente recompone las filas terminales con shadow abierto; dry-run + apply + verify. → `scripts/recompute-attributable-lateness-terminal-open.ts`.
+- [x] `shadow_open_but_task_done` (PG real) tiende a 0 post-backfill. → 250 corregidas → 0 terminal-open (target preciso = status terminal).
+- [x] Signal `delivery.attributable_lateness.shadow_terminal_open` wired, steady=0. → severity=ok, count=0 live.
+- [x] Verificado: nada de esta task altera `otd_pct` ni el bono. → shadow / no consumer productivo lee la tabla.
+- [x] ISSUE-098 movido a `resolved/` con verificación documentada.
+- [x] `pnpm test` (full, clean env) 0 fail + `pnpm build` exit 0 verdes (+ tsc 0 + lint 0 + pg:doctor healthy).
 
 ## Verification
 
@@ -249,13 +249,13 @@ N/A — repo-only change (shadow / runtime interno). Ninguna coordinación que t
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` sincronizado
-- [ ] archivo en la carpeta correcta
-- [ ] `docs/tasks/README.md` sincronizado
-- [ ] `Handoff.md` + `changelog.md` actualizados
-- [ ] chequeo de impacto cruzado (TASK-921/922/927/1169/1170 + ISSUE-098/081)
-- [ ] ADR + metric spec + RELIABILITY control plane actualizados
-- [ ] ISSUE-098 movido a `resolved/`
+- [x] `Lifecycle` sincronizado → `complete`
+- [x] archivo en la carpeta correcta → `complete/`
+- [x] `docs/tasks/README.md` sincronizado
+- [x] `Handoff.md` + `changelog.md` actualizados
+- [x] chequeo de impacto cruzado → TASK-927 (Delta: desbloqueada), TASK-922 (compute endurecido), TASK-1169 (su harness ya descartaba esta data)
+- [x] ADR §16.12 + metric spec + RELIABILITY control plane actualizados
+- [x] ISSUE-098 movido a `resolved/`
 
 ## Follow-ups
 

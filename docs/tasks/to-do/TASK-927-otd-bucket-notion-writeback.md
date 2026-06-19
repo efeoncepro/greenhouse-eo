@@ -1,5 +1,13 @@
 # TASK-927 — OTD bucket writeback a Notion (`[GH] OTD`, display, shadow→flip gateado)
 
+## Delta 2026-06-19 — desbloqueada por TASK-1174 (ISSUE-098 resuelto)
+
+Esta task escribe el bucket/“días de retraso” por-tarea leyendo el M2 shadow `task_attributable_lateness_shadow`. Se había detectado (TASK-1169) que ese shadow estaba **stale en el 75% de las tareas completadas** (bucket abierto congelado en tareas `Aprobado`) — escribirlo habría puesto "atrasada/no entregada" sobre tareas entregadas, **visible al cliente**. Eso era **`ISSUE-098`**, ahora **resuelto por TASK-1174**:
+
+- El compute M2 ahora reconcilia el estado contra el log de transiciones (`resolveEffectiveTaskState`) → no congela buckets abiertos en tareas terminales; backfill aplicó 250→0 terminal-open.
+- **Gate de escritura obligatorio:** antes de habilitar el writeback, verificar que el signal **`delivery.attributable_lateness.shadow_terminal_open`** esté en **steady=0** (hoy `ok`/count=0). Si > 0, NO escribir (la fuente volvió a tener buckets stale → correr `scripts/recompute-attributable-lateness-terminal-open.ts`).
+- Recordatorio: el bucket es `now()`-dependiente para tareas abiertas → el writeback sigue siendo batch diario (no event-driven), y debe re-leer la fuente fresca, no confiar un snapshot viejo.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
