@@ -44,11 +44,23 @@ export const agencyPerformanceReportProjection: ProjectionDefinition = {
       ? payload.reportScope.trim()
       : 'agency'
 
-    return { entityType: 'agency_performance_report', entityId: reportScope }
+    // TASK-1171 — el scope DEBE incluir el período. Sin él, eventos de períodos
+    // distintos (abril/mayo/junio) coalescían en un único scope 'agency' y el
+    // refresh usaba el payload de OTRO período → el mes vigente nunca refrescaba
+    // (serving stale, Berel ausente del reporte aunque BQ lo tenía). Cada período
+    // = scope distinto → no coalescen entre meses.
+    const now = new Date()
+    const periodYear = Number(payload.periodYear ?? now.getFullYear())
+    const periodMonth = Number(payload.periodMonth ?? (now.getMonth() + 1))
+
+    return { entityType: 'agency_performance_report', entityId: `${reportScope}:${periodYear}:${periodMonth}` }
   },
 
   refresh: async (scope, payload) => {
-    const reportScope = scope.entityId || 'agency'
+    const reportScope = typeof payload.reportScope === 'string' && payload.reportScope.trim()
+      ? payload.reportScope.trim()
+      : (scope.entityId.split(':')[0] || 'agency')
+
     const now = new Date()
     const periodYear = Number(payload.periodYear ?? now.getFullYear())
     const periodMonth = Number(payload.periodMonth ?? (now.getMonth() + 1))
