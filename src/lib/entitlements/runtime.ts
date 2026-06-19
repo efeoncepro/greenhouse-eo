@@ -1,6 +1,18 @@
-import { ENTITLEMENT_CAPABILITY_MAP, type EntitlementAction, type EntitlementCapabilityKey, type EntitlementScope, type GreenhouseEntitlementModule } from '@/config/entitlements-catalog'
+import {
+  ENTITLEMENT_CAPABILITY_MAP,
+  type EntitlementAction,
+  type EntitlementCapabilityKey,
+  type EntitlementScope,
+  type GreenhouseEntitlementModule
+} from '@/config/entitlements-catalog'
 import { ROLE_CODES } from '@/config/role-codes'
-import type { TenantEntitlement, TenantEntitlementSource, TenantEntitlements, TenantEntitlementSubject, HomeAudienceKey } from '@/lib/entitlements/types'
+import type {
+  TenantEntitlement,
+  TenantEntitlementSource,
+  TenantEntitlements,
+  TenantEntitlementSubject,
+  HomeAudienceKey
+} from '@/lib/entitlements/types'
 import { resolvePortalHomePolicy } from '@/lib/tenant/resolve-portal-home-path'
 
 const UNIQUE_SEPARATOR = '::'
@@ -22,13 +34,14 @@ const normalizeSubject = (subject: TenantEntitlementSubject): TenantEntitlementS
 })
 
 const hasRole = (subject: TenantEntitlementSubject, roleCode: string) => subject.roleCodes.includes(roleCode)
-const hasRouteGroup = (subject: TenantEntitlementSubject, routeGroup: string) => subject.routeGroups.includes(routeGroup)
-const hasAuthorizedView = (subject: TenantEntitlementSubject, viewCode: string) => subject.authorizedViews.includes(viewCode)
 
-const addEntitlement = (
-  registry: Map<string, TenantEntitlement>,
-  entitlement: TenantEntitlement
-) => {
+const hasRouteGroup = (subject: TenantEntitlementSubject, routeGroup: string) =>
+  subject.routeGroups.includes(routeGroup)
+
+const hasAuthorizedView = (subject: TenantEntitlementSubject, viewCode: string) =>
+  subject.authorizedViews.includes(viewCode)
+
+const addEntitlement = (registry: Map<string, TenantEntitlement>, entitlement: TenantEntitlement) => {
   const key = [entitlement.capability, entitlement.action, entitlement.scope].join(UNIQUE_SEPARATOR)
 
   if (!registry.has(key)) {
@@ -201,7 +214,7 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
       capability: 'hr.leave',
       action: 'read',
       scope: 'tenant',
-        source: hasRouteGroup(subject, 'hr') ? 'route_group' : 'authorized_view'
+      source: hasRouteGroup(subject, 'hr') ? 'route_group' : 'authorized_view'
     })
 
     addEntitlement(entries, {
@@ -363,9 +376,7 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
     hasRole(subject, ROLE_CODES.EFEONCE_ADMIN) ||
     hasRole(subject, ROLE_CODES.FINANCE_ADMIN)
   ) {
-    const source: TenantEntitlementSource = hasRouteGroup(subject, 'hr')
-      ? 'route_group'
-      : 'role'
+    const source: TenantEntitlementSource = hasRouteGroup(subject, 'hr') ? 'route_group' : 'role'
 
     addEntitlement(entries, {
       module: 'workforce',
@@ -405,9 +416,7 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
     hasRole(subject, ROLE_CODES.HR_MANAGER)
   ) {
     const source: TenantEntitlementSource =
-      hasRouteGroup(subject, 'internal') ||
-      hasRouteGroup(subject, 'finance') ||
-      hasRouteGroup(subject, 'hr')
+      hasRouteGroup(subject, 'internal') || hasRouteGroup(subject, 'finance') || hasRouteGroup(subject, 'hr')
         ? 'route_group'
         : 'role'
 
@@ -453,9 +462,7 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
     hasRole(subject, ROLE_CODES.EFEONCE_ADMIN) ||
     hasRole(subject, ROLE_CODES.FINANCE_ADMIN)
   ) {
-    const source: TenantEntitlementSource = hasRouteGroup(subject, 'hr')
-      ? 'route_group'
-      : 'role'
+    const source: TenantEntitlementSource = hasRouteGroup(subject, 'hr') ? 'route_group' : 'role'
 
     addEntitlement(entries, {
       module: 'workforce',
@@ -691,9 +698,7 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
     hasRole(subject, ROLE_CODES.FINANCE_ADMIN) ||
     hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)
   ) {
-    const source: TenantEntitlementSource = hasRouteGroup(subject, 'finance')
-      ? 'route_group'
-      : 'role'
+    const source: TenantEntitlementSource = hasRouteGroup(subject, 'finance') ? 'route_group' : 'role'
 
     for (const action of ['read', 'create', 'manage'] as const) {
       addEntitlement(entries, {
@@ -734,9 +739,7 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
     hasRole(subject, ROLE_CODES.EFEONCE_ADMIN) ||
     hasRole(subject, ROLE_CODES.FINANCE_ADMIN)
   ) {
-    const source: TenantEntitlementSource = hasRouteGroup(subject, 'hr')
-      ? 'route_group'
-      : 'role'
+    const source: TenantEntitlementSource = hasRouteGroup(subject, 'hr') ? 'route_group' : 'role'
 
     addEntitlement(entries, {
       module: 'workforce',
@@ -825,7 +828,11 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
     })
   }
 
-  if (hasRouteGroup(subject, 'hr') || hasAuthorizedView(subject, 'equipo.offboarding') || hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)) {
+  if (
+    hasRouteGroup(subject, 'hr') ||
+    hasAuthorizedView(subject, 'equipo.offboarding') ||
+    hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)
+  ) {
     const source: TenantEntitlementSource = hasRouteGroup(subject, 'hr')
       ? 'route_group'
       : hasAuthorizedView(subject, 'equipo.offboarding')
@@ -859,7 +866,11 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
     }
   }
 
-  if (hasRouteGroup(subject, 'hr') || hasAuthorizedView(subject, 'equipo.onboarding') || hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)) {
+  if (
+    hasRouteGroup(subject, 'hr') ||
+    hasAuthorizedView(subject, 'equipo.onboarding') ||
+    hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)
+  ) {
     const source: TenantEntitlementSource = hasRouteGroup(subject, 'hr')
       ? 'route_group'
       : hasAuthorizedView(subject, 'equipo.onboarding')
@@ -1388,7 +1399,9 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
   }
 
   if (hasRouteGroup(subject, 'my') || hasAuthorizedView(subject, 'mi_ficha.onboarding')) {
-    const source: TenantEntitlementSource = hasAuthorizedView(subject, 'mi_ficha.onboarding') ? 'authorized_view' : 'route_group'
+    const source: TenantEntitlementSource = hasAuthorizedView(subject, 'mi_ficha.onboarding')
+      ? 'authorized_view'
+      : 'route_group'
 
     addEntitlement(entries, {
       module: 'my_workspace',
@@ -1550,7 +1563,12 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
       })
     }
 
-    for (const capability of ['commercial.contract', 'commercial.sow', 'commercial.master_agreement', 'commercial.product_catalog'] as const) {
+    for (const capability of [
+      'commercial.contract',
+      'commercial.sow',
+      'commercial.master_agreement',
+      'commercial.product_catalog'
+    ] as const) {
       for (const action of ['read', 'create', 'update'] as const) {
         addEntitlement(entries, {
           module: 'commercial',
@@ -1640,18 +1658,72 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
   // the sales role family, extend this block (and do not remove the admin
   // grants: efeonce_admin remains the catch-all for commercial writes).
   if (hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)) {
-    addEntitlement(entries, { module: 'commercial', capability: 'commercial.party.create', action: 'create', scope: 'tenant', source: 'role' })
-    addEntitlement(entries, { module: 'commercial', capability: 'commercial.party.promote_to_client', action: 'update', scope: 'tenant', source: 'role' })
-    addEntitlement(entries, { module: 'commercial', capability: 'commercial.party.churn', action: 'update', scope: 'tenant', source: 'role' })
-    addEntitlement(entries, { module: 'commercial', capability: 'commercial.party.override_lifecycle', action: 'update', scope: 'tenant', source: 'role' })
-    addEntitlement(entries, { module: 'commercial', capability: 'commercial.deal.create', action: 'create', scope: 'tenant', source: 'role' })
-    addEntitlement(entries, { module: 'commercial', capability: 'commercial.quote_to_cash.execute', action: 'approve', scope: 'tenant', source: 'role' })
-    addEntitlement(entries, { module: 'commercial', capability: 'commercial.product_catalog.resolve_conflict', action: 'update', scope: 'all', source: 'role' })
+    addEntitlement(entries, {
+      module: 'commercial',
+      capability: 'commercial.party.create',
+      action: 'create',
+      scope: 'tenant',
+      source: 'role'
+    })
+    addEntitlement(entries, {
+      module: 'commercial',
+      capability: 'commercial.party.promote_to_client',
+      action: 'update',
+      scope: 'tenant',
+      source: 'role'
+    })
+    addEntitlement(entries, {
+      module: 'commercial',
+      capability: 'commercial.party.churn',
+      action: 'update',
+      scope: 'tenant',
+      source: 'role'
+    })
+    addEntitlement(entries, {
+      module: 'commercial',
+      capability: 'commercial.party.override_lifecycle',
+      action: 'update',
+      scope: 'tenant',
+      source: 'role'
+    })
+    addEntitlement(entries, {
+      module: 'commercial',
+      capability: 'commercial.deal.create',
+      action: 'create',
+      scope: 'tenant',
+      source: 'role'
+    })
+    addEntitlement(entries, {
+      module: 'commercial',
+      capability: 'commercial.quote_to_cash.execute',
+      action: 'approve',
+      scope: 'tenant',
+      source: 'role'
+    })
+    addEntitlement(entries, {
+      module: 'commercial',
+      capability: 'commercial.product_catalog.resolve_conflict',
+      action: 'update',
+      scope: 'all',
+      source: 'role'
+    })
   }
 
   if (hasRole(subject, ROLE_CODES.FINANCE_ADMIN)) {
-    addEntitlement(entries, { module: 'commercial', capability: 'commercial.party.promote_to_client', action: 'update', scope: 'tenant', source: 'role' })
-    addEntitlement(entries, { module: 'commercial', capability: 'commercial.quote_to_cash.execute', action: 'approve', scope: 'tenant', source: 'role' })
+    addEntitlement(entries, {
+      module: 'commercial',
+      capability: 'commercial.party.promote_to_client',
+      action: 'update',
+      scope: 'tenant',
+      source: 'role'
+    })
+    addEntitlement(entries, {
+      module: 'commercial',
+      capability: 'commercial.quote_to_cash.execute',
+      action: 'approve',
+      scope: 'tenant',
+      source: 'role'
+    })
   }
 
   // ─── TASK-992 — Client Lifecycle Orchestrator (GREENHOUSE_CLIENT_LIFECYCLE_V1 §8) ───
@@ -1668,20 +1740,56 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
     const source: TenantEntitlementSource =
       hasRouteGroup(subject, 'commercial') || hasRouteGroup(subject, 'finance') ? 'route_group' : 'role'
 
-    addEntitlement(entries, { module: 'commercial', capability: 'client.lifecycle.case.read', action: 'read', scope: 'tenant', source })
-    addEntitlement(entries, { module: 'commercial', capability: 'client.lifecycle.case.advance', action: 'update', scope: 'tenant', source })
+    addEntitlement(entries, {
+      module: 'commercial',
+      capability: 'client.lifecycle.case.read',
+      action: 'read',
+      scope: 'tenant',
+      source
+    })
+    addEntitlement(entries, {
+      module: 'commercial',
+      capability: 'client.lifecycle.case.advance',
+      action: 'update',
+      scope: 'tenant',
+      source
+    })
     // TASK-1001 — inviting client-portal users is part of advancing the onboarding
     // checklist (provision_client_users_access). Same tier as advance, NOT EFEONCE_ADMIN-only.
-    addEntitlement(entries, { module: 'commercial', capability: 'client.lifecycle.portal_user.invite', action: 'create', scope: 'tenant', source })
+    addEntitlement(entries, {
+      module: 'commercial',
+      capability: 'client.lifecycle.portal_user.invite',
+      action: 'create',
+      scope: 'tenant',
+      source
+    })
   }
 
   if (hasRole(subject, ROLE_CODES.EFEONCE_ADMIN) || hasRole(subject, ROLE_CODES.FINANCE_ADMIN)) {
-    addEntitlement(entries, { module: 'commercial', capability: 'client.lifecycle.case.open', action: 'create', scope: 'tenant', source: 'role' })
-    addEntitlement(entries, { module: 'commercial', capability: 'client.lifecycle.case.resolve', action: 'approve', scope: 'tenant', source: 'role' })
+    addEntitlement(entries, {
+      module: 'commercial',
+      capability: 'client.lifecycle.case.open',
+      action: 'create',
+      scope: 'tenant',
+      source: 'role'
+    })
+    addEntitlement(entries, {
+      module: 'commercial',
+      capability: 'client.lifecycle.case.resolve',
+      action: 'approve',
+      scope: 'tenant',
+      source: 'role'
+    })
   }
 
   if (hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)) {
-    addEntitlement(entries, { module: 'commercial', capability: 'client.lifecycle.case.override_blocker', action: 'override', scope: 'tenant', source: 'role' })
+    addEntitlement(entries, {
+      module: 'commercial',
+      capability: 'client.lifecycle.case.override_blocker',
+      action: 'override',
+      scope: 'tenant',
+      source: 'role'
+    })
   }
 
   // ─── TASK-696 Wave 6 — Smart Home strategic blocks (CEO/role-aware) ───
@@ -1692,28 +1800,70 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
   // home.briefing.daily — every authenticated user gets the AI briefing in
   // their own scope; the narrative content varies by audience inside the
   // loader (CEO vs finance vs hr vs delivery vs collaborator).
-  addEntitlement(entries, { module: 'home', capability: 'home.briefing.daily', action: 'read', scope: 'own', source: 'policy' })
+  addEntitlement(entries, {
+    module: 'home',
+    capability: 'home.briefing.daily',
+    action: 'read',
+    scope: 'own',
+    source: 'policy'
+  })
 
   // home.runway — finance + CEO. Organization scope (the whole tenant cash
   // position, not per-team).
-  if (hasRole(subject, ROLE_CODES.EFEONCE_ADMIN) || hasRole(subject, ROLE_CODES.FINANCE_ADMIN) || hasRole(subject, ROLE_CODES.FINANCE_ANALYST)) {
-    addEntitlement(entries, { module: 'finance', capability: 'home.runway', action: 'read', scope: 'organization', source: 'role' })
+  if (
+    hasRole(subject, ROLE_CODES.EFEONCE_ADMIN) ||
+    hasRole(subject, ROLE_CODES.FINANCE_ADMIN) ||
+    hasRole(subject, ROLE_CODES.FINANCE_ANALYST)
+  ) {
+    addEntitlement(entries, {
+      module: 'finance',
+      capability: 'home.runway',
+      action: 'read',
+      scope: 'organization',
+      source: 'role'
+    })
   }
 
   // home.atrisk.spaces — only CEO/admin sees the cross-tenant Top 5 risk list.
   if (hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)) {
-    addEntitlement(entries, { module: 'agency', capability: 'home.atrisk.spaces', action: 'read', scope: 'organization', source: 'role' })
+    addEntitlement(entries, {
+      module: 'agency',
+      capability: 'home.atrisk.spaces',
+      action: 'read',
+      scope: 'organization',
+      source: 'role'
+    })
   }
 
   // home.atrisk.invoices — finance roles + CEO.
-  if (hasRole(subject, ROLE_CODES.EFEONCE_ADMIN) || hasRole(subject, ROLE_CODES.FINANCE_ADMIN) || hasRole(subject, ROLE_CODES.FINANCE_ANALYST)) {
-    addEntitlement(entries, { module: 'finance', capability: 'home.atrisk.invoices', action: 'read', scope: 'organization', source: 'role' })
+  if (
+    hasRole(subject, ROLE_CODES.EFEONCE_ADMIN) ||
+    hasRole(subject, ROLE_CODES.FINANCE_ADMIN) ||
+    hasRole(subject, ROLE_CODES.FINANCE_ANALYST)
+  ) {
+    addEntitlement(entries, {
+      module: 'finance',
+      capability: 'home.atrisk.invoices',
+      action: 'read',
+      scope: 'organization',
+      source: 'role'
+    })
   }
 
   // home.atrisk.members — HR roles + CEO. Tenant scope (covers all members
   // of the organization).
-  if (hasRole(subject, ROLE_CODES.EFEONCE_ADMIN) || hasRole(subject, ROLE_CODES.HR_MANAGER) || hasRole(subject, ROLE_CODES.HR_PAYROLL)) {
-    addEntitlement(entries, { module: 'hr', capability: 'home.atrisk.members', action: 'read', scope: 'tenant', source: 'role' })
+  if (
+    hasRole(subject, ROLE_CODES.EFEONCE_ADMIN) ||
+    hasRole(subject, ROLE_CODES.HR_MANAGER) ||
+    hasRole(subject, ROLE_CODES.HR_PAYROLL)
+  ) {
+    addEntitlement(entries, {
+      module: 'hr',
+      capability: 'home.atrisk.members',
+      action: 'read',
+      scope: 'tenant',
+      source: 'role'
+    })
   }
 
   // home.atrisk.projects — delivery / operations roles + CEO. Team scope —
@@ -1724,7 +1874,13 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
     hasRole(subject, ROLE_CODES.EFEONCE_OPERATIONS) ||
     hasRole(subject, ROLE_CODES.EFEONCE_ACCOUNT)
   ) {
-    addEntitlement(entries, { module: 'agency', capability: 'home.atrisk.projects', action: 'read', scope: 'team', source: 'role' })
+    addEntitlement(entries, {
+      module: 'agency',
+      capability: 'home.atrisk.projects',
+      action: 'read',
+      scope: 'team',
+      source: 'role'
+    })
   }
 
   // TASK-611 — Organization Workspace facet capabilities.
@@ -1767,16 +1923,17 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
   // TASK-839 — Admin Center governance overlay. Route/view access opens the
   // surface; these capabilities gate mutations and audit reads.
   if (hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)) {
-    const accessGovernanceCapabilities: Array<{ capability: EntitlementCapabilityKey; actions: EntitlementAction[] }> = [
-      { capability: 'access.governance.role_defaults.read', actions: ['read'] },
-      { capability: 'access.governance.role_defaults.update', actions: ['update'] },
-      { capability: 'access.governance.user_overrides.read', actions: ['read'] },
-      { capability: 'access.governance.user_overrides.create', actions: ['create'] },
-      { capability: 'access.governance.user_overrides.approve', actions: ['approve'] },
-      { capability: 'access.governance.startup_policy.update', actions: ['update'] },
-      { capability: 'access.governance.audit_log.read', actions: ['read'] },
-      { capability: 'access.governance.capability.deprecate', actions: ['manage'] }
-    ]
+    const accessGovernanceCapabilities: Array<{ capability: EntitlementCapabilityKey; actions: EntitlementAction[] }> =
+      [
+        { capability: 'access.governance.role_defaults.read', actions: ['read'] },
+        { capability: 'access.governance.role_defaults.update', actions: ['update'] },
+        { capability: 'access.governance.user_overrides.read', actions: ['read'] },
+        { capability: 'access.governance.user_overrides.create', actions: ['create'] },
+        { capability: 'access.governance.user_overrides.approve', actions: ['approve'] },
+        { capability: 'access.governance.startup_policy.update', actions: ['update'] },
+        { capability: 'access.governance.audit_log.read', actions: ['read'] },
+        { capability: 'access.governance.capability.deprecate', actions: ['manage'] }
+      ]
 
     for (const { capability, actions } of accessGovernanceCapabilities) {
       for (const action of actions) {
@@ -1951,6 +2108,36 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
     })
   }
 
+  // TASK-1120 — Design Handoff Registry. Read is internal-wide because Design
+  // System itself is view-accessible to internal collaborators; create/transition
+  // stays with DESIGNER ∪ EFEONCE_ADMIN.
+  if (hasRouteGroup(subject, 'internal') || hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)) {
+    addEntitlement(entries, {
+      module: 'design_system',
+      capability: 'design_system.handoff.read',
+      action: 'read',
+      scope: 'tenant',
+      source: hasRouteGroup(subject, 'internal') ? 'route_group' : 'role'
+    })
+  }
+
+  if (hasRole(subject, ROLE_CODES.DESIGNER) || hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)) {
+    addEntitlement(entries, {
+      module: 'design_system',
+      capability: 'design_system.handoff.create',
+      action: 'create',
+      scope: 'tenant',
+      source: 'role'
+    })
+    addEntitlement(entries, {
+      module: 'design_system',
+      capability: 'design_system.handoff.transition',
+      action: 'update',
+      scope: 'tenant',
+      source: 'role'
+    })
+  }
+
   // TASK-1081 — Knowledge Platform capabilities. MVP solo interno. Sembradas en el
   // catalog + capabilities_registry en el mismo PR (invariant TASK-873/935; guard
   // capability-grant-coverage.test.ts). Aún no can()-checked: los consumidores
@@ -1967,20 +2154,56 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
   ) {
     const source: TenantEntitlementSource = hasRouteGroup(subject, 'internal') ? 'route_group' : 'role'
 
-    addEntitlement(entries, { module: 'knowledge', capability: 'knowledge.document.read', action: 'read', scope: 'tenant', source })
-    addEntitlement(entries, { module: 'knowledge', capability: 'knowledge.agentic.retrieve', action: 'read', scope: 'all', source })
-    addEntitlement(entries, { module: 'knowledge', capability: 'knowledge.feedback.submit', action: 'create', scope: 'tenant', source })
+    addEntitlement(entries, {
+      module: 'knowledge',
+      capability: 'knowledge.document.read',
+      action: 'read',
+      scope: 'tenant',
+      source
+    })
+    addEntitlement(entries, {
+      module: 'knowledge',
+      capability: 'knowledge.agentic.retrieve',
+      action: 'read',
+      scope: 'all',
+      source
+    })
+    addEntitlement(entries, {
+      module: 'knowledge',
+      capability: 'knowledge.feedback.submit',
+      action: 'create',
+      scope: 'tenant',
+      source
+    })
   }
 
   if (hasRouteGroup(subject, 'internal') || hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)) {
     const source: TenantEntitlementSource = hasRouteGroup(subject, 'internal') ? 'route_group' : 'role'
 
-    addEntitlement(entries, { module: 'knowledge', capability: 'knowledge.document.publish', action: 'create', scope: 'tenant', source })
-    addEntitlement(entries, { module: 'knowledge', capability: 'knowledge.document.publish', action: 'update', scope: 'tenant', source })
+    addEntitlement(entries, {
+      module: 'knowledge',
+      capability: 'knowledge.document.publish',
+      action: 'create',
+      scope: 'tenant',
+      source
+    })
+    addEntitlement(entries, {
+      module: 'knowledge',
+      capability: 'knowledge.document.publish',
+      action: 'update',
+      scope: 'tenant',
+      source
+    })
   }
 
   if (hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)) {
-    addEntitlement(entries, { module: 'knowledge', capability: 'knowledge.source.admin', action: 'manage', scope: 'all', source: 'role' })
+    addEntitlement(entries, {
+      module: 'knowledge',
+      capability: 'knowledge.source.admin',
+      action: 'manage',
+      scope: 'all',
+      source: 'role'
+    })
   }
 
   // TASK-1137 — Nexa governed action runtime. Audiencia del piloto: usuarios internos ∪ EFEONCE_ADMIN
@@ -1989,7 +2212,13 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
   if (hasRouteGroup(subject, 'internal') || hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)) {
     const source: TenantEntitlementSource = hasRouteGroup(subject, 'internal') ? 'route_group' : 'role'
 
-    addEntitlement(entries, { module: 'home', capability: 'nexa.action.execute', action: 'execute', scope: 'own', source })
+    addEntitlement(entries, {
+      module: 'home',
+      capability: 'nexa.action.execute',
+      action: 'execute',
+      scope: 'own',
+      source
+    })
   }
 
   const resolvedEntries = Array.from(entries.values())
@@ -2032,10 +2261,8 @@ export const hasEntitlement = (
 ) => {
   const entitlements = resolveEntitlements(input)
 
-  return entitlements.entries.some(entry =>
-    entry.capability === capability &&
-    entry.action === action &&
-    scopeMatches(entry.scope, scope)
+  return entitlements.entries.some(
+    entry => entry.capability === capability && entry.action === action && scopeMatches(entry.scope, scope)
   )
 }
 

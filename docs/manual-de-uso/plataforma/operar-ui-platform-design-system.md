@@ -23,6 +23,16 @@
 4. Revisa props, variants y kinds documentados.
 5. Usa la primitive desde `@/components/greenhouse/primitives` cuando exista.
 
+## Registrar handoffs de diseño producto
+
+1. Abre `/design-system/handoff`.
+2. Verifica que el archivo Figma de producto esté aprobado en `greenhouse_core.design_handoff_allowed_files`.
+3. Pega una URL de selección Figma desde un archivo allowlisted; no uses nodos del master AXIS.
+4. Registra el handoff como `Página` o `Componente`.
+5. DEV toma la entrada, la pasa a `En implementación` y solo la marca `Implementado` cuando exista una ruta interna real.
+
+Si el allowlist está vacío, la vista debe permanecer fail-closed: se puede inspeccionar el carril, pero no registrar nodos reales hasta aprobar un `file_key` de producto.
+
 ## Crear o extender una primitive
 
 1. Confirma que no existe primitive equivalente.

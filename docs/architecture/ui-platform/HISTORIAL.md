@@ -7,6 +7,12 @@
 
 ---
 
+## Delta 2026-06-19 — TASK-1120: Design Handoff Registry producto→DEV
+
+Se agregó `/design-system/handoff` como carril gobernado para registrar nodos Figma de **producto** hacia implementación sin contaminar el master AXIS ni el aggregate AXIS-only de TASK-1072 (`design_system_figma_nodes`). La ruta vive bajo el catálogo interno del Design System, usa `CompositionShell` + `AdaptiveSidecarLayout` y declara discoverability en `DesignSystemCatalogView` + `route-reachability-manifest`.
+
+El contrato runtime es intentionally fail-closed: `greenhouse_core.design_handoff_allowed_files` debe autorizar `file_key` de producto antes de registrar entradas; el `AXIS_FILE_KEY` queda bloqueado por DB y store. La UI muestra preview Figma solo si el archivo está allowlisted y degrada honesto cuando el allowlist está vacío. GVC local desktop/mobile: `.captures/2026-06-19T22-18-12_inline-design-system-handoff` y `.captures/2026-06-19T22-20-38_inline-design-system-handoff`. Nota: el overflow móvil global de child routes DS sigue cubierto por TASK-1168; no se resuelve en este delta.
+
 ## Delta 2026-06-18 — Brand logo variations desde AXIS Figma
 
 Se agregó `GreenhouseBrandLogoMark` como primitive gobernada para portar logos externos desde AXIS Figma sin crear SVGs sueltos por surface. La primitive conserva `variant` para los modos funcionales (`isotype`, `contained`, `lockup`) y modela las variantes de marca como `kind`. El set vigente cubre Gemini, ChatGPT/GPT, Adobe, Adobe Express, Adobe Firefly, Adobe Photoshop, Adobe Premiere Pro, Adobe Illustrator, Adobe After Effects, Envato, Shutterstock, Higgsfield, Magnific, ElevenLabs, Claude, Microsoft Teams, Notion, HubSpot, Semrush, Ahrefs y Metricool.

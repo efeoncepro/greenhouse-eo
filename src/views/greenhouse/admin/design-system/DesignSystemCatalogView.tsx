@@ -630,6 +630,20 @@ const CATALOG_ITEMS: CatalogItem[] = [
     owner: 'DesignSystemCatalogView',
     tags: ['navigation', 'catalog', 'governance'],
     icon: 'tabler-layout-list'
+  },
+  {
+    id: 'design-handoff',
+    title: 'Design handoff',
+    description:
+      'Registro gobernado para pasar nodos Figma de producto a DEV sin contaminar el master AXIS ni perder estado de implementación.',
+    route: '/design-system/handoff',
+    category: 'Governance',
+    kind: 'Pattern',
+    status: 'Hardening',
+    owner: 'DesignHandoffLaneView',
+    tags: ['figma', 'handoff', 'implementation', 'governance'],
+    searchAliases: ['design handoff', 'handoff', 'registro figma', 'implementacion', 'producto'],
+    icon: 'tabler-layout-kanban'
   }
 ]
 

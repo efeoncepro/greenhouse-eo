@@ -20,13 +20,7 @@
  * Mockup routes (`**​/mockup/**`) are excluded.
  */
 
-export type ChildRouteVia =
-  | 'header-cta'
-  | 'row-action'
-  | 'inline-link'
-  | 'wizard-step'
-  | 'tab'
-  | 'redirect-alias' // legacy URL that only redirects to the canonical surface (kept for old bookmarks)
+export type ChildRouteVia = 'header-cta' | 'row-action' | 'inline-link' | 'wizard-step' | 'tab' | 'redirect-alias' // legacy URL that only redirects to the canonical surface (kept for old bookmarks)
 
 export interface ChildRouteDeclaration {
   /** The child route that is intentionally NOT a top-level menu item. */
@@ -158,6 +152,13 @@ export const DECLARED_CHILD_ROUTES: readonly ChildRouteDeclaration[] = [
     via: 'inline-link',
     reason:
       'Adaptive Card density Lab (TASK-1115) — child surface del Design System para el contrato de densidad de cards (full/condensed/peek por container query); capacidad hermana del Composition Shell; alcanzable desde el catalogo canonico /design-system.'
+  },
+  {
+    route: '/design-system/handoff',
+    parent: '/design-system',
+    via: 'inline-link',
+    reason:
+      'Design Handoff Registry (TASK-1120) — child surface del Design System para gobernar handoff Figma producto -> DEV sin mezclar nodos de producto en el master AXIS; alcanzable desde el catalogo canonico /design-system.'
   },
   {
     route: '/design-system/loaders',

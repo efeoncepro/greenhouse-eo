@@ -7,15 +7,10 @@ import { usePathname, useRouter } from 'next/navigation'
 import Box from '@mui/material/Box'
 import Stack from '@mui/material/Stack'
 
-import {
-  GreenhouseBreadcrumbs,
-  type GreenhouseBreadcrumbItem
-} from '@/components/greenhouse/primitives'
+import { GreenhouseBreadcrumbs, type GreenhouseBreadcrumbItem } from '@/components/greenhouse/primitives'
 import type { DesignSystemFigmaNodeMap } from '@/lib/design-system/figma-nodes/store'
 
-import FigmaNodeLinkAffordance, {
-  type FigmaNodeLinkResult
-} from './figma-link/FigmaNodeLinkAffordance'
+import FigmaNodeLinkAffordance, { type FigmaNodeLinkResult } from './figma-link/FigmaNodeLinkAffordance'
 
 const HOME_ROUTE = '/home'
 const DESIGN_SYSTEM_ROUTE = '/design-system'
@@ -34,6 +29,7 @@ const DESIGN_SYSTEM_ROUTE_LABELS = {
   [`${DESIGN_SYSTEM_ROUTE}/elevation`]: 'Elevation',
   [`${DESIGN_SYSTEM_ROUTE}/floating-surfaces`]: 'Floating Surfaces',
   [`${DESIGN_SYSTEM_ROUTE}/geometry`]: 'Geometry',
+  [`${DESIGN_SYSTEM_ROUTE}/handoff`]: 'Design Handoff',
   [`${DESIGN_SYSTEM_ROUTE}/loaders`]: 'Loaders',
   [`${DESIGN_SYSTEM_ROUTE}/microinteractions`]: 'Microinteractions',
   [`${DESIGN_SYSTEM_ROUTE}/mockup/brand-color-comparison`]: 'Brand Color Comparison',
@@ -90,7 +86,9 @@ const resolveDesignSystemBreadcrumbItems = (pathname: string): GreenhouseBreadcr
 
   if (currentRoute !== DESIGN_SYSTEM_ROUTE) {
     items.push({
-      label: DESIGN_SYSTEM_ROUTE_LABELS[currentRoute as keyof typeof DESIGN_SYSTEM_ROUTE_LABELS] ?? fallbackLabel(currentRoute)
+      label:
+        DESIGN_SYSTEM_ROUTE_LABELS[currentRoute as keyof typeof DESIGN_SYSTEM_ROUTE_LABELS] ??
+        fallbackLabel(currentRoute)
     })
   }
 

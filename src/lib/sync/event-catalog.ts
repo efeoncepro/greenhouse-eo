@@ -222,6 +222,8 @@ export const AGGREGATE_TYPES = {
   // TASK-1072 — Design System ↔ AXIS Figma node link (SSOT runtime del vínculo
   // superficie↔nodo). Aggregate identity = surface_key (ruta normalizada del DS).
   designSystemFigmaNode: 'design_system_figma_node',
+  // TASK-1120 — Design handoff de producto. Aggregate identity = entry_id.
+  designHandoffEntry: 'design_handoff_entry',
 
   // TASK-1171 Slice 3 — Activación gobernada del sync Notion->ICO de un cliente.
   // Aggregate identity = source_id ('sns-{uuid}') de greenhouse_core.space_notion_sources.
@@ -780,13 +782,11 @@ export const EVENT_TYPES = {
   contractorEngagementPaused: 'workforce.contractor_engagement.paused',
   contractorEngagementEnded: 'workforce.contractor_engagement.ended',
   contractorEngagementCancelled: 'workforce.contractor_engagement.cancelled',
-  contractorEngagementClassificationRiskFlagged:
-    'workforce.contractor_engagement.classification_risk_flagged',
+  contractorEngagementClassificationRiskFlagged: 'workforce.contractor_engagement.classification_risk_flagged',
   // TASK-797 — cierre contractor iniciado (active/paused -> ending; winding-down,
   // no se aceptan nuevas work submissions). El cierre ejecutado (-> ended) reusa
   // `contractorEngagementEnded` con payload enriquecido de closure.
-  contractorEngagementClosureInitiated:
-    'workforce.contractor_engagement.closure_initiated',
+  contractorEngagementClosureInitiated: 'workforce.contractor_engagement.closure_initiated',
 
   // TASK-792 — Contractor work submissions lifecycle (v1). Evidencia de trabajo
   // (timesheet/milestone/deliverable/...) con approval/dispute/reject. Aprobación
@@ -1044,6 +1044,12 @@ export const EVENT_TYPES = {
   // Sin consumer reactivo en V1 (audit/observabilidad). Enrichment (node render) = Slice 4 diferido.
   designSystemFigmaNodeLinked: 'design_system.figma_node.linked',
   designSystemFigmaNodeRelinked: 'design_system.figma_node.relinked',
+
+  // TASK-1120 — Design Handoff Registry. Sin consumer reactivo en V1; audit,
+  // timeline y future MCP/API consumers leen el aggregate/store.
+  designHandoffRegistered: 'design_system.handoff.registered',
+  designHandoffTransitioned: 'design_system.handoff.transitioned',
+  designHandoffArchived: 'design_system.handoff.archived',
 
   // TASK-1171 Slice 3 — Sync Notion->ICO de un cliente activado vía command gobernado.
   // aggregate_type = space_notion_source, aggregate_id = source_id. Sin consumer

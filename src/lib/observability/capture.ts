@@ -68,6 +68,7 @@ export type CaptureDomain =
   | 'workforce' // TASK-1019 — Workforce Contracting Studio (offer letters + employment contracts, AI drafting)
   | 'documents' // TASK-490 — Signature orchestration + document vault (EPIC-001 signable pack)
   | 'knowledge' // TASK-1081 — Knowledge Platform (corpus + chunks + retrieval agéntico)
+  | 'platform' // TASK-1120 — Design System/platform governance surfaces and signals
   | 'roadmap' // TASK-1152 — Roadmap work item index reader (Markdown SSOT, read-only)
 
 export interface CaptureOptions {

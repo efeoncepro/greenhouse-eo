@@ -57,6 +57,10 @@ export type CanonicalErrorCode =
   // Design System Figma node linking (TASK-1072).
   | 'invalid_figma_url'
   | 'figma_node_not_axis'
+  | 'figma_file_not_allowed'
+  | 'design_handoff_not_found'
+  | 'invalid_design_handoff_input'
+  | 'invalid_design_handoff_transition'
   // Nexa chat endpoint (TASK-1131).
   | 'nexa_prompt_required'
   | 'nexa_generation_failed'
@@ -69,8 +73,8 @@ export type CanonicalErrorCode =
   // ICO sync activation gobernada (TASK-1171 Slice 3).
   | 'ico_sync_client_not_found'
   | 'ico_sync_source_not_connected'
-  // Reserved for future canonical codes — extender aquí cuando emerjan
-  // nuevos error paths estructurales. NUNCA usar strings ad-hoc.
+// Reserved for future canonical codes — extender aquí cuando emerjan
+// nuevos error paths estructurales. NUNCA usar strings ad-hoc.
 
 export interface CanonicalErrorBody {
   /** es-CL canónico, safe para mostrar al usuario directo. */
@@ -102,7 +106,8 @@ const CANONICAL_ERRORS: Record<CanonicalErrorCode, CanonicalErrorDefinition> = {
     status: 422,
     // Mensaje accionable explicando QUÉ falta y QUÉ hacer.
     // Reintentar no resuelve — el operador debe gestionar con HR.
-    message: 'Tu cuenta aún no está enlazada a un colaborador. Pídele a People Ops que active tu identidad para acceder a las vistas personales.',
+    message:
+      'Tu cuenta aún no está enlazada a un colaborador. Pídele a People Ops que active tu identidad para acceder a las vistas personales.',
     actionable: false
   },
   client_tenant_required: {
@@ -139,6 +144,27 @@ const CANONICAL_ERRORS: Record<CanonicalErrorCode, CanonicalErrorDefinition> = {
     status: 422,
     message: 'El nodo debe ser del archivo AXIS. Pega un enlace de un nodo del Design System en AXIS.',
     actionable: true
+  },
+  figma_file_not_allowed: {
+    status: 422,
+    message:
+      'Ese archivo de Figma aún no está aprobado para handoff de producto. Pídele a un admin que lo agregue al allowlist.',
+    actionable: false
+  },
+  design_handoff_not_found: {
+    status: 404,
+    message: 'No encontramos ese handoff de diseño. Puede que se haya archivado o movido.',
+    actionable: false
+  },
+  invalid_design_handoff_input: {
+    status: 422,
+    message: 'Revisa los datos del handoff. La ruta implementada debe ser una ruta interna válida.',
+    actionable: true
+  },
+  invalid_design_handoff_transition: {
+    status: 409,
+    message: 'Ese cambio de estado no es válido para el handoff seleccionado.',
+    actionable: false
   },
   nexa_prompt_required: {
     status: 422,
@@ -183,7 +209,8 @@ const CANONICAL_ERRORS: Record<CanonicalErrorCode, CanonicalErrorDefinition> = {
   ico_sync_source_not_connected: {
     status: 422,
     // Reintentar no resuelve: hay que conectar Notion primero (wizard de onboarding).
-    message: 'Este cliente aún no tiene Notion conectado, así que no se puede activar su sync de ICO. Conéctalo primero desde el onboarding.',
+    message:
+      'Este cliente aún no tiene Notion conectado, así que no se puede activar su sync de ICO. Conéctalo primero desde el onboarding.',
     actionable: false
   }
 }

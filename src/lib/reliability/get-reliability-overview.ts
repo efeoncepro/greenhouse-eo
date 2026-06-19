@@ -7,10 +7,7 @@ import { getGitHubBillingOverview } from '@/lib/cloud/github-billing'
 import { getVercelBillingOverview } from '@/lib/cloud/vercel-billing'
 import { getNotionSyncOperationalOverview } from '@/lib/integrations/notion-sync-operational-overview'
 import type { NotionSyncOperationalOverview } from '@/lib/integrations/notion-sync-operational-overview'
-import {
-  getOperationsOverview,
-  type OperationsOverview
-} from '@/lib/operations/get-operations-overview'
+import { getOperationsOverview, type OperationsOverview } from '@/lib/operations/get-operations-overview'
 import { getFinanceSmokeLaneStatus } from '@/lib/reliability/finance/get-finance-smoke-lane-status'
 import { getLatestSyntheticSnapshotsByRoute } from '@/lib/reliability/synthetic/reader'
 import type { GcpBillingOverview } from '@/types/billing-export'
@@ -100,10 +97,7 @@ import {
   getNotionStatusTransitionsBqSyncLagSignal
 } from './queries/notion-status-transitions-signals'
 import { getNotionStatusTransitionsReconciliationSignal } from './queries/notion-status-transitions-reconciliation'
-import {
-  getRescheduleCaptureLagSignal,
-  getReschedulePendingReasonSignal
-} from './queries/reschedule-signals'
+import { getRescheduleCaptureLagSignal, getReschedulePendingReasonSignal } from './queries/reschedule-signals'
 import {
   getAttributableLatenessShadowParidadSignal,
   getAttributableLatenessOverlapSignal,
@@ -172,10 +166,7 @@ import { getServicesLegacyResidualReadsSignal } from './queries/services-legacy-
 import { getServicesOrganizationUnresolvedSignal } from './queries/services-organization-unresolved'
 import { getServicesSyncLagSignal } from './queries/services-sync-lag'
 import { getHomeRolloutDriftSignal } from './queries/home-rollout-drift'
-import {
-  getRoleTitleDriftWithEntraSignal,
-  getRoleTitleUnresolvedDriftOverdueSignal
-} from './queries/role-title-drift'
+import { getRoleTitleDriftWithEntraSignal, getRoleTitleUnresolvedDriftOverdueSignal } from './queries/role-title-drift'
 import { getShortcutsInvalidPinsSignal } from './queries/shortcuts-invalid-pins'
 import { getWorkspaceProjectionFacetViewDriftSignal } from './queries/workspace-projection-drift'
 import { getWorkspaceProjectionUnresolvedRelationsSignal } from './queries/workspace-projection-unresolved-relations'
@@ -200,6 +191,7 @@ import { getReleaseWorkerRevisionDriftSignal } from './queries/release-worker-re
 import { getKortexGithubCiLastStatusSignal } from './queries/kortex-github-ci-last-status'
 import { getPublicSiteAstroDeployFailedSignal } from './queries/public-site-astro-deploy-failed'
 import { getPublicSiteAstroCiFailedSignal } from './queries/public-site-astro-ci-failed'
+import { getDesignHandoffStaleEntriesSignal } from './queries/design-handoff-stale-entries'
 import { getEmailRenderFailureSignal } from './queries/email-render-failure'
 import { getNuboxSourceFreshnessSignal } from './queries/nubox-source-freshness'
 import { getNotionConformedDrainFreshnessSignal } from './queries/notion-conformed-drain-freshness'
@@ -240,11 +232,7 @@ import { getEngagementUnapprovedActiveSignal } from './queries/engagement-unappr
 import { getEngagementZombieSignal } from './queries/engagement-zombie'
 import { RELIABILITY_REGISTRY } from './registry'
 import { getReliabilityRegistry } from './registry-store'
-import {
-  aggregateModuleStatus,
-  computeConfidence,
-  isConcreteSeverity
-} from './severity'
+import { aggregateModuleStatus, computeConfidence, isConcreteSeverity } from './severity'
 import {
   buildCloudSignals,
   buildDomainIncidentSignals,
@@ -413,9 +401,7 @@ const buildSummary = (
   return `Estado: ${status}.`
 }
 
-const buildSignalCounts = (
-  signals: ReliabilitySignal[]
-): Record<ReliabilitySeverity, number> => {
+const buildSignalCounts = (signals: ReliabilitySignal[]): Record<ReliabilitySeverity, number> => {
   const counts: Record<ReliabilitySeverity, number> = {
     ok: 0,
     warning: 0,
@@ -893,6 +879,13 @@ interface ReliabilityOverviewSources {
   publicSiteAstroCiFailed?: ReliabilitySignal | null
 
   /**
+   * TASK-1120 — Design Handoff Registry signal.
+   *   - design_system.handoff.stale_entries (drift)
+   * Roll up bajo moduleKey='platform' como governance del Design System.
+   */
+  designHandoffStaleEntries?: ReliabilitySignal | null
+
+  /**
    * TASK-910 Slice 4 — Notion Demo Teamspace Sandbox signals (6 canonical):
    *   - notion.metrics.shadow_paridad_rpa_demo (drift)
    *   - notion.metrics.echo_loop_detected_demo (drift)
@@ -941,9 +934,7 @@ export const buildReliabilityOverview = (
 ): ReliabilityOverview => {
   const syntheticSnapshots = sources.syntheticSnapshots ?? []
 
-  const effectiveModules = sources.modules && sources.modules.length > 0
-    ? sources.modules
-    : RELIABILITY_REGISTRY
+  const effectiveModules = sources.modules && sources.modules.length > 0 ? sources.modules : RELIABILITY_REGISTRY
 
   const allSignals: ReliabilitySignal[] = [
     ...buildSubsystemSignals(operations.subsystems),
@@ -1000,13 +991,9 @@ export const buildReliabilityOverview = (
       ? [sources.notionCorrectionTransitionsSourceAvailability]
       : []),
     // TASK-923 (M1) — shadow paridad clasificador OTD GH vs Notion synced.
-    ...(sources.notionMetricsOtdClassifierParity
-      ? [sources.notionMetricsOtdClassifierParity]
-      : []),
+    ...(sources.notionMetricsOtdClassifierParity ? [sources.notionMetricsOtdClassifierParity] : []),
     // TASK-1169 Slice 3 — OTD imputable member×month: comparabilidad de cohorte.
-    ...(sources.otdAttributableMemberMonthParity
-      ? [sources.otdAttributableMemberMonthParity]
-      : []),
+    ...(sources.otdAttributableMemberMonthParity ? [sources.otdAttributableMemberMonthParity] : []),
     // TASK-893 Slice 5 — Payroll Participation Window signals (3 readers).
     // Subsystem rollup Finance Data Quality via moduleKey='finance'. Each
     // reader degrades honestly (severity=unknown) on query failure. The
@@ -1050,24 +1037,16 @@ export const buildReliabilityOverview = (
     ...(sources.multiCurrencyNativeEquivalentDrift ? [sources.multiCurrencyNativeEquivalentDrift] : []),
     ...(sources.cashSignalUnsupportedCurrency ? [sources.cashSignalUnsupportedCurrency] : []),
     // TASK-793 Slice 3 — contractor payable → Finance bridge (lag + dead-letter).
-    ...(sources.contractorPayableReadyWithoutObligation
-      ? [sources.contractorPayableReadyWithoutObligation]
-      : []),
+    ...(sources.contractorPayableReadyWithoutObligation ? [sources.contractorPayableReadyWithoutObligation] : []),
     ...(sources.contractorPayableBridgeDeadLetter ? [sources.contractorPayableBridgeDeadLetter] : []),
     ...(sources.contractorRemittanceEmailDeadLetter ? [sources.contractorRemittanceEmailDeadLetter] : []),
     // TASK-795 Fase A — international boundary block signals (tax review + FX).
     ...(sources.contractorPayableTaxReviewOverdue ? [sources.contractorPayableTaxReviewOverdue] : []),
-    ...(sources.contractorPayableFxUnresolvedOverdue
-      ? [sources.contractorPayableFxUnresolvedOverdue]
-      : []),
+    ...(sources.contractorPayableFxUnresolvedOverdue ? [sources.contractorPayableFxUnresolvedOverdue] : []),
     // TASK-968 — payables blocked by the agreed-amount guardrail (no override).
-    ...(sources.contractorPayableExceedsAgreedAmount
-      ? [sources.contractorPayableExceedsAgreedAmount]
-      : []),
+    ...(sources.contractorPayableExceedsAgreedAmount ? [sources.contractorPayableExceedsAgreedAmount] : []),
     // TASK-977 — committed payables without a materialized expense (settlement precondition).
-    ...(sources.contractorPayableExpenseUnmaterialized
-      ? [sources.contractorPayableExpenseUnmaterialized]
-      : []),
+    ...(sources.contractorPayableExpenseUnmaterialized ? [sources.contractorPayableExpenseUnmaterialized] : []),
     ...(sources.contractorPayablePaymentSlaOverdue ? [sources.contractorPayablePaymentSlaOverdue] : []),
     // TASK-1019 — Workforce Contracting signals (moduleKey 'workforce').
     ...(sources.contractingAiDraftFailed ? [sources.contractingAiDraftFailed] : []),
@@ -1135,6 +1114,8 @@ export const buildReliabilityOverview = (
     ...(sources.publicSiteAstroDeployFailed ? [sources.publicSiteAstroDeployFailed] : []),
     // TASK-1167 — Public Site Astro GitHub repository CI runtime signal.
     ...(sources.publicSiteAstroCiFailed ? [sources.publicSiteAstroCiFailed] : []),
+    // TASK-1120 — Design handoff queue stale entries.
+    ...(sources.designHandoffStaleEntries ? [sources.designHandoffStaleEntries] : []),
     // TASK-910 Slice 4 — Notion Demo Teamspace Sandbox signals (6 canonical).
     // 5 bajo moduleKey 'delivery' + 1 CRITICAL bajo moduleKey 'payroll'.
     ...(sources.notionMetricsDemo ?? []),
@@ -1246,9 +1227,7 @@ export const getReliabilityOverview = async (
   const operations = preloadedOperations ?? (await getOperationsOverview())
 
   const billing =
-    preloadedSources.billing !== undefined
-      ? preloadedSources.billing
-      : await getGcpBillingOverview().catch(() => null)
+    preloadedSources.billing !== undefined ? preloadedSources.billing : await getGcpBillingOverview().catch(() => null)
 
   const vercelBilling =
     preloadedSources.vercelBilling !== undefined
@@ -1302,9 +1281,10 @@ export const getReliabilityOverview = async (
   // overview. Skipped when caller pre-provides `domainIncidents` (admin/AI
   // observer paths that already have the data) or when there are no modules
   // declaring an incident tag.
-  const domainIncidents = preloadedSources.domainIncidents !== undefined
-    ? preloadedSources.domainIncidents
-    : await hydrateDomainIncidents(modules ?? RELIABILITY_REGISTRY)
+  const domainIncidents =
+    preloadedSources.domainIncidents !== undefined
+      ? preloadedSources.domainIncidents
+      : await hydrateDomainIncidents(modules ?? RELIABILITY_REGISTRY)
 
   // TASK-765 Slice 7 — payment_order ↔ bank settlement signals (drift /
   // dead_letter / lag). Cada reader degrada honestamente (severity=unknown)
@@ -1970,6 +1950,11 @@ export const getReliabilityOverview = async (
       ? preloadedSources.publicSiteAstroCiFailed
       : await getPublicSiteAstroCiFailedSignal().catch(() => null)
 
+  const designHandoffStaleEntries =
+    preloadedSources.designHandoffStaleEntries !== undefined
+      ? preloadedSources.designHandoffStaleEntries
+      : await getDesignHandoffStaleEntriesSignal().catch(() => null)
+
   // TASK-807 — Commercial Health readers (6). Cada reader degrada
   // honestamente a `unknown` si su query falla. Incluye stale_progress de
   // TASK-805 como primitive reutilizada, no recreada.
@@ -2015,13 +2000,9 @@ export const getReliabilityOverview = async (
           .then(([healthSignals, projectionSignal, ...outboundSignals]) => {
             const collected = healthSignals ?? []
 
-            const withProjection = projectionSignal
-              ? [...collected, projectionSignal]
-              : collected
+            const withProjection = projectionSignal ? [...collected, projectionSignal] : collected
 
-            const validOutbound = outboundSignals.filter(
-              (s): s is NonNullable<typeof s> => s !== null
-            )
+            const validOutbound = outboundSignals.filter((s): s is NonNullable<typeof s> => s !== null)
 
             return [...withProjection, ...validOutbound]
           })
@@ -2189,6 +2170,7 @@ export const getReliabilityOverview = async (
     kortexGithubCiLastStatus,
     publicSiteAstroDeployFailed,
     publicSiteAstroCiFailed,
+    designHandoffStaleEntries,
     icoMaterializerSkippedSafety,
     nexaInsightsFreshness,
     nexaInsightsNoNewSignals,

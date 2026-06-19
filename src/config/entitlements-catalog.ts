@@ -1548,6 +1548,26 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     actions: ['update'] as const,
     defaultScope: 'tenant'
   },
+  // TASK-1120 — Design Handoff Registry. Ver el carril es interno; registrar y
+  // transicionar handoffs de producto es exclusivo de designer + efeonce_admin.
+  {
+    key: 'design_system.handoff.read',
+    module: 'design_system',
+    actions: ['read'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'design_system.handoff.create',
+    module: 'design_system',
+    actions: ['create'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'design_system.handoff.transition',
+    module: 'design_system',
+    actions: ['update'] as const,
+    defaultScope: 'tenant'
+  },
   // TASK-1081 — Knowledge Platform foundation (5 capabilities). Sembradas con grant
   // en runtime.ts mismo PR (invariant TASK-873/935). Aún no can()-checked: los
   // consumidores (search API / human center / Nexa / MCP) llegan en TASK-1083/1084.
