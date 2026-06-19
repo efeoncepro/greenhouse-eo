@@ -28,6 +28,7 @@
     "task:lint:test": "node scripts/ci/__tests__/task-lint.test.mjs",
     "docs:closure-check": "node scripts/check-documentation-closure.mjs",
     "docs:context-check": "node scripts/check-context-handoff.mjs",
+    "flags:audit": "node scripts/ci/feature-flags-audit.mjs",
     "docs:context-check:strict": "node scripts/check-context-handoff.mjs --strict",
     "next-global-entrypoint-gate": "node scripts/ci/next-global-entrypoint-gate.mjs",
     "start": "node scripts/run-next-start.mjs",

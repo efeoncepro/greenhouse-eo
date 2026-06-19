@@ -128,8 +128,10 @@ Para los **PG rollout flags** (`home_rollout_flags`): se prenden vía admin endp
 
 **Kortex bridge / sister platform:** `GREENHOUSE_SISTER_PLATFORM_OAUTH_ENABLED` · `KORTEX_COMMAND_ADAPTER_ENABLED` · `KORTEX_COMMAND_ADMIN_ENABLED` · `KORTEX_COMMAND_LIVE_EXECUTE_ENABLED` · `KORTEX_GITHUB_COMMANDS_ENABLED` · `KORTEX_GITHUB_WORKFLOW_DISPATCH_ENABLED`.
 
-> Para regenerar el inventario desde código:
-> `grep -rhoE "process\.env\.(NEXT_PUBLIC_)?[A-Z0-9_]+_ENABLED" src/ services/ | sed -E 's/process\.env\.//' | sort -u`
+**Mirrors `NEXT_PUBLIC_*` (client-readable)** — pares de un flag server que la UI necesita leer client-side: `NEXT_PUBLIC_NEXA_FLOATING_EXPANDABLE_ENABLED` · `NEXT_PUBLIC_NEXA_INTERACTION_LANE_ENABLED` · `NEXT_PUBLIC_NEXA_KNOWLEDGE_RETRIEVAL_ENABLED` · `NEXT_PUBLIC_NEXA_SUGGESTED_PROMPTS_DATA_AWARE_ENABLED` · `NEXT_PUBLIC_CLIENT_LIFECYCLE_ONBOARDING_ENABLED` · `NEXT_PUBLIC_AXIS_NEUTRALS_ENABLED` · `NEXT_PUBLIC_AXIS_SECONDARY_LIME_ENABLED`. Recordá: se hornean en build → prenderlos requiere build fresco.
+
+> Para regenerar/auditar el inventario desde código + cruzarlo contra Vercel y este ledger:
+> **`pnpm flags:audit`** (resalta: en código sin registrar · ON en staging pero no prod · OFF everywhere · en Vercel sin código). `--strict` falla si hay flags en código sin registrar acá. Script: `scripts/ci/feature-flags-audit.mjs`.
 
 ---
 
