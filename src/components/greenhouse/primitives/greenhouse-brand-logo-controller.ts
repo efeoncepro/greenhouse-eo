@@ -1,6 +1,16 @@
 export type GreenhouseBrandLogoVariant = 'isotype' | 'contained' | 'lockup'
 
-export type GreenhouseBrandLogoFamily = 'gemini' | 'adobe' | 'firefly' | 'photoshop' | 'illustrator' | 'afterEffects'
+export type GreenhouseBrandLogoFamily =
+  | 'gemini'
+  | 'adobe'
+  | 'express'
+  | 'firefly'
+  | 'photoshop'
+  | 'premiere'
+  | 'illustrator'
+  | 'afterEffects'
+  | 'envato'
+  | 'shutterstock'
 
 export type GreenhouseBrandLogoKind =
   | 'geminiIsotype'
@@ -12,6 +22,11 @@ export type GreenhouseBrandLogoKind =
   | 'adobeOnNeutral'
   | 'adobeOnPink'
   | 'adobeLogotype'
+  | 'expressIsotype'
+  | 'expressOnBlack'
+  | 'expressFullColorOnBlack'
+  | 'expressOnNeutral'
+  | 'expressLogotype'
   | 'fireflyIsotype'
   | 'fireflyOnRed'
   | 'fireflyOnNeutral'
@@ -22,6 +37,11 @@ export type GreenhouseBrandLogoKind =
   | 'photoshopOnNeutral'
   | 'photoshopOnLightBlue'
   | 'photoshopLogotype'
+  | 'premiereIsotype'
+  | 'premiereOnLightPurple'
+  | 'premiereOnDarkPurple'
+  | 'premiereOnNeutral'
+  | 'premiereLogotype'
   | 'illustratorIsotype'
   | 'illustratorOnBrown'
   | 'illustratorOnNeutral'
@@ -32,6 +52,16 @@ export type GreenhouseBrandLogoKind =
   | 'afterEffectsOnNeutral'
   | 'afterEffectsOnLightPurple'
   | 'afterEffectsLogotype'
+  | 'envatoIsotype'
+  | 'envatoOnGreen'
+  | 'envatoOnNeutral'
+  | 'envatoOnLightGreen'
+  | 'envatoLogotype'
+  | 'shutterstockIsotype'
+  | 'shutterstockOnRed'
+  | 'shutterstockOnNeutral'
+  | 'shutterstockOnPink'
+  | 'shutterstockLogotype'
 
 export type GreenhouseBrandLogoSize = 'small' | 'medium' | 'large'
 
@@ -39,8 +69,7 @@ export interface GreenhouseBrandLogoKindConfig {
   family: GreenhouseBrandLogoFamily
   variant: GreenhouseBrandLogoVariant
   ariaLabel: string
-  label?: string
-  assetSrc?: string
+  assetSrc: string
   assetAspectRatio?: number
   tone:
     | 'geminiBlue'
@@ -51,6 +80,10 @@ export interface GreenhouseBrandLogoKindConfig {
     | 'adobeOnRed'
     | 'adobeOnNeutral'
     | 'adobeOnPink'
+    | 'expressSpectrum'
+    | 'expressOnBlack'
+    | 'expressFullColorOnBlack'
+    | 'expressOnNeutral'
     | 'fireflyRed'
     | 'fireflyOnRed'
     | 'fireflyOnNeutral'
@@ -59,6 +92,10 @@ export interface GreenhouseBrandLogoKindConfig {
     | 'photoshopOnDarkBlue'
     | 'photoshopOnNeutral'
     | 'photoshopOnLightBlue'
+    | 'premierePurple'
+    | 'premiereOnLightPurple'
+    | 'premiereOnDarkPurple'
+    | 'premiereOnNeutral'
     | 'illustratorOrange'
     | 'illustratorOnBrown'
     | 'illustratorOnNeutral'
@@ -67,10 +104,18 @@ export interface GreenhouseBrandLogoKindConfig {
     | 'afterEffectsOnDarkPurple'
     | 'afterEffectsOnNeutral'
     | 'afterEffectsOnLightPurple'
+    | 'envatoGreen'
+    | 'envatoOnGreen'
+    | 'envatoOnNeutral'
+    | 'envatoOnLightGreen'
+    | 'shutterstockRed'
+    | 'shutterstockOnRed'
+    | 'shutterstockOnNeutral'
+    | 'shutterstockOnPink'
 }
 
 const AXIS_BRAND_LOGO_ASSET_BASE = '/images/logos/axis'
-const AXIS_BRAND_LOGO_ASSET_VERSION = '20260619-svg-fit-3'
+const AXIS_BRAND_LOGO_ASSET_VERSION = '20260619-svg-fit-12'
 
 const createAxisBrandLogoAssetSrc = (fileName: string) =>
   `${AXIS_BRAND_LOGO_ASSET_BASE}/${fileName}?v=${AXIS_BRAND_LOGO_ASSET_VERSION}`
@@ -83,6 +128,8 @@ export const GREENHOUSE_BRAND_LOGO_ASSET_COLORS = {
   geminiGreen: 'rgb(52 168 83)',
   adobeRed: 'rgb(226 6 19)',
   adobePinkSurface: 'rgb(255 232 230)',
+  expressNavy: 'rgb(0 11 29)',
+  expressNeutralSurface: 'rgb(243 243 244)',
   fireflyRed: 'rgb(250 24 12)',
   fireflyRedDeep: 'rgb(210 26 24)',
   fireflyCoral: 'rgb(255 116 106)',
@@ -90,12 +137,24 @@ export const GREENHOUSE_BRAND_LOGO_ASSET_COLORS = {
   photoshopBlue: 'rgb(49 168 255)',
   photoshopDarkBlue: 'rgb(0 30 54)',
   photoshopLightBlueSurface: 'rgb(214 241 255)',
+  premierePurple: 'rgb(153 153 255)',
+  premiereDarkPurple: 'rgb(0 0 91)',
+  premiereLightPurpleSurface: 'rgb(214 214 255)',
   illustratorOrange: 'rgb(255 154 0)',
   illustratorBrown: 'rgb(51 0 0)',
   illustratorYellowSurface: 'rgb(255 241 204)',
   afterEffectsPurple: 'rgb(153 153 255)',
   afterEffectsDarkPurple: 'rgb(0 0 51)',
-  afterEffectsLightPurpleSurface: 'rgb(230 230 255)'
+  afterEffectsLightPurpleSurface: 'rgb(230 230 255)',
+  envatoGreen: 'rgb(135 230 75)',
+  envatoLogotypeGreen: 'rgb(138 229 72)',
+  envatoBlack: 'rgb(25 25 25)',
+  envatoNeutralSurface: 'rgb(243 243 244)',
+  envatoLightGreenSurface: 'rgb(221 245 228)',
+  shutterstockRed: 'rgb(255 26 3)',
+  shutterstockLogotypeRed: 'rgb(255 41 23)',
+  shutterstockNeutralSurface: 'rgb(243 243 244)',
+  shutterstockPinkSurface: 'rgb(255 232 230)'
 } as const
 
 export const GREENHOUSE_BRAND_LOGO_KIND_CONFIG = {
@@ -103,18 +162,21 @@ export const GREENHOUSE_BRAND_LOGO_KIND_CONFIG = {
     family: 'gemini',
     variant: 'isotype',
     ariaLabel: 'Gemini',
-    tone: 'geminiBlue'
+    assetSrc: createAxisBrandLogoAssetSrc('gemini-isotype.svg'),
+    tone: 'geminiFullColor'
   },
   geminiOnBlue: {
     family: 'gemini',
     variant: 'contained',
     ariaLabel: 'Gemini',
+    assetSrc: createAxisBrandLogoAssetSrc('gemini-on-blue.svg'),
     tone: 'geminiOnBlue'
   },
   geminiOnNeutral: {
     family: 'gemini',
     variant: 'contained',
     ariaLabel: 'Gemini',
+    assetSrc: createAxisBrandLogoAssetSrc('gemini-on-neutral.svg'),
     tone: 'geminiOnNeutral'
   },
   geminiLogotype: {
@@ -122,7 +184,7 @@ export const GREENHOUSE_BRAND_LOGO_KIND_CONFIG = {
     variant: 'lockup',
     ariaLabel: 'Gemini',
     assetSrc: createAxisBrandLogoAssetSrc('gemini-logotype.svg'),
-    assetAspectRatio: 299.09979248046875 / 63.016353607177734,
+    assetAspectRatio: 301 / 63.016353607177734,
     tone: 'geminiFullColor'
   },
   adobeIsotype: {
@@ -161,6 +223,43 @@ export const GREENHOUSE_BRAND_LOGO_KIND_CONFIG = {
     assetSrc: createAxisBrandLogoAssetSrc('adobe-logotype.svg'),
     assetAspectRatio: 207 / 46.1848,
     tone: 'adobeOnRed'
+  },
+  expressIsotype: {
+    family: 'express',
+    variant: 'isotype',
+    ariaLabel: 'Adobe Express',
+    assetSrc: createAxisBrandLogoAssetSrc('adobe-express-isotype.svg'),
+    assetAspectRatio: 50 / 46.75,
+    tone: 'expressSpectrum'
+  },
+  expressOnBlack: {
+    family: 'express',
+    variant: 'contained',
+    ariaLabel: 'Adobe Express',
+    assetSrc: createAxisBrandLogoAssetSrc('adobe-express-on-black.svg'),
+    tone: 'expressOnBlack'
+  },
+  expressFullColorOnBlack: {
+    family: 'express',
+    variant: 'contained',
+    ariaLabel: 'Adobe Express',
+    assetSrc: createAxisBrandLogoAssetSrc('adobe-express-full-color-on-black.svg'),
+    tone: 'expressFullColorOnBlack'
+  },
+  expressOnNeutral: {
+    family: 'express',
+    variant: 'contained',
+    ariaLabel: 'Adobe Express',
+    assetSrc: createAxisBrandLogoAssetSrc('adobe-express-on-neutral.svg'),
+    tone: 'expressOnNeutral'
+  },
+  expressLogotype: {
+    family: 'express',
+    variant: 'lockup',
+    ariaLabel: 'Adobe Express',
+    assetSrc: createAxisBrandLogoAssetSrc('adobe-express-logotype.svg'),
+    assetAspectRatio: 265 / 50,
+    tone: 'expressOnBlack'
   },
   fireflyIsotype: {
     family: 'firefly',
@@ -236,6 +335,43 @@ export const GREENHOUSE_BRAND_LOGO_KIND_CONFIG = {
     assetAspectRatio: 260 / 46,
     tone: 'photoshopOnDarkBlue'
   },
+  premiereIsotype: {
+    family: 'premiere',
+    variant: 'isotype',
+    ariaLabel: 'Adobe Premiere Pro',
+    assetSrc: createAxisBrandLogoAssetSrc('adobe-premiere-isotype.svg'),
+    assetAspectRatio: 50 / 46.75,
+    tone: 'premierePurple'
+  },
+  premiereOnLightPurple: {
+    family: 'premiere',
+    variant: 'contained',
+    ariaLabel: 'Adobe Premiere Pro',
+    assetSrc: createAxisBrandLogoAssetSrc('adobe-premiere-on-light-purple.svg'),
+    tone: 'premiereOnLightPurple'
+  },
+  premiereOnDarkPurple: {
+    family: 'premiere',
+    variant: 'contained',
+    ariaLabel: 'Adobe Premiere Pro',
+    assetSrc: createAxisBrandLogoAssetSrc('adobe-premiere-on-dark-purple.svg'),
+    tone: 'premiereOnDarkPurple'
+  },
+  premiereOnNeutral: {
+    family: 'premiere',
+    variant: 'contained',
+    ariaLabel: 'Adobe Premiere Pro',
+    assetSrc: createAxisBrandLogoAssetSrc('adobe-premiere-on-neutral.svg'),
+    tone: 'premiereOnNeutral'
+  },
+  premiereLogotype: {
+    family: 'premiere',
+    variant: 'lockup',
+    ariaLabel: 'Adobe Premiere Pro',
+    assetSrc: createAxisBrandLogoAssetSrc('adobe-premiere-logotype.svg'),
+    assetAspectRatio: 246 / 46.000003814697266,
+    tone: 'premiereOnDarkPurple'
+  },
   illustratorIsotype: {
     family: 'illustrator',
     variant: 'isotype',
@@ -309,6 +445,80 @@ export const GREENHOUSE_BRAND_LOGO_KIND_CONFIG = {
     assetSrc: createAxisBrandLogoAssetSrc('adobe-after-effects-logotype.png'),
     assetAspectRatio: 283 / 46,
     tone: 'afterEffectsOnDarkPurple'
+  },
+  envatoIsotype: {
+    family: 'envato',
+    variant: 'isotype',
+    ariaLabel: 'Envato',
+    assetSrc: createAxisBrandLogoAssetSrc('envato-isotype.svg'),
+    assetAspectRatio: 50 / 46.75,
+    tone: 'envatoGreen'
+  },
+  envatoOnGreen: {
+    family: 'envato',
+    variant: 'contained',
+    ariaLabel: 'Envato',
+    assetSrc: createAxisBrandLogoAssetSrc('envato-on-green.svg'),
+    tone: 'envatoOnGreen'
+  },
+  envatoOnNeutral: {
+    family: 'envato',
+    variant: 'contained',
+    ariaLabel: 'Envato',
+    assetSrc: createAxisBrandLogoAssetSrc('envato-on-neutral.svg'),
+    tone: 'envatoOnNeutral'
+  },
+  envatoOnLightGreen: {
+    family: 'envato',
+    variant: 'contained',
+    ariaLabel: 'Envato',
+    assetSrc: createAxisBrandLogoAssetSrc('envato-on-light-green.svg'),
+    tone: 'envatoOnLightGreen'
+  },
+  envatoLogotype: {
+    family: 'envato',
+    variant: 'lockup',
+    ariaLabel: 'Envato',
+    assetSrc: createAxisBrandLogoAssetSrc('envato-logotype.svg'),
+    assetAspectRatio: 170.98574829101562 / 50,
+    tone: 'envatoGreen'
+  },
+  shutterstockIsotype: {
+    family: 'shutterstock',
+    variant: 'isotype',
+    ariaLabel: 'Shutterstock',
+    assetSrc: createAxisBrandLogoAssetSrc('shutterstock-isotype.svg'),
+    assetAspectRatio: 50 / 46.75,
+    tone: 'shutterstockRed'
+  },
+  shutterstockOnRed: {
+    family: 'shutterstock',
+    variant: 'contained',
+    ariaLabel: 'Shutterstock',
+    assetSrc: createAxisBrandLogoAssetSrc('shutterstock-on-red.svg'),
+    tone: 'shutterstockOnRed'
+  },
+  shutterstockOnNeutral: {
+    family: 'shutterstock',
+    variant: 'contained',
+    ariaLabel: 'Shutterstock',
+    assetSrc: createAxisBrandLogoAssetSrc('shutterstock-on-neutral.svg'),
+    tone: 'shutterstockOnNeutral'
+  },
+  shutterstockOnPink: {
+    family: 'shutterstock',
+    variant: 'contained',
+    ariaLabel: 'Shutterstock',
+    assetSrc: createAxisBrandLogoAssetSrc('shutterstock-on-pink.svg'),
+    tone: 'shutterstockOnPink'
+  },
+  shutterstockLogotype: {
+    family: 'shutterstock',
+    variant: 'lockup',
+    ariaLabel: 'Shutterstock',
+    assetSrc: createAxisBrandLogoAssetSrc('shutterstock-logotype.svg'),
+    assetAspectRatio: 270 / 38,
+    tone: 'shutterstockRed'
   }
 } as const satisfies Record<GreenhouseBrandLogoKind, GreenhouseBrandLogoKindConfig>
 
@@ -338,8 +548,7 @@ export const GREENHOUSE_BRAND_LOGO_SIZE_CONFIG = {
 
 export const resolveGreenhouseBrandLogoKind = (
   kind: GreenhouseBrandLogoKind = 'geminiIsotype'
-): GreenhouseBrandLogoKindConfig =>
-  GREENHOUSE_BRAND_LOGO_KIND_CONFIG[kind]
+): GreenhouseBrandLogoKindConfig => GREENHOUSE_BRAND_LOGO_KIND_CONFIG[kind]
 
 export const resolveGreenhouseBrandLogoVariant = ({
   kind = 'geminiIsotype',

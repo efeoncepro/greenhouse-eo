@@ -24,17 +24,29 @@ const GEMINI_FIGMA_NODE_URL =
 const ADOBE_FIGMA_NODE_URL =
   'https://www.figma.com/design/yyMksCoijfMaIoYplXKZaR/Design-System-%7C-AXIS?node-id=12273-32&m=dev'
 
+const EXPRESS_FIGMA_NODE_URL =
+  'https://www.figma.com/design/yyMksCoijfMaIoYplXKZaR/Design-System-%7C-AXIS?node-id=12274-44&m=dev'
+
 const FIREFLY_FIGMA_NODE_URL =
   'https://www.figma.com/design/yyMksCoijfMaIoYplXKZaR/Design-System-%7C-AXIS?node-id=12267-441&m=dev'
 
 const PHOTOSHOP_FIGMA_NODE_URL =
   'https://www.figma.com/design/yyMksCoijfMaIoYplXKZaR/Design-System-%7C-AXIS?node-id=12270-452&m=dev'
 
+const PREMIERE_FIGMA_NODE_URL =
+  'https://www.figma.com/design/yyMksCoijfMaIoYplXKZaR/Design-System-%7C-AXIS?node-id=12273-5&m=dev'
+
 const ILLUSTRATOR_FIGMA_NODE_URL =
   'https://www.figma.com/design/yyMksCoijfMaIoYplXKZaR/Design-System-%7C-AXIS?node-id=12270-481&m=dev'
 
 const AFTER_EFFECTS_FIGMA_NODE_URL =
   'https://www.figma.com/design/yyMksCoijfMaIoYplXKZaR/Design-System-%7C-AXIS?node-id=12271-506&m=dev'
+
+const ENVATO_FIGMA_NODE_URL =
+  'https://www.figma.com/design/yyMksCoijfMaIoYplXKZaR/Design-System-%7C-AXIS?node-id=12274-35&m=dev'
+
+const SHUTTERSTOCK_FIGMA_NODE_URL =
+  'https://www.figma.com/design/yyMksCoijfMaIoYplXKZaR/Design-System-%7C-AXIS?node-id=12274-62&m=dev'
 
 const InlineCode = ({ children }: { children: string }) => (
   <Box
@@ -65,7 +77,7 @@ const GEMINI_KIND_SPECIMENS: KindSpecimen[] = [
     kind: 'geminiIsotype',
     title: 'Isotipo',
     figmaProperty: 'Property 1=Isotipo',
-    description: 'Marca simple para contextos donde Gemini ya está nombrado cerca.'
+    description: 'Marca cromática independiente para contextos donde Gemini ya está nombrado cerca.'
   },
   {
     kind: 'geminiOnBlue',
@@ -117,6 +129,39 @@ const ADOBE_KIND_SPECIMENS: KindSpecimen[] = [
     title: 'Logotipo',
     figmaProperty: 'Property 1=Logotipo',
     description: 'Lockup corporativo completo para referencias de proveedor, integración o documentación.'
+  }
+]
+
+const EXPRESS_KIND_SPECIMENS: KindSpecimen[] = [
+  {
+    kind: 'expressIsotype',
+    title: 'Isotipo',
+    figmaProperty: 'Property 1=Isotipo',
+    description: 'Marca cromática simple para menciones donde Adobe Express ya está nombrado cerca.'
+  },
+  {
+    kind: 'expressOnBlack',
+    title: 'Fondo negro',
+    figmaProperty: 'Property 1=Fondo-Negro',
+    description: 'Badge de alto contraste para matrices compactas y estados sobre superficies claras.'
+  },
+  {
+    kind: 'expressFullColorOnBlack',
+    title: 'Full color sobre negro',
+    figmaProperty: 'Derived: Isotipo + Fondo-Negro',
+    description: 'Badge con el isotipo cromático completo dentro del círculo negro de marca.'
+  },
+  {
+    kind: 'expressOnNeutral',
+    title: 'Fondo gris',
+    figmaProperty: 'Property 1=Fondo-Gris',
+    description: 'Badge sobre superficies neutras cuando el fondo negro pesa demasiado.'
+  },
+  {
+    kind: 'expressLogotype',
+    title: 'Logotipo',
+    figmaProperty: 'Property 1=Logotipo',
+    description: 'Lockup completo para referencias de proveedor, integración o biblioteca de marca.'
   }
 ]
 
@@ -180,6 +225,39 @@ const PHOTOSHOP_KIND_SPECIMENS: KindSpecimen[] = [
   },
   {
     kind: 'photoshopLogotype',
+    title: 'Logotipo',
+    figmaProperty: 'Property 1=Logotipo',
+    description: 'Lockup completo para referencias de proveedor, integración o biblioteca de marca.'
+  }
+]
+
+const PREMIERE_KIND_SPECIMENS: KindSpecimen[] = [
+  {
+    kind: 'premiereIsotype',
+    title: 'Isotipo',
+    figmaProperty: 'Property 1=Isotipo',
+    description: 'Marca simple para menciones donde Premiere ya está nombrado cerca.'
+  },
+  {
+    kind: 'premiereOnLightPurple',
+    title: 'Fondo morado claro',
+    figmaProperty: 'Property 1=Fondo-MoradoClaro',
+    description: 'Badge suave para documentación, comparativas y referencias menos prominentes.'
+  },
+  {
+    kind: 'premiereOnDarkPurple',
+    title: 'Fondo morado oscuro',
+    figmaProperty: 'Property 1=Fondo-MoradoOscuro',
+    description: 'Badge de alto contraste para matrices compactas y estados sobre superficies claras.'
+  },
+  {
+    kind: 'premiereOnNeutral',
+    title: 'Fondo gris',
+    figmaProperty: 'Property 1=Fondo-Gris',
+    description: 'Badge sobre superficies neutras cuando el morado oscuro pesa demasiado.'
+  },
+  {
+    kind: 'premiereLogotype',
     title: 'Logotipo',
     figmaProperty: 'Property 1=Logotipo',
     description: 'Lockup completo para referencias de proveedor, integración o biblioteca de marca.'
@@ -252,6 +330,72 @@ const AFTER_EFFECTS_KIND_SPECIMENS: KindSpecimen[] = [
   }
 ]
 
+const ENVATO_KIND_SPECIMENS: KindSpecimen[] = [
+  {
+    kind: 'envatoIsotype',
+    title: 'Isotipo',
+    figmaProperty: 'Property 1=Isotipo',
+    description: 'Marca simple para menciones donde Envato ya está nombrado cerca.'
+  },
+  {
+    kind: 'envatoOnGreen',
+    title: 'Fondo verde',
+    figmaProperty: 'Property 1=Fondo-Verde',
+    description: 'Badge de alto contraste para matrices compactas y estados visuales.'
+  },
+  {
+    kind: 'envatoOnNeutral',
+    title: 'Fondo gris',
+    figmaProperty: 'Property 1=Fondo-Gris',
+    description: 'Badge sobre superficies neutras cuando el verde sólido compite con el contenido.'
+  },
+  {
+    kind: 'envatoOnLightGreen',
+    title: 'Fondo verde claro',
+    figmaProperty: 'Property 1=Fondo-VerdeClaro',
+    description: 'Badge suave para documentación, comparativas y referencias menos prominentes.'
+  },
+  {
+    kind: 'envatoLogotype',
+    title: 'Logotipo',
+    figmaProperty: 'Property 1=Logotipo',
+    description: 'Lockup completo para referencias de proveedor, integración o biblioteca de marca.'
+  }
+]
+
+const SHUTTERSTOCK_KIND_SPECIMENS: KindSpecimen[] = [
+  {
+    kind: 'shutterstockIsotype',
+    title: 'Isotipo',
+    figmaProperty: 'Property 1=Isotipo',
+    description: 'Marca simple para menciones donde Shutterstock ya está nombrado cerca.'
+  },
+  {
+    kind: 'shutterstockOnNeutral',
+    title: 'Fondo gris',
+    figmaProperty: 'Property 1=Fondo-Gris',
+    description: 'Badge sobre superficies neutras cuando el rojo sólido compite con el contenido.'
+  },
+  {
+    kind: 'shutterstockOnRed',
+    title: 'Fondo rojo',
+    figmaProperty: 'Property 1=Fondo-Rojo',
+    description: 'Badge de alto contraste para matrices compactas y estados visuales.'
+  },
+  {
+    kind: 'shutterstockOnPink',
+    title: 'Fondo rosado',
+    figmaProperty: 'Property 1=Fondo-Rosado',
+    description: 'Badge suave para documentación, comparativas y referencias menos prominentes.'
+  },
+  {
+    kind: 'shutterstockLogotype',
+    title: 'Logotipo',
+    figmaProperty: 'Property 1=Logotipo',
+    description: 'Lockup completo para referencias de proveedor, integración o biblioteca de marca.'
+  }
+]
+
 const SIZES: GreenhouseBrandLogoSize[] = ['small', 'medium', 'large']
 
 const BRAND_LOGO_FAMILY_CARD_QUERY = '@container (min-width: 760px)'
@@ -272,6 +416,13 @@ const BRAND_LOGO_FAMILIES = [
     specimens: ADOBE_KIND_SPECIMENS
   },
   {
+    title: 'Adobe Express',
+    nodeId: '12274:44',
+    figmaUrl: EXPRESS_FIGMA_NODE_URL,
+    dataCapture: 'brand-logo-express-kind-matrix',
+    specimens: EXPRESS_KIND_SPECIMENS
+  },
+  {
     title: 'Adobe Firefly',
     nodeId: '12267:441',
     figmaUrl: FIREFLY_FIGMA_NODE_URL,
@@ -286,6 +437,13 @@ const BRAND_LOGO_FAMILIES = [
     specimens: PHOTOSHOP_KIND_SPECIMENS
   },
   {
+    title: 'Adobe Premiere Pro',
+    nodeId: '12273:5',
+    figmaUrl: PREMIERE_FIGMA_NODE_URL,
+    dataCapture: 'brand-logo-premiere-kind-matrix',
+    specimens: PREMIERE_KIND_SPECIMENS
+  },
+  {
     title: 'Adobe Illustrator',
     nodeId: '12270:481',
     figmaUrl: ILLUSTRATOR_FIGMA_NODE_URL,
@@ -298,6 +456,20 @@ const BRAND_LOGO_FAMILIES = [
     figmaUrl: AFTER_EFFECTS_FIGMA_NODE_URL,
     dataCapture: 'brand-logo-after-effects-kind-matrix',
     specimens: AFTER_EFFECTS_KIND_SPECIMENS
+  },
+  {
+    title: 'Envato',
+    nodeId: '12274:35',
+    figmaUrl: ENVATO_FIGMA_NODE_URL,
+    dataCapture: 'brand-logo-envato-kind-matrix',
+    specimens: ENVATO_KIND_SPECIMENS
+  },
+  {
+    title: 'Shutterstock',
+    nodeId: '12274:62',
+    figmaUrl: SHUTTERSTOCK_FIGMA_NODE_URL,
+    dataCapture: 'brand-logo-shutterstock-kind-matrix',
+    specimens: SHUTTERSTOCK_KIND_SPECIMENS
   }
 ] as const satisfies ReadonlyArray<{
   title: string
@@ -335,10 +507,24 @@ const BrandLogoHero = () => (
     >
       <Stack spacing={2.5} alignItems='center' justifyContent='center' sx={{ minWidth: 0 }}>
         <Stack direction='row' spacing={3} alignItems='center' justifyContent='center' flexWrap='wrap' useFlexGap>
-          <GreenhouseBrandLogoMark kind='geminiIsotype' size='large' dataCapture='brand-logo-gemini-logotype-hero' />
+          <GreenhouseBrandLogoMark kind='geminiIsotype' size='large' dataCapture='brand-logo-gemini-isotype-hero' />
           <GreenhouseBrandLogoMark kind='adobeOnRed' size='large' dataCapture='brand-logo-adobe-logotype-hero' />
+          <GreenhouseBrandLogoMark
+            kind='expressFullColorOnBlack'
+            size='large'
+            dataCapture='brand-logo-express-logotype-hero'
+          />
           <GreenhouseBrandLogoMark kind='fireflyOnRed' size='large' dataCapture='brand-logo-firefly-logotype-hero' />
-          <GreenhouseBrandLogoMark kind='photoshopOnDarkBlue' size='large' dataCapture='brand-logo-photoshop-logotype-hero' />
+          <GreenhouseBrandLogoMark
+            kind='photoshopOnDarkBlue'
+            size='large'
+            dataCapture='brand-logo-photoshop-logotype-hero'
+          />
+          <GreenhouseBrandLogoMark
+            kind='premiereOnDarkPurple'
+            size='large'
+            dataCapture='brand-logo-premiere-logotype-hero'
+          />
           <GreenhouseBrandLogoMark
             kind='illustratorOnBrown'
             size='large'
@@ -349,9 +535,16 @@ const BrandLogoHero = () => (
             size='large'
             dataCapture='brand-logo-after-effects-logotype-hero'
           />
+          <GreenhouseBrandLogoMark kind='envatoOnGreen' size='large' dataCapture='brand-logo-envato-logotype-hero' />
+          <GreenhouseBrandLogoMark
+            kind='shutterstockOnRed'
+            size='large'
+            dataCapture='brand-logo-shutterstock-logotype-hero'
+          />
         </Stack>
         <Typography variant='caption' color='text.secondary'>
-          Gemini / Adobe / Adobe Firefly / Adobe Photoshop / Adobe Illustrator / Adobe After Effects
+          Gemini / Adobe / Adobe Express / Adobe Firefly / Adobe Photoshop / Adobe Premiere Pro / Adobe Illustrator /
+          Adobe After Effects / Envato / Shutterstock
         </Typography>
       </Stack>
     </Box>
@@ -370,7 +563,13 @@ const BrandLogoHero = () => (
           reinterpretan el lockup.
         </Typography>
       </Stack>
-      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} flexWrap='wrap' useFlexGap sx={{ pb: { xs: 10, sm: 0 } }}>
+      <Stack
+        direction={{ xs: 'column', sm: 'row' }}
+        spacing={1.5}
+        flexWrap='wrap'
+        useFlexGap
+        sx={{ pb: { xs: 10, sm: 0 } }}
+      >
         <GreenhouseButton
           href={GEMINI_FIGMA_NODE_URL}
           kind='secondaryAction'
@@ -390,6 +589,16 @@ const BrandLogoHero = () => (
           sx={{ width: { xs: '100%', sm: 'auto' } }}
         >
           Nodo Adobe
+        </GreenhouseButton>
+        <GreenhouseButton
+          href={EXPRESS_FIGMA_NODE_URL}
+          kind='secondaryAction'
+          variant='outlined'
+          tone='primary'
+          leadingIcon={<i className='tabler-brand-figma' />}
+          sx={{ width: { xs: '100%', sm: 'auto' } }}
+        >
+          Nodo Express
         </GreenhouseButton>
         <GreenhouseButton
           href={FIREFLY_FIGMA_NODE_URL}
@@ -412,6 +621,16 @@ const BrandLogoHero = () => (
           Nodo Photoshop
         </GreenhouseButton>
         <GreenhouseButton
+          href={PREMIERE_FIGMA_NODE_URL}
+          kind='secondaryAction'
+          variant='outlined'
+          tone='primary'
+          leadingIcon={<i className='tabler-brand-figma' />}
+          sx={{ width: { xs: '100%', sm: 'auto' } }}
+        >
+          Nodo Premiere
+        </GreenhouseButton>
+        <GreenhouseButton
           href={ILLUSTRATOR_FIGMA_NODE_URL}
           kind='secondaryAction'
           variant='outlined'
@@ -430,6 +649,26 @@ const BrandLogoHero = () => (
           sx={{ width: { xs: '100%', sm: 'auto' } }}
         >
           Nodo After Effects
+        </GreenhouseButton>
+        <GreenhouseButton
+          href={ENVATO_FIGMA_NODE_URL}
+          kind='secondaryAction'
+          variant='outlined'
+          tone='primary'
+          leadingIcon={<i className='tabler-brand-figma' />}
+          sx={{ width: { xs: '100%', sm: 'auto' } }}
+        >
+          Nodo Envato
+        </GreenhouseButton>
+        <GreenhouseButton
+          href={SHUTTERSTOCK_FIGMA_NODE_URL}
+          kind='secondaryAction'
+          variant='outlined'
+          tone='primary'
+          leadingIcon={<i className='tabler-brand-figma' />}
+          sx={{ width: { xs: '100%', sm: 'auto' } }}
+        >
+          Nodo Shutterstock
         </GreenhouseButton>
       </Stack>
     </Stack>
@@ -640,6 +879,11 @@ const BrandLogoSizeSpecimens = () => (
             <GreenhouseBrandLogoMark kind='adobeOnNeutral' size={size} />
             <GreenhouseBrandLogoMark kind='adobeOnPink' size={size} />
             <GreenhouseBrandLogoMark kind='adobeLogotype' size='small' />
+            <GreenhouseBrandLogoMark kind='expressIsotype' size={size} />
+            <GreenhouseBrandLogoMark kind='expressOnBlack' size={size} />
+            <GreenhouseBrandLogoMark kind='expressFullColorOnBlack' size={size} />
+            <GreenhouseBrandLogoMark kind='expressOnNeutral' size={size} />
+            <GreenhouseBrandLogoMark kind='expressLogotype' size='small' />
             <GreenhouseBrandLogoMark kind='fireflyIsotype' size={size} />
             <GreenhouseBrandLogoMark kind='fireflyOnRed' size={size} />
             <GreenhouseBrandLogoMark kind='fireflyOnNeutral' size={size} />
@@ -650,6 +894,11 @@ const BrandLogoSizeSpecimens = () => (
             <GreenhouseBrandLogoMark kind='photoshopOnNeutral' size={size} />
             <GreenhouseBrandLogoMark kind='photoshopOnLightBlue' size={size} />
             <GreenhouseBrandLogoMark kind='photoshopLogotype' size='small' />
+            <GreenhouseBrandLogoMark kind='premiereIsotype' size={size} />
+            <GreenhouseBrandLogoMark kind='premiereOnLightPurple' size={size} />
+            <GreenhouseBrandLogoMark kind='premiereOnDarkPurple' size={size} />
+            <GreenhouseBrandLogoMark kind='premiereOnNeutral' size={size} />
+            <GreenhouseBrandLogoMark kind='premiereLogotype' size='small' />
             <GreenhouseBrandLogoMark kind='illustratorIsotype' size={size} />
             <GreenhouseBrandLogoMark kind='illustratorOnBrown' size={size} />
             <GreenhouseBrandLogoMark kind='illustratorOnNeutral' size={size} />
@@ -660,6 +909,16 @@ const BrandLogoSizeSpecimens = () => (
             <GreenhouseBrandLogoMark kind='afterEffectsOnNeutral' size={size} />
             <GreenhouseBrandLogoMark kind='afterEffectsOnLightPurple' size={size} />
             <GreenhouseBrandLogoMark kind='afterEffectsLogotype' size='small' />
+            <GreenhouseBrandLogoMark kind='envatoIsotype' size={size} />
+            <GreenhouseBrandLogoMark kind='envatoOnGreen' size={size} />
+            <GreenhouseBrandLogoMark kind='envatoOnNeutral' size={size} />
+            <GreenhouseBrandLogoMark kind='envatoOnLightGreen' size={size} />
+            <GreenhouseBrandLogoMark kind='envatoLogotype' size='small' />
+            <GreenhouseBrandLogoMark kind='shutterstockIsotype' size={size} />
+            <GreenhouseBrandLogoMark kind='shutterstockOnNeutral' size={size} />
+            <GreenhouseBrandLogoMark kind='shutterstockOnRed' size={size} />
+            <GreenhouseBrandLogoMark kind='shutterstockOnPink' size={size} />
+            <GreenhouseBrandLogoMark kind='shutterstockLogotype' size='small' />
           </Stack>
         ))}
       </Stack>
@@ -687,15 +946,17 @@ const ContractAside = () => (
       <Typography variant='h6'>Contrato Figma</Typography>
       <Typography variant='body2' color='text.secondary'>
         Nodos AXIS <InlineCode>12267:95</InlineCode>, <InlineCode>12273:32</InlineCode>,{' '}
-        <InlineCode>12267:441</InlineCode>, <InlineCode>12270:452</InlineCode>,{' '}
-        <InlineCode>12270:481</InlineCode> y <InlineCode>12271:506</InlineCode>. Variables de nodo: vacío. Code
-        Connect: bloqueado por seat/plan de Figma.
+        <InlineCode>12274:44</InlineCode>, <InlineCode>12267:441</InlineCode>, <InlineCode>12270:452</InlineCode>,{' '}
+        <InlineCode>12273:5</InlineCode>, <InlineCode>12270:481</InlineCode>, <InlineCode>12271:506</InlineCode>,{' '}
+        <InlineCode>12274:35</InlineCode> y <InlineCode>12274:62</InlineCode>. Variables de nodo: vacío. Code Connect:
+        bloqueado por seat/plan de Figma.
       </Typography>
     </Stack>
     <Stack spacing={DESIGN_SYSTEM_LAB_TOKENS.spacing.tight}>
       <Typography variant='h6'>Regla de implementación</Typography>
       <Typography variant='body2' color='text.secondary'>
-        Las variantes del componente Figma entran como <InlineCode>kind</InlineCode>; el <InlineCode>variant</InlineCode>
+        Las variantes del componente Figma entran como <InlineCode>kind</InlineCode>; el{' '}
+        <InlineCode>variant</InlineCode>
         queda reservado para el modo funcional de la primitive: isotype, contained o lockup.
       </Typography>
     </Stack>

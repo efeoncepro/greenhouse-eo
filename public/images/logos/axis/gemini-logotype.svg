@@ -1,4 +1,4 @@
-<svg preserveAspectRatio="xMidYMid meet" width="100%" height="100%" overflow="visible" style="display: block;" viewBox="0 0 299.0998 63.0164" fill="none" xmlns="http://www.w3.org/2000/svg">
+<svg preserveAspectRatio="xMidYMid meet" width="100%" height="100%" overflow="visible" style="display: block;" viewBox="0 0 301 63.0164" fill="none" xmlns="http://www.w3.org/2000/svg">
 <defs>
 <linearGradient id="gemini-logotype-spark" x1="8" x2="55" y1="7" y2="56" gradientUnits="userSpaceOnUse">
 <stop offset="0" stop-color="#4285F4"/>
@@ -8,7 +8,7 @@
 </linearGradient>
 </defs>
 <path d="M31.5082 0C34.8518 14.0624 46.984 26.1848 63.0164 31.5082C46.984 36.8316 34.8518 48.954 31.5082 63.0164C28.1646 48.954 16.0324 36.8316 0 31.5082C16.0324 26.1848 28.1646 14.0624 31.5082 0Z" fill="url(#gemini-logotype-spark)"/>
-<g fill="#44414D">
+<g fill="#000000">
 <svg x="83.7479" y="6.3584" width="51.829" height="52.495" viewBox="0 0 38.1277 38.3285" preserveAspectRatio="none">
 <path d="M16.363 32.5755C23.7971 34.261 31.5769 30.5318 32.3753 22.6494H19.6021L19.5919 17.6585H37.8313C38.8381 23.3861 37.2872 29.25 33.0617 33.3426C29.5328 36.764 24.9564 38.2174 20.0597 38.3233C9.10184 38.5656 0.244001 30.2441 0.00501276 19.6417C-0.233976 9.02422 8.10012 0.258712 19.0987 0.0063947C24.6005 -0.119764 29.8227 1.61618 33.7329 5.62298L29.7159 9.49353C26.4005 6.0166 21.6462 4.71968 16.902 5.64317C10.2002 6.94008 5.81701 12.4759 5.83735 19.1724C5.85769 25.6166 9.92559 31.1121 16.3681 32.5755H16.363Z"/>
 </svg>
@@ -27,7 +27,9 @@
 <svg x="237.518" y="6.441" width="10.354" height="10.342" viewBox="0 0 7.60695 7.54934" preserveAspectRatio="none">
 <path d="M3.80347 7.54934C5.90407 7.54934 7.60695 5.85936 7.60695 3.77467C7.60695 1.68998 5.90407 0 3.80347 0C1.70287 0 0 1.68998 0 3.77467C0 5.85936 1.70287 7.54934 3.80347 7.54934Z"/>
 </svg>
-<rect x="291.01" y="21.898" width="5.705" height="35.849" rx="0.2"/>
+<svg x="290.07" y="21.898" width="7.716" height="35.849" viewBox="0 0 5.67471 26.1704" preserveAspectRatio="none">
+<path d="M5.67471 0H0V26.1704H5.67471V0Z"/>
+</svg>
 <svg x="288.751" y="6.441" width="10.354" height="10.342" viewBox="0 0 7.60695 7.54934" preserveAspectRatio="none">
 <path d="M3.80347 7.54934C5.90407 7.54934 7.60695 5.85936 7.60695 3.77467C7.60695 1.68998 5.90407 0 3.80347 0C1.70287 0 0 1.68998 0 3.77467C0 5.85936 1.70287 7.54934 3.80347 7.54934Z"/>
 </svg>

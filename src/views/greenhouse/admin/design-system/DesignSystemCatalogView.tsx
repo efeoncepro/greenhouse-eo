@@ -143,7 +143,8 @@ const CATALOG_ITEMS: CatalogItem[] = [
   {
     id: 'nexa-provenance',
     title: 'Nexa provenance trace',
-    description: 'Grounding canónico de Nexa: trust cue (inline), razonamiento (expandable) y evidencia bajo demanda (panel). Transversal por dominio.',
+    description:
+      'Grounding canónico de Nexa: trust cue (inline), razonamiento (expandable) y evidencia bajo demanda (panel). Transversal por dominio.',
     route: '/design-system/nexa-provenance',
     category: 'Primitives',
     kind: 'Primitive',
@@ -156,20 +157,31 @@ const CATALOG_ITEMS: CatalogItem[] = [
   {
     id: 'nexa-response-toolbar',
     title: 'Nexa response toolbar',
-    description: 'Chrome de confianza de una respuesta de Nexa: feedback ¿útil? + copiar/compartir/regenerar. Variants embedded/floating/docked. Transversal por dominio.',
+    description:
+      'Chrome de confianza de una respuesta de Nexa: feedback ¿útil? + copiar/compartir/regenerar. Variants embedded/floating/docked. Transversal por dominio.',
     route: '/design-system/nexa-response-toolbar',
     category: 'Primitives',
     kind: 'Primitive',
     status: 'Hardening',
     owner: 'NexaResponseToolbar',
     tags: ['nexa', 'feedback', 'copiar', 'compartir', 'regenerar', 'toolbar', 'AI overview'],
-    searchAliases: ['toolbar', 'feedback', 'util', 'copiar', 'compartir', 'regenerar', 'nexa response toolbar', 'acciones de respuesta'],
+    searchAliases: [
+      'toolbar',
+      'feedback',
+      'util',
+      'copiar',
+      'compartir',
+      'regenerar',
+      'nexa response toolbar',
+      'acciones de respuesta'
+    ],
     icon: 'tabler-thumb-up'
   },
   {
     id: 'nexa-streaming-text',
     title: 'Nexa streaming text',
-    description: 'Revelado progresivo de la respuesta de Nexa (el "feel" del asistente que escribe): modes value (revela fracción) / stream (chunks reales). Caret tokenizado, never-hidden + reduced-motion.',
+    description:
+      'Revelado progresivo de la respuesta de Nexa (el "feel" del asistente que escribe): modes value (revela fracción) / stream (chunks reales). Caret tokenizado, never-hidden + reduced-motion.',
     route: '/design-system/nexa-streaming-text',
     category: 'Primitives',
     kind: 'Primitive',
@@ -182,14 +194,25 @@ const CATALOG_ITEMS: CatalogItem[] = [
   {
     id: 'nexa-moment-composition',
     title: 'Nexa moment composition',
-    description: 'Composición in-place de Nexa Answers con un host (GAP A): la respuesta lidera, el host persiste como contexto vivo + citas ancladas al ítem real + next-step gobernado + puente a la lente. Variants leadOverlay/anchoredAside/inlineExpand. Transversal por dominio.',
+    description:
+      'Composición in-place de Nexa Answers con un host (GAP A): la respuesta lidera, el host persiste como contexto vivo + citas ancladas al ítem real + next-step gobernado + puente a la lente. Variants leadOverlay/anchoredAside/inlineExpand. Transversal por dominio.',
     route: '/design-system/nexa-moment-composition',
     category: 'Primitives',
     kind: 'Primitive',
     status: 'Hardening',
     owner: 'NexaMomentComposition',
     tags: ['nexa', 'composición', 'moment', 'host', 'AI overview', 'anclaje', 'next-step', 'view transitions'],
-    searchAliases: ['composicion', 'moment', 'overview', 'in-place', 'host', 'ai mode', 'ai overview', 'nexa moment composition', 'anclaje'],
+    searchAliases: [
+      'composicion',
+      'moment',
+      'overview',
+      'in-place',
+      'host',
+      'ai mode',
+      'ai overview',
+      'nexa moment composition',
+      'anclaje'
+    ],
     icon: 'tabler-layers-subtract'
   },
   {
@@ -202,21 +225,52 @@ const CATALOG_ITEMS: CatalogItem[] = [
     kind: 'Pattern',
     status: 'Hardening',
     owner: 'NexaAnswersCanvas + NexaMomentComposition',
-    tags: ['nexa', 'answers', 'experiencia', 'conversacional', 'moment', 'se arma', 'chart draw', 'count', 'AI overview', 'in-place'],
-    searchAliases: ['nexa answers', 'experiencia conversacional', 'answers experience', 'se arma', 'armando', 'moment', 'conversational', 'overview', 'in-place'],
+    tags: [
+      'nexa',
+      'answers',
+      'experiencia',
+      'conversacional',
+      'moment',
+      'se arma',
+      'chart draw',
+      'count',
+      'AI overview',
+      'in-place'
+    ],
+    searchAliases: [
+      'nexa answers',
+      'experiencia conversacional',
+      'answers experience',
+      'se arma',
+      'armando',
+      'moment',
+      'conversational',
+      'overview',
+      'in-place'
+    ],
     icon: 'tabler-message-chatbot'
   },
   {
     id: 'composition-shell',
     title: 'Composition shell',
-    description: 'Substrato de coreografía de layout (TASK-1114): regiones singleton (primary/aside/lead/dock/overlay) + composiciones nombradas (single/leadPlusContext/split/focused) + morph in-place (View Transitions) + reflow por size class. Domain-neutral, opt-in; del que Adaptive Sidecar / NexaMomentComposition son consumers.',
+    description:
+      'Substrato de coreografía de layout (TASK-1114): regiones singleton (primary/aside/lead/dock/overlay) + composiciones nombradas (single/leadPlusContext/split/focused) + morph in-place (View Transitions) + reflow por size class. Domain-neutral, opt-in; del que Adaptive Sidecar / NexaMomentComposition son consumers.',
     route: '/design-system/composition-shell',
     category: 'Primitives',
     kind: 'Primitive',
     status: 'Hardening',
     owner: 'CompositionShell',
     tags: ['shell', 'layout', 'composición', 'regiones', 'morph', 'view transitions', 'fluidez', 'breakpoints'],
-    searchAliases: ['composition shell', 'shell', 'layout', 'regiones', 'composicion', 'morph', 'coreografia', 'canonical layouts'],
+    searchAliases: [
+      'composition shell',
+      'shell',
+      'layout',
+      'regiones',
+      'composicion',
+      'morph',
+      'coreografia',
+      'canonical layouts'
+    ],
     icon: 'tabler-layout-board-split'
   },
   {
@@ -230,7 +284,15 @@ const CATALOG_ITEMS: CatalogItem[] = [
     status: 'Canonical',
     owner: 'card-density',
     tags: ['card', 'densidad', 'container query', 'condensación', 'adaptive', 'fit mode'],
-    searchAliases: ['adaptive card', 'card density', 'densidad', 'container query', 'condensacion', 'full condensed peek', 'fit mode'],
+    searchAliases: [
+      'adaptive card',
+      'card density',
+      'densidad',
+      'container query',
+      'condensacion',
+      'full condensed peek',
+      'fit mode'
+    ],
     icon: 'tabler-layout-cards'
   },
   {
@@ -248,27 +310,48 @@ const CATALOG_ITEMS: CatalogItem[] = [
   {
     id: 'breadcrumbs',
     title: 'Breadcrumbs',
-    description: 'Primitive para jerarquía de navegación con ancestors clickeables, current page y separadores gobernados.',
+    description:
+      'Primitive para jerarquía de navegación con ancestors clickeables, current page y separadores gobernados.',
     route: '/design-system/breadcrumbs',
     category: 'Primitives',
     kind: 'Primitive',
     status: 'Canonical',
     owner: 'GreenhouseBreadcrumbs',
     tags: ['navigation', 'hierarchy', 'figma'],
-    searchAliases: ['breadcrumb', 'breadcrumbs', 'breadcumbs', 'migas', 'migas de pan', 'ruta', 'rutas', 'jerarquía', 'jerarquia'],
+    searchAliases: [
+      'breadcrumb',
+      'breadcrumbs',
+      'breadcumbs',
+      'migas',
+      'migas de pan',
+      'ruta',
+      'rutas',
+      'jerarquía',
+      'jerarquia'
+    ],
     icon: 'tabler-slash'
   },
   {
     id: 'roadmap-timeline',
     title: 'Roadmap timeline',
-    description: 'Primitive para roadmaps, release plans y horizontes de producto con periodos, estados y kinds gobernados.',
+    description:
+      'Primitive para roadmaps, release plans y horizontes de producto con periodos, estados y kinds gobernados.',
     route: '/design-system/roadmap-timeline',
     category: 'Primitives',
     kind: 'Primitive',
     status: 'Hardening',
     owner: 'GreenhouseRoadmapTimeline',
     tags: ['roadmap', 'timeline', 'release', 'nexa'],
-    searchAliases: ['roadmap', 'roadmap card', 'release plan', 'timeline', 'momentos', 'nexa moments', 'q1', 'trimestre'],
+    searchAliases: [
+      'roadmap',
+      'roadmap card',
+      'release plan',
+      'timeline',
+      'momentos',
+      'nexa moments',
+      'q1',
+      'trimestre'
+    ],
     icon: 'tabler-timeline-event'
   },
   {
@@ -286,20 +369,36 @@ const CATALOG_ITEMS: CatalogItem[] = [
   {
     id: 'disclosure',
     title: 'Disclosure',
-    description: 'El “+” rotatorio (DisclosureTrigger) y el patrón que lo ancla a una superficie flotante para desplegar UI contextual (AnchoredDisclosure).',
+    description:
+      'El “+” rotatorio (DisclosureTrigger) y el patrón que lo ancla a una superficie flotante para desplegar UI contextual (AnchoredDisclosure).',
     route: '/design-system/disclosure',
     category: 'Primitives',
     kind: 'Primitive',
     status: 'Canonical',
     owner: 'GreenhouseDisclosureTrigger · GreenhouseAnchoredDisclosure',
     tags: ['disclosure', 'trigger', 'popover', 'add', 'motion'],
-    searchAliases: ['disclosure', 'mas', 'más', 'plus', '+', 'agregar', 'desplegar', 'popover', 'editor inline', 'rotacion', 'rotación', 'expandir', 'trigger'],
+    searchAliases: [
+      'disclosure',
+      'mas',
+      'más',
+      'plus',
+      '+',
+      'agregar',
+      'desplegar',
+      'popover',
+      'editor inline',
+      'rotacion',
+      'rotación',
+      'expandir',
+      'trigger'
+    ],
     icon: 'tabler-circle-plus'
   },
   {
     id: 'feedback-atoms',
     title: 'Feedback atoms',
-    description: 'KPI delta inline (signo+flecha+color AA) y status dot (dot+label). Color nunca solo; consumen theme.greenhouseSemantic.',
+    description:
+      'KPI delta inline (signo+flecha+color AA) y status dot (dot+label). Color nunca solo; consumen theme.greenhouseSemantic.',
     route: '/design-system/chips',
     category: 'Primitives',
     kind: 'Primitive',
@@ -323,14 +422,32 @@ const CATALOG_ITEMS: CatalogItem[] = [
   {
     id: 'brand-logos',
     title: 'Brand logo variations',
-    description: 'Primitive para portar logos desde AXIS Figma y mapear variantes del componente como kinds gobernados.',
+    description:
+      'Primitive para portar logos desde AXIS Figma y mapear variantes del componente como kinds gobernados.',
     route: '/design-system/brand-logos',
     category: 'Primitives',
     kind: 'Primitive',
     status: 'Hardening',
     owner: 'GreenhouseBrandLogoMark',
-    tags: ['brand', 'logo', 'figma', 'gemini', 'kind'],
-    searchAliases: ['logo', 'logos', 'marca', 'gemini', 'figma', 'brand logo', 'variaciones de logo'],
+    tags: ['brand', 'logo', 'figma', 'gemini', 'adobe', 'envato', 'shutterstock', 'kind'],
+    searchAliases: [
+      'logo',
+      'logos',
+      'marca',
+      'gemini',
+      'adobe',
+      'express',
+      'firefly',
+      'photoshop',
+      'premiere',
+      'illustrator',
+      'after effects',
+      'envato',
+      'shutterstock',
+      'figma',
+      'brand logo',
+      'variaciones de logo'
+    ],
     icon: 'tabler-badge-tm'
   },
   {
@@ -348,7 +465,8 @@ const CATALOG_ITEMS: CatalogItem[] = [
   {
     id: 'talent-profile',
     title: 'Talent profile',
-    description: 'Dossier enterprise, badge Verificado por Efeonce y kind Talento verificado para perfiles verificables.',
+    description:
+      'Dossier enterprise, badge Verificado por Efeonce y kind Talento verificado para perfiles verificables.',
     route: '/design-system/talent-profile',
     category: 'Primitives',
     kind: 'Primitive',
@@ -660,7 +778,10 @@ const DesignSystemCatalogView = () => {
   const [kind, setKind] = useState<CatalogKind | 'Todos'>('Todos')
   const [query, setQuery] = useState('')
 
-  const filteredItems = useMemo(() => filterDesignSystemCatalogItems({ category, kind, query }), [category, kind, query])
+  const filteredItems = useMemo(
+    () => filterDesignSystemCatalogItems({ category, kind, query }),
+    [category, kind, query]
+  )
 
   const categoryCounts = useMemo(
     () =>

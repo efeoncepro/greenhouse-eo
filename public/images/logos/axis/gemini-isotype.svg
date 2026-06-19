@@ -1,0 +1,11 @@
+<svg preserveAspectRatio="xMidYMid meet" width="100%" height="100%" overflow="visible" style="display: block;" viewBox="0 0 46 46" fill="none" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<linearGradient id="gemini-isotype-gradient" x1="2" x2="44" y1="2" y2="44" gradientUnits="userSpaceOnUse">
+<stop offset="0" stop-color="#5495FB"/>
+<stop offset="0.42" stop-color="#24B970"/>
+<stop offset="0.68" stop-color="#FABB05"/>
+<stop offset="1" stop-color="#EC4135"/>
+</linearGradient>
+</defs>
+<path d="M22.0892 45.31C19.0716 35.006 10.994 26.9284 0.69 23.9108C0.276 23.7912 0 23.4324 0 23C0 22.5676 0.276 22.2088 0.69 22.0892C10.9848 19.0716 19.0716 10.9848 22.0892 0.69C22.2088 0.276 22.5768 0 23 0C23.4232 0 23.7912 0.276 23.9108 0.69C26.9284 10.994 35.006 19.0716 45.31 22.0892C45.724 22.2088 46 22.5768 46 23C46 23.4232 45.724 23.7912 45.31 23.9108C35.006 26.9284 26.9284 35.006 23.9108 45.31C23.7912 45.724 23.4232 46 23 46C22.5768 46 22.2088 45.724 22.0892 45.31Z" fill="url(#gemini-isotype-gradient)"/>
+</svg>

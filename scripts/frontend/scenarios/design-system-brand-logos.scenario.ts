@@ -34,7 +34,7 @@ export const scenario: CaptureScenario = {
       kind: 'mark',
       label: 'brand-logo-hero',
       clipSelector: '[data-capture="brand-logo-hero"]',
-      note: 'Specimens principales de Gemini, Adobe, Adobe Firefly, Adobe Photoshop, Adobe Illustrator y Adobe After Effects portados desde AXIS Figma.'
+      note: 'Specimens principales de Gemini, Adobe, Adobe Express, Adobe Firefly, Adobe Photoshop, Adobe Premiere Pro, Adobe Illustrator, Adobe After Effects, Envato y Shutterstock portados desde AXIS Figma.'
     },
     {
       kind: 'mark',
@@ -50,6 +50,12 @@ export const scenario: CaptureScenario = {
     },
     {
       kind: 'mark',
+      label: 'brand-logo-express-kind-matrix',
+      clipSelector: '[data-capture="brand-logo-express-kind-matrix"]',
+      note: 'Matriz de kinds expressIsotype, expressOnBlack, expressFullColorOnBlack, expressOnNeutral y expressLogotype.'
+    },
+    {
+      kind: 'mark',
       label: 'brand-logo-firefly-kind-matrix',
       clipSelector: '[data-capture="brand-logo-firefly-kind-matrix"]',
       note: 'Matriz de kinds fireflyIsotype, fireflyOnRed, fireflyOnNeutral, fireflyOnPink y fireflyLogotype.'
@@ -62,6 +68,12 @@ export const scenario: CaptureScenario = {
     },
     {
       kind: 'mark',
+      label: 'brand-logo-premiere-kind-matrix',
+      clipSelector: '[data-capture="brand-logo-premiere-kind-matrix"]',
+      note: 'Matriz de kinds premiereIsotype, premiereOnLightPurple, premiereOnDarkPurple, premiereOnNeutral y premiereLogotype.'
+    },
+    {
+      kind: 'mark',
       label: 'brand-logo-illustrator-kind-matrix',
       clipSelector: '[data-capture="brand-logo-illustrator-kind-matrix"]',
       note: 'Matriz de kinds illustratorIsotype, illustratorOnBrown, illustratorOnNeutral, illustratorOnYellow y illustratorLogotype.'
@@ -71,6 +83,18 @@ export const scenario: CaptureScenario = {
       label: 'brand-logo-after-effects-kind-matrix',
       clipSelector: '[data-capture="brand-logo-after-effects-kind-matrix"]',
       note: 'Matriz de kinds afterEffectsIsotype, afterEffectsOnDarkPurple, afterEffectsOnNeutral, afterEffectsOnLightPurple y afterEffectsLogotype.'
+    },
+    {
+      kind: 'mark',
+      label: 'brand-logo-envato-kind-matrix',
+      clipSelector: '[data-capture="brand-logo-envato-kind-matrix"]',
+      note: 'Matriz de kinds envatoIsotype, envatoOnGreen, envatoOnNeutral, envatoOnLightGreen y envatoLogotype.'
+    },
+    {
+      kind: 'mark',
+      label: 'brand-logo-shutterstock-kind-matrix',
+      clipSelector: '[data-capture="brand-logo-shutterstock-kind-matrix"]',
+      note: 'Matriz de kinds shutterstockIsotype, shutterstockOnNeutral, shutterstockOnRed, shutterstockOnPink y shutterstockLogotype.'
     }
   ]
 }
