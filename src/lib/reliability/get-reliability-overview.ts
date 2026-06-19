@@ -83,6 +83,7 @@ import { getNexaActionFailureRateSignal } from './queries/nexa-action-failure-ra
 import { getNexaActionUnauthorizedProposalRateSignal } from './queries/nexa-action-unauthorized-proposal-rate'
 import { getNotionCorrectionTransitionsSourceAvailabilitySignal } from './queries/notion-correction-transitions-source-availability'
 import { getNotionMetricsOtdClassifierParitySignal } from './queries/notion-metrics-otd-classifier-parity'
+import { getOtdAttributableMemberMonthParitySignal } from './queries/otd-attributable-member-month-parity'
 import {
   getNotionMetricsShadowParidadRpaDemoSignal,
   getNotionMetricsEchoLoopDemoSignal,
@@ -540,6 +541,7 @@ interface ReliabilityOverviewSources {
    * Notion. Steady: paridad alta (mismatch ~0%). Roll up moduleKey='delivery'.
    */
   notionMetricsOtdClassifierParity?: ReliabilitySignal | null
+  otdAttributableMemberMonthParity?: ReliabilitySignal | null
 
   /**
    * TASK-893 Slice 5 — Payroll Participation Window signals (3 readers):
@@ -999,6 +1001,10 @@ export const buildReliabilityOverview = (
     // TASK-923 (M1) — shadow paridad clasificador OTD GH vs Notion synced.
     ...(sources.notionMetricsOtdClassifierParity
       ? [sources.notionMetricsOtdClassifierParity]
+      : []),
+    // TASK-1169 Slice 3 — OTD imputable member×month: comparabilidad de cohorte.
+    ...(sources.otdAttributableMemberMonthParity
+      ? [sources.otdAttributableMemberMonthParity]
       : []),
     // TASK-893 Slice 5 — Payroll Participation Window signals (3 readers).
     // Subsystem rollup Finance Data Quality via moduleKey='finance'. Each
@@ -1925,6 +1931,11 @@ export const getReliabilityOverview = async (
       ? preloadedSources.notionMetricsOtdClassifierParity
       : await getNotionMetricsOtdClassifierParitySignal().catch(() => null)
 
+  const otdAttributableMemberMonthParity =
+    preloadedSources.otdAttributableMemberMonthParity !== undefined
+      ? preloadedSources.otdAttributableMemberMonthParity
+      : await getOtdAttributableMemberMonthParitySignal().catch(() => null)
+
   // TASK-848 Slice 7 + TASK-849 Slice 2 + TASK-854 Slice 0 + TASK-857 —
   // Production Release Control Plane signals. 6 readers en paralelo. Cada
   // uno degrada a `severity=unknown` si no hay GITHUB_RELEASE_OBSERVER_TOKEN /
@@ -2184,6 +2195,7 @@ export const getReliabilityOverview = async (
     nexaActionUnauthorizedProposalRate,
     notionCorrectionTransitionsSourceAvailability,
     notionMetricsOtdClassifierParity,
+    otdAttributableMemberMonthParity,
     notionMetricsDemo,
     notionStatusTransitions,
     notionMetricsRpa,
