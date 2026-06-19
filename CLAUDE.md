@@ -257,8 +257,12 @@ Cuando una instrucción menciona "repos hermanos" o pide aplicar un cambio a mú
 
 **Regla base:** todo lo que se pueda hacer dentro de Greenhouse debe poder hacerse, o tener camino planificado para hacerse, a traves de un contrato programatico gobernado. La UI no es el source of truth de una capacidad: es un cliente de commands, readers, projections y API contracts server-side.
 
+**Norte del portal — Nexa total operability (directiva CEO 2026-06-19):** el objetivo final es que **Nexa Agent pueda operar ABSOLUTAMENTE TODO el portal desde la Conversational Experience**. Por eso Full API Parity no es opcional: **toda UI nueva y toda capability/entitlement nuevo DEBE nacer con su contrato programático gobernado** que el action-runtime de Nexa pueda invocar — lecturas directas, y writes vía el loop de acción gobernada `propose → confirm → execute` (el LLM nunca ejecuta un write directo; muta sólo en el endpoint de confirmación humana). La pregunta de diseño obligatoria de toda feature: **"¿puede Nexa hacer esto end-to-end por contrato?"** Si la respuesta es no, la feature **no está completa**.
+
 **Implicaciones duras:**
 
+- **NUNCA** entregar una UI o una capability nueva sin su contrato programático gobernado equivalente: rompe la operabilidad total de Nexa (el norte del portal). UI y Nexa son dos clientes del MISMO primitive canónico, no dos implementaciones.
+- **SIEMPRE** al declarar el camino programático de una feature visible, validar explícitamente que Nexa puede consumirlo (read) y/o accionarlo (write vía propose→confirm→execute). Detalle del runtime de acción gobernada: **`docs/architecture/agent-invariants/KNOWLEDGE_NEXA_AGENT_INVARIANTS.md`** + `GREENHOUSE_NEXA_ARCHITECTURE_V1.md`.
 - **NUNCA** implementar una accion de negocio solo dentro de un componente UI si puede afectar estado, permisos, datos, aprobaciones, exports, recoveries, reportes o configuracion. Extraer primero la primitive canonica en `src/lib/**`.
 - **NUNCA** crear endpoints que sean simples "click handlers remotos" acoplados al componente visible. Modelar el aggregate/recurso/command y su contrato estable.
 - **SIEMPRE** que una feature nueva agregue una accion visible, declarar el camino programatico esperado: Product API interna, `api/platform/app/*`, `api/platform/ecosystem/*`, MCP downstream, CLI/runbook, o task follow-up si se difiere.

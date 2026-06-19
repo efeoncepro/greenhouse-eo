@@ -48,6 +48,17 @@ Greenhouse adopts **full API parity** as a product/platform principle:
 
 Parity is evaluated at the **business capability** level, not at the UI component level. The UI is a client of canonical server-side primitives, commands, readers and projections; it is not the source of truth for business logic.
 
+### North Star: Nexa total operability (CEO directive, 2026-06-19)
+
+The driving purpose of full API parity is that **Nexa Agent must eventually be able to operate the ENTIRE portal from the Conversational Experience** — every business capability reachable through Nexa, not only through screens. This elevates parity from "agent-ready as a benefit" to a **hard product mandate**:
+
+- Every **new UI** and every **new capability/entitlement** must be born with its governed programmatic contract that Nexa's action runtime can invoke.
+- Reads are consumed directly; **writes go through the governed-action loop `propose → confirm → execute`** — the LLM never executes a write directly; mutation happens only at the human confirmation endpoint (see `docs/architecture/agent-invariants/KNOWLEDGE_NEXA_AGENT_INVARIANTS.md` + `GREENHOUSE_NEXA_ARCHITECTURE_V1.md`).
+- UI and Nexa are **two clients of the same canonical primitive**, never two implementations of the same logic.
+- Mandatory design-time question for any feature: **"can Nexa do this end-to-end through a contract?"** If no, the feature is not complete.
+
+This does not grant Nexa raw write power: parity guarantees the *contract path exists and is governed*; the confirm step and capability/authorization gates still apply.
+
 ## Alternatives Considered
 
 ### Alternative 1: UI-first, API-on-demand
@@ -95,6 +106,7 @@ Future Greenhouse work must apply these rules:
 
 - Business logic lives in canonical server-side primitives (`src/lib/**` commands/readers/projections), not only in UI components.
 - New visible capabilities must declare their programmatic path: Product API, `api/platform/app/*`, `api/platform/ecosystem/*`, MCP downstream, CLI/runbook or explicit deferred task.
+- **Nexa-operability is part of "done":** every new UI/capability must validate that Nexa can consume it (read) and/or action it (write via `propose → confirm → execute`). A UI-only or capability-only delivery without its Nexa-invokable contract is incomplete (North Star above).
 - Programmatic writes require command semantics, tenant-safe authorization, sanitized errors, observability, audit/outbox when applicable and idempotency when retries are possible.
 - API contracts model aggregates, resources and commands, not buttons, tabs, components or page-specific handlers.
 - API Platform docs and tasks remain the canonical path for shared app/ecosystem/MCP contracts:
