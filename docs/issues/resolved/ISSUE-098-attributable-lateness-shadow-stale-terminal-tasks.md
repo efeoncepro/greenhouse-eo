@@ -38,22 +38,23 @@ Es un bug distinto de [`ISSUE-081`](ISSUE-081-dias-retraso-freeze-roto-frozenday
 
 ## Solución
 
-Pendiente (su propia task: **TASK-1174**). Direcciones candidatas:
+**RESUELTA por TASK-1174 (2026-06-19), sin migración.** Causa raíz refinada en el fix: no es sólo el lag de `completed_at` sino que **el `task_status` del row laggea** la transición terminal (el row sync de `tasks` es un pipeline distinto al de `task_status_transitions`, que es el que dispara el compute). El classifier nunca devuelve open para `Aprobado`, así que el bucket abierto sólo pudo computarse leyendo un `task_status` pre-terminal.
 
-1. **Recompute robusto al estado final:** que el compute no fije un bucket terminal con `completed_at` nulo cuando el estado ya es terminal (`Aprobado`/`Archivado`) — esperar/re-leer `completed_at`, o degradar honesto (`data_status` que marque "pendiente de completed_at") en vez de persistir un bucket abierto definitivo.
-2. **Barrido periódico (no solo event-driven):** un recálculo idempotente que pase sobre tareas terminales con shadow abierto y las corrija (cierra el gap de "estado terminal sin transición futura"). Reusar el patrón materializer/recovery canónico.
-3. **Backfill** de las 252 filas ya congeladas tras aplicar el fix.
-4. Reliability signal nuevo: `delivery.attributable_lateness.shadow_terminal_open` (steady=0; cuenta filas con tarea completada pero bucket abierto) como detector + gate del writeback.
+1. **`resolveEffectiveTaskState`** (`src/lib/sync/projections/notion-attributable-lateness-compute.ts`, pure SSOT): reconcilia el estado contra el **log de transiciones** (autoritativo). Terminal gana desde cualquiera de las dos fuentes; un reopen real (transición abierta capturada) no fuerza terminal; cuando es terminal sin `completed_at` en el row, el `transitioned_at` de la transición terminal ES el momento de completado (fallback honesto).
+2. **`computeAttributableLatenessForTask`**: core canónico extraído reusado por el consumer y por el barrido.
+3. **Barrido idempotente** `scripts/recompute-attributable-lateness-terminal-open.ts` (dry-run/`--apply`). Target preciso = **status terminal** (no `completed_at` como proxy: una tarea en revisión puede traer `completed_at` y su bucket abierto es correcto).
+4. **Reliability signal** `delivery.attributable_lateness.shadow_terminal_open` (steady=0; warning 1-10 / error >10) — gate del writeback TASK-927.
 
 ## Verificación
 
-- Tras el fix + backfill: `COUNT(*) FILTER (WHERE t.completed_at IS NOT NULL AND s.bucket_attributable IN ('overdue','carry_over'))` sobre `task_attributable_lateness_shadow ⋈ tasks` debe tender a 0.
-- Smoke contra PG real (proxy) en data de Sky/Efeonce.
-- TASK-927 solo puede levantar su gate de writeback cuando el signal `shadow_terminal_open` esté en steady=0.
+- Backfill aplicado contra PG real (proxy): **250 filas corregidas → 0 terminal-open** restantes (objetivo cumplido). Las filas `Listo para revisión` con `completed_at` quedan excluidas (no son terminal por status; su bucket abierto es correcto).
+- Signal `delivery.attributable_lateness.shadow_terminal_open` verificado live: `severity=ok`, `count=0`.
+- 17 tests del consumer (6 nuevos del resolver: carrera, preserva `completed_at`, reopen, abierta, backstop) + 434 tests reliability verdes.
+- TASK-927 puede levantar su gate de writeback ahora que el signal está en steady=0.
 
 ## Estado
 
-open
+resolved (2026-06-19, TASK-1174)
 
 ## Relacionado
 
