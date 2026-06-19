@@ -59,6 +59,25 @@ The driving purpose of full API parity is that **Nexa Agent must eventually be a
 
 This does not grant Nexa raw write power: parity guarantees the *contract path exists and is governed*; the confirm step and capability/authorization gates still apply.
 
+### Canonical consumers (declared)
+
+Every governed capability is consumed by a **single canonical server-side primitive** (command/reader/projection); the following are all **clients** of that primitive, never parallel implementations. A capability is "parity-complete" only when its contract serves the consumers it needs across this set:
+
+| # | Consumer | What it is | Path / surface |
+|---|---|---|---|
+| 1 | **UI (web portal)** | Human-facing Next.js views/components | reads via readers, writes via Product API → canonical command |
+| 2 | **Nexa Agent (Conversational Experience)** | The North Star: operate the entire portal conversationally | action-runtime: reads direct, writes via `propose → confirm → execute` |
+| 3 | **MCP / downstream agents** | External agents (Claude, etc.) operating Greenhouse | MCP adapters over `api/platform/ecosystem/*` |
+| 4 | **First-party apps (app lane)** | Future mobile/desktop/native Greenhouse clients | `api/platform/app/*` |
+| 5 | **Ecosystem / sister platforms** | Peer systems: Kortex (CRM/HubSpot), public site `efeonce-web`, `notion-bigquery` sync | `api/platform/ecosystem/*` |
+| 6 | **Inbound integrations / webhooks** | HubSpot, Notion, Teams, ZapSign, Entra/SCIM, GCP/Azure — trigger commands | webhook bus → canonical command (idempotent) |
+| 7 | **Teams Bot** | Operate/announce capabilities from Microsoft Teams | bot → Product/Platform contract |
+| 8 | **Async runtime (crons / workers / reactive)** | Cloud Run ops-worker, Cloud Scheduler, outbox publisher, reactive projections, materializers, recovery flows | server-side commands/readers (no UI) |
+| 9 | **CLI / runbooks / scripts** | `pnpm` operational tooling, agent scripts, ops runbooks | canonical primitives / Product API |
+| 10 | **E2E / verification harness** | Playwright + agent auth, smoke/contract tests | same contracts as UI/agents (no private back doors) |
+
+Hard rule: if a new behavior is reachable by **any** of these consumers, the business logic must live in the canonical primitive and be exposed through a governed contract — not duplicated per consumer. New consumer classes (e.g. a future voice or email channel) inherit the same contract automatically.
+
 ## Alternatives Considered
 
 ### Alternative 1: UI-first, API-on-demand
