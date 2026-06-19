@@ -321,6 +321,19 @@ const CATALOG_ITEMS: CatalogItem[] = [
     icon: 'tabler-sparkles'
   },
   {
+    id: 'brand-logos',
+    title: 'Brand logo variations',
+    description: 'Primitive para portar logos desde AXIS Figma y mapear variantes del componente como kinds gobernados.',
+    route: '/design-system/brand-logos',
+    category: 'Primitives',
+    kind: 'Primitive',
+    status: 'Hardening',
+    owner: 'GreenhouseBrandLogoMark',
+    tags: ['brand', 'logo', 'figma', 'gemini', 'kind'],
+    searchAliases: ['logo', 'logos', 'marca', 'gemini', 'figma', 'brand logo', 'variaciones de logo'],
+    icon: 'tabler-badge-tm'
+  },
+  {
     id: 'efeonce-brand',
     title: 'Efeonce orbital signature',
     description: 'Primitive experimental para la firma orbital del wordmark institucional de Efeonce.',

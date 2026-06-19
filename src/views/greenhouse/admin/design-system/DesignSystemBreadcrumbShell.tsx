@@ -19,10 +19,12 @@ import FigmaNodeLinkAffordance, {
 
 const HOME_ROUTE = '/home'
 const DESIGN_SYSTEM_ROUTE = '/design-system'
+const DESIGN_SYSTEM_WIDE_CANVAS_ROUTES = new Set([`${DESIGN_SYSTEM_ROUTE}/brand-logos`])
 
 const DESIGN_SYSTEM_ROUTE_LABELS = {
   [DESIGN_SYSTEM_ROUTE]: 'Design System',
   [`${DESIGN_SYSTEM_ROUTE}/breadcrumbs`]: 'Breadcrumbs',
+  [`${DESIGN_SYSTEM_ROUTE}/brand-logos`]: 'Brand Logos',
   [`${DESIGN_SYSTEM_ROUTE}/buttons`]: 'Buttons',
   [`${DESIGN_SYSTEM_ROUTE}/charts`]: 'Charts',
   [`${DESIGN_SYSTEM_ROUTE}/chips`]: 'Chips',
@@ -112,6 +114,7 @@ const DesignSystemBreadcrumbShell = ({
   const router = useRouter()
   const currentRoute = normalizePathname(pathname)
   const breadcrumbItems = resolveDesignSystemBreadcrumbItems(pathname)
+  const routeUsesWideCanvas = DESIGN_SYSTEM_WIDE_CANVAS_ROUTES.has(currentRoute)
   // SSOT runtime: the node comes from the DB-fed map (TASK-1072), not the TS seed.
   const figmaNodeId = figmaNodeMap[currentRoute]?.nodeId ?? null
 
@@ -147,8 +150,8 @@ const DesignSystemBreadcrumbShell = ({
         data-capture='design-system-page-breadcrumbs'
         sx={{
           inlineSize: '100%',
-          maxInlineSize: 1360,
-          mx: 'auto'
+          maxInlineSize: routeUsesWideCanvas ? 'none' : 1360,
+          mx: routeUsesWideCanvas ? 0 : 'auto'
         }}
       >
         <Stack

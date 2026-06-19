@@ -223,6 +223,13 @@ export const DECLARED_CHILD_ROUTES: readonly ChildRouteDeclaration[] = [
       'Nexa Brand Mark Lab — child surface del Design System para la primitive GreenhouseNexaBrandMark y sus kinds de marca, alcanzable desde el catalogo canonico /design-system.'
   },
   {
+    route: '/design-system/brand-logos',
+    parent: '/design-system',
+    via: 'inline-link',
+    reason:
+      'Brand Logo Variations Lab — child surface del Design System para la primitive GreenhouseBrandLogoMark y sus kinds portados desde AXIS Figma, alcanzable desde el catalogo canonico /design-system.'
+  },
+  {
     route: '/design-system/efeonce-brand',
     parent: '/design-system',
     via: 'inline-link',

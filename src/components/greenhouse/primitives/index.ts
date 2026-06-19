@@ -81,6 +81,8 @@ export {
 } from './border-beam/greenhouse-border-beam-controller'
 export type { GreenhouseBorderBeamKindConfig } from './border-beam/greenhouse-border-beam-controller'
 export { default as GreenhouseNexaBrandMark } from './GreenhouseNexaBrandMark'
+export { default as GreenhouseBrandLogoMark } from './GreenhouseBrandLogoMark'
+export type { GreenhouseBrandLogoMarkProps } from './GreenhouseBrandLogoMark'
 export { default as GreenhouseNexaAnimatedMark } from './GreenhouseNexaAnimatedMark'
 export type { GreenhouseNexaAnimatedMarkProps } from './GreenhouseNexaAnimatedMark'
 export { default as NexaGlowBorder } from './NexaGlowBorder'
@@ -390,6 +392,19 @@ export type {
 // Claude experiment — variante de órbita completa con el hueco del anillo relleno.
 export { default as ClaudeEfeonceFilledOrbitMark } from './ClaudeEfeonceFilledOrbitMark'
 export type { ClaudeEfeonceFilledOrbitMarkProps } from './ClaudeEfeonceFilledOrbitMark'
+export {
+  GREENHOUSE_BRAND_LOGO_ASSET_COLORS,
+  GREENHOUSE_BRAND_LOGO_KIND_CONFIG,
+  GREENHOUSE_BRAND_LOGO_SIZE_CONFIG,
+  resolveGreenhouseBrandLogoKind,
+  resolveGreenhouseBrandLogoVariant
+} from './greenhouse-brand-logo-controller'
+export type {
+  GreenhouseBrandLogoKind,
+  GreenhouseBrandLogoKindConfig,
+  GreenhouseBrandLogoSize,
+  GreenhouseBrandLogoVariant
+} from './greenhouse-brand-logo-controller'
 export {
   GREENHOUSE_NEXA_BRAND_ASSETS,
   GREENHOUSE_NEXA_BRAND_COLORS,
