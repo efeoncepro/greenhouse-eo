@@ -12,7 +12,6 @@ const canMock = vi.fn()
 const runQueryMock = vi.fn()
 const txMock = vi.fn()
 const publishOutboxMock = vi.fn()
-const bqQueryMock = vi.fn()
 const captureMock = vi.fn()
 const refreshGovernanceMock = vi.fn()
 
@@ -25,10 +24,6 @@ vi.mock('@/lib/postgres/client', () => ({
   withGreenhousePostgresTransaction: (cb: (client: unknown) => unknown) => txMock(cb)
 }))
 vi.mock('@/lib/sync/publish-event', () => ({ publishOutboxEvent: (...args: unknown[]) => publishOutboxMock(...args) }))
-vi.mock('@/lib/bigquery', () => ({
-  getBigQueryClient: () => ({ query: (...args: unknown[]) => bqQueryMock(...args) }),
-  getBigQueryProjectId: () => 'efeonce-group'
-}))
 vi.mock('@/lib/space-notion/notion-governance', () => ({
   refreshSpaceNotionGovernance: (...args: unknown[]) => refreshGovernanceMock(...args)
 }))
@@ -40,7 +35,6 @@ beforeEach(() => {
   vi.clearAllMocks()
   canMock.mockReturnValue(true)
   publishOutboxMock.mockResolvedValue('evt-1')
-  bqQueryMock.mockResolvedValue([])
   refreshGovernanceMock.mockResolvedValue(undefined)
 })
 
@@ -105,7 +99,7 @@ return cb(client)
     })
   }
 
-  it('flip FALSE→TRUE: alreadyEnabled=false, emite outbox, replica BQ', async () => {
+  it('flip FALSE→TRUE: alreadyEnabled=false, emite outbox, encola BQ', async () => {
     wireSourceFound(false)
     const out = await enableClientIcoSync({ tenant, clientId: 'cli-1', reason: 'onboarding Berel' })
 
@@ -113,30 +107,25 @@ return cb(client)
 
     if (out.ok) {
       expect(out.alreadyEnabled).toBe(false)
-      expect(out.bigQueryReplicated).toBe(true)
+      expect(out.bigQuerySyncQueued).toBe(true)
       expect(out.sourceId).toBe('sns-1')
     }
 
+    // El outbox event dispara el reactive consumer que propaga a BQ (ops-worker).
     expect(publishOutboxMock).toHaveBeenCalledTimes(1)
-    expect(bqQueryMock).toHaveBeenCalledTimes(1)
   })
 
-  it('ya activo: alreadyEnabled=true, NO emite outbox (no-op idempotente)', async () => {
+  it('ya activo: alreadyEnabled=true, NO emite outbox ni encola BQ (no-op idempotente)', async () => {
     wireSourceFound(true)
     const out = await enableClientIcoSync({ tenant, clientId: 'cli-1' })
 
     expect(out.ok).toBe(true)
-    if (out.ok) expect(out.alreadyEnabled).toBe(true)
+
+    if (out.ok) {
+      expect(out.alreadyEnabled).toBe(true)
+      expect(out.bigQuerySyncQueued).toBe(false)
+    }
+
     expect(publishOutboxMock).not.toHaveBeenCalled()
-  })
-
-  it('fallo de BigQuery NO tumba el command: bigQueryReplicated=false + capture', async () => {
-    wireSourceFound(false)
-    bqQueryMock.mockRejectedValueOnce(new Error('bq down'))
-    const out = await enableClientIcoSync({ tenant, clientId: 'cli-1' })
-
-    expect(out.ok).toBe(true)
-    if (out.ok) expect(out.bigQueryReplicated).toBe(false)
-    expect(captureMock).toHaveBeenCalled()
   })
 })

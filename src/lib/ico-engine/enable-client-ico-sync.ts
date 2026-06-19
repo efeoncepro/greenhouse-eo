@@ -1,6 +1,5 @@
 import 'server-only'
 
-import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
 import type { CanonicalErrorCode } from '@/lib/api/canonical-error-response'
 import { buildTenantEntitlementSubject } from '@/lib/commercial/party/route-entitlement-subject'
 import { can } from '@/lib/entitlements/runtime'
@@ -34,11 +33,12 @@ import type { TenantContext } from '@/lib/tenant/get-tenant-context'
  * `writeSpaceNotionSourcesFromIntent` con `sync_enabled=FALSE`). Si el cliente no
  * tiene Notion conectado → `ico_sync_source_not_connected` (conectar primero).
  *
- * El flip se replica a BigQuery (mirror del register legacy) porque el pipeline
- * Cloud Run lee el flag desde BQ. PG es la fuente de verdad; un fallo de BQ NO
- * tumba el command (se reporta `bigQueryReplicated=false` + captureWithDomain), y
- * la señal `delivery.ico.client_absent_from_org_rollup` (Slice 1) detecta si el
- * cliente no termina fluyendo.
+ * PG es la fuente de verdad; la propagación a BigQuery (que el pipeline Notion→BQ
+ * lee para tomar al cliente) la hace el reactive consumer
+ * `space_notion_source_ico_sync_bq` disparado por el outbox event — corre en
+ * ops-worker, que SÍ tiene BQ write (el runtime Vercel es BQ read-only). La señal
+ * `delivery.ico.client_absent_from_org_rollup` (Slice 1) detecta si el cliente no
+ * termina fluyendo.
  */
 
 export interface EnableClientIcoSyncInput {
@@ -58,8 +58,11 @@ export type EnableClientIcoSyncOutcome =
       sourceId: string
       /** true = ya estaba activo (no-op idempotente). */
       alreadyEnabled: boolean
-      /** true = el flip se replicó a BigQuery (pipeline). */
-      bigQueryReplicated: boolean
+      /**
+       * true = se emitió el outbox event que dispara la propagación a BigQuery
+       * vía el reactive consumer (ops-worker). false = no-op (ya estaba activo).
+       */
+      bigQuerySyncQueued: boolean
     }
   | {
       ok: false
@@ -177,61 +180,10 @@ export const enableClientIcoSync = async (
     return wasEnabled
   })
 
-  // 4. Replicar el flip a BigQuery (mirror del register legacy; el pipeline lee BQ).
-  //    Idempotente (MERGE). PG es autoritativo: un fallo de BQ NO tumba el command.
-  let bigQueryReplicated = false
-
-  try {
-    const projectId = getBigQueryProjectId()
-    const bq = getBigQueryClient()
-
-    await bq.query({
-      query: `
-        MERGE \`${projectId}.greenhouse.space_notion_sources\` AS target
-        USING (
-          SELECT
-            @sourceId AS source_id,
-            @spaceId AS space_id,
-            @clientId AS client_id,
-            @dbProyectos AS notion_db_proyectos,
-            @dbTareas AS notion_db_tareas,
-            @dbSprints AS notion_db_sprints,
-            @dbRevisiones AS notion_db_revisiones,
-            CAST(NULL AS STRING) AS notion_workspace_id,
-            TRUE AS sync_enabled,
-            'daily' AS sync_frequency,
-            CAST(NULL AS TIMESTAMP) AS last_synced_at,
-            CURRENT_TIMESTAMP() AS created_at,
-            CURRENT_TIMESTAMP() AS updated_at,
-            @createdBy AS created_by
-        ) AS source
-        ON target.space_id = source.space_id
-        WHEN MATCHED THEN UPDATE SET
-          sync_enabled = TRUE,
-          updated_at = CURRENT_TIMESTAMP()
-        WHEN NOT MATCHED THEN INSERT ROW
-      `,
-      params: {
-        sourceId,
-        spaceId,
-        clientId: resolvedClientId,
-        dbProyectos: source.notion_db_proyectos,
-        dbTareas: source.notion_db_tareas,
-        dbSprints: source.notion_db_sprints || null,
-        dbRevisiones: source.notion_db_revisiones || null,
-        createdBy: tenant.userId
-      }
-    })
-
-    bigQueryReplicated = true
-  } catch (error) {
-    captureWithDomain(error, 'delivery', {
-      tags: { source: 'ico_sync_enable_bq_replica_failed' },
-      extra: { spaceId, sourceId, clientId: resolvedClientId }
-    })
-  }
-
-  // 5. Refrescar gobernanza de Notion del space (best-effort, mirror register).
+  // 4. Refrescar gobernanza de Notion del space (best-effort, mirror register).
+  //    La propagación a BigQuery la hace el reactive consumer
+  //    `space_notion_source_ico_sync_bq` (ops-worker) disparado por el outbox
+  //    event emitido arriba — el runtime Vercel es BQ read-only.
   try {
     await refreshSpaceNotionGovernance(spaceId, tenant.userId)
   } catch (error) {
@@ -247,6 +199,7 @@ export const enableClientIcoSync = async (
     spaceId,
     sourceId,
     alreadyEnabled,
-    bigQueryReplicated
+    // El outbox event (→ reactive consumer → BQ) solo se emite en la transición real.
+    bigQuerySyncQueued: !alreadyEnabled
   }
 }

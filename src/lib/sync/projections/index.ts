@@ -69,6 +69,7 @@ import { notionStatusTransitionCaptureProjection } from './notion-status-transit
 import { notionDueDateChangeCaptureProjection } from './notion-due-date-change-capture'
 import { notionAttributableLatenessComputeProjection } from './notion-attributable-lateness-compute'
 import { notionTransitionBqSyncProjection } from './notion-transition-bq-sync'
+import { spaceNotionSourceIcoSyncBqProjection } from './space-notion-source-ico-sync-bq'
 import { notionRpaComputeDemoProjection } from './notion-rpa-compute-demo'
 import { notionRpaWritebackDemoProjection } from './notion-rpa-writeback-demo'
 import { notionRpaComputeProjection } from './notion-rpa-compute'
@@ -160,6 +161,7 @@ registerProjection(contractorPayableExpenseMaterializeProjection)
   registerProjection(notionDueDateChangeCaptureProjection) // TASK-921 — captura cambios de Fecha límite (task_due_date_changes) reusando page_change_signal; persist-if-changed + inferencia de motivo; gated NOTION_DUE_DATE_CAPTURE_ENABLED (default OFF)
   registerProjection(notionAttributableLatenessComputeProjection) // TASK-922 (M2) — cómputo shadow de atraso imputable (task_attributable_lateness_shadow) reusando status_transitioned; calculateAttributableLateness; gated ATTRIBUTABLE_LATENESS_OTD_ENABLED (default OFF)
   registerProjection(notionTransitionBqSyncProjection) // TASK-912 Slice 3 — MERGE task_status_transitions PG → greenhouse_conformed BQ (reactivo, re-read PG, idempotente por transition_id)
+  registerProjection(spaceNotionSourceIcoSyncBqProjection) // TASK-1171 Slice 4 — MERGE space_notion_sources PG → BQ al activar ICO de un cliente (reactivo, re-read PG, idempotente por space_id; cierra onboarding ICO escalable desde ops-worker con BQ write)
   registerProjection(notionRpaComputeDemoProjection) // TASK-913 Slice 1 — compute RpA V2 demo via calculateRpaV2Demo + snapshot + emit writeback chain event (sibling físicamente separado del path productivo futuro TASK-901 Slice 4)
   registerProjection(notionRpaWritebackDemoProjection) // TASK-913 Slice 2 — PATCH Notion [GH] RpA v2 con valor del snapshot (re-read PG defensive, retryable, idempotent — sibling físicamente separado del writeback productivo futuro)
   registerProjection(notionRpaComputeProjection) // TASK-916 Slice 3 — compute RpA V2 PRODUCTIVO (Efeonce/Sky) via calculateRpaV2 post notion.task.status_transitioned + snapshot task_rpa_snapshots + chain event metrics_writeback_requested
