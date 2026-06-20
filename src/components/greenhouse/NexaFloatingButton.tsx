@@ -18,6 +18,7 @@ import Drawer from '@mui/material/Drawer'
 
 import {
   AssistantRuntimeProvider,
+  ThreadPrimitive,
   useLocalRuntime
 } from '@assistant-ui/react'
 import type { ChatModelAdapter, ChatModelRunResult } from '@assistant-ui/react'
@@ -109,6 +110,48 @@ const createFloatingAdapter = (
   }
 })
 
+// TASK-1182 — auto-envío de la pregunta semilla del insight enfocado. Se monta DENTRO del
+// AssistantRuntimeProvider (donde el thread está vivo y el store tiene contexto): el outer runtime
+// expone un thread placeholder que no envía. Usa el primitive oficial `ThreadPrimitive.Suggestion`
+// con `send` (auto-envía el prompt al clickear) renderizado oculto, y lo clickea una vez cuando el
+// botón ya está habilitado (el thread listo). Retry por frames + degradación honesta sin crash.
+const NexaSeedAutoSend = ({ seed, onSent }: { seed: string; onSent: () => void }) => {
+  const ref = useRef<HTMLButtonElement>(null)
+  const sentRef = useRef(false)
+
+  useEffect(() => {
+    if (sentRef.current) return
+
+    let frame = 0
+    let attempts = 0
+
+    const tryClick = () => {
+      attempts += 1
+      const btn = ref.current
+
+      if (btn && !btn.disabled) {
+        sentRef.current = true
+        btn.click()
+        onSent()
+
+        return
+      }
+
+      if (attempts < 40) {
+        frame = requestAnimationFrame(tryClick)
+      } else {
+        onSent()
+      }
+    }
+
+    frame = requestAnimationFrame(tryClick)
+
+    return () => cancelAnimationFrame(frame)
+  }, [onSent])
+
+  return <ThreadPrimitive.Suggestion ref={ref} prompt={seed} send style={{ display: 'none' }} />
+}
+
 interface NexaFloatingButtonProps {
   docked?: boolean
 }
@@ -121,12 +164,12 @@ const NexaFloatingButton = ({ docked = false }: NexaFloatingButtonProps) => {
   const [expanded, setExpanded] = useState(false)
   const fabRef = useRef<HTMLButtonElement>(null)
 
-  // TASK-1182 — conciencia de superficie (declarados temprano: los consume `closePanel` y el listener
-  // del evento, ambos antes de que `runtime` exista en el render). `focusRefRef` ancla el turno al
-  // insight enfocado; `runtimeRef` permite auto-enviar la pregunta semilla desde el listener.
+  // TASK-1182 — conciencia de superficie. `focusRefRef` ancla el turno al insight enfocado (lo lee el
+  // adapter para el body). `pendingSeed` (estado) dispara el auto-envío de la pregunta semilla DESDE
+  // DENTRO del provider (un thread del outer runtime queda en placeholder; el envío válido es vía el
+  // primitive `ThreadPrimitive.Suggestion` montado en el contexto del store).
   const focusRefRef = useRef<NexaFocusRef | null>(null)
-  const runtimeRef = useRef<ReturnType<typeof useLocalRuntime> | null>(null)
-  const pendingSeedRef = useRef<string | null>(null)
+  const [pendingSeed, setPendingSeed] = useState<string | null>(null)
 
   // TASK-1079 — el modo de interacción decide el form-factor del flotante:
   // - lane (C): la burbuja togglea el lane (no abre panel flotante); el lane lo monta
@@ -152,8 +195,9 @@ const NexaFloatingButton = ({ docked = false }: NexaFloatingButtonProps) => {
 
   const closePanel = useCallback(() => {
     setOpen(false)
-    // TASK-1182 — al cerrar, se limpia el insight enfocado (el próximo open normal no arrastra focus stale).
+    // TASK-1182 — al cerrar, se limpia el insight enfocado + el seed pendiente (sin arrastre stale).
     focusRefRef.current = null
+    setPendingSeed(null)
     // Non-modal: el foco vuelve al FAB al cerrar (Escape / click-fuera / botón cerrar).
     requestAnimationFrame(() => fabRef.current?.focus())
   }, [])
@@ -206,15 +250,15 @@ const NexaFloatingButton = ({ docked = false }: NexaFloatingButtonProps) => {
       if (detail?.focusRef?.kind === 'nexa_insight' && detail.focusRef.id) {
         focusRefRef.current = detail.focusRef
 
-        // La pregunta semilla NO se envía acá: el panel (y su AssistantRuntimeProvider) aún no montó
-        // → `runtime.thread` sería el placeholder "empty thread" y assistant-ui crashea ("call thread
-        // methods inside a useEffect"). Se agenda y el effect de abajo la envía cuando el panel está vivo.
+        // La pregunta semilla se agenda como estado: el auto-envío real lo hace `NexaSeedAutoSend`
+        // (montado dentro del AssistantRuntimeProvider, donde el thread sí está vivo). Enviar desde
+        // acá usaría el thread del outer runtime (placeholder vacío) → no envía / crashea.
         const seed = typeof detail.seedPrompt === 'string' ? detail.seedPrompt.trim() : ''
 
-        pendingSeedRef.current = seed || null
+        setPendingSeed(seed || null)
       } else {
         focusRefRef.current = null
-        pendingSeedRef.current = null
+        setPendingSeed(null)
       }
     }
 
@@ -222,37 +266,6 @@ const NexaFloatingButton = ({ docked = false }: NexaFloatingButtonProps) => {
 
     return () => window.removeEventListener(NEXA_FLOATING_OPEN_EVENT, onOpen)
   }, [expandableEnabled, isLaneMode, setLaneOpen])
-
-  // TASK-1182 — auto-envío de la pregunta semilla (insight enfocado) cuando el panel ya montó.
-  // assistant-ui exige llamar métodos del thread fuera del render; acá el provider ya está vivo. Se
-  // reintenta unos frames por si el thread tarda en activarse, y degrada en silencio si nunca está
-  // listo (el chat queda abierto, sin crash). El `focusRef` del turno viaja en el body del adapter.
-  useEffect(() => {
-    if (!open || !pendingSeedRef.current) return
-
-    const seed = pendingSeedRef.current
-    let frame = 0
-    let attempts = 0
-
-    const trySend = () => {
-      attempts += 1
-
-      try {
-        runtimeRef.current?.thread.append(seed)
-        pendingSeedRef.current = null
-      } catch {
-        if (attempts < 8) {
-          frame = requestAnimationFrame(trySend)
-        } else {
-          pendingSeedRef.current = null
-        }
-      }
-    }
-
-    frame = requestAnimationFrame(trySend)
-
-    return () => cancelAnimationFrame(frame)
-  }, [open])
 
   // TASK-1134 — auto es el default real (el runtime decide server-side); el picker fija un override
   // manual. El FAB no persiste (estado efímero por montaje), a diferencia de useNexaPersistentRuntime.
@@ -286,10 +299,6 @@ const NexaFloatingButton = ({ docked = false }: NexaFloatingButtonProps) => {
       { role: 'assistant', content: [{ type: 'text' as const, text: 'Hola, soy Nexa. ¿En que puedo ayudarte?' }] }
     ]
   })
-
-  // TASK-1182 — expone el runtime al listener del evento (que corre antes en el render) para
-  // auto-enviar la pregunta semilla cuando el CTA del insight abre el chat enfocado.
-  runtimeRef.current = runtime
 
   const nexaFabRestShadow = fabOpen ? 'none' : `0 12px 30px ${alpha(GREENHOUSE_NEXA_BRAND_COLORS.midnightNavy, 0.28)}`
 
@@ -351,6 +360,7 @@ const NexaFloatingButton = ({ docked = false }: NexaFloatingButtonProps) => {
 
   const panelContent = (
     <AssistantRuntimeProvider runtime={runtime}>
+      {pendingSeed ? <NexaSeedAutoSend seed={pendingSeed} onSent={() => setPendingSeed(null)} /> : null}
       <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         {/* Mini header */}
         <Stack direction='row' justifyContent='space-between' alignItems='center' sx={{ px: 2, py: 1.5, borderBottom: 1, borderColor: 'divider' }}>
