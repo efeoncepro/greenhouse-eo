@@ -12,6 +12,7 @@ import { requireTenantContext } from '@/lib/tenant/authorization'
 import { mapDesignHandoffError, runDesignHandoffCommand } from './api-helpers'
 
 export const dynamic = 'force-dynamic'
+export const maxDuration = 30
 
 const READ_CAPABILITY = 'design_system.handoff.read' as const
 const CREATE_CAPABILITY = 'design_system.handoff.create' as const

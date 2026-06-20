@@ -1211,4 +1211,6 @@ TASK-1175 mantiene la ruta `/design-system/handoff` en el plano **views** y endu
 
 El lifecycle agrega `in_review` y el gate `implemented` exige ruta runtime no vacía más evidencia gobernada (`gvc_capture`, `runtime_route` o excepción manual auditada). Owner, prioridad, target surface, links TASK/PR/deploy y snapshots Figma son metadata operacional del aggregate, no permisos implícitos. Leer drift no concede mutar allowlist ni forzar implementación.
 
+Delta 2026-06-20: `design_system.handoff.create` cubre el registro inicial **y** el primer snapshot Figma del nodo allowlisted. `design_system.handoff.verify` no es requerido para crear; queda reservado para re-verificaciones posteriores sobre entradas existentes. Esta separación mantiene el intake productivo de diseño en una sola acción gobernada sin abrir un permiso amplio de re-verificación/drift.
+
 Spec: `docs/tasks/in-progress/TASK-1175-design-handoff-control-plane-full-api-parity.md`.

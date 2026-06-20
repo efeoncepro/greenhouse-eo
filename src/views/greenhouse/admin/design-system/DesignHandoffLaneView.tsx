@@ -908,7 +908,7 @@ const DesignHandoffLaneView = () => {
         <Stack spacing={0.5}>
           <Typography variant='h5'>{DESIGN_HANDOFF_COPY.sections.intake}</Typography>
           <Typography variant='body2' color='text.secondary'>
-            El archivo debe estar en allowlist; el backend valida file_key, nodo y ownership de forma fail-closed.
+            El archivo debe estar en allowlist; el backend valida file_key, nodo, ownership y crea el primer snapshot de verificación.
           </Typography>
         </Stack>
         <Stack direction={{ xs: 'column', md: 'row' }} spacing={2}>

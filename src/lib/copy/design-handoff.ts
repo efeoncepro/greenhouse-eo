@@ -62,7 +62,7 @@ export const DESIGN_HANDOFF_COPY = {
   },
   messages: {
     loaded: 'Registro actualizado.',
-    created: 'Handoff registrado.',
+    created: 'Handoff registrado con verificación inicial.',
     stateChanged: 'Estado actualizado.',
     planningSaved: 'Planificación actualizada.',
     ownersSaved: 'Owners actualizados.',

@@ -38,7 +38,7 @@ Eso cumple Full API Parity solo parcialmente: la accion core existe por API, per
 - Completar Full API Parity del handoff: todo lo que la UI pueda hacer tambien existe como reader/command server-side gobernado.
 - Administrar la allowlist de archivos Figma producto por command, con audit/outbox y capability fina.
 - Enriquecer `design_handoff_entries` con ownership, prioridad, target surface, bloqueos, links y evidencia.
-- Agregar validacion de nodo Figma y drift/orphan readers: nodo eliminado/renombrado/stale, handoffs stale y surfaces implementadas sin diseno.
+- Agregar validacion de nodo Figma y drift/orphan readers: el create genera snapshot inicial; re-verificaciones posteriores detectan nodo eliminado/renombrado/stale, handoffs stale y surfaces implementadas sin diseno.
 - Exponer commands aptos para `propose -> confirm -> execute`, sin construir integraciones Nexa-especificas.
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -141,7 +141,7 @@ N/A — esta task no implementa UI visible. Menciona la UI solo como consumer co
   - readers: enriched list/detail, drift/orphan summary, stale node summary;
   - API routes under `/api/design-system/handoff/**` or API Platform command adapter.
 - Backward compatibility: `compatible` / additive. Existing V1 APIs must keep working.
-- Full API parity: every business action in TASK-1176 must call these commands/readers; no UI-only lifecycle, allowlist, owner, link or evidence logic.
+- Full API parity: every business action in TASK-1176 must call these commands/readers; no UI-only lifecycle, allowlist, owner, link, evidence or Figma snapshot logic.
 
 ### Data model and invariants
 
@@ -152,6 +152,7 @@ N/A — esta task no implementa UI visible. Menciona la UI solo como consumer co
   - new additive tables such as `design_handoff_entry_links`, `design_handoff_entry_evidence`, `design_handoff_node_snapshots` (names to confirm in Discovery).
 - Invariantes que no se pueden romper:
   - AXIS master file remains blocked for product handoff.
+  - Creating a handoff persists the first Figma node snapshot; manual verify commands append later snapshots only.
   - `implemented` requires `implemented_surface_key` and runtime evidence, or an explicit governed exception.
   - Append-only event history cannot be updated/deleted.
   - External refs (`TASK-###`, PR URLs, capture dirs) must be typed and sanitized.
@@ -228,6 +229,7 @@ N/A — esta task no implementa UI visible. Menciona la UI solo como consumer co
 ### Slice 2 — Commands and readers
 
 - Implement server-side commands for allowlist manage, owner assignment, priority/target updates, link work item, attach evidence, verify Figma node and transition-with-evidence.
+- Ensure `createDesignHandoffEntry` performs the initial Figma node verification/snapshot after URL + allowlist validation.
 - Implement enriched readers for list/detail/drift/orphans.
 - Keep existing V1 APIs compatible.
 
@@ -262,6 +264,7 @@ N/A — esta task no implementa UI visible. Menciona la UI solo como consumer co
 Recommended contract names (verify during Discovery):
 
 - Commands:
+  - `createDesignHandoffEntry` (registers entry + initial Figma snapshot)
   - `upsertDesignHandoffAllowedFile`
   - `deprecateDesignHandoffAllowedFile`
   - `assignDesignHandoffOwner`
@@ -320,7 +323,7 @@ Recommended contract names (verify during Discovery):
 1. Local/dev: migration up + unit/integration tests.
 2. Staging: apply TASK-1120 migration if missing, then TASK-1175 migration.
 3. Seed one approved product `file_key`.
-4. Create handoff via API/command; link `TASK-###`; attach GVC evidence; transition to `in_review` and `implemented`.
+4. Create handoff via API/command and verify the initial Figma snapshot exists; link `TASK-###`; attach GVC evidence; transition to `in_review` and `implemented`.
 5. Verify event rows, outbox payloads, reliability signals and API reader response.
 6. Production only after staging evidence is attached to the task/handoff.
 
@@ -338,7 +341,7 @@ Recommended contract names (verify during Discovery):
 
 - [x] Additive migration creates/extends handoff ownership, planning, links, evidence and node snapshot model.
 - [x] State machine includes `in_review` and prevents `implemented` without implemented surface + evidence or governed exception.
-- [x] Allowlist manage, owner assignment, planning fields, work item link, evidence attach and node verification are server-side commands.
+- [x] Allowlist manage, owner assignment, planning fields, work item link, evidence attach, initial node snapshot on create and node re-verification are server-side commands.
 - [x] Enriched readers expose list/detail/drift/orphans without UI-only logic.
 - [x] New capabilities/grants + coverage tests exist for all new commands.
 - [x] Canonical errors cover invalid file, invalid link, missing evidence, stale/deleted node and forbidden actions.

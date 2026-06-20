@@ -1071,6 +1071,7 @@ TASK-1175 conserva el aggregate `design_handoff_entry` y agrega eventos audit-fi
 - **Lifecycle V2**: `proposed → in_implementation → in_review → implemented → archived`; `archived` sigue terminal. `implemented` exige `implemented_surface_key` + evidencia gobernada, salvo `manual_exception` auditada.
 - **Reliability V2**: signals separados `design_system.handoff.missing_evidence`, `design_system.handoff.figma_node_drift`, `design_system.handoff.orphan_implemented_surface` y `design_system.handoff.allowlist_orphan` cuando aplique. No se reemplaza `design_system.handoff.stale_entries`.
 - **Full API Parity**: allowlist manage, owner/planning, links, evidence, verify y drift son commands/readers server-side; las rutas API son thin wrappers con capabilities granulares.
+- **Delta 2026-06-20 — snapshot inicial en create**: `createDesignHandoffEntry` emite `design_system.handoff.registered` y luego `design_system.handoff.figma_node_verified` en el mismo flujo gobernado, con metadata `trigger:'create'` en el snapshot/evento local. `verifyDesignHandoffFigmaNode` sigue emitiendo el mismo evento para re-verificaciones posteriores; consumers deben tratarlo como snapshot append-only, no como transición de lifecycle.
 
 Spec: `docs/tasks/in-progress/TASK-1175-design-handoff-control-plane-full-api-parity.md`.
 

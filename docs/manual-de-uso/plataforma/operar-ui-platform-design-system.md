@@ -5,7 +5,7 @@
 > **Creado:** 2026-06-15 por Codex
 > **Modulo:** UI Platform / Design System
 > **Rutas:** `/admin/design-system`, `/admin/design-system/colors`, `/admin/design-system/*`
-> **Documentacion relacionada:** `docs/documentation/plataforma/ui-platform-design-system-end-to-end.md`
+> **Documentacion relacionada:** `docs/documentation/plataforma/ui-platform-design-system-end-to-end.md`, `docs/documentation/plataforma/design-handoff-control-plane.md`
 
 ## Antes de construir UI
 
@@ -28,8 +28,8 @@
 1. Abre `/design-system/handoff`.
 2. Usa el ledger para revisar handoffs que requieren acción, están listos para review o fueron implementados recientemente.
 3. En `Allowlist`, aprueba el `file_key` de un archivo Figma de producto antes de registrar nodos. No uses nodos del master AXIS.
-4. En `Nuevo nodo`, pega una URL de selección Figma desde un archivo allowlisted y registra el handoff como `Página` o `Componente`.
-5. Abre una entrada del ledger para asignar owners, prioridad, target surface, links, evidencia y verificación del nodo Figma.
+4. En `Nuevo nodo`, pega una URL de selección Figma desde un archivo allowlisted y registra el handoff como `Página` o `Componente`; el backend crea el primer snapshot de verificación del nodo en el mismo comando.
+5. Abre una entrada del ledger para asignar owners, prioridad, target surface, links, evidencia y re-verificación del nodo Figma cuando haya drift o cambios de diseño.
 6. DEV pasa el handoff por `En implementación` -> `En revisión` -> `Implementado`. El cierre requiere ruta interna real y evidencia runtime/GVC o excepción gobernada.
 
 Si el allowlist está vacío, la vista debe permanecer fail-closed: se puede inspeccionar el carril, pero no registrar nodos reales hasta aprobar un `file_key` de producto.

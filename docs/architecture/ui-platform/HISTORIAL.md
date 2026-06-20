@@ -7,6 +7,10 @@
 
 ---
 
+## Delta 2026-06-20 — Design Handoff create con snapshot Figma inicial
+
+`/design-system/handoff` conserva el modelo Evidence Ledger, pero el intake queda mas robusto: `POST /api/design-system/handoff` ahora registra el handoff y persiste el primer snapshot Figma del nodo allowlisted en el mismo comando. El boton `Verificar nodo Figma` queda como re-verificacion posterior. Contrato funcional: [`docs/documentation/plataforma/design-handoff-control-plane.md`](../../documentation/plataforma/design-handoff-control-plane.md). GVC local desktop/mobile: `.captures/2026-06-20T02-00-35_design-system-handoff-cockpit`.
+
 ## Delta 2026-06-19 — TASK-1120: Design Handoff Registry producto→DEV
 
 Se agregó `/design-system/handoff` como carril gobernado para registrar nodos Figma de **producto** hacia implementación sin contaminar el master AXIS ni el aggregate AXIS-only de TASK-1072 (`design_system_figma_nodes`). La ruta vive bajo el catálogo interno del Design System, usa `CompositionShell` + `AdaptiveSidecarLayout` y declara discoverability en `DesignSystemCatalogView` + `route-reachability-manifest`.

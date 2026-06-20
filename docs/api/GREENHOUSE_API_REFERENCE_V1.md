@@ -130,6 +130,41 @@ Key rules:
 - sync route now requires explicit payload
 - this is not the recommended external connector surface
 
+### 3. Design Handoff Control Plane API
+
+Purpose:
+- internal product-design -> DEV handoff workflow for allowlisted Figma product nodes
+- Full API Parity surface behind `/design-system/handoff`; UI, agents and future Nexa actions must consume the same commands/readers
+
+Auth:
+- authenticated internal tenant session
+- capability-gated by `design_system.handoff.*`
+
+Routes:
+- `GET /api/design-system/handoff`
+- `POST /api/design-system/handoff`
+- `GET /api/design-system/handoff/preview`
+- `POST /api/design-system/handoff/allowlist`
+- `POST /api/design-system/handoff/allowlist/[fileKey]/deprecate`
+- `PATCH /api/design-system/handoff/[entryId]/owners`
+- `PATCH /api/design-system/handoff/[entryId]/planning`
+- `POST /api/design-system/handoff/[entryId]/links`
+- `POST /api/design-system/handoff/[entryId]/evidence`
+- `POST /api/design-system/handoff/[entryId]/verify-node`
+- `PATCH /api/design-system/handoff/[entryId]/transition`
+- `GET /api/design-system/handoff/drift`
+
+Key rules:
+- `POST /api/design-system/handoff` validates URL, blocks AXIS, checks product allowlist and creates the first Figma node snapshot in the same command.
+- `POST /api/design-system/handoff/[entryId]/verify-node` is a re-verification command for existing entries.
+- Figma token stays server-only; failed render becomes an `unavailable` snapshot, not raw provider leakage.
+- `implemented` requires internal route + governed evidence unless a manual exception is auditably attached.
+
+Read next:
+- `docs/documentation/plataforma/design-handoff-control-plane.md`
+- `docs/architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md`
+- `docs/architecture/GREENHOUSE_EVENT_CATALOG_V1.md`
+
 ## Recommended Read Order For Another Codex
 
 1. `docs/api/GREENHOUSE_API_REFERENCE_V1.md`

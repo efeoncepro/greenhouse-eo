@@ -328,6 +328,74 @@ const publishEntryEvent = async (
   )
 }
 
+const persistDesignHandoffNodeSnapshot = async (
+  client: PoolClient,
+  {
+    entry,
+    render,
+    actorUserId,
+    metadata = {}
+  }: {
+    entry: DesignHandoffEntry
+    render: Awaited<ReturnType<typeof getFigmaNodeRender>>
+    actorUserId: string
+    metadata?: JsonRecord
+  }
+): Promise<DesignHandoffNodeSnapshot> => {
+  const nodeStatus: DesignHandoffNodeSnapshotStatus =
+    render.status === 'unavailable'
+      ? 'unavailable'
+      : render.nodeName && entry.nodeName && render.nodeName !== entry.nodeName
+        ? 'renamed'
+        : 'reachable'
+
+  const renderHash = createHash('sha256')
+    .update(JSON.stringify({ imageUrl: render.imageUrl, nodeName: render.nodeName, status: render.status }))
+    .digest('hex')
+
+  const snapshotId = `dhns-${randomUUID()}`
+
+  const rows = await client.query<SnapshotRow>(
+    `INSERT INTO greenhouse_core.design_handoff_node_snapshots
+       (snapshot_id, entry_id, file_key, node_id, expected_name, observed_name, node_status,
+        render_url, render_hash, provider_checked_at, created_by, metadata_json)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW(), $10, $11::jsonb)
+     RETURNING snapshot_id, entry_id, file_key, node_id, expected_name, observed_name, node_status,
+               render_url, render_hash, provider_checked_at::text AS provider_checked_at, metadata_json,
+               created_by, created_at::text AS created_at`,
+    [
+      snapshotId,
+      entry.entryId,
+      entry.fileKey,
+      entry.nodeId,
+      entry.nodeName,
+      render.nodeName,
+      nodeStatus,
+      render.imageUrl,
+      renderHash,
+      actorUserId,
+      JSON.stringify({ source: 'figma_render', ...metadata })
+    ]
+  )
+
+  const snapshot = mapSnapshot(rows.rows[0]!)
+
+  await insertEvent(client, {
+    entry,
+    eventType: 'figma_node_verified',
+    fromStatus: entry.status,
+    actorUserId,
+    metadata: { snapshotId: snapshot.snapshotId, nodeStatus: snapshot.nodeStatus, ...metadata }
+  })
+  await publishEntryEvent(client, entry, 'figma_node_verified', actorUserId, {
+    snapshotId: snapshot.snapshotId,
+    nodeStatus: snapshot.nodeStatus,
+    ...metadata
+  })
+
+  return snapshot
+}
+
 const enrichEntries = async (entries: DesignHandoffEntry[]): Promise<DesignHandoffEntry[]> => {
   if (entries.length === 0) return entries
 
@@ -528,29 +596,36 @@ export const createDesignHandoffEntry = async (input: CreateDesignHandoffEntryIn
     throw new DesignHandoffError('figma_file_not_allowed', 'Product Figma file is not allowlisted')
   }
 
+  const render = await getFigmaNodeRender({ fileKey: parsed.fileKey, nodeId: parsed.nodeId })
   const entryId = `dhe-${randomUUID()}`
+  const resolvedNodeName = input.nodeName?.trim() || render.nodeName || parsed.fileName || null
 
   const title = normalizeTitle({
     title: input.title,
-    nodeName: input.nodeName ?? parsed.fileName,
+    nodeName: resolvedNodeName,
     nodeId: parsed.nodeId
   })
 
   const kind = normalizeKind(input.kind)
-  const nodeName = input.nodeName?.trim() || parsed.fileName || null
 
   return withGreenhousePostgresTransaction(async client => {
     await client.query(
       `INSERT INTO greenhouse_core.design_handoff_entries
          (entry_id, title, kind, file_key, node_id, node_name, status, priority, created_by, updated_by)
        VALUES ($1, $2, $3, $4, $5, $6, 'proposed', 'normal', $7, $7)`,
-      [entryId, title, kind, parsed.fileKey, parsed.nodeId, nodeName, input.actorUserId]
+      [entryId, title, kind, parsed.fileKey, parsed.nodeId, resolvedNodeName, input.actorUserId]
     )
 
     const entry = await requireEntryForUpdate(client, entryId)
 
     await insertEvent(client, { entry, eventType: 'registered', fromStatus: null, actorUserId: input.actorUserId })
     await publishEntryEvent(client, entry, 'registered', input.actorUserId)
+    await persistDesignHandoffNodeSnapshot(client, {
+      entry,
+      render,
+      actorUserId: input.actorUserId,
+      metadata: { trigger: 'create' }
+    })
 
     return entry
   })
@@ -750,59 +825,10 @@ export const verifyDesignHandoffFigmaNode = async (
 
   const render = await getFigmaNodeRender({ fileKey: entry.fileKey, nodeId: entry.nodeId })
 
-  const nodeStatus: DesignHandoffNodeSnapshotStatus =
-    render.status === 'unavailable'
-      ? 'unavailable'
-      : render.nodeName && entry.nodeName && render.nodeName !== entry.nodeName
-        ? 'renamed'
-        : 'reachable'
-
-  const renderHash = createHash('sha256')
-    .update(JSON.stringify({ imageUrl: render.imageUrl, nodeName: render.nodeName, status: render.status }))
-    .digest('hex')
-
   return withGreenhousePostgresTransaction(async client => {
     const current = await requireEntryForUpdate(client, input.entryId)
-    const snapshotId = `dhns-${randomUUID()}`
 
-    const rows = await client.query<SnapshotRow>(
-      `INSERT INTO greenhouse_core.design_handoff_node_snapshots
-         (snapshot_id, entry_id, file_key, node_id, expected_name, observed_name, node_status,
-          render_url, render_hash, provider_checked_at, created_by, metadata_json)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW(), $10, $11::jsonb)
-       RETURNING snapshot_id, entry_id, file_key, node_id, expected_name, observed_name, node_status,
-                 render_url, render_hash, provider_checked_at::text AS provider_checked_at, metadata_json,
-                 created_by, created_at::text AS created_at`,
-      [
-        snapshotId,
-        current.entryId,
-        current.fileKey,
-        current.nodeId,
-        current.nodeName,
-        render.nodeName,
-        nodeStatus,
-        render.imageUrl,
-        renderHash,
-        input.actorUserId,
-        JSON.stringify({ source: 'figma_render' })
-      ]
-    )
-
-    const snapshot = mapSnapshot(rows.rows[0]!)
-
-    await insertEvent(client, {
-      entry: current,
-      eventType: 'figma_node_verified',
-      fromStatus: current.status,
-      actorUserId: input.actorUserId,
-      metadata: { snapshotId: snapshot.snapshotId, nodeStatus: snapshot.nodeStatus }
-    })
-    await publishEntryEvent(client, current, 'figma_node_verified', input.actorUserId, {
-      snapshotId: snapshot.snapshotId,
-      nodeStatus: snapshot.nodeStatus
-    })
-
-    return snapshot
+    return persistDesignHandoffNodeSnapshot(client, { entry: current, render, actorUserId: input.actorUserId })
   })
 }
 
