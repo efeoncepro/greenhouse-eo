@@ -389,6 +389,8 @@ const FinanceDashboardView = () => {
   const [syncing, setSyncing] = useState(false)
   const [workingCapital, setWorkingCapital] = useState<{ dso: number | null; dpo: number | null; payrollToRevenueRatio: number | null }>({ dso: null, dpo: null, payrollToRevenueRatio: null })
   const [vatPosition, setVatPosition] = useState<VatMonthlyPositionPayload | null>(null)
+  // TASK-725 Slice 1 — el fallo de la card IVA degrada local, no en el banner global.
+  const [vatError, setVatError] = useState<string | null>(null)
 
   const [nexaInsights, setNexaInsights] = useState<{
     insights: NexaInsightItem[]
@@ -556,10 +558,13 @@ const FinanceDashboardView = () => {
 
       if (vatPositionRes.ok) {
         setVatPosition(await vatPositionRes.json())
+        setVatError(null)
       } else {
-        const d = await vatPositionRes.json().catch(() => ({}))
-
-        errors.push(`IVA mensual: ${d.error || vatPositionRes.status}`)
+        // TASK-725 Slice 1 — degradación honesta: NO se contamina el banner
+        // global con el fallo del widget IVA, ni se filtra prosa cruda del
+        // backend. Mensaje es-CL local en la card.
+        setVatPosition(null)
+        setVatError('La posición fiscal del período no está disponible en este momento. Vuelve a intentarlo.')
       }
     } catch (e) {
       errors.push(`Conexión: ${e instanceof Error ? e.message : 'Error desconocido'}`)
@@ -872,6 +877,8 @@ const FinanceDashboardView = () => {
         position={vatPosition?.position ?? null}
         recentPositions={vatPosition?.recentPositions ?? []}
         entries={vatPosition?.entries ?? []}
+        error={vatError}
+        onRetry={() => void fetchData()}
       />
 
       {/* Charts row */}
