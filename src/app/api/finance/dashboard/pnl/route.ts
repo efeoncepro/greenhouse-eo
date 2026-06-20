@@ -7,6 +7,7 @@ import {
   isFinanceSlice2PostgresEnabled
 } from '@/lib/finance/postgres-store-slice2'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
+import { getMonthDateRange } from '@/lib/finance/periods'
 import { getFinanceCurrentPeriod } from '@/lib/finance/reporting'
 
 export const dynamic = 'force-dynamic'
@@ -31,8 +32,7 @@ export async function GET(request: Request) {
 
   await assertFinanceSlice2PostgresReady()
 
-  const periodStart = `${year}-${String(month).padStart(2, '0')}-01`
-  const periodEnd = `${year}-${String(month).padStart(2, '0')}-31`
+  const { periodStart, periodEnd } = getMonthDateRange(year, month)
 
   // Run all six queries in parallel
   const [incomeRows, collectedRows, expenseRows, payrollRows, linkedPayrollRows, rateRows] = await Promise.all([

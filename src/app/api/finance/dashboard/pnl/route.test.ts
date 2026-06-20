@@ -150,6 +150,58 @@ describe('GET /api/finance/dashboard/pnl — TASK-766 anti-regresion', () => {
     expect(String(incomeCall![0])).not.toContain('effective_cost_amount_clp')
   })
 
+  it('uses the real calendar month end instead of a hard-coded 31st day', async () => {
+    runQueryMock.mockImplementation((query: string) => {
+      if (query.includes('collected_clp') && query.includes('payment_count')) {
+        return Promise.resolve([{ collected_clp: '0', payment_count: '0' }])
+      }
+
+      if (query.includes('partner_share_clp')) {
+        return Promise.resolve([{ total_clp: '0', record_count: '0', partner_share_clp: '0' }])
+      }
+
+      if (query.includes('payroll_entries')) {
+        return Promise.resolve([
+          {
+            headcount: '0',
+            gross_clp: '0',
+            gross_usd: '0',
+            net_clp: '0',
+            net_usd: '0',
+            deductions_clp: '0',
+            deductions_usd: '0',
+            bonuses_clp: '0',
+            bonuses_usd: '0'
+          }
+        ])
+      }
+
+      if (query.includes('linked_clp')) {
+        return Promise.resolve([{ linked_clp: '0' }])
+      }
+
+      if (query.includes('exchange_rates')) {
+        return Promise.resolve([{ rate: '910' }])
+      }
+
+      return Promise.resolve([])
+    })
+
+    const response = await GET(
+      buildRequest('http://localhost/api/finance/dashboard/pnl?year=2026&month=6')
+    )
+
+    expect(response.status).toBe(200)
+
+    for (const call of runQueryMock.mock.calls) {
+      const params = call[1]
+
+      if (Array.isArray(params) && params[0] === '2026-06-01') {
+        expect(params[1]).toBe('2026-06-30')
+      }
+    }
+  })
+
   it('returns realistic collected revenue total (anti-regresion: pin valor razonable)', async () => {
     runQueryMock.mockImplementation((query: string) => {
       if (query.includes('collected_clp') && query.includes('payment_count')) {

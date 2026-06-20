@@ -18,12 +18,12 @@ Pero Finance **todavia no esta cerrado como sistema financiero market-grade comp
 
 1. `DTE emission queue` estaba peor que en el audit anterior: la tabla no existia en Cloud SQL y el helper ejecutaba DDL en runtime (`CREATE TABLE IF NOT EXISTS`). Delta Codex 2026-06-20: `TASK-1194` Slice 0 agrego migracion gobernada `20260620193557859_task-1194-dte-emission-queue-governed-ddl.sql`, la aplico en Cloud SQL dev y dejo el runtime validation-only. Slice 0b deja code-complete el scheduler home: processor canónico compartido, ops-worker `POST /finance/dte-emission-retry`, Cloud Scheduler job `ops-finance-dte-emission-retry` en `deploy.sh`, y pattern async-critical en los gates. Falta deploy/re-smoke del ops-worker.
 2. Las mutaciones sensibles siguen dependiendo de route-group amplio en varias familias. `TASK-1192`, `TASK-1193` y `TASK-1194` siguen siendo obligatorias.
-3. F29 mensual esta compuesto y `TASK-1195` aparece complete local-first, pero retencion/PPM siguen en shadow/flag OFF y PPM usa tasa placeholder `placeholder_pending_contador`.
+3. F29 mensual esta compuesto y verificado en staging: `GET /api/finance/f29/monthly-position` responde HTTP 200 y el card `TASK-1197` muestra IVA/retencion oficiales + PPM en validacion. Sigue sin ser filing oficial hasta validar PPM/tasas con contador; PPM usa tasa placeholder `placeholder_pending_contador`.
 4. F22 anual (`TASK-1196`) no debe tomarse como listo: requiere regla de regimen/tasa IDPC, fuente RLI y validacion contable.
 5. Junio 2026 no es margen canonico: `operational_pl` tiene revenue con costo `0` porque falta upstream payroll/labor allocation.
-6. `/api/finance/data-quality` reportaba falsos warnings porque usaba `SUM(payments)` raw y no el canon con superseded/settlement/factoring. Quedó corregido localmente: income usa `income_settlement_reconciliation`; expenses usa `expense_payments_normalized` activo. Falta deploy/re-smoke.
+6. `/api/finance/data-quality` reportaba falsos warnings porque usaba `SUM(payments)` raw y no el canon con superseded/settlement/factoring. Quedó corregido y verificado en staging: income usa `income_settlement_reconciliation`; expenses usa `expense_payments_normalized` activo. El endpoint ya no reporta drift de ledger falso; quedan issues reales de backlog operativo.
 7. Integraciones outbound comerciales tienen 4 handlers `degraded` (quotation HubSpot y Sample Sprint HubSpot). No rompen caja, pero si afectan quote-to-cash/commercial sync.
-8. Staging expuso un 500 real en `/api/finance/dashboard/pnl`: el query de ingresos leia `effective_cost_amount_clp` desde `income`, pero esa columna es de `expenses`. El fix local cambia ingresos a `SUM(total_amount_clp)` y agrega test anti-regresion; falta deploy/re-smoke.
+8. Staging expuso un 500 real en `/api/finance/dashboard/pnl`: primero por leer `effective_cost_amount_clp` desde `income`, ya corregido en repo; el refresh 20:25 UTC mostro una segunda causa runtime (`2026-06-31` por fin de mes hardcodeado). Fix local nuevo usa `getMonthDateRange()` y agrega test anti-regresion para junio; falta deploy/re-smoke.
 9. La segunda pasada de superficie amplia encontró 205 rutas Finance/admin Finance/cron Finance, 123 write routes y 116 write routes sin capability fina visible por scan estatico. La brecha de controles es mas grande que el numero previo de 75 rutas y debe tratarse como programa de hardening, no como fix puntual.
 10. Operativamente hay backlog AR/AP: 32 receivables vencidas por 83.386.937 CLP y 129 payables vencidas por 18.370.018,95 CLP. Esto no contradice que el ledger este sano; indica que Finance aun no esta listo para prometer cobranza/pagos/close operativo sin limpieza.
 
@@ -35,10 +35,10 @@ Pero Finance **todavia no esta cerrado como sistema financiero market-grade comp
 | Treasury / cash / bank | `pass` | 8 cuentas activas con `account_balances` al 2026-06-20; payment account pending post-cutover = 0 |
 | Payment orders | `pass with control warning` | 5 paid orders, 0 paid orders without `expense_payment`; capability gates pendientes |
 | Purchase orders | `pass with low data volume` | 2 active POs CLP por 6.903.000 autorizados; ISSUE-045 resuelto |
-| Fiscal monthly F29 | `provisional` | VAT 30 periods latest 2026-06; retention 2 periods; PPM 19 periods with placeholder rate |
+| Fiscal monthly F29 | `provisional` | Staging HTTP 200; VAT 30 periods latest 2026-06; retention 2 periods enabled in staging; PPM 19 periods with placeholder rate still in validation |
 | DTE retry | `code fixed, rollout pending` | Migracion gobernada aplicada en Cloud SQL dev + helper validation-only; scheduler home code-complete en ops-worker/deploy.sh; Cloud Scheduler rollout pendiente |
 | Management accounting / P&L | `provisional` | CCA sano hasta 2026-05; 2026-06 revenue 6.902.000 with cost 0 |
-| PnL dashboard endpoint | `code fixed, rollout pending` | staging 500 por columna inexistente; fix local usa `income.total_amount_clp` |
+| PnL dashboard endpoint | `code fixed, rollout pending` | staging 500 por fecha invalida `2026-06-31`; fix local usa `getMonthDateRange()` |
 | Controls / access | `warning high` | 123 write routes in Finance/admin Finance; 116 without visible fine capability by static scan |
 | Sync / integrations | `warning` | finance outbox ok; 4 commercial outbound handlers degraded; Vercel cron parity gap remains |
 
@@ -92,6 +92,29 @@ Fourth pass reconfirmed the same DB/runtime posture and advanced `FD-1` locally:
 | DTE queue | `greenhouse_finance.dte_emission_queue` exists and has 0 rows | pass for DB infra |
 | DTE retry scheduler | Code complete locally: `processDteEmissionRetryQueue`, ops-worker `POST /finance/dte-emission-retry`, `ops-finance-dte-emission-retry` every 15 min in deploy script, async-critical pattern in cron gates | rollout pending |
 | Quote data | commercial quotations 57 / 119.953.739,68 CLP; finance quotes 37 / 112.379.302 CLP; commercial and finance quote line orphans 0/0 | pass on read integrity |
+
+### Refresh pass — 2026-06-20 20:25 UTC
+
+Fifth pass after staging deploy `greenhouse-cy931va53` separated resolved rollout gaps from the remaining PnL runtime defect:
+
+| Area | Fresh evidence | Decision |
+|---|---|---|
+| DB auth / runtime role | `pnpm pg:doctor` healthy; runtime role `greenhouse_app` still has schema `USAGE` and no schema `CREATE` | pass |
+| Staging rollout status | Alias `greenhouse-eo-env-staging` points to Ready deployment `greenhouse-cy931va53`; F29/data-quality/bank fixes are live | mostly pass |
+| PnL dashboard | staging `/api/finance/dashboard/pnl` still HTTP 500; Vercel logs now show `date/time field value out of range: "2026-06-31"` | code fixed locally, rollout pending |
+| PnL local fix | `route.ts` now uses `getMonthDateRange(year, month)` instead of `YYYY-MM-31`; test asserts June 2026 uses `2026-06-30` | pass local |
+| Data quality endpoint | staging `/api/finance/data-quality` HTTP 200; ledger drift checks all `ok` and false raw drift warnings are gone | pass with real backlog warnings |
+| F29 consolidated | staging `/api/finance/f29/monthly-position` HTTP 200 with `legalEntity`; `enabledByLine`: VAT true, retention true, PPM false | pass provisional |
+| Bank freshness | staging `/api/finance/bank` HTTP 200; all active accounts cover `balance_date=2026-06-20`; `freshness.isStale=false` despite 11h computed age | pass |
+| Income / expenses | staging `/api/finance/income/summary` and `/api/finance/expenses/summary` HTTP 200; June accrual income 6.902.000 CLP, expenses 1.578.984 CLP; cash month 0/0 | pass |
+| Cashflow / cash position | staging dashboard summary, cashflow, cash-position, cash-in and cash-out all HTTP 200; cash-in driftCount 0, cash-out driftCount 0 | pass with reconciliation backlog |
+| Payment orders | DB: 5 paid, 3 cancelled, 1 pending approval; paid-without-expense-payment 0. Staging list HTTP 200 total 9 | pass with control warning |
+| Purchase orders | staging list HTTP 200 total 2; DB active POs 6.903.000 CLP authorized, 0 invoiced | pass with low volume |
+| Fiscal readiness | VAT 30 periods, retention 2, PPM 19, 1 placeholder PPM config, `f22_annual_positions` missing | provisional |
+| AR/AP backlog | DB: 33 open receivables for 90.286.328 CLP; 32 overdue for 83.384.328 CLP; 154 open payables for 28.469.416,17 CLP; 129 overdue for 18.370.018,95 CLP | operational backlog |
+| Queues / integrations | DTE pending 0, dead-letter 0; external cash unresolved 70; economic-category pending 171; outbox unpublished 0; degraded handlers 4 | warning |
+| Quote data | DB: commercial quotations 57 / 121.513.793,16 CLP; finance quotes 37 / 112.379.302 CLP; line orphans 0/0. Staging pricing lookup includes `ECG-004` | pass on read integrity |
+| Operational P&L | June 2026 still revenue 6.902.000 CLP and cost 0 across client/space/organization | provisional; margin not canonical |
 
 ### Core counts
 
@@ -408,12 +431,15 @@ Severity: `low`
 
 Severity: `medium-high`
 
-Staging returned 500 for `/api/finance/dashboard/pnl`. Vercel logs showed `column "effective_cost_amount_clp" does not exist`. Root cause: the income query used `COALESCE(effective_cost_amount_clp, total_amount_clp)` inside `FROM greenhouse_finance.income`, but `effective_cost_amount_clp` is an expense-side field. The canonical PnL architecture already defines revenue as `SUM(income.total_amount_clp)`.
+Staging returned 500 for `/api/finance/dashboard/pnl`. The first Vercel logs showed `column "effective_cost_amount_clp" does not exist`. Root cause: the income query used `COALESCE(effective_cost_amount_clp, total_amount_clp)` inside `FROM greenhouse_finance.income`, but `effective_cost_amount_clp` is an expense-side field. The canonical PnL architecture already defines revenue as `SUM(income.total_amount_clp)`.
+
+Refresh 2026-06-20 20:25 UTC: after the column fix reached staging, the endpoint still returned HTTP 500 with a new Vercel log: `date/time field value out of range: "2026-06-31"`. Root cause: the route built `periodEnd` as `YYYY-MM-31`, which is invalid for June, April, September, November and February.
 
 Treatment applied locally:
 
 - `src/app/api/finance/dashboard/pnl/route.ts` now calculates accrued income with `SUM(total_amount_clp)`.
-- `src/app/api/finance/dashboard/pnl/route.test.ts` asserts the income query does not reference `effective_cost_amount_clp`.
+- `src/app/api/finance/dashboard/pnl/route.ts` now uses the canonical `getMonthDateRange(year, month)` helper for real month boundaries.
+- `src/app/api/finance/dashboard/pnl/route.test.ts` asserts the income query does not reference `effective_cost_amount_clp` and that June 2026 uses `2026-06-30`.
 
 Remaining: deploy to staging and re-smoke `/api/finance/dashboard/pnl`.
 
@@ -471,7 +497,7 @@ Treatment applied locally:
   - fallback threshold when coverage is unknown.
 - GVC local `/finance/bank` passed after webpack warmup: `.captures/2026-06-20T19-51-30_inline-finance-bank`. Frame and aria evidence show the page rendered without skeleton/login/error and without the stale snapshot banner; the separate FX materialization degraded warning remains visible.
 
-Remaining: deploy/re-smoke staging `/api/finance/bank`; staging will keep showing the old freshness behavior until deploy.
+Refresh 2026-06-20 20:25 UTC: staging `/api/finance/bank` now returns `freshness.isStale=false` with `balance_date=2026-06-20`; rollout/re-smoke complete for this finding.
 
 ## What Is Ready
 
@@ -481,34 +507,31 @@ Remaining: deploy/re-smoke staging `/api/finance/bank`; staging will keep showin
 - Purchase orders: create/read bug from `ISSUE-045` is resolved.
 - Pricing quote gap from `ISSUE-055` is resolved.
 - Quote data: commercial/finance quotation line items have 0 orphan rows; staging quote reads and pricing lookup respond.
-- Data-quality ledger false positives are fixed locally with canonical settlement/normalized payment sources.
+- Data-quality ledger false positives are fixed and verified in staging with canonical settlement/normalized payment sources.
 - Cost attribution technical recovery from `TASK-1190` is effective: CCA handlers are no longer failed.
 - VAT legal-entity scope and fiscal period stamping are in place.
-- F29 consolidated reader has the right design and appears complete local-first.
-- PnL dashboard 500 root cause is fixed locally with a focused anti-regression test.
-- Bank freshness false warning has a local fix with focal tests and GVC evidence.
-- Staging confirms core read surfaces respond: dashboard summary, cashflow, bank, income summary, expense summary, payment orders, purchase orders, quote pricing lookup, VAT monthly and operational P&L.
+- F29 consolidated endpoint/card are verified in staging; VAT and retention show official, PPM remains in validation.
+- PnL dashboard 500 root causes are fixed locally with focused anti-regression tests; deploy/re-smoke still pending.
+- Bank freshness false warning is fixed and verified in staging (`freshness.isStale=false` with same-day balance coverage).
+- Staging confirms core read surfaces respond: dashboard summary, cashflow, cash-position, cash-in, cash-out, bank, income summary, expense summary, payment orders, purchase orders, quote pricing lookup, F29/VAT monthly and operational P&L.
 
 ## What Is Missing
 
 Priority order if the goal is "Finance funciona y funciona bien":
 
 1. Deploy/re-smoke the new `ops-finance-dte-emission-retry` scheduler home and add DTE queue reliability signal (`FD-1` remainder).
-2. Deploy/re-smoke the local PnL dashboard fix in staging (`FD-10`).
-3. Deploy/re-smoke the local `data-quality` false-positive ledger fix (`FD-5`).
-4. Deploy/re-smoke TASK-1195/F29 consolidated endpoint and card if it is ready for staging.
-5. Execute `TASK-1192` payment/treasury capability gates.
-6. Execute `TASK-1193` fiscal/document action gates.
-7. Continue `TASK-1194` sync/materializer boundary beyond DTE queue DDL.
-8. Validate retention + PPM with accountant and flip flags only after evidence.
-9. Complete upstream payroll/labor allocation for June 2026 before using margin.
-10. Drain `economic_category_manual_queue`.
-11. Provision Teams Finance Alerts webhook (`ISSUE-058`).
-12. Decide finance AI signal source-of-truth before Nexa finance actions.
-13. Add navigation/viewCode for `/finance/external-signals`.
-14. Triage AR/AP backlog: 32 overdue receivables, 129 overdue payables, 70 unresolved external cash signals and pending/draft payment profiles.
-15. Deploy/re-smoke the bank freshness signal fix (`FD-13`).
-16. Extend capability hardening beyond the original count: static scan now shows 123 write routes and 116 without visible fine capability markers, with `quotes` and `reconciliation` as the largest surfaces.
+2. Deploy/re-smoke the local PnL dashboard month-boundary fix in staging (`FD-10`).
+3. Execute `TASK-1192` payment/treasury capability gates.
+4. Execute `TASK-1193` fiscal/document action gates.
+5. Continue `TASK-1194` sync/materializer boundary beyond DTE queue DDL.
+6. Validate PPM with accountant and flip its flag only after evidence; retention is enabled in staging but still needs official accounting sign-off for filing use.
+7. Complete upstream payroll/labor allocation for June 2026 before using margin.
+8. Drain `economic_category_manual_queue`.
+9. Provision Teams Finance Alerts webhook (`ISSUE-058`).
+10. Decide finance AI signal source-of-truth before Nexa finance actions.
+11. Add navigation/viewCode for `/finance/external-signals`.
+12. Triage AR/AP backlog: 32 overdue receivables, 129 overdue payables, 70 unresolved external cash signals and pending/draft payment profiles.
+13. Extend capability hardening beyond the original count: static scan now shows 123 write routes and 116 without visible fine capability markers, with `quotes` and `reconciliation` as the largest surfaces.
 
 ## Verification Performed
 
@@ -542,8 +565,15 @@ Priority order if the goal is "Finance funciona y funciona bien":
 - Vercel logs for `/api/finance/dashboard/pnl` 500.
 - `pnpm exec vitest run src/app/api/finance/dashboard/pnl/route.test.ts` after the local PnL fix.
 - Reads of finance architecture, runtime map, payment orders architecture, cash/bank docs, reconciliation docs, prior finance audits, route capability audit and selected source files.
+- Refresh 20:25 UTC:
+  - `pnpm pg:doctor`
+  - direct Cloud SQL read-only SQL via controlled `cloud-sql-proxy` + Node `pg` for queues, quote integrity and payment-order side effects.
+  - staging API probes: `dashboard/summary` 200, `dashboard/cashflow` 200, `cash-position` 200, `cash-in` 200, `cash-out` 200, `bank` 200 with `freshness.isStale=false`, `income/summary` 200, `expenses/summary` 200, `data-quality` 200 with ledger drift checks ok, `f29/monthly-position` 200, `admin/finance/payment-orders` 200, `purchase-orders` 200, `quotes/pricing/lookup?type=role` 200.
+  - Vercel logs for deployment `greenhouse-cy931va53` showing remaining PnL 500 cause `date/time field value out of range: "2026-06-31"`.
+  - `pnpm exec vitest run src/app/api/finance/dashboard/pnl/route.test.ts src/lib/finance/periods.test.ts`
+  - `pnpm exec eslint src/app/api/finance/dashboard/pnl/route.ts src/app/api/finance/dashboard/pnl/route.test.ts`
 
-Test result before PnL fix: 17 test files passed, 83 tests passed. PnL focal after fix: 1 test file passed, 3 tests passed.
+Test result before PnL fix: 17 test files passed, 83 tests passed. PnL/month-boundary focal after latest fix: 2 test files passed, 7 tests passed.
 
 ## Limits / Not Verified
 

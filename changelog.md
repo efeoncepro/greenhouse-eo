@@ -2,6 +2,8 @@
 
 ## 2026-06-20
 
+- **Finance audit refresh — PnL month-boundary fix + staging re-smoke.** Refresh profundo 20:25 UTC sobre Finance confirmó que staging ya tiene OK F29 consolidado, data-quality sin falsos drifts de ledger y banco sin falso stale (`freshness.isStale=false`). El único 500 crítico restante es `/api/finance/dashboard/pnl`: Vercel ya no muestra la columna vieja, sino `2026-06-31` por fin de mes hardcodeado. Fix local: PnL usa `getMonthDateRange(year, month)` y test anti-regresión cubre junio `2026-06-30`; deploy/re-smoke pendiente.
+
 - **Finance DTE — retry queue obtiene scheduler home en ops-worker (TASK-1194 Slice 0b).** La ruta `/api/cron/dte-emission-retry` deja de ser un cron huérfano: la lógica vive en `processDteEmissionRetryQueue()`, la route Next queda como fallback protegido por `requireCronAuth`, y el ops-worker expone `POST /finance/dte-emission-retry`. `services/ops-worker/deploy.sh` declara `ops-finance-dte-emission-retry` cada 15 minutos con `{"batchSize":5}`; `vercel-cron-gate` y `cron-staging-drift` clasifican cualquier intento futuro de Vercel cron DTE como `async_critical`. Code-complete local; deploy/re-smoke de ops-worker pendiente.
 
 - **Finance — F29 consolidado verificado en STAGING (TASK-1195 + TASK-1197 rollout).** Push a `develop` desplegado a staging: `GET /api/finance/f29/monthly-position` → HTTP 200 con las 3 líneas + `legalEntity`; GVC del card "Posición F29 del mes" en `dev-greenhouse` (2 frames). El card propaga el estado real de flags por línea: IVA + Retenciones **Oficial** (`RETENTION_POSITION_ENABLED=true` en staging), PPM **En validación** (flag OFF). Runtime Rollout Completion Gate cerrado.
