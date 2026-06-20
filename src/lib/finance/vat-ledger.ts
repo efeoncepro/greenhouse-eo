@@ -16,7 +16,7 @@ export interface VatLedgerEntryRecord {
   periodId: string
   periodYear: number
   periodMonth: number
-  spaceId: string
+  spaceId: string | null
   spaceName: string | null
   sourceKind: 'income' | 'expense'
   sourceId: string
@@ -37,7 +37,7 @@ export interface VatMonthlyPositionRecord {
   periodId: string
   periodYear: number
   periodMonth: number
-  spaceId: string
+  spaceId: string | null
   spaceName: string | null
   debitFiscalAmountClp: number
   creditFiscalAmountClp: number
@@ -150,7 +150,7 @@ const mapPositionRow = (row: Record<string, unknown>): VatMonthlyPositionRecord 
   periodId: String(row.period_id),
   periodYear: Number(row.period_year),
   periodMonth: Number(row.period_month),
-  spaceId: String(row.space_id),
+  spaceId: row.space_id == null ? null : String(row.space_id),
   spaceName: typeof row.space_name === 'string' ? row.space_name : null,
   debitFiscalAmountClp: toNumber(row.debit_fiscal_amount_clp),
   creditFiscalAmountClp: toNumber(row.credit_fiscal_amount_clp),
@@ -169,7 +169,7 @@ const mapEntryRow = (row: Record<string, unknown>): VatLedgerEntryRecord => ({
   periodId: String(row.period_id),
   periodYear: Number(row.period_year),
   periodMonth: Number(row.period_month),
-  spaceId: String(row.space_id),
+  spaceId: row.space_id == null ? null : String(row.space_id),
   spaceName: typeof row.space_name === 'string' ? row.space_name : null,
   sourceKind: String(row.source_kind) as 'income' | 'expense',
   sourceId: String(row.source_id),
@@ -613,7 +613,8 @@ export async function materializeAllAvailableVatPeriods(reason: string) {
 }
 
 export async function getVatMonthlyPosition(params: {
-  spaceId: string
+  /** TASK-725 — scope fiscal = entidad legal (operating entity), no space. */
+  legalEntityOrganizationId: string
   year: number
   month: number
 }): Promise<VatMonthlyPositionRecord | null> {
@@ -640,7 +641,7 @@ export async function getVatMonthlyPosition(params: {
     FROM greenhouse_finance.vat_monthly_positions p
     LEFT JOIN greenhouse_core.spaces s
       ON s.space_id = p.space_id
-    WHERE p.space_id = ${params.spaceId}
+    WHERE p.organization_id = ${params.legalEntityOrganizationId}
       AND p.period_year = ${params.year}
       AND p.period_month = ${params.month}
     LIMIT 1
@@ -650,7 +651,8 @@ export async function getVatMonthlyPosition(params: {
 }
 
 export async function listVatMonthlyPositions(params: {
-  spaceId: string
+  /** TASK-725 — scope fiscal = entidad legal (operating entity), no space. */
+  legalEntityOrganizationId: string
   limit?: number
 }): Promise<VatMonthlyPositionRecord[]> {
   const db = await getDb()
@@ -677,7 +679,7 @@ export async function listVatMonthlyPositions(params: {
     FROM greenhouse_finance.vat_monthly_positions p
     LEFT JOIN greenhouse_core.spaces s
       ON s.space_id = p.space_id
-    WHERE p.space_id = ${params.spaceId}
+    WHERE p.organization_id = ${params.legalEntityOrganizationId}
     ORDER BY p.period_year DESC, p.period_month DESC
     LIMIT ${limit}
   `.execute(db)
@@ -686,7 +688,8 @@ export async function listVatMonthlyPositions(params: {
 }
 
 export async function listVatLedgerEntries(params: {
-  spaceId: string
+  /** TASK-725 — scope fiscal = entidad legal (operating entity), no space. */
+  legalEntityOrganizationId: string
   year: number
   month: number
 }): Promise<VatLedgerEntryRecord[]> {
@@ -715,7 +718,7 @@ export async function listVatLedgerEntries(params: {
     FROM greenhouse_finance.vat_ledger_entries e
     LEFT JOIN greenhouse_core.spaces s
       ON s.space_id = e.space_id
-    WHERE e.space_id = ${params.spaceId}
+    WHERE e.organization_id = ${params.legalEntityOrganizationId}
       AND e.period_year = ${params.year}
       AND e.period_month = ${params.month}
     ORDER BY

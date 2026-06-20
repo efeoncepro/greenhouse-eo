@@ -3,7 +3,7 @@ export interface VatMonthlyPosition {
   periodId: string
   periodYear: number
   periodMonth: number
-  spaceId: string
+  spaceId: string | null
   spaceName: string | null
   debitFiscalAmountClp: number
   creditFiscalAmountClp: number
@@ -22,7 +22,7 @@ export interface VatLedgerEntry {
   periodId: string
   periodYear: number
   periodMonth: number
-  spaceId: string
+  spaceId: string | null
   spaceName: string | null
   sourceKind: 'income' | 'expense'
   sourceId: string

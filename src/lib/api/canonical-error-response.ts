@@ -79,6 +79,8 @@ export type CanonicalErrorCode =
   // ICO sync activation gobernada (TASK-1171 Slice 3).
   | 'ico_sync_client_not_found'
   | 'ico_sync_source_not_connected'
+  // Finance fiscal scope (TASK-725) — sin entidad legal operating configurada.
+  | 'fiscal_entity_unavailable'
 // Reserved for future canonical codes — extender aquí cuando emerjan
 // nuevos error paths estructurales. NUNCA usar strings ad-hoc.
 
@@ -135,6 +137,14 @@ const CANONICAL_ERRORS: Record<CanonicalErrorCode, CanonicalErrorDefinition> = {
     status: 429,
     message: 'Demasiados intentos. Espera un momento e inténtalo de nuevo.',
     actionable: true
+  },
+  fiscal_entity_unavailable: {
+    status: 422,
+    // Estructural: falta la entidad legal operativa (is_operating_entity).
+    // Reintentar no resuelve — requiere configuración de Admin/Finanzas.
+    message:
+      'La posición fiscal no está disponible: falta configurar la entidad legal operativa. Contacta a tu administrador de Finanzas.',
+    actionable: false
   },
   internal_error: {
     status: 500,

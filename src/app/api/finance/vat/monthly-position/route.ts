@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server'
 
+import { getOperatingEntityIdentity } from '@/lib/account-360/organization-identity'
+import { canonicalErrorResponse } from '@/lib/api/canonical-error-response'
 import { getFinanceCurrentPeriod } from '@/lib/finance/reporting'
 import {
   getVatMonthlyPosition,
@@ -13,19 +15,20 @@ import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 export const dynamic = 'force-dynamic'
 
 const buildEmptyPosition = ({
-  spaceId,
+  legalEntityOrgId,
   year,
   month
 }: {
-  spaceId: string
+  legalEntityOrgId: string
   year: number
   month: number
 }): VatMonthlyPositionRecord => ({
-  vatPositionId: `EO-VMP-${year}${String(month).padStart(2, '0')}-${spaceId}`,
+  vatPositionId: `EO-VMP-${year}${String(month).padStart(2, '0')}-${legalEntityOrgId}`,
   periodId: `${year}-${String(month).padStart(2, '0')}`,
   periodYear: year,
   periodMonth: month,
-  spaceId,
+  // TASK-725 — posición consolidada por entidad legal; sin space de contraparte.
+  spaceId: null,
   spaceName: null,
   debitFiscalAmountClp: 0,
   creditFiscalAmountClp: 0,
@@ -100,14 +103,17 @@ export async function GET(request: Request) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const spaceId = tenant.spaceId ?? null
+  // TASK-725 — El IVA / F29 se declara por entidad legal (RUT), no por space.
+  // El scope deja de exigir `tenant.spaceId` (que un admin interno no tiene) y
+  // se resuelve a la operating entity canónica. Esto desbloquea el dashboard
+  // consolidado interno (causa del 422 de ISSUE-101).
+  const operatingEntity = await getOperatingEntityIdentity()
 
-  if (!spaceId) {
-    return NextResponse.json(
-      { error: 'Finance VAT position requires a tenant with canonical space scope.' },
-      { status: 422 }
-    )
+  if (!operatingEntity) {
+    return canonicalErrorResponse('fiscal_entity_unavailable')
   }
+
+  const legalEntityOrganizationId = operatingEntity.organizationId
 
   const { searchParams } = new URL(request.url)
   const currentPeriod = getFinanceCurrentPeriod()
@@ -116,12 +122,12 @@ export async function GET(request: Request) {
   const format = searchParams.get('format')
 
   const [position, recentPositions, entries] = await Promise.all([
-    getVatMonthlyPosition({ spaceId, year, month }),
-    listVatMonthlyPositions({ spaceId, limit: 6 }),
-    listVatLedgerEntries({ spaceId, year, month })
+    getVatMonthlyPosition({ legalEntityOrganizationId, year, month }),
+    listVatMonthlyPositions({ legalEntityOrganizationId, limit: 6 }),
+    listVatLedgerEntries({ legalEntityOrganizationId, year, month })
   ])
 
-  const resolvedPosition = position ?? buildEmptyPosition({ spaceId, year, month })
+  const resolvedPosition = position ?? buildEmptyPosition({ legalEntityOrgId: legalEntityOrganizationId, year, month })
 
   if (format === 'csv') {
     return new NextResponse(toCsv({ position: resolvedPosition, entries }), {
@@ -139,6 +145,11 @@ export async function GET(request: Request) {
     entries,
     year,
     month,
-    spaceId
+    legalEntity: {
+      organizationId: operatingEntity.organizationId,
+      legalName: operatingEntity.legalName,
+      taxId: operatingEntity.taxId,
+      country: operatingEntity.country
+    }
   })
 }
