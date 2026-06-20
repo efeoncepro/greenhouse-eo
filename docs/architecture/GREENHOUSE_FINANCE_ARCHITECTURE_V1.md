@@ -2341,10 +2341,10 @@ Checks relevantes:
 
 | Check                             | Qué verifica                                                                 |
 | --------------------------------- | ---------------------------------------------------------------------------- |
-| `income_payment_ledger_integrity` | `income.amount_paid = SUM(income_payments.amount)`                           |
-| `income_paid_without_ledger`      | Facturas con `amount_paid > 0` pero sin filas en `income_payments`           |
-| `expense_payment_ledger_integrity`| `expenses.amount_paid = SUM(expense_payments.amount)`                        |
-| `expense_paid_without_ledger`     | Compras con `amount_paid > 0` pero sin filas en `expense_payments`           |
+| `income_payment_ledger_integrity` | `income_settlement_reconciliation.has_drift` (settlement canónico: pagos activos + factoring + withholding) |
+| `income_paid_without_ledger`      | Facturas con `amount_paid > 0` pero sin filas activas en `income_payments_normalized` |
+| `expense_payment_ledger_integrity`| `expenses.amount_paid = SUM(expense_payments_normalized.payment_amount_native)` |
+| `expense_paid_without_ledger`     | Compras con `amount_paid > 0` pero sin filas activas en `expense_payments_normalized` |
 | `direct_cost_without_client`      | Gastos directos sin `allocated_client_id` / `client_id` efectivo             |
 | `shared_overhead_unallocated`     | Overhead compartido sin asignación explícita; visible pero **no** se trata como falla |
 | `income_without_client`           | Ingresos sin cliente                                                         |
@@ -2357,6 +2357,7 @@ Reglas adicionales:
 1. Cuando el tenant trae `spaceId`, los checks que tienen `space_id` canónico deben leer en scope tenant.
 2. Los checks globales siguen existiendo para tablas que no exponen `space_id` confiable en todas sus filas.
 3. `Finance Data Quality` en Ops/Admin no debe volver a mezclar backlog de riesgo con overhead compartido permitido bajo un único contador de “fallas”.
+4. El endpoint no debe re-derivar ledger drift con `SUM(income_payments.amount)` ni `SUM(expense_payments.amount)` raw; debe consumir los contracts canónicos que filtran superseded y settlement.
 
 Integrado en Admin Center > Ops Health como subsistema "Finance Data Quality", con summary semántico por buckets en vez de sobrecargar `processed/failed`.
 

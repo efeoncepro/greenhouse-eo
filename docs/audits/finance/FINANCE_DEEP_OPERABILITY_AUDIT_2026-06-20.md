@@ -21,7 +21,7 @@ Pero Finance **todavia no esta cerrado como sistema financiero market-grade comp
 3. F29 mensual esta compuesto y `TASK-1195` aparece complete local-first, pero retencion/PPM siguen en shadow/flag OFF y PPM usa tasa placeholder `placeholder_pending_contador`.
 4. F22 anual (`TASK-1196`) no debe tomarse como listo: requiere regla de regimen/tasa IDPC, fuente RLI y validacion contable.
 5. Junio 2026 no es margen canonico: `operational_pl` tiene revenue con costo `0` porque falta upstream payroll/labor allocation.
-6. `/api/finance/data-quality` puede reportar falsos warnings porque usa `SUM(payments)` raw y no el canon con superseded/settlement/factoring.
+6. `/api/finance/data-quality` reportaba falsos warnings porque usaba `SUM(payments)` raw y no el canon con superseded/settlement/factoring. Quedó corregido localmente: income usa `income_settlement_reconciliation`; expenses usa `expense_payments_normalized` activo. Falta deploy/re-smoke.
 7. Integraciones outbound comerciales tienen 4 handlers `degraded` (quotation HubSpot y Sample Sprint HubSpot). No rompen caja, pero si afectan quote-to-cash/commercial sync.
 8. Staging expuso un 500 real en `/api/finance/dashboard/pnl`: el query de ingresos leia `effective_cost_amount_clp` desde `income`, pero esa columna es de `expenses`. El fix local cambia ingresos a `SUM(total_amount_clp)` y agrega test anti-regresion; falta deploy/re-smoke.
 9. La segunda pasada de superficie amplia encontró 205 rutas Finance/admin Finance/cron Finance, 123 write routes y 116 write routes sin capability fina visible por scan estatico. La brecha de controles es mas grande que el numero previo de 75 rutas y debe tratarse como programa de hardening, no como fix puntual.
@@ -189,7 +189,7 @@ Read-only staging requests showed the main finance surfaces responding, with thr
 - `500`: `/api/finance/dashboard/pnl` because the income query referenced `effective_cost_amount_clp`, a column that does not exist on `greenhouse_finance.income`. Local fix applied in `src/app/api/finance/dashboard/pnl/route.ts`; deploy/re-smoke pending.
 - `404`: `/api/finance/f29/monthly-position` in staging because the TASK-1195 endpoint was still local-first/not deployed.
 - `503`: `/api/admin/finance/ledger-health` is honest-blocking on operational backlog, not hidden corruption: canonical settlement drift and phantoms were 0, but unanchored legacy expenses and external cash signals remain unresolved.
-- `/api/finance/data-quality` returned `overallStatus=error`: includes stale ledger-warning logic plus real operational backlog (`overdue_receivables`, direct costs without client, Nubox balance divergence, annulled expenses).
+- `/api/finance/data-quality` returned `overallStatus=error`: staging still includes stale ledger-warning logic until deploy, plus real operational backlog (`overdue_receivables`, direct costs without client, Nubox balance divergence, annulled expenses).
 
 Second staging smoke pass (60 GET endpoints, authenticated agent, no writes):
 
@@ -306,7 +306,7 @@ Severity: `medium-high`
 
 Cost Intelligence is recovered technically, but June has revenue with zero cost because upstream labor allocation is missing. Do not use June 2026 `operational_pl` as real margin for leadership, Nexa, pricing, or client profitability decisions until payroll/labor allocation is complete and the degradation signal clears.
 
-### FD-5 - `/api/finance/data-quality` ledger checks are stale relative to canonical ledger semantics
+### FD-5 - `/api/finance/data-quality` ledger checks were stale relative to canonical ledger semantics
 
 Severity: `medium`
 
@@ -316,11 +316,15 @@ The endpoint compares `amount_paid` to raw `SUM(income_payments)` / `SUM(expense
 - payments should exclude superseded chains (`superseded_by_payment_id`, `superseded_by_otb_id`, `superseded_at`);
 - canonical paid-without-ledger is 0/0, while raw drift counted 4 income / 69 expense rows.
 
-Recommended fix:
+Treatment applied locally:
 
-- Refactor data-quality ledger checks to use `income_settlement_reconciliation` for income.
-- Use active payment filters for expense payments.
-- Add tests covering superseded and factoring cases.
+- Income ledger drift now reads `greenhouse_finance.income_settlement_reconciliation.has_drift`.
+- Income paid-without-ledger now checks active rows through `greenhouse_finance.income_payments_normalized`.
+- Expense ledger drift now compares `expenses.amount_paid` to `SUM(expense_payments_normalized.payment_amount_native)`, which excludes superseded rows.
+- Expense paid-without-ledger now checks active rows through `greenhouse_finance.expense_payments_normalized`.
+- Anti-regression test ensures the endpoint no longer reintroduces raw `SUM(amount)` over `income_payments` / `expense_payments`.
+
+Runtime evidence: Cloud SQL raw expense drift was 69, canonical active-native expense drift is 0; `income_settlement_reconciliation` drift is 0. Remaining: deploy to staging and re-smoke `/api/finance/data-quality`.
 
 ### FD-6 - Economic category manual queue still needs operations drain
 
@@ -397,6 +401,7 @@ But the write route scan found 20 `quotes` write routes without visible fine cap
 - Purchase orders: create/read bug from `ISSUE-045` is resolved.
 - Pricing quote gap from `ISSUE-055` is resolved.
 - Quote data: commercial/finance quotation line items have 0 orphan rows; staging quote reads and pricing lookup respond.
+- Data-quality ledger false positives are fixed locally with canonical settlement/normalized payment sources.
 - Cost attribution technical recovery from `TASK-1190` is effective: CCA handlers are no longer failed.
 - VAT legal-entity scope and fiscal period stamping are in place.
 - F29 consolidated reader has the right design and appears complete local-first.
@@ -412,7 +417,7 @@ Priority order if the goal is "Finance funciona y funciona bien":
 4. Execute `TASK-1194` sync/materializer boundary, including DTE retry if scoped there.
 5. Validate retention + PPM with accountant and flip flags only after evidence.
 6. Complete upstream payroll/labor allocation for June 2026 before using margin.
-7. Fix `data-quality` false-positive ledger checks.
+7. Deploy/re-smoke the local `data-quality` false-positive ledger fix.
 8. Drain `economic_category_manual_queue`.
 9. Provision Teams Finance Alerts webhook (`ISSUE-058`).
 10. Decide finance AI signal source-of-truth before Nexa finance actions.
@@ -433,6 +438,8 @@ Priority order if the goal is "Finance funciona y funciona bien":
 - Second read-only staging API smoke: 60 GET endpoints; 53 passed first call, 4 parameter-validation endpoints passed with valid params, 3 real failures remained (PnL 500 pending deploy, F29 404 pending deploy, ledger-health 503 by design).
 - Static API route scan for `src/app/api/finance/**`, `src/app/api/admin/finance/**` and Finance-owned crons.
 - Read-only Cloud SQL probes for commercial/finance quotations, quote line orphans, AR/AP aging, payment profiles and external cash signals.
+- Read-only Cloud SQL probe comparing raw vs canonical data-quality ledger drift (`expense` raw 69 -> canonical 0; income settlement drift 0).
+- `pnpm exec vitest run src/app/api/finance/data-quality/route.test.ts`
 - Vercel logs for `/api/finance/dashboard/pnl` 500.
 - `pnpm exec vitest run src/app/api/finance/dashboard/pnl/route.test.ts` after the local PnL fix.
 - Reads of finance architecture, runtime map, payment orders architecture, cash/bank docs, reconciliation docs, prior finance audits, route capability audit and selected source files.

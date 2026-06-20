@@ -41,10 +41,14 @@ describe('GET /api/finance/data-quality', () => {
     })
 
     mockRunGreenhousePostgresQuery.mockImplementation(async (sql: string, params?: unknown[]) => {
-      if (sql.includes('ABS(COALESCE(i.amount_paid, 0) - p.total) > 0.01')) return [{ count: '1' }]
-      if (sql.includes('ip.payment_id IS NULL')) return [{ count: '0' }]
-      if (sql.includes('ABS(COALESCE(e.amount_paid, 0) - p.total) > 0.01')) return [{ count: '0' }]
-      if (sql.includes('ep.payment_id IS NULL')) return [{ count: '0' }]
+      if (sql.includes('FROM greenhouse_finance.income_settlement_reconciliation')) return [{ count: '1' }]
+      if (sql.includes('income_payments_normalized ipn')) return [{ count: '0' }]
+
+      if (sql.includes('FROM greenhouse_finance.expense_payments_normalized') && sql.includes('SUM(payment_amount_native)')) {
+        return [{ count: '0' }]
+      }
+
+      if (sql.includes('expense_payments_normalized epn')) return [{ count: '0' }]
       if (sql.includes('settlement_groups sg')) return [{ count: '0' }]
       if (sql.includes('FROM greenhouse_finance.income_payments ip')) return [{ count: '0' }]
       if (sql.includes('FROM greenhouse_finance.expense_payments ep')) return [{ count: '0' }]
@@ -178,10 +182,11 @@ describe('GET /api/finance/data-quality', () => {
       }
 
       if (
-        sql.includes('ABS(COALESCE(i.amount_paid, 0) - p.total) > 0.01') ||
-        sql.includes('ip.payment_id IS NULL') ||
-        sql.includes('ABS(COALESCE(e.amount_paid, 0) - p.total) > 0.01') ||
-        sql.includes('ep.payment_id IS NULL') ||
+        sql.includes('FROM greenhouse_finance.income_settlement_reconciliation') ||
+        sql.includes('income_payments_normalized ipn') ||
+        (sql.includes('FROM greenhouse_finance.expense_payments_normalized') &&
+          sql.includes('SUM(payment_amount_native)')) ||
+        sql.includes('expense_payments_normalized epn') ||
         sql.includes('settlement_groups sg') ||
         sql.includes('FROM greenhouse_finance.income_payments ip') ||
         sql.includes('FROM greenhouse_finance.expense_payments ep') ||
@@ -211,5 +216,22 @@ describe('GET /api/finance/data-quality', () => {
     expect(response.status).toBe(200)
     expect(directCostCheck.scope).toBe('global')
     expect(body.summary.scope).toBe('global')
+  })
+
+  it('uses canonical active ledger sources instead of raw payment sums', async () => {
+    const response = await GET()
+
+    expect(response.status).toBe(200)
+
+    const executedSql = mockRunGreenhousePostgresQuery.mock.calls
+      .map(call => String(call[0]))
+      .join('\n\n')
+
+    expect(executedSql).toContain('greenhouse_finance.income_settlement_reconciliation')
+    expect(executedSql).toContain('greenhouse_finance.income_payments_normalized')
+    expect(executedSql).toContain('greenhouse_finance.expense_payments_normalized')
+    expect(executedSql).toContain('SUM(payment_amount_native)')
+    expect(executedSql).not.toMatch(/SELECT\s+income_id,\s+SUM\(amount\)::numeric\s+AS\s+total\s+FROM\s+greenhouse_finance\.income_payments/i)
+    expect(executedSql).not.toMatch(/SELECT\s+expense_id,\s+SUM\(amount\)::numeric\s+AS\s+total\s+FROM\s+greenhouse_finance\.expense_payments/i)
   })
 })
