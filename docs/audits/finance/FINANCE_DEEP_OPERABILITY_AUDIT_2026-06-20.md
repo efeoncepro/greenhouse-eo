@@ -44,6 +44,34 @@ Pero Finance **todavia no esta cerrado como sistema financiero market-grade comp
 
 ## Runtime Evidence Snapshot
 
+### Refresh pass — 2026-06-20 19:45 UTC
+
+Third pass after commits `20434dc49`, `6b622fa0d` and `d07dec5ce` reconfirmed the audit against current Cloud SQL dev plus staging API:
+
+| Area | Fresh evidence | Decision |
+|---|---|---|
+| DB auth / runtime role | `pnpm pg:doctor` healthy; runtime `greenhouse_app` has `USAGE` on governed schemas and no `CREATE` on schemas | pass |
+| Core finance counts | unchanged: 75 income, 226 expenses, 27 income payments, 121 expense payments, 9 payment orders, 2 purchase orders, 8 accounts | stable |
+| Ledger/cash integrity | income settlement drift 0; income paid-without-active-payment 0; expense paid-without-active-payment 0; income/expense FX repair required 0/0 | pass |
+| DTE queue | `greenhouse_finance.dte_emission_queue` exists and has 0 rows | partial pass; scheduler still missing |
+| Bank balances | all 8 active accounts have latest `balance_date=2026-06-20` | cash snapshot pass |
+| Bank API freshness signal | staging `/api/finance/bank` returns HTTP 200, but `freshness.isStale=true` because `lastMaterializedAt` is ~10h old despite same-day balances | warning; likely over-sensitive UI signal |
+| Payment orders | staging `/api/admin/finance/payment-orders` HTTP 200, total 9; DB paid-without-expense-payment 0 | pass with control warning |
+| Purchase orders | staging `/api/finance/purchase-orders` HTTP 200, 2 active POs, 6.903.000 CLP authorized | pass with low data volume |
+| Income / expenses summaries | staging `/api/finance/income/summary` and `/api/finance/expenses/summary` HTTP 200 | pass |
+| Cashflow / dashboard summary | staging `/api/finance/dashboard/summary` and `/api/finance/dashboard/cashflow` HTTP 200 | pass |
+| PnL dashboard | staging `/api/finance/dashboard/pnl` still HTTP 500 | rollout pending; local fix not deployed |
+| Data quality endpoint | staging `/api/finance/data-quality` HTTP 200 but still reports stale ledger false positives: 4 income + 69 expense raw drifts | rollout pending; local fix not deployed |
+| F29 consolidated | staging `/api/finance/f29/monthly-position` still HTTP 404 | rollout pending; local TASK-1195 not deployed |
+| VAT monthly | staging `/api/finance/vat/monthly-position` HTTP 200 for 2026-06, net VAT 1.085.952,22 CLP | pass as VAT line |
+| Retention / PPM / F22 | retention 2 periods, PPM 19 periods, 1 placeholder PPM config, `f22_annual_positions` table absent | provisional / not official |
+| Operational P&L | staging and DB both show June 2026 revenue 6.902.000 CLP, cost 0 across scopes | provisional; margin not canonical |
+| Handler health | DB: 283 healthy, 4 degraded (`quotation_hubspot_outbound:*`, `sample_sprint_hubspot_outbound:*`) | warning |
+| AR/AP backlog | DB: 32 overdue receivables for 83.384.328 CLP; 129 overdue payables for 18.370.018,95 CLP; 70 unresolved external cash signals for 24.313.807 native amount | operational backlog |
+| Economic category manual queue | 171 pending, 10 archived | operational backlog |
+
+Important nuance: staging is currently behind local `develop` by at least the local Finance fixes. The failures for PnL, F29 consolidated and data-quality ledger false positives are therefore rollout gaps, not necessarily current repo-code gaps. Because the operator has not asked for push/deploy, they remain documented as rollout pending.
+
 ### Core counts
 
 | Object | Count |
@@ -398,6 +426,21 @@ Sales/quotes data exists and line-item integrity looks healthy:
 
 But the write route scan found 20 `quotes` write routes without visible fine capability markers, including lifecycle and price-affecting routes (`issue`, `send`, `approve`, `cost-override`, `pricing/config`). Quote-to-cash should be included explicitly in the capability hardening plan, even though the immediate ECG-004 pricing data issue is resolved.
 
+### FD-13 - Bank freshness signal is over-sensitive for daily snapshots
+
+Severity: `medium-low`
+
+Staging `/api/finance/bank` returns HTTP 200 and all 8 active accounts have `balance_date=2026-06-20` in Cloud SQL. The same response still marks:
+
+- `freshness.lastMaterializedAt = 2026-06-20 09:00:02Z`
+- `freshness.ageSeconds ~= 38.740`
+- `freshness.isStale = true`
+- `freshness.label = Hace 10 h`
+
+Root cause candidate: `src/lib/finance/bank-freshness.ts` currently applies a 1-hour threshold to `computed_at`, while the canonical ops-worker balance materializer runs daily (`ops-finance-rematerialize-balances`) and the account snapshot date is already current. For a no-payment current day, a 10-hour-old computed snapshot can be faithful and should not necessarily render as stale.
+
+Recommended fix: adjust the freshness contract to consider both `computed_at` and the latest `balance_date`/expected period end. A current same-day balance should not warn purely because the daily cron ran in the morning; missing today's balance or a materializer older than the accepted daily SLA should still warn. Because this affects visible UI state, validate with a GVC pass on `/finance/bank` after implementation.
+
 ## What Is Ready
 
 - Transactional ledgers: income/expense payments have no FX repair required.
@@ -411,25 +454,28 @@ But the write route scan found 20 `quotes` write routes without visible fine cap
 - VAT legal-entity scope and fiscal period stamping are in place.
 - F29 consolidated reader has the right design and appears complete local-first.
 - PnL dashboard 500 root cause is fixed locally with a focused anti-regression test.
+- Staging confirms core read surfaces respond: dashboard summary, cashflow, bank, income summary, expense summary, payment orders, purchase orders, quote pricing lookup, VAT monthly and operational P&L.
 
 ## What Is Missing
 
 Priority order if the goal is "Finance funciona y funciona bien":
 
-1. Fix/plan DTE retry queue governance (`FD-1`).
-2. Execute `TASK-1192` payment/treasury capability gates.
-3. Execute `TASK-1193` fiscal/document action gates.
-4. Execute `TASK-1194` sync/materializer boundary, including DTE retry if scoped there.
-5. Validate retention + PPM with accountant and flip flags only after evidence.
-6. Complete upstream payroll/labor allocation for June 2026 before using margin.
-7. Deploy/re-smoke the local `data-quality` false-positive ledger fix.
-8. Drain `economic_category_manual_queue`.
-9. Provision Teams Finance Alerts webhook (`ISSUE-058`).
-10. Decide finance AI signal source-of-truth before Nexa finance actions.
-11. Add navigation/viewCode for `/finance/external-signals`.
-12. Deploy/re-smoke the local PnL dashboard fix in staging.
-13. Triage AR/AP backlog: 32 overdue receivables, 129 overdue payables, 70 unresolved external cash signals and pending/draft payment profiles.
-14. Extend capability hardening beyond the original count: static scan now shows 123 write routes and 116 without visible fine capability markers, with `quotes` and `reconciliation` as the largest surfaces.
+1. Register or intentionally retire `/api/cron/dte-emission-retry` and add DTE queue reliability signal (`FD-1` remainder).
+2. Deploy/re-smoke the local PnL dashboard fix in staging (`FD-10`).
+3. Deploy/re-smoke the local `data-quality` false-positive ledger fix (`FD-5`).
+4. Deploy/re-smoke TASK-1195/F29 consolidated endpoint and card if it is ready for staging.
+5. Execute `TASK-1192` payment/treasury capability gates.
+6. Execute `TASK-1193` fiscal/document action gates.
+7. Continue `TASK-1194` sync/materializer boundary beyond DTE queue DDL.
+8. Validate retention + PPM with accountant and flip flags only after evidence.
+9. Complete upstream payroll/labor allocation for June 2026 before using margin.
+10. Drain `economic_category_manual_queue`.
+11. Provision Teams Finance Alerts webhook (`ISSUE-058`).
+12. Decide finance AI signal source-of-truth before Nexa finance actions.
+13. Add navigation/viewCode for `/finance/external-signals`.
+14. Triage AR/AP backlog: 32 overdue receivables, 129 overdue payables, 70 unresolved external cash signals and pending/draft payment profiles.
+15. Fix or intentionally tune the bank freshness signal (`FD-13`), with GVC evidence because it changes visible state.
+16. Extend capability hardening beyond the original count: static scan now shows 123 write routes and 116 without visible fine capability markers, with `quotes` and `reconciliation` as the largest surfaces.
 
 ## Verification Performed
 
@@ -441,6 +487,10 @@ Priority order if the goal is "Finance funciona y funciona bien":
 - `pnpm finance:e2e-gate`
 - Read-only staging API smoke across Finance dashboard, cash, bank, payment orders, purchase orders, summaries, fiscal monthly positions and operational P&L.
 - Second read-only staging API smoke: 60 GET endpoints; 53 passed first call, 4 parameter-validation endpoints passed with valid params, 3 real failures remained (PnL 500 pending deploy, F29 404 pending deploy, ledger-health 503 by design).
+- Third read-only refresh pass at 2026-06-20 19:45 UTC:
+  - `pnpm pg:doctor`
+  - Cloud SQL probes for core counts, canonical ledger/cash integrity, DTE queue, AR/AP backlog, F29/F22 readiness, CCA/OPL and handler health.
+  - Staging API probes: `dashboard/summary` 200, `dashboard/cashflow` 200, `bank` 200, `income/summary` 200, `expenses/summary` 200, `admin/finance/payment-orders` 200, `purchase-orders` 200, `quotes/pricing/lookup?type=role` 200, `vat/monthly-position` 200, `intelligence/operational-pl?year=2026&month=6&scope=client` 200, `dashboard/pnl` 500, `f29/monthly-position` 404, `data-quality` 200 with stale raw ledger warnings, `admin/finance/ledger-health` 503 by design/backlog.
 - Static API route scan for `src/app/api/finance/**`, `src/app/api/admin/finance/**` and Finance-owned crons.
 - Read-only Cloud SQL probes for commercial/finance quotations, quote line orphans, AR/AP aging, payment profiles and external cash signals.
 - Read-only Cloud SQL probe comparing raw vs canonical data-quality ledger drift (`expense` raw 69 -> canonical 0; income settlement drift 0).
