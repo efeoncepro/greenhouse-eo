@@ -16,6 +16,8 @@ En el dashboard de Finanzas, **encima** del card de IVA, ahora hay un card **"Po
 
 Cada línea trae un sello: **"Oficial"** (cifra validada, hoy solo el IVA) o **"En validación"** (cifra en revisión contable, aún no es el F29 oficial — hoy retenciones y PPM). Si una línea todavía no tiene datos del período, muestra **"Sin datos del período"** en vez de un falso $0. El card **no recalcula nada**: solo muestra lo que ya calcularon los motores de IVA, retenciones y PPM. No se edita ni se envía el F29 al SII desde aquí.
 
+Al pie del card hay una fila destacada **"Total F29 a pagar"** = IVA + Retenciones + PPM (TASK-1207). Si las 3 líneas están oficiales, el total es **"Oficial"**; si alguna está en validación, el total se marca **"Provisional (en validación)"** para que no lo confundas con el definitivo. Arriba a la derecha hay un **selector de período**: por default ves el **mes en curso** (etiquetado *"proyección"*, para estimar cuánto pagarás), y puedes cambiar al **mes cerrado** que estás declarando (etiquetado *"a declarar"*). Ejemplo: mayo 2026 → IVA $1.080.405 + Retenciones $134.653 + PPM $7.250 = **Total $1.222.308**.
+
 > Detalle técnico: card `F29ConsolidatedPositionCard` que consume `GET /api/finance/f29/monthly-position` (TASK-1195) — un solo contrato gobernado que compone los 3 readers canónicos.
 
 ## Que resuelve

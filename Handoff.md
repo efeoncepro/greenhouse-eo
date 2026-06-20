@@ -2,6 +2,25 @@
 
 > **Estado:** `released` (manifest transicionó a released, post-release health check verde). Orchestrator run [`27721723752`](https://github.com/efeoncepro/greenhouse-eo/actions/runs/27721723752) `completed/success`. Conducido por Claude tras pedido del operador ("paso a producción que Codex dejó preparado").
 
+## Sesión 2026-06-20 — Commercial / Quote-to-Cash deep audit — Codex
+
+> **Estado:** auditoria documentada, sin cambios runtime. Se creó `docs/audits/commercial/COMMERCIAL_QUOTE_TO_CASH_DEEP_AUDIT_2026-06-20.md` y la categoría `docs/audits/commercial/`.
+> - **Veredicto:** Commercial/Quotation tiene base técnica sólida (schema canónico, pricing/costing, issue lifecycle, document chain, deal creation, party lifecycle, projections y comando `convertQuoteToCash`), pero Quote-to-Cash no está cerrado end-to-end como operación única.
+> - **Hallazgo principal:** el cierre está partido: `/api/commercial/quotations/[id]/convert-to-cash` crea contrato/promueve party/client/emite eventos pero no income; `/api/finance/quotes/[id]/convert-to-invoice` crea income y marca converted, pero no usa `commercial_operations_audit` ni `commercial.quote_to_cash.*`. La UI visible usa `convert-to-invoice`; no se encontró consumo UI de `convert-to-cash`.
+> - **Snapshot dev read-only:** 57 quotations, 12 `issued`, 0 `converted`, 0 filas `operation_type='quote_to_cash'`; las 12 emitidas carecen de `hubspot_deal_id`, así que el autopromoter por `commercial.deal.won` no puede convertirlas.
+> - **Full API Parity:** parcial. Hay rutas internas y commands server-side, pero no contrato API Platform versionado para quotations/Q2C, y varias mutaciones siguen sin capability fina/idempotencia uniforme.
+> - **Verificación:** Cloud SQL dev read-only via `cloud-sql-proxy`; vitest focal Q2C/HubSpot/deal creation `6 files / 18 tests` verde; `pnpm docs:closure-check` sin warnings.
+
+## Sesión 2026-06-20 — TASK-1207 Card F29: total a pagar + selector de período (COMPLETE) — Claude
+
+> **Estado:** ✅ complete, local-first en `develop`. Follow-up `ui-ux` de TASK-1197, salió de que el contador vio el IVA suelto ($1.080.406) y no lo reconoció como el F29 (que se paga como total único $1.222.308).
+> - **Total a pagar:** fila destacada "Total F29 a pagar" = IVA + Retenciones + PPM, estado honesto ("Oficial" solo si las 3 oficiales; "Provisional (en validación)" si alguna shadow; nota si falta materializar una línea). Suma simple del VM, NO recalcula.
+> - **Selector de período:** distingue mes en curso (*proyección*, para estimar) vs mes cerrado (*a declarar*). El endpoint ya soportaba `year/month`; el dashboard captura el período vigente del primer payload + `fetchF29` dedicado (no recarga todo al cambiar mes).
+> - **Cliente puro** del contrato F29 (backend impact none). Copy es-CL en `GH_F29_CONSOLIDATED`.
+> - **GVC** desktop+mobile mirado: junio (proyección) total **$1.231.848** provisional; mayo (a declarar) total **$1.222.308**. Sin scroll horizontal.
+> - **Gates:** full suite **7489** + build verde + 8 tests del card. Rollout: deploy staging pendiente (local-first).
+> - **Convivencia Claude+Codex:** persisten las colisiones (Codex barrió/mezcló mi WIP otra vez; reasigné IDs por choque). Recomendación sigue en pie: serializar agentes o usar git worktrees.
+
 ## Sesión 2026-06-20 — TASK-1204 F29 fiscal accuracy: exclusión de anulados + tasa PPM (COMPLETE, cierra ISSUE-105) — Claude
 
 > **Estado:** ✅ complete, local-first en `develop`. Surgió de la validación contable real del F29 mayo 2026 vs SII. El IVA cuadraba al peso; la retención sobre-declaraba $107.970 y el PPM era el doble.
