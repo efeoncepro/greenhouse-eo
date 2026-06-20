@@ -38,6 +38,7 @@ import EmptyState from '@/components/greenhouse/EmptyState'
 import NexaInsightRootCauseSection from '@/components/greenhouse/NexaInsightRootCauseSection'
 import NexaMentionText from '@/components/greenhouse/NexaMentionText'
 import { GH_NEXA } from '@/lib/copy/nexa'
+import { NEXA_FLOATING_OPEN_EVENT } from '@/lib/nexa/floating-events'
 import { formatDate as formatGreenhouseDate } from '@/lib/format'
 
 import type { NexaInsightDrillResult } from '@/lib/ico-engine/ai/nexa-insight-drill-reader'
@@ -480,14 +481,14 @@ const NexaInsightDetailView = ({ result, drillId, homeHref }: NexaInsightDetailV
         {insight.recommendedAction ? (
           <Stack spacing={3}>
             <NexaMentionText text={insight.recommendedAction} variant='body1' />
-            <CopyLinkButton drillId={drillId} />
+            <InsightActionsRow drillId={drillId} signalId={insight.signalId} />
           </Stack>
         ) : (
           <Stack spacing={3}>
             <Typography variant='body2' color='text.secondary'>
               —
             </Typography>
-            <CopyLinkButton drillId={drillId} />
+            <InsightActionsRow drillId={drillId} signalId={insight.signalId} />
           </Stack>
         )}
       </SectionCard>
@@ -506,6 +507,47 @@ const NexaInsightDetailView = ({ result, drillId, homeHref }: NexaInsightDetailV
     </Stack>
   )
 }
+
+// ─── Insight actions row (TASK-1182 — CTA "Pregúntale a Nexa" + copy link) ───
+//
+// "Pregúntale a Nexa sobre este insight" (primario): abre el chat flotante ENFOCADO en este
+// insight (`focusRef`) y auto-envía la pregunta semilla. El chat lo recibe vía el CustomEvent
+// canónico `NEXA_FLOATING_OPEN_EVENT` — el mismo que usa el resto del portal; cero superficie nueva.
+// El servidor pre-resuelve el insight con el reader anti-oracle (TASK-1182 Slice 1) y ancla la
+// respuesta. Lado inverso de TASK-1181 (chat → insights): aquí es insight → chat.
+
+const AskNexaButton = ({ signalId }: { signalId: string }) => {
+  const handleAsk = () => {
+    window.dispatchEvent(
+      new CustomEvent(NEXA_FLOATING_OPEN_EVENT, {
+        detail: {
+          source: 'nexa-insight',
+          focusRef: { kind: 'nexa_insight', id: signalId },
+          seedPrompt: GH_NEXA.insight_ask_nexa_seed
+        }
+      })
+    )
+  }
+
+  return (
+    <Button
+      variant='contained'
+      color='primary'
+      onClick={handleAsk}
+      startIcon={<i className='tabler-message-2' aria-hidden='true' />}
+      aria-label={GH_NEXA.insight_ask_nexa_aria}
+    >
+      {GH_NEXA.insight_ask_nexa_cta}
+    </Button>
+  )
+}
+
+const InsightActionsRow = ({ drillId, signalId }: { drillId: string; signalId: string }) => (
+  <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} data-capture='insight-ask-nexa'>
+    <AskNexaButton signalId={signalId} />
+    <CopyLinkButton drillId={drillId} />
+  </Stack>
+)
 
 // ─── Copy link button (client-only interaction) ─────────────────────────────
 

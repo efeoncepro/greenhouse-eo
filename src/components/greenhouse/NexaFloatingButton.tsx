@@ -25,7 +25,7 @@ import type { ReadonlyJSONObject, ReadonlyJSONValue } from 'assistant-stream/uti
 
 import { DEFAULT_NEXA_MODEL, resolveNexaModel, type NexaModelId, type NexaModelMode } from '@/config/nexa-models'
 import type { NexaModelSelectorValue } from '@/lib/nexa/use-nexa-runtime'
-import type { NexaResponse } from '@/lib/nexa/nexa-contract'
+import type { NexaFocusRef, NexaResponse } from '@/lib/nexa/nexa-contract'
 import { isNexaFloatingExpandableEnabled } from '@/lib/nexa/flags'
 import { NEXA_FLOATING_OPEN_EVENT } from '@/lib/nexa/floating-events'
 import { useNexaInteractionMode } from '@/lib/nexa/nexa-interaction-mode-context'
@@ -53,7 +53,10 @@ const toJsonValue = (value: unknown): ReadonlyJSONValue => {
 
 const createFloatingAdapter = (
   modelRef: React.MutableRefObject<NexaModelId>,
-  modelModeRef: React.MutableRefObject<NexaModelMode>
+  modelModeRef: React.MutableRefObject<NexaModelMode>,
+  // TASK-1182 — conciencia de superficie: el insight enfocado (set por el CTA del detalle) viaja en
+  // el body para que el servidor ancle la respuesta. null = conversación normal (sin ancla).
+  focusRefRef: React.MutableRefObject<NexaFocusRef | null>
 ): ChatModelAdapter => ({
   async run({ messages, abortSignal }): Promise<ChatModelRunResult> {
     const lastMessage = messages[messages.length - 1]
@@ -72,7 +75,14 @@ const createFloatingAdapter = (
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       // TASK-1134 — `modelMode` auto (default) deja correr el router; manual fija el modelo del picker.
-      body: JSON.stringify({ prompt, history, model: modelRef.current, modelMode: modelModeRef.current }),
+      // TASK-1182 — `focusRef` (si hay) ancla el turno al insight enfocado.
+      body: JSON.stringify({
+        prompt,
+        history,
+        model: modelRef.current,
+        modelMode: modelModeRef.current,
+        ...(focusRefRef.current ? { focusRef: focusRefRef.current } : {})
+      }),
       signal: abortSignal
     })
 
@@ -111,6 +121,12 @@ const NexaFloatingButton = ({ docked = false }: NexaFloatingButtonProps) => {
   const [expanded, setExpanded] = useState(false)
   const fabRef = useRef<HTMLButtonElement>(null)
 
+  // TASK-1182 — conciencia de superficie (declarados temprano: los consume `closePanel` y el listener
+  // del evento, ambos antes de que `runtime` exista en el render). `focusRefRef` ancla el turno al
+  // insight enfocado; `runtimeRef` permite auto-enviar la pregunta semilla desde el listener.
+  const focusRefRef = useRef<NexaFocusRef | null>(null)
+  const runtimeRef = useRef<ReturnType<typeof useLocalRuntime> | null>(null)
+
   // TASK-1079 — el modo de interacción decide el form-factor del flotante:
   // - lane (C): la burbuja togglea el lane (no abre panel flotante); el lane lo monta
   //   NexaLaneContentHost en el contenido.
@@ -135,6 +151,8 @@ const NexaFloatingButton = ({ docked = false }: NexaFloatingButtonProps) => {
 
   const closePanel = useCallback(() => {
     setOpen(false)
+    // TASK-1182 — al cerrar, se limpia el insight enfocado (el próximo open normal no arrastra focus stale).
+    focusRefRef.current = null
     // Non-modal: el foco vuelve al FAB al cerrar (Escape / click-fuera / botón cerrar).
     requestAnimationFrame(() => fabRef.current?.focus())
   }, [])
@@ -171,8 +189,11 @@ const NexaFloatingButton = ({ docked = false }: NexaFloatingButtonProps) => {
   }, [open, expandableEnabled, closePanel])
 
   useEffect(() => {
-    const onOpen = () => {
+    const onOpen = (event: Event) => {
+      const detail = (event as CustomEvent<{ focusRef?: NexaFocusRef; seedPrompt?: string }>).detail
+
       if (isLaneMode) {
+        // El sidecar lane usa otro runtime; la conciencia de superficie V1 vive en el panel flotante.
         setLaneOpen(true)
 
         return
@@ -180,6 +201,17 @@ const NexaFloatingButton = ({ docked = false }: NexaFloatingButtonProps) => {
 
       setOpen(true)
       if (expandableEnabled) setExpanded(true)
+
+      if (detail?.focusRef?.kind === 'nexa_insight' && detail.focusRef.id) {
+        focusRefRef.current = detail.focusRef
+
+        // Auto-envía la pregunta semilla: el usuario hizo click explícito en el CTA del insight.
+        const seed = typeof detail.seedPrompt === 'string' ? detail.seedPrompt.trim() : ''
+
+        if (seed) runtimeRef.current?.thread.append(seed)
+      } else {
+        focusRefRef.current = null
+      }
     }
 
     window.addEventListener(NEXA_FLOATING_OPEN_EVENT, onOpen)
@@ -212,13 +244,17 @@ const NexaFloatingButton = ({ docked = false }: NexaFloatingButtonProps) => {
 
   const selectedModel: NexaModelSelectorValue = modelMode === 'auto' ? 'auto' : manualModel
 
-  const adapter = useMemo(() => createFloatingAdapter(modelRef, modelModeRef), [])
+  const adapter = useMemo(() => createFloatingAdapter(modelRef, modelModeRef, focusRefRef), [])
 
   const runtime = useLocalRuntime(adapter, {
     initialMessages: [
       { role: 'assistant', content: [{ type: 'text' as const, text: 'Hola, soy Nexa. ¿En que puedo ayudarte?' }] }
     ]
   })
+
+  // TASK-1182 — expone el runtime al listener del evento (que corre antes en el render) para
+  // auto-enviar la pregunta semilla cuando el CTA del insight abre el chat enfocado.
+  runtimeRef.current = runtime
 
   const nexaFabRestShadow = fabOpen ? 'none' : `0 12px 30px ${alpha(GREENHOUSE_NEXA_BRAND_COLORS.midnightNavy, 0.28)}`
 

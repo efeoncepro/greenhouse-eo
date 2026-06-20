@@ -25,6 +25,11 @@ export const GH_NEXA = {
   insights_last_analysis: (label: string) => `Último análisis: ${label}`,
   insights_total_analyzed: (count: number) => `${count} ${count === 1 ? 'señal analizada' : 'señales analizadas'}`,
 
+  // TASK-1182 — CTA "Pregúntale a Nexa sobre este insight" (Bridge Slice 2): abre el chat enfocado.
+  insight_ask_nexa_cta: 'Pregúntale a Nexa',
+  insight_ask_nexa_aria: 'Pregúntale a Nexa sobre este insight',
+  insight_ask_nexa_seed: 'Explícame este insight y qué debería hacer.',
+
   // View mode toggle (Recientes vs Historial)
   insights_view_mode_aria: 'Modo de visualización',
   insights_view_mode_recent: 'Recientes',
