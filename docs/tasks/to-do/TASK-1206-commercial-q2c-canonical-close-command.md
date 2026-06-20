@@ -109,8 +109,8 @@ Reglas obligatorias:
 
 ### Blocks / Impacts
 
-- Desbloquea una UI Q2C honesta como follow-up (`TASK-1209`, propuesta, no creada aun).
-- Desbloquea API Platform/App parity versionada para `quotation.v1` / `quote_to_cash.v1` como follow-up (`TASK-1208`, propuesta, no creada aun).
+- Desbloquea una UI Q2C honesta como follow-up (el follow-up de UI de cierre Q2C, propuesta, no creada aun).
+- Desbloquea API Platform/App parity versionada para `quotation.v1` / `quote_to_cash.v1` como follow-up (el follow-up de API Platform parity Q2C, propuesta, no creada aun).
 - Reduce drift entre Commercial y Finance para cotizaciones visibles en `/finance/quotes`.
 - Alimenta reliability/readiness signals de cierre comercial y HubSpot anchors.
 
@@ -232,7 +232,7 @@ closeQuoteToCash({
 - [ ] Existing UI/API routes delegate to the same server-side command instead of separate business logic.
 - [ ] The command emits audit/outbox/history with actor, reason, correlation and idempotency.
 - [ ] Denied or invalid actions fail before mutation and without leaking finance/commercial internals.
-- [ ] API Platform parity follow-up is either implemented or explicitly linked as `TASK-1208`.
+- [ ] API Platform parity follow-up is either implemented or explicitly linked as el follow-up de API Platform parity Q2C.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -282,8 +282,8 @@ closeQuoteToCash({
 
 ## Out of Scope
 
-- No new visible UI flow in this task; create/use the proposed `TASK-1209` for the operator close experience.
-- No API Platform app/ecosystem lane in this task; create/use the proposed `TASK-1208`.
+- No new visible UI flow in this task; create/use the proposed el follow-up de UI de cierre Q2C for the operator close experience.
+- No API Platform app/ecosystem lane in this task; create/use the proposed el follow-up de API Platform parity Q2C.
 - No historical mass conversion/backfill of issued quotes.
 - No broad capability hardening for all quote/reconciliation routes; coordinate with `TASK-1202`.
 - No direct HubSpot mutation unless required for one controlled smoke and already covered by existing guarded commands.
@@ -379,13 +379,13 @@ Commercial/Finance owner must approve the first production Q2C close smoke and a
 - [ ] `docs/tasks/TASK_ID_REGISTRY.md` quedo sincronizado con el cierre
 - [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
 - [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre `TASK-1202`, `TASK-1208` y `TASK-1209` si existen
+- [ ] se ejecuto chequeo de impacto cruzado sobre `TASK-1202`, el follow-up de API Platform parity Q2C y el follow-up de UI de cierre Q2C si existen
 - [ ] Commercial Q2C audit fue actualizado con el nuevo estado o evidencia de cierre.
 
 ## Follow-ups
 
-- `TASK-1208` (propuesta): API Platform parity para `quotation.v1` / `quote_to_cash.v1`.
-- `TASK-1209` (propuesta): UI operator close experience que consuma el comando canonico.
+- el follow-up de API Platform parity Q2C (propuesta): API Platform parity para `quotation.v1` / `quote_to_cash.v1`.
+- el follow-up de UI de cierre Q2C (propuesta): UI operator close experience que consuma el comando canonico.
 - Approval workflow resoluble para Q2C >100M si no queda cubierto por el sistema generico de aprobaciones.
 
 ## Open Questions
