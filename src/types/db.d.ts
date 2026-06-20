@@ -2297,6 +2297,45 @@ export interface GreenhouseCoreDepartments {
   updated_at: Generated<Timestamp>;
 }
 
+export interface GreenhouseCoreDesignHandoffAllowedFiles {
+  added_at: Generated<Timestamp>;
+  added_by: string;
+  file_key: string;
+  file_label: string;
+  metadata_json: Generated<Json>;
+  superseded_at: Timestamp | null;
+}
+
+export interface GreenhouseCoreDesignHandoffEntries {
+  archived_at: Timestamp | null;
+  created_at: Generated<Timestamp>;
+  created_by: string;
+  entry_id: string;
+  file_key: string;
+  implemented_surface_key: string | null;
+  kind: string;
+  node_id: string;
+  node_name: string | null;
+  status: Generated<string>;
+  title: string;
+  updated_at: Generated<Timestamp>;
+  updated_by: string;
+}
+
+export interface GreenhouseCoreDesignHandoffEntryEvents {
+  actor_user_id: string | null;
+  created_at: Generated<Timestamp>;
+  entry_id: string;
+  event_id: string;
+  event_type: string;
+  file_key: string | null;
+  from_status: string | null;
+  implemented_surface_key: string | null;
+  metadata_json: Generated<Json>;
+  node_id: string | null;
+  to_status: string;
+}
+
 export interface GreenhouseCoreDesignSystemFigmaNodeEvents {
   actor_user_id: string | null;
   created_at: Generated<Timestamp>;
@@ -4147,6 +4186,20 @@ export interface GreenhouseDeliveryTaskFtrSnapshots {
   source_event_id: string | null;
   source_event_received_at: Timestamp | null;
   source_mode: string;
+  task_source_id: string;
+  workspace_id: string;
+  written_to_notion_at: Timestamp | null;
+}
+
+export interface GreenhouseDeliveryTaskOtdWritebackSnapshots {
+  computed_at: Generated<Timestamp>;
+  created_at: Generated<Timestamp>;
+  formula_version: Generated<string>;
+  notion_writeback_attempt_count: Generated<number>;
+  notion_writeback_last_error: string | null;
+  otd_bucket: string | null;
+  otd_data_status: string;
+  snapshot_id: Generated<string>;
   task_source_id: string;
   workspace_id: string;
   written_to_notion_at: Timestamp | null;
@@ -10174,6 +10227,9 @@ export interface DB {
   "greenhouse_core.client_users": GreenhouseCoreClientUsers;
   "greenhouse_core.clients": GreenhouseCoreClients;
   "greenhouse_core.departments": GreenhouseCoreDepartments;
+  "greenhouse_core.design_handoff_allowed_files": GreenhouseCoreDesignHandoffAllowedFiles;
+  "greenhouse_core.design_handoff_entries": GreenhouseCoreDesignHandoffEntries;
+  "greenhouse_core.design_handoff_entry_events": GreenhouseCoreDesignHandoffEntryEvents;
   "greenhouse_core.design_system_figma_node_events": GreenhouseCoreDesignSystemFigmaNodeEvents;
   "greenhouse_core.design_system_figma_nodes": GreenhouseCoreDesignSystemFigmaNodes;
   "greenhouse_core.entitlement_governance_audit_log": GreenhouseCoreEntitlementGovernanceAuditLog;
@@ -10267,6 +10323,7 @@ export interface DB {
   "greenhouse_delivery.task_attributable_lateness_shadow": GreenhouseDeliveryTaskAttributableLatenessShadow;
   "greenhouse_delivery.task_due_date_changes": GreenhouseDeliveryTaskDueDateChanges;
   "greenhouse_delivery.task_ftr_snapshots": GreenhouseDeliveryTaskFtrSnapshots;
+  "greenhouse_delivery.task_otd_writeback_snapshots": GreenhouseDeliveryTaskOtdWritebackSnapshots;
   "greenhouse_delivery.task_rpa_demo_snapshots": GreenhouseDeliveryTaskRpaDemoSnapshots;
   "greenhouse_delivery.task_rpa_snapshots": GreenhouseDeliveryTaskRpaSnapshots;
   "greenhouse_delivery.task_status_transitions": GreenhouseDeliveryTaskStatusTransitions;

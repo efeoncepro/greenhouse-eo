@@ -38,3 +38,28 @@ export const OTD_BUCKET_SELECT_NAME: Record<OtdBucket, string> = {
 
 /** Opciones del select `[GH] OTD` a crear en Notion (rollout out-of-band). */
 export const OTD_BUCKET_SELECT_OPTIONS: readonly string[] = Object.values(OTD_BUCKET_SELECT_NAME)
+
+/** Workspaces productivos del writeback OTD (demo excluido). */
+export const OTD_WRITEBACK_PRODUCTIVE_WORKSPACES: ReadonlySet<string> = new Set(['efeonce', 'sky'])
+
+/**
+ * Gate del writeback OTD (default OFF — no escribe a Notion hasta el flip gated
+ * por el operador). Override per-cliente `NOTION_OTD_WRITEBACK_ENABLED_<EFEONCE|SKY>`
+ * gana sobre el global `NOTION_OTD_WRITEBACK_ENABLED` (mirror del patrón FTR/RpA,
+ * permite prender un solo cliente). Display-only — NUNCA toca el bono.
+ */
+export const isOtdWritebackEnabled = (workspaceId?: string): boolean => {
+  if (workspaceId) {
+    const perClient = process.env[`NOTION_OTD_WRITEBACK_ENABLED_${workspaceId.toUpperCase()}`]
+
+    if (perClient === 'true') {
+      return true
+    }
+
+    if (perClient === 'false') {
+      return false // override explícito por-cliente gana
+    }
+  }
+
+  return process.env.NOTION_OTD_WRITEBACK_ENABLED === 'true'
+}
