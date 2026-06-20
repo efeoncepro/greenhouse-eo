@@ -240,7 +240,7 @@ Cuando una instrucción menciona "repos hermanos" o pide aplicar un cambio a mú
 - **Build:** `pnpm build`
 - **Lint:** `pnpm lint`
 - **Test:** `pnpm test` (Vitest)
-- **Type check:** `npx tsc --noEmit`
+- **Type check:** `pnpm typecheck` (hornea `--max-old-space-size=8192`; **usar este, NO `npx tsc --noEmit` crudo** — el bare tsc hace OOM bajo el Node 20 al que Volta ata `pnpm`. ISSUE-104)
 - **PostgreSQL connect:** `pnpm pg:connect` (ADC + proxy + test), `pnpm pg:connect:migrate`, `pnpm pg:connect:status`, `pnpm pg:connect:shell`
 - **PostgreSQL health:** `pnpm pg:doctor`
 - **Migrations:** `pnpm migrate:up`, `pnpm migrate:down`, `pnpm migrate:create <nombre>`, `pnpm migrate:status`
@@ -1051,7 +1051,7 @@ Los invariantes operativos de Finance ledger/bank — internal account number al
 
 - Tests unitarios: Vitest + Testing Library + jsdom
 - Helper de render para tests: `src/test/render.tsx`
-- Validar con: `pnpm build`, `pnpm lint`, `pnpm test`, `npx tsc --noEmit`
+- Validar con: `pnpm build`, `pnpm lint`, `pnpm test`, `pnpm typecheck` (NO `npx tsc --noEmit` crudo — OOM bajo Node 20, ISSUE-104)
 
 ### Charts — política canónica (decisión 2026-04-26 — prioridad: impacto visual)
 

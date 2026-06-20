@@ -6,6 +6,7 @@
   "packageManager": "pnpm@10.32.1",
   "scripts": {
     "local:check": "pnpm lint && NODE_OPTIONS=--max-old-space-size=8192 pnpm exec tsc --noEmit",
+    "typecheck": "NODE_OPTIONS=--max-old-space-size=8192 pnpm exec tsc --noEmit",
     "local:check:full": "pnpm local:check && pnpm test && pnpm build",
     "local:check:ui": "pnpm local:check && pnpm design:lint && pnpm build",
     "actions:cost:audit": "node scripts/github-actions-cost-audit.mjs",

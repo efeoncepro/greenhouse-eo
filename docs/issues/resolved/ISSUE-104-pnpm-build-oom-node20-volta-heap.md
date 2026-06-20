@@ -37,6 +37,12 @@ Resultado: pnpm-bajo-Node-20 + build sin techo de heap = OOM determinista en cad
 
 Resuelto en **commit `11ac6adf9`** (2026-06-20): el build runner `scripts/run-next-build.mjs` inyecta `--max-old-space-size=8192` en `NODE_OPTIONS` del `next build` (preservando un `NODE_OPTIONS` existente, sin pisarlo). Espeja el flag que `local:check` ya aplica a `tsc`. Es **independiente de la versión de Node**, así que resuelve el OOM incluso bajo el Node 20 al que Volta ata pnpm — sin imponerle una versión de Node a nadie (la app deliberadamente no pinea Node).
 
+### Superficie gemela: `tsc` directo (2026-06-20, segundo hallazgo — Codex)
+
+La misma bug-class golpea el **typecheck directo**: `local:check` horneaba el heap flag para tsc, pero un agente que corre `tsc --noEmit` / `npx tsc --noEmit` / `pnpm exec tsc --noEmit` **directo** (que es justo lo que CLAUDE.md Quick Reference y la skill `greenhouse-qa-release-auditor` indicaban) NO recibía el flag → OOM bajo Node 20. Le pasó a Codex.
+
+Fix: nuevo script canónico **`pnpm typecheck`** (`NODE_OPTIONS=--max-old-space-size=8192 pnpm exec tsc --noEmit`) — heap-protegido, discoverable, independiente de la versión de Node. Las referencias a `npx tsc --noEmit` crudo en CLAUDE.md (Quick Reference + Conventions) ahora apuntan a `pnpm typecheck`. Verificado: `pnpm typecheck` exit 0 bajo el toolchain default. Regla para agentes: **usar `pnpm typecheck`, nunca `tsc --noEmit` crudo.**
+
 ## Verificación
 
 - `pnpm build` completo (`✓ Compiled successfully` + `Generating static pages 22/22` + exit 0) bajo el **toolchain DEFAULT** (Volta con pnpm→Node 20), **sin** nvm ni `NODE_OPTIONS` manual. El OOM ya no ocurre.
