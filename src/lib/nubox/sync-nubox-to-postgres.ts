@@ -3,6 +3,7 @@ import 'server-only'
 import { randomUUID } from 'node:crypto'
 
 import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
+import { getOperationalFiscalPeriod } from '@/lib/calendar/operational-calendar'
 import {
   buildIncomeTaxWriteFields,
   serializeIncomeTaxSnapshot
@@ -222,6 +223,16 @@ export const upsertIncomeFromSale = async (sale: NuboxProjectionSale): Promise<'
   // Annulled documents are stored but excluded from revenue calculations
   const isAnnulled = sale.is_annulled === true
 
+  // TASK-1191 / ISSUE-103 — estampar el período fiscal (F29) derivándolo de la
+  // fecha del documento (invoice_date = emission_date) con el calendario
+  // operativo canónico (America/Santiago). El conformed de Nubox no estampa el
+  // período, así que sin esto el documento nace sin period_year/period_month y
+  // NUNCA entra a una posición F29 (el crédito/débito fiscal queda sin declarar).
+  // Fallback al período del conformed sólo si no hay fecha de documento.
+  const fiscalPeriod = sale.emission_date ? getOperationalFiscalPeriod(sale.emission_date) : null
+  const periodYear = fiscalPeriod?.periodYear ?? sale.period_year
+  const periodMonth = fiscalPeriod?.periodMonth ?? sale.period_month
+
   // Check if income already exists for this nubox document
   const existing = await runGreenhousePostgresQuery<{ income_id: string }>(
     `SELECT income_id FROM greenhouse_finance.income
@@ -244,6 +255,9 @@ export const upsertIncomeFromSale = async (sale: NuboxProjectionSale): Promise<'
         nubox_pdf_url = $9,
         nubox_xml_url = $10,
         nubox_last_synced_at = COALESCE($11::timestamptz, greenhouse_finance.income.nubox_last_synced_at, NOW()),
+        -- TASK-1191: self-heal del período fiscal sin pisar un valor ya correcto.
+        period_year = COALESCE(greenhouse_finance.income.period_year, $12),
+        period_month = COALESCE(greenhouse_finance.income.period_month, $13),
         updated_at = NOW()
       WHERE nubox_document_id = $1`,
       [
@@ -257,7 +271,9 @@ export const upsertIncomeFromSale = async (sale: NuboxProjectionSale): Promise<'
         isAnnulled,
         sale.pdf_url,
         sale.xml_url,
-        sale.source_last_ingested_at
+        sale.source_last_ingested_at,
+        periodYear,
+        periodMonth
       ]
     )
 
@@ -456,8 +472,8 @@ export const upsertIncomeFromSale = async (sale: NuboxProjectionSale): Promise<'
         sale.payment_form_code === '1' ? 'contado' : sale.payment_form_code === '2' ? 'credito' : null,
         sale.payment_form_name,
         sale.origin_name,
-        sale.period_year,
-        sale.period_month,
+        periodYear,
+        periodMonth,
         sale.pdf_url,
         sale.xml_url,
         sale.details_url,
@@ -540,6 +556,15 @@ const autoProvisionSupplier = async (purchase: NuboxConformedPurchase): Promise<
 const upsertExpenseFromPurchase = async (
   purchase: NuboxProjectionPurchase
 ): Promise<{ action: 'created' | 'updated' | 'skipped'; autoProvisioned: boolean }> => {
+  // TASK-1191 / ISSUE-103 — estampar el período fiscal (F29) del documento de
+  // compra derivándolo de la fecha del documento (document_date = emission_date)
+  // con el calendario operativo canónico. Sin esto el crédito fiscal de la
+  // compra queda sin período y NUNCA entra al F29. Fallback al período del
+  // conformed sólo si no hay fecha de emisión.
+  const fiscalPeriod = purchase.emission_date ? getOperationalFiscalPeriod(purchase.emission_date) : null
+  const periodYear = fiscalPeriod?.periodYear ?? purchase.period_year
+  const periodMonth = fiscalPeriod?.periodMonth ?? purchase.period_month
+
   // Check if expense already exists for this nubox purchase
   const existing = await runGreenhousePostgresQuery<{ expense_id: string }>(
     `SELECT expense_id FROM greenhouse_finance.expenses
@@ -558,6 +583,9 @@ const upsertExpenseFromPurchase = async (
         balance_nubox = $5,
         nubox_pdf_url = $6,
         nubox_last_synced_at = COALESCE($7::timestamptz, greenhouse_finance.expenses.nubox_last_synced_at, NOW()),
+        -- TASK-1191: self-heal del período fiscal sin pisar un valor ya correcto.
+        period_year = COALESCE(greenhouse_finance.expenses.period_year, $8),
+        period_month = COALESCE(greenhouse_finance.expenses.period_month, $9),
         updated_at = NOW()
       WHERE nubox_purchase_id = $1`,
       [
@@ -567,7 +595,9 @@ const upsertExpenseFromPurchase = async (
         purchase.document_status_name,
         safeNum(purchase.balance),
         purchase.pdf_url,
-        purchase.source_last_ingested_at
+        purchase.source_last_ingested_at,
+        periodYear,
+        periodMonth
       ]
     )
 
@@ -697,8 +727,8 @@ const upsertExpenseFromPurchase = async (
         safeNum(purchase.exempt_amount),
         safeNum(purchase.total_other_taxes_amount),
         projectionAmounts.withholdingAmount,
-        purchase.period_year,
-        purchase.period_month
+        periodYear,
+        periodMonth
       ]
     )
 

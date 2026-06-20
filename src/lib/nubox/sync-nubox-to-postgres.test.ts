@@ -18,6 +18,7 @@ vi.mock('@/lib/finance/quotation-canonical-store', () => ({
 
 import {
   resolveNuboxPurchaseProjectionAmounts,
+  upsertIncomeFromSale,
   upsertNuboxQuoteFromSale,
   type NuboxProjectionPurchase,
   type NuboxProjectionSale
@@ -104,6 +105,40 @@ describe('upsertNuboxQuoteFromSale', () => {
     expect(insertSql).toContain("'nubox'")
     expect(insertSql).toContain("source_system = 'nubox'")
     expect(syncCanonicalFinanceQuote).toHaveBeenCalledWith({ quoteId: 'QUO-NB-28186300' })
+  })
+})
+
+describe('upsertIncomeFromSale — fiscal period stamping (TASK-1191)', () => {
+  beforeEach(() => {
+    runGreenhousePostgresQuery.mockReset()
+  })
+
+  it('self-heals the fiscal period of an existing income from the document date even when conformed period is NULL', async () => {
+    // Existing income row → UPDATE path (does not enter the mocked transaction).
+    runGreenhousePostgresQuery
+      .mockResolvedValueOnce([{ income_id: 'INC-NB-28186300' }]) // SELECT existing
+      .mockResolvedValueOnce([]) // UPDATE
+      .mockResolvedValueOnce([]) // publishOutboxEvent INSERT
+
+    const result = await upsertIncomeFromSale(
+      makeProjectionSale({
+        dte_type_code: '33',
+        emission_date: '2025-08-15',
+        period_year: null,
+        period_month: null
+      })
+    )
+
+    expect(result).toBe('updated')
+
+    const updateSql = String(runGreenhousePostgresQuery.mock.calls[1]?.[0] ?? '')
+    const updateParams = runGreenhousePostgresQuery.mock.calls[1]?.[1] as unknown[]
+
+    // Self-heal COALESCE present + derived period (Aug 2025) passed as params.
+    expect(updateSql).toContain('period_year = COALESCE(greenhouse_finance.income.period_year')
+    expect(updateSql).toContain('period_month = COALESCE(greenhouse_finance.income.period_month')
+    expect(updateParams).toContain(2025)
+    expect(updateParams).toContain(8)
   })
 })
 

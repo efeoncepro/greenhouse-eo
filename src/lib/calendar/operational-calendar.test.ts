@@ -6,6 +6,7 @@ import {
   DEFAULT_OPERATIONAL_CALENDAR_TIMEZONE,
   getLastBusinessDayOfMonth,
   getOperationalDateKey,
+  getOperationalFiscalPeriod,
   getOperationalPayrollMonth,
   isLastBusinessDayOfMonth,
   isWithinPayrollCloseWindow,
@@ -72,6 +73,36 @@ describe('operational-calendar', () => {
     expect(resolution.calendarMonthKey).toBe('2026-01')
     expect(resolution.operationalMonthKey).toBe('2025-12')
     expect(resolution.inCloseWindow).toBe(true)
+  })
+
+  it('derives the fiscal period as the calendar month of a date-only document date (tz-stable)', () => {
+    // TASK-1191 / ISSUE-103 — period = month of the document. Date-only strings
+    // (the shape of document_date/invoice_date) must NOT shift across timezones.
+    expect(getOperationalFiscalPeriod('2026-03-11')).toEqual({
+      periodYear: 2026,
+      periodMonth: 3,
+      periodKey: '2026-03'
+    })
+
+    expect(getOperationalFiscalPeriod('2023-06-26')).toEqual({
+      periodYear: 2023,
+      periodMonth: 6,
+      periodKey: '2023-06'
+    })
+
+    // Date-only derivation is identical regardless of the operational timezone.
+    expect(getOperationalFiscalPeriod('2025-12-01', { timezone: 'America/Santiago' })).toEqual(
+      getOperationalFiscalPeriod('2025-12-01', { timezone: 'Pacific/Kiritimati' })
+    )
+  })
+
+  it('derives the fiscal period of a timestamp in the operational timezone', () => {
+    // 2026-04-01T02:00Z is still 2026-03-31 in America/Santiago (UTC-3/-4) → March.
+    expect(
+      getOperationalFiscalPeriod(new Date('2026-04-01T02:00:00.000Z'), {
+        timezone: DEFAULT_OPERATIONAL_CALENDAR_TIMEZONE
+      })
+    ).toEqual({ periodYear: 2026, periodMonth: 3, periodKey: '2026-03' })
   })
 
   it('resolves a Date input in America/Santiago instead of UTC around DST-sensitive dates', () => {
