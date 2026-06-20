@@ -2,6 +2,18 @@
 
 > **Estado:** `released` (manifest transicionó a released, post-release health check verde). Orchestrator run [`27721723752`](https://github.com/efeoncepro/greenhouse-eo/actions/runs/27721723752) `completed/success`. Conducido por Claude tras pedido del operador ("paso a producción que Codex dejó preparado").
 
+## Sesión 2026-06-20 — TASK-1197 UI Posición F29 mensual consolidada (COMPLETE) — Claude
+
+> **Estado:** ✅ complete, local-first en `develop` (sin push). Follow-up `ui-ux` de TASK-1195; cierra la **capa de visibilidad humana** del alcance mensual del F29 (umbrella TASK-1186).
+> - **Card** `F29ConsolidatedPositionCard` montado en `FinanceDashboardView` **encima** del card de IVA. **Cliente puro** del contrato `GET /api/finance/f29/monthly-position` (TASK-1195): **backend impact none**, no recomputa.
+> - **3 líneas** (IVA/retención/PPM) con badge **oficial** vs **"En validación"/shadow** (desde `enabledByLine`, texto+color a11y) + **degradación honesta** (`null` → "Sin datos del período", nunca `$0`). Loading/error cubiertos. Copy es-CL `GH_F29_CONSOLIDATED`.
+> - **Open questions resueltas:** (1) NO se extrae primitive compartido (rule of three; sibling card). (2) Sin selector de período en v1 (paridad con VAT card; endpoint ya soporta year/month).
+> - **GVC** desktop + mobile mirado (scenario `finance-f29-consolidated`). Datos reales 2026-06: IVA $1.085.952 oficial, retención $138.646 + PPM $14.500 shadow. El dock flotante de Nexa flota sobre el bottom-right por diseño (TASK-1035), no es overlap.
+> - **Gates:** full suite **7474** verde, lint+tsc OK, design:lint **0 err**, build compiled, 5 tests de render.
+> - **Convivencia con Codex:** paralelo en el mismo working tree. **Commiteé solo mis archivos** con `git add` explícito por archivo (nunca `git add -A`) para no mezclar su WIP (finance audit + pnl route).
+> - **Rollout pendiente:** deploy a staging (local-first). Retención/PPM siguen shadow hasta el flip contable (TASK-1188/1189).
+> - **Docs:** changelog + `libro-iva-posicion-mensual.md` v1.1 + umbrella TASK-1186 + README/registry + este handoff sincronizados.
+
 ## Sesión 2026-06-20 — Finance deep operability audit — Codex
 
 > **Estado:** auditoria documentada con deltas de remediación local. Se creó/actualizó `docs/audits/finance/FINANCE_DEEP_OPERABILITY_AUDIT_2026-06-20.md` para revisar Finance completo: ventas/quotes, compras, ingresos, egresos, OC, banco, flujo de caja, F29/F22, payment orders, conciliacion, Cost Intelligence, syncs e integraciones.

@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P3`
 - Impact: `Medio`
 - Effort: `Medio`
@@ -257,13 +257,13 @@ N/A — repo-only change. Las cifras subyacentes ya tienen sus gates contables e
 
 ## Acceptance Criteria
 
-- [ ] El card consume `GET /api/finance/f29/monthly-position` y NO recomputa cifras (test del mapeo lo verifica).
-- [ ] Cada línea muestra oficial vs shadow desde `enabledByLine`; una línea `enabled:false` no se presenta como cifra F29 oficial.
-- [ ] Línea `null` se muestra como "sin datos del período", nunca `$0`.
-- [ ] Estados loading/empty/error/permission cubiertos.
-- [ ] Copy visible es-CL tokenizado en `src/lib/copy/*` (validado con `greenhouse-ux-writing`).
-- [ ] GVC desktop + mobile 390px capturado y mirado; `scrollWidth == clientWidth` en ambos.
-- [ ] `Backend impact: none` se mantiene (no se tocó reader/endpoint); si se necesitó un campo nuevo, se abrió task backend-data separada.
+- [x] El card consume `GET /api/finance/f29/monthly-position` y NO recomputa cifras (test del mapeo lo verifica — `F29ConsolidatedPositionCard.test.tsx`).
+- [x] Cada línea muestra oficial vs shadow desde `enabledByLine`; una línea `enabled:false` no se presenta como cifra F29 oficial (badge "En validación", verificado en GVC + test).
+- [x] Línea `null` se muestra como "Sin datos del período", nunca `$0` (test lo verifica).
+- [x] Estados loading/empty/error cubiertos (loading skeletons, error+retry, null por línea). Permission: heredado del gate del dashboard (sin gate propio nuevo).
+- [x] Copy visible es-CL tokenizado en `src/lib/copy/finance.ts` (`GH_F29_CONSOLIDATED`, validado con `greenhouse-ux-writing`).
+- [x] GVC desktop + mobile capturado y mirado (scenario `finance-f29-consolidated`, 2 frames). Sin scroll horizontal; el dock flotante de Nexa flota sobre el bottom-right del dashboard por diseño (TASK-1035), no es overlap del card.
+- [x] `Backend impact: none` se mantiene (no se tocó reader/endpoint TASK-1195).
 
 ## Verification
 
@@ -273,13 +273,13 @@ N/A — repo-only change. Las cifras subyacentes ya tienen sus gates contables e
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` sincronizado
-- [ ] archivo en la carpeta correcta
-- [ ] `docs/tasks/README.md` + `TASK_ID_REGISTRY.md` sincronizados
-- [ ] `Handoff.md` + `changelog.md` actualizados
-- [ ] doc funcional/manual si cambia comportamiento visible (`docs/documentation/finance/` + `docs/manual-de-uso/finance/`)
-- [ ] chequeo de impacto cruzado: marcar en TASK-1186 (umbrella) que la capa de visibilidad mensual quedó cerrada
-- [ ] evidencia GVC adjunta en el cierre
+- [x] `Lifecycle` sincronizado
+- [x] archivo en la carpeta correcta
+- [x] `docs/tasks/README.md` + `TASK_ID_REGISTRY.md` sincronizados
+- [x] `Handoff.md` + `changelog.md` actualizados
+- [x] doc funcional/manual: delta corto en `docs/documentation/finance/` (card read-only que superficie el contrato TASK-1195; sin flujo operable nuevo → no requiere manual paso-a-paso)
+- [x] chequeo de impacto cruzado: marcado en TASK-1186 (umbrella) que la capa de visibilidad mensual del F29 quedó cerrada
+- [x] evidencia GVC: scenario `finance-f29-consolidated` (desktop + mobile), frames mirados
 
 ## Follow-ups
 
@@ -288,5 +288,5 @@ N/A — repo-only change. Las cifras subyacentes ya tienen sus gates contables e
 
 ## Open Questions
 
-- ¿El card vive suelto en `FinanceDashboardView` o en una sección/sub-ruta fiscal agrupando IVA/retención/PPM/F29? Resolver en Discovery según la IA actual del dashboard.
-- ¿Se extrae un primitive compartido `FiscalPositionCard` reusando `VatMonthlyPositionCard`, o el F29 consolidado lo absorbe? Decidir en Discovery (evitar duplicar el patrón).
+- ~~¿El card vive suelto en `FinanceDashboardView` o en una sección/sub-ruta fiscal?~~ **Resuelto:** card en `FinanceDashboardView`, montado **encima** del `VatMonthlyPositionCard` (IA overview-first: F29 resumen → IVA detalle). Una sub-ruta fiscal agrupadora queda como mejora futura si crece la superficie.
+- ~~¿Se extrae un primitive compartido `FiscalPositionCard`?~~ **Resuelto: NO por ahora.** Rule of three (VAT=1, F29=2): extraer ahora elevaría el blast radius sobre el `VatMonthlyPositionCard` que funciona, y los dos cards son distintos (IVA = buckets; F29 = 3 líneas con oficial/shadow). Se construyó un sibling `F29ConsolidatedPositionCard`. Si aparece un 3er card fiscal, extraer `FiscalPositionCard` ahí.
