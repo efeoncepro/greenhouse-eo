@@ -18,7 +18,8 @@ import Drawer from '@mui/material/Drawer'
 
 import {
   AssistantRuntimeProvider,
-  ThreadPrimitive,
+  useAui,
+  useAuiState,
   useLocalRuntime
 } from '@assistant-ui/react'
 import type { ChatModelAdapter, ChatModelRunResult } from '@assistant-ui/react'
@@ -111,45 +112,24 @@ const createFloatingAdapter = (
 })
 
 // TASK-1182 — auto-envío de la pregunta semilla del insight enfocado. Se monta DENTRO del
-// AssistantRuntimeProvider (donde el thread está vivo y el store tiene contexto): el outer runtime
-// expone un thread placeholder que no envía. Usa el primitive oficial `ThreadPrimitive.Suggestion`
-// con `send` (auto-envía el prompt al clickear) renderizado oculto, y lo clickea una vez cuando el
-// botón ya está habilitado (el thread listo). Retry por frames + degradación honesta sin crash.
+// AssistantRuntimeProvider y usa el MISMO API probado que las follow-up suggestions del chat
+// (`aui.thread().append({ role:'user', ... })` vía el store `useAui`): el outer runtime expone un
+// thread placeholder que no envía; este es el camino vivo. Se envía una vez, cuando el thread no
+// está corriendo, en un effect (fuera del render).
 const NexaSeedAutoSend = ({ seed, onSent }: { seed: string; onSent: () => void }) => {
-  const ref = useRef<HTMLButtonElement>(null)
+  const aui = useAui()
+  const isRunning = useAuiState(s => s.thread.isRunning)
   const sentRef = useRef(false)
 
   useEffect(() => {
-    if (sentRef.current) return
+    if (sentRef.current || isRunning) return
 
-    let frame = 0
-    let attempts = 0
+    sentRef.current = true
+    aui.thread().append({ role: 'user', content: [{ type: 'text' as const, text: seed }] })
+    onSent()
+  }, [aui, isRunning, seed, onSent])
 
-    const tryClick = () => {
-      attempts += 1
-      const btn = ref.current
-
-      if (btn && !btn.disabled) {
-        sentRef.current = true
-        btn.click()
-        onSent()
-
-        return
-      }
-
-      if (attempts < 40) {
-        frame = requestAnimationFrame(tryClick)
-      } else {
-        onSent()
-      }
-    }
-
-    frame = requestAnimationFrame(tryClick)
-
-    return () => cancelAnimationFrame(frame)
-  }, [onSent])
-
-  return <ThreadPrimitive.Suggestion ref={ref} prompt={seed} send style={{ display: 'none' }} />
+  return null
 }
 
 interface NexaFloatingButtonProps {
