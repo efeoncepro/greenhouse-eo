@@ -37,6 +37,7 @@ import CustomChip from '@core/components/mui/Chip'
 import EmptyState from '@/components/greenhouse/EmptyState'
 import NexaInsightRootCauseSection from '@/components/greenhouse/NexaInsightRootCauseSection'
 import NexaMentionText from '@/components/greenhouse/NexaMentionText'
+import { GreenhouseNexaBrandMark, GreenhouseShinyBorder } from '@/components/greenhouse/primitives'
 import { GH_NEXA } from '@/lib/copy/nexa'
 import { NEXA_FLOATING_OPEN_EVENT } from '@/lib/nexa/floating-events'
 import { formatDate as formatGreenhouseDate } from '@/lib/format'
@@ -529,16 +530,19 @@ const AskNexaButton = ({ signalId }: { signalId: string }) => {
     )
   }
 
+  // Convención de marca (AGENTS.md / CLAUDE.md): los botones de Nexa usan el Nexa Mark; el navy
+  // característico de Nexa se expresa con el Shiny Button (`GreenhouseShinyBorder palette='nexa'`).
   return (
-    <Button
-      variant='contained'
-      color='primary'
+    <GreenhouseShinyBorder
+      asButton
+      variant='cta'
+      palette='nexa'
+      ariaLabel={GH_NEXA.insight_ask_nexa_aria}
       onClick={handleAsk}
-      startIcon={<i className='tabler-message-2' aria-hidden='true' />}
-      aria-label={GH_NEXA.insight_ask_nexa_aria}
     >
+      <GreenhouseNexaBrandMark kind='inlineMarkOnDark' size='small' />
       {GH_NEXA.insight_ask_nexa_cta}
-    </Button>
+    </GreenhouseShinyBorder>
   )
 }
 

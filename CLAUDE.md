@@ -1360,6 +1360,24 @@ Toda resolución de la foto/avatar de un usuario pasa por el helper canónico **
 - **`resolveAvatarUrl` es `import 'server-only'`** → en un componente cliente (`'use client'`) NO se puede importar. Patrón canónico: resolverlo en el **server component / route / reader** y pasar el `avatarUrl` ya resuelto como prop/campo del VM (el cliente solo renderiza `<Avatar src={vm.avatarUrl ?? undefined}>` con fallback a iniciales). Caso fuente: `OnboardingCasesInboxView` (TASK-1015) recibe `operator.avatarUrl` resuelto en su page server.
 - **SIEMPRE** que un reader/route/VM exponga un avatar de usuario, mapearlo con `resolveAvatarUrl(rawAvatarUrl, userId)` (mirror de los facets person-360 / account-360 / people / finance responsibles que ya lo consumen).
 
+### Botones de Nexa — Nexa Mark + Shiny Button (navy) (convención de marca, desde 2026-06-20)
+
+Todo botón/CTA que **invoque o represente a Nexa** (ej. "Pregúntale a Nexa", "Seguir con Nexa") usa la marca de Nexa, no un botón genérico:
+
+- **Nexa Mark obligatorio:** el ícono es el **Nexa Mark** (`GreenhouseNexaBrandMark` desde `@/components/greenhouse/primitives`), NUNCA un ícono Tabler genérico (`tabler-message-*`, `tabler-sparkles`, etc.) ni texto solo. Para botón sobre fondo oscuro usar `kind='inlineMarkOnDark'`.
+- **Shiny Button para el navy de Nexa:** el color característico de Nexa (midnight navy) se expresa con el **Shiny Button** — `GreenhouseShinyBorder asButton variant='cta' palette='nexa'` (desde `@/components/greenhouse/primitives`), pasando el Mark + label como `children`. NO usar un MUI `<Button color='primary'>` plano para un CTA de Nexa.
+
+Patrón canónico (copiar este shape):
+
+```tsx
+<GreenhouseShinyBorder asButton variant='cta' palette='nexa' ariaLabel={…} onClick={…}>
+  <GreenhouseNexaBrandMark kind='inlineMarkOnDark' size='small' />
+  {GH_NEXA.insight_ask_nexa_cta}
+</GreenhouseShinyBorder>
+```
+
+**Referencias vivas:** el bridge CTA de `KnowledgeNexaCompositionLens` ("Seguir con Nexa") y el CTA "Pregúntale a Nexa" de `NexaInsightDetailView` (TASK-1182). El copy visible va en `src/lib/copy/nexa.ts` (`GH_NEXA`), validado con `greenhouse-ux-writing`. **NUNCA** pintar un botón de Nexa con `<Button>` MUI plano + ícono genérico; **NUNCA** hardcodear el navy (sale del `palette='nexa'` de la primitive).
+
 ### Otras convenciones
 
 - Line endings: LF (ver `.gitattributes`)
