@@ -222,7 +222,9 @@ export const AGGREGATE_TYPES = {
   // TASK-1072 — Design System ↔ AXIS Figma node link (SSOT runtime del vínculo
   // superficie↔nodo). Aggregate identity = surface_key (ruta normalizada del DS).
   designSystemFigmaNode: 'design_system_figma_node',
-  // TASK-1120 — Design handoff de producto. Aggregate identity = entry_id.
+  // TASK-1120/TASK-1175 — Design handoff de producto.
+  // Entry identity = entry_id; allowlist identity = product Figma file_key.
+  designHandoffAllowedFile: 'design_handoff_allowed_file',
   designHandoffEntry: 'design_handoff_entry',
 
   // TASK-1171 Slice 3 — Activación gobernada del sync Notion->ICO de un cliente.
@@ -1050,6 +1052,13 @@ export const EVENT_TYPES = {
   designHandoffRegistered: 'design_system.handoff.registered',
   designHandoffTransitioned: 'design_system.handoff.transitioned',
   designHandoffArchived: 'design_system.handoff.archived',
+  designHandoffAllowedFileUpserted: 'design_system.handoff.allowed_file_upserted',
+  designHandoffAllowedFileDeprecated: 'design_system.handoff.allowed_file_deprecated',
+  designHandoffOwnerAssigned: 'design_system.handoff.owner_assigned',
+  designHandoffPlanningUpdated: 'design_system.handoff.planning_updated',
+  designHandoffWorkItemLinked: 'design_system.handoff.work_item_linked',
+  designHandoffEvidenceAttached: 'design_system.handoff.evidence_attached',
+  designHandoffFigmaNodeVerified: 'design_system.handoff.figma_node_verified',
 
   // TASK-1171 Slice 3 — Sync Notion->ICO de un cliente activado vía command gobernado.
   // aggregate_type = space_notion_source, aggregate_id = source_id. Sin consumer

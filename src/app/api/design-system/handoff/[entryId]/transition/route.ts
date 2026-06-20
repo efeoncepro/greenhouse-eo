@@ -1,11 +1,11 @@
-import { NextResponse } from 'next/server'
-
 import { canonicalErrorResponse } from '@/lib/api/canonical-error-response'
 import { DesignHandoffError, isDesignHandoffStatus } from '@/lib/design-system/handoff/state-machine'
 import { transitionDesignHandoffEntry } from '@/lib/design-system/handoff/store'
 import { can } from '@/lib/entitlements/runtime'
 import { captureWithDomain } from '@/lib/observability/capture'
 import { requireTenantContext } from '@/lib/tenant/authorization'
+
+import { mapDesignHandoffError, runDesignHandoffCommand } from '../../api-helpers'
 
 export const dynamic = 'force-dynamic'
 
@@ -14,13 +14,6 @@ const TRANSITION_CAPABILITY = 'design_system.handoff.transition' as const
 interface TransitionBody {
   toStatus?: unknown
   implementedSurfaceKey?: unknown
-}
-
-const mapHandoffError = (error: DesignHandoffError) => {
-  if (error.code === 'design_handoff_not_found') return canonicalErrorResponse('design_handoff_not_found')
-  if (error.code === 'invalid_design_handoff_input') return canonicalErrorResponse('invalid_design_handoff_input')
-
-  return canonicalErrorResponse('invalid_design_handoff_transition')
 }
 
 export async function PATCH(request: Request, { params }: { params: Promise<{ entryId: string }> }) {
@@ -47,19 +40,27 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ en
   }
 
   const { entryId } = await params
+  const toStatus = body.toStatus
 
   try {
-    const result = await transitionDesignHandoffEntry({
-      entryId,
-      toStatus: body.toStatus,
-      implementedSurfaceKey: typeof body.implementedSurfaceKey === 'string' ? body.implementedSurfaceKey : null,
-      actorUserId: tenant.userId
+    return await runDesignHandoffCommand({
+      tenant,
+      request,
+      routeKey: 'design_system.handoff.transition',
+      body: { entryId, ...body },
+      run: async () => ({
+        ok: true,
+        ...(await transitionDesignHandoffEntry({
+          entryId,
+          toStatus,
+          implementedSurfaceKey: typeof body.implementedSurfaceKey === 'string' ? body.implementedSurfaceKey : null,
+          actorUserId: tenant.userId
+        }))
+      })
     })
-
-    return NextResponse.json({ ok: true, ...result })
   } catch (error) {
     if (error instanceof DesignHandoffError) {
-      return mapHandoffError(error)
+      return mapDesignHandoffError(error)
     }
 
     captureWithDomain(error, 'platform', { tags: { source: 'design_handoff_transition' } })

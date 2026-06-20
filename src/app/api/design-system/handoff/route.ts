@@ -9,6 +9,8 @@ import { can } from '@/lib/entitlements/runtime'
 import { captureWithDomain } from '@/lib/observability/capture'
 import { requireTenantContext } from '@/lib/tenant/authorization'
 
+import { mapDesignHandoffError, runDesignHandoffCommand } from './api-helpers'
+
 export const dynamic = 'force-dynamic'
 
 const READ_CAPABILITY = 'design_system.handoff.read' as const
@@ -19,14 +21,6 @@ interface CreateBody {
   kind?: unknown
   url?: unknown
   nodeName?: unknown
-}
-
-const mapHandoffError = (error: DesignHandoffError) => {
-  if (error.code === 'invalid_figma_url') return canonicalErrorResponse('invalid_figma_url')
-  if (error.code === 'figma_file_not_allowed') return canonicalErrorResponse('figma_file_not_allowed')
-  if (error.code === 'invalid_design_handoff_input') return canonicalErrorResponse('invalid_design_handoff_input')
-
-  return canonicalErrorResponse('invalid_design_handoff_transition')
 }
 
 export async function GET() {
@@ -74,19 +68,28 @@ export async function POST(request: Request) {
     return canonicalErrorResponse('invalid_figma_url')
   }
 
-  try {
-    const entry = await createDesignHandoffEntry({
-      title: typeof body.title === 'string' ? body.title : undefined,
-      kind: body.kind === 'component' || body.kind === 'page' ? (body.kind as DesignHandoffKind) : undefined,
-      url: body.url,
-      nodeName: typeof body.nodeName === 'string' ? body.nodeName : null,
-      actorUserId: tenant.userId
-    })
+  const url = body.url
 
-    return NextResponse.json({ ok: true, entry })
+  try {
+    return await runDesignHandoffCommand({
+      tenant,
+      request,
+      routeKey: 'design_system.handoff.create',
+      body,
+      run: async () => ({
+        ok: true,
+        entry: await createDesignHandoffEntry({
+          title: typeof body.title === 'string' ? body.title : undefined,
+          kind: body.kind === 'component' || body.kind === 'page' ? (body.kind as DesignHandoffKind) : undefined,
+          url,
+          nodeName: typeof body.nodeName === 'string' ? body.nodeName : null,
+          actorUserId: tenant.userId
+        })
+      })
+    })
   } catch (error) {
     if (error instanceof DesignHandoffError) {
-      return mapHandoffError(error)
+      return mapDesignHandoffError(error)
     }
 
     captureWithDomain(error, 'platform', { tags: { source: 'design_handoff_create' } })

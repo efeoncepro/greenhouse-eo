@@ -44,6 +44,7 @@ interface HandoffResponse {
 const STATUS_LABELS: Record<DesignHandoffStatus, string> = {
   proposed: 'Propuesto',
   in_implementation: 'En implementación',
+  in_review: 'En revisión',
   implemented: 'Implementado',
   archived: 'Archivado'
 }
@@ -51,6 +52,7 @@ const STATUS_LABELS: Record<DesignHandoffStatus, string> = {
 const STATUS_TONES: Record<DesignHandoffStatus, 'default' | 'info' | 'success' | 'warning'> = {
   proposed: 'warning',
   in_implementation: 'info',
+  in_review: 'info',
   implemented: 'success',
   archived: 'default'
 }
@@ -64,9 +66,10 @@ const sortEntries = (entries: DesignHandoffEntry[]) =>
   [...entries].sort((a, b) => {
     const statusOrder: Record<DesignHandoffStatus, number> = {
       in_implementation: 0,
-      proposed: 1,
-      implemented: 2,
-      archived: 3
+      in_review: 1,
+      proposed: 2,
+      implemented: 3,
+      archived: 4
     }
 
     return statusOrder[a.status] - statusOrder[b.status] || b.updatedAt.localeCompare(a.updatedAt)

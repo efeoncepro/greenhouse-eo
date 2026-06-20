@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -15,7 +15,7 @@
 - UI impact: `none`
 - Backend impact: `command`
 - Epic: `none`
-- Status real: `Diseno`
+- Status real: `Code complete local; rollout pendiente`
 - Rank: `TBD`
 - Domain: `ui|platform|design-system|api|nexa`
 - Blocked by: `none`
@@ -172,7 +172,7 @@ N/A — esta task no implementa UI visible. Menciona la UI solo como consumer co
 
 - Auth/access gate: internal tenant + capabilities:
   - existing: `design_system.handoff.read|create|transition`;
-  - new proposed: `design_system.handoff.allowlist.manage`, `design_system.handoff.link`, `design_system.handoff.evidence.attach`, `design_system.handoff.drift.read`.
+  - new: `design_system.handoff.allowlist.manage`, `design_system.handoff.owner.assign`, `design_system.handoff.planning.update`, `design_system.handoff.link`, `design_system.handoff.evidence.attach`, `design_system.handoff.verify`, `design_system.handoff.drift.read`.
 - Sensitive data posture: no secrets; Figma token stays server-only via existing secret resolution; no raw Figma token/client errors.
 - Error contract: canonical errors for not allowed, invalid ref, missing evidence, stale/deleted node, invalid link, forbidden.
 - Abuse/rate-limit posture: Figma node verification is rate-limited/cached; no client-driven arbitrary Figma file crawling.
@@ -336,31 +336,37 @@ Recommended contract names (verify during Discovery):
 
 ## Acceptance Criteria
 
-- [ ] Additive migration creates/extends handoff ownership, planning, links, evidence and node snapshot model.
-- [ ] State machine includes `in_review` and prevents `implemented` without implemented surface + evidence or governed exception.
-- [ ] Allowlist manage, owner assignment, planning fields, work item link, evidence attach and node verification are server-side commands.
-- [ ] Enriched readers expose list/detail/drift/orphans without UI-only logic.
-- [ ] New capabilities/grants + coverage tests exist for all new commands.
-- [ ] Canonical errors cover invalid file, invalid link, missing evidence, stale/deleted node and forbidden actions.
-- [ ] Reliability signals cover stale entries, node drift, orphan surfaces and missing evidence.
+- [x] Additive migration creates/extends handoff ownership, planning, links, evidence and node snapshot model.
+- [x] State machine includes `in_review` and prevents `implemented` without implemented surface + evidence or governed exception.
+- [x] Allowlist manage, owner assignment, planning fields, work item link, evidence attach and node verification are server-side commands.
+- [x] Enriched readers expose list/detail/drift/orphans without UI-only logic.
+- [x] New capabilities/grants + coverage tests exist for all new commands.
+- [x] Canonical errors cover invalid file, invalid link, missing evidence, stale/deleted node and forbidden actions.
+- [x] Reliability signals cover stale entries, node drift, orphan surfaces and missing evidence.
 - [ ] Staging smoke proves create -> link -> evidence -> implemented with a real approved product Figma node.
 - [ ] TASK-1176 is updated/unblocked with the final contract paths.
 
 ## Verification
 
 - `pnpm vitest run src/lib/design-system/handoff`
-- `NODE_OPTIONS=--max-old-space-size=8192 pnpm exec tsc --noEmit`
-- `pnpm lint`
+- `pnpm vitest run src/lib/design-system/handoff/state-machine.test.ts src/lib/reliability/queries/design-handoff-control-plane-signals.test.ts src/lib/tenant/designer-role.test.ts`
+- `pnpm exec eslint src/lib/design-system/handoff src/app/api/design-system/handoff src/lib/reliability/queries/design-handoff-*.ts src/lib/reliability/get-reliability-overview.ts src/lib/tenant/designer-role.test.ts src/config/entitlements-catalog.ts src/lib/entitlements/runtime.ts src/lib/sync/event-catalog.ts`
+- `gtimeout 240s pnpm exec tsc --noEmit --pretty false`
+- `gtimeout 600s env NODE_OPTIONS=--max-old-space-size=8192 pnpm build`
 - `pnpm task:lint --task TASK-1175`
+- `pnpm design:lint`
 - `pnpm route-reachability-gate` if API route manifest changes
 - `pnpm migration-marker-gate`
+- `pnpm qa:gates --changed --agent codex --task TASK-1175 --runtime --auth --data --docs`
+- `pnpm docs:closure-check`
+- `pnpm fe:capture --route=/design-system/handoff --env=local --hold=3000` (compatibilidad del consumer V1; capture `.captures/2026-06-20T00-56-59_inline-design-system-handoff`)
 - DB smoke: migration up/down or migration verify in local/dev.
 - Staging API smoke with real product Figma file (after operator approval).
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` synchronized with folder.
-- [ ] `docs/tasks/README.md` and `docs/tasks/TASK_ID_REGISTRY.md` synchronized.
-- [ ] `Handoff.md`, `project_context.md`, `changelog.md` updated.
-- [ ] Architecture/manual docs updated.
-- [ ] Runtime rollout state documented: `complete`, `code complete rollout pendiente`, or `operativamente bloqueado`.
+- [x] `Lifecycle` synchronized with folder.
+- [x] `docs/tasks/README.md` and `docs/tasks/TASK_ID_REGISTRY.md` synchronized.
+- [x] `Handoff.md`, `project_context.md`, `changelog.md` updated.
+- [x] Architecture/manual docs updated.
+- [x] Runtime rollout state documented: `complete`, `code complete rollout pendiente`, or `operativamente bloqueado`.

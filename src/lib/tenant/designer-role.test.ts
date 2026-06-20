@@ -65,3 +65,42 @@ describe('TASK-1072 — design_system.figma_node.link capability gate', () => {
     expect(can(s, 'design_system.figma_node.link', 'update', 'tenant')).toBe(false)
   })
 })
+
+describe('TASK-1175 — design_system.handoff V2 capability gates', () => {
+  const mutatingCapabilities = [
+    ['design_system.handoff.allowlist.manage', 'create'],
+    ['design_system.handoff.allowlist.manage', 'update'],
+    ['design_system.handoff.owner.assign', 'update'],
+    ['design_system.handoff.planning.update', 'update'],
+    ['design_system.handoff.link', 'create'],
+    ['design_system.handoff.evidence.attach', 'create'],
+    ['design_system.handoff.verify', 'update']
+  ] as const
+
+  it('grants V2 mutating handoff capabilities to a designer', () => {
+    const s = subject([ROLE_CODES.DESIGNER, ROLE_CODES.COLLABORATOR], ['internal', 'my'])
+
+    for (const [capability, action] of mutatingCapabilities) {
+      expect(can(s, capability, action, 'tenant')).toBe(true)
+    }
+  })
+
+  it('grants V2 mutating handoff capabilities to efeonce_admin', () => {
+    const s = subject([ROLE_CODES.EFEONCE_ADMIN], ['internal', 'admin', 'my'])
+
+    for (const [capability, action] of mutatingCapabilities) {
+      expect(can(s, capability, action, 'tenant')).toBe(true)
+    }
+  })
+
+  it('limits a plain internal collaborator to read and drift-read handoff capabilities', () => {
+    const s = subject([ROLE_CODES.COLLABORATOR], ['internal', 'my'])
+
+    expect(can(s, 'design_system.handoff.read', 'read', 'tenant')).toBe(true)
+    expect(can(s, 'design_system.handoff.drift.read', 'read', 'tenant')).toBe(true)
+
+    for (const [capability, action] of mutatingCapabilities) {
+      expect(can(s, capability, action, 'tenant')).toBe(false)
+    }
+  })
+})

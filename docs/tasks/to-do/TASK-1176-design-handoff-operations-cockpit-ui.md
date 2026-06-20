@@ -54,7 +54,7 @@ Revisar y respetar:
 - `docs/architecture/GREENHOUSE_COMPOSITION_SHELL_DECISION_V1.md`
 - `docs/architecture/GREENHOUSE_UI_PRIMITIVE_VARIANTS_DECISION_V1.md`
 - `docs/architecture/GREENHOUSE_FULL_API_PARITY_DECISION_V1.md`
-- `docs/tasks/to-do/TASK-1175-design-handoff-control-plane-full-api-parity.md`
+- `docs/tasks/in-progress/TASK-1175-design-handoff-control-plane-full-api-parity.md`
 - `docs/tasks/to-do/TASK-1168-design-system-mobile-shell-overflow-containment.md`
 
 Reglas obligatorias:
@@ -317,4 +317,3 @@ The card/inspector should present blockers as operational facts:
 - [ ] `Handoff.md`, `project_context.md`, `changelog.md` updated.
 - [ ] GVC evidence paths recorded in task/handoff.
 - [ ] Any inherited TASK-1168 overflow remains documented if unresolved.
-

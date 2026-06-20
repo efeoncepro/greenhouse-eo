@@ -196,6 +196,9 @@ import { getKortexGithubCiLastStatusSignal } from './queries/kortex-github-ci-la
 import { getPublicSiteAstroDeployFailedSignal } from './queries/public-site-astro-deploy-failed'
 import { getPublicSiteAstroCiFailedSignal } from './queries/public-site-astro-ci-failed'
 import { getDesignHandoffStaleEntriesSignal } from './queries/design-handoff-stale-entries'
+import { getDesignHandoffMissingEvidenceSignal } from './queries/design-handoff-missing-evidence'
+import { getDesignHandoffNodeDriftSignal } from './queries/design-handoff-node-drift'
+import { getDesignHandoffOrphanSurfacesSignal } from './queries/design-handoff-orphan-surfaces'
 import { getEmailRenderFailureSignal } from './queries/email-render-failure'
 import { getNuboxSourceFreshnessSignal } from './queries/nubox-source-freshness'
 import { getNotionConformedDrainFreshnessSignal } from './queries/notion-conformed-drain-freshness'
@@ -888,6 +891,7 @@ interface ReliabilityOverviewSources {
    * Roll up bajo moduleKey='platform' como governance del Design System.
    */
   designHandoffStaleEntries?: ReliabilitySignal | null
+  designHandoffControlPlane?: ReliabilitySignal[] | null
 
   /**
    * TASK-910 Slice 4 — Notion Demo Teamspace Sandbox signals (6 canonical):
@@ -1121,6 +1125,8 @@ export const buildReliabilityOverview = (
     ...(sources.publicSiteAstroCiFailed ? [sources.publicSiteAstroCiFailed] : []),
     // TASK-1120 — Design handoff queue stale entries.
     ...(sources.designHandoffStaleEntries ? [sources.designHandoffStaleEntries] : []),
+    // TASK-1175 — Design handoff control-plane API parity signals.
+    ...(sources.designHandoffControlPlane ?? []),
     // TASK-910 Slice 4 — Notion Demo Teamspace Sandbox signals (6 canonical).
     // 5 bajo moduleKey 'delivery' + 1 CRITICAL bajo moduleKey 'payroll'.
     ...(sources.notionMetricsDemo ?? []),
@@ -1962,6 +1968,15 @@ export const getReliabilityOverview = async (
       ? preloadedSources.designHandoffStaleEntries
       : await getDesignHandoffStaleEntriesSignal().catch(() => null)
 
+  const designHandoffControlPlane =
+    preloadedSources.designHandoffControlPlane !== undefined
+      ? preloadedSources.designHandoffControlPlane
+      : await Promise.all([
+          getDesignHandoffMissingEvidenceSignal(),
+          getDesignHandoffNodeDriftSignal(),
+          getDesignHandoffOrphanSurfacesSignal()
+        ]).catch(() => null)
+
   // TASK-807 — Commercial Health readers (6). Cada reader degrada
   // honestamente a `unknown` si su query falla. Incluye stale_progress de
   // TASK-805 como primitive reutilizada, no recreada.
@@ -2189,6 +2204,7 @@ export const getReliabilityOverview = async (
     publicSiteAstroDeployFailed,
     publicSiteAstroCiFailed,
     designHandoffStaleEntries,
+    designHandoffControlPlane,
     icoMaterializerSkippedSafety,
     nexaInsightsFreshness,
     nexaInsightsNoNewSignals,

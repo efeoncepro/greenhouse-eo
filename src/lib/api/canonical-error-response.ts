@@ -61,6 +61,10 @@ export type CanonicalErrorCode =
   | 'design_handoff_not_found'
   | 'invalid_design_handoff_input'
   | 'invalid_design_handoff_transition'
+  | 'invalid_design_handoff_link'
+  | 'invalid_design_handoff_evidence'
+  | 'design_handoff_missing_evidence'
+  | 'design_handoff_node_unavailable'
   // Nexa chat endpoint (TASK-1131).
   | 'nexa_prompt_required'
   | 'nexa_generation_failed'
@@ -165,6 +169,26 @@ const CANONICAL_ERRORS: Record<CanonicalErrorCode, CanonicalErrorDefinition> = {
     status: 409,
     message: 'Ese cambio de estado no es válido para el handoff seleccionado.',
     actionable: false
+  },
+  invalid_design_handoff_link: {
+    status: 422,
+    message: 'El vínculo del handoff no es válido. Usa una referencia tipada y segura.',
+    actionable: true
+  },
+  invalid_design_handoff_evidence: {
+    status: 422,
+    message: 'La evidencia del handoff no es válida. Adjunta una ruta, captura o revisión reconocida.',
+    actionable: true
+  },
+  design_handoff_missing_evidence: {
+    status: 409,
+    message: 'Para cerrar un handoff como implementado necesitas evidencia runtime o una excepción gobernada.',
+    actionable: false
+  },
+  design_handoff_node_unavailable: {
+    status: 409,
+    message: 'No pudimos verificar ese nodo Figma ahora. Revisa el acceso al archivo o inténtalo más tarde.',
+    actionable: true
   },
   nexa_prompt_required: {
     status: 422,

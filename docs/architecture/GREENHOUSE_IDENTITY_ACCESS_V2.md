@@ -1194,3 +1194,21 @@ El Design Handoff Registry reusa el plano **views** existente del Design System 
 La decisión mantiene el principio TASK-1072: **ver** Design System ≠ **operar** Figma/handoff. Colaboradores internos pueden leer el carril; solo diseño/admin registra nodos de producto o cambia estado. El allowlist de archivos producto vive en `greenhouse_core.design_handoff_allowed_files`; el master AXIS está excluido por constraint y validación server-side.
 
 Spec: `docs/tasks/in-progress/TASK-1120-design-handoff-registry.md`.
+
+## Delta 2026-06-19 — TASK-1175: Design Handoff Control Plane
+
+TASK-1175 mantiene la ruta `/design-system/handoff` en el plano **views** y endurece el plano programático con capabilities de control plane. La UI, Nexa y cualquier cliente API deben llamar commands/readers equivalentes; ningún botón de negocio queda como único camino.
+
+| Capability                                | Action   | Scope    | Grant runtime                            |
+| ----------------------------------------- | -------- | -------- | ---------------------------------------- |
+| `design_system.handoff.allowlist.manage`  | `update` | `tenant` | `efeonce_admin`                          |
+| `design_system.handoff.owner.assign`      | `update` | `tenant` | `designer` ∪ `efeonce_admin`             |
+| `design_system.handoff.planning.update`   | `update` | `tenant` | `designer` ∪ `efeonce_admin`             |
+| `design_system.handoff.link`              | `create` | `tenant` | `designer` ∪ `efeonce_admin`             |
+| `design_system.handoff.evidence.attach`   | `create` | `tenant` | `designer` ∪ `efeonce_admin`             |
+| `design_system.handoff.verify`            | `update` | `tenant` | `designer` ∪ `efeonce_admin`             |
+| `design_system.handoff.drift.read`        | `read`   | `tenant` | `designer` ∪ `efeonce_admin`             |
+
+El lifecycle agrega `in_review` y el gate `implemented` exige ruta runtime no vacía más evidencia gobernada (`gvc_capture`, `runtime_route` o excepción manual auditada). Owner, prioridad, target surface, links TASK/PR/deploy y snapshots Figma son metadata operacional del aggregate, no permisos implícitos. Leer drift no concede mutar allowlist ni forzar implementación.
+
+Spec: `docs/tasks/in-progress/TASK-1175-design-handoff-control-plane-full-api-parity.md`.

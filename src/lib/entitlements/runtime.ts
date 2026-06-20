@@ -2136,6 +2136,65 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
       scope: 'tenant',
       source: 'role'
     })
+    addEntitlement(entries, {
+      module: 'design_system',
+      capability: 'design_system.handoff.allowlist.manage',
+      action: 'create',
+      scope: 'tenant',
+      source: 'role'
+    })
+    addEntitlement(entries, {
+      module: 'design_system',
+      capability: 'design_system.handoff.allowlist.manage',
+      action: 'update',
+      scope: 'tenant',
+      source: 'role'
+    })
+    addEntitlement(entries, {
+      module: 'design_system',
+      capability: 'design_system.handoff.owner.assign',
+      action: 'update',
+      scope: 'tenant',
+      source: 'role'
+    })
+    addEntitlement(entries, {
+      module: 'design_system',
+      capability: 'design_system.handoff.planning.update',
+      action: 'update',
+      scope: 'tenant',
+      source: 'role'
+    })
+    addEntitlement(entries, {
+      module: 'design_system',
+      capability: 'design_system.handoff.link',
+      action: 'create',
+      scope: 'tenant',
+      source: 'role'
+    })
+    addEntitlement(entries, {
+      module: 'design_system',
+      capability: 'design_system.handoff.evidence.attach',
+      action: 'create',
+      scope: 'tenant',
+      source: 'role'
+    })
+    addEntitlement(entries, {
+      module: 'design_system',
+      capability: 'design_system.handoff.verify',
+      action: 'update',
+      scope: 'tenant',
+      source: 'role'
+    })
+  }
+
+  if (hasRouteGroup(subject, 'internal') || hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)) {
+    addEntitlement(entries, {
+      module: 'design_system',
+      capability: 'design_system.handoff.drift.read',
+      action: 'read',
+      scope: 'tenant',
+      source: hasRouteGroup(subject, 'internal') ? 'route_group' : 'role'
+    })
   }
 
   // TASK-1081 — Knowledge Platform capabilities. MVP solo interno. Sembradas en el

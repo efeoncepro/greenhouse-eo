@@ -4,11 +4,13 @@
 
 ## Sesión 2026-06-20 — TASK-1175/1176 Design Handoff V2 backlog — Codex
 
-> **Estado:** tasks creadas en `to-do/`, sin implementar. Se dividió intencionalmente por disciplina híbrida: backend-data foundation primero, UI consumer después.
+> **Estado:** `TASK-1175` code complete local / rollout pendiente en `develop` (`in-progress` hasta smoke staging con `file_key` real); `TASK-1176` queda en `to-do/` bloqueada por 1175. Se dividió intencionalmente por disciplina híbrida: backend-data foundation primero, UI consumer después.
 
-- **Creado:** `TASK-1175` (`docs/tasks/to-do/TASK-1175-design-handoff-control-plane-full-api-parity.md`) para convertir TASK-1120 en control plane Full API Parity: allowlist commands, owners, prioridad, target surface, links TASK/PR/deploy, evidencia GVC, Figma node verification, drift/orphan readers, capabilities finas y programmatic command path.
+- **Tomada:** `TASK-1175` (`docs/tasks/in-progress/TASK-1175-design-handoff-control-plane-full-api-parity.md`) para convertir TASK-1120 en control plane Full API Parity: allowlist commands, owners, prioridad, target surface, links TASK/PR/deploy, evidencia GVC, Figma node verification, drift/orphan readers, capabilities finas y programmatic command path.
+- **Code complete local:** migración V2 additive `20260620003944557_task-1175-design-handoff-control-plane-v2.sql`; commands/readers server-side en `src/lib/design-system/handoff/**`; Product API bajo `/api/design-system/handoff/**` con `executeApiPlatformCommand`; capabilities `allowlist.manage`, `owner.assign`, `planning.update`, `link`, `evidence.attach`, `verify`, `drift.read`; reliability signals `missing_evidence`, `node_drift`, `orphan_surfaces`; coverage de designer/admin vs collaborator.
+- **Pendiente rollout:** aplicar TASK-1120+TASK-1175 migrations en target, aprobar/seedear un `file_key` Figma de producto y ejecutar smoke staging create -> link -> evidence -> in_review -> implemented. Sin eso no mover TASK-1175 a `complete`.
 - **Creado:** `TASK-1176` (`docs/tasks/to-do/TASK-1176-design-handoff-operations-cockpit-ui.md`) como UI consumer bloqueada por TASK-1175: lanes, inspector, allowlist UI, evidence gating y GVC desktop/mobile.
-- **Verificación documental:** `pnpm task:lint --task TASK-1175` y `pnpm task:lint --task TASK-1176` => `template=1`, `errors=0`, `warnings=0`. `pnpm ops:lint --changed` mantiene warning ajeno/preexistente en TASK-927 por falta de Backend/Data Contract; no hay diff en TASK-927.
+- **Verificación:** ESLint focal, Vitest focal (`26/26`), `gtimeout 240s pnpm exec tsc --noEmit --pretty false`, `gtimeout 600s env NODE_OPTIONS=--max-old-space-size=8192 pnpm build` (warning conocido Roadmap dynamic pattern), `pnpm design:lint`, `pnpm route-reachability-gate`, `pnpm migration-marker-gate`, `pnpm task:lint --task TASK-1175`, `pnpm qa:gates --changed --agent codex --task TASK-1175 --runtime --auth --data --docs`, `pnpm docs:closure-check`. GVC local de compatibilidad en `.captures/2026-06-20T00-56-59_inline-design-system-handoff`; scrollWidth desktop/mobile `== clientWidth`. `pnpm ops:lint --changed` mantiene warning ajeno/preexistente en TASK-927 por falta de Backend/Data Contract; no hay diff en TASK-927.
 
 ## Sesión 2026-06-19 — TASK-1120 Design Handoff Registry — Codex
 

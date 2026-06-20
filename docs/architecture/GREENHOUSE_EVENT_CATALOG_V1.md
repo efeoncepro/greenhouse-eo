@@ -1054,6 +1054,26 @@ Spec: `docs/tasks/complete/TASK-1072-designer-role-figma-node-linking.md`.
 
 Spec: `docs/tasks/in-progress/TASK-1120-design-handoff-registry.md`.
 
+## Delta 2026-06-19 — TASK-1175: `design_system.handoff.*` V2 control plane
+
+TASK-1175 conserva el aggregate `design_handoff_entry` y agrega eventos audit-first para Full API Parity del control plane. Todos los payloads usan `schemaVersion:1`; los consumers iniciales son auditoria, Reliability y futuros lanes Nexa/API.
+
+| Event                                       | Cuándo                                                              | Payload v1                                                                                                  | Consumers                 |
+| ------------------------------------------- | ------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- | ------------------------- |
+| `design_system.handoff.allowed_file_upserted` | alta o actualización idempotente de archivo Figma producto allowlist | `{schemaVersion:1, fileKey, label, productArea, actorUserId}`                                               | audit / observabilidad V1 |
+| `design_system.handoff.allowed_file_deprecated` | archivo allowlisted queda deprecado                                  | `{schemaVersion:1, fileKey, supersededAt, actorUserId}`                                                     | audit / observabilidad V1 |
+| `design_system.handoff.owner_assigned`      | cambia owner diseño/dev                                             | `{schemaVersion:1, entryId, designerOwnerMemberId, devOwnerMemberId, actorUserId}`                          | audit / observabilidad V1 |
+| `design_system.handoff.planning_updated`    | cambia prioridad, target surface, due date o bloqueo                | `{schemaVersion:1, entryId, priority, targetSurfaceKey, dueAt, blockedReason, actorUserId}`                 | audit / observabilidad V1 |
+| `design_system.handoff.work_item_linked`    | se vincula TASK, PR, commit, deploy, route, comentario Figma o link externo | `{schemaVersion:1, entryId, linkId, linkType, ref, actorUserId}`                                            | audit / observabilidad V1 |
+| `design_system.handoff.evidence_attached`   | se adjunta evidencia `gvc_capture`, `runtime_route`, review o excepción | `{schemaVersion:1, entryId, evidenceId, evidenceType, ref, actorUserId}`                                    | audit / observabilidad V1 |
+| `design_system.handoff.figma_node_verified` | verificación Figma persiste snapshot reachable/renamed/stale/deleted/unavailable | `{schemaVersion:1, entryId, snapshotId, fileKey, nodeId, nodeStatus, checkedAt, actorUserId}`               | audit / Reliability V1    |
+
+- **Lifecycle V2**: `proposed → in_implementation → in_review → implemented → archived`; `archived` sigue terminal. `implemented` exige `implemented_surface_key` + evidencia gobernada, salvo `manual_exception` auditada.
+- **Reliability V2**: signals separados `design_system.handoff.missing_evidence`, `design_system.handoff.figma_node_drift`, `design_system.handoff.orphan_implemented_surface` y `design_system.handoff.allowlist_orphan` cuando aplique. No se reemplaza `design_system.handoff.stale_entries`.
+- **Full API Parity**: allowlist manage, owner/planning, links, evidence, verify y drift son commands/readers server-side; las rutas API son thin wrappers con capabilities granulares.
+
+Spec: `docs/tasks/in-progress/TASK-1175-design-handoff-control-plane-full-api-parity.md`.
+
 ## Delta 2026-06-12 — Knowledge auto-ingest (TASK-1094)
 
 | Evento                                | Versión | Aggregate                         | Emisor                                                                      | Consumer                                          |
