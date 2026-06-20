@@ -453,3 +453,22 @@ Cuando implementás un runtime desde un mockup aprobado, GVC puede verificar la 
 - `index.html` y `review-dossier.md` muestran un **resumen ejecutivo**: `Apto para implementar` / `Revisar` / `Requiere iteración`.
 
 Detalle técnico: [docs/architecture/GREENHOUSE_FRONTEND_CAPTURE_HELPER_V1.md](../../architecture/GREENHOUSE_FRONTEND_CAPTURE_HELPER_V1.md) Delta V1.5.
+
+## Control de tamaño de `.captures/` (auto-gc, TASK-927)
+
+`.captures/` es local + gitignored + vercelignored (no va a git ni a Vercel), pero crecía sin tope (cada captura agrega frames + `.webm`). Ahora se **auto-limita al final de cada `pnpm fe:capture`**, sin romper lo que un agente necesita en su sesión:
+
+1. **Per-scenario**: conserva las N corridas más recientes por scenario (la evidencia vigente), purga las iteraciones viejas del mismo scenario.
+2. **Size-cap (throttled)**: si `.captures/` supera el presupuesto, purga lo **más viejo** hasta quedar bajo el cap, **protegiendo siempre** las corridas más recientes (global) + una ventana de gracia de 2 días → la sesión/loop en curso de un agente nunca se toca.
+
+**Variables de control** (env):
+
+| Variable | Default | Qué hace |
+|---|---|---|
+| `GVC_NO_AUTOPRUNE` | — | `=1` desactiva TODO el auto-gc |
+| `GVC_KEEP_PER_SCENARIO` | `3` | evidencias conservadas por scenario |
+| `GVC_CAPTURE_MAX_GB` | `4` | presupuesto total; `=0` desactiva el size-cap |
+| `GVC_CAPTURE_KEEP_NEWEST` | `20` | corridas recientes protegidas del size-cap |
+| `GVC_AUTOGC_INTERVAL_HOURS` | `12` | cada cuánto corre el size-cap como máximo (throttle) |
+
+**Limpieza manual** (forzar ahora): `pnpm fe:capture:gc --per-scenario=2 --max-gb=4 --keep=20 --apply` (dry-run sin `--apply`). `pnpm fe:capture:gc -h` lista todo.
