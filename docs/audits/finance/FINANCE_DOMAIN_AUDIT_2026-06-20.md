@@ -227,6 +227,8 @@ Esto es una heurística textual, no una condena final: algunas rutas pueden dele
 - mutations con maker-checker/capability explícita;
 - sync endpoints y admin-only actions.
 
+Delta Codex 2026-06-20: auditoría focal documentada en `docs/audits/finance/FINANCE_ROUTE_CAPABILITY_AUDIT_2026-06-20.md`. Resultado: `205/206` route files tienen tenant context directo; el único `POST` sin auth directa es `quotes/hubspot`, tombstone `410 Gone` sin mutación. El riesgo real no es exposición anónima general, sino autorización demasiado amplia: `75` rutas write tienen auth de dominio/route-group pero no capability fina textual. Prioridad de remediación: Payment Orders + Treasury/Bank/Shareholder movements, luego DTE/Income/Expense/HES, luego sync/materializer HTTP boundary coordinado post-TASK-1191.
+
 ### F10 — Finance AI enrichments corren, pero no hay señales persistidas (🟡 Nexa/insights)
 
 `greenhouse_serving.finance_ai_enrichment_runs` tiene ejecuciones recientes, pero `finance_ai_signals` y `finance_ai_signal_enrichments` están vacías. Esto puede explicar degradaciones/404 en superficies Nexa que intenten profundizar insights financieros, y vuelve riesgoso construir acciones gobernadas sobre finance insights sin validar primero el source-of-truth de signals.

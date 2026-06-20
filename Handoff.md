@@ -48,6 +48,7 @@
 > - **Tasks creadas:** `TASK-1192` (Payment Orders + Treasury/shareholder capability gates), `TASK-1193` (DTE/Income/Expense/HES/PO action capability gates), `TASK-1194` (sync/materializer HTTP boundary hardening).
 > - **Índices sincronizados:** `docs/tasks/README.md` next ID `TASK-1195`, `docs/tasks/TASK_ID_REGISTRY.md`, `docs/audits/finance/README.md`, y delta en `FINANCE_DOMAIN_AUDIT_2026-06-20.md`.
 > - **Verificación:** `pnpm task:lint --task TASK-1192|1193|1194` todos `errors=0 warnings=0`; `docs:closure-check` scoped warning resuelto con esta nota; `git diff --check` verde.
+> - **Cierre 2026-06-20 14:01 -04:** worktree revisado para commit; el scope pendiente es solo documentación/auditoría Finance F9 y las tres tasks de remediación.
 > - **Nota multi-agente:** en paralelo apareció movimiento ajeno de `TASK-1187` a `in-progress/`; no se tocó ni se incluyó en esta línea de trabajo.
 
 ## Sesión 2026-06-20 — TASK-1191 Período fiscal sync Nubox + backfill F29 (COMPLETE, cierra ISSUE-103) — Claude
