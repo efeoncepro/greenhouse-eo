@@ -4758,6 +4758,20 @@ export interface GreenhouseFinanceCostAllocations {
   updated_at: Generated<Timestamp | null>;
 }
 
+export interface GreenhouseFinanceDteEmissionQueue {
+  attempt_count: Generated<number>;
+  created_at: Generated<Timestamp>;
+  dte_type_code: Generated<string>;
+  income_id: string;
+  last_error: string | null;
+  max_attempts: Generated<number>;
+  next_retry_at: Timestamp | null;
+  queue_id: string;
+  requested_by: string;
+  status: Generated<string>;
+  updated_at: Generated<Timestamp>;
+}
+
 export interface GreenhouseFinanceEconomicCategoryManualQueue {
   candidate_category: string | null;
   candidate_confidence: string | null;
@@ -10479,6 +10493,7 @@ export interface DB {
   "greenhouse_finance.client_economics": GreenhouseFinanceClientEconomics;
   "greenhouse_finance.client_profiles": GreenhouseFinanceClientProfiles;
   "greenhouse_finance.cost_allocations": GreenhouseFinanceCostAllocations;
+  "greenhouse_finance.dte_emission_queue": GreenhouseFinanceDteEmissionQueue;
   "greenhouse_finance.economic_category_manual_queue": GreenhouseFinanceEconomicCategoryManualQueue;
   "greenhouse_finance.economic_category_resolution_log": GreenhouseFinanceEconomicCategoryResolutionLog;
   "greenhouse_finance.economic_indicators": GreenhouseFinanceEconomicIndicators;

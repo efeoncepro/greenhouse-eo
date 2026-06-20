@@ -136,6 +136,8 @@ La ruta de reintento/dead-letter de DTE existe pero **no está registrada en `ve
 
 - **Acción sugerida:** registrar el cron en Cloud Scheduler (lane canónico) o eliminar la ruta si está muerta. Si se registra, agregar reliability signal de `dte_emission_queue` dead-letter.
 
+Delta Codex 2026-06-20: además del scheduler huérfano, el audit profundo confirmó que `greenhouse_finance.dte_emission_queue` no estaba gobernada por migración y que el helper ejecutaba DDL runtime. `TASK-1194` Slice 0 agrega y aplica en Cloud SQL dev la migración `20260620193557859_task-1194-dte-emission-queue-governed-ddl.sql`; `src/lib/finance/dte-emission-queue.ts` queda validation-only. `pnpm pg:connect:status` reporta `No migrations to run` y SQL smoke confirma tabla con `0` filas. Sigue pendiente registrar o retirar el cron y agregar signal de pending/retry/dead-letter.
+
 ### F3 — Dos crons en Vercel cron (solo prod, no staging) (🟠 paridad staging)
 
 Exactamente la bug-class que CLAUDE.md advierte (Vercel custom env no corre crons):

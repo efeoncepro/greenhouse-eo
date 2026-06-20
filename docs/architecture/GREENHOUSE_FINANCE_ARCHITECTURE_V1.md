@@ -1984,13 +1984,14 @@ Finance es el módulo más grande del portal: 49 API routes, 13 páginas, 28 arc
 | `client_economics`            | Postgres (`greenhouse_finance`)         | No                                      | Nativo; persiste `organization_id` + `client_id` compat                     |
 | `reconciliation_periods`      | Postgres                                | `fin_reconciliation_periods` (fallback) | Migrado                                                                     |
 | `bank_statement_rows`         | Postgres                                | `fin_bank_statement_rows` (fallback)    | Migrado                                                                     |
-| `dte_emission_queue`          | Postgres only                           | No                                      | TASK-139                                                                    |
+| `dte_emission_queue`          | Postgres only                           | No                                      | Gobernada por migración `20260620193557859_task-1194-dte-emission-queue-governed-ddl.sql`; runtime validation-only |
 | `commercial_cost_attribution` | Serving Postgres (`greenhouse_serving`) | No                                      | Canónico materializado; persiste `organization_id` + `client_id` compat     |
 | `service_attribution_facts`   | Serving Postgres (`greenhouse_serving`) | No                                      | Foundation factual por `service_id + period + source`; desbloquea `service_economics` |
 
 Nota operativa:
 
 - `commercial_cost_attribution` existe en el schema snapshot y ya es contrato vigente del sistema. Desde el delta 2026-06-20 su DDL base vive en migración gobernada (`20260620141000000_commercial-cost-attribution-governed-ddl.sql`) y el runtime/store solo valida existencia + ejecuta DML/SELECT; no debe recuperar privilegios `CREATE` sobre `greenhouse_serving`.
+- `dte_emission_queue` sigue el mismo patrón desde el delta 2026-06-20 de `TASK-1194` Slice 0: DDL, grants e índice viven en migración gobernada (`20260620193557859_task-1194-dte-emission-queue-governed-ddl.sql`), mientras `src/lib/finance/dte-emission-queue.ts` solo valida columnas requeridas y ejecuta DML. La app no debe crear/alterar esta cola en runtime.
 - `service_attribution_unresolved` acompaña a `service_attribution_facts` como cola auditable de casos ambiguos o sin evidencia suficiente; no debe tratarse como error silencioso ni como fallback inventado en UI.
 
 ### BigQuery Cutover Plan

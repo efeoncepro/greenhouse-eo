@@ -24,37 +24,44 @@ export interface DteEmissionQueueItem {
 
 let schemaReady = false
 
+const REQUIRED_DTE_EMISSION_QUEUE_COLUMNS = [
+  'queue_id',
+  'income_id',
+  'requested_by',
+  'dte_type_code',
+  'status',
+  'attempt_count',
+  'max_attempts',
+  'last_error',
+  'next_retry_at',
+  'created_at',
+  'updated_at'
+] as const
+
+export const resetDteEmissionQueueSchemaForTests = () => {
+  schemaReady = false
+}
+
 export const ensureDteEmissionQueueSchema = async () => {
   if (schemaReady) return
 
-  await runGreenhousePostgresQuery(`
-    CREATE TABLE IF NOT EXISTS greenhouse_finance.dte_emission_queue (
-      queue_id         TEXT PRIMARY KEY,
-      income_id        TEXT NOT NULL,
-      requested_by     TEXT NOT NULL,
-      dte_type_code    TEXT NOT NULL DEFAULT '33',
-      status           TEXT NOT NULL DEFAULT 'pending'
-                       CHECK (status IN ('pending', 'emitting', 'emitted', 'failed', 'retry_scheduled', 'dead_letter')),
-      attempt_count    INT NOT NULL DEFAULT 0,
-      max_attempts     INT NOT NULL DEFAULT 3,
-      last_error       TEXT,
-      next_retry_at    TIMESTAMPTZ,
-      created_at       TIMESTAMPTZ NOT NULL DEFAULT now(),
-      updated_at       TIMESTAMPTZ NOT NULL DEFAULT now(),
-      CONSTRAINT dte_queue_income_unique UNIQUE (income_id, status)
+  const rows = await runGreenhousePostgresQuery<{ column_name: string } & Record<string, unknown>>(
+    `SELECT column_name
+     FROM information_schema.columns
+     WHERE table_schema = 'greenhouse_finance'
+       AND table_name = 'dte_emission_queue'`
+  )
+
+  const actualColumns = new Set(rows.map(row => String(row.column_name)))
+  const missingColumns = REQUIRED_DTE_EMISSION_QUEUE_COLUMNS.filter(column => !actualColumns.has(column))
+
+  if (missingColumns.length > 0) {
+    throw new Error(
+      `greenhouse_finance.dte_emission_queue is not provisioned for runtime use. ` +
+        `Run migration 20260620193557859_task-1194-dte-emission-queue-governed-ddl.sql. ` +
+        `Missing columns: ${missingColumns.join(', ')}`
     )
-  `)
-
-  await runGreenhousePostgresQuery(`
-    ALTER TABLE greenhouse_finance.dte_emission_queue
-    ADD COLUMN IF NOT EXISTS dte_type_code TEXT NOT NULL DEFAULT '33'
-  `)
-
-  await runGreenhousePostgresQuery(`
-    CREATE INDEX IF NOT EXISTS idx_dte_queue_pending
-    ON greenhouse_finance.dte_emission_queue (status, next_retry_at)
-    WHERE status IN ('pending', 'retry_scheduled')
-  `)
+  }
 
   schemaReady = true
 }

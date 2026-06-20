@@ -5,7 +5,7 @@
 - Date: 2026-06-20
 - Auditor: Codex usando `greenhouse-finance-accounting-operator` + `greenhouse-documentation-governor`
 - Mode: `audit`
-- Mutation policy: read-only sobre runtime; solo se documenta evidencia
+- Mutation policy: audit inicial read-only sobre runtime; deltas posteriores documentan fixes locales aplicados
 - Runtime checked: Cloud SQL dev via `pnpm pg:doctor` y `pnpm pg:connect --shell`
 - Scope requested: ventas, compras, ingresos, egresos, ordenes de compra, banco, flujo de caja, F29/F22, payment orders, conciliacion, Cost Intelligence, syncs, alertas e integraciones
 - Decision: `warning`
@@ -16,7 +16,7 @@ Finance **funciona y no muestra corrupcion critica de caja/ledger** en la BD viv
 
 Pero Finance **todavia no esta cerrado como sistema financiero market-grade completo**. Los bloqueos no son "no hay modulo"; son controles, observabilidad y fiscal/management accounting todavia provisionales:
 
-1. `DTE emission queue` esta peor que en el audit anterior: la tabla no existe en Cloud SQL y el helper todavia ejecuta DDL en runtime (`CREATE TABLE IF NOT EXISTS`). Esto debe moverse a migracion gobernada y entrar en `TASK-1194` o task focal.
+1. `DTE emission queue` estaba peor que en el audit anterior: la tabla no existia en Cloud SQL y el helper ejecutaba DDL en runtime (`CREATE TABLE IF NOT EXISTS`). Delta Codex 2026-06-20: `TASK-1194` Slice 0 agrego migracion gobernada `20260620193557859_task-1194-dte-emission-queue-governed-ddl.sql`, la aplico en Cloud SQL dev y dejo el runtime validation-only; falta registrar o retirar el scheduler.
 2. Las mutaciones sensibles siguen dependiendo de route-group amplio en varias familias. `TASK-1192`, `TASK-1193` y `TASK-1194` siguen siendo obligatorias.
 3. F29 mensual esta compuesto y `TASK-1195` aparece complete local-first, pero retencion/PPM siguen en shadow/flag OFF y PPM usa tasa placeholder `placeholder_pending_contador`.
 4. F22 anual (`TASK-1196`) no debe tomarse como listo: requiere regla de regimen/tasa IDPC, fuente RLI y validacion contable.
@@ -36,7 +36,7 @@ Pero Finance **todavia no esta cerrado como sistema financiero market-grade comp
 | Payment orders | `pass with control warning` | 5 paid orders, 0 paid orders without `expense_payment`; capability gates pendientes |
 | Purchase orders | `pass with low data volume` | 2 active POs CLP por 6.903.000 autorizados; ISSUE-045 resuelto |
 | Fiscal monthly F29 | `provisional` | VAT 30 periods latest 2026-06; retention 2 periods; PPM 19 periods with placeholder rate |
-| DTE retry | `block` | `to_regclass('greenhouse_finance.dte_emission_queue') = null`; runtime helper creates schema |
+| DTE retry | `partial pass` | Migracion gobernada aplicada en Cloud SQL dev + helper validation-only; scheduler registration/removal still pending |
 | Management accounting / P&L | `provisional` | CCA sano hasta 2026-05; 2026-06 revenue 6.902.000 with cost 0 |
 | PnL dashboard endpoint | `code fixed, rollout pending` | staging 500 por columna inexistente; fix local usa `income.total_amount_clp` |
 | Controls / access | `warning high` | 123 write routes in Finance/admin Finance; 116 without visible fine capability by static scan |
@@ -132,19 +132,19 @@ Latest 2026-06 values:
 
 ### DTE retry queue
 
-Finding: `greenhouse_finance.dte_emission_queue` does not exist in Cloud SQL (`to_regclass = null`). The code path `src/lib/finance/dte-emission-queue.ts` still owns schema creation with:
+Initial finding: `greenhouse_finance.dte_emission_queue` did not exist in Cloud SQL (`to_regclass = null`). The code path `src/lib/finance/dte-emission-queue.ts` owned schema creation with:
 
 - `CREATE TABLE IF NOT EXISTS greenhouse_finance.dte_emission_queue`
 - `ALTER TABLE ... ADD COLUMN IF NOT EXISTS`
 - `CREATE INDEX IF NOT EXISTS`
 
-This is not acceptable for runtime. Finance already fixed the same class for `commercial_cost_attribution` in `TASK-1190`: DDL belongs in migration governance, runtime validates/uses the provisioned table. The audit F2 should be upgraded from "cron orphan" to:
+This was not acceptable for runtime. Finance already fixed the same class for `commercial_cost_attribution` in `TASK-1190`: DDL belongs in migration governance, runtime validates/uses the provisioned table. The audit F2 should be upgraded from "cron orphan" to:
 
 1. missing governed migration/runtime table in current DB;
 2. runtime DDL anti-pattern;
 3. cron still not registered in the canonical scheduler lane.
 
-Recommended treatment: fold into `TASK-1194` if its hook confirms scope, or create a focused `TASK-*` for DTE retry queue governance.
+Delta Codex 2026-06-20: folded into `TASK-1194` Slice 0. Code now has governed migration `20260620193557859_task-1194-dte-emission-queue-governed-ddl.sql`; `ensureDteEmissionQueueSchema()` now queries `information_schema.columns` and fails honestly if the provisioned table is missing or incomplete. The helper no longer runs `CREATE`, `ALTER` or `CREATE INDEX` at request time. The migration was applied in Cloud SQL dev; `pnpm pg:connect:status` reports `No migrations to run` and `to_regclass('greenhouse_finance.dte_emission_queue')` returns the table with `0` rows. Remaining: register or intentionally retire `/api/cron/dte-emission-retry` in the canonical scheduler lane.
 
 ### Cost intelligence / management accounting
 
@@ -261,16 +261,21 @@ Interpretation: this is not evidence of ledger corruption. It is evidence that t
 
 ## Findings
 
-### FD-1 - DTE retry queue has runtime DDL and no table in Cloud SQL
+### FD-1 - DTE retry queue had runtime DDL and no table in Cloud SQL
 
 Severity: `high`
 
 The prior audit described the DTE retry cron as orphaned with an empty queue. The deeper check shows the table itself is absent in current Cloud SQL, and the helper would create it at runtime. That violates the Finance DDL governance pattern and can fail under runtime roles or remain unobservable until the first retry path executes.
 
-Recommended fix:
+Treatment applied locally under `TASK-1194` Slice 0:
 
-- Add governed migration for `greenhouse_finance.dte_emission_queue`.
-- Remove DDL from `ensureDteEmissionQueueSchema()`; make it validate the table or fail honestly.
+- Added governed migration `20260620193557859_task-1194-dte-emission-queue-governed-ddl.sql` for `greenhouse_finance.dte_emission_queue`, grants and pending/retry index.
+- Removed runtime DDL from `ensureDteEmissionQueueSchema()`; it now validates required columns and fails with a migration-specific error if the table is absent/incomplete.
+- Added anti-regression coverage proving enqueue does not execute `CREATE`/`ALTER`/`DROP` and missing governed schema fails before insert.
+- Applied the migration in Cloud SQL dev; `pnpm pg:connect:status` reports no pending migrations and SQL smoke confirms `greenhouse_finance.dte_emission_queue` exists with `0` rows.
+
+Remaining:
+
 - Register or intentionally retire `/api/cron/dte-emission-retry`.
 - Add reliability signal for pending/retry/dead-letter queue state.
 

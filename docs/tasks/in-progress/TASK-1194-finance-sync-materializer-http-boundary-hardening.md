@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -17,7 +17,7 @@
 - UI impact: `none`
 - Backend impact: `cron`
 - Epic: `optional`
-- Status real: `Diseno`
+- Status real: `Parcial`
 - Rank: `TBD`
 - Domain: `finance|sync|ops|access`
 - Blocked by: `none`
@@ -198,6 +198,20 @@ Reglas obligatorias:
      ═══════════════════════════════════════════════════════════ -->
 
 ## Scope
+
+### Slice 0 — DTE retry queue governance addendum (Codex, 2026-06-20)
+
+- Treat `greenhouse_finance.dte_emission_queue` as governed DB infrastructure, not runtime-created state.
+- Add migration for the queue table/indexes and remove runtime DDL from `src/lib/finance/dte-emission-queue.ts`.
+- Keep `/api/cron/dte-emission-retry` behind existing `requireCronAuth`; scheduler registration/parity remains for later slices.
+- Branch exception: operator requested staying on `develop`; this execution remains on `develop` instead of `task/TASK-1194-*`.
+
+Slice 0 implementation status:
+
+- Migration `20260620193557859_task-1194-dte-emission-queue-governed-ddl.sql` creates the queue table, grants and pending/retry index.
+- `ensureDteEmissionQueueSchema()` is validation-only against `information_schema.columns`; it no longer runs `CREATE`/`ALTER`/`CREATE INDEX`.
+- Cloud SQL dev: migration applied; `pnpm pg:connect:status` reports `No migrations to run`; SQL smoke confirms `greenhouse_finance.dte_emission_queue` exists with `0` rows.
+- Remaining in TASK-1194: route classification, capability/service boundary, scheduler parity and reliability signal.
 
 ### Slice 1 — Route classification ledger
 
