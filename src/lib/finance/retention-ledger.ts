@@ -165,6 +165,10 @@ export async function materializeRetentionLedgerForPeriod(
         WHERE e.period_year = ${year}::int
           AND e.period_month = ${month}::int
           AND COALESCE(e.withholding_amount, 0) > 0
+          -- TASK-1204 guard: excluir documentos anulados (espeja el filtro del
+          -- materializador de income). Una boleta anulada en SII/Nubox NUNCA
+          -- declara retención (caso real: folio 40 Valentina, anulada, +107.970).
+          AND COALESCE(e.is_annulled, false) = false
           -- TASK-1185 guard FX: NO materializar retención no-CLP con FX nulo/0
           -- (honorarios son CLP; este guard evita la sub-declaración ×1 silenciosa).
           AND (e.currency = 'CLP' OR COALESCE(NULLIF(e.exchange_rate_to_clp, 0), 0) <> 0)

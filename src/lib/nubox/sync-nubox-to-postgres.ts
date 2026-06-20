@@ -47,6 +47,17 @@ const safeNum = (v: unknown): number | null => {
 
 const roundAmount = (value: number): number => Math.round((value + Number.EPSILON) * 100) / 100
 
+/**
+ * TASK-1204 — La anulación autoritativa de un documento Nubox/SII viaja en
+ * `document_status_name='Anulada'`, NO siempre en el booleano `is_annulled`
+ * (Nubox no lo puebla en todos los casos). Antes derivábamos `is_annulled` sólo
+ * del booleano, dejando boletas anuladas como válidas → contaban en la posición
+ * F29 de retención (caso real: folio 40 Valentina, +107.970). Esta derivación
+ * acopla `is_annulled` al estado autoritativo del SII.
+ */
+const isNuboxPurchaseAnnulled = (purchase: NuboxProjectionPurchase): boolean =>
+  purchase.is_annulled === true || (purchase.document_status_name ?? '').trim().toLowerCase() === 'anulada'
+
 export const resolveNuboxPurchaseProjectionAmounts = (purchase: NuboxProjectionPurchase) => {
   const netAmount = safeNum(purchase.net_amount) ?? 0
   const exemptAmount = safeNum(purchase.exempt_amount) ?? 0
@@ -591,7 +602,7 @@ const upsertExpenseFromPurchase = async (
       [
         Number(purchase.nubox_purchase_id),
         purchase.document_status_name,
-        purchase.is_annulled ?? false,
+        isNuboxPurchaseAnnulled(purchase),
         purchase.document_status_name,
         safeNum(purchase.balance),
         purchase.pdf_url,
@@ -625,7 +636,7 @@ const upsertExpenseFromPurchase = async (
   // Create new expense record
   const expenseId = `EXP-NB-${purchase.nubox_purchase_id}`
 
-  const isExpenseAnnulled = purchase.is_annulled === true
+  const isExpenseAnnulled = isNuboxPurchaseAnnulled(purchase)
   const exchangeRateToClp = 1
 
   const projectionAmounts = resolveNuboxPurchaseProjectionAmounts(purchase)
