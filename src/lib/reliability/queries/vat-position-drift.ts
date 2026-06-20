@@ -12,15 +12,23 @@ import type { ReliabilitySignal } from '@/types/reliability'
  * overhead). El IVA / F29 se declara por entidad legal, así que TODO documento
  * con IVA del período debe tener su asiento en `vat_ledger_entries`.
  *
- * Cuenta documentos elegibles para IVA (income `vat_output` con tax>0, expenses
- * con crédito/no-recuperable>0) de períodos YA materializados que NO tienen un
- * asiento correspondiente en el ledger. Es el detector directo de "documentos
- * fiscales dropeados" — exactamente lo que el filtro `space_id IS NOT NULL`
- * causaba.
+ * Cuenta **(documento, bucket fiscal) elegibles** para IVA de períodos YA
+ * materializados que NO tienen su asiento correspondiente en el ledger. Es
+ * bucket-aware (no document-level): un income `vat_output` con tax>0 espera un
+ * asiento `debit_fiscal`; un expense con `recoverable>0` espera `credito_fiscal`
+ * y con `non_recoverable>0` espera `iva_no_recuperable`. Así detecta tanto un
+ * documento entero dropeado (lo que causaba el filtro `space_id IS NOT NULL`)
+ * como el drop de un solo bucket de un documento con ambos (que un check
+ * document-level dejaría pasar como falso-negativo).
  *
  * Steady state: `0` post re-materialización (Slice 4 rollout). Cualquier `> 0`
- * indica que el materializador volvió a dejar fuera documentos con IVA (regresión
- * de la bug-class) → la posición F29 quedaría subestimada/sobreestimada.
+ * indica que el materializador dejó fuera un (documento, bucket) con IVA
+ * (regresión de la bug-class) → la posición F29 quedaría incompleta.
+ *
+ * **Límite conocido:** los documentos con IVA y `period_year`/`period_month`
+ * NULL no se materializan en ningún período (comportamiento del materializador,
+ * pre-existente) y por construcción son invisibles a este signal — se cubren con
+ * un signal de data-quality aparte (follow-up TASK-725).
  *
  * **Kind**: `drift`. **Severidad**: `error` cuando count > 0.
  */
@@ -36,19 +44,27 @@ export const getVatPositionDriftSignal = async (): Promise<ReliabilitySignal> =>
          FROM greenhouse_finance.vat_monthly_positions
        ),
        eligible AS (
-         SELECT i.income_id AS source_id, i.period_year, i.period_month
+         -- income vat_output con tax>0 ⇒ espera un asiento debit_fiscal
+         SELECT i.income_id AS source_id, i.period_year, i.period_month, 'debit_fiscal' AS vat_bucket
          FROM greenhouse_finance.income i
          JOIN materialized_periods mp
            ON mp.period_year = i.period_year AND mp.period_month = i.period_month
          WHERE COALESCE(i.tax_snapshot_json ->> 'kind', '') = 'vat_output'
            AND COALESCE(i.tax_amount_snapshot, i.tax_amount, 0) > 0
          UNION ALL
-         SELECT e.expense_id AS source_id, e.period_year, e.period_month
+         -- expense recoverable>0 ⇒ espera un asiento credito_fiscal
+         SELECT e.expense_id AS source_id, e.period_year, e.period_month, 'credito_fiscal' AS vat_bucket
          FROM greenhouse_finance.expenses e
          JOIN materialized_periods mp
            ON mp.period_year = e.period_year AND mp.period_month = e.period_month
          WHERE COALESCE(e.recoverable_tax_amount, 0) > 0
-            OR COALESCE(e.non_recoverable_tax_amount, 0) > 0
+         UNION ALL
+         -- expense non_recoverable>0 ⇒ espera un asiento iva_no_recuperable
+         SELECT e.expense_id AS source_id, e.period_year, e.period_month, 'iva_no_recuperable' AS vat_bucket
+         FROM greenhouse_finance.expenses e
+         JOIN materialized_periods mp
+           ON mp.period_year = e.period_year AND mp.period_month = e.period_month
+         WHERE COALESCE(e.non_recoverable_tax_amount, 0) > 0
        )
        SELECT COUNT(*)::int AS n
        FROM eligible el
@@ -57,6 +73,7 @@ export const getVatPositionDriftSignal = async (): Promise<ReliabilitySignal> =>
          WHERE le.source_id = el.source_id
            AND le.period_year = el.period_year
            AND le.period_month = el.period_month
+           AND le.vat_bucket = el.vat_bucket
        )`
     )
 

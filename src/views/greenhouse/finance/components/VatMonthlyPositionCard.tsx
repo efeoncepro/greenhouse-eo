@@ -283,7 +283,7 @@ const VatMonthlyPositionCard = ({
               Sin movimientos con IVA materializados
             </Typography>
             <Typography variant='body2' color='text.secondary' sx={{ mt: 1 }}>
-              Este período no tiene documentos con débito fiscal ni crédito fiscal recuperable para el `space` activo.
+              Este período no tiene documentos con débito fiscal ni crédito fiscal recuperable para la entidad legal.
             </Typography>
           </Box>
         ) : (
