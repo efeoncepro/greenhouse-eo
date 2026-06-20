@@ -140,6 +140,14 @@ describe('GET /api/finance/dashboard/pnl — TASK-766 anti-regresion', () => {
     expect(sql).toContain('income_payments_normalized')
     expect(sql).toContain('payment_amount_clp')
     expect(sql).not.toMatch(/ip\.amount\s*\*\s*COALESCE\s*\(\s*[a-z_.]*exchange_rate_to_clp/i)
+
+    const incomeCall = runQueryMock.mock.calls.find((call) =>
+      String(call[0]).includes('partner_share_clp')
+    )
+
+    expect(incomeCall).toBeDefined()
+    expect(String(incomeCall![0])).toContain('FROM greenhouse_finance.income')
+    expect(String(incomeCall![0])).not.toContain('effective_cost_amount_clp')
   })
 
   it('returns realistic collected revenue total (anti-regresion: pin valor razonable)', async () => {

@@ -2,6 +2,14 @@
 
 > **Estado:** `released` (manifest transicionó a released, post-release health check verde). Orchestrator run [`27721723752`](https://github.com/efeoncepro/greenhouse-eo/actions/runs/27721723752) `completed/success`. Conducido por Claude tras pedido del operador ("paso a producción que Codex dejó preparado").
 
+## Sesión 2026-06-20 — Finance deep operability audit — Codex
+
+> **Estado:** auditoria read-only documentada, sin runtime writes. Se creó `docs/audits/finance/FINANCE_DEEP_OPERABILITY_AUDIT_2026-06-20.md` para revisar Finance completo: ventas/quotes, compras, ingresos, egresos, OC, banco, flujo de caja, F29/F22, payment orders, conciliacion, Cost Intelligence, syncs e integraciones.
+> - **Decision:** `warning`. Ledger/caja funcionan: 0 FX repair, 0 paid-without-ledger canonico, `income_settlement_reconciliation` drift 0, account balances frescos al 2026-06-20, payment orders paid sin drift.
+> - **Hallazgos nuevos/agravados:** `greenhouse_finance.dte_emission_queue` no existe en Cloud SQL y `src/lib/finance/dte-emission-queue.ts` aun ejecuta DDL runtime (`CREATE TABLE IF NOT EXISTS`); tratar junto a `TASK-1194` o task focal. `/api/finance/data-quality` usa checks legacy raw contra `SUM(payments)` y puede false-warning frente a factoring/superseded; canonical ledger esta limpio. Staging expuso 500 en `/api/finance/dashboard/pnl` por leer `effective_cost_amount_clp` desde `income`; fix local aplicado a `SUM(total_amount_clp)` + test anti-regresion, deploy/re-smoke pendiente.
+> - **Pendientes principales:** `TASK-1192`/`1193`/`1194` capability/sync hardening, deploy/re-smoke del fix PnL, accountant validation + flags para retencion/PPM, upstream payroll/labor allocation de junio antes de usar margen, `ISSUE-058` webhook Teams, drain de 171 economic-category pending.
+> - **Verificacion:** `pnpm pg:doctor`, SQL read-only via `pnpm pg:connect --shell`, staging API smoke read-only, Vercel logs del PnL 500, vitest focal Finance 17 files / 83 tests, PnL focal post-fix 3/3, `pnpm finance:e2e-gate`.
+
 ## Sesión 2026-06-20 — TASK-1195 Posición F29 mensual CONSOLIDADA (COMPLETE) — Claude
 
 > **Estado:** ✅ complete, local-first en `develop` (sin push). Child E / **cierre del alcance MENSUAL** de la umbrella TASK-1186. Une las 3 líneas del F29 (IVA TASK-725 + retenciones TASK-1188 + PPM TASK-1189) en un único contrato gobernado.

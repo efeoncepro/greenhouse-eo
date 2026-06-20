@@ -48,7 +48,7 @@ export async function GET(request: Request) {
     // task derivada antes de ser desplegada.
     runGreenhousePostgresQuery<PnlRow>(
       `SELECT
-         COALESCE(SUM(COALESCE(effective_cost_amount_clp, total_amount_clp)), 0) AS total_clp,
+         COALESCE(SUM(total_amount_clp), 0) AS total_clp,
          COUNT(*) AS record_count,
          COALESCE(SUM(partner_share_amount * COALESCE(exchange_rate_to_clp, 1)), 0) AS partner_share_clp
        FROM greenhouse_finance.income

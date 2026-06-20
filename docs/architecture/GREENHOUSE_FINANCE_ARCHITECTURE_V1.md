@@ -2,7 +2,16 @@
 
 > **Version:** 1.0
 > **Created:** 2026-03-30
-> **Last updated:** 2026-06-20 (TASK-1195 posición F29 mensual consolidada — compositor de las 3 líneas)
+> **Last updated:** 2026-06-20 (PnL dashboard income query hardening + TASK-1195 posición F29 mensual consolidada)
+
+## Delta 2026-06-20 — PnL dashboard income query hardening
+
+`GET /api/finance/dashboard/pnl` mantiene el mismo response contract, pero el query de
+ingresos devengados debe leer **solo columnas de `greenhouse_finance.income`**. La métrica
+`totalRevenue` se calcula con `SUM(income.total_amount_clp)`; `effective_cost_amount_clp`
+pertenece a `greenhouse_finance.expenses` y no debe usarse en el query de ingresos. Este delta
+cierra el 500 observado en staging cuando el endpoint intentaba leer esa columna desde
+`income`, y agrega test anti-regresión para evitar reintroducir el drift de schema.
 
 ## Delta 2026-06-20 — TASK-1195 Posición F29 mensual consolidada (compositor IVA + Retenciones + PPM)
 
@@ -2043,6 +2052,7 @@ Este es el **endpoint más importante del módulo Finance**. Construye un P&L op
 Query 1: Income (devengado por invoice_date)
   → greenhouse_finance.income
   → total_amount_clp, partner_share, record_count
+  → NUNCA effective_cost_amount_clp (esa columna es de expenses)
 
 Query 2: Collected Revenue (caja por payment_date)
   → greenhouse_finance.income_payments JOIN income
