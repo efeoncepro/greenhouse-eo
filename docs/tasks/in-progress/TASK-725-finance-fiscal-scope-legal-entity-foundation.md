@@ -592,6 +592,17 @@ Cerrar una task es obligatorio y forma parte de Definition of Done. Si la implem
 - Multi-country tax profiles.
 - Eventual deprecacion de `space_id` en `vat_monthly_positions` cuando no queden readers legacy.
 
+### Follow-ups de la auditoría adversarial (2026-06-20)
+
+Hallazgos del review post-implementación. Los 2 primeros **resueltos en la misma task**; el resto son riesgos **pre-existentes** del materializador (no introducidos por TASK-725) o gaps de data-quality → tasks/issues aparte.
+
+- ✅ **Resuelto:** signal `finance.vat.position_drift` ahora bucket-aware (cazaba falso-negativo si se dropea un solo bucket de un doc con crédito + no-recuperable). Copy del empty-state de la card → "entidad legal".
+- **[scope] Force-attribution a la operating entity única:** el materializador escribe `organization_id = operating entity` para TODO income/expense, ignorando el `organization_id` derivado por documento. Es **correcto hoy** (Greenhouse = libros de Efeonce; el cliente es contraparte, no dueño fiscal), pero para multi-entidad real habría que persistir un `legal_entity_organization_id` por documento (income/expense) y agrupar por él. Cubierto por el follow-up "Selector fiscal global / multi-entidad".
+- **[pre-existente, MED] Fallback FX a multiplicador 1:** `COALESCE(NULLIF(exchange_rate_to_clp,0),1)` en income/expense — un documento con IVA no-CLP y FX nulo/0 materializa el monto document como CLP (~900x sub-declarado), silencioso. Pre-existe a TASK-725. Follow-up: fail/quarantine + signal `vat.entry_unresolved_fx` para asientos no-CLP sin FX (IVA Chile es CLP, así que el caso es raro pero peligroso).
+- **[pre-existente, MED] Race de materialización concurrente:** `DELETE` por período + `INSERT` sin advisory lock; dos consumers reactivos del mismo período pueden pisarse. Pre-existe (misma forma per-space). Follow-up: `pg_advisory_xact_lock(hashtext(periodId))` al inicio de la tx.
+- **[pre-existente, MED] Cache de `getOperatingEntityIdentity()` sin invalidación en el ops-worker** (proceso long-lived): si la operating entity cambia (RUT/flag), el worker escribe la org stale hasta reiniciar. Primitive compartido (payroll/contractor también). Follow-up: `clearOperatingEntityCache()` en eventos de update de org, o TTL.
+- **[data-quality] Docs con IVA y `period_year`/`period_month` NULL** nunca se materializan en ningún período (pre-existe) y son invisibles al `position_drift`. Follow-up: signal de data-quality `vat.eligible_without_period` + remediación (stampear `tax_period`).
+
 ## Delta 2026-04-29
 
 Task creada tras detectar que el error visible de IVA mensual no es solo falta de `spaceId`, sino una deuda conceptual: IVA debe depender de entidad fiscal/legal, no de `space_id` operacional. La solucion robusta separa `legal_entity_id` de `space_id`, introduce resolver fiscal compartido y mantiene degradacion local del widget para no romper `/finance`.
