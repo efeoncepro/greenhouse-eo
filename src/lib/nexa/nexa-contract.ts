@@ -10,6 +10,8 @@ export type NexaToolName =
   | 'search_knowledge'
   | 'explain_my_pay'
   | 'propose_action'
+  | 'get_insight'
+  | 'list_insights'
 
 export type NexaToolMetricTone = 'default' | 'success' | 'warning' | 'error' | 'info'
 

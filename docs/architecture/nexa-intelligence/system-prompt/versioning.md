@@ -14,7 +14,7 @@ código. Define cómo Nexa habla, qué políticas aplica y su contrato de voz. P
 | Pieza | Valor |
 |---|---|
 | Familia | `home-chat` (`NEXA_SYSTEM_PROMPT_FAMILY`) |
-| Versión activa | `nexa-system-prompt.v2.0` (`NEXA_SYSTEM_PROMPT_V2_VERSION`) — modular |
+| Versión activa | `nexa-system-prompt.v2.3.0` (`NEXA_SYSTEM_PROMPT_V2_VERSION`) — modular. Última bump v2.3.0 (2026-06-19, clase `policy`): ruteo de Nexa Insights (`list_insights`/`get_insight`) en el módulo `toolRouting` — TASK-1181, Bridge Slice 1 |
 | Rollback | `nexa-system-prompt.v1` (`NEXA_SYSTEM_PROMPT_V1_VERSION`) — extracción **byte-equivalente** del prompt inline previo |
 | Flag de activación | `NEXA_SYSTEM_PROMPT_V2_ENABLED` (default OFF → V1) |
 

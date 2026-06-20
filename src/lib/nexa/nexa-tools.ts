@@ -8,6 +8,13 @@ import { getAgencyPulseKpis } from '@/lib/agency/agency-queries'
 import { readOrganizationAiSignals, type AiSignalListItem } from '@/lib/ico-engine/ai/read-signals'
 import { readOrganizationAiLlmEnrichments } from '@/lib/ico-engine/ai/llm-enrichment-reader'
 import type { OrganizationAiLlmEnrichmentItem } from '@/lib/ico-engine/ai/llm-types'
+import {
+  readNexaInsightDrill,
+  type NexaInsightDetailSnapshot,
+  type NexaInsightDrillSubject
+} from '@/lib/ico-engine/ai/nexa-insight-drill-reader'
+import { listNexaInsightsForPeriod } from '@/lib/ico-engine/ai/nexa-insight-list-reader'
+import { buildNexaInsightDrillHref } from '@/lib/ico-engine/ai/nexa-insight-href'
 import { ensureFinanceInfrastructure } from '@/lib/finance/schema'
 import { getFinanceProjectId, roundCurrency, runFinanceQuery, toNumber as toFinanceNumber } from '@/lib/finance/shared'
 import { ensureMemberCapacityEconomicsSchema, readLatestMemberCapacityEconomicsSnapshot } from '@/lib/member-capacity-economics/store'
@@ -994,6 +1001,207 @@ const proposeActionTool: NexaToolDefinition = {
   }
 }
 
+// ── get_insight / list_insights (TASK-1181 — Nexa Insight ↔ Conversation Bridge, Slice 1) ──
+// El chat se vuelve cliente del MISMO reader del insight que la page /nexa/insights (un primitive,
+// muchos consumers — Full API Parity). NUNCA queryea ico_ai_signal_enrichments directo: pasa por
+// readNexaInsightDrill / listNexaInsightsForPeriod, que ya aplican el subject anti-oracle (cliente
+// nunca ve; admin/route-group broad → todos; colaborador → self por member_id). El tool NO relaja la
+// autorización: deriva el subject del runtimeContext del turno (misma fuente que la page server) y deja
+// que el reader filtre. Disponible solo a tenants internos (mirror del primer gate del reader; un
+// cliente igual obtendría empty/not_found). Deep-link siempre via buildNexaInsightDrillHref.
+// Contrato: docs/architecture/GREENHOUSE_NEXA_INSIGHT_CONVERSATION_BRIDGE_V1.md §2.1.
+
+const buildInsightSubject = (tenant: NexaRuntimeContext): NexaInsightDrillSubject => ({
+  userId: tenant.userId,
+  tenantType: tenant.tenantType,
+  roleCodes: tenant.roleCodes,
+  routeGroups: tenant.routeGroups,
+  memberId: tenant.memberId ?? null
+})
+
+const SEVERITY_LABEL: Record<string, string> = {
+  critical: 'crítica',
+  warning: 'de atención',
+  info: 'informativa'
+}
+
+const describeInsight = (insight: NexaInsightDetailSnapshot): string => {
+  const severity = insight.severity ? `Severidad ${SEVERITY_LABEL[insight.severity] ?? insight.severity}.` : ''
+  const cause = insight.rootCauseNarrative || insight.explanationSummary
+  const causeText = cause ? ` ${cause}` : ''
+  const action = insight.recommendedAction ? ` Acción recomendada: ${insight.recommendedAction}.` : ''
+
+  return `Insight de ${insight.metricName || 'una métrica de delivery'} (${insight.signalType || 'señal'}). ${severity}${causeText}${action}`.trim()
+}
+
+const getInsightTool: NexaToolDefinition = {
+  declaration: {
+    name: 'get_insight',
+    description:
+      'Recupera un Nexa Insight de delivery/ICO por su ID (EO-AIS-*, EO-AIE-* o EO-AIH-*): explica la anomalía/predicción/causa raíz y la acción recomendada sobre una métrica (OTD, RpA, FTR) de un espacio/miembro/período. Úsalo cuando el usuario pregunta por un insight puntual o por la causa/detalle de una señal. Al responder, ofrece el enlace para profundizar. NO lo uses para el OTD en vivo (eso es get_otd) ni para definiciones/procesos (eso es search_knowledge).',
+    parametersJsonSchema: {
+      type: 'object',
+      additionalProperties: false,
+      properties: {
+        insightId: {
+          type: 'string',
+          description: 'El ID del insight (EO-AIS-*, EO-AIE-* o EO-AIH-*).'
+        }
+      },
+      required: ['insightId']
+    }
+  },
+  // Mirror del primer gate de subjectCanReadInsight: client tenants nunca acceden al detail V1.
+  isAvailable: tenant => tenant.tenantType === 'efeonce_internal',
+  async execute(args, context) {
+    const { tenant } = context
+    const insightId = typeof args.insightId === 'string' ? args.insightId.trim() : ''
+
+    if (!insightId) {
+      return buildToolUnavailableResult('get_insight', 'Falta el ID del insight a recuperar.')
+    }
+
+    const result = await readNexaInsightDrill(insightId, buildInsightSubject(tenant))
+
+    // not_found es anti-oracle: cubre id inexistente, shape inválido y subject sin acceso (indistinguibles).
+    if (result.state === 'not_found') {
+      return buildToolUnavailableResult('get_insight', 'No encontré ese insight, o no tienes acceso a él.')
+    }
+
+    if (result.state === 'degraded') {
+      return buildToolUnavailableResult('get_insight', 'No pude leer el insight en este momento. Intenta de nuevo más tarde.')
+    }
+
+    const { insight } = result
+    const drillHref = buildNexaInsightDrillHref(insight.signalId || insightId)
+
+    const stateNote =
+      result.state === 'superseded'
+        ? ' Nota: este insight fue superado por un análisis más reciente de la misma señal.'
+        : result.state === 'expired'
+          ? ' Nota: la anomalía ya se resolvió; no hay acción pendiente.'
+          : ''
+
+    const metrics: NexaToolResult['metrics'] = [
+      { label: 'Métrica', value: insight.metricName || 'Sin dato' },
+      {
+        label: 'Severidad',
+        value: insight.severity ? SEVERITY_LABEL[insight.severity] ?? insight.severity : 'Sin dato',
+        tone: insight.severity === 'critical' ? 'error' : insight.severity === 'warning' ? 'warning' : 'info'
+      }
+    ]
+
+    return {
+      available: true,
+      summary: `${describeInsight(insight)}${stateNote} Puedes ver el detalle completo en ${drillHref}.`,
+      source: 'postgres',
+      scopeLabel: 'Nexa Insights',
+      generatedAt: new Date().toISOString(),
+      metrics,
+      raw: {
+        state: result.state,
+        drillHref,
+        insight
+      }
+    }
+  }
+}
+
+const listInsightsTool: NexaToolDefinition = {
+  declaration: {
+    name: 'list_insights',
+    description:
+      'Lista los Nexa Insights (señales advisory de delivery/ICO sobre OTD, RpA y FTR) de un período, ordenados por severidad. Úsalo cuando el usuario pregunta qué insights/señales/anomalías hay en un período (su alcance lo define su acceso: la operación interna ve todo; un colaborador ve los suyos). Cada insight trae su ID para profundizar con get_insight. NO lo uses para el OTD en vivo (get_otd) ni para definiciones (search_knowledge).',
+    parametersJsonSchema: {
+      type: 'object',
+      additionalProperties: false,
+      properties: {
+        periodYear: {
+          type: 'integer',
+          description: 'Año del período (opcional; default: mes actual de Santiago).'
+        },
+        periodMonth: {
+          type: 'integer',
+          description: 'Mes 1-12 del período (opcional; default: mes actual de Santiago).'
+        }
+      }
+    }
+  },
+  isAvailable: tenant => tenant.tenantType === 'efeonce_internal',
+  async execute(args, context) {
+    const { tenant } = context
+    const current = getCurrentSantiagoPeriod()
+
+    const yearRaw = Number(args.periodYear)
+    const monthRaw = Number(args.periodMonth)
+    const periodYear = Number.isFinite(yearRaw) && yearRaw > 0 ? Math.floor(yearRaw) : current.year
+
+    const periodMonth =
+      Number.isFinite(monthRaw) && monthRaw >= 1 && monthRaw <= 12 ? Math.floor(monthRaw) : current.month
+
+    const result = await listNexaInsightsForPeriod(buildInsightSubject(tenant), { periodYear, periodMonth })
+
+    if (result.state === 'degraded') {
+      return buildToolUnavailableResult('list_insights', 'No pude leer los insights en este momento. Intenta de nuevo más tarde.')
+    }
+
+    if (result.state === 'empty-positive') {
+      return {
+        available: true,
+        summary: `No hay insights de delivery para ${result.periodLabel}.`,
+        source: 'postgres',
+        scopeLabel: 'Nexa Insights',
+        generatedAt: new Date().toISOString(),
+        metrics: [],
+        raw: { insights: [], totalCount: 0, periodLabel: result.periodLabel }
+      }
+    }
+
+    const top = result.insights.slice(0, 8)
+    const critical = result.insights.filter(insight => insight.severity === 'critical').length
+    const warning = result.insights.filter(insight => insight.severity === 'warning').length
+
+    const lines = top.map(insight => {
+      const sev = insight.severity ? SEVERITY_LABEL[insight.severity] ?? insight.severity : 'sin severidad'
+
+      return `- ${insight.metricName || 'métrica'} (${sev}): ${insight.explanationSummary || insight.rootCauseNarrative || 'sin resumen'} [${insight.signalId}]`
+    })
+
+    const metrics: NexaToolResult['metrics'] = [
+      { label: 'Total', value: String(result.totalCount) },
+      { label: 'Críticas', value: String(critical), tone: critical > 0 ? 'error' : 'default' },
+      { label: 'Atención', value: String(warning), tone: warning > 0 ? 'warning' : 'default' }
+    ]
+
+    return {
+      available: true,
+      summary: `Encontré ${result.totalCount} insight(s) para ${result.periodLabel}${critical > 0 ? `, ${critical} crítica(s)` : ''}. Más relevantes:\n${lines.join('\n')}`,
+      source: 'postgres',
+      scopeLabel: 'Nexa Insights',
+      generatedAt: new Date().toISOString(),
+      metrics,
+      raw: {
+        totalCount: result.totalCount,
+        periodLabel: result.periodLabel,
+        insights: top.map(insight => ({
+          signalId: insight.signalId,
+          enrichmentId: insight.enrichmentId,
+          metricName: insight.metricName,
+          signalType: insight.signalType,
+          severity: insight.severity,
+          explanationSummary: insight.explanationSummary,
+          recommendedAction: insight.recommendedAction,
+          spaceId: insight.spaceId,
+          memberId: insight.memberId,
+          periodYear: insight.periodYear,
+          periodMonth: insight.periodMonth,
+          drillHref: buildNexaInsightDrillHref(insight.signalId)
+        }))
+      }
+    }
+  }
+}
+
 const NEXA_TOOLS: Record<NexaToolName, NexaToolDefinition> = {
   check_payroll: checkPayrollTool,
   get_otd: getOtdTool,
@@ -1002,7 +1210,9 @@ const NEXA_TOOLS: Record<NexaToolName, NexaToolDefinition> = {
   pending_invoices: pendingInvoicesTool,
   search_knowledge: searchKnowledgeTool,
   explain_my_pay: explainMyPayTool,
-  propose_action: proposeActionTool
+  propose_action: proposeActionTool,
+  get_insight: getInsightTool,
+  list_insights: listInsightsTool
 }
 
 export const getNexaToolDeclarations = (tenant: NexaRuntimeContext): FunctionDeclaration[] =>

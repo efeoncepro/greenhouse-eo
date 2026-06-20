@@ -3,7 +3,7 @@
 > **Capa:** System prompt (contenido vigente). **Código:** [`src/lib/nexa/nexa-system-prompt.ts`](../../../../src/lib/nexa/nexa-system-prompt.ts) → `buildNexaSystemPromptV2`.
 > **Versionado:** [`01-system-prompt-versioning.md`](versioning.md).
 
-El prompt activo es **`nexa-system-prompt.v2.2.0`** (flag `NEXA_SYSTEM_PROMPT_V2_ENABLED`). Es
+El prompt activo es **`nexa-system-prompt.v2.3.0`** (flag `NEXA_SYSTEM_PROMPT_V2_ENABLED`). Es
 **modular**: un array de bloques que se compone por turno. La fecha runtime se inyecta
 determinista (`America/Santiago`). La política de Knowledge solo aparece con retrieval ON.
 
@@ -19,8 +19,10 @@ determinista (`America/Santiago`). La política de Knowledge solo aparece con re
    responder desde Knowledge habla del mecanismo, no afirma estado productivo sin un tool en vivo).
 3. **`userContext`** — nombre, rol, módulos disponibles, tareas pendientes, señal financiera (si hay).
 4. **`toolRouting`** — decide antes de responder: proceso/política/definición → `search_knowledge`;
-   dato operativo en vivo → tool operativo (NO Knowledge); conversación general → sin tool; tool no
-   disponible → dilo con honestidad.
+   dato operativo en vivo → tool operativo (NO Knowledge); **causa raíz / señales / anomalías de
+   delivery (OTD/RpA/FTR de un espacio/miembro/período) → `list_insights` / `get_insight`** (Nexa
+   Insights advisory, distinto del OTD vivo de `get_otd`; ofrecer el enlace del insight al citarlo —
+   v2.3.0, TASK-1181); conversación general → sin tool; tool no disponible → dilo con honestidad.
 5. **`knowledgePolicy`** (solo con retrieval ON) — **sintetizar** (no copiar un fragmento); citar
    `[n]` inline; **sin lista "Fuentes:"** (la UI es dueña); **nunca** Markdown estructural crudo
    (`##`, `#`, frontmatter); evidencia insuficiente → gap honesto; fuente stale/deprecated → declararlo;

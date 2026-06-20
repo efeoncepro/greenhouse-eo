@@ -3,6 +3,14 @@
 > **Capa:** retrieval del corpus + calidad de respuesta. **Código:** [`nexa-tools.ts`](../../../../src/lib/nexa/nexa-tools.ts), [`search-knowledge.ts`](../../../../src/lib/knowledge/search/search-knowledge.ts), [`rerank-knowledge-chunks.ts`](../../../../src/lib/knowledge/search/rerank-knowledge-chunks.ts), [`scripts/nexa-knowledge-qa-matrix.mjs`](../../../../scripts/nexa-knowledge-qa-matrix.mjs).
 > **Detalle técnico del RAG:** [`technical/rag-pipeline.md`](../technical/rag-pipeline.md).
 
+**Frontera con Nexa Insights (TASK-1181):** `nexa-tools.ts` también hospeda `get_insight` / `list_insights`
+(Bridge Slice 1), que NO son retrieval de Knowledge: son lectura insight-addressable del análisis advisory
+de delivery (OTD/RpA/FTR) vía los readers canónicos `readNexaInsightDrill` / `listNexaInsightsForPeriod`
+(subject anti-oracle reusado). El ruteo es explícito: definiciones/procesos → `search_knowledge`; causa raíz /
+señales de delivery → los insight tools; dato en vivo → `get_otd`. Detalle del ruteo en
+[`behavior/behavior-and-routing.md`](../behavior/behavior-and-routing.md); contrato en
+`GREENHOUSE_NEXA_INSIGHT_CONVERSATION_BRIDGE_V1.md`.
+
 ## De "pegar un fragmento" a "respuesta sintetizada"
 
 La meta de esta capa: que una respuesta respaldada por Knowledge sea una **respuesta propia que
