@@ -2,6 +2,13 @@
 
 > **Estado:** `released` (manifest transicionó a released, post-release health check verde). Orchestrator run [`27721723752`](https://github.com/efeoncepro/greenhouse-eo/actions/runs/27721723752) `completed/success`. Conducido por Claude tras pedido del operador ("paso a producción que Codex dejó preparado").
 
+## Sesión 2026-06-20 — Sample Sprints approval idempotente (staging verificado) — Codex
+
+> **Estado:** ✅ fix desplegado en staging. El operador veía en `/agency/sample-sprints/:id/approve` el error "Pending engagement approval was not found" al reintentar aprobar un Sample Sprint que ya estaba `approved`; el backend buscaba solo approvals `pending` y la UI seguía mostrando acciones de aprobación aunque el detail real estuviera finalizado.
+> - **Fix backend:** `approveEngagement()` ahora bloquea el approval row sin filtrar por `pending`; si ya está `approved`, devuelve el approval existente sin duplicar audit/outbox. `rejected/withdrawn` quedan como conflicto explícito.
+> - **Fix UI:** el tab Aprobación consume `detail.approval.status`, muestra "Sample Sprint aprobado" y deshabilita `Aprobar Sprint`/`Rechazar` cuando el approval está finalizado.
+> - **Rollout/evidencia:** commit `2a60f491f` en `origin/develop`; Vercel staging `greenhouse-rnil9pzpj-efeonce-7670142f.vercel.app` `Ready`; POST repetido por alias staging a `/api/agency/sample-sprints/svc-7bec41af-0aa8-4bec-a5ea-be92a9d7bdeb/approve` retorna HTTP 200 con `status=approved`. GVC: `.captures/2026-06-20T17-56-03_inline-agency-sample-sprints-svc-7bec41af-0aa8-4bec-a5ea-be92a9d7bdeb-approve`. Playwright DOM: estado aprobado visible, error viejo ausente, botones approve/reject disabled, `scrollWidth=clientWidth=1440`; sin console/page errors ni app 4xx/5xx.
+
 ## Sesión 2026-06-20 — TASK-1188 Posición mensual de retenciones F29 (COMPLETE, code-complete + shadow) — Claude
 
 > **Estado:** ✅ code-complete + shadow verificado. Child B de la umbrella TASK-1186 (segunda línea del F29 tras IVA/TASK-725).
