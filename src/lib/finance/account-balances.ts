@@ -1521,10 +1521,15 @@ export const getBankOverview = async ({
       }
     })
 
-  // TASK-705 — freshness signal: max(computed_at) across active accounts.
-  const freshnessRows = await queryRows<{ last_materialized_at: string | null } & Record<string, unknown>>(
+  // TASK-705 — freshness signal: max(computed_at) plus coverage date across active accounts.
+  const freshnessRows = await queryRows<{
+    last_materialized_at: string | null
+    latest_balance_date: string | null
+  } & Record<string, unknown>>(
     `
-      SELECT MAX(computed_at)::text AS last_materialized_at
+      SELECT
+        MAX(computed_at)::text AS last_materialized_at,
+        MAX(balance_date)::text AS latest_balance_date
       FROM greenhouse_finance.account_balances
       WHERE balance_date BETWEEN $1::date AND $2::date
     `,
@@ -1532,7 +1537,10 @@ export const getBankOverview = async ({
     client
   )
 
-  const freshness = buildFreshnessSignal(freshnessRows[0]?.last_materialized_at ?? null)
+  const freshness = buildFreshnessSignal(freshnessRows[0]?.last_materialized_at ?? null, {
+    latestBalanceDate: freshnessRows[0]?.latest_balance_date ?? null,
+    expectedFreshThroughDate: periodEnd
+  })
 
   return {
     period: {
@@ -1857,7 +1865,11 @@ export const getBankAccountDetail = async ({
   // TASK-705 — freshness signal por cuenta. computed_at del último snapshot daily.
   const computedAtRaw = currentBalance.computed_at
   const computedAtStr = computedAtRaw instanceof Date ? computedAtRaw.toISOString() : (computedAtRaw ?? null)
-  const accountFreshness = buildFreshnessSignal(computedAtStr)
+
+  const accountFreshness = buildFreshnessSignal(computedAtStr, {
+    latestBalanceDate: currentBalance.balance_date,
+    expectedFreshThroughDate: overview.period.endDate
+  })
 
   // TASK-706 — processor digest is only computed for payroll_processor accounts.
   // For everyone else this is `null`/undefined and the drawer renders the

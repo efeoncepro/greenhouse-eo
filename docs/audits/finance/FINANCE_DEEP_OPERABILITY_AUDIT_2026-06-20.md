@@ -55,7 +55,7 @@ Third pass after commits `20434dc49`, `6b622fa0d` and `d07dec5ce` reconfirmed th
 | Ledger/cash integrity | income settlement drift 0; income paid-without-active-payment 0; expense paid-without-active-payment 0; income/expense FX repair required 0/0 | pass |
 | DTE queue | `greenhouse_finance.dte_emission_queue` exists and has 0 rows | partial pass; scheduler still missing |
 | Bank balances | all 8 active accounts have latest `balance_date=2026-06-20` | cash snapshot pass |
-| Bank API freshness signal | staging `/api/finance/bank` returns HTTP 200, but `freshness.isStale=true` because `lastMaterializedAt` is ~10h old despite same-day balances | warning; likely over-sensitive UI signal |
+| Bank API freshness signal | staging `/api/finance/bank` returns HTTP 200, but `freshness.isStale=true` because `lastMaterializedAt` is ~10h old despite same-day balances | code fixed locally; rollout pending |
 | Payment orders | staging `/api/admin/finance/payment-orders` HTTP 200, total 9; DB paid-without-expense-payment 0 | pass with control warning |
 | Purchase orders | staging `/api/finance/purchase-orders` HTTP 200, 2 active POs, 6.903.000 CLP authorized | pass with low data volume |
 | Income / expenses summaries | staging `/api/finance/income/summary` and `/api/finance/expenses/summary` HTTP 200 | pass |
@@ -426,7 +426,7 @@ Sales/quotes data exists and line-item integrity looks healthy:
 
 But the write route scan found 20 `quotes` write routes without visible fine capability markers, including lifecycle and price-affecting routes (`issue`, `send`, `approve`, `cost-override`, `pricing/config`). Quote-to-cash should be included explicitly in the capability hardening plan, even though the immediate ECG-004 pricing data issue is resolved.
 
-### FD-13 - Bank freshness signal is over-sensitive for daily snapshots
+### FD-13 - Bank freshness signal was over-sensitive for daily snapshots
 
 Severity: `medium-low`
 
@@ -437,9 +437,20 @@ Staging `/api/finance/bank` returns HTTP 200 and all 8 active accounts have `bal
 - `freshness.isStale = true`
 - `freshness.label = Hace 10 h`
 
-Root cause candidate: `src/lib/finance/bank-freshness.ts` currently applies a 1-hour threshold to `computed_at`, while the canonical ops-worker balance materializer runs daily (`ops-finance-rematerialize-balances`) and the account snapshot date is already current. For a no-payment current day, a 10-hour-old computed snapshot can be faithful and should not necessarily render as stale.
+Root cause: `src/lib/finance/bank-freshness.ts` applied a 1-hour threshold to `computed_at`, while the canonical ops-worker balance materializer runs daily (`ops-finance-rematerialize-balances`) and the account snapshot date is already current. For a no-payment current day, a 10-hour-old computed snapshot can be faithful and should not render as stale.
 
-Recommended fix: adjust the freshness contract to consider both `computed_at` and the latest `balance_date`/expected period end. A current same-day balance should not warn purely because the daily cron ran in the morning; missing today's balance or a materializer older than the accepted daily SLA should still warn. Because this affects visible UI state, validate with a GVC pass on `/finance/bank` after implementation.
+Treatment applied locally:
+
+- `buildFreshnessSignal()` now accepts coverage metadata (`latestBalanceDate`, `expectedFreshThroughDate`) and treats a snapshot as fresh when the materialized balance date covers the requested period end.
+- `getBankOverview()` passes `MAX(balance_date)` plus `periodEnd`; `getBankAccountDetail()` passes the account snapshot `balance_date` plus the overview period end.
+- The computed-at threshold remains as fallback when coverage dates are unknown.
+- Anti-regression test covers:
+  - same-day covered snapshot with old `computed_at` -> not stale;
+  - stale when materialized balance date does not cover expected date;
+  - fallback threshold when coverage is unknown.
+- GVC local `/finance/bank` passed after webpack warmup: `.captures/2026-06-20T19-51-30_inline-finance-bank`. Frame and aria evidence show the page rendered without skeleton/login/error and without the stale snapshot banner; the separate FX materialization degraded warning remains visible.
+
+Remaining: deploy/re-smoke staging `/api/finance/bank`; staging will keep showing the old freshness behavior until deploy.
 
 ## What Is Ready
 
@@ -454,6 +465,7 @@ Recommended fix: adjust the freshness contract to consider both `computed_at` an
 - VAT legal-entity scope and fiscal period stamping are in place.
 - F29 consolidated reader has the right design and appears complete local-first.
 - PnL dashboard 500 root cause is fixed locally with a focused anti-regression test.
+- Bank freshness false warning has a local fix with focal tests and GVC evidence.
 - Staging confirms core read surfaces respond: dashboard summary, cashflow, bank, income summary, expense summary, payment orders, purchase orders, quote pricing lookup, VAT monthly and operational P&L.
 
 ## What Is Missing
@@ -474,7 +486,7 @@ Priority order if the goal is "Finance funciona y funciona bien":
 12. Decide finance AI signal source-of-truth before Nexa finance actions.
 13. Add navigation/viewCode for `/finance/external-signals`.
 14. Triage AR/AP backlog: 32 overdue receivables, 129 overdue payables, 70 unresolved external cash signals and pending/draft payment profiles.
-15. Fix or intentionally tune the bank freshness signal (`FD-13`), with GVC evidence because it changes visible state.
+15. Deploy/re-smoke the bank freshness signal fix (`FD-13`).
 16. Extend capability hardening beyond the original count: static scan now shows 123 write routes and 116 without visible fine capability markers, with `quotes` and `reconciliation` as the largest surfaces.
 
 ## Verification Performed
@@ -491,6 +503,10 @@ Priority order if the goal is "Finance funciona y funciona bien":
   - `pnpm pg:doctor`
   - Cloud SQL probes for core counts, canonical ledger/cash integrity, DTE queue, AR/AP backlog, F29/F22 readiness, CCA/OPL and handler health.
   - Staging API probes: `dashboard/summary` 200, `dashboard/cashflow` 200, `bank` 200, `income/summary` 200, `expenses/summary` 200, `admin/finance/payment-orders` 200, `purchase-orders` 200, `quotes/pricing/lookup?type=role` 200, `vat/monthly-position` 200, `intelligence/operational-pl?year=2026&month=6&scope=client` 200, `dashboard/pnl` 500, `f29/monthly-position` 404, `data-quality` 200 with stale raw ledger warnings, `admin/finance/ledger-health` 503 by design/backlog.
+- `pnpm exec vitest run src/lib/finance/bank-freshness.test.ts`
+- `pnpm exec vitest run src/lib/finance/bank-freshness.test.ts src/app/api/finance/cash-position/route.test.ts src/app/api/finance/dashboard/cashflow/route.test.ts`
+- `pnpm exec eslint src/lib/finance/bank-freshness.ts src/lib/finance/bank-freshness.test.ts src/lib/finance/account-balances.ts`
+- GVC local `/finance/bank`: first run blocked by initial webpack compile/skeleton; second run passed at `.captures/2026-06-20T19-51-30_inline-finance-bank`.
 - Static API route scan for `src/app/api/finance/**`, `src/app/api/admin/finance/**` and Finance-owned crons.
 - Read-only Cloud SQL probes for commercial/finance quotations, quote line orphans, AR/AP aging, payment profiles and external cash signals.
 - Read-only Cloud SQL probe comparing raw vs canonical data-quality ledger drift (`expense` raw 69 -> canonical 0; income settlement drift 0).
