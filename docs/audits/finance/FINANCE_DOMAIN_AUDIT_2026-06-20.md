@@ -157,11 +157,11 @@ En staging estos indicadores quedan stale. Además, `exchange-rates/sync` (USD/C
 - **ISSUE-055** — Quote builder no puede cotizar rol `ECG-004` (PR Analyst): el pricing engine no tiene cost basis para ese SKU (`Missing cost components for role ECG-004`).
 - **ISSUE-058** — Webhook `greenhouse-teams-finance-alerts-webhook` no provisionado en GCP Secret Manager (TASK-669 deploy pendiente) → alertas finance se saltan. Mitigado con flag `provisioning_status='pending_setup'`.
 
-### F6 — Cuatro tasks `in-progress` sin cerrar lifecycle (🟡 higiene)
+### F6 — Cuatro tasks `in-progress` sin cerrar lifecycle (✅ resuelto 2026-06-20)
 
-TASK-929 (ledger drift remediation), TASK-934 (unanchored expense ack), TASK-776 (temporal modes), TASK-871 (rolling anchor) aparecen como `in-progress` en el doc canónico; los invariantes están escritos pero el lifecycle no se movió a `complete`. Verificar estado real y cerrar o reflejar el bloqueo.
+TASK-929 (ledger drift remediation) y TASK-934 (unanchored expense ack) ya estaban en `complete`. El cleanup documental de 2026-06-20 actualizó el registry para TASK-776 (temporal modes) y TASK-871 (rolling anchor) a `complete`, corrigió sus rutas canónicas hacia `docs/tasks/complete/**` y removió TASK-871 de la tabla activa `In Progress` del README. No queda acción abierta para este hallazgo.
 
-### F7 — `commercial_cost_attribution` reactivo fallando por permisos de `greenhouse_serving` (🔴 management accounting)
+### F7 — `commercial_cost_attribution` reactivo fallando por permisos de `greenhouse_serving` (✅ resuelto 2026-06-20)
 
 Los handlers reactivos de `commercial_cost_attribution` aparecen en estado `failed`, con `infra.db_privilege / permission denied for schema greenhouse_serving`. Afecta eventos como:
 
@@ -182,13 +182,15 @@ Delta Codex 2026-06-20: se implementó el fix de código para que `ensureCommerc
 
 Evidencia post-rollout dev: la materialización con perfil runtime `greenhouse_app` ya no falla por permisos. Mayo 2026 materializó `3` filas de `commercial_cost_attribution` por `2,706,028.15` CLP de loaded cost y `operational_pl_snapshots` quedó con costo total `8,118,084.45` CLP. Junio 2026 sigue con `0` filas porque `greenhouse_serving.client_labor_cost_allocation_consolidated` también tiene `0` filas para junio; por tanto el remanente de junio ya no es F7/DDL sino falta de facts upstream de labor allocation.
 
-Tratamiento recomendado:
+Delta Codex TASK-1190 / ISSUE-102 2026-06-20: se expuso `--replay-failed-handlers` y `--handler=<key>` en `scripts/reactive-backfill.ts` para usar el soporte focal que ya existía en `processReactiveEvents`. El replay focal sobre los 9 handlers `commercial_cost_attribution:*` que estaban `failed` drenó `126` eventos, coalesció `4` scopes, ejecutó la materialización CCA sin fallos y dejó:
 
-- desplegar/reiniciar app + ops-worker con el runtime sin DDL;
-- reprocesar handlers fallidos después del deploy. El backlog normal `reactive:backfill --dry-run --domain=cost_intelligence` está vacío, pero `handler_health` aún conserva fallos históricos `commercial_cost_attribution:*` con `infra.db_privilege`; el replay local con `replayFailedHandlers=true` se colgó antes de emitir actividad en PG, así que debe reintentarse desde ops-worker desplegado o con una task de recovery focal;
-- confirmar que `handler_health` vuelve a `healthy` y que `outbox_reactive_log` no conserva dead letters no recuperados.
+- `greenhouse_sync.handler_health`: `21` handlers `commercial_cost_attribution:*` en `healthy`, `0` en `failed`;
+- `greenhouse_sync.outbox_reactive_log`: `0` dead letters activas CCA (`acknowledged_at IS NULL AND recovered_at IS NULL`);
+- mayo 2026 `commercial_cost_attribution`: `3` rows, `2,706,028.15` CLP loaded cost.
 
-### F8 — `operational_pl` de mayo/junio no es confiable como margen canónico (🔴 cost intelligence)
+No se devolvieron privilegios DDL al runtime.
+
+### F8 — `operational_pl` con costo upstream faltante no puede ser margen canónico (🟠 degradado honestamente)
 
 `commercial_cost_attribution` solo tiene materialización efectiva hasta abril 2026. En junio 2026, `operational_pl_snapshots` muestra revenue materializado, pero costo `0`. Ese patrón no debe presentarse como margen real; es una degradación de serving.
 
@@ -198,14 +200,16 @@ Impacto:
 - Nexa o cualquier insight financiero que use `operational_pl` puede producir recomendaciones con base incompleta;
 - cualquier cierre o baseline de margen mayo/junio debe quedar como provisional/degradado hasta rematerializar.
 
-Delta Codex 2026-06-20: mayo 2026 quedó rematerializado con costo, pero junio 2026 sigue degradado porque no existen rows en `client_labor_cost_allocation_consolidated` para ese período.
+Delta Codex TASK-1190 / ISSUE-102 2026-06-20: se agregó el health gate read-only `finance.operational_pl.cost_coverage_degraded` (`src/lib/reliability/queries/operational-pl-cost-coverage-degraded.ts`) y se conectó a Reliability Overview. El gate detecta períodos con `operational_pl_snapshots.revenue_clp > 0`, `total_cost_clp = 0` y sin filas upstream en `commercial_cost_attribution` ni `client_labor_cost_allocation_consolidated`; en ese caso retorna `severity='error'` y el resumen indica que ese margen no debe usarse como canónico.
 
-Tratamiento recomendado:
+Evidencia post-TASK-1190:
 
-- resolver F7 primero;
-- completar/materializar la fuente upstream de labor allocation para junio;
-- rematerializar `commercial_cost_attribution` y `operational_pl_snapshots` para junio;
-- agregar un health gate que marque `operational_pl` como degradado cuando falte cost attribution para el período.
+- mayo 2026 rematerializado: cada scope (`client`, `space`, `organization`) conserva `6,902,000.00` CLP revenue y `2,706,028.15` CLP cost;
+- junio 2026 rematerializado: cada scope conserva `6,902,000.00` CLP revenue y `0` cost porque no existe payroll period junio `approved/exported` ni rows en `client_labor_cost_allocation_consolidated`;
+- `member_capacity_economics` sí tiene junio (`27` rows, `5,256,512.00` CLP labor target), pero sin allocation cliente-período auditable no se infiere reparto comercial;
+- el gate detecta `4` períodos degradados históricos (`2025-11`, `2025-12`, `2026-01`, `2026-06`) con `24` snapshots y `94,707,468.00` CLP de revenue expuesto a costo upstream faltante.
+
+Tratamiento pendiente: completar la fuente payroll/labor allocation de junio por el flujo payroll/capacity normal antes de usar junio como baseline canónico de margen. Mientras tanto, F8 ya no es silencioso.
 
 ### F9 — Auditoría de permisos/capabilities route-by-route pendiente (🟠 controls)
 

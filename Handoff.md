@@ -2,11 +2,26 @@
 
 > **Estado:** `released` (manifest transicionó a released, post-release health check verde). Orchestrator run [`27721723752`](https://github.com/efeoncepro/greenhouse-eo/actions/runs/27721723752) `completed/success`. Conducido por Claude tras pedido del operador ("paso a producción que Codex dejó preparado").
 
+## Sesión 2026-06-20 — TASK-1190 Cost Intelligence recovery + Operational P&L gate — Codex
+
+> **Estado:** ✅ complete en dev/Cloud SQL. Cierra F7/F8 de la auditoría Finance sin devolver DDL al runtime: `commercial_cost_attribution:*` fue recuperado con replay focal (`reactive:backfill --replay-failed-handlers --handler=<key>`), y Operational P&L ahora tiene health gate para costo upstream faltante.
+> - **Código:** `scripts/reactive-backfill.ts` soporta `--replay-failed-handlers` + `--handler=<key>`; `materializeOperationalPl()` ya no oculta fallos técnicos de Cost Attribution; nuevo signal `finance.operational_pl.cost_coverage_degraded` en Reliability Overview.
+> - **Replay/runtime:** replay focal sobre 9 handlers CCA drenó `126` eventos, `scopeGroupsFailed=0`; `handler_health` quedó `21` CCA handlers `healthy`; dead letters activas CCA = `0`.
+> - **P&L data:** mayo 2026 CCA = `3` rows / `2,706,028.15` CLP loaded cost; Operational P&L mayo conserva costo `2,706,028.15` por scope. Junio 2026 mantiene revenue `6,902,000.00` y costo `0` por scope porque no existe payroll period junio `approved/exported` ni `client_labor_cost_allocation_consolidated`; no se inventó reparto desde `member_capacity_economics`.
+> - **Gate:** `finance.operational_pl.cost_coverage_degraded` retorna `error` con `4` períodos (`2025-11`, `2025-12`, `2026-01`, `2026-06`), `24` snapshots y `94,707,468.00` CLP revenue expuesto a costo upstream faltante. Esos márgenes no deben usarse como canónicos.
+> - **Verificación:** `task:lint TASK-1190`, `ops:lint --changed`, vitest focal `7/7`, `tsc --noEmit`, SQL before/after, replay focal y smoke del signal. Producción no fue mutada; la promoción va por release normal.
+
 ## Sesión 2026-06-20 — TASK harness UI/UX Goal Guard — Codex
 
 > **Estado:** docs/tooling local actualizado, sin rollout runtime. Se ajustó el harness TASK para que toda task con UI visible arranque con una meta verificable de calidad enterprise antes de JSX/copy: `CODEX_EXECUTION_PROMPT_V1` agrega `UI/UX GOAL GUARD`; `.codex/skills/greenhouse-task-execution-hook/SKILL.md` lo declara como hard gate; `.claude/commands/implement-task.md` fija `/goal TASK-### UI enterprise-ready`; `scripts/check-codex-task-harness.mjs` valida que no derive. La condición exige skills product design, decisión primitive reuse/extend/new, tokens/copy canónicos, GVC desktop+mobile con frames revisados, `scrollWidth==clientWidth` desktop+390px, sin overlaps/console errors y docs/gates sincronizados.
 > - **Verificación:** `pnpm codex:task-hook:check` verde antes del cierre documental; repetirlo si se toca de nuevo el prompt/hook/commands.
 > - **Pendiente:** ninguno runtime. No se creó ADR porque es endurecimiento compatible de un harness operativo existente, no cambio de arquitectura de producto.
+
+## Sesión 2026-06-20 — Finance audit hygiene F6 cleanup — Codex
+
+> **Estado:** ✅ higiene documental resuelta para el hallazgo F6 de la auditoría Finance. Se verificó que `TASK-929` y `TASK-934` ya estaban `complete`; se corrigió `docs/tasks/TASK_ID_REGISTRY.md` para que `TASK-776` y `TASK-871` apunten a `docs/tasks/complete/**`; se removió la fila stale de `TASK-871` en la tabla activa `In Progress` de `docs/tasks/README.md`; `ISSUE-069` ahora referencia la spec canónica en `complete/`; y la auditoría Finance marca F6 como resuelto.
+> - **Normalización adicional:** `TASK-871` tenía formato moderno incompleto; se agregó `Execution profile: backend-data`, `Backend impact: cron`, `## Backend/Data Contract` y `## Rollout Plan & Risk Matrix` basados en su cierre histórico.
+> - **Verificación:** `pnpm task:lint --task TASK-871`, `TASK-1185`, `TASK-1186`, `TASK-1187` todos `template=1/errors=0/warnings=0`; `pnpm task:lint --task TASK-776` queda `legacy=1/errors=0/warnings=0` (histórico completo, no migrado); `pnpm ops:lint --changed`, `pnpm docs:context-check` y `git diff --check` verdes. `docs:closure-check` solo deja warning conocido de monolito de arquitectura Finance.
 
 ## Sesión 2026-06-20 — TASK-725 Finance VAT re-scope a operating entity (ISSUE-101) — Claude
 

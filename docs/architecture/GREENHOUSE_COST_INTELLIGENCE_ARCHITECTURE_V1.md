@@ -403,6 +403,13 @@ P&L operativo por scope y período.
 | **Max retries** | 2 |
 | **Derived events** | `accounting.pl_snapshot.materialized`, `accounting.margin_alert.triggered` |
 
+#### Delta 2026-06-20 — Cost coverage degraded gate (TASK-1190)
+
+- `materializeOperationalPl()` ya no oculta errores técnicos de `materializeCommercialCostAttributionForPeriod`; si Cost Attribution falla, la materialización de P&L falla en vez de publicar snapshots silenciosamente incompletos.
+- Costo real `0` sigue permitido, pero costo desconocido no se trata como margen canónico. El signal `finance.operational_pl.cost_coverage_degraded` detecta períodos con revenue > 0, total cost = 0 y sin upstream en `commercial_cost_attribution` ni `client_labor_cost_allocation_consolidated`.
+- Si el signal está en `error`, los consumidores deben tratar esos snapshots como degradados hasta que la fuente payroll/labor allocation sea materializada por el flujo canónico.
+- Evidencia dev 2026-06-20: junio 2026 queda degradado porque no existe payroll period junio `approved/exported`; mayo 2026 conserva costo real.
+
 ## 7. APIs oficiales
 
 ### Runtime reads

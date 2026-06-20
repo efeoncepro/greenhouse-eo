@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const mockRunGreenhousePostgresQuery = vi.fn()
 const mockReadCommercialCostAttributionByClientForPeriod = vi.fn()
+const mockMaterializeCommercialCostAttributionForPeriod = vi.fn()
 
 vi.mock('@/lib/postgres/client', () => ({
   onGreenhousePostgresReset: () => () => {},
@@ -10,15 +11,18 @@ vi.mock('@/lib/postgres/client', () => ({
 }))
 
 vi.mock('@/lib/commercial-cost-attribution/member-period-attribution', () => ({
+  materializeCommercialCostAttributionForPeriod: (...args: unknown[]) =>
+    mockMaterializeCommercialCostAttributionForPeriod(...args),
   readCommercialCostAttributionByClientForPeriod: (...args: unknown[]) =>
     mockReadCommercialCostAttributionByClientForPeriod(...args)
 }))
 
-import { computeOperationalPl } from '@/lib/cost-intelligence/compute-operational-pl'
+import { computeOperationalPl, materializeOperationalPl } from '@/lib/cost-intelligence/compute-operational-pl'
 
 describe('computeOperationalPl', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    mockMaterializeCommercialCostAttributionForPeriod.mockResolvedValue({ rows: [], replaced: 0 })
   })
 
   it('computes client, space, and organization snapshots using net revenue semantics', async () => {
@@ -173,5 +177,13 @@ describe('computeOperationalPl', () => {
     expect(revenueQuery).toContain('LEFT JOIN greenhouse_finance.client_profiles cp')
     expect(revenueQuery).toContain('COALESCE(i.client_id, cp.client_id, i.organization_id, cp.organization_id) AS client_id')
     expect(revenueQuery).toContain('COALESCE(i.organization_id, cp.organization_id, cb.organization_id) AS organization_id')
+  })
+
+  it('does not publish operational P&L when commercial cost attribution fails technically', async () => {
+    mockMaterializeCommercialCostAttributionForPeriod.mockRejectedValueOnce(new Error('permission denied'))
+
+    await expect(materializeOperationalPl(2026, 6, 'test')).rejects.toThrow('permission denied')
+
+    expect(mockRunGreenhousePostgresQuery).not.toHaveBeenCalled()
   })
 })
