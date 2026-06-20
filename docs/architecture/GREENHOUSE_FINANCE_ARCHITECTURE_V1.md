@@ -1843,7 +1843,7 @@ Finance es el módulo más grande del portal: 49 API routes, 13 páginas, 28 arc
 
 Nota operativa:
 
-- `commercial_cost_attribution` existe en el schema snapshot y ya es contrato vigente del sistema, pero su DDL base sigue asegurado por runtime/store code además de las migraciones incrementales; todavía no vive como create-table canónico separado dentro de `scripts/` o una migración histórica dedicada.
+- `commercial_cost_attribution` existe en el schema snapshot y ya es contrato vigente del sistema. Desde el delta 2026-06-20 su DDL base vive en migración gobernada (`20260620141000000_commercial-cost-attribution-governed-ddl.sql`) y el runtime/store solo valida existencia + ejecuta DML/SELECT; no debe recuperar privilegios `CREATE` sobre `greenhouse_serving`.
 - `service_attribution_unresolved` acompaña a `service_attribution_facts` como cola auditable de casos ambiguos o sin evidencia suficiente; no debe tratarse como error silencioso ni como fallback inventado en UI.
 
 ### BigQuery Cutover Plan

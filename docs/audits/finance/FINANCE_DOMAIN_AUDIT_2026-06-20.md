@@ -178,11 +178,14 @@ Evidencia adicional: la auditoría de reliability del 2026-05-26 ya documentaba 
 
 Root cause probable: `src/lib/commercial-cost-attribution/store.ts:66` ejecuta `CREATE TABLE IF NOT EXISTS greenhouse_serving.commercial_cost_attribution` desde runtime mediante `ensureCommercialCostAttributionSchema()`. Ese DDL exige privilegios de schema que el rol runtime no debería necesitar. La proyección reactiva en `src/lib/sync/projections/commercial-cost-attribution.ts:157` invoca la materialización y hereda esa falla.
 
+Delta Codex 2026-06-20: se implementó el fix de código para que `ensureCommercialCostAttributionSchema()` deje de ejecutar DDL y solo valide la existencia de la tabla gobernada con `SELECT 1 FROM greenhouse_serving.commercial_cost_attribution LIMIT 1`. El DDL base + grants se movió a la migración forward-fix `20260620141000000_commercial-cost-attribution-governed-ddl.sql`. La migración quedó aplicada en Cloud SQL dev con `pnpm pg:connect:migrate` y `pnpm pg:connect:status` reporta `No migrations to run`.
+
+Evidencia post-rollout dev: la materialización con perfil runtime `greenhouse_app` ya no falla por permisos. Mayo 2026 materializó `3` filas de `commercial_cost_attribution` por `2,706,028.15` CLP de loaded cost y `operational_pl_snapshots` quedó con costo total `8,118,084.45` CLP. Junio 2026 sigue con `0` filas porque `greenhouse_serving.client_labor_cost_allocation_consolidated` también tiene `0` filas para junio; por tanto el remanente de junio ya no es F7/DDL sino falta de facts upstream de labor allocation.
+
 Tratamiento recomendado:
 
-- mover el DDL de `commercial_cost_attribution` a migración gobernada;
-- dejar runtime solo con DML/SELECT sobre tablas ya existentes;
-- reprocesar handlers fallidos después del fix;
+- desplegar/reiniciar app + ops-worker con el runtime sin DDL;
+- reprocesar handlers fallidos después del deploy. El backlog normal `reactive:backfill --dry-run --domain=cost_intelligence` está vacío, pero `handler_health` aún conserva fallos históricos `commercial_cost_attribution:*` con `infra.db_privilege`; el replay local con `replayFailedHandlers=true` se colgó antes de emitir actividad en PG, así que debe reintentarse desde ops-worker desplegado o con una task de recovery focal;
 - confirmar que `handler_health` vuelve a `healthy` y que `outbox_reactive_log` no conserva dead letters no recuperados.
 
 ### F8 — `operational_pl` de mayo/junio no es confiable como margen canónico (🔴 cost intelligence)
@@ -195,11 +198,13 @@ Impacto:
 - Nexa o cualquier insight financiero que use `operational_pl` puede producir recomendaciones con base incompleta;
 - cualquier cierre o baseline de margen mayo/junio debe quedar como provisional/degradado hasta rematerializar.
 
+Delta Codex 2026-06-20: mayo 2026 quedó rematerializado con costo, pero junio 2026 sigue degradado porque no existen rows en `client_labor_cost_allocation_consolidated` para ese período.
+
 Tratamiento recomendado:
 
 - resolver F7 primero;
-- rematerializar `commercial_cost_attribution` para mayo/junio;
-- rematerializar `operational_pl_snapshots`;
+- completar/materializar la fuente upstream de labor allocation para junio;
+- rematerializar `commercial_cost_attribution` y `operational_pl_snapshots` para junio;
 - agregar un health gate que marque `operational_pl` como degradado cuando falte cost attribution para el período.
 
 ### F9 — Auditoría de permisos/capabilities route-by-route pendiente (🟠 controls)

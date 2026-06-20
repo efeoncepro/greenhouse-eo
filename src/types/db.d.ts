@@ -6304,7 +6304,7 @@ export interface GreenhouseFinanceVatLedgerEntries {
   source_id: string;
   source_kind: string;
   source_public_ref: string | null;
-  space_id: string;
+  space_id: string | null;
   /**
    * How tenant isolation was resolved for the source row: quotation, client_bridge, or expense.
    */
@@ -6340,7 +6340,7 @@ export interface GreenhouseFinanceVatMonthlyPositions {
   period_id: string;
   period_month: number;
   period_year: number;
-  space_id: string;
+  space_id: string | null;
   vat_position_id: string;
 }
 

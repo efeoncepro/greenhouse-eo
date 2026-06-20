@@ -20,12 +20,15 @@ describe('commercial cost attribution store', () => {
     vi.clearAllMocks()
   })
 
-  it('creates the serving table schema', async () => {
+  it('checks the governed serving table without runtime DDL', async () => {
     mockRunGreenhousePostgresQuery.mockResolvedValue([])
 
     await ensureCommercialCostAttributionSchema()
 
     expect(mockRunGreenhousePostgresQuery).toHaveBeenCalledWith(
+      expect.stringContaining('FROM greenhouse_serving.commercial_cost_attribution')
+    )
+    expect(mockRunGreenhousePostgresQuery).not.toHaveBeenCalledWith(
       expect.stringContaining('CREATE TABLE IF NOT EXISTS greenhouse_serving.commercial_cost_attribution')
     )
   })

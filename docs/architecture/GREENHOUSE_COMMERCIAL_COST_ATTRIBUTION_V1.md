@@ -170,7 +170,13 @@ Regla:
 - los readers compartidos siguen pudiendo resumir por cliente para compatibilidad, pero ya cargan contexto organizacional en memoria.
 - `client_labor_cost_allocation` sigue siendo el bridge laboral histórico; el serving nuevo no vuelve a exponerse como contrato directo para consumers nuevos.
 - el cambio deja la tabla `org-aware`, no `org-enforced`: la lane agrega columna e índice, pero no introduce todavía `FK` ni `NOT NULL` sobre `organization_id`.
-- el create table base sigue estando garantizado por el runtime en `src/lib/commercial-cost-attribution/store.ts`; no existe aún una migración histórica dedicada que institucionalice todo el DDL inicial de esta serving table.
+
+## Delta 2026-06-20 — DDL gobernado para `commercial_cost_attribution`
+
+- `greenhouse_serving.commercial_cost_attribution` queda bajo ownership de migración gobernada mediante `migrations/20260620141000000_commercial-cost-attribution-governed-ddl.sql`.
+- `src/lib/commercial-cost-attribution/store.ts` ya no ejecuta `CREATE TABLE IF NOT EXISTS` ni otro DDL en runtime; el ensure del store solo valida que la tabla exista y falle rápido si el contrato no fue provisionado.
+- Los roles runtime (`greenhouse_app`, `greenhouse_runtime`) deben conservar DML/SELECT sobre la tabla, pero no requieren `CREATE` sobre `greenhouse_serving`.
+- Si esta tabla falta o el runtime reporta `permission denied for schema greenhouse_serving`, el fix correcto es aplicar migración/grants y replay de proyecciones, no devolver privilegios DDL al runtime.
 
 ## Estrategia de Cutover
 
