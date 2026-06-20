@@ -65,7 +65,7 @@ Veredicto arquitectónico (4 pilares) y razonamiento fiscal completo en TASK-725
 
 ## Estado
 
-open — **fix verificado en dev (TASK-725); cierre pendiente de deploy del ops-worker + validación F29.** El re-scope está aplicado y re-materializado en Cloud SQL dev con `finance.vat.position_drift=0` y el crédito fiscal entrando. Falta: (B) desplegar el ops-worker con el código nuevo (el desplegado corre el materializador viejo), y (C) cuadrar la cifra corregida vs el F29 real con el contador antes de baseline productivo.
+open — **fix verificado en dev/staging (TASK-725); cierre fiscal pendiente de validación F29.** El re-scope está aplicado y re-materializado en Cloud SQL dev con `finance.vat.position_drift=0` y el crédito fiscal entrando. El `ops-worker` ya fue desplegado con el materializador nuevo (`ops-worker-00375-fz7`, 100% tráfico, `GIT_SHA=a1c71840b...`). Falta cuadrar la cifra corregida vs el F29 real con el contador antes de baseline productivo.
 
 ## Delta 2026-06-20 — implementación TASK-725 (code-complete, rollout pendiente)
 
@@ -73,7 +73,7 @@ Re-scope implementado end-to-end en `develop` local-first (Slices 1–5). Precis
 
 **Verificación en dev (2026-06-20, autorizada):** migración `20260620131856180` aplicada + re-materialización con el código nuevo. Las 4 posiciones (mar–jun) quedaron ancladas a Efeonce Group SpA (`org-2df565fb`, RUT 77.357.182-1), `space_id=NULL`, con crédito fiscal entrando (mar $19.264 · abr $67.870 · may $21.594 · jun $16.048; antes $0). Net abril $1.102.000→$1.034.130 (rebajado por el crédito). `finance.vat.position_drift=0`.
 
-Pendiente para cierre total: (B) push develop + redeploy ops-worker (`services/ops-worker/deploy.sh`) para que el worker reactivo corra el materializador nuevo; (C) validación de la cifra corregida vs F29 real con contador.
+Pendiente para cierre total: validación de la cifra corregida vs F29 real con contador.
 
 ## Relacionado
 

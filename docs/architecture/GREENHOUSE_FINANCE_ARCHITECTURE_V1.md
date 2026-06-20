@@ -696,7 +696,7 @@ BigQuery queda solo como carril legacy de compatibilidad por slice, no como guar
 
 **Invariantes (agentes):** **NUNCA** particionar un agregado fiscal (IVA/F29 — y por extensión PPM/retenciones) por `space_id`/`client_id` (la SSOT fiscal es la entidad legal/RUT); **NUNCA** filtrar `space_id IS NOT NULL` en un cómputo fiscal (bota el overhead sin cliente); **SIEMPRE** emitir `finance.vat.position_drift` cuando el VAT mute; **SIEMPRE** validar la cifra corregida vs el F29 real antes de baseline productivo.
 
-**Rollout:** code-complete + verificado en dev (re-materializado, `position_drift=0`) y staging (endpoint HTTP 200 con `legalEntity`). Pendiente: redeploy del ops-worker (materializador reactivo) + validación F29 con contador. Spec: `docs/tasks/in-progress/TASK-725-finance-fiscal-scope-legal-entity-foundation.md`.
+**Rollout:** code-complete + verificado en dev (re-materializado, `position_drift=0`) y staging (endpoint HTTP 200 con `legalEntity`). El `ops-worker` reactivo ya corre el materializador nuevo desde la revisión `ops-worker-00375-fz7` (100% tráfico, `GIT_SHA=a1c71840b...`). Pendiente antes de baseline productivo: validación F29 con contador. Spec: `docs/tasks/in-progress/TASK-725-finance-fiscal-scope-legal-entity-foundation.md`.
 
 > **Nota:** el Delta de abajo (TASK-533) describe el modelo V1 por `space_id`, recontextualizado por este Delta. Se conserva como historia.
 
