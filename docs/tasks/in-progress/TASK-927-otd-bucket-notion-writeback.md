@@ -14,7 +14,7 @@ Esta task escribe el bucket/“días de retraso” por-tarea leyendo el M2 shado
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Medio`
