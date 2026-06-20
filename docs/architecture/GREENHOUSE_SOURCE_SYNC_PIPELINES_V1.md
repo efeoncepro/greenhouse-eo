@@ -1,5 +1,23 @@
 # Greenhouse Source Sync Pipelines V1
 
+## Delta 2026-06-20 — TASK-1209 proyección recurrente de facturas de exportación/exentas + visibilidad
+
+El step PG del sync Nubox (`upsertIncomeFromSale`) ya intentaba **cada** conformed sale por corrida (incluidas las facturas de exportación DTE 110/111/112), pero **toda factura exenta fallaba** registrada con `nubox_postgres_projection_failed` por el bug de exento de `buildIncomeTaxWriteFields` (ver Finance arch Delta TASK-1209). Con el fix, una factura de exportación válida con cliente resuelto **se materializa sola en el próximo sync** — sin scripts por cliente. Berel es fixture, no rama de código.
+
+**Contrato recurrente (modelo objetivo):**
+
+```text
+Nubox emite factura mensual
+  -> raw/conformed Nubox sales evidence
+  -> postgres_projection lee la conformed sale (readConformedSales)
+  -> org/client resuelto por identidad tributaria canónica
+  -> upsertIncomeFromSale escribe/actualiza greenhouse_finance.income (total = neto + IVA + exento)
+  -> finance.income.created outbox para income nuevo
+  -> reliability ok
+```
+
+**Visibilidad / failure taxonomy:** `writeSyncFailure` acepta `errorCode`; las fallas de projection de export DTE usan el código estable **`nubox_income_projection_failed`** con `nuboxDocumentId` en el payload. Signal nuevo **`finance.nubox_export.unprojected_invoice`** (`src/lib/reliability/queries/nubox-export-unprojected-invoice.ts`, kind `data_quality`, warning, steady=0) que cruza `source_sync_failures` (30d) contra `income.nubox_document_id` y **se auto-limpia** al materializarse el AR. Distinto de `finance.nubox_export.orphan_rfc` (RFC sin org, no se intenta) y `finance.nubox_export.foreign_amount_missing` (income existe sin plano nativo). Diagnóstico read-only: `scripts/finance/task-1209-unprojected-export-invoices-diagnostic.ts`. Owner operativo del signal: Finance Ops.
+
 ## Delta 2026-06-20 — TASK-1191 el step PG del sync Nubox estampa el período fiscal (F29)
 
 El step PG del sync Nubox (`upsertIncomeFromSale` / `upsertExpenseFromPurchase` en

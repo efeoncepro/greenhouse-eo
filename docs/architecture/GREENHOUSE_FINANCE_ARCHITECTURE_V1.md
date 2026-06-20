@@ -2,7 +2,17 @@
 
 > **Version:** 1.0
 > **Created:** 2026-03-30
-> **Last updated:** 2026-06-20 (TASK-1208 vocabulario contable canónico — income = factura/AR, no caja)
+> **Last updated:** 2026-06-20 (TASK-1209 income tax snapshot contabiliza el monto exento)
+
+## Delta 2026-06-20 — TASK-1209 income tax snapshot contabiliza el monto exento (export/exentos)
+
+**Causa raíz (verificada PG+BQ):** ninguna factura **exenta** se había proyectado jamás a `greenhouse_finance.income` (PG sólo tenía DTE 33 afecto + 61). El sync recurrente intentaba las facturas de exportación Berel (`28800562`, `29062197`) cada día con `client_id` resuelto, pero fallaban en `buildIncomeTaxWriteFields` con `totalAmount does not match the resolved tax snapshot (0)` (26 fallos en `source_sync_failures`). Una factura de exportación (DTE 110/111/112) es **100% exenta**: `net_amount=0`, todo el valor en `exempt_amount`. El builder computaba `expectedTotal = base_afecta + IVA` e **ignoraba el monto exento**, así que para un doc 100% exento daba `expectedTotal=0` y rechazaba el total real → bloqueaba la proyección de **toda** factura exenta (no sólo export: también DTE 34 factura exenta, 41 boleta exenta, NC exentas 61).
+
+**Invariante nuevo (income/AR):** el total documental de un income respeta la identidad del DTE chileno **`total = neto_afecto + IVA + exento`** (Monto Neto + IVA + Monto Exento = Monto Total). `buildIncomeTaxWriteFields` (`src/lib/finance/income-tax-snapshot.ts`) suma `exemptAmount` al `totalAmount` esperado/escrito. El **snapshot de impuesto se mantiene tax-puro** (`taxableAmount + IVA`, sin exento) porque `vat-ledger` lo lee como base afecta y el exento se reporta aparte como ventas exentas (F29). `subtotal` (base afecta) y `exemptAmount` son disjuntos por construcción del conformed Nubox y del contrato manual → no doble-cuenta. Facturas afectas (`exempt=0`) quedan bit-for-bit iguales.
+
+**Visibilidad (defensa en profundidad):** las fallas de projection de export DTE estampan el código estable `nubox_income_projection_failed` + `nuboxDocumentId` en `source_sync_failures`; nuevo signal `finance.nubox_export.unprojected_invoice` (kind `data_quality`, severity `warning`, steady=0, auto-clearing por cruce con `income.nubox_document_id`). Diagnóstico read-only `scripts/finance/task-1209-unprojected-export-invoices-diagnostic.ts`.
+
+**Pendiente operativo (rollout):** Berel pasa a fixture; con el fix el sync recurrente lo proyecta solo (apply real = próximo sync, gated por sign-off Finance + redeploy worker). Junio 2026 esperado tras repair: Sky $6.902.000 → Sky+Berel **$15.983.109** (apareció una 2ª factura Berel `29062197` desde que se escribió la spec). **Simetría latente:** `expense-tax-snapshot.ts:431` tiene el mismo patrón (compras exentas) — follow-up fuera del scope income.
 
 ## Delta 2026-06-20 — TASK-1208 Vocabulario contable canónico (factura/AR vs caja)
 

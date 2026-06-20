@@ -2,6 +2,28 @@
 
 > **Estado:** `released` (manifest transicionó a released, post-release health check verde). Orchestrator run [`27721723752`](https://github.com/efeoncepro/greenhouse-eo/actions/runs/27721723752) `completed/success`. Conducido por Claude tras pedido del operador ("paso a producción que Codex dejó preparado").
 
+## Sesión 2026-06-20 — TASK-1209 Nubox export/exempt invoice automatic income projection (code-complete, rollout pendiente) — Claude
+
+> **Estado:** **code-complete local-first, rollout pendiente** (sin push). Lifecycle `in-progress` (no se mueve a complete hasta apply Berel + worker redeploy + staging smoke con sign-off Finance).
+>
+> **Recalibración mayor de causa raíz (la spec estaba equivocada):** la hipótesis original (`!client_id` skip / foreign plane / cliente no resoluble) quedó desmentida por el Discovery. Verificado contra PG+BQ:
+> - Conformed tiene **dos** facturas de exportación Berel: `28800562` (folio 1, CLP 4.617.647) y `29062197` (folio 51, CLP 4.463.462) — ambas con `organization_id` Y `client_id` resueltos.
+> - Fallaban cada sync diario (26 fallos en `source_sync_failures`) con `totalAmount does not match the resolved tax snapshot (0)`.
+> - **Causa real (genérica de exentos, no de export/Berel):** una factura de exportación es 100% exenta (`net_amount=0`, todo en `exempt_amount`). `buildIncomeTaxWriteFields` computaba `expectedTotal = base_afecta + IVA` e ignoraba el exento → para 100% exento daba 0 y rechazaba el total. **0 facturas exentas proyectadas jamás** (PG income sólo DTE 33/61); 6 docs exentos bloqueados en conformed (2×110, 1×34, 1×41, 2×61).
+>
+> **Implementado (4 commits en develop, sin push):**
+> - Slice 2 — `buildIncomeTaxWriteFields` suma `exemptAmount` al total documental (identidad `total = neto + IVA + exento`); snapshot tax-puro intacto. Tests: exento puro (fixtures Berel) + mixto + afecto regresión + idempotencia + defensa preservada.
+> - Slice 3 — `writeSyncFailure` con `errorCode` estable (`nubox_income_projection_failed` para export DTE + `nuboxDocumentId` en payload); signal `finance.nubox_export.unprojected_invoice` (data_quality/warning/steady=0/auto-clearing) wired en `get-reliability-overview`; diagnóstico read-only.
+> - Slice 4 — dry-run live que prueba que **ambas** Berel proyectarían (total=exento, pending, due 2026-07-01). NO escribe.
+>
+> **Evidencia runtime:** PG read-only (Berel ausente, junio=Sky $6.902.000, 0 export DTEs en income, 26 fallos tax-snapshot); BQ conformed (2 Berel, amounts); diagnóstico live (2/2 MISSING con `client✓`); dry-run live (2/2 WOULD PROJECT); vitest focal verde (income-tax-snapshot-exempt 5/5, signal 4/4, nubox+postgres-store 87/87).
+>
+> **Rollout pendiente (requiere sign-off Finance + operador):** (1) apply real = correr el sync recurrente (proyecta Berel solo — NO se mutó la dev PG compartida); (2) redeploy del worker que corre el postgres_projection; (3) staging smoke verificando que `finance.nubox_export.unprojected_invoice` queda en 0 y junio sube a **$15.983.109** (Sky 6.902.000 + Berel 4.617.647 + 4.463.462 — la cifra $11.519.647 de la spec quedó desactualizada por la 2ª factura Berel).
+>
+> **Follow-up:** `expense-tax-snapshot.ts:431` tiene el bug simétrico para compras exentas (fuera del scope income de esta task).
+>
+> **Orphan de sesión previa (NO tocado):** working tree tenía `D in-progress/TASK-1207` (ya está en complete/, es cleanup) y `?? src/lib/reliability/queries/dte-emission-queue-health.ts` (untracked, otra sesión) — no incluidos en mis commits.
+
 ## Sesión 2026-06-20 — Commercial / Quote-to-Cash deep audit — Codex
 
 > **Estado:** auditoria documentada, sin cambios runtime. Se creó `docs/audits/commercial/COMMERCIAL_QUOTE_TO_CASH_DEEP_AUDIT_2026-06-20.md` y la categoría `docs/audits/commercial/`.

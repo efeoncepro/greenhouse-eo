@@ -381,7 +381,7 @@ Berel `28800562` is the acceptance fixture for the already-emitted historical in
 - [ ] Berel historical invoice `28800562` is repaired once, with native `89.960 MXN`, functional `4.617.647 CLP`, due date `2026-07-01`, `payment_status='pending'` and no duplicate income rows.
 - [ ] Future Berel invoices are explicitly covered by the recurring sync contract, not by a Berel-specific script.
 - [ ] Invalid or incomplete export invoices produce actionable `source_sync_failures` and reliability signals.
-- [ ] The Finance monthly facturación source includes Sky + Berel after historical repair (`$11.519.647` for June 2026, unless later Nubox data changes).
+- [ ] The Finance monthly facturación source includes Sky + Berel after historical repair. **Cifra recalibrada 2026-06-20:** apareció una 2ª factura Berel (`29062197`, folio 51, CLP 4.463.462) en conformed, así que el total junio 2026 esperado es **`$15.983.109`** (Sky 6.902.000 + Berel 4.617.647 + 4.463.462), no el `$11.519.647` original.
 - [ ] CLP-only income projection remains compatible and covered by regression tests.
 - [ ] Worker/runtime evidence proves the deployed sync path contains the projection changes and the required flags/env.
 - [ ] No UI-only or manual-only operating path is introduced.
@@ -415,6 +415,7 @@ Berel `28800562` is the acceptance fixture for the already-emitted historical in
 
 ## Follow-ups
 
+- **Simetría exento en expenses (compras).** `src/lib/finance/expense-tax-snapshot.ts:431` tiene el mismo patrón que el bug de income corregido en Slice 2 (`expectedTotalAmount = snapshot.totalAmount` sin sumar el exento). Las compras 100% exentas (DTE 34 de proveedor, etc.) podrían rechazarse igual. Fuera del scope income/AR de esta task; crear task derivada para el lado expense.
 - API/governed manual retry surface only if `TASK-1194` does not already cover the needed finance sync retry boundary.
 - Cash settlement of Berel payment when funds arrive in the Global66 MXN account.
 - Broader multi-country export invoice fixtures beyond Berel if another non-CLP finance-core client appears.
