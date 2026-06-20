@@ -5871,6 +5871,34 @@ export interface GreenhouseFinancePaymentProviderCatalog {
   updated_at: Generated<Timestamp>;
 }
 
+export interface GreenhouseFinancePpmMonthlyPositions {
+  base_amount_clp: Generated<Numeric>;
+  document_count: Generated<number>;
+  materialization_reason: string | null;
+  materialized_at: Generated<Timestamp>;
+  metadata: Generated<Json>;
+  organization_id: string | null;
+  period_id: string;
+  period_month: number;
+  period_year: number;
+  ppm_amount_clp: Generated<Numeric>;
+  ppm_position_id: string;
+  ppm_rate: Generated<Numeric>;
+  rate_source: string | null;
+}
+
+export interface GreenhouseFinancePpmRateConfig {
+  created_at: Generated<Timestamp>;
+  effective_period_end: string | null;
+  effective_period_start: string;
+  notes: string | null;
+  organization_id: string | null;
+  ppm_rate_config_id: string;
+  rate: Numeric;
+  source: Generated<string>;
+  updated_at: Generated<Timestamp>;
+}
+
 export interface GreenhouseFinanceProducts {
   billing_frequency: string | null;
   billing_period_count: number | null;
@@ -10492,6 +10520,8 @@ export interface DB {
   "greenhouse_finance.payment_order_state_transitions": GreenhouseFinancePaymentOrderStateTransitions;
   "greenhouse_finance.payment_orders": GreenhouseFinancePaymentOrders;
   "greenhouse_finance.payment_provider_catalog": GreenhouseFinancePaymentProviderCatalog;
+  "greenhouse_finance.ppm_monthly_positions": GreenhouseFinancePpmMonthlyPositions;
+  "greenhouse_finance.ppm_rate_config": GreenhouseFinancePpmRateConfig;
   "greenhouse_finance.products": GreenhouseFinanceProducts;
   "greenhouse_finance.purchase_orders": GreenhouseFinancePurchaseOrders;
   "greenhouse_finance.quote_line_items": GreenhouseFinanceQuoteLineItems;
