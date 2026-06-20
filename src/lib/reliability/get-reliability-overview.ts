@@ -108,6 +108,10 @@ import {
   getNotionMetricsWritebackLagSignal
 } from './queries/notion-metrics-rpa-signals'
 import {
+  getNotionMetricsOtdWritebackDeadLetterSignal,
+  getNotionMetricsOtdWritebackLagSignal
+} from './queries/notion-metrics-otd-writeback-signals'
+import {
   getNotionMetricsFtrWritebackDeadLetterSignal,
   getNotionMetricsFtrWritebackLagSignal
 } from './queries/notion-metrics-ftr-signals'
@@ -919,6 +923,7 @@ interface ReliabilityOverviewSources {
    * OFF) reportan steady (writeback skipea sin tocar attempt_count).
    */
   notionMetricsRpa?: ReliabilitySignal[] | null
+  notionMetricsOtdWriteback?: ReliabilitySignal[] | null
 
   /**
    * TASK-903 — FTR writeback signals (Efeonce/Sky). Roll up bajo moduleKey
@@ -1123,6 +1128,8 @@ export const buildReliabilityOverview = (
     ...(sources.notionStatusTransitions ?? []),
     // TASK-916 — Notion RpA V2 productive writeback signals (2).
     ...(sources.notionMetricsRpa ?? []),
+    // TASK-927 — Notion OTD writeback signals (Efeonce/Sky, daily batch).
+    ...(sources.notionMetricsOtdWriteback ?? []),
     ...(sources.notionMetricsFtr ?? []),
     // TASK-921 — Reschedule (due-date change) capture signals (2).
     ...(sources.notionMetricsReschedule ?? []),
@@ -2052,6 +2059,17 @@ export const getReliabilityOverview = async (
           .then(signals => signals.filter((s): s is NonNullable<typeof s> => s !== null))
           .catch(() => null)
 
+  // TASK-927 — Notion OTD writeback signals (Efeonce/Sky, daily batch).
+  const notionMetricsOtdWriteback =
+    preloadedSources.notionMetricsOtdWriteback !== undefined
+      ? preloadedSources.notionMetricsOtdWriteback
+      : await Promise.all([
+          getNotionMetricsOtdWritebackDeadLetterSignal().catch(() => null),
+          getNotionMetricsOtdWritebackLagSignal().catch(() => null)
+        ])
+          .then(signals => signals.filter((s): s is NonNullable<typeof s> => s !== null))
+          .catch(() => null)
+
   // TASK-903 — Notion FTR writeback signals (Efeonce/Sky).
   const notionMetricsFtr =
     preloadedSources.notionMetricsFtr !== undefined
@@ -2183,6 +2201,7 @@ export const getReliabilityOverview = async (
     notionMetricsDemo,
     notionStatusTransitions,
     notionMetricsRpa,
+    notionMetricsOtdWriteback,
     notionMetricsFtr,
     notionMetricsReschedule,
     attributableLateness
