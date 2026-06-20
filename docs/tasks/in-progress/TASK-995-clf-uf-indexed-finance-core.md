@@ -8,11 +8,14 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
 - Type: `implementation`
+- Execution profile: `backend-data`
+- UI impact: `none`
+- Backend impact: `migration`
 - Epic: `[optional EPIC-TBD]`
 - Status real: `Diseno`
 - Rank: `TBD`
@@ -97,11 +100,13 @@ Reglas obligatorias:
 - `src/lib/finance/economic-indicators.ts`
 - `src/lib/finance/exchange-rates.ts`
 - `src/lib/finance/multi-currency/**` (if/when TASK-990 lands this foundation)
+- `src/lib/finance/multi-currency/native-settlement.ts`
 - `src/lib/nubox/**` if any invoice/source-document projection carries UF-derived CLP evidence
 - `src/lib/finance/payment-obligations/**`
 - `src/lib/finance/payment-orders/**`
 - `src/lib/finance/account-balances.ts`
 - `src/lib/finance/income-settlement.ts`
+- `src/lib/reliability/queries/multi-currency-fx-signals.ts`
 
 ### Blocks / Impacts
 
@@ -149,6 +154,62 @@ Reglas obligatorias:
 - No existe contrato canonico para "cotizacion/contrato en UF, factura legal CLP, cobro CLP indexado a UF".
 - No existe decision aceptada sobre la fecha de conversion UF->CLP por evento: send, invoice emission, due date, payment date o contract-specific policy.
 - No existe reliability signal que detecte eventos CLF sin snapshot UF bloqueado o con settlement/revaluation mal clasificado.
+
+## Discovery Refresh 2026-06-20
+
+### Runtime evidence
+
+- `pnpm task:lint --task TASK-995` estaba en `errors=0 warnings=1`; el warning era la ausencia de `## Backend/Data Contract`. Este refresh lo vuelve requisito explicito antes de ejecucion.
+- `src/lib/finance/currency-domain.ts` y `src/lib/finance/contracts.ts` ya reflejan TASK-990: `finance_core = CLP | USD | MXN`; `CLF` sigue fuera de `FinanceCurrency` y `toFinanceCurrency('CLF')` falla por diseno.
+- `src/lib/finance/currency-registry.ts` ya declara `CLF` con provider `clf_from_indicators`, `compositionHub='CLP'`, `coverage='auto_synced'` y dominio solo `pricing_output`.
+- `src/lib/finance/fx/providers/clf-from-indicators.ts` resuelve CLP<->CLF desde `greenhouse_finance.economic_indicators` (`indicator_code='UF'`), no desde `exchange_rates`.
+- Runtime PostgreSQL tiene UF fresco: `economic_indicators.UF` con ultima fecha `2026-06-19` y 169 filas. En cambio `exchange_rates` solo tiene dos filas CLF obsoletas (`2026-04-20/21`), por lo que TASK-995 no debe basar readiness finance-core CLF en `exchange_rates` sin materializacion/adapter explicito.
+- Runtime PostgreSQL constrine `income.currency`, `expenses.currency`, `payment_obligations.currency`, `payment_orders.currency`, `payment_order_lines.currency`, `beneficiary_payment_profiles.currency`, `payment_order_processor_funding_policies.order_currency` y `fx_snapshots.from_currency/to_currency` a `CLP | USD | MXN`.
+- Runtime PostgreSQL ya tiene `income.native_amount/native_currency` y `expenses.native_amount/native_currency`, pero `payment_obligations` no tiene columnas native/indexed equivalentes. La task debe disenar esa extension en Slice 2 antes de cualquier CLF obligation.
+- `settlement_legs.currency` no tiene CHECK de moneda. Esto no habilita CLF cash; al contrario, TASK-995 debe agregar guardrail o signal para detectar cualquier leg UF accidental.
+- Datos actuales no contienen filas `CLF` en `fx_snapshots`, `settlement_legs` ni `accounts`. En `income` solo hay `CLP` sin native; en `expenses` hay `CLP/USD` sin native; no hay exposicion UF finance-core viva que migrar hoy.
+- Commercial ya tiene uso real de `CLF`: `greenhouse_finance.quotes` contiene 7 quotes CLF; products siguen CLP. La ejecucion debe preservar quoting CLF y no mezclar la migracion finance-core con el cotizador salvo para consumir evidencia/snapshots.
+
+### Semantic blockers before implementation
+
+- La logica TASK-990 de `native-settlement` asume que `native_currency` liquida en la misma moneda nativa. Eso es correcto para MXN/Berel, pero incorrecto para UF: un fact UF debe liquidar normalmente en CLP cash. Por tanto, no se puede permitir `native_currency='CLF'` en los ledgers actuales sin separar `native/indexed unit` de `settlement currency`.
+- `fx_snapshots` actualmente tipa y constrine `from_currency/to_currency` como `FinanceCurrency`. Para UF hay dos opciones aceptables que el ADR debe decidir: ampliar snapshots para unidades indexadas (`CLF -> CLP`) o crear una evidencia separada `indexed_unit_snapshots`. Hacer un cast de `CLF` a `FinanceCurrency` seria un bug.
+- Los helpers `CanonicalMoneySnapshot`, `FxSnapshotEvidence` y `MoneyAmount` usan `FinanceCurrency`; TASK-995 debe introducir `FinanceNativeUnit`/`IndexedUnit` sin contaminar `AccountCurrency` ni `SettlementCurrency`.
+- Los readers/signals de TASK-990 (`finance.fx.snapshot_missing`, `native_equivalent_drift`, `fx_gain_loss.unclassified`) pueden reutilizarse parcialmente, pero sus nombres/semantica apuntan a FX de moneda extranjera. UF necesita senales propias o parametrizadas para `indexed_unit_revaluation`.
+- Hay drift documental: `docs/documentation/finance/monedas-y-tipos-de-cambio.md` aun presenta partes de la plataforma CLF como `manual_only`, mientras el registry actual la declara `auto_synced`. La task debe corregir docs durante Slice 0/6 para que Finance no opere con una idea vieja de cobertura UF.
+
+### Pre-execution adjustment
+
+TASK-995 debe ejecutarse como migracion backend/data con ADR/delta obligatorio. El primer slice no debe escribir codigo funcional de CLF: debe cerrar el modelo de datos y la decision de policy UF->CLP por evento, y debe producir una tabla de invariantes por campo:
+
+| Campo/familia | Puede aceptar `CLF`? | Regla V1 |
+|---|---:|---|
+| `income.native_currency` / indexed unit | Si, tras ADR | Solo con snapshot UF->CLP y CLP funcional/legal bloqueado. |
+| `expenses.native_currency` / indexed unit | Si, tras ADR | Solo cuando el gasto/contrato este pactado en UF. |
+| `payment_obligations.native_currency` o equivalente | Si, tras schema nuevo | Debe producir orden/pago cash en CLP salvo instrumento futuro aprobado. |
+| `fx_snapshots` o `indexed_unit_snapshots` | Si, segun ADR | Debe representar `CLF -> CLP` desde UF y no mercado FX. |
+| `accounts.currency` | No | Cash account currency; rechazar UF. |
+| `payment_orders.currency` / `payment_order_lines.currency` | No | Ordenes V1 son cash-denominated; UF obligation genera CLP order. |
+| `settlement_legs.currency` | No | Leg representa cash/instrument movement real; UF accidental debe alertar/bloquear. |
+| `income_payments.currency` / `expense_payments.currency` | No por default | Pago real esperado en CLP para flujo UF chileno. |
+| `quotes.currency` | Ya si | Pricing/output CLF existente; no migrar ni romper. |
+
+## Backend/Data Contract
+
+- Execution profile: `backend-data`; cualquier UI visible o reporting card nuevo debe convertirse en task `ui-ux` dependiente.
+- ADR/delta requerido antes de codigo: aceptar `GREENHOUSE_CLF_INDEXED_FINANCE_CORE_V1` o delta explicito de `GREENHOUSE_MULTI_CURRENCY_FINANCE_CORE_V1`.
+- Schema V1 debe distinguir:
+  - `FinanceNativeUnit = CLP | USD | MXN | CLF` o shape equivalente.
+  - `IndexedUnit = CLF` para evidencia UF.
+  - `SettlementCurrency = CLP | USD | MXN`.
+  - `AccountCurrency = CLP | USD | MXN`.
+  - `PaymentOrderCurrency = CLP | USD | MXN`.
+- `CLF` no puede entrar a cuentas, payment order headers, payment order lines, settlement legs ni payment profile cash currency por default. Si el ADR descubriera un instrumento UF real, debe modelarse como rail/instrumento nuevo, no como enum oportunista.
+- El write path de income/expense/obligation debe persistir native/indexed amount, functional CLP, reporting USD y snapshot/evidence bloqueada. Readers no recalculan UF historica.
+- `payment_obligations` necesita migracion aditiva para native/indexed evidence antes de habilitar obligaciones UF.
+- Los triggers/functions de settlement deben distinguir `native foreign currency` de `indexed unit`; una UF fact no debe exigir pago `currency='CLF'`.
+- Todo cambio de constraints debe usar expand-and-contract con flags default OFF, dry-run/backfill allowlisted, expected mutation counts y rollback documentado.
+- Los reliability signals deben cubrir ausencia de snapshot, staleness UF, leakage de CLF a cash lanes, drift native-functional y revaluation no clasificada.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
