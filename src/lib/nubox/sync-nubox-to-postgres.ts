@@ -1082,12 +1082,17 @@ const writeSyncFailure = async ({
   runId,
   sourceObjectId,
   errorMessage,
-  payload
+  payload,
+  errorCode = 'nubox_postgres_projection_failed'
 }: {
   runId: string
   sourceObjectId: string
   errorMessage: string
   payload?: Record<string, unknown>
+  // TASK-1209 — stable error code so downstream reliability signals can target a
+  // specific failure class. Export-DTE income projection failures use
+  // `nubox_income_projection_failed`; the rest keep the generic default.
+  errorCode?: string
 }) => {
   await runGreenhousePostgresQuery(
     `INSERT INTO greenhouse_sync.source_sync_failures (
@@ -1095,16 +1100,26 @@ const writeSyncFailure = async ({
       source_object_id, error_code, error_message, payload_json, retryable
     )
     VALUES ($1, $2, 'nubox', 'postgres_projection',
-      $3, 'nubox_postgres_projection_failed', $4, $5::jsonb, TRUE)`,
+      $3, $6, $4, $5::jsonb, TRUE)`,
     [
       `fail-${randomUUID()}`,
       runId,
       sourceObjectId,
       errorMessage.slice(0, 2000),
-      JSON.stringify(payload || {})
+      JSON.stringify(payload || {}),
+      errorCode
     ]
   )
 }
+
+// TASK-1209 — export DTE codes whose income projection failures get the stable
+// `nubox_income_projection_failed` code + nuboxDocumentId in the payload so the
+// `finance.nubox_export.unprojected_invoice` reliability signal can join them
+// against greenhouse_finance.income and surface any export invoice that the
+// recurring sync attempted but could not materialize.
+const EXPORT_DTE_CODES = new Set(['110', '111', '112'])
+
+export const NUBOX_EXPORT_PROJECTION_FAILED_CODE = 'nubox_income_projection_failed'
 
 // ─── Main Sync Function ────────────────────────────────────────────────────
 
@@ -1153,13 +1168,20 @@ export const syncNuboxToPostgres = async (): Promise<SyncNuboxToPostgresResult> 
         const message = error instanceof Error ? error.message : String(error)
 
         console.error(`[nubox-postgres-projection] sale ${sale.nubox_sale_id} failed:`, error)
+        const isExportDte = EXPORT_DTE_CODES.has(sale.dte_type_code ?? '')
+        const numericSaleId = Number(sale.nubox_sale_id)
+
         await writeSyncFailure({
           runId: syncRunId,
           sourceObjectId: `sale:${sale.nubox_sale_id ?? 'unknown'}`,
           errorMessage: message,
+          errorCode: isExportDte ? NUBOX_EXPORT_PROJECTION_FAILED_CODE : undefined,
           payload: {
             phase: sale.dte_type_code === '52' || sale.dte_type_code === 'COT' ? 'quote' : 'income',
             nuboxSaleId: sale.nubox_sale_id,
+            // Numeric form joins against income.nubox_document_id (bigint) so the
+            // unprojected-invoice signal can self-clear once the row materializes.
+            nuboxDocumentId: Number.isFinite(numericSaleId) ? numericSaleId : null,
             dteTypeCode: sale.dte_type_code,
             folio: sale.folio,
             clientRut: sale.client_rut

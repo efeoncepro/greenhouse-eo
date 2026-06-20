@@ -39,6 +39,7 @@ import { getEntraWebhookSubscriptionHealthSignal } from './queries/entra-webhook
 import { getExpensePaymentsClpDriftSignal } from './queries/expense-payments-clp-drift'
 import { getLedgerUnresolvedDriftItemsSignal } from './queries/ledger-unresolved-drift-items'
 import { getNuboxExportOrphanRfcSignal } from './queries/nubox-export-orphan-rfc'
+import { getNuboxExportUnprojectedInvoiceSignal } from './queries/nubox-export-unprojected-invoice'
 import { getPaymentOrderMixedCurrencySignal } from './queries/payment-order-mixed-currency'
 import { getFxGainLossUnclassifiedSignal } from './queries/fx-gain-loss-unclassified'
 import {
@@ -670,6 +671,7 @@ interface ReliabilityOverviewSources {
 
   /** TASK-990 Slice 4 — Nubox export RFC sin organización (disposición pendiente). */
   nuboxExportOrphanRfc?: ReliabilitySignal | null
+  nuboxExportUnprojectedInvoice?: ReliabilitySignal | null
 
   /** TASK-990 Slice 6 — payment order con currency distinta a sus obligations. */
   paymentOrderMixedCurrency?: ReliabilitySignal | null
@@ -1071,6 +1073,7 @@ export const buildReliabilityOverview = (
     ...(sources.accountBalancesFxDrift ? [sources.accountBalancesFxDrift] : []),
     ...(sources.ledgerUnresolvedDriftItems ? [sources.ledgerUnresolvedDriftItems] : []),
     ...(sources.nuboxExportOrphanRfc ? [sources.nuboxExportOrphanRfc] : []),
+    ...(sources.nuboxExportUnprojectedInvoice ? [sources.nuboxExportUnprojectedInvoice] : []),
     ...(sources.paymentOrderMixedCurrency ? [sources.paymentOrderMixedCurrency] : []),
     ...(sources.fxGainLossUnclassified ? [sources.fxGainLossUnclassified] : []),
     ...(sources.mxnRateFreshness ? [sources.mxnRateFreshness] : []),
@@ -1558,6 +1561,11 @@ export const getReliabilityOverview = async (
     preloadedSources.nuboxExportOrphanRfc !== undefined
       ? preloadedSources.nuboxExportOrphanRfc
       : await getNuboxExportOrphanRfcSignal().catch(() => null)
+
+  const nuboxExportUnprojectedInvoice =
+    preloadedSources.nuboxExportUnprojectedInvoice !== undefined
+      ? preloadedSources.nuboxExportUnprojectedInvoice
+      : await getNuboxExportUnprojectedInvoiceSignal().catch(() => null)
 
   const paymentOrderMixedCurrency =
     preloadedSources.paymentOrderMixedCurrency !== undefined
@@ -2232,6 +2240,7 @@ export const getReliabilityOverview = async (
     accountBalancesFxDrift,
     ledgerUnresolvedDriftItems,
     nuboxExportOrphanRfc,
+    nuboxExportUnprojectedInvoice,
     paymentOrderMixedCurrency,
     fxGainLossUnclassified,
     mxnRateFreshness,
