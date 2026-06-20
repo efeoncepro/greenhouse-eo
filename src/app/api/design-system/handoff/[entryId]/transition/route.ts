@@ -39,8 +39,12 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ en
     return canonicalErrorResponse('invalid_design_handoff_transition')
   }
 
-  const { entryId } = await params
+  // Capturar el valor narrowed ANTES de cualquier `await`: el type-guard estrecha
+  // `body.toStatus` a DesignHandoffStatus, pero TS re-ensancha el narrowing de la
+  // propiedad de un `let` mutable al cruzar el `await params` (lo atrapa el TS-pass
+  // de `next build`, no `tsc --noEmit`).
   const toStatus = body.toStatus
+  const { entryId } = await params
 
   try {
     return await runDesignHandoffCommand({
