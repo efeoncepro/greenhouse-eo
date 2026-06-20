@@ -2,7 +2,16 @@
 
 > **Version:** 1.0
 > **Created:** 2026-03-30
-> **Last updated:** 2026-06-20 (PnL dashboard income query hardening + TASK-1195 posición F29 mensual consolidada)
+> **Last updated:** 2026-06-20 (TASK-1204 exclusión de documentos anulados del F29 + corrección tasa PPM)
+
+## Delta 2026-06-20 — TASK-1204 F29 fiscal accuracy: exclusión de anulados + tasa PPM (cierra ISSUE-105)
+
+Detectado en validación contable real del F29 mayo 2026 vs SII (el contador comparó el portal contra el F29 oficial). El IVA cuadraba al peso, pero la retención sobre-declaraba $107.970 y el PPM era el doble. Dos causas, ambas corregidas en causa raíz:
+
+- **Invariante nuevo — exclusión de documentos anulados (lado expenses).** Una boleta de honorarios anulada en SII/Nubox (`document_status_name='Anulada'`) seguía contando en la posición de retención porque (a) el sync Nubox derivaba `is_annulled` solo del booleano de Nubox (no del status autoritativo), y (b) el materializador de retención no excluía anulados. **Invariante:** `sii_document_status='Anulada'` ⇒ `is_annulled=true`, y **todo materializador fiscal que lea documentos de fuente excluye anulados** (`is_annulled=false`) — espeja el filtro que el materializador de income ya aplicaba. Fix: helper `isNuboxPurchaseAnnulled` (`sync-nubox-to-postgres.ts`, deriva de status + booleano) + guard `AND COALESCE(e.is_annulled,false)=false` en `retention-ledger.ts` + backfill (migration `20260620205300001`, 2 docs) + re-materialización.
+- **Tasa PPM confirmada.** TASK-1189 sembró `ppm_rate_config` con placeholder 0,25% (`source='placeholder_pending_contador'`); el F29 real confirma **0,125%**. Corregida a 0,00125 (migration `20260620205224350`, `source='sii_f29_confirmed_2026'`) + re-materialización PPM.
+
+Resultado: F29 mayo 2026 cuadra **al peso** con el SII — retención 134.653, PPM 7.250, IVA 1.080.405, total 1.222.308. **Hard rules:** NUNCA derivar `is_annulled` solo del booleano de Nubox (usar el status autoritativo); NUNCA un materializador fiscal cuenta documentos anulados; la tasa PPM vive en `ppm_rate_config` (SSOT), NUNCA hardcode. Detalle en ISSUE-105 + TASK-1204.
 
 ## Delta 2026-06-20 — PnL dashboard income query hardening
 

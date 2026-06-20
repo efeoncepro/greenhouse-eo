@@ -2,6 +2,17 @@
 
 > **Estado:** `released` (manifest transicionó a released, post-release health check verde). Orchestrator run [`27721723752`](https://github.com/efeoncepro/greenhouse-eo/actions/runs/27721723752) `completed/success`. Conducido por Claude tras pedido del operador ("paso a producción que Codex dejó preparado").
 
+## Sesión 2026-06-20 — TASK-1204 F29 fiscal accuracy: exclusión de anulados + tasa PPM (COMPLETE, cierra ISSUE-105) — Claude
+
+> **Estado:** ✅ complete, local-first en `develop`. Surgió de la validación contable real del F29 mayo 2026 vs SII. El IVA cuadraba al peso; la retención sobre-declaraba $107.970 y el PPM era el doble.
+> - **Causa raíz #1 (bug class):** boleta de honorarios anulada en SII/Nubox (`document_status_name='Anulada'`, folio 40) seguía contando en retención porque el sync derivaba `is_annulled` solo del booleano y el materializador de retención no excluía anulados (income sí). Fix: helper `isNuboxPurchaseAnnulled` + guard `is_annulled` en `retention-ledger.ts` + backfill (2 docs) + re-materialización.
+> - **Causa raíz #2:** tasa PPM placeholder 0,25% → **0,125%** real (confirmada por el contador). `ppm_rate_config` corregida (migration) + re-materialización.
+> - **Verificación (PG real):** mayo 2026 cuadra **al peso** con el SII → retención **134.653**, PPM **7.250**, IVA 1.080.405, total **1.222.308**.
+> - **Gates:** full suite **7486** + build verde + tests (annulled mapping + retention guard). 2 migrations aplicadas en Cloud SQL dev.
+> - **Rollout pendiente:** deploy staging (local-first). La **oficialización** (flip de flags) la maneja **TASK-1203** (downstream).
+> - **Docs:** ISSUE-105 (resolved), Finance arch Delta, changelog, registry, este handoff.
+> - **⚠️ Convivencia Claude+Codex:** Codex hizo `git add -A` + commit (`1ea153782`) que barrió mi WIP de TASK-1204 y lo mezcló con sus task creations. Trabajo preservado y correcto, pero commit mixto. **Recomendación:** serializar agentes o usar git worktrees separados — dos agentes en el mismo working tree causó contaminación cruzada repetida.
+
 ## Sesión 2026-06-20 — TASK-1197 UI Posición F29 mensual consolidada (COMPLETE + staging verificado) — Claude
 
 > **✅ Staging verificado (Runtime Rollout Completion Gate cerrado, 2026-06-20):** push a `develop` (`f381d138a..777d486ba`, deploy Vercel staging Ready). `pnpm staging:request /api/finance/f29/monthly-position` → **HTTP 200** con las 3 líneas + `legalEntity` (TASK-1195 operativamente completo). **GVC del card en staging** (`dev-greenhouse`, scenario `finance-f29-consolidated` `--env=staging`, 2 frames mirados): el card propaga el **estado real de flags** — IVA **Oficial** + Retenciones **Oficial** (`RETENTION_POSITION_ENABLED=true` en staging) + PPM **En validación** (flag OFF). La distinción oficial/shadow por línea funciona end-to-end con datos reales.

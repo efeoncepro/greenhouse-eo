@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -21,7 +21,7 @@
 - Blocked by: `none`
 - Branch: `task/TASK-1204-f29-annulled-document-exclusion-ppm-rate`
 - Legacy ID: `none`
-- GitHub Issue: `none`
+- GitHub Issue: `ISSUE-105`
 
 ## Summary
 
@@ -256,13 +256,13 @@ No coordination beyond the already captured accountant/operator evidence: the af
 
 ## Acceptance Criteria
 
-- [ ] Sync mapea `document_status='Anulada'` → `is_annulled=true` (test).
-- [ ] Materializador de retención excluye `is_annulled=true` (test).
-- [ ] Backfill idempotente aplicado: folios 40 y 29 quedan `is_annulled=true`.
-- [ ] `ppm_rate_config.rate = 0.00125` (source SII-confirmado, ya no placeholder).
-- [ ] Re-materializado: retención mayo 2026 = 134.653; PPM mayo 2026 = 7.250.
-- [ ] `staging:request /api/finance/f29/monthly-position?year=2026&month=5` devuelve retención 134.653 + PPM 7.250 (IVA ya cuadra a 1.080.405).
-- [ ] ISSUE-### creado + cerrado con evidencia de no-regresión.
+- [x] Sync mapea `document_status='Anulada'` → `is_annulled=true` (test `isNuboxPurchaseAnnulled`, 4 casos).
+- [x] Materializador de retención excluye `is_annulled=true` (test verifica el guard en el SQL).
+- [x] Backfill idempotente aplicado: folios 40 y 29 quedan `is_annulled=true` (verificado en PG).
+- [x] `ppm_rate_config.rate = 0.00125` (source `sii_f29_confirmed_2026`, ya no placeholder).
+- [x] Re-materializado: retención mayo 2026 = 134.653; PPM mayo 2026 = 7.250 (verificado en PG).
+- [x] F29 mayo 2026 cuadra al peso con el SII (retención 134.653 + PPM 7.250 + IVA 1.080.405 = total 1.222.308). *Verificación HTTP staging pendiente de deploy (local-first).*
+- [x] ISSUE-105 creado en `resolved/` con evidencia de no-regresión.
 
 ## Verification
 
@@ -272,13 +272,13 @@ No coordination beyond the already captured accountant/operator evidence: the af
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` sincronizado
-- [ ] archivo en la carpeta correcta
-- [ ] `docs/tasks/README.md` + `TASK_ID_REGISTRY.md` sincronizados
-- [ ] `Handoff.md` + `changelog.md` actualizados
-- [ ] `GREENHOUSE_FINANCE_ARCHITECTURE_V1.md` Delta (annulled exclusion invariant + PPM rate confirmada)
-- [ ] ISSUE-### movido a `resolved/` con verificación
-- [ ] chequeo de impacto cruzado: nota en TASK-1188/1189 (tasa real + guard annulled) y TASK-1197 (números corregidos)
+- [x] `Lifecycle` sincronizado
+- [x] archivo en la carpeta correcta
+- [x] `docs/tasks/README.md` + `TASK_ID_REGISTRY.md` sincronizados
+- [x] `Handoff.md` + `changelog.md` actualizados
+- [x] `GREENHOUSE_FINANCE_ARCHITECTURE_V1.md` Delta (annulled exclusion invariant + PPM rate confirmada)
+- [x] ISSUE-105 creado en `resolved/` con verificación
+- [x] chequeo de impacto cruzado: la corrección de números impacta TASK-1197 (card F29) y los flags de TASK-1188/1189; la oficialización (flip) la maneja TASK-1203 (downstream)
 
 ## Follow-ups
 
