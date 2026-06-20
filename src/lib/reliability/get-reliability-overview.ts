@@ -157,6 +157,7 @@ import { getPayrollContractTaxonomyInvalidStatutoryApplicationSignal } from './q
 import { getProviderBqSyncDeadLetterSignal } from './queries/provider-bq-sync-dead-letter'
 import { getVatPositionDriftSignal } from './queries/vat-position-drift'
 import { getRetentionPositionDriftSignal } from './queries/retention-position-drift'
+import { getPpmPositionDriftSignal } from './queries/ppm-position-drift'
 import { getVatEntryUnresolvedFxSignal } from './queries/vat-entry-unresolved-fx'
 import { getVatEligibleWithoutPeriodSignal } from './queries/vat-eligible-without-period'
 import { getHubspotCompaniesIntakeDeadLetterSignal } from './queries/hubspot-companies-intake-dead-letter'
@@ -604,6 +605,9 @@ interface ReliabilityOverviewSources {
   /** TASK-1188 — Retention position drift (BHE con retención sin asiento en períodos materializados). */
   retentionPositionDrift?: ReliabilitySignal | null
 
+  /** TASK-1189 — PPM position drift (posición PPM con base stale vs income real). */
+  ppmPositionDrift?: ReliabilitySignal | null
+
   /** TASK-1082 — Knowledge ingestion signals (quarantine count + failed sync source). */
   knowledgeQuarantineCount?: ReliabilitySignal | null
   knowledgeSyncFailedSource?: ReliabilitySignal | null
@@ -1043,6 +1047,8 @@ export const buildReliabilityOverview = (
     ...(sources.vatEligibleWithoutPeriod ? [sources.vatEligibleWithoutPeriod] : []),
     // TASK-1188 — Retention position drift (línea retenciones del F29).
     ...(sources.retentionPositionDrift ? [sources.retentionPositionDrift] : []),
+    // TASK-1189 — PPM position drift (línea PPM del F29).
+    ...(sources.ppmPositionDrift ? [sources.ppmPositionDrift] : []),
     // TASK-878 Slice 2 — HubSpot companies intake dead-letter (async webhook path).
     ...(sources.hubspotCompaniesIntakeDeadLetter ? [sources.hubspotCompaniesIntakeDeadLetter] : []),
     // TASK-878 follow-up — Identity UX hardening: internal users sin member enlazado.
@@ -1452,6 +1458,12 @@ export const getReliabilityOverview = async (
     preloadedSources.retentionPositionDrift !== undefined
       ? preloadedSources.retentionPositionDrift
       : await getRetentionPositionDriftSignal().catch(() => null)
+
+  // TASK-1189 — PPM position drift (línea PPM del F29). Degrada honesto si falla.
+  const ppmPositionDrift =
+    preloadedSources.ppmPositionDrift !== undefined
+      ? preloadedSources.ppmPositionDrift
+      : await getPpmPositionDriftSignal().catch(() => null)
 
   // TASK-878 Slice 2 — HubSpot companies intake dead-letter (mirror provider_bq_sync).
   // Detecta path async caído: webhook companies emite outbox event pero la projection
@@ -2206,6 +2218,7 @@ export const getReliabilityOverview = async (
     vatEntryUnresolvedFx,
     vatEligibleWithoutPeriod,
     retentionPositionDrift,
+    ppmPositionDrift,
     hubspotCompaniesIntakeDeadLetter,
     workforceUnlinkedInternalUsers,
     knowledgeQuarantineCount,
