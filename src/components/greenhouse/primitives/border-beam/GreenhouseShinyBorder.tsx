@@ -158,9 +158,11 @@ const GreenhouseShinyBorder = ({
           insetInlineEnd: 0,
           zIndex: -1,
           inlineSize: '65%',
-          blockSize: '60%',
+          // Compact: el botón mide ~la mitad de alto, así que los glows (relativos al alto) pierden
+          // área y el shiny se apaga. Se compensa subiendo la cobertura + el punch en compact.
+          blockSize: isCompact ? '88%' : '60%',
           borderRadius: `${theme.shape.customBorderRadius.display * 7.5}px`,
-          boxShadow: `0 0 ${theme.spacing(5)} ${alpha(theme.palette.common.white, 0.22 * scale)}`,
+          boxShadow: `0 0 ${theme.spacing(isCompact ? 6 : 5)} ${alpha(theme.palette.common.white, (isCompact ? 0.34 : 0.22) * scale)}`,
           transition: 'box-shadow 240ms ease'
         })}
       />
@@ -175,11 +177,13 @@ const GreenhouseShinyBorder = ({
             position: 'absolute',
             insetBlockEnd: 0,
             insetInlineStart: 0,
-            inlineSize: theme.spacing(12),
-            blockSize: '50%',
+            inlineSize: theme.spacing(isCompact ? 9 : 12),
+            // Compact: cubre casi todo el alto (poco hay) + círculo más tight = acento teal punchy
+            // en el corner pese al botón corto. Comfortable conserva su geometría histórica.
+            blockSize: isCompact ? '92%' : '50%',
             borderRadius: `${theme.shape.customBorderRadius.display}px`,
-            background: `radial-gradient(circle ${theme.spacing(15)} at 0% 100%, ${alpha(accent, 0.94)}, ${alpha(accentSoft, 0.34)}, transparent)`,
-            boxShadow: `-${theme.spacing(0.5)} ${theme.spacing(2.25)} ${theme.spacing(10)} ${alpha(accent, 0.26 * scale)}`,
+            background: `radial-gradient(circle ${theme.spacing(isCompact ? 9 : 15)} at 0% 100%, ${alpha(accent, 0.94)}, ${alpha(accentSoft, 0.34)}, transparent)`,
+            boxShadow: `-${theme.spacing(0.5)} ${theme.spacing(isCompact ? 1 : 2.25)} ${theme.spacing(isCompact ? 7 : 10)} ${alpha(accent, (isCompact ? 0.42 : 0.26) * scale)}`,
             transition: 'inline-size 240ms ease, box-shadow 240ms ease'
           }
         }}
