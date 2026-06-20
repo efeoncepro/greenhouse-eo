@@ -806,7 +806,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-722` | `complete` | Bank Reconciliation Synergy Workbench | `docs/tasks/complete/TASK-722-bank-reconciliation-synergy-workbench.md` |
 | `TASK-723` | `complete` | AI-Assisted Reconciliation Intelligence | `docs/tasks/complete/TASK-723-ai-assisted-reconciliation-intelligence.md` |
 | `TASK-724` | `to-do` | Cash Position Canonical Ledger Alignment | `docs/tasks/to-do/TASK-724-cash-position-canonical-ledger-alignment.md` |
-| `TASK-725` | `in-progress` | Finance Fiscal Scope & Legal Entity Foundation | `docs/tasks/in-progress/TASK-725-finance-fiscal-scope-legal-entity-foundation.md` |
+| `TASK-725` | `complete` | Finance Fiscal Scope & Legal Entity Foundation | `docs/tasks/complete/TASK-725-finance-fiscal-scope-legal-entity-foundation.md` |
 | `TASK-726` | `complete` | Finance Movement Feed Foundation | `docs/tasks/complete/TASK-726-finance-movement-feed-foundation.md` |
 | `TASK-727` | `complete` | Internal Role × View Matrix Seed + Supervisor Scope en JWT | `docs/tasks/complete/TASK-727-internal-role-view-seed-and-supervisor-jwt.md` |
 | `TASK-728` | `complete` | Finance Movement Feed Decision Polish | `docs/tasks/complete/TASK-728-finance-movement-feed-decision-polish.md` |

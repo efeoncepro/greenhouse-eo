@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -587,10 +587,12 @@ Cerrar una task es obligatorio y forma parte de Definition of Done. Si la implem
 
 ## Follow-ups
 
-- Selector fiscal global para Finance si aparecen multiples entidades.
-- PPM/retenciones/renta anual sobre el mismo `legal_entity_id`.
-- Multi-country tax profiles.
-- Eventual deprecacion de `space_id` en `vat_monthly_positions` cuando no queden readers legacy.
+Movidos a tasks dedicadas al cierre de TASK-725 (2026-06-20):
+
+- **Selector fiscal global / multi-entidad + PPM/retenciones/renta anual + multi-country tax profiles → `TASK-1186`** (umbrella P1, prioritaria).
+- **Deprecación de `space_id` en las tablas VAT → `TASK-1187`** (P3, no prioritaria, blocked by este cierre).
+- **Hardening del materializador (FX guard, advisory lock, cache invalidation, signal de docs sin período) → `TASK-1185`** (P3).
+- **Validación F29 de la cifra corregida con el contador** — gate humano post-cierre (no bloquea el código; el operador valida antes de tratar la cifra como baseline fiscal oficial).
 
 ### Follow-ups de la auditoría adversarial (2026-06-20)
 
