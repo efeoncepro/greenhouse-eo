@@ -43,5 +43,8 @@ export const aria: AriaCopy = {
   paymentOrderTabs: 'Pestañas de órdenes de pago',
   paymentObligationFilters: 'Filtros de obligaciones',
   breadcrumb: 'Ruta de navegación',
-  dismissHelper: 'Ocultar ayuda contextual'
+  dismissHelper: 'Ocultar ayuda contextual',
+  leaderboardRunSelect: 'Seleccionar periodo de leaderboard',
+  leaderboardPagination: 'Paginación del leaderboard',
+  leaderboardRowsCollapsed: 'Filas de leaderboard colapsadas'
 }

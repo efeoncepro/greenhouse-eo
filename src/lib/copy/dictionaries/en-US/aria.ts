@@ -31,5 +31,8 @@ export const aria: AriaCopy = {
   paymentOrderTabs: 'Payment order tabs',
   paymentObligationFilters: 'Payment obligation filters',
   breadcrumb: 'Breadcrumb',
-  dismissHelper: 'Dismiss helper'
+  dismissHelper: 'Dismiss helper',
+  leaderboardRunSelect: 'Select leaderboard period',
+  leaderboardPagination: 'Leaderboard pagination',
+  leaderboardRowsCollapsed: 'Collapsed leaderboard rows'
 }

@@ -189,6 +189,13 @@ export const DECLARED_CHILD_ROUTES: readonly ChildRouteDeclaration[] = [
       'Chips Lab — child surface del Design System para la primitive GreenhouseChip, alcanzable desde el catalogo canonico /design-system.'
   },
   {
+    route: '/design-system/gamification',
+    parent: '/design-system',
+    via: 'inline-link',
+    reason:
+      'Gamification Lab — child surface del Design System para GreenhouseLeaderboardPodium, ranking top 3 y avatars reales de equipo antes de cablearlo a datos productivos.'
+  },
+  {
     route: '/design-system/buttons',
     parent: '/design-system',
     via: 'inline-link',

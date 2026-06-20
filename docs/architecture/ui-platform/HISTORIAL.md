@@ -7,6 +7,10 @@
 
 ---
 
+## Delta 2026-06-20 — Gamification leaderboard primitives
+
+Se agregaron `GreenhouseLeaderboardCard`, `GreenhouseLeaderboardRankings` y `GreenhouseLeaderboardPodium` como primitives para portar los componentes de leaderboard del prompt a Greenhouse sin shadcn/Tailwind/CVA ni avatars externos. El card compone periodo, selector de run, podium top-3 y lista paginada; rankings soporta byline, usuario actual, `displayed`, avatars y `valueFormatter`; podium conserva sizes `sm/default/lg`, `medalStyle classic/modern/minimal`, toggles de avatar/value y orden visual 2-1-3 con labels accesibles por rank. Lab vivo: `/design-system/gamification`; scenario GVC: `design-system-gamification`; assets demo: avatars reales bajo `public/images/greenhouse/team/`.
+
 ## Delta 2026-06-20 — TASK-1180: Design Handoff x Primitive Governance
 
 `/design-system/handoff` ahora actúa como gateway de gobernanza hacia el Design System: cada entry puede registrar strategy (`route_only`, `reuse_primitive`, `extend_primitive`, `new_primitive`, `variant_kind`, `research_required`), primitive key, variant/kind, Lab, runtime, GVC, docs, rationale y owner. El contrato vive en commands/readers/API, no en la UI; el cierre `implemented` bloquea decisiones vacías o `research_required`, y endurece `new_primitive` con Lab + docs + GVC. Contrato funcional: [`docs/documentation/plataforma/design-handoff-control-plane.md`](../../documentation/plataforma/design-handoff-control-plane.md).

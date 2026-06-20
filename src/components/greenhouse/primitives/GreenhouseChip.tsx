@@ -56,9 +56,10 @@ const toneMain = (tone: Exclude<GreenhouseChipTone, 'default'>) => `var(--mui-pa
 const toneContrast = (tone: Exclude<GreenhouseChipTone, 'default'>) => `var(--mui-palette-${tone}-contrastText)`
 const toneSoft = (tone: Exclude<GreenhouseChipTone, 'default'>) => `var(--mui-palette-${tone}-lightOpacity)`
 
-const CHIP_SHIMMER_DURATION = `calc(${motionCss.duration.extended} * 3.333)`
-const CHIP_SHIMMER_DELAY = `calc(${motionCss.duration.extended} * 2.5)`
-const CHIP_SIGNAL_DURATION = `calc(${motionCss.duration.extended} * 3)`
+// Animated chip motion is ambient status, not a notification burst.
+const CHIP_SPOTLIGHT_DURATION = `calc(${motionCss.duration.extended} * 6.5)`
+const CHIP_SPOTLIGHT_DELAY = `calc(${motionCss.duration.extended} * 1.5)`
+const CHIP_SIGNAL_DURATION = `calc(${motionCss.duration.extended} * 4.75)`
 
 const GREENHOUSE_CHIP_SIZE_TOKENS = {
   medium: {
@@ -290,22 +291,51 @@ const getChipSx = (
             '&::before': {
               content: '""',
               position: 'absolute',
-              inset: 0,
+              insetBlock: 0,
+              insetInlineStart: '-46%',
+              inlineSize: '44%',
+              blockSize: '100%',
               borderRadius: 'inherit',
               pointerEvents: 'none',
               background:
-                'linear-gradient(90deg, transparent 0%, color-mix(in srgb, currentColor 18%, transparent) 50%, transparent 100%)',
-              transform: 'translateX(-120%)',
-              animationName: 'gh-chip-spotlight-wave',
-              animationDuration: CHIP_SHIMMER_DURATION,
-              animationDelay: CHIP_SHIMMER_DELAY,
+                'radial-gradient(ellipse 60% 90% at 50% 50%, color-mix(in srgb, currentColor 24%, transparent) 0%, color-mix(in srgb, currentColor 12%, transparent) 42%, transparent 74%)',
+              opacity: 0,
+              transform: 'translate3d(0, 0, 0) skewX(-16deg) scaleX(0.7)',
+              willChange: 'transform, opacity',
+              animationName: 'gh-chip-spotlight-glint',
+              animationDuration: CHIP_SPOTLIGHT_DURATION,
+              animationDelay: CHIP_SPOTLIGHT_DELAY,
+              animationIterationCount: 'infinite',
+              animationTimingFunction: motionCss.ease.emphasized
+            },
+
+            '&::after': {
+              content: '""',
+              position: 'absolute',
+              inset: 1,
+              borderRadius: 'inherit',
+              pointerEvents: 'none',
+              background:
+                'linear-gradient(180deg, color-mix(in srgb, currentColor 10%, transparent) 0%, transparent 48%)',
+              opacity: 0.12,
+              animationName: 'gh-chip-spotlight-surface',
+              animationDuration: CHIP_SPOTLIGHT_DURATION,
+              animationDelay: CHIP_SPOTLIGHT_DELAY,
               animationIterationCount: 'infinite',
               animationTimingFunction: motionCss.ease.standard
             },
 
-            '@keyframes gh-chip-spotlight-wave': {
-              '0%': { transform: 'translateX(-120%)' },
-              '46%, 100%': { transform: 'translateX(220%)' }
+            '@keyframes gh-chip-spotlight-glint': {
+              '0%, 44%': { opacity: 0, transform: 'translate3d(0, 0, 0) skewX(-16deg) scaleX(0.7)' },
+              '56%': { opacity: 0.58, transform: 'translate3d(145%, 0, 0) skewX(-16deg) scaleX(0.92)' },
+              '72%': { opacity: 0.2, transform: 'translate3d(330%, 0, 0) skewX(-16deg) scaleX(1.04)' },
+              '100%': { opacity: 0, transform: 'translate3d(330%, 0, 0) skewX(-16deg) scaleX(0.88)' }
+            },
+
+            '@keyframes gh-chip-spotlight-surface': {
+              '0%, 42%, 100%': { opacity: 0.1 },
+              '60%': { opacity: 0.22 },
+              '78%': { opacity: 0.14 }
             }
           }
         : null),
@@ -320,6 +350,10 @@ const getChipSx = (
               zIndex: 1,
               flexShrink: 0,
               backgroundColor: tone === 'default' ? 'var(--mui-palette-text-secondary)' : toneMain(tone),
+              backgroundImage:
+                tone === 'default'
+                  ? 'radial-gradient(circle at 35% 30%, var(--mui-palette-background-paper) 0%, transparent 38%)'
+                  : `radial-gradient(circle at 35% 30%, color-mix(in srgb, ${toneContrast(tone)} 78%, transparent) 0%, transparent 40%)`,
               boxShadow:
                 tone === 'default'
                   ? '0 0 0 3px var(--mui-palette-action-hover)'
@@ -345,13 +379,15 @@ const getChipSx = (
             },
 
             '@keyframes gh-chip-signal-dot-breathe': {
-              '0%, 100%': { opacity: 0.62, transform: 'scale(0.92)' },
-              '50%': { opacity: 1, transform: 'scale(1)' }
+              '0%, 100%': { opacity: 0.78, transform: 'scale(0.96)' },
+              '46%': { opacity: 1, transform: 'scale(1.04)' },
+              '64%': { opacity: 0.9, transform: 'scale(1)' }
             },
 
             '@keyframes gh-chip-signal-ring': {
-              '0%': { opacity: 0.28, transform: 'scale(0.72)' },
-              '68%, 100%': { opacity: 0, transform: 'scale(1.55)' }
+              '0%, 36%': { opacity: 0, transform: 'scale(0.88)' },
+              '56%': { opacity: 0.2, transform: 'scale(1.12)' },
+              '82%, 100%': { opacity: 0, transform: 'scale(1.65)' }
             }
           }
         : null),

@@ -367,6 +367,19 @@ const CATALOG_ITEMS: CatalogItem[] = [
     icon: 'tabler-badge'
   },
   {
+    id: 'gamification-podium',
+    title: 'Gamification podium',
+    description: 'Primitive para rankings top 3 con podium 2-1-3, avatars reales y variantes compactas.',
+    route: '/design-system/gamification',
+    category: 'Primitives',
+    kind: 'Primitive',
+    status: 'Hardening',
+    owner: 'GreenhouseLeaderboardPodium',
+    tags: ['gamification', 'leaderboard', 'podium', 'ranking', 'team'],
+    searchAliases: ['ranking', 'podio', 'leaderboard', 'gamificacion', 'gamificación', 'equipo', 'avatars'],
+    icon: 'tabler-trophy'
+  },
+  {
     id: 'disclosure',
     title: 'Disclosure',
     description:

@@ -2,12 +2,37 @@
 
 > **Estado:** `released` (manifest transicionó a released, post-release health check verde). Orchestrator run [`27721723752`](https://github.com/efeoncepro/greenhouse-eo/actions/runs/27721723752) `completed/success`. Conducido por Claude tras pedido del operador ("paso a producción que Codex dejó preparado").
 
+## Sesión 2026-06-20 — Gamification leaderboard primitives — Codex
+
+> **Estado:** code complete local, sin wiring productivo. Se portaron los prompts `LeaderboardCard` y `LeaderboardPodium` como primitives Greenhouse/MUI tokenizadas (`GreenhouseLeaderboardCard`, `GreenhouseLeaderboardRankings`, `GreenhouseLeaderboardPodium`) en vez de copiar shadcn/Tailwind/CVA. El card compone periodo, selector de run, podium top-3 y lista paginada; rankings soporta usuario actual, byline, `displayed`, avatar y `valueFormatter`; podium mantiene `rankings`, `size`, `showValue`, `showAvatar`, `medalStyle` y orden visual 2-1-3.
+> - **Lab:** `/design-system/gamification` con avatars reales desde `public/images/greenhouse/team/`, card completo y variantes `classic/modern/minimal`.
+> - **Discoverability:** export en barrel, entrada en `DesignSystemCatalogView`, `route-reachability-manifest`, docs `ui-platform/PRIMITIVES.md` + `HISTORIAL.md`, scenario GVC `design-system-gamification`.
+> - **Verificación:** eslint focal verde, vitest `GreenhouseLeaderboardPodium` + catalog verde, `design:lint`, `route-reachability-gate`, Playwright smoke sin console/page errors y GVC local desktop/mobile `.captures/2026-06-20T11-42-29_design-system-gamification`.
+> - **Nota:** el primer intento GVC se colgó en `Compiling /design-system/gamification`; se reinició el dev server webpack en `:3002` y se removió `CompositionShell` del lab porque era un specimen simple, no una superficie operativa con regiones.
+
 ## Sesión 2026-06-20 — ISSUE-100 local dev Nexa Insight skeleton stuck — Codex
 
 > **Estado:** resolved local. El síntoma `/nexa/insights/[id]` quedando en skeleton + `Compiling...` fue degradación de Turbopack local, no eliminación/bug de skeletons ni credenciales GCP/Cloud SQL. `pnpm pg:doctor` quedó sano.
 > - **Cambio operativo:** `pnpm dev` ahora usa `next dev --webpack`; `pnpm dev:turbo` queda opt-in para diagnóstico Turbopack. Server local vivo en `http://localhost:3002` con un solo listener.
 > - **Verificación:** Playwright autenticado a `http://localhost:3002/nexa/insights/EO-AIS-0B48FAC9DBBA` confirmó `skeletonGone=true`, `hasRoot=true`, `hasSuggestedAction=true` en ~5.8s; `ps` posterior mostró `next-server` idle.
 > - **Docs:** `docs/issues/resolved/ISSUE-100-local-dev-turbopack-nexa-insight-skeleton-stuck.md`, tracker `docs/issues/README.md` y changelog actualizados. Los skeletons siguen siendo necesarios; el criterio correcto es que desaparezcan al llegar data real.
+
+## Sesión 2026-06-20 — TASK-1182 Nexa Insight ↔ Conversation Bridge (Slice 2) — Claude
+
+> **Estado:** `TASK-1182` **code complete, rollout pendiente (GVC + smoke staging)** — local-first, develop, **sin push** (commits locales `630b12aee` backend + `e27bc7a36` UI; esperando instrucción del operador para pushear). Cierra el lado Insights→Chat del bridge: conciencia de superficie.
+> - **Backend (`630b12aee`):** `NexaRuntimeContext += focusRef?:{kind:'nexa_insight',id}` (aditivo); `insight-focus.ts` (SSOT) con `buildNexaInsightSubject` (reusado por nexa-tools, elimina el inline de TASK-1181) + `buildFocusedInsightNote` (pre-resuelve el insight con el reader anti-oracle e inyecta una nota al system prompt del turno, NO al prompt versionado); `route.ts` valida `focusRef` del body; `nexa-service.ts` appendea la nota. `focusRef` = contexto, no permiso; no resoluble → sin ancla.
+> - **UI (`e27bc7a36`):** CTA primario **"Pregúntale a Nexa"** (label pedido por el operador) en `NexaInsightDetailView` (card de acción) → dispatcha `NEXA_FLOATING_OPEN_EVENT` con `{focusRef, seedPrompt}`; `NexaFloatingButton` lee `event.detail`, setea `focusRefRef` (threadeado al POST del adapter) + auto-envía la pregunta semilla vía `runtime.thread.append` (resuelta la Open Question: auto-send, el click es intención explícita); `focusRef` se limpia al cerrar. Copy en `GH_NEXA` (cta/aria/seed). Lane mode: focus diferido.
+> - **Gates verdes:** `vitest src/lib/nexa` 179 passed (insight-focus.test.ts 8 + sin regresión TASK-1181) · `tsc --noEmit` 0 · `eslint` 0 · `design:lint` 0 · `nexa:doc-gate --changed` OK.
+> - **Rollout pendiente:** GVC del CTA + chat enfocado (el `fe:capture` local expiró por render autenticado del dashboard pesado en dev + server contendido; NO es defecto de código — la ruta sin sesión responde en 1.2s, mis archivos compilan sin error). Verificación visual: `http://localhost:3000/nexa/insights/EO-AIS-0B48FAC9DBBA` (insight warning real con acción → el CTA aparece). Falta smoke multi-persona en staging (collaborator self-scope + client anti-oracle) + ejercicio real del chat (auto-send + respuesta anclada, requiere LLM). El ruteo/ancla funciona con `NEXA_SYSTEM_PROMPT_V2_ENABLED=true` (ya ON staging+prod).
+> - **Follow-ups:** Slice 3 (TASK-1183, cross-citación), Slice 4 (TASK-1184, acción gobernada).
+
+## Sesión 2026-06-19 — TASK-1181 Nexa Insight ↔ Conversation Bridge (Slice 1) — Claude
+
+> **Estado:** `TASK-1181` **code complete, rollout pendiente** (local-first, develop, sin push). El chat de Nexa ahora puede leer/listar insights de delivery por construcción: dos tools nuevos `get_insight(insightId)` y `list_insights(periodYear?, periodMonth?)` en `nexa-tools.ts` que envuelven los readers canónicos `readNexaInsightDrill`/`listNexaInsightsForPeriod` (subject anti-oracle reusado — un primitive, muchos consumers) + módulo de ruteo en el system prompt V2 (bump v2.2.0→v2.3.0, golden snapshot actualizado). Sin schema, sin capability nueva (reusa `nexa.insights.read` vía gate `tenantType==='efeonce_internal'` + filtro del reader), sin UI nueva. ADR + spec creados (`GREENHOUSE_NEXA_INSIGHT_CONVERSATION_BRIDGE_DECISION_V1.md` + `..._V1.md`), registrados en DECISIONS_INDEX.
+>
+> **Gates locales verdes:** `vitest src/lib/nexa` 171 passed · nuevo `nexa-insight-tools.test.ts` 12 passed · prompt golden 17 passed (snapshot -u) · `tsc --noEmit` full 0 errores · `eslint` archivos tocados 0 · `pnpm nexa:doc-gate --changed` OK.
+> **Rollout pendiente (NO marcar complete):** (1) el ruteo del prompt está activo solo con `NEXA_SYSTEM_PROMPT_V2_ENABLED=true` (los tools funcionan igual sin él, solo no se rutea explícito); (2) smoke multi-persona en staging (collaborator self-scope + client anti-oracle) + ejercicio real del chat (`qa:nexa-knowledge`); (3) `pnpm test` full + `pnpm build` para mover a `complete/` (el árbol tiene WIP ajeno de TASK-1180; commit hecho con paths explícitos mine-only).
+> **Follow-ups del bridge:** Slice 2 (`focusRef` + CTA "Pregúntale a Nexa"), Slice 3 (cross-citación `drillDown`), Slice 4 (acción gobernada sobre insight, ADR propio).
 
 ## Sesión 2026-06-20 — TASK-1172 Full API Parity gap audit — Claude
 
