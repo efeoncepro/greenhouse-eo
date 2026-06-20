@@ -243,6 +243,23 @@ export const GH_AGENCY = {
       noProgressHint: 'El último snapshot no incluye porcentaje de avance medible.',
       teamUnresolvedHint: 'Algunos miembros propuestos no resolvieron en el directorio activo.'
     },
+    approval: {
+      approvedTitle: 'Sample Sprint aprobado',
+      approvedDescription: 'El engagement ya está aprobado y puede operar. No se generó un segundo evento de aprobación.',
+      rejectedTitle: 'Aprobación rechazada',
+      rejectedDescription: 'Este engagement fue rechazado. Para continuar, declara un nuevo Sample Sprint o revisa el criterio comercial.',
+      withdrawnTitle: 'Declaración retirada',
+      withdrawnDescription: 'La solicitud de aprobación fue retirada y ya no acepta aprobación directa.',
+      pendingDescription: 'Revisa capacidad y registra una razón si apruebas con override.',
+      success: 'Sample Sprint aprobado.',
+      alreadyApproved: 'Este Sample Sprint ya estaba aprobado.',
+      rejectSuccess: 'Sample Sprint rechazado.',
+      loadError: 'No fue posible cargar el detalle de aprobación.',
+      rejectReasonRequired: 'Escribe una razón de rechazo de al menos 10 caracteres.',
+      overrideReasonRequired: 'El warning de capacidad requiere razón de override.',
+      approveError: 'No fue posible aprobar el engagement.',
+      rejectError: 'No fue posible rechazar el engagement.'
+    },
     activity: {
       title: 'Auditoría',
       previewTitle: 'Preview de eventos',

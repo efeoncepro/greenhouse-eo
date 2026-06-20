@@ -120,7 +120,7 @@ interface ApprovalServiceRow extends Record<string, unknown> {
   target_end_date: Date | string | null
 }
 
-interface PendingApprovalContext extends ApprovalRow, ApprovalServiceRow {}
+interface ApprovalContext extends ApprovalRow, ApprovalServiceRow {}
 
 export class EngagementApprovalValidationError extends Error {
   constructor(message: string) {
@@ -274,16 +274,15 @@ const assertWithdrawInput = (input: WithdrawApprovalInput) => {
   return { ...lookup, withdrawnBy, withdrawalReason, withdrawnAt }
 }
 
-const findPendingApprovalForUpdate = async (
+const findApprovalForUpdate = async (
   client: PoolClient,
   lookup: ReturnType<typeof assertLookupInput>
-): Promise<PendingApprovalContext> => {
-  const result = await client.query<PendingApprovalContext>(
+): Promise<ApprovalContext> => {
+  const result = await client.query<ApprovalContext>(
     `SELECT a.*, s.engagement_kind, s.start_date, s.target_end_date
      FROM greenhouse_commercial.engagement_approvals a
      JOIN greenhouse_core.services s ON s.service_id = a.service_id
-     WHERE a.status = 'pending'
-       AND (($1::text IS NOT NULL AND a.approval_id = $1)
+     WHERE (($1::text IS NOT NULL AND a.approval_id = $1)
          OR ($2::text IS NOT NULL AND a.service_id = $2))
      LIMIT 1
      FOR UPDATE OF a, s`,
@@ -292,9 +291,15 @@ const findPendingApprovalForUpdate = async (
 
   const approval = result.rows[0]
 
-  if (!approval) throw new EngagementApprovalNotFoundError('Pending engagement approval was not found.')
+  if (!approval) throw new EngagementApprovalNotFoundError('Engagement approval was not found.')
 
   return approval
+}
+
+const assertPendingApproval = (approval: ApprovalContext) => {
+  if (approval.status === 'pending') return
+
+  throw new EngagementApprovalConflictError(`Engagement approval is already ${approval.status}.`)
 }
 
 const getServiceForUpdate = async (client: PoolClient, serviceId: string): Promise<ApprovalServiceRow> => {
@@ -322,7 +327,7 @@ const subtractDays = (dateKey: string, days: number): string => {
   return date.toISOString().slice(0, 10)
 }
 
-const resolveCapacityWindow = (approval: PendingApprovalContext): { fromDate: string; toDate: string } => {
+const resolveCapacityWindow = (approval: ApprovalContext): { fromDate: string; toDate: string } => {
   const deadline = toDateString(approval.decision_deadline) ?? new Date().toISOString().slice(0, 10)
   const fallbackFrom = subtractDays(deadline, Math.max(approval.expected_duration_days - 1, 0))
   const fromDate = toDateString(approval.start_date) ?? fallbackFrom
@@ -426,7 +431,11 @@ export const approveEngagement = async (input: ApproveEngagementInput): Promise<
   const normalized = assertApproveInput(input)
 
   return withTransaction(async client => {
-    const pending = await findPendingApprovalForUpdate(client, normalized)
+    const pending = await findApprovalForUpdate(client, normalized)
+
+    if (pending.status === 'approved') return normalizeApproval(pending)
+
+    assertPendingApproval(pending)
 
     await assertEngagementServiceEligible(client, pending.service_id)
     assertNonRegularService(pending, pending.service_id)
@@ -543,7 +552,9 @@ export const rejectEngagement = async (input: RejectEngagementInput): Promise<En
   const normalized = assertRejectInput(input)
 
   return withTransaction(async client => {
-    const pending = await findPendingApprovalForUpdate(client, normalized)
+    const pending = await findApprovalForUpdate(client, normalized)
+
+    assertPendingApproval(pending)
 
     await assertEngagementServiceEligible(client, pending.service_id)
     assertNonRegularService(pending, pending.service_id)
@@ -600,7 +611,9 @@ export const withdrawApproval = async (input: WithdrawApprovalInput): Promise<En
   const normalized = assertWithdrawInput(input)
 
   return withTransaction(async client => {
-    const pending = await findPendingApprovalForUpdate(client, normalized)
+    const pending = await findApprovalForUpdate(client, normalized)
+
+    assertPendingApproval(pending)
 
     await assertEngagementServiceEligible(client, pending.service_id)
     assertNonRegularService(pending, pending.service_id)

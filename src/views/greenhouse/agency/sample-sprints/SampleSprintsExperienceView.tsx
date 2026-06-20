@@ -147,6 +147,13 @@ type RuntimeSampleSprintDetail = {
   name: string
   spaceId: string
   proposedTeam: Array<{ memberId: string; proposedFte: number; role?: string | null }>
+  approval: {
+    approvalId: string
+    status: 'pending' | 'approved' | 'rejected' | 'withdrawn'
+    approvedAt?: string | null
+    rejectedAt?: string | null
+    withdrawnAt?: string | null
+  } | null
 }
 
 const sprintKinds: Record<SprintKind, { label: string; icon: string; color: HealthSeverity }> = {
@@ -1604,6 +1611,32 @@ const RuntimeApprovalWizard = ({ sprint }: { sprint: Sprint }) => {
   const [feedback, setFeedback] = useState<{ severity: 'success' | 'error' | 'info'; message: string } | null>(null)
   const hasCapacityRisk = sprint.team.some(member => member.availability < 0.1)
   const proposedMembers = detail?.proposedTeam.map(member => ({ memberId: member.memberId, proposedFte: member.proposedFte })) ?? []
+  const approvalStatus = detail?.approval?.status ?? null
+  const isApprovalFinal = approvalStatus === 'approved' || approvalStatus === 'rejected' || approvalStatus === 'withdrawn'
+  const approvalCopy = sampleCopy.approval
+
+  const finalApprovalState = approvalStatus === 'approved'
+    ? {
+        severity: 'success' as const,
+        icon: 'tabler-circle-check',
+        title: approvalCopy.approvedTitle,
+        description: approvalCopy.approvedDescription
+      }
+    : approvalStatus === 'rejected'
+      ? {
+          severity: 'error' as const,
+          icon: 'tabler-circle-x',
+          title: approvalCopy.rejectedTitle,
+          description: approvalCopy.rejectedDescription
+        }
+      : approvalStatus === 'withdrawn'
+        ? {
+            severity: 'info' as const,
+            icon: 'tabler-archive',
+            title: approvalCopy.withdrawnTitle,
+            description: approvalCopy.withdrawnDescription
+          }
+        : null
 
   useEffect(() => {
     let mounted = true
@@ -1614,23 +1647,31 @@ const RuntimeApprovalWizard = ({ sprint }: { sprint: Sprint }) => {
         if (mounted) setDetail(payload)
       })
       .catch(() => {
-        if (mounted) setFeedback({ severity: 'error', message: 'No fue posible cargar el detalle de approval.' })
+        if (mounted) setFeedback({ severity: 'error', message: approvalCopy.loadError })
       })
 
     return () => {
       mounted = false
     }
-  }, [sprint.id])
+  }, [approvalCopy.loadError, sprint.id])
 
   const submit = (action: 'approve' | 'reject') => {
+    if (approvalStatus === 'approved') {
+      setFeedback({ severity: 'info', message: approvalCopy.alreadyApproved })
+
+      return
+    }
+
+    if (isApprovalFinal) return
+
     if (action === 'reject' && approvalOverride.trim().length < 10) {
-      setFeedback({ severity: 'error', message: 'Escribe una razón de rechazo de al menos 10 caracteres.' })
+      setFeedback({ severity: 'error', message: approvalCopy.rejectReasonRequired })
 
       return
     }
 
     if (action === 'approve' && hasCapacityRisk && approvalOverride.trim().length < 10) {
-      setFeedback({ severity: 'error', message: 'El warning de capacidad requiere razón de override.' })
+      setFeedback({ severity: 'error', message: approvalCopy.overrideReasonRequired })
 
       return
     }
@@ -1648,13 +1689,19 @@ const RuntimeApprovalWizard = ({ sprint }: { sprint: Sprint }) => {
       const payload = await response.json().catch(() => null)
 
       if (!response.ok) {
-        setFeedback({ severity: 'error', message: payload?.error || `No fue posible ${action === 'approve' ? 'aprobar' : 'rechazar'} el engagement.` })
+        setFeedback({ severity: 'error', message: payload?.error || (action === 'approve' ? approvalCopy.approveError : approvalCopy.rejectError) })
 
         return
       }
 
+      if (action === 'approve') {
+        setDetail(current => current
+          ? { ...current, approval: { ...(current.approval ?? { approvalId: payload?.approvalId ?? '', status: 'approved' }), status: 'approved' } }
+          : current)
+      }
+
       router.refresh()
-      setFeedback({ severity: 'success', message: action === 'approve' ? 'Sample Sprint aprobado.' : 'Sample Sprint rechazado.' })
+      setFeedback({ severity: 'success', message: action === 'approve' ? approvalCopy.success : approvalCopy.rejectSuccess })
     })
   }
 
@@ -1665,7 +1712,17 @@ const RuntimeApprovalWizard = ({ sprint }: { sprint: Sprint }) => {
           <CardHeader title='Aprobar engagement' subheader={`${sprint.client} · ${sprint.name}`} avatar={<CustomAvatar skin='light' color='warning' variant='rounded'><i className='tabler-shield-check' /></CustomAvatar>} />
           <CardContent>
             {feedback ? <Alert severity={feedback.severity} sx={{ mb: 5 }}>{feedback.message}</Alert> : null}
-            {hasCapacityRisk ? <Alert severity='warning' icon={<i className='tabler-alert-triangle' />}>Hay miembros con disponibilidad bajo 10%. Puedes aprobar, pero el override queda auditado.</Alert> : null}
+            {finalApprovalState ? (
+              <Alert severity={finalApprovalState.severity} icon={<i className={finalApprovalState.icon} />} sx={{ mb: 5 }}>
+                <Typography variant='subtitle2' sx={{ fontWeight: 700 }}>
+                  {finalApprovalState.title}
+                </Typography>
+                <Typography variant='body2'>
+                  {finalApprovalState.description}
+                </Typography>
+              </Alert>
+            ) : null}
+            {!isApprovalFinal && hasCapacityRisk ? <Alert severity='warning' icon={<i className='tabler-alert-triangle' />}>Hay miembros con disponibilidad bajo 10%. Puedes aprobar, pero el override queda auditado.</Alert> : null}
             <TableContainer sx={{ mt: 5 }}>
               <Table size='small' aria-label={domainAria.capacityByMember}>
                 <TableHead><TableRow><TableCell>Miembro</TableCell><TableCell>Rol</TableCell><TableCell align='right'>Asignado</TableCell><TableCell align='right'>Disponible</TableCell><TableCell>Estado</TableCell></TableRow></TableHead>
@@ -1682,13 +1739,13 @@ const RuntimeApprovalWizard = ({ sprint }: { sprint: Sprint }) => {
                 </TableBody>
               </Table>
             </TableContainer>
-            <CustomTextField sx={{ mt: 5 }} multiline minRows={3} label='Razón de override o rechazo' value={approvalOverride} onChange={event => setApprovalOverride(event.target.value)} helperText='Requerido para rechazar o aprobar con warning. Mínimo 10 caracteres.' fullWidth />
+            <CustomTextField sx={{ mt: 5 }} multiline minRows={3} label='Razón de override o rechazo' value={approvalOverride} onChange={event => setApprovalOverride(event.target.value)} helperText='Requerido para rechazar o aprobar con warning. Mínimo 10 caracteres.' disabled={isApprovalFinal} fullWidth />
           </CardContent>
           <Divider />
           <CardContent>
             <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} justifyContent='flex-end'>
-              <Button variant='tonal' color='secondary' startIcon={<i className='tabler-x' />} onClick={() => submit('reject')} disabled={pending}>Rechazar</Button>
-              <Button variant='contained' startIcon={<i className='tabler-check' />} onClick={() => submit('approve')} disabled={pending || (hasCapacityRisk && approvalOverride.length < 10)}>Aprobar Sprint</Button>
+              <Button variant='tonal' color='secondary' startIcon={<i className='tabler-x' />} onClick={() => submit('reject')} disabled={pending || isApprovalFinal}>Rechazar</Button>
+              <Button variant='contained' startIcon={<i className='tabler-check' />} onClick={() => submit('approve')} disabled={pending || isApprovalFinal || (hasCapacityRisk && approvalOverride.length < 10)}>Aprobar Sprint</Button>
             </Stack>
           </CardContent>
         </Card>
