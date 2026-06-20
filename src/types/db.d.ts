@@ -2308,15 +2308,22 @@ export interface GreenhouseCoreDesignHandoffAllowedFiles {
 
 export interface GreenhouseCoreDesignHandoffEntries {
   archived_at: Timestamp | null;
+  blocked_reason: string | null;
   created_at: Generated<Timestamp>;
   created_by: string;
+  designer_owner_member_id: string | null;
+  dev_owner_member_id: string | null;
+  due_at: Timestamp | null;
   entry_id: string;
   file_key: string;
   implemented_surface_key: string | null;
   kind: string;
   node_id: string;
   node_name: string | null;
+  priority: Generated<string>;
+  review_owner_member_id: string | null;
   status: Generated<string>;
+  target_surface_key: string | null;
   title: string;
   updated_at: Generated<Timestamp>;
   updated_by: string;
@@ -2334,6 +2341,44 @@ export interface GreenhouseCoreDesignHandoffEntryEvents {
   metadata_json: Generated<Json>;
   node_id: string | null;
   to_status: string;
+}
+
+export interface GreenhouseCoreDesignHandoffEntryEvidence {
+  created_at: Generated<Timestamp>;
+  created_by: string;
+  entry_id: string;
+  evidence_id: string;
+  evidence_type: string;
+  label: string | null;
+  metadata_json: Generated<Json>;
+  ref: string;
+}
+
+export interface GreenhouseCoreDesignHandoffEntryLinks {
+  created_at: Generated<Timestamp>;
+  created_by: string;
+  entry_id: string;
+  label: string | null;
+  link_id: string;
+  link_type: string;
+  metadata_json: Generated<Json>;
+  ref: string;
+}
+
+export interface GreenhouseCoreDesignHandoffNodeSnapshots {
+  created_at: Generated<Timestamp>;
+  created_by: string;
+  entry_id: string;
+  expected_name: string | null;
+  file_key: string;
+  metadata_json: Generated<Json>;
+  node_id: string;
+  node_status: string;
+  observed_name: string | null;
+  provider_checked_at: Generated<Timestamp>;
+  render_hash: string | null;
+  render_url: string | null;
+  snapshot_id: string;
 }
 
 export interface GreenhouseCoreDesignSystemFigmaNodeEvents {
@@ -10230,6 +10275,9 @@ export interface DB {
   "greenhouse_core.design_handoff_allowed_files": GreenhouseCoreDesignHandoffAllowedFiles;
   "greenhouse_core.design_handoff_entries": GreenhouseCoreDesignHandoffEntries;
   "greenhouse_core.design_handoff_entry_events": GreenhouseCoreDesignHandoffEntryEvents;
+  "greenhouse_core.design_handoff_entry_evidence": GreenhouseCoreDesignHandoffEntryEvidence;
+  "greenhouse_core.design_handoff_entry_links": GreenhouseCoreDesignHandoffEntryLinks;
+  "greenhouse_core.design_handoff_node_snapshots": GreenhouseCoreDesignHandoffNodeSnapshots;
   "greenhouse_core.design_system_figma_node_events": GreenhouseCoreDesignSystemFigmaNodeEvents;
   "greenhouse_core.design_system_figma_nodes": GreenhouseCoreDesignSystemFigmaNodes;
   "greenhouse_core.entitlement_governance_audit_log": GreenhouseCoreEntitlementGovernanceAuditLog;

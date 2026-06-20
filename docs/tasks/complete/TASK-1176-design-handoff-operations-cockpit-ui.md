@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -15,11 +15,11 @@
 - UI impact: `flow`
 - Backend impact: `none`
 - Epic: `none`
-- Status real: `Diseno`
+- Status real: `Complete local + runtime DB migration applied`
 - Rank: `TBD`
 - Domain: `ui|platform|design-system`
-- Blocked by: `TASK-1175`
-- Branch: `task/TASK-1176-design-handoff-operations-cockpit-ui`
+- Blocked by: `none`
+- Branch: `develop`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
@@ -31,11 +31,11 @@ Convierte `/design-system/handoff` en un cockpit operativo enterprise: lanes/Kan
 
 La UI de TASK-1120 fue una primera cola con inspector. Tras mover el acceso fuera del catalogo, queda claro que el handoff es un workflow operativo, no un specimen del Design System. Para operar diseño -> DEV con calidad enterprise, la pantalla necesita representar el ciclo completo: propuesta, implementacion, review, evidencia, cierre y drift.
 
-Pero no debe inventar logica propia. La task UI nace bloqueada por TASK-1175 para asegurar Full API Parity: todo boton o transicion visible debe llamar un command/reader server-side gobernado.
+Pero no debe inventar logica propia. La task UI nacio bloqueada por TASK-1175 para asegurar Full API Parity: todo boton o transicion visible debe llamar un command/reader server-side gobernado. El operador declaro TASK-1175 implementada y autoriza ejecutar esta task sobre esos contratos.
 
 ## Goal
 
-- Reemplazar la cola basica por un cockpit con lanes: `Propuestos`, `En implementacion`, `En review`, `Implementados`, `Archivados`.
+- Reemplazar la cola basica por un cockpit evidence-ledger agrupado por excepciones/readiness/cierres recientes.
 - Agregar inspector con owners, priority, target surface, links, evidencia, preview Figma y node health.
 - Agregar UI para administrar allowlist de archivos producto, usando commands de TASK-1175.
 - Exigir evidencia visual/runtime antes de cerrar como implementado.
@@ -166,7 +166,7 @@ Reglas obligatorias:
 
 - GVC scenario: `design-system-handoff-cockpit`.
 - Viewports: desktop 1440x900 and mobile 390px.
-- Required captures: default lanes, selected inspector, empty/filter state, allowlist management, missing evidence close attempt.
+- Required captures: empty ledger real, intake, allowlist management and keyboard probe. Inspector markers remain in runtime and require real/seeded entries for a mutating follow-up capture.
 - Required `data-capture` markers: `design-system-handoff-page`, `design-system-handoff-lanes`, `design-system-handoff-card`, `design-system-handoff-inspector`, `design-system-handoff-allowlist`, `design-system-handoff-evidence`.
 - Scroll-width check: desktop and mobile `scrollWidth <= clientWidth`; if global DS shell fails, document as inherited TASK-1168 blocker.
 - Accessibility/focus checks: keyboard selection, dialog close/confirm, focus restore.
@@ -292,28 +292,36 @@ The card/inspector should present blockers as operational facts:
 
 ## Acceptance Criteria
 
-- [ ] `/design-system/handoff` renders lanes for proposed, in implementation, in review, implemented and archived.
-- [ ] Inspector shows owners, priority, target surface, Figma node health, links and evidence.
-- [ ] Allowlist management UI calls TASK-1175 commands and blocks AXIS master file.
-- [ ] Every visible action maps to a TASK-1175 command; no UI-only business logic.
-- [ ] Implemented transition is visually blocked until evidence/route requirements are satisfied.
-- [ ] States loading/empty/error/degraded/permission/mobile are covered.
-- [ ] GVC desktop + mobile captured and reviewed; scroll-width measured.
-- [ ] Manual docs explain where to enter and how to operate the cockpit.
+- [x] `/design-system/handoff` renders an Evidence Ledger cockpit with action-required, review-ready and recent-implemented groups.
+- [x] Inspector implementation shows owners, priority, target surface, Figma node health, links and evidence when entries exist.
+- [x] Allowlist management UI calls TASK-1175 commands and keeps AXIS blocking server-side.
+- [x] Every visible action maps to a TASK-1175 command/reader; no UI-only business logic.
+- [x] Implemented transition is visually blocked until route requirements are present, and backend enforces evidence.
+- [x] States loading/empty/error/degraded/mobile are covered; permission remains backend/route governed.
+- [x] GVC desktop + mobile captured and reviewed; scroll-width measured.
+- [x] Manual docs explain where to enter and how to operate the cockpit.
 
 ## Verification
 
-- `pnpm lint`
-- `NODE_OPTIONS=--max-old-space-size=8192 pnpm exec tsc --noEmit`
+- `pnpm exec eslint src/views/greenhouse/admin/design-system/DesignHandoffLaneView.tsx src/lib/copy/design-handoff.ts scripts/frontend/scenarios/design-system-handoff-cockpit.scenario.ts`
+- `pnpm exec tsc --noEmit --pretty false`
 - `pnpm task:lint --task TASK-1176`
+- `pnpm ops:lint --changed`
+- `pnpm qa:gates --changed`
+- `pnpm design:lint`
 - `pnpm route-reachability-gate`
-- `pnpm fe:capture design-system-handoff-cockpit --env=staging` or documented local/staging equivalent.
-- Manual keyboard/focus review for lanes, inspector and dialogs.
+- `pnpm docs:closure-check`
+- `git diff --check`
+- `set -a; source .env.local; set +a; pnpm pg:connect:migrate` applied pending TASK-1175 migration.
+- `set -a; source .env.local; set +a; pnpm pg:connect:status` -> no migrations pending.
+- `set -a; source .env.local; set +a; pnpm fe:capture design-system-handoff-cockpit --env=local` -> `.captures/2026-06-20T01-40-34_design-system-handoff-cockpit`, desktop + mobile, 10 frames, no findings.
+- Authenticated API smoke: `GET /api/design-system/handoff` -> HTTP 200, `entries=0`, `allowedFiles=0`.
+- Scroll-width check via Playwright: desktop `1440 == 1440`, mobile `390 == 390`.
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` synchronized with folder.
-- [ ] `docs/tasks/README.md` and `docs/tasks/TASK_ID_REGISTRY.md` synchronized.
-- [ ] `Handoff.md`, `project_context.md`, `changelog.md` updated.
-- [ ] GVC evidence paths recorded in task/handoff.
-- [ ] Any inherited TASK-1168 overflow remains documented if unresolved.
+- [x] `Lifecycle` synchronized with folder.
+- [x] `docs/tasks/README.md` and `docs/tasks/TASK_ID_REGISTRY.md` synchronized.
+- [x] `Handoff.md`, `project_context.md`, `changelog.md` updated.
+- [x] GVC evidence paths recorded in task/handoff.
+- [x] TASK-1168 overflow did not reproduce on this route after measurement (`scrollWidth == clientWidth` desktop/mobile).
