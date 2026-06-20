@@ -2,6 +2,14 @@
 
 > **Estado:** `released` (manifest transicionó a released, post-release health check verde). Orchestrator run [`27721723752`](https://github.com/efeoncepro/greenhouse-eo/actions/runs/27721723752) `completed/success`. Conducido por Claude tras pedido del operador ("paso a producción que Codex dejó preparado").
 
+## Sesión 2026-06-20 — TASK-1175/1176 Design Handoff V2 backlog — Codex
+
+> **Estado:** tasks creadas en `to-do/`, sin implementar. Se dividió intencionalmente por disciplina híbrida: backend-data foundation primero, UI consumer después.
+
+- **Creado:** `TASK-1175` (`docs/tasks/to-do/TASK-1175-design-handoff-control-plane-full-api-parity.md`) para convertir TASK-1120 en control plane Full API Parity: allowlist commands, owners, prioridad, target surface, links TASK/PR/deploy, evidencia GVC, Figma node verification, drift/orphan readers, capabilities finas y programmatic command path.
+- **Creado:** `TASK-1176` (`docs/tasks/to-do/TASK-1176-design-handoff-operations-cockpit-ui.md`) como UI consumer bloqueada por TASK-1175: lanes, inspector, allowlist UI, evidence gating y GVC desktop/mobile.
+- **Verificación documental:** `pnpm task:lint --task TASK-1175` y `pnpm task:lint --task TASK-1176` => `template=1`, `errors=0`, `warnings=0`. `pnpm ops:lint --changed` mantiene warning ajeno/preexistente en TASK-927 por falta de Backend/Data Contract; no hay diff en TASK-927.
+
 ## Sesión 2026-06-19 — TASK-1120 Design Handoff Registry — Codex
 
 > **Estado:** code complete local en `develop`, sin branch/worktree nuevo. `rollout pendiente`: migración no aplicada a Cloud SQL y allowlist de producto vacío hasta aprobación humana de `file_key`.
@@ -32597,3 +32605,22 @@ Trabajo directo en `develop` por instrucción del operador (sin branch). P3, dom
 - **Slice 4** docs (ADR §16.12, metric spec, RELIABILITY, changelog) + ISSUE-098 → resolved + cross-impact Delta a TASK-927.
 
 **Sin migración. Shadow / no toca el bono.** Próximo paso: TASK-927 (writeback) ya puede levantar su gate, con el signal en steady=0 como precondición.
+
+---
+
+## TASK-927 — Writeback bucket OTD a Notion `[GH] OTD` (code complete, rollout pendiente; develop local-first)
+
+**code complete, rollout pendiente (2026-06-20)** — 5 slices construidos + testeados (26 tests focales) + gates verdes. **Display-only, NO toca el bono.** Desbloqueada por TASK-1174.
+
+- **S1** constantes `otd-writeback-constants.ts` (`[GH] OTD` + mapping bucket→select-name verbatim del legacy + flag `isOtdWritebackEnabled` default OFF).
+- **S2** migration `task_otd_writeback_snapshots` (append-only, idempotencia skip-if-unchanged, sin source_event_id: batch).
+- **S3** batch `otd-writeback-batch.ts` (recompute via `computeAttributableLatenessForTask` → solo `valid` → idempotencia → throttle ~2.5 req/s → PATCH select → snapshot; **gate duro `shadow_terminal_open` steady=0**) + ops-worker endpoint `/otd/writeback` + Cloud Scheduler `ops-otd-writeback` (0 11 * * *).
+- **S4** 2 signals `otd_writeback_dead_letter` + `otd_writeback_lag` (thresholds batch-diario) + wiring.
+- **S5** docs (OTD_V1 §Delta, RELIABILITY Delta, changelog, ledger flag).
+
+**Rollout pendiente (gateado al operador, client-facing) — NO se hizo sin tu OK:**
+1. Crear la propiedad `[GH] OTD` (select read-only, opciones 🟢 On-Time/🟡 Late Drop/🔴 Overdue/🔵 Carry-Over/—) en Notion Efeonce + Sky.
+2. Redeploy del ops-worker (registra el Cloud Scheduler job + endpoint).
+3. Flip `NOTION_OTD_WRITEBACK_ENABLED_<EFEONCE|SKY>` con el gate `shadow_terminal_open` en verde.
+
+NO mover a `complete/` hasta property creada + flip + verificado en vivo (acceptance #1 depende de la propiedad Notion). Nota: comparte worktree con Codex (TASK-1120) — Codex pusheó su trabajo; tree reconciliado.

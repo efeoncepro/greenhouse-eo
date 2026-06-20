@@ -20,7 +20,7 @@ Esta task escribe el bucket/“días de retraso” por-tarea leyendo el M2 shado
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `optional`
-- Status real: `Diseno (writeback display del bucket OTD GH-owned por TASK-923 M1)`
+- Status real: `code complete, rollout pendiente (2026-06-20). 5 slices construidos + testeados + gates verdes. Pendiente de rollout gateado al operador (client-facing): crear la propiedad [GH] OTD en Notion Efeonce+Sky + redeploy ops-worker + flip flag NOTION_OTD_WRITEBACK_ENABLED per-cliente con el gate shadow_terminal_open en steady=0. Flag default OFF → cero writes hasta activar. NO se mueve a complete/ hasta que la propiedad exista + el flip esté hecho + verificado en vivo (acceptance criteria #1 depende de la propiedad Notion).`
 - Rank: `TBD`
 - Domain: `delivery|ico|integrations|reliability`
 - Blocked by: `TASK-922 (M2 — bucket_attributable freeze-aware en task_attributable_lateness_shadow) ✅ SHIPPED 2026-05-24, shadow compute ACTIVO en prod (ATTRIBUTABLE_LATENESS_OTD_ENABLED=true). TASK-923 (M1) ✅ SHIPPED es el clasificador base que M2 reusa. Soft-dep: TASK-912 captura de transiciones ACTIVA en prod (alimenta el shadow event-driven); el batch recomputa los buckets now()-dependientes.`
