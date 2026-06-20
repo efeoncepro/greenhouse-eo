@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -232,13 +232,13 @@ N/A (read-only). Verificación = el reader corre y el ledger refleja el estado r
 
 ## Acceptance Criteria
 
-- [ ] Inventario de capabilities por dominio, derivado de registry + API + `src/lib/**` + vistas.
-- [ ] Cada capability clasificada (contrato/UI-only/admin-coarse/hardcoded/parcial) con evidencia (paths) verificada.
-- [ ] Mapeo capability ↔ consumers ↔ tool de Nexa (gap de cobertura de Nexa explícito).
-- [ ] Backlog priorizado por valor-Nexa + riesgo + frecuencia, enrutado a TASK-1002 / API Platform.
-- [ ] Ledger durable `GREENHOUSE_FULL_API_PARITY_GAP_LEDGER_V1.md` + reader/script re-ejecutable.
-- [ ] Tasks derivadas de remediación creadas para el top del backlog.
-- [ ] `pnpm lint` + `pnpm tsc --noEmit` verdes (si se agrega script/reader).
+- [x] Inventario de capabilities por dominio, derivado de registry + API + `src/lib/**` + vistas — 217 capabilities del catálogo, clasificadas por módulo (reader + ledger §1).
+- [x] Cada capability clasificada con evidencia (paths) verificada — taxonomía governed/api-inline/lib-only/ui-only/declared-unwired por consumer-reach; casos seed verificados en ledger §5 (incl. supuestos desactualizados corregidos: enable-sync ya gobernado).
+- [x] Mapeo capability ↔ consumers ↔ tool de Nexa — ledger §2 (mapa de los 8 tools + gap North Star: 51% lectura, 0% accionable).
+- [x] Backlog priorizado por valor-Nexa + riesgo + frecuencia, enrutado a TASK-1002 / API Platform — ledger §6.
+- [x] Ledger durable `GREENHOUSE_FULL_API_PARITY_GAP_LEDGER_V1.md` + reader/script re-ejecutable (`scripts/audit/full-api-parity-coverage.ts`).
+- [x] Tasks derivadas de remediación creadas para el top del backlog — TASK-1177/1178/1179.
+- [x] `pnpm lint` + `pnpm tsc --noEmit` verdes (reader).
 
 ## Verification
 

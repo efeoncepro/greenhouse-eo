@@ -149,6 +149,7 @@ Reopen this decision if:
 ## Related Documents
 
 - `docs/architecture/GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md`
+- `docs/architecture/GREENHOUSE_FULL_API_PARITY_GAP_LEDGER_V1.md` — gap ledger + reader re-ejecutable (TASK-1172): mide la cobertura real de parity y de operabilidad de Nexa contra el portal existente.
 - `docs/architecture/DECISIONS_INDEX.md`
 - `docs/tasks/to-do/TASK-1002-full-api-parity-first-wave-program.md`
 - `AGENTS.md`

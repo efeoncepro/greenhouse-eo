@@ -2,6 +2,18 @@
 
 > **Estado:** `released` (manifest transicionó a released, post-release health check verde). Orchestrator run [`27721723752`](https://github.com/efeoncepro/greenhouse-eo/actions/runs/27721723752) `completed/success`. Conducido por Claude tras pedido del operador ("paso a producción que Codex dejó preparado").
 
+## Sesión 2026-06-20 — TASK-1172 Full API Parity gap audit — Claude
+
+> **Estado:** `TASK-1172` **complete** local (read-only, sin push). Entregables: reader re-ejecutable `scripts/audit/full-api-parity-coverage.ts` + ledger durable `docs/architecture/GREENHOUSE_FULL_API_PARITY_GAP_LEDGER_V1.md`. Gates: `tsc --noEmit` verde, `eslint` del reader verde, `task:lint` de las 4 tasks template=1/errors=0/warnings=0.
+
+**Qué se midió (snapshot 2026-06-20):** 217 capabilities del catálogo → 15% governed / 43% api-inline / 19% lib-only / 1 ui-only / 22% declared-unwired. Nexa: 51% lectura por dominio (8 tools), **0% accionable** (gap North Star). 486 mutation routes: 19% capability-governed, 71% session-coarse, 5% external, 6% unguarded-review.
+
+**Lección de método registrada en el ledger:** el reader es triage, NO veredicto. `session-coarse` cuenta routes sin `can()` en el boundary, pero el patrón canónico de Full API Parity empuja el `can()` al command (`src/lib`) — verificado con `enable-sync` (route con `requireInternalTenantContext` + command con `can('delivery.ico.sync.enable')`). El supuesto "enable-sync admin-coarse" de la spec quedó **desactualizado** (lo cerró TASK-1171). La verificación per-route es el trabajo de las tasks derivadas.
+
+**Derivó 3 tasks priorizadas (to-do):** TASK-1177 (Nexa write operability, rank #1, P1), TASK-1178 (triage session-coarse + backfill capability, rank #2), TASK-1179 (read-contracts organization+client_portal, rank #3). Re-correr el reader mide el avance del programa.
+
+**Pendiente:** ninguno bloqueante. Read-only, sin rollout. Push a develop pendiente de instrucción explícita del operador (local-first).
+
 ## Sesión 2026-06-20 — TASK-1175/1176 Design Handoff V2 backlog — Codex
 
 > **Estado:** `TASK-1176` complete local + runtime dev verificado en `develop`; `TASK-1175` code complete local con migración V2 aplicada en Cloud SQL dev, pero sigue pendiente de smoke operacional con `file_key` Figma real en el target de rollout. Se dividió intencionalmente por disciplina híbrida: backend-data foundation primero, UI consumer después.
