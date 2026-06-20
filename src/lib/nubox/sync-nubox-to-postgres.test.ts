@@ -17,6 +17,7 @@ vi.mock('@/lib/finance/quotation-canonical-store', () => ({
 }))
 
 import {
+  isNuboxPurchaseAnnulled,
   resolveNuboxPurchaseProjectionAmounts,
   upsertIncomeFromSale,
   upsertNuboxQuoteFromSale,
@@ -211,5 +212,25 @@ describe('resolveNuboxPurchaseProjectionAmounts', () => {
       grossFiscalTotalAmount: 119000,
       withholdingAmount: 0
     })
+  })
+})
+
+describe('isNuboxPurchaseAnnulled (TASK-1204)', () => {
+  it('detecta anulación por document_status_name="Anulada" aunque el booleano venga en false', () => {
+    // Caso real folio 40 Valentina: Nubox/SII traen "Anulada" pero is_annulled=false.
+    expect(isNuboxPurchaseAnnulled({ is_annulled: false, document_status_name: 'Anulada' })).toBe(true)
+  })
+
+  it('respeta el booleano is_annulled cuando viene en true', () => {
+    expect(isNuboxPurchaseAnnulled({ is_annulled: true, document_status_name: null })).toBe(true)
+  })
+
+  it('no marca anulado un documento válido', () => {
+    expect(isNuboxPurchaseAnnulled({ is_annulled: false, document_status_name: 'Válido' })).toBe(false)
+    expect(isNuboxPurchaseAnnulled({ is_annulled: false, document_status_name: null })).toBe(false)
+  })
+
+  it('normaliza mayúsculas/espacios del estado', () => {
+    expect(isNuboxPurchaseAnnulled({ is_annulled: false, document_status_name: '  ANULADA  ' })).toBe(true)
   })
 })

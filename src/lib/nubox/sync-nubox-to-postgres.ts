@@ -55,7 +55,9 @@ const roundAmount = (value: number): number => Math.round((value + Number.EPSILO
  * F29 de retención (caso real: folio 40 Valentina, +107.970). Esta derivación
  * acopla `is_annulled` al estado autoritativo del SII.
  */
-const isNuboxPurchaseAnnulled = (purchase: NuboxProjectionPurchase): boolean =>
+export const isNuboxPurchaseAnnulled = (
+  purchase: Pick<NuboxProjectionPurchase, 'is_annulled' | 'document_status_name'>
+): boolean =>
   purchase.is_annulled === true || (purchase.document_status_name ?? '').trim().toLowerCase() === 'anulada'
 
 export const resolveNuboxPurchaseProjectionAmounts = (purchase: NuboxProjectionPurchase) => {

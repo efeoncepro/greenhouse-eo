@@ -120,6 +120,8 @@ describe('materializeRetentionLedgerForPeriod', () => {
     expect(ledgerInsert).toMatch(/e\.currency = 'CLP' OR COALESCE\(NULLIF\(e\.exchange_rate_to_clp, 0\), 0\) <> 0/)
     // Solo documentos con retención.
     expect(ledgerInsert).toMatch(/COALESCE\(e\.withholding_amount, 0\) > 0/)
+    // TASK-1204 guard: excluye documentos anulados (boleta anulada en SII NUNCA declara retención).
+    expect(ledgerInsert).toMatch(/COALESCE\(e\.is_annulled, false\) = false/)
     // Casts explícitos (gate TASK-893 SQL embebido).
     expect(ledgerInsert?.match(/\$\d+::int/g)?.length).toBeGreaterThanOrEqual(2)
     expect(ledgerInsert).toMatch(/\$\d+::text/)
