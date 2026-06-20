@@ -2,6 +2,15 @@
 
 > **Estado:** `released` (manifest transicionó a released, post-release health check verde). Orchestrator run [`27721723752`](https://github.com/efeoncepro/greenhouse-eo/actions/runs/27721723752) `completed/success`. Conducido por Claude tras pedido del operador ("paso a producción que Codex dejó preparado").
 
+## Sesión 2026-06-20 — TASK-995 CLF/UF Indexed Finance Core — Slice 0 ADR (proposed, STOP para aceptación) — Claude
+
+> **Estado:** `in-progress`, Slice 0 (ADR) entregado, **STOP en gate de aceptación**. No se escribió código funcional de CLF (la spec lo prohíbe sin ADR aceptado).
+> - **Discovery:** foundation TASK-990 existe (`src/lib/finance/multi-currency/*`); `FinanceCurrency='CLP'|'USD'|'MXN'` (CLF fuera, por diseño); `clf-from-indicators` resuelve CLP↔CLF desde `economic_indicators.UF` (fresco 2026-06-19, `exchange_rates` CLF stale). El ADR CLF no existía.
+> - **Entregado:** `docs/architecture/GREENHOUSE_CLF_INDEXED_FINANCE_CORE_V1.md` (Proposed) — modelo indexed-unit ≠ cash currency, split de tipos, mapa de invariantes campo-por-campo, policy UF→CLP por evento, snapshot model (Option A: extender `fx_snapshots` con discriminador), event shape, 5 reliability signals, fail-closed, rollout con 5 flags default-OFF. Indexado en `DECISIONS_INDEX.md`.
+> - **Decisión operador 2026-06-20:** policy UF→CLP = reconocimiento a fecha del evento legal + remedición del cash CLP a fecha de pago; delta `indexed_unit_revaluation`.
+> - **Bloqueado para implementación por:** (1) aceptación del ADR (3 confirmaciones Finance pendientes — §0: ratificar policy, confirmar no-UF-cash, precedencia de evidencia UF); (2) decisión snapshot Option A vs B; (3) secuencia: TASK-990 (base MXN) sigue in-progress/no desplegada (TASK-1209 le arregló un bug core de exentos hoy). El código de CLF no debe empezar hasta que la base MXN esté operativamente estable.
+> - **Próximo paso:** Finance ratifica el ADR (§0) → mover a `Accepted` en el header + DECISIONS_INDEX → recién ahí Slice 1 (type split) y siguientes.
+
 ## Sesión 2026-06-20 — TASK-1209 Nubox export/exempt invoice automatic income projection (code-complete, rollout pendiente) — Claude
 
 > **Estado:** **code-complete local-first, rollout pendiente** (sin push). Lifecycle `in-progress` (no se mueve a complete hasta apply Berel + worker redeploy + staging smoke con sign-off Finance).

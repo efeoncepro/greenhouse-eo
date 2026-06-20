@@ -25,6 +25,13 @@
 - Legacy ID: `none`
 - GitHub Issue: `[optional]`
 
+## Delta 2026-06-20 — Slice 0 ADR redactado (proposed); STOP para aceptación
+
+- **Discovery confirmado:** foundation TASK-990 existe (`src/lib/finance/multi-currency/*`), `FinanceCurrency='CLP'|'USD'|'MXN'` (CLF fuera), provider `clf-from-indicators` resuelve CLP↔CLF desde `economic_indicators.UF` (fresco 2026-06-19). El ADR `GREENHOUSE_CLF_INDEXED_FINANCE_CORE_V1` no existía.
+- **Slice 0 entregado:** redactado `docs/architecture/GREENHOUSE_CLF_INDEXED_FINANCE_CORE_V1.md` (status `Proposed`) con mapa de invariantes campo-por-campo, split de tipos (`FinanceNativeUnit`/`IndexedUnit`/`SettlementCurrency`/`AccountCurrency`), tabla de policy UF→CLP por evento, modelo de snapshot (Option A recomendado), event shape canónico, signals, fail-closed y rollout. Indexado en `DECISIONS_INDEX.md` (Proposed).
+- **Decisión de policy (operador 2026-06-20):** UF→CLP = **reconocimiento a fecha del evento legal + remedición del cash CLP a fecha de pago; delta = `indexed_unit_revaluation`** (separado de FX gain/loss). Ratificar en la aceptación del ADR.
+- **STOP (gate duro):** la spec prohíbe implementar sin ADR aceptado. El ADR queda `Proposed` pendiente de 3 confirmaciones Finance (§0: ratificar policy, confirmar que no hay instrumento UF-cash real, confirmar precedencia de evidencia UF). **No se escribió código funcional de CLF.** Secuencia: TASK-990 (base MXN) sigue `in-progress`/no desplegada — el código de TASK-995 no debería empezar hasta que esa base esté operativamente estable.
+
 ## Summary
 
 Promover CLF/UF desde pricing-only a soporte finance-core como **unidad indexada nativa**, no como moneda bancaria. Greenhouse ya cotiza en UF y el negocio puede pactar/cobrar importes en UF, pero la factura legal y el movimiento de caja normalmente se materializan en CLP. Esta task extiende la arquitectura multi-currency de TASK-990 para preservar UF nativa, CLP funcional, USD reporting y settlement real sin fingir que existen cuentas u ordenes bancarias en UF.
