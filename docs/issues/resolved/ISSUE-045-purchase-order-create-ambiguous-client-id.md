@@ -38,7 +38,7 @@ Como el join incorpora también `s.client_id`, PostgreSQL falla con `column refe
 
 ## Solución
 
-Fix localizado ya aplicado en repo:
+Fix localizado aplicado y validado en staging:
 
 - se calificaron las columnas del query con alias `cp.`
   - `cp.client_profile_id`
@@ -47,26 +47,29 @@ Fix localizado ya aplicado en repo:
 - se auditó el resolver canónico de Finance para este carril y se confirmó que la ambigüedad estaba concentrada en ese lookup de `client_profiles`
 - se agregó una prueba focalizada en `src/lib/finance/canonical.test.ts` para asegurar que el SQL del lookup quede aliasado y no vuelva a introducir referencias ambiguas
 - se volvió a correr la suite de la route de purchase orders para confirmar que el flujo sigue cerrando con el contrato esperado del endpoint
-
-Pendiente para cerrar el issue:
-
-- validar el flujo recuperado en staging una vez que el fix esté desplegado
+- se repitió el boundary HTTP de staging que fallaba en el formulario (`POST /api/finance/purchase-orders`) usando scope `organizationId` + `clientProfileId`, sin `clientId` crudo, y dejó de responder 500
 
 ## Verificación
 
-Ejecutada localmente:
+Ejecutada localmente el 2026-06-20:
 
 1. `pnpm exec vitest run src/lib/finance/canonical.test.ts src/app/api/finance/purchase-orders/route.test.ts`
+   - Resultado: 2 archivos, 17 tests passed.
 
-Pendiente en staging post-deploy:
+Ejecutada en staging el 2026-06-20:
 
-1. repetir `POST /api/finance/purchase-orders` con el payload que hoy falla
-2. confirmar que la respuesta deja de ser HTTP 500
-3. validar desde la UI que `Registrar OC` crea la orden correctamente
+1. `pnpm staging:request /api/finance/clients --grep Sky`
+   - Resultado: HTTP 200; `Sky Airline` resuelto con `organizationId=org-b9977f96-f7ef-4afb-bb26-7355d78c981f` y `clientProfileId=hubspot-company-30825221458`.
+2. `pnpm staging:request POST /api/finance/purchase-orders '{"poNumber":"GH-ISSUE-045-20260620-1427","organizationId":"org-b9977f96-f7ef-4afb-bb26-7355d78c981f","clientProfileId":"hubspot-company-30825221458","authorizedAmount":1000,"issueDate":"2026-06-20","currency":"CLP",...}' --pretty`
+   - Resultado: HTTP 201; creada `PO-b254c2db`.
+3. `pnpm staging:request '/api/finance/purchase-orders?organizationId=org-b9977f96-f7ef-4afb-bb26-7355d78c981f&status=active' --grep GH-ISSUE-045-20260620-1427`
+   - Resultado: HTTP 200; la OC creada aparece en el listado.
+
+Nota de alcance: no se repitió una segunda creación desde UI para evitar duplicar datos de staging; la causa raíz estaba en el boundary HTTP del endpoint consumido por el formulario y ese boundary quedó validado con create + read.
 
 ## Estado
 
-open
+resolved
 
 ## Relacionado
 

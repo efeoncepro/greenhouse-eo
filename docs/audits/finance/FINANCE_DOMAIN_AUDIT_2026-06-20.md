@@ -23,7 +23,7 @@ El trabajo real no es corrupción de datos: son **gaps de borde y backlog operat
 1. Un cron de reintento DTE huérfano (sin scheduler).
 2. Dos crons que viven en Vercel cron (solo corren en prod, no en staging) → indicadores económicos y FX LATAM stale en staging.
 3. Una cola de revisión de `economic_category` con 171 ítems `pending` sin drenar.
-4. Tres issues abiertos con usuario afectado (ISSUE-045, ISSUE-055, ISSUE-058).
+4. Dos issues abiertos con usuario afectado (ISSUE-055, ISSUE-058); ISSUE-045 quedó resuelto el 2026-06-20.
 5. Cuatro tasks `in-progress` cuyos invariantes ya están escritos pero el lifecycle no se cerró.
 6. Una vista viva sin ítem de menú (`/finance/external-signals`).
 
@@ -55,7 +55,7 @@ Subsistemas: Income/DTE · Expenses/Payables · Ledger/Settlement (`settlement_g
 - `docs/architecture/GREENHOUSE_COMMERCIAL_COST_ATTRIBUTION_V1.md`
 - `.codex/skills/greenhouse-finance-accounting-operator/references/greenhouse-finance-runtime-map.md`
 - `docs/architecture/agent-invariants` (secciones finance embebidas)
-- `docs/issues/open/ISSUE-045`, `ISSUE-055`, `ISSUE-058`
+- `docs/issues/resolved/ISSUE-045`, `docs/issues/open/ISSUE-055`, `docs/issues/open/ISSUE-058`
 - `src/lib/navigation/route-reachability-manifest.ts`
 - `vercel.json` + `services/ops-worker/deploy.sh`
 
@@ -153,7 +153,7 @@ En staging estos indicadores quedan stale. Además, `exchange-rates/sync` (USD/C
 
 ### F5 — Issues abiertos con usuario afectado (🔴)
 
-- **ISSUE-045** — `POST /api/finance/purchase-orders` → HTTP 500: referencia ambigua a `client_id` sin alias en `resolveFinanceClientContext()` (`src/lib/finance/canonical.ts`, JOIN `client_profiles cp LEFT JOIN spaces s`). Coherente con que `purchase_orders` tiene solo 1 fila en prod. **Fix de baja complejidad, alto valor.**
+- **ISSUE-045** — ✅ resuelto 2026-06-20. `POST /api/finance/purchase-orders` ya no cae en HTTP 500 por referencia ambigua a `client_id`; el fix aliasó `cp.*` en `resolveFinanceClientContext()` y se validó en staging con create HTTP 201 + read HTTP 200 (`PO-b254c2db`, `GH-ISSUE-045-20260620-1427`).
 - **ISSUE-055** — Quote builder no puede cotizar rol `ECG-004` (PR Analyst): el pricing engine no tiene cost basis para ese SKU (`Missing cost components for role ECG-004`).
 - **ISSUE-058** — Webhook `greenhouse-teams-finance-alerts-webhook` no provisionado en GCP Secret Manager (TASK-669 deploy pendiente) → alertas finance se saltan. Mitigado con flag `provisioning_status='pending_setup'`.
 
@@ -254,7 +254,7 @@ Tratamiento recomendado:
 | 0 | Remover DDL runtime de `commercial-cost-attribution/store.ts`, migrarlo a schema governance y reintentar handlers fallidos | Management accounting / sync | Medio | Crítico |
 | 0.1 | Rematerializar `commercial_cost_attribution` + `operational_pl_snapshots` mayo/junio y marcar snapshots degradados si falta costo | Cost Intelligence | Medio | Crítico |
 | 0.2 | Ejecutar auditoría de capabilities sobre las 206 rutas finance/admin/cost-intelligence | Controls / API governance | Medio | Alto |
-| 1 | Fix ISSUE-045 (alias `client_id` en `resolveFinanceClientContext`) | Bug runtime | Bajo | Alto |
+| 1 | ✅ Resuelto 2026-06-20: Fix ISSUE-045 (alias `client_id` en `resolveFinanceClientContext`) | Bug runtime | Bajo | Alto |
 | 2 | Migrar `economic-indicators/sync` + `fx-sync-latam` a Cloud Scheduler | Robustez/paridad | Medio | Alto |
 | 3 | Registrar o eliminar `dte-emission-retry` cron + signal dead-letter | Robustez | Bajo | Medio |
 | 4 | Drenar/triagear 171 pending de `economic_category_manual_queue` | Backlog ops | Medio | Medio |

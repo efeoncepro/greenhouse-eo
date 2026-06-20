@@ -83,4 +83,4 @@ resolved
 - `src/app/api/hr/payroll/compensation/route.ts`
 - `src/views/greenhouse/payroll/PayrollDashboard.tsx`
 - `src/views/greenhouse/payroll/PayrollCompensationTab.tsx`
-- `docs/issues/open/ISSUE-045-purchase-order-create-ambiguous-client-id.md`
+- `docs/issues/resolved/ISSUE-045-purchase-order-create-ambiguous-client-id.md`

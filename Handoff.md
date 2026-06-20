@@ -19671,7 +19671,7 @@ Converted/LineItemsSynced/DiscountHealthAlert`, `productCatalogCreated/Synced`.
   - mini-task cerrada en `docs/mini-tasks/complete/MINI-002-hes-client-contact-and-po-document-inheritance.md`
   - tracker y registry de mini-tasks actualizados
 
-## Sesion 2026-04-13 — ISSUE-045 abierto: registrar OC cae por `client_id` ambiguo en Finance canonical
+## Sesion 2026-04-13 / cierre 2026-06-20 — ISSUE-045 resuelto: registrar OC caía por `client_id` ambiguo en Finance canonical
 
 - incidente:
   - el flujo `Finance > Purchase Orders > Registrar OC` devuelve error genérico al crear una OC en staging
@@ -19688,8 +19688,8 @@ Converted/LineItemsSynced/DiscountHealthAlert`, `productCatalogCreated/Synced`.
   - `pnpm exec vitest run src/lib/finance/canonical.test.ts src/app/api/finance/purchase-orders/route.test.ts`
   - `pnpm lint -- src/lib/finance/canonical.ts src/lib/finance/canonical.test.ts`
 - estado documental:
-  - issue creado en `docs/issues/open/ISSUE-045-purchase-order-create-ambiguous-client-id.md`
-  - queda **open** hasta validar el recovery en staging post-deploy
+  - issue movido a `docs/issues/resolved/ISSUE-045-purchase-order-create-ambiguous-client-id.md` el 2026-06-20
+  - recovery validado en staging con `POST /api/finance/purchase-orders` HTTP 201 y lectura posterior HTTP 200 para `GH-ISSUE-045-20260620-1427`
   - tracker actualizado en `docs/issues/README.md`
 
 ## Sesion 2026-04-13 — MINI-001 cerrada: OC ahora prioriza contactos del cliente seleccionado
