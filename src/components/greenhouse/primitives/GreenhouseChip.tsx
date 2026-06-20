@@ -7,9 +7,10 @@ import Chip from '@mui/material/Chip'
 import type { ChipProps } from '@mui/material/Chip'
 import type { SxProps, Theme } from '@mui/material/styles'
 
+import { motionCss } from '@/components/greenhouse/motion/core/tokens'
 import { typographyScale } from '@/components/theme/typography-tokens'
 
-export type GreenhouseChipVariant = 'solid' | 'label' | 'outlined'
+export type GreenhouseChipVariant = 'solid' | 'label' | 'outlined' | 'spotlight' | 'signal'
 export type GreenhouseChipTone = 'default' | 'primary' | 'secondary' | 'error' | 'warning' | 'info' | 'success'
 export type GreenhouseChipSize = 'medium' | 'small'
 export type GreenhouseChipKind =
@@ -55,6 +56,10 @@ const toneMain = (tone: Exclude<GreenhouseChipTone, 'default'>) => `var(--mui-pa
 const toneContrast = (tone: Exclude<GreenhouseChipTone, 'default'>) => `var(--mui-palette-${tone}-contrastText)`
 const toneSoft = (tone: Exclude<GreenhouseChipTone, 'default'>) => `var(--mui-palette-${tone}-lightOpacity)`
 
+const CHIP_SHIMMER_DURATION = `calc(${motionCss.duration.extended} * 3.333)`
+const CHIP_SHIMMER_DELAY = `calc(${motionCss.duration.extended} * 2.5)`
+const CHIP_SIGNAL_DURATION = `calc(${motionCss.duration.extended} * 3)`
+
 const GREENHOUSE_CHIP_SIZE_TOKENS = {
   medium: {
     blockSize: 32,
@@ -82,6 +87,26 @@ const GREENHOUSE_CHIP_SIZE_TOKENS = {
 >
 
 const getChipSurface = (variant: GreenhouseChipVariant, tone: GreenhouseChipTone) => {
+  if (variant === 'spotlight') {
+    return getChipSurface('label', tone)
+  }
+
+  if (variant === 'signal') {
+    if (tone === 'default') {
+      return {
+        backgroundColor: 'var(--mui-palette-background-paper)',
+        borderColor: 'var(--mui-palette-divider)',
+        color: 'var(--mui-palette-text-primary)'
+      }
+    }
+
+    return {
+      backgroundColor: 'var(--mui-palette-background-paper)',
+      borderColor: toneSoft(tone),
+      color: toneMain(tone)
+    }
+  }
+
   if (tone === 'default') {
     if (variant === 'outlined') {
       return {
@@ -122,6 +147,24 @@ const getChipSurface = (variant: GreenhouseChipVariant, tone: GreenhouseChipTone
 }
 
 const getHoverSurface = (variant: GreenhouseChipVariant, tone: GreenhouseChipTone) => {
+  if (variant === 'spotlight') {
+    return getHoverSurface('label', tone)
+  }
+
+  if (variant === 'signal') {
+    if (tone === 'default') {
+      return {
+        backgroundColor: 'var(--mui-palette-action-hover)',
+        color: 'var(--mui-palette-text-primary)'
+      }
+    }
+
+    return {
+      backgroundColor: toneSoft(tone),
+      color: toneMain(tone)
+    }
+  }
+
   if (tone === 'default') {
     return {
       backgroundColor: variant === 'outlined' ? 'var(--mui-palette-action-hover)' : 'var(--mui-palette-action-focus)',
@@ -150,6 +193,8 @@ const getChipSx = (
   const surface = getChipSurface(variant, tone)
   const hoverSurface = getHoverSurface(variant, tone)
   const isSmall = size === 'small'
+  const isSpotlight = variant === 'spotlight'
+  const isSignal = variant === 'signal'
   const sizeTokens = GREENHOUSE_CHIP_SIZE_TOKENS[size]
   const { labelTypography } = sizeTokens
   // TASK-1053 Fase B: tonal (label) feedback chips consume the curated tonal
@@ -157,7 +202,7 @@ const getChipSx = (
   // instead of the opacity wash + `main`-as-text — which fails AA for warning
   // (amber #ffb703 as text is unreadable). Resolved inside the theme callback so it
   // is mode-correct (theme rebuilds per currentMode).
-  const tonalFeedback = variant === 'label' && isFeedbackTone(tone)
+  const tonalFeedback = (variant === 'label' || variant === 'spotlight') && isFeedbackTone(tone)
 
   return theme => {
     const sem = tonalFeedback ? theme.greenhouseSemantic[tone] : null
@@ -180,7 +225,9 @@ const getChipSx = (
       '--gh-chip-icon-size': sizeTokens.iconSize,
       blockSize: sizeTokens.blockSize,
       minInlineSize: 0,
-      borderRadius: 1,
+      position: 'relative',
+      overflow: 'hidden',
+      borderRadius: isSpotlight || isSignal ? '999px' : 1,
       border: '1px solid',
       borderColor: resolvedSurface.borderColor,
       backgroundColor: resolvedSurface.backgroundColor,
@@ -194,6 +241,8 @@ const getChipSx = (
         px: isSmall ? 2.5 : 3,
         py: 0,
         display: 'inline-flex',
+        position: 'relative',
+        zIndex: 1,
         minInlineSize: 0,
         alignItems: 'center',
         lineHeight: labelTypography.lineHeight,
@@ -203,6 +252,8 @@ const getChipSx = (
       '& .MuiChip-avatar, & .MuiChip-icon': {
         inlineSize: 'var(--gh-chip-avatar-size)',
         blockSize: 'var(--gh-chip-avatar-size)',
+        position: 'relative',
+        zIndex: 1,
         marginInlineStart: isSmall ? theme.spacing(1) : theme.spacing(1.5),
         marginInlineEnd: isSmall ? theme.spacing(-1.5) : theme.spacing(-2),
         color: 'currentColor',
@@ -233,6 +284,77 @@ const getChipSx = (
           transform: 'scale(1.08)'
         }
       },
+
+      ...(isSpotlight
+        ? {
+            '&::before': {
+              content: '""',
+              position: 'absolute',
+              inset: 0,
+              borderRadius: 'inherit',
+              pointerEvents: 'none',
+              background:
+                'linear-gradient(90deg, transparent 0%, color-mix(in srgb, currentColor 18%, transparent) 50%, transparent 100%)',
+              transform: 'translateX(-120%)',
+              animationName: 'gh-chip-spotlight-wave',
+              animationDuration: CHIP_SHIMMER_DURATION,
+              animationDelay: CHIP_SHIMMER_DELAY,
+              animationIterationCount: 'infinite',
+              animationTimingFunction: motionCss.ease.standard
+            },
+
+            '@keyframes gh-chip-spotlight-wave': {
+              '0%': { transform: 'translateX(-120%)' },
+              '46%, 100%': { transform: 'translateX(220%)' }
+            }
+          }
+        : null),
+
+      ...(isSignal
+        ? {
+            '& .gh-chip-signal-dot': {
+              inlineSize: isSmall ? 6 : 7,
+              blockSize: isSmall ? 6 : 7,
+              borderRadius: '50%',
+              position: 'relative',
+              zIndex: 1,
+              flexShrink: 0,
+              backgroundColor: tone === 'default' ? 'var(--mui-palette-text-secondary)' : toneMain(tone),
+              boxShadow:
+                tone === 'default'
+                  ? '0 0 0 3px var(--mui-palette-action-hover)'
+                  : `0 0 0 3px var(--mui-palette-${tone}-lightOpacity)`,
+              animationName: 'gh-chip-signal-dot-breathe',
+              animationDuration: CHIP_SIGNAL_DURATION,
+              animationIterationCount: 'infinite',
+              animationTimingFunction: motionCss.ease.standard
+            },
+
+            '& .gh-chip-signal-dot::after': {
+              content: '""',
+              position: 'absolute',
+              inset: -4,
+              borderRadius: 'inherit',
+              border: '1px solid currentColor',
+              opacity: 0.2,
+              transform: 'scale(0.8)',
+              animationName: 'gh-chip-signal-ring',
+              animationDuration: CHIP_SIGNAL_DURATION,
+              animationIterationCount: 'infinite',
+              animationTimingFunction: motionCss.ease.standard
+            },
+
+            '@keyframes gh-chip-signal-dot-breathe': {
+              '0%, 100%': { opacity: 0.62, transform: 'scale(0.92)' },
+              '50%': { opacity: 1, transform: 'scale(1)' }
+            },
+
+            '@keyframes gh-chip-signal-ring': {
+              '0%': { opacity: 0.28, transform: 'scale(0.72)' },
+              '68%, 100%': { opacity: 0, transform: 'scale(1.55)' }
+            }
+          }
+        : null),
 
       '&.MuiChip-clickable': {
         cursor: 'pointer'
@@ -267,6 +389,11 @@ const getChipSx = (
 
         '& .MuiChip-deleteIcon': {
           transition: 'none',
+          transform: 'none'
+        },
+
+        '&::before, & .gh-chip-signal-dot, & .gh-chip-signal-dot::after': {
+          animation: 'none',
           transform: 'none'
         },
 
@@ -319,6 +446,15 @@ const GreenhouseChip = ({
   const avatar = buildAvatar({ avatarAlt, avatarInitials, avatarNode, avatarSrc })
   const deleteHandler = closable ? (onDelete ?? (() => undefined)) : undefined
 
+  const icon =
+    iconClassName || variant !== 'signal' ? (
+      iconClassName ? (
+        <i className={iconClassName} />
+      ) : undefined
+    ) : (
+      <span aria-hidden='true' className='gh-chip-signal-dot' />
+    )
+
   return (
     <Chip
       {...props}
@@ -330,7 +466,7 @@ const GreenhouseChip = ({
       data-variant={variant}
       deleteIcon={closable ? <i aria-label={closeLabel} className='tabler-circle-x-filled' /> : undefined}
       disabled={disabled}
-      icon={iconClassName ? <i className={iconClassName} /> : undefined}
+      icon={icon}
       onDelete={deleteHandler}
       size={size}
       variant='filled'

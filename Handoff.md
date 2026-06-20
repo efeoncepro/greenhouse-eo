@@ -2,6 +2,13 @@
 
 > **Estado:** `released` (manifest transicionó a released, post-release health check verde). Orchestrator run [`27721723752`](https://github.com/efeoncepro/greenhouse-eo/actions/runs/27721723752) `completed/success`. Conducido por Claude tras pedido del operador ("paso a producción que Codex dejó preparado").
 
+## Sesión 2026-06-20 — ISSUE-100 local dev Nexa Insight skeleton stuck — Codex
+
+> **Estado:** resolved local. El síntoma `/nexa/insights/[id]` quedando en skeleton + `Compiling...` fue degradación de Turbopack local, no eliminación/bug de skeletons ni credenciales GCP/Cloud SQL. `pnpm pg:doctor` quedó sano.
+> - **Cambio operativo:** `pnpm dev` ahora usa `next dev --webpack`; `pnpm dev:turbo` queda opt-in para diagnóstico Turbopack. Server local vivo en `http://localhost:3002` con un solo listener.
+> - **Verificación:** Playwright autenticado a `http://localhost:3002/nexa/insights/EO-AIS-0B48FAC9DBBA` confirmó `skeletonGone=true`, `hasRoot=true`, `hasSuggestedAction=true` en ~5.8s; `ps` posterior mostró `next-server` idle.
+> - **Docs:** `docs/issues/resolved/ISSUE-100-local-dev-turbopack-nexa-insight-skeleton-stuck.md`, tracker `docs/issues/README.md` y changelog actualizados. Los skeletons siguen siendo necesarios; el criterio correcto es que desaparezcan al llegar data real.
+
 ## Sesión 2026-06-20 — TASK-1172 Full API Parity gap audit — Claude
 
 > **Estado:** `TASK-1172` **complete** local (read-only, sin push). Entregables: reader re-ejecutable `scripts/audit/full-api-parity-coverage.ts` + ledger durable `docs/architecture/GREENHOUSE_FULL_API_PARITY_GAP_LEDGER_V1.md`. Gates: `tsc --noEmit` verde, `eslint` del reader verde, `task:lint` de las 4 tasks template=1/errors=0/warnings=0.

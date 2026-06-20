@@ -31,6 +31,12 @@ export const scenario: CaptureScenario = {
       label: 'chips-lab',
       fullPage: true,
       note: 'Laboratorio interno dedicado para GreenhouseChip y sus variants, tonos, sizes, avatar y close states'
+    },
+    {
+      kind: 'mark',
+      label: 'chips-animated-capability',
+      clipSelector: '[data-capture="chips-animated-capability"]',
+      note: 'Port gobernado del prompt badge: shimmer spotlight y signal dot pulsante sobre GreenhouseChip'
     }
   ]
 }

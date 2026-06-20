@@ -752,6 +752,7 @@ Docs canonicos:
 Contrato:
 
 - Variants oficiales V1: `solid`, `label`, `outlined`. `label` conserva el nombre AXIS/Figma y se traduce internamente al affordance tonal de Vuexy/MUI.
+- Variants oficiales V1.1 (animated badge capability): `spotlight` y `signal`. `spotlight` porta el acabado shimmer/wave del prompt shadcn badge como overlay tokenizado sobre la superficie tonal del chip; `signal` porta el dot vivo con anillo pulsante para monitoreo/estado live. Ambas variants son parte de `GreenhouseChip`, no un componente `/components/ui` paralelo; consumen MUI/theme tokens, motion tokens y `prefers-reduced-motion`. Lab: `/design-system/chips`, frame GVC `chips-animated-capability`.
 - Tones oficiales V1: `default`, `primary`, `secondary`, `error`, `warning`, `info`, `success`.
 - Sizes oficiales V1: `medium` (32px) y `small` (24px), alineados al nodo Figma.
 - Kinds semanticos V1: `status`, `attribute`, `input`, `action`, `identity`, `filter`, `metric`, `custom`.
