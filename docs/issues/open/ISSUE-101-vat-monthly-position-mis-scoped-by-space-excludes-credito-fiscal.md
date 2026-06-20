@@ -65,13 +65,15 @@ Veredicto arquitectónico (4 pilares) y razonamiento fiscal completo en TASK-725
 
 ## Estado
 
-open — **fix code-complete (TASK-725), rollout pendiente.** Falta aplicar la migración a Cloud SQL + re-materializar abr/may/jun + validar drift=0 en runtime y la cifra vs F29 real.
+open — **fix verificado en dev (TASK-725); cierre pendiente de deploy del ops-worker + validación F29.** El re-scope está aplicado y re-materializado en Cloud SQL dev con `finance.vat.position_drift=0` y el crédito fiscal entrando. Falta: (B) desplegar el ops-worker con el código nuevo (el desplegado corre el materializador viejo), y (C) cuadrar la cifra corregida vs el F29 real con el contador antes de baseline productivo.
 
 ## Delta 2026-06-20 — implementación TASK-725 (code-complete, rollout pendiente)
 
 Re-scope implementado end-to-end en `develop` local-first (Slices 1–5). Precisión sobre el número del Impacto: el **$2.56M CLP** era el universo de gastos con `recoverable_tax_amount > 0` **sin filtro de período fiscal** (la mayoría sin `period_year/month`, que el materializador no procesa en ninguna versión). El crédito fiscal **materializable** (con período) que el gate `space_id IS NOT NULL` excluía es menor: validado read-only vs PG, el materializador viejo veía **0** filas de crédito fiscal (`credito_rows_viejo=0`); el re-scope incorpora el crédito por período (mar/abr/may/jun), todo proveniente de gastos sin space. La dirección del bug es la misma (el gate excluía el 100% del crédito materializable); la magnitud F29 exacta se confirma al re-materializar + validar con contador.
 
-Pendiente de rollout para cerrar: `pnpm pg:connect:migrate` (migración `20260620131856180`) → regen `db.d.ts` → re-materializar (`POST /api/internal/vat-ledger-materialize` sin body, o `materializeAllAvailableVatPeriods`) → verificar `finance.vat.position_drift = 0` en `/admin/operations` → cuadrar net vs F29 real.
+**Verificación en dev (2026-06-20, autorizada):** migración `20260620131856180` aplicada + re-materialización con el código nuevo. Las 4 posiciones (mar–jun) quedaron ancladas a Efeonce Group SpA (`org-2df565fb`, RUT 77.357.182-1), `space_id=NULL`, con crédito fiscal entrando (mar $19.264 · abr $67.870 · may $21.594 · jun $16.048; antes $0). Net abril $1.102.000→$1.034.130 (rebajado por el crédito). `finance.vat.position_drift=0`.
+
+Pendiente para cierre total: (B) push develop + redeploy ops-worker (`services/ops-worker/deploy.sh`) para que el worker reactivo corra el materializador nuevo; (C) validación de la cifra corregida vs F29 real con contador.
 
 ## Relacionado
 
