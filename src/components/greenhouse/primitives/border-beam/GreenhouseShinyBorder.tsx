@@ -199,7 +199,7 @@ const GreenhouseShinyBorder = ({
               alignItems: 'center',
               gap: isCta ? theme.spacing(isCompact ? 1 : 1.25) : 0,
               px: isCta ? (isCompact ? 3 : 4) : 6,
-              py: isCta ? (isCompact ? 1.5 : 2.25) : 3,
+              py: isCta ? (isCompact ? 1 : 2.25) : 3,
               borderRadius: `${theme.shape.customBorderRadius.xxl}px`,
               color: theme.palette.common.white,
               bgcolor: theme.axis.ramp.primary[900],

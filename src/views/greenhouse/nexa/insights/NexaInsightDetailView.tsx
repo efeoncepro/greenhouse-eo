@@ -542,7 +542,7 @@ const AskNexaButton = ({ signalId }: { signalId: string }) => {
       ariaLabel={GH_NEXA.insight_ask_nexa_aria}
       onClick={handleAsk}
     >
-      <GreenhouseNexaBrandMark kind='inlineMarkOnDark' size='small' />
+      <GreenhouseNexaBrandMark kind='inlineMarkOnDark' size='small' sx={{ inlineSize: 18, blockSize: 18 }} />
       {GH_NEXA.insight_ask_nexa_cta}
     </GreenhouseShinyBorder>
   )
