@@ -23,7 +23,7 @@ El trabajo real no es corrupción de datos: son **gaps de borde y backlog operat
 1. Un cron de reintento DTE huérfano (sin scheduler).
 2. Dos crons que viven en Vercel cron (solo corren en prod, no en staging) → indicadores económicos y FX LATAM stale en staging.
 3. Una cola de revisión de `economic_category` con 171 ítems `pending` sin drenar.
-4. Dos issues abiertos con usuario afectado (ISSUE-055, ISSUE-058); ISSUE-045 quedó resuelto el 2026-06-20.
+4. Un issue abierto con usuario afectado (ISSUE-058); ISSUE-045 e ISSUE-055 quedaron resueltos el 2026-06-20.
 5. Cuatro tasks `in-progress` cuyos invariantes ya están escritos pero el lifecycle no se cerró.
 6. Una vista viva sin ítem de menú (`/finance/external-signals`).
 
@@ -55,7 +55,7 @@ Subsistemas: Income/DTE · Expenses/Payables · Ledger/Settlement (`settlement_g
 - `docs/architecture/GREENHOUSE_COMMERCIAL_COST_ATTRIBUTION_V1.md`
 - `.codex/skills/greenhouse-finance-accounting-operator/references/greenhouse-finance-runtime-map.md`
 - `docs/architecture/agent-invariants` (secciones finance embebidas)
-- `docs/issues/resolved/ISSUE-045`, `docs/issues/open/ISSUE-055`, `docs/issues/open/ISSUE-058`
+- `docs/issues/resolved/ISSUE-045`, `docs/issues/resolved/ISSUE-055`, `docs/issues/open/ISSUE-058`
 - `src/lib/navigation/route-reachability-manifest.ts`
 - `vercel.json` + `services/ops-worker/deploy.sh`
 
@@ -151,10 +151,10 @@ En staging estos indicadores quedan stale. Además, `exchange-rates/sync` (USD/C
 
 `ExternalSignalsView` (vista viva, TASK-708) es alcanzable solo por URL directa; no tiene ítem de navegación. Tracked como follow-up TASK-983 (necesita viewCode + migración seed). La reachability-gate la cubre como child route declarada, así que no es "orphan" formal, pero es un dead-end de UX.
 
-### F5 — Issues abiertos con usuario afectado (🔴)
+### F5 — Issues abiertos con usuario afectado (🟠)
 
 - **ISSUE-045** — ✅ resuelto 2026-06-20. `POST /api/finance/purchase-orders` ya no cae en HTTP 500 por referencia ambigua a `client_id`; el fix aliasó `cp.*` en `resolveFinanceClientContext()` y se validó en staging con create HTTP 201 + read HTTP 200 (`PO-b254c2db`, `GH-ISSUE-045-20260620-1427`).
-- **ISSUE-055** — Quote builder no puede cotizar rol `ECG-004` (PR Analyst): el pricing engine no tiene cost basis para ese SKU (`Missing cost components for role ECG-004`).
+- **ISSUE-055** — ✅ resuelto 2026-06-20. `ECG-004` (PR Analyst) ya cotiza en staging: la migración `20260620190000000_issue-055-reviewed-staff-role-cost-basis.sql` sembró `role_employment_compatibility` + `sellable_role_cost_components` revisados con `employment_type_code='indefinido_clp'` y provenance `admin_manual`. El mismo fix cubre `ECG-017` y `ECG-018`; `ECG-032` queda fuera por una ambigüedad distinta. Verificado con `POST /api/finance/quotes/pricing/simulate` (`HTTP 200`, `costBasisKind='role_modeled'`) y smoke vecino `ECG-001` (`role_blended` intacto).
 - **ISSUE-058** — Webhook `greenhouse-teams-finance-alerts-webhook` no provisionado en GCP Secret Manager (TASK-669 deploy pendiente) → alertas finance se saltan. Mitigado con flag `provisioning_status='pending_setup'`.
 
 ### F6 — Cuatro tasks `in-progress` sin cerrar lifecycle (✅ resuelto 2026-06-20)
@@ -258,7 +258,7 @@ Tratamiento recomendado:
 | 2 | Migrar `economic-indicators/sync` + `fx-sync-latam` a Cloud Scheduler | Robustez/paridad | Medio | Alto |
 | 3 | Registrar o eliminar `dte-emission-retry` cron + signal dead-letter | Robustez | Bajo | Medio |
 | 4 | Drenar/triagear 171 pending de `economic_category_manual_queue` | Backlog ops | Medio | Medio |
-| 5 | Fix ISSUE-055 (cost basis ECG-004) | Bug runtime | Medio | Medio |
+| 5 | ✅ Resuelto 2026-06-20: Fix ISSUE-055 (cost basis ECG-004/017/018) | Bug runtime | Medio | Medio |
 | 6 | Provisionar webhook Teams Finance (ISSUE-058 / TASK-669) | Infra | Bajo | Medio |
 | 7 | Agregar ítem de menú + viewCode a `/finance/external-signals` (TASK-983) | UI | Bajo | Bajo |
 | 8 | Cerrar lifecycle de TASK-929/934/776/871 o reflejar bloqueo | Higiene docs | Bajo | Bajo |

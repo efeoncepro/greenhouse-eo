@@ -2,6 +2,15 @@
 
 > **Estado:** `released` (manifest transicionó a released, post-release health check verde). Orchestrator run [`27721723752`](https://github.com/efeoncepro/greenhouse-eo/actions/runs/27721723752) `completed/success`. Conducido por Claude tras pedido del operador ("paso a producción que Codex dejó preparado").
 
+## Sesión 2026-06-20 — ISSUE-055 Quote Builder ECG-004 cost basis — Codex
+
+> **Estado:** ✅ resolved en staging/dev DB, sin push. `ISSUE-055` se resolvió como `issue-only fix`: `ECG-004` existía en `sellable_roles` y tenía pricing por moneda, pero no tenía `role_employment_compatibility` ni `sellable_role_cost_components` por quedar `needs_review` en TASK-464a (Fee Deel + gastos previsionales). Migración aplicada `20260620190000000_issue-055-reviewed-staff-role-cost-basis.sql`.
+> - **Fix data canónica:** se sembró cost basis revisado `indefinido_clp` con `source_kind='admin_manual'`, `confidence_score=0.75` para `ECG-004`, y por la misma clase para `ECG-017/ECG-018`. `ECG-032` queda fuera: ambigüedad distinta que requiere decisión comercial separada.
+> - **Runtime verificado:** `pnpm pg:connect:migrate` aplicado; `pnpm pg:connect:status` → `No migrations to run`. Staging `POST /api/finance/quotes/pricing/simulate` para `ECG-004` → HTTP 200, `costBasisKind='role_modeled'`, `employmentTypeCode='indefinido_clp'`, `unitPriceOutputCurrency=1498500`. Smokes `ECG-017/018` HTTP 200. No-regression `ECG-001` HTTP 200 y conserva `role_blended`.
+> - **Gates:** vitest focal `sellable-roles-seed` + `pricing-engine-v2` (`9/9`) verde. UI no modificada; no se ejecutó GVC porque no existe scenario reusable del quote builder para agregar línea, y el fix es de contrato runtime del endpoint que alimenta la UI.
+> - **Docs:** issue movido a `docs/issues/resolved/ISSUE-055-quote-builder-role-sku-missing-cost-basis.md`, tracker `docs/issues/README.md`, audit Finance, changelog y este handoff sincronizados.
+> - **Siguiente Finance pendiente:** `ISSUE-058` (Teams Finance Alerts webhook no provisionado).
+
 ## Sesión 2026-06-20 — TASK-1189 Posición mensual de PPM F29 (COMPLETE, code-complete + shadow) — Claude
 
 > **Estado:** ✅ code-complete + shadow verificado. Child A de TASK-1186. **Completa las 3 líneas mensuales del F29** (IVA TASK-725 + retenciones TASK-1188 + PPM acá).
