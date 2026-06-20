@@ -144,5 +144,19 @@ export const GH_F29_CONSOLIDATED = {
   errorTitle: 'No pudimos cargar la posición F29 de este período',
 
   // Pie con la entidad legal + corte
-  pendingMaterialization: 'Pendiente de materializar'
+  pendingMaterialization: 'Pendiente de materializar',
+
+  // TASK-1207 — Total a pagar
+  totalLabel: 'Total F29 a pagar',
+  totalHelper: 'Suma de IVA, retenciones y PPM del período.',
+  totalOfficial: 'Oficial',
+  totalProvisional: 'Provisional (en validación)',
+  totalProvisionalNote: 'Incluye líneas aún en validación contable; no es el total oficial.',
+  totalIncompleteNote: 'Falta materializar alguna línea del período; el total puede estar incompleto.',
+  totalNoData: 'Sin datos del período',
+
+  // TASK-1207 — Selector de período + proyección vs declarado
+  periodSelectorLabel: 'Período',
+  periodCurrentHint: 'mes en curso · proyección',
+  periodClosedHint: 'cerrado · a declarar'
 } as const

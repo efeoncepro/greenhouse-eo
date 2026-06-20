@@ -396,6 +396,29 @@ const FinanceDashboardView = () => {
   // TASK-1197 — F29 consolidado (IVA + retenciones + PPM); mismo patrón de degradación local.
   const [f29Position, setF29Position] = useState<F29ConsolidatedPayload | null>(null)
   const [f29Error, setF29Error] = useState<string | null>(null)
+  // TASK-1207 — período vigente del endpoint (capturado del primer payload F29) para
+  // distinguir proyección (mes en curso) vs a declarar (mes cerrado) en el selector.
+  const [f29CurrentPeriod, setF29CurrentPeriod] = useState<{ year: number; month: number } | null>(null)
+
+  // TASK-1207 — fetch del F29 por período (selector). Separado de fetchData para no
+  // recargar todo el dashboard al cambiar de mes. Consume el year/month que el
+  // endpoint ya soporta (TASK-1195).
+  const fetchF29 = useCallback(async (year: number, month: number) => {
+    try {
+      const res = await fetch(`/api/finance/f29/monthly-position?year=${year}&month=${month}`, { cache: 'no-store' })
+
+      if (res.ok) {
+        setF29Position(await res.json())
+        setF29Error(null)
+      } else {
+        setF29Position(null)
+        setF29Error('La posición F29 del período no está disponible en este momento. Vuelve a intentarlo.')
+      }
+    } catch {
+      setF29Position(null)
+      setF29Error('La posición F29 del período no está disponible en este momento. Vuelve a intentarlo.')
+    }
+  }, [])
 
   const [nexaInsights, setNexaInsights] = useState<{
     insights: NexaInsightItem[]
@@ -576,8 +599,13 @@ const FinanceDashboardView = () => {
       if (f29PositionRes.ok) {
         // TASK-1197 — F29 consolidado: cliente puro del contrato gobernado; el VM
         // ya trae las 3 líneas + enabledByLine. No se recompone nada acá.
-        setF29Position(await f29PositionRes.json())
+        const f29Payload = (await f29PositionRes.json()) as F29ConsolidatedPayload
+
+        setF29Position(f29Payload)
         setF29Error(null)
+        // TASK-1207 — el primer load (sin year/month) trae el período vigente del
+        // endpoint; lo fijamos como referencia para el selector (proyección vs declarado).
+        setF29CurrentPeriod(prev => prev ?? { year: f29Payload.year, month: f29Payload.month })
       } else {
         setF29Position(null)
         setF29Error('La posición F29 del período no está disponible en este momento. Vuelve a intentarlo.')
@@ -893,6 +921,8 @@ const FinanceDashboardView = () => {
         payload={f29Position}
         error={f29Error}
         onRetry={() => void fetchData()}
+        currentPeriod={f29CurrentPeriod ?? undefined}
+        onPeriodChange={period => void fetchF29(period.year, period.month)}
       />
 
       <VatMonthlyPositionCard

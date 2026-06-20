@@ -60,6 +60,33 @@ describe('F29ConsolidatedPositionCard', () => {
     expect(screen.getAllByText('En validación')).toHaveLength(2)
   })
 
+  it('TASK-1207 — muestra el total a pagar = suma de las 3 líneas (sin recomputar posiciones)', () => {
+    renderWithTheme(<F29ConsolidatedPositionCard loading={false} payload={basePayload()} />)
+
+    // 1.085.952 + 138.646 + 14.500 = 1.239.098
+    expect(screen.getByText('Total F29 a pagar')).toBeInTheDocument()
+    expect(screen.getByText('$1.239.098')).toBeInTheDocument()
+  })
+
+  it('TASK-1207 — total "Provisional (en validación)" si alguna línea está en shadow', () => {
+    renderWithTheme(<F29ConsolidatedPositionCard loading={false} payload={basePayload()} />)
+
+    // basePayload tiene retención + PPM en shadow → el total no es oficial.
+    expect(screen.getByText('Provisional (en validación)')).toBeInTheDocument()
+  })
+
+  it('TASK-1207 — total "Oficial" solo cuando las 3 líneas están oficiales', () => {
+    const payload = basePayload()
+
+    payload.enabledByLine = { vat: true, retention: true, ppm: true }
+
+    renderWithTheme(<F29ConsolidatedPositionCard loading={false} payload={payload} />)
+
+    // El total y el IVA muestran "Oficial"; no debe haber "Provisional".
+    expect(screen.queryByText('Provisional (en validación)')).not.toBeInTheDocument()
+    expect(screen.getByText('$1.239.098')).toBeInTheDocument()
+  })
+
   it('degrada honesto: línea null muestra "Sin datos del período", nunca $0', () => {
     const payload = basePayload()
 
