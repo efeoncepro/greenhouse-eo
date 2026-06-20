@@ -198,6 +198,21 @@ Guía Codex vigente:
 - Arquitectura estructural: `software-architect-2026`
 - Seguridad: skills `codex-security:*` solo si el trabajo realmente es security/hardening
 
+UI/UX GOAL GUARD
+
+Si la task tiene `Execution profile: ui-ux`, `UI impact != none`, toca UI visible, copy visible, layout, interacción, motion, primitive, flow o requiere GVC, fija antes de escribir JSX/copy visible un objetivo de sesión verificable para no salir del loop visual antes de tiempo.
+
+- En Claude Code, usa `/goal` explícitamente.
+- En Codex, usa el mecanismo nativo equivalente de goal cuando esté disponible; si no puedes activarlo desde el harness, copia la condición en Audit/Plan y trátala como gate duro de cierre.
+
+Condición mínima recomendada:
+
+```text
+/goal [TASK-###] UI enterprise-ready: las skills product design aplicables fueron cargadas antes de JSX; la decisión primitive reuse/extend/new quedó documentada; no hay HEX/font/px hardcodeado fuera de tokens; copy visible vive en la capa canónica; GVC desktop+mobile corrió en loop y los frames PNG fueron revisados; scrollWidth==clientWidth en desktop y 390px o hay blocker exacto; no hay overlaps, clipping incoherente ni console/page errors; docs, handoff y gates proporcionales están sincronizados.
+```
+
+No declares UI lista si esa condición no está demostrada en la conversación con comandos, rutas de captura y hallazgos resueltos o bloqueadores exactos.
+
 IMPLEMENTACIÓN
 
 - Reutiliza antes de crear.

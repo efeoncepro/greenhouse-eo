@@ -2,6 +2,12 @@
 
 > **Estado:** `released` (manifest transicionó a released, post-release health check verde). Orchestrator run [`27721723752`](https://github.com/efeoncepro/greenhouse-eo/actions/runs/27721723752) `completed/success`. Conducido por Claude tras pedido del operador ("paso a producción que Codex dejó preparado").
 
+## Sesión 2026-06-20 — TASK harness UI/UX Goal Guard — Codex
+
+> **Estado:** docs/tooling local actualizado, sin rollout runtime. Se ajustó el harness TASK para que toda task con UI visible arranque con una meta verificable de calidad enterprise antes de JSX/copy: `CODEX_EXECUTION_PROMPT_V1` agrega `UI/UX GOAL GUARD`; `.codex/skills/greenhouse-task-execution-hook/SKILL.md` lo declara como hard gate; `.claude/commands/implement-task.md` fija `/goal TASK-### UI enterprise-ready`; `scripts/check-codex-task-harness.mjs` valida que no derive. La condición exige skills product design, decisión primitive reuse/extend/new, tokens/copy canónicos, GVC desktop+mobile con frames revisados, `scrollWidth==clientWidth` desktop+390px, sin overlaps/console errors y docs/gates sincronizados.
+> - **Verificación:** `pnpm codex:task-hook:check` verde antes del cierre documental; repetirlo si se toca de nuevo el prompt/hook/commands.
+> - **Pendiente:** ninguno runtime. No se creó ADR porque es endurecimiento compatible de un harness operativo existente, no cambio de arquitectura de producto.
+
 ## Sesión 2026-06-20 — TASK-725 Finance VAT re-scope a operating entity (ISSUE-101) — Claude
 
 > **Estado:** in-progress en `develop` local-first (sin push). Re-scope del IVA del `space_id` operacional a la **operating entity** canónica. Recalibrada pre-ejecución: el foundation ya existe — `getOperatingEntityIdentity()` (`account-360/organization-identity.ts:80`) resuelve Efeonce Group SpA (RUT 77.357.182-1, `is_operating_entity=TRUE`), y las tablas VAT ya tienen `organization_id`. NO se crea tabla `legal_entity` nueva (hard rule arch: no identidad paralela).

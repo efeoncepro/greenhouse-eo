@@ -66,6 +66,9 @@ its temporary branch before closing unless the operator asks to keep it.
 - It blocks completed tasks and tasks with declared blockers.
 - It substitutes the canonical execution prompt from
   `docs/operations/CODEX_EXECUTION_PROMPT_V1.md`.
+- For UI/UX tasks, that prompt requires an explicit UI enterprise-ready goal
+  guard before JSX/copy work: use Claude Code `/goal` when running there, or the
+  native Codex goal mechanism/equivalent hard gate when running in Codex.
 - `pnpm codex:task-hook:check` verifies the hook, prompt, aliases, entrypoint
   references, and a live active-task smoke.
 - This is not a Git hook or runtime listener; Codex must execute the command when
