@@ -156,6 +156,7 @@ import { getPayrollContractTaxonomyInvalidTupleDriftSignal } from './queries/pay
 import { getPayrollContractTaxonomyInvalidStatutoryApplicationSignal } from './queries/payroll-contract-taxonomy-invalid-statutory-application'
 import { getProviderBqSyncDeadLetterSignal } from './queries/provider-bq-sync-dead-letter'
 import { getVatPositionDriftSignal } from './queries/vat-position-drift'
+import { getRetentionPositionDriftSignal } from './queries/retention-position-drift'
 import { getVatEntryUnresolvedFxSignal } from './queries/vat-entry-unresolved-fx'
 import { getVatEligibleWithoutPeriodSignal } from './queries/vat-eligible-without-period'
 import { getHubspotCompaniesIntakeDeadLetterSignal } from './queries/hubspot-companies-intake-dead-letter'
@@ -600,6 +601,9 @@ interface ReliabilityOverviewSources {
   vatEntryUnresolvedFx?: ReliabilitySignal | null
   vatEligibleWithoutPeriod?: ReliabilitySignal | null
 
+  /** TASK-1188 — Retention position drift (BHE con retención sin asiento en períodos materializados). */
+  retentionPositionDrift?: ReliabilitySignal | null
+
   /** TASK-1082 — Knowledge ingestion signals (quarantine count + failed sync source). */
   knowledgeQuarantineCount?: ReliabilitySignal | null
   knowledgeSyncFailedSource?: ReliabilitySignal | null
@@ -1037,6 +1041,8 @@ export const buildReliabilityOverview = (
     // TASK-1185 — VAT FX/data-quality signals.
     ...(sources.vatEntryUnresolvedFx ? [sources.vatEntryUnresolvedFx] : []),
     ...(sources.vatEligibleWithoutPeriod ? [sources.vatEligibleWithoutPeriod] : []),
+    // TASK-1188 — Retention position drift (línea retenciones del F29).
+    ...(sources.retentionPositionDrift ? [sources.retentionPositionDrift] : []),
     // TASK-878 Slice 2 — HubSpot companies intake dead-letter (async webhook path).
     ...(sources.hubspotCompaniesIntakeDeadLetter ? [sources.hubspotCompaniesIntakeDeadLetter] : []),
     // TASK-878 follow-up — Identity UX hardening: internal users sin member enlazado.
@@ -1439,6 +1445,13 @@ export const getReliabilityOverview = async (
     preloadedSources.vatEligibleWithoutPeriod !== undefined
       ? preloadedSources.vatEligibleWithoutPeriod
       : await getVatEligibleWithoutPeriodSignal().catch(() => null)
+
+  // TASK-1188 — Retention position drift (línea retenciones del F29). Degrada
+  // honesto (severity='unknown') si la query falla.
+  const retentionPositionDrift =
+    preloadedSources.retentionPositionDrift !== undefined
+      ? preloadedSources.retentionPositionDrift
+      : await getRetentionPositionDriftSignal().catch(() => null)
 
   // TASK-878 Slice 2 — HubSpot companies intake dead-letter (mirror provider_bq_sync).
   // Detecta path async caído: webhook companies emite outbox event pero la projection
@@ -2192,6 +2205,7 @@ export const getReliabilityOverview = async (
     vatPositionDrift,
     vatEntryUnresolvedFx,
     vatEligibleWithoutPeriod,
+    retentionPositionDrift,
     hubspotCompaniesIntakeDeadLetter,
     workforceUnlinkedInternalUsers,
     knowledgeQuarantineCount,
