@@ -537,7 +537,6 @@ const AskNexaButton = ({ signalId }: { signalId: string }) => {
       asButton
       variant='cta'
       size='compact'
-      intensity='subtle'
       palette='nexa'
       ariaLabel={GH_NEXA.insight_ask_nexa_aria}
       onClick={handleAsk}
