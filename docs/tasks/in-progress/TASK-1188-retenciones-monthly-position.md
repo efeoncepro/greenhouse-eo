@@ -10,7 +10,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -26,6 +26,16 @@
 - Branch: `task/TASK-1188-retenciones-monthly-position`
 - Legacy ID: `none`
 - GitHub Issue: `none`
+
+## Discovery + Decisión de source (2026-06-20, Slice 1)
+
+**Source-of-truth resuelto (empírico, BD viva):** la retención SII practicada vive en 2 lugares:
+1. `greenhouse_payroll.payroll_entries.sii_retention_amount` (honorarios internos; 4 entries, ~148.869 CLP).
+2. `greenhouse_finance.expenses.withholding_amount` (boletas de honorarios BHE recibidas; 6 docs, ~489.234 CLP).
+
+**Hallazgo clave (cambia el diseño):** las 2 fuentes **se solapan** para honorarios internos — un mismo honorario aparece en payroll Y como BHE-expense (verificado: Luis Reyes payroll 2026-04 26.687,50 ↔ BHE `EXP-NB-36671467` 26.688 2026-05; Felipe Zurita payroll 2026-05 30.681,55 ↔ BHE `EXP-NB-37792465` 30.681 2026-06). Sumar ambas **doblaría** la cifra. Además: (a) los períodos difieren por fuente (payroll = mes de trabajo; BHE = mes de emisión = el período legal del F29); (b) el join payroll→RUT está bloqueado por PII (legal profile).
+
+**Decisión (razonada con skills finance/payroll/arquitectura):** la posición F29 se materializa **solo desde las BHE** (`expenses.withholding_amount > 0`), en el período de emisión de la boleta, scope entidad legal. La BHE es el **instrumento legal declarado al SII**; el dato de payroll es su espejo interno y sumarlo doble-cuenta. La retención de payroll sin BHE correspondiente (sub-declaración por gap de sync) se cubre con un **signal de gap** (follow-up), no sumándola. El schema del ledger conserva `source_kind`/`dedup_status` como punto de extensión para ese v2.
 
 ## Summary
 
