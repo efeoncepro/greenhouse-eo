@@ -2,9 +2,11 @@
 
 > **Estado:** `released` (manifest transicionó a released, post-release health check verde). Orchestrator run [`27721723752`](https://github.com/efeoncepro/greenhouse-eo/actions/runs/27721723752) `completed/success`. Conducido por Claude tras pedido del operador ("paso a producción que Codex dejó preparado").
 
-## Sesión 2026-06-20 — TASK-1197 UI Posición F29 mensual consolidada (COMPLETE) — Claude
+## Sesión 2026-06-20 — TASK-1197 UI Posición F29 mensual consolidada (COMPLETE + staging verificado) — Claude
 
-> **Estado:** ✅ complete, local-first en `develop` (sin push). Follow-up `ui-ux` de TASK-1195; cierra la **capa de visibilidad humana** del alcance mensual del F29 (umbrella TASK-1186).
+> **✅ Staging verificado (Runtime Rollout Completion Gate cerrado, 2026-06-20):** push a `develop` (`f381d138a..777d486ba`, deploy Vercel staging Ready). `pnpm staging:request /api/finance/f29/monthly-position` → **HTTP 200** con las 3 líneas + `legalEntity` (TASK-1195 operativamente completo). **GVC del card en staging** (`dev-greenhouse`, scenario `finance-f29-consolidated` `--env=staging`, 2 frames mirados): el card propaga el **estado real de flags** — IVA **Oficial** + Retenciones **Oficial** (`RETENTION_POSITION_ENABLED=true` en staging) + PPM **En validación** (flag OFF). La distinción oficial/shadow por línea funciona end-to-end con datos reales.
+>
+> **Estado:** ✅ complete + verificado en staging. Follow-up `ui-ux` de TASK-1195; cierra la **capa de visibilidad humana** del alcance mensual del F29 (umbrella TASK-1186).
 > - **Card** `F29ConsolidatedPositionCard` montado en `FinanceDashboardView` **encima** del card de IVA. **Cliente puro** del contrato `GET /api/finance/f29/monthly-position` (TASK-1195): **backend impact none**, no recomputa.
 > - **3 líneas** (IVA/retención/PPM) con badge **oficial** vs **"En validación"/shadow** (desde `enabledByLine`, texto+color a11y) + **degradación honesta** (`null` → "Sin datos del período", nunca `$0`). Loading/error cubiertos. Copy es-CL `GH_F29_CONSOLIDATED`.
 > - **Open questions resueltas:** (1) NO se extrae primitive compartido (rule of three; sibling card). (2) Sin selector de período en v1 (paridad con VAT card; endpoint ya soporta year/month).
