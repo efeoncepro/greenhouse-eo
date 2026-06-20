@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -263,8 +263,20 @@ Validación contable (contador) de cada posición fiscal antes de baseline produ
 - Formalizar como `EPIC-###` si las children core resultan ser >3 tasks grandes.
 - Presentación/envío a SII (más allá del insumo) — fuera de alcance, evaluar a futuro.
 
+## Delta 2026-06-20 — descomposición (decisiones del operador)
+
+Open Questions resueltas por el operador en el intake de la umbrella:
+
+- **Single-RUT por ahora** → la sub-capacidad **D (multi-entity foundation) se difiere** como foundation no urgente. A/B/C se construyen sobre el singleton vía `getOperatingEntityIdentity()` (multi-entidad-ready por construcción).
+- **Prioritarias primero (B Retenciones + A PPM)** → se crearon las 2 children mensuales/operativas:
+  - **`TASK-1188`** — Retenciones monthly position (child B, P2).
+  - **`TASK-1189`** — PPM monthly position (child A, P2).
+- **C (Renta Anual F22) y D (multi-country/multi-entity) quedan como children siguientes** (no creadas aún; se levantan cuando se prioricen).
+- **EPIC:** no formalizada aún; la umbrella coordina. Re-evaluar si C+D agregan ≥2 tasks grandes más.
+
+La umbrella sigue `in-progress` (rastrea las children hasta que las core estén complete).
+
 ## Open Questions
 
-- ¿Efeonce será single-RUT en el corto/mediano plazo, o hay multi-entidad real planeada? Define el timing de la sub-capacidad D (multi-entity foundation) vs A/B/C sobre el singleton.
-- ¿Esta umbrella debería formalizarse como `EPIC-###` desde el inicio (si las 4 sub-capacidades son cada una multi-task)?
-- ¿Prioridad relativa entre A (PPM), B (Retenciones) y C (F22)? F22 es anual (menos frecuente) pero más complejo; PPM/Retenciones son mensuales (más operativos).
+- ¿Cuándo se priorizan C (F22) y D (multi-entity)? Pendiente de decisión del operador (no bloquea A/B).
+- ¿Esta umbrella debería formalizarse como `EPIC-###` cuando se sumen C+D?
