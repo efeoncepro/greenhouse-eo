@@ -8,10 +8,10 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
-- Effort: `Alto`
+- Effort: `Medio`
 - Type: `implementation`
 - Execution profile: `backend-data`
 - UI impact: `interaction`
@@ -612,6 +612,17 @@ Implicaciones para esta task:
 - **Reliability signal recomendado (nuevo):** `finance.vat.position_drift` (steady=0) que compare la posición materializada vs Σ directo de income/expenses con IVA del período — habría cazado este bug antes de inspección manual.
 - **Coordinación out-of-band:** validar la posición IVA corregida (con los $2.56M de crédito que hoy faltan) contra el F29 real declarado de abr/may/jun con el contador antes de tomarla como baseline.
 - **Razonamiento fiscal:** F29 se declara por RUT (una entidad legal = una posición consolidada/mes); el crédito fiscal del overhead no pertenece a ningún cliente. Refuerza el goal central de esta task (scope fiscal = entidad legal, no `space_id`).
+
+### Recalibración pre-ejecución (Discovery 2026-06-20, antes de implementar)
+
+Discovery contra código + BD viva **reduce el alcance**: el foundation que la spec pensaba construir desde cero **ya existe**. Slices 2/3/5 originales se simplifican.
+
+- **La entidad legal ya es una organization canónica:** `org-2df565fb-…` = "Efeonce Group SpA", RUT `77.357.182-1`, `country=CL`, `is_operating_entity=TRUE` (singleton: 1 de 279 orgs). **No se crea tabla `legal_entity` nueva** (hard rule arch: no identidad paralela). Resuelve las Open Questions "¿existe tabla?" y "¿core o finance?".
+- **El resolver ya existe:** `getOperatingEntityIdentity()` en `src/lib/account-360/organization-identity.ts:80` (org + RUT + país, cacheado). Es el `resolveFinanceFiscalScope` que la spec quería construir. Multi-entidad futuro: `getOrganizationIssuerIdentityById` ya existe → extensión limpia, **no se sobre-construye ahora** (singleton).
+- **Las tablas VAT ya tienen `organization_id`** (`vat_ledger_entries` + `vat_monthly_positions`). El bug es que el materializador la llena con la org del **cliente** (Sky Airline, `org-b9977f96-…`) en vez de la operating entity, y agrupa/filtra por `space_id`.
+- **Decisión de modelo (arch + finance):** `organization_id` en las tablas VAT pasa a significar el **dueño fiscal (operating entity)**; `space_id`/`client_id` quedan como **etiqueta analítica de contraparte** (nullable). La posición agrupa por operating entity → 1 fila por período.
+- **Alcance real:** (1) dashboard resilience, (2) migración mínima (`space_id` nullable en ambas tablas + unique `(organization_id, period)` reemplaza el unique por space), (3) materializador re-scopeado a operating entity sin los gates `space_id IS NOT NULL` (`vat-ledger.ts:246` income, `:358` expense; group `:473`; pk `:496`), (4) readers + route por operating entity + re-materializar abr/may/jun, (5) signal `finance.vat.position_drift` + tests + docs + cierre ISSUE-101.
+- **Slice 6 original (selector multi-entidad)** queda **fuera** (singleton hoy) → follow-up si aparece multi-RUT. Por eso `Effort: Medio` (antes `Alto`).
 
 ## Open Questions
 

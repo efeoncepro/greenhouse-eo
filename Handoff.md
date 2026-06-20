@@ -2,6 +2,21 @@
 
 > **Estado:** `released` (manifest transicionó a released, post-release health check verde). Orchestrator run [`27721723752`](https://github.com/efeoncepro/greenhouse-eo/actions/runs/27721723752) `completed/success`. Conducido por Claude tras pedido del operador ("paso a producción que Codex dejó preparado").
 
+## Sesión 2026-06-20 — TASK-725 Finance VAT re-scope a operating entity (ISSUE-101) — Claude
+
+> **Estado:** in-progress en `develop` local-first (sin push). Re-scope del IVA del `space_id` operacional a la **operating entity** canónica. Recalibrada pre-ejecución: el foundation ya existe — `getOperatingEntityIdentity()` (`account-360/organization-identity.ts:80`) resuelve Efeonce Group SpA (RUT 77.357.182-1, `is_operating_entity=TRUE`), y las tablas VAT ya tienen `organization_id`. NO se crea tabla `legal_entity` nueva (hard rule arch: no identidad paralela).
+> - **Causa raíz (ISSUE-101):** el materializador `vat-ledger.ts` filtra `space_id IS NOT NULL` (income `:246`, expense `:358`) y agrupa por `space_id` (`:473`). 225/226 expenses tienen `space_id NULL` → $2.56M de crédito fiscal excluido; las 3 posiciones cuelgan de la org del cliente (Sky Airline), no de Efeonce. Cifra F29 sobreestimada.
+> - **Modelo objetivo:** `organization_id` en tablas VAT = dueño fiscal (operating entity); `space_id`/`client_id` = etiqueta analítica nullable; posición agrupa por operating entity → 1 fila/período.
+> - **Slices:** (1) dashboard resilience, (2) migración space_id nullable + unique (org, period), (3) materializador re-scope, (4) readers/route + re-materializar abr/may/jun, (5) signal `finance.vat.position_drift` + tests + docs + cierre ISSUE-101.
+> - **Pendiente de validación operativa:** cuadrar el net corregido (sube por el crédito) contra el F29 real declarado con contador antes de baseline.
+
+## Sesión 2026-06-20 — Finance Cost Attribution runtime DDL fix — Codex
+
+> **Estado:** code complete local, rollout pendiente. Se atendió el hallazgo F7/F8 de la auditoría Finance: `commercial_cost_attribution` fallaba en reactive handlers por `permission denied for schema greenhouse_serving` porque el store ejecutaba `CREATE TABLE IF NOT EXISTS` desde runtime. `src/lib/commercial-cost-attribution/store.ts` ahora solo valida la tabla gobernada con `SELECT 1`; el DDL/grants viven en la migración forward-fix `20260620141000000_commercial-cost-attribution-governed-ddl.sql`.
+> - **Docs actualizados:** auditoría Finance 2026-06-20, `GREENHOUSE_COMMERCIAL_COST_ATTRIBUTION_V1`, `GREENHOUSE_FINANCE_ARCHITECTURE_V1`, changelog.
+> - **Verificación local:** vitest focal Cost Attribution/Operational P&L `17/17`, `tsc --noEmit`, `pnpm pg:connect:status` dry-run contra Cloud SQL dev detectando la migración nueva como pendiente con SQL válido.
+> - **Pendiente operativo:** no se aplicó la migración a Cloud SQL dev ni se desplegó el runtime para no adelantar BD compartida a un cambio local. Para cerrar F7/F8: merge/push, aplicar migración, redeploy/restart app + ops-worker, ejecutar `POST /cost-attribution/materialize` para mayo/junio con `recomputeEconomics=true`, reprocesar handlers fallidos y validar `handler_health` + `operational_pl_snapshots`.
+
 ## Sesión 2026-06-20 — Gamification leaderboard primitives — Codex
 
 > **Estado:** code complete local, sin wiring productivo. Se portaron los prompts `LeaderboardCard` y `LeaderboardPodium` como primitives Greenhouse/MUI tokenizadas (`GreenhouseLeaderboardCard`, `GreenhouseLeaderboardRankings`, `GreenhouseLeaderboardPodium`) en vez de copiar shadcn/Tailwind/CVA. El card compone periodo, selector de run, podium top-3 y lista paginada; rankings soporta usuario actual, byline, `displayed`, avatar y `valueFormatter`; podium mantiene `rankings`, `size`, `showValue`, `showAvatar`, `medalStyle` y orden visual 2-1-3.
