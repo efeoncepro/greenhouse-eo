@@ -149,7 +149,7 @@ const CardShell = ({
   avatarTone?: 'secondary' | 'warning'
   children: React.ReactNode
 }) => (
-  <Card elevation={0} sx={{ border: theme => `1px solid ${theme.palette.divider}` }}>
+  <Card elevation={0} data-capture='f29-consolidated-card' sx={{ border: theme => `1px solid ${theme.palette.divider}` }}>
     <CardHeader
       title={COPY.cardTitle}
       subheader={subheader}
