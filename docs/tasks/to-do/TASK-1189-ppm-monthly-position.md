@@ -1,5 +1,9 @@
 # TASK-1189 — PPM monthly position (F29 línea PPM) por entidad legal
 
+## Delta 2026-06-20
+
+- Precondición de período cerrada por TASK-1191 (ISSUE-103): los documentos de income sincronizados desde Nubox ya nacen con `period_year`/`period_month` (el sync los estampa desde la fecha del documento + backfill de los 165 históricos). Al materializar la posición PPM por período (que se calcula sobre ingresos del período), los docs Nubox ya tienen período poblado. Reusar el helper canónico `getOperationalFiscalPeriod()` (`src/lib/calendar/operational-calendar.ts`) si se necesita derivar período de una fecha.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->

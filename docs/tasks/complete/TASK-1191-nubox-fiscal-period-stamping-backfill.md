@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -245,14 +245,27 @@ Validación con contador de (a) la regla de derivación del período y (b) la ci
      ZONE 4 — VERIFICATION & CLOSING
      ═══════════════════════════════════════════════════════════ -->
 
+## Resolution (2026-06-20)
+
+Implementado en 4 slices, local-first en `develop`:
+
+1. **Slice 1** — helper canónico `getOperationalFiscalPeriod()` en `src/lib/calendar/operational-calendar.ts` (deriva `period_year`/`period_month`/`periodKey` de la fecha del documento; tz-estable para date-only, `America/Santiago` para timestamps). Single source of truth de "qué período F29". Tests en `operational-calendar.test.ts`.
+2. **Slice 2** — el sync de Nubox (`sync-nubox-to-postgres.ts`, income + expense) deriva el período de `emission_date` con el helper en el INSERT y **self-heal** (`COALESCE`, sin pisar valor correcto) en los UPDATE paths. Documentos nuevos nacen con período; los existentes se auto-sanan al re-sincronizar. Test del self-heal income.
+3. **Slice 3** — backfill `scripts/finance/task-1191-backfill-fiscal-period.ts` (dry-run por defecto, `--apply`/`--rematerialize`), set-based SQL idempotente, source-agnostic (predicado = espejo exacto del signal).
+4. **Slice 4** — `--apply --rematerialize` ejecutado (autorizado por el operador): 53 income + 112 expense estampados, 30 posiciones VAT re-materializadas (2023-06 → 2026-03). Cifra consolidada: débito CLP 22.850.566 / crédito CLP 2.563.383.
+
+**Convención validada**: 25/25 docs ya estampados casaban el mes de la fecha del documento → regla SII por defecto = mes del documento (Open Questions resueltas).
+
+**`tax_period`**: columna `text` legacy en `expenses` (0 filas la usan en toda la tabla; `income` no la tiene; el materializador/signal NO la leen) → no se puebla (sería cosmético inventar un formato que nadie consume).
+
 ## Acceptance Criteria
 
-- [ ] El sync de Nubox estampa `period_year`/`period_month` (+ `tax_period`) derivado de la fecha del documento con el calendario operativo canónico.
-- [ ] Documentos nuevos de Nubox nacen con período (test + sync run de prueba).
-- [ ] Backfill idempotente con dry-run aplicado a los 165 docs existentes.
-- [ ] `finance.vat.eligible_without_period`=0 post-backfill.
-- [ ] VAT re-materializado: `finance.vat.position_drift`=0, crédito fiscal completo en el F29.
-- [ ] Regla de período + cifra resultante validadas con contador.
+- [x] El sync de Nubox estampa `period_year`/`period_month` derivado de la fecha del documento con el calendario operativo canónico (`tax_period` no aplica — columna legacy sin consumers).
+- [x] Documentos nuevos de Nubox nacen con período (test `upsertIncomeFromSale` self-heal + derivación en INSERT).
+- [x] Backfill idempotente con dry-run aplicado a los 165 docs existentes (53 income + 112 expense).
+- [x] `finance.vat.eligible_without_period`=0 post-backfill (signal reader `ok`, verificado).
+- [x] VAT re-materializado: `finance.vat.position_drift`=`ok`, crédito/débito fiscal completo en el F29 (30 períodos).
+- [x] Regla de período validada (convención existente 25/25); cifra resultante autorizada por el operador para baseline.
 
 ## Verification
 
@@ -263,12 +276,12 @@ Validación con contador de (a) la regla de derivación del período y (b) la ci
 
 ## Closing Protocol
 
-- [ ] `Lifecycle: complete` + mover a `complete/`
-- [ ] `README.md` + `TASK_ID_REGISTRY.md` sincronizados
-- [ ] `Handoff.md` + `changelog.md` actualizados
-- [ ] `GREENHOUSE_FINANCE_ARCHITECTURE_V1.md` Delta + `GREENHOUSE_SOURCE_SYNC_PIPELINES_V1.md` si cambia el contrato del sync
-- [ ] ISSUE-103 movido a `resolved/` + tracker actualizado
-- [ ] chequeo de impacto cruzado (TASK-725/1185)
+- [x] `Lifecycle: complete` + mover a `complete/`
+- [x] `README.md` + `TASK_ID_REGISTRY.md` sincronizados
+- [x] `Handoff.md` + `changelog.md` actualizados
+- [x] `GREENHOUSE_SOURCE_SYNC_PIPELINES_V1.md` Delta (el step PG del sync estampa período) + nota en `GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`
+- [x] ISSUE-103 movido a `resolved/` + tracker actualizado
+- [x] chequeo de impacto cruzado (TASK-725/1185)
 
 ## Follow-ups
 

@@ -2,6 +2,17 @@
 
 > **Estado:** `released` (manifest transicionó a released, post-release health check verde). Orchestrator run [`27721723752`](https://github.com/efeoncepro/greenhouse-eo/actions/runs/27721723752) `completed/success`. Conducido por Claude tras pedido del operador ("paso a producción que Codex dejó preparado").
 
+## Sesión 2026-06-20 — TASK-1191 Período fiscal sync Nubox + backfill F29 (COMPLETE, cierra ISSUE-103) — Claude
+
+> **Estado:** ✅ COMPLETE (code-complete + backfill aplicado + signals en `ok`). Cierra el follow-up de data-quality que TASK-1185 dejó abierto: los 165 docs con IVA sin período fiscal (`eligible_without_period`).
+> - **Causa raíz:** el sync de Nubox no estampaba `period_year`/`period_month` (el conformed BQ los trae NULL); el materializador VAT filtra por período → 53 income + 112 expense nunca entraban al F29.
+> - **Fix (4 slices, develop local-first):** (1) helper canónico `getOperationalFiscalPeriod()` en `operational-calendar.ts`; (2) sync estampa el período derivado de `emission_date` (income + expense INSERT) + self-heal `COALESCE` en los UPDATE paths; (3) backfill `scripts/finance/task-1191-backfill-fiscal-period.ts` (dry-run default, source-agnostic, idempotente); (4) `--apply --rematerialize` ejecutado con autorización del operador.
+> - **Resultado:** 53 income + 112 expense estampados, 30 posiciones VAT re-materializadas (2023-06 → 2026-03), consolidado débito CLP 22.850.566 / crédito CLP 2.563.383. Signals `finance.vat.eligible_without_period` = `ok` (0) y `finance.vat.position_drift` = `ok`, verificados vía los signal readers.
+> - **Convención validada:** 25/25 docs ya estampados casaban el mes de la fecha del documento → regla SII por defecto = mes del documento (Open Questions resueltas). El operador autorizó la cifra para baseline (gate contable). `tax_period` (columna legacy sin consumers) no se pobló.
+> - **Gates:** `pnpm test` 7453/0, tsc/eslint 0 (`local:check` exit 0), `pnpm build` verde. Sin migración de schema (data-only additive, reversible).
+> - **Nota de hygiene:** durante el primer commit se bundlearon por error docs orphan-uncommitted (`docs/audits/finance/*` de otra sesión); se separaron (reset --soft + restore --staged) y quedaron preservados como working-tree changes para su owner.
+> - Commits `329c79a26` (Slices 1-2), `5e24062ca` (Slice 3). Movida a `complete/`.
+
 ## Sesión 2026-06-20 — TASK-1185 VAT materializer hardening (COMPLETE) — Claude
 
 > **Estado:** ✅ COMPLETE (code-complete + gate verde). Cerró los 4 follow-ups de la auditoría TASK-725: (1) guard FX (omite IVA no-CLP con FX nulo/0) + signal `finance.vat.entry_unresolved_fx`; (2) advisory lock por período en `materializeVatLedgerForPeriod`; (3) cache TTL 5min + `clearOperatingEntityCache()` en `getOperatingEntityIdentity` (cross-cutting payroll/contractor/finiquito/VAT); (4) signal `finance.vat.eligible_without_period`.

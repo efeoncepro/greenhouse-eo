@@ -44,13 +44,23 @@ Remediación planificada en **TASK-1191**:
 
 ## Verificación
 
-- `finance.vat.eligible_without_period` → 0 post-remediación.
-- Documentos nuevos de Nubox nacen con `period_year`/`period_month`.
-- La posición de IVA incluye el crédito fiscal de los documentos backfilleados (validación de la cifra vs F29 real con contador).
+- `finance.vat.eligible_without_period` → **0** post-remediación (verificado 2026-06-20, signal reader `ok`).
+- Documentos nuevos de Nubox nacen con `period_year`/`period_month` (sync estampa el período derivando de la fecha del documento con el calendario operativo canónico — TASK-1191 Slice 2; self-heal en los UPDATE paths).
+- La posición de IVA incluye ahora el crédito/débito fiscal de los 165 documentos backfilleados: 30 períodos re-materializados (2023-06 → 2026-03), `finance.vat.position_drift` = `ok`.
+- Cifra resultante (débito CLP 22.850.566 / crédito CLP 2.563.383 consolidados) autorizada por el operador para baseline el 2026-06-20.
+
+## Resolución
+
+Resuelto por **TASK-1191** (2026-06-20):
+
+1. Helper canónico `getOperationalFiscalPeriod()` (deriva el período F29 de la fecha del documento).
+2. Sync de Nubox estampa el período (income + expense) en el INSERT + self-heal en los UPDATE paths.
+3. Backfill idempotente source-agnostic de los 165 docs (53 income + 112 expense; incluye 1 income no-Nubox).
+4. Re-materialización de las 30 posiciones VAT → ambos signals (`eligible_without_period`, `position_drift`) en `ok`.
 
 ## Estado
 
-open
+resolved (2026-06-20)
 
 ## Relacionado
 

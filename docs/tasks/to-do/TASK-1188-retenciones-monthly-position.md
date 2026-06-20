@@ -1,5 +1,9 @@
 # TASK-1188 — Retenciones monthly position (F29 línea retenciones) por entidad legal
 
+## Delta 2026-06-20
+
+- Precondición de período cerrada por TASK-1191 (ISSUE-103): los documentos con IVA/retenciones sincronizados desde Nubox ya nacen con `period_year`/`period_month` (el sync los estampa desde la fecha del documento + backfill de los 165 históricos). Al materializar las posiciones de retenciones por período, los docs Nubox ya tienen período poblado — no hace falta re-derivar acá. Reusar el helper canónico `getOperationalFiscalPeriod()` (`src/lib/calendar/operational-calendar.ts`) si se necesita derivar período de una fecha.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->

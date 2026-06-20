@@ -2,7 +2,25 @@
 
 > **Version:** 1.0
 > **Created:** 2026-03-30
-> **Last updated:** 2026-05-13 (TASK-871 Rolling Rematerialization Anchor Contract)
+> **Last updated:** 2026-06-20 (TASK-1191 fiscal period stamping en el sync Nubox + backfill F29)
+
+## Delta 2026-06-20 — TASK-1191 Período fiscal estampado en el sync Nubox (cierra ISSUE-103)
+
+El materializador VAT (`materializeVatLedgerForPeriod` / `materializeAllAvailableVatPeriods`)
+sólo procesa documentos con `period_year`/`period_month` poblados. El sync de Nubox
+no estampaba el período → 165 docs con IVA (53 income + 112 expense) quedaban fuera
+de toda posición F29 (el tramo mayor del crédito/débito excluido detectado por el
+signal `finance.vat.eligible_without_period` de TASK-1185).
+
+Resolución: el step PG del sync Nubox estampa el período derivado de la fecha del
+documento con el helper canónico `getOperationalFiscalPeriod()` (ver Delta en
+`GREENHOUSE_SOURCE_SYNC_PIPELINES_V1.md` 2026-06-20), self-heal en los UPDATE paths,
+backfill idempotente source-agnostic de los 165 históricos y re-materialización de
+30 posiciones VAT (2023-06 → 2026-03). Post-remediación ambos signals
+(`finance.vat.eligible_without_period`, `finance.vat.position_drift`) quedan en `ok`.
+Regla de derivación = mes del documento (validada contra la convención existente);
+la cifra resultante (débito CLP 22.850.566 / crédito CLP 2.563.383) la autoriza el
+contador/operador antes del baseline.
 
 ## Delta 2026-05-13 — TASK-871 Rolling Rematerialization Anchor Contract
 

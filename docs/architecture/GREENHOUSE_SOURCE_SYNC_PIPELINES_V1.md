@@ -1,5 +1,32 @@
 # Greenhouse Source Sync Pipelines V1
 
+## Delta 2026-06-20 — TASK-1191 el step PG del sync Nubox estampa el período fiscal (F29)
+
+El step PG del sync Nubox (`upsertIncomeFromSale` / `upsertExpenseFromPurchase` en
+`src/lib/nubox/sync-nubox-to-postgres.ts`) ahora **deriva y estampa** el período
+fiscal (`period_year` / `period_month`) del documento desde su fecha de emisión
+(`emission_date` → `invoice_date`/`document_date`) usando el helper canónico
+`getOperationalFiscalPeriod()` (`src/lib/calendar/operational-calendar.ts`). El
+conformed BQ trae el período NULL, así que sin esto los documentos con IVA nacían
+sin período y **nunca entraban a una posición F29** (ISSUE-103: 165 docs excluidos
+del crédito/débito fiscal).
+
+Contrato del estampado:
+
+- **INSERT** (doc nuevo): el período sale del helper sobre `emission_date`;
+  fallback al período del conformed sólo si no hay fecha de emisión.
+- **UPDATE** (doc existente, re-sync): **self-heal** `period_* = COALESCE(existente, derivado)`
+  — nunca pisa un período ya correcto, sólo rellena NULLs. El sync se vuelve
+  auto-sanador para documentos históricos sin período.
+- Regla SII por defecto = **mes del documento** (validada: 25/25 docs ya estampados
+  casaban el mes de la fecha del doc). La ventana de 2 períodos para crédito tardío
+  es una decisión manual del contador, no el default.
+
+Backfill one-shot de los 165 docs históricos: `scripts/finance/task-1191-backfill-fiscal-period.ts`
+(dry-run por defecto, `--apply`/`--rematerialize`, idempotente, source-agnostic).
+Downstream: re-materialización VAT (`materializeAllAvailableVatPeriods`) + signals
+`finance.vat.eligible_without_period` / `finance.vat.position_drift` en `ok`.
+
 ## Delta 2026-04-26 — Nubox Quotes Hot Sync separa frescura comercial del ETL diario
 
 Las cotizaciones Nubox (`COT` / DTE 52) ya no dependen solo del ETL diario
