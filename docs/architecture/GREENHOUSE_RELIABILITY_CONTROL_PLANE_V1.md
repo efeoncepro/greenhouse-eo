@@ -9,6 +9,18 @@
 
 ---
 
+## Delta 2026-06-20 — TASK-1189: signal `finance.ppm.position_drift`
+
+Nuevo signal de drift en el módulo `finance` (línea PPM del F29). PPM es un agregado
+(base ventas netas × tasa), sin ledger per-documento, así que el drift se mide a nivel
+posición: una `ppm_monthly_positions` cuya `base_amount_clp` almacenada difiere (>1 CLP) de
+las ventas netas recomputadas en vivo (`income.subtotal` CLP del período) → la cifra PPM quedó
+stale (p.ej. entró una factura a un período ya materializado sin re-materializar). `kind=drift`,
+severidad `error` si count > 0, steady = `0`. Reader `getPpmPositionDriftSignal`
+(`src/lib/reliability/queries/ppm-position-drift.ts`), wired en `get-reliability-overview.ts`
+con degradación honesta. Completa el trío de signals de las 3 líneas del F29
+(`finance.vat.position_drift`, `finance.retention.position_drift`, `finance.ppm.position_drift`).
+
 ## Delta 2026-06-20 — TASK-1188: signal `finance.retention.position_drift`
 
 Nuevo signal de drift en el módulo `finance` (mirror de `finance.vat.position_drift`):

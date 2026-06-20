@@ -2,6 +2,24 @@
 
 > **Estado:** `released` (manifest transicionó a released, post-release health check verde). Orchestrator run [`27721723752`](https://github.com/efeoncepro/greenhouse-eo/actions/runs/27721723752) `completed/success`. Conducido por Claude tras pedido del operador ("paso a producción que Codex dejó preparado").
 
+## Sesión 2026-06-20 — TASK-1189 Posición mensual de PPM F29 (COMPLETE, code-complete + shadow) — Claude
+
+> **Estado:** ✅ code-complete + shadow verificado. Child A de TASK-1186. **Completa las 3 líneas mensuales del F29** (IVA TASK-725 + retenciones TASK-1188 + PPM acá).
+> - **Discovery (Slice 1):** base imponible PPM = ventas netas (`income.subtotal` CLP-normalizado, sin anuladas, notas de crédito netean). NO existe SSOT de tasa PPM → la introduje (`ppm_rate_config`, parametrizable org+período, seed placeholder 0.25%).
+> - **Slices 2-5:** migración 2 tablas (`180458811`) + `ppm-ledger.ts` (advisory lock + guard FX + resolver de tasa) + endpoint `GET /api/finance/ppm/monthly-position` + signal `finance.ppm.position_drift` (wired, `ok`) + flag `PPM_POSITION_ENABLED` (OFF) + tests. PPM es agregado → sin tabla ledger.
+> - **Cifra shadow (validar con contador):** 19 períodos, ej. 2026-06 base 5.800.000 × 0.25% = 14.500 CLP. La tasa 0.25% es **placeholder** (`placeholder_pending_contador`) — la real la fija el SII.
+> - **Gates:** local:check 0, vitest focal verde, `pnpm test`/`pnpm build` (Node 24) verde. Migración applied dev.
+> - **Rollout pendiente:** captura de la tasa PPM real con el contador (UPDATE `ppm_rate_config`) + validación vs F29 real → flip `PPM_POSITION_ENABLED` → redeploy ops-worker.
+> - **ADC re-auth:** al iniciar, la ADC de gcloud estaba vencida (bloqueaba PG); el operador relanzó `gcloud auth login` + `application-default login`.
+> - Commits `de527012a` (S2), `cb45e6860` (S3), `b267f6081` (S4-5). Movida a `complete/`.
+
+## Sesión 2026-06-20 — Codex ISSUE execution hook — Codex
+
+> **Estado:** docs/tooling local actualizado, sin rollout runtime. Se agregó un harness hermano del TASK hook para issues formales: `pnpm codex:issue-hook ISSUE-###`, prompt `docs/operations/CODEX_ISSUE_EXECUTION_PROMPT_V1.md`, skill `.codex/skills/greenhouse-issue-execution-hook/SKILL.md` y drift guard `pnpm codex:issue-hook:check`.
+> - **Contrato:** al ver `ISSUE-###`, `[ISSUE-###]`, `docs/issues/**/ISSUE-###-*.md`, `/fix-issue ###` o `/issue ###`, Codex debe ejecutar el hook antes de escribir código. El prompt fuerza triage `issue-only fix` vs `issue + TASK` vs `blocked`.
+> - **Arquitectura:** decisión reversible/operativa; no requiere ADR. Evita convertir bugs localizados en tasks pesadas y evita cerrar incidentes sin evidencia.
+> - **Coordinación:** el worktree tenía cambios ajenos de TASK-1189/PPM en `src/**`; no se tocaron. El scope de Codex fue sólo tooling/docs del harness.
+
 ## Sesión 2026-06-20 — Sample Sprints approval idempotente (staging verificado) — Codex
 
 > **Estado:** ✅ fix desplegado en staging. El operador veía en `/agency/sample-sprints/:id/approve` el error "Pending engagement approval was not found" al reintentar aprobar un Sample Sprint que ya estaba `approved`; el backend buscaba solo approvals `pending` y la UI seguía mostrando acciones de aprobación aunque el detail real estuviera finalizado.

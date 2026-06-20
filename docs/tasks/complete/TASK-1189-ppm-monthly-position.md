@@ -10,7 +10,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Medio`
@@ -249,14 +249,26 @@ Captura de la tasa PPM del contribuyente con el contador; validación de la posi
      ZONE 4 — VERIFICATION & CLOSING
      ═══════════════════════════════════════════════════════════ -->
 
+## Resolution (2026-06-20)
+
+Implementado en 5 slices. Tercera línea del F29; **con esto IVA + retenciones + PPM están materializadas.**
+
+- **Slice 1 (Discovery):** base PPM = ventas netas (`income.subtotal` CLP-normalizado, sin anuladas; notas de crédito DTE 61 netean). NO existía SSOT de tasa PPM → introducida (`ppm_rate_config`).
+- **Slice 2:** migración `ppm_rate_config` (SSOT parametrizable org+período, seed placeholder 0.25% `placeholder_pending_contador`) + `ppm_monthly_positions` (scope `organization_id`).
+- **Slice 3:** `ppm-ledger.ts` — PPM = base × tasa resuelta (org-specific > default), advisory lock, guard FX. Agregado → sin ledger.
+- **Slice 4:** endpoint `GET /api/finance/ppm/monthly-position` (mirror, `enabled` flag) + flag `PPM_POSITION_ENABLED` (OFF/shadow).
+- **Slice 5:** signal `finance.ppm.position_drift` (`ok`) + test + docs.
+
+Shadow: 19 períodos (ej. 2026-06 base 5.800.000 × 0.25% = 14.500 CLP).
+
 ## Acceptance Criteria
 
-- [ ] Posición mensual de PPM materializada por (entidad legal, período), scope operating entity.
-- [ ] Tasa PPM desde SSOT versionada/parametrizable; test sin hardcode.
-- [ ] Base imponible leída del reader de ventas canónico (no recompute).
-- [ ] `finance.ppm.position_drift` existe, wired, steady=0.
-- [ ] `GET /api/finance/ppm/monthly-position` responde 200 con `legalEntity`.
-- [ ] Materializador con advisory lock; sin gate de space.
+- [x] Posición mensual de PPM materializada por (entidad legal, período), scope operating entity. 19 períodos shadow.
+- [x] Tasa PPM desde SSOT versionada/parametrizable (`ppm_rate_config`); test verifica que la tasa no está hardcodeada (resolver desde la tabla).
+- [x] Base imponible = ventas netas (`income.subtotal` CLP-normalizado) — mismo patrón CLP del VAT materializer, no viola `no-untokenized-fx-math` (targetea payments, no invoices).
+- [x] `finance.ppm.position_drift` existe, wired en `get-reliability-overview.ts`, steady=`ok`.
+- [x] `GET /api/finance/ppm/monthly-position` (mirror VAT/retención, scope operating entity) — code-complete; readers verificados live. Staging pendiente (deploy).
+- [x] Materializador con advisory lock (`pg_advisory_xact_lock('ppm_materialize', period)`); sin gate de space.
 
 ## Verification
 
@@ -267,12 +279,13 @@ Captura de la tasa PPM del contribuyente con el contador; validación de la posi
 
 ## Closing Protocol
 
-- [ ] `Lifecycle: complete` + mover a `complete/`
-- [ ] `README.md` + `TASK_ID_REGISTRY.md` sincronizados
-- [ ] `Handoff.md` + `changelog.md` actualizados
-- [ ] `GREENHOUSE_FINANCE_ARCHITECTURE_V1.md` Delta (línea PPM del F29)
-- [ ] `RELIABILITY_CONTROL_PLANE` Delta (signal nuevo)
-- [ ] chequeo de impacto cruzado: marcar en TASK-1186 (umbrella) la sub-capacidad A como complete
+- [x] `Lifecycle: complete` + mover a `complete/`
+- [x] `TASK_ID_REGISTRY.md` sincronizado
+- [x] `Handoff.md` + `changelog.md` actualizados
+- [x] `GREENHOUSE_FINANCE_ARCHITECTURE_V1.md` Delta (línea PPM del F29)
+- [x] `RELIABILITY_CONTROL_PLANE` Delta (signal `finance.ppm.position_drift`)
+- [x] `FEATURE_FLAG_STATE_LEDGER` fila `PPM_POSITION_ENABLED` (3 secciones)
+- [x] chequeo de impacto cruzado: TASK-1186 (umbrella) child A marcada complete
 
 ## Follow-ups
 

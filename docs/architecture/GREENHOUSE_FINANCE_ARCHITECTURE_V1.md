@@ -2,7 +2,31 @@
 
 > **Version:** 1.0
 > **Created:** 2026-03-30
-> **Last updated:** 2026-06-20 (TASK-1188 posición mensual de retenciones — línea retenciones del F29)
+> **Last updated:** 2026-06-20 (TASK-1189 posición mensual de PPM — línea PPM del F29)
+
+## Delta 2026-06-20 — TASK-1189 Posición mensual de PPM (línea PPM del F29)
+
+Tercera línea del F29 materializada por entidad legal (IVA TASK-725, retenciones TASK-1188,
+PPM acá). Completa las 3 líneas mensuales del F29. Tablas `greenhouse_finance.ppm_rate_config`
+(SSOT parametrizable de la tasa PPM) + `ppm_monthly_positions`, scope `organization_id`
+(operating entity), **NUNCA** `space_id`. Materializador `materializePpmForPeriod`
+(`src/lib/finance/ppm-ledger.ts`) con advisory lock + guard FX.
+
+**PPM = base × tasa.** Base imponible = ventas netas del período (`income.subtotal`
+CLP-normalizado, sin anuladas; las notas de crédito DTE 61 entran negativas y netean) — mismo
+patrón CLP que el VAT materializer, no viola `no-untokenized-fx-math` (ese lint targetea
+`ip.amount`/`ep.amount` de payments, no `income.subtotal` de invoices). Tasa desde la SSOT
+`ppm_rate_config` (resolver org-specific > default, rango de período) — **la tasa PPM la fija
+el SII por contribuyente**, por eso es parametrizable y NUNCA hardcode; seed default placeholder
+`0.25%` flagged `placeholder_pending_contador` (el contador actualiza la fila con la tasa real
+antes del flip). PPM es un agregado (base × tasa), no per-documento → sin tabla ledger.
+
+Reader/endpoint `GET /api/finance/ppm/monthly-position` (scope operating entity, degradación
+honesta), signal `finance.ppm.position_drift` (steady=0: posición con base stale vs income real),
+flag `PPM_POSITION_ENABLED` (default OFF + shadow → `enabled:false`). Shadow verificado: 19
+períodos materializados (ej. 2026-06 base 5.800.000 × 0.25% = 14.500 CLP). Child A de TASK-1186.
+Con IVA + retenciones + PPM, las 3 líneas mensuales del F29 están materializadas (falta solo la
+vista consolidada — child E futura).
 
 ## Delta 2026-06-20 — TASK-1188 Posición mensual de RETENCIONES (línea retenciones del F29)
 
