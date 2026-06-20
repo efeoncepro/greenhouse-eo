@@ -65,7 +65,13 @@ Veredicto arquitectónico (4 pilares) y razonamiento fiscal completo en TASK-725
 
 ## Estado
 
-open
+open — **fix code-complete (TASK-725), rollout pendiente.** Falta aplicar la migración a Cloud SQL + re-materializar abr/may/jun + validar drift=0 en runtime y la cifra vs F29 real.
+
+## Delta 2026-06-20 — implementación TASK-725 (code-complete, rollout pendiente)
+
+Re-scope implementado end-to-end en `develop` local-first (Slices 1–5). Precisión sobre el número del Impacto: el **$2.56M CLP** era el universo de gastos con `recoverable_tax_amount > 0` **sin filtro de período fiscal** (la mayoría sin `period_year/month`, que el materializador no procesa en ninguna versión). El crédito fiscal **materializable** (con período) que el gate `space_id IS NOT NULL` excluía es menor: validado read-only vs PG, el materializador viejo veía **0** filas de crédito fiscal (`credito_rows_viejo=0`); el re-scope incorpora el crédito por período (mar/abr/may/jun), todo proveniente de gastos sin space. La dirección del bug es la misma (el gate excluía el 100% del crédito materializable); la magnitud F29 exacta se confirma al re-materializar + validar con contador.
+
+Pendiente de rollout para cerrar: `pnpm pg:connect:migrate` (migración `20260620131856180`) → regen `db.d.ts` → re-materializar (`POST /api/internal/vat-ledger-materialize` sin body, o `materializeAllAvailableVatPeriods`) → verificar `finance.vat.position_drift = 0` en `/admin/operations` → cuadrar net vs F29 real.
 
 ## Relacionado
 
