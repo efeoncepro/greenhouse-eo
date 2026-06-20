@@ -109,8 +109,8 @@ Reglas obligatorias:
 
 ### Blocks / Impacts
 
-- Desbloquea una UI Q2C honesta como follow-up (`TASK-1208`, propuesta, no creada aun).
-- Desbloquea API Platform/App parity versionada para `quotation.v1` / `quote_to_cash.v1` como follow-up (`TASK-1207`, propuesta, no creada aun).
+- Desbloquea una UI Q2C honesta como follow-up (`TASK-1209`, propuesta, no creada aun).
+- Desbloquea API Platform/App parity versionada para `quotation.v1` / `quote_to_cash.v1` como follow-up (`TASK-1208`, propuesta, no creada aun).
 - Reduce drift entre Commercial y Finance para cotizaciones visibles en `/finance/quotes`.
 - Alimenta reliability/readiness signals de cierre comercial y HubSpot anchors.
 
@@ -187,11 +187,12 @@ closeQuoteToCash({
   - No new quote reaches final `converted` state without a completed or explicitly suspended `quote_to_cash` audit record.
   - When strategy requires invoice, `converted_to_income_id` or equivalent link points to an existing `greenhouse_finance.income` row.
   - Contract and income are correlated to the same quotation and organization.
-  - Retry/idempotent replay cannot create a second income for the same quotation/strategy.
+  - **Income idempotency (refuerzo audit M2):** una retry/replay NUNCA crea un segundo income. El comando resuelve idempotencia con (a) `idempotencyKey` persistido + (b) lookup de income existente por `quotation_id`+`strategy` ANTES de insertar + (c) **replay devuelve el resultado previo (mismo `incomeId`)**, NO un conflicto. NUNCA depender solo del `FOR UPDATE`/status como prevención de doble AR — el `INC-${randomUUID()}` actual de `convert-to-invoice` debe quedar detrás de este guard (un segundo income = AR/revenue sobre-declarado).
+  - **`contract_only` no es estado terminal silencioso:** solo permitido como estado **suspendido/intermedio**, gateado por flag, con `reason` + audit `status='suspended'` + SLA + signal de breach. Una quote en `contract_only` NUNCA cuenta como Q2C cerrado (deal ganado sin AR = revenue leakage); la conversión real (invoice) queda pendiente y observable.
   - Enterprise/HES flow cannot bypass required PO/HES evidence.
   - Approval-gated high-value Q2C cannot mutate final state through `skipApprovalGate` without explicit actor/reason/audit.
 - Tenant/space boundary: use existing tenant/internal context and quotation `organization_id`; no cross-tenant lookup by raw id.
-- Idempotency/concurrency: lock quotation row, use command correlation/idempotency key and existing audit/idempotent-hit substrate; fail loud or return prior result on replay.
+- Idempotency/concurrency: lock quotation row + **`idempotencyKey` persistido + lookup de income existente antes de insertar**; en replay **devolver el resultado previo (incl. `incomeId`)**, no un conflicto. El lock/status es defensa-en-profundidad, NO el mecanismo único de prevención de doble income.
 - Audit/outbox/history: record actor, reason, strategy, before/after, correlation id, and emitted event ids.
 
 ### Migration, backfill and rollout
@@ -214,7 +215,7 @@ closeQuoteToCash({
 - Local checks: focused unit/integration tests for simple invoice, enterprise HES guard, contract-only suspension, idempotent replay and concurrent duplicate prevention.
 - DB/runtime checks: read-only SQL before/after for `issued`, `converted`, `commercial_operations_audit`, `income`, `converted_to_income_id`, missing HubSpot deal anchors.
 - Integration checks: staging smoke on a controlled quote fixture or approved existing issued quote.
-- Reliability signals/logs: add or wire signals for `commercial.quote_to_cash.converted_without_income`, `commercial.quote_to_cash.converted_without_audit`, `commercial.quotation.issued_without_deal`, and Q2C completion health.
+- Reliability signals/logs: add or wire signals for `commercial.quote_to_cash.converted_without_income`, `commercial.quote_to_cash.converted_without_audit`, `commercial.quotation.issued_without_deal`, `commercial.quote_to_cash.contract_only_sla_breach` (quote en `contract_only` más allá del SLA sin income), `commercial.quote_to_cash.duplicate_income` (más de un income por `quotation_id`+`strategy`, steady=0), and Q2C completion health.
 - Production verification sequence: deploy gated -> run read-only readiness -> execute one allowlisted close -> verify contract + income + audit + outbox + signal steady.
 
 ### Acceptance criteria additions
@@ -231,7 +232,7 @@ closeQuoteToCash({
 - [ ] Existing UI/API routes delegate to the same server-side command instead of separate business logic.
 - [ ] The command emits audit/outbox/history with actor, reason, correlation and idempotency.
 - [ ] Denied or invalid actions fail before mutation and without leaking finance/commercial internals.
-- [ ] API Platform parity follow-up is either implemented or explicitly linked as `TASK-1207`.
+- [ ] API Platform parity follow-up is either implemented or explicitly linked as `TASK-1208`.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -281,8 +282,8 @@ closeQuoteToCash({
 
 ## Out of Scope
 
-- No new visible UI flow in this task; create/use the proposed `TASK-1208` for the operator close experience.
-- No API Platform app/ecosystem lane in this task; create/use the proposed `TASK-1207`.
+- No new visible UI flow in this task; create/use the proposed `TASK-1209` for the operator close experience.
+- No API Platform app/ecosystem lane in this task; create/use the proposed `TASK-1208`.
 - No historical mass conversion/backfill of issued quotes.
 - No broad capability hardening for all quote/reconciliation routes; coordinate with `TASK-1202`.
 - No direct HubSpot mutation unless required for one controlled smoke and already covered by existing guarded commands.
@@ -308,7 +309,8 @@ The preferred implementation shape is one orchestration layer around existing pr
 
 | Riesgo | Sistema | Probabilidad | Mitigation | Signal de alerta |
 |---|---|---|---|---|
-| Duplicate income on retry | finance AR | medium | quotation lock, idempotency key, existing income lookup before insert | converted_without_income / duplicate income count |
+| Duplicate income on retry (doble AR) | finance AR | medium | `idempotencyKey` persistido + lookup de income existente ANTES de insert + replay devuelve el previo (no solo lock/status) | `duplicate_income` (steady=0) / converted_without_income |
+| `contract_only` queda como cierre silencioso sin AR | commercial-finance | medium | flag-gated + audit `status='suspended'` + SLA + signal; nunca terminal | `contract_only_sla_breach` |
 | Quote converted without Q2C audit | commercial controls | medium | single final state writer, route convergence, regression test | converted_without_audit |
 | Enterprise deal invoiced without HES/PO | commercial-finance boundary | medium | strategy-specific guards and canonical errors | enterprise missing evidence |
 | HubSpot-driven autopromoter no-ops silently | sync | high | readiness reason and issued-without-deal signal | issued_without_deal |
@@ -352,8 +354,10 @@ Commercial/Finance owner must approve the first production Q2C close smoke and a
 - [ ] A canonical Q2C close command exists or `convertQuoteToCash` is extended so it can materialize contract/client/income/audit/events in one governed operation.
 - [ ] `convert-to-cash` and `convert-to-invoice` cannot diverge into separate final-state business paths.
 - [ ] The command is idempotent, concurrent-safe and covered by tests for duplicate prevention.
+- [ ] **Income idempotency dura:** un replay con el mismo `idempotencyKey` devuelve el resultado previo (mismo `incomeId`), NO crea un segundo income ni retorna conflicto (test de replay + test de concurrencia). El `INC-${randomUUID()}` de `convert-to-invoice` queda detrás del lookup de income existente.
+- [ ] **`contract_only` no terminal:** una quote en `contract_only` no aparece como Q2C cerrado; queda `status='suspended'` en audit, con SLA + signal `contract_only_sla_breach` (test).
 - [ ] Strategy-specific guards exist for `simple_invoice`, `enterprise_hes` and `contract_only`.
-- [ ] New or updated signals report converted-without-audit, converted-without-income and issued-without-deal.
+- [ ] New or updated signals report converted-without-audit, converted-without-income, issued-without-deal, contract-only SLA breach y duplicate-income (steady=0).
 - [ ] Staging or controlled runtime evidence proves one Q2C close produces contract + income + audit + outbox/events.
 - [ ] Full API Parity follow-up is linked or created for API Platform exposure.
 
@@ -375,17 +379,17 @@ Commercial/Finance owner must approve the first production Q2C close smoke and a
 - [ ] `docs/tasks/TASK_ID_REGISTRY.md` quedo sincronizado con el cierre
 - [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
 - [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre `TASK-1202`, `TASK-1207` y `TASK-1208` si existen
+- [ ] se ejecuto chequeo de impacto cruzado sobre `TASK-1202`, `TASK-1208` y `TASK-1209` si existen
 - [ ] Commercial Q2C audit fue actualizado con el nuevo estado o evidencia de cierre.
 
 ## Follow-ups
 
-- `TASK-1207` (propuesta): API Platform parity para `quotation.v1` / `quote_to_cash.v1`.
-- `TASK-1208` (propuesta): UI operator close experience que consuma el comando canonico.
+- `TASK-1208` (propuesta): API Platform parity para `quotation.v1` / `quote_to_cash.v1`.
+- `TASK-1209` (propuesta): UI operator close experience que consuma el comando canonico.
 - Approval workflow resoluble para Q2C >100M si no queda cubierto por el sistema generico de aprobaciones.
 
 ## Open Questions
 
-- Debe `contract_only` existir en produccion o solo como modo interno/suspendido con SLA?
+- ~~Debe `contract_only` existir en produccion o solo como modo interno/suspendido con SLA?~~ **Resuelto (endurecimiento 2026-06-20):** `contract_only` existe SOLO como **estado interno/suspendido** gateado por flag, con `reason` + audit `status='suspended'` + SLA + signal `contract_only_sla_breach`. NUNCA es un Q2C cerrado terminal (sería deal ganado sin AR = revenue leakage). El owner Commercial/Finance debe aprobar cualquier política que lo permita en prod (ver Out-of-band coordination).
 - Que capability fina exacta sera canonica: `commercial.quote_to_cash.execute`, `commercial.quotation.close` u otra ya registrada?
 - El primer smoke debe usar una quote fixture nueva o una de las 12 issued observadas en dev/staging?
