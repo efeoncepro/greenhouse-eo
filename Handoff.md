@@ -2,6 +2,18 @@
 
 > **Estado:** `released` (manifest transicionó a released, post-release health check verde). Orchestrator run [`27721723752`](https://github.com/efeoncepro/greenhouse-eo/actions/runs/27721723752) `completed/success`. Conducido por Claude tras pedido del operador ("paso a producción que Codex dejó preparado").
 
+## Sesión 2026-06-20 — TASK-1188 Posición mensual de retenciones F29 (COMPLETE, code-complete + shadow) — Claude
+
+> **Estado:** ✅ code-complete + shadow verificado. Child B de la umbrella TASK-1186 (segunda línea del F29 tras IVA/TASK-725).
+> - **Discovery (Slice 1):** retención practicada vive en 2 fuentes — `payroll_entries.sii_retention_amount` (honorarios internos) + `expenses.withholding_amount` (BHE recibidas). **Hallazgo:** se solapan (Luis Reyes, Felipe Zurita en ambas) → sumarlas doble-cuenta.
+> - **Decisión (skills finance/payroll/arq):** materializar **solo desde BHE** (`expenses.withholding_amount>0`, el doc legal SII, en su período de emisión). Payroll es el espejo interno; su gap-sin-BHE = signal futuro, no se suma.
+> - **Slices 2-5:** migración 2 tablas (`172009209`, scope org, advisory lock-ready) + `retention-ledger.ts` (advisory lock + guard FX + tasa SSOT) + endpoint `GET /api/finance/retention/monthly-position` (mirror VAT, sin RUT/PII) + signal `finance.retention.position_drift` (wired, `ok`) + flag `RETENTION_POSITION_ENABLED` (OFF) + tests.
+> - **Cifra shadow (validar con contador):** 2026-05 = 242.623 CLP (3 docs), 2026-06 = 138.646 CLP (2 docs). 1 BHE sin período (107.964) excluida → gap data-quality (follow-up).
+> - **Gates:** `pnpm test` 7459/0, local:check 0, `pnpm build` (Node 24) verde. Migración applied dev.
+> - **Rollout pendiente:** validación contable vs F29 real → flip `RETENTION_POSITION_ENABLED` → redeploy ops-worker (materializador reactivo). NO declarar oficial hasta entonces.
+> - **Coordinación:** worktree con trabajo concurrente de Codex (sample-sprints, TASK-1192/1193/1194, su migración `172000000`); mi migración `172009209` quedó después por el clock UTC (regenerada para ordenar). No toqué archivos de Codex.
+> - Commits `3c5f9266a` (Slice 2), `186126558` (Slice 3), `d0936b3f4` (Slices 4-5). Movida a `complete/`.
+
 ## Sesión 2026-06-20 — Sample Sprints create/detail desbloqueado — Codex
 
 > **Estado:** ✅ end-to-end en staging. La UI `/agency/sample-sprints/new` mostraba "No fue posible declarar el Sample Sprint" porque `declareSampleSprint()` insertaba `greenhouse_core.services.status='pending_approval'`, pero `services_status_check` (TASK-836) solo admitía `active/closed/paused/legacy_seed_archived`. Tras aplicar el CHECK, el create funcionó y dejó el service real `svc-7bec41af-0aa8-4bec-a5ea-be92a9d7bdeb`, pero el detalle de staging aún devolvía 500 porque el reader consultaba `engagement_audit_log.created_at`; la tabla real usa `occurred_at`.

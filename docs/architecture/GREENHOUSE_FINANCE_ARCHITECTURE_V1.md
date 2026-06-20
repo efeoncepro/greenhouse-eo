@@ -2,7 +2,31 @@
 
 > **Version:** 1.0
 > **Created:** 2026-03-30
-> **Last updated:** 2026-06-20 (TASK-1187 deprecación de space_id/client_id en vat_monthly_positions)
+> **Last updated:** 2026-06-20 (TASK-1188 posición mensual de retenciones — línea retenciones del F29)
+
+## Delta 2026-06-20 — TASK-1188 Posición mensual de RETENCIONES (línea retenciones del F29)
+
+Segunda línea del F29 materializada por entidad legal (la primera fue IVA, TASK-725).
+Mirror del patrón VAT: tablas `greenhouse_finance.retention_ledger_entries` +
+`retention_monthly_positions`, scope `organization_id` (operating entity), **NUNCA**
+`space_id`. Materializador `materializeRetentionLedgerForPeriod` (`src/lib/finance/retention-ledger.ts`)
+con advisory lock por período + guard FX (lecciones TASK-1185), tasa de referencia
+desde `SII_RETENTION_RATES` (versionada, nunca hardcode).
+
+**Source-of-truth (decisión clave, evidencia BD viva):** la posición se materializa
+**solo desde las boletas de honorarios (BHE) recibidas** (`expenses.withholding_amount > 0`),
+el instrumento legal declarado al SII, en su período de emisión. **NO** se suma
+`payroll_entries.sii_retention_amount` (honorarios internos): doble-contaría — un mismo
+honorario aparece en ambas fuentes (probado: Luis Reyes, Felipe Zurita en payroll Y como
+BHE-expense). El ledger conserva `source_kind`/`dedup_status` como punto de extensión para
+un v2 que sume el gap payroll-sin-BHE (sub-declaración) vía signal, no sumándolo.
+
+Reader/endpoint gobernados (`GET /api/finance/retention/monthly-position`) scopeados a la
+operating entity, degradación honesta (`fiscal_entity_unavailable`), sin exponer el RUT de
+la contraparte (PII). Signal `finance.retention.position_drift` (steady=0). Flag
+`RETENTION_POSITION_ENABLED` (default OFF + shadow) → el endpoint marca `enabled:false`
+hasta validación contable vs el F29 real + flip. Cifra shadow verificada: 2026-05 = 242.623
+CLP (3 docs), 2026-06 = 138.646 CLP (2 docs). Child B de la umbrella TASK-1186.
 
 ## Delta 2026-06-20 — TASK-1187 `space_id`/`client_id` deprecadas en `vat_monthly_positions`
 

@@ -269,7 +269,7 @@ Open Questions resueltas por el operador en el intake de la umbrella:
 
 - **Single-RUT por ahora** → la sub-capacidad **D (multi-entity foundation) se difiere** como foundation no urgente. A/B/C se construyen sobre el singleton vía `getOperatingEntityIdentity()` (multi-entidad-ready por construcción).
 - **Prioritarias primero (B Retenciones + A PPM)** → se crearon las 2 children mensuales/operativas:
-  - **`TASK-1188`** — Retenciones monthly position (child B, P2).
+  - **`TASK-1188`** — Retenciones monthly position (child B, P2). ✅ **complete (code-complete + shadow) 2026-06-20:** tablas `retention_*`, materializador desde BHE (decisión: no sumar payroll — doble-conteo), endpoint, signal `finance.retention.position_drift`, flag `RETENTION_POSITION_ENABLED` (OFF). Cifra shadow validable: 2026-05 242.623 / 2026-06 138.646 CLP. Rollout pendiente: validación contable + flip.
   - **`TASK-1189`** — PPM monthly position (child A, P2).
 - **C (Renta Anual F22) y D (multi-country/multi-entity) quedan como children siguientes** (no creadas aún; se levantan cuando se prioricen).
 - **EPIC:** no formalizada aún; la umbrella coordina. Re-evaluar si C+D agregan ≥2 tasks grandes más.

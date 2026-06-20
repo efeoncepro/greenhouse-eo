@@ -9,6 +9,17 @@
 
 ---
 
+## Delta 2026-06-20 — TASK-1188: signal `finance.retention.position_drift`
+
+Nuevo signal de drift en el módulo `finance` (mirror de `finance.vat.position_drift`):
+detecta boletas de honorarios (BHE, `expenses.withholding_amount > 0`) de períodos ya
+materializados que no tienen su asiento `counted` en `retention_ledger_entries` — la línea
+de retenciones del F29 quedaría incompleta. `kind=drift`, severidad `error` si count > 0,
+steady = `0`. Reader `getRetentionPositionDriftSignal` (`src/lib/reliability/queries/retention-position-drift.ts`),
+wired en `get-reliability-overview.ts` con degradación honesta (`unknown` si la query falla).
+Límite conocido (igual que IVA): documentos con retención y período NULL son invisibles a
+este drift — se cubrirían con un signal de data-quality aparte (follow-up).
+
 ## Delta 2026-06-17 — TASK-1167: signal `public_site.astro_ci_failed`
 
 Nuevo signal canonical de observabilidad para el repo GitHub del rail objetivo Astro del sitio publico Efeonce.
