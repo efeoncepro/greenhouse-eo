@@ -15,6 +15,7 @@ import FigmaNodeLinkAffordance, { type FigmaNodeLinkResult } from './figma-link/
 const HOME_ROUTE = '/home'
 const DESIGN_SYSTEM_ROUTE = '/design-system'
 const DESIGN_SYSTEM_WIDE_CANVAS_ROUTES = new Set([`${DESIGN_SYSTEM_ROUTE}/brand-logos`])
+const DESIGN_SYSTEM_HIDE_AXIS_LINK_ROUTES = new Set([`${DESIGN_SYSTEM_ROUTE}/handoff`])
 
 const DESIGN_SYSTEM_ROUTE_LABELS = {
   [DESIGN_SYSTEM_ROUTE]: 'Design System',
@@ -113,6 +114,7 @@ const DesignSystemBreadcrumbShell = ({
   const currentRoute = normalizePathname(pathname)
   const breadcrumbItems = resolveDesignSystemBreadcrumbItems(pathname)
   const routeUsesWideCanvas = DESIGN_SYSTEM_WIDE_CANVAS_ROUTES.has(currentRoute)
+  const routeShowsAxisLink = !DESIGN_SYSTEM_HIDE_AXIS_LINK_ROUTES.has(currentRoute)
   // SSOT runtime: the node comes from the DB-fed map (TASK-1072), not the TS seed.
   const figmaNodeId = figmaNodeMap[currentRoute]?.nodeId ?? null
 
@@ -149,7 +151,9 @@ const DesignSystemBreadcrumbShell = ({
         sx={{
           inlineSize: '100%',
           maxInlineSize: routeUsesWideCanvas ? 'none' : 1360,
-          mx: routeUsesWideCanvas ? 0 : 'auto'
+          mx: routeUsesWideCanvas ? 0 : 'auto',
+          px: routeUsesWideCanvas ? 0 : { xs: 2, md: 3 },
+          boxSizing: 'border-box'
         }}
       >
         <Stack
@@ -166,7 +170,9 @@ const DesignSystemBreadcrumbShell = ({
             kind='pageHierarchy'
             showIcons={false}
           />
-          <FigmaNodeLinkAffordance nodeId={figmaNodeId} canLink={canLinkFigmaNode} onLink={handleLink} />
+          {routeShowsAxisLink ? (
+            <FigmaNodeLinkAffordance nodeId={figmaNodeId} canLink={canLinkFigmaNode} onLink={handleLink} />
+          ) : null}
         </Stack>
       </Box>
       {children}

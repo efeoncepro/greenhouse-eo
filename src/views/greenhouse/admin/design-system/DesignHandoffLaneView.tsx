@@ -1,11 +1,13 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
 
+import Accordion from '@mui/material/Accordion'
+import AccordionDetails from '@mui/material/AccordionDetails'
+import AccordionSummary from '@mui/material/AccordionSummary'
 import Alert from '@mui/material/Alert'
 import Box from '@mui/material/Box'
 import CircularProgress from '@mui/material/CircularProgress'
-import Divider from '@mui/material/Divider'
 import FormControl from '@mui/material/FormControl'
 import InputLabel from '@mui/material/InputLabel'
 import LinearProgress from '@mui/material/LinearProgress'
@@ -510,11 +512,88 @@ const SectionHeader = ({ title, helper, count }: { title: string; helper: string
   </Stack>
 )
 
+const InspectorAccordion = ({
+  title,
+  helper,
+  icon,
+  defaultExpanded = false,
+  dataCapture,
+  children
+}: {
+  title: string
+  helper?: string
+  icon: string
+  defaultExpanded?: boolean
+  dataCapture?: string
+  children: ReactNode
+}) => (
+  <Accordion
+    disableGutters
+    elevation={0}
+    defaultExpanded={defaultExpanded}
+    data-capture={dataCapture}
+    sx={theme => ({
+      overflow: 'hidden',
+      bgcolor: 'background.paper',
+      border: `1px solid ${theme.palette.divider}`,
+      borderRadius: `${theme.shape.customBorderRadius.md}px`,
+      '&:before': { display: 'none' },
+      '& + &': { mt: 1.5 }
+    })}
+  >
+    <AccordionSummary
+      expandIcon={<i className='tabler-chevron-down' aria-hidden='true' />}
+      sx={theme => ({
+        minBlockSize: 52,
+        px: 2,
+        py: 0.5,
+        '&.Mui-expanded': {
+          minBlockSize: 52,
+          borderBlockEnd: `1px solid ${theme.palette.divider}`
+        },
+        '& .MuiAccordionSummary-content': { my: 1, minInlineSize: 0 },
+        '& .MuiAccordionSummary-content.Mui-expanded': { my: 1 }
+      })}
+    >
+      <Stack direction='row' spacing={1.25} alignItems='center' sx={{ minInlineSize: 0 }}>
+        <Box
+          component='i'
+          className={icon}
+          aria-hidden='true'
+          sx={theme => ({
+            display: 'grid',
+            inlineSize: 28,
+            blockSize: 28,
+            flex: '0 0 auto',
+            placeItems: 'center',
+            color: 'primary.main',
+            bgcolor: alpha(theme.palette.primary.main, 0.09),
+            borderRadius: `${theme.shape.customBorderRadius.sm}px`,
+            fontSize: 17
+          })}
+        />
+        <Box sx={{ minInlineSize: 0 }}>
+          <Typography variant='subtitle2'>{title}</Typography>
+          {helper ? (
+            <Typography variant='caption' color='text.secondary' sx={{ display: 'block', overflowWrap: 'anywhere' }}>
+              {helper}
+            </Typography>
+          ) : null}
+        </Box>
+      </Stack>
+    </AccordionSummary>
+    <AccordionDetails sx={{ p: 2 }}>
+      <Stack spacing={2}>{children}</Stack>
+    </AccordionDetails>
+  </Accordion>
+)
+
 const DesignHandoffLaneView = () => {
   const [apiState, setApiState] = useState<ApiState>('loading')
   const [entries, setEntries] = useState<DesignHandoffEntry[]>([])
   const [allowedFiles, setAllowedFiles] = useState<DesignHandoffAllowedFile[]>([])
   const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [inspectorOpen, setInspectorOpen] = useState(true)
   const [activeTab, setActiveTab] = useState<HandoffTab>('ledger')
   const [message, setMessage] = useState<{ severity: 'success' | 'warning' | 'error' | 'info'; text: string } | null>(null)
   const [command, setCommand] = useState<CommandKey | null>(null)
@@ -558,14 +637,16 @@ const DesignHandoffLaneView = () => {
   const parsed = useMemo(() => parseFigmaUrl(url), [url])
   const sortedEntries = useMemo(() => sortEntries(entries), [entries])
 
-  const selectedEntry = useMemo(
-    () =>
-      entries.find(entry => entry.entryId === selectedId) ??
-      entries.find(entry => entry.status !== 'archived') ??
-      entries[0] ??
-      null,
-    [entries, selectedId]
-  )
+  const selectedEntry = useMemo(() => {
+    if (!inspectorOpen) return null
+
+    return entries.find(entry => entry.entryId === selectedId) ?? entries.find(entry => entry.status !== 'archived') ?? entries[0] ?? null
+  }, [entries, inspectorOpen, selectedId])
+
+  const selectEntry = (entry: DesignHandoffEntry) => {
+    setSelectedId(entry.entryId)
+    setInspectorOpen(true)
+  }
 
   const activeEntries = useMemo(() => entries.filter(entry => entry.status !== 'archived'), [entries])
 
@@ -980,7 +1061,7 @@ const DesignHandoffLaneView = () => {
                   key={entry.entryId}
                   entry={entry}
                   active={entry.entryId === selectedEntry?.entryId}
-                  onSelect={entry => setSelectedId(entry.entryId)}
+                  onSelect={selectEntry}
                 />
               ))}
             </Stack>
@@ -1220,46 +1301,11 @@ const DesignHandoffLaneView = () => {
 
   const renderMain = () => (
     <Stack spacing={3}>
-      <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} justifyContent='space-between' alignItems={{ xs: 'stretch', md: 'flex-start' }}>
-        <Stack spacing={1} sx={{ maxInlineSize: 780 }}>
-          <Stack direction='row' spacing={1} alignItems='center' flexWrap='wrap' useFlexGap>
-            <GreenhouseChip
-              size='small'
-              variant='label'
-              tone='primary'
-              iconClassName='tabler-layout-kanban'
-              label={DESIGN_HANDOFF_COPY.overline}
-            />
-            <GreenhouseChip
-              size='small'
-              variant='outlined'
-              tone='success'
-              iconClassName='tabler-api'
-              label='Full API parity'
-            />
-          </Stack>
-          <Typography variant='h3'>{DESIGN_HANDOFF_COPY.pageTitle}</Typography>
-          <Typography variant='body1' color='text.secondary'>
-            {DESIGN_HANDOFF_COPY.pageDescription}
-          </Typography>
-        </Stack>
-        <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
-          <GreenhouseButton
-            kind='secondaryAction'
-            leadingIconClassName={command === 'reload' ? 'tabler-loader-2' : 'tabler-refresh'}
-            disabled={command === 'reload'}
-            onClick={() => runCommand('reload', async () => {
-              await reload(true)
-
-              return DESIGN_HANDOFF_COPY.messages.loaded
-            })}
-          >
-            {DESIGN_HANDOFF_COPY.actions.refresh}
-          </GreenhouseButton>
-          <GreenhouseButton kind='primaryAction' leadingIconClassName='tabler-plus' onClick={() => setActiveTab('intake')}>
-            {DESIGN_HANDOFF_COPY.tabs.intake}
-          </GreenhouseButton>
-        </Stack>
+      <Stack spacing={1} sx={{ maxInlineSize: 780 }}>
+        <Typography variant='h3'>{DESIGN_HANDOFF_COPY.pageTitle}</Typography>
+        <Typography variant='body1' color='text.secondary'>
+          {DESIGN_HANDOFF_COPY.pageDescription}
+        </Typography>
       </Stack>
 
       {message ? <Alert severity={message.severity}>{message.text}</Alert> : null}
@@ -1286,46 +1332,71 @@ const DesignHandoffLaneView = () => {
           overflow: 'hidden'
         })}
       >
-        <Tabs
-          value={activeTab}
-          onChange={(_, value: HandoffTab) => setActiveTab(value)}
-          variant='scrollable'
-          scrollButtons='auto'
+        <Stack
+          direction='row'
+          alignItems='center'
+          justifyContent='space-between'
+          spacing={1}
           sx={theme => ({
             px: 2,
-            borderBlockEnd: `1px solid ${theme.palette.divider}`,
-            '& .MuiTab-root': { minBlockSize: 52 }
+            borderBlockEnd: `1px solid ${theme.palette.divider}`
           })}
         >
-          <Tab
-            value='ledger'
-            label={DESIGN_HANDOFF_COPY.tabs.ledger}
-            icon={<i className='tabler-list-details' />}
-            iconPosition='start'
-            data-capture='design-system-handoff-tab-ledger'
-          />
-          <Tab
-            value='intake'
-            label={DESIGN_HANDOFF_COPY.tabs.intake}
-            icon={<i className='tabler-circle-plus' />}
-            iconPosition='start'
-            data-capture='design-system-handoff-tab-intake'
-          />
-          <Tab
-            value='allowlist'
-            label={DESIGN_HANDOFF_COPY.tabs.allowlist}
-            icon={<i className='tabler-shield-check' />}
-            iconPosition='start'
-            data-capture='design-system-handoff-tab-allowlist'
-          />
-          <Tab
-            value='drift'
-            label={DESIGN_HANDOFF_COPY.tabs.drift}
-            icon={<i className='tabler-activity-heartbeat' />}
-            iconPosition='start'
-            data-capture='design-system-handoff-tab-drift'
-          />
-        </Tabs>
+          <Tabs
+            value={activeTab}
+            onChange={(_, value: HandoffTab) => setActiveTab(value)}
+            variant='scrollable'
+            scrollButtons='auto'
+            sx={{
+              minInlineSize: 0,
+              '& .MuiTab-root': { minBlockSize: 52 }
+            }}
+          >
+            <Tab
+              value='ledger'
+              label={DESIGN_HANDOFF_COPY.tabs.ledger}
+              icon={<i className='tabler-list-details' />}
+              iconPosition='start'
+              data-capture='design-system-handoff-tab-ledger'
+            />
+            <Tab
+              value='intake'
+              label={DESIGN_HANDOFF_COPY.tabs.intake}
+              icon={<i className='tabler-circle-plus' />}
+              iconPosition='start'
+              data-capture='design-system-handoff-tab-intake'
+            />
+            <Tab
+              value='allowlist'
+              label={DESIGN_HANDOFF_COPY.tabs.allowlist}
+              icon={<i className='tabler-shield-check' />}
+              iconPosition='start'
+              data-capture='design-system-handoff-tab-allowlist'
+            />
+            <Tab
+              value='drift'
+              label={DESIGN_HANDOFF_COPY.tabs.drift}
+              icon={<i className='tabler-activity-heartbeat' />}
+              iconPosition='start'
+              data-capture='design-system-handoff-tab-drift'
+            />
+          </Tabs>
+          <GreenhouseButton
+            kind='secondaryAction'
+            variant='outlined'
+            size='small'
+            leadingIconClassName={command === 'reload' ? 'tabler-loader-2' : 'tabler-refresh'}
+            disabled={command === 'reload'}
+            onClick={() => runCommand('reload', async () => {
+              await reload(true)
+
+              return DESIGN_HANDOFF_COPY.messages.loaded
+            })}
+            sx={{ flex: '0 0 auto', display: { xs: 'none', sm: 'inline-flex' } }}
+          >
+            {DESIGN_HANDOFF_COPY.actions.refresh}
+          </GreenhouseButton>
+        </Stack>
         <Box sx={{ p: { xs: 2, md: 3 }, minInlineSize: 0 }}>
           {activeTab === 'ledger' ? renderLedger() : null}
           {activeTab === 'intake' ? renderIntake() : null}
@@ -1350,11 +1421,11 @@ const DesignHandoffLaneView = () => {
       icon='tabler-layout-sidebar-right'
       kind='inspector'
       variant='inspector'
-      onClose={() => setSelectedId(null)}
+      onClose={() => setInspectorOpen(false)}
       dataCapture='design-system-handoff-inspector'
     >
       {selectedEntry ? (
-        <Stack spacing={3}>
+        <Stack spacing={2}>
           <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
             <GreenhouseChip
               size='small'
@@ -1375,69 +1446,100 @@ const DesignHandoffLaneView = () => {
 
           <Box
             sx={theme => ({
-              p: 2.5,
+              p: 2,
               border: `1px solid ${theme.palette.divider}`,
               borderRadius: `${theme.shape.customBorderRadius.md}px`,
-              bgcolor: alpha(theme.palette.primary.main, 0.035)
+              bgcolor: 'background.paper'
             })}
           >
-            <Stack spacing={1.25}>
-              <Typography variant='caption' color='text.secondary' sx={typographyScale.labelSm}>
-                Figma node
-              </Typography>
-              <Typography variant='body2' sx={{ wordBreak: 'break-word' }}>
-                {selectedEntry.fileKey} · {selectedEntry.nodeId}
-              </Typography>
-              <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
+            <Stack direction='row' spacing={2} alignItems='center' justifyContent='space-between' useFlexGap>
+              <Stack spacing={0.5} sx={{ minInlineSize: 0 }}>
+                <Typography variant='caption' color='text.secondary' sx={typographyScale.labelSm}>
+                  Figma node
+                </Typography>
+                <Typography variant='body2' sx={{ wordBreak: 'break-word' }}>
+                  {selectedEntry.fileKey} · {selectedEntry.nodeId}
+                </Typography>
                 <GreenhouseChip
                   size='small'
                   variant='label'
                   tone={SNAPSHOT_TONES[getSnapshotStatus(selectedEntry)]}
                   label={DESIGN_HANDOFF_NODE_STATUS_LABELS[getSnapshotStatus(selectedEntry)]}
                 />
-                <Tooltip title={selectedEntry.latestNodeSnapshot?.providerCheckedAt ?? 'Sin snapshot'}>
-                  <span>
-                    <GreenhouseButton
-                      kind='secondaryAction'
-                      variant='outlined'
-                      size='small'
-                      leadingIconClassName={command === 'verify' ? 'tabler-loader-2' : 'tabler-refresh-dot'}
-                      disabled={command === 'verify'}
-                      onClick={verifyNode}
-                    >
-                      {DESIGN_HANDOFF_COPY.actions.verifyNode}
-                    </GreenhouseButton>
-                  </span>
-                </Tooltip>
               </Stack>
+              <Tooltip title={selectedEntry.latestNodeSnapshot?.providerCheckedAt ?? 'Sin snapshot'}>
+                <span>
+                  <GreenhouseButton
+                    kind='secondaryAction'
+                    variant='outlined'
+                    size='small'
+                    leadingIconClassName={command === 'verify' ? 'tabler-loader-2' : 'tabler-refresh-dot'}
+                    disabled={command === 'verify'}
+                    onClick={verifyNode}
+                  >
+                    Verificar
+                  </GreenhouseButton>
+                </span>
+              </Tooltip>
             </Stack>
           </Box>
 
-          <Stack spacing={1.5} data-capture='design-system-handoff-evidence'>
+          <Stack spacing={1.25} data-capture='design-system-handoff-evidence'>
             <Typography variant='subtitle2'>{DESIGN_HANDOFF_COPY.sections.implementationReadiness}</Typography>
-            {readiness.map(item => (
-              <Stack key={item.label} direction='row' spacing={1.25} alignItems='flex-start'>
-                <Box
-                  component='i'
-                  className={item.done ? 'tabler-circle-check' : 'tabler-circle-dashed'}
-                  aria-hidden='true'
-                  sx={{ color: item.done ? 'success.main' : 'text.disabled', fontSize: 18, mt: 0.25 }}
-                />
-                <Box sx={{ minInlineSize: 0 }}>
-                  <Typography variant='body2'>{item.label}</Typography>
-                  <Typography variant='caption' color='text.secondary' sx={{ wordBreak: 'break-word' }}>
-                    {item.helper}
-                  </Typography>
-                </Box>
-              </Stack>
-            ))}
+            <Box
+              sx={{
+                display: 'grid',
+                gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, minmax(0, 1fr))' },
+                gap: 1
+              }}
+            >
+              {readiness.map(item => (
+                <Stack
+                  key={item.label}
+                  direction='row'
+                  spacing={1}
+                  alignItems='flex-start'
+                  sx={theme => ({
+                    minInlineSize: 0,
+                    p: 1.25,
+                    border: `1px solid ${theme.palette.divider}`,
+                    borderRadius: `${theme.shape.customBorderRadius.sm}px`,
+                    bgcolor: item.done ? alpha(theme.palette.success.main, 0.05) : alpha(theme.palette.text.primary, 0.025)
+                  })}
+                >
+                  <Box
+                    component='i'
+                    className={item.done ? 'tabler-circle-check' : 'tabler-circle-dashed'}
+                    aria-hidden='true'
+                    sx={{ color: item.done ? 'success.main' : 'text.disabled', fontSize: 17, mt: 0.25 }}
+                  />
+                  <Box sx={{ minInlineSize: 0 }}>
+                    <Typography variant='caption' sx={{ display: 'block', fontWeight: 600 }}>
+                      {item.label}
+                    </Typography>
+                    <Typography variant='caption' color='text.secondary' sx={{ display: 'block', wordBreak: 'break-word' }}>
+                      {item.helper}
+                    </Typography>
+                  </Box>
+                </Stack>
+              ))}
+            </Box>
           </Stack>
 
-          <Divider />
-
-          <Stack spacing={2} data-capture='design-system-handoff-primitive-governance'>
+          <InspectorAccordion
+            title={DESIGN_HANDOFF_COPY.sections.primitiveGovernance}
+            helper={
+              selectedEntry.primitiveKey
+                ? `${selectedEntry.primitiveKey}${selectedEntry.primitiveVariant ? ` · ${selectedEntry.primitiveVariant}` : ''}${selectedEntry.primitiveKind ? ` · ${selectedEntry.primitiveKind}` : ''}`
+                : 'Define si esto reutiliza, extiende o crea una primitive.'
+            }
+            icon='tabler-components'
+            dataCapture='design-system-handoff-primitive-governance'
+          >
             <Stack direction='row' spacing={1} alignItems='center' justifyContent='space-between' flexWrap='wrap' useFlexGap>
-              <Typography variant='subtitle2'>{DESIGN_HANDOFF_COPY.sections.primitiveGovernance}</Typography>
+              <Typography variant='caption' color='text.secondary' sx={typographyScale.labelSm}>
+                Estado DS
+              </Typography>
               <GreenhouseChip
                 size='small'
                 kind='status'
@@ -1577,12 +1679,9 @@ const DesignHandoffLaneView = () => {
             >
               {DESIGN_HANDOFF_COPY.actions.savePrimitiveDecision}
             </GreenhouseButton>
-          </Stack>
+          </InspectorAccordion>
 
-          <Divider />
-
-          <Stack spacing={2}>
-            <Typography variant='subtitle2'>Planificación</Typography>
+          <InspectorAccordion title='Planificación' helper={planningTargetSurfaceKey || 'Prioridad, ruta target y bloqueo.'} icon='tabler-calendar-stats'>
             <FormControl fullWidth>
               <InputLabel id='design-handoff-priority-label'>Prioridad</InputLabel>
               <Select
@@ -1630,12 +1729,9 @@ const DesignHandoffLaneView = () => {
             >
               {DESIGN_HANDOFF_COPY.actions.savePlanning}
             </GreenhouseButton>
-          </Stack>
+          </InspectorAccordion>
 
-          <Divider />
-
-          <Stack spacing={2}>
-            <Typography variant='subtitle2'>Owners</Typography>
+          <InspectorAccordion title='Owners' helper={devOwner || designerOwner || 'Asignación de diseño y DEV.'} icon='tabler-users'>
             <TextField
               label='Designer owner member_id'
               value={designerOwner}
@@ -1656,12 +1752,13 @@ const DesignHandoffLaneView = () => {
             >
               {DESIGN_HANDOFF_COPY.actions.assignOwners}
             </GreenhouseButton>
-          </Stack>
+          </InspectorAccordion>
 
-          <Divider />
-
-          <Stack spacing={2}>
-            <Typography variant='subtitle2'>{DESIGN_HANDOFF_COPY.sections.evidence}</Typography>
+          <InspectorAccordion
+            title={DESIGN_HANDOFF_COPY.sections.evidence}
+            helper={`${selectedEntry.evidence?.length ?? 0} registros adjuntos`}
+            icon='tabler-shield-check'
+          >
             <FormControl fullWidth>
               <InputLabel id='design-handoff-evidence-label'>Tipo</InputLabel>
               <Select
@@ -1704,12 +1801,13 @@ const DesignHandoffLaneView = () => {
                 />
               ))}
             </Stack>
-          </Stack>
+          </InspectorAccordion>
 
-          <Divider />
-
-          <Stack spacing={2}>
-            <Typography variant='subtitle2'>{DESIGN_HANDOFF_COPY.sections.workItems}</Typography>
+          <InspectorAccordion
+            title={DESIGN_HANDOFF_COPY.sections.workItems}
+            helper={`${selectedEntry.links?.length ?? 0} vínculos`}
+            icon='tabler-link'
+          >
             <FormControl fullWidth>
               <InputLabel id='design-handoff-link-label'>Tipo</InputLabel>
               <Select
@@ -1747,11 +1845,9 @@ const DesignHandoffLaneView = () => {
                 />
               ))}
             </Stack>
-          </Stack>
+          </InspectorAccordion>
 
-          <Divider />
-
-          <Stack spacing={1.5}>
+          <InspectorAccordion title='Cierre' helper='Transiciones del lifecycle y ruta implementada.' icon='tabler-checkup-list'>
             <TextField
               label='Ruta implementada'
               value={implementedSurfaceKey}
@@ -1794,7 +1890,7 @@ const DesignHandoffLaneView = () => {
             >
               {DESIGN_HANDOFF_COPY.actions.archive}
             </GreenhouseButton>
-          </Stack>
+          </InspectorAccordion>
         </Stack>
       ) : (
         <Stack spacing={2} alignItems='center' sx={{ py: 4, textAlign: 'center' }}>
@@ -1810,7 +1906,15 @@ const DesignHandoffLaneView = () => {
   return (
     <Box
       data-capture='design-system-handoff-page'
-      sx={{ inlineSize: '100%', maxInlineSize: 1440, mx: 'auto', minWidth: 0, overflowX: 'clip' }}
+      sx={{
+        inlineSize: '100%',
+        maxInlineSize: 1440,
+        mx: 'auto',
+        minWidth: 0,
+        overflowX: 'clip',
+        px: { xs: 2, md: 3 },
+        boxSizing: 'border-box'
+      }}
     >
       <CompositionShell
         composition='single'
@@ -1818,9 +1922,9 @@ const DesignHandoffLaneView = () => {
         regions={{
           primary: (
             <AdaptiveSidecarLayout
-              open={Boolean(selectedEntry)}
+              open={inspectorOpen && Boolean(selectedEntry)}
               onOpenChange={open => {
-                if (!open) setSelectedId(null)
+                if (!open) setInspectorOpen(false)
               }}
               sidecar={inspector}
               kind='inspector'

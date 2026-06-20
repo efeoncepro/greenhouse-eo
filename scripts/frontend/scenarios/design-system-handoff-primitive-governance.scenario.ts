@@ -38,7 +38,7 @@ export const scenario: CaptureScenario = {
       probes: [
         {
           name: 'primitive-decision-focus',
-          startSelector: '[data-capture="design-system-handoff-primitive-governance"] input',
+          startSelector: '[data-capture="design-system-handoff-primitive-governance"] .MuiAccordionSummary-root',
           keys: ['Tab'],
           requireVisibleFocusRing: true
         }
