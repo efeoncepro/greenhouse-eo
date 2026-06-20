@@ -61,6 +61,8 @@ import CreateIncomeDrawer from '@views/greenhouse/finance/drawers/CreateIncomeDr
 import CreateExpenseDrawer from '@views/greenhouse/finance/drawers/CreateExpenseDrawer'
 import VatMonthlyPositionCard from '@views/greenhouse/finance/components/VatMonthlyPositionCard'
 import type { VatMonthlyPositionPayload } from '@views/greenhouse/finance/components/vat-monthly-position-types'
+import F29ConsolidatedPositionCard from '@views/greenhouse/finance/components/F29ConsolidatedPositionCard'
+import type { F29ConsolidatedPayload } from '@views/greenhouse/finance/components/f29-consolidated-position-types'
 import { getMicrocopy } from '@/lib/copy'
 import { formatCurrency as formatGreenhouseCurrency, formatDateTime as formatGreenhouseDateTime, formatNumber as formatGreenhouseNumber } from '@/lib/format'
 
@@ -391,6 +393,9 @@ const FinanceDashboardView = () => {
   const [vatPosition, setVatPosition] = useState<VatMonthlyPositionPayload | null>(null)
   // TASK-725 Slice 1 — el fallo de la card IVA degrada local, no en el banner global.
   const [vatError, setVatError] = useState<string | null>(null)
+  // TASK-1197 — F29 consolidado (IVA + retenciones + PPM); mismo patrón de degradación local.
+  const [f29Position, setF29Position] = useState<F29ConsolidatedPayload | null>(null)
+  const [f29Error, setF29Error] = useState<string | null>(null)
 
   const [nexaInsights, setNexaInsights] = useState<{
     insights: NexaInsightItem[]
@@ -410,7 +415,7 @@ const FinanceDashboardView = () => {
     const errors: string[] = []
 
     try {
-      const [accountsRes, indicatorsRes, incomeSummaryRes, expenseSummaryRes, incomeListRes, expenseListRes, pnlRes, nuboxSyncRes, cashflowRes, dashSummaryRes, nexaRes, vatPositionRes] = await Promise.all([
+      const [accountsRes, indicatorsRes, incomeSummaryRes, expenseSummaryRes, incomeListRes, expenseListRes, pnlRes, nuboxSyncRes, cashflowRes, dashSummaryRes, nexaRes, vatPositionRes, f29PositionRes] = await Promise.all([
         fetch('/api/finance/accounts', { cache: 'no-store' }),
         fetch('/api/finance/economic-indicators/latest', { cache: 'no-store' }),
         fetch('/api/finance/income/summary', { cache: 'no-store' }),
@@ -422,7 +427,8 @@ const FinanceDashboardView = () => {
         fetch('/api/finance/dashboard/cashflow', { cache: 'no-store' }),
         fetch('/api/finance/dashboard/summary', { cache: 'no-store' }),
         fetch('/api/finance/intelligence/nexa-insights', { cache: 'no-store' }),
-        fetch('/api/finance/vat/monthly-position', { cache: 'no-store' })
+        fetch('/api/finance/vat/monthly-position', { cache: 'no-store' }),
+        fetch('/api/finance/f29/monthly-position', { cache: 'no-store' })
       ])
 
       if (cancelled) return
@@ -565,6 +571,16 @@ const FinanceDashboardView = () => {
         // backend. Mensaje es-CL local en la card.
         setVatPosition(null)
         setVatError('La posición fiscal del período no está disponible en este momento. Vuelve a intentarlo.')
+      }
+
+      if (f29PositionRes.ok) {
+        // TASK-1197 — F29 consolidado: cliente puro del contrato gobernado; el VM
+        // ya trae las 3 líneas + enabledByLine. No se recompone nada acá.
+        setF29Position(await f29PositionRes.json())
+        setF29Error(null)
+      } else {
+        setF29Position(null)
+        setF29Error('La posición F29 del período no está disponible en este momento. Vuelve a intentarlo.')
       }
     } catch (e) {
       errors.push(`Conexión: ${e instanceof Error ? e.message : 'Error desconocido'}`)
@@ -871,6 +887,13 @@ const FinanceDashboardView = () => {
           })()}
         </Grid>
       </Grid>
+
+      <F29ConsolidatedPositionCard
+        loading={loading}
+        payload={f29Position}
+        error={f29Error}
+        onRetry={() => void fetchData()}
+      />
 
       <VatMonthlyPositionCard
         loading={loading}

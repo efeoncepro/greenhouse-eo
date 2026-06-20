@@ -105,3 +105,44 @@ export const GH_COST_ATTRIBUTION = {
 // ────────────────────────────────────────────────────────────────
 // TASK-471 — Pricing Catalog Phase-4 UX (diff + revert + bulk + impact + approvals + excel)
 // ────────────────────────────────────────────────────────────────
+
+// ────────────────────────────────────────────────────────────────
+// TASK-1197 — Card F29 mensual consolidado (IVA + Retenciones + PPM)
+// ────────────────────────────────────────────────────────────────
+
+export const GH_F29_CONSOLIDATED = {
+  cardTitle: 'Posición F29 del mes',
+  cardSubtitleLoading: 'Cargando las 3 líneas del F29 del período',
+  // Subheader con período + entidad legal; se interpola en el card.
+  cardSubtitle: 'IVA, retenciones y PPM materializados por entidad legal',
+
+  // Líneas del F29
+  vatLabel: 'IVA',
+  vatHelper: 'Débito fiscal menos crédito recuperable del período.',
+  retentionLabel: 'Retenciones',
+  retentionHelper: 'Retención de honorarios practicada (boletas recibidas).',
+  ppmLabel: 'PPM',
+  ppmHelper: 'Pago Provisional Mensual: base de ventas netas por la tasa vigente.',
+
+  // Sub-detalle por línea (caption bajo el monto)
+  vatNetDebit: 'IVA por pagar',
+  vatNetCredit: 'Crédito a favor',
+  vatNetEven: 'Saldo equilibrado',
+  ppmRateLabel: 'Tasa aplicada',
+  retentionDocsLabel: 'Documentos',
+
+  // Estado oficial vs shadow (badge con texto, nunca solo color)
+  badgeOfficial: 'Oficial',
+  badgeShadow: 'En validación',
+  shadowTooltip: 'Cifra en revisión contable; aún no es el F29 oficial del período.',
+
+  // Degradación honesta por línea (null = sin materializar, NO $0)
+  lineNoData: 'Sin datos del período',
+  lineNoDataHelper: 'No hay posición materializada para este período.',
+
+  // Estado de error del card (degradación honesta local, sin tocar banner global)
+  errorTitle: 'No pudimos cargar la posición F29 de este período',
+
+  // Pie con la entidad legal + corte
+  pendingMaterialization: 'Pendiente de materializar'
+} as const
