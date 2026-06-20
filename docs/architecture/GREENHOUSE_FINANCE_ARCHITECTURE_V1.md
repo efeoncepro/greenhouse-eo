@@ -2,7 +2,37 @@
 
 > **Version:** 1.0
 > **Created:** 2026-03-30
-> **Last updated:** 2026-06-20 (TASK-1189 posición mensual de PPM — línea PPM del F29)
+> **Last updated:** 2026-06-20 (TASK-1195 posición F29 mensual consolidada — compositor de las 3 líneas)
+
+## Delta 2026-06-20 — TASK-1195 Posición F29 mensual consolidada (compositor IVA + Retenciones + PPM)
+
+Child E (cierre) de la umbrella TASK-1186. Con las 3 líneas mensuales del F29 ya
+materializadas por entidad legal (IVA TASK-725, retenciones TASK-1188, PPM TASK-1189),
+esta entrega las **une en un único contrato gobernado** sin materializar nada nuevo ni
+tocar schema: es **composición pura** de los 3 readers canónicos.
+
+- **Reader compositor** `getF29ConsolidatedMonthlyPosition({ legalEntityOrganizationId, year, month })`
+  (`src/lib/finance/f29-consolidated.ts`): invoca `getVatMonthlyPosition` +
+  `getRetentionMonthlyPosition` + `getPpmMonthlyPosition` en paralelo y arma el VM
+  `{ legalEntityOrganizationId, year, month, periodId, enabledByLine, vat, retention, ppm }`.
+  NUNCA recomputa ni emite SQL fiscal nuevo — la cifra de cada línea es exactamente la
+  que su reader canónico expone. Single source of truth gobernada (un reader, muchos
+  consumers: UI Finance futura, Nexa, CLI/contador) por Full API Parity.
+- **Endpoint** `GET /api/finance/f29/monthly-position` (`src/app/api/finance/f29/monthly-position/route.ts`):
+  mirror del patrón de las 3 líneas — scope = operating entity (RUT), NUNCA `space_id`;
+  `canonicalErrorResponse('fiscal_entity_unavailable')` si no hay entidad legal.
+- **Degradación honesta**: cada línea puede venir `null` (sin posición materializada del
+  período), distinto de cero. `enabledByLine` propaga el rollout flag por línea (IVA sin
+  flag = siempre oficial; retención/PPM gated por `RETENTION_POSITION_ENABLED`/`PPM_POSITION_ENABLED`).
+  Un consumer NUNCA totaliza como F29 oficial una línea con `enabled:false` (shadow).
+- **Sin schema/migración/signal nuevos**: reusa los 3 signals existentes
+  (`finance.{vat,retention,ppm}.position_drift`). Smoke runtime contra PG (2026-06): IVA
+  neto $1.085.952 (oficial), retención $138.646 + PPM $14.500 (shadow local). Tests del
+  compositor verifican composición pura (llama los 3 readers, no SQL fiscal) + `null`
+  honesto + propagación de `enabled`. La UI visible (card/dashboard F29) queda como
+  follow-up `ui-ux` separado (disciplina backend-data → ui-ux).
+- **Hard rules**: NUNCA recomputar las posiciones inline (solo componer los 3 readers);
+  NUNCA scopear por `space_id` (F29 = entidad legal); SIEMPRE propagar el `enabled` por línea.
 
 ## Delta 2026-06-20 — TASK-1189 Posición mensual de PPM (línea PPM del F29)
 

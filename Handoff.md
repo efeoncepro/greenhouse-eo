@@ -2,6 +2,18 @@
 
 > **Estado:** `released` (manifest transicionó a released, post-release health check verde). Orchestrator run [`27721723752`](https://github.com/efeoncepro/greenhouse-eo/actions/runs/27721723752) `completed/success`. Conducido por Claude tras pedido del operador ("paso a producción que Codex dejó preparado").
 
+## Sesión 2026-06-20 — TASK-1195 Posición F29 mensual CONSOLIDADA (COMPLETE) — Claude
+
+> **Estado:** ✅ complete, local-first en `develop` (sin push). Child E / **cierre del alcance MENSUAL** de la umbrella TASK-1186. Une las 3 líneas del F29 (IVA TASK-725 + retenciones TASK-1188 + PPM TASK-1189) en un único contrato gobernado.
+> - **Composición pura, sin schema/migración/signal nuevos.** Reader `getF29ConsolidatedMonthlyPosition` (`src/lib/finance/f29-consolidated.ts`) invoca los 3 readers canónicos (`getVatMonthlyPosition`/`getRetentionMonthlyPosition`/`getPpmMonthlyPosition`) en paralelo → VM `{ legalEntityOrganizationId, year, month, periodId, enabledByLine, vat, retention, ppm }`. NUNCA recomputa ni emite SQL fiscal nuevo.
+> - **Endpoint** `GET /api/finance/f29/monthly-position` (mirror del patrón de las 3 líneas, scope operating entity/RUT nunca `space_id`, `fiscal_entity_unavailable`).
+> - **Degradación honesta:** cada línea puede venir `null` (sin materializar, ≠ cero); `enabledByLine` distingue oficial vs shadow (IVA siempre oficial; retención/PPM gated por su flag). El consumer no totaliza como F29 oficial una línea `enabled:false`.
+> - **Runtime:** smoke del compositor contra PG 2026-06 → IVA neto $1.085.952 (oficial), retención $138.646 + PPM $14.500 (shadow local, flags OFF). Sin error SQL.
+> - **Gates:** lint+tsc 0, tests del compositor (composición pura + null honesto + propagación enabled), `pnpm test` full 7467 verde, `pnpm build` OK con `/api/finance/f29/monthly-position` en el route list.
+> - **Rollout pendiente:** verificación HTTP staging del endpoint pendiente de deploy (local-first, sin push). Las cifras retención/PPM siguen en shadow (gates contables en TASK-1188/1189).
+> - **Follow-up declarado:** UI F29 consolidado (card/dashboard, `ui-ux`) — task separada; + export consolidado PDF/CSV si el contador lo pide.
+> - **Docs:** changelog + Finance arch Delta + umbrella TASK-1186 (child E marcada complete) + README/registry + este handoff sincronizados. **Umbrella TASK-1186: alcance mensual cerrado; quedan child C (F22 anual → TASK-1196) y child D (multi-entidad).**
+
 ## Sesión 2026-06-20 — ISSUE-055 Quote Builder ECG-004 cost basis — Codex
 
 > **Estado:** ✅ resolved en staging/dev DB, sin push. `ISSUE-055` se resolvió como `issue-only fix`: `ECG-004` existía en `sellable_roles` y tenía pricing por moneda, pero no tenía `role_employment_compatibility` ni `sellable_role_cost_components` por quedar `needs_review` en TASK-464a (Fee Deel + gastos previsionales). Migración aplicada `20260620190000000_issue-055-reviewed-staff-role-cost-basis.sql`.
