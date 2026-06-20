@@ -18,7 +18,13 @@
 >
 > **Evidencia runtime:** PG read-only (Berel ausente, junio=Sky $6.902.000, 0 export DTEs en income, 26 fallos tax-snapshot); BQ conformed (2 Berel, amounts); diagnóstico live (2/2 MISSING con `client✓`); dry-run live (2/2 WOULD PROJECT); vitest focal verde (income-tax-snapshot-exempt 5/5, signal 4/4, nubox+postgres-store 87/87).
 >
-> **Rollout pendiente (requiere sign-off Finance + operador):** (1) apply real = correr el sync recurrente (proyecta Berel solo — NO se mutó la dev PG compartida); (2) redeploy del worker que corre el postgres_projection; (3) staging smoke verificando que `finance.nubox_export.unprojected_invoice` queda en 0 y junio sube a **$15.983.109** (Sky 6.902.000 + Berel 4.617.647 + 4.463.462 — la cifra $11.519.647 de la spec quedó desactualizada por la 2ª factura Berel).
+> **Repair histórico APLICADO en dev PG (autorizado por el operador 2026-06-20).** Vía `scripts/finance/task-1209-berel-apply.ts --apply`, que proyecta las 2 facturas Berel por el path canónico `upsertIncomeFromSale` (NO writer bespoke). Resultado verificado en PG:
+> - `INC-NB-28800562` = 4.617.647 CLP / pending / exento / due 2026-07-01 (created).
+> - `INC-NB-29062197` = 4.463.462 CLP / pending / exento / due 2026-07-01 (created).
+> - **Junio 2026 facturación = $15.983.109** (Sky 6.902.000 + Berel 4.617.647 + 4.463.462) ✓.
+> - Idempotencia probada: 2ª corrida → `updated`, `income_row_count_berel=2` (sin duplicados), 2 outbox `finance.income.created`.
+>
+> **Rollout pendiente (automatización recurrente en producción):** redeploy del worker / Vercel que corre el postgres_projection para que el sync recurrente **futuro** lleve el fix de exento (hoy sólo en develop local). Luego staging smoke confirmando `finance.nubox_export.unprojected_invoice` en 0. Hasta ese deploy, facturas Berel futuras (julio+) no proyectan solas. Por eso la task queda `in-progress` (la repair histórica está hecha en dev, la automatización productiva no).
 >
 > **Follow-up:** `expense-tax-snapshot.ts:431` tiene el bug simétrico para compras exentas (fuera del scope income de esta task).
 >
