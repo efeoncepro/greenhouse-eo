@@ -28,7 +28,7 @@ import type { ReliabilitySignal } from '@/types/reliability'
  */
 export const NUBOX_EXPORT_UNPROJECTED_INVOICE_SIGNAL_ID = 'finance.nubox_export.unprojected_invoice'
 
-interface UnprojectedRow {
+type UnprojectedRow = {
   nubox_document_id: string
   folio: string | null
   dte_type_code: string | null
