@@ -427,6 +427,7 @@ Los issues documentan incidentes operativos detectados en runtime. Viven en `doc
 - **Tasks** (`TASK-###`) son trabajo planificado (features, hardening, refactors)
 - **Issues** (`ISSUE-###`) son problemas encontrados en runtime (errores, fallos, degradación)
 - Un issue puede generar una task si la solución requiere trabajo significativo
+- **Awareness de hook pre-ejecucion ISSUE-* para Codex**: cuando el operador menciona `ISSUE-###`, `[ISSUE-###]`, una ruta `docs/issues/**/ISSUE-###-*.md` o alias slash-style de Codex como `/fix-issue ISSUE-###`, `/fix-issue ###`, `/issue ISSUE-###` o `/issue ###`, Codex debe ejecutar `pnpm codex:issue-hook ISSUE-###` antes de implementar y aplicar el prompt que imprime. Este hook es solo de Codex; no obliga automaticamente a Claude, Cursor u otros agentes. El prompt fuerza triage `issue-only fix` vs `issue + TASK` vs `blocked`; remediaciones amplias deben pasar a task; el cierre requiere evidencia de no-regresion sobre consumidores/contratos vecinos o riesgo residual documentado. Drift guard Codex: `pnpm codex:issue-hook:check`.
 
 ## Task Lifecycle Protocol
 

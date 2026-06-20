@@ -16,7 +16,7 @@
 ## Sesión 2026-06-20 — Codex ISSUE execution hook — Codex
 
 > **Estado:** docs/tooling local actualizado, sin rollout runtime. Se agregó un harness hermano del TASK hook para issues formales: `pnpm codex:issue-hook ISSUE-###`, prompt `docs/operations/CODEX_ISSUE_EXECUTION_PROMPT_V1.md`, skill `.codex/skills/greenhouse-issue-execution-hook/SKILL.md` y drift guard `pnpm codex:issue-hook:check`.
-> - **Contrato:** al ver `ISSUE-###`, `[ISSUE-###]`, `docs/issues/**/ISSUE-###-*.md`, `/fix-issue ###` o `/issue ###`, Codex debe ejecutar el hook antes de escribir código. El prompt fuerza triage `issue-only fix` vs `issue + TASK` vs `blocked`.
+> - **Contrato:** al ver `ISSUE-###`, `[ISSUE-###]`, `docs/issues/**/ISSUE-###-*.md`, `/fix-issue ###` o `/issue ###`, Codex debe ejecutar el hook antes de escribir código. El prompt fuerza triage `issue-only fix` vs `issue + TASK` vs `blocked`, más `REGRESSION / BLAST RADIUS GUARD` y `NO-REGRESSION EVIDENCE` para no cerrar un bug rompiendo consumidores/contratos vecinos.
 > - **Arquitectura:** decisión reversible/operativa; no requiere ADR. Evita convertir bugs localizados en tasks pesadas y evita cerrar incidentes sin evidencia.
 > - **Coordinación:** el worktree tenía cambios ajenos de TASK-1189/PPM en `src/**`; no se tocaron. El scope de Codex fue sólo tooling/docs del harness.
 
