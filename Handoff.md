@@ -2,6 +2,33 @@
 
 > **Estado:** `released` (manifest transicionó a released, post-release health check verde). Orchestrator run [`27721723752`](https://github.com/efeoncepro/greenhouse-eo/actions/runs/27721723752) `completed/success`. Conducido por Claude tras pedido del operador ("paso a producción que Codex dejó preparado").
 
+## Sesión 2026-06-20 — Sample Sprints declare bloqueado por CHECK de services.status — Codex
+
+> **Estado:** ✅ corregido en Cloud SQL dev. La UI `/agency/sample-sprints/new` mostraba el fallback "No fue posible declarar el Sample Sprint" porque `declareSampleSprint()` insertaba `greenhouse_core.services.status='pending_approval'`, pero `services_status_check` (agregado por TASK-836) solo permitía `active/closed/paused/legacy_seed_archived`. El error era un 500 SQL no mapeado, no un problema del deal/form.
+> - **Fix:** migración `20260620172000000_sample-sprint-service-status-check.sql` extiende `services_status_check` con `pending_approval` + DO block anti-drift.
+> - **Docs:** `GREENHOUSE_PILOT_ENGAGEMENT_ARCHITECTURE_V1` deja de afirmar que no existe CHECK y documenta el contrato real.
+> - **Rollout:** `pnpm pg:connect:migrate` aplicado; `pnpm pg:connect:status` confirma `No migrations to run`.
+> - **Gates:** vitest focal Sample Sprints `27/27` passed; `git diff --check` verde para la migración/doc.
+
+## Sesión 2026-06-20 — TASK-1187 Deprecar space_id en tablas VAT (COMPLETE) — Claude
+
+> **Estado:** ✅ COMPLETE (cleanup post-TASK-725; migración additive aplicada en Cloud SQL). Cierra el follow-up de deprecación que dejó TASK-725.
+> - **Audit (Slice 1):** 0 readers usan `space_id`/`client_id` de las tablas VAT como scope fiscal (scope = `organization_id`/`legalEntityOrganizationId`). Empírico: `vat_monthly_positions` 30/30 NULL (columnas muertas); `vat_ledger_entries` 53/181 `space_id` + 56/181 `client_id` non-null (tag de contraparte vivo).
+> - **Decisión (Open Question):** deprecar `vat_monthly_positions.space_id`/`client_id` (muertas); **conservar** `vat_ledger_entries.space_id`/`client_id` (tag analítico de contraparte por asiento, data viva).
+> - **Slice 2:** migración additive `20260620164008059` con `COMMENT ON COLUMN` + DO block anti pre-up-marker; deprecación propagada a `db.d.ts` como JSDoc. Aplicada + verificada vía `pg_description`. `finance.vat.position_drift` sigue `ok`.
+> - **Slice 3 (DROP físico):** diferido/opcional — columnas nullable no molestan, ROI bajo.
+> - **Gates:** `pnpm local:check` 0, vat-ledger test verde, `pnpm test`/`pnpm build` en verificación. Migración reversible (Down quita los comentarios).
+> - **Nota:** los docs `docs/audits/finance/*` en el árbol son de la sesión Codex F9 (TASK-1192/1193/1194), no de esta task — no los toqué.
+> - Commit `49ea2e02f` (migración + db.d.ts). Movida a `complete/`.
+
+## Sesión 2026-06-20 — Finance F9 route capability audit → TASK-1192/1193/1194 — Codex
+
+> **Estado:** auditoría documental complete; remediación convertida en tasks. Se creó `docs/audits/finance/FINANCE_ROUTE_CAPABILITY_AUDIT_2026-06-20.md` como refresh focal del hallazgo F9. Resultado: `205/206` rutas Finance/Admin/Cost Intelligence tienen tenant context directo; el único `POST` sin auth directa (`quotes/hubspot`) es tombstone `410 Gone`. El riesgo real es authorization broad: `75` write routes con auth de dominio/route-group pero sin capability fina textual.
+> - **Tasks creadas:** `TASK-1192` (Payment Orders + Treasury/shareholder capability gates), `TASK-1193` (DTE/Income/Expense/HES/PO action capability gates), `TASK-1194` (sync/materializer HTTP boundary hardening).
+> - **Índices sincronizados:** `docs/tasks/README.md` next ID `TASK-1195`, `docs/tasks/TASK_ID_REGISTRY.md`, `docs/audits/finance/README.md`, y delta en `FINANCE_DOMAIN_AUDIT_2026-06-20.md`.
+> - **Verificación:** `pnpm task:lint --task TASK-1192|1193|1194` todos `errors=0 warnings=0`; `docs:closure-check` scoped warning resuelto con esta nota; `git diff --check` verde.
+> - **Nota multi-agente:** en paralelo apareció movimiento ajeno de `TASK-1187` a `in-progress/`; no se tocó ni se incluyó en esta línea de trabajo.
+
 ## Sesión 2026-06-20 — TASK-1191 Período fiscal sync Nubox + backfill F29 (COMPLETE, cierra ISSUE-103) — Claude
 
 > **Estado:** ✅ COMPLETE (code-complete + backfill aplicado + signals en `ok`). Cierra el follow-up de data-quality que TASK-1185 dejó abierto: los 165 docs con IVA sin período fiscal (`eligible_without_period`).

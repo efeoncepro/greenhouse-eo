@@ -590,7 +590,7 @@ Cerrar una task es obligatorio y forma parte de Definition of Done. Si la implem
 Movidos a tasks dedicadas al cierre de TASK-725 (2026-06-20):
 
 - **Selector fiscal global / multi-entidad + PPM/retenciones/renta anual + multi-country tax profiles → `TASK-1186`** (umbrella P1, prioritaria).
-- **Deprecación de `space_id` en las tablas VAT → `TASK-1187`** (P3, no prioritaria, blocked by este cierre).
+- **Deprecación de `space_id` en las tablas VAT → `TASK-1187`** (P3, no prioritaria, blocked by este cierre). ✅ **Cerrado 2026-06-20:** `vat_monthly_positions.space_id`/`client_id` marcadas deprecated (siempre NULL post-re-scope); `vat_ledger_entries.space_id`/`client_id` conservadas como tag de contraparte vivo. Migración `20260620164008059`. DROP físico = follow-up opcional diferido.
 - **Hardening del materializador (FX guard, advisory lock, cache invalidation, signal de docs sin período) → `TASK-1185`** (P3).
 - **Validación F29 de la cifra corregida con el contador** — gate humano post-cierre (no bloquea el código; el operador valida antes de tratar la cifra como baseline fiscal oficial).
 

@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P3`
 - Impact: `Bajo`
 - Effort: `Bajo`
@@ -213,12 +213,21 @@ N/A — repo-only cleanup.
      ZONE 4 — VERIFICATION & CLOSING
      ═══════════════════════════════════════════════════════════ -->
 
+## Resolution (2026-06-20)
+
+Slices 1-2 ejecutados; Slice 3 (DROP físico) queda como follow-up opcional diferido.
+
+- **Slice 1 — Audit + decisión.** 0 readers usan `space_id`/`client_id` VAT como scope fiscal (scope = `organization_id`/`legalEntityOrganizationId` en `route.ts:116`, `getVatMonthlyPosition`, `listVatLedgerEntries`, drift reader). Empíricamente: `vat_monthly_positions` 30/30 filas con `space_id`/`client_id` NULL (columnas muertas); `vat_ledger_entries` 53/181 `space_id` + 56/181 `client_id` non-null (tag de contraparte vivo).
+  - **Decisión (Open Question):** `vat_monthly_positions.space_id`/`client_id` → **deprecar** (siempre NULL, sin valor analítico). `vat_ledger_entries.space_id`/`client_id` → **CONSERVAR** como tag analítico de contraparte por asiento (data viva, útil para análisis de contraparte; retirarlo perdería señal real).
+- **Slice 2 — Marcar deprecated.** Migración additive `20260620164008059_task-1187-deprecate-space-id-vat-monthly-positions.sql`: `COMMENT ON COLUMN` deprecando ambas columnas de `vat_monthly_positions` + DO block anti pre-up-marker. La deprecación se propaga a `db.d.ts` como JSDoc (consumers la ven en el editor). Aplicada en Cloud SQL; comentarios verificados vía `pg_description`. `finance.vat.position_drift` sigue `ok`; readers/tests VAT verdes.
+- **Slice 3 — DROP físico (diferido, opcional).** No se ejecuta: las columnas nullable no molestan y el ROI de la remoción física es bajo. Queda como follow-up si se decide limpiar.
+
 ## Acceptance Criteria
 
-- [ ] Audit confirma que ningún reader usa `space_id`/`client_id` VAT como scope fiscal.
-- [ ] `vat_monthly_positions.space_id`/`client_id` quedan marcadas deprecated (comentario de columna).
-- [ ] Decisión documentada sobre el tag en `vat_ledger_entries` (conservar vs retirar).
-- [ ] `finance.vat.position_drift` sigue 0 y la card/endpoint IVA no rompen.
+- [x] Audit confirma que ningún reader usa `space_id`/`client_id` VAT como scope fiscal.
+- [x] `vat_monthly_positions.space_id`/`client_id` quedan marcadas deprecated (comentario de columna + JSDoc en `db.d.ts`).
+- [x] Decisión documentada sobre el tag en `vat_ledger_entries` (conservar — data viva de contraparte).
+- [x] `finance.vat.position_drift` sigue `ok` y la card/endpoint IVA no rompen (readers intactos, tests verdes).
 
 ## Verification
 
@@ -229,11 +238,12 @@ N/A — repo-only cleanup.
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` sincronizado
-- [ ] archivo en la carpeta correcta
-- [ ] `docs/tasks/README.md` + `TASK_ID_REGISTRY.md` sincronizados
-- [ ] `Handoff.md` + `changelog.md` actualizados si hubo cambio visible
-- [ ] chequeo de impacto cruzado (TASK-725 §Follow-ups: marcar la deprecación como movida acá)
+- [x] `Lifecycle` sincronizado (`complete`)
+- [x] archivo en la carpeta correcta (`complete/`)
+- [x] `docs/tasks/README.md` (registry) + `TASK_ID_REGISTRY.md` sincronizados
+- [x] `Handoff.md` + `changelog.md` actualizados
+- [x] chequeo de impacto cruzado (TASK-725 §Follow-ups: deprecación movida acá)
+- [x] Delta en `GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`
 
 ## Follow-ups
 

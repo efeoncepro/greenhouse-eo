@@ -2,7 +2,20 @@
 
 > **Version:** 1.0
 > **Created:** 2026-03-30
-> **Last updated:** 2026-06-20 (TASK-1191 fiscal period stamping en el sync Nubox + backfill F29)
+> **Last updated:** 2026-06-20 (TASK-1187 deprecación de space_id/client_id en vat_monthly_positions)
+
+## Delta 2026-06-20 — TASK-1187 `space_id`/`client_id` deprecadas en `vat_monthly_positions`
+
+Cleanup post-TASK-725. El scope fiscal del IVA es la entidad legal (operating entity);
+`vat_monthly_positions` consolida por `organization_id` y escribe `space_id`/`client_id`
+**siempre NULL** (30/30 filas). Audit: 0 readers las usan como scope fiscal (el scope es
+`organization_id`/`legalEntityOrganizationId`). Quedan marcadas **deprecated** vía
+`COMMENT ON COLUMN` (migración `20260620164008059`, propagado a `db.d.ts` como JSDoc).
+
+`vat_ledger_entries.space_id`/`client_id` **se conservan** como tag analítico de
+contraparte por asiento (data viva: 53/56 filas non-null) — NO se deprecan. La remoción
+física de las columnas muertas de `vat_monthly_positions` queda como follow-up opcional.
+Invariante TASK-725 intacto: `space_id` no vuelve a ser clave fiscal.
 
 ## Delta 2026-06-20 — TASK-1191 Período fiscal estampado en el sync Nubox (cierra ISSUE-103)
 
