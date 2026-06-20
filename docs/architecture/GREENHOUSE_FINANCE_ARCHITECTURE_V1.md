@@ -682,6 +682,17 @@ El endpoint `GET /api/finance/expenses/meta` deja de tratar el schema legacy de 
 
 BigQuery queda solo como carril legacy de compatibilidad por slice, no como guard global del endpoint. Si los enrichments opcionales no están disponibles, el drawer mantiene `200` con defaults y payload crítico intacto.
 
+## Delta 2026-06-20 — VAT materializer fiscal robustness hardening (TASK-1185)
+
+Hardening additive/defensivo del materializador de IVA (follow-ups de la auditoría adversarial de TASK-725):
+
+- **Guard FX:** el materializador omite (no materializa) IVA en moneda ≠ CLP con `exchange_rate_to_clp` nulo/0, en vez de convertir con el fallback `×1` (que sub-declararía ~900x silencioso). Esos documentos los hace observables el signal `finance.vat.entry_unresolved_fx` (data_quality, steady=0). **Invariante:** NUNCA materializar un asiento fiscal no-CLP con FX nulo/0.
+- **Advisory lock:** `materializeVatLedgerForPeriod` toma `pg_advisory_xact_lock(hashtext('vat_materialize'), hashtext(periodId))` al inicio de la tx → serializa materializaciones concurrentes del mismo período (el DELETE+INSERT no es atómico entre runs).
+- **Cache TTL del resolver:** `getOperatingEntityIdentity()` deja de cachear inmortalmente (TTL 5min + `clearOperatingEntityCache()`); en el ops-worker long-lived un cambio de operating entity ya no queda stale hasta reiniciar. Cross-cutting: payroll/contractor/finiquito/VAT.
+- **Signal data-quality:** `finance.vat.eligible_without_period` cuenta documentos con IVA y `period_year`/`period_month` NULL — nunca se materializan en ningún período F29 y son invisibles a `finance.vat.position_drift`. Steady=0 (hoy 165 → remediación: stampear `tax_period`).
+
+Rollout: los 2 signals son app-side (live al deploy); el hardening del materializador es worker-bundled (guard FX hoy no-op porque todo es CLP) → activa en el próximo redeploy del ops-worker. Spec: `docs/tasks/complete/TASK-1185-vat-materializer-fiscal-robustness-hardening.md`.
+
 ## Delta 2026-06-20 — VAT scope = entidad legal (operating entity), no `space_id` (TASK-725, cierra ISSUE-101)
 
 **Re-scope del modelo VAT del TASK-533 (abajo).** El IVA / F29 se declara por **RUT (entidad legal)**, no por `space_id`/cliente: una entidad legal = una posición consolidada por mes. El modelo original (TASK-533) particionaba `vat_monthly_positions` por `space_id` y el materializador filtraba `space_id IS NOT NULL` — eso **excluía el 100% del crédito fiscal del overhead** (gastos de Efeonce sin client_space), produciendo una posición F29 sobreestimada (ISSUE-101).

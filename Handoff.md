@@ -2,6 +2,14 @@
 
 > **Estado:** `released` (manifest transicionó a released, post-release health check verde). Orchestrator run [`27721723752`](https://github.com/efeoncepro/greenhouse-eo/actions/runs/27721723752) `completed/success`. Conducido por Claude tras pedido del operador ("paso a producción que Codex dejó preparado").
 
+## Sesión 2026-06-20 — TASK-1185 VAT materializer hardening (COMPLETE) — Claude
+
+> **Estado:** ✅ COMPLETE (code-complete + gate verde). Cerró los 4 follow-ups de la auditoría TASK-725: (1) guard FX (omite IVA no-CLP con FX nulo/0) + signal `finance.vat.entry_unresolved_fx`; (2) advisory lock por período en `materializeVatLedgerForPeriod`; (3) cache TTL 5min + `clearOperatingEntityCache()` en `getOperatingEntityIdentity` (cross-cutting payroll/contractor/finiquito/VAT); (4) signal `finance.vat.eligible_without_period`.
+> - **Verificación read-only PG:** `entry_unresolved_fx=0` (IVA es CLP), `eligible_without_period=165` (gap real de data-quality ahora observable: docs con IVA sin período fiscal). Gates: `pnpm test` 7450/0, `pnpm build` exit 0, tsc/eslint 0, worker:runtime-deps-gate ✓.
+> - **Rollout:** los 2 signals son app-side (live al deploy del app). El hardening del materializador (guards 1/2 + cache 3) es worker-bundled additive/**defensivo** (guard FX hoy es no-op porque todo es CLP) → **activa en el próximo redeploy del ops-worker**, sin cambio de comportamiento actual. NO redeployé el worker unilateralmente (lleva también el cost-intelligence de Codex → coordinación).
+> - **Follow-up data-quality:** los 165 docs con IVA sin período (`eligible_without_period`) necesitan remediación operativa (stampear `tax_period`) — observable en `/admin/operations`.
+> - Commit `444c01fe2`. Movida a `complete/`.
+
 ## Sesión 2026-06-20 — TASK-1190 Cost Intelligence recovery + Operational P&L gate — Codex
 
 > **Estado:** ✅ complete en dev/Cloud SQL. Cierra F7/F8 de la auditoría Finance sin devolver DDL al runtime: `commercial_cost_attribution:*` fue recuperado con replay focal (`reactive:backfill --replay-failed-handlers --handler=<key>`), y Operational P&L ahora tiene health gate para costo upstream faltante.
