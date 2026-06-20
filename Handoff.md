@@ -11,6 +11,15 @@
 > - **Full API Parity:** parcial. Hay rutas internas y commands server-side, pero no contrato API Platform versionado para quotations/Q2C, y varias mutaciones siguen sin capability fina/idempotencia uniforme.
 > - **Verificación:** Cloud SQL dev read-only via `cloud-sql-proxy`; vitest focal Q2C/HubSpot/deal creation `6 files / 18 tests` verde; `pnpm docs:closure-check` sin warnings.
 
+## Sesión 2026-06-20 — TASK-1208 Vocabulario contable canónico (income = factura/AR, no caja) (COMPLETE) — Claude
+
+> **Estado:** ✅ complete, local-first en `develop`. Doc-only (backend none). Salió de la observación del operador: `income` se llama "ingreso" pero es la factura/AR (devengado), no caja.
+> - **Slice 1:** nuevo `docs/architecture/GREENHOUSE_ACCOUNTING_VOCABULARY_V1.md` — mapeo objeto↔término↔plano (income=factura/AR devengado IFRS 15; income_payments=cobro percibido IAS 7; expenses=AP; expense_payments=pago; account_balances=banco), regla de copy y hard rules para Nexa. Linkeado desde Finance arch Delta + DECISIONS_INDEX.
+> - **Slice 2 (auditoría):** el copy visible **ya estaba mayormente de-conflado** — nav "Ventas", income "Por cobrar"/"Con cobro", dashboard "devengados"/"(facturado)", caja "Cobros"/"recaudado". **No había mislabels** que corregir; la conflación vivía solo en el nombre físico `income` + la ausencia de glosario (ambos resueltos por Slice 1). Sin cambios de copy → sin GVC.
+> - **NO se renombró** el símbolo físico `income` (puerta de un solo sentido: F29/marts BQ/sync Nubox-HubSpot/lint). Deuda de naming documentada; rename físico gobernado = follow-up opcional (alias-view + cutover por fases).
+> - **Decisión 3-lentes** (finanzas/arquitectura/commercial): fix semántico, no estructural. Precedente: TASK-768 (`economic_category` sin renombrar `expense_type`).
+> - También: endurecí TASK-1206 (idempotencia income + contract_only) y de-numeré sus follow-ups propuestos para frenar las colisiones de ID entre agentes.
+
 ## Sesión 2026-06-20 — TASK-1207 Card F29: total a pagar + selector de período (COMPLETE) — Claude
 
 > **Estado:** ✅ complete, local-first en `develop`. Follow-up `ui-ux` de TASK-1197, salió de que el contador vio el IVA suelto ($1.080.406) y no lo reconoció como el F29 (que se paga como total único $1.222.308).

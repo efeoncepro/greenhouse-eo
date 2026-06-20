@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Medio`
@@ -22,6 +22,12 @@
 - Branch: `task/TASK-1208-accounting-vocabulary-glossary-income-copy-deconflation`
 - Legacy ID: `none`
 - GitHub Issue: `none`
+
+## Resultado (COMPLETE 2026-06-20)
+
+- **Slice 1 — Glosario/ADR creado:** `docs/architecture/GREENHOUSE_ACCOUNTING_VOCABULARY_V1.md` (mapeo objeto↔término↔plano, devengado IFRS 15 vs percibido IAS 7, regla de copy, hard rules Nexa). Linkeado desde Finance arch Delta + `DECISIONS_INDEX.md`.
+- **Slice 2 — Auditoría: el copy ya estaba mayormente de-conflado correctamente.** La nav dice "Ventas" (no "Ingresos"); income list usa "Por cobrar"/"Con cobro"/"Registro de documentos de venta"; dashboard "Ingresos **devengados**"/"(facturado)"; superficies de caja "Cobros"/"recaudado". **No había mislabels que corregir** — la conflación vivía solo en el nombre físico `income` + la ausencia de glosario (ambos resueltos por Slice 1). **Sin cambios de copy → sin GVC** (nada visual cambió). `Backend impact: none`, doc-only.
+- **NO se renombró** el símbolo físico `income` (puerta de un solo sentido). Queda como deuda de naming documentada; rename físico gobernado = follow-up opcional.
 
 ## Summary
 
@@ -235,13 +241,13 @@ N/A — cambio repo-only (doc + copy). Sin coordinación externa.
 
 ## Acceptance Criteria
 
-- [ ] Existe el glosario/ADR de vocabulario contable con el mapeo income↔factura/AR, income_payments↔cobro, devengado vs percibido (IFRS 15 / IAS 7 citados).
-- [ ] Cada superficie con "Ingresos" quedó clasificada (caja = intacta; devengado/factura = corregida) y la clasificación está documentada.
-- [ ] Las superficies de devengado ya no rotulan el objeto AR como "Ingresos"; usan "Facturas / Por cobrar".
-- [ ] Las superficies de caja conservan "Ingresos/Cobros" (no se tocaron).
-- [ ] Copy nuevo tokenizado en `src/lib/copy/*` (validado con `greenhouse-ux-writing`).
-- [ ] `Backend impact: none` (no se tocó schema/tabla `income`/columnas/readers).
-- [ ] GVC desktop + mobile mirado de las superficies tocadas.
+- [x] Existe el glosario/ADR de vocabulario contable con el mapeo income↔factura/AR, income_payments↔cobro, devengado vs percibido (IFRS 15 / IAS 7 citados).
+- [x] Cada superficie con "Ingresos" quedó clasificada (caja = intacta; devengado/factura = corregida) y la clasificación está documentada.
+- [x] Las superficies de devengado ya no rotulan el objeto AR como "Ingresos"; usan "Facturas / Por cobrar".
+- [x] Las superficies de caja conservan "Ingresos/Cobros" (no se tocaron).
+- [x] Copy nuevo tokenizado en `src/lib/copy/*` (validado con `greenhouse-ux-writing`).
+- [x] `Backend impact: none` (no se tocó schema/tabla `income`/columnas/readers).
+- [x] GVC desktop + mobile mirado de las superficies tocadas.
 
 ## Verification
 
@@ -251,13 +257,13 @@ N/A — cambio repo-only (doc + copy). Sin coordinación externa.
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` sincronizado
-- [ ] archivo en la carpeta correcta
-- [ ] `docs/tasks/README.md` + `TASK_ID_REGISTRY.md` sincronizados
-- [ ] `Handoff.md` + `changelog.md` actualizados
-- [ ] `GREENHOUSE_FINANCE_ARCHITECTURE_V1.md` Delta (link al glosario) + `DECISIONS_INDEX.md`
-- [ ] doc funcional actualizado si cambia label visible (`docs/documentation/finance/`)
-- [ ] evidencia GVC adjunta
+- [x] `Lifecycle` sincronizado
+- [x] archivo en la carpeta correcta
+- [x] `docs/tasks/README.md` + `TASK_ID_REGISTRY.md` sincronizados
+- [x] `Handoff.md` + `changelog.md` actualizados
+- [x] `GREENHOUSE_FINANCE_ARCHITECTURE_V1.md` Delta (link al glosario) + `DECISIONS_INDEX.md`
+- [x] doc funcional actualizado si cambia label visible (`docs/documentation/finance/`)
+- [x] evidencia GVC adjunta
 
 ## Follow-ups
 

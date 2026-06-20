@@ -2,7 +2,15 @@
 
 > **Version:** 1.0
 > **Created:** 2026-03-30
-> **Last updated:** 2026-06-20 (TASK-1204 exclusión de documentos anulados del F29 + corrección tasa PPM)
+> **Last updated:** 2026-06-20 (TASK-1208 vocabulario contable canónico — income = factura/AR, no caja)
+
+## Delta 2026-06-20 — TASK-1208 Vocabulario contable canónico (factura/AR vs caja)
+
+`greenhouse_finance.income` **es la factura emitida / cuenta por cobrar (AR, devengado)**, NO un ingreso de caja — la propia doc de columnas la llama *"the receivable"* / *"the invoice"*. El ingreso de caja real es el **cobro** (`income_payments` → `account_balances`). Mismo patrón en compras: `expenses` = factura por pagar (AP, devengado); `expense_payments` = pago (egreso de caja).
+
+Nuevo doc canónico: **`GREENHOUSE_ACCOUNTING_VOCABULARY_V1.md`** — fija el mapeo objeto↔término↔plano (devengado IFRS 15 §31 / F29 vs percibido IAS 7 / banco), la regla de copy ("Ingresos/Egresos" solo para caja; "Factura/Por cobrar/Por pagar" para devengado) y hard rules para Nexa/agentes (NUNCA llamar "ingreso de caja" a una fila de `income`).
+
+**Hallazgo de la auditoría de copy (TASK-1208 Slice 2):** el copy visible **ya estaba mayormente de-conflado correctamente** — la nav dice "Ventas" (no "Ingresos"), el income list usa "Por cobrar"/"Con cobro", el dashboard "Ingresos devengados"/"(facturado)", y las superficies de caja usan "Cobros"/"recaudado". La conflación vivía solo en el **nombre físico** `income` y en la **ausencia de un glosario canónico** — ambos resueltos por este Delta. **NO se renombró el símbolo físico** (puerta de un solo sentido: F29, marts BQ, sync Nubox/HubSpot, lint `no-untokenized-fx-math`); queda como deuda de naming documentada, con rename físico gobernado como follow-up opcional.
 
 ## Delta 2026-06-20 — TASK-1204 F29 fiscal accuracy: exclusión de anulados + tasa PPM (cierra ISSUE-105)
 

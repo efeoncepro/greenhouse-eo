@@ -128,3 +128,4 @@ Estas decisiones existen en runtime o docs, pero pueden merecer ADR mas explicit
 | Event/outbox compatibility entre eventos genericos y eventos granulares | Define contratos de idempotencia y fan-out | `GREENHOUSE_EVENT_CATALOG_V1.md` |
 | Preview generic env baseline vs branch overrides | Evita deploys rojos por secrets solo en `Preview (develop)` | `RELEASE_CHANNELS_OPERATING_MODEL_V1.md` o cloud governance |
 | Access design dual-plane obligatorio | Muchas tasks deben distinguir `views` vs `entitlements` | `GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md` |
+| Vocabulario contable: `income` = factura/AR (devengado), NO caja | El ingreso real es el cobro (`income_payments`→banco); fix semántico, sin rename físico (TASK-1208) | `GREENHOUSE_ACCOUNTING_VOCABULARY_V1.md` |
