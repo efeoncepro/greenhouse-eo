@@ -10,11 +10,12 @@ import { readOrganizationAiLlmEnrichments } from '@/lib/ico-engine/ai/llm-enrich
 import type { OrganizationAiLlmEnrichmentItem } from '@/lib/ico-engine/ai/llm-types'
 import {
   readNexaInsightDrill,
-  type NexaInsightDetailSnapshot,
-  type NexaInsightDrillSubject
+  type NexaInsightDetailSnapshot
 } from '@/lib/ico-engine/ai/nexa-insight-drill-reader'
 import { listNexaInsightsForPeriod } from '@/lib/ico-engine/ai/nexa-insight-list-reader'
 import { buildNexaInsightDrillHref } from '@/lib/ico-engine/ai/nexa-insight-href'
+
+import { buildNexaInsightSubject } from './insight-focus'
 import { ensureFinanceInfrastructure } from '@/lib/finance/schema'
 import { getFinanceProjectId, roundCurrency, runFinanceQuery, toNumber as toFinanceNumber } from '@/lib/finance/shared'
 import { ensureMemberCapacityEconomicsSchema, readLatestMemberCapacityEconomicsSnapshot } from '@/lib/member-capacity-economics/store'
@@ -1011,14 +1012,6 @@ const proposeActionTool: NexaToolDefinition = {
 // cliente igual obtendría empty/not_found). Deep-link siempre via buildNexaInsightDrillHref.
 // Contrato: docs/architecture/GREENHOUSE_NEXA_INSIGHT_CONVERSATION_BRIDGE_V1.md §2.1.
 
-const buildInsightSubject = (tenant: NexaRuntimeContext): NexaInsightDrillSubject => ({
-  userId: tenant.userId,
-  tenantType: tenant.tenantType,
-  roleCodes: tenant.roleCodes,
-  routeGroups: tenant.routeGroups,
-  memberId: tenant.memberId ?? null
-})
-
 const SEVERITY_LABEL: Record<string, string> = {
   critical: 'crítica',
   warning: 'de atención',
@@ -1061,7 +1054,7 @@ const getInsightTool: NexaToolDefinition = {
       return buildToolUnavailableResult('get_insight', 'Falta el ID del insight a recuperar.')
     }
 
-    const result = await readNexaInsightDrill(insightId, buildInsightSubject(tenant))
+    const result = await readNexaInsightDrill(insightId, buildNexaInsightSubject(tenant))
 
     // not_found es anti-oracle: cubre id inexistente, shape inválido y subject sin acceso (indistinguibles).
     if (result.state === 'not_found') {
@@ -1139,7 +1132,7 @@ const listInsightsTool: NexaToolDefinition = {
     const periodMonth =
       Number.isFinite(monthRaw) && monthRaw >= 1 && monthRaw <= 12 ? Math.floor(monthRaw) : current.month
 
-    const result = await listNexaInsightsForPeriod(buildInsightSubject(tenant), { periodYear, periodMonth })
+    const result = await listNexaInsightsForPeriod(buildNexaInsightSubject(tenant), { periodYear, periodMonth })
 
     if (result.state === 'degraded') {
       return buildToolUnavailableResult('list_insights', 'No pude leer los insights en este momento. Intenta de nuevo más tarde.')

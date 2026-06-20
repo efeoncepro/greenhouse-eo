@@ -66,6 +66,7 @@
         "src/lib/nexa/nexa-model-router.ts",
         "src/lib/nexa/nexa-provider.ts",
         "src/lib/nexa/nexa-turn-telemetry.ts",
+        "src/lib/nexa/insight-focus.ts",
         "src/lib/nexa/providers/gemini.ts",
         "src/lib/nexa/providers/anthropic.ts"
       ],

@@ -12,6 +12,7 @@ import { getGreenhouseAgentModel } from '@/lib/ai/google-genai'
 import type { NexaMessage, HomeSnapshot } from '@/types/home'
 
 import { extractNexaActionProposals } from './actions/extract-proposals'
+import { buildFocusedInsightNote } from './insight-focus'
 import {
   getNexaProviderOverride,
   isNexaAutoRouterEnabled,
@@ -214,6 +215,17 @@ export class NexaService {
     const forcedToolName = resolveForcedToolName(intent)
     const plan = this.buildProviderPlan(input, intent)
     const systemPromptResult = this.buildSystemPrompt(input.context)
+
+    // TASK-1182 — conciencia de superficie: si el usuario abrió el chat desde un insight
+    // (`runtimeContext.focusRef`), se appendea una nota de contexto del insight enfocado al system
+    // prompt del turno (NO al prompt versionado: es contexto runtime per-turno). Reusa el reader
+    // anti-oracle; no resoluble → null → el turno procede sin ancla (degradación honesta).
+    const focusedInsightNote = await buildFocusedInsightNote(input.runtimeContext)
+
+    const systemPromptText = focusedInsightNote
+      ? `${systemPromptResult.text}\n\n${focusedInsightNote}`
+      : systemPromptResult.text
+
     const startTotal = Date.now()
     const primaryProvider = plan[0].providerKey
     const providerSteps: NexaTurnProviderStepTelemetry[] = []
@@ -228,7 +240,7 @@ export class NexaService {
 
       try {
         const turn = await provider.resolveTurn({
-          systemPrompt: systemPromptResult.text,
+          systemPrompt: systemPromptText,
           history: input.history,
           prompt: input.prompt,
           runtimeContext: input.runtimeContext,
