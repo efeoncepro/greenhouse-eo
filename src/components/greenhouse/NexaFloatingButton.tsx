@@ -126,6 +126,7 @@ const NexaFloatingButton = ({ docked = false }: NexaFloatingButtonProps) => {
   // insight enfocado; `runtimeRef` permite auto-enviar la pregunta semilla desde el listener.
   const focusRefRef = useRef<NexaFocusRef | null>(null)
   const runtimeRef = useRef<ReturnType<typeof useLocalRuntime> | null>(null)
+  const pendingSeedRef = useRef<string | null>(null)
 
   // TASK-1079 — el modo de interacción decide el form-factor del flotante:
   // - lane (C): la burbuja togglea el lane (no abre panel flotante); el lane lo monta
@@ -205,12 +206,15 @@ const NexaFloatingButton = ({ docked = false }: NexaFloatingButtonProps) => {
       if (detail?.focusRef?.kind === 'nexa_insight' && detail.focusRef.id) {
         focusRefRef.current = detail.focusRef
 
-        // Auto-envía la pregunta semilla: el usuario hizo click explícito en el CTA del insight.
+        // La pregunta semilla NO se envía acá: el panel (y su AssistantRuntimeProvider) aún no montó
+        // → `runtime.thread` sería el placeholder "empty thread" y assistant-ui crashea ("call thread
+        // methods inside a useEffect"). Se agenda y el effect de abajo la envía cuando el panel está vivo.
         const seed = typeof detail.seedPrompt === 'string' ? detail.seedPrompt.trim() : ''
 
-        if (seed) runtimeRef.current?.thread.append(seed)
+        pendingSeedRef.current = seed || null
       } else {
         focusRefRef.current = null
+        pendingSeedRef.current = null
       }
     }
 
@@ -218,6 +222,37 @@ const NexaFloatingButton = ({ docked = false }: NexaFloatingButtonProps) => {
 
     return () => window.removeEventListener(NEXA_FLOATING_OPEN_EVENT, onOpen)
   }, [expandableEnabled, isLaneMode, setLaneOpen])
+
+  // TASK-1182 — auto-envío de la pregunta semilla (insight enfocado) cuando el panel ya montó.
+  // assistant-ui exige llamar métodos del thread fuera del render; acá el provider ya está vivo. Se
+  // reintenta unos frames por si el thread tarda en activarse, y degrada en silencio si nunca está
+  // listo (el chat queda abierto, sin crash). El `focusRef` del turno viaja en el body del adapter.
+  useEffect(() => {
+    if (!open || !pendingSeedRef.current) return
+
+    const seed = pendingSeedRef.current
+    let frame = 0
+    let attempts = 0
+
+    const trySend = () => {
+      attempts += 1
+
+      try {
+        runtimeRef.current?.thread.append(seed)
+        pendingSeedRef.current = null
+      } catch {
+        if (attempts < 8) {
+          frame = requestAnimationFrame(trySend)
+        } else {
+          pendingSeedRef.current = null
+        }
+      }
+    }
+
+    frame = requestAnimationFrame(trySend)
+
+    return () => cancelAnimationFrame(frame)
+  }, [open])
 
   // TASK-1134 — auto es el default real (el runtime decide server-side); el picker fija un override
   // manual. El FAB no persiste (estado efímero por montaje), a diferencia de useNexaPersistentRuntime.
