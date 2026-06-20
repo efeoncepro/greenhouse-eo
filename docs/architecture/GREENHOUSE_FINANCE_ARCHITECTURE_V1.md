@@ -682,6 +682,24 @@ El endpoint `GET /api/finance/expenses/meta` deja de tratar el schema legacy de 
 
 BigQuery queda solo como carril legacy de compatibilidad por slice, no como guard global del endpoint. Si los enrichments opcionales no están disponibles, el drawer mantiene `200` con defaults y payload crítico intacto.
 
+## Delta 2026-06-20 — VAT scope = entidad legal (operating entity), no `space_id` (TASK-725, cierra ISSUE-101)
+
+**Re-scope del modelo VAT del TASK-533 (abajo).** El IVA / F29 se declara por **RUT (entidad legal)**, no por `space_id`/cliente: una entidad legal = una posición consolidada por mes. El modelo original (TASK-533) particionaba `vat_monthly_positions` por `space_id` y el materializador filtraba `space_id IS NOT NULL` — eso **excluía el 100% del crédito fiscal del overhead** (gastos de Efeonce sin client_space), produciendo una posición F29 sobreestimada (ISSUE-101).
+
+**Modelo vigente:**
+
+- **Scope fiscal = operating entity.** El dueño fiscal de toda venta (débito) y compra (crédito) es la operating entity canónica (`is_operating_entity=TRUE`; hoy Efeonce Group SpA, RUT 77.357.182-1), resuelta vía `getOperatingEntityIdentity()` (`src/lib/account-360/organization-identity.ts`). NO se creó tabla `legal_entity` nueva — se reusa el modelo `organization` canónico (hard rule: no identidad paralela).
+- **`organization_id`** en `vat_ledger_entries` / `vat_monthly_positions` pasa a significar el **dueño fiscal** (operating entity). `space_id`/`client_id` quedan como **etiqueta analítica de contraparte** (nullable).
+- **Materializador** (`materializeVatLedgerForPeriod`): sin gates `space_id IS NOT NULL` (income/expense), agrupa por `organization_id` → 1 posición consolidada/período. Migración `20260620131856180` (space_id nullable + unique `(organization_id, period)` reemplaza el unique por space).
+- **Readers + endpoint**: por operating entity, no `tenant.spaceId`. El endpoint deja de exigir space (causa del 422 del dashboard consolidado interno) y degrada con `canonicalErrorResponse('fiscal_entity_unavailable')`.
+- **Reliability signal** `finance.vat.position_drift` (steady=0): documentos con IVA de períodos materializados sin asiento en el ledger (detector de la bug-class).
+
+**Invariantes (agentes):** **NUNCA** particionar un agregado fiscal (IVA/F29 — y por extensión PPM/retenciones) por `space_id`/`client_id` (la SSOT fiscal es la entidad legal/RUT); **NUNCA** filtrar `space_id IS NOT NULL` en un cómputo fiscal (bota el overhead sin cliente); **SIEMPRE** emitir `finance.vat.position_drift` cuando el VAT mute; **SIEMPRE** validar la cifra corregida vs el F29 real antes de baseline productivo.
+
+**Rollout:** code-complete + verificado en dev (re-materializado, `position_drift=0`) y staging (endpoint HTTP 200 con `legalEntity`). Pendiente: redeploy del ops-worker (materializador reactivo) + validación F29 con contador. Spec: `docs/tasks/in-progress/TASK-725-finance-fiscal-scope-legal-entity-foundation.md`.
+
+> **Nota:** el Delta de abajo (TASK-533) describe el modelo V1 por `space_id`, recontextualizado por este Delta. Se conserva como historia.
+
 ## Delta 2026-04-21 — Chile VAT Ledger & Monthly Position (TASK-533)
 
 Greenhouse ya puede materializar una posicion mensual de IVA Chile por `space_id` sin recalcular inline en UI ni depender de planillas manuales.
