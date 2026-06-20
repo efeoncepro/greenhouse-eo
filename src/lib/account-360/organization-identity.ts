@@ -69,16 +69,40 @@ type OperatingEntityRow = {
 }
 
 let cachedOperatingEntity: OperatingEntityIdentity | null = null
+let cachedOperatingEntityAt = 0
+
+/**
+ * TASK-1185 Slice 3 — TTL del cache de operating entity. El ops-worker es un
+ * proceso long-lived; sin invalidación, un cambio en la operating entity
+ * (corrección de RUT/legal_name, o el flag `is_operating_entity` movido a otra
+ * org en una re-incorporación) dejaría al worker escribiendo la org stale hasta
+ * reiniciar. El TTL acota la staleness; `clearOperatingEntityCache()` permite
+ * invalidación explícita inmediata desde un evento de update de org.
+ */
+const OPERATING_ENTITY_CACHE_TTL_MS = 5 * 60 * 1000
+
+/**
+ * Invalida el cache en memoria de la operating entity. Llamar cuando la
+ * operating entity cambie (update de org / flag `is_operating_entity`). Beneficia
+ * a todos los consumers del resolver (payroll, contractor, finiquito, VAT, etc.).
+ */
+export const clearOperatingEntityCache = (): void => {
+  cachedOperatingEntity = null
+  cachedOperatingEntityAt = 0
+}
 
 /**
  * Resolves the operating entity — the legal organization that owns Greenhouse,
  * employs collaborators, signs payroll documents, and emits DTEs.
  *
- * Uses `is_operating_entity = TRUE` flag. Result is cached in memory since
- * the operating entity does not change between requests.
+ * Uses `is_operating_entity = TRUE` flag. Result is cached in memory con TTL
+ * (TASK-1185) — la operating entity casi nunca cambia, pero el cache ya no es
+ * inmortal en procesos long-lived.
  */
 export const getOperatingEntityIdentity = async (): Promise<OperatingEntityIdentity | null> => {
-  if (cachedOperatingEntity) return cachedOperatingEntity
+  if (cachedOperatingEntity && Date.now() - cachedOperatingEntityAt < OPERATING_ENTITY_CACHE_TTL_MS) {
+    return cachedOperatingEntity
+  }
 
   const rows = await runGreenhousePostgresQuery<OperatingEntityRow>(
     `SELECT organization_id, legal_name, tax_id, tax_id_type, legal_address, country
@@ -99,6 +123,7 @@ export const getOperatingEntityIdentity = async (): Promise<OperatingEntityIdent
     legalAddress: row.legal_address,
     country: row.country
   }
+  cachedOperatingEntityAt = Date.now()
 
   return cachedOperatingEntity
 }

@@ -144,6 +144,7 @@ import { getPaymentOrdersDeadLetterSignal } from './queries/payment-orders-dead-
 import { getPaidOrdersWithoutExpensePaymentSignal } from './queries/payment-orders-paid-without-expense-payment'
 import { getPayrollComplianceExportDriftSignal } from './queries/payroll-compliance-export-drift'
 import { getPayrollExpenseMaterializationLagSignal } from './queries/payroll-expense-materialization-lag'
+import { getOperationalPlCostCoverageDegradedSignal } from './queries/operational-pl-cost-coverage-degraded'
 import { getPayrollParticipationWindowFullMonthEntryDriftSignal } from './queries/payroll-participation-window-full-month-entry-drift'
 import { getPayrollParticipationWindowProjectionDeltaAnomalySignal } from './queries/payroll-participation-window-projection-delta-anomaly'
 import { getPayrollParticipationWindowSourceDateDisagreementSignal } from './queries/payroll-participation-window-source-date-disagreement'
@@ -155,6 +156,8 @@ import { getPayrollContractTaxonomyInvalidTupleDriftSignal } from './queries/pay
 import { getPayrollContractTaxonomyInvalidStatutoryApplicationSignal } from './queries/payroll-contract-taxonomy-invalid-statutory-application'
 import { getProviderBqSyncDeadLetterSignal } from './queries/provider-bq-sync-dead-letter'
 import { getVatPositionDriftSignal } from './queries/vat-position-drift'
+import { getVatEntryUnresolvedFxSignal } from './queries/vat-entry-unresolved-fx'
+import { getVatEligibleWithoutPeriodSignal } from './queries/vat-eligible-without-period'
 import { getHubspotCompaniesIntakeDeadLetterSignal } from './queries/hubspot-companies-intake-dead-letter'
 import { getWorkforceUnlinkedInternalUsersSignal } from './queries/workforce-unlinked-internal-users'
 // TASK-1082 — Knowledge Platform ingestion signals (moduleKey 'knowledge').
@@ -483,6 +486,7 @@ interface ReliabilityOverviewSources {
    * query falla. El composer los inyecta en `allSignals` con resto del array.
    */
   paymentOrderSettlement?: ReliabilitySignal[] | null
+  operationalPlCostCoverageDegraded?: ReliabilitySignal | null
 
   /**
    * TASK-812 — Previred/LRE compliance export artifact drift. Steady state = 0
@@ -591,6 +595,10 @@ interface ReliabilityOverviewSources {
 
   /** TASK-725 — Finance VAT position drift (documentos con IVA sin asiento en períodos materializados). */
   vatPositionDrift?: ReliabilitySignal | null
+
+  /** TASK-1185 — VAT FX/data-quality signals (no-CLP sin FX, docs sin período). */
+  vatEntryUnresolvedFx?: ReliabilitySignal | null
+  vatEligibleWithoutPeriod?: ReliabilitySignal | null
 
   /** TASK-1082 — Knowledge ingestion signals (quarantine count + failed sync source). */
   knowledgeQuarantineCount?: ReliabilitySignal | null
@@ -974,6 +982,9 @@ export const buildReliabilityOverview = (
     // dead_letter / lag). Inyectadas pre-fetched desde getReliabilityOverview
     // para mantener buildReliabilityOverview sincrónico.
     ...(sources.paymentOrderSettlement ?? []),
+    // TASK-1190 — Operational P&L cost coverage gate. Evita tratar como
+    // margen canónico un período con revenue y costo 0 cuando falta upstream.
+    ...(sources.operationalPlCostCoverageDegraded ? [sources.operationalPlCostCoverageDegraded] : []),
     // TASK-812 — Previred/LRE artifact registry drift.
     ...(sources.payrollComplianceExportDrift ? [sources.payrollComplianceExportDrift] : []),
     // TASK-863 V1.5.2 — Final settlement PDF status drift (DB document_status vs
@@ -1023,6 +1034,9 @@ export const buildReliabilityOverview = (
     ...(sources.providerBqSyncDeadLetter ?? []),
     // TASK-725 — Finance VAT position drift (documentos con IVA sin asiento).
     ...(sources.vatPositionDrift ? [sources.vatPositionDrift] : []),
+    // TASK-1185 — VAT FX/data-quality signals.
+    ...(sources.vatEntryUnresolvedFx ? [sources.vatEntryUnresolvedFx] : []),
+    ...(sources.vatEligibleWithoutPeriod ? [sources.vatEligibleWithoutPeriod] : []),
     // TASK-878 Slice 2 — HubSpot companies intake dead-letter (async webhook path).
     ...(sources.hubspotCompaniesIntakeDeadLetter ? [sources.hubspotCompaniesIntakeDeadLetter] : []),
     // TASK-878 follow-up — Identity UX hardening: internal users sin member enlazado.
@@ -1318,6 +1332,11 @@ export const getReliabilityOverview = async (
           materializationLag: getPayrollExpenseMaterializationLagSignal
         }).catch(() => null)
 
+  const operationalPlCostCoverageDegraded =
+    preloadedSources.operationalPlCostCoverageDegraded !== undefined
+      ? preloadedSources.operationalPlCostCoverageDegraded
+      : await getOperationalPlCostCoverageDegradedSignal().catch(() => null)
+
   const payrollComplianceExportDrift =
     preloadedSources.payrollComplianceExportDrift !== undefined
       ? preloadedSources.payrollComplianceExportDrift
@@ -1408,6 +1427,18 @@ export const getReliabilityOverview = async (
     preloadedSources.vatPositionDrift !== undefined
       ? preloadedSources.vatPositionDrift
       : await getVatPositionDriftSignal().catch(() => null)
+
+  // TASK-1185 — VAT FX/data-quality signals. Degradan honesto (severity='unknown')
+  // si su query falla; no envenenan el overview.
+  const vatEntryUnresolvedFx =
+    preloadedSources.vatEntryUnresolvedFx !== undefined
+      ? preloadedSources.vatEntryUnresolvedFx
+      : await getVatEntryUnresolvedFxSignal().catch(() => null)
+
+  const vatEligibleWithoutPeriod =
+    preloadedSources.vatEligibleWithoutPeriod !== undefined
+      ? preloadedSources.vatEligibleWithoutPeriod
+      : await getVatEligibleWithoutPeriodSignal().catch(() => null)
 
   // TASK-878 Slice 2 — HubSpot companies intake dead-letter (mirror provider_bq_sync).
   // Detecta path async caído: webhook companies emite outbox event pero la projection
@@ -2148,6 +2179,7 @@ export const getReliabilityOverview = async (
     aiObservations,
     domainIncidents,
     paymentOrderSettlement,
+    operationalPlCostCoverageDegraded,
     payrollComplianceExportDrift,
     payrollContractorDoubleRailOverlap,
     payrollDeelMemberWithoutContractId,
@@ -2158,6 +2190,8 @@ export const getReliabilityOverview = async (
     financeClpDrift,
     providerBqSyncDeadLetter,
     vatPositionDrift,
+    vatEntryUnresolvedFx,
+    vatEligibleWithoutPeriod,
     hubspotCompaniesIntakeDeadLetter,
     workforceUnlinkedInternalUsers,
     knowledgeQuarantineCount,

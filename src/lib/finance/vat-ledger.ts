@@ -210,6 +210,14 @@ export async function materializeVatLedgerForPeriod(
   const legalEntityOrgId = operatingEntity.organizationId
 
   await db.transaction().execute(async trx => {
+    // TASK-1185 Slice 2: advisory lock por período (namespaced 'vat_materialize')
+    // para serializar materializaciones concurrentes del mismo período. Sin él,
+    // dos consumers reactivos del mismo período pueden pisarse (DELETE+INSERT no
+    // atómico entre sí). Scope xact → se libera al commit/rollback.
+    await sql`
+      SELECT pg_advisory_xact_lock(hashtext('vat_materialize'), hashtext(${periodId}::text))
+    `.execute(trx)
+
     await sql`
       DELETE FROM greenhouse_finance.vat_monthly_positions
       WHERE period_year = ${year}::int AND period_month = ${month}::int
@@ -262,6 +270,10 @@ export async function materializeVatLedgerForPeriod(
           AND COALESCE(i.tax_amount_snapshot, i.tax_amount, 0) > 0
           -- TASK-725: el débito fiscal pertenece a la entidad legal (Efeonce),
           -- exista o no un space de contraparte. NO se filtra por space.
+          -- TASK-1185 Slice 1: guard FX — NO materializar IVA no-CLP con FX
+          -- nulo/0 (el fallback ×1 lo sub-declararía ~900x silencioso). Estos
+          -- docs los cuenta el signal finance.vat.entry_unresolved_fx.
+          AND (i.currency = 'CLP' OR COALESCE(NULLIF(i.exchange_rate_to_clp, 0), 0) <> 0)
       )
       INSERT INTO greenhouse_finance.vat_ledger_entries (
         ledger_entry_id,
@@ -380,6 +392,10 @@ export async function materializeVatLedgerForPeriod(
             COALESCE(e.recoverable_tax_amount, 0) > 0
             OR COALESCE(e.non_recoverable_tax_amount, 0) > 0
           )
+          -- TASK-1185 Slice 1: guard FX — mismo criterio que income; los
+          -- gastos no-CLP sin FX resoluble se omiten (no se sub-declaran ×1)
+          -- y los detecta el signal finance.vat.entry_unresolved_fx.
+          AND (e.currency = 'CLP' OR COALESCE(NULLIF(e.exchange_rate_to_clp, 0), 0) <> 0)
       )
       INSERT INTO greenhouse_finance.vat_ledger_entries (
         ledger_entry_id,

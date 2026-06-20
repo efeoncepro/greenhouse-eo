@@ -58,6 +58,7 @@ describe('materializeVatLedgerForPeriod', () => {
     queuedResults.length = 0
 
     queuedResults.push(
+      { rows: [] }, // TASK-1185 Slice 2: pg_advisory_xact_lock (1er statement de la tx)
       { rows: [] },
       { rows: [] },
       { rows: [] },
@@ -86,7 +87,12 @@ describe('materializeVatLedgerForPeriod', () => {
 
     expect(mockGetDb).toHaveBeenCalledTimes(1)
     expect(mockTransactionExecute).toHaveBeenCalledTimes(1)
-    expect(executedSql).toHaveLength(6)
+    // TASK-1185 Slice 2: el advisory lock agrega un statement al inicio de la tx
+    // (advisory lock + 2 DELETE + 2 INSERT entries + INSERT position + summary).
+    expect(executedSql).toHaveLength(7)
+
+    // TASK-1185 Slice 2: advisory lock por período (namespaced) es el 1er statement.
+    expect(executedSql[0]).toMatch(/pg_advisory_xact_lock\(hashtext\('vat_materialize'\), hashtext\(\$\d+::text\)\)/)
 
     const incomeInsert = executedSql.find(query =>
       query.includes('INSERT INTO greenhouse_finance.vat_ledger_entries') && query.includes('FROM scoped_income')
@@ -126,6 +132,11 @@ describe('materializeVatLedgerForPeriod', () => {
     // etiqueta — no es un gate y debe poder coexistir.)
     expect(incomeInsert).not.toMatch(/COALESCE\(q\.space_id, cb\.space_id\) IS NOT NULL/)
     expect(expenseInsert).not.toMatch(/AND e\.space_id IS NOT NULL/)
+
+    // TASK-1185 Slice 1: guard FX — los CTEs income/expense omiten docs no-CLP
+    // con FX nulo/0 (evita la sub-declaración ×1 silenciosa).
+    expect(incomeInsert).toMatch(/i\.currency = 'CLP' OR COALESCE\(NULLIF\(i\.exchange_rate_to_clp, 0\), 0\) <> 0/)
+    expect(expenseInsert).toMatch(/e\.currency = 'CLP' OR COALESCE\(NULLIF\(e\.exchange_rate_to_clp, 0\), 0\) <> 0/)
 
     expect(summary).toEqual({
       periodId: '2026-04',
