@@ -108,6 +108,7 @@ import {
   runReconciliationAutoMatch,
   runWebhookDispatch
 } from '@/lib/cron-orchestrators'
+import { runOtdWritebackBatch } from '@/lib/notion-metrics/otd-writeback-batch'
 import { buildWeeklyDigest, resolveWeeklyDigestRecipients, WEEKLY_DIGEST_DEFAULT_LIMIT } from '@/lib/nexa/digest'
 
 import { getCurrentAuthReadiness } from '@/lib/auth-secrets'
@@ -1763,6 +1764,17 @@ const handleIcoMemberSync = wrapCronHandler({
   run: async (): Promise<Record<string, unknown>> => runIcoMemberSync()
 })
 
+// ─── /otd/writeback ──────────────────────────────────────────────────────────
+// TASK-927 — Daily batch del writeback del bucket OTD freeze-aware a Notion
+// (`[GH] OTD`). Gated por NOTION_OTD_WRITEBACK_ENABLED (default OFF → no-op) +
+// gate duro ISSUE-098 (no escribe si el shadow tiene buckets terminales abiertos).
+// Display-only, NO toca el bono.
+const handleOtdWriteback = wrapCronHandler({
+  name: 'otd-writeback',
+  domain: 'integrations.notion',
+  run: async (): Promise<Record<string, unknown>> => ({ ...(await runOtdWritebackBatch()) })
+})
+
 const handleNotionConformedSync = async (req: IncomingMessage, res: ServerResponse) => {
   const body = await readBody(req)
   const rawSource = typeof body.executionSource === 'string' ? body.executionSource.trim() : 'scheduled_primary'
@@ -2286,6 +2298,12 @@ const server = createServer(async (req, res) => {
 
     if (method === 'POST' && path === '/ico/member-sync') {
       await handleIcoMemberSync(req, res)
+
+      return
+    }
+
+    if (method === 'POST' && path === '/otd/writeback') {
+      await handleOtdWriteback(req, res)
 
       return
     }

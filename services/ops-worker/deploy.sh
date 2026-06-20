@@ -815,6 +815,13 @@ upsert_scheduler_job \
   '{}'
 echo "  -> ops-ico-member-sync: 30 10 * * * (ICO member metrics BQ → PG, TASK-775)"
 
+upsert_scheduler_job \
+  "ops-otd-writeback" \
+  "0 11 * * *" \
+  "/otd/writeback" \
+  '{}'
+echo "  -> ops-otd-writeback: 0 11 * * * (OTD bucket freeze-aware → Notion [GH] OTD, TASK-927; gated NOTION_OTD_WRITEBACK_ENABLED default OFF)"
+
 # Global projection recovery — unchanged lane.
 upsert_scheduler_job \
   "ops-reactive-recover" \
