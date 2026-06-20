@@ -13,6 +13,9 @@
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `implementation`
+- Execution profile: `backend-data`
+- UI impact: `interaction`
+- Backend impact: `migration`
 - Epic: `optional`
 - Status real: `Diseno`
 - Rank: `TBD`
@@ -20,7 +23,7 @@
 - Blocked by: `none`
 - Branch: `task/TASK-725-finance-fiscal-scope-legal-entity-foundation`
 - Legacy ID: `none`
-- GitHub Issue: `optional`
+- GitHub Issue: `ISSUE-101`
 
 ## Summary
 
@@ -147,6 +150,140 @@ Reglas obligatorias:
 - Los documentos tributarios no tienen un `legal_entity_id` canonico persistido como owner fiscal.
 - No hay selector ni default de entidad fiscal para usuarios internos/admin multi-scope.
 - Un widget tributario opcional puede generar banner global y degradar toda la pagina `/finance`.
+
+## Backend/Data Contract
+
+### Backend/data brief
+
+- Backend rigor: `backend-critical` (finance + migration + backfill + source-of-truth switch del scope fiscal)
+- Impacto principal: `migration` (+ `reader` + `command`/materializer + `api`)
+- Source of truth afectado: `greenhouse_finance.vat_ledger_entries` + `vat_monthly_positions` (materializados desde `income`/`expenses`); nuevo SoT de scope fiscal = entidad legal
+- Consumidores afectados: `UI` (card IVA + export CSV), `API` (endpoint monthly-position), futuros (period closing, Nexa finance, PPM/retenciones)
+- Runtime target: `staging` → `production` (misma Cloud SQL); materializador en ops-worker reactivo/cron
+
+### Contract surface
+
+- Contrato existente a respetar: `GET /api/finance/vat/monthly-position` (shape `VatMonthlyPositionRecord`), helpers de `src/lib/finance/vat-ledger.ts`, `requireFinanceTenantContext`.
+- Contrato nuevo o modificado: `resolveFinanceFiscalScope()` (resolver canónico); el endpoint acepta `legalEntityId` y devuelve estados tipados (`ready|scope_required|forbidden`) en vez de 422 inglés crudo; materializador agrega por `legal_entity_id`.
+- Backward compatibility: `gated` — el shape se conserva; `spaceId` pasa a parámetro transicional; `space_id` sobrevive como audit/etiqueta nullable.
+- Full API parity: la posición IVA se expone como reader canónico de **entidad legal** reutilizable por UI/Nexa/CLI sin recomputar; el resolver es el único punto de autorización fiscal.
+
+### Data model and invariants
+
+- Entidades/tablas/views afectadas: `greenhouse_finance.vat_ledger_entries`, `greenhouse_finance.vat_monthly_positions`, nueva tabla de entidad fiscal (`legal_entity`) + mapping `space ↔ legal_entity`.
+- Invariantes que no se pueden romper:
+  - Posición IVA = `Σ débito − Σ crédito recuperable` de **toda** la entidad legal; **ningún documento con IVA queda fuera por falta de space** (quitar el filtro `space_id IS NOT NULL` del materializador fiscal — causa raíz de ISSUE-101).
+  - El scope fiscal se deriva de `legal_entity_id`, **NUNCA** de `space_id`. `space_id`/`client_id` = etiqueta analítica nullable.
+  - Ledger append-only / re-materializable; nunca DELETE destructivo sin re-build validado.
+  - El resolver no auto-selecciona si hay múltiples entidades autorizadas; no usa "primer space/registro" como fallback silencioso.
+- Tenant/space boundary: autorización del usuario contra la entidad fiscal solicitada en `resolveFinanceFiscalScope`; gate `requireFinanceTenantContext` (route group `finance` / `EFEONCE_ADMIN`).
+- Idempotency/concurrency: materializador idempotente por `(legal_entity_id, period_year, period_month)`; unique constraint que evite duplicados por período tras agregar la columna.
+- Audit/outbox/history: re-materialización deja `materialized_at` + `materialization_reason`; nuevo reliability signal de drift (ver Rollout).
+
+### Migration, backfill and rollout
+
+- Migration posture: `additive` (tabla `legal_entity` + mapping + columna `legal_entity_id` nullable en las 2 tablas VAT) + `backfill` (mapear `space_id → legal_entity_id` y re-materializar abr/may/jun).
+- Default state: Slice 1 (degradación de la card) ship sin tocar datos; el re-scope del materializador detrás de validación staging (dry-run comparativo).
+- Backfill plan: dry-run que compare net previo vs nuevo por período (debe subir por la entrada del crédito fiscal) → apply; allowlist de períodos existentes (3).
+- Rollback path: flag off / revert PR / re-materializar con lógica previa (fuente intacta en `income`/`expenses`; el ledger es reconstruible — no hay pérdida).
+- External coordination: validar la posición IVA corregida contra el **F29 real declarado** de abr/may/jun con el contador antes de tomarla como baseline.
+
+### Security and access
+
+- Auth/access gate: `requireFinanceTenantContext` + autorización fina por entidad fiscal en el resolver.
+- Sensitive data posture: `finance` (cifras fiscales internas; no PII de terceros; un portal de cliente NUNCA ve el IVA de Efeonce).
+- Error contract: `canonicalErrorResponse` / estados tipados (`code`), NUNCA prosa inglesa cruda (el 422 actual es justo el anti-patrón a remover); la UI degrada por `code`, no parseando strings.
+- Abuse/rate-limit posture: N/A — endpoint read-only autenticado.
+
+### Runtime evidence
+
+- Local checks: tests focales del materializador (overhead sin space → entra al crédito), del resolver (sin scope / entidad única / múltiples / no autorizada / fallback `space_id`), y del endpoint (sin spaceId → estado tipado, no 422).
+- DB/runtime checks: query `credito_con_space_incluido > 0` y `clp_credito_excluido = 0` post-fix; re-materialización verificada vía `pnpm pg:connect:shell`.
+- Integration checks: `pnpm staging:request /api/finance/vat/monthly-position --pretty` con agent admin interno → estado resuelto.
+- Reliability signals/logs: `finance.vat.position_drift` steady=0 en `/admin/operations`.
+- Production verification sequence: ver `## Rollout Plan & Risk Matrix`.
+
+### Acceptance criteria additions
+
+- [ ] Source of truth, contract surface y consumidores nombrados con paths reales.
+- [ ] Invariantes (clave fiscal = entidad legal; space = etiqueta; sin filtro `space_id IS NOT NULL`), tenant boundary e idempotencia explícitos.
+- [ ] Migration/backfill/rollback proporcional al riesgo (re-materialización validada en staging + vs F29).
+- [ ] Evidencia DB listada (crédito fiscal incluido; drift=0).
+- [ ] Dominio finance con errores canónicos/tipados y signal de drift.
+
+## Capability Definition of Done — Full API Parity gate
+
+`N/A — no capability de negocio nueva` (no introduce un write mutante de negocio; es un reader/materializer fiscal correcto + resolver de scope). La posición IVA y `resolveFinanceFiscalScope` quedan como contratos canónicos reutilizables por todos los consumers (UI/Nexa/CLI), sin lógica duplicada por pantalla.
+
+## UI/UX Contract
+
+### Experience brief
+
+- UI rigor: `ui-standard`
+- Usuario / rol: operador Finanzas / admin interno Efeonce (único consumidor del IVA).
+- Momento del flujo: dashboard `/finance` (Resumen) + card "Posición IVA del mes".
+- Resultado perceptible esperado: la card IVA carga sin banner de error global; muestra la posición consolidada de la entidad legal (con crédito fiscal incluido). Si hay múltiples entidades, selector compacto.
+- Friccion que debe reducir: hoy el 422 genera un banner amarillo permanente que ensucia todo el dashboard del admin interno.
+- No-goals UX: no rediseñar el dashboard; no construir un selector fiscal global pesado si hay una sola entidad.
+
+### Surface & system decision
+
+- Surface: `VatMonthlyPositionCard` + `FinanceDashboardView` (degradación local del error).
+- Composition Shell: `no aplica` — card existente dentro del dashboard actual.
+- Primitive decision: `reuse` — card existente; agregar estados; selector compacto reusa primitives de selección existentes si hay multi-entidad.
+- Adaptive density / The Seam: `no aplica`.
+- Floating/Sidecar/Dialog decision: N/A (selector inline compacto).
+- Copy source: `src/lib/copy/*` (estados, labels, mensajes) — NUNCA prosa inglesa cruda; validar con `greenhouse-ux-writing`.
+- Access impact: `none` runtime nuevo (lectura gateada por `finance`/`EFEONCE_ADMIN`); si el selector fiscal se vuelve visible para multi-entidad, declarar `views`+`entitlements` antes de implementar (Slice 6).
+
+### State inventory
+
+- Default: `ready` — posición consolidada de la entidad legal.
+- Loading: skeleton de la card (existente).
+- Empty: período sin movimientos con IVA → empty positivo, no error.
+- Error: `error` tipado local en la card (no banner global).
+- Degraded / partial: `stale` cuando la materialización está vencida.
+- Permission denied: `forbidden` → card oculta/mensaje, no 422 global.
+- Long content: tabla de buckets ya truncada (slice de 6).
+- Mobile / compact: card responsive existente.
+- Keyboard / focus: selector fiscal accesible por teclado si aparece.
+- Reduced motion: sin motion nuevo.
+
+### Interaction contract
+
+- Primary interaction: ver posición; (multi-entidad) elegir entidad fiscal.
+- Hover / focus / active: estados estándar del selector.
+- Pending / disabled: durante fetch de la posición tras cambiar entidad.
+- Escape / click-away: cerrar selector.
+- Focus restore: al cerrar selector, foco vuelve al trigger.
+- Latency feedback: skeleton/loading en la card al recomputar.
+- Toast / alert behavior: el error de IVA vive en la card, NUNCA en el banner global del dashboard.
+
+### Motion & microinteractions
+
+- Motion primitive: `none` — sin motion nuevo.
+- Enter / exit / layout morph / stagger: N/A.
+- Timing / easing token: N/A.
+- Reduced-motion fallback: N/A (sin motion).
+- Non-goal motion: no animar la card.
+
+### Visual verification
+
+- GVC scenario: capturar `/finance` con agent admin interno (sin space) antes/después — el banner desaparece.
+- Viewports: desktop + mobile 390px.
+- Required captures: dashboard con card IVA `ready`; estado `scope_required`/`forbidden` si aplica.
+- Required `data-capture` markers: `data-capture="vat-monthly-position-card"`.
+- Scroll-width check: sin scroll horizontal de página en desktop ni 390px.
+- Accessibility/focus checks: selector fiscal navegable por teclado + aria.
+- Before/after evidence: captura del banner actual vs card cargada post-fix.
+- Known visual debt: ninguna nueva.
+
+## Hybrid Execution Justification
+
+- Why not split: el core es backend-data (foundation fiscal + resolver + migración + materializador). La UI (Slice 6) es un **consumidor delgado** de la card ya existente: degradación local + estados tipados + selector solo si hay multi-entidad. El boundary es estable (la UI consume `resolveFinanceFiscalScope` + el endpoint), así que el riesgo de mantenerla junta es bajo y reduce coordinación.
+- Primary execution profile: `backend-data`.
+- Contract boundary: la UI nunca computa scope ni IVA; consume el reader/endpoint canónico y decide render por `code` tipado. Slice 1 (degradación) y Slice 6 (estados/selector) son los únicos slices UI; el resto es backend.
+- Risk controls: ordering hard rule (UI de Slice 1 no depende del schema; Slice 6 va al final, tras el read path migrado); GVC desktop+mobile; copy en `src/lib/copy/*`; si el selector se vuelve visible para multi-entidad, declarar `views`+`entitlements` antes.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -330,6 +467,84 @@ Respuesta forbidden:
 - La UI no debe parsear strings humanos para saber si debe degradar; debe usar `code`.
 - Las queries de IVA no deben mezclar entidades fiscales.
 
+## Rollout Plan & Risk Matrix
+
+### Slice ordering hard rule
+
+- **Slice 1 (dashboard resilience)** puede shipear solo y primero — additive, no toca datos, desbloquea el banner de inmediato.
+- **Slice 2 (schema entidad fiscal + mapping)** → **Slice 3 (`resolveFinanceFiscalScope`)** → **Slice 4 (read path compat)**: el read path no puede migrar antes de que exista el resolver, y el resolver no puede existir sin el schema.
+- **Slice 5 (materialization migration)** DESPUÉS de Slice 4, con dry-run validado en staging. Aquí se **quita el filtro `space_id IS NOT NULL`** (corrige el crédito fiscal) y se re-materializa.
+- **Slice 6 (UI fiscal scope)** va al **final**, tras el read path migrado (la UI consume estados ya estables).
+- **Slice 7 (docs)** al cierre.
+- Cualquier agente que materialice por `legal_entity_id` (Slice 5) antes de tener el resolver + read path (Slice 3-4) viola el contract.
+
+### Risk matrix
+
+| Riesgo | Sistema | Probabilidad | Mitigation | Signal de alerta |
+|---|---|---|---|---|
+| Re-materialización cambia el net y descuadra vs F29 ya declarado | finance | medium | dry-run comparativo + validación con contador antes de baseline | `finance.vat.position_drift` |
+| Quitar `space_id IS NOT NULL` mete gastos no fiscales por error | finance | low | filtrar por `recoverable_tax_amount > 0` / `tax_recoverability`, NUNCA por space; tests focales | test focal materializador |
+| Doble conteo de un documento por space y por entidad | finance / migration | low | unique constraint `(legal_entity_id, period_year, period_month)` + agregación idempotente | `finance.vat.position_drift` |
+| Backfill `space_id → legal_entity_id` mapea a entidad equivocada | migration | medium | mapping explícito + dry-run; no auto-asignar "primer registro" | revisión manual del mapping |
+| Resolver auto-selecciona entidad y filtra datos de otra | finance / identity | low | autorización fina + estado `forbidden`; no auto-select con múltiples | test resolver multi-entidad |
+| Consumidores que asumían `spaceId` requerido en el shape | UI / API | low | shape conservado, `spaceId` opcional/transicional, backward-compatible | smoke endpoint + build |
+
+### Feature flags / cutover
+
+Slice 1 sin flag — additive, immediate cutover (degradación honesta es estrictamente mejor que un banner 422). Slices 2-5 detrás de validación staging (dry-run) antes de apply en prod; el ledger es re-materializable y reversible. Si se quiere shadow, gatear el re-scope del materializador con `VAT_LEGAL_ENTITY_SCOPE_ENABLED` (default OFF) durante validación — decisión del agente que tome la task.
+
+### Rollback plan per slice
+
+| Slice | Rollback | Tiempo | Reversible? |
+|---|---|---|---|
+| Slice 1 | revert PR + redeploy | <5 min | sí |
+| Slice 2 | reverse migration (DROP tabla/columna additive, sin data productiva) | <15 min | sí |
+| Slice 3 | revert PR (resolver es código nuevo) | <5 min | sí |
+| Slice 4 | revert PR (endpoint vuelve a scope previo) | <10 min | sí |
+| Slice 5 | revert PR + re-materializar con lógica previa (fuente intacta) | <30 min | sí |
+| Slice 6 | revert PR (UI additive) | <5 min | sí |
+| Slice 7 | revert PR (docs) | <5 min | sí |
+
+### Production verification sequence
+
+1. Slice 1 a staging → `/finance` con agent admin interno (sin space): banner global ausente, card IVA degrada local.
+2. Slices 2-4 a staging → `GET /api/finance/vat/monthly-position` resuelve por entidad legal; sin scope → estado tipado, no 422.
+3. Slice 5 dry-run en staging → comparar net previo vs nuevo por período; confirmar `clp_credito_excluido = 0` y crédito fiscal incluido.
+4. Slice 5 apply en staging → re-materializar abr/may/jun → verificar buckets.
+5. Validar cifras corregidas contra F29 real (contador/operador).
+6. Repetir 1-5 en producción con cooldown.
+7. Slice 6 (UI) + monitorear `finance.vat.position_drift` steady=0 durante 7d.
+
+### Out-of-band coordination required
+
+Validación de la posición IVA corregida (con los ~$2.56M de crédito fiscal que hoy faltan) contra el F29 real declarado de abr/may/jun con el contador/operador de Efeonce antes de tomarla como baseline. Resto: repo-only.
+
+## Architecture & Finance Skill Review
+
+Revisado con `arch-architect` (overlay Greenhouse) + `greenhouse-finance-accounting-operator` el 2026-06-20.
+
+### Razonamiento fiscal (finance)
+
+- **F29 se declara por RUT, una vez al mes** (SII): una posición de IVA = `Σ débito ventas − Σ crédito compras recuperable` de **toda la entidad legal**, sin importar el cliente. El crédito fiscal del overhead (arriendo, software, servicios) no pertenece a ningún cliente — pertenece a Efeonce. Por eso el scope correcto es la entidad legal, no `space_id`.
+- El `space`/`client` es dimensión de **atribución analítica** (margen por cliente), ortogonal a la dimensión **fiscal** (RUT/F29). Mezclarlas en una sola clave de particionado es el error.
+- Escalamiento: la cifra corregida debe cuadrarse contra el F29 real con el contador antes de tomarla como baseline (no es asesoría de filing; es validación de insumo).
+
+### 4 pilares (arch-architect) del estado objetivo
+
+- **Safety:** ✅ el número fiscal pasa a ser correcto y auditable contra el F29; autorización fina por entidad fiscal en el resolver evita cross-tenant leak. Riesgo actual = declarar un IVA sobreestimado.
+- **Robustness:** ✅ quitar el filtro `space_id IS NOT NULL` cierra la fuga silenciosa de crédito fiscal; unique constraint `(legal_entity_id, period)` + idempotencia evitan doble conteo; estados tipados evitan el 422 que rompía el dashboard.
+- **Resilience:** ✅ reliability signal `finance.vat.position_drift` (steady=0, patrón VIEW/helper/signal de TASK-571/766/774) cazaría la regresión; ledger re-materializable → rollback barato.
+- **Scalability:** ✅ particionar por entidad legal (cardinalidad baja) en vez de por space (N); el modelo soporta multi-entidad/multi-país sin redesign (Slice 2 deja el foundation).
+
+### Hard rules (anti-regresión)
+
+- **NUNCA** particionar un agregado fiscal (IVA/F29 — y a futuro PPM/retenciones/renta) por `space_id`/`client_id`. La SSOT fiscal es la **entidad legal (RUT)**.
+- **NUNCA** filtrar `space_id IS NOT NULL` en un cómputo fiscal (bota el overhead sin cliente = el grueso del crédito).
+- **NUNCA** auto-seleccionar entidad fiscal cuando hay múltiples autorizadas, ni usar "primer space/registro" como fallback silencioso.
+- **NUNCA** devolver prosa inglesa cruda como error fiscal (usar `canonicalErrorResponse`/estado tipado; la UI degrada por `code`).
+- **SIEMPRE** que el VAT mute, emitir `finance.vat.position_drift` (materializada vs Σ directo).
+- **SIEMPRE** validar la cifra corregida contra el F29 real antes de baseline.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 4 — VERIFICATION & CLOSING
      "Como compruebo que termine y que actualizo?"
@@ -380,6 +595,23 @@ Cerrar una task es obligatorio y forma parte de Definition of Done. Si la implem
 ## Delta 2026-04-29
 
 Task creada tras detectar que el error visible de IVA mensual no es solo falta de `spaceId`, sino una deuda conceptual: IVA debe depender de entidad fiscal/legal, no de `space_id` operacional. La solucion robusta separa `legal_entity_id` de `space_id`, introduce resolver fiscal compartido y mantiene degradacion local del widget para no romper `/finance`.
+
+## Delta 2026-06-20
+
+Re-diagnóstico contra la BD viva (auditoría `docs/audits/finance/FINANCE_DOMAIN_AUDIT_2026-06-20.md`, skills `greenhouse-finance-accounting-operator` + `arch-architect`) confirma y **agrava** la deuda: el mis-scoping no es solo el 422, es **incorrección fiscal medible**. Registrado como `ISSUE-101`.
+
+Evidencia (2026-06-20):
+
+- El materializador (`src/lib/finance/vat-ledger.ts`) filtra `space_id IS NOT NULL` al recoger gastos. **125/125 gastos con IVA crédito fiscal tienen `space_id NULL` → los 125 quedan excluidos.** Crédito fiscal que entra al ledger hoy = **0**; crédito excluido = **$2.563.383 CLP**. La posición publicada ($1.102.000 net abr/may/jun) es solo débito de Sky Airline, sin crédito → **sobreestima el IVA a pagar**.
+- Las 3 posiciones + 3 asientos del ledger cuelgan de un único `space_id = spc-ae463d9f-…` (**"Sky Airline", un client_space**), no de una entidad fiscal de Efeonce.
+
+Implicaciones para esta task:
+
+- **Invariante adicional (Slice 5):** quitar el filtro `space_id IS NOT NULL` del materializador fiscal — todo documento con IVA recuperable entra, tenga o no space. Filtrar por `recoverable_tax_amount > 0` / `tax_recoverability`, NUNCA por space. Sin esto, migrar a `legal_entity_id` deja el bug del crédito fiscal vivo.
+- **AC adicional:** post-fix, query BD debe mostrar `credito_con_space_incluido > 0` y `clp_credito_excluido = 0`.
+- **Reliability signal recomendado (nuevo):** `finance.vat.position_drift` (steady=0) que compare la posición materializada vs Σ directo de income/expenses con IVA del período — habría cazado este bug antes de inspección manual.
+- **Coordinación out-of-band:** validar la posición IVA corregida (con los $2.56M de crédito que hoy faltan) contra el F29 real declarado de abr/may/jun con el contador antes de tomarla como baseline.
+- **Razonamiento fiscal:** F29 se declara por RUT (una entidad legal = una posición consolidada/mes); el crédito fiscal del overhead no pertenece a ningún cliente. Refuerza el goal central de esta task (scope fiscal = entidad legal, no `space_id`).
 
 ## Open Questions
 
