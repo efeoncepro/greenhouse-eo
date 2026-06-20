@@ -6071,6 +6071,49 @@ export interface GreenhouseFinanceReconciliationPeriods {
   year: number;
 }
 
+export interface GreenhouseFinanceRetentionLedgerEntries {
+  counterparty_name: string | null;
+  counterparty_rut: string | null;
+  created_at: Generated<Timestamp>;
+  currency: Generated<string>;
+  dedup_status: Generated<string>;
+  exchange_rate_to_clp: Numeric | null;
+  gross_amount: Generated<Numeric>;
+  metadata: Generated<Json>;
+  organization_id: string | null;
+  period_id: string;
+  period_month: number;
+  period_year: number;
+  retention_amount: Generated<Numeric>;
+  retention_amount_clp: Generated<Numeric>;
+  retention_bucket: string;
+  retention_entry_id: string;
+  retention_rate: Numeric | null;
+  source_date: Timestamp;
+  source_id: string;
+  source_kind: string;
+  source_public_ref: string | null;
+  superseded_by_entry_id: string | null;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseFinanceRetentionMonthlyPositions {
+  document_count: Generated<number>;
+  gross_base_amount_clp: Generated<Numeric>;
+  honorarios_retention_amount_clp: Generated<Numeric>;
+  ledger_entry_count: Generated<number>;
+  materialization_reason: string | null;
+  materialized_at: Generated<Timestamp>;
+  metadata: Generated<Json>;
+  organization_id: string | null;
+  period_id: string;
+  period_month: number;
+  period_year: number;
+  retention_position_id: string;
+  segunda_categoria_retention_amount_clp: Generated<Numeric>;
+  total_retention_amount_clp: Generated<Numeric>;
+}
+
 export interface GreenhouseFinanceServiceEntrySheets {
   amount: Numeric;
   /**
@@ -10455,6 +10498,8 @@ export interface DB {
   "greenhouse_finance.quotes": GreenhouseFinanceQuotes;
   "greenhouse_finance.reconciliation_ai_suggestions": GreenhouseFinanceReconciliationAiSuggestions;
   "greenhouse_finance.reconciliation_periods": GreenhouseFinanceReconciliationPeriods;
+  "greenhouse_finance.retention_ledger_entries": GreenhouseFinanceRetentionLedgerEntries;
+  "greenhouse_finance.retention_monthly_positions": GreenhouseFinanceRetentionMonthlyPositions;
   "greenhouse_finance.service_entry_sheets": GreenhouseFinanceServiceEntrySheets;
   "greenhouse_finance.settlement_groups": GreenhouseFinanceSettlementGroups;
   "greenhouse_finance.settlement_legs": GreenhouseFinanceSettlementLegs;
