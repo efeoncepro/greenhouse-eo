@@ -57,9 +57,24 @@ if (tsconfigBackup !== null) {
   })
 }
 
+// Heap ceiling para `next build`. Sin esto el build hace OOM
+// (`Ineffective mark-compacts near heap limit`) de forma sistemática cuando pnpm
+// corre bajo un Node con old-space chico — caso típico: Volta ata `pnpm` a Node
+// 20 (`volta list` → `pnpm / node@20.20.1`) aunque el runtime default sea mayor.
+// El grafo de build de esta app no entra en el heap default. Espeja el
+// `--max-old-space-size=8192` que `local:check` ya aplica a `tsc`. Preserva un
+// NODE_OPTIONS existente (no lo pisa) y es independiente de la versión de Node.
+const HEAP_FLAG = '--max-old-space-size=8192'
+const existingNodeOptions = process.env.NODE_OPTIONS ?? ''
+
+const nextBuildNodeOptions = existingNodeOptions.includes('--max-old-space-size')
+  ? existingNodeOptions
+  : `${existingNodeOptions} ${HEAP_FLAG}`.trim()
+
 try {
   await runProcess('npx', ['next', 'build'], {
     ...process.env,
+    NODE_OPTIONS: nextBuildNodeOptions,
     NEXT_DIST_DIR: distDir
   })
 
