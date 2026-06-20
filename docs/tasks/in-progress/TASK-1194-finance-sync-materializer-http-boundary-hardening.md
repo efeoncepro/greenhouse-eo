@@ -213,6 +213,23 @@ Slice 0 implementation status:
 - Cloud SQL dev: migration applied; `pnpm pg:connect:status` reports `No migrations to run`; SQL smoke confirms `greenhouse_finance.dte_emission_queue` exists with `0` rows.
 - Remaining in TASK-1194: route classification, capability/service boundary, scheduler parity and reliability signal.
 
+### Slice 0b — DTE retry scheduler home (Codex, 2026-06-20)
+
+- Classify `/api/cron/dte-emission-retry` as `async_critical` and `scheduler-only primary`.
+- Keep the Next route as guarded fallback with `requireCronAuth`; do not add it to `vercel.json`.
+- Extract the retry loop into canonical processor `src/lib/finance/dte-emission-retry.ts` so Next route and ops-worker share one implementation.
+- Add ops-worker endpoint `POST /finance/dte-emission-retry` using `wrapCronHandler`, domain `finance`, bounded `batchSize` 1..25 default 5.
+- Add Cloud Scheduler job `ops-finance-dte-emission-retry` in `services/ops-worker/deploy.sh` every 15 minutes with `{"batchSize":5}`.
+- Extend `vercel-cron-gate` + `cron-staging-drift` async-critical patterns so any future attempt to put `/api/cron/dte-emission-retry` in Vercel cron is caught.
+- Branch exception: operator requested staying on `develop`; this execution remains on `develop` instead of `task/TASK-1194-*`.
+
+Slice 0b implementation status:
+
+- Code complete locally; no Cloud Scheduler job was created yet because `services/ops-worker/deploy.sh` has not been run/deployed in this slice.
+- Runtime DB evidence: `greenhouse_finance.dte_emission_queue` exists and has `0` rows.
+- Local verification: focal vitest for DTE retry processor/route, ops-worker deploy contract, cron staging drift and wrapper passed; `pnpm typecheck`, `pnpm vercel-cron-gate`, `pnpm worker:runtime-deps-gate`, `pnpm docs:closure-check`, `pnpm task:lint --task TASK-1194`, `pnpm docs:context-check`, `pnpm qa:gates --changed --agent codex --task TASK-1194 --finance --runtime --cron --docs`, `pnpm ops:lint --changed` and `git diff --check` passed. `pnpm finance:e2e-gate` skipped because no Finance product route handlers changed.
+- Required rollout: deploy ops-worker, verify job exists in Cloud Scheduler, and smoke the endpoint without emitting unexpected DTEs.
+
 ### Slice 1 — Route classification ledger
 
 - Clasificar cada route sync/materializer: scheduler-only, manual-admin-run, deprecated/remove, read-only.

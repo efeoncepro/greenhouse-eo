@@ -2,8 +2,7 @@ import { NextResponse } from 'next/server'
 
 import { requireCronAuth } from '@/lib/cron/require-cron-auth'
 import { alertCronFailure } from '@/lib/alerts/slack-notify'
-import { claimPendingDteEmissions, markDteEmitted, markDteEmissionFailed } from '@/lib/finance/dte-emission-queue'
-import { emitDte } from '@/lib/nubox/emission'
+import { processDteEmissionRetryQueue } from '@/lib/finance/dte-emission-retry'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 30
@@ -25,42 +24,9 @@ export async function GET(request: Request) {
   }
 
   try {
-    const items = await claimPendingDteEmissions(5)
+    const result = await processDteEmissionRetryQueue(5)
 
-    if (items.length === 0) {
-      return NextResponse.json({ processed: 0, message: 'No pending DTE emissions' })
-    }
-
-    let emitted = 0
-    let failed = 0
-
-    for (const item of items) {
-      try {
-        console.log(`[dte-emission-retry] Processing ${item.incomeId} (${item.dteTypeCode}) attempt ${item.attemptCount}`)
-        const result = await emitDte({ incomeId: item.incomeId, dteTypeCode: item.dteTypeCode || '33' })
-
-        if (!result.success) {
-          await markDteEmissionFailed(
-            item.queueId,
-            result.error || 'Unknown DTE emission error',
-            item.attemptCount,
-            item.maxAttempts
-          )
-          failed++
-          continue
-        }
-
-        await markDteEmitted(item.queueId)
-        emitted++
-      } catch (error) {
-        const errorMsg = error instanceof Error ? error.message : String(error)
-
-        await markDteEmissionFailed(item.queueId, errorMsg, item.attemptCount, item.maxAttempts)
-        failed++
-      }
-    }
-
-    return NextResponse.json({ processed: items.length, emitted, failed })
+    return NextResponse.json(result)
   } catch (error) {
     await alertCronFailure('dte-emission-retry', error).catch(() => {})
 

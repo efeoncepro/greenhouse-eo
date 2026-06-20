@@ -130,6 +130,7 @@ Ejemplos:
 | `/api/cron/nubox-sync` | `async_critical` | Cloud Scheduler | `ops-nubox-sync` (TASK-775 Slice 7) |
 | `/api/cron/nubox-quotes-hot-sync` | `async_critical` | Cloud Scheduler | `ops-nubox-quotes-hot-sync` (TASK-775 Slice 7) |
 | `/api/cron/reconciliation-auto-match` | `async_critical` | Cloud Scheduler | `ops-reconciliation-auto-match` (TASK-775 Slice 7) |
+| `/api/cron/dte-emission-retry` | `async_critical` | Cloud Scheduler | `ops-finance-dte-emission-retry` (TASK-1194 Slice 1; Next route remains guarded fallback) |
 | `/api/cron/quotation-lifecycle` | `async_critical` (duplicado) | Cloud Scheduler | `ops-quotation-lifecycle` (eliminar Vercel duplicado) |
 | `/api/cron/ico-materialize` | `tooling` (legacy duplicado) | Cloud Scheduler | `ico-materialize-daily` (eliminar Vercel duplicado) |
 | `/api/cron/email-data-retention` | `prod_only` | Vercel | — |

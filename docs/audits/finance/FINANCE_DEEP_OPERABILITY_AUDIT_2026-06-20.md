@@ -16,7 +16,7 @@ Finance **funciona y no muestra corrupcion critica de caja/ledger** en la BD viv
 
 Pero Finance **todavia no esta cerrado como sistema financiero market-grade completo**. Los bloqueos no son "no hay modulo"; son controles, observabilidad y fiscal/management accounting todavia provisionales:
 
-1. `DTE emission queue` estaba peor que en el audit anterior: la tabla no existia en Cloud SQL y el helper ejecutaba DDL en runtime (`CREATE TABLE IF NOT EXISTS`). Delta Codex 2026-06-20: `TASK-1194` Slice 0 agrego migracion gobernada `20260620193557859_task-1194-dte-emission-queue-governed-ddl.sql`, la aplico en Cloud SQL dev y dejo el runtime validation-only; falta registrar o retirar el scheduler.
+1. `DTE emission queue` estaba peor que en el audit anterior: la tabla no existia en Cloud SQL y el helper ejecutaba DDL en runtime (`CREATE TABLE IF NOT EXISTS`). Delta Codex 2026-06-20: `TASK-1194` Slice 0 agrego migracion gobernada `20260620193557859_task-1194-dte-emission-queue-governed-ddl.sql`, la aplico en Cloud SQL dev y dejo el runtime validation-only. Slice 0b deja code-complete el scheduler home: processor canónico compartido, ops-worker `POST /finance/dte-emission-retry`, Cloud Scheduler job `ops-finance-dte-emission-retry` en `deploy.sh`, y pattern async-critical en los gates. Falta deploy/re-smoke del ops-worker.
 2. Las mutaciones sensibles siguen dependiendo de route-group amplio en varias familias. `TASK-1192`, `TASK-1193` y `TASK-1194` siguen siendo obligatorias.
 3. F29 mensual esta compuesto y `TASK-1195` aparece complete local-first, pero retencion/PPM siguen en shadow/flag OFF y PPM usa tasa placeholder `placeholder_pending_contador`.
 4. F22 anual (`TASK-1196`) no debe tomarse como listo: requiere regla de regimen/tasa IDPC, fuente RLI y validacion contable.
@@ -36,7 +36,7 @@ Pero Finance **todavia no esta cerrado como sistema financiero market-grade comp
 | Payment orders | `pass with control warning` | 5 paid orders, 0 paid orders without `expense_payment`; capability gates pendientes |
 | Purchase orders | `pass with low data volume` | 2 active POs CLP por 6.903.000 autorizados; ISSUE-045 resuelto |
 | Fiscal monthly F29 | `provisional` | VAT 30 periods latest 2026-06; retention 2 periods; PPM 19 periods with placeholder rate |
-| DTE retry | `partial pass` | Migracion gobernada aplicada en Cloud SQL dev + helper validation-only; scheduler registration/removal still pending |
+| DTE retry | `code fixed, rollout pending` | Migracion gobernada aplicada en Cloud SQL dev + helper validation-only; scheduler home code-complete en ops-worker/deploy.sh; Cloud Scheduler rollout pendiente |
 | Management accounting / P&L | `provisional` | CCA sano hasta 2026-05; 2026-06 revenue 6.902.000 with cost 0 |
 | PnL dashboard endpoint | `code fixed, rollout pending` | staging 500 por columna inexistente; fix local usa `income.total_amount_clp` |
 | Controls / access | `warning high` | 123 write routes in Finance/admin Finance; 116 without visible fine capability by static scan |
@@ -53,7 +53,7 @@ Third pass after commits `20434dc49`, `6b622fa0d` and `d07dec5ce` reconfirmed th
 | DB auth / runtime role | `pnpm pg:doctor` healthy; runtime `greenhouse_app` has `USAGE` on governed schemas and no `CREATE` on schemas | pass |
 | Core finance counts | unchanged: 75 income, 226 expenses, 27 income payments, 121 expense payments, 9 payment orders, 2 purchase orders, 8 accounts | stable |
 | Ledger/cash integrity | income settlement drift 0; income paid-without-active-payment 0; expense paid-without-active-payment 0; income/expense FX repair required 0/0 | pass |
-| DTE queue | `greenhouse_finance.dte_emission_queue` exists and has 0 rows | partial pass; scheduler still missing |
+| DTE queue | `greenhouse_finance.dte_emission_queue` exists and has 0 rows | DB infra pass; scheduler code fixed locally, rollout pending |
 | Bank balances | all 8 active accounts have latest `balance_date=2026-06-20` | cash snapshot pass |
 | Bank API freshness signal | staging `/api/finance/bank` returns HTTP 200, but `freshness.isStale=true` because `lastMaterializedAt` is ~10h old despite same-day balances | code fixed locally; rollout pending |
 | Payment orders | staging `/api/admin/finance/payment-orders` HTTP 200, total 9; DB paid-without-expense-payment 0 | pass with control warning |
@@ -71,6 +71,27 @@ Third pass after commits `20434dc49`, `6b622fa0d` and `d07dec5ce` reconfirmed th
 | Economic category manual queue | 171 pending, 10 archived | operational backlog |
 
 Important nuance: staging is currently behind local `develop` by at least the local Finance fixes. The failures for PnL, F29 consolidated and data-quality ledger false positives are therefore rollout gaps, not necessarily current repo-code gaps. Because the operator has not asked for push/deploy, they remain documented as rollout pending.
+
+### Refresh pass — 2026-06-20 20:00 UTC
+
+Fourth pass reconfirmed the same DB/runtime posture and advanced `FD-1` locally:
+
+| Area | Fresh evidence | Decision |
+|---|---|---|
+| DB auth / runtime role | `pnpm pg:doctor` healthy; runtime role still has schema `USAGE` and no schema `CREATE` | pass |
+| Staging rollout | PnL still HTTP 500, F29 consolidated still HTTP 404, data-quality still reports raw ledger false positives, bank freshness still stale despite same-day balances | rollout pending |
+| Core finance counts | income 75, expenses 226, income payments 27, expense payments 121, payment orders 9, purchase orders 2, accounts 8, account balances 1712 | stable |
+| Ledger/cash integrity | income settlement drift 0; income paid-without-active-payment 0; expense paid-without-active-payment 0; income/expense FX repair required 0/0 | pass |
+| Bank balances | all 8 active accounts have latest `balance_date=2026-06-20`, `computed_at` around 09:00 UTC | cash snapshot pass |
+| Payment orders | 5 paid, 3 cancelled, 1 pending approval; paid-without-expense-payment 0 | pass with control warning |
+| Purchase orders | 2 active POs, 6.903.000 CLP authorized, 0 invoiced, 6.903.000 remaining | pass with low data volume |
+| Fiscal readiness | VAT 30 periods, retention 2, PPM 19, 1 placeholder PPM config, `f22_annual_positions` missing | provisional |
+| AR/AP backlog | 33 open receivables for 90.286.328 CLP, of which 32 are overdue for 83.384.328 CLP; 157 open payables for 31.282.727,17 CLP, of which 129 are overdue for 18.370.018,95 CLP | operational backlog |
+| External signals / economic category | external cash signals: 70 unresolved, 21 adopted, 65 dismissed; economic category queue: 171 pending, 10 archived | operational backlog |
+| Operational P&L | June 2026 revenue 6.902.000 CLP and cost 0 across client/space/organization | provisional; margin not canonical |
+| DTE queue | `greenhouse_finance.dte_emission_queue` exists and has 0 rows | pass for DB infra |
+| DTE retry scheduler | Code complete locally: `processDteEmissionRetryQueue`, ops-worker `POST /finance/dte-emission-retry`, `ops-finance-dte-emission-retry` every 15 min in deploy script, async-critical pattern in cron gates | rollout pending |
+| Quote data | commercial quotations 57 / 119.953.739,68 CLP; finance quotes 37 / 112.379.302 CLP; commercial and finance quote line orphans 0/0 | pass on read integrity |
 
 ### Core counts
 
@@ -304,7 +325,7 @@ Treatment applied locally under `TASK-1194` Slice 0:
 
 Remaining:
 
-- Register or intentionally retire `/api/cron/dte-emission-retry`.
+- Deploy/re-smoke `ops-finance-dte-emission-retry` from `services/ops-worker/deploy.sh`.
 - Add reliability signal for pending/retry/dead-letter queue state.
 
 ### FD-2 - Action-level Finance capabilities remain the highest control gap
@@ -472,7 +493,7 @@ Remaining: deploy/re-smoke staging `/api/finance/bank`; staging will keep showin
 
 Priority order if the goal is "Finance funciona y funciona bien":
 
-1. Register or intentionally retire `/api/cron/dte-emission-retry` and add DTE queue reliability signal (`FD-1` remainder).
+1. Deploy/re-smoke the new `ops-finance-dte-emission-retry` scheduler home and add DTE queue reliability signal (`FD-1` remainder).
 2. Deploy/re-smoke the local PnL dashboard fix in staging (`FD-10`).
 3. Deploy/re-smoke the local `data-quality` false-positive ledger fix (`FD-5`).
 4. Deploy/re-smoke TASK-1195/F29 consolidated endpoint and card if it is ready for staging.
@@ -507,6 +528,13 @@ Priority order if the goal is "Finance funciona y funciona bien":
 - `pnpm exec vitest run src/lib/finance/bank-freshness.test.ts src/app/api/finance/cash-position/route.test.ts src/app/api/finance/dashboard/cashflow/route.test.ts`
 - `pnpm exec eslint src/lib/finance/bank-freshness.ts src/lib/finance/bank-freshness.test.ts src/lib/finance/account-balances.ts`
 - GVC local `/finance/bank`: first run blocked by initial webpack compile/skeleton; second run passed at `.captures/2026-06-20T19-51-30_inline-finance-bank`.
+- `pnpm exec vitest run src/lib/finance/dte-emission-retry.test.ts src/app/api/cron/dte-emission-retry/route.test.ts services/ops-worker/deploy-contract.test.ts src/lib/reliability/queries/cron-staging-drift.test.ts services/ops-worker/cron-handler-wrapper.test.ts`
+- `pnpm exec eslint src/lib/finance/dte-emission-retry.ts src/lib/finance/dte-emission-retry.test.ts src/app/api/cron/dte-emission-retry/route.ts src/app/api/cron/dte-emission-retry/route.test.ts services/ops-worker/server.ts services/ops-worker/deploy-contract.test.ts scripts/ci/vercel-cron-async-critical-gate.mjs src/lib/reliability/queries/cron-staging-drift.ts`
+- `pnpm typecheck`
+- `pnpm vercel-cron-gate`
+- `pnpm worker:runtime-deps-gate`
+- `pnpm finance:e2e-gate` (skipped: no Finance product route handlers changed)
+- `pnpm qa:gates --changed --agent codex --task TASK-1194 --finance --runtime --cron --docs`
 - Static API route scan for `src/app/api/finance/**`, `src/app/api/admin/finance/**` and Finance-owned crons.
 - Read-only Cloud SQL probes for commercial/finance quotations, quote line orphans, AR/AP aging, payment profiles and external cash signals.
 - Read-only Cloud SQL probe comparing raw vs canonical data-quality ledger drift (`expense` raw 69 -> canonical 0; income settlement drift 0).

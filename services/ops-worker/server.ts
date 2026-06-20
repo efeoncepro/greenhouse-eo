@@ -20,6 +20,7 @@
  *   POST /reliability-ai-watch         → Reliability AI Observer (TASK-638): Gemini watcher over RCP overview
  *   POST /cloud-cost-ai-watch          → Cloud cost FinOps AI + deterministic alert sweep (TASK-769)
  *   POST /finance/account-balances/fx-drift/remediate → Bounded FX drift remediation (TASK-842)
+ *   POST /finance/dte-emission-retry → Retry queued DTE emissions (TASK-1194)
  *   POST /notion-conformed/sync        → Notion BQ raw → conformed → PG cycle (replaces Vercel /api/cron/sync-conformed)
  *   POST /outbox/publish-batch         → Outbox PG → BQ raw publisher with state machine (TASK-773, replaces Vercel /api/cron/outbox-publish)
  *   POST /email-deliverability-monitor → Bounce/complaint rate monitor (TASK-775, replaces Vercel /api/cron/email-deliverability-monitor)
@@ -82,6 +83,7 @@ import {
   type FxDriftRemediationPolicy
 } from '@/lib/finance/account-balances-fx-drift-remediation'
 import { getFinanceLedgerHealth } from '@/lib/finance/ledger-health'
+import { processDteEmissionRetryQueue } from '@/lib/finance/dte-emission-retry'
 import { captureMessageWithDomain, captureWithDomain } from '@/lib/observability/capture'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { discoverOrganizationBrandAssets } from '@/lib/account-360/organization-brand-assets-discovery'
@@ -1753,6 +1755,25 @@ const handleReconciliationAutoMatch = wrapCronHandler({
   run: async (): Promise<Record<string, unknown>> => runReconciliationAutoMatch()
 })
 
+// ─── /finance/dte-emission-retry ───────────────────────────────────────────
+//
+// TASK-1194 Slice 1 — DTE retry leaves the orphaned Vercel cron route class and
+// gets a Cloud Scheduler/ops-worker home. The Next route remains as guarded
+// fallback, but both call the same canonical processor.
+const handleFinanceDteEmissionRetry = wrapCronHandler({
+  name: 'finance-dte-emission-retry',
+  domain: 'finance',
+  run: async (body): Promise<Record<string, unknown>> => {
+    const batchSize = typeof body.batchSize === 'number' && Number.isFinite(body.batchSize)
+      ? Math.max(1, Math.min(25, Math.floor(body.batchSize)))
+      : 5
+
+    const result = await processDteEmissionRetryQueue(batchSize)
+
+    return { ...result, batchSize }
+  }
+})
+
 // ─── /ico/member-sync ───────────────────────────────────────────────────────
 //
 // TASK-775 Slice 9 — ICO member sync migrado a Cloud Run. Async-critical:
@@ -2292,6 +2313,12 @@ const server = createServer(async (req, res) => {
 
     if (method === 'POST' && path === '/reconciliation/auto-match') {
       await handleReconciliationAutoMatch(req, res)
+
+      return
+    }
+
+    if (method === 'POST' && path === '/finance/dte-emission-retry') {
+      await handleFinanceDteEmissionRetry(req, res)
 
       return
     }

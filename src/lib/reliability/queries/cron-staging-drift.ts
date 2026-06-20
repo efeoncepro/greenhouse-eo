@@ -59,7 +59,8 @@ const ASYNC_CRITICAL_PATH_PATTERNS = [
   /\/api\/cron\/ico-/i,
   /\/api\/cron\/.*-monitor/i,
   /\/api\/cron\/email-delivery-retry/i,
-  /\/api\/cron\/reconciliation-auto-match/i
+  /\/api\/cron\/reconciliation-auto-match/i,
+  /\/api\/cron\/dte-emission-retry/i
 ]
 
 /**

@@ -884,6 +884,13 @@ upsert_scheduler_job \
 echo "  -> ops-finance-ledger-health: 30 5 * * * America/Santiago (daily 05:30, drift probe + Sentry alert, TASK-702)"
 
 upsert_scheduler_job \
+  "ops-finance-dte-emission-retry" \
+  "*/15 * * * *" \
+  "/finance/dte-emission-retry" \
+  '{"batchSize":5}'
+echo "  -> ops-finance-dte-emission-retry: */15 * * * * America/Santiago (queued DTE emission retry, TASK-1194)"
+
+upsert_scheduler_job \
   "ops-quotation-lifecycle" \
   "0 7 * * *" \
   "/quotation-lifecycle/sweep" \
