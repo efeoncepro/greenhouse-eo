@@ -17,6 +17,7 @@ import type {
 } from '@/lib/commercial/sample-sprints/runtime-projection-types'
 
 import SampleSprintsMockupView, {
+  type RuntimeAuditEvent,
   type RuntimeSampleSprintOptions,
   type Signal,
   type Sprint,
@@ -65,12 +66,7 @@ type SampleSprintDetail = SampleSprintItem & {
     qualitativeNotes: string | null
   }>
   outcome: { outcomeId: string; outcomeKind: string; decisionDate: string } | null
-  auditEvents: Array<{
-    auditId: string
-    eventKind: string
-    reason: string | null
-    createdAt: string | null
-  }>
+  auditEvents: RuntimeAuditEvent[]
 }
 
 type Options = {
@@ -122,6 +118,8 @@ const getSprintStatus = (item: SampleSprintItem): SprintStatus => {
   if (item.outcomeKind === 'converted') return 'converted'
   if (['cancelled', 'cancelled_by_client', 'cancelled_by_provider'].includes(item.outcomeKind ?? '')) return 'cancelled'
   if (item.outcomeKind === 'dropped') return 'dropped'
+  if (item.approvalStatus === 'rejected') return 'rejected'
+  if (item.approvalStatus === 'withdrawn') return 'withdrawn'
   if (item.status === 'pending_approval') return 'pending_approval'
   if (item.status === 'active' && item.latestSnapshotDate) return 'reporting'
   if (item.status === 'active') return 'active'
@@ -387,6 +385,7 @@ const RuntimeWorkspaceView = ({
       initialSelectedSprintId={detail?.serviceId ?? runtimeItems[0]?.serviceId}
       initialActiveSurface={surfaceByMode[mode]}
       runtimeOptions={options}
+      runtimeAuditEvents={detail?.auditEvents ?? []}
     />
   )
 }

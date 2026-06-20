@@ -2,13 +2,15 @@
 
 > **Estado:** `released` (manifest transicionó a released, post-release health check verde). Orchestrator run [`27721723752`](https://github.com/efeoncepro/greenhouse-eo/actions/runs/27721723752) `completed/success`. Conducido por Claude tras pedido del operador ("paso a producción que Codex dejó preparado").
 
-## Sesión 2026-06-20 — Sample Sprints declare bloqueado por CHECK de services.status — Codex
+## Sesión 2026-06-20 — Sample Sprints create/detail desbloqueado — Codex
 
-> **Estado:** ✅ corregido en Cloud SQL dev. La UI `/agency/sample-sprints/new` mostraba el fallback "No fue posible declarar el Sample Sprint" porque `declareSampleSprint()` insertaba `greenhouse_core.services.status='pending_approval'`, pero `services_status_check` (agregado por TASK-836) solo permitía `active/closed/paused/legacy_seed_archived`. El error era un 500 SQL no mapeado, no un problema del deal/form.
-> - **Fix:** migración `20260620172000000_sample-sprint-service-status-check.sql` extiende `services_status_check` con `pending_approval` + DO block anti-drift.
-> - **Docs:** `GREENHOUSE_PILOT_ENGAGEMENT_ARCHITECTURE_V1` deja de afirmar que no existe CHECK y documenta el contrato real.
-> - **Rollout:** `pnpm pg:connect:migrate` aplicado; `pnpm pg:connect:status` confirma `No migrations to run`.
-> - **Gates:** vitest focal Sample Sprints `27/27` passed; `git diff --check` verde para la migración/doc.
+> **Estado:** `code complete, rollout pendiente` para el código; DB dev ya aplicada. La UI `/agency/sample-sprints/new` mostraba "No fue posible declarar el Sample Sprint" porque `declareSampleSprint()` insertaba `greenhouse_core.services.status='pending_approval'`, pero `services_status_check` (TASK-836) solo admitía `active/closed/paused/legacy_seed_archived`. Tras aplicar el CHECK, el create funcionó y dejó el service real `svc-7bec41af-0aa8-4bec-a5ea-be92a9d7bdeb`, pero el detalle de staging aún devolvía 500 porque el reader consultaba `engagement_audit_log.created_at`; la tabla real usa `occurred_at`.
+> - **Fix DB:** migración `20260620172000000_sample-sprint-service-status-check.sql` extiende `services_status_check` con `pending_approval` + DO block anti-drift; aplicada en Cloud SQL dev y `pnpm pg:connect:status` confirma `No migrations to run`.
+> - **Fix code:** `getSampleSprintDetail()` lee `occurred_at AS created_at`; la UI runtime recibe `auditEvents` reales, elimina el feed/costo mock del detalle y muestra estados `rejected/withdrawn` antes de `pending_approval`.
+> - **Docs:** `GREENHOUSE_PILOT_ENGAGEMENT_ARCHITECTURE_V1` documenta el CHECK real sobre `services.status`.
+> - **Evidencia local:** API detail/list HTTP 200; Playwright desktop/mobile sin 4xx/5xx ni overflow; GVC local revisado en `.captures/2026-06-20T17-06-25_inline-agency-sample-sprints-svc-7bec41af-0aa8-4bec-a5ea-be92a9d7bdeb`.
+> - **Gates:** vitest focal Sample Sprints `40/40`, ESLint focal, `git diff --check`, `route-reachability-gate`, `design:lint`, `ops:lint --changed`, `NODE_OPTIONS=--max-old-space-size=8192 pnpm exec tsc --noEmit`, `NODE_OPTIONS=--max-old-space-size=8192 pnpm build` OK. Build conserva warning ajeno de patrón dinámico en `roadmap/work-item-index/reader.ts`.
+> - **Pendiente:** commit/push/deploy para que staging use el fix de detail API/UI. Hasta ese rollout, staging ya permite crear por la migración aplicada, pero `/api/agency/sample-sprints/:id` puede seguir 500 con el bundle anterior.
 
 ## Sesión 2026-06-20 — TASK-1187 Deprecar space_id en tablas VAT (COMPLETE) — Claude
 

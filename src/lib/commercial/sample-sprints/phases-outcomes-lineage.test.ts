@@ -207,8 +207,12 @@ describe('engagement outcomes helpers', () => {
     ).resolves.toEqual({ outcomeId: 'engagement-outcome-1' })
 
     const calls = client.query.mock.calls as unknown as Array<[string, unknown[]?]>
+    const outcomeValues = calls[1][1] ?? []
 
     expect(calls[1][0]).toContain('INSERT INTO greenhouse_commercial.engagement_outcomes')
+    expect(outcomeValues).toHaveLength(10)
+    expect(outcomeValues[8]).toBeNull()
+    expect(outcomeValues[9]).toBe('user-1')
     expect(calls[2][0]).toContain('INSERT INTO greenhouse_commercial.engagement_audit_log')
     expect(calls[3][0]).toContain('INSERT INTO greenhouse_sync.outbox_events')
   })
@@ -257,7 +261,14 @@ describe('engagement outcomes helpers', () => {
       nextServiceId: 'SVC-HS-456'
     })
 
+    const calls = client.query.mock.calls as unknown as Array<[string, unknown[]?]>
+    const outcomeValues = calls[2][1] ?? []
+
     expect(client.query).toHaveBeenCalledTimes(7)
+    expect(outcomeValues).toHaveLength(10)
+    expect(outcomeValues[7]).toBe('SVC-HS-456')
+    expect(outcomeValues[8]).toBeNull()
+    expect(outcomeValues[9]).toBe('user-1')
   })
 
   it('maps duplicate terminal outcomes to conflict', async () => {

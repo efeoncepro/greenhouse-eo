@@ -175,6 +175,9 @@ export const GH_AGENCY = {
       outcome: 'Resultado',
       health: 'Salud comercial'
     },
+    states: {
+      withdrawn: 'Retirado'
+    },
     metrics: {
       totalTitle: 'Sample Sprints',
       totalEmpty: 'Sin registros',
@@ -235,9 +238,43 @@ export const GH_AGENCY = {
     runtimeMetrics: {
       noCostValue: '—',
       noCostHint: 'Sin costo registrado para el período actual.',
+      costSubheader: 'Costo interno esperado del engagement.',
       noProgressValue: 'Sin progreso',
       noProgressHint: 'El último snapshot no incluye porcentaje de avance medible.',
       teamUnresolvedHint: 'Algunos miembros propuestos no resolvieron en el directorio activo.'
+    },
+    activity: {
+      title: 'Auditoría',
+      previewTitle: 'Preview de eventos',
+      runtimeSubheader: 'Eventos inmutables del engagement.',
+      mockupSubheader: 'Secuencia referencial de eventos del flujo.',
+      emptyTitle: 'Sin eventos auditados aún',
+      emptyDescription: 'Cuando se apruebe, actualice o cierre el Sample Sprint, el evento aparecerá aquí.',
+      unknownEvent: 'Evento registrado',
+      events: {
+        declared: 'Sample Sprint declarado',
+        approved: 'Aprobación registrada',
+        rejected: 'Aprobación rechazada',
+        withdrawn: 'Declaración retirada',
+        phase_completed: 'Fase completada',
+        progress_snapshot_recorded: 'Snapshot registrado',
+        capacity_overridden: 'Override de capacidad auditado',
+        outcome_recorded: 'Resultado registrado',
+        converted: 'Conversión registrada',
+        dropped: 'Sample Sprint descartado',
+        cancelled: 'Sample Sprint cancelado',
+        'service.engagement.declared': 'Sample Sprint declarado',
+        'service.engagement.approved': 'Aprobación registrada',
+        'service.engagement.rejected': 'Aprobación rechazada',
+        'service.engagement.withdrawn': 'Declaración retirada',
+        'service.engagement.phase_completed': 'Fase completada',
+        'service.engagement.progress_snapshot_recorded': 'Snapshot registrado',
+        'service.engagement.capacity_overridden': 'Override de capacidad auditado',
+        'service.engagement.outcome_recorded': 'Resultado registrado',
+        'service.engagement.converted': 'Conversión registrada',
+        'service.engagement.dropped': 'Sample Sprint descartado',
+        'service.engagement.cancelled': 'Sample Sprint cancelado'
+      }
     },
     degraded: {
       bannerTitle: 'Datos parciales en este momento',
