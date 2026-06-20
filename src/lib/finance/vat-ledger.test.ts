@@ -37,6 +37,18 @@ vi.mock('@/lib/finance/reporting', () => ({
   getFinanceCurrentPeriod: () => ({ year: 2026, month: 4 })
 }))
 
+// TASK-725 — el materializador resuelve la operating entity (dueño fiscal).
+vi.mock('@/lib/account-360/organization-identity', () => ({
+  getOperatingEntityIdentity: vi.fn(async () => ({
+    organizationId: 'org-efeonce-test',
+    legalName: 'Efeonce Group SpA',
+    taxId: '77.357.182-1',
+    taxIdType: 'RUT',
+    legalAddress: null,
+    country: 'CL'
+  }))
+}))
+
 import { materializeVatLedgerForPeriod } from '@/lib/finance/vat-ledger'
 
 describe('materializeVatLedgerForPeriod', () => {
@@ -100,10 +112,20 @@ describe('materializeVatLedgerForPeriod', () => {
     expect(expenseInsert).toMatch(/\$\d+::text/)
     expect(expenseInsert?.match(/\$\d+::int/g)?.length).toBeGreaterThanOrEqual(4)
 
-    expect(monthlyPositionInsert).toMatch(/concat_ws\(':', space_id, \$\d+::text\)/)
+    // TASK-725 — la posición se llavea/agrupa por organization_id (entidad
+    // legal), no por space_id.
+    expect(monthlyPositionInsert).toMatch(/concat_ws\(':', organization_id, \$\d+::text\)/)
+    expect(monthlyPositionInsert).toMatch(/GROUP BY e\.organization_id/)
     expect(monthlyPositionInsert).toMatch(/'periodId', \$\d+::text/)
     expect(monthlyPositionInsert).toMatch(/'materializationReason', \$\d+::text/)
     expect(monthlyPositionInsert?.match(/\$\d+::text/g)?.length).toBeGreaterThanOrEqual(5)
+
+    // TASK-725 anti-regresión ISSUE-101: NUNCA re-introducir el gate de WHERE
+    // `space_id IS NOT NULL` que excluía el crédito fiscal del overhead. (El
+    // CASE `space_resolution_source` sí usa `q.space_id IS NOT NULL` como
+    // etiqueta — no es un gate y debe poder coexistir.)
+    expect(incomeInsert).not.toMatch(/COALESCE\(q\.space_id, cb\.space_id\) IS NOT NULL/)
+    expect(expenseInsert).not.toMatch(/AND e\.space_id IS NOT NULL/)
 
     expect(summary).toEqual({
       periodId: '2026-04',

@@ -154,6 +154,7 @@ import { getPayrollContractTaxonomyFallbackResolutionLegacySignal } from './quer
 import { getPayrollContractTaxonomyInvalidTupleDriftSignal } from './queries/payroll-contract-taxonomy-invalid-tuple-drift'
 import { getPayrollContractTaxonomyInvalidStatutoryApplicationSignal } from './queries/payroll-contract-taxonomy-invalid-statutory-application'
 import { getProviderBqSyncDeadLetterSignal } from './queries/provider-bq-sync-dead-letter'
+import { getVatPositionDriftSignal } from './queries/vat-position-drift'
 import { getHubspotCompaniesIntakeDeadLetterSignal } from './queries/hubspot-companies-intake-dead-letter'
 import { getWorkforceUnlinkedInternalUsersSignal } from './queries/workforce-unlinked-internal-users'
 // TASK-1082 — Knowledge Platform ingestion signals (moduleKey 'knowledge').
@@ -588,6 +589,9 @@ interface ReliabilityOverviewSources {
   hubspotCompaniesIntakeDeadLetter?: ReliabilitySignal | null
   workforceUnlinkedInternalUsers?: ReliabilitySignal | null
 
+  /** TASK-725 — Finance VAT position drift (documentos con IVA sin asiento en períodos materializados). */
+  vatPositionDrift?: ReliabilitySignal | null
+
   /** TASK-1082 — Knowledge ingestion signals (quarantine count + failed sync source). */
   knowledgeQuarantineCount?: ReliabilitySignal | null
   knowledgeSyncFailedSource?: ReliabilitySignal | null
@@ -1017,6 +1021,8 @@ export const buildReliabilityOverview = (
     ...(sources.financeClpDrift ?? []),
     // TASK-771 Slice 4 — Provider BQ sync dead-letter signal (drift PG↔BQ).
     ...(sources.providerBqSyncDeadLetter ?? []),
+    // TASK-725 — Finance VAT position drift (documentos con IVA sin asiento).
+    ...(sources.vatPositionDrift ? [sources.vatPositionDrift] : []),
     // TASK-878 Slice 2 — HubSpot companies intake dead-letter (async webhook path).
     ...(sources.hubspotCompaniesIntakeDeadLetter ? [sources.hubspotCompaniesIntakeDeadLetter] : []),
     // TASK-878 follow-up — Identity UX hardening: internal users sin member enlazado.
@@ -1394,6 +1400,14 @@ export const getReliabilityOverview = async (
       : await getProviderBqSyncDeadLetterSignal()
           .then(signal => [signal])
           .catch(() => null)
+
+  // TASK-725 Slice 5 — Finance VAT position drift. Detecta documentos con IVA
+  // dropeados del ledger en períodos materializados (bug-class ISSUE-101).
+  // Degrada honestamente (severity='unknown') si la query falla.
+  const vatPositionDrift =
+    preloadedSources.vatPositionDrift !== undefined
+      ? preloadedSources.vatPositionDrift
+      : await getVatPositionDriftSignal().catch(() => null)
 
   // TASK-878 Slice 2 — HubSpot companies intake dead-letter (mirror provider_bq_sync).
   // Detecta path async caído: webhook companies emite outbox event pero la projection
@@ -2143,6 +2157,7 @@ export const getReliabilityOverview = async (
     payrollContractTaxonomy,
     financeClpDrift,
     providerBqSyncDeadLetter,
+    vatPositionDrift,
     hubspotCompaniesIntakeDeadLetter,
     workforceUnlinkedInternalUsers,
     knowledgeQuarantineCount,
