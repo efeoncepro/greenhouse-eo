@@ -6321,6 +6321,9 @@ export interface GreenhouseFinanceVatLedgerEntries {
 }
 
 export interface GreenhouseFinanceVatMonthlyPositions {
+  /**
+   * DEPRECATED (TASK-1187, post-TASK-725): el scope fiscal es la entidad legal (organization_id); la posición consolida por entidad y esta columna queda siempre NULL. No usar como dimensión. Remoción física diferida.
+   */
   client_id: string | null;
   credit_document_count: Generated<number>;
   credit_fiscal_amount_clp: Generated<Numeric>;
@@ -6340,6 +6343,9 @@ export interface GreenhouseFinanceVatMonthlyPositions {
   period_id: string;
   period_month: number;
   period_year: number;
+  /**
+   * DEPRECATED (TASK-1187, post-TASK-725): el scope fiscal es la entidad legal (organization_id); la posición consolida por entidad y esta columna queda siempre NULL. No usar como dimensión. Remoción física diferida.
+   */
   space_id: string | null;
   vat_position_id: string;
 }
