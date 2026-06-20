@@ -18,6 +18,13 @@ export type GreenhouseShinyBorderIntensity = 'subtle' | 'medium' | 'strong'
  */
 export type GreenhouseShinyBorderVariant = 'surface' | 'cta'
 
+/**
+ * Densidad del contenido (solo aplica a `variant='cta'`): `comfortable` = el tamaño generoso
+ * histórico ("Seguir con Nexa"); `compact` = misma marca/shiny/hover en una caja más pequeña, para
+ * un CTA que vive dentro de una card/sección y no debe dominar el bloque.
+ */
+export type GreenhouseShinyBorderSize = 'comfortable' | 'compact'
+
 export interface GreenhouseShinyBorderProps {
   children: ReactNode
   asButton?: boolean
@@ -28,6 +35,7 @@ export interface GreenhouseShinyBorderProps {
   onClick?: MouseEventHandler<HTMLButtonElement>
   palette?: GreenhouseShinyBorderPalette
   variant?: GreenhouseShinyBorderVariant
+  size?: GreenhouseShinyBorderSize
   sx?: SxProps<Theme>
   contentSx?: SxProps<Theme>
   type?: 'button' | 'submit' | 'reset'
@@ -54,10 +62,12 @@ const GreenhouseShinyBorder = ({
   onClick,
   palette = 'axis',
   variant = 'surface',
+  size = 'comfortable',
   sx,
   type = 'button'
 }: GreenhouseShinyBorderProps) => {
   const isCta = variant === 'cta'
+  const isCompact = isCta && size === 'compact'
 
   const actionProps = asButton
     ? {
@@ -118,7 +128,7 @@ const GreenhouseShinyBorder = ({
               boxShadow: `-${theme.spacing(1)} ${theme.spacing(0.25)} ${theme.spacing(11)} ${alpha(accent, 0.38 * scale)}`
             },
             '&:hover [data-gh-shiny-content]': {
-              transform: disabled ? 'none' : 'scale(1.06)'
+              transform: disabled ? 'none' : `scale(${isCompact ? 1.03 : 1.06})`
             },
             '@media (prefers-reduced-motion: reduce)': {
               transition: 'none',
@@ -183,19 +193,20 @@ const GreenhouseShinyBorder = ({
             return {
               position: 'relative',
               zIndex: 1,
-              // `cta` = compacto + contenido inline (marca/ícono líder + label); `surface` = bloque generoso.
+              // `cta` = contenido inline (marca/ícono líder + label); `surface` = bloque generoso.
+              // `size='compact'` (solo cta): densidad de producto (vive dentro de una card, no domina).
               display: 'inline-flex',
               alignItems: 'center',
-              gap: isCta ? theme.spacing(1.25) : 0,
-              px: isCta ? 4 : 6,
-              py: isCta ? 2.25 : 3,
+              gap: isCta ? theme.spacing(isCompact ? 1 : 1.25) : 0,
+              px: isCta ? (isCompact ? 3 : 4) : 6,
+              py: isCta ? (isCompact ? 1.5 : 2.25) : 3,
               borderRadius: `${theme.shape.customBorderRadius.xxl}px`,
               color: theme.palette.common.white,
               bgcolor: theme.axis.ramp.primary[900],
               background: `radial-gradient(circle ${theme.spacing(20)} at 80% -50%, ${alpha(theme.palette.common.white, 0.42)}, ${theme.axis.ramp.primary[900]} 68%)`,
               boxShadow: `inset 0 1px 0 ${alpha(theme.palette.common.white, 0.18)}`,
               fontWeight: 700,
-              fontSize: isCta ? '0.9375rem' : undefined,
+              fontSize: isCta ? (isCompact ? '0.875rem' : '0.9375rem') : undefined,
               lineHeight: 1.25,
               transformOrigin: 'center',
               transition: 'transform 240ms ease',

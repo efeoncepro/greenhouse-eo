@@ -536,6 +536,8 @@ const AskNexaButton = ({ signalId }: { signalId: string }) => {
     <GreenhouseShinyBorder
       asButton
       variant='cta'
+      size='compact'
+      intensity='subtle'
       palette='nexa'
       ariaLabel={GH_NEXA.insight_ask_nexa_aria}
       onClick={handleAsk}
@@ -547,7 +549,7 @@ const AskNexaButton = ({ signalId }: { signalId: string }) => {
 }
 
 const InsightActionsRow = ({ drillId, signalId }: { drillId: string; signalId: string }) => (
-  <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} data-capture='insight-ask-nexa'>
+  <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.25} alignItems={{ xs: 'stretch', sm: 'center' }} data-capture='insight-ask-nexa'>
     <AskNexaButton signalId={signalId} />
     <CopyLinkButton drillId={drillId} />
   </Stack>
@@ -577,8 +579,10 @@ const CopyLinkButton = ({ drillId }: { drillId: string }) => {
       <Button
         variant='tonal'
         color='secondary'
+        size='small'
         onClick={handleCopy}
         startIcon={<i className='tabler-link' aria-hidden='true' />}
+        sx={{ minBlockSize: 34, px: 2.5 }}
       >
         {GH_NEXA.detail_action_copy_link}
       </Button>
