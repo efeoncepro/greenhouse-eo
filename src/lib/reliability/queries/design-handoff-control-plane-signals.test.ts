@@ -25,6 +25,14 @@ const { getDesignHandoffOrphanSurfacesSignal, DESIGN_HANDOFF_ORPHAN_SURFACES_SIG
   './design-handoff-orphan-surfaces'
 )
 
+const {
+  getDesignHandoffPrimitiveGovernanceSignals,
+  DESIGN_HANDOFF_PRIMITIVE_DECISION_MISSING_SIGNAL_ID,
+  DESIGN_HANDOFF_PRIMITIVE_LAB_MISSING_SIGNAL_ID,
+  DESIGN_HANDOFF_RUNTIME_WITHOUT_GVC_SIGNAL_ID,
+  DESIGN_HANDOFF_ROUTE_ONLY_REUSE_SUSPECT_SIGNAL_ID
+} = await import('./design-handoff-primitive-governance')
+
 describe('TASK-1175 design handoff reliability signals', () => {
   beforeEach(() => {
     vi.clearAllMocks()
@@ -165,6 +173,53 @@ describe('TASK-1175 design handoff reliability signals', () => {
       'platform',
       expect.objectContaining({
         tags: expect.objectContaining({ source: 'reliability_signal_design_handoff_orphan_surfaces' })
+      })
+    )
+  })
+
+  it('returns primitive governance warning signals when handoffs miss DS decisions and evidence', async () => {
+    mockRunGreenhousePostgresQuery.mockResolvedValueOnce([
+      {
+        active_count: 9,
+        primitive_decision_missing_count: 2,
+        primitive_lab_missing_count: 1,
+        runtime_without_gvc_count: 3,
+        route_only_reuse_suspect_count: 1
+      }
+    ])
+
+    const signals = await getDesignHandoffPrimitiveGovernanceSignals()
+
+    expect(signals).toHaveLength(4)
+    expect(signals.map(signal => signal.signalId)).toEqual([
+      DESIGN_HANDOFF_PRIMITIVE_DECISION_MISSING_SIGNAL_ID,
+      DESIGN_HANDOFF_PRIMITIVE_LAB_MISSING_SIGNAL_ID,
+      DESIGN_HANDOFF_RUNTIME_WITHOUT_GVC_SIGNAL_ID,
+      DESIGN_HANDOFF_ROUTE_ONLY_REUSE_SUSPECT_SIGNAL_ID
+    ])
+    expect(signals.map(signal => signal.severity)).toEqual(['warning', 'warning', 'warning', 'warning'])
+    expect(signals[0]?.summary).toContain('2 de 9')
+    expect(signals[2]?.evidence).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ label: 'count', value: '3' }),
+        expect.objectContaining({ label: 'active_count', value: '9' })
+      ])
+    )
+  })
+
+  it('degrades primitive governance signals without exposing raw DB errors', async () => {
+    mockRunGreenhousePostgresQuery.mockRejectedValueOnce(new Error('column implementation_strategy missing'))
+
+    const signals = await getDesignHandoffPrimitiveGovernanceSignals()
+
+    expect(signals).toHaveLength(4)
+    expect(signals.every(signal => signal.severity === 'unknown')).toBe(true)
+    expect(signals.map(signal => signal.summary).join(' ')).not.toContain('implementation_strategy')
+    expect(mockCaptureWithDomain).toHaveBeenCalledWith(
+      expect.any(Error),
+      'platform',
+      expect.objectContaining({
+        tags: expect.objectContaining({ source: 'reliability_signal_design_handoff_primitive_governance' })
       })
     )
   })

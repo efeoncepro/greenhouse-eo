@@ -2185,6 +2185,13 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
       scope: 'tenant',
       source: 'role'
     })
+    addEntitlement(entries, {
+      module: 'design_system',
+      capability: 'design_system.handoff.primitive_decision.manage',
+      action: 'update',
+      scope: 'tenant',
+      source: 'role'
+    })
   }
 
   if (hasRouteGroup(subject, 'internal') || hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)) {

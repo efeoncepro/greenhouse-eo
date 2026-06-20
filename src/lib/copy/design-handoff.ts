@@ -1,9 +1,12 @@
 import type {
   DesignHandoffEvidenceType,
+  DesignHandoffImplementationStrategy,
   DesignHandoffKind,
   DesignHandoffLinkType,
   DesignHandoffNodeSnapshotStatus,
   DesignHandoffPriority,
+  DesignHandoffPrimitiveDecisionStatus,
+  DesignHandoffPrimitiveWarningCode,
   DesignHandoffStatus
 } from '@/lib/design-system/handoff/types'
 
@@ -28,7 +31,8 @@ export const DESIGN_HANDOFF_COPY = {
     evidence: 'Evidencia',
     workItems: 'Trazabilidad',
     commandCenter: 'Command center',
-    implementationReadiness: 'Readiness de implementación'
+    implementationReadiness: 'Readiness de implementación',
+    primitiveGovernance: 'Primitive governance'
   },
   helper: {
     emptyAllowlist:
@@ -52,6 +56,7 @@ export const DESIGN_HANDOFF_COPY = {
     attachEvidence: 'Adjuntar evidencia',
     linkWorkItem: 'Vincular work item',
     verifyNode: 'Verificar nodo Figma',
+    savePrimitiveDecision: 'Guardar decisión DS',
     startImplementation: 'Tomar para implementar',
     sendReview: 'Enviar a review',
     markImplemented: 'Marcar implementado',
@@ -69,6 +74,7 @@ export const DESIGN_HANDOFF_COPY = {
     evidenceAttached: 'Evidencia adjuntada.',
     linkAttached: 'Work item vinculado.',
     nodeVerified: 'Nodo Figma verificado.',
+    primitiveDecisionSaved: 'Decisión Primitive governance actualizada.',
     allowlistSaved: 'Archivo aprobado para handoff.',
     allowlistDeprecated: 'Archivo deprecado.',
     driftLoaded: 'Signals cargados.'
@@ -120,4 +126,30 @@ export const DESIGN_HANDOFF_NODE_STATUS_LABELS: Record<DesignHandoffNodeSnapshot
   stale: 'Stale',
   unavailable: 'No disponible',
   unknown: 'Sin verificar'
+}
+
+export const DESIGN_HANDOFF_IMPLEMENTATION_STRATEGY_LABELS: Record<DesignHandoffImplementationStrategy, string> = {
+  route_only: 'Route only',
+  reuse_primitive: 'Reusar primitive',
+  extend_primitive: 'Extender primitive',
+  new_primitive: 'Nueva primitive',
+  variant_kind: 'Variant / kind',
+  research_required: 'Requiere investigación'
+}
+
+export const DESIGN_HANDOFF_PRIMITIVE_DECISION_STATUS_LABELS: Record<DesignHandoffPrimitiveDecisionStatus, string> = {
+  missing: 'Sin decisión',
+  research: 'Investigación',
+  warning: 'Con deuda',
+  ready: 'Governed'
+}
+
+export const DESIGN_HANDOFF_PRIMITIVE_WARNING_LABELS: Record<DesignHandoffPrimitiveWarningCode, string> = {
+  primitive_decision_missing: 'Falta decidir la estrategia DS',
+  primitive_key_missing: 'Falta primitive key',
+  lab_route_missing: 'Falta Lab del Design System',
+  runtime_route_missing: 'Falta ruta runtime',
+  gvc_evidence_missing: 'Falta evidencia GVC',
+  route_only_reuse_suspect: 'Route only sospechoso',
+  research_overdue: 'Investigación vencida'
 }

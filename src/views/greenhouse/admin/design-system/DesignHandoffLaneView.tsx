@@ -31,10 +31,13 @@ import {
 import {
   DESIGN_HANDOFF_COPY,
   DESIGN_HANDOFF_EVIDENCE_TYPE_LABELS,
+  DESIGN_HANDOFF_IMPLEMENTATION_STRATEGY_LABELS,
   DESIGN_HANDOFF_KIND_LABELS,
   DESIGN_HANDOFF_LINK_TYPE_LABELS,
   DESIGN_HANDOFF_NODE_STATUS_LABELS,
   DESIGN_HANDOFF_PRIORITY_LABELS,
+  DESIGN_HANDOFF_PRIMITIVE_DECISION_STATUS_LABELS,
+  DESIGN_HANDOFF_PRIMITIVE_WARNING_LABELS,
   DESIGN_HANDOFF_STATUS_LABELS
 } from '@/lib/copy/design-handoff'
 import { parseFigmaUrl } from '@/lib/design-system/figma-nodes/parse-figma-url'
@@ -42,10 +45,12 @@ import type {
   DesignHandoffAllowedFile,
   DesignHandoffEntry,
   DesignHandoffEvidenceType,
+  DesignHandoffImplementationStrategy,
   DesignHandoffKind,
   DesignHandoffLinkType,
   DesignHandoffNodeSnapshotStatus,
   DesignHandoffPriority,
+  DesignHandoffPrimitiveDecisionStatus,
   DesignHandoffStatus
 } from '@/lib/design-system/handoff/types'
 import { formatDate as formatCanonicalDate, formatDateTime as formatCanonicalDateTime } from '@/lib/format'
@@ -61,6 +66,7 @@ type CommandKey =
   | 'create'
   | 'planning'
   | 'owners'
+  | 'primitiveDecision'
   | 'evidence'
   | 'link'
   | 'verify'
@@ -90,6 +96,13 @@ const PRIORITY_TONES: Record<DesignHandoffPriority, 'default' | 'info' | 'warnin
   normal: 'info',
   high: 'warning',
   urgent: 'error'
+}
+
+const PRIMITIVE_DECISION_TONES: Record<DesignHandoffPrimitiveDecisionStatus, 'default' | 'info' | 'success' | 'warning'> = {
+  missing: 'warning',
+  research: 'info',
+  warning: 'warning',
+  ready: 'success'
 }
 
 const SNAPSHOT_TONES: Record<DesignHandoffNodeSnapshotStatus, 'default' | 'info' | 'success' | 'warning' | 'error'> = {
@@ -145,6 +158,15 @@ const EVIDENCE_TYPES: DesignHandoffEvidenceType[] = [
 
 const PRIORITIES: DesignHandoffPriority[] = ['low', 'normal', 'high', 'urgent']
 
+const IMPLEMENTATION_STRATEGIES: DesignHandoffImplementationStrategy[] = [
+  'route_only',
+  'reuse_primitive',
+  'extend_primitive',
+  'new_primitive',
+  'variant_kind',
+  'research_required'
+]
+
 const parseErrorPayload = async (res: Response, fallback: string) => {
   const payload = (await res.json().catch(() => null)) as { error?: string; message?: string } | null
 
@@ -178,6 +200,9 @@ const hasImplementationEvidence = (entry: DesignHandoffEntry | null) =>
     )
   )
 
+const hasPrimitiveGvcEvidence = (entry: DesignHandoffEntry | null) =>
+  Boolean(entry?.primitiveGvcRef || entry?.evidence?.some(evidence => evidence.evidenceType === 'gvc_capture'))
+
 const getSnapshotStatus = (entry: DesignHandoffEntry): DesignHandoffNodeSnapshotStatus =>
   entry.latestNodeSnapshot?.nodeStatus ?? 'unknown'
 
@@ -206,6 +231,13 @@ const getReadiness = (entry: DesignHandoffEntry | null) => {
       label: 'Evidencia runtime/GVC',
       done: hasImplementationEvidence(entry),
       helper: hasImplementationEvidence(entry) ? 'Lista para cierre' : 'Requerida antes de implementar'
+    },
+    {
+      label: 'Primitive governance',
+      done: entry.primitiveGovernance?.decisionStatus === 'ready',
+      helper: entry.primitiveGovernance
+        ? DESIGN_HANDOFF_PRIMITIVE_DECISION_STATUS_LABELS[entry.primitiveGovernance.decisionStatus]
+        : 'Sin decisión'
     }
   ]
 }
@@ -345,6 +377,7 @@ const HandoffLedgerRow = ({
   const snapshotStatus = getSnapshotStatus(entry)
   const evidenceCount = entry.evidence?.length ?? 0
   const linkCount = entry.links?.length ?? 0
+  const primitiveStatus = entry.primitiveGovernance?.decisionStatus ?? 'missing'
 
   return (
     <Box
@@ -452,6 +485,14 @@ const HandoffLedgerRow = ({
           tone={SNAPSHOT_TONES[snapshotStatus]}
           iconClassName='tabler-brand-figma'
         />
+        <GreenhouseChip
+          size='small'
+          kind='status'
+          variant='label'
+          label={DESIGN_HANDOFF_PRIMITIVE_DECISION_STATUS_LABELS[primitiveStatus]}
+          tone={PRIMITIVE_DECISION_TONES[primitiveStatus]}
+          iconClassName='tabler-components'
+        />
       </Stack>
     </Box>
   )
@@ -492,6 +533,17 @@ const DesignHandoffLaneView = () => {
   const [planningBlockedReason, setPlanningBlockedReason] = useState('')
   const [designerOwner, setDesignerOwner] = useState('')
   const [devOwner, setDevOwner] = useState('')
+  const [implementationStrategy, setImplementationStrategy] = useState<DesignHandoffImplementationStrategy | ''>('')
+  const [primitiveKey, setPrimitiveKey] = useState('')
+  const [primitiveVariant, setPrimitiveVariant] = useState('')
+  const [primitiveKind, setPrimitiveKind] = useState('')
+  const [primitiveLabRoute, setPrimitiveLabRoute] = useState('')
+  const [primitiveRuntimeRoute, setPrimitiveRuntimeRoute] = useState('')
+  const [primitiveGvcRef, setPrimitiveGvcRef] = useState('')
+  const [primitiveDocsRef, setPrimitiveDocsRef] = useState('')
+  const [primitiveRationale, setPrimitiveRationale] = useState('')
+  const [primitiveDecisionOwner, setPrimitiveDecisionOwner] = useState('')
+  const [primitiveDecisionDueAt, setPrimitiveDecisionDueAt] = useState('')
   const [evidenceType, setEvidenceType] = useState<DesignHandoffEvidenceType>('gvc_capture')
   const [evidenceRef, setEvidenceRef] = useState('')
   const [evidenceLabel, setEvidenceLabel] = useState('')
@@ -567,8 +619,9 @@ const DesignHandoffLaneView = () => {
     const missingEvidence = entries.filter(entry => entry.status === 'implemented' && !hasImplementationEvidence(entry)).length
     const nodeDrift = activeEntries.filter(entry => getSnapshotStatus(entry) !== 'reachable').length
     const blocked = activeEntries.filter(entry => entry.blockedReason).length
+    const primitiveGaps = activeEntries.filter(entry => entry.primitiveGovernance?.decisionStatus !== 'ready').length
 
-    return { missingEvidence, nodeDrift, blocked }
+    return { missingEvidence, nodeDrift, blocked, primitiveGaps }
   }, [activeEntries, entries])
 
   const reload = useCallback(async (showMessage = false) => {
@@ -609,6 +662,17 @@ const DesignHandoffLaneView = () => {
     setPlanningBlockedReason(selectedEntry.blockedReason ?? '')
     setDesignerOwner(selectedEntry.designerOwnerMemberId ?? '')
     setDevOwner(selectedEntry.devOwnerMemberId ?? '')
+    setImplementationStrategy(selectedEntry.implementationStrategy ?? '')
+    setPrimitiveKey(selectedEntry.primitiveKey ?? '')
+    setPrimitiveVariant(selectedEntry.primitiveVariant ?? '')
+    setPrimitiveKind(selectedEntry.primitiveKind ?? '')
+    setPrimitiveLabRoute(selectedEntry.primitiveLabRoute ?? '')
+    setPrimitiveRuntimeRoute(selectedEntry.primitiveRuntimeRoute ?? selectedEntry.implementedSurfaceKey ?? selectedEntry.targetSurfaceKey ?? '')
+    setPrimitiveGvcRef(selectedEntry.primitiveGvcRef ?? '')
+    setPrimitiveDocsRef(selectedEntry.primitiveDocsRef ?? '')
+    setPrimitiveRationale(selectedEntry.primitiveRationale ?? '')
+    setPrimitiveDecisionOwner(selectedEntry.primitiveDecisionOwner ?? '')
+    setPrimitiveDecisionDueAt(selectedEntry.primitiveDecisionDueAt ? selectedEntry.primitiveDecisionDueAt.slice(0, 10) : '')
   }, [selectedEntry])
 
   useEffect(() => {
@@ -769,6 +833,38 @@ const DesignHandoffLaneView = () => {
       await reload()
 
       return DESIGN_HANDOFF_COPY.messages.ownersSaved
+    })
+
+  const savePrimitiveDecision = () =>
+    runCommand('primitiveDecision', async () => {
+      if (!selectedEntry) return DESIGN_HANDOFF_COPY.messages.primitiveDecisionSaved
+
+      const res = await fetch(
+        `/api/design-system/handoff/${encodeURIComponent(selectedEntry.entryId)}/primitive-decision`,
+        {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            implementationStrategy: implementationStrategy || null,
+            primitiveKey,
+            primitiveVariant,
+            primitiveKind,
+            primitiveLabRoute,
+            primitiveRuntimeRoute,
+            primitiveGvcRef,
+            primitiveDocsRef,
+            primitiveRationale,
+            primitiveDecisionOwner,
+            primitiveDecisionDueAt
+          })
+        }
+      )
+
+      if (!res.ok) throw new Error(await parseErrorPayload(res, 'No se pudo guardar la decisión DS.'))
+
+      await reload()
+
+      return DESIGN_HANDOFF_COPY.messages.primitiveDecisionSaved
     })
 
   const attachEvidence = () =>
@@ -1171,12 +1267,13 @@ const DesignHandoffLaneView = () => {
       <Box
         sx={{
           display: 'grid',
-          gridTemplateColumns: { xs: '1fr', md: 'repeat(4, minmax(0, 1fr))' },
+          gridTemplateColumns: { xs: '1fr', md: 'repeat(5, minmax(0, 1fr))' },
           gap: 2
         }}
       >
         <MetricTile label='Activos' value={activeEntries.length} helper='No archivados en el ledger' tone='info' icon='tabler-stack-2' />
         <MetricTile label='Bloqueos' value={metrics.blocked} helper='Con razón de bloqueo' tone={metrics.blocked ? 'warning' : 'success'} icon='tabler-lock' />
+        <MetricTile label='Primitive gaps' value={metrics.primitiveGaps} helper='Sin decisión DS lista' tone={metrics.primitiveGaps ? 'warning' : 'success'} icon='tabler-components' />
         <MetricTile label='Node drift' value={metrics.nodeDrift} helper='Snapshot no reachable' tone={metrics.nodeDrift ? 'warning' : 'success'} icon='tabler-brand-figma' />
         <MetricTile label='Missing evidence' value={metrics.missingEvidence} helper='Implementados sin GVC/runtime' tone={metrics.missingEvidence ? 'error' : 'success'} icon='tabler-shield-x' />
       </Box>
@@ -1334,6 +1431,152 @@ const DesignHandoffLaneView = () => {
                 </Box>
               </Stack>
             ))}
+          </Stack>
+
+          <Divider />
+
+          <Stack spacing={2} data-capture='design-system-handoff-primitive-governance'>
+            <Stack direction='row' spacing={1} alignItems='center' justifyContent='space-between' flexWrap='wrap' useFlexGap>
+              <Typography variant='subtitle2'>{DESIGN_HANDOFF_COPY.sections.primitiveGovernance}</Typography>
+              <GreenhouseChip
+                size='small'
+                kind='status'
+                variant='label'
+                tone={PRIMITIVE_DECISION_TONES[selectedEntry.primitiveGovernance?.decisionStatus ?? 'missing']}
+                label={
+                  DESIGN_HANDOFF_PRIMITIVE_DECISION_STATUS_LABELS[
+                    selectedEntry.primitiveGovernance?.decisionStatus ?? 'missing'
+                  ]
+                }
+                iconClassName='tabler-components'
+              />
+            </Stack>
+
+            {(selectedEntry.primitiveGovernance?.warnings ?? []).length > 0 ? (
+              <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
+                {(selectedEntry.primitiveGovernance?.warnings ?? []).map(warning => (
+                  <GreenhouseChip
+                    key={warning}
+                    size='small'
+                    kind='status'
+                    variant='outlined'
+                    tone='warning'
+                    label={DESIGN_HANDOFF_PRIMITIVE_WARNING_LABELS[warning]}
+                    iconClassName='tabler-alert-triangle'
+                  />
+                ))}
+              </Stack>
+            ) : null}
+
+            <FormControl fullWidth>
+              <InputLabel id='design-handoff-strategy-label'>Estrategia</InputLabel>
+              <Select
+                labelId='design-handoff-strategy-label'
+                label='Estrategia'
+                value={implementationStrategy}
+                onChange={event => setImplementationStrategy(event.target.value as DesignHandoffImplementationStrategy)}
+              >
+                <MenuItem value=''>Sin decisión</MenuItem>
+                {IMPLEMENTATION_STRATEGIES.map(strategy => (
+                  <MenuItem key={strategy} value={strategy}>
+                    {DESIGN_HANDOFF_IMPLEMENTATION_STRATEGY_LABELS[strategy]}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+
+            <TextField
+              label='Primitive key'
+              value={primitiveKey}
+              onChange={event => setPrimitiveKey(event.target.value)}
+              placeholder='CompositionShell'
+              fullWidth
+            />
+
+            <Stack direction='column' spacing={2}>
+              <TextField
+                label='Variant'
+                value={primitiveVariant}
+                onChange={event => setPrimitiveVariant(event.target.value)}
+                placeholder='inspector'
+                fullWidth
+              />
+              <TextField
+                label='Kind'
+                value={primitiveKind}
+                onChange={event => setPrimitiveKind(event.target.value)}
+                placeholder='designHandoff'
+                fullWidth
+              />
+            </Stack>
+
+            <TextField
+              label='Lab route'
+              value={primitiveLabRoute}
+              onChange={event => setPrimitiveLabRoute(event.target.value)}
+              placeholder='/design-system/composition-shell'
+              fullWidth
+            />
+            <TextField
+              label='Runtime route'
+              value={primitiveRuntimeRoute}
+              onChange={event => setPrimitiveRuntimeRoute(event.target.value)}
+              placeholder='/design-system/handoff'
+              fullWidth
+            />
+            <TextField
+              label='GVC capture'
+              value={primitiveGvcRef}
+              onChange={event => setPrimitiveGvcRef(event.target.value)}
+              placeholder='.captures/2026-..._scenario'
+              fullWidth
+              multiline
+              minRows={2}
+              helperText={hasPrimitiveGvcEvidence(selectedEntry) ? 'GVC asociado al handoff.' : 'Requerido para decisiones reutilizables.'}
+            />
+            <TextField
+              label='Docs ref'
+              value={primitiveDocsRef}
+              onChange={event => setPrimitiveDocsRef(event.target.value)}
+              placeholder='docs/architecture/ui-platform/PRIMITIVES.md'
+              fullWidth
+              multiline
+              minRows={2}
+            />
+            <TextField
+              label='Rationale'
+              value={primitiveRationale}
+              onChange={event => setPrimitiveRationale(event.target.value)}
+              placeholder='Por qué esta estrategia es correcta para este handoff.'
+              fullWidth
+              multiline
+              minRows={2}
+            />
+            <Stack direction={{ xs: 'column', md: 'row' }} spacing={2}>
+              <TextField
+                label='Decision owner'
+                value={primitiveDecisionOwner}
+                onChange={event => setPrimitiveDecisionOwner(event.target.value)}
+                placeholder='designer/member id'
+                fullWidth
+              />
+              <TextField
+                label='Review due'
+                type='date'
+                value={primitiveDecisionDueAt}
+                onChange={event => setPrimitiveDecisionDueAt(event.target.value)}
+                fullWidth
+                slotProps={{ inputLabel: { shrink: true } }}
+              />
+            </Stack>
+            <GreenhouseButton
+              kind='secondaryAction'
+              leadingIconClassName={command === 'primitiveDecision' ? 'tabler-loader-2' : 'tabler-device-floppy'}
+              disabled={command === 'primitiveDecision'}
+              onClick={savePrimitiveDecision}
+            >
+              {DESIGN_HANDOFF_COPY.actions.savePrimitiveDecision}
+            </GreenhouseButton>
           </Stack>
 
           <Divider />

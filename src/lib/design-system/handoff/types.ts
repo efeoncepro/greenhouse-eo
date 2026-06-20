@@ -6,6 +6,25 @@ export type DesignHandoffPriority = 'low' | 'normal' | 'high' | 'urgent'
 
 export type DesignHandoffOwnerKind = 'designer' | 'dev'
 
+export type DesignHandoffImplementationStrategy =
+  | 'route_only'
+  | 'reuse_primitive'
+  | 'extend_primitive'
+  | 'new_primitive'
+  | 'variant_kind'
+  | 'research_required'
+
+export type DesignHandoffPrimitiveDecisionStatus = 'missing' | 'research' | 'warning' | 'ready'
+
+export type DesignHandoffPrimitiveWarningCode =
+  | 'primitive_decision_missing'
+  | 'primitive_key_missing'
+  | 'lab_route_missing'
+  | 'runtime_route_missing'
+  | 'gvc_evidence_missing'
+  | 'route_only_reuse_suspect'
+  | 'research_overdue'
+
 export type DesignHandoffLinkType =
   | 'task'
   | 'pull_request'
@@ -73,6 +92,26 @@ export interface DesignHandoffImplementationEvidenceSummary {
   evidenceTypes: readonly DesignHandoffEvidenceType[]
 }
 
+export interface DesignHandoffPrimitiveDecisionFields {
+  implementationStrategy: DesignHandoffImplementationStrategy | null
+  primitiveKey: string | null
+  primitiveVariant: string | null
+  primitiveKind: string | null
+  primitiveLabRoute: string | null
+  primitiveRuntimeRoute: string | null
+  primitiveGvcRef: string | null
+  primitiveDocsRef: string | null
+  primitiveRationale: string | null
+  primitiveDecisionOwner: string | null
+  primitiveDecisionDueAt: string | null
+  primitiveDecisionUpdatedAt: string | null
+}
+
+export interface DesignHandoffPrimitiveGovernance {
+  decisionStatus: DesignHandoffPrimitiveDecisionStatus
+  warnings: readonly DesignHandoffPrimitiveWarningCode[]
+}
+
 export interface DesignHandoffLinkInput {
   linkType: DesignHandoffLinkType
   ref: string
@@ -121,6 +160,19 @@ export interface DesignHandoffEntry {
   targetSurfaceKey: string | null
   dueAt: string | null
   blockedReason: string | null
+  implementationStrategy: DesignHandoffImplementationStrategy | null
+  primitiveKey: string | null
+  primitiveVariant: string | null
+  primitiveKind: string | null
+  primitiveLabRoute: string | null
+  primitiveRuntimeRoute: string | null
+  primitiveGvcRef: string | null
+  primitiveDocsRef: string | null
+  primitiveRationale: string | null
+  primitiveDecisionOwner: string | null
+  primitiveDecisionDueAt: string | null
+  primitiveDecisionUpdatedAt: string | null
+  primitiveGovernance?: DesignHandoffPrimitiveGovernance
   designerOwnerMemberId: string | null
   devOwnerMemberId: string | null
   links?: readonly DesignHandoffEntryLink[]
@@ -162,6 +214,22 @@ export interface SetDesignHandoffPlanningFieldsInput {
   targetSurfaceKey?: string | null
   dueAt?: string | null
   blockedReason?: string | null
+  actorUserId: string
+}
+
+export interface SetDesignHandoffPrimitiveDecisionInput {
+  entryId: string
+  implementationStrategy?: DesignHandoffImplementationStrategy | null
+  primitiveKey?: string | null
+  primitiveVariant?: string | null
+  primitiveKind?: string | null
+  primitiveLabRoute?: string | null
+  primitiveRuntimeRoute?: string | null
+  primitiveGvcRef?: string | null
+  primitiveDocsRef?: string | null
+  primitiveRationale?: string | null
+  primitiveDecisionOwner?: string | null
+  primitiveDecisionDueAt?: string | null
   actorUserId: string
 }
 

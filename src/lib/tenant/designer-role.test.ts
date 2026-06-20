@@ -74,7 +74,8 @@ describe('TASK-1175 — design_system.handoff V2 capability gates', () => {
     ['design_system.handoff.planning.update', 'update'],
     ['design_system.handoff.link', 'create'],
     ['design_system.handoff.evidence.attach', 'create'],
-    ['design_system.handoff.verify', 'update']
+    ['design_system.handoff.verify', 'update'],
+    ['design_system.handoff.primitive_decision.manage', 'update']
   ] as const
 
   it('grants V2 mutating handoff capabilities to a designer', () => {

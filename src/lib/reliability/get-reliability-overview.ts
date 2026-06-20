@@ -199,6 +199,7 @@ import { getDesignHandoffStaleEntriesSignal } from './queries/design-handoff-sta
 import { getDesignHandoffMissingEvidenceSignal } from './queries/design-handoff-missing-evidence'
 import { getDesignHandoffNodeDriftSignal } from './queries/design-handoff-node-drift'
 import { getDesignHandoffOrphanSurfacesSignal } from './queries/design-handoff-orphan-surfaces'
+import { getDesignHandoffPrimitiveGovernanceSignals } from './queries/design-handoff-primitive-governance'
 import { getEmailRenderFailureSignal } from './queries/email-render-failure'
 import { getNuboxSourceFreshnessSignal } from './queries/nubox-source-freshness'
 import { getNotionConformedDrainFreshnessSignal } from './queries/notion-conformed-drain-freshness'
@@ -1974,8 +1975,11 @@ export const getReliabilityOverview = async (
       : await Promise.all([
           getDesignHandoffMissingEvidenceSignal(),
           getDesignHandoffNodeDriftSignal(),
-          getDesignHandoffOrphanSurfacesSignal()
-        ]).catch(() => null)
+          getDesignHandoffOrphanSurfacesSignal(),
+          getDesignHandoffPrimitiveGovernanceSignals()
+        ])
+          .then(results => results.flat())
+          .catch(() => null)
 
   // TASK-807 — Commercial Health readers (6). Cada reader degrada
   // honestamente a `unknown` si su query falla. Incluye stale_progress de

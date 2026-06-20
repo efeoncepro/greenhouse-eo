@@ -7,6 +7,7 @@ import {
   normalizeDesignHandoffAllowedFileInput,
   normalizeDesignHandoffEvidenceInput,
   normalizeDesignHandoffLinkInput,
+  normalizeDesignHandoffPrimitiveDecisionFields,
   normalizeDesignHandoffPlanningFields,
   normalizeImplementedSurfaceKey
 } from './state-machine'
@@ -32,7 +33,21 @@ describe('design handoff state machine', () => {
         fromStatus: 'in_review',
         toStatus: 'implemented',
         implementedSurfaceKey: '/design-system/handoff',
-        evidenceSummary: { evidenceTypes: ['gvc_capture'] }
+        evidenceSummary: { evidenceTypes: ['gvc_capture'] },
+        primitiveDecision: {
+          implementationStrategy: 'reuse_primitive',
+          primitiveKey: 'CompositionShell',
+          primitiveVariant: null,
+          primitiveKind: null,
+          primitiveLabRoute: null,
+          primitiveRuntimeRoute: '/design-system/handoff',
+          primitiveGvcRef: '.captures/2026-06-20_design-system-handoff-cockpit',
+          primitiveDocsRef: null,
+          primitiveRationale: null,
+          primitiveDecisionOwner: null,
+          primitiveDecisionDueAt: null,
+          primitiveDecisionUpdatedAt: '2026-06-20T14:00:00.000Z'
+        }
       })
     ).not.toThrow()
   })
@@ -54,7 +69,21 @@ describe('design handoff state machine', () => {
         fromStatus: 'proposed',
         toStatus: 'implemented',
         implementedSurfaceKey: '/design-system/handoff',
-        evidenceSummary: { evidenceTypes: ['gvc_capture'] }
+        evidenceSummary: { evidenceTypes: ['gvc_capture'] },
+        primitiveDecision: {
+          implementationStrategy: 'route_only',
+          primitiveKey: null,
+          primitiveVariant: null,
+          primitiveKind: null,
+          primitiveLabRoute: null,
+          primitiveRuntimeRoute: '/design-system/handoff',
+          primitiveGvcRef: null,
+          primitiveDocsRef: null,
+          primitiveRationale: 'One-off route.',
+          primitiveDecisionOwner: null,
+          primitiveDecisionDueAt: null,
+          primitiveDecisionUpdatedAt: '2026-06-20T14:00:00.000Z'
+        }
       })
     ).toThrow(DesignHandoffError)
 
@@ -72,7 +101,21 @@ describe('design handoff state machine', () => {
         fromStatus: 'in_review',
         toStatus: 'implemented',
         implementedSurfaceKey: '/design-system/handoff',
-        evidenceSummary: { evidenceTypes: ['visual_review'] }
+        evidenceSummary: { evidenceTypes: ['visual_review'] },
+        primitiveDecision: {
+          implementationStrategy: 'route_only',
+          primitiveKey: null,
+          primitiveVariant: null,
+          primitiveKind: null,
+          primitiveLabRoute: null,
+          primitiveRuntimeRoute: '/design-system/handoff',
+          primitiveGvcRef: null,
+          primitiveDocsRef: null,
+          primitiveRationale: 'One-off route.',
+          primitiveDecisionOwner: null,
+          primitiveDecisionDueAt: null,
+          primitiveDecisionUpdatedAt: '2026-06-20T14:00:00.000Z'
+        }
       })
     ).toThrow(DesignHandoffError)
 
@@ -81,9 +124,79 @@ describe('design handoff state machine', () => {
         fromStatus: 'in_review',
         toStatus: 'implemented',
         implementedSurfaceKey: '/design-system/handoff',
-        evidenceSummary: { evidenceTypes: ['manual_exception'] }
+        evidenceSummary: { evidenceTypes: ['manual_exception'] },
+        primitiveDecision: {
+          implementationStrategy: 'route_only',
+          primitiveKey: null,
+          primitiveVariant: null,
+          primitiveKind: null,
+          primitiveLabRoute: null,
+          primitiveRuntimeRoute: '/design-system/handoff',
+          primitiveGvcRef: null,
+          primitiveDocsRef: null,
+          primitiveRationale: 'One-off route.',
+          primitiveDecisionOwner: null,
+          primitiveDecisionDueAt: null,
+          primitiveDecisionUpdatedAt: '2026-06-20T14:00:00.000Z'
+        }
       })
     ).not.toThrow()
+  })
+
+  it('normalizes primitive governance decisions and blocks unresolved implementation closure', () => {
+    expect(
+      normalizeDesignHandoffPrimitiveDecisionFields({
+        implementationStrategy: 'variant_kind',
+        primitiveKey: 'ContextualSidecar',
+        primitiveVariant: 'inspector',
+        primitiveKind: 'designHandoff',
+        primitiveRuntimeRoute: '/design-system/handoff/',
+        primitiveGvcRef: '.captures/2026-06-20_design-system-handoff-cockpit'
+      })
+    ).toEqual({
+      implementationStrategy: 'variant_kind',
+      primitiveKey: 'ContextualSidecar',
+      primitiveVariant: 'inspector',
+      primitiveKind: 'designHandoff',
+      primitiveLabRoute: null,
+      primitiveRuntimeRoute: '/design-system/handoff',
+      primitiveGvcRef: '.captures/2026-06-20_design-system-handoff-cockpit',
+      primitiveDocsRef: null,
+      primitiveRationale: null,
+      primitiveDecisionOwner: null,
+      primitiveDecisionDueAt: null
+    })
+
+    expect(() =>
+      normalizeDesignHandoffPrimitiveDecisionFields({
+        implementationStrategy: 'variant_kind',
+        primitiveKey: 'ContextualSidecar',
+        primitiveVariant: 'inspector'
+      })
+    ).toThrow(DesignHandoffError)
+
+    expect(() =>
+      assertValidHandoffTransition({
+        fromStatus: 'in_review',
+        toStatus: 'implemented',
+        implementedSurfaceKey: '/design-system/handoff',
+        evidenceSummary: { evidenceTypes: ['gvc_capture'] },
+        primitiveDecision: {
+          implementationStrategy: 'research_required',
+          primitiveKey: null,
+          primitiveVariant: null,
+          primitiveKind: null,
+          primitiveLabRoute: null,
+          primitiveRuntimeRoute: null,
+          primitiveGvcRef: null,
+          primitiveDocsRef: null,
+          primitiveRationale: null,
+          primitiveDecisionOwner: 'designer-1',
+          primitiveDecisionDueAt: '2026-06-20T14:00:00.000Z',
+          primitiveDecisionUpdatedAt: '2026-06-20T14:00:00.000Z'
+        }
+      })
+    ).toThrow(DesignHandoffError)
   })
 
   it('normalizes implemented surface keys as internal app routes only', () => {

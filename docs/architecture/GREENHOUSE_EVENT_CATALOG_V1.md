@@ -1073,6 +1073,16 @@ TASK-1175 conserva el aggregate `design_handoff_entry` y agrega eventos audit-fi
 - **Full API Parity**: allowlist manage, owner/planning, links, evidence, verify y drift son commands/readers server-side; las rutas API son thin wrappers con capabilities granulares.
 - **Delta 2026-06-20 — snapshot inicial en create**: `createDesignHandoffEntry` emite `design_system.handoff.registered` y luego `design_system.handoff.figma_node_verified` en el mismo flujo gobernado, con metadata `trigger:'create'` en el snapshot/evento local. `verifyDesignHandoffFigmaNode` sigue emitiendo el mismo evento para re-verificaciones posteriores; consumers deben tratarlo como snapshot append-only, no como transición de lifecycle.
 
+## Delta 2026-06-20 — TASK-1180: Primitive governance para Design Handoff
+
+TASK-1180 agrega un evento audit-first al mismo aggregate `design_handoff_entry` para dejar trazabilidad de la decision Design System asociada a cada intencion Figma.
+
+| Event type                                             | Cuándo se emite                                               | Payload mínimo                                                                                                                        | Consumer inicial        |
+| ------------------------------------------------------ | ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- | ----------------------- |
+| `design_system.handoff.primitive_decision_updated`     | cambia strategy/primitive/lab/runtime/GVC/docs/rationale      | `{schemaVersion:1, entryId, implementationStrategy, primitiveKey, primitiveVariant, primitiveKind, warningCodes, actorUserId}`        | audit / Reliability V1  |
+
+El evento no reemplaza `evidence_attached`: referencias GVC y runtime siguen pudiendo adjuntarse como evidencia append-only. Primitive governance guarda el estado actual de decision; evidence/links preservan las pruebas y referencias históricas.
+
 Spec: `docs/tasks/in-progress/TASK-1175-design-handoff-control-plane-full-api-parity.md`.
 
 ## Delta 2026-06-12 — Knowledge auto-ingest (TASK-1094)

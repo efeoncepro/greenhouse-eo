@@ -1214,3 +1214,15 @@ El lifecycle agrega `in_review` y el gate `implemented` exige ruta runtime no va
 Delta 2026-06-20: `design_system.handoff.create` cubre el registro inicial **y** el primer snapshot Figma del nodo allowlisted. `design_system.handoff.verify` no es requerido para crear; queda reservado para re-verificaciones posteriores sobre entradas existentes. Esta separación mantiene el intake productivo de diseño en una sola acción gobernada sin abrir un permiso amplio de re-verificación/drift.
 
 Spec: `docs/tasks/in-progress/TASK-1175-design-handoff-control-plane-full-api-parity.md`.
+
+## Delta 2026-06-20 — TASK-1180: Primitive governance en Design Handoff
+
+TASK-1180 agrega una capability fina para registrar la decision de implementacion Design System de cada handoff. Mantiene la lectura en `design_system.handoff.read` y separa la mutacion para que Nexa/API/UI usen el mismo command gobernado.
+
+| Capability                                           | Action   | Scope    | Grant runtime                |
+| ---------------------------------------------------- | -------- | -------- | ---------------------------- |
+| `design_system.handoff.primitive_decision.manage`    | `update` | `tenant` | `designer` ∪ `efeonce_admin` |
+
+La capability permite actualizar strategy, primitive key, variant/kind, Lab route, runtime route, GVC ref, docs ref, rationale, owner y due date. No concede allowlist, verify-node, evidence attach ni transition por si sola. El cierre `implemented` sigue requiriendo `design_system.handoff.transition`, pero la state machine bloquea cierre si Primitive governance está vacía o en `research_required`.
+
+Spec: `docs/tasks/in-progress/TASK-1180-design-handoff-primitive-governance-loop.md`.

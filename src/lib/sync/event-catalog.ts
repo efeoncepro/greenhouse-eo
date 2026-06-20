@@ -1059,6 +1059,7 @@ export const EVENT_TYPES = {
   designHandoffWorkItemLinked: 'design_system.handoff.work_item_linked',
   designHandoffEvidenceAttached: 'design_system.handoff.evidence_attached',
   designHandoffFigmaNodeVerified: 'design_system.handoff.figma_node_verified',
+  designHandoffPrimitiveDecisionUpdated: 'design_system.handoff.primitive_decision_updated',
 
   // TASK-1171 Slice 3 — Sync Notion->ICO de un cliente activado vía command gobernado.
   // aggregate_type = space_notion_source, aggregate_id = source_id. Sin consumer

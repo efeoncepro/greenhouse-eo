@@ -2,11 +2,13 @@ import type {
   DesignHandoffAllowedFileInput,
   DesignHandoffEvidenceInput,
   DesignHandoffEvidenceType,
+  DesignHandoffImplementationStrategy,
   DesignHandoffImplementationEvidenceSummary,
   DesignHandoffLinkInput,
   DesignHandoffLinkType,
   DesignHandoffNodeSnapshot,
   DesignHandoffPlanningFields,
+  DesignHandoffPrimitiveDecisionFields,
   DesignHandoffPriority,
   DesignHandoffStatus
 } from './types'
@@ -20,7 +22,9 @@ export type DesignHandoffErrorCode =
   | 'invalid_allowed_file'
   | 'invalid_design_handoff_link'
   | 'invalid_design_handoff_evidence'
+  | 'invalid_design_handoff_primitive_decision'
   | 'design_handoff_missing_evidence'
+  | 'design_handoff_missing_primitive_decision'
   | 'design_handoff_node_unavailable'
 
 export class DesignHandoffError extends Error {
@@ -51,6 +55,15 @@ export const DESIGN_HANDOFF_STATUSES: readonly DesignHandoffStatus[] = [
 
 export const DESIGN_HANDOFF_PRIORITIES: readonly DesignHandoffPriority[] = ['low', 'normal', 'high', 'urgent']
 
+export const DESIGN_HANDOFF_IMPLEMENTATION_STRATEGIES: readonly DesignHandoffImplementationStrategy[] = [
+  'route_only',
+  'reuse_primitive',
+  'extend_primitive',
+  'new_primitive',
+  'variant_kind',
+  'research_required'
+]
+
 export const DESIGN_HANDOFF_LINK_TYPES: readonly DesignHandoffLinkType[] = [
   'task',
   'pull_request',
@@ -75,6 +88,9 @@ export const isDesignHandoffStatus = (value: unknown): value is DesignHandoffSta
 export const isDesignHandoffPriority = (value: unknown): value is DesignHandoffPriority =>
   typeof value === 'string' && DESIGN_HANDOFF_PRIORITIES.includes(value as DesignHandoffPriority)
 
+export const isDesignHandoffImplementationStrategy = (value: unknown): value is DesignHandoffImplementationStrategy =>
+  typeof value === 'string' && DESIGN_HANDOFF_IMPLEMENTATION_STRATEGIES.includes(value as DesignHandoffImplementationStrategy)
+
 export const isDesignHandoffLinkType = (value: unknown): value is DesignHandoffLinkType =>
   typeof value === 'string' && DESIGN_HANDOFF_LINK_TYPES.includes(value as DesignHandoffLinkType)
 
@@ -85,12 +101,14 @@ export const assertValidHandoffTransition = ({
   fromStatus,
   toStatus,
   implementedSurfaceKey,
-  evidenceSummary
+  evidenceSummary,
+  primitiveDecision
 }: {
   fromStatus: DesignHandoffStatus
   toStatus: DesignHandoffStatus
   implementedSurfaceKey?: string | null
   evidenceSummary?: DesignHandoffImplementationEvidenceSummary | null
+  primitiveDecision?: DesignHandoffPrimitiveDecisionFields | null
 }) => {
   if (!TRANSITIONS[fromStatus]?.includes(toStatus)) {
     throw new DesignHandoffError(
@@ -120,6 +138,8 @@ export const assertValidHandoffTransition = ({
       'Implemented design handoffs require GVC capture or runtime route evidence'
     )
   }
+
+  assertPrimitiveDecisionReadyForImplementation(primitiveDecision)
 }
 
 export const normalizeImplementedSurfaceKey = (value: string | null | undefined): string | null => {
@@ -157,6 +177,59 @@ export const normalizeDesignHandoffPlanningFields = (input: {
   dueAt: normalizeIsoDateTimeOrNull(input.dueAt, 'dueAt'),
   blockedReason: normalizeNullableText(input.blockedReason)
 })
+
+export const normalizeDesignHandoffPrimitiveDecisionFields = (input: {
+  implementationStrategy?: unknown
+  primitiveKey?: string | null
+  primitiveVariant?: string | null
+  primitiveKind?: string | null
+  primitiveLabRoute?: string | null
+  primitiveRuntimeRoute?: string | null
+  primitiveGvcRef?: string | null
+  primitiveDocsRef?: string | null
+  primitiveRationale?: string | null
+  primitiveDecisionOwner?: string | null
+  primitiveDecisionDueAt?: string | null
+}): Omit<DesignHandoffPrimitiveDecisionFields, 'primitiveDecisionUpdatedAt'> => {
+  const strategyValue = input.implementationStrategy === '' ? null : input.implementationStrategy
+
+  if (strategyValue != null && !isDesignHandoffImplementationStrategy(strategyValue)) {
+    throw new DesignHandoffError(
+      'invalid_design_handoff_primitive_decision',
+      'Invalid design handoff implementation strategy'
+    )
+  }
+
+  const implementationStrategy = strategyValue ?? null
+  const primitiveKey = normalizeNullableText(input.primitiveKey)
+  const primitiveVariant = normalizeNullableText(input.primitiveVariant)
+  const primitiveKind = normalizeNullableText(input.primitiveKind)
+  const primitiveLabRoute = normalizeNullableRoute(input.primitiveLabRoute, 'primitiveLabRoute')
+  const primitiveRuntimeRoute = normalizeNullableRoute(input.primitiveRuntimeRoute, 'primitiveRuntimeRoute')
+  const primitiveGvcRef = normalizeNullableGvcRef(input.primitiveGvcRef)
+  const primitiveDocsRef = normalizeNullableText(input.primitiveDocsRef)
+  const primitiveRationale = normalizeNullableText(input.primitiveRationale)
+  const primitiveDecisionOwner = normalizeNullableText(input.primitiveDecisionOwner)
+  const primitiveDecisionDueAt = normalizeIsoDateTimeOrNull(input.primitiveDecisionDueAt, 'primitiveDecisionDueAt')
+
+  const decision = {
+    implementationStrategy,
+    primitiveKey,
+    primitiveVariant,
+    primitiveKind,
+    primitiveLabRoute,
+    primitiveRuntimeRoute,
+    primitiveGvcRef,
+    primitiveDocsRef,
+    primitiveRationale,
+    primitiveDecisionOwner,
+    primitiveDecisionDueAt
+  }
+
+  assertPrimitiveDecisionShape(decision)
+
+  return decision
+}
 
 export const normalizeDesignHandoffLinkInput = (input: DesignHandoffLinkInput): DesignHandoffLinkInput => {
   if (!isDesignHandoffLinkType(input.linkType)) {
@@ -241,6 +314,74 @@ export const assertFreshDesignHandoffNodeSnapshot = (snapshot: DesignHandoffNode
   }
 }
 
+export const assertPrimitiveDecisionReadyForImplementation = (
+  decision: DesignHandoffPrimitiveDecisionFields | null | undefined
+) => {
+  if (!decision?.implementationStrategy || decision.implementationStrategy === 'research_required') {
+    throw new DesignHandoffError(
+      'design_handoff_missing_primitive_decision',
+      'Implemented design handoffs require a resolved primitive governance decision'
+    )
+  }
+
+  assertPrimitiveDecisionShape(decision, { implemented: true })
+}
+
+const assertPrimitiveDecisionShape = (
+  decision: Omit<DesignHandoffPrimitiveDecisionFields, 'primitiveDecisionUpdatedAt'>,
+  options: { implemented?: boolean } = {}
+) => {
+  const strategy = decision.implementationStrategy
+
+  if (!strategy) return
+
+  const needsPrimitiveKey = ['reuse_primitive', 'extend_primitive', 'new_primitive', 'variant_kind'].includes(strategy)
+
+  if (needsPrimitiveKey && !decision.primitiveKey) {
+    throw new DesignHandoffError(
+      'invalid_design_handoff_primitive_decision',
+      'Primitive governance strategy requires a primitive key'
+    )
+  }
+
+  if (strategy === 'variant_kind' && (!decision.primitiveVariant || !decision.primitiveKind)) {
+    throw new DesignHandoffError(
+      'invalid_design_handoff_primitive_decision',
+      'Variant/kind governance requires primitive variant and kind'
+    )
+  }
+
+  if (strategy === 'route_only' && !decision.primitiveRationale) {
+    throw new DesignHandoffError(
+      'invalid_design_handoff_primitive_decision',
+      'Route-only governance requires rationale'
+    )
+  }
+
+  if (strategy === 'research_required' && (!decision.primitiveDecisionOwner || !decision.primitiveDecisionDueAt)) {
+    throw new DesignHandoffError(
+      'invalid_design_handoff_primitive_decision',
+      'Research governance requires owner and due date'
+    )
+  }
+
+  if (!options.implemented) return
+
+  if (['extend_primitive', 'new_primitive'].includes(strategy) && !decision.primitiveLabRoute) {
+    throw new DesignHandoffError(
+      'design_handoff_missing_primitive_decision',
+      'Primitive extensions require a Design System lab route before implementation closure'
+    )
+  }
+
+  if (strategy === 'new_primitive' && (!decision.primitiveDocsRef || !decision.primitiveGvcRef)) {
+    throw new DesignHandoffError(
+      'design_handoff_missing_primitive_decision',
+      'New primitives require docs and GVC evidence before implementation closure'
+    )
+  }
+}
+
 const normalizeRequiredText = (
   value: string | null | undefined,
   code: DesignHandoffErrorCode,
@@ -273,6 +414,36 @@ const normalizeIsoDateTimeOrNull = (value: string | null | undefined, fieldName:
   }
 
   return new Date(time).toISOString()
+}
+
+const normalizeNullableRoute = (value: string | null | undefined, fieldName: string): string | null => {
+  const normalized = normalizeNullableText(value)
+
+  if (!normalized) return null
+
+  try {
+    return normalizeImplementedSurfaceKey(normalized)
+  } catch {
+    throw new DesignHandoffError(
+      'invalid_design_handoff_primitive_decision',
+      `Invalid design handoff ${fieldName}`
+    )
+  }
+}
+
+const normalizeNullableGvcRef = (value: string | null | undefined): string | null => {
+  const normalized = normalizeNullableText(value)
+
+  if (!normalized) return null
+
+  if (!normalized.startsWith('.captures/')) {
+    throw new DesignHandoffError(
+      'invalid_design_handoff_primitive_decision',
+      'Primitive governance GVC reference must use a .captures path'
+    )
+  }
+
+  return normalized
 }
 
 const normalizeMetadata = (metadata: Record<string, unknown> | null | undefined): Record<string, unknown> =>

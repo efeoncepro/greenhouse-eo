@@ -15,7 +15,17 @@ export const mapDesignHandoffError = (error: DesignHandoffError) => {
   if (error.code === 'invalid_allowed_file') return canonicalErrorResponse('figma_file_not_allowed')
   if (error.code === 'invalid_design_handoff_link') return canonicalErrorResponse('invalid_design_handoff_link')
   if (error.code === 'invalid_design_handoff_evidence') return canonicalErrorResponse('invalid_design_handoff_evidence')
+
+  if (error.code === 'invalid_design_handoff_primitive_decision') {
+    return canonicalErrorResponse('invalid_design_handoff_primitive_decision')
+  }
+
   if (error.code === 'design_handoff_missing_evidence') return canonicalErrorResponse('design_handoff_missing_evidence')
+
+  if (error.code === 'design_handoff_missing_primitive_decision') {
+    return canonicalErrorResponse('design_handoff_missing_primitive_decision')
+  }
+
   if (error.code === 'design_handoff_node_unavailable') return canonicalErrorResponse('design_handoff_node_unavailable')
 
   return canonicalErrorResponse('invalid_design_handoff_transition')

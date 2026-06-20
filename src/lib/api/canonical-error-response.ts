@@ -63,7 +63,9 @@ export type CanonicalErrorCode =
   | 'invalid_design_handoff_transition'
   | 'invalid_design_handoff_link'
   | 'invalid_design_handoff_evidence'
+  | 'invalid_design_handoff_primitive_decision'
   | 'design_handoff_missing_evidence'
+  | 'design_handoff_missing_primitive_decision'
   | 'design_handoff_node_unavailable'
   // Nexa chat endpoint (TASK-1131).
   | 'nexa_prompt_required'
@@ -180,10 +182,20 @@ const CANONICAL_ERRORS: Record<CanonicalErrorCode, CanonicalErrorDefinition> = {
     message: 'La evidencia del handoff no es válida. Adjunta una ruta, captura o revisión reconocida.',
     actionable: true
   },
+  invalid_design_handoff_primitive_decision: {
+    status: 422,
+    message: 'Revisa la decisión de Primitive governance. La estrategia debe tener los campos obligatorios.',
+    actionable: true
+  },
   design_handoff_missing_evidence: {
     status: 409,
     message: 'Para cerrar un handoff como implementado necesitas evidencia runtime o una excepción gobernada.',
     actionable: false
+  },
+  design_handoff_missing_primitive_decision: {
+    status: 409,
+    message: 'Para cerrar un handoff como implementado necesitas una decisión Primitive governance resuelta.',
+    actionable: true
   },
   design_handoff_node_unavailable: {
     status: 409,

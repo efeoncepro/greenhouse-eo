@@ -1610,6 +1610,12 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     actions: ['read'] as const,
     defaultScope: 'tenant'
   },
+  {
+    key: 'design_system.handoff.primitive_decision.manage',
+    module: 'design_system',
+    actions: ['update'] as const,
+    defaultScope: 'tenant'
+  },
   // TASK-1081 — Knowledge Platform foundation (5 capabilities). Sembradas con grant
   // en runtime.ts mismo PR (invariant TASK-873/935). Aún no can()-checked: los
   // consumidores (search API / human center / Nexa / MCP) llegan en TASK-1083/1084.

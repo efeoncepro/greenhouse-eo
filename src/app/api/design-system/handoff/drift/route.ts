@@ -5,6 +5,7 @@ import { can } from '@/lib/entitlements/runtime'
 import { getDesignHandoffMissingEvidenceSignal } from '@/lib/reliability/queries/design-handoff-missing-evidence'
 import { getDesignHandoffNodeDriftSignal } from '@/lib/reliability/queries/design-handoff-node-drift'
 import { getDesignHandoffOrphanSurfacesSignal } from '@/lib/reliability/queries/design-handoff-orphan-surfaces'
+import { getDesignHandoffPrimitiveGovernanceSignals } from '@/lib/reliability/queries/design-handoff-primitive-governance'
 import { requireTenantContext } from '@/lib/tenant/authorization'
 
 export const dynamic = 'force-dynamic'
@@ -20,11 +21,12 @@ export async function GET() {
     return canonicalErrorResponse('forbidden')
   }
 
-  const signals = await Promise.all([
+  const [missingEvidence, nodeDrift, orphanSurfaces, primitiveGovernance] = await Promise.all([
     getDesignHandoffMissingEvidenceSignal(),
     getDesignHandoffNodeDriftSignal(),
-    getDesignHandoffOrphanSurfacesSignal()
+    getDesignHandoffOrphanSurfacesSignal(),
+    getDesignHandoffPrimitiveGovernanceSignals()
   ])
 
-  return NextResponse.json({ signals })
+  return NextResponse.json({ signals: [missingEvidence, nodeDrift, orphanSurfaces, ...primitiveGovernance] })
 }

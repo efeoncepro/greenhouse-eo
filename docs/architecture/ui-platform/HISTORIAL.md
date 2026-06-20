@@ -7,6 +7,10 @@
 
 ---
 
+## Delta 2026-06-20 — TASK-1180: Design Handoff x Primitive Governance
+
+`/design-system/handoff` ahora actúa como gateway de gobernanza hacia el Design System: cada entry puede registrar strategy (`route_only`, `reuse_primitive`, `extend_primitive`, `new_primitive`, `variant_kind`, `research_required`), primitive key, variant/kind, Lab, runtime, GVC, docs, rationale y owner. El contrato vive en commands/readers/API, no en la UI; el cierre `implemented` bloquea decisiones vacías o `research_required`, y endurece `new_primitive` con Lab + docs + GVC. Contrato funcional: [`docs/documentation/plataforma/design-handoff-control-plane.md`](../../documentation/plataforma/design-handoff-control-plane.md).
+
 ## Delta 2026-06-20 — Design Handoff create con snapshot Figma inicial
 
 `/design-system/handoff` conserva el modelo Evidence Ledger, pero el intake queda mas robusto: `POST /api/design-system/handoff` ahora registra el handoff y persiste el primer snapshot Figma del nodo allowlisted en el mismo comando. El boton `Verificar nodo Figma` queda como re-verificacion posterior. Contrato funcional: [`docs/documentation/plataforma/design-handoff-control-plane.md`](../../documentation/plataforma/design-handoff-control-plane.md). GVC local desktop/mobile: `.captures/2026-06-20T02-00-35_design-system-handoff-cockpit`.

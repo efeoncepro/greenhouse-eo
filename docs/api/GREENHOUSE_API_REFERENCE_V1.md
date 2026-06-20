@@ -151,12 +151,15 @@ Routes:
 - `POST /api/design-system/handoff/[entryId]/links`
 - `POST /api/design-system/handoff/[entryId]/evidence`
 - `POST /api/design-system/handoff/[entryId]/verify-node`
+- `PATCH /api/design-system/handoff/[entryId]/primitive-decision`
 - `PATCH /api/design-system/handoff/[entryId]/transition`
 - `GET /api/design-system/handoff/drift`
 
 Key rules:
 - `POST /api/design-system/handoff` validates URL, blocks AXIS, checks product allowlist and creates the first Figma node snapshot in the same command.
 - `POST /api/design-system/handoff/[entryId]/verify-node` is a re-verification command for existing entries.
+- `PATCH /api/design-system/handoff/[entryId]/primitive-decision` stores the Design System implementation strategy and primitive/lab/runtime/GVC contract.
+- `PATCH /api/design-system/handoff/[entryId]/transition` blocks `implemented` unless primitive governance is resolved.
 - Figma token stays server-only; failed render becomes an `unavailable` snapshot, not raw provider leakage.
 - `implemented` requires internal route + governed evidence unless a manual exception is auditably attached.
 

@@ -19,6 +19,7 @@ import {
   normalizeDesignHandoffAllowedFileInput,
   normalizeDesignHandoffEvidenceInput,
   normalizeDesignHandoffLinkInput,
+  normalizeDesignHandoffPrimitiveDecisionFields,
   normalizeDesignHandoffPlanningFields,
   normalizeImplementedSurfaceKey
 } from './state-machine'
@@ -36,9 +37,12 @@ import type {
   DesignHandoffNodeSnapshot,
   DesignHandoffNodeSnapshotStatus,
   DesignHandoffPriority,
+  DesignHandoffPrimitiveGovernance,
+  DesignHandoffPrimitiveWarningCode,
   DesignHandoffStatus,
   DesignHandoffTransitionResult,
   LinkDesignHandoffWorkItemInput,
+  SetDesignHandoffPrimitiveDecisionInput,
   SetDesignHandoffPlanningFieldsInput,
   TransitionDesignHandoffEntryInput,
   VerifyDesignHandoffFigmaNodeInput
@@ -62,6 +66,18 @@ type DesignHandoffEntryRow = {
   due_at: string | null
   blocked_reason: string | null
   implemented_surface_key: string | null
+  implementation_strategy: DesignHandoffEntry['implementationStrategy']
+  primitive_key: string | null
+  primitive_variant: string | null
+  primitive_kind: string | null
+  primitive_lab_route: string | null
+  primitive_runtime_route: string | null
+  primitive_gvc_ref: string | null
+  primitive_docs_ref: string | null
+  primitive_rationale: string | null
+  primitive_decision_owner: string | null
+  primitive_decision_due_at: string | null
+  primitive_decision_updated_at: string | null
   created_by: string
   updated_by: string
   created_at: string
@@ -124,6 +140,7 @@ type LocalEventType =
   | 'work_item_linked'
   | 'evidence_attached'
   | 'figma_node_verified'
+  | 'primitive_decision_updated'
 
 const VALID_KINDS = new Set<DesignHandoffKind>(['page', 'component'])
 
@@ -174,6 +191,18 @@ const mapEntry = (row: DesignHandoffEntryRow): DesignHandoffEntry => ({
   dueAt: row.due_at,
   blockedReason: row.blocked_reason,
   implementedSurfaceKey: row.implemented_surface_key,
+  implementationStrategy: row.implementation_strategy,
+  primitiveKey: row.primitive_key,
+  primitiveVariant: row.primitive_variant,
+  primitiveKind: row.primitive_kind,
+  primitiveLabRoute: row.primitive_lab_route,
+  primitiveRuntimeRoute: row.primitive_runtime_route,
+  primitiveGvcRef: row.primitive_gvc_ref,
+  primitiveDocsRef: row.primitive_docs_ref,
+  primitiveRationale: row.primitive_rationale,
+  primitiveDecisionOwner: row.primitive_decision_owner,
+  primitiveDecisionDueAt: row.primitive_decision_due_at,
+  primitiveDecisionUpdatedAt: row.primitive_decision_updated_at,
   createdBy: row.created_by,
   updatedBy: row.updated_by,
   createdAt: row.created_at,
@@ -223,7 +252,12 @@ const ENTRY_SELECT = `
   SELECT e.entry_id, e.title, e.kind, e.file_key, f.file_label, e.node_id, e.node_name,
          e.status, e.designer_owner_member_id, e.dev_owner_member_id, e.priority,
          e.target_surface_key, e.due_at::text AS due_at, e.blocked_reason,
-         e.implemented_surface_key, e.created_by, e.updated_by,
+         e.implemented_surface_key, e.implementation_strategy, e.primitive_key,
+         e.primitive_variant, e.primitive_kind, e.primitive_lab_route, e.primitive_runtime_route,
+         e.primitive_gvc_ref, e.primitive_docs_ref, e.primitive_rationale,
+         e.primitive_decision_owner, e.primitive_decision_due_at::text AS primitive_decision_due_at,
+         e.primitive_decision_updated_at::text AS primitive_decision_updated_at,
+         e.created_by, e.updated_by,
          e.created_at::text AS created_at, e.updated_at::text AS updated_at, e.archived_at::text AS archived_at
     FROM greenhouse_core.design_handoff_entries e
     LEFT JOIN greenhouse_core.design_handoff_allowed_files f ON f.file_key = e.file_key
@@ -303,8 +337,10 @@ const publishEntryEvent = async (
               : eventType === 'work_item_linked'
                 ? EVENT_TYPES.designHandoffWorkItemLinked
                 : eventType === 'evidence_attached'
-                  ? EVENT_TYPES.designHandoffEvidenceAttached
-                  : EVENT_TYPES.designHandoffFigmaNodeVerified
+              ? EVENT_TYPES.designHandoffEvidenceAttached
+                  : eventType === 'figma_node_verified'
+                    ? EVENT_TYPES.designHandoffFigmaNodeVerified
+                    : EVENT_TYPES.designHandoffPrimitiveDecisionUpdated
 
   await publishOutboxEvent(
     {
@@ -450,12 +486,74 @@ const enrichEntries = async (entries: DesignHandoffEntry[]): Promise<DesignHando
     snapshotsByEntry.set(row.entry_id, mapSnapshot(row))
   }
 
-  return entries.map(entry => ({
-    ...entry,
-    links: linksByEntry.get(entry.entryId) ?? [],
-    evidence: evidenceByEntry.get(entry.entryId) ?? [],
-    latestNodeSnapshot: snapshotsByEntry.get(entry.entryId) ?? null
-  }))
+  return entries.map(entry => {
+    const enriched = {
+      ...entry,
+      links: linksByEntry.get(entry.entryId) ?? [],
+      evidence: evidenceByEntry.get(entry.entryId) ?? [],
+      latestNodeSnapshot: snapshotsByEntry.get(entry.entryId) ?? null
+    }
+
+    return {
+      ...enriched,
+      primitiveGovernance: derivePrimitiveGovernance(enriched)
+    }
+  })
+}
+
+const requiresPrimitiveKey = (strategy: DesignHandoffEntry['implementationStrategy']) =>
+  strategy === 'reuse_primitive' ||
+  strategy === 'extend_primitive' ||
+  strategy === 'new_primitive' ||
+  strategy === 'variant_kind'
+
+const hasRuntimeRouteEvidence = (entry: DesignHandoffEntry) =>
+  Boolean(
+    entry.primitiveRuntimeRoute ||
+      entry.implementedSurfaceKey ||
+      entry.targetSurfaceKey ||
+      entry.links?.some(link => link.linkType === 'route') ||
+      entry.evidence?.some(evidence => evidence.evidenceType === 'runtime_route')
+  )
+
+const hasGvcEvidence = (entry: DesignHandoffEntry) =>
+  Boolean(entry.primitiveGvcRef || entry.evidence?.some(evidence => evidence.evidenceType === 'gvc_capture'))
+
+const derivePrimitiveGovernance = (entry: DesignHandoffEntry): DesignHandoffPrimitiveGovernance => {
+  const warnings: DesignHandoffPrimitiveWarningCode[] = []
+  const strategy = entry.implementationStrategy
+
+  if (!strategy) warnings.push('primitive_decision_missing')
+
+  if (requiresPrimitiveKey(strategy) && !entry.primitiveKey) warnings.push('primitive_key_missing')
+
+  if ((strategy === 'extend_primitive' || strategy === 'new_primitive') && !entry.primitiveLabRoute) {
+    warnings.push('lab_route_missing')
+  }
+
+  if (!hasRuntimeRouteEvidence(entry)) warnings.push('runtime_route_missing')
+
+  if (strategy && strategy !== 'route_only' && strategy !== 'research_required' && !hasGvcEvidence(entry)) {
+    warnings.push('gvc_evidence_missing')
+  }
+
+  if (strategy === 'route_only' && entry.kind === 'component') warnings.push('route_only_reuse_suspect')
+
+  if (strategy === 'research_required' && entry.primitiveDecisionDueAt) {
+    const dueTime = Date.parse(entry.primitiveDecisionDueAt)
+
+    if (!Number.isNaN(dueTime) && dueTime < Date.now()) warnings.push('research_overdue')
+  }
+
+  const decisionStatus: DesignHandoffPrimitiveGovernance['decisionStatus'] = !strategy
+    ? 'missing'
+    : strategy === 'research_required'
+      ? 'research'
+      : warnings.length > 0
+        ? 'warning'
+        : 'ready'
+
+  return { decisionStatus, warnings }
 }
 
 const getImplementationEvidenceSummary = async (client: PoolClient, entryId: string) => {
@@ -704,6 +802,94 @@ export const setDesignHandoffPlanningFields = async (
     return updated
   })
 
+export const setDesignHandoffPrimitiveDecision = async (
+  input: SetDesignHandoffPrimitiveDecisionInput
+): Promise<DesignHandoffEntry> =>
+  withGreenhousePostgresTransaction(async client => {
+    const current = await requireEntryForUpdate(client, input.entryId)
+
+    const normalized = normalizeDesignHandoffPrimitiveDecisionFields({
+      implementationStrategy:
+        input.implementationStrategy === undefined ? current.implementationStrategy : input.implementationStrategy,
+      primitiveKey: input.primitiveKey === undefined ? current.primitiveKey : input.primitiveKey,
+      primitiveVariant: input.primitiveVariant === undefined ? current.primitiveVariant : input.primitiveVariant,
+      primitiveKind: input.primitiveKind === undefined ? current.primitiveKind : input.primitiveKind,
+      primitiveLabRoute: input.primitiveLabRoute === undefined ? current.primitiveLabRoute : input.primitiveLabRoute,
+      primitiveRuntimeRoute:
+        input.primitiveRuntimeRoute === undefined ? current.primitiveRuntimeRoute : input.primitiveRuntimeRoute,
+      primitiveGvcRef: input.primitiveGvcRef === undefined ? current.primitiveGvcRef : input.primitiveGvcRef,
+      primitiveDocsRef: input.primitiveDocsRef === undefined ? current.primitiveDocsRef : input.primitiveDocsRef,
+      primitiveRationale: input.primitiveRationale === undefined ? current.primitiveRationale : input.primitiveRationale,
+      primitiveDecisionOwner:
+        input.primitiveDecisionOwner === undefined ? current.primitiveDecisionOwner : input.primitiveDecisionOwner,
+      primitiveDecisionDueAt:
+        input.primitiveDecisionDueAt === undefined ? current.primitiveDecisionDueAt : input.primitiveDecisionDueAt
+    })
+
+    await client.query(
+      `UPDATE greenhouse_core.design_handoff_entries
+          SET implementation_strategy = $2,
+              primitive_key = $3,
+              primitive_variant = $4,
+              primitive_kind = $5,
+              primitive_lab_route = $6,
+              primitive_runtime_route = $7,
+              primitive_gvc_ref = $8,
+              primitive_docs_ref = $9,
+              primitive_rationale = $10,
+              primitive_decision_owner = $11,
+              primitive_decision_due_at = $12,
+              primitive_decision_updated_at = NOW(),
+              updated_by = $13
+        WHERE entry_id = $1`,
+      [
+        input.entryId,
+        normalized.implementationStrategy,
+        normalized.primitiveKey,
+        normalized.primitiveVariant,
+        normalized.primitiveKind,
+        normalized.primitiveLabRoute,
+        normalized.primitiveRuntimeRoute,
+        normalized.primitiveGvcRef,
+        normalized.primitiveDocsRef,
+        normalized.primitiveRationale,
+        normalized.primitiveDecisionOwner,
+        normalized.primitiveDecisionDueAt,
+        input.actorUserId
+      ]
+    )
+
+    const updated = await requireEntryForUpdate(client, input.entryId)
+
+    const entry = {
+      ...updated,
+      primitiveGovernance: derivePrimitiveGovernance(updated)
+    }
+
+    await insertEvent(client, {
+      entry,
+      eventType: 'primitive_decision_updated',
+      fromStatus: current.status,
+      actorUserId: input.actorUserId,
+      metadata: {
+        implementationStrategy: entry.implementationStrategy,
+        primitiveKey: entry.primitiveKey,
+        primitiveVariant: entry.primitiveVariant,
+        primitiveKind: entry.primitiveKind,
+        warnings: entry.primitiveGovernance?.warnings ?? []
+      }
+    })
+    await publishEntryEvent(client, entry, 'primitive_decision_updated', input.actorUserId, {
+      implementationStrategy: entry.implementationStrategy,
+      primitiveKey: entry.primitiveKey,
+      primitiveVariant: entry.primitiveVariant,
+      primitiveKind: entry.primitiveKind,
+      warnings: entry.primitiveGovernance?.warnings ?? []
+    })
+
+    return entry
+  })
+
 export const linkDesignHandoffWorkItem = async (
   input: LinkDesignHandoffWorkItemInput
 ): Promise<DesignHandoffEntryLink> =>
@@ -852,7 +1038,8 @@ export const transitionDesignHandoffEntry = async (
       fromStatus: current.status,
       toStatus: input.toStatus,
       implementedSurfaceKey: effectiveImplementedSurfaceKey,
-      evidenceSummary
+      evidenceSummary,
+      primitiveDecision: current
     })
 
     await client.query(
