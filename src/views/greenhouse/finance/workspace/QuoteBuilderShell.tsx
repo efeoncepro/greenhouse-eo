@@ -1743,49 +1743,51 @@ const QuoteBuilderShell = ({
         router.push(`/finance/quotes/${quotationId}`)
       }
 
-      // Fresh-simulate on submit: el hook usePricingSimulation debouncea,
-      // así que el `simulation` cacheado puede estar desfasado vs el draft
-      // que el usuario acaba de tocar. Antes de persistir pedimos al engine
-      // un output fresco sobre la SNAPSHOT ACTUAL. Cero race condition.
-      let freshSimulationLines: PricingLineOutputV2[] | null = null
-      let freshSimulationError: string | null = null
+      // TASK-1212: la autoría/emisión delega en el command canónico
+      // `submitQuoteFromBuilder` vía POST /api/finance/quotes/author. El command
+      // re-simula fresco server-side (el precio SIEMPRE del engine) y construye las
+      // líneas — la UI ya NO es source of truth del pricing. Mandamos los drafts
+      // crudos del editor. El fresh-simulate + build client-side se conserva solo para
+      // el seam legacy `onSubmit` (no usado por las páginas new/edit).
+      if (onSubmit) {
+        let freshSimulationLines: PricingLineOutputV2[] | null = null
+        let freshSimulationError: string | null = null
 
-      if (!selectedTemplateId) {
-        const freshInput = buildQuotePricingInput(builderState, currency, draftLines)
+        if (!selectedTemplateId) {
+          const freshInput = buildQuotePricingInput(builderState, currency, draftLines)
 
-        if (freshInput) {
-          try {
-            const simRes = await fetch('/api/finance/quotes/pricing/simulate', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(freshInput satisfies PricingEngineInputV2)
-            })
+          if (freshInput) {
+            try {
+              const simRes = await fetch('/api/finance/quotes/pricing/simulate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(freshInput satisfies PricingEngineInputV2)
+              })
 
-            if (!simRes.ok) {
-              const simBody = (await simRes.json().catch(() => ({}))) as { error?: string }
+              if (!simRes.ok) {
+                const simBody = (await simRes.json().catch(() => ({}))) as { error?: string }
 
-              freshSimulationError = simBody.error ?? 'No pudimos recalcular el pricing antes de guardar.'
-            } else {
-              const simBody = (await simRes.json()) as { lines?: PricingLineOutputV2[] }
+                freshSimulationError = simBody.error ?? 'No pudimos recalcular el pricing antes de guardar.'
+              } else {
+                const simBody = (await simRes.json()) as { lines?: PricingLineOutputV2[] }
 
-              freshSimulationLines = simBody.lines ?? null
+                freshSimulationLines = simBody.lines ?? null
+              }
+            } catch {
+              freshSimulationError = 'No pudimos conectar con el motor de pricing. Revisa tu conexión.'
             }
-          } catch {
-            freshSimulationError = 'No pudimos conectar con el motor de pricing. Revisa tu conexión.'
           }
         }
-      }
 
-      const persistedLineItems = selectedTemplateId
-        ? []
-        : buildPersistedQuoteLineItems({
-            lines: draftLines,
-            currency,
-            simulationLines: freshSimulationLines,
-            missingPriceMessage: freshSimulationError ?? UNPRICED_QUOTATION_LINE_ITEMS_MESSAGE
-          })
+        const persistedLineItems = selectedTemplateId
+          ? []
+          : buildPersistedQuoteLineItems({
+              lines: draftLines,
+              currency,
+              simulationLines: freshSimulationLines,
+              missingPriceMessage: freshSimulationError ?? UNPRICED_QUOTATION_LINE_ITEMS_MESSAGE
+            })
 
-      if (onSubmit) {
         const result = await onSubmit({
           mode,
           quotationId: quote?.quotationId ?? null,
@@ -1816,96 +1818,59 @@ const QuoteBuilderShell = ({
         return
       }
 
-      if (mode === 'create') {
-        const res = await fetch('/api/finance/quotes', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            templateId: selectedTemplateId,
+      const authorRes = await fetch('/api/finance/quotes/author', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          mode,
+          quotationId: quote?.quotationId ?? null,
+          header: {
             organizationId,
-            description: builderState.description.trim(),
-            pricingModel,
-            currency,
-            billingFrequency,
-            contractDurationMonths: builderState.contractDurationMonths,
-            validUntil: builderState.validUntil,
-            businessLineCode: builderState.businessLineCode,
-            commercialModel: builderState.commercialModel,
-            pricingEngineCommercialModel: builderState.commercialModel,
-            countryFactorCode: builderState.countryFactorCode,
             contactIdentityProfileId,
             hubspotDealId,
-            lineItems: persistedLineItems
-          })
-        })
-
-        if (!res.ok) {
-          const body = (await res.json().catch(() => ({}))) as { error?: string }
-
-          throw new Error(body.error ?? GH_PRICING.builderSubmitErrorGeneric)
-        }
-
-        const created = (await res.json()) as { quotationId?: string }
-
-        const createdQuotationId = created.quotationId ?? null
-
-        if (issueAfterSave) {
-          await resolveIssuedRedirect(createdQuotationId)
-        } else {
-          resolveSavedRedirect(createdQuotationId)
-        }
-
-        return
-      }
-
-      if (mode === 'edit' && quote?.quotationId) {
-        const putRes = await fetch(`/api/finance/quotes/${quote.quotationId}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            description: builderState.description.trim(),
+            templateId: selectedTemplateId,
+            businessLineCode: builderState.businessLineCode,
             currency,
             billingFrequency,
             contractDurationMonths: builderState.contractDurationMonths,
             validUntil: builderState.validUntil,
-            businessLineCode: builderState.businessLineCode,
+            description: builderState.description.trim(),
             pricingModel,
             commercialModel: builderState.commercialModel,
-            contactIdentityProfileId,
-            hubspotDealId
-          })
+            pricingEngineCommercialModel: builderState.commercialModel,
+            countryFactorCode: builderState.countryFactorCode
+          },
+          lines: draftLines,
+          issueAfterSave
         })
+      })
 
-        if (!putRes.ok) {
-          const body = (await putRes.json().catch(() => ({}))) as { error?: string }
+      const authorBody = (await authorRes.json().catch(() => ({}))) as {
+        quotationId?: string
+        finalState?: 'draft' | 'issued' | 'pending_approval'
+        error?: string
+      }
 
-          throw new Error(body.error ?? GH_PRICING.builderSubmitErrorGeneric)
-        }
+      if (!authorRes.ok) {
+        throw new Error(authorBody.error ?? GH_PRICING.builderSubmitErrorGeneric)
+      }
 
-        const linesRes = await fetch(`/api/finance/quotes/${quote.quotationId}/lines`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            lineItems: persistedLineItems,
-            pricingContext: {
-              commercialModelCode: builderState.commercialModel,
-              countryFactorCode: builderState.countryFactorCode,
-              autoResolveAddons: 'internal_only'
-            }
-          })
-        })
+      const authoredQuotationId = authorBody.quotationId ?? quote?.quotationId ?? null
 
-        if (!linesRes.ok) {
-          const body = (await linesRes.json().catch(() => ({}))) as { error?: string }
+      if (issueAfterSave) {
+        if (!authoredQuotationId) return
 
-          throw new Error(body.error ?? GH_PRICING.builderSubmitErrorGeneric)
-        }
-
-        if (issueAfterSave) {
-          await resolveIssuedRedirect(quote.quotationId)
-        } else {
-          resolveSavedRedirect(quote.quotationId)
-        }
+        // El command ya emitió en la misma llamada (etapa post-save). Solo
+        // resolvemos el toast/redirect según el estado final que devolvió.
+        toast.success(
+          authorBody.finalState === 'pending_approval'
+            ? GH_PRICING.builderIssueRequested
+            : GH_PRICING.builderIssued,
+          { duration: 2600 }
+        )
+        router.push(`/finance/quotes/${authoredQuotationId}`)
+      } else {
+        resolveSavedRedirect(authoredQuotationId)
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : GH_PRICING.builderSubmitErrorGeneric)
