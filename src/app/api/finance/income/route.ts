@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
+import { can } from '@/lib/entitlements/runtime'
 import { resolveFinanceClientContext } from '@/lib/finance/canonical'
 import { assertFinanceBigQueryReadiness, ensureFinanceInfrastructure } from '@/lib/finance/schema'
 import {
@@ -269,6 +270,11 @@ export async function POST(request: Request) {
 
   if (!tenant) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  // TASK-1193 — gate fino de acción (capability != route-group).
+  if (!can(tenant, 'finance.income.create', 'create', 'tenant')) {
+    return NextResponse.json({ error: 'No tienes permiso para crear ingresos.', code: 'forbidden' }, { status: 403 })
   }
 
   return withIdempotency(request, tenant.clientId, '/api/finance/income', async () => {

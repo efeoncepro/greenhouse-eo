@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
+import { can } from '@/lib/entitlements/runtime'
 import { emitDte } from '@/lib/nubox/emission'
 import { enqueueDteEmissionWithType } from '@/lib/finance/dte-emission-queue'
 
@@ -27,6 +28,11 @@ export async function POST(
 
   if (!tenant) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  // TASK-1193 — gate fino de acción (capability != route-group).
+  if (!can(tenant, 'finance.income.emit_dte', 'update', 'tenant')) {
+    return NextResponse.json({ error: 'No tienes permiso para emitir DTE de ingresos.', code: 'forbidden' }, { status: 403 })
   }
 
   const { id: incomeId } = await params

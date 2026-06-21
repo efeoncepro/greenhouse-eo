@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
+import { can } from '@/lib/entitlements/runtime'
 import { emitDte, type EmitDteResult } from '@/lib/nubox/emission'
 import { enqueueDteEmissionWithType } from '@/lib/finance/dte-emission-queue'
 
@@ -24,7 +25,16 @@ const isRetryableDteError = (error: string | null | undefined) => {
 }
 
 export async function POST(request: Request) {
-  await requireFinanceTenantContext()
+  const { tenant, errorResponse } = await requireFinanceTenantContext()
+
+  if (!tenant) return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+  // TASK-1193 — gate fino de acción (capability != route-group). De paso cierra un gap
+  // latente: la ruta antes hacía `await requireFinanceTenantContext()` sin chequear el
+  // resultado (el errorResponse se descartaba y la emisión batch corría igual).
+  if (!can(tenant, 'finance.income.batch_emit_dte', 'update', 'tenant')) {
+    return NextResponse.json({ error: 'No tienes permiso para emitir DTE en batch.', code: 'forbidden' }, { status: 403 })
+  }
 
   const body = (await request.json()) as { incomeIds?: string[]; dteTypeCode?: string }
 

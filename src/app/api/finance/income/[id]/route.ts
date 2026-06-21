@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
+import { can } from '@/lib/entitlements/runtime'
 import { resolveFinanceClientContext } from '@/lib/finance/canonical'
 import { assertFinanceBigQueryReadiness, ensureFinanceInfrastructure } from '@/lib/finance/schema'
 import {
@@ -174,6 +175,11 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
 
   if (!tenant) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  // TASK-1193 — gate fino de acción (capability != route-group).
+  if (!can(tenant, 'finance.income.update', 'update', 'tenant')) {
+    return NextResponse.json({ error: 'No tienes permiso para editar ingresos.', code: 'forbidden' }, { status: 403 })
   }
 
   try {

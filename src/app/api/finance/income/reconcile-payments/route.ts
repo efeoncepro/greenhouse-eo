@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { reconcilePaymentTotals } from '@/lib/finance/payment-ledger'
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
+import { can } from '@/lib/entitlements/runtime'
 import { toNumber } from '@/lib/finance/shared'
 
 export const dynamic = 'force-dynamic'
@@ -20,6 +21,11 @@ export async function POST() {
 
   if (!tenant) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  // TASK-1193 — gate fino de acción (capability != route-group).
+  if (!can(tenant, 'finance.income.record_payment', 'create', 'tenant')) {
+    return NextResponse.json({ error: 'No tienes permiso para reconciliar pagos de ingreso.', code: 'forbidden' }, { status: 403 })
   }
 
   // Find divergent incomes
