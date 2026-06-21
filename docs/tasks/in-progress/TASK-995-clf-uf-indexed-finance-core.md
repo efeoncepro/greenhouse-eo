@@ -25,6 +25,24 @@
 - Legacy ID: `none`
 - GitHub Issue: `[optional]`
 
+## Delta 2026-06-21 — Slices 3–6 implementados (gated OFF); expense-CLF/readers/revaluación diferidos (anti-drift)
+
+Con el gate de la base MXN liberado por el operador, se implementó el grueso de la capability CLF, **todo gated default-OFF + aditivo + sin regresión** (full suite 7529 verde):
+
+- **Slice 3a — snapshot CLF→CLP (Option A):** migration `20260621073434333` (fx_snapshots admite `from_currency='CLF'` + discriminador `from_unit_class` + CHECK de coherencia); `FxSnapshotEvidence` ampliado + `resolveIndexedUnitSnapshotEvidence` (UF desde `economic_indicators.UF` vía `clf_from_indicators`, fail-closed); 5 flags CLF.
+- **Slice 3b — income projection CLF:** `buildClfIncomeProjection` (native CLF × UF → CLP funcional, fail-closed); `createFinanceIncomeInPostgres` con plano native opcional; rama gated en el quote-to-cash materializer (cotización/**OC en UF** → income moneda legal CLP + plano native UF + snapshot bloqueado). Camino no-CLF/flag-OFF bit-for-bit.
+- **Slice 4 — guarda órdenes:** `assertPaymentOrderCashCurrency` rechaza CLF como moneda de orden de pago (defensa en profundidad sobre el CHECK de DB).
+- **Slice 6 — 4 reliability signals:** `finance.uf.rate_freshness`, `finance.indexed_unit.{snapshot_missing,native_functional_drift,settlement_currency_violation}` (wired al overview; SQL ejercitada contra PG real, todas steady).
+
+**Datos de negocio del operador (2026-06-21) incorporados a la ADR:** (1) las **OC del cliente llegan en UF** (fuente del monto nativo; factura legal CLP) → resuelve Q3; (2) las **compras llegan en UF/MXN/CLP/USD** (no todas UF) — la proyección CLF es condicional por moneda real.
+
+**Diferido con documentación (anti-drift, sin consumer vivo — misma disciplina que TASK-990 con sus readers USD):**
+- **Expense-CLF writer (compras en UF):** el operador confirmó que **las compras en UF aún NO se registran** como expense. El schema ya está listo (`expenses.native_currency` acepta CLF) + el helper UF→CLP es reutilizable; el writer (~1 rama gated análoga a income) se construye cuando exista el upstream (gasto manual / OC a proveedor).
+- **Slice 5 readers + reconciliación CLF + revaluación-al-pago:** sin income CLF real ni cobro CLF vivo, exponer readers/clasificar revaluación sería sembrar sin consumidor. Schema listo; se cablea cuando haya datos CLF reales + un consumer (UI = task `ui-ux` dependiente).
+- **`finance.indexed_unit.revaluation_unclassified`** difiere junto con la columna/lógica de revaluación.
+
+Estado: `in-progress` (code-complete de la capa con consumer; rollout = flip de flags CLF + verificación con datos reales, acción operador). Sin push (local-first).
+
 ## Delta 2026-06-20 — Slice 0 ADR redactado (proposed); STOP para aceptación
 
 - **Discovery confirmado:** foundation TASK-990 existe (`src/lib/finance/multi-currency/*`), `FinanceCurrency='CLP'|'USD'|'MXN'` (CLF fuera), provider `clf-from-indicators` resuelve CLP↔CLF desde `economic_indicators.UF` (fresco 2026-06-19). El ADR `GREENHOUSE_CLF_INDEXED_FINANCE_CORE_V1` no existía.
