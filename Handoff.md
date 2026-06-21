@@ -1,3 +1,12 @@
+## Sesión 2026-06-21 — TASK-1206 Q2C Close Command (Slice 1 — diseño + readiness) — Claude
+
+> **Estado:** 🚧 in-progress. **Slice 1 (discovery + readiness report) HECHO**; Slices 2-5 (command + convergencia de rutas + signals + smoke) PENDIENTES por decisión del operador (diseño + report ahora, implementar el command que toca AR después).
+> - **Commit (`e8547122c`):** `q2c-readiness-report.ts` (read-only) + test + diseño completo en la spec (Zone 2).
+> - **Discovery clave (no re-hacer):** divergencia confirmada — `convertQuoteToCash` tiene audit Q2C + contrato + idempotencia pero NO income; `materializeInvoiceFromApprovedQuotation` (el path VISIBLE = convert-to-invoice) crea income pero NO audit Q2C y NO es idempotente (replay lanza 409, no devuelve incomeId). Live: 12 issued, 0 converted, **las 12 sin hubspot_deal** (autopromoter no las cierra).
+> - **Decisiones tomadas:** atomicidad = **income idempotente PRIMERO → converted** (no tx compartida). Capability = `commercial.quote_to_cash.execute` (ya existe + enforced en ambas rutas por TASK-1202).
+> - **Próximo paso (retomar con `/implement-task 1206`):** Slice 2 = orquestador `closeQuoteToCash` (income idempotente + substrate `convertQuoteToCash`, 3 estrategias) → Slice 3 convergencia de rutas (cutover gated) → Slice 4 signals (lógica ya en el reader) → Slice 5 smoke. El diseño detallado está en Zone 2 de la spec.
+> - **Convivencia:** Slice 1 está local sin pushear (1 commit). Stack F9 (1192/1193/1202) ya pusheado.
+
 ## Sesión 2026-06-21 — TASK-1202 Quote + reconciliation capability gates (Wave 3 F9) — Claude
 
 > **Estado:** ✅ code-complete local-first en `develop`, sin push. **Rollout pendiente:** narrowing intencional → staging smoke. Migración seed aplicada en dev.
