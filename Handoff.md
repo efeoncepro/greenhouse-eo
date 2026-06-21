@@ -1,3 +1,23 @@
+## Sesión 2026-06-21 — TASK-1212 Quote Write Parity (command + Nexa governed action) — Claude
+
+> **Estado:** ✅ code-complete local-first en `develop`, sin push (esperando instrucción del operador). Rollout pendiente: prender `NEXA_QUOTE_AUTHOR_ACTION_ENABLED` en staging/prod (default OFF) para habilitar la governed action.
+> - **Decisión del operador en sesión:** Slice 2 (delegación del shell) **NO diferido** — Codex cerró TASK-1213, así que la delegación se hizo aquí. Atomicidad: el operador pidió decidir con arch-architect + commercial-expert → **por etapa + idempotencia + rollback honesto** (NO total: `persistQuotationPricing` ya es atómico interno; issue es etapa separada con draft recuperable, modelo CPQ correcto). Capability: se **consume `commercial.quotation`** existente (no se acuñó nada; esquiva TASK-1202).
+> - **Slice 1 (`a6b7cbc6e`):** command `submitQuoteFromBuilder` (`src/lib/commercial/`) — SSOT del write path; reusa persist/issue/engine/build; idempotencia vía ledger canónico `api_platform_command_executions` (sin migración); reubica lógica pura pricing-build a `src/lib/finance/pricing/quote-builder-line-items.ts` (vista re-exporta). 10 tests.
+> - **Slice 3 (`9040c7c9f`):** contrato Zod `submitQuoteFromBuilderPayloadSchema` con guards de asignabilidad. 6 tests.
+> - **Slice 2 (`c9bb6d48a`):** endpoint `POST /api/finance/quotes/author` + shell delega en una sola llamada (drafts crudos, server re-simula). Diff del shell 100% lógica de red (estética TASK-1213 intacta — frame GVC `02-initial-context-wizard` revisado). **E2E live**: create 201 + idempotencia real (mismo key → mismo quotation/operation, replayed, sin duplicar). 5 tests. `[downstream-verified: quote-author]`.
+> - **Slice 4 (`f67fa9a3b`):** Nexa governed action `author_quote` — runtime extendido a acciones **parametrizadas** (`NexaActionDefinition<TInput>` + `inputSchema`); loop `propose → confirm → execute`; el confirm re-valida input + ejecuta el MISMO command. Gateada por `NEXA_QUOTE_AUTHOR_ACTION_ENABLED` (default OFF, en el ledger). 6 tests + 17 backward-compat verdes.
+> - **Slice 5 (`6c4e971e2`):** signal `commercial.quote.authored_without_command` (steady=0 verificado live: los 12 zombies del dev eran imports nubox, excluidos por scope `source_system='manual'`); docs funcional + ADR delta + changelog + manual.
+> - **Verificación de cierre:** full `pnpm test` 7589 passed / 0 failed; tsc + lint verdes por slice; grant-coverage 2/2; finance:e2e-gate skip (árbol limpio, trailer presente); task:lint errors=0; `pnpm build` corriendo.
+> - **Convivencia:** no toqué `src/lib/reliability/queries/dte-emission-queue-health.ts` ni el `TASK-1207` borrado (ajenos). Write lane externo MCP/agentes sigue diferido (consultar-first).
+
+## Sesión 2026-06-21 — Breadcrumbs shadcn prompt port — Codex
+
+> **Estado:** complete local-first, sin backend/schema. A pedido del operador, dos prompts shadcn de breadcrumbs se trajeron como capacidades de la primitive canónica `GreenhouseBreadcrumbs`, no como `/components/ui/breadcrumb`.
+> - **Implementado:** `separator='chevrons'`, `labelVisuallyHidden` para raíz icon-only accesible, `motion='subtle'`, `hitArea='comfortable'`, robustez responsive de labels (`minInlineSize:0` + wrap honesto), specimens nuevos en `/design-system/breadcrumbs` con Home/Documents/Add Document y Home/Components/Breadcrumb e iconos Tabler.
+> - **Docs/evidencia:** contrato actualizado en `docs/architecture/ui-platform/PRIMITIVES.md` y changelog. Scenario `design-system-breadcrumbs` ahora espera ambos specimens y captura frames clippeados `breadcrumbs-chevrons-icons` y `breadcrumbs-motion-comfortable`.
+> - **Verificación:** ESLint focal verde; vitest `GreenhouseBreadcrumbs` 5/5 verde; `tsc --noEmit` verde; `pnpm design:lint` verde; GVC local `.captures/2026-06-21T19-49-49_design-system-breadcrumbs` desktop/mobile revisado.
+> - **Convivencia:** no tocar cambios ajenos existentes en Nexa, `TASK-1207` ni `src/lib/reliability/queries/dte-emission-queue-health.ts`.
+
 ## Sesión 2026-06-21 — TASK-1213 Quotes Pipeline Redesign + Adaptive Preview — Codex
 
 > **Estado:** ✅ complete local-first. La task fue tomada desde `to-do/`, implementada y movida a `docs/tasks/complete/TASK-1213-quotes-pipeline-redesign-adaptive-preview.md`; README/registry sincronizados.

@@ -1,5 +1,9 @@
 # TASK-1202 — Finance Quotes Reconciliation Capability Extension
 
+## Delta 2026-06-21
+
+- **La autoría/emisión de cotización NO necesita una capability nueva de este catálogo** — cerrado por TASK-1212. El write vertical del cotizador consume la capability **existente `commercial.quotation`** (actions `create` para autorar, `approve` para emitir), ya granteada a los roles internos comerciales en `runtime.ts`. TASK-1212 NO acuñó `commercial.quotation.author`/`.issue`; si 1202 reorganiza el catálogo de quotes, mantener `commercial.quotation` create/approve como el contrato de write del cotizador (consumido por el command `submitQuoteFromBuilder` + la Nexa governed action `author_quote`). La huérfana `commercial.quote_to_cash.execute` sigue siendo del cierre (TASK-1206), no de la autoría.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"

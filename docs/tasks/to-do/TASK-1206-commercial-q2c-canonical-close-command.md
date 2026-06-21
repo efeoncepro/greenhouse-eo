@@ -1,5 +1,10 @@
 # TASK-1206 — Commercial Q2C Canonical Close Command
 
+## Delta 2026-06-21 — runtime gobernado parametrizado ya disponible (TASK-1212)
+
+- TASK-1212 extendió el **runtime de Nexa governed actions a acciones PARAMETRIZADAS** (`NexaActionDefinition<TInput>` + `inputSchema` Zod; `resolveNexaActionProposal`/`confirmNexaAction` ahora parsean + re-validan input; el `propose_action` tool acepta `input`). El close command de esta task debe **reusar ese mismo runtime** (registrar una acción `close_quote`/`convert_to_cash` con su `inputSchema`), NO crear una integración Nexa paralela. Comparte el governed-action surface (dominio `commercial-q2c`) con `author_quote`.
+- El command de autoría `submitQuoteFromBuilder` (`src/lib/commercial/`) es el **patrón de referencia**: command server-side único + idempotencia vía el ledger canónico `api_platform_command_executions` (sin migración) + capability `can(commercial.quotation, ...)` enforced en el command + atomicidad por etapa con rollback honesto. El cierre debe enforzar la capability huérfana **`commercial.quote_to_cash.execute`** (que esta task hace dejar de ser huérfana).
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
