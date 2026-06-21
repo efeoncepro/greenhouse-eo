@@ -1,5 +1,18 @@
 # TASK-990 — MXN Multi-Currency Finance Core
 
+## Cierre 2026-06-21 — COMPLETE (implementación) · rollout trasladado a TASK-1210
+
+**Decisión del operador:** cerrar esta task como **implementación completa** (Slices 0–9 mergeados en `develop`, gated default-OFF, cuenta Global66 MXN nativa creada/verificada, dry-runs verdes, open question fx_drift resuelta) y **trasladar el rollout operativo pendiente a [TASK-1210](../to-do/TASK-1210-mxn-clf-finance-core-rollout-completion.md)**. Pendiente trazado allí: flip de flags MXN, redeploy ops-worker, backfill Berel native plane (`28800562`+`29062197`), verificación runtime. No se prendió ningún flag ni se pusheó (Codex trabajando en paralelo).
+
+## Delta 2026-06-21 — Cuenta Global66 MXN nativa CREADA (rollout step 3 ✅)
+
+El operador creó la cuenta de settlement nativa-MXN; **ya NO es pendiente de rollout**. Verificado live en dev PG (`greenhouse_finance.accounts`):
+
+- `account_id='global-66-mxn-mxn'`, `account_name='Global 66 - MXN'`, `currency='MXN'`, `is_active=true`, `provider_slug='global66'`, CLABE `703180052006860943`, `default_for=['client_collection']`, `account_kind='asset'`. Creada 2026-06-02 por `user-efeonce-admin-julio-reyes` (vía admin, no por el script gateado — equivalente y previsto en Slice 9).
+- Es la fila nativa-MXN correcta, **distinta** de la Global66 CLP→USD de payroll internacional (no confundir; ADR §0 + §9.1).
+
+Rollout step 3 (onboardear cuenta Global66 MXN) → **HECHO**. Restan: flip de flags MXN, redeploy workers, backfill income Berel, verificación post-rollout.
+
 ## Delta 2026-06-03 — MXN validado LIVE con Grupo Berel (primer cliente MXN del programa)
 
 **Contexto programa (EPIC-CLIENT-360):** esta task (soporte MXN en finance core) es el **enabler raíz** del onboarding de **Grupo Berel** — cliente mexicano cuya incorporación motivó todo el programa (MXN + vía canónica para incorporar clientes). Encadena: TASK-990 (MXN) → TASK-991 (org write SSOT) → TASK-992/997 (puerta única / wizard) → TASK-998 (teamspace link) → TASK-1000/1003 (sync diario).
@@ -16,7 +29,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P0`
 - Impact: `Muy alto`
 - Effort: `Alto`
@@ -59,7 +72,7 @@ TASK-991 (Slice 3) ya remedió **en vivo** la identidad de la org de Grupo Berel
 
 **Dry-runs (read-only, repetibles):** `scripts/finance/task-990-nubox-export-rfc-dryrun.ts` (RFC match: Berel auto-match, 0 orphans) · `scripts/finance/task-990-berel-income-native-dryrun.ts` (income native plane: 89960 MXN / 4617647 CLP / 51.33).
 
-**Pendiente:** **rollout operativo** (acción del operador — ver "Delta Slice 9 — rollout sequence" abajo): el código está **code-complete** (Slices 1–9) pero NO **operationally complete** (flags OFF, cuenta Global66 MXN no onboardeada, income de Berel no proyectado, workers Cloud Run no redeployados con flags activos). Per la Runtime Rollout Completion Gate, la task queda `in-progress` (code complete, rollout pendiente). **Diferido con documentación** (sin consumer vivo → no especular, anti-drift): (a) columnas USD en las VIEWs `*_payments_normalized` + superficies reader USD (gated `FINANCE_MULTI_CURRENCY_REPORTING_ENABLED`, sin dashboard consumidor aún); (b) capability `finance.fx.manual_override` + su endpoint admin de override de rate stale/missing (no existe write surface; sembrar la capability sin consumer = drift TASK-873). El override ya es posible hoy vía `exchangeRateOverride` en los ledgers. Gate de cierre: `pnpm test` + `pnpm build` + verificar deploy workers (ops-worker consume `src/lib/nubox`).
+**Pendiente:** **rollout operativo** (acción del operador — ver "Delta Slice 9 — rollout sequence" abajo): el código está **code-complete** (Slices 1–9) pero NO **operationally complete** (flags OFF, ~~cuenta Global66 MXN no onboardeada~~ → **cuenta Global66 MXN creada ✅ 2026-06-21**, income de Berel no proyectado, workers Cloud Run no redeployados con flags activos). Per la Runtime Rollout Completion Gate, la task queda `in-progress` (code complete, rollout pendiente). **Diferido con documentación** (sin consumer vivo → no especular, anti-drift): (a) columnas USD en las VIEWs `*_payments_normalized` + superficies reader USD (gated `FINANCE_MULTI_CURRENCY_REPORTING_ENABLED`, sin dashboard consumidor aún); (b) capability `finance.fx.manual_override` + su endpoint admin de override de rate stale/missing (no existe write surface; sembrar la capability sin consumer = drift TASK-873). El override ya es posible hoy vía `exchangeRateOverride` en los ledgers. Gate de cierre: `pnpm test` + `pnpm build` + verificar deploy workers (ops-worker consume `src/lib/nubox`).
 
 ## Delta 2026-06-02 — PROGRESO Slice 8 (reporting USD plane + 5 signals) — anti-pérdida-de-contexto
 
@@ -96,7 +109,7 @@ Orden canónico (cada paso reversible vía flags / rollback per-slice del Risk M
 
 1. **Staging primero.** Setear en staging (Vercel env `Preview/develop` + ops-worker) los flags uno a uno, validar, luego producción. Redeploy requerido tras cada cambio de env var.
 2. **`FINANCE_CORE_MXN_ENABLED=true`** (master). Activa: native plane en el income write de Nubox, settlement nativo + resultado cambiario, reporting USD. Verificar señales en `/admin/operations` (las 7 MXN deben quedar `ok`).
-3. **Onboardear la cuenta Global66 MXN**: `pnpm tsx --require ./scripts/lib/server-only-shim.cjs scripts/finance/task-990-onboard-global66-mxn-account.ts --apply` (gated tras el master flag; idempotente; expected-mutation-count=1). Declarar su OTB si corresponde.
+3. ~~**Onboardear la cuenta Global66 MXN**~~ ✅ **HECHO 2026-06-21** — creada vía admin: `account_id='global-66-mxn-mxn'`, `currency='MXN'`, `is_active=true`, CLABE `703180052006860943`. Verificada live en dev PG. (El script `scripts/finance/task-990-onboard-global66-mxn-account.ts` queda como referencia idempotente; ya no hace falta correrlo.) Declarar su OTB si corresponde.
 4. **`NUBOX_EXPORT_FOREIGN_CURRENCY_ENABLED=true`** + correr el dry-run RFC (`scripts/finance/task-990-nubox-export-rfc-dryrun.ts`) → resolver dispositions pendientes si las hay.
 5. **Backfill Berel** (gated `FINANCE_MXN_BEREL_BACKFILL_APPLY_ENABLED=true`): dry-run primero (`scripts/finance/task-990-berel-income-native-dryrun.ts`), revisar payload before/after + FX snapshot + match RFC, luego `--apply --allowlist-source-object-id 28800562 --actor <id> --reason "<...>"`. Abort si mutation count ≠ esperado.
 6. **`FINANCE_MXN_PAYMENT_ORDERS_ENABLED`** / **`FINANCE_MULTI_CURRENCY_REPORTING_ENABLED`**: encender cuando se necesiten payables MXN / readers USD (este último sin consumer vivo aún — ver "Diferido").
@@ -793,4 +806,4 @@ Flags must be present in Production, staging and Preview develop before the code
 - Should `reporting` and `analytics` expose USD broadly now, or only in finance multi-currency readers behind `FINANCE_MULTI_CURRENCY_REPORTING_ENABLED` first?
 - **Governance del plano USD — RESUELTO 2026-06-02 (operador):** se confirma la cadena canonica `MXN → CLP(legal Nubox) → USD` para V1 (IAS 21: USD es moneda de presentacion, se convierte desde la funcional CLP). Registrado en ADR §8.4 + `## Currency Plane Sourcing Contract` punto 3. El MXN→USD directo queda como analitica ad-hoc, no como numero consolidado. Reabrir solo si Finance pide reporting "market-pure".
 - **Verificacion fiscal DTE 110:** confirmar contra el artefacto Nubox/SII real (XML/PDF de `28800562`) que el income export se mapea IVA-exento (D.L. 825 Art 12) y que el equivalente CLP que trae Nubox es el valor documental legal (no un estimado). Escalar a contador si el campo de exportacion no es inequivoco.
-- **`account_balances.fx_drift` con cuenta MXN nativa:** confirmar en Slice 7 que el signal `finance.account_balances.fx_drift` (TASK-774) trata correctamente el plano nativo MXN y no dispara drift artificial sobre una cuenta cuyo `currency='MXN'`.
+- ✅ RESUELTO 2026-06-21 — **`account_balances.fx_drift` con cuenta MXN nativa:** verificado read-only contra dev PG. El detector `finance.account_balances.fx_drift` (TASK-774) filtra `AND a.currency = 'CLP'` en su WHERE (Slice 7b) → **por construcción excluye toda cuenta no-CLP**; la cuenta `global-66-mxn-mxn` (MXN) **no puede disparar drift artificial**. Conteos live: drift total (90d) = **0**; drift cuenta MXN = **0**; la cuenta ya tiene 27 filas en `account_balances` (saldo 0, sin drift). No requiere acción en el rollout.

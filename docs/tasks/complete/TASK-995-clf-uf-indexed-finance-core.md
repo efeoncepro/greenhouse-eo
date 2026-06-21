@@ -1,5 +1,9 @@
 # TASK-995 — CLF/UF Indexed Finance Core
 
+## Cierre 2026-06-21 — COMPLETE (implementación) · fix de desglose + rollout + diferidos trasladados a TASK-1210
+
+**Decisión del operador:** cerrar esta task como **implementación completa** (ADR aceptado; Slices 0–6 entregados gated default-OFF, sin regresión, full suite verde; CLP entero + dry-run 7/7 + triple doc) y **trasladar a [TASK-1210](../to-do/TASK-1210-mxn-clf-finance-core-rollout-completion.md)**: (1) el fix de desglose neto/IVA de quotes CLF (HubSpot entrega `subtotal/tax=0`; regla dura: NO asumir IVA, clasificar afecta/exenta por cotización), documentado en §#1.1 de esta task; (2) el rollout (flip flags CLF + verificación con OC/cotización real); (3) los items diferidos por anti-drift (expense-CLF writer, readers/reconciliación Slice 5, revaluación-al-pago + signal). No se prendió ningún flag ni se pusheó (Codex trabajando en la zona de cotizaciones).
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
@@ -8,7 +12,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
@@ -47,6 +51,27 @@ Estado: `in-progress` (code-complete de la capa con consumer; rollout = flip de 
 
 - **#2 CLP entero (HECHO):** el plano funcional CLP de una factura CLF se redondea a entero (factura chilena sin centavos); el native UF conserva decimales. Test con UF realista.
 - **#1 Dry-run de cotizaciones CLF (HECHO):** `scripts/finance/task-995-clf-quotes-projection-dryrun.ts` (READ-ONLY) sobre las **7 cotizaciones CLF reales** → 7/7 proyectables, UF fresca, CLP entero. **Hallazgo pre-rollout (de-risk):** las quotes CLF de HubSpot (`QUO-HS-*`) traen `subtotal/tax_amount=0` (solo `total_amount` poblado) — la rama CLF (y el camino normal) recomputa el tax desde el subtotal, así que materializarían con total=0. **Pre-requisito antes del flip:** poblar/derivar el desglose subtotal+IVA de esas quotes. **Modelo fiscal (operador 2026-06-21):** en income NO todo es exento — la mayoría se **factura con IVA 19% (afecta)**; **sólo las facturas de exportación electrónica** (DTE 110/111/112, p.ej. Berel CL→MX) son **exentas** por exportación. Por eso, para una quote CLF **afecta** con `subtotal=0` y `total` bruto, hay que derivar `neto = total/1.19` + `IVA`; sólo si es de exportación el total va a `exempt`. El fix de exento (TASK-1209) ya es condicional al `exempt_amount` real → income afecto queda bit-for-bit. Es problema de datos/desglose de quotes HubSpot, no del fix CLF.
+- **#1.1 PLAN DEL FIX — desglose subtotal/IVA por cotización (DOC-ONLY, listo para implementar post-Codex):**
+
+  > ⚠️ **REGLA DURA (operador 2026-06-21): NO todas las quotes llevan IVA.** El fix **NUNCA** puede despejar `total/1.19` a ciegas sobre todas. La decisión afecta-vs-exento se toma **por cotización** (y, si existe, **por línea**), leyendo el tratamiento fiscal real de la quote — no asumiendo. Una quote exenta a la que se le aplique gross-up genera un IVA inventado (descuadre SII).
+
+  **Origen del problema:** las quotes CLF de HubSpot traen sólo `total_amount`; `subtotal` y `tax_amount` llegan en 0. La proyección necesita las tres cifras separadas.
+
+  **Orden de resolución del desglose (primera fuente que exista gana):**
+  1. **Desglose real por línea** (preferido): si las líneas de la cotización (Greenhouse pricing / HubSpot line items) traen neto + IVA reales, usar esos. Cubre quotes **mixtas** (líneas afectas + exentas en la misma quote) sin asumir nada.
+  2. **Despeje desde el total + clasificación fiscal de la quote** (fallback, sólo si no hay desglose por línea):
+     - **Afecta** (lleva IVA 19%): `neto = round(total / 1.19)`, `IVA = total − neto`. (CLP entero, half-up, consistente con #2.)
+     - **Exenta** (exportación electrónica DTE 110/111/112 **u otro servicio exento**): `neto = total`, `IVA = 0`, monto al plano `exempt`. **No** despejar.
+  3. Si no se puede clasificar la quote como afecta NI exenta con confianza → **NO proyectar**: marcar para revisión (no adivinar el IVA). Mejor bloquear que materializar un IVA falso.
+
+  **De dónde sale la clasificación afecta/exenta (no hardcodear):** del propio tratamiento fiscal de la cotización (flag/condición de exención de la quote + tipo de DTE esperado), reutilizando el resolver fiscal existente (`resolveNuboxIncomeTaxCode` / convención `cl_vat_exempt` para export DTE) — la misma fuente que ya usa el income afecto/exento, no una heurística nueva.
+
+  **Invariante de no-regresión:** el income **afecto** debe quedar con identidad `total = neto + IVA`; el **exento** con `total = exento`, `IVA = 0`. El fix de exento de TASK-1209 ya es condicional al `exempt_amount` real → no se rompe.
+
+  **Fixtures reales para el test (de las 7 quotes CLF del dry-run, todas con `subtotal=0 tax=0` hoy):** `QUO-HS-39213268895` total 128,996 UF → 5.262.151 CLP; `QUO-HS-15109410903` 92,3954 UF → 3.769.098; `QUO-HS-15109412530` 20,4442 UF → 833.983; `QUO-HS-17578192421` 17,0527 UF → 695.633; `QUO-HS-38303115271` 128,996 UF → 5.262.151; `QUO-HS-39215560714` 128,996 UF → 5.262.151. Para cada una, el test verifica: (a) si afecta → `neto + IVA == total` con IVA = round(neto×0.19); (b) si exenta → `IVA == 0` y `total == exento`; (c) caso mixto con líneas → suma de líneas == total. **Incluir al menos un fixture exento** para blindar la regla dura (no asumir IVA).
+
+  **Zona de código (la toca Codex ahora → IMPLEMENTAR DESPUÉS):** rama CLF del quote-to-cash materializer + `buildClfIncomeProjection`. Por eso queda **doc-only** hasta que Codex libere `src/views/.../finance/workspace/*` y la zona de pricing. Sin flags, sin push.
+
 - **#3 Fix exento en expenses (RECALIBRADO, no aplicado):** NO es espejo del fix de income. En expenses la convención es opuesta — el sync de compras pasa el exento **como subtotal** (`taxSubtotal = exempt cuando net=0`), así que `buildExpenseTaxWriteFields` ya incluye el exento en el total. Sumar `exemptAmount` (income-style) **rompería las compras Nubox exentas por doble-conteo**. El gap real es acotado (gasto manual 100% exento con subtotal=0 + exempt separado, vía `POST /api/finance/expenses`) y su fix correcto es **alinear la convención de exento en expenses** (refactor con riesgo sobre el sync que funciona) → amerita **task separada**, no colarlo en TASK-995.
 
 ## Delta 2026-06-20 — Slice 0 ADR redactado (proposed); STOP para aceptación
