@@ -3,7 +3,7 @@
 > **Tipo:** Spec de arquitectura (contrato agent-facing)
 > **Versión:** 1.0
 > **Creado:** 2026-06-21 por Claude (arch-architect)
-> **Estado:** `Proposed` — gobierna el diseño de TASK-1211 y converge TASK-1202/1206. No implementar contratos irreversibles hasta `Accepted` (ver `GREENHOUSE_QUOTE_API_PARITY_DECISION_V1.md`).
+> **Estado:** `Accepted` (ADR) — **read vertical (TASK-1211) implementado 2026-06-21**: redactor `redactPricingOutputForProfile` (3 audiencias) + resolver `searchServiceCatalog` + capability `commercial.quote.simulate` + contrato Zod + envelope `simulateQuotePricing` + consumers Nexa (`quote_price`) / MCP (`search_services`,`quote_price`) / API Platform lanes `quotation` (app+ecosystem). Cierra el leak de `from-service`. Write vertical = TASK-1212. Converge TASK-1202/1206.
 > **Decisión canónica:** `docs/architecture/GREENHOUSE_QUOTE_API_PARITY_DECISION_V1.md`
 > **Subordinada a:** `GREENHOUSE_FULL_API_PARITY_DECISION_V1.md` (base + North Star) · `GREENHOUSE_COMMERCIAL_QUOTATION_ARCHITECTURE_V1.md` · `GREENHOUSE_COMMERCIAL_FINANCE_DOMAIN_BOUNDARY_V1.md` · `GREENHOUSE_NEXA_ARCHITECTURE_V1.md` · `GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md`
 
