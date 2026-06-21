@@ -25,11 +25,20 @@ import { buildReceiptPresentation, RECEIPT_REGIME_BADGES } from '@/lib/payroll/r
 import { searchKnowledge } from '@/lib/knowledge/search/search-knowledge'
 import type { KnowledgeRetrievalPacket, KnowledgeSearchSubject } from '@/lib/knowledge/search'
 import { captureWithDomain } from '@/lib/observability/capture'
+import { searchServiceCatalog } from '@/lib/commercial/service-catalog-search'
+import { PRICING_OUTPUT_CURRENCIES, type PricingOutputCurrency } from '@/lib/finance/pricing/contracts'
+import { simulateQuotePricingFromService } from '@/lib/finance/pricing/simulate-quote-pricing'
 
 import { recordNexaActionEvent } from './actions/events-store'
 import { buildNexaActionContext, canUseNexaActionRuntime, resolveNexaActionProposal } from './actions/registry'
 import { isNexaActionRuntimeEnabled, isNexaKnowledgeRetrievalEnabled, isNexaKnowledgeSynthesisBriefEnabled } from './flags'
-import type { NexaRuntimeContext, NexaToolInvocation, NexaToolName, NexaToolResult } from './nexa-contract'
+import type {
+  NexaRuntimeContext,
+  NexaToolInvocation,
+  NexaToolMetric,
+  NexaToolName,
+  NexaToolResult
+} from './nexa-contract'
 
 export interface NexaToolExecutionContext {
   tenant: NexaRuntimeContext
@@ -1195,6 +1204,150 @@ const listInsightsTool: NexaToolDefinition = {
   }
 }
 
+// TASK-1211 — Quote read tool: estima el precio de un servicio nombrado.
+// Read-only (no muta), honest-unavailable, sin alucinación: si no encuentra el
+// servicio lo dice, si es ambiguo pide aclaración. Redacta cost stack/margen por
+// audiencia (cliente nunca ve margen). Un primitive, muchos consumers: comparte
+// searchServiceCatalog + simulateQuotePricingFromService con MCP y la API Platform.
+const QUOTE_COST_STACK_ROLE_CODES = [
+  ROLE_CODES.EFEONCE_ADMIN,
+  ROLE_CODES.FINANCE_ADMIN,
+  ROLE_CODES.FINANCE_ANALYST
+]
+
+const resolveQuoteAudience = (
+  tenant: NexaRuntimeContext
+): { audience: 'internal' | 'client'; costStackVisible: boolean } => {
+  const internal = tenant.tenantType === 'efeonce_internal'
+  const costStackVisible = internal && QUOTE_COST_STACK_ROLE_CODES.some(code => hasRoleCode(tenant, code))
+
+  return { audience: internal ? 'internal' : 'client', costStackVisible }
+}
+
+const normalizeQuoteCurrency = (value: unknown): PricingOutputCurrency => {
+  const candidate = typeof value === 'string' ? value.trim().toUpperCase() : ''
+
+  return (PRICING_OUTPUT_CURRENCIES as readonly string[]).includes(candidate)
+    ? (candidate as PricingOutputCurrency)
+    : 'USD'
+}
+
+const formatQuoteAmount = (value: number) => Math.round(value).toLocaleString('es-CL')
+
+const quotePriceTool: NexaToolDefinition = {
+  declaration: {
+    name: 'quote_price',
+    description:
+      'Estima el precio de un servicio de Efeonce por su nombre (ej. "diseño digital"). Devuelve un estimado referencial NO vinculante (paquete estándar). Para clientes oculta costo y margen. Si el nombre es ambiguo, pide aclaración; si no existe, dilo — no inventes un precio.',
+    parametersJsonSchema: {
+      type: 'object',
+      additionalProperties: false,
+      properties: {
+        service: { type: 'string', description: 'Nombre o SKU del servicio a cotizar.' },
+        currency: {
+          type: 'string',
+          description: 'Moneda de salida: USD, CLP, CLF, COP, MXN o PEN. Default USD.'
+        }
+      },
+      required: ['service']
+    }
+  },
+  isAvailable: tenant =>
+    isInternalOperationsUser(tenant) ||
+    hasRouteGroup(tenant, 'commercial') ||
+    hasRouteGroup(tenant, 'finance') ||
+    Boolean(tenant.clientId),
+  async execute(args, context) {
+    const { tenant } = context
+    const service = typeof args.service === 'string' ? args.service.trim() : ''
+    const generatedAt = new Date().toISOString()
+
+    if (!service) {
+      return {
+        available: false,
+        summary: 'Indícame el nombre del servicio que quieres cotizar.',
+        source: 'none',
+        scopeLabel: 'Cotizador',
+        generatedAt,
+        metrics: []
+      }
+    }
+
+    const candidates = await searchServiceCatalog(service, { limit: 5 })
+
+    if (candidates.length === 0) {
+      return {
+        available: true,
+        summary: `No encontré un servicio que coincida con "${service}" en el catálogo. ¿Me das el nombre exacto o el SKU?`,
+        source: 'postgres',
+        scopeLabel: 'Cotizador',
+        generatedAt,
+        metrics: [],
+        raw: { query: service, matches: 0 }
+      }
+    }
+
+    const normalizedService = service.toLowerCase()
+
+    const exact = candidates.find(
+      candidate =>
+        candidate.name.toLowerCase() === normalizedService ||
+        candidate.serviceSku.toLowerCase() === normalizedService
+    )
+
+    if (!exact && candidates.length > 1) {
+      return {
+        available: true,
+        summary: `Hay varios servicios que coinciden con "${service}". ¿A cuál te refieres?`,
+        source: 'postgres',
+        scopeLabel: 'Cotizador',
+        generatedAt,
+        metrics: candidates.map(candidate => ({ label: candidate.name, value: candidate.serviceSku })),
+        raw: { query: service, candidates }
+      }
+    }
+
+    const chosen = exact ?? candidates[0]
+    const currency = normalizeQuoteCurrency(args.currency)
+    const { audience, costStackVisible } = resolveQuoteAudience(tenant)
+
+    const simulation = await simulateQuotePricingFromService(
+      { serviceSku: chosen.serviceSku, outputCurrency: currency },
+      { audience, costStackVisible }
+    )
+
+    const total = simulation.pricing.totals.totalOutputCurrency
+
+    const metrics: NexaToolMetric[] = [
+      { label: 'Servicio', value: simulation.service.name },
+      { label: 'Estimado', value: `${formatQuoteAmount(total)} ${currency}` }
+    ]
+
+    if (audience === 'internal' && simulation.pricing.aggregateMargin) {
+      metrics.push({
+        label: 'Margen',
+        value: `${Math.round(simulation.pricing.aggregateMargin.marginPct)}%`,
+        tone: 'info'
+      })
+    }
+
+    return {
+      available: true,
+      summary: `${simulation.service.name}: estimado referencial de ${formatQuoteAmount(total)} ${currency} (paquete estándar). ${simulation.estimate.disclaimer}`,
+      source: 'postgres',
+      scopeLabel: audience === 'internal' ? 'Cotizador (interno)' : 'Cotizador (cliente)',
+      generatedAt,
+      metrics,
+      raw: {
+        serviceSku: simulation.service.serviceSku,
+        currency,
+        audience,
+        estimate: simulation.estimate
+      }
+    }
+  }
+}
+
 const NEXA_TOOLS: Record<NexaToolName, NexaToolDefinition> = {
   check_payroll: checkPayrollTool,
   get_otd: getOtdTool,
@@ -1205,7 +1358,8 @@ const NEXA_TOOLS: Record<NexaToolName, NexaToolDefinition> = {
   explain_my_pay: explainMyPayTool,
   propose_action: proposeActionTool,
   get_insight: getInsightTool,
-  list_insights: listInsightsTool
+  list_insights: listInsightsTool,
+  quote_price: quotePriceTool
 }
 
 export const getNexaToolDeclarations = (tenant: NexaRuntimeContext): FunctionDeclaration[] =>

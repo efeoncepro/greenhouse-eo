@@ -12,6 +12,7 @@ export type NexaToolName =
   | 'propose_action'
   | 'get_insight'
   | 'list_insights'
+  | 'quote_price'
 
 export type NexaToolMetricTone = 'default' | 'success' | 'warning' | 'error' | 'info'
 
