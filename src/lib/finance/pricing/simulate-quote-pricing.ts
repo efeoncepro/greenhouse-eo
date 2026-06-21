@@ -2,13 +2,14 @@ import 'server-only'
 
 import { expandServiceIntoQuoteLines, type ExpandServiceInput } from '@/lib/commercial/service-catalog-expand'
 
-import type { PricingEngineInputV2, PricingOutputCurrency } from './contracts'
+import { PRICING_OUTPUT_CURRENCIES, type PricingEngineInputV2, type PricingOutputCurrency } from './contracts'
 import { buildPricingEngineOutputV2 } from './pricing-engine-v2'
 import {
   redactPricingOutputForProfile,
   type PricingAudience,
   type RedactedPricingEngineOutput
 } from './pricing-output-redaction'
+import { simulateQuoteInputSchema } from './simulate-input-schema'
 
 /**
  * Envelope canónico de simulación de precio (TASK-1211) — el primitive read/compute
@@ -93,4 +94,49 @@ export const simulateQuotePricingFromService = async (
     pricing: redactPricingOutputForProfile(result.pricing, context),
     estimate: buildEstimateMeta(currency, calculatedAt)
   }
+}
+
+export const normalizeQuoteCurrency = (value: unknown): PricingOutputCurrency => {
+  const candidate = typeof value === 'string' ? value.trim().toUpperCase() : ''
+
+  return (PRICING_OUTPUT_CURRENCIES as readonly string[]).includes(candidate)
+    ? (candidate as PricingOutputCurrency)
+    : DEFAULT_OUTPUT_CURRENCY
+}
+
+export type QuoteSimulationFromBody =
+  | { ok: true; simulation: QuotePricingSimulation | QuotePricingSimulationFromService }
+  | { ok: false; error: string }
+
+/**
+ * Branch compartido por los lanes API Platform (app + ecosystem): un body acepta
+ * `{ serviceSku, currency }` (cotizar un servicio por SKU) o `{ input }` (un
+ * `PricingEngineInputV2` completo validado por Zod). Devuelve un resultado
+ * discriminado para que cada lane mapee el error a su contrato (route 400 /
+ * ApiPlatformError). No decide la audiencia: la recibe en `context`.
+ */
+export const runQuoteSimulationFromBody = async (
+  body: unknown,
+  context: SimulateQuotePricingContext
+): Promise<QuoteSimulationFromBody> => {
+  const record = body && typeof body === 'object' ? (body as Record<string, unknown>) : {}
+  const serviceSku = typeof record.serviceSku === 'string' ? record.serviceSku.trim() : ''
+
+  if (serviceSku) {
+    return {
+      ok: true,
+      simulation: await simulateQuotePricingFromService(
+        { serviceSku, outputCurrency: normalizeQuoteCurrency(record.currency) },
+        context
+      )
+    }
+  }
+
+  const parsed = simulateQuoteInputSchema.safeParse(record.input ?? record)
+
+  if (!parsed.success) {
+    return { ok: false, error: 'Provide serviceSku (+ optional currency) or a valid pricing input.' }
+  }
+
+  return { ok: true, simulation: await simulateQuotePricing(parsed.data, context) }
 }

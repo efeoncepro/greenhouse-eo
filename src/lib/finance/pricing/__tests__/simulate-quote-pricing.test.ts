@@ -1,7 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import type { PricingEngineInputV2 } from '../contracts'
-import { simulateQuotePricing, simulateQuotePricingFromService } from '../simulate-quote-pricing'
+import {
+  runQuoteSimulationFromBody,
+  simulateQuotePricing,
+  simulateQuotePricingFromService
+} from '../simulate-quote-pricing'
 
 vi.mock('../pricing-engine-v2', () => ({ buildPricingEngineOutputV2: vi.fn() }))
 vi.mock('@/lib/commercial/service-catalog-expand', () => ({ expandServiceIntoQuoteLines: vi.fn() }))
@@ -105,5 +109,39 @@ describe('simulateQuotePricingFromService', () => {
     expect(result.pricing.aggregateMargin).toBeUndefined()
     expect(result.estimate.currency).toBe('CLP')
     expect(result.estimate.binding).toBe(false)
+  })
+})
+
+describe('runQuoteSimulationFromBody', () => {
+  beforeEach(() => vi.clearAllMocks())
+
+  it('serviceSku path: routes to from-service', async () => {
+    vi.mocked(expandServiceIntoQuoteLines).mockResolvedValue({
+      service: { serviceSku: 'EFG-9', displayName: 'Diseño Digital', moduleName: 'Diseño' },
+      lines: [],
+      pricing: engineOutput()
+    } as unknown as Awaited<ReturnType<typeof expandServiceIntoQuoteLines>>)
+
+    const result = await runQuoteSimulationFromBody(
+      { serviceSku: 'EFG-9', currency: 'CLP' },
+      { audience: 'client', costStackVisible: false }
+    )
+
+    expect(result.ok).toBe(true)
+  })
+
+  it('input path: routes to full simulate', async () => {
+    vi.mocked(buildPricingEngineOutputV2).mockResolvedValue(engineOutput())
+
+    const result = await runQuoteSimulationFromBody(input, { audience: 'internal', costStackVisible: true })
+
+    expect(result.ok).toBe(true)
+  })
+
+  it('invalid body: returns ok=false without calling the engine', async () => {
+    const result = await runQuoteSimulationFromBody({ nonsense: true }, { audience: 'client', costStackVisible: false })
+
+    expect(result.ok).toBe(false)
+    expect(buildPricingEngineOutputV2).not.toHaveBeenCalled()
   })
 })
