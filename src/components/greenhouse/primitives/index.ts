@@ -23,6 +23,7 @@ export type { GreenhouseFigmaNodeButtonProps } from './GreenhouseFigmaNodeButton
 export { default as GreenhouseBreadcrumbs } from './GreenhouseBreadcrumbs'
 export type {
   GreenhouseBreadcrumbItem,
+  GreenhouseBreadcrumbOverflowItem,
   GreenhouseBreadcrumbsProps
 } from './GreenhouseBreadcrumbs'
 export { default as GreenhouseVerificationBadge } from './GreenhouseVerificationBadge'

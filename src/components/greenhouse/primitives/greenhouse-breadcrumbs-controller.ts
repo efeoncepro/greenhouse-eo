@@ -7,7 +7,11 @@ export type GreenhouseBreadcrumbsKind =
   | 'legacy'
   | 'custom'
 
-export type GreenhouseBreadcrumbsSeparator = 'slash' | 'chevron'
+export type GreenhouseBreadcrumbsSeparator = 'slash' | 'chevron' | 'chevrons'
+
+export type GreenhouseBreadcrumbsMotion = 'none' | 'subtle'
+
+export type GreenhouseBreadcrumbsHitArea = 'standard' | 'comfortable'
 
 export const GREENHOUSE_BREADCRUMBS_VARIANTS = ['default', 'compact'] as const
 

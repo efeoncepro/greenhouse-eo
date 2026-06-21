@@ -12,10 +12,10 @@
 
 ## Sesión 2026-06-21 — Breadcrumbs shadcn prompt port — Codex
 
-> **Estado:** complete local-first, sin backend/schema. A pedido del operador, dos prompts shadcn de breadcrumbs se trajeron como capacidades de la primitive canónica `GreenhouseBreadcrumbs`, no como `/components/ui/breadcrumb`.
-> - **Implementado:** `separator='chevrons'`, `labelVisuallyHidden` para raíz icon-only accesible, `motion='subtle'`, `hitArea='comfortable'`, robustez responsive de labels (`minInlineSize:0` + wrap honesto), specimens nuevos en `/design-system/breadcrumbs` con Home/Documents/Add Document y Home/Components/Breadcrumb e iconos Tabler.
-> - **Docs/evidencia:** contrato actualizado en `docs/architecture/ui-platform/PRIMITIVES.md` y changelog. Scenario `design-system-breadcrumbs` ahora espera ambos specimens y captura frames clippeados `breadcrumbs-chevrons-icons` y `breadcrumbs-motion-comfortable`.
-> - **Verificación:** ESLint focal verde; vitest `GreenhouseBreadcrumbs` 5/5 verde; `tsc --noEmit` verde; `pnpm design:lint` verde; GVC local `.captures/2026-06-21T19-49-49_design-system-breadcrumbs` desktop/mobile revisado.
+> **Estado:** complete local-first, sin backend/schema. A pedido del operador, tres prompts shadcn de breadcrumbs se trajeron como capacidades de la primitive canónica `GreenhouseBreadcrumbs`, no como `/components/ui/breadcrumb`.
+> - **Implementado:** `separator='chevrons'`, `labelVisuallyHidden` para raíz icon-only accesible, `motion='subtle'`, `hitArea='comfortable'`, `overflowItems` para ellipsis menu con `GreenhouseFloatingSurface` `actionMenu`, robustez responsive de labels (`minInlineSize:0`, `maxInlineSize:100%`, wrap honesto, `overflowX:'clip'`), specimens nuevos en `/design-system/breadcrumbs` con Home/Documents/Add Document, Home/Components/Breadcrumb y Home/More routes/Caching/Revalidating e iconos Tabler.
+> - **Docs/evidencia:** contrato actualizado en `docs/architecture/ui-platform/PRIMITIVES.md` y changelog. Scenario `design-system-breadcrumbs` ahora espera los tres specimens y captura frames clippeados `breadcrumbs-chevrons-icons`, `breadcrumbs-motion-comfortable`, `breadcrumbs-overflow-closed` y `breadcrumbs-overflow-menu-open`.
+> - **Verificación:** ESLint focal verde; vitest `GreenhouseBreadcrumbs` 6/6 verde; `pnpm design:lint` verde; GVC local `.captures/2026-06-21T20-12-29_design-system-breadcrumbs` desktop/mobile revisado. `tsc --noEmit` se intentó con `gtimeout 240s` y `420s`; ambos expiraron sin output de errores, así que no se declara verde en este slice.
 > - **Convivencia:** no tocar cambios ajenos existentes en Nexa, `TASK-1207` ni `src/lib/reliability/queries/dte-emission-queue-health.ts`.
 
 ## Sesión 2026-06-21 — TASK-1213 Quotes Pipeline Redesign + Adaptive Preview — Codex

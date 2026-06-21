@@ -14,6 +14,7 @@ import {
   GreenhouseChip,
   GREENHOUSE_BREADCRUMBS_VARIANT_CONFIG,
   GREENHOUSE_BREADCRUMBS_VARIANTS,
+  type GreenhouseBreadcrumbItem,
   type GreenhouseBreadcrumbsKind,
   type GreenhouseBreadcrumbsSeparator,
   type GreenhouseBreadcrumbsVariant
@@ -33,6 +34,34 @@ const workbenchItems = [
   { label: 'Agency', href: '/agency' },
   { label: 'Organizaciones', href: '/agency/organizations' },
   { label: 'Workspace enterprise' }
+]
+
+const shadcnPromptItems = [
+  { label: 'Home', href: '/home', iconClassName: 'tabler-home', labelVisuallyHidden: true },
+  { label: 'Documents', href: '/documents', iconClassName: 'tabler-folder' },
+  { label: 'Add Document', iconClassName: 'tabler-file-text' }
+]
+
+const animatedPromptItems = [
+  { label: 'Home', href: '/home', iconClassName: 'tabler-home' },
+  { label: 'Components', href: '/design-system', iconClassName: 'tabler-components' },
+  { label: 'Breadcrumb', iconClassName: 'tabler-route' }
+]
+
+const overflowPromptItems: GreenhouseBreadcrumbItem[] = [
+  { label: 'Home', href: '/home', iconClassName: 'tabler-home' },
+  {
+    label: 'More routes',
+    ariaLabel: 'More routes',
+    iconClassName: 'tabler-dots',
+    overflowItems: [
+      { label: 'Documentation', href: '/docs', iconClassName: 'tabler-book' },
+      { label: 'Building Your Application', href: '/docs/building-your-application', iconClassName: 'tabler-layout-dashboard' },
+      { label: 'Data Fetching', href: '/docs/data-fetching', iconClassName: 'tabler-database' }
+    ]
+  },
+  { label: 'Caching', href: '/docs/caching', iconClassName: 'tabler-package' },
+  { label: 'Revalidating', iconClassName: 'tabler-refresh' }
 ]
 
 const variants: { label: string; value: GreenhouseBreadcrumbsVariant; note: string }[] = [
@@ -73,7 +102,8 @@ const SectionFrame = ({
       p: { xs: 3, md: DESIGN_SYSTEM_LAB_TOKENS.spacing.sectionInset },
       border: `1px solid ${theme.palette.divider}`,
       borderRadius: 1,
-      backgroundColor: theme.palette.background.paper
+      backgroundColor: theme.palette.background.paper,
+      minInlineSize: 0
     })}
   >
     <Stack spacing={0.75}>
@@ -92,6 +122,7 @@ const BreadcrumbsLabView = () => {
       data-capture='breadcrumbs-lab'
       sx={{
         maxInlineSize: DESIGN_SYSTEM_LAB_TOKENS.layout.pageMaxInlineSize,
+        minInlineSize: 0,
         mx: 'auto',
         px: { xs: 3, md: 5 },
         py: { xs: 4, md: 6 }
@@ -134,6 +165,7 @@ const BreadcrumbsLabView = () => {
               minBlockSize: 132,
               display: 'flex',
               alignItems: 'center',
+              minInlineSize: 0,
               px: { xs: 2, md: 4 },
               borderRadius: 1,
               backgroundColor: alpha(theme.palette.background.default, 0.72)
@@ -143,6 +175,71 @@ const BreadcrumbsLabView = () => {
               items={previewItems}
               kind='designSystemSpecimen'
               dataCapture='breadcrumbs-default-specimen'
+            />
+          </Box>
+        </SectionFrame>
+
+        <SectionFrame dataCapture='greenhouse-breadcrumbs-shadcn-port' eyebrow='Prompt port' title='Chevrons with icon-only root'>
+          <Box
+            sx={theme => ({
+              minBlockSize: 132,
+              display: 'flex',
+              alignItems: 'center',
+              minInlineSize: 0,
+              px: { xs: 2, md: 4 },
+              borderRadius: 1,
+              backgroundColor: alpha(theme.palette.background.default, 0.72)
+            })}
+          >
+            <GreenhouseBreadcrumbs
+              items={shadcnPromptItems}
+              kind='workbenchHierarchy'
+              separator='chevrons'
+              dataCapture='breadcrumbs-shadcn-chevrons-specimen'
+            />
+          </Box>
+        </SectionFrame>
+
+        <SectionFrame dataCapture='greenhouse-breadcrumbs-animated-port' eyebrow='Prompt port' title='Animated comfortable trail'>
+          <Box
+            sx={theme => ({
+              minBlockSize: 132,
+              display: 'flex',
+              alignItems: 'center',
+              minInlineSize: 0,
+              px: { xs: 2, md: 4 },
+              borderRadius: 1,
+              backgroundColor: alpha(theme.palette.background.default, 0.72)
+            })}
+          >
+            <GreenhouseBreadcrumbs
+              items={animatedPromptItems}
+              kind='workbenchHierarchy'
+              separator='chevron'
+              motion='subtle'
+              hitArea='comfortable'
+              dataCapture='breadcrumbs-shadcn-motion-specimen'
+            />
+          </Box>
+        </SectionFrame>
+
+        <SectionFrame dataCapture='greenhouse-breadcrumbs-overflow-port' eyebrow='Prompt port' title='Ellipsis overflow menu'>
+          <Box
+            sx={theme => ({
+              minBlockSize: 132,
+              display: 'flex',
+              alignItems: 'center',
+              minInlineSize: 0,
+              px: { xs: 2, md: 4 },
+              borderRadius: 1,
+              backgroundColor: alpha(theme.palette.background.default, 0.72)
+            })}
+          >
+            <GreenhouseBreadcrumbs
+              items={overflowPromptItems}
+              kind='workbenchHierarchy'
+              separator='chevron'
+              dataCapture='breadcrumbs-shadcn-overflow-specimen'
             />
           </Box>
         </SectionFrame>
@@ -214,6 +311,15 @@ const BreadcrumbsLabView = () => {
             </Typography>
             <Typography variant='body1' sx={{ color: 'text.secondary' }}>
               El diseño Figma se mapea a tokens Greenhouse: links con <code>theme.palette.primary</code>, current con <code>text.primary</code>, separator con <code>text.secondary</code>, tipografía MUI <code>body1/body2</code> y radius/focus desde <code>theme.shape</code>.
+            </Typography>
+            <Typography variant='body1' sx={{ color: 'text.secondary' }}>
+              El port del prompt shadcn vive como capacidades de la primitive: <code>separator=&apos;chevrons&apos;</code>, iconos Tabler tokenizados y <code>labelVisuallyHidden</code> para raíces icon-only con nombre accesible.
+            </Typography>
+            <Typography variant='body1' sx={{ color: 'text.secondary' }}>
+              El prompt animado se expresa con <code>motion=&apos;subtle&apos;</code> y <code>hitArea=&apos;comfortable&apos;</code>: entrada suave con Framer Motion, layout motion opt-in y targets táctiles de 40px que respetan reduced-motion.
+            </Typography>
+            <Typography variant='body1' sx={{ color: 'text.secondary' }}>
+              El prompt con ellipsis se expresa con <code>overflowItems</code>: el item renderiza un trigger accesible y un <code>GreenhouseFloatingSurface</code> <code>actionMenu</code> para ancestros colapsados.
             </Typography>
             <Typography variant='body2' sx={{ color: 'text.secondary' }}>
               El acceso al nodo AXIS vive en el shell del Design System (esquina superior derecha) vía <code>GreenhouseFigmaNodeButton</code>; queda inactivo en las páginas sin nodo asociado para señalar que falta crearlo.
