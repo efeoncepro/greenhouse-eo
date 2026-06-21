@@ -86,6 +86,8 @@ Reglas obligatorias:
 - Completes the next high-value wave of Finance control hardening.
 - Feeds `TASK-1178` broad session-coarse route remediation with a finance-specific slice.
 - Prepares future Nexa `propose -> confirm -> execute` for quotes/reconciliation.
+- **Capability catalog consumido por `TASK-1211`** (Quote Builder API Parity & Multi-Consumer Foundation): TASK-1211 extrae el command de autoria/emision y registra la Nexa governed action + MCP + API Platform lane consumiendo las capabilities que ESTA task acuña. TASK-1202 es **SSOT del catalogo de capabilities de quote-write**; TASK-1211 NO re-acuña — sigue la convencion de nombres de aqui. La capability de **simulacion** (read/compute, dimension de perfil `internal`/`client`/`public`) la agrega TASK-1211 siguiendo esta misma convencion (ver Open Questions).
+- **No invade `TASK-1206`** (close command Q2C): TASK-1202 gatea las rutas; TASK-1206 compone el cierre. El naming de la capability fina de cierre (`commercial.quote_to_cash.execute` u otra) lo fija ESTA task como steward del catalogo.
 
 ### Files owned
 
@@ -217,6 +219,8 @@ Reglas obligatorias:
 - No pricing algorithm change.
 - No reconciliation algorithm rewrite.
 - No HubSpot handler recovery; that belongs to a separate integration issue/task if still degraded.
+- No command extraction ni Nexa governed action / MCP / API Platform lane para quotes — eso es `TASK-1211`. Esta task solo acuña capabilities + gates de ruta.
+- No close command Q2C (convert-to-cash/invoice) — eso es `TASK-1206`.
 
 ## Detailed Spec
 
@@ -299,3 +303,4 @@ Access owner/Finance owner review for role grants.
 ## Open Questions
 
 - Which commercial roles beyond `FINANCE_ADMIN` should retain quote lifecycle actions?
+- ¿La capability de **simulacion de precio** (read/compute con perfil de output) se acuña aqui o en `TASK-1211`? Decision: la **convencion de nombres** la fija esta task (catalogo SSOT); `TASK-1211` agrega la fila de simulate siguiendola. Confirmar al mapear el route/action matrix (Slice 1).

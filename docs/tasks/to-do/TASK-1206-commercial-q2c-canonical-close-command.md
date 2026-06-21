@@ -71,7 +71,8 @@ Reglas obligatorias:
 - Commercial es owner del cierre de cotizacion; Finance es owner del objeto financiero `income`/AR. El comando Q2C debe respetar esa frontera sin duplicar reglas.
 - La UI no puede ser source of truth ni contener logica de cierre. Debe llamar a command/route thin.
 - No crear endpoints ad hoc que expongan tablas; usar commands/readers server-side y contratos API gobernados.
-- No duplicar `TASK-1202`: esta task cierra el comando canonico Q2C; `TASK-1202` endurece capabilities de quotes/reconciliation.
+- No duplicar `TASK-1202`: esta task cierra el comando canonico Q2C; `TASK-1202` endurece capabilities de quotes/reconciliation. La capability fina de cierre sigue la **convencion del catalogo que fija TASK-1202** (steward del catalogo de quote capabilities).
+- No duplicar `TASK-1211`: el command de **autoria/emision** del frente del embudo y la Nexa governed action / MCP / API Platform lane los construye TASK-1211. La Nexa governed action del **cierre** Q2C se registra en el MISMO governed-action surface (dominio commercial-q2c) que establece TASK-1211 — no una integracion Nexa paralela.
 - Cualquier workaround `contract_only` debe quedar explicitamente auditado, con reason y SLA, no como estado final silencioso.
 
 ## Normative Docs
@@ -110,7 +111,7 @@ Reglas obligatorias:
 ### Blocks / Impacts
 
 - Desbloquea una UI Q2C honesta como follow-up (el follow-up de UI de cierre Q2C, propuesta, no creada aun).
-- Desbloquea API Platform/App parity versionada para `quotation.v1` / `quote_to_cash.v1` como follow-up (el follow-up de API Platform parity Q2C, propuesta, no creada aun).
+- Desbloquea API Platform/App parity versionada para `quotation.v1` / `quote_to_cash.v1`: **este follow-up lo absorbe `TASK-1211`** (Quote Builder API Parity), que expone el lane versionado para todo el embudo. Coordinar el orden de cierre: si TASK-1206 cierra primero, TASK-1211 incluye su close en el lane; si TASK-1211 cierra primero, deja el slot del close listo para esta task.
 - Reduce drift entre Commercial y Finance para cotizaciones visibles en `/finance/quotes`.
 - Alimenta reliability/readiness signals de cierre comercial y HubSpot anchors.
 
@@ -232,7 +233,7 @@ closeQuoteToCash({
 - [ ] Existing UI/API routes delegate to the same server-side command instead of separate business logic.
 - [ ] The command emits audit/outbox/history with actor, reason, correlation and idempotency.
 - [ ] Denied or invalid actions fail before mutation and without leaking finance/commercial internals.
-- [ ] API Platform parity follow-up is either implemented or explicitly linked as el follow-up de API Platform parity Q2C.
+- [ ] API Platform parity follow-up queda implementado o explicitamente enlazado a `TASK-1211` (que lo absorbe para todo el embudo).
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -384,12 +385,12 @@ Commercial/Finance owner must approve the first production Q2C close smoke and a
 
 ## Follow-ups
 
-- el follow-up de API Platform parity Q2C (propuesta): API Platform parity para `quotation.v1` / `quote_to_cash.v1`.
+- API Platform parity Q2C → **absorbido por `TASK-1211`** (`quotation.v1` / `quote_to_cash.v1` para todo el embudo). Coordinar el slot del close.
 - el follow-up de UI de cierre Q2C (propuesta): UI operator close experience que consuma el comando canonico.
 - Approval workflow resoluble para Q2C >100M si no queda cubierto por el sistema generico de aprobaciones.
 
 ## Open Questions
 
 - ~~Debe `contract_only` existir en produccion o solo como modo interno/suspendido con SLA?~~ **Resuelto (endurecimiento 2026-06-20):** `contract_only` existe SOLO como **estado interno/suspendido** gateado por flag, con `reason` + audit `status='suspended'` + SLA + signal `contract_only_sla_breach`. NUNCA es un Q2C cerrado terminal (sería deal ganado sin AR = revenue leakage). El owner Commercial/Finance debe aprobar cualquier política que lo permita en prod (ver Out-of-band coordination).
-- Que capability fina exacta sera canonica: `commercial.quote_to_cash.execute`, `commercial.quotation.close` u otra ya registrada?
+- Que capability fina exacta sera canonica: `commercial.quote_to_cash.execute`, `commercial.quotation.close` u otra ya registrada? **El naming lo fija `TASK-1202`** como steward del catalogo de quote capabilities; esta task la consume.
 - El primer smoke debe usar una quote fixture nueva o una de las 12 issued observadas en dev/staging?
