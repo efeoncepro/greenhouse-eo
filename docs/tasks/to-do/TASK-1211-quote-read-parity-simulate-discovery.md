@@ -154,6 +154,9 @@ Reglas obligatorias:
   - **Perfil por auth context, NUNCA default a `internal`.**
   - **El perfil `public` computa sobre catálogo publicado curado**, no `pricing/lookup` interno; no filtra IDs internos.
   - El precio siempre del engine (no se inventa ni se acepta override de precio del caller en simulate).
+  - **Precio = estimado, NO oferta vinculante:** todo output de simulación lleva framing de estimado referencial + moneda explícita + fecha de validez (sello "calculado al `quoteDate`"). Un agente / cliente / público NUNCA recibe un número presentado como precio comprometido. La moneda se resuelve del contexto del caller o se solicita; no se asume en silencio.
+  - **Defaults del paquete fijados (consistencia entre canales):** el "paquete estándar" de un servicio (horas/tier/duración por defecto desde la receta) es el MISMO para UI, Nexa, MCP y público; la misma pregunta da el mismo número (modulo perfil). Ningún canal redefine los defaults.
+  - **Frescura de datos base:** si las tarifas / cost basis / FX / margen que alimentan el engine están vencidos más allá de un umbral, el simulate **degrada honesto** (marca el estimado como "datos desactualizados") en vez de devolver un número confiado y silencioso.
 - Tenant/space boundary: contexto tenant/internal existente; el perfil `public` es anónimo y su superficie de datos es solo el catálogo publicado.
 - Idempotency/concurrency: N/A (read-only puro).
 - Audit/outbox/history: N/A para reads; observabilidad vía logs/Sentry (`captureWithDomain`).
@@ -214,6 +217,7 @@ Reglas obligatorias:
 
 - Definir `simulateQuotePricing({...}, outputProfile)` con redacción server-side (`internal`/`client`/`public`).
 - Reemplazar el recorte binario por el perfil derivado del auth context; `client`/`public` sin cost stack / role rates / margin.
+- Envolver el output con framing de **estimado** (referencial + moneda explícita + fecha de validez / sello de cálculo) y degradación honesta por frescura de datos base.
 - Tests de redacción: ningún campo sensible cruza en `client`/`public`; default nunca `internal`.
 
 ### Slice 2 — Resolver `searchServiceCatalog` (nombre→SKU)
@@ -309,6 +313,9 @@ El resolver es el eslabón que hace utilizable el simulate tool para agentes: si
 - [ ] El perfil `public` computa sobre catálogo publicado curado, no el catálogo interno.
 - [ ] `searchServiceCatalog(query)` mapea nombre/alias → `serviceSku` y retorna candidatos para elicitación ante ambigüedad (test).
 - [ ] Hay contrato Zod introspectable del input de simulate; la ruta parsea con el schema.
+- [ ] Todo output de simulación incluye framing de estimado referencial (no oferta vinculante) + moneda explícita + fecha de validez / sello de cálculo.
+- [ ] Los defaults del paquete estándar están fijados y producen el MISMO número en UI/Nexa/MCP/público (modulo perfil) — test de consistencia entre canales.
+- [ ] El simulate degrada honesto (estimado marcado "datos desactualizados") si las tarifas / FX / cost basis base superan el umbral de frescura, en vez de devolver un número confiado.
 - [ ] `commercial.quote.simulate` acuñada + grant + coverage test, sin duplicar el catálogo de `TASK-1202`.
 - [ ] El cotizador está registrado como Nexa read tool + MCP read tool + API Platform read lane.
 - [ ] Evidencia runtime: preguntar el precio de un servicio por nombre vía Nexa y vía MCP retorna respuesta correcta y sin fuga de margen.
