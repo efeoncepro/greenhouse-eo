@@ -6,6 +6,7 @@ import { buildPricingEngineOutputV2 } from '@/lib/finance/pricing/pricing-engine
 import { redactPricingOutputForProfile } from '@/lib/finance/pricing/pricing-output-redaction'
 import { simulateQuoteInputSchema } from '@/lib/finance/pricing/simulate-input-schema'
 import { canViewCostStack, requireCommercialTenantContext } from '@/lib/tenant/authorization'
+import { can } from '@/lib/entitlements/runtime'
 
 export const dynamic = 'force-dynamic'
 
@@ -14,6 +15,11 @@ export async function POST(request: Request) {
 
   if (!tenant) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  // TASK-1202 — gate fino de acción (capability != route-group).
+  if (!can(tenant, 'commercial.quote.simulate', 'read', 'tenant')) {
+    return NextResponse.json({ error: 'No tienes permiso para simular precios.', code: 'forbidden' }, { status: 403 })
   }
 
   let body: unknown

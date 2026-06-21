@@ -21,6 +21,7 @@ import {
   tenantCanAccessQuotationIdentity
 } from '@/lib/finance/pricing/quotation-tenant-access'
 import { requireCommercialTenantContext } from '@/lib/tenant/authorization'
+import { can } from '@/lib/entitlements/runtime'
 
 export const dynamic = 'force-dynamic'
 
@@ -103,6 +104,11 @@ export async function POST(
 
   if (!tenant) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  // TASK-1202 — gate fino de accion (capability != route-group).
+  if (!can(tenant, 'commercial.quotation', 'approve', 'tenant')) {
+    return NextResponse.json({ error: 'No tienes permiso para aprobar cotizaciones.', code: 'forbidden' }, { status: 403 })
   }
 
   const { id } = await params

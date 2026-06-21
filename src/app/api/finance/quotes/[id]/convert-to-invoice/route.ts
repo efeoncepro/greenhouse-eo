@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 
 import { requireCommercialTenantContext } from '@/lib/tenant/authorization'
+import { can } from '@/lib/entitlements/runtime'
 import { resolveQuotationIdentity } from '@/lib/finance/pricing'
 import { materializeInvoiceFromApprovedQuotation } from '@/lib/finance/quote-to-cash/materialize-invoice-from-quotation'
 
@@ -27,6 +28,11 @@ export async function POST(
   const { tenant, errorResponse } = await requireCommercialTenantContext()
 
   if (!tenant) return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+  // TASK-1202 — gate fino de accion (capability != route-group).
+  if (!can(tenant, 'commercial.quote_to_cash.execute', 'approve', 'tenant')) {
+    return NextResponse.json({ error: 'No tienes permiso para convertir una cotizacion en factura.', code: 'forbidden' }, { status: 403 })
+  }
 
   const { id } = await params
 

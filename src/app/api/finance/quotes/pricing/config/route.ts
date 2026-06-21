@@ -22,14 +22,16 @@ import {
   type QuotationPricingCurrency,
   type RoleRateSeniorityLevel
 } from '@/lib/finance/pricing'
-import { hasRoleCode, requireCommercialTenantContext } from '@/lib/tenant/authorization'
+import { requireCommercialTenantContext } from '@/lib/tenant/authorization'
+import { can } from '@/lib/entitlements/runtime'
 
 export const dynamic = 'force-dynamic'
 
-const FINANCE_ADMIN_ROLES = ['efeonce_admin', 'finance_admin']
-
-const canEditPricingConfig = (tenant: Parameters<typeof hasRoleCode>[0]) =>
-  FINANCE_ADMIN_ROLES.some(role => hasRoleCode(tenant, role))
+// TASK-1202 — antes era un check de rol inline (FINANCE_ADMIN_ROLES.some(hasRoleCode)),
+// anti-patrón. Ahora capability-based: la usan el flag canEdit del GET y el gate del PUT,
+// así ruta y UI quedan alineadas. Capability admin-only commercial.quotation.pricing_config.
+const canEditPricingConfig = (tenant: Parameters<typeof can>[0]) =>
+  can(tenant, 'commercial.quotation.pricing_config', 'update', 'tenant')
 
 export async function GET() {
   const { tenant, errorResponse } = await requireCommercialTenantContext()
@@ -125,7 +127,7 @@ export async function PUT(request: Request) {
 
   if (!canEditPricingConfig(tenant)) {
     return NextResponse.json(
-      { error: 'Requires finance_admin or efeonce_admin role to edit pricing config.' },
+      { error: 'No tienes permiso para configurar el pricing del cotizador.', code: 'forbidden' },
       { status: 403 }
     )
   }

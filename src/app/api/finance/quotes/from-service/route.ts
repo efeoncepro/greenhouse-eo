@@ -10,6 +10,7 @@ import {
 import type { PricingOutputCurrency } from '@/lib/finance/pricing/contracts'
 import { redactPricingOutputForProfile } from '@/lib/finance/pricing/pricing-output-redaction'
 import { canViewCostStack, requireCommercialTenantContext } from '@/lib/tenant/authorization'
+import { can } from '@/lib/entitlements/runtime'
 
 export const dynamic = 'force-dynamic'
 
@@ -58,6 +59,11 @@ export async function POST(request: Request) {
 
   if (!tenant) {
     return errorResponse ?? NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  // TASK-1202 — gate fino de acción (capability != route-group).
+  if (!can(tenant, 'commercial.quotation', 'create', 'tenant')) {
+    return NextResponse.json({ error: 'No tienes permiso para crear cotizaciones desde un servicio.', code: 'forbidden' }, { status: 403 })
   }
 
   let body: Body

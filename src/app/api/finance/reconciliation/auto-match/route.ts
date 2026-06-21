@@ -13,6 +13,7 @@ import {
 } from '@/lib/finance/postgres-reconciliation'
 import { FinanceValidationError, normalizeString } from '@/lib/finance/shared'
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
+import { can } from '@/lib/entitlements/runtime'
 
 export const dynamic = 'force-dynamic'
 
@@ -41,6 +42,11 @@ export async function POST(request: Request) {
 
   if (!tenant) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  // TASK-1202 — gate fino de accion (capability != route-group).
+  if (!can(tenant, 'finance.reconciliation.match', 'create', 'space')) {
+    return NextResponse.json({ error: 'No tienes permiso para ejecutar auto-match de conciliacion.', code: 'forbidden' }, { status: 403 })
   }
 
   try {
