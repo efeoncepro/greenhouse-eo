@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState, type ChangeEvent } from 'react'
 
 import { useRouter } from 'next/navigation'
 
@@ -13,9 +13,10 @@ import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
 import TableHead from '@mui/material/TableHead'
+import TablePagination from '@mui/material/TablePagination'
 import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
-import { alpha } from '@mui/material/styles'
+import { alpha, type Theme } from '@mui/material/styles'
 
 import CustomTextField from '@core/components/mui/TextField'
 
@@ -23,11 +24,9 @@ import { DataTableShell } from '@/components/greenhouse/data-table'
 import {
   AdaptiveSidecarLayout,
   ContextualSidecar,
-  ContextualSidecarMetricStrip,
   ContextualSidecarProgress,
   ContextualSidecarSection,
   ContextualSidecarSignal,
-  ContextualSidecarTimeline,
   GreenhouseButton,
   GreenhouseChip,
   type GreenhouseButtonTone,
@@ -50,6 +49,9 @@ const COPY = GH_QUOTES_PIPELINE
 type Quote = QuoteListItem
 type StatusBucket = 'all' | 'draft' | 'issued' | 'expired' | 'accepted'
 type SortDirection = 'desc' | 'asc'
+type QuoteSurfaceTone = Exclude<GreenhouseChipTone, 'default'> | 'neutral'
+
+const DEFAULT_ROWS_PER_PAGE = 12
 
 const STATUS_CONFIG: Record<string, { label: string; tone: GreenhouseChipTone }> = {
   draft: { label: GREENHOUSE_COPY.states.draft, tone: 'default' },
@@ -73,7 +75,7 @@ const SOURCE_OPTIONS = [
 
 const SOURCE_CHIP_CONFIG: Record<string, { label: string; tone: GreenhouseChipTone; activity: string }> = {
   nubox: { label: 'Nubox', tone: 'info', activity: COPY.activitySourceNubox },
-  hubspot: { label: 'HubSpot', tone: 'warning', activity: COPY.activitySourceHubSpot },
+  hubspot: { label: 'HubSpot', tone: 'info', activity: COPY.activitySourceHubSpot },
   manual: { label: 'Manual', tone: 'default', activity: COPY.activitySourceManual }
 }
 
@@ -93,6 +95,46 @@ const EMPTY_SIDECAR_STATE: AdaptiveSidecarControllerState = {
 
 const SURFACE_GUTTER = { xs: 4, md: 5 } as const
 const SURFACE_GUTTER_COMPACT = { xs: 3.5, md: 4 } as const
+
+const neutralControlSx = (theme: Theme) => ({
+  color: theme.palette.text.secondary,
+  borderColor: alpha(theme.palette.divider, 0.9),
+  bgcolor: alpha(theme.palette.background.paper, theme.palette.mode === 'dark' ? 0.46 : 0.74),
+  '&:hover': {
+    color: theme.palette.text.primary,
+    borderColor: alpha(theme.palette.text.primary, theme.palette.mode === 'dark' ? 0.28 : 0.2),
+    bgcolor: alpha(theme.palette.action.hover, theme.palette.mode === 'dark' ? 0.36 : 0.72)
+  }
+})
+
+const neutralSelectedControlSx = (theme: Theme) => ({
+  color: theme.palette.text.primary,
+  borderColor: alpha(theme.palette.text.primary, theme.palette.mode === 'dark' ? 0.3 : 0.18),
+  bgcolor: alpha(theme.palette.text.primary, theme.palette.mode === 'dark' ? 0.16 : 0.075),
+  boxShadow: `inset 0 0 0 1px ${alpha(theme.palette.text.primary, theme.palette.mode === 'dark' ? 0.1 : 0.06)}`,
+  '&:hover': {
+    bgcolor: alpha(theme.palette.text.primary, theme.palette.mode === 'dark' ? 0.2 : 0.095),
+    borderColor: alpha(theme.palette.text.primary, theme.palette.mode === 'dark' ? 0.38 : 0.24)
+  }
+})
+
+const tonePalette = (theme: Theme, tone: QuoteSurfaceTone) => {
+  if (tone === 'neutral') {
+    return {
+      main: theme.palette.text.secondary,
+      soft: alpha(theme.palette.action.selected, theme.palette.mode === 'dark' ? 0.46 : 0.72),
+      border: alpha(theme.palette.divider, 0.72),
+      shadow: alpha(theme.palette.common.black, theme.palette.mode === 'dark' ? 0.18 : 0.05)
+    }
+  }
+
+  return {
+    main: theme.palette[tone].main,
+    soft: alpha(theme.palette[tone].main, theme.palette.mode === 'dark' ? 0.14 : 0.08),
+    border: alpha(theme.palette[tone].main, theme.palette.mode === 'dark' ? 0.4 : 0.22),
+    shadow: alpha(theme.palette[tone].main, theme.palette.mode === 'dark' ? 0.14 : 0.07)
+  }
+}
 
 const formatCLP = (amount: number) =>
   formatGreenhouseCurrency(amount, 'CLP', { maximumFractionDigits: 0 }, 'es-CL')
@@ -183,7 +225,7 @@ const MetricTile = ({
   label: string
   value: string
   helper: string
-  tone?: Exclude<GreenhouseChipTone, 'default'> | 'neutral'
+  tone?: QuoteSurfaceTone
 }) => (
   <Box
     role='group'
@@ -192,9 +234,9 @@ const MetricTile = ({
       minWidth: 0,
       border: `1px solid ${alpha(theme.palette.divider, 0.76)}`,
       borderRadius: `${theme.shape.customBorderRadius.md}px`,
-      bgcolor: alpha(theme.palette.background.paper, theme.palette.mode === 'dark' ? 0.72 : 0.86),
+      bgcolor: alpha(theme.palette.background.paper, theme.palette.mode === 'dark' ? 0.62 : 0.72),
       p: 2.5,
-      boxShadow: `0 6px 18px ${alpha(theme.palette.common.black, theme.palette.mode === 'dark' ? 0.18 : 0.032)}`,
+      boxShadow: 'none',
       transition: theme.transitions.create(['border-color', 'box-shadow', 'transform'], {
         duration: theme.transitions.duration.shorter,
         easing: 'cubic-bezier(0.2, 0, 0, 1)'
@@ -204,8 +246,8 @@ const MetricTile = ({
           ? alpha(theme.palette.divider, 0.92)
           : alpha(theme.palette[tone].main, theme.palette.mode === 'dark' ? 0.48 : 0.28),
         boxShadow: tone === 'neutral'
-          ? `0 10px 24px ${alpha(theme.palette.common.black, theme.palette.mode === 'dark' ? 0.18 : 0.05)}`
-          : `0 10px 24px ${alpha(theme.palette[tone].main, theme.palette.mode === 'dark' ? 0.14 : 0.06)}`,
+          ? `0 8px 20px ${alpha(theme.palette.common.black, theme.palette.mode === 'dark' ? 0.16 : 0.035)}`
+          : `0 8px 20px ${alpha(theme.palette[tone].main, theme.palette.mode === 'dark' ? 0.12 : 0.04)}`,
         transform: 'translateY(-1px)'
       },
       '@media (prefers-reduced-motion: reduce)': {
@@ -249,6 +291,273 @@ const MetricTile = ({
   </Box>
 )
 
+const QuotePreviewMetricStrip = ({
+  items
+}: {
+  items: Array<{
+    label: string
+    value: string
+    helper: string
+    icon: string
+    tone: QuoteSurfaceTone
+  }>
+}) => (
+  <Box
+    role='list'
+    data-sidecar-block='metric-strip'
+    sx={theme => ({
+      display: 'grid',
+      gridTemplateColumns: { xs: '1fr', sm: `repeat(${items.length}, minmax(0, 1fr))` },
+      border: `1px solid ${alpha(theme.palette.divider, 0.78)}`,
+      borderRadius: `${theme.shape.customBorderRadius.lg}px`,
+      overflow: 'hidden',
+      bgcolor: alpha(theme.palette.background.paper, theme.palette.mode === 'dark' ? 0.7 : 0.92),
+      boxShadow: `0 14px 38px ${alpha(theme.palette.common.black, theme.palette.mode === 'dark' ? 0.22 : 0.05)}`
+    })}
+  >
+    {items.map((item, index) => (
+      <Box
+        key={item.label}
+        role='listitem'
+        sx={theme => ({
+          minWidth: 0,
+          p: 3,
+          borderInlineStart: { xs: 0, sm: index === 0 ? 0 : `1px solid ${alpha(theme.palette.divider, 0.72)}` },
+          borderBlockStart: { xs: index === 0 ? 0 : `1px solid ${alpha(theme.palette.divider, 0.72)}`, sm: 0 },
+          transition: theme.transitions.create(['background-color'], {
+            duration: theme.transitions.duration.shorter,
+            easing: 'cubic-bezier(0.2, 0, 0, 1)'
+          }),
+          '&:hover': {
+            bgcolor: tonePalette(theme, item.tone).soft
+          }
+        })}
+      >
+        <Stack direction='row' spacing={2} alignItems='center'>
+          <Box
+            aria-hidden='true'
+            sx={theme => {
+              const palette = tonePalette(theme, item.tone)
+
+              return {
+                display: 'grid',
+                placeItems: 'center',
+                inlineSize: 28,
+                blockSize: 28,
+                flexShrink: 0,
+                borderRadius: `${theme.shape.customBorderRadius.sm}px`,
+                color: palette.main,
+                bgcolor: palette.soft
+              }
+            }}
+          >
+            <i className={item.icon} />
+          </Box>
+          <Box sx={{ minWidth: 0 }}>
+            <Typography variant='caption' color='text.secondary'>
+              {item.label}
+            </Typography>
+            <Typography
+              variant='h5'
+              sx={theme => ({
+                mt: 0.5,
+                color: item.tone === 'neutral' ? theme.palette.text.primary : tonePalette(theme, item.tone).main,
+                fontVariantNumeric: 'tabular-nums'
+              })}
+            >
+              {item.value}
+            </Typography>
+          </Box>
+        </Stack>
+        <Typography variant='caption' color='text.secondary' sx={{ display: 'block', mt: 1, overflowWrap: 'anywhere' }}>
+          {item.helper}
+        </Typography>
+      </Box>
+    ))}
+  </Box>
+)
+
+const QuoteCycleTimeline = ({
+  items
+}: {
+  items: Array<{
+    id: string
+    title: string
+    meta: string
+    icon: string
+    tone: QuoteSurfaceTone
+  }>
+}) => (
+  <Stack spacing={0} role='list' data-sidecar-block='timeline'>
+    {items.map((item, index) => (
+      <Stack key={item.id} direction='row' spacing={3} alignItems='flex-start' role='listitem'>
+        <Stack alignItems='center' sx={{ pt: 0.25 }}>
+          <Box
+            aria-hidden='true'
+            sx={theme => {
+              const palette = tonePalette(theme, item.tone)
+
+              return {
+                display: 'grid',
+                placeItems: 'center',
+                inlineSize: 30,
+                blockSize: 30,
+                borderRadius: '50%',
+                color: palette.main,
+                bgcolor: palette.soft,
+                boxShadow: `0 0 0 4px ${alpha(palette.main, theme.palette.mode === 'dark' ? 0.08 : 0.045)}`
+              }
+            }}
+          >
+            <i className={item.icon} />
+          </Box>
+          {index < items.length - 1 ? (
+            <Box
+              sx={theme => {
+                const palette = tonePalette(theme, item.tone)
+
+                return {
+                  width: 2,
+                  minHeight: 34,
+                  my: 1,
+                  borderRadius: 999,
+                  bgcolor: alpha(palette.main, theme.palette.mode === 'dark' ? 0.28 : 0.16)
+                }
+              }}
+            />
+          ) : null}
+        </Stack>
+        <Box sx={{ minWidth: 0, flex: 1, pb: index < items.length - 1 ? 3 : 0 }}>
+          <Stack direction='row' spacing={2} alignItems='center' justifyContent='space-between'>
+            <Typography variant='body2' fontWeight={800}>
+              {item.title}
+            </Typography>
+            <Box
+              component='span'
+              sx={theme => {
+                const palette = tonePalette(theme, item.tone)
+
+                return {
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  maxInlineSize: 190,
+                  border: `1px solid ${palette.border}`,
+                  borderRadius: `${theme.shape.customBorderRadius.sm}px`,
+                  px: 1.5,
+                  py: 0.5,
+                  color: item.tone === 'neutral' ? theme.palette.text.secondary : palette.main,
+                  bgcolor: palette.soft,
+                  fontSize: theme.typography.caption.fontSize,
+                  fontWeight: 700,
+                  lineHeight: 1.2,
+                  fontVariantNumeric: 'tabular-nums',
+                  overflowWrap: 'anywhere'
+                }
+              }}
+            >
+              {item.meta}
+            </Box>
+          </Stack>
+        </Box>
+      </Stack>
+    ))}
+  </Stack>
+)
+
+const QuoteActivitySignal = ({
+  icon,
+  title,
+  description,
+  meta,
+  secondaryMeta,
+  tone
+}: {
+  icon: string
+  title: string
+  description: string
+  meta: string
+  secondaryMeta: string
+  tone: QuoteSurfaceTone
+}) => (
+  <Box
+    role='group'
+    aria-label={title}
+    data-sidecar-block='signal'
+    sx={theme => {
+      const palette = tonePalette(theme, tone)
+
+      return {
+        border: `1px solid ${palette.border}`,
+        borderRadius: `${theme.shape.customBorderRadius.lg}px`,
+        p: 4,
+        bgcolor: tone === 'neutral'
+          ? alpha(theme.palette.background.paper, theme.palette.mode === 'dark' ? 0.72 : 0.92)
+          : `linear-gradient(135deg, ${alpha(palette.main, 0.068)} 0%, ${alpha(theme.palette.background.paper, 0.98)} 72%)`,
+        boxShadow: `0 14px 38px ${palette.shadow}`,
+        transition: theme.transitions.create(['border-color', 'box-shadow', 'transform'], {
+          duration: theme.transitions.duration.shorter,
+          easing: 'cubic-bezier(0.2, 0, 0, 1)'
+        }),
+        '&:hover': {
+          borderColor: tone === 'neutral' ? alpha(theme.palette.divider, 0.9) : alpha(palette.main, 0.34),
+          transform: 'translateY(-1px)'
+        },
+        '@media (prefers-reduced-motion: reduce)': {
+          transition: 'none',
+          '&:hover': { transform: 'none' }
+        }
+      }
+    }}
+  >
+    <Stack direction='row' spacing={3} alignItems='flex-start'>
+      <Box
+        aria-hidden='true'
+        sx={theme => {
+          const palette = tonePalette(theme, tone)
+
+          return {
+            display: 'grid',
+            placeItems: 'center',
+            inlineSize: 38,
+            blockSize: 38,
+            flexShrink: 0,
+            borderRadius: `${theme.shape.customBorderRadius.sm}px`,
+            color: palette.main,
+            bgcolor: palette.soft
+          }
+        }}
+      >
+        <i className={icon} />
+      </Box>
+      <Stack spacing={1.5} sx={{ minWidth: 0, flex: 1 }}>
+        <Stack direction='row' spacing={2} alignItems='flex-start' justifyContent='space-between'>
+          <Typography variant='body2' fontWeight={800}>
+            {title}
+          </Typography>
+          <Stack spacing={0.5} alignItems='flex-end' sx={{ flexShrink: 0 }}>
+            <Typography
+              variant='caption'
+              sx={theme => ({
+                color: tone === 'neutral' ? theme.palette.text.secondary : tonePalette(theme, tone).main,
+                fontWeight: 800,
+                fontVariantNumeric: 'tabular-nums'
+              })}
+            >
+              {meta}
+            </Typography>
+            <Typography variant='caption' color='text.secondary' sx={{ fontVariantNumeric: 'tabular-nums' }}>
+              {secondaryMeta}
+            </Typography>
+          </Stack>
+        </Stack>
+        <Typography variant='body2' color='text.secondary' sx={{ overflowWrap: 'anywhere' }}>
+          {description}
+        </Typography>
+      </Stack>
+    </Stack>
+  </Box>
+)
+
 const QuotePreview = ({
   quote,
   onClose,
@@ -284,6 +593,8 @@ const QuotePreview = ({
   const currentMarginTone = marginTone(quote.effectiveMarginPct, quote.marginFloorPct, quote.targetMarginPct)
   const marginProgress = Math.max(0, Math.min(100, Math.round(quote.effectiveMarginPct ?? 0)))
   const version = quote.currentVersion ?? 1
+  const quoteHasIssued = statusMatchesBucket(quote.status, 'issued') || statusMatchesBucket(quote.status, 'accepted')
+  const dueTone: QuoteSurfaceTone = quote.status === 'expired' ? 'warning' : isDueThisWeek(quote.dueDate) ? 'warning' : 'neutral'
 
   return (
     <ContextualSidecar
@@ -309,47 +620,47 @@ const QuotePreview = ({
       }
     >
       <Stack spacing={4}>
-        <ContextualSidecarMetricStrip
+        <QuotePreviewMetricStrip
           items={[
             {
               label: COPY.colValue,
               value: formatCompactCLP(quote.totalAmountClp),
               helper: quote.currency,
-              color: 'primary',
+              tone: quote.totalAmountClp > 0 ? 'primary' : 'neutral',
               icon: 'tabler-cash'
             },
             {
               label: COPY.colMargin,
               value: quote.effectiveMarginPct === null ? '—' : `${quote.effectiveMarginPct.toFixed(1)}%`,
               helper: marginLabel(quote),
-              color: currentMarginTone === 'default' ? 'primary' : currentMarginTone,
+              tone: currentMarginTone === 'default' ? 'neutral' : currentMarginTone,
               icon: 'tabler-chart-dots'
             }
           ]}
         />
 
         <ContextualSidecarSection title={COPY.cycleTitle}>
-          <ContextualSidecarTimeline
+          <QuoteCycleTimeline
             items={[
               {
                 id: 'draft',
                 title: COPY.cycleDraft,
                 meta: formatDate(quote.quoteDate),
-                color: 'primary',
+                tone: 'neutral',
                 icon: 'tabler-pencil'
               },
               {
                 id: 'issued',
                 title: COPY.cycleIssued,
-                meta: statusMatchesBucket(quote.status, 'issued') || statusMatchesBucket(quote.status, 'accepted') ? statusConf.label : 'Pendiente',
-                color: statusMatchesBucket(quote.status, 'issued') || statusMatchesBucket(quote.status, 'accepted') ? 'info' : 'primary',
+                meta: quoteHasIssued ? statusConf.label : COPY.pendingStep,
+                tone: quoteHasIssued ? 'info' : 'neutral',
                 icon: 'tabler-send'
               },
               {
                 id: 'due',
                 title: quote.status === 'expired' ? COPY.cycleExpired : COPY.dateDue,
                 meta: quote.dueDate ? formatDate(quote.dueDate) : COPY.noDueDate,
-                color: quote.status === 'expired' ? 'warning' : 'info',
+                tone: dueTone,
                 icon: quote.status === 'expired' ? 'tabler-clock-exclamation' : 'tabler-calendar-due'
               }
             ]}
@@ -388,8 +699,8 @@ const QuotePreview = ({
           </Stack>
         </ContextualSidecarSection>
 
-        <ContextualSidecarSignal
-          color={sourceConf.tone === 'default' ? 'primary' : sourceConf.tone}
+        <QuoteActivitySignal
+          tone={sourceConf.tone === 'default' ? 'neutral' : sourceConf.tone}
           icon='tabler-activity'
           title={COPY.recentActivity}
           description={`${COPY.activityGenerated}. ${sourceConf.activity}.`}
@@ -408,6 +719,8 @@ const QuotesListView = () => {
   const [sourceFilter, setSourceFilter] = useState('')
   const [query, setQuery] = useState('')
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc')
+  const [page, setPage] = useState(0)
+  const [rowsPerPage, setRowsPerPage] = useState(DEFAULT_ROWS_PER_PAGE)
   const [selectedQuoteId, setSelectedQuoteId] = useState<string | null>(null)
   const [sidecarState, setSidecarState] = useState<AdaptiveSidecarControllerState>(EMPTY_SIDECAR_STATE)
   const [tableBodyRef] = useListAnimation()
@@ -451,6 +764,11 @@ const QuotesListView = () => {
     })
   }, [items, query, sortDirection, statusFilter])
 
+  const pagedItems = useMemo(
+    () => filteredItems.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage),
+    [filteredItems, page, rowsPerPage]
+  )
+
   const selectedQuote = useMemo(
     () => filteredItems.find(item => item.quoteId === selectedQuoteId) ?? items.find(item => item.quoteId === selectedQuoteId) ?? null,
     [filteredItems, items, selectedQuoteId]
@@ -493,6 +811,16 @@ const QuotesListView = () => {
     }
   }, [items, selectedQuoteId, sidecarState.open])
 
+  useEffect(() => {
+    setPage(0)
+  }, [query, sortDirection, sourceFilter, statusFilter])
+
+  useEffect(() => {
+    const maxPage = Math.max(0, Math.ceil(filteredItems.length / rowsPerPage) - 1)
+
+    if (page > maxPage) setPage(maxPage)
+  }, [filteredItems.length, page, rowsPerPage])
+
   const handleNewQuote = useCallback(() => {
     router.push('/finance/quotes/new')
   }, [router])
@@ -501,6 +829,11 @@ const QuotesListView = () => {
     setStatusFilter('all')
     setSourceFilter('')
     setQuery('')
+  }, [])
+
+  const handleRowsPerPageChange = useCallback((event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setRowsPerPage(Number(event.target.value))
+    setPage(0)
   }, [])
 
   const handleOpenPreview = useCallback((quote: Quote) => {
@@ -563,12 +896,12 @@ const QuotesListView = () => {
         <Stack
           direction={{ xs: 'column', md: 'row' }}
           spacing={3}
-          alignItems={{ xs: 'stretch', md: 'flex-start' }}
+          alignItems={{ xs: 'flex-start', md: 'flex-start' }}
           justifyContent='space-between'
         >
-          <Stack spacing={1} sx={{ minWidth: 0 }}>
+          <Stack spacing={1} sx={{ minWidth: 0, maxWidth: 760 }}>
             <Stack direction='row' spacing={1.5} alignItems='center' sx={{ minWidth: 0 }}>
-              <Typography variant='h5' sx={{ fontWeight: 700, overflowWrap: 'anywhere' }}>
+              <Typography variant='h4' sx={{ overflowWrap: 'anywhere' }}>
                 {COPY.pageTitle}
               </Typography>
               <GreenhouseChip
@@ -583,17 +916,7 @@ const QuotesListView = () => {
               {COPY.pageSubtitle}
             </Typography>
           </Stack>
-          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-            <GreenhouseButton
-              kind='custom'
-              variant='label'
-              tone='primary'
-              leadingIconClassName='tabler-filter-x'
-              size='medium'
-              onClick={handleClearFilters}
-            >
-              {COPY.savedFilters}
-            </GreenhouseButton>
+          <Stack direction='row' spacing={2} sx={{ alignSelf: { xs: 'flex-start', md: 'center' } }}>
             <GreenhouseButton
               kind='primaryAction'
               leadingIconClassName='tabler-plus'
@@ -681,6 +1004,7 @@ const QuotesListView = () => {
                       leadingIconClassName={bucket.icon}
                       onClick={() => setStatusFilter(bucket.value)}
                       reserveInlineSize={112}
+                      sx={bucket.value === 'draft' ? (active ? neutralSelectedControlSx : neutralControlSx) : undefined}
                     >
                       {bucket.label} {statusCounts[bucket.value]}
                     </GreenhouseButton>
@@ -693,11 +1017,12 @@ const QuotesListView = () => {
           <Box
             sx={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(148px, 1fr))',
+              gridTemplateColumns: { xs: 'repeat(2, minmax(0, 1fr))', lg: 'repeat(5, minmax(0, 1fr))' },
               gap: 2.5,
               px: SURFACE_GUTTER,
               py: SURFACE_GUTTER_COMPACT,
-              '& > *': { minWidth: 0 }
+              '& > *': { minWidth: 0 },
+              '& > :last-of-type': { gridColumn: { xs: 'span 2', lg: 'auto' } }
             }}
             data-capture='finance-quotes-summary'
           >
@@ -727,14 +1052,14 @@ const QuotesListView = () => {
               label={COPY.metricAverageMargin}
               value={metrics.averageMargin === null ? '—' : `${metrics.averageMargin.toFixed(1)}%`}
               helper={metrics.averageMargin === null ? COPY.metricNoMargin : COPY.marginHealthy}
-              tone={metrics.averageMargin === null ? 'primary' : 'success'}
+              tone={metrics.averageMargin === null ? 'neutral' : 'success'}
             />
             <MetricTile
               icon='tabler-calendar-exclamation'
               label={COPY.metricDueThisWeek}
               value={String(metrics.dueThisWeek)}
-              helper={metrics.dueThisWeek > 0 ? COPY.reviewAction : COPY.noDueDate}
-              tone={metrics.dueThisWeek > 0 ? 'warning' : 'info'}
+              helper={metrics.dueThisWeek > 0 ? COPY.reviewAction : COPY.noDueThisWeek}
+              tone={metrics.dueThisWeek > 0 ? 'warning' : 'neutral'}
             />
           </Box>
 
@@ -749,7 +1074,7 @@ const QuotesListView = () => {
           >
             <Stack
               direction={{ xs: 'column', md: 'row' }}
-              spacing={3}
+              spacing={2}
               alignItems={{ xs: 'stretch', md: 'center' }}
               justifyContent='space-between'
             >
@@ -790,10 +1115,22 @@ const QuotesListView = () => {
                   variant='outlined'
                   tone='primary'
                   size='small'
+                  leadingIconClassName='tabler-filter-x'
+                  onClick={handleClearFilters}
+                  sx={neutralControlSx}
+                >
+                  {COPY.savedFilters}
+                </GreenhouseButton>
+                <GreenhouseButton
+                  kind='filter'
+                  variant='outlined'
+                  tone='primary'
+                  size='small'
                   leadingIconClassName='tabler-arrows-sort'
                   onClick={() => setSortDirection(current => (current === 'desc' ? 'asc' : 'desc'))}
+                  sx={neutralControlSx}
                 >
-                  {COPY.sortAction}
+                  {sortDirection === 'desc' ? COPY.sortNewest : COPY.sortOldest}
                 </GreenhouseButton>
               </Stack>
             </Stack>
@@ -818,20 +1155,18 @@ const QuotesListView = () => {
               </Typography>
             </Box>
           ) : (
-            <DataTableShell identifier='finance-quotes-list' ariaLabel='Listado comercial de cotizaciones'>
+            <DataTableShell
+              identifier='finance-quotes-list'
+              ariaLabel='Listado comercial de cotizaciones'
+              density='compact'
+              stickyFirstColumn
+            >
               <Box
-                role='region'
-                aria-label={COPY.tableAriaLabel}
-                tabIndex={0}
                 data-capture='finance-quotes-table'
                 sx={{
                   px: SURFACE_GUTTER_COMPACT,
-                  pb: SURFACE_GUTTER_COMPACT,
-                  overflowX: 'auto',
-                  '&:focus-visible': {
-                    outline: theme => `2px solid ${theme.palette.primary.main}`,
-                    outlineOffset: -2
-                  }
+                  pt: 1,
+                  pb: 1.5
                 }}
               >
                 <Table size='small' sx={{ minWidth: 980 }}>
@@ -848,7 +1183,7 @@ const QuotesListView = () => {
                     </TableRow>
                   </TableHead>
                   <TableBody ref={tableBodyRef}>
-                    {filteredItems.map(quote => {
+                    {pagedItems.map(quote => {
                       const statusConf = STATUS_CONFIG[quote.status] ?? STATUS_CONFIG.draft
                       const sourceConf = SOURCE_CHIP_CONFIG[quote.source] ?? SOURCE_CHIP_CONFIG.manual
 
@@ -902,8 +1237,7 @@ const QuotesListView = () => {
                           <TableCell>
                             <Stack spacing={0.5} sx={{ minWidth: 0 }}>
                               <Typography
-                                variant='body2'
-                                fontWeight={700}
+                                variant='monoId'
                                 sx={{
                                   viewTransitionName: `quote-identity-${quote.quoteId}`,
                                   overflowWrap: 'anywhere'
@@ -1002,6 +1336,34 @@ const QuotesListView = () => {
                     })}
                   </TableBody>
                 </Table>
+              </Box>
+              <Box
+                sx={theme => ({
+                  borderBlockStart: `1px solid ${alpha(theme.palette.divider, 0.7)}`,
+                  px: { xs: 1, md: 2 },
+                  '& .MuiTablePagination-toolbar': {
+                    minHeight: 48,
+                    px: { xs: 1, md: 2 },
+                    flexWrap: 'wrap',
+                    rowGap: 1
+                  },
+                  '& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows': {
+                    ...theme.typography.caption,
+                    color: theme.palette.text.secondary
+                  }
+                })}
+              >
+                <TablePagination
+                  component='div'
+                  count={filteredItems.length}
+                  page={page}
+                  rowsPerPage={rowsPerPage}
+                  rowsPerPageOptions={[12, 24, 48]}
+                  labelRowsPerPage={COPY.rowsPerPage}
+                  labelDisplayedRows={({ from, to, count }) => COPY.pageRange(from, to, count)}
+                  onPageChange={(_, nextPage) => setPage(nextPage)}
+                  onRowsPerPageChange={handleRowsPerPageChange}
+                />
               </Box>
             </DataTableShell>
           )}

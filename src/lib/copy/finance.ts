@@ -108,17 +108,19 @@ export const GH_COST_ATTRIBUTION = {
 
 export const GH_QUOTES_PIPELINE = {
   pageTitle: 'Cotizaciones',
-  pageSubtitle: 'Propuestas comerciales, pricing y emisión documental para el ciclo de venta.',
-  savedFilters: 'Limpiar filtros',
+  pageSubtitle: 'Crea, revisa y sigue propuestas comerciales sin perder el contexto del pipeline.',
+  savedFilters: 'Limpiar',
   newQuote: 'Nueva cotización',
   surfaceTitle: 'Pipeline de cotizaciones',
-  surfaceSubtitle: 'Ledger comercial con preview contextual para revisar riesgo, margen y vencimiento sin salir del flujo.',
+  surfaceSubtitle: 'Cola comercial con estado, margen y vencimiento revisables en contexto.',
   searchLabel: 'Buscar cotización',
   searchPlaceholder: 'Cliente, folio o fuente',
   sourceLabel: 'Fuente',
   allSources: 'Todas las fuentes',
   columnsAction: 'Columnas',
   sortAction: 'Ordenar',
+  sortNewest: 'Más recientes',
+  sortOldest: 'Más antiguas',
   previewAction: 'Revisar',
   reviewAction: 'Revisar',
   openDetail: 'Abrir detalle',
@@ -136,6 +138,7 @@ export const GH_QUOTES_PIPELINE = {
   metricAverageMargin: 'Margen promedio',
   metricDueThisWeek: 'Vencen esta semana',
   metricNoMargin: 'Sin margen',
+  noDueThisWeek: 'Sin vencimientos',
   colQuote: 'Cotización',
   colClient: 'Cliente',
   colDates: 'Fechas',
@@ -155,11 +158,12 @@ export const GH_QUOTES_PIPELINE = {
   noFilteredQuotesBody: 'Ajusta el estado, la fuente o la búsqueda para volver a ver el pipeline.',
   previewEyebrow: 'Vista previa',
   previewEmptyTitle: 'Selecciona una cotización',
-  previewEmptyBody: 'Usa Preview en cualquier renglón para revisar el detalle sin perder el contexto del ledger.',
+  previewEmptyBody: 'Revisa una fila para abrir el detalle contextual sin salir del ledger.',
   cycleTitle: 'Ciclo comercial',
   cycleDraft: 'Borrador',
   cycleIssued: 'Emitida',
   cycleExpired: 'Vencida',
+  pendingStep: 'Pendiente',
   commercialFacts: 'Datos comerciales',
   marginHealth: 'Salud de margen',
   marginHealthy: 'Dentro de objetivo',
@@ -170,7 +174,9 @@ export const GH_QUOTES_PIPELINE = {
   activityGenerated: 'Cotización generada',
   activitySourceManual: 'Actualizada manualmente',
   activitySourceNubox: 'Sincronizada desde Nubox',
-  activitySourceHubSpot: 'Sincronizada desde HubSpot'
+  activitySourceHubSpot: 'Sincronizada desde HubSpot',
+  rowsPerPage: 'Filas',
+  pageRange: (from: number, to: number, count: number) => `${from}-${to} de ${count}`
 } as const
 
 // ────────────────────────────────────────────────────────────────
