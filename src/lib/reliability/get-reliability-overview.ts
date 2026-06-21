@@ -40,6 +40,12 @@ import { getExpensePaymentsClpDriftSignal } from './queries/expense-payments-clp
 import { getLedgerUnresolvedDriftItemsSignal } from './queries/ledger-unresolved-drift-items'
 import { getNuboxExportOrphanRfcSignal } from './queries/nubox-export-orphan-rfc'
 import { getNuboxExportUnprojectedInvoiceSignal } from './queries/nubox-export-unprojected-invoice'
+import {
+  getUfRateFreshnessSignal,
+  getIndexedUnitSnapshotMissingSignal,
+  getIndexedUnitNativeFunctionalDriftSignal,
+  getIndexedUnitSettlementCurrencyViolationSignal
+} from './queries/indexed-unit-signals'
 import { getPaymentOrderMixedCurrencySignal } from './queries/payment-order-mixed-currency'
 import { getFxGainLossUnclassifiedSignal } from './queries/fx-gain-loss-unclassified'
 import {
@@ -672,6 +678,10 @@ interface ReliabilityOverviewSources {
   /** TASK-990 Slice 4 — Nubox export RFC sin organización (disposición pendiente). */
   nuboxExportOrphanRfc?: ReliabilitySignal | null
   nuboxExportUnprojectedInvoice?: ReliabilitySignal | null
+  ufRateFreshness?: ReliabilitySignal | null
+  indexedUnitSnapshotMissing?: ReliabilitySignal | null
+  indexedUnitNativeFunctionalDrift?: ReliabilitySignal | null
+  indexedUnitSettlementCurrencyViolation?: ReliabilitySignal | null
 
   /** TASK-990 Slice 6 — payment order con currency distinta a sus obligations. */
   paymentOrderMixedCurrency?: ReliabilitySignal | null
@@ -1074,6 +1084,10 @@ export const buildReliabilityOverview = (
     ...(sources.ledgerUnresolvedDriftItems ? [sources.ledgerUnresolvedDriftItems] : []),
     ...(sources.nuboxExportOrphanRfc ? [sources.nuboxExportOrphanRfc] : []),
     ...(sources.nuboxExportUnprojectedInvoice ? [sources.nuboxExportUnprojectedInvoice] : []),
+    ...(sources.ufRateFreshness ? [sources.ufRateFreshness] : []),
+    ...(sources.indexedUnitSnapshotMissing ? [sources.indexedUnitSnapshotMissing] : []),
+    ...(sources.indexedUnitNativeFunctionalDrift ? [sources.indexedUnitNativeFunctionalDrift] : []),
+    ...(sources.indexedUnitSettlementCurrencyViolation ? [sources.indexedUnitSettlementCurrencyViolation] : []),
     ...(sources.paymentOrderMixedCurrency ? [sources.paymentOrderMixedCurrency] : []),
     ...(sources.fxGainLossUnclassified ? [sources.fxGainLossUnclassified] : []),
     ...(sources.mxnRateFreshness ? [sources.mxnRateFreshness] : []),
@@ -1566,6 +1580,26 @@ export const getReliabilityOverview = async (
     preloadedSources.nuboxExportUnprojectedInvoice !== undefined
       ? preloadedSources.nuboxExportUnprojectedInvoice
       : await getNuboxExportUnprojectedInvoiceSignal().catch(() => null)
+
+  const ufRateFreshness =
+    preloadedSources.ufRateFreshness !== undefined
+      ? preloadedSources.ufRateFreshness
+      : await getUfRateFreshnessSignal().catch(() => null)
+
+  const indexedUnitSnapshotMissing =
+    preloadedSources.indexedUnitSnapshotMissing !== undefined
+      ? preloadedSources.indexedUnitSnapshotMissing
+      : await getIndexedUnitSnapshotMissingSignal().catch(() => null)
+
+  const indexedUnitNativeFunctionalDrift =
+    preloadedSources.indexedUnitNativeFunctionalDrift !== undefined
+      ? preloadedSources.indexedUnitNativeFunctionalDrift
+      : await getIndexedUnitNativeFunctionalDriftSignal().catch(() => null)
+
+  const indexedUnitSettlementCurrencyViolation =
+    preloadedSources.indexedUnitSettlementCurrencyViolation !== undefined
+      ? preloadedSources.indexedUnitSettlementCurrencyViolation
+      : await getIndexedUnitSettlementCurrencyViolationSignal().catch(() => null)
 
   const paymentOrderMixedCurrency =
     preloadedSources.paymentOrderMixedCurrency !== undefined
@@ -2241,6 +2275,10 @@ export const getReliabilityOverview = async (
     ledgerUnresolvedDriftItems,
     nuboxExportOrphanRfc,
     nuboxExportUnprojectedInvoice,
+    ufRateFreshness,
+    indexedUnitSnapshotMissing,
+    indexedUnitNativeFunctionalDrift,
+    indexedUnitSettlementCurrencyViolation,
     paymentOrderMixedCurrency,
     fxGainLossUnclassified,
     mxnRateFreshness,
