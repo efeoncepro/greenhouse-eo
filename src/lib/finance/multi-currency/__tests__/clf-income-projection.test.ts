@@ -52,6 +52,22 @@ describe('buildClfIncomeProjection (TASK-995)', () => {
     expect(p?.nativeAmountClf).toBe(50)
   })
 
+  it('redondea el CLP funcional a ENTERO (factura chilena sin centavos)', async () => {
+    // UF realista con decimales → native × UF da un valor no-entero que debe
+    // redondearse a entero CLP, no quedar con centavos.
+    const resolveSnapshot = vi.fn().mockResolvedValue(snapshot(39383.07))
+
+    const p = await buildClfIncomeProjection(
+      { subtotalClf: 0, taxAmountClf: 0, totalClf: 117.27, rateDate: '2026-06-20' },
+      { resolveSnapshot }
+    )
+
+    // 117.27 × 39383.07 = 4.618.948,17... → entero
+    expect(p?.functionalTotalClp).toBe(Math.round(117.27 * 39383.07))
+    expect(Number.isInteger(p?.functionalTotalClp)).toBe(true)
+    expect(p?.nativeAmountClf).toBe(117.27) // el native UF conserva decimales
+  })
+
   it('fail-closed: sin valor UF → null (el caller bloquea el write)', async () => {
     const resolveSnapshot = vi.fn().mockResolvedValue(null)
 

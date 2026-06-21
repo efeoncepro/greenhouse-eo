@@ -1,8 +1,12 @@
 import 'server-only'
 
-import { roundCurrency } from '@/lib/finance/shared'
-
 import { resolveIndexedUnitSnapshotEvidence, type FxSnapshotEvidence } from './fx-snapshot'
+
+// TASK-995 — el plano funcional de una factura CLF es CLP, y en Chile las
+// facturas en CLP son ENTERAS (sin centavos). Por eso el CLP derivado de
+// native_UF × valor_UF se redondea a entero (no a 2 decimales). El monto nativo
+// UF conserva sus decimales en el plano native.
+const roundClp = (value: number): number => Math.round(value)
 
 // TASK-995 Slice 3 (ADR GREENHOUSE_CLF_INDEXED_FINANCE_CORE_V1) — project a
 // CLF/UF-denominated commercial fact (a CLF quote/contract) into the CLP
@@ -61,9 +65,9 @@ export const buildClfIncomeProjection = async (
   return {
     fxSnapshotEvidence: evidence,
     ufRate,
-    functionalSubtotalClp: roundCurrency(Math.abs(input.subtotalClf) * ufRate),
-    functionalTaxAmountClp: roundCurrency(Math.abs(input.taxAmountClf) * ufRate),
-    functionalTotalClp: roundCurrency(Math.abs(input.totalClf) * ufRate),
+    functionalSubtotalClp: roundClp(Math.abs(input.subtotalClf) * ufRate),
+    functionalTaxAmountClp: roundClp(Math.abs(input.taxAmountClf) * ufRate),
+    functionalTotalClp: roundClp(Math.abs(input.totalClf) * ufRate),
     nativeAmountClf: Math.abs(input.totalClf)
   }
 }
