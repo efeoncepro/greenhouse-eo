@@ -5738,6 +5738,9 @@ export interface GreenhouseFinancePaymentObligations {
   currency: string;
   due_date: Timestamp | null;
   metadata_json: Generated<Json>;
+  native_amount: Numeric | null;
+  native_currency: string | null;
+  native_to_functional_fx_snapshot_id: string | null;
   obligation_id: string;
   /**
    * employee_net_pay = neto al colaborador; employer_social_security = aporte previsional consolidado; employee_withheld_component = retencion entregada al estado (SII); provider_payroll = placeholder Deel/EOR; processor_fee = costo plataforma de pago; fx_component = costo cambiario; manual = entrada manual.
