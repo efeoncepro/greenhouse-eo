@@ -32,6 +32,18 @@
 
 `FINANCE_ANALYST` read-only. La capability es solo gate de acceso; emisión DTE sigue por Nubox, pagos por readers normalizados, state machine HES en command/DB. **Gap latente cerrado:** `income/batch-emit-dte` hacía `await requireFinanceTenantContext()` sin chequear el resultado (corría sin auth real) → ahora con guard + gate. Tests: `fiscal-document-capability-gates.test.ts` (behavioral emit-dte + matriz de los 19). Narrowing intencional → staging smoke en rollout. **Pendiente:** sync/materializers → TASK-1194; quotes/reconciliation → TASK-1202. Maker-checker (DTE/HES/PO) = follow-up.
 
+## Wave 3 — estado de remediación (TASK-1202, 2026-06-21) ✅
+
+**Quotes + Reconciliation → GATEADOS.** El lifecycle del cotizador usa la capability EXISTENTE `commercial.quotation` (consistente con el command de TASK-1212; roles comerciales, sin lockout) — esta task NO la re-acuñó. Se gatean 20 write routes con `can()` ANTES del command (en el handler de write, no en GET):
+
+- **Quotes lifecycle (15):** `commercial.quotation` create (route, from-service), update ([id], lines, recalculate, terms, versions, save-as-template), approve (issue, approve), export (send, share, share DELETE, send-email, resend-email).
+- **Convert (1):** `commercial.quote_to_cash.execute` (convert-to-invoice) — enforza la huérfana; TASK-1206 compondrá el close command encima.
+- **Simulate (1):** `commercial.quote.simulate` (TASK-1211).
+- **Price-affecting admin-only (2 capabilities nuevas):** `commercial.quotation.cost_override` (override manual de costo de línea) + `commercial.quotation.pricing_config` (config de márgenes/tiers). De paso convirtieron 2 gates role-based a capability-based: cost-override (antes `canOverrideQuoteCost` + prosa inglesa cruda) y pricing/config (antes `FINANCE_ADMIN_ROLES.some(hasRoleCode)` inline — anti-patrón). Grants `FINANCE_ADMIN` + `EFEONCE_ADMIN`, seed migración `20260621213649205`.
+- **Reconciliation (1):** `finance.reconciliation.match` (create/space) en `auto-match/route.ts` — la única ruta de reconciliation que faltaba (14/15 ya tenían gate por TASK-722/723).
+
+La autoría (`/author`) queda gobernada por el command (TASK-1212); `quotes/hubspot` (410 Gone, sin mutación) se omite. Tests: `quote-reconciliation-capability-gates.test.ts`. **Las 3 olas F9 de quote/finance route hardening (TASK-1192/1193/1202) quedan cerradas; pendiente sync/materializers → TASK-1194.** Rollout: narrowing intencional → staging smoke.
+
 ## Executive Summary
 
 La auditoria confirma que Finance no esta "abierto" de forma general: **205 de 206 route files tienen algun tenant context directo**. El unico `POST` sin auth directa es `src/app/api/finance/quotes/hubspot/route.ts`, pero devuelve `410 Gone` sin ejecutar mutacion; es deuda de limpieza, no exposicion activa.

@@ -1,3 +1,14 @@
+## Sesión 2026-06-21 — TASK-1202 Quote + reconciliation capability gates (Wave 3 F9) — Claude
+
+> **Estado:** ✅ code-complete local-first en `develop`, sin push. **Rollout pendiente:** narrowing intencional → staging smoke. Migración seed aplicada en dev.
+> - **Contexto:** retomada tras pausar (1192/1193 fijaron el patrón). Cierra las 3 olas F9.
+> - **Decisión clave (corrigió tu respuesta previa):** el lifecycle del cotizador usa la capability EXISTENTE `commercial.quotation` (roles comerciales, consistente con el command de TASK-1212) — NO se narrow a admin, porque eso romperia al equipo comercial que cotiza a diario. Solo las 2 acciones price-affecting (cost_override, pricing_config) se restringen a admin.
+> - **Slice 2 (`86c8b8e4e`):** 2 capabilities admin-only nuevas + grants (runtime.ts:942) + migración seed `20260621213649205`. grant-coverage 2/2.
+> - **Slices 3-4 (`a18a18ee4`):** gate `can()` en 20 write routes (15 commercial.quotation lifecycle + convert→quote_to_cash.execute + simulate→quote.simulate + 2 admin price-affecting + 1 reconciliation auto-match→reconciliation.match). De paso convertí 2 gates role-based a capability-based (cost-override: prosa inglesa cruda; pricing/config: check de rol inline anti-patrón). La autoría (/author) queda gobernada por el command de 1212; hubspot (410) skip. 21 tests.
+> - **Slice 5:** audit F9 Wave 3 ✅ + changelog + este Handoff.
+> - **Invariante:** capability = solo gate; el pricing engine sigue SoT. Convertir los 2 role-based a capability-based alinea ruta+UI (pricing/config canEdit) y cierra 1 anti-patrón inline.
+> - **Convivencia:** stack F9 completo local sin push: TASK-1192 (5 commits) + 1193 (8) + 1202 (3). 3 olas cerradas; 1194 (sync/materializers) pendiente.
+
 ## Sesión 2026-06-21 — TASK-1193 Finance fiscal/document capability gates — Claude
 
 > **Estado:** ✅ code-complete local-first en `develop`, sin push. **Rollout pendiente:** narrowing intencional → staging smoke (grant + denegado por familia) antes de prod. Migración seed aplicada en dev.
