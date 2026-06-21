@@ -819,6 +819,15 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     actions: ['read', 'create', 'update', 'approve', 'export'] as const,
     defaultScope: 'tenant'
   },
+  // TASK-1211 — read/compute capability del cotizador (simular precio, stateless).
+  // Separada de commercial.quotation (autoría/lifecycle) por el split A/B del ADR
+  // GREENHOUSE_QUOTE_API_PARITY_DECISION_V1.
+  {
+    key: 'commercial.quote.simulate',
+    module: 'commercial',
+    actions: ['read'] as const,
+    defaultScope: 'tenant'
+  },
   {
     key: 'commercial.contract',
     module: 'commercial',

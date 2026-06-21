@@ -2,25 +2,12 @@ import 'server-only'
 
 import { NextResponse } from 'next/server'
 
-import type { PricingEngineInputV2 } from '@/lib/finance/pricing/contracts'
 import { buildPricingEngineOutputV2 } from '@/lib/finance/pricing/pricing-engine-v2'
 import { redactPricingOutputForProfile } from '@/lib/finance/pricing/pricing-output-redaction'
+import { simulateQuoteInputSchema } from '@/lib/finance/pricing/simulate-input-schema'
 import { canViewCostStack, requireCommercialTenantContext } from '@/lib/tenant/authorization'
 
 export const dynamic = 'force-dynamic'
-
-const isValidInput = (payload: unknown): payload is PricingEngineInputV2 => {
-  if (!payload || typeof payload !== 'object') return false
-  const candidate = payload as Partial<PricingEngineInputV2>
-
-  return (
-    typeof candidate.commercialModel === 'string' &&
-    typeof candidate.countryFactorCode === 'string' &&
-    typeof candidate.outputCurrency === 'string' &&
-    typeof candidate.quoteDate === 'string' &&
-    Array.isArray(candidate.lines)
-  )
-}
 
 export async function POST(request: Request) {
   const { tenant, errorResponse } = await requireCommercialTenantContext()
@@ -37,18 +24,23 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Invalid JSON payload.' }, { status: 400 })
   }
 
-  if (!isValidInput(body)) {
+  // Gate de validación con el contrato Zod introspectable. Si pasa, ejercemos el
+  // body original (no la versión transformada) contra el engine para preservar el
+  // contrato runtime del UI.
+  const parsed = simulateQuoteInputSchema.safeParse(body)
+
+  if (!parsed.success) {
     return NextResponse.json(
       {
         error:
-          'Missing required fields. Expected { commercialModel, countryFactorCode, outputCurrency, quoteDate, lines[] }.'
+          'Missing or invalid fields. Expected { commercialModel, countryFactorCode, outputCurrency, quoteDate, lines[] }.'
       },
       { status: 400 }
     )
   }
 
   try {
-    const output = await buildPricingEngineOutputV2(body)
+    const output = await buildPricingEngineOutputV2(parsed.data)
 
     const payload = redactPricingOutputForProfile(output, {
       audience: 'internal',

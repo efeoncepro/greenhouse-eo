@@ -1563,6 +1563,15 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
       })
     }
 
+    // TASK-1211 — capability read/compute de simulación de precio (split A/B).
+    addEntitlement(entries, {
+      module: 'commercial',
+      capability: 'commercial.quote.simulate',
+      action: 'read',
+      scope: 'tenant',
+      source
+    })
+
     for (const capability of [
       'commercial.contract',
       'commercial.sow',
