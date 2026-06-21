@@ -8,7 +8,8 @@ import {
   type ServiceLineOverride
 } from '@/lib/commercial/service-catalog-expand'
 import type { PricingOutputCurrency } from '@/lib/finance/pricing/contracts'
-import { requireCommercialTenantContext } from '@/lib/tenant/authorization'
+import { redactPricingOutputForProfile } from '@/lib/finance/pricing/pricing-output-redaction'
+import { canViewCostStack, requireCommercialTenantContext } from '@/lib/tenant/authorization'
 
 export const dynamic = 'force-dynamic'
 
@@ -112,7 +113,10 @@ export async function POST(request: Request) {
         businessLineCode: result.service.businessLineCode
       },
       lines: result.lines,
-      pricing: result.pricing
+      pricing: redactPricingOutputForProfile(result.pricing, {
+        audience: 'internal',
+        costStackVisible: canViewCostStack(tenant)
+      })
     })
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Failed to expand service.'
