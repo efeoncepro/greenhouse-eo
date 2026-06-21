@@ -38,6 +38,7 @@ import {
 } from '@/components/greenhouse/primitives/adaptive-sidecar-controller'
 import { GH_QUOTES_PIPELINE } from '@/lib/copy/finance'
 import { getMicrocopy } from '@/lib/copy'
+import { isEditableFinanceQuotationStatus } from '@/lib/finance/quotation-access'
 import { formatCurrency as formatGreenhouseCurrency, formatNumber } from '@/lib/format'
 import { useListAnimation } from '@/hooks/useListAnimation'
 import useQuotesList, { type QuoteListItem } from '@/hooks/useQuotesList'
@@ -561,11 +562,19 @@ const QuoteActivitySignal = ({
 const QuotePreview = ({
   quote,
   onClose,
-  onOpenDetail
+  onDownloadPdf,
+  onOpenDetail,
+  onOpenEdit,
+  onOpenHubSpot,
+  onOpenQuoteAction
 }: {
   quote: Quote | null
   onClose: () => void
+  onDownloadPdf: (quote: Quote) => void
   onOpenDetail: (quote: Quote) => void
+  onOpenEdit: (quote: Quote) => void
+  onOpenHubSpot: (quote: Quote) => void
+  onOpenQuoteAction: (quote: Quote, action: 'issue' | 'share' | 'invoice') => void
 }) => {
   if (!quote) {
     return (
@@ -593,7 +602,9 @@ const QuotePreview = ({
   const currentMarginTone = marginTone(quote.effectiveMarginPct, quote.marginFloorPct, quote.targetMarginPct)
   const marginProgress = Math.max(0, Math.min(100, Math.round(quote.effectiveMarginPct ?? 0)))
   const version = quote.currentVersion ?? 1
+  const canPrepareIssue = isEditableFinanceQuotationStatus(quote.status)
   const quoteHasIssued = statusMatchesBucket(quote.status, 'issued') || statusMatchesBucket(quote.status, 'accepted')
+  const canReviewBilling = ['issued', 'sent', 'approved', 'accepted'].includes(quote.status)
   const dueTone: QuoteSurfaceTone = quote.status === 'expired' ? 'warning' : isDueThisWeek(quote.dueDate) ? 'warning' : 'neutral'
 
   return (
@@ -697,6 +708,86 @@ const QuotePreview = ({
               </Stack>
             ))}
           </Stack>
+        </ContextualSidecarSection>
+
+        <ContextualSidecarSection title={COPY.commercialActions}>
+          <Box
+            data-capture='finance-quotes-preview-actions'
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, minmax(0, 1fr))' },
+              gap: 2,
+              '& > *': { minWidth: 0 }
+            }}
+          >
+            {canPrepareIssue ? (
+              <>
+                <GreenhouseButton
+                  kind='primaryAction'
+                  leadingIconClassName='tabler-edit'
+                  onClick={() => onOpenEdit(quote)}
+                >
+                  {COPY.editQuote}
+                </GreenhouseButton>
+                <GreenhouseButton
+                  kind='primaryAction'
+                  variant='outlined'
+                  leadingIconClassName='tabler-file-check'
+                  onClick={() => onOpenQuoteAction(quote, 'issue')}
+                >
+                  {COPY.issueQuote}
+                </GreenhouseButton>
+              </>
+            ) : null}
+
+            {quoteHasIssued ? (
+              <>
+                <GreenhouseButton
+                  kind='primaryAction'
+                  leadingIconClassName='tabler-share'
+                  onClick={() => onOpenQuoteAction(quote, 'share')}
+                >
+                  {COPY.shareQuote}
+                </GreenhouseButton>
+                {canReviewBilling ? (
+                  <GreenhouseButton
+                    kind='filter'
+                    variant='outlined'
+                    tone='primary'
+                    leadingIconClassName='tabler-receipt'
+                    onClick={() => onOpenQuoteAction(quote, 'invoice')}
+                    sx={neutralControlSx}
+                  >
+                    {COPY.reviewBilling}
+                  </GreenhouseButton>
+                ) : null}
+              </>
+            ) : null}
+
+            <GreenhouseButton
+              kind='filter'
+              variant='outlined'
+              tone='primary'
+              leadingIconClassName='tabler-file-download'
+              onClick={() => onDownloadPdf(quote)}
+              sx={neutralControlSx}
+            >
+              {COPY.downloadPdf}
+            </GreenhouseButton>
+
+            {quote.hubspotQuoteId ? (
+              <GreenhouseButton
+                kind='filter'
+                variant='outlined'
+                tone='primary'
+                leadingIconClassName='tabler-external-link'
+                onClick={() => onOpenHubSpot(quote)}
+                sx={neutralControlSx}
+              >
+                {COPY.openHubSpot}
+              </GreenhouseButton>
+            ) : null}
+          </Box>
         </ContextualSidecarSection>
 
         <QuoteActivitySignal
@@ -860,6 +951,34 @@ const QuotesListView = () => {
     [morphRouter]
   )
 
+  const handleOpenEdit = useCallback(
+    (quote: Quote) => {
+      morphRouter.push(`/finance/quotes/${quote.quoteId}/edit`)
+    },
+    [morphRouter]
+  )
+
+  const handleOpenQuoteAction = useCallback(
+    (quote: Quote, action: 'issue' | 'share' | 'invoice') => {
+      morphRouter.push(`/finance/quotes/${quote.quoteId}?action=${action}`)
+    },
+    [morphRouter]
+  )
+
+  const handleDownloadPdf = useCallback((quote: Quote) => {
+    window.open(`/api/finance/quotes/${quote.quoteId}/pdf`, '_blank', 'noopener,noreferrer')
+  }, [])
+
+  const handleOpenHubSpot = useCallback((quote: Quote) => {
+    if (!quote.hubspotQuoteId) return
+
+    window.open(
+      `https://app.hubspot.com/contacts/48713323/record/0-14/${quote.hubspotQuoteId}`,
+      '_blank',
+      'noopener,noreferrer'
+    )
+  }, [])
+
   if (loading) {
     return (
       <Stack spacing={4} data-capture='finance-quotes-page'>
@@ -888,7 +1007,11 @@ const QuotesListView = () => {
         <QuotePreview
           quote={selectedQuote}
           onClose={handleClosePreview}
+          onDownloadPdf={handleDownloadPdf}
           onOpenDetail={handleOpenDetail}
+          onOpenEdit={handleOpenEdit}
+          onOpenHubSpot={handleOpenHubSpot}
+          onOpenQuoteAction={handleOpenQuoteAction}
         />
       }
     >

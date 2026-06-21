@@ -1,9 +1,9 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import Link from 'next/link'
-import { useParams } from 'next/navigation'
+import { useParams, useSearchParams } from 'next/navigation'
 
 import Alert from '@mui/material/Alert'
 import Avatar from '@mui/material/Avatar'
@@ -205,8 +205,10 @@ const fetchViewerContext = async (): Promise<QuoteViewerContext> => {
 
 const QuoteDetailView = () => {
   const params = useParams()
+  const searchParams = useSearchParams()
   const morphRouter = useViewTransitionRouter()
   const quoteId = params.id as string
+  const consumedActionRef = useRef<string | null>(null)
 
   const [loading, setLoading] = useState(true)
   const [quote, setQuote] = useState<QuoteDetail | null>(null)
@@ -505,6 +507,35 @@ const QuoteDetailView = () => {
       setFxReadiness(null)
     }
   }, [quote?.currency])
+
+  useEffect(() => {
+    const action = searchParams.get('action')
+
+    if (!action || !quote) return
+
+    const actionKey = `${quoteId}:${action}`
+
+    if (consumedActionRef.current === actionKey) return
+
+    if (action === 'share') {
+      consumedActionRef.current = actionKey
+      setShareOpen(true)
+
+      return
+    }
+
+    if (action === 'chain' || action === 'invoice') {
+      consumedActionRef.current = actionKey
+      setTab('chain')
+
+      return
+    }
+
+    if (action === 'issue' && viewer.canEdit && isEditableFinanceQuotationStatus(quote.status)) {
+      consumedActionRef.current = actionKey
+      void handleOpenSendDialog()
+    }
+  }, [handleOpenSendDialog, quote, quoteId, searchParams, viewer.canEdit])
 
   const handleConfirmSend = useCallback(async () => {
     setSending(true)
