@@ -1,3 +1,12 @@
+## Sesión 2026-06-21 — TASK-1213 Quotes Pipeline Redesign + Adaptive Preview — Codex
+
+> **Estado:** `in-progress`, implementación UI en curso local-first. La task fue tomada desde `to-do/` y movida a `docs/tasks/in-progress/TASK-1213-quotes-pipeline-redesign-adaptive-preview.md`; README/registry sincronizados.
+> - **Dirección visual:** opción Product Design 3 elegida por el operador: "Quote Ledger + Preview Sheet" para `/finance/quotes`.
+> - **Decisión de primitive:** reuse de `AdaptiveSidecarLayout` + `ContextualSidecar` + `DataTableShell` + `GreenhouseButton`/`GreenhouseChip`; no nace primitive nueva ni backend nuevo.
+> - **Implementación parcial:** `QuotesListView` reemplazado por ledger con summary strip, status tabs, búsqueda/fuente, acciones de fila `Preview` en hover/focus/mobile y preview sidecar con timeline, métricas, margen y actividad. Copy reusable agregado en `GH_QUOTES_PIPELINE`.
+> - **Pendiente antes de cierre:** lint/tsc, GVC desktop/mobile, scrollWidth desktop+390, QA/docs closure y polish visual según captura.
+> - **Convivencia:** no tocar cambios ajenos existentes: `D docs/tasks/in-progress/TASK-1207-f29-card-total-a-pagar-period-selector.md` y `?? src/lib/reliability/queries/dte-emission-queue-health.ts`.
+
 ## Sesión 2026-06-21 — TASK-990 rollout: cuenta Global66 MXN creada — Claude
 
 > **Estado:** TASK-990 sigue `in-progress` (code-complete, rollout pendiente), pero **un paso de rollout se completó**: la cuenta de settlement nativa-MXN ya existe.
@@ -32972,3 +32981,9 @@ NO mover a `complete/` hasta property creada + flip + verificado en vivo (accept
 Read vertical del cotizador (capability A. simular) en `develop`, local-first, sin push. Spec: `docs/tasks/in-progress/TASK-1211-quote-read-parity-simulate-discovery.md`. ADR `GREENHOUSE_QUOTE_API_PARITY_DECISION_V1.md` (Accepted, MCP consultar-first). Discovery hecho. Hallazgo clave: el `stripCostStack` actual es **shallow** (solo borra `costStack` por línea) y deja expuesto margen/tierCompliance/multipliers/warnings; `from-service` route no redacta nada (leak existente). El redactor nuevo debe ser profundo y modelar 3 tiers (internal-finance ve cost stack / internal-commercial ve margen sin cost / client-public sin margen). NO toca el shell (eso es TASK-1212, coordinar con Codex).
 
 **Cerrada (code-complete) 2026-06-21.** 5 slices implementados + testeados + commiteados local (sin push): (1) redactor profundo `redactPricingOutputForProfile` 3 audiencias + cierra leak from-service; (2) resolver `searchServiceCatalog`; (3) Zod + capability `commercial.quote.simulate` + envelope estimado; (4) consumers Nexa `quote_price` + MCP `search_services`/`quote_price` + API Platform lanes `quotation` app/ecosystem. Gates: full suite **7556 verde** + build OK + tsc + lint + grant-coverage. Sin flags/migraciones/env (capability enforced en código). **Pendiente de rollout:** live Nexa/MCP smoke contra staging (recomendado post-deploy; no bloquea — no hay paso de rollout). Write vertical = TASK-1212. Decisión 3-tier validada con commercial-expert (margen visible a interno comercial, oculto a cliente/público).
+
+---
+
+## TASK-1212 — Quote Write Parity — to-do, Discovery hecho (listo para sesión fresca) 2026-06-21
+
+Write vertical del cotizador (command de autoría/emisión + Nexa governed action). **Sigue en `to-do`** — NO tomada; Discovery + audit pre-ejecución documentados en la spec `docs/tasks/to-do/TASK-1212-*.md` → §`Discovery 2026-06-21`. Hallazgos: (1) `handleSubmit` (`QuoteBuilderShell.tsx:1687-1909`) mantiene la coreografía client-side post-redIseño Codex, con seam `onSubmit` a nivel página; (2) commands canónicos a reusar (`persistQuotationPricing`, `requestQuotationIssue`, `buildPersistedQuoteLineItems`, `simulateQuotePricing`); (3) **gate de coordinación con Codex**: él posee el shell (3 redIseños + TASK-1213 en vuelo) → Slice 2 (delegación shell) DIFERIDO. **Plan decidido:** Slices 1/3/4/5 (backend: command + Zod + capability + Nexa governed action + reliability) primero; Slice 2 (shell) como handoff coordinado con Codex después. Command en `src/lib/commercial/**`. Capability de write: coordinar con TASK-1202 o acuñar `commercial.quotation.author`/`commercial.quotation.issue`. Open question real: atomicidad total vs por-etapa+idempotencia (Plan Mode). Razón de no arrancar ahora: sesión muy profunda (TASK-1211 completa) — el command atómico merece contexto limpio.

@@ -43,6 +43,20 @@ Esta task cierra ese gap extrayendo el command canónico y exponiéndolo como ac
 - Registrar la Nexa governed action de autoría/emisión (`propose → confirm → execute`) behind capability; el LLM nunca muta directo.
 - Consumir la capability de write que acuña `TASK-1202` (no re-acuñar).
 
+## Discovery 2026-06-21 (pre-ejecución — leer antes de tomar la task)
+
+Discovery + audit hechos por Claude antes de tomar la task (con TASK-1211 read vertical ya cerrada y en `develop`). Un agente que tome esta task debe respetar estas conclusiones:
+
+**El `handleSubmit` actual** (verificado `QuoteBuilderShell.tsx:1687-1909`, post-redIseño Codex): la coreografía client-side sigue intacta — fresh-simulate (`POST /pricing/simulate`) → `buildPersistedQuoteLineItems` → persist (create `POST /quotes` | edit `PUT /quotes/:id` + `POST /lines`) → issue opcional (`POST /quotes/:id/issue`). No atómico (riesgo zombie), no idempotente, no reusable. **Hay un seam de delegación a nivel página: la prop `onSubmit` (línea 1788)** — el command se puede cablear en las páginas (`new/page.tsx`, `edit/page.tsx`), no en el layout que Codex rediseña.
+
+**Commands canónicos a reusar (NO reimplementar SQL):** `persistQuotationPricing`/`recalculateQuotationPricing` (`src/lib/finance/pricing/quotation-pricing-orchestrator.ts`, atómicos), `requestQuotationIssue` (`src/lib/commercial/quotation-issue-command.ts`), `buildPersistedQuoteLineItems` (`src/lib/finance/pricing/quote-builder-pricing.ts`), `simulateQuotePricing` (TASK-1211, para el fresh-simulate). El header INSERT (create) y el PUT dynamic-update viven inline en los routes (`api/finance/quotes/route.ts` + `[id]/route.ts`) — el command debe orquestarlos en UNA transacción (o, como mínimo, garantizar idempotencia + rollback honesto).
+
+**⚠️ COORDINACIÓN CON CODEX (gate duro).** Codex es dueño del shell AHORA: 3 redIseños recientes (`ae688c622`/`cf19093fe`/`2a1b8475e`) + **TASK-1213 (rediseño del pipeline de cotizaciones) EN VUELO**, que toca `QuoteBuilderShell.tsx`. El **Slice 2 (delegación del shell) colisiona** y garantiza merge conflict.
+
+**Decisión de ejecución (recomendada):** hacer **Slices 1, 3, 4, 5 primero** (todo backend — entregan la capability "Nexa puede crear/emitir una cotización" end-to-end) y **diferir el Slice 2** (delegación del shell) como **handoff coordinado con Codex** cuando TASK-1213 aterrice. El command + governed action son la SSOT; el shell migra a ellos como paso separado (duplicación transitoria aceptada y trackeada). Cablear el command por el seam `onSubmit` a nivel página minimiza la colisión.
+
+**Capability de write:** TASK-1202 (steward del catálogo) aún no cerrada. Coordinar el naming; si no está disponible, acuñar `commercial.quotation.author` (action `create`) + `commercial.quotation.issue` (action `approve`) siguiendo la convención del catálogo y dejar nota para que TASK-1202 las absorba. La huérfana `commercial.quote_to_cash.execute` es del CIERRE (TASK-1206), no de la autoría.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 1 — CONTEXT & CONSTRAINTS
      "Que necesito entender antes de planificar?"
@@ -343,5 +357,6 @@ El loop gobernado (§7 de la spec): `propose_action(author_quote, {...})` → pr
 
 ## Open Questions
 
-- ¿Ubicación exacta del command — `src/lib/commercial/**` (owner del aggregate) vs `src/lib/finance/pricing/**` (donde vive el pricing)? Resolver con `GREENHOUSE_COMMERCIAL_FINANCE_DOMAIN_BOUNDARY_V1.md`.
-- ¿El refactor del shell se hace en esta task o se coordina como handoff con Codex? Depende del estado del trabajo UI en curso al tomarla.
+- ~~¿Ubicación exacta del command?~~ **Resuelto (Discovery 2026-06-21):** `src/lib/commercial/**` — Commercial es owner del aggregate quotation (`greenhouse_commercial.quotations`), aunque la UI viva en `/finance/quotes`. Boundary `GREENHOUSE_COMMERCIAL_FINANCE_DOMAIN_BOUNDARY_V1.md`.
+- ~~¿El refactor del shell se hace en esta task o handoff con Codex?~~ **Resuelto (Discovery 2026-06-21): HANDOFF con Codex.** El Slice 2 se difiere; Codex posee el shell (TASK-1213 en vuelo). Slices 1/3/4/5 (backend) se hacen primero; el shell delega al command como paso coordinado posterior. Ver §Discovery.
+- Pendiente real: ¿el command logra atomicidad TOTAL (header+líneas+issue en una transacción) o atomicidad por etapa + idempotencia con rollback honesto? Decidir en Plan Mode según el contrato de `persistQuotationPricing` + el header INSERT inline.
