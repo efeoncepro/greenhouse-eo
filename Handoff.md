@@ -1,3 +1,11 @@
+## Sesión 2026-06-21 — CI GitHub Actions OOM + CLAUDE.md governance root cause — Codex
+
+> **Estado:** fix local aplicado, sin push. Causa raíz del CI rojo repetido en `develop`: workflow `CI` ejecutaba `pnpm exec tsc --noEmit` crudo; en GitHub Actions Node 20 el proceso hacía OOM cerca de 4 GB (`Ineffective mark-compacts near heap limit`). El contrato vigente del repo ya era `pnpm typecheck` con heap 8192 (ISSUE-104), pero CI no lo usaba.
+> - **Implementado:** `.github/workflows/ci.yml` cambia el paso `Typecheck` a `pnpm typecheck`.
+> - **Governance relacionado:** `CLAUDE.md governance` fallaba por 2 líneas legacy del baseline congelado que mencionaban `npx tsc --noEmit`; se añadieron al allowlist append-only con comentario de ISSUE-104 porque el live corpus ya preserva la intención como `pnpm typecheck` y advierte no usar el comando bare.
+> - **Evidencia local:** `pnpm typecheck` verde; `node scripts/ci/claude-md.mjs budget --strict && node scripts/ci/claude-md.mjs audit --strict --list` verde (0 orphans, +5 allowlist); `git diff --check` verde; `pnpm qa:gates --changed --agent codex --docs` ejecutado.
+> - **Pendiente:** pushear/re-ejecutar Actions para confirmar `CI` verde en GitHub con el workflow corregido. No requiere ADR nuevo; aplica el contrato ya documentado en ISSUE-104.
+
 ## Sesión 2026-06-21 — TASK-1206 Q2C Close Command (Slice 1 — diseño + readiness) — Claude
 
 > **Estado:** 🚧 in-progress. **Slice 1 (discovery + readiness report) HECHO**; Slices 2-5 (command + convergencia de rutas + signals + smoke) PENDIENTES por decisión del operador (diseño + report ahora, implementar el command que toca AR después).

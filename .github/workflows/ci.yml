@@ -106,7 +106,7 @@ jobs:
         run: pnpm test:lint-rules
 
       - name: Typecheck
-        run: pnpm exec tsc --noEmit
+        run: pnpm typecheck
 
       - name: Vercel cron async-critical gate (TASK-775)
         # Bloquea PRs que agreguen entries `async-critical` a vercel.json sin
