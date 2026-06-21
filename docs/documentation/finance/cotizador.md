@@ -1,7 +1,7 @@
 # Cotizador — Builder de Cotizaciones con Pricing Engine Canónico
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 3.12
+> **Version:** 3.13
 > **Creado:** 2026-04-18 por Claude (TASK-464e close-out)
 > **Ultima actualizacion:** 2026-06-21 por Claude (v3.12 — TASK-1211 read parity: split simular/autorar, capability `commercial.quote.simulate`, perfiles de output internal/client/public, resolver `searchServiceCatalog`, consumers Nexa/MCP/API Platform), 2026-05-07 por Codex (v3.11 — TASK-556 adopta cotizaciones como surface Comercial sobre path legacy `/finance/quotes`), 2026-04-22 por Codex (v3.10 — hidratacion canonica de contactos HubSpot al seleccionar una org adoptada), Codex (v3.9 — TASK-543 cleanup de flags legacy del selector unificado), Codex (v3.8 — TASK-538 selector unificado de parties en el Quote Builder), Claude (v3.7 — TASK-509 Floating UI en TotalsLadder: anchor self-contained + a11y integral) y Codex (v3.6 — HubSpot deal anchor + contacto obligatorio para sync bidireccional robusta)
 > **Documentacion tecnica:**
@@ -465,6 +465,33 @@ El input del engine v2 se construye en el cliente mapeando las líneas:
 Esto evita cambios de schema en `quotation_line_items` y mantiene la compatibilidad con el storage existente.
 
 > **Detalle técnico:** código en [src/views/greenhouse/finance/workspace/](../../../src/views/greenhouse/finance/workspace/). Primitives reusables en [src/components/greenhouse/pricing/](../../../src/components/greenhouse/pricing/). Hook de simulación en [src/hooks/usePricingSimulation.ts](../../../src/hooks/usePricingSimulation.ts). Gating de cost stack en [src/lib/tenant/authorization.ts](../../../src/lib/tenant/authorization.ts) (`canViewCostStack`).
+
+## Vertical de escritura — autoría/emisión gobernada (TASK-1212)
+
+Antes, "guardar" y "emitir" una cotización se coreografiaban en el navegador: el builder
+hacía 3-4 llamadas seguidas (crear cabecera, reemplazar líneas, emitir). Si una fallaba a
+medias, podía quedar una cotización "a medio hacer". Ahora todo eso vive en **un solo
+comando del servidor** (`submitQuoteFromBuilder`):
+
+- **Una sola operación, sin estados a medias.** El comando guarda cabecera + líneas + versión
+  de forma atómica; si algo falla al crear, borra la cabecera huérfana (no deja basura). La
+  emisión es un paso aparte: si falla, la cotización queda como **borrador recuperable**, nunca
+  rota.
+- **El precio siempre lo calcula el motor.** El comando vuelve a simular el precio en el
+  servidor antes de guardar; no respeta precios manuales en ítems de catálogo (el catálogo es la
+  fuente de verdad).
+- **A prueba de doble clic.** Si se reintenta la misma operación con la misma clave, devuelve el
+  resultado anterior en vez de crear una cotización duplicada.
+- **La pantalla ya no es la dueña del precio.** El builder solo manda los datos crudos; el
+  servidor arma todo. Visualmente es idéntico — cambió el "cómo", no el "qué se ve".
+
+**Nexa puede crear o emitir una cotización por ti.** Si le pides a Nexa cotizar algo, te muestra
+un **resumen de lo que va a hacer** (qué cliente, qué moneda, cuántas líneas, si la emite o la
+deja en borrador) y **espera tu confirmación**. Nexa nunca escribe sola: propone, tú confirmas, y
+recién ahí se ejecuta el mismo comando que usa la pantalla. Esta acción nace **apagada por
+defecto** y se prende por configuración cuando el equipo lo decide.
+
+> **Detalle técnico:** comando en [src/lib/commercial/submit-quote-from-builder.ts](../../../src/lib/commercial/submit-quote-from-builder.ts); contrato Zod en [submit-quote-from-builder-schema.ts](../../../src/lib/commercial/submit-quote-from-builder-schema.ts); endpoint [POST /api/finance/quotes/author](../../../src/app/api/finance/quotes/author/route.ts); Nexa governed action en [src/lib/nexa/actions/author-quote.ts](../../../src/lib/nexa/actions/author-quote.ts) (loop `propose → confirm → execute`); ADR [GREENHOUSE_QUOTE_API_PARITY_MULTI_CONSUMER_V1](../../architecture/GREENHOUSE_QUOTE_API_PARITY_MULTI_CONSUMER_V1.md). Señal de integridad `commercial.quote.authored_without_command` (steady=0) en `/admin/operations`.
 
 ## Próximos pasos
 

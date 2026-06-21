@@ -156,6 +156,19 @@ Traza end-to-end y qué pieza la sirve:
 - **Ubicación del command B:** `src/lib/commercial/**` (owner del aggregate) vs `src/lib/finance/pricing/**` (donde vive el pricing). Resolver con `GREENHOUSE_COMMERCIAL_FINANCE_DOMAIN_BOUNDARY_V1.md`.
 - **Resolver:** ¿determinista (alias/fuzzy) suficiente, o requiere grounding semántico (índice Knowledge) para nombres muy libres?
 
+## Delta 2026-06-21 — write vertical aterrizado (TASK-1212, capability B)
+
+El **write vertical** (capability B. autorar/emitir) se implementó end-to-end:
+
+- **Command canónico `submitQuoteFromBuilder`** (`src/lib/commercial/submit-quote-from-builder.ts`): SSOT del write path. Atomicidad **por etapa + idempotencia + rollback honesto** (decisión arch-architect + commercial-expert): `persistQuotationPricing` ya es atómico internamente (header+líneas+versión en una tx → zombie "líneas viejas" imposible); create borra el header huérfano si el persist falla; **issue es etapa separada post-commit** (no se puede meter approval/FX/outbox en la misma tx; si falla, queda draft recuperable — modelo CPQ correcto). Idempotencia opt-in vía el ledger canónico `api_platform_command_executions` (sin migración nueva).
+- **Capability:** se **consume `commercial.quotation`** (`create`/`approve`, ya existente y granteada) — NO se acuñó nada nuevo (esquiva la coordinación con TASK-1202; la huérfana `commercial.quote_to_cash.execute` queda para el cierre TASK-1206).
+- **Contrato Zod** (`submit-quote-from-builder-schema.ts`) + endpoint `POST /api/finance/quotes/author`. El **shell delega** (`QuoteBuilderShell.handleSubmit` → una sola llamada, drafts crudos; el server re-simula y construye — la UI ya no es source of truth del pricing; diff 100% lógica, estética del rediseño TASK-1213 intacta). El **Slice 2 NO quedó diferido**: Codex cerró TASK-1213, así que la delegación del shell se hizo en esta task.
+- **Nexa governed action `author_quote`** (`src/lib/nexa/actions/author-quote.ts`): primera acción **parametrizada** del runtime (`NexaActionDefinition<TInput>` + `inputSchema`); loop `propose → confirm → execute`; el confirm re-valida el input y ejecuta el MISMO command. Gateada por `NEXA_QUOTE_AUTHOR_ACTION_ENABLED` (default OFF). El LLM nunca muta directo.
+- **Reliability:** `commercial.quote.authored_without_command` (steady=0; detecta cotizaciones `manual` en estado terminal con cero líneas — la zombie que el command previene).
+- **Verificación live:** create + idempotencia (mismo key → mismo `quotationId`/`operationId`, `replayed=true`, sin duplicar) ejercidos contra la DB dev vía el endpoint.
+
+El **write lane externo de MCP/agentes** sigue diferido (consultar-first). Spec: `docs/tasks/complete/TASK-1212-*.md`.
+
 ## Detalle técnico
 
 - Engine + commands + readers: `src/lib/finance/pricing/`, `src/lib/finance/quotation-canonical-store.ts`, `src/lib/commercial/service-catalog-*.ts`.

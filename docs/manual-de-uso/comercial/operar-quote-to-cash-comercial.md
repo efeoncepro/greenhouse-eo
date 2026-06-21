@@ -84,3 +84,23 @@ Revisa anchors company/deal/contact y conflictos de producto. No dupliques a man
 ### El cliente acepto, pero no hay ingreso
 
 Cotizacion aceptada/emitida no es cash. Usa contrato/quote-to-cash y luego Finance para cobro/conciliacion.
+
+## Pedirle a Nexa que cree o emita una cotizacion (TASK-1212)
+
+Ademas del builder, puedes pedirle a Nexa que cotice por ti. Como funciona:
+
+1. Le pides a Nexa cotizar algo (cliente, moneda, lineas/servicios). Si quieres que la emita, diselo.
+2. Nexa NO escribe sola: te muestra un **resumen de lo que va a hacer** (cliente, moneda, cuantas lineas, si la deja en borrador o la emite) y espera tu **confirmacion explicita**.
+3. Al confirmar, se ejecuta el MISMO comando que usa la pantalla (`submitQuoteFromBuilder`): guarda atomicamente y, si pediste emitir, la emite como paso aparte (si la emision falla, queda como borrador recuperable).
+
+Que esperar:
+
+- **El precio lo calcula el motor**, no Nexa: aunque sugieras un precio para un item de catalogo, se usa el del catalogo.
+- **A prueba de doble confirmacion**: confirmar dos veces no crea dos cotizaciones.
+- **Permisos**: necesitas permiso para autorar cotizaciones (y para emitir, permiso de emision). Si no, Nexa te lo dice y no hace nada.
+
+### Nexa dice que la accion no esta disponible
+
+La accion de autoria nace **apagada por defecto**. Si Nexa responde que no puede crear/emitir cotizaciones, falta prender la configuracion (`NEXA_QUOTE_AUTHOR_ACTION_ENABLED`) en ese ambiente. Pidele al equipo de plataforma que la habilite tras el sign-off.
+
+> Detalle tecnico: `docs/documentation/finance/cotizador.md` (Vertical de escritura) + `docs/architecture/GREENHOUSE_QUOTE_API_PARITY_MULTI_CONSUMER_V1.md`.
