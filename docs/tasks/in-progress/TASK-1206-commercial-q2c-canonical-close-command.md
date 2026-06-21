@@ -13,7 +13,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
@@ -245,6 +245,34 @@ closeQuoteToCash({
      El agente que toma esta task ejecuta Discovery y produce
      plan.md segun TASK_PROCESS.md. No llenar al crear la task.
      ═══════════════════════════════════════════════════════════ -->
+
+## Plan / Diseño (2026-06-21, Claude — Slice 1 hecho, resto pendiente)
+
+> **Decisión del operador en esta sesión:** hacer **diseño + readiness report read-only ahora**, y **diferir el command/rutas/signals/cutover** (toca AR; entrega conservadora). Atomicidad elegida: **income idempotente primero → converted** (NO una sola tx compartida que toque primitives compartidos).
+
+**Estado de la sesión:** `Slice 1 (discovery + readiness report) ✅ HECHO`; Slices 2-5 (command + convergencia + signals + smoke) PENDIENTES.
+
+### Discovery verificado (no re-hacer)
+
+- **Divergencia confirmada en código:**
+  - `convertQuoteToCash` (`src/lib/commercial/party/commands/convert-quote-to-cash.ts`): substrate comercial — `FOR UPDATE`, `commercial_operations_audit` (`operation_type='quote_to_cash'`), contrato (reuse/create), promoción party/client, eventos, **approval gate**, **idempotente** (replay → `status:'idempotent_hit'`). **NO materializa income** (comentario explícito ~línea 49).
+  - `materializeInvoiceFromApprovedQuotation` (`src/lib/finance/quote-to-cash/materialize-invoice-from-quotation.ts`): crea income `INC-${randomUUID().slice(0,8)}` (~línea 193) + contrato + marca `converted` (~350). **NO escribe audit Q2C.** **NO idempotente:** replay con `converted_to_income_id`/status converted **lanza 409** (~146), NO devuelve el `incomeId` previo. Errores string-matched (frágil).
+- **Path VISIBLE del operador = `convert-to-invoice`** (finance), ya con gate `commercial.quote_to_cash.execute` (TASK-1202). `convert-to-cash` (commercial) NO tiene consumer visible.
+- **Live dev (2026-06-21):** 48 draft, 12 issued, 2 expired; **0 converted, 0 income-linked, 0 audit Q2C**. Green-field. **Las 12 issued tienen organización (canCloseSimple) pero NINGUNA tiene `hubspot_deal_id`** → el autopromoter no las puede cerrar; el primer smoke debe ser un cierre operator-triggered (no autopromoter) sobre una de esas 12 (o un fixture nuevo).
+- **Schema:** `commercial_operations_audit(operation_type, status, quotation_id, contract_id, ...)`; `contracts(contract_id, originator_quote_id, organization_id, status)`; `quotations(status, organization_id, hubspot_deal_id, converted_to_income_id, converted_at)`.
+
+### Slice 1 — Readiness report (HECHO)
+
+- `src/lib/commercial/quote-to-cash/q2c-readiness-report.ts` (read-only) + test. SQL con LATERAL joins ejercido contra PG real (gate TASK-893). Reporta por quote: `canCloseSimple`, `issuedWithoutDeal`, `convertedWithoutIncome`, `convertedWithoutAudit`, `contractOnlySuspended` + agregados. Live: 12 rows, 12 canCloseSimple, 12 issuedWithoutDeal, 0 drifts.
+
+### Slices 2-5 — diseño para implementar (PENDIENTE)
+
+- **Slice 2 — `closeQuoteToCash` orquestador** (`src/lib/commercial/quote-to-cash/`): NO copia SQL; compone los primitives. **Orden de atomicidad (decisión del operador):** (1) si `strategy` requiere invoice, **materializar income de forma idempotente PRIMERO** (lookup de income existente por `quotation_id`(+strategy) ANTES de insert; replay devuelve el `incomeId` previo, NO 409); (2) LUEGO `convertQuoteToCash` (substrate: audit Q2C + contrato + party + marca `converted` + eventos). Así **nunca queda `converted` sin income**; si el income falla, la quote sigue `issued` (recuperable). Idempotencia global vía el ledger canónico `api_platform_command_executions` (sin migración, patrón TASK-1212) keyado por `idempotencyKey`. Refactor mínimo de `materializeInvoiceFromApprovedQuotation`: extraer/guardar el "create-or-return-existing income" idempotente; el `INC-${uuid}` queda DETRÁS del lookup. Capability: `commercial.quote_to_cash.execute` (ya existe + granteada + enforced en ambas rutas).
+  - **Estrategias:** `simple_invoice` (income desde quotation), `enterprise_hes` (income desde HES vía `materializeInvoiceFromHes`, exige PO/HES), `contract_only` (sin income, `status='suspended'` en audit + flag + SLA + signal — NUNCA terminal).
+- **Slice 3 — convergencia de rutas (gated):** `convert-to-invoice` (visible) y `convert-to-cash` delegan en `closeQuoteToCash`. **Cutover behind flag/allowlist** hasta staging smoke (cambia el path visible). Backward-compatible en el response.
+- **Slice 4 — signals read-only** (steady=0): `commercial.quote_to_cash.converted_without_income`, `converted_without_audit`, `commercial.quotation.issued_without_deal`, `commercial.quote_to_cash.contract_only_sla_breach`, `commercial.quote_to_cash.duplicate_income`. La lógica de detección YA vive en el readiness reader (Slice 1) — wire-up a `/admin/operations`.
+- **Slice 5 — smoke + docs:** un cierre `simple_invoice` controlado (operator-triggered, sobre una de las 12 issued o fixture) → verificar contrato + income + audit + outbox + signal steady. Owner Commercial/Finance firma antes del primer cierre prod.
+- **Nexa governed action `close_quote`:** reusa el runtime PARAMETRIZADO de TASK-1212 (`NexaActionDefinition<TInput>` + `inputSchema`); comparte surface `commercial-q2c` con `author_quote`. (Slice opcional post-cutover.)
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 3 — EXECUTION SPEC
