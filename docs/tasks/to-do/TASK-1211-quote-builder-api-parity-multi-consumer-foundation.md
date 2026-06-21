@@ -60,6 +60,8 @@ Auditoria 2026-06-21 (arch-architect) sobre el estado real:
 
 Revisar y respetar:
 
+- `docs/architecture/GREENHOUSE_QUOTE_API_PARITY_DECISION_V1.md` (**ADR gobernante de esta task** — `Proposed`; no materializar contratos externos irreversibles hasta `Accepted`)
+- `docs/architecture/GREENHOUSE_QUOTE_API_PARITY_MULTI_CONSUMER_V1.md` (**spec de detalle**: split capability A/B, perfiles de output, matriz de consumers, resolver nombre→SKU, worked example)
 - `docs/architecture/GREENHOUSE_FULL_API_PARITY_DECISION_V1.md` (base + North Star + Canonical consumers)
 - `docs/architecture/GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md`
 - `docs/architecture/GREENHOUSE_COMMERCIAL_QUOTATION_ARCHITECTURE_V1.md`
