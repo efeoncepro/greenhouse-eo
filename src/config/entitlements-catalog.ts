@@ -1016,6 +1016,24 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     actions: ['read'] as const,
     defaultScope: 'tenant'
   },
+  // ── TASK-1202 — quote capability hardening (Wave 3 F9) ──
+  // Las acciones de lifecycle del cotizador usan la capability EXISTENTE
+  // `commercial.quotation` (granteada a roles comerciales, consistente con el command
+  // de TASK-1212). Estas DOS son las price-affecting más sensibles, restringidas a
+  // FINANCE_ADMIN + EFEONCE_ADMIN (no a todo el equipo comercial): override manual del
+  // costo de una línea (bypassa el engine) y la config global de márgenes/tiers.
+  {
+    key: 'commercial.quotation.cost_override',
+    module: 'commercial',
+    actions: ['update'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'commercial.quotation.pricing_config',
+    module: 'commercial',
+    actions: ['update'] as const,
+    defaultScope: 'tenant'
+  },
   {
     key: 'commercial.contract',
     module: 'commercial',

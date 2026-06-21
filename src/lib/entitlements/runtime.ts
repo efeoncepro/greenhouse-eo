@@ -1124,6 +1124,16 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
       source
     })
 
+    // ── TASK-1202 — quote price-affecting actions admin-only (Wave 3 F9) ──
+    // FINANCE_ADMIN + EFEONCE_ADMIN (este bloque). El resto del lifecycle del cotizador
+    // usa commercial.quotation (roles comerciales, granteada aparte).
+    for (const capability of [
+      'commercial.quotation.cost_override',
+      'commercial.quotation.pricing_config'
+    ] as const) {
+      addEntitlement(entries, { module: 'commercial', capability, action: 'update', scope: 'tenant', source })
+    }
+
     addEntitlement(entries, {
       module: 'finance',
       capability: 'finance.payroll.rematerialize',

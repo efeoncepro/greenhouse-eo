@@ -28,7 +28,7 @@ Claude hizo discovery (read-only) e intentó tomar la task vía `/implement-task
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
