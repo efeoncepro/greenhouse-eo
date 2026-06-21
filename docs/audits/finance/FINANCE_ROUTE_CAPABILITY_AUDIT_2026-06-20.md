@@ -21,6 +21,17 @@
 
 `FINANCE_ANALYST` queda **read-only** (sin grant de estas writes). La capability es solo gate de acceso; los invariantes (state machine, source account, anti-zombie, outbox) siguen en command/DB. Narrowing intencional → verificar acceso de operadores reales + staging smoke en rollout. Tests: `payment-orders-capability-gates.test.ts` (behavioral mark-paid + matriz) + `treasury-shareholder-capability-gates.test.ts` (matriz). **Pendiente de remediación (otras olas):** RC de DTE/Income/Expense/HES/PO → TASK-1193; sync/materializers → TASK-1194; quotes/reconciliation → TASK-1202 (mayormente ya gobernado, ver su Delta). Maker-checker (segregación adicional en approve/mark_paid) = follow-up, fuera de scope de TASK-1192.
 
+## Wave 2 — estado de remediación (TASK-1193, 2026-06-21) ✅
+
+**DTE/Income/Expenses/HES/Purchase Orders → GATEADOS.** Se acuñaron 16 capabilities finas por acción (catálogo + grants `FINANCE_ADMIN`/`EFEONCE_ADMIN` en `runtime.ts:942` + seed `capabilities_registry` migración `20260621210618008`) y se enforzan en los 19 write routes con `can()` ANTES del command:
+
+- **Income (8 routes):** `finance.income.{create,update,emit_dte,batch_emit_dte,record_payment,factor}` (`record_payment` cubre `/payment`, `/payments` y `/reconcile-payments`; `factor` = cesión de facturas, no estaba en la lista original del spec — gateada por proof).
+- **Expenses (4):** `finance.expenses.{create,update,record_payment}` (`create` cubre `/expenses` + `/expenses/bulk`).
+- **HES (4):** `finance.hes.{create,submit,approve,reject}`.
+- **Purchase Orders (3):** `finance.purchase_orders.{create,update,cancel}`.
+
+`FINANCE_ANALYST` read-only. La capability es solo gate de acceso; emisión DTE sigue por Nubox, pagos por readers normalizados, state machine HES en command/DB. **Gap latente cerrado:** `income/batch-emit-dte` hacía `await requireFinanceTenantContext()` sin chequear el resultado (corría sin auth real) → ahora con guard + gate. Tests: `fiscal-document-capability-gates.test.ts` (behavioral emit-dte + matriz de los 19). Narrowing intencional → staging smoke en rollout. **Pendiente:** sync/materializers → TASK-1194; quotes/reconciliation → TASK-1202. Maker-checker (DTE/HES/PO) = follow-up.
+
 ## Executive Summary
 
 La auditoria confirma que Finance no esta "abierto" de forma general: **205 de 206 route files tienen algun tenant context directo**. El unico `POST` sin auth directa es `src/app/api/finance/quotes/hubspot/route.ts`, pero devuelve `410 Gone` sin ejecutar mutacion; es deuda de limpieza, no exposicion activa.

@@ -1,3 +1,14 @@
+## Sesión 2026-06-21 — TASK-1193 Finance fiscal/document capability gates — Claude
+
+> **Estado:** ✅ code-complete local-first en `develop`, sin push. **Rollout pendiente:** narrowing intencional → staging smoke (grant + denegado por familia) antes de prod. Migración seed aplicada en dev.
+> - **Contexto:** Wave 2 de F9, tras TASK-1192 (Wave 1, pagos/tesorería). Mismo patrón. Sin bloqueo.
+> - **Grants (operador):** writes → `efeonce_admin` + `finance_admin`; `finance_analyst` read-only.
+> - **Slice 2 (`cbdb76374`):** 16 capabilities (income/expenses/hes/PO; income.factor sumada por proof) + grants en `runtime.ts:942` + migración seed `20260621210618008` (DO block verificó 16). grant-coverage 2/2.
+> - **Slices 3-5 (`4713e712b`):** gate `can()` en los 19 write routes (income 8, expenses 4, hes 4, PO 3), siempre en el handler de write (POST/PUT, no GET). **Cerré un gap latente:** `income/batch-emit-dte` hacía `await requireFinanceTenantContext()` sin chequear el resultado → corría sin auth real; ahora destructura + guard + gate. 20 tests.
+> - **Slice 6:** audit F9 Wave 2 ✅ + changelog + este Handoff.
+> - **Invariante respetado:** capability = solo gate; NO toqué Nubox emission / payment readers / HES state machine.
+> - **Convivencia:** stack local sobre TASK-1192 + el note de TASK-1202 (`9ae565953`, sin pushear). 3 tasks de la cadena F9 (1192 done, 1193 done, 1202 pausada) más el note, todas locales sin push.
+
 ## Sesión 2026-06-21 — TASK-1192 Finance payment & treasury capability gates — Claude
 
 > **Estado:** ✅ code-complete local-first en `develop`, sin push (esperando instrucción). **Rollout pendiente:** narrowing intencional de acceso → verificar operadores reales + staging smoke (un grant + un denegado por familia) antes de prod. Migración seed YA aplicada en dev.
