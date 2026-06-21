@@ -238,6 +238,13 @@ import { getCommercialOrganizationIndustryNoncanonicalSignal } from './queries/c
 import { getCommercialOrganizationTypeLifecycleDriftSignal } from './queries/commercial-organization-type-lifecycle-drift'
 // TASK-1212 — cotizaciones emitidas sin líneas (autoría fuera del command atómico). Roll up `commercial`.
 import { getCommercialQuoteAuthoredWithoutCommandSignal } from './queries/commercial-quote-authored-without-command'
+import {
+  getQ2cConvertedWithoutIncomeSignal,
+  getQ2cConvertedWithoutAuditSignal,
+  getQ2cIssuedWithoutDealSignal,
+  getQ2cContractOnlySlaBreachSignal,
+  getQ2cDuplicateIncomeSignal
+} from './queries/commercial-quote-to-cash-health'
 import { getSampleSprintProjectionDegradedSignal } from './queries/sample-sprint-projection-degraded'
 // TASK-837 Slice 6 — 7 reliability signals for Sample Sprint outbound projection.
 import {
@@ -2137,7 +2144,13 @@ export const getReliabilityOverview = async (
           // TASK-1017 — evidencia auto-derivable detectada pero el paso sigue sin marcar.
           getClientLifecycleEvidenceDetectedNotMarkedSignal().catch(() => null),
           // TASK-1212 — cotización emitida sin líneas (autoría fuera del command atómico).
-          getCommercialQuoteAuthoredWithoutCommandSignal().catch(() => null)
+          getCommercialQuoteAuthoredWithoutCommandSignal().catch(() => null),
+          // TASK-1206 — Q2C close health (rollup commercial).
+          getQ2cConvertedWithoutIncomeSignal().catch(() => null),
+          getQ2cConvertedWithoutAuditSignal().catch(() => null),
+          getQ2cIssuedWithoutDealSignal().catch(() => null),
+          getQ2cContractOnlySlaBreachSignal().catch(() => null),
+          getQ2cDuplicateIncomeSignal().catch(() => null)
         ])
           .then(([healthSignals, projectionSignal, ...outboundSignals]) => {
             const collected = healthSignals ?? []
