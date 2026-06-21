@@ -10,6 +10,17 @@
 - Parent finding: F9 en `docs/audits/finance/FINANCE_DOMAIN_AUDIT_2026-06-20.md`
 - Decision: `warning` con remediation prioritaria por oleadas
 
+## Wave 1 — estado de remediación (TASK-1192, 2026-06-21) ✅
+
+**RC1 (Payment Orders) + RC2 (Bank/Treasury) + shareholder + settlement payment → GATEADOS.** Se acuñaron 13 capabilities finas por acción (catálogo + grants `FINANCE_ADMIN`/`EFEONCE_ADMIN` en `runtime.ts:942` + seed `capabilities_registry` migración `20260621204031990`) y se enforzan en los 13 write routes con `can(tenant, capability, action, 'tenant')` ANTES del command:
+
+- **Payment Orders (7):** `finance.payment_orders.{create,update,submit,approve,schedule,mark_paid,cancel}` en `src/app/api/admin/finance/payment-orders/**` (gate en el handler de write; GET read queda coarse).
+- **Bank/Treasury (3):** `finance.bank_accounts.{create,update}` + `finance.bank_transfers.create` en `src/app/api/finance/bank/**`.
+- **Settlement (1):** `finance.settlements.record_payment` en `src/app/api/finance/settlements/payment/route.ts`.
+- **Shareholder (2):** `finance.shareholder_account.{create,record_movement}` en `src/app/api/finance/shareholder-account/**`.
+
+`FINANCE_ANALYST` queda **read-only** (sin grant de estas writes). La capability es solo gate de acceso; los invariantes (state machine, source account, anti-zombie, outbox) siguen en command/DB. Narrowing intencional → verificar acceso de operadores reales + staging smoke en rollout. Tests: `payment-orders-capability-gates.test.ts` (behavioral mark-paid + matriz) + `treasury-shareholder-capability-gates.test.ts` (matriz). **Pendiente de remediación (otras olas):** RC de DTE/Income/Expense/HES/PO → TASK-1193; sync/materializers → TASK-1194; quotes/reconciliation → TASK-1202 (mayormente ya gobernado, ver su Delta). Maker-checker (segregación adicional en approve/mark_paid) = follow-up, fuera de scope de TASK-1192.
+
 ## Executive Summary
 
 La auditoria confirma que Finance no esta "abierto" de forma general: **205 de 206 route files tienen algun tenant context directo**. El unico `POST` sin auth directa es `src/app/api/finance/quotes/hubspot/route.ts`, pero devuelve `410 Gone` sin ejecutar mutacion; es deuda de limpieza, no exposicion activa.

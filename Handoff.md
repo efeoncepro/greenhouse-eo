@@ -1,3 +1,15 @@
+## Sesión 2026-06-21 — TASK-1192 Finance payment & treasury capability gates — Claude
+
+> **Estado:** ✅ code-complete local-first en `develop`, sin push (esperando instrucción). **Rollout pendiente:** narrowing intencional de acceso → verificar operadores reales + staging smoke (un grant + un denegado por familia) antes de prod. Migración seed YA aplicada en dev.
+> - **Contexto:** retomada como bloqueador de TASK-1202 (que el operador pausó). Establece el patrón de nombres `finance.<dominio>.<acción>` que 1202/1193 consumen.
+> - **Decisión de grants del operador:** writes → `efeonce_admin` + `finance_admin`; `finance_analyst` read-only (restrictivo, matchea default de la spec).
+> - **Slice 2 (`6f9a75a2a`):** 13 capabilities en catálogo + grants en `runtime.ts:942` (bloque FINANCE_ADMIN||EFEONCE_ADMIN) + migración seed `capabilities_registry` (`20260621204031990`, DO block verificó 13). grant-coverage 2/2.
+> - **Slice 3 (`e99a2326f`):** gate `can()` en los 7 write routes de payment-orders (gate en POST/PATCH, NO en GET — corregí un bug donde el script lo puso en el GET de los 2 multi-handler). 10 tests.
+> - **Slice 4 (`92b3ba811`):** gate en los 6 routes treasury/shareholder (bank accounts/transfer, settlement payment, shareholder create/movement). 6 tests.
+> - **Slice 5:** audit F9 actualizado (Wave 1 ✅) + changelog + arch PO delta + este Handoff.
+> - **Invariante respetado:** capability = SOLO gate de acceso; NO toqué state machine / commands / ledger (guardrail finance skill). El GET/read sigue coarse a propósito.
+> - **Convivencia:** el commit `9ae565953` (note de TASK-1202, local sin pushear) es ancestro de esta cadena. No toqué archivos ajenos.
+
 ## Sesión 2026-06-21 — TASK-1212 Quote Write Parity (command + Nexa governed action) — Claude
 
 > **Estado:** ✅ code-complete local-first en `develop`, sin push (esperando instrucción del operador). Rollout pendiente: prender `NEXA_QUOTE_AUTHOR_ACTION_ENABLED` en staging/prod (default OFF) para habilitar la governed action.

@@ -1,5 +1,21 @@
 # Greenhouse Payment Orders Architecture V1
 
+## Delta 2026-06-21 — capability gates por acción (TASK-1192)
+
+El lifecycle de Payment Orders dejó de estar autorizado solo por `requireFinanceTenantContext()` (route-group). Cada write route enforza ahora una **capability fina por acción** con `can(tenant, capability, action, 'tenant')` ANTES de invocar el command:
+
+| Ruta | Capability | Action |
+|---|---|---|
+| `POST /api/admin/finance/payment-orders` | `finance.payment_orders.create` | create |
+| `PATCH .../[orderId]` | `finance.payment_orders.update` | update |
+| `POST .../[orderId]/submit` | `finance.payment_orders.submit` | update |
+| `POST .../[orderId]/approve` | `finance.payment_orders.approve` | approve |
+| `POST .../[orderId]/schedule` | `finance.payment_orders.schedule` | update |
+| `POST .../[orderId]/mark-paid` | `finance.payment_orders.mark_paid` | update |
+| `POST .../[orderId]/cancel` | `finance.payment_orders.cancel` | update |
+
+Granted a `FINANCE_ADMIN` + `EFEONCE_ADMIN` (`runtime.ts:942`); `FINANCE_ANALYST` read-only. La capability es **solo gate de acceso** — la state machine, el source-account-required, el anti-zombie trigger, el path atómico de mark-paid y el outbox siguen en command/DB, sin cambio. El `GET`/read sigue coarse (route-group) a propósito. Mismo patrón aplicado a Bank/Treasury + shareholder + settlement payment (audit F9). Seed: migración `20260621204031990`. Maker-checker adicional en `approve`/`mark_paid` = follow-up.
+
 ## Delta 2026-06-02 — Contractor payment orders as first-class consumer
 
 Payment Orders es el owner del tramo final de pagos a contractors. La corrida
