@@ -93,6 +93,7 @@ export interface CloseQuoteToCashResult {
   clientId: string | null
   organizationId: string | null
   hubspotDealId: string | null
+  totalAmountClp: number
   requiresApproval: boolean
   approvalId: string | null
   replayed: boolean
@@ -244,6 +245,7 @@ const runContractOnly = async (
     clientId: context.clientId,
     organizationId: context.organizationId,
     hubspotDealId: context.hubspotDealId,
+    totalAmountClp: context.totalAmountClp,
     requiresApproval: false,
     approvalId: null,
     replayed: false
@@ -313,6 +315,7 @@ const runIncomeClose = async (
     clientId: convert.clientId ?? context.clientId,
     organizationId: convert.organizationId ?? context.organizationId,
     hubspotDealId: convert.hubspotDealId ?? context.hubspotDealId,
+    totalAmountClp: income.totalAmountClp || context.totalAmountClp,
     requiresApproval: false,
     approvalId: null,
     replayed: false
