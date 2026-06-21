@@ -21,6 +21,7 @@ import { toast } from 'sonner'
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 
+import GreenhouseDatePicker from '@/components/greenhouse/GreenhouseDatePicker'
 import {
   CompositionShell,
   FieldsProgressChip,
@@ -48,6 +49,10 @@ import usePricingSimulation from '@/hooks/usePricingSimulation'
 import useReducedMotion from '@/hooks/useReducedMotion'
 import { GH_PRICING } from '@/lib/copy/pricing'
 import { previewChileTaxAmounts } from '@/lib/finance/pricing/quotation-tax-constants'
+import {
+  formatLocalDateToDateOnly,
+  parseDateOnlyToLocalDate
+} from '@/lib/finance/quotation-date-only'
 import {
   formatCurrency as formatGreenhouseCurrency,
   formatDate as formatGreenhouseDate,
@@ -201,6 +206,13 @@ const QUOTE_CURRENCY_OPTIONS: ContextChipOption[] = [
   { value: 'PEN', label: 'PEN', secondary: 'Sol peruano' }
 ]
 
+const QUOTE_LINE_UNIT_LABEL: Record<QuoteLineItem['unit'], string> = {
+  hour: 'horas',
+  month: 'meses',
+  unit: 'unidades',
+  project: 'proyecto'
+}
+
 const PARTY_STAGE_LABEL: Record<NonNullable<QuoteContextPartySelectorOption['lifecycleStage']>, string> = {
   prospect: 'Prospecto',
   opportunity: 'Oportunidad',
@@ -268,6 +280,7 @@ const QuoteWizardFrame = ({
   children
 }: QuoteWizardFrameProps) => {
   const prefersReducedMotion = useReducedMotion()
+  const [hoveredStep, setHoveredStep] = useState<QuoteWizardStepId | null>(null)
 
   const steps: Array<{
     id: QuoteWizardStepId
@@ -280,6 +293,7 @@ const QuoteWizardFrame = ({
   ]
 
   const activeStepIndex = steps.findIndex(item => item.id === activeStep)
+  const timelineProgressPercent = Math.max(0, Math.min(100, (activeStepIndex / Math.max(steps.length - 1, 1)) * 100))
   const previousStepIndexRef = useRef(activeStepIndex)
   const transitionDirection = activeStepIndex >= previousStepIndexRef.current ? 1 : -1
 
@@ -293,155 +307,260 @@ const QuoteWizardFrame = ({
         component='nav'
         aria-label={GH_PRICING.builderWizard.tabsAriaLabel}
         data-capture='quote-wizard-stepper'
-        sx={theme => ({
-          display: 'grid',
-          gridTemplateColumns: { xs: 'repeat(3, minmax(0, 1fr))', md: 'repeat(3, minmax(0, 1fr))' },
-          gap: { xs: 0.5, md: 0.75 },
-          mb: { xs: 1.25, md: 2 },
-          p: { xs: 0.35, md: 0.5 },
-          borderRadius: `${theme.shape.customBorderRadius.lg}px`,
-          border: `1px solid ${alpha(theme.palette.divider, 0.72)}`,
-          backgroundColor: alpha(theme.palette.background.paper, 0.72)
-        })}
+        sx={{
+          mb: { xs: 2.5, md: 3.5, xl: 4 },
+          minWidth: 0
+        }}
       >
-        {steps.map((step, index) => {
-          const selected = activeStep === step.id
-          const completed = index < activeStepIndex
-          const copy = GH_PRICING.builderWizard.steps[step.id]
+        <Box
+          aria-hidden='true'
+          sx={{
+            position: 'relative',
+            height: { xs: 18, md: 20 },
+            mb: { xs: 0.65, md: 0.85 },
+            mx: { xs: 0.25, md: 0.5 },
+            pointerEvents: 'none'
+          }}
+        >
+          <Box
+            sx={theme => ({
+              position: 'absolute',
+              insetInline: 0,
+              top: '50%',
+              height: 2,
+              borderRadius: 999,
+              backgroundColor: alpha(theme.palette.text.primary, 0.1),
+              transform: 'translateY(-50%)'
+            })}
+          />
+          <Box
+            component={motion.div}
+            initial={false}
+            animate={{ width: `calc(${timelineProgressPercent}% * 2 / 3)` }}
+            transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.22, ease: 'easeOut' }}
+            sx={theme => ({
+              position: 'absolute',
+              insetInlineStart: 'calc(100% / 6)',
+              top: '50%',
+              height: 2,
+              borderRadius: 999,
+              backgroundImage: `linear-gradient(90deg, ${alpha(theme.palette.primary.main, 0.74)}, ${theme.palette.primary.main})`,
+              transform: 'translateY(-50%)'
+            })}
+          />
+          <Box
+            sx={{
+              position: 'absolute',
+              inset: 0,
+              display: 'grid',
+              gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
+              alignItems: 'center'
+            }}
+          >
+            {steps.map((step, index) => {
+              const selected = activeStep === step.id
+              const completed = index < activeStepIndex
+              const reachable = completed || selected || !step.disabled
+              const previewed = hoveredStep === step.id && reachable
 
-          const positionLabel = selected
-            ? GH_PRICING.builderWizard.contextSetup.currentStepLabel
-            : completed
-              ? GH_PRICING.builderWizard.contextSetup.completedStepLabel
-              : step.disabled
-                ? GH_PRICING.builderWizard.contextSetup.lockedStepLabel
-                : GH_PRICING.builderWizard.contextSetup.nextStepLabel
-
-          return (
-            <ButtonBase
-              key={step.id}
-              disabled={step.disabled}
-              onClick={() => onStepChange(step.id)}
-              aria-current={selected ? 'step' : undefined}
-              sx={theme => ({
-                minWidth: 0,
-                minHeight: { xs: 46, md: 54 },
-                justifyContent: { xs: 'center', md: 'flex-start' },
-                gap: { xs: 0.5, md: 1.25 },
-                px: { xs: 0.5, md: 1 },
-                py: { xs: 0.65, md: 0.75 },
-                borderRadius: `${theme.shape.customBorderRadius.md}px`,
-                border: `1px solid ${
-                  selected
-                    ? alpha(theme.palette.primary.main, 0.3)
-                    : completed
-                      ? alpha(theme.palette.primary.main, 0.1)
-                      : 'transparent'
-                }`,
-                backgroundColor: selected
-                  ? alpha(theme.palette.primary.main, theme.palette.mode === 'dark' ? 0.12 : 0.045)
-                  : completed
-                    ? alpha(theme.palette.primary.main, theme.palette.mode === 'dark' ? 0.06 : 0.022)
-                    : 'transparent',
-                color: 'text.primary',
-                textAlign: 'left',
-                boxShadow: selected
-                  ? `0 10px 26px -28px ${alpha(theme.palette.primary.main, 0.72)}`
-                  : 'none',
-                transition: theme.transitions.create(['background-color', 'border-color', 'box-shadow', 'transform'], {
-                  duration: theme.transitions.duration.shortest
-                }),
-                '&:hover': !step.disabled
-                  ? {
-                      borderColor: selected ? alpha(theme.palette.primary.main, 0.4) : alpha(theme.palette.primary.main, 0.2),
-                      backgroundColor: selected
-                        ? alpha(theme.palette.primary.main, theme.palette.mode === 'dark' ? 0.16 : 0.075)
-                        : alpha(theme.palette.primary.main, 0.028),
-                      transform: 'translateY(-1px)'
+              return (
+                <Box key={step.id} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Box
+                    component={motion.span}
+                    initial={false}
+                    animate={
+                      prefersReducedMotion
+                        ? undefined
+                        : {
+                            scale: selected ? 1.14 : previewed ? 1.08 : 1,
+                            y: previewed ? -1 : 0
+                          }
                     }
-                  : undefined,
-                '@media (prefers-reduced-motion: reduce)': { transition: 'none' },
-                '&.Mui-focusVisible': {
-                  outline: `2px solid ${theme.palette.primary.main}`,
-                  outlineOffset: 2
-                },
-                '&.Mui-disabled': {
-                  color: theme.palette.text.secondary,
-                  backgroundColor: 'transparent',
-                  borderColor: 'transparent',
-                  opacity: 0.68
-                }
-              })}
-            >
-              <Box
-                component='i'
-                className={completed ? 'tabler-check' : step.icon}
-                aria-hidden='true'
+                    transition={{ duration: 0.18, ease: 'easeOut' }}
+                    sx={theme => ({
+                      width: selected ? 14 : 10,
+                      height: selected ? 14 : 10,
+                      borderRadius: 999,
+                      backgroundColor: completed || selected ? theme.palette.primary.main : theme.palette.background.paper,
+                      border: `2px solid ${
+                        completed || selected
+                          ? theme.palette.primary.main
+                          : reachable
+                            ? alpha(theme.palette.primary.main, 0.34)
+                            : alpha(theme.palette.text.primary, 0.18)
+                      }`,
+                      boxShadow: selected
+                        ? `0 0 0 5px ${alpha(theme.palette.primary.main, 0.1)}`
+                        : previewed
+                          ? `0 0 0 5px ${alpha(theme.palette.primary.main, 0.075)}`
+                        : `0 0 0 3px ${alpha(theme.palette.background.paper, 0.9)}`
+                    })}
+                  />
+                </Box>
+              )
+            })}
+          </Box>
+        </Box>
+        <Box
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: { xs: 'repeat(3, minmax(0, 1fr))', md: 'repeat(3, minmax(0, 1fr))' },
+            gap: { xs: 0.5, md: 0.75 },
+            px: { xs: 0.25, md: 0.5 }
+          }}
+        >
+          {steps.map((step, index) => {
+            const selected = activeStep === step.id
+            const completed = index < activeStepIndex
+            const previewed = hoveredStep === step.id && !step.disabled
+            const copy = GH_PRICING.builderWizard.steps[step.id]
+
+            const positionLabel = selected
+              ? GH_PRICING.builderWizard.contextSetup.currentStepLabel
+              : completed
+                ? GH_PRICING.builderWizard.contextSetup.completedStepLabel
+                : step.disabled
+                  ? GH_PRICING.builderWizard.contextSetup.lockedStepLabel
+                  : GH_PRICING.builderWizard.contextSetup.nextStepLabel
+
+            return (
+              <ButtonBase
+                key={step.id}
+                disabled={step.disabled}
+                onClick={() => onStepChange(step.id)}
+                onMouseEnter={() => setHoveredStep(step.id)}
+                onMouseLeave={() => setHoveredStep(current => (current === step.id ? null : current))}
+                onFocus={() => setHoveredStep(step.id)}
+                onBlur={() => setHoveredStep(current => (current === step.id ? null : current))}
+                aria-current={selected ? 'step' : undefined}
                 sx={theme => ({
-                  width: { xs: 26, md: 32 },
-                  height: { xs: 26, md: 32 },
-                  borderRadius: 999,
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  flexShrink: 0,
-                  fontSize: { xs: selected ? 16 : 15, md: selected ? 18 : 17 },
-                  color: selected || completed ? 'primary.main' : 'text.secondary',
-                  backgroundColor: selected
-                    ? alpha(theme.palette.primary.main, 0.12)
-                    : completed
-                      ? alpha(theme.palette.primary.main, 0.075)
-                      : alpha(theme.palette.text.primary, 0.035),
+                  minWidth: 0,
+                  minHeight: { xs: 48, md: 58 },
+                  justifyContent: { xs: 'center', md: 'flex-start' },
+                  gap: { xs: 0.5, md: 1.25 },
+                  px: { xs: 0.5, md: 1 },
+                  py: { xs: 0.65, md: 0.75 },
+                  borderRadius: `${theme.shape.customBorderRadius.md}px`,
                   border: `1px solid ${
                     selected
                       ? alpha(theme.palette.primary.main, 0.32)
+                      : previewed
+                        ? alpha(theme.palette.primary.main, 0.24)
                       : completed
-                        ? alpha(theme.palette.primary.main, 0.22)
-                        : alpha(theme.palette.divider, 0.72)
+                        ? alpha(theme.palette.primary.main, 0.12)
+                        : 'transparent'
                   }`,
-                  boxShadow: selected ? `0 8px 18px -16px ${alpha(theme.palette.primary.main, 0.82)}` : 'none'
+                  backgroundColor: selected
+                    ? alpha(theme.palette.primary.main, theme.palette.mode === 'dark' ? 0.12 : 0.05)
+                    : previewed
+                      ? alpha(theme.palette.primary.main, theme.palette.mode === 'dark' ? 0.1 : 0.038)
+                    : completed
+                      ? alpha(theme.palette.primary.main, theme.palette.mode === 'dark' ? 0.06 : 0.024)
+                      : 'transparent',
+                  color: 'text.primary',
+                  textAlign: 'left',
+                  boxShadow: selected
+                    ? `0 10px 26px -28px ${alpha(theme.palette.primary.main, 0.72)}`
+                    : previewed
+                      ? `0 10px 22px -26px ${alpha(theme.palette.primary.main, 0.54)}`
+                    : 'none',
+                  transition: theme.transitions.create(['background-color', 'border-color', 'box-shadow', 'transform'], {
+                    duration: theme.transitions.duration.shortest
+                  }),
+                  '&:hover': !step.disabled
+                    ? {
+                        borderColor: selected
+                          ? alpha(theme.palette.primary.main, 0.42)
+                          : alpha(theme.palette.primary.main, 0.2),
+                        backgroundColor: selected
+                          ? alpha(theme.palette.primary.main, theme.palette.mode === 'dark' ? 0.16 : 0.075)
+                          : alpha(theme.palette.primary.main, 0.028),
+                        transform: 'translateY(-1px)'
+                      }
+                    : undefined,
+                  '@media (prefers-reduced-motion: reduce)': { transition: 'none' },
+                  '&.Mui-focusVisible': {
+                    outline: `2px solid ${theme.palette.primary.main}`,
+                    outlineOffset: 2
+                  },
+                  '&.Mui-disabled': {
+                    color: theme.palette.text.secondary,
+                    backgroundColor: 'transparent',
+                    borderColor: 'transparent',
+                    opacity: 0.68
+                  }
                 })}
-              />
-              <Stack spacing={0.1} alignItems={{ xs: 'center', md: 'flex-start' }} sx={{ minWidth: 0 }}>
-                <Typography
-                  variant='caption'
-                  sx={{
-                    display: { xs: 'none', sm: 'block' },
-                    color: selected ? 'primary.main' : 'text.secondary',
-                    fontWeight: 600
-                  }}
-                >
-                  {positionLabel}
-                </Typography>
-                <Typography
-                  variant='subtitle1'
-                  sx={{
-                    color: selected ? 'primary.main' : 'text.primary',
-                    fontWeight: 600,
-                    lineHeight: { xs: 1.2, md: undefined },
-                    whiteSpace: 'nowrap',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis'
-                  }}
-                >
-                  {`${index + 1}. ${copy.title}`}
-                </Typography>
-                <Typography
-                  variant='body2'
-                  sx={{
-                    display: { xs: 'none', xl: 'block' },
-                    color: 'text.secondary',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap'
-                  }}
-                >
-                  {copy.description}
-                </Typography>
-              </Stack>
-            </ButtonBase>
-          )
-        })}
+              >
+                <Box
+                  component='i'
+                  className={completed ? 'tabler-check' : step.icon}
+                  aria-hidden='true'
+                  sx={theme => ({
+                    width: { xs: 26, md: 32 },
+                    height: { xs: 26, md: 32 },
+                    borderRadius: 999,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                    fontSize: { xs: selected ? 16 : 15, md: selected ? 18 : 17 },
+                    color: selected || completed ? 'primary.main' : 'text.secondary',
+                    backgroundColor: selected
+                      ? alpha(theme.palette.primary.main, 0.12)
+                      : completed
+                        ? alpha(theme.palette.primary.main, 0.075)
+                        : alpha(theme.palette.text.primary, 0.035),
+                    border: `1px solid ${
+                      selected
+                        ? alpha(theme.palette.primary.main, 0.32)
+                        : completed
+                          ? alpha(theme.palette.primary.main, 0.22)
+                          : alpha(theme.palette.divider, 0.72)
+                    }`,
+                    boxShadow: selected ? `0 8px 18px -16px ${alpha(theme.palette.primary.main, 0.82)}` : 'none'
+                  })}
+                />
+                <Stack spacing={0.1} alignItems={{ xs: 'center', md: 'flex-start' }} sx={{ minWidth: 0 }}>
+                  <Typography
+                    variant='caption'
+                    sx={{
+                      display: { xs: 'none', sm: 'block' },
+                      color: selected ? 'primary.main' : 'text.secondary',
+                      fontWeight: 600
+                    }}
+                  >
+                    {positionLabel}
+                  </Typography>
+                  <Typography
+                    variant='subtitle1'
+                    sx={{
+                      color: selected ? 'primary.main' : 'text.primary',
+                      fontWeight: 600,
+                      lineHeight: { xs: 1.2, md: undefined },
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis'
+                    }}
+                  >
+                    {`${index + 1}. ${copy.title}`}
+                  </Typography>
+                  <Typography
+                    variant='body2'
+                    sx={{
+                      display: { xs: 'none', xl: 'block' },
+                      color: 'text.secondary',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap'
+                    }}
+                  >
+                    {copy.description}
+                  </Typography>
+                </Stack>
+              </ButtonBase>
+            )
+          })}
+        </Box>
       </Box>
       <AnimatePresence initial={false} mode='wait'>
         <Box
@@ -490,6 +609,20 @@ const formatQuoteMargin = (marginPct: number | null): string => {
   if (marginPct === null || Number.isNaN(marginPct)) return GH_PRICING.dealDesk.marginUnavailable
 
   return `${Math.round(marginPct)}%`
+}
+
+const buildQuoteReviewInitials = (value: string | null | undefined): string => {
+  if (!value) return '—'
+
+  const words = value
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean)
+
+  if (words.length === 0) return '—'
+  if (words.length === 1) return words[0]?.slice(0, 2).toUpperCase() ?? '—'
+
+  return `${words[0]?.[0] ?? ''}${words[1]?.[0] ?? ''}`.toUpperCase()
 }
 
 const resolveMarginChipColor = (
@@ -822,6 +955,8 @@ const QuoteBuilderShell = ({
 }: QuoteBuilderShellProps) => {
   const router = useRouter()
   const editorRef = useRef<QuoteLineItemsEditorHandle>(null)
+  const contactsCacheRef = useRef<Map<string, QuoteOrganizationContact[]>>(new Map())
+  const dealsCacheRef = useRef<Map<string, QuoteOrganizationDeal[]>>(new Map())
 
   const initialBuilderState = useMemo<BuilderContextState>(
     () => ({
@@ -903,6 +1038,7 @@ const QuoteBuilderShell = ({
     searchError: partySearchError,
     settledQuery: partySearchSettledQuery,
     adoptingCompanyId,
+    retrySearch: retryPartySearch,
     clearSearch: clearPartySearch,
     adoptParty
   } = useParties({ enabled: unifiedPartySelectorEnabled })
@@ -1097,8 +1233,15 @@ const QuoteBuilderShell = ({
     }
 
     const controller = new AbortController()
+    const cachedContacts = contactsCacheRef.current.get(organizationId)
 
-    setContactsLoading(true)
+    if (cachedContacts) {
+      setOrgContacts(cachedContacts)
+    } else {
+      setOrgContacts([])
+    }
+
+    setContactsLoading(!cachedContacts)
 
     ;(async () => {
       try {
@@ -1114,14 +1257,21 @@ const QuoteBuilderShell = ({
         }
 
         const payload = (await res.json()) as { items?: QuoteOrganizationContact[] }
+        const items = payload.items ?? []
 
-        setOrgContacts(payload.items ?? [])
+        contactsCacheRef.current.set(organizationId, items)
+        setOrgContacts(items)
       } catch (err) {
         if (err instanceof Error && err.name === 'AbortError') return
         console.warn('[QuoteBuilderShell] contacts fetch error', err)
-        setOrgContacts([])
+
+        if (!cachedContacts) {
+          setOrgContacts([])
+        }
       } finally {
-        setContactsLoading(false)
+        if (!controller.signal.aborted) {
+          setContactsLoading(false)
+        }
       }
     })()
 
@@ -1137,8 +1287,15 @@ const QuoteBuilderShell = ({
     }
 
     const controller = new AbortController()
+    const cachedDeals = dealsCacheRef.current.get(organizationId)
 
-    setDealsLoading(true)
+    if (cachedDeals) {
+      setOrgDeals(cachedDeals)
+    } else {
+      setOrgDeals([])
+    }
+
+    setDealsLoading(!cachedDeals)
 
     ;(async () => {
       try {
@@ -1156,6 +1313,7 @@ const QuoteBuilderShell = ({
         const payload = (await res.json()) as { items?: QuoteOrganizationDeal[] }
         const items = payload.items ?? []
 
+        dealsCacheRef.current.set(organizationId, items)
         setOrgDeals(items)
         setHubspotDealId(current =>
           current && items.some(item => item.hubspotDealId === current) ? current : null
@@ -1163,9 +1321,14 @@ const QuoteBuilderShell = ({
       } catch (err) {
         if (err instanceof Error && err.name === 'AbortError') return
         console.warn('[QuoteBuilderShell] deals fetch error', err)
-        setOrgDeals([])
+
+        if (!cachedDeals) {
+          setOrgDeals([])
+        }
       } finally {
-        setDealsLoading(false)
+        if (!controller.signal.aborted) {
+          setDealsLoading(false)
+        }
       }
     })()
 
@@ -1827,9 +1990,14 @@ const QuoteBuilderShell = ({
     return () => window.removeEventListener('keydown', handler)
   }, [handleSubmit, openCatalogPicker])
 
+  const selectedOrganization = useMemo(
+    () => localOrganizations.find(o => o.organizationId === organizationId) ?? null,
+    [localOrganizations, organizationId]
+  )
+
   const selectedOrgName = useMemo(
-    () => localOrganizations.find(o => o.organizationId === organizationId)?.organizationName ?? pendingOrganizationLabel ?? null,
-    [localOrganizations, organizationId, pendingOrganizationLabel]
+    () => selectedOrganization?.organizationName ?? pendingOrganizationLabel ?? null,
+    [pendingOrganizationLabel, selectedOrganization?.organizationName]
   )
 
   const selectedContact = useMemo(
@@ -1938,6 +2106,34 @@ const QuoteBuilderShell = ({
     return hasApplied ? total : null
   }, [linesSnapshot, simulation?.lines])
 
+  const reviewLineSummaries = useMemo(
+    () =>
+      linesSnapshot.slice(0, 3).map((line, idx) => {
+        const simulatedLine = simulation?.lines?.[idx] ?? null
+
+        const fallbackSubtotal =
+          line.subtotalAfterDiscount ??
+          line.subtotalPrice ??
+          (line.unitPrice !== null ? line.unitPrice * line.quantity : null)
+
+        const subtotal =
+          simulatedLine?.suggestedBillRate?.totalBillOutputCurrency ?? fallbackSubtotal
+
+        const supportingParts = [
+          line.metadata?.sku ?? line.roleCode ?? line.productId ?? null,
+          `${formatGreenhouseNumber(line.quantity, 'es-CL')} ${QUOTE_LINE_UNIT_LABEL[line.unit]}`
+        ].filter(Boolean)
+
+        return {
+          key: line.lineItemId ?? `${line.label}-${idx}`,
+          label: line.label,
+          supporting: supportingParts.join(' · '),
+          amount: formatQuoteMoney(subtotal, currency)
+        }
+      }),
+    [currency, linesSnapshot, simulation?.lines]
+  )
+
   // Save state indicator: dirty si lines diff vs initial, clean cuando submitted.
   // changeCount = diferencia en cantidad de líneas (mínimo confiable sin diff
   // semántico deep); cuando es 0 pero sigue dirty (edit de campos existentes)
@@ -2020,10 +2216,6 @@ const QuoteBuilderShell = ({
   const quoteReadinessTotal = readinessItems.length
   const quoteReadinessFilled = readinessItems.filter(item => item.complete).length
 
-  const quoteContextReady = readinessItems
-    .filter(item => item.key !== 'lines')
-    .every(item => item.complete)
-
   const quoteReadinessNextStep = readinessItems.find(item => !item.complete)
 
   const quoteReadinessNextHint = quoteReadinessNextStep
@@ -2090,22 +2282,40 @@ const QuoteBuilderShell = ({
           <Typography variant='body2' sx={{ fontWeight: 600, lineHeight: 1.3, minWidth: 0 }} noWrap>
             {option.label}
           </Typography>
-          {badgeLabel ? (
-            <CustomChip
-              round='true'
-              size='small'
-              variant='tonal'
-              color={badgeColor}
-              label={badgeLabel}
-              sx={{ flexShrink: 0 }}
-            />
-          ) : null}
         </Stack>
         <Stack direction='row' spacing={1} alignItems='center' flexWrap='wrap' useFlexGap sx={{ minWidth: 0 }}>
           {domain ? (
             <Typography variant='caption' color='text.secondary' sx={{ lineHeight: 1.3 }}>
               {domain}
             </Typography>
+          ) : null}
+          {badgeLabel ? (
+            <Box
+              component='span'
+              sx={theme => ({
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 0.55,
+                minWidth: 0,
+                color: `${badgeColor}.main`,
+                ...theme.typography.caption,
+                fontWeight: 600,
+                lineHeight: 1.3
+              })}
+            >
+              <Box
+                component='span'
+                aria-hidden='true'
+                sx={{
+                  width: 5,
+                  height: 5,
+                  borderRadius: '9999px',
+                  backgroundColor: `${badgeColor}.main`,
+                  flexShrink: 0
+                }}
+              />
+              {badgeLabel}
+            </Box>
           ) : null}
           {kind === 'hubspot_candidate' && party?.canAdopt === false ? (
             <Typography variant='caption' color='warning.main' sx={{ lineHeight: 1.3, fontWeight: 600 }}>
@@ -2199,9 +2409,9 @@ const QuoteBuilderShell = ({
     ? GH_PRICING.contextChips.duration.unit(builderState.contractDurationMonths)
     : null
 
-  const validUntilValue = builderState.validUntil
+  const validUntilReviewValue = builderState.validUntil
     ? formatGreenhouseDate(builderState.validUntil, {}, 'es-CL')
-    : null
+    : GH_PRICING.builderWizard.steps.economics.summary.validUntilFallback
 
   const organizationContextStatus: ContextChipStatus = organizationId
       ? 'filled'
@@ -2418,6 +2628,16 @@ const QuoteBuilderShell = ({
                     ? formatPartySelectorError(partySearchError)
                     : GH_PRICING.contextChips.organization.unifiedEmpty
                 }
+                popoverNotice={
+                  partySearchError
+                    ? {
+                        tone: 'warning',
+                        message: formatPartySelectorError(partySearchError),
+                        actionLabel: GH_PRICING.contextChips.organization.unifiedRetry,
+                        onAction: retryPartySearch
+                      }
+                    : undefined
+                }
                 liveMessage={partySelectorLiveMessage}
                 popoverWidth={460}
               />
@@ -2602,34 +2822,18 @@ const QuoteBuilderShell = ({
                   </Stack>
                 )}
               />
-              <ContextChip
-                fullWidth
-                prominence='primary'
-                mode='custom'
-                icon={GH_PRICING.contextChips.validUntil.icon}
+              <GreenhouseDatePicker
                 label={GH_PRICING.contextChips.validUntil.label}
-                value={validUntilValue}
+                value={parseDateOnlyToLocalDate(builderState.validUntil)}
+                onChange={nextDate =>
+                  setBuilderState(prev => ({
+                    ...prev,
+                    validUntil: formatLocalDateToDateOnly(nextDate)
+                  }))
+                }
                 placeholder={GH_PRICING.contextChips.validUntil.placeholder}
                 disabled={submitting}
-                popoverWidth={300}
-                popoverContent={() => (
-                  <Stack spacing={1.5}>
-                    <Typography variant='h6'>{GH_PRICING.contextChips.validUntil.label}</Typography>
-                    <CustomTextField
-                      fullWidth
-                      size='small'
-                      type='date'
-                      value={builderState.validUntil ?? ''}
-                      onChange={event =>
-                        setBuilderState(prev => ({ ...prev, validUntil: event.target.value || null }))
-                      }
-                      InputLabelProps={{ shrink: true }}
-                      disabled={submitting}
-                      aria-label={GH_PRICING.contextChips.validUntil.label}
-                      autoFocus
-                    />
-                  </Stack>
-                )}
+                testId='quote-valid-until-trigger'
               />
             </Box>
           </Stack>
@@ -2704,12 +2908,17 @@ const QuoteBuilderShell = ({
           sx={theme => ({
             border: `1px solid ${theme.palette.divider}`,
             borderRadius: `${theme.shape.customBorderRadius.md}px`,
-            backgroundColor: theme.palette.background.default,
+            backgroundColor: theme.palette.background.paper,
             overflow: 'hidden'
           })}
         >
-          <Box sx={{ p: { xs: 2, md: 2.5 }, backgroundColor: 'background.paper' }}>
-            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} alignItems={{ xs: 'flex-start', sm: 'center' }} justifyContent='space-between'>
+          <Box sx={{ p: { xs: 2, md: 2.5 } }}>
+            <Stack
+              direction={{ xs: 'column', sm: 'row' }}
+              spacing={1.5}
+              alignItems={{ xs: 'flex-start', sm: 'center' }}
+              justifyContent='space-between'
+            >
               <Stack spacing={0.35} sx={{ minWidth: 0 }}>
                 <Typography variant='h6'>{GH_PRICING.builderWizard.steps.economics.reviewTitle}</Typography>
                 <Typography variant='body2' color='text.secondary'>
@@ -2731,113 +2940,274 @@ const QuoteBuilderShell = ({
           </Box>
           <Divider />
           <Box
-            component='ul'
-            sx={{
+            sx={theme => ({
               display: 'grid',
-              gridTemplateColumns: { xs: '1fr', md: 'repeat(3, minmax(0, 1fr))' },
-              gap: 0,
-              m: 0,
-              p: 0,
-              listStyle: 'none'
-            }}
+              gridTemplateColumns: { xs: '1fr', xl: 'minmax(0, 1.05fr) minmax(0, 0.95fr)' },
+              gap: { xs: 2, xl: 0 },
+              backgroundColor: alpha(theme.palette.background.default, 0.46)
+            })}
           >
-            {[
-              {
-                key: 'context',
-                icon: 'tabler-building-bank',
-                title: GH_PRICING.builderWizard.steps.context.title,
-                description: GH_PRICING.builderWizard.steps.context.description,
-                complete: quoteContextReady,
-                onClick: () => setActiveWizardStep('context')
-              },
-              {
-                key: 'scope',
-                icon: 'tabler-list-details',
-                title: GH_PRICING.builderWizard.steps.scope.title,
-                description: GH_PRICING.builderWizard.steps.scope.description,
-                complete: hasSubmittableContent,
-                onClick: () => setActiveWizardStep('scope')
-              },
-              {
-                key: 'pricing',
-                icon: 'tabler-chart-donut-3',
-                title: GH_PRICING.dealDesk.pricingTitle,
-                description: simulating ? GH_PRICING.dealDesk.pricingCalculating : GH_PRICING.dealDesk.pricingReady,
-                complete: !saveDraftDisabled && hasSubmittableContent && !simulationError,
-                onClick: undefined
-              }
-            ].map(item => (
+            <Stack
+              spacing={2}
+              sx={theme => ({
+                minWidth: 0,
+                p: { xs: 2, md: 2.5 },
+                borderInlineEnd: { xl: `1px solid ${theme.palette.divider}` }
+              })}
+            >
+              <Stack direction='row' alignItems='center' justifyContent='space-between' spacing={1.5}>
+                <Typography variant='subtitle1' sx={{ fontWeight: 600 }}>
+                  {GH_PRICING.builderWizard.steps.economics.summary.clientTitle}
+                </Typography>
+                <Button
+                  size='small'
+                  variant='text'
+                  onClick={() => setActiveWizardStep('context')}
+                  startIcon={<i className='tabler-pencil' aria-hidden='true' />}
+                >
+                  {GH_PRICING.builderWizard.steps.economics.summary.editContext}
+                </Button>
+              </Stack>
               <Box
-                key={item.key}
-                component='li'
                 sx={theme => ({
-                  minWidth: 0,
-                  borderInlineEnd: { md: `1px solid ${theme.palette.divider}` },
-                  '&:last-of-type': {
-                    borderInlineEnd: 0
-                  }
+                  p: { xs: 1.5, md: 2 },
+                  borderRadius: `${theme.shape.customBorderRadius.md}px`,
+                  backgroundColor: theme.palette.background.paper,
+                  border: `1px solid ${alpha(theme.palette.divider, 0.78)}`
                 })}
               >
-                <ButtonBase
-                  disabled={!item.onClick}
-                  onClick={item.onClick}
-                  sx={theme => ({
-                    width: '100%',
-                    minHeight: 92,
-                    alignItems: 'flex-start',
-                    justifyContent: 'flex-start',
-                    gap: 1.25,
-                    p: { xs: 2, md: 2.25 },
-                    textAlign: 'left',
-                    color: 'text.primary',
-                    cursor: item.onClick ? 'pointer' : 'default',
-                    transition: theme.transitions.create(['background-color', 'color'], {
-                      duration: theme.transitions.duration.shortest
-                    }),
-                    '&:hover': item.onClick
-                      ? {
-                          backgroundColor: alpha(theme.palette.primary.main, 0.035)
-                        }
-                      : undefined,
-                    '&.Mui-disabled': {
-                      color: theme.palette.text.primary,
-                      opacity: 1
-                    },
-                    '&.Mui-focusVisible': {
-                      outline: `2px solid ${theme.palette.primary.main}`,
-                      outlineOffset: -2
-                    }
-                  })}
-                >
+                <Stack direction='row' spacing={1.5} alignItems='center' sx={{ minWidth: 0 }}>
                   <Box
-                    component='span'
-                    aria-hidden='true'
                     sx={theme => ({
-                      width: 34,
-                      height: 34,
+                      position: 'relative',
+                      width: 44,
+                      height: 44,
+                      borderRadius: `${theme.shape.customBorderRadius.md}px`,
                       display: 'inline-flex',
                       alignItems: 'center',
                       justifyContent: 'center',
                       flexShrink: 0,
-                      borderRadius: `${theme.shape.customBorderRadius.sm}px`,
-                      color: item.complete ? 'success.main' : 'text.secondary',
-                      backgroundColor: item.complete ? theme.palette.success.lightOpacity : theme.palette.background.paper,
-                      border: `1px solid ${item.complete ? alpha(theme.palette.success.main, 0.22) : theme.palette.divider}`
+                      overflow: 'hidden',
+                      color: 'primary.main',
+                      backgroundColor: alpha(theme.palette.primary.main, 0.08),
+                      border: `1px solid ${alpha(theme.palette.primary.main, 0.14)}`
                     })}
                   >
-                    <i className={item.complete ? 'tabler-check' : item.icon} aria-hidden='true' style={{ fontSize: 18 }} />
-                  </Box>
-                  <Stack spacing={0.3} sx={{ minWidth: 0 }}>
-                    <Typography variant='subtitle1' sx={{ fontWeight: 600 }}>
-                      {item.title}
+                    <Typography variant='subtitle2' sx={{ fontWeight: 700 }}>
+                      {buildQuoteReviewInitials(selectedOrgName)}
                     </Typography>
-                    <Typography variant='body2' color='text.secondary'>
-                      {item.description}
+                    {selectedOrganization?.logoUrl ? (
+                      <Box
+                        component='img'
+                        src={selectedOrganization.logoUrl}
+                        alt=''
+                        onError={event => {
+                          event.currentTarget.style.display = 'none'
+                        }}
+                        sx={{
+                          position: 'absolute',
+                          inset: 0,
+                          width: '100%',
+                          height: '100%',
+                          objectFit: 'cover',
+                          backgroundColor: 'background.paper'
+                        }}
+                      />
+                    ) : null}
+                  </Box>
+                  <Stack spacing={0.2} sx={{ minWidth: 0 }}>
+                    <Typography variant='h6' sx={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {selectedOrgName ?? GH_PRICING.builderWizard.steps.economics.summary.organizationFallback}
+                    </Typography>
+                    <Typography variant='body2' color='text.secondary' sx={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {selectedContact?.fullName ??
+                        selectedContact?.canonicalEmail ??
+                        GH_PRICING.builderWizard.steps.economics.summary.contactFallback}
                     </Typography>
                   </Stack>
-                </ButtonBase>
+                </Stack>
+                <Box
+                  sx={{
+                    display: 'grid',
+                    gridTemplateColumns: { xs: '1fr', md: 'repeat(2, minmax(0, 1fr))' },
+                    gap: 1.25,
+                    mt: 2
+                  }}
+                >
+                  {[
+                    {
+                      icon: 'tabler-briefcase',
+                      label: GH_PRICING.contextChips.deal.label,
+                      value: selectedDeal?.dealName ?? GH_PRICING.builderWizard.steps.economics.summary.dealFallback
+                    },
+                    {
+                      icon: GH_PRICING.contextChips.businessLine.icon,
+                      label: GH_PRICING.contextChips.businessLine.label,
+                      value: selectedBusinessLine?.label ?? GH_PRICING.builderWizard.steps.economics.summary.businessLineFallback
+                    },
+                    {
+                      icon: GH_PRICING.contextChips.duration.icon,
+                      label: GH_PRICING.contextChips.duration.label,
+                      value: durationValue ?? GH_PRICING.builderWizard.steps.economics.summary.durationFallback
+                    },
+                    {
+                      icon: GH_PRICING.contextChips.validUntil.icon,
+                      label: GH_PRICING.contextChips.validUntil.label,
+                      value: validUntilReviewValue
+                    }
+                  ].map(item => (
+                    <Stack key={item.label} direction='row' spacing={1} alignItems='flex-start' sx={{ minWidth: 0 }}>
+                      <Box component='i' className={item.icon} aria-hidden='true' sx={{ color: 'text.secondary', fontSize: 18, mt: 0.15 }} />
+                      <Stack spacing={0.1} sx={{ minWidth: 0 }}>
+                        <Typography variant='caption' color='text.secondary' sx={{ fontWeight: 600 }}>
+                          {item.label}
+                        </Typography>
+                        <Typography variant='body2' sx={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          {item.value}
+                        </Typography>
+                      </Stack>
+                    </Stack>
+                  ))}
+                </Box>
               </Box>
-            ))}
+            </Stack>
+
+            <Stack spacing={2} sx={{ minWidth: 0, p: { xs: 2, md: 2.5 } }}>
+              <Stack direction='row' alignItems='center' justifyContent='space-between' spacing={1.5}>
+                <Stack direction='row' spacing={1} alignItems='center' sx={{ minWidth: 0 }}>
+                  <Typography variant='subtitle1' sx={{ fontWeight: 600 }}>
+                    {GH_PRICING.builderWizard.steps.economics.summary.scopeTitle}
+                  </Typography>
+                  <CustomChip
+                    round='true'
+                    size='small'
+                    variant='tonal'
+                    color='primary'
+                    label={GH_PRICING.builderWizard.steps.economics.summary.lineCount(linesSnapshot.length)}
+                  />
+                </Stack>
+                <Button
+                  size='small'
+                  variant='text'
+                  onClick={() => setActiveWizardStep('scope')}
+                  startIcon={<i className='tabler-pencil' aria-hidden='true' />}
+                >
+                  {GH_PRICING.builderWizard.steps.economics.summary.editScope}
+                </Button>
+              </Stack>
+              <Box
+                sx={theme => ({
+                  borderRadius: `${theme.shape.customBorderRadius.md}px`,
+                  backgroundColor: theme.palette.background.paper,
+                  border: `1px solid ${alpha(theme.palette.divider, 0.78)}`,
+                  overflow: 'hidden'
+                })}
+              >
+                {reviewLineSummaries.length > 0 ? (
+                  <Stack divider={<Divider flexItem />}>
+                    {reviewLineSummaries.map(line => (
+                      <Stack
+                        key={line.key}
+                        direction='row'
+                        spacing={1.5}
+                        alignItems='center'
+                        justifyContent='space-between'
+                        sx={{ minWidth: 0, px: 1.5, py: 1.25 }}
+                      >
+                        <Stack spacing={0.15} sx={{ minWidth: 0 }}>
+                          <Typography variant='body2' sx={{ fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                            {line.label}
+                          </Typography>
+                          <Typography variant='caption' color='text.secondary' sx={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                            {line.supporting}
+                          </Typography>
+                        </Stack>
+                        <Typography variant='body2' sx={{ fontWeight: 700, flexShrink: 0 }}>
+                          {line.amount}
+                        </Typography>
+                      </Stack>
+                    ))}
+                    {linesSnapshot.length > reviewLineSummaries.length ? (
+                      <Box sx={{ px: 1.5, py: 1 }}>
+                        <Typography variant='caption' color='text.secondary'>
+                          {GH_PRICING.builderWizard.steps.economics.summary.moreLines(
+                            linesSnapshot.length - reviewLineSummaries.length
+                          )}
+                        </Typography>
+                      </Box>
+                    ) : null}
+                  </Stack>
+                ) : (
+                  <Typography variant='body2' color='text.secondary' sx={{ px: 1.5, py: 1.5 }}>
+                    {GH_PRICING.builderWizard.steps.economics.summary.emptyScope}
+                  </Typography>
+                )}
+              </Box>
+            </Stack>
+          </Box>
+          <Divider />
+          <Box sx={{ p: { xs: 2, md: 2.5 } }}>
+            <Stack spacing={1.5}>
+              <Typography variant='subtitle1' sx={{ fontWeight: 600 }}>
+                {GH_PRICING.builderWizard.steps.economics.summary.economicsTitle}
+              </Typography>
+              <Box
+                sx={{
+                  display: 'grid',
+                  gridTemplateColumns: { xs: 'repeat(2, minmax(0, 1fr))', md: 'repeat(5, minmax(0, 1fr))' },
+                  gap: 1
+                }}
+              >
+                {[
+                  {
+                    label: GH_PRICING.builderWizard.steps.economics.summary.subtotalLabel,
+                    value: formatQuoteMoney(subtotalOutputCurrency, currency)
+                  },
+                  {
+                    label: GH_PRICING.builderWizard.steps.economics.summary.ivaLabel,
+                    value: formatQuoteMoney(ivaAmountPreview, currency)
+                  },
+                  {
+                    label: GH_PRICING.builderWizard.steps.economics.summary.totalLabel,
+                    value: formatQuoteMoney(totalWithIvaPreview, currency),
+                    emphasized: true
+                  },
+                  {
+                    label: GH_PRICING.builderWizard.steps.economics.summary.marginLabel,
+                    value: formatQuoteMargin(marginPct)
+                  },
+                  {
+                    label: GH_PRICING.builderWizard.steps.economics.summary.addonsLabel,
+                    value:
+                      appliedAddonsTotal !== null
+                        ? formatQuoteMoney(appliedAddonsTotal, currency)
+                        : `${addonPanelEntries.length}`
+                  }
+                ].map(item => (
+                  <Box
+                    key={item.label}
+                    sx={theme => ({
+                      minWidth: 0,
+                      p: 1.35,
+                      borderRadius: `${theme.shape.customBorderRadius.md}px`,
+                      backgroundColor: item.emphasized
+                        ? alpha(theme.palette.primary.main, 0.06)
+                        : alpha(theme.palette.background.default, 0.68),
+                      border: `1px solid ${item.emphasized ? alpha(theme.palette.primary.main, 0.18) : alpha(theme.palette.divider, 0.7)}`
+                    })}
+                  >
+                    <Typography variant='caption' color='text.secondary' sx={{ fontWeight: 600 }}>
+                      {item.label}
+                    </Typography>
+                    <Typography variant={item.emphasized ? 'h6' : 'subtitle1'} sx={{ fontWeight: 700, mt: 0.3 }}>
+                      {simulating && item.emphasized
+                        ? GH_PRICING.builderWizard.steps.economics.summary.pricingPending
+                        : item.value}
+                    </Typography>
+                  </Box>
+                ))}
+              </Box>
+            </Stack>
           </Box>
           <Box sx={{ px: { xs: 2, md: 2.5 }, py: 1.75, borderTop: theme => `1px solid ${theme.palette.divider}` }}>
             <Typography variant='body2' color='text.secondary' role='status'>
@@ -2879,6 +3249,7 @@ const QuoteBuilderShell = ({
             readyLabel={GH_PRICING.contextChips.progress.readyLabel}
             nextStepHint={quoteReadinessNextHint}
             testId='quote-header-readiness-progress'
+            variant='rail'
           />
         }
         actions={

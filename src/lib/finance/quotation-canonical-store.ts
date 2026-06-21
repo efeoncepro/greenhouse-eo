@@ -234,6 +234,54 @@ export const resolveFinanceQuoteTenantOrganizationIds = async (tenant: TenantCon
   return rows.map(row => row.organization_id)
 }
 
+export const canAccessFinanceQuoteOrganization = async (
+  tenant: TenantContext,
+  organizationId: string
+) => {
+  const normalizedOrganizationId = organizationId.trim()
+
+  if (!normalizedOrganizationId) {
+    return false
+  }
+
+  if (tenant.tenantType === 'efeonce_internal') {
+    const rows = await query<TenantOrganizationRow>(
+      `SELECT organization_id
+       FROM greenhouse_core.organizations
+       WHERE active = TRUE
+         AND organization_id = $1
+       LIMIT 1`,
+      [normalizedOrganizationId]
+    )
+
+    return rows.length > 0
+  }
+
+  const tenantOrganizationId = tenant.organizationId?.trim()
+
+  if (tenantOrganizationId) {
+    return tenantOrganizationId === normalizedOrganizationId
+  }
+
+  const clientId = tenant.clientId?.trim()
+
+  if (!clientId) {
+    return false
+  }
+
+  const rows = await query<TenantOrganizationRow>(
+    `SELECT DISTINCT s.organization_id
+     FROM greenhouse_core.spaces s
+     WHERE s.active = TRUE
+       AND s.client_id = $1
+       AND s.organization_id = $2
+     LIMIT 1`,
+    [clientId, normalizedOrganizationId]
+  )
+
+  return rows.length > 0
+}
+
 export const listFinanceQuotesFromCanonical = async ({
   tenant,
   status,

@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const mockRequireFinanceTenantContext = vi.fn()
-const mockResolveFinanceQuoteTenantOrganizationIds = vi.fn()
+const mockCanAccessFinanceQuoteOrganization = vi.fn()
 const mockQuery = vi.fn()
 const mockGetOrganizationDetail = vi.fn()
 const mockSyncOrganizationHubSpotContacts = vi.fn()
@@ -11,8 +11,8 @@ vi.mock('@/lib/tenant/authorization', () => ({
 }))
 
 vi.mock('@/lib/finance/quotation-canonical-store', () => ({
-  resolveFinanceQuoteTenantOrganizationIds: (...args: unknown[]) =>
-    mockResolveFinanceQuoteTenantOrganizationIds(...args)
+  canAccessFinanceQuoteOrganization: (...args: unknown[]) =>
+    mockCanAccessFinanceQuoteOrganization(...args)
 }))
 
 vi.mock('@/lib/db', () => ({
@@ -40,7 +40,7 @@ describe('GET /api/commercial/organizations/[id]/contacts', () => {
       },
       errorResponse: null
     })
-    mockResolveFinanceQuoteTenantOrganizationIds.mockResolvedValue(['org-1'])
+    mockCanAccessFinanceQuoteOrganization.mockResolvedValue(true)
     mockGetOrganizationDetail.mockResolvedValue({
       organizationId: 'org-1',
       hubspotCompanyId: 'hs-company-1'
@@ -76,6 +76,7 @@ describe('GET /api/commercial/organizations/[id]/contacts', () => {
     const body = await response.json()
 
     expect(response.status).toBe(200)
+    expect(mockCanAccessFinanceQuoteOrganization).toHaveBeenCalledWith(expect.anything(), 'org-1')
     expect(mockSyncOrganizationHubSpotContacts).not.toHaveBeenCalled()
     expect(body).toEqual({
       items: [
@@ -90,11 +91,37 @@ describe('GET /api/commercial/organizations/[id]/contacts', () => {
           isPrimary: true
         }
       ],
-      total: 1
+      total: 1,
+      refresh: {
+        mode: 'cached',
+        refreshedFromHubSpot: false
+      }
     })
   })
 
-  it('hydrates from HubSpot when the local mirror has no contacts yet', async () => {
+  it('returns cached empty contacts by default without blocking on HubSpot hydration', async () => {
+    mockQuery.mockResolvedValue([])
+
+    const response = await GET(new Request('http://localhost'), {
+      params: Promise.resolve({ id: 'org-1' })
+    })
+
+    const body = await response.json()
+
+    expect(response.status).toBe(200)
+    expect(mockGetOrganizationDetail).not.toHaveBeenCalled()
+    expect(mockSyncOrganizationHubSpotContacts).not.toHaveBeenCalled()
+    expect(body).toEqual({
+      items: [],
+      total: 0,
+      refresh: {
+        mode: 'cached',
+        refreshedFromHubSpot: false
+      }
+    })
+  })
+
+  it('hydrates from HubSpot after an explicit live refresh', async () => {
     mockQuery
       .mockResolvedValueOnce([])
       .mockResolvedValueOnce([
@@ -110,7 +137,7 @@ describe('GET /api/commercial/organizations/[id]/contacts', () => {
         }
       ])
 
-    const response = await GET(new Request('http://localhost'), {
+    const response = await GET(new Request('http://localhost?refresh=1'), {
       params: Promise.resolve({ id: 'org-1' })
     })
 
@@ -119,38 +146,39 @@ describe('GET /api/commercial/organizations/[id]/contacts', () => {
     expect(response.status).toBe(200)
     expect(mockSyncOrganizationHubSpotContacts).toHaveBeenCalledWith({ organizationId: 'org-1' })
     expect(mockQuery).toHaveBeenCalledTimes(2)
-    expect(body).toEqual({
-      items: [
-        {
-          identityProfileId: 'profile-2',
-          fullName: 'Marco Moreno',
-          canonicalEmail: 'marco@carozzi.cl',
-          jobTitle: null,
-          roleLabel: 'Gerente de Trade',
-          department: null,
-          membershipType: 'contact',
-          isPrimary: false
-        }
-      ],
-      total: 1
+    expect(body).toMatchObject({
+      total: 1,
+      refresh: {
+        mode: 'hubspot',
+        refreshedFromHubSpot: true
+      }
     })
+    expect(body.items[0].identityProfileId).toBe('profile-2')
   })
 
-  it('returns empty when the organization has no local contacts and no HubSpot company binding', async () => {
+  it('returns cached empty contacts when an explicit refresh has no HubSpot company binding', async () => {
     mockQuery.mockResolvedValue([])
     mockGetOrganizationDetail.mockResolvedValue({
       organizationId: 'org-1',
       hubspotCompanyId: null
     })
 
-    const response = await GET(new Request('http://localhost'), {
+    const response = await GET(new Request('http://localhost?refresh=1'), {
       params: Promise.resolve({ id: 'org-1' })
     })
 
     const body = await response.json()
 
     expect(response.status).toBe(200)
+    expect(mockGetOrganizationDetail).toHaveBeenCalledWith('org-1')
     expect(mockSyncOrganizationHubSpotContacts).not.toHaveBeenCalled()
-    expect(body).toEqual({ items: [], total: 0 })
+    expect(body).toEqual({
+      items: [],
+      total: 0,
+      refresh: {
+        mode: 'hubspot',
+        refreshedFromHubSpot: false
+      }
+    })
   })
 })

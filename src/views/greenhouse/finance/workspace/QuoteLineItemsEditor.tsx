@@ -785,10 +785,28 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
                   <Box component='i' className='tabler-search' aria-hidden='true' sx={{ fontSize: 19 }} />
                 </Box>
                 <Stack spacing={0.15} sx={{ minWidth: 0 }}>
-                  <Typography variant='body1' sx={{ fontWeight: 600, lineHeight: 1.3 }} noWrap>
+                  <Typography
+                    variant='body1'
+                    sx={{
+                      fontWeight: 600,
+                      lineHeight: 1.3,
+                      whiteSpace: { xs: 'normal', sm: 'nowrap' },
+                      overflow: { sm: 'hidden' },
+                      textOverflow: { sm: 'ellipsis' }
+                    }}
+                  >
                     {GH_PRICING.dealDesk.lineCanvas.searchPlaceholder}
                   </Typography>
-                  <Typography variant='body2' color='text.secondary' sx={{ lineHeight: 1.35 }} noWrap>
+                  <Typography
+                    variant='body2'
+                    color='text.secondary'
+                    sx={{
+                      lineHeight: 1.35,
+                      whiteSpace: { xs: 'normal', sm: 'nowrap' },
+                      overflow: { sm: 'hidden' },
+                      textOverflow: { sm: 'ellipsis' }
+                    }}
+                  >
                     {GH_PRICING.dealDesk.lineCanvas.searchSupportingText}
                   </Typography>
                 </Stack>
@@ -1090,15 +1108,15 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
                       onMouseLeave={() => setHoveredRow(prev => (prev === index ? null : prev))}
                       sx={theme => ({
                         display: 'grid',
-                        gridTemplateColumns: {
-                          xs: 'minmax(0, 1fr) auto',
-                          md: 'repeat(2, minmax(0, 1fr))',
-                          lg: EDITOR_ROW_GRID_COLUMNS
-                        },
-                        gap: { xs: 0.6, md: 1, lg: 1.25 },
-                        alignItems: { xs: 'stretch', lg: 'center' },
-                        px: { xs: 1.5, lg: 2 },
-                        py: { xs: 0.85, lg: 0.95 },
+	                        gridTemplateColumns: {
+	                          xs: 'auto minmax(0, 1fr) auto',
+	                          md: 'repeat(2, minmax(0, 1fr))',
+	                          lg: EDITOR_ROW_GRID_COLUMNS
+	                        },
+	                        gap: { xs: 0.5, md: 1, lg: 1.25 },
+	                        alignItems: { xs: 'stretch', lg: 'center' },
+	                        px: { xs: 1, lg: 2 },
+	                        py: { xs: 0.65, lg: 0.95 },
                         borderBlockEnd: `1px solid ${theme.palette.divider}`,
                         backgroundColor: theme.palette.background.paper,
                         transition: theme.transitions.create(['background-color'], {
@@ -1143,7 +1161,7 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
                         ) : null}
                       </Box>
                       <Box role='cell' sx={{ minWidth: 0, gridColumn: { xs: '1 / -1', md: '1 / -1', lg: '2 / 3' } }}>
-                        <Stack spacing={0.35}>
+	                        <Stack spacing={0.25}>
                           <Stack direction='row' spacing={0.75} alignItems='center' sx={{ minWidth: 0 }}>
                             {hasDetails ? (
                               <Tooltip title={isExpanded ? 'Ocultar detalle' : 'Ver detalle'} disableInteractive>
@@ -1172,9 +1190,9 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
                               onChange={event => updateLine(index, { label: event.target.value })}
                               disabled={saving}
                               aria-label={`Etiqueta del ítem ${index + 1}`}
-                              sx={theme => ({
-                                '& .MuiInputBase-root': {
-                                  minHeight: { xs: 36, md: 40 },
+	                              sx={theme => ({
+	                                '& .MuiInputBase-root': {
+	                                  minHeight: { xs: 32, md: 40 },
                                   borderRadius: `${theme.shape.customBorderRadius.md}px`,
                                   backgroundColor: { xs: 'transparent', sm: theme.palette.background.paper },
                                   boxShadow: { xs: 'none', sm: undefined }
@@ -1188,11 +1206,11 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
                                 '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
                                   borderColor: { xs: alpha(theme.palette.primary.main, 0.38), sm: undefined }
                                 },
-                                '& .MuiInputBase-input': {
-                                  py: { xs: 0.45, md: 0.85 },
-                                  px: { xs: 0, sm: undefined }
-                                }
-                              })}
+	                                '& .MuiInputBase-input': {
+	                                  py: { xs: 0.35, md: 0.85 },
+	                                  px: { xs: 0, sm: undefined }
+	                                }
+	                              })}
                             />
                           </Stack>
                           <Stack direction='row' spacing={0.6} alignItems='center' useFlexGap flexWrap='wrap'>
@@ -1256,7 +1274,7 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
                           ) : null}
                         </Stack>
                       </Box>
-                      <Box role='cell' sx={{ minWidth: 0, gridColumn: { xs: '1 / 2', sm: '1 / 2', md: '2 / 3', lg: '3 / 4' } }}>
+	                      <Box role='cell' sx={{ minWidth: 0, gridColumn: { xs: '1 / 2', sm: '1 / 2', md: '2 / 3', lg: '3 / 4' } }}>
                         <Stack spacing={0.25} alignItems={{ xs: 'stretch', lg: 'flex-start' }} sx={{ minWidth: 0 }}>
                           <Typography
                             variant='caption'
@@ -1293,17 +1311,17 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
                                 )
                               }}
                               disabled={saving}
-                              aria-label={needsPricingContext ? `Meses del ítem ${index + 1}` : `Cantidad del ítem ${index + 1}`}
-                              sx={theme => ({
-                                maxWidth: { xs: 76, sm: 104, lg: 74 },
-                                '& .MuiInputBase-root': {
-                                  minHeight: { xs: 34, lg: 38 },
-                                  borderRadius: `${theme.shape.customBorderRadius.md}px`
-                                },
-                                '& .MuiInputBase-input': {
-                                  py: { xs: 0.55, lg: 0.75 }
-                                }
-                              })}
+	                              aria-label={needsPricingContext ? `Meses del ítem ${index + 1}` : `Cantidad del ítem ${index + 1}`}
+	                              sx={theme => ({
+	                                maxWidth: { xs: 64, sm: 104, lg: 74 },
+	                                '& .MuiInputBase-root': {
+	                                  minHeight: { xs: 32, lg: 38 },
+	                                  borderRadius: `${theme.shape.customBorderRadius.md}px`
+	                                },
+	                                '& .MuiInputBase-input': {
+	                                  py: { xs: 0.42, lg: 0.75 }
+	                                }
+	                              })}
                             />
                             {needsPricingContext ? (
                               <Tooltip title='El engine usa base mensual para roles y personas' disableInteractive>
@@ -1346,7 +1364,14 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
                           ) : null}
                         </Stack>
                       </Box>
-                      <Box role='cell' sx={{ minWidth: 0, gridColumn: { xs: '2 / 3', sm: '2 / 3', md: '1 / -1', lg: '4 / 5' } }}>
+	                      <Box
+	                        role='cell'
+	                        sx={{
+	                          display: { xs: 'none', sm: 'block' },
+	                          minWidth: 0,
+	                          gridColumn: { sm: '2 / 3', md: '1 / -1', lg: '4 / 5' }
+	                        }}
+	                      >
                         <Stack
                           spacing={0.25}
                           alignItems={{ xs: 'flex-end', md: 'flex-start', lg: 'flex-end' }}
@@ -1429,13 +1454,13 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
                       </Box>
                       <Box
                         role='cell'
-                        sx={{
-                          minWidth: 0,
-                          gridColumn: { xs: '1 / 2', sm: '1 / -1', md: '1 / -1', lg: '5 / 6' },
-                          textAlign: { lg: 'right' }
-                        }}
-                      >
-                        <Stack spacing={0.25} alignItems={{ xs: 'flex-start', sm: 'flex-end', lg: 'flex-end' }} sx={{ minWidth: 0 }}>
+	                        sx={{
+	                          minWidth: 0,
+	                          gridColumn: { xs: '2 / 3', sm: '1 / -1', md: '1 / -1', lg: '5 / 6' },
+	                          textAlign: { lg: 'right' }
+	                        }}
+	                      >
+	                        <Stack spacing={0.25} alignItems={{ xs: 'flex-end', sm: 'flex-end', lg: 'flex-end' }} sx={{ minWidth: 0 }}>
                           <Typography
                             variant='caption'
                             color='text.secondary'
@@ -1458,11 +1483,11 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
                       </Box>
                       <Box
                         role='cell'
-                        sx={{
-                          minWidth: 0,
-                          gridColumn: { xs: '2 / 3', sm: '2 / 3', lg: '6 / 7' },
-                          alignSelf: { lg: 'center' }
-                        }}
+	                        sx={{
+	                          minWidth: 0,
+	                          gridColumn: { xs: '3 / 4', sm: '2 / 3', lg: '6 / 7' },
+	                          alignSelf: { lg: 'center' }
+	                        }}
                       >
                         <Stack
                           direction={{ xs: 'row', lg: 'column' }}

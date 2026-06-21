@@ -107,7 +107,30 @@ export const GH_PRICING = {
         reviewReady: 'Listo para emisión',
         reviewPending: 'Aún hay bloqueadores',
         reviewHintReady: 'Puedes emitir desde el panel de economía cuando el total esté calculado.',
-        reviewHintPending: 'Completa los campos pendientes o vuelve al paso correspondiente.'
+        reviewHintPending: 'Completa los campos pendientes o vuelve al paso correspondiente.',
+        summary: {
+          clientTitle: 'Cliente y oportunidad',
+          scopeTitle: 'Alcance cotizado',
+          economicsTitle: 'Economía calculada',
+          termsTitle: 'Términos',
+          editContext: 'Ajustar contexto',
+          editScope: 'Editar alcance',
+          organizationFallback: 'Sin cliente seleccionado',
+          contactFallback: 'Sin contacto',
+          dealFallback: 'Sin deal vinculado',
+          businessLineFallback: 'Sin business line',
+          validUntilFallback: 'Sin fecha de validez',
+          durationFallback: 'Sin duración',
+          emptyScope: 'Aún no hay ítems vendibles.',
+          moreLines: (count: number) => `+${count} líneas más`,
+          lineCount: (count: number) => (count === 1 ? '1 ítem' : `${count} ítems`),
+          subtotalLabel: 'Subtotal',
+          ivaLabel: 'IVA',
+          totalLabel: 'Total',
+          marginLabel: 'Margen',
+          addonsLabel: 'Addons',
+          pricingPending: 'Calculando al guardar cambios'
+        }
       }
     },
       contextSetup: {

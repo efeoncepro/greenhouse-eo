@@ -1,7 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const mockRequireFinanceTenantContext = vi.fn()
-const mockResolveFinanceQuoteTenantOrganizationIds = vi.fn()
 const mockSearchParties = vi.fn()
 const mockEnforcePartyEndpointRateLimit = vi.fn()
 const mockRecordPartyEndpointRequest = vi.fn()
@@ -10,11 +9,6 @@ const mockHasEntitlement = vi.fn()
 
 vi.mock('@/lib/tenant/authorization', () => ({
   requireFinanceTenantContext: (...args: unknown[]) => mockRequireFinanceTenantContext(...args)
-}))
-
-vi.mock('@/lib/finance/quotation-canonical-store', () => ({
-  resolveFinanceQuoteTenantOrganizationIds: (...args: unknown[]) =>
-    mockResolveFinanceQuoteTenantOrganizationIds(...args)
 }))
 
 vi.mock('@/lib/commercial/party', async () => {
@@ -59,7 +53,6 @@ describe('GET /api/commercial/parties/search', () => {
       },
       errorResponse: null
     })
-    mockResolveFinanceQuoteTenantOrganizationIds.mockResolvedValue(['org-1'])
     mockSearchParties.mockResolvedValue({
       parties: [
         {
@@ -104,9 +97,8 @@ describe('GET /api/commercial/parties/search', () => {
     const body = await response.json()
 
     expect(response.status).toBe(200)
-    expect(mockResolveFinanceQuoteTenantOrganizationIds).toHaveBeenCalled()
     expect(mockSearchParties).toHaveBeenCalledWith('acme', expect.objectContaining({
-      visibleOrganizationIds: ['org-1'],
+      tenant: expect.objectContaining({ tenantType: 'efeonce_internal' }),
       allowHubspotCandidates: true,
       includeStages: ['prospect', 'opportunity']
     }))

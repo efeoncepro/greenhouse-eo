@@ -11,6 +11,7 @@ import AnimatedCounter from '@/components/greenhouse/AnimatedCounter'
 export interface FieldsProgressChipProps {
   filled: number
   total: number
+  variant?: 'chip' | 'rail'
 
   /** Screen reader announcement. Shown via role='status' + aria-live='polite'. */
   srLabel: (filled: number, total: number) => string
@@ -53,6 +54,7 @@ export interface FieldsProgressChipProps {
 const FieldsProgressChip = ({
   filled,
   total,
+  variant = 'chip',
   srLabel,
   suffix,
   readyLabel,
@@ -66,25 +68,30 @@ const FieldsProgressChip = ({
   const progressColor = isReady ? theme.palette.success.main : theme.palette.primary.main
   const trackColor = alpha(theme.palette.text.primary, 0.09)
   const showReady = isReady && readyLabel
+  const isRail = variant === 'rail'
 
   return (
     <Stack
-      spacing={0.6}
+      spacing={isRail ? 0.75 : 0.6}
       role='status'
       aria-live='polite'
       aria-atomic='true'
       data-testid={testId}
       sx={theme => ({
-        minWidth: { xs: 0, sm: isReady ? 360 : 340 },
-        maxWidth: isReady ? 480 : 460,
+        minWidth: isRail ? 0 : { xs: 0, sm: isReady ? 360 : 340 },
+        maxWidth: isRail ? 560 : isReady ? 480 : 460,
         width: '100%',
-        px: 1.25,
-        py: 0.75,
+        px: isRail ? 0 : 1.25,
+        py: isRail ? 0 : 0.75,
         borderRadius: `${theme.shape.customBorderRadius.md}px`,
-        border: `1px solid ${isReady ? alpha(theme.palette.success.main, 0.32) : alpha(theme.palette.primary.main, 0.16)}`,
-        backgroundColor: isReady
-          ? alpha(theme.palette.success.main, theme.palette.mode === 'dark' ? 0.14 : 0.065)
-          : alpha(theme.palette.primary.main, theme.palette.mode === 'dark' ? 0.08 : 0.035),
+        border: isRail
+          ? 0
+          : `1px solid ${isReady ? alpha(theme.palette.success.main, 0.32) : alpha(theme.palette.primary.main, 0.16)}`,
+        backgroundColor: isRail
+          ? 'transparent'
+          : isReady
+            ? alpha(theme.palette.success.main, theme.palette.mode === 'dark' ? 0.14 : 0.065)
+            : alpha(theme.palette.primary.main, theme.palette.mode === 'dark' ? 0.08 : 0.035),
         color: 'text.secondary',
         overflow: 'hidden'
       })}
@@ -124,15 +131,15 @@ const FieldsProgressChip = ({
           <Box
             component='span'
             sx={theme => ({
-              width: 34,
-              height: 20,
+              width: isRail ? 42 : 34,
+              height: isRail ? 24 : 20,
               borderRadius: 999,
               display: 'inline-flex',
               alignItems: 'center',
               justifyContent: 'center',
               flexShrink: 0,
               color: theme.palette.primary.main,
-              backgroundColor: alpha(theme.palette.primary.main, 0.08),
+              backgroundColor: isRail ? alpha(theme.palette.primary.main, 0.1) : alpha(theme.palette.primary.main, 0.08),
               fontVariantNumeric: 'tabular-nums'
             })}
           >
@@ -147,10 +154,11 @@ const FieldsProgressChip = ({
         aria-hidden='true'
         sx={{
           position: 'relative',
-          height: 5,
+          height: isRail ? 8 : 5,
           borderRadius: 999,
           backgroundColor: trackColor,
-          overflow: 'hidden'
+          overflow: 'hidden',
+          boxShadow: isRail ? `inset 0 0 0 1px ${alpha(theme.palette.text.primary, 0.025)}` : 'none'
         }}
       >
         <Box
@@ -158,7 +166,11 @@ const FieldsProgressChip = ({
             width: `${Math.max(0, Math.min(100, percent))}%`,
             height: '100%',
             borderRadius: 999,
-            backgroundColor: progressColor,
+            backgroundImage: isRail
+              ? `linear-gradient(90deg, ${progressColor}, ${alpha(progressColor, 0.72)})`
+              : undefined,
+            backgroundColor: isRail ? undefined : progressColor,
+            boxShadow: isRail ? `0 0 0 1px ${alpha(progressColor, 0.08)}, 0 8px 18px -12px ${alpha(progressColor, 0.65)}` : 'none',
             transition: theme.transitions.create('width', {
               duration: theme.transitions.duration.short,
               easing: theme.transitions.easing.easeOut

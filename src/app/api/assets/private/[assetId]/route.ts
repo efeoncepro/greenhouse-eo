@@ -5,6 +5,23 @@ import { requireTenantContext } from '@/lib/tenant/authorization'
 
 export const dynamic = 'force-dynamic'
 
+const ORGANIZATION_LOGO_ASSET_TYPES = new Set([
+  'organization_logo',
+  'organization_logo_candidate',
+  'organization_logo_draft'
+])
+
+const resolvePrivateAssetCacheControl = (asset: Awaited<ReturnType<typeof downloadPrivateAsset>>['asset']) => {
+  const isOrganizationLogo = ORGANIZATION_LOGO_ASSET_TYPES.has(asset.ownerAggregateType)
+  const isImage = asset.mimeType.startsWith('image/')
+
+  if (isOrganizationLogo && isImage) {
+    return 'private, max-age=86400, immutable'
+  }
+
+  return null
+}
+
 export async function GET(_: Request, { params }: { params: Promise<{ assetId: string }> }) {
   const { tenant, unauthorizedResponse } = await requireTenantContext()
 
@@ -33,12 +50,13 @@ export async function GET(_: Request, { params }: { params: Promise<{ assetId: s
     const wantsInline = searchParams.get('inline') === '1'
     const isPreviewable = /^(application\/pdf|image\/)/.test(downloaded.asset.mimeType)
     const disposition = wantsInline || isPreviewable ? 'inline' : 'attachment'
+    const cacheControl = resolvePrivateAssetCacheControl(downloaded.asset) ?? downloaded.file.cacheControl
 
     return new NextResponse(new Uint8Array(downloaded.file.arrayBuffer), {
       headers: {
         'Content-Type': downloaded.asset.mimeType,
         'Content-Disposition': `${disposition}; filename="${downloaded.asset.filename}"`,
-        'Cache-Control': downloaded.file.cacheControl
+        'Cache-Control': cacheControl
       }
     })
   } catch (error) {

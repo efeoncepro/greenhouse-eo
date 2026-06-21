@@ -1,6 +1,19 @@
-import { describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { mergePartySearchItems } from '../party-search-reader'
+import type { TenantContext } from '@/lib/tenant/get-tenant-context'
+
+const mockQuery = vi.fn()
+
+vi.mock('@/lib/db', () => ({
+  query: (...args: unknown[]) => mockQuery(...args)
+}))
+
+import { mergePartySearchItems, searchParties } from '../party-search-reader'
+
+beforeEach(() => {
+  vi.clearAllMocks()
+  mockQuery.mockResolvedValue([])
+})
 
 describe('mergePartySearchItems', () => {
   it('prefers materialized parties over HubSpot candidates with the same company id', () => {
@@ -72,5 +85,44 @@ describe('mergePartySearchItems', () => {
       'party',
       'hubspot_candidate'
     ])
+  })
+})
+
+describe('searchParties tenant scoping', () => {
+  it('searches internal tenants without materializing all visible organization ids', async () => {
+    await searchParties('sky', {
+      tenant: {
+        tenantType: 'efeonce_internal',
+        userId: 'usr-1',
+        clientId: 'cli-1'
+      } as TenantContext,
+      includeStages: ['active_client'],
+      allowHubspotCandidates: false
+    })
+
+    const [sql, values] = mockQuery.mock.calls[0] as [string, unknown[]]
+
+    expect(sql).not.toContain('organization_id = ANY')
+    expect(values).toEqual([['active_client'], '%sky%', 40])
+  })
+
+  it('scopes client tenants through active spaces instead of passing broad id arrays', async () => {
+    await searchParties('sky', {
+      tenant: {
+        tenantType: 'client',
+        userId: 'usr-1',
+        clientId: 'cli-1'
+      } as TenantContext,
+      includeStages: ['active_client', 'opportunity'],
+      allowHubspotCandidates: false,
+      limit: 10
+    })
+
+    const [sql, values] = mockQuery.mock.calls[0] as [string, unknown[]]
+
+    expect(sql).toContain('EXISTS')
+    expect(sql).toContain('greenhouse_core.spaces')
+    expect(sql).not.toContain('organization_id = ANY')
+    expect(values).toEqual([['active_client', 'opportunity'], '%sky%', 'cli-1', 20])
   })
 })

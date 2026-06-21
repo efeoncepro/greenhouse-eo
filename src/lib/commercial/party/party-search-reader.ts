@@ -1,10 +1,9 @@
 import 'server-only'
 
-import { sql } from 'kysely'
-
-import { getDb } from '@/lib/db'
+import { query as runQuery } from '@/lib/db'
 
 import { buildPrivateAssetDownloadUrl } from '@/lib/storage/greenhouse-assets'
+import type { TenantContext } from '@/lib/tenant/get-tenant-context'
 import {
   listHubSpotCandidates,
   normalizeCompanyDomain,
@@ -13,7 +12,7 @@ import {
 import { parseLifecycleStage } from './lifecycle-state-machine'
 import type { LifecycleStage } from './types'
 
-interface OrganizationSearchRow {
+interface OrganizationSearchRow extends Record<string, unknown> {
   organization_id: string
   commercial_party_id: string
   hubspot_company_id: string | null
@@ -26,7 +25,8 @@ interface OrganizationSearchRow {
 }
 
 export interface PartySearchFilters {
-  visibleOrganizationIds: string[]
+  visibleOrganizationIds?: string[]
+  tenant?: TenantContext
   includeStages: readonly LifecycleStage[]
   allowHubspotCandidates: boolean
   limit?: number
@@ -150,49 +150,83 @@ const listVisibleOrganizations = async ({
   query,
   visibleOrganizationIds,
   includeStages,
+  tenant,
   limit
 }: {
   query: string
-  visibleOrganizationIds: string[]
+  visibleOrganizationIds?: string[]
   includeStages: readonly LifecycleStage[]
+  tenant?: TenantContext
   limit: number
 }): Promise<PartySearchItem[]> => {
-  if (visibleOrganizationIds.length === 0) {
+  if (!tenant && (!visibleOrganizationIds || visibleOrganizationIds.length === 0)) {
     return []
   }
 
-  const db = await getDb()
   const needle = `%${query.trim()}%`
+  const values: unknown[] = [[...includeStages], needle]
 
-  const rows = await db
-    .selectFrom('greenhouse_core.organizations as o')
-    .leftJoin('greenhouse_crm.companies as c', 'c.hubspot_company_id', 'o.hubspot_company_id')
-    .select([
-      'o.organization_id',
-      'o.commercial_party_id',
-      'o.hubspot_company_id',
-      'o.organization_name',
-      'o.legal_name',
-      'o.lifecycle_stage',
-      'o.updated_at',
-      'o.logo_asset_id',
-      'c.website_url'
-    ])
-    .where('o.active', '=', true)
-    .where('o.organization_id', 'in', visibleOrganizationIds)
-    .where('o.lifecycle_stage', 'in', [...includeStages])
-    .where(
-      sql<boolean>`(
-        o.organization_name ILIKE ${needle}
-        OR COALESCE(o.legal_name, '') ILIKE ${needle}
-        OR COALESCE(o.public_id, '') ILIKE ${needle}
-        OR COALESCE(o.hubspot_company_id, '') ILIKE ${needle}
-        OR COALESCE(c.website_url, '') ILIKE ${needle}
-      )`
-    )
-    .orderBy('o.updated_at', 'desc')
-    .limit(Math.max(limit * 2, 20))
-    .execute()
+  const conditions = [
+    'o.active = TRUE',
+    'o.lifecycle_stage = ANY($1::text[])',
+    `(
+      o.organization_name ILIKE $2
+      OR COALESCE(o.legal_name, '') ILIKE $2
+      OR COALESCE(o.public_id, '') ILIKE $2
+      OR COALESCE(o.hubspot_company_id, '') ILIKE $2
+      OR COALESCE(c.website_url, '') ILIKE $2
+    )`
+  ]
+
+  if (tenant) {
+    if (tenant.tenantType !== 'efeonce_internal') {
+      const organizationId = tenant.organizationId?.trim()
+      const clientId = tenant.clientId?.trim()
+
+      if (organizationId) {
+        values.push(organizationId)
+        conditions.push(`o.organization_id = $${values.length}`)
+      } else if (clientId) {
+        values.push(clientId)
+        conditions.push(
+          `EXISTS (
+             SELECT 1
+             FROM greenhouse_core.spaces s
+             WHERE s.active = TRUE
+               AND s.client_id = $${values.length}
+               AND s.organization_id = o.organization_id
+           )`
+        )
+      } else {
+        return []
+      }
+    }
+  } else if (visibleOrganizationIds && visibleOrganizationIds.length > 0) {
+    values.push(visibleOrganizationIds)
+    conditions.push(`o.organization_id = ANY($${values.length}::text[])`)
+  }
+
+  values.push(Math.max(limit * 2, 20))
+
+  const rows = await runQuery<OrganizationSearchRow>(
+    `SELECT
+       o.organization_id,
+       o.commercial_party_id,
+       o.hubspot_company_id,
+       o.organization_name,
+       o.legal_name,
+       o.lifecycle_stage,
+       o.updated_at,
+       o.logo_asset_id,
+       c.website_url
+     FROM greenhouse_core.organizations o
+     LEFT JOIN greenhouse_crm.companies c
+       ON c.hubspot_company_id = o.hubspot_company_id
+     WHERE ${conditions.join(' AND ')}
+     ORDER BY o.updated_at DESC
+     LIMIT $${values.length}`,
+    values
+  )
 
   return rows.map(mapOrganizationRow)
 }
@@ -216,6 +250,7 @@ export const searchParties = async (
       query: normalizedQuery,
       visibleOrganizationIds: filters.visibleOrganizationIds,
       includeStages: filters.includeStages,
+      tenant: filters.tenant,
       limit
     }),
     filters.allowHubspotCandidates

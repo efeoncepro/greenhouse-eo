@@ -22,6 +22,8 @@ type GreenhouseDatePickerProps = {
   disabled?: boolean
   showMonthYearPicker?: boolean
   dateFormat?: string
+  inline?: boolean
+  testId?: string
 }
 
 type DateInputProps = {
@@ -32,10 +34,11 @@ type DateInputProps = {
   helperText?: ReactNode
   error?: boolean
   disabled?: boolean
+  testId?: string
 }
 
 const DateInput = forwardRef<HTMLInputElement, DateInputProps>(function DateInput(
-  { value, onClick, label, placeholder, helperText, error, disabled },
+  { value, onClick, label, placeholder, helperText, error, disabled, testId },
   ref
 ) {
   return (
@@ -49,6 +52,7 @@ const DateInput = forwardRef<HTMLInputElement, DateInputProps>(function DateInpu
       helperText={helperText}
       error={error}
       disabled={disabled}
+      data-testid={testId}
       sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
       slotProps={{
         input: {
@@ -75,8 +79,34 @@ const GreenhouseDatePicker = ({
   maxDate,
   disabled = false,
   showMonthYearPicker = false,
-  dateFormat = showMonthYearPicker ? 'MM/yyyy' : 'dd/MM/yyyy'
+  dateFormat = showMonthYearPicker ? 'MM/yyyy' : 'dd/MM/yyyy',
+  inline = false,
+  testId
 }: GreenhouseDatePickerProps) => {
+  if (inline) {
+    return (
+      <AppReactDatepicker
+        selected={value}
+        onChange={date => onChange(date)}
+        minDate={minDate}
+        maxDate={maxDate}
+        disabled={disabled}
+        dateFormat={dateFormat}
+        showMonthYearPicker={showMonthYearPicker}
+        inline
+        ariaLabelClose='Cerrar calendario'
+        boxProps={{
+          sx: {
+            '& .react-datepicker': {
+              boxShadow: 'none',
+              border: '1px solid var(--mui-palette-divider)'
+            }
+          }
+        }}
+      />
+    )
+  }
+
   return (
     <AppReactDatepicker
       selected={value}
@@ -93,6 +123,7 @@ const GreenhouseDatePicker = ({
           helperText={helperText}
           error={error}
           disabled={disabled}
+          testId={testId}
         />
       }
     />

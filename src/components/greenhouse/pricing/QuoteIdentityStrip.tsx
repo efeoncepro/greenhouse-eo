@@ -75,7 +75,8 @@ const QuoteIdentityStrip = ({
         backdropFilter: 'saturate(180%) blur(8px)',
         WebkitBackdropFilter: 'saturate(180%) blur(8px)',
         borderBottom: `1px solid ${theme.palette.divider}`,
-        py: 1.5,
+        pt: 1.5,
+        pb: 1.85,
         px: { xs: 2, md: 3 }
       })}
     >
@@ -109,9 +110,18 @@ const QuoteIdentityStrip = ({
         <Box
           sx={{
             display: 'grid',
-            gridTemplateColumns: { xs: '1fr', xl: 'minmax(0, 1fr) minmax(620px, auto)' },
-            alignItems: { xs: 'flex-start', xl: 'center' },
-            gap: { xs: 1.5, xl: 2 },
+            gridTemplateColumns: {
+              xs: '1fr',
+              lg: centerSlot
+                ? 'minmax(390px, 1fr) minmax(340px, 420px) max-content'
+                : 'minmax(0, 1fr) max-content',
+              xl: centerSlot
+                ? 'minmax(430px, 1fr) minmax(460px, 560px) minmax(260px, 1fr)'
+                : 'minmax(0, 1fr) max-content'
+            },
+            alignItems: { xs: 'flex-start', lg: 'center' },
+            columnGap: { xs: 1.5, lg: 2.5, xl: 3 },
+            rowGap: { xs: 1.5, lg: 1 },
             minWidth: 0
           }}
         >
@@ -137,20 +147,20 @@ const QuoteIdentityStrip = ({
             >
               <i className='tabler-file-invoice' style={{ fontSize: 22 }} />
             </Box>
-            <Stack spacing={0.25} sx={{ minWidth: 0 }}>
-              <Stack direction='row' spacing={1.5} alignItems='center' flexWrap='wrap' useFlexGap>
-                <Typography
-                  component='h1'
-                  variant='surfaceHeroTitle'
-                  sx={{
-                    whiteSpace: { xs: 'normal', sm: 'nowrap' },
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    overflowWrap: 'anywhere'
-                  }}
-                >
-                  {title}
-                </Typography>
+            <Stack spacing={0.35} sx={{ minWidth: 0 }}>
+              <Typography
+                component='h1'
+                variant='surfaceHeroTitle'
+                sx={{
+                  whiteSpace: { xs: 'normal', sm: 'nowrap' },
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  overflowWrap: 'anywhere'
+                }}
+              >
+                {title}
+              </Typography>
+              <Stack direction='row' spacing={0.75} alignItems='center' flexWrap='wrap' useFlexGap>
                 <Tooltip
                   title={quoteNumber ? '' : 'El número se asigna automáticamente al guardar'}
                   placement='bottom-start'
@@ -188,49 +198,38 @@ const QuoteIdentityStrip = ({
             </Stack>
           </Stack>
 
-          {centerSlot || actions ? (
+          {centerSlot ? (
+            <Box
+              sx={{
+                justifySelf: { xs: 'stretch', lg: 'center' },
+                minWidth: 0,
+                width: { xs: '100%', lg: '100%' },
+                maxWidth: { xs: '100%', lg: 420, xl: 560 }
+              }}
+            >
+              {centerSlot}
+            </Box>
+          ) : null}
+
+          {actions ? (
             <Stack
               direction={{ xs: 'column', sm: 'row' }}
               spacing={1}
               alignItems={{ xs: 'stretch', sm: 'center' }}
-              justifyContent={{ xs: 'flex-start', xl: 'flex-end' }}
+              justifyContent={{ xs: 'flex-start', lg: 'flex-end' }}
+              flexWrap={{ xs: 'wrap', sm: 'nowrap' }}
               useFlexGap
-              flexWrap={{ xs: 'wrap', xl: 'nowrap' }}
-              sx={{ minWidth: 0, width: { xs: '100%', xl: 'auto' } }}
+              sx={{
+                justifySelf: { xs: 'stretch', lg: 'end' },
+                flexShrink: 0,
+                minWidth: 0,
+                width: { xs: '100%', sm: 'auto' },
+                '& .MuiButton-root': {
+                  width: { xs: '100%', sm: 'auto' }
+                }
+              }}
             >
-              {centerSlot ? (
-                <Box
-                  sx={{
-                    flex: '1 1 auto',
-                    minWidth: { xs: 0, sm: 340 },
-                    maxWidth: { xs: '100%', xl: 480 },
-                    width: { xs: '100%', sm: 'auto' }
-                  }}
-                >
-                  {centerSlot}
-                </Box>
-              ) : null}
-
-              {actions ? (
-                <Stack
-                  direction={{ xs: 'column', sm: 'row' }}
-                  spacing={1}
-                  alignItems={{ xs: 'stretch', sm: 'center' }}
-                  justifyContent={{ xs: 'flex-start', xl: 'flex-end' }}
-                  flexWrap={{ xs: 'wrap', sm: 'nowrap' }}
-                  useFlexGap
-                  sx={{
-                    flexShrink: 0,
-                    minWidth: 0,
-                    width: { xs: '100%', sm: 'auto' },
-                    '& .MuiButton-root': {
-                      width: { xs: '100%', sm: 'auto' }
-                    }
-                  }}
-                >
-                  {actions}
-                </Stack>
-              ) : null}
+              {actions}
             </Stack>
           ) : null}
         </Box>

@@ -66,9 +66,10 @@ export const scenario: CaptureScenario = {
       clipSelector: '[data-capture="quote-builder-deal-desk"]',
       note: 'Wizard de nueva cotización: contexto comercial full-width y readiness global en header.'
     },
-    { kind: 'click', selector: 'button:has-text("Elige organización")', timeout: 12000 },
-    { kind: 'wait', selector: '[role="combobox"]', timeout: 12000 },
-    { kind: 'fill', selector: '[role="combobox"]', value: 'sky', timeout: 12000 },
+    { kind: 'sleep', ms: 3000 },
+    { kind: 'click', selector: 'button[data-testid="quote-party-organization-trigger"]', timeout: 12000 },
+    { kind: 'wait', selector: '[data-capture="context-chip-search"] input', timeout: 12000 },
+    { kind: 'fill', selector: '[data-capture="context-chip-search"] input', value: 'sky', timeout: 12000 },
     { kind: 'wait', selector: '[role="option"]:has-text("Sky Airlines")', timeout: 180000 },
     {
       kind: 'mark',

@@ -22,6 +22,7 @@ import ClickAwayListener from '@mui/material/ClickAwayListener'
 import CircularProgress from '@mui/material/CircularProgress'
 import InputAdornment from '@mui/material/InputAdornment'
 import InputBase from '@mui/material/InputBase'
+import LinearProgress from '@mui/material/LinearProgress'
 import Paper from '@mui/material/Paper'
 import type { PaperProps } from '@mui/material/Paper'
 import Popover from '@mui/material/Popover'
@@ -32,6 +33,9 @@ import Typography from '@mui/material/Typography'
 import { alpha, styled, useTheme } from '@mui/material/styles'
 import type { Theme } from '@mui/material/styles'
 import { visuallyHidden } from '@mui/utils'
+
+import useReducedMotion from '@/hooks/useReducedMotion'
+import { motion } from '@/libs/FramerMotion'
 
 export type ContextChipStatus = 'empty' | 'filled' | 'invalid' | 'locked' | 'blocking-empty'
 
@@ -320,6 +324,7 @@ const ContextChip = forwardRef<HTMLButtonElement, ContextChipProps>(function Con
   const openedAtRef = useRef(0)
   const [open, setOpen] = useState(false)
   const [internalInputValue, setInternalInputValue] = useState('')
+  const prefersReducedMotion = useReducedMotion()
 
   const status: ContextChipStatus = statusProp ?? (value ? 'filled' : 'empty')
   const isInteractive = status !== 'locked' && !disabled
@@ -351,6 +356,7 @@ const ContextChip = forwardRef<HTMLButtonElement, ContextChipProps>(function Con
   const inputValue = !isCustomMode(props) ? (props.inputValue ?? internalInputValue) : ''
   const selectOptionsCount = !isCustomMode(props) ? props.options.length : 0
   const isSelectLoading = !isCustomMode(props) && props.loading === true
+  const selectedLogoUrl = !isCustomMode(props) && status === 'filled' ? selectedOption?.logoUrl : null
 
   // Notice to render inside the Autocomplete Paper footer. Only defined for
   // select mode — custom mode has no listbox to pair a notice with.
@@ -567,48 +573,84 @@ const ContextChip = forwardRef<HTMLButtonElement, ContextChipProps>(function Con
           </>
         ) : (
           <>
-            <Box
-              component='i'
-              className={
-                status === 'invalid'
-                  ? 'tabler-alert-triangle'
-                  : status === 'blocking-empty'
-                    ? 'tabler-alert-circle'
-                    : status === 'locked'
-                      ? 'tabler-lock'
-                      : icon
-              }
-              aria-hidden='true'
-              sx={theme => ({
-                width: 32,
-                height: 32,
-                borderRadius: `${theme.shape.customBorderRadius.sm}px`,
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                backgroundColor:
-                  status === 'blocking-empty'
-                    ? alpha(theme.palette.warning.main, 0.12)
-                    : status === 'filled'
-                      ? alpha(theme.palette.primary.main, 0.12)
-                      : theme.palette.background.default,
-                border: `1px solid ${
-                  status === 'blocking-empty'
-                    ? alpha(theme.palette.warning.main, 0.24)
-                    : status === 'filled'
-                      ? alpha(theme.palette.primary.main, 0.22)
-                      : theme.palette.divider
-                }`,
-                color:
-                  status === 'blocking-empty'
-                    ? 'warning.dark'
-                    : status === 'filled'
-                      ? 'primary.main'
-                      : 'text.secondary',
-                fontSize: 17,
-                flexShrink: 0
-              })}
-            />
+            {selectedLogoUrl ? (
+              <Box
+                component='span'
+                aria-hidden='true'
+                sx={theme => ({
+                  width: 32,
+                  height: 32,
+                  borderRadius: `${theme.shape.customBorderRadius.sm}px`,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                  backgroundColor: alpha(theme.palette.primary.main, 0.08),
+                  border: `1px solid ${alpha(theme.palette.primary.main, 0.2)}`
+                })}
+              >
+                <Box
+                  component='img'
+                  src={selectedLogoUrl}
+                  alt=''
+                  loading='eager'
+                  decoding='async'
+                  onError={event => {
+                    event.currentTarget.style.display = 'none'
+                  }}
+                  sx={theme => ({
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'contain',
+                    p: 0.45,
+                    borderRadius: `${theme.shape.customBorderRadius.sm}px`
+                  })}
+                />
+              </Box>
+            ) : (
+              <Box
+                component='i'
+                className={
+                  status === 'invalid'
+                    ? 'tabler-alert-triangle'
+                    : status === 'blocking-empty'
+                      ? 'tabler-alert-circle'
+                      : status === 'locked'
+                        ? 'tabler-lock'
+                        : icon
+                }
+                aria-hidden='true'
+                sx={theme => ({
+                  width: 32,
+                  height: 32,
+                  borderRadius: `${theme.shape.customBorderRadius.sm}px`,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  backgroundColor:
+                    status === 'blocking-empty'
+                      ? alpha(theme.palette.warning.main, 0.12)
+                      : status === 'filled'
+                        ? alpha(theme.palette.primary.main, 0.12)
+                        : theme.palette.background.default,
+                  border: `1px solid ${
+                    status === 'blocking-empty'
+                      ? alpha(theme.palette.warning.main, 0.24)
+                      : status === 'filled'
+                        ? alpha(theme.palette.primary.main, 0.22)
+                        : theme.palette.divider
+                  }`,
+                  color:
+                    status === 'blocking-empty'
+                      ? 'warning.dark'
+                      : status === 'filled'
+                        ? 'primary.main'
+                        : 'text.secondary',
+                  fontSize: 17,
+                  flexShrink: 0
+                })}
+              />
+            )}
             <Stack spacing={density === 'compact' ? 0.15 : 0.5} sx={{ minWidth: 0, flex: 1 }}>
               <Typography
                 id={labelId}
@@ -742,6 +784,11 @@ const ContextChip = forwardRef<HTMLButtonElement, ContextChipProps>(function Con
         >
           <ClickAwayListener mouseEvent='onMouseDown' touchEvent='onTouchStart' onClickAway={handleClose}>
             <Paper
+              component={motion.div}
+              data-capture='context-chip-popover'
+              initial={prefersReducedMotion ? false : { opacity: 0, y: -4, scale: 0.985 }}
+              animate={prefersReducedMotion ? undefined : { opacity: 1, y: 0, scale: 1 }}
+              transition={{ duration: 0.14, ease: 'easeOut' }}
               elevation={0}
               sx={theme => ({
                 width: props.popoverWidth ?? 360,
@@ -781,7 +828,7 @@ const ContextChip = forwardRef<HTMLButtonElement, ContextChipProps>(function Con
                     border: `1px solid ${alpha(theme.palette.primary.main, 0.18)}`
                   })}
                 >
-	                    <i className={icon} aria-hidden='true' style={{ fontSize: 17 }} />
+                  <i className={icon} aria-hidden='true' style={{ fontSize: 17 }} />
                 </Box>
                 <Stack spacing={0.15} sx={{ minWidth: 0, flex: 1 }}>
                   <Typography variant='subtitle2' sx={{ lineHeight: 1.2 }}>
@@ -817,6 +864,18 @@ const ContextChip = forwardRef<HTMLButtonElement, ContextChipProps>(function Con
                       : `${selectOptionsCount} resultados`}
                 </Typography>
               </Stack>
+              {isSelectLoading ? (
+                <LinearProgress
+                  aria-hidden='true'
+                  sx={theme => ({
+                    height: 2,
+                    backgroundColor: alpha(theme.palette.primary.main, 0.08),
+                    '& .MuiLinearProgress-bar': {
+                      borderRadius: '9999px'
+                    }
+                  })}
+                />
+              ) : null}
               <Autocomplete<ContextChipOption, false, true, false>
                 id={autocompleteId}
                 open
@@ -918,6 +977,7 @@ const ContextChip = forwardRef<HTMLButtonElement, ContextChipProps>(function Con
                 }}
                 renderInput={params => (
                   <StyledSearchInput
+                    data-capture='context-chip-search'
                     ref={params.InputProps.ref}
                     inputProps={params.inputProps}
                     autoFocus
@@ -1011,7 +1071,8 @@ const ContextChip = forwardRef<HTMLButtonElement, ContextChipProps>(function Con
                             component='img'
                             src={option.logoUrl}
                             alt=''
-                            loading='lazy'
+                            loading='eager'
+                            decoding='async'
                             onError={event => {
                               event.currentTarget.style.display = 'none'
                             }}
@@ -1022,8 +1083,7 @@ const ContextChip = forwardRef<HTMLButtonElement, ContextChipProps>(function Con
                               height: '100%',
                               objectFit: 'contain',
                               p: 0.5,
-                              borderRadius: `${theme.shape.customBorderRadius.md}px`,
-                              backgroundColor: theme.palette.background.paper
+                              borderRadius: `${theme.shape.customBorderRadius.md}px`
                             })}
                           />
                         ) : null}

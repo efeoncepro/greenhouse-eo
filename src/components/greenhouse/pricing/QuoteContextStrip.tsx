@@ -10,6 +10,7 @@ import { visuallyHidden } from '@mui/utils'
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 
+import GreenhouseDatePicker from '@/components/greenhouse/GreenhouseDatePicker'
 import ContextChip, {
   type ContextChipOption,
   type ContextChipStatus
@@ -18,7 +19,10 @@ import FieldsProgressChip from '@/components/greenhouse/primitives/FieldsProgres
 import useReducedMotion from '@/hooks/useReducedMotion'
 import { motion } from '@/libs/FramerMotion'
 import { GH_PRICING } from '@/lib/copy/pricing'
-import { formatDate } from '@/lib/format'
+import {
+  formatLocalDateToDateOnly,
+  parseDateOnlyToLocalDate
+} from '@/lib/finance/quotation-date-only'
 import type { CommercialModelCode } from '@/lib/commercial/pricing-governance-types'
 import type { PricingOutputCurrency } from '@/lib/finance/pricing/contracts'
 
@@ -365,16 +369,6 @@ const QuoteContextStrip = ({
 
   const durationValue = values.contractDurationMonths
     ? GH_PRICING.contextChips.duration.unit(values.contractDurationMonths)
-    : null
-
-  const validUntilValue = values.validUntil
-    ? (() => {
-        try {
-          return formatDate(values.validUntil, { day: '2-digit', month: 'short', year: 'numeric' })
-        } catch {
-          return values.validUntil
-        }
-      })()
     : null
 
   // TASK-565: blocking-empty tension only when organization is set but required
@@ -894,33 +888,16 @@ const QuoteContextStrip = ({
             <Typography component='span' variant='body2' sx={{ display: 'none' }}>
               ·
             </Typography>
-            {/* Valida hasta — custom input (date) */}
-            <ContextChip
-              prominence='inline'
-              mode='custom'
-              icon={GH_PRICING.contextChips.validUntil.icon}
-              label={GH_PRICING.contextChips.validUntil.label}
-              value={validUntilValue}
-              placeholder={GH_PRICING.contextChips.validUntil.placeholder}
-              disabled={disabled}
-              popoverWidth={280}
-              popoverContent={() => (
-                <Stack spacing={1.5}>
-                  <Typography variant='subtitle1'>{GH_PRICING.contextChips.validUntil.label}</Typography>
-                  <CustomTextField
-                    fullWidth
-                    size='small'
-                    type='date'
-                    value={values.validUntil ?? ''}
-                    onChange={event => onValidUntilChange(event.target.value || null)}
-                    InputLabelProps={{ shrink: true }}
-                    disabled={disabled}
-                    aria-label={GH_PRICING.contextChips.validUntil.label}
-                    autoFocus
-                  />
-                </Stack>
-              )}
-            />
+            <Box sx={{ minWidth: { xs: '100%', sm: 184 } }}>
+              <GreenhouseDatePicker
+                label={GH_PRICING.contextChips.validUntil.label}
+                value={parseDateOnlyToLocalDate(values.validUntil)}
+                onChange={nextDate => onValidUntilChange(formatLocalDateToDateOnly(nextDate))}
+                placeholder={GH_PRICING.contextChips.validUntil.placeholder}
+                disabled={disabled}
+                testId='quote-valid-until-trigger'
+              />
+            </Box>
             </Stack>
           </Stack>
         </Box>

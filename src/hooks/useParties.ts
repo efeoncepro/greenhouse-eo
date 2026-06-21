@@ -54,8 +54,14 @@ interface UsePartiesResult {
   adoptParty: (party: PartySearchItem) => Promise<AdoptPartyResult | null>
 }
 
+interface PartySearchSnapshot {
+  parties: PartySearchItem[]
+  hasMore: boolean
+  settledQuery: string
+}
+
 const DEFAULT_MIN_QUERY_LENGTH = 2
-const PARTY_SEARCH_TIMEOUT_MS = 15000
+const PARTY_SEARCH_TIMEOUT_MS = 30000
 const PARTY_SEARCH_TIMEOUT_RETRIES = 1
 
 const isPartySearchError = (value: unknown): value is PartySearchError =>
@@ -119,6 +125,7 @@ const useParties = ({
   const searchAbortRef = useRef<AbortController | null>(null)
   const adoptAbortRef = useRef<AbortController | null>(null)
   const timeoutRetryRef = useRef<Map<string, number>>(new Map())
+  const searchCacheRef = useRef<Map<string, PartySearchSnapshot>>(new Map())
   const [searchVersion, setSearchVersion] = useState(0)
 
   const debouncedQuery = useDebounce(query, debounceMs)
@@ -159,6 +166,7 @@ const useParties = ({
 
     const controller = new AbortController()
     const retryKey = `${trimmedQuery}::${includeStages?.join(',') ?? 'all'}`
+    const cachedSnapshot = searchCacheRef.current.get(retryKey)
     let timedOut = false
 
     const timeoutId = window.setTimeout(() => {
@@ -168,6 +176,12 @@ const useParties = ({
 
     searchAbortRef.current?.abort()
     searchAbortRef.current = controller
+
+    if (cachedSnapshot) {
+      setParties(cachedSnapshot.parties)
+      setHasMore(cachedSnapshot.hasMore)
+      setSettledQuery(cachedSnapshot.settledQuery)
+    }
 
     setLoading(true)
     setSearchError(null)
@@ -194,8 +208,16 @@ const useParties = ({
         }
 
         timeoutRetryRef.current.delete(retryKey)
-        setParties(payload.parties ?? [])
-        setHasMore(payload.hasMore === true)
+
+        const nextSnapshot: PartySearchSnapshot = {
+          parties: payload.parties ?? [],
+          hasMore: payload.hasMore === true,
+          settledQuery: trimmedQuery
+        }
+
+        searchCacheRef.current.set(retryKey, nextSnapshot)
+        setParties(nextSnapshot.parties)
+        setHasMore(nextSnapshot.hasMore)
         setSettledQuery(trimmedQuery)
       } catch (caught) {
         if (caught instanceof DOMException && caught.name === 'AbortError') {
@@ -217,8 +239,16 @@ const useParties = ({
             statusCode: 408
           }
 
-          setParties([])
-          setHasMore(false)
+          const fallbackSnapshot = searchCacheRef.current.get(retryKey)
+
+          if (fallbackSnapshot) {
+            setParties(fallbackSnapshot.parties)
+            setHasMore(fallbackSnapshot.hasMore)
+          } else {
+            setParties([])
+            setHasMore(false)
+          }
+
           setSearchError(timeoutError)
           setSettledQuery(trimmedQuery)
 
@@ -235,15 +265,23 @@ const useParties = ({
           statusCode: 0
         }
 
-        setParties([])
-        setHasMore(false)
+        const fallbackSnapshot = searchCacheRef.current.get(retryKey)
+
+        if (fallbackSnapshot) {
+          setParties(fallbackSnapshot.parties)
+          setHasMore(fallbackSnapshot.hasMore)
+        } else {
+          setParties([])
+          setHasMore(false)
+        }
+
         setSearchError(isPartySearchError(caught) ? caught : fallback)
         setSettledQuery(trimmedQuery)
       } finally {
         window.clearTimeout(timeoutId)
-        setLoading(false)
 
         if (searchAbortRef.current === controller) {
+          setLoading(false)
           searchAbortRef.current = null
         }
       }
