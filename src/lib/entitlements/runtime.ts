@@ -1088,6 +1088,42 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
       source
     })
 
+    // ── TASK-1193 — Finance fiscal/document action capability gates (Wave 2 F9) ──
+    // FINANCE_ADMIN + EFEONCE_ADMIN reciben las 16 capabilities de write de documentos
+    // fiscales/financieros (DTE/income/expenses/HES/PO). FINANCE_ANALYST read-only.
+    for (const capability of [
+      'finance.income.create',
+      'finance.income.record_payment',
+      'finance.income.factor',
+      'finance.expenses.create',
+      'finance.expenses.record_payment',
+      'finance.hes.create',
+      'finance.purchase_orders.create'
+    ] as const) {
+      addEntitlement(entries, { module: 'finance', capability, action: 'create', scope: 'tenant', source })
+    }
+
+    for (const capability of [
+      'finance.income.update',
+      'finance.income.emit_dte',
+      'finance.income.batch_emit_dte',
+      'finance.expenses.update',
+      'finance.hes.submit',
+      'finance.hes.reject',
+      'finance.purchase_orders.update',
+      'finance.purchase_orders.cancel'
+    ] as const) {
+      addEntitlement(entries, { module: 'finance', capability, action: 'update', scope: 'tenant', source })
+    }
+
+    addEntitlement(entries, {
+      module: 'finance',
+      capability: 'finance.hes.approve',
+      action: 'approve',
+      scope: 'tenant',
+      source
+    })
+
     addEntitlement(entries, {
       module: 'finance',
       capability: 'finance.payroll.rematerialize',

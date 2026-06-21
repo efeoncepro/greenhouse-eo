@@ -494,6 +494,110 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     actions: ['create'] as const,
     defaultScope: 'tenant'
   },
+  // ── TASK-1193 — Finance fiscal/document action capability gates (Wave 2 F9) ──
+  // Gate fino por ACCIÓN para mutaciones de documentos fiscales/financieros: DTE
+  // emission, income/expenses create/update/payment, HES lifecycle y purchase orders.
+  // SOLO gate de acceso (la emisión DTE sigue por Nubox gateway, los pagos por los
+  // readers normalizados, la state machine de HES en command/DB). Reservadas
+  // FINANCE_ADMIN + EFEONCE_ADMIN (write); FINANCE_ANALYST read-only.
+  {
+    key: 'finance.income.create',
+    module: 'finance',
+    actions: ['create'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'finance.income.update',
+    module: 'finance',
+    actions: ['update'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'finance.income.emit_dte',
+    module: 'finance',
+    actions: ['update'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'finance.income.batch_emit_dte',
+    module: 'finance',
+    actions: ['update'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'finance.income.record_payment',
+    module: 'finance',
+    actions: ['create'] as const,
+    defaultScope: 'tenant'
+  },
+  // Cesión de facturas (factoring) — mutación financiera distinta de pago/update
+  // (no estaba en la lista original del spec; se gatea por proof, no por estética).
+  {
+    key: 'finance.income.factor',
+    module: 'finance',
+    actions: ['create'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'finance.expenses.create',
+    module: 'finance',
+    actions: ['create'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'finance.expenses.update',
+    module: 'finance',
+    actions: ['update'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'finance.expenses.record_payment',
+    module: 'finance',
+    actions: ['create'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'finance.hes.create',
+    module: 'finance',
+    actions: ['create'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'finance.hes.submit',
+    module: 'finance',
+    actions: ['update'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'finance.hes.approve',
+    module: 'finance',
+    actions: ['approve'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'finance.hes.reject',
+    module: 'finance',
+    actions: ['update'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'finance.purchase_orders.create',
+    module: 'finance',
+    actions: ['create'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'finance.purchase_orders.update',
+    module: 'finance',
+    actions: ['update'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'finance.purchase_orders.cancel',
+    module: 'finance',
+    actions: ['update'] as const,
+    defaultScope: 'tenant'
+  },
   // TASK-766 Slice 5 — Repair de payments con drift CLP.
   // Permite a FINANCE_ADMIN / EFEONCE_ADMIN reparar registros de
   // expense_payments / income_payments con `requires_fx_repair=TRUE`
