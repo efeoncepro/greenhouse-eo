@@ -5328,6 +5328,7 @@ export interface GreenhouseFinanceFxSnapshots {
   composed_via: string[] | null;
   created_at: Generated<Timestamp>;
   from_currency: string;
+  from_unit_class: Generated<string>;
   inverse_rate: Numeric;
   locked_at: Generated<Timestamp>;
   locked_by: string;

@@ -47,6 +47,7 @@ type RateResolver = (input: ResolveFxReadinessInput) => Promise<FxReadiness>
 const identityEvidence = (currency: FinanceCurrency, rateDate: string): FxSnapshotEvidence => ({
   fromCurrency: currency,
   toCurrency: currency,
+  fromUnitClass: 'currency',
   rate: '1.00000000',
   inverseRate: '1.00000000',
   rateDate,
