@@ -1,7 +1,8 @@
 # Greenhouse CLF/UF Indexed Finance Core V1
 
-> **Status:** Proposed
+> **Status:** Accepted
 > **Date:** 2026-06-20
+> **Accepted:** 2026-06-20 by operator (Julio Reyes) — policy pre-selected + "avancemos". V1 defaults ratified per §0; snapshot model = Option A (extend `fx_snapshots` with an indexed-unit discriminator). Implementation proceeds via TASK-995, **Slice-by-slice with a hard gate: Slice 2 (schema) must not begin until the MXN foundation (TASK-990) is operationally stable**. Slice 1 (type split) is additive/flags-off and proceeds now.
 > **Owner:** Finance / Treasury / Commercial / Data / Integrations / Reliability
 > **Reversibility:** two-way-but-slow (type split + additive schema are reversible while flags are OFF; constraint re-narrowing is slow)
 > **Confidence:** high for the conceptual model (indexed unit ≠ cash currency); medium for the per-event UF→CLP policy until Finance confirms contractual conventions
