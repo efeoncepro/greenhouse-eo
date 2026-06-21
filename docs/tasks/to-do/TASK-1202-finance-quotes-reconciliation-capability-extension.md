@@ -4,6 +4,22 @@
 
 - **La autoría/emisión de cotización NO necesita una capability nueva de este catálogo** — cerrado por TASK-1212. El write vertical del cotizador consume la capability **existente `commercial.quotation`** (actions `create` para autorar, `approve` para emitir), ya granteada a los roles internos comerciales en `runtime.ts`. TASK-1212 NO acuñó `commercial.quotation.author`/`.issue`; si 1202 reorganiza el catálogo de quotes, mantener `commercial.quotation` create/approve como el contrato de write del cotizador (consumido por el command `submitQuoteFromBuilder` + la Nexa governed action `author_quote`). La huérfana `commercial.quote_to_cash.execute` sigue siendo del cierre (TASK-1206), no de la autoría.
 
+## Delta 2026-06-21 (#2) — discovery pre-ejecución + decisión del operador: TASK EN PAUSA por bloqueo
+
+Claude hizo discovery (read-only) e intentó tomar la task vía `/implement-task 1202`. **Decisión del operador: DETENER y respetar el bloqueo** (`Blocked by: TASK-1192, TASK-1193`, ambas aún `to-do`). La task **NO se movió a in-progress**; queda en `to-do` con este estado para que quien la retome (después de que 1192/1193 fijen el patrón) arranque informado y no repita el discovery.
+
+**Inventario real del gap (verificado por scan de handlers, 2026-06-21) — más chico que el "20 quotes + 15 reconciliation" del summary:**
+
+- **Reconciliation: 14/15 write routes YA tienen `can()` fino** (TASK-722/723). Único coarse: `src/app/api/finance/reconciliation/auto-match/route.ts` (el top-level). Gap reconciliation real ≈ **1 ruta**.
+- **Quotes: 21/21 handlers usan `requireCommercialTenantContext()` (route-group coarse)**, pero parte ya está gobernada aguas abajo:
+  - `author/route.ts` → gobernada a nivel command (`submitQuoteFromBuilder` enforza `commercial.quotation` create/approve, TASK-1212). NO re-gatear en la ruta.
+  - `pricing/simulate/route.ts` → capability `commercial.quote.simulate` (TASK-1211) — confirmar dónde se enforza (route vs lane/command) en Slice 1.
+  - Quedan ~17 rutas de lifecycle/pricing sin gate fino visible: `[id]` PUT, `[id]/approve`, `[id]/issue`, `[id]/send`, `[id]/convert-to-invoice`, `[id]/recalculate`, `[id]/lines`, `[id]/lines/[lineItemId]/cost-override`, `pricing/config` PUT, `[id]/terms`, `[id]/versions`, `[id]/save-as-template`, `[id]/share` (+ `[shortCode]` DELETE / send-email / resend-email), `from-service`, `hubspot`. Mapear a `commercial.quotation` (update/approve/export) + `commercial.quote_to_cash.execute` (convert-to-invoice, coordinando con TASK-1206); el `cost-override` + `pricing/config` (price-affecting) podrían ameritar una acción fina propia — decidir en Slice 1/2.
+
+**Decisión de grants del operador (resuelve la Open Question "¿qué roles retienen quote lifecycle?"):** quote lifecycle/pricing → **`efeonce_admin` + `finance_admin`** (más restrictivo). Cuando se implemente, validar contra acceso actual + staging smoke (riesgo de lockout) antes de enforzar; granteear ANTES o junto al gate.
+
+**Convención de nombres:** ya existe de facto (`finance.reconciliation.*`, `finance.payment_*.*`, `commercial.quotation`, `commercial.quote.simulate`). 1192/1193 deberían formalizarla; 1202 la consume como SSOT de quote-write/reconciliation.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
