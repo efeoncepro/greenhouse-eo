@@ -19,6 +19,7 @@ La diferencia con otras capas de documentacion:
 - [Distribucion de costos para P&L operativo](finance/distribucion-costos-pnl.md) — como revisar, materializar y cerrar períodos sin inflar overhead de clientes con payroll, regulatorio, financiero o treasury transit.
 - [Sugerencias asistidas de conciliacion](finance/sugerencias-asistidas-conciliacion.md) — como generar, revisar, aceptar o descartar sugerencias AI sin alterar saldos automaticamente.
 - [Saldos bancarios FX drift](finance/saldos-bancarios-fx-drift-remediation.md) — como diagnosticar, auditar y remediar drift FX de saldos bancarios usando el control plane canonico sin SQL/backfills ad hoc.
+- [Monedas indexadas UF/CLF — rollout y operacion](finance/monedas-indexadas-uf-clf-rollout.md) — como prender los flags CLF, verificar la proyeccion de una OC de cliente en UF a income CLP + plano native UF, leer las señales indexed-unit y que NO hacer (UF nunca es caja).
 - [Finance Movement Feed](../documentation/finance/finance-movement-feed.md) — contrato reusable para mostrar movimientos financieros sin duplicar tablas, hardcodes de logos ni calculos de saldo en UI.
 - [Pagos a Contractors (Finanzas)](finance/pagos-a-contractors.md) — flujo completo desde envio aprobado hasta payable, readiness, `ready_for_finance`, corrida mensual, orden de pago, aprobacion, mark-paid, conciliacion y comprobante; incluye crear desde envio/off-cycle, cancelar, waiver, override y las diferencias entre HR, payable, obligacion financiera, orden y banco.
 
