@@ -35,7 +35,15 @@
 ## Delta 2026-06-20 — Slice 1 (type split) entregado; STOP antes de Slice 2
 
 - **Slice 1 hecho (aditivo, flags-off, sin schema ni cambio de comportamiento):** `src/lib/finance/contracts.ts` agrega `IndexedUnit='CLF'`, `FinanceNativeUnit=FinanceCurrency|IndexedUnit`, y aliases `SettlementCurrency`/`AccountCurrency`/`PaymentOrderCurrency`/`ReportingCurrency`. `src/lib/finance/currency-domain.ts` agrega `isIndexedUnit`/`toIndexedUnit`/`isCashCurrency`/`toFinanceNativeUnit`/`assertCashCurrency` (guard que rechaza CLF en planos cash). `toFinanceCurrency('CLF')` sigue lanzando. 9 tests bloquean el contrato (`indexed-unit-currency-split.test.ts`). Gates: lint + tsc verdes.
-- **STOP antes de Slice 2 (gate duro de secuencia):** Slice 2 es la migración de schema (expand de `income`/`expenses`/`payment_obligations` + constraints) y NO debe iniciar hasta que la base MXN (TASK-990) esté operativamente estable y desplegada. Los guards de Slice 1 aún no están cableados a los write paths reales (eso es Slice 4); por ahora son la primitive compile-time + tests. **No se escribió migración ni se mutó PG.**
+## Delta 2026-06-21 — Operador limpió el gate de la base MXN; Slice 2 entregado
+
+- **Gate liberado por el operador (2026-06-21):** "todo lo que bloqueaba está, la cuenta bancaria ya está creada (Global MXN)". Verificado en dev PG: cuenta `global-66-mxn-mxn` (currency MXN, activa) existe. Con esto la base MXN está materialmente lista a nivel de datos; el flip de flags productivos + worker redeploy siguen siendo acción del operador (money-movement, ver TASK-990 Slice 9), pero ya no bloquean el schema aditivo de CLF.
+- **Slice 2 hecho (aditivo, reversible, flag-OFF — sin writer CLF aún):** migration `20260621070234783_task-995-slice2-clf-native-indexed-fields.sql` aplicada a dev PG:
+  - `payment_obligations` gana `native_amount`/`native_currency`/`native_to_functional_fx_snapshot_id` (FK `fx_snapshots`), espejo del plano native de income/expenses (TASK-990).
+  - Guardrail `FinanceNativeUnit` CHECK (`CLP|USD|MXN|CLF` o NULL) en `native_currency` de income/expenses/payment_obligations (NOT VALID + VALIDATE).
+  - Los CHECK de moneda **cash** (`currency`) quedaron intactos: CLF nunca es moneda de caja.
+  - `db.d.ts` regenerado; tsc + 99 tests focales verdes.
+- **Próximo: Slice 3 (write paths CLF)** — proyección de facturas/contratos UF: escribir native CLF + functional CLP + snapshot `CLF→CLP` (requiere widening de `fx_snapshots` Option A + el writer gated por `FINANCE_CLF_INCOME_PROJECTION_ENABLED`). Es donde empieza la escritura real de hechos CLF; su verificación end-to-end depende del rollout de flags MXN/CLF (acción operador).
 
 ## Summary
 

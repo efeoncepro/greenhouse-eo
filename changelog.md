@@ -1,5 +1,9 @@
 # changelog.md
 
+## 2026-06-21
+
+- **Finance — CLF/UF indexed finance core: type split + additive schema (TASK-995 Slices 1–2).** Tras aceptar el ADR (operador), **Slice 1** agrega el split de tipos indexed-unit vs cash currency (`IndexedUnit`/`FinanceNativeUnit` + aliases `SettlementCurrency`/`AccountCurrency`/`PaymentOrderCurrency`/`ReportingCurrency`) y los guards canónicos (`isIndexedUnit`/`toFinanceNativeUnit`/`isCashCurrency`/`assertCashCurrency`) — CLF aceptado solo en el plano native, rechazado en todo plano cash; `toFinanceCurrency('CLF')` sigue lanzando. **Slice 2** (operador limpió el gate de la base MXN: cuenta Global66 MXN ya creada) agrega, de forma aditiva/reversible/flag-OFF, el plano native a `payment_obligations` (espejo de income/expenses TASK-990) + guardrail CHECK `FinanceNativeUnit` (`CLP|USD|MXN|CLF` o NULL) en las 3 tablas ledger; los CHECK de moneda cash quedan intactos (CLF nunca es caja). Migration aplicada a dev PG, `db.d.ts` regenerado; tsc + 99 tests focales verdes. Sin writer CLF aún (Slice 3). backend impact migration.
+
 ## 2026-06-20
 
 - **Finance / Commercial — Nueva cotización rediseñada como Deal Desk workspace.** `/finance/quotes/new` deja el patrón de barra + dock dominante y pasa a una composición enterprise con `CompositionShell split`: rail de contexto/readiness dentro del primary, canvas de líneas con command row + headers + métodos de composición, y aside económico/checklist con CTA sticky en desktop. En móvil se evita el trigger redundante del aside y se conserva el resumen dentro del flujo. Copy nuevo vive en `GH_PRICING.dealDesk`; `QuoteContextStrip` gana modo `sticky={false}` reutilizable. Nuevo scenario GVC `finance-quote-builder-deal-desk` desktop/mobile. Sin cambio backend ni contrato de pricing.
