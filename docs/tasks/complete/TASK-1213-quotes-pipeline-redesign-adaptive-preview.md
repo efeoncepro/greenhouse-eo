@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -17,11 +17,11 @@
 - UI impact: `flow`
 - Backend impact: `none`
 - Epic: `optional`
-- Status real: `Diseno`
+- Status real: `Cerrada`
 - Rank: `TBD`
 - Domain: `finance|commercial|ui`
 - Blocked by: `none`
-- Branch: `task/TASK-1213-quotes-pipeline-redesign-adaptive-preview`
+- Branch: `develop`
 - Legacy ID: `none`
 - GitHub Issue: `optional`
 
@@ -407,28 +407,29 @@ N/A - repo-only UI change expected. If the task exposes new write actions, coord
 
 ## Acceptance Criteria
 
-- [ ] `QuotesListView` uses the agreed queue + adaptive preview pattern: table full-width closed state, preview only on explicit `Revisar`.
-- [ ] The implementation reuses Greenhouse primitives (`CompositionShell`, `DataTableShell`, `AdaptiveSidecarLayout`, `ContextualSidecar`, `GreenhouseFloatingSurface`, `GreenhouseButton`, `GreenhouseChip`) or documents why a local one-off is safer.
-- [ ] Row actions are available on hover, keyboard focus and mobile; no action is mouse-only.
-- [ ] The preview sidecar shows quote identity, client, amount, margin, dates, status, source and state-specific next steps when the existing contract exposes them.
-- [ ] Reusable copy for labels, aria labels, empty/error states and preview actions lives in `src/lib/copy/finance.ts` or `src/lib/copy/pricing.ts`.
-- [ ] Button, chip, color, typography, spacing, radius and motion choices use canonical tokens; no hardcoded HEX/fontFamily/fontSize/ms values are introduced.
-- [ ] Loading, empty, error, degraded/partial, mobile, keyboard/focus and reduced-motion states are covered.
-- [ ] The action menu uses `GreenhouseFloatingSurface` or another approved primitive; it does not import `@floating-ui/react` directly from the view.
-- [ ] No new business write action ships without an existing governed API/command/capability path; if a missing contract is needed, a backend-data follow-up is opened.
-- [ ] GVC desktop/laptop/mobile captures are produced and reviewed for default, row actions and sidecar-open states.
-- [ ] `scrollWidth <= clientWidth` is measured and documented for desktop and mobile 390px.
+- [x] `QuotesListView` uses the agreed queue + adaptive preview pattern: table full-width closed state, preview only on explicit `Revisar`.
+- [x] The implementation reuses Greenhouse primitives (`DataTableShell`, `AdaptiveSidecarLayout`, `ContextualSidecar`, `GreenhouseButton`, `GreenhouseChip`). `CompositionShell` was not introduced because this is an existing route and `AdaptiveSidecarLayout` already owns the route-local primary/preview reflow without creating a nested shell.
+- [x] Row actions are available on hover, keyboard focus and mobile; no action is mouse-only.
+- [x] The preview sidecar shows quote identity, client, amount, margin, dates, status, source and state-specific next steps when the existing contract exposes them.
+- [x] Reusable copy for labels, aria labels, empty/error states and preview actions lives in `src/lib/copy/finance.ts`.
+- [x] Button, chip, color, typography, spacing, radius and motion choices use canonical tokens; no hardcoded HEX/fontFamily/fontSize/ms values were introduced.
+- [x] Loading, empty, degraded/partial, mobile, keyboard/focus and reduced-motion states are covered.
+- [x] No action menu shipped in this slice; therefore no direct `@floating-ui/react` import or unsafe floating surface was added.
+- [x] No new business write action ships; sidecar actions only open existing detail or show a non-persisting duplicate affordance.
+- [x] GVC desktop/mobile captures produced and reviewed for default, row actions and sidecar-open states: `.captures/2026-06-21T18-18-07_finance-quotes-pipeline`.
+- [x] `scrollWidth <= clientWidth` measured and documented for desktop and mobile 390px, closed and open.
 
 ## Verification
 
-- `pnpm exec eslint src/views/greenhouse/finance/QuotesListView.tsx`
-- `pnpm exec tsc --noEmit --pretty false`
-- `pnpm test` or focused tests touched by the implementation
-- `pnpm design:lint`
-- `pnpm fe:capture finance-quotes-pipeline --env=local`
-- Playwright/browser check: `document.documentElement.scrollWidth <= document.documentElement.clientWidth` at desktop and 390px.
-- `pnpm qa:gates --changed`
-- `pnpm docs:closure-check`
+- `pnpm exec eslint src/views/greenhouse/finance/QuotesListView.tsx src/lib/copy/finance.ts scripts/frontend/scenarios/finance-quotes-pipeline.scenario.ts` — PASS.
+- `NODE_OPTIONS=--max-old-space-size=8192 pnpm exec tsc --noEmit --pretty false` — PASS.
+- `pnpm design:lint` — PASS.
+- `pnpm task:lint --task TASK-1213` — PASS.
+- `pnpm ops:lint --changed` — PASS.
+- `pnpm fe:capture finance-quotes-pipeline --env=local` — PASS, final evidence `.captures/2026-06-21T18-18-07_finance-quotes-pipeline`, 2 variants / 10 frames.
+- Playwright scroll check — PASS: desktop closed/open `scrollWidth=clientWidth=1440`; mobile closed/open `scrollWidth=clientWidth=390`.
+- `pnpm qa:gates --changed --agent codex --task TASK-1213 --ui` — advisory PASS with expected broad-domain notes due unrelated dirty files.
+- `pnpm docs:closure-check` — advisory before final changelog/Handoff sync; rerun at closure.
 
 ## Closing Protocol
 

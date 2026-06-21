@@ -103,6 +103,77 @@ export const GH_COST_ATTRIBUTION = {
 } as const
 
 // ────────────────────────────────────────────────────────────────
+// TASK-1213 — Quotes pipeline ledger + adaptive preview
+// ────────────────────────────────────────────────────────────────
+
+export const GH_QUOTES_PIPELINE = {
+  pageTitle: 'Cotizaciones',
+  pageSubtitle: 'Propuestas comerciales, pricing y emisión documental para el ciclo de venta.',
+  savedFilters: 'Limpiar filtros',
+  newQuote: 'Nueva cotización',
+  surfaceTitle: 'Pipeline de cotizaciones',
+  surfaceSubtitle: 'Ledger comercial con preview contextual para revisar riesgo, margen y vencimiento sin salir del flujo.',
+  searchLabel: 'Buscar cotización',
+  searchPlaceholder: 'Cliente, folio o fuente',
+  sourceLabel: 'Fuente',
+  allSources: 'Todas las fuentes',
+  columnsAction: 'Columnas',
+  sortAction: 'Ordenar',
+  previewAction: 'Revisar',
+  reviewAction: 'Revisar',
+  openDetail: 'Abrir detalle',
+  duplicateQuote: 'Duplicar',
+  moreActions: 'Más acciones',
+  quotesCount: (count: number) => `${count} cotizaciones`,
+  statusAll: 'Todas',
+  statusDraft: 'Borrador',
+  statusIssued: 'Emitida',
+  statusExpired: 'Vencida',
+  statusAccepted: 'Aceptada',
+  metricTotalPipeline: 'Total pipeline',
+  metricIssued: 'Emitidas',
+  metricDrafts: 'Borradores',
+  metricAverageMargin: 'Margen promedio',
+  metricDueThisWeek: 'Vencen esta semana',
+  metricNoMargin: 'Sin margen',
+  colQuote: 'Cotización',
+  colClient: 'Cliente',
+  colDates: 'Fechas',
+  colValue: 'Valor',
+  colMargin: 'Margen',
+  colStatus: 'Estado',
+  colSource: 'Fuente',
+  colActions: 'Acciones',
+  tableAriaLabel: 'Tabla de cotizaciones',
+  dateCreated: 'Creada',
+  dateDue: 'Vence',
+  noDueDate: 'Sin vencimiento',
+  versionLabel: (version: number) => `v${version}`,
+  noQuotesTitle: 'Sin cotizaciones',
+  noQuotesBody: 'Las cotizaciones aparecerán aquí cuando se creen en Comercial o se sincronicen desde HubSpot.',
+  noFilteredQuotesTitle: 'Sin resultados para este corte',
+  noFilteredQuotesBody: 'Ajusta el estado, la fuente o la búsqueda para volver a ver el pipeline.',
+  previewEyebrow: 'Vista previa',
+  previewEmptyTitle: 'Selecciona una cotización',
+  previewEmptyBody: 'Usa Preview en cualquier renglón para revisar el detalle sin perder el contexto del ledger.',
+  cycleTitle: 'Ciclo comercial',
+  cycleDraft: 'Borrador',
+  cycleIssued: 'Emitida',
+  cycleExpired: 'Vencida',
+  commercialFacts: 'Datos comerciales',
+  marginHealth: 'Salud de margen',
+  marginHealthy: 'Dentro de objetivo',
+  marginWatch: 'Bajo target',
+  marginRisk: 'Bajo piso',
+  marginUnknown: 'Pendiente',
+  recentActivity: 'Actividad reciente',
+  activityGenerated: 'Cotización generada',
+  activitySourceManual: 'Actualizada manualmente',
+  activitySourceNubox: 'Sincronizada desde Nubox',
+  activitySourceHubSpot: 'Sincronizada desde HubSpot'
+} as const
+
+// ────────────────────────────────────────────────────────────────
 // TASK-471 — Pricing Catalog Phase-4 UX (diff + revert + bulk + impact + approvals + excel)
 // ────────────────────────────────────────────────────────────────
 

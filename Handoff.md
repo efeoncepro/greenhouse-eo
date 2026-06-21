@@ -1,10 +1,10 @@
 ## Sesión 2026-06-21 — TASK-1213 Quotes Pipeline Redesign + Adaptive Preview — Codex
 
-> **Estado:** `in-progress`, implementación UI en curso local-first. La task fue tomada desde `to-do/` y movida a `docs/tasks/in-progress/TASK-1213-quotes-pipeline-redesign-adaptive-preview.md`; README/registry sincronizados.
+> **Estado:** ✅ complete local-first. La task fue tomada desde `to-do/`, implementada y movida a `docs/tasks/complete/TASK-1213-quotes-pipeline-redesign-adaptive-preview.md`; README/registry sincronizados.
 > - **Dirección visual:** opción Product Design 3 elegida por el operador: "Quote Ledger + Preview Sheet" para `/finance/quotes`.
 > - **Decisión de primitive:** reuse de `AdaptiveSidecarLayout` + `ContextualSidecar` + `DataTableShell` + `GreenhouseButton`/`GreenhouseChip`; no nace primitive nueva ni backend nuevo.
-> - **Implementación parcial:** `QuotesListView` reemplazado por ledger con summary strip, status tabs, búsqueda/fuente, acciones de fila `Preview` en hover/focus/mobile y preview sidecar con timeline, métricas, margen y actividad. Copy reusable agregado en `GH_QUOTES_PIPELINE`.
-> - **Pendiente antes de cierre:** lint/tsc, GVC desktop/mobile, scrollWidth desktop+390, QA/docs closure y polish visual según captura.
+> - **Implementado:** `QuotesListView` reemplazado por ledger con summary strip compacto, tabs azules del ramp canónico, búsqueda/fuente, acciones de fila `Revisar` en hover/focus/mobile y preview sidecar con timeline, métricas, margen y actividad. Copy reusable agregado en `GH_QUOTES_PIPELINE`.
+> - **Evidencia:** ESLint focal verde; `NODE_OPTIONS=--max-old-space-size=8192 pnpm exec tsc --noEmit --pretty false` verde; `pnpm design:lint` verde; `pnpm task:lint --task TASK-1213` y `pnpm ops:lint --changed` verdes; GVC local `.captures/2026-06-21T18-18-07_finance-quotes-pipeline` desktop/mobile con 10 frames; scrollWidth cerrado/abierto desktop `1440=1440` y mobile `390=390`.
 > - **Convivencia:** no tocar cambios ajenos existentes: `D docs/tasks/in-progress/TASK-1207-f29-card-total-a-pagar-period-selector.md` y `?? src/lib/reliability/queries/dte-emission-queue-health.ts`.
 
 ## Sesión 2026-06-21 — TASK-990 rollout: cuenta Global66 MXN creada — Claude
