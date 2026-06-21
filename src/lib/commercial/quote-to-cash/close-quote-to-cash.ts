@@ -214,7 +214,7 @@ const runContractOnly = async (
   // `contract_only_sla_breach` detecta suspensiones más allá del SLA.
   const { operationId, correlationId } = await withTransaction(async client => {
     const started = await startCorrelatedOperation(client, {
-      correlationId: input.correlationId,
+      correlationId: input.correlationId ?? undefined,
       operationType: 'quote_to_cash',
       triggerSource: input.conversionTriggeredBy ?? 'operator',
       actorUserId: input.actor.userId,
@@ -270,7 +270,7 @@ const runIncomeClose = async (
     await convertQuoteToCash({
       quotationId: context.quotationId,
       conversionTriggeredBy: input.conversionTriggeredBy ?? 'operator',
-      correlationId: input.correlationId,
+      correlationId: input.correlationId ?? undefined,
       skipApprovalGate: false,
       actor: input.actor
     })
@@ -298,7 +298,7 @@ const runIncomeClose = async (
   const convert = await convertQuoteToCash({
     quotationId: context.quotationId,
     conversionTriggeredBy: input.conversionTriggeredBy ?? 'operator',
-    correlationId: input.correlationId,
+    correlationId: input.correlationId ?? undefined,
     skipApprovalGate: true,
     incomeId: income.incomeId,
     actor: input.actor
