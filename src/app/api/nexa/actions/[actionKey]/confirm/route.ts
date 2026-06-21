@@ -19,6 +19,8 @@ interface RouteParams {
 
 interface ConfirmBody {
   idempotencyKey?: string
+  /** Re-eco del input para acciones parametrizadas (TASK-1212); se re-valida server-side. */
+  input?: unknown
 }
 
 /**
@@ -60,7 +62,7 @@ export async function POST(request: Request, { params }: RouteParams) {
   const context = buildNexaActionContext(tenant)
 
   try {
-    const outcome = await confirmNexaAction({ actionKey, context, idempotencyKey, request })
+    const outcome = await confirmNexaAction({ actionKey, context, idempotencyKey, input: body.input, request })
 
     if (outcome.kind === 'gap') {
       await recordNexaActionEvent({ userId: context.userId, actionKey, eventType: 'execution_denied', reason: outcome.reason, idempotencyKey })

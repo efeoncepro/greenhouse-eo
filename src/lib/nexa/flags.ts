@@ -67,6 +67,14 @@ export const isNexaKnowledgeSynthesisBriefEnabled = (): boolean =>
 // ejecuta vía la foundation de command/idempotency (TASK-655).
 export const isNexaActionRuntimeEnabled = (): boolean => process.env.NEXA_ACTION_RUNTIME_ENABLED === 'true'
 
+// TASK-1212 — per-action allowlist de la governed action de AUTORÍA de cotización (`author_quote`).
+// Default OFF (independiente del master flag): autorar/emitir una cotización es alto impacto, así que
+// nace gateada explícitamente además del runtime master. Con OFF, el resolver devuelve gap honesto
+// `runtime_disabled` y el confirm rechaza. La mutación SIEMPRE ocurre en el confirm humano + el
+// command re-enforza capability + precio del engine. Server-only.
+export const isNexaQuoteAuthorActionEnabled = (): boolean =>
+  process.env.NEXA_QUOTE_AUTHOR_ACTION_ENABLED === 'true'
+
 // TASK-1087 — Prompts sugeridos data-aware (Tier 2). Default OFF: con OFF, los prompts del chat
 // flotante se quedan en Tier 1/1.5 (plantillas por ruta + nombre real de la entidad), byte-idéntico
 // al comportamiento previo. Con ON, el panel consulta `GET /api/nexa/suggested-prompts` y, si hay

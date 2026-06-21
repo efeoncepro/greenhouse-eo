@@ -5,6 +5,7 @@ import { randomUUID } from 'node:crypto'
 import { ROLE_CODES } from '@/config/role-codes'
 
 import { isNexaActionRuntimeEnabled } from '../flags'
+import { authorQuoteAction } from './author-quote'
 import { markNotificationsReadAction } from './pilot-mark-notifications-read'
 import {
   NEXA_ACTION_PROPOSAL_CONTRACT_VERSION,
@@ -56,11 +57,14 @@ export const buildNexaActionContext = (source: NexaActionContextSource): NexaAct
  * is allowed to act on, what command each action binds to, and how each is gated. Adding a new
  * action is a code change reviewed by a human — never inferred from free text.
  */
-const NEXA_ACTION_REGISTRY: Record<string, NexaActionDefinition> = {
-  [markNotificationsReadAction.actionKey]: markNotificationsReadAction
+// Heterogéneo: las acciones difieren en su TInput (self-action void vs parametrizada). El resolver
+// valida el input via `inputSchema` antes de invocar los callbacks tipados, así que `any` es seguro.
+const NEXA_ACTION_REGISTRY: Record<string, NexaActionDefinition<any>> = {
+  [markNotificationsReadAction.actionKey]: markNotificationsReadAction,
+  [authorQuoteAction.actionKey]: authorQuoteAction
 }
 
-export const getNexaActionDefinition = (actionKey: string): NexaActionDefinition | null =>
+export const getNexaActionDefinition = (actionKey: string): NexaActionDefinition<any> | null =>
   NEXA_ACTION_REGISTRY[actionKey] ?? null
 
 /** Action keys currently enabled (runtime flag ON + per-action allowlist). Used to hint the LLM. */
@@ -87,7 +91,8 @@ export type NexaActionResolution =
  */
 export const resolveNexaActionProposal = async (
   actionKey: string,
-  context: NexaActionContext
+  context: NexaActionContext,
+  rawInput?: unknown
 ): Promise<NexaActionResolution> => {
   const definition = getNexaActionDefinition(actionKey)
 
@@ -125,7 +130,28 @@ export const resolveNexaActionProposal = async (
     }
   }
 
-  const preview = await definition.buildPreview(context)
+  // Parametrized actions (TASK-1212): validar el input que el LLM propuso contra su Zod schema.
+  // Falla → gap honesto, NUNCA se propone una mutación con datos inválidos.
+  let actionInput: unknown
+
+  if (definition.inputSchema) {
+    const parsed = definition.inputSchema.safeParse(rawInput)
+
+    if (!parsed.success) {
+      return {
+        kind: 'gap',
+        gap: {
+          reason: 'invalid_input',
+          message: 'Los datos para esta acción no están completos o no son válidos. Revisa lo que me pediste.',
+          deepLink: definition.deepLinkFallback
+        }
+      }
+    }
+
+    actionInput = parsed.data
+  }
+
+  const preview = await definition.buildPreview(context, actionInput)
 
   const proposal: NexaActionProposal = {
     contractVersion: NEXA_ACTION_PROPOSAL_CONTRACT_VERSION,
@@ -139,7 +165,9 @@ export const resolveNexaActionProposal = async (
       confirmEndpoint: buildNexaActionConfirmEndpoint(definition.actionKey),
       // Server-generated idempotency key bound to this proposal instance. The UI echoes it on
       // confirm so a double-click replays instead of double-executing (TASK-655 foundation).
-      idempotencyKey: `nexa-act-idem-${randomUUID()}`
+      idempotencyKey: `nexa-act-idem-${randomUUID()}`,
+      // El input validado viaja al cliente y se re-eco en confirm (re-validado server-side).
+      input: actionInput
     },
     expiresAt: new Date(Date.now() + definition.expirationSeconds * 1000).toISOString()
   }

@@ -944,15 +944,21 @@ const proposeActionTool: NexaToolDefinition = {
   declaration: {
     name: 'propose_action',
     description:
-      'PROPONE (no ejecuta) una acción gobernada para que el usuario la confirme antes de que ocurra cualquier cambio. Úsalo SOLO cuando el usuario pide explícitamente realizar una acción registrada. Pasa el `actionKey` exacto de una acción registrada — NUNCA inventes una acción, endpoint ni URL. Devuelve una previsualización con el impacto; tú debes pedirle al usuario que confirme. Acciones registradas: ' +
-      'mark_notifications_read (marcar todas tus notificaciones como leídas). Si la acción no existe o no está permitida, te lo diré y debes ofrecer una alternativa honesta, no inventar.',
+      'PROPONE (no ejecuta) una acción gobernada para que el usuario la confirme antes de que ocurra cualquier cambio. Úsalo SOLO cuando el usuario pide explícitamente realizar una acción registrada. Pasa el `actionKey` exacto de una acción registrada — NUNCA inventes una acción, endpoint ni URL. Para acciones parametrizadas, pasa también `input` con los datos requeridos. Devuelve una previsualización con el impacto; tú debes pedirle al usuario que confirme. Acciones registradas: ' +
+      'mark_notifications_read (marcar todas tus notificaciones como leídas, sin input); author_quote (crear o emitir una cotización; requiere `input` = { mode: "create"|"edit", header: { organizationId, currency, ... }, lines: [...], issueAfterSave }). Si la acción no existe o no está permitida, te lo diré y debes ofrecer una alternativa honesta, no inventar.',
     parametersJsonSchema: {
       type: 'object',
       additionalProperties: false,
       properties: {
         actionKey: {
           type: 'string',
-          description: 'La clave exacta de una acción registrada (p. ej. "mark_notifications_read").'
+          description: 'La clave exacta de una acción registrada (p. ej. "mark_notifications_read" o "author_quote").'
+        },
+        input: {
+          type: 'object',
+          additionalProperties: true,
+          description:
+            'Datos de la acción para acciones parametrizadas (p. ej. el payload de autoría de author_quote). Omitir para acciones self-scoped sin input. Se valida server-side contra el schema de la acción.'
         }
       },
       required: ['actionKey']
@@ -967,7 +973,7 @@ const proposeActionTool: NexaToolDefinition = {
       return buildToolUnavailableResult('propose_action', 'Falta la clave de la acción a proponer.')
     }
 
-    const resolution = await resolveNexaActionProposal(actionKey, buildNexaActionContext(tenant))
+    const resolution = await resolveNexaActionProposal(actionKey, buildNexaActionContext(tenant), args.input)
 
     if (resolution.kind === 'gap') {
       // Gap honesto: la acción no existe / no está habilitada / sin permiso. NO se propone nada.
