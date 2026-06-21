@@ -17,11 +17,7 @@ import {
   resolveIdempotencyDecision
 } from '@/lib/api-platform/core/idempotency'
 
-import {
-  resolveQuoteDeliveryModel,
-  type CommercialModel,
-  type StaffingModel
-} from '@/lib/commercial/delivery-model'
+import { resolveQuoteDeliveryModel } from '@/lib/commercial/delivery-model'
 import { getCommercialDealByHubSpotId } from '@/lib/commercial/deals-store'
 import { validateHubSpotQuoteCommercialContext } from '@/lib/commercial/quote-hubspot-sync-context'
 import { recordAudit } from '@/lib/commercial/governance/audit-log'
@@ -123,8 +119,9 @@ export interface SubmitQuoteFromBuilderHeader {
   description?: string | null
   internalNotes?: string | null
   pricingModel?: 'staff_aug' | 'retainer' | 'project'
-  commercialModel?: CommercialModel | null
-  staffingModel?: StaffingModel | null
+  /** Wire format: string crudo del builder; el command coacciona via resolveQuoteDeliveryModel. */
+  commercialModel?: string | null
+  staffingModel?: string | null
   /** CommercialModelCode del motor de pricing (on_going/on_demand/hybrid/license_consulting). */
   pricingEngineCommercialModel?: string | null
   countryFactorCode?: string | null
