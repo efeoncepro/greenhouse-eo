@@ -1054,6 +1054,40 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
       source
     })
 
+    // ── TASK-1192 — Finance payment & treasury capability gates (Wave 1 F9) ──
+    // FINANCE_ADMIN + EFEONCE_ADMIN reciben las 13 capabilities de write de pagos/
+    // tesorería (este bloque corre para ambos roles). FINANCE_ANALYST queda read-only
+    // (NO entra a este bloque). Cada grant matchea el action que la ruta `can()`-chequea.
+    for (const capability of [
+      'finance.payment_orders.create',
+      'finance.bank_accounts.create',
+      'finance.bank_transfers.create',
+      'finance.settlements.record_payment',
+      'finance.shareholder_account.create',
+      'finance.shareholder_account.record_movement'
+    ] as const) {
+      addEntitlement(entries, { module: 'finance', capability, action: 'create', scope: 'tenant', source })
+    }
+
+    for (const capability of [
+      'finance.payment_orders.update',
+      'finance.payment_orders.submit',
+      'finance.payment_orders.schedule',
+      'finance.payment_orders.mark_paid',
+      'finance.payment_orders.cancel',
+      'finance.bank_accounts.update'
+    ] as const) {
+      addEntitlement(entries, { module: 'finance', capability, action: 'update', scope: 'tenant', source })
+    }
+
+    addEntitlement(entries, {
+      module: 'finance',
+      capability: 'finance.payment_orders.approve',
+      action: 'approve',
+      scope: 'tenant',
+      source
+    })
+
     addEntitlement(entries, {
       module: 'finance',
       capability: 'finance.payroll.rematerialize',

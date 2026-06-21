@@ -410,6 +410,90 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     actions: ['update'] as const,
     defaultScope: 'tenant'
   },
+  // ── TASK-1192 — Finance payment & treasury capability gates (Wave 1 F9) ──
+  // Gate fino por ACCIÓN para las mutaciones más sensibles de pagos/tesorería.
+  // El KEY encoda la acción específica; el campo `action` es el EntitlementAction
+  // genérico (create/update/approve). NUNCA reemplazan invariantes del command/DB
+  // (state machine, source account, anti-zombie, outbox) — son solo gate de acceso.
+  // Reservadas FINANCE_ADMIN + EFEONCE_ADMIN (write); FINANCE_ANALYST queda read-only.
+  {
+    key: 'finance.payment_orders.create',
+    module: 'finance',
+    actions: ['create'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'finance.payment_orders.update',
+    module: 'finance',
+    actions: ['update'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'finance.payment_orders.submit',
+    module: 'finance',
+    actions: ['update'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'finance.payment_orders.approve',
+    module: 'finance',
+    actions: ['approve'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'finance.payment_orders.schedule',
+    module: 'finance',
+    actions: ['update'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'finance.payment_orders.mark_paid',
+    module: 'finance',
+    actions: ['update'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'finance.payment_orders.cancel',
+    module: 'finance',
+    actions: ['update'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'finance.bank_accounts.create',
+    module: 'finance',
+    actions: ['create'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'finance.bank_accounts.update',
+    module: 'finance',
+    actions: ['update'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'finance.bank_transfers.create',
+    module: 'finance',
+    actions: ['create'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'finance.settlements.record_payment',
+    module: 'finance',
+    actions: ['create'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'finance.shareholder_account.create',
+    module: 'finance',
+    actions: ['create'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'finance.shareholder_account.record_movement',
+    module: 'finance',
+    actions: ['create'] as const,
+    defaultScope: 'tenant'
+  },
   // TASK-766 Slice 5 — Repair de payments con drift CLP.
   // Permite a FINANCE_ADMIN / EFEONCE_ADMIN reparar registros de
   // expense_payments / income_payments con `requires_fx_repair=TRUE`
