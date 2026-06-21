@@ -7,6 +7,36 @@ export type FinanceCurrency = 'CLP' | 'USD' | 'MXN'
 
 export const VALID_CURRENCIES: FinanceCurrency[] = ['CLP', 'USD', 'MXN']
 
+// ── TASK-995: indexed unit vs cash currency split ───────────────────────────
+// ADR GREENHOUSE_CLF_INDEXED_FINANCE_CORE_V1 (accepted 2026-06-20). CLF/UF is a
+// reajustable UNIT OF ACCOUNT, never cash: it can denominate a contractual fact
+// (the `native` plane) but a UF fact always settles in CLP cash. These aliases
+// give callers a semantic, compiler-checkable boundary so CLF can never leak
+// into accounts, payment orders or settlement legs. The cash aliases are
+// intentionally identical to `FinanceCurrency`; the value is the named intent
+// plus the `assertCashCurrency`/`toFinanceNativeUnit` guards in currency-domain.
+
+/** A reajustable unit of account (UF). Denominates facts; never holds cash. */
+export type IndexedUnit = 'CLF'
+export const INDEXED_UNITS: IndexedUnit[] = ['CLF']
+
+/** Cash currency that actually moves in treasury. CLF is excluded by design. */
+export type SettlementCurrency = FinanceCurrency
+
+/** Currency a cash account can be denominated in. CLF excluded by design. */
+export type AccountCurrency = FinanceCurrency
+
+/** Currency a payment order header/line can carry. CLF excluded by design. */
+export type PaymentOrderCurrency = FinanceCurrency
+
+/** Management reporting plane. Derived from functional CLP (IAS 21). */
+export type ReportingCurrency = 'CLP' | 'USD'
+
+/** The `native` plane of a finance fact: a cash currency OR an indexed unit. */
+export type FinanceNativeUnit = FinanceCurrency | IndexedUnit
+
+export const FINANCE_NATIVE_UNITS: FinanceNativeUnit[] = [...VALID_CURRENCIES, ...INDEXED_UNITS]
+
 export const QUOTATION_SOURCE_SYSTEMS = ['manual', 'hubspot', 'nubox'] as const
 export type QuotationSourceSystem = (typeof QUOTATION_SOURCE_SYSTEMS)[number]
 

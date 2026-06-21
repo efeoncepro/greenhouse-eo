@@ -21,7 +21,8 @@
 //
 // No other surface should have hardcoded currency lists.
 
-import type { FinanceCurrency } from './contracts'
+import type { FinanceCurrency, FinanceNativeUnit, IndexedUnit } from './contracts'
+import { INDEXED_UNITS, VALID_CURRENCIES } from './contracts'
 
 // ── Domain matrix ───────────────────────────────────────────────────
 
@@ -224,4 +225,62 @@ export const narrowToDomainCurrency = (
   const normalized = currency.toUpperCase()
 
   return isSupportedCurrencyForDomain(normalized, domain) ? (normalized as PlatformCurrency) : null
+}
+
+// ── TASK-995: indexed-unit (UF/CLF) helpers + cash-currency guard ────────────
+// ADR GREENHOUSE_CLF_INDEXED_FINANCE_CORE_V1. These are the canonical primitives
+// downstream slices use so CLF is accepted ONLY on native/indexed-unit planes
+// and rejected on every cash plane (accounts, payment orders, settlement legs).
+
+/** True when the value is a reajustable unit of account (UF/CLF), not cash. */
+export const isIndexedUnit = (unit: string): unit is IndexedUnit =>
+  (INDEXED_UNITS as readonly string[]).includes(unit.toUpperCase())
+
+export const toIndexedUnit = (unit: string): IndexedUnit => {
+  const normalized = unit.toUpperCase()
+
+  if (!isIndexedUnit(normalized)) {
+    throw new Error(
+      `"${unit}" is not a supported indexed unit (expected one of ${INDEXED_UNITS.join(', ')}).`
+    )
+  }
+
+  return normalized
+}
+
+/** True when the value is a cash currency that can hold balances and settle. */
+export const isCashCurrency = (currency: string): currency is FinanceCurrency =>
+  (VALID_CURRENCIES as readonly string[]).includes(currency.toUpperCase())
+
+/**
+ * Narrow to the `native` plane of a finance fact: a cash currency OR an indexed
+ * unit (UF/CLF). Throws when the value is neither.
+ */
+export const toFinanceNativeUnit = (unit: string): FinanceNativeUnit => {
+  const normalized = unit.toUpperCase()
+
+  if (isIndexedUnit(normalized)) return normalized
+
+  // Must be a finance cash currency; throws otherwise.
+  return toFinanceCurrency(normalized)
+}
+
+/**
+ * Cash-plane guard: reject indexed units (UF/CLF) on account / payment-order /
+ * settlement-leg currencies. A UF fact settles in CLP cash — CLF must never
+ * reach a cash lane. Use this at every cash-currency boundary (Slice 4 wires it
+ * into the actual write paths). Throws a clear, distinct error for the indexed
+ * unit case vs an unknown currency.
+ */
+export const assertCashCurrency = (currency: string, context = 'cash'): FinanceCurrency => {
+  const normalized = currency.toUpperCase()
+
+  if (isIndexedUnit(normalized)) {
+    throw new Error(
+      `Indexed unit "${currency}" cannot be used as a ${context} currency. ` +
+        'UF/CLF facts settle in CLP cash (ADR GREENHOUSE_CLF_INDEXED_FINANCE_CORE_V1).'
+    )
+  }
+
+  return toFinanceCurrency(normalized)
 }
