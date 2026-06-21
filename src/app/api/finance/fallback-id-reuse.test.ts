@@ -17,6 +17,9 @@ vi.mock('@/lib/tenant/authorization', () => ({
   requireFinanceTenantContext: (...args: unknown[]) => mockRequireFinanceTenantContext(...args)
 }))
 
+// TASK-1193: estos tests ejercen handlers que ahora gatean por capability; no testean authz.
+vi.mock('@/lib/entitlements/runtime', () => ({ can: () => true }))
+
 vi.mock('@/lib/finance/canonical', () => ({
   resolveFinanceClientContext: (...args: unknown[]) => mockResolveFinanceClientContext(...args),
   resolveFinanceDownstreamScope: (...args: unknown[]) => mockResolveFinanceDownstreamScope(...args),
