@@ -2,6 +2,14 @@
 
 > **Estado:** `released` (manifest transicionó a released, post-release health check verde). Orchestrator run [`27721723752`](https://github.com/efeoncepro/greenhouse-eo/actions/runs/27721723752) `completed/success`. Conducido por Claude tras pedido del operador ("paso a producción que Codex dejó preparado").
 
+## Sesión 2026-06-21 — Nueva cotización Deal Desk redesign — Codex
+
+> **Estado:** code complete local-first, sin backend/schema. Rediseño visible de `/finance/quotes/new` basado en el concepto visual 1 elegido por el operador.
+> - **Implementado:** `QuoteBuilderShell` ahora usa `CompositionShell split` para separar primary workspace y aside económico/checklist; `QuoteContextStrip` puede renderizar no-sticky (`sticky={false}`); `QuoteLineItemsEditor` tiene empty canvas enterprise con command row, headers y tiles de métodos; copy nuevo en `GH_PRICING.dealDesk`; scenario GVC dedicado `finance-quote-builder-deal-desk`.
+> - **Evidencia:** `pnpm exec eslint ...` verde, `pnpm exec tsc --noEmit --pretty false` verde, `pnpm fe:capture finance-quote-builder-deal-desk --env=local` verde desktop/mobile (`.captures/2026-06-21T00-56-50_finance-quote-builder-deal-desk`), Playwright ad hoc sin overflow horizontal ni console/page warnings en desktop 1440 y iPhone 15.
+> - **Notas:** el GVC quality report conserva warnings de `layout_text_clipped` sobre spans de texto accesible/oculto (`clientWidth=1`), no truncamiento visible tras acortar placeholders. No se actualizó arquitectura/DESIGN porque se reutilizaron primitives existentes y no nació contrato de plataforma nuevo.
+> - **Convivencia:** persisten cambios ajenos no tocados: `D docs/tasks/in-progress/TASK-1207-f29-card-total-a-pagar-period-selector.md` y `?? src/lib/reliability/queries/dte-emission-queue-health.ts`.
+
 ## Sesión 2026-06-20 — TASK-995 CLF/UF Indexed Finance Core — Slice 0 ADR (proposed, STOP para aceptación) — Claude
 
 > **Estado:** `in-progress`, Slice 0 (ADR) entregado, **STOP en gate de aceptación**. No se escribió código funcional de CLF (la spec lo prohíbe sin ADR aceptado).

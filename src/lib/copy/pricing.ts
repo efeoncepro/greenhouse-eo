@@ -321,7 +321,7 @@ export const GH_PRICING = {
     lockedHint: 'No se puede cambiar después de crear la cotización',
     organization: {
       label: 'Organización',
-      placeholder: 'Seleccionar organización',
+      placeholder: 'Elige organización',
       icon: 'tabler-building',
       hint: 'Cliente o prospecto de la cotización',
       unifiedSearchPlaceholder: 'Buscar por nombre o dominio…',
@@ -338,7 +338,7 @@ export const GH_PRICING = {
       placeholder: 'Agregar contacto',
       icon: 'tabler-user',
       hint: 'Persona de la organización responsable',
-      noOrgFirst: 'Selecciona una organización primero',
+      noOrgFirst: 'Primero organización',
       loading: 'Cargando contactos…',
       empty: 'Sin contactos registrados en esta organización',
       primaryBadge: 'Principal'
@@ -348,7 +348,7 @@ export const GH_PRICING = {
       placeholder: 'Vincular deal',
       icon: 'tabler-briefcase-2',
       hint: 'Vincula la cotización a una oportunidad de HubSpot. Requiere contacto comercial.',
-      noOrgFirst: 'Selecciona una organización primero',
+      noOrgFirst: 'Primero organización',
       loading: 'Cargando deals…',
       empty: 'Sin deals disponibles para esta organización',
       emptyHelper: 'Vincula una Company HubSpot o crea un deal nuevo',
@@ -441,6 +441,53 @@ export const GH_PRICING = {
       noOrganization: 'Selecciona la organización para poder emitir.',
       notIssueable: 'Esta cotización ya no se puede emitir desde el builder.',
       simulationError: 'Resuelve los avisos del motor antes de emitir.'
+    }
+  },
+  dealDesk: {
+    workspaceAriaLabel: 'Workspace de nueva cotización',
+    contextRailLabel: 'Readiness de cliente y términos',
+    asideTitle: 'Readiness & economía',
+    asideEyebrow: 'Deal desk',
+    checklistTitle: 'Checklist para emitir',
+    hubspotTitle: 'HubSpot',
+    hubspotConnected: 'Deal conectado',
+    hubspotMissing: 'Sin deal vinculado',
+    hubspotNoOrganization: 'Elige una organización para conectar el deal.',
+    hubspotCreateCta: 'Crear deal',
+    pricingTitle: 'Pricing',
+    pricingCalculating: 'Calculando motor v2',
+    pricingReady: 'Listo para simular al agregar ítems',
+    pricingError: 'Revisar avisos del motor',
+    marginLabel: 'Margen',
+    totalUnavailable: 'Sin calcular',
+    marginUnavailable: '—',
+    saveStateDirty: 'Cambios sin guardar',
+    saveStateClean: 'Sin cambios',
+    checklistItems: {
+      organization: 'Organización',
+      contact: 'Contacto',
+      deal: 'Deal HubSpot',
+      businessLine: 'Business line',
+      terms: 'Vigencia',
+      lines: 'Al menos una línea'
+    },
+    checklistStates: {
+      ready: 'Listo',
+      missing: 'Pendiente'
+    },
+    lineCanvas: {
+      searchPlaceholder: 'Buscar catálogo, servicio o template',
+      filterLabel: 'Filtros',
+      emptyTitle: 'Sin líneas todavía',
+      emptySubtitle: 'Agrega ítems vendibles para activar pricing, margen y addons.',
+      tableHeaders: {
+        item: 'Ítem',
+        type: 'Tipo',
+        quantity: 'Cant.',
+        unit: 'Unidad',
+        unitPrice: 'Precio',
+        subtotal: 'Subtotal'
+      }
     }
   },
   addMenu: {

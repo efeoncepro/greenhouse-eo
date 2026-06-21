@@ -139,6 +139,7 @@ export interface QuoteContextStripProps extends QuoteContextStripHandlers {
   organizationSelector?: QuoteContextOrganizationSelectorConfig
   disabled?: boolean
   organizationLocked?: boolean
+  sticky?: boolean
   stickyOffset?: number
   invalidFields?: Partial<Record<keyof QuoteContextStripValues, string>>
 }
@@ -205,6 +206,7 @@ const QuoteContextStrip = ({
   organizationSelector,
   disabled = false,
   organizationLocked = false,
+  sticky = true,
   stickyOffset = 0,
   invalidFields = {},
   onOrganizationChange,
@@ -442,17 +444,21 @@ const QuoteContextStrip = ({
 
   return (
     <Box
+      data-capture='quote-builder-readiness-rail'
       sx={theme => ({
-        position: 'sticky',
-        top: stickyOffset,
-        zIndex: theme.zIndex.appBar - 2,
+        position: sticky ? 'sticky' : 'relative',
+        top: sticky ? stickyOffset : 'auto',
+        zIndex: sticky ? theme.zIndex.appBar - 2 : 1,
         py: 2,
         px: { xs: 2, md: 3 },
 
         // Solid subtle bg + crisp border-bottom — 2026 enterprise pattern
         // (Stripe Dashboard, Vercel, Linear). Glass-morphism skipped on purpose.
         backgroundColor: theme.palette.background.paper,
-        borderBottom: `1px solid ${theme.palette.divider}`
+        border: sticky ? 0 : `1px solid ${theme.palette.divider}`,
+        borderBottom: `1px solid ${theme.palette.divider}`,
+        borderRadius: sticky ? 0 : `${theme.shape.customBorderRadius.lg}px`,
+        boxShadow: sticky ? 'none' : theme.shadows[1]
       })}
     >
       <Stack spacing={2} aria-label={GH_PRICING.contextChips.ariaLabel}>

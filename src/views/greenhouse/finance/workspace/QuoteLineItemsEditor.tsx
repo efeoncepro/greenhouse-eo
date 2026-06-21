@@ -16,6 +16,7 @@ import {
 import Avatar from '@mui/material/Avatar'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
+import ButtonBase from '@mui/material/ButtonBase'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import CardHeader from '@mui/material/CardHeader'
@@ -651,7 +652,15 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
   }
 
   return (
-    <Card elevation={0} sx={theme => ({ border: `1px solid ${theme.palette.divider}`, borderRadius: `${theme.shape.customBorderRadius.lg}px` })}>
+    <Card
+      elevation={0}
+      data-capture='quote-builder-line-canvas'
+      sx={theme => ({
+        border: `1px solid ${theme.palette.divider}`,
+        borderRadius: `${theme.shape.customBorderRadius.lg}px`,
+        overflow: 'hidden'
+      })}
+    >
       <CardHeaderWithBadge
         title='Ítems de la cotización'
         badgeValue={draftLines.length}
@@ -663,140 +672,191 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
       <Divider />
 
       {draftLines.length === 0 ? (
-        <CardContent>
+        <CardContent sx={{ p: 0 }}>
           {/*
             TASK-615 — el empty state ahora ENSEÑA el modelo de composición.
             Eyebrow + título + 4 method-hints en grid + CTA primario único +
             CTAs secundarios honestos. El split button del header desaparece
             mientras estamos aquí, así no compite por la affordance dominante.
           */}
-          <EmptyState
-            icon='tabler-file-invoice'
-            animatedIcon='/animations/empty-chart.json'
-            title={GH_PRICING.emptyItems.title}
-            description={GH_PRICING.emptyItems.subtitle}
-            action={
-              onAddFromCatalog ? (
-                <Stack spacing={3} sx={{ width: '100%', maxWidth: 720, mx: 'auto' }}>
-                  <Box
-                    component='ul'
-                    sx={{
-                      display: 'grid',
-                      gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, minmax(0, 1fr))' },
-                      gap: 1.5,
-                      m: 0,
-                      p: 0,
-                      listStyle: 'none',
-                      textAlign: 'left'
-                    }}
-                  >
-                    {GH_PRICING.emptyItems.methodHints.map(hint => (
+          <Stack spacing={0}>
+            <Box
+              sx={theme => ({
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: 2,
+                px: { xs: 3, md: 4 },
+                py: 2,
+                backgroundColor: theme.palette.action.hover,
+                borderBottom: `1px solid ${theme.palette.divider}`
+              })}
+            >
+              <Button
+                variant='tonal'
+                color='secondary'
+                size='small'
+                startIcon={<i className='tabler-search' aria-hidden='true' />}
+                onClick={onAddFromCatalog}
+                disabled={saving || !onAddFromCatalog}
+                sx={{ justifyContent: 'flex-start', minWidth: 0, flex: 1, maxWidth: 420 }}
+              >
+                {GH_PRICING.dealDesk.lineCanvas.searchPlaceholder}
+              </Button>
+              <Button
+                variant='text'
+                color='secondary'
+                size='small'
+                startIcon={<i className='tabler-adjustments-horizontal' aria-hidden='true' />}
+                disabled
+                sx={{
+                  display: { xs: 'none', sm: 'inline-flex' },
+                  '&.Mui-disabled': {
+                    color: 'text.secondary',
+                    opacity: 0.72
+                  }
+                }}
+              >
+                {GH_PRICING.dealDesk.lineCanvas.filterLabel}
+              </Button>
+            </Box>
+
+            <Box
+              sx={theme => ({
+                display: { xs: 'none', md: 'grid' },
+                gridTemplateColumns: 'minmax(220px, 1.7fr) minmax(120px, .8fr) 80px 100px 120px 120px',
+                gap: 2,
+                px: 4,
+                py: 1.5,
+                borderBottom: `1px solid ${theme.palette.divider}`,
+                color: 'text.secondary',
+                backgroundColor: theme.palette.background.default
+              })}
+            >
+              {Object.values(GH_PRICING.dealDesk.lineCanvas.tableHeaders).map(label => (
+                <Typography
+                  key={label}
+                  variant='caption'
+                  sx={{ fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0 }}
+                >
+                  {label}
+                </Typography>
+              ))}
+            </Box>
+
+            <Box data-capture='quote-builder-empty-line-methods' sx={{ px: { xs: 3, md: 4 }, py: { xs: 5, md: 6 } }}>
+              <EmptyState
+                icon='tabler-file-invoice'
+                animatedIcon='/animations/empty-chart.json'
+                title={GH_PRICING.dealDesk.lineCanvas.emptyTitle}
+                description={GH_PRICING.dealDesk.lineCanvas.emptySubtitle}
+                action={
+                  onAddFromCatalog ? (
+                    <Stack spacing={3} sx={{ width: '100%', maxWidth: 780, mx: 'auto' }}>
                       <Box
-                        key={hint.title}
-                        component='li'
-                        sx={theme => ({
-                          display: 'flex',
-                          gap: 1.25,
-                          alignItems: 'flex-start',
-                          p: 1.25,
-                          borderRadius: `${theme.shape.customBorderRadius.sm}px`,
-                          backgroundColor: 'action.hover'
-                        })}
+                        component='ul'
+                        sx={{
+                          display: 'grid',
+                          gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, minmax(0, 1fr))' },
+                          gap: 1.5,
+                          m: 0,
+                          p: 0,
+                          listStyle: 'none',
+                          textAlign: 'left'
+                        }}
                       >
-                        <Box
-                          component='i'
-                          className={hint.icon}
-                          aria-hidden='true'
-                          sx={{ fontSize: 18, color: 'text.secondary', mt: 0.25, flexShrink: 0 }}
-                        />
-                        <Stack spacing={0.25}>
-                          <Typography variant='body2' sx={{ fontWeight: 600, lineHeight: 1.3 }}>
-                            {hint.title}
-                          </Typography>
-                          <Typography variant='caption' color='text.secondary' sx={{ lineHeight: 1.35 }}>
-                            {hint.description}
+                        {GH_PRICING.emptyItems.methodHints.map((hint, index) => {
+                          const handlers = [onAddFromCatalog, onAddFromService, onAddFromTemplate, onAddFromManual]
+                          const handler = handlers[index]
+
+                          return (
+                            <Box key={hint.title} component='li'>
+                              <ButtonBase
+                                onClick={handler}
+                                disabled={saving || !handler}
+                                sx={theme => ({
+                                  width: '100%',
+                                  display: 'flex',
+                                  gap: 1.5,
+                                  alignItems: 'flex-start',
+                                  justifyContent: 'flex-start',
+                                  p: 2,
+                                  minHeight: 96,
+                                  border: `1px solid ${theme.palette.divider}`,
+                                  borderRadius: `${theme.shape.customBorderRadius.md}px`,
+                                  backgroundColor: theme.palette.background.paper,
+                                  textAlign: 'left',
+                                  transition: theme.transitions.create(['border-color', 'box-shadow', 'background-color'], {
+                                    duration: theme.transitions.duration.shortest
+                                  }),
+                                  '&:hover': {
+                                    borderColor: theme.palette.primary.main,
+                                    backgroundColor: theme.palette.primary.lightOpacity,
+                                    boxShadow: theme.shadows[1]
+                                  },
+                                  '&.Mui-disabled': {
+                                    opacity: 0.56
+                                  }
+                                })}
+                              >
+                                <Box
+                                  component='i'
+                                  className={hint.icon}
+                                  aria-hidden='true'
+                                  sx={{ fontSize: 20, color: 'text.secondary', mt: 0.25, flexShrink: 0 }}
+                                />
+                                <Stack spacing={0.5}>
+                                  <Typography variant='body2' sx={{ fontWeight: 700, lineHeight: 1.3 }}>
+                                    {hint.title}
+                                  </Typography>
+                                  <Typography variant='caption' color='text.secondary' sx={{ lineHeight: 1.35 }}>
+                                    {hint.description}
+                                  </Typography>
+                                </Stack>
+                              </ButtonBase>
+                            </Box>
+                          )
+                        })}
+                      </Box>
+
+                      <Button
+                        variant='contained'
+                        size='small'
+                        startIcon={<i className='tabler-books' aria-hidden='true' />}
+                        onClick={onAddFromCatalog}
+                        disabled={saving}
+                        sx={{ alignSelf: 'center' }}
+                      >
+                        {GH_PRICING.emptyItems.ctaPrimary}
+                      </Button>
+
+                      {pendingHint ? (
+                        <Stack
+                          direction='row'
+                          spacing={1}
+                          alignItems='center'
+                          justifyContent='center'
+                          role='status'
+                          sx={{ color: 'warning.main' }}
+                        >
+                          <Box
+                            component='i'
+                            className='tabler-alert-circle'
+                            aria-hidden='true'
+                            sx={{ fontSize: 16 }}
+                          />
+                          <Typography variant='caption' sx={{ color: 'warning.main', fontWeight: 500 }}>
+                            {pendingHint}
                           </Typography>
                         </Stack>
-                      </Box>
-                    ))}
-                  </Box>
-
-                  <Stack
-                    direction={{ xs: 'column', sm: 'row' }}
-                    spacing={1}
-                    alignItems='center'
-                    justifyContent='center'
-                    useFlexGap
-                  >
-                    <Button
-                      variant='contained'
-                      size='small'
-                      startIcon={<i className='tabler-books' aria-hidden='true' />}
-                      onClick={onAddFromCatalog}
-                      disabled={saving}
-                    >
-                      {GH_PRICING.emptyItems.ctaPrimary}
-                    </Button>
-                    {onAddFromService ? (
-                      <Button
-                        variant='text'
-                        size='small'
-                        color='primary'
-                        onClick={onAddFromService}
-                        disabled={saving}
-                      >
-                        {GH_PRICING.emptyItems.ctaSecondary}
-                      </Button>
-                    ) : null}
-                    {onAddFromTemplate ? (
-                      <Button
-                        variant='text'
-                        size='small'
-                        color='primary'
-                        onClick={onAddFromTemplate}
-                        disabled={saving}
-                      >
-                        {GH_PRICING.emptyItems.ctaTertiary}
-                      </Button>
-                    ) : null}
-                    {onAddFromManual ? (
-                      <Button
-                        variant='text'
-                        size='small'
-                        color='secondary'
-                        onClick={onAddFromManual}
-                        disabled={saving}
-                      >
-                        {GH_PRICING.emptyItems.ctaManual}
-                      </Button>
-                    ) : null}
-                  </Stack>
-
-                  {pendingHint ? (
-                    <Stack
-                      direction='row'
-                      spacing={1}
-                      alignItems='center'
-                      justifyContent='center'
-                      role='status'
-                      sx={{ color: 'warning.main' }}
-                    >
-                      <Box
-                        component='i'
-                        className='tabler-alert-circle'
-                        aria-hidden='true'
-                        sx={{ fontSize: 16 }}
-                      />
-                      <Typography variant='caption' sx={{ color: 'warning.main', fontWeight: 500 }}>
-                        {pendingHint}
-                      </Typography>
+                      ) : null}
                     </Stack>
-                  ) : null}
-                </Stack>
-              ) : null
-            }
-            minHeight={260}
-          />
+                  ) : null
+                }
+                minHeight={220}
+              />
+            </Box>
+          </Stack>
         </CardContent>
       ) : (
         <DataTableShell
