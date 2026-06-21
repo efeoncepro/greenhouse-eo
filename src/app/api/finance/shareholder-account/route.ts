@@ -14,6 +14,7 @@ import {
   type FinanceCurrency
 } from '@/lib/finance/shared'
 import { requireShareholderAccountTenantContext } from '@/lib/tenant/authorization'
+import { can } from '@/lib/entitlements/runtime'
 
 export const dynamic = 'force-dynamic'
 
@@ -82,6 +83,11 @@ export async function POST(request: Request) {
 
   if (!tenant) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  // TASK-1192 — gate fino de acción (capability != route-group).
+  if (!can(tenant, 'finance.shareholder_account.create', 'create', 'tenant')) {
+    return NextResponse.json({ error: 'No tienes permiso para crear cuentas corrientes de accionista.', code: 'forbidden' }, { status: 403 })
   }
 
   try {
