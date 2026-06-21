@@ -7,6 +7,10 @@
 
 ---
 
+## Delta 2026-06-21 — Adaptive Sidecar main inset opt-in
+
+`AdaptiveSidecarLayout` agrega `inlineMainPadding` como safe area opt-in para el slot main cuando el sidecar se renderiza inline/push y el layout crea una card madre con borde. El default es `0`, por lo que los adopters existentes quedan byte-identicos; consumers densos como `/finance/quotes` pueden pasar su gutter canónico para evitar que headers o contenido principal queden pegados al borde al abrir un preview. GVC: `.captures/2026-06-21T19-04-32_finance-quotes-pipeline`.
+
 ## Delta 2026-06-20 — Gamification leaderboard primitives
 
 Se agregaron `GreenhouseLeaderboardCard`, `GreenhouseLeaderboardRankings` y `GreenhouseLeaderboardPodium` como primitives para portar los componentes de leaderboard del prompt a Greenhouse sin shadcn/Tailwind/CVA ni avatars externos. El card compone periodo, selector de run, podium top-3 y lista paginada; rankings soporta byline, usuario actual, `displayed`, avatars y `valueFormatter`; podium conserva sizes `sm/default/lg`, `medalStyle classic/modern/minimal`, toggles de avatar/value y orden visual 2-1-3 con labels accesibles por rank. Lab vivo: `/design-system/gamification`; scenario GVC: `design-system-gamification`; assets demo: avatars reales bajo `public/images/greenhouse/team/`.

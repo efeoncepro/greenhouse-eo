@@ -1002,6 +1002,7 @@ const QuotesListView = () => {
       sidecarMaxWidth={500}
       mainMinWidth={820}
       panelEntrance='slide'
+      inlineMainPadding={SURFACE_GUTTER}
       dataCapture='finance-quotes-page'
       sidecar={
         <QuotePreview

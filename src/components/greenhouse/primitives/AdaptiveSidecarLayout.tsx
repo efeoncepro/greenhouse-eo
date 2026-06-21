@@ -59,6 +59,11 @@ export interface AdaptiveSidecarLayoutProps {
   dataCapture?: string
   source?: string
   onTelemetry?: (event: AdaptiveSidecarTelemetryEvent) => void
+  /**
+   * Optional safe area for the main slot while the sidecar is rendered inline.
+   * Keep at 0 by default so existing adopters remain byte-identical.
+   */
+  inlineMainPadding?: number | string | Partial<Record<Breakpoint, number | string>>
 }
 
 const DEFAULT_SIDECAR_WIDTH = 420
@@ -119,7 +124,8 @@ const AdaptiveSidecarLayout = ({
   restoreFocusRef,
   dataCapture,
   source,
-  onTelemetry
+  onTelemetry,
+  inlineMainPadding = 0
 }: AdaptiveSidecarLayoutProps) => {
   const theme = useTheme()
   const prefersReducedMotion = useReducedMotion()
@@ -669,7 +675,20 @@ const AdaptiveSidecarLayout = ({
             ) : null}
           </AnimatePresence>
           {inlineOpen && side === 'left' ? resizeHandle : null}
-          <Box data-capture={dataCapture ? `${dataCapture}-main` : undefined} sx={{ minWidth: 0 }}>
+          <Box
+            data-capture={dataCapture ? `${dataCapture}-main` : undefined}
+            sx={theme => ({
+              minWidth: 0,
+              p: layoutInlineOpen && !viewportExtent ? inlineMainPadding : 0,
+              transition: theme.transitions.create(['padding'], {
+                duration: theme.transitions.duration.standard,
+                easing: SIDECAR_LAYOUT_EASING
+              }),
+              '@media (prefers-reduced-motion: reduce)': {
+                transition: 'none'
+              }
+            })}
+          >
             {children}
           </Box>
           {inlineOpen && side === 'right' ? resizeHandle : null}
