@@ -30,7 +30,12 @@
 - **Discovery confirmado:** foundation TASK-990 existe (`src/lib/finance/multi-currency/*`), `FinanceCurrency='CLP'|'USD'|'MXN'` (CLF fuera), provider `clf-from-indicators` resuelve CLP↔CLF desde `economic_indicators.UF` (fresco 2026-06-19). El ADR `GREENHOUSE_CLF_INDEXED_FINANCE_CORE_V1` no existía.
 - **Slice 0 entregado:** redactado `docs/architecture/GREENHOUSE_CLF_INDEXED_FINANCE_CORE_V1.md` (status `Proposed`) con mapa de invariantes campo-por-campo, split de tipos (`FinanceNativeUnit`/`IndexedUnit`/`SettlementCurrency`/`AccountCurrency`), tabla de policy UF→CLP por evento, modelo de snapshot (Option A recomendado), event shape canónico, signals, fail-closed y rollout. Indexado en `DECISIONS_INDEX.md` (Proposed).
 - **Decisión de policy (operador 2026-06-20):** UF→CLP = **reconocimiento a fecha del evento legal + remedición del cash CLP a fecha de pago; delta = `indexed_unit_revaluation`** (separado de FX gain/loss). Ratificar en la aceptación del ADR.
-- **STOP (gate duro):** la spec prohíbe implementar sin ADR aceptado. El ADR queda `Proposed` pendiente de 3 confirmaciones Finance (§0: ratificar policy, confirmar que no hay instrumento UF-cash real, confirmar precedencia de evidencia UF). **No se escribió código funcional de CLF.** Secuencia: TASK-990 (base MXN) sigue `in-progress`/no desplegada — el código de TASK-995 no debería empezar hasta que esa base esté operativamente estable.
+- **ADR ACEPTADO (operador, 2026-06-20, "avancemos"):** status `Accepted`; snapshot = Option A; Q2/Q3 quedan como defaults V1 conservadores (reversibles) hasta confirmación Finance.
+
+## Delta 2026-06-20 — Slice 1 (type split) entregado; STOP antes de Slice 2
+
+- **Slice 1 hecho (aditivo, flags-off, sin schema ni cambio de comportamiento):** `src/lib/finance/contracts.ts` agrega `IndexedUnit='CLF'`, `FinanceNativeUnit=FinanceCurrency|IndexedUnit`, y aliases `SettlementCurrency`/`AccountCurrency`/`PaymentOrderCurrency`/`ReportingCurrency`. `src/lib/finance/currency-domain.ts` agrega `isIndexedUnit`/`toIndexedUnit`/`isCashCurrency`/`toFinanceNativeUnit`/`assertCashCurrency` (guard que rechaza CLF en planos cash). `toFinanceCurrency('CLF')` sigue lanzando. 9 tests bloquean el contrato (`indexed-unit-currency-split.test.ts`). Gates: lint + tsc verdes.
+- **STOP antes de Slice 2 (gate duro de secuencia):** Slice 2 es la migración de schema (expand de `income`/`expenses`/`payment_obligations` + constraints) y NO debe iniciar hasta que la base MXN (TASK-990) esté operativamente estable y desplegada. Los guards de Slice 1 aún no están cableados a los write paths reales (eso es Slice 4); por ahora son la primitive compile-time + tests. **No se escribió migración ni se mutó PG.**
 
 ## Summary
 
