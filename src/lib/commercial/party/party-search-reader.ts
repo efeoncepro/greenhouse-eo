@@ -4,6 +4,7 @@ import { sql } from 'kysely'
 
 import { getDb } from '@/lib/db'
 
+import { buildPrivateAssetDownloadUrl } from '@/lib/storage/greenhouse-assets'
 import {
   listHubSpotCandidates,
   normalizeCompanyDomain,
@@ -21,6 +22,7 @@ interface OrganizationSearchRow {
   lifecycle_stage: string
   updated_at: Date | string
   website_url: string | null
+  logo_asset_id: string | null
 }
 
 export interface PartySearchFilters {
@@ -38,6 +40,7 @@ export interface PartySearchItem {
   displayName: string
   lifecycleStage?: LifecycleStage
   domain?: string | null
+  logoUrl?: string | null
   lastActivityAt?: string | null
   canAdopt: boolean
 }
@@ -82,6 +85,7 @@ const mapOrganizationRow = (row: OrganizationSearchRow): PartySearchItem => {
     displayName: row.organization_name || row.legal_name || row.hubspot_company_id || row.organization_id,
     lifecycleStage,
     domain: normalizeCompanyDomain(row.website_url),
+    logoUrl: row.logo_asset_id ? `${buildPrivateAssetDownloadUrl(row.logo_asset_id)}?inline=1` : null,
     lastActivityAt: toIsoString(row.updated_at),
     canAdopt: false
   }
@@ -171,6 +175,7 @@ const listVisibleOrganizations = async ({
       'o.legal_name',
       'o.lifecycle_stage',
       'o.updated_at',
+      'o.logo_asset_id',
       'c.website_url'
     ])
     .where('o.active', '=', true)

@@ -1,12 +1,15 @@
 'use client'
 
 import {
+  Children,
+  Fragment,
   forwardRef,
-  useId,
   useMemo,
   useRef,
   useState,
+  type MouseEvent,
   type HTMLAttributes,
+  type Key,
   type ReactNode,
   type SyntheticEvent
 } from 'react'
@@ -15,8 +18,8 @@ import Autocomplete from '@mui/material/Autocomplete'
 import type { AutocompleteCloseReason } from '@mui/material/Autocomplete'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
-import ButtonBase from '@mui/material/ButtonBase'
 import ClickAwayListener from '@mui/material/ClickAwayListener'
+import CircularProgress from '@mui/material/CircularProgress'
 import InputAdornment from '@mui/material/InputAdornment'
 import InputBase from '@mui/material/InputBase'
 import Paper from '@mui/material/Paper'
@@ -38,6 +41,7 @@ export interface ContextChipOption {
   value: string
   label: string
   secondary?: string
+  logoUrl?: string | null
   disabled?: boolean
   meta?: Record<string, unknown>
 }
@@ -64,6 +68,9 @@ interface ContextChipCommonProps {
 
   /** Micro-label shown below the chip when status='blocking-empty' (e.g. "Requerido"). */
   requiredHint?: string
+
+  /** Compact boxed treatment for dense workbench rails. */
+  density?: 'regular' | 'compact'
 
   /**
    * When true, the chip fills 100% of its parent width and drops the 40ch cap.
@@ -117,16 +124,52 @@ const isCustomMode = (props: ContextChipProps): props is ContextChipCustomProps 
  * Borderless — the Paper provides the visual boundary.
  */
 const StyledSearchInput = styled(InputBase)(({ theme }) => ({
-  padding: theme.spacing(1.25, 1.5),
-  width: '100%',
-  borderBottom: `1px solid ${theme.palette.divider}`,
+  margin: theme.spacing(1, 1, 0.75),
+  padding: theme.spacing(0.75, 1),
+  width: `calc(100% - ${theme.spacing(2)})`,
+  minHeight: 38,
+  border: `1px solid ${alpha(theme.palette.divider, 0.92)}`,
+  borderRadius: `${theme.shape.customBorderRadius.md}px`,
+  backgroundColor: alpha(theme.palette.background.default, 0.58),
+  boxShadow: 'none',
+  transition: theme.transitions.create(['border-color', 'box-shadow', 'background-color'], {
+    duration: theme.transitions.duration.shortest
+  }),
+  '&:focus-within': {
+    borderColor: alpha(theme.palette.primary.main, 0.38),
+    backgroundColor: theme.palette.background.paper,
+    boxShadow: `0 0 0 3px ${alpha(theme.palette.primary.main, 0.055)}`
+  },
   '& input': {
     borderRadius: 0,
     padding: 0,
-    fontSize: '0.875rem',
-    fontFamily: theme.typography.fontFamily
+    fontFamily: theme.typography.fontFamily,
+    ...theme.typography.body2,
+    lineHeight: 1.35
+  },
+  '& input::placeholder': {
+    color: theme.palette.text.secondary,
+    opacity: 0.82
+  },
+  '@media (prefers-reduced-motion: reduce)': {
+    transition: 'none',
+    '&:focus-within': {
+      transform: 'none'
+    }
   }
 }))
+
+const buildOptionInitials = (label: string): string => {
+  const words = label
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean)
+
+  if (words.length === 0) return '—'
+  if (words.length === 1) return words[0]?.slice(0, 2).toUpperCase() ?? '—'
+
+  return `${words[0]?.[0] ?? ''}${words[1]?.[0] ?? ''}`.toUpperCase()
+}
 
 /**
  * Resolves the background tint color for the popover notice footer based on
@@ -185,7 +228,7 @@ const ContextChipAutocompletePaper = forwardRef<HTMLDivElement, ContextChipPaper
           ...(Array.isArray(sx) ? sx : sx ? [sx] : [])
         ]}
       >
-        {children}
+        <Box sx={{ minWidth: 0 }}>{Children.toArray(children)}</Box>
         {notice ? (
           <Stack
             direction='row'
@@ -253,26 +296,43 @@ const ContextChip = forwardRef<HTMLButtonElement, ContextChipProps>(function Con
     ariaLabel,
     prominence = 'primary',
     requiredHint,
+    density = 'regular',
     fullWidth = false
   } = props
 
-  const labelId = useId()
-  const errorId = useId()
-  const liveRegionId = useId()
+  const stableIdBase = useMemo(() => {
+    const raw = `${testId ?? ariaLabel ?? label}-${icon}`
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '')
+
+    return `context-chip-${raw || 'field'}`
+  }, [ariaLabel, icon, label, testId])
+
+  const labelId = `${stableIdBase}-label`
+  const errorId = `${stableIdBase}-error`
+  const liveRegionId = `${stableIdBase}-live`
+  const autocompleteId = `${stableIdBase}-autocomplete`
 
   const anchorRef = useRef<HTMLButtonElement | null>(null)
+  const openedAtRef = useRef(0)
   const [open, setOpen] = useState(false)
   const [internalInputValue, setInternalInputValue] = useState('')
 
   const status: ContextChipStatus = statusProp ?? (value ? 'filled' : 'empty')
   const isInteractive = status !== 'locked' && !disabled
 
-  const handleOpen = () => {
-    if (!isInteractive) return
+  const handleOpen = (event?: MouseEvent<HTMLButtonElement>) => {
+    event?.preventDefault()
+    event?.stopPropagation()
+    openedAtRef.current = Date.now()
     setOpen(true)
   }
 
   const handleClose = () => {
+    if (Date.now() - openedAtRef.current < 250) return
     setOpen(false)
   }
 
@@ -289,6 +349,8 @@ const ContextChip = forwardRef<HTMLButtonElement, ContextChipProps>(function Con
       : null
 
   const inputValue = !isCustomMode(props) ? (props.inputValue ?? internalInputValue) : ''
+  const selectOptionsCount = !isCustomMode(props) ? props.options.length : 0
+  const isSelectLoading = !isCustomMode(props) && props.loading === true
 
   // Notice to render inside the Autocomplete Paper footer. Only defined for
   // select mode — custom mode has no listbox to pair a notice with.
@@ -317,11 +379,15 @@ const ContextChip = forwardRef<HTMLButtonElement, ContextChipProps>(function Con
 
   return (
     <>
-      <ButtonBase
+      <Box
+        component='button'
+        type='button'
         ref={node => {
-          anchorRef.current = node
-          if (typeof ref === 'function') ref(node)
-          else if (ref) ref.current = node
+          const buttonNode = node as HTMLButtonElement | null
+
+          anchorRef.current = buttonNode
+          if (typeof ref === 'function') ref(buttonNode)
+          else if (ref) ref.current = buttonNode
         }}
         disabled={!isInteractive}
         onClick={handleOpen}
@@ -335,7 +401,6 @@ const ContextChip = forwardRef<HTMLButtonElement, ContextChipProps>(function Con
         aria-labelledby={labelId}
         aria-required={required}
         data-testid={testId}
-        focusRipple
         sx={theme => {
           const isOpen = open
           const isFilled = status === 'filled'
@@ -343,12 +408,13 @@ const ContextChip = forwardRef<HTMLButtonElement, ContextChipProps>(function Con
           const isLocked = status === 'locked'
           const isBlocking = status === 'blocking-empty'
           const isInline = prominence === 'inline'
+          const isCompact = density === 'compact'
 
           const borderColor = isInvalid
             ? theme.palette.error.main
             : isBlocking
               ? theme.palette.warning.main
-              : isFilled || isOpen
+              : isOpen
                 ? theme.palette.primary.main
                 : alpha(theme.palette.divider, 1)
 
@@ -356,18 +422,18 @@ const ContextChip = forwardRef<HTMLButtonElement, ContextChipProps>(function Con
             ? theme.palette.action.disabledBackground
             : isBlocking
               ? alpha(theme.palette.warning.main, 0.08)
-              : isFilled
-                ? alpha(theme.palette.primary.main, theme.palette.mode === 'dark' ? 0.18 : 0.08)
+            : isFilled
+                ? theme.palette.background.default
                 : isInvalid
                   ? alpha(theme.palette.error.main, 0.06)
                   : 'transparent'
 
           const textColor = isFilled
-            ? theme.palette.primary.main
-            : isInvalid
-              ? theme.palette.error.main
-              : isBlocking
-                ? theme.palette.warning.dark
+            ? theme.palette.text.primary
+              : isInvalid
+                ? theme.palette.error.main
+                : isBlocking
+                  ? theme.palette.warning.dark
                 : isLocked
                   ? theme.palette.text.disabled
                   : theme.palette.text.primary
@@ -375,19 +441,23 @@ const ContextChip = forwardRef<HTMLButtonElement, ContextChipProps>(function Con
           // Inline prominence: no box, inline text with hover underline, same popover behavior.
           if (isInline) {
             return {
-              minHeight: 28,
+              minHeight: 34,
               minWidth: 0,
-              px: 0.5,
-              py: 0.25,
-              borderRadius: `${theme.shape.customBorderRadius.sm}px`,
-              border: '1px solid transparent',
-              backgroundColor: 'transparent',
+              font: 'inherit',
+              appearance: 'none',
+              cursor: isInteractive ? 'pointer' : 'default',
+              px: 0.85,
+              py: 0.45,
+              borderRadius: `${theme.shape.customBorderRadius.md}px`,
+              border: `1px solid ${alpha(theme.palette.divider, 0.88)}`,
+              backgroundColor: theme.palette.background.paper,
               color: textColor,
               display: 'inline-flex',
-              alignItems: 'baseline',
+              alignItems: 'center',
               gap: 0.75,
               textAlign: 'left',
-              transition: theme.transitions.create(['background-color', 'border-color'], {
+              boxShadow: 'none',
+        transition: theme.transitions.create(['background-color', 'border-color', 'box-shadow'], {
                 duration: 200,
                 easing: 'cubic-bezier(0.2, 0, 0, 1)'
               }),
@@ -395,32 +465,33 @@ const ContextChip = forwardRef<HTMLButtonElement, ContextChipProps>(function Con
               '&:hover': isInteractive
                 ? {
                     backgroundColor: alpha(theme.palette.primary.main, 0.04),
-                    textDecoration: 'underline',
-                    textDecorationStyle: 'dotted',
-                    textDecorationColor: theme.palette.primary.main,
-                    textUnderlineOffset: 4
+                    borderColor: alpha(theme.palette.primary.main, 0.32),
                   }
                 : undefined,
-              '&.Mui-focusVisible': {
+              '&:active': isInteractive ? { transform: 'translateY(0)' } : undefined,
+              '&:focus-visible': {
                 outline: `2px solid ${theme.palette.primary.main}`,
                 outlineOffset: 2
               },
-              '&.Mui-disabled': { opacity: 1, pointerEvents: 'none' }
+              '&:disabled': { opacity: 1, pointerEvents: 'none' }
             }
           }
 
           // Primary prominence: boxed chip (default).
           return {
-            minHeight: 44,
-            minWidth: 0,
+              minHeight: isCompact ? 40 : 44,
+              minWidth: 0,
+              font: 'inherit',
+              appearance: 'none',
+              cursor: isInteractive ? 'pointer' : 'default',
 
             // fullWidth makes the chip claim 100% of its parent flex/grid cell and
             // drops the natural 40ch content-cap so a distributed-row layout can
             // balance 3 chips across the strip instead of leaving dead space.
             width: fullWidth ? '100%' : undefined,
             maxWidth: fullWidth ? 'none' : '40ch',
-            px: 2,
-            py: 1.25,
+            px: isCompact ? 1.25 : 2,
+            py: isCompact ? 0.75 : 1.25,
             borderRadius: `${theme.shape.customBorderRadius.md}px`,
 
             // Solid border on all states (2026 enterprise — Linear, Stripe).
@@ -431,9 +502,14 @@ const ContextChip = forwardRef<HTMLButtonElement, ContextChipProps>(function Con
             color: textColor,
             display: 'inline-flex',
             alignItems: 'center',
-            gap: 1,
+            gap: isCompact ? 0.75 : 1,
             textAlign: 'left',
-            transition: theme.transitions.create(['background-color', 'border-color', 'box-shadow', 'transform'], {
+            boxShadow: isOpen
+              ? `0 8px 22px -22px ${alpha(theme.palette.primary.main, 0.76)}, 0 0 0 3px ${alpha(theme.palette.primary.main, 0.075)}`
+              : isFilled
+                ? `inset 0 0 0 1px ${alpha(theme.palette.common.black, 0.025)}`
+                : 'none',
+            transition: theme.transitions.create(['background-color', 'border-color', 'box-shadow'], {
               duration: 200,
               easing: 'cubic-bezier(0.2, 0, 0, 1)'
             }),
@@ -443,15 +519,17 @@ const ContextChip = forwardRef<HTMLButtonElement, ContextChipProps>(function Con
                   borderColor: isBlocking ? theme.palette.warning.main : theme.palette.primary.main,
                   backgroundColor: isBlocking
                     ? alpha(theme.palette.warning.main, 0.12)
-                    : alpha(theme.palette.primary.main, theme.palette.mode === 'dark' ? 0.14 : 0.06)
+                    : alpha(theme.palette.primary.main, theme.palette.mode === 'dark' ? 0.14 : 0.06),
+                  boxShadow: isOpen
+                    ? `0 8px 22px -22px ${alpha(theme.palette.primary.main, 0.76)}, 0 0 0 3px ${alpha(theme.palette.primary.main, 0.075)}`
+                    : 'none'
                 }
               : undefined,
-            '&:active': isInteractive ? { transform: 'scale(0.98)' } : undefined,
-            '&.Mui-focusVisible': {
+            '&:focus-visible': {
               outline: `2px solid ${theme.palette.primary.main}`,
               outlineOffset: 2
             },
-            '&.Mui-disabled': { opacity: 1, pointerEvents: 'none' }
+            '&:disabled': { opacity: 1, pointerEvents: 'none' }
           }
         }}
       >
@@ -469,16 +547,16 @@ const ContextChip = forwardRef<HTMLButtonElement, ContextChipProps>(function Con
                       : icon
               }
               aria-hidden='true'
-              sx={{ fontSize: 14, flexShrink: 0 }}
+              sx={{ fontSize: 16, flexShrink: 0, color: status === 'filled' ? 'primary.main' : 'text.secondary' }}
             />
             <Typography
               id={labelId}
               component='span'
               variant='body2'
               sx={{
-                fontWeight: status === 'filled' ? 500 : 400,
+                fontWeight: status === 'filled' ? 600 : 400,
                 color: 'inherit',
-                lineHeight: 1.3,
+                lineHeight: 1.35,
                 whiteSpace: 'nowrap',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis'
@@ -501,16 +579,44 @@ const ContextChip = forwardRef<HTMLButtonElement, ContextChipProps>(function Con
                       : icon
               }
               aria-hidden='true'
-              sx={{ fontSize: 16, flexShrink: 0 }}
+              sx={theme => ({
+                width: 32,
+                height: 32,
+                borderRadius: `${theme.shape.customBorderRadius.sm}px`,
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor:
+                  status === 'blocking-empty'
+                    ? alpha(theme.palette.warning.main, 0.12)
+                    : status === 'filled'
+                      ? alpha(theme.palette.primary.main, 0.12)
+                      : theme.palette.background.default,
+                border: `1px solid ${
+                  status === 'blocking-empty'
+                    ? alpha(theme.palette.warning.main, 0.24)
+                    : status === 'filled'
+                      ? alpha(theme.palette.primary.main, 0.22)
+                      : theme.palette.divider
+                }`,
+                color:
+                  status === 'blocking-empty'
+                    ? 'warning.dark'
+                    : status === 'filled'
+                      ? 'primary.main'
+                      : 'text.secondary',
+                fontSize: 17,
+                flexShrink: 0
+              })}
             />
-            <Stack spacing={0.5} sx={{ minWidth: 0, flex: 1 }}>
+            <Stack spacing={density === 'compact' ? 0.15 : 0.5} sx={{ minWidth: 0, flex: 1 }}>
               <Typography
                 id={labelId}
                 variant='caption'
                 sx={{
-                  lineHeight: 1.2,
+                  lineHeight: 1.25,
                   color: 'text.secondary',
-                  fontWeight: 500,
+                  fontWeight: 600,
                   letterSpacing: 0
                 }}
               >
@@ -522,20 +628,18 @@ const ContextChip = forwardRef<HTMLButtonElement, ContextChipProps>(function Con
                 ) : null}
               </Typography>
               <Typography
-                variant={status === 'filled' ? 'subtitle1' : 'body1'}
+                variant='body1'
                 sx={{
-                  fontWeight: status === 'filled' ? 500 : 400,
-                  color:
-                    status === 'empty' || status === 'blocking-empty' ? 'text.secondary' : 'inherit',
-                  lineHeight: 1.3,
+                  fontWeight: status === 'filled' ? 600 : 400,
+                  color: status === 'empty' ? 'text.secondary' : 'inherit',
+                  lineHeight: 1.35,
                   whiteSpace: 'nowrap',
                   overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  fontStyle: status === 'empty' ? 'italic' : 'normal'
+                  textOverflow: 'ellipsis'
                 }}
               >
                 {status === 'blocking-empty' ? (
-                  <Box component='span' sx={{ color: 'warning.dark', fontWeight: 500 }}>
+                  <Box component='span' sx={{ color: 'warning.dark', fontWeight: 600 }}>
                     {displayText}
                   </Box>
                 ) : (
@@ -559,7 +663,7 @@ const ContextChip = forwardRef<HTMLButtonElement, ContextChipProps>(function Con
             ) : null}
           </>
         )}
-      </ButtonBase>
+      </Box>
 
       {prominence === 'primary' && status === 'blocking-empty' && requiredHint ? (
         <Typography
@@ -569,7 +673,7 @@ const ContextChip = forwardRef<HTMLButtonElement, ContextChipProps>(function Con
             display: 'block',
             mt: 0.5,
             color: 'warning.main',
-            fontWeight: 500,
+            fontWeight: 600,
             lineHeight: 1.2
           }}
           aria-hidden='true'
@@ -593,7 +697,7 @@ const ContextChip = forwardRef<HTMLButtonElement, ContextChipProps>(function Con
       ) : null}
 
       {!isCustomMode(props) && props.liveMessage ? (
-        <Box id={liveRegionId} component='span' aria-live='polite' sx={visuallyHidden}>
+        <Box id={liveRegionId} component='span' aria-live='polite' data-gvc-ignore-layout='true' sx={visuallyHidden}>
           {props.liveMessage}
         </Box>
       ) : null}
@@ -636,7 +740,7 @@ const ContextChip = forwardRef<HTMLButtonElement, ContextChipProps>(function Con
             { name: 'preventOverflow', options: { padding: 16 } }
           ]}
         >
-          <ClickAwayListener onClickAway={handleClose}>
+          <ClickAwayListener mouseEvent='onMouseDown' touchEvent='onTouchStart' onClickAway={handleClose}>
             <Paper
               elevation={0}
               sx={theme => ({
@@ -651,7 +755,70 @@ const ContextChip = forwardRef<HTMLButtonElement, ContextChipProps>(function Con
               role='dialog'
               aria-labelledby={labelId}
             >
+              <Stack
+                direction='row'
+                spacing={1.25}
+                alignItems='center'
+                sx={theme => ({
+                  px: 1.25,
+                  py: 1,
+                  borderBottom: `1px solid ${alpha(theme.palette.divider, 0.82)}`,
+                  backgroundColor: alpha(theme.palette.background.default, 0.46)
+                })}
+              >
+                <Box
+                  component='span'
+                  aria-hidden='true'
+                  sx={theme => ({
+                    width: 30,
+                    height: 30,
+                    borderRadius: `${theme.shape.customBorderRadius.md}px`,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: 'primary.main',
+                    backgroundColor: alpha(theme.palette.primary.main, 0.1),
+                    border: `1px solid ${alpha(theme.palette.primary.main, 0.18)}`
+                  })}
+                >
+	                    <i className={icon} aria-hidden='true' style={{ fontSize: 17 }} />
+                </Box>
+                <Stack spacing={0.15} sx={{ minWidth: 0, flex: 1 }}>
+                  <Typography variant='subtitle2' sx={{ lineHeight: 1.2 }}>
+                    {label}
+                  </Typography>
+                  <Typography
+                    variant='caption'
+                    color='text.secondary'
+                    sx={{ lineHeight: 1.25, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+                  >
+                    {(selectedOption?.label ?? displayText) || (props.searchPlaceholder ?? 'Selecciona una opción')}
+                  </Typography>
+                </Stack>
+                <Typography
+                  variant='caption'
+                  sx={theme => ({
+                    px: 0.9,
+                    py: 0.35,
+                    borderRadius: `${theme.shape.customBorderRadius.sm}px`,
+                    color: isSelectLoading || selectOptionsCount > 0 ? 'primary.main' : 'text.secondary',
+                    backgroundColor:
+                      isSelectLoading || selectOptionsCount > 0
+                        ? alpha(theme.palette.primary.main, 0.12)
+                        : alpha(theme.palette.text.primary, 0.05),
+                    fontWeight: 600,
+                    whiteSpace: 'nowrap'
+                  })}
+                >
+                  {isSelectLoading
+                    ? 'Consultando'
+                    : selectOptionsCount === 1
+                      ? '1 resultado'
+                      : `${selectOptionsCount} resultados`}
+                </Typography>
+              </Stack>
               <Autocomplete<ContextChipOption, false, true, false>
+                id={autocompleteId}
                 open
                 onClose={handleAutocompleteClose}
                 disablePortal
@@ -673,11 +840,66 @@ const ContextChip = forwardRef<HTMLButtonElement, ContextChipProps>(function Con
                 }}
                 options={props.options}
                 getOptionLabel={option => option.label}
+                getOptionKey={option => `${option.value}-${option.label}-${props.options.indexOf(option)}`}
                 getOptionDisabled={option => option.disabled === true}
                 isOptionEqualToValue={(opt, val) => opt.value === val.value}
                 loading={props.loading}
-                loadingText={props.loadingText ?? 'Cargando…'}
-                noOptionsText={props.noOptionsText ?? 'Sin resultados'}
+                loadingText={
+                  <Stack direction='row' spacing={1.25} alignItems='center'>
+                    <CircularProgress size={18} thickness={4} />
+                    <Stack spacing={0.2}>
+                      <Typography variant='body2' sx={{ fontWeight: 600 }}>
+                        {props.loadingText ?? 'Cargando…'}
+                      </Typography>
+                      <Typography variant='caption' color='text.secondary'>
+                        Actualizando opciones disponibles.
+                      </Typography>
+                    </Stack>
+                  </Stack>
+                }
+                noOptionsText={
+                  isSelectLoading ? (
+                    <Stack direction='row' spacing={1.25} alignItems='center'>
+                      <CircularProgress size={18} thickness={4} />
+                      <Stack spacing={0.2}>
+                        <Typography variant='body2' sx={{ fontWeight: 600 }}>
+                          {props.loadingText ?? 'Cargando…'}
+                        </Typography>
+                        <Typography variant='caption' color='text.secondary'>
+                          Actualizando opciones disponibles.
+                        </Typography>
+                      </Stack>
+                    </Stack>
+                  ) : (
+                    <Stack direction='row' spacing={1.25} alignItems='flex-start'>
+                    <Box
+                      component='span'
+                      aria-hidden='true'
+                      sx={theme => ({
+                        mt: 0.1,
+                        width: 28,
+                        height: 28,
+                        borderRadius: `${theme.shape.customBorderRadius.sm}px`,
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        color: 'text.secondary',
+                        backgroundColor: alpha(theme.palette.text.primary, 0.05)
+                      })}
+                    >
+                      <i className='tabler-search-off' aria-hidden='true' style={{ fontSize: 16 }} />
+                    </Box>
+                    <Stack spacing={0.2}>
+                      <Typography variant='body2' sx={{ fontWeight: 600 }}>
+                        {props.noOptionsText ?? 'Sin resultados'}
+                      </Typography>
+                      <Typography variant='caption' color='text.secondary'>
+                        Ajusta la búsqueda o revisa el contexto seleccionado.
+                      </Typography>
+                    </Stack>
+                  </Stack>
+                  )
+                }
                 filterOptions={(options, { inputValue }) => {
                   if (props.filterOptions) {
                     return props.filterOptions(options, inputValue)
@@ -705,14 +927,43 @@ const ContextChip = forwardRef<HTMLButtonElement, ContextChipProps>(function Con
                         <i className='tabler-search' aria-hidden='true' style={{ fontSize: 18 }} />
                       </InputAdornment>
                     }
+                    endAdornment={
+                      <InputAdornment position='end' sx={{ ml: 1, display: { xs: 'none', sm: 'flex' } }}>
+                        <Typography
+                          variant='caption'
+                          color='text.secondary'
+                          sx={theme => ({
+                            px: 0.75,
+                            py: 0.25,
+                            borderRadius: `${theme.shape.customBorderRadius.sm}px`,
+                            border: `1px solid ${alpha(theme.palette.divider, 0.9)}`,
+                            backgroundColor: alpha(theme.palette.background.default, 0.72),
+                            lineHeight: 1.15
+                          })}
+                        >
+                          Enter
+                        </Typography>
+                      </InputAdornment>
+                    }
                   />
                 )}
-                renderOption={(optionProps: HTMLAttributes<HTMLLIElement>, option) => {
+                renderOption={(optionProps: HTMLAttributes<HTMLLIElement>, option, optionState) => {
+                  const {
+                    key: _muiOptionKey,
+                    style: optionStyle,
+                    ...resolvedOptionProps
+                  } = optionProps as HTMLAttributes<HTMLLIElement> & { key?: Key }
+
+                  void _muiOptionKey
+
+                  const isSelected = option.value === selectedOption?.value
+                  const optionKey = `${option.value}-${option.label}-${optionState.index}`
+
                   const optionContent = props.renderOption ? (
                     props.renderOption(option)
                   ) : (
                     <>
-                      <Typography variant='body2' sx={{ fontWeight: 500, lineHeight: 1.3, width: '100%' }}>
+                      <Typography variant='body2' sx={{ fontWeight: 600, lineHeight: 1.3, width: '100%' }}>
                         {option.label}
                       </Typography>
                       {option.secondary ? (
@@ -724,18 +975,89 @@ const ContextChip = forwardRef<HTMLButtonElement, ContextChipProps>(function Con
                   )
 
                   return (
+                    <Fragment key={optionKey}>
                     <li
-                      {...optionProps}
-                      key={option.value}
+                      {...resolvedOptionProps}
                       style={{
+                        ...optionStyle,
                         display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'flex-start',
-                        gap: 2
+                        alignItems: 'center',
+                        gap: 10
                       }}
                     >
-                      {optionContent}
+                      <Box
+                        component='span'
+                        aria-hidden='true'
+                        sx={theme => ({
+                          position: 'relative',
+                          width: 30,
+                          height: 30,
+                          borderRadius: `${theme.shape.customBorderRadius.md}px`,
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          flexShrink: 0,
+                          color: isSelected ? 'primary.main' : 'text.secondary',
+                          backgroundColor: isSelected
+                            ? alpha(theme.palette.primary.main, 0.1)
+                            : alpha(theme.palette.text.primary, 0.04),
+                          border: `1px solid ${
+                            isSelected ? alpha(theme.palette.primary.main, 0.2) : alpha(theme.palette.divider, 0.8)
+                          }`
+                        })}
+                      >
+                        {option.logoUrl ? (
+                          <Box
+                            component='img'
+                            src={option.logoUrl}
+                            alt=''
+                            loading='lazy'
+                            onError={event => {
+                              event.currentTarget.style.display = 'none'
+                            }}
+                            sx={theme => ({
+                              position: 'absolute',
+                              inset: 0,
+                              width: '100%',
+                              height: '100%',
+                              objectFit: 'contain',
+                              p: 0.5,
+                              borderRadius: `${theme.shape.customBorderRadius.md}px`,
+                              backgroundColor: theme.palette.background.paper
+                            })}
+                          />
+                        ) : null}
+                        <Typography variant='caption' component='span' sx={{ fontWeight: 700, lineHeight: 1 }}>
+                          {buildOptionInitials(option.label)}
+                        </Typography>
+                      </Box>
+	                      <Stack spacing={0.1} sx={{ minWidth: 0, flex: 1 }}>
+                        {optionContent}
+                      </Stack>
+                      <Box
+                        component='span'
+                        aria-hidden='true'
+                        sx={theme => ({
+                          width: 26,
+                          height: 26,
+                          borderRadius: `${theme.shape.customBorderRadius.sm}px`,
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          flexShrink: 0,
+                          color: isSelected ? 'primary.main' : 'text.disabled',
+                          opacity: isSelected ? 1 : 0,
+                          transform: isSelected ? 'scale(1)' : 'scale(0.92)',
+                          transition: theme.transitions.create(['opacity', 'transform'], {
+                            duration: theme.transitions.duration.shortest
+                          }),
+                          '@media (prefers-reduced-motion: reduce)': { transition: 'none' }
+                        })}
+                      >
+                        <i className='tabler-check' aria-hidden='true' style={{ fontSize: 17 }} />
+                      </Box>
                     </li>
+                    </Fragment>
                   )
                 }}
                 slotProps={{
@@ -749,17 +1071,39 @@ const ContextChip = forwardRef<HTMLButtonElement, ContextChipProps>(function Con
                   },
                   listbox: {
                     sx: theme => ({
-                      maxHeight: 320,
-                      padding: theme.spacing(0.5),
+	                      maxHeight: 292,
+	                      padding: theme.spacing(0.25, 1, 1),
                       '& .MuiAutocomplete-option': {
-                        borderRadius: `${theme.shape.customBorderRadius.sm}px`,
-                        padding: theme.spacing(1.25, 1.75),
-                        margin: theme.spacing(0.25, 0),
-                        alignItems: 'flex-start !important'
+                        borderRadius: `${theme.shape.customBorderRadius.md}px`,
+	                        padding: theme.spacing(0.85, 1),
+	                        margin: theme.spacing(0.25, 0),
+	                        minHeight: 50,
+                        alignItems: 'center !important',
+                        border: '1px solid transparent',
+                        transition: theme.transitions.create(['background-color', 'border-color', 'box-shadow', 'color'], {
+                          duration: theme.transitions.duration.shortest
+                        }),
+                        '&.Mui-focused': {
+                          backgroundColor: alpha(theme.palette.primary.main, 0.035),
+                          borderColor: alpha(theme.palette.primary.main, 0.14),
+                          boxShadow: `inset 0 0 0 1px ${alpha(theme.palette.primary.main, 0.045)}`
+                        },
+                        '&[aria-disabled="true"]': {
+                          opacity: 0.56
+                        }
                       },
                       '& .MuiAutocomplete-option[aria-selected="true"]': {
-                        backgroundColor: alpha(theme.palette.primary.main, 0.12),
-                        color: theme.palette.primary.main
+                        backgroundColor: alpha(theme.palette.primary.main, 0.09),
+                        borderColor: alpha(theme.palette.primary.main, 0.3),
+                        color: theme.palette.text.primary
+                      },
+                      '& .MuiAutocomplete-loading, & .MuiAutocomplete-noOptions': {
+                        margin: theme.spacing(0.25, 1.25, 1.25),
+                        padding: theme.spacing(1.35, 1.5),
+                        borderRadius: `${theme.shape.customBorderRadius.md}px`,
+                        backgroundColor: alpha(theme.palette.background.default, 0.62),
+                        border: `1px solid ${alpha(theme.palette.divider, 0.72)}`,
+                        color: theme.palette.text.secondary
                       }
                     })
                   }

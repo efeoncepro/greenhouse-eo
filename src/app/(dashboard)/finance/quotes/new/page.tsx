@@ -36,7 +36,9 @@ const QuoteBuilderNewPage = async () => {
 
   const [templateRows, orgResult] = await Promise.all([
     listTemplates({ activeOnly: true }).catch(() => []),
-    getOrganizationList({ page: 1, pageSize: 200, status: 'active' }).catch(() => ({ items: [] as Array<{ organizationId: string; organizationName: string }> }))
+    getOrganizationList({ page: 1, pageSize: 200, status: 'active' }).catch(() => ({
+      items: [] as Array<{ organizationId: string; organizationName: string; logoUrl?: string | null }>
+    }))
   ])
 
   const templates: QuoteCreateTemplate[] = templateRows.map(template => ({
@@ -56,7 +58,8 @@ const QuoteBuilderNewPage = async () => {
 
   const organizations: QuoteCreateOrganization[] = orgResult.items.map(org => ({
     organizationId: String(org.organizationId),
-    organizationName: String(org.organizationName)
+    organizationName: String(org.organizationName),
+    logoUrl: org.logoUrl ?? null
   }))
 
   return (

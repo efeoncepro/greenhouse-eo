@@ -13,6 +13,9 @@ type StyledMainProps = {
 
 const StyledMain = styled.main<StyledMainProps>`
   padding: ${themeConfig.layoutPadding}px;
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  overflow-x: clip;
   ${({ isContentCompact }) =>
     isContentCompact &&
     `

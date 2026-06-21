@@ -26,4 +26,5 @@ export interface QuoteCreateTemplate {
 export interface QuoteCreateOrganization {
   organizationId: string
   organizationName: string
+  logoUrl?: string | null
 }

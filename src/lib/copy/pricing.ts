@@ -55,7 +55,7 @@ export const GH_PRICING = {
       title: 'Manual',
       subtitle: 'Crea una línea en blanco y edítala a mano',
       icon: 'tabler-edit',
-      color: 'secondary' as const
+      color: 'info' as const
     }
   },
   builderTemplatePickerTitle: 'Desde template',
@@ -74,9 +74,65 @@ export const GH_PRICING = {
     'Las cotizaciones sincronizadas con HubSpot requieren un deal vinculado.',
   builderValidationLines: 'Agrega al menos un ítem a la cotización.',
   builderSubmitErrorGeneric: 'No pudimos guardar la cotización. Intenta de nuevo.',
+  builderWizard: {
+    progressTitle: 'Flujo de cotización',
+    progressDescription: 'Completa el contexto, compón el alcance y revisa la economía antes de emitir.',
+    progressAriaLabel: 'Progreso del wizard de nueva cotización',
+    tabsAriaLabel: 'Pasos del cotizador',
+    readyLabel: 'Listo',
+    steps: {
+      context: {
+        title: 'Contexto',
+        description: 'Cliente, contacto, deal y términos',
+        panelTitle: 'Configura el contexto comercial',
+        panelDescription: 'Selecciona el cliente, vincula el deal y define los términos base antes de componer el alcance.',
+        cta: 'Continuar al alcance'
+      },
+      scope: {
+        title: 'Alcance',
+        description: 'Ítems vendibles y pricing',
+        panelTitle: 'Compón el alcance vendible',
+        panelDescription: 'Agrega roles, servicios, templates o líneas manuales. El motor de pricing recalcula en tiempo real.',
+        cta: 'Revisar economía',
+        back: 'Volver'
+      },
+      economics: {
+        title: 'Economía',
+        description: 'Totales, notas y emisión',
+        panelTitle: 'Revisa economía y emisión',
+        panelDescription: 'Valida totales, margen, notas y readiness antes de guardar o emitir la cotización.',
+        back: 'Volver al alcance',
+        reviewTitle: 'Revisión final',
+        reviewDescription: 'Confirma que el alcance, los términos y la oportunidad estén listos antes de emitir.',
+        reviewReady: 'Listo para emisión',
+        reviewPending: 'Aún hay bloqueadores',
+        reviewHintReady: 'Puedes emitir desde el panel de economía cuando el total esté calculado.',
+        reviewHintPending: 'Completa los campos pendientes o vuelve al paso correspondiente.'
+      }
+    },
+      contextSetup: {
+      identityTitle: 'Identidad comercial',
+      identityDescription: 'Define quién compra, quién responde y qué oportunidad gobierna la cotización.',
+      termsTitle: 'Pricing y vigencia',
+      termsDescription: 'Fija el modelo económico antes de enviar ítems al motor de pricing.',
+      readinessTitle: 'Readiness del contexto',
+      readinessComplete: 'Contexto completo',
+      readinessPending: 'Faltan campos para continuar',
+      helperTitle: 'Siguiente decisión',
+      lockedEdit: 'La organización no se cambia en una cotización existente.',
+      createDealInline: 'Crear deal',
+      sectionActionsLabel: 'Acciones del paso contexto',
+      completedStepLabel: 'Listo',
+      currentStepLabel: 'En curso',
+      lockedStepLabel: 'Bloqueado',
+      nextStepLabel: 'Pendiente'
+    }
+  },
 
   // Sellable item picker (drawer con 5 tabs)
   pickerTitle: 'Agregar ítem',
+  pickerEyebrow: 'Catálogo vendible',
+  pickerDescription: 'Busca roles, personas, herramientas, overhead o servicios aprobados para componer el alcance.',
   pickerTabs: {
     roles: 'Roles',
     people: 'Personas',
@@ -84,15 +140,34 @@ export const GH_PRICING = {
     overhead: 'Overhead',
     services: 'Servicios'
   } as Record<string, string>,
-  pickerSearchPlaceholder: 'Buscar por SKU o nombre...',
+  pickerTabDescriptions: {
+    roles: 'Roles con tarifa vigente y costo modelado.',
+    people: 'Personas específicas cuando el alcance requiere asignación nominal.',
+    tools: 'Herramientas y licencias que impactan el costo del servicio.',
+    overhead: 'Add-ons aprobados para cubrir gastos operativos.',
+    services: 'Servicios empaquetados que expanden varias líneas.'
+  } as Record<string, string>,
+  pickerSearchPlaceholder: 'Buscar rol, SKU, herramienta o servicio',
+  pickerSearchHint: 'Usa el catálogo aprobado para mantener pricing y margen trazables.',
+  pickerSearchShortcut: 'Enter',
+  pickerResultCount: (n: number) => `${n} resultados`,
+  pickerResultSummary: (tabLabel: string, count: number) =>
+    `${count === 1 ? '1 resultado disponible' : `${count} resultados disponibles`} en ${tabLabel}.`,
   pickerEmpty: 'No hay ítems activos para este filtro',
   pickerEmptyCta: 'Ir al catálogo',
   pickerServicesPlaceholder: 'Aún no hay servicios activos. Agrega uno en Admin › Catálogo de pricing › Servicios.',
   pickerLoadingAria: 'Cargando catálogo',
+  pickerLoadingTitle: 'Consultando catálogo',
+  pickerLoadingDescription: 'Estamos trayendo ítems vendibles y su contexto de pricing.',
   pickerSelectionNone: 'Ningún ítem seleccionado',
   pickerSelectionCountOne: (n: number) => `${n} ítem seleccionado`,
   pickerSelectionCountMany: (n: number) => `${n} ítems seleccionados`,
+  pickerSelectionHelperNone: 'Selecciona uno o más ítems para agregarlos al alcance.',
+  pickerSelectionHelperOne: 'Se agregará como una línea editable del alcance.',
+  pickerSelectionHelperMany: (n: number) => `Se agregarán ${n} líneas editables al alcance.`,
   pickerSubmit: 'Agregar seleccionados',
+  pickerSubmitCompact: 'Agregar',
+  pickerSubmitCount: (n: number) => (n === 1 ? 'Agregar 1 ítem' : `Agregar ${n} ítems`),
   pickerCancel: 'Cancelar',
   pickerClose: 'Cerrar',
   pickerTabsAriaLabel: 'Categorías de ítems vendibles',
@@ -326,6 +401,7 @@ export const GH_PRICING = {
       hint: 'Cliente o prospecto de la cotización',
       unifiedSearchPlaceholder: 'Buscar por nombre o dominio…',
       unifiedMinQuery: 'Escribe al menos 2 caracteres para buscar.',
+      unifiedSearching: 'Buscando organizaciones…',
       unifiedEmpty: 'No encontramos organizaciones con ese nombre o dominio.',
       unifiedError: 'No pudimos actualizar los resultados ahora mismo.',
       unifiedRetry: 'Reintentar',
@@ -363,12 +439,14 @@ export const GH_PRICING = {
     commercialModel: {
       label: 'Modelo comercial',
       placeholder: 'Seleccionar modelo',
-      icon: 'tabler-briefcase'
+      icon: 'tabler-briefcase',
+      multiplierSecondary: (multiplier: string) => `${multiplier} sobre tarifa base`
     },
     countryFactor: {
       label: 'País',
       placeholder: 'Seleccionar país',
-      icon: 'tabler-world'
+      icon: 'tabler-world',
+      factorSecondary: (factor: string) => `Factor ${factor}`
     },
     currency: {
       label: 'Moneda',
@@ -397,6 +475,7 @@ export const GH_PRICING = {
         contact: 'agrega un contacto',
         deal: 'vincula un deal',
         businessLine: 'asigna una business line',
+        terms: 'define duración y validez',
         duration: 'define la duración',
         validUntil: 'fija la fecha de validez',
         lines: 'agrega ítems al detalle'
@@ -413,6 +492,10 @@ export const GH_PRICING = {
       terms: 'Términos comerciales',
       timing: 'Plazos',
       termsAndTiming: 'Términos y plazos'
+    },
+    groupDescriptions: {
+      party: 'Cliente, responsable comercial y deal asociado a la oportunidad.',
+      termsAndTiming: 'Modelo, territorio, moneda y fechas que gobiernan el pricing.'
     }
   },
   summaryDock: {
@@ -446,7 +529,7 @@ export const GH_PRICING = {
   dealDesk: {
     workspaceAriaLabel: 'Workspace de nueva cotización',
     contextRailLabel: 'Readiness de cliente y términos',
-    asideTitle: 'Readiness & economía',
+    asideTitle: 'Economía',
     asideEyebrow: 'Deal desk',
     checklistTitle: 'Checklist para emitir',
     hubspotTitle: 'HubSpot',
@@ -458,6 +541,7 @@ export const GH_PRICING = {
     pricingCalculating: 'Calculando motor v2',
     pricingReady: 'Listo para simular al agregar ítems',
     pricingError: 'Revisar avisos del motor',
+    closureTitle: 'Cierre',
     marginLabel: 'Margen',
     totalUnavailable: 'Sin calcular',
     marginUnavailable: '—',
@@ -477,9 +561,11 @@ export const GH_PRICING = {
     },
     lineCanvas: {
       searchPlaceholder: 'Buscar catálogo, servicio o template',
+      searchSupportingText: 'Catálogo, servicios empaquetados y templates aprobados',
+      searchOpenLabel: 'Abrir catálogo',
       filterLabel: 'Filtros',
       emptyTitle: 'Sin líneas todavía',
-      emptySubtitle: 'Agrega ítems vendibles para activar pricing, margen y addons.',
+      emptySubtitle: 'Empieza con un ítem aprobado. Después ajustas dedicación, cantidad y notas sin perder el pricing canónico.',
       tableHeaders: {
         item: 'Ítem',
         type: 'Tipo',
@@ -541,6 +627,7 @@ export const GH_PRICING = {
     ctaSecondary: 'Desde servicio empaquetado',
     ctaTertiary: 'Desde template',
     ctaManual: 'Crear línea manual',
+    recommendedLabel: 'Recomendado',
     pendingNote: (label: string) => `Aún falta ${label} antes de poder emitir.`
   },
   adjustPopover: {

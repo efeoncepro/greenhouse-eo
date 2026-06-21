@@ -25,6 +25,7 @@ import type { PricingOutputCurrency } from '@/lib/finance/pricing/contracts'
 export interface QuoteContextOrganizationOption {
   organizationId: string
   organizationName: string
+  logoUrl?: string | null
 }
 
 export interface QuoteContextPartySelectorOption {
@@ -35,6 +36,7 @@ export interface QuoteContextPartySelectorOption {
   displayName: string
   lifecycleStage?: 'prospect' | 'opportunity' | 'active_client' | 'inactive'
   domain?: string | null
+  logoUrl?: string | null
   canAdopt: boolean
 }
 
@@ -139,8 +141,10 @@ export interface QuoteContextStripProps extends QuoteContextStripHandlers {
   organizationSelector?: QuoteContextOrganizationSelectorConfig
   disabled?: boolean
   organizationLocked?: boolean
+  layout?: 'rail' | 'wizard'
   sticky?: boolean
   stickyOffset?: number
+  showProgress?: boolean
   invalidFields?: Partial<Record<keyof QuoteContextStripValues, string>>
 }
 
@@ -177,12 +181,12 @@ const PARTY_STAGE_LABEL: Record<NonNullable<QuoteContextPartySelectorOption['lif
 
 const PARTY_STAGE_COLOR: Record<
   NonNullable<QuoteContextPartySelectorOption['lifecycleStage']>,
-  'success' | 'warning' | 'info' | 'secondary'
+  'success' | 'warning' | 'info' | 'primary'
 > = {
   prospect: 'warning',
   opportunity: 'info',
   active_client: 'success',
-  inactive: 'secondary'
+  inactive: 'primary'
 }
 
 /**
@@ -206,8 +210,10 @@ const QuoteContextStrip = ({
   organizationSelector,
   disabled = false,
   organizationLocked = false,
+  layout = 'rail',
   sticky = true,
   stickyOffset = 0,
+  showProgress = true,
   invalidFields = {},
   onOrganizationChange,
   onContactChange,
@@ -224,7 +230,8 @@ const QuoteContextStrip = ({
     () =>
       options.organizations.map(org => ({
         value: org.organizationId,
-        label: org.organizationName
+        label: org.organizationName,
+        logoUrl: org.logoUrl ?? undefined
       })),
     [options.organizations]
   )
@@ -235,12 +242,14 @@ const QuoteContextStrip = ({
         value: party.organizationId ?? party.hubspotCompanyId ?? party.displayName,
         label: party.displayName,
         secondary: party.domain ?? undefined,
+        logoUrl: party.logoUrl ?? undefined,
         disabled: party.kind === 'hubspot_candidate' && !party.canAdopt,
         meta: {
           kind: party.kind,
           lifecycleStage: party.lifecycleStage,
           canAdopt: party.canAdopt,
-          domain: party.domain ?? null
+          domain: party.domain ?? null,
+          logoUrl: party.logoUrl ?? null
         }
       })) ?? [],
     [organizationSelector?.options]
@@ -392,37 +401,12 @@ const QuoteContextStrip = ({
     (values.contractDurationMonths ? 1 : 0) +
     (values.validUntil ? 1 : 0)
 
-  // TASK-615: orientación contextual. El progress chip ya no muestra solo
-  // "N de 6 campos"; cuando hay un siguiente paso pendiente, lo nombra. La
-  // secuencia respeta la dependencia real del flujo (organización → contacto
-  // → deal → BL → duración → vigencia) y usa GH_PRICING para todo el copy.
-  const nextStepHint = useMemo<string | null>(() => {
-    if (progressFilled >= progressTotal) return null
-    const steps = GH_PRICING.contextChips.progress.nextSteps
-
-    if (!values.organizationId) return `${GH_PRICING.contextChips.progress.nextStepPrefix} ${steps.organization}`
-    if (!values.contactIdentityProfileId) return `${GH_PRICING.contextChips.progress.nextStepPrefix} ${steps.contact}`
-    if (!values.hubspotDealId) return `${GH_PRICING.contextChips.progress.nextStepPrefix} ${steps.deal}`
-    if (!values.businessLineCode) return `${GH_PRICING.contextChips.progress.nextStepPrefix} ${steps.businessLine}`
-    if (!values.contractDurationMonths) return `${GH_PRICING.contextChips.progress.nextStepPrefix} ${steps.duration}`
-    if (!values.validUntil) return `${GH_PRICING.contextChips.progress.nextStepPrefix} ${steps.validUntil}`
-
-    return null
-  }, [
-    progressFilled,
-    values.organizationId,
-    values.contactIdentityProfileId,
-    values.hubspotDealId,
-    values.businessLineCode,
-    values.contractDurationMonths,
-    values.validUntil
-  ])
-
   // TASK-565: fire a single "attention" pulse on the Deal chip the first time
   // the user picks an organization with no deal attached. Gated by reduced-motion.
   const prefersReduced = useReducedMotion()
   const previousOrganizationIdRef = useRef<string | null>(values.organizationId)
   const [dealShouldPulse, setDealShouldPulse] = useState(false)
+  const isWizardLayout = layout === 'wizard'
 
   useEffect(() => {
     const previous = previousOrganizationIdRef.current
@@ -446,22 +430,30 @@ const QuoteContextStrip = ({
     <Box
       data-capture='quote-builder-readiness-rail'
       sx={theme => ({
-        position: sticky ? 'sticky' : 'relative',
-        top: sticky ? stickyOffset : 'auto',
+        position: sticky && !isWizardLayout ? 'sticky' : 'relative',
+        top: sticky && !isWizardLayout ? stickyOffset : 'auto',
         zIndex: sticky ? theme.zIndex.appBar - 2 : 1,
-        py: 2,
-        px: { xs: 2, md: 3 },
+        py: isWizardLayout ? 0 : { xs: 1.5, md: 2 },
+        px: isWizardLayout ? 0 : { xs: 2, md: 2.5 },
 
         // Solid subtle bg + crisp border-bottom — 2026 enterprise pattern
         // (Stripe Dashboard, Vercel, Linear). Glass-morphism skipped on purpose.
-        backgroundColor: theme.palette.background.paper,
-        border: sticky ? 0 : `1px solid ${theme.palette.divider}`,
-        borderBottom: `1px solid ${theme.palette.divider}`,
-        borderRadius: sticky ? 0 : `${theme.shape.customBorderRadius.lg}px`,
-        boxShadow: sticky ? 'none' : theme.shadows[1]
+        backgroundColor: isWizardLayout ? 'transparent' : theme.palette.background.paper,
+        border: sticky || isWizardLayout ? 0 : `1px solid ${theme.palette.divider}`,
+        borderBottom: isWizardLayout ? 0 : `1px solid ${theme.palette.divider}`,
+        borderRadius: sticky || isWizardLayout ? 0 : `${theme.shape.customBorderRadius.lg}px`,
+        boxShadow: sticky || isWizardLayout ? 'none' : `0 12px 28px -22px ${theme.palette.common.black}`
       })}
     >
-      <Stack spacing={2} aria-label={GH_PRICING.contextChips.ariaLabel}>
+      <Stack spacing={isWizardLayout ? 2.5 : 1.5} aria-label={GH_PRICING.contextChips.ariaLabel}>
+        {isWizardLayout ? (
+          <Stack spacing={0.5}>
+            <Typography variant='h6'>{GH_PRICING.contextChips.groupLabels.party}</Typography>
+            <Typography variant='body2' color='text.secondary'>
+              {GH_PRICING.contextChips.groupDescriptions.party}
+            </Typography>
+          </Stack>
+        ) : null}
         {/* ────────────────────────────────────────────────────────────────
             Tier 1 — Party (prominence='primary'). Flex-distributed chips
             + right-anchored progress counter. Balances the strip so the
@@ -480,17 +472,28 @@ const QuoteContextStrip = ({
           >
             <Stack
               direction='row'
-              spacing={2}
-              rowGap={2}
+              spacing={1}
+              rowGap={1}
               flexWrap='wrap'
               useFlexGap
               alignItems='stretch'
-              sx={{ flex: 1, minWidth: 0 }}
+              sx={{
+                flex: 1,
+                minWidth: 0,
+                ...(isWizardLayout
+                  ? {
+                      display: 'grid',
+                      gridTemplateColumns: { xs: '1fr', md: 'repeat(3, minmax(0, 1fr))' },
+                      gap: 1.25
+                    }
+                  : {})
+              }}
             >
         {/* Organizacion — 2 clicks con Autocomplete */}
-        <Box sx={{ flex: 1, minWidth: 180 }}>
+        <Box sx={{ flex: 1, minWidth: isWizardLayout ? 0 : { xs: '100%', sm: 220, lg: 220 } }}>
         <ContextChip
           fullWidth
+          density='compact'
           prominence='primary'
           icon={GH_PRICING.contextChips.organization.icon}
           label={GH_PRICING.contextChips.organization.label}
@@ -549,7 +552,7 @@ const QuoteContextStrip = ({
                       ? PARTY_STAGE_COLOR[lifecycleStage]
                       : kind === 'hubspot_candidate'
                         ? 'warning'
-                        : 'secondary'
+                        : 'primary'
 
                   return (
                     <Stack spacing={0.75} sx={{ width: '100%' }}>
@@ -600,13 +603,15 @@ const QuoteContextStrip = ({
                 : organizationSelector.emptyMessage ?? GH_PRICING.contextChips.organization.unifiedEmpty
               : 'Sin organizaciones'
           }
+          popoverWidth={420}
         />
         </Box>
 
         {/* Contacto — 2 clicks con Autocomplete */}
-        <Box sx={{ flex: 1, minWidth: 180 }}>
+        <Box sx={{ flex: 1, minWidth: isWizardLayout ? 0 : { xs: '100%', sm: 220, lg: 220 } }}>
         <ContextChip
           fullWidth
+          density='compact'
           prominence='primary'
           icon={GH_PRICING.contextChips.contact.icon}
           label={GH_PRICING.contextChips.contact.label}
@@ -643,6 +648,7 @@ const QuoteContextStrip = ({
               ? GH_PRICING.contextChips.contact.noOrgFirst
               : GH_PRICING.contextChips.contact.empty
           }
+          popoverWidth={420}
           popoverNotice={
             values.organizationId && !values.contactIdentityProfileId && contactOptions.length === 0 && !options.contactsLoading
               ? {
@@ -655,7 +661,7 @@ const QuoteContextStrip = ({
         </Box>
 
         {/* Deal HubSpot */}
-        <Box sx={{ flex: 1, minWidth: 180 }}>
+        <Box sx={{ flex: 1, minWidth: isWizardLayout ? 0 : { xs: '100%', sm: 220, lg: 220 } }}>
         <motion.div
           style={{ display: 'block', height: '100%' }}
           animate={dealShouldPulse ? { opacity: [1, 0.88, 1, 0.88, 1] } : { opacity: 1 }}
@@ -663,6 +669,7 @@ const QuoteContextStrip = ({
         >
           <ContextChip
             fullWidth
+            density='compact'
             prominence='primary'
             icon={GH_PRICING.contextChips.deal.icon}
             label={GH_PRICING.contextChips.deal.label}
@@ -686,6 +693,7 @@ const QuoteContextStrip = ({
               ? GH_PRICING.contextChips.deal.noOrgFirst
               : GH_PRICING.contextChips.deal.empty
           }
+          popoverWidth={420}
           popoverNotice={
             values.organizationId && !values.hubspotDealId && onCreateDeal
               ? {
@@ -703,29 +711,29 @@ const QuoteContextStrip = ({
         </motion.div>
         </Box>
             </Stack>
-            {/* Progress counter anchored right, vertically centered on Tier 1. */}
-            <Box
-              sx={{
-                flexShrink: 0,
-                display: 'flex',
-                alignItems: 'center',
-                alignSelf: { xs: 'flex-start', md: 'stretch' }
-              }}
-            >
-              <FieldsProgressChip
-                filled={progressFilled}
-                total={progressTotal}
-                suffix={GH_PRICING.contextChips.progress.suffix}
-                srLabel={
-                  progressFilled >= progressTotal
-                    ? () => GH_PRICING.contextChips.progress.readyAriaLive
-                    : GH_PRICING.contextChips.progress.ariaLive
-                }
-                readyLabel={GH_PRICING.contextChips.progress.readyLabel}
-                nextStepHint={nextStepHint ?? undefined}
-                testId='quote-context-progress'
-              />
-            </Box>
+            {showProgress ? (
+              <Box
+                sx={{
+                  flexShrink: 0,
+                  display: 'flex',
+                  alignItems: 'center',
+                  alignSelf: { xs: 'flex-start', md: 'stretch' }
+                }}
+              >
+                <FieldsProgressChip
+                  filled={progressFilled}
+                  total={progressTotal}
+                  suffix={GH_PRICING.contextChips.progress.suffix}
+                  srLabel={
+                    progressFilled >= progressTotal
+                      ? () => GH_PRICING.contextChips.progress.readyAriaLive
+                      : GH_PRICING.contextChips.progress.ariaLive
+                  }
+                  readyLabel={GH_PRICING.contextChips.progress.readyLabel}
+                  testId='quote-context-progress'
+                />
+              </Box>
+            ) : null}
           </Stack>
         </Box>
 
@@ -735,24 +743,40 @@ const QuoteContextStrip = ({
             inline narrative read within each subgroup while balancing the
             strip horizontally (Stripe / Linear / GitHub convention).
             ──────────────────────────────────────────────────────────────── */}
+        {isWizardLayout ? (
+          <Stack spacing={0.5}>
+            <Typography variant='h6'>{GH_PRICING.contextChips.groupLabels.termsAndTiming}</Typography>
+            <Typography variant='body2' color='text.secondary'>
+              {GH_PRICING.contextChips.groupDescriptions.termsAndTiming}
+            </Typography>
+          </Stack>
+        ) : null}
+
         <Box component='fieldset' sx={FIELDSET_RESET_SX}>
           <Typography component='legend' sx={visuallyHidden}>
             {GH_PRICING.contextChips.groupLabels.termsAndTiming}
           </Typography>
           <Stack
             direction={{ xs: 'column', md: 'row' }}
-            spacing={{ xs: 1, md: 0 }}
+            spacing={{ xs: 1, md: isWizardLayout ? 1.25 : 0 }}
             justifyContent='space-between'
-            alignItems={{ xs: 'flex-start', md: 'baseline' }}
+            alignItems={{ xs: 'stretch', md: isWizardLayout ? 'stretch' : 'baseline' }}
             useFlexGap
+            sx={isWizardLayout ? { display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'minmax(0, 1fr) minmax(280px, 0.65fr)' }, gap: 1.25 } : undefined}
           >
             <Stack
               direction='row'
               spacing={0.5}
               flexWrap='wrap'
-              rowGap={0.5}
-              alignItems='baseline'
+              rowGap={0.75}
+              alignItems='center'
               useFlexGap
+              sx={theme => ({
+                p: 0.5,
+                borderRadius: `${theme.shape.customBorderRadius.md}px`,
+                backgroundColor: theme.palette.background.default,
+                border: `1px solid ${theme.palette.divider}`
+              })}
             >
             {/* Business line */}
             <ContextChip
@@ -768,7 +792,7 @@ const QuoteContextStrip = ({
               searchPlaceholder='Buscar business line…'
               noOptionsText='Sin business lines activas'
             />
-            <Typography component='span' variant='body2' sx={{ color: 'text.secondary', px: 0.5, userSelect: 'none' }}>
+            <Typography component='span' variant='body2' sx={{ display: 'none' }}>
               ·
             </Typography>
             {/* Modelo comercial */}
@@ -785,7 +809,7 @@ const QuoteContextStrip = ({
               searchPlaceholder='Buscar modelo…'
               noOptionsText='Sin modelos'
             />
-            <Typography component='span' variant='body2' sx={{ color: 'text.secondary', px: 0.5, userSelect: 'none' }}>
+            <Typography component='span' variant='body2' sx={{ display: 'none' }}>
               ·
             </Typography>
             {/* Pais / factor */}
@@ -802,7 +826,7 @@ const QuoteContextStrip = ({
               searchPlaceholder='Buscar país…'
               noOptionsText='Sin países'
             />
-            <Typography component='span' variant='body2' sx={{ color: 'text.secondary', px: 0.5, userSelect: 'none' }}>
+            <Typography component='span' variant='body2' sx={{ display: 'none' }}>
               ·
             </Typography>
             {/* Moneda */}
@@ -825,9 +849,15 @@ const QuoteContextStrip = ({
               direction='row'
               spacing={0.5}
               flexWrap='wrap'
-              rowGap={0.5}
-              alignItems='baseline'
+              rowGap={0.75}
+              alignItems='center'
               useFlexGap
+              sx={theme => ({
+                p: 0.5,
+                borderRadius: `${theme.shape.customBorderRadius.md}px`,
+                backgroundColor: theme.palette.background.default,
+                border: `1px solid ${theme.palette.divider}`
+              })}
             >
             {/* Duracion — custom input (number) */}
             <ContextChip
@@ -861,7 +891,7 @@ const QuoteContextStrip = ({
                 </Stack>
               )}
             />
-            <Typography component='span' variant='body2' sx={{ color: 'text.secondary', px: 0.5, userSelect: 'none' }}>
+            <Typography component='span' variant='body2' sx={{ display: 'none' }}>
               ·
             </Typography>
             {/* Valida hasta — custom input (date) */}

@@ -1,24 +1,35 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 
 import { useRouter } from 'next/navigation'
 
 import Alert from '@mui/material/Alert'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
+import ButtonBase from '@mui/material/ButtonBase'
 import Card from '@mui/material/Card'
 import Divider from '@mui/material/Divider'
 import Stack from '@mui/material/Stack'
 import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
+import { alpha } from '@mui/material/styles'
+import { visuallyHidden } from '@mui/utils'
 
 import { toast } from 'sonner'
 
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 
-import { CompositionShell, FormSectionAccordion } from '@/components/greenhouse/primitives'
+import {
+  CompositionShell,
+  FieldsProgressChip,
+  FormSectionAccordion
+} from '@/components/greenhouse/primitives'
+import ContextChip, {
+  type ContextChipOption,
+  type ContextChipStatus
+} from '@/components/greenhouse/primitives/ContextChip'
 
 import type { CommercialModelCode } from '@/lib/commercial/pricing-governance-types'
 import { requiresHubSpotQuoteCommercialContext } from '@/lib/commercial/quote-hubspot-sync-context'
@@ -34,14 +45,17 @@ import { isIssueableFinanceQuotationStatus } from '@/lib/finance/quotation-acces
 import useParties, { type PartySearchError, type PartySearchItem } from '@/hooks/useParties'
 import usePricingConfig from '@/hooks/usePricingConfig'
 import usePricingSimulation from '@/hooks/usePricingSimulation'
+import useReducedMotion from '@/hooks/useReducedMotion'
 import { GH_PRICING } from '@/lib/copy/pricing'
 import { previewChileTaxAmounts } from '@/lib/finance/pricing/quotation-tax-constants'
-import { formatCurrency as formatGreenhouseCurrency, formatNumber as formatGreenhouseNumber } from '@/lib/format'
+import {
+  formatCurrency as formatGreenhouseCurrency,
+  formatDate as formatGreenhouseDate,
+  formatNumber as formatGreenhouseNumber
+} from '@/lib/format'
 
 import AddLineSplitButton from '@/components/greenhouse/pricing/AddLineSplitButton'
-import QuoteContextStrip, {
-  type QuoteContextPartySelectorOption
-} from '@/components/greenhouse/pricing/QuoteContextStrip'
+import type { QuoteContextPartySelectorOption } from '@/components/greenhouse/pricing/QuoteContextStrip'
 import QuoteIdentityStrip, {
   type QuoteStatus
 } from '@/components/greenhouse/pricing/QuoteIdentityStrip'
@@ -51,6 +65,7 @@ import SellableItemPickerDrawer, {
   type SellableItemPickerTab,
   type SellableSelection
 } from '@/components/greenhouse/pricing/SellableItemPickerDrawer'
+import { AnimatePresence, motion } from '@/libs/FramerMotion'
 
 import AddonSuggestionsPanel from './AddonSuggestionsPanel'
 import CreateDealDrawer from './CreateDealDrawer'
@@ -177,13 +192,56 @@ const DEFAULT_COUNTRY_FACTORS: CountryFactorOption[] = [
   { code: 'cliente_estrategico', label: 'Cliente Estratégico', factor: 1.0 }
 ]
 
+const QUOTE_CURRENCY_OPTIONS: ContextChipOption[] = [
+  { value: 'CLP', label: 'CLP', secondary: 'Peso chileno' },
+  { value: 'USD', label: 'USD', secondary: 'Dólar estadounidense' },
+  { value: 'CLF', label: 'CLF', secondary: 'Unidad de fomento' },
+  { value: 'COP', label: 'COP', secondary: 'Peso colombiano' },
+  { value: 'MXN', label: 'MXN', secondary: 'Peso mexicano' },
+  { value: 'PEN', label: 'PEN', secondary: 'Sol peruano' }
+]
+
+const PARTY_STAGE_LABEL: Record<NonNullable<QuoteContextPartySelectorOption['lifecycleStage']>, string> = {
+  prospect: 'Prospecto',
+  opportunity: 'Oportunidad',
+  active_client: 'Cliente activo',
+  inactive: 'Inactivo'
+}
+
+const PARTY_STAGE_COLOR: Record<
+  NonNullable<QuoteContextPartySelectorOption['lifecycleStage']>,
+  'primary' | 'success' | 'info' | 'warning' | 'secondary'
+> = {
+  prospect: 'info',
+  opportunity: 'primary',
+  active_client: 'primary',
+  inactive: 'secondary'
+}
+
+const formatMultiplier = (pct: number): string => {
+  const signed = pct >= 0 ? `+${pct}` : `${pct}`
+
+  return `${signed}%`
+}
+
+const formatCountryFactor = (factor: number): string => factor.toFixed(2)
+
 interface QuoteReadinessItem {
   key: keyof typeof GH_PRICING.dealDesk.checklistItems
   complete: boolean
 }
 
+type QuoteWizardStepId = 'context' | 'scope' | 'economics'
+
+interface QuoteWizardFrameProps {
+  activeStep: QuoteWizardStepId
+  canOpenScope: boolean
+  canOpenEconomics: boolean
+  onStepChange: (step: QuoteWizardStepId) => void
+  children: ReactNode
+}
+
 interface QuoteReadinessAsideProps {
-  readinessItems: QuoteReadinessItem[]
   subtotal: number | null
   ivaAmount: number | null
   total: number | null
@@ -194,15 +252,228 @@ interface QuoteReadinessAsideProps {
   marginClassification: string | null
   addonCount: number
   appliedAddonsTotal: number | null
-  hubspotDealId: string | null
-  organizationId: string | null
   primaryCtaLabel: string
   primaryCtaLoading: boolean
   primaryCtaDisabled: boolean
   disabledReason: string | null
   saveState: { kind: 'clean' | 'dirty' | 'saving' | 'saved'; changeCount?: number } | null
   onPrimaryClick: () => void
-  onCreateDeal: () => void
+}
+
+const QuoteWizardFrame = ({
+  activeStep,
+  canOpenScope,
+  canOpenEconomics,
+  onStepChange,
+  children
+}: QuoteWizardFrameProps) => {
+  const prefersReducedMotion = useReducedMotion()
+
+  const steps: Array<{
+    id: QuoteWizardStepId
+    icon: string
+    disabled: boolean
+  }> = [
+    { id: 'context', icon: 'tabler-building-bank', disabled: false },
+    { id: 'scope', icon: 'tabler-list-details', disabled: !canOpenScope },
+    { id: 'economics', icon: 'tabler-chart-donut-3', disabled: !canOpenEconomics }
+  ]
+
+  const activeStepIndex = steps.findIndex(item => item.id === activeStep)
+  const previousStepIndexRef = useRef(activeStepIndex)
+  const transitionDirection = activeStepIndex >= previousStepIndexRef.current ? 1 : -1
+
+  useEffect(() => {
+    previousStepIndexRef.current = activeStepIndex
+  }, [activeStepIndex])
+
+  return (
+    <Box data-capture='quote-builder-wizard'>
+      <Box
+        component='nav'
+        aria-label={GH_PRICING.builderWizard.tabsAriaLabel}
+        data-capture='quote-wizard-stepper'
+        sx={theme => ({
+          display: 'grid',
+          gridTemplateColumns: { xs: 'repeat(3, minmax(0, 1fr))', md: 'repeat(3, minmax(0, 1fr))' },
+          gap: { xs: 0.5, md: 0.75 },
+          mb: { xs: 1.25, md: 2 },
+          p: { xs: 0.35, md: 0.5 },
+          borderRadius: `${theme.shape.customBorderRadius.lg}px`,
+          border: `1px solid ${alpha(theme.palette.divider, 0.72)}`,
+          backgroundColor: alpha(theme.palette.background.paper, 0.72)
+        })}
+      >
+        {steps.map((step, index) => {
+          const selected = activeStep === step.id
+          const completed = index < activeStepIndex
+          const copy = GH_PRICING.builderWizard.steps[step.id]
+
+          const positionLabel = selected
+            ? GH_PRICING.builderWizard.contextSetup.currentStepLabel
+            : completed
+              ? GH_PRICING.builderWizard.contextSetup.completedStepLabel
+              : step.disabled
+                ? GH_PRICING.builderWizard.contextSetup.lockedStepLabel
+                : GH_PRICING.builderWizard.contextSetup.nextStepLabel
+
+          return (
+            <ButtonBase
+              key={step.id}
+              disabled={step.disabled}
+              onClick={() => onStepChange(step.id)}
+              aria-current={selected ? 'step' : undefined}
+              sx={theme => ({
+                minWidth: 0,
+                minHeight: { xs: 46, md: 54 },
+                justifyContent: { xs: 'center', md: 'flex-start' },
+                gap: { xs: 0.5, md: 1.25 },
+                px: { xs: 0.5, md: 1 },
+                py: { xs: 0.65, md: 0.75 },
+                borderRadius: `${theme.shape.customBorderRadius.md}px`,
+                border: `1px solid ${
+                  selected
+                    ? alpha(theme.palette.primary.main, 0.3)
+                    : completed
+                      ? alpha(theme.palette.primary.main, 0.1)
+                      : 'transparent'
+                }`,
+                backgroundColor: selected
+                  ? alpha(theme.palette.primary.main, theme.palette.mode === 'dark' ? 0.12 : 0.045)
+                  : completed
+                    ? alpha(theme.palette.primary.main, theme.palette.mode === 'dark' ? 0.06 : 0.022)
+                    : 'transparent',
+                color: 'text.primary',
+                textAlign: 'left',
+                boxShadow: selected
+                  ? `0 10px 26px -28px ${alpha(theme.palette.primary.main, 0.72)}`
+                  : 'none',
+                transition: theme.transitions.create(['background-color', 'border-color', 'box-shadow', 'transform'], {
+                  duration: theme.transitions.duration.shortest
+                }),
+                '&:hover': !step.disabled
+                  ? {
+                      borderColor: selected ? alpha(theme.palette.primary.main, 0.4) : alpha(theme.palette.primary.main, 0.2),
+                      backgroundColor: selected
+                        ? alpha(theme.palette.primary.main, theme.palette.mode === 'dark' ? 0.16 : 0.075)
+                        : alpha(theme.palette.primary.main, 0.028),
+                      transform: 'translateY(-1px)'
+                    }
+                  : undefined,
+                '@media (prefers-reduced-motion: reduce)': { transition: 'none' },
+                '&.Mui-focusVisible': {
+                  outline: `2px solid ${theme.palette.primary.main}`,
+                  outlineOffset: 2
+                },
+                '&.Mui-disabled': {
+                  color: theme.palette.text.secondary,
+                  backgroundColor: 'transparent',
+                  borderColor: 'transparent',
+                  opacity: 0.68
+                }
+              })}
+            >
+              <Box
+                component='i'
+                className={completed ? 'tabler-check' : step.icon}
+                aria-hidden='true'
+                sx={theme => ({
+                  width: { xs: 26, md: 32 },
+                  height: { xs: 26, md: 32 },
+                  borderRadius: 999,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                  fontSize: { xs: selected ? 16 : 15, md: selected ? 18 : 17 },
+                  color: selected || completed ? 'primary.main' : 'text.secondary',
+                  backgroundColor: selected
+                    ? alpha(theme.palette.primary.main, 0.12)
+                    : completed
+                      ? alpha(theme.palette.primary.main, 0.075)
+                      : alpha(theme.palette.text.primary, 0.035),
+                  border: `1px solid ${
+                    selected
+                      ? alpha(theme.palette.primary.main, 0.32)
+                      : completed
+                        ? alpha(theme.palette.primary.main, 0.22)
+                        : alpha(theme.palette.divider, 0.72)
+                  }`,
+                  boxShadow: selected ? `0 8px 18px -16px ${alpha(theme.palette.primary.main, 0.82)}` : 'none'
+                })}
+              />
+              <Stack spacing={0.1} alignItems={{ xs: 'center', md: 'flex-start' }} sx={{ minWidth: 0 }}>
+                <Typography
+                  variant='caption'
+                  sx={{
+                    display: { xs: 'none', sm: 'block' },
+                    color: selected ? 'primary.main' : 'text.secondary',
+                    fontWeight: 600
+                  }}
+                >
+                  {positionLabel}
+                </Typography>
+                <Typography
+                  variant='subtitle1'
+                  sx={{
+                    color: selected ? 'primary.main' : 'text.primary',
+                    fontWeight: 600,
+                    lineHeight: { xs: 1.2, md: undefined },
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis'
+                  }}
+                >
+                  {`${index + 1}. ${copy.title}`}
+                </Typography>
+                <Typography
+                  variant='body2'
+                  sx={{
+                    display: { xs: 'none', xl: 'block' },
+                    color: 'text.secondary',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap'
+                  }}
+                >
+                  {copy.description}
+                </Typography>
+              </Stack>
+            </ButtonBase>
+          )
+        })}
+      </Box>
+      <AnimatePresence initial={false} mode='wait'>
+        <Box
+          component={motion.div}
+          key={activeStep}
+          role='tabpanel'
+          initial={prefersReducedMotion ? false : { opacity: 0, x: transitionDirection * 12 }}
+          animate={prefersReducedMotion ? undefined : { opacity: 1, x: 0 }}
+          exit={prefersReducedMotion ? undefined : { opacity: 0, x: transitionDirection * -8 }}
+          transition={{ duration: 0.18, ease: 'easeOut' }}
+          sx={{
+            minWidth: 0,
+            overflow: 'visible'
+          }}
+        >
+          <Card
+            elevation={0}
+            data-capture='quote-builder-active-step-card'
+            sx={theme => ({
+              borderRadius: `${theme.shape.customBorderRadius.lg}px`,
+              border: `1px solid ${alpha(theme.palette.divider, 0.92)}`,
+              backgroundColor: theme.palette.background.paper,
+              boxShadow: theme.greenhouseElevation.raised.boxShadow,
+              overflow: 'visible'
+            })}
+          >
+            {children}
+          </Card>
+        </Box>
+      </AnimatePresence>
+    </Box>
+  )
 }
 
 const formatQuoteMoney = (amount: number | null, currency: PricingOutputCurrency): string => {
@@ -223,8 +494,8 @@ const formatQuoteMargin = (marginPct: number | null): string => {
 
 const resolveMarginChipColor = (
   marginClassification: string | null
-): 'success' | 'warning' | 'error' | 'secondary' => {
-  if (!marginClassification) return 'secondary'
+): 'success' | 'warning' | 'error' | 'primary' => {
+  if (!marginClassification) return 'primary'
   if (marginClassification.includes('below') || marginClassification.includes('critical')) return 'error'
   if (marginClassification.includes('above') || marginClassification.includes('warning')) return 'warning'
 
@@ -232,7 +503,6 @@ const resolveMarginChipColor = (
 }
 
 const QuoteReadinessAside = ({
-  readinessItems,
   subtotal,
   ivaAmount,
   total,
@@ -243,19 +513,13 @@ const QuoteReadinessAside = ({
   marginClassification,
   addonCount,
   appliedAddonsTotal,
-  hubspotDealId,
-  organizationId,
   primaryCtaLabel,
   primaryCtaLoading,
   primaryCtaDisabled,
   disabledReason,
   saveState,
-  onPrimaryClick,
-  onCreateDeal
+  onPrimaryClick
 }: QuoteReadinessAsideProps) => {
-  const completed = readinessItems.filter(item => item.complete).length
-  const totalItems = readinessItems.length
-
   const pricingStatus = simulationError
     ? GH_PRICING.dealDesk.pricingError
     : loading
@@ -289,18 +553,11 @@ const QuoteReadinessAside = ({
         <Box sx={{ p: 3 }}>
           <Stack direction='row' alignItems='flex-start' justifyContent='space-between' spacing={2}>
             <Stack spacing={0.5}>
-              <Typography variant='caption' color='text.secondary' sx={{ fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0 }}>
+              <Typography variant='overline' color='text.secondary'>
                 {GH_PRICING.dealDesk.asideEyebrow}
               </Typography>
               <Typography variant='h6'>{GH_PRICING.dealDesk.asideTitle}</Typography>
             </Stack>
-            <CustomChip
-              round='true'
-              size='small'
-              variant='tonal'
-              color={completed === totalItems ? 'success' : 'secondary'}
-              label={`${completed} ${GH_PRICING.contextChips.progress.suffix(totalItems)}`}
-            />
           </Stack>
 
           <Stack spacing={1} sx={{ mt: 3 }}>
@@ -308,17 +565,15 @@ const QuoteReadinessAside = ({
               {GH_PRICING.summaryDock.totalLabel}
             </Typography>
             <Typography
-              variant='h4'
+              variant='kpiValue'
               sx={{
-                fontVariantNumeric: 'tabular-nums',
-                lineHeight: 1,
                 wordBreak: 'break-word'
               }}
             >
               {loading && total === null ? GH_PRICING.summaryDock.loadingLabel : formatQuoteMoney(total, currency)}
             </Typography>
             {saveStateLabel ? (
-              <Typography variant='caption' color='text.secondary'>
+            <Typography variant='body2' color='text.secondary'>
                 {saveStateLabel}
               </Typography>
             ) : null}
@@ -337,7 +592,7 @@ const QuoteReadinessAside = ({
               <Typography variant='body2' color='text.secondary'>
                 {label}
               </Typography>
-              <Typography variant='body2' sx={{ fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>
+              <Typography variant='monoAmount' sx={{ color: 'text.primary' }}>
                 {value}
               </Typography>
             </Stack>
@@ -360,69 +615,15 @@ const QuoteReadinessAside = ({
 
         <Stack spacing={1.75} sx={{ p: 3 }}>
           <Stack direction='row' alignItems='center' justifyContent='space-between' spacing={2}>
-            <Typography variant='subtitle2'>{GH_PRICING.dealDesk.pricingTitle}</Typography>
+            <Typography variant='h6'>{GH_PRICING.dealDesk.pricingTitle}</Typography>
             <CustomChip
               round='true'
               size='small'
               variant='tonal'
-              color={simulationError ? 'error' : loading ? 'warning' : 'success'}
+              color={simulationError ? 'error' : loading ? 'warning' : 'primary'}
               label={pricingStatus}
             />
           </Stack>
-
-          <Stack spacing={1.1}>
-            <Typography variant='subtitle2'>{GH_PRICING.dealDesk.checklistTitle}</Typography>
-            {readinessItems.map(item => (
-              <Stack key={item.key} direction='row' alignItems='center' justifyContent='space-between' spacing={2}>
-                <Stack direction='row' alignItems='center' spacing={1.25} sx={{ minWidth: 0 }}>
-                  <Box
-                    component='i'
-                    className={item.complete ? 'tabler-circle-check' : 'tabler-circle'}
-                    aria-hidden='true'
-                    sx={{ color: item.complete ? 'success.main' : 'text.disabled', fontSize: 18, flexShrink: 0 }}
-                  />
-                  <Typography variant='body2' sx={{ minWidth: 0 }}>
-                    {GH_PRICING.dealDesk.checklistItems[item.key]}
-                  </Typography>
-                </Stack>
-                <Typography variant='caption' color={item.complete ? 'success.main' : 'text.secondary'} sx={{ flexShrink: 0 }}>
-                  {item.complete ? GH_PRICING.dealDesk.checklistStates.ready : GH_PRICING.dealDesk.checklistStates.missing}
-                </Typography>
-              </Stack>
-            ))}
-          </Stack>
-        </Stack>
-
-        <Divider />
-
-        <Stack spacing={1.75} sx={{ p: 3 }}>
-          <Stack direction='row' alignItems='center' justifyContent='space-between' spacing={2}>
-            <Typography variant='subtitle2'>{GH_PRICING.dealDesk.hubspotTitle}</Typography>
-            <CustomChip
-              round='true'
-              size='small'
-              variant='tonal'
-              color={hubspotDealId ? 'success' : 'secondary'}
-              label={hubspotDealId ? GH_PRICING.dealDesk.hubspotConnected : GH_PRICING.dealDesk.hubspotMissing}
-            />
-          </Stack>
-          {!hubspotDealId ? (
-            <Stack spacing={1.5}>
-              <Typography variant='caption' color='text.secondary'>
-                {organizationId ? GH_PRICING.contextChips.deal.emptyHelper : GH_PRICING.dealDesk.hubspotNoOrganization}
-              </Typography>
-              <Button
-                variant='tonal'
-                color='secondary'
-                size='small'
-                startIcon={<i className='tabler-briefcase-2' aria-hidden='true' />}
-                onClick={onCreateDeal}
-                disabled={!organizationId}
-              >
-                {GH_PRICING.dealDesk.hubspotCreateCta}
-              </Button>
-            </Stack>
-          ) : null}
         </Stack>
 
         <Divider />
@@ -437,6 +638,7 @@ const QuoteReadinessAside = ({
             zIndex: 1
           }}
         >
+          <Typography variant='h6'>{GH_PRICING.dealDesk.closureTitle}</Typography>
           <Tooltip title={disabledReason ?? ''} disableHoverListener={!disabledReason} disableInteractive>
             <span>
               <Button
@@ -445,13 +647,20 @@ const QuoteReadinessAside = ({
                 startIcon={<i className='tabler-file-check' aria-hidden='true' />}
                 disabled={primaryCtaDisabled}
                 onClick={onPrimaryClick}
+                sx={theme => ({
+                  '&.Mui-disabled': {
+                    backgroundColor: theme.palette.action.disabledBackground,
+                    color: theme.palette.text.disabled,
+                    boxShadow: 'none'
+                  }
+                })}
               >
                 {primaryCtaLoading ? GH_PRICING.builderSaving : primaryCtaLabel}
               </Button>
             </span>
           </Tooltip>
           {disabledReason ? (
-            <Typography variant='caption' color='text.secondary' role='status' sx={{ textAlign: 'center' }}>
+            <Typography variant='body2' color='text.secondary' role='status' sx={{ textAlign: 'center' }}>
               {disabledReason}
             </Typography>
           ) : null}
@@ -657,6 +866,11 @@ const QuoteBuilderShell = ({
 
   const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null)
   const [linesSnapshot, setLinesSnapshot] = useState<QuoteLineItem[]>(initialLines)
+
+  const [activeWizardStep, setActiveWizardStep] = useState<QuoteWizardStepId>(
+    quote?.organizationId ? (initialLines.length > 0 ? 'economics' : 'scope') : 'context'
+  )
+
   const [submitting, setSubmitting] = useState(false)
   const [serviceExpanding, setServiceExpanding] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -687,8 +901,8 @@ const QuoteBuilderShell = ({
     hasMore: partySearchHasMore,
     loading: partySearchLoading,
     searchError: partySearchError,
+    settledQuery: partySearchSettledQuery,
     adoptingCompanyId,
-    retrySearch: retryPartySearch,
     clearSearch: clearPartySearch,
     adoptParty
   } = useParties({ enabled: unifiedPartySelectorEnabled })
@@ -709,10 +923,19 @@ const QuoteBuilderShell = ({
         displayName: result.displayName,
         lifecycleStage: result.lifecycleStage,
         domain: result.domain ?? null,
+        logoUrl: result.logoUrl ?? null,
         canAdopt: result.canAdopt
       })),
     [partySearchResults]
   )
+
+  const partySearchTrimmedQuery = partySearchQuery.trim()
+
+  const partySearchWaitingForCurrentQuery =
+    unifiedPartySelectorEnabled &&
+    partySearchTrimmedQuery.length >= 2 &&
+    partySearchSettledQuery !== partySearchTrimmedQuery &&
+    !partySearchError
 
   const partySelectorLiveMessage = useMemo(() => {
     if (!unifiedPartySelectorEnabled) return undefined
@@ -721,7 +944,7 @@ const QuoteBuilderShell = ({
       return GH_PRICING.contextChips.organization.unifiedAdopting
     }
 
-    if (partySearchLoading) {
+    if (partySearchLoading || partySearchWaitingForCurrentQuery) {
       return 'Buscando organizaciones…'
     }
 
@@ -749,6 +972,7 @@ const QuoteBuilderShell = ({
     partySearchLoading,
     partySearchQuery,
     partySearchResults.length,
+    partySearchWaitingForCurrentQuery,
     unifiedPartySelectorEnabled
   ])
 
@@ -773,7 +997,8 @@ const QuoteBuilderShell = ({
       setLocalOrganizations(current =>
         upsertOrganization(current, {
           organizationId: party.organizationId as string,
-          organizationName: party.displayName
+          organizationName: party.displayName,
+          logoUrl: party.logoUrl ?? null
         })
       )
       setOrganizationContext(party.organizationId)
@@ -796,7 +1021,8 @@ const QuoteBuilderShell = ({
       setLocalOrganizations(current =>
         upsertOrganization(current, {
           organizationId: adopted.organizationId,
-          organizationName: party.displayName
+          organizationName: party.displayName,
+          logoUrl: party.logoUrl ?? null
         })
       )
       setOrganizationContext(adopted.organizationId)
@@ -1215,6 +1441,8 @@ const QuoteBuilderShell = ({
   const handlePickerSelect = useCallback(
     (selections: SellableSelection[]) => {
       if (selections.length === 0) return
+
+      setPickerOpen(false)
 
       if (pickerMode === 'service') {
         void expandServiceSelections(selections)
@@ -1653,31 +1881,6 @@ const QuoteBuilderShell = ({
     selectedTemplateId
   ])
 
-  const contextValues = useMemo(
-    () => ({
-      organizationId,
-      contactIdentityProfileId,
-      hubspotDealId,
-      businessLineCode: builderState.businessLineCode,
-      commercialModel: builderState.commercialModel,
-      countryFactorCode: builderState.countryFactorCode,
-      outputCurrency: builderState.outputCurrency,
-      contractDurationMonths: builderState.contractDurationMonths,
-      validUntil: builderState.validUntil
-    }),
-    [
-      organizationId,
-      contactIdentityProfileId,
-      hubspotDealId,
-      builderState.businessLineCode,
-      builderState.commercialModel,
-      builderState.countryFactorCode,
-      builderState.outputCurrency,
-      builderState.contractDurationMonths,
-      builderState.validUntil
-    ]
-  )
-
   const totalOutputCurrency = simulation?.totals.totalOutputCurrency ?? null
   const subtotalOutputCurrency = simulation?.totals.totalOutputCurrency ?? null // same for now — engine returns consolidated totalOutputCurrency
 
@@ -1814,62 +2017,207 @@ const QuoteBuilderShell = ({
     ]
   )
 
-  const quoteContextStripNode = (
-    <QuoteContextStrip
-      values={contextValues}
-      options={{
-        organizations: localOrganizations,
-        contacts: orgContacts,
-        contactsLoading,
-        deals: orgDeals,
-        dealsLoading,
-        businessLines: builderOptions.businessLines,
-        commercialModels: builderOptions.commercialModels,
-        countryFactors: builderOptions.countryFactors
-      }}
-      organizationSelector={
-        unifiedPartySelectorEnabled
-          ? {
-              enabled: true,
-              searchValue: partySearchQuery,
-              selectedLabel: pendingOrganizationLabel,
-              options: partySelectorOptions,
-              loading: partySearchLoading || Boolean(adoptingCompanyId),
-              liveMessage: partySelectorLiveMessage,
-              errorMessage: partySearchError ? formatPartySelectorError(partySearchError) : null,
-              retryActionLabel: GH_PRICING.contextChips.organization.unifiedRetry,
-              minQueryMessage: GH_PRICING.contextChips.organization.unifiedMinQuery,
-              emptyMessage: partySearchHasMore
-                ? `${GH_PRICING.contextChips.organization.unifiedEmpty} Hay más resultados disponibles.`
-                : GH_PRICING.contextChips.organization.unifiedEmpty,
-              loadingText: adoptingCompanyId
-                ? GH_PRICING.contextChips.organization.unifiedAdopting
-                : 'Buscando organizaciones…',
-              searchPlaceholder: GH_PRICING.contextChips.organization.unifiedSearchPlaceholder,
-              onSearchChange: setPartySearchQuery,
-              onSelectParty: party => {
-                void handlePartySelection(party)
-              },
-              onRetry: retryPartySearch
-            }
-          : undefined
-      }
-      invalidFields={invalidFields}
-      disabled={submitting}
-      organizationLocked={mode === 'edit'}
-      sticky={false}
-      onOrganizationChange={handleOrganizationChange}
-      onContactChange={setContactIdentityProfileId}
-      onDealChange={setHubspotDealId}
-      onBusinessLineChange={code => setBuilderState(prev => ({ ...prev, businessLineCode: code }))}
-      onCommercialModelChange={code => setBuilderState(prev => ({ ...prev, commercialModel: code }))}
-      onCountryFactorChange={code => setBuilderState(prev => ({ ...prev, countryFactorCode: code }))}
-      onCurrencyChange={value => setBuilderState(prev => ({ ...prev, outputCurrency: value }))}
-      onDurationChange={months => setBuilderState(prev => ({ ...prev, contractDurationMonths: months }))}
-      onValidUntilChange={iso => setBuilderState(prev => ({ ...prev, validUntil: iso }))}
-      onCreateDeal={submitting ? undefined : () => setCreateDealDrawerOpen(true)}
-    />
+  const quoteReadinessTotal = readinessItems.length
+  const quoteReadinessFilled = readinessItems.filter(item => item.complete).length
+
+  const quoteContextReady = readinessItems
+    .filter(item => item.key !== 'lines')
+    .every(item => item.complete)
+
+  const quoteReadinessNextStep = readinessItems.find(item => !item.complete)
+
+  const quoteReadinessNextHint = quoteReadinessNextStep
+    ? `${GH_PRICING.contextChips.progress.nextStepPrefix} ${
+        GH_PRICING.contextChips.progress.nextSteps[quoteReadinessNextStep.key]
+      }`
+    : undefined
+
+  const organizationChipOptions = useMemo<ContextChipOption[]>(
+    () =>
+      localOrganizations.map(org => ({
+        value: org.organizationId,
+        label: org.organizationName,
+        logoUrl: org.logoUrl ?? null
+      })),
+    [localOrganizations]
   )
+
+  const partyChipOptions = useMemo<ContextChipOption[]>(
+    () =>
+      partySelectorOptions.map(party => ({
+        value: party.organizationId ?? party.hubspotCompanyId ?? party.displayName,
+        label: party.displayName,
+        secondary: party.domain ?? undefined,
+        logoUrl: party.logoUrl ?? null,
+        disabled: party.kind === 'hubspot_candidate' && !party.canAdopt,
+        meta: {
+          party,
+          kind: party.kind,
+          lifecycleStage: party.lifecycleStage,
+          domain: party.domain ?? null,
+          canAdopt: party.canAdopt,
+          logoUrl: party.logoUrl ?? null
+        }
+      })),
+    [partySelectorOptions]
+  )
+
+  const renderPartySelectorOption = useCallback((option: ContextChipOption) => {
+    const party = option.meta?.party as QuoteContextPartySelectorOption | undefined
+    const lifecycleStage = party?.lifecycleStage
+    const kind = party?.kind
+    const domain = party?.domain ?? option.secondary ?? null
+
+    const badgeLabel =
+      kind === 'hubspot_candidate'
+        ? lifecycleStage
+          ? `HubSpot · ${PARTY_STAGE_LABEL[lifecycleStage]}`
+          : 'HubSpot'
+        : lifecycleStage
+          ? PARTY_STAGE_LABEL[lifecycleStage]
+          : null
+
+    const badgeColor =
+      lifecycleStage && PARTY_STAGE_COLOR[lifecycleStage]
+        ? PARTY_STAGE_COLOR[lifecycleStage]
+        : kind === 'hubspot_candidate'
+          ? 'warning'
+          : 'primary'
+
+    return (
+      <Stack spacing={0.65} sx={{ width: '100%', minWidth: 0 }}>
+        <Stack direction='row' spacing={1} alignItems='center' justifyContent='space-between' sx={{ minWidth: 0 }}>
+          <Typography variant='body2' sx={{ fontWeight: 600, lineHeight: 1.3, minWidth: 0 }} noWrap>
+            {option.label}
+          </Typography>
+          {badgeLabel ? (
+            <CustomChip
+              round='true'
+              size='small'
+              variant='tonal'
+              color={badgeColor}
+              label={badgeLabel}
+              sx={{ flexShrink: 0 }}
+            />
+          ) : null}
+        </Stack>
+        <Stack direction='row' spacing={1} alignItems='center' flexWrap='wrap' useFlexGap sx={{ minWidth: 0 }}>
+          {domain ? (
+            <Typography variant='caption' color='text.secondary' sx={{ lineHeight: 1.3 }}>
+              {domain}
+            </Typography>
+          ) : null}
+          {kind === 'hubspot_candidate' && party?.canAdopt === false ? (
+            <Typography variant='caption' color='warning.main' sx={{ lineHeight: 1.3, fontWeight: 600 }}>
+              {GH_PRICING.contextChips.organization.unifiedNoAdoptPermission}
+            </Typography>
+          ) : null}
+        </Stack>
+      </Stack>
+    )
+  }, [])
+
+  const contactChipOptions = useMemo<ContextChipOption[]>(
+    () =>
+      orgContacts.map(contact => {
+        const primary = contact.fullName ?? contact.canonicalEmail ?? contact.identityProfileId
+
+        const secondary =
+          contact.canonicalEmail && contact.fullName
+            ? contact.canonicalEmail
+            : contact.jobTitle ?? contact.roleLabel ?? undefined
+
+        return {
+          value: contact.identityProfileId,
+          label: contact.isPrimary ? `${primary} · ${GH_PRICING.contextChips.contact.primaryBadge}` : primary,
+          secondary
+        }
+      }),
+    [orgContacts]
+  )
+
+  const dealChipOptions = useMemo<ContextChipOption[]>(
+    () =>
+      orgDeals.map(deal => ({
+        value: deal.hubspotDealId,
+        label: deal.dealName,
+        secondary: [deal.dealstageLabel, deal.pipelineName].filter(Boolean).join(' · ') || undefined
+      })),
+    [orgDeals]
+  )
+
+  const businessLineChipOptions = useMemo<ContextChipOption[]>(
+    () => builderOptions.businessLines.map(bl => ({ value: bl.code, label: bl.label, secondary: bl.code })),
+    [builderOptions.businessLines]
+  )
+
+  const commercialModelChipOptions = useMemo<ContextChipOption[]>(
+    () =>
+      builderOptions.commercialModels.map(model => ({
+        value: model.code,
+        label: model.label,
+        secondary: GH_PRICING.contextChips.commercialModel.multiplierSecondary(
+          formatMultiplier(model.multiplierPct)
+        )
+      })),
+    [builderOptions.commercialModels]
+  )
+
+  const countryFactorChipOptions = useMemo<ContextChipOption[]>(
+    () =>
+      builderOptions.countryFactors.map(country => ({
+        value: country.code,
+        label: country.label,
+        secondary: GH_PRICING.contextChips.countryFactor.factorSecondary(
+          formatCountryFactor(country.factor)
+        )
+      })),
+    [builderOptions.countryFactors]
+  )
+
+  const selectedDeal = useMemo(
+    () => orgDeals.find(deal => deal.hubspotDealId === hubspotDealId) ?? null,
+    [hubspotDealId, orgDeals]
+  )
+
+  const selectedBusinessLine = useMemo(
+    () => builderOptions.businessLines.find(line => line.code === builderState.businessLineCode) ?? null,
+    [builderOptions.businessLines, builderState.businessLineCode]
+  )
+
+  const selectedCommercialModel = useMemo(
+    () => builderOptions.commercialModels.find(model => model.code === builderState.commercialModel) ?? null,
+    [builderOptions.commercialModels, builderState.commercialModel]
+  )
+
+  const selectedCountryFactor = useMemo(
+    () => builderOptions.countryFactors.find(country => country.code === builderState.countryFactorCode) ?? null,
+    [builderOptions.countryFactors, builderState.countryFactorCode]
+  )
+
+  const durationValue = builderState.contractDurationMonths
+    ? GH_PRICING.contextChips.duration.unit(builderState.contractDurationMonths)
+    : null
+
+  const validUntilValue = builderState.validUntil
+    ? formatGreenhouseDate(builderState.validUntil, {}, 'es-CL')
+    : null
+
+  const organizationContextStatus: ContextChipStatus = organizationId
+      ? 'filled'
+      : 'blocking-empty'
+
+  const contactContextStatus: ContextChipStatus | undefined = invalidFields.contactIdentityProfileId
+    ? 'invalid'
+    : organizationId && !contactIdentityProfileId
+      ? 'blocking-empty'
+      : undefined
+
+  const dealContextStatus: ContextChipStatus | undefined = invalidFields.hubspotDealId
+    ? 'invalid'
+    : organizationId && !hubspotDealId
+      ? 'blocking-empty'
+      : undefined
 
   const summaryDockNode = (
     <QuoteSummaryDock
@@ -1917,6 +2265,595 @@ const QuoteBuilderShell = ({
     />
   )
 
+  const quoteLineItemsNode = (
+    <QuoteLineItemsEditor
+      ref={editorRef}
+      quotationId={quote?.quotationId ?? ''}
+      currency={currency}
+      editable
+      lineItems={linesSnapshot}
+      saving={submitting || serviceExpanding}
+      businessLineCode={builderState.businessLineCode}
+      canViewCostStack={canSeeCostStack}
+      canOverrideCost={canSeeCostStack}
+      onCostOverrideApplied={() => {
+        // TASK-481: refresh pricing después del override; re-seteamos
+        // el snapshot para que el hook de simulación recompute cost
+        // breakdown + margen con la metadata nueva persistida.
+        setLinesSnapshot(current => current.map(line => ({ ...line })))
+      }}
+      simulationLines={simulation?.lines ?? null}
+      outputCurrency={currency}
+      structuredWarnings={mergedStructuredWarnings.length > 0 ? mergedStructuredWarnings : null}
+      simulating={simulating}
+      employmentTypeOptions={builderOptions.employmentTypes}
+      onDraftChange={setLinesSnapshot}
+      headerAction={
+        linesSnapshot.length > 0 ? (
+          <AddLineSplitButton
+            onCatalog={openCatalogPicker}
+            onService={openServicePicker}
+            onTemplate={() => setTemplatePickerOpen(true)}
+            onManual={handleManualLine}
+            disabled={submitting || serviceExpanding}
+          />
+        ) : null
+      }
+      onAddFromCatalog={openCatalogPicker}
+      onAddFromService={openServicePicker}
+      onAddFromTemplate={() => setTemplatePickerOpen(true)}
+      onAddFromManual={handleManualLine}
+      pendingHint={
+        !organizationId
+          ? GH_PRICING.emptyItems.pendingNote(
+              GH_PRICING.contextChips.progress.nextSteps.organization
+            )
+          : null
+      }
+    />
+  )
+
+  const quoteDetailsNode = (
+    <FormSectionAccordion
+      id='quote-detail'
+      title={GH_PRICING.detailAccordion.title}
+      iconClassName='tabler-notes'
+      defaultExpanded={builderState.description.length > 0}
+    >
+      <CustomTextField
+        fullWidth
+        multiline
+        minRows={3}
+        size='small'
+        label={GH_PRICING.detailAccordion.descriptionLabel}
+        value={builderState.description}
+        disabled={submitting}
+        onChange={event =>
+          setBuilderState(prev => ({ ...prev, description: event.target.value }))
+        }
+        placeholder={GH_PRICING.detailAccordion.descriptionPlaceholder}
+      />
+    </FormSectionAccordion>
+  )
+
+  const activeWizardPanel =
+    activeWizardStep === 'context' ? (
+      <Stack spacing={3} sx={{ p: { xs: 2.5, md: 3 } }}>
+        <Box
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: { xs: '1fr', xl: 'minmax(0, 1.05fr) minmax(360px, 0.95fr)' },
+            gap: { xs: 3, xl: 4 },
+            alignItems: 'start'
+          }}
+        >
+          <Stack spacing={2.5} sx={{ minWidth: 0 }}>
+            <Stack spacing={0.5}>
+              <Typography variant='h6'>{GH_PRICING.builderWizard.contextSetup.identityTitle}</Typography>
+              <Typography variant='body2' color='text.secondary' sx={{ maxWidth: '62ch' }}>
+                {GH_PRICING.builderWizard.contextSetup.identityDescription}
+              </Typography>
+            </Stack>
+
+            <Box
+              component='fieldset'
+              sx={{
+                border: 0,
+                m: 0,
+                p: 0,
+                display: 'grid',
+                gridTemplateColumns: { xs: '1fr', md: 'repeat(3, minmax(0, 1fr))' },
+                gap: 1.25,
+                minWidth: 0
+              }}
+            >
+              <Typography component='legend' sx={visuallyHidden}>
+                {GH_PRICING.builderWizard.contextSetup.identityTitle}
+              </Typography>
+              <ContextChip
+                fullWidth
+                required
+                testId='quote-party-organization-trigger'
+                prominence='primary'
+                icon={GH_PRICING.contextChips.organization.icon}
+                label={GH_PRICING.contextChips.organization.label}
+                value={selectedOrgName ?? pendingOrganizationLabel}
+                placeholder={GH_PRICING.contextChips.organization.placeholder}
+                status={mode === 'edit' ? 'locked' : organizationContextStatus}
+                disabled={submitting}
+                options={unifiedPartySelectorEnabled ? partyChipOptions : organizationChipOptions}
+                selectedValue={organizationId}
+                inputValue={unifiedPartySelectorEnabled ? partySearchQuery : undefined}
+                onInputValueChange={unifiedPartySelectorEnabled ? setPartySearchQuery : undefined}
+                onSelectChange={value => {
+                  if (unifiedPartySelectorEnabled) {
+                    if (!value) void handlePartySelection(null)
+
+                    return
+                  }
+
+                  handleOrganizationChange(value)
+                }}
+                onOptionSelect={
+                  unifiedPartySelectorEnabled
+                    ? option => {
+                        const party = option?.meta?.party as QuoteContextPartySelectorOption | undefined
+
+                        void handlePartySelection(party ?? null)
+                      }
+                    : undefined
+                }
+                searchPlaceholder={GH_PRICING.contextChips.organization.unifiedSearchPlaceholder}
+                loading={partySearchLoading || partySearchWaitingForCurrentQuery || Boolean(adoptingCompanyId)}
+                loadingText={
+                  adoptingCompanyId
+                    ? GH_PRICING.contextChips.organization.unifiedAdopting
+                    : partySearchTrimmedQuery.length >= 2
+                      ? GH_PRICING.contextChips.organization.unifiedSearching
+                      : GH_PRICING.contextChips.organization.unifiedMinQuery
+                }
+                renderOption={unifiedPartySelectorEnabled ? renderPartySelectorOption : undefined}
+                noOptionsText={
+                  partySearchError
+                    ? formatPartySelectorError(partySearchError)
+                    : GH_PRICING.contextChips.organization.unifiedEmpty
+                }
+                liveMessage={partySelectorLiveMessage}
+                popoverWidth={460}
+              />
+              <ContextChip
+                fullWidth
+                prominence='primary'
+                icon={GH_PRICING.contextChips.contact.icon}
+                label={GH_PRICING.contextChips.contact.label}
+                value={selectedContact?.fullName ?? selectedContact?.canonicalEmail ?? null}
+                placeholder={
+                  organizationId
+                    ? GH_PRICING.contextChips.contact.placeholder
+                    : GH_PRICING.contextChips.contact.noOrgFirst
+                }
+                status={contactContextStatus}
+                disabled={submitting || !organizationId}
+                errorMessage={invalidFields.contactIdentityProfileId}
+                options={contactChipOptions}
+                selectedValue={contactIdentityProfileId}
+                onSelectChange={setContactIdentityProfileId}
+                loading={contactsLoading}
+                loadingText={GH_PRICING.contextChips.contact.loading}
+                noOptionsText={
+                  organizationId
+                    ? GH_PRICING.contextChips.contact.empty
+                    : GH_PRICING.contextChips.contact.noOrgFirst
+                }
+                popoverWidth={420}
+              />
+              <ContextChip
+                fullWidth
+                prominence='primary'
+                icon={GH_PRICING.contextChips.deal.icon}
+                label={GH_PRICING.contextChips.deal.label}
+                value={selectedDeal?.dealName ?? null}
+                placeholder={
+                  organizationId
+                    ? GH_PRICING.contextChips.deal.placeholder
+                    : GH_PRICING.contextChips.deal.noOrgFirst
+                }
+                status={dealContextStatus}
+                disabled={submitting || !organizationId}
+                errorMessage={invalidFields.hubspotDealId}
+                options={dealChipOptions}
+                selectedValue={hubspotDealId}
+                onSelectChange={setHubspotDealId}
+                loading={dealsLoading}
+                loadingText={GH_PRICING.contextChips.deal.loading}
+                noOptionsText={
+                  organizationId
+                    ? GH_PRICING.contextChips.deal.empty
+                    : GH_PRICING.contextChips.deal.noOrgFirst
+                }
+                popoverWidth={420}
+                popoverNotice={
+                  organizationId
+                    ? {
+                        tone: dealChipOptions.length === 0 ? 'warning' : 'info',
+                        message:
+                          dealChipOptions.length === 0
+                            ? GH_PRICING.contextChips.deal.emptyHelper
+                            : GH_PRICING.contextChips.deal.searchFooterPrompt,
+                        actionLabel: GH_PRICING.builderWizard.contextSetup.createDealInline,
+                        onAction: () => setCreateDealDrawerOpen(true)
+                      }
+                    : undefined
+                }
+              />
+            </Box>
+          </Stack>
+
+          <Stack spacing={2.5} sx={{ minWidth: 0 }}>
+            <Stack spacing={0.5}>
+              <Typography variant='h6'>{GH_PRICING.builderWizard.contextSetup.termsTitle}</Typography>
+              <Typography variant='body2' color='text.secondary' sx={{ maxWidth: '62ch' }}>
+                {GH_PRICING.builderWizard.contextSetup.termsDescription}
+              </Typography>
+            </Stack>
+
+            <Box
+              component='fieldset'
+              sx={{
+                border: 0,
+                m: 0,
+                p: 0,
+                display: 'grid',
+                gridTemplateColumns: { xs: '1fr', md: 'repeat(2, minmax(0, 1fr))' },
+                gap: 1.25,
+                minWidth: 0
+              }}
+            >
+              <Typography component='legend' sx={visuallyHidden}>
+                {GH_PRICING.builderWizard.contextSetup.termsTitle}
+              </Typography>
+              <ContextChip
+                fullWidth
+                prominence='primary'
+                icon={GH_PRICING.contextChips.businessLine.icon}
+                label={GH_PRICING.contextChips.businessLine.label}
+                value={selectedBusinessLine?.label ?? null}
+                placeholder={GH_PRICING.contextChips.businessLine.placeholder}
+                disabled={submitting}
+                options={businessLineChipOptions}
+                selectedValue={builderState.businessLineCode}
+                onSelectChange={code => setBuilderState(prev => ({ ...prev, businessLineCode: code }))}
+              />
+              <ContextChip
+                fullWidth
+                prominence='primary'
+                icon={GH_PRICING.contextChips.commercialModel.icon}
+                label={GH_PRICING.contextChips.commercialModel.label}
+                value={selectedCommercialModel?.label ?? null}
+                placeholder={GH_PRICING.contextChips.commercialModel.placeholder}
+                disabled={submitting}
+                options={commercialModelChipOptions}
+                selectedValue={builderState.commercialModel}
+                onSelectChange={value =>
+                  value && setBuilderState(prev => ({ ...prev, commercialModel: value as CommercialModelCode }))
+                }
+              />
+              <ContextChip
+                fullWidth
+                prominence='primary'
+                icon={GH_PRICING.contextChips.countryFactor.icon}
+                label={GH_PRICING.contextChips.countryFactor.label}
+                value={selectedCountryFactor?.label ?? null}
+                placeholder={GH_PRICING.contextChips.countryFactor.placeholder}
+                disabled={submitting}
+                options={countryFactorChipOptions}
+                selectedValue={builderState.countryFactorCode}
+                onSelectChange={value =>
+                  value && setBuilderState(prev => ({ ...prev, countryFactorCode: value }))
+                }
+              />
+              <ContextChip
+                fullWidth
+                prominence='primary'
+                icon={GH_PRICING.contextChips.currency.icon}
+                label={GH_PRICING.contextChips.currency.label}
+                value={builderState.outputCurrency}
+                placeholder={GH_PRICING.contextChips.currency.placeholder}
+                disabled={submitting}
+                options={QUOTE_CURRENCY_OPTIONS}
+                selectedValue={builderState.outputCurrency}
+                onSelectChange={value =>
+                  value && setBuilderState(prev => ({ ...prev, outputCurrency: value as PricingOutputCurrency }))
+                }
+                popoverWidth={320}
+              />
+              <ContextChip
+                fullWidth
+                prominence='primary'
+                mode='custom'
+                icon={GH_PRICING.contextChips.duration.icon}
+                label={GH_PRICING.contextChips.duration.label}
+                value={durationValue}
+                placeholder={GH_PRICING.contextChips.duration.placeholder}
+                disabled={submitting}
+                popoverWidth={300}
+                popoverContent={() => (
+                  <Stack spacing={1.5}>
+                    <Typography variant='h6'>{GH_PRICING.contextChips.duration.label}</Typography>
+                    <CustomTextField
+                      fullWidth
+                      size='small'
+                      type='number'
+                      value={builderState.contractDurationMonths ?? ''}
+                      onChange={event => {
+                        const parsed = Number.parseInt(event.target.value, 10)
+
+                        setBuilderState(prev => ({
+                          ...prev,
+                          contractDurationMonths: Number.isFinite(parsed) ? parsed : null
+                        }))
+                      }}
+                      inputProps={{ min: 1, max: 120, step: 1 }}
+                      helperText={GH_PRICING.contextChips.duration.hint}
+                      disabled={submitting}
+                      aria-label={GH_PRICING.contextChips.duration.label}
+                      autoFocus
+                    />
+                  </Stack>
+                )}
+              />
+              <ContextChip
+                fullWidth
+                prominence='primary'
+                mode='custom'
+                icon={GH_PRICING.contextChips.validUntil.icon}
+                label={GH_PRICING.contextChips.validUntil.label}
+                value={validUntilValue}
+                placeholder={GH_PRICING.contextChips.validUntil.placeholder}
+                disabled={submitting}
+                popoverWidth={300}
+                popoverContent={() => (
+                  <Stack spacing={1.5}>
+                    <Typography variant='h6'>{GH_PRICING.contextChips.validUntil.label}</Typography>
+                    <CustomTextField
+                      fullWidth
+                      size='small'
+                      type='date'
+                      value={builderState.validUntil ?? ''}
+                      onChange={event =>
+                        setBuilderState(prev => ({ ...prev, validUntil: event.target.value || null }))
+                      }
+                      InputLabelProps={{ shrink: true }}
+                      disabled={submitting}
+                      aria-label={GH_PRICING.contextChips.validUntil.label}
+                      autoFocus
+                    />
+                  </Stack>
+                )}
+              />
+            </Box>
+          </Stack>
+        </Box>
+
+        <Divider />
+
+        <Stack
+          direction={{ xs: 'column', md: 'row' }}
+          spacing={2}
+          alignItems={{ xs: 'stretch', md: 'center' }}
+          justifyContent='space-between'
+          aria-label={GH_PRICING.builderWizard.contextSetup.sectionActionsLabel}
+        >
+          <Stack spacing={0.25}>
+            <Typography variant='h6'>
+              {organizationId
+                ? GH_PRICING.builderWizard.contextSetup.readinessComplete
+                : GH_PRICING.builderWizard.contextSetup.readinessPending}
+            </Typography>
+            <Typography variant='body2' color='text.secondary'>
+              {organizationId
+                ? GH_PRICING.builderWizard.steps.scope.description
+                : GH_PRICING.identityStrip.subtitleNeedsOrganization}
+            </Typography>
+          </Stack>
+          <Button
+            variant='contained'
+            endIcon={<i className='tabler-arrow-right' aria-hidden='true' />}
+            onClick={() => setActiveWizardStep('scope')}
+            disabled={!organizationId}
+          >
+            {GH_PRICING.builderWizard.steps.context.cta}
+          </Button>
+        </Stack>
+      </Stack>
+    ) : activeWizardStep === 'scope' ? (
+      <Stack spacing={2.5} sx={{ p: { xs: 2, md: 3 } }}>
+        {quoteLineItemsNode}
+        <Divider />
+        <Stack
+          direction={{ xs: 'column', sm: 'row' }}
+          spacing={1.25}
+          alignItems={{ xs: 'stretch', sm: 'center' }}
+          justifyContent='space-between'
+        >
+          <Button
+            variant='text'
+            color='inherit'
+            startIcon={<i className='tabler-arrow-left' aria-hidden='true' />}
+            onClick={() => setActiveWizardStep('context')}
+            sx={{ alignSelf: { sm: 'center' } }}
+          >
+            {GH_PRICING.builderWizard.steps.scope.back}
+          </Button>
+          <Button
+            variant='contained'
+            size='small'
+            endIcon={<i className='tabler-arrow-right' aria-hidden='true' />}
+            onClick={() => setActiveWizardStep('economics')}
+            disabled={!hasSubmittableContent}
+            sx={{ minHeight: 38, px: 2.5 }}
+          >
+            {GH_PRICING.builderWizard.steps.scope.cta}
+          </Button>
+        </Stack>
+      </Stack>
+    ) : (
+      <Stack spacing={2.5} sx={{ p: { xs: 2, md: 3 } }}>
+        <Box
+          data-capture='quote-builder-economics-review'
+          sx={theme => ({
+            border: `1px solid ${theme.palette.divider}`,
+            borderRadius: `${theme.shape.customBorderRadius.md}px`,
+            backgroundColor: theme.palette.background.default,
+            overflow: 'hidden'
+          })}
+        >
+          <Box sx={{ p: { xs: 2, md: 2.5 }, backgroundColor: 'background.paper' }}>
+            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} alignItems={{ xs: 'flex-start', sm: 'center' }} justifyContent='space-between'>
+              <Stack spacing={0.35} sx={{ minWidth: 0 }}>
+                <Typography variant='h6'>{GH_PRICING.builderWizard.steps.economics.reviewTitle}</Typography>
+                <Typography variant='body2' color='text.secondary'>
+                  {GH_PRICING.builderWizard.steps.economics.reviewDescription}
+                </Typography>
+              </Stack>
+              <CustomChip
+                round='true'
+                size='small'
+                variant='tonal'
+                color={!issueActionDisabled ? 'success' : 'warning'}
+                label={
+                  !issueActionDisabled
+                    ? GH_PRICING.builderWizard.steps.economics.reviewReady
+                    : GH_PRICING.builderWizard.steps.economics.reviewPending
+                }
+              />
+            </Stack>
+          </Box>
+          <Divider />
+          <Box
+            component='ul'
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: { xs: '1fr', md: 'repeat(3, minmax(0, 1fr))' },
+              gap: 0,
+              m: 0,
+              p: 0,
+              listStyle: 'none'
+            }}
+          >
+            {[
+              {
+                key: 'context',
+                icon: 'tabler-building-bank',
+                title: GH_PRICING.builderWizard.steps.context.title,
+                description: GH_PRICING.builderWizard.steps.context.description,
+                complete: quoteContextReady,
+                onClick: () => setActiveWizardStep('context')
+              },
+              {
+                key: 'scope',
+                icon: 'tabler-list-details',
+                title: GH_PRICING.builderWizard.steps.scope.title,
+                description: GH_PRICING.builderWizard.steps.scope.description,
+                complete: hasSubmittableContent,
+                onClick: () => setActiveWizardStep('scope')
+              },
+              {
+                key: 'pricing',
+                icon: 'tabler-chart-donut-3',
+                title: GH_PRICING.dealDesk.pricingTitle,
+                description: simulating ? GH_PRICING.dealDesk.pricingCalculating : GH_PRICING.dealDesk.pricingReady,
+                complete: !saveDraftDisabled && hasSubmittableContent && !simulationError,
+                onClick: undefined
+              }
+            ].map(item => (
+              <Box
+                key={item.key}
+                component='li'
+                sx={theme => ({
+                  minWidth: 0,
+                  borderInlineEnd: { md: `1px solid ${theme.palette.divider}` },
+                  '&:last-of-type': {
+                    borderInlineEnd: 0
+                  }
+                })}
+              >
+                <ButtonBase
+                  disabled={!item.onClick}
+                  onClick={item.onClick}
+                  sx={theme => ({
+                    width: '100%',
+                    minHeight: 92,
+                    alignItems: 'flex-start',
+                    justifyContent: 'flex-start',
+                    gap: 1.25,
+                    p: { xs: 2, md: 2.25 },
+                    textAlign: 'left',
+                    color: 'text.primary',
+                    cursor: item.onClick ? 'pointer' : 'default',
+                    transition: theme.transitions.create(['background-color', 'color'], {
+                      duration: theme.transitions.duration.shortest
+                    }),
+                    '&:hover': item.onClick
+                      ? {
+                          backgroundColor: alpha(theme.palette.primary.main, 0.035)
+                        }
+                      : undefined,
+                    '&.Mui-disabled': {
+                      color: theme.palette.text.primary,
+                      opacity: 1
+                    },
+                    '&.Mui-focusVisible': {
+                      outline: `2px solid ${theme.palette.primary.main}`,
+                      outlineOffset: -2
+                    }
+                  })}
+                >
+                  <Box
+                    component='span'
+                    aria-hidden='true'
+                    sx={theme => ({
+                      width: 34,
+                      height: 34,
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0,
+                      borderRadius: `${theme.shape.customBorderRadius.sm}px`,
+                      color: item.complete ? 'success.main' : 'text.secondary',
+                      backgroundColor: item.complete ? theme.palette.success.lightOpacity : theme.palette.background.paper,
+                      border: `1px solid ${item.complete ? alpha(theme.palette.success.main, 0.22) : theme.palette.divider}`
+                    })}
+                  >
+                    <i className={item.complete ? 'tabler-check' : item.icon} aria-hidden='true' style={{ fontSize: 18 }} />
+                  </Box>
+                  <Stack spacing={0.3} sx={{ minWidth: 0 }}>
+                    <Typography variant='subtitle1' sx={{ fontWeight: 600 }}>
+                      {item.title}
+                    </Typography>
+                    <Typography variant='body2' color='text.secondary'>
+                      {item.description}
+                    </Typography>
+                  </Stack>
+                </ButtonBase>
+              </Box>
+            ))}
+          </Box>
+          <Box sx={{ px: { xs: 2, md: 2.5 }, py: 1.75, borderTop: theme => `1px solid ${theme.palette.divider}` }}>
+            <Typography variant='body2' color='text.secondary' role='status'>
+              {!issueActionDisabled
+                ? GH_PRICING.builderWizard.steps.economics.reviewHintReady
+                : issueDisabledReason ?? GH_PRICING.builderWizard.steps.economics.reviewHintPending}
+            </Typography>
+          </Box>
+        </Box>
+        {quoteDetailsNode}
+        <Box data-capture='quote-builder-mobile-summary-dock' sx={{ display: { xs: 'block', lg: 'none' } }}>
+          {summaryDockNode}
+        </Box>
+      </Stack>
+    )
+
   return (
     <Box>
       <QuoteIdentityStrip
@@ -1929,6 +2866,21 @@ const QuoteBuilderShell = ({
         subtitle={subtitle}
         quoteNumber={quote?.quotationNumber ?? null}
         status={quoteStatus}
+        centerSlot={
+          <FieldsProgressChip
+            filled={quoteReadinessFilled}
+            total={quoteReadinessTotal}
+            suffix={GH_PRICING.contextChips.progress.suffix}
+            srLabel={
+              quoteReadinessFilled >= quoteReadinessTotal
+                ? () => GH_PRICING.contextChips.progress.readyAriaLive
+                : GH_PRICING.contextChips.progress.ariaLive
+            }
+            readyLabel={GH_PRICING.contextChips.progress.readyLabel}
+            nextStepHint={quoteReadinessNextHint}
+            testId='quote-header-readiness-progress'
+          />
+        }
         actions={
 
           /*
@@ -1936,11 +2888,25 @@ const QuoteBuilderShell = ({
             Header conserva navegación + save draft. La acción terminal vive
             EXCLUSIVAMENTE en QuoteSummaryDock (junto al total y al save state)
             para que la pantalla tenga un solo centro de gravedad. El save
-            draft baja a tonal/secondary (sin color primario) para no competir
+            draft queda outlined/primary para mantener affordance sin competir
             con el contained CTA del dock.
           */
           <>
-            <Button variant='tonal' color='secondary' onClick={handleCancel} disabled={submitting}>
+            <Button
+              variant='outlined'
+              color='inherit'
+              onClick={handleCancel}
+              disabled={submitting}
+              sx={theme => ({
+                borderColor: theme.palette.divider,
+                color: theme.palette.text.secondary,
+                backgroundColor: theme.palette.background.paper,
+                '&:hover': {
+                  borderColor: theme.palette.text.primary,
+                  backgroundColor: theme.palette.action.hover
+                }
+              })}
+            >
               {GH_PRICING.builderCancel}
             </Button>
             <Tooltip
@@ -1950,8 +2916,8 @@ const QuoteBuilderShell = ({
             >
               <span>
                 <Button
-                  variant='tonal'
-                  color='secondary'
+                  variant='outlined'
+                  color='primary'
                   size='small'
                   startIcon={<i className='tabler-device-floppy' aria-hidden='true' />}
                   onClick={() => handleSubmit({ closeAfter: false })}
@@ -2018,15 +2984,13 @@ const QuoteBuilderShell = ({
         }}
       >
         <CompositionShell
-          composition='split'
+          composition={activeWizardStep === 'context' ? 'single' : 'split'}
           kind='custom'
           instanceId='finance-quote-builder-deal-desk'
           asideLabel={GH_PRICING.dealDesk.asideTitle}
           regions={{
             primary: (
               <Stack spacing={3} sx={{ minWidth: 0 }}>
-                {quoteContextStripNode}
-
                 {error ? (
                   <Alert severity='error' role='alert' onClose={() => setError(null)}>
                     {error}
@@ -2039,110 +3003,37 @@ const QuoteBuilderShell = ({
                   </Alert>
                 ) : null}
 
-                <QuoteLineItemsEditor
-                  ref={editorRef}
-                  quotationId={quote?.quotationId ?? ''}
-                  currency={currency}
-                  editable
-                  lineItems={linesSnapshot}
-                  saving={submitting || serviceExpanding}
-                  businessLineCode={builderState.businessLineCode}
-                  canViewCostStack={canSeeCostStack}
-                  canOverrideCost={canSeeCostStack}
-                  onCostOverrideApplied={() => {
-                    // TASK-481: refresh pricing después del override; re-seteamos
-                    // el snapshot para que el hook de simulación recompute cost
-                    // breakdown + margen con la metadata nueva persistida.
-                    setLinesSnapshot(current => current.map(line => ({ ...line })))
-                  }}
-                  simulationLines={simulation?.lines ?? null}
-                  outputCurrency={currency}
-                  structuredWarnings={mergedStructuredWarnings.length > 0 ? mergedStructuredWarnings : null}
-                  simulating={simulating}
-                  employmentTypeOptions={builderOptions.employmentTypes}
-                  onDraftChange={setLinesSnapshot}
-
-                  /*
-                    TASK-615 — Empty state vs toolbar orchestration.
-                    Cuando todavía no hay líneas, el split button NO se muestra en
-                    el header del editor: el EmptyState lleva el peso de la affordance
-                    y enseña los 4 métodos de composición. Una vez que existen líneas,
-                    el split button vuelve al header como acelerador de continuidad.
-                  */
-                  headerAction={
-                    linesSnapshot.length > 0 ? (
-                      <AddLineSplitButton
-                        onCatalog={openCatalogPicker}
-                        onService={openServicePicker}
-                        onTemplate={() => setTemplatePickerOpen(true)}
-                        onManual={handleManualLine}
-                        disabled={submitting || serviceExpanding}
-                      />
-                    ) : null
-                  }
-                  onAddFromCatalog={openCatalogPicker}
-                  onAddFromService={openServicePicker}
-                  onAddFromTemplate={() => setTemplatePickerOpen(true)}
-                  onAddFromManual={handleManualLine}
-                  pendingHint={
-                    !organizationId
-                      ? GH_PRICING.emptyItems.pendingNote(
-                          GH_PRICING.contextChips.progress.nextSteps.organization
-                        )
-                      : null
-                  }
-                />
-
-                <FormSectionAccordion
-                  id='quote-detail'
-                  title={GH_PRICING.detailAccordion.title}
-                  iconClassName='tabler-notes'
-                  defaultExpanded={builderState.description.length > 0}
+                <QuoteWizardFrame
+                  activeStep={activeWizardStep}
+                  canOpenScope={Boolean(organizationId)}
+                  canOpenEconomics={hasSubmittableContent}
+                  onStepChange={setActiveWizardStep}
                 >
-                  <CustomTextField
-                    fullWidth
-                    multiline
-                    minRows={3}
-                    size='small'
-                    label={GH_PRICING.detailAccordion.descriptionLabel}
-                    value={builderState.description}
-                    disabled={submitting}
-                    onChange={event =>
-                      setBuilderState(prev => ({ ...prev, description: event.target.value }))
-                    }
-                    placeholder={GH_PRICING.detailAccordion.descriptionPlaceholder}
-                  />
-                </FormSectionAccordion>
-
-                <Box data-capture='quote-builder-mobile-summary-dock' sx={{ display: { xs: 'block', lg: 'none' } }}>
-                  {summaryDockNode}
-                </Box>
+                  {activeWizardPanel}
+                </QuoteWizardFrame>
               </Stack>
             ),
-            aside: (
-              <QuoteReadinessAside
-                readinessItems={readinessItems}
-                subtotal={subtotalOutputCurrency}
-                ivaAmount={ivaAmountPreview}
-                total={totalWithIvaPreview}
-                currency={currency}
-                loading={simulating}
-                simulationError={dockSimulationError}
-                marginPct={marginPct}
-                marginClassification={marginClass}
-                addonCount={addonPanelEntries.length}
-                appliedAddonsTotal={appliedAddonsTotal}
-                hubspotDealId={hubspotDealId}
-                organizationId={organizationId}
-                primaryCtaLabel={GH_PRICING.summaryDock.primaryCta}
-                primaryCtaLoading={submitting}
-                primaryCtaDisabled={issueActionDisabled}
-                disabledReason={issueDisabledReason}
-                saveState={saveState}
-                onPrimaryClick={() => handleSubmit({ issueAfterSave: true })}
-                onCreateDeal={() => setCreateDealDrawerOpen(true)}
-              />
-            )
+            aside:
+              activeWizardStep === 'context' ? undefined : (
+                <QuoteReadinessAside
+                  subtotal={subtotalOutputCurrency}
+                  ivaAmount={ivaAmountPreview}
+                  total={totalWithIvaPreview}
+                  currency={currency}
+                  loading={simulating}
+                  simulationError={dockSimulationError}
+                  marginPct={marginPct}
+                  marginClassification={marginClass}
+                  addonCount={addonPanelEntries.length}
+                  appliedAddonsTotal={appliedAddonsTotal}
+                  primaryCtaLabel={GH_PRICING.summaryDock.primaryCta}
+                  primaryCtaLoading={submitting}
+                  primaryCtaDisabled={issueActionDisabled}
+                  disabledReason={issueDisabledReason}
+                  saveState={saveState}
+                  onPrimaryClick={() => handleSubmit({ issueAfterSave: true })}
+                />
+              )
           }}
         />
       </Box>
