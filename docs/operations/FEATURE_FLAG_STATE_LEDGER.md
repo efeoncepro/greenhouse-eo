@@ -2,7 +2,7 @@
 
 > **Tipo de documento:** Ledger operativo vivo (SSOT del ESTADO de los env-var flags)
 > **Creado:** 2026-06-18 por Claude (TASK-1079 follow-up)
-> **Última actualización:** 2026-06-18
+> **Última actualización:** 2026-06-21 (TASK-995 — 5 flags CLF agregados a § Pendientes)
 > **Doc relacionado:** [GREENHOUSE_FEATURE_FLAGS_ROLLOUT_PLATFORM_V1.md](../architecture/GREENHOUSE_FEATURE_FLAGS_ROLLOUT_PLATFORM_V1.md) (los flags PG declarativos — mecanismo distinto, ver abajo)
 
 ## Por qué existe este doc
@@ -22,7 +22,7 @@ Es **encontrable** desde: `CLAUDE.md` (Runtime Rollout Completion Gate), `AGENTS
 
 ## ⚠️ Reglas duras
 
-- **NUNCA** declarar un env-var flag nuevo (`*_ENABLED`) sin agregar una fila a **§ Inventario** y, si queda code-complete pero sin prender, a **§ Pendientes de acción** — en el mismo PR.
+- **NUNCA** declarar un env-var flag nuevo (`*_ENABLED`) sin agregar una fila a **§ Inventario** y, si queda code-complete pero sin prender, a **§ Pendientes de acción** — en el mismo PR. **Enforcement mecánico:** `pnpm docs:closure-check` corre `feature-flags-audit --strict` y **falla (exit 1) si hay un flag en código sin registrar acá** → ningún cierre/closure pasa con un flag sin documentar.
 - **NUNCA** considerar un flag "rolled out" hasta verlo en el environment correcto (`vercel env ls`) **+ redeploy aplicado**. `code complete` ≠ `operationally complete` (ver Runtime Rollout Completion Gate en `CLAUDE.md`).
 - **SIEMPRE** que prendas/apagues un flag en un environment, actualizá la **§ Snapshot** (con fecha) y, si cerró un pendiente, sacá la fila de **§ Pendientes de acción**.
 - **NUNCA** confíes en este doc como verdad live para una decisión crítica — la **verdad live es `vercel env ls`**. Este doc es el ledger humano (intención + pendientes + último snapshot conocido).
@@ -42,6 +42,8 @@ Es **encontrable** desde: `CLAUDE.md` (Runtime Rollout Completion Gate), `AGENTS
 | `NOTION_DUE_DATE_CAPTURE_ENABLED` (M0) + `ATTRIBUTABLE_LATENESS_OTD_ENABLED` (M2) | TASK-921/922 (consumido por TASK-1169 → TASK-1170) | OFF/default por environment (verdad live: `vercel env ls`) | **NO bloquea TASK-1169** (su materializador/reconciliación/signal corren sin flag, shadow). Pero el OTD-imputable member×month tiene cobertura de freeze casi nula sobre la cohorte productiva hasta que estos flags estén ON + se backfillee el M2 shadow sobre la cohorte. Prender + backfill es prerequisito del reloj ≥30d y del cutover **TASK-1170**, no de esta task. | Dependencia de rollout documentada en ADR `GREENHOUSE_ATTRIBUTABLE_LATENESS_V1` §16.11 + Handoff. El flip productivo del bono es TASK-1170 (gateado, ≥30d shadow + sign-off). |
 
 | `NOTION_OTD_WRITEBACK_ENABLED` + per-cliente `_EFEONCE` / `_SKY` | TASK-927 | OFF/default en todos los environments (verdad live: `vercel env ls`) · **code complete, rollout pendiente** | Writeback `[GH] OTD` a Notion (display-only, client-facing). Activación gateada al operador: (1) crear la propiedad `[GH] OTD` (select, read-only) en Notion Efeonce + Sky; (2) redeploy del ops-worker (registra el Cloud Scheduler `ops-otd-writeback` + endpoint `/otd/writeback`); (3) flip del flag per-cliente con el gate `delivery.attributable_lateness.shadow_terminal_open` en steady=0. | Display-only, NUNCA toca el bono. Default OFF → cero writes hasta activar. El batch es no-op con flag OFF aunque el job exista. Spec: TASK-927 + OTD_V1 §Delta 2026-06-20. |
+
+| `FINANCE_CORE_CLF_INDEXED_ENABLED` + `FINANCE_CLF_INCOME_PROJECTION_ENABLED` + `FINANCE_CLF_OBLIGATIONS_ENABLED` + `FINANCE_CLF_REPORTING_ENABLED` + `FINANCE_CLF_BACKFILL_APPLY_ENABLED` | TASK-995 | OFF/default en todos los environments (verdad live: `vercel env ls`) · **code-complete + gated** | (1) `FINANCE_CORE_CLF_INDEXED_ENABLED=true` (master) + `FINANCE_CLF_INCOME_PROJECTION_ENABLED=true` en staging → habilita la rama CLF de los materializers (cotización/HES/**OC de cliente en UF** → income CLP + plano native UF + snapshot CLF→CLP); (2) validar con una OC de cliente en UF real → income materializado + los 4 signals `finance.uf.rate_freshness`/`finance.indexed_unit.*` en steady; (3) prod tras sign-off Finance. `FINANCE_CLF_OBLIGATIONS_ENABLED`/`FINANCE_CLF_REPORTING_ENABLED`/`FINANCE_CLF_BACKFILL_APPLY_ENABLED` se prenden cuando se cableen sus consumers (obligations CLF / readers / backfill — diferidos por anti-drift). | CLF/UF como unidad indexada nativa (ADR `GREENHOUSE_CLF_INDEXED_FINANCE_CORE_V1`). Default OFF → CLF sigue pricing/quote-only; el camino CLP/USD/MXN es bit-for-bit. Las OC son las **recibidas de clientes** (lado income/AR), no compras a proveedores. |
 
 _(Agregá acá cualquier flag que dejes code-complete sin prender. Si está vacío, ¡no hay deuda pendiente!)_
 
