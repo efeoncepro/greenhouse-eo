@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
+import { can } from '@/lib/entitlements/runtime'
 import { listPaymentOrders } from '@/lib/finance/payment-orders/list-orders'
 import { createPaymentOrderFromObligations } from '@/lib/finance/payment-orders/create-from-obligations'
 import {
@@ -55,6 +56,11 @@ export async function POST(request: Request) {
   const { tenant, errorResponse } = await requireFinanceTenantContext()
 
   if (!tenant) return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+  // TASK-1192 — gate fino de acción (capability != route-group).
+  if (!can(tenant, 'finance.payment_orders.create', 'create', 'tenant')) {
+    return NextResponse.json({ error: 'No tienes permiso para crear órdenes de pago.', code: 'forbidden' }, { status: 403 })
+  }
 
   try {
     const body = await request.json()
