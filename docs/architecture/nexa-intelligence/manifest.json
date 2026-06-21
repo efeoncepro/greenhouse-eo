@@ -119,6 +119,7 @@
         "src/lib/nexa/actions/types.ts",
         "src/lib/nexa/actions/registry.ts",
         "src/lib/nexa/actions/pilot-mark-notifications-read.ts",
+        "src/lib/nexa/actions/author-quote.ts",
         "src/lib/nexa/actions/extract-proposals.ts",
         "src/lib/nexa/actions/confirm.ts",
         "src/lib/nexa/actions/events-store.ts",

@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.2
+> **Version:** 1.3
 > **Creado:** 2026-06-13 por Claude (sesión TASK-1104/1105 + capstone)
-> **Ultima actualizacion:** 2026-06-18 por Claude (TASK-1079 — modo de interacción dock/expandible/lane)
+> **Ultima actualizacion:** 2026-06-21 por Claude (v1.3 — TASK-1212: sección "Nexa puede ejecutar acciones con tu confirmación" + governed action `author_quote`), 2026-06-18 por Claude (TASK-1079 — modo de interacción dock/expandible/lane)
 > **Documentacion tecnica:** [docs/architecture/ui-platform/CONVERSATIONAL_EXPERIENCE.md](../../architecture/ui-platform/CONVERSATIONAL_EXPERIENCE.md)
 
 # Experiencia Conversacional de Nexa — cómo funciona
@@ -101,6 +101,32 @@ Cambias el modo desde el propio chat de Nexa (botón de modo en la cabecera). La
 > Detalle técnico: el modo "Lateral" llega de forma gradual (controlado por el equipo); por defecto verás
 > Compacto o Panel. La fuente de verdad del modo vive en `greenhouse_core.client_users.nexa_interaction_mode`.
 > Para operarlo paso a paso: [manual de uso](../../manual-de-uso/plataforma/nexa-modo-de-interaccion.md).
+
+## Nexa puede ejecutar acciones — con tu confirmación
+
+Nexa no solo responde: también puede **hacer cosas por ti** dentro del portal. Pero nunca actúa sola.
+El flujo es siempre **propone → confirmas → ejecuta**:
+
+1. **Propone.** Le pides algo (por ejemplo, "cotiza este servicio para tal cliente"). Nexa NO escribe
+   nada todavía: te muestra una **tarjeta de confirmación** con un resumen de lo que va a pasar (qué se
+   va a crear/cambiar, con qué datos, el impacto).
+2. **Confirmas.** Tú revisas el resumen y aprietas confirmar (o cancelas). Nada cambia hasta ese clic.
+3. **Ejecuta.** Recién ahí el portal ejecuta la acción, usando exactamente el mismo motor que usarías a
+   mano desde la pantalla. Confirmar dos veces no la ejecuta dos veces.
+
+Por qué es seguro:
+
+- **El modelo de IA nunca escribe directo.** Solo puede proponer acciones que están **registradas** por
+  el equipo; no puede inventar una operación, un endpoint ni una consulta.
+- **Tus permisos mandan.** Si no tienes permiso para esa acción, Nexa te lo dice y no hace nada.
+- **Si algo no calza, no se propone.** Datos incompletos o inválidos → Nexa lo dice honestamente en vez
+  de adivinar.
+
+**Qué puede hacer hoy:** marcar tus notificaciones como leídas, y **crear o emitir una cotización**
+(`author_quote`, TASK-1212). Cada acción nace **apagada por defecto** y se prende por configuración cuando
+el equipo lo decide. La lista crece a medida que se registran nuevas (por ejemplo, el cierre Quote-to-Cash).
+
+> Detalle técnico: runtime de acciones gobernadas en [behavior-and-routing.md](../../architecture/nexa-intelligence/behavior/behavior-and-routing.md) + contrato `nexa-action-proposal.v1` en [data-contracts.md](../../architecture/nexa-intelligence/technical/data-contracts.md). Para cotizaciones: [cotizador.md (vertical de escritura)](../finance/cotizador.md) + manual [Operar Comercial y Quote-to-Cash](../../manual-de-uso/comercial/operar-quote-to-cash-comercial.md).
 
 ## Dónde verla viva
 

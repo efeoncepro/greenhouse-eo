@@ -152,6 +152,29 @@ security para el primer piloto).
 `nexa.action.failure_rate` y `nexa.action.unauthorized_proposal_rate` (SECURITY — detecta al LLM
 inducido a proponer acciones prohibidas/inexistentes). Contrato: [`technical/data-contracts.md`](../technical/data-contracts.md).
 
+### Acciones parametrizadas (TASK-1212)
+
+El piloto V1 (`mark_notifications_read`) es una **self-action sin input**. TASK-1212 extendió el runtime
+a **acciones parametrizadas**: el LLM propone un `input` además de la `actionKey`, y la acción declara un
+**`inputSchema` Zod**. El contrato `NexaActionDefinition` es ahora genérico sobre `TInput`; las
+self-actions quedan en `TInput = void` (sin cambio). Flujo:
+
+1. **Propose** — `propose_action(actionKey, input)`. El resolver parsea `input` con `definition.inputSchema`;
+   si no pasa → gap honesto `invalid_input` (NUNCA se propone una mutación con datos inválidos). El
+   `input` validado viaja en `proposal.execution.input` (eco al cliente).
+2. **Confirm** — la confirm-card echa de vuelta `idempotencyKey` **+ `input`**. El endpoint **re-valida**
+   el `input` contra el schema en el punto de mutación (no confía en el eco del cliente).
+3. **Execute** — el command bound corre con el `input` validado. Como el command **re-enforza todos sus
+   invariantes** (capability, precio del engine, idempotencia), un eco manipulado **no escala privilegio**:
+   solo puede autorar lo que el usuario ya podía.
+
+**Primera acción parametrizada**: `author_quote` (crear/emitir una cotización) — bound al command canónico
+`submitQuoteFromBuilder` (mismo primitive que la UI y las rutas; NO una integración Nexa paralela).
+Dominio `commercial-q2c`, capability `commercial.quotation`, gateada por
+`NEXA_QUOTE_AUTHOR_ACTION_ENABLED` (default OFF, además del master runtime flag). Comparte el
+governed-action surface con el close Q2C (TASK-1206). Spec: ADR
+`GREENHOUSE_QUOTE_API_PARITY_MULTI_CONSUMER_V1.md` (Delta 2026-06-21).
+
 ## Reglas duras
 
 - **TASK-1137** — el LLM **NUNCA** ejecuta un write: solo propone una `actionKey` registrada vía

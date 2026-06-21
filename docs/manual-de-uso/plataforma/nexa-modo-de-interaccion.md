@@ -1,7 +1,7 @@
 > **Tipo de documento:** Manual de uso (operador del portal)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-06-18 por Claude (TASK-1079)
-> **Ultima actualizacion:** 2026-06-18 por Claude (TASK-1079)
+> **Ultima actualizacion:** 2026-06-21 por Claude (v1.1 — TASK-1212: cómo confirmar una acción de Nexa)
 > **Documentacion tecnica:** [docs/architecture/nexa-intelligence/experience/conversational-experience.md](../../architecture/nexa-intelligence/experience/conversational-experience.md)
 
 # Nexa — modo de interacción (Compacto / Panel / Lateral)
@@ -48,9 +48,30 @@ cuenta y te sigue entre dispositivos.
   Compacto habilitado, no hay nada que elegir.
 - **Cambié de computador y se mantuvo mi modo:** es lo esperado — la preferencia se guarda en tu cuenta.
 
+## Confirmar una acción de Nexa
+
+Además de responder, Nexa puede **ejecutar acciones** por ti (por ejemplo, marcar notificaciones como
+leídas o crear/emitir una cotización). Siempre con tu confirmación. Cómo se ve:
+
+1. Le pides la acción en el chat. Nexa **no la ejecuta**: te muestra una **tarjeta de confirmación** con
+   el resumen de lo que va a pasar (qué, con qué datos, el impacto) y dos botones: confirmar o cancelar.
+2. Revisa el resumen. Si está bien, aprieta **Confirmar**. Si no, **Cancelar** y no pasa nada.
+3. Verás el estado: ejecutando → listo (o un mensaje claro si falló). Confirmar dos veces no duplica la
+   acción.
+
+Qué tener en cuenta:
+
+- **Nada cambia hasta que confirmas.** La propuesta es solo una vista previa.
+- **Si no tienes permiso**, Nexa te lo dice y no ofrece la acción.
+- **Si la acción no está disponible** (apagada en ese ambiente), Nexa lo dice honestamente y, cuando
+  puede, te deja un enlace para hacerlo a mano.
+
+> Para el paso a paso de cotizar con Nexa: [Operar Comercial y Quote-to-Cash](../comercial/operar-quote-to-cash-comercial.md).
+
 ## Referencias técnicas
 
 - Funcional: [Experiencia Conversacional de Nexa](../../documentation/plataforma/nexa-conversational-experience.md)
+- Acciones gobernadas (técnica): [behavior-and-routing.md](../../architecture/nexa-intelligence/behavior/behavior-and-routing.md) + contrato [data-contracts.md](../../architecture/nexa-intelligence/technical/data-contracts.md)
 - Técnica: [conversational-experience.md (capa experience)](../../architecture/nexa-intelligence/experience/conversational-experience.md)
 - Fuente de verdad del modo: `greenhouse_core.client_users.nexa_interaction_mode`; flag de disponibilidad
-  del Lateral: `NEXA_INTERACTION_LANE_ENABLED` (default OFF).
+  del Lateral: `NEXA_INTERACTION_LANE_ENABLED` (default OFF). Acción de cotización: `NEXA_QUOTE_AUTHOR_ACTION_ENABLED` (default OFF).
