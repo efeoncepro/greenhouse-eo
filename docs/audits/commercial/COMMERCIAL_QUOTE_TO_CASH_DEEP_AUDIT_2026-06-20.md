@@ -1,5 +1,7 @@
 # Commercial Quote-to-Cash Deep Audit 2026-06-20
 
+> **Delta 2026-06-21 — resuelto por TASK-1206 (code-complete, smoke de conversión diferido).** El hallazgo principal (cierre partido en dos caminos) quedó cerrado con el comando canónico `closeQuoteToCash` (`src/lib/commercial/quote-to-cash/close-quote-to-cash.ts`): income idempotente PRIMERO → `convertQuoteToCash` DESPUÉS (nunca converted sin income), 3 estrategias (`simple_invoice`/`enterprise_hes`/`contract_only`), idempotencia vía ledger + primitives idempotentes (anti doble-AR), 5 reliability signals (converted_without_income/audit, issued_without_deal, contract_only_sla_breach, duplicate_income). `convert-to-invoice` delega en el command detrás de `COMMERCIAL_Q2C_CANONICAL_CLOSE_ENABLED` (default OFF). **Pendiente de rollout:** el smoke de conversión real quedó diferido porque las 12 `issued` de dev son `source_system='nubox'` (convertir = doble AR); requiere fixture manual o sign-off. Detalle en `docs/tasks/in-progress/TASK-1206-commercial-q2c-canonical-close-command.md`.
+
 > Snapshot operativo del dominio Commercial, con foco en cotizaciones y Quote-to-Cash.
 > Fecha: 2026-06-20.
 > Alcance verificado: docs de arquitectura, rutas API, commands/readers, UI, tests focales y Cloud SQL dev read-only.

@@ -246,6 +246,25 @@ closeQuoteToCash({
      plan.md segun TASK_PROCESS.md. No llenar al crear la task.
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-06-21 (Claude) — Slices 2-5 implementados (code-complete, smoke de conversión diferido)
+
+**Estado:** `code complete, rollout pendiente`. Slices 2-5 implementados local-first en `develop` (sin push). El **flag del cutover y el smoke de conversión real quedan diferidos** (ver más abajo). La task **sigue `in-progress`** hasta el smoke + flip con sign-off (Runtime Rollout Completion Gate).
+
+**Commits:** `e7c45c59c` (2a: audit `suspended` + `convertQuoteToCash.incomeId`), `039ca3c47` (2b: primitives idempotentes de income), `3b26e92b4` (2c: orquestador `closeQuoteToCash` + 12 tests), `08920d3b5` (3: convergencia de ruta flag-gated + ledger), `fdd6611ed` (4: 5 reliability signals + 4 tests), `8b797a7f5` (fix tsc).
+
+**Qué quedó construido:**
+- **Slice 2a** — migración aditiva `20260621222152560` (extiende CHECK `commercial_operations_audit_status_valid` con `'suspended'`, DO block) + `'suspended'` en `COMMERCIAL_OPERATION_STATUSES`; `convertQuoteToCash` acepta `incomeId?` y enlaza `converted_to_income_id` (COALESCE).
+- **Slice 2b** — `ensureIncomeFromQuotation` / `ensureIncomeFromHes` (`src/lib/finance/quote-to-cash/`): primitives **idempotentes** (lookup income existente por `quotation_id` / `HES.income_id` ANTES de insertar; replay devuelve el `incomeId` previo, NUNCA un 2.º AR). NO marcan converted ni crean contrato (contract_id NULL, backfill vía `syncContractIdOnDocumentChain`). Builder de campos de income compartido con el materializer legacy (fuente única).
+- **Slice 2c** — `closeQuoteToCash` (`src/lib/commercial/quote-to-cash/close-quote-to-cash.ts`): orquestador SSOT. **income idempotente PRIMERO → `convertQuoteToCash` DESPUÉS** (nunca converted sin income). 3 estrategias: `simple_invoice`, `enterprise_hes` (exige `sourceHesId`), `contract_only` (suspended + reason + SLA, flag-gated, NUNCA terminal). Approval pre-gate ANTES de income (nunca AR antes de aprobar). Idempotencia global vía ledger `api_platform_command_executions`. Capability `commercial.quote_to_cash.execute` enforced en el command. 12 tests.
+- **Slice 3** — `/api/finance/quotes/[id]/convert-to-invoice` delega en `closeQuoteToCash(simple_invoice)` detrás de `COMMERCIAL_Q2C_CANONICAL_CLOSE_ENABLED` (default OFF → legacy intacto). Response backward-compatible.
+- **Slice 4** — 5 signals en `commercial-quote-to-cash-health.ts` (rollup `commercial`), wired en `get-reliability-overview`. Live steady: `converted_without_income`=0, `converted_without_audit`=0, `issued_without_deal`=12 (warning), `contract_only_sla_breach`=0, `duplicate_income`=0. Ejercidas contra PG real (gate TASK-893).
+
+**Smoke de conversión real DIFERIDO (hallazgo de seguridad AR):** las **12 cotizaciones `issued` en dev son TODAS `source_system='nubox'`** (espejos de facturación importada, 0 líneas de builder). Convertir cualquiera de ellas materializaría un income que **DUPLICA el AR ya proyectado por Nubox** (revenue double-count). Por eso NO se corrió el smoke happy-path sobre data real. Resuelve la Open Question "fixture nueva vs una de las 12": **debe ser un fixture nuevo manual** (o sign-off del operador), NUNCA una de las 12 importadas. Evidencia runtime entregada sin tocar AR: 5 signals live + 12 tests del orquestador (incl. replay idempotente, ledger replay anti doble-income, approval pre-gate, contract_only suspended).
+
+**Gates de cierre verdes:** `pnpm test` full (7669 passed / 0 failed), `pnpm build` (Turbopack ✓), `tsc --noEmit` ✓, `pnpm lint` ✓, capability-grant-coverage ✓, flags audit ✓ (0 sin registrar).
+
+**Pendiente de rollout (acción operador):** (1) crear fixture manual o autorizar; (2) `COMMERCIAL_Q2C_CANONICAL_CLOSE_ENABLED=true` en staging + smoke `simple_invoice` controlado → verificar income + contrato + audit Q2C + outbox + signals steady; (3) prod tras sign-off Commercial/Finance. `COMMERCIAL_Q2C_CONTRACT_ONLY_ENABLED` solo con política aprobada.
+
 ## Plan / Diseño (2026-06-21, Claude — Slice 1 hecho, resto pendiente)
 
 > **Decisión del operador en esta sesión:** hacer **diseño + readiness report read-only ahora**, y **diferir el command/rutas/signals/cutover** (toca AR; entrega conservadora). Atomicidad elegida: **income idempotente primero → converted** (NO una sola tx compartida que toque primitives compartidos).
@@ -385,15 +404,15 @@ Commercial/Finance owner must approve the first production Q2C close smoke and a
 
 ## Acceptance Criteria
 
-- [ ] A canonical Q2C close command exists or `convertQuoteToCash` is extended so it can materialize contract/client/income/audit/events in one governed operation.
-- [ ] `convert-to-cash` and `convert-to-invoice` cannot diverge into separate final-state business paths.
-- [ ] The command is idempotent, concurrent-safe and covered by tests for duplicate prevention.
-- [ ] **Income idempotency dura:** un replay con el mismo `idempotencyKey` devuelve el resultado previo (mismo `incomeId`), NO crea un segundo income ni retorna conflicto (test de replay + test de concurrencia). El `INC-${randomUUID()}` de `convert-to-invoice` queda detrás del lookup de income existente.
-- [ ] **`contract_only` no terminal:** una quote en `contract_only` no aparece como Q2C cerrado; queda `status='suspended'` en audit, con SLA + signal `contract_only_sla_breach` (test).
-- [ ] Strategy-specific guards exist for `simple_invoice`, `enterprise_hes` and `contract_only`.
-- [ ] New or updated signals report converted-without-audit, converted-without-income, issued-without-deal, contract-only SLA breach y duplicate-income (steady=0).
-- [ ] Staging or controlled runtime evidence proves one Q2C close produces contract + income + audit + outbox/events.
-- [ ] Full API Parity follow-up is linked or created for API Platform exposure.
+- [x] A canonical Q2C close command exists (`closeQuoteToCash`) componiendo contract/client/income/audit/events en una operación gobernada.
+- [x] `convert-to-cash` and `convert-to-invoice` cannot diverge: ambos pasan por `convertQuoteToCash`; `convert-to-invoice` delega en `closeQuoteToCash` (flag) que añade el audit Q2C que le faltaba.
+- [x] The command is idempotent, concurrent-safe (income primitive con `FOR UPDATE` + lookup; ledger global) y cubierto por tests de duplicate prevention.
+- [x] **Income idempotency dura:** replay devuelve el resultado previo (mismo `incomeId`), sin segundo income ni conflicto (test de replay + ledger replay). El `INC-${randomUUID()}` queda detrás del lookup de income existente.
+- [x] **`contract_only` no terminal:** queda `status='suspended'` en audit + SLA + signal `contract_only_sla_breach` (test); NUNCA marca converted.
+- [x] Strategy-specific guards exist for `simple_invoice`, `enterprise_hes` and `contract_only`.
+- [x] New or updated signals report converted-without-audit, converted-without-income, issued-without-deal, contract-only SLA breach y duplicate-income (live steady verificado).
+- [ ] **DIFERIDO (rollout):** Staging or controlled runtime evidence proves one Q2C close produces contract + income + audit + outbox/events. Las 12 issued de dev son Nubox imports (convertir = doble AR); requiere fixture manual o sign-off. Evidencia interina: 12 tests + 5 signals live.
+- [x] Full API Parity follow-up enlazado a `TASK-1211` (lane versionado para todo el embudo).
 
 ## Verification
 
