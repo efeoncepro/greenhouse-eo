@@ -151,7 +151,7 @@ Traza end-to-end y qué pieza la sirve:
 
 ## 12. Open Questions
 
-- **MCP-write (decisión de producto):** ¿el norte es que un agente externo (Claude/MCP) **opere** cotizaciones (crear/emitir), o solo que las **consulte**? Si opera → write lane externo es task propia (auth de agente + idempotencia + rate-limit + aprobación). Si solo consulta → el MCP read tool basta.
+- **MCP-write — RESUELTO 2026-06-21 (consultar-first):** externos/MCP solo **consultan** (simulate); Nexa opera internamente vía governed action; el write lane externo se difiere hasta un caso real. El MCP read tool basta para la wave 1.
 - **Cliente self-service:** ¿solo simula (A) o pide cotización real (A + B con aprobación interna)? Cambia el alcance del follow-up de UI.
 - **Ubicación del command B:** `src/lib/commercial/**` (owner del aggregate) vs `src/lib/finance/pricing/**` (donde vive el pricing). Resolver con `GREENHOUSE_COMMERCIAL_FINANCE_DOMAIN_BOUNDARY_V1.md`.
 - **Resolver:** ¿determinista (alias/fuzzy) suficiente, o requiere grounding semántico (índice Knowledge) para nombres muy libres?

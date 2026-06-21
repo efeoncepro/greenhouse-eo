@@ -2,12 +2,12 @@
 
 > ADR dedicado (decisión cross-domain: commercial · finance · nexa/AI · MCP · API Platform). Append-only por `ARCHITECTURE_DECISION_RECORD_OPERATING_MODEL_V1`.
 
-- **Status:** `Proposed`
-- **Date:** 2026-06-21
+- **Status:** `Accepted`
+- **Date:** 2026-06-21 (aceptada por el operador — MCP consultar-first)
 - **Owner:** Commercial + Finance (cotizador) con AI/Nexa + API Platform como consumers
 - **Scope:** cotizador / quote-to-cash front-end; `src/lib/finance/pricing/**`, `src/lib/commercial/service-catalog-*`, `src/lib/nexa/**`, `src/mcp/greenhouse/server.ts`, `src/app/api/platform/**`, capabilities de quote, perfiles de output de pricing
 - **Reversibility:** `two-way-but-slow` (los contratos de tool/lane y los perfiles de output, una vez consumidos por agentes externos, tienden a `one-way`)
-- **Confidence:** `high` en el split de capabilities y los perfiles; `medium` en el alcance de MCP-write (decisión de producto abierta)
+- **Confidence:** `high` (MCP-write resuelto 2026-06-21: consultar-first — Nexa opera vía governed action; externos/MCP solo simulan)
 - **Validated as of:** 2026-06-21 (auditoría de código arch-architect: engine V2, `from-service`/recipe, Nexa/MCP registries, ausencia de resolver nombre→SKU)
 - **Spec canónica (detalle):** `GREENHOUSE_QUOTE_API_PARITY_MULTI_CONSUMER_V1.md`
 
@@ -30,7 +30,7 @@ Reglas estructurales:
 
 - **Un primitive por capability, muchos consumers** (SSOT-reader): UI, Nexa, MCP, cliente, público y API Platform son clientes del MISMO command/reader. Prohibida toda integración "Nexa-específica".
 - **Discovery por nombre** vía un reader compartido `searchServiceCatalog(query)` (nombre/alias → `serviceSku`); habilita pricing en frío para Nexa/MCP y la elicitación ante ambigüedad.
-- **Writes gobernados:** Nexa muta solo vía `propose → confirm → execute`; agentes externos vía API Platform write lane (auth + idempotencia + rate-limit + aprobación). **El MCP downstream surface permanece read-only** — operar una cotización desde un agente externo va por el write lane, no por los MCP tools.
+- **Writes gobernados (wave 1 aceptada = consultar-first):** Nexa **interno** muta solo vía `propose → confirm → execute`. **Externos / MCP = simulate-only**: el MCP downstream surface permanece read-only y el write lane externo (operar cotizaciones desde un agente externo) se **difiere** hasta que emerja un caso real (auth de agente + idempotencia + rate-limit + aprobación).
 - **El simulador público** computa sobre una **proyección de catálogo publicado curado**, no el catálogo interno; su endpoint anónimo es una task aparte (STOP quadrant, ADR propio).
 - **Ownership de capabilities:** TASK-1202 es steward del catálogo de quote capabilities; A y B consumen su convención, no re-acuñan.
 
@@ -63,7 +63,7 @@ Fuente de verdad que queda vigente:
 
 ## Revisit When
 
-- Se resuelve la decisión de producto **MCP-write** (operar vs solo consultar) → si opera, abrir task del write lane externo y mover esta decisión a `Accepted` con ese alcance.
+- **MCP-write resuelto 2026-06-21: consultar-first** (Nexa opera; externos/MCP simulan). Reabrir SOLO si emerge un caso real de operar cotizaciones desde un agente externo → entonces abrir task del write lane externo (auth de agente + idempotencia + rate-limit + aprobación).
 - Se diseña el **simulador público** (su propio ADR de endpoint anónimo + rate-limit + catálogo publicado).
 - El pricing engine adquiere un "starting price" escalar por servicio (cambiaría el resolver/simulate).
 - Cliente self-service pasa de "solo simular" a "pedir cotización real" (activa B con aprobación).
