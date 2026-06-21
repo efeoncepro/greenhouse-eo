@@ -15,6 +15,10 @@ import {
   serializeIncomeTaxSnapshot
 } from '@/lib/finance/income-tax-snapshot'
 import { createFinanceIncomeInPostgres } from '@/lib/finance/postgres-store-slice2'
+import { FinanceValidationError } from '@/lib/finance/shared'
+import { buildClfIncomeProjection } from '@/lib/finance/multi-currency/clf-income-projection'
+import { persistFxSnapshot } from '@/lib/finance/multi-currency/fx-snapshot-store'
+import { isFinanceClfIncomeProjectionEnabled } from '@/lib/finance/multi-currency/flags'
 
 export interface MaterializeInvoiceFromHesActor {
   userId: string
@@ -217,6 +221,51 @@ export const materializeInvoiceFromApprovedHes = async (
       ? totalAmountClp / totalAmount
       : 1
 
+    // TASK-995 (ADR GREENHOUSE_CLF_INDEXED_FINANCE_CORE_V1) — una HES / OC de
+    // cliente en CLF (UF) se proyecta a un income con moneda legal CLP + plano
+    // native UF. Gated: con flag OFF o currency≠CLF, camino bit-for-bit legacy.
+    // Las Órdenes de Compra que recibimos de clientes llegan en UF/MXN/CLP/USD.
+    let finalCurrency = currency
+    let finalSubtotal = subtotal
+    let finalTaxWriteFields = taxWriteFields
+    let finalTotalAmount = totalAmount
+    let finalTotalAmountClp = totalAmountClp
+    let finalExchangeRateToClp = exchangeRateToClp
+    let nativeAmount: number | null = null
+    let nativeCurrency: string | null = null
+    let nativeToFunctionalFxSnapshotId: string | null = null
+
+    if (currency === 'CLF' && isFinanceClfIncomeProjectionEnabled()) {
+      const projection = await buildClfIncomeProjection({
+        subtotalClf: subtotal,
+        taxAmountClf: taxWriteFields.taxAmount,
+        totalClf: totalAmount,
+        rateDate: invoiceDate
+      })
+
+      if (!projection) {
+        throw new FinanceValidationError(
+          'No hay valor UF para proyectar la HES/OC CLF a CLP en la fecha de emisión.'
+        )
+      }
+
+      nativeToFunctionalFxSnapshotId = await persistFxSnapshot(projection.fxSnapshotEvidence, client)
+      finalTaxWriteFields = await buildIncomeTaxWriteFields({
+        subtotal: projection.functionalSubtotalClp,
+        taxCode: quotation.tax_code,
+        taxAmount: projection.functionalTaxAmountClp,
+        totalAmount: projection.functionalTotalClp,
+        issuedAt: invoiceDate
+      })
+      finalCurrency = 'CLP'
+      finalSubtotal = projection.functionalSubtotalClp
+      finalTotalAmount = finalTaxWriteFields.totalAmount
+      finalTotalAmountClp = finalTaxWriteFields.totalAmount
+      finalExchangeRateToClp = 1
+      nativeAmount = projection.nativeAmountClf
+      nativeCurrency = 'CLF'
+    }
+
     const clientName = await resolveClientName(
       client,
       hes.client_id,
@@ -241,19 +290,23 @@ export const materializeInvoiceFromApprovedHes = async (
       invoiceDate,
       dueDate,
       description: hes.service_description,
-      currency,
-      subtotal,
-      taxRate: taxWriteFields.taxRate,
-      taxAmount: taxWriteFields.taxAmount,
-      taxCode: taxWriteFields.taxCode,
-      taxRateSnapshot: taxWriteFields.taxRateSnapshot,
-      taxAmountSnapshot: taxWriteFields.taxAmountSnapshot,
-      taxSnapshotJson: serializeIncomeTaxSnapshot(taxWriteFields.taxSnapshot),
-      isTaxExempt: taxWriteFields.isTaxExempt,
-      taxSnapshotFrozenAt: taxWriteFields.taxSnapshotFrozenAt,
-      totalAmount,
-      exchangeRateToClp,
-      totalAmountClp,
+      currency: finalCurrency,
+      subtotal: finalSubtotal,
+      taxRate: finalTaxWriteFields.taxRate,
+      taxAmount: finalTaxWriteFields.taxAmount,
+      taxCode: finalTaxWriteFields.taxCode,
+      taxRateSnapshot: finalTaxWriteFields.taxRateSnapshot,
+      taxAmountSnapshot: finalTaxWriteFields.taxAmountSnapshot,
+      taxSnapshotJson: serializeIncomeTaxSnapshot(finalTaxWriteFields.taxSnapshot),
+      isTaxExempt: finalTaxWriteFields.isTaxExempt,
+      taxSnapshotFrozenAt: finalTaxWriteFields.taxSnapshotFrozenAt,
+      totalAmount: finalTotalAmount,
+      exchangeRateToClp: finalExchangeRateToClp,
+      totalAmountClp: finalTotalAmountClp,
+      // TASK-995 — plano native UF (null salvo rama CLF gated).
+      nativeAmount,
+      nativeCurrency,
+      nativeToFunctionalFxSnapshotId,
       paymentStatus: 'pending',
       quotationId,
       contractId: contract.contractId,

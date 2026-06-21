@@ -24,7 +24,7 @@ This ADR is `Proposed`. Acceptance requires the operator/Finance to confirm thre
 
 Until all three are ratified, no functional CLF write path ships (per TASK-995 hard rule "No implementar sin ADR aceptado").
 
-> **Operator input 2026-06-21 — multi-currency reality (no asumir UF para todo):** las **compras (expenses / OC a proveedor) llegan en UF, MXN, CLP o USD** según el documento — NO todas son UF. La proyección CLF es estrictamente condicional por moneda real del documento (`currency === 'CLF'`); MXN ya lo cubre TASK-990, CLP/USD su camino legacy. El **path de compras en UF** (expense CLF native + functional CLP) es el complemento simétrico del income CLF — mismo helper/snapshot, en el expense writer; pendiente de confirmar el punto de entrada exacto de las compras UF (Nubox purchases / manual / OC proveedor) antes de cablearlo.
+> **Operator input 2026-06-21 — multi-currency reality (no asumir UF para todo):** las **Órdenes de Compra que RECIBIMOS de clientes** (no las que emitimos a proveedores) llegan en **UF, MXN, CLP o USD** — NO todas son UF. Es un flujo del lado **income/ventas (AR)**: la OC del cliente fija el monto (en su moneda) → facturamos → income. La proyección CLF es estrictamente condicional por la moneda real de la OC/cotización (`currency === 'CLF'` → income CLP + plano native UF; MXN ya lo cubre TASK-990; CLP/USD su camino legacy). Cableado en **ambos** materializers de income: `materialize-invoice-from-quotation` y `materialize-invoice-from-hes` (este último porta `purchase_order_id` — el path de OC de cliente). **No existe un "expense-CLF" derivado de este dato** (fue una lectura errónea inicial de "compras"): el flujo es enteramente income desde OC de clientes.
 
 ---
 
