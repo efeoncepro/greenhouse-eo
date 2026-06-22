@@ -72,6 +72,8 @@ Los smoke lanes Playwright son una fuente `test_lane`: validan flujos críticos 
 
 Desde TASK-845, los smoke lanes y los workflows de app/tests/builds corren con Node.js `24.x`, igual que el contrato de Vercel para el portal. Esto no cambia la semántica de las señales: solo evita que el resultado de Playwright, lint, typecheck o build dependa de un runtime Node 20 que ya no es el target productivo.
 
+En GitHub Actions, los smoke lanes usan Chromium headless. Por eso el workflow instala `playwright install --with-deps --only-shell chromium`: mantiene las dependencias/browser necesarios para tests headless y evita descargar el Chrome for Testing completo cuando no se ejecutan specs headed.
+
 La regla operativa es:
 
 - si una prueba falla, el lane puede quedar `failed`; eso es una señal funcional válida

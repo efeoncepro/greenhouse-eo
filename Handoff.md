@@ -26,6 +26,7 @@
 > - **Lint/Playwright:** `pnpm lint` full queda bloqueado por archivo local ignorado/ajeno `scripts/commercial/task-1206-q2c-close-smoke.ts` (padding-line errors, no versionado en esta diff). ESLint sobre la diff/repo excluyendo ese scratch: verde. Playwright local con server Node 24: `login-session` 2/2 passed; `cron-staging-parity` falla por timeout navegando a `/api/admin/reliability`, también aislado con `--timeout=60000`.
 > - **Vercel:** `vercel project ls --scope efeonce-7670142f` muestra `greenhouse-eo` con `Node Version 24.x`; `engines.node=24.x` queda igualmente como SSOT de repo.
 > - **Pendiente antes de cerrar complete:** push + GitHub Actions + Playwright CI + deployment/build evidence Vercel post-push. Hasta entonces TASK-845 queda `code complete local / rollout pendiente`, no `complete`.
+> - **Post-push 2026-06-22:** commit `1d0c731fd` fue pusheado. GitHub `CI` pasó completo (`27941727942`); Vercel staging deploy `greenhouse-k8y5akbkt-efeonce-7670142f.vercel.app` quedó `READY` y `/api/internal/health` respondió `ok` con version `1d0c731`. Playwright push run `27941727902` no llegó a specs: `pnpm exec playwright install --with-deps chromium` descargó Chrome for Testing al 100% y quedó sin progreso hasta timeout/cancelación. Fix focal posterior: `.github/workflows/playwright.yml` instala solo el Chromium headless shell (`--only-shell`) porque los smokes CI corren headless.
 
 ## Sesión 2026-06-21 — CI GitHub Actions OOM + CLAUDE.md governance root cause — Codex
 

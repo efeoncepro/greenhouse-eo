@@ -78,7 +78,9 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Install Playwright Chromium
-        run: pnpm exec playwright install --with-deps chromium
+        # CI runs Chromium headless. Installing only the headless shell avoids
+        # the full Chrome for Testing archive stalling before smoke specs run.
+        run: pnpm exec playwright install --with-deps --only-shell chromium
 
       - name: Run Playwright smoke suite
         run: pnpm test:e2e
