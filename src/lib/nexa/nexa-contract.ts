@@ -4,6 +4,7 @@ import type { NexaTurnTelemetry } from './nexa-turn-telemetry'
 export type NexaToolName =
   | 'check_payroll'
   | 'get_otd'
+  | 'get_member_performance'
   | 'check_emails'
   | 'get_capacity'
   | 'pending_invoices'

@@ -26,6 +26,10 @@ import { searchKnowledge } from '@/lib/knowledge/search/search-knowledge'
 import type { KnowledgeRetrievalPacket, KnowledgeSearchSubject } from '@/lib/knowledge/search'
 import { captureWithDomain } from '@/lib/observability/capture'
 import { searchServiceCatalog } from '@/lib/commercial/service-catalog-search'
+import {
+  readMemberIcoProfileForSubject,
+  type PeopleActivitySubject
+} from '@/lib/people/person-activity-access'
 import { PRICING_OUTPUT_CURRENCIES, type PricingOutputCurrency } from '@/lib/finance/pricing/contracts'
 import { simulateQuotePricingFromService } from '@/lib/finance/pricing/simulate-quote-pricing'
 
@@ -1240,6 +1244,145 @@ const normalizeQuoteCurrency = (value: unknown): PricingOutputCurrency => {
 
 const formatQuoteAmount = (value: number) => Math.round(value).toLocaleString('es-CL')
 
+// ── get_member_performance (TASK-1216 — person-level ICO read, Full API Parity) ──────────────
+// Consumer fino del primitive canónico readMemberIcoProfileForSubject (un primitive, muchos
+// consumers: este tool, los lanes MCP/app de API Platform y la UI consumen el MISMO reader).
+// NO recomputa OTD/RpA ni queryea ico_member_metrics: delega. La autorización es la de People
+// (canViewActivity + anti-IDOR de scope) — el tool sólo mapea el NexaRuntimeContext al subject
+// neutral. not_found es uniforme (no distingue "no existe" de "sin acceso"). Disponible sólo a
+// tenants internos (mirror de get_insight; un cliente igual obtendría forbidden del primitive).
+
+const HEALTH_LABEL: Record<'green' | 'yellow' | 'red', { label: string; tone: NexaToolMetric['tone'] }> = {
+  green: { label: 'Saludable', tone: 'success' },
+  yellow: { label: 'En riesgo', tone: 'warning' },
+  red: { label: 'Crítica', tone: 'error' }
+}
+
+const formatScore = (value: number | null) => (value == null ? 'Sin datos' : String(Math.round(value)))
+
+const getMemberPerformanceTool: NexaToolDefinition = {
+  declaration: {
+    name: 'get_member_performance',
+    description:
+      'Consulta el desempeño ICO (OTD, RpA, FTR, salud + tendencia) de UNA persona específica del equipo nombrada por el usuario (ej. "el OTD de Daniela Ferreira"). Resuelve la persona por nombre o id si tienes acceso a ella. Úsalo cuando el usuario pregunta por la métrica/desempeño de una persona concreta. NO uses get_otd para esto: get_otd es solo el OTD agregado de la organización o el global de agencia, nunca de una persona. Para la causa/por qué de una anomalía usa get_insight.',
+    parametersJsonSchema: {
+      type: 'object',
+      additionalProperties: false,
+      properties: {
+        person: {
+          type: 'string',
+          description: 'Nombre (o id) de la persona del equipo cuyo desempeño consultar.'
+        }
+      },
+      required: ['person']
+    }
+  },
+  // Mirror del primer gate de get_insight: tenants cliente nunca consultan desempeño de personas.
+  isAvailable: tenant => tenant.tenantType === 'efeonce_internal',
+  async execute(args, context) {
+    const { tenant } = context
+    const person = typeof args.person === 'string' ? args.person.trim() : ''
+
+    if (!person) {
+      return buildToolUnavailableResult('get_member_performance', 'Falta el nombre de la persona a consultar.')
+    }
+
+    const subject: PeopleActivitySubject = {
+      userId: tenant.userId,
+      tenantType: tenant.tenantType,
+      memberId: tenant.memberId ?? null,
+      roleCodes: tenant.roleCodes,
+      routeGroups: tenant.routeGroups,
+      organizationId: tenant.organizationId ?? null
+    }
+
+    const result = await readMemberIcoProfileForSubject(subject, person)
+
+    if (result.status === 'forbidden') {
+      return buildToolUnavailableResult(
+        'get_member_performance',
+        'No tienes acceso al desempeño de personas del equipo.'
+      )
+    }
+
+    // not_found es uniforme (no existe / fuera de scope, indistinguibles): nunca filtra existencia.
+    if (result.status === 'not_found') {
+      return buildToolUnavailableResult(
+        'get_member_performance',
+        `No encontré a «${person}», o no tienes acceso a su desempeño.`
+      )
+    }
+
+    if (result.status === 'ambiguous') {
+      const names = result.candidates.map(candidate => candidate.displayName).join(', ')
+
+      return {
+        available: false,
+        summary: `Encontré varias personas que coinciden con «${person}»: ${names}. ¿A cuál te refieres? Indícame el nombre completo.`,
+        source: 'postgres',
+        scopeLabel: 'Desambiguación',
+        generatedAt: new Date().toISOString(),
+        metrics: [],
+        notes: [`Coincidencias: ${names}.`],
+        raw: { toolName: 'get_member_performance', ambiguous: true, candidates: result.candidates }
+      }
+    }
+
+    const { profile, displayName, memberId } = result
+    const current = profile.current
+
+    if (!profile.hasData || !current) {
+      return {
+        available: true,
+        summary: `Aún no hay métricas ICO materializadas para ${displayName}.`,
+        source: 'postgres',
+        scopeLabel: displayName,
+        generatedAt: new Date().toISOString(),
+        metrics: [],
+        notes: ['Sin período materializado todavía.'],
+        raw: { toolName: 'get_member_performance', memberId, displayName, hasData: false }
+      }
+    }
+
+    const periodLabel = formatPeriodLabel(current.periodYear, current.periodMonth)
+    const health = profile.health ? HEALTH_LABEL[profile.health] : null
+
+    const metrics: NexaToolResult['metrics'] = [
+      {
+        label: 'OTD',
+        value: formatPercent(current.otdPct) ?? 'Sin datos',
+        tone: current.otdPct == null ? 'default' : current.otdPct >= 90 ? 'success' : 'warning'
+      },
+      { label: 'RpA', value: formatScore(current.rpaAvg) },
+      { label: 'FTR', value: formatPercent(current.ftrPct) ?? 'Sin datos' }
+    ]
+
+    if (health) {
+      metrics.push({ label: 'Salud', value: health.label, tone: health.tone })
+    }
+
+    return {
+      available: true,
+      summary:
+        `Desempeño de ${displayName} en ${periodLabel}: OTD ${formatPercent(current.otdPct) ?? 'sin datos'}, ` +
+        `RpA ${formatScore(current.rpaAvg)}, FTR ${formatPercent(current.ftrPct) ?? 'sin datos'}.` +
+        (health ? ` Salud general: ${health.label.toLowerCase()}.` : ''),
+      source: 'postgres',
+      scopeLabel: displayName,
+      generatedAt: new Date().toISOString(),
+      metrics,
+      raw: {
+        toolName: 'get_member_performance',
+        memberId,
+        displayName,
+        health: profile.health,
+        current,
+        trendMonths: profile.trend.length
+      }
+    }
+  }
+}
+
 const quotePriceTool: NexaToolDefinition = {
   declaration: {
     name: 'quote_price',
@@ -1357,6 +1500,7 @@ const quotePriceTool: NexaToolDefinition = {
 const NEXA_TOOLS: Record<NexaToolName, NexaToolDefinition> = {
   check_payroll: checkPayrollTool,
   get_otd: getOtdTool,
+  get_member_performance: getMemberPerformanceTool,
   check_emails: checkEmailsTool,
   get_capacity: getCapacityTool,
   pending_invoices: pendingInvoicesTool,
