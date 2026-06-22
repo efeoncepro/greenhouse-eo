@@ -16,6 +16,8 @@
 //   pnpm reactive:backfill --dry-run               # one small iteration
 //   pnpm reactive:backfill --domain=finance        # one domain only
 //   pnpm reactive:backfill --max-iterations=20     # safety brake
+//   pnpm reactive:backfill --replay-failed-handlers # retry active retry/dead-letter logs
+//   pnpm reactive:backfill --handler=commercial_cost_attribution:payroll_period.exported
 //
 // Environment:
 //   Reads from .env.local via loadGreenhouseToolEnv() and uses
@@ -54,6 +56,8 @@ interface ParsedArgs {
   domain: string | null
   maxIterations: number
   batchSize: number
+  replayFailedHandlers: boolean
+  handlerKeys: string[]
 }
 
 const DEFAULT_BATCH_SIZE = 1_000
@@ -65,7 +69,9 @@ const parseArgs = (argv: string[]): ParsedArgs => {
     dryRun: false,
     domain: null,
     maxIterations: DEFAULT_MAX_ITERATIONS,
-    batchSize: DEFAULT_BATCH_SIZE
+    batchSize: DEFAULT_BATCH_SIZE,
+    replayFailedHandlers: false,
+    handlerKeys: []
   }
 
   for (const raw of argv) {
@@ -80,6 +86,24 @@ const parseArgs = (argv: string[]): ParsedArgs => {
       const value = raw.slice('--domain='.length).trim()
 
       args.domain = value.length > 0 ? value : null
+
+      continue
+    }
+
+    if (raw === '--replay-failed-handlers') {
+      args.replayFailedHandlers = true
+
+      continue
+    }
+
+    if (raw.startsWith('--handler=') || raw.startsWith('--handler-key=')) {
+      const value = raw.includes('--handler-key=')
+        ? raw.slice('--handler-key='.length).trim()
+        : raw.slice('--handler='.length).trim()
+
+      if (value.length > 0) {
+        args.handlerKeys.push(value)
+      }
 
       continue
     }
@@ -121,6 +145,8 @@ const printUsage = (): void => {
     '  --dry-run                Run a single iteration with a small batch (50) and exit.',
     '  --domain=<name>          Restrict drain to one projection domain.',
     '                           One of: organization|people|finance|notifications|delivery|cost_intelligence',
+    '  --replay-failed-handlers Include active retry/dead-letter handler logs in the drain.',
+    '  --handler=<key>         Restrict drain to one handler key. Repeatable.',
     '  --max-iterations=<n>     Safety cap on iterations. Default 100.',
     `  --batch-size=<n>         Override batch size. Default ${DEFAULT_BATCH_SIZE}.`,
     '  --help                   Print this message.'
@@ -172,10 +198,10 @@ const main = async (): Promise<void> => {
   })()
 
   console.log(
-    `[backfill] Starting drain${domain ? ` (domain=${domain})` : ''}${args.dryRun ? ' [DRY RUN]' : ''}`
+    `[backfill] Starting drain${domain ? ` (domain=${domain})` : ''}${args.dryRun ? ' [DRY RUN]' : ''}${args.replayFailedHandlers ? ' [REPLAY FAILED HANDLERS]' : ''}`
   )
   console.log(
-    `[backfill] batchSize=${args.batchSize} maxIterations=${args.maxIterations}`
+    `[backfill] batchSize=${args.batchSize} maxIterations=${args.maxIterations}${args.handlerKeys.length > 0 ? ` handlers=${args.handlerKeys.join(',')}` : ''}`
   )
 
   const runStartMs = Date.now()
@@ -198,7 +224,9 @@ const main = async (): Promise<void> => {
     try {
       result = await processReactiveEvents({
         batchSize: args.batchSize,
-        domain
+        domain,
+        replayFailedHandlers: args.replayFailedHandlers,
+        handlerKeys: args.handlerKeys
       })
     } catch (error) {
       console.error(`[backfill] iter=${iteration} FAILED:`, error)

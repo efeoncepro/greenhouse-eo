@@ -130,6 +130,7 @@ El corpus es 100% `internal`. Los embeddings se generan en **Vertex AI, mismo pr
 - Flag canónico nuevo `KNOWLEDGE_SEARCH_HYBRID_ENABLED` (default OFF → byte-equivalente al FTS+rerank actual). Patrón `process.env.X === 'true'`.
 - El híbrido entra **detrás del mismo SSOT `searchKnowledge`** (aditivo; no se crea reader paralelo; contrato `knowledge-search.v1` intacto).
 - Generación de embeddings del corpus = paso de ingesta (reactivo/idempotente por checksum), NUNCA inline en el request path.
+  TASK-1155 materializa esto con un hook post-publish en `ingestOne`; `embed-corpus.ts` queda como backfill/guardrail.
 - Rollback = flag OFF (instantáneo, sin deploy). La columna/índice pgvector quedan inertes con el flag OFF.
 
 ---

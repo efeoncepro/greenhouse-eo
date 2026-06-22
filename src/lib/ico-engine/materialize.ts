@@ -793,9 +793,15 @@ const materializePerformanceReports = async (
         AND ms.period_month = @periodMonth
     ),
     scoped_report_snapshots AS (
+      -- TASK-1171 Slice 2: el reporte de agencia es DATA-DRIVEN sobre TODOS los
+      -- clientes reales (ICO transversal a las 4 unidades; el hardcode efeonce/sky
+      -- subcontaba la operación — caso Pinturas Berel). Demo excluido (y ausente
+      -- upstream: sync_enabled=FALSE). Las columnas efeonce_tasks_count/
+      -- sky_tasks_count se preservan abajo (CASE-filtered, legacy aditivo).
       SELECT *
       FROM classified_snapshots
-      WHERE segment_key IN ('efeonce', 'sky')
+      WHERE LOWER(COALESCE(segment_key, '')) NOT LIKE '%demo%'
+        AND LOWER(COALESCE(segment_label, '')) NOT LIKE '%demo%'
     ),
     agency_summary AS (
       SELECT

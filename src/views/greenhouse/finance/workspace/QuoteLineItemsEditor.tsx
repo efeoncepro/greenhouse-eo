@@ -16,6 +16,7 @@ import {
 import Avatar from '@mui/material/Avatar'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
+import ButtonBase from '@mui/material/ButtonBase'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import CardHeader from '@mui/material/CardHeader'
@@ -32,14 +33,15 @@ import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
+import { alpha } from '@mui/material/styles'
 
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 
-import EmptyState from '@/components/greenhouse/EmptyState'
-import { CardHeaderWithBadge } from '@/components/greenhouse/primitives'
 import { DataTableShell } from '@/components/greenhouse/data-table'
 import { useListAnimation } from '@/hooks/useListAnimation'
+import useReducedMotion from '@/hooks/useReducedMotion'
+import { motion } from '@/libs/FramerMotion'
 import type {
   PricingLineOutputV2,
   PricingOutputCurrency,
@@ -63,6 +65,7 @@ const TASK407_ARIA_CALCULANDO_PRECIO_DEL_CATALOGO = "Calculando precio del catá
 const TASK407_ARIA_CALCULANDO_SUBTOTAL = "Calculando subtotal"
 const TASK407_ARIA_SUBTOTAL_SIN_DATOS_SUFICIENTES = "Subtotal sin datos suficientes"
 const TASK407_ARIA_AVISOS_DEL_MOTOR_DE_PRICING = "Avisos del motor de pricing"
+const TASK407_ARIA_EDITOR_LINEAS = "Editor de lineas del quote"
 
 
 export type QuoteLineSource = 'catalog' | 'service' | 'template' | 'manual'
@@ -185,12 +188,15 @@ const UNIT_LABELS: Record<QuoteLineItem['unit'], string> = {
   project: 'Proyecto'
 }
 
-const SOURCE_META: Record<QuoteLineSource, { label: string; color: 'primary' | 'info' | 'success' | 'warning' | 'secondary'; icon: string }> = {
+const SOURCE_META: Record<QuoteLineSource, { label: string; color: 'primary' | 'info' | 'success' | 'warning'; icon: string }> = {
   catalog: { label: 'Catálogo', color: 'primary', icon: 'tabler-books' },
   service: { label: 'Servicio', color: 'success', icon: 'tabler-package' },
   template: { label: 'Template', color: 'info', icon: 'tabler-template' },
-  manual: { label: 'Manual', color: 'secondary', icon: 'tabler-edit' }
+  manual: { label: 'Manual', color: 'info', icon: 'tabler-edit' }
 }
+
+const EDITOR_ROW_GRID_COLUMNS =
+  '28px minmax(260px, 1fr) minmax(104px, 0.28fr) minmax(132px, 0.34fr) minmax(132px, 0.34fr) 36px'
 
 const TIER_STATUS_META: Record<
   'below_min' | 'in_range' | 'at_optimum' | 'above_max' | 'unknown',
@@ -428,6 +434,7 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
   const [hoveredRow, setHoveredRow] = useState<number | null>(null)
   const [readonlyTableBodyRef] = useListAnimation()
   const [draftTableBodyRef] = useListAnimation()
+  const prefersReducedMotion = useReducedMotion()
 
   // Popover "Ajustes" por fila — un solo popover global abierto a la vez
   const [adjustAnchor, setAdjustAnchor] = useState<HTMLElement | null>(null)
@@ -452,20 +459,30 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
   }, [])
 
   const onDraftChangeRef = useRef(onDraftChange)
+  const pendingDraftChangeRef = useRef<QuoteLineItem[] | null>(null)
 
   useEffect(() => {
     onDraftChangeRef.current = onDraftChange
   }, [onDraftChange])
 
+  useEffect(() => {
+    const pendingDraft = pendingDraftChangeRef.current
+
+    if (!pendingDraft) return
+
+    pendingDraftChangeRef.current = null
+    onDraftChangeRef.current?.(pendingDraft)
+  }, [draftLines])
+
   const mutateDraft = useCallback((updater: (prev: QuoteLineItem[]) => QuoteLineItem[]) => {
+    setDirty(true)
     setDraftLines(prev => {
       const next = updater(prev)
 
-      onDraftChangeRef.current?.(next)
+      pendingDraftChangeRef.current = next
 
       return next
     })
-    setDirty(true)
   }, [])
 
   useImperativeHandle(
@@ -600,7 +617,7 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
                   return (
                     <TableRow key={line.lineItemId ?? `${line.label}-${idx}`} hover>
                       <TableCell>
-                        <Typography variant='body2' sx={{ fontWeight: 500 }}>
+                        <Typography variant='body2' sx={{ fontWeight: 600 }}>
                           {line.label}
                         </Typography>
                         {line.description && (
@@ -635,7 +652,7 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
                         </Typography>
                       </TableCell>
                       <TableCell align='right'>
-                        <Typography variant='body2' sx={{ fontVariantNumeric: 'tabular-nums', fontWeight: 500 }}>
+                        <Typography variant='monoAmount'>
                           {formatCurrency(subtotal, currency)}
                         </Typography>
                       </TableCell>
@@ -651,178 +668,398 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
   }
 
   return (
-    <Card elevation={0} sx={theme => ({ border: `1px solid ${theme.palette.divider}`, borderRadius: `${theme.shape.customBorderRadius.lg}px` })}>
-      <CardHeaderWithBadge
-        title='Ítems de la cotización'
-        badgeValue={draftLines.length}
-        badgeColor={draftLines.length === 0 ? 'secondary' : 'primary'}
-        subheader={draftLines.length === 0 ? undefined : 'Agrega ítems vendibles desde el catálogo o crea una línea manual.'}
-        avatarIcon='tabler-list-details'
-        action={headerAction}
-      />
+    <Box
+      data-capture='quote-builder-line-canvas'
+      sx={theme => ({
+        minWidth: 0,
+        overflowX: 'clip',
+        borderBlockStart: `1px solid ${alpha(theme.palette.divider, 0.92)}`
+      })}
+    >
+      <Box
+        sx={{
+          display: 'grid',
+          gridTemplateColumns: { xs: '1fr', md: 'minmax(0, 1fr) auto' },
+          alignItems: { xs: 'stretch', md: 'center' },
+          gap: { xs: 1.25, md: 2 },
+          px: { xs: 0, md: 0 },
+          py: { xs: 1.25, md: 1.75 }
+        }}
+      >
+        <Stack spacing={0.35} sx={{ minWidth: 0 }}>
+          <Stack direction='row' spacing={1} alignItems='center' useFlexGap flexWrap='wrap'>
+            <Typography variant='h6'>Ítems de la cotización</Typography>
+            <CustomChip round='true' size='small' variant='tonal' color='primary' label={draftLines.length} />
+          </Stack>
+          {draftLines.length === 0 ? null : (
+            <Typography variant='body2' color='text.secondary' sx={{ display: { xs: 'none', sm: 'block' } }}>
+              Agrega ítems vendibles desde el catálogo o crea una línea manual.
+            </Typography>
+          )}
+        </Stack>
+        {headerAction ? (
+          <Box
+            sx={{
+              justifySelf: { xs: 'start', md: 'end' },
+              '& .MuiButton-root': {
+                minHeight: { xs: 38, md: 40 },
+                px: { xs: 1.4, md: 1.8 }
+              }
+            }}
+          >
+            {headerAction}
+          </Box>
+        ) : null}
+      </Box>
       <Divider />
 
       {draftLines.length === 0 ? (
-        <CardContent>
-          {/*
-            TASK-615 — el empty state ahora ENSEÑA el modelo de composición.
-            Eyebrow + título + 4 method-hints en grid + CTA primario único +
-            CTAs secundarios honestos. El split button del header desaparece
-            mientras estamos aquí, así no compite por la affordance dominante.
-          */}
-          <EmptyState
-            icon='tabler-file-invoice'
-            animatedIcon='/animations/empty-chart.json'
-            title={GH_PRICING.emptyItems.title}
-            description={GH_PRICING.emptyItems.subtitle}
-            action={
-              onAddFromCatalog ? (
-                <Stack spacing={3} sx={{ width: '100%', maxWidth: 720, mx: 'auto' }}>
-                  <Box
-                    component='ul'
+        <Box sx={{ p: 0 }}>
+          <Stack spacing={0}>
+            <Box
+              sx={theme => ({
+                display: 'grid',
+                gridTemplateColumns: { xs: '1fr', sm: 'minmax(0, 1fr) auto' },
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: 1.5,
+                px: { xs: 2.5, md: 4 },
+                py: 2,
+                backgroundColor: theme.palette.background.paper,
+                borderBottom: `1px solid ${theme.palette.divider}`
+              })}
+            >
+              <ButtonBase
+                data-capture='quote-builder-open-catalog'
+                onClick={onAddFromCatalog}
+                disabled={saving || !onAddFromCatalog}
+                sx={theme => ({
+                  width: '100%',
+                  display: 'grid',
+                  gridTemplateColumns: 'auto minmax(0, 1fr) auto',
+                  alignItems: 'center',
+                  gap: 1.5,
+                  minWidth: 0,
+                  maxWidth: { sm: 620 },
+                  px: 1.5,
+                  py: 1.25,
+                  borderRadius: `${theme.shape.customBorderRadius.md}px`,
+                  border: `1px solid ${theme.palette.divider}`,
+                  backgroundColor: theme.palette.background.default,
+                  boxShadow: `inset 0 1px 0 ${alpha(theme.palette.common.white, 0.58)}`,
+                  textAlign: 'left',
+                  transition: prefersReducedMotion
+                    ? 'none'
+                    : theme.transitions.create(['border-color', 'background-color', 'box-shadow', 'transform'], {
+                        duration: theme.transitions.duration.shortest
+                      }),
+                  '&:hover': {
+                    borderColor: theme.palette.primary.main,
+                    backgroundColor: theme.palette.background.paper,
+                    transform: 'translateY(-1px)'
+                  },
+                  '&:focus-visible': {
+                    outline: `2px solid ${theme.palette.primary.main}`,
+                    outlineOffset: 2
+                  },
+                  '&.Mui-disabled': {
+                    opacity: 0.64,
+                    transform: 'none'
+                  }
+                })}
+              >
+                <Box
+                  component='span'
+                  sx={theme => ({
+                    width: 36,
+                    height: 36,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    borderRadius: `${theme.shape.customBorderRadius.sm}px`,
+                    color: 'primary.main',
+                    backgroundColor: theme.palette.primary.lightOpacity,
+                    flexShrink: 0
+                  })}
+                >
+                  <Box component='i' className='tabler-search' aria-hidden='true' sx={{ fontSize: 19 }} />
+                </Box>
+                <Stack spacing={0.15} sx={{ minWidth: 0 }}>
+                  <Typography
+                    variant='body1'
                     sx={{
-                      display: 'grid',
-                      gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, minmax(0, 1fr))' },
-                      gap: 1.5,
-                      m: 0,
-                      p: 0,
-                      listStyle: 'none',
-                      textAlign: 'left'
+                      fontWeight: 600,
+                      lineHeight: 1.3,
+                      whiteSpace: { xs: 'normal', sm: 'nowrap' },
+                      overflow: { sm: 'hidden' },
+                      textOverflow: { sm: 'ellipsis' }
                     }}
                   >
-                    {GH_PRICING.emptyItems.methodHints.map(hint => (
-                      <Box
-                        key={hint.title}
-                        component='li'
-                        sx={theme => ({
-                          display: 'flex',
-                          gap: 1.25,
-                          alignItems: 'flex-start',
-                          p: 1.25,
-                          borderRadius: `${theme.shape.customBorderRadius.sm}px`,
-                          backgroundColor: 'action.hover'
-                        })}
-                      >
-                        <Box
-                          component='i'
-                          className={hint.icon}
-                          aria-hidden='true'
-                          sx={{ fontSize: 18, color: 'text.secondary', mt: 0.25, flexShrink: 0 }}
-                        />
-                        <Stack spacing={0.25}>
-                          <Typography variant='body2' sx={{ fontWeight: 600, lineHeight: 1.3 }}>
-                            {hint.title}
-                          </Typography>
-                          <Typography variant='caption' color='text.secondary' sx={{ lineHeight: 1.35 }}>
-                            {hint.description}
-                          </Typography>
-                        </Stack>
-                      </Box>
-                    ))}
-                  </Box>
-
-                  <Stack
-                    direction={{ xs: 'column', sm: 'row' }}
-                    spacing={1}
-                    alignItems='center'
-                    justifyContent='center'
-                    useFlexGap
+                    {GH_PRICING.dealDesk.lineCanvas.searchPlaceholder}
+                  </Typography>
+                  <Typography
+                    variant='body2'
+                    color='text.secondary'
+                    sx={{
+                      lineHeight: 1.35,
+                      whiteSpace: { xs: 'normal', sm: 'nowrap' },
+                      overflow: { sm: 'hidden' },
+                      textOverflow: { sm: 'ellipsis' }
+                    }}
                   >
-                    <Button
-                      variant='contained'
-                      size='small'
-                      startIcon={<i className='tabler-books' aria-hidden='true' />}
-                      onClick={onAddFromCatalog}
-                      disabled={saving}
-                    >
-                      {GH_PRICING.emptyItems.ctaPrimary}
-                    </Button>
-                    {onAddFromService ? (
-                      <Button
-                        variant='text'
-                        size='small'
-                        color='primary'
-                        onClick={onAddFromService}
-                        disabled={saving}
-                      >
-                        {GH_PRICING.emptyItems.ctaSecondary}
-                      </Button>
-                    ) : null}
-                    {onAddFromTemplate ? (
-                      <Button
-                        variant='text'
-                        size='small'
-                        color='primary'
-                        onClick={onAddFromTemplate}
-                        disabled={saving}
-                      >
-                        {GH_PRICING.emptyItems.ctaTertiary}
-                      </Button>
-                    ) : null}
-                    {onAddFromManual ? (
-                      <Button
-                        variant='text'
-                        size='small'
-                        color='secondary'
-                        onClick={onAddFromManual}
-                        disabled={saving}
-                      >
-                        {GH_PRICING.emptyItems.ctaManual}
-                      </Button>
-                    ) : null}
+                    {GH_PRICING.dealDesk.lineCanvas.searchSupportingText}
+                  </Typography>
+                </Stack>
+                <CustomChip
+                  round='true'
+                  size='small'
+                  variant='outlined'
+                  color='primary'
+                  label={GH_PRICING.dealDesk.lineCanvas.searchOpenLabel}
+                  sx={{ display: { xs: 'none', sm: 'inline-flex' }, flexShrink: 0 }}
+                />
+              </ButtonBase>
+            </Box>
+
+            <Box
+              component={motion.div}
+              initial={prefersReducedMotion ? false : { opacity: 0, y: 10 }}
+              animate={prefersReducedMotion ? undefined : { opacity: 1, y: 0 }}
+              transition={{ duration: 0.22, ease: 'easeOut' }}
+              data-capture='quote-builder-empty-line-methods'
+              sx={theme => ({
+                px: { xs: 2.5, md: 4 },
+                py: { xs: 4, md: 5 },
+                backgroundColor: theme.palette.background.paper
+              })}
+            >
+              <Box
+                sx={{
+                  display: 'grid',
+                  gridTemplateColumns: { xs: '1fr', md: 'minmax(220px, 0.72fr) minmax(0, 1.28fr)' },
+                  gap: { xs: 3, md: 4 },
+                  alignItems: 'start',
+                  minWidth: 0
+                }}
+              >
+                <Stack spacing={2} sx={{ minWidth: 0 }}>
+                  <Stack spacing={0.75}>
+                    <Typography variant='overline' color='text.secondary'>
+                      Alcance
+                    </Typography>
+                    <Typography variant='h5'>
+                      {GH_PRICING.dealDesk.lineCanvas.emptyTitle}
+                    </Typography>
+                    <Typography variant='body1' color='text.secondary' sx={{ maxWidth: 420 }}>
+                      {GH_PRICING.dealDesk.lineCanvas.emptySubtitle}
+                    </Typography>
                   </Stack>
 
                   {pendingHint ? (
                     <Stack
                       direction='row'
                       spacing={1}
-                      alignItems='center'
-                      justifyContent='center'
+                      alignItems='flex-start'
                       role='status'
-                      sx={{ color: 'warning.main' }}
+                      sx={theme => ({
+                        color: 'warning.main',
+                        p: 1.5,
+                        pr: { xs: 7, sm: 1.5 },
+                        borderRadius: `${theme.shape.customBorderRadius.sm}px`,
+                        backgroundColor: theme.palette.warning.lightOpacity
+                      })}
                     >
                       <Box
                         component='i'
                         className='tabler-alert-circle'
                         aria-hidden='true'
-                        sx={{ fontSize: 16 }}
+                        sx={{ fontSize: 16, mt: 0.1, flexShrink: 0 }}
                       />
-                      <Typography variant='caption' sx={{ color: 'warning.main', fontWeight: 500 }}>
+                      <Typography variant='body2' sx={{ color: 'warning.main', fontWeight: 600, minWidth: 0 }}>
                         {pendingHint}
                       </Typography>
                     </Stack>
                   ) : null}
                 </Stack>
-              ) : null
-            }
-            minHeight={260}
-          />
-        </CardContent>
+
+                <Box
+                  component='ul'
+                  sx={{
+                    display: 'grid',
+                    gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, minmax(0, 1fr))' },
+                    gap: 1.5,
+                    m: 0,
+                    p: 0,
+                    listStyle: 'none',
+                    minWidth: 0
+                  }}
+                >
+                  {GH_PRICING.emptyItems.methodHints.map((hint, index) => {
+                    const handlers = [onAddFromCatalog, onAddFromService, onAddFromTemplate, onAddFromManual]
+                    const handler = handlers[index]
+                    const isPrimaryMethod = index === 0
+
+                    return (
+                      <Box
+                        key={hint.title}
+                        component={motion.li}
+                        initial={prefersReducedMotion ? false : { opacity: 0, y: 12 }}
+                        animate={prefersReducedMotion ? undefined : { opacity: 1, y: 0 }}
+                        transition={{ duration: 0.2, ease: 'easeOut', delay: index * 0.035 }}
+                        sx={{ minWidth: 0 }}
+                      >
+                        <ButtonBase
+                          onClick={handler}
+                          disabled={saving || !handler}
+                          sx={theme => ({
+                            width: '100%',
+                            minWidth: 0,
+                            minHeight: { xs: 88, md: 104 },
+                            display: 'grid',
+                            gridTemplateColumns: 'auto minmax(0, 1fr)',
+                            gap: 1.5,
+                            alignItems: 'flex-start',
+                            justifyContent: 'flex-start',
+                            p: 2,
+                            border: `1px solid ${isPrimaryMethod ? theme.palette.primary.main : theme.palette.divider}`,
+                            borderRadius: `${theme.shape.customBorderRadius.md}px`,
+                            backgroundColor: isPrimaryMethod
+                              ? alpha(theme.palette.primary.main, 0.08)
+                              : theme.palette.background.default,
+                            textAlign: 'left',
+                            boxShadow: isPrimaryMethod ? `inset 0 0 0 1px ${alpha(theme.palette.primary.main, 0.08)}` : 'none',
+                            transition: prefersReducedMotion
+                              ? 'none'
+                              : theme.transitions.create(['border-color', 'box-shadow', 'background-color', 'transform'], {
+                                  duration: theme.transitions.duration.shortest
+                                }),
+                            '&:hover': {
+                              borderColor: theme.palette.primary.main,
+                              backgroundColor: theme.palette.background.paper,
+                              transform: 'translateY(-2px)'
+                            },
+                            '&:active': {
+                              transform: 'translateY(0)'
+                            },
+                            '&:focus-visible': {
+                              outline: `2px solid ${theme.palette.primary.main}`,
+                              outlineOffset: 2
+                            },
+                            '&.Mui-disabled': {
+                              opacity: 0.56
+                            }
+                          })}
+                        >
+                          <Box
+                            component='span'
+                            sx={theme => ({
+                              width: 32,
+                              height: 32,
+                              borderRadius: `${theme.shape.customBorderRadius.sm}px`,
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              backgroundColor: theme.palette.background.paper,
+                              border: `1px solid ${theme.palette.divider}`,
+                              color: isPrimaryMethod ? 'primary.main' : 'text.secondary',
+                              flexShrink: 0
+                            })}
+                          >
+                            <Box
+                              component='i'
+                              className={hint.icon}
+                              aria-hidden='true'
+                              sx={{ fontSize: 18 }}
+                            />
+                          </Box>
+                          <Stack spacing={0.5} sx={{ minWidth: 0 }}>
+                            <Stack direction='row' spacing={1} alignItems='center' useFlexGap flexWrap='wrap'>
+                              <Typography variant='body1' sx={{ fontWeight: 600, lineHeight: 1.35 }}>
+                                {hint.title}
+                              </Typography>
+                              {isPrimaryMethod ? (
+                                <CustomChip
+                                  round='true'
+                                  size='small'
+                                  variant='tonal'
+                                  color='primary'
+                                  label={GH_PRICING.emptyItems.recommendedLabel}
+                                />
+                              ) : null}
+                            </Stack>
+                            <Typography variant='body2' color='text.secondary' sx={{ lineHeight: 1.45 }}>
+                              {hint.description}
+                            </Typography>
+                          </Stack>
+                        </ButtonBase>
+                      </Box>
+                    )
+                  })}
+                </Box>
+              </Box>
+            </Box>
+          </Stack>
+        </Box>
       ) : (
-        <DataTableShell
-          identifier='quote-line-items-editor'
-          ariaLabel='Editor de lineas del quote'
-          containerSx={{
-            // Density post-TASK-508: reduce padding vertical de body cells
-            // para llegar a ~48px por row (target enterprise Linear/Notion).
-            '& .MuiTableBody-root .MuiTableCell-root': { py: 0.75 },
-            '& .MuiTableHead-root .MuiTableCell-root': { py: 1 }
-          }}
+        <Box
+          role='table'
+          aria-label={TASK407_ARIA_EDITOR_LINEAS}
+          sx={theme => ({
+            minWidth: 0,
+            borderBlockStart: `1px solid ${theme.palette.divider}`,
+            overflowX: 'clip'
+          })}
         >
-          <Table size='small'>
-            <TableHead>
-              <TableRow>
-                <TableCell sx={{ width: 32, minWidth: 32 }} aria-label={TASK407_ARIA_EXPANDIR_DETALLE} />
-                <TableCell sx={{ minWidth: 220 }}>Ítem</TableCell>
-                <TableCell sx={{ minWidth: 160 }}>Tipo</TableCell>
-                <TableCell sx={{ minWidth: 90 }} align='right'>Cantidad</TableCell>
-                <TableCell sx={{ minWidth: 110 }}>Unidad</TableCell>
-                <TableCell sx={{ minWidth: 130 }} align='right'>Precio unitario</TableCell>
-                <TableCell sx={{ minWidth: 110 }} align='right'>Subtotal</TableCell>
-                <TableCell sx={{ minWidth: 100 }} align='right' aria-label={TASK407_ARIA_ACCIONES} />
-              </TableRow>
-            </TableHead>
-            <TableBody ref={draftTableBodyRef}>
+          <Typography
+            variant='caption'
+            sx={{
+              position: 'absolute',
+              width: 1,
+              height: 1,
+              p: 0,
+              m: -1,
+              overflow: 'hidden',
+              clip: 'rect(0 0 0 0)',
+              whiteSpace: 'nowrap',
+              border: 0
+            }}
+          >
+            {TASK407_ARIA_EXPANDIR_DETALLE} · {TASK407_ARIA_ACCIONES}
+          </Typography>
+          <Box
+            role='row'
+            sx={theme => ({
+              display: { xs: 'none', lg: 'grid' },
+              gridTemplateColumns: EDITOR_ROW_GRID_COLUMNS,
+              alignItems: 'center',
+              gap: 1.25,
+              mx: 1.5,
+              mt: 1.25,
+              px: 1.5,
+              py: 0.75,
+              borderRadius: `${theme.shape.customBorderRadius.md}px`,
+              backgroundColor: alpha(theme.palette.text.primary, 0.025),
+              color: theme.palette.text.secondary,
+              minWidth: 0
+            })}
+          >
+            <Box aria-hidden='true' />
+            <Typography role='columnheader' variant='caption' sx={{ fontWeight: 600 }}>
+              Ítem
+            </Typography>
+            <Typography role='columnheader' variant='caption' sx={{ fontWeight: 600 }}>
+              Cantidad
+            </Typography>
+            <Typography role='columnheader' variant='caption' sx={{ fontWeight: 600, textAlign: 'right' }}>
+              Precio unitario
+            </Typography>
+            <Typography role='columnheader' variant='caption' sx={{ fontWeight: 600, textAlign: 'right' }}>
+              Subtotal
+            </Typography>
+            <Box role='columnheader' aria-label={TASK407_ARIA_ACCIONES} />
+          </Box>
+
+          <Box ref={draftTableBodyRef} role='rowgroup'>
               {draftLines.map((line, index) => {
                 const simulationLine = simulationLines?.[index] ?? null
                 const enginePrice = simulationLine?.suggestedBillRate?.unitPriceOutputCurrency ?? null
@@ -864,13 +1101,47 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
 
                 return (
                   <Fragment key={rowId}>
-                    <TableRow
+                    <Box
                       id={rowId}
-                      hover
+                      role='row'
                       onMouseEnter={() => setHoveredRow(index)}
                       onMouseLeave={() => setHoveredRow(prev => (prev === index ? null : prev))}
+                      sx={theme => ({
+                        display: 'grid',
+	                        gridTemplateColumns: {
+	                          xs: 'auto minmax(0, 1fr) auto',
+	                          md: 'repeat(2, minmax(0, 1fr))',
+	                          lg: EDITOR_ROW_GRID_COLUMNS
+	                        },
+	                        gap: { xs: 0.5, md: 1, lg: 1.25 },
+	                        alignItems: { xs: 'stretch', lg: 'center' },
+	                        px: { xs: 1, lg: 2 },
+	                        py: { xs: 0.65, lg: 0.95 },
+                        borderBlockEnd: `1px solid ${theme.palette.divider}`,
+                        backgroundColor: theme.palette.background.paper,
+                        transition: theme.transitions.create(['background-color'], {
+                          duration: theme.transitions.duration.shortest
+                        }),
+                        '&:hover': {
+                          backgroundColor: alpha(theme.palette.primary.main, 0.018)
+                        },
+                        '@media (prefers-reduced-motion: reduce)': {
+                          transition: 'none'
+                        },
+                        minWidth: 0
+                      })}
                     >
-                      <TableCell sx={{ width: 32, minWidth: 32, pr: 0 }}>
+                      <Box
+                        role='cell'
+                        sx={{
+                          display: { xs: 'none', lg: 'flex' },
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          minWidth: 0,
+                          gridColumn: '1 / 2',
+                          alignSelf: 'center'
+                        }}
+                      >
                         {hasDetails ? (
                           <Tooltip title={isExpanded ? 'Ocultar detalle' : 'Ver detalle'} disableInteractive>
                             <IconButton
@@ -888,19 +1159,61 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
                             </IconButton>
                           </Tooltip>
                         ) : null}
-                      </TableCell>
-                      <TableCell>
-                        <Stack spacing={1}>
-                          <CustomTextField
-                            size='small'
-                            fullWidth
-                            placeholder='Ej. Diseño de identidad'
-                            value={line.label}
-                            onChange={event => updateLine(index, { label: event.target.value })}
-                            disabled={saving}
-                            aria-label={`Etiqueta del ítem ${index + 1}`}
-                          />
-                          <Stack direction='row' spacing={1} alignItems='center' useFlexGap>
+                      </Box>
+                      <Box role='cell' sx={{ minWidth: 0, gridColumn: { xs: '1 / -1', md: '1 / -1', lg: '2 / 3' } }}>
+	                        <Stack spacing={0.25}>
+                          <Stack direction='row' spacing={0.75} alignItems='center' sx={{ minWidth: 0 }}>
+                            {hasDetails ? (
+                              <Tooltip title={isExpanded ? 'Ocultar detalle' : 'Ver detalle'} disableInteractive>
+                                <IconButton
+                                  size='small'
+                                  onClick={() => toggleRowExpanded(index)}
+                                  aria-expanded={isExpanded}
+                                  aria-label={isExpanded ? 'Ocultar detalle de pricing' : 'Ver detalle de pricing'}
+                                  sx={{
+                                    display: { xs: 'inline-flex', lg: 'none' },
+                                    flexShrink: 0,
+                                    transition: 'transform 150ms ease-out',
+                                    transform: isExpanded ? 'rotate(90deg)' : 'rotate(0deg)',
+                                    '@media (prefers-reduced-motion: reduce)': { transition: 'none' }
+                                  }}
+                                >
+                                  <i className='tabler-chevron-right' style={{ fontSize: 16 }} />
+                                </IconButton>
+                              </Tooltip>
+                            ) : null}
+                            <CustomTextField
+                              size='small'
+                              fullWidth
+                              placeholder='Ej. Diseño de identidad'
+                              value={line.label}
+                              onChange={event => updateLine(index, { label: event.target.value })}
+                              disabled={saving}
+                              aria-label={`Etiqueta del ítem ${index + 1}`}
+	                              sx={theme => ({
+	                                '& .MuiInputBase-root': {
+	                                  minHeight: { xs: 32, md: 40 },
+                                  borderRadius: `${theme.shape.customBorderRadius.md}px`,
+                                  backgroundColor: { xs: 'transparent', sm: theme.palette.background.paper },
+                                  boxShadow: { xs: 'none', sm: undefined }
+                                },
+                                '& .MuiOutlinedInput-notchedOutline': {
+                                  borderColor: { xs: 'transparent', sm: undefined }
+                                },
+                                '& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline': {
+                                  borderColor: { xs: alpha(theme.palette.primary.main, 0.28), sm: undefined }
+                                },
+                                '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                  borderColor: { xs: alpha(theme.palette.primary.main, 0.38), sm: undefined }
+                                },
+	                                '& .MuiInputBase-input': {
+	                                  py: { xs: 0.35, md: 0.85 },
+	                                  px: { xs: 0, sm: undefined }
+	                                }
+	                              })}
+                            />
+                          </Stack>
+                          <Stack direction='row' spacing={0.6} alignItems='center' useFlexGap flexWrap='wrap'>
                             {line.source ? (
                               <Tooltip title={`Origen: ${SOURCE_META[line.source].label}`} disableInteractive>
                                 <Box
@@ -921,13 +1234,33 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
                                 SKU {line.metadata.sku}
                               </Typography>
                             ) : null}
+                            <CustomChip round='true' size='small' variant='tonal' color={typeMeta.color} label={typeMeta.label} />
+                            {tierMeta ? (
+                              <CustomChip
+                                round='true'
+                                size='small'
+                                variant='tonal'
+                                color={tierMeta.color}
+                                label={tierMeta.label}
+                              />
+                            ) : null}
                           </Stack>
                         </Stack>
-                      </TableCell>
-                      <TableCell>
+                      </Box>
+                      <Box
+                        role='cell'
+                        sx={{
+                          display: 'none',
+                          minWidth: 0,
+                          gridColumn: { xs: 'auto', md: '1 / 2' }
+                        }}
+                      >
                         {/* Consolidación post-TASK-508: tipo + tier en una columna
                             compacta. Source (catálogo/servicio/template/manual)
                             se muestra como ícono prefijo en la celda Ítem. */}
+                        <Typography variant='caption' color='text.secondary' sx={{ display: { xs: 'block', lg: 'none' }, mb: 0.5 }}>
+                          Tipo
+                        </Typography>
                         <Stack spacing={0.5} direction='row' alignItems='center' flexWrap='wrap' useFlexGap>
                           <CustomChip round='true' size='small' variant='tonal' color={typeMeta.color} label={typeMeta.label} />
                           {tierMeta ? (
@@ -940,153 +1273,228 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
                             />
                           ) : null}
                         </Stack>
-                      </TableCell>
-                      <TableCell align='right'>
-                        <Stack spacing={0.25} alignItems='flex-end'>
-                          <CustomTextField
-                            size='small'
-                            type='number'
-                            value={needsPricingContext
-                              ? (line.metadata?.periods ?? 1)
-                              : line.quantity
-                            }
-                            onChange={event => {
-                              const raw = event.target.value
-                              const next = raw === '' ? 0 : Number(raw)
-                              const parsed = Number.isFinite(next) ? next : 0
+                      </Box>
+	                      <Box role='cell' sx={{ minWidth: 0, gridColumn: { xs: '1 / 2', sm: '1 / 2', md: '2 / 3', lg: '3 / 4' } }}>
+                        <Stack spacing={0.25} alignItems={{ xs: 'stretch', lg: 'flex-start' }} sx={{ minWidth: 0 }}>
+                          <Typography
+                            variant='caption'
+                            color='text.secondary'
+                            sx={{ display: { xs: 'none', sm: 'block', lg: 'none' } }}
+                          >
+                            Cantidad
+                          </Typography>
+                          <Stack direction='row' spacing={0.6} alignItems='center' sx={{ minWidth: 0 }}>
+                            <CustomTextField
+                              size='small'
+                              type='number'
+                              value={needsPricingContext
+                                ? (line.metadata?.periods ?? 1)
+                                : line.quantity
+                              }
+                              onChange={event => {
+                                const raw = event.target.value
+                                const next = raw === '' ? 0 : Number(raw)
+                                const parsed = Number.isFinite(next) ? next : 0
 
-                              // Para role/person la Cantidad visible representa meses
-                              // (periods). Mutamos solo metadata.periods; line.quantity
-                              // permanece en 1 para evitar el doble-conteo en el engine
-                              // (bill = unitPrice × fte × periods × quantity).
-                              updateLine(index, needsPricingContext
-                                ? {
-                                    metadata: {
-                                      ...(line.metadata ?? {}),
-                                      periods: parsed
+                                // Para role/person la Cantidad visible representa meses
+                                // (periods). Mutamos solo metadata.periods; line.quantity
+                                // permanece en 1 para evitar el doble-conteo en el engine
+                                // (bill = unitPrice × fte × periods × quantity).
+                                updateLine(index, needsPricingContext
+                                  ? {
+                                      metadata: {
+                                        ...(line.metadata ?? {}),
+                                        periods: parsed
+                                      }
                                     }
-                                  }
-                                : { quantity: parsed }
-                              )
-                            }}
-                            disabled={saving}
-                            aria-label={needsPricingContext ? `Meses del ítem ${index + 1}` : `Cantidad del ítem ${index + 1}`}
-                          />
+                                  : { quantity: parsed }
+                                )
+                              }}
+                              disabled={saving}
+	                              aria-label={needsPricingContext ? `Meses del ítem ${index + 1}` : `Cantidad del ítem ${index + 1}`}
+	                              sx={theme => ({
+	                                maxWidth: { xs: 64, sm: 104, lg: 74 },
+	                                '& .MuiInputBase-root': {
+	                                  minHeight: { xs: 32, lg: 38 },
+	                                  borderRadius: `${theme.shape.customBorderRadius.md}px`
+	                                },
+	                                '& .MuiInputBase-input': {
+	                                  py: { xs: 0.42, lg: 0.75 }
+	                                }
+	                              })}
+                            />
+                            {needsPricingContext ? (
+                              <Tooltip title='El engine usa base mensual para roles y personas' disableInteractive>
+                                <span>
+                                  <CustomChip
+                                    round='true'
+                                    size='small'
+                                    variant='tonal'
+                                    color='primary'
+                                    label='Mes'
+                                  />
+                                </span>
+                              </Tooltip>
+                            ) : (
+                              <CustomTextField
+                                select
+                                size='small'
+                                value={line.unit}
+                                onChange={event => updateLine(index, { unit: event.target.value as QuoteLineItem['unit'] })}
+                                disabled={saving}
+                                aria-label={`Unidad del ítem ${index + 1}`}
+                                sx={{ minWidth: 112 }}
+                              >
+                                {UNIT_OPTIONS.map(option => (
+                                  <MenuItem key={option.value} value={option.value}>
+                                    {option.label}
+                                  </MenuItem>
+                                ))}
+                              </CustomTextField>
+                            )}
+                          </Stack>
                           {needsPricingContext ? (
-                            <Typography variant='caption' color='text.secondary'>
+                            <Typography
+                              variant='caption'
+                              color='text.secondary'
+                              sx={{ display: { xs: 'none', sm: 'block', lg: 'none' } }}
+                            >
                               meses facturables
                             </Typography>
                           ) : null}
                         </Stack>
-                      </TableCell>
-                      <TableCell>
-                        {needsPricingContext ? (
-                          <Tooltip title='El engine usa base mensual para roles y personas' disableInteractive>
-                            <span>
-                              <CustomChip
-                                round='true'
-                                size='small'
-                                variant='tonal'
-                                color='secondary'
-                                label='Mes'
-                              />
-                            </span>
-                          </Tooltip>
-                        ) : (
-                          <CustomTextField
-                            select
-                            size='small'
-                            fullWidth
-                            value={line.unit}
-                            onChange={event => updateLine(index, { unit: event.target.value as QuoteLineItem['unit'] })}
-                            disabled={saving}
-                            aria-label={`Unidad del ítem ${index + 1}`}
+                      </Box>
+	                      <Box
+	                        role='cell'
+	                        sx={{
+	                          display: { xs: 'none', sm: 'block' },
+	                          minWidth: 0,
+	                          gridColumn: { sm: '2 / 3', md: '1 / -1', lg: '4 / 5' }
+	                        }}
+	                      >
+                        <Stack
+                          spacing={0.25}
+                          alignItems={{ xs: 'flex-end', md: 'flex-start', lg: 'flex-end' }}
+                          sx={{ minWidth: 0 }}
+                        >
+                          <Typography
+                            variant='caption'
+                            color='text.secondary'
+                            sx={{ display: { xs: 'none', sm: 'block', lg: 'none' } }}
                           >
-                            {UNIT_OPTIONS.map(option => (
-                              <MenuItem key={option.value} value={option.value}>
-                                {option.label}
-                              </MenuItem>
-                            ))}
-                          </CustomTextField>
-                        )}
-                      </TableCell>
-                      <TableCell align='right'>
-                        <Stack spacing={0.5} alignItems='flex-end'>
+                            Precio unitario
+                          </Typography>
                           {isCatalogPriced ? (
 
-                            /*
-                              Items de catálogo (role / person / tool / overhead_addon):
-                              el catálogo es SoT; el precio no se edita desde la UI.
-                              Se muestra como Typography read-only, FTE-ajustado en
-                              role/person para que el subtotal (meses × precio) sea
-                              lineal y auditable a ojo. Si el usuario necesita un
-                              precio distinto, crea una línea manual (direct_cost).
-                            */
-                            simulating && enginePrice === null ? (
-                              <Skeleton variant='text' width={110} height={22} aria-label={TASK407_ARIA_CALCULANDO_PRECIO_DEL_CATALOGO} />
-                            ) : displayedUnitPrice !== null ? (
-                              <Stack spacing={0.25} alignItems='flex-end'>
-                                <Typography
-                                  variant='body2'
-                                  sx={{ fontVariantNumeric: 'tabular-nums', fontWeight: 500 }}
-                                  aria-label={`Precio unitario del ítem ${index + 1}, precio del catálogo`}
+                              /*
+                                Items de catálogo (role / person / tool / overhead_addon):
+                                el catálogo es SoT; el precio no se edita desde la UI.
+                                Se muestra como Typography read-only, FTE-ajustado en
+                                role/person para que el subtotal (meses × precio) sea
+                                lineal y auditable a ojo. Si el usuario necesita un
+                                precio distinto, crea una línea manual (direct_cost).
+                              */
+                              simulating && enginePrice === null ? (
+                                <Skeleton variant='text' width={110} height={22} aria-label={TASK407_ARIA_CALCULANDO_PRECIO_DEL_CATALOGO} />
+                              ) : displayedUnitPrice !== null ? (
+                                <Stack
+                                  direction='row'
+                                  spacing={0.75}
+                                  alignItems='center'
+                                  justifyContent={{ xs: 'flex-end', md: 'flex-start', lg: 'flex-end' }}
+                                  useFlexGap
+                                  flexWrap='wrap'
+                                  sx={{ minWidth: 0 }}
                                 >
-                                  {formatCurrency(displayedUnitPrice, currency)}
+                                  <Typography
+                                    variant='monoAmount'
+                                    aria-label={`Precio unitario del ítem ${index + 1}, precio del catálogo`}
+                                  >
+                                    {formatCurrency(displayedUnitPrice, currency)}
+                                  </Typography>
+                                  {needsPricingContext ? (
+                                    <Tooltip title='Ajustar FTE y tipo de contratación'>
+                                      <span>
+                                        <CustomChip
+                                          round='true'
+                                          size='small'
+                                          variant='tonal'
+                                          color='primary'
+                                          label={`FTE ${fteFraction.toFixed(2).replace(/\.?0+$/, '')}×`}
+                                          onClick={event => handleAdjustOpen(event, index)}
+                                          sx={{ cursor: 'pointer' }}
+                                        />
+                                      </span>
+                                    </Tooltip>
+                                  ) : null}
+                                </Stack>
+                              ) : (
+                                <Typography variant='body2' color='text.secondary' sx={{ fontVariantNumeric: 'tabular-nums' }}>
+                                  —
                                 </Typography>
-                                {needsPricingContext ? (
-                                  <Tooltip title='Ajustar FTE y tipo de contratación'>
-                                    <span>
-                                      <CustomChip
-                                        round='true'
-                                        size='small'
-                                        variant='tonal'
-                                        color={fteFraction !== 1 ? 'primary' : 'secondary'}
-                                        label={`FTE ${fteFraction.toFixed(2).replace(/\.?0+$/, '')}×`}
-                                        onClick={event => handleAdjustOpen(event, index)}
-                                        sx={{ cursor: 'pointer' }}
-                                      />
-                                    </span>
-                                  </Tooltip>
-                                ) : null}
-                              </Stack>
+                              )
                             ) : (
-                              <Typography variant='body2' color='text.secondary' sx={{ fontVariantNumeric: 'tabular-nums' }}>
-                                —
-                              </Typography>
-                            )
+
+                              /* Líneas manuales (direct_cost sin pricingV2LineType): editable. */
+                              <CustomTextField
+                                size='small'
+                                type='number'
+                                value={line.unitPrice ?? ''}
+                                onChange={event => {
+                                  const raw = event.target.value
+
+                                  updateLine(index, { unitPrice: raw === '' ? null : Number(raw) })
+                                }}
+                                disabled={saving}
+                                aria-label={`Precio unitario del ítem ${index + 1}`}
+                                sx={{ maxWidth: { sm: 150 } }}
+                              />
+                            )}
+                        </Stack>
+                      </Box>
+                      <Box
+                        role='cell'
+	                        sx={{
+	                          minWidth: 0,
+	                          gridColumn: { xs: '2 / 3', sm: '1 / -1', md: '1 / -1', lg: '5 / 6' },
+	                          textAlign: { lg: 'right' }
+	                        }}
+	                      >
+	                        <Stack spacing={0.25} alignItems={{ xs: 'flex-end', sm: 'flex-end', lg: 'flex-end' }} sx={{ minWidth: 0 }}>
+                          <Typography
+                            variant='caption'
+                            color='text.secondary'
+                            sx={{ display: { xs: 'none', sm: 'block', lg: 'none' } }}
+                          >
+                            Subtotal
+                          </Typography>
+                          {simulating && !hasManualPrice && subtotal === 0 ? (
+                            <Skeleton variant='text' width={90} height={22} aria-label={TASK407_ARIA_CALCULANDO_SUBTOTAL} />
+                          ) : subtotal === 0 && enginePrice === null && !hasManualPrice ? (
+                            <Typography variant='body2' sx={{ fontVariantNumeric: 'tabular-nums', color: 'text.secondary' }} aria-label={TASK407_ARIA_SUBTOTAL_SIN_DATOS_SUFICIENTES}>
+                              —
+                            </Typography>
                           ) : (
-
-                            /* Líneas manuales (direct_cost sin pricingV2LineType): editable. */
-                            <CustomTextField
-                              size='small'
-                              type='number'
-                              value={line.unitPrice ?? ''}
-                              onChange={event => {
-                                const raw = event.target.value
-
-                                updateLine(index, { unitPrice: raw === '' ? null : Number(raw) })
-                              }}
-                              disabled={saving}
-                              aria-label={`Precio unitario del ítem ${index + 1}`}
-                            />
+                            <Typography variant='monoAmount'>
+                              {formatCurrency(subtotal, currency)}
+                            </Typography>
                           )}
                         </Stack>
-                      </TableCell>
-                      <TableCell align='right'>
-                        {simulating && !hasManualPrice && subtotal === 0 ? (
-                          <Skeleton variant='text' width={90} height={22} sx={{ ml: 'auto' }} aria-label={TASK407_ARIA_CALCULANDO_SUBTOTAL} />
-                        ) : subtotal === 0 && enginePrice === null && !hasManualPrice ? (
-                          <Typography variant='body2' sx={{ fontVariantNumeric: 'tabular-nums', color: 'text.secondary' }} aria-label={TASK407_ARIA_SUBTOTAL_SIN_DATOS_SUFICIENTES}>
-                            —
-                          </Typography>
-                        ) : (
-                          <Typography variant='body2' sx={{ fontVariantNumeric: 'tabular-nums', fontWeight: 500 }}>
-                            {formatCurrency(subtotal, currency)}
-                          </Typography>
-                        )}
-                      </TableCell>
-                      <TableCell align='right'>
-                        <Stack direction='row' spacing={0.25} justifyContent='flex-end'>
+                      </Box>
+                      <Box
+                        role='cell'
+	                        sx={{
+	                          minWidth: 0,
+	                          gridColumn: { xs: '3 / 4', sm: '2 / 3', lg: '6 / 7' },
+	                          alignSelf: { lg: 'center' }
+	                        }}
+                      >
+                        <Stack
+                          direction={{ xs: 'row', lg: 'column' }}
+                          spacing={0.25}
+                          justifyContent={{ xs: 'flex-end', lg: 'center' }}
+                          alignItems='center'
+                        >
                           {rowWarnings.length > 0 ? (
                             (() => {
                               const worstSeverity = rowWarnings.some(w => w.severity === 'critical')
@@ -1174,7 +1582,7 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
                                 disabled={saving}
                                 aria-label={`Eliminar ítem ${index + 1}`}
                                 sx={{
-                                  opacity: isHovered ? 1 : 0,
+                                  opacity: isHovered ? 1 : 0.68,
                                   transition: 'opacity 150ms ease-out',
                                   '@media (prefers-reduced-motion: reduce)': { transition: 'none' },
                                   '&:focus-visible': { opacity: 1 }
@@ -1185,29 +1593,35 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
                             </span>
                           </Tooltip>
                         </Stack>
-                      </TableCell>
-                    </TableRow>
+                      </Box>
+                    </Box>
 
                     {isExpanded && showCostStack && simulationLine && outputCurrency ? (
-                      <TableRow>
-                        <TableCell
-                          colSpan={8}
-                          sx={theme => ({
-                            py: 1.5,
-                            bgcolor: 'background.default',
-                            borderLeft: `3px solid ${theme.palette.primary.main}`
-                          })}
+                      <Box
+                        role='row'
+                        sx={theme => ({
+                          py: 1.5,
+                          px: { xs: 0, lg: 2 },
+                          bgcolor: 'background.default',
+                          borderBlockEnd: `1px solid ${theme.palette.divider}`
+                        })}
+                      >
+                        <Box
+                          role='cell'
+                          sx={{
+                            minWidth: 0,
+                            pl: { xs: 1.5, lg: 2 }
+                          }}
                         >
                           <QuoteLineCostStack lineOutput={simulationLine} outputCurrency={outputCurrency} />
-                        </TableCell>
-                      </TableRow>
+                        </Box>
+                      </Box>
                     ) : null}
                   </Fragment>
                 )
               })}
-            </TableBody>
-          </Table>
-        </DataTableShell>
+          </Box>
+        </Box>
       )}
 
       {globalWarnings.length > 0 ? (
@@ -1222,7 +1636,7 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
           <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 1, px: 3, py: 2 }}>
             <Button
               variant='text'
-              color='secondary'
+              color='primary'
               size='small'
               onClick={handleDiscard}
               disabled={saving}
@@ -1246,9 +1660,9 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
               mt: 1,
               width: 360,
               maxWidth: 'calc(100vw - 32px)',
-              borderRadius: 2,
-              border: `1px solid ${theme.palette.divider}`,
-              boxShadow: theme.shadows[6]
+              borderRadius: `${theme.shape.customBorderRadius.lg}px`,
+              border: `1px solid ${theme.greenhouseElevation.floating.borderColor}`,
+              boxShadow: theme.greenhouseElevation.floating.boxShadow
             })
           }
         }}
@@ -1320,7 +1734,7 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
                 ))}
               </CustomTextField>
               <Stack direction='row' spacing={1} justifyContent='flex-end'>
-                <Button variant='tonal' color='secondary' onClick={handleAdjustClose}>
+                <Button variant='tonal' color='primary' onClick={handleAdjustClose}>
                   {GH_PRICING.adjustPopover.closeLabel}
                 </Button>
                 <Button variant='contained' onClick={handleAdjustClose}>
@@ -1347,9 +1761,9 @@ const QuoteLineItemsEditor = forwardRef<QuoteLineItemsEditorHandle, QuoteLineIte
               mt: 1,
               width: 420,
               maxWidth: 'calc(100vw - 32px)',
-              borderRadius: 2,
-              border: `1px solid ${theme.palette.divider}`,
-              boxShadow: theme.shadows[6]
+              borderRadius: `${theme.shape.customBorderRadius.lg}px`,
+              border: `1px solid ${theme.greenhouseElevation.floating.borderColor}`,
+              boxShadow: theme.greenhouseElevation.floating.boxShadow
             })
           }
         }}
@@ -1395,7 +1809,7 @@ return (
           })()
         : null}
 
-    </Card>
+    </Box>
   )
 })
 

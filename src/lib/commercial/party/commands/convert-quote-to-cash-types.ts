@@ -31,7 +31,11 @@ export const COMMERCIAL_OPERATION_STATUSES = [
   'completed',
   'failed',
   'pending_approval',
-  'idempotent_hit'
+  'idempotent_hit',
+  // TASK-1206: estado SUSPENDIDO del cierre Q2C `contract_only` (deal con contrato, sin
+  // income/AR todavía). NUNCA es un cierre terminal. Espejo del CHECK ampliado en
+  // migrations/20260621222152560_task-1206-q2c-audit-suspended-status.sql.
+  'suspended'
 ] as const
 
 export type CommercialOperationStatus = (typeof COMMERCIAL_OPERATION_STATUSES)[number]
@@ -68,6 +72,14 @@ export interface ConvertQuoteToCashInput {
    * correlation uuid, pass it through. Defaults to a fresh uuid.
    */
   correlationId?: string
+
+  /**
+   * TASK-1206: cuando el orquestador `closeQuoteToCash` ya materializó el income
+   * de forma idempotente ANTES de convertir, lo pasa para que el substrate enlace
+   * `quotations.converted_to_income_id` en la misma transición a `converted`. Sin él,
+   * el campo queda como estaba (COALESCE — no lo pisa con null).
+   */
+  incomeId?: string | null
 }
 
 export interface ConvertQuoteToCashResult {
@@ -85,6 +97,13 @@ export interface ConvertQuoteToCashResult {
   requiresApproval: boolean
   approvalId: string | null
   message: string
+
+  /**
+   * TASK-1206: income enlazado a la cotización tras la conversión (el que pasó el
+   * orquestador, o el `converted_to_income_id` previo en un idempotent hit). null si
+   * la conversión no tiene income (no debería ocurrir vía `closeQuoteToCash`).
+   */
+  incomeId: string | null
 }
 
 // ── Error classes ─────────────────────────────────────────────────────────

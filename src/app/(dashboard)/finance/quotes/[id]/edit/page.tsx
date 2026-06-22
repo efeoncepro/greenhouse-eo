@@ -92,7 +92,9 @@ const QuoteBuilderEditPage = async ({ params }: { params: Promise<{ id: string }
   const [linesRows, templateRows, orgResult] = await Promise.all([
     listFinanceQuoteLinesFromCanonical({ tenant, quoteId: id }).catch(() => []),
     listTemplates({ activeOnly: true }).catch(() => []),
-    getOrganizationList({ page: 1, pageSize: 200, status: 'active' }).catch(() => ({ items: [] as Array<{ organizationId: string; organizationName: string }> }))
+    getOrganizationList({ page: 1, pageSize: 200, status: 'active' }).catch(() => ({
+      items: [] as Array<{ organizationId: string; organizationName: string; logoUrl?: string | null }>
+    }))
   ])
 
   const coerceEditLineType = (value: string | null): QuoteLineItem['lineType'] => {
@@ -208,7 +210,8 @@ const QuoteBuilderEditPage = async ({ params }: { params: Promise<{ id: string }
 
   const organizations: QuoteCreateOrganization[] = orgResult.items.map(org => ({
     organizationId: String(org.organizationId),
-    organizationName: String(org.organizationName)
+    organizationName: String(org.organizationName),
+    logoUrl: org.logoUrl ?? null
   }))
 
   const quote: QuoteBuilderShellQuote = {

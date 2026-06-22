@@ -644,7 +644,7 @@ export const materializeOperationalPl = async (
   month: number,
   reason: string | null = null
 ) => {
-  await materializeCommercialCostAttributionForPeriod(year, month, reason).catch(() => [])
+  await materializeCommercialCostAttributionForPeriod(year, month, reason)
 
   const result = await computeOperationalPl(year, month, reason)
 

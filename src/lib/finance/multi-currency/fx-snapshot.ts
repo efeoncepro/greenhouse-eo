@@ -12,9 +12,10 @@
 //      (the Nubox legal-document CLP equivalent; Greenhouse does NOT recompute).
 //   3. manualOverrideFxSnapshotEvidence — Finance Admin supplied the rate.
 
-import type { FinanceCurrency } from '../contracts'
+import type { FinanceCurrency, IndexedUnit } from '../contracts'
 import type { CurrencyDomain, FxReadiness } from '../currency-domain'
 import { resolveFxReadiness, type ResolveFxReadinessInput } from '../fx-readiness'
+import { clfFromIndicatorsAdapter } from '../fx/providers/clf-from-indicators'
 
 /** Snapshot policy = WHEN the rate was frozen (ADR §5.2). Subset of FX_POLICIES
  *  excluding `'none'`; a snapshot always froze at a moment. */
@@ -28,8 +29,13 @@ export type FxSnapshotPolicy =
 /** The evidence to persist into greenhouse_finance.fx_snapshots (Slice 2). The
  *  persisted row adds `snapshotId` + `lockedAt` + `supersededBy`. */
 export interface FxSnapshotEvidence {
-  fromCurrency: FinanceCurrency
+  /** TASK-995: may be an indexed unit (CLF) on an indexed-unit snapshot. Cash
+   *  FX snapshots keep a FinanceCurrency here. */
+  fromCurrency: FinanceCurrency | IndexedUnit
   toCurrency: FinanceCurrency
+  /** TASK-995 (Option A) discriminator: `indexed_unit` for a UF→CLP conversion
+   *  (never confused with an FX-market rate); `currency` for cash FX. */
+  fromUnitClass: 'currency' | 'indexed_unit'
   /** Rate as decimal string: 1 unit of `from` = `rate` units of `to`. */
   rate: string
   /** 1 / rate, pre-computed so consumers never divide. */
@@ -100,6 +106,7 @@ export const resolveFxSnapshotEvidence = async (
     evidence: {
       fromCurrency: params.fromCurrency,
       toCurrency: params.toCurrency,
+      fromUnitClass: 'currency',
       rate: formatRate(rate),
       inverseRate: formatRate(1 / rate),
       rateDate: params.rateDate,
@@ -138,6 +145,7 @@ export const observedFxSnapshotEvidence = (params: {
   return {
     fromCurrency: params.fromCurrency,
     toCurrency: params.toCurrency,
+    fromUnitClass: 'currency',
     rate: formatRate(rate),
     inverseRate: formatRate(1 / rate),
     rateDate: params.rateDate,
@@ -174,6 +182,7 @@ export const manualOverrideFxSnapshotEvidence = (params: {
   return {
     fromCurrency: params.fromCurrency,
     toCurrency: params.toCurrency,
+    fromUnitClass: 'currency',
     rate: formatRate(params.rate),
     inverseRate: formatRate(1 / params.rate),
     rateDate: params.rateDate,
@@ -183,5 +192,46 @@ export const manualOverrideFxSnapshotEvidence = (params: {
     policy: 'manual_override',
     lockedBy: 'finance_admin',
     manualOverrideReason: params.reason.trim()
+  }
+}
+
+/**
+ * TASK-995 (ADR §7, Option A) — resolve snapshotable evidence for an indexed
+ * unit (UF/CLF) → CLP, sourced from `greenhouse_finance.economic_indicators`
+ * (`indicator_code='UF'`) via the canonical `clf_from_indicators` adapter (NOT
+ * the FX-market `exchange_rates`). Produces an `indexed_unit` snapshot whose rate
+ * is CLP per CLF at the policy date. Fail-closed: returns null when no UF value
+ * exists on/before the date (caller blocks the write per the ADR fail-closed
+ * contract). The functional CLP is NEVER recomputed on read once locked.
+ */
+export const resolveIndexedUnitSnapshotEvidence = async (
+  params: {
+    unit: IndexedUnit
+    rateDate: string
+    policy?: FxSnapshotPolicy
+  },
+  deps: { fetchRate?: typeof clfFromIndicatorsAdapter.fetchDailyRate } = {}
+): Promise<FxSnapshotEvidence | null> => {
+  if (params.unit !== 'CLF') return null
+
+  const fetch = deps.fetchRate ?? clfFromIndicatorsAdapter.fetchDailyRate
+
+  const result = await fetch({ fromCurrency: 'CLF', toCurrency: 'CLP', rateDate: params.rateDate })
+
+  if (!result || !(result.rate > 0)) return null
+
+  return {
+    fromCurrency: 'CLF',
+    toCurrency: 'CLP',
+    fromUnitClass: 'indexed_unit',
+    rate: formatRate(result.rate),
+    inverseRate: formatRate(1 / result.rate),
+    rateDate: params.rateDate,
+    rateDateResolved: result.rateDate,
+    source: 'economic_indicators.UF',
+    composedVia: null,
+    policy: params.policy ?? 'rate_at_event',
+    lockedBy: 'system',
+    manualOverrideReason: null
   }
 }

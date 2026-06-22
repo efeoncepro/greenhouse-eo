@@ -1493,7 +1493,13 @@ export const createFinanceIncomeInPostgres = async ({
   partnerShareAmount,
   netAfterPartner,
   notes,
-  actorUserId
+  actorUserId,
+  // TASK-995 — optional indexed-unit (CLF) native plane. Default null → cash
+  // income unchanged. When set (CLF quote→CLP invoice), `currency` stays the
+  // legal/cash CLP while these carry the UF evidence + locked CLF→CLP snapshot.
+  nativeAmount = null,
+  nativeCurrency = null,
+  nativeToFunctionalFxSnapshotId = null
 }: {
   incomeId: string
   clientId: string | null
@@ -1536,6 +1542,9 @@ export const createFinanceIncomeInPostgres = async ({
   netAfterPartner: number | null
   notes: string | null
   actorUserId: string | null
+  nativeAmount?: number | null
+  nativeCurrency?: string | null
+  nativeToFunctionalFxSnapshotId?: string | null
 }, opts?: { client?: PoolClient }) => {
   await assertFinanceSlice2PostgresReady()
 
@@ -1569,6 +1578,7 @@ export const createFinanceIncomeInPostgres = async ({
           is_reconciled,
           partner_id, partner_name, partner_share_percent, partner_share_amount, net_after_partner,
           notes, created_by_user_id, economic_category,
+          native_amount, native_currency, native_to_functional_fx_snapshot_id,
           created_at, updated_at
         )
         VALUES (
@@ -1584,6 +1594,7 @@ export const createFinanceIncomeInPostgres = async ({
           FALSE,
           $35, $36, $37, $38, $39,
           $40, $41, $42,
+          $43, $44, $45,
           CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
         )
         RETURNING *
@@ -1599,7 +1610,8 @@ export const createFinanceIncomeInPostgres = async ({
         quotationId, contractId, sourceHesId, purchaseOrderId, hesId,
         poNumber, hesNumber, serviceLine, incomeType,
         partnerId, partnerName, partnerSharePercent, partnerShareAmount, netAfterPartner,
-        notes, actorUserId, incomeEconomicCategoryResolution.category
+        notes, actorUserId, incomeEconomicCategoryResolution.category,
+        nativeAmount, nativeCurrency, nativeToFunctionalFxSnapshotId
       ],
       client
     )

@@ -2,6 +2,7 @@ import 'server-only'
 
 import { query } from '@/lib/db'
 import { captureWithDomain } from '@/lib/observability/capture'
+import { TASK_STATUS_CANONICAL, taskStatusSql } from '@/lib/delivery/task-status-canonical'
 
 import type { ReliabilitySignal } from '@/types/reliability'
 
@@ -165,6 +166,84 @@ export const getAttributableLatenessOverlapSignal = async (): Promise<Reliabilit
     return buildErrorSignal(
       ATTRIBUTABLE_LATENESS_OVERLAP_SIGNAL_ID,
       'Atraso imputable — invariante anti-doble-descuento',
+      'data_quality',
+      error,
+      observedAt
+    )
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// delivery.attributable_lateness.shadow_terminal_open  (TASK-1174 / ISSUE-098)
+// ════════════════════════════════════════════════════════════════════════════
+
+export const ATTRIBUTABLE_LATENESS_TERMINAL_OPEN_SIGNAL_ID =
+  'delivery.attributable_lateness.shadow_terminal_open'
+
+// Terminal = status Aprobado/Archivado. NO `completed_at` como proxy: una tarea en
+// revisión puede traer completed_at y su bucket abierto es correcto (ver TASK-1174).
+const TERMINAL_OPEN_WARNING = 0
+const TERMINAL_OPEN_ERROR = 10
+
+/**
+ * ISSUE-098 — invariante de terminalidad: una tarea TERMINAL (`Aprobado`/
+ * `Archivado`) NUNCA debe tener un bucket abierto (`overdue`/`carry_over`) en el
+ * shadow. El compute M2 es event-driven y congelaba un bucket abierto cuando el
+ * row de `tasks` laggeaba la transición terminal (no hay transición futura que
+ * recompute). Con el fix TASK-1174 (estado efectivo desde el log de transiciones
+ * + barrido) el steady state es 0. Cualquier > 0 = re-aparición del bug class →
+ * gate del writeback `[GH] OTD` (TASK-927). Cero date-math (gate TASK-893).
+ *
+ * Severidad: 0 → ok · 1-10 → warning (carrera transitoria de sync) · >10 → error.
+ */
+export const getAttributableLatenessTerminalOpenSignal = async (): Promise<ReliabilitySignal> => {
+  const observedAt = new Date().toISOString()
+
+  try {
+    const rows = await query<{ n: string }>(
+      `SELECT COUNT(*)::text AS n
+       FROM greenhouse_delivery.task_attributable_lateness_shadow s
+       JOIN greenhouse_delivery.tasks t ON t.notion_task_id = s.task_source_id
+       WHERE t.task_status IN (${taskStatusSql(TASK_STATUS_CANONICAL.APROBADO)}, ${taskStatusSql(TASK_STATUS_CANONICAL.ARCHIVADO)})
+         AND s.bucket_attributable IN ('overdue', 'carry_over')`
+    )
+
+    const count = Number(rows[0]?.n ?? 0)
+
+    const severity: ReliabilitySignal['severity'] =
+      count <= TERMINAL_OPEN_WARNING ? 'ok' : count <= TERMINAL_OPEN_ERROR ? 'warning' : 'error'
+
+    return {
+      signalId: ATTRIBUTABLE_LATENESS_TERMINAL_OPEN_SIGNAL_ID,
+      moduleKey: MODULE_KEY,
+      kind: 'data_quality',
+      source: 'getAttributableLatenessTerminalOpenSignal',
+      label: 'Atraso imputable — tareas terminales con bucket abierto',
+      severity,
+      summary:
+        count === 0
+          ? 'Invariante de terminalidad intacto: ninguna tarea Aprobado/Archivado con bucket abierto.'
+          : `${count} tarea(s) terminal(es) (Aprobado/Archivado) con bucket abierto (overdue/carry_over) — bug class ISSUE-098. Correr el barrido recompute-attributable-lateness-terminal-open. Bloquea writeback [GH] OTD (TASK-927).`,
+      observedAt,
+      evidence: [
+        { kind: 'metric', label: 'count', value: String(count) },
+        { kind: 'metric', label: 'warning_threshold', value: String(TERMINAL_OPEN_WARNING) },
+        { kind: 'metric', label: 'error_threshold', value: String(TERMINAL_OPEN_ERROR) },
+        {
+          kind: 'doc',
+          label: 'Issue',
+          value: 'docs/issues/open/ISSUE-098-attributable-lateness-shadow-stale-terminal-tasks.md'
+        }
+      ]
+    }
+  } catch (error) {
+    captureWithDomain(error, 'delivery', {
+      tags: { source: 'reliability_signal_attributable_lateness_terminal_open' }
+    })
+
+    return buildErrorSignal(
+      ATTRIBUTABLE_LATENESS_TERMINAL_OPEN_SIGNAL_ID,
+      'Atraso imputable — tareas terminales con bucket abierto',
       'data_quality',
       error,
       observedAt

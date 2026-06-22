@@ -706,10 +706,10 @@ export const getSampleSprintDetail = async ({
   const terms = normalizeTerms(row.commitment_terms_json)
 
   const auditRows = await query<AuditEventRow>(
-    `SELECT audit_id, event_kind, actor_user_id, reason, payload_json, created_at
+    `SELECT audit_id, event_kind, actor_user_id, reason, payload_json, occurred_at AS created_at
      FROM greenhouse_commercial.engagement_audit_log
      WHERE service_id = $1
-     ORDER BY created_at DESC
+     ORDER BY occurred_at DESC
      LIMIT 50`,
     [normalizedServiceId]
   )

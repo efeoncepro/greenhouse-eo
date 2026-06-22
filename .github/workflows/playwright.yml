@@ -50,6 +50,7 @@ jobs:
       AGENT_AUTH_SECRET: ${{ secrets.AGENT_AUTH_SECRET }}
       AGENT_AUTH_EMAIL: ${{ secrets.AGENT_AUTH_EMAIL || 'agent@greenhouse.efeonce.org' }}
       VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
+      PLAYWRIGHT_CHROMIUM_CHANNEL: chrome
     steps:
       - name: Guard — require base URL + agent secret
         run: |
@@ -71,14 +72,38 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v5
         with:
-          node-version: 20
+          node-version: 24
           cache: pnpm
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Install Playwright Chromium
-        run: pnpm exec playwright install --with-deps chromium
+      - name: Verify Chrome browser
+        # GitHub's Ubuntu runners include Chrome. CI uses the system channel to
+        # avoid downloading Playwright's browser archive before every smoke run.
+        run: google-chrome --version
+
+      - name: Provision Playwright ffmpeg
+        # Video-on-failure needs an executable at Playwright's hermetic ffmpeg path.
+        # Use the runner/system ffmpeg and link it there instead of invoking
+        # Playwright's downloader, which can stall in Actions.
+        run: |
+          if ! command -v ffmpeg >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install -y --no-install-recommends ffmpeg
+          fi
+
+          FFMPEG_PATH="$(node - <<'NODE'
+          const packageJsonPath = require.resolve('playwright-core/package.json')
+          const { registry } = require(packageJsonPath.replace('package.json', 'lib/server/registry/index.js'))
+
+          process.stdout.write(registry.findExecutable('ffmpeg').executablePath())
+          NODE
+          )"
+
+          mkdir -p "$(dirname "$FFMPEG_PATH")"
+          ln -sf "$(command -v ffmpeg)" "$FFMPEG_PATH"
+          "$FFMPEG_PATH" -version
 
       - name: Run Playwright smoke suite
         run: pnpm test:e2e

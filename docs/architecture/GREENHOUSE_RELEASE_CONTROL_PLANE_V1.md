@@ -6,6 +6,41 @@
 > **Replaces:** N/A (no formal release contract pre-2026-05-10; lived as tribal knowledge in `Handoff.md`)
 > **Related:** TASK-849 (Production Release Watchdog Alerts), TASK-857 (GitHub Webhooks Release Event Ingestion), TASK-742 (Auth Resilience 7-layer), TASK-765 (payment_orders state machine), TASK-773 (outbox publisher cutover)
 
+## Delta 2026-06-18 — Ops Worker workflow drift guard
+
+El `ops-worker` sigue desplegándose exclusivamente por GitHub Actions como
+entrypoint canónico. El incidente operativo del 2026-06-18 fue de control plane,
+no de runtime: un `workflow_dispatch` manual con `expected_sha` apuntando al HEAD
+documental forzó rebuild Docker + deploy Cloud Run aunque el cambio no alteraba
+el worker. La revisión resultante quedó sana (`ops-worker-00363-kd6`, Ready,
+100% tráfico), pero el costo/tiempo mostró que el workflow necesitaba distinguir
+SHA de repo vs SHA operativo del worker.
+
+Contrato vigente:
+
+- `.github/workflows/ops-worker-deploy.yml` mantiene `deploy.sh` como único
+  camino de deploy y no modifica `services/ops-worker/server.ts`, Dockerfile ni
+  Cloud Scheduler definitions.
+- En `push`, el workflow se dispara solo cuando cambian paths que pueden afectar
+  el bundle/runtime del worker (`services/ops-worker/**`, `services/_shared/**`,
+  `src/lib/sync/**`, `src/lib/knowledge/**`, payroll/finance/email/integrations/
+  Notion/auth/secrets/reliability/notion-metrics, `package.json`,
+  `pnpm-lock.yaml`, `tsconfig.json`).
+- En `workflow_dispatch` sin `expected_sha`, el workflow resuelve el último
+  commit que tocó ese runtime surface. Esto evita que un commit documental sea
+  tratado como drift operativo.
+- Antes de construir Docker, el workflow lee la revisión Cloud Run actual y su
+  `GIT_SHA`. Si coincide con el SHA esperado, o si `git diff` demuestra que no
+  cambiaron paths runtime del worker entre ambos SHAs, salta build/deploy y solo
+  continúa con verificación.
+- Si hay drift real de runtime, el workflow conserva el camino anterior:
+  Cloud Build + Cloud Run deploy + `GIT_SHA` verification + Ready polling.
+
+Validado en `develop` con commit `dfd85612d`: CI completo success, `Worker
+runtime-deps gate` success, y no se disparó un nuevo `Ops Worker Deploy` por el
+cambio workflow-only. El último deploy real del worker siguió siendo el run
+`27753918151` (`ops-worker-00363-kd6`).
+
 ## Delta 2026-05-11 — TASK-861 HubSpot drift recovery hardening
 
 `TASK-861` no cambia el comportamiento runtime del bridge HubSpot ni el flujo

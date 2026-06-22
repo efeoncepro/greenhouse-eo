@@ -8,6 +8,14 @@ import { getAgencyPulseKpis } from '@/lib/agency/agency-queries'
 import { readOrganizationAiSignals, type AiSignalListItem } from '@/lib/ico-engine/ai/read-signals'
 import { readOrganizationAiLlmEnrichments } from '@/lib/ico-engine/ai/llm-enrichment-reader'
 import type { OrganizationAiLlmEnrichmentItem } from '@/lib/ico-engine/ai/llm-types'
+import {
+  readNexaInsightDrill,
+  type NexaInsightDetailSnapshot
+} from '@/lib/ico-engine/ai/nexa-insight-drill-reader'
+import { listNexaInsightsForPeriod } from '@/lib/ico-engine/ai/nexa-insight-list-reader'
+import { buildNexaInsightDrillHref } from '@/lib/ico-engine/ai/nexa-insight-href'
+
+import { buildNexaInsightSubject } from './insight-focus'
 import { ensureFinanceInfrastructure } from '@/lib/finance/schema'
 import { getFinanceProjectId, roundCurrency, runFinanceQuery, toNumber as toFinanceNumber } from '@/lib/finance/shared'
 import { ensureMemberCapacityEconomicsSchema, readLatestMemberCapacityEconomicsSnapshot } from '@/lib/member-capacity-economics/store'
@@ -17,11 +25,24 @@ import { buildReceiptPresentation, RECEIPT_REGIME_BADGES } from '@/lib/payroll/r
 import { searchKnowledge } from '@/lib/knowledge/search/search-knowledge'
 import type { KnowledgeRetrievalPacket, KnowledgeSearchSubject } from '@/lib/knowledge/search'
 import { captureWithDomain } from '@/lib/observability/capture'
+import { searchServiceCatalog } from '@/lib/commercial/service-catalog-search'
+import {
+  readMemberIcoProfileForSubject,
+  type PeopleActivitySubject
+} from '@/lib/people/person-activity-access'
+import { PRICING_OUTPUT_CURRENCIES, type PricingOutputCurrency } from '@/lib/finance/pricing/contracts'
+import { simulateQuotePricingFromService } from '@/lib/finance/pricing/simulate-quote-pricing'
 
 import { recordNexaActionEvent } from './actions/events-store'
 import { buildNexaActionContext, canUseNexaActionRuntime, resolveNexaActionProposal } from './actions/registry'
 import { isNexaActionRuntimeEnabled, isNexaKnowledgeRetrievalEnabled, isNexaKnowledgeSynthesisBriefEnabled } from './flags'
-import type { NexaRuntimeContext, NexaToolInvocation, NexaToolName, NexaToolResult } from './nexa-contract'
+import type {
+  NexaRuntimeContext,
+  NexaToolInvocation,
+  NexaToolMetric,
+  NexaToolName,
+  NexaToolResult
+} from './nexa-contract'
 
 export interface NexaToolExecutionContext {
   tenant: NexaRuntimeContext
@@ -927,15 +948,21 @@ const proposeActionTool: NexaToolDefinition = {
   declaration: {
     name: 'propose_action',
     description:
-      'PROPONE (no ejecuta) una acción gobernada para que el usuario la confirme antes de que ocurra cualquier cambio. Úsalo SOLO cuando el usuario pide explícitamente realizar una acción registrada. Pasa el `actionKey` exacto de una acción registrada — NUNCA inventes una acción, endpoint ni URL. Devuelve una previsualización con el impacto; tú debes pedirle al usuario que confirme. Acciones registradas: ' +
-      'mark_notifications_read (marcar todas tus notificaciones como leídas). Si la acción no existe o no está permitida, te lo diré y debes ofrecer una alternativa honesta, no inventar.',
+      'PROPONE (no ejecuta) una acción gobernada para que el usuario la confirme antes de que ocurra cualquier cambio. Úsalo SOLO cuando el usuario pide explícitamente realizar una acción registrada. Pasa el `actionKey` exacto de una acción registrada — NUNCA inventes una acción, endpoint ni URL. Para acciones parametrizadas, pasa también `input` con los datos requeridos. Devuelve una previsualización con el impacto; tú debes pedirle al usuario que confirme. Acciones registradas: ' +
+      'mark_notifications_read (marcar todas tus notificaciones como leídas, sin input); author_quote (crear o emitir una cotización; requiere `input` = { mode: "create"|"edit", header: { organizationId, currency, ... }, lines: [...], issueAfterSave }). Si la acción no existe o no está permitida, te lo diré y debes ofrecer una alternativa honesta, no inventar.',
     parametersJsonSchema: {
       type: 'object',
       additionalProperties: false,
       properties: {
         actionKey: {
           type: 'string',
-          description: 'La clave exacta de una acción registrada (p. ej. "mark_notifications_read").'
+          description: 'La clave exacta de una acción registrada (p. ej. "mark_notifications_read" o "author_quote").'
+        },
+        input: {
+          type: 'object',
+          additionalProperties: true,
+          description:
+            'Datos de la acción para acciones parametrizadas (p. ej. el payload de autoría de author_quote). Omitir para acciones self-scoped sin input. Se valida server-side contra el schema de la acción.'
         }
       },
       required: ['actionKey']
@@ -950,7 +977,7 @@ const proposeActionTool: NexaToolDefinition = {
       return buildToolUnavailableResult('propose_action', 'Falta la clave de la acción a proponer.')
     }
 
-    const resolution = await resolveNexaActionProposal(actionKey, buildNexaActionContext(tenant))
+    const resolution = await resolveNexaActionProposal(actionKey, buildNexaActionContext(tenant), args.input)
 
     if (resolution.kind === 'gap') {
       // Gap honesto: la acción no existe / no está habilitada / sin permiso. NO se propone nada.
@@ -994,15 +1021,495 @@ const proposeActionTool: NexaToolDefinition = {
   }
 }
 
+// ── get_insight / list_insights (TASK-1181 — Nexa Insight ↔ Conversation Bridge, Slice 1) ──
+// El chat se vuelve cliente del MISMO reader del insight que la page /nexa/insights (un primitive,
+// muchos consumers — Full API Parity). NUNCA queryea ico_ai_signal_enrichments directo: pasa por
+// readNexaInsightDrill / listNexaInsightsForPeriod, que ya aplican el subject anti-oracle (cliente
+// nunca ve; admin/route-group broad → todos; colaborador → self por member_id). El tool NO relaja la
+// autorización: deriva el subject del runtimeContext del turno (misma fuente que la page server) y deja
+// que el reader filtre. Disponible solo a tenants internos (mirror del primer gate del reader; un
+// cliente igual obtendría empty/not_found). Deep-link siempre via buildNexaInsightDrillHref.
+// Contrato: docs/architecture/GREENHOUSE_NEXA_INSIGHT_CONVERSATION_BRIDGE_V1.md §2.1.
+
+const SEVERITY_LABEL: Record<string, string> = {
+  critical: 'crítica',
+  warning: 'de atención',
+  info: 'informativa'
+}
+
+const describeInsight = (insight: NexaInsightDetailSnapshot): string => {
+  const severity = insight.severity ? `Severidad ${SEVERITY_LABEL[insight.severity] ?? insight.severity}.` : ''
+  const cause = insight.rootCauseNarrative || insight.explanationSummary
+  const causeText = cause ? ` ${cause}` : ''
+  const action = insight.recommendedAction ? ` Acción recomendada: ${insight.recommendedAction}.` : ''
+
+  return `Insight de ${insight.metricName || 'una métrica de delivery'} (${insight.signalType || 'señal'}). ${severity}${causeText}${action}`.trim()
+}
+
+const getInsightTool: NexaToolDefinition = {
+  declaration: {
+    name: 'get_insight',
+    description:
+      'Recupera un Nexa Insight de delivery/ICO por su ID (EO-AIS-*, EO-AIE-* o EO-AIH-*): explica la anomalía/predicción/causa raíz y la acción recomendada sobre una métrica (OTD, RpA, FTR) de un espacio/miembro/período. Úsalo cuando el usuario pregunta por un insight puntual o por la causa/detalle de una señal. Al responder, ofrece el enlace para profundizar. NO lo uses para el OTD en vivo (eso es get_otd) ni para definiciones/procesos (eso es search_knowledge).',
+    parametersJsonSchema: {
+      type: 'object',
+      additionalProperties: false,
+      properties: {
+        insightId: {
+          type: 'string',
+          description: 'El ID del insight (EO-AIS-*, EO-AIE-* o EO-AIH-*).'
+        }
+      },
+      required: ['insightId']
+    }
+  },
+  // Mirror del primer gate de subjectCanReadInsight: client tenants nunca acceden al detail V1.
+  isAvailable: tenant => tenant.tenantType === 'efeonce_internal',
+  async execute(args, context) {
+    const { tenant } = context
+    const insightId = typeof args.insightId === 'string' ? args.insightId.trim() : ''
+
+    if (!insightId) {
+      return buildToolUnavailableResult('get_insight', 'Falta el ID del insight a recuperar.')
+    }
+
+    const result = await readNexaInsightDrill(insightId, buildNexaInsightSubject(tenant))
+
+    // not_found es anti-oracle: cubre id inexistente, shape inválido y subject sin acceso (indistinguibles).
+    if (result.state === 'not_found') {
+      return buildToolUnavailableResult('get_insight', 'No encontré ese insight, o no tienes acceso a él.')
+    }
+
+    if (result.state === 'degraded') {
+      return buildToolUnavailableResult('get_insight', 'No pude leer el insight en este momento. Intenta de nuevo más tarde.')
+    }
+
+    const { insight } = result
+    const drillHref = buildNexaInsightDrillHref(insight.signalId || insightId)
+
+    const stateNote =
+      result.state === 'superseded'
+        ? ' Nota: este insight fue superado por un análisis más reciente de la misma señal.'
+        : result.state === 'expired'
+          ? ' Nota: la anomalía ya se resolvió; no hay acción pendiente.'
+          : ''
+
+    const metrics: NexaToolResult['metrics'] = [
+      { label: 'Métrica', value: insight.metricName || 'Sin dato' },
+      {
+        label: 'Severidad',
+        value: insight.severity ? SEVERITY_LABEL[insight.severity] ?? insight.severity : 'Sin dato',
+        tone: insight.severity === 'critical' ? 'error' : insight.severity === 'warning' ? 'warning' : 'info'
+      }
+    ]
+
+    return {
+      available: true,
+      summary: `${describeInsight(insight)}${stateNote} Puedes ver el detalle completo en ${drillHref}.`,
+      source: 'postgres',
+      scopeLabel: 'Nexa Insights',
+      generatedAt: new Date().toISOString(),
+      metrics,
+      raw: {
+        state: result.state,
+        drillHref,
+        insight
+      }
+    }
+  }
+}
+
+const listInsightsTool: NexaToolDefinition = {
+  declaration: {
+    name: 'list_insights',
+    description:
+      'Lista los Nexa Insights (señales advisory de delivery/ICO sobre OTD, RpA y FTR) de un período, ordenados por severidad. Úsalo cuando el usuario pregunta qué insights/señales/anomalías hay en un período (su alcance lo define su acceso: la operación interna ve todo; un colaborador ve los suyos). Cada insight trae su ID para profundizar con get_insight. NO lo uses para el OTD en vivo (get_otd) ni para definiciones (search_knowledge).',
+    parametersJsonSchema: {
+      type: 'object',
+      additionalProperties: false,
+      properties: {
+        periodYear: {
+          type: 'integer',
+          description: 'Año del período (opcional; default: mes actual de Santiago).'
+        },
+        periodMonth: {
+          type: 'integer',
+          description: 'Mes 1-12 del período (opcional; default: mes actual de Santiago).'
+        }
+      }
+    }
+  },
+  isAvailable: tenant => tenant.tenantType === 'efeonce_internal',
+  async execute(args, context) {
+    const { tenant } = context
+    const current = getCurrentSantiagoPeriod()
+
+    const yearRaw = Number(args.periodYear)
+    const monthRaw = Number(args.periodMonth)
+    const periodYear = Number.isFinite(yearRaw) && yearRaw > 0 ? Math.floor(yearRaw) : current.year
+
+    const periodMonth =
+      Number.isFinite(monthRaw) && monthRaw >= 1 && monthRaw <= 12 ? Math.floor(monthRaw) : current.month
+
+    const result = await listNexaInsightsForPeriod(buildNexaInsightSubject(tenant), { periodYear, periodMonth })
+
+    if (result.state === 'degraded') {
+      return buildToolUnavailableResult('list_insights', 'No pude leer los insights en este momento. Intenta de nuevo más tarde.')
+    }
+
+    if (result.state === 'empty-positive') {
+      return {
+        available: true,
+        summary: `No hay insights de delivery para ${result.periodLabel}.`,
+        source: 'postgres',
+        scopeLabel: 'Nexa Insights',
+        generatedAt: new Date().toISOString(),
+        metrics: [],
+        raw: { insights: [], totalCount: 0, periodLabel: result.periodLabel }
+      }
+    }
+
+    const top = result.insights.slice(0, 8)
+    const critical = result.insights.filter(insight => insight.severity === 'critical').length
+    const warning = result.insights.filter(insight => insight.severity === 'warning').length
+
+    const lines = top.map(insight => {
+      const sev = insight.severity ? SEVERITY_LABEL[insight.severity] ?? insight.severity : 'sin severidad'
+
+      return `- ${insight.metricName || 'métrica'} (${sev}): ${insight.explanationSummary || insight.rootCauseNarrative || 'sin resumen'} [${insight.signalId}]`
+    })
+
+    const metrics: NexaToolResult['metrics'] = [
+      { label: 'Total', value: String(result.totalCount) },
+      { label: 'Críticas', value: String(critical), tone: critical > 0 ? 'error' : 'default' },
+      { label: 'Atención', value: String(warning), tone: warning > 0 ? 'warning' : 'default' }
+    ]
+
+    return {
+      available: true,
+      summary: `Encontré ${result.totalCount} insight(s) para ${result.periodLabel}${critical > 0 ? `, ${critical} crítica(s)` : ''}. Más relevantes:\n${lines.join('\n')}`,
+      source: 'postgres',
+      scopeLabel: 'Nexa Insights',
+      generatedAt: new Date().toISOString(),
+      metrics,
+      raw: {
+        totalCount: result.totalCount,
+        periodLabel: result.periodLabel,
+        insights: top.map(insight => ({
+          signalId: insight.signalId,
+          enrichmentId: insight.enrichmentId,
+          metricName: insight.metricName,
+          signalType: insight.signalType,
+          severity: insight.severity,
+          explanationSummary: insight.explanationSummary,
+          recommendedAction: insight.recommendedAction,
+          spaceId: insight.spaceId,
+          memberId: insight.memberId,
+          periodYear: insight.periodYear,
+          periodMonth: insight.periodMonth,
+          drillHref: buildNexaInsightDrillHref(insight.signalId)
+        }))
+      }
+    }
+  }
+}
+
+// TASK-1211 — Quote read tool: estima el precio de un servicio nombrado.
+// Read-only (no muta), honest-unavailable, sin alucinación: si no encuentra el
+// servicio lo dice, si es ambiguo pide aclaración. Redacta cost stack/margen por
+// audiencia (cliente nunca ve margen). Un primitive, muchos consumers: comparte
+// searchServiceCatalog + simulateQuotePricingFromService con MCP y la API Platform.
+const QUOTE_COST_STACK_ROLE_CODES = [
+  ROLE_CODES.EFEONCE_ADMIN,
+  ROLE_CODES.FINANCE_ADMIN,
+  ROLE_CODES.FINANCE_ANALYST
+]
+
+const resolveQuoteAudience = (
+  tenant: NexaRuntimeContext
+): { audience: 'internal' | 'client'; costStackVisible: boolean } => {
+  const internal = tenant.tenantType === 'efeonce_internal'
+  const costStackVisible = internal && QUOTE_COST_STACK_ROLE_CODES.some(code => hasRoleCode(tenant, code))
+
+  return { audience: internal ? 'internal' : 'client', costStackVisible }
+}
+
+const normalizeQuoteCurrency = (value: unknown): PricingOutputCurrency => {
+  const candidate = typeof value === 'string' ? value.trim().toUpperCase() : ''
+
+  return (PRICING_OUTPUT_CURRENCIES as readonly string[]).includes(candidate)
+    ? (candidate as PricingOutputCurrency)
+    : 'USD'
+}
+
+const formatQuoteAmount = (value: number) => Math.round(value).toLocaleString('es-CL')
+
+// ── get_member_performance (TASK-1216 — person-level ICO read, Full API Parity) ──────────────
+// Consumer fino del primitive canónico readMemberIcoProfileForSubject (un primitive, muchos
+// consumers: este tool, los lanes MCP/app de API Platform y la UI consumen el MISMO reader).
+// NO recomputa OTD/RpA ni queryea ico_member_metrics: delega. La autorización es la de People
+// (canViewActivity + anti-IDOR de scope) — el tool sólo mapea el NexaRuntimeContext al subject
+// neutral. not_found es uniforme (no distingue "no existe" de "sin acceso"). Disponible sólo a
+// tenants internos (mirror de get_insight; un cliente igual obtendría forbidden del primitive).
+
+const HEALTH_LABEL: Record<'green' | 'yellow' | 'red', { label: string; tone: NexaToolMetric['tone'] }> = {
+  green: { label: 'Saludable', tone: 'success' },
+  yellow: { label: 'En riesgo', tone: 'warning' },
+  red: { label: 'Crítica', tone: 'error' }
+}
+
+const formatScore = (value: number | null) => (value == null ? 'Sin datos' : String(Math.round(value)))
+
+const getMemberPerformanceTool: NexaToolDefinition = {
+  declaration: {
+    name: 'get_member_performance',
+    description:
+      'Consulta el desempeño ICO (OTD, RpA, FTR, salud + tendencia) de UNA persona específica del equipo nombrada por el usuario (ej. "el OTD de Daniela Ferreira"). Resuelve la persona por nombre o id si tienes acceso a ella. Úsalo cuando el usuario pregunta por la métrica/desempeño de una persona concreta. NO uses get_otd para esto: get_otd es solo el OTD agregado de la organización o el global de agencia, nunca de una persona. Para la causa/por qué de una anomalía usa get_insight.',
+    parametersJsonSchema: {
+      type: 'object',
+      additionalProperties: false,
+      properties: {
+        person: {
+          type: 'string',
+          description: 'Nombre (o id) de la persona del equipo cuyo desempeño consultar.'
+        }
+      },
+      required: ['person']
+    }
+  },
+  // Mirror del primer gate de get_insight: tenants cliente nunca consultan desempeño de personas.
+  isAvailable: tenant => tenant.tenantType === 'efeonce_internal',
+  async execute(args, context) {
+    const { tenant } = context
+    const person = typeof args.person === 'string' ? args.person.trim() : ''
+
+    if (!person) {
+      return buildToolUnavailableResult('get_member_performance', 'Falta el nombre de la persona a consultar.')
+    }
+
+    const subject: PeopleActivitySubject = {
+      userId: tenant.userId,
+      tenantType: tenant.tenantType,
+      memberId: tenant.memberId ?? null,
+      roleCodes: tenant.roleCodes,
+      routeGroups: tenant.routeGroups,
+      organizationId: tenant.organizationId ?? null
+    }
+
+    const result = await readMemberIcoProfileForSubject(subject, person)
+
+    if (result.status === 'forbidden') {
+      return buildToolUnavailableResult(
+        'get_member_performance',
+        'No tienes acceso al desempeño de personas del equipo.'
+      )
+    }
+
+    // not_found es uniforme (no existe / fuera de scope, indistinguibles): nunca filtra existencia.
+    if (result.status === 'not_found') {
+      return buildToolUnavailableResult(
+        'get_member_performance',
+        `No encontré a «${person}», o no tienes acceso a su desempeño.`
+      )
+    }
+
+    if (result.status === 'ambiguous') {
+      const names = result.candidates.map(candidate => candidate.displayName).join(', ')
+
+      return {
+        available: false,
+        summary: `Encontré varias personas que coinciden con «${person}»: ${names}. ¿A cuál te refieres? Indícame el nombre completo.`,
+        source: 'postgres',
+        scopeLabel: 'Desambiguación',
+        generatedAt: new Date().toISOString(),
+        metrics: [],
+        notes: [`Coincidencias: ${names}.`],
+        raw: { toolName: 'get_member_performance', ambiguous: true, candidates: result.candidates }
+      }
+    }
+
+    const { profile, displayName, memberId } = result
+    const current = profile.current
+
+    if (!profile.hasData || !current) {
+      return {
+        available: true,
+        summary: `Aún no hay métricas ICO materializadas para ${displayName}.`,
+        source: 'postgres',
+        scopeLabel: displayName,
+        generatedAt: new Date().toISOString(),
+        metrics: [],
+        notes: ['Sin período materializado todavía.'],
+        raw: { toolName: 'get_member_performance', memberId, displayName, hasData: false }
+      }
+    }
+
+    const periodLabel = formatPeriodLabel(current.periodYear, current.periodMonth)
+    const health = profile.health ? HEALTH_LABEL[profile.health] : null
+
+    const metrics: NexaToolResult['metrics'] = [
+      {
+        label: 'OTD',
+        value: formatPercent(current.otdPct) ?? 'Sin datos',
+        tone: current.otdPct == null ? 'default' : current.otdPct >= 90 ? 'success' : 'warning'
+      },
+      { label: 'RpA', value: formatScore(current.rpaAvg) },
+      { label: 'FTR', value: formatPercent(current.ftrPct) ?? 'Sin datos' }
+    ]
+
+    if (health) {
+      metrics.push({ label: 'Salud', value: health.label, tone: health.tone })
+    }
+
+    return {
+      available: true,
+      summary:
+        `Desempeño de ${displayName} en ${periodLabel}: OTD ${formatPercent(current.otdPct) ?? 'sin datos'}, ` +
+        `RpA ${formatScore(current.rpaAvg)}, FTR ${formatPercent(current.ftrPct) ?? 'sin datos'}.` +
+        (health ? ` Salud general: ${health.label.toLowerCase()}.` : ''),
+      source: 'postgres',
+      scopeLabel: displayName,
+      generatedAt: new Date().toISOString(),
+      metrics,
+      raw: {
+        toolName: 'get_member_performance',
+        memberId,
+        displayName,
+        health: profile.health,
+        current,
+        trendMonths: profile.trend.length
+      }
+    }
+  }
+}
+
+const quotePriceTool: NexaToolDefinition = {
+  declaration: {
+    name: 'quote_price',
+    description:
+      'Estima el precio de un servicio de Efeonce por su nombre (ej. "diseño digital"). Devuelve un estimado referencial NO vinculante (paquete estándar). Para clientes oculta costo y margen. Si el nombre es ambiguo, pide aclaración; si no existe, dilo — no inventes un precio.',
+    parametersJsonSchema: {
+      type: 'object',
+      additionalProperties: false,
+      properties: {
+        service: { type: 'string', description: 'Nombre o SKU del servicio a cotizar.' },
+        currency: {
+          type: 'string',
+          description: 'Moneda de salida: USD, CLP, CLF, COP, MXN o PEN. Default USD.'
+        }
+      },
+      required: ['service']
+    }
+  },
+  isAvailable: tenant =>
+    isInternalOperationsUser(tenant) ||
+    hasRouteGroup(tenant, 'commercial') ||
+    hasRouteGroup(tenant, 'finance') ||
+    Boolean(tenant.clientId),
+  async execute(args, context) {
+    const { tenant } = context
+    const service = typeof args.service === 'string' ? args.service.trim() : ''
+    const generatedAt = new Date().toISOString()
+
+    if (!service) {
+      return {
+        available: false,
+        summary: 'Indícame el nombre del servicio que quieres cotizar.',
+        source: 'none',
+        scopeLabel: 'Cotizador',
+        generatedAt,
+        metrics: []
+      }
+    }
+
+    const candidates = await searchServiceCatalog(service, { limit: 5 })
+
+    if (candidates.length === 0) {
+      return {
+        available: true,
+        summary: `No encontré un servicio que coincida con "${service}" en el catálogo. ¿Me das el nombre exacto o el SKU?`,
+        source: 'postgres',
+        scopeLabel: 'Cotizador',
+        generatedAt,
+        metrics: [],
+        raw: { query: service, matches: 0 }
+      }
+    }
+
+    const normalizedService = service.toLowerCase()
+
+    const exact = candidates.find(
+      candidate =>
+        candidate.name.toLowerCase() === normalizedService ||
+        candidate.serviceSku.toLowerCase() === normalizedService
+    )
+
+    if (!exact && candidates.length > 1) {
+      return {
+        available: true,
+        summary: `Hay varios servicios que coinciden con "${service}". ¿A cuál te refieres?`,
+        source: 'postgres',
+        scopeLabel: 'Cotizador',
+        generatedAt,
+        metrics: candidates.map(candidate => ({ label: candidate.name, value: candidate.serviceSku })),
+        raw: { query: service, candidates }
+      }
+    }
+
+    const chosen = exact ?? candidates[0]
+    const currency = normalizeQuoteCurrency(args.currency)
+    const { audience, costStackVisible } = resolveQuoteAudience(tenant)
+
+    const simulation = await simulateQuotePricingFromService(
+      { serviceSku: chosen.serviceSku, outputCurrency: currency },
+      { audience, costStackVisible }
+    )
+
+    const total = simulation.pricing.totals.totalOutputCurrency
+
+    const metrics: NexaToolMetric[] = [
+      { label: 'Servicio', value: simulation.service.name },
+      { label: 'Estimado', value: `${formatQuoteAmount(total)} ${currency}` }
+    ]
+
+    if (audience === 'internal' && simulation.pricing.aggregateMargin) {
+      metrics.push({
+        label: 'Margen',
+        value: `${Math.round(simulation.pricing.aggregateMargin.marginPct)}%`,
+        tone: 'info'
+      })
+    }
+
+    return {
+      available: true,
+      summary: `${simulation.service.name}: estimado referencial de ${formatQuoteAmount(total)} ${currency} (paquete estándar). ${simulation.estimate.disclaimer}`,
+      source: 'postgres',
+      scopeLabel: audience === 'internal' ? 'Cotizador (interno)' : 'Cotizador (cliente)',
+      generatedAt,
+      metrics,
+      raw: {
+        serviceSku: simulation.service.serviceSku,
+        currency,
+        audience,
+        estimate: simulation.estimate
+      }
+    }
+  }
+}
+
 const NEXA_TOOLS: Record<NexaToolName, NexaToolDefinition> = {
   check_payroll: checkPayrollTool,
   get_otd: getOtdTool,
+  get_member_performance: getMemberPerformanceTool,
   check_emails: checkEmailsTool,
   get_capacity: getCapacityTool,
   pending_invoices: pendingInvoicesTool,
   search_knowledge: searchKnowledgeTool,
   explain_my_pay: explainMyPayTool,
-  propose_action: proposeActionTool
+  propose_action: proposeActionTool,
+  get_insight: getInsightTool,
+  list_insights: listInsightsTool,
+  quote_price: quotePriceTool
 }
 
 export const getNexaToolDeclarations = (tenant: NexaRuntimeContext): FunctionDeclaration[] =>

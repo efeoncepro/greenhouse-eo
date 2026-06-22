@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 
 import { query } from '@/lib/db'
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
+import { can } from '@/lib/entitlements/runtime'
 import { getPaymentOrderWithLines } from '@/lib/finance/payment-orders/list-orders'
 import {
   PaymentOrderConflictError,
@@ -59,6 +60,11 @@ export async function PATCH(
   const { tenant, errorResponse } = await requireFinanceTenantContext()
 
   if (!tenant) return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+  // TASK-1192 — gate fino de acción (capability != route-group).
+  if (!can(tenant, 'finance.payment_orders.update', 'update', 'tenant')) {
+    return NextResponse.json({ error: 'No tienes permiso para editar órdenes de pago.', code: 'forbidden' }, { status: 403 })
+  }
 
   const { orderId } = await params
 

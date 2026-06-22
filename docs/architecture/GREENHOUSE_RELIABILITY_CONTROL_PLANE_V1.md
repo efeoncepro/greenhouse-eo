@@ -5,9 +5,63 @@
 > Versión: `1.10`
 > Estado: `vigente`
 > Creada: `2026-04-25` por TASK-600
-> Última actualización: `2026-06-17` por TASK-1161 (Public Site Astro deploy signal)
+> Última actualización: `2026-06-22` por TASK-845 (Node 24 app/test runtime)
+
+## Delta 2026-06-22 — TASK-845: Node 24 app/test/build runtime
+
+TASK-607 resolvio el runtime interno de GitHub Actions; TASK-845 completa el segundo plano: el runtime de app, tests, build y smoke lanes del portal. El contrato vigente del repo es Node.js `24.x` para Greenhouse web runtime, expresado en `package.json#engines.node`, `.nvmrc`, `.node-version` y los workflows que ejecutan app/tests/builds.
+
+Contratos operativos:
+
+- `node-version: 24` es obligatorio en workflows GitHub que ejecutan Next.js, lint/typecheck, tests, Playwright o scripts del repo.
+- `package.json#engines.node = "24.x"` es el source of truth portable para Vercel builds/functions; evita depender solo de Project Settings externos.
+- `.nvmrc` es el archivo humano canonico local; `.node-version` existe solo como espejo para herramientas compatibles y debe mantenerse en `24`.
+- GitHub Actions runtime interno y app runtime siguen siendo planos distintos: actions versionadas (`checkout`, `setup-node`, `upload-artifact`, `pnpm/action-setup`, Google auth/gcloud) deben mantenerse compatibles con Node 24, pero eso no reemplaza `node-version: 24`.
+- Cloud Run worker Dockerfiles que usan `node:22-slim` (`services/ops-worker`, `services/commercial-cost-worker`, `services/ico-batch`) son runtime container separado. No bloquean el portal/Vercel y requieren follow-up propio si se homogeneizan.
 
 ---
+
+## Delta 2026-06-20 — TASK-1189: signal `finance.ppm.position_drift`
+
+Nuevo signal de drift en el módulo `finance` (línea PPM del F29). PPM es un agregado
+(base ventas netas × tasa), sin ledger per-documento, así que el drift se mide a nivel
+posición: una `ppm_monthly_positions` cuya `base_amount_clp` almacenada difiere (>1 CLP) de
+las ventas netas recomputadas en vivo (`income.subtotal` CLP del período) → la cifra PPM quedó
+stale (p.ej. entró una factura a un período ya materializado sin re-materializar). `kind=drift`,
+severidad `error` si count > 0, steady = `0`. Reader `getPpmPositionDriftSignal`
+(`src/lib/reliability/queries/ppm-position-drift.ts`), wired en `get-reliability-overview.ts`
+con degradación honesta. Completa el trío de signals de las 3 líneas del F29
+(`finance.vat.position_drift`, `finance.retention.position_drift`, `finance.ppm.position_drift`).
+
+## Delta 2026-06-20 — TASK-1188: signal `finance.retention.position_drift`
+
+Nuevo signal de drift en el módulo `finance` (mirror de `finance.vat.position_drift`):
+detecta boletas de honorarios (BHE, `expenses.withholding_amount > 0`) de períodos ya
+materializados que no tienen su asiento `counted` en `retention_ledger_entries` — la línea
+de retenciones del F29 quedaría incompleta. `kind=drift`, severidad `error` si count > 0,
+steady = `0`. Reader `getRetentionPositionDriftSignal` (`src/lib/reliability/queries/retention-position-drift.ts`),
+wired en `get-reliability-overview.ts` con degradación honesta (`unknown` si la query falla).
+Límite conocido (igual que IVA): documentos con retención y período NULL son invisibles a
+este drift — se cubrirían con un signal de data-quality aparte (follow-up).
+
+## Delta 2026-06-17 — TASK-1167: signal `public_site.astro_ci_failed`
+
+Nuevo signal canonical de observabilidad para el repo GitHub del rail objetivo Astro del sitio publico Efeonce.
+
+- `signalKey`: `public_site.astro_ci_failed`
+- `moduleKey`: `platform` en V1, rollup operativo Cloud/Public Site hasta que el dominio acumule mas signals.
+- `kind`: `runtime`
+- Reader: `src/lib/reliability/queries/public-site-astro-ci-failed.ts`
+- Fuente: `composePublicSiteGithubControlPlanePacket()` (`public-site-github-control-plane.v1`) y ultimo run `CI` en `main` de `efeoncepro/efeonce-web`.
+
+Severidad:
+
+- latest `CI` en `main` `success` + correlation matched -> `ok`;
+- latest `CI` `success` pero deploy va detras/mismatch -> `warning`;
+- latest `CI` `failure`/`cancelled`/`timed_out`/`action_required` -> `error`;
+- run en progreso, token ausente o GitHub degradado -> `unknown` honesto.
+
+Estado real 2026-06-17: el repo `efeoncepro/efeonce-web` tiene `CI` rojo en `main` (`run_id=27657858751`, SHA `4d050fbf7baf4097684f131d4ac31e1d6148ff02`, `conclusion=failure`). El steady-state del control-plane es reportar `error` hasta que ese CI se corrija fuera de Greenhouse. La signal no ejecuta deploy, rollback ni cutover.
 
 ## Delta 2026-06-17 — TASK-1161: signal `public_site.astro_deploy_failed`
 
@@ -95,6 +149,18 @@ Severity matrix:
 
 Reader canonical: `src/lib/reliability/queries/nexa-insights-freshness.ts`. Wire-up en `getReliabilityOverview` via source `nexaInsightsFreshness`. Verificación de cierre TASK-941: `2026-05` con 20 señales elegibles y 20 enrichments servidos, `severity=ok`.
 
+## Delta 2026-06-20 — TASK-927: signals `notion.metrics.otd_writeback_dead_letter` + `otd_writeback_lag`
+
+Dos signals nuevos (subsystem `delivery`) del writeback del bucket OTD freeze-aware a Notion (`[GH] OTD`, daily batch). Clone del patrón RpA/FTR writeback signals, reapuntado a `greenhouse_delivery.task_otd_writeback_snapshots`. Thresholds adaptados al modelo **batch diario** (no reactivo 5-min): `otd_writeback_dead_letter` (kind `drift`, error si > 0) = snapshots writable pending con error persistente > 3 días (≥3 ciclos diarios); `otd_writeback_lag` (kind `lag`, ok/warning≤5/error) = snapshots writable pending sin escribir > 26 h (≥1 ciclo diario perdido: batch caído, flag apagado tras estar ON, o gate ISSUE-098 bloqueando). **steady=0** pre-flip (tabla vacía con `NOTION_OTD_WRITEBACK_ENABLED` default OFF). Cero `EXTRACT(EPOCH)` sobre date-subtraction (`computed_at` TIMESTAMPTZ → interval; gate TASK-893). Reader: `src/lib/reliability/queries/notion-metrics-otd-writeback-signals.ts`. Wire-up en `getReliabilityOverview` via el array `notionMetricsOtdWriteback` (5 touchpoints). Verificación live 2026-06-20: ambos `ok`. Display-only, NO toca el bono. Spec: TASK-927.
+
+## Delta 2026-06-19 — TASK-1174: signal `delivery.attributable_lateness.shadow_terminal_open`
+
+Signal nuevo (subsystem `delivery`, kind `data_quality`) que vigila el **invariante de terminalidad** del M2 shadow por-tarea (`task_attributable_lateness_shadow`): una tarea TERMINAL (`Aprobado`/`Archivado`) NUNCA debe tener un bucket abierto (`overdue`/`carry_over`). El compute M2 es event-driven y congelaba un bucket abierto cuando el row de `greenhouse_delivery.tasks` laggeaba la transición terminal (no hay transición futura que recompute — ISSUE-098, 250/337 filas). **Steady=0** (warning 1-10 = carrera transitoria de sync, error >10). Es el **gate del writeback `[GH] OTD` (TASK-927)**: con > 0 escribiría "atrasada" sobre tareas entregadas, visible al cliente. Reader: `src/lib/reliability/queries/attributable-lateness-signals.ts` (3er signal del archivo). Wire-up en `getReliabilityOverview` via el array `attributableLateness`. Target preciso = status terminal (no `completed_at` como proxy). Cero date-math (gate TASK-893). Verificación live 2026-06-19 post-backfill: `severity=ok`, `count=0`. Fix completo (estado efectivo desde el log de transiciones + barrido idempotente): TASK-1174 / ADR `GREENHOUSE_ATTRIBUTABLE_LATENESS_V1` §16.12.
+
+## Delta 2026-06-19 — TASK-1169: signal `delivery.attributable_lateness.member_month_paridad`
+
+Signal nuevo (subsystem `delivery`, kind `drift`) que vigila la **comparabilidad de cohorte** del OTD imputable corregido a nivel member×month: lee `greenhouse_delivery.otd_attributable_member_month_shadow` del período más reciente y mide el % de member-months `cohort_mismatch` (la enumeración de candidatos NO reproduce el legacy del bono). **Steady=0** (warning >0%, error >10%, unknown si no hay data). Es el **detector upstream** del bug class de cohorte 2026-06-19 (leer el M2 shadow por-tarea como si fuera el OTD mensual del bono → cohortes incomparables, shadow 0-50% vs bono 66-100%) que se encontró a mano; ahora tiene signal antes de que lo encuentre una UI/decisión rota. Reader: `src/lib/reliability/queries/otd-attributable-member-month-parity.ts`. Wire-up en `getReliabilityOverview` via source `otdAttributableMemberMonthParity` (5 touchpoints). Cero `EXTRACT(EPOCH)`/date-math (gate SQL Signal Reader TASK-893). Verificación live 2026-06-19: `severity=ok`, `cohort_mismatch_pct=0`, `2026-06` 7/8 reproducen el legacy. Todo shadow / flag OFF — no toca el bono (el cutover es TASK-1170).
+
 ## Delta 2026-05-18 — TASK-900: signal `delivery.ico_materializer.skipped_safety`
 
 Nuevo signal canonical bajo `moduleKey='delivery'` que cuenta corridas del materializer ICO con `status='skipped_safety'` en `greenhouse_sync.ico_materialization_runs` ventana 24h. Complementario al `identity.notion_bridge.coverage_drift` (TASK-877 follow-up): este último detecta el síntoma upstream (bridge regresión), el nuevo `delivery.ico_materializer.skipped_safety` confirma que el gate canonical activó la defensa anti-bug-class antes de destruir downstream.
@@ -155,7 +221,7 @@ Steady state esperado:
 
 - Una suite Playwright con `33 passed, 3 flaky` publica `failed_tests=0`, `summary_json.flakyCount=3` y `status='flaky'`.
 - No quedan referencias a las actions target antiguas (`checkout/setup-node/upload-artifact@v4`, `pnpm/action-setup@v4`, `google-github-actions/auth/setup-gcloud@v2`) en `.github/workflows/`.
-- Los warnings de GitHub Actions por Node.js 20 de actions desaparecen; `node-version: 20` de los jobs se mantiene separado y solo controla el runtime de app/tests.
+- Los warnings de GitHub Actions por Node.js 20 de actions desaparecen. Desde TASK-845, los jobs de app/tests/builds tambien usan `node-version: 24`; mantenerlos en `20` vuelve a abrir deuda de runtime.
 
 ## Delta 2026-05-09 — ISSUE-072 smoke-lane publisher reliability
 

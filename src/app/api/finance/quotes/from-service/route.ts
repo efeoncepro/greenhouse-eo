@@ -8,7 +8,9 @@ import {
   type ServiceLineOverride
 } from '@/lib/commercial/service-catalog-expand'
 import type { PricingOutputCurrency } from '@/lib/finance/pricing/contracts'
-import { requireCommercialTenantContext } from '@/lib/tenant/authorization'
+import { redactPricingOutputForProfile } from '@/lib/finance/pricing/pricing-output-redaction'
+import { canViewCostStack, requireCommercialTenantContext } from '@/lib/tenant/authorization'
+import { can } from '@/lib/entitlements/runtime'
 
 export const dynamic = 'force-dynamic'
 
@@ -57,6 +59,11 @@ export async function POST(request: Request) {
 
   if (!tenant) {
     return errorResponse ?? NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  // TASK-1202 — gate fino de acción (capability != route-group).
+  if (!can(tenant, 'commercial.quotation', 'create', 'tenant')) {
+    return NextResponse.json({ error: 'No tienes permiso para crear cotizaciones desde un servicio.', code: 'forbidden' }, { status: 403 })
   }
 
   let body: Body
@@ -112,7 +119,10 @@ export async function POST(request: Request) {
         businessLineCode: result.service.businessLineCode
       },
       lines: result.lines,
-      pricing: result.pricing
+      pricing: redactPricingOutputForProfile(result.pricing, {
+        audience: 'internal',
+        costStackVisible: canViewCostStack(tenant)
+      })
     })
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Failed to expand service.'

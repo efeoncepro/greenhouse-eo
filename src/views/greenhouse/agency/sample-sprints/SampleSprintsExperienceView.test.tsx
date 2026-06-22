@@ -19,6 +19,7 @@ vi.mock('next/navigation', () => ({
 
 afterEach(() => {
   cleanup()
+  vi.unstubAllGlobals()
 })
 
 describe('SampleSprintsExperienceView copy governance', () => {
@@ -48,6 +49,110 @@ describe('SampleSprintsExperienceView copy governance', () => {
     expect(screen.queryByText('Commercial Health')).not.toBeInTheDocument()
     expect(screen.queryByText('0%')).not.toBeInTheDocument()
     expect(screen.queryByText('$0')).not.toBeInTheDocument()
+  })
+
+  it('renders runtime audit events from API data instead of mock activity copy', () => {
+    renderWithTheme(
+      <SampleSprintsExperienceView
+        variant='runtime'
+        initialActiveSurface='detail'
+        initialSelectedSprintId='svc-001'
+        sprints={[
+          {
+            id: 'svc-001',
+            client: 'Sky Airline',
+            name: 'Paid Social Care',
+            kind: 'pilot',
+            subtype: 'Operations Sprint',
+            status: 'pending_approval',
+            owner: 'Sky Airline',
+            startDate: '2026-11-05',
+            decisionDate: '2026-11-06',
+            budgetClp: 698000,
+            actualClp: null,
+            conversionProbability: 0,
+            progressPct: null,
+            lastSnapshotDays: 0,
+            phase: 'Kickoff',
+            signal: 'warning',
+            team: []
+          }
+        ]}
+        signals={[]}
+        runtimeOptions={{ spaces: [], members: [], conversionTargets: [], quotations: [] }}
+        runtimeAuditEvents={[
+          {
+            auditId: 'audit-001',
+            eventKind: 'service.engagement.declared',
+            reason: 'Declarado desde deal HubSpot',
+            createdAt: '2026-06-20T16:51:39.332Z'
+          }
+        ]}
+      />
+    )
+
+    expect(screen.getByText('Declarado desde deal HubSpot')).toBeInTheDocument()
+    expect(screen.getByText('Eventos inmutables del engagement.')).toBeInTheDocument()
+    expect(screen.getByText('Costo interno esperado del engagement.')).toBeInTheDocument()
+    expect(screen.queryByText('Append-only mock para TASK-808.')).not.toBeInTheDocument()
+    expect(screen.queryByText('Lectura mock de GTM investment')).not.toBeInTheDocument()
+    expect(screen.queryByText('Valentina cerró Operación')).not.toBeInTheDocument()
+  })
+
+  it('shows the approved approval state without enabling a duplicate approval action', async () => {
+    const fetchMock = vi.fn(async () => new Response(JSON.stringify({
+      serviceId: 'svc-001',
+      publicId: 'EO-SVC-0001',
+      name: 'Paid Social Care',
+      spaceId: 'space-sky',
+      proposedTeam: [],
+      approval: {
+        approvalId: 'approval-001',
+        status: 'approved',
+        approvedAt: '2026-06-20T17:36:41.273Z'
+      }
+    }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' }
+    }))
+
+    vi.stubGlobal('fetch', fetchMock)
+
+    renderWithTheme(
+      <SampleSprintsExperienceView
+        variant='runtime'
+        initialActiveSurface='approval'
+        initialSelectedSprintId='svc-001'
+        sprints={[
+          {
+            id: 'svc-001',
+            client: 'Sky Airline',
+            name: 'Paid Social Care',
+            kind: 'pilot',
+            subtype: 'Operations Sprint',
+            status: 'active',
+            owner: 'Sky Airline',
+            startDate: '2026-11-05',
+            decisionDate: '2026-11-06',
+            budgetClp: 698000,
+            actualClp: null,
+            conversionProbability: 55,
+            progressPct: null,
+            lastSnapshotDays: 0,
+            phase: 'Operación',
+            signal: 'success',
+            team: []
+          }
+        ]}
+        signals={[]}
+        runtimeOptions={{ spaces: [], members: [], conversionTargets: [], quotations: [] }}
+      />
+    )
+
+    expect(await screen.findByText('Sample Sprint aprobado')).toBeInTheDocument()
+    expect(screen.getByText('El engagement ya está aprobado y puede operar. No se generó un segundo evento de aprobación.')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Aprobar Sprint/i })).toBeDisabled()
+    expect(screen.getByRole('button', { name: /Rechazar/i })).toBeDisabled()
   })
 
   it('renders operational health signals with Spanish product copy and system primitives', () => {

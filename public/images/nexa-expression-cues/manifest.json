@@ -1,0 +1,41 @@
+{
+  "contractVersion": "nexa-expression-cues-assets.v1",
+  "source": "Microsoft Fluent Emoji",
+  "sourceRepository": "https://github.com/microsoft/fluentui-emoji",
+  "license": "MIT",
+  "licenseSource": "https://github.com/microsoft/fluentui-emoji/blob/main/LICENSE",
+  "lastVerifiedAt": "2026-06-18",
+  "strategy": "Curated, vendored Flat SVG subset. No CDN and no full emoji package in runtime.",
+  "assets": [
+    {
+      "cue": "ready",
+      "asset": "/images/nexa-expression-cues/fluent-check-mark-flat.svg",
+      "sourceUrl": "https://github.com/microsoft/fluentui-emoji/blob/main/assets/Check%20mark/Flat/check_mark_flat.svg",
+      "fallbackTreatment": "tablerIcon"
+    },
+    {
+      "cue": "idea",
+      "asset": "/images/nexa-expression-cues/fluent-light-bulb-flat.svg",
+      "sourceUrl": "https://github.com/microsoft/fluentui-emoji/blob/main/assets/Light%20bulb/Flat/light_bulb_flat.svg",
+      "fallbackTreatment": "tablerIcon"
+    },
+    {
+      "cue": "source",
+      "asset": "/images/nexa-expression-cues/fluent-memo-flat.svg",
+      "sourceUrl": "https://github.com/microsoft/fluentui-emoji/blob/main/assets/Memo/Flat/memo_flat.svg",
+      "fallbackTreatment": "tablerIcon"
+    },
+    {
+      "cue": "next_step",
+      "asset": "/images/nexa-expression-cues/fluent-compass-flat.svg",
+      "sourceUrl": "https://github.com/microsoft/fluentui-emoji/blob/main/assets/Compass/Flat/compass_flat.svg",
+      "fallbackTreatment": "tablerIcon"
+    },
+    {
+      "cue": "missing_context",
+      "asset": "/images/nexa-expression-cues/fluent-puzzle-piece-flat.svg",
+      "sourceUrl": "https://github.com/microsoft/fluentui-emoji/blob/main/assets/Puzzle%20piece/Flat/puzzle_piece_flat.svg",
+      "fallbackTreatment": "tablerIcon"
+    }
+  ]
+}

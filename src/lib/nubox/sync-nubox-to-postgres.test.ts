@@ -1,23 +1,31 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-const { runGreenhousePostgresQuery, syncCanonicalFinanceQuote } = vi.hoisted(() => ({
+const { runGreenhousePostgresQuery, syncCanonicalFinanceQuote, withGreenhousePostgresTransaction } = vi.hoisted(() => ({
   runGreenhousePostgresQuery: vi.fn(),
-  syncCanonicalFinanceQuote: vi.fn()
+  syncCanonicalFinanceQuote: vi.fn(),
+  withGreenhousePostgresTransaction: vi.fn()
 }))
 
 vi.mock('@/lib/postgres/client', () => ({
   onGreenhousePostgresReset: () => () => {},
   isGreenhousePostgresRetryableConnectionError: () => false,
   runGreenhousePostgresQuery,
-  withGreenhousePostgresTransaction: vi.fn()
+  withGreenhousePostgresTransaction
 }))
 
 vi.mock('@/lib/finance/quotation-canonical-store', () => ({
   syncCanonicalFinanceQuote
 }))
 
+// TASK-1210 — el native backfill persiste el snapshot FX dentro de la transacción.
+vi.mock('@/lib/finance/multi-currency/fx-snapshot-store', () => ({
+  persistFxSnapshot: vi.fn().mockResolvedValue('fxs-test-mxn')
+}))
+
 import {
+  isNuboxPurchaseAnnulled,
   resolveNuboxPurchaseProjectionAmounts,
+  upsertIncomeFromSale,
   upsertNuboxQuoteFromSale,
   type NuboxProjectionPurchase,
   type NuboxProjectionSale
@@ -107,6 +115,103 @@ describe('upsertNuboxQuoteFromSale', () => {
   })
 })
 
+describe('upsertIncomeFromSale — fiscal period stamping (TASK-1191)', () => {
+  beforeEach(() => {
+    runGreenhousePostgresQuery.mockReset()
+  })
+
+  it('self-heals the fiscal period of an existing income from the document date even when conformed period is NULL', async () => {
+    // Existing income row → UPDATE path (does not enter the mocked transaction).
+    runGreenhousePostgresQuery
+      .mockResolvedValueOnce([{ income_id: 'INC-NB-28186300' }]) // SELECT existing
+      .mockResolvedValueOnce([]) // UPDATE
+      .mockResolvedValueOnce([]) // publishOutboxEvent INSERT
+
+    const result = await upsertIncomeFromSale(
+      makeProjectionSale({
+        dte_type_code: '33',
+        emission_date: '2025-08-15',
+        period_year: null,
+        period_month: null
+      })
+    )
+
+    expect(result).toBe('updated')
+
+    const updateSql = String(runGreenhousePostgresQuery.mock.calls[1]?.[0] ?? '')
+    const updateParams = runGreenhousePostgresQuery.mock.calls[1]?.[1] as unknown[]
+
+    // Self-heal COALESCE present + derived period (Aug 2025) passed as params.
+    expect(updateSql).toContain('period_year = COALESCE(greenhouse_finance.income.period_year')
+    expect(updateSql).toContain('period_month = COALESCE(greenhouse_finance.income.period_month')
+    expect(updateParams).toContain(2025)
+    expect(updateParams).toContain(8)
+  })
+})
+
+describe('upsertIncomeFromSale — native plane backfill on existing CLP row (TASK-1210)', () => {
+  beforeEach(() => {
+    runGreenhousePostgresQuery.mockReset()
+    withGreenhousePostgresTransaction.mockReset()
+  })
+
+  const mxnSale = () =>
+    makeProjectionSale({
+      nubox_sale_id: '28800562',
+      dte_type_code: '110',
+      foreign_currency_code: 'MXN',
+      foreign_total_amount: 89960,
+      functional_total_amount_clp: 4617647
+    })
+
+  it('backfills native_amount/native_currency on an EXISTING income row when MXN is enabled (TASK-1209 creates CLP first)', async () => {
+    process.env.FINANCE_CORE_MXN_ENABLED = 'true'
+
+    const clientQuery = vi.fn().mockResolvedValue({ rows: [] })
+
+    withGreenhousePostgresTransaction.mockImplementation(async (cb: (c: unknown) => Promise<unknown>) =>
+      cb({ query: clientQuery })
+    )
+    runGreenhousePostgresQuery
+      .mockResolvedValueOnce([{ income_id: 'INC-NB-28800562' }]) // SELECT existing
+      .mockResolvedValueOnce([]) // publishOutboxEvent
+
+    const result = await upsertIncomeFromSale(mxnSale())
+
+    expect(result).toBe('updated')
+    // El native backfill va por el client de la transacción (no por runGreenhousePostgresQuery).
+    expect(withGreenhousePostgresTransaction).toHaveBeenCalledTimes(1)
+
+    const updateSql = String(clientQuery.mock.calls[0]?.[0] ?? '')
+    const updateParams = clientQuery.mock.calls[0]?.[1] as unknown[]
+
+    expect(updateSql).toContain('native_amount = COALESCE(greenhouse_finance.income.native_amount')
+    expect(updateSql).toContain('native_currency = COALESCE(greenhouse_finance.income.native_currency')
+    expect(updateParams).toContain(89960) // nativeAmount
+    expect(updateParams).toContain('MXN')
+
+    delete process.env.FINANCE_CORE_MXN_ENABLED
+  })
+
+  it('does NOT touch the native plane when MXN flag is OFF (bit-for-bit legacy UPDATE)', async () => {
+    delete process.env.FINANCE_CORE_MXN_ENABLED
+
+    runGreenhousePostgresQuery
+      .mockResolvedValueOnce([{ income_id: 'INC-NB-28800562' }]) // SELECT existing
+      .mockResolvedValueOnce([]) // UPDATE (non-tx path)
+      .mockResolvedValueOnce([]) // publishOutboxEvent
+
+    const result = await upsertIncomeFromSale(mxnSale())
+
+    expect(result).toBe('updated')
+    expect(withGreenhousePostgresTransaction).not.toHaveBeenCalled()
+
+    const updateSql = String(runGreenhousePostgresQuery.mock.calls[1]?.[0] ?? '')
+
+    expect(updateSql).not.toContain('native_amount')
+  })
+})
+
 const makeProjectionPurchase = (overrides: Partial<NuboxProjectionPurchase> = {}): NuboxProjectionPurchase => ({
   nubox_purchase_id: '36671467',
   folio: '13',
@@ -176,5 +281,25 @@ describe('resolveNuboxPurchaseProjectionAmounts', () => {
       grossFiscalTotalAmount: 119000,
       withholdingAmount: 0
     })
+  })
+})
+
+describe('isNuboxPurchaseAnnulled (TASK-1204)', () => {
+  it('detecta anulación por document_status_name="Anulada" aunque el booleano venga en false', () => {
+    // Caso real folio 40 Valentina: Nubox/SII traen "Anulada" pero is_annulled=false.
+    expect(isNuboxPurchaseAnnulled({ is_annulled: false, document_status_name: 'Anulada' })).toBe(true)
+  })
+
+  it('respeta el booleano is_annulled cuando viene en true', () => {
+    expect(isNuboxPurchaseAnnulled({ is_annulled: true, document_status_name: null })).toBe(true)
+  })
+
+  it('no marca anulado un documento válido', () => {
+    expect(isNuboxPurchaseAnnulled({ is_annulled: false, document_status_name: 'Válido' })).toBe(false)
+    expect(isNuboxPurchaseAnnulled({ is_annulled: false, document_status_name: null })).toBe(false)
+  })
+
+  it('normaliza mayúsculas/espacios del estado', () => {
+    expect(isNuboxPurchaseAnnulled({ is_annulled: false, document_status_name: '  ANULADA  ' })).toBe(true)
   })
 })

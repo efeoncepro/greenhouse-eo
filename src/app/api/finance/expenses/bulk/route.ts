@@ -26,6 +26,7 @@ import {
   type ServiceLine
 } from '@/lib/finance/shared'
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
+import { can } from '@/lib/entitlements/runtime'
 
 export const dynamic = 'force-dynamic'
 
@@ -34,6 +35,11 @@ export async function POST(request: Request) {
 
   if (!tenant) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  // TASK-1193 — gate fino de acción (capability != route-group).
+  if (!can(tenant, 'finance.expenses.create', 'create', 'tenant')) {
+    return NextResponse.json({ error: 'No tienes permiso para crear gastos en lote.', code: 'forbidden' }, { status: 403 })
   }
 
   try {

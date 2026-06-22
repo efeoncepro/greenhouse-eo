@@ -61,6 +61,8 @@ import CreateIncomeDrawer from '@views/greenhouse/finance/drawers/CreateIncomeDr
 import CreateExpenseDrawer from '@views/greenhouse/finance/drawers/CreateExpenseDrawer'
 import VatMonthlyPositionCard from '@views/greenhouse/finance/components/VatMonthlyPositionCard'
 import type { VatMonthlyPositionPayload } from '@views/greenhouse/finance/components/vat-monthly-position-types'
+import F29ConsolidatedPositionCard from '@views/greenhouse/finance/components/F29ConsolidatedPositionCard'
+import type { F29ConsolidatedPayload } from '@views/greenhouse/finance/components/f29-consolidated-position-types'
 import { getMicrocopy } from '@/lib/copy'
 import { formatCurrency as formatGreenhouseCurrency, formatDateTime as formatGreenhouseDateTime, formatNumber as formatGreenhouseNumber } from '@/lib/format'
 
@@ -389,6 +391,34 @@ const FinanceDashboardView = () => {
   const [syncing, setSyncing] = useState(false)
   const [workingCapital, setWorkingCapital] = useState<{ dso: number | null; dpo: number | null; payrollToRevenueRatio: number | null }>({ dso: null, dpo: null, payrollToRevenueRatio: null })
   const [vatPosition, setVatPosition] = useState<VatMonthlyPositionPayload | null>(null)
+  // TASK-725 Slice 1 — el fallo de la card IVA degrada local, no en el banner global.
+  const [vatError, setVatError] = useState<string | null>(null)
+  // TASK-1197 — F29 consolidado (IVA + retenciones + PPM); mismo patrón de degradación local.
+  const [f29Position, setF29Position] = useState<F29ConsolidatedPayload | null>(null)
+  const [f29Error, setF29Error] = useState<string | null>(null)
+  // TASK-1207 — período vigente del endpoint (capturado del primer payload F29) para
+  // distinguir proyección (mes en curso) vs a declarar (mes cerrado) en el selector.
+  const [f29CurrentPeriod, setF29CurrentPeriod] = useState<{ year: number; month: number } | null>(null)
+
+  // TASK-1207 — fetch del F29 por período (selector). Separado de fetchData para no
+  // recargar todo el dashboard al cambiar de mes. Consume el year/month que el
+  // endpoint ya soporta (TASK-1195).
+  const fetchF29 = useCallback(async (year: number, month: number) => {
+    try {
+      const res = await fetch(`/api/finance/f29/monthly-position?year=${year}&month=${month}`, { cache: 'no-store' })
+
+      if (res.ok) {
+        setF29Position(await res.json())
+        setF29Error(null)
+      } else {
+        setF29Position(null)
+        setF29Error('La posición F29 del período no está disponible en este momento. Vuelve a intentarlo.')
+      }
+    } catch {
+      setF29Position(null)
+      setF29Error('La posición F29 del período no está disponible en este momento. Vuelve a intentarlo.')
+    }
+  }, [])
 
   const [nexaInsights, setNexaInsights] = useState<{
     insights: NexaInsightItem[]
@@ -408,7 +438,7 @@ const FinanceDashboardView = () => {
     const errors: string[] = []
 
     try {
-      const [accountsRes, indicatorsRes, incomeSummaryRes, expenseSummaryRes, incomeListRes, expenseListRes, pnlRes, nuboxSyncRes, cashflowRes, dashSummaryRes, nexaRes, vatPositionRes] = await Promise.all([
+      const [accountsRes, indicatorsRes, incomeSummaryRes, expenseSummaryRes, incomeListRes, expenseListRes, pnlRes, nuboxSyncRes, cashflowRes, dashSummaryRes, nexaRes, vatPositionRes, f29PositionRes] = await Promise.all([
         fetch('/api/finance/accounts', { cache: 'no-store' }),
         fetch('/api/finance/economic-indicators/latest', { cache: 'no-store' }),
         fetch('/api/finance/income/summary', { cache: 'no-store' }),
@@ -420,7 +450,8 @@ const FinanceDashboardView = () => {
         fetch('/api/finance/dashboard/cashflow', { cache: 'no-store' }),
         fetch('/api/finance/dashboard/summary', { cache: 'no-store' }),
         fetch('/api/finance/intelligence/nexa-insights', { cache: 'no-store' }),
-        fetch('/api/finance/vat/monthly-position', { cache: 'no-store' })
+        fetch('/api/finance/vat/monthly-position', { cache: 'no-store' }),
+        fetch('/api/finance/f29/monthly-position', { cache: 'no-store' })
       ])
 
       if (cancelled) return
@@ -556,10 +587,28 @@ const FinanceDashboardView = () => {
 
       if (vatPositionRes.ok) {
         setVatPosition(await vatPositionRes.json())
+        setVatError(null)
       } else {
-        const d = await vatPositionRes.json().catch(() => ({}))
+        // TASK-725 Slice 1 — degradación honesta: NO se contamina el banner
+        // global con el fallo del widget IVA, ni se filtra prosa cruda del
+        // backend. Mensaje es-CL local en la card.
+        setVatPosition(null)
+        setVatError('La posición fiscal del período no está disponible en este momento. Vuelve a intentarlo.')
+      }
 
-        errors.push(`IVA mensual: ${d.error || vatPositionRes.status}`)
+      if (f29PositionRes.ok) {
+        // TASK-1197 — F29 consolidado: cliente puro del contrato gobernado; el VM
+        // ya trae las 3 líneas + enabledByLine. No se recompone nada acá.
+        const f29Payload = (await f29PositionRes.json()) as F29ConsolidatedPayload
+
+        setF29Position(f29Payload)
+        setF29Error(null)
+        // TASK-1207 — el primer load (sin year/month) trae el período vigente del
+        // endpoint; lo fijamos como referencia para el selector (proyección vs declarado).
+        setF29CurrentPeriod(prev => prev ?? { year: f29Payload.year, month: f29Payload.month })
+      } else {
+        setF29Position(null)
+        setF29Error('La posición F29 del período no está disponible en este momento. Vuelve a intentarlo.')
       }
     } catch (e) {
       errors.push(`Conexión: ${e instanceof Error ? e.message : 'Error desconocido'}`)
@@ -867,11 +916,22 @@ const FinanceDashboardView = () => {
         </Grid>
       </Grid>
 
+      <F29ConsolidatedPositionCard
+        loading={loading}
+        payload={f29Position}
+        error={f29Error}
+        onRetry={() => void fetchData()}
+        currentPeriod={f29CurrentPeriod ?? undefined}
+        onPeriodChange={period => void fetchF29(period.year, period.month)}
+      />
+
       <VatMonthlyPositionCard
         loading={loading}
         position={vatPosition?.position ?? null}
         recentPositions={vatPosition?.recentPositions ?? []}
         entries={vatPosition?.entries ?? []}
+        error={vatError}
+        onRetry={() => void fetchData()}
       />
 
       {/* Charts row */}

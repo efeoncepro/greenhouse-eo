@@ -103,5 +103,144 @@ export const GH_COST_ATTRIBUTION = {
 } as const
 
 // ────────────────────────────────────────────────────────────────
+// TASK-1213 — Quotes pipeline ledger + adaptive preview
+// ────────────────────────────────────────────────────────────────
+
+export const GH_QUOTES_PIPELINE = {
+  pageTitle: 'Cotizaciones',
+  pageSubtitle: 'Crea, revisa y sigue propuestas comerciales sin perder el contexto del pipeline.',
+  savedFilters: 'Limpiar',
+  newQuote: 'Nueva cotización',
+  surfaceTitle: 'Pipeline de cotizaciones',
+  surfaceSubtitle: 'Cola comercial con estado, margen y vencimiento revisables en contexto.',
+  searchLabel: 'Buscar cotización',
+  searchPlaceholder: 'Cliente, folio o fuente',
+  sourceLabel: 'Fuente',
+  allSources: 'Todas las fuentes',
+  columnsAction: 'Columnas',
+  sortAction: 'Ordenar',
+  sortNewest: 'Más recientes',
+  sortOldest: 'Más antiguas',
+  previewAction: 'Revisar',
+  reviewAction: 'Revisar',
+  openDetail: 'Abrir detalle',
+  commercialActions: 'Acciones comerciales',
+  editQuote: 'Editar',
+  issueQuote: 'Emitir',
+  shareQuote: 'Compartir',
+  downloadPdf: 'PDF',
+  openHubSpot: 'HubSpot',
+  reviewBilling: 'Facturar',
+  duplicateQuote: 'Duplicar',
+  moreActions: 'Más acciones',
+  quotesCount: (count: number) => `${count} cotizaciones`,
+  statusAll: 'Todas',
+  statusDraft: 'Borrador',
+  statusIssued: 'Emitida',
+  statusExpired: 'Vencida',
+  statusAccepted: 'Aceptada',
+  metricTotalPipeline: 'Total pipeline',
+  metricIssued: 'Emitidas',
+  metricDrafts: 'Borradores',
+  metricAverageMargin: 'Margen promedio',
+  metricDueThisWeek: 'Vencen esta semana',
+  metricNoMargin: 'Sin margen',
+  noDueThisWeek: 'Sin vencimientos',
+  colQuote: 'Cotización',
+  colClient: 'Cliente',
+  colDates: 'Fechas',
+  colValue: 'Valor',
+  colMargin: 'Margen',
+  colStatus: 'Estado',
+  colSource: 'Fuente',
+  colActions: 'Acciones',
+  tableAriaLabel: 'Tabla de cotizaciones',
+  dateCreated: 'Creada',
+  dateDue: 'Vence',
+  noDueDate: 'Sin vencimiento',
+  versionLabel: (version: number) => `v${version}`,
+  noQuotesTitle: 'Sin cotizaciones',
+  noQuotesBody: 'Las cotizaciones aparecerán aquí cuando se creen en Comercial o se sincronicen desde HubSpot.',
+  noFilteredQuotesTitle: 'Sin resultados para este corte',
+  noFilteredQuotesBody: 'Ajusta el estado, la fuente o la búsqueda para volver a ver el pipeline.',
+  previewEyebrow: 'Vista previa',
+  previewEmptyTitle: 'Selecciona una cotización',
+  previewEmptyBody: 'Revisa una fila para abrir el detalle contextual sin salir del ledger.',
+  cycleTitle: 'Ciclo comercial',
+  cycleDraft: 'Borrador',
+  cycleIssued: 'Emitida',
+  cycleExpired: 'Vencida',
+  pendingStep: 'Pendiente',
+  commercialFacts: 'Datos comerciales',
+  marginHealth: 'Salud de margen',
+  marginHealthy: 'Dentro de objetivo',
+  marginWatch: 'Bajo target',
+  marginRisk: 'Bajo piso',
+  marginUnknown: 'Pendiente',
+  recentActivity: 'Actividad reciente',
+  activityGenerated: 'Cotización generada',
+  activitySourceManual: 'Actualizada manualmente',
+  activitySourceNubox: 'Sincronizada desde Nubox',
+  activitySourceHubSpot: 'Sincronizada desde HubSpot',
+  rowsPerPage: 'Filas',
+  pageRange: (from: number, to: number, count: number) => `${from}-${to} de ${count}`
+} as const
+
+// ────────────────────────────────────────────────────────────────
 // TASK-471 — Pricing Catalog Phase-4 UX (diff + revert + bulk + impact + approvals + excel)
 // ────────────────────────────────────────────────────────────────
+
+// ────────────────────────────────────────────────────────────────
+// TASK-1197 — Card F29 mensual consolidado (IVA + Retenciones + PPM)
+// ────────────────────────────────────────────────────────────────
+
+export const GH_F29_CONSOLIDATED = {
+  cardTitle: 'Posición F29 del mes',
+  cardSubtitleLoading: 'Cargando las 3 líneas del F29 del período',
+  // Subheader con período + entidad legal; se interpola en el card.
+  cardSubtitle: 'IVA, retenciones y PPM materializados por entidad legal',
+
+  // Líneas del F29
+  vatLabel: 'IVA',
+  vatHelper: 'Débito fiscal menos crédito recuperable del período.',
+  retentionLabel: 'Retenciones',
+  retentionHelper: 'Retención de honorarios practicada (boletas recibidas).',
+  ppmLabel: 'PPM',
+  ppmHelper: 'Pago Provisional Mensual: base de ventas netas por la tasa vigente.',
+
+  // Sub-detalle por línea (caption bajo el monto)
+  vatNetDebit: 'IVA por pagar',
+  vatNetCredit: 'Crédito a favor',
+  vatNetEven: 'Saldo equilibrado',
+  ppmRateLabel: 'Tasa aplicada',
+  retentionDocsLabel: 'Documentos',
+
+  // Estado oficial vs shadow (badge con texto, nunca solo color)
+  badgeOfficial: 'Oficial',
+  badgeShadow: 'En validación',
+  shadowTooltip: 'Cifra en revisión contable; aún no es el F29 oficial del período.',
+
+  // Degradación honesta por línea (null = sin materializar, NO $0)
+  lineNoData: 'Sin datos del período',
+  lineNoDataHelper: 'No hay posición materializada para este período.',
+
+  // Estado de error del card (degradación honesta local, sin tocar banner global)
+  errorTitle: 'No pudimos cargar la posición F29 de este período',
+
+  // Pie con la entidad legal + corte
+  pendingMaterialization: 'Pendiente de materializar',
+
+  // TASK-1207 — Total a pagar
+  totalLabel: 'Total F29 a pagar',
+  totalHelper: 'Suma de IVA, retenciones y PPM del período.',
+  totalOfficial: 'Oficial',
+  totalProvisional: 'Provisional (en validación)',
+  totalProvisionalNote: 'Incluye líneas aún en validación contable; no es el total oficial.',
+  totalIncompleteNote: 'Falta materializar alguna línea del período; el total puede estar incompleto.',
+  totalNoData: 'Sin datos del período',
+
+  // TASK-1207 — Selector de período + proyección vs declarado
+  periodSelectorLabel: 'Período',
+  periodCurrentHint: 'mes en curso · proyección',
+  periodClosedHint: 'cerrado · a declarar'
+} as const

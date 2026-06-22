@@ -10,6 +10,8 @@
 // to the client on `NexaResponse.actionProposals`. The registry-side types (NexaActionDefinition,
 // NexaActionContext) are erased at runtime and live here for cohesion.
 
+import type { ZodType, ZodTypeDef } from 'zod'
+
 export const NEXA_ACTION_PROPOSAL_CONTRACT_VERSION = 'nexa-action-proposal.v1' as const
 
 export type NexaActionSensitivity = 'low' | 'medium' | 'high'
@@ -51,6 +53,13 @@ export interface NexaActionProposal {
     confirmEndpoint: string
     /** Server-generated idempotency key bound to this proposal; the UI echoes it on confirm. */
     idempotencyKey: string
+    /**
+     * For PARAMETRIZED actions (TASK-1212): the Zod-validated input the LLM proposed. The UI echoes
+     * it back on confirm; the confirm endpoint re-validates it. Undefined for self-actions (no input).
+     * Re-validation at confirm time + the bound command's own invariants (capability, price-from-engine)
+     * mean a tampered echo cannot escalate privilege — it can only author what the user could anyway.
+     */
+    input?: unknown
   }
   /** ISO timestamp; a proposal past this must be re-requested (stale → re-resolve). */
   expiresAt: string
@@ -67,6 +76,8 @@ export type NexaActionGapReason =
   | 'runtime_disabled'
   | 'no_command_binding'
   | 'unavailable'
+  // TASK-1212: el input que el LLM propuso para una acción parametrizada no pasó su Zod schema.
+  | 'invalid_input'
 
 export interface NexaActionGap {
   reason: NexaActionGapReason
@@ -105,8 +116,14 @@ export interface NexaActionExecutionResult {
 /**
  * A registered action. The registry maps actionKey → this definition. The LLM never sees the
  * command binding — only the key. The resolver enforces enablement + permission deterministically.
+ *
+ * Generic over `TInput` (TASK-1212): self-actions (mark_notifications_read) keep `TInput = void` and
+ * omit `inputSchema`; parametrized actions (author_quote) declare an `inputSchema` and receive the
+ * Zod-validated input in `buildPreview`/`execute`. The registry stores `NexaActionDefinition<any>`
+ * because actions are heterogeneous — the resolver/confirm validate the input via `inputSchema`
+ * BEFORE invoking the typed callbacks, so runtime is safe.
  */
-export interface NexaActionDefinition {
+export interface NexaActionDefinition<TInput = void> {
   actionKey: string
   intent: string
   sensitivity: NexaActionSensitivity
@@ -114,14 +131,20 @@ export interface NexaActionDefinition {
   domain: string
   /** Domain capability backing the action beyond the runtime capability, or null for self-actions. */
   requiredCapability: string | null
+  /**
+   * Zod schema for parametrized actions. Omitted by self-actions (TInput = void). El tercer
+   * genérico (Input) queda `unknown` para aceptar schemas con `.refine`/`.default` (ZodEffects),
+   * cuyo Input difiere del Output; solo nos importa que el OUTPUT validado sea `TInput`.
+   */
+  inputSchema?: ZodType<TInput, ZodTypeDef, unknown>
   /** Runtime/feature gate (flag + per-action allowlist). False → resolver returns runtime_disabled gap. */
   isEnabled: () => boolean
   /** Deterministic permission check from session context. False → not_permitted gap. */
   isPermitted: (context: NexaActionContext) => boolean
   /** Builds a fresh, real-data preview. Read-only — NEVER mutates. */
-  buildPreview: (context: NexaActionContext) => Promise<NexaActionPreviewResult>
+  buildPreview: (context: NexaActionContext, input: TInput) => Promise<NexaActionPreviewResult>
   /** The bound command. Runs ONLY from the confirm endpoint, inside the idempotency foundation. */
-  execute: (context: NexaActionContext) => Promise<NexaActionExecutionResult>
+  execute: (context: NexaActionContext, input: TInput) => Promise<NexaActionExecutionResult>
   confirmation: {
     title: string
     body: string

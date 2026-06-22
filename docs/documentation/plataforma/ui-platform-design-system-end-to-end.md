@@ -41,6 +41,7 @@ DB agregada:
 | Catalogo vivo | `/admin/design-system` |
 | Captura visual | GVC `pnpm fe:capture` |
 | Figma linking | Figma node store + route `/admin/design-system/figma-link` |
+| Handoff producto -> DEV | `docs/documentation/plataforma/design-handoff-control-plane.md` + `/design-system/handoff` |
 
 ## Reglas operativas
 
@@ -60,6 +61,7 @@ DB agregada:
 - GVC captura frames/video/aria snapshots.
 - Route reachability valida surfaces internas.
 - Figma node store conserva links y eventos para nodos gobernados.
+- Design Handoff crea el primer snapshot Figma cuando registra un handoff de producto allowlisted.
 
 ## Que hace el operador/agente
 
@@ -78,9 +80,11 @@ DB agregada:
 - Donde vive la paleta AXIS?
 - Que no debo copiar literal desde Figma?
 - Como agrego una primitive al catalogo?
+- Como paso un nodo Figma de producto a DEV con evidencia?
 
 ## Documentacion relacionada
 
+- `docs/documentation/plataforma/design-handoff-control-plane.md`
 - `docs/architecture/ui-platform/README.md`
 - `docs/architecture/ui-platform/PRIMITIVES.md`
 - `docs/architecture/ui-platform/PATTERNS.md`

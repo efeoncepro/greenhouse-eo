@@ -2,51 +2,24 @@ import 'server-only'
 
 import { NextResponse } from 'next/server'
 
-import type {
-  PricingEngineInputV2,
-  PricingEngineOutputV2,
-  PricingLineOutputV2
-} from '@/lib/finance/pricing/contracts'
 import { buildPricingEngineOutputV2 } from '@/lib/finance/pricing/pricing-engine-v2'
+import { redactPricingOutputForProfile } from '@/lib/finance/pricing/pricing-output-redaction'
+import { simulateQuoteInputSchema } from '@/lib/finance/pricing/simulate-input-schema'
 import { canViewCostStack, requireCommercialTenantContext } from '@/lib/tenant/authorization'
+import { can } from '@/lib/entitlements/runtime'
 
 export const dynamic = 'force-dynamic'
-
-type SanitizedPricingLineOutput = Omit<PricingLineOutputV2, 'costStack'> & {
-  costStack?: PricingLineOutputV2['costStack']
-}
-
-type SanitizedPricingEngineOutput = Omit<PricingEngineOutputV2, 'lines'> & {
-  lines: SanitizedPricingLineOutput[]
-}
-
-const stripCostStack = (output: PricingEngineOutputV2): SanitizedPricingEngineOutput => ({
-  ...output,
-  lines: output.lines.map(({ costStack, ...rest }) => {
-    void costStack
-
-    return rest
-  })
-})
-
-const isValidInput = (payload: unknown): payload is PricingEngineInputV2 => {
-  if (!payload || typeof payload !== 'object') return false
-  const candidate = payload as Partial<PricingEngineInputV2>
-
-  return (
-    typeof candidate.commercialModel === 'string' &&
-    typeof candidate.countryFactorCode === 'string' &&
-    typeof candidate.outputCurrency === 'string' &&
-    typeof candidate.quoteDate === 'string' &&
-    Array.isArray(candidate.lines)
-  )
-}
 
 export async function POST(request: Request) {
   const { tenant, errorResponse } = await requireCommercialTenantContext()
 
   if (!tenant) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  // TASK-1202 — gate fino de acción (capability != route-group).
+  if (!can(tenant, 'commercial.quote.simulate', 'read', 'tenant')) {
+    return NextResponse.json({ error: 'No tienes permiso para simular precios.', code: 'forbidden' }, { status: 403 })
   }
 
   let body: unknown
@@ -57,19 +30,28 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Invalid JSON payload.' }, { status: 400 })
   }
 
-  if (!isValidInput(body)) {
+  // Gate de validación con el contrato Zod introspectable. Si pasa, ejercemos el
+  // body original (no la versión transformada) contra el engine para preservar el
+  // contrato runtime del UI.
+  const parsed = simulateQuoteInputSchema.safeParse(body)
+
+  if (!parsed.success) {
     return NextResponse.json(
       {
         error:
-          'Missing required fields. Expected { commercialModel, countryFactorCode, outputCurrency, quoteDate, lines[] }.'
+          'Missing or invalid fields. Expected { commercialModel, countryFactorCode, outputCurrency, quoteDate, lines[] }.'
       },
       { status: 400 }
     )
   }
 
   try {
-    const output = await buildPricingEngineOutputV2(body)
-    const payload = canViewCostStack(tenant) ? output : stripCostStack(output)
+    const output = await buildPricingEngineOutputV2(parsed.data)
+
+    const payload = redactPricingOutputForProfile(output, {
+      audience: 'internal',
+      costStackVisible: canViewCostStack(tenant)
+    })
 
     return NextResponse.json(payload)
   } catch (error) {

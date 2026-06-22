@@ -1,0 +1,282 @@
+# FINANCE_DOMAIN_AUDIT_2026-06-20
+
+## Status
+
+- Date: 2026-06-20
+- Scope: revisión end-to-end del dominio Finance en `greenhouse-eo` — rutas API, UI, lógica de dominio (`src/lib/finance/**`), syncs/integraciones externas, outbox→reactive projections, estado de la BD viva y señales de salud
+- Auditor: Claude (Opus 4.8) usando la skill `greenhouse-finance-accounting-operator`
+- Addendum auditor: Codex (GPT-5) usando `greenhouse-finance-accounting-operator` y `pnpm codex:task-hook TASK-1184` como contexto operativo
+- Mode: `audit`
+- Runtime checked: Cloud SQL dev/staging vía `pnpm pg:connect --shell` (proxy Cloud SQL, read-only)
+- Mutation policy: **read-only**; no se modificó runtime ni datos
+- External benchmarks: IFRS 15, IAS 7, COSO (SoD, control activities), Chile SII/DTE/VAT
+- Criticality: alta
+- Business sensitivity: alta
+- Predecesora: [FINANCE_DOMAIN_AUDIT_2026-05-03](FINANCE_DOMAIN_AUDIT_2026-05-03.md)
+
+## Executive Summary
+
+El dominio Finance está **arquitectónicamente maduro y sano en datos**. Las defensas canónicas (VIEWs CLP-normalizadas, `economic_category`, OTB cascade-supersede, payment-order atómico, outbox→reactive) están operando y **todas las señales de drift críticas están en cero** en runtime vivo (2026-06-20).
+
+El trabajo real no es corrupción de datos: son **gaps de borde y backlog operativo**:
+
+1. Un cron de reintento DTE huérfano (sin scheduler).
+2. Dos crons que viven en Vercel cron (solo corren en prod, no en staging) → indicadores económicos y FX LATAM stale en staging.
+3. Una cola de revisión de `economic_category` con 171 ítems `pending` sin drenar.
+4. Un issue abierto con usuario afectado (ISSUE-058); ISSUE-045 e ISSUE-055 quedaron resueltos el 2026-06-20.
+5. Cuatro tasks `in-progress` cuyos invariantes ya están escritos pero el lifecycle no se cerró.
+6. Una vista viva sin ítem de menú (`/finance/external-signals`).
+
+Conclusión práctica Claude: **Finance transaccional está bien defendido; el foco de mejora es robustez de infraestructura de syncs (paridad staging), higiene de lifecycle y drenaje de backlog de clasificación — no remediación de datos.**
+
+Delta Codex: esa conclusión se sostiene para **transactional finance / treasury / payment ledgers**, pero no debe extenderse a **Management Accounting / Cost Attribution / Cost Intelligence**. La capa `commercial_cost_attribution` presenta handlers reactivos en `failed` por `permission denied for schema greenhouse_serving`, no materializa mayo/junio y deja `operational_pl` con costos `0` en junio. Por tanto, el estado correcto del dominio es: **transaccional sano; management accounting degradado y no apto todavía como baseline canónico de margen para mayo/junio.**
+
+## Audit Scope
+
+### Forma del dominio (inventario)
+
+| Capa | Cantidad |
+|---|---|
+| Rutas API (`src/app/api/finance/**`) | 156 archivos (~140 `route.ts`) |
+| Páginas UI (`(dashboard)/finance/**`) | 38 pages |
+| Subdominios de lógica (`src/lib/finance/*`) | 28 carpetas + ~70 módulos |
+| Migraciones finance | 74 |
+| Tablas en `greenhouse_finance` | 66 |
+| VIEWs canónicas | 4 |
+| Eventos outbox finance (histórico) | 40.745 (100% `published`) |
+
+Subsistemas: Income/DTE · Expenses/Payables · Ledger/Settlement (`settlement_groups` + `settlement_legs`) · Bank/Treasury · Reconciliación · Payment Orders/Obligations · Payment Instruments · FX/Currency · Economic Category · Expense Distribution · Quotes/Quote-to-Cash · Contractor Payables · VAT Chile · Cost Allocation/Intelligence · Shareholder CCA · Beneficiary Payment Profiles.
+
+### Architecture / docs reviewed
+
+- `docs/architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`
+- `docs/architecture/GREENHOUSE_MANAGEMENT_ACCOUNTING_ARCHITECTURE_V1.md`
+- `docs/architecture/GREENHOUSE_COST_INTELLIGENCE_ARCHITECTURE_V1.md`
+- `docs/architecture/GREENHOUSE_COMMERCIAL_COST_ATTRIBUTION_V1.md`
+- `.codex/skills/greenhouse-finance-accounting-operator/references/greenhouse-finance-runtime-map.md`
+- `docs/architecture/agent-invariants` (secciones finance embebidas)
+- `docs/issues/resolved/ISSUE-045`, `docs/issues/resolved/ISSUE-055`, `docs/issues/open/ISSUE-058`
+- `src/lib/navigation/route-reachability-manifest.ts`
+- `vercel.json` + `services/ops-worker/deploy.sh`
+
+## Live runtime health (2026-06-20)
+
+Sondas de drift ejecutadas contra Cloud SQL (read-only). **Todas las señales críticas en steady state:**
+
+| Señal | Esperado | Real | Estado |
+|---|---|---|---|
+| `expense_payments` requiring FX repair | 0 | 0 / 121 | ✅ |
+| `income_payments` requiring FX repair | 0 | 0 / 27 | ✅ |
+| `expenses.economic_category` sin resolver | 0 | 0 / 226 | ✅ |
+| `income.economic_category` sin resolver | 0 | 0 / 75 | ✅ |
+| `payment_orders` paid sin `expense_payment` (drift) | 0 | 0 | ✅ |
+| Outbox finance pendiente/dead-letter | 0 | 0 (40.745 published) | ✅ |
+| `account_balances` frescura (8 cuentas) | hoy | 2026-06-20 | ✅ |
+| DTE emission queue stuck | 0 | cola vacía | ✅ |
+
+Cuentas con saldo rematerializado al día: `santander-clp`, `santander-usd`, `santander-corp-clp`, `global66-clp`, `global-66-mxn`, `deel-clp`, `previred-clp`, `sha-cca-julio-reyes-clp`. El cron `ops-finance-rematerialize-balances` (5am Santiago) está corriendo correctamente.
+
+`payment_orders` por estado: 5 `paid`, 3 `cancelled`, 1 `pending_approval`.
+
+### Management accounting / cost intelligence caveat (Codex addendum)
+
+Las sondas transaccionales no cubren por sí solas la salud de P&L operativo. La revisión Codex encontró:
+
+| Señal | Real | Estado |
+|---|---|---|
+| `greenhouse_serving.commercial_cost_attribution` | filas solo para 2026-02, 2026-03 y 2026-04; sin mayo/junio | ❌ |
+| `commercial_cost_attribution:*` handlers reactivos | `failed` con `permission denied for schema greenhouse_serving` | ❌ |
+| `operational_pl_snapshots` junio 2026 | revenue materializado con costo `0` | ❌ |
+| `greenhouse_serving.finance_ai_enrichment_runs` | 66 ejecuciones | 🟡 |
+| `greenhouse_serving.finance_ai_signals` / `finance_ai_signal_enrichments` | 0 filas | 🟡 |
+
+El outbox principal puede estar `published` y aun así dejar consumidores reactivos degradados. En este caso el problema vive en la proyección/consumer y en permisos/runtime DDL, no en la cola principal.
+
+## Mapa de syncs e integraciones
+
+### Lane canónico — Cloud Scheduler + ops-worker (corre en staging **y** prod)
+
+| Job | Schedule | Propósito |
+|---|---|---|
+| `ops-outbox-publish` | `*/2 * * * *` | PG outbox → BQ raw |
+| `ops-reactive-finance` | `*/5 * * * *` | Materializa projections finance |
+| `ops-nubox-sync` | `30 7 * * *` | Ingesta Nubox 3 fases (API→BQ raw→conformed→PG) |
+| `ops-nubox-balance-sync` | `0 */4 * * *` | Balances Nubox → PG + outbox `finance.balance_divergence.detected` |
+| `ops-nubox-quotes-hot-sync` | `*/15 * * * *` | Quotes hot path |
+| `ops-finance-rematerialize-balances` | `0 5 * * *` | Rematerialize rolling 7 días de `account_balances` |
+| `ops-finance-fx-drift-remediate` | `15 5 * * *` | Remediación acotada FX drift (TASK-842) |
+| `ops-finance-ledger-health` | `30 5 * * *` | Probe de drift + alerta Sentry |
+| `ops-reconciliation-auto-match` | `45 7 * * *` | Auto-match de statements bancarios |
+| `ops-quotation-lifecycle` | `0 7 * * *` | Expiración/renovación de cotizaciones |
+| `ops-hubspot-quotes-sync` / `-products-sync` | `0 */6` / `0 8` | Outbound a HubSpot |
+
+### Integraciones externas
+
+- **Nubox** = gateway de DTE (no SII directo, vía `src/lib/nubox/emission.ts`) + fuente inbound de facturación (3 fases). Códigos DTE: 33/34/56/61/38/39/41/52.
+- **mindicador.cl** = USD/CLP + UF/UTM/IPC (fallback `open.er-api.com`). IMM es `manual_only`.
+- **FX LATAM** (COP/PEN/MXN) vía TRM/SUNAT/Banxico con circuit breakers (`src/lib/finance/fx/sync-orchestrator.ts`).
+- **HubSpot** = income→invoice, products, quotes (todo outbound vía reactive projections). Ruta `quotes/hubspot` deprecada (410 Gone, TASK-463).
+
+### Reactive projections finance (consumidores de outbox)
+
+`account_balances`, `provider_bq_sync`, `income_hubspot_outbound`, `vat_monthly_position`, `operational_pl`, `client_economics`, `member_capacity_economics`, `commercial_cost_attribution`, `record_expense_payment_from_order` (read-only safety net), `contractor_payable_*`, `quotation_*`, `product_catalog_*`, `deal_pipeline`, `contract_mrr_arr`.
+
+## Findings
+
+### F1 — `economic_category_manual_queue`: 171 ítems `pending` (🟡 backlog operativo)
+
+La data no está rota (0 `economic_category` unresolved en expenses/income), pero el clasificador automático encoló 171 ítems de baja confianza para confirmación humana y nadie los está drenando. Es el ítem más "vivo" de la auditoría.
+
+- **Impacto:** clasificación analítica de baja confianza acumulándose; no afecta fiscal (`expense_type`/`income_type`) ni cash.
+- **Acción sugerida:** triagear/drenar la cola; revisar si hay reglas declarativas (`known_regulators`/`known_payroll_vendors`) que cubrirían el grueso.
+
+### F2 — `/api/cron/dte-emission-retry` huérfano (🟠 gap latente)
+
+La ruta de reintento/dead-letter de DTE existe pero **no está registrada en `vercel.json`, ni en ops-worker `deploy.sh`, ni en GitHub Actions**. Hoy la `dte_emission_queue` está vacía, así que no muerde — pero si una emisión DTE falla y se encola, nada la reintenta.
+
+- **Acción sugerida:** registrar el cron en Cloud Scheduler (lane canónico) o eliminar la ruta si está muerta. Si se registra, agregar reliability signal de `dte_emission_queue` dead-letter.
+
+Delta Codex 2026-06-20: además del scheduler huérfano, el audit profundo confirmó que `greenhouse_finance.dte_emission_queue` no estaba gobernada por migración y que el helper ejecutaba DDL runtime. `TASK-1194` Slice 0 agrega y aplica en Cloud SQL dev la migración `20260620193557859_task-1194-dte-emission-queue-governed-ddl.sql`; `src/lib/finance/dte-emission-queue.ts` queda validation-only. `pnpm pg:connect:status` reporta `No migrations to run` y SQL smoke confirma tabla con `0` filas. Sigue pendiente registrar o retirar el cron y agregar signal de pending/retry/dead-letter.
+
+### F3 — Dos crons en Vercel cron (solo prod, no staging) (🟠 paridad staging)
+
+Exactamente la bug-class que CLAUDE.md advierte (Vercel custom env no corre crons):
+
+- `economic-indicators/sync` (`vercel.json`) — UF/UTM/IPC + co-sync USD/CLP.
+- `fx-sync-latam` (3 ventanas) — COP/PEN/MXN.
+
+En staging estos indicadores quedan stale. Además, `exchange-rates/sync` (USD/CLP plano) no tiene scheduler propio — depende de ser llamado o del co-sync de economic-indicators.
+
+- **Acción sugerida:** migrar ambos a Cloud Scheduler / ops-worker, replicando el patrón de TASK-775.
+
+### F4 — `/finance/external-signals` sin ítem de menú (🟠 UI)
+
+`ExternalSignalsView` (vista viva, TASK-708) es alcanzable solo por URL directa; no tiene ítem de navegación. Tracked como follow-up TASK-983 (necesita viewCode + migración seed). La reachability-gate la cubre como child route declarada, así que no es "orphan" formal, pero es un dead-end de UX.
+
+### F5 — Issues abiertos con usuario afectado (🟠)
+
+- **ISSUE-045** — ✅ resuelto 2026-06-20. `POST /api/finance/purchase-orders` ya no cae en HTTP 500 por referencia ambigua a `client_id`; el fix aliasó `cp.*` en `resolveFinanceClientContext()` y se validó en staging con create HTTP 201 + read HTTP 200 (`PO-b254c2db`, `GH-ISSUE-045-20260620-1427`).
+- **ISSUE-055** — ✅ resuelto 2026-06-20. `ECG-004` (PR Analyst) ya cotiza en staging: la migración `20260620190000000_issue-055-reviewed-staff-role-cost-basis.sql` sembró `role_employment_compatibility` + `sellable_role_cost_components` revisados con `employment_type_code='indefinido_clp'` y provenance `admin_manual`. El mismo fix cubre `ECG-017` y `ECG-018`; `ECG-032` queda fuera por una ambigüedad distinta. Verificado con `POST /api/finance/quotes/pricing/simulate` (`HTTP 200`, `costBasisKind='role_modeled'`) y smoke vecino `ECG-001` (`role_blended` intacto).
+- **ISSUE-058** — Webhook `greenhouse-teams-finance-alerts-webhook` no provisionado en GCP Secret Manager (TASK-669 deploy pendiente) → alertas finance se saltan. Mitigado con flag `provisioning_status='pending_setup'`.
+
+### F6 — Cuatro tasks `in-progress` sin cerrar lifecycle (✅ resuelto 2026-06-20)
+
+TASK-929 (ledger drift remediation) y TASK-934 (unanchored expense ack) ya estaban en `complete`. El cleanup documental de 2026-06-20 actualizó el registry para TASK-776 (temporal modes) y TASK-871 (rolling anchor) a `complete`, corrigió sus rutas canónicas hacia `docs/tasks/complete/**` y removió TASK-871 de la tabla activa `In Progress` del README. No queda acción abierta para este hallazgo.
+
+### F7 — `commercial_cost_attribution` reactivo fallando por permisos de `greenhouse_serving` (✅ resuelto 2026-06-20)
+
+Los handlers reactivos de `commercial_cost_attribution` aparecen en estado `failed`, con `infra.db_privilege / permission denied for schema greenhouse_serving`. Afecta eventos como:
+
+- `finance.exchange_rate.upserted`
+- `membership.created`
+- `membership.deactivated`
+- `finance.expense.created`
+- `payroll_entry.upserted`
+- `compensation_version.created`
+- `finance.income.created`
+- `payroll_period.calculated` / `payroll_period.exported`
+
+Evidencia adicional: la auditoría de reliability del 2026-05-26 ya documentaba el mismo síntoma en proyecciones sobre `greenhouse_serving`; por lo tanto no parece un incidente aislado del día.
+
+Root cause probable: `src/lib/commercial-cost-attribution/store.ts:66` ejecuta `CREATE TABLE IF NOT EXISTS greenhouse_serving.commercial_cost_attribution` desde runtime mediante `ensureCommercialCostAttributionSchema()`. Ese DDL exige privilegios de schema que el rol runtime no debería necesitar. La proyección reactiva en `src/lib/sync/projections/commercial-cost-attribution.ts:157` invoca la materialización y hereda esa falla.
+
+Delta Codex 2026-06-20: se implementó el fix de código para que `ensureCommercialCostAttributionSchema()` deje de ejecutar DDL y solo valide la existencia de la tabla gobernada con `SELECT 1 FROM greenhouse_serving.commercial_cost_attribution LIMIT 1`. El DDL base + grants se movió a la migración forward-fix `20260620141000000_commercial-cost-attribution-governed-ddl.sql`. La migración quedó aplicada en Cloud SQL dev con `pnpm pg:connect:migrate` y `pnpm pg:connect:status` reporta `No migrations to run`.
+
+Evidencia post-rollout dev: la materialización con perfil runtime `greenhouse_app` ya no falla por permisos. Mayo 2026 materializó `3` filas de `commercial_cost_attribution` por `2,706,028.15` CLP de loaded cost y `operational_pl_snapshots` quedó con costo total `8,118,084.45` CLP. Junio 2026 sigue con `0` filas porque `greenhouse_serving.client_labor_cost_allocation_consolidated` también tiene `0` filas para junio; por tanto el remanente de junio ya no es F7/DDL sino falta de facts upstream de labor allocation.
+
+Delta Codex TASK-1190 / ISSUE-102 2026-06-20: se expuso `--replay-failed-handlers` y `--handler=<key>` en `scripts/reactive-backfill.ts` para usar el soporte focal que ya existía en `processReactiveEvents`. El replay focal sobre los 9 handlers `commercial_cost_attribution:*` que estaban `failed` drenó `126` eventos, coalesció `4` scopes, ejecutó la materialización CCA sin fallos y dejó:
+
+- `greenhouse_sync.handler_health`: `21` handlers `commercial_cost_attribution:*` en `healthy`, `0` en `failed`;
+- `greenhouse_sync.outbox_reactive_log`: `0` dead letters activas CCA (`acknowledged_at IS NULL AND recovered_at IS NULL`);
+- mayo 2026 `commercial_cost_attribution`: `3` rows, `2,706,028.15` CLP loaded cost.
+
+No se devolvieron privilegios DDL al runtime.
+
+### F8 — `operational_pl` con costo upstream faltante no puede ser margen canónico (🟠 degradado honestamente)
+
+`commercial_cost_attribution` solo tiene materialización efectiva hasta abril 2026. En junio 2026, `operational_pl_snapshots` muestra revenue materializado, pero costo `0`. Ese patrón no debe presentarse como margen real; es una degradación de serving.
+
+Impacto:
+
+- dashboards de profitability / P&L pueden sobreestimar margen;
+- Nexa o cualquier insight financiero que use `operational_pl` puede producir recomendaciones con base incompleta;
+- cualquier cierre o baseline de margen mayo/junio debe quedar como provisional/degradado hasta rematerializar.
+
+Delta Codex TASK-1190 / ISSUE-102 2026-06-20: se agregó el health gate read-only `finance.operational_pl.cost_coverage_degraded` (`src/lib/reliability/queries/operational-pl-cost-coverage-degraded.ts`) y se conectó a Reliability Overview. El gate detecta períodos con `operational_pl_snapshots.revenue_clp > 0`, `total_cost_clp = 0` y sin filas upstream en `commercial_cost_attribution` ni `client_labor_cost_allocation_consolidated`; en ese caso retorna `severity='error'` y el resumen indica que ese margen no debe usarse como canónico.
+
+Evidencia post-TASK-1190:
+
+- mayo 2026 rematerializado: cada scope (`client`, `space`, `organization`) conserva `6,902,000.00` CLP revenue y `2,706,028.15` CLP cost;
+- junio 2026 rematerializado: cada scope conserva `6,902,000.00` CLP revenue y `0` cost porque no existe payroll period junio `approved/exported` ni rows en `client_labor_cost_allocation_consolidated`;
+- `member_capacity_economics` sí tiene junio (`27` rows, `5,256,512.00` CLP labor target), pero sin allocation cliente-período auditable no se infiere reparto comercial;
+- el gate detecta `4` períodos degradados históricos (`2025-11`, `2025-12`, `2026-01`, `2026-06`) con `24` snapshots y `94,707,468.00` CLP de revenue expuesto a costo upstream faltante.
+
+Tratamiento pendiente: completar la fuente payroll/labor allocation de junio por el flujo payroll/capacity normal antes de usar junio como baseline canónico de margen. Mientras tanto, F8 ya no es silencioso.
+
+### F9 — Auditoría de permisos/capabilities route-by-route pendiente (🟠 controls)
+
+Inventario Codex:
+
+- `206` route files entre `src/app/api/finance`, `src/app/api/admin/finance` y `src/app/api/cost-intelligence`;
+- `143` con tokens directos de contexto/session guard (`requireFinanceTenantContext`, `requireInternalTenantContext`, etc.);
+- `35` con token textual `can(...)`;
+- `63` sin esos tokens directos, incluyendo superficies de Cost Intelligence, Bank, Contracts, Quotes, Reconciliation snapshots y Shareholder Account.
+
+Esto es una heurística textual, no una condena final: algunas rutas pueden delegar auth en helpers internos, share routes o readers. Pero por criticidad financiera no basta con patrón implícito. Requiere revisión route-by-route separando:
+
+- rutas públicas/share intencionales;
+- rutas read-only internas;
+- mutations con maker-checker/capability explícita;
+- sync endpoints y admin-only actions.
+
+Delta Codex 2026-06-20: auditoría focal documentada en `docs/audits/finance/FINANCE_ROUTE_CAPABILITY_AUDIT_2026-06-20.md`. Resultado: `205/206` route files tienen tenant context directo; el único `POST` sin auth directa es `quotes/hubspot`, tombstone `410 Gone` sin mutación. El riesgo real no es exposición anónima general, sino autorización demasiado amplia: `75` rutas write tienen auth de dominio/route-group pero no capability fina textual. Prioridad de remediación: Payment Orders + Treasury/Bank/Shareholder movements, luego DTE/Income/Expense/HES, luego sync/materializer HTTP boundary coordinado post-TASK-1191.
+
+### F10 — Finance AI enrichments corren, pero no hay señales persistidas (🟡 Nexa/insights)
+
+`greenhouse_serving.finance_ai_enrichment_runs` tiene ejecuciones recientes, pero `finance_ai_signals` y `finance_ai_signal_enrichments` están vacías. Esto puede explicar degradaciones/404 en superficies Nexa que intenten profundizar insights financieros, y vuelve riesgoso construir acciones gobernadas sobre finance insights sin validar primero el source-of-truth de signals.
+
+Tratamiento recomendado:
+
+- identificar si finance insights deben venir de `finance_ai_signals`, `nexa-insights` API, `operational_pl`, o una capa nueva;
+- asegurar IDs resolubles antes de habilitar drill/actions;
+- degradar honestamente cuando un insight financiero no tenga señal persistida.
+
+## Invariantes verificados (no violados)
+
+- VIEWs CLP-normalizadas (`expense_payments_normalized` / `income_payments_normalized`) en uso; 0 drift.
+- `economic_category` persistida y resuelta (0 unresolved); separada de `expense_type` fiscal.
+- Payment-order atómico (`markPaymentOrderPaidAtomic`): 0 paid sin `expense_payment`.
+- Outbox→reactive: 0 eventos finance pendientes/dead-letter.
+- OTB cascade + genesis floor: `account_balances` fresco al día sin filas pre-genesis observadas.
+
+## Recommendations (priorizadas)
+
+| # | Acción | Tipo | Esfuerzo | Valor |
+|---|---|---|---|---|
+| 0 | Remover DDL runtime de `commercial-cost-attribution/store.ts`, migrarlo a schema governance y reintentar handlers fallidos | Management accounting / sync | Medio | Crítico |
+| 0.1 | Rematerializar `commercial_cost_attribution` + `operational_pl_snapshots` mayo/junio y marcar snapshots degradados si falta costo | Cost Intelligence | Medio | Crítico |
+| 0.2 | Ejecutar auditoría de capabilities sobre las 206 rutas finance/admin/cost-intelligence | Controls / API governance | Medio | Alto |
+| 1 | ✅ Resuelto 2026-06-20: Fix ISSUE-045 (alias `client_id` en `resolveFinanceClientContext`) | Bug runtime | Bajo | Alto |
+| 2 | Migrar `economic-indicators/sync` + `fx-sync-latam` a Cloud Scheduler | Robustez/paridad | Medio | Alto |
+| 3 | Registrar o eliminar `dte-emission-retry` cron + signal dead-letter | Robustez | Bajo | Medio |
+| 4 | Drenar/triagear 171 pending de `economic_category_manual_queue` | Backlog ops | Medio | Medio |
+| 5 | ✅ Resuelto 2026-06-20: Fix ISSUE-055 (cost basis ECG-004/017/018) | Bug runtime | Medio | Medio |
+| 6 | Provisionar webhook Teams Finance (ISSUE-058 / TASK-669) | Infra | Bajo | Medio |
+| 7 | Agregar ítem de menú + viewCode a `/finance/external-signals` (TASK-983) | UI | Bajo | Bajo |
+| 8 | Cerrar lifecycle de TASK-929/934/776/871 o reflejar bloqueo | Higiene docs | Bajo | Bajo |
+
+## Escalation / límites de esta auditoría
+
+- Auditoría **read-only** sobre runtime dev/staging vía Cloud SQL Connector; no se ejecutaron writes ni se validó el comportamiento de prod independientemente.
+- El addendum Codex también fue **read-only**; no se editó runtime, no se reprocesaron handlers y no se ejecutaron rematerializaciones.
+- No se recomputó `account_balances.fx_drift` con la sonda de 90 días (se verificó frescura y ausencia de filas en cola de repair; el recompute completo queda para la remediación si se aborda F3).
+- Los conteos `-1` de `reltuples` en tablas pequeñas indican tablas sin `ANALYZE` reciente (no es un defecto; son tablas de baja escritura).
+- No es asesoría tributaria/legal de filings (DTE/F29/VAT). Verificar tasas y reglas vigentes contra SII antes de cualquier cierre fiscal.
+
+## Verification performed
+
+- `find`/`grep` sobre `src/app/api/finance`, `src/lib/finance`, `migrations`, `vercel.json`, `services/ops-worker`.
+- Lectura del doc canónico `GREENHOUSE_FINANCE_ARCHITECTURE_V1.md` + secciones de invariantes.
+- SQL read-only contra `greenhouse_finance` (tablas, VIEWs, drift, frescura de balances, outbox lag) vía `pnpm pg:connect --shell`.
+- Cross-check de `docs/issues/open/` y `route-reachability-manifest.ts`.
+- Codex addendum: `pnpm codex:task-hook TASK-1184`, `pnpm pg:doctor`, inventario `rg` de rutas API/UI/libs/scripts, SQL read-only contra `greenhouse_finance`, `greenhouse_serving`, `greenhouse_cost_intelligence` y `greenhouse_sync`, revisión de `handler_health` / `outbox_reactive_log`, y contraste con `src/lib/commercial-cost-attribution/store.ts` + `src/lib/sync/projections/commercial-cost-attribution.ts`.

@@ -1,5 +1,50 @@
 # Greenhouse Source Sync Pipelines V1
 
+## Delta 2026-06-20 — TASK-1209 proyección recurrente de facturas de exportación/exentas + visibilidad
+
+El step PG del sync Nubox (`upsertIncomeFromSale`) ya intentaba **cada** conformed sale por corrida (incluidas las facturas de exportación DTE 110/111/112), pero **toda factura exenta fallaba** registrada con `nubox_postgres_projection_failed` por el bug de exento de `buildIncomeTaxWriteFields` (ver Finance arch Delta TASK-1209). Con el fix, una factura de exportación válida con cliente resuelto **se materializa sola en el próximo sync** — sin scripts por cliente. Berel es fixture, no rama de código.
+
+**Contrato recurrente (modelo objetivo):**
+
+```text
+Nubox emite factura mensual
+  -> raw/conformed Nubox sales evidence
+  -> postgres_projection lee la conformed sale (readConformedSales)
+  -> org/client resuelto por identidad tributaria canónica
+  -> upsertIncomeFromSale escribe/actualiza greenhouse_finance.income (total = neto + IVA + exento)
+  -> finance.income.created outbox para income nuevo
+  -> reliability ok
+```
+
+**Visibilidad / failure taxonomy:** `writeSyncFailure` acepta `errorCode`; las fallas de projection de export DTE usan el código estable **`nubox_income_projection_failed`** con `nuboxDocumentId` en el payload. Signal nuevo **`finance.nubox_export.unprojected_invoice`** (`src/lib/reliability/queries/nubox-export-unprojected-invoice.ts`, kind `data_quality`, warning, steady=0) que cruza `source_sync_failures` (30d) contra `income.nubox_document_id` y **se auto-limpia** al materializarse el AR. Distinto de `finance.nubox_export.orphan_rfc` (RFC sin org, no se intenta) y `finance.nubox_export.foreign_amount_missing` (income existe sin plano nativo). Diagnóstico read-only: `scripts/finance/task-1209-unprojected-export-invoices-diagnostic.ts`. Owner operativo del signal: Finance Ops.
+
+## Delta 2026-06-20 — TASK-1191 el step PG del sync Nubox estampa el período fiscal (F29)
+
+El step PG del sync Nubox (`upsertIncomeFromSale` / `upsertExpenseFromPurchase` en
+`src/lib/nubox/sync-nubox-to-postgres.ts`) ahora **deriva y estampa** el período
+fiscal (`period_year` / `period_month`) del documento desde su fecha de emisión
+(`emission_date` → `invoice_date`/`document_date`) usando el helper canónico
+`getOperationalFiscalPeriod()` (`src/lib/calendar/operational-calendar.ts`). El
+conformed BQ trae el período NULL, así que sin esto los documentos con IVA nacían
+sin período y **nunca entraban a una posición F29** (ISSUE-103: 165 docs excluidos
+del crédito/débito fiscal).
+
+Contrato del estampado:
+
+- **INSERT** (doc nuevo): el período sale del helper sobre `emission_date`;
+  fallback al período del conformed sólo si no hay fecha de emisión.
+- **UPDATE** (doc existente, re-sync): **self-heal** `period_* = COALESCE(existente, derivado)`
+  — nunca pisa un período ya correcto, sólo rellena NULLs. El sync se vuelve
+  auto-sanador para documentos históricos sin período.
+- Regla SII por defecto = **mes del documento** (validada: 25/25 docs ya estampados
+  casaban el mes de la fecha del doc). La ventana de 2 períodos para crédito tardío
+  es una decisión manual del contador, no el default.
+
+Backfill one-shot de los 165 docs históricos: `scripts/finance/task-1191-backfill-fiscal-period.ts`
+(dry-run por defecto, `--apply`/`--rematerialize`, idempotente, source-agnostic).
+Downstream: re-materialización VAT (`materializeAllAvailableVatPeriods`) + signals
+`finance.vat.eligible_without_period` / `finance.vat.position_drift` en `ok`.
+
 ## Delta 2026-04-26 — Nubox Quotes Hot Sync separa frescura comercial del ETL diario
 
 Las cotizaciones Nubox (`COT` / DTE 52) ya no dependen solo del ETL diario

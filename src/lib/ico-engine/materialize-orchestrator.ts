@@ -167,7 +167,21 @@ export const runIcoMaterializerCycle = async (
   // ── Capa 2b: Incremental delta cutoff lookup ─────────────────────────────
   let deltaCutoffIso: string | null = null
 
-  if (useMerge && input.isIncrementalDeltaEnabled()) {
+  // TASK-1171 — el período EN CURSO siempre se materializa FULL (deltaCutoff=null).
+  // El incremental-delta deja STALE a una entidad ya-materializada cuyas ediciones
+  // no cruzan el cutoff que avanza cada noche → el rollup del mes vigente queda
+  // congelado al inicio del mes (caso efeonce/sky 2026-06-19: OTD almacenado
+  // 1.5%/2.4% vs real 89%/60%). El mes en curso es chico → full es barato y elimina
+  // la staleness; el delta solo es seguro para períodos CERRADOS/históricos (ya no
+  // cambian). Misma convención de "mes actual" que materializeMonthlySnapshots
+  // (`new Date()` getFullYear/getMonth+1). Aplica simétricamente a los 5 rollups.
+  const nowForPeriod = new Date()
+
+  const isCurrentPeriod =
+    periodYear === nowForPeriod.getFullYear() &&
+    periodMonth === nowForPeriod.getMonth() + 1
+
+  if (useMerge && input.isIncrementalDeltaEnabled() && !isCurrentPeriod) {
     try {
       const lastMaterializedAt = await getLastSuccessfulMaterializationAt({
         tableName,

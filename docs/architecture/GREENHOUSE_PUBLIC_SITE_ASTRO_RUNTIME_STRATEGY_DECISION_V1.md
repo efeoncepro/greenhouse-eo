@@ -63,6 +63,14 @@ El reader compone binding estático, route ownership, GitHub HEAD y Vercel deplo
 
 Esto **no** cambia el cutover: WordPress/Kinsta sigue siendo el runtime live y Astro/Vercel sigue siendo el rail objetivo hasta completar route parity, SEO/canonical/redirect gates y aprobación humana.
 
+## Delta 2026-06-17 — TASK-1167 agrega el control-plane GitHub del rail Astro
+
+Greenhouse agrega la pieza repo/CI del rail objetivo Astro: contratos `public-site-github-control-plane.v1` y `public-site-github-command-adapter.v1`, implementados bajo `src/lib/public-site/astro/github-control-plane/` y expuestos por `GET /api/admin/public-site/github-control-plane` y `POST /api/admin/public-site/github-commands`.
+
+El repo queda fijado server-side como `efeoncepro/efeonce-web`. El reader observa GitHub Actions `CI`, ramas `main`/`develop`, runs recientes, PRs/issues/releases y correlacion de commit con el binding reader de TASK-1161. Los commands V1 quedan allowlisted y default OFF: rerun de CI fallido y dispatch de `CI` sobre refs permitidos, con `Idempotency-Key`, `executeApiPlatformCommand()` y frase humana para dispatch.
+
+Estado real verificado: el `CI` de `efeonce-web` en `main` esta rojo; la nueva signal `public_site.astro_ci_failed` reporta `error` hasta que se arregle en el repo publico. Staging quedo verificado en `greenhouse-8arcw12v5` con reader HTTP 200 `confidence=high`, command OFF HTTP 409 y reliability severity `error`. Esto no autoriza deploy, rollback, DNS ni cutover.
+
 ## Context
 
 Efeonce needs to update service landing pages, business cases and acquisition assets much faster than WordPress + Ohio + Elementor currently allows. The operator explicitly wants those assets controlled from Greenhouse and generated with the speed of VIBE Coding, using the existing Ohio/Figma design assets as a basis for tokenized production.
@@ -228,6 +236,7 @@ Before any apex or path cutover:
 Future implementation tasks must define signals for:
 
 - `public_site.astro_deploy_failed`
+- `public_site.astro_ci_failed`
 - `public_site.astro_preview_unverified`
 - `public_site.route_canonical_mismatch`
 - `public_site.sitemap_drift`

@@ -196,7 +196,7 @@ const EntitySummaryDock = ({
                 aria-hidden='true'
                 sx={{ fontSize: 20, color: 'text.secondary' }}
               />
-              <Typography variant='body2' color='text.secondary' sx={{ fontWeight: 500 }}>
+              <Typography variant='body2' color='text.secondary' sx={{ fontWeight: 600 }}>
                 {emptyStateMessage}
               </Typography>
             </Stack>
@@ -215,8 +215,8 @@ const EntitySummaryDock = ({
           >
             {secondaryCta ? (
               <Button
-                variant='tonal'
-                color='secondary'
+                variant='outlined'
+                color='inherit'
                 size='medium'
                 onClick={secondaryCta.onClick}
                 disabled={Boolean(secondaryCta.disabled || secondaryCta.loading)}
@@ -227,7 +227,15 @@ const EntitySummaryDock = ({
                     <i className={secondaryCta.iconClassName} aria-hidden='true' />
                   ) : undefined
                 }
-                sx={{ minHeight: 44 }}
+                sx={theme => ({
+                  minHeight: 44,
+                  borderColor: theme.palette.divider,
+                  color: theme.palette.text.secondary,
+                  '&:hover': {
+                    borderColor: theme.palette.text.primary,
+                    backgroundColor: theme.palette.action.hover
+                  }
+                })}
               >
                 {secondaryCta.label}
               </Button>
@@ -248,7 +256,15 @@ const EntitySummaryDock = ({
                       <i className={primaryCta.iconClassName} aria-hidden='true' />
                     ) : undefined
                   }
-                  sx={{ minHeight: 44, fontWeight: 600 }}
+                  sx={theme => ({
+                    minHeight: 44,
+                    fontWeight: 600,
+                    '&.Mui-disabled': {
+                      backgroundColor: theme.palette.action.disabledBackground,
+                      color: theme.palette.text.disabled,
+                      boxShadow: 'none'
+                    }
+                  })}
                 >
                   {primaryCta.label}
                 </Button>

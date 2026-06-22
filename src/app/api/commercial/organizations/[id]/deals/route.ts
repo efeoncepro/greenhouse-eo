@@ -17,13 +17,13 @@ import {
   OrganizationHasNoCompanyError
 } from '@/lib/commercial/party'
 import { hasEntitlement } from '@/lib/entitlements/runtime'
-import { resolveFinanceQuoteTenantOrganizationIds } from '@/lib/finance/quotation-canonical-store'
+import { canAccessFinanceQuoteOrganization } from '@/lib/finance/quotation-canonical-store'
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 
 export const dynamic = 'force-dynamic'
 
 export async function GET(
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { tenant, errorResponse } = await requireFinanceTenantContext()
@@ -39,37 +39,50 @@ export async function GET(
     return NextResponse.json({ error: 'organization id is required' }, { status: 400 })
   }
 
-  const visibleOrgIds = await resolveFinanceQuoteTenantOrganizationIds(tenant)
+  const canAccessOrganization = await canAccessFinanceQuoteOrganization(tenant, normalizedOrganizationId)
 
-  if (!visibleOrgIds.includes(normalizedOrganizationId)) {
+  if (!canAccessOrganization) {
     return NextResponse.json({ error: 'Organization not visible to this tenant.' }, { status: 403 })
   }
 
+  const url = new URL(request.url)
+  const refreshMode = url.searchParams.get('refresh') === '1' || url.searchParams.get('sync') === '1'
+
   let items = await listCommercialDealsForOrganization(normalizedOrganizationId)
+  let refreshedFromHubSpot = false
 
-  const organization = await getOrganizationDetail(normalizedOrganizationId)
+  if (refreshMode) {
+    const organization = await getOrganizationDetail(normalizedOrganizationId)
 
-  if (organization?.hubspotCompanyId) {
-    try {
-      await syncOrganizationHubSpotDeals({ organizationId: normalizedOrganizationId })
-      items = await listCommercialDealsForOrganization(normalizedOrganizationId)
-    } catch (error) {
-      console.warn('[commercial organization deals] hubspot read-through sync failed', {
-        organizationId: normalizedOrganizationId,
-        error: error instanceof Error ? error.message : String(error)
-      })
+    if (organization?.hubspotCompanyId) {
+      try {
+        await syncOrganizationHubSpotDeals({ organizationId: normalizedOrganizationId })
+        items = await listCommercialDealsForOrganization(normalizedOrganizationId)
+        refreshedFromHubSpot = true
+      } catch (error) {
+        console.warn('[commercial organization deals] hubspot refresh failed', {
+          organizationId: normalizedOrganizationId,
+          error: error instanceof Error ? error.message : String(error)
+        })
+      }
     }
   }
 
-  return NextResponse.json({ items, total: items.length })
+  return NextResponse.json({
+    items,
+    total: items.length,
+    refresh: {
+      mode: refreshMode ? 'hubspot' : 'cached',
+      refreshedFromHubSpot
+    }
+  })
 }
 
 // TASK-539: inline deal creation from the Quote Builder.
 // POST /api/commercial/organizations/:id/deals
 //
 // Auth: `requireFinanceTenantContext` + capability `commercial.deal.create`.
-// Tenant isolation: organization must be in the caller's visible set
-// (`resolveFinanceQuoteTenantOrganizationIds`).
+// Tenant isolation: organization must be visible to the caller.
 // Rate limit + idempotency are enforced by the command itself via
 // `greenhouse_commercial.deal_create_attempts`.
 export async function POST(
@@ -101,9 +114,9 @@ export async function POST(
   }
 
   // Tenant isolation.
-  const visibleOrgIds = await resolveFinanceQuoteTenantOrganizationIds(tenant)
+  const canAccessOrganization = await canAccessFinanceQuoteOrganization(tenant, normalizedOrganizationId)
 
-  if (!visibleOrgIds.includes(normalizedOrganizationId)) {
+  if (!canAccessOrganization) {
     return NextResponse.json({ error: 'Organization not visible to this tenant.' }, { status: 403 })
   }
 

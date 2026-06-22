@@ -126,6 +126,13 @@ Reglas duras:
   - `Posicion de caja`
   lean el mismo instrumento canonico
 
+### Freshness del snapshot
+
+- `Banco` lee saldos desde snapshots materializados; no recalcula saldos inline en la vista.
+- La senal de freshness considera cobertura primero: si `latestBalanceDate` cubre la fecha esperada del periodo, el snapshot se trata como vigente aunque `computed_at` tenga varias horas.
+- El umbral horario de `computed_at` queda como fallback cuando no existe fecha de cobertura suficiente.
+- Si falta la cobertura esperada, la vista debe advertir snapshot stale en vez de ocultar el riesgo operativo.
+
 ### Transferencias internas
 
 - `Banco` agrega la accion **Transferencia interna**

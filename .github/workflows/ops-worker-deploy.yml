@@ -21,11 +21,18 @@ on:
       - develop
     paths:
       - 'services/ops-worker/**'
+      - 'services/_shared/**'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'tsconfig.json'
       - 'src/lib/sync/**'
+      - 'src/lib/knowledge/**'
       - 'src/lib/payroll/**'
       - 'src/lib/finance/payroll-expense-reactive.ts'
       - 'src/lib/finance/apply-payroll-reliquidation-delta.ts'
       - 'src/lib/email/**'
+      - 'src/lib/integrations/**'
+      - 'src/lib/space-notion/**'
       # TASK-742 — ops-worker hosts the auth-providers smoke lane and consumes
       # the readiness/secrets stack, so changes here must trigger a redeploy.
       - 'src/lib/auth/**'
@@ -118,8 +125,10 @@ jobs:
         }}
       # TASK-851 — pass EXPECTED_SHA to deploy.sh. Orchestrator (workflow_call)
       # passes its target_sha; workflow_dispatch optionally accepts override;
-      # push events fall back to github.sha automatically (deploy.sh handles).
-      EXPECTED_SHA: >-
+      # push events fall back to github.sha. A later step resolves manual dispatch
+      # without override to the last commit touching the worker runtime surface,
+      # so docs-only HEAD commits do not force noisy rebuilds.
+      RAW_EXPECTED_SHA: >-
         ${{
           github.event_name == 'workflow_call'
             && inputs.expected_sha
@@ -141,6 +150,55 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Resolve expected worker SHA
+        id: resolve-worker-sha
+        shell: bash
+        env:
+          RAW_EXPECTED_SHA: ${{ env.RAW_EXPECTED_SHA }}
+        run: |
+          set -euo pipefail
+
+          if [ -n "${RAW_EXPECTED_SHA}" ]; then
+            RESOLVED_SHA="${RAW_EXPECTED_SHA}"
+            RESOLUTION_SOURCE="explicit-input"
+          elif [ "${GITHUB_EVENT_NAME}" = "workflow_dispatch" ]; then
+            RESOLVED_SHA="$(git log -1 --format=%H -- \
+              package.json \
+              pnpm-lock.yaml \
+              tsconfig.json \
+              services/ops-worker \
+              services/_shared \
+              src/lib/sync \
+              src/lib/knowledge \
+              src/lib/payroll \
+              src/lib/finance/payroll-expense-reactive.ts \
+              src/lib/finance/apply-payroll-reliquidation-delta.ts \
+              src/lib/email \
+              src/lib/integrations \
+              src/lib/space-notion \
+              src/lib/auth \
+              src/lib/auth-secrets.ts \
+              src/lib/secrets \
+              src/lib/reliability \
+              src/lib/notion-metrics)"
+            RESOLUTION_SOURCE="latest-worker-runtime-path"
+          else
+            RESOLVED_SHA="${GITHUB_SHA}"
+            RESOLUTION_SOURCE="event-sha"
+          fi
+
+          if [ -z "${RESOLVED_SHA}" ]; then
+            echo "ERROR: could not resolve expected ops-worker SHA."
+            exit 1
+          fi
+
+          echo "EXPECTED_SHA=${RESOLVED_SHA}" >> "${GITHUB_ENV}"
+          echo "expected_sha=${RESOLVED_SHA}" >> "${GITHUB_OUTPUT}"
+          echo "resolution_source=${RESOLUTION_SOURCE}" >> "${GITHUB_OUTPUT}"
+          echo "Resolved ops-worker expected SHA: ${RESOLVED_SHA} (${RESOLUTION_SOURCE})"
 
       - name: Authenticate to Google Cloud
         id: auth
@@ -159,12 +217,69 @@ jobs:
           gcloud config list --format='value(core.project,core.account)'
           gcloud auth list
 
+      - name: Check deployed revision drift
+        id: worker-drift
+        shell: bash
+        run: |
+          set -euo pipefail
+          WORKER_RUNTIME_PATHS=(
+            package.json
+            pnpm-lock.yaml
+            tsconfig.json
+            services/ops-worker
+            services/_shared
+            src/lib/sync
+            src/lib/knowledge
+            src/lib/payroll
+            src/lib/finance/payroll-expense-reactive.ts
+            src/lib/finance/apply-payroll-reliquidation-delta.ts
+            src/lib/email
+            src/lib/integrations
+            src/lib/space-notion
+            src/lib/auth
+            src/lib/auth-secrets.ts
+            src/lib/secrets
+            src/lib/reliability
+            src/lib/notion-metrics
+          )
+
+          CURRENT_REVISION="$(gcloud run services describe ops-worker \
+            --project="${GCP_PROJECT_ID}" \
+            --region="${GCP_REGION}" \
+            --format='value(status.latestReadyRevisionName)' 2>/dev/null || true)"
+
+          CURRENT_GIT_SHA=""
+          if [ -n "${CURRENT_REVISION}" ]; then
+            CURRENT_GIT_SHA="$(gcloud run revisions describe "${CURRENT_REVISION}" \
+              --project="${GCP_PROJECT_ID}" \
+              --region="${GCP_REGION}" \
+              --format=json | python3 -c 'import json, sys; data = json.load(sys.stdin); print(next((env.get("value", "") for c in (data.get("spec", {}).get("containers", []) or []) for env in (c.get("env") or []) if env.get("name") == "GIT_SHA"), ""))' 2>/dev/null || true)"
+          fi
+
+          if [ "${CURRENT_GIT_SHA}" = "${EXPECTED_SHA}" ]; then
+            DEPLOY_NEEDED="false"
+            echo "ops-worker already serves EXPECTED_SHA=${EXPECTED_SHA} at revision ${CURRENT_REVISION}; skipping build/deploy."
+          elif [ -n "${CURRENT_GIT_SHA}" ] \
+            && git cat-file -e "${CURRENT_GIT_SHA}^{commit}" 2>/dev/null \
+            && git diff --quiet "${EXPECTED_SHA}..${CURRENT_GIT_SHA}" -- "${WORKER_RUNTIME_PATHS[@]}"; then
+            DEPLOY_NEEDED="false"
+            echo "ops-worker serves ${CURRENT_GIT_SHA}; worker runtime paths are unchanged since EXPECTED_SHA=${EXPECTED_SHA}; skipping build/deploy."
+          else
+            DEPLOY_NEEDED="true"
+            echo "ops-worker deploy required: current_revision=${CURRENT_REVISION:-none}, current_git_sha=${CURRENT_GIT_SHA:-none}, expected_sha=${EXPECTED_SHA}"
+          fi
+
+          echo "deploy_needed=${DEPLOY_NEEDED}" >> "${GITHUB_OUTPUT}"
+          echo "current_revision=${CURRENT_REVISION}" >> "${GITHUB_OUTPUT}"
+          echo "current_git_sha=${CURRENT_GIT_SHA}" >> "${GITHUB_OUTPUT}"
+
       - name: Deploy ops-worker
+        if: steps.worker-drift.outputs.deploy_needed == 'true'
         run: |
           bash services/ops-worker/deploy.sh
         env:
           ENV: ${{ env.ENV }}
-          EXPECTED_SHA: ${{ env.EXPECTED_SHA }}
+          EXPECTED_SHA: ${{ steps.resolve-worker-sha.outputs.expected_sha }}
 
       - name: Verify deployment health
         run: |
@@ -211,6 +326,8 @@ jobs:
 
       - name: Record deployment commit
         run: |
-          echo "Deployed commit: ${{ env.EXPECTED_SHA }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "Deployed commit: ${{ steps.resolve-worker-sha.outputs.expected_sha }}" >> "$GITHUB_STEP_SUMMARY"
           echo "Environment: ${{ env.ENV }}" >> "$GITHUB_STEP_SUMMARY"
           echo "Triggered by: ${{ github.event_name }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "SHA resolution: ${{ steps.resolve-worker-sha.outputs.resolution_source }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "Deploy needed: ${{ steps.worker-drift.outputs.deploy_needed }}" >> "$GITHUB_STEP_SUMMARY"

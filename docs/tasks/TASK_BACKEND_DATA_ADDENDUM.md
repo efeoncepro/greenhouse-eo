@@ -74,6 +74,23 @@ No usarlo para docs puros, copy-only UI, cambios visuales sin API/data, refactor
 - [ ] Runtime or DB evidence is listed for any change beyond docs/tooling.
 - [ ] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks.
 
+## Capability Definition of Done — Full API Parity gate
+
+Aplica cuando la task **introduce o modifica una capability** (cualquier acción de negocio que afecte estado, permisos, datos, aprobaciones, exports, recoveries, reportes o configuración). Si la task no toca una capability (refactor local, doc, copy), marcá `N/A — no capability` con razón.
+
+**Base:** Full API Parity (contrato gobernado a nivel capability). **Consecuencia:** Nexa y los 10 consumers la operan por construcción. Fuente: `docs/architecture/GREENHOUSE_FULL_API_PARITY_DECISION_V1.md` (§North Star + §Canonical consumers), CLAUDE.md §"Full API Parity Principle".
+
+- [ ] **Lógica en el primitive, no en la UI.** La regla de negocio vive en `src/lib/**` (command/reader/projection), no dentro de un componente UI.
+- [ ] **Modelada como aggregate/recurso/command, no como click-handler** acoplado a la pantalla.
+- [ ] **Read** expuesto como reader/recurso canónico; **write** como command con: command semantics, **authorization fina** (capability/entitlement, NO admin-coarse), idempotencia si es reintentable, audit/outbox cuando aplique, errores canónicos sanitizados, observabilidad.
+- [ ] **Capability + grant en el MISMO PR** (si gatea): registry + grant a ≥1 rol real + coverage test (TASK-873/935).
+- [ ] **Camino programático declarado:** Product API / `api/platform/app` / `api/platform/ecosystem` (MCP) / CLI / o task follow-up explícita. `UI-only por ahora` solo con deuda documentada (owner + condición de retiro).
+- [ ] **Write apto para `propose → confirm → execute`** (runtime de acción gobernada). NO construir integración Nexa-específica.
+- [ ] **Un primitive, muchos consumers:** cero lógica duplicada por consumer (UI/Nexa/MCP/app/ecosystem/webhook/Teams/async/CLI/E2E).
+- [ ] **Parity check = SÍ:** "¿esta capability tiene contrato gobernado a nivel capability?" Si sí → todos los consumers (incl. Nexa) la operan por construcción. Si no → la feature NO está completa.
+
+> Para capabilities **existentes** que la task toca: aplica el mismo gate con regla *touch-it/fix-it* (estrangulamiento). No retrofitear backlog cold; sí subir a parity lo que se modifica, o registrar la brecha como deuda visible.
+
 ## Rigor Levels
 
 | Rigor | Cuándo basta | Evidencia mínima |

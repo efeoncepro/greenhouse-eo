@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
+import { can } from '@/lib/entitlements/runtime'
 import { markPaymentOrderPaid } from '@/lib/finance/payment-orders/mark-paid'
 import {
   PaymentOrderConflictError,
@@ -19,6 +20,11 @@ export async function POST(
   const { tenant, errorResponse } = await requireFinanceTenantContext()
 
   if (!tenant) return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+  // TASK-1192 — gate fino de acción (capability != route-group).
+  if (!can(tenant, 'finance.payment_orders.mark_paid', 'update', 'tenant')) {
+    return NextResponse.json({ error: 'No tienes permiso para marcar órdenes de pago como pagadas.', code: 'forbidden' }, { status: 403 })
+  }
 
   const { orderId } = await params
 

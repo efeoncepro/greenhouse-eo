@@ -130,6 +130,44 @@ Key rules:
 - sync route now requires explicit payload
 - this is not the recommended external connector surface
 
+### 3. Design Handoff Control Plane API
+
+Purpose:
+- internal product-design -> DEV handoff workflow for allowlisted Figma product nodes
+- Full API Parity surface behind `/design-system/handoff`; UI, agents and future Nexa actions must consume the same commands/readers
+
+Auth:
+- authenticated internal tenant session
+- capability-gated by `design_system.handoff.*`
+
+Routes:
+- `GET /api/design-system/handoff`
+- `POST /api/design-system/handoff`
+- `GET /api/design-system/handoff/preview`
+- `POST /api/design-system/handoff/allowlist`
+- `POST /api/design-system/handoff/allowlist/[fileKey]/deprecate`
+- `PATCH /api/design-system/handoff/[entryId]/owners`
+- `PATCH /api/design-system/handoff/[entryId]/planning`
+- `POST /api/design-system/handoff/[entryId]/links`
+- `POST /api/design-system/handoff/[entryId]/evidence`
+- `POST /api/design-system/handoff/[entryId]/verify-node`
+- `PATCH /api/design-system/handoff/[entryId]/primitive-decision`
+- `PATCH /api/design-system/handoff/[entryId]/transition`
+- `GET /api/design-system/handoff/drift`
+
+Key rules:
+- `POST /api/design-system/handoff` validates URL, blocks AXIS, checks product allowlist and creates the first Figma node snapshot in the same command.
+- `POST /api/design-system/handoff/[entryId]/verify-node` is a re-verification command for existing entries.
+- `PATCH /api/design-system/handoff/[entryId]/primitive-decision` stores the Design System implementation strategy and primitive/lab/runtime/GVC contract.
+- `PATCH /api/design-system/handoff/[entryId]/transition` blocks `implemented` unless primitive governance is resolved.
+- Figma token stays server-only; failed render becomes an `unavailable` snapshot, not raw provider leakage.
+- `implemented` requires internal route + governed evidence unless a manual exception is auditably attached.
+
+Read next:
+- `docs/documentation/plataforma/design-handoff-control-plane.md`
+- `docs/architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md`
+- `docs/architecture/GREENHOUSE_EVENT_CATALOG_V1.md`
+
 ## Recommended Read Order For Another Codex
 
 1. `docs/api/GREENHOUSE_API_REFERENCE_V1.md`
@@ -191,6 +229,8 @@ Internal endpoints for ICO metrics. Auth: `requireAgencyTenantContext()` or `req
 | GET | `/api/ico-engine/health` | Materialization freshness | — |
 | GET | `/api/people/[memberId]/ico` | Person-level ICO metrics (convenience) | `year`, `month` |
 | GET | `/api/organizations/[id]/ico` | Organization ICO metrics (all active spaces) | `year`, `month` |
+| POST | `/api/delivery/ico/enable-sync` | Enable Notion→ICO sync for a client already connected to Notion (data-driven inclusion, idempotent). Capability `delivery.ico.sync.enable` (EFEONCE_ADMIN, EFEONCE_OPERATIONS, EFEONCE_ACCOUNT). Body `{ clientId? , spaceId? , reason? }` (clientId or spaceId). Errors es-CL: `ico_sync_client_not_found`, `ico_sync_source_not_connected`, `forbidden` | body: `clientId` \| `spaceId`, `reason` |
+| GET | `/api/delivery/ico/sync-status` | Preflight of real ICO state ("configured ≠ flowing"). Capability `delivery.ico.sync.read` (internal route_group ∪ EFEONCE_ADMIN). Returns `stage` (`not_connected` → `connected_not_enabled` → `enabled_not_calculating` → `calculating`), `connected`, `enabled`, `calculating` (null = BigQuery unreachable), `lastSyncedAt`, `currentPeriod`, `currentTotalTasks`, `currentOtdPct`, `lastCalculatedPeriodKey` | `clientId` \| `spaceId` |
 
 **Context endpoint** (`/api/ico-engine/context`) is the preferred generic entry point for new consumers. It validates dimension against `ICO_DIMENSIONS` allowlist, tries materialized cache first, and falls back to live compute.
 

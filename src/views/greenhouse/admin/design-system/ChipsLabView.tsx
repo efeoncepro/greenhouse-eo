@@ -24,8 +24,9 @@ const FIGMA_AVATAR_SRC = '/images/greenhouse/design-system/axis-avatar-greenhous
 
 type PreviewMode = 'light' | 'dark'
 type PreviewTone = 'default' | 'primary' | 'secondary' | 'error' | 'warning' | 'info' | 'success'
+type BaseChipVariant = Exclude<GreenhouseChipVariant, 'spotlight' | 'signal'>
 
-const variants: { label: string; value: GreenhouseChipVariant }[] = [
+const variants: { label: string; value: BaseChipVariant }[] = [
   { label: 'Solid', value: 'solid' },
   { label: 'Label', value: 'label' },
   { label: 'Outline', value: 'outlined' }
@@ -240,7 +241,7 @@ const HeaderRow = ({ mode }: { mode: PreviewMode }) => (
   <Box
     sx={{
       display: 'grid',
-      gridTemplateColumns: '86px repeat(3, 72px)',
+      gridTemplateColumns: `86px repeat(${variants.length}, 72px)`,
       gap: 2,
       minInlineSize: 350,
       alignItems: 'center'
@@ -273,7 +274,7 @@ const MatrixRow = ({
   <Box
     sx={{
       display: 'grid',
-      gridTemplateColumns: '86px repeat(3, 72px)',
+      gridTemplateColumns: `86px repeat(${variants.length}, 72px)`,
       gap: 2,
       minInlineSize: 350,
       alignItems: 'center'
@@ -406,6 +407,68 @@ const FeedbackAtomsCard = () => (
   </Card>
 )
 
+const AnimatedCapabilityCard = () => (
+  <Card variant='outlined' data-capture='chips-animated-capability'>
+    <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+        <Typography variant='h5'>Animated badge capability — shimmer · signal dot</Typography>
+        <Typography variant='body2' color='text.secondary'>
+          Port gobernado del prompt badge: mismo acabado de shimmer y pulso, pero sobre <code>GreenhouseChip</code>, tokens MUI
+          y reduced motion. Usar <code>spotlight</code> para lanzamientos o estados destacados y <code>signal</code> para
+          monitoreo vivo.
+        </Typography>
+      </Box>
+
+      <Box
+        sx={theme => ({
+          display: 'grid',
+          placeItems: 'center',
+          minBlockSize: 164,
+          border: `1px solid ${theme.palette.divider}`,
+          borderRadius: `${theme.shape.customBorderRadius.md}px`,
+          bgcolor: 'background.default',
+          px: { xs: 3, sm: 5 },
+          py: 4,
+          overflow: 'hidden'
+        })}
+      >
+        <Typography
+          variant='h6'
+          component='div'
+          sx={{
+            maxInlineSize: 760,
+            textAlign: 'center',
+            lineHeight: 1.8,
+            color: 'text.primary'
+          }}
+        >
+          Mark the beat with a{' '}
+          <GreenhouseChip variant='spotlight' tone='success' size='small' kind='status' label='Fresh Launch' /> tag for
+          releases,{' '}
+          <GreenhouseChip variant='spotlight' tone='warning' size='small' kind='status' label='Private Beta' /> while
+          tuning,{' '}
+          <GreenhouseChip variant='spotlight' tone='error' size='small' kind='status' label='Now Shipping' /> once it is
+          out the door, and a quieter{' '}
+          <GreenhouseChip variant='signal' tone='info' size='small' kind='status' label='Status Monitoring' /> pulse when
+          the release needs a status check.
+        </Typography>
+      </Box>
+
+      <ShowcaseRow label='Spotlight'>
+        <GreenhouseChip variant='spotlight' tone='primary' size='small' kind='status' label='Launching' />
+        <GreenhouseChip variant='spotlight' tone='success' size='small' kind='status' label='Ready' />
+        <GreenhouseChip variant='spotlight' tone='warning' size='small' kind='status' label='Beta' />
+      </ShowcaseRow>
+
+      <ShowcaseRow label='Signal'>
+        <GreenhouseChip variant='signal' tone='success' size='small' kind='status' label='Healthy' />
+        <GreenhouseChip variant='signal' tone='info' size='small' kind='status' label='Monitoring' />
+        <GreenhouseChip variant='signal' tone='warning' size='small' kind='status' label='Degraded' />
+      </ShowcaseRow>
+    </CardContent>
+  </Card>
+)
+
 const ChipsLabView = () => (
   <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, maxWidth: 1360, mx: 'auto' }}>
     <Box
@@ -422,6 +485,7 @@ const ChipsLabView = () => (
     </Box>
 
     <FeedbackAtomsCard />
+    <AnimatedCapabilityCard />
   </Box>
 )
 

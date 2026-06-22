@@ -12,7 +12,7 @@ La clase recurrió el 2026-05-13 con tres cuentas afectadas (`santander-corp-clp
 - `resolveCleanSeedDate({ client, accountId, candidateSeedDate, maxExpandDays=30 })` (`src/lib/finance/account-balances-clean-seed-resolver.ts`) — walks backward hasta encontrar día movement-free o devuelve `ok=false, reason='exceeded_max_expand'` para escalar honestamente a `historical_restatement`.
 - `FxDriftRemediationPolicy` agrega 5to value `rolling_window_repair` (`src/lib/finance/account-balances-fx-drift-remediation.ts`) — narrow-scope counterpart del `known_bug_class_restatement`, usa `seedMode='explicit'` + `block_on_reconciled_drift` evidence guard.
 
-Spec canónica: `docs/tasks/in-progress/TASK-871-account-balance-rolling-anchor-contract.md`. Delta arquitectónico: `docs/architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md` Delta 2026-05-13.
+Spec canónica: `docs/tasks/complete/TASK-871-account-balance-rolling-anchor-contract.md`. Delta arquitectónico: `docs/architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md` Delta 2026-05-13.
 
 `computeRematerializeSeedDate` permanece como wrapper back-compat que devuelve `window.seedDate` — los 7 tests originales de ISSUE-069 siguen verdes.
 

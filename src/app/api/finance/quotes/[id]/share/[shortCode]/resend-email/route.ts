@@ -9,6 +9,7 @@ import { resolveQuoteShortLink } from '@/lib/finance/quote-share/short-link'
 import { buildShortQuoteUrl } from '@/lib/finance/quote-share/url-builder'
 import { IdempotencyKeyError, withIdempotency } from '@/lib/idempotency/idempotency-key'
 import { requireCommercialTenantContext } from '@/lib/tenant/authorization'
+import { can } from '@/lib/entitlements/runtime'
 
 export const dynamic = 'force-dynamic'
 
@@ -88,6 +89,11 @@ export async function POST(
 
   if (!tenant) {
     return authError || errorResponse({ code: 'unauthorized', message: 'Unauthorized' })
+  }
+
+  // TASK-1202 — gate fino de accion (capability != route-group).
+  if (!can(tenant, 'commercial.quotation', 'export', 'tenant')) {
+    return NextResponse.json({ error: 'No tienes permiso para reenviar por email una cotizacion.', code: 'forbidden' }, { status: 403 })
   }
 
   const { id, shortCode } = await params

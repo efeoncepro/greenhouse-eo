@@ -8,7 +8,7 @@ import {
 } from '@/lib/notion-metrics/attributable-lateness-types'
 import { classifyOtdBucket } from '@/lib/notion-metrics/classify-otd-bucket'
 import type { RescheduleReasonCode } from '@/lib/delivery/reschedule-reason-inference'
-import { normalizeTaskStatus } from '@/lib/delivery/task-status-canonical'
+import { normalizeTaskStatus, TASK_STATUS_CANONICAL } from '@/lib/delivery/task-status-canonical'
 import { isAttributableLatenessOtdEnabled } from '@/lib/notion-metrics/status-transitions-flags'
 import { captureWithDomain } from '@/lib/observability/capture'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
@@ -39,6 +39,21 @@ import type { ProjectionDefinition } from '../projection-registry'
  */
 
 const FREEZE_STATUS_SET: ReadonlySet<string> = new Set(ATTRIBUTABLE_FREEZE_STATUSES)
+
+const TERMINAL_STATUS_SET: ReadonlySet<string> = new Set([
+  TASK_STATUS_CANONICAL.APROBADO,
+  TASK_STATUS_CANONICAL.ARCHIVADO
+])
+
+const isTerminalStatus = (status: string | null): boolean => {
+  if (!status) {
+    return false
+  }
+
+  const canonical = normalizeTaskStatus(status)
+
+  return canonical !== null && TERMINAL_STATUS_SET.has(canonical)
+}
 
 interface StatusTransitionedPayload {
   schemaVersion?: number
@@ -107,6 +122,197 @@ export const reconstructFreezeIntervals = (
   return intervals
 }
 
+/**
+ * TASK-1174 / ISSUE-098 — Reconcilia el estado de la task contra el log de
+ * transiciones (fuente autoritativa) para evitar congelar un bucket abierto en
+ * una tarea ya terminal.
+ *
+ * Causa raíz: `greenhouse_delivery.tasks` (status + completed_at) se actualiza por
+ * un pipeline de row sync distinto al de `task_status_transitions` (que es el que
+ * dispara este compute). Al instante de la transición `→Aprobado`, el row puede
+ * seguir mostrando el estado pre-terminal y `completed_at = NULL`, mientras la
+ * última transición capturada ya es terminal. Como `Aprobado`/`Archivado` son
+ * terminales (no hay transición futura), el bucket abierto quedaba congelado.
+ *
+ * Regla canónica (simétrica a ambos lags): **terminal gana desde cualquiera de
+ * las dos fuentes**. Si el row es terminal → usar el row; si la última transición
+ * es terminal → usar esa; si ninguna → estado abierto vigente (última transición,
+ * o el row si no hay transiciones). Un reopen real (`Aprobado → En curso`) es a su
+ * vez una transición capturada → la última transición es abierta → no fuerza
+ * terminal. Cuando el estado efectivo es terminal pero el row aún no trae
+ * `completed_at`, el `transitioned_at` de la transición terminal ES el momento de
+ * completado (fallback honesto, no inventado).
+ */
+export const resolveEffectiveTaskState = (
+  rowStatus: string | null,
+  rowCompletedAt: Date | null,
+  transitions: readonly { toStatus: string; transitionedAt: string }[]
+): { taskStatus: string | null; completedAt: Date | null } => {
+  const latest = transitions.length > 0 ? transitions[transitions.length - 1] : null
+
+  let effectiveStatus: string | null
+
+  if (isTerminalStatus(rowStatus)) {
+    effectiveStatus = rowStatus
+  } else if (latest && isTerminalStatus(latest.toStatus)) {
+    effectiveStatus = latest.toStatus
+  } else {
+    effectiveStatus = latest?.toStatus ?? rowStatus
+  }
+
+  // completed_at de respaldo: la última transición a un estado terminal marca el
+  // momento de completado cuando el row aún no lo trajo.
+  let terminalTransitionAt: Date | null = null
+
+  if (!rowCompletedAt && isTerminalStatus(effectiveStatus)) {
+    for (let i = transitions.length - 1; i >= 0; i--) {
+      if (isTerminalStatus(transitions[i].toStatus)) {
+        terminalTransitionAt = parseDate(transitions[i].transitionedAt)
+        break
+      }
+    }
+  }
+
+  return {
+    taskStatus: effectiveStatus,
+    completedAt: rowCompletedAt ?? terminalTransitionAt
+  }
+}
+
+/**
+ * Core canónico del cómputo shadow de atraso imputable por-tarea: re-lee PG
+ * (task + transitions + reschedules), reconcilia el estado efectivo (TASK-1174)
+ * y UPSERT en `task_attributable_lateness_shadow`. SSOT reusado por el consumer
+ * reactivo (`refresh`) y por el barrido de recovery (TASK-1174 Slice 2).
+ *
+ * NO aplica el flag gate ni el demo check — eso es responsabilidad del caller
+ * (el consumer gatea por `ATTRIBUTABLE_LATENESS_OTD_ENABLED` + demo; el barrido
+ * sólo recompone filas ya existentes). Devuelve un string de resultado.
+ */
+export const computeAttributableLatenessForTask = async (
+  taskSourceId: string,
+  workspaceId: string
+): Promise<string> => {
+  // Re-leer la task + transitions + reschedules de PG (source of truth).
+  const taskRows = await runGreenhousePostgresQuery<TaskRow>(
+    `SELECT task_status,
+            due_date::text AS due_date,
+            original_due_date::text AS original_due_date,
+            completed_at::text AS completed_at,
+            performance_indicator_code
+     FROM greenhouse_delivery.tasks
+     WHERE notion_task_id = $1`,
+    [taskSourceId]
+  )
+
+  const task = taskRows[0]
+
+  if (!task) {
+    return `skip:task_not_found:${taskSourceId}`
+  }
+
+  const transitions = await runGreenhousePostgresQuery<{
+    to_status: string
+    transitioned_at: string
+  }>(
+    `SELECT to_status, transitioned_at::text AS transitioned_at
+     FROM greenhouse_delivery.task_status_transitions
+     WHERE task_source_id = $1
+     ORDER BY transitioned_at ASC, created_at ASC`,
+    [taskSourceId]
+  )
+
+  const rescheduleRows = await runGreenhousePostgresQuery<{
+    days_delta: number | null
+    reason_code: string
+    reason_source: string
+  }>(
+    `SELECT days_delta, reason_code, reason_source
+     FROM greenhouse_delivery.task_due_date_changes
+     WHERE task_source_id = $1`,
+    [taskSourceId]
+  )
+
+  const transitionInputs = transitions.map(t => ({
+    toStatus: t.to_status,
+    transitionedAt: t.transitioned_at
+  }))
+
+  const freezeIntervals = reconstructFreezeIntervals(transitionInputs)
+
+  const reschedules: RescheduleObservation[] = rescheduleRows.map(r => ({
+    daysDelta: r.days_delta,
+    reasonCode: r.reason_code as RescheduleReasonCode,
+    reasonSource: r.reason_source === 'operator_confirmed' ? 'operator_confirmed' : 'inferred'
+  }))
+
+  // TASK-1174 / ISSUE-098: reconciliar el estado contra el log de transiciones
+  // (autoritativo) — el row sync de `tasks` puede laggear la transición terminal
+  // que disparó este compute, congelando un bucket abierto en una tarea ya
+  // completada.
+  const { taskStatus: effectiveStatus, completedAt } = resolveEffectiveTaskState(
+    task.task_status,
+    parseDate(task.completed_at),
+    transitionInputs
+  )
+
+  const result = calculateAttributableLateness({
+    originalDueDate: parseDate(task.original_due_date),
+    currentDueDate: parseDate(task.due_date),
+    completedAt,
+    taskStatus: effectiveStatus,
+    freezeIntervals,
+    reschedules,
+    hasStatusHistory: transitions.length > 0
+  })
+
+  // bucket_no_freeze: mismo input con freeze OFF (baseline de paridad).
+  const noFreezeBucket = result.fairDeadline
+    ? classifyOtdBucket({
+        taskStatus: effectiveStatus,
+        dueDate: parseDate(result.fairDeadline),
+        completedAt,
+        frozenDays: 0,
+        applyMonthGate: false
+      }).bucket
+    : result.bucket
+
+  // UPSERT shadow (último cómputo gana).
+  await runGreenhousePostgresQuery(
+    `INSERT INTO greenhouse_delivery.task_attributable_lateness_shadow (
+       task_source_id, workspace_id, fair_deadline, attributable_days_late,
+       frozen_days_excluded, bucket_attributable, bucket_no_freeze, bucket_legacy,
+       data_status, formula_version, computed_at, created_at
+     )
+     VALUES ($1, $2, $3::date, $4, $5, $6, $7, $8, $9, $10, NOW(), NOW())
+     ON CONFLICT (task_source_id) DO UPDATE SET
+       workspace_id = EXCLUDED.workspace_id,
+       fair_deadline = EXCLUDED.fair_deadline,
+       attributable_days_late = EXCLUDED.attributable_days_late,
+       frozen_days_excluded = EXCLUDED.frozen_days_excluded,
+       bucket_attributable = EXCLUDED.bucket_attributable,
+       bucket_no_freeze = EXCLUDED.bucket_no_freeze,
+       bucket_legacy = EXCLUDED.bucket_legacy,
+       data_status = EXCLUDED.data_status,
+       formula_version = EXCLUDED.formula_version,
+       computed_at = NOW()`,
+    [
+      taskSourceId,
+      workspaceId,
+      result.fairDeadline,
+      result.attributableDaysLate,
+      result.frozenDaysExcluded,
+      result.bucket,
+      noFreezeBucket,
+      task.performance_indicator_code,
+      result.dataStatus,
+      result.formulaVersion
+    ]
+  )
+
+  return `task_attributable_lateness_shadow:${workspaceId}:${taskSourceId}:${result.dataStatus}`
+}
+
 export const notionAttributableLatenessComputeProjection: ProjectionDefinition = {
   name: 'notion_attributable_lateness_compute',
   description:
@@ -148,113 +354,8 @@ export const notionAttributableLatenessComputeProjection: ProjectionDefinition =
     }
 
     try {
-      // 2. Re-leer la task + transitions + reschedules de PG (source of truth).
-      const taskRows = await runGreenhousePostgresQuery<TaskRow>(
-        `SELECT task_status,
-                due_date::text AS due_date,
-                original_due_date::text AS original_due_date,
-                completed_at::text AS completed_at,
-                performance_indicator_code
-         FROM greenhouse_delivery.tasks
-         WHERE notion_task_id = $1`,
-        [taskSourceId]
-      )
-
-      const task = taskRows[0]
-
-      if (!task) {
-        return `skip:task_not_found:${taskSourceId}`
-      }
-
-      const transitions = await runGreenhousePostgresQuery<{
-        to_status: string
-        transitioned_at: string
-      }>(
-        `SELECT to_status, transitioned_at::text AS transitioned_at
-         FROM greenhouse_delivery.task_status_transitions
-         WHERE task_source_id = $1
-         ORDER BY transitioned_at ASC, created_at ASC`,
-        [taskSourceId]
-      )
-
-      const rescheduleRows = await runGreenhousePostgresQuery<{
-        days_delta: number | null
-        reason_code: string
-        reason_source: string
-      }>(
-        `SELECT days_delta, reason_code, reason_source
-         FROM greenhouse_delivery.task_due_date_changes
-         WHERE task_source_id = $1`,
-        [taskSourceId]
-      )
-
-      const freezeIntervals = reconstructFreezeIntervals(
-        transitions.map(t => ({ toStatus: t.to_status, transitionedAt: t.transitioned_at }))
-      )
-
-      const reschedules: RescheduleObservation[] = rescheduleRows.map(r => ({
-        daysDelta: r.days_delta,
-        reasonCode: r.reason_code as RescheduleReasonCode,
-        reasonSource: r.reason_source === 'operator_confirmed' ? 'operator_confirmed' : 'inferred'
-      }))
-
-      const completedAt = parseDate(task.completed_at)
-
-      const result = calculateAttributableLateness({
-        originalDueDate: parseDate(task.original_due_date),
-        currentDueDate: parseDate(task.due_date),
-        completedAt,
-        taskStatus: task.task_status,
-        freezeIntervals,
-        reschedules,
-        hasStatusHistory: transitions.length > 0
-      })
-
-      // 4. bucket_no_freeze: mismo input con freeze OFF (baseline de paridad).
-      const noFreezeBucket = result.fairDeadline
-        ? classifyOtdBucket({
-            taskStatus: task.task_status,
-            dueDate: parseDate(result.fairDeadline),
-            completedAt,
-            frozenDays: 0,
-            applyMonthGate: false
-          }).bucket
-        : result.bucket
-
-      // 5. UPSERT shadow (último cómputo gana).
-      await runGreenhousePostgresQuery(
-        `INSERT INTO greenhouse_delivery.task_attributable_lateness_shadow (
-           task_source_id, workspace_id, fair_deadline, attributable_days_late,
-           frozen_days_excluded, bucket_attributable, bucket_no_freeze, bucket_legacy,
-           data_status, formula_version, computed_at, created_at
-         )
-         VALUES ($1, $2, $3::date, $4, $5, $6, $7, $8, $9, $10, NOW(), NOW())
-         ON CONFLICT (task_source_id) DO UPDATE SET
-           workspace_id = EXCLUDED.workspace_id,
-           fair_deadline = EXCLUDED.fair_deadline,
-           attributable_days_late = EXCLUDED.attributable_days_late,
-           frozen_days_excluded = EXCLUDED.frozen_days_excluded,
-           bucket_attributable = EXCLUDED.bucket_attributable,
-           bucket_no_freeze = EXCLUDED.bucket_no_freeze,
-           bucket_legacy = EXCLUDED.bucket_legacy,
-           data_status = EXCLUDED.data_status,
-           formula_version = EXCLUDED.formula_version,
-           computed_at = NOW()`,
-        [
-          taskSourceId,
-          workspaceId,
-          result.fairDeadline,
-          result.attributableDaysLate,
-          result.frozenDaysExcluded,
-          result.bucket,
-          noFreezeBucket,
-          task.performance_indicator_code,
-          result.dataStatus,
-          result.formulaVersion
-        ]
-      )
-
-      return `task_attributable_lateness_shadow:${workspaceId}:${taskSourceId}:${result.dataStatus}`
+      // 2-5. Core canónico (read + reconciliar estado efectivo + compute + UPSERT).
+      return await computeAttributableLatenessForTask(taskSourceId, workspaceId)
     } catch (err) {
       captureWithDomain(err, 'delivery', {
         level: 'error',

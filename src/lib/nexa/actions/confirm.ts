@@ -16,7 +16,7 @@ import type { NexaActionContext, NexaActionExecutionResult } from './types'
  * command/idempotency foundation (TASK-655) with `principalKind='app_user'`. The LLM never reaches
  * this function; only the human-triggered confirm endpoint does.
  */
-export type NexaActionConfirmGapReason = 'unknown_action' | 'runtime_disabled' | 'not_permitted'
+export type NexaActionConfirmGapReason = 'unknown_action' | 'runtime_disabled' | 'not_permitted' | 'invalid_input'
 
 export type NexaActionConfirmOutcome =
   | { kind: 'executed'; result: NexaActionExecutionResult; replayed: boolean }
@@ -27,11 +27,14 @@ export const confirmNexaAction = async ({
   actionKey,
   context,
   idempotencyKey,
+  input,
   request
 }: {
   actionKey: string
   context: NexaActionContext
   idempotencyKey: string
+  /** Re-eco del input para acciones parametrizadas (TASK-1212). Re-validado AQUÍ contra el schema. */
+  input?: unknown
   request: Request
 }): Promise<NexaActionConfirmOutcome> => {
   const definition = getNexaActionDefinition(actionKey)
@@ -42,6 +45,19 @@ export const confirmNexaAction = async ({
   // may have flipped since it was shown). NEVER execute on a disabled/unpermitted action.
   if (!isNexaActionRuntimeEnabled() || !definition.isEnabled()) return { kind: 'gap', reason: 'runtime_disabled' }
   if (!definition.isPermitted(context)) return { kind: 'gap', reason: 'not_permitted' }
+
+  // Re-validar el input en el punto de mutación (no confiar en el eco del cliente). Para
+  // acciones parametrizadas, el command vinculado además re-enforza todos sus invariantes
+  // (capability, precio del engine), así que un eco manipulado no escala privilegio.
+  let actionInput: unknown
+
+  if (definition.inputSchema) {
+    const parsed = definition.inputSchema.safeParse(input)
+
+    if (!parsed.success) return { kind: 'gap', reason: 'invalid_input' }
+
+    actionInput = parsed.data
+  }
 
   try {
     const success = await executeApiPlatformCommand<NexaActionExecutionResult>({
@@ -57,12 +73,12 @@ export const confirmNexaAction = async ({
       },
       routeKey: `nexa.action.${actionKey}`,
       request,
-      body: { actionKey },
+      body: { actionKey, input: actionInput ?? null },
       // The proposal's server-generated key scopes idempotency: a double-confirm replays the stored
       // result instead of re-running the command.
       idempotencyKeyOverride: idempotencyKey,
       run: async () => {
-        const result = await definition.execute(context)
+        const result = await definition.execute(context, actionInput)
 
         return { data: result, status: 200 }
       }

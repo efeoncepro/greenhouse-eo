@@ -25,6 +25,11 @@ export const GH_NEXA = {
   insights_last_analysis: (label: string) => `Último análisis: ${label}`,
   insights_total_analyzed: (count: number) => `${count} ${count === 1 ? 'señal analizada' : 'señales analizadas'}`,
 
+  // TASK-1182 — CTA "Pregúntale a Nexa sobre este insight" (Bridge Slice 2): abre el chat enfocado.
+  insight_ask_nexa_cta: 'Pregúntale a Nexa',
+  insight_ask_nexa_aria: 'Pregúntale a Nexa sobre este insight',
+  insight_ask_nexa_seed: 'Explícame este insight y qué debería hacer.',
+
   // View mode toggle (Recientes vs Historial)
   insights_view_mode_aria: 'Modo de visualización',
   insights_view_mode_recent: 'Recientes',
@@ -510,5 +515,21 @@ export const GH_NEXA = {
     // composer
     composer_placeholder: 'Pregúntale a Nexa sobre tu operación…',
     composer_disclaimer: 'Nexa analiza tus datos en tiempo real. Verifica antes de una decisión crítica.'
+  },
+
+  // ── TASK-1079 — Modo de interacción (dock A / expandible B / lane C) ──
+  interactionMode: {
+    menu_title: 'Modo de Nexa',
+    menu_trigger_aria: 'Cambiar cómo ves a Nexa',
+    lane_aria: 'Nexa AI',
+    // Toggle del rail de historial dentro del lane.
+    history_toggle_aria: 'Mostrar u ocultar historial',
+    // Colapsar el lane (la burbuja sigue disponible para reabrirlo).
+    collapse_lane_aria: 'Contraer Nexa',
+    options: {
+      dock: { label: 'Compacto', description: 'Burbuja flotante para preguntas rápidas' },
+      expandible: { label: 'Panel', description: 'Panel ampliable con historial' },
+      lane: { label: 'Lateral', description: 'Columna fija junto a tu pantalla' }
+    } as Record<'dock' | 'expandible' | 'lane', { label: string; description: string }>
   }
 } as const

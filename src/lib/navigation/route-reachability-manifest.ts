@@ -20,13 +20,7 @@
  * Mockup routes (`**​/mockup/**`) are excluded.
  */
 
-export type ChildRouteVia =
-  | 'header-cta'
-  | 'row-action'
-  | 'inline-link'
-  | 'wizard-step'
-  | 'tab'
-  | 'redirect-alias' // legacy URL that only redirects to the canonical surface (kept for old bookmarks)
+export type ChildRouteVia = 'header-cta' | 'row-action' | 'inline-link' | 'wizard-step' | 'tab' | 'redirect-alias' // legacy URL that only redirects to the canonical surface (kept for old bookmarks)
 
 export interface ChildRouteDeclaration {
   /** The child route that is intentionally NOT a top-level menu item. */
@@ -160,6 +154,13 @@ export const DECLARED_CHILD_ROUTES: readonly ChildRouteDeclaration[] = [
       'Adaptive Card density Lab (TASK-1115) — child surface del Design System para el contrato de densidad de cards (full/condensed/peek por container query); capacidad hermana del Composition Shell; alcanzable desde el catalogo canonico /design-system.'
   },
   {
+    route: '/design-system/handoff',
+    parent: '/design-system',
+    via: 'inline-link',
+    reason:
+      'Design Handoff Registry (TASK-1120) — child surface del Design System para gobernar handoff Figma producto -> DEV sin mezclar nodos de producto en el master AXIS; alcanzable desde el catalogo canonico /design-system.'
+  },
+  {
     route: '/design-system/loaders',
     parent: '/design-system',
     via: 'inline-link',
@@ -186,6 +187,13 @@ export const DECLARED_CHILD_ROUTES: readonly ChildRouteDeclaration[] = [
     via: 'inline-link',
     reason:
       'Chips Lab — child surface del Design System para la primitive GreenhouseChip, alcanzable desde el catalogo canonico /design-system.'
+  },
+  {
+    route: '/design-system/gamification',
+    parent: '/design-system',
+    via: 'inline-link',
+    reason:
+      'Gamification Lab — child surface del Design System para GreenhouseLeaderboardPodium, ranking top 3 y avatars reales de equipo antes de cablearlo a datos productivos.'
   },
   {
     route: '/design-system/buttons',
@@ -221,6 +229,13 @@ export const DECLARED_CHILD_ROUTES: readonly ChildRouteDeclaration[] = [
     via: 'inline-link',
     reason:
       'Nexa Brand Mark Lab — child surface del Design System para la primitive GreenhouseNexaBrandMark y sus kinds de marca, alcanzable desde el catalogo canonico /design-system.'
+  },
+  {
+    route: '/design-system/brand-logos',
+    parent: '/design-system',
+    via: 'inline-link',
+    reason:
+      'Brand Logo Variations Lab — child surface del Design System para la primitive GreenhouseBrandLogoMark y sus kinds portados desde AXIS Figma, alcanzable desde el catalogo canonico /design-system.'
   },
   {
     route: '/design-system/efeonce-brand',

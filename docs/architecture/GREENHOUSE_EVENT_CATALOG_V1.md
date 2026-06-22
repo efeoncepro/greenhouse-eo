@@ -6,30 +6,30 @@ Catalogo canonico de eventos del sistema de outbox de Greenhouse. Cada evento se
 
 Aggregate type: `leave_request`. Audit-only (NO reactivo — no dispara projection).
 
-| Evento | Trigger | Notas |
-| --- | --- | --- |
+| Evento                                       | Trigger                                                                | Notas                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| -------------------------------------------- | ---------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `leave_request.approval_authority_recovered` | `runLeaveApprovalAuthorityRecovery()` (apply), 1 por snapshot reparado | Payload `schemaVersion:1` con `{ leaveRequestId, subjectMemberId, stageCode:'supervisor_review', before:{authoritySource, formal/effective approver, delegateResponsibilityId}, after:{...}, revokedResponsibilityIds[], actorUserId, reason }`. Registra el before/after de la corrección de autoridad cuando un snapshot quedó congelado con un `approval_delegate` genérico inválido. La revocación de la responsabilidad emite además `responsibility.revoked` (existente). |
 
 ## Delta 2026-05-31 — TASK-979: Monthly Contractor Payment Run (1 event v1)
 
 Aggregate type: `contractor_payable`. Extiende los 5 eventos de TASK-793 con la transición que faltaba al lifecycle del payable.
 
-| Evento | Trigger | Notas |
-| --- | --- | --- |
+| Evento                                               | Trigger                                           | Notas                                                                                                                                                                                                                                                                                                               |
+| ---------------------------------------------------- | ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `workforce.contractor_payable.payment_order_created` | `markPayablePaymentOrderCreated()` (writer ÚNICO) | la corrida mensual batchea la obligación en una payment order → payable `obligation_created → payment_order_created`. Payload base + `paymentOrderId`. La state machine exige este estado antes de `paid`; antes de TASK-979 nadie lo escribía. Migración extiende el CHECK `contractor_payable_events.event_type`. |
 
 ## Delta 2026-05-30 — TASK-793: Contractor Payables → Finance bridge (5 events v1)
 
 Aggregate type: `contractor_payable`. Obligación económica aprobada del contractor, PREVIA a Finance (Workforce/HR → Finance). Payload base `{schemaVersion:1, contractorPayableId, publicId, contractorEngagementId, beneficiaryType, beneficiaryId, netPayable, currency, status, ...}`.
 
-| Evento | Trigger | Notas |
-| --- | --- | --- |
-| `workforce.contractor_payable.created` | `createContractorPayableFromSubmission()` / `createContractorPayableOffCycle()` | nace en `pending_readiness`; payout = `labor_cost_external`, NUNCA payroll |
-| `workforce.contractor_payable.ready_for_finance` | `transitionPayableToReadyForFinance()` (readiness OK) | **REACTIVO** — dispara la projection `contractor_payable_finance_obligation` (bridge a Finance) |
-| `workforce.contractor_payable.obligation_created` | `markPayableObligationCreated()` (bridge) | una `payment_obligation` (`source_kind=contractor_payable`, `amount=net_payable`) creada idempotente |
-| `workforce.contractor_payable.paid` | `markPayablePaid()` (writer ÚNICO, TASK-981) | **REACTIVO** — el cascade `contractor-payable-paid-cascade` lo emite cuando la `finance.payment_order.paid` marca pagada la orden que lo paga (`payment_order_created → paid`). Payload base + `paymentOrderId` + `paidAt`. Dispara la projection `contractor-payable-paid-email` (envía el comprobante TASK-960 por email). Antes de TASK-981 nadie transicionaba el payable a `paid`; migración extiende el CHECK `contractor_payable_events.event_type`. |
-| `workforce.contractor_payable.blocked` | readiness fail-closed | payload incluye `blockerCodes[]` |
-| `workforce.contractor_payable.cancelled` | `cancelContractorPayable()` | terminal |
+| Evento                                            | Trigger                                                                         | Notas                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| ------------------------------------------------- | ------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `workforce.contractor_payable.created`            | `createContractorPayableFromSubmission()` / `createContractorPayableOffCycle()` | nace en `pending_readiness`; payout = `labor_cost_external`, NUNCA payroll                                                                                                                                                                                                                                                                                                                                                                                  |
+| `workforce.contractor_payable.ready_for_finance`  | `transitionPayableToReadyForFinance()` (readiness OK)                           | **REACTIVO** — dispara la projection `contractor_payable_finance_obligation` (bridge a Finance)                                                                                                                                                                                                                                                                                                                                                             |
+| `workforce.contractor_payable.obligation_created` | `markPayableObligationCreated()` (bridge)                                       | una `payment_obligation` (`source_kind=contractor_payable`, `amount=net_payable`) creada idempotente                                                                                                                                                                                                                                                                                                                                                        |
+| `workforce.contractor_payable.paid`               | `markPayablePaid()` (writer ÚNICO, TASK-981)                                    | **REACTIVO** — el cascade `contractor-payable-paid-cascade` lo emite cuando la `finance.payment_order.paid` marca pagada la orden que lo paga (`payment_order_created → paid`). Payload base + `paymentOrderId` + `paidAt`. Dispara la projection `contractor-payable-paid-email` (envía el comprobante TASK-960 por email). Antes de TASK-981 nadie transicionaba el payable a `paid`; migración extiende el CHECK `contractor_payable_events.event_type`. |
+| `workforce.contractor_payable.blocked`            | readiness fail-closed                                                           | payload incluye `blockerCodes[]`                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| `workforce.contractor_payable.cancelled`          | `cancelContractorPayable()`                                                     | terminal                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
 
 `ready_for_finance` SÍ tiene consumer reactivo (el bridge). El resto son auditoría/notificación. La obligación downstream sigue emitiendo `finance.payment_obligation.generated v1` (sin cambios). Finance es owner de payment orders + banco + conciliación.
 
@@ -37,13 +37,13 @@ Aggregate type: `contractor_payable`. Obligación económica aprobada del contra
 
 Aggregate type: `contractor_work_submission`. Evidencia de trabajo del contractor (timesheet/milestone/deliverable/…) con approval/dispute/reject. Aprobación operacional ≠ pago. Payload base `{schemaVersion:1, contractorWorkSubmissionId, publicId, contractorEngagementId, submissionType, status, grossAmount, currency, ...}`.
 
-| Evento | Trigger | Notas |
-| --- | --- | --- |
-| `workforce.contractor_work_submission.submitted` | `submitContractorWorkSubmission()` | draft/disputed → submitted |
-| `workforce.contractor_work_submission.approved` | `reviewContractorWorkSubmission(approve)` | requiere gross_amount; input de readiness del payable |
-| `workforce.contractor_work_submission.disputed` | `reviewContractorWorkSubmission(dispute)` | reason ≥10 |
-| `workforce.contractor_work_submission.rejected` | `reviewContractorWorkSubmission(reject)` | reason ≥10; terminal |
-| `workforce.contractor_work_submission.cancelled` | `cancelContractorWorkSubmission()` | bloqueado si ya consumido; terminal |
+| Evento                                           | Trigger                                   | Notas                                                 |
+| ------------------------------------------------ | ----------------------------------------- | ----------------------------------------------------- |
+| `workforce.contractor_work_submission.submitted` | `submitContractorWorkSubmission()`        | draft/disputed → submitted                            |
+| `workforce.contractor_work_submission.approved`  | `reviewContractorWorkSubmission(approve)` | requiere gross_amount; input de readiness del payable |
+| `workforce.contractor_work_submission.disputed`  | `reviewContractorWorkSubmission(dispute)` | reason ≥10                                            |
+| `workforce.contractor_work_submission.rejected`  | `reviewContractorWorkSubmission(reject)`  | reason ≥10; terminal                                  |
+| `workforce.contractor_work_submission.cancelled` | `cancelContractorWorkSubmission()`        | bloqueado si ya consumido; terminal                   |
 
 V1 sin consumer reactivo (Finance bridge es TASK-793). Eventos de auditoría/notificación. NO se agregan a `REACTIVE_EVENT_TYPES`.
 
@@ -51,15 +51,15 @@ V1 sin consumer reactivo (Finance bridge es TASK-793). Eventos de auditoría/not
 
 Aggregate type: `contractor_engagement`. Cambios materiales del lifecycle del engagement contractor/honorarios (Workforce/HR). Payload base `{schemaVersion:1, contractorEngagementId, publicId, profileId, memberId, personLegalEntityRelationshipId, legalEntityOrganizationId, relationshipSubtype, payrollVia, paymentModel, status, classificationRiskStatus, ...}`.
 
-| Evento | Trigger | Notas |
-| --- | --- | --- |
-| `workforce.contractor_engagement.created` | `createContractorEngagement()` | Nace en `draft`; incluye `relationshipSubtype` |
-| `workforce.contractor_engagement.activated` | transición → `active` | hard gate: relación activa + riesgo no bloqueante |
-| `workforce.contractor_engagement.paused` | transición → `paused` (incl. auto-pause por escalada de riesgo) | `reason:'classification_risk_escalation'` cuando es auto-pause |
-| `workforce.contractor_engagement.ended` | transición → `ended` (incl. cierre ejecutado vía `executeContractorClosure`) | terminal; payload de cierre enriquecido (`lifecycle:'closure_executed'`, `closureReason`, `postClosureInvoicesAllowed`) cuando viene del flujo de cierre |
-| `workforce.contractor_engagement.cancelled` | transición → `cancelled` | terminal |
-| `workforce.contractor_engagement.closure_initiated` | `initiateContractorClosure()` (active/paused → `ending`) | TASK-797 — winding-down; no se aceptan nuevas work submissions |
-| `workforce.contractor_engagement.classification_risk_flagged` | riesgo escala a `legal_review_required`/`blocked` | bloquea readiness/activación |
+| Evento                                                        | Trigger                                                                      | Notas                                                                                                                                                    |
+| ------------------------------------------------------------- | ---------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `workforce.contractor_engagement.created`                     | `createContractorEngagement()`                                               | Nace en `draft`; incluye `relationshipSubtype`                                                                                                           |
+| `workforce.contractor_engagement.activated`                   | transición → `active`                                                        | hard gate: relación activa + riesgo no bloqueante                                                                                                        |
+| `workforce.contractor_engagement.paused`                      | transición → `paused` (incl. auto-pause por escalada de riesgo)              | `reason:'classification_risk_escalation'` cuando es auto-pause                                                                                           |
+| `workforce.contractor_engagement.ended`                       | transición → `ended` (incl. cierre ejecutado vía `executeContractorClosure`) | terminal; payload de cierre enriquecido (`lifecycle:'closure_executed'`, `closureReason`, `postClosureInvoicesAllowed`) cuando viene del flujo de cierre |
+| `workforce.contractor_engagement.cancelled`                   | transición → `cancelled`                                                     | terminal                                                                                                                                                 |
+| `workforce.contractor_engagement.closure_initiated`           | `initiateContractorClosure()` (active/paused → `ending`)                     | TASK-797 — winding-down; no se aceptan nuevas work submissions                                                                                           |
+| `workforce.contractor_engagement.classification_risk_flagged` | riesgo escala a `legal_review_required`/`blocked`                            | bloquea readiness/activación                                                                                                                             |
 
 V1 NO tiene consumer reactivo (Finance bridge es TASK-793). Son eventos de auditoría/notificación. NO se agregan a `REACTIVE_EVENT_TYPES`.
 
@@ -67,8 +67,8 @@ V1 NO tiene consumer reactivo (Finance bridge es TASK-793). Son eventos de audit
 
 Aggregate type: `notion_task`. Sibling de TASK-916 repointeado a FTR (derivada pura de RpA).
 
-| Event Type | Disparado por | Payload v1 contract | Consumers |
-|---|---|---|---|
+| Event Type                            | Disparado por                                                                                                                                                                 | Payload v1 contract                                                                                                                                                    | Consumers                                                                                                                                      |
+| ------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
 | `notion.task.ftr_writeback_requested` | Reactive consumer `notion_ftr_compute` (productivo) post `calculateFtr`, cuando `ftrDataStatus='valid'` con veredicto pass/fail y el snapshot persistió (no ON CONFLICT skip) | `{schemaVersion:1, taskSourceId, workspaceId:'efeonce' or 'sky', ftrValue:'pass' or 'fail', ftrDataStatus:'valid', snapshotId, formulaVersion:'ftr_v1.0', computedAt}` | `notion_ftr_writeback` (productivo) — PATCH propiedad Notion select `[GH] FTR` (Pass/Fail), gated `NOTION_FTR_WRITEBACK_ENABLED` (default OFF) |
 
 Reglas duras:
@@ -82,8 +82,8 @@ Reglas duras:
 
 Aggregate type: `notion_task`.
 
-| Event Type | Disparado por | Payload v1 contract | Consumers |
-|---|---|---|---|
+| Event Type                                | Disparado por                                                                                                                                           | Payload v1 contract                                                                                                                                          | Consumers                                                                                                                      |
+| ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------ |
 | `notion.task.metrics_writeback_requested` | Reactive consumer `notion_rpa_compute` (productivo) post `calculateRpaV2`, cuando `rpaDataStatus='valid'` y el snapshot persistió (no ON CONFLICT skip) | `{schemaVersion:1, taskSourceId, workspaceId:'efeonce' or 'sky', rpaValue:number, rpaDataStatus:'valid', snapshotId, formulaVersion:'rpa_v2.0', computedAt}` | `notion_rpa_writeback` (productivo) — PATCH propiedad Notion `[GH] RpA v2`, gated `NOTION_RPA_WRITEBACK_ENABLED` (default OFF) |
 
 Reglas duras:
@@ -96,9 +96,9 @@ Reglas duras:
 
 Aggregate type: `member`.
 
-| Event Type | Disparado por | Payload v1 contract | Consumers |
-|---|---|---|---|
-| `member.contract_type.changed` | Write paths canónicos de Payroll compensation y Workforce intake cuando cambia `contract_type`, `pay_regime`, `payroll_via` o `deel_contract_id` en `greenhouse_core.members` | `{version:1, memberId, actorUserId, previous:{contractType,payRegime,payrollVia,hasDeelContractId}, next:{contractType,payRegime,payrollVia,hasDeelContractId}, hasLegalReviewReference:boolean, source:'payroll_compensation'|'workforce_intake', occurredAt}` | Auditoría, payroll participation/readiness refresh, payment lane refresh, Person 360/workforce projections |
+| Event Type                     | Disparado por                                                                                                                                                                 | Payload v1 contract                                                                                                                                                                                                            | Consumers                        |
+| ------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| `member.contract_type.changed` | Write paths canónicos de Payroll compensation y Workforce intake cuando cambia `contract_type`, `pay_regime`, `payroll_via` o `deel_contract_id` en `greenhouse_core.members` | `{version:1, memberId, actorUserId, previous:{contractType,payRegime,payrollVia,hasDeelContractId}, next:{contractType,payRegime,payrollVia,hasDeelContractId}, hasLegalReviewReference:boolean, source:'payroll_compensation' | 'workforce_intake', occurredAt}` | Auditoría, payroll participation/readiness refresh, payment lane refresh, Person 360/workforce projections |
 
 Reglas duras:
 
@@ -110,8 +110,8 @@ Reglas duras:
 
 Aggregate type: `workforce_member_intake`
 
-| Event Type | Disparado por | Payload v1 contract | Consumers |
-|---|---|---|---|
+| Event Type                        | Disparado por                                                                                              | Payload v1 contract                                                                                                            | Consumers                                                             |
+| --------------------------------- | ---------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------- |
 | `workforce.member.intake_updated` | `updateWorkforceMemberIntake()` cuando un operador guarda datos laborales de intake sin completar la ficha | `{version:1, memberId, tenantId, actorUserId, previousStatus, nextStatus, changedFields:string[], reason?:string, occurredAt}` | Auditoria, readiness refresh, futuros consumers de onboarding/payroll |
 
 Reglas duras:
@@ -124,13 +124,13 @@ Reglas duras:
 
 Aggregate type: `client_portal_module_assignment`.
 
-| Event Type | Disparado por | Payload v1 contract | Consumers |
-|---|---|---|---|
+| Event Type                                | Disparado por                                                                                                                                | Payload v1 contract                                                                                                           | Consumers                                                                                                       |
+| ----------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
 | `client.portal.module.assignment.created` | `enableClientPortalModule({...})` — atomic tx que inserta nuevo assignment + audit + outbox en `greenhouse_client_portal.module_assignments` | `{version:1, assignmentId, organizationId, moduleKey, status:'pending'\|'active'\|'pilot', source, effectiveFrom, expiresAt}` | Resolver TASK-825 cache invalidation, futura cascade reactiva (TASK-828), reliability signals (TASK-829), audit |
-| `client.portal.module.assignment.paused` | `pauseClientPortalModule({...})` — transition `active\|pilot\|pending → paused` | `{version:1, assignmentId, organizationId, moduleKey, fromStatus, toStatus:'paused', actorUserId}` | Resolver cache invalidation, audit, notification optional |
-| `client.portal.module.assignment.resumed` | `resumeClientPortalModule({...})` — transition `paused → active` | `{version:1, assignmentId, organizationId, moduleKey, fromStatus:'paused', toStatus:'active', actorUserId}` | Resolver cache invalidation, audit |
-| `client.portal.module.assignment.expired` | `expireClientPortalModule({...})` — transition non-terminal → `expired`, SET `effective_to=hoy` | `{version:1, assignmentId, organizationId, moduleKey, fromStatus, toStatus:'expired', effectiveTo, actorUserId}` | Resolver cache invalidation, audit, billing (futuro) |
-| `client.portal.module.assignment.churned` | `churnClientPortalModule({...})` — transition non-terminal → `churned`, SET `effective_to=hoy` | `{version:1, assignmentId, organizationId, moduleKey, fromStatus, toStatus:'churned', effectiveTo, actorUserId}` | Resolver cache invalidation, audit, lifecycle reporting, GTM signals (futuro) |
+| `client.portal.module.assignment.paused`  | `pauseClientPortalModule({...})` — transition `active\|pilot\|pending → paused`                                                              | `{version:1, assignmentId, organizationId, moduleKey, fromStatus, toStatus:'paused', actorUserId}`                            | Resolver cache invalidation, audit, notification optional                                                       |
+| `client.portal.module.assignment.resumed` | `resumeClientPortalModule({...})` — transition `paused → active`                                                                             | `{version:1, assignmentId, organizationId, moduleKey, fromStatus:'paused', toStatus:'active', actorUserId}`                   | Resolver cache invalidation, audit                                                                              |
+| `client.portal.module.assignment.expired` | `expireClientPortalModule({...})` — transition non-terminal → `expired`, SET `effective_to=hoy`                                              | `{version:1, assignmentId, organizationId, moduleKey, fromStatus, toStatus:'expired', effectiveTo, actorUserId}`              | Resolver cache invalidation, audit, billing (futuro)                                                            |
+| `client.portal.module.assignment.churned` | `churnClientPortalModule({...})` — transition non-terminal → `churned`, SET `effective_to=hoy`                                               | `{version:1, assignmentId, organizationId, moduleKey, fromStatus, toStatus:'churned', effectiveTo, actorUserId}`              | Resolver cache invalidation, audit, lifecycle reporting, GTM signals (futuro)                                   |
 
 Reglas de emisión:
 
@@ -150,10 +150,10 @@ Reglas duras (anti-regresión):
 
 Aggregate type: `payroll_compliance_export_artifact`.
 
-| Event Type | Disparado por | Payload v1 contract | Consumers |
-|---|---|---|---|
+| Event Type                          | Disparado por                                                                                                                                                 | Payload v1 contract                                                                                                                              | Consumers                                                               |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------- |
 | `payroll.export.previred_generated` | `GET /api/hr/payroll/periods/:periodId/export/previred` cuando el artefacto pasa validacion y se registra en `greenhouse_payroll.compliance_export_artifacts` | `{schemaVersion:1, artifactId, periodId, exportKind:'previred', specVersion, sourceSnapshotHash, artifactSha256, recordCount, validationStatus}` | Auditoria, Reliability drift, futuros workflows de upload/rectification |
-| `payroll.export.lre_generated` | `GET /api/hr/payroll/periods/:periodId/export/lre` cuando el artefacto pasa validacion y se registra en `greenhouse_payroll.compliance_export_artifacts` | `{schemaVersion:1, artifactId, periodId, exportKind:'lre', specVersion, sourceSnapshotHash, artifactSha256, recordCount, validationStatus}` | Auditoria, Reliability drift, futuros workflows de upload/rectification |
+| `payroll.export.lre_generated`      | `GET /api/hr/payroll/periods/:periodId/export/lre` cuando el artefacto pasa validacion y se registra en `greenhouse_payroll.compliance_export_artifacts`      | `{schemaVersion:1, artifactId, periodId, exportKind:'lre', specVersion, sourceSnapshotHash, artifactSha256, recordCount, validationStatus}`      | Auditoria, Reliability drift, futuros workflows de upload/rectification |
 
 Reglas duras:
 
@@ -165,8 +165,8 @@ Reglas duras:
 
 Aggregate type: `service_engagement`.
 
-| Event Type | Disparado por | Payload v1 contract | Consumers |
-|---|---|---|---|
+| Event Type                                        | Disparado por                                                                                                 | Payload v1 contract                                                                                                                                                                                                                                                                                           | Consumers                                                                                                                                                                                 |
+| ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `commercial.service_engagement.lifecycle_changed` | `upsertServiceFromHubSpot()` cuando hay diff real en `pipeline_stage`, `active`, `status` o `engagement_kind` | `{version:1, serviceId, hubspotServiceId, previousPipelineStage, nextPipelineStage, previousActive, nextActive, previousStatus, nextStatus, previousEngagementKind, nextEngagementKind, triggeredBy:'hubspot-services-webhook'\|'backfill-from-hubspot.ts'\|'manual_command'\|'cron-safety-net', occurredAt}` | Reactive consumers downstream (P&L, ICO, attribution, organization workspace, audit) reaccionan selectivamente a transiciones reales sin reprocesar el service en cada UPSERT idempotente |
 
 Reglas de emisión:
@@ -185,8 +185,8 @@ Reglas duras (anti-regresión):
 
 Aggregate type: `hubspot_companies_batch`.
 
-| Event type | Trigger | Payload | Consumer |
-| --- | --- | --- | --- |
+| Event type                                  | Trigger                                                                                                                                                                                                              | Payload                                                           | Consumer                                                                                                                                                                                                                                                                            |
+| ------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `commercial.hubspot_company.sync_requested` | Webhook `hubspot-companies` recibe events `company.*` / `contact.*` / `object.*` (Developer Platform 2025.2). El handler valida firma, extrae `companyIds` únicos del batch, y emite un event por unique company id. | `{version:1, hubspotCompanyId:string, source:string, enqueuedAt}` | Projection `hubspot_companies_intake` (domain=finance, mirror TASK-813b) consume vía ops-reactive-finance cron, hace bridge fetch (`/companies/{id}` + `/companies/{id}/contacts`) + UPSERT canónico greenhouse_crm + promote crm → core + capability sync, fuera del request path. |
 
 **Por qué async** (root cause Sentry JAVASCRIPT-NEXTJS-5T, 2026-05-14): `syncHubSpotCompanyById` toma 3-10s por company (2 bridge fetches + N contact UPSERTs + promote `syncHubSpotCompanies({fullResync:false})`). HubSpot tiene 5s timeout POST → retries concurrentes → race conditions. TASK-878 Slice 1 cerró la race condition estructural (RETURNING canónico). Slice 2 (este event) cierra la causa arquitectónica: webhook responde <100ms, sync corre async, retries innecesarios.
@@ -204,8 +204,8 @@ Hard rules:
 
 Aggregate type: `hubspot_services_batch`.
 
-| Event type | Trigger | Payload | Consumer |
-| --- | --- | --- | --- |
+| Event type                                       | Trigger                                                                                                                                            | Payload                                                       | Consumer                                                                                                                                                 |
+| ------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `commercial.service_engagement.intake_requested` | Webhook hubspot-services / hubspot-companies recibe events `service.*` / `p_services.*` / `0-162.*` y emite event ASYNC en lugar de fetch sincrono | `{version:1, serviceIds:string[], source:string, enqueuedAt}` | Projection `hubspot_services_intake` (domain=finance) consume vía ops-reactive-finance cron, hace HubSpot fetch + UPSERT canónico fuera del request path |
 
 **Por qué async**: el webhook HubSpot tiene timeout 5s. Si el batch tiene N services, el handler hace 1 batchRead + N association lookups sincronos = N+1 calls HubSpot. Para batches grandes (50+) excede timeout → HubSpot reintenta → loop. Patrón TASK-771/773 (anti-pattern: fetch sincrono dentro del request path).
@@ -221,11 +221,11 @@ Hard rules:
 
 Aggregate types: `service_engagement`, `space`.
 
-| Event type | Trigger | Payload | Consumer |
-| --- | --- | --- | --- |
-| `commercial.service_engagement.materialized` | Projection `hubspot_services_intake` (TASK-813b) + backfill script crea/actualiza fila en `core.services` desde HubSpot 0-162 | `{version:1, action:'created'\|'updated', serviceId, hubspotServiceId, hubspotCompanyId, name, spaceId, clientId, organizationId, syncStatus, materializedAt, source}` | Reactive consumers downstream (P&L, ICO, service_attribution_facts) |
-| `commercial.service_engagement.archived_legacy_seed` | Script `archive-legacy-seed.ts` archiva las 30 filas seedeadas el 2026-03-16 (cross-product `service_modules × clients`) | `{version:1, serviceId, name, previousStatus, previousActive, archivedAt, rationale}` | Audit log; service_attribution_facts respeta filtro `WHERE status != 'legacy_seed_archived'` |
-| `commercial.space.auto_created` | Backfill o webhook auto-crea space para client con hubspot_company_id pero sin space (caso Aguas Andinas + Motogas) | `{version:1, spaceId, clientId, organizationId, clientName, source, createdAt}` | Audit; alerta si auto-creation rate > 5% (TASK-807 follow-up) |
+| Event type                                           | Trigger                                                                                                                       | Payload                                                                                                                                                                | Consumer                                                                                     |
+| ---------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| `commercial.service_engagement.materialized`         | Projection `hubspot_services_intake` (TASK-813b) + backfill script crea/actualiza fila en `core.services` desde HubSpot 0-162 | `{version:1, action:'created'\|'updated', serviceId, hubspotServiceId, hubspotCompanyId, name, spaceId, clientId, organizationId, syncStatus, materializedAt, source}` | Reactive consumers downstream (P&L, ICO, service_attribution_facts)                          |
+| `commercial.service_engagement.archived_legacy_seed` | Script `archive-legacy-seed.ts` archiva las 30 filas seedeadas el 2026-03-16 (cross-product `service_modules × clients`)      | `{version:1, serviceId, name, previousStatus, previousActive, archivedAt, rationale}`                                                                                  | Audit log; service_attribution_facts respeta filtro `WHERE status != 'legacy_seed_archived'` |
+| `commercial.space.auto_created`                      | Backfill o webhook auto-crea space para client con hubspot_company_id pero sin space (caso Aguas Andinas + Motogas)           | `{version:1, spaceId, clientId, organizationId, clientName, source, createdAt}`                                                                                        | Audit; alerta si auto-creation rate > 5% (TASK-807 follow-up)                                |
 
 Hard rules:
 
@@ -238,20 +238,20 @@ Reglas duras: NUNCA loggear `value_full`, `value_normalized`, `street_line_1`, `
 
 Aggregate types: `person_identity_document`, `person_address`.
 
-| Event | Trigger | Payload (no value_full) |
-|---|---|---|
-| `person.identity_document.declared` | self-service o HR declara documento nuevo | `{ documentId, profileId, documentType, countryCode, source, declaredByUserId }` |
-| `person.identity_document.updated` | metadata refresh sin cambiar valor | `{ documentId, profileId, documentType, countryCode, source }` |
-| `person.identity_document.verified` | HR aprueba | `{ documentId, profileId, verifiedByUserId }` |
-| `person.identity_document.rejected` | HR rechaza con reason | `{ documentId, profileId, rejectedByUserId, rejectedReason }` |
-| `person.identity_document.archived` | superseded o archive manual | `{ documentId, profileId, actorUserId }` |
-| `person.identity_document.revealed_sensitive` | reveal con capability + reason | `{ documentId, profileId, actorUserId, reason, revealedFields }` |
-| `person.address.declared` | self-service o HR declara | `{ addressId, profileId, addressType, countryCode, source }` |
-| `person.address.updated` | metadata refresh | `{ addressId, profileId, addressType, countryCode, source }` |
-| `person.address.verified` | HR aprueba | `{ addressId, profileId, verifiedByUserId }` |
-| `person.address.rejected` | HR rechaza con reason | `{ addressId, profileId, rejectedByUserId, rejectedReason }` |
-| `person.address.archived` | superseded o archive manual | `{ addressId, profileId, actorUserId }` |
-| `person.address.revealed_sensitive` | reveal con capability + reason | `{ addressId, profileId, actorUserId, reason, revealedFields }` |
+| Event                                         | Trigger                                   | Payload (no value_full)                                                          |
+| --------------------------------------------- | ----------------------------------------- | -------------------------------------------------------------------------------- |
+| `person.identity_document.declared`           | self-service o HR declara documento nuevo | `{ documentId, profileId, documentType, countryCode, source, declaredByUserId }` |
+| `person.identity_document.updated`            | metadata refresh sin cambiar valor        | `{ documentId, profileId, documentType, countryCode, source }`                   |
+| `person.identity_document.verified`           | HR aprueba                                | `{ documentId, profileId, verifiedByUserId }`                                    |
+| `person.identity_document.rejected`           | HR rechaza con reason                     | `{ documentId, profileId, rejectedByUserId, rejectedReason }`                    |
+| `person.identity_document.archived`           | superseded o archive manual               | `{ documentId, profileId, actorUserId }`                                         |
+| `person.identity_document.revealed_sensitive` | reveal con capability + reason            | `{ documentId, profileId, actorUserId, reason, revealedFields }`                 |
+| `person.address.declared`                     | self-service o HR declara                 | `{ addressId, profileId, addressType, countryCode, source }`                     |
+| `person.address.updated`                      | metadata refresh                          | `{ addressId, profileId, addressType, countryCode, source }`                     |
+| `person.address.verified`                     | HR aprueba                                | `{ addressId, profileId, verifiedByUserId }`                                     |
+| `person.address.rejected`                     | HR rechaza con reason                     | `{ addressId, profileId, rejectedByUserId, rejectedReason }`                     |
+| `person.address.archived`                     | superseded o archive manual               | `{ addressId, profileId, actorUserId }`                                          |
+| `person.address.revealed_sensitive`           | reveal con capability + reason            | `{ addressId, profileId, actorUserId, reason, revealedFields }`                  |
 
 Reactive consumers: ninguno V1. El reliability signal `identity.legal_profile.reveal_anomaly_rate` lee `person_identity_document_audit_log` directo (no via outbox) — el outbox da auditoria cross-system, el audit log es la fuente authoritative dentro del runtime.
 
@@ -271,14 +271,14 @@ Schema v1:
 type FinanceExpenseEconomicCategoryChangedV1 = {
   eventVersion: 'v1'
   expenseId: string
-  previousCategory: ExpenseEconomicCategory | null  // null si era pre-backfill
-  newCategory: ExpenseEconomicCategory               // 11 valores enum canonicos
-  reason: string                                     // min 10 chars (audit trail)
-  bulkContext: string | null                         // si fue bulk reclassify
-  confidence: 'manual'                               // siempre manual via UI
-  matchedRule: 'manual_reclassify'                   // siempre, vs auto rules
+  previousCategory: ExpenseEconomicCategory | null // null si era pre-backfill
+  newCategory: ExpenseEconomicCategory // 11 valores enum canonicos
+  reason: string // min 10 chars (audit trail)
+  bulkContext: string | null // si fue bulk reclassify
+  confidence: 'manual' // siempre manual via UI
+  matchedRule: 'manual_reclassify' // siempre, vs auto rules
   actorUserId: string
-  changedAt: string                                  // ISO timestamp
+  changedAt: string // ISO timestamp
 }
 ```
 
@@ -359,15 +359,15 @@ type FinancePaymentOrderSettlementBlockedV1 = {
   orderId: string
   state: 'paid'
   reason:
-    | 'expense_unresolved'        // resolver no encontró expenses para (period_id, member_id)
-    | 'account_missing'           // source_account_id NULL al transicionar
-    | 'cutover_violation'         // CHECK expense_payments_account_required_after_cutover rechazó el INSERT
-    | 'materializer_dead_letter'  // upstream payroll materializer en dead-letter
-    | 'out_of_scope_v1'           // V1 del proyector no cubre este obligation_kind (e.g. employer_social_security)
-  detail: string                  // mensaje human-readable, sanitizable
-  affectedLineIds: string[]       // payment_order_lines afectadas
-  retryableAfter?: string         // ISO timestamp, sugiere re-disparo
-  blockedAt: string               // ISO timestamp del bloqueo
+    | 'expense_unresolved' // resolver no encontró expenses para (period_id, member_id)
+    | 'account_missing' // source_account_id NULL al transicionar
+    | 'cutover_violation' // CHECK expense_payments_account_required_after_cutover rechazó el INSERT
+    | 'materializer_dead_letter' // upstream payroll materializer en dead-letter
+    | 'out_of_scope_v1' // V1 del proyector no cubre este obligation_kind (e.g. employer_social_security)
+  detail: string // mensaje human-readable, sanitizable
+  affectedLineIds: string[] // payment_order_lines afectadas
+  retryableAfter?: string // ISO timestamp, sugiere re-disparo
+  blockedAt: string // ISO timestamp del bloqueo
 }
 ```
 
@@ -394,16 +394,16 @@ Schema v1:
 ```ts
 type FinancePayrollExpensesRematerializedV1 = {
   eventVersion: 'v1'
-  periodId: string                 // greenhouse_payroll.payroll_periods.period_id
-  year: number                     // 2000-2100
-  month: number                    // 1-12
-  dryRun: boolean                  // true = preview (no INSERTs)
-  payrollCreated: number           // filas `expenses` creadas (expense_type='payroll')
-  payrollSkipped: number           // filas existentes (idempotencia)
-  socialSecurityCreated: boolean   // true si se creó la fila Previred consolidada
-  socialSecuritySkipped: boolean   // inverse
-  actorUserId: string              // tenant.userId del admin
-  rematerializedAt: string         // ISO timestamp del trigger
+  periodId: string // greenhouse_payroll.payroll_periods.period_id
+  year: number // 2000-2100
+  month: number // 1-12
+  dryRun: boolean // true = preview (no INSERTs)
+  payrollCreated: number // filas `expenses` creadas (expense_type='payroll')
+  payrollSkipped: number // filas existentes (idempotencia)
+  socialSecurityCreated: boolean // true si se creó la fila Previred consolidada
+  socialSecuritySkipped: boolean // inverse
+  actorUserId: string // tenant.userId del admin
+  rematerializedAt: string // ISO timestamp del trigger
 }
 ```
 
@@ -467,26 +467,26 @@ Reglas:
 
 ## Infraestructura
 
-| Componente | Ubicacion | Funcion |
-|---|---|---|
-| Tabla outbox | `greenhouse_sync.outbox_events` | Cola de eventos pendientes (Postgres) |
-| Helper publicacion | `src/lib/sync/publish-event.ts` | `publishOutboxEvent()` — helper reutilizable |
-| Catalogo tipos | `src/lib/sync/event-catalog.ts` | Constantes de aggregate types y event types |
-| Consumer BigQuery | `src/lib/sync/outbox-consumer.ts` | Publica eventos a `greenhouse_raw.postgres_outbox_events` |
-| Consumer reactivo | `src/lib/sync/reactive-consumer.ts` | Procesa eventos via projection registry |
-| Projection registry | `src/lib/sync/projection-registry.ts` | Mapa declarativo evento → proyecciones afectadas |
-| Projections | `src/lib/sync/projections/*.ts` | Definiciones individuales por proyeccion |
-| Refresh queue | `src/lib/sync/refresh-queue.ts` | Cola persistente con dedup, prioridad y retry |
-| Cron publish | `/api/cron/outbox-publish` | Cada 5 min — publica a BigQuery |
-| Cron react (all) | `/api/cron/outbox-react` | Procesa todos los dominios (secuencial) |
-| Cron react (org) | `/api/cron/outbox-react-org` | Solo dominio `organization` |
-| Cron react (people) | `/api/cron/outbox-react-people` | Solo dominio `people` |
-| Cron react (finance) | `/api/cron/outbox-react-finance` | Solo dominio `finance` |
-| Cron react (notify) | `/api/cron/outbox-react-notify` | Solo dominio `notifications` |
-| Cron react (delivery) | `/api/cron/outbox-react-delivery` | Solo dominio `delivery` (TASK-253) |
-| Log reactivo | `greenhouse_sync.outbox_reactive_log` | Tracking con retries y dead-letter, keyed by `(event_id, handler)` |
-| Recovery cron | `/api/cron/projection-recovery` | Cada 15 min — reclama items huérfanos (pending/processing >30 min) y re-ejecuta el refresh |
-| Observabilidad | `/api/internal/projections` | Stats por proyeccion + queue health |
+| Componente            | Ubicacion                             | Funcion                                                                                    |
+| --------------------- | ------------------------------------- | ------------------------------------------------------------------------------------------ |
+| Tabla outbox          | `greenhouse_sync.outbox_events`       | Cola de eventos pendientes (Postgres)                                                      |
+| Helper publicacion    | `src/lib/sync/publish-event.ts`       | `publishOutboxEvent()` — helper reutilizable                                               |
+| Catalogo tipos        | `src/lib/sync/event-catalog.ts`       | Constantes de aggregate types y event types                                                |
+| Consumer BigQuery     | `src/lib/sync/outbox-consumer.ts`     | Publica eventos a `greenhouse_raw.postgres_outbox_events`                                  |
+| Consumer reactivo     | `src/lib/sync/reactive-consumer.ts`   | Procesa eventos via projection registry                                                    |
+| Projection registry   | `src/lib/sync/projection-registry.ts` | Mapa declarativo evento → proyecciones afectadas                                           |
+| Projections           | `src/lib/sync/projections/*.ts`       | Definiciones individuales por proyeccion                                                   |
+| Refresh queue         | `src/lib/sync/refresh-queue.ts`       | Cola persistente con dedup, prioridad y retry                                              |
+| Cron publish          | `/api/cron/outbox-publish`            | Cada 5 min — publica a BigQuery                                                            |
+| Cron react (all)      | `/api/cron/outbox-react`              | Procesa todos los dominios (secuencial)                                                    |
+| Cron react (org)      | `/api/cron/outbox-react-org`          | Solo dominio `organization`                                                                |
+| Cron react (people)   | `/api/cron/outbox-react-people`       | Solo dominio `people`                                                                      |
+| Cron react (finance)  | `/api/cron/outbox-react-finance`      | Solo dominio `finance`                                                                     |
+| Cron react (notify)   | `/api/cron/outbox-react-notify`       | Solo dominio `notifications`                                                               |
+| Cron react (delivery) | `/api/cron/outbox-react-delivery`     | Solo dominio `delivery` (TASK-253)                                                         |
+| Log reactivo          | `greenhouse_sync.outbox_reactive_log` | Tracking con retries y dead-letter, keyed by `(event_id, handler)`                         |
+| Recovery cron         | `/api/cron/projection-recovery`       | Cada 15 min — reclama items huérfanos (pending/processing >30 min) y re-ejecuta el refresh |
+| Observabilidad        | `/api/internal/projections`           | Stats por proyeccion + queue health                                                        |
 
 ## Ciclo de vida de un evento
 
@@ -515,43 +515,43 @@ Los payloads del outbox siguen dos versiones que coexisten durante el rollout de
 
 **Event types `*.period_materialized` introducidos por Slice 2 de TASK-379:**
 
-| Aggregate Type | Event Type | Publisher | Proyeccion downstream |
-|---|---|---|---|
-| `provider_tooling_snapshot` | `provider.tooling_snapshot.period_materialized` | `src/lib/sync/projections/provider-tooling.ts` | `staff_augmentation_placements` |
-| `commercial_cost_attribution` | `accounting.commercial_cost_attribution.period_materialized` | `src/lib/sync/projections/commercial-cost-attribution.ts` | `client_economics`, `operational_pl` |
-| `service_attribution` | `accounting.service_attribution.period_materialized` | `src/lib/sync/projections/service-attribution.ts` | — |
-| `pl_snapshot` | `accounting.pl_snapshot.period_materialized` | `src/lib/sync/projections/operational-pl.ts` | `operational_pl_rollup` |
-| `staff_aug_placement_snapshot` | `staff_aug.placement_snapshot.period_materialized` | `src/lib/sync/projections/staff-augmentation.ts` | Downstream de staff augmentation |
-| `vat_position` | `finance.vat_position.period_materialized` | `src/lib/sync/projections/vat-monthly-position.ts` | observability, serving VAT mensual, futuros cierres fiscales |
+| Aggregate Type                 | Event Type                                                   | Publisher                                                 | Proyeccion downstream                                        |
+| ------------------------------ | ------------------------------------------------------------ | --------------------------------------------------------- | ------------------------------------------------------------ |
+| `provider_tooling_snapshot`    | `provider.tooling_snapshot.period_materialized`              | `src/lib/sync/projections/provider-tooling.ts`            | `staff_augmentation_placements`                              |
+| `commercial_cost_attribution`  | `accounting.commercial_cost_attribution.period_materialized` | `src/lib/sync/projections/commercial-cost-attribution.ts` | `client_economics`, `operational_pl`                         |
+| `service_attribution`          | `accounting.service_attribution.period_materialized`         | `src/lib/sync/projections/service-attribution.ts`         | —                                                            |
+| `pl_snapshot`                  | `accounting.pl_snapshot.period_materialized`                 | `src/lib/sync/projections/operational-pl.ts`              | `operational_pl_rollup`                                      |
+| `staff_aug_placement_snapshot` | `staff_aug.placement_snapshot.period_materialized`           | `src/lib/sync/projections/staff-augmentation.ts`          | Downstream de staff augmentation                             |
+| `vat_position`                 | `finance.vat_position.period_materialized`                   | `src/lib/sync/projections/vat-monthly-position.ts`        | observability, serving VAT mensual, futuros cierres fiscales |
 
 ## Catalogo de eventos
 
 ### Finance
 
-| Aggregate Type | Event Type | Publisher | Payload | Consumer reactivo |
-|---|---|---|---|---|
-| `income` | `income.created`, `income.updated`, `income.deleted` | `finance/postgres-store.ts` | `{ incomeId, clientProfileId, amount, currency }` | `service_attribution`, `income_hubspot_outbound` |
-| `income` | `finance.income.nubox_synced` | `nubox/sync-nubox-to-postgres.ts` | `{ incomeId, nuboxDocumentId, emissionStatus, dteFolio }` | `income_hubspot_outbound` (re-run + prepare artifact attach) |
-| `income` | `finance.income.hubspot_synced` | `finance/income-hubspot/income-hubspot-events.ts` (from reactive projection `income_hubspot_outbound`) | `{ incomeId, hubspotInvoiceId, hubspotCompanyId, hubspotDealId, syncedAt, attemptCount }` | audit, analytics BigQuery |
-| `income` | `finance.income.hubspot_sync_failed` | `finance/income-hubspot/income-hubspot-events.ts` | `{ incomeId, hubspotInvoiceId?, status: 'failed'\|'endpoint_not_deployed'\|'skipped_no_anchors', errorMessage, failedAt, attemptCount }` | alerting, retry worker, soporte ops |
-| `income` | `finance.income.hubspot_artifact_attached` | `finance/income-hubspot/income-hubspot-events.ts` (Fase 2 — post-Nubox attach) | `{ incomeId, hubspotInvoiceId, hubspotArtifactNoteId, attachedAt, artifactKind }` | audit |
-| `expense` | `expense.created`, `expense.updated`, `expense.deleted` | `finance/postgres-store.ts` | `{ expenseId, amount, currency }` | `service_attribution` |
-| `expense` | `finance.expense.nubox_synced` | `nubox/sync-nubox-to-postgres.ts` | `{ nubox_purchase_id, document_status }` | `vat_monthly_position`, futuros consumers de conciliacion tributaria |
-| `vat_position` | `finance.vat_position.period_materialized` | `sync/projections/vat-monthly-position.ts` | `{ schemaVersion: 2, periodId, periodYear, periodMonth, snapshotCount, source: 'vat_monthly_position', triggerEventType, scope }` | observability, audit fiscal, serving readers |
-| `account` | `account.created`, `account.updated` | `finance/postgres-store-slice2.ts` | `{ accountId }` | — |
-| `supplier` | `supplier.created`, `supplier.updated` | `finance/postgres-store-slice2.ts` | `{ supplierId }` | — |
-| `exchange_rate` | `exchange_rate.updated` | `finance/postgres-store-slice2.ts` | `{ currency, rate }` | — |
-| `economic_indicator` | `finance.economic_indicator.upserted` | `finance/postgres-store.ts` | `{ indicatorId, indicatorCode, indicatorDate, value, source }` | `member_capacity_economics`, `person_intelligence`, futuros consumers de forecast laboral/financiero |
-| `finance_expense_payment` | `finance.expense_payment.recorded` | `finance/expense-payment-ledger.ts` | `{ paymentId, expenseId, paymentDate, amount, paymentSource, reference, paymentStatus, amountPaid }` | client-economics, commercial-cost-attribution, operational-pl, period-closure-status |
+| Aggregate Type            | Event Type                                              | Publisher                                                                                              | Payload                                                                                                                                  | Consumer reactivo                                                                                    |
+| ------------------------- | ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| `income`                  | `income.created`, `income.updated`, `income.deleted`    | `finance/postgres-store.ts`                                                                            | `{ incomeId, clientProfileId, amount, currency }`                                                                                        | `service_attribution`, `income_hubspot_outbound`                                                     |
+| `income`                  | `finance.income.nubox_synced`                           | `nubox/sync-nubox-to-postgres.ts`                                                                      | `{ incomeId, nuboxDocumentId, emissionStatus, dteFolio }`                                                                                | `income_hubspot_outbound` (re-run + prepare artifact attach)                                         |
+| `income`                  | `finance.income.hubspot_synced`                         | `finance/income-hubspot/income-hubspot-events.ts` (from reactive projection `income_hubspot_outbound`) | `{ incomeId, hubspotInvoiceId, hubspotCompanyId, hubspotDealId, syncedAt, attemptCount }`                                                | audit, analytics BigQuery                                                                            |
+| `income`                  | `finance.income.hubspot_sync_failed`                    | `finance/income-hubspot/income-hubspot-events.ts`                                                      | `{ incomeId, hubspotInvoiceId?, status: 'failed'\|'endpoint_not_deployed'\|'skipped_no_anchors', errorMessage, failedAt, attemptCount }` | alerting, retry worker, soporte ops                                                                  |
+| `income`                  | `finance.income.hubspot_artifact_attached`              | `finance/income-hubspot/income-hubspot-events.ts` (Fase 2 — post-Nubox attach)                         | `{ incomeId, hubspotInvoiceId, hubspotArtifactNoteId, attachedAt, artifactKind }`                                                        | audit                                                                                                |
+| `expense`                 | `expense.created`, `expense.updated`, `expense.deleted` | `finance/postgres-store.ts`                                                                            | `{ expenseId, amount, currency }`                                                                                                        | `service_attribution`                                                                                |
+| `expense`                 | `finance.expense.nubox_synced`                          | `nubox/sync-nubox-to-postgres.ts`                                                                      | `{ nubox_purchase_id, document_status }`                                                                                                 | `vat_monthly_position`, futuros consumers de conciliacion tributaria                                 |
+| `vat_position`            | `finance.vat_position.period_materialized`              | `sync/projections/vat-monthly-position.ts`                                                             | `{ schemaVersion: 2, periodId, periodYear, periodMonth, snapshotCount, source: 'vat_monthly_position', triggerEventType, scope }`        | observability, audit fiscal, serving readers                                                         |
+| `account`                 | `account.created`, `account.updated`                    | `finance/postgres-store-slice2.ts`                                                                     | `{ accountId }`                                                                                                                          | —                                                                                                    |
+| `supplier`                | `supplier.created`, `supplier.updated`                  | `finance/postgres-store-slice2.ts`                                                                     | `{ supplierId }`                                                                                                                         | —                                                                                                    |
+| `exchange_rate`           | `exchange_rate.updated`                                 | `finance/postgres-store-slice2.ts`                                                                     | `{ currency, rate }`                                                                                                                     | —                                                                                                    |
+| `economic_indicator`      | `finance.economic_indicator.upserted`                   | `finance/postgres-store.ts`                                                                            | `{ indicatorId, indicatorCode, indicatorDate, value, source }`                                                                           | `member_capacity_economics`, `person_intelligence`, futuros consumers de forecast laboral/financiero |
+| `finance_expense_payment` | `finance.expense_payment.recorded`                      | `finance/expense-payment-ledger.ts`                                                                    | `{ paymentId, expenseId, paymentDate, amount, paymentSource, reference, paymentStatus, amountPaid }`                                     | client-economics, commercial-cost-attribution, operational-pl, period-closure-status                 |
 
 ### Quotes — legacy finance namespace (TASK-210, kept during cutover per TASK-347)
 
-| Aggregate Type | Event Type | Publisher | Payload | Consumer reactivo |
-|---|---|---|---|---|
-| `quote` | `finance.quote.created` | `commercial/quotation-events.ts` (dual-publish helper called from `hubspot/create-hubspot-quote.ts`) | `{ quoteId, hubspotQuoteId, sourceSystem, direction, organizationId, amount, currency }` | — |
-| `quote` | `finance.quote.synced` | `commercial/quotation-events.ts` (from `hubspot/sync-hubspot-quotes.ts`) | `{ quoteId, hubspotQuoteId, hubspotDealId, sourceSystem, action, organizationId, spaceId }` | — |
-| `quote` | `finance.quote.converted` | (futuro: quote → invoice bridge) | `{ quoteId, incomeId }` | — |
-| `quote_line_item` | `finance.quote_line_item.synced` | `commercial/quotation-events.ts` (from `hubspot/sync-hubspot-line-items.ts`) | `{ quoteId, hubspotQuoteId, created, updated }` | — |
+| Aggregate Type    | Event Type                       | Publisher                                                                                            | Payload                                                                                     | Consumer reactivo |
+| ----------------- | -------------------------------- | ---------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- | ----------------- |
+| `quote`           | `finance.quote.created`          | `commercial/quotation-events.ts` (dual-publish helper called from `hubspot/create-hubspot-quote.ts`) | `{ quoteId, hubspotQuoteId, sourceSystem, direction, organizationId, amount, currency }`    | —                 |
+| `quote`           | `finance.quote.synced`           | `commercial/quotation-events.ts` (from `hubspot/sync-hubspot-quotes.ts`)                             | `{ quoteId, hubspotQuoteId, hubspotDealId, sourceSystem, action, organizationId, spaceId }` | —                 |
+| `quote`           | `finance.quote.converted`        | (futuro: quote → invoice bridge)                                                                     | `{ quoteId, incomeId }`                                                                     | —                 |
+| `quote_line_item` | `finance.quote_line_item.synced` | `commercial/quotation-events.ts` (from `hubspot/sync-hubspot-line-items.ts`)                         | `{ quoteId, hubspotQuoteId, created, updated }`                                             | —                 |
 
 ### Commercial Quotation — canonical namespace (TASK-347)
 
@@ -559,46 +559,46 @@ Emitted alongside the legacy `finance.quote.*` family by the same publishers so
 consumers can migrate gradually. Canonical events are scoped to the commercial
 `quotation_id` and include the legacy `quoteId` in payload for cross-reference.
 
-| Aggregate Type | Event Type | Publisher | Payload | Consumer reactivo |
-|---|---|---|---|---|
-| `quotation` | `commercial.quotation.created` | `commercial/quotation-events.ts` (from `hubspot/create-hubspot-quote.ts`, outbound) | `{ quotationId, quoteId, hubspotQuoteId, direction, organizationId, spaceId, amount, currency, lineItemCount }` | — |
-| `quotation` | `commercial.quotation.synced` | `commercial/quotation-events.ts` (from `hubspot/sync-hubspot-quotes.ts`, inbound) | `{ quotationId, quoteId, hubspotQuoteId, hubspotDealId, action, organizationId, spaceId }` | — |
-| `quotation` | `commercial.quotation.updated` | `commercial/quotation-events.ts` (update path canónico) | `{ quotationId, quoteId, hubspotDealId, organizationId, spaceId, changedFields }` | `service_attribution` |
-| `quotation` | `commercial.quotation.converted` | (futuro: quote-to-cash bridge, TASK-350) | `{ quotationId, quoteId, incomeId }` | — |
-| `quotation` | `commercial.quotation.po_linked` (TASK-350) | `finance/quote-to-cash/link-purchase-order.ts`, `api/finance/purchase-orders` POST/PUT | `{ quotationId, poId, poNumber, authorizedAmountClp, linkedBy }` | Audit log (quotation_audit_log `po_received`), profitability tracking (TASK-351), `service_attribution` |
-| `quotation` | `commercial.quotation.hes_linked` (TASK-350) | `finance/quote-to-cash/link-service-entry.ts`, `api/finance/hes` POST | `{ quotationId, hesId, hesNumber, amountAuthorizedClp, linkedBy }` | Audit log (`hes_received`), profitability tracking, `service_attribution` |
-| `quotation` | `commercial.quotation.invoice_emitted` (TASK-350) | `finance/quote-to-cash/materialize-invoice-from-{quotation,hes}.ts` | `{ quotationId, incomeId, sourceHesId \| null, totalAmountClp, emittedBy }` | Audit log (`invoice_triggered`), pipeline projection, Nubox emission follow-up |
-| `quotation` | `commercial.quotation.expired` (TASK-351) | `commercial-intelligence/renewal-lifecycle.ts` | `{ quotationId, clientId, organizationId, totalAmountClp, expiredAt, daysSinceExpiry }` | `quotation_pipeline` projection, audit log (`action: 'expired'`), notifications |
-| `quotation` | `commercial.quotation.renewal_due` (TASK-351) | `commercial-intelligence/renewal-lifecycle.ts` | `{ quotationId, clientId, organizationId, totalAmountClp, expiryDate, daysUntilExpiry }` | `quotation_pipeline` projection, notifications (`finance_alert` + `metadata.subtype: quotation_renewal`) |
-| `quotation` | `commercial.quotation.pipeline_materialized` (TASK-351) | `commercial/quotation-events.ts` (from `quotation_pipeline` projection) | `{ quotationId, pipelineStage, status, totalAmountClp, probabilityPct }` | observability/dashboards |
-| `quotation` | `commercial.quotation.profitability_materialized` (TASK-351) | `commercial/quotation-events.ts` (from `quotation_profitability` projection) | `{ quotationId, periodYear, periodMonth, effectiveMarginPct, quotedMarginPct, marginDriftPct, driftSeverity }` | observability/dashboards |
-| `quotation_line_item` | `commercial.quotation.line_items_synced` | `commercial/quotation-events.ts` (from `hubspot/sync-hubspot-line-items.ts`) | `{ quotationId, quoteId, hubspotQuoteId, created, updated }` | — |
-| `contract` | `commercial.contract.created` (TASK-460) | `commercial/contract-events.ts` (from `commercial/contract-lifecycle.ts`) | `{ contractId, contractNumber, originatorQuoteId, clientId, organizationId, spaceId, status }` | `contract_profitability`, `contract_renewal`, `service_attribution` y futuros consumers de MRR/ARR |
-| `contract` | `commercial.contract.activated` (TASK-460) | `commercial/contract-events.ts` (from `commercial/contract-lifecycle.ts`) | `{ contractId, contractNumber, originatorQuoteId, clientId, organizationId, spaceId, status, activatedAt }` | `contract_profitability`, `contract_renewal`, `service_attribution`, observability |
-| `contract` | `commercial.contract.renewed` (TASK-460) | `commercial/contract-events.ts` (from `commercial/contract-lifecycle.ts`) | `{ contractId, contractNumber, quotationId?, relationshipType, renewedAt, nextEndDate?, spaceId }` | `contract_renewal`, timeline UI, futuros consumers de MRR/ARR |
-| `contract` | `commercial.contract.modified` (TASK-460) | `commercial/contract-events.ts` (from `commercial/contract-lifecycle.ts`) | `{ contractId, contractNumber, quotationId, relationshipType, modifiedAt, spaceId }` | detail UI, audit timeline, `service_attribution` |
-| `contract` | `commercial.contract.terminated` (TASK-460) | `commercial/contract-events.ts` (from `commercial/contract-lifecycle.ts`) | `{ contractId, contractNumber, terminatedAt, terminatedReason?, clientId, organizationId, spaceId }` | `contract_renewal`, futuros consumers de churn |
-| `contract` | `commercial.contract.completed` (TASK-460) | `commercial/contract-events.ts` (from `commercial/contract-lifecycle.ts`) | `{ contractId, contractNumber, completedAt, clientId, organizationId, spaceId }` | `contract_renewal`, observability |
-| `contract` | `commercial.contract.renewal_due` (TASK-460) | `commercial/contract-events.ts` (from `commercial-intelligence/contract-renewal-lifecycle.ts`) | `{ contractId, contractNumber, clientId, organizationId, spaceId, endDate, daysUntilEndDate }` | notifications, renewals UI, futuros dashboards de ARR en riesgo |
-| `contract` | `commercial.contract.profitability_materialized` (TASK-460) | `commercial/contract-events.ts` (from `commercial-intelligence/contract-profitability-materializer.ts`) | `{ contractId, contractNumber, periodYear, periodMonth, effectiveMarginPct, quotedMarginPct, marginDriftPct, driftSeverity, spaceId }` | observability, dashboards de rentabilidad contractual |
-| `deal` | `commercial.deal.created` (TASK-453) | `commercial/deal-events.ts` (from `hubspot/sync-hubspot-deals.ts`) | `{ dealId, hubspotDealId, hubspotPipelineId, dealstage, clientId, organizationId, spaceId, amountClp, currency, closeDate }` | `deal_pipeline` projection (TASK-456), `service_attribution`, foundation for TASK-457 |
-| `deal` | `commercial.deal.synced` (TASK-453) | `commercial/deal-events.ts` (from `hubspot/sync-hubspot-deals.ts`) | `{ dealId, hubspotDealId, hubspotPipelineId, dealstage, clientId, organizationId, spaceId, action, amountClp, currency, closeDate, isClosed, isWon, changedFields }` | `deal_pipeline` projection (TASK-456), `service_attribution`, foundation for TASK-457 |
-| `deal` | `commercial.deal.stage_changed` (TASK-453) | `commercial/deal-events.ts` (from `hubspot/sync-hubspot-deals.ts`) | `{ dealId, hubspotDealId, hubspotPipelineId, dealstage, previousPipelineId, previousDealstage, previousStageLabel, currentStageLabel }` | `deal_pipeline` projection (TASK-456), `service_attribution` |
-| `deal` | `commercial.deal.won` (TASK-453) | `commercial/deal-events.ts` (from `hubspot/sync-hubspot-deals.ts`) | `{ dealId, hubspotDealId, hubspotPipelineId, dealstage, clientId, organizationId, spaceId, amountClp, closeDate }` | `deal_pipeline` projection (TASK-456), `service_attribution`, forecast |
-| `deal` | `commercial.deal.lost` (TASK-453) | `commercial/deal-events.ts` (from `hubspot/sync-hubspot-deals.ts`) | `{ dealId, hubspotDealId, hubspotPipelineId, dealstage, clientId, organizationId, spaceId, closeDate }` | `deal_pipeline` projection (TASK-456), `service_attribution`, forecast |
-| `deal` | `commercial.deal.create_requested` (TASK-539) | `commercial/deal-events.ts` (from `createDealFromQuoteContext`) | `{ attemptId, organizationId, hubspotCompanyId, actorUserId, dealName, amountClp, idempotencyKey }` | Audit trail de intentos inline (incluye intentos que nunca llegaron a HubSpot por rate limit o threshold) |
-| `deal` | `commercial.deal.create_approval_requested` (TASK-539) | `commercial/deal-events.ts` (from `createDealFromQuoteContext` cuando amount > $50M CLP) | `{ attemptId, organizationId, actorUserId, dealName, amountClp, thresholdClp, approvalId }` | Approval workflow + notificación al Sales Lead |
-| `deal` | `commercial.deal.created_from_greenhouse` (TASK-539) | `commercial/deal-events.ts` (from `createDealFromQuoteContext` happy path) | `{ dealId, hubspotDealId, organizationId, hubspotCompanyId, dealName, amount, amountClp, currency, pipelineId, stageId, ownerHubspotUserId, actorUserId, quotationId?, origin: 'greenhouse_quote_builder', attemptId }` | Distingue deals originados desde Greenhouse vs sync inbound; `promoteParty(prospect→opportunity)` ya se disparó en la misma transacción |
-| `commercial_operation` | `commercial.quote_to_cash.started` (TASK-541 Fase G) | `commercial/party/commands/quote-to-cash-events.ts` (from `convertQuoteToCash` entry) | `{ operationId, correlationId, quotationId, organizationId, hubspotDealId?, triggerSource, actorUserId, totalAmountClp, startedAt }` | Audit trail + observabilidad del funnel quote→cash |
-| `commercial_operation` | `commercial.quote_to_cash.completed` (TASK-541 Fase G) | `commercial/party/commands/quote-to-cash-events.ts` (from `convertQuoteToCash` happy path) | `{ ...started fields, contractId, clientId, organizationPromoted, clientInstantiated, dealWonEmitted, completedAt }` | Analytics, MRR materializer trigger confirmado |
-| `commercial_operation` | `commercial.quote_to_cash.failed` (TASK-541 Fase G) | `commercial/party/commands/quote-to-cash-events.ts` (mid-transaction catch) | `{ ...started fields, errorCode, errorMessage, failedAt }` | Alerting, retry worker, soporte |
-| `commercial_operation` | `commercial.quote_to_cash.approval_requested` (TASK-541 Fase G) | `commercial/party/commands/quote-to-cash-events.ts` (cuando `total_amount_clp > $100M`) | `{ ...started fields, approvalId, thresholdClp, requestedAt }` | Dual approval workflow (CFO+CEO); genérico pendiente, hoy audit trace persist. `quoteToCash` queda en `pending_approval` hasta resolución. |
-| `quotation` | `commercial.quotation.converted` (re-emitido por la coreografía con `correlationId`) | `convertQuoteToCash` emite directo vía `publishOutboxEvent` con payload `{ quotationId, organizationId, contractId, correlationId, operationId, convertedAt, source: 'quote_to_cash_choreography' }` | Legacy + quotation_pipeline projection + downstream consumers |
-| `quotation` | `commercial.discount.health_alert` | `finance/pricing/quotation-pricing-orchestrator.ts` (TASK-346) | `{ quotationId, versionNumber, marginPct, floorPct, targetPct, alerts, createdBy }` | `notifications` (Finance approvals), audit log |
-| `quotation` | `commercial.quotation.pushed_to_hubspot` (TASK-463) | `commercial/quotation-events.ts` (from `hubspot/push-canonical-quote.ts` invocado por projection `quotationHubSpotOutbound`) | `{ quotationId, hubspotQuoteId, hubspotDealId, direction: 'outbound', result: 'created' \| 'updated' \| 'skipped', reason?, actorId? }` | observability del bridge outbound + retry audit |
-| `quotation` | `commercial.quotation.hubspot_sync_failed` (TASK-463) | `commercial/quotation-events.ts` (from `hubspot/push-canonical-quote.ts` catch branch) | `{ quotationId, hubspotDealId, errorMessage, attemptedAction: 'create' \| 'update', actorId? }` | ops-worker retry, Finance alerting |
-| `pricing_catalog_approval` | `commercial.pricing_catalog_approval.proposed` (TASK-550) | `commercial/pricing-catalog-approvals.ts` (from `proposeApproval`) | `{ approvalId, entityType, entityId, entitySku, proposedByUserId, proposedByName, criticality, justification, proposedAt, proposalMeta? }` | `pricing_catalog_approval_notifier`, audit/observability |
-| `pricing_catalog_approval` | `commercial.pricing_catalog_approval.decided` (TASK-550) | `commercial/pricing-catalog-approvals.ts` (from `decideApproval`) | `{ approvalId, entityType, entityId, entitySku, proposedByUserId, proposedByName, criticality, decision, decidedByUserId, decidedByName, decidedAt, comment, applied, appliedFields, newAuditId, proposalMeta? }` | `pricing_catalog_approval_notifier`, audit/observability |
+| Aggregate Type             | Event Type                                                                           | Publisher                                                                                                                                                                                            | Payload                                                                                                                                                                                                                 | Consumer reactivo                                                                                                                          |
+| -------------------------- | ------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| `quotation`                | `commercial.quotation.created`                                                       | `commercial/quotation-events.ts` (from `hubspot/create-hubspot-quote.ts`, outbound)                                                                                                                  | `{ quotationId, quoteId, hubspotQuoteId, direction, organizationId, spaceId, amount, currency, lineItemCount }`                                                                                                         | —                                                                                                                                          |
+| `quotation`                | `commercial.quotation.synced`                                                        | `commercial/quotation-events.ts` (from `hubspot/sync-hubspot-quotes.ts`, inbound)                                                                                                                    | `{ quotationId, quoteId, hubspotQuoteId, hubspotDealId, action, organizationId, spaceId }`                                                                                                                              | —                                                                                                                                          |
+| `quotation`                | `commercial.quotation.updated`                                                       | `commercial/quotation-events.ts` (update path canónico)                                                                                                                                              | `{ quotationId, quoteId, hubspotDealId, organizationId, spaceId, changedFields }`                                                                                                                                       | `service_attribution`                                                                                                                      |
+| `quotation`                | `commercial.quotation.converted`                                                     | (futuro: quote-to-cash bridge, TASK-350)                                                                                                                                                             | `{ quotationId, quoteId, incomeId }`                                                                                                                                                                                    | —                                                                                                                                          |
+| `quotation`                | `commercial.quotation.po_linked` (TASK-350)                                          | `finance/quote-to-cash/link-purchase-order.ts`, `api/finance/purchase-orders` POST/PUT                                                                                                               | `{ quotationId, poId, poNumber, authorizedAmountClp, linkedBy }`                                                                                                                                                        | Audit log (quotation_audit_log `po_received`), profitability tracking (TASK-351), `service_attribution`                                    |
+| `quotation`                | `commercial.quotation.hes_linked` (TASK-350)                                         | `finance/quote-to-cash/link-service-entry.ts`, `api/finance/hes` POST                                                                                                                                | `{ quotationId, hesId, hesNumber, amountAuthorizedClp, linkedBy }`                                                                                                                                                      | Audit log (`hes_received`), profitability tracking, `service_attribution`                                                                  |
+| `quotation`                | `commercial.quotation.invoice_emitted` (TASK-350)                                    | `finance/quote-to-cash/materialize-invoice-from-{quotation,hes}.ts`                                                                                                                                  | `{ quotationId, incomeId, sourceHesId \| null, totalAmountClp, emittedBy }`                                                                                                                                             | Audit log (`invoice_triggered`), pipeline projection, Nubox emission follow-up                                                             |
+| `quotation`                | `commercial.quotation.expired` (TASK-351)                                            | `commercial-intelligence/renewal-lifecycle.ts`                                                                                                                                                       | `{ quotationId, clientId, organizationId, totalAmountClp, expiredAt, daysSinceExpiry }`                                                                                                                                 | `quotation_pipeline` projection, audit log (`action: 'expired'`), notifications                                                            |
+| `quotation`                | `commercial.quotation.renewal_due` (TASK-351)                                        | `commercial-intelligence/renewal-lifecycle.ts`                                                                                                                                                       | `{ quotationId, clientId, organizationId, totalAmountClp, expiryDate, daysUntilExpiry }`                                                                                                                                | `quotation_pipeline` projection, notifications (`finance_alert` + `metadata.subtype: quotation_renewal`)                                   |
+| `quotation`                | `commercial.quotation.pipeline_materialized` (TASK-351)                              | `commercial/quotation-events.ts` (from `quotation_pipeline` projection)                                                                                                                              | `{ quotationId, pipelineStage, status, totalAmountClp, probabilityPct }`                                                                                                                                                | observability/dashboards                                                                                                                   |
+| `quotation`                | `commercial.quotation.profitability_materialized` (TASK-351)                         | `commercial/quotation-events.ts` (from `quotation_profitability` projection)                                                                                                                         | `{ quotationId, periodYear, periodMonth, effectiveMarginPct, quotedMarginPct, marginDriftPct, driftSeverity }`                                                                                                          | observability/dashboards                                                                                                                   |
+| `quotation_line_item`      | `commercial.quotation.line_items_synced`                                             | `commercial/quotation-events.ts` (from `hubspot/sync-hubspot-line-items.ts`)                                                                                                                         | `{ quotationId, quoteId, hubspotQuoteId, created, updated }`                                                                                                                                                            | —                                                                                                                                          |
+| `contract`                 | `commercial.contract.created` (TASK-460)                                             | `commercial/contract-events.ts` (from `commercial/contract-lifecycle.ts`)                                                                                                                            | `{ contractId, contractNumber, originatorQuoteId, clientId, organizationId, spaceId, status }`                                                                                                                          | `contract_profitability`, `contract_renewal`, `service_attribution` y futuros consumers de MRR/ARR                                         |
+| `contract`                 | `commercial.contract.activated` (TASK-460)                                           | `commercial/contract-events.ts` (from `commercial/contract-lifecycle.ts`)                                                                                                                            | `{ contractId, contractNumber, originatorQuoteId, clientId, organizationId, spaceId, status, activatedAt }`                                                                                                             | `contract_profitability`, `contract_renewal`, `service_attribution`, observability                                                         |
+| `contract`                 | `commercial.contract.renewed` (TASK-460)                                             | `commercial/contract-events.ts` (from `commercial/contract-lifecycle.ts`)                                                                                                                            | `{ contractId, contractNumber, quotationId?, relationshipType, renewedAt, nextEndDate?, spaceId }`                                                                                                                      | `contract_renewal`, timeline UI, futuros consumers de MRR/ARR                                                                              |
+| `contract`                 | `commercial.contract.modified` (TASK-460)                                            | `commercial/contract-events.ts` (from `commercial/contract-lifecycle.ts`)                                                                                                                            | `{ contractId, contractNumber, quotationId, relationshipType, modifiedAt, spaceId }`                                                                                                                                    | detail UI, audit timeline, `service_attribution`                                                                                           |
+| `contract`                 | `commercial.contract.terminated` (TASK-460)                                          | `commercial/contract-events.ts` (from `commercial/contract-lifecycle.ts`)                                                                                                                            | `{ contractId, contractNumber, terminatedAt, terminatedReason?, clientId, organizationId, spaceId }`                                                                                                                    | `contract_renewal`, futuros consumers de churn                                                                                             |
+| `contract`                 | `commercial.contract.completed` (TASK-460)                                           | `commercial/contract-events.ts` (from `commercial/contract-lifecycle.ts`)                                                                                                                            | `{ contractId, contractNumber, completedAt, clientId, organizationId, spaceId }`                                                                                                                                        | `contract_renewal`, observability                                                                                                          |
+| `contract`                 | `commercial.contract.renewal_due` (TASK-460)                                         | `commercial/contract-events.ts` (from `commercial-intelligence/contract-renewal-lifecycle.ts`)                                                                                                       | `{ contractId, contractNumber, clientId, organizationId, spaceId, endDate, daysUntilEndDate }`                                                                                                                          | notifications, renewals UI, futuros dashboards de ARR en riesgo                                                                            |
+| `contract`                 | `commercial.contract.profitability_materialized` (TASK-460)                          | `commercial/contract-events.ts` (from `commercial-intelligence/contract-profitability-materializer.ts`)                                                                                              | `{ contractId, contractNumber, periodYear, periodMonth, effectiveMarginPct, quotedMarginPct, marginDriftPct, driftSeverity, spaceId }`                                                                                  | observability, dashboards de rentabilidad contractual                                                                                      |
+| `deal`                     | `commercial.deal.created` (TASK-453)                                                 | `commercial/deal-events.ts` (from `hubspot/sync-hubspot-deals.ts`)                                                                                                                                   | `{ dealId, hubspotDealId, hubspotPipelineId, dealstage, clientId, organizationId, spaceId, amountClp, currency, closeDate }`                                                                                            | `deal_pipeline` projection (TASK-456), `service_attribution`, foundation for TASK-457                                                      |
+| `deal`                     | `commercial.deal.synced` (TASK-453)                                                  | `commercial/deal-events.ts` (from `hubspot/sync-hubspot-deals.ts`)                                                                                                                                   | `{ dealId, hubspotDealId, hubspotPipelineId, dealstage, clientId, organizationId, spaceId, action, amountClp, currency, closeDate, isClosed, isWon, changedFields }`                                                    | `deal_pipeline` projection (TASK-456), `service_attribution`, foundation for TASK-457                                                      |
+| `deal`                     | `commercial.deal.stage_changed` (TASK-453)                                           | `commercial/deal-events.ts` (from `hubspot/sync-hubspot-deals.ts`)                                                                                                                                   | `{ dealId, hubspotDealId, hubspotPipelineId, dealstage, previousPipelineId, previousDealstage, previousStageLabel, currentStageLabel }`                                                                                 | `deal_pipeline` projection (TASK-456), `service_attribution`                                                                               |
+| `deal`                     | `commercial.deal.won` (TASK-453)                                                     | `commercial/deal-events.ts` (from `hubspot/sync-hubspot-deals.ts`)                                                                                                                                   | `{ dealId, hubspotDealId, hubspotPipelineId, dealstage, clientId, organizationId, spaceId, amountClp, closeDate }`                                                                                                      | `deal_pipeline` projection (TASK-456), `service_attribution`, forecast                                                                     |
+| `deal`                     | `commercial.deal.lost` (TASK-453)                                                    | `commercial/deal-events.ts` (from `hubspot/sync-hubspot-deals.ts`)                                                                                                                                   | `{ dealId, hubspotDealId, hubspotPipelineId, dealstage, clientId, organizationId, spaceId, closeDate }`                                                                                                                 | `deal_pipeline` projection (TASK-456), `service_attribution`, forecast                                                                     |
+| `deal`                     | `commercial.deal.create_requested` (TASK-539)                                        | `commercial/deal-events.ts` (from `createDealFromQuoteContext`)                                                                                                                                      | `{ attemptId, organizationId, hubspotCompanyId, actorUserId, dealName, amountClp, idempotencyKey }`                                                                                                                     | Audit trail de intentos inline (incluye intentos que nunca llegaron a HubSpot por rate limit o threshold)                                  |
+| `deal`                     | `commercial.deal.create_approval_requested` (TASK-539)                               | `commercial/deal-events.ts` (from `createDealFromQuoteContext` cuando amount > $50M CLP)                                                                                                             | `{ attemptId, organizationId, actorUserId, dealName, amountClp, thresholdClp, approvalId }`                                                                                                                             | Approval workflow + notificación al Sales Lead                                                                                             |
+| `deal`                     | `commercial.deal.created_from_greenhouse` (TASK-539)                                 | `commercial/deal-events.ts` (from `createDealFromQuoteContext` happy path)                                                                                                                           | `{ dealId, hubspotDealId, organizationId, hubspotCompanyId, dealName, amount, amountClp, currency, pipelineId, stageId, ownerHubspotUserId, actorUserId, quotationId?, origin: 'greenhouse_quote_builder', attemptId }` | Distingue deals originados desde Greenhouse vs sync inbound; `promoteParty(prospect→opportunity)` ya se disparó en la misma transacción    |
+| `commercial_operation`     | `commercial.quote_to_cash.started` (TASK-541 Fase G)                                 | `commercial/party/commands/quote-to-cash-events.ts` (from `convertQuoteToCash` entry)                                                                                                                | `{ operationId, correlationId, quotationId, organizationId, hubspotDealId?, triggerSource, actorUserId, totalAmountClp, startedAt }`                                                                                    | Audit trail + observabilidad del funnel quote→cash                                                                                         |
+| `commercial_operation`     | `commercial.quote_to_cash.completed` (TASK-541 Fase G)                               | `commercial/party/commands/quote-to-cash-events.ts` (from `convertQuoteToCash` happy path)                                                                                                           | `{ ...started fields, contractId, clientId, organizationPromoted, clientInstantiated, dealWonEmitted, completedAt }`                                                                                                    | Analytics, MRR materializer trigger confirmado                                                                                             |
+| `commercial_operation`     | `commercial.quote_to_cash.failed` (TASK-541 Fase G)                                  | `commercial/party/commands/quote-to-cash-events.ts` (mid-transaction catch)                                                                                                                          | `{ ...started fields, errorCode, errorMessage, failedAt }`                                                                                                                                                              | Alerting, retry worker, soporte                                                                                                            |
+| `commercial_operation`     | `commercial.quote_to_cash.approval_requested` (TASK-541 Fase G)                      | `commercial/party/commands/quote-to-cash-events.ts` (cuando `total_amount_clp > $100M`)                                                                                                              | `{ ...started fields, approvalId, thresholdClp, requestedAt }`                                                                                                                                                          | Dual approval workflow (CFO+CEO); genérico pendiente, hoy audit trace persist. `quoteToCash` queda en `pending_approval` hasta resolución. |
+| `quotation`                | `commercial.quotation.converted` (re-emitido por la coreografía con `correlationId`) | `convertQuoteToCash` emite directo vía `publishOutboxEvent` con payload `{ quotationId, organizationId, contractId, correlationId, operationId, convertedAt, source: 'quote_to_cash_choreography' }` | Legacy + quotation_pipeline projection + downstream consumers                                                                                                                                                           |
+| `quotation`                | `commercial.discount.health_alert`                                                   | `finance/pricing/quotation-pricing-orchestrator.ts` (TASK-346)                                                                                                                                       | `{ quotationId, versionNumber, marginPct, floorPct, targetPct, alerts, createdBy }`                                                                                                                                     | `notifications` (Finance approvals), audit log                                                                                             |
+| `quotation`                | `commercial.quotation.pushed_to_hubspot` (TASK-463)                                  | `commercial/quotation-events.ts` (from `hubspot/push-canonical-quote.ts` invocado por projection `quotationHubSpotOutbound`)                                                                         | `{ quotationId, hubspotQuoteId, hubspotDealId, direction: 'outbound', result: 'created' \| 'updated' \| 'skipped', reason?, actorId? }`                                                                                 | observability del bridge outbound + retry audit                                                                                            |
+| `quotation`                | `commercial.quotation.hubspot_sync_failed` (TASK-463)                                | `commercial/quotation-events.ts` (from `hubspot/push-canonical-quote.ts` catch branch)                                                                                                               | `{ quotationId, hubspotDealId, errorMessage, attemptedAction: 'create' \| 'update', actorId? }`                                                                                                                         | ops-worker retry, Finance alerting                                                                                                         |
+| `pricing_catalog_approval` | `commercial.pricing_catalog_approval.proposed` (TASK-550)                            | `commercial/pricing-catalog-approvals.ts` (from `proposeApproval`)                                                                                                                                   | `{ approvalId, entityType, entityId, entitySku, proposedByUserId, proposedByName, criticality, justification, proposedAt, proposalMeta? }`                                                                              | `pricing_catalog_approval_notifier`, audit/observability                                                                                   |
+| `pricing_catalog_approval` | `commercial.pricing_catalog_approval.decided` (TASK-550)                             | `commercial/pricing-catalog-approvals.ts` (from `decideApproval`)                                                                                                                                    | `{ approvalId, entityType, entityId, entitySku, proposedByUserId, proposedByName, criticality, decision, decidedByUserId, decidedByName, decidedAt, comment, applied, appliedFields, newAuditId, proposalMeta? }`       | `pricing_catalog_approval_notifier`, audit/observability                                                                                   |
 
 ### Commercial Party Lifecycle (TASK-535)
 
@@ -606,12 +606,12 @@ Fase A del programa TASK-534. Eventos emitidos por los 3 comandos CQRS en
 `commercial/party/commands/*`. Nuevos aggregate types: `commercial_party` y
 `commercial_client`.
 
-| Aggregate Type | Event Type | Publisher | Payload | Consumer reactivo |
-|---|---|---|---|---|
-| `commercial_party` | `commercial.party.created` (TASK-535) | `commercial/party/party-events.ts` (from `commands/create-party-from-hubspot-company.ts`) | `{ commercialPartyId, organizationId, initialStage, source: 'hubspot_sync', hubspotCompanyId }` | TASK-536 inbound sync, TASK-540 outbound HubSpot, TASK-538 selector projection |
-| `commercial_party` | `commercial.party.promoted` (TASK-535) | `commercial/party/party-events.ts` (from `commands/promote-party.ts`) | `{ commercialPartyId, organizationId, fromStage, toStage, source, triggerEntity?, actorUserId?, reason? }` | TASK-540 outbound HubSpot (write-back lifecyclestage), TASK-541 quote-to-cash, analytics |
-| `commercial_party` | `commercial.party.demoted` (TASK-535) | `commercial/party/party-events.ts` (from `commands/promote-party.ts`) | `{ commercialPartyId, organizationId, fromStage, toStage, source, direction: 'demote', triggerEntity?, actorUserId?, reason? }` | TASK-540 outbound, analytics |
-| `commercial_client` | `commercial.client.instantiated` (TASK-535) | `commercial/party/party-events.ts` (from `commands/instantiate-client-for-party.ts`, side-effect de `promoteParty → active_client`) | `{ clientId, clientProfileId, organizationId, commercialPartyId, triggerEntity, actorUserId? }` | Finance bootstrap (profile ya creado en misma transacción), ICO/attribution pipelines, TASK-541 |
+| Aggregate Type      | Event Type                                  | Publisher                                                                                                                           | Payload                                                                                                                         | Consumer reactivo                                                                               |
+| ------------------- | ------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| `commercial_party`  | `commercial.party.created` (TASK-535)       | `commercial/party/party-events.ts` (from `commands/create-party-from-hubspot-company.ts`)                                           | `{ commercialPartyId, organizationId, initialStage, source: 'hubspot_sync', hubspotCompanyId }`                                 | TASK-536 inbound sync, TASK-540 outbound HubSpot, TASK-538 selector projection                  |
+| `commercial_party`  | `commercial.party.promoted` (TASK-535)      | `commercial/party/party-events.ts` (from `commands/promote-party.ts`)                                                               | `{ commercialPartyId, organizationId, fromStage, toStage, source, triggerEntity?, actorUserId?, reason? }`                      | TASK-540 outbound HubSpot (write-back lifecyclestage), TASK-541 quote-to-cash, analytics        |
+| `commercial_party`  | `commercial.party.demoted` (TASK-535)       | `commercial/party/party-events.ts` (from `commands/promote-party.ts`)                                                               | `{ commercialPartyId, organizationId, fromStage, toStage, source, direction: 'demote', triggerEntity?, actorUserId?, reason? }` | TASK-540 outbound, analytics                                                                    |
+| `commercial_client` | `commercial.client.instantiated` (TASK-535) | `commercial/party/party-events.ts` (from `commands/instantiate-client-for-party.ts`, side-effect de `promoteParty → active_client`) | `{ clientId, clientProfileId, organizationId, commercialPartyId, triggerEntity, actorUserId? }`                                 | Finance bootstrap (profile ya creado en misma transacción), ICO/attribution pipelines, TASK-541 |
 
 Eventos adicionales del programa TASK-534:
 
@@ -623,65 +623,68 @@ Eventos adicionales del programa TASK-534:
 
 ### Products — legacy finance namespace (TASK-211, kept during cutover)
 
-| Aggregate Type | Event Type | Publisher | Payload | Consumer reactivo |
-|---|---|---|---|---|
-| `product` | `finance.product.synced` | `commercial/quotation-events.ts` (from `hubspot/sync-hubspot-products.ts`) | `{ productId, hubspotProductId, name, sku, action }` | — |
-| `product` | `finance.product.created` | `commercial/quotation-events.ts` (from `hubspot/create-hubspot-product.ts`) | `{ productId, hubspotProductId, name, sku, direction }` | — |
+| Aggregate Type | Event Type                | Publisher                                                                   | Payload                                                 | Consumer reactivo |
+| -------------- | ------------------------- | --------------------------------------------------------------------------- | ------------------------------------------------------- | ----------------- |
+| `product`      | `finance.product.synced`  | `commercial/quotation-events.ts` (from `hubspot/sync-hubspot-products.ts`)  | `{ productId, hubspotProductId, name, sku, action }`    | —                 |
+| `product`      | `finance.product.created` | `commercial/quotation-events.ts` (from `hubspot/create-hubspot-product.ts`) | `{ productId, hubspotProductId, name, sku, direction }` | —                 |
 
 ### Commercial Product Catalog — canonical namespace (TASK-347 + TASK-545 sync foundation)
 
-| Aggregate Type | Event Type | Publisher | Payload | Consumer reactivo |
-|---|---|---|---|---|
-| `product_catalog` | `commercial.product_catalog.created` | `commercial/product-catalog/product-catalog-events.ts` (from TASK-546 materializer handlers; legacy `commercial/quotation-events.ts` still emits for HubSpot-driven creation during cutover) | `{ productId, sourceKind, sourceId, productCode, productName, defaultUnitPrice, defaultCurrency, defaultUnit, businessLineCode, hubspotProductId, ghOwnedFieldsChecksum, isArchived }` | `source_to_product_catalog` (Fase A scaffolded no-op), TASK-547 outbound (Fase C) |
-| `product_catalog` | `commercial.product_catalog.updated` | `commercial/product-catalog/product-catalog-events.ts` (from TASK-546 handlers) | `{ ...created payload, changedFields, previousChecksum }` | TASK-547 outbound, TASK-548 drift |
-| `product_catalog` | `commercial.product_catalog.archived` | `commercial/product-catalog/product-catalog-events.ts` | `{ productId, sourceKind, sourceId, productCode, archivedAt, archivedBy, reason? }` | TASK-547 archive HubSpot |
-| `product_catalog` | `commercial.product_catalog.unarchived` | `commercial/product-catalog/product-catalog-events.ts` | `{ productId, sourceKind, sourceId, productCode, unarchivedAt, unarchivedBy }` | TASK-547 unarchive HubSpot |
-| `product_catalog` | `commercial.product_catalog.synced` | `commercial/quotation-events.ts` (from `hubspot/sync-hubspot-products.ts`) | `{ commercialProductId, productId, hubspotProductId, name, sku, action }` | legacy, retained during cutover |
-| `product_sync_conflict` | `commercial.product_sync_conflict.detected` | `commercial/product-catalog/product-catalog-events.ts` (emitted by TASK-548 drift cron) | `{ conflictId, productId?, hubspotProductId?, conflictType, detectedAt, conflictingFields?, metadata? }` | TASK-548 Admin Center alerts |
-| `product_sync_conflict` | `commercial.product_sync_conflict.resolved` | `commercial/product-catalog/product-catalog-events.ts` (emitted by Admin Center resolution handler) | `{ conflictId, productId?, hubspotProductId?, conflictType, resolutionStatus, resolvedBy, resolutionAppliedAt }` | audit trail |
+| Aggregate Type          | Event Type                                  | Publisher                                                                                                                                                                                    | Payload                                                                                                                                                                                | Consumer reactivo                                                                 |
+| ----------------------- | ------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| `product_catalog`       | `commercial.product_catalog.created`        | `commercial/product-catalog/product-catalog-events.ts` (from TASK-546 materializer handlers; legacy `commercial/quotation-events.ts` still emits for HubSpot-driven creation during cutover) | `{ productId, sourceKind, sourceId, productCode, productName, defaultUnitPrice, defaultCurrency, defaultUnit, businessLineCode, hubspotProductId, ghOwnedFieldsChecksum, isArchived }` | `source_to_product_catalog` (Fase A scaffolded no-op), TASK-547 outbound (Fase C) |
+| `product_catalog`       | `commercial.product_catalog.updated`        | `commercial/product-catalog/product-catalog-events.ts` (from TASK-546 handlers)                                                                                                              | `{ ...created payload, changedFields, previousChecksum }`                                                                                                                              | TASK-547 outbound, TASK-548 drift                                                 |
+| `product_catalog`       | `commercial.product_catalog.archived`       | `commercial/product-catalog/product-catalog-events.ts`                                                                                                                                       | `{ productId, sourceKind, sourceId, productCode, archivedAt, archivedBy, reason? }`                                                                                                    | TASK-547 archive HubSpot                                                          |
+| `product_catalog`       | `commercial.product_catalog.unarchived`     | `commercial/product-catalog/product-catalog-events.ts`                                                                                                                                       | `{ productId, sourceKind, sourceId, productCode, unarchivedAt, unarchivedBy }`                                                                                                         | TASK-547 unarchive HubSpot                                                        |
+| `product_catalog`       | `commercial.product_catalog.synced`         | `commercial/quotation-events.ts` (from `hubspot/sync-hubspot-products.ts`)                                                                                                                   | `{ commercialProductId, productId, hubspotProductId, name, sku, action }`                                                                                                              | legacy, retained during cutover                                                   |
+| `product_sync_conflict` | `commercial.product_sync_conflict.detected` | `commercial/product-catalog/product-catalog-events.ts` (emitted by TASK-548 drift cron)                                                                                                      | `{ conflictId, productId?, hubspotProductId?, conflictType, detectedAt, conflictingFields?, metadata? }`                                                                               | TASK-548 Admin Center alerts                                                      |
+| `product_sync_conflict` | `commercial.product_sync_conflict.resolved` | `commercial/product-catalog/product-catalog-events.ts` (emitted by Admin Center resolution handler)                                                                                          | `{ conflictId, productId?, hubspotProductId?, conflictType, resolutionStatus, resolvedBy, resolutionAppliedAt }`                                                                       | audit trail                                                                       |
 
 TASK-545 Fase A (shipped 2026-04-21) adds the `source_kind` + `source_id` linkage, `is_archived` archival semantics, and `gh_owned_fields_checksum` drift primitives to `greenhouse_commercial.product_catalog`, plus the `product_sync_conflicts` table. TASK-546 (same date) activates the source handlers/materializer; TASK-547 wires HubSpot outbound; TASK-548 closes the loop with drift detection, Admin Center resolution UI, and `source_sync_runs` tracking for the nightly reconciler. See `GREENHOUSE_COMMERCIAL_PRODUCT_CATALOG_SYNC_V1`.
 
 ### Nubox
 
-| Aggregate Type | Event Type | Publisher | Payload | Consumer reactivo |
-|---|---|---|---|---|
-| `nubox_emission` | `nubox.emission.*` | `nubox/emission.ts` | `{ emissionId, dteType }` | — |
-| `nubox_sync` | `nubox.sync.*` | `nubox/sync-nubox-to-postgres.ts` | `{ syncRunId }` | — |
+| Aggregate Type   | Event Type         | Publisher                         | Payload                   | Consumer reactivo |
+| ---------------- | ------------------ | --------------------------------- | ------------------------- | ----------------- |
+| `nubox_emission` | `nubox.emission.*` | `nubox/emission.ts`               | `{ emissionId, dteType }` | —                 |
+| `nubox_sync`     | `nubox.sync.*`     | `nubox/sync-nubox-to-postgres.ts` | `{ syncRunId }`           | —                 |
 
 ### HR Leave
 
-| Aggregate Type | Event Type | Publisher | Payload | Consumer reactivo |
-|---|---|---|---|---|
-| `leave_request` | `leave_request.created`, `leave_request.escalated_to_hr`, `leave_request.approved`, `leave_request.rejected`, `leave_request.cancelled` | `hr-core/postgres-leave-store.ts` | `{ requestId, memberId, leaveTypeCode, startDate, endDate, status }` | `notifications` |
-| `leave_request` | `leave_request.payroll_impact_detected` | `hr-core/postgres-leave-store.ts` | `{ requestId, memberId, affectedPeriods, payrollImpact }` | `notifications`, `projected_payroll`, `leave_payroll_recalculation` |
+| Aggregate Type  | Event Type                                                                                                                              | Publisher                         | Payload                                                              | Consumer reactivo                                                   |
+| --------------- | --------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------- | -------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| `leave_request` | `leave_request.created`, `leave_request.escalated_to_hr`, `leave_request.approved`, `leave_request.rejected`, `leave_request.cancelled` | `hr-core/postgres-leave-store.ts` | `{ requestId, memberId, leaveTypeCode, startDate, endDate, status }` | `notifications`                                                     |
+| `leave_request` | `leave_request.payroll_impact_detected`                                                                                                 | `hr-core/postgres-leave-store.ts` | `{ requestId, memberId, affectedPeriods, payrollImpact }`            | `notifications`, `projected_payroll`, `leave_payroll_recalculation` |
 
 Notas:
+
 - `leave_request.payroll_impact_detected` es una señal operativa; no reemplaza `payroll_entry.upserted` como source of truth económico downstream.
 - `Finance`, `Cost Intelligence`, `Providers` y `AI Tooling` deben seguir reaccionando al carril `payroll -> projections`, no a `leave_request.*` directo salvo alertas.
 
 ### Payroll
 
-| Aggregate Type | Event Type | Publisher | Payload | Consumer reactivo |
-|---|---|---|---|---|
-| `payroll_period` | `payroll_period.created`, `payroll_period.updated`, `payroll_period.calculated`, `payroll_period.approved`, `payroll_period.exported` | `payroll/postgres-store.ts` | `{ periodId, month, year, status? }` | `member_capacity_economics`, `person_intelligence`, `client_economics`, `service_attribution` |
-| `payroll_entry` | `payroll_entry.upserted` | `payroll/postgres-store.ts` | `{ entryId, periodId, memberId, currency, grossTotal, netTotal }` | `member_capacity_economics`, `person_intelligence`, `client_economics`, `service_attribution` |
-| `payroll_entry` | `payroll_entry.reliquidated` | `payroll/postgres-store.ts` (supersede path) | `{ entryId, periodId, operationalYear, operationalMonth, memberId, version, previousVersion, previousEntryId, previousGrossTotal, previousNetTotal, newGrossTotal, newNetTotal, deltaGross, deltaNet, currency, reopenAuditId, reason }` | `payroll_reliquidation_delta`, `commercial_cost_attribution`, `client_economics`, `service_attribution` |
-| `compensation_version` | `compensation_version.created`, `compensation_version.updated` | `payroll/postgres-store.ts` | `{ versionId, memberId, effectiveFrom, payRegime, currency, baseSalary }` | `member_capacity_economics`, `person_intelligence`, `service_attribution` |
+| Aggregate Type         | Event Type                                                                                                                            | Publisher                                    | Payload                                                                                                                                                                                                                                  | Consumer reactivo                                                                                       |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| `payroll_period`       | `payroll_period.created`, `payroll_period.updated`, `payroll_period.calculated`, `payroll_period.approved`, `payroll_period.exported` | `payroll/postgres-store.ts`                  | `{ periodId, month, year, status? }`                                                                                                                                                                                                     | `member_capacity_economics`, `person_intelligence`, `client_economics`, `service_attribution`           |
+| `payroll_entry`        | `payroll_entry.upserted`                                                                                                              | `payroll/postgres-store.ts`                  | `{ entryId, periodId, memberId, currency, grossTotal, netTotal }`                                                                                                                                                                        | `member_capacity_economics`, `person_intelligence`, `client_economics`, `service_attribution`           |
+| `payroll_entry`        | `payroll_entry.reliquidated`                                                                                                          | `payroll/postgres-store.ts` (supersede path) | `{ entryId, periodId, operationalYear, operationalMonth, memberId, version, previousVersion, previousEntryId, previousGrossTotal, previousNetTotal, newGrossTotal, newNetTotal, deltaGross, deltaNet, currency, reopenAuditId, reason }` | `payroll_reliquidation_delta`, `commercial_cost_attribution`, `client_economics`, `service_attribution` |
+| `compensation_version` | `compensation_version.created`, `compensation_version.updated`                                                                        | `payroll/postgres-store.ts`                  | `{ versionId, memberId, effectiveFrom, payRegime, currency, baseSalary }`                                                                                                                                                                | `member_capacity_economics`, `person_intelligence`, `service_attribution`                               |
 
 Notas:
+
 - `payroll_period.exported` sigue siendo el cierre canónico de nómina y también alimenta el intake reactivo de `Finance > Expenses`.
 - La materialización reactiva de expenses de payroll y cargas sociales se publica downstream por las señales existentes de `finance.expense.created|updated`; no existe un evento dedicado `expense.tool_linked`.
 - **TASK-409 / TASK-411** — `payroll_entry.reliquidated` es el evento canónico de reliquidación post-reopen. Lo emite `pgUpsertPayrollEntry` cuando se invoca en modo supersede (dentro de la TX de `supersedePayrollEntryOnRecalculate`). Lleva `deltaGross`/`deltaNet` ya calculados — el consumer `payroll_reliquidation_delta` **solo aplica el delta** a `greenhouse_finance.expenses` (nunca el monto completo) y referencia la fila `payroll_period_reopen_audit` vía `reopenAuditId` para trazabilidad. `finance_expense_reactive_intake` dedupe por `(payroll_period_id, member_id, source_type='payroll_generated')` para que v2 no cree un segundo expense "primario" — la suma canónica queda: `expense_primario_v1 + sum(expense_delta_v2..vN) = monto_final`.
 
 ### ICO Materialization
 
-| Aggregate Type | Event Type | Publisher | Payload | Consumer reactivo |
-|---|---|---|---|---|
-| `ico_materialization` | `ico.materialization.completed` | `ico-engine/materialize.ts` | `{ memberId?, organizationId?, periodYear, periodMonth, memberMetricsWritten?, organizationMetricsWritten? }` | `person_intelligence`, `projected_payroll`, organization-level projections derivadas |
-| `ico_ai_signals` | `ico.ai_signals.materialized` | `ico-engine/materialize.ts` | `{ periodYear, periodMonth, aiSignalsWritten, predictionLogsWritten, spaceId? }` | `ico_ai_signals` projection hacia `greenhouse_serving.ico_ai_signals` y consumers internal-only (`Agency`, `Ops Health`, `Nexa`) |
+| Aggregate Type        | Event Type                      | Publisher                   | Payload                                                                                                       | Consumer reactivo                                                                                                                |
+| --------------------- | ------------------------------- | --------------------------- | ------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| `ico_materialization` | `ico.materialization.completed` | `ico-engine/materialize.ts` | `{ memberId?, organizationId?, periodYear, periodMonth, memberMetricsWritten?, organizationMetricsWritten? }` | `person_intelligence`, `projected_payroll`, organization-level projections derivadas                                             |
+| `ico_ai_signals`      | `ico.ai_signals.materialized`   | `ico-engine/materialize.ts` | `{ periodYear, periodMonth, aiSignalsWritten, predictionLogsWritten, spaceId? }`                              | `ico_ai_signals` projection hacia `greenhouse_serving.ico_ai_signals` y consumers internal-only (`Agency`, `Ops Health`, `Nexa`) |
 
 Notas:
+
 - `ico.materialization.completed` es hoy la señal reactiva canónica downstream cuando ya quedaron materializadas las métricas mensuales de `ICO`.
 - `ico.ai_signals.materialized` es aditivo sobre `ico.materialization.completed`: no reemplaza el contrato base de snapshots, solo publica la lane de señales AI persistidas.
 - `projected_payroll` y `person_intelligence` deben reaccionar a este evento derivado, no recalcular directamente desde cambios crudos de tareas.
@@ -696,6 +699,7 @@ Notas:
   - Regla: estos cuatro eventos son **audit-only** hasta que un consumer real con contrato de negocio explícito los reclame. `projected_payroll_snapshots` es serving cache, no transactional source of truth.
 
 Notas:
+
 - `payroll_period.exported` es el evento canónico de cierre mensual de nómina.
 - los eventos `payroll_period.*` pueden resolverse por `finance_period` en projections que necesiten fanout a todos los miembros del período.
 - el fallback BigQuery de Payroll mantiene compatibilidad funcional, pero la arquitectura reactiva canonica depende del path `Postgres-first` con outbox.
@@ -703,46 +707,46 @@ Notas:
 
 ### Capacity Economics (nuevo)
 
-| Aggregate Type | Event Type | Publisher | Payload | Consumer reactivo |
-|---|---|---|---|---|
+| Aggregate Type          | Event Type                       | Publisher                   | Payload                                                        | Consumer reactivo           |
+| ----------------------- | -------------------------------- | --------------------------- | -------------------------------------------------------------- | --------------------------- |
 | `finance_exchange_rate` | `finance.exchange_rate.upserted` | `finance/postgres-store.ts` | `{ rateId, fromCurrency, toCurrency, rate, rateDate, source }` | `member_capacity_economics` |
-| `finance_overhead` | `finance.overhead.updated` | — | `{ periodYear, periodMonth, amount }` | `member_capacity_economics` |
-| `finance_license_cost` | `finance.license_cost.updated` | — | `{ periodYear, periodMonth, amount }` | `member_capacity_economics` |
-| `finance_tooling_cost` | `finance.tooling_cost.updated` | — | `{ periodYear, periodMonth, amount }` | `member_capacity_economics` |
+| `finance_overhead`      | `finance.overhead.updated`       | —                           | `{ periodYear, periodMonth, amount }`                          | `member_capacity_economics` |
+| `finance_license_cost`  | `finance.license_cost.updated`   | —                           | `{ periodYear, periodMonth, amount }`                          | `member_capacity_economics` |
+| `finance_tooling_cost`  | `finance.tooling_cost.updated`   | —                           | `{ periodYear, periodMonth, amount }`                          | `member_capacity_economics` |
 
 ### AI Tools
 
-| Aggregate Type | Event Type | Publisher | Payload | Consumer reactivo |
-|---|---|---|---|---|
-| `ai_credits` | `ai.credits.*` | `ai-tools/postgres-store.ts` | `{ tenantId, amount }` | — |
-| `ai_wallet` | `ai.wallet.*` | `ai-tools/postgres-store.ts` | `{ walletId }` | — |
+| Aggregate Type | Event Type     | Publisher                    | Payload                | Consumer reactivo |
+| -------------- | -------------- | ---------------------------- | ---------------------- | ----------------- |
+| `ai_credits`   | `ai.credits.*` | `ai-tools/postgres-store.ts` | `{ tenantId, amount }` | —                 |
+| `ai_wallet`    | `ai.wallet.*`  | `ai-tools/postgres-store.ts` | `{ walletId }`         | —                 |
 
 ### Account 360 (nuevo)
 
-| Aggregate Type | Event Type | Publisher | Payload | Consumer reactivo |
-|---|---|---|---|---|
-| `organization` | `organization.updated` | `account-360/organization-store.ts` | `{ organizationId, updatedFields }` | — |
-| `membership` | `membership.created` | `account-360/organization-store.ts` | `{ membershipId, profileId, organizationId, spaceId }` | `invalidateOrganization360`, `service_attribution` |
-| `membership` | `membership.updated` | `account-360/organization-store.ts` | `{ membershipId, updatedFields }` | `invalidateOrganization360`, `service_attribution` |
-| `membership` | `membership.deactivated` | `account-360/organization-store.ts` | `{ membershipId }` | `invalidateOrganization360`, `service_attribution` |
+| Aggregate Type | Event Type               | Publisher                           | Payload                                                | Consumer reactivo                                  |
+| -------------- | ------------------------ | ----------------------------------- | ------------------------------------------------------ | -------------------------------------------------- |
+| `organization` | `organization.updated`   | `account-360/organization-store.ts` | `{ organizationId, updatedFields }`                    | —                                                  |
+| `membership`   | `membership.created`     | `account-360/organization-store.ts` | `{ membershipId, profileId, organizationId, spaceId }` | `invalidateOrganization360`, `service_attribution` |
+| `membership`   | `membership.updated`     | `account-360/organization-store.ts` | `{ membershipId, updatedFields }`                      | `invalidateOrganization360`, `service_attribution` |
+| `membership`   | `membership.deactivated` | `account-360/organization-store.ts` | `{ membershipId }`                                     | `invalidateOrganization360`, `service_attribution` |
 
 ### CRM Company Lifecycle (TASK-454)
 
-| Aggregate Type | Event Type | Publisher | Payload | Consumer reactivo |
-|---|---|---|---|---|
-| `crm_company` | `crm.company.lifecyclestage_changed` | `hubspot/company-lifecycle-events.ts` (from `hubspot/sync-hubspot-company-lifecycle.ts`) | `{ clientId, organizationId, spaceId, hubspotCompanyId, fromStage, toStage, source }` | — |
+| Aggregate Type | Event Type                           | Publisher                                                                                | Payload                                                                               | Consumer reactivo |
+| -------------- | ------------------------------------ | ---------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- | ----------------- |
+| `crm_company`  | `crm.company.lifecyclestage_changed` | `hubspot/company-lifecycle-events.ts` (from `hubspot/sync-hubspot-company-lifecycle.ts`) | `{ clientId, organizationId, spaceId, hubspotCompanyId, fromStage, toStage, source }` | —                 |
 
 ### Commercial Party Lifecycle (TASK-535, Fase A)
 
 Domain: `cost_intelligence`. Canonical source of truth for the commercial state of every organization — `greenhouse_core.organizations.lifecycle_stage`. Every write passes through the CQRS commands in `src/lib/commercial/party/commands/**`; direct UPDATEs to `lifecycle_stage` are not permitted.
 
-| Aggregate Type | Event Type | Publisher | Payload | Consumer reactivo |
-|---|---|---|---|---|
-| `commercial_party` | `commercial.party.created` | `party/party-events.ts` (from `createPartyFromHubSpotCompany`) | `{ commercialPartyId, organizationId, initialStage, source, hubspotCompanyId? }` | TASK-536 inbound sync materialization, TASK-538 selector cache |
-| `commercial_party` | `commercial.party.promoted` | `party/party-events.ts` (from `promoteParty`) | `{ commercialPartyId, organizationId, fromStage, toStage, source, triggerEntity?, actorUserId?, reason? }` | TASK-540 HubSpot outbound, TASK-541 quote-to-cash |
-| `commercial_party` | `commercial.party.demoted` | `party/party-events.ts` (from `promoteParty` when the stage rank drops) | `{ …promoted payload, direction: 'demote' }` | TASK-540 HubSpot outbound |
-| `commercial_party` | `commercial.party.lifecycle_backfilled` | Reserved for the operational backfill runbook (M2 migration + CLI). Not emitted in Fase A. | `{ commercialPartyId, organizationId, toStage, batchId }` | — |
-| `commercial_client` | `commercial.client.instantiated` | `party/party-events.ts` (from `instantiateClientForParty`, invoked as side-effect of promoteParty → active_client) | `{ clientId, clientProfileId, organizationId, commercialPartyId, triggerEntity, actorUserId? }` | Finance (`fin_client_profiles` bootstrap is already in-transaction), ICO / cost attribution pipelines |
+| Aggregate Type      | Event Type                              | Publisher                                                                                                          | Payload                                                                                                    | Consumer reactivo                                                                                     |
+| ------------------- | --------------------------------------- | ------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| `commercial_party`  | `commercial.party.created`              | `party/party-events.ts` (from `createPartyFromHubSpotCompany`)                                                     | `{ commercialPartyId, organizationId, initialStage, source, hubspotCompanyId? }`                           | TASK-536 inbound sync materialization, TASK-538 selector cache                                        |
+| `commercial_party`  | `commercial.party.promoted`             | `party/party-events.ts` (from `promoteParty`)                                                                      | `{ commercialPartyId, organizationId, fromStage, toStage, source, triggerEntity?, actorUserId?, reason? }` | TASK-540 HubSpot outbound, TASK-541 quote-to-cash                                                     |
+| `commercial_party`  | `commercial.party.demoted`              | `party/party-events.ts` (from `promoteParty` when the stage rank drops)                                            | `{ …promoted payload, direction: 'demote' }`                                                               | TASK-540 HubSpot outbound                                                                             |
+| `commercial_party`  | `commercial.party.lifecycle_backfilled` | Reserved for the operational backfill runbook (M2 migration + CLI). Not emitted in Fase A.                         | `{ commercialPartyId, organizationId, toStage, batchId }`                                                  | —                                                                                                     |
+| `commercial_client` | `commercial.client.instantiated`        | `party/party-events.ts` (from `instantiateClientForParty`, invoked as side-effect of promoteParty → active_client) | `{ clientId, clientProfileId, organizationId, commercialPartyId, triggerEntity, actorUserId? }`            | Finance (`fin_client_profiles` bootstrap is already in-transaction), ICO / cost attribution pipelines |
 
 Invariants:
 
@@ -754,118 +758,119 @@ Invariants:
 
 ### HR Core / People (nuevo)
 
-| Aggregate Type | Event Type | Publisher | Payload | Consumer reactivo |
-|---|---|---|---|---|
-| `member` | `member.created` | `team-admin/mutate-team.ts` | `{ memberId, email, displayName }` | — |
-| `member` | `member.updated` | `team-admin/mutate-team.ts` | `{ memberId, updatedFields }` | — |
-| `member` | `member.deactivated` | `team-admin/mutate-team.ts` | `{ memberId }` | — |
-| `assignment` | `assignment.created` | `team-admin/mutate-team.ts` | `{ assignmentId, memberId, clientId, fteAllocation }` | `invalidateOrganization360`, `service_attribution` |
-| `assignment` | `assignment.updated` | `team-admin/mutate-team.ts` | `{ assignmentId, memberId, clientId, updatedFields }` | `invalidateOrganization360`, `service_attribution` |
-| `assignment` | `assignment.removed` | `team-admin/mutate-team.ts` | `{ assignmentId, memberId, clientId }` | `invalidateOrganization360`, `service_attribution` |
+| Aggregate Type | Event Type           | Publisher                   | Payload                                               | Consumer reactivo                                  |
+| -------------- | -------------------- | --------------------------- | ----------------------------------------------------- | -------------------------------------------------- |
+| `member`       | `member.created`     | `team-admin/mutate-team.ts` | `{ memberId, email, displayName }`                    | —                                                  |
+| `member`       | `member.updated`     | `team-admin/mutate-team.ts` | `{ memberId, updatedFields }`                         | —                                                  |
+| `member`       | `member.deactivated` | `team-admin/mutate-team.ts` | `{ memberId }`                                        | —                                                  |
+| `assignment`   | `assignment.created` | `team-admin/mutate-team.ts` | `{ assignmentId, memberId, clientId, fteAllocation }` | `invalidateOrganization360`, `service_attribution` |
+| `assignment`   | `assignment.updated` | `team-admin/mutate-team.ts` | `{ assignmentId, memberId, clientId, updatedFields }` | `invalidateOrganization360`, `service_attribution` |
+| `assignment`   | `assignment.removed` | `team-admin/mutate-team.ts` | `{ assignmentId, memberId, clientId }`                | `invalidateOrganization360`, `service_attribution` |
 
 ### Identity (nuevo)
 
-| Aggregate Type | Event Type | Publisher | Payload | Consumer reactivo |
-|---|---|---|---|---|
-| `identity_reconciliation` | `identity.reconciliation.approved` | `identity/reconciliation/apply-link.ts` | `{ proposalId, status, resolvedBy }` | — |
-| `identity_reconciliation` | `identity.reconciliation.rejected` | `identity/reconciliation/apply-link.ts` | `{ proposalId, status, resolvedBy }` | — |
-| `identity_profile` | `identity.profile.linked` | `identity/reconciliation/apply-link.ts` | `{ proposalId, profileId, memberId, sourceSystem, sourceObjectId }` | — |
+| Aggregate Type            | Event Type                         | Publisher                               | Payload                                                             | Consumer reactivo |
+| ------------------------- | ---------------------------------- | --------------------------------------- | ------------------------------------------------------------------- | ----------------- |
+| `identity_reconciliation` | `identity.reconciliation.approved` | `identity/reconciliation/apply-link.ts` | `{ proposalId, status, resolvedBy }`                                | —                 |
+| `identity_reconciliation` | `identity.reconciliation.rejected` | `identity/reconciliation/apply-link.ts` | `{ proposalId, status, resolvedBy }`                                | —                 |
+| `identity_profile`        | `identity.profile.linked`          | `identity/reconciliation/apply-link.ts` | `{ proposalId, profileId, memberId, sourceSystem, sourceObjectId }` | —                 |
 
 ### Operational Responsibility (nuevo, TASK-227)
 
-| Aggregate Type | Event Type | Publisher | Payload | Consumer reactivo |
-|---|---|---|---|---|
-| `operational_responsibility` | `responsibility.assigned` | `operational-responsibility/store.ts` | `{ responsibilityId, memberId, scopeType, scopeId, responsibilityType, isPrimary }` | — |
-| `operational_responsibility` | `responsibility.revoked` | `operational-responsibility/store.ts` | `{ responsibilityId, memberId, scopeType, scopeId, responsibilityType }` | — |
-| `operational_responsibility` | `responsibility.updated` | `operational-responsibility/store.ts` | `{ responsibilityId, memberId, scopeType, scopeId, responsibilityType, changes }` | — |
+| Aggregate Type               | Event Type                | Publisher                             | Payload                                                                             | Consumer reactivo |
+| ---------------------------- | ------------------------- | ------------------------------------- | ----------------------------------------------------------------------------------- | ----------------- |
+| `operational_responsibility` | `responsibility.assigned` | `operational-responsibility/store.ts` | `{ responsibilityId, memberId, scopeType, scopeId, responsibilityType, isPrimary }` | —                 |
+| `operational_responsibility` | `responsibility.revoked`  | `operational-responsibility/store.ts` | `{ responsibilityId, memberId, scopeType, scopeId, responsibilityType }`            | —                 |
+| `operational_responsibility` | `responsibility.updated`  | `operational-responsibility/store.ts` | `{ responsibilityId, memberId, scopeType, scopeId, responsibilityType, changes }`   | —                 |
 
 ### Role Governance (TASK-226)
 
-| Aggregate Type | Event Type | Publisher | Payload | Consumer reactivo |
-|---|---|---|---|---|
-| `role_assignment` | `role.assigned` | `admin/role-management.ts` | `{ userId, roleCode, assignedByUserId }` | — |
-| `role_assignment` | `role.revoked` | `admin/role-management.ts` | `{ userId, roleCode, revokedByUserId }` | — |
+| Aggregate Type    | Event Type      | Publisher                  | Payload                                  | Consumer reactivo |
+| ----------------- | --------------- | -------------------------- | ---------------------------------------- | ----------------- |
+| `role_assignment` | `role.assigned` | `admin/role-management.ts` | `{ userId, roleCode, assignedByUserId }` | —                 |
+| `role_assignment` | `role.revoked`  | `admin/role-management.ts` | `{ userId, roleCode, revokedByUserId }`  | —                 |
 
 ### Scope Governance (TASK-248)
 
-| Aggregate Type | Event Type | Publisher | Payload | Consumer reactivo |
-|---|---|---|---|---|
-| `user_scope` | `scope.assigned` | `admin/tenant-member-provisioning.ts` | `{ userId, scopeType, scopeId, clientId, accessLevel }` | — |
-| `user_scope` | `scope.revoked` | — (no revoke function yet) | `{ userId, scopeType, scopeId, clientId }` | — |
+| Aggregate Type | Event Type       | Publisher                             | Payload                                                 | Consumer reactivo |
+| -------------- | ---------------- | ------------------------------------- | ------------------------------------------------------- | ----------------- |
+| `user_scope`   | `scope.assigned` | `admin/tenant-member-provisioning.ts` | `{ userId, scopeType, scopeId, clientId, accessLevel }` | —                 |
+| `user_scope`   | `scope.revoked`  | — (no revoke function yet)            | `{ userId, scopeType, scopeId, clientId }`              | —                 |
 
 ### Auth Session (TASK-248)
 
-| Aggregate Type | Event Type | Publisher | Payload | Consumer reactivo |
-|---|---|---|---|---|
-| `auth_session` | `auth.login.success` | `auth.ts` (NextAuth `events.signIn`) | `{ userId, email, provider, tenantType }` | — |
-| `auth_session` | `auth.login.failed` | `auth.ts` (credentials `authorize`) | `{ email, provider, reason }` | — |
+| Aggregate Type | Event Type           | Publisher                            | Payload                                   | Consumer reactivo |
+| -------------- | -------------------- | ------------------------------------ | ----------------------------------------- | ----------------- |
+| `auth_session` | `auth.login.success` | `auth.ts` (NextAuth `events.signIn`) | `{ userId, email, provider, tenantType }` | —                 |
+| `auth_session` | `auth.login.failed`  | `auth.ts` (credentials `authorize`)  | `{ email, provider, reason }`             | —                 |
 
 ### Email Delivery
 
-| Aggregate | Event Type | Trigger | Payload |
-|-----------|-----------|---------|---------|
-| `email_delivery` | `email_delivery.bounced` | Resend webhook `email.bounced` | `{ recipientEmail, resendId, bounceType, reason }` |
-| `email_delivery` | `email_delivery.complained` | Resend webhook `email.complained` | `{ recipientEmail, resendId, reason }` |
-| `email_delivery` | `email_delivery.rate_limited` | deliverRecipient() rate limit exceeded | `{ recipientEmail, emailType, currentCount, limit }` |
-| `email_delivery` | `email_delivery.undeliverable_marked` | Hard bounce → client_users.email_undeliverable = true | `{ recipientEmail, userId, reason }` |
+| Aggregate        | Event Type                            | Trigger                                               | Payload                                              |
+| ---------------- | ------------------------------------- | ----------------------------------------------------- | ---------------------------------------------------- |
+| `email_delivery` | `email_delivery.bounced`              | Resend webhook `email.bounced`                        | `{ recipientEmail, resendId, bounceType, reason }`   |
+| `email_delivery` | `email_delivery.complained`           | Resend webhook `email.complained`                     | `{ recipientEmail, resendId, reason }`               |
+| `email_delivery` | `email_delivery.rate_limited`         | deliverRecipient() rate limit exceeded                | `{ recipientEmail, emailType, currentCount, limit }` |
+| `email_delivery` | `email_delivery.undeliverable_marked` | Hard bounce → client_users.email_undeliverable = true | `{ recipientEmail, userId, reason }`                 |
 
 Publisher: `src/app/api/webhooks/resend/route.ts` (bounce/complaint), `src/lib/email/delivery.ts` (rate_limited)
 Consumer: none yet (future: admin alerts, delivery health metrics)
 
 ### User Lifecycle (TASK-253, TASK-267)
 
-| Aggregate Type | Event Type | Publisher | Payload | Consumer reactivo |
-|---|---|---|---|---|
-| `user_lifecycle` | `user.deactivated` | `admin/users/[id]/route.ts` | `{ userId, email, deactivatedByUserId }` | — |
-| `user_lifecycle` | `user.reactivated` | `admin/users/[id]/route.ts` | `{ userId, email, reactivatedByUserId }` | — |
-| `user_lifecycle` | `invitation.resent` | `admin/users/[id]/route.ts` | `{ userId, email, resentByUserId }` | — |
+| Aggregate Type   | Event Type          | Publisher                   | Payload                                  | Consumer reactivo |
+| ---------------- | ------------------- | --------------------------- | ---------------------------------------- | ----------------- |
+| `user_lifecycle` | `user.deactivated`  | `admin/users/[id]/route.ts` | `{ userId, email, deactivatedByUserId }` | —                 |
+| `user_lifecycle` | `user.reactivated`  | `admin/users/[id]/route.ts` | `{ userId, email, reactivatedByUserId }` | —                 |
+| `user_lifecycle` | `invitation.resent` | `admin/users/[id]/route.ts` | `{ userId, email, resentByUserId }`      | —                 |
 
 ### Services (nuevo)
 
-| Aggregate Type | Event Type | Publisher | Payload | Consumer reactivo |
-|---|---|---|---|---|
-| `service` | `service.created` | `services/service-store.ts` | `{ serviceId, spaceId, organizationId, lineaDeServicio }` | `service_attribution` |
-| `service` | `service.updated` | `services/service-store.ts` | `{ serviceId, updatedFields }` | `service_attribution` |
-| `service` | `service.deactivated` | `services/service-store.ts` | `{ serviceId }` | `service_attribution` |
+| Aggregate Type | Event Type            | Publisher                   | Payload                                                   | Consumer reactivo     |
+| -------------- | --------------------- | --------------------------- | --------------------------------------------------------- | --------------------- |
+| `service`      | `service.created`     | `services/service-store.ts` | `{ serviceId, spaceId, organizationId, lineaDeServicio }` | `service_attribution` |
+| `service`      | `service.updated`     | `services/service-store.ts` | `{ serviceId, updatedFields }`                            | `service_attribution` |
+| `service`      | `service.deactivated` | `services/service-store.ts` | `{ serviceId }`                                           | `service_attribution` |
 
 ## Consumer reactivo — Projection Registry
 
 El consumer ya no usa handlers hardcodeados. Usa el Projection Registry declarativo:
 
-| Projection | Domain | Trigger Events | Accion |
-|---|---|---|---|
-| `organization_360` | organization | assignment.*, membership.* | Invalida `updated_at` de la organizacion afectada |
-| `notification_dispatch` | notifications | service.created, identity.reconciliation.approved, finance.dte.discrepancy_found, identity.profile.linked | Despacha notificacion in-app + email via NotificationService |
-| `ico_member_metrics` | people | member.*, assignment.* | Refresh dirigido: pull member data BQ → Postgres |
-| `client_economics` | finance | membership.*, assignment.* | Recompute snapshots del periodo actual |
-| `service_attribution` | finance | income.*, expense.*, payroll_entry.*, membership.*, assignment.*, commercial.quotation.created, commercial.quotation.synced, commercial.quotation.po_linked, commercial.quotation.hes_linked, commercial.contract.created, commercial.contract.activated, commercial.contract.modified, commercial.deal.created, commercial.deal.synced, commercial.deal.stage_changed, service.* | Materializa attribution factual por `service_id + period` y persiste unresolved auditable |
-| `member_capacity_economics` | people | member.*, assignment.*, compensation_version.*, payroll_period.*, payroll_entry.*, finance.expense.created, finance.expense.updated, finance.exchange_rate.upserted, finance.overhead.updated, finance.license_cost.updated, finance.tooling_cost.updated | Materializa snapshot por miembro/periodo en `greenhouse_serving.member_capacity_economics` |
-| `person_intelligence` | people | member.*, assignment.*, compensation_version.*, payroll_period.*, payroll_entry.*, finance.exchange_rate.upserted, finance.overhead.updated, finance.license_cost.updated, finance.tooling_cost.updated, ico.materialization.completed | Materializa inteligencia operativa/capacidad/costo por miembro y también soporta fanout por `finance_period` |
-| `projected_payroll` | people | compensation_version.*, payroll_entry.*, payroll_period.calculated, finance.exchange_rate.upserted, ico.materialization.completed | Refresca snapshots de nómina proyectada del período cuando cambia compensación, FX o quedan materializados KPI `ICO` |
-| `finance_expense_reactive_intake` | finance | payroll_period.exported | Materializa expenses system-generated de payroll y social_security en `greenhouse_finance.expenses`. Dedupe por `(period_id, member_id, source_type='payroll_generated')` tras TASK-411. |
-| `payroll_reliquidation_delta` | finance | payroll_entry.reliquidated | Aplica delta neto (`deltaGross`) como nuevo expense con `source_type='payroll_reliquidation'` y `reopen_audit_id` FK. Skip/no-op si delta=0. Idempotente por `(event_id, handler)` en outbox_reactive_log. |
-| `payroll_receipts_delivery` | notifications | payroll_period.exported | Genera, persiste y envía el batch de recibos del período exportado |
-| `payroll_export_ready_notification` | notifications | payroll_period.exported | Envía el aviso de cierre/exportación a Finance/HR con el resumen operativo del período |
+| Projection                          | Domain        | Trigger Events                                                                                                                                                                                                                                                                                                                                                                    | Accion                                                                                                                                                                                                     |
+| ----------------------------------- | ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `organization_360`                  | organization  | assignment._, membership._                                                                                                                                                                                                                                                                                                                                                        | Invalida `updated_at` de la organizacion afectada                                                                                                                                                          |
+| `notification_dispatch`             | notifications | service.created, identity.reconciliation.approved, finance.dte.discrepancy_found, identity.profile.linked                                                                                                                                                                                                                                                                         | Despacha notificacion in-app + email via NotificationService                                                                                                                                               |
+| `ico_member_metrics`                | people        | member._, assignment._                                                                                                                                                                                                                                                                                                                                                            | Refresh dirigido: pull member data BQ → Postgres                                                                                                                                                           |
+| `client_economics`                  | finance       | membership._, assignment._                                                                                                                                                                                                                                                                                                                                                        | Recompute snapshots del periodo actual                                                                                                                                                                     |
+| `service_attribution`               | finance       | income._, expense._, payroll_entry._, membership._, assignment._, commercial.quotation.created, commercial.quotation.synced, commercial.quotation.po_linked, commercial.quotation.hes_linked, commercial.contract.created, commercial.contract.activated, commercial.contract.modified, commercial.deal.created, commercial.deal.synced, commercial.deal.stage_changed, service._ | Materializa attribution factual por `service_id + period` y persiste unresolved auditable                                                                                                                  |
+| `member_capacity_economics`         | people        | member._, assignment._, compensation_version._, payroll_period._, payroll_entry.\*, finance.expense.created, finance.expense.updated, finance.exchange_rate.upserted, finance.overhead.updated, finance.license_cost.updated, finance.tooling_cost.updated                                                                                                                        | Materializa snapshot por miembro/periodo en `greenhouse_serving.member_capacity_economics`                                                                                                                 |
+| `person_intelligence`               | people        | member._, assignment._, compensation_version._, payroll_period._, payroll_entry.\*, finance.exchange_rate.upserted, finance.overhead.updated, finance.license_cost.updated, finance.tooling_cost.updated, ico.materialization.completed                                                                                                                                           | Materializa inteligencia operativa/capacidad/costo por miembro y también soporta fanout por `finance_period`                                                                                               |
+| `projected_payroll`                 | people        | compensation_version._, payroll_entry._, payroll_period.calculated, finance.exchange_rate.upserted, ico.materialization.completed                                                                                                                                                                                                                                                 | Refresca snapshots de nómina proyectada del período cuando cambia compensación, FX o quedan materializados KPI `ICO`                                                                                       |
+| `finance_expense_reactive_intake`   | finance       | payroll_period.exported                                                                                                                                                                                                                                                                                                                                                           | Materializa expenses system-generated de payroll y social_security en `greenhouse_finance.expenses`. Dedupe por `(period_id, member_id, source_type='payroll_generated')` tras TASK-411.                   |
+| `payroll_reliquidation_delta`       | finance       | payroll_entry.reliquidated                                                                                                                                                                                                                                                                                                                                                        | Aplica delta neto (`deltaGross`) como nuevo expense con `source_type='payroll_reliquidation'` y `reopen_audit_id` FK. Skip/no-op si delta=0. Idempotente por `(event_id, handler)` en outbox_reactive_log. |
+| `payroll_receipts_delivery`         | notifications | payroll_period.exported                                                                                                                                                                                                                                                                                                                                                           | Genera, persiste y envía el batch de recibos del período exportado                                                                                                                                         |
+| `payroll_export_ready_notification` | notifications | payroll_period.exported                                                                                                                                                                                                                                                                                                                                                           | Envía el aviso de cierre/exportación a Finance/HR con el resumen operativo del período                                                                                                                     |
 
 ### Sample Sprints / Engagement Platform (TASK-808)
 
 Los eventos de engagement usan `aggregate_type='service'`, `aggregate_id=<service_id>` y versionan contrato con `payload_json.version=1`. No llevan sufijo `_v1` en `event_type`.
 
-| Aggregate Type | Event Type | Publisher | Payload | Consumer reactivo |
-|---|---|---|---|---|
-| `service` | `service.engagement.declared` | `commercial/sample-sprints/engagement-events.ts` desde `declareCommercialTerms()` | `{ version:1, serviceId, actorUserId, termsId, termsKind, effectiveFrom }` | audit/event preview |
-| `service` | `service.engagement.approved` | `approveEngagement()` | `{ version:1, serviceId, actorUserId, approvalId, approvedAt, capacityWarning }` | audit/event preview |
-| `service` | `service.engagement.rejected` | `rejectEngagement()` | `{ version:1, serviceId, actorUserId, approvalId, rejectedAt }` | audit/event preview |
-| `service` | `service.engagement.capacity_overridden` | `approveEngagement()` cuando `capacity_warning_json.hasWarning=true` | `{ version:1, serviceId, actorUserId, approvalId, capacityWarning }` | audit/event preview |
-| `service` | `service.engagement.phase_completed` | `completePhase()` | `{ version:1, serviceId, actorUserId, phaseId, phaseKind, completedAt }` | audit/event preview |
-| `service` | `service.engagement.progress_snapshot_recorded` | `recordProgressSnapshot()` | `{ version:1, serviceId, actorUserId, snapshotId, snapshotDate }` | audit/event preview |
-| `service` | `service.engagement.outcome_recorded` | `recordOutcome()` | `{ version:1, serviceId, actorUserId, outcomeId, outcomeKind, decisionDate, nextServiceId?, nextQuotationId? }` | audit/event preview |
-| `service` | `service.engagement.cancelled` | `recordOutcome()` para `cancelled_by_*` | `{ version:1, serviceId, actorUserId, outcomeId, outcomeKind, cancellationReason }` | `engagement_cancelled_manual_notification` (`notifications`) |
-| `service` | `service.engagement.converted` | `recordOutcome(converted)` y `convertEngagement()` | `{ version:1, serviceId, actorUserId, outcomeId, lineageId?, termsId?, nextServiceId?, nextQuotationId? }` | `engagement_converted_lifecycle` (`cost_intelligence`) llama `promoteParty()` |
-| `service` | `service.engagement.outbound_requested` | `declareSampleSprint()` desde `commercial/sample-sprints/store.ts` (TASK-837 Slice 3) | `{ version:1, serviceId, actorUserId, hubspotDealId, hubspotCompanyId, contactHubspotIds[], idempotencyKey, engagementKind, requestedAt }` | `sample_sprint_hubspot_outbound` (`finance` domain) — projecta a HubSpot p_services con idempotency |
-| `service` | `service.engagement.outbound_skipped` | Dead-letter UX cuando operador declara skip explícito (TASK-837 Slice 5, pendiente) | `{ version:1, serviceId, actorUserId, reason, skippedAt }` | audit-only (no consumer downstream) |
+| Aggregate Type | Event Type                                      | Publisher                                                                             | Payload                                                                                                                                    | Consumer reactivo                                                                                   |
+| -------------- | ----------------------------------------------- | ------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------- |
+| `service`      | `service.engagement.declared`                   | `commercial/sample-sprints/engagement-events.ts` desde `declareCommercialTerms()`     | `{ version:1, serviceId, actorUserId, termsId, termsKind, effectiveFrom }`                                                                 | audit/event preview                                                                                 |
+| `service`      | `service.engagement.approved`                   | `approveEngagement()`                                                                 | `{ version:1, serviceId, actorUserId, approvalId, approvedAt, capacityWarning }`                                                           | audit/event preview                                                                                 |
+| `service`      | `service.engagement.rejected`                   | `rejectEngagement()`                                                                  | `{ version:1, serviceId, actorUserId, approvalId, rejectedAt }`                                                                            | audit/event preview                                                                                 |
+| `service`      | `service.engagement.capacity_overridden`        | `approveEngagement()` cuando `capacity_warning_json.hasWarning=true`                  | `{ version:1, serviceId, actorUserId, approvalId, capacityWarning }`                                                                       | audit/event preview                                                                                 |
+| `service`      | `service.engagement.phase_completed`            | `completePhase()`                                                                     | `{ version:1, serviceId, actorUserId, phaseId, phaseKind, completedAt }`                                                                   | audit/event preview                                                                                 |
+| `service`      | `service.engagement.progress_snapshot_recorded` | `recordProgressSnapshot()`                                                            | `{ version:1, serviceId, actorUserId, snapshotId, snapshotDate }`                                                                          | audit/event preview                                                                                 |
+| `service`      | `service.engagement.outcome_recorded`           | `recordOutcome()`                                                                     | `{ version:1, serviceId, actorUserId, outcomeId, outcomeKind, decisionDate, nextServiceId?, nextQuotationId? }`                            | audit/event preview                                                                                 |
+| `service`      | `service.engagement.cancelled`                  | `recordOutcome()` para `cancelled_by_*`                                               | `{ version:1, serviceId, actorUserId, outcomeId, outcomeKind, cancellationReason }`                                                        | `engagement_cancelled_manual_notification` (`notifications`)                                        |
+| `service`      | `service.engagement.converted`                  | `recordOutcome(converted)` y `convertEngagement()`                                    | `{ version:1, serviceId, actorUserId, outcomeId, lineageId?, termsId?, nextServiceId?, nextQuotationId? }`                                 | `engagement_converted_lifecycle` (`cost_intelligence`) llama `promoteParty()`                       |
+| `service`      | `service.engagement.outbound_requested`         | `declareSampleSprint()` desde `commercial/sample-sprints/store.ts` (TASK-837 Slice 3) | `{ version:1, serviceId, actorUserId, hubspotDealId, hubspotCompanyId, contactHubspotIds[], idempotencyKey, engagementKind, requestedAt }` | `sample_sprint_hubspot_outbound` (`finance` domain) — projecta a HubSpot p_services con idempotency |
+| `service`      | `service.engagement.outbound_skipped`           | Dead-letter UX cuando operador declara skip explícito (TASK-837 Slice 5, pendiente)   | `{ version:1, serviceId, actorUserId, reason, skippedAt }`                                                                                 | audit-only (no consumer downstream)                                                                 |
 
 Notas:
+
 - `engagement_converted_lifecycle` no escribe directo en `greenhouse_core.organizations`; usa `promoteParty()` para lifecycle history, campos coordinados, client/profile side-effects y eventos `commercial.party.*`.
 - HubSpot deal creation service→deal queda diferida porque el write path canónico existente es `createDealFromQuoteContext()` para Quote Builder; TASK-808 no llama directo al bridge Cloud Run.
 - `engagement_cancelled_manual_notification` despacha notificación interna `system_event` para follow-up manual y mantiene `automaticClientEmail=false`.
@@ -875,17 +880,18 @@ Notas:
 
 Los eventos de release usan `aggregate_type='platform.release'`, `aggregate_id=<release_id>` y versionan contrato con `payload_json.version=1`. El `release_id` formato `<targetSha[:12]>-<UUIDv4>` garantiza idempotencia cross-attempt y trazabilidad.
 
-| Aggregate Type | Event Type | Publisher | Payload | Consumer reactivo |
-|---|---|---|---|---|
-| `platform.release` | `platform.release.started` | `recordReleaseStarted()` desde `src/lib/release/manifest-store.ts` | `{ version:1, releaseId, targetSha, sourceBranch, targetBranch, attemptN, triggeredBy, operatorMemberId, startedAt, preflightResult }` | audit-only (Teams notification follow-up V1.1) |
-| `platform.release` | `platform.release.deploying` | transición `ready → deploying` | `{ version:1, releaseId, targetSha, deployingPhase (vercel/workers/integrations), plannedRevisions }` | audit-only |
-| `platform.release` | `platform.release.verifying` | transición `deploying → verifying` | `{ version:1, releaseId, vercelDeploymentUrl, workerRevisions, verifyingAt }` | post-release-health probe |
-| `platform.release` | `platform.release.released` | transición `verifying → released` | `{ version:1, releaseId, targetSha, vercelDeploymentUrl, workerRevisions, completedAt, postReleaseHealth }` | downstream notifications + reliability dashboard refresh |
-| `platform.release` | `platform.release.degraded` | transición `verifying → degraded` (post-release health failure) | `{ version:1, releaseId, failureReason, failureSignals[], degradedAt, recommendedAction }` | Teams notification escalation (follow-up V1.1) |
-| `platform.release` | `platform.release.rolled_back` | `production-rollback.ts` desde transición `released|degraded → rolled_back` | `{ version:1, releaseId, rolledFromSha, rolledToSha, rolledAt, rollbackReason, rollbackTargets }` | downstream notifications + audit forensic |
-| `platform.release` | `platform.release.aborted` | transición `* → aborted` (operator cancel) | `{ version:1, releaseId, abortedBy, abortReason, abortedAt }` | audit-only |
+| Aggregate Type     | Event Type                     | Publisher                                                          | Payload                                                                                                                                | Consumer reactivo                                                                                 |
+| ------------------ | ------------------------------ | ------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- | ----------------------------------------- |
+| `platform.release` | `platform.release.started`     | `recordReleaseStarted()` desde `src/lib/release/manifest-store.ts` | `{ version:1, releaseId, targetSha, sourceBranch, targetBranch, attemptN, triggeredBy, operatorMemberId, startedAt, preflightResult }` | audit-only (Teams notification follow-up V1.1)                                                    |
+| `platform.release` | `platform.release.deploying`   | transición `ready → deploying`                                     | `{ version:1, releaseId, targetSha, deployingPhase (vercel/workers/integrations), plannedRevisions }`                                  | audit-only                                                                                        |
+| `platform.release` | `platform.release.verifying`   | transición `deploying → verifying`                                 | `{ version:1, releaseId, vercelDeploymentUrl, workerRevisions, verifyingAt }`                                                          | post-release-health probe                                                                         |
+| `platform.release` | `platform.release.released`    | transición `verifying → released`                                  | `{ version:1, releaseId, targetSha, vercelDeploymentUrl, workerRevisions, completedAt, postReleaseHealth }`                            | downstream notifications + reliability dashboard refresh                                          |
+| `platform.release` | `platform.release.degraded`    | transición `verifying → degraded` (post-release health failure)    | `{ version:1, releaseId, failureReason, failureSignals[], degradedAt, recommendedAction }`                                             | Teams notification escalation (follow-up V1.1)                                                    |
+| `platform.release` | `platform.release.rolled_back` | `production-rollback.ts` desde transición `released                | degraded → rolled_back`                                                                                                                | `{ version:1, releaseId, rolledFromSha, rolledToSha, rolledAt, rollbackReason, rollbackTargets }` | downstream notifications + audit forensic |
+| `platform.release` | `platform.release.aborted`     | transición `* → aborted` (operator cancel)                         | `{ version:1, releaseId, abortedBy, abortReason, abortedAt }`                                                                          | audit-only                                                                                        |
 
 Notas:
+
 - Los 7 eventos son **audit + downstream notification primarios**. NO disparan side-effects automáticos sobre cloud (Vercel/Cloud Run/Azure) — esas mutaciones viven en el orquestador `production-release.yml` y `production-rollback.ts`.
 - **State machine canónico**: `preflight → ready → deploying → verifying → released | degraded | aborted`; `released → rolled_back`; `degraded → rolled_back | released`. Enforced en DB via CHECK constraint `release_manifests_state_canonical_check` + audit row append-only por transición en `release_state_transitions`.
 - **Operador member**: `operatorMemberId` puede ser NULL cuando el actor es system (e.g. rollback automatizado por health-check post-release). El audit primario vive en `triggered_by TEXT NOT NULL` con convención `member:<id>`, `system:<actor>`, `cli:<gh-login>`.
@@ -942,16 +948,16 @@ Spec: `docs/tasks/in-progress/TASK-934-unanchored-paid-expense-anchoring-review-
 
 8 eventos versionados v1, aggregate type `client_lifecycle_case`, aggregate_id = `caseId` (`clc-{uuid}`). Implementan `GREENHOUSE_CLIENT_LIFECYCLE_V1` §10 (alcance onboarding/reactivation; offboarding diferido).
 
-| Event | Cuándo | Payload v1 (además de `schemaVersion:1, caseId`) | Consumers |
-|---|---|---|---|
-| `client.lifecycle.case.opened` | `provisionClientLifecycle` | `{organizationId, caseKind, triggerSource, effectiveDate, templateCode}` | UI notification, BQ projection (futuro) |
-| `client.lifecycle.case.activated` | draft → in_progress | `{activatedBy}` | dashboards (reservado) |
-| `client.lifecycle.item.advanced` | `advanceLifecycleChecklistItem` | `{itemCode, fromStatus, toStatus, evidenceAssetId?}` | UI notifications |
-| `client.lifecycle.blocker.added` | `addLifecycleBlocker` | `{reasonCode}` | reliability signal, alerts |
-| `client.lifecycle.blocker.resolved` | `resolveLifecycleBlocker` | `{reasonCode}` | reliability signal |
-| `client.lifecycle.case.completed` | `resolveLifecycleCase` (completed) | `{caseKind, organizationId}` | **cascade**: onboarding completa invoca `instantiateClientForParty` si no existe |
-| `client.lifecycle.case.cancelled` | `resolveLifecycleCase` (cancelled) | `{caseKind, organizationId}` | UI, BQ projection |
-| `client.lifecycle.blocker.overridden` | resolve con `overrideBlockers` | `{blockedReasonCodes}` | reliability signal `client.lifecycle.blocker_override_anomaly_rate`, audit |
+| Event                                 | Cuándo                             | Payload v1 (además de `schemaVersion:1, caseId`)                         | Consumers                                                                        |
+| ------------------------------------- | ---------------------------------- | ------------------------------------------------------------------------ | -------------------------------------------------------------------------------- |
+| `client.lifecycle.case.opened`        | `provisionClientLifecycle`         | `{organizationId, caseKind, triggerSource, effectiveDate, templateCode}` | UI notification, BQ projection (futuro)                                          |
+| `client.lifecycle.case.activated`     | draft → in_progress                | `{activatedBy}`                                                          | dashboards (reservado)                                                           |
+| `client.lifecycle.item.advanced`      | `advanceLifecycleChecklistItem`    | `{itemCode, fromStatus, toStatus, evidenceAssetId?}`                     | UI notifications                                                                 |
+| `client.lifecycle.blocker.added`      | `addLifecycleBlocker`              | `{reasonCode}`                                                           | reliability signal, alerts                                                       |
+| `client.lifecycle.blocker.resolved`   | `resolveLifecycleBlocker`          | `{reasonCode}`                                                           | reliability signal                                                               |
+| `client.lifecycle.case.completed`     | `resolveLifecycleCase` (completed) | `{caseKind, organizationId}`                                             | **cascade**: onboarding completa invoca `instantiateClientForParty` si no existe |
+| `client.lifecycle.case.cancelled`     | `resolveLifecycleCase` (cancelled) | `{caseKind, organizationId}`                                             | UI, BQ projection                                                                |
+| `client.lifecycle.blocker.overridden` | resolve con `overrideBlockers`     | `{blockedReasonCodes}`                                                   | reliability signal `client.lifecycle.blocker_override_anomaly_rate`, audit       |
 
 - **Emisor**: comandos en `src/lib/client-lifecycle/commands/**` vía `publishLifecycleEvent` (dual-mode, dentro de la misma tx que la mutación + el `client_lifecycle_case_events` append-only).
 - **Cascade canónico**: el `.case.completed` de kind `onboarding` invoca `instantiateClientForParty(organizationId)` dentro de la tx; swallow `OrganizationAlreadyHasClientError` (idempotente). El org row NUNCA se escribe desde el lifecycle — eso es `upsertCanonicalOrganization` (TASK-991), invocado por el wizard composer (Slice 2).
@@ -963,14 +969,14 @@ Spec: `docs/architecture/GREENHOUSE_CLIENT_LIFECYCLE_V1.md` §10 + `docs/tasks/i
 
 6 eventos versionados v1, aggregate type `workforce_contracting_case`, aggregate_id = `caseId` (`wcc-{uuid}`). Foundation advisory-only: ningún consumer genera PDF/firma/email en TASK-1019.
 
-| Event | Cuándo | Payload v1 (además de `schemaVersion:1, caseId`) | Consumers |
-|---|---|---|---|
-| `workforce.contracting.case_opened` | `createWorkforceContractingCase` | `{caseKind, subjectIdentityProfileId, operatingEntityOrganizationId, jurisdictionPackCode, status}` | audit, UI notification (futuro) |
-| `workforce.contracting.ai_draft_created` | `createWorkforceContractingDraft` con `source='claude_ai'` (adapter Slice 3) | `{draftId, draftVersion, aiRunId, caseStatus}` | **REACTIVO futuro** — render/PDF consumer (EPIC-001) |
-| `workforce.contracting.draft_approved` | `approveWorkforceContractingDraft` | `{draftId, draftVersion, caseKind, caseStatus, approvedByUserId}` | **REACTIVO futuro** — render/PDF (EPIC-001) |
-| `workforce.contracting.ready_for_pdf` | transición → `ready_for_pdf` (comando futuro) | `{...}` | render consumer (EPIC-001 `TASK-489`/`TASK-493`) |
-| `workforce.contracting.ready_for_signature` | transición → `ready_for_signature` (comando futuro) | `{...}` | signature consumer (EPIC-001 `TASK-490`/`TASK-491`, ZapSign) |
-| `workforce.contracting.signature_pending_overdue` | **scheduler futuro** (no emitido en TASK-1019) | `{...}` | Notification Hub (recordatorio de firma pendiente) |
+| Event                                             | Cuándo                                                                       | Payload v1 (además de `schemaVersion:1, caseId`)                                                    | Consumers                                                    |
+| ------------------------------------------------- | ---------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
+| `workforce.contracting.case_opened`               | `createWorkforceContractingCase`                                             | `{caseKind, subjectIdentityProfileId, operatingEntityOrganizationId, jurisdictionPackCode, status}` | audit, UI notification (futuro)                              |
+| `workforce.contracting.ai_draft_created`          | `createWorkforceContractingDraft` con `source='claude_ai'` (adapter Slice 3) | `{draftId, draftVersion, aiRunId, caseStatus}`                                                      | **REACTIVO futuro** — render/PDF consumer (EPIC-001)         |
+| `workforce.contracting.draft_approved`            | `approveWorkforceContractingDraft`                                           | `{draftId, draftVersion, caseKind, caseStatus, approvedByUserId}`                                   | **REACTIVO futuro** — render/PDF (EPIC-001)                  |
+| `workforce.contracting.ready_for_pdf`             | transición → `ready_for_pdf` (comando futuro)                                | `{...}`                                                                                             | render consumer (EPIC-001 `TASK-489`/`TASK-493`)             |
+| `workforce.contracting.ready_for_signature`       | transición → `ready_for_signature` (comando futuro)                          | `{...}`                                                                                             | signature consumer (EPIC-001 `TASK-490`/`TASK-491`, ZapSign) |
+| `workforce.contracting.signature_pending_overdue` | **scheduler futuro** (no emitido en TASK-1019)                               | `{...}`                                                                                             | Notification Hub (recordatorio de firma pendiente)           |
 
 - **Emisor**: comandos en `src/lib/workforce/contracting/commands/**` vía `publishContractingEvent` (dual-mode, dentro de la misma tx que la mutación + el `workforce_contracting_case_events` append-only). En TASK-1019 se emiten `case_opened` (createCase), `ai_draft_created` (draft AI) y `draft_approved` (approve); los demás quedan declarados como contrato para tasks futuras.
 - **Contratos de integración futura** (no implementados en TASK-1019):
@@ -986,15 +992,15 @@ Spec: `docs/architecture/GREENHOUSE_WORKFORCE_CONTRACTING_STUDIO_V1.md` + `docs/
 
 7 eventos versionados v1, aggregate type `signature_request`, aggregate_id = `signatureRequestId` (`sig-{uuid}`). Plataforma de firma provider-neutral (hexagonal port; adapter ZapSign = TASK-491). Foundation: el aggregate + state machine + commands existen; ningún provider real se invoca todavía (`notImplementedSignatureAdapter` lanza 503 hasta TASK-491).
 
-| Event | Cuándo | Payload v1 (además de `schemaVersion:1, signatureRequestId, sourceKind, sourceRef, status`) | Consumers |
-|---|---|---|---|
-| `signature.request.created` | `createSignatureRequest` (draft) | — | audit, UI (futuro) |
-| `signature.request.sent` | `sendSignatureRequest` (→ provider) | `{}` (status=sent) | Notification Hub (futuro) |
-| `signature.request.partially_signed` | `applyProviderSignatureUpdate` (un firmante de varios) | `{signedDocumentAssetId}` | UI progreso (futuro) |
-| `signature.request.completed` | `applyProviderSignatureUpdate` (todos firman) | `{signedDocumentAssetId}` | **REACTIVO futuro** — Workforce Activation, vault del documento firmado |
-| `signature.request.cancelled` | `cancelSignatureRequest` | `{}` (status=cancelled) | audit |
-| `signature.request.failed` | `applyProviderSignatureUpdate` (provider rechaza) | `{}` (status=failed) | reliability `documents.signature_request.failed` |
-| `signature.request.expired` | `applyProviderSignatureUpdate` (TTL provider) | `{}` (status=expired) | audit |
+| Event                                | Cuándo                                                 | Payload v1 (además de `schemaVersion:1, signatureRequestId, sourceKind, sourceRef, status`) | Consumers                                                               |
+| ------------------------------------ | ------------------------------------------------------ | ------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| `signature.request.created`          | `createSignatureRequest` (draft)                       | —                                                                                           | audit, UI (futuro)                                                      |
+| `signature.request.sent`             | `sendSignatureRequest` (→ provider)                    | `{}` (status=sent)                                                                          | Notification Hub (futuro)                                               |
+| `signature.request.partially_signed` | `applyProviderSignatureUpdate` (un firmante de varios) | `{signedDocumentAssetId}`                                                                   | UI progreso (futuro)                                                    |
+| `signature.request.completed`        | `applyProviderSignatureUpdate` (todos firman)          | `{signedDocumentAssetId}`                                                                   | **REACTIVO futuro** — Workforce Activation, vault del documento firmado |
+| `signature.request.cancelled`        | `cancelSignatureRequest`                               | `{}` (status=cancelled)                                                                     | audit                                                                   |
+| `signature.request.failed`           | `applyProviderSignatureUpdate` (provider rechaza)      | `{}` (status=failed)                                                                        | reliability `documents.signature_request.failed`                        |
+| `signature.request.expired`          | `applyProviderSignatureUpdate` (TTL provider)          | `{}` (status=expired)                                                                       | audit                                                                   |
 
 - **Emisor**: comandos en `src/lib/signatures/commands.ts` vía `publishSignatureEvent` (dual-mode, dentro de la misma tx que la mutación + el `signature_request_events` append-only). El estado provider-driven es **monotónico + tolerante a callbacks fuera de orden** (`applyProviderStatus` nunca regresa; terminal es inmutable) → el evento de status solo se emite en un cambio real de estado (idempotente ante reentrega del webhook TASK-491).
 - **Hexagonal port**: `SignatureProviderAdapter` (DI). El adapter real ZapSign + el webhook inbound = TASK-491. El render del documento = TASK-1023. El bridge `ready_for_signature` (workforce_contracting → signature_request) = TASK-491.
@@ -1006,11 +1012,11 @@ Spec: `docs/tasks/in-progress/TASK-490-signature-orchestration-foundation.md`.
 
 3 eventos v1 nuevos, aggregate type `workforce_contracting_case`. Cierran el bridge contrato↔firma (consume EPIC-001 TASK-490/491).
 
-| Event | Cuándo | Payload v1 (además de `schemaVersion:1, caseId`) | Consumers |
-|---|---|---|---|
-| `workforce.contracting.sent_for_signature` | producer `sendContractingCaseToSignature` (CTA operador) | `{signatureRequestId}` | TASK-1025 (notificación de envío) |
+| Event                                       | Cuándo                                                              | Payload v1 (además de `schemaVersion:1, caseId`)          | Consumers                                                                           |
+| ------------------------------------------- | ------------------------------------------------------------------- | --------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| `workforce.contracting.sent_for_signature`  | producer `sendContractingCaseToSignature` (CTA operador)            | `{signatureRequestId}`                                    | TASK-1025 (notificación de envío)                                                   |
 | `workforce.contracting.signature_completed` | consumer reactivo (signature.request.completed → case fully_signed) | `{signatureRequestId, signatureStatus, signedPdfAssetId}` | **REACTIVO futuro** — TASK-1025 (archivar + notificar), TASK-1026 (registro DT/REL) |
-| `workforce.contracting.signature_failed` | consumer reactivo (signature.request.failed/expired) | `{signatureRequestId, signatureStatus, signedPdfAssetId}` | TASK-1025 (alerta / reenvío) |
+| `workforce.contracting.signature_failed`    | consumer reactivo (signature.request.failed/expired)                | `{signatureRequestId, signatureStatus, signedPdfAssetId}` | TASK-1025 (alerta / reenvío)                                                        |
 
 - **Emisor producer**: `src/lib/workforce/contracting/signature/send-to-signature.ts` vía `publishContractingEvent` (dentro de la tx que avanza el caso a `sent_for_signature`). El worker es el único firmante electrónico (firma del representante pre-estampada, TASK-863/1023).
 - **Emisor consumer**: projection reactiva `contracting_signature_bridge` (`src/lib/sync/projections/contracting-signature-bridge.ts`) que consume `signature.request.{completed,partially_signed,failed,expired}` filtrado a `sourceKind='contracting_case'`, re-lee PG, avanza el caso + liga `signed_pdf_asset_id`. `expired` mapea a `signature_failed` (estado del caso = `expired`, distinto). `partially_signed` es audit-only (single-signer no dispara).
@@ -1022,20 +1028,75 @@ Spec: `docs/tasks/in-progress/TASK-1024-workforce-contracting-signature-consumer
 
 `aggregate_type = design_system_figma_node`, `aggregate_id = surface_key` (ruta normalizada del DS, ej. `/design-system/breadcrumbs`).
 
-| Event | Cuándo | Payload v1 | Consumers |
-|---|---|---|---|
-| `design_system.figma_node.linked` | primer vínculo de la superficie a un nodo AXIS | `{surfaceKey, fileKey, nodeId, previousNodeId:null, actorUserId}` | ninguno (audit/observabilidad V1) |
-| `design_system.figma_node.relinked` | cambio del nodo (supersede del anterior) | `{surfaceKey, fileKey, nodeId, previousNodeId, actorUserId}` | ninguno (audit/observabilidad V1) |
+| Event                               | Cuándo                                         | Payload v1                                                        | Consumers                         |
+| ----------------------------------- | ---------------------------------------------- | ----------------------------------------------------------------- | --------------------------------- |
+| `design_system.figma_node.linked`   | primer vínculo de la superficie a un nodo AXIS | `{surfaceKey, fileKey, nodeId, previousNodeId:null, actorUserId}` | ninguno (audit/observabilidad V1) |
+| `design_system.figma_node.relinked` | cambio del nodo (supersede del anterior)       | `{surfaceKey, fileKey, nodeId, previousNodeId, actorUserId}`      | ninguno (audit/observabilidad V1) |
 
 - **Emisor**: command `linkDesignSystemFigmaNode` (`src/lib/design-system/figma-nodes/store.ts`) dentro de la tx que hace el upsert del current + el INSERT del audit event append-only (`greenhouse_core.design_system_figma_node_events`).
 - **Sin consumer reactivo en V1** — la feature es link-only síncrona. El enrichment del nodo (render real vía Figma REST) sería un consumer futuro (Slice 4 diferido).
 
 Spec: `docs/tasks/complete/TASK-1072-designer-role-figma-node-linking.md`.
 
+## Delta 2026-06-19 — TASK-1120: `design_system.handoff.{registered,transitioned,archived}` (Design Handoff Registry)
+
+`aggregate_type = design_handoff_entry`, `aggregate_id = entry_id` (`dhe-{uuid}`). Este aggregate es hermano y separado de `design_system_figma_node`: producto usa allowlist gobernado propio y AXIS queda excluido.
+
+| Event                                | Cuándo                                                                           | Payload v1                                                                                       | Consumers                 |
+| ------------------------------------ | -------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ | ------------------------- |
+| `design_system.handoff.registered`   | se registra un nodo Figma de producto allowlisted                                | `{entryId, title, kind, fileKey, nodeId, status, implementedSurfaceKey:null, actorUserId}`       | audit / observabilidad V1 |
+| `design_system.handoff.transitioned` | transición válida `proposed→in_implementation` o `in_implementation→implemented` | `{entryId, title, kind, fileKey, nodeId, status, implementedSurfaceKey, actorUserId}`            | audit / observabilidad V1 |
+| `design_system.handoff.archived`     | cualquier estado activo pasa a `archived`                                        | `{entryId, title, kind, fileKey, nodeId, status:'archived', implementedSurfaceKey, actorUserId}` | audit / observabilidad V1 |
+
+- **Emisor**: commands `createDesignHandoffEntry` y `transitionDesignHandoffEntry` (`src/lib/design-system/handoff/store.ts`) dentro de la tx que muta `greenhouse_core.design_handoff_entries` + inserta `greenhouse_core.design_handoff_entry_events`.
+- **Lifecycle**: `proposed → in_implementation → implemented → archived`; `archived` es terminal. `implemented` exige `implemented_surface_key`.
+- **Reliability**: `design_system.handoff.stale_entries` (moduleKey `platform`, kind `drift`) detecta entradas `proposed|in_implementation` viejas.
+
+Spec: `docs/tasks/in-progress/TASK-1120-design-handoff-registry.md`.
+
+## Delta 2026-06-19 — TASK-1175: `design_system.handoff.*` V2 control plane
+
+TASK-1175 conserva el aggregate `design_handoff_entry` y agrega eventos audit-first para Full API Parity del control plane. Todos los payloads usan `schemaVersion:1`; los consumers iniciales son auditoria, Reliability y futuros lanes Nexa/API.
+
+| Event                                       | Cuándo                                                              | Payload v1                                                                                                  | Consumers                 |
+| ------------------------------------------- | ------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- | ------------------------- |
+| `design_system.handoff.allowed_file_upserted` | alta o actualización idempotente de archivo Figma producto allowlist | `{schemaVersion:1, fileKey, label, productArea, actorUserId}`                                               | audit / observabilidad V1 |
+| `design_system.handoff.allowed_file_deprecated` | archivo allowlisted queda deprecado                                  | `{schemaVersion:1, fileKey, supersededAt, actorUserId}`                                                     | audit / observabilidad V1 |
+| `design_system.handoff.owner_assigned`      | cambia owner diseño/dev                                             | `{schemaVersion:1, entryId, designerOwnerMemberId, devOwnerMemberId, actorUserId}`                          | audit / observabilidad V1 |
+| `design_system.handoff.planning_updated`    | cambia prioridad, target surface, due date o bloqueo                | `{schemaVersion:1, entryId, priority, targetSurfaceKey, dueAt, blockedReason, actorUserId}`                 | audit / observabilidad V1 |
+| `design_system.handoff.work_item_linked`    | se vincula TASK, PR, commit, deploy, route, comentario Figma o link externo | `{schemaVersion:1, entryId, linkId, linkType, ref, actorUserId}`                                            | audit / observabilidad V1 |
+| `design_system.handoff.evidence_attached`   | se adjunta evidencia `gvc_capture`, `runtime_route`, review o excepción | `{schemaVersion:1, entryId, evidenceId, evidenceType, ref, actorUserId}`                                    | audit / observabilidad V1 |
+| `design_system.handoff.figma_node_verified` | verificación Figma persiste snapshot reachable/renamed/stale/deleted/unavailable | `{schemaVersion:1, entryId, snapshotId, fileKey, nodeId, nodeStatus, checkedAt, actorUserId}`               | audit / Reliability V1    |
+
+- **Lifecycle V2**: `proposed → in_implementation → in_review → implemented → archived`; `archived` sigue terminal. `implemented` exige `implemented_surface_key` + evidencia gobernada, salvo `manual_exception` auditada.
+- **Reliability V2**: signals separados `design_system.handoff.missing_evidence`, `design_system.handoff.figma_node_drift`, `design_system.handoff.orphan_implemented_surface` y `design_system.handoff.allowlist_orphan` cuando aplique. No se reemplaza `design_system.handoff.stale_entries`.
+- **Full API Parity**: allowlist manage, owner/planning, links, evidence, verify y drift son commands/readers server-side; las rutas API son thin wrappers con capabilities granulares.
+- **Delta 2026-06-20 — snapshot inicial en create**: `createDesignHandoffEntry` emite `design_system.handoff.registered` y luego `design_system.handoff.figma_node_verified` en el mismo flujo gobernado, con metadata `trigger:'create'` en el snapshot/evento local. `verifyDesignHandoffFigmaNode` sigue emitiendo el mismo evento para re-verificaciones posteriores; consumers deben tratarlo como snapshot append-only, no como transición de lifecycle.
+
+## Delta 2026-06-20 — TASK-1180: Primitive governance para Design Handoff
+
+TASK-1180 agrega un evento audit-first al mismo aggregate `design_handoff_entry` para dejar trazabilidad de la decision Design System asociada a cada intencion Figma.
+
+| Event type                                             | Cuándo se emite                                               | Payload mínimo                                                                                                                        | Consumer inicial        |
+| ------------------------------------------------------ | ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- | ----------------------- |
+| `design_system.handoff.primitive_decision_updated`     | cambia strategy/primitive/lab/runtime/GVC/docs/rationale      | `{schemaVersion:1, entryId, implementationStrategy, primitiveKey, primitiveVariant, primitiveKind, warningCodes, actorUserId}`        | audit / Reliability V1  |
+
+El evento no reemplaza `evidence_attached`: referencias GVC y runtime siguen pudiendo adjuntarse como evidencia append-only. Primitive governance guarda el estado actual de decision; evidence/links preservan las pruebas y referencias históricas.
+
+Spec: `docs/tasks/in-progress/TASK-1175-design-handoff-control-plane-full-api-parity.md`.
+
 ## Delta 2026-06-12 — Knowledge auto-ingest (TASK-1094)
 
-| Evento | Versión | Aggregate | Emisor | Consumer |
-| --- | --- | --- | --- | --- |
-| `knowledge.notion.page_change_signal` | v1 | `knowledge_notion_page` (page id) | webhook `notion-knowledge` (HMAC, gated `NOTION_KNOWLEDGE_WEBHOOK_ENABLED`) | projection `knowledge_notion_ingest` (ops-worker) |
+| Evento                                | Versión | Aggregate                         | Emisor                                                                      | Consumer                                          |
+| ------------------------------------- | ------- | --------------------------------- | --------------------------------------------------------------------------- | ------------------------------------------------- |
+| `knowledge.notion.page_change_signal` | v1      | `knowledge_notion_page` (page id) | webhook `notion-knowledge` (HMAC, gated `NOTION_KNOWLEDGE_WEBHOOK_ENABLED`) | projection `knowledge_notion_ingest` (ops-worker) |
 
 **Payload v1**: `{ schemaVersion: 1, pageId, notionEventType, isDeletion, parentId, sourceEventId, occurredAt }`. Trigger ligero (NO confiable como source of truth) — el consumer re-fetchea la página, aplica el gate de gobernanza (parent data_source ∈ corpus declarado) y re-ingiere idempotente o deprecia (borrado). Mismo patrón re-fetch que `notion.task.page_change_signal` (TASK-912).
+
+## Delta 2026-06-19 — TASK-1171: `space_notion_source.ico_sync_enabled` (activación ICO gobernada)
+
+| Evento                                 | Versión | Aggregate                                      | Emisor                                                                                                   | Consumer                                                                     |
+| -------------------------------------- | ------- | ---------------------------------------------- | -------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| `space_notion_source.ico_sync_enabled` | v1      | `space_notion_source` (source_id `sns-{uuid}`) | command `enableClientIcoSync` (`src/lib/ico-engine/enable-client-ico-sync.ts`), on-transition FALSE→TRUE | projection `space_notion_source_ico_sync_bq` (ops-worker, domain `delivery`) |
+
+**Payload v1**: `{ sourceId, spaceId, clientId, enabledByUserId, reason }`. Se emite SOLO en la transición real (`sync_enabled` FALSE→TRUE); re-ejecutar sobre un cliente ya activo es no-op (no emite). El consumer re-lee PG por `source_id` (no confía el payload) y MERGEa `greenhouse.space_notion_sources` en BigQuery (idempotente por `space_id`) — el command corre en Vercel (BQ read-only), la propagación a BQ va por este outbox→reactive desde ops-worker (BQ write). Detalle: `metrics/ICO_DELIVERY_METRICS_AGENT_INVARIANTS.md` § ICO Client Inclusion.

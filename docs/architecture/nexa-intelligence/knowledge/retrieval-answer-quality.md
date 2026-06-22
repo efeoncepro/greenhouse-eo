@@ -3,6 +3,16 @@
 > **Capa:** retrieval del corpus + calidad de respuesta. **Código:** [`nexa-tools.ts`](../../../../src/lib/nexa/nexa-tools.ts), [`search-knowledge.ts`](../../../../src/lib/knowledge/search/search-knowledge.ts), [`rerank-knowledge-chunks.ts`](../../../../src/lib/knowledge/search/rerank-knowledge-chunks.ts), [`scripts/nexa-knowledge-qa-matrix.mjs`](../../../../scripts/nexa-knowledge-qa-matrix.mjs).
 > **Detalle técnico del RAG:** [`technical/rag-pipeline.md`](../technical/rag-pipeline.md).
 
+**Frontera con Nexa Insights (TASK-1181/1182):** `nexa-tools.ts` también hospeda `get_insight` / `list_insights`
+(Bridge Slice 1), que NO son retrieval de Knowledge: son lectura insight-addressable del análisis advisory
+de delivery (OTD/RpA/FTR) vía los readers canónicos `readNexaInsightDrill` / `listNexaInsightsForPeriod`
+(subject anti-oracle reusado). El mapeo `runtimeContext → subject` vive en `insight-focus.ts`
+(`buildNexaInsightSubject`, SSOT) y lo reusan tanto los tools como la conciencia de superficie
+`focusRef` del servicio (TASK-1182, Slice 2). El ruteo es explícito: definiciones/procesos → `search_knowledge`;
+causa raíz / señales de delivery → los insight tools; dato en vivo → `get_otd`. Detalle del ruteo en
+[`behavior/behavior-and-routing.md`](../behavior/behavior-and-routing.md); contrato en
+`GREENHOUSE_NEXA_INSIGHT_CONVERSATION_BRIDGE_V1.md`.
+
 ## De "pegar un fragmento" a "respuesta sintetizada"
 
 La meta de esta capa: que una respuesta respaldada por Knowledge sea una **respuesta propia que
@@ -55,9 +65,9 @@ El eval de **retrieval** (golden questions) vive aparte, offline: `golden-questi
 (correctitud del recall/precisión del FTS). Son complementarios: uno mide la respuesta, el otro la búsqueda.
 
 > **Nightly contra staging (TASK-1127):** `.github/workflows/nexa-knowledge-qa-nightly.yml` corre la QA
-> matrix toda las noches contra staging (provider real → Claude) con `--min-pass=9`. El **umbral** tolera
-> la flakiness conocida del LLM (tool-routing K4/G1/K7) para no volverse ruidoso (lección del
-> production-release-watchdog) — pero si varios casos core caen, el job FALLA = alerta honesta. Es
+> matrix toda las noches contra staging (provider real → Claude) con `--min-pass=9`. Desde TASK-1156,
+> K4/G1/K7 no deben fallar por tool-routing cuando el forced Knowledge retrieval flag esta ON; el
+> umbral queda como amortiguador de calidad nightly, no como permiso para omitir `search_knowledge`. Es
 > `tooling` (GitHub Actions, no async-critical, no Vercel cron). Skip honesto si faltan los secrets de
 > staging. **El nightly ya probó su valor:** detectó que el gate K6 fallaba en staging (Claude truncaba
 > a 700 tokens) cuando el fix de Gemini solo cubría local.
@@ -94,8 +104,10 @@ ON en local + Vercel **staging**; **producción gated por sign-off del operador*
 
 Brazo vector aditivo dentro del SSOT `searchKnowledge` (`KNOWLEDGE_SEARCH_HYBRID_ENABLED`, default OFF =
 byte-equivalente). pgvector + HNSW cosine en el Cloud SQL existente (NO managed Vertex); embeddings Vertex
-`text-multilingual-embedding-002` como **paso de ingesta idempotente por checksum** (`embed-corpus.ts`), NUNCA
-en el request path. Acotado a **modo agéntico** (la latencia del embedding de la query ~600ms se absorbe en el
+`text-multilingual-embedding-002` como **paso de ingesta idempotente por checksum**: `embed-corpus.ts` para
+backfill/guardrail y hook reactivo post-publish en `ingestOne` (TASK-1155) para chunks nuevos de repo docs o
+Notion auto-ingest. NUNCA corre en el request path; un fallo de Vertex no rompe el publish y el sistema cae a FTS
+hasta reintento/backfill. Acotado a **modo agéntico** (la latencia del embedding de la query ~600ms se absorbe en el
 stream del LLM; el search humano queda FTS puro). **FTS-signal-gate** (vector solo si el FTS encontró algo →
 no-answer honesto intacto) + **fusión de dos niveles `hybridFuse`** (protege hits FUERTES del FTS = golden-safe;
 compite los débiles vs vector-only = recall de paráfrasis) + degradación honesta a FTS. **Source-agnostic** →

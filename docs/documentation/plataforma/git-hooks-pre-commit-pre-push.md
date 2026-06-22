@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
 > **Version:** 1.0
 > **Creado:** 2026-05-05 por agente
-> **Ultima actualizacion:** 2026-05-05 por agente
+> **Ultima actualizacion:** 2026-06-22 por agente
 > **Documentacion tecnica:** `docs/architecture/GREENHOUSE_GIT_HOOKS_AUTOENFORCEMENT_V1.md`
 
 # Git hooks — autoenforcement local de calidad
@@ -17,7 +17,7 @@ Desde 2026-05-05 el repo tiene 2 git hooks que se ejecutan automaticamente en ca
 | Hook | Cuando corre | Que hace | Cuanto tarda |
 | --- | --- | --- | --- |
 | **pre-commit** | Cada vez que ejecutas `git commit` | Aplica `eslint --fix` automaticamente sobre los archivos que estas commiteando. Si quedan errores no auto-corregibles, bloquea el commit. | < 5 segundos |
-| **pre-push** | Cada vez que ejecutas `git push` | Corre el lint completo de todo el repo + verifica que TypeScript compila. Si hay 1+ error, bloquea el push. | < 90 segundos |
+| **pre-push** | Cada vez que ejecutas `git push` | Corre el lint completo de todo el repo + verifica que TypeScript compila con el typecheck canonico y heap protegido. Si hay 1+ error, bloquea el push. | < 90 segundos |
 
 Los hooks son automaticos. No requieren que el agente recuerde correrlos. Cualquier `git commit` o `git push` los dispara.
 
@@ -51,7 +51,7 @@ El hook detecto problemas, los arreglo, y el commit procedio. **Cero accion del 
 
 ```bash
 $ git push
-[pre-push] Running pnpm lint (full repo)…
+[pre-push] Running pnpm local:check (lint + tsc)…
 src/views/.../FooView.tsx
   42:5  error  'unused' is defined but never used  @typescript-eslint/no-unused-vars
 

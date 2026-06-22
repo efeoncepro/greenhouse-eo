@@ -91,47 +91,35 @@ export const OWNER_ATTRIBUTION_POLICY = 'primary_owner_first_assignee'
 
 export type IcoDimensionKey = keyof typeof ICO_DIMENSIONS
 
-export const AGENCY_REPORT_SCOPE_SPACE_IDS = [
-  'spc-c0cf6478-1bf1-4804-8e04-db7bc73655ad',
-  'spc-ae463d9f-b404-438b-bd5c-bd117d45c3b9',
-  'space-efeonce'
-] as const
-
-export const AGENCY_REPORT_SCOPE_CLIENT_IDS = [
-  'efeonce_internal',
-  'client_internal'
-] as const
-
-const AGENCY_REPORT_SCOPE_SPACE_IDS_SQL = AGENCY_REPORT_SCOPE_SPACE_IDS.map(id => `'${id}'`).join(', ')
-const AGENCY_REPORT_SCOPE_CLIENT_IDS_SQL = AGENCY_REPORT_SCOPE_CLIENT_IDS.map(id => `'${id}'`).join(', ')
-
 const normalizeAgencyScopeValue = (value: string | null | undefined) => normalizeString(value).toLowerCase()
+
+/**
+ * TASK-1171 Slice 2 — El reporte de agencia es DATA-DRIVEN sobre TODOS los clientes
+ * reales de Efeonce. ICO es transversal a las 4 unidades ("la forma en que Efeonce
+ * opera"); el hardcode previo a `{efeonce, sky}` era deuda de cuando había 2 clientes
+ * y subcontaba la operación real (caso Pinturas Berel 2026-06-19). Único excluido: el
+ * teamspace demo (que además ya no entra a la pipeline — sync_enabled=FALSE). Incluye
+ * Efeonce internal + todo cliente con espacio/identidad real. Las columnas legacy
+ * `efeonce_tasks_count`/`sky_tasks_count` se preservan (CASE-filtered) por backward-compat.
+ */
+const isDemoAgencyScope = (combined: string): boolean => combined.includes('demo')
 
 export const isAgencyReportIncludedSpace = (context: {
   spaceId?: string | null
   clientId?: string | null
   clientName?: string | null
 }): boolean => {
-  const spaceId = normalizeAgencyScopeValue(context.spaceId)
-  const clientId = normalizeAgencyScopeValue(context.clientId)
-  const clientName = normalizeAgencyScopeValue(context.clientName)
-  const combined = [spaceId, clientId, clientName].filter(Boolean).join(' ')
+  const combined = [
+    normalizeAgencyScopeValue(context.spaceId),
+    normalizeAgencyScopeValue(context.clientId),
+    normalizeAgencyScopeValue(context.clientName)
+  ]
+    .filter(Boolean)
+    .join(' ')
 
-  if (AGENCY_REPORT_SCOPE_SPACE_IDS.includes(spaceId as (typeof AGENCY_REPORT_SCOPE_SPACE_IDS)[number])) {
-    return true
-  }
+  if (!combined) return false
 
-  if (AGENCY_REPORT_SCOPE_CLIENT_IDS.includes(clientId as (typeof AGENCY_REPORT_SCOPE_CLIENT_IDS)[number])) {
-    return true
-  }
-
-  return (
-    clientName === 'efeonce' ||
-    clientName === 'efeonce internal' ||
-    combined.includes(' sky') ||
-    combined.startsWith('sky') ||
-    combined.includes('sky ')
-  )
+  return !isDemoAgencyScope(combined)
 }
 
 export const buildAgencyReportScopeSql = ({
@@ -148,11 +136,10 @@ export const buildAgencyReportScopeSql = ({
   const primaryName = primaryNameExpression ?? "''"
   const secondaryName = secondaryNameExpression ?? "''"
 
+  // Data-driven: incluye toda fila con espacio/cliente real, EXCEPTO demo.
   return `(
-    LOWER(TRIM(COALESCE(${spaceIdExpression}, ''))) IN (${AGENCY_REPORT_SCOPE_SPACE_IDS_SQL})
-    OR LOWER(TRIM(COALESCE(${clientIdExpression}, ''))) IN (${AGENCY_REPORT_SCOPE_CLIENT_IDS_SQL})
-    OR LOWER(TRIM(COALESCE(${primaryName}, ${secondaryName}, ''))) IN ('efeonce', 'efeonce internal')
-    OR LOWER(TRIM(COALESCE(${primaryName}, ${secondaryName}, ${clientIdExpression}, ${spaceIdExpression}, ''))) LIKE '%sky%'
+    COALESCE(${spaceIdExpression}, ${clientIdExpression}) IS NOT NULL
+    AND LOWER(TRIM(COALESCE(${primaryName}, ${secondaryName}, ${clientIdExpression}, ${spaceIdExpression}, ''))) NOT LIKE '%demo%'
   )`
 }
 

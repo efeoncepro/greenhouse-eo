@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 
 import { revokeQuoteShortLink } from '@/lib/finance/quote-share/short-link'
 import { requireCommercialTenantContext } from '@/lib/tenant/authorization'
+import { can } from '@/lib/entitlements/runtime'
 
 export const dynamic = 'force-dynamic'
 
@@ -18,6 +19,11 @@ export async function DELETE(
 
   if (!tenant) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  // TASK-1202 — gate fino de accion (capability != route-group).
+  if (!can(tenant, 'commercial.quotation', 'export', 'tenant')) {
+    return NextResponse.json({ error: 'No tienes permiso para revocar el compartido de una cotizacion.', code: 'forbidden' }, { status: 403 })
   }
 
   const { shortCode } = await params

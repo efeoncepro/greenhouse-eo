@@ -12,6 +12,7 @@ import Paper from '@mui/material/Paper'
 import Popper from '@mui/material/Popper'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
+import { alpha } from '@mui/material/styles'
 
 import { GH_PRICING } from '@/lib/copy/pricing'
 
@@ -26,11 +27,11 @@ export interface AddLineSplitButtonProps {
 
 type MenuKey = 'catalog' | 'service' | 'template' | 'manual'
 
-const MENU_ITEMS: Array<{ key: MenuKey; icon: string; color: 'primary' | 'success' | 'info' | 'secondary' }> = [
+const MENU_ITEMS: Array<{ key: MenuKey; icon: string; color: 'primary' | 'success' | 'info' | 'warning' }> = [
   { key: 'catalog', icon: 'tabler-books', color: 'primary' },
   { key: 'service', icon: 'tabler-package', color: 'success' },
   { key: 'template', icon: 'tabler-template', color: 'info' },
-  { key: 'manual', icon: 'tabler-edit', color: 'secondary' }
+  { key: 'manual', icon: 'tabler-edit', color: 'info' }
 ]
 
 const AddLineSplitButton = ({
@@ -104,30 +105,48 @@ const AddLineSplitButton = ({
         {({ TransitionProps }) => (
           <Grow {...TransitionProps} style={{ transformOrigin: 'top right' }}>
             <Paper
-              elevation={4}
               sx={theme => ({
                 mt: 1,
-                minWidth: 260,
-                border: `1px solid ${theme.palette.divider}`,
-                borderRadius: 2,
+                minWidth: 292,
+                border: `1px solid ${theme.greenhouseElevation.floating.borderColor}`,
+                borderRadius: `${theme.shape.customBorderRadius.lg}px`,
+                boxShadow: theme.greenhouseElevation.floating.boxShadow,
                 overflow: 'hidden'
               })}
             >
               <ClickAwayListener onClickAway={handleClose}>
-                <MenuList id='add-line-menu' autoFocusItem={open}>
+                <MenuList id='add-line-menu' autoFocusItem={open} sx={{ p: 0.75 }}>
                   {MENU_ITEMS.map(item => (
                     <MenuItem
                       key={item.key}
                       onClick={() => handleMenu(item.key)}
-                      sx={{ py: 1.25, gap: 1.5, minHeight: 44 }}
+                      sx={theme => ({
+                        py: 1.1,
+                        px: 1.2,
+                        gap: 1.25,
+                        minHeight: 48,
+                        borderRadius: `${theme.shape.customBorderRadius.md}px`,
+                        '&:hover, &.Mui-focusVisible': {
+                          backgroundColor: alpha(theme.palette.primary.main, 0.06)
+                        }
+                      })}
                     >
-                      <i
-                        className={item.icon}
-                        aria-hidden='true'
-                        style={{ fontSize: 18, color: `var(--mui-palette-${item.color}-main)` }}
-                      />
+                      <Stack
+                        alignItems='center'
+                        justifyContent='center'
+                        sx={theme => ({
+                          width: 30,
+                          height: 30,
+                          borderRadius: `${theme.shape.customBorderRadius.sm}px`,
+                          color: `${item.color}.main`,
+                          backgroundColor: alpha(theme.palette[item.color].main, 0.08),
+                          flexShrink: 0
+                        })}
+                      >
+                        <i className={item.icon} aria-hidden='true' style={{ fontSize: 17 }} />
+                      </Stack>
                       <Stack spacing={0}>
-                        <Typography variant='body2' sx={{ fontWeight: 500, lineHeight: 1.3 }}>
+                        <Typography variant='body2' sx={{ fontWeight: 600, lineHeight: 1.3 }}>
                           {GH_PRICING.addMenu.items[item.key]}
                         </Typography>
                       </Stack>

@@ -13,6 +13,7 @@ export const DESIGN_SYSTEM_LAB_TOKENS = Object.freeze({
   },
   layout: {
     pageMaxInlineSize: 1100,
+    widePageMaxInlineSize: 1480,
     introMaxInlineSize: 820,
     logoBlockSize: 32,
     sectionGap: 4,

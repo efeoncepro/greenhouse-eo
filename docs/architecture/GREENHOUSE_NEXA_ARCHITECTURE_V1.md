@@ -4,6 +4,19 @@
 
 Definir el contrato arquitectonico de Nexa: el asistente IA conversacional de Greenhouse. Este documento es la fuente canonica de la capa de IA del portal — que es, como funciona, que puede hacer, y como se integra con el resto del sistema.
 
+## Delta 2026-06-18 — TASK-1156: Knowledge retrieval forced first-pass
+
+El tool routing de Nexa sigue **AUTO por defecto**: los providers reciben tools y el modelo decide
+si invocarlas en el primer pase. TASK-1156 agrega un override deterministico y gated para Knowledge:
+cuando `NEXA_FORCE_KNOWLEDGE_RETRIEVAL_ENABLED=true`, `NEXA_KNOWLEDGE_RETRIEVAL_ENABLED=true` y
+`classifyNexaIntent(prompt) === 'knowledge'`, `NexaService.generateResponse()` pasa
+`forcedToolName: 'search_knowledge'` al provider.
+
+Los providers conservan el loop de 2 pases ya existente: primer pase con tool forced, ejecucion por
+el SSOT `searchKnowledge`/`executeNexaTool`, y segunda pasada de composicion con la misma voz de
+Nexa. No se toca `nexa-system-prompt.ts`, no cambia el prompt, y los modulos de composicion/voz
+permanecen intactos. Con el flag forced OFF, el comportamiento vuelve al routing AUTO previo.
+
 ## Delta 2026-06-15 — TASK-1134: model selection truth (el auto-router se alcanza en el chat)
 
 El chat (`/api/home/nexa`) resolvía SIEMPRE un modelo soportado (`resolveNexaModel`), así que el

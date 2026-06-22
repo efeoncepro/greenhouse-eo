@@ -10,23 +10,41 @@ prompt del usuario
   → NexaService.generateResponse (orquestador provider-agnóstico)
     → buildProviderPlan (elige provider primario + cadena de failover)
     → buildSystemPrompt (artefacto versionado V1/V2)
-    → provider.resolveTurn (2-pass tool loop: el modelo decide tool → se ejecuta → 2da pasada compone)
-      → tool search_knowledge (si aplica) → packet knowledge-search.v1
+    → provider.resolveTurn (2-pass tool loop: tool AUTO por defecto → se ejecuta → 2da pasada compone)
+      → tool search_knowledge (AUTO o forced first-pass si aplica) → packet knowledge-search.v1
     → generateSuggestions
   → NexaResponse { content, toolInvocations, suggestions, modelId }
 ```
 
-## Ruteo de tools (decidido por el prompt)
+## Ruteo de tools
+
+Por defecto, el ruteo de tools sigue en modo **AUTO**: el provider recibe las tool declarations y
+el modelo decide si llama una tool en el primer pase. TASK-1156 agrega un unico override
+deterministico: si `NEXA_FORCE_KNOWLEDGE_RETRIEVAL_ENABLED=true`,
+`NEXA_KNOWLEDGE_RETRIEVAL_ENABLED=true` y `classifyNexaIntent(prompt) === 'knowledge'`, el
+orquestador pasa `forcedToolName: 'search_knowledge'` al provider para el primer pase. El provider
+mantiene el loop de 2 pases existente y la segunda pasada compone con la misma voz. No cambia el
+system prompt ni los modulos de composicion/voz.
 
 | Intención | Acción |
 |---|---|
 | Proceso / política / guía / definición / "cómo se hace X" | `search_knowledge` ANTES de responder |
 | Dato operativo en vivo (su nómina, OTD, correos, capacidad, cuentas por cobrar) | tool operativo correspondiente; NUNCA desde Knowledge |
 | **"¿Cuánto cobré / por qué cobré eso?" (pago PROPIO del colaborador)** | **`explain_my_pay`** (TASK-1146) — líquido + desglose regime-aware del **propio** member (anti-oracle por `context.memberId`); NUNCA el pago de otro ni el agregado de la nómina (eso es `check_payroll`, operador) |
+| **"¿Cuál es el OTD/RpA/FTR/desempeño de UNA persona nombrada?" (ej. "el OTD de Daniela Ferreira")** | **`get_member_performance`** (TASK-1216) — desempeño ICO de esa persona si el caller tiene acceso. `get_otd` es agregado de organización/agencia, NUNCA de una persona |
+| **"¿Por qué cambió el OTD/RpA/FTR? ¿Qué señales/anomalías/insights hay?" (causa raíz de delivery)** | **`list_insights`** (lista del período) / **`get_insight`** (un insight por ID) — TASK-1181, Nexa Insight ↔ Conversation Bridge Slice 1. Análisis advisory (Nexa Insights), distinto del OTD en vivo (`get_otd`) y de las definiciones (`search_knowledge`); al citar un insight, ofrece su enlace |
 | Conversación general / aclaración / siguiente paso | sin tool, responde directo |
 | Tool no disponible (permisos/datos) | lo dice con honestidad + ofrece el camino real |
 
-**Catálogo de tools operativos (member/operador):** `check_payroll` (operador, agregado del período), `explain_my_pay` (member-self, pago propio + por qué, TASK-1146), `get_otd`, `check_emails`, `get_capacity`, `pending_invoices`, `search_knowledge`. Cada uno gateado por `isAvailable`; `explain_my_pay` solo con `memberId` y reusa `buildReceiptPresentation` (regime-aware, NUNCA recomputa).
+**Catálogo de tools operativos (member/operador):** `check_payroll` (operador, agregado del período), `explain_my_pay` (member-self, pago propio + por qué, TASK-1146), `get_otd`, `get_member_performance` (desempeño ICO de una persona nombrada, TASK-1216), `check_emails`, `get_capacity`, `pending_invoices`, `search_knowledge`, `get_insight` + `list_insights` (Nexa Insights — advisory de delivery, TASK-1181). Cada uno gateado por `isAvailable`; `explain_my_pay` solo con `memberId` y reusa `buildReceiptPresentation` (regime-aware, NUNCA recomputa).
+
+**Person-level performance read (TASK-1216, Full API Parity):** `get_member_performance(person)` hace que el chat sea **cliente del MISMO primitive** `readMemberIcoProfileForSubject` (`src/lib/people/person-activity-access.ts`) que consumen los lanes MCP/app de API Platform (`api/platform/{ecosystem,app}/people/performance`) y la UI — un primitive, muchos consumers. Wrapper fino: NO recomputa ni queryea `ico_member_metrics` directo; mapea el `runtimeContext` del turno a `PeopleActivitySubject` (shape neutral session-free) y delega. Autorización = la de People (`canViewActivity` + anti-IDOR de scope, supervisor → subárbol). `isAvailable = tenantType === 'efeonce_internal'` (mirror de `get_insight`). `not_found` uniforme (no existe / fuera de scope), ambiguo → desambiguación, sin métricas → gap honesto. NUNCA confundir con `get_otd` (agregado de org/agencia, nunca persona).
+
+**Insight-addressable read (TASK-1181, Bridge Slice 1):** `get_insight(insightId)` y `list_insights(periodYear?, periodMonth?)` hacen que el chat sea **cliente del MISMO reader** de la page `/nexa/insights` (`readNexaInsightDrill` / `listNexaInsightsForPeriod`) — un primitive, muchos consumers (Full API Parity). Wrappers finos: NO queryean `ico_ai_signal_enrichments` directo; derivan el subject del `runtimeContext` del turno (misma fuente que la page server, vía `buildNexaInsightSubject` en `insight-focus.ts` — SSOT del mapeo) y dejan que el reader aplique el **subject anti-oracle** (cliente nunca ve; admin/route-group broad → todos; colaborador → self por `member_id`). `isAvailable = tenantType === 'efeonce_internal'` (mirror del primer gate del reader). Estados `not_found`/`degraded`/`superseded`/`expired`/`empty-positive` → gap honesto, nunca invención. Deep-link siempre vía `buildNexaInsightDrillHref`. Contrato: `docs/architecture/GREENHOUSE_NEXA_INSIGHT_CONVERSATION_BRIDGE_V1.md` §2.1.
+
+**Conciencia de superficie — `focusRef` (TASK-1182, Bridge Slice 2):** cuando el usuario abre el chat desde un insight (CTA "Pregúntale a Nexa sobre este insight"), la UI manda `focusRef: { kind:'nexa_insight', id }` en el body del POST; `route.ts` lo valida (shape estricto) y lo setea en `runtimeContext.focusRef`. En `NexaService.generateResponse`, `buildFocusedInsightNote(runtimeContext)` (`insight-focus.ts`) **pre-resuelve** ese insight con el reader anti-oracle (subject del turno) y appendea una nota de contexto al **system prompt del turno** (NO al prompt versionado: es contexto runtime per-turno). Reglas: `focusRef` es **contexto, no permiso** (el reader decide el acceso; un `focusRef` ajeno → `not_found` → sin ancla); no resoluble → `null` → el turno procede normal (degradación honesta); la nota instruye usar el contexto solo si la pregunta es sobre ese insight. Contrato: `..._BRIDGE_V1.md` §2.2.
+
+**Enviar/sembrar un mensaje al chat PROGRAMÁTICAMENTE (TASK-1182) — patrón canónico:** un CTA de dominio que abre el chat con una pregunta pre-hecha (ej. "Pregúntale a Nexa sobre este insight") debe inyectar el mensaje con el store de assistant-ui **`aui.thread().append({ role: 'user', content: [{ type: 'text', text }] })`** (hook `useAui()` de `@assistant-ui/react`), **desde un componente montado DENTRO del `AssistantRuntimeProvider`**. Es el MISMO API que usan las follow-up suggestions del chat (`NexaThread` → `FollowupSuggestions`), por eso es el camino vivo y probado. Implementación de referencia: `NexaSeedAutoSend` en `NexaFloatingButton.tsx` envía una vez (cuando `useAuiState(s => s.thread.isRunning)` es false), gatillado por el estado `pendingSeed` que setea el listener de `NEXA_FLOATING_OPEN_EVENT`. **Anti-patrones (NO usar):** (1) `runtime.thread.append()` sobre el objeto del outer `useLocalRuntime` — su `.thread` es el placeholder "empty thread" → crashea en render o no envía en silencio; (2) `ThreadPrimitive.Suggestion` oculto + auto-click — frágil, no dispara. El `focusRef` del turno viaja por el body del adapter (arriba), así que el mensaje sembrado llega anclado al insight.
 
 ## Ruteo de provider (interno, NUNCA expuesto al usuario)
 
@@ -136,6 +154,29 @@ security para el primer piloto).
 / executed / failed / execution_denied / conflict / cancelled) + 2 reliability signals (módulo Home):
 `nexa.action.failure_rate` y `nexa.action.unauthorized_proposal_rate` (SECURITY — detecta al LLM
 inducido a proponer acciones prohibidas/inexistentes). Contrato: [`technical/data-contracts.md`](../technical/data-contracts.md).
+
+### Acciones parametrizadas (TASK-1212)
+
+El piloto V1 (`mark_notifications_read`) es una **self-action sin input**. TASK-1212 extendió el runtime
+a **acciones parametrizadas**: el LLM propone un `input` además de la `actionKey`, y la acción declara un
+**`inputSchema` Zod**. El contrato `NexaActionDefinition` es ahora genérico sobre `TInput`; las
+self-actions quedan en `TInput = void` (sin cambio). Flujo:
+
+1. **Propose** — `propose_action(actionKey, input)`. El resolver parsea `input` con `definition.inputSchema`;
+   si no pasa → gap honesto `invalid_input` (NUNCA se propone una mutación con datos inválidos). El
+   `input` validado viaja en `proposal.execution.input` (eco al cliente).
+2. **Confirm** — la confirm-card echa de vuelta `idempotencyKey` **+ `input`**. El endpoint **re-valida**
+   el `input` contra el schema en el punto de mutación (no confía en el eco del cliente).
+3. **Execute** — el command bound corre con el `input` validado. Como el command **re-enforza todos sus
+   invariantes** (capability, precio del engine, idempotencia), un eco manipulado **no escala privilegio**:
+   solo puede autorar lo que el usuario ya podía.
+
+**Primera acción parametrizada**: `author_quote` (crear/emitir una cotización) — bound al command canónico
+`submitQuoteFromBuilder` (mismo primitive que la UI y las rutas; NO una integración Nexa paralela).
+Dominio `commercial-q2c`, capability `commercial.quotation`, gateada por
+`NEXA_QUOTE_AUTHOR_ACTION_ENABLED` (default OFF, además del master runtime flag). Comparte el
+governed-action surface con el close Q2C (TASK-1206). Spec: ADR
+`GREENHOUSE_QUOTE_API_PARITY_MULTI_CONSUMER_V1.md` (Delta 2026-06-21).
 
 ## Reglas duras
 

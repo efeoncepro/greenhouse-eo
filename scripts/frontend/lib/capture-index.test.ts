@@ -2,11 +2,13 @@ import { mkdirSync, mkdtempSync, rmSync, utimesSync, writeFileSync } from 'node:
 import { tmpdir } from 'node:os'
 import { resolve } from 'node:path'
 
+import { existsSync, readdirSync } from 'node:fs'
+
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 
 import { buildCaptureIndexModel } from './capture-index'
 import { scenarioFromDirName } from './capture-paths'
-import { pruneScenarioRuns } from '../gc'
+import { pruneScenarioRuns, pruneCapturesBudget, shouldRunAutoGc } from '../gc'
 
 let CAP = ''
 
@@ -145,5 +147,79 @@ describe('pruneScenarioRuns', () => {
 
     expect(model.scenarios.find(s => s.scenario === 'zz-a')?.runCount).toBe(1)
     expect(model.scenarios.find(s => s.scenario === 'zz-b')?.runCount).toBe(1)
+  })
+})
+
+// Crea un run con un archivo de `sizeMb` MB y la edad dada (para size-cap tests).
+const makeSizedRun = (name: string, ageMs: number, sizeMb: number): void => {
+  const path = resolve(CAP, name)
+
+  mkdirSync(path, { recursive: true })
+  writeFileSync(resolve(path, 'frame.bin'), Buffer.alloc(sizeMb * 1024 * 1024))
+  const t = (Date.now() - ageMs) / 1000
+
+  utimesSync(path, t, t)
+}
+
+describe('pruneCapturesBudget (TASK-927 captures governance)', () => {
+  it('purga lo más viejo hasta quedar bajo el cap', () => {
+    makeSizedRun('2026-06-01T00-00-00_zz-old', 20 * DAY, 3) // viejo, 3MB
+    makeSizedRun('2026-06-02T00-00-00_zz-mid', 15 * DAY, 3) // 3MB
+    makeSizedRun('2026-06-03T00-00-00_zz-new', 10 * DAY, 3) // 3MB → total 9MB
+
+    // cap ~5MB, keepNewest=1, grace 2d (todos son viejos > 2d).
+    const { removed } = pruneCapturesBudget({
+      maxGb: 5 / 1024,
+      keepNewest: 1,
+      graceDays: 2,
+      capturesDir: CAP
+    })
+
+    expect(removed).toBeGreaterThanOrEqual(1)
+    // el más nuevo (protegido por keepNewest) sobrevive.
+    expect(existsSync(resolve(CAP, '2026-06-03T00-00-00_zz-new'))).toBe(true)
+  })
+
+  it('NUNCA toca lo reciente (grace window) aunque exceda el cap', () => {
+    makeSizedRun('2026-06-10T00-00-00_zz-recent-a', 1 * HOUR, 5)
+    makeSizedRun('2026-06-10T01-00-00_zz-recent-b', 2 * HOUR, 5) // total 10MB, ambos < 2d
+
+    const { removed } = pruneCapturesBudget({
+      maxGb: 1 / 1024, // cap 1MB (excedido) pero todo es reciente
+      keepNewest: 0,
+      graceDays: 2,
+      capturesDir: CAP
+    })
+
+    expect(removed).toBe(0) // grace protege la sesión en curso del agente
+    expect(readdirSync(CAP).length).toBe(2)
+  })
+
+  it('no hace nada si está bajo el cap', () => {
+    makeSizedRun('2026-06-01T00-00-00_zz-a', 10 * DAY, 1)
+
+    const { removed } = pruneCapturesBudget({ maxGb: 1, capturesDir: CAP }) // cap 1GB >> 1MB
+
+    expect(removed).toBe(0)
+  })
+
+  it('maxGb=0 desactiva el size-cap (no-op)', () => {
+    makeSizedRun('2026-06-01T00-00-00_zz-a', 10 * DAY, 5)
+
+    const { removed } = pruneCapturesBudget({ maxGb: 0, capturesDir: CAP })
+
+    expect(removed).toBe(0)
+  })
+})
+
+describe('shouldRunAutoGc throttle (TASK-927)', () => {
+  it('corre la 1ra vez y throttlea la 2da dentro del intervalo', () => {
+    expect(shouldRunAutoGc(12, CAP)).toBe(true) // 1ra vez: crea el stamp
+    expect(shouldRunAutoGc(12, CAP)).toBe(false) // dentro del intervalo: throttle
+  })
+
+  it('intervalo 0 → siempre corre', () => {
+    expect(shouldRunAutoGc(0, CAP)).toBe(true)
+    expect(shouldRunAutoGc(0, CAP)).toBe(true)
   })
 })

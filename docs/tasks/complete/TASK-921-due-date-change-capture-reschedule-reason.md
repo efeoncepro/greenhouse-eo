@@ -111,3 +111,16 @@ Slices: 1 migration (`20260524100613341`) · 2 helper `reschedule-reason-inferen
 ## Follow-ups
 - **TASK-922** (compute shadow / atraso imputable) consume este log + el motivo confirmado. Desbloqueado.
 - **Writeback-de-sugerencia del motivo a Notion** (deferido): proyección que escribe el `reason_code` inferido a la propiedad `Motivo de reprogramación` (read-only para el operador, con sufijo "(sugerido)") vía Cloud Tasks throttled + echo-loop. Requiere crear la propiedad out-of-band. Patrón fuente: TASK-927 (writeback display). Crear task derivada cuando se priorice la UX de sugerencia.
+
+## Delta 2026-06-19 — runtime verificado: captura viva pero **0 motivos confirmados** (pre-planeación M3)
+
+Auditoría read-only a pedido del CEO. **No se tocó código ni runtime.** Estado real:
+
+- **Captura M0 ACTIVA en producción.** El flag `NOTION_DUE_DATE_CAPTURE_ENABLED=true` está vivo en el ops-worker (deploy.sh lo defaultea a `true` desde 2026-05-24). `greenhouse_delivery.task_due_date_changes` tiene **735 filas, última captura 2026-06-18** (fresco). El plumbing funciona.
+- **⚠️ 0 motivos `operator_confirmed`.** Las 735 capturas son **100% `reason_source='inferred'`**. Como por diseño del ADR §6 **solo `operator_confirmed` extiende la `fairDeadline`**, hoy `fairDeadline = fecha original` para todas las tareas → la dimensión de extensión por cliente/scope **no acredita nada** en el shadow de TASK-922. La mitad que funciona es el freeze por estados; la mitad de la fecha justa está inerte.
+- **Implicación para M3:** el writeback-de-sugerencia (este follow-up, hoy deferido) **deja de ser nicety y pasa a ser load-bearing** para que el cutover corrija por demoras de cliente y no solo por freeze. Sin operadores confirmando motivos, M3 corregiría a medias. Es prerequisito #2 del cutover (ver TASK-1169 → §Prerequisitos). Decisión de UX a tomar: ¿propiedad `[GH] Motivo (sugerido)` separada read-only, o empujar directamente la confirmación en `Motivo de reprogramación`?
+- **Observación colateral (corregida más abajo):** `task_status_transitions.assignee_member_id` está **0% poblado** (0/932).
+
+### Corrección 2026-06-19 — el 0% de assignee en transitions NO es un blocker de atribución
+
+La observación colateral de arriba me llevó (en TASK-922 / TASK-1169) a concluir erróneamente que el cutover no podía atribuir por miembro. **Estuvo mal:** la atribución vive en `greenhouse_delivery.tasks.assignee_member_id` (no en transitions), joinable por `notion_task_id`, con **~51% de cobertura directa hoy** sobre las filas shadow + reconstruible desde estos mismos logs append-only. Que transitions no traiga assignee es irrelevante para la atribución — la fuente correcta está intacta. Esto **abarata la ruta B** del cutover (PG-native) y deja a TASK-927 como ruta A opcional, no como prerequisito duro. Ver TASK-1169 §Prerequisitos (corregido) + TASK-922 Corrección 2026-06-19.

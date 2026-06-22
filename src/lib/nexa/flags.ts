@@ -8,6 +8,15 @@ export const isNexaFloatingExpandableEnabled = (): boolean =>
   process.env.NEXA_FLOATING_EXPANDABLE_ENABLED === 'true' ||
   process.env.NEXT_PUBLIC_NEXA_FLOATING_EXPANDABLE_ENABLED === 'true'
 
+// TASK-1079 — Nexa interaction-mode lane (concepto C) availability gate. Default OFF:
+// el lane reflowea el contenido del dashboard (split full-height), cambio de hot-path;
+// con OFF, el modo `lane` no se ofrece en el selector y cualquier preferencia `lane`
+// degrada al default (panel B / dock) → comportamiento idéntico al previo. NEXT_PUBLIC
+// mirror para que el provider client (selector + host) puedan gatear consistentemente.
+export const isNexaInteractionLaneEnabled = (): boolean =>
+  process.env.NEXA_INTERACTION_LANE_ENABLED === 'true' ||
+  process.env.NEXT_PUBLIC_NEXA_INTERACTION_LANE_ENABLED === 'true'
+
 // TASK-1085 — Nexa Knowledge Retrieval gate. Default OFF: el tool `search_knowledge`
 // (Nexa recupera del corpus gobernado vía searchKnowledge agentic + cita) solo aparece
 // con este flag ON. Con OFF, Nexa se comporta exactamente como antes (cero retrieval de
@@ -16,6 +25,13 @@ export const isNexaFloatingExpandableEnabled = (): boolean =>
 export const isNexaKnowledgeRetrievalEnabled = (): boolean =>
   process.env.NEXA_KNOWLEDGE_RETRIEVAL_ENABLED === 'true' ||
   process.env.NEXT_PUBLIC_NEXA_KNOWLEDGE_RETRIEVAL_ENABLED === 'true'
+
+// TASK-1156 — forced Knowledge retrieval routing. Default OFF: with OFF, the
+// LLM keeps deciding whether to call `search_knowledge`. With ON, the service
+// forces the first-pass tool when deterministic intent routing says `knowledge`
+// and Knowledge retrieval is enabled.
+export const isNexaForceKnowledgeRetrievalEnabled = (): boolean =>
+  process.env.NEXA_FORCE_KNOWLEDGE_RETRIEVAL_ENABLED === 'true'
 
 // TASK-1091 — pin explícito del provider LLM de Nexa (`google` | `anthropic`). Gana
 // sobre el router. Default unset → router (si está ON) o Gemini (default). Server-only
@@ -50,6 +66,14 @@ export const isNexaKnowledgeSynthesisBriefEnabled = (): boolean =>
 // el LLM: el LLM propone una actionKey registrada, el humano confirma, el endpoint determinístico
 // ejecuta vía la foundation de command/idempotency (TASK-655).
 export const isNexaActionRuntimeEnabled = (): boolean => process.env.NEXA_ACTION_RUNTIME_ENABLED === 'true'
+
+// TASK-1212 — per-action allowlist de la governed action de AUTORÍA de cotización (`author_quote`).
+// Default OFF (independiente del master flag): autorar/emitir una cotización es alto impacto, así que
+// nace gateada explícitamente además del runtime master. Con OFF, el resolver devuelve gap honesto
+// `runtime_disabled` y el confirm rechaza. La mutación SIEMPRE ocurre en el confirm humano + el
+// command re-enforza capability + precio del engine. Server-only.
+export const isNexaQuoteAuthorActionEnabled = (): boolean =>
+  process.env.NEXA_QUOTE_AUTHOR_ACTION_ENABLED === 'true'
 
 // TASK-1087 — Prompts sugeridos data-aware (Tier 2). Default OFF: con OFF, los prompts del chat
 // flotante se quedan en Tier 1/1.5 (plantillas por ruta + nombre real de la entidad), byte-idéntico

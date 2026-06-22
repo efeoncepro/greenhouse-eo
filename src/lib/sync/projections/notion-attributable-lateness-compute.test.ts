@@ -20,6 +20,7 @@ vi.mock('@/lib/notion-metrics/status-transitions-flags', () => ({
 
 import {
   notionAttributableLatenessComputeProjection,
+  resolveEffectiveTaskState,
   __testing__
 } from './notion-attributable-lateness-compute'
 
@@ -195,5 +196,69 @@ describe('TASK-922 — notion-attributable-lateness-compute', () => {
 
     await expect(notionAttributableLatenessComputeProjection.refresh(scope, signal)).rejects.toThrow('pg down')
     expect(mocks.captureWithDomain).toHaveBeenCalled()
+  })
+})
+
+describe('resolveEffectiveTaskState (TASK-1174 / ISSUE-098)', () => {
+  it('usa el estado terminal de la última transición cuando el row laggea (carrera de sync)', () => {
+    // Caso ISSUE-098: la transición →Aprobado disparó el compute, pero el row de
+    // `tasks` aún muestra el estado pre-terminal y completed_at NULL.
+    const r = resolveEffectiveTaskState('En curso', null, [
+      { toStatus: 'Sin empezar', transitionedAt: '2026-06-04T18:36:00Z' },
+      { toStatus: 'En curso', transitionedAt: '2026-06-10T12:00:00Z' },
+      { toStatus: 'Aprobado', transitionedAt: '2026-06-18T16:02:00Z' }
+    ])
+
+    expect(r.taskStatus).toBe('Aprobado')
+    // completed_at de respaldo = transitioned_at de la transición terminal.
+    expect(r.completedAt?.toISOString()).toBe('2026-06-18T16:02:00.000Z')
+  })
+
+  it('preserva el completed_at del row si ya está presente (no lo sobreescribe)', () => {
+    const rowCompleted = new Date('2026-06-18T00:00:00Z')
+
+    const r = resolveEffectiveTaskState('Aprobado', rowCompleted, [
+      { toStatus: 'En curso', transitionedAt: '2026-06-10T12:00:00Z' },
+      { toStatus: 'Aprobado', transitionedAt: '2026-06-18T16:02:00Z' }
+    ])
+
+    expect(r.taskStatus).toBe('Aprobado')
+    expect(r.completedAt).toBe(rowCompleted)
+  })
+
+  it('terminal gana también si el row es terminal y la última transición no fue capturada', () => {
+    const r = resolveEffectiveTaskState('Aprobado', new Date('2026-06-18T00:00:00Z'), [
+      { toStatus: 'En curso', transitionedAt: '2026-06-10T12:00:00Z' }
+    ])
+
+    expect(r.taskStatus).toBe('Aprobado')
+  })
+
+  it('NO fuerza terminal en un reopen real (Aprobado → En curso capturado)', () => {
+    const r = resolveEffectiveTaskState('En curso', null, [
+      { toStatus: 'Aprobado', transitionedAt: '2026-06-18T16:02:00Z' },
+      { toStatus: 'En curso', transitionedAt: '2026-06-19T09:00:00Z' }
+    ])
+
+    expect(r.taskStatus).toBe('En curso')
+    expect(r.completedAt).toBeNull()
+  })
+
+  it('tarea genuinamente abierta: usa el estado abierto vigente, completed_at null', () => {
+    const r = resolveEffectiveTaskState('En curso', null, [
+      { toStatus: 'Sin empezar', transitionedAt: '2026-06-10T12:00:00Z' },
+      { toStatus: 'En curso', transitionedAt: '2026-06-12T12:00:00Z' }
+    ])
+
+    expect(r.taskStatus).toBe('En curso')
+    expect(r.completedAt).toBeNull()
+  })
+
+  it('sin transiciones: cae al estado del row (backstop)', () => {
+    const completed = new Date('2026-06-18T00:00:00Z')
+    const r = resolveEffectiveTaskState('Aprobado', completed, [])
+
+    expect(r.taskStatus).toBe('Aprobado')
+    expect(r.completedAt).toBe(completed)
   })
 })

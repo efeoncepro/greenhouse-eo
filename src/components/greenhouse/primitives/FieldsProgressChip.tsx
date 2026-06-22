@@ -1,7 +1,6 @@
 'use client'
 
 import Box from '@mui/material/Box'
-import LinearProgress from '@mui/material/LinearProgress'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import { alpha, useTheme } from '@mui/material/styles'
@@ -12,6 +11,7 @@ import AnimatedCounter from '@/components/greenhouse/AnimatedCounter'
 export interface FieldsProgressChipProps {
   filled: number
   total: number
+  variant?: 'chip' | 'rail'
 
   /** Screen reader announcement. Shown via role='status' + aria-live='polite'. */
   srLabel: (filled: number, total: number) => string
@@ -36,13 +36,6 @@ export interface FieldsProgressChipProps {
   testId?: string
 }
 
-const resolveColor = (percent: number): 'success' | 'warning' | 'error' => {
-  if (percent >= 80) return 'success'
-  if (percent >= 50) return 'warning'
-
-  return 'error'
-}
-
 /**
  * Enterprise-grade form completion counter.
  *
@@ -54,13 +47,14 @@ const resolveColor = (percent: number): 'success' | 'warning' | 'error' => {
  * Announces progress via `role='status'` + `aria-live='polite'` so screen
  * readers get the full context (`"Cotización completa en X%. Faltan Y campos."`).
  *
- * Color of the bar + counter text shifts from error (<50%) → warning (50-79%)
- * → success (≥80%) so the counter carries semantic signal in addition to the
- * numeric progress.
+ * In-progress state stays neutral/primary; only the complete state turns
+ * success. This avoids yelling error/warning while the user is simply early in
+ * the flow.
  */
 const FieldsProgressChip = ({
   filled,
   total,
+  variant = 'chip',
   srLabel,
   suffix,
   readyLabel,
@@ -71,48 +65,43 @@ const FieldsProgressChip = ({
 
   const percent = total > 0 ? Math.round((filled / total) * 100) : 0
   const isReady = total > 0 && filled >= total
-  const colorKey = resolveColor(percent)
-  const progressColor = isReady ? theme.palette.success.main : theme.palette[colorKey].main
-  const trackColor = alpha(theme.palette.text.primary, 0.08)
+  const progressColor = isReady ? theme.palette.success.main : theme.palette.primary.main
+  const trackColor = alpha(theme.palette.text.primary, 0.09)
   const showReady = isReady && readyLabel
+  const isRail = variant === 'rail'
 
   return (
     <Stack
-      direction='row'
-      spacing={1.25}
-      alignItems={nextStepHint ? 'flex-start' : 'center'}
+      spacing={isRail ? 0.75 : 0.6}
       role='status'
       aria-live='polite'
       aria-atomic='true'
       data-testid={testId}
-      sx={{
-        px: 0.5,
-        py: 0.25,
-        color: 'text.secondary'
-      }}
+      sx={theme => ({
+        minWidth: isRail ? 0 : { xs: 0, sm: isReady ? 360 : 340 },
+        maxWidth: isRail ? 560 : isReady ? 480 : 460,
+        width: '100%',
+        px: isRail ? 0 : 1.25,
+        py: isRail ? 0 : 0.75,
+        borderRadius: `${theme.shape.customBorderRadius.md}px`,
+        border: isRail
+          ? 0
+          : `1px solid ${isReady ? alpha(theme.palette.success.main, 0.32) : alpha(theme.palette.primary.main, 0.16)}`,
+        backgroundColor: isRail
+          ? 'transparent'
+          : isReady
+            ? alpha(theme.palette.success.main, theme.palette.mode === 'dark' ? 0.14 : 0.065)
+            : alpha(theme.palette.primary.main, theme.palette.mode === 'dark' ? 0.08 : 0.035),
+        color: 'text.secondary',
+        overflow: 'hidden'
+      })}
     >
-      <LinearProgress
-        aria-hidden='true'
-        variant='determinate'
-        value={percent}
-        sx={{
-          width: 56,
-          height: 3,
-          mt: nextStepHint ? 0.75 : 0,
-          borderRadius: 999,
-          backgroundColor: trackColor,
-          '& .MuiLinearProgress-bar': {
-            backgroundColor: progressColor,
-            borderRadius: 999
-          }
-        }}
-      />
-      <Stack spacing={0.25} sx={{ minWidth: 0 }}>
+      <Stack direction='row' spacing={1.25} alignItems='center' justifyContent='space-between' sx={{ minWidth: 0 }}>
         <Typography
-          variant='caption'
+          variant='body2'
           sx={{
-            lineHeight: 1.2,
-            color: showReady ? 'success.main' : 'text.secondary',
+            lineHeight: 1.35,
+            color: showReady ? 'success.main' : 'text.primary',
             whiteSpace: 'nowrap',
             fontWeight: showReady ? 600 : 400
           }}
@@ -129,13 +118,71 @@ const FieldsProgressChip = ({
             </Stack>
           ) : (
             <>
-              <Box component='span' sx={{ color: 'text.primary', fontWeight: 500, mr: 0.5 }}>
+              <Box component='span' sx={{ color: 'text.primary', fontWeight: 600, mr: 0.5 }}>
                 <AnimatedCounter value={filled} format='integer' />
               </Box>
-              {suffix(total)}
+              <Box component='span' sx={{ color: 'text.secondary' }}>
+                {suffix(total)}
+              </Box>
             </>
           )}
         </Typography>
+        {!showReady ? (
+          <Box
+            component='span'
+            sx={theme => ({
+              width: isRail ? 42 : 34,
+              height: isRail ? 24 : 20,
+              borderRadius: 999,
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0,
+              color: theme.palette.primary.main,
+              backgroundColor: isRail ? alpha(theme.palette.primary.main, 0.1) : alpha(theme.palette.primary.main, 0.08),
+              fontVariantNumeric: 'tabular-nums'
+            })}
+          >
+            <Typography variant='caption' sx={{ color: 'inherit', fontWeight: 600, lineHeight: 1 }}>
+              {percent}%
+            </Typography>
+          </Box>
+        ) : null}
+      </Stack>
+
+      <Box
+        aria-hidden='true'
+        sx={{
+          position: 'relative',
+          height: isRail ? 8 : 5,
+          borderRadius: 999,
+          backgroundColor: trackColor,
+          overflow: 'hidden',
+          boxShadow: isRail ? `inset 0 0 0 1px ${alpha(theme.palette.text.primary, 0.025)}` : 'none'
+        }}
+      >
+        <Box
+          sx={theme => ({
+            width: `${Math.max(0, Math.min(100, percent))}%`,
+            height: '100%',
+            borderRadius: 999,
+            backgroundImage: isRail
+              ? `linear-gradient(90deg, ${progressColor}, ${alpha(progressColor, 0.72)})`
+              : undefined,
+            backgroundColor: isRail ? undefined : progressColor,
+            boxShadow: isRail ? `0 0 0 1px ${alpha(progressColor, 0.08)}, 0 8px 18px -12px ${alpha(progressColor, 0.65)}` : 'none',
+            transition: theme.transitions.create('width', {
+              duration: theme.transitions.duration.short,
+              easing: theme.transitions.easing.easeOut
+            }),
+            '@media (prefers-reduced-motion: reduce)': {
+              transition: 'none'
+            }
+          })}
+        />
+      </Box>
+
+      <Stack spacing={0.25} sx={{ minWidth: 0 }}>
         {nextStepHint && !showReady ? (
           <Typography
             variant='caption'
@@ -143,7 +190,9 @@ const FieldsProgressChip = ({
               lineHeight: 1.2,
               color: 'text.secondary',
               whiteSpace: 'nowrap',
-              fontStyle: 'italic'
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              fontWeight: 400
             }}
           >
             {nextStepHint}

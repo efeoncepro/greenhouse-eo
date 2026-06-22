@@ -3,6 +3,7 @@ import 'server-only'
 import { randomUUID } from 'node:crypto'
 
 import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
+import { getOperationalFiscalPeriod } from '@/lib/calendar/operational-calendar'
 import {
   buildIncomeTaxWriteFields,
   serializeIncomeTaxSnapshot
@@ -45,6 +46,19 @@ const safeNum = (v: unknown): number | null => {
 }
 
 const roundAmount = (value: number): number => Math.round((value + Number.EPSILON) * 100) / 100
+
+/**
+ * TASK-1204 — La anulación autoritativa de un documento Nubox/SII viaja en
+ * `document_status_name='Anulada'`, NO siempre en el booleano `is_annulled`
+ * (Nubox no lo puebla en todos los casos). Antes derivábamos `is_annulled` sólo
+ * del booleano, dejando boletas anuladas como válidas → contaban en la posición
+ * F29 de retención (caso real: folio 40 Valentina, +107.970). Esta derivación
+ * acopla `is_annulled` al estado autoritativo del SII.
+ */
+export const isNuboxPurchaseAnnulled = (
+  purchase: Pick<NuboxProjectionPurchase, 'is_annulled' | 'document_status_name'>
+): boolean =>
+  purchase.is_annulled === true || (purchase.document_status_name ?? '').trim().toLowerCase() === 'anulada'
 
 export const resolveNuboxPurchaseProjectionAmounts = (purchase: NuboxProjectionPurchase) => {
   const netAmount = safeNum(purchase.net_amount) ?? 0
@@ -222,6 +236,48 @@ export const upsertIncomeFromSale = async (sale: NuboxProjectionSale): Promise<'
   // Annulled documents are stored but excluded from revenue calculations
   const isAnnulled = sale.is_annulled === true
 
+  // TASK-1191 / ISSUE-103 — estampar el período fiscal (F29) derivándolo de la
+  // fecha del documento (invoice_date = emission_date) con el calendario
+  // operativo canónico (America/Santiago). El conformed de Nubox no estampa el
+  // período, así que sin esto el documento nace sin period_year/period_month y
+  // NUNCA entra a una posición F29 (el crédito/débito fiscal queda sin declarar).
+  // Fallback al período del conformed sólo si no hay fecha de documento.
+  const fiscalPeriod = sale.emission_date ? getOperationalFiscalPeriod(sale.emission_date) : null
+  const periodYear = fiscalPeriod?.periodYear ?? sale.period_year
+  const periodMonth = fiscalPeriod?.periodMonth ?? sale.period_month
+
+  // Credit notes (DTE 61) are stored with negative amounts.
+  const isCreditNote = sale.dte_type_code === '61'
+  const signMultiplier: 1 | -1 = isCreditNote ? -1 : 1
+
+  // TASK-990 Slice 5b / TASK-1210 — native (foreign) plane, computed BEFORE the
+  // existing-vs-new branch so BOTH paths can persist it. Additive: the CLP fields
+  // (currency='CLP', total_amount, total_amount_clp) stay the legal/functional
+  // record bit-for-bit. When the conformed sync sourced a foreign plane from the
+  // SII XML (foreign_currency_code + foreign_total_amount + functional CLP) AND the
+  // currency is a finance_core member, populate native_amount/native_currency and
+  // link an FX snapshot recording the document-legal MXN→CLP implied rate
+  // (source='nubox_legal_document', never recomputed). Gated FINANCE_CORE_MXN_ENABLED.
+  const foreignActive =
+    isFinanceCoreMxnEnabled() &&
+    !!sale.foreign_currency_code &&
+    VALID_CURRENCIES.includes(sale.foreign_currency_code as FinanceCurrency) &&
+    safeNum(sale.foreign_total_amount) != null &&
+    safeNum(sale.functional_total_amount_clp) != null
+
+  const nativeAmount = foreignActive ? Math.abs(safeNum(sale.foreign_total_amount) ?? 0) * signMultiplier : null
+  const nativeCurrency = foreignActive ? sale.foreign_currency_code : null
+
+  const fxEvidence: FxSnapshotEvidence | null = foreignActive
+    ? observedFxSnapshotEvidence({
+        fromCurrency: sale.foreign_currency_code as FinanceCurrency,
+        toCurrency: 'CLP',
+        fromAmount: Math.abs(safeNum(sale.foreign_total_amount) ?? 0),
+        toAmount: Math.abs(safeNum(sale.functional_total_amount_clp) ?? 0),
+        rateDate: sale.emission_date ?? new Date().toISOString().slice(0, 10)
+      })
+    : null
+
   // Check if income already exists for this nubox document
   const existing = await runGreenhousePostgresQuery<{ income_id: string }>(
     `SELECT income_id FROM greenhouse_finance.income
@@ -231,9 +287,29 @@ export const upsertIncomeFromSale = async (sale: NuboxProjectionSale): Promise<'
   )
 
   if (existing.length > 0) {
-    // Update existing income with latest Nubox data + backfill organization_id if missing
-    await runGreenhousePostgresQuery(
-      `UPDATE greenhouse_finance.income SET
+    // Update existing income with latest Nubox data + backfill organization_id if missing.
+    // TASK-1210 — el native plane (foreign) se backfillea acá también: TASK-1209 crea
+    // la fila CLP primero, así que cuando el flag MXN se prende el income YA existe y
+    // este es el único path que corre en el re-sync. Sin esto, native_amount nunca
+    // converge para una factura foránea ya proyectada como CLP. COALESCE nunca pisa un
+    // native plane ya seteado. El snapshot FX se persiste atómico con el UPDATE.
+    const baseUpdateParams = [
+      Number(sale.nubox_sale_id),
+      sale.sii_track_id ? Number(sale.sii_track_id) : null,
+      sale.emission_status_name,
+      sale.dte_type_code,
+      sale.folio,
+      sale.organization_id || null,
+      safeNum(sale.balance),
+      isAnnulled,
+      sale.pdf_url,
+      sale.xml_url,
+      sale.source_last_ingested_at,
+      periodYear,
+      periodMonth
+    ]
+
+    const buildUpdateSql = (nativeSet: string) => `UPDATE greenhouse_finance.income SET
         nubox_sii_track_id = $2,
         nubox_emission_status = $3,
         dte_type_code = $4,
@@ -244,22 +320,27 @@ export const upsertIncomeFromSale = async (sale: NuboxProjectionSale): Promise<'
         nubox_pdf_url = $9,
         nubox_xml_url = $10,
         nubox_last_synced_at = COALESCE($11::timestamptz, greenhouse_finance.income.nubox_last_synced_at, NOW()),
+        -- TASK-1191: self-heal del período fiscal sin pisar un valor ya correcto.
+        period_year = COALESCE(greenhouse_finance.income.period_year, $12),
+        period_month = COALESCE(greenhouse_finance.income.period_month, $13),${nativeSet}
         updated_at = NOW()
-      WHERE nubox_document_id = $1`,
-      [
-        Number(sale.nubox_sale_id),
-        sale.sii_track_id ? Number(sale.sii_track_id) : null,
-        sale.emission_status_name,
-        sale.dte_type_code,
-        sale.folio,
-        sale.organization_id || null,
-        safeNum(sale.balance),
-        isAnnulled,
-        sale.pdf_url,
-        sale.xml_url,
-        sale.source_last_ingested_at
-      ]
-    )
+      WHERE nubox_document_id = $1`
+
+    if (foreignActive) {
+      await withGreenhousePostgresTransaction(async client => {
+        const fxSnapshotId = fxEvidence ? await persistFxSnapshot(fxEvidence, client) : null
+
+        await client.query(
+          buildUpdateSql(`
+        native_amount = COALESCE(greenhouse_finance.income.native_amount, $14),
+        native_currency = COALESCE(greenhouse_finance.income.native_currency, $15),
+        native_to_functional_fx_snapshot_id = COALESCE(greenhouse_finance.income.native_to_functional_fx_snapshot_id, $16),`),
+          [...baseUpdateParams, nativeAmount, nativeCurrency, fxSnapshotId]
+        )
+      })
+    } else {
+      await runGreenhousePostgresQuery(buildUpdateSql(''), baseUpdateParams)
+    }
 
     // Publish outbox event
     await publishOutboxEvent(
@@ -283,9 +364,6 @@ export const upsertIncomeFromSale = async (sale: NuboxProjectionSale): Promise<'
   // Create new income record
   const incomeId = `INC-NB-${sale.nubox_sale_id}`
 
-  // Credit notes (DTE 61) are stored with negative amounts
-  const isCreditNote = sale.dte_type_code === '61'
-  const signMultiplier: 1 | -1 = isCreditNote ? -1 : 1
   const subtotalAbs = Math.abs(safeNum(sale.net_amount) ?? 0)
 
   const taxWriteFields = await buildIncomeTaxWriteFields({
@@ -304,34 +382,10 @@ export const upsertIncomeFromSale = async (sale: NuboxProjectionSale): Promise<'
   const signedTaxAmountSnapshot = taxWriteFields.taxAmountSnapshot * signMultiplier
   const signedTotalAmount = taxWriteFields.totalAmount * signMultiplier
 
-  // TASK-990 Slice 5b — native (foreign) plane. Additive: the existing CLP fields
-  // (currency='CLP', total_amount, total_amount_clp) stay the legal/functional
-  // record bit-for-bit. When the conformed sync sourced a foreign plane from the
-  // SII XML (foreign_currency_code + foreign_total_amount + functional CLP) AND
-  // the currency is a finance_core member, populate native_amount/native_currency
-  // and link an FX snapshot recording the document-legal MXN→CLP implied rate
-  // (source='nubox_legal_document', never recomputed). Gated FINANCE_CORE_MXN_ENABLED.
-  // USD reporting plane (amount_usd + functional→reporting snapshot) lands in Slice 8.
-  const foreignActive =
-    isFinanceCoreMxnEnabled() &&
-    !!sale.foreign_currency_code &&
-    VALID_CURRENCIES.includes(sale.foreign_currency_code as FinanceCurrency) &&
-    safeNum(sale.foreign_total_amount) != null &&
-    safeNum(sale.functional_total_amount_clp) != null
-
-  const nativeAmount = foreignActive ? Math.abs(safeNum(sale.foreign_total_amount) ?? 0) * signMultiplier : null
-  const nativeCurrency = foreignActive ? sale.foreign_currency_code : null
-
-  const fxEvidence: FxSnapshotEvidence | null = foreignActive
-    ? observedFxSnapshotEvidence({
-        fromCurrency: sale.foreign_currency_code as FinanceCurrency,
-        toCurrency: 'CLP',
-        fromAmount: Math.abs(safeNum(sale.foreign_total_amount) ?? 0),
-        toAmount: Math.abs(safeNum(sale.functional_total_amount_clp) ?? 0),
-        rateDate: sale.emission_date ?? new Date().toISOString().slice(0, 10)
-      })
-    : null
-
+  // TASK-990 Slice 8 — the USD reporting plane (amount_usd + functional→reporting
+  // snapshot) is derived inside the transaction below from the functional CLP. The
+  // native (foreign) plane + fxEvidence were computed before the existing-vs-new
+  // branch (so the existing-row backfill can persist them too — TASK-1210).
   await withGreenhousePostgresTransaction(async client => {
     const fxSnapshotId = fxEvidence ? await persistFxSnapshot(fxEvidence, client) : null
 
@@ -456,8 +510,8 @@ export const upsertIncomeFromSale = async (sale: NuboxProjectionSale): Promise<'
         sale.payment_form_code === '1' ? 'contado' : sale.payment_form_code === '2' ? 'credito' : null,
         sale.payment_form_name,
         sale.origin_name,
-        sale.period_year,
-        sale.period_month,
+        periodYear,
+        periodMonth,
         sale.pdf_url,
         sale.xml_url,
         sale.details_url,
@@ -540,6 +594,15 @@ const autoProvisionSupplier = async (purchase: NuboxConformedPurchase): Promise<
 const upsertExpenseFromPurchase = async (
   purchase: NuboxProjectionPurchase
 ): Promise<{ action: 'created' | 'updated' | 'skipped'; autoProvisioned: boolean }> => {
+  // TASK-1191 / ISSUE-103 — estampar el período fiscal (F29) del documento de
+  // compra derivándolo de la fecha del documento (document_date = emission_date)
+  // con el calendario operativo canónico. Sin esto el crédito fiscal de la
+  // compra queda sin período y NUNCA entra al F29. Fallback al período del
+  // conformed sólo si no hay fecha de emisión.
+  const fiscalPeriod = purchase.emission_date ? getOperationalFiscalPeriod(purchase.emission_date) : null
+  const periodYear = fiscalPeriod?.periodYear ?? purchase.period_year
+  const periodMonth = fiscalPeriod?.periodMonth ?? purchase.period_month
+
   // Check if expense already exists for this nubox purchase
   const existing = await runGreenhousePostgresQuery<{ expense_id: string }>(
     `SELECT expense_id FROM greenhouse_finance.expenses
@@ -558,16 +621,21 @@ const upsertExpenseFromPurchase = async (
         balance_nubox = $5,
         nubox_pdf_url = $6,
         nubox_last_synced_at = COALESCE($7::timestamptz, greenhouse_finance.expenses.nubox_last_synced_at, NOW()),
+        -- TASK-1191: self-heal del período fiscal sin pisar un valor ya correcto.
+        period_year = COALESCE(greenhouse_finance.expenses.period_year, $8),
+        period_month = COALESCE(greenhouse_finance.expenses.period_month, $9),
         updated_at = NOW()
       WHERE nubox_purchase_id = $1`,
       [
         Number(purchase.nubox_purchase_id),
         purchase.document_status_name,
-        purchase.is_annulled ?? false,
+        isNuboxPurchaseAnnulled(purchase),
         purchase.document_status_name,
         safeNum(purchase.balance),
         purchase.pdf_url,
-        purchase.source_last_ingested_at
+        purchase.source_last_ingested_at,
+        periodYear,
+        periodMonth
       ]
     )
 
@@ -595,7 +663,7 @@ const upsertExpenseFromPurchase = async (
   // Create new expense record
   const expenseId = `EXP-NB-${purchase.nubox_purchase_id}`
 
-  const isExpenseAnnulled = purchase.is_annulled === true
+  const isExpenseAnnulled = isNuboxPurchaseAnnulled(purchase)
   const exchangeRateToClp = 1
 
   const projectionAmounts = resolveNuboxPurchaseProjectionAmounts(purchase)
@@ -697,8 +765,8 @@ const upsertExpenseFromPurchase = async (
         safeNum(purchase.exempt_amount),
         safeNum(purchase.total_other_taxes_amount),
         projectionAmounts.withholdingAmount,
-        purchase.period_year,
-        purchase.period_month
+        periodYear,
+        periodMonth
       ]
     )
 
@@ -1039,12 +1107,17 @@ const writeSyncFailure = async ({
   runId,
   sourceObjectId,
   errorMessage,
-  payload
+  payload,
+  errorCode = 'nubox_postgres_projection_failed'
 }: {
   runId: string
   sourceObjectId: string
   errorMessage: string
   payload?: Record<string, unknown>
+  // TASK-1209 — stable error code so downstream reliability signals can target a
+  // specific failure class. Export-DTE income projection failures use
+  // `nubox_income_projection_failed`; the rest keep the generic default.
+  errorCode?: string
 }) => {
   await runGreenhousePostgresQuery(
     `INSERT INTO greenhouse_sync.source_sync_failures (
@@ -1052,16 +1125,26 @@ const writeSyncFailure = async ({
       source_object_id, error_code, error_message, payload_json, retryable
     )
     VALUES ($1, $2, 'nubox', 'postgres_projection',
-      $3, 'nubox_postgres_projection_failed', $4, $5::jsonb, TRUE)`,
+      $3, $6, $4, $5::jsonb, TRUE)`,
     [
       `fail-${randomUUID()}`,
       runId,
       sourceObjectId,
       errorMessage.slice(0, 2000),
-      JSON.stringify(payload || {})
+      JSON.stringify(payload || {}),
+      errorCode
     ]
   )
 }
+
+// TASK-1209 — export DTE codes whose income projection failures get the stable
+// `nubox_income_projection_failed` code + nuboxDocumentId in the payload so the
+// `finance.nubox_export.unprojected_invoice` reliability signal can join them
+// against greenhouse_finance.income and surface any export invoice that the
+// recurring sync attempted but could not materialize.
+const EXPORT_DTE_CODES = new Set(['110', '111', '112'])
+
+export const NUBOX_EXPORT_PROJECTION_FAILED_CODE = 'nubox_income_projection_failed'
 
 // ─── Main Sync Function ────────────────────────────────────────────────────
 
@@ -1110,13 +1193,20 @@ export const syncNuboxToPostgres = async (): Promise<SyncNuboxToPostgresResult> 
         const message = error instanceof Error ? error.message : String(error)
 
         console.error(`[nubox-postgres-projection] sale ${sale.nubox_sale_id} failed:`, error)
+        const isExportDte = EXPORT_DTE_CODES.has(sale.dte_type_code ?? '')
+        const numericSaleId = Number(sale.nubox_sale_id)
+
         await writeSyncFailure({
           runId: syncRunId,
           sourceObjectId: `sale:${sale.nubox_sale_id ?? 'unknown'}`,
           errorMessage: message,
+          errorCode: isExportDte ? NUBOX_EXPORT_PROJECTION_FAILED_CODE : undefined,
           payload: {
             phase: sale.dte_type_code === '52' || sale.dte_type_code === 'COT' ? 'quote' : 'income',
             nuboxSaleId: sale.nubox_sale_id,
+            // Numeric form joins against income.nubox_document_id (bigint) so the
+            // unprojected-invoice signal can self-clear once the row materializes.
+            nuboxDocumentId: Number.isFinite(numericSaleId) ? numericSaleId : null,
             dteTypeCode: sale.dte_type_code,
             folio: sale.folio,
             clientRut: sale.client_rut

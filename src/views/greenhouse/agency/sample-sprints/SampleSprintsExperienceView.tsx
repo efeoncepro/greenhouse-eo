@@ -53,9 +53,13 @@ import {
 import useReducedMotion from '@/hooks/useReducedMotion'
 import { GH_AGENCY } from '@/lib/copy/agency'
 import { getMicrocopy } from '@/lib/copy'
-import { formatCurrency as formatGreenhouseCurrency, formatDate as formatGreenhouseDate } from '@/lib/format'
+import {
+  formatCurrency as formatGreenhouseCurrency,
+  formatDate as formatGreenhouseDate,
+  formatDateTime as formatGreenhouseDateTime
+} from '@/lib/format'
 
-export type SprintStatus = 'pending_approval' | 'active' | 'reporting' | 'converted' | 'cancelled' | 'dropped'
+export type SprintStatus = 'pending_approval' | 'active' | 'reporting' | 'converted' | 'cancelled' | 'dropped' | 'rejected' | 'withdrawn'
 export type SprintKind = 'pilot' | 'trial' | 'poc' | 'discovery'
 export type HealthSeverity = 'primary' | 'success' | 'warning' | 'error' | 'info' | 'secondary'
 
@@ -99,6 +103,13 @@ export type Signal = {
   description: string
 }
 
+export type RuntimeAuditEvent = {
+  auditId: string
+  eventKind: string
+  reason: string | null
+  createdAt: string | null
+}
+
 export type RuntimeSampleSprintOptions = {
   spaces: Array<{
     spaceId: string
@@ -136,6 +147,13 @@ type RuntimeSampleSprintDetail = {
   name: string
   spaceId: string
   proposedTeam: Array<{ memberId: string; proposedFte: number; role?: string | null }>
+  approval: {
+    approvalId: string
+    status: 'pending' | 'approved' | 'rejected' | 'withdrawn'
+    approvedAt?: string | null
+    rejectedAt?: string | null
+    withdrawnAt?: string | null
+  } | null
 }
 
 const sprintKinds: Record<SprintKind, { label: string; icon: string; color: HealthSeverity }> = {
@@ -154,7 +172,9 @@ const statusMeta: Record<SprintStatus, { label: string; color: HealthSeverity; i
   reporting: { label: 'En reporte', color: 'info', icon: 'tabler-file-analytics' },
   converted: { label: 'Convertido', color: 'primary', icon: 'tabler-arrow-up-right' },
   cancelled: { label: copy.states.cancelled, color: 'error', icon: 'tabler-circle-x' },
-  dropped: { label: 'Descartado', color: 'secondary', icon: 'tabler-archive' }
+  dropped: { label: 'Descartado', color: 'secondary', icon: 'tabler-archive' },
+  rejected: { label: copy.states.rejected, color: 'error', icon: 'tabler-circle-x' },
+  withdrawn: { label: sampleCopy.states.withdrawn, color: 'secondary', icon: 'tabler-archive' }
 }
 
 const domainAria = {
@@ -315,6 +335,14 @@ const formatDate = (value: string) => {
   return formatGreenhouseDate(value, { day: '2-digit', month: 'short' }, 'es-CL')
 }
 
+const formatAuditDate = (value: string | null) => {
+  return formatGreenhouseDateTime(
+    value,
+    { dateStyle: 'short', timeStyle: 'short', fallback: sampleCopy.runtimeMetrics.noCostValue },
+    'es-CL'
+  )
+}
+
 const parseRecord = (value: string, fallback: Record<string, unknown>) => {
   try {
     const parsed = JSON.parse(value)
@@ -349,6 +377,7 @@ type SampleSprintsMockupViewProps = {
   initialSelectedSprintId?: string
   initialActiveSurface?: string
   runtimeOptions?: RuntimeSampleSprintOptions | null
+  runtimeAuditEvents?: RuntimeAuditEvent[]
 }
 
 const SampleSprintsMockupView = ({
@@ -357,7 +386,8 @@ const SampleSprintsMockupView = ({
   variant = 'mockup',
   initialSelectedSprintId,
   initialActiveSurface = 'command',
-  runtimeOptions = null
+  runtimeOptions = null,
+  runtimeAuditEvents = []
 }: SampleSprintsMockupViewProps = {}) => {
   const theme = useTheme()
   const reducedMotion = useReducedMotion()
@@ -388,7 +418,7 @@ const SampleSprintsMockupView = ({
   }, [filteredSprints])
 
   const activeCount = sprints.filter(sprint => sprint.status === 'active' || sprint.status === 'reporting').length
-  const closedCount = sprints.filter(sprint => ['converted', 'cancelled', 'dropped'].includes(sprint.status)).length
+  const closedCount = sprints.filter(sprint => ['converted', 'cancelled', 'dropped', 'rejected', 'withdrawn'].includes(sprint.status)).length
   const convertedCount = sprints.filter(sprint => sprint.status === 'converted').length
   const conversionRate = variant === 'mockup' ? 64 : closedCount > 0 ? Math.round((convertedCount / closedCount) * 100) : 0
 
@@ -519,7 +549,14 @@ const SampleSprintsMockupView = ({
         </TabPanel>
 
         <TabPanel value='detail' sx={{ p: 0, pt: 6 }}>
-          {selectedSprint ? <DetailSurface sprint={selectedSprint} reducedMotion={reducedMotion} variant={variant} /> : <NoSprintSelected setActiveSurface={setActiveSurface} />}
+          {selectedSprint ? (
+            <DetailSurface
+              sprint={selectedSprint}
+              reducedMotion={reducedMotion}
+              variant={variant}
+              auditEvents={runtimeAuditEvents}
+            />
+          ) : <NoSprintSelected setActiveSurface={setActiveSurface} />}
         </TabPanel>
 
         <TabPanel value='declare' sx={{ p: 0, pt: 6 }}>
@@ -602,7 +639,7 @@ const CommandCenter = ({
 }) => {
   const allSprints = Object.values(groupedByClient).flat()
   const hasSample = metrics.total > 0
-  const hasConversionSample = allSprints.some(sprint => ['converted', 'cancelled', 'dropped'].includes(sprint.status))
+  const hasConversionSample = allSprints.some(sprint => ['converted', 'cancelled', 'dropped', 'rejected', 'withdrawn'].includes(sprint.status))
   const variantCopy = variant === 'runtime' ? sampleCopy.runtime : sampleCopy.mockup
 
   const nextDecisionSprints = [...allSprints]
@@ -896,7 +933,17 @@ const SprintRow = ({ sprint, selected, onSelect }: { sprint: Sprint; selected: b
   )
 }
 
-const DetailSurface = ({ sprint, reducedMotion, variant }: { sprint: Sprint; reducedMotion: boolean; variant: SampleSprintsExperienceVariant }) => {
+const DetailSurface = ({
+  sprint,
+  reducedMotion,
+  variant,
+  auditEvents
+}: {
+  sprint: Sprint
+  reducedMotion: boolean
+  variant: SampleSprintsExperienceVariant
+  auditEvents: RuntimeAuditEvent[]
+}) => {
   const activeStep = phaseSteps.indexOf(sprint.phase)
 
   const costProgress =
@@ -957,7 +1004,10 @@ const DetailSurface = ({ sprint, reducedMotion, variant }: { sprint: Sprint; red
               </Grid>
               <Grid size={{ xs: 12, md: 6 }}>
                 <Card variant='outlined' sx={{ boxShadow: 0 }}>
-                  <CardHeader title='Costo acumulado' subheader='Lectura mock de GTM investment' />
+                  <CardHeader
+                    title='Costo acumulado'
+                    subheader={variant === 'mockup' ? 'Lectura mock de GTM investment' : sampleCopy.runtimeMetrics.costSubheader}
+                  />
                   <CardContent>
                     <Stack spacing={3}>
                       <Typography variant='h4' sx={{ fontVariantNumeric: 'tabular-nums' }}>
@@ -994,7 +1044,7 @@ const DetailSurface = ({ sprint, reducedMotion, variant }: { sprint: Sprint; red
 
       <Grid size={{ xs: 12, lg: 4 }}>
         <Stack spacing={6}>
-          <ActivityFeed />
+          <ActivityFeed events={variant === 'runtime' ? auditEvents : undefined} variant={variant} />
           <Card>
             <CardHeader title='Snapshots' subheader='Cadencia semanal esperada.' />
             <CardContent>
@@ -1561,6 +1611,32 @@ const RuntimeApprovalWizard = ({ sprint }: { sprint: Sprint }) => {
   const [feedback, setFeedback] = useState<{ severity: 'success' | 'error' | 'info'; message: string } | null>(null)
   const hasCapacityRisk = sprint.team.some(member => member.availability < 0.1)
   const proposedMembers = detail?.proposedTeam.map(member => ({ memberId: member.memberId, proposedFte: member.proposedFte })) ?? []
+  const approvalStatus = detail?.approval?.status ?? null
+  const isApprovalFinal = approvalStatus === 'approved' || approvalStatus === 'rejected' || approvalStatus === 'withdrawn'
+  const approvalCopy = sampleCopy.approval
+
+  const finalApprovalState = approvalStatus === 'approved'
+    ? {
+        severity: 'success' as const,
+        icon: 'tabler-circle-check',
+        title: approvalCopy.approvedTitle,
+        description: approvalCopy.approvedDescription
+      }
+    : approvalStatus === 'rejected'
+      ? {
+          severity: 'error' as const,
+          icon: 'tabler-circle-x',
+          title: approvalCopy.rejectedTitle,
+          description: approvalCopy.rejectedDescription
+        }
+      : approvalStatus === 'withdrawn'
+        ? {
+            severity: 'info' as const,
+            icon: 'tabler-archive',
+            title: approvalCopy.withdrawnTitle,
+            description: approvalCopy.withdrawnDescription
+          }
+        : null
 
   useEffect(() => {
     let mounted = true
@@ -1571,23 +1647,31 @@ const RuntimeApprovalWizard = ({ sprint }: { sprint: Sprint }) => {
         if (mounted) setDetail(payload)
       })
       .catch(() => {
-        if (mounted) setFeedback({ severity: 'error', message: 'No fue posible cargar el detalle de approval.' })
+        if (mounted) setFeedback({ severity: 'error', message: approvalCopy.loadError })
       })
 
     return () => {
       mounted = false
     }
-  }, [sprint.id])
+  }, [approvalCopy.loadError, sprint.id])
 
   const submit = (action: 'approve' | 'reject') => {
+    if (approvalStatus === 'approved') {
+      setFeedback({ severity: 'info', message: approvalCopy.alreadyApproved })
+
+      return
+    }
+
+    if (isApprovalFinal) return
+
     if (action === 'reject' && approvalOverride.trim().length < 10) {
-      setFeedback({ severity: 'error', message: 'Escribe una razón de rechazo de al menos 10 caracteres.' })
+      setFeedback({ severity: 'error', message: approvalCopy.rejectReasonRequired })
 
       return
     }
 
     if (action === 'approve' && hasCapacityRisk && approvalOverride.trim().length < 10) {
-      setFeedback({ severity: 'error', message: 'El warning de capacidad requiere razón de override.' })
+      setFeedback({ severity: 'error', message: approvalCopy.overrideReasonRequired })
 
       return
     }
@@ -1605,13 +1689,19 @@ const RuntimeApprovalWizard = ({ sprint }: { sprint: Sprint }) => {
       const payload = await response.json().catch(() => null)
 
       if (!response.ok) {
-        setFeedback({ severity: 'error', message: payload?.error || `No fue posible ${action === 'approve' ? 'aprobar' : 'rechazar'} el engagement.` })
+        setFeedback({ severity: 'error', message: payload?.error || (action === 'approve' ? approvalCopy.approveError : approvalCopy.rejectError) })
 
         return
       }
 
+      if (action === 'approve') {
+        setDetail(current => current
+          ? { ...current, approval: { ...(current.approval ?? { approvalId: payload?.approvalId ?? '', status: 'approved' }), status: 'approved' } }
+          : current)
+      }
+
       router.refresh()
-      setFeedback({ severity: 'success', message: action === 'approve' ? 'Sample Sprint aprobado.' : 'Sample Sprint rechazado.' })
+      setFeedback({ severity: 'success', message: action === 'approve' ? approvalCopy.success : approvalCopy.rejectSuccess })
     })
   }
 
@@ -1622,7 +1712,17 @@ const RuntimeApprovalWizard = ({ sprint }: { sprint: Sprint }) => {
           <CardHeader title='Aprobar engagement' subheader={`${sprint.client} · ${sprint.name}`} avatar={<CustomAvatar skin='light' color='warning' variant='rounded'><i className='tabler-shield-check' /></CustomAvatar>} />
           <CardContent>
             {feedback ? <Alert severity={feedback.severity} sx={{ mb: 5 }}>{feedback.message}</Alert> : null}
-            {hasCapacityRisk ? <Alert severity='warning' icon={<i className='tabler-alert-triangle' />}>Hay miembros con disponibilidad bajo 10%. Puedes aprobar, pero el override queda auditado.</Alert> : null}
+            {finalApprovalState ? (
+              <Alert severity={finalApprovalState.severity} icon={<i className={finalApprovalState.icon} />} sx={{ mb: 5 }}>
+                <Typography variant='subtitle2' sx={{ fontWeight: 700 }}>
+                  {finalApprovalState.title}
+                </Typography>
+                <Typography variant='body2'>
+                  {finalApprovalState.description}
+                </Typography>
+              </Alert>
+            ) : null}
+            {!isApprovalFinal && hasCapacityRisk ? <Alert severity='warning' icon={<i className='tabler-alert-triangle' />}>Hay miembros con disponibilidad bajo 10%. Puedes aprobar, pero el override queda auditado.</Alert> : null}
             <TableContainer sx={{ mt: 5 }}>
               <Table size='small' aria-label={domainAria.capacityByMember}>
                 <TableHead><TableRow><TableCell>Miembro</TableCell><TableCell>Rol</TableCell><TableCell align='right'>Asignado</TableCell><TableCell align='right'>Disponible</TableCell><TableCell>Estado</TableCell></TableRow></TableHead>
@@ -1639,13 +1739,13 @@ const RuntimeApprovalWizard = ({ sprint }: { sprint: Sprint }) => {
                 </TableBody>
               </Table>
             </TableContainer>
-            <CustomTextField sx={{ mt: 5 }} multiline minRows={3} label='Razón de override o rechazo' value={approvalOverride} onChange={event => setApprovalOverride(event.target.value)} helperText='Requerido para rechazar o aprobar con warning. Mínimo 10 caracteres.' fullWidth />
+            <CustomTextField sx={{ mt: 5 }} multiline minRows={3} label='Razón de override o rechazo' value={approvalOverride} onChange={event => setApprovalOverride(event.target.value)} helperText='Requerido para rechazar o aprobar con warning. Mínimo 10 caracteres.' disabled={isApprovalFinal} fullWidth />
           </CardContent>
           <Divider />
           <CardContent>
             <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} justifyContent='flex-end'>
-              <Button variant='tonal' color='secondary' startIcon={<i className='tabler-x' />} onClick={() => submit('reject')} disabled={pending}>Rechazar</Button>
-              <Button variant='contained' startIcon={<i className='tabler-check' />} onClick={() => submit('approve')} disabled={pending || (hasCapacityRisk && approvalOverride.length < 10)}>Aprobar Sprint</Button>
+              <Button variant='tonal' color='secondary' startIcon={<i className='tabler-x' />} onClick={() => submit('reject')} disabled={pending || isApprovalFinal}>Rechazar</Button>
+              <Button variant='contained' startIcon={<i className='tabler-check' />} onClick={() => submit('approve')} disabled={pending || isApprovalFinal || (hasCapacityRisk && approvalOverride.length < 10)}>Aprobar Sprint</Button>
             </Stack>
           </CardContent>
         </Card>
@@ -1948,36 +2048,93 @@ const MemberLoadRow = ({ member }: { member: TeamMember }) => (
   </Stack>
 )
 
-const ActivityFeed = ({ title = 'Audit feed' }: { title?: string }) => (
-  <Card>
-    <CardHeader
-      title={title}
-      subheader='Append-only mock para TASK-808.'
-      avatar={
-        <CustomAvatar skin='light' color='secondary' variant='rounded'>
-          <i className='tabler-history' />
-        </CustomAvatar>
-      }
-    />
-    <CardContent>
-      <Stack spacing={3}>
-        {[
-          ['service.engagement.phase_completed', 'Valentina cerró Operación', 'Hace 2 días'],
-          ['service.engagement.progress_snapshot_recorded', 'Snapshot semanal registrado', 'Hace 4 días'],
-          ['service.engagement.capacity_overridden', 'Override de capacidad auditado', 'Hace 9 días']
-        ].map(([event, label, when]) => (
-          <Stack key={event} direction='row' spacing={2}>
-            <SignalDot severity={event.includes('overridden') ? 'warning' : 'info'} />
-            <Box>
-              <Typography variant='body2' sx={{ fontWeight: 600 }}>{label}</Typography>
-              <Typography variant='caption' color='text.secondary'>{event} · {when}</Typography>
-            </Box>
+const getActivityEventLabel = (eventKind: string) => {
+  const labels = sampleCopy.activity.events as Record<string, string>
+
+  return labels[eventKind] ?? sampleCopy.activity.unknownEvent
+}
+
+const getActivitySeverity = (eventKind: string): HealthSeverity => {
+  if (eventKind.includes('rejected') || eventKind.includes('cancelled') || eventKind.includes('dropped')) return 'error'
+  if (eventKind.includes('overridden') || eventKind.includes('withdrawn')) return 'warning'
+  if (eventKind.includes('approved') || eventKind.includes('converted')) return 'success'
+
+  return 'info'
+}
+
+const ActivityFeed = ({
+  title = sampleCopy.activity.title,
+  variant = 'mockup',
+  events
+}: {
+  title?: string
+  variant?: SampleSprintsExperienceVariant
+  events?: RuntimeAuditEvent[]
+}) => {
+  const mockEvents: RuntimeAuditEvent[] = [
+    {
+      auditId: 'mock-phase-completed',
+      eventKind: 'service.engagement.phase_completed',
+      reason: 'Valentina cerró Operación',
+      createdAt: null
+    },
+    {
+      auditId: 'mock-progress-snapshot',
+      eventKind: 'service.engagement.progress_snapshot_recorded',
+      reason: 'Snapshot semanal registrado',
+      createdAt: null
+    },
+    {
+      auditId: 'mock-capacity-overridden',
+      eventKind: 'service.engagement.capacity_overridden',
+      reason: 'Override de capacidad auditado',
+      createdAt: null
+    }
+  ]
+
+  const visibleEvents = variant === 'runtime' ? (events ?? []) : mockEvents
+  const isRuntimeEmpty = variant === 'runtime' && visibleEvents.length === 0
+
+  return (
+    <Card>
+      <CardHeader
+        title={title}
+        subheader={variant === 'runtime' ? sampleCopy.activity.runtimeSubheader : sampleCopy.activity.mockupSubheader}
+        avatar={
+          <CustomAvatar skin='light' color='secondary' variant='rounded'>
+            <i className='tabler-history' />
+          </CustomAvatar>
+        }
+      />
+      <CardContent>
+        {isRuntimeEmpty ? (
+          <EmptyState
+            icon='tabler-history-off'
+            title={sampleCopy.activity.emptyTitle}
+            description={sampleCopy.activity.emptyDescription}
+            minHeight={180}
+          />
+        ) : (
+          <Stack spacing={3}>
+            {visibleEvents.map(event => (
+              <Stack key={event.auditId} direction='row' spacing={2}>
+                <SignalDot severity={getActivitySeverity(event.eventKind)} />
+                <Box>
+                  <Typography variant='body2' sx={{ fontWeight: 600 }}>
+                    {event.reason || getActivityEventLabel(event.eventKind)}
+                  </Typography>
+                  <Typography variant='caption' color='text.secondary'>
+                    {event.eventKind} · {formatAuditDate(event.createdAt)}
+                  </Typography>
+                </Box>
+              </Stack>
+            ))}
           </Stack>
-        ))}
-      </Stack>
-    </CardContent>
-  </Card>
-)
+        )}
+      </CardContent>
+    </Card>
+  )
+}
 
 const SideGuidance = ({ title, icon, items }: { title: string; icon: string; items: string[] }) => (
   <Card>

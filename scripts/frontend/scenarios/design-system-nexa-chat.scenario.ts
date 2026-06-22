@@ -80,6 +80,18 @@ export const scenario: CaptureScenario = {
     },
     {
       kind: 'scroll',
+      selector: '[data-capture="nexa-expression-cue-specimen"]',
+      scrollBlock: 'start',
+      scrollY: -260
+    },
+    {
+      kind: 'mark',
+      label: 'nexa-expression-cue-specimen',
+      clipSelector: '[data-capture="nexa-expression-cue-specimen"]',
+      note: 'Nexa Expression Layer: cues semánticos, degradación sensible y segmento cue en NexaExpressiveText'
+    },
+    {
+      kind: 'scroll',
       selector: '[data-capture="nexa-knowledge-answer-surface-specimen"]',
       scrollBlock: 'center'
     },

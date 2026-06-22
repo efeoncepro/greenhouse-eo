@@ -214,6 +214,8 @@ const computeDaysSince = (isoDate: string | null): number | null => {
  * `SampleSprintsWorkspace.tsx:150-158`. Reglas:
  *  - outcome converted → success
  *  - outcome cancelled (cliente o provider) → error
+ *  - approval rejected/cancelled → error
+ *  - approval withdrawn → info
  *  - status pending_approval → warning
  *  - status active + último snapshot > 10 días → warning (stale-progress)
  *  - default → info
@@ -226,6 +228,9 @@ const resolveItemSeverity = (item: SampleSprintListItem): SampleSprintSignalSeve
   if (item.outcomeKind === 'cancelled_by_client' || item.outcomeKind === 'cancelled_by_provider') {
     return 'error'
   }
+
+  if (item.approvalStatus === 'rejected') return 'error'
+  if (item.approvalStatus === 'withdrawn') return 'info'
 
   if (item.status === 'pending_approval') return 'warning'
 

@@ -209,6 +209,39 @@ export const createGreenhouseMcpServer = (
     async args => handlers.getKnowledgeDocument(args)
   )
 
+  // TASK-1211 — Cotizador (read-only, consultar-first). Resolver de servicios +
+  // simulación de precio. El estimate es referencial, NO vinculante; el cost
+  // stack/margen no cruza a un scope cliente (redacción server-side en el lane).
+  server.registerTool(
+    'search_services',
+    {
+      title: 'Search Services',
+      description:
+        'List sellable Greenhouse services available for quoting within the configured scope. Returns each service with its serviceSku and name. Use this to resolve a free-text service name before quote_price.',
+      inputSchema: {
+        query: z.string().trim().min(1).optional(),
+        limit: z.number().int().positive().max(50).optional()
+      },
+      outputSchema: greenhouseMcpToolOutputSchema
+    },
+    async args => handlers.searchServices(args)
+  )
+
+  server.registerTool(
+    'quote_price',
+    {
+      title: 'Quote Price',
+      description:
+        'Simulate a read-only price estimate for a Greenhouse service by its serviceSku (resolve it first with search_services). Returns a REFERENTIAL, non-binding estimate with currency. Cost and margin are never exposed to a client scope. Does not persist anything.',
+      inputSchema: {
+        serviceSku: z.string().trim().min(1),
+        currency: z.string().trim().min(1).optional()
+      },
+      outputSchema: greenhouseMcpToolOutputSchema
+    },
+    async args => handlers.quotePrice(args)
+  )
+
   // Resource addressable: el mismo documento read-only por URI estable.
   server.registerResource(
     'knowledge_document',

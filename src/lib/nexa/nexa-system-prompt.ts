@@ -15,7 +15,7 @@ import { isNexaKnowledgeRetrievalEnabled, isNexaSystemPromptV2Enabled } from './
  */
 
 export const NEXA_SYSTEM_PROMPT_V1_VERSION = 'nexa-system-prompt.v1'
-export const NEXA_SYSTEM_PROMPT_V2_VERSION = 'nexa-system-prompt.v2.2.0'
+export const NEXA_SYSTEM_PROMPT_V2_VERSION = 'nexa-system-prompt.v2.4.0'
 export const NEXA_SYSTEM_PROMPT_FAMILY = 'home-chat'
 
 export interface NexaSystemPromptOptions {
@@ -131,6 +131,8 @@ export const buildNexaSystemPromptV2 = (context: HomeSnapshot, options?: NexaSys
     'RUTEO DE TOOLS (decide antes de responder):',
     '- Pregunta de proceso / política / guía / definición / "cómo se hace X" → usa search_knowledge ANTES de responder (si está disponible).',
     '- Pregunta por dato operativo en vivo (su nómina, OTD, correos, capacidad, cuentas por cobrar) → usa el tool operativo correspondiente; NO lo respondas desde Knowledge.',
+    '- Pregunta por el OTD, RpA, FTR o desempeño de UNA PERSONA específica del equipo nombrada (ej. "el OTD de Daniela Ferreira") → usa get_member_performance (resuelve a esa persona si tienes acceso a ella). get_otd NUNCA es de una persona: es el OTD agregado de la organización o el global de la agencia.',
+    '- Pregunta por POR QUÉ cambió una métrica de delivery, su causa raíz, o qué señales/anomalías/insights hay en OTD, RpA o FTR de un espacio/miembro/período → usa list_insights (la lista del período) o get_insight (un insight puntual por su ID). Son análisis advisory de Nexa (Nexa Insights), distinto del OTD en vivo de get_otd. Al citar un insight, ofrece su enlace para profundizar.',
     '- Conversación general / aclaración / siguiente paso → sin tool; responde directo con lo que ya tienes.',
     '- Si un tool no está disponible por permisos o falta de datos, dilo con honestidad y ofrece el camino real.'
   ]
@@ -271,6 +273,24 @@ export const NEXA_PROMPT_GOVERNANCE: NexaPromptGovernance = {
   changelog: [
     {
       version: NEXA_SYSTEM_PROMPT_V2_VERSION,
+      date: '2026-06-22',
+      class: 'policy',
+      summary:
+        'Ruteo de desempeño por persona (TASK-1216): el módulo RUTEO DE TOOLS suma una regla que envía las preguntas por el OTD/RpA/FTR/desempeño de UNA persona nombrada (ej. "el OTD de Daniela Ferreira") al tool nuevo get_member_performance, distinto del OTD agregado de get_otd (organización/agencia, nunca persona). Aditivo; no toca voz/formato/políticas de Knowledge.'
+    },
+    {
+      // Congelada a literal al bumpear a v2.4.0 (freeze-on-bump): una entrada histórica del
+      // changelog no debe relabelarse cuando el const NEXA_SYSTEM_PROMPT_V2_VERSION avanza.
+      version: 'nexa-system-prompt.v2.3.0',
+      date: '2026-06-19',
+      class: 'policy',
+      summary:
+        'Ruteo de Nexa Insights (TASK-1181, Bridge Slice 1): el módulo RUTEO DE TOOLS suma una regla que envía las preguntas de causa raíz / señales / anomalías de delivery (OTD/RpA/FTR de un espacio/miembro/período) a los tools nuevos list_insights/get_insight, distintos del OTD en vivo (get_otd) y de las definiciones (search_knowledge), e instruye ofrecer el enlace del insight al citarlo. Aditivo; no toca voz/formato/políticas de Knowledge.'
+    },
+    {
+      // Congelada a literal al bumpear a v2.3.0 (freeze-on-bump): una entrada histórica del
+      // changelog no debe relabelarse cuando el const NEXA_SYSTEM_PROMPT_V2_VERSION avanza.
+      version: 'nexa-system-prompt.v2.2.0',
       date: '2026-06-15',
       class: 'policy',
       summary:

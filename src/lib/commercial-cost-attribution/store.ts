@@ -61,41 +61,21 @@ const toNumber = (value: unknown) => {
   return 0
 }
 
-let ensureSchemaPromise: Promise<void> | null = null
+let ensureTablePromise: Promise<void> | null = null
 
 export const ensureCommercialCostAttributionSchema = async () => {
-  if (ensureSchemaPromise) return ensureSchemaPromise
+  if (ensureTablePromise) return ensureTablePromise
 
-  ensureSchemaPromise = runGreenhousePostgresQuery(`
-    CREATE TABLE IF NOT EXISTS greenhouse_serving.commercial_cost_attribution (
-      member_id TEXT NOT NULL,
-      client_id TEXT NOT NULL,
-      organization_id TEXT,
-      client_name TEXT NOT NULL,
-      period_year INT NOT NULL,
-      period_month INT NOT NULL,
-      base_labor_cost_target NUMERIC(14,2) NOT NULL DEFAULT 0,
-      internal_operational_cost_target NUMERIC(14,2) NOT NULL DEFAULT 0,
-      direct_overhead_target NUMERIC(14,2) NOT NULL DEFAULT 0,
-      shared_overhead_target NUMERIC(14,2) NOT NULL DEFAULT 0,
-      fte_contribution NUMERIC(10,3) NOT NULL DEFAULT 0,
-      allocation_ratio NUMERIC(10,6) NOT NULL DEFAULT 0,
-      commercial_labor_cost_target NUMERIC(14,2) NOT NULL DEFAULT 0,
-      commercial_direct_overhead_target NUMERIC(14,2) NOT NULL DEFAULT 0,
-      commercial_shared_overhead_target NUMERIC(14,2) NOT NULL DEFAULT 0,
-      commercial_loaded_cost_target NUMERIC(14,2) NOT NULL DEFAULT 0,
-      source_of_truth TEXT NOT NULL,
-      rule_version TEXT NOT NULL,
-      materialization_reason TEXT,
-      materialized_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-      PRIMARY KEY (member_id, client_id, period_year, period_month)
-    )
+  ensureTablePromise = runGreenhousePostgresQuery(`
+    SELECT 1
+    FROM greenhouse_serving.commercial_cost_attribution
+    LIMIT 1
   `).then(() => {}).catch(error => {
-    ensureSchemaPromise = null
+    ensureTablePromise = null
     throw error
   })
 
-  return ensureSchemaPromise
+  return ensureTablePromise
 }
 
 // ── Atomic purge + upsert within a transaction ──

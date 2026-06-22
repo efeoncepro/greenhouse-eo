@@ -4,12 +4,16 @@ import type { NexaTurnTelemetry } from './nexa-turn-telemetry'
 export type NexaToolName =
   | 'check_payroll'
   | 'get_otd'
+  | 'get_member_performance'
   | 'check_emails'
   | 'get_capacity'
   | 'pending_invoices'
   | 'search_knowledge'
   | 'explain_my_pay'
   | 'propose_action'
+  | 'get_insight'
+  | 'list_insights'
+  | 'quote_price'
 
 export type NexaToolMetricTone = 'default' | 'success' | 'warning' | 'error' | 'info'
 
@@ -70,6 +74,18 @@ export interface NexaThreadDetail {
   messages: NexaThreadMessage[]
 }
 
+/**
+ * TASK-1182 — conciencia de superficie (Nexa Insight ↔ Conversation Bridge, Slice 2). Hint
+ * opcional de "qué está mirando el usuario" cuando abre el chat desde una superficie de dominio.
+ * Es CONTEXTO, no permiso: el gate sigue siendo el subject + capability (el reader anti-oracle
+ * decide qué se puede leer). `kind` es extensible (forward-compat para otros dominios addressable);
+ * V1 solo `nexa_insight`.
+ */
+export interface NexaFocusRef {
+  kind: 'nexa_insight'
+  id: string
+}
+
 export interface NexaRuntimeContext {
   userId: string
   clientId: string
@@ -82,6 +98,7 @@ export interface NexaRuntimeContext {
   organizationId?: string
   organizationName?: string
   memberId?: string
+  focusRef?: NexaFocusRef
 }
 
 export interface NexaResponse {

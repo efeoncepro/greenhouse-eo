@@ -31,11 +31,11 @@ export const persistFxSnapshot = async (
     INSERT INTO greenhouse_finance.fx_snapshots (
       snapshot_id, from_currency, to_currency, rate, inverse_rate,
       rate_date, rate_date_resolved, source, composed_via, policy,
-      locked_by, manual_override_reason
+      locked_by, manual_override_reason, from_unit_class
     ) VALUES (
       $1, $2, $3, $4, $5,
       $6, $7, $8, $9, $10,
-      $11, $12
+      $11, $12, $13
     )`
 
   const values = [
@@ -50,7 +50,9 @@ export const persistFxSnapshot = async (
     evidence.composedVia,
     evidence.policy,
     evidence.lockedBy,
-    evidence.manualOverrideReason
+    evidence.manualOverrideReason,
+    // TASK-995: 'currency' (default) for cash FX; 'indexed_unit' for CLF→CLP.
+    evidence.fromUnitClass ?? 'currency'
   ]
 
   if (client) {

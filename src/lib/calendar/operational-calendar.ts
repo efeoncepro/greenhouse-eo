@@ -313,6 +313,42 @@ export const getOperationalDateKey = (
   return getCalendarDate(referenceDate, context.timezone).key
 }
 
+export interface OperationalFiscalPeriod {
+  periodYear: number
+  periodMonth: number
+  /** `YYYY-MM` — canonical fiscal period key, mirror of `buildVatPeriodId`. */
+  periodKey: string
+}
+
+/**
+ * Canonical derivation of the **fiscal period** (`period_year`/`period_month`)
+ * of a document from its date, resolved in the operational timezone
+ * (`America/Santiago` by default). For a pure date-only string (`YYYY-MM-DD`,
+ * the shape of `expenses.document_date` / `income.invoice_date`) the result is
+ * timezone-stable — it is exactly the date's own calendar month. For a
+ * timestamp/`Date` it resolves the local calendar month in the operational
+ * timezone before extracting year/month.
+ *
+ * This is the single canonical primitive for "what F29 period does this document
+ * belong to". NEVER derive the fiscal period with an ad-hoc view/date helper —
+ * compose this (TASK-1191 / ISSUE-103). The default imputation rule is the month
+ * of the document; the SII 2-period late-credit window is a manual accounting
+ * decision, not the default.
+ */
+export const getOperationalFiscalPeriod = (
+  referenceDate: DateLike,
+  options?: OperationalCalendarContextInput | null
+): OperationalFiscalPeriod => {
+  const context = resolveOperationalCalendarContext(options ?? null, null, null)
+  const localDate = getCalendarDate(referenceDate, context.timezone)
+
+  return {
+    periodYear: localDate.year,
+    periodMonth: localDate.month,
+    periodKey: toMonthKey(localDate.year, localDate.month)
+  }
+}
+
 export const getLastBusinessDayOfMonth = (
   year: number,
   month: number,

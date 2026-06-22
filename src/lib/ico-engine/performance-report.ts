@@ -277,6 +277,59 @@ const parseTaskMix = (raw: unknown): PerformanceReportTaskMixEntry[] => {
   }
 }
 
+// TASK-1171 — el label del task_mix se resuelve en el materializer desde
+// greenhouse.clients (BQ); un cliente space-only sin fila en `clients` (p.ej.
+// Grupo Berel) cae a su space_id crudo. Su nombre real vive solo en
+// greenhouse_core.spaces.space_name (PG). Enriquecemos el label en la capa de
+// lectura (Vercel, PG disponible) — sin tocar materializer/BQ. Override SOLO
+// cuando el label luce como id crudo (preserva 'Efeonce'/'Sky').
+const looksLikeRawSegmentId = (label: string, segmentId: string): boolean =>
+  !label || label === segmentId || /^(space-|spc-|cli-)/.test(label)
+
+const enrichTaskMixLabels = async (
+  taskMix: PerformanceReportTaskMixEntry[]
+): Promise<PerformanceReportTaskMixEntry[]> => {
+  const idsToResolve = Array.from(
+    new Set(taskMix.filter(e => looksLikeRawSegmentId(e.segmentLabel, e.segmentId)).map(e => e.segmentId).filter(Boolean))
+  )
+
+  if (idsToResolve.length === 0) return taskMix
+
+  try {
+    const rows = await runGreenhousePostgresQuery<{ client_id: string | null; space_id: string; space_name: string | null }>(
+      `SELECT client_id, space_id, space_name
+       FROM greenhouse_core.spaces
+       WHERE client_id = ANY($1) OR space_id = ANY($1)`,
+      [idsToResolve]
+    )
+
+    const nameById = new Map<string, string>()
+
+    for (const r of rows) {
+      const name = normalizeString(r.space_name)
+
+      if (!name) continue
+      if (r.client_id) nameById.set(r.client_id, name)
+      if (r.space_id) nameById.set(r.space_id, name)
+    }
+
+    if (nameById.size === 0) return taskMix
+
+    return taskMix.map(e =>
+      looksLikeRawSegmentId(e.segmentLabel, e.segmentId) && nameById.has(e.segmentId)
+        ? { ...e, segmentLabel: nameById.get(e.segmentId) as string }
+        : e
+    )
+  } catch {
+    return taskMix // degradación honesta: el label crudo no rompe el reporte
+  }
+}
+
+const enrichReportTaskMix = async (report: AgencyPerformanceReport): Promise<AgencyPerformanceReport> => ({
+  ...report,
+  taskMix: await enrichTaskMixLabels(report.taskMix)
+})
+
 const BENCHMARK_TYPES: Record<string, MetricBenchmarkType> = {
   on_time_pct: 'external',
   late_drop_count: 'internal',
@@ -725,13 +778,13 @@ export const readAgencyPerformanceReport = async (
   const serving = await readServingAgencyPerformanceReport(periodYear, periodMonth)
 
   if (serving) {
-    return serving
+    return enrichReportTaskMix(serving)
   }
 
   const materialized = await readMaterializedAgencyPerformanceReport(periodYear, periodMonth)
 
   if (materialized) {
-    return materialized
+    return enrichReportTaskMix(materialized)
   }
 
   const previous = getPreviousPeriod(periodYear, periodMonth)
@@ -808,7 +861,7 @@ export const readAgencyPerformanceReport = async (
     skyTasks: currentSummary.skyTasks
   }
 
-  return {
+  const liveReport: AgencyPerformanceReport = {
     periodYear,
     periodMonth,
     previousPeriodYear: previous.year,
@@ -825,4 +878,6 @@ export const readAgencyPerformanceReport = async (
       trendStableBandPp: TREND_STABLE_BAND_PP
     }
   }
+
+  return enrichReportTaskMix(liveReport)
 }

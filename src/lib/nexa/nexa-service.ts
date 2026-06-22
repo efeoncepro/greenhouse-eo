@@ -12,7 +12,13 @@ import { getGreenhouseAgentModel } from '@/lib/ai/google-genai'
 import type { NexaMessage, HomeSnapshot } from '@/types/home'
 
 import { extractNexaActionProposals } from './actions/extract-proposals'
-import { getNexaProviderOverride, isNexaAutoRouterEnabled, isNexaKnowledgeRetrievalEnabled } from './flags'
+import { buildFocusedInsightNote } from './insight-focus'
+import {
+  getNexaProviderOverride,
+  isNexaAutoRouterEnabled,
+  isNexaForceKnowledgeRetrievalEnabled,
+  isNexaKnowledgeRetrievalEnabled
+} from './flags'
 import { buildNexaSystemPrompt, type NexaSystemPromptResult } from './nexa-system-prompt'
 import { classifyNexaIntent, nexaProviderFailoverChain, routeNexaProviderKey } from './nexa-model-router'
 import type { NexaResponse, NexaRuntimeContext, NexaToolInvocation } from './nexa-contract'
@@ -39,6 +45,11 @@ interface NexaProviderStep {
   providerKey: NexaProviderKey
   model: NexaModelId
 }
+
+const resolveForcedToolName = (intent: ReturnType<typeof classifyNexaIntent>): 'search_knowledge' | null =>
+  intent === 'knowledge' && isNexaKnowledgeRetrievalEnabled() && isNexaForceKnowledgeRetrievalEnabled()
+    ? 'search_knowledge'
+    : null
 
 const createNexaProvider = (providerKey: NexaProviderKey): NexaChatProvider =>
   providerKey === 'anthropic' ? new AnthropicNexaProvider() : new GeminiNexaProvider()
@@ -127,7 +138,7 @@ export class NexaService {
    *   3. router `NEXA_AUTO_ROUTER_ENABLED` — primario por intención + failover al otro.
    *   4. default — Gemini, comportamiento idéntico al previo a TASK-1091 (single).
    */
-  private static buildProviderPlan(input: NexaServiceInput): NexaProviderStep[] {
+  private static buildProviderPlan(input: NexaServiceInput, intent: ReturnType<typeof classifyNexaIntent>): NexaProviderStep[] {
     if (isSupportedNexaModel(input.requestedModel)) {
       return [{ providerKey: resolveNexaProviderKey(input.requestedModel), model: input.requestedModel }]
     }
@@ -139,7 +150,6 @@ export class NexaService {
     }
 
     if (isNexaAutoRouterEnabled()) {
-      const intent = classifyNexaIntent(input.prompt)
       const primary = routeNexaProviderKey({ intent, knowledgeRetrievalEnabled: isNexaKnowledgeRetrievalEnabled() })
 
       return nexaProviderFailoverChain(primary).map(providerKey => ({
@@ -201,8 +211,21 @@ export class NexaService {
   }
 
   static async generateResponse(input: NexaServiceInput): Promise<NexaResponse> {
-    const plan = this.buildProviderPlan(input)
+    const intent = classifyNexaIntent(input.prompt)
+    const forcedToolName = resolveForcedToolName(intent)
+    const plan = this.buildProviderPlan(input, intent)
     const systemPromptResult = this.buildSystemPrompt(input.context)
+
+    // TASK-1182 — conciencia de superficie: si el usuario abrió el chat desde un insight
+    // (`runtimeContext.focusRef`), se appendea una nota de contexto del insight enfocado al system
+    // prompt del turno (NO al prompt versionado: es contexto runtime per-turno). Reusa el reader
+    // anti-oracle; no resoluble → null → el turno procede sin ancla (degradación honesta).
+    const focusedInsightNote = await buildFocusedInsightNote(input.runtimeContext)
+
+    const systemPromptText = focusedInsightNote
+      ? `${systemPromptResult.text}\n\n${focusedInsightNote}`
+      : systemPromptResult.text
+
     const startTotal = Date.now()
     const primaryProvider = plan[0].providerKey
     const providerSteps: NexaTurnProviderStepTelemetry[] = []
@@ -217,12 +240,13 @@ export class NexaService {
 
       try {
         const turn = await provider.resolveTurn({
-          systemPrompt: systemPromptResult.text,
+          systemPrompt: systemPromptText,
           history: input.history,
           prompt: input.prompt,
           runtimeContext: input.runtimeContext,
           context: input.context,
-          model: step.model
+          model: step.model,
+          forcedToolName
         })
 
         providerSteps.push({ providerKey: step.providerKey, model: step.model, latencyMs: Date.now() - stepStart, ok: true })

@@ -815,6 +815,13 @@ upsert_scheduler_job \
   '{}'
 echo "  -> ops-ico-member-sync: 30 10 * * * (ICO member metrics BQ → PG, TASK-775)"
 
+upsert_scheduler_job \
+  "ops-otd-writeback" \
+  "0 11 * * *" \
+  "/otd/writeback" \
+  '{}'
+echo "  -> ops-otd-writeback: 0 11 * * * (OTD bucket freeze-aware → Notion [GH] OTD, TASK-927; gated NOTION_OTD_WRITEBACK_ENABLED default OFF)"
+
 # Global projection recovery — unchanged lane.
 upsert_scheduler_job \
   "ops-reactive-recover" \
@@ -875,6 +882,13 @@ upsert_scheduler_job \
   "/finance/ledger-health-check" \
   '{}'
 echo "  -> ops-finance-ledger-health: 30 5 * * * America/Santiago (daily 05:30, drift probe + Sentry alert, TASK-702)"
+
+upsert_scheduler_job \
+  "ops-finance-dte-emission-retry" \
+  "*/15 * * * *" \
+  "/finance/dte-emission-retry" \
+  '{"batchSize":5}'
+echo "  -> ops-finance-dte-emission-retry: */15 * * * * America/Santiago (queued DTE emission retry, TASK-1194)"
 
 upsert_scheduler_job \
   "ops-quotation-lifecycle" \

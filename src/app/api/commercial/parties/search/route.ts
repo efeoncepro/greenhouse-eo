@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server'
 
 import { hasEntitlement } from '@/lib/entitlements/runtime'
-import { resolveFinanceQuoteTenantOrganizationIds } from '@/lib/finance/quotation-canonical-store'
 import {
   buildTenantEntitlementSubject,
   LIFECYCLE_STAGES,
@@ -104,19 +103,14 @@ export async function GET(request: Request) {
     throw error
   }
 
-  const [visibleOrganizationIds, canAdopt] = await Promise.all([
-    resolveFinanceQuoteTenantOrganizationIds(tenant),
-    Promise.resolve(
-      hasEntitlement(
-        buildTenantEntitlementSubject(tenant),
-        'commercial.party.create',
-        'create'
-      )
-    )
-  ])
+  const canAdopt = hasEntitlement(
+    buildTenantEntitlementSubject(tenant),
+    'commercial.party.create',
+    'create'
+  )
 
   const result = await searchParties(query, {
-    visibleOrganizationIds,
+    tenant,
     includeStages,
     allowHubspotCandidates: tenant.tenantType === 'efeonce_internal'
   })

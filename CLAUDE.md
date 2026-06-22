@@ -149,7 +149,7 @@ Reglas duras:
 - Usar solo enums vigentes: `Execution profile: standard|ui-ux|backend-data`, `UI impact: none|copy|layout|interaction|motion|primitive|flow`, `Backend impact: none|api|db|migration|command|reader|sync|cron|webhook|integration`.
 - Si `UI impact != none`, agregar `## UI/UX Contract` desde `docs/tasks/TASK_UI_UX_ADDENDUM.md`.
 - Si `Backend impact != none`, agregar `## Backend/Data Contract` desde `docs/tasks/TASK_BACKEND_DATA_ADDENDUM.md`.
-- Si una capacidad combina backend/data y UI visible, preferir dos tasks secuenciadas por `Execution profile`: primero `backend-data` para schema/API/reader/command/migration/sync/contrato de datos, despues `ui-ux` para ruta visible, layout, interaccion, copy y GVC. Excepcion valida: `ui-ux` discovery/mockup/prototipo primero cuando el contrato de producto todavia esta borroso, por ejemplo si no sabemos que layout humano funciona mejor, hay que validar board/list/inspector, el problema es mas de flujo que de data, o conviene que el backend se disene alrededor de una experiencia aprobada; en ese caso usar datos mockeados y declarar la task `backend-data` que cableara el contrato real. Mantener una task vertical hibrida solo si es pequena, reversible, sin migracion/schema riesgoso y declara justificacion + orden interno de ejecucion. Fuente canonica: `docs/tasks/TASK_PROCESS.md`; formalizacion pendiente: `TASK-1154`.
+- Si una capacidad combina backend/data y UI visible, preferir dos tasks secuenciadas por `Execution profile`: primero `backend-data` para schema/API/reader/command/migration/sync/contrato de datos, despues `ui-ux` para ruta visible, layout, interaccion, copy y GVC. Mantener una task vertical hibrida solo si es pequena, reversible, sin migracion/schema riesgoso y declara `## Hybrid Execution Justification` + orden interno de ejecucion. Fuente canonica: `docs/tasks/TASK_PROCESS.md` (`Hybrid Execution Profile Discipline`).
 - Sincronizar `docs/tasks/README.md` y `docs/tasks/TASK_ID_REGISTRY.md` al registrar o cambiar lifecycle.
 - Correr `pnpm task:lint --task TASK-###` y `pnpm ops:lint --changed`; si la task sale como `legacy=1`, corregir el markdown antes de responder.
 
@@ -240,7 +240,7 @@ Cuando una instrucción menciona "repos hermanos" o pide aplicar un cambio a mú
 - **Build:** `pnpm build`
 - **Lint:** `pnpm lint`
 - **Test:** `pnpm test` (Vitest)
-- **Type check:** `npx tsc --noEmit`
+- **Type check:** `pnpm typecheck` (hornea `--max-old-space-size=8192`; **usar este, NO `npx tsc --noEmit` crudo** — el bare tsc hace OOM bajo el Node 20 al que Volta ata `pnpm`. ISSUE-104)
 - **PostgreSQL connect:** `pnpm pg:connect` (ADC + proxy + test), `pnpm pg:connect:migrate`, `pnpm pg:connect:status`, `pnpm pg:connect:shell`
 - **PostgreSQL health:** `pnpm pg:doctor`
 - **Migrations:** `pnpm migrate:up`, `pnpm migrate:down`, `pnpm migrate:create <nombre>`, `pnpm migrate:status`
@@ -257,8 +257,12 @@ Cuando una instrucción menciona "repos hermanos" o pide aplicar un cambio a mú
 
 **Regla base:** todo lo que se pueda hacer dentro de Greenhouse debe poder hacerse, o tener camino planificado para hacerse, a traves de un contrato programatico gobernado. La UI no es el source of truth de una capacidad: es un cliente de commands, readers, projections y API contracts server-side.
 
+**La base es Full API Parity; Nexa total operability es su consecuencia y North Star (directiva CEO 2026-06-19).** El requisito duro es que **toda UI nueva y toda capability/entitlement nuevo nazca con su contrato programático gobernado** a nivel de capability (un primitive canónico, muchos consumers). De ahí se sigue automáticamente que **Nexa Agent pueda operar ABSOLUTAMENTE TODO el portal desde la Conversational Experience** — no se construye nada "Nexa-específico"; si el contrato existe (parity), Nexa y los demás consumers lo operan por construcción (reads directos; writes vía el loop de acción gobernada `propose → confirm → execute`, el LLM nunca escribe directo, muta sólo en el endpoint de confirmación humana). La pregunta de diseño obligatoria: **"¿esta capability tiene contrato gobernado a nivel capability?"** Si no, la feature **no está completa** (y por lo tanto Nexa tampoco podría operarla).
+
 **Implicaciones duras:**
 
+- **NUNCA** entregar una UI o una capability nueva sin su contrato programático gobernado equivalente: viola la base (Full API Parity) y, como consecuencia, rompe la operabilidad total de Nexa. UI y Nexa son dos clientes del MISMO primitive canónico, no dos implementaciones.
+- **SIEMPRE** verificar parity a nivel capability (contrato gobernado reutilizable por todos los consumers); la operabilidad de Nexa se valida como consecuencia, no como integración aparte. Runtime de acción gobernada: **`docs/architecture/agent-invariants/KNOWLEDGE_NEXA_AGENT_INVARIANTS.md`** + `GREENHOUSE_NEXA_ARCHITECTURE_V1.md`.
 - **NUNCA** implementar una accion de negocio solo dentro de un componente UI si puede afectar estado, permisos, datos, aprobaciones, exports, recoveries, reportes o configuracion. Extraer primero la primitive canonica en `src/lib/**`.
 - **NUNCA** crear endpoints que sean simples "click handlers remotos" acoplados al componente visible. Modelar el aggregate/recurso/command y su contrato estable.
 - **SIEMPRE** que una feature nueva agregue una accion visible, declarar el camino programatico esperado: Product API interna, `api/platform/app/*`, `api/platform/ecosystem/*`, MCP downstream, CLI/runbook, o task follow-up si se difiere.
@@ -289,6 +293,8 @@ Antes de cerrar, verificar y documentar segun aplique:
 - Handoff actualizado con lo aplicado, lo verificado y cualquier pendiente bloqueante.
 
 Si falta algo, reportar el estado como `code complete, rollout pendiente` o `operativamente bloqueado`; no mover lifecycle a complete ni decir "listo" como si el usuario ya pudiera usarlo.
+
+**Feature Flag State Ledger (anti deuda cognitiva):** los env-var flags (`*_ENABLED`) que quedan code-complete pero pendientes de prender, y el estado por environment de los ~60 flags activos, se registran en **`docs/operations/FEATURE_FLAG_STATE_LEDGER.md`** (SSOT humano del estado; la verdad live es `vercel env ls`). **SIEMPRE** que declares un flag nuevo, agregá su fila al inventario; si lo dejás code-complete sin prender, agregá una fila a "§ Pendientes de acción"; al prenderlo/apagarlo, actualizá el snapshot. Es distinto de los flags PG declarativos (`home_rollout_flags`, `GREENHOUSE_FEATURE_FLAGS_ROLLOUT_PLATFORM_V1.md`). **Gate mecánico de cierre:** `pnpm docs:closure-check` corre `feature-flags-audit --strict` y **falla (exit 1) si hay un `*_ENABLED` en código sin fila en el ledger** — ningún cierre pasa con un flag sin registrar. Pasada manual: `pnpm flags:audit` (advisory) / `pnpm flags:audit --strict --no-vercel`.
 
 **Caso fuente 2026-06-01:** Workforce Activation/SCIM tenia codigo TASK-872/874/876, pero sin `SCIM_INTERNAL_COLLABORATOR_PRIMITIVE_ENABLED=true`, `PAYROLL_WORKFORCE_INTAKE_GATE_ENABLED=true`, redeploy de Vercel y backfill de usuarios ya creados, Entra seguia creando solo `client_users` y no `members`. La pantalla prometia activacion laboral, pero Maggie Borralles no aparecia hasta completar rollout + recovery.
 
@@ -421,6 +427,7 @@ Los issues documentan incidentes operativos detectados en runtime. Viven en `doc
 - **Tasks** (`TASK-###`) son trabajo planificado (features, hardening, refactors)
 - **Issues** (`ISSUE-###`) son problemas encontrados en runtime (errores, fallos, degradación)
 - Un issue puede generar una task si la solución requiere trabajo significativo
+- **Awareness de hook pre-ejecucion ISSUE-* para Codex**: cuando el operador menciona `ISSUE-###`, `[ISSUE-###]`, una ruta `docs/issues/**/ISSUE-###-*.md` o alias slash-style de Codex como `/fix-issue ISSUE-###`, `/fix-issue ###`, `/issue ISSUE-###` o `/issue ###`, Codex debe ejecutar `pnpm codex:issue-hook ISSUE-###` antes de implementar y aplicar el prompt que imprime. Este hook es solo de Codex; no obliga automaticamente a Claude, Cursor u otros agentes. El prompt fuerza triage `issue-only fix` vs `issue + TASK` vs `blocked`; remediaciones amplias deben pasar a task; el cierre requiere evidencia de no-regresion sobre consumidores/contratos vecinos o riesgo residual documentado. Drift guard Codex: `pnpm codex:issue-hook:check`.
 
 ## Task Lifecycle Protocol
 
@@ -1045,7 +1052,7 @@ Los invariantes operativos de Finance ledger/bank — internal account number al
 
 - Tests unitarios: Vitest + Testing Library + jsdom
 - Helper de render para tests: `src/test/render.tsx`
-- Validar con: `pnpm build`, `pnpm lint`, `pnpm test`, `npx tsc --noEmit`
+- Validar con: `pnpm build`, `pnpm lint`, `pnpm test`, `pnpm typecheck` (NO `npx tsc --noEmit` crudo — OOM bajo Node 20, ISSUE-104)
 
 ### Charts — política canónica (decisión 2026-04-26 — prioridad: impacto visual)
 
@@ -1353,6 +1360,24 @@ Toda resolución de la foto/avatar de un usuario pasa por el helper canónico **
 - **NUNCA** usar `session.user.avatarUrl` crudo en un `<Avatar src>` — puede ser un `gs://` no servible. Pasarlo siempre por `resolveAvatarUrl(avatarUrl, userId)` primero.
 - **`resolveAvatarUrl` es `import 'server-only'`** → en un componente cliente (`'use client'`) NO se puede importar. Patrón canónico: resolverlo en el **server component / route / reader** y pasar el `avatarUrl` ya resuelto como prop/campo del VM (el cliente solo renderiza `<Avatar src={vm.avatarUrl ?? undefined}>` con fallback a iniciales). Caso fuente: `OnboardingCasesInboxView` (TASK-1015) recibe `operator.avatarUrl` resuelto en su page server.
 - **SIEMPRE** que un reader/route/VM exponga un avatar de usuario, mapearlo con `resolveAvatarUrl(rawAvatarUrl, userId)` (mirror de los facets person-360 / account-360 / people / finance responsibles que ya lo consumen).
+
+### Botones de Nexa — Nexa Mark + Shiny Button (navy) (convención de marca, desde 2026-06-20)
+
+Todo botón/CTA que **invoque o represente a Nexa** (ej. "Pregúntale a Nexa", "Seguir con Nexa") usa la marca de Nexa, no un botón genérico:
+
+- **Nexa Mark obligatorio:** el ícono es el **Nexa Mark** (`GreenhouseNexaBrandMark` desde `@/components/greenhouse/primitives`), NUNCA un ícono Tabler genérico (`tabler-message-*`, `tabler-sparkles`, etc.) ni texto solo. Para botón sobre fondo oscuro usar `kind='inlineMarkOnDark'`.
+- **Shiny Button para el navy de Nexa:** el color característico de Nexa (midnight navy) se expresa con el **Shiny Button** — `GreenhouseShinyBorder asButton variant='cta' palette='nexa'` (desde `@/components/greenhouse/primitives`), pasando el Mark + label como `children`. NO usar un MUI `<Button color='primary'>` plano para un CTA de Nexa.
+
+Patrón canónico (copiar este shape):
+
+```tsx
+<GreenhouseShinyBorder asButton variant='cta' palette='nexa' ariaLabel={…} onClick={…}>
+  <GreenhouseNexaBrandMark kind='inlineMarkOnDark' size='small' />
+  {GH_NEXA.insight_ask_nexa_cta}
+</GreenhouseShinyBorder>
+```
+
+**Referencias vivas:** el bridge CTA de `KnowledgeNexaCompositionLens` ("Seguir con Nexa") y el CTA "Pregúntale a Nexa" de `NexaInsightDetailView` (TASK-1182). El copy visible va en `src/lib/copy/nexa.ts` (`GH_NEXA`), validado con `greenhouse-ux-writing`. **NUNCA** pintar un botón de Nexa con `<Button>` MUI plano + ícono genérico; **NUNCA** hardcodear el navy (sale del `palette='nexa'` de la primitive).
 
 ### Otras convenciones
 

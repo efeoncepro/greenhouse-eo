@@ -13,6 +13,9 @@
 - Impact: `Muy alto`
 - Effort: `Medio`
 - Type: `implementation`
+- Execution profile: `backend-data`
+- UI impact: `none`
+- Backend impact: `cron`
 - Epic: `optional`
 - Status real: `Implementación shipped 2026-05-13 directo en develop (commits a918ecd4 → 23ba4c2a → 8524d745 → 689d35cf → ec16aca9). Recovery 3 cuentas + release develop→main pendientes de autorización operador. ISSUE-069 actualizado: fix parcial; TASK-871 cierra contrato completo.`
 - Rank: `TBD`
@@ -166,6 +169,57 @@ Reglas obligatorias:
 - El remediator no tiene una politica estrecha para drift reciente con firma de "seed blind spot".
 - La documentacion dice que la clase estaba resuelta, pero el runtime del 2026-05-13 mostro que no.
 
+## Backend/Data Contract
+
+### Backend/data brief
+
+- Backend rigor: `backend-critical` (finance/account balances + cron + remediation policy).
+- Impacto principal: `cron` + `command` + `reader`.
+- Source of truth afectado: `greenhouse_finance.account_balances` y readers de drift FX contra settlement legs / payments normalizados.
+- Consumidores afectados: ops-worker (`ops-finance-rematerialize-balances`), remediation command de FX drift, reliability signal `finance.account_balances.fx_drift`, smoke Playwright de finance.
+- Runtime target: `worker` + `staging/production` para recovery controlado.
+
+### Contract surface
+
+- Contrato existente a respetar: `rematerializeAccountBalanceRange`, `finance.account_balances.fx_drift`, VIEWs canónicas `expense_payments_normalized` / `income_payments_normalized`, evidence guard de balances reconciliados.
+- Contrato nuevo o modificado: primitive `computeRollingRematerializationWindow`, reader `resolveCleanSeedDate`, policy `rolling_window_repair` en el remediator de drift FX.
+- Backward compatibility: `compatible`; `computeRematerializeSeedDate` permanece como wrapper back-compat sobre `window.seedDate`.
+- Full API parity: `N/A — remediation/cron interno`, sin capability nueva de producto.
+
+### Data model and invariants
+
+- Entidades/tablas/views afectadas: `greenhouse_finance.account_balances`, `settlement_legs`, `expense_payments_normalized`, `income_payments_normalized`.
+- Invariantes que no se pueden romper:
+  - El primer día materializado de la ventana rolling jamás puede usarse como seed silencioso.
+  - Si el seed candidato contiene movimientos canónicos, se expande hacia atrás hasta un anchor limpio o escala honestamente.
+  - Evidencia protegida dentro del rango bloquea o exige `historical_restatement`; evidencia fuera del rango no debe bloquear rolling repair acotado.
+- Tenant/space boundary: account-level; no cambia `space_id` ni ownership de cuentas.
+- Idempotency/concurrency: re-runs del cron producen la misma ventana y el mismo seed limpio para `(today, lookbackDays, accountId)` mientras la evidencia no cambie.
+- Audit/outbox/history: sin outbox nuevo; evidencia vía reliability signal, logs del ops-worker y Sentry domain `finance` en escalations.
+
+### Migration, backfill and rollout
+
+- Migration posture: `none` (cambio de código + recovery controlado; no schema).
+- Default state: enabled con el cron existente una vez desplegado el ops-worker.
+- Backfill plan: recovery acotado a las 3 cuentas afectadas (`global66-clp`, `santander-clp`, `santander-corp-clp`) después del deploy.
+- Rollback path: revert del deploy/PR; no hay migración a revertir. Si recovery ya aplicó, re-materializar desde anchor histórico explícito con evidence guard.
+- External coordination: autorización operador para Slice 5 recovery y release develop→main.
+
+### Security and access
+
+- Auth/access gate: ejecución por Cloud Scheduler/ops-worker o endpoints internos existentes de remediation con capability/admin gating.
+- Sensitive data posture: finance ledger/balances; no exponer raw errors ni mutar fuera del allowlist.
+- Error contract: escalations con `captureWithDomain('finance')`; no debilitar el smoke ni el reliability signal.
+- Abuse/rate-limit posture: cron/recovery scoped; no endpoint público nuevo.
+
+### Runtime evidence
+
+- Local checks: vitest focales de seed/window/clean-seed/remediation/invariants, tsc, lint, build.
+- DB/runtime checks: `finance.account_balances.fx_drift` debe volver a `count=0` tras recovery.
+- Integration checks: logs de Cloud Scheduler `ops-finance-rematerialize-balances` y `ops-finance-fx-drift-remediate`.
+- Reliability signals/logs: `finance.account_balances.fx_drift` + Sentry finance escalations.
+- Production verification sequence: deploy ops-worker → recovery allowlisted → smoke finance account balances → release orchestrator develop→main con gates canónicos.
+
 ### Incident Evidence 2026-05-13
 
 - GitHub Actions fallidos:
@@ -315,6 +369,31 @@ No usar strings sueltos ni math duplicada en callers.
 - Si no existe dry-run, consultar y registrar antes/despues con queries read-only.
 - No modificar cuentas no afectadas por el incidente salvo que el signal muestre drift adicional.
 - Si aparece evidencia protegida en el dia exacto a reparar, detener y abrir decision de restatement.
+
+## Rollout Plan & Risk Matrix
+
+### Slice ordering hard rule
+
+- Slice 1 (Discovery + Architecture Decision) precede cualquier cambio runtime.
+- Slice 2 (Rolling Window Contract) debe shippear antes de Slice 3 (Remediation Policy Split), porque el remediator consume la primitive tipada.
+- Slice 4 (Tests Anti-Regresion) debe cerrar antes de Slice 5 (Controlled Recovery); sin invariantes verdes no se toca data.
+- Slice 5 (Controlled Recovery) queda fuera de scope local y requiere autorización operador.
+- Slice 6 (Docs + Close) sincroniza arquitectura, issue, README/registry y cierre después de los gates locales.
+
+### Risk matrix
+
+| Riesgo | Sistema | Probabilidad | Mitigation | Signal de alerta |
+|---|---|---|---|---|
+| Seed silencioso persiste y deja movimientos fuera del replay | finance / cron | medium | primitive tipada + invariants + smoke FX drift | `finance.account_balances.fx_drift` |
+| Recovery toca cuentas no afectadas | finance data | low | allowlist de 3 cuentas + dry-run/read-only evidence antes/despues | logs ops-worker + PG read smoke |
+| Evidence guard se debilita y permite restatement inseguro | finance controls | medium | separar `rolling_window_repair` de `historical_restatement`; protected evidence sigue bloqueando dentro del rango | Sentry `finance` + tests remediation |
+| Deploy worker sin recovery deja smoke rojo | release | medium | recovery operator-approved antes de release develop→main | Playwright smoke finance |
+
+### Feature flags / cutover
+
+- No hay flag nuevo; el cutover ocurre por deploy del ops-worker con el contrato nuevo.
+- Recovery de datos queda como paso explícito y autorizado, no automático.
+- Rollback: revert deploy; si la recovery se ejecutó, usar restatement histórico explícito con evidence guard para re-materializar desde anchor controlado.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 4 — VERIFICATION & CLOSING

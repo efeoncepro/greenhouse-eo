@@ -234,6 +234,54 @@ export const resolveFinanceQuoteTenantOrganizationIds = async (tenant: TenantCon
   return rows.map(row => row.organization_id)
 }
 
+export const canAccessFinanceQuoteOrganization = async (
+  tenant: TenantContext,
+  organizationId: string
+) => {
+  const normalizedOrganizationId = organizationId.trim()
+
+  if (!normalizedOrganizationId) {
+    return false
+  }
+
+  if (tenant.tenantType === 'efeonce_internal') {
+    const rows = await query<TenantOrganizationRow>(
+      `SELECT organization_id
+       FROM greenhouse_core.organizations
+       WHERE active = TRUE
+         AND organization_id = $1
+       LIMIT 1`,
+      [normalizedOrganizationId]
+    )
+
+    return rows.length > 0
+  }
+
+  const tenantOrganizationId = tenant.organizationId?.trim()
+
+  if (tenantOrganizationId) {
+    return tenantOrganizationId === normalizedOrganizationId
+  }
+
+  const clientId = tenant.clientId?.trim()
+
+  if (!clientId) {
+    return false
+  }
+
+  const rows = await query<TenantOrganizationRow>(
+    `SELECT DISTINCT s.organization_id
+     FROM greenhouse_core.spaces s
+     WHERE s.active = TRUE
+       AND s.client_id = $1
+       AND s.organization_id = $2
+     LIMIT 1`,
+    [clientId, normalizedOrganizationId]
+  )
+
+  return rows.length > 0
+}
+
 export const listFinanceQuotesFromCanonical = async ({
   tenant,
   status,
@@ -996,13 +1044,16 @@ export const syncCanonicalFinanceQuote = async ({
        $2,
        $3,
        $4,
+       -- TASK-1222 Slice A — el inbound de HubSpot ya escribe finance.quotes.status en
+       -- vocabulario canónico (issued/pending_approval/approval_rejected/expired/...).
+       -- El CASE legacy solo conocía el vocab del quote-builder (accepted/sent/rejected)
+       -- y colapsaba todo lo demás a 'draft' → 17/24 quotes HubSpot issued se mostraban
+       -- como borrador. Passthrough de los status canónicos PRIMERO; mapeo legacy después.
        CASE
+         WHEN q.status IN ('draft', 'pending_approval', 'approval_rejected', 'issued', 'expired', 'converted') THEN q.status
          WHEN q.status = 'accepted' THEN 'issued'
-         WHEN q.status = 'draft' THEN 'draft'
          WHEN q.status = 'sent' THEN 'issued'
          WHEN q.status = 'rejected' THEN 'approval_rejected'
-         WHEN q.status = 'expired' THEN 'expired'
-         WHEN q.status = 'converted' THEN 'converted'
          ELSE 'draft'
        END,
        1,

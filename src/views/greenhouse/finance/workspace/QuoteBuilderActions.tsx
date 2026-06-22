@@ -8,9 +8,14 @@ import Typography from '@mui/material/Typography'
 
 import CustomTextField from '@core/components/mui/TextField'
 
+import GreenhouseDatePicker from '@/components/greenhouse/GreenhouseDatePicker'
 import type { CommercialModelCode } from '@/lib/commercial/pricing-governance-types'
 import type { PricingOutputCurrency } from '@/lib/finance/pricing/contracts'
 import { GH_PRICING } from '@/lib/copy/pricing'
+import {
+  formatLocalDateToDateOnly,
+  parseDateOnlyToLocalDate
+} from '@/lib/finance/quotation-date-only'
 
 import CurrencySwitcher from '@/components/greenhouse/pricing/CurrencySwitcher'
 
@@ -160,15 +165,12 @@ const QuoteBuilderActions = ({ state, onChange, options, disabled = false }: Quo
         helperText='Requerido para retainer o híbrido'
       />
 
-      <CustomTextField
-        fullWidth
-        size='small'
-        type='date'
-        label='Válida hasta'
-        value={state.validUntil ?? ''}
+      <GreenhouseDatePicker
+        label={GH_PRICING.contextChips.validUntil.label}
+        value={parseDateOnlyToLocalDate(state.validUntil)}
         disabled={disabled}
-        onChange={event => onChange({ validUntil: event.target.value || null })}
-        InputLabelProps={{ shrink: true }}
+        onChange={nextDate => onChange({ validUntil: formatLocalDateToDateOnly(nextDate) })}
+        placeholder={GH_PRICING.contextChips.validUntil.placeholder}
       />
 
       <CustomTextField

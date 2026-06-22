@@ -41,6 +41,8 @@ const StyledVerticalNav = styled.aside<StyledVerticalNavProps>`
   /* Collapsed & Toggled */
   &.${verticalNavClasses.breakpointReached} {
     position: fixed;
+    flex: 0 0 0;
+    min-inline-size: 0;
     block-size: 100%;
     inset-block-start: 0;
     inset-inline-start: ${({ width }) => `-${width}px`};

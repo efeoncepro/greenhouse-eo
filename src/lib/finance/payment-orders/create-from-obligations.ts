@@ -19,7 +19,7 @@ import {
   type PaymentObligationStatus
 } from '@/types/payment-obligations'
 
-import { PaymentOrderConflictError, PaymentOrderValidationError } from './errors'
+import { assertPaymentOrderCashCurrency, PaymentOrderConflictError, PaymentOrderValidationError } from './errors'
 import { mapOrderRow, type OrderRow } from './row-mapper'
 import { resolvePaymentOrderSourcePolicy } from './source-instrument-policy'
 
@@ -197,6 +197,12 @@ export async function createPaymentOrderFromObligations(
         'unsupported_corridor'
       )
     }
+
+    // 4c. TASK-995 (ADR GREENHOUSE_CLF_INDEXED_FINANCE_CORE_V1) — CLF/UF es una
+    // unidad indexada, NUNCA moneda de caja. Una obligación CLF liquida en CLP:
+    // su plano native lleva el CLF, pero su `currency` cash es CLP. Defensa en
+    // profundidad sobre el CHECK de DB (payment_orders.currency ∈ {CLP,USD}).
+    assertPaymentOrderCashCurrency(currency)
 
     // 5. Computar total + validar partial amounts
     let totalAmount = 0

@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server'
 import { getOrganizationDetail } from '@/lib/account-360/organization-store'
 import { syncOrganizationHubSpotContacts } from '@/lib/account-360/sync-organization-hubspot-contacts'
 import { query } from '@/lib/db'
-import { resolveFinanceQuoteTenantOrganizationIds } from '@/lib/finance/quotation-canonical-store'
+import { canAccessFinanceQuoteOrganization } from '@/lib/finance/quotation-canonical-store'
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 
 export const dynamic = 'force-dynamic'
@@ -58,7 +58,7 @@ const listQuoteOrganizationContacts = async (organizationId: string) =>
   )
 
 export async function GET(
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { tenant, errorResponse } = await requireFinanceTenantContext()
@@ -75,24 +75,29 @@ export async function GET(
 
   // Tenant isolation — la org solicitada debe ser visible al tenant. Reutilizamos el resolver
   // canónico (mismo usado por la lista de quotes) para no duplicar lógica de scoping.
-  const visibleOrgIds = await resolveFinanceQuoteTenantOrganizationIds(tenant)
+  const normalizedOrganizationId = organizationId.trim()
+  const canAccessOrganization = await canAccessFinanceQuoteOrganization(tenant, normalizedOrganizationId)
 
-  if (!visibleOrgIds.includes(organizationId.trim())) {
+  if (!canAccessOrganization) {
     return NextResponse.json({ error: 'Organization not visible to this tenant.' }, { status: 403 })
   }
 
-  const normalizedOrganizationId = organizationId.trim()
-  let rows = await listQuoteOrganizationContacts(normalizedOrganizationId)
+  const url = new URL(request.url)
+  const refreshMode = url.searchParams.get('refresh') === '1' || url.searchParams.get('sync') === '1'
 
-  if (rows.length === 0) {
+  let rows = await listQuoteOrganizationContacts(normalizedOrganizationId)
+  let refreshedFromHubSpot = false
+
+  if (refreshMode) {
     const organization = await getOrganizationDetail(normalizedOrganizationId)
 
     if (organization?.hubspotCompanyId) {
       try {
         await syncOrganizationHubSpotContacts({ organizationId: normalizedOrganizationId })
         rows = await listQuoteOrganizationContacts(normalizedOrganizationId)
+        refreshedFromHubSpot = true
       } catch (error) {
-        console.warn('[commercial organization contacts] hubspot read-through sync failed', {
+        console.warn('[commercial organization contacts] hubspot refresh failed', {
           organizationId: normalizedOrganizationId,
           error: error instanceof Error ? error.message : String(error)
         })
@@ -111,5 +116,12 @@ export async function GET(
     isPrimary: Boolean(row.is_primary)
   }))
 
-  return NextResponse.json({ items, total: items.length })
+  return NextResponse.json({
+    items,
+    total: items.length,
+    refresh: {
+      mode: refreshMode ? 'hubspot' : 'cached',
+      refreshedFromHubSpot
+    }
+  })
 }

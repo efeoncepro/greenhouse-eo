@@ -189,29 +189,25 @@ const auditScopedPaymentLedgers = async (spaceId: string | null): Promise<Scoped
   ] = await Promise.all([
     countRows(
       `SELECT COUNT(*)::text AS count
-       FROM greenhouse_finance.income i
-       INNER JOIN (
-         SELECT income_id, SUM(amount)::numeric AS total
-         FROM greenhouse_finance.income_payments
-         GROUP BY income_id
-       ) p ON p.income_id = i.income_id
-       WHERE ABS(COALESCE(i.amount_paid, 0) - p.total) > 0.01${incomeScope.clause}`,
+       FROM greenhouse_finance.income_settlement_reconciliation r
+       INNER JOIN greenhouse_finance.income i ON i.income_id = r.income_id
+       WHERE r.has_drift = TRUE${incomeScope.clause}`,
       incomeScope.params
     ),
     countRows(
       `SELECT COUNT(*)::text AS count
        FROM greenhouse_finance.income i
-       LEFT JOIN greenhouse_finance.income_payments ip ON ip.income_id = i.income_id
+       LEFT JOIN greenhouse_finance.income_payments_normalized ipn ON ipn.income_id = i.income_id
        WHERE COALESCE(i.amount_paid, 0) > 0.01
-         AND ip.payment_id IS NULL${incomeScope.clause}`,
+         AND ipn.payment_id IS NULL${incomeScope.clause}`,
       incomeScope.params
     ),
     countRows(
       `SELECT COUNT(*)::text AS count
        FROM greenhouse_finance.expenses e
        INNER JOIN (
-         SELECT expense_id, SUM(amount)::numeric AS total
-         FROM greenhouse_finance.expense_payments
+         SELECT expense_id, SUM(payment_amount_native)::numeric AS total
+         FROM greenhouse_finance.expense_payments_normalized
          GROUP BY expense_id
        ) p ON p.expense_id = e.expense_id
        WHERE ABS(COALESCE(e.amount_paid, 0) - p.total) > 0.01${expenseScope.clause}`,
@@ -220,9 +216,9 @@ const auditScopedPaymentLedgers = async (spaceId: string | null): Promise<Scoped
     countRows(
       `SELECT COUNT(*)::text AS count
        FROM greenhouse_finance.expenses e
-       LEFT JOIN greenhouse_finance.expense_payments ep ON ep.expense_id = e.expense_id
+       LEFT JOIN greenhouse_finance.expense_payments_normalized epn ON epn.expense_id = e.expense_id
        WHERE COALESCE(e.amount_paid, 0) > 0.01
-         AND ep.payment_id IS NULL${expenseScope.clause}`,
+         AND epn.payment_id IS NULL${expenseScope.clause}`,
       expenseScope.params
     )
   ])
@@ -263,7 +259,7 @@ export async function GET() {
       status: audit.incomeLedgerDriftCount === 0 ? 'ok' : 'warning',
       detail: audit.incomeLedgerDriftCount === 0
         ? 'Todos los saldos de pago están consistentes'
-        : `${audit.incomeLedgerDriftCount} factura(s) con amount_paid divergente de SUM(income_payments)`,
+        : `${audit.incomeLedgerDriftCount} factura(s) con settlement canónico divergente`,
       value: audit.incomeLedgerDriftCount
     })
 
@@ -285,7 +281,7 @@ export async function GET() {
       status: audit.expenseLedgerDriftCount === 0 ? 'ok' : 'warning',
       detail: audit.expenseLedgerDriftCount === 0
         ? 'Todos los saldos de pagos de compras están consistentes'
-        : `${audit.expenseLedgerDriftCount} compra(s) con amount_paid divergente de SUM(expense_payments)`,
+        : `${audit.expenseLedgerDriftCount} compra(s) con amount_paid divergente de pagos activos`,
       value: audit.expenseLedgerDriftCount
     })
 

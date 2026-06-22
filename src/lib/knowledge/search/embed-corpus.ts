@@ -43,28 +43,42 @@ export interface EmbedCorpusResult {
 
 const BATCH = 50
 
-/**
- * @param apply false (default) = dry-run: NO escribe, solo reporta cuántos se embeberían.
- * @param refresh true = re-embebe todo aunque el checksum coincida.
- */
-export const embedKnowledgeCorpus = async (options?: {
-  apply?: boolean
-  refresh?: boolean
-}): Promise<EmbedCorpusResult> => {
-  const apply = options?.apply ?? false
-  const refresh = options?.refresh ?? false
+const loadChunksToEmbed = async (scope?: {
+  documentVersionId?: string
+}): Promise<ChunkToEmbedRow[]> => {
+  const params: string[] = []
+  const where: string[] = []
 
-  // Solo chunks de la versión vigente — los únicos que el retrieval puede devolver.
-  const rows = await query<ChunkToEmbedRow>(
+  if (scope?.documentVersionId) {
+    params.push(scope.documentVersionId)
+    where.push(`kc.document_version_id = $${params.length}`)
+  } else {
+    // Solo chunks de la versión vigente — los únicos que el retrieval puede devolver.
+    where.push('kc.document_version_id = kd.current_version_id')
+  }
+
+  return query<ChunkToEmbedRow>(
     `SELECT kc.chunk_id, kd.title, kc.heading_path, kc.body_text,
             kc.embedding_checksum,
             (kc.embedding IS NOT NULL) AS has_embedding
      FROM greenhouse_knowledge.knowledge_chunks kc
      JOIN greenhouse_knowledge.knowledge_documents kd ON kd.document_id = kc.document_id
-     WHERE kc.document_version_id = kd.current_version_id
-     ORDER BY kc.document_id, kc.chunk_index`
+     WHERE ${where.join(' AND ')}
+     ORDER BY kc.document_id, kc.chunk_index`,
+    params
   )
+}
 
+const embedLoadedChunks = async (
+  rows: ChunkToEmbedRow[],
+  options: {
+    apply: boolean
+    refresh: boolean
+    captureSource: string
+    captureExtra?: Record<string, unknown>
+  }
+): Promise<EmbedCorpusResult> => {
+  const { apply, refresh, captureSource, captureExtra } = options
   const pending: { chunkId: string; embedText: string; checksum: string }[] = []
   let skippedUpToDate = 0
 
@@ -119,8 +133,8 @@ export const embedKnowledgeCorpus = async (options?: {
       }
     } catch (err) {
       captureWithDomain(err, 'knowledge', {
-        tags: { source: 'embed_corpus', stage: 'embed_batch' },
-        extra: { batchStart: i, batchSize: slice.length }
+        tags: { source: captureSource, stage: 'embed_batch' },
+        extra: { ...captureExtra, batchStart: i, batchSize: slice.length }
       })
       throw err
     }
@@ -135,4 +149,41 @@ export const embedKnowledgeCorpus = async (options?: {
     model: KNOWLEDGE_EMBED_MODEL,
     apply
   }
+}
+
+/**
+ * Embebe una versión publicada puntual. Es el brazo reactivo de ingesta:
+ * `publishKnowledgeDocumentVersion` ya terminó su transacción, por lo que si
+ * Vertex falla el caller puede capturar el error sin revertir la publicación.
+ */
+export const embedKnowledgeDocumentVersion = async (options: {
+  documentVersionId: string
+  apply?: boolean
+  refresh?: boolean
+}): Promise<EmbedCorpusResult> => {
+  const apply = options.apply ?? false
+  const refresh = options.refresh ?? false
+  const rows = await loadChunksToEmbed({ documentVersionId: options.documentVersionId })
+
+  return embedLoadedChunks(rows, {
+    apply,
+    refresh,
+    captureSource: 'embed_document_version',
+    captureExtra: { documentVersionId: options.documentVersionId }
+  })
+}
+
+/**
+ * @param apply false (default) = dry-run: NO escribe, solo reporta cuántos se embeberían.
+ * @param refresh true = re-embebe todo aunque el checksum coincida.
+ */
+export const embedKnowledgeCorpus = async (options?: {
+  apply?: boolean
+  refresh?: boolean
+}): Promise<EmbedCorpusResult> => {
+  const apply = options?.apply ?? false
+  const refresh = options?.refresh ?? false
+  const rows = await loadChunksToEmbed()
+
+  return embedLoadedChunks(rows, { apply, refresh, captureSource: 'embed_corpus' })
 }

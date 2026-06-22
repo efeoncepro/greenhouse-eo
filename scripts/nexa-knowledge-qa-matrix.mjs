@@ -140,8 +140,8 @@ const parseArgs = () => {
       options.json = true
     } else if (arg.startsWith('--min-pass=')) {
       // Umbral para el nightly (TASK-1127): exit 1 solo si pasan MENOS de N casos.
-      // Tolera la flakiness conocida del LLM (tool-routing K4/G1/K7) sin volverse ruidoso
-      // — pero una regresión real (varios casos core caen) sí dispara la alerta del workflow.
+      // Tras TASK-1156, K4/G1/K7 ya no deben fallar por tool-routing cuando el forced
+      // Knowledge retrieval flag esta ON; --min-pass queda solo como amortiguador nightly.
       const parsed = Number.parseInt(arg.slice('--min-pass='.length), 10)
 
       options.minPass = Number.isNaN(parsed) ? null : parsed
@@ -385,8 +385,8 @@ const main = async () => {
     )
   }
 
-  // Umbral del nightly: con --min-pass=N, falla solo si pasan menos de N (tolera flakiness
-  // conocida). Sin el flag (uso on-demand), mantiene el contrato estricto: cualquier fallo → exit 1.
+  // Umbral del nightly: con --min-pass=N, falla solo si pasan menos de N. Sin el flag
+  // (uso on-demand), mantiene el contrato estricto: cualquier fallo -> exit 1.
   if (options.minPass !== null) {
     if (summary.passed < options.minPass) {
       console.error(

@@ -2259,6 +2259,10 @@ export interface GreenhouseCoreClientUsers {
   microsoft_email: string | null;
   microsoft_oid: string | null;
   microsoft_tenant_id: string | null;
+  /**
+   * TASK-1079 — Nexa interaction mode preference: dock (compacto), expandible (panel), lane (sidecar full-height). NULL = system default (dock). Las 3 modalidades comparten runtime/persistencia/historial (greenhouse_ai.nexa_threads/nexa_messages).
+   */
+  nexa_interaction_mode: string | null;
   password_hash: string | null;
   password_hash_algorithm: string | null;
   /**
@@ -2291,6 +2295,102 @@ export interface GreenhouseCoreDepartments {
   parent_department_id: string | null;
   sort_order: Generated<number>;
   updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseCoreDesignHandoffAllowedFiles {
+  added_at: Generated<Timestamp>;
+  added_by: string;
+  file_key: string;
+  file_label: string;
+  metadata_json: Generated<Json>;
+  superseded_at: Timestamp | null;
+}
+
+export interface GreenhouseCoreDesignHandoffEntries {
+  archived_at: Timestamp | null;
+  blocked_reason: string | null;
+  created_at: Generated<Timestamp>;
+  created_by: string;
+  designer_owner_member_id: string | null;
+  dev_owner_member_id: string | null;
+  due_at: Timestamp | null;
+  entry_id: string;
+  file_key: string;
+  implementation_strategy: string | null;
+  implemented_surface_key: string | null;
+  kind: string;
+  node_id: string;
+  node_name: string | null;
+  primitive_decision_due_at: Timestamp | null;
+  primitive_decision_owner: string | null;
+  primitive_decision_updated_at: Timestamp | null;
+  primitive_docs_ref: string | null;
+  primitive_gvc_ref: string | null;
+  primitive_key: string | null;
+  primitive_kind: string | null;
+  primitive_lab_route: string | null;
+  primitive_rationale: string | null;
+  primitive_runtime_route: string | null;
+  primitive_variant: string | null;
+  priority: Generated<string>;
+  review_owner_member_id: string | null;
+  status: Generated<string>;
+  target_surface_key: string | null;
+  title: string;
+  updated_at: Generated<Timestamp>;
+  updated_by: string;
+}
+
+export interface GreenhouseCoreDesignHandoffEntryEvents {
+  actor_user_id: string | null;
+  created_at: Generated<Timestamp>;
+  entry_id: string;
+  event_id: string;
+  event_type: string;
+  file_key: string | null;
+  from_status: string | null;
+  implemented_surface_key: string | null;
+  metadata_json: Generated<Json>;
+  node_id: string | null;
+  to_status: string;
+}
+
+export interface GreenhouseCoreDesignHandoffEntryEvidence {
+  created_at: Generated<Timestamp>;
+  created_by: string;
+  entry_id: string;
+  evidence_id: string;
+  evidence_type: string;
+  label: string | null;
+  metadata_json: Generated<Json>;
+  ref: string;
+}
+
+export interface GreenhouseCoreDesignHandoffEntryLinks {
+  created_at: Generated<Timestamp>;
+  created_by: string;
+  entry_id: string;
+  label: string | null;
+  link_id: string;
+  link_type: string;
+  metadata_json: Generated<Json>;
+  ref: string;
+}
+
+export interface GreenhouseCoreDesignHandoffNodeSnapshots {
+  created_at: Generated<Timestamp>;
+  created_by: string;
+  entry_id: string;
+  expected_name: string | null;
+  file_key: string;
+  metadata_json: Generated<Json>;
+  node_id: string;
+  node_status: string;
+  observed_name: string | null;
+  provider_checked_at: Generated<Timestamp>;
+  render_hash: string | null;
+  render_url: string | null;
+  snapshot_id: string;
 }
 
 export interface GreenhouseCoreDesignSystemFigmaNodeEvents {
@@ -3933,6 +4033,27 @@ export interface GreenhouseCrmDeals {
   updated_at: Generated<Timestamp>;
 }
 
+export interface GreenhouseDeliveryOtdAttributableMemberMonthShadow {
+  cohort_reproduced: Generated<boolean>;
+  computed_at: Generated<Timestamp>;
+  created_at: Generated<Timestamp>;
+  data_status: string;
+  denominator_drop_count: Generated<number>;
+  eligible_task_count: Generated<number>;
+  formula_version: string;
+  freeze_covered_count: Generated<number>;
+  improvable_candidate_count: Generated<number>;
+  late_drop_count: Generated<number>;
+  member_id: string;
+  numerator_flip_count: Generated<number>;
+  on_time_count: Generated<number>;
+  otd_pct_corrected: Numeric | null;
+  otd_pct_legacy: Numeric | null;
+  overdue_count: Generated<number>;
+  period_month: number;
+  period_year: number;
+}
+
 export interface GreenhouseDeliveryProjects {
   active: Generated<boolean>;
   avg_rpa_source: Numeric | null;
@@ -4122,6 +4243,20 @@ export interface GreenhouseDeliveryTaskFtrSnapshots {
   source_event_id: string | null;
   source_event_received_at: Timestamp | null;
   source_mode: string;
+  task_source_id: string;
+  workspace_id: string;
+  written_to_notion_at: Timestamp | null;
+}
+
+export interface GreenhouseDeliveryTaskOtdWritebackSnapshots {
+  computed_at: Generated<Timestamp>;
+  created_at: Generated<Timestamp>;
+  formula_version: Generated<string>;
+  notion_writeback_attempt_count: Generated<number>;
+  notion_writeback_last_error: string | null;
+  otd_bucket: string | null;
+  otd_data_status: string;
+  snapshot_id: Generated<string>;
   task_source_id: string;
   workspace_id: string;
   written_to_notion_at: Timestamp | null;
@@ -4621,6 +4756,20 @@ export interface GreenhouseFinanceCostAllocations {
   period_year: number;
   space_id: string | null;
   updated_at: Generated<Timestamp | null>;
+}
+
+export interface GreenhouseFinanceDteEmissionQueue {
+  attempt_count: Generated<number>;
+  created_at: Generated<Timestamp>;
+  dte_type_code: Generated<string>;
+  income_id: string;
+  last_error: string | null;
+  max_attempts: Generated<number>;
+  next_retry_at: Timestamp | null;
+  queue_id: string;
+  requested_by: string;
+  status: Generated<string>;
+  updated_at: Generated<Timestamp>;
 }
 
 export interface GreenhouseFinanceEconomicCategoryManualQueue {
@@ -5179,6 +5328,7 @@ export interface GreenhouseFinanceFxSnapshots {
   composed_via: string[] | null;
   created_at: Generated<Timestamp>;
   from_currency: string;
+  from_unit_class: Generated<string>;
   inverse_rate: Numeric;
   locked_at: Generated<Timestamp>;
   locked_by: string;
@@ -5589,6 +5739,9 @@ export interface GreenhouseFinancePaymentObligations {
   currency: string;
   due_date: Timestamp | null;
   metadata_json: Generated<Json>;
+  native_amount: Numeric | null;
+  native_currency: string | null;
+  native_to_functional_fx_snapshot_id: string | null;
   obligation_id: string;
   /**
    * employee_net_pay = neto al colaborador; employer_social_security = aporte previsional consolidado; employee_withheld_component = retencion entregada al estado (SII); provider_payroll = placeholder Deel/EOR; processor_fee = costo plataforma de pago; fx_component = costo cambiario; manual = entrada manual.
@@ -5733,6 +5886,34 @@ export interface GreenhouseFinancePaymentProviderCatalog {
   metadata_json: Generated<Json>;
   provider_slug: string;
   provider_type: string;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseFinancePpmMonthlyPositions {
+  base_amount_clp: Generated<Numeric>;
+  document_count: Generated<number>;
+  materialization_reason: string | null;
+  materialized_at: Generated<Timestamp>;
+  metadata: Generated<Json>;
+  organization_id: string | null;
+  period_id: string;
+  period_month: number;
+  period_year: number;
+  ppm_amount_clp: Generated<Numeric>;
+  ppm_position_id: string;
+  ppm_rate: Generated<Numeric>;
+  rate_source: string | null;
+}
+
+export interface GreenhouseFinancePpmRateConfig {
+  created_at: Generated<Timestamp>;
+  effective_period_end: string | null;
+  effective_period_start: string;
+  notes: string | null;
+  organization_id: string | null;
+  ppm_rate_config_id: string;
+  rate: Numeric;
+  source: Generated<string>;
   updated_at: Generated<Timestamp>;
 }
 
@@ -5934,6 +6115,49 @@ export interface GreenhouseFinanceReconciliationPeriods {
   status: Generated<string>;
   updated_at: Generated<Timestamp>;
   year: number;
+}
+
+export interface GreenhouseFinanceRetentionLedgerEntries {
+  counterparty_name: string | null;
+  counterparty_rut: string | null;
+  created_at: Generated<Timestamp>;
+  currency: Generated<string>;
+  dedup_status: Generated<string>;
+  exchange_rate_to_clp: Numeric | null;
+  gross_amount: Generated<Numeric>;
+  metadata: Generated<Json>;
+  organization_id: string | null;
+  period_id: string;
+  period_month: number;
+  period_year: number;
+  retention_amount: Generated<Numeric>;
+  retention_amount_clp: Generated<Numeric>;
+  retention_bucket: string;
+  retention_entry_id: string;
+  retention_rate: Numeric | null;
+  source_date: Timestamp;
+  source_id: string;
+  source_kind: string;
+  source_public_ref: string | null;
+  superseded_by_entry_id: string | null;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseFinanceRetentionMonthlyPositions {
+  document_count: Generated<number>;
+  gross_base_amount_clp: Generated<Numeric>;
+  honorarios_retention_amount_clp: Generated<Numeric>;
+  ledger_entry_count: Generated<number>;
+  materialization_reason: string | null;
+  materialized_at: Generated<Timestamp>;
+  metadata: Generated<Json>;
+  organization_id: string | null;
+  period_id: string;
+  period_month: number;
+  period_year: number;
+  retention_position_id: string;
+  segunda_categoria_retention_amount_clp: Generated<Numeric>;
+  total_retention_amount_clp: Generated<Numeric>;
 }
 
 export interface GreenhouseFinanceServiceEntrySheets {
@@ -6169,7 +6393,7 @@ export interface GreenhouseFinanceVatLedgerEntries {
   source_id: string;
   source_kind: string;
   source_public_ref: string | null;
-  space_id: string;
+  space_id: string | null;
   /**
    * How tenant isolation was resolved for the source row: quotation, client_bridge, or expense.
    */
@@ -6186,6 +6410,9 @@ export interface GreenhouseFinanceVatLedgerEntries {
 }
 
 export interface GreenhouseFinanceVatMonthlyPositions {
+  /**
+   * DEPRECATED (TASK-1187, post-TASK-725): el scope fiscal es la entidad legal (organization_id); la posición consolida por entidad y esta columna queda siempre NULL. No usar como dimensión. Remoción física diferida.
+   */
   client_id: string | null;
   credit_document_count: Generated<number>;
   credit_fiscal_amount_clp: Generated<Numeric>;
@@ -6205,7 +6432,10 @@ export interface GreenhouseFinanceVatMonthlyPositions {
   period_id: string;
   period_month: number;
   period_year: number;
-  space_id: string;
+  /**
+   * DEPRECATED (TASK-1187, post-TASK-725): el scope fiscal es la entidad legal (organization_id); la posición consolida por entidad y esta columna queda siempre NULL. No usar como dimensión. Remoción física diferida.
+   */
+  space_id: string | null;
   vat_position_id: string;
 }
 
@@ -10149,6 +10379,12 @@ export interface DB {
   "greenhouse_core.client_users": GreenhouseCoreClientUsers;
   "greenhouse_core.clients": GreenhouseCoreClients;
   "greenhouse_core.departments": GreenhouseCoreDepartments;
+  "greenhouse_core.design_handoff_allowed_files": GreenhouseCoreDesignHandoffAllowedFiles;
+  "greenhouse_core.design_handoff_entries": GreenhouseCoreDesignHandoffEntries;
+  "greenhouse_core.design_handoff_entry_events": GreenhouseCoreDesignHandoffEntryEvents;
+  "greenhouse_core.design_handoff_entry_evidence": GreenhouseCoreDesignHandoffEntryEvidence;
+  "greenhouse_core.design_handoff_entry_links": GreenhouseCoreDesignHandoffEntryLinks;
+  "greenhouse_core.design_handoff_node_snapshots": GreenhouseCoreDesignHandoffNodeSnapshots;
   "greenhouse_core.design_system_figma_node_events": GreenhouseCoreDesignSystemFigmaNodeEvents;
   "greenhouse_core.design_system_figma_nodes": GreenhouseCoreDesignSystemFigmaNodes;
   "greenhouse_core.entitlement_governance_audit_log": GreenhouseCoreEntitlementGovernanceAuditLog;
@@ -10232,6 +10468,7 @@ export interface DB {
   "greenhouse_crm.companies": GreenhouseCrmCompanies;
   "greenhouse_crm.contacts": GreenhouseCrmContacts;
   "greenhouse_crm.deals": GreenhouseCrmDeals;
+  "greenhouse_delivery.otd_attributable_member_month_shadow": GreenhouseDeliveryOtdAttributableMemberMonthShadow;
   "greenhouse_delivery.projects": GreenhouseDeliveryProjects;
   "greenhouse_delivery.space_property_mappings": GreenhouseDeliverySpacePropertyMappings;
   "greenhouse_delivery.sprints": GreenhouseDeliverySprints;
@@ -10241,6 +10478,7 @@ export interface DB {
   "greenhouse_delivery.task_attributable_lateness_shadow": GreenhouseDeliveryTaskAttributableLatenessShadow;
   "greenhouse_delivery.task_due_date_changes": GreenhouseDeliveryTaskDueDateChanges;
   "greenhouse_delivery.task_ftr_snapshots": GreenhouseDeliveryTaskFtrSnapshots;
+  "greenhouse_delivery.task_otd_writeback_snapshots": GreenhouseDeliveryTaskOtdWritebackSnapshots;
   "greenhouse_delivery.task_rpa_demo_snapshots": GreenhouseDeliveryTaskRpaDemoSnapshots;
   "greenhouse_delivery.task_rpa_snapshots": GreenhouseDeliveryTaskRpaSnapshots;
   "greenhouse_delivery.task_status_transitions": GreenhouseDeliveryTaskStatusTransitions;
@@ -10259,6 +10497,7 @@ export interface DB {
   "greenhouse_finance.client_economics": GreenhouseFinanceClientEconomics;
   "greenhouse_finance.client_profiles": GreenhouseFinanceClientProfiles;
   "greenhouse_finance.cost_allocations": GreenhouseFinanceCostAllocations;
+  "greenhouse_finance.dte_emission_queue": GreenhouseFinanceDteEmissionQueue;
   "greenhouse_finance.economic_category_manual_queue": GreenhouseFinanceEconomicCategoryManualQueue;
   "greenhouse_finance.economic_category_resolution_log": GreenhouseFinanceEconomicCategoryResolutionLog;
   "greenhouse_finance.economic_indicators": GreenhouseFinanceEconomicIndicators;
@@ -10300,12 +10539,16 @@ export interface DB {
   "greenhouse_finance.payment_order_state_transitions": GreenhouseFinancePaymentOrderStateTransitions;
   "greenhouse_finance.payment_orders": GreenhouseFinancePaymentOrders;
   "greenhouse_finance.payment_provider_catalog": GreenhouseFinancePaymentProviderCatalog;
+  "greenhouse_finance.ppm_monthly_positions": GreenhouseFinancePpmMonthlyPositions;
+  "greenhouse_finance.ppm_rate_config": GreenhouseFinancePpmRateConfig;
   "greenhouse_finance.products": GreenhouseFinanceProducts;
   "greenhouse_finance.purchase_orders": GreenhouseFinancePurchaseOrders;
   "greenhouse_finance.quote_line_items": GreenhouseFinanceQuoteLineItems;
   "greenhouse_finance.quotes": GreenhouseFinanceQuotes;
   "greenhouse_finance.reconciliation_ai_suggestions": GreenhouseFinanceReconciliationAiSuggestions;
   "greenhouse_finance.reconciliation_periods": GreenhouseFinanceReconciliationPeriods;
+  "greenhouse_finance.retention_ledger_entries": GreenhouseFinanceRetentionLedgerEntries;
+  "greenhouse_finance.retention_monthly_positions": GreenhouseFinanceRetentionMonthlyPositions;
   "greenhouse_finance.service_entry_sheets": GreenhouseFinanceServiceEntrySheets;
   "greenhouse_finance.settlement_groups": GreenhouseFinanceSettlementGroups;
   "greenhouse_finance.settlement_legs": GreenhouseFinanceSettlementLegs;

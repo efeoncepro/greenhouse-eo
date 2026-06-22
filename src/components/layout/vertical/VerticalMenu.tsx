@@ -812,8 +812,11 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
   if (canSeeView('plataforma.design_system', false)) {
     menuData.push({
       label: nl(GH_INTERNAL_NAV.adminDesignSystem),
-      href: '/design-system',
-      icon: 'tabler-palette'
+      icon: 'tabler-palette',
+      children: [
+        { label: nl(GH_INTERNAL_NAV.adminDesignCatalog), href: '/design-system', icon: 'tabler-layout-list' },
+        { label: nl(GH_INTERNAL_NAV.adminDesignHandoff), href: '/design-system/handoff', icon: 'tabler-layout-kanban' }
+      ]
     })
   }
 

@@ -55,3 +55,16 @@ describe('ops-worker deploy finance FX drift remediation contract', () => {
     expect(script).toContain('"maxAbsDriftClp":"5000000"')
   })
 })
+
+describe('ops-worker deploy finance DTE emission retry contract', () => {
+  it('schedules the governed DTE retry lane through Cloud Scheduler', () => {
+    const script = deployScript()
+    const ledgerHealthIndex = script.indexOf('ops-finance-ledger-health')
+    const dteRetryIndex = script.indexOf('ops-finance-dte-emission-retry')
+
+    expect(dteRetryIndex).toBeGreaterThan(ledgerHealthIndex)
+    expect(script).toContain('/finance/dte-emission-retry')
+    expect(script).toContain('"batchSize":5')
+    expect(script).toContain('queued DTE emission retry, TASK-1194')
+  })
+})

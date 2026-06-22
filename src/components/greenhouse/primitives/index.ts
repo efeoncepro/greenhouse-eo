@@ -23,6 +23,7 @@ export type { GreenhouseFigmaNodeButtonProps } from './GreenhouseFigmaNodeButton
 export { default as GreenhouseBreadcrumbs } from './GreenhouseBreadcrumbs'
 export type {
   GreenhouseBreadcrumbItem,
+  GreenhouseBreadcrumbOverflowItem,
   GreenhouseBreadcrumbsProps
 } from './GreenhouseBreadcrumbs'
 export { default as GreenhouseVerificationBadge } from './GreenhouseVerificationBadge'
@@ -81,6 +82,8 @@ export {
 } from './border-beam/greenhouse-border-beam-controller'
 export type { GreenhouseBorderBeamKindConfig } from './border-beam/greenhouse-border-beam-controller'
 export { default as GreenhouseNexaBrandMark } from './GreenhouseNexaBrandMark'
+export { default as GreenhouseBrandLogoMark } from './GreenhouseBrandLogoMark'
+export type { GreenhouseBrandLogoMarkProps } from './GreenhouseBrandLogoMark'
 export { default as GreenhouseNexaAnimatedMark } from './GreenhouseNexaAnimatedMark'
 export type { GreenhouseNexaAnimatedMarkProps } from './GreenhouseNexaAnimatedMark'
 export { default as NexaGlowBorder } from './NexaGlowBorder'
@@ -141,6 +144,26 @@ export type {
   NexaExpressiveTextStyle,
   NexaExpressiveTextValue
 } from './nexa-expressive-text/nexa-expressive-text-types'
+export {
+  NexaExpressionCue,
+  getNexaExpressionCuePlainText,
+  isNexaExpressionCueSensitive,
+  NEXA_EXPRESSION_CUE_REGISTRY,
+  resolveNexaExpressionCue
+} from './nexa-expression-cue'
+export type {
+  NexaExpressionCueConfig,
+  NexaExpressionCueContext,
+  NexaExpressionCueDomain,
+  NexaExpressionCueKey,
+  NexaExpressionCueProps,
+  NexaExpressionCueResolveInput,
+  NexaExpressionCueSensitivity,
+  NexaExpressionCueTone,
+  NexaExpressionCueTreatment,
+  NexaExpressionCueVariant,
+  ResolvedNexaExpressionCue
+} from './nexa-expression-cue'
 export { default as NexaEvidencePanel } from './NexaEvidencePanel'
 export type { NexaEvidencePanelProps, NexaEvidencePanelVariant } from './NexaEvidencePanel'
 export { default as NexaProvenanceTrace } from './nexa-provenance-trace/NexaProvenanceTrace'
@@ -371,6 +394,19 @@ export type {
 export { default as ClaudeEfeonceFilledOrbitMark } from './ClaudeEfeonceFilledOrbitMark'
 export type { ClaudeEfeonceFilledOrbitMarkProps } from './ClaudeEfeonceFilledOrbitMark'
 export {
+  GREENHOUSE_BRAND_LOGO_ASSET_COLORS,
+  GREENHOUSE_BRAND_LOGO_KIND_CONFIG,
+  GREENHOUSE_BRAND_LOGO_SIZE_CONFIG,
+  resolveGreenhouseBrandLogoKind,
+  resolveGreenhouseBrandLogoVariant
+} from './greenhouse-brand-logo-controller'
+export type {
+  GreenhouseBrandLogoKind,
+  GreenhouseBrandLogoKindConfig,
+  GreenhouseBrandLogoSize,
+  GreenhouseBrandLogoVariant
+} from './greenhouse-brand-logo-controller'
+export {
   GREENHOUSE_NEXA_BRAND_ASSETS,
   GREENHOUSE_NEXA_BRAND_COLORS,
   GREENHOUSE_NEXA_BRAND_KIND_CONFIG,
@@ -467,6 +503,23 @@ export type {
   GreenhouseChipTone,
   GreenhouseChipVariant
 } from './GreenhouseChip'
+export { default as GreenhouseLeaderboardPodium } from './GreenhouseLeaderboardPodium'
+export type {
+  GreenhouseLeaderboardPodiumMedalStyle,
+  GreenhouseLeaderboardPodiumProps,
+  GreenhouseLeaderboardPodiumSize,
+  GreenhouseLeaderboardRanking
+} from './GreenhouseLeaderboardPodium'
+export { default as GreenhouseLeaderboardRankings } from './GreenhouseLeaderboardRankings'
+export type {
+  GreenhouseLeaderboardRankingItem,
+  GreenhouseLeaderboardRankingsProps
+} from './GreenhouseLeaderboardRankings'
+export { default as GreenhouseLeaderboardCard } from './GreenhouseLeaderboardCard'
+export type {
+  GreenhouseLeaderboardCardProps,
+  GreenhouseLeaderboardRunOption
+} from './GreenhouseLeaderboardCard'
 export { default as GreenhouseKpiDelta } from './GreenhouseKpiDelta'
 export type {
   GreenhouseKpiDeltaDirection,

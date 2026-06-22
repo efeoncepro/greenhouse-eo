@@ -18,6 +18,8 @@ import Drawer from '@mui/material/Drawer'
 
 import {
   AssistantRuntimeProvider,
+  useAui,
+  useAuiState,
   useLocalRuntime
 } from '@assistant-ui/react'
 import type { ChatModelAdapter, ChatModelRunResult } from '@assistant-ui/react'
@@ -25,11 +27,13 @@ import type { ReadonlyJSONObject, ReadonlyJSONValue } from 'assistant-stream/uti
 
 import { DEFAULT_NEXA_MODEL, resolveNexaModel, type NexaModelId, type NexaModelMode } from '@/config/nexa-models'
 import type { NexaModelSelectorValue } from '@/lib/nexa/use-nexa-runtime'
-import type { NexaResponse } from '@/lib/nexa/nexa-contract'
+import type { NexaFocusRef, NexaResponse } from '@/lib/nexa/nexa-contract'
 import { isNexaFloatingExpandableEnabled } from '@/lib/nexa/flags'
 import { NEXA_FLOATING_OPEN_EVENT } from '@/lib/nexa/floating-events'
+import { useNexaInteractionMode } from '@/lib/nexa/nexa-interaction-mode-context'
 import { GreenhouseNexaAnimatedMark, GreenhouseNexaBrandMark, GreenhouseSpectrumBeam } from '@/components/greenhouse/primitives'
 import { GREENHOUSE_NEXA_BRAND_COLORS } from '@/components/greenhouse/primitives/greenhouse-nexa-brand-controller'
+import NexaModeMenu from '@/components/greenhouse/NexaModeMenu'
 
 import NexaThread from '@/views/greenhouse/home/components/NexaThread'
 import NexaFloatingPanel from '@/views/greenhouse/nexa/floating-chat/NexaFloatingPanel'
@@ -51,7 +55,10 @@ const toJsonValue = (value: unknown): ReadonlyJSONValue => {
 
 const createFloatingAdapter = (
   modelRef: React.MutableRefObject<NexaModelId>,
-  modelModeRef: React.MutableRefObject<NexaModelMode>
+  modelModeRef: React.MutableRefObject<NexaModelMode>,
+  // TASK-1182 — conciencia de superficie: el insight enfocado (set por el CTA del detalle) viaja en
+  // el body para que el servidor ancle la respuesta. null = conversación normal (sin ancla).
+  focusRefRef: React.MutableRefObject<NexaFocusRef | null>
 ): ChatModelAdapter => ({
   async run({ messages, abortSignal }): Promise<ChatModelRunResult> {
     const lastMessage = messages[messages.length - 1]
@@ -70,7 +77,14 @@ const createFloatingAdapter = (
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       // TASK-1134 — `modelMode` auto (default) deja correr el router; manual fija el modelo del picker.
-      body: JSON.stringify({ prompt, history, model: modelRef.current, modelMode: modelModeRef.current }),
+      // TASK-1182 — `focusRef` (si hay) ancla el turno al insight enfocado.
+      body: JSON.stringify({
+        prompt,
+        history,
+        model: modelRef.current,
+        modelMode: modelModeRef.current,
+        ...(focusRefRef.current ? { focusRef: focusRefRef.current } : {})
+      }),
       signal: abortSignal
     })
 
@@ -97,6 +111,27 @@ const createFloatingAdapter = (
   }
 })
 
+// TASK-1182 — auto-envío de la pregunta semilla del insight enfocado. Se monta DENTRO del
+// AssistantRuntimeProvider y usa el MISMO API probado que las follow-up suggestions del chat
+// (`aui.thread().append({ role:'user', ... })` vía el store `useAui`): el outer runtime expone un
+// thread placeholder que no envía; este es el camino vivo. Se envía una vez, cuando el thread no
+// está corriendo, en un effect (fuera del render).
+const NexaSeedAutoSend = ({ seed, onSent }: { seed: string; onSent: () => void }) => {
+  const aui = useAui()
+  const isRunning = useAuiState(s => s.thread.isRunning)
+  const sentRef = useRef(false)
+
+  useEffect(() => {
+    if (sentRef.current || isRunning) return
+
+    sentRef.current = true
+    aui.thread().append({ role: 'user', content: [{ type: 'text' as const, text: seed }] })
+    onSent()
+  }, [aui, isRunning, seed, onSent])
+
+  return null
+}
+
 interface NexaFloatingButtonProps {
   docked?: boolean
 }
@@ -108,10 +143,41 @@ const NexaFloatingButton = ({ docked = false }: NexaFloatingButtonProps) => {
   const [open, setOpen] = useState(false)
   const [expanded, setExpanded] = useState(false)
   const fabRef = useRef<HTMLButtonElement>(null)
-  const expandableEnabled = isNexaFloatingExpandableEnabled()
+
+  // TASK-1182 — conciencia de superficie. `focusRefRef` ancla el turno al insight enfocado (lo lee el
+  // adapter para el body). `pendingSeed` (estado) dispara el auto-envío de la pregunta semilla DESDE
+  // DENTRO del provider (un thread del outer runtime queda en placeholder; el envío válido es vía el
+  // primitive `ThreadPrimitive.Suggestion` montado en el contexto del store).
+  const focusRefRef = useRef<NexaFocusRef | null>(null)
+  const [pendingSeed, setPendingSeed] = useState<string | null>(null)
+
+  // TASK-1079 — el modo de interacción decide el form-factor del flotante:
+  // - lane (C): la burbuja togglea el lane (no abre panel flotante); el lane lo monta
+  //   NexaLaneContentHost en el contenido.
+  // - expandible (B): panel ampliable (requiere además el flag de plataforma).
+  // - dock (A): panel compacto (Drawer mobile / Card desktop).
+  const { mode, laneOpen, setLaneOpen } = useNexaInteractionMode()
+  const isLaneMode = mode === 'lane'
+  const expandableEnabled = mode === 'expandible' && isNexaFloatingExpandableEnabled()
+
+  // Estado de apertura visible de la burbuja según el modo.
+  const fabOpen = isLaneMode ? laneOpen : open
+
+  const handleFabClick = useCallback(() => {
+    if (isLaneMode) {
+      setLaneOpen(!laneOpen)
+
+      return
+    }
+
+    setOpen(prev => !prev)
+  }, [isLaneMode, laneOpen, setLaneOpen])
 
   const closePanel = useCallback(() => {
     setOpen(false)
+    // TASK-1182 — al cerrar, se limpia el insight enfocado + el seed pendiente (sin arrastre stale).
+    focusRefRef.current = null
+    setPendingSeed(null)
     // Non-modal: el foco vuelve al FAB al cerrar (Escape / click-fuera / botón cerrar).
     requestAnimationFrame(() => fabRef.current?.focus())
   }, [])
@@ -148,15 +214,38 @@ const NexaFloatingButton = ({ docked = false }: NexaFloatingButtonProps) => {
   }, [open, expandableEnabled, closePanel])
 
   useEffect(() => {
-    const onOpen = () => {
+    const onOpen = (event: Event) => {
+      const detail = (event as CustomEvent<{ focusRef?: NexaFocusRef; seedPrompt?: string }>).detail
+
+      if (isLaneMode) {
+        // El sidecar lane usa otro runtime; la conciencia de superficie V1 vive en el panel flotante.
+        setLaneOpen(true)
+
+        return
+      }
+
       setOpen(true)
       if (expandableEnabled) setExpanded(true)
+
+      if (detail?.focusRef?.kind === 'nexa_insight' && detail.focusRef.id) {
+        focusRefRef.current = detail.focusRef
+
+        // La pregunta semilla se agenda como estado: el auto-envío real lo hace `NexaSeedAutoSend`
+        // (montado dentro del AssistantRuntimeProvider, donde el thread sí está vivo). Enviar desde
+        // acá usaría el thread del outer runtime (placeholder vacío) → no envía / crashea.
+        const seed = typeof detail.seedPrompt === 'string' ? detail.seedPrompt.trim() : ''
+
+        setPendingSeed(seed || null)
+      } else {
+        focusRefRef.current = null
+        setPendingSeed(null)
+      }
     }
 
     window.addEventListener(NEXA_FLOATING_OPEN_EVENT, onOpen)
 
     return () => window.removeEventListener(NEXA_FLOATING_OPEN_EVENT, onOpen)
-  }, [expandableEnabled])
+  }, [expandableEnabled, isLaneMode, setLaneOpen])
 
   // TASK-1134 — auto es el default real (el runtime decide server-side); el picker fija un override
   // manual. El FAB no persiste (estado efímero por montaje), a diferencia de useNexaPersistentRuntime.
@@ -183,7 +272,7 @@ const NexaFloatingButton = ({ docked = false }: NexaFloatingButtonProps) => {
 
   const selectedModel: NexaModelSelectorValue = modelMode === 'auto' ? 'auto' : manualModel
 
-  const adapter = useMemo(() => createFloatingAdapter(modelRef, modelModeRef), [])
+  const adapter = useMemo(() => createFloatingAdapter(modelRef, modelModeRef, focusRefRef), [])
 
   const runtime = useLocalRuntime(adapter, {
     initialMessages: [
@@ -191,9 +280,9 @@ const NexaFloatingButton = ({ docked = false }: NexaFloatingButtonProps) => {
     ]
   })
 
-  const nexaFabRestShadow = open ? 'none' : `0 12px 30px ${alpha(GREENHOUSE_NEXA_BRAND_COLORS.midnightNavy, 0.28)}`
+  const nexaFabRestShadow = fabOpen ? 'none' : `0 12px 30px ${alpha(GREENHOUSE_NEXA_BRAND_COLORS.midnightNavy, 0.28)}`
 
-  const nexaFabHoverShadow = open ? 'none' : `0 14px 34px ${alpha(GREENHOUSE_NEXA_BRAND_COLORS.midnightNavy, 0.34)}`
+  const nexaFabHoverShadow = fabOpen ? 'none' : `0 14px 34px ${alpha(GREENHOUSE_NEXA_BRAND_COLORS.midnightNavy, 0.34)}`
 
   const nexaFabAuraSx = {
     position: docked ? 'relative' : 'fixed',
@@ -227,12 +316,12 @@ const NexaFloatingButton = ({ docked = false }: NexaFloatingButtonProps) => {
       animationPlayState: 'paused'
     },
     '&:hover [data-nexa-floating-spectrum="true"], &:focus-within [data-nexa-floating-spectrum="true"]': {
-      opacity: open ? 0 : 1,
+      opacity: fabOpen ? 0 : 1,
       transform: 'scale(1)',
       transitionDuration: '180ms'
     },
     '&:hover [data-nexa-floating-spectrum="true"] [data-gh-border-beam], &:focus-within [data-nexa-floating-spectrum="true"] [data-gh-border-beam], &:hover [data-nexa-floating-spectrum="true"] [data-gh-border-beam-glow], &:focus-within [data-nexa-floating-spectrum="true"] [data-gh-border-beam-glow]': {
-      animationPlayState: open ? 'paused' : 'running'
+      animationPlayState: fabOpen ? 'paused' : 'running'
     },
     '& > .MuiFab-root': {
       position: 'relative',
@@ -251,6 +340,7 @@ const NexaFloatingButton = ({ docked = false }: NexaFloatingButtonProps) => {
 
   const panelContent = (
     <AssistantRuntimeProvider runtime={runtime}>
+      {pendingSeed ? <NexaSeedAutoSend seed={pendingSeed} onSent={() => setPendingSeed(null)} /> : null}
       <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         {/* Mini header */}
         <Stack direction='row' justifyContent='space-between' alignItems='center' sx={{ px: 2, py: 1.5, borderBottom: 1, borderColor: 'divider' }}>
@@ -267,9 +357,12 @@ const NexaFloatingButton = ({ docked = false }: NexaFloatingButtonProps) => {
               Nexa AI
             </Box>
           </Stack>
-          <IconButton size='small' onClick={() => setOpen(false)} aria-label={TASK407_ARIA_CERRAR_NEXA}>
-            <i className='tabler-x' style={{ fontSize: '1rem' }} />
-          </IconButton>
+          <Stack direction='row' spacing={0.5} alignItems='center'>
+            <NexaModeMenu />
+            <IconButton size='small' onClick={() => setOpen(false)} aria-label={TASK407_ARIA_CERRAR_NEXA}>
+              <i className='tabler-x' style={{ fontSize: '1rem' }} />
+            </IconButton>
+          </Stack>
         </Stack>
 
         {/* Thread */}
@@ -309,8 +402,8 @@ const NexaFloatingButton = ({ docked = false }: NexaFloatingButtonProps) => {
           color='primary'
           size='medium'
           aria-label={TASK407_ARIA_ABRIR_NEXA_AI}
-          aria-expanded={open}
-          onClick={() => setOpen(prev => !prev)}
+          aria-expanded={fabOpen}
+          onClick={handleFabClick}
           sx={{
             position: 'static',
             zIndex: 'inherit',
@@ -328,7 +421,7 @@ const NexaFloatingButton = ({ docked = false }: NexaFloatingButtonProps) => {
             }
           }}
         >
-          {open ? (
+          {fabOpen ? (
             <i className='tabler-x' style={{ fontSize: '1.25rem' }} />
           ) : (
             <GreenhouseNexaAnimatedMark
@@ -345,8 +438,10 @@ const NexaFloatingButton = ({ docked = false }: NexaFloatingButtonProps) => {
       </Box>
 
       {/* Panel expandible persistido (TASK-1078) detrás del flag; con flag OFF, el
-          panel efímero histórico (Drawer mobile / Card desktop) bit-for-bit. */}
-      {expandableEnabled ? (
+          panel efímero histórico (Drawer mobile / Card desktop) bit-for-bit.
+          En modo lane (C) la burbuja no abre panel: solo togglea el lane (lo monta
+          NexaLaneContentHost en el contenido). */}
+      {isLaneMode ? null : expandableEnabled ? (
         <Fade in={open} unmountOnExit>
           <Box
             sx={{

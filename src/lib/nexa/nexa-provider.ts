@@ -18,6 +18,7 @@ import type { NexaRuntimeContext, NexaToolInvocation } from './nexa-contract'
  */
 
 export type NexaProviderKey = 'google' | 'anthropic'
+export type NexaForcedToolName = 'search_knowledge'
 
 export interface NexaTurnInput {
   /** System prompt ya construido por el orquestador (provider-agnóstico). */
@@ -29,6 +30,8 @@ export interface NexaTurnInput {
   context: HomeSnapshot
   /** Model string concreto para este provider (derivado del NexaModelId). */
   model: string
+  /** Tool que el orquestador puede forzar en el primer pase si está disponible. */
+  forcedToolName?: NexaForcedToolName | null
 }
 
 export interface NexaTurnResult {

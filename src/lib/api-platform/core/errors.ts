@@ -1,4 +1,5 @@
 export type ApiPlatformErrorCode =
+  | 'ambiguous_reference'
   | 'bad_request'
   | 'binding_not_active'
   | 'binding_not_found'
@@ -29,6 +30,11 @@ export type ApiPlatformErrorCode =
   | 'kortex_github_upstream_failed'
   | 'kortex_upstream_timeout'
   | 'kortex_upstream_unauthorized'
+  | 'public_site_github_command_disabled'
+  | 'public_site_github_command_not_allowed'
+  | 'public_site_github_confirmation_required'
+  | 'public_site_github_preflight_failed'
+  | 'public_site_github_upstream_failed'
   | 'missing_external_scope_id'
   | 'missing_external_scope_type'
   | 'missing_session'

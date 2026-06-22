@@ -2,6 +2,7 @@ import 'server-only'
 
 import { sql } from 'kysely'
 
+import { getOperatingEntityIdentity } from '@/lib/account-360/organization-identity'
 import { getDb } from '@/lib/db'
 import { getFinanceCurrentPeriod } from '@/lib/finance/reporting'
 import { roundCurrency, toNumber } from '@/lib/finance/shared'
@@ -15,7 +16,7 @@ export interface VatLedgerEntryRecord {
   periodId: string
   periodYear: number
   periodMonth: number
-  spaceId: string
+  spaceId: string | null
   spaceName: string | null
   sourceKind: 'income' | 'expense'
   sourceId: string
@@ -36,7 +37,7 @@ export interface VatMonthlyPositionRecord {
   periodId: string
   periodYear: number
   periodMonth: number
-  spaceId: string
+  spaceId: string | null
   spaceName: string | null
   debitFiscalAmountClp: number
   creditFiscalAmountClp: number
@@ -149,7 +150,7 @@ const mapPositionRow = (row: Record<string, unknown>): VatMonthlyPositionRecord 
   periodId: String(row.period_id),
   periodYear: Number(row.period_year),
   periodMonth: Number(row.period_month),
-  spaceId: String(row.space_id),
+  spaceId: row.space_id == null ? null : String(row.space_id),
   spaceName: typeof row.space_name === 'string' ? row.space_name : null,
   debitFiscalAmountClp: toNumber(row.debit_fiscal_amount_clp),
   creditFiscalAmountClp: toNumber(row.credit_fiscal_amount_clp),
@@ -168,7 +169,7 @@ const mapEntryRow = (row: Record<string, unknown>): VatLedgerEntryRecord => ({
   periodId: String(row.period_id),
   periodYear: Number(row.period_year),
   periodMonth: Number(row.period_month),
-  spaceId: String(row.space_id),
+  spaceId: row.space_id == null ? null : String(row.space_id),
   spaceName: typeof row.space_name === 'string' ? row.space_name : null,
   sourceKind: String(row.source_kind) as 'income' | 'expense',
   sourceId: String(row.source_id),
@@ -192,7 +193,31 @@ export async function materializeVatLedgerForPeriod(
   const db = await getDb()
   const periodId = buildVatPeriodId(year, month)
 
+  // TASK-725 — El IVA / F29 se declara por entidad legal (RUT), no por space.
+  // El dueño fiscal de toda venta (débito) y toda compra (crédito) de Greenhouse
+  // es la operating entity (Efeonce). `organization_id` en las tablas VAT pasa a
+  // significar ese dueño fiscal; `space_id`/`client_id` quedan como etiqueta
+  // analítica de contraparte (nullable). Sin operating entity no hay posición
+  // fiscal posible → fail-fast (no se materializa una cifra sin declarante).
+  const operatingEntity = await getOperatingEntityIdentity()
+
+  if (!operatingEntity) {
+    throw new Error(
+      'TASK-725 VAT materialization: no operating entity (is_operating_entity=TRUE) configured. Cannot scope the fiscal position.'
+    )
+  }
+
+  const legalEntityOrgId = operatingEntity.organizationId
+
   await db.transaction().execute(async trx => {
+    // TASK-1185 Slice 2: advisory lock por período (namespaced 'vat_materialize')
+    // para serializar materializaciones concurrentes del mismo período. Sin él,
+    // dos consumers reactivos del mismo período pueden pisarse (DELETE+INSERT no
+    // atómico entre sí). Scope xact → se libera al commit/rollback.
+    await sql`
+      SELECT pg_advisory_xact_lock(hashtext('vat_materialize'), hashtext(${periodId}::text))
+    `.execute(trx)
+
     await sql`
       DELETE FROM greenhouse_finance.vat_monthly_positions
       WHERE period_year = ${year}::int AND period_month = ${month}::int
@@ -243,7 +268,12 @@ export async function materializeVatLedgerForPeriod(
           AND i.period_month = ${month}::int
           AND COALESCE(i.tax_snapshot_json ->> 'kind', '') = 'vat_output'
           AND COALESCE(i.tax_amount_snapshot, i.tax_amount, 0) > 0
-          AND COALESCE(q.space_id, cb.space_id) IS NOT NULL
+          -- TASK-725: el débito fiscal pertenece a la entidad legal (Efeonce),
+          -- exista o no un space de contraparte. NO se filtra por space.
+          -- TASK-1185 Slice 1: guard FX — NO materializar IVA no-CLP con FX
+          -- nulo/0 (el fallback ×1 lo sub-declararía ~900x silencioso). Estos
+          -- docs los cuenta el signal finance.vat.entry_unresolved_fx.
+          AND (i.currency = 'CLP' OR COALESCE(NULLIF(i.exchange_rate_to_clp, 0), 0) <> 0)
       )
       INSERT INTO greenhouse_finance.vat_ledger_entries (
         ledger_entry_id,
@@ -275,7 +305,7 @@ export async function materializeVatLedgerForPeriod(
         ${month}::int,
         ${periodId}::text,
         space_id,
-        organization_id,
+        ${legalEntityOrgId}::text,
         client_id,
         'income',
         income_id,
@@ -355,11 +385,17 @@ export async function materializeVatLedgerForPeriod(
           ON cb.client_id = COALESCE(e.allocated_client_id, e.client_id)
         WHERE e.period_year = ${year}::int
           AND e.period_month = ${month}::int
-          AND e.space_id IS NOT NULL
+          -- TASK-725: el crédito fiscal del overhead de Efeonce no cuelga de
+          -- ningún cliente/space. NO se filtra por space (causa de ISSUE-101:
+          -- el filtro excluía el 100% del crédito fiscal sin space).
           AND (
             COALESCE(e.recoverable_tax_amount, 0) > 0
             OR COALESCE(e.non_recoverable_tax_amount, 0) > 0
           )
+          -- TASK-1185 Slice 1: guard FX — mismo criterio que income; los
+          -- gastos no-CLP sin FX resoluble se omiten (no se sub-declaran ×1)
+          -- y los detecta el signal finance.vat.entry_unresolved_fx.
+          AND (e.currency = 'CLP' OR COALESCE(NULLIF(e.exchange_rate_to_clp, 0), 0) <> 0)
       )
       INSERT INTO greenhouse_finance.vat_ledger_entries (
         ledger_entry_id,
@@ -391,7 +427,7 @@ export async function materializeVatLedgerForPeriod(
         ${month}::int,
         ${periodId}::text,
         space_id,
-        organization_id,
+        ${legalEntityOrgId}::text,
         client_id,
         'expense',
         expense_id,
@@ -456,10 +492,11 @@ export async function materializeVatLedgerForPeriod(
 
     await sql`
       WITH aggregated AS (
+        -- TASK-725: la posición se agrega por entidad legal (operating entity),
+        -- no por space. Como todos los asientos del período llevan el mismo
+        -- organization_id (dueño fiscal), esto produce 1 fila consolidada/mes.
         SELECT
-          e.space_id,
-          MAX(e.organization_id) AS organization_id,
-          MAX(e.client_id) AS client_id,
+          e.organization_id,
           COALESCE(SUM(CASE WHEN e.vat_bucket = 'debit_fiscal' THEN e.amount_clp ELSE 0 END), 0) AS debit_fiscal_amount_clp,
           COALESCE(SUM(CASE WHEN e.vat_bucket = 'credito_fiscal' THEN e.amount_clp ELSE 0 END), 0) AS credit_fiscal_amount_clp,
           COALESCE(SUM(CASE WHEN e.vat_bucket = 'iva_no_recuperable' THEN e.amount_clp ELSE 0 END), 0) AS non_recoverable_vat_amount_clp,
@@ -470,7 +507,7 @@ export async function materializeVatLedgerForPeriod(
         FROM greenhouse_finance.vat_ledger_entries e
         WHERE e.period_year = ${year}::int
           AND e.period_month = ${month}::int
-        GROUP BY e.space_id
+        GROUP BY e.organization_id
       )
       INSERT INTO greenhouse_finance.vat_monthly_positions (
         vat_position_id,
@@ -493,13 +530,13 @@ export async function materializeVatLedgerForPeriod(
         metadata
       )
       SELECT
-        'EO-VMP-' || upper(substr(md5(concat_ws(':', space_id, ${periodId}::text)), 1, 8)),
+        'EO-VMP-' || upper(substr(md5(concat_ws(':', organization_id, ${periodId}::text)), 1, 8)),
         ${year}::int,
         ${month}::int,
         ${periodId}::text,
-        space_id,
+        NULL::text,
         organization_id,
-        client_id,
+        NULL::text,
         ROUND(debit_fiscal_amount_clp, 2),
         ROUND(credit_fiscal_amount_clp, 2),
         ROUND(non_recoverable_vat_amount_clp, 2),
@@ -526,7 +563,7 @@ export async function materializeVatLedgerForPeriod(
     non_recoverable_vat_amount_clp: string | number | null
   }>`
     SELECT
-      COUNT(DISTINCT p.space_id)::int AS positions_materialized,
+      COUNT(*)::int AS positions_materialized,
       COALESCE(SUM(p.ledger_entry_count), 0)::int AS ledger_entries_materialized,
       COALESCE(SUM(p.debit_fiscal_amount_clp), 0) AS debit_fiscal_amount_clp,
       COALESCE(SUM(p.credit_fiscal_amount_clp), 0) AS credit_fiscal_amount_clp,
@@ -592,7 +629,8 @@ export async function materializeAllAvailableVatPeriods(reason: string) {
 }
 
 export async function getVatMonthlyPosition(params: {
-  spaceId: string
+  /** TASK-725 — scope fiscal = entidad legal (operating entity), no space. */
+  legalEntityOrganizationId: string
   year: number
   month: number
 }): Promise<VatMonthlyPositionRecord | null> {
@@ -619,7 +657,7 @@ export async function getVatMonthlyPosition(params: {
     FROM greenhouse_finance.vat_monthly_positions p
     LEFT JOIN greenhouse_core.spaces s
       ON s.space_id = p.space_id
-    WHERE p.space_id = ${params.spaceId}
+    WHERE p.organization_id = ${params.legalEntityOrganizationId}
       AND p.period_year = ${params.year}
       AND p.period_month = ${params.month}
     LIMIT 1
@@ -629,7 +667,8 @@ export async function getVatMonthlyPosition(params: {
 }
 
 export async function listVatMonthlyPositions(params: {
-  spaceId: string
+  /** TASK-725 — scope fiscal = entidad legal (operating entity), no space. */
+  legalEntityOrganizationId: string
   limit?: number
 }): Promise<VatMonthlyPositionRecord[]> {
   const db = await getDb()
@@ -656,7 +695,7 @@ export async function listVatMonthlyPositions(params: {
     FROM greenhouse_finance.vat_monthly_positions p
     LEFT JOIN greenhouse_core.spaces s
       ON s.space_id = p.space_id
-    WHERE p.space_id = ${params.spaceId}
+    WHERE p.organization_id = ${params.legalEntityOrganizationId}
     ORDER BY p.period_year DESC, p.period_month DESC
     LIMIT ${limit}
   `.execute(db)
@@ -665,7 +704,8 @@ export async function listVatMonthlyPositions(params: {
 }
 
 export async function listVatLedgerEntries(params: {
-  spaceId: string
+  /** TASK-725 — scope fiscal = entidad legal (operating entity), no space. */
+  legalEntityOrganizationId: string
   year: number
   month: number
 }): Promise<VatLedgerEntryRecord[]> {
@@ -694,7 +734,7 @@ export async function listVatLedgerEntries(params: {
     FROM greenhouse_finance.vat_ledger_entries e
     LEFT JOIN greenhouse_core.spaces s
       ON s.space_id = e.space_id
-    WHERE e.space_id = ${params.spaceId}
+    WHERE e.organization_id = ${params.legalEntityOrganizationId}
       AND e.period_year = ${params.year}
       AND e.period_month = ${params.month}
     ORDER BY

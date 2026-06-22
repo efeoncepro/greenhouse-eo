@@ -6,11 +6,11 @@ import type { TreasuryFreshness } from '@/lib/finance/account-balances'
  * TASK-705 — Freshness signal canónico para Banco read path.
  * ===========================================================
  *
- * Convención: cualquier snapshot mayor a `STALE_THRESHOLD_SECONDS` se reporta
- * como `isStale: true` para que la UI muestre banner "Snapshot actualizado
- * hace X". El threshold es operativo (no negocio): refleja la SLA esperada
- * entre el evento (`finance.{income,expense}_payment.recorded`) y la
- * proyeccion reactiva (`accountBalancesProjection`).
+ * Convención: si el snapshot cubre la fecha esperada del período, no se reporta
+ * stale solo porque `computed_at` tenga varias horas. El threshold operativo
+ * de `computed_at` se usa como fallback cuando no sabemos hasta qué fecha llega
+ * el snapshot. Esto evita falsos banners en Banco cuando el materializador diario
+ * ya produjo balances de hoy en la mañana.
  *
  * Default: 3600s (1 hora). Override via `BANK_FRESHNESS_STALE_THRESHOLD_SECONDS`
  * env var. El cron `ops-finance-rematerialize-balances` corre 5:00 CLT con
@@ -37,11 +37,18 @@ const formatRelativeLabel = (ageSeconds: number): string => {
 }
 
 /**
- * Construye el `TreasuryFreshness` desde el `computed_at` máximo de los
- * snapshots feeding la response. Si no hay snapshots, retorna `null`-shape
- * (UI maneja como "sin datos").
+ * Construye el `TreasuryFreshness` desde el `computed_at` máximo y, cuando está
+ * disponible, la última `balance_date` materializada. Si `latestBalanceDate`
+ * cubre `expectedFreshThroughDate`, la señal no es stale aunque `computed_at`
+ * supere el threshold horario.
  */
-export const buildFreshnessSignal = (lastMaterializedAt: string | null | undefined): TreasuryFreshness => {
+export const buildFreshnessSignal = (
+  lastMaterializedAt: string | null | undefined,
+  coverage?: {
+    latestBalanceDate?: string | Date | null
+    expectedFreshThroughDate?: string | Date | null
+  }
+): TreasuryFreshness => {
   if (!lastMaterializedAt) {
     return {
       lastMaterializedAt: null,
@@ -64,11 +71,32 @@ export const buildFreshnessSignal = (lastMaterializedAt: string | null | undefin
 
   const ageSeconds = Math.max(0, Math.floor((Date.now() - lastMs) / 1000))
   const threshold = getStaleThresholdSeconds()
+  const latestBalanceDate = normalizeDateKey(coverage?.latestBalanceDate)
+  const expectedFreshThroughDate = normalizeDateKey(coverage?.expectedFreshThroughDate)
+
+  const isCoveredThroughExpectedDate =
+    Boolean(latestBalanceDate && expectedFreshThroughDate && latestBalanceDate >= expectedFreshThroughDate)
 
   return {
     lastMaterializedAt,
     ageSeconds,
-    isStale: ageSeconds > threshold,
+    isStale: isCoveredThroughExpectedDate ? false : ageSeconds > threshold,
     label: formatRelativeLabel(ageSeconds)
   }
+}
+
+const normalizeDateKey = (value: string | Date | null | undefined): string | null => {
+  if (!value) return null
+
+  if (value instanceof Date) {
+    return Number.isFinite(value.getTime()) ? value.toISOString().slice(0, 10) : null
+  }
+
+  const trimmed = value.trim()
+
+  if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) return trimmed
+
+  const parsed = new Date(trimmed)
+
+  return Number.isFinite(parsed.getTime()) ? parsed.toISOString().slice(0, 10) : null
 }

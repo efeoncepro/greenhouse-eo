@@ -161,18 +161,35 @@ export class GreenhouseApiPlatformClient {
     return this.request(`/api/platform/ecosystem/knowledge/documents/${encodedId}`)
   }
 
+  // TASK-1211 — Cotizador (read-only). Resolver de servicios + simulación de precio
+  // (estimado referencial NO vinculante). Lane ecosystem; scope por binding.
+  async searchServices(input: { query?: string; limit?: number }) {
+    return this.request('/api/platform/ecosystem/quotation/services', {
+      query: input.query,
+      limit: input.limit
+    })
+  }
+
+  async simulateQuote(input: Record<string, unknown>) {
+    return this.request('/api/platform/ecosystem/quotation/simulate', {}, { method: 'POST', body: input })
+  }
+
   private async request<TData>(
     path: string,
-    query: QueryParams = {}
+    query: QueryParams = {},
+    init?: { method?: 'GET' | 'POST'; body?: Record<string, unknown> }
   ): Promise<GreenhouseMcpSuccessResult<TData>> {
     const url = new URL(path, this.config.apiBaseUrl)
 
+    // Los scope params van SIEMPRE en el querystring (el auth ecosystem los lee de la
+    // URL), incluso en el POST read-only de simulate.
     appendQueryParams(url, {
       externalScopeType: this.config.externalScopeType,
       externalScopeId: this.config.externalScopeId,
       ...query
     })
 
+    const method = init?.method ?? 'GET'
     const controller = new AbortController()
     const timeout = setTimeout(() => controller.abort(), this.config.requestTimeoutMs)
 
@@ -180,12 +197,14 @@ export class GreenhouseApiPlatformClient {
 
     try {
       response = await this.fetchImpl(url.toString(), {
-        method: 'GET',
+        method,
         headers: {
           accept: 'application/json',
+          ...(method === 'POST' ? { 'content-type': 'application/json' } : {}),
           authorization: `Bearer ${this.config.consumerToken}`,
           'x-greenhouse-api-version': this.config.apiVersion
         },
+        ...(init?.body ? { body: JSON.stringify(init.body) } : {}),
         signal: controller.signal
       })
     } catch (error) {

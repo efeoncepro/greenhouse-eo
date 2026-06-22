@@ -124,6 +124,39 @@ describe('buildMergeSql', () => {
     expect(sql).not.toContain('entity_last_edited >= TIMESTAMP')
   })
 
+  it('MERGE con delta incluye coverage-gap NOT EXISTS — inserta entidades nunca-materializadas (TASK-1171)', () => {
+    const sql = buildMergeSql(MEMBER_CFG, FAKE_PROJECT, true)
+
+    // El delta filter original se preserva (optimización para entidades editadas)
+    expect(sql).toContain('entity_last_edited >= TIMESTAMP(@deltaCutoff)')
+    // Coverage-gap aditivo: una entidad ausente del target para el período entra
+    // al source igual (se inserta vía WHEN NOT MATCHED) → no más exclusión silenciosa.
+    expect(sql).toContain('OR NOT EXISTS')
+    expect(sql).toContain('FROM `efeonce-test.ico_engine.metrics_by_member` cov')
+    // Correlación CALIFICADA con el alias `grp` de la subquery externa — sin
+    // calificar, BQ resuelve el RHS a la tabla interna cov → no-op (bug class).
+    expect(sql).toContain('cov.member_id = grp.member_id')
+    expect(sql).toContain('cov.period_year = @periodYear')
+    expect(sql).toContain('cov.period_month = @periodMonth')
+    // La subquery agrupada externa debe estar aliaseada como grp para la correlación.
+    expect(sql).toContain(') AS grp')
+  })
+
+  it('MERGE con delta + key compuesto correlaciona TODAS las keys en coverage-gap (project)', () => {
+    const sql = buildMergeSql(PROJECT_CFG, FAKE_PROJECT, true)
+
+    expect(sql).toContain('cov.project_source_id = grp.project_source_id')
+    expect(sql).toContain('cov.space_id = grp.space_id')
+  })
+
+  it('MERGE sin delta NO incluye coverage-gap (path full-period byte-idéntico)', () => {
+    const sql = buildMergeSql(MEMBER_CFG, FAKE_PROJECT, false)
+
+    // El coverage-gap (correlación cov.<key> = grp.<key>) solo existe en el path delta.
+    expect(sql).not.toContain('cov.member_id = grp.member_id')
+    expect(sql).not.toContain('cov.period_year = @periodYear')
+  })
+
   it('UPDATE SET incluye TODAS las 22 metric columns + materialized_at (NO key + NO period)', () => {
     const sql = buildMergeSql(MEMBER_CFG, FAKE_PROJECT, false)
 

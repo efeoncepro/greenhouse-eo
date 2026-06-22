@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
+import { can } from '@/lib/entitlements/runtime'
 import { approveHes } from '@/lib/finance/hes-store'
 import { materializeInvoiceFromApprovedHes } from '@/lib/finance/quote-to-cash/materialize-invoice-from-hes'
 
@@ -20,6 +21,11 @@ export async function POST(
   const { tenant, errorResponse } = await requireFinanceTenantContext()
 
   if (!tenant) return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+  // TASK-1193 — gate fino de acción (capability != route-group).
+  if (!can(tenant, 'finance.hes.approve', 'approve', 'tenant')) {
+    return NextResponse.json({ error: 'No tienes permiso para aprobar HES.', code: 'forbidden' }, { status: 403 })
+  }
 
   const { id } = await params
 

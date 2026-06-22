@@ -54,8 +54,10 @@ Nexa hace **RAG** sobre el corpus gobernado de Greenhouse Knowledge: recupera ev
   Brazo vector aditivo DENTRO del SSOT `searchKnowledge` (`KNOWLEDGE_SEARCH_HYBRID_ENABLED`, **default OFF** =
   byte-equivalente al FTS+rerank). `embedding vector(768)` en `knowledge_chunks` + índice HNSW cosine en el
   Cloud SQL existente (**NO** managed Vertex Vector Search/RAG Engine — corpus chico); embeddings Vertex
-  `text-multilingual-embedding-002` como **paso de ingesta idempotente por checksum** (`embed-corpus.ts`), NUNCA
-  en el request path. Runtime: **mode-scope a agéntico** (la latencia del embedding de la query ~600ms se
+  `text-multilingual-embedding-002` como **paso de ingesta idempotente por checksum**: backfill/guardrail por
+  `embed-corpus.ts` y, desde TASK-1155, hook reactivo post-publish en `ingestOne` para embeber la versión recién
+  publicada. NUNCA corre en el request path ni dentro del webhook handler; si Vertex falla, el publish queda
+  publicado y el corpus degrada honesto a FTS hasta el próximo reintento/backfill. Runtime: **mode-scope a agéntico** (la latencia del embedding de la query ~600ms se
   absorbe en el stream del LLM; el search humano queda FTS puro) + **FTS-signal-gate** (vector solo si el FTS
   encontró algo → no-answer honesto intacto) + **fusión de dos niveles `hybridFuse`** (protege hits FUERTES del
   FTS = golden-safe; compite los débiles vs vector-only = recall de paráfrasis) + degradación honesta a FTS.

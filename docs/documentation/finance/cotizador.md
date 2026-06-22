@@ -1,15 +1,41 @@
 # Cotizador — Builder de Cotizaciones con Pricing Engine Canónico
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 3.10
+> **Version:** 3.13
 > **Creado:** 2026-04-18 por Claude (TASK-464e close-out)
-> **Ultima actualizacion:** 2026-05-07 por Codex (v3.11 — TASK-556 adopta cotizaciones como surface Comercial sobre path legacy `/finance/quotes`), 2026-04-22 por Codex (v3.10 — hidratacion canonica de contactos HubSpot al seleccionar una org adoptada), Codex (v3.9 — TASK-543 cleanup de flags legacy del selector unificado), Codex (v3.8 — TASK-538 selector unificado de parties en el Quote Builder), Claude (v3.7 — TASK-509 Floating UI en TotalsLadder: anchor self-contained + a11y integral) y Codex (v3.6 — HubSpot deal anchor + contacto obligatorio para sync bidireccional robusta)
+> **Ultima actualizacion:** 2026-06-21 por Claude (v3.12 — TASK-1211 read parity: split simular/autorar, capability `commercial.quote.simulate`, perfiles de output internal/client/public, resolver `searchServiceCatalog`, consumers Nexa/MCP/API Platform), 2026-05-07 por Codex (v3.11 — TASK-556 adopta cotizaciones como surface Comercial sobre path legacy `/finance/quotes`), 2026-04-22 por Codex (v3.10 — hidratacion canonica de contactos HubSpot al seleccionar una org adoptada), Codex (v3.9 — TASK-543 cleanup de flags legacy del selector unificado), Codex (v3.8 — TASK-538 selector unificado de parties en el Quote Builder), Claude (v3.7 — TASK-509 Floating UI en TotalsLadder: anchor self-contained + a11y integral) y Codex (v3.6 — HubSpot deal anchor + contacto obligatorio para sync bidireccional robusta)
 > **Documentacion tecnica:**
 > - Surfaces full-page: [TASK-473 — Quote Builder Full-Page Surface Migration](../../tasks/complete/TASK-473-quote-builder-full-page-surface-migration.md)
 > - Service composition: [TASK-465 — Service Composition Catalog](../../tasks/complete/TASK-465-service-composition-catalog-ui.md)
 > - FX foundation: [GREENHOUSE_FX_CURRENCY_PLATFORM_V1](../../architecture/GREENHOUSE_FX_CURRENCY_PLATFORM_V1.md)
 > - Engine: [GREENHOUSE_COMMERCIAL_QUOTATION_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_COMMERCIAL_QUOTATION_ARCHITECTURE_V1.md)
 > - Primitives originales: [TASK-464e — Quote Builder UI Exposure](../../tasks/complete/TASK-464e-quote-builder-ui-exposure.md) · [TASK-469 — UI Interface Plan](../../tasks/complete/TASK-469-commercial-pricing-ui-interface-plan.md)
+
+## Cambios v3.12 (2026-06-21 — TASK-1211 · Read parity multi-consumer)
+
+El cotizador separa dos capacidades distintas: **simular precio** (consultar, sin guardar nada) y **autorar/emitir** (escribir una cotización real). Esta entrega cubre la primera y la abre a más consumidores.
+
+**Simular precio por nombre de servicio.** Ya no hace falta armar la cotización línea por línea para saber cuánto cuesta un servicio. Se puede preguntar "¿cuánto cuesta un servicio de diseño digital?" y el sistema resuelve el servicio del catálogo y devuelve un **estimado referencial** (no una oferta vinculante), con su moneda y fecha de cálculo. Si el nombre es ambiguo, ofrece los candidatos para elegir; si no existe, lo dice — no inventa un precio.
+
+**Quién ve qué (perfiles de output).** El precio se muestra distinto según quién pregunta, y la regla se aplica en el servidor (un cliente no puede pedir el perfil interno):
+
+| Perfil | Ve costo | Ve margen | Ve precio de venta + IVA |
+|---|---|---|---|
+| Interno finance (admin / finance) | Sí | Sí | Sí |
+| Interno comercial (no finance) | No | Sí | Sí |
+| Cliente / público | No | No | Sí |
+
+El costo y el margen son información sensible (poder de negociación + inteligencia competitiva): jamás cruzan al comprador.
+
+**Nuevos consumidores (un motor, muchos canales).** Además de la pantalla del cotizador, la misma capacidad la operan ahora:
+
+- **Nexa** (asistente): tool `quote_price` — preguntás un precio por nombre y responde con el estimado; elicita si es ambiguo; perfil según quién pregunta (el cliente nunca ve margen).
+- **MCP / agentes externos** (ej. Claude conectando el MCP): tools `search_services` + `quote_price`, read-only, perfil cliente por defecto. Consultar, no operar.
+- **API Platform**: lane `quotation` (app + ecosystem) para integraciones programáticas.
+
+Como todos usan el mismo motor de precio, el número es consistente en todos los canales (modulo el recorte por perfil).
+
+> Detalle técnico: ADR [GREENHOUSE_QUOTE_API_PARITY_DECISION_V1](../../architecture/GREENHOUSE_QUOTE_API_PARITY_DECISION_V1.md) + spec [GREENHOUSE_QUOTE_API_PARITY_MULTI_CONSUMER_V1](../../architecture/GREENHOUSE_QUOTE_API_PARITY_MULTI_CONSUMER_V1.md). Code: `src/lib/finance/pricing/{pricing-output-redaction,simulate-quote-pricing,simulate-input-schema}.ts`, `src/lib/commercial/service-catalog-search.ts`, tool Nexa `quote_price`, lanes `src/app/api/platform/{app,ecosystem}/quotation/*`, MCP `search_services`/`quote_price`.
 
 ## Cambios v3.11 (2026-05-07 — TASK-556 · Surface Comercial sobre path legacy)
 
@@ -439,6 +465,33 @@ El input del engine v2 se construye en el cliente mapeando las líneas:
 Esto evita cambios de schema en `quotation_line_items` y mantiene la compatibilidad con el storage existente.
 
 > **Detalle técnico:** código en [src/views/greenhouse/finance/workspace/](../../../src/views/greenhouse/finance/workspace/). Primitives reusables en [src/components/greenhouse/pricing/](../../../src/components/greenhouse/pricing/). Hook de simulación en [src/hooks/usePricingSimulation.ts](../../../src/hooks/usePricingSimulation.ts). Gating de cost stack en [src/lib/tenant/authorization.ts](../../../src/lib/tenant/authorization.ts) (`canViewCostStack`).
+
+## Vertical de escritura — autoría/emisión gobernada (TASK-1212)
+
+Antes, "guardar" y "emitir" una cotización se coreografiaban en el navegador: el builder
+hacía 3-4 llamadas seguidas (crear cabecera, reemplazar líneas, emitir). Si una fallaba a
+medias, podía quedar una cotización "a medio hacer". Ahora todo eso vive en **un solo
+comando del servidor** (`submitQuoteFromBuilder`):
+
+- **Una sola operación, sin estados a medias.** El comando guarda cabecera + líneas + versión
+  de forma atómica; si algo falla al crear, borra la cabecera huérfana (no deja basura). La
+  emisión es un paso aparte: si falla, la cotización queda como **borrador recuperable**, nunca
+  rota.
+- **El precio siempre lo calcula el motor.** El comando vuelve a simular el precio en el
+  servidor antes de guardar; no respeta precios manuales en ítems de catálogo (el catálogo es la
+  fuente de verdad).
+- **A prueba de doble clic.** Si se reintenta la misma operación con la misma clave, devuelve el
+  resultado anterior en vez de crear una cotización duplicada.
+- **La pantalla ya no es la dueña del precio.** El builder solo manda los datos crudos; el
+  servidor arma todo. Visualmente es idéntico — cambió el "cómo", no el "qué se ve".
+
+**Nexa puede crear o emitir una cotización por ti.** Si le pides a Nexa cotizar algo, te muestra
+un **resumen de lo que va a hacer** (qué cliente, qué moneda, cuántas líneas, si la emite o la
+deja en borrador) y **espera tu confirmación**. Nexa nunca escribe sola: propone, tú confirmas, y
+recién ahí se ejecuta el mismo comando que usa la pantalla. Esta acción nace **apagada por
+defecto** y se prende por configuración cuando el equipo lo decide.
+
+> **Detalle técnico:** comando en [src/lib/commercial/submit-quote-from-builder.ts](../../../src/lib/commercial/submit-quote-from-builder.ts); contrato Zod en [submit-quote-from-builder-schema.ts](../../../src/lib/commercial/submit-quote-from-builder-schema.ts); endpoint [POST /api/finance/quotes/author](../../../src/app/api/finance/quotes/author/route.ts); Nexa governed action en [src/lib/nexa/actions/author-quote.ts](../../../src/lib/nexa/actions/author-quote.ts) (loop `propose → confirm → execute`); ADR [GREENHOUSE_QUOTE_API_PARITY_MULTI_CONSUMER_V1](../../architecture/GREENHOUSE_QUOTE_API_PARITY_MULTI_CONSUMER_V1.md). Señal de integridad `commercial.quote.authored_without_command` (steady=0) en `/admin/operations`.
 
 ## Próximos pasos
 

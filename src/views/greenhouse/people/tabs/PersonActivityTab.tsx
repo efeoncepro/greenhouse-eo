@@ -159,15 +159,14 @@ const PersonActivityTab = ({ memberId }: Props) => {
   const years = Array.from({ length: 3 }, (_, i) => now.getFullYear() - i)
   const showPendingClosuresState = shouldShowPendingClosures(data)
 
-  // Trend cards share the SAME temporal mode as the period selector above — no
-  // mixed temporal modes in one render (TASK-776 doctrine). The card headlines a
-  // CLOSED month: the selected month when it is closed, otherwise the latest
-  // closed month (a partial in-progress month is never a meaningful monthly
-  // headline). The sparkline is the trailing window ending at that month, so
-  // moving the month/year selector re-anchors the line, marker, value and delta.
+  // Trend cards share the SAME temporal mode as the period selector above. This
+  // is an operational activity surface, so the selected in-progress month is
+  // shown as a partial read instead of silently falling back to the last closed
+  // month. Formal month-close/payroll surfaces can keep a closed-period policy.
   const sortedTrend = [...trend].sort((a, b) => a.period.year - b.period.year || a.period.month - b.period.month)
   const currentRealYear = now.getFullYear()
   const currentRealMonth = now.getMonth() + 1
+  const currentRealDay = now.getDate()
 
   const isInProgressMonth = (p: { year: number; month: number }) =>
     p.year === currentRealYear && p.month === currentRealMonth
@@ -177,25 +176,45 @@ const PersonActivityTab = ({ memberId }: Props) => {
   const withinSelected = (p: { year: number; month: number }) =>
     p.year < year || (p.year === year && p.month <= month)
 
-  // Closed months only, clamped to the selected period when a past month is
-  // selected; when the in-progress month is selected we keep all closed months
-  // and headline the latest of them.
+  // Closed months are clamped to the selected period for historical reads. When
+  // the selected period is the current month, keep the current snapshot in the
+  // trend and label it as partial so the UI matches the period selector.
   const closedTrend = sortedTrend.filter(s => !isInProgressMonth(s.period))
-  const windowTrend = selectedIsInProgress ? closedTrend : closedTrend.filter(s => withinSelected(s.period))
+  const selectedTrend = sortedTrend.filter(s => withinSelected(s.period))
+  const windowTrend = selectedIsInProgress ? selectedTrend : closedTrend.filter(s => withinSelected(s.period))
+  const trendHasSelectedPeriod = selectedTrend.some(s => s.period.year === year && s.period.month === month)
 
   const anchorSnapshot = windowTrend.at(-1) ?? null
   const hasTrend = windowTrend.length > 0 || hasData
 
   // Explicit comparison period (dataviz rule): show the month the card reflects.
-  const anchorPeriodLabel = anchorSnapshot
-    ? `${MONTH_SHORT[anchorSnapshot.period.month] ?? anchorSnapshot.period.month} ${anchorSnapshot.period.year}`
-    : `${MONTH_SHORT[month] ?? month} ${year}`
+  const periodLabelBase = (() => {
+    if (selectedIsInProgress || !anchorSnapshot) {
+      return `${MONTH_SHORT[month] ?? month} ${year}`
+    }
 
-  const buildTrendSeries = (metricId: string): MetricTrendPoint[] =>
-    windowTrend.map(s => ({
+    return `${MONTH_SHORT[anchorSnapshot.period.month] ?? anchorSnapshot.period.month} ${anchorSnapshot.period.year}`
+  })()
+
+  const anchorPeriodLabel = selectedIsInProgress
+    ? `${periodLabelBase} · parcial al ${String(currentRealDay).padStart(2, '0')}/${String(currentRealMonth).padStart(2, '0')}`
+    : periodLabelBase
+
+  const buildTrendSeries = (metricId: string): MetricTrendPoint[] => {
+    const series = windowTrend.map(s => ({
       label: MONTH_SHORT[s.period.month] ?? String(s.period.month),
       value: s.deliveryMetrics.find(m => m.metricId === metricId)?.value ?? null
     }))
+
+    if (selectedIsInProgress && hasData && !trendHasSelectedPeriod) {
+      series.push({
+        label: MONTH_SHORT[month] ?? String(month),
+        value: getMetricValue(data, metricId)
+      })
+    }
+
+    return series
+  }
 
   // Hero = the anchor (headline) month. Fall back to the selected-period ICO
   // context when the rolling window has no snapshot (deep historical selection).
@@ -203,7 +222,9 @@ const PersonActivityTab = ({ memberId }: Props) => {
     const anchorMetric = anchorSnapshot?.deliveryMetrics.find(m => m.metricId === metricId)
     const periodMetric = hasData ? getMetric(data, metricId) : undefined
 
-    const heroValue = anchorMetric?.value ?? periodMetric?.value ?? null
+    const heroValue = selectedIsInProgress
+      ? periodMetric?.value ?? anchorMetric?.value ?? null
+      : anchorMetric?.value ?? periodMetric?.value ?? null
 
     // Zone is ALWAYS derived from the value that is displayed (the anchor month).
     // Never inherit a snapshot zone from the selected ICO context — that is the

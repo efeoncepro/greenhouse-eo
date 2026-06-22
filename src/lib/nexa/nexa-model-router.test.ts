@@ -16,6 +16,12 @@ describe('classifyNexaIntent', () => {
     expect(classifyNexaIntent('Explícame el procedimiento de cierre')).toBe('knowledge')
   })
 
+  it('cubre los casos K4/G1/K7 de la QA matrix como intención de conocimiento', () => {
+    expect(classifyNexaIntent('¿Cuál es la diferencia entre Efeonce, Greenhouse y Nexa?')).toBe('knowledge')
+    expect(classifyNexaIntent('zxqv-778 procedimiento azul inexistente')).toBe('knowledge')
+    expect(classifyNexaIntent('¿Puedo usar Knowledge para saber mi ICO real del período actual?')).toBe('knowledge')
+  })
+
   it('operativo gana sobre conocimiento cuando ambos aparecen', () => {
     expect(classifyNexaIntent('¿Cómo se calcula la nómina?')).toBe('operational')
   })

@@ -177,6 +177,8 @@ export const createGreenhouseMcpHandlers = (client: Pick<
   | 'getWebhookDelivery'
   | 'searchKnowledge'
   | 'getKnowledgeDocument'
+  | 'searchServices'
+  | 'simulateQuote'
 >) => ({
   async getContext() {
     return callReadTool(
@@ -342,6 +344,30 @@ export const createGreenhouseMcpHandlers = (client: Pick<
         )}, ${sectionCount} sections) (${result.requestId}).`
       },
       () => client.getKnowledgeDocument(input)
+    )
+  },
+  // TASK-1211 — Cotizador read-only. Estima precio por nombre de servicio. El
+  // estimate es referencial, NO vinculante; el cost stack/margen no cruza a scope cliente.
+  async searchServices(input: { query?: string; limit?: number }) {
+    return callReadTool(
+      result => {
+        const data = result.data as { total?: number }
+
+        return `Loaded ${Number(data.total ?? 0)} sellable services from Greenhouse (${result.requestId}).`
+      },
+      () => client.searchServices(input)
+    )
+  },
+  async quotePrice(input: Record<string, unknown>) {
+    return callReadTool(
+      result => {
+        const data = result.data as { service?: { name?: string }; estimate?: { currency?: string } }
+
+        return `Simulated quote estimate for ${String(data.service?.name ?? 'service')} in ${String(
+          data.estimate?.currency ?? 'USD'
+        )} — referencial, no vinculante (${result.requestId}).`
+      },
+      () => client.simulateQuote(input)
     )
   }
 })

@@ -37,6 +37,18 @@ vi.mock('@/lib/finance/reporting', () => ({
   getFinanceCurrentPeriod: () => ({ year: 2026, month: 4 })
 }))
 
+// TASK-725 — el materializador resuelve la operating entity (dueño fiscal).
+vi.mock('@/lib/account-360/organization-identity', () => ({
+  getOperatingEntityIdentity: vi.fn(async () => ({
+    organizationId: 'org-efeonce-test',
+    legalName: 'Efeonce Group SpA',
+    taxId: '77.357.182-1',
+    taxIdType: 'RUT',
+    legalAddress: null,
+    country: 'CL'
+  }))
+}))
+
 import { materializeVatLedgerForPeriod } from '@/lib/finance/vat-ledger'
 
 describe('materializeVatLedgerForPeriod', () => {
@@ -46,6 +58,7 @@ describe('materializeVatLedgerForPeriod', () => {
     queuedResults.length = 0
 
     queuedResults.push(
+      { rows: [] }, // TASK-1185 Slice 2: pg_advisory_xact_lock (1er statement de la tx)
       { rows: [] },
       { rows: [] },
       { rows: [] },
@@ -74,7 +87,12 @@ describe('materializeVatLedgerForPeriod', () => {
 
     expect(mockGetDb).toHaveBeenCalledTimes(1)
     expect(mockTransactionExecute).toHaveBeenCalledTimes(1)
-    expect(executedSql).toHaveLength(6)
+    // TASK-1185 Slice 2: el advisory lock agrega un statement al inicio de la tx
+    // (advisory lock + 2 DELETE + 2 INSERT entries + INSERT position + summary).
+    expect(executedSql).toHaveLength(7)
+
+    // TASK-1185 Slice 2: advisory lock por período (namespaced) es el 1er statement.
+    expect(executedSql[0]).toMatch(/pg_advisory_xact_lock\(hashtext\('vat_materialize'\), hashtext\(\$\d+::text\)\)/)
 
     const incomeInsert = executedSql.find(query =>
       query.includes('INSERT INTO greenhouse_finance.vat_ledger_entries') && query.includes('FROM scoped_income')
@@ -100,10 +118,25 @@ describe('materializeVatLedgerForPeriod', () => {
     expect(expenseInsert).toMatch(/\$\d+::text/)
     expect(expenseInsert?.match(/\$\d+::int/g)?.length).toBeGreaterThanOrEqual(4)
 
-    expect(monthlyPositionInsert).toMatch(/concat_ws\(':', space_id, \$\d+::text\)/)
+    // TASK-725 — la posición se llavea/agrupa por organization_id (entidad
+    // legal), no por space_id.
+    expect(monthlyPositionInsert).toMatch(/concat_ws\(':', organization_id, \$\d+::text\)/)
+    expect(monthlyPositionInsert).toMatch(/GROUP BY e\.organization_id/)
     expect(monthlyPositionInsert).toMatch(/'periodId', \$\d+::text/)
     expect(monthlyPositionInsert).toMatch(/'materializationReason', \$\d+::text/)
     expect(monthlyPositionInsert?.match(/\$\d+::text/g)?.length).toBeGreaterThanOrEqual(5)
+
+    // TASK-725 anti-regresión ISSUE-101: NUNCA re-introducir el gate de WHERE
+    // `space_id IS NOT NULL` que excluía el crédito fiscal del overhead. (El
+    // CASE `space_resolution_source` sí usa `q.space_id IS NOT NULL` como
+    // etiqueta — no es un gate y debe poder coexistir.)
+    expect(incomeInsert).not.toMatch(/COALESCE\(q\.space_id, cb\.space_id\) IS NOT NULL/)
+    expect(expenseInsert).not.toMatch(/AND e\.space_id IS NOT NULL/)
+
+    // TASK-1185 Slice 1: guard FX — los CTEs income/expense omiten docs no-CLP
+    // con FX nulo/0 (evita la sub-declaración ×1 silenciosa).
+    expect(incomeInsert).toMatch(/i\.currency = 'CLP' OR COALESCE\(NULLIF\(i\.exchange_rate_to_clp, 0\), 0\) <> 0/)
+    expect(expenseInsert).toMatch(/e\.currency = 'CLP' OR COALESCE\(NULLIF\(e\.exchange_rate_to_clp, 0\), 0\) <> 0/)
 
     expect(summary).toEqual({
       periodId: '2026-04',

@@ -22,6 +22,7 @@ import {
 } from '@/lib/finance/pricing'
 import { isUnpricedQuotationLineItemsError } from '@/lib/finance/pricing/quotation-line-input-validation'
 import { requireCommercialTenantContext } from '@/lib/tenant/authorization'
+import { can } from '@/lib/entitlements/runtime'
 import { roundCurrency, toNumber } from '@/lib/finance/shared'
 import type { CommercialModelCode } from '@/lib/commercial/pricing-governance-types'
 
@@ -150,6 +151,11 @@ export async function POST(
 
   if (!tenant) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  // TASK-1202 — gate fino de accion (capability != route-group).
+  if (!can(tenant, 'commercial.quotation', 'update', 'tenant')) {
+    return NextResponse.json({ error: 'No tienes permiso para editar las lineas de una cotizacion.', code: 'forbidden' }, { status: 403 })
   }
 
   const { id: quoteId } = await params

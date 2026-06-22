@@ -183,6 +183,16 @@ describe('runtime-projection — Slice 1 skeleton', () => {
     expect(projection.items[0]!.daysSinceLastSnapshot).toBeGreaterThanOrEqual(15)
   })
 
+  it('deriva signalSeverity=error para approval rechazado aunque services.status siga pending_approval', async () => {
+    mockedListSampleSprints.mockResolvedValue([
+      buildItem({ serviceId: 'svc-A', status: 'pending_approval', approvalStatus: 'rejected' })
+    ])
+
+    const projection = await resolveSampleSprintRuntimeProjection({ tenant: buildTenant() })
+
+    expect(projection.items[0]!.signalSeverity).toBe('error')
+  })
+
   it('deriva signalSeverity=success para outcome converted', async () => {
     mockedListSampleSprints.mockResolvedValue([buildItem({ outcomeKind: 'converted', status: 'closed' })])
 

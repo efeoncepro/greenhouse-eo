@@ -1,10 +1,25 @@
 # TASK-915 — RpA V2 productive cutover (Efeonce + Sky, two-flip)
 
+## Delta 2026-06-22 — TASK-917 partida en dos (Flip A / Flip B)
+
+El hijo TASK-917 (que bundleaba ambos flips) se **partió en dos** para separar el flip de display (sin riesgo) del flip del bono (toca nómina):
+
+- **TASK-917 = Flip A:** materializar `rpa_avg_v2` (member×mes) + señal `shadow_paridad_rpa` + repoint 6 UI/trends + activar writeback. Bono intacto.
+- **TASK-1221 = Flip B:** cutover del bono `BONUS_USE_RPA_V2` (Efeonce → Sky) + decisión de criterio (paridad-vs-correctitud). Bloqueada por TASK-917.
+
+Orden de hijos ahora: TASK-912 (captura ✅) → TASK-916 (compute/writeback ✅) → **TASK-917 (Flip A)** → **TASK-1221 (Flip B)**. Recalibración: el sign-off del cutover es del **CEO** (no gate HR/Finance externo).
+
+**⚠️ Gate de validación corregido (2026-06-22):** el gate NO es "paridad ≥95% vs V1". V1 (`client_change_round_final`) es un Rollup de Notion inexacto que se está deprecando → validar V2 contra él es circular. El motor V2 cuenta bien; el gate real es **ground truth confirmado por el operador** + disciplina del equipo con "Cambios solicitados". Detalle: `GREENHOUSE_RPA_V2_STRANGLER_MIGRATION_V1.md` Delta 2026-06-22 + BUG-CLASS-005.
+
 ## Delta 2026-05-21 — TASK-916 (hijo) SHIPPED: compute/writeback prod corriendo en paralelo (writeback OFF)
 
 El segundo hijo del umbrella (TASK-916 — compute + writeback productivos) está COMPLETE V1.0 en `develop`. Estado de los hijos: TASK-912 (captura) ACTIVADA EN PRODUCCIÓN + verificada E2E; TASK-916 (compute/writeback) SHIPPED con writeback gated OFF; **falta TASK-917** (wiring consumers + flag bono + ejecución de los dos flips). El pipeline V2 prod ya está completo end-to-end en código (captura → compute → snapshot → chain → writeback gated). Lo que resta es operacional: crear `[GH] RpA v2` en Notion + activar el writeback flag bajo los 8 stop-gates + materializar `rpa_avg_v2` + paridad shadow + flip bono (todo en TASK-917). Spec TASK-916: `complete/TASK-916-rpa-v2-productive-compute-writeback.md`.
 
 Delta 2026-05-26: el eco raw BigQuery de la propiedad Notion `[GH] RpA v2` es `notion_ops.tareas.gh_rpa_v2`. Usarlo solo para auditoría/paridad; el cutover de bono debe seguir leyendo el agregado canónico V2, no la tabla raw.
+
+## Delta 2026-06-18 — Lectura temprana de paridad (forward-accumulation validado): gate ≥95% alcanzable
+
+Shadow-compare exploratorio contra runtime prod (sin tocar código): pipeline V2 vivo desde 21/05 (captura + compute acumulando ambos workspaces; writeback/bono aún OFF → Flip A/B NO ejecutados). Paridad per-tarea V2 vs legacy en la **cohorte fully-covered** (1ra transición ≥ 01/06) ya pasa el gate: **Efeonce 98.1%, Sky 95.5%**; la cohorte pre-captura arrastra sesgo negativo (V2 subcuenta correcciones previas a la captura) → confirma empíricamente por qué el Flip B solo aplica a períodos enteramente cubiertos. Detalle + tablas + caveats en `to-do/TASK-917-...md` → Delta 2026-06-18. Próximo paso: TASK-917 Slice 1 (signal `shadow_paridad_rpa` oficial a grano member-mes).
 
 <!-- ZONE 0 — IDENTITY & TRIAGE -->
 

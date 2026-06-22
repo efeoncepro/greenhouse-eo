@@ -3,6 +3,8 @@
 // el UI los mapea a microcopy es-CL, el reactive worker los rutea por
 // error_class, y los tests verifican estabilidad.
 
+import { isIndexedUnit } from '@/lib/finance/currency-domain'
+
 export type PaymentOrderErrorCode =
   // Generic
   | 'validation_error'
@@ -29,6 +31,8 @@ export type PaymentOrderErrorCode =
   | 'maker_checker_violation'
   | 'mixed_currencies'
   | 'unsupported_corridor'
+  // TASK-995 — CLF (indexed unit) rejected as a cash/payment-order currency.
+  | 'unsupported_currency'
   | 'invalid_amount'
   | 'amount_exceeds_obligation'
 
@@ -145,6 +149,20 @@ export class PaymentOrderSettlementBlockedError extends Error {
     this.orderId = orderId
     this.reason = reason
     this.lineId = lineId
+  }
+}
+
+// TASK-995 (ADR GREENHOUSE_CLF_INDEXED_FINANCE_CORE_V1) — guarda canónica que
+// rechaza una unidad indexada (UF/CLF) como moneda de una orden de pago. Una
+// obligación CLF liquida en CLP: el CLF vive en el plano native, nunca como
+// `currency` cash. Defensa en profundidad sobre el CHECK de DB
+// (payment_orders.currency ∈ {CLP,USD}). Función pura → testeable directo.
+export const assertPaymentOrderCashCurrency = (currency: string): void => {
+  if (isIndexedUnit(currency)) {
+    throw new PaymentOrderValidationError(
+      `${currency.toUpperCase()} (unidad indexada / UF) no puede ser moneda de una orden de pago. Las obligaciones indexadas se liquidan en CLP.`,
+      'unsupported_currency'
+    )
   }
 }
 

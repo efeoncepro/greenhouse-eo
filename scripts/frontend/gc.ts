@@ -12,7 +12,7 @@
  *                                              # purga las iteraciones anteriores
  */
 
-import { existsSync, readdirSync, rmSync, statSync } from 'node:fs'
+import { existsSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { parseArgs } from 'node:util'
@@ -45,6 +45,18 @@ Ejemplos:
   pnpm fe:capture:gc --per-scenario=1            # dry-run: qué iteraciones borraría
   pnpm fe:capture:gc --per-scenario=1 --apply    # conserva 1 evidencia por scenario
   pnpm fe:capture:gc --per-scenario=2 --days=90 --apply   # 2 por scenario + barrido >90d
+
+Auto-gc (corre solo al final de cada \`pnpm fe:capture\`, sin romper lo reciente):
+  - per-scenario prune: conserva GVC_KEEP_PER_SCENARIO (default 3) corridas por scenario.
+  - size-cap prune (throttled): si .captures/ supera GVC_CAPTURE_MAX_GB (default 4),
+    purga lo más VIEJO hasta el cap, protegiendo GVC_CAPTURE_KEEP_NEWEST (default 20)
+    recientes + 2 días de gracia (la sesión/loop en curso de un agente).
+  Variables de control (env):
+    GVC_NO_AUTOPRUNE=1            desactiva TODO el auto-gc.
+    GVC_KEEP_PER_SCENARIO=N       evidencias conservadas por scenario (default 3).
+    GVC_CAPTURE_MAX_GB=N          presupuesto total; 0 desactiva el size-cap (default 4).
+    GVC_CAPTURE_KEEP_NEWEST=N     corridas recientes protegidas del size-cap (default 20).
+    GVC_AUTOGC_INTERVAL_HOURS=N   cada cuánto corre el size-cap como máximo (default 12).
 `
 
 interface CaptureDir {
@@ -93,11 +105,11 @@ const directorySize = (path: string): number => {
   return total
 }
 
-const listCaptureDirs = (): CaptureDir[] =>
-  readdirSync(CAPTURES_DIR, { withFileTypes: true })
+const listCaptureDirs = (capturesDir: string = CAPTURES_DIR): CaptureDir[] =>
+  readdirSync(capturesDir, { withFileTypes: true })
     .filter(entry => entry.isDirectory() && !RESERVED_TOP_LEVEL_DIRS.has(entry.name))
     .flatMap(entry => {
-      const path = resolve(CAPTURES_DIR, entry.name)
+      const path = resolve(capturesDir, entry.name)
 
       try {
         const stat = statSync(path)
@@ -164,6 +176,90 @@ export const pruneScenarioRuns = (
   }
 
   return removed
+}
+
+const AUTOGC_STAMP = '.autogc-stamp'
+
+/**
+ * Throttle del auto-gc por tamaño: devuelve true (y actualiza el stamp) si pasó
+ * más de `intervalHours` desde la última corrida. Evita recalcular el tamaño de
+ * `.captures/` (du de cientos de dirs) en CADA captura — el size-cap corre a lo
+ * sumo cada `intervalHours`. Best-effort: ante cualquier error, no corre.
+ */
+export const shouldRunAutoGc = (intervalHours = 12, capturesDir: string = CAPTURES_DIR): boolean => {
+  if (!existsSync(capturesDir)) return false
+
+  const stampPath = resolve(capturesDir, AUTOGC_STAMP)
+  const intervalMs = intervalHours * 60 * 60 * 1000
+
+  try {
+    if (intervalMs > 0 && existsSync(stampPath) && Date.now() - statSync(stampPath).mtimeMs < intervalMs) {
+      return false
+    }
+
+    writeFileSync(stampPath, new Date().toISOString())
+
+    return true
+  } catch {
+    return false
+  }
+}
+
+/**
+ * Auto-gc por PRESUPUESTO de tamaño, pensado para llamarse (throttled) al final
+ * de cada captura. Si `.captures/` supera `maxGb`, purga las corridas más viejas
+ * hasta quedar bajo el cap — PERO nunca toca:
+ *   - las `keepNewest` corridas más recientes (global), ni
+ *   - corridas más nuevas que `graceDays` (la sesión/loop en curso de un agente).
+ *
+ * Es la pieza que faltaba: `pruneScenarioRuns` poda iteraciones viejas POR
+ * scenario, pero no acota el TOTAL. Best-effort + silencioso: nunca rompe el
+ * flujo de captura. Devuelve `{ removed, reclaimedBytes }`.
+ */
+export const pruneCapturesBudget = (opts: {
+  maxGb: number
+  keepNewest?: number
+  graceDays?: number
+  capturesDir?: string
+}): { removed: number; reclaimedBytes: number } => {
+  const capturesDir = opts.capturesDir ?? CAPTURES_DIR
+
+  if (!existsSync(capturesDir) || !(opts.maxGb > 0)) return { removed: 0, reclaimedBytes: 0 }
+
+  const maxBytes = opts.maxGb * 1024 ** 3
+  const keepNewest = Math.max(0, Math.floor(opts.keepNewest ?? 20))
+  const graceCutoffMs = Date.now() - (opts.graceDays ?? 2) * 24 * 60 * 60 * 1000
+
+  try {
+    const dirs = listCaptureDirs(capturesDir) // newest-first, con sizeBytes
+    let retained = dirs.reduce((acc, dir) => acc + dir.sizeBytes, 0)
+
+    if (retained <= maxBytes) return { removed: 0, reclaimedBytes: 0 }
+
+    const protectedNewest = new Set(dirs.slice(0, keepNewest).map(dir => dir.name))
+    let removed = 0
+    let reclaimedBytes = 0
+
+    for (const dir of [...dirs].reverse()) {
+      // oldest-first
+      if (retained <= maxBytes) break
+      if (protectedNewest.has(dir.name)) continue
+      if (dir.mtimeMs >= graceCutoffMs) continue // protege lo reciente (agentes)
+
+      try {
+        rmSync(dir.path, { recursive: true, force: true })
+        removed += 1
+        reclaimedBytes += dir.sizeBytes
+        retained -= dir.sizeBytes
+      } catch {
+        // best-effort; nunca bloquear la captura por limpieza.
+      }
+    }
+
+    return { removed, reclaimedBytes }
+  } catch {
+    return { removed: 0, reclaimedBytes: 0 }
+  }
 }
 
 const main = (): void => {

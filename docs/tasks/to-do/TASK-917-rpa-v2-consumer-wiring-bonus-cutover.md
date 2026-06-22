@@ -1,4 +1,15 @@
-# TASK-917 — RpA V2 consumer wiring + bonus flag + two-flip cutover
+# TASK-917 — RpA V2 Flip A: materializar rpa_avg_v2 + display cutover
+
+## Delta 2026-06-22 — SPLIT en dos tasks (decisión operador/CEO)
+
+Esta task se **partió en dos** para separar el flip sin riesgo (display) del flip que toca nómina (bono):
+
+- **TASK-917 (esta) = Flip A:** materializar `metrics_by_member.rpa_avg_v2` (el número mensual por persona) + señal `shadow_paridad_rpa` (member×mes) + repoint de las 6 UI/trends a V2 + activar `NOTION_RPA_WRITEBACK_ENABLED`. **Bono intacto.** = Slices 1-2.
+- **TASK-1221 = Flip B:** cutover del bono `BONUS_USE_RPA_V2` (Efeonce primero → Sky) + reconciliación + decisión de criterio (paridad-vs-correctitud). Bloqueada por esta task. = ex-Slices 3-4.
+
+**Recalibración con estado real (verificado 2026-06-22):** V2 **ya está vivo en Efeonce+Sky** (captura `task_status_transitions` desde 2026-05-21, compute `task_rpa_snapshots` corriendo, writeback `[GH] RpA v2` activado). El sign-off del cutover es del **CEO** (no gate HR/Finance externo). Las precondiciones (propiedad Notion + writeback) ya ocurrieron (ver delta 2026-05-21).
+
+**⚠️ El signal `shadow_paridad_rpa` (Slice 1) es un MONITOR, NO el gate de cutover.** La paridad vs V1 NO valida nada: V1 (`client_change_round_final`) es un Rollup de Notion inexacto que se está deprecando — comparar V2 contra él es circular. Ver `GREENHOUSE_RPA_V2_STRANGLER_MIGRATION_V1.md` Delta 2026-06-22 + BUG-CLASS-005. El gate real (en TASK-1221) es ground truth confirmado por el operador, no paridad.
 
 ## Delta 2026-05-21 — TASK-916 SHIPPED (compute/writeback siblings prod): blocker resuelto + 2 precondiciones de Flip A heredadas
 
@@ -12,6 +23,38 @@ Delta 2026-05-26: cuando esta task valide paridad contra el eco de Notion en Big
 2. **Activar `NOTION_RPA_WRITEBACK_ENABLED=true`** en el ops-worker (Vercel/Cloud Run env) bajo los 8 stop-gates ADR Strangler + ~3-4 semanas de captura acumulada vía TASK-912.
 
 El signal `shadow_paridad_rpa` (V2 vs legacy) se materializa en este task (TASK-917) — `task_rpa_snapshots` ya tiene el índice `paridad` listo. Spec TASK-916: `complete/TASK-916-rpa-v2-productive-compute-writeback.md`.
+
+## Delta 2026-06-18 — Shadow-compare exploratorio (pre-Slice 1): forward-accumulation validado empíricamente, gate ≥95% alcanzable
+
+Comparativo ad-hoc contra runtime productivo real (sin tocar código de prod) para tener lectura temprana de paridad antes del cierre de junio. Evidencia del pipeline V2 vivo: captura (`greenhouse_delivery.task_status_transitions`) acumulando desde **2026-05-21 16:25 UTC**, última transición al momento del check **2026-06-18 18:05 UTC**, 928 transiciones (efeonce + sky); compute V2 (`task_rpa_snapshots`) 926 snapshots, ambos workspaces, última hoy. Writeback (`NOTION_RPA_WRITEBACK_ENABLED`) y bono (`BONUS_USE_RPA_V2`) **siguen OFF** (no presentes en env prod) → Flip A y Flip B aún NO ejecutados (cronograma 01/06 corrido).
+
+**Método**: último snapshot V2 por tarea (`task_rpa_snapshots.rpa_value`) vs RpA legacy por-tarea (`greenhouse_delivery.tasks.rpa_value`), join `task_source_id = notion_task_id`. Cobertura casi total: efeonce 169/171, sky 370/373.
+
+**Paridad global (incluye tareas pre-captura):**
+
+| Workspace | Comparables | Paridad exacta | Sesgo (V2−V1) |
+|---|---|---|---|
+| efeonce | 169 | **95.9%** | −0.018 |
+| sky | 370 | **92.2%** | −0.097 |
+
+Desajustes casi todos por **V2 subcontando correcciones** (34 tareas V2<V1, solo 2 V2>V1) — firma exacta del forward-accumulation: correcciones previas al 21/05 no fueron capturadas.
+
+**Segmentado por cohorte (la prueba limpia):**
+
+| Cohorte | efeonce | sky |
+|---|---|---|
+| **Fully-covered** (1ra transición ≥ 01/06, historia V2 completa) | **98.1%** (n=154, sesgo +0.006) | **95.5%** (n=244, sesgo −0.057) |
+| Pre-captura (1ra transición < 01/06, historia incompleta) | 73.3% (n=15, sesgo −0.267) | 85.7% (n=126, sesgo −0.175) |
+
+**Conclusiones:**
+
+1. El diseño forward-accumulation queda **validado empíricamente**: la cohorte con historia completa converge (≥95% ambos clientes, sesgo ~0); las pre-captura arrastran sesgo negativo claro. El número global lo deprimen justo las tareas que el gate del Flip B excluye.
+2. La cohorte elegible **ya pasa el gate ≥95%** (Efeonce 98.1%, Sky 95.5%) con junio parcial + ~4 semanas acumuladas → al 01/07 (junio cerrado, enteramente cubierto) debería aterrizar cómodo sobre el umbral, Efeonce con holgura.
+3. El sesgo negativo confirma el riesgo del risk matrix (V2 incompleto → subcuenta → infla bono); el gate forward-accumulation protege exactamente contra eso. Sky justo en la línea (95.5%, más cola legacy del incidente TASK-877) → bien justificado el orden Efeonce-primero.
+
+**Caveats**: esto es per-tarea (último snapshot) vs legacy *vivo*, NO el `rpa_avg` por member-mes que usa el bono — es **leading indicator fuerte, no el gate oficial**. El `shadow_paridad_rpa` real (Slice 1) debe agregar a member-mes sobre el período cerrado. `tasks.rpa_value` es editable por operadores; el shadow oficial compara snapshots de período. n aún modesto (junio completo lo engorda).
+
+**Implicación para esta task**: TASK-917 está des-riesgada — el motor V2 produce el número correcto cuando tiene data completa y el gate de paridad es alcanzable. Slice 1 (materializar `rpa_avg_v2` + signal `shadow_paridad_rpa` a grano member-mes) sigue siendo el siguiente paso para tener el número oficial monitoreado hasta el cierre de junio.
 
 <!-- ZONE 0 -->
 
@@ -30,7 +73,7 @@ El signal `shadow_paridad_rpa` (V2 vs legacy) se materializa en este task (TASK-
 
 ## Summary
 
-Enchufar los consumers de RpA (que ya existen, hoy leen el legacy `rpa_avg`) al motor V2, y ejecutar los **dos flips**: Flip A (01/06) poblar `metrics_by_member.rpa_avg_v2` desde V2 + repoint las 6 UI + trends a V2 + activar writeback; Flip B (01/07, Efeonce primero) flag `BONUS_USE_RPA_V2` en `calculateRpaBonus`. Legacy `rpa_avg` intacto (rollback <5min).
+**Flip A (display, sin riesgo de nómina).** Poblar `metrics_by_member.rpa_avg_v2` desde el motor V2 (el número mensual por persona) + materializar la señal `shadow_paridad_rpa` (member×mes) + repoint las 6 UI + trends a V2 + activar `NOTION_RPA_WRITEBACK_ENABLED`. **El bono sigue leyendo el legacy `rpa_avg` — esta task NO lo toca.** El cutover del bono (Flip B, `BONUS_USE_RPA_V2`) se separó a **TASK-1221**. Legacy `rpa_avg` intacto (rollback <5min).
 
 ## Why This Task Exists
 
@@ -38,10 +81,10 @@ Los consumers (bonus `calculateRpaBonus`, 6 UI views, materialización, trends A
 
 ## Goal
 
-- `metrics_by_member.rpa_avg_v2` poblado desde el cómputo V2.
-- 6 UI views + trends API leyendo V2 (Flip A 01/06).
-- Flag `BONUS_USE_RPA_V2` en el path de bono (Flip B 01/07, Efeonce primero, Sky después).
-- Cada flip reversible <5min vía flag.
+- `metrics_by_member.rpa_avg_v2` poblado desde el cómputo V2 (agregación AVG por member-mes) — el número que el bono leerá en Flip B.
+- Señal canónica `shadow_paridad_rpa` (member×mes, V2 vs legacy sobre período cerrado) materializada y monitoreable.
+- 6 UI views + trends API leyendo V2 (gated por flag de display) + `NOTION_RPA_WRITEBACK_ENABLED` activado.
+- Flip A reversible <5min vía flag. **Bono intacto** (Flip B = TASK-1221).
 
 ## Architecture Alignment
 
@@ -57,10 +100,10 @@ Los consumers (bonus `calculateRpaBonus`, 6 UI views, materialización, trends A
 
 ## Scope (slices)
 
-1. Materialización: poblar `metrics_by_member.rpa_avg_v2` desde el cómputo V2 (agregación AVG por member-mes).
+1. Materialización: poblar `metrics_by_member.rpa_avg_v2` desde el cómputo V2 (agregación AVG por member-mes) + materializar la señal `shadow_paridad_rpa` (member×mes, V2 vs legacy sobre período cerrado — el gate oficial, no el leading indicator per-tarea del delta 2026-06-18).
 2. Flip A — repoint display: UI views + trends API leen `rpa_avg_v2` (gated por flag de display) + activar `NOTION_RPA_WRITEBACK_ENABLED`. **NO toca bono.**
-3. Flip B — flag bono: `BONUS_USE_RPA_V2` en `calculateRpaBonus` (lee `rpa_avg_v2` en vez de `rpa_avg`). Efeonce primero.
-4. Sky bonus tras Efeonce verde.
+
+> **Flip B (ex-Slices 3-4) → TASK-1221:** `BONUS_USE_RPA_V2` en `calculateRpaBonus`, Efeonce primero → Sky. Bloqueada por esta task (necesita `rpa_avg_v2` + `shadow_paridad_rpa`).
 
 ## Out of Scope
 
@@ -94,11 +137,12 @@ Los consumers (bonus `calculateRpaBonus`, 6 UI views, materialización, trends A
 
 ## Acceptance Criteria
 
-- [ ] `rpa_avg_v2` poblado y paridad ≥95% vs `rpa_avg` sobre junio.
-- [ ] Flip A: UI + trends muestran V2; bono sigue V1 (verificable en `payroll_entries`).
-- [ ] Flip B Efeonce: bono lee V2 con `BONUS_USE_RPA_V2=true` + sign-off HR registrado.
-- [ ] Cada flip reversible <5min verificado en staging.
-- [ ] HR reconciliación bono mes 1 documentada.
+- [ ] `rpa_avg_v2` poblado (member×mes) desde V2; señal `shadow_paridad_rpa` materializada y visible en `/admin/operations`.
+- [ ] Flip A: UI + trends muestran V2; **bono sigue V1** (verificable en `payroll_entries.kpi_rpa_avg`).
+- [ ] Flag de display reversible <5min verificado en staging.
+- [ ] El número `rpa_avg_v2` queda listo y monitoreado para que TASK-1221 (Flip B) decida el cutover del bono.
+
+> Acceptance del cutover del bono (paridad ≥95% sobre cohorte cubierta, sign-off CEO, reconciliación) vive en **TASK-1221**.
 
 ## Verification
 

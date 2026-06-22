@@ -5,7 +5,8 @@ import {
   listQuotationLineCostOverrideHistory,
   QuotationLineCostOverrideValidationError
 } from '@/lib/finance/quotation-line-cost-override-store'
-import { canOverrideQuoteCost, requireCommercialTenantContext } from '@/lib/tenant/authorization'
+import { requireCommercialTenantContext } from '@/lib/tenant/authorization'
+import { can } from '@/lib/entitlements/runtime'
 
 export const dynamic = 'force-dynamic'
 
@@ -18,7 +19,7 @@ interface RouteParams {
  * POST /api/finance/quotes/[id]/lines/[lineItemId]/cost-override
  *
  * Applies a governed manual cost override on a quotation line (TASK-481).
- * Requires `canOverrideQuoteCost` capability (efeonce_admin + finance_admin).
+ * Requires `commercial.quotation.cost_override` capability (efeonce_admin + finance_admin).
  *
  * Body (JSON):
  *   - category: 'competitive_pressure' | 'strategic_investment' | 'roi_correction'
@@ -39,9 +40,11 @@ export async function POST(
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  if (!canOverrideQuoteCost(tenant)) {
+  // TASK-1202 — gate fino por capability (antes role-based canOverrideQuoteCost +
+  // prosa inglesa cruda). Capability admin-only commercial.quotation.cost_override.
+  if (!can(tenant, 'commercial.quotation.cost_override', 'update', 'tenant')) {
     return NextResponse.json(
-      { error: 'Permission denied: cost override requires finance_admin or efeonce_admin.' },
+      { error: 'No tienes permiso para sobrescribir el costo de una línea de cotización.', code: 'forbidden' },
       { status: 403 }
     )
   }

@@ -3,8 +3,43 @@
 > Archivo histórico **append-only** de la plataforma UI: las entradas datadas (`Delta YYYY-MM-DD`) que antes se acumulaban en el monolito `GREENHOUSE_UI_PLATFORM_V1.md`.
 > El **estado vigente** NO vive acá — vive en los docs temáticos de [`ui-platform/`](./README.md) (STACK · PRIMITIVES · STATE · FORMS · TABLES · MOTION · I18N · PATTERNS · GOVERNANCE).
 > Orden cronológico inverso aproximado (más reciente arriba), tal como estaban en el monolito. No tratar entradas antiguas como contrato vigente; son trazabilidad.
+> **Disciplina de longitud:** cada delta resume el cambio y enlaza el contrato vivo. No enumerar matrices completas de kinds, tokens, assets o screenshots en este archivo; esas listas viven en docs temáticos, runbooks o ADRs. Si una entrada necesita más de ~8-10 líneas, crear o usar un doc temático y dejar aquí solo el índice.
 
 ---
+
+## Delta 2026-06-21 — Adaptive Sidecar main inset opt-in
+
+`AdaptiveSidecarLayout` agrega `inlineMainPadding` como safe area opt-in para el slot main cuando el sidecar se renderiza inline/push y el layout crea una card madre con borde. El default es `0`, por lo que los adopters existentes quedan byte-identicos; consumers densos como `/finance/quotes` pueden pasar su gutter canónico para evitar que headers o contenido principal queden pegados al borde al abrir un preview. GVC: `.captures/2026-06-21T19-04-32_finance-quotes-pipeline`.
+
+## Delta 2026-06-20 — Gamification leaderboard primitives
+
+Se agregaron `GreenhouseLeaderboardCard`, `GreenhouseLeaderboardRankings` y `GreenhouseLeaderboardPodium` como primitives para portar los componentes de leaderboard del prompt a Greenhouse sin shadcn/Tailwind/CVA ni avatars externos. El card compone periodo, selector de run, podium top-3 y lista paginada; rankings soporta byline, usuario actual, `displayed`, avatars y `valueFormatter`; podium conserva sizes `sm/default/lg`, `medalStyle classic/modern/minimal`, toggles de avatar/value y orden visual 2-1-3 con labels accesibles por rank. Lab vivo: `/design-system/gamification`; scenario GVC: `design-system-gamification`; assets demo: avatars reales bajo `public/images/greenhouse/team/`.
+
+## Delta 2026-06-20 — TASK-1180: Design Handoff x Primitive Governance
+
+`/design-system/handoff` ahora actúa como gateway de gobernanza hacia el Design System: cada entry puede registrar strategy (`route_only`, `reuse_primitive`, `extend_primitive`, `new_primitive`, `variant_kind`, `research_required`), primitive key, variant/kind, Lab, runtime, GVC, docs, rationale y owner. El contrato vive en commands/readers/API, no en la UI; el cierre `implemented` bloquea decisiones vacías o `research_required`, y endurece `new_primitive` con Lab + docs + GVC. Contrato funcional: [`docs/documentation/plataforma/design-handoff-control-plane.md`](../../documentation/plataforma/design-handoff-control-plane.md).
+
+## Delta 2026-06-20 — Design Handoff create con snapshot Figma inicial
+
+`/design-system/handoff` conserva el modelo Evidence Ledger, pero el intake queda mas robusto: `POST /api/design-system/handoff` ahora registra el handoff y persiste el primer snapshot Figma del nodo allowlisted en el mismo comando. El boton `Verificar nodo Figma` queda como re-verificacion posterior. Contrato funcional: [`docs/documentation/plataforma/design-handoff-control-plane.md`](../../documentation/plataforma/design-handoff-control-plane.md). GVC local desktop/mobile: `.captures/2026-06-20T02-00-35_design-system-handoff-cockpit`.
+
+## Delta 2026-06-19 — TASK-1120: Design Handoff Registry producto→DEV
+
+Se agregó `/design-system/handoff` como carril gobernado para registrar nodos Figma de **producto** hacia implementación sin contaminar el master AXIS ni el aggregate AXIS-only de TASK-1072 (`design_system_figma_nodes`). La ruta vive bajo el catálogo interno del Design System, usa `CompositionShell` + `AdaptiveSidecarLayout` y declara discoverability en `DesignSystemCatalogView` + `route-reachability-manifest`.
+
+El contrato runtime es intentionally fail-closed: `greenhouse_core.design_handoff_allowed_files` debe autorizar `file_key` de producto antes de registrar entradas; el `AXIS_FILE_KEY` queda bloqueado por DB y store. La UI muestra preview Figma solo si el archivo está allowlisted y degrada honesto cuando el allowlist está vacío. GVC local desktop/mobile: `.captures/2026-06-19T22-18-12_inline-design-system-handoff` y `.captures/2026-06-19T22-20-38_inline-design-system-handoff`. Nota: el overflow móvil global de child routes DS sigue cubierto por TASK-1168; no se resuelve en este delta.
+
+## Delta 2026-06-18 — Brand logo variations desde AXIS Figma
+
+Se agregó `GreenhouseBrandLogoMark` como primitive gobernada para portar logos externos desde AXIS Figma sin crear SVGs sueltos por surface. La primitive conserva `variant` para los modos funcionales (`isotype`, `contained`, `lockup`) y modela las variantes de marca como `kind`. El set vigente cubre Gemini, ChatGPT/GPT, Adobe, Adobe Express, Adobe Firefly, Adobe Photoshop, Adobe Premiere Pro, Adobe Illustrator, Adobe After Effects, Envato, Shutterstock, Higgsfield, Magnific, ElevenLabs, Claude, Microsoft Teams, Notion, HubSpot, Semrush, Ahrefs y Metricool.
+
+La matriz completa de nodes/kinds, la política SVG/PNG, los pitfalls de importación (Gemini, Adobe Express, lockups, clipping) y el checklist GVC viven en [`BRAND_LOGO_VARIATIONS.md`](./BRAND_LOGO_VARIATIONS.md) y [`BRAND_LOGO_IMPORT_RUNBOOK.md`](./BRAND_LOGO_IMPORT_RUNBOOK.md). Lab vivo: `/design-system/brand-logos`; scenario GVC: `design-system-brand-logos`; catálogo: [`PRIMITIVES.md`](./PRIMITIVES.md).
+
+## Delta 2026-06-18 — TASK-1132: Nexa Expression Layer
+
+Se agregó `NexaExpressionCue` como primitive gobernada para la **Nexa Expression Layer**: un registry tipado `cue -> treatment` que traduce intenciones visuales (`ready`, `reviewing`, `risk`, `idea`, `source`, `next_step`, `opportunity`, `missing_context`, `blocked`, `sensitive`) a tratamientos cerrados (`nexaMark`, `fluentAsset`, `tablerIcon`, `statusDot`, `textOnly`, `none`) por contexto y sensibilidad.
+
+La identidad Nexa sigue siendo primaria: `reviewing` y `opportunity` usan `nexaMark` por defecto; Fluent Emoji entra solo como set curado vendoreado para cues de baja sensibilidad (`ready`, `idea`, `source`, `next_step`, `missing_context`) con notice MIT en `public/images/nexa-expression-cues/`. Contextos sensibles (`finance`, `payroll`, `legal`, `security`, `contractual`, `people`) degradan a iconografía sobria o texto. `NexaExpressiveText` acepta segmento `type: 'cue'` y `getNexaExpressiveTextPlainText()` conserva labels accesibles para clipboard/screen readers. El Lab `/design-system/nexa-chat` agrega specimen `data-capture='nexa-expression-cue-specimen'` y el scenario `design-system-nexa-chat` captura desktop/mobile ese bloque.
 
 ## Delta 2026-06-14 (d) — "Nexa Answers Experience": primera page DS que agrega un flujo conversacional end-to-end (TASK-1110 Slice B)
 
@@ -326,7 +361,7 @@ mockups internos.
   editorial o parent específico.
 - Como consecuencia del shell, los labs y mockups del Design System no deben
   renderizar CTAs locales de retorno al catálogo (`Design System`, `Volver al
-  sistema`, `Volver al catálogo`) en el header o secciones de reglas; ese
+sistema`, `Volver al catálogo`) en el header o secciones de reglas; ese
   retorno vive en el breadcrumb global. Se conservan solo links no redundantes
   como nodos Figma, links entre labs o specimens de botones.
 
@@ -339,7 +374,7 @@ px directo.
 - `theme.shape.customBorderRadius.*` guarda números en px (`2/4/6/8/10`), pero
   dentro de `sx` deben emitirse como CSS length (`'4px'`, `'6px'`, etc.).
 - Queda prohibido presentar `borderRadius:
-  theme.shape.customBorderRadius.*` como ejemplo correcto dentro de `sx`, porque
+theme.shape.customBorderRadius.*` como ejemplo correcto dentro de `sx`, porque
   puede inflar el radio visual.
 - `DESIGN.md`, `ui-platform/STACK.md` y las skills locales de Codex/Claude se
   sincronizan para que agentes no repitan el error en labs, mockups o primitives.
@@ -514,9 +549,9 @@ sin componer iconos sueltos por surface.
   `.captures/2026-06-09T17-17-52_design-system-nexa-brand`
   (desktop/mobile, `qualityFindings=[]`) + GVC `design-system-charts`
   `.captures/2026-06-09T18-35-44_design-system-charts` para el primer consumer
-  + micro evidence
-  `.captures/2026-06-09T20-52-25_micro-admin-design-system-nexa-brand-data-capture-nexa-brand-animated-ask-badge-hero`
-  para el badge animado.
+  - micro evidence
+    `.captures/2026-06-09T20-52-25_micro-admin-design-system-nexa-brand-data-capture-nexa-brand-animated-ask-badge-hero`
+    para el badge animado.
 
 ## Delta 2026-06-09c — Greenhouse Funnel Chart primitive
 
@@ -640,7 +675,6 @@ Greenhouse gana un SoT semántico de elevación. Las primitives dejan de leer í
 - El lab `/admin/design-system/floating-surfaces` expone el chip `motion: anchored` por variant.
 - Verificado con tests focales de controller/component y GVC desktop+mobile en `.captures/2026-06-07T15-54-46_floating-surface-primitives`.
 
-
 ## Delta 2026-06-07i — Utilities Lab y Activity Timeline token hardening
 
 `/admin/design-system/utilities` y `GreenhouseActivityTimeline` se alinean al contrato tokenizado del Design System, manteniendo `ActivityTimeline` como primitive reusable y no como composición visual route-local.
@@ -650,7 +684,6 @@ Greenhouse gana un SoT semántico de elevación. Las primitives dejan de leer í
 - Se retira el peso `500` del título de item y los overrides inline `700/800` de labels/títulos/avatars; la primitive queda dentro del ladder vigente `400/600/700/800` sin roles ad-hoc.
 - `UtilitiesLabView` compone `GreenhouseButton`, `GreenhouseChip`, `DESIGN_SYSTEM_LAB_TOKENS` y `GREENHOUSE_ACTIVITY_TIMELINE_TOKENS`; ya no usa MUI `Button`/`Chip` crudos ni `rgba`/type literals route-locales para documentar la primitive.
 - Se agrega test focal para el controller y evidencia GVC desktop+mobile en `.captures/2026-06-07T14-43-31_design-system-utilities`.
-
 
 ## Delta 2026-06-07h — Charts Lab y chart primitives token hardening
 
@@ -662,7 +695,6 @@ Greenhouse gana un SoT semántico de elevación. Las primitives dejan de leer í
 - Se retiró el HEX hardcodeado del tone `ink` en `GreenhouseStackedDistributionChartCard` y se resolvió desde `theme.palette.text.primary` / `theme.palette.grey`.
 - `ChartsLabView` usa `GreenhouseButton`, `DESIGN_SYSTEM_LAB_TOKENS` y `GREENHOUSE_CHART_CHROME_TOKENS`.
 
-
 ## Delta 2026-06-07g — Floating Surface Lab tokenizado
 
 `/admin/design-system/floating-surfaces` deja de usar literals visuales route-locales para documentar la primitive y se conecta al vocabulario vivo del Design System.
@@ -672,7 +704,6 @@ Greenhouse gana un SoT semántico de elevación. Las primitives dejan de leer í
 - Layout, opacidades, focus ring, sombra e icon specimen viven en `DESIGN_SYSTEM_LAB_TOKENS` (`src/views/greenhouse/admin/design-system/design-system-lab-tokens.ts`) para evitar números visuales dispersos en views del museo.
 - La primitive mantiene sus tokens propios en `floating-surface-controller` (`FLOATING_SURFACE_CHROME_TOKENS`, `FLOATING_SURFACE_MOTION_TOKENS`); el namespace del lab no sustituye el contrato de la primitive.
 
-
 ## Delta 2026-06-07f — FieldProvenance usa Floating Surface canonica
 
 `GreenhouseFieldProvenancePeek` deja de mantener un popover ad-hoc sobre `@floating-ui/react` y compone `GreenhouseFloatingSurface variant='evidencePeek' kind='fieldProvenance'`.
@@ -680,7 +711,6 @@ Greenhouse gana un SoT semántico de elevación. Las primitives dejan de leer í
 - La API pública de `GreenhouseFieldProvenancePeek` se mantiene intacta (`source`, `confidence`, `freshness`, `variant`, `triggerLabel`, `dataCapture`).
 - El trigger conserva su affordance visual y metadata (`data-source`, `data-variant`, `data-capture`), mientras positioning/focus/dismissal/portal/role pasan a la primitive canónica.
 - Cierra el follow-up anotado en el Delta 2026-06-06b.
-
 
 ## Delta 2026-06-07e — Greenhouse Button + AsyncAction composition
 
@@ -691,7 +721,6 @@ Greenhouse gana un SoT semántico de elevación. Las primitives dejan de leer í
 - Compatibilidad legacy: AsyncAction conserva `variant='contained'|'tonal'|'outlined'|'text'` y `color='primary'|'secondary'|'error'|'warning'|'info'|'success'`; internamente traduce a `GreenhouseButton` (`contained→solid`, `tonal→label`, `outlined→outlined`, `text→text`) y `tone`.
 - Escape canonical: AsyncAction acepta `greenhouseVariant` y `tone` para que nuevos consumers puedan declarar el contrato Greenhouse directo sin depender del mapping legacy.
 - A11y: el status live region vive fuera del `<button>` para no duplicar el accessible name del control.
-
 
 ## Delta 2026-06-07d — Greenhouse Button Primitive
 
@@ -717,7 +746,6 @@ Contrato:
 - Product consumers deben preferir `GreenhouseButton` para botones nuevos/reusables de plataforma. Raw `<Button>` sigue permitido para adapters legacy, Vuexy internals o callsites no tocados; migrar por slices, no por sweep cosmetico.
 - Nuevas variants no pueden ser skins de color/radio/sombra; deben cambiar emphasis, action model, density o state contract. Nuevos kinds deben mapear a una variant existente antes de crear `FooButton` locales.
 
-
 ## Delta 2026-06-07c — Greenhouse Chip Primitive
 
 Greenhouse adopta `GreenhouseChip` como primitive canonical para chips compactos basada en AXIS Figma (`Design System | Vuexy → AXIS`, node `369:92030`). El objetivo es cortar la proliferacion de chips route-locales cuando el caso es reusable: estados, atributos, filtros, entradas removibles, identidad compacta y metadatos operativos.
@@ -732,6 +760,7 @@ Docs canonicos:
 Contrato:
 
 - Variants oficiales V1: `solid`, `label`, `outlined`. `label` conserva el nombre AXIS/Figma y se traduce internamente al affordance tonal de Vuexy/MUI.
+- Variants oficiales V1.1 (animated badge capability): `spotlight` y `signal`. `spotlight` porta el acabado shimmer/wave del prompt shadcn badge como overlay tokenizado sobre la superficie tonal del chip; `signal` porta el dot vivo con anillo pulsante para monitoreo/estado live. Ambas variants son parte de `GreenhouseChip`, no un componente `/components/ui` paralelo; consumen MUI/theme tokens, motion tokens y `prefers-reduced-motion`. Lab: `/design-system/chips`, frame GVC `chips-animated-capability`.
 - Tones oficiales V1: `default`, `primary`, `secondary`, `error`, `warning`, `info`, `success`.
 - Sizes oficiales V1: `medium` (32px) y `small` (24px), alineados al nodo Figma.
 - Kinds semanticos V1: `status`, `attribute`, `input`, `action`, `identity`, `filter`, `metric`, `custom`.
@@ -739,7 +768,6 @@ Contrato:
 - La primitive owns altura, border radius AXIS, avatar/delete icon sizing, focus ring, hover/pressed state, delete-icon affordance, reduced-motion fallback, `data-variant`, `data-tone`, `data-kind`, `data-capture` y estados disabled/clickable.
 - Product consumers deben preferir `GreenhouseChip` cuando el chip tenga semantica reusable o de plataforma. `@core/components/mui/Chip` y `@mui/material/Chip` siguen permitidos para adapters legacy o componentes Vuexy internos mientras se migra por slice.
 - Nuevas variants no pueden ser skins de color/radio; deben cambiar contrato funcional, densidad, interaccion o state model. Nuevos kinds deben mapear un uso semantico hacia una variant existente antes de crear componentes locales como `FooStatusChip`.
-
 
 ## Delta 2026-06-07b — Greenhouse Utilities / Activity Timeline Primitive
 
@@ -762,7 +790,6 @@ Contrato:
 - Library choice V1: Framer Motion via `@/libs/FramerMotion` + `useReducedMotion`. Se eligio sobre GSAP porque este diseño necesita mount transitions y crecimiento sutil de conectores; GSAP queda para timelines complejas, SVG/path/text, ScrollTrigger o motion medido.
 - Boundary: no reemplaza auditoria legal completa, event sourcing UI, sidecars de evidencia, maker-checker ni readers/commands de dominio. Los dominios calculan/filtran eventos, permisos, evidencia y URLs; la primitive gobierna shell visual, a11y, responsive y motion.
 - Toda nueva variant utility debe aparecer primero en `/admin/design-system/utilities` con `data-capture`, GVC desktop+mobile y test focal antes de migrar consumers productivos.
-
 
 ## Delta 2026-06-07 — Greenhouse Chart Card Primitives
 
@@ -792,7 +819,6 @@ Contrato:
 - Extension futura: nuevas variants deben cambiar comportamiento de visualizacion, densidad, interaccion o contrato de datos; no se aceptan variants que solo cambien color, sombra o radio. Nuevos kinds deben mapear un uso semantico de dominio hacia una variant oficial antes de que el consumer pinte layout propio.
 - Toda variant chart nueva debe aparecer primero en `/admin/design-system/charts` con `data-capture`, GVC desktop+mobile y test focal antes de migrar consumers productivos.
 
-
 ## Delta 2026-06-06e — Greenhouse Microinteraction Primitives V1/V1.1
 
 Greenhouse adopta `GreenhouseAsyncActionButton`, `GreenhouseCommandFeedback`, `GreenhouseStateTransition`, `GreenhouseInlineValidation`, `GreenhouseFieldProvenancePeek`, `GreenhouseStepperProgressMicro`, `GreenhouseEvidenceAttachmentDropzone` y `GreenhouseInlineDecisionPrompt` como primitives V1/V1.1 de microinteracciones. Cubren commands puntuales, resultados post-accion, cambios de estado visibles, validacion local/async, procedencia de datos, progreso operativo compacto, evidencia/upload verificado y decisiones inline de riesgo controlado.
@@ -812,16 +838,16 @@ Docs canonicos:
 
 Canon V1/V1.1:
 
-| Primitive | Job funcional | States / tones | Variants oficiales | No reemplaza |
-| --- | --- | --- | --- | --- |
-| `GreenhouseAsyncActionButton` | Command puntual localizado | `idle`, `loading`, `success`, `error` | Compone `GreenhouseButton`; acepta legacy `contained/tonal/outlined/text` y canonical `solid/label/outlined/text` via `greenhouseVariant` | Confirmaciones destructivas, procesos largos |
-| `GreenhouseCommandFeedback` | Resultado persistente post-accion | `success`, `error`, `warning`, `info`, `retrying` | `compact` como density secundaria | Alerts bloqueantes, toast global unico |
-| `GreenhouseStateTransition` | Cambio visible de estado en row/card/panel | `success`, `warning`, `error`, `info`, `neutral` | `surface`, `inline` | Timeline/audit history completo |
-| `GreenhouseInlineValidation` | Validacion local/async cerca del campo o seccion | `idle`, `checking`, `valid`, `warning`, `error`, `blocked` | `field`, `section`, `summary`, `asyncCheck` | Summary legal completo, bloqueos maker-checker |
-| `GreenhouseFieldProvenancePeek` | Procedencia, confianza y frescura de un dato | source: `integration`, `manual`, `calculated`, `override`, `seeded`, `fallback`, `system`; confidence/freshness | `icon`, `chip`, `inline` | Auditoria completa, lineage explorer, sidecar de evidencia |
-| `GreenhouseStepperProgressMicro` | Progreso compacto de 3-5 pasos operativos | `pending`, `active`, `complete`, `warning`, `error`, `blocked` | `horizontal`, `vertical`, `compact` | Wizard largo, loader de pagina, timeline permanente |
-| `GreenhouseEvidenceAttachmentDropzone` | Adjuntar/verificar evidencia con estados reales | `idle`, `dragging`, `uploading`, `scanning`, `verified`, `rejected`, `disabled` | `panel`, `compact` | Adapter de upload, vault, malware scan, asset service |
-| `GreenhouseInlineDecisionPrompt` | Decision inline contextual de riesgo controlado | states `idle`, `reviewing`, `submitting`, `confirmed`, `blocked`; tones `info`, `warning`, `error`, `success`, `neutral` | `choice`, `confirmation`, `impact` | Dialog destructivo/legal/financiero, maker-checker |
+| Primitive                              | Job funcional                                    | States / tones                                                                                                           | Variants oficiales                                                                                                                        | No reemplaza                                               |
+| -------------------------------------- | ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------- |
+| `GreenhouseAsyncActionButton`          | Command puntual localizado                       | `idle`, `loading`, `success`, `error`                                                                                    | Compone `GreenhouseButton`; acepta legacy `contained/tonal/outlined/text` y canonical `solid/label/outlined/text` via `greenhouseVariant` | Confirmaciones destructivas, procesos largos               |
+| `GreenhouseCommandFeedback`            | Resultado persistente post-accion                | `success`, `error`, `warning`, `info`, `retrying`                                                                        | `compact` como density secundaria                                                                                                         | Alerts bloqueantes, toast global unico                     |
+| `GreenhouseStateTransition`            | Cambio visible de estado en row/card/panel       | `success`, `warning`, `error`, `info`, `neutral`                                                                         | `surface`, `inline`                                                                                                                       | Timeline/audit history completo                            |
+| `GreenhouseInlineValidation`           | Validacion local/async cerca del campo o seccion | `idle`, `checking`, `valid`, `warning`, `error`, `blocked`                                                               | `field`, `section`, `summary`, `asyncCheck`                                                                                               | Summary legal completo, bloqueos maker-checker             |
+| `GreenhouseFieldProvenancePeek`        | Procedencia, confianza y frescura de un dato     | source: `integration`, `manual`, `calculated`, `override`, `seeded`, `fallback`, `system`; confidence/freshness          | `icon`, `chip`, `inline`                                                                                                                  | Auditoria completa, lineage explorer, sidecar de evidencia |
+| `GreenhouseStepperProgressMicro`       | Progreso compacto de 3-5 pasos operativos        | `pending`, `active`, `complete`, `warning`, `error`, `blocked`                                                           | `horizontal`, `vertical`, `compact`                                                                                                       | Wizard largo, loader de pagina, timeline permanente        |
+| `GreenhouseEvidenceAttachmentDropzone` | Adjuntar/verificar evidencia con estados reales  | `idle`, `dragging`, `uploading`, `scanning`, `verified`, `rejected`, `disabled`                                          | `panel`, `compact`                                                                                                                        | Adapter de upload, vault, malware scan, asset service      |
+| `GreenhouseInlineDecisionPrompt`       | Decision inline contextual de riesgo controlado  | states `idle`, `reviewing`, `submitting`, `confirmed`, `blocked`; tones `info`, `warning`, `error`, `success`, `neutral` | `choice`, `confirmation`, `impact`                                                                                                        | Dialog destructivo/legal/financiero, maker-checker         |
 
 Contrato especifico:
 
@@ -848,7 +874,6 @@ Contrato especifico:
 - No usar para confirmaciones destructivas/legales/financieras que requieren decision explicita: usar `Dialog`/maker-checker y luego el boton async dentro de la accion confirmada.
 - Product consumers deben reemplazar patrones locales `startIcon={submitting ? <CircularProgress /> : ...}` por esta primitive cuando el boton modela un command puntual.
 - Nuevas variants visuales, states o kinds semanticos deben iterarse dentro de estas primitives y en el Microinteractions Lab antes de crear `FooSubmitButton`, `FooValidation`, `FooStatusPulse`, `FooFeedbackCard` o componentes locales equivalentes. Una variant nueva debe cambiar comportamiento, densidad, state model, action placement o microinteraction contract; nunca solo color/radius/icono.
-
 
 ## Delta 2026-06-06d — Greenhouse Loading Surface
 
@@ -885,7 +910,6 @@ Contrato:
 - `Lottie` o `GSAP` solo deben entrar en una variant o consumer si el Loading Lab demuestra que aportan valor claro y conservan reduced-motion.
 - GVC requerido para variants nuevas o cambios visuales materiales; el scenario `design-system-loaders` captura desktop + mobile.
 
-
 ## Delta 2026-06-06c — Dashboard Floating Action Dock
 
 Greenhouse adopta **Dashboard Floating Action Dock** como primitive shell para acciones flotantes persistentes ancladas al viewport. El dock gobierna la columna bottom-right del dashboard y evita que cada accion global defina `position: fixed`, `bottom`, `right` y `z-index` por separado.
@@ -912,7 +936,6 @@ Contrato:
 - Mobile debe respetar `env(safe-area-inset-bottom)` y mantener el fallback drawer de los consumers que lo requieran.
 - Toda accion persistente nueva debe declarar si pertenece al dock; no puede agregar otro fixed bottom-right global sin revisar el collision model.
 
-
 ## Delta 2026-06-06b — Greenhouse Floating Surface
 
 Greenhouse adopta **Floating UI** como engine canonico para superficies contextuales ancladas: popovers, menus, rich tooltips, evidence peeks, inline editors, validation bubbles y command previews.
@@ -932,7 +955,6 @@ Contrato:
 - Floating Surface cubre UI anclada, transiente y contextual. Para carriles full-height usar `AdaptiveSidecar`; para destructivo/legal/financiero/maker-checker usar `Dialog`; para workflows largos usar sidecar/drawer/stepper segun dominio.
 - Toda adopcion visible debe verificar keyboard, Escape/outside dismissal, focus return, collision near viewport edge y scroll containment con tests + GVC.
 
-
 ## Delta 2026-06-06 — Primitive + Variants + Kinds methodology
 
 Greenhouse adopta **Primitive + Variants + Kinds** como metodologia canonica para desarrollar UI reusable de producto.
@@ -951,7 +973,6 @@ Contrato:
 - Nuevas primitives o ampliaciones de primitives deben declarar sus variants oficiales, mapear kinds relevantes y validar cada variant con GVC cuando la UI sea visible.
 - No crear familias paralelas (`FooDrawer`, `FooInspector`, `FooAssistant`) si una primitive + variants cubre el problema.
 - No introducir variants que solo cambian color/radius/icono.
-
 
 ## Delta 2026-06-05 — Adaptive Sidecar UI Platform
 
@@ -979,7 +1000,6 @@ Contratos:
 - Toda adopcion debe declarar URL mode (`ephemeral`/`addressable`), Back behavior, collision model, dirty guard, scroll containment, AI redaction si aplica e instrumentation hooks.
 - Toda adopcion runtime requiere GVC desktop closed/open + mobile temporary mode.
 
-
 ## Delta 2026-06-02 — `MetricTrendCard` primitive (KPI trend chart reutilizable)
 
 `MetricTrendCard` (`src/components/greenhouse/primitives/MetricTrendCard.tsx`,
@@ -1000,18 +1020,21 @@ trend card **funcional** con valores on-hover.)
 
 ```tsx
 import { MetricTrendCard } from '@/components/greenhouse/primitives'
-
-<MetricTrendCard
-  title='OTD%'                                   // código de métrica (prominente, h5)
-  metricName='On-Time Delivery'                  // nombre completo (gris, al lado)
-  periodLabel='Mensual · May 2026'               // cadencia + período explícito
-  value={100}                                    // hero (mes ancla)
-  series={[{ label: 'Feb', value: 98.2 }, /* … */]}  // oldest → newest, value|null
-  tone='success'                                 // success | warning | error (semáforo)
-  format='percentage'                            // percentage | integer | decimal
+;<MetricTrendCard
+  title='OTD%' // código de métrica (prominente, h5)
+  metricName='On-Time Delivery' // nombre completo (gris, al lado)
+  periodLabel='Mensual · May 2026' // cadencia + período explícito
+  value={100} // hero (mes ancla)
+  series={[{ label: 'Feb', value: 98.2 } /* … */]} // oldest → newest, value|null
+  tone='success' // success | warning | error (semáforo)
+  format='percentage' // percentage | integer | decimal
   deltaUnit='pts'
-  menuOptions={[/* OptionMenu items */]}         // 3-dot opcional
-  dataCapture='person-trend-otd'                 // hook GVC opcional
+  menuOptions={
+    [
+      /* OptionMenu items */
+    ]
+  } // 3-dot opcional
+  dataCapture='person-trend-otd' // hook GVC opcional
 />
 ```
 
@@ -1030,7 +1053,6 @@ import { MetricTrendCard } from '@/components/greenhouse/primitives'
 - **NUNCA** derivar el `tone` de un período distinto al que muestra el hero (bug class GVC: el color debe salir del valor mostrado, no del mes en curso).
 
 **Verificación GVC**: escenario `person-activity-trend-microinteractions` (`scripts/frontend/scenarios/`) captura tooltip OTD/FTR, hover-lift y semáforo. **Primer consumer**: Person 360 → Activity (`PersonActivityTab.tsx`), OTD%/FTR% month-over-month.
-
 
 ## Delta 2026-05-08 — Organization Workspace Shell (TASK-612)
 
@@ -1051,7 +1073,7 @@ foundation. Patrón reusable por múltiples entrypoints organization-first
   enumerados con copy es-CL tuteo, sin tabs ni acciones.
 - `FacetContentRouter.tsx` — registry lazy-loaded de los 9 facets canónicos
   via `dynamic(() => import('@/views/greenhouse/organizations/facets/<Name>Facet'),
-  { ssr: false })`. Suspense fallback con label es-CL. Defense-in-depth guard
+{ ssr: false })`. Suspense fallback con label es-CL. Defense-in-depth guard
   contra facets desconocidos.
 - `types.ts` — `FacetContentProps` (organizationId, entrypointContext,
   relationship, fieldRedactions[facet], projection completa read-only),
@@ -1123,7 +1145,6 @@ source: TASK-611 V1.1 que difiere generalizaciones hasta que duela.
 **Spec canónica**: `docs/architecture/GREENHOUSE_ORGANIZATION_WORKSPACE_PROJECTION_V1.md`
 V1.1 (Delta 2026-05-08 recalibración pre-execution).
 
-
 ## Delta 2026-05-06c — TASK-430 i18n runtime activation
 
 El runtime i18n del App Router ya está activo.
@@ -1150,7 +1171,6 @@ Reglas nuevas:
 
 Access model: sin cambios en `routeGroups`, `views`, `entitlements` ni startup policy.
 
-
 ## Delta 2026-05-06b — TASK-428 i18n architecture decision
 
 La arquitectura i18n canónica vive en [`GREENHOUSE_I18N_ARCHITECTURE_V1.md`](./GREENHOUSE_I18N_ARCHITECTURE_V1.md).
@@ -1167,7 +1187,6 @@ Decisiones vigentes:
 
 Access model: sin cambios en `routeGroups`, `views`, `entitlements` ni startup policy. Locale es preferencia de presentación, no autorización.
 
-
 ## Delta 2026-05-06 — TASK-811 nomenclature domain microcopy trim
 
 `src/config/greenhouse-nomenclature.ts` deja de ser el contenedor de domain microcopy. Su contrato activo queda acotado a:
@@ -1178,15 +1197,15 @@ Access model: sin cambios en `routeGroups`, `views`, `entitlements` ni startup p
 
 El microcopy reutilizable de dominios vive ahora en módulos type-safe bajo `src/lib/copy/`:
 
-| Módulo | Exports |
-| --- | --- |
-| `src/lib/copy/agency.ts` | `GH_AGENCY` |
-| `src/lib/copy/client-portal.ts` | `GH_LABELS`, `GH_TEAM`, `GH_MESSAGES` |
-| `src/lib/copy/admin.ts` | `GH_INTERNAL_MESSAGES` |
-| `src/lib/copy/pricing.ts` | `GH_PRICING`, `GH_PRICING_GOVERNANCE` |
-| `src/lib/copy/workforce.ts` | `GH_SKILLS_CERTS`, `GH_TALENT_DISCOVERY`, `GH_CLIENT_TALENT` |
-| `src/lib/copy/finance.ts` | `GH_MRR_ARR_DASHBOARD` |
-| `src/lib/copy/payroll.ts` | `GH_PAYROLL_PROJECTED_ARIA` |
+| Módulo                          | Exports                                                      |
+| ------------------------------- | ------------------------------------------------------------ |
+| `src/lib/copy/agency.ts`        | `GH_AGENCY`                                                  |
+| `src/lib/copy/client-portal.ts` | `GH_LABELS`, `GH_TEAM`, `GH_MESSAGES`                        |
+| `src/lib/copy/admin.ts`         | `GH_INTERNAL_MESSAGES`                                       |
+| `src/lib/copy/pricing.ts`       | `GH_PRICING`, `GH_PRICING_GOVERNANCE`                        |
+| `src/lib/copy/workforce.ts`     | `GH_SKILLS_CERTS`, `GH_TALENT_DISCOVERY`, `GH_CLIENT_TALENT` |
+| `src/lib/copy/finance.ts`       | `GH_MRR_ARR_DASHBOARD`                                       |
+| `src/lib/copy/payroll.ts`       | `GH_PAYROLL_PROJECTED_ARIA`                                  |
 
 Reglas nuevas:
 
@@ -1202,17 +1221,16 @@ Guardrail runtime/mockup:
 - Si una experiencia aprobada debe promocionarse a runtime, extraer primero un shell compartido fuera de `/mockup/`; el mockup importa ese shell con datos/copy de mockup y el runtime lo importa con datos/copy productivos.
 - ESLint bloquea regresiones con `greenhouse/no-runtime-mockup-import`.
 
-
 ## Delta 2026-05-07 — Operational UI primitives para dashboards y health surfaces
 
 Las surfaces operativas que combinan KPIs, paneles de salud, señales, riesgos o runbooks deben reutilizar primitives compartidas antes de crear shells locales con `Box` + bordes + chips. La familia canónica vive en `src/components/greenhouse/primitives/`:
 
-| Primitive | Uso |
-| --- | --- |
-| `OperationalPanel` | Secciones operativas con `Card + CardHeader + CardContent`, icon slot, acción y padding/radius del theme. |
-| `MetricSummaryCard` | KPIs operativos con valor honesto, fallback textual para datos nulos, icon slot y badge de estado opcional. |
-| `OperationalStatusBadge` | Badge pequeño para estados reales (`Estable`, `Sin muestra`, `Requiere revisión`); no reemplaza contenedores. |
-| `OperationalSignalList` | Señales/riesgos/runbooks como lista o grid sobrio con padding interno suficiente, código técnico opcional y acción recomendada. |
+| Primitive                | Uso                                                                                                                             |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------- |
+| `OperationalPanel`       | Secciones operativas con `Card + CardHeader + CardContent`, icon slot, acción y padding/radius del theme.                       |
+| `MetricSummaryCard`      | KPIs operativos con valor honesto, fallback textual para datos nulos, icon slot y badge de estado opcional.                     |
+| `OperationalStatusBadge` | Badge pequeño para estados reales (`Estable`, `Sin muestra`, `Requiere revisión`); no reemplaza contenedores.                   |
+| `OperationalSignalList`  | Señales/riesgos/runbooks como lista o grid sobrio con padding interno suficiente, código técnico opcional y acción recomendada. |
 
 Reglas:
 
@@ -1220,7 +1238,6 @@ Reglas:
 - Full pill (`9999`) queda reservado para chips pequeños; contenedores grandes usan `theme.shape.customBorderRadius.*`.
 - Copy visible de señales debe venir de `src/lib/copy/*` o del reader/adapter canonizado del dominio; no mezclar `steady/stale/outcome/threshold` visibles en runtime es-CL.
 - Estados nulos no se renderizan como `0`, `0%` o `$0` salvo que el cero sea dato real confirmado.
-
 
 ## Delta 2026-05-05 — Quote Builder primitives extraction Sprint 3 (TASK-498)
 
@@ -1241,27 +1258,14 @@ src/components/greenhouse/primitives/
 Generic sticky-bottom cockpit primitive. Chasis canónico de cualquier builder enterprise (quote, invoice, purchase order, contract, finiquito, statement of work). Layout 3-zona Grid 3/6/3 en md+, single-column en xs.
 
 ```tsx
-import {
-  EntitySummaryDock,
-  TotalsLadder,
-  type EntitySummaryDockSaveState
-} from '@/components/greenhouse/primitives'
-
-<EntitySummaryDock
+import { EntitySummaryDock, TotalsLadder, type EntitySummaryDockSaveState } from '@/components/greenhouse/primitives'
+;<EntitySummaryDock
   ariaLabel='Resumen de la cotización'
   saveState={{ kind: 'dirty', changeCount: 2 }}
   marginIndicator={{ classification: 'healthy', marginPct: 0.494, tierRange: null }}
-  centerSlot={
-    <TotalsLadder
-      subtotal={2923500}
-      factor={1.15}
-      ivaAmount={558345}
-      total={3921845}
-      currency='CLP'
-    />
-  }
+  centerSlot={<TotalsLadder subtotal={2923500} factor={1.15} ivaAmount={558345} total={3921845} currency='CLP' />}
   emptyStateMessage='Agrega ítems para ver el total.' /* fallback cuando centerSlot=null */
-  simulationError='Error al simular precios.'        /* opcional, alert top */
+  simulationError='Error al simular precios.' /* opcional, alert top */
   primaryCta={{
     label: 'Guardar y emitir',
     onClick: () => handleSubmit(),
@@ -1289,8 +1293,7 @@ Card header con title + badge inline. Pattern enterprise (Linear / Notion / Stri
 
 ```tsx
 import { CardHeaderWithBadge } from '@/components/greenhouse/primitives'
-
-<CardHeaderWithBadge
+;<CardHeaderWithBadge
   title='Ítems de la cotización'
   badgeValue={draftLines.length}
   badgeColor={draftLines.length === 0 ? 'secondary' : 'primary'}
@@ -1339,9 +1342,10 @@ Props:
 
 ```tsx
 import { ContextChipStrip, ContextChip } from '@/components/greenhouse/primitives'
-
-<ContextChipStrip ariaLabel='Filtros de cotización' overflowAfter={6}>
-  {fields.map(f => <ContextChip key={f.id} {...f} />)}
+;<ContextChipStrip ariaLabel='Filtros de cotización' overflowAfter={6}>
+  {fields.map(f => (
+    <ContextChip key={f.id} {...f} />
+  ))}
 </ContextChipStrip>
 ```
 
@@ -1361,18 +1365,17 @@ A11y: el chip overflow tiene `aria-haspopup='menu' aria-expanded` + `aria-contro
 
 Reusable platform-wide. Sin domain logic. Tokens canónicos (`customBorderRadius.lg`, `theme.palette.divider`, `theme.zIndex.appBar - 2`). Apto para Quote / Invoice / Purchase Order / Contract / Reconciliation Workbench / HR Profile / Settings.
 
-
 ## Delta 2026-05-04 — Quick Access Shortcuts Platform (TASK-553)
 
 Tres capas canónicas reemplazan los arrays de shortcuts hardcodeados que vivían en `vertical/NavbarContent.tsx` y `horizontal/NavbarContent.tsx`. Home y header ahora resuelven shortcuts desde la misma fuente autorizada.
 
 ### Capas
 
-| Capa | Fuente | Persistencia | Visibilidad |
-|------|--------|--------------|-------------|
-| **Recommended** | Top-N (default 4) ordenado por `audienceKey` desde `AUDIENCE_SHORTCUT_ORDER` | No | Filtrado por acceso real |
-| **Available** | Catálogo completo filtrado por dual-plane gate | No | Drives flujo `+ Agregar acceso` |
-| **Pinned** | `greenhouse_core.user_shortcut_pins` (per-user) | PG, CASCADE on user delete | Revalidado server-side en cada lectura |
+| Capa            | Fuente                                                                       | Persistencia               | Visibilidad                            |
+| --------------- | ---------------------------------------------------------------------------- | -------------------------- | -------------------------------------- |
+| **Recommended** | Top-N (default 4) ordenado por `audienceKey` desde `AUDIENCE_SHORTCUT_ORDER` | No                         | Filtrado por acceso real               |
+| **Available**   | Catálogo completo filtrado por dual-plane gate                               | No                         | Drives flujo `+ Agregar acceso`        |
+| **Pinned**      | `greenhouse_core.user_shortcut_pins` (per-user)                              | PG, CASCADE on user delete | Revalidado server-side en cada lectura |
 
 ### Componentes canónicos
 
@@ -1398,12 +1401,12 @@ Las tres dimensiones se AND-ean. La `validateShortcutAccess` retorna `false` par
 
 ### API canónica
 
-| Method | Path | Propósito |
-|--------|------|----------|
-| GET    | `/api/me/shortcuts` | `{ recommended, available, pinned }` para el usuario actual |
-| POST   | `/api/me/shortcuts` | Pin idempotente. Body: `{ shortcutKey }`. Valida acceso server-side |
+| Method | Path                              | Propósito                                                                             |
+| ------ | --------------------------------- | ------------------------------------------------------------------------------------- |
+| GET    | `/api/me/shortcuts`               | `{ recommended, available, pinned }` para el usuario actual                           |
+| POST   | `/api/me/shortcuts`               | Pin idempotente. Body: `{ shortcutKey }`. Valida acceso server-side                   |
 | DELETE | `/api/me/shortcuts/[shortcutKey]` | Unpin idempotente (sin gate de acceso — un usuario puede siempre quitar lo que pineó) |
-| PUT    | `/api/me/shortcuts/order` | Reorder atómico. Body: `{ orderedKeys: string[] }` |
+| PUT    | `/api/me/shortcuts/order`         | Reorder atómico. Body: `{ orderedKeys: string[] }`                                    |
 
 Auth: `getServerAuthSession` + capability `home.shortcuts:read` + `validateShortcutAccess` server-side antes de cualquier write. Errores sanitizados con `redactErrorForResponse` + `captureWithDomain('home', ...)`.
 
@@ -1420,17 +1423,16 @@ Auth: `getServerAuthSession` + capability `home.shortcuts:read` + `validateShort
 - **NUNCA** mezclar el shape de header (`{key, label, subtitle, route, icon, module}`) con el legacy de Home (`{id, label, route, icon, module}`). Use `projectShortcutForHome` cuando necesite el shape legacy.
 - Cuando emerja una surface nueva (Mi Greenhouse, command palette, settings personales) que necesite shortcuts adaptativos, debe consumir el resolver — no copiar el catálogo.
 
-
 ## Delta 2026-05-02 — Copy System Contract (TASK-265)
 
 Toda string visible al usuario en Greenhouse EO vive en una de **dos capas canónicas**, separadas por propósito y locale-aware desde día uno. Cualquier hardcode en JSX es drift y será bloqueado por la rule ESLint `greenhouse/no-untokenized-copy` (modo `error` post cierre TASK-408).
 
 ### Las dos capas
 
-| Capa | Path | Propósito | Locale-aware |
-|---|---|---|---|
-| **Product nomenclature** | `src/config/greenhouse-nomenclature.ts` | Lenguaje propio del producto: Pulse, Spaces, Ciclos, Mi Greenhouse, Torre de control. Navegación. Labels institucionales del shell. | No (es-CL only por design) |
-| **Functional shared microcopy** | `src/lib/copy/` (TASK-265) | CTAs base, estados operativos, loading/processing, empty states, meses, aria-labels, errores genéricos, feedback toasts, tiempo relativo, copy institucional de emails. | Sí (`es-CL` default, `en-US` stub para TASK-266) |
+| Capa                            | Path                                    | Propósito                                                                                                                                                               | Locale-aware                                     |
+| ------------------------------- | --------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------ |
+| **Product nomenclature**        | `src/config/greenhouse-nomenclature.ts` | Lenguaje propio del producto: Pulse, Spaces, Ciclos, Mi Greenhouse, Torre de control. Navegación. Labels institucionales del shell.                                     | No (es-CL only por design)                       |
+| **Functional shared microcopy** | `src/lib/copy/` (TASK-265)              | CTAs base, estados operativos, loading/processing, empty states, meses, aria-labels, errores genéricos, feedback toasts, tiempo relativo, copy institucional de emails. | Sí (`es-CL` default, `en-US` stub para TASK-266) |
 
 ### API pública del módulo de microcopy
 
@@ -1503,6 +1505,7 @@ const subject = t.emails.subjects.payrollExport('Marzo 2026', 4)
 Las surfaces 404, 401, access denied, coming soon, maintenance y rutas no disponibles deben tratarse como microcopy funcional de producto, no como texto decorativo. La regla canonica es brand + recuperacion: el mensaje puede tener personalidad, pero siempre debe dejar claro que paso y que camino tomar.
 
 Contrato:
+
 - guardar variantes reutilizables en `src/lib/copy/dictionaries/<locale>/...` y tiparlas en `src/lib/copy/types.ts`
 - usar 3 a 5 variantes curadas cuando la surface lo amerite; seleccionarlas una vez al entrar a la pantalla
 - no rotar mensajes mientras el usuario lee ni cambiar CTAs por variante
@@ -1560,12 +1563,12 @@ Esto es válido pero requiere review por skill `greenhouse-ux-writing` para tono
 
 ESLint rule `greenhouse/no-untokenized-copy` (TASK-265 Slice 5a) detecta:
 
-| Pattern | Mensaje accionable |
-|---|---|
-| `aria-label='X'` literal | Use `getMicrocopy().aria.<key>` |
-| `{ label: 'Pendiente' }` en status maps | Use `getMicrocopy().states.<key>` |
-| `'Cargando...'` / `'Guardando...'` literales | Use `getMicrocopy().loading.<key>` |
-| `'Sin datos'` / `'Sin resultados'` literales | Use `getMicrocopy().empty.<key>` |
+| Pattern                                                                | Mensaje accionable                                  |
+| ---------------------------------------------------------------------- | --------------------------------------------------- |
+| `aria-label='X'` literal                                               | Use `getMicrocopy().aria.<key>`                     |
+| `{ label: 'Pendiente' }` en status maps                                | Use `getMicrocopy().states.<key>`                   |
+| `'Cargando...'` / `'Guardando...'` literales                           | Use `getMicrocopy().loading.<key>`                  |
+| `'Sin datos'` / `'Sin resultados'` literales                           | Use `getMicrocopy().empty.<key>`                    |
 | `label`/`placeholder`/`helperText`/`title`/`subtitle` literales en JSX | Use `getMicrocopy()` o `greenhouse-nomenclature.ts` |
 
 Excluidos por scope: `src/components/theme/**`, `src/@core/**`, `src/app/global-error.tsx`, `src/app/public/**`, `src/emails/**`, `src/lib/finance/pdf/**`, tests.
@@ -1679,7 +1682,6 @@ Esta task (TASK-265) NO crea adapter ejecutable para Kortex; solo deja la separa
 - `eslint-plugins/greenhouse/rules/no-untokenized-copy.mjs` — gate ESLint
 - `~/.claude/skills/greenhouse-ux-writing/skill.md` — skill governance (tono, anti-patterns, decision tree)
 
-
 ## Delta 2026-05-01 — Operational Data Table Density Contract (TASK-743)
 
 Toda tabla operativa con celdas editables inline o > 8 columnas vive bajo el contrato de densidad canonico. Resuelve el overflow horizontal contra `compactContentWidth: 1440` de manera declarativa, robusta y escalable.
@@ -1695,7 +1697,6 @@ Toda tabla operativa con celdas editables inline o > 8 columnas vive bajo el con
 - **Visual regression**: `e2e/visual/payroll-table-density.spec.ts`.
 
 Reglas duras estan en `CLAUDE.md` y `AGENTS.md` (seccion "Operational Data Table Density Contract").
-
 
 ## Delta 2026-04-26b — ESLint 9 flat config (TASK-514)
 
@@ -1750,12 +1751,25 @@ Quedan **`off`** porque la spec exige migración 1:1 (mismo baseline pre/post). 
 ```js
 // eslint.config.mjs (resumen)
 export default [
-  { ignores: [/* generated, vendored, docs, etc. */] },
-  ...nextCoreWebVitals,           // Next 16 + react-hooks + jsx-a11y + import (registered)
+  {
+    ignores: [
+      /* generated, vendored, docs, etc. */
+    ]
+  },
+  ...nextCoreWebVitals, // Next 16 + react-hooks + jsx-a11y + import (registered)
   ...tseslint.configs.recommended, // typescript-eslint metapackage
-  { rules: { /* convenciones del portal */ } },
-  { files: ['**/*.ts', '**/*.tsx', 'src/iconify-bundle/**'], rules: { /* TS-only overrides */ } },
-  prettierConfig                    // disable rules conflicting with prettier (last)
+  {
+    rules: {
+      /* convenciones del portal */
+    }
+  },
+  {
+    files: ['**/*.ts', '**/*.tsx', 'src/iconify-bundle/**'],
+    rules: {
+      /* TS-only overrides */
+    }
+  },
+  prettierConfig // disable rules conflicting with prettier (last)
 ]
 ```
 
@@ -1772,7 +1786,6 @@ export default [
 - Cualquier nuevo dev override va al objeto custom rules de `eslint.config.mjs` (no agregar archivos `.eslintrc.*` nuevos).
 - Para overrides per-directorio, usar bloques flat con `files: ['src/foo/**']` + `rules: { ... }`.
 - Para temporalmente silenciar una regla en un archivo concreto, mantener `// eslint-disable-next-line <rule>` (sin cambios — flat config respeta la sintaxis).
-
 
 ## Delta 2026-04-26 — Server state con React Query (TASK-513)
 
@@ -1810,11 +1823,11 @@ queryClient.invalidateQueries({ queryKey: qk.finance.quotes.all })
 
 Cada recurso server-side tiene su hook custom en `src/hooks/use<Resource>.ts` que envuelve `useQuery` con su queryKey, queryFn y overrides apropiados de cache. Tres ejemplos shipping en V1:
 
-| Hook | Endpoint | Override |
-|---|---|---|
-| `useQuotesList(filters)` | `/api/finance/quotes` | defaults |
-| `usePricingConfig()` | `/api/finance/quotes/pricing/config` | `staleTime: 5min`, `gcTime: 30min`, `refetchOnWindowFocus: false` (catalog data) |
-| `usePeopleList()` | `/api/people` | defaults |
+| Hook                     | Endpoint                             | Override                                                                         |
+| ------------------------ | ------------------------------------ | -------------------------------------------------------------------------------- |
+| `useQuotesList(filters)` | `/api/finance/quotes`                | defaults                                                                         |
+| `usePricingConfig()`     | `/api/finance/quotes/pricing/config` | `staleTime: 5min`, `gcTime: 30min`, `refetchOnWindowFocus: false` (catalog data) |
+| `usePeopleList()`        | `/api/people`                        | defaults                                                                         |
 
 ### Migration cheatsheet
 
@@ -1829,7 +1842,10 @@ const load = useCallback(async () => {
   if (res.ok) setData(await res.json())
 }, [])
 
-useEffect(() => { void load(); setLoading(false) }, [load])
+useEffect(() => {
+  void load()
+  setLoading(false)
+}, [load])
 ```
 
 Después:
@@ -1880,7 +1896,6 @@ void queryClient.invalidateQueries({ queryKey: qk.x.all })
 - Migración progresiva del resto de fetches (~100+ lugares) en olas por dominio: finance, hr, agency, admin.
 - `useMutation` canónico para los flujos save/issue del Quote Builder con optimistic updates.
 
-
 ## Delta 2026-04-25c — `react-toastify` → `sonner` (TASK-512)
 
 Reemplazamos `react-toastify 11.0.5` por **sonner 2.0** como librería canónica de toasts del portal. Sonner es el estándar 2024-2026 que usan Vercel, Linear, Resend y shadcn: stack visual moderno (pinch effect tipo iOS notifications), bundle ~4 KB (vs ~30 KB de react-toastify), `toast.promise()` integrado, swipe dismiss en mobile, keyboard shortcut `Alt+T`, y theme bridge con CSS vars.
@@ -1891,14 +1906,7 @@ Reemplazamos `react-toastify 11.0.5` por **sonner 2.0** como librería canónica
 
 ```tsx
 import { Toaster } from 'sonner'
-
-<Toaster
-  position='top-right'
-  richColors
-  closeButton
-  theme='system'
-  duration={4000}
-/>
+;<Toaster position='top-right' richColors closeButton theme='system' duration={4000} />
 ```
 
 - `position='top-right'` preserva el placement convención del portal (mismo que tenía `react-toastify` desde antes).
@@ -1945,7 +1953,6 @@ Los 60 consumers existentes solo cambiaron la línea de import:
 - 59 archivos de `src/views/*` — codemod del import.
 - `src/views/greenhouse/finance/workspace/QuoteBuilderShell.tsx` — `autoClose` → `duration`, drop `position` (5 callsites).
 - `src/views/greenhouse/finance/FinancePeriodClosureDashboardView.test.tsx` — mock `'sonner'`.
-
 
 ## Delta 2026-04-25 — Navigation transitions con View Transitions API (TASK-525)
 
@@ -2003,7 +2010,6 @@ await startViewTransition(() => {
 - `src/components/greenhouse/motion/ViewTransitionLink.tsx` — Link drop-in.
 - `src/app/globals.css` — keyframes `greenhouse-view-transition-fade-{in,out}` + reduced-motion guard.
 
-
 ## Delta 2026-06-06 — Greenhouse Floating Surface primitive (TASK-1033)
 
 La capa de plataforma que el Delta 2026-04-20b anticipaba (Floating UI como engine, wrapper Greenhouse pendiente) ya existe. El contrato Floating UI dejó de vivir duplicado en cada consumer: ahora hay una primitive canónica.
@@ -2016,14 +2022,14 @@ ADR: `docs/architecture/GREENHOUSE_FLOATING_SURFACE_DECISION_V1.md` (Accepted 20
 - **`floating-surface-controller.ts`** — fuente única (pura, testeable) de los unions `variant`/`kind`, el contrato congelado por variant (`FLOATING_SURFACE_VARIANT_CONFIG`) y el resolver idempotente `resolveFloatingSurfaceVariant({ variant?, kind? })`.
 - **6 variants oficiales V1** con contrato de a11y por variant:
 
-  | variant | role | interaction | focus managed | outside dismiss | placement |
-  |---|---|---|---|---|---|
-  | `richTooltip` | tooltip | hover + focus | no | sí | top |
-  | `actionMenu` | menu | click | sí (+ return) | sí | bottom-start |
-  | `evidencePeek` | dialog | click | sí (+ return) | sí | bottom-start |
-  | `inlineEditor` | dialog | click | sí (+ return) | **no** (dirty seguro) | bottom-start |
-  | `validationBubble` | tooltip | hover + focus | no | sí | bottom-start |
-  | `commandPreview` | tooltip | hover + focus | no | sí | right-start |
+  | variant            | role    | interaction   | focus managed | outside dismiss       | placement    |
+  | ------------------ | ------- | ------------- | ------------- | --------------------- | ------------ |
+  | `richTooltip`      | tooltip | hover + focus | no            | sí                    | top          |
+  | `actionMenu`       | menu    | click         | sí (+ return) | sí                    | bottom-start |
+  | `evidencePeek`     | dialog  | click         | sí (+ return) | sí                    | bottom-start |
+  | `inlineEditor`     | dialog  | click         | sí (+ return) | **no** (dirty seguro) | bottom-start |
+  | `validationBubble` | tooltip | hover + focus | no            | sí                    | bottom-start |
+  | `commandPreview`   | tooltip | hover + focus | no            | sí                    | right-start  |
 
 - **Shape canónica**: `<GreenhouseFloatingSurface variant='evidencePeek' kind='costProvenance' />` (metodología Primitive + Variants + Kinds).
 
@@ -2048,7 +2054,6 @@ Ambos dejaron de importar `@floating-ui/react`; paridad visual + focus preservad
 
 `GreenhouseFieldProvenancePeek` sigue usando Floating UI ad-hoc (es primitive/infra, no view de producto) — candidato a adoptar la primitive en un follow-up.
 
-
 ## Delta 2026-04-20b — Floating UI como stack oficial de popovers (TASK-509 / TASK-510)
 
 ### Decisión de plataforma
@@ -2056,6 +2061,7 @@ Ambos dejaron de importar `@floating-ui/react`; paridad visual + focus preservad
 `@floating-ui/react` (v0.27+) pasa a ser el stack canónico para cualquier popover nuevo en el portal. Reemplaza progresivamente a `@mui/material/Popper` (basado en popper.js v2, legacy 2019). Es el stack que usan en 2024-2026 Linear, Stripe, Vercel, Radix, shadcn, Notion.
 
 **Motivación**:
+
 - Recuperación de stale-anchor vía `autoUpdate` (ResizeObserver + IntersectionObserver + MutationObserver).
 - Middleware composable: `offset`, `flip`, `shift`, `size`, `arrow`, `hide`.
 - A11y hooks integrados: `useRole`, `useDismiss`, `useClick`, `useHover`, `useFocus`.
@@ -2120,6 +2126,7 @@ const MyPopoverPrimitive = ({ content, ...triggerProps }) => {
 ### Middleware defaults
 
 Para popovers enterprise del portal:
+
 - `offset(8)` — separación de 8px entre reference y floating.
 - `flip({ fallbackAxisSideDirection: 'end' })` — si no cabe top-start, cae a bottom-end antes que centrar.
 - `shift({ padding: 16 })` — mantiene 16px de viewport padding al hacer shift.
@@ -2134,7 +2141,6 @@ Hasta que TASK-510 complete la migración platform-wide, `@mui/material/Popper` 
 
 - `TotalsLadder` (TASK-509) — segmento inline de addons.
 
-
 ## Delta 2026-04-20 — TotalsLadder `addonsSegment` prop (TASK-507)
 
 Extensión del primitive `TotalsLadder` para soportar un segmento interactivo inline dentro de la ladder de ajustes. Pattern observado en Notion / Linear / Stripe Billing: cuando un ajuste es **clickeable** (abre un detalle), debe vivir con los otros ajustes, no flotar como chip aparte.
@@ -2143,8 +2149,7 @@ Extensión del primitive `TotalsLadder` para soportar un segmento interactivo in
 
 ```tsx
 import { TotalsLadder, type TotalsLadderAddonsSegment } from '@/components/greenhouse/primitives'
-
-<TotalsLadder
+;<TotalsLadder
   subtotal={2923500}
   factor={1.15}
   ivaAmount={558345}
@@ -2171,6 +2176,7 @@ Subtotal $2.923.500  ·  ✨ 1 addon $196.134  ·  Factor ×1,15  ·  IVA $558.3
 ```
 
 Affordance de botón:
+
 - Hover → `color: primary.main` + `textDecoration: underline` (150ms).
 - Focus-visible → outline primary, offset 2px.
 - `aria-expanded` refleja el popover state.
@@ -2184,9 +2190,9 @@ Affordance de botón:
 - `count === 0` → no renderiza (el segmento se omite de la ladder).
 
 ### Consumers
+
 - `QuoteSummaryDock` (TASK-507) — reemplaza el chip redondo de zone 3 por este segmento inline.
 - Patrón aplicable a: invoice dock, purchase order footer, contract summary — cualquier dock con total + ajustes clickeables.
-
 
 ## Delta 2026-04-19 — Summary dock primitives extraction (TASK-505)
 
@@ -2208,15 +2214,15 @@ Indicador de save lifecycle para docks sticky-bottom o footers de forms enterpri
 
 ```tsx
 import { SaveStateIndicator, type SaveStateKind } from '@/components/greenhouse/primitives'
-
-<SaveStateIndicator
-  state='dirty'                    // 'clean' | 'dirty' | 'saving' | 'saved'
-  changeCount={2}                  // opcional, solo para 'dirty'
-  lastSavedAt={new Date()}         // opcional, solo para 'saved'
+;<SaveStateIndicator
+  state='dirty' // 'clean' | 'dirty' | 'saving' | 'saved'
+  changeCount={2} // opcional, solo para 'dirty'
+  lastSavedAt={new Date()} // opcional, solo para 'saved'
 />
 ```
 
 Estados y color del dot:
+
 - `clean` — gris `action.disabled`.
 - `dirty` — `warning.main`. Caption muestra `N cambios`.
 - `saving` — `info.main` + `@keyframes save-dot-pulse` 1200ms infinite. Respeta `prefers-reduced-motion` (cae a opacidad fija).
@@ -2230,11 +2236,10 @@ Status chip semantic con 3 niveles (healthy / warning / critical) para KPIs de h
 
 ```tsx
 import { MarginHealthChip, type MarginClassification } from '@/components/greenhouse/primitives'
-
-<MarginHealthChip
-  classification='healthy'         // 'healthy' | 'warning' | 'critical'
-  marginPct={0.494}                // 0.0–1.0
-  tierRange={{ min: 0.4, opt: 0.5, max: 0.6, tierLabel: 'Tier 3' }}  // opcional
+;<MarginHealthChip
+  classification='healthy' // 'healthy' | 'warning' | 'critical'
+  marginPct={0.494} // 0.0–1.0
+  tierRange={{ min: 0.4, opt: 0.5, max: 0.6, tierLabel: 'Tier 3' }} // opcional
 />
 ```
 
@@ -2248,19 +2253,19 @@ Total prominent + adaptive ladder para docks de cotización, invoice, purchase o
 
 ```tsx
 import { TotalsLadder, type TotalsLadderCurrency } from '@/components/greenhouse/primitives'
-
-<TotalsLadder
+;<TotalsLadder
   subtotal={2923500}
-  factor={1.15}                    // factor país
-  ivaAmount={558345}               // IVA calculado
+  factor={1.15} // factor país
+  ivaAmount={558345} // IVA calculado
   total={3921845}
   currency='CLP'
   loading={false}
-  totalLabel='Total CLP'           // override opcional
+  totalLabel='Total CLP' // override opcional
 />
 ```
 
 Render adaptive:
+
 - Si `total === subtotal && factor ∈ {null, 1} && !ivaAmount` → solo el Total.
 - Si hay al menos un ajuste → overline `Total {currency}` + `h4` monto (text.primary, tabular-nums, fontWeight 600) + caption muted one-liner: `Subtotal $X · Factor ×1,15 · IVA $Y`.
 
@@ -2269,6 +2274,7 @@ Loading: `Skeleton variant='text' width=180 height=40`. Respeta `useReducedMotio
 ### Regla de primitives
 
 Componentes bajo `src/components/greenhouse/primitives/`:
+
 1. **Sin domain logic** — no importan de `@/lib/finance`, `@/lib/hr`, `@/lib/commercial`. Toman primitivos tipados y renderizan UI.
 2. **Tipos se exportan desde `index.ts`** — consumers importan `{ SaveStateIndicator, type SaveStateKind }` del barrel.
 3. **Accessible-by-default** — aria-label, aria-live, prefers-reduced-motion.
@@ -2277,17 +2283,16 @@ Componentes bajo `src/components/greenhouse/primitives/`:
 
 Esta regla se formaliza con TASK-505 y aplica desde TASK-498 (Sprint 3) en adelante.
 
-
 ## Delta 2026-04-11 — Professional profile patterns and certificate preview (TASK-313)
 
 ### SkillsCertificationsTab (shared component, dual-mode)
 
 `src/views/greenhouse/hr/certifications/SkillsCertificationsTab.tsx` is a shared tab component used in both self-service (`/my/profile`) and admin (`/people/:slug`) contexts.
 
-| Mode | Trigger | Capabilities |
-|------|---------|-------------|
-| `self` | User views own profile | Add/edit/delete own certifications, upload certificate file |
-| `admin` | HR/admin views a member | All of the above + verification workflow (verify/reject) |
+| Mode    | Trigger                 | Capabilities                                                |
+| ------- | ----------------------- | ----------------------------------------------------------- |
+| `self`  | User views own profile  | Add/edit/delete own certifications, upload certificate file |
+| `admin` | HR/admin views a member | All of the above + verification workflow (verify/reject)    |
 
 Mode is resolved at render time via props, not via route. The same component renders in both contexts with conditional actions.
 
@@ -2295,11 +2300,11 @@ Mode is resolved at render time via props, not via route. The same component ren
 
 `src/views/greenhouse/hr/certifications/CertificatePreviewDialog.tsx` — dialog for inline preview of uploaded certificate files.
 
-| File type | Render strategy |
-|-----------|----------------|
+| File type               | Render strategy                                          |
+| ----------------------- | -------------------------------------------------------- |
 | PDF (`application/pdf`) | `<iframe>` with `src={signedUrl}` inside `DialogContent` |
-| Image (`image/*`) | `<img>` with `object-fit: contain` |
-| Other | Download link fallback |
+| Image (`image/*`)       | `<img>` with `object-fit: contain`                       |
+| Other                   | Download link fallback                                   |
 
 Pattern: `Dialog maxWidth='md' fullWidth` with `DialogContent sx={{ minHeight: 400 }}`. The signed URL is fetched on dialog open, not pre-fetched.
 
@@ -2320,14 +2325,13 @@ Both cards reuse `CustomAvatar`, `CustomIconButton`, and the Card+CardContent Vu
 
 ### Key files
 
-| File | Purpose |
-|------|---------|
-| `src/views/greenhouse/hr/certifications/SkillsCertificationsTab.tsx` | Shared certifications tab (self/admin) |
-| `src/views/greenhouse/hr/certifications/CertificatePreviewDialog.tsx` | PDF/image inline preview dialog |
-| `src/views/greenhouse/hr/certifications/CertificationCard.tsx` | Individual certification card with status badge |
-| `src/views/greenhouse/people/cards/ProfessionalLinksCard.tsx` | Social/professional links sidebar card |
-| `src/views/greenhouse/people/cards/AboutMeCard.tsx` | About me free-text sidebar card |
-
+| File                                                                  | Purpose                                         |
+| --------------------------------------------------------------------- | ----------------------------------------------- |
+| `src/views/greenhouse/hr/certifications/SkillsCertificationsTab.tsx`  | Shared certifications tab (self/admin)          |
+| `src/views/greenhouse/hr/certifications/CertificatePreviewDialog.tsx` | PDF/image inline preview dialog                 |
+| `src/views/greenhouse/hr/certifications/CertificationCard.tsx`        | Individual certification card with status badge |
+| `src/views/greenhouse/people/cards/ProfessionalLinksCard.tsx`         | Social/professional links sidebar card          |
+| `src/views/greenhouse/people/cards/AboutMeCard.tsx`                   | About me free-text sidebar card                 |
 
 ## Delta 2026-04-10 — Org chart explorer visual stack (TASK-329)
 
@@ -2342,7 +2346,6 @@ Both cards reuse `CustomAvatar`, `CustomIconButton`, and the Card+CardContent Vu
 - El organigrama es una surface de lectura con zoom, pan, foco y quick actions.
 - La edición de jerarquía sigue viviendo fuera del canvas, en `HR > Jerarquía`.
 - Los nodos deben reutilizar primitives Greenhouse/Vuexy/MUI del portal antes de crear una estética paralela al resto de HR.
-
 
 ## Delta 2026-04-05 — Permission Sets UI patterns (TASK-263)
 
@@ -2372,19 +2375,28 @@ Regla: toda `<Card>` con `onClick` debe incluir `role="button"`, `tabIndex={0}`,
 Pattern estandar para confirmacion antes de eliminar o revocar:
 
 ```tsx
-<Dialog open={confirmOpen} onClose={() => setConfirmOpen(false)} maxWidth='xs' fullWidth aria-labelledby='confirm-title'>
+<Dialog
+  open={confirmOpen}
+  onClose={() => setConfirmOpen(false)}
+  maxWidth='xs'
+  fullWidth
+  aria-labelledby='confirm-title'
+>
   <DialogTitle id='confirm-title'>¿Eliminar «{itemName}»?</DialogTitle>
   <DialogContent>
     <DialogContentText>Esta acción no se puede deshacer. [consecuencia específica].</DialogContentText>
   </DialogContent>
   <DialogActions>
     <Button onClick={() => setConfirmOpen(false)}>Cancelar</Button>
-    <Button variant='contained' color='error' onClick={handleConfirm}>Eliminar [objeto]</Button>
+    <Button variant='contained' color='error' onClick={handleConfirm}>
+      Eliminar [objeto]
+    </Button>
   </DialogActions>
 </Dialog>
 ```
 
 Reglas:
+
 - Titulo como pregunta con nombre del objeto entre comillas latinas (« »)
 - Body describe la consecuencia, no repite el titulo
 - Boton destructivo: `variant='contained' color='error'`, label especifico ("Eliminar set", "Revocar acceso")
@@ -2415,8 +2427,12 @@ Pattern para asignar usuarios desde un buscador en vez de IDs crudos:
   options={availableUsers}
   getOptionLabel={opt => `${opt.fullName} (${opt.email})`}
   isOptionEqualToValue={(opt, val) => opt.userId === val.userId}
-  renderInput={params => <TextField {...params} label='Buscar usuarios' placeholder='Escribe un nombre...' size='small' />}
-  renderTags={(value, getTagProps) => value.map((opt, i) => <Chip {...getTagProps({ index: i })} key={opt.userId} label={opt.fullName} size='small' />)}
+  renderInput={params => (
+    <TextField {...params} label='Buscar usuarios' placeholder='Escribe un nombre...' size='small' />
+  )}
+  renderTags={(value, getTagProps) =>
+    value.map((opt, i) => <Chip {...getTagProps({ index: i })} key={opt.userId} label={opt.fullName} size='small' />)
+  }
   noOptionsText='No se encontraron usuarios disponibles'
 />
 ```
@@ -2429,8 +2445,13 @@ Mapa de colores por seccion de governance, exportado desde `src/lib/admin/view-a
 
 ```tsx
 export const SECTION_ACCENT: Record<string, 'primary' | 'info' | 'success' | 'warning' | 'secondary'> = {
-  gestion: 'info', equipo: 'success', finanzas: 'warning', ia: 'secondary',
-  administracion: 'primary', mi_ficha: 'secondary', cliente: 'success'
+  gestion: 'info',
+  equipo: 'success',
+  finanzas: 'warning',
+  ia: 'secondary',
+  administracion: 'primary',
+  mi_ficha: 'secondary',
+  cliente: 'success'
 }
 ```
 
@@ -2438,17 +2459,16 @@ Importar desde `@/lib/admin/view-access-catalog` en vez de duplicar en cada comp
 
 ### Archivos clave
 
-| Archivo | Proposito |
-|---------|-----------|
-| `src/views/greenhouse/admin/permission-sets/PermissionSetsTab.tsx` | Tab CRUD de sets de permisos |
-| `src/views/greenhouse/admin/users/UserAccessTab.tsx` | Tab "Accesos" en detalle de usuario |
-| `src/lib/admin/permission-sets.ts` | CRUD + resolucion de Permission Sets |
-| `src/lib/admin/view-access-catalog.ts` | VIEW_REGISTRY, GOVERNANCE_SECTIONS, SECTION_ACCENT |
-
+| Archivo                                                            | Proposito                                          |
+| ------------------------------------------------------------------ | -------------------------------------------------- |
+| `src/views/greenhouse/admin/permission-sets/PermissionSetsTab.tsx` | Tab CRUD de sets de permisos                       |
+| `src/views/greenhouse/admin/users/UserAccessTab.tsx`               | Tab "Accesos" en detalle de usuario                |
+| `src/lib/admin/permission-sets.ts`                                 | CRUD + resolucion de Permission Sets               |
+| `src/lib/admin/view-access-catalog.ts`                             | VIEW_REGISTRY, GOVERNANCE_SECTIONS, SECTION_ACCENT |
 
 ## Delta 2026-04-05 — Vuexy User View Pattern: sidebar profile + tabs (referencia para Mi Perfil)
 
-Patron enterprise de detalle de usuario extraido del full-version de Vuexy (`apps/user/view`). Aplicable a vistas self-service ("Mi *") donde el usuario ve su propia informacion.
+Patron enterprise de detalle de usuario extraido del full-version de Vuexy (`apps/user/view`). Aplicable a vistas self-service ("Mi \*") donde el usuario ve su propia informacion.
 
 ### Estructura en Vuexy full-version
 
@@ -2501,24 +2521,24 @@ src/views/apps/user/view/
 
 ### Decisiones de diseno
 
-| Decision | Justificacion |
-|----------|---------------|
-| Sidebar 4 + Tabs 8 | Identidad siempre visible; content area maximizada para tablas y forms |
-| `CustomTabList pill='true'` | Tabs con pill style coherente con el resto del portal |
-| `dynamic()` en cada tab | Lazy loading — solo carga el tab activo, mejor performance |
-| Stats con `CustomAvatar` + Typography | Patron reusable de Vuexy: icon avatar + numero + label |
-| Key-value details con `Typography font-medium` | Patron consistente: label bold + value regular |
-| `OpenDialogOnElementClick` para acciones | Dialogs modales para edit/delete/suspend sin navegacion |
+| Decision                                       | Justificacion                                                          |
+| ---------------------------------------------- | ---------------------------------------------------------------------- |
+| Sidebar 4 + Tabs 8                             | Identidad siempre visible; content area maximizada para tablas y forms |
+| `CustomTabList pill='true'`                    | Tabs con pill style coherente con el resto del portal                  |
+| `dynamic()` en cada tab                        | Lazy loading — solo carga el tab activo, mejor performance             |
+| Stats con `CustomAvatar` + Typography          | Patron reusable de Vuexy: icon avatar + numero + label                 |
+| Key-value details con `Typography font-medium` | Patron consistente: label bold + value regular                         |
+| `OpenDialogOnElementClick` para acciones       | Dialogs modales para edit/delete/suspend sin navegacion                |
 
 ### Diferencia con Person Detail View (TASK-168)
 
-| Aspecto | Person Detail View | User View (Mi Perfil) |
-|---------|-------------------|----------------------|
-| Layout | Horizontal header full-width + tabs below | Sidebar left + tabs right |
-| Uso | Admin ve a otro usuario | Usuario ve su propio perfil |
-| Actions | OptionMenu con acciones admin | Edit dialog (o read-only) |
-| Stats | `CardStatsSquare` en header | Stats inline en sidebar |
-| Tabs | 5 tabs domain-oriented (Profile, Economy, Delivery, Assignments, Activity) | Tabs self-service (Resumen, Seguridad, Mi Nomina, Mi Delivery) |
+| Aspecto | Person Detail View                                                         | User View (Mi Perfil)                                          |
+| ------- | -------------------------------------------------------------------------- | -------------------------------------------------------------- |
+| Layout  | Horizontal header full-width + tabs below                                  | Sidebar left + tabs right                                      |
+| Uso     | Admin ve a otro usuario                                                    | Usuario ve su propio perfil                                    |
+| Actions | OptionMenu con acciones admin                                              | Edit dialog (o read-only)                                      |
+| Stats   | `CardStatsSquare` en header                                                | Stats inline en sidebar                                        |
+| Tabs    | 5 tabs domain-oriented (Profile, Economy, Delivery, Assignments, Activity) | Tabs self-service (Resumen, Seguridad, Mi Nomina, Mi Delivery) |
 
 ### Cuando aplicar cada patron
 
@@ -2527,20 +2547,19 @@ src/views/apps/user/view/
 
 ### Componentes core reutilizables (ya migrados)
 
-| Componente | Archivo | Rol en User View |
-|-----------|---------|------------------|
-| `CustomAvatar` | `src/@core/components/mui/Avatar.tsx` | Avatar 120px rounded en sidebar |
-| `CustomTabList` | `src/@core/components/mui/TabList.tsx` | Tabs con pill style |
-| `CustomTextField` | `src/@core/components/mui/TextField.tsx` | Inputs en dialogs de edicion |
-| `CustomChip` | `src/@core/components/mui/Chip.tsx` | Chip de rol/estado en sidebar |
-| `OpenDialogOnElementClick` | `src/components/dialogs/OpenDialogOnElementClick.tsx` | Edit dialog trigger |
-| `CardStatsSquare` | `src/components/card-statistics/CardStatsSquare.tsx` | KPIs compactos |
-| `TablePaginationComponent` | `src/components/TablePaginationComponent.tsx` | Paginacion en tablas de tabs |
+| Componente                 | Archivo                                               | Rol en User View                |
+| -------------------------- | ----------------------------------------------------- | ------------------------------- |
+| `CustomAvatar`             | `src/@core/components/mui/Avatar.tsx`                 | Avatar 120px rounded en sidebar |
+| `CustomTabList`            | `src/@core/components/mui/TabList.tsx`                | Tabs con pill style             |
+| `CustomTextField`          | `src/@core/components/mui/TextField.tsx`              | Inputs en dialogs de edicion    |
+| `CustomChip`               | `src/@core/components/mui/Chip.tsx`                   | Chip de rol/estado en sidebar   |
+| `OpenDialogOnElementClick` | `src/components/dialogs/OpenDialogOnElementClick.tsx` | Edit dialog trigger             |
+| `CardStatsSquare`          | `src/components/card-statistics/CardStatsSquare.tsx`  | KPIs compactos                  |
+| `TablePaginationComponent` | `src/components/TablePaginationComponent.tsx`         | Paginacion en tablas de tabs    |
 
 ### Task de implementacion
 
 TASK-257 aplica este patron a Mi Perfil (`/my/profile`).
-
 
 ## Delta 2026-04-04 — TanStack React Table: componentes avanzados extraídos de Vuexy full-version
 
@@ -2548,16 +2567,16 @@ Se extrajeron los patrones avanzados de tabla del full-version de Vuexy como com
 
 ### Componentes disponibles
 
-| Componente | Archivo | Propósito |
-|------------|---------|-----------|
-| `EditableCell` | `src/components/EditableCell.tsx` | Celda editable inline con `onBlur` → `table.options.meta.updateData()` |
-| `ColumnFilter` | `src/components/ColumnFilter.tsx` | Filtro por columna: texto (búsqueda) o numérico (min/max range) |
-| `DebouncedInput` | `src/components/DebouncedInput.tsx` | Input con debounce 500ms para búsqueda global |
-| `TablePaginationComponent` | `src/components/TablePaginationComponent.tsx` | Paginación MUI integrada con TanStack |
-| `fuzzyFilter` | `src/components/tableUtils.ts` | Fuzzy filter via `@tanstack/match-sorter-utils` |
-| `buildSelectionColumn` | `src/components/tableUtils.ts` | Column definition de checkbox para row selection |
-| `getToggleableColumns` | `src/components/tableUtils.ts` | Helper para obtener columnas que pueden ocultarse |
-| `getColumnFacetedRange` | `src/components/tableUtils.ts` | Helper para obtener min/max de una columna numérica |
+| Componente                 | Archivo                                       | Propósito                                                              |
+| -------------------------- | --------------------------------------------- | ---------------------------------------------------------------------- |
+| `EditableCell`             | `src/components/EditableCell.tsx`             | Celda editable inline con `onBlur` → `table.options.meta.updateData()` |
+| `ColumnFilter`             | `src/components/ColumnFilter.tsx`             | Filtro por columna: texto (búsqueda) o numérico (min/max range)        |
+| `DebouncedInput`           | `src/components/DebouncedInput.tsx`           | Input con debounce 500ms para búsqueda global                          |
+| `TablePaginationComponent` | `src/components/TablePaginationComponent.tsx` | Paginación MUI integrada con TanStack                                  |
+| `fuzzyFilter`              | `src/components/tableUtils.ts`                | Fuzzy filter via `@tanstack/match-sorter-utils`                        |
+| `buildSelectionColumn`     | `src/components/tableUtils.ts`                | Column definition de checkbox para row selection                       |
+| `getToggleableColumns`     | `src/components/tableUtils.ts`                | Helper para obtener columnas que pueden ocultarse                      |
+| `getColumnFacetedRange`    | `src/components/tableUtils.ts`                | Helper para obtener min/max de una columna numérica                    |
 
 ### Patrón de tabla full-featured
 
@@ -2583,7 +2602,7 @@ const table = useReactTable({
   getPaginationRowModel: getPaginationRowModel(),
   meta: {
     updateData: (rowIndex, columnId, value) => {
-      setData(old => old.map((row, i) => i === rowIndex ? { ...row, [columnId]: value } : row))
+      setData(old => old.map((row, i) => (i === rowIndex ? { ...row, [columnId]: value } : row)))
     }
   }
 })
@@ -2592,6 +2611,7 @@ const table = useReactTable({
 ### TableMeta augmentation
 
 `tableUtils.ts` augmenta `TableMeta` con `updateData` para que `EditableCell` funcione sin type errors:
+
 ```typescript
 declare module '@tanstack/table-core' {
   interface TableMeta<TData extends RowData> {
@@ -2599,7 +2619,6 @@ declare module '@tanstack/table-core' {
   }
 }
 ```
-
 
 ## Delta 2026-04-04 — PeriodNavigator: componente reutilizable de navegación de período
 
@@ -2609,11 +2628,11 @@ Componente compartido para navegación de período mensual (año + mes). Consoli
 
 ### Variantes
 
-| Variante | Render | Caso de uso |
-|----------|--------|-------------|
-| `arrows` (default) | `< [Hoy] Abril 2026 >` | Header de cards, vistas de detalle |
-| `dropdowns` | `[Año ▼] [Mes ▼] [Hoy]` | Filtros de período en dashboards |
-| `compact` | `< Abr 2026 >` | Inline en tablas o espacios reducidos |
+| Variante           | Render                  | Caso de uso                           |
+| ------------------ | ----------------------- | ------------------------------------- |
+| `arrows` (default) | `< [Hoy] Abril 2026 >`  | Header de cards, vistas de detalle    |
+| `dropdowns`        | `[Año ▼] [Mes ▼] [Hoy]` | Filtros de período en dashboards      |
+| `compact`          | `< Abr 2026 >`          | Inline en tablas o espacios reducidos |
 
 ### Props
 
@@ -2622,11 +2641,11 @@ interface PeriodNavigatorProps {
   year: number
   month: number
   onChange: (period: { year: number; month: number }) => void
-  variant?: 'arrows' | 'dropdowns' | 'compact'  // default: 'arrows'
-  minYear?: number          // default: 2024
-  maxYear?: number          // default: currentYear + 1
-  showToday?: boolean       // default: true
-  todayLabel?: string       // default: 'Hoy'
+  variant?: 'arrows' | 'dropdowns' | 'compact' // default: 'arrows'
+  minYear?: number // default: 2024
+  maxYear?: number // default: currentYear + 1
+  showToday?: boolean // default: true
+  todayLabel?: string // default: 'Hoy'
   size?: 'small' | 'medium' // default: 'small'
   disabled?: boolean
 }
@@ -2636,11 +2655,13 @@ interface PeriodNavigatorProps {
 
 ```tsx
 import PeriodNavigator from '@/components/greenhouse/PeriodNavigator'
-
-<PeriodNavigator
+;<PeriodNavigator
   year={year}
   month={month}
-  onChange={({ year, month }) => { setYear(year); setMonth(month) }}
+  onChange={({ year, month }) => {
+    setYear(year)
+    setMonth(month)
+  }}
   variant='arrows'
 />
 ```
@@ -2648,6 +2669,7 @@ import PeriodNavigator from '@/components/greenhouse/PeriodNavigator'
 ### Vistas candidatas a migrar
 
 Las siguientes vistas usan selectores duplicados que deberían migrarse a `PeriodNavigator`:
+
 - `CostAllocationsView` (dropdowns inline)
 - `ProjectedPayrollView` (arrows inline)
 - `OrganizationEconomicsTab` (dropdowns inline)
@@ -2663,7 +2685,6 @@ Las siguientes vistas usan selectores duplicados que deberían migrarse a `Perio
 - Botón "Hoy" indica si ya estás en el período actual
 - `disabled` prop deshabilita todos los controles
 
-
 ## Delta 2026-04-03 — Cost Intelligence Dashboard (cost-allocations redesign)
 
 La vista `/finance/cost-allocations` fue rediseñada de un CRUD vacío a un dashboard de inteligencia de costos:
@@ -2674,7 +2695,6 @@ La vista `/finance/cost-allocations` fue rediseñada de un CRUD vacío a un dash
 Patrón aplicado: fetch paralelo de health actual + health período anterior para computar deltas. Las 4 KPI cards usan `HorizontalWithSubtitle` con `trend`/`trendNumber`/`statusLabel`/`footer` siguiendo el patrón canónico documentado abajo.
 
 Para costos: aumento = `'negative'` (rojo), disminución = `'positive'` (verde). Para conteos (clientes, personas): aumento = `'positive'`.
-
 
 ## Delta 2026-04-03 — GreenhouseFunnelCard: componente reutilizable de embudo
 
@@ -2688,36 +2708,37 @@ Componente de visualización de embudo/funnel para procesos secuenciales con eta
 interface FunnelStage {
   name: string
   value: number
-  color?: string                                    // Override de color por etapa
-  status?: 'success' | 'warning' | 'error'          // Semáforo override
+  color?: string // Override de color por etapa
+  status?: 'success' | 'warning' | 'error' // Semáforo override
 }
 
 interface GreenhouseFunnelCardProps {
   title: string
   subtitle?: string
-  avatarIcon?: string                               // Default: 'tabler-filter'
-  avatarColor?: ThemeColor                          // Default: 'primary'
+  avatarIcon?: string // Default: 'tabler-filter'
+  avatarColor?: ThemeColor // Default: 'primary'
   data: FunnelStage[]
-  height?: number                                   // Default: 280
-  showConversionBadges?: boolean                    // Default: true
-  showFooterSummary?: boolean                       // Default: true
+  height?: number // Default: 280
+  showConversionBadges?: boolean // Default: true
+  showFooterSummary?: boolean // Default: true
   onStageClick?: (stage: FunnelStage, index: number) => void
 }
 ```
 
 ### Paleta secuencial por defecto (cuando no hay semáforo)
 
-| Posición | Token | Hex | Razón |
-|----------|-------|-----|-------|
-| Etapa 1 (tope) | `primary` | `#7367F0` | Punto de entrada |
-| Etapa 2 | `info` | `#00BAD1` | Calificación |
-| Etapa 3 | `warning` | `#ff6500` | Punto de decisión |
-| Etapa 4 | `error` | `#bb1954` | Punto crítico de conversión |
-| Etapa 5+ (fondo) | `success` | `#6ec207` | Completación |
+| Posición         | Token     | Hex       | Razón                       |
+| ---------------- | --------- | --------- | --------------------------- |
+| Etapa 1 (tope)   | `primary` | `#7367F0` | Punto de entrada            |
+| Etapa 2          | `info`    | `#00BAD1` | Calificación                |
+| Etapa 3          | `warning` | `#ff6500` | Punto de decisión           |
+| Etapa 4          | `error`   | `#bb1954` | Punto crítico de conversión |
+| Etapa 5+ (fondo) | `success` | `#6ec207` | Completación                |
 
 ### Footer inteligente
 
 Auto-genera dos insights:
+
 1. **Conversión total**: `lastStage.value / firstStage.value × 100`
 2. **Etapa crítica**: la etapa con mayor caída % vs anterior. Si todas ≥ 80% → "Flujo saludable"
 
@@ -2736,7 +2757,6 @@ Auto-genera dos insights:
 - Onboarding: Contacto → Propuesta → Contrato → Setup → Activo
 - Cualquier proceso secuencial con `FunnelStage[]`
 
-
 ## Delta 2026-04-03 — Helpers canónicos de comparativa + patrones de KPI cards
 
 ### Helpers reutilizables de comparativa
@@ -2745,21 +2765,22 @@ Dos archivos canónicos para cualquier vista que necesite mostrar deltas entre p
 
 **`src/lib/finance/currency-comparison.ts`** — funciones puras, importable desde client Y server:
 
-| Función | Propósito | Ejemplo de uso |
-|---------|-----------|----------------|
-| `consolidateCurrencyEquivalents(totals, usdToClp)` | Convierte multi-currency `{ USD, CLP }` a totales consolidados CLP y USD | Cards de Nómina, Finance |
-| `computeCurrencyDelta(current, compare, rate, label)` | Computa `grossDeltaPct`, `netDeltaPct`, `compareLabel`, `grossReference`, `netReference` | Cards con "vs oficial" o "vs 2026-03" |
-| `payrollTrendDirection(deltaPct)` | Para costos: subir = `'negative'`, bajar = `'positive'` | Prop `trend` de `HorizontalWithSubtitle` |
-| `formatDeltaLabel(deltaPct, label)` | `"5% vs 2026-03"` | Prop `trendNumber` de `HorizontalWithSubtitle` |
+| Función                                               | Propósito                                                                                | Ejemplo de uso                                 |
+| ----------------------------------------------------- | ---------------------------------------------------------------------------------------- | ---------------------------------------------- |
+| `consolidateCurrencyEquivalents(totals, usdToClp)`    | Convierte multi-currency `{ USD, CLP }` a totales consolidados CLP y USD                 | Cards de Nómina, Finance                       |
+| `computeCurrencyDelta(current, compare, rate, label)` | Computa `grossDeltaPct`, `netDeltaPct`, `compareLabel`, `grossReference`, `netReference` | Cards con "vs oficial" o "vs 2026-03"          |
+| `payrollTrendDirection(deltaPct)`                     | Para costos: subir = `'negative'`, bajar = `'positive'`                                  | Prop `trend` de `HorizontalWithSubtitle`       |
+| `formatDeltaLabel(deltaPct, label)`                   | `"5% vs 2026-03"`                                                                        | Prop `trendNumber` de `HorizontalWithSubtitle` |
 
 **`src/lib/payroll/period-comparison.ts`** — server-only, queries PostgreSQL:
 
-| Función | Propósito |
-|---------|-----------|
+| Función                                           | Propósito                                                       |
+| ------------------------------------------------- | --------------------------------------------------------------- |
 | `getPreviousOfficialPeriodTotals(beforePeriodId)` | Último período oficial (`approved`/`exported`) anterior al dado |
-| `getOfficialPeriodTotals(periodId)` | Oficial del mismo período |
+| `getOfficialPeriodTotals(periodId)`               | Oficial del mismo período                                       |
 
 Patrón de uso en API routes:
+
 ```typescript
 import { consolidateCurrencyEquivalents } from '@/lib/finance/currency-comparison'
 import { getPreviousOfficialPeriodTotals } from '@/lib/payroll/period-comparison'
@@ -2769,6 +2790,7 @@ const consolidated = consolidateCurrencyEquivalents(totals, usdToClp)
 ```
 
 Patrón de uso en views (client):
+
 ```typescript
 import { computeCurrencyDelta, payrollTrendDirection, formatDeltaLabel } from '@/lib/finance/currency-comparison'
 
@@ -2804,26 +2826,27 @@ const delta = computeCurrencyDelta(current, compareSource, fxRate, 'vs 2026-03')
 
 Toda vista que muestre métricas operativas debe incluir comparativa vs período anterior. No mostrar números aislados sin contexto.
 
-
 ## Delta 2026-03-31 — Shared uploader pattern
 
 `TASK-173` ya deja un patrón canónico de upload para el portal:
+
 - componente shared `src/components/greenhouse/GreenhouseFileUploader.tsx`
 - base visual y funcional:
   - `react-dropzone`
   - `src/libs/styles/AppReactDropzone.ts`
 
 Regla de plataforma:
+
 - si una surface del portal necesita adjuntos, debe intentar reutilizar `GreenhouseFileUploader` antes de crear un uploader propio
 - la personalización por módulo debe vivir en props, labels, allowed mime types y aggregate context
 - no copiar el demo de Vuexy inline en cada módulo
-
 
 ## Delta 2026-03-30 — View Governance UI ya es parte de la plataforma
 
 `/admin/views` ya no debe leerse como experimento aislado.
 
 La plataforma UI ahora asume un patrón explícito de gobernanza de vistas:
+
 - catálogo de superficies gobernables por `view_code`
 - matrix por rol como superficie de administración
 - preview por usuario con lectura efectiva
@@ -2832,12 +2855,12 @@ La plataforma UI ahora asume un patrón explícito de gobernanza de vistas:
 
 Esto convierte `Admin Center > Vistas y acceso` en un componente de plataforma, no en una pantalla ad hoc.
 
-
 ## Delta 2026-03-30 — capability modules cliente entran al modelo gobernable
 
 La sección `Módulos` del portal cliente ya no debe tratarse como navegación libre derivada solo desde `routeGroups`.
 
 Estado vigente:
+
 - `cliente.modulos` es el access point gobernable del carril `/capabilities/**`
 - el menú solo debe exponer capability modules cuando la sesión conserve esa vista
 - el acceso al layout dinámico debe pasar dos checks:
@@ -2845,7 +2868,6 @@ Estado vigente:
   - autorización específica del módulo (`verifyCapabilityModuleAccess`)
 
 Esto deja explícito que los capability modules son parte del modelo de gobierno del portal y no un apéndice fuera de `/admin/views`.
-
 
 ## Delta 2026-03-31 — Person Detail View: Enterprise Redesign Pattern (TASK-168)
 
@@ -2869,28 +2891,29 @@ Reemplaza el patrón anterior de sidebar izquierdo + contenido derecho con:
 
 ### Decisiones de diseño validadas (research enterprise UX 2026)
 
-| Decisión | Justificación |
-|----------|---------------|
-| Header horizontal > sidebar | Top-rail layout maximiza content area ([Pencil & Paper](https://www.pencilandpaper.io/articles/ux-pattern-analysis-data-dashboards)) |
-| Tabs consolidados (9→5) | Máx 5-6 tabs evitan overflow; agrupar por dominio lógico |
+| Decisión                           | Justificación                                                                                                                                      |
+| ---------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Header horizontal > sidebar        | Top-rail layout maximiza content area ([Pencil & Paper](https://www.pencilandpaper.io/articles/ux-pattern-analysis-data-dashboards))               |
+| Tabs consolidados (9→5)            | Máx 5-6 tabs evitan overflow; agrupar por dominio lógico                                                                                           |
 | Progressive disclosure (Accordion) | "Carefully sequencing when users encounter features" ([FuseLab 2026](https://fuselabcreative.com/enterprise-ux-design-guide-2026-best-practices/)) |
-| Campos vacíos omitidos | Reducir ruido: no renderizar "—" dashes en DOM |
-| Admin actions en OptionMenu | Quick actions accesibles desde cualquier tab, sin clutterear la UI |
-| Integration status con chips | Texto + icon + color (no solo ✓/✗) para WCAG 2.2 AA |
-| Legacy URL redirects | Backward-compatible: `?tab=compensation` → `?tab=economy` |
+| Campos vacíos omitidos             | Reducir ruido: no renderizar "—" dashes en DOM                                                                                                     |
+| Admin actions en OptionMenu        | Quick actions accesibles desde cualquier tab, sin clutterear la UI                                                                                 |
+| Integration status con chips       | Texto + icon + color (no solo ✓/✗) para WCAG 2.2 AA                                                                                                |
+| Legacy URL redirects               | Backward-compatible: `?tab=compensation` → `?tab=economy`                                                                                          |
 
 ### Componentes del patrón
 
-| Componente | Archivo | Rol |
-|-----------|---------|-----|
-| `PersonProfileHeader` | `views/greenhouse/people/PersonProfileHeader.tsx` | Header horizontal con avatar, KPIs, admin OptionMenu |
-| `PersonProfileTab` | `views/greenhouse/people/tabs/PersonProfileTab.tsx` | 3 Accordion sections: datos laborales, identidad, actividad |
-| `PersonEconomyTab` | `views/greenhouse/people/tabs/PersonEconomyTab.tsx` | Compensación card + nómina accordion + costos accordion |
-| `CardStatsSquare` | `components/card-statistics/CardStatsSquare.tsx` | KPI pill compacto en headers |
+| Componente            | Archivo                                             | Rol                                                         |
+| --------------------- | --------------------------------------------------- | ----------------------------------------------------------- |
+| `PersonProfileHeader` | `views/greenhouse/people/PersonProfileHeader.tsx`   | Header horizontal con avatar, KPIs, admin OptionMenu        |
+| `PersonProfileTab`    | `views/greenhouse/people/tabs/PersonProfileTab.tsx` | 3 Accordion sections: datos laborales, identidad, actividad |
+| `PersonEconomyTab`    | `views/greenhouse/people/tabs/PersonEconomyTab.tsx` | Compensación card + nómina accordion + costos accordion     |
+| `CardStatsSquare`     | `components/card-statistics/CardStatsSquare.tsx`    | KPI pill compacto en headers                                |
 
 ### Cuándo aplicar este patrón
 
 Usar para **cualquier entity detail view** que tenga:
+
 - Identidad (avatar, nombre, estado)
 - 4+ secciones de contenido
 - Acciones admin contextuales
@@ -2905,7 +2928,6 @@ Candidatos: Organization Detail, Space Detail, Client Detail, Provider Detail.
 - Cada accordion header: `Avatar variant='rounded' skin='light'` + `Typography h6` + subtitle
 - Divider entre summary y details
 - `disableGutters elevation={0}` en el Accordion interno, Card wrapper con border
-
 
 ## Delta 2026-04-06 — Mi Perfil rich view: Vuexy user-profile pattern (TASK-272)
 
@@ -2944,24 +2966,24 @@ src/views/greenhouse/my/my-profile/
 
 ### Tabs
 
-| Tab | Contenido | Componente |
-|-----|-----------|------------|
-| Perfil | Sobre mi, Contacto, Actividad reciente (timeline), Equipos, Colegas | `AboutOverview` + `ActivityTimeline` + `ConnectionsTeams` |
-| Equipos | Espacios/clientes donde esta asignado | teams components |
-| Proyectos | Proyectos con progreso y detalle (TanStack table + fuzzy search) | projects components |
-| Colegas | Miembros del mismo departamento/organizacion | connections components |
-| Seguridad | Configuracion de seguridad (pendiente) | placeholder |
+| Tab       | Contenido                                                           | Componente                                                |
+| --------- | ------------------------------------------------------------------- | --------------------------------------------------------- |
+| Perfil    | Sobre mi, Contacto, Actividad reciente (timeline), Equipos, Colegas | `AboutOverview` + `ActivityTimeline` + `ConnectionsTeams` |
+| Equipos   | Espacios/clientes donde esta asignado                               | teams components                                          |
+| Proyectos | Proyectos con progreso y detalle (TanStack table + fuzzy search)    | projects components                                       |
+| Colegas   | Miembros del mismo departamento/organizacion                        | connections components                                    |
+| Seguridad | Configuracion de seguridad (pendiente)                              | placeholder                                               |
 
 ### Data fetching
 
 4 APIs en paralelo desde `MyProfileView.tsx`:
 
-| API | Datos |
-|-----|-------|
-| `GET /api/my/profile` | person_360: nombre, cargo, departamento, fecha ingreso, contacto |
-| `GET /api/my/assignments` | asignaciones activas a espacios/clientes |
-| `GET /api/my/leave` | solicitudes de permisos (para activity timeline) |
-| `GET /api/my/organization/members` | miembros del departamento/organizacion |
+| API                                | Datos                                                            |
+| ---------------------------------- | ---------------------------------------------------------------- |
+| `GET /api/my/profile`              | person_360: nombre, cargo, departamento, fecha ingreso, contacto |
+| `GET /api/my/assignments`          | asignaciones activas a espacios/clientes                         |
+| `GET /api/my/leave`                | solicitudes de permisos (para activity timeline)                 |
+| `GET /api/my/organization/members` | miembros del departamento/organizacion                           |
 
 La capa de transformacion en `MyProfileView.tsx` mapea las respuestas de API a props compatibles con los componentes Vuexy adaptados.
 
@@ -2975,24 +2997,23 @@ La capa de transformacion en `MyProfileView.tsx` mapea las respuestas de API a p
 
 ### Componentes Vuexy reutilizados
 
-| Componente Vuexy | Uso en Mi Perfil |
-|-------------------|------------------|
-| `CustomAvatar` | Avatar en header |
-| `CustomChip` | Badges de estado, departamento |
-| `CustomTabList` | Tabs con pill style |
-| MUI `Timeline` (Lab) | Activity timeline con solicitudes |
-| TanStack `useReactTable` + `fuzzyFilter` | Tabla de proyectos con busqueda |
+| Componente Vuexy                         | Uso en Mi Perfil                  |
+| ---------------------------------------- | --------------------------------- |
+| `CustomAvatar`                           | Avatar en header                  |
+| `CustomChip`                             | Badges de estado, departamento    |
+| `CustomTabList`                          | Tabs con pill style               |
+| MUI `Timeline` (Lab)                     | Activity timeline con solicitudes |
+| TanStack `useReactTable` + `fuzzyFilter` | Tabla de proyectos con busqueda   |
 
 ### Diferencia con Person Detail View (TASK-168)
 
-| Aspecto | Person Detail View | Mi Perfil (TASK-272) |
-|---------|-------------------|---------------------|
-| Layout | Horizontal header + accordions | Gradient banner header + tabs |
-| Modelo Vuexy | `apps/user/view` (sidebar + tabs) | `pages/user-profile` (banner + tabs) |
-| Uso | Admin ve perfil de OTRA persona | Usuario ve SU propio perfil |
-| Interacciones | OptionMenu con acciones admin | Read-only, sin acciones admin |
-| Datos | person_360 completo (admin scope) | person_360 propio + asignaciones + permisos |
-
+| Aspecto       | Person Detail View                | Mi Perfil (TASK-272)                        |
+| ------------- | --------------------------------- | ------------------------------------------- |
+| Layout        | Horizontal header + accordions    | Gradient banner header + tabs               |
+| Modelo Vuexy  | `apps/user/view` (sidebar + tabs) | `pages/user-profile` (banner + tabs)        |
+| Uso           | Admin ve perfil de OTRA persona   | Usuario ve SU propio perfil                 |
+| Interacciones | OptionMenu con acciones admin     | Read-only, sin acciones admin               |
+| Datos         | person_360 completo (admin scope) | person_360 propio + asignaciones + permisos |
 
 ---
 
@@ -3032,6 +3053,7 @@ Registro de versiones que vivía en el front-matter de `GREENHOUSE_UI_PLATFORM_V
 > **Updated:** 2026-04-20 — v1.3: Floating UI (`@floating-ui/react` 0.27) introducido como stack oficial de positioning para popovers (TASK-509). Primer consumer: `TotalsLadder`. TASK-510 backlog migra el resto. Ver Delta 2026-04-20b abajo.
 > **Updated:** 2026-04-20 — v1.2: `TotalsLadder` primitive extiende su API con `addonsSegment?: { count, amount, onClick, ariaExpanded } | null` (TASK-507) para renderizar un segmento interactivo inline dentro de la ladder de ajustes. Pattern: acciones contextuales viven con sus datos, no como chips flotantes separados. Ver Delta 2026-04-20 abajo.
 > **Updated:** 2026-04-19 — v1.1: registry de primitives `src/components/greenhouse/primitives/` gana 3 componentes nuevos extraídos de `QuoteSummaryDock` (TASK-505). Ver Delta 2026-04-19 abajo.
+
 ## Delta 2026-06-07 — TASK-1050 Geometry foundations
 
 Se agrego la referencia viva interna `/admin/design-system/geometry` para spacing/radius base. La pagina renderiza AXIS `Gap/Padding 1..16 + 25` desde `theme.spacing(N)`, AXIS `Border-Radius xs..xl` desde `theme.shape.customBorderRadius`, `Border-Round` como `9999px`/`50%`, y la extension Greenhouse `xxl=12` / `display=16` para superficies grandes. `xxl/display` viven en el theme y tipos MUI; no son valores AXIS upstream ni deben aplicarse a tablas, inputs, menus o cards densas. Scenario GVC: `design-system-geometry`.

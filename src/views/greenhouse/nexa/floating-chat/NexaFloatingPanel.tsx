@@ -16,6 +16,7 @@ import { AssistantRuntimeProvider, useAui, useAuiState } from '@assistant-ui/rea
 
 import { GREENHOUSE_NEXA_BRAND_COLORS } from '@/components/greenhouse/primitives/greenhouse-nexa-brand-controller'
 import { NexaFace, NexaPresenceMark } from '@/components/greenhouse/primitives'
+import NexaModeMenu from '@/components/greenhouse/NexaModeMenu'
 import { GH_NEXA } from '@/lib/copy/nexa'
 import {
   mapThreadMessagesToInitial,
@@ -489,6 +490,8 @@ const NexaFloatingPanel = ({ expanded, onToggleExpanded, onClose }: NexaFloating
         </Stack>
 
         {/* Controles del header — mismo hover (círculo gris) en los tres, vía HeaderIconButton */}
+        {/* TASK-1079 — selector de modo (dock/expandible/lane) — solo aparece con >1 modo disponible. */}
+        <NexaModeMenu tone='onNavy' />
         <HeaderIconButton icon='tabler-plus' label={COPY.new_conversation_aria} onClick={handleNewConversation} iconSize='1.15rem' restOpacity={1} />
         <HeaderIconButton
           icon={expanded ? 'tabler-arrows-diagonal-minimize-2' : 'tabler-arrows-diagonal'}

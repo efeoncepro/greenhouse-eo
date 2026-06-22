@@ -3,7 +3,7 @@
 > **Tipo de documento:** Documentación funcional (lenguaje simple)
 > **Versión:** 1.0
 > **Creado:** 2026-06-11 por Claude (TASK-1081)
-> **Última actualización:** 2026-06-12 por Codex (TASK-1090)
+> **Última actualización:** 2026-06-18 por Codex (TASK-1155)
 > **Documentación técnica:** [GREENHOUSE_KNOWLEDGE_PLATFORM_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_KNOWLEDGE_PLATFORM_ARCHITECTURE_V1.md) · [GREENHOUSE_KNOWLEDGE_PLATFORM_DECISION_V1.md](../../architecture/GREENHOUSE_KNOWLEDGE_PLATFORM_DECISION_V1.md)
 
 ## Qué es
@@ -98,6 +98,7 @@ El conocimiento no se escribe a mano en Greenhouse: se **ingiere** desde una fue
 - **De dónde viene hoy:** el corpus son **archivos del repositorio** (manuales y docs que ya existen). Empezó con 15 documentos piloto (TASK-1082) y se amplió a **82** al sumar el paquete de manuales operativos end-to-end (TASK-1140: Finance, People/Workforce/Payroll/Contractors, Comercial, Agency, Identity, My Space, Portal Cliente, Integraciones/Sync, Comunicaciones, AI Tooling, Admin Center, Public Site y UI Platform). Cuando se conecte un teamspace de Notion de conocimiento (TASK-1088), entrarán también desde ahí — pero el flujo es el mismo.
 - **La revisión de seguridad va primero:** si un documento trae un secreto, un dato personal o una instrucción que intente "controlar" a Nexa, se pone en **cuarentena** (no se publica ni Nexa lo puede usar) hasta limpiarlo.
 - **Es idempotente:** re-correr la ingesta no duplica nada; solo publica una versión nueva si el contenido cambió de verdad.
+- **Los embeddings nacen con la publicación:** desde TASK-1155, cuando un documento se publica o se sincroniza, Greenhouse embebe automáticamente los chunks de esa versión para que el brazo vector del retrieval híbrido vea el contenido nuevo sin esperar una corrida manual. Si Vertex falla, el documento queda publicado igual y Nexa degrada honesto a búsqueda full-text hasta el próximo reintento/backfill.
 - **Es auditada:** cada corrida queda registrada (qué se publicó, qué se puso en cuarentena, qué se omitió).
 
 > Detalle técnico: el pipeline de ingesta vive en `src/lib/knowledge/ingestion/` y `src/lib/knowledge/sanitization/`. Operar la foundation (aplicar migración, ingerir el corpus, usar los helpers): ver el [manual de uso](../../manual-de-uso/plataforma/knowledge-platform.md).

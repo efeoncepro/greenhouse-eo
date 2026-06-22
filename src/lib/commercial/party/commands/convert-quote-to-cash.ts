@@ -119,16 +119,20 @@ const lockQuotation = async (
 
 const transitionQuotationToConverted = async (
   client: QueryableClient,
-  quotationId: string
+  quotationId: string,
+  incomeId: string | null
 ): Promise<void> => {
+  // TASK-1206: enlaza converted_to_income_id cuando el orquestador ya materializó el
+  // income (COALESCE para no pisar un enlace previo con null si no se pasa).
   await client.query(
     `UPDATE greenhouse_commercial.quotations
         SET status = 'converted',
             converted_at = COALESCE(converted_at, NOW()),
+            converted_to_income_id = COALESCE($2, converted_to_income_id),
             updated_at = NOW()
       WHERE quotation_id = $1
         AND status IN ('issued', 'sent', 'approved')`,
-    [quotationId]
+    [quotationId, incomeId]
   )
 }
 
@@ -200,7 +204,8 @@ export const convertQuoteToCash = async (
           dealWonEmitted: false,
           requiresApproval: priorOp.status === 'pending_approval',
           approvalId: priorOp.approval_id,
-          message: `Idempotent hit — quotation already processed (operation ${priorOp.operation_id}).`
+          message: `Idempotent hit — quotation already processed (operation ${priorOp.operation_id}).`,
+          incomeId: quotation.converted_to_income_id ?? input.incomeId ?? null
         }
       }
 
@@ -239,7 +244,8 @@ export const convertQuoteToCash = async (
         dealWonEmitted: false,
         requiresApproval: false,
         approvalId: null,
-        message: 'Quote already converted before Fase G audit substrate existed.'
+        message: 'Quote already converted before Fase G audit substrate existed.',
+        incomeId: quotation.converted_to_income_id ?? input.incomeId ?? null
       }
     }
 
@@ -325,9 +331,10 @@ export const convertQuoteToCash = async (
     }
 
     try {
-      // Step 1 — transition quote → converted. Must happen before the
-      // contract lifecycle helper so the derived contract status is `active`.
-      await transitionQuotationToConverted(client, quotationId)
+      // Step 1 — transition quote → converted (linking income when the orchestrator
+      // already materialized it). Must happen before the contract lifecycle helper so
+      // the derived contract status is `active`.
+      await transitionQuotationToConverted(client, quotationId, input.incomeId ?? null)
 
       // Step 2 — create or reuse the contract.
       const contract = await ensureContractForQuotation({
@@ -488,7 +495,8 @@ export const convertQuoteToCash = async (
         approvalId: null,
         message: organizationPromoted
           ? 'Quote converted, contract activated, party promoted to active_client.'
-          : 'Quote converted, contract activated.'
+          : 'Quote converted, contract activated.',
+        incomeId: input.incomeId ?? null
       }
     } catch (error) {
       const code = error instanceof Error && 'code' in error && typeof (error as { code?: string }).code === 'string'

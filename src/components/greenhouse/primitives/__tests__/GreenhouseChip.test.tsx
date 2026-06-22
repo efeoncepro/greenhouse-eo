@@ -44,4 +44,28 @@ describe('GreenhouseChip', () => {
     fireEvent.click(getByLabelText('Quitar Julio'))
     expect(onDelete).toHaveBeenCalledTimes(1)
   })
+
+  it('supports the spotlight badge variant without replacing the chip contract', () => {
+    const { getByText } = renderWithTheme(
+      <GreenhouseChip label='Fresh Launch' variant='spotlight' tone='success' kind='status' dataCapture='chip-launch' />
+    )
+
+    const chip = getByText('Fresh Launch').closest('.MuiChip-root')
+
+    expect(chip).toHaveAttribute('data-variant', 'spotlight')
+    expect(chip).toHaveAttribute('data-tone', 'success')
+    expect(chip).toHaveAttribute('data-kind', 'status')
+    expect(chip).toHaveAttribute('data-capture', 'chip-launch')
+  })
+
+  it('renders the signal dot affordance for live status chips', () => {
+    const { getByText } = renderWithTheme(
+      <GreenhouseChip label='Status Monitoring' variant='signal' tone='info' kind='status' />
+    )
+
+    const chip = getByText('Status Monitoring').closest('.MuiChip-root')
+
+    expect(chip).toHaveAttribute('data-variant', 'signal')
+    expect(chip?.querySelector('.gh-chip-signal-dot')).toBeInTheDocument()
+  })
 })

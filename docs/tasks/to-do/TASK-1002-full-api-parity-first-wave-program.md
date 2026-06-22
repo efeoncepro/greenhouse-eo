@@ -1,5 +1,9 @@
 # TASK-1002 — Full API Parity First Wave Program
 
+## Delta 2026-06-20
+
+- El gap audit (TASK-1172) ya entregó el **backlog priorizado y re-medible** que este programa necesitaba: `docs/architecture/GREENHOUSE_FULL_API_PARITY_GAP_LEDGER_V1.md` + reader `scripts/audit/full-api-parity-coverage.ts`. Snapshot base: 217 capabilities (15% governed), 71% de mutation routes session-coarse, 0% de capabilities accionables por Nexa. Las 3 tasks de remediación derivadas (TASK-1177 write operability, TASK-1178 backfill capability session-coarse, TASK-1179 read-contracts organization+client_portal) son candidatas a la primera ola — re-correr el reader mide el avance.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"

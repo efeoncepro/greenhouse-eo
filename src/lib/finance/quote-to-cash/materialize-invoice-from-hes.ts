@@ -15,6 +15,10 @@ import {
   serializeIncomeTaxSnapshot
 } from '@/lib/finance/income-tax-snapshot'
 import { createFinanceIncomeInPostgres } from '@/lib/finance/postgres-store-slice2'
+import { FinanceValidationError } from '@/lib/finance/shared'
+import { buildClfIncomeProjection } from '@/lib/finance/multi-currency/clf-income-projection'
+import { persistFxSnapshot } from '@/lib/finance/multi-currency/fx-snapshot-store'
+import { isFinanceClfIncomeProjectionEnabled } from '@/lib/finance/multi-currency/flags'
 
 export interface MaterializeInvoiceFromHesActor {
   userId: string
@@ -33,6 +37,20 @@ export interface MaterializeInvoiceFromHesResult {
   contractId: string
   sourceHesId: string
   totalAmountClp: number
+}
+
+/**
+ * TASK-1206 — resultado del primitive idempotente de income (enterprise/HES branch). NO marca
+ * la cotización `converted` ni crea el contrato (eso lo hace `convertQuoteToCash` después, vía
+ * `closeQuoteToCash`). `created=false` en un replay (la HES ya estaba materializada) — NUNCA un
+ * segundo income.
+ */
+export interface EnsureIncomeFromHesResult {
+  incomeId: string
+  quotationId: string
+  sourceHesId: string
+  totalAmountClp: number
+  created: boolean
 }
 
 interface HesRow extends Record<string, unknown> {
@@ -76,6 +94,33 @@ interface ClientNameRow extends Record<string, unknown> {
   client_name: string | null
 }
 
+/** Campos de escritura del income, sin `incomeId`/`contractId` (los inyecta cada caller). */
+type HesIncomeWriteFields = Omit<
+  Parameters<typeof createFinanceIncomeInPostgres>[0],
+  'incomeId' | 'contractId'
+>
+
+const HES_SELECT_SQL = `
+  SELECT hes_id, hes_number, purchase_order_id, client_id, organization_id, space_id,
+         service_description, amount, currency, amount_clp, amount_authorized_clp,
+         status, income_id, quotation_id
+    FROM greenhouse_finance.service_entry_sheets
+    WHERE hes_id = $1
+    FOR UPDATE`
+
+const QUOTATION_FOR_HES_SELECT_SQL = `
+  SELECT q.quotation_id, q.client_id, q.organization_id, q.space_id, q.client_name_cache,
+         q.status, q.converted_to_income_id, q.current_version,
+         q.tax_rate, q.tax_amount, q.tax_code, q.tax_rate_snapshot, q.tax_amount_snapshot,
+         q.tax_snapshot_json, q.tax_snapshot_frozen_at,
+         q.hubspot_deal_id,
+         o.hubspot_company_id AS organization_hubspot_company_id
+    FROM greenhouse_commercial.quotations q
+    LEFT JOIN greenhouse_core.organizations o
+      ON o.organization_id = q.organization_id
+    WHERE q.quotation_id = $1
+    FOR UPDATE OF q`
+
 const addDaysToIsoDate = (isoDate: string, days: number): string => {
   const d = new Date(`${isoDate}T00:00:00Z`)
 
@@ -102,6 +147,185 @@ const resolveClientName = async (
 }
 
 /**
+ * Fuente ÚNICA de la construcción de los campos del income desde una HES aprobada (tax snapshot
+ * + rama CLF + nombre de cliente). Usado por el materializer legacy y por el primitive
+ * idempotente. Devuelve los campos SIN `incomeId`/`contractId` y el `totalAmountClp` pre-CLF.
+ */
+const buildHesIncomeWriteFields = async (
+  client: PoolClient,
+  hes: HesRow,
+  quotation: QuotationRow,
+  dueDateParam: string | null | undefined
+): Promise<{ writeFields: HesIncomeWriteFields; totalAmountClp: number }> => {
+  const totalAmountClpRaw = hes.amount_authorized_clp !== null && hes.amount_authorized_clp !== undefined
+    ? Number(hes.amount_authorized_clp)
+    : Number(hes.amount_clp ?? 0)
+
+  const subtotal = Number(hes.amount ?? hes.amount_clp ?? totalAmountClpRaw)
+  const currency = hes.currency || 'CLP'
+  const invoiceDate = new Date().toISOString().slice(0, 10)
+  const dueDate = dueDateParam || addDaysToIsoDate(invoiceDate, 30)
+  const sourceTaxSnapshot = parsePersistedIncomeTaxSnapshot(quotation.tax_snapshot_json)
+
+  const taxWriteFields = await buildIncomeTaxWriteFields({
+    subtotal,
+    taxCode: quotation.tax_code,
+    taxRate: quotation.tax_rate_snapshot != null
+      ? Number(quotation.tax_rate_snapshot)
+      : quotation.tax_rate != null
+        ? Number(quotation.tax_rate)
+        : null,
+    taxAmount: quotation.tax_amount_snapshot != null
+      ? Number(quotation.tax_amount_snapshot)
+      : quotation.tax_amount != null
+        ? Number(quotation.tax_amount)
+        : null,
+    sourceSnapshot: sourceTaxSnapshot,
+    issuedAt: quotation.tax_snapshot_frozen_at ?? invoiceDate
+  })
+
+  const totalAmount = taxWriteFields.totalAmount
+
+  const totalAmountClp = currency === 'CLP'
+    ? totalAmount
+    : totalAmountClpRaw
+
+  const exchangeRateToClp = totalAmount > 0
+    ? totalAmountClp / totalAmount
+    : 1
+
+  // TASK-995 — una HES / OC de cliente en CLF (UF) se proyecta a CLP + plano native UF.
+  let finalCurrency = currency
+  let finalSubtotal = subtotal
+  let finalTaxWriteFields = taxWriteFields
+  let finalTotalAmount = totalAmount
+  let finalTotalAmountClp = totalAmountClp
+  let finalExchangeRateToClp = exchangeRateToClp
+  let nativeAmount: number | null = null
+  let nativeCurrency: string | null = null
+  let nativeToFunctionalFxSnapshotId: string | null = null
+
+  if (currency === 'CLF' && isFinanceClfIncomeProjectionEnabled()) {
+    const projection = await buildClfIncomeProjection({
+      subtotalClf: subtotal,
+      taxAmountClf: taxWriteFields.taxAmount,
+      totalClf: totalAmount,
+      rateDate: invoiceDate
+    })
+
+    if (!projection) {
+      throw new FinanceValidationError(
+        'No hay valor UF para proyectar la HES/OC CLF a CLP en la fecha de emisión.'
+      )
+    }
+
+    nativeToFunctionalFxSnapshotId = await persistFxSnapshot(projection.fxSnapshotEvidence, client)
+    finalTaxWriteFields = await buildIncomeTaxWriteFields({
+      subtotal: projection.functionalSubtotalClp,
+      taxCode: quotation.tax_code,
+      taxAmount: projection.functionalTaxAmountClp,
+      totalAmount: projection.functionalTotalClp,
+      issuedAt: invoiceDate
+    })
+    finalCurrency = 'CLP'
+    finalSubtotal = projection.functionalSubtotalClp
+    finalTotalAmount = finalTaxWriteFields.totalAmount
+    finalTotalAmountClp = finalTaxWriteFields.totalAmount
+    finalExchangeRateToClp = 1
+    nativeAmount = projection.nativeAmountClf
+    nativeCurrency = 'CLF'
+  }
+
+  const clientName = await resolveClientName(
+    client,
+    hes.client_id,
+    quotation.client_name_cache
+  )
+
+  const writeFields: HesIncomeWriteFields = {
+    clientId: hes.client_id,
+    organizationId: hes.organization_id,
+    clientProfileId: null,
+    hubspotCompanyId: quotation.organization_hubspot_company_id,
+    hubspotDealId: quotation.hubspot_deal_id,
+    clientName,
+    invoiceNumber: hes.hes_number,
+    invoiceDate,
+    dueDate,
+    description: hes.service_description,
+    currency: finalCurrency,
+    subtotal: finalSubtotal,
+    taxRate: finalTaxWriteFields.taxRate,
+    taxAmount: finalTaxWriteFields.taxAmount,
+    taxCode: finalTaxWriteFields.taxCode,
+    taxRateSnapshot: finalTaxWriteFields.taxRateSnapshot,
+    taxAmountSnapshot: finalTaxWriteFields.taxAmountSnapshot,
+    taxSnapshotJson: serializeIncomeTaxSnapshot(finalTaxWriteFields.taxSnapshot),
+    isTaxExempt: finalTaxWriteFields.isTaxExempt,
+    taxSnapshotFrozenAt: finalTaxWriteFields.taxSnapshotFrozenAt,
+    totalAmount: finalTotalAmount,
+    exchangeRateToClp: finalExchangeRateToClp,
+    totalAmountClp: finalTotalAmountClp,
+    nativeAmount,
+    nativeCurrency,
+    nativeToFunctionalFxSnapshotId,
+    paymentStatus: 'pending',
+    quotationId: quotation.quotation_id,
+    sourceHesId: hes.hes_id,
+    purchaseOrderId: hes.purchase_order_id,
+    hesId: hes.hes_id,
+    poNumber: null,
+    hesNumber: hes.hes_number,
+    serviceLine: null,
+    incomeType: 'service_fee',
+    partnerId: null,
+    partnerName: null,
+    partnerSharePercent: null,
+    partnerShareAmount: null,
+    netAfterPartner: null,
+    notes: null,
+    actorUserId: null
+  }
+
+  return { writeFields, totalAmountClp }
+}
+
+const loadHesAndQuotation = async (
+  client: PoolClient,
+  hesId: string
+): Promise<{ hes: HesRow; quotation: QuotationRow; quotationId: string }> => {
+  const hesResult = (await client.query(HES_SELECT_SQL, [hesId])) as { rows: HesRow[] }
+
+  const hes = hesResult.rows[0]
+
+  if (!hes) {
+    throw new Error(`HES ${hesId} not found.`)
+  }
+
+  if (hes.status !== 'approved') {
+    throw new Error(`HES ${hesId} must be approved (current status: ${hes.status}).`)
+  }
+
+  if (!hes.quotation_id) {
+    throw new Error(`HES ${hesId} has no quotation_id; link it to a quotation first.`)
+  }
+
+  const quotationId = hes.quotation_id
+
+  const quotationResult = (await client.query(QUOTATION_FOR_HES_SELECT_SQL, [quotationId])) as {
+    rows: QuotationRow[]
+  }
+
+  const quotation = quotationResult.rows[0]
+
+  if (!quotation) {
+    throw new Error(`Quotation ${quotationId} not found.`)
+  }
+
+  return { hes, quotation, quotationId }
+}
+
+/**
  * Materializes an income row (invoice) from an approved HES, closing the
  * enterprise branch of the quotation-to-cash chain.
  *
@@ -110,12 +334,10 @@ const resolveClientName = async (
  *  - HES.quotation_id must be set (HES linked to a canonical quotation)
  *  - HES.income_id must be null (not already materialized)
  *
- * Effects:
- *  - Inserts into `greenhouse_finance.income` with `quotation_id` + `source_hes_id`
- *  - Updates HES: sets income_id + invoiced = TRUE
- *  - Updates quotation: status → 'converted', converted_to_income_id, converted_at
- *  - Publishes `commercial.quotation.invoice_emitted`
- *  - Records `invoice_triggered` + `status_changed` audit entries
+ * NOTE (TASK-1206): este materializer legacy mantiene su contrato externo (income + HES
+ * marcada + cotización converted + contrato en una tx, 409 si ya materializada) y sigue
+ * detrás de `/api/finance/hes/[id]/approve`. El camino canónico nuevo es el primitive
+ * idempotente `ensureIncomeFromHes` orquestado por `closeQuoteToCash`.
  */
 export const materializeInvoiceFromApprovedHes = async (
   params: MaterializeInvoiceFromHesParams
@@ -123,29 +345,7 @@ export const materializeInvoiceFromApprovedHes = async (
   const { hesId, actor } = params
 
   const result = await withTransaction(async client => {
-    const hesResult = (await client.query(
-      `SELECT hes_id, hes_number, purchase_order_id, client_id, organization_id, space_id,
-              service_description, amount, currency, amount_clp, amount_authorized_clp,
-              status, income_id, quotation_id
-         FROM greenhouse_finance.service_entry_sheets
-         WHERE hes_id = $1
-         FOR UPDATE`,
-      [hesId]
-    )) as { rows: HesRow[] }
-
-    const hes = hesResult.rows[0]
-
-    if (!hes) {
-      throw new Error(`HES ${hesId} not found.`)
-    }
-
-    if (hes.status !== 'approved') {
-      throw new Error(`HES ${hesId} must be approved (current status: ${hes.status}).`)
-    }
-
-    if (!hes.quotation_id) {
-      throw new Error(`HES ${hesId} has no quotation_id; link it to a quotation first.`)
-    }
+    const { hes, quotation, quotationId } = await loadHesAndQuotation(client, hesId)
 
     if (hes.income_id) {
       throw new Error(
@@ -153,75 +353,8 @@ export const materializeInvoiceFromApprovedHes = async (
       )
     }
 
-    const quotationId = hes.quotation_id
-
-    // TASK-524: resolve HubSpot anchors from the quotation + its organization
-    // so the materialized income inherits the commercial thread.
-    const quotationResult = (await client.query(
-      `SELECT q.quotation_id, q.client_id, q.organization_id, q.space_id, q.client_name_cache,
-              q.status, q.converted_to_income_id, q.current_version,
-              q.tax_rate, q.tax_amount, q.tax_code, q.tax_rate_snapshot, q.tax_amount_snapshot,
-              q.tax_snapshot_json, q.tax_snapshot_frozen_at,
-              q.hubspot_deal_id,
-              o.hubspot_company_id AS organization_hubspot_company_id
-         FROM greenhouse_commercial.quotations q
-         LEFT JOIN greenhouse_core.organizations o
-           ON o.organization_id = q.organization_id
-         WHERE q.quotation_id = $1
-         FOR UPDATE OF q`,
-      [quotationId]
-    )) as { rows: QuotationRow[] }
-
-    const quotation = quotationResult.rows[0]
-
-    if (!quotation) {
-      throw new Error(`Quotation ${quotationId} not found.`)
-    }
-
     const incomeId = `INC-${randomUUID().slice(0, 8)}`
-
-    const totalAmountClpRaw = hes.amount_authorized_clp !== null && hes.amount_authorized_clp !== undefined
-      ? Number(hes.amount_authorized_clp)
-      : Number(hes.amount_clp ?? 0)
-
-    const subtotal = Number(hes.amount ?? hes.amount_clp ?? totalAmountClpRaw)
-    const currency = hes.currency || 'CLP'
-    const invoiceDate = new Date().toISOString().slice(0, 10)
-    const dueDate = params.dueDate || addDaysToIsoDate(invoiceDate, 30)
-    const sourceTaxSnapshot = parsePersistedIncomeTaxSnapshot(quotation.tax_snapshot_json)
-
-    const taxWriteFields = await buildIncomeTaxWriteFields({
-      subtotal,
-      taxCode: quotation.tax_code,
-      taxRate: quotation.tax_rate_snapshot != null
-        ? Number(quotation.tax_rate_snapshot)
-        : quotation.tax_rate != null
-          ? Number(quotation.tax_rate)
-          : null,
-      taxAmount: quotation.tax_amount_snapshot != null
-        ? Number(quotation.tax_amount_snapshot)
-        : quotation.tax_amount != null
-          ? Number(quotation.tax_amount)
-          : null,
-      sourceSnapshot: sourceTaxSnapshot,
-      issuedAt: quotation.tax_snapshot_frozen_at ?? invoiceDate
-    })
-
-    const totalAmount = taxWriteFields.totalAmount
-
-    const totalAmountClp = currency === 'CLP'
-      ? totalAmount
-      : totalAmountClpRaw
-
-    const exchangeRateToClp = totalAmount > 0
-      ? totalAmountClp / totalAmount
-      : 1
-
-    const clientName = await resolveClientName(
-      client,
-      hes.client_id,
-      quotation.client_name_cache
-    )
+    const { writeFields, totalAmountClp } = await buildHesIncomeWriteFields(client, hes, quotation, params.dueDate)
 
     const contract = await ensureContractForQuotation({
       quotationId,
@@ -229,49 +362,15 @@ export const materializeInvoiceFromApprovedHes = async (
       client
     })
 
-    await createFinanceIncomeInPostgres({
-      incomeId,
-      clientId: hes.client_id,
-      organizationId: hes.organization_id,
-      clientProfileId: null,
-      hubspotCompanyId: quotation.organization_hubspot_company_id,
-      hubspotDealId: quotation.hubspot_deal_id,
-      clientName,
-      invoiceNumber: hes.hes_number,
-      invoiceDate,
-      dueDate,
-      description: hes.service_description,
-      currency,
-      subtotal,
-      taxRate: taxWriteFields.taxRate,
-      taxAmount: taxWriteFields.taxAmount,
-      taxCode: taxWriteFields.taxCode,
-      taxRateSnapshot: taxWriteFields.taxRateSnapshot,
-      taxAmountSnapshot: taxWriteFields.taxAmountSnapshot,
-      taxSnapshotJson: serializeIncomeTaxSnapshot(taxWriteFields.taxSnapshot),
-      isTaxExempt: taxWriteFields.isTaxExempt,
-      taxSnapshotFrozenAt: taxWriteFields.taxSnapshotFrozenAt,
-      totalAmount,
-      exchangeRateToClp,
-      totalAmountClp,
-      paymentStatus: 'pending',
-      quotationId,
-      contractId: contract.contractId,
-      sourceHesId: hes.hes_id,
-      purchaseOrderId: hes.purchase_order_id,
-      hesId: hes.hes_id,
-      poNumber: null,
-      hesNumber: hes.hes_number,
-      serviceLine: null,
-      incomeType: 'service_fee',
-      partnerId: null,
-      partnerName: null,
-      partnerSharePercent: null,
-      partnerShareAmount: null,
-      netAfterPartner: null,
-      notes: null,
-      actorUserId: actor.userId
-    }, { client })
+    await createFinanceIncomeInPostgres(
+      {
+        ...writeFields,
+        incomeId,
+        contractId: contract.contractId,
+        actorUserId: actor.userId
+      },
+      { client }
+    )
 
     await client.query(
       `UPDATE greenhouse_finance.service_entry_sheets
@@ -356,4 +455,98 @@ export const materializeInvoiceFromApprovedHes = async (
   await materializeContractProfitabilitySnapshots({ contractId: result.contractId })
 
   return result
+}
+
+/**
+ * TASK-1206 — primitive IDEMPOTENTE de income para el cierre Q2C (enterprise/HES branch).
+ *
+ * A diferencia de `materializeInvoiceFromApprovedHes`, este primitive:
+ *  - NO marca la cotización `converted` ni crea el contrato (eso lo hace `convertQuoteToCash`
+ *    DESPUÉS, vía `closeQuoteToCash`).
+ *  - es IDEMPOTENTE: si la HES ya tiene `income_id` (replay), devuelve ese income y NUNCA crea
+ *    un segundo income (anti doble-AR). El lock `FOR UPDATE` serializa cierres concurrentes.
+ *  - crea el income con `contract_id` NULL; `convertQuoteToCash` lo backfillea al crear el
+ *    contrato (`syncContractIdOnDocumentChain` cubre income + service_entry_sheets).
+ *
+ * Corre su propia transacción (el orquestador lo invoca ANTES de la conversión).
+ */
+export const ensureIncomeFromHes = async (
+  params: MaterializeInvoiceFromHesParams
+): Promise<EnsureIncomeFromHesResult> => {
+  const { hesId, actor } = params
+
+  return withTransaction(async client => {
+    const { hes, quotation, quotationId } = await loadHesAndQuotation(client, hesId)
+
+    // Idempotencia dura: si la HES ya fue materializada, devolver su income.
+    if (hes.income_id) {
+      return {
+        incomeId: hes.income_id,
+        quotationId,
+        sourceHesId: hesId,
+        totalAmountClp: 0,
+        created: false
+      }
+    }
+
+    const incomeId = `INC-${randomUUID().slice(0, 8)}`
+    const { writeFields, totalAmountClp } = await buildHesIncomeWriteFields(client, hes, quotation, params.dueDate)
+
+    await createFinanceIncomeInPostgres(
+      {
+        ...writeFields,
+        incomeId,
+        // contract_id NULL — backfilled by ensureContractForQuotation in the convert step.
+        contractId: null,
+        actorUserId: actor.userId
+      },
+      { client }
+    )
+
+    await client.query(
+      `UPDATE greenhouse_finance.service_entry_sheets
+         SET income_id = $1,
+             invoiced = TRUE,
+             updated_at = NOW()
+         WHERE hes_id = $2`,
+      [incomeId, hesId]
+    )
+
+    await publishQuotationInvoiceEmitted(
+      {
+        quotationId,
+        incomeId,
+        sourceHesId: hesId,
+        totalAmountClp,
+        emittedBy: actor.userId
+      },
+      client
+    )
+
+    await recordAudit(
+      {
+        quotationId,
+        versionNumber: quotation.current_version ?? null,
+        action: 'invoice_triggered',
+        actorUserId: actor.userId,
+        actorName: actor.name,
+        details: {
+          incomeId,
+          sourceHesId: hesId,
+          totalAmountClp,
+          branch: 'enterprise',
+          via: 'closeQuoteToCash'
+        }
+      },
+      client
+    )
+
+    return {
+      incomeId,
+      quotationId,
+      sourceHesId: hesId,
+      totalAmountClp,
+      created: true
+    }
+  })
 }

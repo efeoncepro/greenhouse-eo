@@ -16,10 +16,17 @@ export const dynamic = 'force-dynamic'
 
 const VALID_DENSITY = new Set(['cozy', 'comfortable', 'compact'])
 
+// TASK-1079 — Nexa interaction mode (dock A / expandible B / lane C). Self-preference
+// per usuario; mismo pattern de columna que ui_density. Validación mirror del CHECK en DB.
+const VALID_NEXA_INTERACTION_MODE = new Set(['dock', 'expandible', 'lane'])
+
+export type NexaInteractionMode = 'dock' | 'expandible' | 'lane'
+
 interface PreferencesPayload {
   uiDensity?: 'cozy' | 'comfortable' | 'compact' | null
   homeDefaultView?: string | null
   homeV2OptOut?: boolean
+  nexaInteractionMode?: NexaInteractionMode | null
 }
 
 export async function GET() {
@@ -33,9 +40,10 @@ export async function GET() {
     ui_density: string | null
     home_default_view: string | null
     home_v2_opt_out: boolean | null
+    nexa_interaction_mode: string | null
     preferences_updated_at: string | null
   } & Record<string, unknown>>(
-    `SELECT ui_density, home_default_view, home_v2_opt_out, preferences_updated_at
+    `SELECT ui_density, home_default_view, home_v2_opt_out, nexa_interaction_mode, preferences_updated_at
        FROM greenhouse_core.client_users
       WHERE user_id = $1`,
     [session.user.userId]
@@ -47,6 +55,7 @@ export async function GET() {
     uiDensity: row?.ui_density ?? null,
     homeDefaultView: row?.home_default_view ?? null,
     homeV2OptOut: row?.home_v2_opt_out ?? false,
+    nexaInteractionMode: row?.nexa_interaction_mode ?? null,
     preferencesUpdatedAt: row?.preferences_updated_at ?? null
   })
 }
@@ -87,6 +96,15 @@ export async function PATCH(request: Request) {
   if ('homeV2OptOut' in payload) {
     updates.push(`home_v2_opt_out = $${position++}`)
     params.push(Boolean(payload.homeV2OptOut))
+  }
+
+  if ('nexaInteractionMode' in payload) {
+    if (payload.nexaInteractionMode != null && !VALID_NEXA_INTERACTION_MODE.has(payload.nexaInteractionMode)) {
+      return NextResponse.json({ error: 'Invalid Nexa interaction mode' }, { status: 400 })
+    }
+
+    updates.push(`nexa_interaction_mode = $${position++}`)
+    params.push(payload.nexaInteractionMode)
   }
 
   if (updates.length === 0) {

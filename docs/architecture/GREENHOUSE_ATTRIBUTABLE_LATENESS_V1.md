@@ -301,3 +301,66 @@ M2 cerró en `develop` (directo, sin branch, override operador). El cómputo de 
 **Verificación**: 53 tests focales nuevos (helper 16 + classify +5 + consumer 11 + … ) + lint + tsc verdes; signals verificados live contra PG (steady 0). NO toca el bono (shadow).
 
 **Camino restante para cerrar ISSUE-081**: M3 (cutover bono) — task futura gated (8 stop-gates + sign-off HR + ≥30d shadow verde + activación de captura M0/M1). Para que el shadow acumule datos: el operador activa `NOTION_DUE_DATE_CAPTURE_ENABLED` (M0) + `ATTRIBUTABLE_LATENESS_OTD_ENABLED` (M2).
+
+### 16.10 Delta 2026-06-19 — Hallazgo de cohorte + decisión B′-PG (TASK-1169, ADR chico Slice 0)
+
+**El supuesto de §16.2 ("M3 = solo flip de fuente `otd_pct` → columna GH") quedó invalidado** por el discovery profundo 2026-06-19 (verificado contra código + data real). M2 (`task_attributable_lateness_shadow`) vive **por-tarea / estado-actual / sin columna de mes ni de colaborador** (PK `task_source_id`), poblado solo cuando una tarea transiciona con flag ON. El bono, en cambio, lee **member×month** desde BQ `metrics_by_member` (cohorte = `due_date` en período vía `REPORT_PERIOD_SCOPE_SQL`, atribución `primary_owner_member_id` = `assignee_member_id`, denominador `on_time+late_drop+overdue` excl `carry_over`). **Son universos distintos: el shadow crudo NO es comparable como OTD mensual.** Evidencia: la reconciliación member-level ad-hoc del 2026-06-19 leyó el shadow crudo y dio OTD 0-50% mientras producción daba 66-100% para los mismos colaboradores — no por divergencia del freeze sino por **cohorte distinta** (violación además de "honest degradation": el 0% era data faltante, no "todas fallaron").
+
+Por eso M3 NO es un flip simple: **falta producir la corrección de freeze sobre la MISMA cohorte member×month del bono y reconciliarla honestamente** antes de cualquier cutover. Ese trabajo (shadow / flag OFF, **nunca toca el bono**) es **TASK-1169**; el cutover productivo (toca nómina) es **TASK-1170**.
+
+**Decisión (Slice 0, `arch-architect` + `greenhouse-ico` + confirmación CEO 2026-06-19): ruta B′-PG.**
+
+- **B′-PG (elegida):** un **helper TS canónico** (reusa `calculateAttributableLateness` como SSOT del freeze) agrega la corrección a una tabla shadow **enfocada** member×month en PG, sobre la cohorte del bono, junto al M2 shadow que ya vive en PG. Materializa **solo el OTD corregido + sus counts** (legacy-reproducido y corregido) — **NO** duplica las 22 métricas de `metrics_by_member` (respeta SSOT). Reusa el **patrón** ICO (helper-TS-SSOT + materializer idempotente + parity test + reliability signal), **NO** `runIcoMaterializerCycle` literal (ese es BQ; los inputs del freeze son PG-native). Sin round-trip Notion. Migración additive PG.
+- **B′-BQ (rechazada):** el freeze multi-ciclo no es un CASE BQ mantenible (ya rechazado por M2, §16.9). Empujar buckets corregidos por-tarea a BQ + agregar ahí = side-table + sync extra para cero beneficio en shadow.
+- **A / round-trip Notion vía TASK-927 (fallback, no default):** acopla Notion al camino del bono + dependencia TASK-927 + slice de ingestión `[GH] OTD`→BQ no construido. La atribución ya es PG-native (`assignee_member_id`), así que el round-trip no aporta.
+- **B″ / tabla PG mensual full (rechazada):** duplicaría `metrics_by_member` → viola SSOT.
+
+**Score 5-pilar ICO:**
+
+- **Safety:** flag OFF + shadow → no toca el bono (el flip es TASK-1170). El riesgo real NO es el flip sino **medir mal** (ya pasó 2026-06-19) → mitigado por el **harness auto-validante** (reproducir el OTD legacy por colaborador-mes y matchear `metrics_by_member` como baseline conocido-bueno **ANTES** de confiar el corregido; si no matchea, el harness está mal → abortar, no reportar) + degradación honesta (`null`+`dataStatus`, nunca 0).
+- **Robustness:** dedup por tarea + scoping de período + atribución `primary_owner_member_id` alineados al path del bono; partición disjunta freeze/fecha-justa (anti-doble-descuento, §5); `null`+`dataStatus` donde no compare.
+- **Resilience:** signal **member-month** como detector upstream del bug class de cohorte (hoy hallado a mano); materialización idempotente (UPSERT por clave canónica) reproducible desde inputs.
+- **Scalability:** reusa el patrón del materializador ICO (idempotente, additive) → absorbe N colaboradores/meses sin rediseño; sin tabla paralela que duplique `metrics_by_member` (SSOT).
+- **Auditability (ICO):** cada bucket corregido trazable a su `fair_deadline` + motivo (vía M2 helper) y la reconciliación reproducible — sin esto no hay evidencia válida para el cutover (TASK-1170).
+
+**Hard rules (TASK-1169):**
+
+- **NUNCA** esta task cambia un número que el bono lee (todo shadow / flag OFF; el flip es TASK-1170).
+- **NUNCA** reconciliar leyendo el shadow crudo como OTD mensual (error fuente 2026-06-19): aplicar dedup + período + atribución alineados al path BQ del bono.
+- **SIEMPRE** el harness reproduce el legacy y matchea `metrics_by_member` antes de confiar el corregido.
+- **SIEMPRE** degradación honesta (`null`+`dataStatus`, nunca 0 donde no compare).
+- **NUNCA** inventar una tabla mensual paralela que duplique `metrics_by_member` (la tabla shadow es enfocada: solo OTD corregido + counts).
+
+**Bloquea:** TASK-1170 (cutover bono). **No impacta:** bono ni `otd_pct` (shadow / flag OFF).
+
+### 16.11 Delta 2026-06-19 — TASK-1169 implementado (shadow / flag OFF)
+
+Ruta B′-PG construida y verificada contra PG/BQ real. Artefactos:
+
+- **Tabla shadow** `greenhouse_delivery.otd_attributable_member_month_shadow` (migration `20260619164015435`, grano member×month idéntico a `metrics_by_member`; enfocada: solo OTD legacy + corregido + counts, NO duplica las 22 métricas → SSOT).
+- **Helper canónico** `src/lib/notion-metrics/otd-attributable-member-month.ts`: `buildMemberMonthOtdRow` (aggregator puro SSOT, 9 tests) + `computeOtdAttributableMemberMonth` (read-only) + `materializeOtdAttributableMemberMonth` (UPSERT idempotente).
+- **Reconciliación** read-only `scripts/reconcile-otd-attributable-member-month.ts` (blast radius por colaborador-mes + cambio de tier de bono).
+- **Reliability signal** `delivery.attributable_lateness.member_month_paridad` (comparabilidad de cohorte, steady=0 cohort_mismatch; detector upstream del bug class 2026-06-19).
+
+**Decisiones de implementación clave (verificadas con data real):**
+
+1. **El baseline legacy se computa LIVE** (`computeMemberMetricsBatch`), NO desde el `metrics_by_member` materializado crudo. Probe 2026-06-19: el materializado de períodos cerrados está **stale** (ej. valentina 2026-04 stored `on_time=1/late_drop=1`=50% vs live `19/19/overdue=12`=38%; materializado el 19-may, completados-tarde posteriores no re-materializados). El bono recomputa live vía freshness guard cuando está stale, y el cutover (TASK-1170) re-materializa de todas formas → el live es el baseline relevante y es consistente con la enumeración de candidatos (también live). *(La staleness del materializado en períodos cerrados es un hallazgo separado, candidato a follow-up de re-materialización; no afecta esta task ni el pago vigente.)*
+
+2. **El freeze mejora el OTD por DOS mecanismos**, no uno: numerador (`late_drop → on_time`) **y** denominador (`overdue → carry_over`, que sale del denominador OTD). El modelo inicial solo contemplaba el primero.
+
+3. **Hallazgo (responde §Open Questions Q2): el freeze capturado hoy NO mueve la cohorte productiva del bono.** Reconciliación 2026-04/05/06: cohorte reproducida=20, `cohort_mismatch=0`, **0 member-months cambian tier de bono**. Los 29 divergence del M2 shadow (`overdue→carry_over`) caen en tasks NULL-atribuidos en BQ (gap de atribución PG↔conformed) o no-overdue por la clasificación canónica → fuera de la cohorte. Cobertura M2 sobre la cohorte: 1%/31%/61% por mes. **Conclusión: el cutover TASK-1170 no tiene urgencia material por ahora.**
+
+**Rollout pendiente (no bloquea esta task, shadow):** para acumular el reloj ≥30d sobre data comparable, el materializador debe correr periódicamente (hoy es helper/script invocable, sin cron). Mejorar la cobertura del corregido requiere ampliar el M2 shadow sobre la cohorte (flags M0 `NOTION_DUE_DATE_CAPTURE_ENABLED` + M2 `ATTRIBUTABLE_LATENESS_OTD_ENABLED` ON + backfill), que es decisión del operador gateada a TASK-1170.
+
+### 16.12 Delta 2026-06-19 — Fix staleness terminal del M2 shadow (TASK-1174, cierra ISSUE-098)
+
+Durante TASK-1169 se detectó que el M2 shadow por-tarea (`task_attributable_lateness_shadow`) congelaba un bucket **abierto** (`overdue`/`carry_over`) en el **75% de las tareas ya completadas** (250/337 filas; Sky + Efeonce). **Causa raíz** (confirmada en código): el consumer `notion_attributable_lateness_compute` es event-driven y re-lee `greenhouse_delivery.tasks` (`task_status`/`completed_at`), pero ese row sync es un pipeline distinto al de `task_status_transitions` (que es el que **dispara** el compute). Al instante de la transición `→Aprobado`, el row puede seguir mostrando el estado pre-terminal; como `Aprobado`/`Archivado` son terminales (sin transición futura), el bucket abierto quedaba congelado para siempre. Esto **NO afecta el bono** (no lee el shadow), pero **bloqueaba el writeback `[GH] OTD` (TASK-927)**: escribiría "atrasada/no entregada" sobre tareas entregadas, visible al cliente.
+
+**Fix (TASK-1174, sin migración):**
+
+1. **`resolveEffectiveTaskState`** (`notion-attributable-lateness-compute.ts`, pure SSOT): reconcilia el estado contra el **log de transiciones** (autoritativo). Terminal gana desde cualquiera de las dos fuentes (row o última transición); un reopen real (`Aprobado → En curso` capturado) no fuerza terminal; cuando es terminal sin `completed_at` en el row, el `transitioned_at` de la transición terminal ES el momento de completado (fallback honesto, no inventado).
+2. **`computeAttributableLatenessForTask`**: core canónico extraído (read+resolve+compute+UPSERT) reusado por el consumer y por el barrido.
+3. **Barrido idempotente** `scripts/recompute-attributable-lateness-terminal-open.ts` (dry-run/`--apply`): recompone las filas terminales con bucket abierto. Backfill aplicado → 250 corregidas, **0 terminal-open** restantes. Target preciso = **status terminal** (no `completed_at` como proxy: una tarea en revisión puede traer `completed_at` y su bucket abierto es correcto).
+4. **Reliability signal** `delivery.attributable_lateness.shadow_terminal_open` (kind `data_quality`, steady=0; warning 1-10 / error >10): invariante de terminalidad + gate del writeback TASK-927. Verificado live = `ok` (count=0).
+
+**Invariante nuevo:** una tarea TERMINAL (`Aprobado`/`Archivado`) NUNCA tiene un bucket abierto en el M2 shadow. El compute reconcilia el estado contra el log de transiciones (no confía sólo en el row de `tasks`, que laggea).

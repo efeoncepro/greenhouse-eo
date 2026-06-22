@@ -12,7 +12,7 @@ vi.mock('@/lib/ai/google-genai', () => ({
 }))
 
 const mockExecuteNexaTool = vi.fn()
-const mockGetNexaToolDeclarations = vi.fn(() => [])
+const mockGetNexaToolDeclarations = vi.fn<() => { name: string }[]>(() => [])
 
 vi.mock('./nexa-tools', () => ({
   executeNexaTool: (...args: unknown[]) => mockExecuteNexaTool(...args),
@@ -388,6 +388,61 @@ describe('NexaService', () => {
     expect(systemInstruction).toContain('Usa marcadores inline [n]')
     expect(systemInstruction).toContain('cita siempre con [n]')
     expect(systemInstruction).toContain('validación humana')
+  })
+
+  it('fuerza search_knowledge en Gemini para intención knowledge cuando el rollout está ON', async () => {
+    vi.stubEnv('NEXA_KNOWLEDGE_RETRIEVAL_ENABLED', 'true')
+    vi.stubEnv('NEXA_FORCE_KNOWLEDGE_RETRIEVAL_ENABLED', 'true')
+    mockGetNexaToolDeclarations.mockReturnValue([{ name: 'search_knowledge' }])
+
+    mockGenerateContent
+      .mockResolvedValueOnce({
+        text: '',
+        functionCalls: [
+          {
+            id: 'tool-knowledge-forced',
+            name: 'search_knowledge',
+            args: { query: '¿Cuál es la diferencia entre Efeonce, Greenhouse y Nexa?' }
+          }
+        ]
+      })
+      .mockResolvedValueOnce({ text: 'Efeonce es la agencia; Greenhouse es el portal; Nexa es el asistente [1].' })
+      .mockResolvedValueOnce({ text: '{"suggestions":["¿Qué hace Greenhouse?","¿Qué hace Nexa?","¿Dónde veo más?"]}' })
+
+    mockExecuteNexaTool.mockResolvedValue({
+      toolCallId: 'tool-knowledge-forced',
+      toolName: 'search_knowledge',
+      args: { query: '¿Cuál es la diferencia entre Efeonce, Greenhouse y Nexa?' },
+      result: {
+        available: true,
+        summary: 'Recuperé evidencia de Knowledge.',
+        source: 'postgres',
+        scopeLabel: 'Knowledge',
+        generatedAt: '2026-06-18T12:00:00.000Z',
+        metrics: []
+      }
+    })
+
+    const response = await NexaService.generateResponse({
+      prompt: '¿Cuál es la diferencia entre Efeonce, Greenhouse y Nexa?',
+      history: [],
+      context: {
+        user: { firstName: 'Julio', lastName: null, role: 'admin' },
+        greeting: { title: '', subtitle: '' },
+        modules: [],
+        tasks: [],
+        nexaIntro: '',
+        computedAt: '2026-06-18T00:00:00.000Z'
+      },
+      runtimeContext
+    })
+
+    const firstPassConfig = mockGenerateContent.mock.calls[0]?.[0]?.config?.toolConfig?.functionCallingConfig
+
+    expect(firstPassConfig).toEqual({ mode: 'ANY', allowedFunctionNames: ['search_knowledge'] })
+    expect(mockExecuteNexaTool).toHaveBeenCalledWith(expect.objectContaining({ toolName: 'search_knowledge' }))
+    expect(response.toolInvocations?.[0]?.toolName).toBe('search_knowledge')
+    expect(response.turnTelemetry?.toolsUsed).toEqual(['search_knowledge'])
   })
 
   // TASK-1129 — telemetría de turno (observabilidad, sin contenido sensible).

@@ -2,7 +2,152 @@
 
 > **Version:** 1.0
 > **Created:** 2026-03-30
-> **Last updated:** 2026-05-13 (TASK-871 Rolling Rematerialization Anchor Contract)
+> **Last updated:** 2026-06-20 (TASK-1209 income tax snapshot contabiliza el monto exento)
+
+## Delta 2026-06-20 — TASK-1209 income tax snapshot contabiliza el monto exento (export/exentos)
+
+**Causa raíz (verificada PG+BQ):** ninguna factura **exenta** se había proyectado jamás a `greenhouse_finance.income` (PG sólo tenía DTE 33 afecto + 61). El sync recurrente intentaba las facturas de exportación Berel (`28800562`, `29062197`) cada día con `client_id` resuelto, pero fallaban en `buildIncomeTaxWriteFields` con `totalAmount does not match the resolved tax snapshot (0)` (26 fallos en `source_sync_failures`). Una factura de exportación (DTE 110/111/112) es **100% exenta**: `net_amount=0`, todo el valor en `exempt_amount`. El builder computaba `expectedTotal = base_afecta + IVA` e **ignoraba el monto exento**, así que para un doc 100% exento daba `expectedTotal=0` y rechazaba el total real → bloqueaba la proyección de **toda** factura exenta (no sólo export: también DTE 34 factura exenta, 41 boleta exenta, NC exentas 61).
+
+**Invariante nuevo (income/AR):** el total documental de un income respeta la identidad del DTE chileno **`total = neto_afecto + IVA + exento`** (Monto Neto + IVA + Monto Exento = Monto Total). `buildIncomeTaxWriteFields` (`src/lib/finance/income-tax-snapshot.ts`) suma `exemptAmount` al `totalAmount` esperado/escrito. El **snapshot de impuesto se mantiene tax-puro** (`taxableAmount + IVA`, sin exento) porque `vat-ledger` lo lee como base afecta y el exento se reporta aparte como ventas exentas (F29). `subtotal` (base afecta) y `exemptAmount` son disjuntos por construcción del conformed Nubox y del contrato manual → no doble-cuenta. Facturas afectas (`exempt=0`) quedan bit-for-bit iguales.
+
+**Visibilidad (defensa en profundidad):** las fallas de projection de export DTE estampan el código estable `nubox_income_projection_failed` + `nuboxDocumentId` en `source_sync_failures`; nuevo signal `finance.nubox_export.unprojected_invoice` (kind `data_quality`, severity `warning`, steady=0, auto-clearing por cruce con `income.nubox_document_id`). Diagnóstico read-only `scripts/finance/task-1209-unprojected-export-invoices-diagnostic.ts`.
+
+**Pendiente operativo (rollout):** Berel pasa a fixture; con el fix el sync recurrente lo proyecta solo (apply real = próximo sync, gated por sign-off Finance + redeploy worker). Junio 2026 esperado tras repair: Sky $6.902.000 → Sky+Berel **$15.983.109** (apareció una 2ª factura Berel `29062197` desde que se escribió la spec). **Simetría latente:** `expense-tax-snapshot.ts:431` tiene el mismo patrón (compras exentas) — follow-up fuera del scope income.
+
+## Delta 2026-06-20 — TASK-1208 Vocabulario contable canónico (factura/AR vs caja)
+
+`greenhouse_finance.income` **es la factura emitida / cuenta por cobrar (AR, devengado)**, NO un ingreso de caja — la propia doc de columnas la llama *"the receivable"* / *"the invoice"*. El ingreso de caja real es el **cobro** (`income_payments` → `account_balances`). Mismo patrón en compras: `expenses` = factura por pagar (AP, devengado); `expense_payments` = pago (egreso de caja).
+
+Nuevo doc canónico: **`GREENHOUSE_ACCOUNTING_VOCABULARY_V1.md`** — fija el mapeo objeto↔término↔plano (devengado IFRS 15 §31 / F29 vs percibido IAS 7 / banco), la regla de copy ("Ingresos/Egresos" solo para caja; "Factura/Por cobrar/Por pagar" para devengado) y hard rules para Nexa/agentes (NUNCA llamar "ingreso de caja" a una fila de `income`).
+
+**Hallazgo de la auditoría de copy (TASK-1208 Slice 2):** el copy visible **ya estaba mayormente de-conflado correctamente** — la nav dice "Ventas" (no "Ingresos"), el income list usa "Por cobrar"/"Con cobro", el dashboard "Ingresos devengados"/"(facturado)", y las superficies de caja usan "Cobros"/"recaudado". La conflación vivía solo en el **nombre físico** `income` y en la **ausencia de un glosario canónico** — ambos resueltos por este Delta. **NO se renombró el símbolo físico** (puerta de un solo sentido: F29, marts BQ, sync Nubox/HubSpot, lint `no-untokenized-fx-math`); queda como deuda de naming documentada, con rename físico gobernado como follow-up opcional.
+
+## Delta 2026-06-20 — TASK-1204 F29 fiscal accuracy: exclusión de anulados + tasa PPM (cierra ISSUE-105)
+
+Detectado en validación contable real del F29 mayo 2026 vs SII (el contador comparó el portal contra el F29 oficial). El IVA cuadraba al peso, pero la retención sobre-declaraba $107.970 y el PPM era el doble. Dos causas, ambas corregidas en causa raíz:
+
+- **Invariante nuevo — exclusión de documentos anulados (lado expenses).** Una boleta de honorarios anulada en SII/Nubox (`document_status_name='Anulada'`) seguía contando en la posición de retención porque (a) el sync Nubox derivaba `is_annulled` solo del booleano de Nubox (no del status autoritativo), y (b) el materializador de retención no excluía anulados. **Invariante:** `sii_document_status='Anulada'` ⇒ `is_annulled=true`, y **todo materializador fiscal que lea documentos de fuente excluye anulados** (`is_annulled=false`) — espeja el filtro que el materializador de income ya aplicaba. Fix: helper `isNuboxPurchaseAnnulled` (`sync-nubox-to-postgres.ts`, deriva de status + booleano) + guard `AND COALESCE(e.is_annulled,false)=false` en `retention-ledger.ts` + backfill (migration `20260620205300001`, 2 docs) + re-materialización.
+- **Tasa PPM confirmada.** TASK-1189 sembró `ppm_rate_config` con placeholder 0,25% (`source='placeholder_pending_contador'`); el F29 real confirma **0,125%**. Corregida a 0,00125 (migration `20260620205224350`, `source='sii_f29_confirmed_2026'`) + re-materialización PPM.
+
+Resultado: F29 mayo 2026 cuadra **al peso** con el SII — retención 134.653, PPM 7.250, IVA 1.080.405, total 1.222.308. **Hard rules:** NUNCA derivar `is_annulled` solo del booleano de Nubox (usar el status autoritativo); NUNCA un materializador fiscal cuenta documentos anulados; la tasa PPM vive en `ppm_rate_config` (SSOT), NUNCA hardcode. Detalle en ISSUE-105 + TASK-1204.
+
+## Delta 2026-06-20 — PnL dashboard income query hardening
+
+`GET /api/finance/dashboard/pnl` mantiene el mismo response contract, pero el query de
+ingresos devengados debe leer **solo columnas de `greenhouse_finance.income`**. La métrica
+`totalRevenue` se calcula con `SUM(income.total_amount_clp)`; `effective_cost_amount_clp`
+pertenece a `greenhouse_finance.expenses` y no debe usarse en el query de ingresos. Este delta
+cierra el 500 observado en staging cuando el endpoint intentaba leer esa columna desde
+`income`, y agrega test anti-regresión para evitar reintroducir el drift de schema.
+
+## Delta 2026-06-20 — TASK-1195 Posición F29 mensual consolidada (compositor IVA + Retenciones + PPM)
+
+Child E (cierre) de la umbrella TASK-1186. Con las 3 líneas mensuales del F29 ya
+materializadas por entidad legal (IVA TASK-725, retenciones TASK-1188, PPM TASK-1189),
+esta entrega las **une en un único contrato gobernado** sin materializar nada nuevo ni
+tocar schema: es **composición pura** de los 3 readers canónicos.
+
+- **Reader compositor** `getF29ConsolidatedMonthlyPosition({ legalEntityOrganizationId, year, month })`
+  (`src/lib/finance/f29-consolidated.ts`): invoca `getVatMonthlyPosition` +
+  `getRetentionMonthlyPosition` + `getPpmMonthlyPosition` en paralelo y arma el VM
+  `{ legalEntityOrganizationId, year, month, periodId, enabledByLine, vat, retention, ppm }`.
+  NUNCA recomputa ni emite SQL fiscal nuevo — la cifra de cada línea es exactamente la
+  que su reader canónico expone. Single source of truth gobernada (un reader, muchos
+  consumers: UI Finance futura, Nexa, CLI/contador) por Full API Parity.
+- **Endpoint** `GET /api/finance/f29/monthly-position` (`src/app/api/finance/f29/monthly-position/route.ts`):
+  mirror del patrón de las 3 líneas — scope = operating entity (RUT), NUNCA `space_id`;
+  `canonicalErrorResponse('fiscal_entity_unavailable')` si no hay entidad legal.
+- **Degradación honesta**: cada línea puede venir `null` (sin posición materializada del
+  período), distinto de cero. `enabledByLine` propaga el rollout flag por línea (IVA sin
+  flag = siempre oficial; retención/PPM gated por `RETENTION_POSITION_ENABLED`/`PPM_POSITION_ENABLED`).
+  Un consumer NUNCA totaliza como F29 oficial una línea con `enabled:false` (shadow).
+- **Sin schema/migración/signal nuevos**: reusa los 3 signals existentes
+  (`finance.{vat,retention,ppm}.position_drift`). Smoke runtime contra PG (2026-06): IVA
+  neto $1.085.952 (oficial), retención $138.646 + PPM $14.500 (shadow local). Tests del
+  compositor verifican composición pura (llama los 3 readers, no SQL fiscal) + `null`
+  honesto + propagación de `enabled`. La UI visible (card/dashboard F29) queda como
+  follow-up `ui-ux` separado (disciplina backend-data → ui-ux).
+- **Hard rules**: NUNCA recomputar las posiciones inline (solo componer los 3 readers);
+  NUNCA scopear por `space_id` (F29 = entidad legal); SIEMPRE propagar el `enabled` por línea.
+
+## Delta 2026-06-20 — TASK-1189 Posición mensual de PPM (línea PPM del F29)
+
+Tercera línea del F29 materializada por entidad legal (IVA TASK-725, retenciones TASK-1188,
+PPM acá). Completa las 3 líneas mensuales del F29. Tablas `greenhouse_finance.ppm_rate_config`
+(SSOT parametrizable de la tasa PPM) + `ppm_monthly_positions`, scope `organization_id`
+(operating entity), **NUNCA** `space_id`. Materializador `materializePpmForPeriod`
+(`src/lib/finance/ppm-ledger.ts`) con advisory lock + guard FX.
+
+**PPM = base × tasa.** Base imponible = ventas netas del período (`income.subtotal`
+CLP-normalizado, sin anuladas; las notas de crédito DTE 61 entran negativas y netean) — mismo
+patrón CLP que el VAT materializer, no viola `no-untokenized-fx-math` (ese lint targetea
+`ip.amount`/`ep.amount` de payments, no `income.subtotal` de invoices). Tasa desde la SSOT
+`ppm_rate_config` (resolver org-specific > default, rango de período) — **la tasa PPM la fija
+el SII por contribuyente**, por eso es parametrizable y NUNCA hardcode; seed default placeholder
+`0.25%` flagged `placeholder_pending_contador` (el contador actualiza la fila con la tasa real
+antes del flip). PPM es un agregado (base × tasa), no per-documento → sin tabla ledger.
+
+Reader/endpoint `GET /api/finance/ppm/monthly-position` (scope operating entity, degradación
+honesta), signal `finance.ppm.position_drift` (steady=0: posición con base stale vs income real),
+flag `PPM_POSITION_ENABLED` (default OFF + shadow → `enabled:false`). Shadow verificado: 19
+períodos materializados (ej. 2026-06 base 5.800.000 × 0.25% = 14.500 CLP). Child A de TASK-1186.
+Con IVA + retenciones + PPM, las 3 líneas mensuales del F29 están materializadas (falta solo la
+vista consolidada — child E futura).
+
+## Delta 2026-06-20 — TASK-1188 Posición mensual de RETENCIONES (línea retenciones del F29)
+
+Segunda línea del F29 materializada por entidad legal (la primera fue IVA, TASK-725).
+Mirror del patrón VAT: tablas `greenhouse_finance.retention_ledger_entries` +
+`retention_monthly_positions`, scope `organization_id` (operating entity), **NUNCA**
+`space_id`. Materializador `materializeRetentionLedgerForPeriod` (`src/lib/finance/retention-ledger.ts`)
+con advisory lock por período + guard FX (lecciones TASK-1185), tasa de referencia
+desde `SII_RETENTION_RATES` (versionada, nunca hardcode).
+
+**Source-of-truth (decisión clave, evidencia BD viva):** la posición se materializa
+**solo desde las boletas de honorarios (BHE) recibidas** (`expenses.withholding_amount > 0`),
+el instrumento legal declarado al SII, en su período de emisión. **NO** se suma
+`payroll_entries.sii_retention_amount` (honorarios internos): doble-contaría — un mismo
+honorario aparece en ambas fuentes (probado: Luis Reyes, Felipe Zurita en payroll Y como
+BHE-expense). El ledger conserva `source_kind`/`dedup_status` como punto de extensión para
+un v2 que sume el gap payroll-sin-BHE (sub-declaración) vía signal, no sumándolo.
+
+Reader/endpoint gobernados (`GET /api/finance/retention/monthly-position`) scopeados a la
+operating entity, degradación honesta (`fiscal_entity_unavailable`), sin exponer el RUT de
+la contraparte (PII). Signal `finance.retention.position_drift` (steady=0). Flag
+`RETENTION_POSITION_ENABLED` (default OFF + shadow) → el endpoint marca `enabled:false`
+hasta validación contable vs el F29 real + flip. Cifra shadow verificada: 2026-05 = 242.623
+CLP (3 docs), 2026-06 = 138.646 CLP (2 docs). Child B de la umbrella TASK-1186.
+
+## Delta 2026-06-20 — TASK-1187 `space_id`/`client_id` deprecadas en `vat_monthly_positions`
+
+Cleanup post-TASK-725. El scope fiscal del IVA es la entidad legal (operating entity);
+`vat_monthly_positions` consolida por `organization_id` y escribe `space_id`/`client_id`
+**siempre NULL** (30/30 filas). Audit: 0 readers las usan como scope fiscal (el scope es
+`organization_id`/`legalEntityOrganizationId`). Quedan marcadas **deprecated** vía
+`COMMENT ON COLUMN` (migración `20260620164008059`, propagado a `db.d.ts` como JSDoc).
+
+`vat_ledger_entries.space_id`/`client_id` **se conservan** como tag analítico de
+contraparte por asiento (data viva: 53/56 filas non-null) — NO se deprecan. La remoción
+física de las columnas muertas de `vat_monthly_positions` queda como follow-up opcional.
+Invariante TASK-725 intacto: `space_id` no vuelve a ser clave fiscal.
+
+## Delta 2026-06-20 — TASK-1191 Período fiscal estampado en el sync Nubox (cierra ISSUE-103)
+
+El materializador VAT (`materializeVatLedgerForPeriod` / `materializeAllAvailableVatPeriods`)
+sólo procesa documentos con `period_year`/`period_month` poblados. El sync de Nubox
+no estampaba el período → 165 docs con IVA (53 income + 112 expense) quedaban fuera
+de toda posición F29 (el tramo mayor del crédito/débito excluido detectado por el
+signal `finance.vat.eligible_without_period` de TASK-1185).
+
+Resolución: el step PG del sync Nubox estampa el período derivado de la fecha del
+documento con el helper canónico `getOperationalFiscalPeriod()` (ver Delta en
+`GREENHOUSE_SOURCE_SYNC_PIPELINES_V1.md` 2026-06-20), self-heal en los UPDATE paths,
+backfill idempotente source-agnostic de los 165 históricos y re-materialización de
+30 posiciones VAT (2023-06 → 2026-03). Post-remediación ambos signals
+(`finance.vat.eligible_without_period`, `finance.vat.position_drift`) quedan en `ok`.
+Regla de derivación = mes del documento (validada contra la convención existente);
+la cifra resultante (débito CLP 22.850.566 / crédito CLP 2.563.383) la autoriza el
+contador/operador antes del baseline.
 
 ## Delta 2026-05-13 — TASK-871 Rolling Rematerialization Anchor Contract
 
@@ -681,6 +826,35 @@ El endpoint `GET /api/finance/expenses/meta` deja de tratar el schema legacy de 
 - instituciones previsionales/salud de Payroll → `greenhouse_payroll.compensation_versions` / reader Postgres `listPayrollSocialSecurityInstitutionsFromPostgres`
 
 BigQuery queda solo como carril legacy de compatibilidad por slice, no como guard global del endpoint. Si los enrichments opcionales no están disponibles, el drawer mantiene `200` con defaults y payload crítico intacto.
+
+## Delta 2026-06-20 — VAT materializer fiscal robustness hardening (TASK-1185)
+
+Hardening additive/defensivo del materializador de IVA (follow-ups de la auditoría adversarial de TASK-725):
+
+- **Guard FX:** el materializador omite (no materializa) IVA en moneda ≠ CLP con `exchange_rate_to_clp` nulo/0, en vez de convertir con el fallback `×1` (que sub-declararía ~900x silencioso). Esos documentos los hace observables el signal `finance.vat.entry_unresolved_fx` (data_quality, steady=0). **Invariante:** NUNCA materializar un asiento fiscal no-CLP con FX nulo/0.
+- **Advisory lock:** `materializeVatLedgerForPeriod` toma `pg_advisory_xact_lock(hashtext('vat_materialize'), hashtext(periodId))` al inicio de la tx → serializa materializaciones concurrentes del mismo período (el DELETE+INSERT no es atómico entre runs).
+- **Cache TTL del resolver:** `getOperatingEntityIdentity()` deja de cachear inmortalmente (TTL 5min + `clearOperatingEntityCache()`); en el ops-worker long-lived un cambio de operating entity ya no queda stale hasta reiniciar. Cross-cutting: payroll/contractor/finiquito/VAT.
+- **Signal data-quality:** `finance.vat.eligible_without_period` cuenta documentos con IVA y `period_year`/`period_month` NULL — nunca se materializan en ningún período F29 y son invisibles a `finance.vat.position_drift`. Steady=0 (hoy 165 → remediación: stampear `tax_period`).
+
+Rollout: los 2 signals son app-side (live al deploy); el hardening del materializador es worker-bundled (guard FX hoy no-op porque todo es CLP) → activa en el próximo redeploy del ops-worker. Spec: `docs/tasks/complete/TASK-1185-vat-materializer-fiscal-robustness-hardening.md`.
+
+## Delta 2026-06-20 — VAT scope = entidad legal (operating entity), no `space_id` (TASK-725, cierra ISSUE-101)
+
+**Re-scope del modelo VAT del TASK-533 (abajo).** El IVA / F29 se declara por **RUT (entidad legal)**, no por `space_id`/cliente: una entidad legal = una posición consolidada por mes. El modelo original (TASK-533) particionaba `vat_monthly_positions` por `space_id` y el materializador filtraba `space_id IS NOT NULL` — eso **excluía el 100% del crédito fiscal del overhead** (gastos de Efeonce sin client_space), produciendo una posición F29 sobreestimada (ISSUE-101).
+
+**Modelo vigente:**
+
+- **Scope fiscal = operating entity.** El dueño fiscal de toda venta (débito) y compra (crédito) es la operating entity canónica (`is_operating_entity=TRUE`; hoy Efeonce Group SpA, RUT 77.357.182-1), resuelta vía `getOperatingEntityIdentity()` (`src/lib/account-360/organization-identity.ts`). NO se creó tabla `legal_entity` nueva — se reusa el modelo `organization` canónico (hard rule: no identidad paralela).
+- **`organization_id`** en `vat_ledger_entries` / `vat_monthly_positions` pasa a significar el **dueño fiscal** (operating entity). `space_id`/`client_id` quedan como **etiqueta analítica de contraparte** (nullable).
+- **Materializador** (`materializeVatLedgerForPeriod`): sin gates `space_id IS NOT NULL` (income/expense), agrupa por `organization_id` → 1 posición consolidada/período. Migración `20260620131856180` (space_id nullable + unique `(organization_id, period)` reemplaza el unique por space).
+- **Readers + endpoint**: por operating entity, no `tenant.spaceId`. El endpoint deja de exigir space (causa del 422 del dashboard consolidado interno) y degrada con `canonicalErrorResponse('fiscal_entity_unavailable')`.
+- **Reliability signal** `finance.vat.position_drift` (steady=0): documentos con IVA de períodos materializados sin asiento en el ledger (detector de la bug-class).
+
+**Invariantes (agentes):** **NUNCA** particionar un agregado fiscal (IVA/F29 — y por extensión PPM/retenciones) por `space_id`/`client_id` (la SSOT fiscal es la entidad legal/RUT); **NUNCA** filtrar `space_id IS NOT NULL` en un cómputo fiscal (bota el overhead sin cliente); **SIEMPRE** emitir `finance.vat.position_drift` cuando el VAT mute; **SIEMPRE** validar la cifra corregida vs el F29 real antes de baseline productivo.
+
+**Rollout:** code-complete + verificado en dev (re-materializado, `position_drift=0`) y staging (endpoint HTTP 200 con `legalEntity`). El `ops-worker` reactivo ya corre el materializador nuevo desde la revisión `ops-worker-00375-fz7` (100% tráfico, `GIT_SHA=a1c71840b...`). Pendiente antes de baseline productivo: validación F29 con contador. Spec: `docs/tasks/in-progress/TASK-725-finance-fiscal-scope-legal-entity-foundation.md`.
+
+> **Nota:** el Delta de abajo (TASK-533) describe el modelo V1 por `space_id`, recontextualizado por este Delta. Se conserva como historia.
 
 ## Delta 2026-04-21 — Chile VAT Ledger & Monthly Position (TASK-533)
 
@@ -1837,13 +2011,14 @@ Finance es el módulo más grande del portal: 49 API routes, 13 páginas, 28 arc
 | `client_economics`            | Postgres (`greenhouse_finance`)         | No                                      | Nativo; persiste `organization_id` + `client_id` compat                     |
 | `reconciliation_periods`      | Postgres                                | `fin_reconciliation_periods` (fallback) | Migrado                                                                     |
 | `bank_statement_rows`         | Postgres                                | `fin_bank_statement_rows` (fallback)    | Migrado                                                                     |
-| `dte_emission_queue`          | Postgres only                           | No                                      | TASK-139                                                                    |
+| `dte_emission_queue`          | Postgres only                           | No                                      | Gobernada por migración `20260620193557859_task-1194-dte-emission-queue-governed-ddl.sql`; runtime validation-only |
 | `commercial_cost_attribution` | Serving Postgres (`greenhouse_serving`) | No                                      | Canónico materializado; persiste `organization_id` + `client_id` compat     |
 | `service_attribution_facts`   | Serving Postgres (`greenhouse_serving`) | No                                      | Foundation factual por `service_id + period + source`; desbloquea `service_economics` |
 
 Nota operativa:
 
-- `commercial_cost_attribution` existe en el schema snapshot y ya es contrato vigente del sistema, pero su DDL base sigue asegurado por runtime/store code además de las migraciones incrementales; todavía no vive como create-table canónico separado dentro de `scripts/` o una migración histórica dedicada.
+- `commercial_cost_attribution` existe en el schema snapshot y ya es contrato vigente del sistema. Desde el delta 2026-06-20 su DDL base vive en migración gobernada (`20260620141000000_commercial-cost-attribution-governed-ddl.sql`) y el runtime/store solo valida existencia + ejecuta DML/SELECT; no debe recuperar privilegios `CREATE` sobre `greenhouse_serving`.
+- `dte_emission_queue` sigue el mismo patrón desde el delta 2026-06-20 de `TASK-1194` Slice 0: DDL, grants e índice viven en migración gobernada (`20260620193557859_task-1194-dte-emission-queue-governed-ddl.sql`), mientras `src/lib/finance/dte-emission-queue.ts` solo valida columnas requeridas y ejecuta DML. La app no debe crear/alterar esta cola en runtime.
 - `service_attribution_unresolved` acompaña a `service_attribution_facts` como cola auditable de casos ambiguos o sin evidencia suficiente; no debe tratarse como error silencioso ni como fallback inventado en UI.
 
 ### BigQuery Cutover Plan
@@ -1905,6 +2080,7 @@ Este es el **endpoint más importante del módulo Finance**. Construye un P&L op
 Query 1: Income (devengado por invoice_date)
   → greenhouse_finance.income
   → total_amount_clp, partner_share, record_count
+  → NUNCA effective_cost_amount_clp (esa columna es de expenses)
 
 Query 2: Collected Revenue (caja por payment_date)
   → greenhouse_finance.income_payments JOIN income
@@ -2193,10 +2369,10 @@ Checks relevantes:
 
 | Check                             | Qué verifica                                                                 |
 | --------------------------------- | ---------------------------------------------------------------------------- |
-| `income_payment_ledger_integrity` | `income.amount_paid = SUM(income_payments.amount)`                           |
-| `income_paid_without_ledger`      | Facturas con `amount_paid > 0` pero sin filas en `income_payments`           |
-| `expense_payment_ledger_integrity`| `expenses.amount_paid = SUM(expense_payments.amount)`                        |
-| `expense_paid_without_ledger`     | Compras con `amount_paid > 0` pero sin filas en `expense_payments`           |
+| `income_payment_ledger_integrity` | `income_settlement_reconciliation.has_drift` (settlement canónico: pagos activos + factoring + withholding) |
+| `income_paid_without_ledger`      | Facturas con `amount_paid > 0` pero sin filas activas en `income_payments_normalized` |
+| `expense_payment_ledger_integrity`| `expenses.amount_paid = SUM(expense_payments_normalized.payment_amount_native)` |
+| `expense_paid_without_ledger`     | Compras con `amount_paid > 0` pero sin filas activas en `expense_payments_normalized` |
 | `direct_cost_without_client`      | Gastos directos sin `allocated_client_id` / `client_id` efectivo             |
 | `shared_overhead_unallocated`     | Overhead compartido sin asignación explícita; visible pero **no** se trata como falla |
 | `income_without_client`           | Ingresos sin cliente                                                         |
@@ -2209,6 +2385,7 @@ Reglas adicionales:
 1. Cuando el tenant trae `spaceId`, los checks que tienen `space_id` canónico deben leer en scope tenant.
 2. Los checks globales siguen existiendo para tablas que no exponen `space_id` confiable en todas sus filas.
 3. `Finance Data Quality` en Ops/Admin no debe volver a mezclar backlog de riesgo con overhead compartido permitido bajo un único contador de “fallas”.
+4. El endpoint no debe re-derivar ledger drift con `SUM(income_payments.amount)` ni `SUM(expense_payments.amount)` raw; debe consumir los contracts canónicos que filtran superseded y settlement.
 
 Integrado en Admin Center > Ops Health como subsistema "Finance Data Quality", con summary semántico por buckets en vez de sobrecargar `processed/failed`.
 

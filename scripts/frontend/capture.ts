@@ -13,7 +13,7 @@ import { parseArgs } from 'node:util'
 
 import { appendAudit, resolveActor } from './lib/audit'
 import { writeCaptureIndex } from './lib/capture-index'
-import { pruneScenarioRuns } from './gc'
+import { pruneScenarioRuns, pruneCapturesBudget, shouldRunAutoGc } from './gc'
 import { ensureStorageStateFresh, refreshStorageState } from './lib/auth'
 import { runBaselineDiffContract } from './lib/baseline-contract'
 import { assertNotRedirectedToLogin, launchCaptureSession } from './lib/browser'
@@ -551,6 +551,29 @@ const main = async (): Promise<void> => {
     const pruned = pruneScenarioRuns(scenario.name, Number.isFinite(keepPerScenario) ? keepPerScenario : 3)
 
     if (pruned > 0) PRINT(`✓ auto-poda: ${pruned} iteración(es) vieja(s) de '${scenario.name}' eliminada(s)`)
+
+    // Auto-gc por PRESUPUESTO de tamaño (throttled): el per-scenario prune de
+    // arriba acota cada scenario pero no el TOTAL. Acá mantenemos .captures/ bajo
+    // GVC_CAPTURE_MAX_GB purgando lo más viejo, SIN tocar lo reciente (keepNewest
+    // global + grace 2d → protege la sesión/loop en curso de un agente). El
+    // throttle (stamp, GVC_AUTOGC_INTERVAL_HOURS) evita recalcular el tamaño en
+    // cada captura. Control: GVC_CAPTURE_MAX_GB=0 lo desactiva.
+    const maxGb = Number(process.env.GVC_CAPTURE_MAX_GB ?? 4)
+    const keepNewest = Number(process.env.GVC_CAPTURE_KEEP_NEWEST ?? 20)
+    const intervalHours = Number(process.env.GVC_AUTOGC_INTERVAL_HOURS ?? 12)
+
+    if (Number.isFinite(maxGb) && maxGb > 0 && shouldRunAutoGc(Number.isFinite(intervalHours) ? intervalHours : 12)) {
+      const { removed, reclaimedBytes } = pruneCapturesBudget({
+        maxGb,
+        keepNewest: Number.isFinite(keepNewest) ? keepNewest : 20
+      })
+
+      if (removed > 0) {
+        PRINT(
+          `✓ auto-gc size-cap: ${removed} captura(s) vieja(s) purgada(s) (${(reclaimedBytes / 1024 ** 3).toFixed(2)} GB; cap ${maxGb}GB, protege ${keepNewest} recientes + 2d grace)`
+        )
+      }
+    }
   }
 
   // Regenera el índice navegable (.captures/INDEX.md + index.json). Best-effort.

@@ -103,12 +103,21 @@ const VatMonthlyPositionCard = ({
   loading,
   position,
   recentPositions,
-  entries
+  entries,
+  error = null,
+  onRetry
 }: {
   loading: boolean
   position: VatMonthlyPosition | null
   recentPositions: VatMonthlyPosition[]
   entries: VatLedgerEntry[]
+  /**
+   * TASK-725 Slice 1 — degradación honesta local: cuando la posición IVA no
+   * pudo cargar, la card lo muestra acá (no se contamina el banner global del
+   * dashboard). Mensaje es-CL safe; NUNCA prosa cruda del backend.
+   */
+  error?: string | null
+  onRetry?: () => void
 }) => {
   if (loading) {
     return (
@@ -131,6 +140,55 @@ const VatMonthlyPositionCard = ({
   }
 
   if (!position) {
+    // TASK-725 Slice 1 — estado degradado honesto: la card no desaparece en
+    // silencio cuando la lectura falla; muestra qué pasó + recuperación.
+    if (error) {
+      return (
+        <Card elevation={0} sx={{ border: theme => `1px solid ${theme.palette.divider}` }}>
+          <CardHeader
+            title='Posición IVA del mes'
+            subheader='No disponible en este momento'
+            avatar={
+              <Avatar variant='rounded' sx={{ bgcolor: 'warning.lightOpacity' }}>
+                <i className='tabler-receipt-tax' style={{ fontSize: 22, color: 'var(--mui-palette-warning-main)' }} />
+              </Avatar>
+            }
+          />
+          <Divider />
+          <CardContent>
+            <Box
+              role='status'
+              sx={{
+                p: 3,
+                borderRadius: 2,
+                border: theme => `1px dashed ${theme.palette.divider}`,
+                bgcolor: 'action.hover',
+                display: 'flex',
+                flexWrap: 'wrap',
+                gap: 2,
+                alignItems: 'center',
+                justifyContent: 'space-between'
+              }}
+            >
+              <Box>
+                <Typography variant='subtitle2' sx={{ fontWeight: 600 }}>
+                  No pudimos cargar la posición IVA de este período
+                </Typography>
+                <Typography variant='body2' color='text.secondary' sx={{ mt: 1 }}>
+                  {error}
+                </Typography>
+              </Box>
+              {onRetry ? (
+                <Button variant='outlined' size='small' onClick={onRetry}>
+                  {GREENHOUSE_COPY.actions.retry}
+                </Button>
+              ) : null}
+            </Box>
+          </CardContent>
+        </Card>
+      )
+    }
+
     return null
   }
 
@@ -225,7 +283,7 @@ const VatMonthlyPositionCard = ({
               Sin movimientos con IVA materializados
             </Typography>
             <Typography variant='body2' color='text.secondary' sx={{ mt: 1 }}>
-              Este período no tiene documentos con débito fiscal ni crédito fiscal recuperable para el `space` activo.
+              Este período no tiene documentos con débito fiscal ni crédito fiscal recuperable para la entidad legal.
             </Typography>
           </Box>
         ) : (

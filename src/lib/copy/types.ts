@@ -252,6 +252,9 @@ export interface AriaCopy {
   paymentObligationFilters: string
   breadcrumb: string
   dismissHelper: string
+  leaderboardRunSelect: string
+  leaderboardPagination: string
+  leaderboardRowsCollapsed: string
 }
 
 /**

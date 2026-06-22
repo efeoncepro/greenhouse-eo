@@ -245,6 +245,30 @@ describe('engagement approval helpers', () => {
     expect(client.query).toHaveBeenCalledTimes(7)
   })
 
+  it('returns an already approved approval idempotently without duplicating audit or outbox writes', async () => {
+    const client = buildClient([
+      { rows: [approvedApproval] }
+    ])
+
+    mockedWithTransaction.mockImplementationOnce(async (run: (client: unknown) => Promise<unknown>) => run(client))
+
+    const approval = await approveEngagement({
+      serviceId: 'SVC-HS-123',
+      approvedBy: 'admin-2',
+      approvedAt: '2026-05-07T14:00:00.000Z',
+      proposedMembers: [{ memberId: 'member-1', proposedFte: 0.4 }],
+      capacityOverrideReason: 'Retry after network timeout.'
+    })
+
+    expect(approval).toMatchObject({
+      status: 'approved',
+      approvedBy: 'admin-1',
+      approvedAt: '2026-05-07T13:00:00.000Z'
+    })
+    expect(client.query).toHaveBeenCalledTimes(1)
+    expect(String(client.query.mock.calls[0][0])).toContain('FOR UPDATE OF a, s')
+  })
+
   it('requires override reason when projected capacity exceeds 100%', async () => {
     const client = buildClient([
       { rows: [pendingApproval] },

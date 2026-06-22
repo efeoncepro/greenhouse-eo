@@ -57,6 +57,16 @@ export type CanonicalErrorCode =
   // Design System Figma node linking (TASK-1072).
   | 'invalid_figma_url'
   | 'figma_node_not_axis'
+  | 'figma_file_not_allowed'
+  | 'design_handoff_not_found'
+  | 'invalid_design_handoff_input'
+  | 'invalid_design_handoff_transition'
+  | 'invalid_design_handoff_link'
+  | 'invalid_design_handoff_evidence'
+  | 'invalid_design_handoff_primitive_decision'
+  | 'design_handoff_missing_evidence'
+  | 'design_handoff_missing_primitive_decision'
+  | 'design_handoff_node_unavailable'
   // Nexa chat endpoint (TASK-1131).
   | 'nexa_prompt_required'
   | 'nexa_generation_failed'
@@ -66,8 +76,13 @@ export type CanonicalErrorCode =
   | 'nexa_action_failed'
   // Roadmap cockpit — work item Markdown lookup (TASK-1153 follow-up).
   | 'roadmap_work_item_not_found'
-  // Reserved for future canonical codes — extender aquí cuando emerjan
-  // nuevos error paths estructurales. NUNCA usar strings ad-hoc.
+  // ICO sync activation gobernada (TASK-1171 Slice 3).
+  | 'ico_sync_client_not_found'
+  | 'ico_sync_source_not_connected'
+  // Finance fiscal scope (TASK-725) — sin entidad legal operating configurada.
+  | 'fiscal_entity_unavailable'
+// Reserved for future canonical codes — extender aquí cuando emerjan
+// nuevos error paths estructurales. NUNCA usar strings ad-hoc.
 
 export interface CanonicalErrorBody {
   /** es-CL canónico, safe para mostrar al usuario directo. */
@@ -99,7 +114,8 @@ const CANONICAL_ERRORS: Record<CanonicalErrorCode, CanonicalErrorDefinition> = {
     status: 422,
     // Mensaje accionable explicando QUÉ falta y QUÉ hacer.
     // Reintentar no resuelve — el operador debe gestionar con HR.
-    message: 'Tu cuenta aún no está enlazada a un colaborador. Pídele a People Ops que active tu identidad para acceder a las vistas personales.',
+    message:
+      'Tu cuenta aún no está enlazada a un colaborador. Pídele a People Ops que active tu identidad para acceder a las vistas personales.',
     actionable: false
   },
   client_tenant_required: {
@@ -122,6 +138,14 @@ const CANONICAL_ERRORS: Record<CanonicalErrorCode, CanonicalErrorDefinition> = {
     message: 'Demasiados intentos. Espera un momento e inténtalo de nuevo.',
     actionable: true
   },
+  fiscal_entity_unavailable: {
+    status: 422,
+    // Estructural: falta la entidad legal operativa (is_operating_entity).
+    // Reintentar no resuelve — requiere configuración de Admin/Finanzas.
+    message:
+      'La posición fiscal no está disponible: falta configurar la entidad legal operativa. Contacta a tu administrador de Finanzas.',
+    actionable: false
+  },
   internal_error: {
     status: 500,
     message: 'Algo salió mal de nuestro lado. Inténtalo de nuevo en unos minutos.',
@@ -135,6 +159,57 @@ const CANONICAL_ERRORS: Record<CanonicalErrorCode, CanonicalErrorDefinition> = {
   figma_node_not_axis: {
     status: 422,
     message: 'El nodo debe ser del archivo AXIS. Pega un enlace de un nodo del Design System en AXIS.',
+    actionable: true
+  },
+  figma_file_not_allowed: {
+    status: 422,
+    message:
+      'Ese archivo de Figma aún no está aprobado para handoff de producto. Pídele a un admin que lo agregue al allowlist.',
+    actionable: false
+  },
+  design_handoff_not_found: {
+    status: 404,
+    message: 'No encontramos ese handoff de diseño. Puede que se haya archivado o movido.',
+    actionable: false
+  },
+  invalid_design_handoff_input: {
+    status: 422,
+    message: 'Revisa los datos del handoff. La ruta implementada debe ser una ruta interna válida.',
+    actionable: true
+  },
+  invalid_design_handoff_transition: {
+    status: 409,
+    message: 'Ese cambio de estado no es válido para el handoff seleccionado.',
+    actionable: false
+  },
+  invalid_design_handoff_link: {
+    status: 422,
+    message: 'El vínculo del handoff no es válido. Usa una referencia tipada y segura.',
+    actionable: true
+  },
+  invalid_design_handoff_evidence: {
+    status: 422,
+    message: 'La evidencia del handoff no es válida. Adjunta una ruta, captura o revisión reconocida.',
+    actionable: true
+  },
+  invalid_design_handoff_primitive_decision: {
+    status: 422,
+    message: 'Revisa la decisión de Primitive governance. La estrategia debe tener los campos obligatorios.',
+    actionable: true
+  },
+  design_handoff_missing_evidence: {
+    status: 409,
+    message: 'Para cerrar un handoff como implementado necesitas evidencia runtime o una excepción gobernada.',
+    actionable: false
+  },
+  design_handoff_missing_primitive_decision: {
+    status: 409,
+    message: 'Para cerrar un handoff como implementado necesitas una decisión Primitive governance resuelta.',
+    actionable: true
+  },
+  design_handoff_node_unavailable: {
+    status: 409,
+    message: 'No pudimos verificar ese nodo Figma ahora. Revisa el acceso al archivo o inténtalo más tarde.',
     actionable: true
   },
   nexa_prompt_required: {
@@ -170,6 +245,18 @@ const CANONICAL_ERRORS: Record<CanonicalErrorCode, CanonicalErrorDefinition> = {
   roadmap_work_item_not_found: {
     status: 404,
     message: 'No encontramos ese work item en el backlog. Puede que se haya movido o renombrado.',
+    actionable: false
+  },
+  ico_sync_client_not_found: {
+    status: 404,
+    message: 'No encontramos un espacio para ese cliente. Verifica que el cliente exista y tenga un espacio activo.',
+    actionable: false
+  },
+  ico_sync_source_not_connected: {
+    status: 422,
+    // Reintentar no resuelve: hay que conectar Notion primero (wizard de onboarding).
+    message:
+      'Este cliente aún no tiene Notion conectado, así que no se puede activar su sync de ICO. Conéctalo primero desde el onboarding.',
     actionable: false
   }
 }

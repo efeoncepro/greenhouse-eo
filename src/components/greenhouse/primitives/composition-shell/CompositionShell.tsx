@@ -60,7 +60,7 @@ const regionSx = (
   const meta = COMPOSITION_SHELL_REGION_META[region]
 
   const base = {
-    minInlineSize: meta.minInlineSize > 0 ? `${meta.minInlineSize}px` : 0,
+    minInlineSize: meta.minInlineSize > 0 ? { xs: 0, sm: `${meta.minInlineSize}px` } : 0,
     containerType: 'inline-size' as const,
     outline: 'none'
   }

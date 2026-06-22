@@ -55,9 +55,18 @@ y con preview de datos reales que Nexa propone para que un humano confirme antes
 
 Campos: `contractVersion` · `proposalId` (UUID, liga la idempotency key) · `actionKey` · `intent` ·
 `sensitivity` (`low|medium|high`) · `preview` (`title`/`summary`/`metrics[]`, datos frescos) ·
-`confirmation` (copy es-CL) · `execution` (`confirmEndpoint` + `idempotencyKey` server-generada) ·
-`expiresAt`. Cuando el resolver no puede proponer → `NexaActionGap` (`reason` ∈ `unknown_action |
-not_permitted | runtime_disabled | no_command_binding | unavailable` + `message` + `deepLink?`).
+`confirmation` (copy es-CL) · `execution` (`confirmEndpoint` + `idempotencyKey` server-generada +
+**`input?`** — TASK-1212: el `input` Zod-validado de una acción **parametrizada**, eco al cliente para
+re-enviarlo en confirm; `undefined` en self-actions) · `expiresAt`. Cuando el resolver no puede proponer
+→ `NexaActionGap` (`reason` ∈ `unknown_action | not_permitted | runtime_disabled | no_command_binding |
+unavailable | invalid_input` + `message` + `deepLink?`; **`invalid_input`** = el `input` no pasó el
+`inputSchema` de la acción).
+
+**Acciones parametrizadas (TASK-1212)**: `NexaActionDefinition` es genérico sobre `TInput` y declara un
+**`inputSchema` Zod** opcional. El resolver (propose) y `confirmNexaAction` (execute) **ambos** parsean el
+`input` contra ese schema — el confirm NO confía en el eco del cliente. El command bound re-enforza sus
+propios invariantes, así que un eco manipulado no escala privilegio. Primera parametrizada: `author_quote`
+→ command `submitQuoteFromBuilder` (contrato Zod en `@/lib/commercial/submit-quote-from-builder-schema.ts`).
 
 **Ledger de eventos** (no es contrato de cliente): `greenhouse_ai.nexa_action_events` (append-only) —
 una fila por evento del ciclo de vida (`proposed | proposal_denied | executed | failed |

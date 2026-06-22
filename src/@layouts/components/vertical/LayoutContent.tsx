@@ -1,5 +1,7 @@
 'use client'
 
+import { usePathname } from 'next/navigation'
+
 // Third-party Imports
 import classnames from 'classnames'
 
@@ -15,13 +17,17 @@ import { verticalLayoutClasses } from '@layouts/utils/layoutClasses'
 // Styled Component Imports
 import StyledMain from '@layouts/styles/shared/StyledMain'
 
+const DESIGN_SYSTEM_BRAND_LOGOS_ROUTE = '/design-system/brand-logos'
+
 const LayoutContent = ({ children }: ChildrenType) => {
   // Hooks
   const { settings } = useSettings()
+  const pathname = usePathname()
 
   // Vars
-  const contentCompact = settings.contentWidth === 'compact'
-  const contentWide = settings.contentWidth === 'wide'
+  const routeUsesWideCanvas = pathname.startsWith(DESIGN_SYSTEM_BRAND_LOGOS_ROUTE)
+  const contentCompact = settings.contentWidth === 'compact' && !routeUsesWideCanvas
+  const contentWide = settings.contentWidth === 'wide' || routeUsesWideCanvas
 
   return (
     <StyledMain

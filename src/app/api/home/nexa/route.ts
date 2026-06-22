@@ -5,7 +5,7 @@ import { canonicalErrorResponse } from '@/lib/api/canonical-error-response'
 import { getServerAuthSession } from '@/lib/auth'
 import { buildHomeEntitlementsContext } from '@/lib/home/build-home-entitlements-context'
 import { getHomeFinanceStatus } from '@/lib/home/get-home-snapshot'
-import type { NexaRuntimeContext } from '@/lib/nexa/nexa-contract'
+import type { NexaFocusRef, NexaRuntimeContext } from '@/lib/nexa/nexa-contract'
 import { NexaService } from '@/lib/nexa/nexa-service'
 import { persistNexaConversation } from '@/lib/nexa/store'
 import { captureWithDomain } from '@/lib/observability/capture'
@@ -34,14 +34,23 @@ export async function POST(req: Request) {
     history = [],
     model,
     modelMode,
-    threadId
+    threadId,
+    focusRef
   } = body as {
     prompt: string
     history: NexaMessage[]
     model?: string | null
     modelMode?: NexaModelMode | null
     threadId?: string | null
+    focusRef?: NexaFocusRef | null
   }
+
+  // TASK-1182 — conciencia de superficie: `focusRef` viaja en el body desde la UI (CTA del insight).
+  // Validación de shape estricta; es CONTEXTO, no permiso (el reader anti-oracle decide el acceso).
+  const focusRefValidated: NexaFocusRef | undefined =
+    focusRef && focusRef.kind === 'nexa_insight' && typeof focusRef.id === 'string' && focusRef.id.trim()
+      ? { kind: 'nexa_insight', id: focusRef.id.trim() }
+      : undefined
 
   if (!prompt) {
     return canonicalErrorResponse('nexa_prompt_required')
@@ -95,7 +104,8 @@ export async function POST(req: Request) {
       timezone: user.timezone || 'America/Santiago',
       ...(user.organizationId ? { organizationId: user.organizationId } : {}),
       ...(user.organizationName ? { organizationName: user.organizationName } : {}),
-      ...(user.memberId ? { memberId: user.memberId } : {})
+      ...(user.memberId ? { memberId: user.memberId } : {}),
+      ...(focusRefValidated ? { focusRef: focusRefValidated } : {})
     }
 
     const nexaResponse = await NexaService.generateResponse({

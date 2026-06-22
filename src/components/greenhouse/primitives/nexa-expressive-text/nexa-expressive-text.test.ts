@@ -56,6 +56,12 @@ describe('getNexaExpressiveTextPlainText', () => {
     expect(getNexaExpressiveTextPlainText(value)).toBe(' [1]')
   })
 
+  it('cue aporta el label gobernado al texto plano y respeta decorativo', () => {
+    expect(getNexaExpressiveTextPlainText([{ type: 'cue', cue: 'ready' }])).toBe('Listo')
+    expect(getNexaExpressiveTextPlainText([{ type: 'cue', cue: 'idea', domain: 'finance' }])).toBe('Punto a evaluar')
+    expect(getNexaExpressiveTextPlainText([{ type: 'cue', cue: 'source', decorative: true }])).toBe('')
+  })
+
   it('arma la prosa completa con citas inline en el span exacto (caso mockup)', () => {
     const value: NexaExpressiveTextValue = [
       { text: 'La lectura útil está en la relación entre señales' },

@@ -48,6 +48,36 @@ Greenhouse adopts **full API parity** as a product/platform principle:
 
 Parity is evaluated at the **business capability** level, not at the UI component level. The UI is a client of canonical server-side primitives, commands, readers and projections; it is not the source of truth for business logic.
 
+### North Star: Nexa total operability (CEO directive, 2026-06-19)
+
+**Full API parity is the base requirement; Nexa total operability is its consequence and North Star.** The hard requirement is the governed contract at the capability level. Because that contract exists, **Nexa Agent can eventually operate the ENTIRE portal from the Conversational Experience** — every business capability reachable through Nexa, not only through screens — *by construction*, without anything Nexa-specific being built. This elevates parity from "agent-ready as a benefit" to a **hard product mandate**:
+
+- Every **new UI** and every **new capability/entitlement** must be born with its governed programmatic contract that Nexa's action runtime can invoke.
+- Reads are consumed directly; **writes go through the governed-action loop `propose → confirm → execute`** — the LLM never executes a write directly; mutation happens only at the human confirmation endpoint (see `docs/architecture/agent-invariants/KNOWLEDGE_NEXA_AGENT_INVARIANTS.md` + `GREENHOUSE_NEXA_ARCHITECTURE_V1.md`).
+- UI and Nexa are **two clients of the same canonical primitive**, never two implementations of the same logic.
+- Mandatory design-time question for any feature: **"does this capability have a governed contract at the capability level?"** If yes, Nexa (and every consumer) can operate it end-to-end by construction; if no, the feature is not complete.
+
+This does not grant Nexa raw write power: parity guarantees the *contract path exists and is governed*; the confirm step and capability/authorization gates still apply.
+
+### Canonical consumers (declared)
+
+Every governed capability is consumed by a **single canonical server-side primitive** (command/reader/projection); the following are all **clients** of that primitive, never parallel implementations. A capability is "parity-complete" only when its contract serves the consumers it needs across this set:
+
+| # | Consumer | What it is | Path / surface |
+|---|---|---|---|
+| 1 | **UI (web portal)** | Human-facing Next.js views/components | reads via readers, writes via Product API → canonical command |
+| 2 | **Nexa Agent (Conversational Experience)** | The North Star: operate the entire portal conversationally | action-runtime: reads direct, writes via `propose → confirm → execute` |
+| 3 | **MCP / downstream agents** | External agents (Claude, etc.) operating Greenhouse | MCP adapters over `api/platform/ecosystem/*` |
+| 4 | **First-party apps (app lane)** | Future mobile/desktop/native Greenhouse clients | `api/platform/app/*` |
+| 5 | **Ecosystem / sister platforms** | Peer systems: Kortex (CRM/HubSpot), public site `efeonce-web`, `notion-bigquery` sync | `api/platform/ecosystem/*` |
+| 6 | **Inbound integrations / webhooks** | HubSpot, Notion, Teams, ZapSign, Entra/SCIM, GCP/Azure — trigger commands | webhook bus → canonical command (idempotent) |
+| 7 | **Teams Bot** | Operate/announce capabilities from Microsoft Teams | bot → Product/Platform contract |
+| 8 | **Async runtime (crons / workers / reactive)** | Cloud Run ops-worker, Cloud Scheduler, outbox publisher, reactive projections, materializers, recovery flows | server-side commands/readers (no UI) |
+| 9 | **CLI / runbooks / scripts** | `pnpm` operational tooling, agent scripts, ops runbooks | canonical primitives / Product API |
+| 10 | **E2E / verification harness** | Playwright + agent auth, smoke/contract tests | same contracts as UI/agents (no private back doors) |
+
+Hard rule: if a new behavior is reachable by **any** of these consumers, the business logic must live in the canonical primitive and be exposed through a governed contract — not duplicated per consumer. New consumer classes (e.g. a future voice or email channel) inherit the same contract automatically.
+
 ## Alternatives Considered
 
 ### Alternative 1: UI-first, API-on-demand
@@ -95,6 +125,7 @@ Future Greenhouse work must apply these rules:
 
 - Business logic lives in canonical server-side primitives (`src/lib/**` commands/readers/projections), not only in UI components.
 - New visible capabilities must declare their programmatic path: Product API, `api/platform/app/*`, `api/platform/ecosystem/*`, MCP downstream, CLI/runbook or explicit deferred task.
+- **Nexa-operability is part of "done":** every new UI/capability must validate that Nexa can consume it (read) and/or action it (write via `propose → confirm → execute`). A UI-only or capability-only delivery without its Nexa-invokable contract is incomplete (North Star above).
 - Programmatic writes require command semantics, tenant-safe authorization, sanitized errors, observability, audit/outbox when applicable and idempotency when retries are possible.
 - API contracts model aggregates, resources and commands, not buttons, tabs, components or page-specific handlers.
 - API Platform docs and tasks remain the canonical path for shared app/ecosystem/MCP contracts:
@@ -118,6 +149,7 @@ Reopen this decision if:
 ## Related Documents
 
 - `docs/architecture/GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md`
+- `docs/architecture/GREENHOUSE_FULL_API_PARITY_GAP_LEDGER_V1.md` — gap ledger + reader re-ejecutable (TASK-1172): mide la cobertura real de parity y de operabilidad de Nexa contra el portal existente.
 - `docs/architecture/DECISIONS_INDEX.md`
 - `docs/tasks/to-do/TASK-1002-full-api-parity-first-wave-program.md`
 - `AGENTS.md`

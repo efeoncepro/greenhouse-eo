@@ -240,7 +240,21 @@ export const buildIncomeTaxWriteFields = async (
   const providedTaxAmount = toRoundedNullable(input.taxAmount)
   const providedTotalAmount = toRoundedNullable(input.totalAmount)
   const expectedTaxAmount = roundCurrency(snapshotColumns.taxAmountSnapshot)
-  const expectedTotalAmount = roundCurrency(snapshotColumns.taxSnapshot.totalAmount)
+
+  // TASK-1209 — el snapshot de impuesto es tax-puro: su `totalAmount` es
+  // `base_afecta + IVA` (computeChileTaxSnapshot). Pero la identidad de un DTE
+  // chileno es `total = neto_afecto + IVA + exento` (Monto Neto + IVA + Monto
+  // Exento = Monto Total). Un documento 100% exento (factura/NC de exportación
+  // DTE 110/111/112, factura exenta 34, boleta exenta 41) trae `net_amount=0` y
+  // todo el valor en `exempt_amount`, por lo que el snapshot tax-puro daría
+  // total=0 y rechazaba el total real (`totalAmount does not match the resolved
+  // tax snapshot (0)`) — bloqueando la proyección de TODA factura exenta. El
+  // exento NO entra al snapshot (lo lee `vat-ledger` como ventas exentas, no
+  // como base afecta); se suma sólo al total documental del income. `subtotal`
+  // (base afecta) y `exemptAmount` son disjuntos por construcción del conformed
+  // Nubox y del contrato manual, así que esto no doble-cuenta el afecto.
+  const exemptAmount = roundCurrency(Math.abs(toRoundedNullable(input.exemptAmount) ?? 0))
+  const expectedTotalAmount = roundCurrency(snapshotColumns.taxSnapshot.totalAmount + exemptAmount)
 
   if (providedTaxAmount !== null && Math.abs(providedTaxAmount - expectedTaxAmount) > 1) {
     throw new FinanceValidationError(

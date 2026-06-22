@@ -7,7 +7,7 @@ Nombre canonico de producto interno: **Greenhouse Visual Capture** (`GVC`).
 ## Status
 
 - Estado: `accepted`
-- Version: `1.6`
+- Version: `1.8`
 - Fecha V1.0: `2026-05-12 mañana` — Slice 0-3 (CLI + scenario + recorder + docs)
 - Fecha V1.1: `2026-05-12 tarde` — Delta OQ-1..OQ-6 (upload, device, diff, capability, reliability, ui-review scaffolding)
 - Fecha V1.2: `2026-05-29` — Hook operativo para verificación visual UI obligatoria vía `pnpm fe:capture` y comandos relacionados
@@ -16,6 +16,7 @@ Nombre canonico de producto interno: **Greenhouse Visual Capture** (`GVC`).
 - Fecha V1.5: `2026-06-07` — mockup→runtime contract gates (TASK-1018): baseline visual diff (pixelmatch + masks + home durable), layout integrity, console/hydration/network strict, trace on failure, keyboard/focus/reduced-motion, performance budgets, enterprise rubric + resumen ejecutivo
 - Fecha V1.6: `2026-06-12` — local/Turbopack reliability: navegación `domcontentloaded` + readiness visual declarativa; `networkidle` deja de ser señal canónica para evidencia GVC.
 - Fecha V1.7: `2026-06-12` — observación máquina-legible para autoría (TASK-1097): cada `mark` escribe el árbol de accesibilidad (`frames/<NN>-<label>.aria.txt` + `manifest.frames[].ariaSnapshotPath`). Técnica destilada de `microsoft/webwright` (`local_browser.py`); convierte "mirá el PNG y adiviná el selector" en "leé el a11y tree y escribí `getByRole(...)`". Aditivo (schemaVersion 1, best-effort/graceful degrade). Acompaña la skill `greenhouse-gvc-playwright`. Roadmap: explore mode + scenario promotion (TASK-1098).
+- Fecha V1.8: `2026-06-20` — auto-gc por presupuesto de tamaño: `pruneCapturesBudget` + throttle `shouldRunAutoGc` acotan el TOTAL de `.captures/` sin tocar lo reciente (keepNewest + grace 2d). Env-configurable (`GVC_CAPTURE_MAX_GB`/`KEEP_NEWEST`/`AUTOGC_INTERVAL_HOURS`). Cierra el crecimiento sin tope (caso real 7.5 GB → 2.3 GB).
 - Fecha V1.8: `2026-06-12` — explore mode + scenario promotion (TASK-1098): `pnpm fe:capture:explore --route=X` observa la página viva (read-only) y persiste `.captures/_explore/<slug>/` con candidatos `getByRole(...)` + uniqueness validada + markers + probes; `pnpm fe:capture:promote --route=X --name=<n>` cristaliza la sesión en un `.scenario.ts` válido (gate `validateScenario`). Cierra el loop observe→author→determinismo (`spawn→inspect→discard` de Webwright aplicado a la autoría). El output durable se queda gobernado/determinístico; cero code-as-action en runtime. Microinteracciones/coreografía siguen vía el step `interaction` (V2) / `fe:capture:micro` — promote emite baseline estático.
 - Fecha V1.9: `2026-06-12` — explore de microinteracciones (TASK-1099): `fe:capture:explore --route=X --interaction '<hover|focus|click>:<selector>'` performa la acción (read-only — rechaza fill/press) y observa `before`/`feedback`/`settled`; `promote` auto-emite un step `interaction` (V2) válido (frames + keyboardEquivalent + `reducedMotion:'capture'`). Lleva el loop observe→author a la coreografía. Hallazgo: la readiness auto de promote, anclada a un heading con copy dinámico, es flaky → revisar/preferir marker estable.
 - Fecha V1.10: `2026-06-12` — explore mide los timings reales de la microinteracción (TASK-1100): tras la acción muestrea el clip del target cada 50ms hasta `--interaction-window` (default 1000) y deriva `feedback`/`settled` por pixel-diff (`detectInteractionTimings` + `lib/visual-diff`). Mide cualquier motion (CSS/framer-motion/GSAP). `measuredTimings:false` + fallback honesto si no hay cambio visible. `promote` emite el step `interaction` con los `atMs` medidos.
@@ -109,6 +110,18 @@ Contrato actualizado:
 - La readiness real vive en el DSL: `scenario.readiness` para scenarios versionados y `--ready='[data-capture="..."]'` para capturas inline.
 - Las capturas inline agregan guards ligeros por defecto contra login, loading dominante y skeletons, y esperan fuentes antes del primer frame.
 - `pnpm fe:capture:health` y reinicios de servidor quedan como diagnóstico/recuperación cuando el proceso local está unhealthy, no como mecanismo primario para resolver evidencia visual.
+
+## Delta 2026-06-20 — Auto-gc por presupuesto de tamaño (V1.8)
+
+`.captures/` crecía sin tope (caso real: 7.5 GB / 895 dirs). El per-scenario prune (`pruneScenarioRuns`, ya cableado en `capture.ts`) acota cada scenario a sus N corridas más recientes, pero **no acota el TOTAL** — muchos scenarios × N evidencias + `.webm` grandes acumulan GBs. Es local + gitignored + vercelignored (no contamina git ni el upload Vercel desde `ISSUE` de `.vercelignore`), pero come disco y, si el `.vercelignore` fallara, reintroduce el riesgo de OOM en el upload.
+
+Se agrega un segundo nivel de auto-gc, **agent-safe por diseño**:
+
+- `pruneCapturesBudget({ maxGb, keepNewest, graceDays })` (`scripts/frontend/gc.ts`): si `.captures/` supera `maxGb`, purga las corridas **más viejas** hasta quedar bajo el cap, protegiendo **siempre** las `keepNewest` más recientes (global) + una ventana de gracia de 2 días → la sesión/loop en curso de un agente nunca se toca.
+- `shouldRunAutoGc(intervalHours)`: throttle por stamp (`.captures/.autogc-stamp`) — el size-cap (que recomputa el tamaño de cientos de dirs) corre a lo sumo cada `intervalHours`, no en cada captura.
+- Cableado en `capture.ts` tras el per-scenario prune. Controlable por env: `GVC_CAPTURE_MAX_GB` (default 4, `=0` desactiva), `GVC_CAPTURE_KEEP_NEWEST` (20), `GVC_AUTOGC_INTERVAL_HOURS` (12), opt-out total `GVC_NO_AUTOPRUNE=1`.
+
+Limpieza manual sigue disponible: `pnpm fe:capture:gc --per-scenario=2 --max-gb=4 --keep=20 --apply` (dry-run sin `--apply`). Manual: `docs/manual-de-uso/plataforma/captura-visual-playwright.md` § Control de tamaño.
 
 ## Por qué
 

@@ -9,7 +9,8 @@ import { styled } from '@mui/material/styles'
 import type { BoxProps } from '@mui/material/Box'
 
 // Third-party Imports
-import ReactDatePickerComponent from 'react-datepicker'
+import ReactDatePickerComponent, { registerLocale } from 'react-datepicker'
+import { es } from 'date-fns/locale/es'
 
 // Styles
 import 'react-datepicker/dist/react-datepicker.css'
@@ -17,6 +18,8 @@ import 'react-datepicker/dist/react-datepicker.css'
 type Props = ComponentProps<typeof ReactDatePickerComponent> & {
   boxProps?: BoxProps
 }
+
+registerLocale('es', es)
 
 // Styled Components
 const StyledReactDatePicker = styled(Box)<BoxProps>(({ theme }) => {
@@ -497,7 +500,7 @@ const AppReactDatepicker = (props: Props) => {
 
   return (
     <StyledReactDatePicker {...boxProps}>
-      <ReactDatePickerComponent popperPlacement='bottom-start' {...rest} />
+      <ReactDatePickerComponent popperPlacement='bottom-start' locale='es' {...rest} />
     </StyledReactDatePicker>
   )
 }

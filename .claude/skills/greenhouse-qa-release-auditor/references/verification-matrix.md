@@ -5,7 +5,7 @@ risk or shared contracts.
 
 | Domain | Minimum evidence candidates |
 |---|---|
-| Generic code | `pnpm lint`, `pnpm exec tsc --noEmit`, focal Vitest |
+| Generic code | `pnpm lint`, `pnpm typecheck` (NO bare `tsc --noEmit` — OOM bajo Node 20, ISSUE-104), focal Vitest |
 | Build/runtime bundling | `pnpm build`, route smoke, no server-only/client boundary drift |
 | UI | `pnpm design:lint`, GVC desktop+mobile, `greenhouse-ui-enterprise-review` |
 | GVC/scenario authoring | `pnpm fe:capture:explore`, `pnpm fe:capture`, read `.aria.txt`, `pnpm fe:capture:review` |

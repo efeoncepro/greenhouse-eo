@@ -1,6 +1,13 @@
 import type { SxProps, Theme } from '@mui/material/styles'
 import type { TypographyProps } from '@mui/material/Typography'
 
+import type {
+  NexaExpressionCueContext,
+  NexaExpressionCueDomain,
+  NexaExpressionCueKey,
+  NexaExpressionCueSensitivity
+} from '../nexa-expression-cue/nexa-expression-cue-types'
+
 export type NexaExpressiveTextStyle =
   | 'plain'
   | 'strong'
@@ -45,6 +52,15 @@ export type NexaExpressiveTextSegment =
   | {
       type: 'citation'
       source: NexaCitationSource
+    }
+  | {
+      type: 'cue'
+      cue: NexaExpressionCueKey
+      context?: NexaExpressionCueContext
+      domain?: NexaExpressionCueDomain
+      sensitivity?: NexaExpressionCueSensitivity
+      label?: string
+      decorative?: boolean
     }
 
 export type NexaExpressiveTextValue = string | NexaExpressiveTextSegment[]

@@ -7,10 +7,7 @@ import { getGitHubBillingOverview } from '@/lib/cloud/github-billing'
 import { getVercelBillingOverview } from '@/lib/cloud/vercel-billing'
 import { getNotionSyncOperationalOverview } from '@/lib/integrations/notion-sync-operational-overview'
 import type { NotionSyncOperationalOverview } from '@/lib/integrations/notion-sync-operational-overview'
-import {
-  getOperationsOverview,
-  type OperationsOverview
-} from '@/lib/operations/get-operations-overview'
+import { getOperationsOverview, type OperationsOverview } from '@/lib/operations/get-operations-overview'
 import { getFinanceSmokeLaneStatus } from '@/lib/reliability/finance/get-finance-smoke-lane-status'
 import { getLatestSyntheticSnapshotsByRoute } from '@/lib/reliability/synthetic/reader'
 import type { GcpBillingOverview } from '@/types/billing-export'
@@ -42,6 +39,13 @@ import { getEntraWebhookSubscriptionHealthSignal } from './queries/entra-webhook
 import { getExpensePaymentsClpDriftSignal } from './queries/expense-payments-clp-drift'
 import { getLedgerUnresolvedDriftItemsSignal } from './queries/ledger-unresolved-drift-items'
 import { getNuboxExportOrphanRfcSignal } from './queries/nubox-export-orphan-rfc'
+import { getNuboxExportUnprojectedInvoiceSignal } from './queries/nubox-export-unprojected-invoice'
+import {
+  getUfRateFreshnessSignal,
+  getIndexedUnitSnapshotMissingSignal,
+  getIndexedUnitNativeFunctionalDriftSignal,
+  getIndexedUnitSettlementCurrencyViolationSignal
+} from './queries/indexed-unit-signals'
 import { getPaymentOrderMixedCurrencySignal } from './queries/payment-order-mixed-currency'
 import { getFxGainLossUnclassifiedSignal } from './queries/fx-gain-loss-unclassified'
 import {
@@ -83,6 +87,7 @@ import { getNexaActionFailureRateSignal } from './queries/nexa-action-failure-ra
 import { getNexaActionUnauthorizedProposalRateSignal } from './queries/nexa-action-unauthorized-proposal-rate'
 import { getNotionCorrectionTransitionsSourceAvailabilitySignal } from './queries/notion-correction-transitions-source-availability'
 import { getNotionMetricsOtdClassifierParitySignal } from './queries/notion-metrics-otd-classifier-parity'
+import { getOtdAttributableMemberMonthParitySignal } from './queries/otd-attributable-member-month-parity'
 import {
   getNotionMetricsShadowParidadRpaDemoSignal,
   getNotionMetricsEchoLoopDemoSignal,
@@ -99,23 +104,26 @@ import {
   getNotionStatusTransitionsBqSyncLagSignal
 } from './queries/notion-status-transitions-signals'
 import { getNotionStatusTransitionsReconciliationSignal } from './queries/notion-status-transitions-reconciliation'
-import {
-  getRescheduleCaptureLagSignal,
-  getReschedulePendingReasonSignal
-} from './queries/reschedule-signals'
+import { getRescheduleCaptureLagSignal, getReschedulePendingReasonSignal } from './queries/reschedule-signals'
 import {
   getAttributableLatenessShadowParidadSignal,
-  getAttributableLatenessOverlapSignal
+  getAttributableLatenessOverlapSignal,
+  getAttributableLatenessTerminalOpenSignal
 } from './queries/attributable-lateness-signals'
 import {
   getNotionMetricsWritebackDeadLetterSignal,
   getNotionMetricsWritebackLagSignal
 } from './queries/notion-metrics-rpa-signals'
 import {
+  getNotionMetricsOtdWritebackDeadLetterSignal,
+  getNotionMetricsOtdWritebackLagSignal
+} from './queries/notion-metrics-otd-writeback-signals'
+import {
   getNotionMetricsFtrWritebackDeadLetterSignal,
   getNotionMetricsFtrWritebackLagSignal
 } from './queries/notion-metrics-ftr-signals'
 import { getIdentityNotionBridgeCoverageSignal } from './queries/identity-notion-bridge-coverage'
+import { getIcoOrganizationRollupCoverageSignal } from './queries/ico-organization-rollup-coverage'
 import { getIdentitySessionRouteGroupDriftSignal } from './queries/identity-session-route-group-drift'
 import { getLeaveInvalidDelegatedApprovalSnapshotsSignal } from './queries/leave-invalid-delegated-approval-snapshots'
 import { getIdentityRelationshipMemberContractDriftSignal } from './queries/identity-relationship-member-contract-drift'
@@ -143,6 +151,7 @@ import { getPaymentOrdersDeadLetterSignal } from './queries/payment-orders-dead-
 import { getPaidOrdersWithoutExpensePaymentSignal } from './queries/payment-orders-paid-without-expense-payment'
 import { getPayrollComplianceExportDriftSignal } from './queries/payroll-compliance-export-drift'
 import { getPayrollExpenseMaterializationLagSignal } from './queries/payroll-expense-materialization-lag'
+import { getOperationalPlCostCoverageDegradedSignal } from './queries/operational-pl-cost-coverage-degraded'
 import { getPayrollParticipationWindowFullMonthEntryDriftSignal } from './queries/payroll-participation-window-full-month-entry-drift'
 import { getPayrollParticipationWindowProjectionDeltaAnomalySignal } from './queries/payroll-participation-window-projection-delta-anomaly'
 import { getPayrollParticipationWindowSourceDateDisagreementSignal } from './queries/payroll-participation-window-source-date-disagreement'
@@ -153,6 +162,11 @@ import { getPayrollContractTaxonomyFallbackResolutionLegacySignal } from './quer
 import { getPayrollContractTaxonomyInvalidTupleDriftSignal } from './queries/payroll-contract-taxonomy-invalid-tuple-drift'
 import { getPayrollContractTaxonomyInvalidStatutoryApplicationSignal } from './queries/payroll-contract-taxonomy-invalid-statutory-application'
 import { getProviderBqSyncDeadLetterSignal } from './queries/provider-bq-sync-dead-letter'
+import { getVatPositionDriftSignal } from './queries/vat-position-drift'
+import { getRetentionPositionDriftSignal } from './queries/retention-position-drift'
+import { getPpmPositionDriftSignal } from './queries/ppm-position-drift'
+import { getVatEntryUnresolvedFxSignal } from './queries/vat-entry-unresolved-fx'
+import { getVatEligibleWithoutPeriodSignal } from './queries/vat-eligible-without-period'
 import { getHubspotCompaniesIntakeDeadLetterSignal } from './queries/hubspot-companies-intake-dead-letter'
 import { getWorkforceUnlinkedInternalUsersSignal } from './queries/workforce-unlinked-internal-users'
 // TASK-1082 — Knowledge Platform ingestion signals (moduleKey 'knowledge').
@@ -169,10 +183,7 @@ import { getServicesLegacyResidualReadsSignal } from './queries/services-legacy-
 import { getServicesOrganizationUnresolvedSignal } from './queries/services-organization-unresolved'
 import { getServicesSyncLagSignal } from './queries/services-sync-lag'
 import { getHomeRolloutDriftSignal } from './queries/home-rollout-drift'
-import {
-  getRoleTitleDriftWithEntraSignal,
-  getRoleTitleUnresolvedDriftOverdueSignal
-} from './queries/role-title-drift'
+import { getRoleTitleDriftWithEntraSignal, getRoleTitleUnresolvedDriftOverdueSignal } from './queries/role-title-drift'
 import { getShortcutsInvalidPinsSignal } from './queries/shortcuts-invalid-pins'
 import { getWorkspaceProjectionFacetViewDriftSignal } from './queries/workspace-projection-drift'
 import { getWorkspaceProjectionUnresolvedRelationsSignal } from './queries/workspace-projection-unresolved-relations'
@@ -196,6 +207,12 @@ import { getReleaseStaleApprovalSignal } from './queries/release-stale-approval'
 import { getReleaseWorkerRevisionDriftSignal } from './queries/release-worker-revision-drift'
 import { getKortexGithubCiLastStatusSignal } from './queries/kortex-github-ci-last-status'
 import { getPublicSiteAstroDeployFailedSignal } from './queries/public-site-astro-deploy-failed'
+import { getPublicSiteAstroCiFailedSignal } from './queries/public-site-astro-ci-failed'
+import { getDesignHandoffStaleEntriesSignal } from './queries/design-handoff-stale-entries'
+import { getDesignHandoffMissingEvidenceSignal } from './queries/design-handoff-missing-evidence'
+import { getDesignHandoffNodeDriftSignal } from './queries/design-handoff-node-drift'
+import { getDesignHandoffOrphanSurfacesSignal } from './queries/design-handoff-orphan-surfaces'
+import { getDesignHandoffPrimitiveGovernanceSignals } from './queries/design-handoff-primitive-governance'
 import { getEmailRenderFailureSignal } from './queries/email-render-failure'
 import { getNuboxSourceFreshnessSignal } from './queries/nubox-source-freshness'
 import { getNotionConformedDrainFreshnessSignal } from './queries/notion-conformed-drain-freshness'
@@ -219,6 +236,15 @@ import {
 import { getCommercialOrganizationIncompleteIdentitySignal } from './queries/commercial-organization-incomplete-identity'
 import { getCommercialOrganizationIndustryNoncanonicalSignal } from './queries/commercial-organization-industry-noncanonical'
 import { getCommercialOrganizationTypeLifecycleDriftSignal } from './queries/commercial-organization-type-lifecycle-drift'
+// TASK-1212 — cotizaciones emitidas sin líneas (autoría fuera del command atómico). Roll up `commercial`.
+import { getCommercialQuoteAuthoredWithoutCommandSignal } from './queries/commercial-quote-authored-without-command'
+import {
+  getQ2cConvertedWithoutIncomeSignal,
+  getQ2cConvertedWithoutAuditSignal,
+  getQ2cIssuedWithoutDealSignal,
+  getQ2cContractOnlySlaBreachSignal,
+  getQ2cDuplicateIncomeSignal
+} from './queries/commercial-quote-to-cash-health'
 import { getSampleSprintProjectionDegradedSignal } from './queries/sample-sprint-projection-degraded'
 // TASK-837 Slice 6 — 7 reliability signals for Sample Sprint outbound projection.
 import {
@@ -236,11 +262,7 @@ import { getEngagementUnapprovedActiveSignal } from './queries/engagement-unappr
 import { getEngagementZombieSignal } from './queries/engagement-zombie'
 import { RELIABILITY_REGISTRY } from './registry'
 import { getReliabilityRegistry } from './registry-store'
-import {
-  aggregateModuleStatus,
-  computeConfidence,
-  isConcreteSeverity
-} from './severity'
+import { aggregateModuleStatus, computeConfidence, isConcreteSeverity } from './severity'
 import {
   buildCloudSignals,
   buildDomainIncidentSignals,
@@ -409,9 +431,7 @@ const buildSummary = (
   return `Estado: ${status}.`
 }
 
-const buildSignalCounts = (
-  signals: ReliabilitySignal[]
-): Record<ReliabilitySeverity, number> => {
+const buildSignalCounts = (signals: ReliabilitySignal[]): Record<ReliabilitySeverity, number> => {
   const counts: Record<ReliabilitySeverity, number> = {
     ok: 0,
     warning: 0,
@@ -484,6 +504,7 @@ interface ReliabilityOverviewSources {
    * query falla. El composer los inyecta en `allSignals` con resto del array.
    */
   paymentOrderSettlement?: ReliabilitySignal[] | null
+  operationalPlCostCoverageDegraded?: ReliabilitySignal | null
 
   /**
    * TASK-812 — Previred/LRE compliance export artifact drift. Steady state = 0
@@ -538,6 +559,7 @@ interface ReliabilityOverviewSources {
    * Notion. Steady: paridad alta (mismatch ~0%). Roll up moduleKey='delivery'.
    */
   notionMetricsOtdClassifierParity?: ReliabilitySignal | null
+  otdAttributableMemberMonthParity?: ReliabilitySignal | null
 
   /**
    * TASK-893 Slice 5 — Payroll Participation Window signals (3 readers):
@@ -588,6 +610,19 @@ interface ReliabilityOverviewSources {
   providerBqSyncDeadLetter?: ReliabilitySignal[] | null
   hubspotCompaniesIntakeDeadLetter?: ReliabilitySignal | null
   workforceUnlinkedInternalUsers?: ReliabilitySignal | null
+
+  /** TASK-725 — Finance VAT position drift (documentos con IVA sin asiento en períodos materializados). */
+  vatPositionDrift?: ReliabilitySignal | null
+
+  /** TASK-1185 — VAT FX/data-quality signals (no-CLP sin FX, docs sin período). */
+  vatEntryUnresolvedFx?: ReliabilitySignal | null
+  vatEligibleWithoutPeriod?: ReliabilitySignal | null
+
+  /** TASK-1188 — Retention position drift (BHE con retención sin asiento en períodos materializados). */
+  retentionPositionDrift?: ReliabilitySignal | null
+
+  /** TASK-1189 — PPM position drift (posición PPM con base stale vs income real). */
+  ppmPositionDrift?: ReliabilitySignal | null
 
   /** TASK-1082 — Knowledge ingestion signals (quarantine count + failed sync source). */
   knowledgeQuarantineCount?: ReliabilitySignal | null
@@ -651,6 +686,11 @@ interface ReliabilityOverviewSources {
 
   /** TASK-990 Slice 4 — Nubox export RFC sin organización (disposición pendiente). */
   nuboxExportOrphanRfc?: ReliabilitySignal | null
+  nuboxExportUnprojectedInvoice?: ReliabilitySignal | null
+  ufRateFreshness?: ReliabilitySignal | null
+  indexedUnitSnapshotMissing?: ReliabilitySignal | null
+  indexedUnitNativeFunctionalDrift?: ReliabilitySignal | null
+  indexedUnitSettlementCurrencyViolation?: ReliabilitySignal | null
 
   /** TASK-990 Slice 6 — payment order con currency distinta a sus obligations. */
   paymentOrderMixedCurrency?: ReliabilitySignal | null
@@ -885,6 +925,15 @@ interface ReliabilityOverviewSources {
    * Roll up bajo moduleKey='platform' hasta que exista subsystem Public Site dedicado.
    */
   publicSiteAstroDeployFailed?: ReliabilitySignal | null
+  publicSiteAstroCiFailed?: ReliabilitySignal | null
+
+  /**
+   * TASK-1120 — Design Handoff Registry signal.
+   *   - design_system.handoff.stale_entries (drift)
+   * Roll up bajo moduleKey='platform' como governance del Design System.
+   */
+  designHandoffStaleEntries?: ReliabilitySignal | null
+  designHandoffControlPlane?: ReliabilitySignal[] | null
 
   /**
    * TASK-910 Slice 4 — Notion Demo Teamspace Sandbox signals (6 canonical):
@@ -920,6 +969,7 @@ interface ReliabilityOverviewSources {
    * OFF) reportan steady (writeback skipea sin tocar attempt_count).
    */
   notionMetricsRpa?: ReliabilitySignal[] | null
+  notionMetricsOtdWriteback?: ReliabilitySignal[] | null
 
   /**
    * TASK-903 — FTR writeback signals (Efeonce/Sky). Roll up bajo moduleKey
@@ -935,9 +985,7 @@ export const buildReliabilityOverview = (
 ): ReliabilityOverview => {
   const syntheticSnapshots = sources.syntheticSnapshots ?? []
 
-  const effectiveModules = sources.modules && sources.modules.length > 0
-    ? sources.modules
-    : RELIABILITY_REGISTRY
+  const effectiveModules = sources.modules && sources.modules.length > 0 ? sources.modules : RELIABILITY_REGISTRY
 
   const allSignals: ReliabilitySignal[] = [
     ...buildSubsystemSignals(operations.subsystems),
@@ -963,6 +1011,9 @@ export const buildReliabilityOverview = (
     // dead_letter / lag). Inyectadas pre-fetched desde getReliabilityOverview
     // para mantener buildReliabilityOverview sincrónico.
     ...(sources.paymentOrderSettlement ?? []),
+    // TASK-1190 — Operational P&L cost coverage gate. Evita tratar como
+    // margen canónico un período con revenue y costo 0 cuando falta upstream.
+    ...(sources.operationalPlCostCoverageDegraded ? [sources.operationalPlCostCoverageDegraded] : []),
     // TASK-812 — Previred/LRE artifact registry drift.
     ...(sources.payrollComplianceExportDrift ? [sources.payrollComplianceExportDrift] : []),
     // TASK-863 V1.5.2 — Final settlement PDF status drift (DB document_status vs
@@ -994,9 +1045,9 @@ export const buildReliabilityOverview = (
       ? [sources.notionCorrectionTransitionsSourceAvailability]
       : []),
     // TASK-923 (M1) — shadow paridad clasificador OTD GH vs Notion synced.
-    ...(sources.notionMetricsOtdClassifierParity
-      ? [sources.notionMetricsOtdClassifierParity]
-      : []),
+    ...(sources.notionMetricsOtdClassifierParity ? [sources.notionMetricsOtdClassifierParity] : []),
+    // TASK-1169 Slice 3 — OTD imputable member×month: comparabilidad de cohorte.
+    ...(sources.otdAttributableMemberMonthParity ? [sources.otdAttributableMemberMonthParity] : []),
     // TASK-893 Slice 5 — Payroll Participation Window signals (3 readers).
     // Subsystem rollup Finance Data Quality via moduleKey='finance'. Each
     // reader degrades honestly (severity=unknown) on query failure. The
@@ -1010,6 +1061,15 @@ export const buildReliabilityOverview = (
     ...(sources.financeClpDrift ?? []),
     // TASK-771 Slice 4 — Provider BQ sync dead-letter signal (drift PG↔BQ).
     ...(sources.providerBqSyncDeadLetter ?? []),
+    // TASK-725 — Finance VAT position drift (documentos con IVA sin asiento).
+    ...(sources.vatPositionDrift ? [sources.vatPositionDrift] : []),
+    // TASK-1185 — VAT FX/data-quality signals.
+    ...(sources.vatEntryUnresolvedFx ? [sources.vatEntryUnresolvedFx] : []),
+    ...(sources.vatEligibleWithoutPeriod ? [sources.vatEligibleWithoutPeriod] : []),
+    // TASK-1188 — Retention position drift (línea retenciones del F29).
+    ...(sources.retentionPositionDrift ? [sources.retentionPositionDrift] : []),
+    // TASK-1189 — PPM position drift (línea PPM del F29).
+    ...(sources.ppmPositionDrift ? [sources.ppmPositionDrift] : []),
     // TASK-878 Slice 2 — HubSpot companies intake dead-letter (async webhook path).
     ...(sources.hubspotCompaniesIntakeDeadLetter ? [sources.hubspotCompaniesIntakeDeadLetter] : []),
     // TASK-878 follow-up — Identity UX hardening: internal users sin member enlazado.
@@ -1032,6 +1092,11 @@ export const buildReliabilityOverview = (
     ...(sources.accountBalancesFxDrift ? [sources.accountBalancesFxDrift] : []),
     ...(sources.ledgerUnresolvedDriftItems ? [sources.ledgerUnresolvedDriftItems] : []),
     ...(sources.nuboxExportOrphanRfc ? [sources.nuboxExportOrphanRfc] : []),
+    ...(sources.nuboxExportUnprojectedInvoice ? [sources.nuboxExportUnprojectedInvoice] : []),
+    ...(sources.ufRateFreshness ? [sources.ufRateFreshness] : []),
+    ...(sources.indexedUnitSnapshotMissing ? [sources.indexedUnitSnapshotMissing] : []),
+    ...(sources.indexedUnitNativeFunctionalDrift ? [sources.indexedUnitNativeFunctionalDrift] : []),
+    ...(sources.indexedUnitSettlementCurrencyViolation ? [sources.indexedUnitSettlementCurrencyViolation] : []),
     ...(sources.paymentOrderMixedCurrency ? [sources.paymentOrderMixedCurrency] : []),
     ...(sources.fxGainLossUnclassified ? [sources.fxGainLossUnclassified] : []),
     ...(sources.mxnRateFreshness ? [sources.mxnRateFreshness] : []),
@@ -1040,24 +1105,16 @@ export const buildReliabilityOverview = (
     ...(sources.multiCurrencyNativeEquivalentDrift ? [sources.multiCurrencyNativeEquivalentDrift] : []),
     ...(sources.cashSignalUnsupportedCurrency ? [sources.cashSignalUnsupportedCurrency] : []),
     // TASK-793 Slice 3 — contractor payable → Finance bridge (lag + dead-letter).
-    ...(sources.contractorPayableReadyWithoutObligation
-      ? [sources.contractorPayableReadyWithoutObligation]
-      : []),
+    ...(sources.contractorPayableReadyWithoutObligation ? [sources.contractorPayableReadyWithoutObligation] : []),
     ...(sources.contractorPayableBridgeDeadLetter ? [sources.contractorPayableBridgeDeadLetter] : []),
     ...(sources.contractorRemittanceEmailDeadLetter ? [sources.contractorRemittanceEmailDeadLetter] : []),
     // TASK-795 Fase A — international boundary block signals (tax review + FX).
     ...(sources.contractorPayableTaxReviewOverdue ? [sources.contractorPayableTaxReviewOverdue] : []),
-    ...(sources.contractorPayableFxUnresolvedOverdue
-      ? [sources.contractorPayableFxUnresolvedOverdue]
-      : []),
+    ...(sources.contractorPayableFxUnresolvedOverdue ? [sources.contractorPayableFxUnresolvedOverdue] : []),
     // TASK-968 — payables blocked by the agreed-amount guardrail (no override).
-    ...(sources.contractorPayableExceedsAgreedAmount
-      ? [sources.contractorPayableExceedsAgreedAmount]
-      : []),
+    ...(sources.contractorPayableExceedsAgreedAmount ? [sources.contractorPayableExceedsAgreedAmount] : []),
     // TASK-977 — committed payables without a materialized expense (settlement precondition).
-    ...(sources.contractorPayableExpenseUnmaterialized
-      ? [sources.contractorPayableExpenseUnmaterialized]
-      : []),
+    ...(sources.contractorPayableExpenseUnmaterialized ? [sources.contractorPayableExpenseUnmaterialized] : []),
     ...(sources.contractorPayablePaymentSlaOverdue ? [sources.contractorPayablePaymentSlaOverdue] : []),
     // TASK-1019 — Workforce Contracting signals (moduleKey 'workforce').
     ...(sources.contractingAiDraftFailed ? [sources.contractingAiDraftFailed] : []),
@@ -1123,6 +1180,12 @@ export const buildReliabilityOverview = (
     ...(sources.kortexGithubCiLastStatus ? [sources.kortexGithubCiLastStatus] : []),
     // TASK-1161 — Public Site Astro/Vercel production deploy failure.
     ...(sources.publicSiteAstroDeployFailed ? [sources.publicSiteAstroDeployFailed] : []),
+    // TASK-1167 — Public Site Astro GitHub repository CI runtime signal.
+    ...(sources.publicSiteAstroCiFailed ? [sources.publicSiteAstroCiFailed] : []),
+    // TASK-1120 — Design handoff queue stale entries.
+    ...(sources.designHandoffStaleEntries ? [sources.designHandoffStaleEntries] : []),
+    // TASK-1175 — Design handoff control-plane API parity signals.
+    ...(sources.designHandoffControlPlane ?? []),
     // TASK-910 Slice 4 — Notion Demo Teamspace Sandbox signals (6 canonical).
     // 5 bajo moduleKey 'delivery' + 1 CRITICAL bajo moduleKey 'payroll'.
     ...(sources.notionMetricsDemo ?? []),
@@ -1130,6 +1193,8 @@ export const buildReliabilityOverview = (
     ...(sources.notionStatusTransitions ?? []),
     // TASK-916 — Notion RpA V2 productive writeback signals (2).
     ...(sources.notionMetricsRpa ?? []),
+    // TASK-927 — Notion OTD writeback signals (Efeonce/Sky, daily batch).
+    ...(sources.notionMetricsOtdWriteback ?? []),
     ...(sources.notionMetricsFtr ?? []),
     // TASK-921 — Reschedule (due-date change) capture signals (2).
     ...(sources.notionMetricsReschedule ?? []),
@@ -1234,9 +1299,7 @@ export const getReliabilityOverview = async (
   const operations = preloadedOperations ?? (await getOperationsOverview())
 
   const billing =
-    preloadedSources.billing !== undefined
-      ? preloadedSources.billing
-      : await getGcpBillingOverview().catch(() => null)
+    preloadedSources.billing !== undefined ? preloadedSources.billing : await getGcpBillingOverview().catch(() => null)
 
   const vercelBilling =
     preloadedSources.vercelBilling !== undefined
@@ -1290,9 +1353,10 @@ export const getReliabilityOverview = async (
   // overview. Skipped when caller pre-provides `domainIncidents` (admin/AI
   // observer paths that already have the data) or when there are no modules
   // declaring an incident tag.
-  const domainIncidents = preloadedSources.domainIncidents !== undefined
-    ? preloadedSources.domainIncidents
-    : await hydrateDomainIncidents(modules ?? RELIABILITY_REGISTRY)
+  const domainIncidents =
+    preloadedSources.domainIncidents !== undefined
+      ? preloadedSources.domainIncidents
+      : await hydrateDomainIncidents(modules ?? RELIABILITY_REGISTRY)
 
   // TASK-765 Slice 7 — payment_order ↔ bank settlement signals (drift /
   // dead_letter / lag). Cada reader degrada honestamente (severity=unknown)
@@ -1305,6 +1369,11 @@ export const getReliabilityOverview = async (
           deadLetter: getPaymentOrdersDeadLetterSignal,
           materializationLag: getPayrollExpenseMaterializationLagSignal
         }).catch(() => null)
+
+  const operationalPlCostCoverageDegraded =
+    preloadedSources.operationalPlCostCoverageDegraded !== undefined
+      ? preloadedSources.operationalPlCostCoverageDegraded
+      : await getOperationalPlCostCoverageDegradedSignal().catch(() => null)
 
   const payrollComplianceExportDrift =
     preloadedSources.payrollComplianceExportDrift !== undefined
@@ -1388,6 +1457,39 @@ export const getReliabilityOverview = async (
       : await getProviderBqSyncDeadLetterSignal()
           .then(signal => [signal])
           .catch(() => null)
+
+  // TASK-725 Slice 5 — Finance VAT position drift. Detecta documentos con IVA
+  // dropeados del ledger en períodos materializados (bug-class ISSUE-101).
+  // Degrada honestamente (severity='unknown') si la query falla.
+  const vatPositionDrift =
+    preloadedSources.vatPositionDrift !== undefined
+      ? preloadedSources.vatPositionDrift
+      : await getVatPositionDriftSignal().catch(() => null)
+
+  // TASK-1185 — VAT FX/data-quality signals. Degradan honesto (severity='unknown')
+  // si su query falla; no envenenan el overview.
+  const vatEntryUnresolvedFx =
+    preloadedSources.vatEntryUnresolvedFx !== undefined
+      ? preloadedSources.vatEntryUnresolvedFx
+      : await getVatEntryUnresolvedFxSignal().catch(() => null)
+
+  const vatEligibleWithoutPeriod =
+    preloadedSources.vatEligibleWithoutPeriod !== undefined
+      ? preloadedSources.vatEligibleWithoutPeriod
+      : await getVatEligibleWithoutPeriodSignal().catch(() => null)
+
+  // TASK-1188 — Retention position drift (línea retenciones del F29). Degrada
+  // honesto (severity='unknown') si la query falla.
+  const retentionPositionDrift =
+    preloadedSources.retentionPositionDrift !== undefined
+      ? preloadedSources.retentionPositionDrift
+      : await getRetentionPositionDriftSignal().catch(() => null)
+
+  // TASK-1189 — PPM position drift (línea PPM del F29). Degrada honesto si falla.
+  const ppmPositionDrift =
+    preloadedSources.ppmPositionDrift !== undefined
+      ? preloadedSources.ppmPositionDrift
+      : await getPpmPositionDriftSignal().catch(() => null)
 
   // TASK-878 Slice 2 — HubSpot companies intake dead-letter (mirror provider_bq_sync).
   // Detecta path async caído: webhook companies emite outbox event pero la projection
@@ -1482,6 +1584,31 @@ export const getReliabilityOverview = async (
     preloadedSources.nuboxExportOrphanRfc !== undefined
       ? preloadedSources.nuboxExportOrphanRfc
       : await getNuboxExportOrphanRfcSignal().catch(() => null)
+
+  const nuboxExportUnprojectedInvoice =
+    preloadedSources.nuboxExportUnprojectedInvoice !== undefined
+      ? preloadedSources.nuboxExportUnprojectedInvoice
+      : await getNuboxExportUnprojectedInvoiceSignal().catch(() => null)
+
+  const ufRateFreshness =
+    preloadedSources.ufRateFreshness !== undefined
+      ? preloadedSources.ufRateFreshness
+      : await getUfRateFreshnessSignal().catch(() => null)
+
+  const indexedUnitSnapshotMissing =
+    preloadedSources.indexedUnitSnapshotMissing !== undefined
+      ? preloadedSources.indexedUnitSnapshotMissing
+      : await getIndexedUnitSnapshotMissingSignal().catch(() => null)
+
+  const indexedUnitNativeFunctionalDrift =
+    preloadedSources.indexedUnitNativeFunctionalDrift !== undefined
+      ? preloadedSources.indexedUnitNativeFunctionalDrift
+      : await getIndexedUnitNativeFunctionalDriftSignal().catch(() => null)
+
+  const indexedUnitSettlementCurrencyViolation =
+    preloadedSources.indexedUnitSettlementCurrencyViolation !== undefined
+      ? preloadedSources.indexedUnitSettlementCurrencyViolation
+      : await getIndexedUnitSettlementCurrencyViolationSignal().catch(() => null)
 
   const paymentOrderMixedCurrency =
     preloadedSources.paymentOrderMixedCurrency !== undefined
@@ -1656,6 +1783,10 @@ export const getReliabilityOverview = async (
           // Notion-user-id → member-id (caso fuente: incidente 2026-05-16
           // post-TASK-877 dejó coverage en 3.7%, colapsando OTD/RpA bonuses).
           getIdentityNotionBridgeCoverageSignal().catch(() => null),
+          // TASK-1171 — cliente con actividad de delivery ausente del rollup ICO
+          // de organización (exclusión silenciosa por coverage-gap del
+          // incremental-delta; caso fuente Grupo Berel 2026-06-19).
+          getIcoOrganizationRollupCoverageSignal().catch(() => null),
           // TASK-790 — contractor engagements con riesgo de clasificación
           // bloqueante (legal_review_required|blocked) y no terminales.
           getContractorEngagementClassificationRiskOpenSignal().catch(() => null),
@@ -1916,6 +2047,11 @@ export const getReliabilityOverview = async (
       ? preloadedSources.notionMetricsOtdClassifierParity
       : await getNotionMetricsOtdClassifierParitySignal().catch(() => null)
 
+  const otdAttributableMemberMonthParity =
+    preloadedSources.otdAttributableMemberMonthParity !== undefined
+      ? preloadedSources.otdAttributableMemberMonthParity
+      : await getOtdAttributableMemberMonthParitySignal().catch(() => null)
+
   // TASK-848 Slice 7 + TASK-849 Slice 2 + TASK-854 Slice 0 + TASK-857 —
   // Production Release Control Plane signals. 6 readers en paralelo. Cada
   // uno degrada a `severity=unknown` si no hay GITHUB_RELEASE_OBSERVER_TOKEN /
@@ -1943,6 +2079,28 @@ export const getReliabilityOverview = async (
     preloadedSources.publicSiteAstroDeployFailed !== undefined
       ? preloadedSources.publicSiteAstroDeployFailed
       : await getPublicSiteAstroDeployFailedSignal().catch(() => null)
+
+  const publicSiteAstroCiFailed =
+    preloadedSources.publicSiteAstroCiFailed !== undefined
+      ? preloadedSources.publicSiteAstroCiFailed
+      : await getPublicSiteAstroCiFailedSignal().catch(() => null)
+
+  const designHandoffStaleEntries =
+    preloadedSources.designHandoffStaleEntries !== undefined
+      ? preloadedSources.designHandoffStaleEntries
+      : await getDesignHandoffStaleEntriesSignal().catch(() => null)
+
+  const designHandoffControlPlane =
+    preloadedSources.designHandoffControlPlane !== undefined
+      ? preloadedSources.designHandoffControlPlane
+      : await Promise.all([
+          getDesignHandoffMissingEvidenceSignal(),
+          getDesignHandoffNodeDriftSignal(),
+          getDesignHandoffOrphanSurfacesSignal(),
+          getDesignHandoffPrimitiveGovernanceSignals()
+        ])
+          .then(results => results.flat())
+          .catch(() => null)
 
   // TASK-807 — Commercial Health readers (6). Cada reader degrada
   // honestamente a `unknown` si su query falla. Incluye stale_progress de
@@ -1984,18 +2142,22 @@ export const getReliabilityOverview = async (
           getClientLifecycleCaseWithoutTemplateSignal().catch(() => null),
           getClientLifecycleBlockerOverrideAnomalySignal().catch(() => null),
           // TASK-1017 — evidencia auto-derivable detectada pero el paso sigue sin marcar.
-          getClientLifecycleEvidenceDetectedNotMarkedSignal().catch(() => null)
+          getClientLifecycleEvidenceDetectedNotMarkedSignal().catch(() => null),
+          // TASK-1212 — cotización emitida sin líneas (autoría fuera del command atómico).
+          getCommercialQuoteAuthoredWithoutCommandSignal().catch(() => null),
+          // TASK-1206 — Q2C close health (rollup commercial).
+          getQ2cConvertedWithoutIncomeSignal().catch(() => null),
+          getQ2cConvertedWithoutAuditSignal().catch(() => null),
+          getQ2cIssuedWithoutDealSignal().catch(() => null),
+          getQ2cContractOnlySlaBreachSignal().catch(() => null),
+          getQ2cDuplicateIncomeSignal().catch(() => null)
         ])
           .then(([healthSignals, projectionSignal, ...outboundSignals]) => {
             const collected = healthSignals ?? []
 
-            const withProjection = projectionSignal
-              ? [...collected, projectionSignal]
-              : collected
+            const withProjection = projectionSignal ? [...collected, projectionSignal] : collected
 
-            const validOutbound = outboundSignals.filter(
-              (s): s is NonNullable<typeof s> => s !== null
-            )
+            const validOutbound = outboundSignals.filter((s): s is NonNullable<typeof s> => s !== null)
 
             return [...withProjection, ...validOutbound]
           })
@@ -2045,6 +2207,17 @@ export const getReliabilityOverview = async (
           .then(signals => signals.filter((s): s is NonNullable<typeof s> => s !== null))
           .catch(() => null)
 
+  // TASK-927 — Notion OTD writeback signals (Efeonce/Sky, daily batch).
+  const notionMetricsOtdWriteback =
+    preloadedSources.notionMetricsOtdWriteback !== undefined
+      ? preloadedSources.notionMetricsOtdWriteback
+      : await Promise.all([
+          getNotionMetricsOtdWritebackDeadLetterSignal().catch(() => null),
+          getNotionMetricsOtdWritebackLagSignal().catch(() => null)
+        ])
+          .then(signals => signals.filter((s): s is NonNullable<typeof s> => s !== null))
+          .catch(() => null)
+
   // TASK-903 — Notion FTR writeback signals (Efeonce/Sky).
   const notionMetricsFtr =
     preloadedSources.notionMetricsFtr !== undefined
@@ -2073,7 +2246,8 @@ export const getReliabilityOverview = async (
       ? preloadedSources.attributableLateness
       : await Promise.all([
           getAttributableLatenessShadowParidadSignal().catch(() => null),
-          getAttributableLatenessOverlapSignal().catch(() => null)
+          getAttributableLatenessOverlapSignal().catch(() => null),
+          getAttributableLatenessTerminalOpenSignal().catch(() => null)
         ])
           .then(signals => signals.filter((s): s is NonNullable<typeof s> => s !== null))
           .catch(() => null)
@@ -2089,6 +2263,7 @@ export const getReliabilityOverview = async (
     aiObservations,
     domainIncidents,
     paymentOrderSettlement,
+    operationalPlCostCoverageDegraded,
     payrollComplianceExportDrift,
     payrollContractorDoubleRailOverlap,
     payrollDeelMemberWithoutContractId,
@@ -2098,6 +2273,11 @@ export const getReliabilityOverview = async (
     payrollContractTaxonomy,
     financeClpDrift,
     providerBqSyncDeadLetter,
+    vatPositionDrift,
+    vatEntryUnresolvedFx,
+    vatEligibleWithoutPeriod,
+    retentionPositionDrift,
+    ppmPositionDrift,
     hubspotCompaniesIntakeDeadLetter,
     workforceUnlinkedInternalUsers,
     knowledgeQuarantineCount,
@@ -2111,6 +2291,11 @@ export const getReliabilityOverview = async (
     accountBalancesFxDrift,
     ledgerUnresolvedDriftItems,
     nuboxExportOrphanRfc,
+    nuboxExportUnprojectedInvoice,
+    ufRateFreshness,
+    indexedUnitSnapshotMissing,
+    indexedUnitNativeFunctionalDrift,
+    indexedUnitSettlementCurrencyViolation,
     paymentOrderMixedCurrency,
     fxGainLossUnclassified,
     mxnRateFreshness,
@@ -2161,6 +2346,9 @@ export const getReliabilityOverview = async (
     productionRelease,
     kortexGithubCiLastStatus,
     publicSiteAstroDeployFailed,
+    publicSiteAstroCiFailed,
+    designHandoffStaleEntries,
+    designHandoffControlPlane,
     icoMaterializerSkippedSafety,
     nexaInsightsFreshness,
     nexaInsightsNoNewSignals,
@@ -2169,9 +2357,11 @@ export const getReliabilityOverview = async (
     nexaActionUnauthorizedProposalRate,
     notionCorrectionTransitionsSourceAvailability,
     notionMetricsOtdClassifierParity,
+    otdAttributableMemberMonthParity,
     notionMetricsDemo,
     notionStatusTransitions,
     notionMetricsRpa,
+    notionMetricsOtdWriteback,
     notionMetricsFtr,
     notionMetricsReschedule,
     attributableLateness

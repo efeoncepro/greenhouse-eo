@@ -112,7 +112,7 @@ Use the smallest command set that proves the claim:
 
 - `pnpm vitest run src/lib/payroll`
 - `pnpm exec eslint src/lib/payroll src/types/payroll.ts src/types/hr-contracts.ts`
-- `pnpm exec tsc --noEmit --pretty false`
+- `pnpm typecheck` (NO bare `tsc --noEmit` — OOM bajo el Node 20 de Volta, ISSUE-104)
 - `pnpm build`
 - `pnpm staging:request /api/hr/payroll/periods/<periodId>/readiness --pretty`
 - `pnpm staging:request POST /api/hr/payroll/periods/<periodId>/calculate '{}' --pretty`

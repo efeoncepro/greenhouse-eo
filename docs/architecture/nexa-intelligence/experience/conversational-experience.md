@@ -43,7 +43,38 @@ La lente rica del canvas YA está cableada a `/knowledge` con retrieval real (fl
 `NEXA_ANSWERS_CANVAS_LENS_ENABLED`, default OFF), GVC-verificada. Cualquier dominio nuevo sigue el
 domain playbook (no se rediseña el shell). Detalle + follow-ups: el contrato canónico.
 
+## Modo de interacción del chat (dock / expandible / lane — TASK-1079)
+
+El **chat flotante** (`NexaThread` montado por `NexaFloatingButton`) tiene tres form-factors que el
+usuario final elige según cómo trabaja — **es una preferencia, no un flag binario de plataforma**:
+
+| Modo | Qué es | Form-factor |
+| --- | --- | --- |
+| `dock` (A) | Burbuja flotante compacta | panel chico (Drawer mobile / Card desktop) |
+| `expandible` (B) | Panel ampliable con historial | `NexaFloatingPanel` (TASK-1078), compacto↔ancho |
+| `lane` (C) | Sidecar full-height in-flow | `AdaptiveSidecarLayout` + `NexaLanePanel`; el dashboard queda 100% visible al lado (split) |
+
+- **Cero lógica de chat duplicada:** los 3 modos comparten `useNexaPersistentRuntime`,
+  `nexa_threads`/`nexa_messages` (historial), `NexaHistoryRail` y `NexaModelSelector`. Solo cambia el chrome.
+- **SSOT de modo:** `src/lib/nexa/interaction-mode.ts` (puro: coerce + gating). Preferencia persistida
+  per-usuario en `greenhouse_core.client_users.nexa_interaction_mode` (NULL = default que **preserva el
+  comportamiento vigente** del flotante; nunca `lane` por default). Reader server-side:
+  `interaction-mode.server.ts`; provider client: `nexa-interaction-mode-context.tsx`; selector reusable:
+  `NexaModeMenu`; host del lane: `NexaLaneContentHost` (envuelve `{children}` del dashboard, passthrough
+  byte-idéntico salvo modo lane).
+- **Flags (gating de disponibilidad, default-safe):** `NEXA_FLOATING_EXPANDABLE_ENABLED` (TASK-1078)
+  habilita el panel B y el runtime persistente; `NEXA_INTERACTION_LANE_ENABLED` (**default OFF**, TASK-1079)
+  habilita el lane C (reflowea el contenido del dashboard = cambio de hot-path). Un modo no disponible
+  degrada al default; el selector solo ofrece lo disponible.
+
+**Reglas duras:** **NUNCA** forkar la lógica de chat por modo (los 3 envuelven el mismo runtime/historial).
+**NUNCA** montar el lane fuera de `NexaLaneContentHost` ni romper su passthrough default-safe. **NUNCA**
+hacer `lane` el default (es opt-in explícito del usuario + flag default-OFF).
+
 ## Código
 
 `src/components/greenhouse/primitives/nexa-answers-canvas/**`, `src/lib/nexa/nexa-answers-surface-context.ts`,
 `src/views/greenhouse/**` (lens hosts). Procedencia: TASK-1095/1096/1101 (+ 1103/1104/1105/1108).
+Modo de interacción (dock/expandible/lane): `src/lib/nexa/interaction-mode*.ts`,
+`src/lib/nexa/nexa-interaction-mode-context.tsx`, `src/components/greenhouse/{NexaModeMenu,NexaLaneContentHost}.tsx`,
+`src/views/greenhouse/nexa/lane-sidecar/NexaLanePanel.tsx`. Procedencia: TASK-1078 (B) + TASK-1079 (C + preferencia).

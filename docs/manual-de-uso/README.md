@@ -19,6 +19,7 @@ La diferencia con otras capas de documentacion:
 - [Distribucion de costos para P&L operativo](finance/distribucion-costos-pnl.md) — como revisar, materializar y cerrar períodos sin inflar overhead de clientes con payroll, regulatorio, financiero o treasury transit.
 - [Sugerencias asistidas de conciliacion](finance/sugerencias-asistidas-conciliacion.md) — como generar, revisar, aceptar o descartar sugerencias AI sin alterar saldos automaticamente.
 - [Saldos bancarios FX drift](finance/saldos-bancarios-fx-drift-remediation.md) — como diagnosticar, auditar y remediar drift FX de saldos bancarios usando el control plane canonico sin SQL/backfills ad hoc.
+- [Monedas indexadas UF/CLF — rollout y operacion](finance/monedas-indexadas-uf-clf-rollout.md) — como prender los flags CLF, verificar la proyeccion de una OC de cliente en UF a income CLP + plano native UF, leer las señales indexed-unit y que NO hacer (UF nunca es caja).
 - [Finance Movement Feed](../documentation/finance/finance-movement-feed.md) — contrato reusable para mostrar movimientos financieros sin duplicar tablas, hardcodes de logos ni calculos de saldo en UI.
 - [Pagos a Contractors (Finanzas)](finance/pagos-a-contractors.md) — flujo completo desde envio aprobado hasta payable, readiness, `ready_for_finance`, corrida mensual, orden de pago, aprobacion, mark-paid, conciliacion y comprobante; incluye crear desde envio/off-cycle, cancelar, waiver, override y las diferencias entre HR, payable, obligacion financiera, orden y banco.
 
@@ -67,6 +68,7 @@ La diferencia con otras capas de documentacion:
 - [Monitorear Costos Cloud con FinOps](operations/monitorear-costos-cloud-finops.md) — como revisar gasto GCP, interpretar proyecciones y drivers, usar alertas tempranas y ejecutar diagnosticos seguros sin depender solo de la consola de Google Cloud.
 - [Operar Integraciones y Sync](operations/operar-integraciones-y-sync.md) — como revisar health/freshness, disparar sync manual, pausar/reanudar conectores, diagnosticar webhooks y no romper la cadena raw/conformed/projection.
 - [Operar el pipeline RpA V2 demo](operations/pipeline-rpa-v2-demo.md) — verificar que un cambio de estado en una tarea demo se captura y se refleja en la propiedad `RpA` de Notion; interpretar señales de confiabilidad; troubleshooting de captura y writeback.
+- [Activar ICO de un cliente y verificar el estado](operations/activar-ico-cliente.md) — como hacer que un cliente nuevo aparezca en ICO sin tocar codigo: activar el sync con `POST /api/delivery/ico/enable-sync` (permisos requeridos, idempotencia, respuesta), verificar la etapa real con `GET /api/delivery/ico/sync-status`, interpretar la escalera de `stage`, que hacer ante cada error/estado y por que nunca se activa el teamspace demo.
 
 ### Plataforma
 

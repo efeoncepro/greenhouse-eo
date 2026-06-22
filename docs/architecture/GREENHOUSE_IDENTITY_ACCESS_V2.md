@@ -11,6 +11,7 @@ que no debía tener. La causa raíz **no es UX** ("falta un botón") — es **dr
 `approval_delegate` genérico es demasiado amplio para ser fuente de autoridad de aprobación.
 
 **Dos planos consumen el mismo delegate genérico** (defense-in-depth: hay que decidir ambos):
+
 1. **Autoridad** — `resolver.ts` → `getEffectiveSupervisor` (`readers.ts`) → snapshot → `leave-review-policy.ts`.
    Lo consumen los TRES stages `effective_supervisor` (`leave`, `expense_report`, `performance_evaluation`).
 2. **Visibilidad/scope** — `access.ts` (`getSupervisorScopeForTenant`) le da a la delegada
@@ -58,6 +59,7 @@ inválido (D4). Reliability signal `hr.leave.invalid_delegated_approval_snapshot
 kind `drift`, steady=0) detecta recurrencia, parametrizado por los stages que no honran delegate.
 
 **Hard rules** (ver CLAUDE.md "Approval Authority Delegation invariants" para la versión completa):
+
 - NUNCA un `approval_delegate` genérico cambia el `effective_approver_member_id` de un stage con
   `honorGenericApprovalDelegate=false`.
 - NUNCA resolver el incidente dando HR/admin broad a la supervisora formal ni tocando `route_groups`/`views`.
@@ -100,11 +102,11 @@ Investigación confirmó dos cosas:
 
 **`client_users.password_hash` es user-initiated. No se sincroniza desde BigQuery, HubSpot, Entra, SCIM ni ningún sistema externo. Nunca.** Los únicos flujos que lo mutan son:
 
-| Flujo | Entry point | Source |
-|---|---|---|
-| Password reset self-service | `POST /api/account/reset-password` | `user_reset` |
-| Invite acceptance (set initial password) | `POST /api/account/accept-invite` | `accept_invite` |
-| Bootstrap admin / test fixture | `scripts/` bajo control explícito | `bootstrap_admin` / `test_fixture` |
+| Flujo                                    | Entry point                        | Source                             |
+| ---------------------------------------- | ---------------------------------- | ---------------------------------- |
+| Password reset self-service              | `POST /api/account/reset-password` | `user_reset`                       |
+| Invite acceptance (set initial password) | `POST /api/account/accept-invite`  | `accept_invite`                    |
+| Bootstrap admin / test fixture           | `scripts/` bajo control explícito  | `bootstrap_admin` / `test_fixture` |
 
 Cualquier otro path que mute `password_hash` es un bug y es **rechazado a nivel DB**.
 
@@ -143,17 +145,14 @@ Comportamiento:
 `src/lib/identity/password-mutation.ts` es la única API autorizada para escribir `password_hash`:
 
 ```ts
-await withPasswordChangeAuthorization(
-  { userId, source: 'user_reset' },
-  async client => {
-    await client.query(
-      `UPDATE greenhouse_core.client_users
+await withPasswordChangeAuthorization({ userId, source: 'user_reset' }, async client => {
+  await client.query(
+    `UPDATE greenhouse_core.client_users
          SET password_hash = $1, password_hash_algorithm = 'bcrypt', updated_at = now()
          WHERE user_id = $2`,
-      [passwordHash, userId]
-    )
-  }
-)
+    [passwordHash, userId]
+  )
+})
 ```
 
 Qué hace internamente:
@@ -279,6 +278,7 @@ El cron `entra-profile-sync` ahora ejecuta el ciclo completo para cada usuario i
 ### person_360 VIEW v2
 
 La VIEW `greenhouse_serving.person_360` fue reemplazada para exponer campos enriched:
+
 - `resolved_avatar_url` (de `client_users.avatar_url`, sincronizado desde Graph via GCS)
 - `resolved_job_title`, `resolved_phone`, `resolved_email`
 - `department_name`, `job_level`, `employment_type`, `linked_systems`, `active_role_codes`
@@ -296,14 +296,14 @@ Migracion: `20260405164846570_person-360-v2-enriched-view.sql`
 
 Funcion SQL `greenhouse_core.canonical_source_system(raw TEXT)` normaliza `source_system` values a nombres display-friendly en la VIEW `person_360`:
 
-| Raw DB values | Canonical | Mostrado en UI |
-|---|---|---|
-| `azure_ad`, `azure-ad`, `microsoft_sso`, `entra` | `microsoft` | Si |
-| `hubspot`, `hubspot_crm` | `hubspot` | Si |
-| `notion` | `notion` | Si |
-| `google`, `google_oauth`, `google_workspace` | `google` | Si |
-| `deel`, `deel_hr`, `deel_com` | `deel` | Si |
-| `greenhouse_auth`, `greenhouse_team` | `NULL` | No (filtrado) |
+| Raw DB values                                    | Canonical   | Mostrado en UI |
+| ------------------------------------------------ | ----------- | -------------- |
+| `azure_ad`, `azure-ad`, `microsoft_sso`, `entra` | `microsoft` | Si             |
+| `hubspot`, `hubspot_crm`                         | `hubspot`   | Si             |
+| `notion`                                         | `notion`    | Si             |
+| `google`, `google_oauth`, `google_workspace`     | `google`    | Si             |
+| `deel`, `deel_hr`, `deel_com`                    | `deel`      | Si             |
+| `greenhouse_auth`, `greenhouse_team`             | `NULL`      | No (filtrado)  |
 
 Regla: nuevos source systems se agregan al CASE de la funcion SQL, no al frontend ni al TypeScript.
 
@@ -375,11 +375,11 @@ Output: `.auth/storageState.json` — compatible with Playwright's `storageState
 
 Dedicated PostgreSQL-provisioned users exist exclusively for agent and E2E sessions. This avoids using personal accounts for automated workflows and lets agents validate role-sensitive behavior with least privilege.
 
-| Persona | `user_id` | `email` | `tenant_type` | `roles` | Canonical use |
-|---|---|---|---|---|---|
-| Superadmin | `user-agent-e2e-001` | `agent@greenhouse.efeonce.org` | `efeonce_internal` | `efeonce_admin` + `collaborator` | Admin, permissions, broad smoke, cross-domain diagnostics |
-| Collaborator | `user-agent-collaborator-001` | `agent-collaborator@greenhouse.efeonce.org` | `efeonce_internal` | `collaborator` | `/my`, personal self-service, collaborator-only access checks |
-| Client | `user-agent-client-001` | `agent-client@greenhouse.efeonce.org` | `client` | `client_executive` + `client_manager` + `client_specialist` | Client portal general coverage without internal/admin access |
+| Persona      | `user_id`                     | `email`                                     | `tenant_type`      | `roles`                                                     | Canonical use                                                 |
+| ------------ | ----------------------------- | ------------------------------------------- | ------------------ | ----------------------------------------------------------- | ------------------------------------------------------------- |
+| Superadmin   | `user-agent-e2e-001`          | `agent@greenhouse.efeonce.org`              | `efeonce_internal` | `efeonce_admin` + `collaborator`                            | Admin, permissions, broad smoke, cross-domain diagnostics     |
+| Collaborator | `user-agent-collaborator-001` | `agent-collaborator@greenhouse.efeonce.org` | `efeonce_internal` | `collaborator`                                              | `/my`, personal self-service, collaborator-only access checks |
+| Client       | `user-agent-client-001`       | `agent-client@greenhouse.efeonce.org`       | `client`           | `client_executive` + `client_manager` + `client_specialist` | Client portal general coverage without internal/admin access  |
 
 Shared properties:
 
@@ -722,23 +722,23 @@ Roles for Efeonce team members accessing their personal self-service.
 
 Roles for Efeonce team members with cross-tenant operational visibility.
 
-| role_code            | role_name       | Description                                                                                                      | Route Groups |
-| -------------------- | --------------- | ---------------------------------------------------------------------------------------------------------------- | ------------ |
+| role_code            | role_name       | Description                                                                                                      | Route Groups             |
+| -------------------- | --------------- | ---------------------------------------------------------------------------------------------------------------- | ------------------------ |
 | `efeonce_account`    | Líder de Cuenta | Responde por relaciones con clientes, salud de cuentas y contexto operativo/comercial de sus clientes asignados. | `internal`, `commercial` |
-| `efeonce_operations` | Operaciones     | Visibilidad operativa cross-tenant: capacidad, bloqueos, utilización y backlog de revisión.                      | `internal`   |
+| `efeonce_operations` | Operaciones     | Visibilidad operativa cross-tenant: capacidad, bloqueos, utilización y backlog de revisión.                      | `internal`               |
 
 #### Family: Domain Operators
 
 Roles for Efeonce team members managing specific internal domains.
 
-| role_code          | role_name                        | Description                                                                                  | Route Groups |
-| ------------------ | -------------------------------- | -------------------------------------------------------------------------------------------- | ------------ |
-| `hr_manager`       | Gestión HR                       | Administra personas, permisos, asistencia, estructura organizacional y catálogos HR.         | `hr`         |
-| `hr_payroll`       | Nómina                           | Procesa períodos, entradas y compensaciones de payroll.                                      | `hr`         |
-| `finance_analyst`  | Analista de Finanzas             | Opera ingresos, egresos, conciliación y suppliers; lectura ampliada sobre finanzas y artefactos comerciales consumidos por finance. | `finance`, `commercial` |
+| role_code          | role_name                        | Description                                                                                                                          | Route Groups            |
+| ------------------ | -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | ----------------------- |
+| `hr_manager`       | Gestión HR                       | Administra personas, permisos, asistencia, estructura organizacional y catálogos HR.                                                 | `hr`                    |
+| `hr_payroll`       | Nómina                           | Procesa períodos, entradas y compensaciones de payroll.                                                                              | `hr`                    |
+| `finance_analyst`  | Analista de Finanzas             | Opera ingresos, egresos, conciliación y suppliers; lectura ampliada sobre finanzas y artefactos comerciales consumidos por finance.  | `finance`, `commercial` |
 | `finance_admin`    | Administrador de Finanzas        | Acceso completo de escritura financiera, incluyendo cuentas, tipos de cambio, conciliación y operaciones comerciales transicionales. | `finance`, `commercial` |
-| `people_viewer`    | Lectura de Personas              | Acceso de lectura a perfiles de colaboradores, assignments y capacidad.                      | `people`     |
-| `ai_tooling_admin` | Administrador de Herramientas AI | Gestiona catálogo de herramientas, licencias, wallets y créditos.                            | `ai_tooling` |
+| `people_viewer`    | Lectura de Personas              | Acceso de lectura a perfiles de colaboradores, assignments y capacidad.                                                              | `people`                |
+| `ai_tooling_admin` | Administrador de Herramientas AI | Gestiona catálogo de herramientas, licencias, wallets y créditos.                                                                    | `ai_tooling`            |
 
 #### Family: Platform Admin
 
@@ -776,17 +776,17 @@ When a user is created or provisioned:
 
 Route groups are the enforcement boundary. Each route group maps to a set of URL prefixes and requires at least one matching role.
 
-| route_group  | URL Prefixes                                                                                                                      | Required Roles (any of)                                                                                             | Tenant Context        |
-| ------------ | --------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- | --------------------- |
-| `client`     | `/home`, `/dashboard`, `/proyectos`, `/sprints`, `/campanas`, `/equipo`, `/settings`                                              | `client_executive`, `client_manager`, `client_specialist`, `efeonce_account`, `efeonce_operations`, `efeonce_admin` | Active tenant         |
-| `my`         | `/my/leave`, `/my/attendance`, `/my/expenses`, `/my/tools`, `/my/payroll`, `/my/profile`                                          | `collaborator`, `efeonce_admin`                                                                                     | Home tenant (efeonce) |
-| `internal`   | `/home`, `/admin`, `/internal/dashboard`, `/internal/clientes`, `/internal/capacidad`, `/internal/riesgos`, `/internal/kpis`    | `efeonce_account`, `efeonce_operations`, `efeonce_admin`                                                            | Cross-tenant          |
-| `commercial` | `/finance/quotes`, `/finance/contracts`, `/finance/master-agreements`, `/finance/products`, `/finance/intelligence`             | `efeonce_account`, `finance_analyst`, `finance_admin`, `efeonce_admin`                                             | Efeonce tenant        |
-| `hr`         | `/hr/leave`, `/hr/attendance`, `/hr/org-chart`, `/hr/payroll`, `/hr/approvals`, `/hr/hierarchy`, `/hr/departments`                | `hr_manager`, `hr_payroll`, `efeonce_admin`                                                                         | Efeonce tenant        |
-| `finance`    | `/finance`, `/finance/income`, `/finance/expenses`, `/finance/suppliers`, `/finance/reconciliation`, `/finance/clients`          | `finance_analyst`, `finance_admin`, `efeonce_admin`                                                                 | Efeonce tenant        |
-| `people`     | `/people`, `/people/[memberId]`                                                                                                   | `people_viewer`, `hr_manager`, `efeonce_operations`, `efeonce_admin`                                                | Efeonce tenant        |
-| `ai_tooling` | `/ai-tools/catalog`, `/ai-tools/licenses`, `/ai-tools/wallets`, `/ai-tools/ledger`                                                | `ai_tooling_admin`, `efeonce_admin`                                                                                 | Efeonce tenant        |
-| `admin`      | `/admin/tenants`, `/admin/users`, `/admin/roles`, `/admin/scopes`, `/admin/feature-flags`                                         | `efeonce_admin`                                                                                                     | Cross-tenant          |
+| route_group  | URL Prefixes                                                                                                                 | Required Roles (any of)                                                                                             | Tenant Context        |
+| ------------ | ---------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- | --------------------- |
+| `client`     | `/home`, `/dashboard`, `/proyectos`, `/sprints`, `/campanas`, `/equipo`, `/settings`                                         | `client_executive`, `client_manager`, `client_specialist`, `efeonce_account`, `efeonce_operations`, `efeonce_admin` | Active tenant         |
+| `my`         | `/my/leave`, `/my/attendance`, `/my/expenses`, `/my/tools`, `/my/payroll`, `/my/profile`                                     | `collaborator`, `efeonce_admin`                                                                                     | Home tenant (efeonce) |
+| `internal`   | `/home`, `/admin`, `/internal/dashboard`, `/internal/clientes`, `/internal/capacidad`, `/internal/riesgos`, `/internal/kpis` | `efeonce_account`, `efeonce_operations`, `efeonce_admin`                                                            | Cross-tenant          |
+| `commercial` | `/finance/quotes`, `/finance/contracts`, `/finance/master-agreements`, `/finance/products`, `/finance/intelligence`          | `efeonce_account`, `finance_analyst`, `finance_admin`, `efeonce_admin`                                              | Efeonce tenant        |
+| `hr`         | `/hr/leave`, `/hr/attendance`, `/hr/org-chart`, `/hr/payroll`, `/hr/approvals`, `/hr/hierarchy`, `/hr/departments`           | `hr_manager`, `hr_payroll`, `efeonce_admin`                                                                         | Efeonce tenant        |
+| `finance`    | `/finance`, `/finance/income`, `/finance/expenses`, `/finance/suppliers`, `/finance/reconciliation`, `/finance/clients`      | `finance_analyst`, `finance_admin`, `efeonce_admin`                                                                 | Efeonce tenant        |
+| `people`     | `/people`, `/people/[memberId]`                                                                                              | `people_viewer`, `hr_manager`, `efeonce_operations`, `efeonce_admin`                                                | Efeonce tenant        |
+| `ai_tooling` | `/ai-tools/catalog`, `/ai-tools/licenses`, `/ai-tools/wallets`, `/ai-tools/ledger`                                           | `ai_tooling_admin`, `efeonce_admin`                                                                                 | Efeonce tenant        |
+| `admin`      | `/admin/tenants`, `/admin/users`, `/admin/roles`, `/admin/scopes`, `/admin/feature-flags`                                    | `efeonce_admin`                                                                                                     | Cross-tenant          |
 
 Notes:
 
@@ -896,14 +896,14 @@ Permission Sets are **additive only** — they can grant access to additional vi
 
 ### System Sets (seeded)
 
-| Set ID | Name | Section | Views |
-|--------|------|---------|-------|
-| `pset-gestion-financiera` | Gestion Financiera | finanzas | 11 |
-| `pset-nomina-completa` | Nomina Completa | equipo | 3 |
-| `pset-agencia-ops` | Agencia Operaciones | gestion | 5 |
-| `pset-solo-lectura-agencia` | Solo Lectura Agencia | gestion | 3 |
-| `pset-admin-plataforma` | Admin Plataforma | administracion | 12 |
-| `pset-mi-ficha-completa` | Mi Ficha Completa | mi_ficha | 8 |
+| Set ID                      | Name                 | Section        | Views |
+| --------------------------- | -------------------- | -------------- | ----- |
+| `pset-gestion-financiera`   | Gestion Financiera   | finanzas       | 11    |
+| `pset-nomina-completa`      | Nomina Completa      | equipo         | 3     |
+| `pset-agencia-ops`          | Agencia Operaciones  | gestion        | 5     |
+| `pset-solo-lectura-agencia` | Solo Lectura Agencia | gestion        | 3     |
+| `pset-admin-plataforma`     | Admin Plataforma     | administracion | 12    |
+| `pset-mi-ficha-completa`    | Mi Ficha Completa    | mi_ficha       | 8     |
 
 System sets are editable in their view codes but not deletable.
 
@@ -1015,8 +1015,8 @@ Errores categorizados por NextAuth error code:
 | `hr_workspace`      | `routeGroup = hr` o rol `hr_manager` / `hr_payroll`                        | `/hr/payroll` |
 | `finance_workspace` | `routeGroup = finance` o rol `finance_admin` / `finance_analyst`           | `/finance`    |
 | `my_workspace`      | `collaborator` puro sin takeover de `efeonce_admin` / `efeonce_operations` | `/my`         |
-| `internal_default`  | tenant `efeonce_internal` sin home funcional más específica                 | `/home`       |
-| `client_default`    | tenant `client` sin home funcional más específica                           | `/home`       |
+| `internal_default`  | tenant `efeonce_internal` sin home funcional más específica                | `/home`       |
+| `client_default`    | tenant `client` sin home funcional más específica                          | `/home`       |
 
 Los valores legacy persistidos se reescriben por compatibilidad antes de producir sesión:
 
@@ -1180,3 +1180,49 @@ ROLE_CODES pasó de 13 → **14**: nació `designer` (`role_family='domain_opera
 La UI de asignación (`/admin/users` → usuario → Acceso) lista `availableRoles` directo desde `greenhouse_core.roles` → `designer` aparece para asignar sin tocar UI; el label visible sale de `roles.role_name` ('Diseñador').
 
 Spec: `docs/tasks/complete/TASK-1072-designer-role-figma-node-linking.md`. Invariante operativo + reglas duras: `CLAUDE.md` §"Design System Figma node linking — ver ≠ vincular".
+
+## Delta 2026-06-19 — TASK-1120: capabilities `design_system.handoff.*`
+
+El Design Handoff Registry reusa el plano **views** existente del Design System (`plataforma.design_system`) para ver la ruta `/design-system/handoff`, pero separa las acciones de negocio en capabilities finas:
+
+| Capability                         | Action   | Scope    | Grant runtime                            |
+| ---------------------------------- | -------- | -------- | ---------------------------------------- |
+| `design_system.handoff.read`       | `read`   | `tenant` | `route_group=internal` ∪ `efeonce_admin` |
+| `design_system.handoff.create`     | `create` | `tenant` | `designer` ∪ `efeonce_admin`             |
+| `design_system.handoff.transition` | `update` | `tenant` | `designer` ∪ `efeonce_admin`             |
+
+La decisión mantiene el principio TASK-1072: **ver** Design System ≠ **operar** Figma/handoff. Colaboradores internos pueden leer el carril; solo diseño/admin registra nodos de producto o cambia estado. El allowlist de archivos producto vive en `greenhouse_core.design_handoff_allowed_files`; el master AXIS está excluido por constraint y validación server-side.
+
+Spec: `docs/tasks/in-progress/TASK-1120-design-handoff-registry.md`.
+
+## Delta 2026-06-19 — TASK-1175: Design Handoff Control Plane
+
+TASK-1175 mantiene la ruta `/design-system/handoff` en el plano **views** y endurece el plano programático con capabilities de control plane. La UI, Nexa y cualquier cliente API deben llamar commands/readers equivalentes; ningún botón de negocio queda como único camino.
+
+| Capability                                | Action   | Scope    | Grant runtime                            |
+| ----------------------------------------- | -------- | -------- | ---------------------------------------- |
+| `design_system.handoff.allowlist.manage`  | `update` | `tenant` | `efeonce_admin`                          |
+| `design_system.handoff.owner.assign`      | `update` | `tenant` | `designer` ∪ `efeonce_admin`             |
+| `design_system.handoff.planning.update`   | `update` | `tenant` | `designer` ∪ `efeonce_admin`             |
+| `design_system.handoff.link`              | `create` | `tenant` | `designer` ∪ `efeonce_admin`             |
+| `design_system.handoff.evidence.attach`   | `create` | `tenant` | `designer` ∪ `efeonce_admin`             |
+| `design_system.handoff.verify`            | `update` | `tenant` | `designer` ∪ `efeonce_admin`             |
+| `design_system.handoff.drift.read`        | `read`   | `tenant` | `designer` ∪ `efeonce_admin`             |
+
+El lifecycle agrega `in_review` y el gate `implemented` exige ruta runtime no vacía más evidencia gobernada (`gvc_capture`, `runtime_route` o excepción manual auditada). Owner, prioridad, target surface, links TASK/PR/deploy y snapshots Figma son metadata operacional del aggregate, no permisos implícitos. Leer drift no concede mutar allowlist ni forzar implementación.
+
+Delta 2026-06-20: `design_system.handoff.create` cubre el registro inicial **y** el primer snapshot Figma del nodo allowlisted. `design_system.handoff.verify` no es requerido para crear; queda reservado para re-verificaciones posteriores sobre entradas existentes. Esta separación mantiene el intake productivo de diseño en una sola acción gobernada sin abrir un permiso amplio de re-verificación/drift.
+
+Spec: `docs/tasks/in-progress/TASK-1175-design-handoff-control-plane-full-api-parity.md`.
+
+## Delta 2026-06-20 — TASK-1180: Primitive governance en Design Handoff
+
+TASK-1180 agrega una capability fina para registrar la decision de implementacion Design System de cada handoff. Mantiene la lectura en `design_system.handoff.read` y separa la mutacion para que Nexa/API/UI usen el mismo command gobernado.
+
+| Capability                                           | Action   | Scope    | Grant runtime                |
+| ---------------------------------------------------- | -------- | -------- | ---------------------------- |
+| `design_system.handoff.primitive_decision.manage`    | `update` | `tenant` | `designer` ∪ `efeonce_admin` |
+
+La capability permite actualizar strategy, primitive key, variant/kind, Lab route, runtime route, GVC ref, docs ref, rationale, owner y due date. No concede allowlist, verify-node, evidence attach ni transition por si sola. El cierre `implemented` sigue requiriendo `design_system.handoff.transition`, pero la state machine bloquea cierre si Primitive governance está vacía o en `research_required`.
+
+Spec: `docs/tasks/in-progress/TASK-1180-design-handoff-primitive-governance-loop.md`.

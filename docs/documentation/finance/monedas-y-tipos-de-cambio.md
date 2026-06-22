@@ -3,7 +3,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
 > **Version:** 1.2
 > **Creado:** 2026-04-19 por Claude (TASK-475 close-out)
-> **Ultima actualizacion:** 2026-06-02 por Claude (TASK-990 — MXN promovido a finance-core)
+> **Ultima actualizacion:** 2026-06-21 por Claude (TASK-995 — UF/CLF como unidad indexada finance-core + fix drift cobertura CLF)
 > **Documentacion tecnica:**
 > - Spec canónica: [GREENHOUSE_FX_CURRENCY_PLATFORM_V1](../../architecture/GREENHOUSE_FX_CURRENCY_PLATFORM_V1.md)
 > - Finance architecture: [GREENHOUSE_FINANCE_ARCHITECTURE_V1](../../architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md)
@@ -77,12 +77,14 @@ Cada moneda está declarada con su política operativa en `currency-registry.ts`
 |---|---|---|---|---|
 | `CLP` | `auto_synced` | Mindicador | OpenER | diario 23:05 UTC |
 | `USD` | `auto_synced` | Mindicador | OpenER | diario 23:05 UTC |
-| `CLF` | `manual_only`* | `clf_from_indicators` (lee UF de `economic_indicators`) | — | on-demand |
+| `CLF` | `auto_synced`‡ | `clf_from_indicators` (lee UF de `economic_indicators`) | `fawaz_ahmed` | diario (UF self-hosted) |
 | `COP` | `manual_only`* | Socrata TRM (Banco República de Colombia) | Fawaz Ahmed CDN | diario 09:00 UTC (tras flip) |
 | `MXN` | `manual_only`* | Banxico SIE FIX (SF43718) | Frankfurter → Fawaz Ahmed | diario 22:00 UTC (tras flip) |
 | `PEN` | `manual_only`* | apis.net.pe SUNAT SBS | BCRP → Fawaz Ahmed | diario 14:00 UTC (tras flip) |
 
 *Los adapters ya están wireados post-TASK-484 y las cron routes corriendo; lo que falta es flipear `coverage` a `auto_synced` en el registry. Eso queda para un **PR separado** después de 24–48h de dry-run verificado en staging. Hasta entonces el pricing engine sigue emitiendo `fx_fallback — Crítico` para esas monedas aunque la tasa ya se esté poblando.
+
+‡ **CLF ya es `auto_synced`** (no aplica el asterisco de transición): la UF se ingesta self-hosted y determinista en `greenhouse_finance.economic_indicators` (no depende de un proveedor externo de mercado), por eso el registry la declara `auto_synced` (`currency-registry.ts` `CLF.coverage`). En TASK-995 la UF pasa además de pricing-only a **unidad indexada finance-core** (gated) — ver sección "UF/CLF como unidad indexada finance-core" más abajo.
 
 **Qué significa "manual_only"**: la moneda está soportada comercialmente (se puede elegir en el cotizador). Finance Admin puede cargar tasas manuales cuando se necesitan. El cotizador avisa al AE que el par no está auto-cubierto — aun cuando el sync automático ya esté corriendo en background, porque hasta el flip el contrato declara que no es confiable para producción.
 
@@ -260,3 +262,36 @@ El tablero de confiabilidad vigila el rollout MXN con: frescura del rate MXN/CLP
 Todo el soporte MXN está detrás de **flags apagados por defecto** (`FINANCE_CORE_MXN_ENABLED` y derivados). Mientras estén apagados, el comportamiento CLP/USD es idéntico al anterior. La activación (encender flags, onboardear la cuenta Global66 MXN, proyectar la factura de Berel) es una secuencia de rollout que ejecuta el operador.
 
 > Detalle técnico: implementación por slices en [TASK-990](../../tasks/in-progress/TASK-990-mxn-multi-currency-finance-core.md). Settlement nativo + resultado cambiario: [`src/lib/finance/payment-ledger.ts`](../../../src/lib/finance/payment-ledger.ts) + [`multi-currency/native-settlement.ts`](../../../src/lib/finance/multi-currency/native-settlement.ts). Señales: [`src/lib/reliability/queries/multi-currency-fx-signals.ts`](../../../src/lib/reliability/queries/multi-currency-fx-signals.ts).
+
+## UF/CLF como unidad indexada finance-core (TASK-995) — Delta 2026-06-21
+
+### Por qué UF es distinta de una moneda
+
+La **UF (Unidad de Fomento, código `CLF`)** no es plata que se tiene en el banco: es una **unidad de cuenta reajustable** publicada todos los días. El negocio **pacta y factura montos en UF**, pero la **caja siempre se mueve en CLP**. Por eso Greenhouse trata a la UF como **unidad indexada nativa**, no como moneda bancaria: una factura puede *nacer en UF*, pero su valor legal y su cobro son en **CLP**.
+
+### El caso real: Órdenes de Compra de clientes en UF
+
+Las **Órdenes de Compra que recibimos de clientes** (no las que emitimos a proveedores) llegan en distintas monedas: **UF, MXN, CLP o USD** — no todas son UF. Cuando una OC/cotización viene en **UF**:
+
+- el **monto nativo** queda en UF (lo que el cliente pactó);
+- la **factura legal** se emite en **CLP** (equivalente UF × valor UF del día, congelado como evidencia);
+- el **reporte USD** se deriva del CLP funcional (igual que MXN, IAS 21);
+- el **cobro** entra en **CLP** — nunca hay "caja en UF".
+
+Las OC en MXN ya las cubre TASK-990; las CLP/USD siguen su camino normal. El sistema enruta por la **moneda real** de cada OC.
+
+### Lo que NUNCA pasa con UF
+
+- UF **nunca** es moneda de una cuenta bancaria, una orden de pago ni un movimiento de caja (hay una guarda que rechaza una orden de pago en CLF).
+- Greenhouse **no recalcula** el CLP de una factura UF ya emitida: el valor UF queda congelado en un snapshot (`CLF→CLP`, fuente `economic_indicators.UF`).
+- El reajuste de la UF entre el reconocimiento y el cobro se contabiliza **aparte** (revaluación de unidad indexada), nunca mezclado con resultado cambiario de moneda extranjera ni con ingresos.
+
+### Señales de seguridad
+
+El tablero de confiabilidad vigila: frescura del valor UF, facturas UF sin snapshot, drift entre el monto UF nativo y el CLP funcional, y cualquier fuga de UF a un carril de caja. En estado normal, todas en verde (`ok`).
+
+### Estado del rollout
+
+Todo el soporte UF/CLF finance-core está detrás de **flags apagados por defecto** (`FINANCE_CORE_CLF_INDEXED_ENABLED`, `FINANCE_CLF_INCOME_PROJECTION_ENABLED` y derivados). Mientras estén apagados, UF sigue siendo solo del cotizador y el comportamiento CLP/USD/MXN es idéntico. La activación la ejecuta el operador (ver el manual de rollout). El registro de **compras en UF** (lado proveedor) **aún no se usa**: queda preparado a nivel de schema para cuando exista ese flujo.
+
+> Detalle técnico: ADR [`GREENHOUSE_CLF_INDEXED_FINANCE_CORE_V1.md`](../../architecture/GREENHOUSE_CLF_INDEXED_FINANCE_CORE_V1.md) + [TASK-995](../../tasks/in-progress/TASK-995-clf-uf-indexed-finance-core.md). Proyección CLF→CLP: [`src/lib/finance/multi-currency/clf-income-projection.ts`](../../../src/lib/finance/multi-currency/clf-income-projection.ts) + [`fx-snapshot.ts`](../../../src/lib/finance/multi-currency/fx-snapshot.ts). Señales: [`src/lib/reliability/queries/indexed-unit-signals.ts`](../../../src/lib/reliability/queries/indexed-unit-signals.ts). Rollout: [`monedas-indexadas-uf-clf-rollout.md`](../../manual-de-uso/finance/monedas-indexadas-uf-clf-rollout.md).

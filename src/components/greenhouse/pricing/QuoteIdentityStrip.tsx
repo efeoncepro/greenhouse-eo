@@ -18,9 +18,9 @@ export type QuoteStatus = 'draft' | 'pending_approval' | 'approval_rejected' | '
 
 const STATUS_META: Record<
   QuoteStatus,
-  { label: string; color: 'secondary' | 'warning' | 'info' | 'success' | 'error' | 'primary'; icon: string }
+  { label: string; color: 'warning' | 'info' | 'success' | 'error' | 'primary'; icon: string }
 > = {
-  draft: { label: GH_PRICING.identityStrip.draftLabel, color: 'secondary', icon: 'tabler-pencil' },
+  draft: { label: GH_PRICING.identityStrip.draftLabel, color: 'primary', icon: 'tabler-pencil' },
   pending_approval: { label: 'En aprobación', color: 'warning', icon: 'tabler-shield-check' },
   approval_rejected: { label: 'Revisión requerida', color: 'error', icon: 'tabler-shield-x' },
   issued: { label: 'Emitida', color: 'info', icon: 'tabler-file-check' },
@@ -36,6 +36,7 @@ export interface QuoteIdentityStripProps {
   subtitle?: string
   quoteNumber?: string | null
   status: QuoteStatus
+  centerSlot?: ReactNode
   actions?: ReactNode
 
   /** Sticky top offset (for MUI AppBar spacing). Default 0 */
@@ -54,6 +55,7 @@ const QuoteIdentityStrip = ({
   subtitle,
   quoteNumber,
   status,
+  centerSlot,
   actions,
   stickyOffset = 0
 }: QuoteIdentityStripProps) => {
@@ -64,19 +66,21 @@ const QuoteIdentityStrip = ({
       component='header'
       role='banner'
       aria-label={GH_PRICING.identityStrip.ariaLabel}
+      data-capture='quote-identity-strip'
       sx={theme => ({
-        position: 'sticky',
-        top: stickyOffset,
+        position: { xs: 'static', md: 'sticky' },
+        top: { md: stickyOffset },
         zIndex: theme.zIndex.appBar - 1,
         backgroundColor: alpha(theme.palette.background.paper, 0.92),
         backdropFilter: 'saturate(180%) blur(8px)',
         WebkitBackdropFilter: 'saturate(180%) blur(8px)',
         borderBottom: `1px solid ${theme.palette.divider}`,
-        py: 2,
+        pt: 1.5,
+        pb: 1.85,
         px: { xs: 2, md: 3 }
       })}
     >
-      <Stack spacing={1.25}>
+      <Stack spacing={1}>
         {breadcrumbs.length > 0 ? (
           <Breadcrumbs
             separator={<Box component='span' sx={{ color: 'text.disabled' }}>›</Box>}
@@ -103,18 +107,35 @@ const QuoteIdentityStrip = ({
           </Breadcrumbs>
         ) : null}
 
-        <Stack
-          direction={{ xs: 'column', md: 'row' }}
-          spacing={{ xs: 1.5, md: 2 }}
-          alignItems={{ xs: 'flex-start', md: 'center' }}
-          justifyContent='space-between'
+        <Box
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: {
+              xs: '1fr',
+              lg: centerSlot
+                ? 'minmax(390px, 1fr) minmax(340px, 420px) max-content'
+                : 'minmax(0, 1fr) max-content',
+              xl: centerSlot
+                ? 'minmax(430px, 1fr) minmax(460px, 560px) minmax(260px, 1fr)'
+                : 'minmax(0, 1fr) max-content'
+            },
+            alignItems: { xs: 'flex-start', lg: 'center' },
+            columnGap: { xs: 1.5, lg: 2.5, xl: 3 },
+            rowGap: { xs: 1.5, lg: 1 },
+            minWidth: 0
+          }}
         >
-          <Stack direction='row' spacing={2} alignItems='center' flexWrap='wrap' useFlexGap sx={{ minWidth: 0 }}>
+          <Stack
+            direction='row'
+            spacing={1.5}
+            alignItems={{ xs: 'flex-start', sm: 'center' }}
+            sx={{ minWidth: 0 }}
+          >
             <Box
               sx={theme => ({
                 width: 40,
                 height: 40,
-                borderRadius: 2,
+                borderRadius: `${theme.shape.customBorderRadius.lg}px`,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -126,21 +147,20 @@ const QuoteIdentityStrip = ({
             >
               <i className='tabler-file-invoice' style={{ fontSize: 22 }} />
             </Box>
-            <Stack spacing={0.25} sx={{ minWidth: 0 }}>
-              <Stack direction='row' spacing={1.5} alignItems='center' flexWrap='wrap' useFlexGap>
-                <Typography
-                  component='h1'
-                  variant='h5'
-                  sx={{
-                    fontWeight: 600,
-                    lineHeight: 1.2,
-                    whiteSpace: 'nowrap',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis'
-                  }}
-                >
-                  {title}
-                </Typography>
+            <Stack spacing={0.35} sx={{ minWidth: 0 }}>
+              <Typography
+                component='h1'
+                variant='surfaceHeroTitle'
+                sx={{
+                  whiteSpace: { xs: 'normal', sm: 'nowrap' },
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  overflowWrap: 'anywhere'
+                }}
+              >
+                {title}
+              </Typography>
+              <Stack direction='row' spacing={0.75} alignItems='center' flexWrap='wrap' useFlexGap>
                 <Tooltip
                   title={quoteNumber ? '' : 'El número se asigna automáticamente al guardar'}
                   placement='bottom-start'
@@ -148,9 +168,8 @@ const QuoteIdentityStrip = ({
                   disableInteractive
                 >
                   <Typography
-                    variant='body2'
+                    variant='monoId'
                     sx={{
-                      fontVariantNumeric: 'tabular-nums',
                       color: 'text.secondary',
                       px: 1,
                       py: 0.25,
@@ -172,19 +191,48 @@ const QuoteIdentityStrip = ({
                 />
               </Stack>
               {subtitle ? (
-                <Typography variant='body2' color='text.secondary' sx={{ lineHeight: 1.3 }}>
+                <Typography variant='body2' color='text.secondary' sx={{ lineHeight: 1.35 }}>
                   {subtitle}
                 </Typography>
               ) : null}
             </Stack>
           </Stack>
 
+          {centerSlot ? (
+            <Box
+              sx={{
+                justifySelf: { xs: 'stretch', lg: 'center' },
+                minWidth: 0,
+                width: { xs: '100%', lg: '100%' },
+                maxWidth: { xs: '100%', lg: 420, xl: 560 }
+              }}
+            >
+              {centerSlot}
+            </Box>
+          ) : null}
+
           {actions ? (
-            <Stack direction='row' spacing={1} alignItems='center' flexWrap='wrap' useFlexGap>
+            <Stack
+              direction={{ xs: 'column', sm: 'row' }}
+              spacing={1}
+              alignItems={{ xs: 'stretch', sm: 'center' }}
+              justifyContent={{ xs: 'flex-start', lg: 'flex-end' }}
+              flexWrap={{ xs: 'wrap', sm: 'nowrap' }}
+              useFlexGap
+              sx={{
+                justifySelf: { xs: 'stretch', lg: 'end' },
+                flexShrink: 0,
+                minWidth: 0,
+                width: { xs: '100%', sm: 'auto' },
+                '& .MuiButton-root': {
+                  width: { xs: '100%', sm: 'auto' }
+                }
+              }}
+            >
               {actions}
             </Stack>
           ) : null}
-        </Stack>
+        </Box>
       </Stack>
     </Box>
   )

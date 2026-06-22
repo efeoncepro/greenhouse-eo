@@ -410,6 +410,194 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     actions: ['update'] as const,
     defaultScope: 'tenant'
   },
+  // ── TASK-1192 — Finance payment & treasury capability gates (Wave 1 F9) ──
+  // Gate fino por ACCIÓN para las mutaciones más sensibles de pagos/tesorería.
+  // El KEY encoda la acción específica; el campo `action` es el EntitlementAction
+  // genérico (create/update/approve). NUNCA reemplazan invariantes del command/DB
+  // (state machine, source account, anti-zombie, outbox) — son solo gate de acceso.
+  // Reservadas FINANCE_ADMIN + EFEONCE_ADMIN (write); FINANCE_ANALYST queda read-only.
+  {
+    key: 'finance.payment_orders.create',
+    module: 'finance',
+    actions: ['create'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'finance.payment_orders.update',
+    module: 'finance',
+    actions: ['update'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'finance.payment_orders.submit',
+    module: 'finance',
+    actions: ['update'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'finance.payment_orders.approve',
+    module: 'finance',
+    actions: ['approve'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'finance.payment_orders.schedule',
+    module: 'finance',
+    actions: ['update'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'finance.payment_orders.mark_paid',
+    module: 'finance',
+    actions: ['update'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'finance.payment_orders.cancel',
+    module: 'finance',
+    actions: ['update'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'finance.bank_accounts.create',
+    module: 'finance',
+    actions: ['create'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'finance.bank_accounts.update',
+    module: 'finance',
+    actions: ['update'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'finance.bank_transfers.create',
+    module: 'finance',
+    actions: ['create'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'finance.settlements.record_payment',
+    module: 'finance',
+    actions: ['create'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'finance.shareholder_account.create',
+    module: 'finance',
+    actions: ['create'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'finance.shareholder_account.record_movement',
+    module: 'finance',
+    actions: ['create'] as const,
+    defaultScope: 'tenant'
+  },
+  // ── TASK-1193 — Finance fiscal/document action capability gates (Wave 2 F9) ──
+  // Gate fino por ACCIÓN para mutaciones de documentos fiscales/financieros: DTE
+  // emission, income/expenses create/update/payment, HES lifecycle y purchase orders.
+  // SOLO gate de acceso (la emisión DTE sigue por Nubox gateway, los pagos por los
+  // readers normalizados, la state machine de HES en command/DB). Reservadas
+  // FINANCE_ADMIN + EFEONCE_ADMIN (write); FINANCE_ANALYST read-only.
+  {
+    key: 'finance.income.create',
+    module: 'finance',
+    actions: ['create'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'finance.income.update',
+    module: 'finance',
+    actions: ['update'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'finance.income.emit_dte',
+    module: 'finance',
+    actions: ['update'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'finance.income.batch_emit_dte',
+    module: 'finance',
+    actions: ['update'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'finance.income.record_payment',
+    module: 'finance',
+    actions: ['create'] as const,
+    defaultScope: 'tenant'
+  },
+  // Cesión de facturas (factoring) — mutación financiera distinta de pago/update
+  // (no estaba en la lista original del spec; se gatea por proof, no por estética).
+  {
+    key: 'finance.income.factor',
+    module: 'finance',
+    actions: ['create'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'finance.expenses.create',
+    module: 'finance',
+    actions: ['create'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'finance.expenses.update',
+    module: 'finance',
+    actions: ['update'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'finance.expenses.record_payment',
+    module: 'finance',
+    actions: ['create'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'finance.hes.create',
+    module: 'finance',
+    actions: ['create'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'finance.hes.submit',
+    module: 'finance',
+    actions: ['update'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'finance.hes.approve',
+    module: 'finance',
+    actions: ['approve'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'finance.hes.reject',
+    module: 'finance',
+    actions: ['update'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'finance.purchase_orders.create',
+    module: 'finance',
+    actions: ['create'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'finance.purchase_orders.update',
+    module: 'finance',
+    actions: ['update'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'finance.purchase_orders.cancel',
+    module: 'finance',
+    actions: ['update'] as const,
+    defaultScope: 'tenant'
+  },
   // TASK-766 Slice 5 — Repair de payments con drift CLP.
   // Permite a FINANCE_ADMIN / EFEONCE_ADMIN reparar registros de
   // expense_payments / income_payments con `requires_fx_repair=TRUE`
@@ -817,6 +1005,33 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     key: 'commercial.quotation',
     module: 'commercial',
     actions: ['read', 'create', 'update', 'approve', 'export'] as const,
+    defaultScope: 'tenant'
+  },
+  // TASK-1211 — read/compute capability del cotizador (simular precio, stateless).
+  // Separada de commercial.quotation (autoría/lifecycle) por el split A/B del ADR
+  // GREENHOUSE_QUOTE_API_PARITY_DECISION_V1.
+  {
+    key: 'commercial.quote.simulate',
+    module: 'commercial',
+    actions: ['read'] as const,
+    defaultScope: 'tenant'
+  },
+  // ── TASK-1202 — quote capability hardening (Wave 3 F9) ──
+  // Las acciones de lifecycle del cotizador usan la capability EXISTENTE
+  // `commercial.quotation` (granteada a roles comerciales, consistente con el command
+  // de TASK-1212). Estas DOS son las price-affecting más sensibles, restringidas a
+  // FINANCE_ADMIN + EFEONCE_ADMIN (no a todo el equipo comercial): override manual del
+  // costo de una línea (bypassa el engine) y la config global de márgenes/tiers.
+  {
+    key: 'commercial.quotation.cost_override',
+    module: 'commercial',
+    actions: ['update'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'commercial.quotation.pricing_config',
+    module: 'commercial',
+    actions: ['update'] as const,
     defaultScope: 'tenant'
   },
   {
@@ -1495,6 +1710,26 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     actions: ['read'] as const,
     defaultScope: 'tenant'
   },
+  // TASK-1171 Slice 3 — Activar el sync Notion->ICO de un cliente (Full API Parity).
+  // Grant matriz (runtime.ts mismo PR): EFEONCE_ADMIN + EFEONCE_OPERATIONS +
+  // EFEONCE_ACCOUNT. Seed en capabilities_registry mismo PR (invariant TASK-873/935;
+  // guard capability-grant-coverage.test.ts). can()-checked en el command
+  // enableClientIcoSync + endpoint POST /api/delivery/ico/enable-sync.
+  {
+    key: 'delivery.ico.sync.enable',
+    module: 'delivery',
+    actions: ['update'] as const,
+    defaultScope: 'tenant'
+  },
+  // TASK-1171 Slice 5 — Leer el estado de sync ICO de un cliente (verify-ICO
+  // preflight "configurado != fluyendo"). Grant matriz (runtime.ts mismo PR):
+  // route_group internal ∪ EFEONCE_ADMIN. Seed capabilities_registry mismo PR.
+  {
+    key: 'delivery.ico.sync.read',
+    module: 'delivery',
+    actions: ['read'] as const,
+    defaultScope: 'tenant'
+  },
   // TASK-1137 — Nexa governed action runtime. Gate de "este usuario puede CONFIRMAR/EJECUTAR una
   // acción gobernada propuesta por Nexa". El LLM nunca ejecuta; el humano confirma vía el endpoint
   // determinístico. Grant (runtime.ts): internal route_group ∪ EFEONCE_ADMIN (audiencia del piloto;
@@ -1524,6 +1759,74 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
   // runtime.ts mismo PR (invariant TASK-873/935; guard capability-grant-coverage.test.ts).
   {
     key: 'design_system.figma_node.link',
+    module: 'design_system',
+    actions: ['update'] as const,
+    defaultScope: 'tenant'
+  },
+  // TASK-1120 — Design Handoff Registry. Ver el carril es interno; registrar y
+  // transicionar handoffs de producto es exclusivo de designer + efeonce_admin.
+  {
+    key: 'design_system.handoff.read',
+    module: 'design_system',
+    actions: ['read'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'design_system.handoff.create',
+    module: 'design_system',
+    actions: ['create'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'design_system.handoff.transition',
+    module: 'design_system',
+    actions: ['update'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'design_system.handoff.allowlist.manage',
+    module: 'design_system',
+    actions: ['create', 'update'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'design_system.handoff.owner.assign',
+    module: 'design_system',
+    actions: ['update'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'design_system.handoff.planning.update',
+    module: 'design_system',
+    actions: ['update'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'design_system.handoff.link',
+    module: 'design_system',
+    actions: ['create'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'design_system.handoff.evidence.attach',
+    module: 'design_system',
+    actions: ['create'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'design_system.handoff.verify',
+    module: 'design_system',
+    actions: ['update'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'design_system.handoff.drift.read',
+    module: 'design_system',
+    actions: ['read'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'design_system.handoff.primitive_decision.manage',
     module: 'design_system',
     actions: ['update'] as const,
     defaultScope: 'tenant'
