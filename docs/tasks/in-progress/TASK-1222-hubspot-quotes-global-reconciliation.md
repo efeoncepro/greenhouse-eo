@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -42,6 +42,24 @@ La causa raiz no es el scheduler ni el token: `ops-hubspot-quotes-sync` corre ca
 - Registrar de forma auditable las quotes no resolubles, sin inventar clientes ni silently skip.
 - Agregar webhook/subscription de HubSpot Quote para reaccionar a nuevas quotes/cambios relevantes.
 - Ejecutar backfill idempotente para cerrar el gap actual entre HubSpot `78` y Greenhouse `24`, con evidencia staging/prod.
+
+## Delta 2026-06-22 — Slice 1 dry-run: RECALIBRACION DE PREMISA (read-only, HubSpot real)
+
+El dry-run global (`scripts/hubspot/reconcile-quotes-dryrun.ts`, ejecutado contra HubSpot real + PG) **invalida la causa raiz principal asumida**. Buckets reales (78 HubSpot quotes):
+
+| Bucket | Count | Lectura |
+|---|---|---|
+| `already_present` (UNION finance ∪ commercial) | 25 | finance=25, commercial=25 (alineados, NO hay split-brain hoy; el "24" eran 25) |
+| `resolvable_direct_company` | **0** | el resolver direct company importaria 0 |
+| `resolvable_via_deal_company` | **0** | el fallback deal→company importaria 0 |
+| `company_not_mapped_to_greenhouse_organization` | **45** | tienen company/deal PERO esa company no existe como organization en GH |
+| `no_company_or_deal_association` | 8 | sin ancla — quedan unresolved legitimas |
+| `multiple_candidate_organizations` | 0 | sin conflictos |
+| `direct≠deal conflict` | 0 | la Open Question de prioridad resolver es moot hoy |
+
+**Implicación dura:** el gap 78→25 **NO es un problema de traversal de quotes** (deal→company fallback aporta 0). Es un problema de **cobertura de organizations**: 45 quotes pertenecen a HubSpot companies que no existen como organization en Greenhouse (verificado: 282 orgs, todas activas, 250 con `hubspot_company_id`, 0 inactivas). El resolver de Slices 2-3, tal como esta especificado, importaria **0 quotes adicionales hoy** — solo reclasificaria 53 como unresolved.
+
+**Decisión pendiente del operador (premisa):** el verdadero lever es upstream — ¿esas 45 companies deben ser organizations en Greenhouse? Si sí, el camino canonico es promoverlas vía el companies sync existente (TASK-706 `upsertCanonicalOrganization`) y RECIÉN ahí las quotes se vuelven resolubles; el resolver global es necesario pero no suficiente. La spec se reescribe según esa decisión (ver checkpoint en Handoff 2026-06-22).
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 1 — CONTEXT & CONSTRAINTS
