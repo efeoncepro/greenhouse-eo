@@ -1,3 +1,11 @@
+## Sesión 2026-06-22 — TASK-1206 Q2C Close — smoke local PASS ✅ — Claude
+
+> **Estado:** sigue `in-progress` (rollout staging+prod pendiente). El **smoke local de conversión real PASÓ** sobre un fixture manual — cierra el bloqueante de evidencia runtime que estaba diferido.
+> - **Tool committeado:** `scripts/commercial/task-1206-q2c-close-smoke.ts` (requiere `--confirm`; crea fixture org `ZZZ Q2C Smoke` vía `upsertCanonicalOrganization` + cotización manual emitida + corre `closeQuoteToCash(simple_invoice)` + replay + verifica downstream + 5 signals). Reusable para el smoke de staging.
+> - **Resultado live (dev):** close → `converted`, income `INC-be2ec127`, contrato `ctr-a878babe`, audit Q2C `completed`, `converted_to_income_id` enlazado, 1 income (no doble), outbox completo (`quote_to_cash.started`→`contract.created`→`quotation.converted`→`quote_to_cash.completed`→`invoice_emitted`). **Replay con el mismo idempotencyKey → MISMO `incomeId`, replayed=true (anti doble-AR confirmado en PG real).** Signals: converted_without_income=0, converted_without_audit=0, contract_only_sla_breach=0, duplicate_income=0; issued_without_deal=13 (warning; subió por un quote fixture issued que quedó de un intento previo + las 12 Nubox).
+> - **Artefactos fixture en dev (append-only, NO se borran, decisión operador):** org `org-ddd962ae-...` (`ZZZ Q2C Smoke`, promovida a active_client), 2 cotizaciones convertidas (`qt-fb3b295f`, `qt-4ea687c7`) + 2 incomes (`INC-745f0d53`, `INC-be2ec127`), 1 quote issued leftover (`qt-5612752b`). Marcados `ZZZ-Q2C-SMOKE` / descripción taggeada → filtrables.
+> - **Falta para cerrar:** (1) push (pediste no pushear sin orden); (2) staging: flip `COMMERCIAL_Q2C_CANONICAL_CLOSE_ENABLED` + redeploy + repetir smoke por HTTP; (3) prod tras sign-off Commercial/Finance → recién ahí mover a complete/. Nada pusheado.
+
 ## Sesión 2026-06-21 — TASK-1206 Q2C Close Command (Slices 2-5 — code-complete, smoke diferido) — Claude
 
 > **Estado:** 🚧 `code complete, rollout pendiente` (sigue `in-progress`). Slices 2-5 implementados local-first en `develop`, **sin push**. El **cutover (flip de flag) y el smoke de conversión real quedan diferidos**. Continuación de la sesión Slice 1.
@@ -7,6 +15,13 @@
 > - **Hallazgo de seguridad AR (por qué el smoke se difirió):** las **12 cotizaciones `issued` en dev son TODAS `source_system='nubox'`** (espejos de facturación importada, 0 líneas builder). Convertir una = **doble AR** (revenue double-count vs el income ya proyectado por Nubox). NO se corrió el happy-path sobre data real. El smoke happy-path requiere **fixture manual nuevo** (resuelve la Open Question) o sign-off. Evidencia interina sin tocar AR: 12 tests (replay idempotente, ledger replay anti doble-income, approval pre-gate, contract_only suspended) + 5 signals **live** contra PG (steady: converted_without_income/audit/sla_breach/duplicate=0, issued_without_deal=12 warning).
 > - **Pendiente de rollout (operador):** (1) fixture manual o autorizar; (2) `COMMERCIAL_Q2C_CANONICAL_CLOSE_ENABLED=true` staging + smoke `simple_invoice` → verificar income+contrato+audit+outbox+signals; (3) prod tras sign-off Commercial/Finance. `COMMERCIAL_Q2C_CONTRACT_ONLY_ENABLED` solo con política aprobada. Flags en el ledger (§ Pendientes).
 > - **Cross-impact:** TASK-1211 (read parity) absorbe el lane API Platform Q2C; TASK-1202 (capabilities) sin cambio — `closeQuoteToCash` consume `commercial.quote_to_cash.execute` existente. Convivencia: la cadena de commits TASK-1206 quedó por debajo del commit Codex `25dd36122` (ISSUE-104 CI typecheck), ajeno.
+
+## Sesión 2026-06-22 — TASK-845 Node 24 App/Test Runtime Upgrade — Codex
+
+> **Estado:** in-progress en `develop` por pedido del operador. Hook ejecutado: `pnpm codex:task-hook TASK-845`; no se creó worktree ni se cambió de rama. Cambio ajeno presente y no tocado: `docs/tasks/in-progress/TASK-1206-commercial-q2c-canonical-close-command.md`.
+> - **Subagentes:** 3 explorers lanzados para discovery paralelo de workflows, runtime/tooling y docs.
+> - **Decisión inicial:** target `24.x` (Node 24 LTS + Vercel 24.x default/available); Node 26 queda fuera de scope por `Current`.
+> - **Slice activo:** ownership documental + runtime contract + CI cutover.
 
 ## Sesión 2026-06-21 — CI GitHub Actions OOM + CLAUDE.md governance root cause — Codex
 
