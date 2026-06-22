@@ -1044,13 +1044,16 @@ export const syncCanonicalFinanceQuote = async ({
        $2,
        $3,
        $4,
+       -- TASK-1222 Slice A — el inbound de HubSpot ya escribe finance.quotes.status en
+       -- vocabulario canónico (issued/pending_approval/approval_rejected/expired/...).
+       -- El CASE legacy solo conocía el vocab del quote-builder (accepted/sent/rejected)
+       -- y colapsaba todo lo demás a 'draft' → 17/24 quotes HubSpot issued se mostraban
+       -- como borrador. Passthrough de los status canónicos PRIMERO; mapeo legacy después.
        CASE
+         WHEN q.status IN ('draft', 'pending_approval', 'approval_rejected', 'issued', 'expired', 'converted') THEN q.status
          WHEN q.status = 'accepted' THEN 'issued'
-         WHEN q.status = 'draft' THEN 'draft'
          WHEN q.status = 'sent' THEN 'issued'
          WHEN q.status = 'rejected' THEN 'approval_rejected'
-         WHEN q.status = 'expired' THEN 'expired'
-         WHEN q.status = 'converted' THEN 'converted'
          ELSE 'draft'
        END,
        1,

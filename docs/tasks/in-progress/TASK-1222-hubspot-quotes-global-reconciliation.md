@@ -267,6 +267,16 @@ N/A — no new user-facing business capability. This task fixes the server-side 
 
 ## Scope
 
+### Execution re-aim 2026-06-22 (decidido con arch-architect + commercial-expert, post Slice 1 + challenge ANAM)
+
+El Slice 1 (dry-run + trace ANAM) reencuadró la task en 3 problemas. Orden de ejecución re-apuntado (supersede el orden original de abajo, que queda como referencia para B/C):
+
+- **Slice A — Status/source drift fix (PRIMERO, máximo valor, root-caused):** el `CASE` de `syncCanonicalFinanceQuote` ([quotation-canonical-store.ts:1047-1055](src/lib/finance/quotation-canonical-store.ts)) solo conoce el vocab del builder legacy (`accepted/sent/draft/rejected/expired/converted`) y cae a `ELSE 'draft'` para los status canónicos que escribe el inbound HubSpot (`issued/pending_approval/approval_rejected/expired`). Resultado: **17/24 quotes HubSpot issued se muestran como `draft`** (`status='draft'` + `legacy_status='issued'`; el read API hace `status || legacy_status` → gana draft). Fix en la FUENTE (passthrough de status canónicos en el CASE) + backfill idempotente de las 17 filas + investigar la 1 quote `source=manual` (explica el 24 vs 25). NO parchar el normalizer de lectura. Skill: `greenhouse-finance-accounting-operator`.
+- **Slices B (re-scoped de los Slices 2-5 originales) — cobertura vía lead orgs:** las 45 HubSpot companies sin organization se promueven a **organizations tipo `lead`** (decisión operador 2026-06-22: probablemente NO clientes) vía el writer canónico `upsertCanonicalOrganization` + `deriveOrganizationType` (invariante TASK-991), luego el resolver global importa sus quotes. Bridge de lectura global = helper directo sancionado (no hay endpoint global en el bridge). NO se crean clients ni privilegios.
+- **Slice C — unresolved (8 sin asociación):** unresolved + signal `commercial.quote_intake.*`, recomendar data hygiene HubSpot. No inventar org.
+
+Los Slices 1-6 originales abajo siguen vigentes como spec de B/C; el resolver direct/deal sigue siendo necesario (post-onboarding de leads) pero no suficiente por sí solo.
+
 ### Slice 1 — Discovery packet + dry-run classifier
 
 - Crear/actualizar un script dry-run read-only que lea HubSpot quotes globales paginadas y compare contra la **UNION** de `greenhouse_commercial.quotations.hubspot_quote_id` y `greenhouse_finance.quotes` (dedup cross-table anti split-brain — ver invariantes).
