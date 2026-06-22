@@ -61,6 +61,16 @@ El dry-run global (`scripts/hubspot/reconcile-quotes-dryrun.ts`, ejecutado contr
 
 **Decisión pendiente del operador (premisa):** el verdadero lever es upstream — ¿esas 45 companies deben ser organizations en Greenhouse? Si sí, el camino canonico es promoverlas vía el companies sync existente (TASK-706 `upsertCanonicalOrganization`) y RECIÉN ahí las quotes se vuelven resolubles; el resolver global es necesario pero no suficiente. La spec se reescribe según esa decisión (ver checkpoint en Handoff 2026-06-22).
 
+### Corrección 2026-06-22 (tras challenge ANAM del operador) — la task son 3 problemas, no 1
+
+Trazando ANAM (cliente real, org existe) end-to-end: **sus 5 quotes YA están importadas** (en `finance.quotes` y en `commercial.quotations`, org-linked, source=hubspot). NO están en las 53 ausentes. El read API (`listFinanceQuotesFromCanonical`) lee de **`greenhouse_commercial.quotations`** filtrando `organization_id = ANY(tenant)` + `source_system`. Hallazgos que reencuadran la task:
+
+- **(A) Display/status drift (NO estaba en scope, es probablemente el dolor real):** las 5 quotes ANAM tienen `status='draft'` en `commercial.quotations` aunque 3 son `issued` en HubSpot (`APPROVAL_NOT_NEEDED`). Y el "24 vs 25 expuesto" = **1 quote HubSpot reclasificada a `source_system='manual'`** en commercial.quotations (queda fuera del filtro `?source=hubspot`). O sea: quotes presentes que se muestran mal, no ausentes.
+- **(B) Cobertura (premisa original, parcialmente válida):** 45 quotes cuelgan de HubSpot companies sin organization en GH (verificado). El resolver direct/deal importa 0 hasta onboardearlas.
+- **(C) Sin asociación:** 8 quotes sin company/deal → unresolved legítimas.
+
+El backfill/resolver global (Slices 2-5) ataca (B/C) pero **no toca (A)**, que es lo que el operador percibe como "ANAM no sale". La task debe re-apuntarse: decidir si (A) status/source drift entra a esta task o sale a una separada, y si (B) implica onboarding de companies. Pendiente decisión del operador.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 1 — CONTEXT & CONSTRAINTS
      "Que necesito entender antes de planificar?"
