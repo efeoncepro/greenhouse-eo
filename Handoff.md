@@ -19,9 +19,13 @@
 ## Sesión 2026-06-22 — TASK-845 Node 24 App/Test Runtime Upgrade — Codex
 
 > **Estado:** in-progress en `develop` por pedido del operador. Hook ejecutado: `pnpm codex:task-hook TASK-845`; no se creó worktree ni se cambió de rama. Cambio ajeno presente y no tocado: `docs/tasks/in-progress/TASK-1206-commercial-q2c-canonical-close-command.md`.
-> - **Subagentes:** 3 explorers lanzados para discovery paralelo de workflows, runtime/tooling y docs.
+> - **Subagentes:** 3 explorers lanzados para discovery paralelo de workflows, runtime/tooling y docs. Primer resultado integrado: 7 usos de `setup-node` en app/tests/builds debían cambiar a 24; production release/nightly ya estaban en 24; Cloud Run workers `node:22-slim` quedan fuera de scope.
 > - **Decisión inicial:** target `24.x` (Node 24 LTS + Vercel 24.x default/available); Node 26 queda fuera de scope por `Current`.
-> - **Slice activo:** ownership documental + runtime contract + CI cutover.
+> - **Implementado local:** `package.json#engines.node="24.x"`, `.nvmrc=24`, `.node-version=24`; workflows `ci`, `ci-deep`, `playwright`, `reliability-verify`, `design-contract` y `task-contract` usan `node-version: 24`.
+> - **Evidencia local Node 24:** `node -v` = `v24.14.0`; `pnpm -v` = `10.32.1`; `corepack enable && pnpm install --frozen-lockfile` verde; `rg node-version: 20` sin resultados en `.github/workflows`; `pnpm typecheck`, `pnpm build`, `pnpm task:lint --task TASK-845`, `pnpm ops:lint --changed`, `pnpm docs:context-check`, `pnpm docs:closure-check`, `pnpm qa:gates --changed --agent codex --docs`, `pnpm migration-marker-gate:test` y `git diff --check` verdes. `pnpm test` full bajo Node 24: 7667 passed / 2 timeouts mientras corrían build+lint en paralelo; re-run aislado de esos 2 archivos HR: 17/17 passed.
+> - **Lint/Playwright:** `pnpm lint` full queda bloqueado por archivo local ignorado/ajeno `scripts/commercial/task-1206-q2c-close-smoke.ts` (padding-line errors, no versionado en esta diff). ESLint sobre la diff/repo excluyendo ese scratch: verde. Playwright local con server Node 24: `login-session` 2/2 passed; `cron-staging-parity` falla por timeout navegando a `/api/admin/reliability`, también aislado con `--timeout=60000`.
+> - **Vercel:** `vercel project ls --scope efeonce-7670142f` muestra `greenhouse-eo` con `Node Version 24.x`; `engines.node=24.x` queda igualmente como SSOT de repo.
+> - **Pendiente antes de cerrar complete:** push + GitHub Actions + Playwright CI + deployment/build evidence Vercel post-push. Hasta entonces TASK-845 queda `code complete local / rollout pendiente`, no `complete`.
 
 ## Sesión 2026-06-21 — CI GitHub Actions OOM + CLAUDE.md governance root cause — Codex
 

@@ -5,7 +5,19 @@
 > Versión: `1.10`
 > Estado: `vigente`
 > Creada: `2026-04-25` por TASK-600
-> Última actualización: `2026-06-17` por TASK-1167 (Public Site Astro GitHub CI signal)
+> Última actualización: `2026-06-22` por TASK-845 (Node 24 app/test runtime)
+
+## Delta 2026-06-22 — TASK-845: Node 24 app/test/build runtime
+
+TASK-607 resolvio el runtime interno de GitHub Actions; TASK-845 completa el segundo plano: el runtime de app, tests, build y smoke lanes del portal. El contrato vigente del repo es Node.js `24.x` para Greenhouse web runtime, expresado en `package.json#engines.node`, `.nvmrc`, `.node-version` y los workflows que ejecutan app/tests/builds.
+
+Contratos operativos:
+
+- `node-version: 24` es obligatorio en workflows GitHub que ejecutan Next.js, lint/typecheck, tests, Playwright o scripts del repo.
+- `package.json#engines.node = "24.x"` es el source of truth portable para Vercel builds/functions; evita depender solo de Project Settings externos.
+- `.nvmrc` es el archivo humano canonico local; `.node-version` existe solo como espejo para herramientas compatibles y debe mantenerse en `24`.
+- GitHub Actions runtime interno y app runtime siguen siendo planos distintos: actions versionadas (`checkout`, `setup-node`, `upload-artifact`, `pnpm/action-setup`, Google auth/gcloud) deben mantenerse compatibles con Node 24, pero eso no reemplaza `node-version: 24`.
+- Cloud Run worker Dockerfiles que usan `node:22-slim` (`services/ops-worker`, `services/commercial-cost-worker`, `services/ico-batch`) son runtime container separado. No bloquean el portal/Vercel y requieren follow-up propio si se homogeneizan.
 
 ---
 
@@ -209,7 +221,7 @@ Steady state esperado:
 
 - Una suite Playwright con `33 passed, 3 flaky` publica `failed_tests=0`, `summary_json.flakyCount=3` y `status='flaky'`.
 - No quedan referencias a las actions target antiguas (`checkout/setup-node/upload-artifact@v4`, `pnpm/action-setup@v4`, `google-github-actions/auth/setup-gcloud@v2`) en `.github/workflows/`.
-- Los warnings de GitHub Actions por Node.js 20 de actions desaparecen; `node-version: 20` de los jobs se mantiene separado y solo controla el runtime de app/tests.
+- Los warnings de GitHub Actions por Node.js 20 de actions desaparecen. Desde TASK-845, los jobs de app/tests/builds tambien usan `node-version: 24`; mantenerlos en `20` vuelve a abrir deuda de runtime.
 
 ## Delta 2026-05-09 — ISSUE-072 smoke-lane publisher reliability
 

@@ -3,7 +3,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
 > **Version:** 1.0
 > **Creado:** 2026-04-25 por agente (TASK-638)
-> **Ultima actualizacion:** 2026-05-09
+> **Ultima actualizacion:** 2026-06-22
 > **Documentacion tecnica:** [GREENHOUSE_RELIABILITY_CONTROL_PLANE_V1.md](../../architecture/GREENHOUSE_RELIABILITY_CONTROL_PLANE_V1.md)
 
 ---
@@ -70,6 +70,8 @@ En particular, las señales `subsystem` no siempre usan el mismo tipo de contado
 
 Los smoke lanes Playwright son una fuente `test_lane`: validan flujos críticos del portal y luego publican el resultado a Postgres con `pnpm sync:smoke-lane <lane-key>`.
 
+Desde TASK-845, los smoke lanes y los workflows de app/tests/builds corren con Node.js `24.x`, igual que el contrato de Vercel para el portal. Esto no cambia la semántica de las señales: solo evita que el resultado de Playwright, lint, typecheck o build dependa de un runtime Node 20 que ya no es el target productivo.
+
 La regla operativa es:
 
 - si una prueba falla, el lane puede quedar `failed`; eso es una señal funcional válida
@@ -77,6 +79,8 @@ La regla operativa es:
 - el publisher no debe fallar por tooling, permisos, secretos o saturación transitoria
 - el log esperado en CI es `[smoke-lane-publish] lane=<lane> status=<passed|failed|flaky> ... flaky=<n>`
 - si aparece `sync:smoke-lane <lane> failed (non-blocking)`, se trata como incidente de plataforma, no como ruido normal
+
+Los servicios Cloud Run con Dockerfile propio tienen runtime container separado. Si un worker sigue en `node:22-slim`, se documenta como frontera operacional del worker y no como contradicción del runtime portal/Vercel.
 
 Desde ISSUE-072/ISSUE-073, el publisher usa el carril canónico: WIF, Cloud SQL Connector, Secret Manager, pool `1`, retry/backoff en la primitive Postgres compartida y parser reusable `scripts/lib/smoke-lane-report.ts` para que `flaky` no incremente `failed_tests`.
 

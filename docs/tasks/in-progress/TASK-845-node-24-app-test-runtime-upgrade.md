@@ -8,13 +8,13 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `optional`
-- Status real: `Diseno actualizado 2026-06-03`
+- Status real: `Code complete local 2026-06-22; rollout GitHub/Vercel pendiente`
 - Rank: `TBD`
 - Domain: `platform`
 - Blocked by: `none`
@@ -147,6 +147,22 @@ Reglas obligatorias:
 - No existe `.nvmrc` ni `.node-version` al momento de reforzar esta task.
 - Vercel soporta Node 24.x para builds/functions y permite override via `engines.node` en `package.json`.
 - Node 26 existe, pero al 2026-06-03 sigue como `Current`; Vercel anuncio soporte Node 26 para Sandboxes, no como senal suficiente para migrar Greenhouse Functions production.
+
+### Runtime verification 2026-06-22
+
+- Node local usado para validacion: `v24.14.0` (`/Users/jreye/.nvm/versions/node/v24.14.0/bin/node`).
+- `pnpm -v`: `10.32.1` bajo Node 24.
+- `corepack enable && pnpm install --frozen-lockfile`: verde.
+- `rg -n "node-version: 20|node-version: '20'|node-version: \"20\"" .github/workflows`: sin resultados.
+- `pnpm typecheck`: verde.
+- `pnpm build`: verde bajo Node 24; warning Turbopack observado por patrón dinámico amplio en `src/lib/roadmap/work-item-index/reader.ts`, no bloqueante.
+- `pnpm test`: full suite bajo Node 24 entregó `7667 passed / 2 failed` por timeouts en tests UI HR mientras corrían build+lint en paralelo; re-run aislado de `HrLeaveView.test.tsx` y `HrOffboardingView.test.tsx` bajo Node 24: `17 passed / 0 failed`.
+- `pnpm lint`: bloqueado por archivo scratch local/ajeno `scripts/commercial/task-1206-q2c-close-smoke.ts` con errores auto-fixables de padding-line; el archivo no forma parte de la diff de TASK-845. `pnpm exec eslint . --ignore-pattern scripts/commercial/task-1206-q2c-close-smoke.ts`: verde.
+- Playwright local con server Node 24: `login-session.spec.ts` 2/2 verde; `cron-staging-parity.spec.ts` falla por timeout navegando a `/api/admin/reliability`, tambien aislado con `--timeout=60000`.
+- `vercel project ls --scope efeonce-7670142f`: `greenhouse-eo` reporta `Node Version 24.x`.
+- Workflows migrados a `node-version: 24`: `ci`, `ci-deep`, `playwright`, `reliability-verify` (2 jobs), `design-contract`, `task-contract`.
+- Workflows ya en Node 24 antes de esta task: `production-release`, `production-release-watchdog`, `nexa-knowledge-qa-nightly`.
+- Cloud Run workers `services/ops-worker`, `services/commercial-cost-worker` y `services/ico-batch` siguen usando Dockerfiles `node:22-slim`; se documentan como runtime container separado y follow-up opcional.
 
 ### Gap
 
@@ -319,15 +335,15 @@ Coordinar cualquier cambio de Vercel Project Settings si la evidencia CLI contra
 
 ## Acceptance Criteria
 
-- [ ] `package.json` declara `engines.node = "24.x"`.
-- [ ] `.nvmrc` existe y contiene `24`; si `.node-version` existe, tambien contiene `24`.
-- [ ] `rg -n "node-version: 20|node-version: '20'|node-version: \"20\"" .github/workflows` no devuelve jobs de app/tests/builds pendientes.
-- [ ] Clean install bajo Node 24 (`corepack enable` + `pnpm install --frozen-lockfile`) termina sin errores.
+- [x] `package.json` declara `engines.node = "24.x"`.
+- [x] `.nvmrc` existe y contiene `24`; si `.node-version` existe, tambien contiene `24`.
+- [x] `rg -n "node-version: 20|node-version: '20'|node-version: \"20\"" .github/workflows` no devuelve jobs de app/tests/builds pendientes.
+- [x] Clean install bajo Node 24 (`corepack enable` + `pnpm install --frozen-lockfile`) termina sin errores.
 - [ ] CI en GitHub corre con Node 24 para app/tests y termina success.
-- [ ] Playwright smoke corre con Node 24 y termina success o publica failure real con evidencia clara no atribuible al upgrade.
+- [ ] Playwright smoke corre con Node 24 y termina success o publica failure real con evidencia clara no atribuible al upgrade. Parcial local 2026-06-22: `login-session` verde; `cron-staging-parity` timeout en `/api/admin/reliability`.
 - [ ] Vercel queda gobernado por Node 24.x para nuevos deployments, via `engines.node` y/o settings verificados, con evidencia de build/deployment.
-- [ ] Worker Dockerfiles `node:22-slim` quedan revisados y documentados como fuera de alcance o follow-up separado, sin bloquear el runtime portal/Vercel.
-- [ ] Documentacion viva diferencia claramente entre runtime interno de GitHub Actions y runtime de app/tests.
+- [x] Worker Dockerfiles `node:22-slim` quedan revisados y documentados como fuera de alcance o follow-up separado, sin bloquear el runtime portal/Vercel.
+- [x] Documentacion viva diferencia claramente entre runtime interno de GitHub Actions y runtime de app/tests.
 - [ ] No se introducen workarounds temporales sin owner, condicion de retiro y follow-up.
 
 ## Verification

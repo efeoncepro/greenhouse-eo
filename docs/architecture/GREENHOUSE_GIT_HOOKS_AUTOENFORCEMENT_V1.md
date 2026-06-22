@@ -2,7 +2,7 @@
 
 > **Version:** 1.0
 > **Created:** 2026-05-05 (Husky + lint-staged install)
-> **Last updated:** 2026-05-05
+> **Last updated:** 2026-06-22
 > **Domain:** platform / dev tooling / multi-agent operations
 
 ## Why this exists
@@ -32,8 +32,8 @@ Causa raiz no era "los agentes no saben programar". Era que los agentes NO corri
 ┌────────────────────────────────────────────────────────────┐
 │  Layer 2 — pre-push hook (.husky/pre-push)                 │
 │  Trigger: git push                                          │
-│  Runs:    pnpm local:check (lint full + tsc --noEmit)     │
-│  Blocks:  cualquier 1+ error de lint o tsc                 │
+│  Runs:    pnpm local:check (lint full + typecheck)         │
+│  Blocks:  cualquier 1+ error de lint o typecheck           │
 │  Latency: < 90s (tsc --incremental cache)                  │
 │  Scope:   repo COMPLETO (no solo staged)                   │
 └────────────────────────────────────────────────────────────┘
@@ -42,7 +42,7 @@ Causa raiz no era "los agentes no saben programar". Era que los agentes NO corri
 ┌────────────────────────────────────────────────────────────┐
 │  Layer 3 — CI gate (.github/workflows/ci.yml)              │
 │  Trigger: push a remote / PR                                │
-│  Runs:    pnpm lint + pnpm tsc + pnpm build + tests        │
+│  Runs:    pnpm lint + pnpm typecheck + pnpm build + tests  │
 │  Blocks:  merge a develop / main                           │
 │  Latency: ~5 min (full pipeline)                           │
 └────────────────────────────────────────────────────────────┘
@@ -57,7 +57,7 @@ Causa raiz no era "los agentes no saben programar". Era que los agentes NO corri
 | File | Purpose |
 | --- | --- |
 | `.husky/pre-commit` | Shell script que invoca `pnpm exec lint-staged` |
-| `.husky/pre-push` | Shell script que corre `pnpm local:check` (`pnpm lint` + `pnpm exec tsc --noEmit`) |
+| `.husky/pre-push` | Shell script que corre `pnpm local:check` (`pnpm lint` + typecheck con heap protegido) |
 | `package.json` → `"prepare": "husky"` | Script lifecycle de npm/pnpm que activa los hooks al `pnpm install` |
 | `package.json` → `"lint-staged"` block | Config glob → comandos por extension |
 | `node_modules/.cache/eslint-staged/` | Cache local de eslint para latencia minima (gitignored) |
@@ -95,7 +95,7 @@ pnpm local:check
 echo "[pre-push] OK — pushing."
 ```
 
-`set -e` aborta el hook si `pnpm local:check` falla. `local:check` es el comando local-first canonico para el minimo pre-push: `pnpm lint` + `pnpm exec tsc --noEmit`.
+`set -e` aborta el hook si `pnpm local:check` falla. `local:check` es el comando local-first canonico para el minimo pre-push: `pnpm lint` + typecheck con `NODE_OPTIONS=--max-old-space-size=8192`, alineado con `pnpm typecheck`.
 
 ### Activation lifecycle
 
@@ -154,7 +154,7 @@ Pendiente (futuro V2 — deuda tecnica documentada):
 Los hooks NO reemplazan CI. CI sigue corriendo:
 
 - `pnpm lint` (mismo que pre-push)
-- `pnpm tsc --noEmit` (mismo que pre-push)
+- `pnpm typecheck` / `pnpm local:check` (mismo contrato de typecheck con heap protegido que pre-push)
 - `pnpm test` (vitest — NO esta en hooks por latencia ~30s + flakiness en tests E2E)
 - `pnpm build` (Next.js build — NO esta en hooks por latencia ~3-5min)
 
