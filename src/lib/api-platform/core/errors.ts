@@ -1,4 +1,5 @@
 export type ApiPlatformErrorCode =
+  | 'ambiguous_reference'
   | 'bad_request'
   | 'binding_not_active'
   | 'binding_not_found'
