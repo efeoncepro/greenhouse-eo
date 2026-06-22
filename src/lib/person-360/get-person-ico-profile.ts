@@ -121,12 +121,28 @@ const mapRow = (row: IcoMetricsRow): IcoMetricPeriod => {
   }
 }
 
-const computeHealth = (m: IcoMetricPeriod): 'green' | 'yellow' | 'red' => {
-  const rpa = m.rpaAvg ?? 0
+/**
+ * Salud ICO de un período (display-only; NUNCA gatea bono — el bono usa `rpaAvg` directo en
+ * `bonus-proration.ts`). Consumers: Person 360 (`get-person-runtime` → `PersonIntelligenceTab`)
+ * y el tool de Nexa `get_member_performance`.
+ *
+ * RpA = Rounds per Asset (RPA_V1): **BAJO = mejor** (0 = aprobado a la primera). Bands alineados al
+ * semáforo canónico de RpA (`GH_AGENCY.rpa_semaphore`, `agency/space-health`, `SpacesCharts`):
+ * ≤1.5 óptimo · ≤2.5 atención · >2.5 alerta. OTD = % a tiempo: **ALTO = mejor** (≥80 / ≥50).
+ * RpA `null` = sin dato → no penaliza (la salud la decide OTD), consistente con `space-health`.
+ *
+ * TASK-1219: corrige el bug de escala previo (`rpa >= 70`, que trataba las rondas como un score
+ * 0-100 → personas excelentes salían rojo, p.ej. OTD 96 / RpA 1.13).
+ */
+export const computeHealth = (m: IcoMetricPeriod): 'green' | 'yellow' | 'red' => {
   const otd = m.otdPct ?? 0
+  const rpa = m.rpaAvg
 
-  if (rpa >= 70 && otd >= 80) return 'green'
-  if (rpa >= 40 && otd >= 50) return 'yellow'
+  const rpaGreen = rpa == null || rpa <= 1.5
+  const rpaYellow = rpa == null || rpa <= 2.5
+
+  if (rpaGreen && otd >= 80) return 'green'
+  if (rpaYellow && otd >= 50) return 'yellow'
 
   return 'red'
 }

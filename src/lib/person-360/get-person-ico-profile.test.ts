@@ -39,7 +39,74 @@ vi.mock('@/lib/ico-engine/schema', () => ({
   ICO_DATASET: 'ico_engine'
 }))
 
-import { getPersonIcoProfile, readPersonIcoSnapshot } from '@/lib/person-360/get-person-ico-profile'
+import {
+  computeHealth,
+  getPersonIcoProfile,
+  readPersonIcoSnapshot,
+  type IcoMetricPeriod
+} from '@/lib/person-360/get-person-ico-profile'
+
+const period = (overrides: Partial<IcoMetricPeriod> = {}): IcoMetricPeriod =>
+  ({
+    periodYear: 2026,
+    periodMonth: 6,
+    rpaAvg: 1,
+    rpaMedian: 1,
+    otdPct: 90,
+    ftrPct: 85,
+    cycleTimeAvgDays: null,
+    cycleTimeVariance: null,
+    throughputCount: null,
+    pipelineVelocity: null,
+    stuckAssetCount: null,
+    stuckAssetPct: null,
+    totalTasks: null,
+    completedTasks: null,
+    activeTasks: null,
+    onTimeCount: null,
+    lateDropCount: null,
+    overdueCount: null,
+    carryOverCount: null,
+    overdueCarriedForwardCount: null,
+    metricTrust: null,
+    ...overrides
+  }) as IcoMetricPeriod
+
+describe('computeHealth — escala RpA (TASK-1219)', () => {
+  it('caso real Daniela: OTD alto + RpA bajo (rondas) → green, NO red', () => {
+    // El bug previo (rpa >= 70) daba red con OTD 96.2 / RpA 1.13.
+    expect(computeHealth(period({ otdPct: 96.2, rpaAvg: 1.13 }))).toBe('green')
+  })
+
+  it('RpA bajo es BUENO: 0 rondas (aprobado a la primera) + OTD alto → green', () => {
+    expect(computeHealth(period({ otdPct: 88, rpaAvg: 0 }))).toBe('green')
+  })
+
+  it('RpA alto (muchas rondas) penaliza: 3 rondas → red aunque OTD sea alto', () => {
+    expect(computeHealth(period({ otdPct: 95, rpaAvg: 3 }))).toBe('red')
+  })
+
+  it('banda atención: RpA 2 + OTD 70 → yellow', () => {
+    expect(computeHealth(period({ otdPct: 70, rpaAvg: 2 }))).toBe('yellow')
+  })
+
+  it('RpA null (sin dato) no penaliza: la salud la decide OTD', () => {
+    expect(computeHealth(period({ otdPct: 90, rpaAvg: null }))).toBe('green')
+    expect(computeHealth(period({ otdPct: 60, rpaAvg: null }))).toBe('yellow')
+    expect(computeHealth(period({ otdPct: 30, rpaAvg: null }))).toBe('red')
+  })
+
+  it('OTD bajo arrastra a red aunque RpA sea óptimo', () => {
+    expect(computeHealth(period({ otdPct: 40, rpaAvg: 0.5 }))).toBe('red')
+  })
+
+  it('cortes canónicos del semáforo RpA (1.5 / 2.5)', () => {
+    expect(computeHealth(period({ otdPct: 90, rpaAvg: 1.5 }))).toBe('green')
+    expect(computeHealth(period({ otdPct: 90, rpaAvg: 1.51 }))).toBe('yellow')
+    expect(computeHealth(period({ otdPct: 60, rpaAvg: 2.5 }))).toBe('yellow')
+    expect(computeHealth(period({ otdPct: 60, rpaAvg: 2.51 }))).toBe('red')
+  })
+})
 
 describe('person ICO org scoping', () => {
   beforeEach(() => {
@@ -55,8 +122,8 @@ describe('person ICO org scoping', () => {
         member_id: 'member-1',
         period_year: 2026,
         period_month: 3,
-        rpa_avg: '72',
-        rpa_median: '70',
+        rpa_avg: '1.2',
+        rpa_median: '1',
         otd_pct: '88',
         ftr_pct: '81',
         cycle_time_avg_days: '3.5',
@@ -81,7 +148,7 @@ describe('person ICO org scoping', () => {
     expect(snapshot).toMatchObject({
       periodYear: 2026,
       periodMonth: 3,
-      rpaAvg: 72,
+      rpaAvg: 1.2,
       totalTasks: 13,
       activeTasks: 1
     })
@@ -98,8 +165,8 @@ describe('person ICO org scoping', () => {
           member_id: 'member-1',
           period_year: 2026,
           period_month: 3,
-          rpa_avg: '80',
-          rpa_median: '79',
+          rpa_avg: '1',
+          rpa_median: '1',
           otd_pct: '92',
           ftr_pct: '85',
           cycle_time_avg_days: '4',
@@ -122,8 +189,8 @@ describe('person ICO org scoping', () => {
           member_id: 'member-1',
           period_year: 2026,
           period_month: 2,
-          rpa_avg: '65',
-          rpa_median: '64',
+          rpa_avg: '2',
+          rpa_median: '2',
           otd_pct: '70',
           ftr_pct: '72',
           cycle_time_avg_days: '5',
