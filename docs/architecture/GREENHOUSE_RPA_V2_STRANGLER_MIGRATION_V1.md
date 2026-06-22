@@ -10,6 +10,40 @@
 
 ---
 
+## Delta 2026-06-22 — ⚠️ El gate "paridad ≥95% vs V1" es INVÁLIDO (V1 es una fuente mala). NO re-basar V2 en el contador.
+
+**Hallazgo (análisis profundo con data real, sesión CEO):** el gate de salida de Fase B/Flip B —
+`paridad ≥95% vs el RpA legacy V1` — **no es un criterio válido**, porque **V1 es la fuente inexacta que
+esta migración existe para reemplazar**, no un ground truth.
+
+- **Qué es V1 realmente:** `tasks.rpa_value` == `client_change_round_final` (100% de coincidencia en 5.964
+  tareas). Ese campo es un **Rollup de Notion** que cuenta páginas en una DB de "correcciones" que el equipo
+  debe **acordarse de crear** manualmente. Es inexacto **por diseño** (depende de disciplina humana) — **esa
+  inexactitud fue lo que motivó construir V2.** Está siendo **deprecado a propósito.**
+- **Consecuencia dura:** **NUNCA validar V2 contra V1 / `client_change_round_final` / "paridad".** Comparar el
+  motor nuevo contra la fuente mala que reemplaza es circular: forzar paridad obligaría a V2 a copiar el
+  error de V1. El "95-97% de paridad" del Delta 2026-06-18 es **paridad-sobre-ceros** (ambos ≈0 en el ~90% de
+  tareas sin corrección) — no mide la capacidad de V2 de detectar correcciones.
+- **NO re-basar V2 en el contador.** (Idea evaluada y descartada en esta sesión: deshace el propósito de la
+  migración.) V2 = transiciones `Listo para revisión → Cambios solicitados` **es la fuente de verdad
+  elegida**, y cuenta correcto: las 7 tareas con corrección de estado real capturadas dieron V2 exacto
+  (cc=count). El motor está bien.
+- **La precondición real del cutover es OPERATIVA, no de ingeniería:** que el equipo **mueva siempre** la
+  tarea a "Cambios solicitados" cuando hay corrección (pasa a ser load-bearing del bono). Hoy a veces no lo
+  mueven (registran solo en el contador) → V2 subcuenta esas. El fix es **disciplina del equipo + avisar que
+  "Cambios solicitados" ahora afecta el bono**, NO tocar el motor.
+- **Gate correcto (reemplaza el de paridad):** validación por **ground truth confirmado por el operador**
+  sobre un mes shadow — "V2 dice que estas N tareas tuvieron corrección; ¿coincide? ¿hay correcciones reales
+  que V2 muestre en 0?" + acotar el residuo de muestreo (round-trips `Listo→Cambios→Listo` más rápidos que la
+  cadencia de re-fetch ~5min, BUG-CLASS-003).
+- **Contexto data 2026-06-22:** ~1 mes de captura limpia; sólo 7 correcciones de estado canónicas capturadas
+  (efeonce 4 / sky 3); forward-accumulation contamina las pre-captura (Sky ~73% entran como snapshot de
+  arranque sin historia). Muestra aún chica para validar.
+
+**Impacto en las tasks:** TASK-917 (Flip A) y TASK-1221 (Flip B) reemplazan "paridad ≥95% vs V1" por el gate
+de validación operador-ground-truth. El cutover NO procede hasta confirmar la disciplina de
+"Cambios solicitados".
+
 ## Delta 2026-05-26 — Alias raw BigQuery para `[GH] RpA v2`
 
 El nombre canónico de writeback en Notion sigue siendo la propiedad literal `[GH] RpA v2`. El writer upstream `notion-bq-sync` aplana propiedades dinámicas de Notion a columnas BigQuery-safe; por eso el eco raw en `notion_ops.tareas` es `gh_rpa_v2`.

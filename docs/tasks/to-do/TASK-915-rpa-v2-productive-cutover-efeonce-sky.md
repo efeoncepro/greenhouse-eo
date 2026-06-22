@@ -9,6 +9,8 @@ El hijo TASK-917 (que bundleaba ambos flips) se **partió en dos** para separar 
 
 Orden de hijos ahora: TASK-912 (captura ✅) → TASK-916 (compute/writeback ✅) → **TASK-917 (Flip A)** → **TASK-1221 (Flip B)**. Recalibración: el sign-off del cutover es del **CEO** (no gate HR/Finance externo).
 
+**⚠️ Gate de validación corregido (2026-06-22):** el gate NO es "paridad ≥95% vs V1". V1 (`client_change_round_final`) es un Rollup de Notion inexacto que se está deprecando → validar V2 contra él es circular. El motor V2 cuenta bien; el gate real es **ground truth confirmado por el operador** + disciplina del equipo con "Cambios solicitados". Detalle: `GREENHOUSE_RPA_V2_STRANGLER_MIGRATION_V1.md` Delta 2026-06-22 + BUG-CLASS-005.
+
 ## Delta 2026-05-21 — TASK-916 (hijo) SHIPPED: compute/writeback prod corriendo en paralelo (writeback OFF)
 
 El segundo hijo del umbrella (TASK-916 — compute + writeback productivos) está COMPLETE V1.0 en `develop`. Estado de los hijos: TASK-912 (captura) ACTIVADA EN PRODUCCIÓN + verificada E2E; TASK-916 (compute/writeback) SHIPPED con writeback gated OFF; **falta TASK-917** (wiring consumers + flag bono + ejecución de los dos flips). El pipeline V2 prod ya está completo end-to-end en código (captura → compute → snapshot → chain → writeback gated). Lo que resta es operacional: crear `[GH] RpA v2` en Notion + activar el writeback flag bajo los 8 stop-gates + materializar `rpa_avg_v2` + paridad shadow + flip bono (todo en TASK-917). Spec TASK-916: `complete/TASK-916-rpa-v2-productive-compute-writeback.md`.

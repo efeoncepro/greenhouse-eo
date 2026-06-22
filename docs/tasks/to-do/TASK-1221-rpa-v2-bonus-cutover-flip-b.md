@@ -1,5 +1,16 @@
 # TASK-1221 — RpA V2 Flip B: cutover del bono (BONUS_USE_RPA_V2, Efeonce → Sky)
 
+## ⚠️ Delta 2026-06-22 — el gate de validación NO es "paridad vs V1" (V1 es la fuente mala)
+
+Análisis profundo con data real (sesión CEO) → ver `GREENHOUSE_RPA_V2_STRANGLER_MIGRATION_V1.md` Delta 2026-06-22 + bug-class catalog BUG-CLASS-005. Resumen:
+
+- **NUNCA validar V2 contra V1 / `client_change_round_final` / "paridad ≥95%".** V1 es un Rollup de Notion sobre una DB de correcciones creadas a mano → inexacto por diseño, **deprecado a propósito** (es la razón de existir de V2). Compararlos es circular.
+- **El motor V2 cuenta correcto** (7/7 correcciones de estado reales). No hay que cambiarlo ni re-basarlo en el contador.
+- **La precondición del cutover es OPERATIVA:** que el equipo **mueva siempre** la tarea a "Cambios solicitados" cuando hay corrección (ahora load-bearing del bono). + avisarle al equipo.
+- **Gate correcto (reemplaza el de abajo):** validación por **ground truth confirmado por el operador** sobre un mes shadow + acotar residuo de muestreo (BUG-CLASS-003). El cutover NO procede hasta eso.
+
+Las secciones de Scope/Acceptance/Open Questions de abajo que mencionan "paridad ≥95%" quedan supersedidas por este gate.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->

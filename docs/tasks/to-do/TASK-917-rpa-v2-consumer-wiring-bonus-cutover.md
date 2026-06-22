@@ -9,6 +9,8 @@ Esta task se **partió en dos** para separar el flip sin riesgo (display) del fl
 
 **Recalibración con estado real (verificado 2026-06-22):** V2 **ya está vivo en Efeonce+Sky** (captura `task_status_transitions` desde 2026-05-21, compute `task_rpa_snapshots` corriendo, writeback `[GH] RpA v2` activado). El sign-off del cutover es del **CEO** (no gate HR/Finance externo). Las precondiciones (propiedad Notion + writeback) ya ocurrieron (ver delta 2026-05-21).
 
+**⚠️ El signal `shadow_paridad_rpa` (Slice 1) es un MONITOR, NO el gate de cutover.** La paridad vs V1 NO valida nada: V1 (`client_change_round_final`) es un Rollup de Notion inexacto que se está deprecando — comparar V2 contra él es circular. Ver `GREENHOUSE_RPA_V2_STRANGLER_MIGRATION_V1.md` Delta 2026-06-22 + BUG-CLASS-005. El gate real (en TASK-1221) es ground truth confirmado por el operador, no paridad.
+
 ## Delta 2026-05-21 — TASK-916 SHIPPED (compute/writeback siblings prod): blocker resuelto + 2 precondiciones de Flip A heredadas
 
 TASK-916 está COMPLETE V1.0 en `develop` (writeback flag OFF). El compute prod (`notionRpaComputeProjection`) persiste snapshots en `task_rpa_snapshots`; el writeback prod (`notionRpaWritebackProjection`) hace PATCH a `[GH] RpA v2` **gated por `NOTION_RPA_WRITEBACK_ENABLED` (default OFF)**. Por lo tanto el blocker "compute/writeback prod" queda resuelto — TASK-917 ya puede wirear consumers + ejecutar el cutover.
