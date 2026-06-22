@@ -152,7 +152,7 @@ describe('golden snapshot del prompt completo (TASK-1126)', () => {
 describe('versiones de prompt', () => {
   it('expone versiones estables para governance', () => {
     expect(NEXA_SYSTEM_PROMPT_V1_VERSION).toBe('nexa-system-prompt.v1')
-    expect(NEXA_SYSTEM_PROMPT_V2_VERSION).toBe('nexa-system-prompt.v2.3.0')
+    expect(NEXA_SYSTEM_PROMPT_V2_VERSION).toBe('nexa-system-prompt.v2.4.0')
   })
 })
 

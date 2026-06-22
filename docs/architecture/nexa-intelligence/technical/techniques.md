@@ -58,6 +58,21 @@ El panel NO hace token-streaming real del provider; usa el **revelado typewriter
 El builder del prompt es determinista con `now` fijo (snapshot tests). El rerank es determinista
 (input fijo → output fijo). Esto hace testeable la inteligencia sin un LLM real en CI.
 
+## Tools operativos no-retrieval: desempeño por persona `get_member_performance` (TASK-1216)
+
+No todos los tools recuperan conocimiento; muchos son operativos (`get_otd`, `check_payroll`, …).
+`get_member_performance` consulta el desempeño ICO (OTD, RpA, FTR, salud + tendencia) de **una persona
+específica** nombrada por el usuario ("el OTD de Daniela Ferreira"). Es un **wrapper fino**: delega en el
+primitive canónico `readMemberIcoProfileForSubject` (`src/lib/people/person-activity-access.ts`) — NO
+recomputa métricas ni queryea `ico_member_metrics` directo. **Un primitive, muchos consumers (Full API
+Parity):** el MISMO reader lo consumen este tool, los lanes MCP/app de API Platform
+(`api/platform/{ecosystem,app}/people/performance`) y la UI; cada consumer solo mapea su caller a
+`PeopleActivitySubject` (shape neutral session-free). La autorización es la de People (`canViewActivity` +
+anti-IDOR de scope); `isAvailable = tenantType === 'efeonce_internal'` (mirror de `get_insight`). Routing
+duro: `get_member_performance` = persona; `get_otd` = agregado de organización/agencia (NUNCA persona).
+`not_found` es uniforme (no existe / fuera de scope, indistinguibles → no filtra existencia); nombre ambiguo
+→ pide desambiguación; sin métricas materializadas → gap honesto.
+
 ## Tools no-retrieval: `propose_action` (TASK-1137)
 
 No todos los tools de Nexa recuperan conocimiento. `propose_action` es un tool **de acción gobernada**
