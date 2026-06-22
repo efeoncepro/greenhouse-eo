@@ -32,13 +32,32 @@ esta migración existe para reemplazar**, no un ground truth.
   tarea a "Cambios solicitados" cuando hay corrección (pasa a ser load-bearing del bono). Hoy a veces no lo
   mueven (registran solo en el contador) → V2 subcuenta esas. El fix es **disciplina del equipo + avisar que
   "Cambios solicitados" ahora afecta el bono**, NO tocar el motor.
-- **Gate correcto (reemplaza el de paridad):** validación por **ground truth confirmado por el operador**
-  sobre un mes shadow — "V2 dice que estas N tareas tuvieron corrección; ¿coincide? ¿hay correcciones reales
-  que V2 muestre en 0?" + acotar el residuo de muestreo (round-trips `Listo→Cambios→Listo` más rápidos que la
-  cadencia de re-fetch ~5min, BUG-CLASS-003).
+- **Gate correcto (reemplaza el de paridad):** validación por **ground truth confirmado por el operador** —
+  "V2 dice que estas N tareas tuvieron corrección; ¿coincide? ¿hay correcciones reales que V2 muestre en 0?"
+  \+ acotar el residuo de muestreo (round-trips `Listo→Cambios→Listo` más rápidos que la cadencia de re-fetch
+  ~5min, BUG-CLASS-003).
+- **⚠️ NO se necesita "otro mes shadow" pasivo (corrige el fraseo previo).** Un mes pasivo adicional NO valida
+  nada nuevo: si hoy el equipo a veces corrige sin mover el estado, otro mes acumula el mismo hueco. **Más
+  tiempo no arregla un problema de disciplina.** El mes de captura que YA existe (junio) alcanza para validar.
+  Dos caminos válidos, ninguno requiere espera pasiva nueva:
+  1. **Auditar el mes existente** (una tarde, no un mes): tomar las tareas de junio que V2 marca 0 y que el
+     operador confirme si alguna tuvo corrección arreglada sin mover el estado. Si está limpio → cutover.
+  2. **Anunciar la regla + cutover Efeonce + validar en vivo** el primer mes de bono: el **incentivo mismo es
+     el mecanismo de disciplina** (mueven el estado porque afecta el bono); Efeonce-primero + reconciliación +
+     rollback <5min como red. No es un mes shadow aparte, es el primer mes real monitoreado.
+  - Un mes nuevo solo se justifica si se **cambia el proceso** (obligar a mover a "Cambios solicitados"): ahí
+    junio ya no es representativo (el equipo no sabía que importaba) y el mes valida el **comportamiento nuevo**,
+    no espera pasiva del viejo.
+- **Revisión V1-free del motor (2026-06-22):** evaluado V2 en sus propios términos + señal independiente
+  (re-submisión a "Listo para revisión" ≥2 = rework aunque no se etiquete). Hallazgo: captura limpia (10
+  estados canónicos, sin variantes ocultas), V2 cuenta exacto, y la señal independiente **NO revela
+  correcciones que V2 pierda** (las tareas con rework tenían su "Cambios solicitados"). La **única** falla
+  posible es corrección arreglada en sitio sin tocar el estado (sin rastro → irrecuperable por cualquier motor
+  de estado; solo el contador deprecado "las veía"). **El motor está bien; la exactitud = disciplina de estado.**
 - **Contexto data 2026-06-22:** ~1 mes de captura limpia; sólo 7 correcciones de estado canónicas capturadas
-  (efeonce 4 / sky 3); forward-accumulation contamina las pre-captura (Sky ~73% entran como snapshot de
-  arranque sin historia). Muestra aún chica para validar.
+  (efeonce 4 / sky 3); tasa de corrección observada baja (~1-3 de 53-76 tareas que llegaron a revisión, cohorte
+  limpia); forward-accumulation contamina las pre-captura (Sky ~73% entran como snapshot de arranque sin
+  historia).
 
 **Impacto en las tasks:** TASK-917 (Flip A) y TASK-1221 (Flip B) reemplazan "paridad ≥95% vs V1" por el gate
 de validación operador-ground-truth. El cutover NO procede hasta confirmar la disciplina de

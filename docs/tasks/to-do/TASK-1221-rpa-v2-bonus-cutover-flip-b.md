@@ -7,9 +7,10 @@ Análisis profundo con data real (sesión CEO) → ver `GREENHOUSE_RPA_V2_STRANG
 - **NUNCA validar V2 contra V1 / `client_change_round_final` / "paridad ≥95%".** V1 es un Rollup de Notion sobre una DB de correcciones creadas a mano → inexacto por diseño, **deprecado a propósito** (es la razón de existir de V2). Compararlos es circular.
 - **El motor V2 cuenta correcto** (7/7 correcciones de estado reales). No hay que cambiarlo ni re-basarlo en el contador.
 - **La precondición del cutover es OPERATIVA:** que el equipo **mueva siempre** la tarea a "Cambios solicitados" cuando hay corrección (ahora load-bearing del bono). + avisarle al equipo.
-- **Gate correcto (reemplaza el de abajo):** validación por **ground truth confirmado por el operador** sobre un mes shadow + acotar residuo de muestreo (BUG-CLASS-003). El cutover NO procede hasta eso.
+- **Gate correcto (reemplaza el de abajo):** validación por **ground truth confirmado por el operador** + acotar residuo de muestreo (BUG-CLASS-003). El cutover NO procede hasta eso.
+- **NO se necesita un mes shadow pasivo nuevo.** Ya hubo ~1 mes de V2 (junio). Más tiempo pasivo no valida (acumula el mismo hueco de disciplina). Dos caminos válidos: **(1)** auditar junio con el operador (una tarde) → si limpio, cutover; o **(2)** anunciar la regla ("Cambios solicitados" afecta el bono) + cutover Efeonce + validar en vivo el primer mes (el incentivo es el mecanismo de disciplina, Efeonce-primero + reconciliación + rollback <5min). Un mes nuevo solo si se cambia el proceso (valida el comportamiento nuevo, no espera pasiva).
 
-Las secciones de Scope/Acceptance/Open Questions de abajo que mencionan "paridad ≥95%" quedan supersedidas por este gate.
+Las secciones de Scope/Acceptance/Open Questions de abajo que mencionan "paridad ≥95%" o "shadow ≥30d / 7-14 días" quedan supersedidas por este gate.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
