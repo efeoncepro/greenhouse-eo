@@ -1,4 +1,13 @@
-# TASK-917 — RpA V2 consumer wiring + bonus flag + two-flip cutover
+# TASK-917 — RpA V2 Flip A: materializar rpa_avg_v2 + display cutover
+
+## Delta 2026-06-22 — SPLIT en dos tasks (decisión operador/CEO)
+
+Esta task se **partió en dos** para separar el flip sin riesgo (display) del flip que toca nómina (bono):
+
+- **TASK-917 (esta) = Flip A:** materializar `metrics_by_member.rpa_avg_v2` (el número mensual por persona) + señal `shadow_paridad_rpa` (member×mes) + repoint de las 6 UI/trends a V2 + activar `NOTION_RPA_WRITEBACK_ENABLED`. **Bono intacto.** = Slices 1-2.
+- **TASK-1221 = Flip B:** cutover del bono `BONUS_USE_RPA_V2` (Efeonce primero → Sky) + reconciliación + decisión de criterio (paridad-vs-correctitud). Bloqueada por esta task. = ex-Slices 3-4.
+
+**Recalibración con estado real (verificado 2026-06-22):** V2 **ya está vivo en Efeonce+Sky** (captura `task_status_transitions` desde 2026-05-21, compute `task_rpa_snapshots` corriendo, writeback `[GH] RpA v2` activado). El sign-off del cutover es del **CEO** (no gate HR/Finance externo). Las precondiciones (propiedad Notion + writeback) ya ocurrieron (ver delta 2026-05-21).
 
 ## Delta 2026-05-21 — TASK-916 SHIPPED (compute/writeback siblings prod): blocker resuelto + 2 precondiciones de Flip A heredadas
 
@@ -62,7 +71,7 @@ Desajustes casi todos por **V2 subcontando correcciones** (34 tareas V2<V1, solo
 
 ## Summary
 
-Enchufar los consumers de RpA (que ya existen, hoy leen el legacy `rpa_avg`) al motor V2, y ejecutar los **dos flips**: Flip A (01/06) poblar `metrics_by_member.rpa_avg_v2` desde V2 + repoint las 6 UI + trends a V2 + activar writeback; Flip B (01/07, Efeonce primero) flag `BONUS_USE_RPA_V2` en `calculateRpaBonus`. Legacy `rpa_avg` intacto (rollback <5min).
+**Flip A (display, sin riesgo de nómina).** Poblar `metrics_by_member.rpa_avg_v2` desde el motor V2 (el número mensual por persona) + materializar la señal `shadow_paridad_rpa` (member×mes) + repoint las 6 UI + trends a V2 + activar `NOTION_RPA_WRITEBACK_ENABLED`. **El bono sigue leyendo el legacy `rpa_avg` — esta task NO lo toca.** El cutover del bono (Flip B, `BONUS_USE_RPA_V2`) se separó a **TASK-1221**. Legacy `rpa_avg` intacto (rollback <5min).
 
 ## Why This Task Exists
 
@@ -70,10 +79,10 @@ Los consumers (bonus `calculateRpaBonus`, 6 UI views, materialización, trends A
 
 ## Goal
 
-- `metrics_by_member.rpa_avg_v2` poblado desde el cómputo V2.
-- 6 UI views + trends API leyendo V2 (Flip A 01/06).
-- Flag `BONUS_USE_RPA_V2` en el path de bono (Flip B 01/07, Efeonce primero, Sky después).
-- Cada flip reversible <5min vía flag.
+- `metrics_by_member.rpa_avg_v2` poblado desde el cómputo V2 (agregación AVG por member-mes) — el número que el bono leerá en Flip B.
+- Señal canónica `shadow_paridad_rpa` (member×mes, V2 vs legacy sobre período cerrado) materializada y monitoreable.
+- 6 UI views + trends API leyendo V2 (gated por flag de display) + `NOTION_RPA_WRITEBACK_ENABLED` activado.
+- Flip A reversible <5min vía flag. **Bono intacto** (Flip B = TASK-1221).
 
 ## Architecture Alignment
 
@@ -89,10 +98,10 @@ Los consumers (bonus `calculateRpaBonus`, 6 UI views, materialización, trends A
 
 ## Scope (slices)
 
-1. Materialización: poblar `metrics_by_member.rpa_avg_v2` desde el cómputo V2 (agregación AVG por member-mes).
+1. Materialización: poblar `metrics_by_member.rpa_avg_v2` desde el cómputo V2 (agregación AVG por member-mes) + materializar la señal `shadow_paridad_rpa` (member×mes, V2 vs legacy sobre período cerrado — el gate oficial, no el leading indicator per-tarea del delta 2026-06-18).
 2. Flip A — repoint display: UI views + trends API leen `rpa_avg_v2` (gated por flag de display) + activar `NOTION_RPA_WRITEBACK_ENABLED`. **NO toca bono.**
-3. Flip B — flag bono: `BONUS_USE_RPA_V2` en `calculateRpaBonus` (lee `rpa_avg_v2` en vez de `rpa_avg`). Efeonce primero.
-4. Sky bonus tras Efeonce verde.
+
+> **Flip B (ex-Slices 3-4) → TASK-1221:** `BONUS_USE_RPA_V2` en `calculateRpaBonus`, Efeonce primero → Sky. Bloqueada por esta task (necesita `rpa_avg_v2` + `shadow_paridad_rpa`).
 
 ## Out of Scope
 
@@ -126,11 +135,12 @@ Los consumers (bonus `calculateRpaBonus`, 6 UI views, materialización, trends A
 
 ## Acceptance Criteria
 
-- [ ] `rpa_avg_v2` poblado y paridad ≥95% vs `rpa_avg` sobre junio.
-- [ ] Flip A: UI + trends muestran V2; bono sigue V1 (verificable en `payroll_entries`).
-- [ ] Flip B Efeonce: bono lee V2 con `BONUS_USE_RPA_V2=true` + sign-off HR registrado.
-- [ ] Cada flip reversible <5min verificado en staging.
-- [ ] HR reconciliación bono mes 1 documentada.
+- [ ] `rpa_avg_v2` poblado (member×mes) desde V2; señal `shadow_paridad_rpa` materializada y visible en `/admin/operations`.
+- [ ] Flip A: UI + trends muestran V2; **bono sigue V1** (verificable en `payroll_entries.kpi_rpa_avg`).
+- [ ] Flag de display reversible <5min verificado en staging.
+- [ ] El número `rpa_avg_v2` queda listo y monitoreado para que TASK-1221 (Flip B) decida el cutover del bono.
+
+> Acceptance del cutover del bono (paridad ≥95% sobre cohorte cubierta, sign-off CEO, reconciliación) vive en **TASK-1221**.
 
 ## Verification
 
