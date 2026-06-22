@@ -51,7 +51,6 @@ jobs:
       AGENT_AUTH_EMAIL: ${{ secrets.AGENT_AUTH_EMAIL || 'agent@greenhouse.efeonce.org' }}
       VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
       PLAYWRIGHT_CHROMIUM_CHANNEL: chrome
-      PLAYWRIGHT_VIDEO: off
     steps:
       - name: Guard — require base URL + agent secret
         run: |
@@ -83,6 +82,11 @@ jobs:
         # GitHub's Ubuntu runners include Chrome. CI uses the system channel to
         # avoid downloading Playwright's browser archive before every smoke run.
         run: google-chrome --version
+
+      - name: Install Playwright ffmpeg
+        # Video-on-failure needs Playwright's ffmpeg binary. Install only ffmpeg,
+        # not Playwright's Chromium bundle, so the smoke lane keeps runner Chrome.
+        run: pnpm exec playwright install ffmpeg
 
       - name: Run Playwright smoke suite
         run: pnpm test:e2e
