@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -28,6 +28,20 @@
 ## Summary
 
 Cierra el rollout operativo pendiente de TASK-990 (MXN finance core) y TASK-995 (CLF/UF indexed finance core), ambas code-complete pero NO operationally-complete (flags OFF, sin push, workers no redeployados). Agrega el único fix de código pendiente: derivar el desglose neto/IVA de cotizaciones CLF que HubSpot entrega solo con `total` (sin asumir IVA — la clasificación afecta/exenta es por cotización). Sin este cierre, Berel (MXN) y los clientes CLF/UF no facturan/proyectan completos en producción.
+
+## Progreso 2026-06-22 — Slice 1 code-complete (local-first), Slices 2–3 rollout pendiente
+
+**Slice 1 (CÓDIGO) — DONE, local-first en `develop` (sin push), commit `b715c2aff`.**
+
+- Helper puro `src/lib/finance/multi-currency/clf-quote-breakdown.ts` (`deriveClfQuoteBreakdown`): afecta (`cl_vat_19`) → `neto=total/1.19`, `IVA=total−neto`; exenta (`cl_vat_exempt`) → `IVA=0`; cualquier otra clasificación o `tax_code` NULL → **fail-closed** (`FinanceValidationError`, no inventa IVA → revisión manual).
+- Wire en la rama CLF de `buildQuotationIncomeWriteFields` (`materialize-invoice-from-quotation.ts`): gatillo **solo** cuando `currency='CLF'` + `FINANCE_CLF_INCOME_PROJECTION_ENABLED` ON + sin `tax_snapshot_json` congelado + sin desglose header. Builder-authored (snapshot congelado) y no-CLF quedan **bit-for-bit**. Base = `total_amount` (total UF documental confiable; `total_price` es ruido del sync legacy).
+- **Hardening de la rama CLF (TASK-995):** el IVA/total CLP ahora se derivan autoritativamente desde el subtotal CLP funcional (antes reusaba `taxWriteFields.taxAmount` redondeado a 2dp y lo proyectaba ×UF → drift ~156 CLP, rompía `total=neto+IVA`); el plano native UF conserva decimales (128.996, no 129); el `totalAmountClp` de evento/audit usa el funcional CLF→CLP.
+- **Hallazgo de Discovery (resuelve la Open Question):** el path de income materializa desde `greenhouse_commercial.quotations` (NO `greenhouse_finance.quotes` del dry-run). Las CLF de ese path NO tienen line items (orden de resolución #1 no aplica) y su `total_price`/`total_amount` es inconsistente → la derivación usa orden #2 (despeje por `tax_code`). El gap subtotal/tax=NULL es **solo legacy HubSpot**; quotes autoradas por el builder ya nacen con desglose congelado.
+- Tests: helper (7 totales UF reales + exenta + fail-closed) + integración del materializer (afecta deriva IVA>0, exenta IVA=0, `tax_code` NULL no materializa). Suite finance **998/998** verde; lint + tsc + build limpios.
+
+**Slices 2–3 (ROLLOUT MXN + CLF) — PENDIENTE (`code complete, rollout pendiente`).** Requieren acciones de producción money-movement + sign-off Finance + coordinación out-of-band (flip de flags en Vercel staging/prod, redeploy ops-worker Cloud Run, backfill income real de Berel). **NO ejecutadas en esta sesión local-first.** Secuencia exacta en §"Rollout Plan & Risk Matrix" + §Scope Slice 2/3. Coordinar el redeploy de worker con TASK-1209 (worker compartido).
+
+**Slice 4 (diferidos) — se mantiene diferido con razón documentada** (ver §Scope Slice 4): expense-CLF writer (sin upstream — compras UF aún no se registran como expense), readers/reconciliación CLF (TASK-995 Slice 5), revaluación-al-pago + su signal. No se cablea consumer muerto hasta que exista data CLF real.
 
 ## Why This Task Exists
 

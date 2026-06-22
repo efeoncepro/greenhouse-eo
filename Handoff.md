@@ -1,3 +1,19 @@
+## Sesión 2026-06-22 — TASK-1210 MXN+CLF Finance Core Rollout — Slice 1 (desglose CLF) code-complete local-first ✅ — Claude
+
+> **Estado:** `in-progress` (movida de `to-do/`), trabajando en **`develop` local-first, SIN push**. **Slice 1 (CÓDIGO) DONE**, commit `b715c2aff`. Slices 2–3 (rollout) **pendientes** (requieren sign-off Finance + coordinación out-of-band). Slice 4 (diferidos) se mantiene diferido con razón.
+> - **Slice 1 — derivación de desglose neto/IVA en income CLF (plan TASK-995 §#1.1):**
+>   - Helper puro `src/lib/finance/multi-currency/clf-quote-breakdown.ts` (`deriveClfQuoteBreakdown`): afecta (`cl_vat_19`) → `neto=total/1.19`, `IVA=total−neto`; exenta (`cl_vat_exempt`) → `IVA=0`; otra clasificación o `tax_code` NULL → **fail-closed** (`FinanceValidationError`, no inventa IVA → revisión manual).
+>   - Wire en la rama CLF de `buildQuotationIncomeWriteFields` ([materialize-invoice-from-quotation.ts](src/lib/finance/quote-to-cash/materialize-invoice-from-quotation.ts)): gatillo **solo** cuando `currency='CLF'` + `FINANCE_CLF_INCOME_PROJECTION_ENABLED` ON + sin `tax_snapshot_json` congelado + sin desglose header. Builder-authored y no-CLF **bit-for-bit**. Base = `total_amount` (total UF documental confiable; `total_price` es ruido legacy).
+>   - **Hardening de la rama CLF de TASK-995:** IVA/total CLP derivados autoritativamente desde el subtotal funcional (antes reusaba `taxWriteFields.taxAmount` redondeado 2dp y lo proyectaba ×UF → drift ~156 CLP, rompía `total=neto+IVA`); native UF conserva decimales (128.996, no 129); `totalAmountClp` de evento/audit usa el funcional CLF→CLP.
+> - **Discovery (resuelve la Open Question):** el income materializa desde `greenhouse_commercial.quotations` (NO `greenhouse_finance.quotes` del dry-run). Las CLF de ese path NO tienen line items + `total_price`/`total_amount` inconsistente → derivación por orden #2 (`tax_code`). El gap subtotal/tax=NULL es **solo legacy HubSpot**; las quotes autoradas por el builder ya nacen con desglose congelado (el materializer las hereda). Zona de cotizaciones confirmada liberada por el operador (Codex la había estado moviendo).
+> - **Gates:** suite finance **998/998** verde; `clf-quote-breakdown` 8/8 + materializer integración 4/4; `local:check` (lint + tsc) verde; `pnpm build` exit 0.
+> - **Pendiente (NO ejecutado en esta sesión, requiere operador):**
+>   - **Slice 2 (Rollout MXN):** flip `FINANCE_CORE_MXN_ENABLED` + `NUBOX_EXPORT_FOREIGN_CURRENCY_ENABLED` + `FINANCE_MXN_PAYMENT_ORDERS_ENABLED` + `FINANCE_MULTI_CURRENCY_REPORTING_ENABLED` (staging→prod) + redeploy ops-worker + backfill Berel native plane (`28800562`+`29062197`, `FINANCE_MXN_BEREL_BACKFILL_APPLY_ENABLED`). Coordinar redeploy con TASK-1209 (worker compartido).
+>   - **Slice 3 (Rollout CLF):** flip `FINANCE_CORE_CLF_INDEXED_ENABLED` + `FINANCE_CLF_INCOME_PROJECTION_ENABLED` (+ resto set CLF) + verificación con una OC/cotización CLF real + 4 signals indexed-unit steady. **Slice 1 ya shipeó antes que Slice 3** (regla de orden cumplida).
+>   - **Slice 4:** diferidos (expense-CLF writer, readers/reconciliación CLF, revaluación-al-pago) — sin upstream real, no se cablea consumer muerto.
+> - **Ledger:** ningún flag prendido → snapshot por environment sin cambios (los flags MXN/CLF ya están inventariados en `FEATURE_FLAG_STATE_LEDGER.md`, siguen OFF).
+> - **NO mover a `complete/`** hasta que Slices 2–3 estén operationally-complete (flags ON + workers redeployados + Berel verificado + signals steady).
+
 ## Sesión 2026-06-22 — TASK-1222 HubSpot Quotes Global Reconciliation — intake + Discovery + checkpoint humano ⏸️ — Claude
 
 > **Estado:** `in-progress` (movida de `to-do/`), trabajando en **`develop` local-first, SIN branch ni push**. Discovery (FASE 1) completa read-only; **DETENIDO en checkpoint FASE 4** por ser P1/Alto/Alto + blast alto + dependencias externas/outward-facing. NO se escribió código aún.
