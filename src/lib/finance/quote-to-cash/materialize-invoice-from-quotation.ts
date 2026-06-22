@@ -17,6 +17,7 @@ import {
 import { createFinanceIncomeInPostgres } from '@/lib/finance/postgres-store-slice2'
 import { FinanceValidationError } from '@/lib/finance/shared'
 import { buildClfIncomeProjection } from '@/lib/finance/multi-currency/clf-income-projection'
+import { deriveClfQuoteBreakdown } from '@/lib/finance/multi-currency/clf-quote-breakdown'
 import { persistFxSnapshot } from '@/lib/finance/multi-currency/fx-snapshot-store'
 import { isFinanceClfIncomeProjectionEnabled } from '@/lib/finance/multi-currency/flags'
 
@@ -191,11 +192,42 @@ const buildQuotationIncomeWriteFields = async (
 ): Promise<{ writeFields: QuotationIncomeWriteFields; totalAmountClp: number }> => {
   const totalAmountRaw = quotation.total_price ?? quotation.total_amount ?? quotation.total_amount_clp ?? 0
   const totalAmountClpRaw = quotation.total_amount_clp ?? quotation.total_price ?? quotation.total_amount ?? 0
-  const subtotal = Number(quotation.subtotal ?? totalAmountRaw)
   const currency = quotation.currency || 'CLP'
   const invoiceDate = new Date().toISOString().slice(0, 10)
   const dueDate = dueDateParam || addDaysToIsoDate(invoiceDate, 30)
   const sourceTaxSnapshot = parsePersistedIncomeTaxSnapshot(quotation.tax_snapshot_json)
+
+  let subtotal = Number(quotation.subtotal ?? totalAmountRaw)
+
+  // TASK-1210 Slice 1 (plan TASK-995 §#1.1) — una cotización CLF (UF) sincronizada
+  // de HubSpot llega con `subtotal`/`tax_amount` NULL y solo `total_amount` (el
+  // total documental en UF). Sin desglose, el income se proyectaría con total=0 en
+  // el plano afecto/IVA (o, peor, `buildIncomeTaxWriteFields` rechazaría el total).
+  // Derivamos neto/IVA desde el total + la clasificación fiscal de la cotización
+  // (`tax_code`), fail-closed si no clasifica (regla dura: no inventar IVA). Las
+  // cotizaciones autoradas por el quote-builder traen `tax_snapshot_json` congelado
+  // o `subtotal`/`tax_amount` ya poblados → NO entran a la derivación (bit-for-bit).
+  let derivedTaxAmountClf: number | null = null
+  let derivedTotalClf: number | null = null
+
+  const clfNeedsBreakdownDerivation =
+    currency === 'CLF' &&
+    isFinanceClfIncomeProjectionEnabled() &&
+    sourceTaxSnapshot == null &&
+    quotation.subtotal == null &&
+    quotation.tax_amount == null &&
+    quotation.tax_amount_snapshot == null
+
+  if (clfNeedsBreakdownDerivation) {
+    // El total documental UF confiable es `total_amount` (coincide con la quote
+    // HubSpot origen); `total_price` es ruido del sync legacy y no se usa acá.
+    const grossTotalClf = Number(quotation.total_amount ?? quotation.total_price ?? 0)
+    const breakdown = deriveClfQuoteBreakdown({ totalClf: grossTotalClf, taxCode: quotation.tax_code })
+
+    subtotal = breakdown.subtotalClf
+    derivedTaxAmountClf = breakdown.taxAmountClf
+    derivedTotalClf = grossTotalClf
+  }
 
   const taxWriteFields = await buildIncomeTaxWriteFields({
     subtotal,
@@ -205,12 +237,18 @@ const buildQuotationIncomeWriteFields = async (
       : quotation.tax_rate != null
         ? Number(quotation.tax_rate)
         : null,
-    taxAmount: quotation.tax_amount_snapshot != null
-      ? Number(quotation.tax_amount_snapshot)
-      : quotation.tax_amount != null
-        ? Number(quotation.tax_amount)
+    taxAmount: derivedTaxAmountClf != null
+      ? derivedTaxAmountClf
+      : quotation.tax_amount_snapshot != null
+        ? Number(quotation.tax_amount_snapshot)
+        : quotation.tax_amount != null
+          ? Number(quotation.tax_amount)
+          : null,
+    totalAmount: derivedTotalClf != null
+      ? derivedTotalClf
+      : totalAmountRaw != null
+        ? Number(totalAmountRaw)
         : null,
-    totalAmount: totalAmountRaw != null ? Number(totalAmountRaw) : null,
     sourceSnapshot: sourceTaxSnapshot,
     issuedAt: quotation.tax_snapshot_frozen_at ?? invoiceDate
   })
@@ -239,10 +277,14 @@ const buildQuotationIncomeWriteFields = async (
   let nativeToFunctionalFxSnapshotId: string | null = null
 
   if (currency === 'CLF' && isFinanceClfIncomeProjectionEnabled()) {
+    // TASK-1210 — en el caso derivado pasamos los valores UF CRUDOS (con decimales)
+    // para que el plano native conserve la precisión UF (p.ej. 128.996 UF, no 129);
+    // `taxWriteFields.*` viene redondeado a 2 decimales (roundCurrency) y perdería
+    // precisión UF. El caso builder-authored mantiene el comportamiento TASK-995.
     const projection = await buildClfIncomeProjection({
       subtotalClf: subtotal,
-      taxAmountClf: taxWriteFields.taxAmount,
-      totalClf: totalAmount,
+      taxAmountClf: derivedTaxAmountClf != null ? derivedTaxAmountClf : taxWriteFields.taxAmount,
+      totalClf: derivedTotalClf != null ? derivedTotalClf : totalAmount,
       rateDate: invoiceDate
     })
 
@@ -254,11 +296,17 @@ const buildQuotationIncomeWriteFields = async (
     }
 
     nativeToFunctionalFxSnapshotId = await persistFxSnapshot(projection.fxSnapshotEvidence, client)
+
+    // TASK-1210 — el IVA/total CLP se derivan AUTORITATIVAMENTE desde el subtotal
+    // CLP funcional (computeChileTaxSnapshot), NO desde los planos proyectados. El
+    // plano UF subtotal/tax/total se redondea a CLP entero por separado, así que
+    // `functionalTax (UF→CLP)` puede driftear de `round(functionalSubtotal × 0.19)`
+    // y romper la identidad chilena `total = neto + IVA`. Derivar desde el subtotal
+    // garantiza la identidad exacta en CLP; el plano native UF (nativeAmountClf) se
+    // preserva aparte. La clasificación afecta/exenta sigue siendo `tax_code`.
     finalTaxWriteFields = await buildIncomeTaxWriteFields({
       subtotal: projection.functionalSubtotalClp,
       taxCode: quotation.tax_code,
-      taxAmount: projection.functionalTaxAmountClp,
-      totalAmount: projection.functionalTotalClp,
       issuedAt: invoiceDate
     })
     finalCurrency = 'CLP'
@@ -321,7 +369,10 @@ const buildQuotationIncomeWriteFields = async (
     actorUserId: null
   }
 
-  return { writeFields, totalAmountClp }
+  // TASK-1210 — el total CLP que viaja a evento/audit/resultado debe ser el
+  // funcional (CLF→CLP) cuando hubo proyección CLF; `finalTotalAmountClp` es
+  // idéntico a `totalAmountClp` en el resto de los caminos (no-CLF / flag OFF).
+  return { writeFields, totalAmountClp: finalTotalAmountClp }
 }
 
 /**
