@@ -83,10 +83,27 @@ jobs:
         # avoid downloading Playwright's browser archive before every smoke run.
         run: google-chrome --version
 
-      - name: Install Playwright ffmpeg
-        # Video-on-failure needs Playwright's ffmpeg binary. Install only ffmpeg,
-        # not Playwright's Chromium bundle, so the smoke lane keeps runner Chrome.
-        run: pnpm exec playwright install ffmpeg
+      - name: Provision Playwright ffmpeg
+        # Video-on-failure needs an executable at Playwright's hermetic ffmpeg path.
+        # Use the runner/system ffmpeg and link it there instead of invoking
+        # Playwright's downloader, which can stall in Actions.
+        run: |
+          if ! command -v ffmpeg >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install -y --no-install-recommends ffmpeg
+          fi
+
+          FFMPEG_PATH="$(node - <<'NODE'
+          const packageJsonPath = require.resolve('playwright-core/package.json')
+          const { registry } = require(packageJsonPath.replace('package.json', 'lib/server/registry/index.js'))
+
+          process.stdout.write(registry.findExecutable('ffmpeg').executablePath())
+          NODE
+          )"
+
+          mkdir -p "$(dirname "$FFMPEG_PATH")"
+          ln -sf "$(command -v ffmpeg)" "$FFMPEG_PATH"
+          "$FFMPEG_PATH" -version
 
       - name: Run Playwright smoke suite
         run: pnpm test:e2e

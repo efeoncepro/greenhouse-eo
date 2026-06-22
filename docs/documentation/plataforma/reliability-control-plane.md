@@ -72,7 +72,7 @@ Los smoke lanes Playwright son una fuente `test_lane`: validan flujos críticos 
 
 Desde TASK-845, los smoke lanes y los workflows de app/tests/builds corren con Node.js `24.x`, igual que el contrato de Vercel para el portal. Esto no cambia la semántica de las señales: solo evita que el resultado de Playwright, lint, typecheck o build dependa de un runtime Node 20 que ya no es el target productivo.
 
-En GitHub Actions, los smoke lanes usan el Chrome del runner (`PLAYWRIGHT_CHROMIUM_CHANNEL=chrome`), verifican `google-chrome --version` e instalan solo `pnpm exec playwright install ffmpeg` para conservar video on failure. Esto evita descargar el Chrome for Testing completo antes de cada corrida, dejando el smoke enfocado en la ruta real y no en el bootstrap del browser.
+En GitHub Actions, los smoke lanes usan el Chrome del runner (`PLAYWRIGHT_CHROMIUM_CHANNEL=chrome`), verifican `google-chrome --version` e provisionan `ffmpeg` del sistema y lo enlazan al path hermetico de Playwright para conservar video on failure. Esto evita descargar el Chrome for Testing completo antes de cada corrida, dejando el smoke enfocado en la ruta real y no en el bootstrap del browser.
 
 La regla operativa es:
 

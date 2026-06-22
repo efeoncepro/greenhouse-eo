@@ -170,7 +170,7 @@ Reglas obligatorias:
 - Fixes Playwright CI: `0d896fa85` (`ci: use runner chrome for playwright smoke`) y `5cd3a1db4` (`ci: disable playwright smoke video on runner chrome`).
 - GitHub CI final: run `27944195483` sobre SHA `5cd3a1db40a5f3a2a4d3e4d557ede75785ba0ab0`, `success`. Pasaron lint, lint-rule tests, typecheck, migration/route/doc/worker gates y tests; build step quedo `skipped` por condicional del workflow, cubierto por Vercel build del mismo SHA.
 - GitHub Playwright final: run `27944195467` sobre el mismo SHA, `success`. `Setup Node.js`, `Install dependencies`, `Verify Chrome browser`, `Run Playwright smoke suite`, artifacts y publish smoke-lane a PG pasaron.
-- Fix de causa raiz Playwright: el install completo `pnpm exec playwright install --with-deps chromium` quedaba colgado descargando Chrome for Testing. El workflow ahora usa Chrome del runner (`PLAYWRIGHT_CHROMIUM_CHANNEL=chrome`) e instala solo `pnpm exec playwright install ffmpeg` para conservar video on failure sin descargar el browser Playwright completo. Trace, screenshots on failure y HTML report siguen disponibles.
+- Fix de causa raiz Playwright: el install completo `pnpm exec playwright install --with-deps chromium` quedaba colgado descargando Chrome for Testing. El workflow ahora usa Chrome del runner (`PLAYWRIGHT_CHROMIUM_CHANNEL=chrome`) e provisiona `ffmpeg` del sistema y lo enlaza al path hermetico de Playwright para conservar video on failure sin descargar el browser Playwright completo. Trace, screenshots on failure y HTML report siguen disponibles.
 - Vercel staging final: `https://greenhouse-m9vyvzfnf-efeonce-7670142f.vercel.app`, `Ready`, commit `5cd3a1d`, build completado. `/api/internal/health` respondio `ok`, `overallStatus: ok`, version `5cd3a1d`, Postgres y BigQuery reachable.
 
 ### Gap
@@ -353,7 +353,7 @@ Coordinar cualquier cambio de Vercel Project Settings si la evidencia CLI contra
 - [x] Vercel queda gobernado por Node 24.x para nuevos deployments, via `engines.node` y/o settings verificados, con evidencia de build/deployment.
 - [x] Worker Dockerfiles `node:22-slim` quedan revisados y documentados como fuera de alcance o follow-up separado, sin bloquear el runtime portal/Vercel.
 - [x] Documentacion viva diferencia claramente entre runtime interno de GitHub Actions y runtime de app/tests.
-- [x] No se introducen workarounds temporales sin owner, condicion de retiro y follow-up. El cambio Playwright es contrato permanente del lane smoke CI: Chrome del runner + ffmpeg focal para video on failure sin bootstrap pesado del browser.
+- [x] No se introducen workarounds temporales sin owner, condicion de retiro y follow-up. El cambio Playwright es contrato permanente del lane smoke CI: Chrome del runner + ffmpeg de sistema enlazado para video on failure sin bootstrap pesado del browser.
 
 ## Verification
 
