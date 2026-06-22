@@ -26,6 +26,11 @@ on:
       - 'pnpm-lock.yaml'
       - 'tsconfig.json'
       - 'src/lib/sync/**'
+      # TASK-1210 — ops-worker hosts /nubox/sync + /nubox/quotes-hot-sync which run
+      # upsertIncomeFromSale (income materialization). Sin este filter, cambios al
+      # Nubox sync NO triggerean redeploy y el worker queda con código stale (drift
+      # live 2026-06-22: el fix del native plane backfill quedó stranded).
+      - 'src/lib/nubox/**'
       - 'src/lib/knowledge/**'
       - 'src/lib/payroll/**'
       - 'src/lib/finance/payroll-expense-reactive.ts'
@@ -172,6 +177,7 @@ jobs:
               services/ops-worker \
               services/_shared \
               src/lib/sync \
+              src/lib/nubox \
               src/lib/knowledge \
               src/lib/payroll \
               src/lib/finance/payroll-expense-reactive.ts \
@@ -229,6 +235,7 @@ jobs:
             services/ops-worker
             services/_shared
             src/lib/sync
+            src/lib/nubox
             src/lib/knowledge
             src/lib/payroll
             src/lib/finance/payroll-expense-reactive.ts
