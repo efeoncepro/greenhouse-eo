@@ -181,6 +181,17 @@ const runSignals = async () => {
 }
 
 const main = async () => {
+  // --fixture-only: crea org + cotización fixture emitida y NO cierra. Imprime QUOTATION_ID=<id>
+  // para el smoke HTTP de staging (la conversión la dispara la ruta convert-to-invoice deployada).
+  if (process.argv.includes('--fixture-only')) {
+    const organizationId = await resolveFixtureOrg()
+    const quotationId = await createFixtureIssuedQuotation(organizationId)
+
+    console.log(`QUOTATION_ID=${quotationId}`)
+    console.log(`ORG_ID=${organizationId}`)
+    process.exit(0)
+  }
+
   if (!process.argv.includes('--confirm')) {
     log('DRY: pasá --confirm para ejecutar el smoke (escribe AR real en dev sobre un fixture).')
     process.exit(0)

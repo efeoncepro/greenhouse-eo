@@ -1,3 +1,11 @@
+## Sesión 2026-06-22 — TASK-1206 Q2C Close — staging cutover + smoke HTTP PASS ✅ — Claude
+
+> **Estado:** sigue `in-progress` (solo falta prod). **Cutover de staging hecho y validado por HTTP.** El código ya está pusheado (Codex lo empujó; los 11 commits TASK-1206 en `origin/develop`).
+> - **Flag:** `COMMERCIAL_Q2C_CANONICAL_CLOSE_ENABLED=true` agregado al environment **staging** (`vercel env add`, link canónico verificado prj_d9v6gihlDq4k1EXazPvzWhSU0qbl) + redeploy `greenhouse-jfz70d2gr` (target staging, Ready). `COMMERCIAL_Q2C_CONTRACT_ONLY_ENABLED` sigue OFF. Ledger snapshot actualizado.
+> - **Smoke HTTP (staging, flag ON):** sobre fixture `qt-b439ba34` (creado con `--fixture-only`), `POST /api/finance/quotes/[id]/convert-to-invoice` (agent-session + bypass) → **HTTP 201 con shape canónico** (`operationId`/`correlationId`/`strategy:simple_invoice`/`finalState:converted`) = la ruta deployada delega en `closeQuoteToCash` (el legacy NO devuelve esos campos). income `INC-197bb6b8` + contrato + audit Q2C + outbox. **2.º POST al mismo quote → MISMO incomeId + PG confirma 1 income (anti doble-AR en el deployment real).**
+> - **Falta SOLO prod:** (1) aplicar migración `20260621222152560` en la base de prod (vía release control plane develop→main); (2) `vercel env add COMMERCIAL_Q2C_CANONICAL_CLOSE_ENABLED true Production` + redeploy; (3) smoke prod sobre fixture; (4) sign-off Commercial/Finance → recién ahí mover a `complete/`. NUNCA convertir las cotizaciones Nubox reales (doble AR).
+> - **Artefactos fixture staging/dev (append-only):** + `qt-b439ba34`/`INC-197bb6b8` (HTTP) sobre la misma org fixture `org-ddd962ae`.
+
 ## Sesión 2026-06-22 — TASK-1206 Q2C Close — smoke local PASS ✅ — Claude
 
 > **Estado:** sigue `in-progress` (rollout staging+prod pendiente). El **smoke local de conversión real PASÓ** sobre un fixture manual — cierra el bloqueante de evidencia runtime que estaba diferido.
