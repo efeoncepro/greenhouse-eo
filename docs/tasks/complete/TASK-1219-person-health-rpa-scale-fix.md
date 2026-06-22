@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Bajo`
@@ -273,3 +273,22 @@ Los umbrales exactos se fijan en Discovery con `greenhouse-ico` según la escala
 - ¿Umbrales exactos de RpA (rondas) para verde/amarillo/rojo? Resolver en Discovery con `greenhouse-ico`.
 - ¿La salud a nivel org/space usa la misma fórmula? `[verificar]`.
 - ¿Algún consumer usa `health` para algo más que mostrar el badge? `[verificar]` (debe ser display-only).
+
+## Delta 2026-06-22 — COMPLETE (fix verificado contra PG real, local-first sin push)
+
+**1 slice.** `computeHealth` ([get-person-ico-profile.ts](../../../src/lib/person-360/get-person-ico-profile.ts)) corregido: RpA interpretado en su escala real (Rounds per Asset, bajo=mejor) con bands canónicos alineados al semáforo (`GH_AGENCY.rpa_semaphore` / `agency/space-health`): **RpA ≤1.5 óptimo · ≤2.5 atención · >2.5 alerta**, OTD ≥80/≥50; **RpA null = neutral** (no penaliza, la salud la decide OTD). `computeHealth` exportada para test. Display-only confirmado (consumers: `get-person-runtime` passthrough, tool Nexa `get_member_performance`, `PersonIntelligenceTab`; el bono usa `rpaAvg` directo en `bonus-proration.ts`, NO `health`).
+
+**Verify-before-fix:** escala confirmada en `RPA_V1.md` (RpA=0 = aprobado a la primera; bajo=mejor). Bug **aislado a person-360**: org/space health usa un score 0-100 legítimo (`organization-projects.ts` `computeHealthScore`), sin el defecto → Slice 2 = verificado, sin cambio.
+
+**Acceptance:**
+- [x] `computeHealth` interpreta RpA en su escala real con umbrales validados (1.5/2.5).
+- [x] Caso real (OTD 96 / RpA 1.13) → green, cubierto por test.
+- [x] Corrección en el reader canónico; People endpoint + UI + tool Nexa heredan la salud correcta.
+- [x] `health` es display-only (no gatea bono ni decisiones) — confirmado.
+- [x] Salud org/space sin el defecto (score 0-100 legítimo) — verificado, sin cambio.
+- [x] 7 tests de matriz (incl. Daniela) + 2 existentes recalibrados a RpA realista; suite full 7697 verde + build prod OK + tsc + lint (en la sesión del fix).
+- [x] **Verificado contra PG real:** Daniela ahora `green` (antes `red`), mismos datos (OTD 96.2 / RpA 1.13 / FTR 93.7).
+
+**Rollout:** sin migración, sin flag, función pura — cutover inmediato al deploy (decisión operador, local-first sin push). Sin pasos de rollout pendientes.
+
+**Nota de recuperación (incidente de worktree compartido):** el commit del fix se perdió una vez por un `git reset` de un agente concurrente (Codex) sincronizando `develop`; recuperado vía `git branch task1219-fix-recovery` + cherry-pick (`e229a27a3`). Verificado de nuevo verde sobre el HEAD mergeado. Lección: agentes concurrentes deben usar worktrees/branches separados.
