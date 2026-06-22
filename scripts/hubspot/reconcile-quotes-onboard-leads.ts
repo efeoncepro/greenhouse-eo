@@ -3,21 +3,25 @@ import 'server-only'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { resolveSecretByRef } from '@/lib/secrets/secret-manager'
 import { getHubSpotGreenhouseCompanyProfile } from '@/lib/integrations/hubspot-greenhouse-service'
-import { upsertCanonicalOrganization } from '@/lib/account-360/organization-identity'
+import { createPartyFromHubSpotCompany } from '@/lib/commercial/party/commands/create-party-from-hubspot-company'
 import { syncHubSpotQuotesForCompany } from '@/lib/hubspot/sync-hubspot-quotes'
 
 /**
- * TASK-1222 Slice B — Reconciliación: onboardear como organizations tipo "lead"
- * (canónico: organization_type='other' + lifecycle_stage='prospect', default del
- * writer SSOT) las HubSpot companies que tienen quotes pero NO existen como org en
- * Greenhouse, y luego importar sus quotes con el sync existente per-company.
+ * TASK-1222 Slice B — Reconciliación: onboardear las HubSpot companies que tienen
+ * quotes pero NO existen como organization en Greenhouse, y luego importar sus
+ * quotes con el sync existente per-company.
  *
- * "Lead" NO es un organization_type (CHECK admite client/supplier/both/other).
- * Se realiza como prospect/other vía upsertCanonicalOrganization (puerta canónica,
- * no se inventa enum). El sync de quotes ya resuelve org por hubspot_company_id;
- * por eso basta con que la org exista.
+ * Semántica de lifecycle (regla operador 2026-06-22, canónica):
+ *   - lead = prospect (mismo concepto). Company cotizada SIN deal → `prospect`.
+ *   - opportunity = organización que tiene AL MENOS un deal → `opportunity`.
+ * Se realiza vía la PUERTA CANÓNICA `createPartyFromHubSpotCompany` (escribe
+ * lifecycle_stage + lifecycle_stage_history + evento party.created, idempotente,
+ * deriva organization_type='other' para no-cliente). NO se inventa enum ni se
+ * hand-setea la fila. El stage se fuerza por la regla de deal pasando el token
+ * HubSpot equivalente (`opportunity` | `lead`) al mapper canónico.
  *
- * Idempotente. Default DRY-RUN; requiere --apply para escribir.
+ * El sync de quotes ya resuelve org por hubspot_company_id; basta con que la org
+ * exista. Idempotente. Default DRY-RUN; requiere --apply para escribir.
  *
  * Uso:
  *   HUBSPOT_ACCESS_TOKEN=$(gcloud secrets versions access latest \
@@ -94,6 +98,21 @@ const companyIdsForDeal = async (token: string, dealId: string): Promise<string[
   return ((await r.json()) as V4AssocResult).results.map(x => String(x.toObjectId))
 }
 
+/** True si la company tiene ≥1 deal asociado (regla operador: deal ⇒ opportunity). */
+const companyHasDeal = async (token: string, companyId: string): Promise<boolean> => {
+  const r = await fetch(`${HUBSPOT_API}/crm/v4/objects/companies/${companyId}/associations/deals?limit=1`, {
+    headers: { Authorization: `Bearer ${token}` },
+    cache: 'no-store',
+    signal: AbortSignal.timeout(15000)
+  })
+
+  if (r.status === 404) return false
+
+  if (!r.ok) throw new Error(`HubSpot company->deals failed: ${r.status} ${(await r.text()).slice(0, 200)}`)
+
+  return (((await r.json()) as V4AssocResult).results.length) > 0
+}
+
 const main = async () => {
   const token = await fetchToken()
   const quotes = await listAllQuotes(token)
@@ -105,7 +124,6 @@ const main = async () => {
 
   const mapped = new Set(orgRows.map(r => r.hubspot_company_id))
 
-  // companies (resueltas direct o via deal) que tienen quotes pero NO son org → onboardear
   const companyQuoteCount = new Map<string, number>()
   let noAssociation = 0
 
@@ -131,30 +149,47 @@ const main = async () => {
   const targetCompanies = [...companyQuoteCount.keys()]
 
   console.log(`[onboard-leads] HubSpot quotes: ${quotes.length} | quotes sin asociación: ${noAssociation}`)
-  console.log(`[onboard-leads] companies con quotes SIN org en GH (a onboardear como lead/prospect): ${targetCompanies.length}`)
+  console.log(`[onboard-leads] companies con quotes SIN org en GH: ${targetCompanies.length}`)
 
-  // Resolver nombres HubSpot (para el plan + el write)
-  const plan: Array<{ companyId: string; name: string; country: string | null; industry: string | null; quotes: number }> = []
+  // Plan: nombre HubSpot + has-deal (⇒ opportunity vs prospect/lead)
+  const plan: Array<{
+    companyId: string
+    name: string
+    country: string | null
+    quotes: number
+    stage: 'opportunity' | 'prospect'
+  }> = []
 
   for (const companyId of targetCompanies) {
+    let name = `HubSpot Company ${companyId}`
+    let country: string | null = null
+
     try {
       const profile = await getHubSpotGreenhouseCompanyProfile(companyId)
 
-      plan.push({
-        companyId,
-        name: profile.identity.name ?? `HubSpot company ${companyId}`,
-        country: profile.identity.country,
-        industry: profile.identity.industry,
-        quotes: companyQuoteCount.get(companyId) ?? 0
-      })
-    } catch (err) {
-      plan.push({ companyId, name: `(perfil no resoluble: ${err instanceof Error ? err.message : String(err)})`, country: null, industry: null, quotes: companyQuoteCount.get(companyId) ?? 0 })
+      name = profile.identity.name ?? name
+      country = profile.identity.country
+    } catch {
+      // perfil no resoluble — se onboardea igual con nombre default
     }
+
+    const hasDeal = await companyHasDeal(token, companyId)
+
+    plan.push({
+      companyId,
+      name,
+      country,
+      quotes: companyQuoteCount.get(companyId) ?? 0,
+      stage: hasDeal ? 'opportunity' : 'prospect'
+    })
   }
 
-  console.log('\n=== Plan de onboarding (company → org prospect/other) ===')
-  plan.forEach(p => console.log(`  ${p.companyId} | ${p.name} | country=${p.country ?? '—'} | quotes=${p.quotes}`))
-  console.log(`\n  Total orgs a crear: ${plan.length} | quotes a importar (aprox): ${plan.reduce((a, p) => a + p.quotes, 0)}`)
+  const opp = plan.filter(p => p.stage === 'opportunity').length
+  const prospect = plan.filter(p => p.stage === 'prospect').length
+
+  console.log('\n=== Plan de onboarding (company → org) ===')
+  plan.forEach(p => console.log(`  ${p.companyId} | ${p.name} | ${p.stage} | country=${p.country ?? '—'} | quotes=${p.quotes}`))
+  console.log(`\n  Total orgs a crear: ${plan.length} (opportunity=${opp}, prospect/lead=${prospect}) | quotes a importar (aprox): ${plan.reduce((a, p) => a + p.quotes, 0)}`)
 
   if (!APPLY) {
     console.log('\n[onboard-leads] DRY-RUN (sin escribir). Re-correr con --apply para onboardear + importar.')
@@ -168,14 +203,13 @@ const main = async () => {
 
   for (const p of plan) {
     try {
-      await upsertCanonicalOrganization({
-        organizationName: p.name,
+      // El mapper canónico: 'opportunity'→opportunity, 'lead'→prospect.
+      await createPartyFromHubSpotCompany({
         hubspotCompanyId: p.companyId,
+        hubspotLifecycleStage: p.stage === 'opportunity' ? 'opportunity' : 'lead',
+        defaultName: p.name,
         country: p.country,
-        industry: p.industry,
-        origin: 'hubspot_sync'
-        // sin hasClientRole/hasSupplierRole → organization_type='other';
-        // lifecycle_stage cae al default 'prospect' = lead canónico.
+        actor: { system: true }
       })
       orgsCreated++
 
