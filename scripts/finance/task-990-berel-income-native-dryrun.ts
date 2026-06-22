@@ -18,20 +18,19 @@ import { getNuboxSaleXml } from '@/lib/nubox/client'
 import { parseDteForeignCurrencyXml } from '@/lib/nubox/dte-foreign-currency'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
-const BEREL_SALE_ID = 28800562
+// TASK-1210 — allowlist de las DOS facturas de exportación Berel (DTE 110 MXN).
+const BEREL_SALE_IDS = [28800562, 29062197]
 
-const main = async () => {
-  const xml = await getNuboxSaleXml(BEREL_SALE_ID)
+const dryRunSale = async (saleId: number): Promise<void> => {
+  console.log(`\n── Berel export invoice ${saleId} ──`)
+
+  const xml = await getNuboxSaleXml(saleId)
   const parsed = parseDteForeignCurrencyXml(xml)
-
-  console.log('═══════════════════════════════════════════════════════════════')
-  console.log('TASK-990 Slice 5b — Berel income native-plane dry-run (READ-ONLY)')
-  console.log('═══════════════════════════════════════════════════════════════')
 
   if (!parsed?.nativeCurrencyCode || parsed.nativeTotal === null) {
     console.log('No foreign plane parsed from XML — would stay CLP-only.')
-    
-return
+
+    return
   }
 
   const fx = observedFxSnapshotEvidence({
@@ -48,7 +47,6 @@ return
   console.log(`  functional CLP  = ${parsed.clpTotal} (legal, total_amount_clp — unchanged)`)
   console.log(`  fx snapshot     = ${fx.fromCurrency}->${fx.toCurrency} rate=${fx.rate} (source=${fx.source}, policy=${fx.policy})`)
   console.log(`  is_tax_exempt   = true (DTE 110, D.L. 825)`)
-  console.log('')
 
   const rows = await runGreenhousePostgresQuery<{
     income_id: string
@@ -62,7 +60,7 @@ return
     `SELECT income_id, currency, total_amount, total_amount_clp, native_amount, native_currency, is_tax_exempt
        FROM greenhouse_finance.income
       WHERE nubox_document_id = $1`,
-    [BEREL_SALE_ID]
+    [saleId]
   )
 
   console.log('Current income row(s) in PG:')
@@ -77,8 +75,18 @@ return
       )
     }
   }
+}
 
+const main = async () => {
   console.log('═══════════════════════════════════════════════════════════════')
+  console.log('TASK-990 Slice 5b — Berel income native-plane dry-run (READ-ONLY)')
+  console.log('═══════════════════════════════════════════════════════════════')
+
+  for (const saleId of BEREL_SALE_IDS) {
+    await dryRunSale(saleId)
+  }
+
+  console.log('\n═══════════════════════════════════════════════════════════════')
 }
 
 main()

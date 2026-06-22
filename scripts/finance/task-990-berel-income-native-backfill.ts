@@ -33,7 +33,8 @@ import { buildNuboxOrgByRutMap } from '@/lib/nubox/sync-nubox-conformed'
 import { readConformedSales, upsertIncomeFromSale, type NuboxProjectionSale } from '@/lib/nubox/sync-nubox-to-postgres'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
-const BEREL_SALE_ID = 28800562
+// TASK-1210 — allowlist de las DOS facturas de exportación Berel (DTE 110 MXN).
+const BEREL_SALE_IDS = [28800562, 29062197]
 const apply = process.argv.includes('--apply')
 
 type ForeignInjectableSale = NuboxProjectionSale & {
@@ -45,34 +46,34 @@ type ForeignInjectableSale = NuboxProjectionSale & {
   functional_total_amount_clp?: number | string | null
 }
 
-const showIncome = async (label: string) => {
+const showIncome = async (saleId: number, label: string) => {
   const rows = await runGreenhousePostgresQuery<Record<string, unknown>>(
     `SELECT income_id, currency, total_amount, total_amount_clp, native_amount, native_currency,
             amount_usd, payment_status, amount_paid, due_date, is_tax_exempt,
             native_to_functional_fx_snapshot_id, functional_to_reporting_fx_snapshot_id
        FROM greenhouse_finance.income WHERE nubox_document_id = $1`,
-    [BEREL_SALE_ID]
+    [saleId]
   )
 
   console.log(`\n${label}:`)
   console.log(rows.length === 0 ? '  (no income row)' : JSON.stringify(rows, null, 2))
 }
 
-const main = async () => {
-  console.log('═══════════════════════════════════════════════════════════════')
-  console.log(`TASK-990 — Berel income native-plane backfill  [${apply ? 'APPLY' : 'DRY-RUN'}]`)
-  console.log('═══════════════════════════════════════════════════════════════')
-  console.log('  FINANCE_CORE_MXN_ENABLED:', isFinanceCoreMxnEnabled())
-  console.log('  FINANCE_MXN_BEREL_BACKFILL_APPLY_ENABLED:', isFinanceMxnBerelBackfillApplyEnabled())
+/**
+ * Procesa UNA factura de exportación Berel: inyecta el plano foráneo desde el XML
+ * SII, resuelve org + Cliente canónicos, y (en apply) escribe vía el writer canónico
+ * `upsertIncomeFromSale` (idempotente ON CONFLICT — agrega el plano nativo MXN a la
+ * fila CLP ya existente, NO crea una segunda fila ni registra cobro).
+ */
+const processSale = async (saleId: number, sales: NuboxProjectionSale[]): Promise<void> => {
+  console.log(`\n── Berel export invoice ${saleId} ──`)
 
-  const projectId = getBigQueryProjectId()
-  const sales = await readConformedSales(projectId)
-  const sale = sales.find(s => Number(s.nubox_sale_id) === BEREL_SALE_ID) as ForeignInjectableSale | undefined
+  const sale = sales.find(s => Number(s.nubox_sale_id) === saleId) as ForeignInjectableSale | undefined
 
-  if (!sale) throw new Error(`Berel conformed sale ${BEREL_SALE_ID} not found in greenhouse_conformed.nubox_sales`)
+  if (!sale) throw new Error(`Berel conformed sale ${saleId} not found in greenhouse_conformed.nubox_sales`)
 
   // Inject the foreign plane from the SII XML (conformed enrichment is gated off).
-  const parsed = parseDteForeignCurrencyXml(await getNuboxSaleXml(BEREL_SALE_ID))
+  const parsed = parseDteForeignCurrencyXml(await getNuboxSaleXml(saleId))
 
   if (!parsed?.nativeCurrencyCode || parsed.nativeTotal === null || parsed.clpTotal === null) {
     throw new Error('Could not parse the foreign plane from the SII XML — aborting (no guesswork).')
@@ -120,14 +121,14 @@ const main = async () => {
     }
   }
 
-  console.log('\nConformed sale (allowlisted) + injected foreign plane:')
+  console.log('Conformed sale (allowlisted) + injected foreign plane:')
   console.log(`  nubox_sale_id   = ${sale.nubox_sale_id}  (DTE ${sale.dte_type_code}, folio ${sale.folio})`)
   console.log(`  client          = ${sale.client_trade_name ?? '—'}  RFC=${sale.client_rut ?? '—'}  org=${sale.organization_id ?? '—'}  client_id=${sale.client_id ?? '—'}`)
   console.log(`  emission_date   = ${sale.emission_date}   due_date = ${sale.due_date}  (30-day credit, UNPAID)`)
   console.log(`  native          = ${parsed.nativeTotal} ${parsed.nativeCurrencyCode}`)
   console.log(`  functional CLP  = ${parsed.clpTotal}`)
 
-  await showIncome('Income row BEFORE')
+  await showIncome(saleId, 'Income row BEFORE')
 
   if (!apply) {
     console.log('\nDRY-RUN: nothing written. Re-run with --apply + the gate/flag env vars.')
@@ -135,19 +136,35 @@ const main = async () => {
     return
   }
 
-  if (!isFinanceCoreMxnEnabled()) {
-    throw new Error('--apply requires FINANCE_CORE_MXN_ENABLED=true so the income write populates the native plane.')
-  }
-
-  if (!isFinanceMxnBerelBackfillApplyEnabled()) {
-    throw new Error('--apply requires FINANCE_MXN_BEREL_BACKFILL_APPLY_ENABLED=true (explicit backfill gate).')
-  }
-
   const outcome = await upsertIncomeFromSale(sale)
 
   console.log(`\n✓ upsertIncomeFromSale → ${outcome}`)
 
-  await showIncome('Income row AFTER (expect native MXN + functional CLP + pending/unpaid)')
+  await showIncome(saleId, 'Income row AFTER (expect native MXN + functional CLP + pending/unpaid)')
+}
+
+const main = async () => {
+  console.log('═══════════════════════════════════════════════════════════════')
+  console.log(`TASK-990 — Berel income native-plane backfill  [${apply ? 'APPLY' : 'DRY-RUN'}]`)
+  console.log('═══════════════════════════════════════════════════════════════')
+  console.log('  FINANCE_CORE_MXN_ENABLED:', isFinanceCoreMxnEnabled())
+  console.log('  FINANCE_MXN_BEREL_BACKFILL_APPLY_ENABLED:', isFinanceMxnBerelBackfillApplyEnabled())
+
+  if (apply && !isFinanceCoreMxnEnabled()) {
+    throw new Error('--apply requires FINANCE_CORE_MXN_ENABLED=true so the income write populates the native plane.')
+  }
+
+  if (apply && !isFinanceMxnBerelBackfillApplyEnabled()) {
+    throw new Error('--apply requires FINANCE_MXN_BEREL_BACKFILL_APPLY_ENABLED=true (explicit backfill gate).')
+  }
+
+  const projectId = getBigQueryProjectId()
+  const sales = await readConformedSales(projectId)
+
+  for (const saleId of BEREL_SALE_IDS) {
+    await processSale(saleId, sales)
+  }
+
   console.log('\n═══════════════════════════════════════════════════════════════')
 }
 
