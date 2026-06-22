@@ -8,17 +8,17 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `optional`
-- Status real: `Code complete local 2026-06-22; rollout GitHub/Vercel pendiente`
+- Status real: `Complete 2026-06-22; Node 24 local + GitHub CI + Playwright + Vercel staging verified`
 - Rank: `TBD`
 - Domain: `platform`
 - Blocked by: `none`
-- Branch: `task/TASK-845-node-24-app-test-runtime-upgrade`
+- Branch: `develop`
 - Legacy ID: `none`
 - GitHub Issue: `optional`
 
@@ -163,6 +163,15 @@ Reglas obligatorias:
 - Workflows migrados a `node-version: 24`: `ci`, `ci-deep`, `playwright`, `reliability-verify` (2 jobs), `design-contract`, `task-contract`.
 - Workflows ya en Node 24 antes de esta task: `production-release`, `production-release-watchdog`, `nexa-knowledge-qa-nightly`.
 - Cloud Run workers `services/ops-worker`, `services/commercial-cost-worker` y `services/ico-batch` siguen usando Dockerfiles `node:22-slim`; se documentan como runtime container separado y follow-up opcional.
+
+### Post-push verification 2026-06-22
+
+- Commit base de runtime: `1d0c731fd` (`chore: cut app runtime to node 24`).
+- Fixes Playwright CI: `0d896fa85` (`ci: use runner chrome for playwright smoke`) y `5cd3a1db4` (`ci: disable playwright smoke video on runner chrome`).
+- GitHub CI final: run `27944195483` sobre SHA `5cd3a1db40a5f3a2a4d3e4d557ede75785ba0ab0`, `success`. Pasaron lint, lint-rule tests, typecheck, migration/route/doc/worker gates y tests; build step quedo `skipped` por condicional del workflow, cubierto por Vercel build del mismo SHA.
+- GitHub Playwright final: run `27944195467` sobre el mismo SHA, `success`. `Setup Node.js`, `Install dependencies`, `Verify Chrome browser`, `Run Playwright smoke suite`, artifacts y publish smoke-lane a PG pasaron.
+- Fix de causa raiz Playwright: el install completo `pnpm exec playwright install --with-deps chromium` quedaba colgado descargando Chrome for Testing. El workflow ahora usa Chrome del runner (`PLAYWRIGHT_CHROMIUM_CHANNEL=chrome`) y desactiva video (`PLAYWRIGHT_VIDEO=off`) para no depender del `ffmpeg` del bundle Playwright. Trace, screenshots on failure y HTML report siguen disponibles.
+- Vercel staging final: `https://greenhouse-m9vyvzfnf-efeonce-7670142f.vercel.app`, `Ready`, commit `5cd3a1d`, build completado. `/api/internal/health` respondio `ok`, `overallStatus: ok`, version `5cd3a1d`, Postgres y BigQuery reachable.
 
 ### Gap
 
@@ -339,12 +348,12 @@ Coordinar cualquier cambio de Vercel Project Settings si la evidencia CLI contra
 - [x] `.nvmrc` existe y contiene `24`; si `.node-version` existe, tambien contiene `24`.
 - [x] `rg -n "node-version: 20|node-version: '20'|node-version: \"20\"" .github/workflows` no devuelve jobs de app/tests/builds pendientes.
 - [x] Clean install bajo Node 24 (`corepack enable` + `pnpm install --frozen-lockfile`) termina sin errores.
-- [ ] CI en GitHub corre con Node 24 para app/tests y termina success.
-- [ ] Playwright smoke corre con Node 24 y termina success o publica failure real con evidencia clara no atribuible al upgrade. Parcial local 2026-06-22: `login-session` verde; `cron-staging-parity` timeout en `/api/admin/reliability`.
-- [ ] Vercel queda gobernado por Node 24.x para nuevos deployments, via `engines.node` y/o settings verificados, con evidencia de build/deployment.
+- [x] CI en GitHub corre con Node 24 para app/tests y termina success.
+- [x] Playwright smoke corre con Node 24 y termina success o publica failure real con evidencia clara no atribuible al upgrade. Final CI 2026-06-22: Playwright run `27944195467` success.
+- [x] Vercel queda gobernado por Node 24.x para nuevos deployments, via `engines.node` y/o settings verificados, con evidencia de build/deployment.
 - [x] Worker Dockerfiles `node:22-slim` quedan revisados y documentados como fuera de alcance o follow-up separado, sin bloquear el runtime portal/Vercel.
 - [x] Documentacion viva diferencia claramente entre runtime interno de GitHub Actions y runtime de app/tests.
-- [ ] No se introducen workarounds temporales sin owner, condicion de retiro y follow-up.
+- [x] No se introducen workarounds temporales sin owner, condicion de retiro y follow-up. El cambio Playwright es contrato permanente del lane smoke CI: Chrome del runner + video off para evitar bootstrap pesado.
 
 ## Verification
 
@@ -362,20 +371,36 @@ Coordinar cualquier cambio de Vercel Project Settings si la evidencia CLI contra
 - Post-push: verificar GitHub CI + Playwright run logs.
 - Verificar Vercel runtime con CLI o deployment evidence.
 
+Evidencia final:
+
+- `node -v`: `v24.14.0`.
+- `pnpm -v`: `10.32.1`.
+- `corepack enable && pnpm install --frozen-lockfile`: success.
+- `rg -n "node-version: 20|node-version: '20'|node-version: \"20\"" .github/workflows`: sin resultados.
+- `pnpm typecheck`: success bajo Node 24.
+- `pnpm build`: success bajo Node 24; solo warning Turbopack preexistente por patrón dinámico amplio en `src/lib/roadmap/work-item-index/reader.ts`.
+- `pnpm test`: full suite local con 7667 passed / 2 HR timeouts concurrentes; re-run aislado HR 17/17 success.
+- `pnpm task:lint --task TASK-845`: success.
+- `pnpm ops:lint --changed`: success antes de cambios ajenos TASK-1216 en el checkout principal.
+- `pnpm docs:closure-check`, `pnpm docs:context-check`, `pnpm qa:gates --changed --agent codex --docs`, `pnpm migration-marker-gate:test`, `git diff --check`: success para el cambio TASK-845.
+- GitHub CI `27944195483`: success.
+- GitHub Playwright `27944195467`: success.
+- Vercel deploy `greenhouse-m9vyvzfnf-efeonce-7670142f.vercel.app`: Ready; `/api/internal/health` ok con version `5cd3a1d`.
+
 ## Closing Protocol
 
 Cerrar una task es obligatorio y forma parte de Definition of Done. Si la implementacion termino pero estos items no se ejecutaron, la task sigue abierta.
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla).
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`).
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre.
-- [ ] `docs/tasks/TASK_ID_REGISTRY.md` quedo sincronizado con el cierre.
-- [ ] `Handoff.md` quedo actualizado con evidencia de Node 24 local, CI, Playwright y Vercel.
-- [ ] `Handoff.md` incluye el output/resumen de `node -v`, clean install, `rg node-version`, CI run IDs, Playwright run ID y evidencia Vercel.
-- [ ] `project_context.md` quedo actualizado si el contrato runtime cambia.
-- [ ] `changelog.md` quedo actualizado.
-- [ ] Arquitectura/documentacion funcional de plataforma quedo actualizada.
-- [ ] Se ejecuto chequeo de impacto cruzado sobre TASK-607, workflows y deploys.
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla).
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`).
+- [x] `docs/tasks/README.md` quedo sincronizado con el cierre.
+- [x] `docs/tasks/TASK_ID_REGISTRY.md` quedo sincronizado con el cierre.
+- [x] `Handoff.md` quedo actualizado con evidencia de Node 24 local, CI, Playwright y Vercel.
+- [x] `Handoff.md` incluye el output/resumen de `node -v`, clean install, `rg node-version`, CI run IDs, Playwright run ID y evidencia Vercel.
+- [x] `project_context.md` quedo actualizado si el contrato runtime cambia.
+- [x] `changelog.md` quedo actualizado.
+- [x] Arquitectura/documentacion funcional de plataforma quedo actualizada.
+- [x] Se ejecuto chequeo de impacto cruzado sobre TASK-607, workflows y deploys.
 
 ## Follow-ups
 
