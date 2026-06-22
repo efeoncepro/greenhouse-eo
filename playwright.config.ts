@@ -48,6 +48,7 @@ const BASE_URL =
 const IS_CI = !!process.env.CI
 const START_WEB_SERVER = process.env.PLAYWRIGHT_START_WEB_SERVER === 'true'
 const CHROMIUM_CHANNEL = process.env.PLAYWRIGHT_CHROMIUM_CHANNEL === 'chrome' ? 'chrome' : undefined
+const RECORD_VIDEO = IS_CI && process.env.PLAYWRIGHT_VIDEO !== 'off'
 
 const chromiumUse = {
   ...devices['Desktop Chrome'],
@@ -79,7 +80,7 @@ export default defineConfig({
     storageState: '.auth/storageState.json',
     trace: IS_CI ? 'retain-on-failure' : 'on-first-retry',
     screenshot: 'only-on-failure',
-    video: IS_CI ? 'retain-on-failure' : 'off',
+    video: RECORD_VIDEO ? 'retain-on-failure' : 'off',
     actionTimeout: 10_000,
     navigationTimeout: 15_000,
     extraHTTPHeaders: process.env.VERCEL_AUTOMATION_BYPASS_SECRET
