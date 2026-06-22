@@ -50,6 +50,7 @@ jobs:
       AGENT_AUTH_SECRET: ${{ secrets.AGENT_AUTH_SECRET }}
       AGENT_AUTH_EMAIL: ${{ secrets.AGENT_AUTH_EMAIL || 'agent@greenhouse.efeonce.org' }}
       VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
+      PLAYWRIGHT_CHROMIUM_CHANNEL: chrome
     steps:
       - name: Guard — require base URL + agent secret
         run: |
@@ -77,10 +78,10 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Install Playwright Chromium
-        # CI runs Chromium headless. Installing only the headless shell avoids
-        # the full Chrome for Testing archive stalling before smoke specs run.
-        run: pnpm exec playwright install --with-deps --only-shell chromium
+      - name: Verify Chrome browser
+        # GitHub's Ubuntu runners include Chrome. CI uses the system channel to
+        # avoid downloading Playwright's browser archive before every smoke run.
+        run: google-chrome --version
 
       - name: Run Playwright smoke suite
         run: pnpm test:e2e

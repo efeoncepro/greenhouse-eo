@@ -47,6 +47,12 @@ const BASE_URL =
 
 const IS_CI = !!process.env.CI
 const START_WEB_SERVER = process.env.PLAYWRIGHT_START_WEB_SERVER === 'true'
+const CHROMIUM_CHANNEL = process.env.PLAYWRIGHT_CHROMIUM_CHANNEL === 'chrome' ? 'chrome' : undefined
+
+const chromiumUse = {
+  ...devices['Desktop Chrome'],
+  ...(CHROMIUM_CHANNEL ? { channel: CHROMIUM_CHANNEL } : {})
+}
 
 export default defineConfig({
   testDir: './tests/e2e',
@@ -83,7 +89,7 @@ export default defineConfig({
   projects: [
     {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'] }
+      use: chromiumUse
     }
   ],
   webServer: START_WEB_SERVER
