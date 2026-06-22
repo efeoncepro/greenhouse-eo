@@ -70,6 +70,7 @@ Tasks, docs de arquitectura, o commits relacionados.
 
 | ID          | Título                                                                                                                       | Ambiente             | Detectado  | Estado |
 | ----------- | ---------------------------------------------------------------------------------------------------------------------------- | -------------------- | ---------- | ------ |
+| `ISSUE-106` | [CHECK product_catalog_hubspot_trace_consistent bloquea productos inbound de quotes HubSpot](open/ISSUE-106-product-catalog-hubspot-trace-check-blocks-inbound-quote-products.md) | dev/staging data plane | 2026-06-22 | open   |
 | `ISSUE-044` | [Dashboard pages 500 via agent headless](open/ISSUE-044-dashboard-ssr-500-agent-headless.md)                                  | staging              | 2026-04-11 | open   |
 | `ISSUE-046` | [Deliverability monitor siempre devuelve 0 bounces y 0 complaints](open/ISSUE-046-deliverability-monitor-query-rota.md) | production + staging | 2026-04-13 | open   |
 | `ISSUE-047` | [Kill switch de email sin endpoint CRUD — solo operable por SQL directo](open/ISSUE-047-email-kill-switch-sin-endpoint-crud.md) | production + staging | 2026-04-13 | open   |

@@ -71,6 +71,15 @@ Trazando ANAM (cliente real, org existe) end-to-end: **sus 5 quotes YA están im
 
 El backfill/resolver global (Slices 2-5) ataca (B/C) pero **no toca (A)**, que es lo que el operador percibe como "ANAM no sale". La task debe re-apuntarse: decidir si (A) status/source drift entra a esta task o sale a una separada, y si (B) implica onboarding de companies. Pendiente decisión del operador.
 
+### Resultado de ejecución dev 2026-06-22 (Slices A + B aplicados)
+
+- **Slice A (status drift):** fix del CASE en `syncCanonicalFinanceQuote` (passthrough de status canónicos) + backfill (`scripts/finance/backfill-quotation-status-from-finance.ts`). Dev: 17 filas `draft→issued`, drift residual=0, ANAM verificado `issued`.
+- **Slice B (lead onboarding + reconcile):** `scripts/hubspot/reconcile-quotes-onboard-leads.ts` aplicó en dev — **31 orgs onboardeadas** (todas `organization_type='other'` + `lifecycle_stage='opportunity'` por regla operador deal⇒opportunity; 0 marcadas como cliente) vía la puerta canónica `createPartyFromHubSpotCompany`, + **44 quotes importadas**.
+- **Resultado neto dev:** `GET /api/finance/quotes?source=hubspot` (vía `commercial.quotations` con org) pasó de **24 → 64** quotes expuestas. `finance.quotes source=hubspot`: 25 → 69.
+- **5 quotes bloqueadas** por **ISSUE-106** (`product_catalog_hubspot_trace_consistent` bloquea productos inbound HubSpot — bug pre-existente de governance outbound, fuera de scope; documentado como ISSUE derivado, NO band-aideado).
+- **8 quotes sin asociación** (Slice C) → siguen sin importar; data hygiene HubSpot recomendada.
+- **Rollout:** todo aplicado SOLO en dev. Staging/prod = pendiente (gated). Webhook (Slice 4) = código no construido aún (la app HubSpot vive en el monorepo `services/hubspot_greenhouse_integration/hubspot-app/hubspot-bigquery/`, account `48713323`; upload outward-facing gated). `code complete (dev), rollout pendiente`.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 1 — CONTEXT & CONSTRAINTS
      "Que necesito entender antes de planificar?"
