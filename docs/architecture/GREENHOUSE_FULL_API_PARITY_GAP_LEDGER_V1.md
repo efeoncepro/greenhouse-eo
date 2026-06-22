@@ -104,6 +104,7 @@ lectura pero ninguna está cableada al loop de acción gobernada de Nexa.
 | `check_payroll` | read | hr | nómina agregada (gate por route-group) |
 | `explain_my_pay` | read (self) | hr | nómina propia del member |
 | `get_otd` | read | agency / organization | OTD org / pulso global |
+| `get_member_performance` | read | ico / people | desempeño ICO **por persona** (OTD/RpA/FTR/salud) — TASK-1216; mismo primitive `readMemberIcoProfileForSubject` que los lanes MCP/app (`api/platform/{ecosystem,app}/people/performance`) y la UI |
 | `get_capacity` | read | people | capacidad equipo / personal |
 | `pending_invoices` | read | finance | facturas pendientes/vencidas |
 | `check_emails` | read | admin | salud delivery email |

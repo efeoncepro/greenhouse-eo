@@ -6,10 +6,10 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Medio`
-- Effort: `Bajo`
+- Effort: `Alto`
 - Type: `implementation`
 - Execution profile: `backend-data`
 - UI impact: `none`
@@ -264,3 +264,25 @@ El nombre final de la tool, el shape del argumento (nombre vs member_id) y el re
 
 - ¿Tool nueva (`get_member_performance`) o extender `get_otd` con argumento opcional de persona? Resolver en Discovery (preferencia: tool nueva para no romper el contrato sin-args actual).
 - ¿Existe ya un resolver nombre→member_id scoped reusable? `[verificar]`.
+
+## Delta 2026-06-22 — COMPLETE (code-complete + verificado contra PG real, local-first sin push)
+
+**Scope expandido por decisión del operador (parity real):** se agregaron como consumers, además del tool de Nexa, los lanes **MCP/ecosystem y app** de API Platform — los tres consumen el MISMO primitive canónico (un primitive, muchos consumers).
+
+**Implementado (4 slices):**
+- **Slice 1** — Primitive canónico neutral `readMemberIcoProfileForSubject` + helpers (`resolvePeopleActivityScope`, `resolveMemberReferenceInScope`, `isMemberVisibleInActivityScope`) en `src/lib/people/person-activity-access.ts`. Reusa primitivas People (canViewActivity + anti-IDOR + supervisor scope) + reader `getPersonIcoProfile`. 12 tests + SQL smoke contra PG real.
+- **Slice 2** — Tool de Nexa `get_member_performance` (`nexa-tools.ts` + `nexa-contract.ts`), wrapper fino que mapea `NexaRuntimeContext`→`PeopleActivitySubject`. isAvailable internal-only; not_found uniforme; ambiguo→desambiguación; gap honesto. 9 tests.
+- **Slice 3** — Regla de ruteo persona vs `get_otd` en el prompt; bump policy v2.3.0→v2.4.0 + changelog + golden snapshot. Docs de capa (versioning/techniques/behavior-and-routing). `nexa:doc-gate` verde.
+- **Slice 4** — Lanes API Platform `people.v1`: `GET /api/platform/ecosystem/people/performance` (solo binding `internal`, subject `people_viewer` de menor privilegio) + `GET /api/platform/app/people/performance` (subject 1:1 del tenant). Shared `buildMemberPerformancePayload`. Nuevo error code `ambiguous_reference`. 7 tests.
+
+**Acceptance:**
+- [x] Nexa/MCP/app responden el OTD (+RpA/FTR/salud) de una persona nombrada con scope/capability.
+- [x] Niega sin filtrar existencia fuera de scope/sin capability (forbidden / not_found uniforme).
+- [x] Delega en `getPersonIcoProfile`; cero recompute o query directa a `ico_member_metrics`.
+- [x] Tests unitarios (scope/sin scope/ambiguo) verdes (28 nuevos) + suite full 7697 verde + build prod OK + tsc + lint + `nexa:doc-gate`.
+- [x] **Verificado con caso real contra PG** (primitive compartido por los 3 consumers): admin→`Daniela Ferreira` ok (OTD 96.2 / RpA 1.13 / FTR 93.7, 2026-06, 5 meses tendencia); cliente→forbidden; nombre inexistente→not_found.
+- [~] **E2E conversacional LLM** (turno real de chat) NO ejecutado local (requiere dev server + LLM); el path de datos+autorización está verificado contra PG real. Recomendado smoke conversacional en staging post-deploy.
+
+**Rollout:** sin migración, sin flag nuevo, additive. El tool funciona en V1 y V2 del prompt (la regla v2.4.0 solo afina el ruteo cuando `NEXA_SYSTEM_PROMPT_V2_ENABLED` está ON). Los lanes MCP/app quedan vivos; el lane MCP solo expone datos si existe un consumer con binding `internal` (acción del operador, no requerida para el contrato). Deploy = decisión del operador (local-first, sin push).
+
+**Follow-up detectado (pre-existente, NO de esta task):** `computeHealth` en `get-person-ico-profile.ts` trata `rpaAvg` como score 0-100 (`>=70` verde) pero el RpA materializado es "rondas de corrección" (bajo=bueno), produciendo salud `red` con OTD 96% (caso Daniela). Es inconsistencia del reader canónico compartida por People endpoint + UI + esta tool (la reflejo fiel por parity). Corregir en el reader canónico (afecta los 3 consumers a la vez), no parchear suelto.
