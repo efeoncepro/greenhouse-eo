@@ -113,6 +113,23 @@ export const FINANCE_LLM_SUPPORTED_SIGNAL_TYPES = ['anomaly', 'prediction', 'roo
 export const FINANCE_LLM_ENRICHMENT_STATUSES = ['succeeded', 'failed', 'skipped'] as const
 export const FINANCE_LLM_RUN_STATUSES = ['succeeded', 'partial', 'failed'] as const
 
+// ─── Materialization (anomaly step) provenance — TASK-1201 ──────────────────
+//
+// Status honesto del paso de anomaly-materialization (NO del enrichment LLM).
+// Una ejecución que ve 0 señales NO es `succeeded`:
+//   - succeeded                → snapshots_evaluated > 0 y se escribieron señales
+//   - empty_positive           → snapshots_evaluated > 0 y 0 señales (salud, sin anomalías)
+//   - skipped_no_eligible_data → snapshots_evaluated = 0 (economics no listo; upstream TASK-1200)
+//   - failed                   → excepción durante la materialización
+export const FINANCE_MATERIALIZATION_RUN_STATUSES = [
+  'succeeded',
+  'empty_positive',
+  'skipped_no_eligible_data',
+  'failed'
+] as const
+
+export type FinanceMaterializationRunStatus = (typeof FINANCE_MATERIALIZATION_RUN_STATUSES)[number]
+
 export type FinanceLlmSupportedSignalType = (typeof FINANCE_LLM_SUPPORTED_SIGNAL_TYPES)[number]
 export type FinanceLlmEnrichmentStatus = (typeof FINANCE_LLM_ENRICHMENT_STATUSES)[number]
 export type FinanceLlmRunStatus = (typeof FINANCE_LLM_RUN_STATUSES)[number]
@@ -247,6 +264,10 @@ export const stableFinanceEnrichmentId = (signalId: string, promptHash: string) 
 
 export const stableFinanceRunId = (periodYear: number, periodMonth: number, promptHash: string) =>
   `EO-FAIR-${createHash('sha1').update(`${periodYear}-${periodMonth}|${promptHash}|${Date.now()}`).digest('hex').slice(0, 8)}`.toUpperCase()
+
+// TASK-1201 — id único por ejecución (append-only ledger de provenance del anomaly step).
+export const stableFinanceMaterializationRunId = (periodYear: number, periodMonth: number) =>
+  `EO-FMAT-${createHash('sha1').update(`${periodYear}-${periodMonth}|${Date.now()}`).digest('hex').slice(0, 8)}`.toUpperCase()
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 

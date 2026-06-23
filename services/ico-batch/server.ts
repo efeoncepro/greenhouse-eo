@@ -236,22 +236,38 @@ const handleFinanceLlmEnrich = async (req: IncomingMessage, res: ServerResponse)
       triggerType: 'cloud_run_batch'
     })
 
-    results.push({
-      period: `${periodYear}-${String(periodMonth).padStart(2, '0')}`,
-      runId: result.run.runId,
-      status: result.run.status,
-      signalsSeen: result.run.signalsSeen,
-      succeeded: result.succeeded,
-      failed: result.failed,
-      skipped: result.skipped,
-      promptVersion: result.run.promptVersion,
-      promptHash: result.run.promptHash,
-      latencyMs: result.run.latencyMs
-    })
+    // TASK-1201 — run-truth: el worker retorna run=null cuando no hubo señales
+    // (noop). No fabricar un run engañoso; reportar honestamente.
+    results.push(
+      result.run
+        ? {
+            period: `${periodYear}-${String(periodMonth).padStart(2, '0')}`,
+            runId: result.run.runId,
+            status: result.run.status,
+            signalsSeen: result.run.signalsSeen,
+            succeeded: result.succeeded,
+            failed: result.failed,
+            skipped: result.skipped,
+            promptVersion: result.run.promptVersion,
+            promptHash: result.run.promptHash,
+            latencyMs: result.run.latencyMs
+          }
+        : {
+            period: `${periodYear}-${String(periodMonth).padStart(2, '0')}`,
+            runId: null,
+            status: 'noop',
+            signalsSeen: 0,
+            succeeded: 0,
+            failed: 0,
+            skipped: 0
+          }
+    )
 
     console.log(
       `[ico-batch] finance-enrich done ${periodYear}-${String(periodMonth).padStart(2, '0')}: ` +
-        `${result.succeeded} ok / ${result.failed} failed / ${result.skipped} skipped`
+        (result.run
+          ? `${result.succeeded} ok / ${result.failed} failed / ${result.skipped} skipped`
+          : 'noop (0 señales que enriquecer)')
     )
   }
 

@@ -147,6 +147,7 @@ import {
   getSisterPlatformOAuthStaleClientConfigSignal
 } from './queries/sister-platform-oauth-signals'
 import { getIncomePaymentsClpDriftSignal } from './queries/income-payments-clp-drift'
+import { getFinanceAiSignalsStaleMaterializationSignal } from './queries/finance-ai-signals-stale-materialization'
 import { getPaymentOrdersDeadLetterSignal } from './queries/payment-orders-dead-letter'
 import { getPaidOrdersWithoutExpensePaymentSignal } from './queries/payment-orders-paid-without-expense-payment'
 import { getPayrollComplianceExportDriftSignal } from './queries/payroll-compliance-export-drift'
@@ -611,6 +612,9 @@ interface ReliabilityOverviewSources {
   hubspotCompaniesIntakeDeadLetter?: ReliabilitySignal | null
   workforceUnlinkedInternalUsers?: ReliabilitySignal | null
 
+  /** TASK-1201 — Finance AI anomaly-materialization staleness (heartbeat del SoT de signals). */
+  financeAiStaleMaterialization?: ReliabilitySignal | null
+
   /** TASK-725 — Finance VAT position drift (documentos con IVA sin asiento en períodos materializados). */
   vatPositionDrift?: ReliabilitySignal | null
 
@@ -1061,6 +1065,8 @@ export const buildReliabilityOverview = (
     ...(sources.financeClpDrift ?? []),
     // TASK-771 Slice 4 — Provider BQ sync dead-letter signal (drift PG↔BQ).
     ...(sources.providerBqSyncDeadLetter ?? []),
+    // TASK-1201 — Finance AI anomaly-materialization staleness (heartbeat SoT).
+    ...(sources.financeAiStaleMaterialization ? [sources.financeAiStaleMaterialization] : []),
     // TASK-725 — Finance VAT position drift (documentos con IVA sin asiento).
     ...(sources.vatPositionDrift ? [sources.vatPositionDrift] : []),
     // TASK-1185 — VAT FX/data-quality signals.
@@ -1465,6 +1471,13 @@ export const getReliabilityOverview = async (
     preloadedSources.vatPositionDrift !== undefined
       ? preloadedSources.vatPositionDrift
       : await getVatPositionDriftSignal().catch(() => null)
+
+  // TASK-1201 — Finance AI anomaly-materialization staleness heartbeat. Degrada
+  // honesto (severity='unknown') si su query falla; no envenena el overview.
+  const financeAiStaleMaterialization =
+    preloadedSources.financeAiStaleMaterialization !== undefined
+      ? preloadedSources.financeAiStaleMaterialization
+      : await getFinanceAiSignalsStaleMaterializationSignal().catch(() => null)
 
   // TASK-1185 — VAT FX/data-quality signals. Degradan honesto (severity='unknown')
   // si su query falla; no envenenan el overview.
@@ -2273,6 +2286,7 @@ export const getReliabilityOverview = async (
     payrollContractTaxonomy,
     financeClpDrift,
     providerBqSyncDeadLetter,
+    financeAiStaleMaterialization,
     vatPositionDrift,
     vatEntryUnresolvedFx,
     vatEligibleWithoutPeriod,
