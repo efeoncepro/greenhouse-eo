@@ -1189,6 +1189,14 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
     })
 
     addEntitlement(entries, {
+      module: 'platform',
+      capability: 'platform.public_site.comparison_table.author',
+      action: 'execute',
+      scope: 'all',
+      source: 'role'
+    })
+
+    addEntitlement(entries, {
       module: 'client_portal',
       capability: 'client_portal.catalog.manage',
       action: 'read',

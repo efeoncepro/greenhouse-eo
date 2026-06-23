@@ -1480,6 +1480,16 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     defaultScope: 'all'
   },
   {
+    // Public Site Comparison Table governed authoring (TASK-1225): validate a
+    // comparisonTable.v1 manifest and (propose→confirm→execute) author the
+    // greenhouse_comparison_table widget into a draft via the signed bridge.
+    // Internal-only; the actual write stays flag/secret-gated (default OFF).
+    key: 'platform.public_site.comparison_table.author',
+    module: 'platform',
+    actions: ['execute'] as const,
+    defaultScope: 'all'
+  },
+  {
     key: 'public_site.runtime_binding.read',
     module: 'public_site',
     actions: ['read'] as const,
