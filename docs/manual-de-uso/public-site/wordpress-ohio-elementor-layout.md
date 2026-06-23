@@ -3,7 +3,7 @@
 > **Tipo de documento:** Manual de uso / runbook
 > **Version:** 1.0
 > **Creado:** 2026-06-14 por Codex
-> **Ultima actualizacion:** 2026-06-14 por Codex
+> **Ultima actualizacion:** 2026-06-23 por Codex
 > **Modulo:** Public Site
 > **Sitio:** `https://efeoncepro.com`
 > **Pagina de referencia:** `/blog` (`page_id=18456`)
@@ -28,6 +28,34 @@ gtimeout 30s ssh -i /Users/jreye/.ssh/greenhouse_efeonce_kinsta_ed25519 \
 ```
 
 No pegues ni imprimas secretos en logs. La Application Password de WordPress debe vivir en Secret Manager o en el mecanismo seguro definido por Greenhouse; no debe quedar en comandos ni documentacion.
+
+## Guardrail antes de guardar documentos Elementor
+
+Si vas a usar `Document::save()` sobre una pagina Ohio publicada, no asumas que el cambio queda limitado al widget o seccion tocada. Primero protege las metas externas a Elementor.
+
+Checklist obligatorio para paginas con headline Ohio:
+
+```bash
+wp post meta get <PAGE_ID> _thumbnail_id
+wp post meta get <PAGE_ID> page_header_title_background_type
+```
+
+Si `page_header_title_background_type=featured`, el hero depende de `_thumbnail_id`. Despues del `Document::save()`, repite la lectura. Si `_thumbnail_id` cambio o quedo vacio sin que eso fuera parte del cambio, restaura la imagen destacada inmediatamente:
+
+```bash
+wp post meta update <PAGE_ID> _thumbnail_id <ATTACHMENT_ID>
+# o desde PHP/WP-CLI:
+set_post_thumbnail(<PAGE_ID>, <ATTACHMENT_ID>)
+```
+
+Luego verifica en navegador:
+
+```js
+getComputedStyle(document.querySelector('.page-headline .bg-image')).backgroundImage
+window.elementorFrontendConfig?.post?.featuredImage
+```
+
+Caso fuente: en `/agencia-creativa/` (`page_id=249582`), la imagen destacada estaba activa antes del cambio del widget `greenhouse_comparison_table`, pero un guardado Elementor dejo `_thumbnail_id` vacio. El valor correcto restaurado fue `attachment_id=249672` (`EO_Landing-GiroAgencia.webp`). El asset de OpenGraph `249740` era parecido, pero incorrecto para el hero porque trae logo/texto integrado.
 
 ## Diagnostico rapido
 
