@@ -1,3 +1,40 @@
+## Sesión 2026-06-23 — TASK-1225 write gobernado ACTIVADO + probado — Claude
+
+> **Estado:** write path ACTIVADO y verificado end-to-end (staging). greenhouse-eo pusheado a `develop` (`be4fa293c`); runtime repo bridge v0.5.0 desplegado a Kinsta (commit local `f5ce614`, sin push remoto).
+> - **WordPress (Kinsta):** bridge v0.5.0 scp + `wp greenhouse-bridge` writes_enabled=true + secreto canónico `public-website-wordpress-bridge-shared-secret-production`; `eo-vibe` activo.
+> - **Secret Manager:** grant secretAccessor a greenhouse-portal@ sobre bridge-shared-secret + app-password (Vercel runtime).
+> - **Vercel staging:** `PUBLIC_SITE_COMPARISON_TABLE_WRITES_ENABLED=true` + 2 `*_SECRET_REF` + username + base URL; push develop → deploy.
+> - **Smoke execute:** 2 corridas `200` → borrador real con widget+contenido (wp-cli verificado; drafts borrados). 2da corrida resolvió secretos vía Secret Manager refs (estilo-Vercel).
+> - **Fixes del smoke (`be4fa293c`):** command manda app-password Basic auth + HMAC; ruta firmada sin `/wp-json` (PHP firma sobre get_route()).
+> - **Pendiente prod:** Vercel Production env (flag + refs) + sign-off. Escritura draft-only; publish siempre humano. UI/botón = follow-up ui-ux.
+> - **Cleanup:** app-password de prueba minted revocado; drafts de smoke borrados.
+
+## Sesión 2026-06-23 — Public Site / Agencia Creativa comparison table copy polish — Codex
+
+> **Estado:** LIVE en `https://efeoncepro.com/agencia-creativa/`; copy de filas actualizado en el widget `greenhouse_comparison_table`; ribbon permanece `BEST OPTION` por decisión del operador.
+> - **Cambio UX writing:** se quitó Spanglish donde bajaba pulcritud (`checkpoints`, `emails`, `dashboard`, `vanity metrics`, `revenue`) y se acortaron frases de la columna Efeonce para mejorar escaneo: puntos de control, reglas claras de IA, marca como sistema vivo, tablero compartido y medición de impacto/aprendizaje.
+> - **Aplicación:** la instancia live no tenía `settings.rows` guardadas en Elementor, renderizaba defaults del plugin. Por eso se actualizó el default canónico del plugin `eo-elementor-widgets` en `class-eo-comparison-table-widget.php`; no fue necesario mutar `_elementor_data`.
+> - **Deploy:** backup live `eo-comparison-table-widget-before-copy-polish-20260623T191743Z.php`; upload por `scp`; OPcache reset OK; `wp kinsta cache purge --all` OK.
+> - **Evidencia:** Playwright confirmó textos nuevos y `ribbon="BEST OPTION"`; featured image sigue `EO_Landing-GiroAgencia-1024x410.webp`; captura `.captures/public-site-comparison-copy-20260623/table-after-copy.png`. Runtime commit `0a9e23b` (`copy(eo-elementor-widgets): polish comparison table rows`), sin push remoto.
+
+## Sesión 2026-06-23 — Public Site / Agencia Creativa client logos ratio fix — Codex
+
+> **Estado:** LIVE en `https://efeoncepro.com/agencia-creativa/`; logos de la franja "Marcas que confían en Globe" corregidos sin tocar Elementor data ni imagen destacada.
+> - **Causa raíz:** los widgets Ohio `ohio_clients_logo` del grid `a43cacf` tenían CSS generado por Elementor con `width` y `height` fijos por logo; algunos assets quedaban estirados/achatados porque el navegador los resolvía como `object-fit: fill`.
+> - **Cambio:** CSS page-scoped en runtime repo `/Users/jreye/Documents/efeonce-public-site-runtime`, archivo `wp-content/themes/ohio-child/assets/css/global-fixes.css`: para `body.page-id-249582 .elementor-element-a43cacf .ohio-widget.logo img` se fuerza `width:auto`, `height:auto`, `max-height:54px`, `max-width:min(100%,170px)`, `object-fit:contain`.
+> - **Deploy:** backup live `global-fixes-before-agencia-client-logo-ratio-20260623T190936Z.css`; archivo subido por `scp`; `wp kinsta cache purge --all` OK.
+> - **Evidencia:** Playwright midió ratios renderizados ≈ ratios naturales para GS/Chile/Bresler/SKY (`objectFit=contain`); captura `.captures/public-site-logo-strip-20260623/section-after.png`. Runtime commit `56ae819` (`fix(ohio-child): preserve agencia client logo ratios`), sin push remoto.
+
+## Sesión 2026-06-23 — Public Site / Agencia Creativa logo Efeonce en comparison table — Codex
+
+> **Estado:** LIVE en `https://efeoncepro.com/agencia-creativa/`; logo cambiado como configuración del widget Elementor `greenhouse_comparison_table` y tamaño ajustado en el CSS canónico del plugin, no hardcodeado en el DOM de la página.
+> - **Cambio:** la columna destacada dejó de usar el logo Globe y ahora usa el adjunto WordPress `249611` (`EfeonceLogoBlanco.svg`) con `alt="Efeonce"` y `col_b_title="Efeonce"`.
+> - **Tamaño:** `.gh-ct-logo` subió de `clamp(154px, 13.6cqw, 330px)`/`max-width:86%` a `clamp(180px, 16cqw, 380px)`/`max-width:92%`; en desktop verificado renderiza ~166×39px, sin overflow.
+> - **Aplicación:** mutación inicial por WP-CLI wrapper + Elementor `Document::save()` sobre `page_id=249582`; ajuste de tamaño subido por `scp` al plugin vivo; Kinsta cache purgado.
+> - **Backups live:** Elementor data `page-249582-before-efeonce-logo-20260623183303.json` y `page-249582-before-efeonce-logo-20260623183414.json`; CSS `eo-comparison-table-before-efeonce-logo-scale-20260623183831.css`.
+> - **Evidencia:** HTML público verificado devuelve `https://efeoncepro.com/wp-content/uploads/2026/03/EfeonceLogoBlanco.svg`; CSS público contiene el nuevo clamp; captura visual local `.captures/public-site-comparison-logo-scale-20260623/desktop-logo-scale.png`. Runtime repo `/Users/jreye/Documents/efeonce-public-site-runtime` commit `97157b0` (`fix(eo-elementor-widgets): scale comparison table brand logo`), sin push remoto.
+> - **Incidente corregido:** la imagen destacada SÍ estaba activa antes de esta ronda; durante la intervención del widget quedó `_thumbnail_id` vacío mientras Ohio usa `page_header_title_background_type="featured"`, por eso desapareció el hero. Se restauró primero el asset equivocado de OpenGraph (`249740`) y luego se corrigió al hero limpio correcto: attachment `249672` (`EO_Landing-GiroAgencia.webp`). Estado final verificado por WP-CLI: `_thumbnail_id="249672"` + background type `featured`. Backups: `page-249582-before-featured-image-restore-20260623184150.json` y `page-249582-before-featured-image-correction-20260623184404.json`; caché Kinsta purgado; evidencia definitiva `.captures/public-site-agencia-hero-correction-20260623/desktop-hero-corrected.png`.
+
 ## Sesión 2026-06-23 — TASK-1225 Comparison Table manifest governance (Slices 1-3 code-complete) — Claude
 
 > **Estado:** code complete (Slices 1-3), **rollout pendiente** (write path OFF). NO complete. greenhouse-eo en `develop` local (Slices 1-2 commiteados); runtime repo `main` local (Slice 3 commit `f5ce614`, sin push).

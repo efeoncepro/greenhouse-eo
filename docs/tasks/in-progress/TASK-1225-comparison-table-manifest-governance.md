@@ -1,8 +1,19 @@
 # TASK-1225 — Comparison Table manifest governance (agent-operable public-site widget)
 
-## Delta 2026-06-23 (Slices 1-3 CODE-COMPLETE · rollout pendiente · Slice 4 diferido)
+## Delta 2026-06-23b (WRITE PATH ACTIVADO + PROBADO end-to-end)
 
-Estado: **code complete (Slices 1-3), rollout pendiente** (write path OFF). NO `complete`.
+El operador pidió activar el write. **Hecho y verificado en vivo:**
+
+- **WordPress:** bridge `greenhouse-wp-bridge` v0.5.0 desplegado en Kinsta (scp) + `eo-vibe` activo; `wp greenhouse-bridge` → `writes_enabled=true` + secreto canónico `public-website-wordpress-bridge-shared-secret-production` configurado.
+- **Secret Manager:** grant `roles/secretmanager.secretAccessor` a `greenhouse-portal@` sobre el bridge shared secret + el app-password (Vercel runtime puede resolverlos por ref).
+- **Greenhouse (Vercel staging):** `PUBLIC_SITE_COMPARISON_TABLE_WRITES_ENABLED=true` + los 2 `*_SECRET_REF` + username + base URL agregados a env `staging`; push a `develop` → deploy.
+- **Bugs reales encontrados en el smoke (fixed, commit `be4fa293c`):** (1) el bridge exige **app-password Basic auth ADEMÁS del HMAC** → el command ahora manda ambos (resolución dual plano||ref); (2) la **ruta firmada no debe llevar `/wp-json`** (PHP firma sobre `$request->get_route()`) → se agrega `/wp-json` solo al fetch. Resolvió `ghwpb_signature_mismatch`.
+- **Smoke `execute` PROBADO:** dos corridas → `200 OK` → borrador real con el widget `greenhouse_comparison_table` + contenido del manifest (verificado por wp-cli, drafts de prueba borrados). La 2da corrida resolvió los secretos vía **Secret Manager refs (estilo-Vercel)**.
+- **Prod pendiente:** Vercel Production env (flag + refs) + sign-off (la escritura es draft-only; publish siempre humano).
+
+## Delta 2026-06-23 (Slices 1-3 CODE-COMPLETE · base previa)
+
+Estado base: code complete (Slices 1-3).
 
 - **Slice 1 ✅** `comparisonTable.v1` (Zod) + validador puro + 9 tests. `src/lib/public-site/comparison-table/manifest-schema.ts` + `validate-manifest.ts`. Espeja `theme_schema()` del widget (drift anchor `data-gh-schema`). Nota: se usó Zod (no el default "sin Zod" de la skill) por la spec + precedente vigente de contratos programáticos (`finance/pricing/simulate-input-schema.ts`, `commercial/submit-quote-from-builder-schema.ts`).
 - **Slice 2 ✅** command `authorComparisonTable` (`author-comparison-table.ts`): validate-before-write → request firmado al bridge; **dry_run default** (sin red, secret sintético), **execute gated** por `PUBLIC_SITE_COMPARISON_TABLE_WRITES_ENABLED` (default OFF) + secret. Capability `platform.public_site.comparison_table.author` + grant a `efeonce_admin` (coverage test verde). Endpoint `POST /api/admin/public-site/comparison-table` (requireAdminTenantContext + `can()` + formatter de error es-CL + `captureWithDomain('platform')`). 5 tests.
