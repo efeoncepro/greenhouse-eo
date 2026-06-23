@@ -122,14 +122,29 @@ No crear un widget custom si:
 
 ### Widgets candidatos para Efeonce
 
+> **✅ Piloto ENTREGADO (2026-06-23, TASK-1224): `Comparison Table` (`greenhouse_comparison_table`).** Primera primitiva custom canonica del sitio publico. Plugin propio `eo-elementor-widgets` (separado de `greenhouse-wp-bridge`), categoria `Greenhouse`, LIVE en `/agencia-creativa/`. Demuestra el contrato completo: render PHP de `<table>` semantica, theming por preset + override de color administrable desde Elementor con `theme_schema()` como SSOT (preparado para gobernanza por agente/manifest = TASK-1225), microinteracciones compositor-only detras de `prefers-reduced-motion`, reflow responsive sin segundo asset. Docs: funcional `comparison-table-widget.md`, manual `../../manual-de-uso/public-site/comparison-table-widget.md`, detalle operativo en la skill `efeonce-public-site-wordpress`.
+
 | Widget custom | Necesidad | Por que no basta siempre Ohio |
 | --- | --- | --- |
+| `Comparison Table` ✅ **entregado** | Tabla comparativa 2 columnas (versus) accesible, editable y reusable; preset + override de color + microinteracciones | Ohio `service_table` es pricing 1-producto; no cubre versus 2-col con ribbon, theming gobernable ni reflow sin segundo asset. |
 | `Greenhouse Hero` | Hero de landing con headline, subheadline, CTA, media/background, variante visual y tracking | Ohio page headline y Elementor hero no comparten contrato; los titulos largos ya generaron regresiones. |
 | `Partner Proof` | Badges tipo HubSpot Gold, logos, claims, metricas y evidencias | Hoy se arma con secciones/widgets sueltos y es sensible a spacing/hover. |
 | `Feature Grid` | Cards de beneficios con iconos, texto, layout boxed/full y variants | Ohio cubre partes, pero Greenhouse necesita manifest semantico y controles seguros. |
 | `HubSpot Form Block` | Embed/form con attribution, fallback, styling y estados | HubSpot/Leadin funciona, pero necesitamos contratos de tracking/UTM y preview. |
 | `CTA Band` | Pre-footer o CTA intermedio coherente con marca | Evita repetir combinaciones de secciones + botones con hover inconsistente. |
 | `Case Study Rail` | Casos/proyectos vinculados a CPT o datos Greenhouse | Ohio recent projects es util, pero puede requerir filtros/curadoria Greenhouse. |
+
+### Plugin contenedor multi-widget (como agregar otro widget)
+
+El plugin `eo-elementor-widgets` es el **hogar canonico de TODOS los widgets custom del sitio publico** — NO es de un solo widget. Para incorporar otro (Hero, Partner Proof, Feature Grid, CTA Band, etc.) NO se crea un plugin nuevo: se agrega al existente.
+
+Receta:
+
+1. Crear la clase en `includes/widgets/class-eo-<nombre>-widget.php` (extiende `\Elementor\Widget_Base`, `get_categories()` retorna `array( 'greenhouse' )`).
+2. Registrar una linea en el array `EO_Widgets_Loader::$widgets` (`'class-eo-<nombre>-widget.php' => 'EO_<Nombre>_Widget'`). El loader solo registra archivos que existen.
+3. Cada widget declara sus propios assets via `get_style_depends()` / `get_script_depends()` y los registra (Elementor los encola solo cuando el widget esta en la pagina). A medida que crezcan los widgets, generalizar `register_styles`/`register_scripts` a un handle por widget (hoy estan acoplados al `comparison-table`; refactor menor pendiente cuando entre el 2do widget).
+4. Si el widget es theme-able/administrable por agente, exponer su propio `theme_schema()` (mismo patron SSOT que `Comparison Table`) + markers `data-gh-schema`/`data-gh-plugin-version`, para que su gobernanza por manifest (familia TASK-1225) sea homogenea.
+5. La categoria `Greenhouse` ya esta registrada (compartida); no se duplica.
 
 ### Contrato tecnico minimo
 
@@ -257,16 +272,15 @@ Objetivo: inspeccionar el runtime real y preparar el contrato draft-only sin cam
 - Foundation v0.3.1 agrega fallback operacional por WP options (`autoload=no`) y comando `wp greenhouse-bridge ...` para provisionar sin editar `wp-config.php`.
 - No hay writes operativos, publish, cache clear, backups ni Abilities registration todavia. El HMAC/replay guard y las rutas draft-only existen en codigo, pero no deben ejecutarse en runtime real hasta completar secret, flag y least-privilege.
 
-### Etapa 2 — Widget custom PHP Elementor
+### Etapa 2 — Widget custom PHP Elementor ✅ COMPLETADA (TASK-1224, 2026-06-23)
 
 Objetivo: cubrir necesidades visuales reutilizables sin cambiar el modelo editorial.
 
-- Registrar categoria `Greenhouse`.
-- Implementar 1 widget piloto, idealmente `Partner Proof` o `HubSpot Form Block`.
-- Exponer controles equivalentes a los patrones Ohio existentes.
-- QA en draft/private.
-- Captura visual desktop/mobile.
-- Drift/deploy por repo runtime.
+- ✅ Registrar categoria `Greenhouse` (plugin `eo-elementor-widgets`).
+- ✅ Implementar 1 widget piloto: se entrego **`Comparison Table`** (`greenhouse_comparison_table`) en lugar de `Partner Proof` — surgio como necesidad real (la comparativa GLOBE vs Agencia era imagen). `Partner Proof` / `HubSpot Form Block` quedan como siguientes candidatos.
+- ✅ Exponer controles (contenido + repeater de filas + preset + override de color via `theme_schema()` SSOT).
+- ✅ QA visual desktop/mobile con Playwright (sitio publico) + a11y (`<table>`/scope/caption/aria).
+- ✅ Drift/deploy por repo runtime (`efeoncepro/efeonce-public-site-runtime`).
 
 ### Etapa 3 — Greenhouse manifest -> Elementor widget
 
