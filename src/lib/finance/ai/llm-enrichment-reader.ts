@@ -49,6 +49,24 @@ const mapTimelineItem = (row: RawRow): FinanceNexaTimelineItem => ({
 export const FINANCE_TIMELINE_DEFAULT_LIMIT = 20
 export const FINANCE_TIMELINE_MAX_LIMIT = 50
 
+// ─── Consumer gate (TASK-1201 Slice 4) ──────────────────────────────────────
+//
+// Gate canónico que TODO consumer (UI, Nexa drill/actions, Teams digest, API
+// platform) DEBE usar antes de afirmar un insight finance como confiable. Es el
+// punto único que materializa el "no inventar finance AI insights si no hay
+// signal durable" (anti-oracle) de la SoT.
+//
+// Condición (a) — status `ready` con al menos un insight materializado — se
+// evalúa acá. Condición (b) — cobertura de costo de TASK-1200 sana
+// (`finance.operational_pl.cost_coverage_degraded` en steady) — es responsabilidad
+// del consumer que ejecuta acciones de management, porque "ready" no garantiza que
+// el margen subyacente sea canónico. Nexa finance drill/actions quedan BLOQUEADOS
+// hasta que ambas condiciones se cumplan (gated; ver ADR).
+//
+// SoT: docs/architecture/GREENHOUSE_FINANCE_AI_SIGNAL_SOURCE_OF_TRUTH_DECISION_V1.md
+export const isFinanceAiInsightConsumable = (payload: FinanceNexaInsightsPayload): boolean =>
+  payload.dataStatus === 'ready' && payload.insights.length > 0
+
 /**
  * Read canonical timeline de Finance Nexa Insights.
  *

@@ -2801,6 +2801,38 @@ El page server component es responsable de:
 
 ---
 
+## Delta 2026-06-23 — TASK-1201: Finance AI signal source-of-truth + run-truth honesto
+
+ADR canónico: `GREENHOUSE_FINANCE_AI_SIGNAL_SOURCE_OF_TRUTH_DECISION_V1.md`.
+
+Cierra el hallazgo FD-7 del audit (`FINANCE_DEEP_OPERABILITY_AUDIT_2026-06-20.md`):
+69 enrichment runs `succeeded` con 0 `finance_ai_signals` / 0 `finance_ai_signal_enrichments`.
+
+- **SoT explícita:** señales/enrichments = snapshot por-período (replace-current-period,
+  idempotente, sin borrar períodos cerrados); provenance = ledger append-only
+  (`finance_ai_enrichment_runs` ya único por ejecución + **nueva**
+  `greenhouse_serving.finance_ai_materialization_runs`).
+- **Run-truth:** el anomaly materializer registra provenance honesta
+  (`succeeded` | `empty_positive` | `skipped_no_eligible_data` | `failed`); el LLM
+  worker ante `signalsSeen===0` retorna `run: null` (noop) en vez de un run `succeeded`
+  engañoso. Callers (cron + ico-batch) reportan `noop` honesto.
+- **Reader/status:** `resolveFinanceNexaInsightsDataStatus` lee `lastCronRun` de la
+  provenance del anomaly step (no del enrichment, que solo corre con señales) +
+  `snapshots_evaluated` distingue `empty-positive` (economics elegible, sin anomalías)
+  de `empty-pending` (economics no listo / upstream TASK-1200).
+- **Consumer gate (gated):** `isFinanceAiInsightConsumable(payload)` (en
+  `llm-enrichment-reader.ts`) = único punto que un consumer usa antes de afirmar un
+  insight finance. Nexa finance drill/actions quedan **BLOQUEADOS** hasta (a) `dataStatus==='ready'`
+  con insights, **y** (b) cobertura de costo TASK-1200 sana
+  (`finance.operational_pl.cost_coverage_degraded` en steady). No se construyó nada
+  Nexa-finance en esta task — solo el gate.
+- **Reliability:** signal `finance.ai.signals.stale_materialization` (kind=freshness,
+  moduleKey=finance, steady=ok) hace observable el síntoma "no-signal with eligible data".
+- **Diferido (follow-up vía ADR de cutover):** event-log append-only intra-período
+  (ICO TASK-943 parity, `*_current` VIEW).
+
+---
+
 ## Invariantes operativos para agentes — Finance ledger/bank/payments (TASK-700…765)
 
 > **Relocados de `CLAUDE.md` por TASK-1160 (2026-06-16), verbatim — cero cambio semántico.** Espejo operativo (NUNCA/SIEMPRE) que un agente carga al tocar este dominio; el contrato técnico vive en su spec. Dedup = TASK-1160 Slice 4.
