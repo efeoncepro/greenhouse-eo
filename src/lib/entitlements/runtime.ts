@@ -939,6 +939,24 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
     })
   }
 
+  // TASK-1200 — readiness de cobertura laboral del Operational P&L. Read-only.
+  // Superset de la audiencia de requireFinanceTenantContext (route_group=finance
+  // OR EFEONCE_ADMIN), + FINANCE_ADMIN/FINANCE_ANALYST explícitos.
+  if (
+    hasRouteGroup(subject, 'finance') ||
+    hasRole(subject, ROLE_CODES.FINANCE_ADMIN) ||
+    hasRole(subject, ROLE_CODES.FINANCE_ANALYST) ||
+    hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)
+  ) {
+    addEntitlement(entries, {
+      module: 'finance',
+      capability: 'finance.operational_pl.read_readiness',
+      action: 'read',
+      scope: 'tenant',
+      source: hasRouteGroup(subject, 'finance') ? 'route_group' : 'role'
+    })
+  }
+
   if (hasRole(subject, ROLE_CODES.FINANCE_ADMIN) || hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)) {
     const source: TenantEntitlementSource = 'role'
 

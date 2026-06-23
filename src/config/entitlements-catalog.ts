@@ -320,6 +320,14 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     defaultScope: 'tenant'
   },
   {
+    // TASK-1200 — readiness de cobertura laboral del Operational P&L
+    // (canonical/pending/unavailable/degraded). Read-only.
+    key: 'finance.operational_pl.read_readiness',
+    module: 'finance',
+    actions: ['read'] as const,
+    defaultScope: 'tenant'
+  },
+  {
     key: 'finance.payment_instruments.read',
     module: 'finance',
     actions: ['read'] as const,
