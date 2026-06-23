@@ -1,5 +1,15 @@
 # TASK-1201 — Finance AI Signal Source Of Truth
 
+## Delta 2026-06-23
+
+- TASK-1200 (complete) entregó el readiness gate de cobertura laboral
+  (`resolveLaborAllocationReadiness` + `finance.operational_pl.cost_coverage_degraded`
+  honesto) que el Slice 4 de esta task referencia como condición (b) del gate de
+  Nexa-finance. **El desbloqueo de Nexa-finance sigue diferido**: junio 2026 queda
+  `pending` hasta que corra su payroll (próxima semana); cuando flipee a `canonical`
+  + el `dataStatus` de Finance AI sea `ready`, recién ahí se puede habilitar el
+  consumer Nexa-finance (follow-up).
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"

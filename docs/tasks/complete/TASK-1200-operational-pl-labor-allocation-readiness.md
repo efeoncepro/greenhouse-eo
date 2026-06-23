@@ -6,9 +6,26 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+## Closure summary (2026-06-23)
+
+**Estado: complete (code + docs); verificado local. Junio se auto-sana cuando corra su payroll (próxima semana).**
+
+- **Slice 1 (root cause):** confirmado contra PG real — el costo 0 NO es bug del pipeline. `payroll_periods` solo tiene Feb–May 2026; junio no existe aún (payroll corre la próxima semana, confirmado por el operador). Costo 0 = ausencia de payroll upstream (pre-sistema Nov2025–Ene2026; open Jun2026).
+- **Slice 2:** `resolveLaborAllocationReadiness(year, month)` + `classifyLaborAllocationCoverage` (single source of truth) + `isLaborAllocationCoverageCanonical` (fail-closed). Estados `canonical | degraded | unavailable | pending`. SQL ejercitada contra PG real (gate TASK-893).
+- **Slice 2b:** signal `finance.operational_pl.cost_coverage_degraded` ahora honesto: `error` solo ante `degraded` (bug, hoy 0); pending/unavailable → `ok`. Deja de ser error permanente por calendario.
+- **Slice 2c:** readiness expuesto en `GET /api/finance/intelligence/operational-pl` (Full API parity).
+- **Slice 3:** SIN rematerialización (no hay payroll que materializar; no se inventa costo). Estado por período documentado.
+- **Slice 4:** arch Delta + audit FD-4 resolution + doc funcional.
+
+**Evidencia:** `pnpm test` 7757/0 · build OK · lint/tsc limpios · pg:doctor sano · task/ops:lint 0/0 · docs:closure-check 0 flags. Datos PG: Nov2025–Ene2026 unavailable, Feb/May2026 canonical, Jun2026 pending; 0 degraded.
+
+**Acceptance criteria:** root cause documentado con conteos ✓ · readiness previene margen canónico sin cobertura ✓ · junio explícitamente blocked-on-payroll (self-heal) con evidencia ✓ · signal posture matchea realidad (0 degraded → ok) ✓ · ningún consumer obtiene 0-cost margin silencioso (fail-closed reader) ✓.
+
+**Pendiente operador:** push → deploy. Cuando corra el payroll de junio, el readiness flipea a `canonical` sin intervención (verificar `/api/finance/intelligence/operational-pl?year=2026&month=6`). Históricos pre-sistema quedan `unavailable` permanente (sin backfill de payroll histórico, por decisión del operador).
+
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`

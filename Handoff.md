@@ -1,3 +1,16 @@
+## Sesión 2026-06-23 — TASK-1200 Operational P&L Labor Allocation Readiness — Claude
+
+> **Estado:** complete (code + docs); verificado local; deploy pendiente (local-first). Task movida a `complete/`.
+> - **Input decisivo del operador:** "Payroll de junio aún no se ejecuta hasta la semana que viene" → resuelve la Open Question: junio = pending por calendario, NO bug.
+> - **Root cause (PG real):** costo 0 = ausencia de payroll upstream, NO defecto del pipeline. `payroll_periods` solo tiene Feb–May 2026 (todos `exported`); junio no existe aún. `payroll_entries` solo 2026-02…05. Cuando hay payroll, el pipeline produce costo bien.
+> - **Deliverable:** `resolveLaborAllocationReadiness` + `classifyLaborAllocationCoverage` (SSOT) + `isLaborAllocationCoverageCanonical` (fail-closed). Estados canonical/degraded/unavailable/pending. SQL ejercitada contra PG real (gate TASK-893).
+> - **Signal honesto:** `finance.operational_pl.cost_coverage_degraded` ahora error SOLO ante `degraded` (bug; hoy 0); pending/unavailable → ok. Dejó de ser error permanente por calendario.
+> - **Readiness en API:** `GET /api/finance/intelligence/operational-pl` expone `readiness`.
+> - **Sin invención/rematerialización** (no hay payroll que materializar). Históricos pre-sistema = `unavailable` permanente (operador: sin backfill histórico). Junio = `pending` self-heal cuando corra payroll.
+> - **Gates:** test 7757/0 · build OK · lint/tsc limpios · pg:doctor sano · task/ops:lint 0/0 · docs:closure-check 0 flags.
+> - **Cross-impact:** desbloquea parcialmente la condición del gate Nexa-finance de TASK-1201 (el readiness existe), pero junio sigue pending hasta que corra su payroll → Nexa-finance sigue gated hasta entonces.
+> - **Pendiente operador:** push → deploy. Verificar que el readiness de junio flipea a `canonical` cuando corra su payroll (`?year=2026&month=6`).
+
 ## Sesión 2026-06-23 — TASK-1201 Finance AI Signal Source Of Truth — Claude
 
 > **Estado:** code complete + verificado local; deploy pendiente (local-first, sin push); enablement Nexa-finance diferido por diseño (gated) hasta TASK-1200. Task movida a `complete/`.
