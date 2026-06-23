@@ -16,6 +16,7 @@
 - **Slice 2c:** readiness expuesto en `GET /api/finance/intelligence/operational-pl` (Full API parity).
 - **Slice 3:** SIN rematerialización (no hay payroll que materializar; no se inventa costo). Estado por período documentado.
 - **Slice 4:** arch Delta + audit FD-4 resolution + doc funcional.
+- **Slice 5 (Full API parity):** capability gobernada `finance.operational_pl.read_readiness` — seed en `capabilities_registry` (migración + guard) + catálogo TS + grant en `runtime.ts` (route_group=finance + FINANCE_ADMIN/FINANCE_ANALYST/EFEONCE_ADMIN, superset sin regresión) + enforcement `can()` en el route. El reader queda detrás de una capability registrada, reutilizable por UI/Nexa/API con autorización fina.
 
 **Evidencia:** `pnpm test` 7757/0 · build OK · lint/tsc limpios · pg:doctor sano · task/ops:lint 0/0 · docs:closure-check 0 flags. Datos PG: Nov2025–Ene2026 unavailable, Feb/May2026 canonical, Jun2026 pending; 0 degraded.
 

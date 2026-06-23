@@ -196,7 +196,7 @@ Cierra FD-4 del audit (junio 2026 con revenue y costo 0). **Root cause confirmad
 | `unavailable` | período `< floor` del sistema de payroll (pre-sistema) | NO canónico (permanente) |
 | `pending` | `>= floor`, payroll aún no corrido/materializado | NO canónico (self-heal) |
 
-`isLaborAllocationCoverageCanonical(readiness)` es fail-closed (canónico solo si `status==='canonical'`). Expuesto en `GET /api/finance/intelligence/operational-pl` (campo `readiness`).
+`isLaborAllocationCoverageCanonical(readiness)` es fail-closed (canónico solo si `status==='canonical'`). Expuesto en `GET /api/finance/intelligence/operational-pl` (campo `readiness`) detrás de la **capability gobernada `finance.operational_pl.read_readiness`** (Full API parity: `capabilities_registry` + catálogo TS + grant en `runtime.ts` a route_group=finance + FINANCE_ADMIN/FINANCE_ANALYST/EFEONCE_ADMIN + enforcement `can()`).
 
 **Signal honesto:** `finance.operational_pl.cost_coverage_degraded` ahora clasifica la causa: `error` SOLO si hay `degraded` (bug); `pending`/`unavailable` → `ok` (ausencia esperada por calendario/pre-sistema). Deja de ser `error` permanente. El fail-closed de margen vive en el readiness reader, no en la severidad del signal.
 
