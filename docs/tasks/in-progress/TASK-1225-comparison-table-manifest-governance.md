@@ -11,6 +11,28 @@ El operador pidió activar el write. **Hecho y verificado en vivo:**
 - **Smoke `execute` PROBADO:** dos corridas → `200 OK` → borrador real con el widget `greenhouse_comparison_table` + contenido del manifest (verificado por wp-cli, drafts de prueba borrados). La 2da corrida resolvió los secretos vía **Secret Manager refs (estilo-Vercel)**.
 - **Prod pendiente:** Vercel Production env (flag + refs) + sign-off (la escritura es draft-only; publish siempre humano).
 
+## Pendientes para cierre (post-activación) — qué falta
+
+El write gobernado está **activado y probado en staging** (Greenhouse desplegado → borrador real en WordPress). Para mover la task a `complete` falta:
+
+1. **Producción Greenhouse (Vercel Production) — rollout.**
+   - `vercel env add` en target **Production**: `PUBLIC_SITE_COMPARISON_TABLE_WRITES_ENABLED=true`, `PUBLIC_WEBSITE_WORDPRESS_BRIDGE_SHARED_SECRET_SECRET_REF=public-website-wordpress-bridge-shared-secret-production:latest`, `PUBLIC_WEBSITE_WORDPRESS_APPLICATION_PASSWORD_SECRET_REF`, `PUBLIC_WEBSITE_WORDPRESS_USERNAME`, `PUBLIC_WEBSITE_WORDPRESS_BASE_URL`.
+   - Promover `develop→main` por el release control plane (el código del command/endpoint ya está en `develop`).
+   - Smoke `execute` contra prod runtime → borrador real → borrar. Bajo riesgo (draft-only; publish siempre humano).
+   - WordPress NO requiere cambios (es sitio único; `writes_enabled=true` + secreto ya viven en producción).
+
+2. **Runtime repo — push para preservar.**
+   - El bridge v0.5.0 (`POST /drafts/comparison-table` + `GHWPB_Comparison_Table_Manifest`) está **vivo en Kinsta vía scp** pero el commit `f5ce614` está **local sin push** en `efeoncepro/efeonce-public-site-runtime` (`main`). Pushear para canonizar (como TASK-1224).
+
+3. **Slice 4 (diferido) — follow-up.**
+   - Persistencia de versiones del manifest (tabla PG append-only) + diff + rollback (hoy el audit es vía `api_platform_command_executions`; no hay historial de manifests autorados).
+   - Exposición formal a **Nexa/MCP** (governed action propose→confirm con la capa de Nexa).
+   - **UI/botón** en el portal para editar/preview/disparar el manifest = task `ui-ux` separada (hoy se opera por API/command).
+
+4. **Verificación documental de cierre** una vez hecho (1): mover lifecycle a `complete`, sync README/registry, marcar acceptance criteria de versionado (Slice 4) como follow-up explícito.
+
+> Riesgo de seguridad residual: la escritura es **draft-only** y el `publish` es siempre humano; el flag prod sigue OFF hasta el paso (1) con sign-off.
+
 ## Delta 2026-06-23 (Slices 1-3 CODE-COMPLETE · base previa)
 
 Estado base: code complete (Slices 1-3).
