@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 import { listOperationalPlSnapshots } from '@/lib/cost-intelligence/compute-operational-pl'
+import { resolveLaborAllocationReadiness } from '@/lib/commercial-cost-attribution/labor-allocation-readiness'
 import {
   financeSchemaDriftResponse,
   isFinanceSchemaDriftError,
@@ -25,9 +26,15 @@ export async function GET(request: Request) {
   const scope = searchParams.get('scope') as 'client' | 'space' | 'organization' | undefined
 
   try {
-    const snapshots = await listOperationalPlSnapshots({ year, month, scopeType: scope || undefined })
+    // TASK-1200 — preflight de cobertura laboral: el margen es canónico SOLO si
+    // `readiness.status === 'canonical'`. Los consumers degradan honestamente
+    // (no tratan revenue/costo 0 como margen real) según este readiness.
+    const [snapshots, readiness] = await Promise.all([
+      listOperationalPlSnapshots({ year, month, scopeType: scope || undefined }),
+      resolveLaborAllocationReadiness(year, month)
+    ])
 
-    return NextResponse.json({ snapshots, year, month })
+    return NextResponse.json({ snapshots, year, month, readiness })
   } catch (error) {
     if (isFinanceSchemaDriftError(error)) {
       logFinanceSchemaDrift('operational pl', error)
