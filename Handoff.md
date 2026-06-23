@@ -1,3 +1,15 @@
+## Sesión 2026-06-23 — TASK-1201 Finance AI Signal Source Of Truth — Claude
+
+> **Estado:** code complete + verificado local; deploy pendiente (local-first, sin push); enablement Nexa-finance diferido por diseño (gated) hasta TASK-1200. Task movida a `complete/`.
+> - **Decisión (operador):** ante el blocker `TASK-1200` (P1, to-do), se aprobó hacer Slices 1–3 ahora + Slice 4 gated (esta task ES el gate de Nexa-finance, no su desbloqueo).
+> - **Realidad PG verificada:** 3 tablas finance_ai existen; 69 enrichment runs `succeeded` con 0 signals / 0 enrichments. Causa raíz doble: (a) worker marcaba `succeeded` con `signalsSeen=0`; (b) reader leía `lastCronRun` de enrichment_runs (que solo corre con señales) → mentía `empty-pending` en períodos sanos.
+> - **Slice 1:** ADR `GREENHOUSE_FINANCE_AI_SIGNAL_SOURCE_OF_TRUTH_DECISION_V1` + `DECISIONS_INDEX`. SoT = snapshot por-período + ledger provenance append-only; event-log intra-período (ICO TASK-943 parity) diferido a follow-up.
+> - **Slice 3:** migración additive `finance_ai_materialization_runs` (append-only, aplicada a dev Cloud SQL); materializer escribe provenance honesta; worker noop run-truth; callers (cron + ico-batch) actualizados; reliability signal `finance.ai.signals.stale_materialization`.
+> - **Slice 2:** reader/status lee provenance del anomaly step + `snapshots_evaluated` (distingue empty-positive vs empty-pending); SQL ejercitada contra PG real (gate TASK-893).
+> - **Slice 4 (gated):** guard `isFinanceAiInsightConsumable`; arch Delta + doc funcional + manual. Cross-impact: Delta en TASK-1077 (drill 404 sigue abierto; usar el guard como pre-gate).
+> - **Gates:** `pnpm test` 7746/0 · build OK · lint/tsc limpios · pg:doctor sano · docs:closure-check 0 warnings · migrate:status sin pendientes · finance:e2e-gate skip. QA auditor → CONDITIONAL PASS (code complete, deploy pendiente).
+> - **Pendiente operador:** push develop → deploy staging → correr cron `finance-ai-signals` → verificar provenance + `dataStatus`. Migración prod vía release control plane. Desbloqueo Nexa-finance = TASK-1200 + follow-up.
+
 ## Sesión 2026-06-23 — TASK-1225 write gobernado ACTIVADO + probado — Claude
 
 > **Estado:** write path ACTIVADO y verificado end-to-end (staging). greenhouse-eo pusheado a `develop` (`be4fa293c`); runtime repo bridge v0.5.0 desplegado a Kinsta (commit local `f5ce614`, sin push remoto).

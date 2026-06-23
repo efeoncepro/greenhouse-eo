@@ -6,9 +6,23 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+## Closure summary (2026-06-23)
+
+**Estado: code complete + verificado local; deploy pendiente (local-first, sin push); enablement Nexa-finance diferido por diseño (gated) hasta TASK-1200.**
+
+- **Slice 1** — ADR `GREENHOUSE_FINANCE_AI_SIGNAL_SOURCE_OF_TRUTH_DECISION_V1.md` + `DECISIONS_INDEX`. SoT = snapshot por-período + ledger provenance append-only; event-log intra-período diferido.
+- **Slice 3a** — migración additive `greenhouse_serving.finance_ai_materialization_runs` (append-only) aplicada a dev Cloud SQL; `db.d.ts` regenerado.
+- **Slice 3b** — run-truth honesto: materializer escribe provenance (`succeeded`/`empty_positive`/`skipped_no_eligible_data`/`failed`); worker `signalsSeen===0` → noop (run=null); callers actualizados; reliability signal `finance.ai.signals.stale_materialization`.
+- **Slice 2** — reader/status lee provenance del anomaly step + `snapshots_evaluated` (distingue empty-positive de empty-pending); SQL ejercitada contra PG real (gate TASK-893).
+- **Slice 4 (gated)** — guard `isFinanceAiInsightConsumable`; arch Delta + doc funcional + manual. Nexa-finance NO construido (esta task es el gate).
+
+**Evidencia:** `pnpm test` 7746/0 · `pnpm build` OK · `pnpm lint`/`tsc` limpios · `pg:doctor` sano · `docs:closure-check` 0 warnings · `migrate:status` sin pendientes · `finance:e2e-gate` skip (sin write handlers). Realidad PG: 3 tablas existen, materialization_runs creada (0 rows).
+
+**Rollout pendiente (operador):** push a develop → deploy staging → correr cron `finance-ai-signals` → verificar provenance + `dataStatus`. Migración a producción vía release control plane. **Desbloqueo Nexa-finance = TASK-1200 + follow-up.**
+
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`

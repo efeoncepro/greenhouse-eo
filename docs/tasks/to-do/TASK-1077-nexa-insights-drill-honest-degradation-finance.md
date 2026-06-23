@@ -1,5 +1,9 @@
 # TASK-1077 — Nexa Insights drill: degradación honesta cuando el id no resuelve (Finance 404)
 
+## Delta 2026-06-23
+
+- TASK-1201 (complete) tocó los archivos que esta task referencia (`src/lib/finance/ai/llm-enrichment-reader.ts`, `finance-signal-types.ts`) de forma **no-breaking**: agregó el guard `isFinanceAiInsightConsumable(payload)` (gate único: `dataStatus==='ready'` + insights) y reescribió `resolveFinanceNexaInsightsDataStatus` para distinguir honestamente `empty-positive`/`empty-pending`/`degraded`. **No** modificó `mapInsightItem` ni el esquema `EO-FSIG-*`/`EO-FAIE-*`, así que el gap de drill 404 de esta task **sigue abierto**. Complemento útil: cuando el status no es `ready` el block ya no debería renderizar insights → menos superficie de CTA-a-404. Considerar `isFinanceAiInsightConsumable` como pre-gate del render del drill.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
