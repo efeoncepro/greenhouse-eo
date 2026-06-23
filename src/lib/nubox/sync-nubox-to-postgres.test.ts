@@ -22,6 +22,17 @@ vi.mock('@/lib/finance/multi-currency/fx-snapshot-store', () => ({
   persistFxSnapshot: vi.fn().mockResolvedValue('fxs-test-mxn')
 }))
 
+// TASK-1210 — el reporting USD plane resuelve la tasa CLP→USD; mockeamos solo eso
+// (preservamos observedFxSnapshotEvidence real para el plano native MXN→CLP).
+vi.mock('@/lib/finance/multi-currency/fx-snapshot', async importActual => {
+  const actual = (await importActual()) as Record<string, unknown>
+
+  return {
+    ...actual,
+    resolveFxSnapshotEvidence: vi.fn().mockResolvedValue({ evidence: { rate: '0.00112' } })
+  }
+})
+
 import {
   isNuboxPurchaseAnnulled,
   resolveNuboxPurchaseProjectionAmounts,
@@ -189,6 +200,9 @@ describe('upsertIncomeFromSale — native plane backfill on existing CLP row (TA
     expect(updateSql).toContain('native_currency = COALESCE(greenhouse_finance.income.native_currency')
     expect(updateParams).toContain(89960) // nativeAmount
     expect(updateParams).toContain('MXN')
+    // TASK-1210 — el reporting USD plane también se backfillea (functional CLP × CLP→USD).
+    expect(updateSql).toContain('amount_usd = COALESCE(greenhouse_finance.income.amount_usd')
+    expect(updateParams).toContain(Math.round(4617647 * 0.00112 * 100) / 100) // amountUsd
 
     delete process.env.FINANCE_CORE_MXN_ENABLED
   })
