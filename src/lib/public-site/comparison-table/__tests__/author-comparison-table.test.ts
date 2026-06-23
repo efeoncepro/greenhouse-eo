@@ -24,7 +24,10 @@ const validManifest = {
 
 describe('authorComparisonTable', () => {
   beforeEach(() => {
+    // Isolate from any ambient .env (the command reads these directly).
     delete process.env.PUBLIC_SITE_COMPARISON_TABLE_WRITES_ENABLED
+    delete process.env.PUBLIC_WEBSITE_WORDPRESS_BRIDGE_SHARED_SECRET
+    delete process.env.PUBLIC_WEBSITE_WORDPRESS_APPLICATION_PASSWORD
   })
 
   it('dry_run builds a signed plan without writing (redacted signature, no network)', async () => {

@@ -30,13 +30,17 @@ import {
  *   execute. Default mode is `dry_run` (no network, synthetic secret).
  */
 
-const BRIDGE_BASE_PATH = '/wp-json/greenhouse-wp-bridge/v1'
+// Signed route = the WordPress REST route WITHOUT the /wp-json prefix, because
+// the bridge verifies the signature over `$request->get_route()` (no /wp-json).
+// The /wp-json prefix is added only to the fetch URL.
+const BRIDGE_BASE_PATH = '/greenhouse-wp-bridge/v1'
 
 export const COMPARISON_TABLE_BRIDGE_ROUTE = `${BRIDGE_BASE_PATH}/drafts/comparison-table`
 export const COMPARISON_TABLE_BRIDGE_CONTRACT_VERSION =
   'greenhouse-wp-bridge-comparison-table.v1' as const
 
 const SYNTHETIC_DRY_RUN_SECRET = 'comparison-table-author-dry-run-secret'
+const SHARED_SECRET_ENV = 'PUBLIC_WEBSITE_WORDPRESS_BRIDGE_SHARED_SECRET'
 const SHARED_SECRET_ENV_REF = 'PUBLIC_WEBSITE_WORDPRESS_BRIDGE_SHARED_SECRET_SECRET_REF'
 const WRITES_FLAG_ENV = 'PUBLIC_SITE_COMPARISON_TABLE_WRITES_ENABLED'
 const DEFAULT_BASE_URL = 'https://efeoncepro.com'
@@ -81,6 +85,7 @@ export const COMPARISON_TABLE_AUTHOR_ERROR_CODES = [
   'comparison_table_manifest_invalid',
   'comparison_table_writes_disabled',
   'comparison_table_shared_secret_missing',
+  'comparison_table_wp_auth_missing',
   'comparison_table_bridge_failed',
 ] as const
 
@@ -210,7 +215,11 @@ export async function authorComparisonTable(
     )
   }
 
-  const secret = await resolveSecretByRef(process.env[SHARED_SECRET_ENV_REF] ?? '')
+  // Dual resolution (canonical): a plain env value wins, else the Secret
+  // Manager ref. Plain env keeps local/public-site-style config working without
+  // requiring Secret Manager + ADC; the ref path supports Vercel runtime.
+  const directSecret = process.env[SHARED_SECRET_ENV]?.trim()
+  const secret = directSecret || (await resolveSecretByRef(process.env[SHARED_SECRET_ENV_REF] ?? ''))
 
   if (!secret) {
     throw new ComparisonTableAuthorError(
@@ -219,6 +228,25 @@ export async function authorComparisonTable(
       { statusCode: 503 }
     )
   }
+
+  // The bridge requires BOTH a logged-in WordPress identity (application
+  // password Basic auth) AND the HMAC signature. Resolve the app password
+  // dual-style (plain env wins, else Secret Manager ref).
+  const wpUsername = process.env.PUBLIC_WEBSITE_WORDPRESS_USERNAME?.trim()
+
+  const wpAppPassword =
+    process.env.PUBLIC_WEBSITE_WORDPRESS_APPLICATION_PASSWORD?.trim() ||
+    (await resolveSecretByRef(process.env.PUBLIC_WEBSITE_WORDPRESS_APPLICATION_PASSWORD_SECRET_REF ?? ''))
+
+  if (!wpUsername || !wpAppPassword) {
+    throw new ComparisonTableAuthorError(
+      'comparison_table_wp_auth_missing',
+      'No se pudo resolver la identidad de WordPress (usuario + application password) del bridge.',
+      { statusCode: 503 }
+    )
+  }
+
+  const authorization = `Basic ${Buffer.from(`${wpUsername}:${wpAppPassword}`).toString('base64')}`
 
   const signed = signPublicSiteBridgeRequest({
     method: 'POST',
@@ -237,9 +265,9 @@ export async function authorComparisonTable(
   let response: Response
 
   try {
-    response = await fetch(`${baseUrl}${COMPARISON_TABLE_BRIDGE_ROUTE}`, {
+    response = await fetch(`${baseUrl}/wp-json${COMPARISON_TABLE_BRIDGE_ROUTE}`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', ...signed.headers },
+      headers: { 'Content-Type': 'application/json', Authorization: authorization, ...signed.headers },
       body: bodyJson,
     })
   } catch {
