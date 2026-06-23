@@ -55,6 +55,8 @@ _(Agregá acá cualquier flag que dejes code-complete sin prender. Si está vac�
 
 ---
 
+| `PUBLIC_SITE_COMPARISON_TABLE_WRITES_ENABLED` | TASK-1225 | OFF/default en todos los environments (verdad live: `vercel env ls`) · **code-complete + gated** | (1) provisionar el shared secret del bridge (`PUBLIC_WEBSITE_WORDPRESS_BRIDGE_SHARED_SECRET_SECRET_REF`) + `GREENHOUSE_WP_BRIDGE_WRITES_ENABLED=1` en WordPress/Kinsta (`wp greenhouse-bridge`); (2) `PUBLIC_SITE_COMPARISON_TABLE_WRITES_ENABLED=true` en staging → smoke firmado del command `authorComparisonTable` mode=execute contra un draft + verificar render (GVC); (3) prod tras sign-off del operador. | Write gobernado del widget `greenhouse_comparison_table` (TASK-1225). Default OFF → el command corre solo `dry_run` (propose, sin red); `execute` lanza `comparison_table_writes_disabled` (409). El LLM nunca muta directo. |
+
 ## § Snapshot de estado por environment
 
 > Snapshot **2026-06-18** vía `vercel env ls`. Un flag **ausente** de una columna = NO seteado = OFF/default en ese environment. **Verdad live: `vercel env ls`.**
@@ -73,6 +75,7 @@ _(Agregá acá cualquier flag que dejes code-complete sin prender. Si está vac�
 | `NEXA_QUOTE_AUTHOR_ACTION_ENABLED` | — | — | — | TASK-1212 |
 | `COMMERCIAL_Q2C_CANONICAL_CLOSE_ENABLED` | — | ✅ (2026-06-22, smoke HTTP PASS) | — | TASK-1206 |
 | `COMMERCIAL_Q2C_CONTRACT_ONLY_ENABLED` | — | — | — | TASK-1206 |
+| `PUBLIC_SITE_COMPARISON_TABLE_WRITES_ENABLED` | — | — | — | TASK-1225 |
 | `NEXT_PUBLIC_NEXA_FLOATING_EXPANDABLE_ENABLED` | ✅ | ✅ | ✅ | TASK-1078 |
 | `KNOWLEDGE_SEARCH_HYBRID_ENABLED` | — | ✅ | — | TASK-1151 |
 | `KNOWLEDGE_SEARCH_RERANK_ENABLED` | — | ✅ | — | TASK-1140 |

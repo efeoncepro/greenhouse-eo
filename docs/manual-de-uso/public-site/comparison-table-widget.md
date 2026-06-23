@@ -67,3 +67,15 @@ Editar la tabla comparativa de 2 columnas del sitio publico (hoy "GLOBE vs Agenc
 - Skill operativa: `efeonce-public-site-wordpress` (seccion "Custom Elementor widget").
 - Estrategia de widgets custom: `docs/documentation/public-site/wordpress-custom-widgets-react-strategy.md`.
 - Gobernanza por agentes (manifest): TASK-1225 (pendiente).
+
+## Runbook — habilitar la autoría gobernada (avanzado, requiere sign-off)
+
+Hoy el widget se edita desde Elementor (arriba). La **autoría por agente/Greenhouse** (TASK-1225) viene apagada por seguridad. Para habilitarla (solo con aprobacion explicita del operador):
+
+1. En WordPress/Kinsta: provisionar el shared secret del bridge y habilitar writes —
+   `printf %s "$SECRET" | wp greenhouse-bridge secret set --stdin` y `wp greenhouse-bridge config --writes-enabled=1`.
+2. En Greenhouse (Vercel): `PUBLIC_SITE_COMPARISON_TABLE_WRITES_ENABLED=true` (staging primero) + redeploy.
+3. Smoke: ejecutar el command en modo `execute` contra un **draft** de prueba y verificar el render (captura).
+4. Recien tras sign-off, repetir en produccion. **Publicar siempre es un paso humano.**
+
+Mientras esto no se haga, el command solo responde en modo "propose" (no escribe). Es el estado seguro por defecto.

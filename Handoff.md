@@ -1,3 +1,13 @@
+## Sesión 2026-06-23 — TASK-1225 Comparison Table manifest governance (Slices 1-3 code-complete) — Claude
+
+> **Estado:** code complete (Slices 1-3), **rollout pendiente** (write path OFF). NO complete. greenhouse-eo en `develop` local (Slices 1-2 commiteados); runtime repo `main` local (Slice 3 commit `f5ce614`, sin push).
+> - **greenhouse-eo:** `comparisonTable.v1` Zod (`src/lib/public-site/comparison-table/`) + command `authorComparisonTable` (dry_run default, execute gated por flag OFF + secret) + endpoint `POST /api/admin/public-site/comparison-table` (can() + capability `platform.public_site.comparison_table.author` → efeonce_admin). 14 tests + coverage verde.
+> - **runtime repo:** `greenhouse-wp-bridge` v0.5.0 `POST /drafts/comparison-table` + `GHWPB_Comparison_Table_Manifest` (validador + node builder semántico→c_*) → draft vía eo-vibe `Document::save()`. write-gate OFF.
+> - **Gates:** `pnpm test` 7730/0 · `pnpm build` OK · lint+tsc verdes · flags:audit 0 sin registrar (flag en ledger §Pendientes).
+> - **Rollout pendiente (out-of-band + sign-off):** shared secret + `GREENHOUSE_WP_BRIDGE_WRITES_ENABLED` en Kinsta + `PUBLIC_SITE_COMPARISON_TABLE_WRITES_ENABLED` + smoke firmado `execute` + GVC.
+> - **Slice 4 diferido:** persistencia/versión/diff/rollback (tabla PG) + exposición Nexa/MCP.
+> - **Decisión:** se usó Zod (vs el default "sin Zod" de greenhouse-backend) por la spec + precedente de contratos programáticos (finance/pricing, commercial).
+
 ## Sesión 2026-06-23 — TASK-1224 Comparison Table widget CANONIZADO ✅ — Claude
 
 > **Estado:** COMPLETE con sign-off visual explícito del operador ("Quedó brutal, me encantó, canonicemos"). Widget LIVE en `https://efeoncepro.com/agencia-creativa/`. Cambios versionados en `/Users/jreye/Documents/efeonce-public-site-runtime` (`main`), **sin push remoto**.
@@ -33196,3 +33206,5 @@ Spacing refinement (same widget, 2026-06-23): runtime commit `79c4d66` increases
 Right-padding correction (same widget, 2026-06-23): runtime commit `88a5517` restores right padding for the Globe column with a selector specific enough to beat Ohio's global `table:not(.-unstyle) td:last-child { padding-right: 0 }`. Live CSS backup: `eo-comparison-table-before-ohio-last-child-padding-20260623164956.css`. Evidence: `.captures/public-site-comparison-spacing-20260623/desktop-ohio-padding-fix.png`; computed Globe `paddingRight=41.54px`, text right inset 42px, desktop `docOverflow=0`.
 
 Rhythm polish (same widget, 2026-06-23): runtime commit `1af0789` slightly compacts desktop rows (`--gh-ct-pad-y: clamp(14px, 1.04cqw, 29px)`), reduces Globe body copy weight/scale via `font-size: clamp(0.94rem, 1.42cqw, 1.58rem)` + `line-height: 1.45`, aligns Globe check icons to the first text line (`top: calc(var(--gh-ct-pad-y) + 0.78em)`), and makes the header-owned ribbon ~8% larger without detaching it from the Globe cell corner. Live CSS backup: `eo-comparison-table-before-polish-20260623171856.css`. Evidence: `.captures/public-site-comparison-polish-20260623/desktop-polish.png` and `mobile-polish.png`; measured check center vs first line ≈1px, table height 663px, desktop `docOverflow=0`, mobile ribbon hidden.
+
+Dimension divider refinement (same widget, 2026-06-23): runtime commit `31617f0` hides the first header label visually (`Dimensión` remains in a 1x1 visually-hidden span for accessibility) and adds a subtle body-only vertical divider between the dimension column and agency column using the existing divider token. Live backups: `eo-comparison-table-before-dimension-divider-20260623182357.css` / `.php`. Evidence: `.captures/public-site-comparison-divider-20260623/desktop-divider.png` and `mobile-divider.png`; desktop computed agency divider `1px solid rgba(255,255,255,0.086)`, mobile divider reset to `0`, desktop `docOverflow=0`.

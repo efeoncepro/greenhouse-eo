@@ -53,3 +53,16 @@ El widget tiene movimiento sutil, siempre elegante y respetando la preferencia d
 Es una **primitiva**: la misma tabla sirve para otras comparativas futuras (planes, nosotros-vs-competencia, antes/despues), solo cambiando el contenido y, si se quiere, los colores.
 
 > Detalle tecnico: plugin `eo-elementor-widgets` (widget `greenhouse_comparison_table`) en el repo `efeoncepro/efeonce-public-site-runtime`. Contrato, tokens, ribbon, microinteracciones y schema de theming en la skill `efeonce-public-site-wordpress` (seccion "Custom Elementor widget"). Gobernanza por manifest = TASK-1225.
+
+## Gobernanza por manifest — operable por agentes (TASK-1225)
+
+Ademas de editarse desde Elementor, el widget tiene un **contrato programatico gobernado** para que Greenhouse (y a futuro Nexa/MCP) pueda autorarlo sin tocar el builder a mano:
+
+- **Contrato `comparisonTable.v1`** (`src/lib/public-site/comparison-table/manifest-schema.ts`): schema Zod que define columnas + filas + tema; espeja 1:1 el `theme_schema()` del widget.
+- **Command `authorComparisonTable`** (`author-comparison-table.ts`): valida el manifest ANTES de escribir y arma un request firmado (HMAC) al bridge de WordPress. Por defecto corre en modo **`dry_run`** (propose, sin red); el modo **`execute`** (escribir de verdad) esta **apagado por defecto** y detras de flag + secret.
+- **Endpoint** `POST /api/admin/public-site/comparison-table` (interno, capability `platform.public_site.comparison_table.author`).
+- **Bridge** (`greenhouse-wp-bridge`): recibe el manifest validado y autora un **draft** Elementor (nunca publica, nunca toca la pagina live).
+
+Loop gobernado: **proponer → confirmar (humano) → ejecutar**. El LLM nunca escribe directo. El write real esta **pendiente de rollout** (provisionar secret + flag + sign-off).
+
+> Detalle tecnico: TASK-1225 (`docs/tasks/in-progress/`). Estado actual: code-complete (Slices 1-3), rollout pendiente; versionado/diff y exposicion Nexa = follow-up (Slice 4).
