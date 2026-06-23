@@ -8286,6 +8286,26 @@ export interface GreenhouseServingFinanceAiEnrichmentRuns {
   trigger_type: string;
 }
 
+export interface GreenhouseServingFinanceAiMaterializationRuns {
+  client_id: string | null;
+  completed_at: Timestamp | null;
+  duration_ms: number | null;
+  error_message: string | null;
+  materialization_run_id: string;
+  model_version: string;
+  organization_id: string | null;
+  period_month: number;
+  period_year: number;
+  signals_written: Generated<number>;
+  snapshots_evaluated: Generated<number>;
+  source: Generated<string>;
+  started_at: Timestamp;
+  status: string;
+  synced_at: Generated<Timestamp>;
+  trigger_event_id: string | null;
+  trigger_type: string;
+}
+
 export interface GreenhouseServingFinanceAiSignalEnrichments {
   client_id: string | null;
   confidence: Numeric | null;
@@ -10644,6 +10664,7 @@ export interface DB {
   "greenhouse_serving.contract_profitability_snapshots": GreenhouseServingContractProfitabilitySnapshots;
   "greenhouse_serving.deal_pipeline_snapshots": GreenhouseServingDealPipelineSnapshots;
   "greenhouse_serving.finance_ai_enrichment_runs": GreenhouseServingFinanceAiEnrichmentRuns;
+  "greenhouse_serving.finance_ai_materialization_runs": GreenhouseServingFinanceAiMaterializationRuns;
   "greenhouse_serving.finance_ai_signal_enrichments": GreenhouseServingFinanceAiSignalEnrichments;
   "greenhouse_serving.finance_ai_signals": GreenhouseServingFinanceAiSignals;
   "greenhouse_serving.gtm_investment_pnl": GreenhouseServingGtmInvestmentPnl;
