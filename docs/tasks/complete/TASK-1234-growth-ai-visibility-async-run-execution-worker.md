@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -237,28 +237,25 @@ Decisión central de Discovery: **¿ops-worker existente o worker dedicado?** y 
      ZONE 4 — VERIFICATION & CLOSING
      ═══════════════════════════════════════════════════════════ -->
 
-## Estado 2026-06-24 — `code complete, rollout pendiente`
+## Estado 2026-06-24 — `complete` (staging operativo; prod fuera de scope)
 
-Las 3 slices están implementadas, testeadas (full suite 7855 verde + build prod OK) y la
-SQL ejercitada contra PG real. **NO está operativamente completa**: falta el rollout
-out-of-band (deploy del ops-worker a staging + flip de flags + smoke real `full`). Por eso
-el lifecycle sigue `in-progress`.
+Las 3 slices están implementadas, testeadas (full suite 7855 verde + build prod OK), la SQL
+ejercitada contra PG real, y **el rollout en staging está aplicado y verificado end-to-end**.
+Prod queda explícitamente fuera de scope (release control plane posterior).
 
-Pendiente de rollout (operador):
-1. `ENV=staging bash services/ops-worker/deploy.sh` → crea Cloud Scheduler `ops-growth-grader-drain`, monta flags (OFF) + `OPENAI/ANTHROPIC_API_KEY_SECRET_REF`, sube `TIMEOUT` del worker a 3600s.
-2. `vercel env add GROWTH_AI_VISIBILITY_ASYNC_EXECUTION_ENABLED=true` (Preview/develop) + provider flags + redeploy.
-3. Smoke real: encolar un run `full` (Gemini 3) → verificar ejecución async sin timeout + observations incrementales + signals en steady.
-
-Nota: la migración `execution_prompts` ya está aplicada en `greenhouse-pg-dev` (cubre dev+staging). Recovery confirmado: hay 1 run huérfano real en `running` (timeout inline TASK-1233) que el drain/recovery finalizará.
+Rollout aplicado (2026-06-24):
+1. **Worker deployed** vía CI `ops-worker-deploy.yml` (push develop): Cloud Scheduler `ops-growth-grader-drain` ENABLED (*/5), flags staging ON (GRADER+OpenAI+Anthropic+Gemini) / prod OFF (ENV-branch + gate `isGraderEnabled()` prod-safe), `OPENAI/ANTHROPIC_API_KEY_SECRET_REF`, `TIMEOUT=3600s`. Verificado live.
+2. **Vercel:** `GROWTH_AI_VISIBILITY_ASYNC_EXECUTION_ENABLED=true` en el environment `staging` + redeploy.
+3. **Smoke real (acceptance):** run `full` multi-provider EO-GRUN-00011 encolado (HTTP **202**) → worker lo ejecutó async en **~12 min** (18:24→18:36:41, muy por encima del timeout de la función Vercel que mató el path inline en TASK-1233) → `partial` con 48 observations (openai 12/12, anthropic 9 ok + 3 fail, **gemini 11 ok + 1 fail (Gemini 3 real)**, perplexity 12 skipped por flag OFF). Observations crecieron **incrementalmente durante `running`** (23→27→31→33→39→47→48 vía poll). Recovery confirmado: el huérfano real EO-GRUN-00006 (timeout inline 1233) finalizado a `failed`. Signals en steady: `run_execution_lag=0`, `run_stuck_running=0`.
 
 ## Acceptance Criteria
 
-- [ ] Un run `full` multi-provider (OpenAI+Anthropic+Gemini 3) completa async sin timeout de función. _(rollout pendiente: requiere deploy worker + smoke)_
-- [x] Las observations se persisten incrementalmente (un fallo mid-run conserva las ya producidas). _(test `persiste cada observación INCREMENTALMENTE` + insert 1×1)_
+- [x] Un run `full` multi-provider (OpenAI+Anthropic+Gemini 3) completa async sin timeout de función. _(EO-GRUN-00011 en staging: ~12 min, `partial`, 48 obs — sin timeout)_
+- [x] Las observations se persisten incrementalmente (un fallo mid-run conserva las ya producidas). _(test 1×1 + smoke real: obs 23→48 visibles durante `running`)_
 - [x] Existe claim/lock que impide doble ejecución concurrente del mismo run. _(`claimPendingGraderRuns` FOR UPDATE SKIP LOCKED; SQL ejercitada en PG real)_
-- [x] Recovery idempotente de runs huérfanos en `running`. _(`recoverStuckRunningRuns` + tests; 1 huérfano real detectado en dev)_
-- [x] Endpoint admin enqueue+poll; el GET detail existente sigue funcionando. _(flag cutover + build prod OK; GET shape intacto)_
-- [x] Signals de ejecución async (lag/stuck) implementados + en steady con DB vacía. _(2 signals en `getGrowthAiVisibilitySignals`; SQL ejercitada)_
+- [x] Recovery idempotente de runs huérfanos en `running`. _(`recoverStuckRunningRuns`; EO-GRUN-00006 finalizado a `failed` en staging)_
+- [x] Endpoint admin enqueue+poll; el GET detail existente sigue funcionando. _(HTTP 202 + runId; GET detail polea progreso)_
+- [x] Signals de ejecución async (lag/stuck) implementados + en steady. _(`run_execution_lag=0`, `run_stuck_running=0` verificados en PG staging)_
 - [x] Sin import `@core` worker-bundled; `pnpm worker:runtime-deps-gate` verde.
 
 ## Verification

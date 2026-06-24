@@ -113,7 +113,7 @@ _(Agregá acá cualquier flag que dejes code-complete sin prender. Si está vac�
 | `GROWTH_AI_VISIBILITY_PERPLEXITY_ENABLED` | — | — | — | TASK-1226 |
 | `GROWTH_AI_VISIBILITY_GEMINI_ENABLED` | — | ✅ (2026-06-24, TASK-1233, smoke real local OK) | — | TASK-1226/1233 |
 | `GROWTH_AI_VISIBILITY_LLM_EXTRACTION_ENABLED` | — | — | — | TASK-1227 |
-| `GROWTH_AI_VISIBILITY_ASYNC_EXECUTION_ENABLED` | — | — | — | TASK-1234 |
+| `GROWTH_AI_VISIBILITY_ASYNC_EXECUTION_ENABLED` | — | ✅ (2026-06-24, smoke real `full` EO-GRUN-00011 OK) | — | TASK-1234 |
 
 ---
 
