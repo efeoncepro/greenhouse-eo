@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-06-24 por Claude (TASK-1226)
-> **Ultima actualizacion:** 2026-06-24 por Claude (TASK-1226)
+> **Ultima actualizacion:** 2026-06-24 por Claude (TASK-1226, rollout staging)
 > **Documentacion tecnica:** [GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md)
 
 # AI Visibility Grader — Motor de Providers (Growth)
@@ -37,6 +37,20 @@ Esta capa es la **fundacion del motor**: corre los prompts contra los providers,
 ## Por que no consume secretos por defecto
 
 El grader nace **apagado** (flags `GROWTH_AI_VISIBILITY_*_ENABLED` en OFF). Sin encender el flag global + el del proveedor, cada llamada se **salta limpio** (no llama a ningun proveedor, no gasta dinero). Para desarrollo local usa un "fake provider" deterministico que simula respuestas sin red.
+
+## Como se opera hoy
+
+Hay un primitive server-side único (`executeGraderRun`) y todos lo consumen igual:
+
+- **Endpoint interno:** `GET/POST /api/admin/growth/ai-visibility/runs` (+ `/<runId>` para el detalle), solo para usuarios internos con la capability correspondiente. Lista corridas y dispara una nueva.
+- **CLI de smoke:** `pnpm growth:ai-visibility:smoke` (ver el [manual](../../manual-de-uso/growth/ai-visibility-grader-smoke.md)).
+- **A futuro:** la UI pública, el admin, Nexa/MCP, el report builder y el handoff a HubSpot consumirán el MISMO primitive — ninguno llamará a los proveedores por su cuenta.
+
+## Estado del rollout (2026-06-24)
+
+- **staging:** encendido para OpenAI + Anthropic (corre proveedores reales; verificado).
+- **producción:** apagado — el encendido es un proceso aparte (migración + release controlado) que se hará después.
+- **Perplexity / Gemini:** apagados hasta tener credenciales.
 
 ## Que no hace (todavia)
 

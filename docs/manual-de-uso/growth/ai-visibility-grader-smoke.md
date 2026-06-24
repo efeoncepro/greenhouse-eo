@@ -1,6 +1,16 @@
-# Manual — Correr el smoke del AI Visibility Grader
+# Manual — Correr el AI Visibility Grader (smoke + endpoint)
 
-> **Para que sirve:** ejecutar una corrida acotada (low-volume) del AI Visibility Grader contra los answer engines, para validar el motor end-to-end. Por defecto usa un proveedor simulado (no gasta dinero); con flags + secrets corre proveedores reales.
+> **Tipo de documento:** Manual de uso / runbook
+> **Version:** 1.1 · **Ultima actualizacion:** 2026-06-24 por Claude (TASK-1226, rollout staging)
+>
+> **Para que sirve:** ejecutar una corrida acotada (low-volume) del AI Visibility Grader contra los answer engines, para validar el motor end-to-end. Por defecto usa un proveedor simulado (no gasta dinero); con flags + secrets corre proveedores reales. Dos caminos: el **CLI** (`pnpm growth:ai-visibility:smoke`, local/dev) y el **endpoint interno** (`/api/admin/growth/ai-visibility/runs`, mismo primitive, apto staging).
+
+## Estado actual del rollout (2026-06-24)
+
+- **staging:** `GROWTH_AI_VISIBILITY_GRADER_ENABLED` + `_OPENAI_ENABLED` + `_ANTHROPIC_ENABLED` **ON**. El endpoint corre proveedores reales (OpenAI/Anthropic). Verificado: `POST` → 201, run `partial`, ~$0.25, 18 obs con citations reales.
+- **producción:** OFF (follow-up pesado: migración `greenhouse_growth` + capabilities seed vía release control plane develop→main + env prod + sign-off).
+- **Perplexity / Gemini:** OFF en todos (sin credenciales aún).
+- Verdad live de flags: `vercel env ls`. Estado humano: `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`.
 
 ## Antes de empezar
 
@@ -34,14 +44,23 @@ GROWTH_AI_VISIBILITY_OPENAI_ENABLED=true \
 pnpm growth:ai-visibility:smoke
 ```
 
-Verificar luego el detalle de un run:
+### 3. Usar el endpoint interno (mismo primitive — apto staging)
 
-```text
-GET /api/admin/growth/ai-visibility/runs            # lista
-GET /api/admin/growth/ai-visibility/runs/<runId>    # detalle + observaciones
+El endpoint es un cliente fino del mismo `executeGraderRun`; no reimplementa nada. Requiere sesión interna + capability `growth.ai_visibility.{observation.read,run.execute}` (grant: internal ∪ EFEONCE_ADMIN ∪ AI_TOOLING_ADMIN). En staging va con `pnpm staging:request` (bypass SSO + agent auth):
+
+```bash
+# Listar runs (capability observation.read)
+pnpm staging:request /api/admin/growth/ai-visibility/runs
+
+# Ejecutar un run real (capability run.execute) — light = barato (OpenAI, perplexity/gemini skip)
+pnpm staging:request POST /api/admin/growth/ai-visibility/runs \
+  '{"brandName":"Efeonce","websiteUrl":"https://efeoncepro.com","market":"Chile","locale":"es-CL","category":"marketing y diseño","mode":"light","runKind":"smoke","competitorsDeclared":["Cebra"]}'
+
+# Detalle de un run + observaciones
+pnpm staging:request /api/admin/growth/ai-visibility/runs/<runId>
 ```
 
-(En staging, usar `pnpm staging:request` con la persona agente.)
+Campos del body POST: `brandName`/`market`/`locale`/`category` (requeridos), `mode` (`light`/`full`/`internal_audit`), `runKind` (default `smoke`), `websiteUrl`/`competitorsDeclared`/`onlyProviders`/`discoveryOnly`/`idempotencyKey` (opcionales). Respuesta: `{ run, observationCount, idempotentHit, costGuardTripped }`. Con `idempotencyKey` repetido NO reejecuta (devuelve el run previo).
 
 ## Que significan los estados
 

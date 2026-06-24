@@ -29,6 +29,10 @@ La diferencia con otras capas de documentacion:
 - [Pipeline comercial](comercial/pipeline-comercial.md) — como usar la lane dedicada de forecast comercial sin confundirla con revenue reconocido ni cierre financiero.
 - [Sample Sprints](comercial/sample-sprints.md) — como declarar, aprobar, registrar progreso y cerrar outcomes de pilotos/trials/POCs/discovery.
 
+### Growth
+
+- [Correr el AI Visibility Grader (smoke + endpoint)](growth/ai-visibility-grader-smoke.md) — como ejecutar una corrida del grader (fake sin secretos / proveedor real uno por vez), interpretar estados (`skipped`/`partial`/`costGuard`), usar el endpoint interno `GET`/`POST /api/admin/growth/ai-visibility/runs`, el estado actual de flags (staging ON) y troubleshooting.
+
 ### Identidad y acceso
 
 - [Operar Identity, Access y Admin Center](identity/operar-identity-access-admin-center.md) — guia para crear/revisar usuarios, roles, vistas, permission sets, SCIM, reconciliacion y diagnostico de acceso sin aplicar bypasses inseguros.
