@@ -1,3 +1,24 @@
+## Sesión 2026-06-24 — Growth / AI Visibility Grader: TASK-1228 eval-spike + re-secuencia 1226/1227 — Claude
+
+> **Estado:** planning docs only; sin runtime/code, sin secrets, sin deploy. Revisión arquitectónica (arch-architect) del programa del grader + corrección de secuencia eval-first.
+> - **Hallazgo de la revisión:** 1226/1227 tienen gobernanza sólida pero secuencia de validación invertida — congelan el modelo de score (7 dimensiones, pesos 25/15/15/15/15/10/5) y dejan la eval al final, en vez de validar empíricamente primero (viola eval-driven). Riesgos sin cerrar: pesos no validados, varianza run-to-run no modelada (input LLM no-determinista), extracción brand-mention asumida determinista-first sin prueba, y cost ceiling de un producto público diferido.
+> - **Task creada:** `TASK-1228` (`docs/tasks/to-do/TASK-1228-growth-ai-visibility-discovery-eval-spike.md`) — Discovery & Eval Spike precursor: prompt pack V1 + golden set × OpenAI/Perplexity/Gemini → discriminación de dimensiones + pesos calibrados, varianza + estrategia de muestreo, costo/run + cost ceiling, determinista-first vs LLM para extracción, y golden eval set V1. Sin runtime/schema/UI/HubSpot. Versión productizada del método de SoV de la skill personal `seo-aeo`.
+> - **Re-secuencia (Delta 2026-06-24):** `TASK-1227` ahora `Blocked by: TASK-1226, TASK-1228` + Delta (eval-first, modelo de varianza/confianza, decisión de extracción informada, "determinista" = agregación sobre evidencia muestreada). `TASK-1226` + Delta (consume cost ceiling + prompt pack de 1228; split de adapters: un provider end-to-end primero).
+> - **Registro:** registry + README sincronizados; siguiente ID disponible `TASK-1229`.
+> - **Gates ejecutados:** `pnpm task:lint` 1228/1226/1227 → template=1, errors=0, warnings=0; `pnpm ops:lint --changed` → scanned=3, errors=0, warnings=0.
+> - **Contexto (fuera del repo):** se construyó la skill personal `~/.claude/skills/seo-aeo/` (SEO+AEO/GEO 2026) como conocimiento de dominio detrás del grader; mapeo 7-dimensiones↔módulos en su `efeonce/AI_VISIBILITY_GRADER.md`.
+
+## Sesión 2026-06-24 — Growth / AI Visibility Grader arquitectura + TASK-1226 — Codex
+
+> **Estado:** documentación y primera task creadas; sin runtime/code changes, sin secrets provisionados, sin deploy/push.
+> - **Arquitectura:** se creó/canonizó el AI Visibility Grader público administrado desde Greenhouse bajo el nuevo dominio `growth`: `docs/architecture/GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md`, ADR `GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_DECISION_V1.md` y `GREENHOUSE_GROWTH_DOMAIN_ARCHITECTURE_V1.md`; `DECISIONS_INDEX.md` actualizado.
+> - **Decisión de dominio:** `growth` owns acquisition intelligence / pre-pipeline diagnostic motions; `commercial` consume handoffs calificados; public-site aloja la experiencia si aplica, pero no es source of truth del scoring.
+> - **Provider contract documentado:** adapters server-side para OpenAI Responses API + web search, Perplexity Sonar y Gemini + Google Search grounding; modos `light/full/internal_audit`; flags/secrets server-only; fake/no-op requerido para local; evidence ledger y signals `growth.ai_visibility.*`. Browser, public UI y HubSpot no llaman providers directo.
+> - **Task creada:** `TASK-1226` en `docs/tasks/to-do/TASK-1226-growth-ai-visibility-provider-adapter-foundation.md`; README/registry sincronizados; siguiente ID disponible `TASK-1227`.
+> - **Alcance de TASK-1226:** foundation backend-data del dominio `growth.ai_visibility`: contracts, provider policy, adapter interface, fake/no-op adapter, adapters OpenAI/Perplexity/Gemini detrás de flags, observation ledger/signals y smoke/eval harness low-volume. Sin UI pública, sin HubSpot writes, sin custom properties.
+> - **Task siguiente creada:** `TASK-1227` en `docs/tasks/to-do/TASK-1227-growth-ai-visibility-normalization-scoring-engine.md`; segundo bloque del motor: `normalized_findings`, `grader_score` V1 deterministico/versionado y gates `insufficient_data`/`review_required`. Queda bloqueada por `TASK-1226`; siguiente ID disponible `TASK-1228`.
+> - **Gates ejecutados:** `pnpm task:lint --task TASK-1226` verde; `pnpm task:lint --task TASK-1227` verde; `pnpm ops:lint --changed` verde; `git diff --check` verde; `pnpm docs:closure-check` verde.
+
 ## Sesión 2026-06-24 — Home / Nexa Insights bento branding pass — Codex
 
 > **Estado:** code complete local; sin deploy/push. Mejora route-local del bento `ai-insights-bento` en `/home`, sin cambio de data/API contract.
