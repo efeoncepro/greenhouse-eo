@@ -39,3 +39,14 @@ export const GROWTH_AI_VISIBILITY_LLM_EXTRACTION_FLAG = 'GROWTH_AI_VISIBILITY_LL
 
 export const isLlmExtractionEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
   isTrue(env[GROWTH_AI_VISIBILITY_LLM_EXTRACTION_FLAG])
+
+/**
+ * TASK-1234 — Cutover inline → async. Default OFF: el endpoint admin ejecuta el run
+ * INLINE (como hoy; sólo `light`/OpenAI cabe en el timeout de la función Vercel).
+ * Con ON: el endpoint ENCOLA el run `pending` (202 + runId) y el worker Cloud Run
+ * lo ejecuta async (sin límite de duración) — única vía para runs `full` multi-provider.
+ */
+export const GROWTH_AI_VISIBILITY_ASYNC_EXECUTION_FLAG = 'GROWTH_AI_VISIBILITY_ASYNC_EXECUTION_ENABLED'
+
+export const isAsyncExecutionEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+  isTrue(env[GROWTH_AI_VISIBILITY_ASYNC_EXECUTION_FLAG])

@@ -2,13 +2,14 @@ import { NextResponse } from 'next/server'
 
 import { canonicalErrorResponse } from '@/lib/api/canonical-error-response'
 import { can } from '@/lib/entitlements/runtime'
-import { runGraderDiagnostic } from '@/lib/growth/ai-visibility/commands'
+import { enqueueGraderDiagnostic, runGraderDiagnostic } from '@/lib/growth/ai-visibility/commands'
 import {
   isGrowthAiVisibilityExecutionMode,
   isGrowthAiVisibilityProviderId,
   isGrowthAiVisibilityRunKind,
   type GrowthAiVisibilityProviderId
 } from '@/lib/growth/ai-visibility/contracts'
+import { isAsyncExecutionEnabled } from '@/lib/growth/ai-visibility/flags'
 import { listGraderRuns } from '@/lib/growth/ai-visibility/store'
 import { captureWithDomain } from '@/lib/observability/capture'
 import { requireInternalTenantContext } from '@/lib/tenant/authorization'
@@ -130,25 +131,45 @@ export async function POST(request: Request) {
       )
     : undefined
 
+  const diagnosticInput = {
+    brandName,
+    websiteUrl: asNonEmptyString(body.websiteUrl),
+    market,
+    locale,
+    category,
+    competitorsDeclared,
+    mode,
+    runKind,
+    discoveryOnly: body.discoveryOnly === true,
+    onlyProviders,
+    idempotencyKey: asNonEmptyString(body.idempotencyKey)
+  }
+
   try {
-    const result = await runGraderDiagnostic({
-      brandName,
-      websiteUrl: asNonEmptyString(body.websiteUrl),
-      market,
-      locale,
-      category,
-      competitorsDeclared,
-      mode,
-      runKind,
-      discoveryOnly: body.discoveryOnly === true,
-      onlyProviders,
-      idempotencyKey: asNonEmptyString(body.idempotencyKey)
-    })
+    // TASK-1234 — Cutover inline → async. Con el flag ON el run se ENCOLA (202 + runId)
+    // y el worker Cloud Run lo ejecuta sin límite de duración; el GET detalle es el poll.
+    // Default OFF: ejecución inline (sólo `light`/OpenAI cabe en el timeout Vercel).
+    if (isAsyncExecutionEnabled()) {
+      const enqueued = await enqueueGraderDiagnostic(diagnosticInput)
+
+      return NextResponse.json(
+        {
+          run: enqueued.run,
+          observationCount: 0,
+          enqueued: true,
+          idempotentHit: enqueued.idempotentHit
+        },
+        { status: enqueued.idempotentHit ? 200 : 202 }
+      )
+    }
+
+    const result = await runGraderDiagnostic(diagnosticInput)
 
     return NextResponse.json(
       {
         run: result.run,
         observationCount: result.observations.length,
+        enqueued: false,
         idempotentHit: result.idempotentHit,
         costGuardTripped: result.costGuardTripped
       },

@@ -14,7 +14,12 @@ import {
   type GrowthAiVisibilityRunKind
 } from './contracts'
 import { GROWTH_AI_VISIBILITY_PROMPT_PACK_VERSION, resolvePromptInputs } from './prompt-pack'
-import { executeGraderRun, type ExecuteGraderRunResult } from './run-engine'
+import {
+  enqueueGraderRun,
+  executeGraderRun,
+  type EnqueueGraderRunResult,
+  type ExecuteGraderRunResult
+} from './run-engine'
 import { type ProviderAdapter } from './providers/types'
 
 export interface RunGraderDiagnosticInput {
@@ -34,9 +39,8 @@ export interface RunGraderDiagnosticInput {
   adapters?: Partial<Record<GrowthAiVisibilityProviderId, ProviderAdapter>>
 }
 
-export const runGraderDiagnostic = async (
-  input: RunGraderDiagnosticInput
-): Promise<ExecuteGraderRunResult> => {
+/** Resuelve el input ejecutable del run (prompts del pack + perfil) — compartido por run/enqueue. */
+const buildExecuteInput = (input: RunGraderDiagnosticInput) => {
   const competitorsDeclared = input.competitorsDeclared ?? []
 
   const prompts = resolvePromptInputs(
@@ -49,7 +53,7 @@ export const runGraderDiagnostic = async (
     { includeBrandNamed: !input.discoveryOnly }
   )
 
-  return executeGraderRun({
+  return {
     profile: {
       brandName: input.brandName,
       websiteUrl: input.websiteUrl ?? null,
@@ -65,5 +69,19 @@ export const runGraderDiagnostic = async (
     idempotencyKey: input.idempotencyKey ?? null,
     onlyProviders: input.onlyProviders,
     adapters: input.adapters
-  })
+  }
 }
+
+/** Ejecuta el run SÍNCRONO (inline endpoint / smoke). Sólo `light` cabe en el timeout Vercel. */
+export const runGraderDiagnostic = async (
+  input: RunGraderDiagnosticInput
+): Promise<ExecuteGraderRunResult> => executeGraderRun(buildExecuteInput(input))
+
+/**
+ * TASK-1234 — Encola el run `pending` (no ejecuta): el worker Cloud Run lo drena
+ * async. Es el camino para runs `full`/`internal_audit` multi-provider que exceden
+ * el timeout de la función Vercel. Mismo primitive, sin ejecución inline.
+ */
+export const enqueueGraderDiagnostic = async (
+  input: RunGraderDiagnosticInput
+): Promise<EnqueueGraderRunResult> => enqueueGraderRun(buildExecuteInput(input))

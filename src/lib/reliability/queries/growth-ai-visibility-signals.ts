@@ -11,12 +11,18 @@ import 'server-only'
 
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { captureWithDomain } from '@/lib/observability/capture'
+import {
+  GROWTH_AI_VISIBILITY_PENDING_LAG_THRESHOLD_MINUTES,
+  GROWTH_AI_VISIBILITY_STUCK_RUNNING_THRESHOLD_MINUTES
+} from '@/lib/growth/ai-visibility/lifecycle'
 import type { ReliabilitySignal } from '@/types/reliability'
 
 export const GROWTH_AI_VISIBILITY_PROVIDER_ERROR_RATE_SIGNAL_ID = 'growth.ai_visibility.provider_error_rate'
 export const GROWTH_AI_VISIBILITY_PROVIDER_LATENCY_P95_SIGNAL_ID = 'growth.ai_visibility.provider_latency_p95'
 export const GROWTH_AI_VISIBILITY_COST_BUDGET_USED_SIGNAL_ID = 'growth.ai_visibility.cost_budget_used'
 export const GROWTH_AI_VISIBILITY_PROVIDER_CALL_SKIPPED_SIGNAL_ID = 'growth.ai_visibility.provider_call_skipped'
+export const GROWTH_AI_VISIBILITY_RUN_EXECUTION_LAG_SIGNAL_ID = 'growth.ai_visibility.run_execution_lag'
+export const GROWTH_AI_VISIBILITY_RUN_STUCK_RUNNING_SIGNAL_ID = 'growth.ai_visibility.run_stuck_running'
 
 const MODULE_KEY = 'growth' as const
 
@@ -175,11 +181,79 @@ const buildSkippedSignal = async (observedAt: string): Promise<ReliabilitySignal
   }
 }
 
-/** Devuelve los 4 signals del grader. Cada uno degrada honestamente si su query falla. */
+// TASK-1234 — Salud de la ejecución async (worker Cloud Run). Date-math segura:
+// created_at / started_at son timestamptz → `NOW() - col` = interval (nunca date-date).
+const buildRunExecutionLagSignal = async (observedAt: string): Promise<ReliabilitySignal> => {
+  const rows = await runGreenhousePostgresQuery<{ pending_lag: number }>(
+    `SELECT COUNT(*)::int AS pending_lag
+       FROM greenhouse_growth.grader_runs
+      WHERE status = 'pending'
+        AND created_at < NOW() - make_interval(mins => ${GROWTH_AI_VISIBILITY_PENDING_LAG_THRESHOLD_MINUTES})`
+  )
+
+  const pendingLag = Number(rows[0]?.pending_lag ?? 0)
+
+  const severity: ReliabilitySignal['severity'] =
+    pendingLag === 0 ? 'ok' : pendingLag <= 2 ? 'warning' : 'error'
+
+  return {
+    signalId: GROWTH_AI_VISIBILITY_RUN_EXECUTION_LAG_SIGNAL_ID,
+    moduleKey: MODULE_KEY,
+    kind: 'lag',
+    source: 'getGrowthAiVisibilitySignals',
+    label: 'Runs encolados sin ejecutar (AI Visibility)',
+    severity,
+    summary:
+      pendingLag === 0
+        ? 'Sin runs encolados esperando ejecución (worker async al día).'
+        : `${pendingLag} run(s) en 'pending' > ${GROWTH_AI_VISIBILITY_PENDING_LAG_THRESHOLD_MINUTES} min — el worker Cloud Run no está drenando.`,
+    observedAt,
+    evidence: [
+      { kind: 'metric', label: 'pending_lag', value: String(pendingLag) },
+      { kind: 'sql', label: 'source', value: 'greenhouse_growth.grader_runs status=pending' },
+      { kind: 'doc', label: 'task', value: 'TASK-1234 (ops-growth-grader-drain)' }
+    ]
+  }
+}
+
+const buildRunStuckRunningSignal = async (observedAt: string): Promise<ReliabilitySignal> => {
+  const rows = await runGreenhousePostgresQuery<{ stuck: number }>(
+    `SELECT COUNT(*)::int AS stuck
+       FROM greenhouse_growth.grader_runs
+      WHERE status = 'running'
+        AND started_at IS NOT NULL
+        AND started_at < NOW() - make_interval(mins => ${GROWTH_AI_VISIBILITY_STUCK_RUNNING_THRESHOLD_MINUTES})`
+  )
+
+  const stuck = Number(rows[0]?.stuck ?? 0)
+
+  const severity: ReliabilitySignal['severity'] = stuck === 0 ? 'ok' : 'error'
+
+  return {
+    signalId: GROWTH_AI_VISIBILITY_RUN_STUCK_RUNNING_SIGNAL_ID,
+    moduleKey: MODULE_KEY,
+    kind: 'runtime',
+    source: 'getGrowthAiVisibilitySignals',
+    label: 'Runs huérfanos en ejecución (AI Visibility)',
+    severity,
+    summary:
+      stuck === 0
+        ? 'Sin runs colgados en ejecución (recovery al día).'
+        : `${stuck} run(s) en 'running' > ${GROWTH_AI_VISIBILITY_STUCK_RUNNING_THRESHOLD_MINUTES} min — crash/timeout mid-run; el recovery los finaliza con la evidencia ya persistida.`,
+    observedAt,
+    evidence: [
+      { kind: 'metric', label: 'stuck_running', value: String(stuck) },
+      { kind: 'sql', label: 'source', value: 'greenhouse_growth.grader_runs status=running' },
+      { kind: 'doc', label: 'task', value: 'TASK-1234 (recoverStuckRunningRuns)' }
+    ]
+  }
+}
+
+/** Devuelve los 6 signals del grader. Cada uno degrada honestamente si su query falla. */
 export const getGrowthAiVisibilitySignals = async (): Promise<ReliabilitySignal[]> => {
   const observedAt = new Date().toISOString()
 
-  const [errorRate, latency, cost, skipped] = await Promise.all([
+  const [errorRate, latency, cost, skipped, executionLag, stuckRunning] = await Promise.all([
     buildProviderErrorRateSignal(observedAt).catch(error =>
       unknownSignal(GROWTH_AI_VISIBILITY_PROVIDER_ERROR_RATE_SIGNAL_ID, 'Tasa de error de providers (AI Visibility)', error)
     ),
@@ -191,8 +265,14 @@ export const getGrowthAiVisibilitySignals = async (): Promise<ReliabilitySignal[
     ),
     buildSkippedSignal(observedAt).catch(error =>
       unknownSignal(GROWTH_AI_VISIBILITY_PROVIDER_CALL_SKIPPED_SIGNAL_ID, 'Llamadas a provider saltadas (AI Visibility)', error)
+    ),
+    buildRunExecutionLagSignal(observedAt).catch(error =>
+      unknownSignal(GROWTH_AI_VISIBILITY_RUN_EXECUTION_LAG_SIGNAL_ID, 'Runs encolados sin ejecutar (AI Visibility)', error)
+    ),
+    buildRunStuckRunningSignal(observedAt).catch(error =>
+      unknownSignal(GROWTH_AI_VISIBILITY_RUN_STUCK_RUNNING_SIGNAL_ID, 'Runs huérfanos en ejecución (AI Visibility)', error)
     )
   ])
 
-  return [errorRate, latency, cost, skipped]
+  return [errorRate, latency, cost, skipped, executionLag, stuckRunning]
 }
