@@ -123,13 +123,14 @@ Reglas obligatorias:
 
 ### Surface & system decision
 
-- Surface: Web Component/custom element + Greenhouse Next.js preview + WordPress wrapper + Astro wrapper.
+- Surface: Web Component/custom element in the host page DOM + Greenhouse Next.js preview + WordPress wrapper + Astro wrapper.
 - Composition Shell: `aplica` for Greenhouse preview page only; public wrappers embed into host layout.
 - Primitive decision: `new` — portable Growth Form renderer primitive/core, with wrappers as adapters.
 - Adaptive density / The Seam: `aplica` for form containers inside variable-width public layouts.
 - Floating/Sidecar/Dialog decision: no modal default; host page decides placement, renderer handles form states.
 - Copy source: render contract/copy refs; reusable UI copy should live in `src/lib/copy/*` if added to Greenhouse.
 - Access impact: `none` for public render; preview route uses existing/internal access as decided in implementation.
+- Iframe decision: not default. Only allowed as explicit fallback for hostile/restricted hosts with `measurement_degraded` and an allowlisted `postMessage` bridge.
 
 ### State inventory
 
@@ -137,7 +138,7 @@ Reglas obligatorias:
 - Loading: contract fetch pending.
 - Empty: no fields or unpublished contract -> safe fallback.
 - Error: public fetch/submit failure with sanitized message.
-- Degraded / partial: JS/CSP/load failure fallback; destination unavailable copy from contract if applicable.
+- Degraded / partial: JS/CSP/load failure fallback; destination unavailable copy from contract if applicable; iframe/fallback measurement degraded.
 - Permission denied: surface not allowed/origin blocked.
 - Long content: multi-step/light forms, free text help, consent copy.
 - Mobile / compact: no horizontal page scroll at 390px.
@@ -153,6 +154,7 @@ Reglas obligatorias:
 - Focus restore: focus first invalid field or success state after submit.
 - Latency feedback: loading/pending/progress messaging.
 - Toast / alert behavior: inline status preferred; host-level toast optional only via wrapper event.
+- Measurement interaction: emit browser-safe `CustomEvent` and optional parent `window.dataLayer.push()` events for view/start/validation/submit/accepted/rejected/success without raw field values.
 
 ### Motion & microinteractions
 
@@ -172,6 +174,7 @@ Reglas obligatorias:
 - Required `data-capture` markers: form root, field group, submit state, success state.
 - Scroll-width check: required for Greenhouse preview and public host smoke.
 - Accessibility/focus checks: keyboard tab flow, labels/errors, focus after failed submit.
+- Measurement checks: parent page receives expected `gh_form_*` events through DOM listener and GTM/dataLayer-compatible payload.
 - Before/after evidence: N/A first implementation; capture against render contract fixtures.
 - Known visual debt: public-site WordPress host CSS may impose constraints; wrapper must document overrides.
 
@@ -198,7 +201,7 @@ Omitido: backend impact `none`. This task consumes APIs/contracts from TASK-1229
 
 - Build renderer core around `render_contract`.
 - Support static, conditional_simple and multi_step_light enough for fixtures.
-- Emit semantic events for submit/success/error without leaking destination details.
+- Emit semantic events for view/start/validation/submit/success/error through host DOM `CustomEvent` and optional parent `dataLayer`, without leaking destination details or PII.
 
 ### Slice 2 — Greenhouse Next.js preview
 
@@ -210,7 +213,7 @@ Omitido: backend impact `none`. This task consumes APIs/contracts from TASK-1229
 
 - Add wrapper/plugin/shortcode/block in the appropriate public-site runtime repo/path.
 - Enqueue pinned renderer bundle and pass surface id/embed key.
-- Smoke in WordPress host with test form.
+- Smoke in WordPress host with test form and verify parent-page `dataLayer` receives expected events.
 
 ### Slice 4 — Astro parity wrapper
 
@@ -284,6 +287,8 @@ Renderer receives `render_contract` only. It never receives destination mapping,
 ## Acceptance Criteria
 
 - [ ] Renderer core consumes only browser-safe `render_contract`.
+- [ ] Renderer default is host-DOM Web Component/custom element, not iframe.
+- [ ] Renderer emits `gh_form_*` CustomEvents/dataLayer events on the parent page with safe payloads only.
 - [ ] Greenhouse preview, WordPress wrapper and Astro wrapper use the same core/contract.
 - [ ] WordPress smoke proves first host surface works with a test form.
 - [ ] Astro parity smoke proves future host surface can reuse same form/version.

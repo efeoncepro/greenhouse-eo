@@ -138,6 +138,8 @@ The first host surface is the current Efeonce public site on WordPress. The rend
 
 The portable renderer core must not depend on React, Next.js, WordPress globals, Astro runtime APIs or HubSpot scripts. Host-specific wrappers may adapt loading, CSP, nonce, asset enqueue, preview fixtures and local design-token injection, but they must not change behavior.
 
+The default renderer is an in-page Web Component/custom element, not an iframe. Public forms must be measurable from the host page's GTM container and `window.dataLayer`, so the renderer emits browser-safe `CustomEvent` and optional parent-page `dataLayer.push()` events under the published `telemetryPolicy`. Iframe embedding is only an explicit fallback for hostile/restricted hosts; it must be marked as degraded measurement and use an allowlisted `postMessage` bridge without raw field values or PII.
+
 Greenhouse preserves the HubSpot attribution contract by collecting and forwarding allowed context such as `hutk`, `pageUri`, `pageName`, consent options and campaign metadata. When the goal is only to update CRM records without a form-submission event, a separate CRM Contacts adapter may use the 2026-03 Contacts API, but that is not the primary lead-capture path.
 
 ## Alternatives considered
@@ -178,6 +180,10 @@ Rejected. WordPress is the first host surface, but it is not the long-term runti
 
 Rejected for V1. Native wrappers are acceptable, but separate renderer implementations would create UX, validation, accessibility and analytics drift. The render contract should have one portable renderer core and surface-specific wrappers.
 
+### Alternative J: Use iframe embeds as the default portable renderer
+
+Rejected for V1. Iframes simplify isolation, but they make GTM/dataLayer measurement, DOM-level accessibility, responsive behavior, styling and attribution harder on the public site. The default is host-DOM rendering through a Web Component/custom element. Iframes remain a fallback only when a host cannot safely run the renderer in-page.
+
 ## Consequences
 
 ### Positive
@@ -206,6 +212,7 @@ Rejected for V1. Native wrappers are acceptable, but separate renderer implement
 - HubSpot remains CRM source of truth, not renderer source of truth.
 - The legacy endpoint is acceptable only because it is isolated behind a destination adapter and still officially documented.
 - The renderer may be distributed as a Web Component, Astro wrapper and WordPress shortcode/plugin, but all consume the same published form contract.
+- Measurement is a renderer contract, not an afterthought: parent-page GTM/dataLayer events and Greenhouse server-side conversion ledger must be reconciled by form/version/surface.
 
 ## Runtime contract
 

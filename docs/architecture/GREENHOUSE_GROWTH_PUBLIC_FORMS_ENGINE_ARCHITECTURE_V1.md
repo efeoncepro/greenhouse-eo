@@ -672,6 +672,42 @@ Analytics rules:
 - Consent/Do Not Track posture can disable optional analytics while preserving required security/audit logs.
 - Conversion reporting should distinguish `submitted`, `accepted`, `delivered`, and `qualified_handoff`.
 
+### 15.1 GTM and parent-page measurement contract
+
+Default client-side measurement must happen in the host page context, not inside an iframe. The portable renderer should therefore render in the host DOM by default as a Web Component/custom element. This lets WordPress, Astro and Greenhouse Next.js use the existing Google Tag Manager container, `window.dataLayer`, DOM listeners and page attribution context without cross-frame workarounds.
+
+The renderer must expose two browser-safe measurement surfaces:
+
+| Surface | Purpose |
+| --- | --- |
+| `CustomEvent` on the custom element / host DOM | Framework-agnostic listener surface for wrappers, QA and non-GTM consumers. |
+| Optional `window.dataLayer.push()` on the parent page | GTM-friendly funnel events for the public site. |
+
+Recommended GTM event names:
+
+| Event | When |
+| --- | --- |
+| `gh_form_viewed` | Published form rendered and visible enough to count as an impression. |
+| `gh_form_started` | Visitor first changes a field or advances from the initial state. |
+| `gh_form_field_validation_failed` | Browser/server validation rejects a field; emit field key and reason class only. |
+| `gh_form_submitted` | Submit attempt sent to Greenhouse public API. |
+| `gh_form_submission_accepted` | Greenhouse accepted the canonical submission. |
+| `gh_form_submission_rejected` | Greenhouse rejected validation, consent, spam, abuse or policy. |
+| `gh_form_destination_delivered` | A destination adapter delivered successfully when the client is allowed to know this. |
+| `gh_form_asset_accessed` | Lead magnet asset, redirect or tokenized result access is granted. |
+
+Event payloads may include:
+
+- `form_id`, `form_slug`, `form_version_id`, `form_kind`;
+- `surface_id`, `surface_kind`, `renderer_version`, `contract_version`;
+- `page_uri`, `page_name`, `referrer`, `locale`, UTM/campaign parameters when consent allows;
+- `correlation_id` or non-reversible submission reference;
+- `reason_class`, `success_behavior`, `destination_kind` only when safe.
+
+Event payloads must not include raw field values, email, phone, document names, free-text answers, HubSpot property names, HubSpot form GUIDs, private endpoint URLs or tokens.
+
+Client-side GTM events are behavioral analytics. The authoritative conversion ledger remains Greenhouse server-side: `received`, `accepted`, `delivered`, `failed`, `dead_letter` and `qualified_handoff` come from the submission and destination-attempt records, not from the browser alone.
+
 ## 16. Progressive profiling
 
 The engine may support progressive profiling, but only under explicit privacy rules.
@@ -775,6 +811,8 @@ Renderer rules:
 - Fetch only published render contracts.
 - Submit only to Greenhouse public API.
 - Render conditional UI from policy rules, not destination/provider internals.
+- Render in the host page DOM by default; iframe is not the default because it degrades GTM/dataLayer measurement and accessibility.
+- Emit browser-safe measurement events through DOM `CustomEvent` and, when enabled by `telemetryPolicy`, parent-page `window.dataLayer.push()`.
 - Identify the host surface via `surface`, signed embed config or registered embed key.
 - Collect `hubspotutk` only when present and permitted by consent posture.
 - Include `pageUri`, `pageName`, referrer and UTM context when allowed.
@@ -854,7 +892,7 @@ Surface security requirements:
 - telemetry includes `surface_id`, page URI and renderer version;
 - stale/deprecated renderer versions can be warned, paused or blocked by policy.
 
-Iframe fallback may be considered only for hostile or highly constrained hosts. It is not the default because it weakens brand integration, responsive behavior, analytics context and accessibility.
+Iframe fallback may be considered only for hostile or highly constrained hosts. It is not the default because it weakens brand integration, responsive behavior, analytics context and accessibility. Any iframe fallback must be explicitly marked `measurement_degraded`, must use an allowlisted `postMessage` bridge to the parent page for the same event schema, must never post raw field values/PII, and must document which GTM measurements cannot be guaranteed.
 
 ### 19.5 Success behavior
 
@@ -1089,6 +1127,8 @@ Signals:
 | `growth.forms.renderer_contract_stale` | Renderer using deprecated/archived version. |
 | `growth.forms.surface_unauthorized` | Render/submit attempted from an unapproved host surface/origin. |
 | `growth.forms.surface_migration_drift` | WordPress/Astro/Next preview render contracts diverge for the same form/version. |
+| `growth.forms.client_analytics_missing_rate` | Server submissions without expected client measurement events by form/surface. |
+| `growth.forms.measurement_degraded` | Host surface rendered through iframe/fallback or without parent-page telemetry bridge. |
 
 Operational dashboards should show:
 

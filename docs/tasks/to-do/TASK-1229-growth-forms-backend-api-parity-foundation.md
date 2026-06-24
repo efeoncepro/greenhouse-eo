@@ -126,7 +126,7 @@ Reglas obligatorias:
 ### Contract surface
 
 - Contrato existente a respetar: `GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md`
-- Contrato nuevo o modificado: public render/submit APIs, Product APIs, commands/readers, schema/contracts
+- Contrato nuevo o modificado: public render/submit APIs, Product APIs, commands/readers, schema/contracts, browser-safe analytics event schema
 - Backward compatibility: `additive`
 - Full API parity: UI/wrappers/Nexa/MCP/CLI deben consumir los mismos commands/readers; no hay business logic en wrappers.
 
@@ -139,6 +139,7 @@ Reglas obligatorias:
   - Consent snapshot se conserva aunque falle delivery.
   - Surface authorization se valida antes de entregar render contract o aceptar submit.
   - Attempts son append-only o event-sourced con historia completa.
+  - Analytics/telemetry policy no puede emitir raw field values, PII, HubSpot property names, form GUIDs or destination internals.
 - Tenant/space boundary: public anonymous submit con `surface_id`/origin/embed key; admin APIs con tenant interno + capabilities `growth.forms.*`.
 - Idempotency/concurrency: `dedupe_fingerprint` + optional idempotency token; commands transaccionales; retries safe.
 - Audit/outbox/history: audit para author/publish/destination/surface/retry; signals para failures/stale/unauthorized.
@@ -163,7 +164,7 @@ Reglas obligatorias:
 - Local checks: unit/contract tests for compiler, readers/commands, validation, surface auth and fake adapter.
 - DB/runtime checks: migration status + smoke against local/staging DB if schema is added.
 - Integration checks: fake/no-op adapter only.
-- Reliability signals/logs: `growth.forms.submission_error_rate`, `growth.forms.surface_unauthorized`, `growth.forms.renderer_contract_stale`, `growth.forms.dead_letter_count` seeded or planned.
+- Reliability signals/logs: `growth.forms.submission_error_rate`, `growth.forms.surface_unauthorized`, `growth.forms.renderer_contract_stale`, `growth.forms.dead_letter_count`, `growth.forms.client_analytics_missing_rate`, `growth.forms.measurement_degraded` seeded or planned.
 - Production verification sequence: deploy additive with no published forms; smoke public GET/POST using test surface and fake destination in staging before prod.
 
 ### Acceptance criteria additions
@@ -221,6 +222,7 @@ Reglas obligatorias:
 ### Slice 4 — Observability and verification
 
 - Agregar reliability signals/logging para failures, unauthorized surfaces, stale renderer and dead letters.
+- Agregar analytics/telemetry contract para renderer clients: event names, safe payload allowlist, dataLayer/CustomEvent policy and server-ledger reconciliation fields.
 - Agregar contract tests de public APIs, compiler, surface registry, idempotency and fake delivery.
 - Documentar operational smoke/runbook minimo si aplica.
 
@@ -292,6 +294,7 @@ N/A — no provider writes or public form rollout in this task.
 - [ ] `src/lib/growth/forms/**` contiene primitives canonicas para contracts, commands/readers, compiler and fake adapter.
 - [ ] Migrations/capabilities/admin/public APIs existen o la task documenta una razon tecnica aprobada para diferir alguna parte.
 - [ ] Public GET/POST no aceptan destination mapping desde browser y validan surface/origin/embed key.
+- [ ] Render contract publica una `telemetryPolicy` segura para `CustomEvent`/GTM `dataLayer` sin raw values, PII ni internals de HubSpot.
 - [ ] Published versions son immutables y publication gate bloquea policy incompleta.
 - [ ] Tests cubren compiler, validation, surface auth, fake delivery, idempotency/dedupe and canonical errors.
 - [ ] No HubSpot or external writes are performed.

@@ -141,7 +141,7 @@ Reglas obligatorias:
 - Loading: readers pending.
 - Empty: no forms yet with CTA/create guidance.
 - Error: canonical error display.
-- Degraded / partial: destination unavailable, stale renderer, HubSpot failed.
+- Degraded / partial: destination unavailable, stale renderer, HubSpot failed, public host measurement degraded/missing.
 - Permission denied: no growth forms capability.
 - Long content: field schema, submissions and attempts.
 - Mobile / compact: usable read/admin view; complex authoring may degrade to review-only if justified.
@@ -228,7 +228,7 @@ Reglas obligatorias:
 - Local checks: UI tests/focal tests where applicable.
 - DB/runtime checks: first form draft/publish/submission/destination attempt query.
 - Integration checks: WordPress smoke + HubSpot/test delivery.
-- Reliability signals/logs: destination failures, unauthorized surface, renderer stale, dead letter.
+- Reliability signals/logs: destination failures, unauthorized surface, renderer stale, dead letter, client analytics missing/degraded measurement.
 - Production verification sequence: staging first; production only with explicit operator approval.
 
 ### Acceptance criteria additions
@@ -363,6 +363,7 @@ The cockpit should be operational and dense, not marketing-like: list/detail/sid
 - [ ] Operator can author/review/publish/deprecate/archive and inspect submissions/delivery attempts.
 - [ ] First form is configured through the engine with host surface, consent, destination and success behavior.
 - [ ] WordPress smoke proves public host -> Greenhouse -> destination path works.
+- [ ] WordPress smoke proves parent-page GTM/dataLayer-compatible `gh_form_*` events fire for view/start/submit/accepted or rejected without raw field values.
 - [ ] GVC desktop/mobile evidence exists for cockpit and public form states.
 - [ ] Rollback path for first form is documented and tested/staged.
 
@@ -375,6 +376,7 @@ The cockpit should be operational and dense, not marketing-like: list/detail/sid
 - `pnpm ops:lint --changed`
 - `pnpm fe:capture growth-forms-admin-cockpit --env=local|staging`
 - WordPress public-host smoke.
+- WordPress parent-page `dataLayer`/DOM event smoke.
 - HubSpot/test destination smoke.
 
 ## Closing Protocol
