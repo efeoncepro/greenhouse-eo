@@ -170,6 +170,34 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
     })
   }
 
+  // TASK-1226 — Growth AI Visibility Grader. Operación interna del dominio growth
+  // (correr el grader/smoke + leer el evidence ledger). route_group internal ∪
+  // EFEONCE_ADMIN ∪ AI_TOOLING_ADMIN (los AI tooling admins operan integraciones
+  // de providers). Los clientes (`client_*`) NO lo ven — V1 es internal/pre-tenant.
+  if (
+    hasRouteGroup(subject, 'internal') ||
+    hasRole(subject, ROLE_CODES.EFEONCE_ADMIN) ||
+    hasRole(subject, ROLE_CODES.AI_TOOLING_ADMIN)
+  ) {
+    const source: TenantEntitlementSource = hasRouteGroup(subject, 'internal') ? 'route_group' : 'role'
+
+    addEntitlement(entries, {
+      module: 'growth',
+      capability: 'growth.ai_visibility.run.execute',
+      action: 'execute',
+      scope: 'tenant',
+      source
+    })
+
+    addEntitlement(entries, {
+      module: 'growth',
+      capability: 'growth.ai_visibility.observation.read',
+      action: 'read',
+      scope: 'tenant',
+      source
+    })
+  }
+
   if (hasRouteGroup(subject, 'people') || hasAuthorizedView(subject, 'equipo.personas')) {
     const source: TenantEntitlementSource = hasRouteGroup(subject, 'people') ? 'route_group' : 'authorized_view'
 

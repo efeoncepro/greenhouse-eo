@@ -48,7 +48,12 @@ export const ENTITLEMENT_MODULES = [
   'roadmap',
   // TASK-1161 — namespace Public Site control plane. V1 read-only para observar
   // el rail Astro/Vercel target desde Greenhouse sin deploy/cutover.
-  'public_site'
+  'public_site',
+  // TASK-1226 — namespace del dominio Growth (acquisition intelligence /
+  // pre-pipeline diagnostic). Distinto de `commercial` (consume handoffs
+  // calificados) y de `public_site` (host surface). V1: AI Visibility Grader
+  // (growth.ai_visibility.run.execute + growth.ai_visibility.observation.read).
+  'growth'
 ] as const
 
 export type GreenhouseEntitlementModule = (typeof ENTITLEMENT_MODULES)[number]
@@ -1896,6 +1901,23 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
   {
     key: 'roadmap.work_items.read',
     module: 'roadmap',
+    actions: ['read'] as const,
+    defaultScope: 'tenant'
+  },
+  // TASK-1226 — Growth AI Visibility Grader (dominio growth.ai_visibility).
+  // run.execute: correr el grader/smoke interno (governed; el LLM nunca escribe
+  // directo — propose→confirm→execute para writes de negocio futuros).
+  // observation.read: leer runs/observations del evidence ledger.
+  // Grant en runtime.ts (internal ∪ EFEONCE_ADMIN ∪ AI_TOOLING_ADMIN) mismo PR.
+  {
+    key: 'growth.ai_visibility.run.execute',
+    module: 'growth',
+    actions: ['execute'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'growth.ai_visibility.observation.read',
+    module: 'growth',
     actions: ['read'] as const,
     defaultScope: 'tenant'
   }
