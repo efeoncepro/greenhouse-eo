@@ -89,6 +89,19 @@ Corrida acotada (`ONLY_PROMPTS=p01,p03,p04,p11,p12,p16,p14`) con el set: Efeonce
 - Tokens de input por run con web search: OpenAI ~17-35k, Anthropic ~20-35k.
 - **Recomendación preliminar:** `light` mode público debería evitar Anthropic con web_search por costo/latencia, o limitar prompts. Cost ceiling por-run a fijar con la corrida de varianza. (Pendiente: N≥3 + medición de costo agregado.)
 
+## 5.bis Varianza run-to-run (N=3, p03 + p14 subject, 12 llamadas, 2026-06-24)
+
+Misma pregunta repetida 3 veces por motor, para definir el modelo de muestreo del score:
+
+- **SoV de categoría (p03): ESTABLE.** OpenAI → Cebra en 3/3; Anthropic → BBDO en 3/3; **Efeonce ausente en 3/3** en ambos. La presencia/ausencia NO es ruido — es consistente. Nota: cada motor es estable pero **difieren entre sí** (Cebra vs BBDO) → refuerza "cada motor = un canal".
+- **Narrativa de Efeonce (p14): ESTABLE por motor.** OpenAI "Growth OS / Nested Loops" en 3/3 (preciso); Claude "Inbound" en 3/3 (genérico/drift). El drift es sistemático del motor, no aleatorio.
+- **Colisión `f11.es`: INTERMITENTE** — aparece en 1/3 (OpenAI) y 2/3 (Anthropic). Señal real pero no determinista.
+
+**Recomendación de muestreo para el score (cierra la pregunta "¿determinista sobre input ruidoso?"):**
+- Para **presencia/ausencia y narrativa core** (AI Visibility, Message Alignment): N=1 es razonablemente confiable (estable run-to-run).
+- Para **señales intermitentes** (colisión de entidad, menciones de borde): **N≥3** — un solo run las pierde (1/3).
+- El score debe reportar cada finding como **`consistente` / `intermitente` / `ausente`** con **confianza = fracción de runs que coinciden**, NO un punto único. Esto es el "agregación determinista sobre evidencia muestreada" del Delta de TASK-1227.
+
 ## 6. Hallazgos para el motor (TASK-1226/1227)
 
 - **Extracción brand-mention NO es name-match ingenuo:** la colisión `Efeonce`↔`f11.es` haría que un match por nombre **sobrecuente**. La extracción debe **desambiguar por dominio** (`efeoncepro.com`) — hallazgo directo para el normalizer de `TASK-1227` (refuerza "preservar `unknown`/ambiguous").
@@ -105,12 +118,11 @@ El arch V1 define providers OpenAI/Perplexity/Gemini. Este spike incluyó **Anth
 
 ## 9. Estado y pendiente
 
-**Hecho:** pipeline validado (OpenAI + Anthropic); subject-only + discriminación (brand-set completo salvo weak); accuracy confirmada. Las dimensiones discriminan (Cebra vs Efeonce/Revops). Evidencia direccional, no estadística.
+**Hecho:** pipeline validado (OpenAI + Anthropic); subject-only + discriminación techo→piso (brand-set v2: BBDO Chile fuerte local, Peras y Manzanas débil); accuracy confirmada; **varianza N=3 medida + modelo de muestreo recomendado** (§5.bis). Las dimensiones discriminan limpio (5→0). Evidencia direccional, no estadística (N pequeño, un mercado, sin Gemini/Perplexity).
 
-**Pendiente para cerrar:**
-1. **Brand-set v2** (refinamientos descubiertos): agencia **fuerte LOCAL** (Ogilvy global no calibró el techo en Chile), **marca débil real** (`weak_reference` sigue sin llenar), y fix de **p12** (menciona "aerolínea/banca" → contamina los controles).
-2. **Corrida de varianza** N≥3 sobre un subset → modelo de muestreo/confianza (Slice 4).
-3. **Recalibrar pesos** con el brand-set v2 + varianza (hasta entonces se mantienen los del arch V1 como hipótesis).
-4. **Curar `golden-set.v1.json`** (inputs + expected findings, desambiguando `efeoncepro.com` del homónimo `f11.es`) para `TASK-1227` (Slice 5).
-5. **Gemini/Perplexity** cuando haya credenciales (completar el provider set arch V1).
-6. **ADR delta**: decidir si Anthropic entra al provider set V1.
+**Pendiente para cerrar (follow-ups):**
+1. **Recalibrar pesos** del score con esta evidencia (hasta entonces se mantienen los del arch V1 como hipótesis; ahora hay escala real 5→0 + modelo de confianza para anclarlos).
+2. **Curar `golden-set.v1.json`** (inputs + expected findings, desambiguando `efeoncepro.com` del homónimo `f11.es`) para `TASK-1227` (Slice 5).
+3. **Gemini/Perplexity** cuando haya credenciales (completar el provider set arch V1).
+4. **ADR delta**: decidir si Anthropic entra al provider set V1.
+5. **Prompt pack v2**: fix p12 ("aerolínea/banca" contamina controles); p06 ya corregido en el harness.
