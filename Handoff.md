@@ -1,3 +1,11 @@
+## Sesión 2026-06-24 — TASK-1233 AI Visibility: Enable Gemini Provider — COMPLETE (dev verificado + staging ON) — Claude
+
+> **Estado:** TASK-1233 completa en `develop` local-first (3 slices, `c02546972`→`22eff2dbc`+docs), movida a `complete/`. Habilita Gemini como 3.er provider del grader (junto a OpenAI+Anthropic).
+> - **Hallazgo clave (Slice 1):** las citations de Gemini/Vertex grounding traen `web.uri` = redirect `vertexaisearch.cloud.google.com/...` y el **dominio real en `web.title`**. El adapter extraía dominio del url → colapsaba todo a `vertexaisearch`, rompiendo la desambiguación por dominio. Fix backward-compatible: `normalizeDomain` + `buildCitation` con `domain` override; el adapter Gemini mapea title→domain. OpenAI/Anthropic sin cambio.
+> - **Modelo (Slice 2, pedido operador "mínimo Gemini 3.1"):** `gemini-3.1`/`gemini-3-pro` dan 404 en Vertex; lo más nuevo es `gemini-3-flash-preview` (Gemini 3). Bump del default 2.5→3 + override por env `GREENHOUSE_GEMINI_GROUNDED_MODEL` para bumpear a 3.1/3-pro sin deploy.
+> - **Verificación:** Vertex real OK (citations dominios reales loup.cl/bigbuda.cl); smoke real local 6/6 succeeded, **cost ~$0.016/marca (el más barato del set)**; score con findings Gemini reales; 90 tests growth; local:check OK. Flag `GROWTH_AI_VISIBILITY_GEMINI_ENABLED` ON en Vercel staging.
+> - **Pendiente:** push del código (Slice 1 fix) + smoke vía endpoint staging; prod = follow-up (release control plane). Perplexity OFF (sin cliente con grounding/creds).
+
 ## Sesión 2026-06-24 — TASK-1227 AI Visibility Normalization + Scoring Engine — COMPLETE (dev verificado) — Claude
 
 > **Estado:** TASK-1227 completa en `develop` local-first (5 slices, commits `e9aa64e5d`→`65f72788f`), movida a `complete/`. **Sin push** (esperando confirmación). 2.º bloque del motor: `provider_observations` (1226) → `normalized_findings` → `grader_score` v1. Consume el golden-set de 1228. Sin UI/report/HubSpot (follow-ups).

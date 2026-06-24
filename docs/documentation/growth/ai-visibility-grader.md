@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.2
+> **Version:** 1.3
 > **Creado:** 2026-06-24 por Claude (TASK-1226)
-> **Ultima actualizacion:** 2026-06-24 por Claude (TASK-1227, motor de normalización + scoring)
+> **Ultima actualizacion:** 2026-06-24 por Claude (TASK-1233, Gemini 3 activo)
 > **Documentacion tecnica:** [GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md)
 
 # AI Visibility Grader — Motor de Providers (Growth)
@@ -48,9 +48,9 @@ Hay un primitive server-side único (`executeGraderRun`) y todos lo consumen igu
 
 ## Estado del rollout (2026-06-24)
 
-- **staging:** encendido para OpenAI + Anthropic (corre proveedores reales; verificado).
+- **staging:** encendido para OpenAI + Anthropic + **Gemini** (corre proveedores reales; verificado). Gemini usa la última generación disponible (**Gemini 3**, `gemini-3-flash-preview` vía Vertex) porque el grader debe medir con el modelo que la gente usa hoy; el modelo es ajustable por env sin redeploy.
 - **producción:** apagado — el encendido es un proceso aparte (migración + release controlado) que se hará después.
-- **Perplexity / Gemini:** apagados hasta tener credenciales.
+- **Perplexity:** apagado hasta tener credenciales (no tiene cliente con grounding aún).
 
 ## Del dato al puntaje (findings y score — TASK-1227)
 

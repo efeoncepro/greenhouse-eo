@@ -1,15 +1,15 @@
 # Manual — Correr el AI Visibility Grader (smoke + endpoint)
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.2 · **Ultima actualizacion:** 2026-06-24 por Claude (TASK-1227, scoring)
+> **Version:** 1.3 · **Ultima actualizacion:** 2026-06-24 por Claude (TASK-1233, Gemini 3 activo)
 >
 > **Para que sirve:** ejecutar una corrida acotada (low-volume) del AI Visibility Grader contra los answer engines, para validar el motor end-to-end. Por defecto usa un proveedor simulado (no gasta dinero); con flags + secrets corre proveedores reales. Dos caminos: el **CLI** (`pnpm growth:ai-visibility:smoke`, local/dev) y el **endpoint interno** (`/api/admin/growth/ai-visibility/runs`, mismo primitive, apto staging).
 
 ## Estado actual del rollout (2026-06-24)
 
-- **staging:** `GROWTH_AI_VISIBILITY_GRADER_ENABLED` + `_OPENAI_ENABLED` + `_ANTHROPIC_ENABLED` **ON**. El endpoint corre proveedores reales (OpenAI/Anthropic). Verificado: `POST` → 201, run `partial`, ~$0.25, 18 obs con citations reales.
+- **staging:** `GROWTH_AI_VISIBILITY_GRADER_ENABLED` + `_OPENAI_ENABLED` + `_ANTHROPIC_ENABLED` + `_GEMINI_ENABLED` **ON**. El endpoint corre proveedores reales (OpenAI/Anthropic/Gemini). Gemini usa **Gemini 3** (`gemini-3-flash-preview` vía Vertex grounding; ajustable con `GREENHOUSE_GEMINI_GROUNDED_MODEL` sin redeploy). Costo Gemini ~$0.016/marca (light, el más barato del set).
 - **producción:** OFF (follow-up pesado: migración `greenhouse_growth` + capabilities seed vía release control plane develop→main + env prod + sign-off).
-- **Perplexity / Gemini:** OFF en todos (sin credenciales aún).
+- **Perplexity:** OFF (sin cliente con grounding/creds aún).
 - Verdad live de flags: `vercel env ls`. Estado humano: `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`.
 
 ## Antes de empezar

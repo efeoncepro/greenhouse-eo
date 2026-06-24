@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Medio`
@@ -15,7 +15,7 @@
 - UI impact: `none`
 - Backend impact: `integration`
 - Epic: `none`
-- Status real: `Diseno`
+- Status real: `Complete (dev verificado + flag staging ON); prod follow-up`
 - Rank: `TBD`
 - Domain: `growth|integrations.ai|reliability`
 - Blocked by: `none`
@@ -233,12 +233,13 @@ El adapter Gemini ya está implementado; esta task es validación + enablement, 
 
 ## Acceptance Criteria
 
-- [ ] Gemini produce `provider_observations` reales (texto + citations + usage) vía Vertex grounding.
-- [ ] Sin flag/credencial, Gemini hace skip limpio (no crash); con flag ON, ejecuta.
-- [ ] El parseo de citations/texto de Gemini está verificado contra el shape vivo (tests + sanity).
-- [ ] `GROWTH_AI_VISIBILITY_GEMINI_ENABLED` ON en staging + smoke verde + score incluye Gemini.
-- [ ] Costo/latencia Gemini documentado; ledger + docs (funcional/manual) actualizados.
-- [ ] Sin cliente paralelo, fetch crudo en el dominio, ni PII a Gemini.
+- [x] Gemini produce `provider_observations` reales (texto + citations + usage) vía Vertex grounding (sanity real + smoke).
+- [x] Sin flag/credencial, Gemini hace skip limpio (no crash); con flag ON, ejecuta (tests + sanity).
+- [x] El parseo de citations/texto de Gemini verificado contra el shape vivo: **fix de dominio** (url=redirect vertexaisearch, dominio real en title) + tests.
+- [x] `GROWTH_AI_VISIBILITY_GEMINI_ENABLED` ON en Vercel staging; smoke real local 6/6 + score incluye Gemini con dominios reales. (Smoke vía endpoint staging = post-push.)
+- [x] Costo/latencia Gemini documentado (~$0.016/marca; ~56s/call con Gemini 3 preview); ledger + docs funcional/manual actualizados.
+- [x] Sin cliente paralelo, sin fetch crudo en el dominio, sin PII a Gemini (reusa el cliente canónico Vertex).
+- [x] **Extra (pedido operador):** modelo bumpeado a Gemini 3 (`gemini-3-flash-preview`, lo más nuevo en Vertex) + override por env `GREENHOUSE_GEMINI_GROUNDED_MODEL`.
 
 ## Verification
 
@@ -265,5 +266,14 @@ El adapter Gemini ya está implementado; esta task es validación + enablement, 
 
 ## Open Questions
 
-1. ¿`isGeminiConfigured()` (solo project id) basta para Vertex grounding en runtime Vercel, o requiere un grant/feature flag de GCP adicional?
-2. ¿El modelo `gemini-2.5-flash` con `googleSearch` está disponible en la location Vertex del proyecto, o hay que fijar otra (`global`/región específica)?
+1. ¿`isGeminiConfigured()` (solo project id) basta para Vertex grounding en runtime? → **RESUELTA: sí.** project + ADC/WIF (el mismo que usa Nexa) basta; grounding funciona en local. Sin project → skip limpio.
+2. ¿`gemini-2.5-flash` + `googleSearch` disponible en la location Vertex? → **RESUELTA: sí en location `global`** (default del cliente), sin región especial. Además se bumpeó a Gemini 3.
+
+## Delta 2026-06-24 — Cierre (complete, dev verificado + staging ON)
+
+Implementada en `develop` local-first (3 slices, commits `c02546972` Slice 1 → `22eff2dbc` Slice 2 → docs).
+
+- **Hallazgo de Discovery (Slice 1):** las citations de Gemini/Vertex grounding traen `web.uri` = redirect `vertexaisearch.cloud.google.com/...` y el **dominio real en `web.title`**. El adapter extraía dominio del url → colapsaba todo a `vertexaisearch`, rompiendo la desambiguación por dominio + citation quality. Fix backward-compatible: `normalizeDomain` + `buildCitation` con `domain` override; el adapter mapea title→domain (preserva el redirect). OpenAI/Anthropic sin cambio.
+- **Modelo (Slice 2, pedido del operador):** bump `gemini-2.5-flash` → `gemini-3-flash-preview` (la última generación en Vertex; `gemini-3.1`/`gemini-3-pro` aún 404) + override por env `GREENHOUSE_GEMINI_GROUNDED_MODEL`.
+- **Verificación:** Vertex real OK (grounding, citations con dominios reales loup.cl/bigbuda.cl); smoke real local 6/6 succeeded, cost ~$0.016/marca (el más barato del set); score con findings Gemini de dominios reales; 90 tests growth; local:check OK.
+- **Rollout:** flag `GROWTH_AI_VISIBILITY_GEMINI_ENABLED` ON en Vercel staging. **Pendiente (no bloquea):** push del código (Slice 1 fix) + smoke vía endpoint staging; prod = follow-up del programa (release control plane). Perplexity sigue OFF (sin cliente con grounding/creds).
