@@ -1,3 +1,9 @@
+## Sesión 2026-06-24 — TASK-1227 AI Visibility Normalization + Scoring Engine — IN-PROGRESS — Claude
+
+> **Estado:** TASK-1227 tomada (movida a `in-progress`, registry/README sync). Develop local-first, sin push hasta confirmación. Construye el 2.º bloque del motor sobre la fundación de TASK-1226 (`provider_observations` → `normalized_findings` → `grader_score` v1). Consume el golden-set de TASK-1228. Sin UI/report/HubSpot (tasks posteriores).
+> - **Open Questions resueltas:** OQ#1 → fallback LLM de extracción usa el cliente canónico `src/lib/ai/anthropic.ts` (`generateStructuredAnthropic`, schema-constrained), NO el provider adapter layer de 1226 (ese OBSERVA answer engines; la extracción es otra cosa); aislado + flag `GROWTH_AI_VISIBILITY_LLM_EXTRACTION_ENABLED` default OFF; sin flag, deterministic-first preserva `unknown` en campos de prosa. OQ#2 → SoV contra competidores declarados ∪ detectados (por dominio de citation), preservando `unknown`. OQ#3 → `review_required` conservador: negative+low-confidence O lenguaje riesgoso/defamatorio (no todo negativo).
+> - **Pesos del score:** se mantienen los del arch V1 (AI Visibility 25 / Entity Clarity 15 / Category Ownership 15 / Competitive SoV 15 / Citation Quality 15 / Message Alignment 10 / Revenue Intent 5) como HIPÓTESIS calibrada (1228 no los recalibró; hay escala real 5→0 + golden set para anclarlos). Documentado como revisable.
+
 ## Sesión 2026-06-24 — TASK-1226 AI Visibility Provider Adapter Foundation — COMPLETE (code complete dev; rollout real-provider pendiente) — Claude
 
 > **Estado:** TASK-1226 implementada completa en `develop` local-first (5 slices, commits `1b08c5814`→`c3f35fba3`), movida a `complete/`. **Sin push** (esperando confirmación del operador). Lifecycle/registry/README sincronizados.
