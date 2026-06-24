@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server'
 
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
+import { can } from '@/lib/entitlements/runtime'
+import { canonicalErrorResponse } from '@/lib/api/canonical-error-response'
 import { getFinanceCurrentPeriod } from '@/lib/finance/reporting'
 import { readFinanceAiLlmSummary } from '@/lib/finance/ai/llm-enrichment-reader'
 
@@ -11,6 +13,13 @@ export async function GET(request: Request) {
 
   if (!tenant) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  // TASK-1201 — lectura de Finance AI insights detrás de la capability gobernada
+  // `finance.ai.read_insights` (Full API parity: un primitive canónico, autorización
+  // fina reutilizable por UI/Nexa/API).
+  if (!can(tenant, 'finance.ai.read_insights', 'read', 'tenant')) {
+    return canonicalErrorResponse('forbidden')
   }
 
   const { searchParams } = new URL(request.url)

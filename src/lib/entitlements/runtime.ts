@@ -948,12 +948,25 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
     hasRole(subject, ROLE_CODES.FINANCE_ANALYST) ||
     hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)
   ) {
+    const readinessSource: TenantEntitlementSource = hasRouteGroup(subject, 'finance')
+      ? 'route_group'
+      : 'role'
+
     addEntitlement(entries, {
       module: 'finance',
       capability: 'finance.operational_pl.read_readiness',
       action: 'read',
       scope: 'tenant',
-      source: hasRouteGroup(subject, 'finance') ? 'route_group' : 'role'
+      source: readinessSource
+    })
+
+    // TASK-1201 — lectura de Finance AI insights (misma audiencia read finance).
+    addEntitlement(entries, {
+      module: 'finance',
+      capability: 'finance.ai.read_insights',
+      action: 'read',
+      scope: 'tenant',
+      source: readinessSource
     })
   }
 

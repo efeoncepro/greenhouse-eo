@@ -328,6 +328,14 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     defaultScope: 'tenant'
   },
   {
+    // TASK-1201 — lectura de Finance AI insights/señales (dataStatus + insights).
+    // Read-only.
+    key: 'finance.ai.read_insights',
+    module: 'finance',
+    actions: ['read'] as const,
+    defaultScope: 'tenant'
+  },
+  {
     key: 'finance.payment_instruments.read',
     module: 'finance',
     actions: ['read'] as const,
