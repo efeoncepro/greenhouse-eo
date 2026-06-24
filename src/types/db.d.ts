@@ -6453,6 +6453,21 @@ export interface GreenhouseGrowthGraderProfiles {
   website_url: string | null;
 }
 
+export interface GreenhouseGrowthGraderReports {
+  as_of: Generated<Timestamp>;
+  audience: Generated<string>;
+  created_at: Generated<Timestamp>;
+  created_by: string | null;
+  expires_at: Timestamp | null;
+  public_report_json: Json;
+  recommendation_pack_version: string;
+  report_id: Generated<string>;
+  report_token: Generated<string>;
+  report_version: string;
+  run_id: string;
+  score_version: string;
+}
+
 export interface GreenhouseGrowthGraderRuns {
   cost_ceiling_usd: Numeric | null;
   created_at: Generated<Timestamp>;
@@ -10681,6 +10696,7 @@ export interface DB {
   "greenhouse_finance.vat_ledger_entries": GreenhouseFinanceVatLedgerEntries;
   "greenhouse_finance.vat_monthly_positions": GreenhouseFinanceVatMonthlyPositions;
   "greenhouse_growth.grader_profiles": GreenhouseGrowthGraderProfiles;
+  "greenhouse_growth.grader_reports": GreenhouseGrowthGraderReports;
   "greenhouse_growth.grader_runs": GreenhouseGrowthGraderRuns;
   "greenhouse_growth.grader_scores": GreenhouseGrowthGraderScores;
   "greenhouse_growth.normalized_findings": GreenhouseGrowthNormalizedFindings;
