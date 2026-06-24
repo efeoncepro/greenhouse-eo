@@ -235,7 +235,7 @@ Paths esperados; el agente debe verificar patrones reales durante Discovery:
 ### Slice 5 — Confidence, review gates and eval baseline
 
 - Implementar policy de `insufficient_data`, `review_required` y `auto_releasable=false`.
-- Agregar golden fixtures para Efeonce/Greenhouse y una marca neutra.
+- Agregar golden fixtures para Efeonce/Greenhouse y una marca neutra — promoviendo el `golden-set.v1.json` de `TASK-1228` desde `docs/architecture/growth/ai-visibility/` a `src/lib/growth/ai-visibility/evals/**`.
 - Tests de no-overclaiming: score no se emite como definitivo sin provider coverage minima; lenguaje riesgoso/defamatorio fuerza review.
 - Emitir/registrar signals de insufficient data y review required rate.
 

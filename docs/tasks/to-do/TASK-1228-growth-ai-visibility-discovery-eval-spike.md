@@ -86,10 +86,12 @@ Reglas obligatorias:
 
 Paths esperados; el agente verifica patrones reales en Discovery:
 
-- `scripts/growth/ai-visibility-spike/**` `[verificar]` — harness throwaway (run del prompt pack, captura de evidencia bounded, parsers de prueba). Local/manual, no productivo.
-- `scripts/growth/ai-visibility-spike/prompt-pack.v1.json` `[verificar]` — prompt pack V1 borrador versionado.
-- `scripts/growth/ai-visibility-spike/golden-set.v1.json` `[verificar]` — golden eval set V1 (inputs + expected normalized findings) para que `TASK-1227` lo promueva a `src/lib/growth/ai-visibility/evals/**`.
-- `docs/architecture/GREENHOUSE_AI_VISIBILITY_GRADER_CALIBRATION_V1.md` `[verificar]` — findings: discriminación de dimensiones, pesos recomendados, varianza, costo/run, recomendación de extracción.
+Casa de artefactos FIJADA (decisión 2026-06-24, opción desacoplada): el harness throwaway vive en `scripts/`; los artefactos durables (prompt pack + golden set) y el doc de calibración viven en `docs/`. 1228 NO toca `src/lib/growth/` — ese root lo crea `TASK-1226`.
+
+- `scripts/growth/ai-visibility-spike/**` — harness throwaway (run del prompt pack, captura de evidencia bounded, parsers de prueba). Local/manual, no productivo; aquí también caen las capturas de evidencia bounded.
+- `docs/architecture/growth/ai-visibility/prompt-pack.v1.json` — prompt pack V1 versionado (artefacto durable; lo consume el smoke de `TASK-1226`).
+- `docs/architecture/growth/ai-visibility/golden-set.v1.json` — golden eval set V1 (inputs + expected normalized findings); artefacto durable que `TASK-1227` promueve a `src/lib/growth/ai-visibility/evals/**` cuando el dominio exista.
+- `docs/architecture/GREENHOUSE_AI_VISIBILITY_GRADER_CALIBRATION_V1.md` — findings: discriminación de dimensiones, pesos recomendados, varianza, costo/run, recomendación de extracción (hermano de los otros docs del grader en `docs/architecture/`).
 - `docs/architecture/GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md` — solo si la calibración descubre drift de pesos/dimensiones (proponer update, no rewrite).
 
 ## Current Repo State
@@ -127,7 +129,7 @@ Paths esperados; el agente verifica patrones reales en Discovery:
 
 ### Data model and invariants
 
-- Entidades/tablas/views afectadas: ninguna (sin DB). Fixtures en disco bajo `scripts/growth/ai-visibility-spike/`.
+- Entidades/tablas/views afectadas: ninguna (sin DB). Artefactos durables (prompt pack + golden set) bajo `docs/architecture/growth/ai-visibility/`; harness + capturas de evidencia bounded bajo `scripts/growth/ai-visibility-spike/`.
 - Invariantes que no se pueden romper:
   - Evidencia de provider = input medido, no verdad; los findings esperados del golden set se curan por humano, no se auto-aceptan del LLM.
   - El golden set preserva `unknown` donde la evidencia es insuficiente (no se inventan rankings/competidores).
@@ -185,7 +187,7 @@ Paths esperados; el agente verifica patrones reales en Discovery:
 
 ### Slice 1 — Prompt pack V1 borrador + mapa de fan-out
 
-- Producir `prompt-pack.v1.json` con 12–20 prompts es-CL, cada uno etiquetado por familia de intent (awareness/problem-aware/consideration/comparison/trust/purchase-intent/local/enterprise/risk-reputation, per arch §8.1) y tipo de Query Fan-Out (relacionada/comparativa/implícita/reciente).
+- Producir `docs/architecture/growth/ai-visibility/prompt-pack.v1.json` con 12–20 prompts es-CL, cada uno etiquetado por familia de intent (awareness/problem-aware/consideration/comparison/trust/purchase-intent/local/enterprise/risk-reputation, per arch §8.1) y tipo de Query Fan-Out (relacionada/comparativa/implícita/reciente).
 - Definir el golden brand set: Efeonce + 2–3 competidores + 2 marcas neutras + 1 cliente Globe (per arch §16), con su perfil mínimo (marca/web/país/categoría/competidores declarados).
 - Reutilizar `seo-aeo/templates/fan-out-matrix.md` como herramienta de diseño del pack.
 
@@ -211,7 +213,7 @@ Paths esperados; el agente verifica patrones reales en Discovery:
 
 - Probar extracción determinista (parse de prosa) vs extracción LLM sobre la evidencia capturada para brand-mention/rank/competidores/sentiment.
 - Recomendar determinista-first vs LLM-primary (con costo/precisión observados) para `TASK-1227`.
-- Curar y versionar `golden-set.v1.json` (inputs + expected normalized findings, con `unknown` donde corresponde) como baseline de regresión para `TASK-1227`.
+- Curar y versionar `docs/architecture/growth/ai-visibility/golden-set.v1.json` (inputs + expected normalized findings, con `unknown` donde corresponde) como baseline de regresión que `TASK-1227` promueve a `src/lib/growth/ai-visibility/evals/**`.
 
 ## Out of Scope
 
