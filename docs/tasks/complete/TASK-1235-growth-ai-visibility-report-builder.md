@@ -51,7 +51,7 @@ La task es backend (`UI impact: none`), pero el reporte ES el dato que las super
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -272,14 +272,14 @@ El reporte es **derivación pura** del score+findings ya persistidos (TASK-1227)
 
 ## Acceptance Criteria
 
-- [ ] `GraderReport` V1 versionado (`report_version` + `recommendation_pack_version`), derivado on-read de score+findings, recomputable.
-- [ ] Recomendaciones deterministas mapeadas desde gaps por dimensión (§8.4) **y priorizadas** (peso × severidad → `primary_gap`/`recommended_motion`), fundadas en la skill `seo-aeo`.
-- [ ] DTO public-safe sin raw provider text/prompts (tipo distinto + builder safe-fields + leak test); internal con evidencia; capability propia `report.read` + grant.
-- [ ] `insufficient_data`/`review_required`/`partial` propagados con **razón + próxima acción** renderizables (sin precisión falsa ni auto-release).
-- [ ] Cada dimensión es `SourceResult<T>` honesto: **`score: null` (sin evidencia) ≠ `score: 0` (gap real)**; severidad nombrada (no color); label plain-language + explainer; metadata de procedencia presente.
-- [ ] Copy de recomendaciones/headline/gate/disclaimer tokenizado en `src/lib/copy/*` (no inline), validado con `greenhouse-ux-writing`; sin difamación.
-- [ ] Dry-run sobre un run real produce un reporte coherente con el score.
-- [ ] Sin UI pública, HubSpot write ni Nexa/MCP en esta task.
+- [x] `GraderReport` V1 versionado (`report_version` + `recommendation_pack_version`), derivado on-read de score+findings, recomputable. — `report/contracts.ts` + `builder.ts`; test determinismo verde.
+- [x] Recomendaciones deterministas mapeadas desde gaps por dimensión (§8.4) **y priorizadas** (peso × severidad → `primary_gap`/`recommended_motion`), fundadas en la skill `seo-aeo`. — `recommendations.ts` (6 drivers, RICE-ish); dry-run primaryGap=low_category_ownership.
+- [x] DTO public-safe sin raw provider text/prompts (tipo distinto + builder safe-fields + leak test); internal con evidencia; capability propia `report.read` + grant. — `PublicGraderReport` + `report-public-leak.test.ts`; capability + grant `runtime.ts` (guard coverage verde).
+- [x] `insufficient_data`/`review_required`/`partial` propagados con **razón + próxima acción** renderizables (sin precisión falsa ni auto-release). — `report.gate` + copy `GH_GROWTH_AI_VISIBILITY.gate`; test gates.
+- [x] Cada dimensión es `SourceResult<T>` honesto: **`score: null` (sin evidencia) ≠ `score: 0` (gap real)**; severidad nombrada (no color); label plain-language + explainer; metadata de procedencia presente. — `ReportDimension` (status ok/empty + severity nombrada + explainer) + `provenance`; test null≠0.
+- [x] Copy de recomendaciones/headline/gate/disclaimer tokenizado en `src/lib/copy/*` (no inline), validado con `greenhouse-ux-writing`; sin difamación. — `src/lib/copy/growth.ts`.
+- [x] Dry-run sobre un run real produce un reporte coherente con el score. — EO-GRUN-00008: headline "AI Visibility 0/100" critico, gate=partial, overall 26.4.
+- [x] Sin UI pública, HubSpot write ni Nexa/MCP en esta task.
 
 ## Verification
 
@@ -291,12 +291,12 @@ El reporte es **derivación pura** del score+findings ya persistidos (TASK-1227)
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` sincronizado (`in-progress`/`complete`)
-- [ ] archivo en la carpeta correcta
-- [ ] `docs/tasks/README.md` + `TASK_ID_REGISTRY.md` sincronizados
-- [ ] `Handoff.md` + `changelog.md` actualizados
-- [ ] arch `## Delta` si el contrato de reporte difiere del §7.7
-- [ ] chequeo de impacto cruzado (TASK-1227/1234 + futuras superficie pública/HubSpot)
+- [x] `Lifecycle` sincronizado (`complete`)
+- [x] archivo en la carpeta correcta (`complete/`)
+- [x] `docs/tasks/README.md` + `TASK_ID_REGISTRY.md` sincronizados
+- [x] `Handoff.md` + `changelog.md` actualizados
+- [x] arch `## Delta 2026-06-24 — TASK-1235` (afina §7.7/§8.4: on-read, versionado, SourceResult, 6 drivers)
+- [x] chequeo de impacto cruzado (TASK-1227/1234 + futuras superficie pública/HubSpot — sin cambio de estado en to-do; el reporte desbloquea esas tasks como estaba previsto)
 
 ## Follow-ups
 
@@ -309,4 +309,4 @@ El reporte es **derivación pura** del score+findings ya persistidos (TASK-1227)
 
 1. ~~¿Persistir `grader_reports` o derivar on-read?~~ **Resuelta (review 2026-06-24) → ON-READ en V1** (reporte = función pura de `(run_id, score_version, report_version, recommendation_pack_version)`; SSOT limpio, sin migración). El snapshot inmutable es de la task de superficie pública. Confirmar en Discovery sólo si emerge una razón fuerte de snapshot temprano.
 2. ~~¿Capability propia o reusar `observation.read`?~~ **Resuelta (review 2026-06-24) → capability propia `growth.ai_visibility.report.read`** (least-privilege: ver el reporte sin la evidencia cruda de provider) + grant en `runtime.ts` mismo slice.
-3. _(nueva)_ ¿El reporte interno surfacea presencia **por-motor** (finding "invisible en Perplexity / presente en Gemini") en V1, o queda como follow-up? Decidir en Discovery (el dato ya existe en `provider_observations`; el riesgo es scope).
+3. ~~¿El reporte interno surfacea presencia **por-motor** en V1?~~ **Resuelta (Discovery 2026-06-24) → SÍ en V1, INTERNAL-ONLY** (`providerPresence` por proveedor: resolved + present, derivación pura de `findings.provider`). No infla scope (es un reducer) y nunca viaja al DTO público. Verificado en dry-run (EO-GRUN-00008: gemini resolved 6/present 1, openai/perplexity 0).

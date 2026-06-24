@@ -1,7 +1,7 @@
 # Manual — Correr el AI Visibility Grader (smoke + endpoint)
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.5 · **Ultima actualizacion:** 2026-06-24 por Claude (TASK-1234, ejecución async ON + verificada en staging)
+> **Version:** 1.6 · **Ultima actualizacion:** 2026-06-24 por Claude (TASK-1235, leer el reporte de un run)
 >
 > **Para que sirve:** ejecutar una corrida acotada (low-volume) del AI Visibility Grader contra los answer engines, para validar el motor end-to-end. Por defecto usa un proveedor simulado (no gasta dinero); con flags + secrets corre proveedores reales. Dos caminos: el **CLI** (`pnpm growth:ai-visibility:smoke`, local/dev) y el **endpoint interno** (`/api/admin/growth/ai-visibility/runs`, mismo primitive, apto staging).
 
@@ -118,6 +118,28 @@ inline como antes; sólo `light`/OpenAI cabe). **En staging ya está APLICADO y 
 - **No** encender todos los proveedores a la vez la primera vez: prender uno, validar costo/errores, recien despues el siguiente.
 - **No** poner secrets en `.env.local` para correr real en serio: viven en GCP Secret Manager (server-side).
 - **No** tratar la respuesta del proveedor como verdad: es evidencia. El score (TASK-1227) se deriva con reglas deterministas; el reporte visual es un paso posterior.
+
+## Leer el reporte de un run (TASK-1235)
+
+Una vez que un run tiene puntaje persistido (corriste `POST /runs/[runId]/score`), puedes leer su **reporte** derivado:
+
+```bash
+pnpm staging:request /api/admin/growth/ai-visibility/runs/<runId>/report --pretty
+```
+
+Devuelve `{ report, publicReport }`:
+
+- `report` = vista **interna** completa: `gate` (con `reason` + `nextAction`), `headline` (KPI dominante), `dimensions` (7, cada una con `score`/`status`/`severity`/`explainer` + `recommendation`), `recommendations` priorizadas, `primaryGap` + `recommendedMotion`, `competitiveSov`, `sourceTypeSummary`, **`providerPresence`** (presencia por motor) y `provenance`.
+- `publicReport` = DTO **público seguro**: el mismo headline/score/findings/competidores top/fuentes/disclaimer, **sin** `providerPresence`, sin reasons internos ni `priority`, sin texto crudo de los motores.
+
+Requiere la capability `growth.ai_visibility.report.read` (roles internos / `efeonce_admin` / `ai_tooling_admin`). Si el run no tiene score aún → `404 score_not_found` (corre `score` primero).
+
+Verificación local (sin endpoint), contra un run real con score:
+
+```bash
+# levanta el proxy + corre el builder vía readGraderReport sobre el run más reciente con score
+# (patrón scripts/_dryrun-report.ts: runGreenhousePostgresQuery + readGraderReport)
+```
 
 ## Problemas comunes
 

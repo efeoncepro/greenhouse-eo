@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.5
+> **Version:** 1.6
 > **Creado:** 2026-06-24 por Claude (TASK-1226)
-> **Ultima actualizacion:** 2026-06-24 por Claude (TASK-1234, ejecución async ON en staging)
+> **Ultima actualizacion:** 2026-06-24 por Claude (TASK-1235, report builder)
 > **Documentacion tecnica:** [GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md)
 
 # AI Visibility Grader — Motor de Providers (Growth)
@@ -84,10 +84,25 @@ En producción todavía no está prendido (va por su proceso aparte).
 
 > Detalle técnico: `GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md` §Delta 2026-06-24 (TASK-1234). Operación/rollout: [manual de smoke](../../manual-de-uso/growth/ai-visibility-grader-smoke.md).
 
+## El reporte (qué le mostramos al prospecto)
+
+Una vez que un análisis tiene puntaje, el sistema arma un **reporte** que traduce los números en una historia accionable. NO inventa nada: es una **derivación directa** del puntaje y la evidencia ya guardados — el mismo análisis siempre produce el mismo reporte.
+
+- **Titular (headline):** el problema dominante, con forma de KPI factual (ej. "AI Visibility 0/100"), nunca alarmista.
+- **Hallazgos (3-5):** cada uno con su severidad nombrada (Crítico/Atención/Óptimo/Sin dato), el número **con contexto** (nunca un número suelto) y un verbo de acción.
+- **Plan priorizado:** las recomendaciones salen **ordenadas por impacto** (qué hacer primero), no como lista plana. La de mayor impacto es el "gap principal" y define el siguiente movimiento comercial.
+- **Honestidad:** una dimensión **sin evidencia** se muestra como "sin dato" (no como 0). Un 0 medido sí es un problema real. Si faltó cobertura o hay lenguaje sensible, el reporte lo dice con su razón y próximo paso, sin fingir precisión.
+- **Dos versiones:** una **interna** completa (para ventas/admin, con presencia por motor y detalle) y una **pública segura** que nunca incluye el texto crudo de los motores ni las fuentes privadas (sólo el puntaje, los competidores top, el resumen de fuentes y los próximos pasos, con el aviso de que es un diagnóstico muestreado por IA).
+
+Este reporte es el **insumo** de las superficies que vienen después (página pública, AI Visibility Snapshot en HubSpot, revisión en el admin). Todavía no se muestra en pantalla ni se envía a ningún lado: es la pieza de datos que esas superficies van a renderizar.
+
+> Detalle técnico: `GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md` §Delta 2026-06-24 (TASK-1235) + §7.7/§8.4. Código: `src/lib/growth/ai-visibility/report/**`, copy `src/lib/copy/growth.ts`. Lectura: `GET /api/admin/growth/ai-visibility/runs/[runId]/report`.
+
 ## Que no hace (todavia)
 
 - No publica nada al sitio publico ni a HubSpot.
-- No arma el reporte visual final ni lo auto-publica (es el siguiente bloque: report builder + admin review).
+- No muestra el reporte en una pantalla ni lo auto-publica (la superficie visual + el snapshot inmutable son tasks posteriores).
+- No usa IA para escribir el reporte: el copy es plantilla determinista (la narrativa asistida por LLM es un follow-up).
 - No mezcla datos de clientes: V1 es interno/pre-tenant.
 
 > Detalle tecnico: invariantes y contrato en [GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md) (§Delta 2026-06-24). Codigo: `src/lib/growth/ai-visibility/**`. Operacion: [manual de smoke](../../manual-de-uso/growth/ai-visibility-grader-smoke.md).
