@@ -1,5 +1,14 @@
 # TASK-1201 — Finance AI Signal Source Of Truth
 
+## Delta 2026-06-24 — Full API parity: capability gobernada
+
+- Se cerró el matiz de parity: el reader de Finance AI insights queda detrás de la
+  capability gobernada **`finance.ai.read_insights`** — seed en `capabilities_registry`
+  (migración `20260624000621427_…`) + catálogo TS + grant en `runtime.ts`
+  (route_group=finance + FINANCE_ADMIN/FINANCE_ANALYST/EFEONCE_ADMIN, superset sin
+  regresión) + enforcement `can()` en `GET /api/finance/intelligence/nexa-insights`.
+  Reutilizable por UI/Nexa/API con autorización fina. Guard grant-coverage verde.
+
 ## Delta 2026-06-23
 
 - TASK-1200 (complete) entregó el readiness gate de cobertura laboral
