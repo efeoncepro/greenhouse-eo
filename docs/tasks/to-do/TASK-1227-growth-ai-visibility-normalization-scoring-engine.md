@@ -1,5 +1,9 @@
 # TASK-1227 — Growth AI Visibility Normalization + Scoring Engine V1
 
+## Delta 2026-06-24
+
+- Dependencia **TASK-1226 cerrada** (code complete dev): existe el dominio `src/lib/growth/ai-visibility/**`, el schema `greenhouse_growth` (incl. `provider_observations` append-only), los contratos/tipos (`ProviderObservation`, citations con `domain`/`sourceType`), el run-engine (`executeGraderRun`) y el store (`getRunObservations`). El normalizer/scorer de esta task consume `provider_observations` y produce `normalized_findings` — NO re-ejecuta providers. La desambiguación por dominio (colisión `efeoncepro.com`↔`f11.es`) ya está soportada por `extractCitationDomain`. Promover `docs/architecture/growth/ai-visibility/golden-set.v1.json` a `src/lib/growth/ai-visibility/evals/`.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"

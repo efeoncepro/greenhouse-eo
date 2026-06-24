@@ -29,6 +29,7 @@ Greenhouse — plataforma operativa/subproducto de Efeonce Group dentro del mode
 | Entitlements governance + capability grants + ROLE_CODES | — | `architecture/GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md` · `architecture/GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md` |
 | Typography + Efeonce brand | `typography-design` | `architecture/agent-invariants/DESIGN_TOKENS_BRAND_AGENT_INVARIANTS.md` |
 | AI image + LLM providers | `greenhouse-ai-image-generator` | `architecture/GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md` |
+| Growth AI Visibility Grader (`src/lib/growth/ai-visibility/**`) | `greenhouse-ai-image-generator` (providers LLM) | `architecture/GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md` (§Delta 2026-06-24) |
 | Workforce Contracting Studio | — | `architecture/GREENHOUSE_WORKFORCE_CONTRACTING_STUDIO_V1.md` |
 | PostgreSQL (conexión/migraciones/SQL readers) | `greenhouse-postgres` | inline (PostgreSQL Access + Migration markers + SQL gate) |
 | Backend (API routes/stores/outbox/reactive) | `greenhouse-backend` | inline (Full API Parity + canonical error contract + auth helpers) |

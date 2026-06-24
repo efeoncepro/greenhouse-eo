@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -17,7 +17,7 @@
 - UI impact: `none`
 - Backend impact: `integration`
 - Epic: `none`
-- Status real: `Diseno`
+- Status real: `Code complete (dev), rollout real-provider pendiente`
 - Rank: `TBD`
 - Domain: `growth|integrations.ai|reliability`
 - Blocked by: `none`
@@ -379,15 +379,15 @@ type ProviderObservation = {
 
 ## Acceptance Criteria
 
-- [ ] Existe `src/lib/growth/ai-visibility/` con contracts base, provider ids, execution modes, lifecycle/status helpers y tests.
-- [ ] Existe `ProviderAdapter` comun + policy resolver + fake/no-op adapter deterministico.
-- [ ] Adapters OpenAI/Perplexity/Gemini existen detras de flags y manejan missing secret/disabled provider sin crash.
-- [ ] Provider observations normalizadas incluyen provider/model/status/usage/latency/citations/error class/request hash.
-- [ ] Ningun adapter envia email/telefono/contact PII a providers.
-- [ ] Si hay migration, es aditiva y verificada; si se difiere DB, la decision queda documentada en la task/delta.
-- [ ] Signals/logs de provider attempt, skipped, error, latency y cost/usage quedan implementados o explicitamente stubbeados con follow-up.
-- [ ] Smoke/eval harness corre con fake adapter y salta providers reales cuando faltan secrets.
-- [ ] No se crea UI publica, public API, HubSpot write ni custom properties en esta task.
+- [x] Existe `src/lib/growth/ai-visibility/` con contracts base, provider ids, execution modes, lifecycle/status helpers y tests.
+- [x] Existe `ProviderAdapter` comun + policy resolver + fake/no-op adapter deterministico.
+- [x] Adapters OpenAI/Anthropic/Perplexity/Gemini existen detras de flags y manejan missing secret/disabled provider sin crash (skip controlado).
+- [x] Provider observations normalizadas incluyen provider/model/status/usage/latency/citations/error class/request hash.
+- [x] Ningun adapter envia email/telefono/contact PII a providers (solo marca/categoría/mercado interpolados como dato).
+- [x] Migration aditiva `greenhouse_growth` (4 tablas) verificada contra PG real (DO guard + sanity); observations append-only por trigger + GRANT.
+- [x] Signals/logs de provider attempt, skipped, error, latency y cost/usage implementados (4 reliability signals wired) + `captureWithDomain('growth')`.
+- [x] Smoke/eval harness corre con fake adapter y salta providers reales cuando faltan secrets (`pnpm growth:ai-visibility:smoke`).
+- [x] No se crea UI publica, public API, HubSpot write ni custom properties en esta task.
 
 ## Verification
 
@@ -429,6 +429,20 @@ Re-secuenciamiento tras revisión arquitectónica (arch-architect) del programa 
 
 ## Open Questions
 
-1. En la primera implementacion, ¿conviene crear tablas Postgres desde esta task o empezar contract-only con fake provider y agregar DB en el mismo PR tras Discovery?
-2. ¿El runtime usara OpenAI API key directa, Vertex para Gemini o ambos via Secret Manager refs existentes?
-3. ¿El primer smoke real debe usar solo Efeonce/Greenhouse o incluir una marca neutra para detectar bias/citation behavior?
+1. En la primera implementacion, ¿conviene crear tablas Postgres desde esta task o empezar contract-only con fake provider y agregar DB en el mismo PR tras Discovery? → **RESUELTA: crear schema `greenhouse_growth` + tablas en esta task** (Full API parity exige observations persistidas/legibles).
+2. ¿El runtime usara OpenAI API key directa, Vertex para Gemini o ambos via Secret Manager refs existentes? → **RESUELTA: OpenAI vía nuevo `src/lib/ai/openai.ts`; Anthropic vía `anthropic.ts`; Gemini vía `google-genai.ts` (Vertex); Perplexity vía nuevo `perplexity.ts`. Todos server-only, secret vía `resolveSecret`.**
+3. ¿El primer smoke real debe usar solo Efeonce/Greenhouse o incluir una marca neutra? → **RESUELTA: incluye marca neutra (Banco de Chile, control) además de Efeonce (sujeto).**
+
+## Delta 2026-06-24 — Cierre (code complete dev; rollout real-provider pendiente)
+
+Implementada completa en `develop` local-first (5 slices, commits `1b08c5814`→`c3f35fba3`):
+
+- **Slice 1:** dominio `growth.ai_visibility` (contracts/lifecycle/observation) + capability `growth.ai_visibility.{run.execute,observation.read}` (catalog + grant runtime.ts internal∪EFEONCE_ADMIN∪AI_TOOLING_ADMIN + seed migration + coverage guard).
+- **Slice 2:** provider policy resolver (light excluye Anthropic por costo §5 del spike; cost ceiling por modo) + `ProviderAdapter` interface + fake adapter determinista.
+- **Slice 3:** adapters reales tras flags `GROWTH_AI_VISIBILITY_*_ENABLED` (default OFF, ledger). Clientes canónicos AI: nuevo `src/lib/ai/openai.ts` (Responses+web_search) + `perplexity.ts`; `anthropic.ts`/`google-genai.ts` extendidos. Factory genérico (skip→retry→observación→capture). `openai-image.ts` intacto.
+- **Slice 4:** schema `greenhouse_growth` (grader_profiles/prompt_packs/grader_runs/provider_observations append-only) + store + run-engine (`executeGraderRun`, primitive de parity) + cost estimator + 4 reliability signals + endpoint interno `/api/admin/growth/ai-visibility/runs` (+`/[runId]`).
+- **Slice 5:** smoke/eval harness canónico (`pnpm growth:ai-visibility:smoke`, fake fallback) + brand fixtures (Efeonce + control neutro) + eval determinista de no-regresión.
+
+**Verificación:** `pnpm test` 7814/0 · `pnpm build` OK · `pnpm local:check` OK · `pnpm pg:doctor` healthy · coverage guard verde · flags:audit 0 sin registrar · sanity PG real (run partial, 18 obs, append-only bloqueado, 4 signals ok) · smoke fake (2 marcas × 18 obs succeeded).
+
+**Rollout pendiente (no bloquea cierre code-complete; fuera de scope público):** provisionar secrets de provider en GCP Secret Manager (`greenhouse-openai-api-key`, `greenhouse-anthropic-api-key`; Perplexity/Gemini sin creds), prender flags en staging (uno por vez, OpenAI primero) y correr el smoke real. Migración prod vía release control plane develop→main. Lanzamiento público = task posterior.

@@ -761,3 +761,14 @@ Artefactos canónicos nuevos:
 - FinOps AI runner/persist: [`src/lib/cloud/finops-ai/`](../../src/lib/cloud/finops-ai/)
 - Migration: [`migrations/20260503115518831_task-769-cloud-cost-ai-observations.sql`](../../migrations/20260503115518831_task-769-cloud-cost-ai-observations.sql)
 - ops-worker endpoint: `POST /cloud-cost-ai-watch` en [`services/ops-worker/server.ts`](../../services/ops-worker/server.ts)
+
+## Delta 2026-06-24 — módulo `growth` (AI Visibility Grader, TASK-1226)
+
+Nuevo módulo de reliability **`growth`** (domain `growth`, incidentDomainTag `growth`) registrado en `registry.ts`. 4 signals nuevos sobre el evidence ledger `greenhouse_growth` (lecturas de 7 días, reader `src/lib/reliability/queries/growth-ai-visibility-signals.ts`, wired en `get-reliability-overview.ts`):
+
+- `growth.ai_visibility.provider_error_rate` (data_quality) — % de observaciones failed/rate_limited; steady=0/ok.
+- `growth.ai_visibility.provider_latency_p95` (runtime) — p95 latencia de observaciones exitosas.
+- `growth.ai_visibility.cost_budget_used` (cost_guard) — max(estimated/ceiling) por run.
+- `growth.ai_visibility.provider_call_skipped` (posture) — skips esperados pre-launch (grader OFF); nunca error por sí mismo.
+
+DB vacía / grader OFF → todos en estado sano (`ok`/`awaiting_data`), steady esperado mientras los flags `GROWTH_AI_VISIBILITY_*_ENABLED` estén OFF. Cada signal degrada honestamente (`unknown` + `captureWithDomain('growth')`) si su query falla.

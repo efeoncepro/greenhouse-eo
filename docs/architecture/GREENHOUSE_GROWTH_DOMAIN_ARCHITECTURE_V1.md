@@ -286,3 +286,7 @@ Revisit this domain boundary if:
 - `docs/context/02_gtm.md`
 - `docs/context/03_ecosistema-producto.md`
 - `docs/context/14_modelo-negocio-asaas.md`
+
+## Delta 2026-06-24 — schema greenhouse_growth nace (TASK-1226)
+
+Primer runtime del dominio `growth`: el schema PostgreSQL **`greenhouse_growth`** existe (migración aditiva TASK-1226, aplicada a dev). Tablas: `grader_profiles`, `prompt_packs`, `grader_runs`, `provider_observations` (append-only). Es el evidence ledger del AI Visibility Grader; el primitive server-side `executeGraderRun` (`src/lib/growth/ai-visibility/run-engine.ts`) es el contrato canónico de Full API parity. Owner del flujo de acquisition intelligence: `growth` (no `commercial`). Capability namespace `growth.ai_visibility.*`; reliability module `growth`; CaptureDomain `growth`. Detalle e invariantes: `GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md` §Delta 2026-06-24.
