@@ -172,6 +172,40 @@ operativa × riesgo de la deuda silenciosa.
 (Niveles inferiores del backlog: `design_system` api-inline, `platform` declared-unwired,
 `admin` declared-unwired — re-medir y enrutar en waves siguientes.)
 
+## Delta 2026-06-23 — TASK-1178 (triage session-coarse verificado + guard anti-regresión)
+
+**Rank #2 cerrado.** TASK-1178 verificó per-route la cola `session-coarse` con un triage
+re-ejecutable (`scripts/audit/session-coarse-triage.ts`) que traza los imports de cada route
+hacia `src/lib/**` (BFS depth ≤ 2) buscando el capability-check en el COMMAND. Resultado:
+
+| Métrica | Snapshot 2026-06-20 (1172) | Verificado 2026-06-23 (1178) |
+|---|---:|---|
+| mutation routes total | 486 | 491 |
+| capability-governed (boundary) | 93 (19%) | 146 (30%) |
+| **session-coarse** | **343 (71%)** | **292** |
+| └ command-governed (can() en el command, depth ≤ 2) — **NO deuda** | — | **286 (97.6%)** |
+| └ debt-candidate (sin capability en ninguna capa) | — | **6** |
+
+**El "71% session-coarse" NO era deuda — era boundary.** El 97.6% de la cola ya está
+gobernada vía command (patrón canónico `enable-sync`). La deuda admin-coarse real era **1 sola
+route**: `/api/admin/invite`, un duplicado huérfano (0 consumidores) del canónico ya gobernado
+`admin/clients/[organizationId]/lifecycle/portal-users/invite` (gateado por
+`client.lifecycle.portal_user.invite`), con shape inseguro (`client_id`/`role_codes` desde el
+body, escalación a `EFEONCE_ADMIN`) y el anti-patrón prohibido `roleCodes.includes()` inline.
+**Deprecado y removido** (no se gobernó/legitimó una superficie de escalación muerta).
+
+Los otros 6 debt-candidate son operaciones **self-service ownership-scoped** (notificaciones /
+threads Nexa / preferencias / recents / feedback PROPIOS del miembro + el capture público
+`coming-soon/notify`): gobernadas por ownership de sesión, NO deuda admin-coarse. Una
+capability fina ahí sería over-governance. Quedan reconocidas en el allowlist del guard.
+
+**Guard anti-regresión (wave 1 real, > backfill):** `scripts/audit/session-coarse-governance-gate.test.ts`
+falla en CI si una route de mutación de negocio NUEVA nace session-coarse sin capability-check
+(en route o command), salvo allowlist documentado. Convierte el reader en enforcement: la deuda
+admin-coarse no puede volver a crecer en silencio.
+
+Re-medir: `pnpm tsx scripts/audit/session-coarse-triage.ts` · guard: `pnpm test scripts/audit`.
+
 ## Related
 
 - [`GREENHOUSE_FULL_API_PARITY_DECISION_V1.md`](GREENHOUSE_FULL_API_PARITY_DECISION_V1.md) — criterio

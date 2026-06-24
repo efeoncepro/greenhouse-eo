@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -15,7 +15,7 @@
 - UI impact: `none`
 - Backend impact: `api`
 - Epic: `optional`
-- Status real: `Diseño — derivada de TASK-1172 (gap ledger). Rank #2 del backlog de parity. Triage + backfill, NO big-bang.`
+- Status real: `Complete 2026-06-23 — triage verificado (286/293 command-governed; "71% session-coarse" era boundary, no deuda). Deuda admin-coarse real = 1 route (admin/invite, duplicado huérfano inseguro) → deprecado/removido. Wave 1 = guard anti-regresión (más valor que backfillar 6 self-service ownership-scoped). Code-complete + verificado local; rollout = repo-only (sin migración/flag).`
 - Rank: `TBD`
 - Domain: `platform|api|agent-governance|quality`
 - Blocked by: `none`
@@ -218,11 +218,31 @@ Slice 1 (triage) → Slice 2 (backfill wave 1) → Slice 3 (re-medición). NUNCA
 
 ## Acceptance Criteria
 
-- [ ] Triage de las 343 session-coarse con la lista de deuda real.
-- [ ] Wave 1 de deuda backfilleada: `can()` + capability + grant + migration seed.
-- [ ] `capability-grant-coverage.test` verde (sin capability huérfana).
-- [ ] No-regression de acceso verificada por rol.
-- [ ] `pnpm lint` + `pnpm tsc --noEmit` + tests verdes; reader re-corrido con delta.
+- [x] Triage de la cola session-coarse con la lista de deuda real — `scripts/audit/session-coarse-triage.ts` (286/293 command-governed, 6 self-service ownership-scoped, 1 deuda admin-coarse).
+- [x] Wave 1 ejecutada: la deuda admin-coarse real (`admin/invite`) resuelta por **deprecación/remoción** (duplicado huérfano inseguro) — decisión del operador; **no** se backfilleó porque gobernar la capability existente broadenaba una superficie de escalación muerta. **Sin migration seed** (no se creó capability nueva).
+- [x] `capability-grant-coverage.test` verde (no se introdujo capability nueva → sin huérfanas).
+- [x] No-regression de acceso verificada — los 6 self-service siguen ownership-scoped; `admin/invite` removido tenía 0 consumidores (cero pérdida de acceso real).
+- [x] `pnpm lint` + `pnpm tsc --noEmit` + tests verdes; reader/triage re-corridos con delta registrado en el gap ledger.
+- [x] Guard anti-regresión agregado (`scripts/audit/session-coarse-governance-gate.test.ts`) — wave 1 real: impide que la deuda admin-coarse vuelva a crecer.
+
+## Closure Summary (2026-06-23)
+
+**Recalibración de baseline:** la spec asumía 343 session-coarse / 93 governed (snapshot
+TASK-1172). Realidad al ejecutar: 292 session-coarse / 146 governed de 491 mutation routes
+(otras tasks avanzaron cobertura). El triage per-route probó que **el "71% session-coarse" no
+es deuda**: 286/293 (97.6%) está gobernada vía `can()` en el command (patrón canónico
+`enable-sync`), no en el boundary del route.
+
+**Deuda admin-coarse real = 1 route.** `/api/admin/invite` — duplicado huérfano (0
+consumidores) del canónico ya gobernado `lifecycle/portal-users/invite`, con shape inseguro
+(`client_id`/`role_codes` desde el body, escalación a `EFEONCE_ADMIN`) + anti-patrón
+`roleCodes.includes()` inline. **Deprecado/removido** (decisión operador) en vez de gobernar/
+legitimar una superficie de escalación muerta. Los otros 6 son self-service ownership-scoped
+(notif/threads/preferencias/recents/feedback propios + capture público) — no deuda.
+
+**Wave 1 = guard, no backfill.** Como la deuda de backfill es mínima, el mayor valor fue un
+guard anti-regresión que convierte el reader en enforcement. Slices: 1) triage re-ejecutable;
+2) remoción admin/invite; 3) guard test con allowlist documentado.
 
 ## Verification
 

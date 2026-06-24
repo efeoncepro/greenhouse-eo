@@ -1,3 +1,15 @@
+## Sesión 2026-06-23 — TASK-1178 Triage session-coarse + guard anti-regresión — Claude
+
+> **Estado:** complete (code + docs); verificado local; rollout = repo-only (sin migración/flag/capability nueva). Task movida a `complete/`. Cierra rank #2 del gap ledger de Full API Parity.
+> - **Hallazgo central:** el "71% session-coarse" de TASK-1172 **no es deuda** — es señal de boundary. Triage per-route (`scripts/audit/session-coarse-triage.ts`, BFS imports route→src/lib depth≤2) probó que **286/293 (97.6%)** ya está gobernada vía `can()` en el command (patrón canónico enable-sync). Validado con depth-1/2/3 (284 governed en depth-1; mismos 7 sin `can()` ni en depth-3).
+> - **Recalibración baseline:** spec asumía 343 session-coarse / 93 governed; realidad al ejecutar 292 / 146 de 491 routes (otras tasks avanzaron). Registrado en el ledger (Delta 2026-06-23).
+> - **Deuda admin-coarse real = 1 route:** `/api/admin/invite` — duplicado huérfano (0 consumidores en src/tests) del canónico ya gobernado `admin/clients/[organizationId]/lifecycle/portal-users/invite` (gateado por `client.lifecycle.portal_user.invite`), con shape inseguro (`client_id`/`role_codes` desde el body, escalación a `EFEONCE_ADMIN`) + anti-patrón prohibido `roleCodes.includes()` inline + error inglés crudo.
+> - **Decisión operador (AskUserQuestion):** (1) **deprecar/remover** admin/invite — no gobernar/legitimar una superficie de escalación muerta; (2) wave 1 = **guard anti-regresión** (más valor que backfillar 6 self-service).
+> - **Slices:** 1) triage re-ejecutable; 2) `git rm` admin/invite + comment del SSOT `inviteClientPortalUser` actualizado (queda intacto, lo usa el route gobernado); 3) guard `scripts/audit/session-coarse-governance-gate.test.ts` (falla si una route de mutación nueva nace session-coarse sin capability; allowlist de 6 self-service ownership-scoped documentado).
+> - **Otros 6 debt-candidate** (no deuda): inbox/preferences/recents/threads/feedback PROPIOS + `coming-soon/notify` (público) — ownership-scoped por `session.user.userId`. Capability fina ahí = over-governance. Quedan en el allowlist.
+> - **Gates:** lint/tsc limpios en cambios · guard test 3/3 verde · `capability-grant-coverage.test` sin tocar (no se creó capability). [Full `pnpm test` + build pendientes de correr antes del push].
+> - **Pendiente operador:** push develop. Sin deploy especial (repo-only). Waves siguientes: ninguna necesaria (deuda cerrada); el guard previene regresión.
+
 ## Sesión 2026-06-23 — TASK-1200 Operational P&L Labor Allocation Readiness — Claude
 
 > **Estado:** complete (code + docs); verificado local; deploy pendiente (local-first). Task movida a `complete/`.
