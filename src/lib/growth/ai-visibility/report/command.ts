@@ -13,9 +13,10 @@ import 'server-only'
 
 import { captureWithDomain } from '@/lib/observability/capture'
 
+import { extractCitationDomain } from '../observation'
 import { readGraderScore } from '../scoring/command'
 import { getPreviousComparableScore } from '../scoring/store'
-import { getGraderRun } from '../store'
+import { getGraderProfile, getGraderRun } from '../store'
 import { buildGraderReport, toPublicGraderReport, type ReportRunMeta } from './builder'
 import { type PreviousScoreInput } from './trend'
 import { type GraderReport, type PublicGraderReport } from './contracts'
@@ -76,7 +77,12 @@ export const readGraderReport = async (input: {
       ? { score: previousRow.score, promptPackVersion: previousRow.promptPackVersion, finishedAt: previousRow.finishedAt }
       : null
 
-    const report = buildGraderReport({ score, findings, run: runMeta, previous })
+    // Dominio del sujeto para el citation share propio (TASK-1237): mismo derivado
+    // que el scoring command (extractCitationDomain del websiteUrl del perfil).
+    const profile = await getGraderProfile(run.profileId)
+    const subjectDomain = profile?.websiteUrl ? extractCitationDomain(profile.websiteUrl) : null
+
+    const report = buildGraderReport({ score, findings, run: runMeta, previous, subjectDomain })
 
     return { report, publicReport: toPublicGraderReport(report) }
   } catch (error) {

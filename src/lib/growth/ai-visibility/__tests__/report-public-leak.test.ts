@@ -41,9 +41,23 @@ describe('growth/ai-visibility — public report DTO (defensa en 3 capas)', () =
     const pub = toPublicGraderReport(buildWithSensitiveEvidence())
 
     expect('providerPresence' in pub).toBe(false)
+    // TASK-1237: el detalle por motor (providerFindings) es internal-only.
+    expect('providerFindings' in pub).toBe(false)
     expect(pub.dimensions.every(d => !('reason' in d))).toBe(true)
     expect(pub.dimensions.every(d => !('recommendation' in d))).toBe(true)
     expect(pub.recommendations.every(r => !('priority' in r))).toBe(true)
+  })
+
+  it('TASK-1237 — los agregados seguros SÍ van al público; sin dominios crudos', () => {
+    const pub = toPublicGraderReport(buildWithSensitiveEvidence())
+    const serialized = JSON.stringify(pub)
+
+    // Agregados seguros presentes (%/conteos, sin dominios).
+    expect(typeof pub.citationInsight.findingsWithCitations).toBe('number')
+    expect(pub.sentimentSummary).toHaveProperty('net')
+    expect(pub.positionSummary).toHaveProperty('ranked')
+    // El dominio crudo de la cita NUNCA aparece (citationInsight es solo %/conteos).
+    expect(serialized).not.toContain(SENSITIVE_CITATION)
   })
 
   it('capa C — leak test: el JSON público NO contiene raw drift/citation/review', () => {

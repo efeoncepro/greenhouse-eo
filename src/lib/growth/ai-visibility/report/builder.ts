@@ -20,10 +20,12 @@ import { type DimensionScore, type PersistedGraderScore } from '../scoring/engin
 import {
   GROWTH_AI_VISIBILITY_RECOMMENDATION_PACK_VERSION,
   GROWTH_AI_VISIBILITY_REPORT_VERSION,
+  type CitationInsight,
   type CompetitiveShareOfVoice,
   type GraderReport,
   type GraderReportGate,
   type GraderReportGateStatus,
+  type PositionSummary,
   type ProviderPresence,
   type PublicGraderReport,
   type ReportDimension,
@@ -31,6 +33,8 @@ import {
   type ReportHeadline,
   type ReportProvenance,
   type ReportRecommendation,
+  type SentimentNet,
+  type SentimentSummary,
   type SourceTypeCount
 } from './contracts'
 import {
@@ -55,6 +59,8 @@ export interface BuildGraderReportInput {
   run: ReportRunMeta
   /** Run previo comparable para la tendencia (TASK-1236); null/undefined → sin histórico. */
   previous?: PreviousScoreInput | null
+  /** Dominio normalizado del sujeto para el citation share propio (TASK-1237); null si el perfil no tiene website. */
+  subjectDomain?: string | null
 }
 
 const FINDINGS_MAX = 5
@@ -237,6 +243,100 @@ const buildProviderPresence = (findings: NormalizedFinding[]): ProviderPresence[
     .sort((a, b) => a.provider.localeCompare(b.provider))
 }
 
+// ── Signal enrichment (TASK-1237) ────────────────────────────────────────────
+
+const round1Safe = (value: number): number => Math.round(value * 10) / 10
+
+/**
+ * Citation share del sitio propio: de las respuestas CON citas, qué fracción cita
+ * el dominio del sujeto. `null` (sin dato) si no hay respuestas con citas — NUNCA 0.
+ * Solo %/conteos; los dominios crudos no salen del finding.
+ */
+const buildCitationInsight = (findings: NormalizedFinding[], subjectDomain: string | null): CitationInsight => {
+  const withCitations = findings.filter(f => f.citationDomains.length > 0)
+
+  const citingOwn = subjectDomain
+    ? withCitations.filter(f => f.citationDomains.includes(subjectDomain)).length
+    : 0
+
+  return {
+    ownDomainShare: withCitations.length === 0 ? null : round1Safe((citingOwn / withCitations.length) * 100),
+    findingsWithCitations: withCitations.length,
+    findingsCitingOwnDomain: citingOwn
+  }
+}
+
+/** Resumen de sentimiento sobre la marca sujeto: conteos por etiqueta + saldo nombrado. */
+const buildSentimentSummary = (findings: NormalizedFinding[]): SentimentSummary => {
+  const counts = { positive: 0, neutral: 0, negative: 0, mixed: 0 }
+
+  for (const finding of findings) {
+    if (finding.sentimentLabel === 'positive') counts.positive += 1
+    else if (finding.sentimentLabel === 'neutral') counts.neutral += 1
+    else if (finding.sentimentLabel === 'negative') counts.negative += 1
+    else if (finding.sentimentLabel === 'mixed') counts.mixed += 1
+  }
+
+  const evaluated = counts.positive + counts.neutral + counts.negative + counts.mixed
+
+  return { ...counts, evaluated, net: resolveSentimentNet(counts, evaluated) }
+}
+
+const resolveSentimentNet = (
+  counts: { positive: number; neutral: number; negative: number; mixed: number },
+  evaluated: number
+): SentimentNet => {
+  if (evaluated === 0) return 'sin_dato'
+
+  const entries: Array<[SentimentNet, number]> = [
+    ['positivo', counts.positive],
+    ['neutral', counts.neutral],
+    ['negativo', counts.negative],
+    ['mixto', counts.mixed]
+  ]
+
+  const max = Math.max(...entries.map(([, count]) => count))
+  const leaders = entries.filter(([, count]) => count === max)
+
+  // Empate entre etiquetas distintas → saldo mixto (no se favorece una arbitrariamente).
+  return leaders.length === 1 ? leaders[0][0] : 'mixto'
+}
+
+/** Posición/prominencia: mejor (min) + promedio del `brandRank`. `null` honesto si nunca hubo rank. */
+const buildPositionSummary = (findings: NormalizedFinding[]): PositionSummary => {
+  const ranks = findings.map(f => f.brandRank).filter((rank): rank is number => rank !== null)
+
+  if (ranks.length === 0) {
+    return { best: null, average: null, ranked: 0 }
+  }
+
+  return {
+    best: Math.min(...ranks),
+    average: round1Safe(ranks.reduce((sum, rank) => sum + rank, 0) / ranks.length),
+    ranked: ranks.length
+  }
+}
+
+/**
+ * Hallazgos narrativos por motor (cada motor es un canal distinto) desde la
+ * presencia por proveedor. INTERNAL ONLY. Solo motores con respuestas evaluables.
+ */
+const buildProviderFindings = (presence: ProviderPresence[]): ReportFinding[] =>
+  presence
+    .filter(entry => entry.resolved > 0)
+    .map(entry => {
+      const label = GH_GROWTH_AI_VISIBILITY.provider_label[entry.provider as keyof typeof GH_GROWTH_AI_VISIBILITY.provider_label] ?? entry.provider
+      const present = entry.present > 0
+
+      return {
+        key: `provider:${entry.provider}`,
+        severity: present ? resolveSeverity((entry.present / entry.resolved) * 100) : 'critico',
+        text: present
+          ? GH_GROWTH_AI_VISIBILITY.provider_finding_present(label, entry.present, entry.resolved)
+          : GH_GROWTH_AI_VISIBILITY.provider_finding_absent(label, entry.resolved)
+      }
+    })
+
 const buildProvenance = (
   score: PersistedGraderScore,
   findings: NormalizedFinding[],
@@ -288,6 +388,10 @@ export const toPublicGraderReport = (report: GraderReport): PublicGraderReport =
   recommendedMotion: report.recommendedMotion,
   competitiveSov: report.competitiveSov,
   sourceTypeSummary: report.sourceTypeSummary,
+  // TASK-1237 — agregados seguros (%/conteos). `providerFindings` se OMITE (detalle por canal, internal-only).
+  citationInsight: report.citationInsight,
+  sentimentSummary: report.sentimentSummary,
+  positionSummary: report.positionSummary,
   // El trend es agregado puro (deltas numéricos, sin raw text) → public-safe.
   trend: report.trend,
   provenance: report.provenance,
@@ -299,6 +403,7 @@ export const toPublicGraderReport = (report: GraderReport): PublicGraderReport =
 /** Deriva el reporte INTERNO completo. PURO + determinista. */
 export const buildGraderReport = (input: BuildGraderReportInput): GraderReport => {
   const { score, findings, run, previous } = input
+  const providerPresence = buildProviderPresence(findings)
 
   const gateStatus = resolveGateStatus(score, run.status)
   const scoredInputs = score.dimensions.map(d => ({ key: d.key, score: d.score, weight: d.weight }))
@@ -335,7 +440,11 @@ export const buildGraderReport = (input: BuildGraderReportInput): GraderReport =
     recommendedMotion: primaryGap?.motion ?? null,
     competitiveSov: buildCompetitiveSov(findings),
     sourceTypeSummary: buildSourceTypeSummary(findings),
-    providerPresence: buildProviderPresence(findings),
+    providerPresence,
+    providerFindings: buildProviderFindings(providerPresence),
+    citationInsight: buildCitationInsight(findings, input.subjectDomain ?? null),
+    sentimentSummary: buildSentimentSummary(findings),
+    positionSummary: buildPositionSummary(findings),
     trend: buildReportTrend(score, run.promptPackVersion, previous ?? null),
     provenance: buildProvenance(score, findings, run),
     disclaimer: GH_GROWTH_AI_VISIBILITY.disclaimer

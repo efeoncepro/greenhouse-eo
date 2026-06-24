@@ -16,8 +16,10 @@ import type {
   GraderReportSeverity,
   GraderReportTrendStatus,
   RecommendationGapKey,
+  SentimentNet,
   TrendDirection
 } from '@/lib/growth/ai-visibility/report/contracts'
+import type { NormalizedFindingProvider } from '@/lib/growth/ai-visibility/normalization/contracts'
 import type { ScoreDimensionKey } from '@/lib/growth/ai-visibility/scoring/config'
 
 export const GH_GROWTH_AI_VISIBILITY = {
@@ -125,6 +127,29 @@ export const GH_GROWTH_AI_VISIBILITY = {
     sin_cambio: 'Sin cambios',
     sin_dato: 'Sin dato'
   } satisfies Record<TrendDirection, string>,
+
+  // Enriquecimiento de señales (TASK-1237): etiquetas de motor + saldo de sentimiento + findings por motor.
+  provider_label: {
+    openai: 'ChatGPT (OpenAI)',
+    anthropic: 'Claude (Anthropic)',
+    perplexity: 'Perplexity',
+    gemini: 'Gemini (Google)',
+    manual_import: 'Evidencia cargada'
+  } satisfies Record<NormalizedFindingProvider, string>,
+
+  sentiment_net_label: {
+    positivo: 'Positivo',
+    neutral: 'Neutral',
+    negativo: 'Negativo',
+    mixto: 'Mixto',
+    sin_dato: 'Sin dato'
+  } satisfies Record<SentimentNet, string>,
+
+  // Finding por motor: presente / invisible, con el conteo de respuestas como contexto.
+  provider_finding_present: (label: string, present: number, resolved: number) =>
+    `Presente en ${label}: apareces en ${present} de ${resolved} ${resolved === 1 ? 'respuesta' : 'respuestas'}.`,
+  provider_finding_absent: (label: string, resolved: number) =>
+    `Invisible en ${label}: no apareces en ${resolved} ${resolved === 1 ? 'respuesta evaluada' : 'respuestas evaluadas'}.`,
 
   // Nota del finding headline cuando el KPI dominante es el resultado compuesto (ai_visibility).
   outcome_note: 'Tu visibilidad en IA resume las brechas de las dimensiones que la explican.',

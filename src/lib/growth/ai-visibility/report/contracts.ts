@@ -189,6 +189,45 @@ export interface ReportProvenance {
   promptCount: number
 }
 
+// ── Signal enrichment (TASK-1237) ────────────────────────────────────────────
+
+/**
+ * Citation share del sitio propio: % de respuestas con citas que citan el dominio
+ * del sujeto (distinto de la calidad de fuente por tipo). `ownDomainShare` null si
+ * no hay respuestas con citas evaluables (sin dato ≠ 0). Solo %/conteos — NUNCA
+ * expone los dominios crudos.
+ */
+export interface CitationInsight {
+  ownDomainShare: number | null
+  findingsWithCitations: number
+  findingsCitingOwnDomain: number
+}
+
+/** Saldo nombrado del sentimiento sobre la marca sujeto (NUNCA un color). */
+export const SENTIMENT_NET_VALUES = ['positivo', 'neutral', 'negativo', 'mixto', 'sin_dato'] as const
+export type SentimentNet = (typeof SENTIMENT_NET_VALUES)[number]
+
+/** Resumen de sentimiento (conteos por etiqueta evaluada + saldo). Factual, sin difamación. */
+export interface SentimentSummary {
+  positive: number
+  neutral: number
+  negative: number
+  mixed: number
+  /** Total de respuestas con sentimiento resuelto (excluye `unknown`). */
+  evaluated: number
+  net: SentimentNet
+}
+
+/** Posición/prominencia de la marca en las respuestas (rank más bajo = más prominente). */
+export interface PositionSummary {
+  /** Mejor posición observada (mínimo `brandRank`); null si nunca se resolvió rank. */
+  best: number | null
+  /** Posición promedio (redondeada); null si no hay rank. */
+  average: number | null
+  /** Cantidad de respuestas con `brandRank` resuelto. */
+  ranked: number
+}
+
 // ── Temporal trend (TASK-1236) ───────────────────────────────────────────────
 
 /**
@@ -249,6 +288,11 @@ export interface GraderReport {
   competitiveSov: CompetitiveShareOfVoice
   sourceTypeSummary: SourceTypeCount[]
   providerPresence: ProviderPresence[]
+  /** Hallazgos narrativos por motor (TASK-1237) — INTERNAL ONLY; no viaja al público. */
+  providerFindings: ReportFinding[]
+  citationInsight: CitationInsight
+  sentimentSummary: SentimentSummary
+  positionSummary: PositionSummary
   trend: ReportTrend
   provenance: ReportProvenance
   disclaimer: string
@@ -282,6 +326,10 @@ export interface PublicGraderReport {
   recommendedMotion: RecommendedMotion | null
   competitiveSov: CompetitiveShareOfVoice
   sourceTypeSummary: SourceTypeCount[]
+  // TASK-1237 — agregados seguros (%/conteos). `providerFindings` NO va al público (detalle por canal).
+  citationInsight: CitationInsight
+  sentimentSummary: SentimentSummary
+  positionSummary: PositionSummary
   trend: ReportTrend
   provenance: ReportProvenance
   disclaimer: string
