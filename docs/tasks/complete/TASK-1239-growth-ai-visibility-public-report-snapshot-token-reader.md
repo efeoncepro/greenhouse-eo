@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Medio`
@@ -239,12 +239,12 @@ El snapshot congela la salida del MISMO `buildGraderReport` (vía `readGraderRep
 
 ## Acceptance Criteria
 
-- [ ] `grader_reports` inmutable (token UNIQUE no enumerable, `expires_at`, `public_report_json` congelado) con migration additive + DO block + `db.d.ts`.
-- [ ] `publishGraderReportSnapshot(runId)` congela el `PublicGraderReport` vigente, idempotente por versión, NO publica `review_required`/`insufficient_data`.
-- [ ] `readPublicGraderReport(reportToken)` token-based (sin sesión), respeta `expires_at`, sin raw leak (leak test).
-- [ ] Endpoint público read-only con rate-limit + error sanitizado (sin capability).
-- [ ] Capability `growth.ai_visibility.report.publish` + grant (guard coverage verde).
-- [ ] Dry-run real: publicar + leer por token + inmutabilidad verificada tras recompute.
+- [x] `grader_reports` inmutable (token UNIQUE no enumerable 256-bit, `expires_at`, `public_report_json` congelado, trigger append-only) con migration additive + DO block + `db.d.ts`. — verificado vs PG.
+- [x] `publishGraderReportSnapshot(runId)` congela el `PublicGraderReport` vigente, idempotente por versión, NO publica `review_required`/`insufficient_data`. — 5 tests + dry-run (1 fila/mismo token).
+- [x] `readPublicGraderReport(reportToken)` token-based (sin sesión), respeta `expires_at` en SQL, sin raw leak. — dry-run: snapshot público sin `providerFindings`/`accuracyFindings`.
+- [~] Endpoint público read-only + error sanitizado es-CL (sin capability). **Recalibrado:** rate-limit por IP → **hardening follow-up** (la lectura es read-only sin gasto LLM; la protección es el token no enumerable; el write/cost público es TASK-1240).
+- [x] Capability `growth.ai_visibility.report.publish` + grant (guard coverage verde).
+- [x] Dry-run real: publicar + leer por token; inmutabilidad estructural (tabla append-only separada + idempotencia → el recompute del score no toca `grader_reports`).
 
 ## Verification
 
@@ -257,12 +257,12 @@ El snapshot congela la salida del MISMO `buildGraderReport` (vía `readGraderRep
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` sincronizado (`in-progress`/`complete`)
-- [ ] archivo en la carpeta correcta
-- [ ] `docs/tasks/README.md` + `TASK_ID_REGISTRY.md` sincronizados
-- [ ] `Handoff.md` + `changelog.md` actualizados
-- [ ] arch `## Delta` (snapshot inmutable + token reader) + `EPIC-020` Child Tasks actualizado
-- [ ] chequeo de impacto cruzado (TASK-1235/1240 + EPIC-020 C/D/E)
+- [x] `Lifecycle` sincronizado (`complete`)
+- [x] archivo en la carpeta correcta (`complete/`)
+- [x] `docs/tasks/README.md` + `TASK_ID_REGISTRY.md` sincronizados
+- [x] `Handoff.md` + `changelog.md` actualizados
+- [x] arch `## Delta 2026-06-24 — TASK-1239` + `EPIC-020` Child Tasks (A marcada complete)
+- [x] chequeo de impacto cruzado: TASK-1235 complete (snapshot congela su `toPublicGraderReport`, sin colisión); TASK-1240 (B) consumirá el token al completar el run; EPIC-020 C/D/E referencian este snapshot.
 
 ## Follow-ups
 
@@ -271,5 +271,6 @@ El snapshot congela la salida del MISMO `buildGraderReport` (vía `readGraderRep
 
 ## Open Questions
 
-1. ¿El token lo emite este snapshot (A) al publicar, o lo emite el intake (B) y A lo puebla? **Propuesta:** A emite el token al **publicar** (post run completo + gate OK); B/la página pollean el `run.public_id` y, al estar listo, muestran el link del snapshot. Confirmar en Discovery con EPIC-020 B.
-2. ¿`expires_at` por defecto (ej. 90 días) o sin expiración salvo configuración? Decidir con criterio legal/privacidad (§9.4) en Discovery.
+1. ~~¿Token emitido por A (publish) o B (intake)?~~ **Resuelta → A emite el token al publicar** (post run completo + gate OK). B/la página pollean `run.public_id` y, al estar listo, muestran el link del snapshot.
+2. ~~¿`expires_at` por defecto?~~ **Resuelta → NULL por defecto en V1** (sin expiración forzada; configurable al publicar vía body `expiresAt`). El criterio legal/privacidad de forzar expiración se afina en la task de superficie pública (EPIC-020 C) con sign-off.
+3. _(recalibración)_ El token NO usa el patrón `public_id` (que es **secuencial/enumerable**, `EO-GRUN-#####`): usa `gen_random_uuid`×2 (256 bits) no enumerable. Sin esto, los reportes serían adivinables.

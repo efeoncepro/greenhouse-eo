@@ -37,7 +37,7 @@ El motor del grader está completo y verificado (TASK-1226/1227/1234/1235/1236/1
 
 ## Child Tasks
 
-- `TASK-1239` — **(A) Public Grader Report Snapshot + Token Reader** — `grader_reports` inmutable (run_id + score_version + report_version + recommendation_pack_version + as_of + DTO público congelado + token + expires_at) + `readPublicGraderReport(reportToken)`. Foundation de parity pública. **P1.**
+- `TASK-1239` ✅ **complete (dev)** — **(A) Public Grader Report Snapshot + Token Reader** — `grader_reports` inmutable (run_id + score_version + report_version + recommendation_pack_version + as_of + DTO público congelado + token NO enumerable 256-bit + expires_at) + `readPublicGraderReport(reportToken)` + `publishGraderReportSnapshot` (idempotente, no publica gateados) + capability `report.publish` + endpoints admin/público. Foundation de parity pública. **P1.**
 - `TASK-1240` — **(B) Public Grader Run Intake + abuse/cost controls** — `createPublicGraderRun(input, idempotencyKey)` (§9.2 input + consent + work email, NO PII a providers) → enqueue al worker async (TASK-1234) + rate-limit/cost ceiling/captcha + modo `light`. **P1.**
 - **(C) Public page: landing + form + states + report render** — superficie pública (product design + a11y WCAG 2.2 AA/EAA): formulario de captura, estados async honestos (§9.3), render del reporte (radar/bar + table-fallback). Consume A (token-reader) + B (intake). **P1, sin ID aún.**
 - **(D) HubSpot handoff** — `syncAiVisibilityRunToHubSpot(runId, idempotencyKey)`: contact/company + props `ai_visibility_*` + lifecycle stage desde `primary_gap`/`recommended_motion`. **P2, sin ID aún.**
