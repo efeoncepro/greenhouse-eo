@@ -120,9 +120,10 @@ El arch V1 define providers OpenAI/Perplexity/Gemini. Este spike incluyó **Anth
 
 **Hecho:** pipeline validado (OpenAI + Anthropic); subject-only + discriminación techo→piso (brand-set v2: BBDO Chile fuerte local, Peras y Manzanas débil); accuracy confirmada; **varianza N=3 medida + modelo de muestreo recomendado** (§5.bis). Las dimensiones discriminan limpio (5→0). Evidencia direccional, no estadística (N pequeño, un mercado, sin Gemini/Perplexity).
 
+**Hecho (cont.):** **`golden-set.v1.json` curado** (Slice 5) — 8 casos {input, expectedFinding} fundados en evidencia real (presente/ausente/ambiguo/drift/trust + regla de desambiguación por dominio), listo para que `TASK-1227` lo promueva a `src/lib/growth/ai-visibility/evals/**`.
+
 **Pendiente para cerrar (follow-ups):**
-1. **Recalibrar pesos** del score con esta evidencia (hasta entonces se mantienen los del arch V1 como hipótesis; ahora hay escala real 5→0 + modelo de confianza para anclarlos).
-2. **Curar `golden-set.v1.json`** (inputs + expected findings, desambiguando `efeoncepro.com` del homónimo `f11.es`) para `TASK-1227` (Slice 5).
-3. **Gemini/Perplexity** cuando haya credenciales (completar el provider set arch V1).
-4. **ADR delta**: decidir si Anthropic entra al provider set V1.
-5. **Prompt pack v2**: fix p12 ("aerolínea/banca" contamina controles); p06 ya corregido en el harness.
+1. **Recalibrar pesos** del score con esta evidencia (hasta entonces se mantienen los del arch V1 como hipótesis; ahora hay escala real 5→0 + modelo de confianza + golden set para anclarlos).
+2. **Gemini/Perplexity** cuando haya credenciales (completar el provider set arch V1).
+3. **ADR delta**: decidir si Anthropic entra al provider set V1.
+4. **Prompt pack v2**: fix p12 ("aerolínea/banca" contamina controles); p06 ya corregido en el harness.

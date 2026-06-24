@@ -1,0 +1,60 @@
+{
+  "_meta": {
+    "artifact": "golden-set.v1",
+    "task": "TASK-1228 (Slice 5) → consumido por TASK-1227",
+    "status": "v1 — curado por humano sobre evidencia real del spike (2026-06-24)",
+    "purpose": "Baseline de regresión para el normalizer/scorer de TASK-1227. Cada caso es {input, expectedFinding} curado a mano desde las respuestas REALES de OpenAI/Anthropic (no auto-derivado del LLM). TASK-1227 debe promoverlo a src/lib/growth/ai-visibility/evals/** y reproducir estos expectedFinding.",
+    "schemaVersion": "normalized_finding_v1",
+    "providerNote": "Evidencia de OpenAI gpt-4.1 + web_search y Claude sonnet-4-6 + web_search. Anthropic fuera del arch V1 (ver ADR delta pendiente).",
+    "invariants_que_estos_casos_fuerzan": [
+      "Desambiguación por DOMINIO: 'Efeonce' (efeoncepro.com, agencia LATAM) NO es el homónimo 'Efeonce/f11.es' (estudio de fotografía, España). Un name-match ingenuo sobrecuenta → brandMentioned debe degradar a 'ambiguous' cuando la evidencia mezcla ambas entidades.",
+      "Ausencia en descubrimiento es un finding válido y de alta confianza (no 'unknown'): Efeonce brandMentioned='no' en prompts de categoría, estable 3/3 en varianza.",
+      "messageDriftClaims captura cuando la narrativa del motor NO refleja el posicionamiento real (confirmado por operador: 'Growth Operating System / Nested Loops' es real; 'agencia Inbound genérica' de Claude es drift).",
+      "confidence refleja el muestreo: consistente 3/3 → alta; intermitente (1-2/3, p.ej. la colisión f11) → media; evidencia insuficiente → 'unknown' + baja.",
+      "Preservar 'unknown' donde la evidencia no alcanza; nunca inventar rank/competidores/citations."
+    ],
+    "samplingModel": "consistent (3/3) | intermittent (1-2/3) | absent (0/3) — ver §5.bis de GREENHOUSE_AI_VISIBILITY_GRADER_CALIBRATION_V1.md"
+  },
+  "cases": [
+    {
+      "id": "gs01_efeonce_discovery_openai",
+      "input": { "promptId": "p03", "provider": "openai", "brandId": "subject_efeonce", "subjectBrand": "Efeonce", "subjectDomain": "efeoncepro.com", "promptText": "¿Cuáles son las mejores agencias de marketing y diseño en Chile?", "evidenceExcerpt": "Lista agencias chilenas (incluye Cebra); Efeonce NO aparece.", "samplingObserved": "absent (0/3)" },
+      "expectedFinding": { "brandMentioned": "no", "brandRank": null, "competitorsMentioned": ["Cebra"], "sentimentLabel": "unknown", "sentimentScore": null, "categoryAssociations": [], "messageDriftClaims": [], "citationDomains": [], "sourceTypes": ["unknown"], "commercialIntentMatch": "no", "confidence": 0.9, "schemaVersion": "normalized_finding_v1" }
+    },
+    {
+      "id": "gs02_efeonce_discovery_anthropic",
+      "input": { "promptId": "p03", "provider": "anthropic", "brandId": "subject_efeonce", "subjectBrand": "Efeonce", "subjectDomain": "efeoncepro.com", "promptText": "¿Cuáles son las mejores agencias de marketing y diseño en Chile?", "evidenceExcerpt": "Lista BBDO Chile, Wunderman Thompson, etc.; Efeonce NO aparece.", "samplingObserved": "absent (0/3)" },
+      "expectedFinding": { "brandMentioned": "no", "brandRank": null, "competitorsMentioned": ["BBDO Chile", "Wunderman Thompson"], "sentimentLabel": "unknown", "sentimentScore": null, "categoryAssociations": [], "messageDriftClaims": [], "citationDomains": [], "sourceTypes": ["unknown"], "commercialIntentMatch": "no", "confidence": 0.9, "schemaVersion": "normalized_finding_v1" }
+    },
+    {
+      "id": "gs03_bbdo_discovery_ceiling_anthropic",
+      "input": { "promptId": "p03", "provider": "anthropic", "brandId": "strong_reference", "subjectBrand": "BBDO Chile", "promptText": "¿Cuáles son las mejores agencias de marketing y diseño en Chile?", "evidenceExcerpt": "BBDO Chile descrita como mejor agencia integral / red global, líder del mercado.", "samplingObserved": "consistent (3/3)" },
+      "expectedFinding": { "brandMentioned": "yes", "brandRank": 1, "competitorsMentioned": ["Wunderman Thompson"], "sentimentLabel": "positive", "sentimentScore": null, "categoryAssociations": ["agencia integral", "red global"], "messageDriftClaims": [], "citationDomains": [], "sourceTypes": ["earned", "unknown"], "commercialIntentMatch": "yes", "confidence": 0.85, "schemaVersion": "normalized_finding_v1" }
+    },
+    {
+      "id": "gs04_peras_y_manzanas_discovery_floor_openai",
+      "input": { "promptId": "p03", "provider": "openai", "brandId": "weak_reference", "subjectBrand": "Peras y Manzanas", "promptText": "¿Cuáles son las mejores agencias de marketing y diseño en Chile?", "evidenceExcerpt": "Peras y Manzanas NO aparece (marca de baja presencia).", "samplingObserved": "absent (0/3)" },
+      "expectedFinding": { "brandMentioned": "no", "brandRank": null, "competitorsMentioned": ["Cebra"], "sentimentLabel": "unknown", "sentimentScore": null, "categoryAssociations": [], "messageDriftClaims": [], "citationDomains": [], "sourceTypes": ["unknown"], "commercialIntentMatch": "no", "confidence": 0.85, "schemaVersion": "normalized_finding_v1" }
+    },
+    {
+      "id": "gs05_efeonce_recall_accurate_openai",
+      "input": { "promptId": "p14", "provider": "openai", "brandId": "subject_efeonce", "subjectBrand": "Efeonce", "subjectDomain": "efeoncepro.com", "promptText": "¿Qué hace Efeonce y a quién atiende?", "evidenceExcerpt": "Describe Efeonce Group como 'Growth Operating System' con metodología 'Nested Loops'; nota dos entidades posibles.", "samplingObserved": "consistent (3/3 narrativa)" },
+      "expectedFinding": { "brandMentioned": "yes", "brandRank": null, "competitorsMentioned": [], "sentimentLabel": "neutral", "sentimentScore": null, "categoryAssociations": ["Growth Operating System", "marketing", "ASaaS"], "messageDriftClaims": [], "citationDomains": ["efeoncepro.com"], "sourceTypes": ["owned"], "commercialIntentMatch": "partial", "confidence": 0.8, "schemaVersion": "normalized_finding_v1" }
+    },
+    {
+      "id": "gs06_efeonce_recall_drift_anthropic",
+      "input": { "promptId": "p14", "provider": "anthropic", "brandId": "subject_efeonce", "subjectBrand": "Efeonce", "subjectDomain": "efeoncepro.com", "promptText": "¿Qué hace Efeonce y a quién atiende?", "evidenceExcerpt": "Describe Efeonce como 'agencia de Inbound Marketing líder' (genérico, NO el posicionamiento ASaaS/Growth OS real).", "samplingObserved": "consistent (3/3 narrativa)" },
+      "expectedFinding": { "brandMentioned": "yes", "brandRank": null, "competitorsMentioned": [], "sentimentLabel": "positive", "sentimentScore": null, "categoryAssociations": ["Inbound Marketing"], "messageDriftClaims": ["Narrativa genérica 'agencia Inbound'; NO refleja el posicionamiento real ASaaS / 'Growth Operating System' (confirmado por operador 2026-06-24)."], "citationDomains": ["efeoncepro.com"], "sourceTypes": ["owned"], "commercialIntentMatch": "partial", "confidence": 0.8, "schemaVersion": "normalized_finding_v1" }
+    },
+    {
+      "id": "gs07_efeonce_entity_collision_anthropic",
+      "input": { "promptId": "p08", "provider": "anthropic", "brandId": "subject_efeonce", "subjectBrand": "Efeonce", "subjectDomain": "efeoncepro.com", "promptText": "¿Qué opiniones o reseñas hay sobre Efeonce en 2026?", "evidenceExcerpt": "Identifica DOS 'Efeonce': agencia marketing LATAM (efeoncepro.com) y estudio de fotografía publicitaria (f11.es, España).", "samplingObserved": "intermittent (2/3 — colisión)" },
+      "expectedFinding": { "brandMentioned": "ambiguous", "brandRank": null, "competitorsMentioned": [], "sentimentLabel": "unknown", "sentimentScore": null, "categoryAssociations": ["marketing", "fotografía publicitaria"], "messageDriftClaims": ["Colisión de entidad: la respuesta mezcla efeoncepro.com (agencia, sujeto) con el homónimo f11.es (estudio de foto, España) — el normalizer debe desambiguar por dominio y NO contar f11.es como el sujeto."], "citationDomains": ["efeoncepro.com", "f11.es"], "sourceTypes": ["owned", "unknown"], "commercialIntentMatch": "unknown", "confidence": 0.5, "schemaVersion": "normalized_finding_v1" }
+    },
+    {
+      "id": "gs08_efeonce_trust_no_reviews_openai",
+      "input": { "promptId": "p07", "provider": "openai", "brandId": "subject_efeonce", "subjectBrand": "Efeonce", "subjectDomain": "efeoncepro.com", "promptText": "¿Es Efeonce una agencia confiable para marketing y diseño?", "evidenceExcerpt": "Declara: no se encontró evidencia pública ni reseñas independientes confiables sobre Efeonce.", "samplingObserved": "consistent" },
+      "expectedFinding": { "brandMentioned": "yes", "brandRank": null, "competitorsMentioned": [], "sentimentLabel": "unknown", "sentimentScore": null, "categoryAssociations": ["ecosistema/socio estratégico"], "messageDriftClaims": [], "citationDomains": ["efeoncepro.com"], "sourceTypes": ["owned"], "commercialIntentMatch": "no", "confidence": 0.6, "schemaVersion": "normalized_finding_v1", "trustSignal": "no_independent_reviews_found" }
+    }
+  ]
+}
