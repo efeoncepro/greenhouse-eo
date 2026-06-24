@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.8
+> **Version:** 1.9
 > **Creado:** 2026-06-24 por Claude (TASK-1226)
-> **Ultima actualizacion:** 2026-06-24 por Claude (TASK-1237, señales del reporte)
+> **Ultima actualizacion:** 2026-06-24 por Claude (TASK-1238, exactitud de marca)
 > **Documentacion tecnica:** [GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md)
 
 # AI Visibility Grader — Motor de Providers (Growth)
@@ -93,6 +93,7 @@ Una vez que un análisis tiene puntaje, el sistema arma un **reporte** que tradu
 - **Plan priorizado:** las recomendaciones salen **ordenadas por impacto** (qué hacer primero), no como lista plana. La de mayor impacto es el "gap principal" y define el siguiente movimiento comercial.
 - **Honestidad:** una dimensión **sin evidencia** se muestra como "sin dato" (no como 0). Un 0 medido sí es un problema real. Si faltó cobertura o hay lenguaje sensible, el reporte lo dice con su razón y próximo paso, sin fingir precisión.
 - **Tendencia (vs análisis anterior):** si la marca ya tiene un análisis previo comparable, el reporte muestra cuánto **subió o bajó** cada dimensión y el puntaje global desde la última vez (la visibilidad en IA se mide por tendencia, no por una foto). Si es el primer análisis dice "primer análisis"; si el anterior usó otra versión de preguntas, lo marca como "no comparable" en vez de inventar un cambio.
+- **Exactitud de marca (¿la IA dice la verdad de ti?):** además de medir si apareces, el sistema revisa si la IA dice cosas **factualmente equivocadas** sobre la marca — te ubica en otra categoría, te confunde con otra empresa o te atribuye algo que no es. Compara lo que dice la IA contra los datos **declarados** de la marca (categoría, competidores). Es conservador: si hay una confusión de identidad clara, el análisis **se marca para revisión humana** antes de poder publicarse (importante para clientes sensibles como bancos o aerolíneas), en vez de afirmar por su cuenta que "la IA miente". Este detalle es **solo de uso interno** — al público nunca se le muestra "la IA se equivoca de ti", solo el equipo lo revisa.
 - **Señales extra:** el reporte también muestra si la IA **cita tu propio sitio** (qué porcentaje de las respuestas con fuentes te citan a ti), el **sentimiento** con que se habla de la marca, tu **posición** cuando apareces (1.º vs 5.º), y en **qué motor** apareces o no (ej. "presente en Gemini, invisible en Perplexity"). El detalle por motor es solo para uso interno; el resto es seguro para la versión pública. Si un dato no se midió, dice "sin dato" (nunca un 0 falso).
 - **Dos versiones:** una **interna** completa (para ventas/admin, con presencia por motor y detalle) y una **pública segura** que nunca incluye el texto crudo de los motores ni las fuentes privadas (sólo el puntaje, los competidores top, el resumen de fuentes y los próximos pasos, con el aviso de que es un diagnóstico muestreado por IA).
 

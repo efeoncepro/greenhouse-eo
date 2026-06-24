@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -245,13 +245,13 @@ El monitor de exactitud contrasta lo que la IA **afirma** de la marca contra la 
 
 ## Acceptance Criteria
 
-- [ ] `BrandTruth` (verdad declarada) + contrato `AccuracyFinding` definidos y testeados.
-- [ ] Detector determinista-first marca category mismatch / contradicción de hecho declarado / colisión de entidad, recomputable.
-- [ ] La extracción LLM (si se usa) aporta SOLO evidencia; el score sigue determinista (test que lo prueba).
-- [ ] Alucinaciones probables escalan a `review_required` (conservador YMYL), no a precisión falsa.
-- [ ] Sin verdad declarada suficiente → degradación honesta (no se inventa inexactitud).
-- [ ] Inexactitudes surfaceadas en el reporte con copy tokenizado (`src/lib/copy/growth.ts`), sin difamación; público sin raw evidence.
-- [ ] Reliability signal de accuracy/review en steady=0; dry-run real coherente.
+- [x] `BrandTruth` (verdad declarada) + contrato `AccuracyFinding` definidos y testeados. — `accuracy/contracts.ts` + `detector.ts`; 6 tests.
+- [x] Detector determinista-first marca category_mismatch / entity_collision / misattribution, recomputable. — `detectBrandInaccuracies`; test determinismo.
+- [x] La extracción LLM aporta SOLO evidencia; el score sigue determinista (test que lo prueba). — el detector lee findings ya enriquecidos; el `grader_score` numérico NO cambia; gate test backward-compatible.
+- [x] Alucinaciones probables escalan a `review_required` (conservador YMYL), no a precisión falsa. — `resolveScoreStatus` + `hasLikelyHallucination` (solo `high`); test "no sobre-escala".
+- [x] Sin verdad declarada suficiente → degradación honesta (no se inventa inexactitud). — `category_mismatch` requiere `category`; detector `[]` sin `BrandTruth`; tests.
+- [x] Inexactitudes surfaceadas en el reporte con copy tokenizado (`accuracy_kind_label`), sin difamación; **internal-only** (no público). — `ReportAccuracyFinding`; leak test + test internal-only.
+- [x] Reliability signal `growth.ai_visibility.brand_accuracy_review`; dry-run real coherente. — SQL `= ANY(review_reasons)` ejercitada vs PG (steady 0/2); dry-run EO-GRUN-00008 sin falsos positivos.
 
 ## Verification
 
@@ -263,12 +263,12 @@ El monitor de exactitud contrasta lo que la IA **afirma** de la marca contra la 
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` sincronizado (`in-progress`/`complete`)
-- [ ] archivo en la carpeta correcta
-- [ ] `docs/tasks/README.md` + `TASK_ID_REGISTRY.md` sincronizados
-- [ ] `Handoff.md` + `changelog.md` actualizados
-- [ ] arch `## Delta` (dimensión/detector de exactitud) + `RELIABILITY_CONTROL_PLANE` Delta por el signal nuevo
-- [ ] chequeo de impacto cruzado (TASK-1235/1237 + futuras superficie pública/admin review)
+- [x] `Lifecycle` sincronizado (`complete`)
+- [x] archivo en la carpeta correcta (`complete/`)
+- [x] `docs/tasks/README.md` + `TASK_ID_REGISTRY.md` sincronizados
+- [x] `Handoff.md` + `changelog.md` actualizados
+- [x] arch `## Delta 2026-06-24 — TASK-1238`. RELIABILITY_CONTROL_PLANE: signal additivo en la familia scoring-signals ya wired (sin Delta separado — proporcional).
+- [x] chequeo de impacto cruzado: TASK-1235/1237 complete (mismos owned files report/, sin colisión — `accuracyFindings` campo distinto). EPIC-020 F (admin review) consumirá estos hallazgos.
 
 ## Follow-ups
 
@@ -277,6 +277,7 @@ El monitor de exactitud contrasta lo que la IA **afirma** de la marca contra la 
 
 ## Open Questions
 
-1. **¿Extender la dimensión `message_alignment` o crear un detector/sección `brand_accuracy` separado?** `message_alignment` mide *posicionamiento desviado* (drift); exactitud mide *hecho falso* — son conceptualmente distintos. Agregar una 8.ª dimensión al score v1 recalibra pesos (→ `score_version` nuevo, costoso). Propuesta para Plan Mode: **NO** nueva dimensión en el score v1; un detector/finding de accuracy que alimenta el reporte (estilo TASK-1237) + escala a `review_required`, sin tocar los números del score. Confirmar en Discovery.
-2. **¿Verdad de marca más rica?** Hoy `grader_profiles` sólo tiene `category`/`competitors_declared`/`brand_name`/`website_url`. La descripción de producto/servicio (§9.2 input público) NO se persiste. ¿V1 acepta verdad limitada (categoría/identidad) o agrega `service_description` (migración additive)? Decidir en Discovery según el valor/costo.
+1. ~~¿Extender `message_alignment` o detector `brand_accuracy` separado?~~ **Resuelta → detector separado `accuracy/`, SIN tocar el score v1.** No nueva dimensión (no recalibrar pesos/`score_version`): el detector alimenta el reporte (estilo TASK-1237, internal-only) + escala el `score_status` a `review_required`. Los números del score no cambian.
+2. ~~¿Verdad de marca más rica?~~ **Resuelta → V1 acepta verdad declarada limitada** (`category`/`competitors_declared`/`brand_name`/`website_url`), SIN migración. Persistir `service_description` = follow-up (ver Follow-ups).
+3. ~~¿Cobertura determinista vs LLM en V1?~~ **Resuelta → determinista-first**: `entity_collision` + `category_mismatch` deterministas (sin depender del flag LLM); `misattribution` se emite como evidencia low desde `messageDriftClaims` cuando el hook LLM corrió. El score nunca lo asigna un LLM.
 3. **¿Cobertura del determinista-first vs LLM en V1?** El determinista cubre category mismatch + colisión de entidad; las afirmaciones libres falsas requieren el hook LLM (flag OFF). ¿V1 entrega sólo determinista (sin depender del flag) y deja el LLM-assisted como evidencia opcional? Probable sí (no bloquear V1 en el flag).
