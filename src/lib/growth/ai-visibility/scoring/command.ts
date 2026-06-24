@@ -12,6 +12,7 @@ import 'server-only'
 
 import { captureWithDomain } from '@/lib/observability/capture'
 
+import { buildBrandTruth, detectBrandInaccuracies } from '../accuracy'
 import { extractCitationDomain } from '../observation'
 import { getGraderProfile, getGraderRun, getRunObservations } from '../store'
 import { normalizeObservation } from '../normalization/normalizer'
@@ -82,7 +83,20 @@ export const scoreGraderRun = async (input: {
     await upsertNormalizedFindings(findings)
 
     const raw = computeGraderScore(input.runId, findings)
-    const status = resolveScoreStatus(raw, findings)
+
+    // Detector de exactitud de marca (TASK-1238): contrasta los findings contra la
+    // verdad declarada; una inexactitud probable escala el gate a review_required.
+    // Determinista — ningún LLM asigna el veredicto.
+    const accuracyFindings = detectBrandInaccuracies(
+      findings,
+      buildBrandTruth({
+        brandName: profile.brandName,
+        category: profile.category,
+        competitorsDeclared: profile.competitorsDeclared
+      })
+    )
+
+    const status = resolveScoreStatus(raw, findings, accuracyFindings)
 
     const score = await upsertGraderScore({
       ...raw,

@@ -11,6 +11,7 @@
  * una task posterior). PURO.
  */
 
+import { hasLikelyHallucination, type AccuracyFinding } from '../accuracy'
 import { type NormalizedFinding } from '../normalization/contracts'
 import {
   MIN_PROMPT_FAMILIES_COVERED,
@@ -65,9 +66,14 @@ const hasLowConfidenceNegative = (findings: NormalizedFinding[]): boolean =>
     finding => finding.sentimentLabel === 'negative' && finding.confidence < REVIEW_LOW_CONFIDENCE_THRESHOLD
   )
 
+/** Razón de revisión por inexactitud de marca probable (TASK-1238). Interno (admin review). */
+export const BRAND_ACCURACY_REVIEW_REASON =
+  'Posible inexactitud de marca (la IA podría afirmar algo incorrecto) — requiere revisión humana antes de publicar.'
+
 export const resolveScoreStatus = (
   raw: RawGraderScore,
-  findings: NormalizedFinding[]
+  findings: NormalizedFinding[],
+  accuracyFindings: AccuracyFinding[] = []
 ): ScoreStatusResolution => {
   const resolved = countResolvedFindings(findings)
 
@@ -97,6 +103,13 @@ export const resolveScoreStatus = (
 
   if (hasLowConfidenceNegative(findings)) {
     reasons.push('Sentimiento negativo con confianza baja — requiere revisión humana antes de publicar.')
+  }
+
+  // Gate de exactitud (TASK-1238, conservador YMYL): inexactitud de marca PROBABLE
+  // (sólo hallazgos de confianza `high`) → revisión humana. El detector es determinista
+  // sobre los findings; ningún LLM asigna el veredicto.
+  if (hasLikelyHallucination(accuracyFindings)) {
+    reasons.push(BRAND_ACCURACY_REVIEW_REASON)
   }
 
   if (reasons.length > 0) {

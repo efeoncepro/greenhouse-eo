@@ -13,6 +13,7 @@ import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { captureWithDomain } from '@/lib/observability/capture'
 import { runGoldenEval, type GoldenEvalCase } from '@/lib/growth/ai-visibility/evals/eval-runner'
 import goldenSet from '@/lib/growth/ai-visibility/evals/golden-set.v1.json'
+import { BRAND_ACCURACY_REVIEW_REASON } from '@/lib/growth/ai-visibility/review-gates/gates'
 import type { ReliabilitySignal } from '@/types/reliability'
 
 export const GROWTH_AI_VISIBILITY_NORMALIZATION_FAILED_SIGNAL_ID = 'growth.ai_visibility.normalization_failed'
@@ -20,22 +21,26 @@ export const GROWTH_AI_VISIBILITY_SCORE_RECOMPUTE_FAILED_SIGNAL_ID = 'growth.ai_
 export const GROWTH_AI_VISIBILITY_INSUFFICIENT_DATA_RATE_SIGNAL_ID = 'growth.ai_visibility.insufficient_data_rate'
 export const GROWTH_AI_VISIBILITY_REVIEW_REQUIRED_RATE_SIGNAL_ID = 'growth.ai_visibility.report_review_required_rate'
 export const GROWTH_AI_VISIBILITY_EVAL_REGRESSION_SIGNAL_ID = 'growth.ai_visibility.prompt_pack_eval_regression'
+export const GROWTH_AI_VISIBILITY_BRAND_ACCURACY_REVIEW_SIGNAL_ID = 'growth.ai_visibility.brand_accuracy_review'
 
 const MODULE_KEY = 'growth' as const
 
 const buildScoreStatusSignals = async (observedAt: string): Promise<ReliabilitySignal[]> => {
-  const rows = await runGreenhousePostgresQuery<{ total: number; insufficient: number; review: number }>(
+  const rows = await runGreenhousePostgresQuery<{ total: number; insufficient: number; review: number; accuracy: number }>(
     `SELECT
        COUNT(*)::int AS total,
        COUNT(*) FILTER (WHERE score_status = 'insufficient_data')::int AS insufficient,
-       COUNT(*) FILTER (WHERE score_status = 'review_required')::int AS review
+       COUNT(*) FILTER (WHERE score_status = 'review_required')::int AS review,
+       COUNT(*) FILTER (WHERE $1 = ANY(review_reasons))::int AS accuracy
      FROM greenhouse_growth.grader_scores
-     WHERE created_at >= NOW() - INTERVAL '30 days'`
+     WHERE created_at >= NOW() - INTERVAL '30 days'`,
+    [BRAND_ACCURACY_REVIEW_REASON]
   )
 
   const total = Number(rows[0]?.total ?? 0)
   const insufficient = Number(rows[0]?.insufficient ?? 0)
   const review = Number(rows[0]?.review ?? 0)
+  const accuracy = Number(rows[0]?.accuracy ?? 0)
   const insufficientRate = total > 0 ? insufficient / total : 0
   const reviewRate = total > 0 ? review / total : 0
 
@@ -71,6 +76,23 @@ const buildScoreStatusSignals = async (observedAt: string): Promise<ReliabilityS
       observedAt,
       evidence: [
         { kind: 'metric', label: 'review_required', value: String(review) },
+        { kind: 'metric', label: 'total', value: String(total) }
+      ]
+    },
+    {
+      signalId: GROWTH_AI_VISIBILITY_BRAND_ACCURACY_REVIEW_SIGNAL_ID,
+      moduleKey: MODULE_KEY,
+      kind: 'posture',
+      source: 'getGrowthAiVisibilityScoringSignals',
+      label: 'Scores con inexactitud de marca en revisión (AI Visibility)',
+      severity: 'ok', // escalar a revisión por inexactitud es comportamiento de seguridad esperado (YMYL), no un fallo.
+      summary:
+        total === 0
+          ? 'Sin scores en 30 días.'
+          : `${accuracy}/${total} scores escalados a revisión por posible inexactitud de marca (TASK-1238) en 30 días.`,
+      observedAt,
+      evidence: [
+        { kind: 'metric', label: 'brand_accuracy_review', value: String(accuracy) },
         { kind: 'metric', label: 'total', value: String(total) }
       ]
     }
