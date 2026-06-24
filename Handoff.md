@@ -1,3 +1,12 @@
+## Sesión 2026-06-24 — TASK-1228 AI Visibility Grader Discovery & Eval Spike COMPLETE — Claude
+
+> **Estado:** spike COMPLETE (Slices 1-5), local-first, sin push (esperando instrucción). Cobertura empírica OpenAI + Anthropic (web search real vía secrets GCP); Gemini/Perplexity diferidos por creds.
+> - **Validó el modelo del grader con data real.** Headline: **Efeonce 0/6 invisible en descubrimiento** en ambos motores (vs Cebra 4, BBDO 5). Entity collision con homónimo `f11.es`. Message drift: OpenAI captura el posicionamiento real ("Growth Operating System / Nested Loops", confirmado por operador) vs Claude genérico ("Inbound"). Trust gap (sin reseñas independientes). Varianza N=3 estable + modelo de muestreo. Costo: Anthropic 3-4× más caro/lento.
+> - **Artefactos:** `docs/architecture/growth/ai-visibility/{prompt-pack,brand-set,golden-set}.v1.json` + harness throwaway `scripts/growth/ai-visibility-spike/` (NO es el adapter canónico — eso es TASK-1226) + `GREENHOUSE_AI_VISIBILITY_GRADER_CALIBRATION_V1.md`. `golden-set.v1.json` (8 casos) listo para que TASK-1227 lo promueva a `src/lib/growth/ai-visibility/evals/`.
+> - **Hallazgos para el motor (1226/1227):** extracción brand-mention debe **desambiguar por dominio** (no name-match, por colisión f11.es); citations per-provider; bug p06 corregido en el harness.
+> - **Follow-ups (no bloquean):** recalibrar pesos (hay escala real 5→0 + golden set), Gemini/Perplexity con creds, ADR delta Anthropic, prompt pack v2 (fix p12).
+> - **Nota:** se commiteó también el trabajo DOCUMENTAL de Codex (Public Forms Engine + TASK-1229..1232) a pedido del operador, en commit aparte atribuido a Codex.
+
 ## Sesión 2026-06-24 — Growth / Public Forms Engine architecture — Codex
 
 > **Estado:** documentación arquitectónica aceptada; sin runtime/code, sin tasks, sin HubSpot writes, sin deploy. Se formalizó que los formularios públicos/lead magnets de Efeonce deben nacer como capability del dominio `growth`, con Greenhouse como source of truth de definición/render contract/submissions/consent/destination attempts y HubSpot como destination adapter.
