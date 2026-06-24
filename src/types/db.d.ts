@@ -6457,6 +6457,7 @@ export interface GreenhouseGrowthGraderRuns {
   cost_ceiling_usd: Numeric | null;
   created_at: Generated<Timestamp>;
   estimated_cost_usd: Generated<Numeric>;
+  execution_prompts: Generated<Json>;
   finished_at: Timestamp | null;
   idempotency_key: string | null;
   mode: string;

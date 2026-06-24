@@ -31,6 +31,12 @@ export interface GraderProfileRow {
   status: string
 }
 
+/** Prompt resuelto persistido en el run (resumibilidad del worker async, TASK-1234). */
+export interface GraderExecutionPrompt {
+  promptId: string
+  promptText: string
+}
+
 export interface GraderRunRow {
   runId: string
   publicId: string
@@ -44,6 +50,8 @@ export interface GraderRunRow {
   idempotencyKey: string | null
   estimatedCostUsd: number
   costCeilingUsd: number | null
+  /** Prompts resueltos a ejecutar (TASK-1234): el worker async los corre sin re-derivar. */
+  executionPrompts: GraderExecutionPrompt[]
   startedAt: string | null
   finishedAt: string | null
   createdAt: string
@@ -78,6 +86,9 @@ const projectRun = (row: RawRun): GraderRunRow => ({
   idempotencyKey: (row.idempotency_key as string | null) ?? null,
   estimatedCostUsd: Number(row.estimated_cost_usd ?? 0),
   costCeilingUsd: row.cost_ceiling_usd != null ? Number(row.cost_ceiling_usd) : null,
+  executionPrompts: Array.isArray(row.execution_prompts)
+    ? (row.execution_prompts as GraderExecutionPrompt[])
+    : [],
   startedAt: (row.started_at as string | null) ?? null,
   finishedAt: (row.finished_at as string | null) ?? null,
   createdAt: String(row.created_at)
@@ -171,12 +182,14 @@ export const createGraderRun = async (input: {
   requestedProviders: GrowthAiVisibilityProviderId[]
   idempotencyKey: string | null
   costCeilingUsd: number | null
+  /** Prompts resueltos a ejecutar (TASK-1234). Default [] (legacy/discovery sin prompts). */
+  executionPrompts?: GraderExecutionPrompt[]
 }): Promise<GraderRunRow> => {
   const rows = await runGreenhousePostgresQuery<RawRun>(
     `INSERT INTO greenhouse_growth.grader_runs
        (profile_id, run_kind, mode, status, provider_policy_version, prompt_pack_version,
-        requested_providers, idempotency_key, cost_ceiling_usd)
-     VALUES ($1, $2, $3, 'pending', $4, $5, $6, $7, $8)
+        requested_providers, idempotency_key, cost_ceiling_usd, execution_prompts)
+     VALUES ($1, $2, $3, 'pending', $4, $5, $6, $7, $8, $9::jsonb)
      RETURNING *`,
     [
       input.profileId,
@@ -186,7 +199,8 @@ export const createGraderRun = async (input: {
       input.promptPackVersion,
       input.requestedProviders,
       input.idempotencyKey,
-      input.costCeilingUsd
+      input.costCeilingUsd,
+      JSON.stringify(input.executionPrompts ?? [])
     ]
   )
 
@@ -235,6 +249,52 @@ export const listGraderRuns = async (input: { limit?: number; profileId?: string
         `SELECT * FROM greenhouse_growth.grader_runs ORDER BY created_at DESC LIMIT $1`,
         [limit]
       )
+
+  return rows.map(projectRun)
+}
+
+/**
+ * TASK-1234 — Claim atómico de runs `pending` para el worker async. La transición
+ * `pending → running` ES el claim: `FOR UPDATE SKIP LOCKED` garantiza que dos
+ * workers concurrentes NUNCA tomen el mismo run (idempotencia de ejecución). El
+ * `started_at` marca el tiempo de claim. Devuelve los runs ya en estado `running`.
+ */
+export const claimPendingGraderRuns = async (limit: number): Promise<GraderRunRow[]> => {
+  const bounded = Math.max(1, Math.min(50, Math.floor(limit)))
+
+  const rows = await runGreenhousePostgresQuery<RawRun>(
+    `UPDATE greenhouse_growth.grader_runs
+        SET status = 'running', started_at = NOW()
+      WHERE run_id IN (
+        SELECT run_id FROM greenhouse_growth.grader_runs
+         WHERE status = 'pending'
+         ORDER BY created_at ASC
+         FOR UPDATE SKIP LOCKED
+         LIMIT $1
+      )
+      RETURNING *`,
+    [bounded]
+  )
+
+  return rows.map(projectRun)
+}
+
+/**
+ * TASK-1234 — Runs huérfanos: en `running` desde hace más de `thresholdMinutes`
+ * (crash/timeout mid-run). El recovery (run-engine) los finaliza recomputando el
+ * estado desde sus observaciones ya persistidas (degradación honesta).
+ */
+export const findStuckRunningRuns = async (thresholdMinutes: number): Promise<GraderRunRow[]> => {
+  const bounded = Math.max(1, Math.floor(thresholdMinutes))
+
+  const rows = await runGreenhousePostgresQuery<RawRun>(
+    `SELECT * FROM greenhouse_growth.grader_runs
+      WHERE status = 'running'
+        AND started_at IS NOT NULL
+        AND started_at < NOW() - make_interval(mins => $1)
+      ORDER BY started_at ASC`,
+    [bounded]
+  )
 
   return rows.map(projectRun)
 }

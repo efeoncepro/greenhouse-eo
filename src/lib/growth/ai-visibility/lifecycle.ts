@@ -26,6 +26,15 @@ const RUN_STATUS_TRANSITIONS: Record<GrowthAiVisibilityRunStatus, readonly Growt
   skipped: []
 }
 
+/**
+ * TASK-1234 — Umbrales de salud de ejecución async (minutos). Anclados al peor caso
+ * de un run `internal_audit` (16 prompts × 4 providers × ~35s ≈ 37 min de pared):
+ *  - PENDING_LAG: un run `pending` que lleva > 20 min sin reclamar ⇒ worker no drena.
+ *  - STUCK_RUNNING: un run `running` que lleva > 90 min ⇒ crash/timeout mid-run (recovery).
+ */
+export const GROWTH_AI_VISIBILITY_PENDING_LAG_THRESHOLD_MINUTES = 20
+export const GROWTH_AI_VISIBILITY_STUCK_RUNNING_THRESHOLD_MINUTES = 90
+
 export const GROWTH_AI_VISIBILITY_TERMINAL_RUN_STATUSES: readonly GrowthAiVisibilityRunStatus[] = [
   'succeeded',
   'partial',
