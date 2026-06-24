@@ -50,23 +50,23 @@
     {
       "id": "strong_reference",
       "role": "strong",
-      "brandName": "Ogilvy",
-      "websiteUrl": "https://www.ogilvy.com",
-      "country": null,
-      "market": "Global/LATAM",
+      "brandName": "BBDO Chile",
+      "websiteUrl": null,
+      "country": "CL",
+      "market": "Chile",
       "category": "marketing y diseño",
+      "note": "Fuerte LOCAL (reemplaza a Ogilvy global, que no calibró el techo en prompts Chile-scoped). Citada por los motores como líder del mercado CL en el smoke.",
       "operatorFill": false
     },
     {
       "id": "weak_reference",
       "role": "weak",
-      "brandName": null,
+      "brandName": "Peras y Manzanas",
       "websiteUrl": null,
       "country": "CL",
       "market": "Chile",
       "category": "marketing y diseño",
-      "criteria": "Marca nueva / de baja presencia (poca o nula aparición esperada) — calibra el piso de discriminación.",
-      "operatorFill": true
+      "operatorFill": false
     },
     {
       "id": "neutral_1",

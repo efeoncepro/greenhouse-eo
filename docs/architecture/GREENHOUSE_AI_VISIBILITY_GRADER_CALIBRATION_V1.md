@@ -68,7 +68,20 @@ Corrida acotada (`ONLY_PROMPTS=p01,p03,p04,p11,p12,p16,p14`) con el set: Efeonce
 - **Cebra: 4 apariciones** (única marca del set con SoV de categoría real) → entre tus competidores, **Cebra te está ganando la visibilidad en IA**.
 - **Revops Latam: 0/6** — también invisible en descubrimiento (igual que Efeonce). El gap AEO no es solo tuyo; es del segmento, y Cebra es la excepción.
 - `*` **LATAM Airlines / Banco de Chile aparecen solo en p12** — pero porque el prompt **menciona "aerolínea o banca"** (contamina el control). El control hizo su trabajo: detectó ruido del prompt, no presencia genuina. → refinamiento p12 en v2.
-- **Ogilvy (fuerte): 0/6** — no apareció en prompts Chile-scoped → la referencia "fuerte" global no calibra el techo en mercado local. → v2 debe usar una **agencia fuerte LOCAL**.
+- **Ogilvy (fuerte global): 0/6** — no apareció en prompts Chile-scoped → la referencia "fuerte" global no calibra el techo en mercado local. → reemplazada por fuerte LOCAL.
+
+**Escala techo→piso completa (brand-set v2, agencia fuerte local = BBDO Chile, débil = Peras y Manzanas; SoV de categoría sobre las mismas respuestas, sin costo extra):**
+
+| Marca | Rol | Apariciones (de 6 prompts × 2 motores) |
+|---|---|---|
+| **BBDO Chile** | fuerte (local) | **5** — techo |
+| **Cebra** | competidor | **4** |
+| **Efeonce** | sujeto | **0** |
+| **Revops Latam** | competidor | **0** |
+| **Peras y Manzanas** | débil | **0** — piso |
+| Ogilvy | fuerte (global) | 0 (no calibró — global) |
+
+**Hallazgo más duro:** en descubrimiento, **la AI Visibility de Efeonce es indistinguible de una agencia deliberadamente débil (Peras y Manzanas) y de Revops Latam — todas en 0**, mientras BBDO Chile (5) y Cebra (4) ocupan el espacio. La dimensión **AI Visibility discrimina limpio** (techo 5 → piso 0) y Efeonce está en el piso. Esto da una escala real para anclar el peso/score de la dimensión.
 
 ## 5. Costo y latencia (input para cost ceiling)
 
