@@ -10,7 +10,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Bajo`
@@ -234,13 +234,13 @@ Todas las señales son **reducers puros** sobre los `normalized_findings` ya car
 
 ## Acceptance Criteria
 
-- [ ] Citation share propio en el reporte: % de respuestas que citan `subjectDomain`; `null` (sin dato) si no hay findings con citas.
-- [ ] Sentiment summary + position summary additivos, `null`-honestos (sin fabricar `0`).
-- [ ] Finding narrativo por-motor derivado de `providerPresence` ("presente/invisible en {motor}"), copy tokenizado.
-- [ ] Public-safe preservado: dominios crudos + por-motor fuera del DTO público salvo decisión explícita; leak test extendido verde.
-- [ ] Copy nuevo en `src/lib/copy/growth.ts` (validado con `greenhouse-ux-writing`); sin difamación.
-- [ ] Dry-run sobre un run real produce las señales coherentes con los findings.
-- [ ] Sin cambio al `grader_score`, sin UI, sin migración, sin write.
+- [x] Citation share propio en el reporte: % de respuestas que citan `subjectDomain`; `null` (sin dato) si no hay findings con citas. — `buildCitationInsight`; test + dry-run (16.7%).
+- [x] Sentiment summary + position summary additivos, `null`-honestos (sin fabricar `0`). — `buildSentimentSummary`/`buildPositionSummary`; test + dry-run (`sin_dato`/`null` reales).
+- [x] Finding narrativo por-motor derivado de `providerPresence` ("presente/invisible en {motor}"), copy tokenizado. — `buildProviderFindings` (internal-only); test + dry-run ("Presente en Gemini 1/6").
+- [x] Public-safe preservado: dominios crudos + por-motor fuera del DTO público; leak test extendido verde. — `providerFindings` omitido del público + citation solo %/conteos.
+- [x] Copy nuevo en `src/lib/copy/growth.ts` (validado con `greenhouse-ux-writing`); sin difamación. — `provider_label` + `sentiment_net_label` + plantillas por-motor.
+- [x] Dry-run sobre un run real produce las señales coherentes con los findings. — EO-GRUN-00008.
+- [x] Sin cambio al `grader_score`, sin UI, sin migración, sin write.
 
 ## Verification
 
@@ -252,12 +252,12 @@ Todas las señales son **reducers puros** sobre los `normalized_findings` ya car
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` sincronizado (`in-progress`/`complete`)
-- [ ] archivo en la carpeta correcta
-- [ ] `docs/tasks/README.md` + `TASK_ID_REGISTRY.md` sincronizados
-- [ ] `Handoff.md` + `changelog.md` actualizados
-- [ ] arch `## Delta` si el contrato de reporte cambia (señales nuevas)
-- [ ] chequeo de impacto cruzado (TASK-1235/1236 + futuras superficie pública/HubSpot)
+- [x] `Lifecycle` sincronizado (`complete`)
+- [x] archivo en la carpeta correcta (`complete/`)
+- [x] `docs/tasks/README.md` + `TASK_ID_REGISTRY.md` sincronizados
+- [x] `Handoff.md` + `changelog.md` actualizados
+- [x] arch `## Delta 2026-06-24 — TASK-1237` (4 señales + invariantes public-safe)
+- [x] chequeo de impacto cruzado: TASK-1235/1236 ya complete (mismos owned files report/, sin colisión — campos distintos: enrichment vs builder/trend)
 
 ## Follow-ups
 
@@ -266,5 +266,5 @@ Todas las señales son **reducers puros** sobre los `normalized_findings` ya car
 
 ## Open Questions
 
-1. ¿El citation share propio se expone en el DTO público (probable sí, es %)? ¿La narrativa por-motor queda internal-only en V1 (probable sí)? Decidir en Discovery con criterio public-safe + leak test.
-2. ¿`subjectDomain` ya llega al builder o hay que pasarlo desde `readGraderReport`/`scoreGraderRun`? [verificar en Discovery].
+1. ~~¿Citation share público? ¿Por-motor internal-only?~~ **Resuelta → citation share + sentiment + position = público + interno** (agregados seguros, %/conteos sin dominios crudos); **per-motor (`providerFindings`) = internal-only** (espeja `providerPresence`). Leak test extendido verde.
+2. ~~¿`subjectDomain` llega al builder?~~ **Resuelta → NO llegaba**; se carga en `readGraderReport` vía `getGraderProfile(run.profileId)` + `extractCitationDomain(websiteUrl)` (mismo derivado que el scoring command) y se pasa a `buildGraderReport`.
