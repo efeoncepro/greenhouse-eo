@@ -1,3 +1,24 @@
+## Sesión 2026-06-24 — TASK-1226 AI Visibility Provider Adapter Foundation — IN-PROGRESS (plan aprobado, sin código aún) — Claude
+
+> **Estado:** TASK-1226 movida a `in-progress` (Lifecycle + registry + README sync); Discovery+Audit+Plan hechos; **STOP en checkpoint P1 — implementación NO iniciada.** Se retoma en sesión nueva con este contexto. Develop local-first, sin push de código.
+>
+> **Directiva dura del operador (2026-06-24):** el grader debe **NACER Full API parity** — tendrá múltiples consumers (UI pública, admin control plane, Nexa/MCP, report builder, HubSpot handoff, futuros Verk/Kortex). Toda capability `growth` nace con contrato programático gobernado server-side (un primitive canónico, muchos consumers); ningún consumer reimplementa lógica ni llama providers directo. Ver ADR delta en `GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_DECISION_V1.md`.
+>
+> **Hallazgo de Discovery (clave):** existen clientes AI canónicos `getAnthropicClient()` + `getGoogleGenAIClient()` (`src/lib/ai/`, resuelven secret vía `resolveSecret`); CLAUDE.md prohíbe SDK paralelo → los adapters deben REUSARLOS. **NO existe cliente OpenAI de texto** (solo `openai-image.ts`) → hay que **agregar `src/lib/ai/openai.ts` canónico** (Responses API + web_search). El harness throwaway del spike (fetch crudo) NO es el adapter productivo.
+>
+> **Open Questions resueltas:** OQ#1 → crear el schema `greenhouse_growth` + tablas en esta task (parity necesita observations persistidas/legibles), no contract-only. OQ#2 → OpenAI vía nuevo `openai.ts`, Gemini vía `google-genai.ts`, ambos server-only. OQ#3 → reusar brand-set/golden-set de TASK-1228.
+>
+> **Inputs de TASK-1228 (completa):** `docs/architecture/growth/ai-visibility/{prompt-pack,brand-set,golden-set}.v1.json` + cost ceiling/latencia (Anthropic 3-4×) + hallazgos de extracción (desambiguar brand-mention por dominio, citations per-provider) en `GREENHOUSE_AI_VISIBILITY_GRADER_CALIBRATION_V1.md`. Anthropic ya en el provider set (ADR delta).
+>
+> **Plan aprobado (5 slices, Slice 1→5; Slice 3 no mergea con providers ON default; Slice 4 aditivo):**
+> 1. Contract skeleton (`src/lib/growth/ai-visibility/` types/enums/lifecycle/provider-ids incl anthropic) + capability `growth.ai_visibility.*` en catalog + seed migration + **grant en `runtime.ts` mismo slice** + coverage test.
+> 2. Provider policy resolver (`light/full/internal_audit` con cost ceiling de 1228) + `ProviderAdapter` interface (`runPrompt→ProviderObservation`) + fake/no-op adapter determinista + error mapping canónico.
+> 3. Real adapters tras flags `GROWTH_AI_VISIBILITY_*_ENABLED` (default OFF, + fila en FEATURE_FLAG_STATE_LEDGER), UN provider primero (agregar `src/lib/ai/openai.ts` → adapter; luego anthropic/gemini reusando clientes canónicos); skip limpio sin secret/flag; citations per-provider; sin PII a providers.
+> 4. Persistencia: migración aditiva `greenhouse_growth` (grader_profiles, grader_runs, prompt_packs, provider_observations) con marker `-- Up Migration` + DO guard + GRANT + `db.d.ts`; **command/reader server-side = el primitive de Full API parity**; signals `growth.ai_visibility.{provider_error_rate,latency_p95,cost_budget_used,provider_call_skipped}` + readers; endpoint interno `/api/admin/growth/ai-visibility/**` que delega en el primitive (read/smoke, sin lógica ad-hoc).
+> 5. Smoke/eval harness consumiendo `prompt-pack.v1.json` (promover de docs a evals) + golden-set; fake + real opcional (flag/secret, skip limpio).
+>
+> **Secrets para correr real:** `greenhouse-openai-api-key` + `greenhouse-anthropic-api-key` en GCP Secret Manager (gcloud auth ya renovada esta sesión). NO en .env.local.
+
 ## Sesión 2026-06-24 — TASK-1228 AI Visibility Grader Discovery & Eval Spike COMPLETE — Claude
 
 > **Estado:** spike COMPLETE (Slices 1-5), local-first, sin push (esperando instrucción). Cobertura empírica OpenAI + Anthropic (web search real vía secrets GCP); Gemini/Perplexity diferidos por creds.
