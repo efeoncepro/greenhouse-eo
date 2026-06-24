@@ -32,7 +32,7 @@ En los **9 prompts de categoría/consideración/comparación/local/enterprise** 
 ## 3. Hallazgos cualitativos (cuando los motores SÍ hablan de Efeonce)
 
 - **Colisión de entidad (Entity Clarity baja):** Anthropic detecta explícitamente **dos "Efeonce"** — la agencia LATAM (`efeoncepro.com`) y un **estudio español de fotografía publicitaria (`f11.es`)**. La marca compite con un homónimo → ambigüedad de entidad real.
-- **Message drift (Message Alignment bajo):** OpenAI describe a Efeonce como *"Growth Operating System"* con metodología *"Nested Loops™"*; Anthropic la describe como *"agencia de Inbound Marketing líder"*. **Narrativas divergentes entre motores** y ninguna aterriza el posicionamiento ASaaS real. ⚠️ *Verificar con el operador si "Growth Operating System / Nested Loops™" es messaging real de Efeonce o alucinación* (clasifica accuracy).
+- **Message drift (Message Alignment bajo):** OpenAI describe a Efeonce como *"Growth Operating System"* con metodología *"Nested Loops™"*; Anthropic la describe como *"agencia de Inbound Marketing líder"*. **Accuracy confirmada por el operador (2026-06-24):** "Growth Operating System" y "Nested Loops™" SON messaging real de Efeonce → **OpenAI representó el posicionamiento con precisión; Claude derivó a un genérico ("agencia Inbound") que NO refleja el ASaaS real.** Es decir, el problema no es alucinación de OpenAI sino **drift/dilución en Claude** + narrativa inconsistente entre motores.
 - **Trust gap:** OpenAI afirma *"No se ha encontrado evidencia pública ni reseñas independientes confiables"* sobre Efeonce. No hay señales de reputación de terceros que la IA pueda citar.
 - **Citation Quality:** los prompts de categoría son ricos en citas (OpenAI hasta 26, Anthropic hasta 31) — pero esas citas van a **competidores**, no a Efeonce. En recall, citan el sitio propio + el homónimo `f11.es`.
 
@@ -49,6 +49,26 @@ En los **9 prompts de categoría/consideración/comparación/local/enterprise** 
 | Revenue Intent Coverage (5) | **Nula** — ausente en precio/comparación/enterprise |
 
 **Pesos:** se mantienen los del arch V1 como hipótesis. **No se recalibran aún** — la calibración de pesos requiere el contraste con el brand-set (marca fuerte vs débil vs competidores) que está pendiente.
+
+## 4.bis Discriminación (brand-set completo, 24 llamadas, 2026-06-24)
+
+Corrida acotada (`ONLY_PROMPTS=p01,p03,p04,p11,p12,p16,p14`) con el set: Efeonce (subject), Revops Latam + Cebra (competidores), Ogilvy (fuerte), LATAM Airlines + Banco de Chile (controles). Marca presente en la respuesta del prompt de **categoría** (descubrimiento sin nombrar marca):
+
+| Prompt categoría | OpenAI | Anthropic |
+|---|---|---|
+| p01 (¿qué agencias en Chile?) | — | **Cebra** |
+| p03 (mejores agencias) | **Cebra** | — |
+| p04 (recomienda proveedores) | — | — |
+| p11 (mejor agencia en Santiago) | — | **Cebra** |
+| p12 (enterprise aerolínea/banca) | — | LATAM Airlines, Banco de Chile* |
+| p16 (líderes 2026) | — | **Cebra** |
+
+**Hallazgos de discriminación (las dimensiones SÍ separan):**
+- **Efeonce: 0/6 — invisible en descubrimiento**, confirmado contra un set comparativo.
+- **Cebra: 4 apariciones** (única marca del set con SoV de categoría real) → entre tus competidores, **Cebra te está ganando la visibilidad en IA**.
+- **Revops Latam: 0/6** — también invisible en descubrimiento (igual que Efeonce). El gap AEO no es solo tuyo; es del segmento, y Cebra es la excepción.
+- `*` **LATAM Airlines / Banco de Chile aparecen solo en p12** — pero porque el prompt **menciona "aerolínea o banca"** (contamina el control). El control hizo su trabajo: detectó ruido del prompt, no presencia genuina. → refinamiento p12 en v2.
+- **Ogilvy (fuerte): 0/6** — no apareció en prompts Chile-scoped → la referencia "fuerte" global no calibra el techo en mercado local. → v2 debe usar una **agencia fuerte LOCAL**.
 
 ## 5. Costo y latencia (input para cost ceiling)
 
@@ -70,10 +90,14 @@ En los **9 prompts de categoría/consideración/comparación/local/enterprise** 
 
 El arch V1 define providers OpenAI/Perplexity/Gemini. Este spike incluyó **Anthropic (Claude)** por decisión de producto (Claude entre los answer engines más usados). El run confirma que Claude es una fuente de observación válida (web search real, citas ricas) pero **más lento/caro**. **Recomendación: retroalimentar al `GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md`** la decisión de si Anthropic entra al provider set V1 (ADR delta).
 
-## 9. Pendiente para cerrar la calibración
+## 9. Estado y pendiente
 
-1. **Completar `brand-set.v1.json`** (competidores, fuerte, débil, neutrales) → correr **discriminación** (Slice 3) y recalibrar pesos con evidencia comparativa.
+**Hecho:** pipeline validado (OpenAI + Anthropic); subject-only + discriminación (brand-set completo salvo weak); accuracy confirmada. Las dimensiones discriminan (Cebra vs Efeonce/Revops). Evidencia direccional, no estadística.
+
+**Pendiente para cerrar:**
+1. **Brand-set v2** (refinamientos descubiertos): agencia **fuerte LOCAL** (Ogilvy global no calibró el techo en Chile), **marca débil real** (`weak_reference` sigue sin llenar), y fix de **p12** (menciona "aerolínea/banca" → contamina los controles).
 2. **Corrida de varianza** N≥3 sobre un subset → modelo de muestreo/confianza (Slice 4).
-3. **Confirmar accuracy** del messaging ("Growth OS / Nested Loops™") con el operador.
-4. **Curar `golden-set.v1.json`** (inputs + expected findings) para `TASK-1227` (Slice 5).
+3. **Recalibrar pesos** con el brand-set v2 + varianza (hasta entonces se mantienen los del arch V1 como hipótesis).
+4. **Curar `golden-set.v1.json`** (inputs + expected findings, desambiguando `efeoncepro.com` del homónimo `f11.es`) para `TASK-1227` (Slice 5).
 5. **Gemini/Perplexity** cuando haya credenciales (completar el provider set arch V1).
+6. **ADR delta**: decidir si Anthropic entra al provider set V1.
