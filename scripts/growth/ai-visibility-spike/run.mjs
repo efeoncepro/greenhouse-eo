@@ -34,6 +34,7 @@ const EXCERPT_MAX = 600
 const N_VARIANCE = Number.parseInt(process.env.N_VARIANCE ?? '1', 10) || 1
 const SMOKE_LIMIT = Number.parseInt(process.env.SMOKE_LIMIT ?? '0', 10) || 0 // 0 = sin límite; N = primeros N runs por provider (validación barata)
 const ONLY_PROMPTS = (process.env.ONLY_PROMPTS ?? '').split(',').map(s => s.trim()).filter(Boolean) // subset de prompt ids (acota costo)
+const ONLY_BRANDS = (process.env.ONLY_BRANDS ?? '').split(',').map(s => s.trim()).filter(Boolean) // subset de brand ids (acota costo; ej. varianza solo del subject)
 
 // Anthropic NO está en el arch V1 del grader (OpenAI/Perplexity/Gemini); se incluye
 // como fuente exploratoria por decisión de producto (TASK-1228) — retroalimentar al arch doc.
@@ -157,12 +158,13 @@ function buildPlan(pack, brandSet) {
   const vars = brandSet._meta.defaultVariables ?? {}
   const brands = brandSet.brands.filter(b => b.brandName)
   const competitor = brands.find(b => b.role === 'competitor')?.brandName ?? null
+  const iterBrands = ONLY_BRANDS.length ? brands.filter(b => ONLY_BRANDS.includes(b.id)) : brands
   const prompts = ONLY_PROMPTS.length ? pack.prompts.filter(p => ONLY_PROMPTS.includes(p.id)) : pack.prompts
   const runs = []
 
   for (const prompt of prompts) {
     if (prompt.namesBrand) {
-      for (const brand of brands) {
+      for (const brand of iterBrands) {
         const v = { ...vars, ...brand, brand: brand.brandName, competitor }
 
         if (/\{\{competitor\}\}/.test(prompt.text) && !competitor) continue
