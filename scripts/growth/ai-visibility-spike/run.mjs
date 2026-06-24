@@ -32,9 +32,13 @@ const ARTIFACTS = join(REPO, 'docs', 'architecture', 'growth', 'ai-visibility')
 const CAPTURES = join(HERE, 'captures')
 const EXCERPT_MAX = 600
 const N_VARIANCE = Number.parseInt(process.env.N_VARIANCE ?? '1', 10) || 1
+const SMOKE_LIMIT = Number.parseInt(process.env.SMOKE_LIMIT ?? '0', 10) || 0 // 0 = sin límite; N = primeros N runs por provider (validación barata)
 
+// Anthropic NO está en el arch V1 del grader (OpenAI/Perplexity/Gemini); se incluye
+// como fuente exploratoria por decisión de producto (TASK-1228) — retroalimentar al arch doc.
 const PROVIDERS = {
   openai: { env: 'OPENAI_API_KEY' },
+  anthropic: { env: 'ANTHROPIC_API_KEY' },
   perplexity: { env: 'PERPLEXITY_API_KEY' },
   gemini: { env: 'GEMINI_API_KEY' }
 }
@@ -97,7 +101,34 @@ async function callGemini(key, prompt) {
 return { ok: res.ok, text, usage: json.usageMetadata ?? {}, latencyMs: Date.now() - started, raw: json }
 }
 
-const ADAPTERS = { openai: callOpenAI, perplexity: callPerplexity, gemini: callGemini }
+async function callAnthropic(key, prompt) {
+  const started = Date.now()
+
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'x-api-key': key,
+      'anthropic-version': '2023-06-01',
+      'content-type': 'application/json'
+    },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 1024,
+      messages: [{ role: 'user', content: prompt }],
+      tools: [{ type: 'web_search_20250305', name: 'web_search', max_uses: 5 }]
+    })
+  })
+
+  const json = await res.json()
+
+  const text = Array.isArray(json.content)
+    ? json.content.filter(b => b.type === 'text').map(b => b.text).join('')
+    : null
+
+  return { ok: res.ok, text, usage: json.usage ?? {}, latencyMs: Date.now() - started, raw: json }
+}
+
+const ADAPTERS = { openai: callOpenAI, anthropic: callAnthropic, perplexity: callPerplexity, gemini: callGemini }
 
 // --- Plan builder -----------------------------------------------------------
 
@@ -145,7 +176,7 @@ async function main() {
   }
 
   if (enabled.length === 0) {
-    console.log('\n[spike] DRY-RUN — no hay keys de provider en env (OPENAI_API_KEY / PERPLEXITY_API_KEY / GEMINI_API_KEY).')
+    console.log(`\n[spike] DRY-RUN — no hay keys de provider en env (${Object.values(PROVIDERS).map(c => c.env).join(' / ')}).`)
     console.log('[spike] Para correr real: agregá al menos una key a .env.local y reejecutá.')
     console.log('[spike] Ejemplos de runs:')
     for (const r of runs.slice(0, 4)) console.log(`   - ${r.promptId}${r.brandId ? ` · ${r.brandId}` : ''}: ${r.text}`)
@@ -160,8 +191,9 @@ return
 
   for (const provider of enabled) {
     const key = process.env[PROVIDERS[provider].env]
+    const runsForProvider = SMOKE_LIMIT > 0 ? runs.slice(0, SMOKE_LIMIT) : runs
 
-    for (const r of runs) {
+    for (const r of runsForProvider) {
       for (let attempt = 1; attempt <= N_VARIANCE; attempt++) {
         try {
           const obs = await ADAPTERS[provider](key, r.text)
