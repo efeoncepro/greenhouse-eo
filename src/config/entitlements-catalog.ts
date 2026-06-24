@@ -1929,6 +1929,15 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     module: 'growth',
     actions: ['read'] as const,
     defaultScope: 'tenant'
+  },
+  // TASK-1239 — report.publish: congelar el snapshot público inmutable + emitir token
+  // (EPIC-020 A). Mint interno gobernado; la LECTURA pública es token-based (sin
+  // capability). Grant en runtime.ts mismo PR.
+  {
+    key: 'growth.ai_visibility.report.publish',
+    module: 'growth',
+    actions: ['publish'] as const,
+    defaultScope: 'tenant'
   }
 ] as const
 

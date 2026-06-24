@@ -207,6 +207,15 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
       scope: 'tenant',
       source
     })
+
+    // TASK-1239 — report.publish: congelar el snapshot público + emitir token.
+    addEntitlement(entries, {
+      module: 'growth',
+      capability: 'growth.ai_visibility.report.publish',
+      action: 'publish',
+      scope: 'tenant',
+      source
+    })
   }
 
   if (hasRouteGroup(subject, 'people') || hasAuthorizedView(subject, 'equipo.personas')) {
