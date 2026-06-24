@@ -2,15 +2,17 @@ import { NextResponse } from 'next/server'
 
 import { canonicalErrorResponse } from '@/lib/api/canonical-error-response'
 import { can } from '@/lib/entitlements/runtime'
+import { readGraderScore } from '@/lib/growth/ai-visibility/scoring/command'
 import { getGraderRun, getRunObservations } from '@/lib/growth/ai-visibility/store'
 import { captureWithDomain } from '@/lib/observability/capture'
 import { requireInternalTenantContext } from '@/lib/tenant/authorization'
 
 /**
- * TASK-1226 — `GET /api/admin/growth/ai-visibility/runs/[runId]`
+ * TASK-1226/1227 — `GET /api/admin/growth/ai-visibility/runs/[runId]`
  *
- * Detalle de un run + sus observaciones normalizadas (evidence ledger).
- * Capability `growth.ai_visibility.observation.read`. Delega en el store.
+ * Detalle de un run + observaciones (evidence ledger) + findings normalizados +
+ * grader_score persistido (TASK-1227). Capability `growth.ai_visibility.observation.read`.
+ * Delega en los primitives (store + scoring reader); sin lógica ad-hoc. Sin ruta pública.
  */
 
 export const dynamic = 'force-dynamic'
@@ -38,8 +40,16 @@ export async function GET(_request: Request, { params }: { params: Promise<{ run
     }
 
     const observations = await getRunObservations(runId)
+    const { score, findings } = await readGraderScore(runId)
 
-    return NextResponse.json({ run, observations, observationCount: observations.length })
+    return NextResponse.json({
+      run,
+      observations,
+      observationCount: observations.length,
+      findings,
+      findingCount: findings.length,
+      score
+    })
   } catch (error) {
     captureWithDomain(error, 'growth', { tags: { source: 'growth_ai_visibility_run_detail_route' } })
 

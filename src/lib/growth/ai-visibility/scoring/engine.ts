@@ -16,6 +16,7 @@ import { type NormalizedFinding } from '../normalization/contracts'
 import {
   AI_VISIBILITY_SCORE_VERSION,
   SCORE_DIMENSION_CONFIG_BY_KEY,
+  type GraderScoreStatus,
   type GraderScoreVersion,
   type ScoreDimensionKey
 } from './config'
@@ -46,6 +47,13 @@ export interface RawGraderScore {
     successfulObservations: number
     promptFamilies: number
   }
+}
+
+/** Score con el gate de status aplicado (review-gates/, Slice 5) — el shape que se persiste. */
+export interface PersistedGraderScore extends RawGraderScore {
+  scoreStatus: GraderScoreStatus
+  autoReleasable: boolean
+  reviewReasons: string[]
 }
 
 const round1 = (value: number): number => Math.round(value * 10) / 10

@@ -49,6 +49,10 @@ export const SCORE_DIMENSION_CONFIG_BY_KEY: Record<ScoreDimensionKey, ScoreDimen
 /** Suma total de pesos (debe ser 100). */
 export const SCORE_TOTAL_WEIGHT = SCORE_DIMENSIONS.reduce((total, dimension) => total + dimension.weight, 0)
 
+/** Estados del score (gate en review-gates/, Slice 5). */
+export const SCORE_STATUSES = ['completed', 'insufficient_data', 'review_required'] as const
+export type GraderScoreStatus = (typeof SCORE_STATUSES)[number]
+
 // ── Minimum gate defaults (coverage para score interno; los gates viven en review-gates/) ──
 
 export const MIN_SUCCESSFUL_OBSERVATIONS = 3

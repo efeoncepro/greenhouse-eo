@@ -142,6 +142,15 @@ export const findOrCreateGraderProfile = async (input: {
   return projectProfile(inserted[0])
 }
 
+export const getGraderProfile = async (profileId: string): Promise<GraderProfileRow | null> => {
+  const rows = await runGreenhousePostgresQuery<RawProfile>(
+    `SELECT * FROM greenhouse_growth.grader_profiles WHERE profile_id = $1 LIMIT 1`,
+    [profileId]
+  )
+
+  return rows[0] ? projectProfile(rows[0]) : null
+}
+
 // ── Runs ─────────────────────────────────────────────────────────────────────
 
 export const findRunByIdempotencyKey = async (key: string): Promise<GraderRunRow | null> => {

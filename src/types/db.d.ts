@@ -6471,6 +6471,44 @@ export interface GreenhouseGrowthGraderRuns {
   status: Generated<string>;
 }
 
+export interface GreenhouseGrowthGraderScores {
+  auto_releasable: Generated<boolean>;
+  confidence: Generated<Numeric>;
+  coverage: Generated<Json>;
+  created_at: Generated<Timestamp>;
+  dimensions: Generated<Json>;
+  evidence_count: Generated<number>;
+  overall_score: Numeric | null;
+  review_reasons: Generated<string[]>;
+  run_id: string;
+  score_id: Generated<string>;
+  score_status: string;
+  score_version: string;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseGrowthNormalizedFindings {
+  brand_mentioned: string;
+  brand_rank: number | null;
+  category_associations: Generated<string[]>;
+  citation_domains: Generated<string[]>;
+  commercial_intent_match: string;
+  competitors_mentioned: Generated<string[]>;
+  confidence: Numeric;
+  created_at: Generated<Timestamp>;
+  finding_id: string;
+  message_drift_claims: Generated<string[]>;
+  prompt_id: string;
+  provider: string;
+  run_id: string;
+  schema_version: string;
+  sentiment_label: string;
+  sentiment_score: Numeric | null;
+  source_types: Generated<string[]>;
+  trust_signal: string | null;
+  updated_at: Generated<Timestamp>;
+}
+
 export interface GreenhouseGrowthPromptPacks {
   created_at: Generated<Timestamp>;
   locale: string;
@@ -10643,6 +10681,8 @@ export interface DB {
   "greenhouse_finance.vat_monthly_positions": GreenhouseFinanceVatMonthlyPositions;
   "greenhouse_growth.grader_profiles": GreenhouseGrowthGraderProfiles;
   "greenhouse_growth.grader_runs": GreenhouseGrowthGraderRuns;
+  "greenhouse_growth.grader_scores": GreenhouseGrowthGraderScores;
+  "greenhouse_growth.normalized_findings": GreenhouseGrowthNormalizedFindings;
   "greenhouse_growth.prompt_packs": GreenhouseGrowthPromptPacks;
   "greenhouse_growth.provider_observations": GreenhouseGrowthProviderObservations;
   "greenhouse_hr.contractor_engagement_events": GreenhouseHrContractorEngagementEvents;
