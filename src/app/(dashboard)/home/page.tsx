@@ -56,7 +56,7 @@ type HomeSearchParams = {
 export default async function HomePage({
   searchParams
 }: {
-  searchParams?: Promise<HomeSearchParams> | HomeSearchParams
+  searchParams?: Promise<HomeSearchParams>
 }) {
   const session = await requireServerSession()
   const { user } = session
