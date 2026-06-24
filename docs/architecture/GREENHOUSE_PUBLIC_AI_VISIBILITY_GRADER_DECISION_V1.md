@@ -199,6 +199,14 @@ Reopen this ADR if:
 - The first 50 real runs show the score is not predictive of sales conversations or buyer intent.
 - AI Search / AEO market terminology shifts enough that public naming should change.
 
+## Delta 2026-06-24 — evidencia del spike TASK-1228
+
+Tras el Discovery & Eval Spike (`TASK-1228`, ver `GREENHOUSE_AI_VISIBILITY_GRADER_CALIBRATION_V1.md`):
+
+- **Anthropic (Claude) se adopta en el provider set**, junto a OpenAI/Perplexity/Gemini. Evidencia: en el spike, Claude con web search resultó una fuente de observación de answer-engine **válida** (web search real, citas ricas) y es de los motores más usados hoy (dirección del operador). **Caveat de costo:** Claude con grounding fue **3-4× más lento/caro** que OpenAI → en el modo `light`/público, ponderar costo/latencia (posible excluir Claude+web_search del tier más barato y reservarlo para `full`/`internal_audit`). El provider set queda: OpenAI, Anthropic, Perplexity, Gemini (estos dos últimos pendientes de credenciales).
+- **Full API parity es requisito de NACIMIENTO, no posterior** (reafirmado por operador 2026-06-24): el grader tendrá **múltiples consumers** (UI pública, admin control plane, Nexa/MCP, report builder, HubSpot handoff, futuros Verk/Kortex). Por lo tanto la fundación de `TASK-1226` y toda capability del dominio `growth` deben nacer con su contrato programático gobernado server-side (un primitive canónico, muchos consumers); ningún consumer reimplementa lógica ni llama providers directo. Ver `GREENHOUSE_FULL_API_PARITY_DECISION_V1.md`.
+- Hallazgos de extracción para el motor (1227): desambiguar brand-mention **por dominio** (no name-match — colisión de entidad real detectada); citations viven per-provider. Golden set de regresión disponible (`golden-set.v1.json`, 8 casos).
+
 ## Related documents
 
 - `docs/architecture/GREENHOUSE_GROWTH_DOMAIN_ARCHITECTURE_V1.md`
