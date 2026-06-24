@@ -772,3 +772,14 @@ Nuevo módulo de reliability **`growth`** (domain `growth`, incidentDomainTag `g
 - `growth.ai_visibility.provider_call_skipped` (posture) — skips esperados pre-launch (grader OFF); nunca error por sí mismo.
 
 DB vacía / grader OFF → todos en estado sano (`ok`/`awaiting_data`), steady esperado mientras los flags `GROWTH_AI_VISIBILITY_*_ENABLED` estén OFF. Cada signal degrada honestamente (`unknown` + `captureWithDomain('growth')`) si su query falla.
+
+## Delta 2026-06-24 — módulo `growth`: signals de normalización/scoring (TASK-1227)
+
+5 signals adicionales del motor de normalización/scoring (reader `src/lib/reliability/queries/growth-ai-visibility-scoring-signals.ts`, wired en `get-reliability-overview.ts`):
+
+- `growth.ai_visibility.insufficient_data_rate` (data_quality) — fracción de `grader_scores` con `score_status=insufficient_data` (30 días).
+- `growth.ai_visibility.report_review_required_rate` (posture) — fracción `review_required` (comportamiento de seguridad esperado, severity ok).
+- `growth.ai_visibility.prompt_pack_eval_regression` (test_lane) — corre el golden eval (1228) sobre el normalizer determinista; `error` si hay divergencias deterministas vs el baseline.
+- `growth.ai_visibility.normalization_failed` + `growth.ai_visibility.score_recompute_failed` (runtime) — **stub** (sin failure-ledger todavía; los fallos van a Sentry domain=growth). Follow-up: tabla de intentos (patrón `auth_attempts`).
+
+Módulo `growth` `expectedSignalKinds` ahora incluye `test_lane`. DB vacía → todos en estado sano.

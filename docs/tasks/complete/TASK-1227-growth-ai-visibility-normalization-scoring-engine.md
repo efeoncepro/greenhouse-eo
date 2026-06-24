@@ -12,7 +12,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -21,7 +21,7 @@
 - UI impact: `none`
 - Backend impact: `command`
 - Epic: `none`
-- Status real: `Diseno`
+- Status real: `Complete (dev verificado); LLM extraction OFF + público fuera de scope`
 - Rank: `TBD`
 - Domain: `growth|data-quality|ai|reliability`
 - Blocked by: `TASK-1226, TASK-1228`
@@ -357,15 +357,15 @@ N/A — repo/internal runtime only. No provider secrets, HubSpot property change
 
 ## Acceptance Criteria
 
-- [ ] Existe schema/contract `NormalizedFinding` V1 con validation y tests.
-- [ ] Existe normalizer desde `ProviderObservation` hacia `NormalizedFinding` que preserva `unknown`.
-- [ ] Existe `score_version='ai_visibility_score_v1'` con dimensiones/pesos versionados y tests de bounds/suma.
-- [ ] Existe scoring command/primitive que calcula `grader_score` desde findings, es idempotente y recomputable.
-- [ ] Existe policy de `insufficient_data` y `review_required` con tests.
-- [ ] Si hay tablas nuevas, migration aditiva + read/verify smoke quedan documentados.
-- [ ] Public-safe DTO no contiene raw provider text, prompts completos ni excerpts sensibles.
-- [ ] No se crea public UI, report builder visual, HubSpot sync ni Nexa/MCP exposure.
-- [ ] Signals/logs de normalization/scoring/review gates quedan implementados o stubbeados con follow-up explicito.
+- [x] Existe schema/contract `NormalizedFinding` V1 con validation y tests (`normalization/contracts.ts` + golden-set valida contra el schema).
+- [x] Existe normalizer desde `ProviderObservation` hacia `NormalizedFinding` que preserva `unknown` (determinista-first por dominio + hook LLM aislado flag OFF).
+- [x] Existe `score_version='ai_visibility_score_v1'` con dimensiones/pesos versionados y tests de bounds/suma/determinismo.
+- [x] Existe scoring command/primitive (`scoreGraderRun`) que calcula `grader_score` desde findings, es idempotente y recomputable (verificado contra PG real).
+- [x] Existe policy de `insufficient_data` y `review_required` con tests (cobertura + lenguaje riesgoso/negativo-baja-confianza).
+- [x] Migration aditiva `normalized_findings` + `grader_scores` aplicada + db.d.ts regen + read/verify smoke contra PG real.
+- [x] Public-safe DTO (`toPublicSafeScore`) no contiene raw provider text/prompts/excerpts (leak test).
+- [x] No se crea public UI, report builder visual, HubSpot sync ni Nexa/MCP exposure (endpoint admin interno, sin ruta pública).
+- [x] 5 signals implementados (insufficient_data_rate + review_required_rate + prompt_pack_eval_regression medibles; normalization_failed + score_recompute_failed stub con follow-up de failure-ledger).
 
 ## Verification
 
@@ -408,6 +408,20 @@ Re-secuenciamiento tras revisión arquitectónica (arch-architect) del programa 
 
 ## Open Questions
 
-1. El fallback LLM de extraction, si se implementa, ¿debe usar el mismo provider adapter layer de `TASK-1226` o una primitive AI interna compartida?
-2. ¿El score V1 debe normalizar competitividad contra competidores declarados solamente o tambien contra competidores detectados por providers?
-3. ¿El primer `review_required` policy debe ser conservador para todo sentimiento negativo o solo para negative + low confidence / defamatory phrasing?
+1. El fallback LLM de extraction → **RESUELTA: cliente canónico `src/lib/ai/anthropic.ts` (`generateStructuredAnthropic`, schema-constrained), NO el provider adapter layer de 1226** (ese OBSERVA answer engines; la extracción es otra cosa). Aislado + flag `GROWTH_AI_VISIBILITY_LLM_EXTRACTION_ENABLED` default OFF; sin flag, determinista-first preserva `unknown`.
+2. SoV vs declarados/detectados → **RESUELTA: declarados ∪ detectados** (competidores declarados que aparecen + dominios de citation), preservando `unknown`.
+3. `review_required` conservador → **RESUELTA: NO todo negativo; solo lenguaje riesgoso/difamatorio O sentimiento negativo de baja confianza (<0.6)**.
+
+## Delta 2026-06-24 — Cierre (complete, dev verificado)
+
+Implementada completa en `develop` local-first (5 slices, commits `e9aa64e5d`→`65f72788f`). Construye el motor de normalización + scoring sobre la fundación de TASK-1226, consumiendo el golden-set de TASK-1228.
+
+- **Slice 1:** `NormalizedFinding` V1 (`normalization/contracts.ts`) + validación estricta + golden-set promovido a `evals/` (test contrato↔baseline: 8 casos validan).
+- **Slice 2:** normalizer determinista-first (desambiguación por dominio del spike 1228) + hook LLM aislado (`llm-extraction.ts`, `generateStructuredAnthropic`, flag OFF, anti prompt-injection).
+- **Slice 3:** scoring config `ai_visibility_score_v1` (7 dimensiones, pesos arch V1 como hipótesis) + engine determinista (dimensión sin evidencia → null, excluida; recompute = mismo score).
+- **Slice 4:** migración aditiva `normalized_findings` + `grader_scores` + store + command `scoreGraderRun` (idempotente) + DTO público-safe + endpoint admin `POST /runs/[runId]/score` + GET detail enriquecido. Sin ruta pública.
+- **Slice 5:** review gates (`insufficient_data`/`review_required` conservador) + golden eval runner (0 divergencias deterministas; ambiguous/prosa → llm_required) + 5 reliability signals + no-overclaiming tests.
+
+**Verificación:** `pnpm test` 7844/0 · `pnpm build` OK · `pnpm local:check` OK · `pnpm pg:doctor` healthy · 84 tests focales growth · sanity PG real (EO-GRUN-00007 18 obs → score 26.4 completed, ai_visibility=0 = gap real de Efeonce, recompute idempotente, readback OK).
+
+**Rollout pendiente (no bloquea cierre; consistente con scope):** (1) `GROWTH_AI_VISIBILITY_LLM_EXTRACTION_ENABLED` (enriquecimiento de prosa: sentiment/drift/category) — prender en staging cuando se quiera score con dimensiones de prosa; (2) prod = follow-up del programa (migración vía release control plane); (3) failure-ledger para `normalization_failed`/`score_recompute_failed` (hoy stub → Sentry domain=growth). **Pesos del score = hipótesis** revisable con evidencia productiva (ADR revisit-when). Desbloquea: report builder, admin evidence review, HubSpot handoff (follow-ups).
