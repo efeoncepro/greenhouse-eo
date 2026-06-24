@@ -7,7 +7,8 @@ const mockRun = vi.fn()
 const mockConfigured = vi.fn()
 
 vi.mock('@/lib/ai/google-genai', () => ({
-  GEMINI_GROUNDED_DEFAULT_MODEL: 'gemini-2.5-flash',
+  GEMINI_GROUNDED_DEFAULT_MODEL: 'gemini-3-flash-preview',
+  resolveGeminiGroundedModel: () => 'gemini-3-flash-preview',
   isGeminiConfigured: () => mockConfigured(),
   runGeminiGroundedSearch: (input: unknown) => mockRun(input)
 }))

@@ -8,8 +8,8 @@ import 'server-only'
  */
 
 import {
-  GEMINI_GROUNDED_DEFAULT_MODEL,
   isGeminiConfigured,
+  resolveGeminiGroundedModel,
   runGeminiGroundedSearch
 } from '@/lib/ai/google-genai'
 
@@ -20,7 +20,7 @@ import { createWebSearchAdapter } from './web-search-adapter'
 export const createGeminiProviderAdapter = (options: { model?: string } = {}): ProviderAdapter =>
   createWebSearchAdapter({
     provider: 'gemini',
-    defaultModel: options.model?.trim() || GEMINI_GROUNDED_DEFAULT_MODEL,
+    defaultModel: options.model?.trim() || resolveGeminiGroundedModel(),
     isConfigured: async () => isGeminiConfigured(),
     runCall: async ({ prompt, model }) => {
       const result = await runGeminiGroundedSearch({ prompt, model })

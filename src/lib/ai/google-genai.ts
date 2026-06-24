@@ -52,10 +52,20 @@ export const getGoogleGenAIClient = async () => {
   return googleGenAIClient
 }
 
-// ── Grounded search runner (TASK-1226) ───────────────────────────────────────
+// ── Grounded search runner (TASK-1226 / modelo Gemini 3 TASK-1233) ────────────
 
-/** Default Gemini model con Google Search grounding (verificable contra docs vigentes). */
-export const GEMINI_GROUNDED_DEFAULT_MODEL = 'gemini-2.5-flash'
+/**
+ * Default Gemini model con Google Search grounding. Gemini 3 (`gemini-3-flash-preview`)
+ * es lo más nuevo disponible en Vertex para el proyecto (gemini-3.1 / gemini-3-pro
+ * aún dan 404 al 2026-06-24). El grader debe medir con el modelo que usa la gente
+ * HOY → se prefiere la última generación. **Override por env** `GREENHOUSE_GEMINI_
+ * GROUNDED_MODEL` para bumpear a 3.1/3-pro apenas lleguen, sin deploy.
+ */
+export const GEMINI_GROUNDED_DEFAULT_MODEL = 'gemini-3-flash-preview'
+
+/** Resuelve el modelo de grounding: env override → default Gemini 3. */
+export const resolveGeminiGroundedModel = (env: NodeJS.ProcessEnv = process.env): string =>
+  env.GREENHOUSE_GEMINI_GROUNDED_MODEL?.trim() || GEMINI_GROUNDED_DEFAULT_MODEL
 
 export interface GeminiGroundedCitation {
   url: string
@@ -84,7 +94,7 @@ export const runGeminiGroundedSearch = async (input: {
   model?: string
 }): Promise<GeminiGroundedSearchResult> => {
   const client = await getGoogleGenAIClient()
-  const model = input.model?.trim() || GEMINI_GROUNDED_DEFAULT_MODEL
+  const model = input.model?.trim() || resolveGeminiGroundedModel()
   const started = Date.now()
 
   const response = await client.models.generateContent({
