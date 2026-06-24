@@ -14,8 +14,10 @@ import 'server-only'
 import { captureWithDomain } from '@/lib/observability/capture'
 
 import { readGraderScore } from '../scoring/command'
+import { getPreviousComparableScore } from '../scoring/store'
 import { getGraderRun } from '../store'
 import { buildGraderReport, toPublicGraderReport, type ReportRunMeta } from './builder'
+import { type PreviousScoreInput } from './trend'
 import { type GraderReport, type PublicGraderReport } from './contracts'
 
 export class GraderReportError extends Error {
@@ -62,7 +64,19 @@ export const readGraderReport = async (input: {
       finishedAt: run.finishedAt
     }
 
-    const report = buildGraderReport({ score, findings, run: runMeta })
+    // Run previo comparable para la tendencia (TASK-1236): el score más reciente
+    // del mismo perfil + score_version anterior a este run. null → sin histórico.
+    const previousRow = await getPreviousComparableScore({
+      profileId: run.profileId,
+      scoreVersion: score.scoreVersion,
+      currentRunId: run.runId
+    })
+
+    const previous: PreviousScoreInput | null = previousRow
+      ? { score: previousRow.score, promptPackVersion: previousRow.promptPackVersion, finishedAt: previousRow.finishedAt }
+      : null
+
+    const report = buildGraderReport({ score, findings, run: runMeta, previous })
 
     return { report, publicReport: toPublicGraderReport(report) }
   } catch (error) {

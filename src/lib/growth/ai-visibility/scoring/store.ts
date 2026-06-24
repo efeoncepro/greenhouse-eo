@@ -147,6 +147,51 @@ export const upsertGraderScore = async (score: PersistedGraderScore): Promise<Pe
   return projectScore(rows[0])
 }
 
+/** Score previo comparable de un perfil + metadata del run que lo produjo (TASK-1236). */
+export interface PreviousComparableScore {
+  score: PersistedGraderScore
+  promptPackVersion: string
+  finishedAt: string | null
+}
+
+/**
+ * Run previo comparable de un perfil para la tendencia (TASK-1236): el score más
+ * reciente del MISMO `score_version` cuyo run es anterior (por `created_at`) al run
+ * vigente. La comparabilidad por `prompt_pack_version` la decide el caller (puede
+ * diferir → `incomparable`). Read-only; la marca temporal del run vigente se resuelve
+ * EN LA DB (subquery) — nunca se round-tripea un timestamp JS (el cliente pg devuelve
+ * `timestamptz` como `Date`, cuyo `String()` no es re-parseable por Postgres).
+ */
+export const getPreviousComparableScore = async (input: {
+  profileId: string
+  scoreVersion: string
+  currentRunId: string
+}): Promise<PreviousComparableScore | null> => {
+  const rows = await runGreenhousePostgresQuery<RawScore>(
+    `SELECT s.*, r.prompt_pack_version, r.finished_at
+       FROM greenhouse_growth.grader_scores s
+       JOIN greenhouse_growth.grader_runs r ON r.run_id = s.run_id
+      WHERE r.profile_id = $1
+        AND s.score_version = $2
+        AND r.created_at < (
+          SELECT created_at FROM greenhouse_growth.grader_runs WHERE run_id = $3
+        )
+      ORDER BY r.created_at DESC
+      LIMIT 1`,
+    [input.profileId, input.scoreVersion, input.currentRunId]
+  )
+
+  const row = rows[0]
+
+  if (!row) return null
+
+  return {
+    score: projectScore(row),
+    promptPackVersion: String(row.prompt_pack_version),
+    finishedAt: (row.finished_at as string | null) ?? null
+  }
+}
+
 export const getGraderScore = async (
   runId: string,
   scoreVersion?: string
