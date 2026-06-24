@@ -10,3 +10,5 @@
 export * from './contracts'
 export * from './lifecycle'
 export * from './observation'
+export * from './policy'
+export * from './providers'
