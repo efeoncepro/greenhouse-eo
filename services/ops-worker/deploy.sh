@@ -64,7 +64,14 @@ MIN_INSTANCES="0"
 MAX_INSTANCES="5"
 MEMORY="2Gi"
 CPU="2"
-TIMEOUT="540"
+# TIMEOUT=3600s (60 min, Cloud Run máximo): el AI Visibility Grader async
+# (/growth/grader/drain, TASK-1234) ejecuta un run `full`/`internal_audit`
+# multi-provider de forma secuencial (hasta ~16 prompts × 4 providers × ~35s ≈ 37
+# min con Gemini 3 ≈ 56s/call) DENTRO del request Cloud Run — el timeout del request
+# es el límite duro real (el attempt-deadline del scheduler que se rinde NO mata el
+# request en vuelo). El resto de handlers (reactive/outbox/finance) terminan en
+# segundos; subir el techo no cambia su comportamiento, sólo deja correr al grader.
+TIMEOUT="3600"
 CONCURRENCY="4"
 REACTIVE_BATCH_SIZE="500"
 DEFAULT_EMAIL_FROM="Efeonce Greenhouse <greenhouse@efeoncepro.com>"
@@ -324,6 +331,32 @@ if [ -n "${RESEND_API_KEY_SECRET_REF}" ]; then
 else
   echo "WARN: RESEND_API_KEY_SECRET_REF is not set; ops-worker will skip outbound email delivery."
 fi
+
+# TASK-1234 — AI Visibility Grader async worker (/growth/grader/drain via Cloud Scheduler).
+# Flags default OFF (mismo default que el portal Vercel): con OFF cada adapter resuelve skip
+# limpio (grader_disabled/provider_disabled/missing_secret) y el drain no llama providers ni
+# gasta. Los *_API_KEY_SECRET_REF se declaran acá para que el worker resuelva las API keys
+# server-side (resolveSecret) cuando los flags se prendan en el rollout; Gemini usa Vertex via
+# WIF (sin secret, ya cubierto por GCP_PROJECT + IAM). Declarativo para que --set-env-vars
+# (destructivo) NO los borre en cada redeploy. Activación = rollout posterior con sign-off.
+GROWTH_AI_VISIBILITY_GRADER_ENABLED="${GROWTH_AI_VISIBILITY_GRADER_ENABLED:-false}"
+GROWTH_AI_VISIBILITY_OPENAI_ENABLED="${GROWTH_AI_VISIBILITY_OPENAI_ENABLED:-false}"
+GROWTH_AI_VISIBILITY_ANTHROPIC_ENABLED="${GROWTH_AI_VISIBILITY_ANTHROPIC_ENABLED:-false}"
+GROWTH_AI_VISIBILITY_PERPLEXITY_ENABLED="${GROWTH_AI_VISIBILITY_PERPLEXITY_ENABLED:-false}"
+GROWTH_AI_VISIBILITY_GEMINI_ENABLED="${GROWTH_AI_VISIBILITY_GEMINI_ENABLED:-false}"
+GROWTH_AI_VISIBILITY_LLM_EXTRACTION_ENABLED="${GROWTH_AI_VISIBILITY_LLM_EXTRACTION_ENABLED:-false}"
+OPENAI_API_KEY_SECRET_REF="${OPENAI_API_KEY_SECRET_REF:-greenhouse-openai-api-key}"
+ANTHROPIC_API_KEY_SECRET_REF="${ANTHROPIC_API_KEY_SECRET_REF:-greenhouse-anthropic-api-key}"
+ENV_VARS="${ENV_VARS},GROWTH_AI_VISIBILITY_GRADER_ENABLED=${GROWTH_AI_VISIBILITY_GRADER_ENABLED}"
+ENV_VARS="${ENV_VARS},GROWTH_AI_VISIBILITY_OPENAI_ENABLED=${GROWTH_AI_VISIBILITY_OPENAI_ENABLED}"
+ENV_VARS="${ENV_VARS},GROWTH_AI_VISIBILITY_ANTHROPIC_ENABLED=${GROWTH_AI_VISIBILITY_ANTHROPIC_ENABLED}"
+ENV_VARS="${ENV_VARS},GROWTH_AI_VISIBILITY_PERPLEXITY_ENABLED=${GROWTH_AI_VISIBILITY_PERPLEXITY_ENABLED}"
+ENV_VARS="${ENV_VARS},GROWTH_AI_VISIBILITY_GEMINI_ENABLED=${GROWTH_AI_VISIBILITY_GEMINI_ENABLED}"
+ENV_VARS="${ENV_VARS},GROWTH_AI_VISIBILITY_LLM_EXTRACTION_ENABLED=${GROWTH_AI_VISIBILITY_LLM_EXTRACTION_ENABLED}"
+ENV_VARS="${ENV_VARS},OPENAI_API_KEY_SECRET_REF=${OPENAI_API_KEY_SECRET_REF}"
+ENV_VARS="${ENV_VARS},ANTHROPIC_API_KEY_SECRET_REF=${ANTHROPIC_API_KEY_SECRET_REF}"
+ensure_secret_accessor_binding "${OPENAI_API_KEY_SECRET_REF}:latest"
+ensure_secret_accessor_binding "${ANTHROPIC_API_KEY_SECRET_REF}:latest"
 
 # Secrets from Secret Manager (mounted as env vars)
 SECRETS="NEXTAUTH_SECRET=${NEXTAUTH_SECRET_REF}"
@@ -675,6 +708,26 @@ upsert_scheduler_job \
   "/outbox/publish-batch" \
   '{"batchSize":500,"maxRetries":5}'
 echo "  -> ops-outbox-publish: */2 * * * * (outbox PG → BQ raw publisher, TASK-773)"
+
+# AI Visibility Grader async drain — TASK-1234.
+#
+# El endpoint admin encola un run `pending`; este job lo reclama (claim atómico
+# FOR UPDATE SKIP LOCKED, sin doble ejecución) y lo ejecuta vía el primitive,
+# persistiendo cada observación incrementalmente, además de recuperar runs
+# huérfanos en `running`. batchSize=1: un run por invocación (los runs full son
+# largos; el request Cloud Run lo sostiene hasta el TIMEOUT=3600s). El
+# attempt-deadline del scheduler (540s) que se rinde NO mata el request en vuelo
+# — el run termina y el siguiente ciclo simplemente no encuentra pending.
+#
+# Cron */5 min: SLA de arranque ≤5 min para un run encolado (los runs duran
+# minutos, no segundos). Gated: con los flags GROWTH_AI_VISIBILITY_* OFF (default)
+# cada adapter resuelve skip limpio; cero llamadas, cero costo.
+upsert_scheduler_job \
+  "ops-growth-grader-drain" \
+  "*/5 * * * *" \
+  "/growth/grader/drain" \
+  '{"batchSize":1}'
+echo "  -> ops-growth-grader-drain: */5 * * * * (AI Visibility Grader async execution, TASK-1234)"
 
 # Email deliverability monitor — TASK-775 Slice 2.
 #

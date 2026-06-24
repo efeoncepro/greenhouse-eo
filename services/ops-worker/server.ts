@@ -117,6 +117,7 @@ import { getCurrentAuthReadiness } from '@/lib/auth-secrets'
 import { probeNextAuthSecretRoundTrip } from '@/lib/auth/readiness'
 
 import { resolveCleanSeedDate } from '@/lib/finance/account-balances-clean-seed-resolver'
+import { drainPendingGraderRuns, recoverStuckRunningRuns } from '@/lib/growth/ai-visibility/run-engine'
 
 import { computeRollingRematerializationWindow } from './finance-rematerialize-seed'
 import { getReactiveQueueDepth, InvalidDomainError } from './reactive-queue-depth'
@@ -1589,6 +1590,63 @@ const handleOutboxPublishBatch = async (req: IncomingMessage, res: ServerRespons
   }
 }
 
+// ─── /growth/grader/drain ───────────────────────────────────────────────────
+//
+// TASK-1234 — AI Visibility Grader: ejecución async fuera del request Vercel.
+// El endpoint admin encola un run `pending`; este handler (Cloud Scheduler) lo
+// reclama (claim atómico FOR UPDATE SKIP LOCKED, sin doble ejecución) y lo ejecuta
+// vía el primitive `drainPendingGraderRuns`, persistiendo cada observación de forma
+// incremental → un timeout/crash mid-run no pierde evidencia. Además recupera runs
+// huérfanos en `running` (crash previo) recomputando su estado.
+//
+// Razón Cloud Scheduler (no Vercel cron): un run `full` multi-provider (Gemini 3 ≈
+// 56s/call × N prompts × M providers) excede el timeout de la función Vercel. El
+// worker Cloud Run no tiene ese límite. Vercel custom env (staging) tampoco corre
+// crons → el drain quedaría invisible en staging (mismo motivo que TASK-773).
+//
+// Gated: con los flags GROWTH_AI_VISIBILITY_* OFF (default) cada adapter resuelve
+// skip limpio; no hay llamadas a providers ni costo.
+//
+// Body opcional: {batchSize?: number, stuckThresholdMinutes?: number}
+const handleGrowthGraderDrain = async (req: IncomingMessage, res: ServerResponse) => {
+  const body = await readBody(req)
+
+  const batchSize = typeof body.batchSize === 'number' && body.batchSize > 0
+    ? Math.min(50, Math.floor(body.batchSize))
+    : 3
+
+  const stuckThresholdMinutes = typeof body.stuckThresholdMinutes === 'number' && body.stuckThresholdMinutes > 0
+    ? Math.floor(body.stuckThresholdMinutes)
+    : undefined
+
+  console.log(`[ops-worker] POST /growth/grader/drain — batchSize=${batchSize}`)
+
+  try {
+    // Recovery primero: libera runs huérfanos antes de drenar nuevos pending.
+    const recovery = await recoverStuckRunningRuns(stuckThresholdMinutes)
+    const drain = await drainPendingGraderRuns({ batchSize })
+
+    console.log(
+      `[ops-worker] /growth/grader/drain done — claimed=${drain.claimedCount} ` +
+      `recovered=${recovery.recoveredCount}`
+    )
+
+    json(res, 200, {
+      ok: true,
+      claimedCount: drain.claimedCount,
+      results: drain.results,
+      recoveredCount: recovery.recoveredCount,
+      recovered: recovery.recovered
+    })
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown grader drain error'
+
+    console.error('[ops-worker] /growth/grader/drain failed:', message)
+    captureWithDomain(error, 'growth', { tags: { source: 'ops_worker_growth_grader_drain' } })
+    json(res, 502, { error: message })
+  }
+}
+
 // ─── /email-deliverability-monitor ──────────────────────────────────────────
 //
 // TASK-775 Slice 2 — Email deliverability monitor migrado de Vercel cron a
@@ -2223,6 +2281,12 @@ const server = createServer(async (req, res) => {
 
     if (method === 'POST' && path === '/email-deliverability-monitor') {
       await handleEmailDeliverabilityMonitor(req, res)
+
+      return
+    }
+
+    if (method === 'POST' && path === '/growth/grader/drain') {
+      await handleGrowthGraderDrain(req, res)
 
       return
     }
