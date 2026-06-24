@@ -118,6 +118,7 @@ import { probeNextAuthSecretRoundTrip } from '@/lib/auth/readiness'
 
 import { resolveCleanSeedDate } from '@/lib/finance/account-balances-clean-seed-resolver'
 import { drainPendingGraderRuns, recoverStuckRunningRuns } from '@/lib/growth/ai-visibility/run-engine'
+import { isGraderEnabled } from '@/lib/growth/ai-visibility/flags'
 
 import { computeRollingRematerializationWindow } from './finance-rematerialize-seed'
 import { getReactiveQueueDepth, InvalidDomainError } from './reactive-queue-depth'
@@ -1618,6 +1619,16 @@ const handleGrowthGraderDrain = async (req: IncomingMessage, res: ServerResponse
   const stuckThresholdMinutes = typeof body.stuckThresholdMinutes === 'number' && body.stuckThresholdMinutes > 0
     ? Math.floor(body.stuckThresholdMinutes)
     : undefined
+
+  // Gate prod-safe: el ops-worker es un servicio Cloud Run compartido staging+prod.
+  // Con el grader OFF (default prod; el schema greenhouse_growth puede no existir aún)
+  // el handler NO toca la DB → cero queries, cero error, cero ruido en Sentry. El
+  // scheduler `ops-growth-grader-drain` puede seguir disparando sin acoplarse a prod.
+  if (!isGraderEnabled()) {
+    json(res, 200, { ok: true, skipped: 'grader_disabled', claimedCount: 0, recoveredCount: 0 })
+
+    return
+  }
 
   console.log(`[ops-worker] POST /growth/grader/drain — batchSize=${batchSize}`)
 

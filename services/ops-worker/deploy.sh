@@ -333,17 +333,30 @@ else
 fi
 
 # TASK-1234 — AI Visibility Grader async worker (/growth/grader/drain via Cloud Scheduler).
-# Flags default OFF (mismo default que el portal Vercel): con OFF cada adapter resuelve skip
-# limpio (grader_disabled/provider_disabled/missing_secret) y el drain no llama providers ni
-# gasta. Los *_API_KEY_SECRET_REF se declaran acá para que el worker resuelva las API keys
-# server-side (resolveSecret) cuando los flags se prendan en el rollout; Gemini usa Vertex via
-# WIF (sin secret, ya cubierto por GCP_PROJECT + IAM). Declarativo para que --set-env-vars
-# (destructivo) NO los borre en cada redeploy. Activación = rollout posterior con sign-off.
-GROWTH_AI_VISIBILITY_GRADER_ENABLED="${GROWTH_AI_VISIBILITY_GRADER_ENABLED:-false}"
-GROWTH_AI_VISIBILITY_OPENAI_ENABLED="${GROWTH_AI_VISIBILITY_OPENAI_ENABLED:-false}"
-GROWTH_AI_VISIBILITY_ANTHROPIC_ENABLED="${GROWTH_AI_VISIBILITY_ANTHROPIC_ENABLED:-false}"
+# El ops-worker es un servicio Cloud Run COMPARTIDO staging+prod → los flags se ramifican por
+# ENV (igual que los secret refs): en `staging` espejan al portal Vercel staging (GRADER +
+# OpenAI/Anthropic/Gemini ON, Perplexity OFF) para que el drain ejecute runs `full` reales; en
+# `production` quedan OFF (el schema greenhouse_growth aún no está migrado en prod — fuera de
+# scope) y el handler de drain hace no-op prod-safe (gate isGraderEnabled, cero queries/Sentry).
+# Los *_API_KEY_SECRET_REF se declaran siempre para que el worker resuelva las API keys
+# server-side (resolveSecret); Gemini usa Vertex via WIF (sin secret, GCP_PROJECT + IAM).
+# Declarativo para que --set-env-vars (destructivo) NO los borre en cada redeploy.
+if [ "${ENV}" = "staging" ]; then
+  DEFAULT_GROWTH_GRADER_ENABLED="true"
+  DEFAULT_GROWTH_OPENAI_ENABLED="true"
+  DEFAULT_GROWTH_ANTHROPIC_ENABLED="true"
+  DEFAULT_GROWTH_GEMINI_ENABLED="true"
+else
+  DEFAULT_GROWTH_GRADER_ENABLED="false"
+  DEFAULT_GROWTH_OPENAI_ENABLED="false"
+  DEFAULT_GROWTH_ANTHROPIC_ENABLED="false"
+  DEFAULT_GROWTH_GEMINI_ENABLED="false"
+fi
+GROWTH_AI_VISIBILITY_GRADER_ENABLED="${GROWTH_AI_VISIBILITY_GRADER_ENABLED:-${DEFAULT_GROWTH_GRADER_ENABLED}}"
+GROWTH_AI_VISIBILITY_OPENAI_ENABLED="${GROWTH_AI_VISIBILITY_OPENAI_ENABLED:-${DEFAULT_GROWTH_OPENAI_ENABLED}}"
+GROWTH_AI_VISIBILITY_ANTHROPIC_ENABLED="${GROWTH_AI_VISIBILITY_ANTHROPIC_ENABLED:-${DEFAULT_GROWTH_ANTHROPIC_ENABLED}}"
 GROWTH_AI_VISIBILITY_PERPLEXITY_ENABLED="${GROWTH_AI_VISIBILITY_PERPLEXITY_ENABLED:-false}"
-GROWTH_AI_VISIBILITY_GEMINI_ENABLED="${GROWTH_AI_VISIBILITY_GEMINI_ENABLED:-false}"
+GROWTH_AI_VISIBILITY_GEMINI_ENABLED="${GROWTH_AI_VISIBILITY_GEMINI_ENABLED:-${DEFAULT_GROWTH_GEMINI_ENABLED}}"
 GROWTH_AI_VISIBILITY_LLM_EXTRACTION_ENABLED="${GROWTH_AI_VISIBILITY_LLM_EXTRACTION_ENABLED:-false}"
 OPENAI_API_KEY_SECRET_REF="${OPENAI_API_KEY_SECRET_REF:-greenhouse-openai-api-key}"
 ANTHROPIC_API_KEY_SECRET_REF="${ANTHROPIC_API_KEY_SECRET_REF:-greenhouse-anthropic-api-key}"

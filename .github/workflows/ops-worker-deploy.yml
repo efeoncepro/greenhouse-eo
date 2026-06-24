@@ -51,6 +51,10 @@ on:
       # (2026-05-19) — canonical schema fix demo signals quedó stranded post-merge.
       - 'src/lib/reliability/**'
       - 'src/lib/notion-metrics/**'
+      # TASK-1234 — ops-worker hosts /growth/grader/drain (drainPendingGraderRuns +
+      # recoverStuckRunningRuns). Sin este filter, cambios al run-engine/store del
+      # grader NO triggerean redeploy y el worker queda con código stale.
+      - 'src/lib/growth/ai-visibility/**'
   workflow_dispatch:
     inputs:
       environment:
