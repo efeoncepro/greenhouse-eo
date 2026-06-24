@@ -1207,3 +1207,15 @@ Cargar junto a los §Delta de provider adapters + normalization/scoring al tocar
 - **NUNCA** entregar las recomendaciones como lista plana. Salen **priorizadas** (peso de la dimensión × tamaño del gap, RICE-ish) → `primaryGap` + `recommendedMotion` (alimentan el HubSpot handoff §7.8). El headline = mayor brecha ponderada (KPI dominante).
 - **Capability** `growth.ai_visibility.report.read` (least-privilege: ver el reporte SIN `observation.read` de evidencia cruda) + grant en `runtime.ts`. En V1 internal-only (mismo set que observation.read); la separación deja preparado el público/client.
 - **Reliability**: V1 NO agrega signal persistido (el reporte es on-read puro sobre un score ya señalizado; un build failure va a `captureWithDomain('growth')` + canonical error). Signal dedicado `report_build_failed` = follow-up cuando exista failure ledger.
+
+## Delta 2026-06-24 — TASK-1236 report temporal trend (complete dev)
+
+El `grader_report` (TASK-1235) gana un bloque `trend` run-over-run: compara el score vigente contra el **run previo comparable** del mismo perfil (mismo `prompt_pack_version` + `score_version`), porque AEO se mide por tendencia, no por una foto (skill `seo-aeo` §07). Derivación on-read pura del histórico ya persistido en `grader_scores` — **sin tabla nueva, sin migración**. Implementado en `src/lib/growth/ai-visibility/report/trend.ts` (cómputo puro) + `scoring/store.ts` (`getPreviousComparableScore`) + wire en `builder.ts`/`command.ts`; copy en `src/lib/copy/growth.ts`.
+
+### Invariantes operativos para agentes (report trend)
+
+- **NUNCA** fabricar un delta sin run previo comparable. Estados honestos: `sin_historico` (no hay previo), `incomparable` (el previo usó otro `prompt_pack_version`), `con_tendencia` (delta computado). Cada uno con `reason` renderizable.
+- **NUNCA** comparar contra un run de otra muestra. La comparabilidad exige `score_version` (en el SELECT) **y** `prompt_pack_version` (chequeo en el caller) idénticos; si difieren → `incomparable`, no delta.
+- **`null ≠ 0` en el delta**: dimensión `null` en cualquiera de los dos extremos → `delta=null` (`direction='sin_dato'`), NUNCA `0`. La dirección es **valor nombrado** (`subio|bajo|sin_cambio|sin_dato`), nunca un color.
+- **NUNCA** round-tripear un timestamp JS a Postgres para la ventana temporal. El cliente pg devuelve `timestamptz` como `Date`, cuyo `String()` (`"... GMT-0400 ..."`) Postgres no re-parsea → la marca temporal del run vigente se resuelve **en la DB** (subquery `SELECT created_at FROM grader_runs WHERE run_id = $3`). Bug detectado ejercitando el SQL contra PG real (gate TASK-893).
+- El `trend` es agregado puro (deltas numéricos, sin raw text) → viaja al DTO **público** además del interno. Capability sin cambio (reusa `report.read`); sin migración; sin signal nuevo.

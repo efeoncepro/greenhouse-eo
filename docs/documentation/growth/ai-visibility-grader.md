@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.6
+> **Version:** 1.7
 > **Creado:** 2026-06-24 por Claude (TASK-1226)
-> **Ultima actualizacion:** 2026-06-24 por Claude (TASK-1235, report builder)
+> **Ultima actualizacion:** 2026-06-24 por Claude (TASK-1236, tendencia del reporte)
 > **Documentacion tecnica:** [GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md)
 
 # AI Visibility Grader — Motor de Providers (Growth)
@@ -92,6 +92,7 @@ Una vez que un análisis tiene puntaje, el sistema arma un **reporte** que tradu
 - **Hallazgos (3-5):** cada uno con su severidad nombrada (Crítico/Atención/Óptimo/Sin dato), el número **con contexto** (nunca un número suelto) y un verbo de acción.
 - **Plan priorizado:** las recomendaciones salen **ordenadas por impacto** (qué hacer primero), no como lista plana. La de mayor impacto es el "gap principal" y define el siguiente movimiento comercial.
 - **Honestidad:** una dimensión **sin evidencia** se muestra como "sin dato" (no como 0). Un 0 medido sí es un problema real. Si faltó cobertura o hay lenguaje sensible, el reporte lo dice con su razón y próximo paso, sin fingir precisión.
+- **Tendencia (vs análisis anterior):** si la marca ya tiene un análisis previo comparable, el reporte muestra cuánto **subió o bajó** cada dimensión y el puntaje global desde la última vez (la visibilidad en IA se mide por tendencia, no por una foto). Si es el primer análisis dice "primer análisis"; si el anterior usó otra versión de preguntas, lo marca como "no comparable" en vez de inventar un cambio.
 - **Dos versiones:** una **interna** completa (para ventas/admin, con presencia por motor y detalle) y una **pública segura** que nunca incluye el texto crudo de los motores ni las fuentes privadas (sólo el puntaje, los competidores top, el resumen de fuentes y los próximos pasos, con el aviso de que es un diagnóstico muestreado por IA).
 
 Este reporte es el **insumo** de las superficies que vienen después (página pública, AI Visibility Snapshot en HubSpot, revisión en el admin). Todavía no se muestra en pantalla ni se envía a ningún lado: es la pieza de datos que esas superficies van a renderizar.

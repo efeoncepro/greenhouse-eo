@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -231,13 +231,13 @@ El trend es **derivación pura** del histórico de `grader_scores` ya persistido
 
 ## Acceptance Criteria
 
-- [ ] Reader `listGraderScoresByProfile` devuelve el histórico de scores de un perfil ordenado temporalmente.
-- [ ] Bloque `trend` additivo en `GraderReport`: delta overall + por dimensión vs run previo comparable, determinista.
-- [ ] Estados honestos `sin_historico` / `incomparable` / `con_tendencia` (sin delta falso en primer run ni entre versiones distintas).
-- [ ] `null≠0` propagado en el delta (dimensión sin dato en cualquier extremo → delta `null`).
-- [ ] Copy de los estados tokenizado en `src/lib/copy/growth.ts` (validado con `greenhouse-ux-writing`).
-- [ ] Dry-run sobre un perfil con ≥2 runs reales produce un trend coherente.
-- [ ] Sin UI, sin migración, sin write; trend público (si se incluye) hereda public-safe + leak test.
+- [x] Reader del histórico de scores de un perfil. **Recalibrado:** se implementó el reader TARGETED `getPreviousComparableScore` (scoring/store.ts) en vez de un `listGraderScoresByProfile` completo — el trend solo necesita el run previo comparable inmediato, no toda la lista (más eficiente, menos superficie). La marca temporal se resuelve en la DB (subquery).
+- [x] Bloque `trend` additivo en `GraderReport`: delta overall + por dimensión vs run previo comparable, determinista. — `report/trend.ts` + wire builder; test determinismo.
+- [x] Estados honestos `sin_historico` / `incomparable` / `con_tendencia` (sin delta falso en primer run ni entre versiones distintas). — tests por estado.
+- [x] `null≠0` propagado en el delta (dimensión sin dato en cualquier extremo → delta `null`). — test null≠0 + dry-run (`message_alignment` null→null = `sin_dato`).
+- [x] Copy de los estados tokenizado en `src/lib/copy/growth.ts` (validado con `greenhouse-ux-writing`).
+- [x] Dry-run sobre un perfil con ≥2 runs reales produce un trend coherente. — EO-GRUN-00008 vs 00007 → `con_tendencia`, deltas 0 (scores idénticos).
+- [x] Sin UI, sin migración, sin write; trend público hereda public-safe (agregado puro, deltas numéricos) — incluido en `PublicGraderReport`, leak test existente verde.
 
 ## Verification
 
@@ -249,12 +249,12 @@ El trend es **derivación pura** del histórico de `grader_scores` ya persistido
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` sincronizado (`in-progress`/`complete`)
-- [ ] archivo en la carpeta correcta
-- [ ] `docs/tasks/README.md` + `TASK_ID_REGISTRY.md` sincronizados
-- [ ] `Handoff.md` + `changelog.md` actualizados
-- [ ] arch `## Delta` si el contrato de reporte cambia (bloque trend)
-- [ ] chequeo de impacto cruzado (TASK-1235/1237 + futuras superficie pública/monitor)
+- [x] `Lifecycle` sincronizado (`complete`)
+- [x] archivo en la carpeta correcta (`complete/`)
+- [x] `docs/tasks/README.md` + `TASK_ID_REGISTRY.md` sincronizados
+- [x] `Handoff.md` + `changelog.md` actualizados
+- [x] arch `## Delta 2026-06-24 — TASK-1236` (bloque trend + invariantes)
+- [x] chequeo de impacto cruzado: TASK-1237 (mismos owned files report/) — `## Delta` agregado notando que `trend` ya existe en el contrato; sin colisión (campos distintos)
 
 ## Follow-ups
 
@@ -263,5 +263,5 @@ El trend es **derivación pura** del histórico de `grader_scores` ya persistido
 
 ## Open Questions
 
-1. ¿El bloque `trend` va también al DTO público en V1, o solo interno? (probable público acotado — decidir en Discovery con criterio de conversión + public-safe).
-2. ¿"Run previo" = run inmediatamente anterior, o el último de un período (ej. mes anterior)? V1 sugerido: run previo comparable inmediato; el agrupamiento por período es follow-up.
+1. ~~¿El bloque `trend` va también al DTO público en V1?~~ **Resuelta → SÍ** (público + interno). El trend es agregado puro (deltas numéricos, sin raw text) → público-safe por construcción; alto valor de conversión ("subiste 8 puntos"). Incluido en `PublicGraderReport`; leak test existente verde.
+2. ~~¿"Run previo" = inmediatamente anterior o último de un período?~~ **Resuelta → run previo comparable inmediato** (mismo perfil + `score_version`, `created_at` <, resuelto en la DB por subquery). El agrupamiento por período (ej. "vs mes anterior") es follow-up.

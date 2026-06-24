@@ -1,5 +1,9 @@
 # TASK-1237 — Growth AI Visibility: Report Signal Enrichment
 
+## Delta 2026-06-24
+
+- TASK-1236 (complete) agregó el bloque `trend` (tendencia temporal) a `GraderReport`/`PublicGraderReport` y un módulo `report/trend.ts` + reader `getPreviousComparableScore`. **No colisiona** con esta task (campos distintos: trend vs citation-share/sentiment/position/per-engine). Al tomar 1237, partir del contrato de reporte ya con `trend` presente; los nuevos campos additivos conviven. El patrón "reducer puro sobre el score/findings + null≠0 + público-safe" de 1235/1236 es el mismo a seguir.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
