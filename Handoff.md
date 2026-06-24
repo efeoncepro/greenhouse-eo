@@ -7,6 +7,7 @@
 > - **Registro:** registry + README sincronizados; siguiente ID disponible `TASK-1229`.
 > - **Gates ejecutados:** `pnpm task:lint` 1228/1226/1227 → template=1, errors=0, warnings=0; `pnpm ops:lint --changed` → scanned=3, errors=0, warnings=0.
 > - **Contexto (fuera del repo):** se construyó la skill personal `~/.claude/skills/seo-aeo/` (SEO+AEO/GEO 2026) como conocimiento de dominio detrás del grader; mapeo 7-dimensiones↔módulos en su `efeonce/AI_VISIBILITY_GRADER.md`.
+> - **Ejecución TASK-1228 (in-progress 2026-06-24):** tomada vía `/implement-task`, develop local-first sin branch. Casa de artefactos fijada (desacoplada: `docs/architecture/growth/ai-visibility/` para prompt pack + golden set, `scripts/growth/ai-visibility-spike/` para harness). **Bloqueo:** no hay keys de provider locales (OPENAI/PERPLEXITY/GEMINI ausentes) → Slice 1 (prompt pack V1 + golden brand set) + Slice 2 (harness code, skippable) son ejecutables ahora; Slices 3–5 (captura + calibración + golden set curado) quedan `operativamente bloqueados` hasta tener keys. Cierre esperado `parcial` salvo que se provean keys.
 
 ## Sesión 2026-06-24 — Growth / AI Visibility Grader arquitectura + TASK-1226 — Codex
 

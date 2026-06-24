@@ -1,0 +1,97 @@
+{
+  "_meta": {
+    "artifact": "brand-set.v1",
+    "task": "TASK-1228",
+    "status": "draft-v1",
+    "createdAt": "2026-06-24",
+    "purpose": "Golden brand set para el spike de calibración. Las marcas se eligen para que el score DISCRIMINE: marca fuerte vs débil deben separarse; las neutrales (fuera de nicho) NO deberían aparecer en prompts de agencia (control). Es input del harness; el golden eval set con expected findings (golden-set.v1.json) se cura DESPUÉS, sobre la evidencia capturada (Slice 5).",
+    "openQuestionResolution": "OQ#1 — el cliente Globe real NO se commitea; se usa una marca enterprise neutra como proxy (data posture confidential del ADR). Un Globe real solo en corrida interna no-versionada.",
+    "operatorFill": "Las entradas con \"operatorFill\": true necesitan que el operador ponga una marca REAL y pública antes de la corrida empírica (no se fabrican para no inventar el set competitivo de Efeonce). Criterio en \"criteria\".",
+    "defaultVariables": {
+      "category": "marketing y diseño",
+      "market": "Chile",
+      "painPoint": "su visibilidad y posicionamiento de marca",
+      "year": "2026"
+    }
+  },
+  "brands": [
+    {
+      "id": "subject_efeonce",
+      "role": "subject",
+      "brandName": "Efeonce",
+      "websiteUrl": "https://efeoncepro.com",
+      "country": "CL",
+      "market": "Chile",
+      "category": "marketing y diseño",
+      "productOrService": "agencia creativa / servicios de marketing (modelo ASaaS)",
+      "competitorsDeclared": [],
+      "operatorFill": false
+    },
+    {
+      "id": "competitor_1",
+      "role": "competitor",
+      "brandName": null,
+      "websiteUrl": null,
+      "country": "CL",
+      "market": "Chile",
+      "category": "marketing y diseño",
+      "criteria": "Competidor directo real y público de Efeonce en agencia/marketing en Chile/LATAM.",
+      "operatorFill": true
+    },
+    {
+      "id": "competitor_2",
+      "role": "competitor",
+      "brandName": null,
+      "websiteUrl": null,
+      "country": "CL",
+      "market": "Chile",
+      "category": "marketing y diseño",
+      "criteria": "Segundo competidor directo real y público.",
+      "operatorFill": true
+    },
+    {
+      "id": "strong_reference",
+      "role": "strong",
+      "brandName": null,
+      "websiteUrl": null,
+      "country": null,
+      "market": "Global/LATAM",
+      "category": "marketing y diseño",
+      "criteria": "Marca reconocida/líder en la categoría (alta presencia esperada en answer engines) — calibra el techo de discriminación. Puede ser una agencia/plataforma global bien conocida.",
+      "operatorFill": true
+    },
+    {
+      "id": "weak_reference",
+      "role": "weak",
+      "brandName": null,
+      "websiteUrl": null,
+      "country": "CL",
+      "market": "Chile",
+      "category": "marketing y diseño",
+      "criteria": "Marca nueva / de baja presencia (poca o nula aparición esperada) — calibra el piso de discriminación.",
+      "operatorFill": true
+    },
+    {
+      "id": "neutral_1",
+      "role": "neutral_control",
+      "brandName": null,
+      "websiteUrl": null,
+      "country": null,
+      "market": "Global",
+      "category": "marketing y diseño",
+      "criteria": "Marca pública MUY conocida pero CLARAMENTE fuera del nicho de agencia/marketing (ej. consumo masivo). Control: NO debería aparecer en prompts de agencia; si aparece, el prompt/dimensión tiene ruido.",
+      "operatorFill": true
+    },
+    {
+      "id": "neutral_2",
+      "role": "neutral_control",
+      "brandName": null,
+      "websiteUrl": null,
+      "country": null,
+      "market": "Global",
+      "category": "marketing y diseño",
+      "criteria": "Segundo control fuera de nicho (proxy enterprise para el caso Globe, sin exponer cliente real).",
+      "operatorFill": true
+    }
+  ]
+}
