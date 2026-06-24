@@ -170,6 +170,7 @@ import { getVatEntryUnresolvedFxSignal } from './queries/vat-entry-unresolved-fx
 import { getVatEligibleWithoutPeriodSignal } from './queries/vat-eligible-without-period'
 import { getHubspotCompaniesIntakeDeadLetterSignal } from './queries/hubspot-companies-intake-dead-letter'
 import { getWorkforceUnlinkedInternalUsersSignal } from './queries/workforce-unlinked-internal-users'
+import { getGrowthAiVisibilitySignals } from './queries/growth-ai-visibility-signals'
 // TASK-1082 — Knowledge Platform ingestion signals (moduleKey 'knowledge').
 import { getKnowledgeNotionIngestDeadLetterSignal } from './queries/knowledge-notion-ingest-dead-letter'
 import { getKnowledgeQuarantineCountSignal } from './queries/knowledge-quarantine-count'
@@ -611,6 +612,7 @@ interface ReliabilityOverviewSources {
   providerBqSyncDeadLetter?: ReliabilitySignal[] | null
   hubspotCompaniesIntakeDeadLetter?: ReliabilitySignal | null
   workforceUnlinkedInternalUsers?: ReliabilitySignal | null
+  growthAiVisibility?: ReliabilitySignal[] | null
 
   /** TASK-1201 — Finance AI anomaly-materialization staleness (heartbeat del SoT de signals). */
   financeAiStaleMaterialization?: ReliabilitySignal | null
@@ -1018,6 +1020,7 @@ export const buildReliabilityOverview = (
     // TASK-1190 — Operational P&L cost coverage gate. Evita tratar como
     // margen canónico un período con revenue y costo 0 cuando falta upstream.
     ...(sources.operationalPlCostCoverageDegraded ? [sources.operationalPlCostCoverageDegraded] : []),
+    ...(sources.growthAiVisibility ?? []),
     // TASK-812 — Previred/LRE artifact registry drift.
     ...(sources.payrollComplianceExportDrift ? [sources.payrollComplianceExportDrift] : []),
     // TASK-863 V1.5.2 — Final settlement PDF status drift (DB document_status vs
@@ -1380,6 +1383,13 @@ export const getReliabilityOverview = async (
     preloadedSources.operationalPlCostCoverageDegraded !== undefined
       ? preloadedSources.operationalPlCostCoverageDegraded
       : await getOperationalPlCostCoverageDegradedSignal().catch(() => null)
+
+  // TASK-1226 — Growth AI Visibility Grader (4 signals: error rate, latency p95,
+  // cost budget, skipped). DB vacía / grader OFF → estado sano (steady pre-launch).
+  const growthAiVisibility =
+    preloadedSources.growthAiVisibility !== undefined
+      ? preloadedSources.growthAiVisibility
+      : await getGrowthAiVisibilitySignals().catch(() => null)
 
   const payrollComplianceExportDrift =
     preloadedSources.payrollComplianceExportDrift !== undefined
@@ -2277,6 +2287,7 @@ export const getReliabilityOverview = async (
     domainIncidents,
     paymentOrderSettlement,
     operationalPlCostCoverageDegraded,
+    growthAiVisibility,
     payrollComplianceExportDrift,
     payrollContractorDoubleRailOverlap,
     payrollDeelMemberWithoutContractId,

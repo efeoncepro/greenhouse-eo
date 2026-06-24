@@ -6439,6 +6439,68 @@ export interface GreenhouseFinanceVatMonthlyPositions {
   vat_position_id: string;
 }
 
+export interface GreenhouseGrowthGraderProfiles {
+  brand_name: string;
+  category: string | null;
+  competitors_declared: Generated<string[]>;
+  created_at: Generated<Timestamp>;
+  locale: string;
+  market: string;
+  profile_id: Generated<string>;
+  public_id: Generated<string>;
+  status: Generated<string>;
+  updated_at: Generated<Timestamp>;
+  website_url: string | null;
+}
+
+export interface GreenhouseGrowthGraderRuns {
+  cost_ceiling_usd: Numeric | null;
+  created_at: Generated<Timestamp>;
+  estimated_cost_usd: Generated<Numeric>;
+  finished_at: Timestamp | null;
+  idempotency_key: string | null;
+  mode: string;
+  profile_id: string;
+  prompt_pack_version: string;
+  provider_policy_version: string;
+  public_id: Generated<string>;
+  requested_providers: Generated<string[]>;
+  run_id: Generated<string>;
+  run_kind: string;
+  started_at: Timestamp | null;
+  status: Generated<string>;
+}
+
+export interface GreenhouseGrowthPromptPacks {
+  created_at: Generated<Timestamp>;
+  locale: string;
+  market: string;
+  prompt_pack_id: Generated<string>;
+  prompts: Generated<Json>;
+  status: Generated<string>;
+  version: string;
+}
+
+export interface GreenhouseGrowthProviderObservations {
+  answer_excerpt: string | null;
+  answer_text_hash: string | null;
+  citations: Generated<Json>;
+  created_at: Generated<Timestamp>;
+  error_code: string | null;
+  latency_ms: Generated<number>;
+  model: string;
+  observation_id: string;
+  prompt_id: string;
+  prompt_pack_version: string;
+  provider: string;
+  provider_policy_version: string;
+  provider_request_hash: string;
+  raw_evidence_pointer: string | null;
+  run_id: string;
+  status: string;
+  usage: Generated<Json>;
+}
+
 export interface GreenhouseHrContractorEngagementEvents {
   actor_user_id: string | null;
   contractor_engagement_id: string;
@@ -10579,6 +10641,10 @@ export interface DB {
   "greenhouse_finance.tax_codes": GreenhouseFinanceTaxCodes;
   "greenhouse_finance.vat_ledger_entries": GreenhouseFinanceVatLedgerEntries;
   "greenhouse_finance.vat_monthly_positions": GreenhouseFinanceVatMonthlyPositions;
+  "greenhouse_growth.grader_profiles": GreenhouseGrowthGraderProfiles;
+  "greenhouse_growth.grader_runs": GreenhouseGrowthGraderRuns;
+  "greenhouse_growth.prompt_packs": GreenhouseGrowthPromptPacks;
+  "greenhouse_growth.provider_observations": GreenhouseGrowthProviderObservations;
   "greenhouse_hr.contractor_engagement_events": GreenhouseHrContractorEngagementEvents;
   "greenhouse_hr.contractor_engagements": GreenhouseHrContractorEngagements;
   "greenhouse_hr.contractor_invoice_assets": GreenhouseHrContractorInvoiceAssets;
