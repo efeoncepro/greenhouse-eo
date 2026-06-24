@@ -107,3 +107,93 @@ export const generateStructuredAnthropic = async <T>(
     }
   }
 }
+
+// ── Web search runner (TASK-1226) ────────────────────────────────────────────
+
+/** Default Claude model con web search (verificable contra docs vigentes al correr). */
+export const ANTHROPIC_WEB_SEARCH_DEFAULT_MODEL = 'claude-sonnet-4-6'
+
+export interface AnthropicWebSearchCitation {
+  url: string
+  title: string | null
+}
+
+export interface AnthropicWebSearchResult {
+  ok: boolean
+  model: string
+  text: string | null
+  citations: AnthropicWebSearchCitation[]
+  usage: Record<string, unknown>
+  latencyMs: number
+}
+
+/**
+ * Ejecuta un prompt único contra Claude con la herramienta web_search. Devuelve
+ * texto + citations normalizadas (parseo per-provider: citations de text blocks +
+ * web_search_tool_result, validado en el spike TASK-1228). Lanza en error de
+ * red/SDK (el caller lo mapea a clase canónica). NUNCA loggea el secret.
+ */
+export const runAnthropicWebSearch = async (input: {
+  prompt: string
+  model?: string
+  maxUses?: number
+  maxTokens?: number
+  timeoutMs?: number
+}): Promise<AnthropicWebSearchResult> => {
+  const client = await getAnthropicClient()
+  const model = input.model?.trim() || ANTHROPIC_WEB_SEARCH_DEFAULT_MODEL
+  const started = Date.now()
+
+  const response = await client.messages.create(
+    {
+      model,
+      max_tokens: input.maxTokens ?? 1024,
+      messages: [{ role: 'user', content: input.prompt }],
+      tools: [{ type: 'web_search_20250305', name: 'web_search', max_uses: input.maxUses ?? 5 }]
+    },
+    input.timeoutMs ? { timeout: input.timeoutMs } : undefined
+  )
+
+  const latencyMs = Date.now() - started
+  const blocks = Array.isArray(response.content) ? response.content : []
+
+  const text =
+    blocks
+      .filter((block): block is Anthropic.Messages.TextBlock => block.type === 'text')
+      .map(block => block.text)
+      .join('') || null
+
+  const citations: AnthropicWebSearchCitation[] = []
+
+  for (const block of blocks as unknown as Array<Record<string, unknown>>) {
+    const blockCitations = block.citations
+
+    if (Array.isArray(blockCitations)) {
+      for (const citation of blockCitations as Array<Record<string, unknown>>) {
+        if (typeof citation.url === 'string') {
+          citations.push({ url: citation.url, title: typeof citation.title === 'string' ? citation.title : null })
+        }
+      }
+    }
+
+    if (block.type === 'web_search_tool_result' && Array.isArray(block.content)) {
+      for (const result of block.content as Array<Record<string, unknown>>) {
+        if (typeof result.url === 'string') {
+          citations.push({ url: result.url, title: typeof result.title === 'string' ? result.title : null })
+        }
+      }
+    }
+  }
+
+  return {
+    ok: true,
+    model: response.model,
+    text,
+    citations,
+    usage: {
+      input_tokens: response.usage.input_tokens,
+      output_tokens: response.usage.output_tokens
+    },
+    latencyMs
+  }
+}

@@ -2,7 +2,7 @@
 
 > **Tipo de documento:** Ledger operativo vivo (SSOT del ESTADO de los env-var flags)
 > **Creado:** 2026-06-18 por Claude (TASK-1079 follow-up)
-> **Última actualización:** 2026-06-22 (TASK-1210 — 8 flags MXN/CLF prendidos en **PRODUCCIÓN** en el release `3a39c68ba`)
+> **Última actualización:** 2026-06-24 (TASK-1226 — 5 flags `GROWTH_AI_VISIBILITY_*_ENABLED` declarados default OFF, code-complete + gated)
 >
 > **Delta 2026-06-22 (TASK-1210, release develop→main `3a39c68ba`, sign-off CEO):** los 8 flags MXN+CLF — `FINANCE_CORE_MXN_ENABLED`, `NUBOX_EXPORT_FOREIGN_CURRENCY_ENABLED`, `FINANCE_MXN_PAYMENT_ORDERS_ENABLED`, `FINANCE_MULTI_CURRENCY_REPORTING_ENABLED`, `FINANCE_CORE_CLF_INDEXED_ENABLED`, `FINANCE_CLF_INCOME_PROJECTION_ENABLED`, `FINANCE_CLF_OBLIGATIONS_ENABLED`, `FINANCE_CLF_REPORTING_ENABLED` — pasaron a **ON en producción**: Vercel prod (agregados + redeploy `greenhouse-midjr78bo`) + ops-worker Cloud Run (persistente via `services/ops-worker/deploy.sh`, `:-true`). Los `*_BACKFILL_APPLY_ENABLED` (gates de script) siguen OFF. Verdad live: `vercel env ls` + `gcloud run services describe ops-worker`.
 > **Doc relacionado:** [GREENHOUSE_FEATURE_FLAGS_ROLLOUT_PLATFORM_V1.md](../architecture/GREENHOUSE_FEATURE_FLAGS_ROLLOUT_PLATFORM_V1.md) (los flags PG declarativos — mecanismo distinto, ver abajo)
@@ -50,6 +50,8 @@ Es **encontrable** desde: `CLAUDE.md` (Runtime Rollout Completion Gate), `AGENTS
 | `NEXA_QUOTE_AUTHOR_ACTION_ENABLED` | TASK-1212 | OFF/default en todos los environments (verdad live: `vercel env ls`) · **code-complete + gated** | (1) además del master `NEXA_ACTION_RUNTIME_ENABLED` (ya ON en staging/prod), prender `NEXA_QUOTE_AUTHOR_ACTION_ENABLED=true` en staging → habilita la governed action `author_quote` (Nexa puede crear/emitir una cotización con confirmación humana); (2) ejercer el loop `propose → confirm → execute` con una cotización real en staging + verificar quotation/líneas/outbox; (3) prod tras sign-off del operador. | Governed action de autoría/emisión de cotización (write gobernado interno). Default OFF → el resolver devuelve gap honesto `runtime_disabled` y el confirm rechaza; la mutación SIEMPRE ocurre en el confirm humano y el command `submitQuoteFromBuilder` re-enforza capability `commercial.quotation` + precio del engine. |
 
 | `COMMERCIAL_Q2C_CANONICAL_CLOSE_ENABLED` + `COMMERCIAL_Q2C_CONTRACT_ONLY_ENABLED` | TASK-1206 | **`COMMERCIAL_Q2C_CANONICAL_CLOSE_ENABLED` staging: ON (2026-06-22, smoke HTTP PASS)** · prod: OFF · `COMMERCIAL_Q2C_CONTRACT_ONLY_ENABLED`: OFF en todos | (1) ~~staging flip + smoke~~ **HECHO 2026-06-22**: flag ON en staging + redeploy `greenhouse-jfz70d2gr`; smoke HTTP sobre fixture → `convert-to-invoice` delegó en `closeQuoteToCash` (201 con operationId/finalState canónicos), income + contrato + audit Q2C + outbox completo; 2.º POST → MISMO incomeId (anti doble-AR confirmado, 1 income en PG). (2) **prod pendiente**: tras sign-off Commercial/Finance, aplicar la migración `20260621222152560` en la base de prod (vía release control plane develop→main) + `vercel env add ... Production` + redeploy + smoke prod. `COMMERCIAL_Q2C_CONTRACT_ONLY_ENABLED` solo si el operador habilita `contract_only` (deal suspendido sin AR + SLA) — política aparte con sign-off. | Cierre canónico Quote-to-Cash (TASK-1206). En staging el path visible ya usa el comando canónico (añade audit Q2C + idempotencia; las conversiones que antes hacía el legacy ahora pasan por `closeQuoteToCash`). `contract_only` NUNCA es cierre terminal: audit `status='suspended'` + signal `contract_only_sla_breach`. |
+
+| `GROWTH_AI_VISIBILITY_GRADER_ENABLED` (master) + `GROWTH_AI_VISIBILITY_OPENAI_ENABLED` / `_ANTHROPIC_ENABLED` / `_PERPLEXITY_ENABLED` / `_GEMINI_ENABLED` | TASK-1226 | OFF/default en todos los environments (verdad live: `vercel env ls`) · **code-complete + gated** | (1) provisionar los secrets de provider en GCP Secret Manager (`greenhouse-openai-api-key`, `greenhouse-anthropic-api-key`; Perplexity/Gemini pendientes de creds); (2) prender el master `GROWTH_AI_VISIBILITY_GRADER_ENABLED=true` + el flag del provider en staging → habilita el adapter real (uno por vez, empezando por OpenAI); (3) correr el smoke acotado (`pnpm growth:ai-visibility:smoke`) + verificar observations + signals; (4) prod fuera de scope de TASK-1226 (lanzamiento público = task posterior). | AI Visibility Grader (dominio growth.ai_visibility). Default OFF → cada adapter resuelve skip controlado (`grader_disabled`/`provider_disabled`/`missing_secret`), cero llamadas a providers, cero costo. El fake adapter es el default sin flags. |
 
 _(Agregá acá cualquier flag que dejes code-complete sin prender. Si está vacío, ¡no hay deuda pendiente!)_
 
@@ -103,6 +105,11 @@ _(Agregá acá cualquier flag que dejes code-complete sin prender. Si está vac�
 | `GREENHOUSE_SISTER_PLATFORM_OAUTH_ENABLED` | — | ✅ | — | Kortex bridge |
 | `KORTEX_COMMAND_*` / `KORTEX_GITHUB_*` (varios) | — | ✅ | — | Kortex bridge |
 | `WORKFORCE_CONTRACTING_AI_ENABLED` | — | — | Dev/Preview | TASK-1019 |
+| `GROWTH_AI_VISIBILITY_GRADER_ENABLED` | — | — | — | TASK-1226 |
+| `GROWTH_AI_VISIBILITY_OPENAI_ENABLED` | — | — | — | TASK-1226 |
+| `GROWTH_AI_VISIBILITY_ANTHROPIC_ENABLED` | — | — | — | TASK-1226 |
+| `GROWTH_AI_VISIBILITY_PERPLEXITY_ENABLED` | — | — | — | TASK-1226 |
+| `GROWTH_AI_VISIBILITY_GEMINI_ENABLED` | — | — | — | TASK-1226 |
 
 ---
 
@@ -148,6 +155,8 @@ Para los **PG rollout flags** (`home_rollout_flags`): se prenden vía admin endp
 **UI / Design tokens:** `HOME_V2_ENABLED` (TASK-696/780) · `NEXT_PUBLIC_AXIS_NEUTRALS_ENABLED` · `NEXT_PUBLIC_AXIS_SECONDARY_LIME_ENABLED` (TASK-1034/1053).
 
 **Kortex bridge / sister platform:** `GREENHOUSE_SISTER_PLATFORM_OAUTH_ENABLED` · `KORTEX_COMMAND_ADAPTER_ENABLED` · `KORTEX_COMMAND_ADMIN_ENABLED` · `KORTEX_COMMAND_LIVE_EXECUTE_ENABLED` · `KORTEX_GITHUB_COMMANDS_ENABLED` · `KORTEX_GITHUB_WORKFLOW_DISPATCH_ENABLED`.
+
+**Growth / AI Visibility Grader** (`src/lib/growth/ai-visibility/flags.ts`): `GROWTH_AI_VISIBILITY_GRADER_ENABLED` (kill switch global) · `GROWTH_AI_VISIBILITY_OPENAI_ENABLED` · `GROWTH_AI_VISIBILITY_ANTHROPIC_ENABLED` · `GROWTH_AI_VISIBILITY_PERPLEXITY_ENABLED` · `GROWTH_AI_VISIBILITY_GEMINI_ENABLED` (TASK-1226 — todos default OFF; sin flag/secret el adapter resuelve skip limpio).
 
 **Mirrors `NEXT_PUBLIC_*` (client-readable)** — pares de un flag server que la UI necesita leer client-side: `NEXT_PUBLIC_NEXA_FLOATING_EXPANDABLE_ENABLED` · `NEXT_PUBLIC_NEXA_INTERACTION_LANE_ENABLED` · `NEXT_PUBLIC_NEXA_KNOWLEDGE_RETRIEVAL_ENABLED` · `NEXT_PUBLIC_NEXA_SUGGESTED_PROMPTS_DATA_AWARE_ENABLED` · `NEXT_PUBLIC_CLIENT_LIFECYCLE_ONBOARDING_ENABLED` · `NEXT_PUBLIC_AXIS_NEUTRALS_ENABLED` · `NEXT_PUBLIC_AXIS_SECONDARY_LIME_ENABLED`. Recordá: se hornean en build → prenderlos requiere build fresco.
 

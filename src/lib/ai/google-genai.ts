@@ -51,3 +51,71 @@ export const getGoogleGenAIClient = async () => {
 
   return googleGenAIClient
 }
+
+// ── Grounded search runner (TASK-1226) ───────────────────────────────────────
+
+/** Default Gemini model con Google Search grounding (verificable contra docs vigentes). */
+export const GEMINI_GROUNDED_DEFAULT_MODEL = 'gemini-2.5-flash'
+
+export interface GeminiGroundedCitation {
+  url: string
+  title: string | null
+}
+
+export interface GeminiGroundedSearchResult {
+  ok: boolean
+  model: string
+  text: string | null
+  citations: GeminiGroundedCitation[]
+  usage: Record<string, unknown>
+  latencyMs: number
+}
+
+/** ¿Hay project id (Vertex via ADC) para Gemini? No lanza. */
+export const isGeminiConfigured = (): boolean => Boolean(getGoogleProjectId())
+
+/**
+ * Ejecuta un prompt contra Gemini con Google Search grounding (Vertex). Devuelve
+ * texto + citations normalizadas (groundingMetadata.groundingChunks[].web.uri).
+ * Lanza en error de SDK/credencial (el caller lo mapea a clase canónica).
+ */
+export const runGeminiGroundedSearch = async (input: {
+  prompt: string
+  model?: string
+}): Promise<GeminiGroundedSearchResult> => {
+  const client = await getGoogleGenAIClient()
+  const model = input.model?.trim() || GEMINI_GROUNDED_DEFAULT_MODEL
+  const started = Date.now()
+
+  const response = await client.models.generateContent({
+    model,
+    contents: input.prompt,
+    config: { tools: [{ googleSearch: {} }] }
+  })
+
+  const latencyMs = Date.now() - started
+  const candidate = response.candidates?.[0]
+
+  const text =
+    candidate?.content?.parts?.map(part => part.text ?? '').join('') || response.text || null
+
+  const citations: GeminiGroundedCitation[] = []
+  const chunks = candidate?.groundingMetadata?.groundingChunks ?? []
+
+  for (const chunk of chunks) {
+    const uri = chunk.web?.uri
+
+    if (typeof uri === 'string') {
+      citations.push({ url: uri, title: chunk.web?.title ?? null })
+    }
+  }
+
+  return {
+    ok: true,
+    model,
+    text,
+    citations,
+    usage: (response.usageMetadata as Record<string, unknown> | undefined) ?? {},
+    latencyMs
+  }
+}
