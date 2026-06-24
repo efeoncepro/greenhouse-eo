@@ -62,10 +62,21 @@ async function callOpenAI(key, prompt) {
   })
 
   const json = await res.json()
-  const text = json.output_text ?? JSON.stringify(json.output ?? json).slice(0, EXCERPT_MAX)
+  const blocks = Array.isArray(json.output) ? json.output : []
 
-  
-return { ok: res.ok, text, usage: json.usage ?? {}, latencyMs: Date.now() - started, raw: json }
+  const textParts = blocks
+    .filter(b => b.type === 'message')
+    .flatMap(b => (Array.isArray(b.content) ? b.content : []))
+    .filter(c => c.type === 'output_text')
+
+  const text = json.output_text ?? (textParts.map(c => c.text).join('') || null)
+
+  const citations = textParts
+    .flatMap(c => (Array.isArray(c.annotations) ? c.annotations : []))
+    .filter(a => a.type === 'url_citation')
+    .map(a => ({ url: a.url, title: a.title ?? null }))
+
+  return { ok: res.ok, text, citations, usage: json.usage ?? {}, latencyMs: Date.now() - started, raw: json }
 }
 
 async function callPerplexity(key, prompt) {
@@ -120,12 +131,21 @@ async function callAnthropic(key, prompt) {
   })
 
   const json = await res.json()
+  const blocks = Array.isArray(json.content) ? json.content : []
+  const text = blocks.filter(b => b.type === 'text').map(b => b.text).join('') || null
+  const citations = []
 
-  const text = Array.isArray(json.content)
-    ? json.content.filter(b => b.type === 'text').map(b => b.text).join('')
-    : null
+  for (const b of blocks) {
+    if (Array.isArray(b.citations)) {
+      for (const c of b.citations) if (c.url) citations.push({ url: c.url, title: c.title ?? null })
+    }
 
-  return { ok: res.ok, text, usage: json.usage ?? {}, latencyMs: Date.now() - started, raw: json }
+    if (b.type === 'web_search_tool_result' && Array.isArray(b.content)) {
+      for (const r of b.content) if (r.url) citations.push({ url: r.url, title: r.title ?? null })
+    }
+  }
+
+  return { ok: res.ok, text, citations, usage: json.usage ?? {}, latencyMs: Date.now() - started, raw: json }
 }
 
 const ADAPTERS = { openai: callOpenAI, anthropic: callAnthropic, perplexity: callPerplexity, gemini: callGemini }
