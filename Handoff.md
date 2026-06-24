@@ -1,3 +1,12 @@
+## Sesión 2026-06-24 — Home / Nexa Insights bento branding pass — Codex
+
+> **Estado:** code complete local; sin deploy/push. Mejora route-local del bento `ai-insights-bento` en `/home`, sin cambio de data/API contract.
+> - **Cambio visual:** `HomeAiInsightsBento` ahora usa `GreenhouseNexaBrandMark` en el header y `GreenhouseShinyBorder palette='nexa'` para el CTA "Pregúntale a Nexa"; se elimina el sparkle genérico como señal principal.
+> - **Jerarquía:** la primera señal se renderiza como prioridad destacada (`Prioridad Nexa`) con chips de dominio/tipo/severidad, impacto, acción sugerida y CTA de causa raíz. Las demás quedan como tarjetas secundarias más escaneables. En mobile se evita duplicar el CTA Nexa dentro de la tarjeta para no pelear con la bottom bar; el CTA Nexa queda visible en el header.
+> - **Copy:** nuevos labels reutilizables en `GH_NEXA` (`home_bento_*`), sin literals reutilizables en JSX.
+> - **Evidencia:** lint focal OK; `HomeAiInsightsBento.test.ts` 3/3 OK; `pnpm typecheck` OK tras limpiar `.next/dev/types` generado por `next dev`; `git diff --check` OK; GVC local desktop/mobile OK en `.captures/2026-06-24T01-00-31_home-nexa-insights-bento/`.
+> - **Notas:** primer intento de GVC falló por servidor local apagado y luego por compile timeout en desktop frío; la captura final pasó con ruta caliente. No se actualizó arquitectura/UI platform porque no nació primitive ni contrato compartido.
+
 ## Sesión 2026-06-23 — TASK-1178 Triage session-coarse + guard anti-regresión — Claude
 
 > **Estado:** complete (code + docs); verificado local; rollout = repo-only (sin migración/flag/capability nueva). Task movida a `complete/`. Cierra rank #2 del gap ledger de Full API Parity.
