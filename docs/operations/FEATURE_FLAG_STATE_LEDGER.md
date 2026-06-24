@@ -110,6 +110,7 @@ _(Agregá acá cualquier flag que dejes code-complete sin prender. Si está vac�
 | `GROWTH_AI_VISIBILITY_ANTHROPIC_ENABLED` | — | ✅ (2026-06-24, smoke real local OK) | — | TASK-1226 |
 | `GROWTH_AI_VISIBILITY_PERPLEXITY_ENABLED` | — | — | — | TASK-1226 |
 | `GROWTH_AI_VISIBILITY_GEMINI_ENABLED` | — | — | — | TASK-1226 |
+| `GROWTH_AI_VISIBILITY_LLM_EXTRACTION_ENABLED` | — | — | — | TASK-1227 |
 
 ---
 
@@ -156,7 +157,7 @@ Para los **PG rollout flags** (`home_rollout_flags`): se prenden vía admin endp
 
 **Kortex bridge / sister platform:** `GREENHOUSE_SISTER_PLATFORM_OAUTH_ENABLED` · `KORTEX_COMMAND_ADAPTER_ENABLED` · `KORTEX_COMMAND_ADMIN_ENABLED` · `KORTEX_COMMAND_LIVE_EXECUTE_ENABLED` · `KORTEX_GITHUB_COMMANDS_ENABLED` · `KORTEX_GITHUB_WORKFLOW_DISPATCH_ENABLED`.
 
-**Growth / AI Visibility Grader** (`src/lib/growth/ai-visibility/flags.ts`): `GROWTH_AI_VISIBILITY_GRADER_ENABLED` (kill switch global) · `GROWTH_AI_VISIBILITY_OPENAI_ENABLED` · `GROWTH_AI_VISIBILITY_ANTHROPIC_ENABLED` · `GROWTH_AI_VISIBILITY_PERPLEXITY_ENABLED` · `GROWTH_AI_VISIBILITY_GEMINI_ENABLED` (TASK-1226 — todos default OFF; sin flag/secret el adapter resuelve skip limpio).
+**Growth / AI Visibility Grader** (`src/lib/growth/ai-visibility/flags.ts`): `GROWTH_AI_VISIBILITY_GRADER_ENABLED` (kill switch global) · `GROWTH_AI_VISIBILITY_OPENAI_ENABLED` · `GROWTH_AI_VISIBILITY_ANTHROPIC_ENABLED` · `GROWTH_AI_VISIBILITY_PERPLEXITY_ENABLED` · `GROWTH_AI_VISIBILITY_GEMINI_ENABLED` (TASK-1226 — todos default OFF; sin flag/secret el adapter resuelve skip limpio) · `GROWTH_AI_VISIBILITY_LLM_EXTRACTION_ENABLED` (TASK-1227 — fallback LLM de extracción de prosa para el normalizer; default OFF → determinista-first preserva `unknown`).
 
 **Mirrors `NEXT_PUBLIC_*` (client-readable)** — pares de un flag server que la UI necesita leer client-side: `NEXT_PUBLIC_NEXA_FLOATING_EXPANDABLE_ENABLED` · `NEXT_PUBLIC_NEXA_INTERACTION_LANE_ENABLED` · `NEXT_PUBLIC_NEXA_KNOWLEDGE_RETRIEVAL_ENABLED` · `NEXT_PUBLIC_NEXA_SUGGESTED_PROMPTS_DATA_AWARE_ENABLED` · `NEXT_PUBLIC_CLIENT_LIFECYCLE_ONBOARDING_ENABLED` · `NEXT_PUBLIC_AXIS_NEUTRALS_ENABLED` · `NEXT_PUBLIC_AXIS_SECONDARY_LIME_ENABLED`. Recordá: se hornean en build → prenderlos requiere build fresco.
 

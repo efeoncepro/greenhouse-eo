@@ -29,3 +29,13 @@ export const isProviderFlagEnabled = (
   provider: GrowthAiVisibilityProviderId,
   env: NodeJS.ProcessEnv = process.env
 ): boolean => isGraderEnabled(env) && isTrue(env[GROWTH_AI_VISIBILITY_PROVIDER_FLAGS[provider]])
+
+/**
+ * TASK-1227 — Fallback LLM de extracción para campos de prosa (sentiment,
+ * categoryAssociations, messageDriftClaims, refinar ambiguous). Default OFF: sin
+ * el flag, el normalizer es determinista-first y preserva `unknown`.
+ */
+export const GROWTH_AI_VISIBILITY_LLM_EXTRACTION_FLAG = 'GROWTH_AI_VISIBILITY_LLM_EXTRACTION_ENABLED'
+
+export const isLlmExtractionEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+  isTrue(env[GROWTH_AI_VISIBILITY_LLM_EXTRACTION_FLAG])

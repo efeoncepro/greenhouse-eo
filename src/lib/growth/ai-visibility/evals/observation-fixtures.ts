@@ -39,7 +39,9 @@ export const FIXTURE_DISCOVERY_ABSENT: GrowthAiVisibilityProviderObservation = b
   observationId: 'obs-fx-discovery-absent',
   promptId: 'p03',
   provider: 'openai',
-  answerExcerpt: 'Entre las mejores agencias de marketing en Chile destacan Cebra y otras; no se menciona Efeonce.',
+  // Respuesta real de ausencia: ni el nombre ni el dominio del sujeto aparecen
+  // (así se ve un gap AEO genuino — la marca simplemente no está).
+  answerExcerpt: 'Entre las mejores agencias de marketing en Chile destacan Cebra, BBDO y otras consolidadas del mercado local.',
   citations: [{ url: 'https://www.cebra.cl/', domain: 'cebra.cl', sourceType: 'earned' }]
 })
 
