@@ -237,15 +237,29 @@ Decisión central de Discovery: **¿ops-worker existente o worker dedicado?** y 
      ZONE 4 — VERIFICATION & CLOSING
      ═══════════════════════════════════════════════════════════ -->
 
+## Estado 2026-06-24 — `code complete, rollout pendiente`
+
+Las 3 slices están implementadas, testeadas (full suite 7855 verde + build prod OK) y la
+SQL ejercitada contra PG real. **NO está operativamente completa**: falta el rollout
+out-of-band (deploy del ops-worker a staging + flip de flags + smoke real `full`). Por eso
+el lifecycle sigue `in-progress`.
+
+Pendiente de rollout (operador):
+1. `ENV=staging bash services/ops-worker/deploy.sh` → crea Cloud Scheduler `ops-growth-grader-drain`, monta flags (OFF) + `OPENAI/ANTHROPIC_API_KEY_SECRET_REF`, sube `TIMEOUT` del worker a 3600s.
+2. `vercel env add GROWTH_AI_VISIBILITY_ASYNC_EXECUTION_ENABLED=true` (Preview/develop) + provider flags + redeploy.
+3. Smoke real: encolar un run `full` (Gemini 3) → verificar ejecución async sin timeout + observations incrementales + signals en steady.
+
+Nota: la migración `execution_prompts` ya está aplicada en `greenhouse-pg-dev` (cubre dev+staging). Recovery confirmado: hay 1 run huérfano real en `running` (timeout inline TASK-1233) que el drain/recovery finalizará.
+
 ## Acceptance Criteria
 
-- [ ] Un run `full` multi-provider (OpenAI+Anthropic+Gemini 3) completa async sin timeout de función.
-- [ ] Las observations se persisten incrementalmente (un fallo mid-run conserva las ya producidas).
-- [ ] Existe claim/lock que impide doble ejecución concurrente del mismo run.
-- [ ] Recovery idempotente de runs huérfanos en `running`.
-- [ ] Endpoint admin enqueue+poll; el GET detail existente sigue funcionando.
-- [ ] Signals de ejecución async (lag/stuck) implementados + en steady con DB vacía.
-- [ ] Sin import `@core` worker-bundled; `pnpm worker:runtime-deps-gate` verde.
+- [ ] Un run `full` multi-provider (OpenAI+Anthropic+Gemini 3) completa async sin timeout de función. _(rollout pendiente: requiere deploy worker + smoke)_
+- [x] Las observations se persisten incrementalmente (un fallo mid-run conserva las ya producidas). _(test `persiste cada observación INCREMENTALMENTE` + insert 1×1)_
+- [x] Existe claim/lock que impide doble ejecución concurrente del mismo run. _(`claimPendingGraderRuns` FOR UPDATE SKIP LOCKED; SQL ejercitada en PG real)_
+- [x] Recovery idempotente de runs huérfanos en `running`. _(`recoverStuckRunningRuns` + tests; 1 huérfano real detectado en dev)_
+- [x] Endpoint admin enqueue+poll; el GET detail existente sigue funcionando. _(flag cutover + build prod OK; GET shape intacto)_
+- [x] Signals de ejecución async (lag/stuck) implementados + en steady con DB vacía. _(2 signals en `getGrowthAiVisibilitySignals`; SQL ejercitada)_
+- [x] Sin import `@core` worker-bundled; `pnpm worker:runtime-deps-gate` verde.
 
 ## Verification
 

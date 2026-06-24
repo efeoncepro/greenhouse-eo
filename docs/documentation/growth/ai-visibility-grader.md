@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.3
+> **Version:** 1.4
 > **Creado:** 2026-06-24 por Claude (TASK-1226)
-> **Ultima actualizacion:** 2026-06-24 por Claude (TASK-1233, Gemini 3 activo)
+> **Ultima actualizacion:** 2026-06-24 por Claude (TASK-1234, ejecución async)
 > **Documentacion tecnica:** [GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md)
 
 # AI Visibility Grader — Motor de Providers (Growth)
@@ -61,6 +61,24 @@ Las observaciones crudas no son producto. El motor las convierte en:
 - **Compuertas de seguridad:** si no hay evidencia mínima → `insufficient_data` (nunca un puntaje falso). Si hay lenguaje riesgoso/difamatorio o sentimiento negativo poco confiable → `review_required` (revisión humana). La auto-publicación está apagada por diseño en esta etapa.
 
 Ejemplo real (smoke): Efeonce obtuvo score ~26 con **AI Visibility = 0** — refleja el hallazgo del spike: invisible en descubrimiento por IA.
+
+## Cómo se ejecuta un análisis (ejecución async — TASK-1234)
+
+Un análisis (run) consulta varios motores de IA con varias preguntas. Con modelos lentos
+(Gemini 3 ≈ 1 minuto por pregunta) y varios proveedores, un análisis completo puede tardar
+varios minutos — demasiado para responderlo "en el momento" dentro de una página web.
+
+Por eso el análisis se ejecuta **en segundo plano**:
+
+- Cuando pides un análisis, el sistema lo **encola** y responde al instante con un identificador. No te quedas esperando.
+- Un **trabajador en segundo plano** (Cloud Run) toma el análisis encolado y lo ejecuta sin límite de tiempo, guardando cada respuesta **a medida que llega** (no todas juntas al final). Así, si algo falla a mitad de camino, lo ya consultado **no se pierde**.
+- Consultas el avance/estado del análisis cuando quieras (el detalle del run muestra cuántas respuestas lleva y si terminó).
+- Si un análisis quedara "colgado" por una caída, el sistema lo **detecta y lo cierra** con la evidencia que alcanzó a juntar (nunca queda corriendo para siempre).
+
+Esto reemplaza la ejecución "en el momento" que sólo alcanzaba para análisis chicos (un solo
+motor). Es un cambio de plomería: el resultado y el puntaje son los mismos.
+
+> Detalle técnico: `GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md` §Delta 2026-06-24 (TASK-1234). Operación/rollout: [manual de smoke](../../manual-de-uso/growth/ai-visibility-grader-smoke.md).
 
 ## Que no hace (todavia)
 

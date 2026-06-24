@@ -1,7 +1,7 @@
 # Manual — Correr el AI Visibility Grader (smoke + endpoint)
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.3 · **Ultima actualizacion:** 2026-06-24 por Claude (TASK-1233, Gemini 3 activo)
+> **Version:** 1.4 · **Ultima actualizacion:** 2026-06-24 por Claude (TASK-1234, ejecución async)
 >
 > **Para que sirve:** ejecutar una corrida acotada (low-volume) del AI Visibility Grader contra los answer engines, para validar el motor end-to-end. Por defecto usa un proveedor simulado (no gasta dinero); con flags + secrets corre proveedores reales. Dos caminos: el **CLI** (`pnpm growth:ai-visibility:smoke`, local/dev) y el **endpoint interno** (`/api/admin/growth/ai-visibility/runs`, mismo primitive, apto staging).
 
@@ -77,6 +77,34 @@ pnpm staging:request /api/admin/growth/ai-visibility/runs/<runId>
 Respuesta del POST: `{ score, findingCount, publicSafe }`. El `score` interno trae las 7 dimensiones con reasons + status; el `publicSafe` es el resumen sin texto crudo. Recomputar el mismo run = mismo score (no duplica).
 
 **Enriquecimiento de prosa (opcional, default OFF):** sentiment / categoryAssociations / messageDriftClaims los llena un paso de IA aislado solo si `GROWTH_AI_VISIBILITY_LLM_EXTRACTION_ENABLED=true` (+ secret Anthropic). Sin el flag, esos campos quedan en `unknown`/`[]` y `message_alignment` no puntúa (honesto).
+
+## Ejecución async — worker Cloud Run (TASK-1234)
+
+Los runs lentos/grandes (`full`/`internal_audit` multi-provider, Gemini 3) **no caben** en el
+timeout de la función Vercel del endpoint. Para esos, la ejecución corre en un **worker async**
+Cloud Run (`ops-worker`, endpoint `POST /growth/grader/drain`, disparado por Cloud Scheduler
+`ops-growth-grader-drain` cada 5 min). El endpoint admin **encola** el run (`202` + `runId`) y el
+worker lo ejecuta sin límite de duración; el `GET /runs/[runId]` es el **poll** del progreso.
+
+Gated por `GROWTH_AI_VISIBILITY_ASYNC_EXECUTION_ENABLED` (default OFF → el endpoint ejecuta
+inline como antes; sólo `light`/OpenAI cabe). Rollout (operador):
+
+1. **Deploy del worker** (crea el scheduler + monta flags/secrets + sube el timeout del worker a 3600s):
+
+   `ENV=staging bash services/ops-worker/deploy.sh`
+
+2. **Prender el cutover async** (Preview/develop) + los flags de provider que correspondan, y redeploy del portal:
+
+   `vercel env add GROWTH_AI_VISIBILITY_ASYNC_EXECUTION_ENABLED` (valor `true`, Preview)
+
+3. **Verificar:** encolar un run `full` (Gemini 3) por el endpoint → respuesta `202` + `runId`; en `GET /runs/[runId]` ver el `status` pasar a `running`/`succeeded` y las observations crecer; en `/admin/operations` los signals `growth.ai_visibility.run_execution_lag` y `run_stuck_running` en verde.
+
+4. **Disparo manual del drain** (sin esperar el cron), para diagnóstico:
+
+   `gcloud scheduler jobs run ops-growth-grader-drain --project=efeonce-group --location=us-east4`
+
+- **Revert (<5 min):** `GROWTH_AI_VISIBILITY_ASYNC_EXECUTION_ENABLED=false` → el endpoint vuelve a inline para `light`.
+- **Recovery de huérfanos:** el drain corre `recoverStuckRunningRuns` antes de drenar — un run colgado en `running` > 90 min se finaliza con la evidencia ya persistida (signal `run_stuck_running`).
 
 ## Que significan los estados
 

@@ -783,3 +783,12 @@ DB vacía / grader OFF → todos en estado sano (`ok`/`awaiting_data`), steady e
 - `growth.ai_visibility.normalization_failed` + `growth.ai_visibility.score_recompute_failed` (runtime) — **stub** (sin failure-ledger todavía; los fallos van a Sentry domain=growth). Follow-up: tabla de intentos (patrón `auth_attempts`).
 
 Módulo `growth` `expectedSignalKinds` ahora incluye `test_lane`. DB vacía → todos en estado sano.
+
+## Delta 2026-06-24 — módulo `growth`: signals de ejecución async (TASK-1234)
+
+2 signals adicionales de salud de la ejecución async del grader (worker Cloud Run), en el mismo reader `src/lib/reliability/queries/growth-ai-visibility-signals.ts` (auto-wired vía el array de `getGrowthAiVisibilitySignals`):
+
+- `growth.ai_visibility.run_execution_lag` (lag) — runs en `pending` desde hace > `GROWTH_AI_VISIBILITY_PENDING_LAG_THRESHOLD_MINUTES` (20 min) ⇒ el worker `ops-growth-grader-drain` no está drenando. steady=0; 1-2 → warning, >2 → error.
+- `growth.ai_visibility.run_stuck_running` (runtime) — runs en `running` desde hace > `GROWTH_AI_VISIBILITY_STUCK_RUNNING_THRESHOLD_MINUTES` (90 min) ⇒ crash/timeout mid-run; `recoverStuckRunningRuns` los finaliza con la evidencia ya persistida. steady=0; >0 → error.
+
+Date-math segura (timestamptz − timestamptz vía `make_interval`, nunca `EXTRACT(EPOCH FROM (date−date))`); SQL ejercitada contra PG real. Detección live 2026-06-24: 1 run huérfano real (`running`) del timeout inline de TASK-1233 → `run_stuck_running=1` hasta el primer drain.

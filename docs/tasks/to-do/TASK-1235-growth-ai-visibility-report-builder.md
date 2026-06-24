@@ -1,5 +1,9 @@
 # TASK-1235 — Growth AI Visibility: Report Builder
 
+## Delta 2026-06-24
+
+- La ejecución async del run está `code complete` por TASK-1234 (worker Cloud Run `POST /growth/grader/drain` + enqueue/poll + persistencia incremental + recovery de huérfanos). Los runs `full` multi-provider ya pueden completar sin timeout una vez prendido el rollout (deploy worker + flag `GROWTH_AI_VISIBILITY_ASYNC_EXECUTION_ENABLED`). El report builder consume **runs completados** (`succeeded`/`partial`) + su `grader_score`; ya no asume ejecución inline. El GET detail (`/runs/[runId]`) sirve como poll de progreso.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
