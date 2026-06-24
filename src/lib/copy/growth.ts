@@ -14,7 +14,9 @@
 import type {
   GraderReportGateStatus,
   GraderReportSeverity,
-  RecommendationGapKey
+  GraderReportTrendStatus,
+  RecommendationGapKey,
+  TrendDirection
 } from '@/lib/growth/ai-visibility/report/contracts'
 import type { ScoreDimensionKey } from '@/lib/growth/ai-visibility/scoring/config'
 
@@ -109,6 +111,20 @@ export const GH_GROWTH_AI_VISIBILITY = {
     `Apareces ${brandMentions} ${brandMentions === 1 ? 'vez' : 'veces'} frente a ${competitorCount} ${
       competitorCount === 1 ? 'competidor' : 'competidores'
     } en las respuestas.`,
+
+  // Tendencia run-over-run (TASK-1236): razón por estado + etiqueta de dirección del delta.
+  trend_status: {
+    sin_historico: 'Primer análisis: aún no hay un período anterior para comparar.',
+    incomparable: 'El análisis anterior usó otra versión de prompts; no es comparable.',
+    con_tendencia: 'Comparado con tu análisis anterior.'
+  } satisfies Record<GraderReportTrendStatus, string>,
+
+  trend_direction_label: {
+    subio: 'Subió',
+    bajo: 'Bajó',
+    sin_cambio: 'Sin cambios',
+    sin_dato: 'Sin dato'
+  } satisfies Record<TrendDirection, string>,
 
   // Nota del finding headline cuando el KPI dominante es el resultado compuesto (ai_visibility).
   outcome_note: 'Tu visibilidad en IA resume las brechas de las dimensiones que la explican.',

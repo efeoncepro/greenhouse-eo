@@ -189,6 +189,45 @@ export interface ReportProvenance {
   promptCount: number
 }
 
+// ── Temporal trend (TASK-1236) ───────────────────────────────────────────────
+
+/**
+ * Estado de la tendencia run-over-run. `sin_historico` = no hay run previo;
+ * `incomparable` = el run previo usó otra versión de prompt-pack/score (no se
+ * computa delta falso); `con_tendencia` = delta computado vs run previo comparable.
+ */
+export const GRADER_REPORT_TREND_STATUSES = ['sin_historico', 'incomparable', 'con_tendencia'] as const
+export type GraderReportTrendStatus = (typeof GRADER_REPORT_TREND_STATUSES)[number]
+
+/** Dirección nombrada del delta (NUNCA un color). `sin_dato` = delta null (sin evidencia comparable). */
+export const TREND_DIRECTIONS = ['subio', 'bajo', 'sin_cambio', 'sin_dato'] as const
+export type TrendDirection = (typeof TREND_DIRECTIONS)[number]
+
+export interface TrendDelta {
+  current: number | null
+  previous: number | null
+  /** current - previous; null si cualquiera de los dos extremos es null (sin dato). */
+  delta: number | null
+  direction: TrendDirection
+}
+
+export interface DimensionTrend extends TrendDelta {
+  key: ScoreDimensionKey
+}
+
+/**
+ * Bloque de tendencia del reporte. `overall`/`dimensions` solo se pueblan en
+ * `con_tendencia` (sin run previo comparable → null/[], sin delta fabricado).
+ */
+export interface ReportTrend {
+  status: GraderReportTrendStatus
+  reason: string
+  /** Fecha (finishedAt) del run previo comparable; null si no hay. */
+  previousAsOf: string | null
+  overall: TrendDelta | null
+  dimensions: DimensionTrend[]
+}
+
 // ── Aggregates ───────────────────────────────────────────────────────────────
 
 /** Reporte INTERNO completo (admin/sales). Incluye recomendaciones + presencia por motor. */
@@ -210,6 +249,7 @@ export interface GraderReport {
   competitiveSov: CompetitiveShareOfVoice
   sourceTypeSummary: SourceTypeCount[]
   providerPresence: ProviderPresence[]
+  trend: ReportTrend
   provenance: ReportProvenance
   disclaimer: string
 }
@@ -242,6 +282,7 @@ export interface PublicGraderReport {
   recommendedMotion: RecommendedMotion | null
   competitiveSov: CompetitiveShareOfVoice
   sourceTypeSummary: SourceTypeCount[]
+  trend: ReportTrend
   provenance: ReportProvenance
   disclaimer: string
 }

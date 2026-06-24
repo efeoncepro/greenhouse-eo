@@ -8,4 +8,5 @@
 
 export * from './contracts'
 export * from './recommendations'
+export * from './trend'
 export * from './builder'

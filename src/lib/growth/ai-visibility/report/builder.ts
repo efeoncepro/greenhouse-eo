@@ -39,6 +39,7 @@ import {
   resolveSeverity,
   toPublicRecommendation
 } from './recommendations'
+import { buildReportTrend, type PreviousScoreInput } from './trend'
 
 /** Metadata del run necesaria para el reporte (subset de `GraderRunRow`). */
 export interface ReportRunMeta {
@@ -52,6 +53,8 @@ export interface BuildGraderReportInput {
   score: PersistedGraderScore
   findings: NormalizedFinding[]
   run: ReportRunMeta
+  /** Run previo comparable para la tendencia (TASK-1236); null/undefined → sin histórico. */
+  previous?: PreviousScoreInput | null
 }
 
 const FINDINGS_MAX = 5
@@ -285,6 +288,8 @@ export const toPublicGraderReport = (report: GraderReport): PublicGraderReport =
   recommendedMotion: report.recommendedMotion,
   competitiveSov: report.competitiveSov,
   sourceTypeSummary: report.sourceTypeSummary,
+  // El trend es agregado puro (deltas numéricos, sin raw text) → public-safe.
+  trend: report.trend,
   provenance: report.provenance,
   disclaimer: report.disclaimer
 })
@@ -293,7 +298,7 @@ export const toPublicGraderReport = (report: GraderReport): PublicGraderReport =
 
 /** Deriva el reporte INTERNO completo. PURO + determinista. */
 export const buildGraderReport = (input: BuildGraderReportInput): GraderReport => {
-  const { score, findings, run } = input
+  const { score, findings, run, previous } = input
 
   const gateStatus = resolveGateStatus(score, run.status)
   const scoredInputs = score.dimensions.map(d => ({ key: d.key, score: d.score, weight: d.weight }))
@@ -331,6 +336,7 @@ export const buildGraderReport = (input: BuildGraderReportInput): GraderReport =
     competitiveSov: buildCompetitiveSov(findings),
     sourceTypeSummary: buildSourceTypeSummary(findings),
     providerPresence: buildProviderPresence(findings),
+    trend: buildReportTrend(score, run.promptPackVersion, previous ?? null),
     provenance: buildProvenance(score, findings, run),
     disclaimer: GH_GROWTH_AI_VISIBILITY.disclaimer
   }
