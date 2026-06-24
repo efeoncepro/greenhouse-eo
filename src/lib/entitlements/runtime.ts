@@ -196,6 +196,17 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
       scope: 'tenant',
       source
     })
+
+    // TASK-1235 — report.read: el reporte derivado (sin evidencia cruda). En V1 el
+    // reporte es internal-only, así que el grant es el mismo set; la separación de
+    // capability deja preparado el least-privilege para audiences public/client.
+    addEntitlement(entries, {
+      module: 'growth',
+      capability: 'growth.ai_visibility.report.read',
+      action: 'read',
+      scope: 'tenant',
+      source
+    })
   }
 
   if (hasRouteGroup(subject, 'people') || hasAuthorizedView(subject, 'equipo.personas')) {

@@ -1,0 +1,247 @@
+/**
+ * TASK-1235 — Growth AI Visibility · Report contract V1 (Slice 1).
+ *
+ * Contrato del `grader_report` (arch §7.7) derivado de `grader_score` +
+ * `normalized_findings` (TASK-1227). PURO (sin IO). Invariantes:
+ *  - El reporte es FUNCIÓN PURA de `(run_id, score_version, report_version,
+ *    recommendation_pack_version)`: recomputar produce el mismo reporte
+ *    (determinismo, sin LLM en el score ni en los gaps; el copy es plantilla).
+ *  - `null ≠ 0`: una dimensión sin evidencia es `status='empty'`/`severity='sin_dato'`
+ *    (excluida del promedio), NUNCA `score: 0`. El 0 medido es un gap real.
+ *  - El DTO público (`PublicGraderReport`) es un TIPO DISTINTO que estructuralmente
+ *    NO puede cargar raw provider text, prompts ni evidencia cruda (defensa capa A).
+ *  - Los gates (`insufficient_data`/`review_required`/`partial`) se propagan con
+ *    razón + próxima acción renderizables, sin precisión falsa ni auto-release.
+ */
+
+import { type ScoreDimensionKey } from '../scoring/config'
+
+export const GROWTH_AI_VISIBILITY_REPORT_VERSION = 'ai_visibility_report_v1' as const
+export const GROWTH_AI_VISIBILITY_RECOMMENDATION_PACK_VERSION = 'ai_visibility_recommendation_pack_v1' as const
+
+export type GraderReportVersion = typeof GROWTH_AI_VISIBILITY_REPORT_VERSION
+export type RecommendationPackVersion = typeof GROWTH_AI_VISIBILITY_RECOMMENDATION_PACK_VERSION
+
+// ── Audience + gate ──────────────────────────────────────────────────────────
+
+/** Audiencias del §7.7 (niveles de disclosure progresivo). V1 materializa internal_sales + public. */
+export const GRADER_REPORT_AUDIENCES = ['public', 'internal_sales', 'client', 'executive'] as const
+export type GraderReportAudience = (typeof GRADER_REPORT_AUDIENCES)[number]
+
+/**
+ * Estado del reporte (gate). Hereda del score (`insufficient_data`/`review_required`)
+ * y del run (`partial`); `ready` sólo cuando hay cobertura suficiente y sin riesgo.
+ */
+export const GRADER_REPORT_GATE_STATUSES = ['ready', 'insufficient_data', 'review_required', 'partial'] as const
+export type GraderReportGateStatus = (typeof GRADER_REPORT_GATE_STATUSES)[number]
+
+/** Gate renderizable (state-design P-3): razón + próxima acción, no sólo un enum. */
+export interface GraderReportGate {
+  status: GraderReportGateStatus
+  reason: string
+  nextAction: string
+}
+
+// ── Severity (valor nombrado, NUNCA un color) ────────────────────────────────
+
+export const GRADER_REPORT_SEVERITIES = ['critico', 'atencion', 'optimo', 'sin_dato'] as const
+export type GraderReportSeverity = (typeof GRADER_REPORT_SEVERITIES)[number]
+
+/** Estado por dimensión (patrón `SourceResult<T>`): ok = medido; empty = sin evidencia. */
+export const GRADER_REPORT_DIMENSION_STATUSES = ['ok', 'empty'] as const
+export type GraderReportDimensionStatus = (typeof GRADER_REPORT_DIMENSION_STATUSES)[number]
+
+// ── Recommendation engine (§8.4) ─────────────────────────────────────────────
+
+/**
+ * Gaps por dimensión driver (§8.4). `ai_visibility` es el RESULTADO compuesto
+ * (no genera recomendación propia; es el KPI del headline), explicado por los 6
+ * drivers de abajo.
+ */
+export const RECOMMENDATION_GAP_KEYS = [
+  'low_entity_clarity',
+  'low_category_ownership',
+  'weak_citation_quality',
+  'competitors_dominate',
+  'message_drift',
+  'weak_revenue_intent'
+] as const
+export type RecommendationGapKey = (typeof RECOMMENDATION_GAP_KEYS)[number]
+
+/** Motion sugerido (alimenta el HubSpot handoff §7.8). */
+export const RECOMMENDED_MOTIONS = [
+  'entity_foundation',
+  'category_authority',
+  'digital_pr_citations',
+  'competitive_content',
+  'message_alignment',
+  'bottom_funnel_content'
+] as const
+export type RecommendedMotion = (typeof RECOMMENDED_MOTIONS)[number]
+
+/** Mapeo canónico dimensión driver → gap → motion (§8.4). */
+export interface RecommendationMappingEntry {
+  dimensionKey: ScoreDimensionKey
+  gapKey: RecommendationGapKey
+  motion: RecommendedMotion
+}
+
+export interface ReportRecommendation {
+  gapKey: RecommendationGapKey
+  dimensionKey: ScoreDimensionKey
+  title: string
+  action: string
+  motion: RecommendedMotion
+  severity: GraderReportSeverity
+  /** Prioridad RICE-ish: peso de la dimensión × tamaño del gap (0..1). Orden desc. */
+  priority: number
+}
+
+/** Proyección pública de una recomendación (bounded, sin internals de scoring). */
+export interface PublicReportRecommendation {
+  gapKey: RecommendationGapKey
+  dimensionKey: ScoreDimensionKey
+  title: string
+  action: string
+  motion: RecommendedMotion
+  severity: GraderReportSeverity
+}
+
+// ── Viz-ready dimensions (chart-agnostic, P-2) ───────────────────────────────
+
+export interface ReportDimension {
+  key: ScoreDimensionKey
+  label: string
+  /** Explainer plain-language de 1 línea (a11y cognitiva, P-6). */
+  explainer: string
+  weight: number
+  score: number | null
+  max: 100
+  status: GraderReportDimensionStatus
+  severity: GraderReportSeverity
+  /** Razón renderizable cuando la dimensión está vacía (sin evidencia). */
+  reason: string | null
+  /** Recomendación asociada si la dimensión driver tiene gap; null si óptima/sin dato. */
+  recommendation: ReportRecommendation | null
+}
+
+/** Dimensión pública: estructuralmente sin reasons internos ni recomendación cruda. */
+export interface PublicReportDimension {
+  key: ScoreDimensionKey
+  label: string
+  explainer: string
+  score: number | null
+  max: 100
+  status: GraderReportDimensionStatus
+  severity: GraderReportSeverity
+}
+
+// ── Narrative (answer-first, P-4/P-5) ────────────────────────────────────────
+
+/** Headline con forma de KPI (métrica + valor + frame), factual no alarmista. */
+export interface ReportHeadline {
+  dimensionKey: ScoreDimensionKey
+  metric: string
+  /** Valor textual del KPI (ej. "0/100"); null si no hay evidencia. */
+  value: string | null
+  frame: string
+  severity: GraderReportSeverity
+}
+
+/** Finding narrativo: severidad nombrada + métrica + contexto + acción (nunca número suelto). */
+export interface ReportFinding {
+  key: string
+  severity: GraderReportSeverity
+  text: string
+}
+
+// ── Comparables + metadata ───────────────────────────────────────────────────
+
+export interface CompetitorPresence {
+  name: string
+  mentions: number
+}
+
+/** Share of voice como lista comparable (marca + competidores), NO pie. */
+export interface CompetitiveShareOfVoice {
+  brandMentions: number
+  competitors: CompetitorPresence[]
+}
+
+export interface SourceTypeCount {
+  sourceType: string
+  count: number
+}
+
+/** Presencia por motor (OQ#3) — INTERNAL ONLY: nunca viaja al DTO público. */
+export interface ProviderPresence {
+  provider: string
+  resolved: number
+  present: number
+}
+
+/** Procedencia: orienta + sostiene el disclaimer (P-4). */
+export interface ReportProvenance {
+  asOfDate: string | null
+  promptPackVersion: string
+  scoreVersion: string
+  providersSampled: string[]
+  promptCount: number
+}
+
+// ── Aggregates ───────────────────────────────────────────────────────────────
+
+/** Reporte INTERNO completo (admin/sales). Incluye recomendaciones + presencia por motor. */
+export interface GraderReport {
+  reportVersion: GraderReportVersion
+  recommendationPackVersion: RecommendationPackVersion
+  scoreVersion: string
+  runId: string
+  audience: GraderReportAudience
+  gate: GraderReportGate
+  headline: ReportHeadline
+  overallScore: number | null
+  overallSeverity: GraderReportSeverity
+  findings: ReportFinding[]
+  dimensions: ReportDimension[]
+  recommendations: ReportRecommendation[]
+  primaryGap: ReportRecommendation | null
+  recommendedMotion: RecommendedMotion | null
+  competitiveSov: CompetitiveShareOfVoice
+  sourceTypeSummary: SourceTypeCount[]
+  providerPresence: ProviderPresence[]
+  provenance: ReportProvenance
+  disclaimer: string
+}
+
+/** Proyección pública del primaryGap (sin action interna, sólo scent + título). */
+export interface PublicPrimaryGap {
+  gapKey: RecommendationGapKey
+  dimensionKey: ScoreDimensionKey
+  title: string
+  severity: GraderReportSeverity
+}
+
+/**
+ * Reporte PÚBLICO (lead magnet). TIPO DISTINTO que estructuralmente NO tiene campos
+ * para raw provider text, prompts, citation URLs, reasons internos ni presencia por
+ * motor. El builder sólo lee campos seguros (defensa capa B) + leak test (capa C).
+ */
+export interface PublicGraderReport {
+  reportVersion: GraderReportVersion
+  recommendationPackVersion: RecommendationPackVersion
+  audience: 'public'
+  gate: GraderReportGate
+  headline: ReportHeadline
+  overallScore: number | null
+  overallSeverity: GraderReportSeverity
+  findings: ReportFinding[]
+  dimensions: PublicReportDimension[]
+  recommendations: PublicReportRecommendation[]
+  primaryGap: PublicPrimaryGap | null
+  recommendedMotion: RecommendedMotion | null
+  competitiveSov: CompetitiveShareOfVoice
+  sourceTypeSummary: SourceTypeCount[]
+  provenance: ReportProvenance
+  disclaimer: string
+}

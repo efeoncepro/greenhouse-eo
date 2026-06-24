@@ -1920,6 +1920,15 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     module: 'growth',
     actions: ['read'] as const,
     defaultScope: 'tenant'
+  },
+  // TASK-1235 — report.read: ver el `grader_report` (narrativa + recomendaciones)
+  // SIN la evidencia cruda de provider (least-privilege; un audience public/client
+  // verá el reporte sin observation.read). Grant en runtime.ts mismo PR.
+  {
+    key: 'growth.ai_visibility.report.read',
+    module: 'growth',
+    actions: ['read'] as const,
+    defaultScope: 'tenant'
   }
 ] as const
 

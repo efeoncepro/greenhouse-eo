@@ -1,0 +1,82 @@
+import { describe, expect, it } from 'vitest'
+
+import { buildGraderReport, toPublicGraderReport, PUBLIC_RECOMMENDATIONS_MAX, type ReportRunMeta } from '../report/builder'
+import { makeFinding, makeScore } from './report-fixtures'
+
+const RUN: ReportRunMeta = {
+  runId: 'run-fixture',
+  status: 'succeeded',
+  promptPackVersion: 'prompt-pack.v1',
+  finishedAt: '2026-06-24T12:00:00.000Z'
+}
+
+// Texto sensible que NO debe filtrarse al DTO público (drift claims, dominios de
+// citación crudos, razones internas de review). Los nombres de competidores SÍ se
+// muestran (arch §7.7: "top competitors").
+const SENSITIVE_DRIFT = 'la IA dijo que somos los más baratos del mercado'
+const SENSITIVE_CITATION = 'foro-privado-interno.example.com'
+const SENSITIVE_REVIEW = 'detalle interno de review que no debe salir'
+
+const buildWithSensitiveEvidence = () => {
+  const score = makeScore(
+    { ai_visibility: 0, entity_clarity: 10, citation_quality: 15, category_ownership: 20, competitive_sov: 25, message_alignment: 30 },
+    { scoreStatus: 'completed', reviewReasons: [SENSITIVE_REVIEW] }
+  )
+
+  const findings = [
+    makeFinding({
+      brandMentioned: 'yes',
+      competitorsMentioned: ['Acme'],
+      messageDriftClaims: [SENSITIVE_DRIFT],
+      citationDomains: [SENSITIVE_CITATION],
+      sourceTypes: ['owned']
+    })
+  ]
+
+  return buildGraderReport({ score, findings, run: RUN })
+}
+
+describe('growth/ai-visibility — public report DTO (defensa en 3 capas)', () => {
+  it('capa A — el tipo público no tiene campos para evidencia interna', () => {
+    const pub = toPublicGraderReport(buildWithSensitiveEvidence())
+
+    expect('providerPresence' in pub).toBe(false)
+    expect(pub.dimensions.every(d => !('reason' in d))).toBe(true)
+    expect(pub.dimensions.every(d => !('recommendation' in d))).toBe(true)
+    expect(pub.recommendations.every(r => !('priority' in r))).toBe(true)
+  })
+
+  it('capa C — leak test: el JSON público NO contiene raw drift/citation/review', () => {
+    const serialized = JSON.stringify(toPublicGraderReport(buildWithSensitiveEvidence()))
+
+    expect(serialized).not.toContain(SENSITIVE_DRIFT)
+    expect(serialized).not.toContain(SENSITIVE_CITATION)
+    expect(serialized).not.toContain(SENSITIVE_REVIEW)
+  })
+
+  it('muestra lo permitido del §7.7: score, competidores top, source-type summary, disclaimer', () => {
+    const pub = toPublicGraderReport(buildWithSensitiveEvidence())
+    const serialized = JSON.stringify(pub)
+
+    expect(pub.audience).toBe('public')
+    expect(serialized).toContain('Acme') // nombre de competidor SÍ permitido
+    expect(pub.sourceTypeSummary.length).toBeGreaterThan(0)
+    expect(pub.disclaimer.length).toBeGreaterThan(0)
+    expect(pub.competitiveSov.brandMentions).toBe(1)
+  })
+
+  it('acota las recomendaciones públicas a un set limitado', () => {
+    const pub = toPublicGraderReport(buildWithSensitiveEvidence())
+
+    expect(pub.recommendations.length).toBeLessThanOrEqual(PUBLIC_RECOMMENDATIONS_MAX)
+  })
+
+  it('propaga el gate al público (sin precisión falsa)', () => {
+    const score = makeScore({}, { scoreStatus: 'insufficient_data', overallScore: null })
+    const pub = toPublicGraderReport(buildGraderReport({ score, findings: [], run: RUN }))
+
+    expect(pub.gate.status).toBe('insufficient_data')
+    expect(pub.overallScore).toBeNull()
+    expect(pub.gate.nextAction.length).toBeGreaterThan(0)
+  })
+})
