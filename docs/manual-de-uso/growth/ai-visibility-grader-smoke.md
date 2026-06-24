@@ -1,14 +1,15 @@
 # Manual — Correr el AI Visibility Grader (smoke + endpoint)
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.4 · **Ultima actualizacion:** 2026-06-24 por Claude (TASK-1234, ejecución async)
+> **Version:** 1.5 · **Ultima actualizacion:** 2026-06-24 por Claude (TASK-1234, ejecución async ON + verificada en staging)
 >
 > **Para que sirve:** ejecutar una corrida acotada (low-volume) del AI Visibility Grader contra los answer engines, para validar el motor end-to-end. Por defecto usa un proveedor simulado (no gasta dinero); con flags + secrets corre proveedores reales. Dos caminos: el **CLI** (`pnpm growth:ai-visibility:smoke`, local/dev) y el **endpoint interno** (`/api/admin/growth/ai-visibility/runs`, mismo primitive, apto staging).
 
 ## Estado actual del rollout (2026-06-24)
 
 - **staging:** `GROWTH_AI_VISIBILITY_GRADER_ENABLED` + `_OPENAI_ENABLED` + `_ANTHROPIC_ENABLED` + `_GEMINI_ENABLED` **ON**. El endpoint corre proveedores reales (OpenAI/Anthropic/Gemini). Gemini usa **Gemini 3** (`gemini-3-flash-preview` vía Vertex grounding; ajustable con `GREENHOUSE_GEMINI_GROUNDED_MODEL` sin redeploy). Costo Gemini ~$0.016/marca (light, el más barato del set).
-- **producción:** OFF (follow-up pesado: migración `greenhouse_growth` + capabilities seed vía release control plane develop→main + env prod + sign-off).
+- **ejecución async (TASK-1234): ON en staging.** `GROWTH_AI_VISIBILITY_ASYNC_EXECUTION_ENABLED=true` (environment `staging`). El endpoint **encola** el run (responde HTTP 202 + runId) y el worker Cloud Run (`ops-worker`, scheduler `ops-growth-grader-drain` cada 5 min) lo ejecuta sin límite de tiempo. Esto es lo único que permite correr runs `full`/`internal_audit` multi-provider (que antes morían por el timeout de la función Vercel). Verificado end-to-end: un run `full` real corrió ~12 min sin timeout. Con la flag OFF el endpoint vuelve a ejecutar inline (sólo `light`/OpenAI cabe).
+- **producción:** OFF (follow-up pesado: migración `greenhouse_growth` + capabilities seed vía release control plane develop→main + env prod + sign-off). El worker es compartido staging+prod, pero el drain hace **no-op prod-safe** mientras el grader esté OFF en prod.
 - **Perplexity:** OFF (sin cliente con grounding/creds aún).
 - Verdad live de flags: `vercel env ls`. Estado humano: `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`.
 
@@ -87,22 +88,20 @@ Cloud Run (`ops-worker`, endpoint `POST /growth/grader/drain`, disparado por Clo
 worker lo ejecuta sin límite de duración; el `GET /runs/[runId]` es el **poll** del progreso.
 
 Gated por `GROWTH_AI_VISIBILITY_ASYNC_EXECUTION_ENABLED` (default OFF → el endpoint ejecuta
-inline como antes; sólo `light`/OpenAI cabe). Rollout (operador):
+inline como antes; sólo `light`/OpenAI cabe). **En staging ya está APLICADO y verificado
+(2026-06-24)** — los pasos quedan como referencia (y como receta para producción):
 
-1. **Deploy del worker** (crea el scheduler + monta flags/secrets + sube el timeout del worker a 3600s):
+1. ✅ **Deploy del worker** — hecho vía CI `ops-worker-deploy.yml` (push a `develop`). Crea el scheduler `ops-growth-grader-drain` (*/5), monta flags (staging ON / prod OFF) + secret refs OpenAI/Anthropic, sube el `TIMEOUT` del worker a 3600s. Break-glass manual: `ENV=staging bash services/ops-worker/deploy.sh`.
 
-   `ENV=staging bash services/ops-worker/deploy.sh`
+2. ✅ **Cutover async** — hecho: `GROWTH_AI_VISIBILITY_ASYNC_EXECUTION_ENABLED=true` en el environment `staging` (`vercel env add ... staging`) + redeploy del portal.
 
-2. **Prender el cutover async** (Preview/develop) + los flags de provider que correspondan, y redeploy del portal:
+3. ✅ **Verificado** — run `full` real EO-GRUN-00011 → `202` + runId → el worker lo ejecutó async **~12 min sin timeout** → `partial` con 48 observations (OpenAI 12/12, Anthropic 9+3, Gemini 11+1, Perplexity 12 skipped por flag OFF); las observations crecieron incrementalmente (23→48 vía `GET /runs/[runId]`); el huérfano EO-GRUN-00006 fue recuperado a `failed`; signals `run_execution_lag`/`run_stuck_running` en `0`.
 
-   `vercel env add GROWTH_AI_VISIBILITY_ASYNC_EXECUTION_ENABLED` (valor `true`, Preview)
-
-3. **Verificar:** encolar un run `full` (Gemini 3) por el endpoint → respuesta `202` + `runId`; en `GET /runs/[runId]` ver el `status` pasar a `running`/`succeeded` y las observations crecer; en `/admin/operations` los signals `growth.ai_visibility.run_execution_lag` y `run_stuck_running` en verde.
-
-4. **Disparo manual del drain** (sin esperar el cron), para diagnóstico:
+4. **Disparo manual del drain** (sin esperar el cron, para diagnóstico):
 
    `gcloud scheduler jobs run ops-growth-grader-drain --project=efeonce-group --location=us-east4`
 
+- **Producción:** fuera de scope (release control plane develop→main). El worker es compartido staging+prod, pero el drain hace **no-op prod-safe** (`isGraderEnabled()` OFF en prod → cero queries, no requiere que `greenhouse_growth` exista en prod).
 - **Revert (<5 min):** `GROWTH_AI_VISIBILITY_ASYNC_EXECUTION_ENABLED=false` → el endpoint vuelve a inline para `light`.
 - **Recovery de huérfanos:** el drain corre `recoverStuckRunningRuns` antes de drenar — un run colgado en `running` > 90 min se finaliza con la evidencia ya persistida (signal `run_stuck_running`).
 

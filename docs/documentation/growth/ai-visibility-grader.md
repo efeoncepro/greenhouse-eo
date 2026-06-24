@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.4
+> **Version:** 1.5
 > **Creado:** 2026-06-24 por Claude (TASK-1226)
-> **Ultima actualizacion:** 2026-06-24 por Claude (TASK-1234, ejecución async)
+> **Ultima actualizacion:** 2026-06-24 por Claude (TASK-1234, ejecución async ON en staging)
 > **Documentacion tecnica:** [GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md)
 
 # AI Visibility Grader — Motor de Providers (Growth)
@@ -77,6 +77,10 @@ Por eso el análisis se ejecuta **en segundo plano**:
 
 Esto reemplaza la ejecución "en el momento" que sólo alcanzaba para análisis chicos (un solo
 motor). Es un cambio de plomería: el resultado y el puntaje son los mismos.
+
+**Ya está activo en el ambiente de pruebas (staging):** se corrió un análisis completo real con
+OpenAI + Anthropic + Gemini 3 que tardó unos 12 minutos y terminó sin cortarse (antes se moría).
+En producción todavía no está prendido (va por su proceso aparte).
 
 > Detalle técnico: `GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md` §Delta 2026-06-24 (TASK-1234). Operación/rollout: [manual de smoke](../../manual-de-uso/growth/ai-visibility-grader-smoke.md).
 
