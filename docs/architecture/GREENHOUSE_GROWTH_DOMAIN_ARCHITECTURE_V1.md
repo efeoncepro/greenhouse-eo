@@ -5,7 +5,7 @@
 > Version: V1
 > Fecha: 2026-06-24
 > Owner: Product / Platform Architecture / GTM
-> Initial resident capability: `GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md`
+> Initial resident capabilities: `GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md`, `GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md`
 
 ## 1. Purpose
 
@@ -89,7 +89,9 @@ These identifiers are direction only until a future backend-data task materializ
 | `Kortex` | CRM intelligence/deployment/advisory over HubSpot. | Greenhouse Growth run source of truth. |
 | HubSpot | CRM identity, lifecycle, owner, pipeline and campaign attribution. | Greenhouse evidence ledger or scoring truth. |
 
-## 6. Initial resident capability: AI Visibility Grader
+## 6. Initial resident capabilities
+
+### 6.1 AI Visibility Grader
 
 The first planned capability in `growth` is the public AI Visibility Grader / Surround Discovery Audit substrate.
 
@@ -107,6 +109,35 @@ src/lib/growth/ai-visibility/
 greenhouse_growth.*
 growth.ai_visibility.*
 growth.ai_visibility.<signal>
+```
+
+### 6.2 Public Forms Engine
+
+The second planned capability in `growth` is the Greenhouse-owned public forms engine for lead magnets, public website forms, diagnostic intakes and other pre-pipeline conversion surfaces.
+
+Ownership:
+
+- `growth` owns form definitions, versions, published render contracts, validation, consent snapshots, submissions ledger, destination routing and destination attempts.
+- Public-site runtimes such as Astro and WordPress host/render the form but do not own the submission contract.
+- WordPress, Astro and Greenhouse Next.js are `host_surface` consumers; HubSpot and future systems are `destination` adapters. Host surfaces are governed through surface registry/origin/embed-key policy.
+- HubSpot receives submissions through a destination adapter; it does not own the renderer or Greenhouse form source of truth.
+- `commercial` consumes qualified handoffs after a form submission is accepted/routed and promoted into revenue motion.
+
+Canonical placement:
+
+```text
+src/lib/growth/forms/
+greenhouse_growth.*
+growth.forms.*
+growth.forms.<signal>
+```
+
+The HubSpot V1 adapter intentionally starts with the documented secure Forms submission endpoint while isolating it behind adapter metadata:
+
+```text
+adapterVersion: hsforms-v3-secure-submit
+endpointStatus: legacy_supported
+migrationTarget: date_versioned_forms_submission_api_when_available
 ```
 
 ## 7. Lifecycle: pre-pipeline to commercial handoff
@@ -153,6 +184,18 @@ Future capability families may include:
 - `growth.attribution.*`
 - `growth.benchmark.*`
 
+Initial planned forms capabilities:
+
+| Capability | Purpose |
+| --- | --- |
+| `growth.forms.read` | Read form definitions and published contracts. |
+| `growth.forms.author` | Create or edit draft form versions. |
+| `growth.forms.review` | Review forms before publication. |
+| `growth.forms.publish` | Publish/deprecate/archive versions. |
+| `growth.forms.submissions.read` | Read accepted/rejected submissions and delivery state. |
+| `growth.forms.destinations.manage` | Manage destination mappings and adapter settings. |
+| `growth.forms.retry_delivery` | Retry or dead-letter destination attempts. |
+
 Do not create these future families until a concrete capability needs them.
 
 ## 9. Data posture
@@ -160,6 +203,7 @@ Do not create these future families until a concrete capability needs them.
 Growth data may include:
 
 - public contact submissions;
+- form definitions, field schemas and consent snapshots;
 - company and website information;
 - competitor names;
 - provider-generated responses;
@@ -173,6 +217,7 @@ Default classification:
 - company/website/product text: confidential until explicitly public;
 - provider responses: evidence artifact with bounded retention;
 - public report: tokenized or otherwise access-controlled artifact unless intentionally published.
+- form submissions: restricted/confidential by default, with consent snapshot and retention policy.
 
 Growth must avoid storing unnecessary personal data in prompts sent to providers. Brand/company facts are usually enough; personal names/emails should not be sent to AI providers unless a future reviewed use case requires it.
 
@@ -234,6 +279,8 @@ Revisit this domain boundary if:
 
 - `GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_DECISION_V1.md`
 - `GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md`
+- `GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_DECISION_V1.md`
+- `GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md`
 - `GREENHOUSE_FULL_API_PARITY_DECISION_V1.md`
 - `GREENHOUSE_PUBLIC_WEBSITE_LANDING_CONTROL_PLANE_DECISION_V1.md`
 - `docs/context/02_gtm.md`
