@@ -33,6 +33,7 @@ const CAPTURES = join(HERE, 'captures')
 const EXCERPT_MAX = 600
 const N_VARIANCE = Number.parseInt(process.env.N_VARIANCE ?? '1', 10) || 1
 const SMOKE_LIMIT = Number.parseInt(process.env.SMOKE_LIMIT ?? '0', 10) || 0 // 0 = sin límite; N = primeros N runs por provider (validación barata)
+const ONLY_PROMPTS = (process.env.ONLY_PROMPTS ?? '').split(',').map(s => s.trim()).filter(Boolean) // subset de prompt ids (acota costo)
 
 // Anthropic NO está en el arch V1 del grader (OpenAI/Perplexity/Gemini); se incluye
 // como fuente exploratoria por decisión de producto (TASK-1228) — retroalimentar al arch doc.
@@ -156,9 +157,10 @@ function buildPlan(pack, brandSet) {
   const vars = brandSet._meta.defaultVariables ?? {}
   const brands = brandSet.brands.filter(b => b.brandName)
   const competitor = brands.find(b => b.role === 'competitor')?.brandName ?? null
+  const prompts = ONLY_PROMPTS.length ? pack.prompts.filter(p => ONLY_PROMPTS.includes(p.id)) : pack.prompts
   const runs = []
 
-  for (const prompt of pack.prompts) {
+  for (const prompt of prompts) {
     if (prompt.namesBrand) {
       for (const brand of brands) {
         const v = { ...vars, ...brand, brand: brand.brandName, competitor }
@@ -167,7 +169,8 @@ function buildPlan(pack, brandSet) {
         runs.push({ promptId: prompt.id, brandId: brand.id, text: interpolate(prompt.text, v) })
       }
     } else {
-      runs.push({ promptId: prompt.id, brandId: null, text: interpolate(prompt.text, vars) })
+      // los prompts de categoría corren una vez; competitor disponible para p06 ("alternativas a X")
+      runs.push({ promptId: prompt.id, brandId: null, text: interpolate(prompt.text, { ...vars, competitor }) })
     }
   }
 

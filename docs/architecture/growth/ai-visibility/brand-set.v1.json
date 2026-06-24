@@ -30,35 +30,32 @@
     {
       "id": "competitor_1",
       "role": "competitor",
-      "brandName": null,
+      "brandName": "Revops Latam",
       "websiteUrl": null,
       "country": "CL",
       "market": "Chile",
       "category": "marketing y diseño",
-      "criteria": "Competidor directo real y público de Efeonce en agencia/marketing en Chile/LATAM.",
-      "operatorFill": true
+      "operatorFill": false
     },
     {
       "id": "competitor_2",
       "role": "competitor",
-      "brandName": null,
+      "brandName": "Cebra",
       "websiteUrl": null,
       "country": "CL",
       "market": "Chile",
       "category": "marketing y diseño",
-      "criteria": "Segundo competidor directo real y público.",
-      "operatorFill": true
+      "operatorFill": false
     },
     {
       "id": "strong_reference",
       "role": "strong",
-      "brandName": null,
-      "websiteUrl": null,
+      "brandName": "Ogilvy",
+      "websiteUrl": "https://www.ogilvy.com",
       "country": null,
       "market": "Global/LATAM",
       "category": "marketing y diseño",
-      "criteria": "Marca reconocida/líder en la categoría (alta presencia esperada en answer engines) — calibra el techo de discriminación. Puede ser una agencia/plataforma global bien conocida.",
-      "operatorFill": true
+      "operatorFill": false
     },
     {
       "id": "weak_reference",
@@ -74,24 +71,24 @@
     {
       "id": "neutral_1",
       "role": "neutral_control",
-      "brandName": null,
-      "websiteUrl": null,
-      "country": null,
+      "brandName": "LATAM Airlines",
+      "websiteUrl": "https://www.latamairlines.com",
+      "country": "CL",
       "market": "Global",
       "category": "marketing y diseño",
-      "criteria": "Marca pública MUY conocida pero CLARAMENTE fuera del nicho de agencia/marketing (ej. consumo masivo). Control: NO debería aparecer en prompts de agencia; si aparece, el prompt/dimensión tiene ruido.",
-      "operatorFill": true
+      "criteria": "Control fuera de nicho: NO debería aparecer en prompts de agencia; si aparece, el prompt/dimensión tiene ruido.",
+      "operatorFill": false
     },
     {
       "id": "neutral_2",
       "role": "neutral_control",
-      "brandName": null,
-      "websiteUrl": null,
-      "country": null,
+      "brandName": "Banco de Chile",
+      "websiteUrl": "https://www.bancochile.cl",
+      "country": "CL",
       "market": "Global",
       "category": "marketing y diseño",
-      "criteria": "Segundo control fuera de nicho (proxy enterprise para el caso Globe, sin exponer cliente real).",
-      "operatorFill": true
+      "criteria": "Segundo control fuera de nicho + proxy enterprise para el caso Globe (sin exponer cliente real).",
+      "operatorFill": false
     }
   ]
 }
