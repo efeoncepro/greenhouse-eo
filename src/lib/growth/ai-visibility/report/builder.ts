@@ -13,6 +13,7 @@
 
 import { GH_GROWTH_AI_VISIBILITY } from '@/lib/copy/growth'
 
+import { detectBrandInaccuracies, type BrandTruth } from '../accuracy'
 import { type GrowthAiVisibilityRunStatus } from '../contracts'
 import { type NormalizedFinding } from '../normalization/contracts'
 import { SCORE_DIMENSION_CONFIG_BY_KEY, type ScoreDimensionKey } from '../scoring/config'
@@ -28,6 +29,7 @@ import {
   type PositionSummary,
   type ProviderPresence,
   type PublicGraderReport,
+  type ReportAccuracyFinding,
   type ReportDimension,
   type ReportFinding,
   type ReportHeadline,
@@ -61,6 +63,8 @@ export interface BuildGraderReportInput {
   previous?: PreviousScoreInput | null
   /** Dominio normalizado del sujeto para el citation share propio (TASK-1237); null si el perfil no tiene website. */
   subjectDomain?: string | null
+  /** Verdad declarada de la marca para el detector de exactitud (TASK-1238); ausente → sin hallazgos. */
+  brandTruth?: BrandTruth | null
 }
 
 const FINDINGS_MAX = 5
@@ -337,6 +341,25 @@ const buildProviderFindings = (presence: ProviderPresence[]): ReportFinding[] =>
       }
     })
 
+/**
+ * Hallazgos de exactitud de marca (TASK-1238) para el reporte — INTERNAL ONLY.
+ * Mapea el detector puro a una forma con etiqueta es-CL. Sin verdad declarada → [].
+ */
+const buildAccuracyFindings = (
+  findings: NormalizedFinding[],
+  brandTruth: BrandTruth | null
+): ReportAccuracyFinding[] => {
+  if (!brandTruth) return []
+
+  return detectBrandInaccuracies(findings, brandTruth).map(finding => ({
+    kind: finding.kind,
+    confidence: finding.confidence,
+    evidenceCount: finding.evidenceCount,
+    label: GH_GROWTH_AI_VISIBILITY.accuracy_kind_label[finding.kind],
+    detail: finding.reason
+  }))
+}
+
 const buildProvenance = (
   score: PersistedGraderScore,
   findings: NormalizedFinding[],
@@ -442,6 +465,7 @@ export const buildGraderReport = (input: BuildGraderReportInput): GraderReport =
     sourceTypeSummary: buildSourceTypeSummary(findings),
     providerPresence,
     providerFindings: buildProviderFindings(providerPresence),
+    accuracyFindings: buildAccuracyFindings(findings, input.brandTruth ?? null),
     citationInsight: buildCitationInsight(findings, input.subjectDomain ?? null),
     sentimentSummary: buildSentimentSummary(findings),
     positionSummary: buildPositionSummary(findings),

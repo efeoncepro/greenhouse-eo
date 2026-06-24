@@ -13,6 +13,7 @@ import 'server-only'
 
 import { captureWithDomain } from '@/lib/observability/capture'
 
+import { buildBrandTruth } from '../accuracy'
 import { extractCitationDomain } from '../observation'
 import { readGraderScore } from '../scoring/command'
 import { getPreviousComparableScore } from '../scoring/store'
@@ -82,7 +83,16 @@ export const readGraderReport = async (input: {
     const profile = await getGraderProfile(run.profileId)
     const subjectDomain = profile?.websiteUrl ? extractCitationDomain(profile.websiteUrl) : null
 
-    const report = buildGraderReport({ score, findings, run: runMeta, previous, subjectDomain })
+    // Verdad declarada para el detector de exactitud de marca (TASK-1238).
+    const brandTruth = profile
+      ? buildBrandTruth({
+          brandName: profile.brandName,
+          category: profile.category,
+          competitorsDeclared: profile.competitorsDeclared
+        })
+      : null
+
+    const report = buildGraderReport({ score, findings, run: runMeta, previous, subjectDomain, brandTruth })
 
     return { report, publicReport: toPublicGraderReport(report) }
   } catch (error) {

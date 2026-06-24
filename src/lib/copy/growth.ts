@@ -20,6 +20,7 @@ import type {
   TrendDirection
 } from '@/lib/growth/ai-visibility/report/contracts'
 import type { NormalizedFindingProvider } from '@/lib/growth/ai-visibility/normalization/contracts'
+import type { AccuracyFindingKind } from '@/lib/growth/ai-visibility/accuracy/contracts'
 import type { ScoreDimensionKey } from '@/lib/growth/ai-visibility/scoring/config'
 
 export const GH_GROWTH_AI_VISIBILITY = {
@@ -150,6 +151,14 @@ export const GH_GROWTH_AI_VISIBILITY = {
     `Presente en ${label}: apareces en ${present} de ${resolved} ${resolved === 1 ? 'respuesta' : 'respuestas'}.`,
   provider_finding_absent: (label: string, resolved: number) =>
     `Invisible en ${label}: no apareces en ${resolved} ${resolved === 1 ? 'respuesta evaluada' : 'respuestas evaluadas'}.`,
+
+  // Exactitud de marca (TASK-1238, INTERNAL): etiqueta por tipo de inexactitud (admin review).
+  accuracy_kind_label: {
+    category_mismatch: 'Categoría equivocada',
+    entity_collision: 'Confusión de identidad',
+    misattribution: 'Atribución desviada',
+    unverifiable_claim: 'Afirmación no verificable'
+  } satisfies Record<AccuracyFindingKind, string>,
 
   // Nota del finding headline cuando el KPI dominante es el resultado compuesto (ai_visibility).
   outcome_note: 'Tu visibilidad en IA resume las brechas de las dimensiones que la explican.',

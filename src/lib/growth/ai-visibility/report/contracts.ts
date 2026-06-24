@@ -14,6 +14,7 @@
  *    razón + próxima acción renderizables, sin precisión falsa ni auto-release.
  */
 
+import { type AccuracyConfidence, type AccuracyFindingKind } from '../accuracy/contracts'
 import { type ScoreDimensionKey } from '../scoring/config'
 
 export const GROWTH_AI_VISIBILITY_REPORT_VERSION = 'ai_visibility_report_v1' as const
@@ -180,6 +181,19 @@ export interface ProviderPresence {
   present: number
 }
 
+/**
+ * Hallazgo de exactitud de marca para el reporte (TASK-1238) — INTERNAL ONLY.
+ * Exponer "la IA se equivoca sobre ti" al público es delicado (difamación/YMYL): la
+ * señal pública es el gate `review_required`, no el detalle. `detail` = razón interna.
+ */
+export interface ReportAccuracyFinding {
+  kind: AccuracyFindingKind
+  confidence: AccuracyConfidence
+  evidenceCount: number
+  label: string
+  detail: string
+}
+
 /** Procedencia: orienta + sostiene el disclaimer (P-4). */
 export interface ReportProvenance {
   asOfDate: string | null
@@ -290,6 +304,8 @@ export interface GraderReport {
   providerPresence: ProviderPresence[]
   /** Hallazgos narrativos por motor (TASK-1237) — INTERNAL ONLY; no viaja al público. */
   providerFindings: ReportFinding[]
+  /** Hallazgos de exactitud de marca (TASK-1238) — INTERNAL ONLY; la señal pública es el gate. */
+  accuracyFindings: ReportAccuracyFinding[]
   citationInsight: CitationInsight
   sentimentSummary: SentimentSummary
   positionSummary: PositionSummary
