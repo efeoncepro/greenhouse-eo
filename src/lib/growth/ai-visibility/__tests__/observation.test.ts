@@ -6,6 +6,7 @@ import {
   buildCitation,
   buildCitations,
   extractCitationDomain,
+  normalizeDomain,
   serializeProviderObservation,
   sha256Hex
 } from '../observation'
@@ -33,6 +34,29 @@ describe('growth/ai-visibility — observation helpers', () => {
     const citation = buildCitation({ url: 'https://www.efeoncepro.com', title: 'Efeonce', sourceType: 'owned' })
 
     expect(citation).toEqual({ url: 'https://www.efeoncepro.com', domain: 'efeoncepro.com', title: 'Efeonce', sourceType: 'owned' })
+  })
+
+  it('normalizeDomain reconoce dominios pelados/urls y rechaza no-dominios', () => {
+    expect(normalizeDomain('loup.cl')).toBe('loup.cl')
+    expect(normalizeDomain('www.Efeoncepro.com')).toBe('efeoncepro.com')
+    expect(normalizeDomain('https://bigbuda.cl/agencia')).toBe('bigbuda.cl')
+    expect(normalizeDomain('Una agencia de marketing')).toBeNull()
+    expect(normalizeDomain(null)).toBeNull()
+  })
+
+  it('buildCitation prioriza el domain explícito sobre el host del url (caso Gemini/Vertex)', () => {
+    const citation = buildCitation({
+      url: 'https://vertexaisearch.cloud.google.com/grounding-api-redirect/AbC',
+      title: 'loup.cl',
+      domain: 'loup.cl'
+    })
+
+    expect(citation?.domain).toBe('loup.cl')
+    expect(citation?.url).toContain('vertexaisearch.cloud.google.com')
+
+    const fallback = buildCitation({ url: 'https://efeoncepro.com', domain: 'no es dominio' })
+
+    expect(fallback?.domain).toBe('efeoncepro.com')
   })
 
   it('buildCitations deduplica por url y descarta inválidas', () => {

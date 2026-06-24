@@ -49,15 +49,36 @@ export const extractCitationDomain = (url: string): string | null => {
 }
 
 /**
- * Construye una citation normalizada a partir de una url cruda de provider.
- * Devuelve `null` si la url no es parseable (se descarta, no se inventa dominio).
+ * Normaliza un candidato a dominio (host pelado o "https://host/path"). Devuelve
+ * el host sin `www.` si parece un dominio válido; null si no. Necesario para
+ * providers cuya citation expone el dominio real en un campo aparte del url
+ * (ej. Gemini/Vertex grounding: el `url` es un redirect `vertexaisearch...` y el
+ * dominio real viene en el `title` — TASK-1233).
+ */
+export const normalizeDomain = (value: string | null | undefined): string | null => {
+  if (typeof value !== 'string') {
+    return null
+  }
+
+  const host = value.trim().toLowerCase().replace(/^https?:\/\//, '').split('/')[0]
+  const clean = host.startsWith('www.') ? host.slice(4) : host
+
+  return /^[a-z0-9-]+(\.[a-z0-9-]+)+$/.test(clean) ? clean : null
+}
+
+/**
+ * Construye una citation normalizada. El dominio se resuelve con prioridad:
+ * `domain` explícito (cuando el provider lo expone aparte del url, ej. Gemini) →
+ * host del `url`. Devuelve `null` si no se puede determinar dominio (se descarta,
+ * NO se inventa).
  */
 export const buildCitation = (input: {
   url: string
   title?: string | null
   sourceType?: GrowthAiVisibilitySourceType
+  domain?: string | null
 }): GrowthAiVisibilityCitation | null => {
-  const domain = extractCitationDomain(input.url)
+  const domain = normalizeDomain(input.domain) ?? extractCitationDomain(input.url)
 
   if (!domain) {
     return null
@@ -71,9 +92,9 @@ export const buildCitation = (input: {
   }
 }
 
-/** Normaliza una lista de urls crudas a citations únicas por url (descarta no parseables). */
+/** Normaliza una lista de citations crudas a únicas por url (descarta sin dominio determinable). */
 export const buildCitations = (
-  raw: ReadonlyArray<{ url: string; title?: string | null; sourceType?: GrowthAiVisibilitySourceType }>
+  raw: ReadonlyArray<{ url: string; title?: string | null; sourceType?: GrowthAiVisibilitySourceType; domain?: string | null }>
 ): GrowthAiVisibilityCitation[] => {
   const seen = new Set<string>()
   const citations: GrowthAiVisibilityCitation[] = []

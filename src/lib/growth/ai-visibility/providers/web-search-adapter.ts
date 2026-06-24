@@ -33,7 +33,8 @@ export interface WebSearchCallResult {
   httpStatus: number | null
   model: string
   text: string | null
-  citations: Array<{ url: string; title?: string | null }>
+  /** `domain` opcional cuando el provider lo expone aparte del url (ej. Gemini/Vertex). */
+  citations: Array<{ url: string; title?: string | null; domain?: string | null }>
   usage: Record<string, unknown>
   latencyMs: number
 }
@@ -113,7 +114,7 @@ export const createWebSearchAdapter = (config: WebSearchAdapterConfig): Provider
             model: result.model,
             answerTextHash: result.text ? sha256Hex(result.text) : null,
             answerExcerpt: boundedExcerpt(result.text),
-            citations: buildCitations(result.citations.map(c => ({ url: c.url, title: c.title ?? null }))),
+            citations: buildCitations(result.citations.map(c => ({ url: c.url, title: c.title ?? null, domain: c.domain ?? null }))),
             usage: result.usage,
             latencyMs: result.latencyMs,
             rawEvidencePointer: null
