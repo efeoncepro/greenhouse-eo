@@ -18,7 +18,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `growth|communications|reliability`
-- Blocked by: `TASK-1245`
+- Blocked by: `TASK-1245, TASK-1252`
 - Branch: `task/TASK-1250-growth-ai-visibility-email-report-delivery`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -290,6 +290,32 @@ Extend (NO owned — append, no apropiar): `src/lib/email/templates.ts` + `types
 
 El email debe ser transaccional, no promocional: "tu diagnóstico está listo". El cuerpo incluye un resumen breve: score global, brecha principal, recomendación principal, disclosure si es parcial y CTA al reporte. El adjunto contiene el informe completo public-safe derivado del snapshot, no una recomputación. La capa de delivery debe persistir `email_deliveries`, usar attachments soportados por `src/lib/email/delivery.ts`, respetar undeliverable/rate-limit/kill-switch y dejar trazabilidad para retry.
 
+### Approved visual direction
+
+Product Design direction approved on 2026-06-25: **Report Packet Delivery**.
+
+Use Option 2 as the implementation base because it represents the email as an auditable delivery packet instead of only a notification: secure tokenized link, consent metadata, attachment notice, `PublicGraderReport` provenance and plain-text fallback are visible in the hierarchy.
+
+Blend these elements into the final email/attachment implementation:
+
+- Base from **Option 2 — Report Packet Delivery**: transactional email plus prominent first-page attachment preview, delivery metadata, consent/link/attachment proof, and fallback link.
+- Add from **Option 1 — Executive Snapshot Email**: compact score summary and mobile-readable preview discipline.
+- Add from **Option 3 — Insight-to-Action Email**: one priority insight with "que detectamos / por que importa / que hacer ahora" so the email creates commercial activation, not only delivery.
+
+Versioned visual assets:
+
+- `docs/assets/product-design/task-1250-ai-visibility-email-report-delivery/executive-snapshot-email.png`
+- `docs/assets/product-design/task-1250-ai-visibility-email-report-delivery/report-packet-delivery.png`
+- `docs/assets/product-design/task-1250-ai-visibility-email-report-delivery/insight-to-action-email.png`
+
+Implementation guardrails:
+
+- Keep the runtime email inside `EmailLayout`, `EmailButton`, `src/emails/components/**` and existing email tokens; do not introduce a web-app layout system for this surface.
+- Preserve email-client safety: inline styles, simple sections/tables, no motion, no interactive controls beyond links.
+- Use canonical copy in `src/lib/copy/dictionaries/es-CL/emails.ts`.
+- Do not include raw provider evidence, internal accuracy findings, provider logos, guaranteed ranking claims or non-public IDs in HTML, text or attachment.
+- Render partial/degraded delivery honestly in subject/body when required by the report state.
+
 ## Rollout Plan & Risk Matrix
 
 ### Slice ordering hard rule
@@ -344,6 +370,7 @@ Slice 1 (template/type) -> Slice 2 (attachment) -> Slice 3 (command/idempotency)
 
 - [ ] Existe email type/template para `ai_visibility_grader_report` con subject, HTML y plain text.
 - [ ] El email incluye resumen breve, CTA al reporte tokenizado y aviso del adjunto.
+- [ ] El template aplica la direccion visual aprobada **Report Packet Delivery** y referencia los assets versionados de Product Design.
 - [ ] El informe completo adjunto se genera desde `PublicGraderReport` snapshot, no desde raw/internal report.
 - [ ] Dispatch es idempotente por lead/report snapshot (UNIQUE a nivel DB) y no duplica en doble poll/retry; se dispara como reactive consumer del evento de publicación, NO desde el GET de status.
 - [ ] Consent-gate verificado: solo envía si el consent snapshot del lead cubre la entrega; nunca a consent ausente/retirado.

@@ -39,16 +39,17 @@ El motor del grader está completo y verificado (TASK-1226/1227/1234/1235/1236/1
 
 - `TASK-1239` ✅ **complete (dev)** — **(A) Public Grader Report Snapshot + Token Reader** — `grader_reports` inmutable (run_id + score_version + report_version + recommendation_pack_version + as_of + DTO público congelado + token NO enumerable 256-bit + expires_at) + `readPublicGraderReport(reportToken)` + `publishGraderReportSnapshot` (idempotente, no publica gateados) + capability `report.publish` + endpoints admin/público. Foundation de parity pública. **P1.**
 - `TASK-1240` ✅ **code complete (dev); rollout pendiente** — **(B) Public Grader Run Intake + abuse/cost controls** — `createPublicGraderRun` (§9.2 input + consent + work email, **email nunca a providers**) → captcha (Turnstile) + rate-limit (per-IP 10/email 3) + presupuesto global diario (circuit breaker) + modo `light` → enqueue al worker async (TASK-1234). Lead dedicado `grader_leads` + `grader_intake_events`. Flag `GROWTH_AI_VISIBILITY_PUBLIC_INTAKE_ENABLED` default OFF. **P1. Pendiente:** sign-off legal consent + secret captcha + flag ON staging.
-- `TASK-1241` — **(C) Public Lead Magnet Page** (ui-ux): landing + form §9.2 + consent + Turnstile + estados async honestos (§9.3) + render del reporte (table-fallback + a11y WCAG 2.2 AA). Cliente puro de A (token-reader) + B (intake). **P1.**
+- `TASK-1241` — **(C) Public Lead Magnet Page** (ui-ux): landing + form §9.2 + consent + Turnstile + estados async honestos (§9.3) + render del reporte usando el artifact design system de `TASK-1252` (table-fallback + a11y WCAG 2.2 AA). Cliente puro de A (token-reader) + B (intake). **P1.**
 - `TASK-1242` — **(D) HubSpot Lead Handoff** (backend, integration): `syncAiVisibilityRunToHubSpot` upserta contact/company + props `ai_visibility_*` + lifecycle desde `primary_gap`/`recommended_motion`, vía outbox + reactive. **P2.**
 - `TASK-1243` — **(E) Client-Scoped Report Access** (backend, reader): reader client-scoped (binding run↔org) gateado por capability `client_*`, mismo `buildGraderReport`. Tercer consumer de la parity; UI portal = follow-up. **P2.**
 - `TASK-1244` — **(F) Admin Evidence Review** (backend, command): cola + `approve`/`reject` (state machine + audit) de `review_required` antes del release público; el publish honra la aprobación. Gate humano YMYL. **P2.**
 - `TASK-1245` — **(G) Public Run Status + Delivery Orchestrator** (backend, api): endpoint público de poll por `runPublicId`, estados public-safe y delivery idempotente de `reportToken` cuando existe snapshot publicable. **P1.**
 - `TASK-1246` — **(H) Public Launch Readiness + Rollout** (ops/backend): legal consent + Turnstile + flags/envs + staging smoke end-to-end + release control plane + rollback. **P1.**
 - `TASK-1247` — **(I) Admin Review UI** (ui-ux): cola y detalle interno para operar approve/reject de `review_required` usando `TASK-1244`. **P2.**
-- `TASK-1248` — **(J) Client Report UI** (ui-ux): superficie del portal cliente sobre el reader client-scoped de `TASK-1243`. **P2.**
+- `TASK-1248` — **(J) Client Report UI** (ui-ux): superficie del portal cliente sobre el reader client-scoped de `TASK-1243`, consumiendo el artifact design system de `TASK-1252`. **P2.**
 - `TASK-1249` — **(K) Calibration + Provider Completion** (backend, data-quality): Perplexity, prompt pack v2 y recalibración/golden eval; calidad del motor no bloqueante del MVP. **P2.**
 - `TASK-1250` — **(L) Email Report Delivery** (backend, communications): email transaccional al lead con resumen breve, link tokenizado e informe completo adjunto generado desde el snapshot público. **P1.**
+- `TASK-1252` — **(M) Report Artifact Design System** (ui-ux): visual y sistema reusable del informe completo del grader, con componentes/variants para web publica, portal cliente, attachment y admin preview. **P1.**
 
 ## Existing Related Work
 
@@ -64,6 +65,7 @@ El motor del grader está completo y verificado (TASK-1226/1227/1234/1235/1236/1
 - [ ] Snapshot inmutable tokenizado: un link público no cambia si el score recomputa; `expires_at` respetado.
 - [ ] Flujo público end-to-end live en staging: input + consent → run async → reporte → lead en HubSpot con `primary_gap`/`recommended_motion`.
 - [ ] El prospecto recibe email transaccional con resumen breve, link tokenizado e informe completo adjunto.
+- [ ] El informe completo tiene direccion visual aprobada y sistema reusable de componentes/variants antes de implementarse en web, portal cliente y adjunto.
 - [ ] Poll público `runPublicId → status → reportToken` existe como contrato backend gobernado, sin lógica de status dentro de la UI.
 - [ ] Control de abuso/costo activo (rate-limit + cost ceiling + modo `light`); sin gasto LLM no acotado.
 - [ ] `review_required` no se auto-publica: gate humano (F) antes de exponer al público (seguridad YMYL).

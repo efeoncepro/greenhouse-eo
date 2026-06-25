@@ -18,7 +18,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `growth|client|ui`
-- Blocked by: `TASK-1243`
+- Blocked by: `TASK-1243, TASK-1252`
 - Branch: `task/TASK-1248-growth-ai-visibility-client-report-ui`
 - Legacy ID: `none`
 - GitHub Issue: `none`

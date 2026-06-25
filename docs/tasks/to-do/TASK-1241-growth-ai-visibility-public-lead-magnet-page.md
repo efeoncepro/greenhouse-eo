@@ -25,7 +25,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `growth|ui`
-- Blocked by: `TASK-1239, TASK-1240, TASK-1245`
+- Blocked by: `TASK-1239, TASK-1240, TASK-1245, TASK-1252`
 - Branch: `task/TASK-1241-growth-ai-visibility-public-lead-magnet-page`
 - Legacy ID: `none`
 - GitHub Issue: `none`
