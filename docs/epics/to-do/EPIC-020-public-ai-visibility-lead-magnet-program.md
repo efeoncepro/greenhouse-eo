@@ -39,10 +39,10 @@ El motor del grader está completo y verificado (TASK-1226/1227/1234/1235/1236/1
 
 - `TASK-1239` ✅ **complete (dev)** — **(A) Public Grader Report Snapshot + Token Reader** — `grader_reports` inmutable (run_id + score_version + report_version + recommendation_pack_version + as_of + DTO público congelado + token NO enumerable 256-bit + expires_at) + `readPublicGraderReport(reportToken)` + `publishGraderReportSnapshot` (idempotente, no publica gateados) + capability `report.publish` + endpoints admin/público. Foundation de parity pública. **P1.**
 - `TASK-1240` ✅ **code complete (dev); rollout pendiente** — **(B) Public Grader Run Intake + abuse/cost controls** — `createPublicGraderRun` (§9.2 input + consent + work email, **email nunca a providers**) → captcha (Turnstile) + rate-limit (per-IP 10/email 3) + presupuesto global diario (circuit breaker) + modo `light` → enqueue al worker async (TASK-1234). Lead dedicado `grader_leads` + `grader_intake_events`. Flag `GROWTH_AI_VISIBILITY_PUBLIC_INTAKE_ENABLED` default OFF. **P1. Pendiente:** sign-off legal consent + secret captcha + flag ON staging.
-- **(C) Public page: landing + form + states + report render** — superficie pública (product design + a11y WCAG 2.2 AA/EAA): formulario de captura, estados async honestos (§9.3), render del reporte (radar/bar + table-fallback). Consume A (token-reader) + B (intake). **P1, sin ID aún.**
-- **(D) HubSpot handoff** — `syncAiVisibilityRunToHubSpot(runId, idempotencyKey)`: contact/company + props `ai_visibility_*` + lifecycle stage desde `primary_gap`/`recommended_motion`. **P2, sin ID aún.**
-- **(E) Client-scoped reader + portal cliente surface** — reader client-scoped (binding run↔org cliente) + surface en el portal cliente vía su anti-corruption layer. Tercer consumer. **P2, sin ID aún.**
-- **(F) Admin evidence review** — aprobar/rechazar reportes `review_required` antes de release público (gate humano YMYL). **P2, sin ID aún.**
+- `TASK-1241` — **(C) Public Lead Magnet Page** (ui-ux): landing + form §9.2 + consent + Turnstile + estados async honestos (§9.3) + render del reporte (table-fallback + a11y WCAG 2.2 AA). Cliente puro de A (token-reader) + B (intake). **P1.**
+- `TASK-1242` — **(D) HubSpot Lead Handoff** (backend, integration): `syncAiVisibilityRunToHubSpot` upserta contact/company + props `ai_visibility_*` + lifecycle desde `primary_gap`/`recommended_motion`, vía outbox + reactive. **P2.**
+- `TASK-1243` — **(E) Client-Scoped Report Access** (backend, reader): reader client-scoped (binding run↔org) gateado por capability `client_*`, mismo `buildGraderReport`. Tercer consumer de la parity; UI portal = follow-up. **P2.**
+- `TASK-1244` — **(F) Admin Evidence Review** (backend, command): cola + `approve`/`reject` (state machine + audit) de `review_required` antes del release público; el publish honra la aprobación. Gate humano YMYL. **P2.**
 
 ## Existing Related Work
 
