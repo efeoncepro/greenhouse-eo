@@ -16,7 +16,8 @@ export const GROWTH_AI_VISIBILITY_LEAD_AGGREGATE = 'growth_ai_visibility_lead' a
 export const GROWTH_AI_VISIBILITY_LEAD_HANDOFF_REQUESTED_EVENT =
   'growth.ai_visibility.lead_handoff_requested' as const
 
-export interface LeadHandoffRequestedPayload {
+/** `type` (no `interface`) para que sea asignable a `Record<string, unknown>` del publisher. */
+export type LeadHandoffRequestedPayload = {
   schemaVersion: 1
   /** El run cuyo lead + score se sincronizan. El consumer re-lee de PG; el payload es PII-free. */
   runId: string
