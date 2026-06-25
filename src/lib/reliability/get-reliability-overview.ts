@@ -172,6 +172,7 @@ import { getHubspotCompaniesIntakeDeadLetterSignal } from './queries/hubspot-com
 import { getWorkforceUnlinkedInternalUsersSignal } from './queries/workforce-unlinked-internal-users'
 import { getGrowthAiVisibilitySignals } from './queries/growth-ai-visibility-signals'
 import { getGrowthAiVisibilityScoringSignals } from './queries/growth-ai-visibility-scoring-signals'
+import { getGrowthAiVisibilityPublicIntakeSignals } from './queries/growth-ai-visibility-public-intake-signals'
 // TASK-1082 — Knowledge Platform ingestion signals (moduleKey 'knowledge').
 import { getKnowledgeNotionIngestDeadLetterSignal } from './queries/knowledge-notion-ingest-dead-letter'
 import { getKnowledgeQuarantineCountSignal } from './queries/knowledge-quarantine-count'
@@ -615,6 +616,7 @@ interface ReliabilityOverviewSources {
   workforceUnlinkedInternalUsers?: ReliabilitySignal | null
   growthAiVisibility?: ReliabilitySignal[] | null
   growthAiVisibilityScoring?: ReliabilitySignal[] | null
+  growthAiVisibilityPublicIntake?: ReliabilitySignal[] | null
 
   /** TASK-1201 — Finance AI anomaly-materialization staleness (heartbeat del SoT de signals). */
   financeAiStaleMaterialization?: ReliabilitySignal | null
@@ -1024,6 +1026,7 @@ export const buildReliabilityOverview = (
     ...(sources.operationalPlCostCoverageDegraded ? [sources.operationalPlCostCoverageDegraded] : []),
     ...(sources.growthAiVisibility ?? []),
     ...(sources.growthAiVisibilityScoring ?? []),
+    ...(sources.growthAiVisibilityPublicIntake ?? []),
     // TASK-812 — Previred/LRE artifact registry drift.
     ...(sources.payrollComplianceExportDrift ? [sources.payrollComplianceExportDrift] : []),
     // TASK-863 V1.5.2 — Final settlement PDF status drift (DB document_status vs
@@ -1400,6 +1403,12 @@ export const getReliabilityOverview = async (
     preloadedSources.growthAiVisibilityScoring !== undefined
       ? preloadedSources.growthAiVisibilityScoring
       : await getGrowthAiVisibilityScoringSignals().catch(() => null)
+
+  // TASK-1240 — intake público (rate/cost/blocked). DB vacía / intake OFF → steady ok.
+  const growthAiVisibilityPublicIntake =
+    preloadedSources.growthAiVisibilityPublicIntake !== undefined
+      ? preloadedSources.growthAiVisibilityPublicIntake
+      : await getGrowthAiVisibilityPublicIntakeSignals().catch(() => null)
 
   const payrollComplianceExportDrift =
     preloadedSources.payrollComplianceExportDrift !== undefined
@@ -2299,6 +2308,7 @@ export const getReliabilityOverview = async (
     operationalPlCostCoverageDegraded,
     growthAiVisibility,
     growthAiVisibilityScoring,
+    growthAiVisibilityPublicIntake,
     payrollComplianceExportDrift,
     payrollContractorDoubleRailOverlap,
     payrollDeelMemberWithoutContractId,
