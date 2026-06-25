@@ -6439,6 +6439,38 @@ export interface GreenhouseFinanceVatMonthlyPositions {
   vat_position_id: string;
 }
 
+export interface GreenhouseGrowthGraderIntakeEvents {
+  created_at: Generated<Timestamp>;
+  email_hash: string | null;
+  estimated_cost_usd: Numeric | null;
+  event_id: Generated<string>;
+  ip_hash: string | null;
+  outcome: string;
+  run_id: string | null;
+}
+
+export interface GreenhouseGrowthGraderLeads {
+  brand_name: string;
+  category: string;
+  company_size: string | null;
+  competitors_declared: Generated<string[]>;
+  consent: boolean;
+  consent_at: Generated<Timestamp>;
+  created_at: Generated<Timestamp>;
+  email: string;
+  hubspot_synced_at: Timestamp | null;
+  industry: string | null;
+  ip_hash: string | null;
+  lead_id: Generated<string>;
+  main_challenge: string | null;
+  market: string;
+  persona: string | null;
+  profile_id: string | null;
+  run_id: string | null;
+  source: Generated<string>;
+  website_url: string | null;
+}
+
 export interface GreenhouseGrowthGraderProfiles {
   brand_name: string;
   category: string | null;
@@ -10695,6 +10727,8 @@ export interface DB {
   "greenhouse_finance.tax_codes": GreenhouseFinanceTaxCodes;
   "greenhouse_finance.vat_ledger_entries": GreenhouseFinanceVatLedgerEntries;
   "greenhouse_finance.vat_monthly_positions": GreenhouseFinanceVatMonthlyPositions;
+  "greenhouse_growth.grader_intake_events": GreenhouseGrowthGraderIntakeEvents;
+  "greenhouse_growth.grader_leads": GreenhouseGrowthGraderLeads;
   "greenhouse_growth.grader_profiles": GreenhouseGrowthGraderProfiles;
   "greenhouse_growth.grader_reports": GreenhouseGrowthGraderReports;
   "greenhouse_growth.grader_runs": GreenhouseGrowthGraderRuns;
