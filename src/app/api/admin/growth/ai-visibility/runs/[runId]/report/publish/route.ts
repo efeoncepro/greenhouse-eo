@@ -20,13 +20,13 @@ import { requireInternalTenantContext } from '@/lib/tenant/authorization'
 export const dynamic = 'force-dynamic'
 
 export async function POST(request: Request, { params }: { params: Promise<{ runId: string }> }) {
-  const { tenant, memberId, errorResponse } = await requireInternalTenantContext()
+  const { tenant, errorResponse } = await requireInternalTenantContext()
 
   if (!tenant) {
     return errorResponse ?? canonicalErrorResponse('unauthorized')
   }
 
-  if (!can(tenant, 'growth.ai_visibility.report.publish', 'publish', 'tenant')) {
+  if (!can(tenant, 'growth.ai_visibility.report.publish', 'execute', 'tenant')) {
     return canonicalErrorResponse('forbidden', {
       extra: { requiredCapability: 'growth.ai_visibility.report.publish' }
     })
@@ -37,7 +37,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ run
   const expiresAt = typeof body.expiresAt === 'string' ? body.expiresAt : null
 
   try {
-    const snapshot = await publishGraderReportSnapshot({ runId, expiresAt, createdBy: memberId })
+    const snapshot = await publishGraderReportSnapshot({ runId, expiresAt, createdBy: tenant.userId })
 
     return NextResponse.json({
       reportToken: snapshot.reportToken,

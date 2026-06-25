@@ -63,7 +63,7 @@ export const getGrowthAiVisibilityPublicIntakeSignals = async (): Promise<Reliab
       {
         signalId: GROWTH_AI_VISIBILITY_PUBLIC_INTAKE_COST_SIGNAL_ID,
         moduleKey: MODULE_KEY,
-        kind: 'cost',
+        kind: 'cost_guard',
         source: 'getGrowthAiVisibilityPublicIntakeSignals',
         label: 'Presupuesto diario del intake público (AI Visibility)',
         severity: budgetUsed >= 1 ? 'error' : budgetUsed >= 0.8 ? 'warning' : 'ok',
@@ -96,7 +96,7 @@ export const getGrowthAiVisibilityPublicIntakeSignals = async (): Promise<Reliab
       {
         signalId: GROWTH_AI_VISIBILITY_PUBLIC_INTAKE_COST_SIGNAL_ID,
         moduleKey: MODULE_KEY,
-        kind: 'cost' as const,
+        kind: 'cost_guard' as const,
         source: 'getGrowthAiVisibilityPublicIntakeSignals',
         label: 'Presupuesto diario del intake público (AI Visibility)',
         severity: 'unknown' as const,

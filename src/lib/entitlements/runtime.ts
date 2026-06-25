@@ -212,7 +212,7 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
     addEntitlement(entries, {
       module: 'growth',
       capability: 'growth.ai_visibility.report.publish',
-      action: 'publish',
+      action: 'execute',
       scope: 'tenant',
       source
     })

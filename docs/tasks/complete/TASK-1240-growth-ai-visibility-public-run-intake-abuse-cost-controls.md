@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
@@ -251,12 +251,12 @@ El intake público reusa el motor existente: valida input (§9.2) + consent, cre
 
 ## Acceptance Criteria
 
-- [ ] `createPublicGraderRun(input, idempotencyKey)` crea perfil/run `public_diagnostic`+`light` + persiste lead (consent+email+timestamp) + encola (`enqueueGraderRun`), NUNCA inline.
-- [ ] PII (email/teléfono) NUNCA viaja a providers (test que lo prueba); consent requerido + persistido.
-- [ ] Rate-limit (IP+email) + cost ceiling por ventana + captcha + modo `light` activos y testeados; exceso → 429/bloqueo sanitizado.
-- [ ] Endpoint público POST detrás del flag `GROWTH_AI_VISIBILITY_PUBLIC_INTAKE_ENABLED` (default OFF) + fila en el ledger.
-- [ ] Migration additive (consent/lead) con DO block + `db.d.ts`; reliability signals (intake/cost/blocked) en steady.
-- [ ] Dry-run staging: POST → 202 + run encolado + worker lo ejecuta; rate-limit/cost ceiling verificados.
+- [x] `createPublicGraderRun` crea perfil/run `public_diagnostic`+`light` + persiste lead (consent+email+`consent_at`) + **encola** (`enqueueGraderDiagnostic`), NUNCA inline. — test.
+- [x] PII (email) NUNCA viaja a providers (test que lo prueba: `JSON.stringify(enqueueArg)` sin email); consent requerido + persistido (CHECK `consent=TRUE` verificado vs PG).
+- [x] Rate-limit (IP+email) + presupuesto global diario (circuit breaker) + captcha (Turnstile port) + modo `light` activos y testeados; exceso → 429/503 sanitizado. — abuse-guard + tests + SQL vs PG.
+- [x] Endpoint público POST detrás del flag `GROWTH_AI_VISIBILITY_PUBLIC_INTAKE_ENABLED` (default OFF) + fila en el ledger. — `flags:audit` limpio.
+- [x] Migration additive (`grader_leads` + `grader_intake_events`) con DO block + `db.d.ts`; 3 reliability signals en steady (SQL vs PG, $0/$25).
+- [~] Dry-run staging: POST → 202 + run encolado + worker. **Rollout-pending** (flag OFF + secret captcha + sign-off legal): el path está cubierto por 6 unit tests + migración/SQL verificadas vs PG; el smoke staging es paso de rollout.
 
 ## Verification
 
@@ -269,12 +269,12 @@ El intake público reusa el motor existente: valida input (§9.2) + consent, cre
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` sincronizado (`in-progress`/`complete`)
-- [ ] archivo en la carpeta correcta
-- [ ] `docs/tasks/README.md` + `TASK_ID_REGISTRY.md` sincronizados
-- [ ] `Handoff.md` + `changelog.md` + FEATURE_FLAG_STATE_LEDGER actualizados
-- [ ] arch `## Delta` (public intake + abuse/cost) + `EPIC-020` Child Tasks actualizado
-- [ ] chequeo de impacto cruzado (TASK-1234/1239 + EPIC-020 C/D)
+- [x] `Lifecycle` `complete` (code-complete dev; **rollout operativamente bloqueado** — sign-off legal + captcha secret + flag, documentado)
+- [x] archivo en la carpeta correcta (`complete/`)
+- [x] `docs/tasks/README.md` + `TASK_ID_REGISTRY.md` sincronizados
+- [x] `Handoff.md` + `changelog.md` + FEATURE_FLAG_STATE_LEDGER actualizados (flag en § Pendientes + § Snapshot)
+- [x] arch `## Delta 2026-06-24 — TASK-1240` + `EPIC-020` Child Task B (code complete)
+- [x] chequeo de impacto cruzado: TASK-1234 (worker ejecuta el run encolado) + TASK-1239 (su token sirve el reporte) + EPIC-020 C (página consume) / D (HubSpot consume el lead). Sin colisión.
 
 ## Follow-ups
 
@@ -283,6 +283,6 @@ El intake público reusa el motor existente: valida input (§9.2) + consent, cre
 
 ## Open Questions
 
-1. ¿Consent/lead como campos en `grader_profiles` o tabla `grader_leads` dedicada? **Propuesta:** tabla `grader_leads` (el lead es un objeto con su ciclo de vida → HubSpot, distinto del perfil de marca). Confirmar en Plan Mode.
-2. ¿Qué captcha (Turnstile/hCaptcha/reCAPTCHA)? Decidir en Discovery (preferir uno sin costo + privacy-friendly).
-3. ¿Cost ceiling público: por IP/email/global por ventana? **Propuesta:** los tres combinados (per-IP + per-email + global diario con circuit breaker). Afinar umbrales con el cost estimator real del modo `light`.
+1. ~~¿Lead en `grader_profiles` o tabla dedicada?~~ **Resuelta (arch-architect) → tabla dedicada `greenhouse_growth.grader_leads`.** El lead (persona + email + consent → HubSpot) es entidad distinta del perfil de marca (lo medido); 1:N; consent append-only (`consent_at`). SSOT + canonical-primitive. Rechazo campos en profile (acopla marca con solicitante).
+2. ~~¿Qué captcha?~~ **Resuelta (arch + seo-aeo) → Cloudflare Turnstile** tras puerto provider-neutral `CaptchaVerifier`. Gratis, sin PII a Google (Ley 21.719/GDPR), **invisible/baja fricción** (preserva conversión del lead magnet). Secret `TURNSTILE_SECRET_REF` = dependencia de rollout; dev/test bypass si no hay secret; fail-closed en prod con flag ON sin secret.
+3. ~~¿Umbrales cost/abuse?~~ **Resuelta → email-gated (no anónimo) + límites generosos para no matar conversión:** per-email **3/día**, per-IP **10/día**, **presupuesto global diario** (circuit breaker → 503 honesto) como guard real de costo, idempotencia doble-submit, modo `light` forzado + per-run cost ceiling. Counters DB-backed en `grader_intake_events` con `ip_hash`/`email_hash` (crudos solo en `grader_leads` con consent). El grader **es email-gated por diseño** (§9.2 = intercambio de valor del lead magnet) pero se siente instantáneo (queued → poll → reporte).

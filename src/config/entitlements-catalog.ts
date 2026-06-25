@@ -1936,7 +1936,9 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
   {
     key: 'growth.ai_visibility.report.publish',
     module: 'growth',
-    actions: ['publish'] as const,
+    // Acción canónica `execute` (verbo de gobernanza; `publish` no está en el enum
+    // de EntitlementAction). La key `report.publish` conserva la intención.
+    actions: ['execute'] as const,
     defaultScope: 'tenant'
   }
 ] as const

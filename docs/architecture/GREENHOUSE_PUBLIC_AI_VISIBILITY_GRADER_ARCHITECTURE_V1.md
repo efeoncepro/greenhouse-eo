@@ -1255,3 +1255,16 @@ Materializa el **snapshot público inmutable** del §7.7/§11.1: `greenhouse_gro
 - **`expires_at` se respeta en SQL** (`expires_at IS NULL OR expires_at > NOW()`); expirado o inexistente → 404 sin distinguir (no filtra existencia). V1: `expires_at` default NULL (configurable al publicar).
 - El snapshot congela el `PublicGraderReport` → hereda su public-safety (sin raw, sin `providerFindings`/`accuracyFindings` internos). **NUNCA** congelar el `GraderReport` interno.
 - Hardening pendiente (follow-up): rate-limit por IP en el endpoint público de lectura (hoy: token no enumerable + read-only sin gasto LLM). El write/cost público es TASK-1240 (EPIC-020 B).
+
+## Delta 2026-06-24 — TASK-1240 public run intake + abuse/cost controls (complete dev) · EPIC-020 B
+
+Materializa el **único WRITE público** del dominio (§9.1/§11.2): `createPublicGraderRun` toma el input §9.2 (marca + **work email + consent**) → captcha → abuse/cost guard → persiste el lead → **encola** un run `public_diagnostic`+`light` (worker async TASK-1234, NO inline). `POST /api/public/growth/ai-visibility/run`. Detrás del flag `GROWTH_AI_VISIBILITY_PUBLIC_INTAKE_ENABLED` (default OFF, gateado por el kill switch). Módulos: migración `…_task-1240-grader-leads-intake-events.sql` + `public-intake/{contracts,captcha,abuse-guard,store,create-public-run}.ts` + 3 reliability signals.
+
+### Invariantes operativos para agentes (public intake)
+
+- **El email (PII) NUNCA viaja a los providers.** Vive SOLO en `greenhouse_growth.grader_leads` (con consent + `consent_at`; CHECK `consent = TRUE`). `enqueueGraderDiagnostic` recibe sólo marca/categoría/mercado/competidores — los prompts interpolan eso, nunca PII. Test lo prueba (`JSON.stringify(enqueueArg)` no contiene el email).
+- **NUNCA** ejecutar el run inline en el endpoint público: se **encola** (`enqueueGraderDiagnostic` → run `pending`) y el worker Cloud Run (TASK-1234) lo drena. El público recibe `runPublicId` para poll.
+- **NUNCA** abrir el POST público sin las 4 capas: captcha (Turnstile, puerto `CaptchaVerifier` — bypass dev / **fail-closed prod** sin secret) + rate-limit (per-IP 10/email 3 por día) + **presupuesto global diario** (circuit breaker → `cost_blocked` 503, el guard REAL de costo) + flag default OFF. Counters en `grader_intake_events` (append-only, `ip_hash`/`email_hash` HASHEADOS por privacidad; el crudo sólo en el lead con consent).
+- **Lead = entidad distinta del perfil** (`grader_leads`, no campos en `grader_profiles`): persona + email + consent + lifecycle propio → HubSpot (EPIC-020 D). 1:N. Consent append-only.
+- El command **NO lanza** para bloqueos esperados (disabled/invalid/captcha/rate/cost) — devuelve `PublicIntakeResult` que el endpoint mapea a status sanitizado (404/400/403/429/503); sólo lanza ante fallo inesperado (502). Doble-submit idempotente (mismo `idempotencyKey`) → no doble lead ni doble costo.
+- Rollout: **code-complete, operativamente bloqueado** hasta (1) sign-off legal del consent, (2) secret `TURNSTILE_SECRET`, (3) flag ON staging + smoke. Decisiones (arch-architect + seo-aeo): lead dedicado, Turnstile (privacidad + baja fricción), email-gated (intercambio de valor del lead magnet) con límites generosos para no matar conversión.
