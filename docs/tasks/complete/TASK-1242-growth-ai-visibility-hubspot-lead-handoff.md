@@ -10,7 +10,7 @@ TASK-1251 **preservó `grader_leads` como la fuente del lead** (sin cambio de fu
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -31,11 +31,18 @@ TASK-1251 **preservó `grader_leads` como la fuente del lead** (sin cambio de fu
 
 Convertir el lead capturado en el intake público (`grader_leads`, TASK-1240) en un **lead de ventas en HubSpot** (EPIC-020 D): `syncAiVisibilityRunToHubSpot` crea/actualiza el contact/company + props `ai_visibility_*` (score, `primary_gap`, `recommended_motion`) + lifecycle stage, vía el patrón **outbox + reactive consumer** (no POST inline en la route). Cierra el bow-tie: el grader (acquisition) entrega el lead a ventas (SQL).
 
-## Estado de ejecución — `code complete, rollout pendiente` (2026-06-25)
+## Estado de ejecución — `staging operativo + smoke E2E verificado` · prod gated EPIC-020 (2026-06-25)
 
-Los 3 slices están implementados, con typecheck + build + 509 tests focales (incluye 26 del handoff + grant coverage + reliability) en verde. **NO se mueve a `complete/`** (Runtime Rollout Completion Gate): el flag `GROWTH_AI_VISIBILITY_LEAD_HANDOFF_ENABLED` está OFF, las **HubSpot custom properties `ai_visibility_*` + grupo "AEO" no existen aún** (out-of-band, portal 48713323), y falta el **smoke real contra HubSpot staging**. Commits: Slice 1 (command/mapper/event), Slice 2 (consumer/CRM client/flag/signal), Slice 3 (capability/endpoint/reader), docs (catalog/ledger).
+Los 3 slices implementados + verificados (typecheck + build + 509 tests focales) **y rollout staging completo con smoke E2E real contra HubSpot**. El flag `GROWTH_AI_VISIBILITY_LEAD_HANDOFF_ENABLED` está **ON en staging** (Vercel + ops-worker). **Prod queda OFF, gated por el launch de EPIC-020** (release control plane develop→main + sign-off; prod no tiene leads del grader hasta que el intake público lance).
 
-**Pendiente de rollout:** (1) crear properties + grupo AEO en HubSpot; (2) `vercel env add GROWTH_AI_VISIBILITY_LEAD_HANDOFF_ENABLED true staging` + redeploy; (3) smoke staging (publicar snapshot de run real con lead → outbox → consumer upsert contact/company en HubSpot + `hubspot_synced_at` + signal `lead_handoff_uncovered` steady=0); (4) prod vía release control plane. **Sub-task aparte** (decisión operador): captura de `first_name`/`last_name` en el intake público + columnas en `grader_leads` (1242 ya mapea `firstname`/`lastname` cuando existan).
+**Smoke E2E PASÓ (2026-06-25):** run `EO-GRUN-00012` score `completed` (25.8) → publish snapshot → auto-trigger → reactive consumer (ops-worker) upsert **contact** `smoke-task1251@example.com` + **company** `example.com` con las 7 props `ai_visibility_*` (score/version/primary_gap/recommended_motion/report_url/last_run_at/competitors) + `hubspot_synced_at`. Registros de prueba borrados post-verificación (CRM limpio).
+
+**3 hallazgos de runtime del smoke (todos corregidos):**
+1. **Gate bug** — `executeLeadHandoff` exigía `gate.status === 'ready'`, más estricto que `publishGraderReportSnapshot` (que permite `partial`) → un score real publicado nunca llegaba. Fix: rechazar solo `insufficient_data`/`review_required` (commit `360fdd7ec`).
+2. **Flag dual-location** — el WRITE corre en el **ops-worker (Cloud Run)**, no en Vercel; el flag se necesita en AMBOS. Sin él en el worker, el consumer salta `reason=disabled`. Fix: flag en el ops-worker + declarativo en `deploy.sh` (commit `69a9e48d5`).
+3. **Worker con imagen vieja** — `gcloud run services update --update-env-vars` pineó la imagen pre-fix; requirió rebuild vía CI Ops Worker Deploy.
+
+**Pendiente (prod, gated EPIC-020):** flag ON en Vercel prod + ops-worker prod (deploy.sh prod-branch) vía release control plane + sign-off. **Sub-task aparte** (decisión operador): captura de `first_name`/`last_name` en el intake público + columnas en `grader_leads` (1242 ya mapea `firstname`/`lastname` cuando existan).
 
 ## Delta 2026-06-25 — frontera con el HubSpot destination adapter del Forms engine (TASK-1230)
 
