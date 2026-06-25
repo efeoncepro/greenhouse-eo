@@ -1,13 +1,24 @@
 # Operar el Motor de Formularios de Growth
 
 > **Tipo:** Manual de uso / runbook operativo
-> **Version:** 1.0 — 2026-06-25 (Claude, TASK-1229/1230)
+> **Version:** 1.1 — 2026-06-25 (Codex, TASK-1232)
 > **Doc funcional:** [docs/documentation/growth/motor-formularios-publicos.md](../../documentation/growth/motor-formularios-publicos.md)
 > **Estado de flags (SoT humano):** [docs/operations/FEATURE_FLAG_STATE_LEDGER.md](../../operations/FEATURE_FLAG_STATE_LEDGER.md)
 
 ## Para que sirve
 
-Operar (prender, verificar, revertir) el motor de formularios publicos de Growth y su entrega a HubSpot. Hoy el motor se opera por API gobernada (el cockpit visual llega con TASK-1232).
+Operar (prender, verificar, revertir) el motor de formularios publicos de Growth y su entrega a HubSpot. La operación humana diaria vive en **Growth → Forms** (`/admin/growth/forms`); las APIs siguen siendo el contrato gobernado para automatización, Nexa, MCP, scripts y verificación.
+
+## Usar el cockpit visual
+
+1. Entra al menú vertical **Growth → Forms**.
+2. Revisa el **Pulso operativo**: cobertura publicada, retry queue, dead letters y surfaces gobernadas.
+3. Selecciona un formulario en el command center. El inspector muestra readiness, host surfaces, destinos, submissions recientes y evidence ledger.
+4. Para authoring básico, usa **Nuevo formulario**. Crea un draft low-risk con email, organización, interés y consentimiento explícito.
+5. Usa las acciones gobernadas: **Enviar a review**, **Publicar**, **Deprecar**, **Archivar** y **Ejecutar dispatch**.
+6. Para auditoría, abre **Ver evidencia** y revisa consent snapshot, delivery attempts, retry state y errores.
+
+El cockpit consume los mismos Product APIs/readers del motor. No reemplaza smoke público: antes de producción hay que validar WordPress/dataLayer contra un form genérico renderizado por `<greenhouse-form>`.
 
 ## Los tres flags
 
@@ -21,7 +32,7 @@ El motor depende de tres flags independientes. Para que funcione punta a punta l
 
 **Verdad live:** `vercel env ls` (flag Vercel) + `gcloud run services describe ops-worker --region=us-east4` (flags worker). El ledger es el estado humano, no la verdad.
 
-**Estado actual:** staging (`develop`) = los 3 ON (2026-06-25). Produccion = OFF.
+**Estado actual:** staging (`develop`) = los 3 ON (2026-06-25). Produccion = OFF hasta release/sign-off + smoke WordPress/dataLayer.
 
 ## Prender en un environment
 
@@ -71,7 +82,7 @@ Señales reliability (en `/admin/operations`): `growth.forms.dead_letter_count`,
 
 ## Que NO hacer
 
-- No prender el publico en produccion sin un formulario real publicado (TASK-1232) + sign-off — el endpoint quedaria abierto sin contenido util.
+- No prender el publico en produccion sin form generico publicado, host surface autorizado, smoke WordPress/dataLayer y sign-off — el endpoint quedaria abierto sin evidencia real de operación.
 - No llamar a HubSpot inline desde el submit: la entrega SIEMPRE corre en el dispatcher async (overlay #3).
 - No reintentar manualmente una submission `delivered` (duplica el lead en HubSpot — secure-submit NO es idempotente).
 

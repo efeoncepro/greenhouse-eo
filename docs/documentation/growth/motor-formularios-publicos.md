@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-06-25 por Claude (TASK-1229)
-> **Ultima actualizacion:** 2026-06-25 por Claude (TASK-1231 — renderer portable + host surfaces)
+> **Ultima actualizacion:** 2026-06-25 por Codex (TASK-1232 — cockpit operativo Growth Forms)
 > **Documentacion tecnica:** [GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md)
 
 # Motor de Formularios Publicos de Growth
@@ -35,7 +35,7 @@ La idea clave: **cualquier** formulario que nazca del motor hereda robustez por 
 ## Estado de rollout
 
 - **Staging (`develop`): VIVO** desde 2026-06-25. Los tres flags estan ON: el API publico (`GROWTH_FORMS_PUBLIC_API_ENABLED`), el dispatcher de entrega (`GROWTH_FORMS_DISPATCH_ENABLED`) y el adapter HubSpot real (`GROWTH_FORMS_HUBSPOT_SECURE_SUBMIT_ENABLED`). Verificado: el endpoint publico responde el render contract y una submission real llego a un HubSpot test form (200).
-- **Produccion: APAGADO.** Se prende cuando exista un formulario real publicado (TASK-1232) + sign-off del operador. La verdad live de los flags es `vercel env ls` + el servicio Cloud Run `ops-worker`; el estado humano vive en `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`.
+- **Produccion: APAGADO.** Se prende con release/sign-off del operador despues de publicar un form generico con host surface autorizado y ejecutar smoke WordPress/dataLayer. La verdad live de los flags es `vercel env ls` + el servicio Cloud Run `ops-worker`; el estado humano vive en `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`.
 
 ## Como se muestra el formulario (renderer portable) — TASK-1231
 
@@ -48,14 +48,29 @@ El mismo formulario se ve igual en WordPress, en Astro y en la vista interna de 
 - **Donde se ve por dentro:** Greenhouse tiene una vista interna de referencia en **Design System → Growth Forms renderer** (solo equipo Efeonce) para previsualizar como se vera en los sitios publicos.
 - **Como se incrusta:** en WordPress hay un widget de Elementor ("Greenhouse Growth Form"); en Astro un componente; ambos solo piden el slug del formulario. Paso a paso en el [manual de incrustacion](../../manual-de-uso/growth/incrustar-formulario-wordpress-astro.md).
 
+## Cockpit operativo — TASK-1232
+
+Greenhouse ya tiene un cockpit interno para operar el motor sin SQL ni portal externo: **Growth → Forms** (`/admin/growth/forms`, viewCode `administracion.growth_forms`).
+
+El cockpit es un command center operativo, no un builder visual completo. Permite:
+
+- ver formularios, versiones, health, host surfaces, destinos, submissions recientes y evidence ledger;
+- crear un draft low-risk con plantilla gobernada;
+- enviar a review, publicar, deprecar, archivar y ejecutar dispatch;
+- inspeccionar consent snapshot, delivery attempts, retry queue y dead letters con degradacion honesta.
+
+La UI consume readers/APIs del motor (`src/lib/growth/forms/**`, `/api/admin/growth/forms/**`) y usa primitives canónicas de Greenhouse (`CompositionShell`, `AdaptiveSidecarLayout`, breadcrumbs, buttons, chips, motion y tokens tipográficos). La navegación top-level es **Growth → Forms**.
+
+Primer form real observado: **AI Visibility Grader** (`fdef-ai-visibility-grader`) convergido por TASK-1251 como anchor del motor. Ese form tiene pagina propia y no prueba por si solo el renderer generico WordPress; el smoke publico WordPress/dataLayer de un form renderizado queda como follow-up de rollout/sign-off.
+
 ## Que NO hace (todavia)
 
-- No tiene aun una pantalla visual para operarlo (eso llega con el cockpit, TASK-1232) — por ahora se opera por API.
 - En **produccion** sigue apagado hasta el primer formulario real (TASK-1232) + sign-off.
-- El renderer es **code-complete**; para verse en un sitio real necesita un formulario publicado con host surface autorizado (TASK-1232). No agrega flags nuevos (reusa `GROWTH_FORMS_PUBLIC_API_ENABLED`).
+- El cockpit no es un drag-and-drop builder; authoring avanzado queda para un follow-up si patrones repetidos lo justifican.
+- El renderer es **code-complete**; para verlo en un sitio real productivo se requiere publicar un form genérico con host surface autorizado y ejecutar smoke WordPress/dataLayer antes de producción. No agrega flags nuevos (reusa `GROWTH_FORMS_PUBLIC_API_ENABLED`).
 
 ## Detalle tecnico
 
 > Arquitectura: [GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md) (§Delta 2026-06-25 TASK-1229/1230/**1231** + §19 renderer + §22 HubSpot).
 > Codigo: `src/lib/growth/forms/**` (commands/readers/compiler/dispatch) + `src/lib/growth/forms/destinations/hubspot/**` (adapter), `src/lib/growth/public-submission/**` (port compartido captcha + abuse-guard), `src/app/api/public/growth/forms/**` + `src/app/api/admin/growth/forms/**`. Renderer portable: `src/growth-forms-renderer/**` (build `pnpm renderer:build` → `public/growth-forms/renderer-<channel>.js`). Host surfaces: `efeonce-public-site-runtime` (widget Elementor) + `efeonce-web` (`GrowthForm.astro`).
-> Operacion paso a paso: [docs/manual-de-uso/growth/operar-motor-formularios.md](../../manual-de-uso/growth/operar-motor-formularios.md). El cockpit visual llega con TASK-1232.
+> Operacion paso a paso: [docs/manual-de-uso/growth/operar-motor-formularios.md](../../manual-de-uso/growth/operar-motor-formularios.md).

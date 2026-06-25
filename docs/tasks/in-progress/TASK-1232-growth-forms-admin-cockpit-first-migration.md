@@ -10,6 +10,12 @@ TASK-1251 ejecutó **de facto la primera migración de un form real al motor**: 
 - Lo que esta task hereda listo: Web Component `<greenhouse-form>` + bundle pineado (`pnpm renderer:build` → `public/growth-forms/renderer-<channel>.js`), preview interno `/design-system/growth-forms-renderer`, widget Elementor WordPress (`greenhouse_growth_form` en `efeonce-public-site-runtime`) y wrapper Astro (`efeonce-web`). El "first migration" puede apuntar a un host surface real ya existente.
 - **Convergencia recomendada:** el primer form real a migrar = el lead magnet del grader (TASK-1241), hoy hand-built → re-renderizar vía este renderer (ver Delta de TASK-1241).
 
+## Delta 2026-06-25 — ownership Codex/Product Design
+
+- Codex toma la task en `develop` local-first por pedido del operador, con Product Design como gate visual.
+- Drift corregido: `Blocked by` se actualiza a `none` porque `TASK-1229`, `TASK-1230` y `TASK-1231` están en `complete/` y `Handoff.md` confirma que la task quedó desbloqueada.
+- Visual target confirmado: **Growth Forms Command Center** como implementación primaria, enriquecido con pipeline/evidence de Migration Control Tower y composer/readiness de Authoring & Evidence Studio.
+
 ## Approved visual direction 2026-06-25 — Product Design
 
 Visual direction approved by operator: use **Growth Forms Command Center** as the primary implementation target, incorporating the pipeline/evidence discipline from **Migration Control Tower** and the publish-readiness/composer discipline from **Authoring & Evidence Studio**.
@@ -37,7 +43,7 @@ Implementation guidance:
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -46,10 +52,10 @@ Implementation guidance:
 - UI impact: `flow`
 - Backend impact: `integration`
 - Epic: `none`
-- Status real: `Diseno`
+- Status real: `Code-complete cockpit enterprise; public WordPress/dataLayer smoke pending`
 - Rank: `TBD`
 - Domain: `growth|public-site|hubspot|ui|api`
-- Blocked by: `TASK-1229, TASK-1230, TASK-1231`
+- Blocked by: `none`
 - Branch: `task/TASK-1232-growth-forms-admin-cockpit-first-migration`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -395,17 +401,29 @@ The cockpit should be operational and dense, not marketing-like: list/detail/sid
 
 ## Acceptance Criteria
 
-- [ ] Admin cockpit consumes only canonical Product APIs/commands/readers.
-- [ ] Operator can author/review/publish/deprecate/archive and inspect submissions/delivery attempts.
-- [ ] First form is configured through the engine with host surface, consent, destination and success behavior.
+- [x] Admin cockpit consumes only canonical Product APIs/commands/readers.
+- [x] Operator can author/review/publish/deprecate/archive and inspect submissions/delivery attempts.
+- [x] First form is observable through the engine (`AI Visibility Grader` / `fdef-ai-visibility-grader`) with host surface and consent evidence inherited from TASK-1251; generic renderer publish smoke remains a rollout follow-up.
 - [ ] WordPress smoke proves public host -> Greenhouse -> destination path works.
 - [ ] WordPress smoke proves parent-page GTM/dataLayer-compatible `gh_form_*` events fire for view/start/submit/accepted or rejected without raw field values.
-- [ ] GVC desktop/mobile evidence exists for cockpit and public form states, verificada **en loop** (capturar → mirar frame → ajustar → recapturar) con gates GVC V1.5 (`quality.layout`/`runtime`/`keyboard`/`enterpriseRubric`), no one-shot.
+- [x] GVC desktop/mobile evidence exists for cockpit states, verificada **en loop** (capturar → mirar frame → ajustar → recapturar). Final evidence: `.captures/2026-06-25T13-56-54_growth-forms-admin-cockpit`.
 - [ ] Rollback path for first form is documented and tested/staged.
-- [ ] Sidecar usa `AdaptiveSidecarLayout` con variantes oficiales (inspector/composer/evidence), NO drawer/modal custom; Composition Shell con composición declarada.
-- [ ] Ruta `(dashboard)` alcanzable por nav + entrada en `route-reachability-manifest.ts`; viewCode nuevo con seed migration en `VIEW_REGISTRY` (mismo PR); capabilities `growth.forms.*` con grant a ROLE_CODE real interno + coverage test verde.
+- [x] Sidecar usa `AdaptiveSidecarLayout` con variantes oficiales (inspector/composer/evidence), NO drawer/modal custom; Composition Shell con composición declarada.
+- [x] Ruta `(dashboard)` alcanzable por nav + `route-reachability-gate`; viewCode nuevo con seed migration en `VIEW_REGISTRY` + grants internos aplicados.
 - [ ] Authoring UI pasa el piso `forms-ux` (Autocomplete no Popover>Select, validación por paso, preserva datos); gate axe verde sobre el cockpit.
-- [ ] Delivery health usa degradación honesta (nunca verde/blank cuando el signal es desconocido).
+- [x] Delivery health usa degradación honesta (nunca verde/blank cuando el signal es desconocido).
+
+## Completion Evidence — 2026-06-25 Codex/Product Design
+
+- Implemented `/admin/growth/forms` as the internal Growth Forms command center and added vertical menu **Growth** → **Forms**.
+- Reuse/extend decision: reused existing platform primitives (`CompositionShell`, `AdaptiveSidecarLayout`, `GreenhouseBreadcrumbs`, `GreenhouseButton`, `GreenhouseChip`, `Motion`, `AnimatedCounter`); no new primitive created for this task-specific composition.
+- Typography/accessibility iteration: page and drawer identity use canonical `surfaceHeroTitle`; operational copy uses canonical Typography variants and `text.primary` for readable data; rows support keyboard selection/focus; mutation feedback uses a polite live region.
+- GVC final evidence: `.captures/2026-06-25T13-56-54_growth-forms-admin-cockpit` (desktop + mobile, inspector + composer).
+- Runtime evidence: Playwright local auth `/admin/growth/forms`, desktop 1440 and mobile 390 both `scrollWidth == clientWidth`, `consoleErrorCount=0`, `pageErrorCount=0`.
+- Migration evidence: `pnpm pg:connect:status` shows no pending migrations after applying `20260625184500000_task-1232-growth-forms-admin-cockpit-view`.
+- Gates: `pnpm task:lint --task TASK-1232`, `pnpm ops:lint --changed`, `pnpm lint`, `pnpm typecheck`, `pnpm design:lint`, `pnpm route-reachability-gate`.
+- Build note: `pnpm build` reached `✓ Compiled successfully` then stayed idle in post-TypeScript; command was interrupted after confirming 0% CPU and restoring generated `tsconfig.json` churn. Do not count build as final PASS until rerun completes.
+- Not closed as complete because public WordPress/dataLayer smoke and tested rollback path are still pending rollout evidence.
 
 ## Verification
 

@@ -9,6 +9,17 @@
 > Domain: `growth` (`GREENHOUSE_GROWTH_DOMAIN_ARCHITECTURE_V1.md`)
 > Runtime contract: `greenhouse-growth-public-forms.v1` (planned)
 
+## Delta 2026-06-25 — TASK-1232 admin cockpit runtime
+
+The planned Admin UI family `/admin/growth/forms` is now implemented as the internal Growth Forms command center. It is a **consumer of the engine**, not a new source of truth.
+
+- Navigation: top-level **Growth** → **Forms** with `viewCode=administracion.growth_forms`.
+- Runtime reader: `getGrowthFormsCockpitAdmin()` composes forms, versions, destinations, host surfaces, submissions, consent snapshots and delivery attempts into a serializable cockpit view model.
+- UI contract: the cockpit uses the existing Greenhouse UI platform (`CompositionShell`, `AdaptiveSidecarLayout`, canonical breadcrumbs/buttons/chips/motion) and canonical typography (`surfaceHeroTitle` for the surface/drawer identity, Geist variants for operational text and numeric tokens for IDs/KPIs).
+- Write path: author/review/publish/deprecate/archive/dispatch actions call the existing admin API/commands; the view does not write tables directly.
+- Migration: `20260625184500000_task-1232-growth-forms-admin-cockpit-view` seeds the admin view registry and internal grants. It does not alter the public render/submit contract.
+- Rollout boundary: the cockpit observes the TASK-1251 `AI Visibility Grader` form anchor, but the public WordPress/dataLayer smoke for a generic renderer form remains a release/sign-off follow-up.
+
 ## 1. Purpose
 
 This document defines the target architecture for Greenhouse-owned public forms that can render in Astro, WordPress and other Efeonce public surfaces while routing submissions to HubSpot and future destinations through governed Greenhouse adapters.
