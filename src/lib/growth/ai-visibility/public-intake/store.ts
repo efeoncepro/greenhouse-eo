@@ -25,14 +25,16 @@ export interface InsertGraderLeadInput {
   runId: string | null
   profileId: string | null
   ipHash: string | null
+  /** TASK-1251 — binding al submission del motor (path convergente). Null en el path a-medida. */
+  submissionId?: string | null
 }
 
 export const insertGraderLead = async (input: InsertGraderLeadInput): Promise<string> => {
   const rows = await runGreenhousePostgresQuery<{ lead_id: string }>(
     `INSERT INTO greenhouse_growth.grader_leads
        (email, consent, brand_name, website_url, market, category, industry, persona,
-        company_size, main_challenge, competitors_declared, run_id, profile_id, ip_hash)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+        company_size, main_challenge, competitors_declared, run_id, profile_id, ip_hash, submission_id)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
      RETURNING lead_id`,
     [
       input.email,
@@ -48,9 +50,20 @@ export const insertGraderLead = async (input: InsertGraderLeadInput): Promise<st
       input.competitorsDeclared,
       input.runId,
       input.profileId,
-      input.ipHash
+      input.ipHash,
+      input.submissionId ?? null
     ]
   )
 
   return String(rows[0].lead_id)
+}
+
+/** TASK-1251 — ¿ya existe un lead materializado para este submission? (idempotencia del reactive consumer). */
+export const findGraderLeadBySubmissionId = async (submissionId: string): Promise<string | null> => {
+  const rows = await runGreenhousePostgresQuery<{ lead_id: string }>(
+    `SELECT lead_id FROM greenhouse_growth.grader_leads WHERE submission_id = $1 LIMIT 1`,
+    [submissionId]
+  )
+
+  return rows[0]?.lead_id ?? null
 }

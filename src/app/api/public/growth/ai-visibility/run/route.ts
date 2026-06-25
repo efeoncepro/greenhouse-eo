@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server'
 
 import { createPublicGraderRun } from '@/lib/growth/ai-visibility/public-intake'
 import { type PublicGraderRunInput, type PublicIntakeOutcome } from '@/lib/growth/ai-visibility/public-intake/contracts'
+import { createPublicGraderRunViaFormsEngine } from '@/lib/growth/ai-visibility/public-intake/forms-engine-binding'
+import { isGraderIntakeOnFormsEngineEnabled } from '@/lib/growth/ai-visibility/flags'
 import { captureWithDomain } from '@/lib/observability/capture'
 
 /**
@@ -74,14 +76,27 @@ export async function POST(request: Request) {
   }
 
   try {
-    const result = await createPublicGraderRun(input, {
+    // TASK-1251 — convergencia detrás de flag: con ON, `POST /run` actúa como fachada
+    // que persiste un submission del motor (el run lo encola un reactive consumer);
+    // con OFF (default), usa el path a-medida que encola inline. Contrato HTTP estable.
+    const intakeContext = {
       ip: getClientIp(request),
       captchaToken: asString(body.captchaToken),
       idempotencyKey: asString(body.idempotencyKey)
-    })
+    }
+
+    const result = isGraderIntakeOnFormsEngineEnabled()
+      ? await createPublicGraderRunViaFormsEngine(input, intakeContext)
+      : await createPublicGraderRun(input, intakeContext)
 
     return NextResponse.json(
-      { outcome: result.outcome, runPublicId: result.runPublicId, message: result.reason },
+      {
+        outcome: result.outcome,
+        // Handle de poll: `runPublicId` (path a-medida) o `submissionId` (path convergente).
+        runPublicId: result.runPublicId,
+        submissionId: result.submissionId ?? null,
+        message: result.reason
+      },
       { status: STATUS_BY_OUTCOME[result.outcome] }
     )
   } catch (error) {

@@ -38,8 +38,33 @@ export type PublicIntakeOutcome = (typeof PUBLIC_INTAKE_OUTCOMES)[number]
 
 export interface PublicIntakeResult {
   outcome: PublicIntakeOutcome
-  /** `public_id` del run encolado (sólo `accepted`) para que la página haga poll. */
+  /**
+   * `public_id` del run encolado (sólo `accepted`) para que la página haga poll.
+   * Path a-medida (TASK-1240): el run se encola inline → este campo se setea.
+   */
   runPublicId: string | null
+  /**
+   * TASK-1251 — Path convergente (motor): el run lo encola un reactive consumer
+   * (no inline), así que el handle de poll es el `submission_id` del motor. La
+   * página/poll (TASK-1245) resuelve submission → run → reportToken. En el path
+   * a-medida queda `null`.
+   */
+  submissionId?: string | null
   /** Mensaje es-CL sanitizado para el cliente. */
   reason: string
 }
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+/**
+ * Validación PURA del input público (consent + email + campos requeridos). Único
+ * source of truth de validación — la consumen el path a-medida (`createPublicGraderRun`)
+ * y la fachada del motor (TASK-1251), para que ambos acepten/rechacen idéntico.
+ */
+export const isValidPublicGraderInput = (input: PublicGraderRunInput): boolean =>
+  input.consent === true &&
+  typeof input.email === 'string' &&
+  EMAIL_RE.test(input.email.trim()) &&
+  [input.brandName, input.market, input.locale, input.category].every(
+    value => typeof value === 'string' && value.trim().length > 0
+  )

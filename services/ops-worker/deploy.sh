@@ -720,6 +720,17 @@ upsert_scheduler_job \
   '{"domain":"cost_intelligence","batchSize":500}'
 echo "  -> ops-reactive-cost-intelligence: */10 * * * * (cost_intelligence domain)"
 
+# TASK-1251 — Growth domain lane. Drena `growth.forms.submission_accepted` (grader-form)
+# → enqueue grader run + materialize lead (proyección growth_grader_run_from_submission).
+# Sin este job, los submissions del grader convergente NO encolarían run (rollout dep del
+# flag GROWTH_GRADER_INTAKE_ON_FORMS_ENGINE_ENABLED; default OFF = sin tráfico hasta el flip).
+upsert_scheduler_job \
+  "ops-reactive-growth" \
+  "*/5 * * * *" \
+  "/reactive/process-domain" \
+  '{"domain":"growth","batchSize":500}'
+echo "  -> ops-reactive-growth: */5 * * * * (growth domain, TASK-1251)"
+
 # ─── Outbox publisher (TASK-773) ─────────────────────────────────────────────
 # Migración desde Vercel cron /api/cron/outbox-publish (que solo corre en
 # producción) a Cloud Scheduler (que corre por proyecto GCP, igual en staging

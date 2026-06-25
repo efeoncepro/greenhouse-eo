@@ -27,18 +27,13 @@ import {
   resolveIntakeLimits
 } from './abuse-guard'
 import { turnstileCaptchaVerifier, type CaptchaVerifier } from './captcha'
-import { type PublicGraderRunInput, type PublicIntakeOutcome, type PublicIntakeResult } from './contracts'
+import {
+  isValidPublicGraderInput,
+  type PublicGraderRunInput,
+  type PublicIntakeOutcome,
+  type PublicIntakeResult,
+} from './contracts'
 import { insertGraderLead } from './store'
-
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-
-const isValidInput = (input: PublicGraderRunInput): boolean =>
-  input.consent === true &&
-  typeof input.email === 'string' &&
-  EMAIL_RE.test(input.email.trim()) &&
-  [input.brandName, input.market, input.locale, input.category].every(
-    value => typeof value === 'string' && value.trim().length > 0
-  )
 
 const reasonFor = (outcome: PublicIntakeOutcome): string =>
   GH_GROWTH_AI_VISIBILITY.public_intake[outcome as keyof typeof GH_GROWTH_AI_VISIBILITY.public_intake]
@@ -65,7 +60,7 @@ export const createPublicGraderRun = async (
     return result('disabled', null)
   }
 
-  if (!isValidInput(input)) {
+  if (!isValidPublicGraderInput(input)) {
     return result('invalid', null)
   }
 
