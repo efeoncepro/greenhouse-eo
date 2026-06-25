@@ -60,6 +60,8 @@ const baseInput: PublicGraderRunInput = {
   category: 'agencia de marketing',
   competitorsDeclared: ['Acme'],
   email: 'prospecto@empresa.com',
+  firstName: 'Ana',
+  lastName: 'Pérez',
   consent: true,
   industry: null,
   persona: null,
@@ -133,8 +135,10 @@ describe('TASK-1251 — createPublicGraderRunViaFormsEngine (fachada del motor)'
 
     expect(persistArg.formId).toBe('fdef-ai-visibility-grader')
     expect(persistArg.formVersionId).toBe('fver-ai-visibility-grader-v1')
-    // El email vive en el normalized_fields del submission (payload entregable en PG con consent).
+    // El email + nombre/apellido viven en el normalized_fields del submission (PII entregable en PG con consent).
     expect((persistArg.normalizedFields as Record<string, unknown>).email).toBe('prospecto@empresa.com')
+    expect((persistArg.normalizedFields as Record<string, unknown>).firstName).toBe('Ana')
+    expect((persistArg.normalizedFields as Record<string, unknown>).lastName).toBe('Pérez')
     expect((persistArg.consent as Record<string, unknown>).consentPolicyVersion).toBe('ai-visibility-grader-consent-v1')
     expect(spies.recordEvent).toHaveBeenCalledWith(expect.objectContaining({ outcome: 'accepted' }))
   })

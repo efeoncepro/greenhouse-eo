@@ -61,6 +61,8 @@ const baseInput: PublicGraderRunInput = {
   category: 'agencia de marketing',
   competitorsDeclared: ['Acme'],
   email: 'prospecto@empresa.com',
+  firstName: 'Ana',
+  lastName: 'Pérez',
   consent: true,
   industry: null,
   persona: null,
@@ -125,11 +127,16 @@ describe('growth/ai-visibility — public run intake (TASK-1240)', () => {
     const enqueueArg = spies.enqueue.mock.calls[0][0] as Record<string, unknown>
 
     expect(JSON.stringify(enqueueArg)).not.toContain('prospecto@empresa.com')
+    // TASK-1257 — nombre/apellido (PII) NUNCA al enqueue del run.
+    expect(JSON.stringify(enqueueArg)).not.toContain('Ana')
+    expect(JSON.stringify(enqueueArg)).not.toContain('Pérez')
     expect(enqueueArg.runKind).toBe('public_diagnostic')
     expect(enqueueArg.mode).toBe('light')
 
-    // El email SÍ va al lead (con consent).
-    expect(spies.insertLead).toHaveBeenCalledWith(expect.objectContaining({ email: 'prospecto@empresa.com', consent: true, runId: 'grun-1' }))
+    // El email + nombre/apellido SÍ van al lead (con consent).
+    expect(spies.insertLead).toHaveBeenCalledWith(
+      expect.objectContaining({ email: 'prospecto@empresa.com', firstName: 'Ana', lastName: 'Pérez', consent: true, runId: 'grun-1' })
+    )
     expect(spies.recordEvent).toHaveBeenCalledWith(expect.objectContaining({ outcome: 'accepted', runId: 'grun-1' }))
   })
 

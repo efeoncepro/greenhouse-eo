@@ -109,10 +109,13 @@ export const growthGraderRunFromSubmissionProjection: ProjectionDefinition = {
       idempotencyKey: submissionId,
     })
 
-    // Materializar el lead linkeado al submission (email + consent viven en PG).
+    // Materializar el lead linkeado al submission (email + nombre/apellido + consent viven en PG).
+    // TASK-1257 — nombre/apellido salen del submission (PII), NUNCA del enqueue del run.
     await insertGraderLead({
       email,
       consent: true,
+      firstName: asString(fields.firstName),
+      lastName: asString(fields.lastName),
       brandName,
       websiteUrl,
       market,

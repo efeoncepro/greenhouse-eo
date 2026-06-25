@@ -54,6 +54,8 @@ const graderSubmission = () => ({
     category: 'agencia',
     competitorsDeclared: ['Acme'],
     email: 'prospecto@empresa.com',
+    firstName: 'Ana',
+    lastName: 'Pérez',
     industry: 'marketing',
     persona: null,
     companySize: null,
@@ -86,12 +88,23 @@ describe('TASK-1251 — growthGraderRunFromSubmissionProjection', () => {
     const enqueueArg = spies.enqueue.mock.calls[0][0] as Record<string, unknown>
 
     expect(JSON.stringify(enqueueArg)).not.toContain('prospecto@empresa.com') // PII nunca al provider
+    // TASK-1257 — nombre/apellido (PII) tampoco al enqueue del run.
+    expect(JSON.stringify(enqueueArg)).not.toContain('Ana')
+    expect(JSON.stringify(enqueueArg)).not.toContain('Pérez')
     expect(enqueueArg.runKind).toBe('public_diagnostic')
     expect(enqueueArg.mode).toBe('light')
     expect(enqueueArg.idempotencyKey).toBe('fsub-1')
 
     expect(spies.insertLead).toHaveBeenCalledWith(
-      expect.objectContaining({ email: 'prospecto@empresa.com', consent: true, runId: 'grun-1', submissionId: 'fsub-1', ipHash: 'iphash-1' }),
+      expect.objectContaining({
+        email: 'prospecto@empresa.com',
+        firstName: 'Ana',
+        lastName: 'Pérez',
+        consent: true,
+        runId: 'grun-1',
+        submissionId: 'fsub-1',
+        ipHash: 'iphash-1',
+      }),
     )
     expect(msg).toContain('EO-GRUN-1')
   })

@@ -40,6 +40,8 @@ interface IntakeBody {
   category?: unknown
   competitorsDeclared?: unknown
   email?: unknown
+  firstName?: unknown
+  lastName?: unknown
   consent?: unknown
   industry?: unknown
   persona?: unknown
@@ -68,6 +70,9 @@ export async function POST(request: Request) {
       ? body.competitorsDeclared.filter((value): value is string => typeof value === 'string')
       : [],
     email: asString(body.email) ?? '',
+    // TASK-1257 — nombre/apellido (PII). Tolerante (nullable): el form los pide, el command no los exige.
+    firstName: asString(body.firstName),
+    lastName: asString(body.lastName),
     consent: body.consent === true,
     industry: asString(body.industry),
     persona: asString(body.persona),

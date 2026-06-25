@@ -73,6 +73,10 @@ const toNormalizedFields = (input: PublicGraderRunInput): Record<string, unknown
   category: input.category.trim(),
   competitorsDeclared: input.competitorsDeclared,
   email: input.email.trim(),
+  // TASK-1257 — nombre/apellido (PII) viajan al submission junto al email; el reactive consumer
+  // los pasa al lead, NUNCA al enqueue del run (que sólo recibe marca/categoría/mercado).
+  firstName: input.firstName,
+  lastName: input.lastName,
   industry: input.industry,
   persona: input.persona,
   companySize: input.companySize,

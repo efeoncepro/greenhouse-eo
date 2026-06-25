@@ -12,6 +12,8 @@ const lead = (overrides: Partial<GraderLeadForHandoff> = {}): GraderLeadForHando
   leadId: 'glead-1',
   email: 'ana@acme.com',
   consent: true,
+  firstName: 'Ana',
+  lastName: 'Pérez',
   brandName: 'Acme',
   websiteUrl: null,
   consentAt: '2026-06-25T10:00:00.000Z',

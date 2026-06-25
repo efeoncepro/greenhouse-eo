@@ -72,9 +72,10 @@ export const executeLeadHandoff = async (runId: string): Promise<LeadHandoffExec
 
   const facts: LeadHandoffFacts = {
     email: lead.email,
-    // Nombre/apellido aún no se capturan en el intake (sub-task aparte) → null por ahora.
-    firstName: null,
-    lastName: null,
+    // TASK-1257 — nombre/apellido reales del lead (null en leads legacy sin captura). El mapper
+    // los manda a `firstname`/`lastname` nativos de HubSpot cuando no son null.
+    firstName: lead.firstName,
+    lastName: lead.lastName,
     brandName: lead.brandName,
     lastSubmitAt: lead.consentAt,
     reportUrl: reportToken ? buildPublicReportUrl(reportToken) : null,

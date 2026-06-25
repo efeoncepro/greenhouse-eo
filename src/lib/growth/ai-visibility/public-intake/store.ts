@@ -13,6 +13,9 @@ import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 export interface InsertGraderLeadInput {
   email: string
   consent: boolean
+  /** TASK-1257 — nombre/apellido del lead (PII con consent). Nullable: leads legacy/a-medida sin nombre. */
+  firstName: string | null
+  lastName: string | null
   brandName: string
   websiteUrl: string | null
   market: string
@@ -32,13 +35,15 @@ export interface InsertGraderLeadInput {
 export const insertGraderLead = async (input: InsertGraderLeadInput): Promise<string> => {
   const rows = await runGreenhousePostgresQuery<{ lead_id: string }>(
     `INSERT INTO greenhouse_growth.grader_leads
-       (email, consent, brand_name, website_url, market, category, industry, persona,
+       (email, consent, first_name, last_name, brand_name, website_url, market, category, industry, persona,
         company_size, main_challenge, competitors_declared, run_id, profile_id, ip_hash, submission_id)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
      RETURNING lead_id`,
     [
       input.email,
       input.consent,
+      input.firstName,
+      input.lastName,
       input.brandName,
       input.websiteUrl,
       input.market,
@@ -73,6 +78,9 @@ export interface GraderLeadForHandoff {
   leadId: string
   email: string
   consent: boolean
+  /** TASK-1257 — nombre/apellido reales del lead (null en leads legacy sin captura). */
+  firstName: string | null
+  lastName: string | null
   brandName: string
   websiteUrl: string | null
   /** ISO — actividad del lead (consent_at). */
@@ -82,21 +90,24 @@ export interface GraderLeadForHandoff {
 }
 
 /**
- * TASK-1242 — Lee el lead asociado a un run para el handoff a HubSpot. El email/nombre no
- * existen desglosados aún (sub-task aparte); por ahora `first_name`/`last_name` se mapean
- * vacíos. Toma el lead más reciente del run si hubiera más de uno.
+ * TASK-1242 — Lee el lead asociado a un run para el handoff a HubSpot. TASK-1257 desglosó
+ * `first_name`/`last_name`: ya se devuelven reales (null en leads legacy sin captura). El mapper
+ * del handoff los manda a `firstname`/`lastname` nativos cuando no son null. Toma el lead más
+ * reciente del run si hubiera más de uno.
  */
 export const getGraderLeadForHandoff = async (runId: string): Promise<GraderLeadForHandoff | null> => {
   const rows = await runGreenhousePostgresQuery<{
     lead_id: string
     email: string
     consent: boolean
+    first_name: string | null
+    last_name: string | null
     brand_name: string
     website_url: string | null
     consent_at: string
     hubspot_synced_at: string | null
   }>(
-    `SELECT lead_id, email, consent, brand_name, website_url, consent_at, hubspot_synced_at
+    `SELECT lead_id, email, consent, first_name, last_name, brand_name, website_url, consent_at, hubspot_synced_at
        FROM greenhouse_growth.grader_leads
       WHERE run_id = $1
       ORDER BY created_at DESC
@@ -112,6 +123,8 @@ export const getGraderLeadForHandoff = async (runId: string): Promise<GraderLead
     leadId: String(row.lead_id),
     email: row.email,
     consent: row.consent,
+    firstName: row.first_name,
+    lastName: row.last_name,
     brandName: row.brand_name,
     websiteUrl: row.website_url,
     consentAt: new Date(row.consent_at).toISOString(),

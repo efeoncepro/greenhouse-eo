@@ -6572,9 +6572,11 @@ export interface GreenhouseGrowthGraderLeads {
   consent_at: Generated<Timestamp>;
   created_at: Generated<Timestamp>;
   email: string;
+  first_name: string | null;
   hubspot_synced_at: Timestamp | null;
   industry: string | null;
   ip_hash: string | null;
+  last_name: string | null;
   lead_id: Generated<string>;
   main_challenge: string | null;
   market: string;

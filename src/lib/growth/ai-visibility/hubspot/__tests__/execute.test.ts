@@ -28,6 +28,8 @@ const lead = (overrides: Partial<GraderLeadForHandoff> = {}): GraderLeadForHando
   leadId: 'glead-1',
   email: 'ana@acme.com',
   consent: true,
+  firstName: 'Ana',
+  lastName: 'Pérez',
   brandName: 'Acme',
   websiteUrl: null,
   consentAt: '2026-06-25T10:00:00.000Z',
@@ -103,6 +105,11 @@ describe('executeLeadHandoff', () => {
 
     expect(result).toMatchObject({ status: 'succeeded', contactId: 'c1', companyId: 'co1' })
     expect(markGraderLeadHubspotSynced).toHaveBeenCalledWith('glead-1')
+    // TASK-1257 — el nombre/apellido reales del lead llegan al payload del handoff (firstname/lastname nativos).
+    const payload = vi.mocked(upsertLeadToHubSpot).mock.calls[0][0]
+
+    expect(payload.contact.firstName).toBe('Ana')
+    expect(payload.contact.lastName).toBe('Pérez')
   })
 
   it('fallo retryable del upsert ⇒ failed retryable, NO marca synced', async () => {

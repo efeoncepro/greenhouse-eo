@@ -14,6 +14,11 @@ export interface PublicGraderRunInput {
   category: string
   competitorsDeclared: string[]
   email: string
+  // Nombre/apellido del lead (TASK-1257). PII como el email: viven en el lead/submission
+  // con consent, NUNCA viajan a los providers. Nullable: el form los pide (required), pero el
+  // command es tolerante (leads legacy/a-medida sin nombre siguen válidos; el handoff mapea vacío).
+  firstName: string | null
+  lastName: string | null
   consent: boolean
   // Firmographics opcionales (§9.2) — enriquecen el lead, no el prompt.
   industry: string | null

@@ -117,6 +117,9 @@ export const createPublicGraderRun = async (
     await insertGraderLead({
       email: input.email.trim(),
       consent: true,
+      // TASK-1257 — nombre/apellido (PII) al lead; NUNCA a `enqueueGraderDiagnostic`.
+      firstName: input.firstName,
+      lastName: input.lastName,
       brandName: input.brandName,
       websiteUrl: input.websiteUrl,
       market: input.market,
