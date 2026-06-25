@@ -6582,6 +6582,7 @@ export interface GreenhouseGrowthGraderLeads {
   profile_id: string | null;
   run_id: string | null;
   source: Generated<string>;
+  submission_id: string | null;
   website_url: string | null;
 }
 

@@ -61,3 +61,18 @@ export const GROWTH_AI_VISIBILITY_PUBLIC_INTAKE_FLAG = 'GROWTH_AI_VISIBILITY_PUB
 
 export const isPublicIntakeEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
   isGraderEnabled(env) && isTrue(env[GROWTH_AI_VISIBILITY_PUBLIC_INTAKE_FLAG])
+
+/**
+ * TASK-1251 — Convergencia del intake del grader sobre el motor Growth Forms.
+ * Default OFF: `POST /run` usa el path a-medida actual (`createPublicGraderRun` inline).
+ * Con ON: `POST /run` actúa como fachada que persiste un SUBMISSION del motor
+ * (`form_submission` + consent_snapshot + outbox `growth.forms.submission_accepted`);
+ * un reactive consumer scoped al grader-form encola el run + persiste el lead (no inline).
+ * Como el intake público NO ha lanzado (sin tráfico vivo), el cutover es converge-before-launch:
+ * prender este flag junto a `GROWTH_AI_VISIBILITY_PUBLIC_INTAKE_ENABLED` cuando se lance.
+ * Registrar en docs/operations/FEATURE_FLAG_STATE_LEDGER.md (gate docs:closure-check).
+ */
+export const GROWTH_GRADER_INTAKE_ON_FORMS_ENGINE_FLAG = 'GROWTH_GRADER_INTAKE_ON_FORMS_ENGINE_ENABLED'
+
+export const isGraderIntakeOnFormsEngineEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+  isTrue(env[GROWTH_GRADER_INTAKE_ON_FORMS_ENGINE_FLAG])
