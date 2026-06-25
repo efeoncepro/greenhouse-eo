@@ -134,7 +134,7 @@ describe('TASK-1251 — createPublicGraderRunViaFormsEngine (fachada del motor)'
     const persistArg = spies.persist.mock.calls[0][0] as Record<string, unknown>
 
     expect(persistArg.formId).toBe('fdef-ai-visibility-grader')
-    expect(persistArg.formVersionId).toBe('fver-ai-visibility-grader-v1')
+    expect(persistArg.formVersionId).toBe('fver-ai-visibility-grader-v2')
     // El email + nombre/apellido viven en el normalized_fields del submission (PII entregable en PG con consent).
     expect((persistArg.normalizedFields as Record<string, unknown>).email).toBe('prospecto@empresa.com')
     expect((persistArg.normalizedFields as Record<string, unknown>).firstName).toBe('Ana')

@@ -44,7 +44,8 @@ import { type PublicIntakeContext } from './create-public-run'
 
 // IDs pineados por la migración task-1251 (seed del grader como form gobernado).
 export const GRADER_FORM_ID = 'fdef-ai-visibility-grader'
-export const GRADER_FORM_VERSION_ID = 'fver-ai-visibility-grader-v1'
+// TASK-1257 — v2: agrega firstName/lastName al field_schema. La v1 quedó deprecada (migración Slice 2).
+export const GRADER_FORM_VERSION_ID = 'fver-ai-visibility-grader-v2'
 export const GRADER_SURFACE_ID = 'fhsf-ai-visibility-grader'
 export const GRADER_CONSENT_POLICY_VERSION = 'ai-visibility-grader-consent-v1'
 
