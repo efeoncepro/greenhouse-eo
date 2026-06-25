@@ -1,5 +1,12 @@
 # TASK-1241 — Growth AI Visibility: Public Lead Magnet Page
 
+## Delta 2026-06-25 — Cloudflare Turnstile keys provisionadas
+
+- **Site key (PÚBLICA, va en el widget client-side de esta página):** `0x4AAAAAADqwX2R7v-k9pItv` (Cloudflare account `eb167eac6a06fa19932249325898a096`). Es pública por diseño (aparece en el HTML); úsala en el `data-sitekey` del widget Turnstile.
+- **Secret key:** guardada en **GCP Secret Manager** `efeonce-group` como `greenhouse-turnstile-secret` (NO se commitea el valor). La consume TASK-1240 server-side.
+- **Pendiente de rollout (TASK-1240):** el código de captcha lee `process.env.TURNSTILE_SECRET`. Al hacer el rollout staging, o bien (a) `vercel env add TURNSTILE_SECRET` con el valor del secret, o bien (b) wire de `TURNSTILE_SECRET_REF` al resolver canónico de secrets (+ grant `secretAccessor` a `greenhouse-portal@`). Decidir en el rollout.
+- **Rotación:** ambas llaves se mostraron en chat → rotar cuando el operador lo indique (Turnstile permite re-ver/rotar; al rotar, agregar nueva versión a `greenhouse-turnstile-secret` + actualizar la Site key acá).
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
