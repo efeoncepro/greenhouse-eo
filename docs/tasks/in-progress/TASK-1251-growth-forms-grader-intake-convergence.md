@@ -52,7 +52,7 @@ Para lanzar EPIC-020 rápido, TASK-1240 shippeó un intake público **a-medida**
 
 **🟢 Rollout STAGING aplicado + verificado E2E (2026-06-25, pedido CEO):** push develop → deploy staging + ops-worker (cron `ops-reactive-growth` creado/ENABLED) → flags staging ON (`GROWTH_GRADER_INTAKE_ON_FORMS_ENGINE_ENABLED` + `GROWTH_AI_VISIBILITY_PUBLIC_INTAKE_ENABLED` + `TURNSTILE_SECRET`=test secret Cloudflare always-pass) → **smoke E2E verde:** `POST /run` → 202 `submissionId=fsub-9623896c…` → submission `delivered` + consent + outbox `published` → reactive consumer materializó **lead `glead-2d1e97f9`** + **run `EO-GRUN-00012`** linkeados (email en PG con consent, nunca al provider).
 
-**Pendiente PROD (bloqueado, NO ejecutable por el agente):** (1) texto del aviso de consentimiento + URL política de privacidad cableados en la página del lead magnet (TASK-1241; el sitio ya tiene política), (2) `TURNSTILE_SECRET` real, (3) release control plane develop→main (aplica la migración a prod + flips). **Slice 4 (retiro del stack a-medida) diferido por la regla dura** (≥7d post-flip prod estable, NUNCA mismo PR).
+**Pendiente PROD (bloqueado, NO ejecutable por el agente):** (1) texto del aviso de consentimiento + URL política de privacidad cableados en la página del lead magnet (TASK-1241; el sitio ya tiene política), (2) `TURNSTILE_SECRET` real, (3) release control plane develop→main (aplica la migración a prod + flips). **Slice 4 (retiro del stack a-medida):** ejecutable **tras el flip prod verificado estable** — **sin espera fija de 7d (waiver CEO 2026-06-25)**; única regla que se mantiene: NUNCA en el mismo PR del cutover (reversibilidad).
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 1 — CONTEXT & CONSTRAINTS
@@ -245,7 +245,7 @@ La convergencia tiene dos pilares independientes en riesgo: (1) **extracción de
 
 - Slice 1 (extracción compartida, sin cambio de comportamiento) → estabiliza → Slice 2 (binding submission→run) → Slice 3 (migración + cutover detrás de flag, shadow antes del flip) → Slice 4 (signals + retiro).
 - Slice 3 NUNCA flipea el flag a `true` en prod antes de: shadow verde + conteos de leads pre/post iguales + smoke público del `POST /run` sin regresión + confirmación de que TASK-1242/1250 siguen recibiendo el lead.
-- El retiro del stack a-medida (Slice 4) MUST correr DESPUÉS de ≥7d de flip estable, NUNCA en el mismo PR del cutover.
+- El retiro del stack a-medida (Slice 4) MUST correr DESPUÉS del flip prod verificado estable — **sin espera fija de 7d (waiver CEO 2026-06-25)** — y NUNCA en el mismo PR del cutover.
 
 ### Risk matrix
 
@@ -281,7 +281,7 @@ La convergencia tiene dos pilares independientes en riesgo: (1) **extracción de
 3. Correr el path nuevo en shadow + comparar resultado contra el a-medida (mismo lead, mismo run, mismo reportToken contract).
 4. Flip flag `true` en staging + smoke público real (form → run → reportToken) + verify lead en HubSpot + email + conteos pre/post iguales.
 5. Repetir 2-4 en producción con cooldown 24h.
-6. Monitor signals 7d post-flip; recién entonces ejecutar Slice 4 (retiro).
+6. Monitor signals post-flip hasta confirmar estable; recién entonces ejecutar Slice 4 (retiro). Sin espera fija de 7d (waiver CEO 2026-06-25); única regla: no retirar en el mismo PR del cutover.
 
 ### Out-of-band coordination required
 

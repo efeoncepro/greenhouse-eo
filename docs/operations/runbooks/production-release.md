@@ -207,6 +207,7 @@ Reason: el concurrency fix Opcion A (TASK-848 Slice 3) cancela pending nuevos cu
 | 3 | Sentry sin nuevos errors | Sentry UI filter `release:<sha>` últimos 30min |
 | 4 | Smoke flows críticos | Browser real: login, `/finance/cash-out`, `/agency/operations`, `/admin/operations` |
 | 5 | Reliability signals OK | `/admin/operations` subsystem `Platform Release` debe estar OK |
+| 6 | **Flags pendientes de prender** | Revisar `docs/operations/FEATURE_FLAG_STATE_LEDGER.md` → **§ Pendientes de acción**: ¿hay flags `*_ENABLED` code-complete cuyo flip estaba gated a este release? Si sí, `vercel env add <FLAG>=true Production` (+ ops-worker si aplica) + redeploy + smoke del flujo + actualizar la fila del ledger. **El deploy del código NO prende los flags** (default OFF); olvidarlo deja la feature invisible en prod (deuda cognitiva). |
 
 ### 4.1. HubSpot drift recovery
 
@@ -496,6 +497,7 @@ Regla: `unmatched` debe investigarse, pero no muta releases. `failed` sí es inc
 - **NUNCA** rollback manual de Azure Bicep sin `what-if` previo.
 - **SIEMPRE** anotar rollback en `Handoff.md` con razón + post-mortem trigger.
 - **SIEMPRE** verificar reliability signals OK antes Y después de release.
+- **SIEMPRE** revisar `docs/operations/FEATURE_FLAG_STATE_LEDGER.md` (**§ Pendientes de acción**) al planear y al cerrar un paso a producción: hay features `code-complete` cuyo flag default-OFF debe **prenderse en prod junto a este release** (a veces + migración/ops-worker). El deploy del código no los activa; saber qué prender se lee del ledger, no de la memoria. Tras prender, actualizar la fila del ledger (snapshot por environment).
 
 ## 11. Referencias
 
