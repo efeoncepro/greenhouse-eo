@@ -23,6 +23,7 @@ import { getSubmissionById } from '@/lib/growth/forms/store'
 
 import { getLatestReportTokenForRun } from '../hubspot/report-link'
 import { type GrowthAiVisibilityRunStatus } from '../contracts'
+import { type PublicDeliveryState } from './finalize-delivery'
 
 /** Estados públicos bounded del run (mapeo honesto, sin razones internas). */
 export const PUBLIC_RUN_STATUSES = [
@@ -62,6 +63,8 @@ const result = (
 interface RunRef {
   runId: string | null
   runStatus: GrowthAiVisibilityRunStatus | null
+  /** Delivery state materializado por el finalizador (TASK-1245 Slice 2). */
+  deliveryState: PublicDeliveryState | null
   /** El submission existe (path convergente) aunque el run aún no se haya materializado. */
   submissionSeen: boolean
 }
@@ -72,19 +75,28 @@ interface RunRef {
  */
 const resolveRunRef = async (handle: string): Promise<RunRef> => {
   // 1. poll_token directo (path a-medida + cualquier run).
-  const byToken = await runGreenhousePostgresQuery<{ run_id: string; status: string }>(
-    `SELECT run_id, status FROM greenhouse_growth.grader_runs WHERE poll_token = $1 LIMIT 1`,
+  const byToken = await runGreenhousePostgresQuery<{ run_id: string; status: string; public_delivery_state: string }>(
+    `SELECT run_id, status, public_delivery_state FROM greenhouse_growth.grader_runs WHERE poll_token = $1 LIMIT 1`,
     [handle],
   )
 
   if (byToken[0]) {
-    return { runId: byToken[0].run_id, runStatus: byToken[0].status as GrowthAiVisibilityRunStatus, submissionSeen: false }
+    return {
+      runId: byToken[0].run_id,
+      runStatus: byToken[0].status as GrowthAiVisibilityRunStatus,
+      deliveryState: byToken[0].public_delivery_state as PublicDeliveryState,
+      submissionSeen: false,
+    }
   }
 
   // 2. submission_id → lead → run (path convergente). El lead lo materializa el reactive consumer
   //    junto al run; si el lead ya existe pero run_id es null, el run está en cola.
-  const bySubmission = await runGreenhousePostgresQuery<{ run_id: string | null; status: string | null }>(
-    `SELECT l.run_id, r.status
+  const bySubmission = await runGreenhousePostgresQuery<{
+    run_id: string | null
+    status: string | null
+    public_delivery_state: string | null
+  }>(
+    `SELECT l.run_id, r.status, r.public_delivery_state
        FROM greenhouse_growth.grader_leads l
        LEFT JOIN greenhouse_growth.grader_runs r ON r.run_id = l.run_id
       WHERE l.submission_id = $1
@@ -96,6 +108,7 @@ const resolveRunRef = async (handle: string): Promise<RunRef> => {
     return {
       runId: bySubmission[0].run_id,
       runStatus: (bySubmission[0].status as GrowthAiVisibilityRunStatus | null) ?? null,
+      deliveryState: (bySubmission[0].public_delivery_state as PublicDeliveryState | null) ?? null,
       submissionSeen: true,
     }
   }
@@ -104,7 +117,7 @@ const resolveRunRef = async (handle: string): Promise<RunRef> => {
   //    materializó lead/run. El submission existe → queued honesto, no 404.
   const submission = await getSubmissionById(handle)
 
-  return { runId: null, runStatus: null, submissionSeen: submission !== null }
+  return { runId: null, runStatus: null, deliveryState: null, submissionSeen: submission !== null }
 }
 
 /**
@@ -132,9 +145,13 @@ export const readPublicGraderRunStatus = async (handle: string): Promise<PublicR
 
   if (reportToken) return result('ready', reportToken)
 
-  // succeeded/partial sin snapshot todavía: el finalizador (Slice 2) aún no publicó, o el gate
-  // dejó el run en revisión/insuficiente. Sin la materialización de Slice 2, lo honesto es
-  // "processing" (transitorio). failed/skipped → unavailable.
+  // Sin token todavía: el delivery state materializado por el finalizador (Slice 2) decide el estado
+  // honesto sin recomputar el gate ni filtrar el motivo interno de review_required.
+  if (ref.deliveryState === 'in_review') return result('in_review')
+  if (ref.deliveryState === 'unavailable') return result('unavailable')
+
+  // delivery 'pending'/'ready'-sin-token: el finalizador aún no corrió (ventana transitoria) →
+  // 'processing'. failed/skipped sin materializar → unavailable.
   if (ref.runStatus === 'failed' || ref.runStatus === 'skipped') return result('unavailable')
 
   return result('processing')

@@ -6629,6 +6629,7 @@ export interface GreenhouseGrowthGraderRuns {
   profile_id: string;
   prompt_pack_version: string;
   provider_policy_version: string;
+  public_delivery_state: Generated<string>;
   public_id: Generated<string>;
   requested_providers: Generated<string[]>;
   run_id: Generated<string>;

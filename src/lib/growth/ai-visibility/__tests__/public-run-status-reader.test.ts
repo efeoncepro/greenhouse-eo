@@ -1,15 +1,15 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 /**
- * TASK-1245 Slice 1 — `readPublicGraderRunStatus(handle)`: traduce el estado interno del run
- * a un DTO público bounded. Cubre la resolución por poll_token (a-medida) y submissionId
- * (convergente + su ventana), el mapeo de estados, el gate del reportToken (sólo cuando hay
- * snapshot publicable) y el invariante de no-leak (sin PII/raw/razones internas en el DTO).
+ * TASK-1245 — `readPublicGraderRunStatus(handle)`: traduce el estado interno del run a un DTO
+ * público bounded. Cubre la resolución por poll_token (a-medida) y submissionId (convergente +
+ * su ventana), el mapeo de estados (incl. el delivery state materializado del Slice 2), el gate
+ * del reportToken (sólo con snapshot publicable) y el no-leak (sin PII/raw/razones internas).
  */
 
 const state = {
-  byToken: null as { run_id: string; status: string } | null,
-  bySubmission: null as { run_id: string | null; status: string | null } | null,
+  byToken: null as { run_id: string; status: string; public_delivery_state: string } | null,
+  bySubmission: null as { run_id: string | null; status: string | null; public_delivery_state: string | null } | null,
   submissionExists: false,
   reportToken: null as string | null,
 }
@@ -37,6 +37,8 @@ vi.mock('../hubspot/report-link', () => ({
 
 const load = async () => (await import('../public-delivery/status-reader')).readPublicGraderRunStatus
 
+const run = (status: string, deliveryState = 'pending') => ({ run_id: 'grun-1', status, public_delivery_state: deliveryState })
+
 beforeEach(() => {
   state.byToken = null
   state.bySubmission = null
@@ -46,11 +48,10 @@ beforeEach(() => {
 })
 
 describe('TASK-1245 — readPublicGraderRunStatus', () => {
-  it('poll_token → run succeeded con snapshot publicable → ready + reportToken', async () => {
-    state.byToken = { run_id: 'grun-1', status: 'succeeded' }
+  it('poll_token → run con snapshot publicable → ready + reportToken (gana sobre delivery state)', async () => {
+    state.byToken = run('succeeded', 'pending')
     state.reportToken = 'grt-abc123'
-    const read = await load()
-    const res = await read('gpt-abc')
+    const res = await (await load())('gpt-abc')
 
     expect(res.status).toBe('ready')
     expect(res.reportToken).toBe('grt-abc123')
@@ -60,10 +61,10 @@ describe('TASK-1245 — readPublicGraderRunStatus', () => {
   it('run pending → queued; running → processing (con retryAfter)', async () => {
     const read = await load()
 
-    state.byToken = { run_id: 'grun-1', status: 'pending' }
+    state.byToken = run('pending')
     expect((await read('gpt-x')).status).toBe('queued')
 
-    state.byToken = { run_id: 'grun-1', status: 'running' }
+    state.byToken = run('running')
     const proc = await read('gpt-x')
 
     expect(proc.status).toBe('processing')
@@ -71,8 +72,21 @@ describe('TASK-1245 — readPublicGraderRunStatus', () => {
     expect(proc.reportToken).toBeNull()
   })
 
-  it('succeeded sin snapshot todavía → processing (transitorio, sin token)', async () => {
-    state.byToken = { run_id: 'grun-1', status: 'succeeded' }
+  it('terminal sin token, delivery in_review → in_review (espera honesta, sin razón interna)', async () => {
+    state.byToken = run('succeeded', 'in_review')
+    const res = await (await load())('gpt-x')
+
+    expect(res.status).toBe('in_review')
+    expect(res.reportToken).toBeNull()
+  })
+
+  it('terminal sin token, delivery unavailable → unavailable', async () => {
+    state.byToken = run('partial', 'unavailable')
+    expect((await (await load())('gpt-x')).status).toBe('unavailable')
+  })
+
+  it('succeeded sin snapshot ni delivery materializado (pending) → processing (transitorio)', async () => {
+    state.byToken = run('succeeded', 'pending')
     state.reportToken = null
     const res = await (await load())('gpt-x')
 
@@ -83,22 +97,20 @@ describe('TASK-1245 — readPublicGraderRunStatus', () => {
   it('failed/skipped → unavailable (sin reporte falso)', async () => {
     const read = await load()
 
-    state.byToken = { run_id: 'grun-1', status: 'failed' }
+    state.byToken = run('failed', 'pending')
     expect((await read('gpt-x')).status).toBe('unavailable')
 
-    state.byToken = { run_id: 'grun-1', status: 'skipped' }
+    state.byToken = run('skipped', 'pending')
     expect((await read('gpt-x')).status).toBe('unavailable')
   })
 
   it('submissionId (convergente) → resuelve run vía lead', async () => {
-    state.bySubmission = { run_id: 'grun-9', status: 'running' }
-    const res = await (await load())('fsub-1')
-
-    expect(res.status).toBe('processing')
+    state.bySubmission = { run_id: 'grun-9', status: 'running', public_delivery_state: 'pending' }
+    expect((await (await load())('fsub-1')).status).toBe('processing')
   })
 
   it('ventana convergente: lead con run_id null → queued', async () => {
-    state.bySubmission = { run_id: null, status: null }
+    state.bySubmission = { run_id: null, status: null, public_delivery_state: null }
     expect((await (await load())('fsub-1')).status).toBe('queued')
   })
 
@@ -115,7 +127,6 @@ describe('TASK-1245 — readPublicGraderRunStatus', () => {
   })
 
   it('public_id SECUENCIAL nunca resuelve (no enumerable): EO-GRUN-#### → not_found', async () => {
-    // El reader sólo consulta poll_token / submission; nunca matchea por public_id.
     const res = await (await load())('EO-GRUN-00012')
 
     expect(res.status).toBe('not_found')
@@ -123,7 +134,7 @@ describe('TASK-1245 — readPublicGraderRunStatus', () => {
   })
 
   it('no-leak: el DTO sólo expone status/reportToken/reason/retryAfter (sin email/raw/razón interna)', async () => {
-    state.byToken = { run_id: 'grun-1', status: 'succeeded' }
+    state.byToken = run('succeeded', 'pending')
     state.reportToken = 'grt-abc'
     const res = await (await load())('gpt-x')
 

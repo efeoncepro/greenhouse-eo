@@ -49,6 +49,12 @@ const makeRun = (input: Record<string, unknown>): GraderRunRow => ({
   createdAt: '2026-06-24T00:00:00.000Z'
 })
 
+// El delivery finalizer (TASK-1245) tiene su propio test; acá se aísla como no-op para mantener
+// el boundary unitario del run-engine (no toca PG/report/snapshot reales).
+vi.mock('../public-delivery/finalize-delivery', () => ({
+  finalizeRunDelivery: async () => null,
+}))
+
 vi.mock('../store', () => ({
   findRunByIdempotencyKey: async (key: string) => db.runsByKey.get(key) ?? null,
   findOrCreateGraderProfile: async () => PROFILE,

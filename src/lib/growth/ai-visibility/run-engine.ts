@@ -51,6 +51,7 @@ import {
   updateGraderRunStatus,
   type GraderRunRow
 } from './store'
+import { finalizeRunDelivery } from './public-delivery/finalize-delivery'
 
 export interface GraderRunPromptInput {
   promptId: string
@@ -168,6 +169,9 @@ export const executeClaimedGraderRun = async (
       finishedAt: new Date().toISOString()
     })
 
+    // TASK-1245 — materializa el delivery state público (failed → unavailable). Best-effort.
+    await finalizeRunDelivery(finalized)
+
     return { run: finalized, observations: [], idempotentHit: false, costGuardTripped: false }
   }
 
@@ -235,6 +239,10 @@ export const executeClaimedGraderRun = async (
     finishedAt: new Date().toISOString()
   })
 
+  // TASK-1245 — auto-publish del snapshot + materialización del delivery state público (write-side,
+  // NO on-read). succeeded/partial publicable → ready; review_required → in_review; resto → unavailable.
+  await finalizeRunDelivery(finalized)
+
   return { run: finalized, observations, idempotentHit: false, costGuardTripped }
 }
 
@@ -300,6 +308,9 @@ export const drainPendingGraderRuns = async (
         finishedAt: new Date().toISOString()
       }).catch(() => null)
 
+      // TASK-1245 — delivery state del run fallido (best-effort; null si el UPDATE de status falló).
+      if (finalized) await finalizeRunDelivery(finalized)
+
       results.push({ runId: run.runId, status: finalized?.status ?? 'failed' })
     }
   }
@@ -343,6 +354,9 @@ export const recoverStuckRunningRuns = async (
       tags: { source: 'growth_ai_visibility_run_engine', reason: 'stuck_running_recovery' },
       extra: { runId: run.runId, status, observations: observations.length, thresholdMinutes }
     })
+
+    // TASK-1245 — materializa el delivery state del run recuperado (best-effort).
+    await finalizeRunDelivery(finalized)
 
     recovered.push({ runId: run.runId, status: finalized.status })
   }
