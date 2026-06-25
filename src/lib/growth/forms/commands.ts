@@ -14,12 +14,20 @@ import {
   type RiskProfile,
   publicSubmitInputSchema,
 } from './contracts'
-import { dedupeFingerprint, hashValue } from './hash'
+import { dedupeFingerprint } from './hash'
+import { resolveFormsAbuseLimits } from './flags'
 import { compileFormVersion } from './policy-compiler'
+import {
+  type CaptchaVerifier,
+  decideAbuse,
+  hashIdentifier,
+  turnstileCaptchaVerifier,
+} from '@/lib/growth/public-submission'
 import {
   type FormDestinationRow,
   type FormVersionRow,
   archiveFormDefinition,
+  countAcceptedSubmissionsByHash,
   findRecentDuplicate,
   getFormDefinitionById,
   getFormDefinitionBySlug,
@@ -171,9 +179,16 @@ return allowlist.includes(origin)
 const slugAllowed = (allowed: unknown, slug: string): boolean =>
   Array.isArray(allowed) && (allowed.length === 0 || allowed.includes(slug))
 
+const FORMS_EMAIL_SALT = 'gh-forms-email-v1'
+const FORMS_IP_SALT = 'gh-forms-ip-v1'
+
 export interface SubmitContext {
   origin: string | null
+  ip?: string | null
+  captchaToken?: string | null
   requestId?: string | null
+  /** Inyectable para tests; default = Turnstile (bypass dev / fail-closed prod). */
+  verifier?: CaptchaVerifier
 }
 
 /**
@@ -193,6 +208,12 @@ export const submitForm = async (rawInput: PublicSubmitInput, context: SubmitCon
   if (input.honeypot && input.honeypot.trim().length > 0) {
     return { outcome: 'spam_rejected', reason: 'honeypot' }
   }
+
+  // Captcha (port compartido Turnstile: bypass dev / fail-closed prod).
+  const verifier = context.verifier ?? turnstileCaptchaVerifier()
+  const captcha = await verifier.verify(context.captchaToken ?? null, context.ip ?? null)
+
+  if (!captcha.ok) return { outcome: 'captcha_failed', reason: captcha.reason }
 
   const version = await getPublishedVersionBySlug(input.formSlug)
 
@@ -228,15 +249,25 @@ export const submitForm = async (rawInput: PublicSubmitInput, context: SubmitCon
 
   if (consentRequired && !input.consent) return { outcome: 'consent_required', reason: 'consent requerido' }
 
-  // Normalización mínima + email hash (nunca PII cruda en el ledger).
+  // Normalización mínima + hashes (nunca PII cruda en el ledger: ni email ni IP).
   const emailRaw = typeof input.fields.email === 'string' ? input.fields.email : null
-  const leadEmailHash = hashValue(emailRaw)
+  const leadEmailHash = hashIdentifier(emailRaw, FORMS_EMAIL_SALT)
+  const ipHash = hashIdentifier(context.ip ?? null, FORMS_IP_SALT)
   const normalizedFields: Record<string, unknown> = {}
 
   for (const [key, value] of Object.entries(input.fields)) {
     if (key === 'email') continue // el email no se persiste crudo
     normalizedFields[key] = value
   }
+
+  // Rate-limit (abuse-guard core compartido): per-email → per-IP. Forms sin costo LLM
+  // → budget Infinity (sólo opera el rate-limit, no el circuit-breaker de costo).
+  const limits = resolveFormsAbuseLimits()
+  const emailCount = leadEmailHash ? await countAcceptedSubmissionsByHash('lead_email_hash', leadEmailHash) : 0
+  const ipCount = ipHash ? await countAcceptedSubmissionsByHash('ip_hash', ipHash) : null
+  const abuse = decideAbuse({ emailCountToday: emailCount, ipCountToday: ipCount, spentUsdToday: 0, estimatedCostUsd: 0, limits })
+
+  if (!abuse.allowed) return { outcome: 'rate_limited', reason: abuse.outcome ?? 'rate_limited' }
 
   // Dedupe (ventana 60 min).
   const fingerprint = dedupeFingerprint(version.form_id, [emailRaw, input.formSlug])
@@ -254,6 +285,7 @@ export const submitForm = async (rawInput: PublicSubmitInput, context: SubmitCon
     normalizedFields,
     dedupeFingerprint: fingerprint,
     requestId: context.requestId ?? null,
+    ipHash,
     consent: {
       consentPolicyVersion: version.consent_policy_version ?? 'unspecified',
       checkboxes: input.consentCheckboxes,

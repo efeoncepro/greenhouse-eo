@@ -6505,6 +6505,7 @@ export interface GreenhouseGrowthFormSubmission {
   dedupe_fingerprint: string | null;
   form_id: string;
   form_version_id: string;
+  ip_hash: string | null;
   lead_email_hash: string | null;
   normalized_fields_json: Generated<Json>;
   page_name: string | null;

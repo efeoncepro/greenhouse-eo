@@ -97,6 +97,7 @@ export type FormSubmissionRow = {
   rejection_reason_class: string | null
   dedupe_fingerprint: string | null
   request_id: string | null
+  ip_hash: string | null
   created_at: Date
   updated_at: Date
 }
@@ -402,6 +403,7 @@ export interface PersistSubmissionInput {
   normalizedFields: Record<string, unknown>
   dedupeFingerprint: string | null
   requestId: string | null
+  ipHash: string | null
   consent: {
     consentPolicyVersion: string
     legalBasis?: string
@@ -421,8 +423,8 @@ export const persistAcceptedSubmission = async (input: PersistSubmissionInput): 
     const submissionRows = await client.query(
       `INSERT INTO greenhouse_growth.form_submission (
          form_id, form_version_id, surface_id, page_uri, page_name, lead_email_hash,
-         normalized_fields_json, status, dedupe_fingerprint, request_id)
-       VALUES ($1, $2, $3, $4, $5, $6, $7::jsonb, 'accepted', $8, $9)
+         normalized_fields_json, status, dedupe_fingerprint, request_id, ip_hash)
+       VALUES ($1, $2, $3, $4, $5, $6, $7::jsonb, 'accepted', $8, $9, $10)
        RETURNING *`,
       [
         input.formId,
@@ -434,6 +436,7 @@ export const persistAcceptedSubmission = async (input: PersistSubmissionInput): 
         JSON.stringify(input.normalizedFields),
         input.dedupeFingerprint,
         input.requestId,
+        input.ipHash,
       ],
     )
 
@@ -543,6 +546,23 @@ export const findRecentDuplicate = async (
 
   
 return rows[0] ?? null
+}
+
+/** Conteo de submissions aceptadas por hash (email/ip) en una ventana — rate-limit. */
+export const countAcceptedSubmissionsByHash = async (
+  column: 'lead_email_hash' | 'ip_hash',
+  value: string,
+  windowMinutes = 1440,
+): Promise<number> => {
+  const rows = await query<{ n: string }>(
+    `SELECT COUNT(*)::text AS n FROM greenhouse_growth.form_submission
+     WHERE ${column} = $1 AND status = 'accepted'
+       AND created_at > NOW() - ($2 || ' minutes')::interval`,
+    [value, String(windowMinutes)],
+  )
+
+  
+return Number(rows[0]?.n ?? 0)
 }
 
 /** Submissions aceptadas/fallidas que el dispatcher debe rutear (sin attempt terminal). */

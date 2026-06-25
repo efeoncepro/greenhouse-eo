@@ -338,6 +338,7 @@ export const PUBLIC_SUBMIT_OUTCOMES = [
   'surface_unauthorized',
   'rate_limited',
   'spam_rejected',
+  'captcha_failed',
   'form_not_published',
   'disabled',
 ] as const

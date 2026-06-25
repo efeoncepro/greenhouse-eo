@@ -22,6 +22,7 @@ const STATUS_BY_OUTCOME: Record<PublicSubmitOutcome, number> = {
   surface_unauthorized: 403,
   rate_limited: 429,
   spam_rejected: 422,
+  captcha_failed: 403,
   form_not_published: 404,
   disabled: 404,
 }
@@ -65,7 +66,9 @@ export async function POST(request: Request, { params }: { params: Promise<{ for
   try {
     const result = await submitForm(input, {
       origin: request.headers.get('origin'),
-      requestId: getClientIp(request),
+      ip: getClientIp(request),
+      captchaToken: typeof body.captchaToken === 'string' ? body.captchaToken : null,
+      requestId: null,
     })
 
     return NextResponse.json(
