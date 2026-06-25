@@ -97,7 +97,7 @@ const StaticState = ({ state }: { state: Exclude<StateKey, 'live'> }) => {
 
   if (state === 'loading') {
     return (
-      <div ref={ref} className='ghf-skeleton' role='status' aria-busy='true' aria-label='Cargando formulario'>
+      <div ref={ref} className='ghf-scope ghf-skeleton' role='status' aria-busy='true' aria-label='Cargando formulario'>
         <span className='ghf-skeleton-row' />
         <span className='ghf-skeleton-row' />
         <span className='ghf-skeleton-row' />
@@ -108,7 +108,7 @@ const StaticState = ({ state }: { state: Exclude<StateKey, 'live'> }) => {
 
   if (state === 'error') {
     return (
-      <div className='ghf-form'>
+      <div className='ghf-scope ghf-form'>
         <p className='ghf-status ghf-status--error' role='alert'>
           No pudimos cargar el formulario. Intenta de nuevo.
         </p>
@@ -122,7 +122,7 @@ const StaticState = ({ state }: { state: Exclude<StateKey, 'live'> }) => {
   }
 
   return (
-    <p className='ghf-status' role='status'>
+    <p className='ghf-scope ghf-status' role='status'>
       Formulario no disponible.
     </p>
   )

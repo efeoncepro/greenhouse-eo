@@ -1,18 +1,22 @@
 /**
  * TASK-1231 — Growth Forms portable renderer · CSS portable (skill `modern-ui` + `a11y`).
  *
- * Light DOM: estilos scopeados bajo el tag `greenhouse-form` + prefijo `.ghf-`, en una
- * `@layer growth-forms` de baja prioridad para que el host pueda sobreescribir a propósito.
- * Tokens = CSS custom properties `--ghf-*` (NUNCA hex inline en el markup); el host las
- * sobreescribe para mapear marca Efeonce/AXIS. Container queries (no @media) para el
- * layout interno → "Adaptive density / The Seam". Dark mode por `prefers-color-scheme`.
- * Focus visible con `outline` (sobrevive forced-colors). Targets ≥24px.
+ * Light DOM: estilos scopeados bajo el tag `greenhouse-form` + prefijo `.ghf-`. NO se
+ * usa `@layer` a propósito: en light DOM una capa nombrada queda POR DEBAJO de los
+ * resets globales sin-capa del host (MUI/Vuexy `input{}`, etc.) y el host gana — los
+ * inputs perdían su borde en el preview Greenhouse. Con selectores scopeados
+ * `greenhouse-form .ghf-*` (specificity > `input`) el widget gana sobre los resets
+ * genéricos del host (robustez en hosts hostiles), y el host sigue pudiendo
+ * personalizar vía los tokens `--ghf-*` (custom properties) o un selector más
+ * específico a propósito. Tokens = CSS custom properties `--ghf-*` (NUNCA hex inline);
+ * el host las sobreescribe para mapear marca Efeonce/AXIS. Container queries (no @media)
+ * para el layout interno → "Adaptive density / The Seam". Dark mode por
+ * `prefers-color-scheme`. Focus visible con `outline` (sobrevive forced-colors). Targets ≥24px.
  */
 export const RENDERER_STYLE_ID = 'greenhouse-form-styles'
 
 export const RENDERER_CSS = `
-@layer growth-forms {
-  greenhouse-form {
+  greenhouse-form, .ghf-scope {
     --ghf-font: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     --ghf-accent: #10162b;
     --ghf-accent-contrast: #ffffff;
@@ -20,8 +24,9 @@ export const RENDERER_CSS = `
     --ghf-muted: #5b6472;
     --ghf-bg: #ffffff;
     --ghf-field-bg: #ffffff;
-    --ghf-border: #c7ccd6;
-    --ghf-border-strong: #8a93a3;
+    /* Border ≥3:1 vs field bg (WCAG 1.4.11 UI component boundary). */
+    --ghf-border: #868c98;
+    --ghf-border-strong: #5b6472;
     --ghf-error: #b32338;
     --ghf-error-bg: #fdecef;
     --ghf-radius: 8px;
@@ -37,13 +42,14 @@ export const RENDERER_CSS = `
   }
 
   @media (prefers-color-scheme: dark) {
-    greenhouse-form:not([data-color-scheme="light"]) {
+    greenhouse-form:not([data-color-scheme="light"]), .ghf-scope:not([data-color-scheme="light"]) {
       --ghf-fg: #e8ebf0;
       --ghf-muted: #9aa3b2;
       --ghf-bg: #11151c;
       --ghf-field-bg: #181d26;
-      --ghf-border: #3a424f;
-      --ghf-border-strong: #5b6472;
+      /* Border ≥3:1 vs dark field bg (WCAG 1.4.11). */
+      --ghf-border: #6b7382;
+      --ghf-border-strong: #8a93a3;
       --ghf-accent: #6c8cff;
       --ghf-accent-contrast: #0b0f16;
       --ghf-error: #ff8aa0;
@@ -53,7 +59,10 @@ export const RENDERER_CSS = `
 
   greenhouse-form *,
   greenhouse-form *::before,
-  greenhouse-form *::after { box-sizing: border-box; }
+  greenhouse-form *::after,
+  .ghf-scope *,
+  .ghf-scope *::before,
+  .ghf-scope *::after { box-sizing: border-box; }
 
   .ghf-form { display: flex; flex-direction: column; gap: var(--ghf-gap); margin: 0; }
   .ghf-fields { display: grid; grid-template-columns: 1fr; gap: var(--ghf-gap); }
@@ -141,7 +150,8 @@ export const RENDERER_CSS = `
   @keyframes ghf-shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
 
   @media (prefers-reduced-motion: reduce) {
-    greenhouse-form *, greenhouse-form *::before, greenhouse-form *::after {
+    greenhouse-form *, greenhouse-form *::before, greenhouse-form *::after,
+    .ghf-scope *, .ghf-scope *::before, .ghf-scope *::after {
       animation-duration: 0.001ms !important; transition-duration: 0.001ms !important;
     }
   }
@@ -151,7 +161,6 @@ export const RENDERER_CSS = `
     .ghf-btn { border-color: ButtonText; }
     .ghf-field[data-invalid="true"] .ghf-input { border-color: Mark; }
   }
-}
 `
 
 /** Inyecta el CSS una sola vez en el documento host (idempotente). */

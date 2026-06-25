@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-06-25 por Claude (TASK-1229)
-> **Ultima actualizacion:** 2026-06-25 por Claude
+> **Ultima actualizacion:** 2026-06-25 por Claude (TASK-1231 — renderer portable + host surfaces)
 > **Documentacion tecnica:** [GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md)
 
 # Motor de Formularios Publicos de Growth
@@ -37,13 +37,25 @@ La idea clave: **cualquier** formulario que nazca del motor hereda robustez por 
 - **Staging (`develop`): VIVO** desde 2026-06-25. Los tres flags estan ON: el API publico (`GROWTH_FORMS_PUBLIC_API_ENABLED`), el dispatcher de entrega (`GROWTH_FORMS_DISPATCH_ENABLED`) y el adapter HubSpot real (`GROWTH_FORMS_HUBSPOT_SECURE_SUBMIT_ENABLED`). Verificado: el endpoint publico responde el render contract y una submission real llego a un HubSpot test form (200).
 - **Produccion: APAGADO.** Se prende cuando exista un formulario real publicado (TASK-1232) + sign-off del operador. La verdad live de los flags es `vercel env ls` + el servicio Cloud Run `ops-worker`; el estado humano vive en `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`.
 
+## Como se muestra el formulario (renderer portable) — TASK-1231
+
+El mismo formulario se ve igual en WordPress, en Astro y en la vista interna de Greenhouse, porque los tres usan **un solo renderer portable**: un componente web `<greenhouse-form>` que Greenhouse sirve como un archivo unico. Cada sitio solo lo "incrusta"; no copia ni cambia el formulario.
+
+- **El sitio no decide nada del formulario.** El renderer le pide el formulario publicado a Greenhouse y lo arma solo (campos, validacion, pasos, consentimiento, mensaje de exito). El sitio (WordPress/Astro) solo aporta donde va y el color de marca; nunca toca los campos ni a donde va el lead.
+- **Funciona aunque algo falle.** Si Internet se cae o el sitio bloquea scripts, muestra un mensaje claro o un link de contacto — nunca una caja vacia. Mientras carga muestra un esqueleto, no un spinner de pagina.
+- **Mide sin exponer datos.** Avisa a la pagina cuando alguien ve, empieza, envia o completa el formulario (para Google Tag Manager), pero **nunca** manda el correo, el telefono ni el texto escrito en esos eventos.
+- **Accesible y en celular.** Etiquetas arriba de cada campo, errores que el lector de pantalla anuncia, foco que salta al primer error, botones grandes, y sin scroll horizontal en pantallas chicas.
+- **Donde se ve por dentro:** Greenhouse tiene una vista interna de referencia en **Design System → Growth Forms renderer** (solo equipo Efeonce) para previsualizar como se vera en los sitios publicos.
+- **Como se incrusta:** en WordPress hay un widget de Elementor ("Greenhouse Growth Form"); en Astro un componente; ambos solo piden el slug del formulario. Paso a paso en el [manual de incrustacion](../../manual-de-uso/growth/incrustar-formulario-wordpress-astro.md).
+
 ## Que NO hace (todavia)
 
 - No tiene aun una pantalla visual para operarlo (eso llega con el cockpit, TASK-1232) — por ahora se opera por API.
 - En **produccion** sigue apagado hasta el primer formulario real (TASK-1232) + sign-off.
+- El renderer es **code-complete**; para verse en un sitio real necesita un formulario publicado con host surface autorizado (TASK-1232). No agrega flags nuevos (reusa `GROWTH_FORMS_PUBLIC_API_ENABLED`).
 
 ## Detalle tecnico
 
-> Arquitectura: [GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md) (§Delta 2026-06-25 + §22 HubSpot).
-> Codigo: `src/lib/growth/forms/**` (commands/readers/compiler/dispatch) + `src/lib/growth/forms/destinations/hubspot/**` (adapter), `src/lib/growth/public-submission/**` (port compartido captcha + abuse-guard), `src/app/api/public/growth/forms/**` + `src/app/api/admin/growth/forms/**`.
+> Arquitectura: [GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md) (§Delta 2026-06-25 TASK-1229/1230/**1231** + §19 renderer + §22 HubSpot).
+> Codigo: `src/lib/growth/forms/**` (commands/readers/compiler/dispatch) + `src/lib/growth/forms/destinations/hubspot/**` (adapter), `src/lib/growth/public-submission/**` (port compartido captcha + abuse-guard), `src/app/api/public/growth/forms/**` + `src/app/api/admin/growth/forms/**`. Renderer portable: `src/growth-forms-renderer/**` (build `pnpm renderer:build` → `public/growth-forms/renderer-<channel>.js`). Host surfaces: `efeonce-public-site-runtime` (widget Elementor) + `efeonce-web` (`GrowthForm.astro`).
 > Operacion paso a paso: [docs/manual-de-uso/growth/operar-motor-formularios.md](../../manual-de-uso/growth/operar-motor-formularios.md). El cockpit visual llega con TASK-1232.

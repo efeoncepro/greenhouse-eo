@@ -34,6 +34,8 @@ export interface FormRendererOptions {
   /** Inyector de fetch (tests). */
   fetchImpl?: typeof fetch
   doc?: Document
+  /** Fuerza el esquema de color (si no, hereda `prefers-color-scheme`). */
+  colorScheme?: 'light' | 'dark'
 }
 
 const el = <K extends keyof HTMLElementTagNameMap>(
@@ -122,6 +124,11 @@ export class FormRenderer {
   // ─── Render ───────────────────────────────────────────────────────────────--
 
   mount(): void {
+    // Marca el root como scope del renderer: los tokens `--ghf-*` se definen sobre
+    // `.ghf-scope`, así el core funciona montado en un div cualquiera (preview Greenhouse)
+    // o dentro de `<greenhouse-form>` (hosts públicos) — sin depender del tag.
+    this.opts.root.classList.add('ghf-scope')
+    if (this.opts.colorScheme) this.opts.root.setAttribute('data-color-scheme', this.opts.colorScheme)
     this.telemetry.emit('gh_form_viewed', {})
     this.renderForm()
   }

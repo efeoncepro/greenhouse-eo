@@ -1,3 +1,16 @@
+## Sesión 2026-06-25 — TASK-1231 Growth Forms renderer portable + host surfaces — COMPLETE (code-complete; rollout pendiente) — Claude
+
+> **Estado:** `complete` (movida a `complete/`), local-first en `develop`, **commits sin push** (espera instrucción). Implementa el §19 del motor (cliente browser) sobre la fundación 1229.
+> - **Slice 1 — core portable** `src/growth-forms-renderer/**` (vanilla TS, sin React/Lit/deps): Web Component `<greenhouse-form>` (light DOM + `ElementInternals`) que consume SOLO el `render_contract` gobernado (GET) y postea SOLO al submit gobernado (POST). **Full API Parity** (un consumer más; cero lógica de destino/vendor en el browser). Módulos: contract (espejo + drift guard), mask (RUT/tel CL display-vs-stored), conditions, validation (3-stage), telemetry (`gh_form_*` + dataLayer con allowlist dura), copy (i18n es-CL+en-US), api-client, styles (tokens `--ghf-*`, @layer, container queries, forced-colors, ≥24px, dark, reduced-motion, skeleton), renderer + element. Composiciones static/conditional_simple/multi_step_light. **22 tests + parity drift-guard.** Build `pnpm renderer:build` (esbuild → `public/growth-forms/renderer-<channel>.js`, 27KB; cableado a `prebuild`, gitignored).
+> - **Slice 2 — preview Greenhouse** `/design-system/growth-forms-renderer` (viewCode `plataforma.design_system`, INTERNAL): monta el MISMO core desde fixtures; route-reachability + catálogo DS + scenario GVC.
+> - **Slice 3 — WordPress (primer host surface real):** widget Elementor `greenhouse_growth_form` en `eo-elementor-widgets` (repo `efeonce-public-site-runtime`, **committeado local**; el repo NO auto-deploya — README "do not deploy until lane"). Operador pidió Elementor; Gutenberg block = follow-up.
+> - **Slice 4 — Astro parity:** `GrowthForm.astro` en `efeonce-web` (**committeado local**, feature branch) + fixture no-routable + `docs/growth-form-parity.md`.
+> - **Decisiones** (arch-architect + a11y-architect + forms-ux): vanilla TS + esbuild static asset (no Lit); light DOM + ElementInternals (IDREF/role=alert no cruzan shadow boundary). `autocomplete`/`inputMode` ya vienen del contract.
+> - **Gates verdes:** core 22 tests + parity; `pnpm test` full **7958 passed**; `pnpm build` prod OK (prebuild regenera el bundle); route-reachability 0 orphans; catalog test ✓; tsc EXIT 0; lint ✓.
+> - **Sin flag nuevo** (reusa `GROWTH_FORMS_PUBLIC_API_ENABLED`). **Rollout pendiente:** render/submit público requiere un form publicado con host surface autorizada (TASK-1232) — el smoke real WordPress/Astro contra staging queda gated por eso. GVC del preview interno: ver estado al final de la sesión.
+> - **Cross-impact:** TASK-1232 desbloqueada (última dependencia cerrada) + TASK-1241 (lead magnet) puede converger al renderer (= first migration de 1232).
+> - **Pendiente operador:** ¿push? (commits 1231 locales en los 3 repos: greenhouse-eo + efeonce-public-site-runtime + efeonce-web).
+
 ## Sesión 2026-06-25 — Growth Forms ENGINE LIVE EN STAGING (3 flags ON, verificado) — Claude
 
 > **Estado:** rollout aplicado a `develop`/staging por pedido del operador. **Los 3 flags forms ON en staging; prod sigue OFF** (gated por TASK-1232 primer form real + sign-off).

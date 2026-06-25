@@ -139,6 +139,7 @@ export class GreenhouseFormElement extends HTMLElement {
       api: this.apiConfig,
       locale: this.getAttribute('locale') ?? undefined,
       pageContext: this.pageContext(),
+      colorScheme: this.getAttribute('color-scheme') === 'light' ? 'light' : undefined,
       doc,
     })
     this.renderer.mount()

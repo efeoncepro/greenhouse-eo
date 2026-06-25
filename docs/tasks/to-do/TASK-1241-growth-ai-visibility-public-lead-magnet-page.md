@@ -1,5 +1,11 @@
 # TASK-1241 — Growth AI Visibility: Public Lead Magnet Page
 
+## Delta 2026-06-25 — el renderer portable (TASK-1231) está listo para la convergencia
+
+- TASK-1231 (renderer portable Growth Forms) está **code-complete**. El form de esta página puede dejar de ser hand-built y **re-renderizarse vía `<greenhouse-form>`** (heredando reintentos, consent snapshot, observabilidad `gh_form_*`, validación 3-stage y operabilidad por Nexa/MCP por construcción) — ese upgrade sería el **first migration de TASK-1232**.
+- El `render_contract` ya soporta el intake del grader (§9.2: marca, sitio, país, industria, descripción, work email, consent). Pendiente upstream para la convergencia plena: un **campo/widget captcha embebible** (Turnstile) dentro del contract/renderer — hoy el captcha vive en el path público server-side (TASK-1240) + el widget client-side de esta página. Si se migra al renderer, declarar el captcha como parte del contrato o como slot del host wrapper.
+- No bloquea esta task: 1241 puede shippear su form actual y converger después; la decisión de migrar es de TASK-1232.
+
 ## Delta 2026-06-25 — Cloudflare Turnstile keys provisionadas
 
 - **Site key (PÚBLICA, va en el widget client-side de esta página):** `0x4AAAAAADqwX2R7v-k9pItv` (Cloudflare account `eb167eac6a06fa19932249325898a096`). Es pública por diseño (aparece en el HTML); úsala en el `data-sitekey` del widget Turnstile.

@@ -1,5 +1,30 @@
 # TASK-1232 — Growth Forms Admin Cockpit + First Migration
 
+## Delta 2026-06-25 — desbloqueada por TASK-1231 (renderer + host surfaces)
+
+- TASK-1231 (renderer portable + host surfaces) está **code-complete** — cerrada la última dependencia bloqueante (1229 ✅, 1230 ✅, **1231 ✅**). El cockpit ya tiene contra qué previsualizar/publicar.
+- Lo que esta task hereda listo: Web Component `<greenhouse-form>` + bundle pineado (`pnpm renderer:build` → `public/growth-forms/renderer-<channel>.js`), preview interno `/design-system/growth-forms-renderer`, widget Elementor WordPress (`greenhouse_growth_form` en `efeonce-public-site-runtime`) y wrapper Astro (`efeonce-web`). El "first migration" puede apuntar a un host surface real ya existente.
+- **Convergencia recomendada:** el primer form real a migrar = el lead magnet del grader (TASK-1241), hoy hand-built → re-renderizar vía este renderer (ver Delta de TASK-1241).
+
+## Approved visual direction 2026-06-25 — Product Design
+
+Visual direction approved by operator: use **Growth Forms Command Center** as the primary implementation target, incorporating the pipeline/evidence discipline from **Migration Control Tower** and the publish-readiness/composer discipline from **Authoring & Evidence Studio**.
+
+Reference assets:
+
+- `docs/assets/product-design/task-1232-growth-forms-admin-cockpit-first-migration/growth-forms-command-center.png` — primary cockpit direction.
+- `docs/assets/product-design/task-1232-growth-forms-admin-cockpit-first-migration/migration-control-tower.png` — migration pipeline, smoke evidence, GTM/dataLayer and rollback reference.
+- `docs/assets/product-design/task-1232-growth-forms-admin-cockpit-first-migration/authoring-evidence-studio.png` — author → review → publish composer, renderer preview and publish-readiness reference.
+
+Implementation guidance:
+
+- Treat the cockpit as an internal **operations command center**, not a marketing page and not a free-form visual builder.
+- Start from `CompositionShell` with `split` or `leadPlusContext`; keep one dense primary work surface plus an `AdaptiveSidecarLayout` inspector/evidence lane.
+- Preserve the Command Center hierarchy: forms list/table, lifecycle/status chips, destination health, submission evidence, selected form inspector and controlled actions.
+- Pull from Migration Control Tower for the first migration slice: public host → Greenhouse ledger → consent snapshot → destination/HubSpot delivery, GTM/dataLayer events, smoke-test evidence and rollback controls.
+- Pull from Authoring & Evidence Studio for publish workflows: stepper/composer, version review, renderer preview, validation summary, browser-safe contract and publish readiness.
+- Do not introduce a drag-and-drop builder, nested-card layout, decorative hero, or non-canonical components for breadcrumbs, buttons, chips, sidecars, tables or form inputs.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
