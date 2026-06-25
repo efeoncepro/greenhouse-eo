@@ -40,6 +40,8 @@ export interface GraderExecutionPrompt {
 export interface GraderRunRow {
   runId: string
   publicId: string
+  /** TASK-1245 — handle de poll público NO enumerable (256 bits). El public_id es secuencial. */
+  pollToken: string
   profileId: string
   runKind: GrowthAiVisibilityRunKind
   mode: GrowthAiVisibilityExecutionMode
@@ -76,6 +78,7 @@ const projectProfile = (row: RawProfile): GraderProfileRow => ({
 const projectRun = (row: RawRun): GraderRunRow => ({
   runId: String(row.run_id),
   publicId: String(row.public_id),
+  pollToken: String(row.poll_token),
   profileId: String(row.profile_id),
   runKind: row.run_kind as GrowthAiVisibilityRunKind,
   mode: row.mode as GrowthAiVisibilityExecutionMode,

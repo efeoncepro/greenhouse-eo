@@ -44,10 +44,17 @@ export type PublicIntakeOutcome = (typeof PUBLIC_INTAKE_OUTCOMES)[number]
 export interface PublicIntakeResult {
   outcome: PublicIntakeOutcome
   /**
-   * `public_id` del run encolado (sólo `accepted`) para que la página haga poll.
+   * `public_id` del run encolado (sólo `accepted`). Id HUMANO-LEGIBLE (EO-GRUN-#####, secuencial)
+   * para display/admin — NO es el handle de poll (es enumerable). El poll usa `pollToken`/`submissionId`.
    * Path a-medida (TASK-1240): el run se encola inline → este campo se setea.
    */
   runPublicId: string | null
+  /**
+   * TASK-1245 — handle de poll de ALTA ENTROPÍA del run (256 bits). Es el id con el que la página
+   * hace poll a `GET /run/[handle]` (el `public_id` secuencial NUNCA autoriza). Path a-medida: se
+   * setea al run encolado. Path convergente: null (el handle de poll es `submissionId`).
+   */
+  pollToken?: string | null
   /**
    * TASK-1251 — Path convergente (motor): el run lo encola un reactive consumer
    * (no inline), así que el handle de poll es el `submission_id` del motor. La

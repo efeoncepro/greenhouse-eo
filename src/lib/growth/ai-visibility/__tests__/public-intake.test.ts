@@ -26,7 +26,7 @@ vi.mock('../commands', () => ({
     spies.enqueue(input)
 
     return {
-      run: { runId: 'grun-1', publicId: 'EO-GRUN-09999', profileId: 'gprf-1' },
+      run: { runId: 'grun-1', publicId: 'EO-GRUN-09999', pollToken: 'gpt-test-9999', profileId: 'gprf-1' },
       idempotentHit: state.idempotentHit
     }
   }
@@ -122,6 +122,8 @@ describe('growth/ai-visibility — public run intake (TASK-1240)', () => {
 
     expect(res.outcome).toBe('accepted')
     expect(res.runPublicId).toBe('EO-GRUN-09999')
+    // TASK-1245 — el handle de poll de alta entropía (NO el public_id secuencial) viaja al cliente.
+    expect(res.pollToken).toBe('gpt-test-9999')
 
     // PII NUNCA en el input del enqueue (sólo marca/categoría/mercado).
     const enqueueArg = spies.enqueue.mock.calls[0][0] as Record<string, unknown>

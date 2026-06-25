@@ -10,7 +10,7 @@ TASK-1251 dejó `POST /run` con DOS paths (flag `GROWTH_GRADER_INTAKE_ON_FORMS_E
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Medio`

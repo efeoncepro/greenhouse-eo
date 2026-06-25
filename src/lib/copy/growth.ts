@@ -162,6 +162,17 @@ export const GH_GROWTH_AI_VISIBILITY = {
     cost_blocked: 'Estamos con mucha demanda en este momento. Intenta de nuevo en unos minutos.'
   } satisfies Record<'accepted' | 'disabled' | 'invalid' | 'captcha_failed' | 'rate_limited' | 'cost_blocked', string>,
 
+  // Status público del run por poll (TASK-1245): mensajes es-CL honestos, sin razones internas
+  // (review_required nunca revela el porqué). Cliente público del lead magnet.
+  public_status: {
+    queued: 'Recibimos tu solicitud. Estamos preparando tu análisis.',
+    processing: 'Estamos analizando tu marca en los motores de IA. Esto toma unos minutos.',
+    ready: 'Tu análisis está listo.',
+    in_review: 'Tu análisis está casi listo. Le estamos dando una última revisión y te avisamos apenas esté.',
+    unavailable: 'No pudimos completar tu análisis esta vez. Vuelve a intentarlo en unos minutos.',
+    not_found: 'No encontramos este análisis. Revisa el enlace o solicita uno nuevo.'
+  } satisfies Record<'queued' | 'processing' | 'ready' | 'in_review' | 'unavailable' | 'not_found', string>,
+
   // Exactitud de marca (TASK-1238, INTERNAL): etiqueta por tipo de inexactitud (admin review).
   accuracy_kind_label: {
     category_mismatch: 'Categoría equivocada',

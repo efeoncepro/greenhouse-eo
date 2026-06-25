@@ -32,6 +32,7 @@ const db: {
 const makeRun = (input: Record<string, unknown>): GraderRunRow => ({
   runId: `grun-${++runSeq}`,
   publicId: `EO-GRUN-${String(runSeq).padStart(5, '0')}`,
+  pollToken: `gpt-test-${runSeq}`,
   profileId: String(input.profileId ?? 'gprf-1'),
   runKind: (input.runKind as GraderRunRow['runKind']) ?? 'smoke',
   mode: (input.mode as GraderRunRow['mode']) ?? 'full',

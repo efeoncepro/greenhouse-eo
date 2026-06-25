@@ -97,8 +97,11 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         outcome: result.outcome,
-        // Handle de poll: `runPublicId` (path a-medida) o `submissionId` (path convergente).
+        // `runPublicId` (EO-GRUN-#####) es display/admin — NO el handle de poll (es secuencial).
         runPublicId: result.runPublicId,
+        // Handle de poll (alta entropía): `pollToken` (path a-medida) o `submissionId` (convergente).
+        // La página hace poll a `GET /run/[pollToken ?? submissionId]`.
+        pollToken: result.pollToken ?? null,
         submissionId: result.submissionId ?? null,
         message: result.reason
       },

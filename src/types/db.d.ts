@@ -6625,6 +6625,7 @@ export interface GreenhouseGrowthGraderRuns {
   finished_at: Timestamp | null;
   idempotency_key: string | null;
   mode: string;
+  poll_token: Generated<string>;
   profile_id: string;
   prompt_pack_version: string;
   provider_policy_version: string;

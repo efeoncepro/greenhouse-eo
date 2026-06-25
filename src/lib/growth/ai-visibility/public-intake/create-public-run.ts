@@ -38,9 +38,14 @@ import { insertGraderLead } from './store'
 const reasonFor = (outcome: PublicIntakeOutcome): string =>
   GH_GROWTH_AI_VISIBILITY.public_intake[outcome as keyof typeof GH_GROWTH_AI_VISIBILITY.public_intake]
 
-const result = (outcome: PublicIntakeOutcome, runPublicId: string | null): PublicIntakeResult => ({
+const result = (
+  outcome: PublicIntakeOutcome,
+  runPublicId: string | null,
+  pollToken: string | null = null
+): PublicIntakeResult => ({
   outcome,
   runPublicId,
+  pollToken,
   reason: reasonFor(outcome)
 })
 
@@ -111,7 +116,7 @@ export const createPublicGraderRun = async (
 
     // Doble-submit idempotente: mismo run → no doble lead ni doble costo.
     if (enqueued.idempotentHit) {
-      return result('accepted', enqueued.run.publicId)
+      return result('accepted', enqueued.run.publicId, enqueued.run.pollToken)
     }
 
     await insertGraderLead({
@@ -142,7 +147,7 @@ export const createPublicGraderRun = async (
       outcome: 'accepted'
     })
 
-    return result('accepted', enqueued.run.publicId)
+    return result('accepted', enqueued.run.publicId, enqueued.run.pollToken)
   } catch (error) {
     captureWithDomain(error, 'growth', { tags: { source: 'growth_ai_visibility_public_intake' } })
 
