@@ -173,6 +173,7 @@ import { getWorkforceUnlinkedInternalUsersSignal } from './queries/workforce-unl
 import { getGrowthAiVisibilitySignals } from './queries/growth-ai-visibility-signals'
 import { getGrowthAiVisibilityScoringSignals } from './queries/growth-ai-visibility-scoring-signals'
 import { getGrowthAiVisibilityPublicIntakeSignals } from './queries/growth-ai-visibility-public-intake-signals'
+import { getGrowthFormsSignals } from './queries/growth-forms-signals'
 // TASK-1082 — Knowledge Platform ingestion signals (moduleKey 'knowledge').
 import { getKnowledgeNotionIngestDeadLetterSignal } from './queries/knowledge-notion-ingest-dead-letter'
 import { getKnowledgeQuarantineCountSignal } from './queries/knowledge-quarantine-count'
@@ -617,6 +618,7 @@ interface ReliabilityOverviewSources {
   growthAiVisibility?: ReliabilitySignal[] | null
   growthAiVisibilityScoring?: ReliabilitySignal[] | null
   growthAiVisibilityPublicIntake?: ReliabilitySignal[] | null
+  growthForms?: ReliabilitySignal[] | null
 
   /** TASK-1201 — Finance AI anomaly-materialization staleness (heartbeat del SoT de signals). */
   financeAiStaleMaterialization?: ReliabilitySignal | null
@@ -1027,6 +1029,7 @@ export const buildReliabilityOverview = (
     ...(sources.growthAiVisibility ?? []),
     ...(sources.growthAiVisibilityScoring ?? []),
     ...(sources.growthAiVisibilityPublicIntake ?? []),
+    ...(sources.growthForms ?? []),
     // TASK-812 — Previred/LRE artifact registry drift.
     ...(sources.payrollComplianceExportDrift ? [sources.payrollComplianceExportDrift] : []),
     // TASK-863 V1.5.2 — Final settlement PDF status drift (DB document_status vs
@@ -1409,6 +1412,13 @@ export const getReliabilityOverview = async (
     preloadedSources.growthAiVisibilityPublicIntake !== undefined
       ? preloadedSources.growthAiVisibilityPublicIntake
       : await getGrowthAiVisibilityPublicIntakeSignals().catch(() => null)
+
+  // TASK-1229 — Growth Forms engine (dead-letter / failure / rejection). Sin forms
+  // publicados / DB vacía → steady ok.
+  const growthForms =
+    preloadedSources.growthForms !== undefined
+      ? preloadedSources.growthForms
+      : await getGrowthFormsSignals().catch(() => null)
 
   const payrollComplianceExportDrift =
     preloadedSources.payrollComplianceExportDrift !== undefined
@@ -2309,6 +2319,7 @@ export const getReliabilityOverview = async (
     growthAiVisibility,
     growthAiVisibilityScoring,
     growthAiVisibilityPublicIntake,
+    growthForms,
     payrollComplianceExportDrift,
     payrollContractorDoubleRailOverlap,
     payrollDeelMemberWithoutContractId,
