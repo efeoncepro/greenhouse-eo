@@ -112,7 +112,7 @@ Reglas obligatorias:
 - `TASK-1240` (complete dev) — `grader_leads` con el lead + consent + run_id.
 - `TASK-1235` (complete) — `readGraderReport` → `primary_gap`/`recommended_motion`.
 - Cliente HubSpot in-app directo (`getHubSpotAccessToken` + adapter pattern, TASK-1230) — ya existe, se reusa. HubSpot custom properties `ai_visibility_*` + grupo "AEO" (out-of-band, creables vía HubSpot API).
-- **Captura de nombre/apellido en el intake** → **sub-task aparte** (decisión operador 2026-06-25): el form público + `grader_leads` no capturan `first_name`/`last_name` hoy. 1242 mapea `firstname`/`lastname` cuando existan, vacío si no.
+- **Captura de nombre/apellido en el intake** → **sub-task aparte** (decisión operador 2026-06-25): ~~el form público + `grader_leads` no capturan `first_name`/`last_name` hoy~~. **Cerrado por TASK-1257 (2026-06-25):** `grader_leads.first_name`/`last_name` capturados en el intake + propagados al lead; `getGraderLeadForHandoff` ya NO devuelve `null` y `execute.ts` manda nombre real a `firstname`/`lastname` nativos. El mapper de 1242 (sin cambios) los consume.
 
 ### Blocks / Impacts
 

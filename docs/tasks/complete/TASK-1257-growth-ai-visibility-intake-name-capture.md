@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P3`
 - Impact: `Medio`
 - Effort: `Bajo`
@@ -244,11 +244,21 @@ Additive end-to-end: la migración agrega 2 columnas nullable; el form pide los 
 
 ## Acceptance Criteria
 
-- [ ] Columnas `first_name`/`last_name` additive nullable en `grader_leads`, migración aplicada + verificada.
-- [ ] El form del grader pide Nombre + Apellido en ambos paths (a-medida + forms-engine), con copy es-CL validada.
-- [ ] El pipeline (binding → consumer → insert) transporta los campos; PII nunca a providers (test).
-- [ ] `getGraderLeadForHandoff` devuelve `firstName`/`lastName` reales (no placeholder null).
-- [ ] Smoke: submit con nombre → lead → handoff manda `firstname`/`lastname` a HubSpot.
+- [x] Columnas `first_name`/`last_name` additive nullable en `grader_leads`, migración aplicada + verificada (`information_schema.columns` → `text`/nullable; DO block + psql live).
+- [x] El form del grader pide Nombre + Apellido en ambos paths (a-medida `route.ts` + forms-engine `field_schema` v2), con copy es-CL validada (`greenhouse-ux-writing`: "Nombre"/"Apellido", sentence-case, `autocomplete` given-name/family-name, sin placeholder).
+- [x] El pipeline (binding → consumer → insert) transporta los campos; PII nunca a providers (tests en los 3 paths: `public-intake`, `forms-engine-binding`, `grader-run-from-submission-projection`).
+- [x] `getGraderLeadForHandoff` devuelve `firstName`/`lastName` reales (no placeholder null); `execute.test` asserta que llegan al payload del handoff (`contact.firstName/lastName`).
+- [~] Smoke: submit con nombre → lead → handoff manda `firstname`/`lastname` a HubSpot — **gated por EPIC-020** (landing público + flags HubSpot OFF en prod, igual que TASK-1242). Verificado por tests E2E del pipeline; el smoke live se ejecuta en el rollout EPIC-020.
+
+## Closure Note (2026-06-25)
+
+**Verdict QA:** CONDITIONAL PASS — `code complete, rollout pendiente` (EPIC-020 gating).
+
+- **Slice 1** (migración + pipeline): `migrations/20260625213313162_task-1257-grader-leads-name-capture.sql` (additive nullable + DO block) + `db.d.ts` regen; `contracts`/`store`/`forms-engine-binding`/`create-public-run`/`growth-grader-run-from-submission`/`route`/`execute` propagan nombre/apellido; PII solo al lead/submission, nunca al `enqueueGraderDiagnostic`.
+- **Slice 2** (form): versión **v2 publicada** del grader-form con `firstName`/`lastName` en `field_schema_json` (las versiones publicadas son inmutables — trigger TASK-1229 — así que el camino gobernado fue versión nueva + deprecar v1, NO editar in-place). `GRADER_FORM_VERSION_ID` pineado a v2. El renderer data-driven pinta los campos sin JSX nuevo.
+- **Open Questions resueltas:** (1) **requeridos** en el form (`required:true`) pero columnas/command/store **tolerantes a null** (backward-compat con leads legacy + a-medida; el handoff ya tolera vacío) — best-of-both resiliente; (2) **dos campos separados** (`firstName`/`lastName`) → mapean limpio a `firstname`/`lastname` nativos de HubSpot.
+- **Gates verdes:** `pnpm test` (8043 pass), `pnpm build`, `pnpm typecheck`, lint clean, `pnpm pg:doctor` healthy, `pnpm docs:closure-check` PASS (0 flags nuevos).
+- **GVC diferido (blocker legítimo):** el landing público del grader no está desplegado (EPIC-020, intake flag OFF en todos los envs) → no hay superficie viva que capturar. La UI es config data-driven verificada a nivel DB + `renderer-contract-parity`.
 
 ## Verification
 
