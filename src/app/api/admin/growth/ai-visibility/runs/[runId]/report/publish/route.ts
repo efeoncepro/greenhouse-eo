@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 
 import { canonicalErrorResponse } from '@/lib/api/canonical-error-response'
 import { can } from '@/lib/entitlements/runtime'
+import { syncAiVisibilityRunToHubSpot } from '@/lib/growth/ai-visibility/hubspot/command'
 import { GraderReportError } from '@/lib/growth/ai-visibility/report/command'
 import { GraderSnapshotError, publishGraderReportSnapshot } from '@/lib/growth/ai-visibility/report/snapshot'
 import { captureWithDomain } from '@/lib/observability/capture'
@@ -38,6 +39,19 @@ export async function POST(request: Request, { params }: { params: Promise<{ run
 
   try {
     const snapshot = await publishGraderReportSnapshot({ runId, expiresAt, createdBy: tenant.userId })
+
+    // TASK-1242 — Auto-trigger del HubSpot lead handoff: el snapshot publicado significa
+    // score releasable (gate `completed`) + report_url disponible. ENQUEUE gobernado (no
+    // write inline); el reactive consumer hace el upsert. No-fatal: un fallo del enqueue no
+    // rompe la publicación (el lead queda detectable por el signal `lead_handoff_uncovered`).
+    try {
+      await syncAiVisibilityRunToHubSpot({ runId, trigger: 'report_published' })
+    } catch (handoffError) {
+      captureWithDomain(handoffError, 'growth', {
+        tags: { source: 'growth_ai_visibility_report_publish_route', stage: 'lead_handoff_enqueue' },
+        extra: { runId }
+      })
+    }
 
     return NextResponse.json({
       reportToken: snapshot.reportToken,

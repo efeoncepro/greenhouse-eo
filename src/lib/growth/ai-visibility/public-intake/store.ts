@@ -67,3 +67,62 @@ export const findGraderLeadBySubmissionId = async (submissionId: string): Promis
 
   return rows[0]?.lead_id ?? null
 }
+
+/** TASK-1242 — Vista del lead para el HubSpot handoff (incluye estado de sync). */
+export interface GraderLeadForHandoff {
+  leadId: string
+  email: string
+  consent: boolean
+  brandName: string
+  websiteUrl: string | null
+  /** ISO — actividad del lead (consent_at). */
+  consentAt: string
+  /** ISO o null — sentinel de idempotencia del handoff. */
+  hubspotSyncedAt: string | null
+}
+
+/**
+ * TASK-1242 — Lee el lead asociado a un run para el handoff a HubSpot. El email/nombre no
+ * existen desglosados aún (sub-task aparte); por ahora `first_name`/`last_name` se mapean
+ * vacíos. Toma el lead más reciente del run si hubiera más de uno.
+ */
+export const getGraderLeadForHandoff = async (runId: string): Promise<GraderLeadForHandoff | null> => {
+  const rows = await runGreenhousePostgresQuery<{
+    lead_id: string
+    email: string
+    consent: boolean
+    brand_name: string
+    website_url: string | null
+    consent_at: string
+    hubspot_synced_at: string | null
+  }>(
+    `SELECT lead_id, email, consent, brand_name, website_url, consent_at, hubspot_synced_at
+       FROM greenhouse_growth.grader_leads
+      WHERE run_id = $1
+      ORDER BY created_at DESC
+      LIMIT 1`,
+    [runId]
+  )
+
+  const row = rows[0]
+
+  if (!row) return null
+
+  return {
+    leadId: String(row.lead_id),
+    email: row.email,
+    consent: row.consent,
+    brandName: row.brand_name,
+    websiteUrl: row.website_url,
+    consentAt: new Date(row.consent_at).toISOString(),
+    hubspotSyncedAt: row.hubspot_synced_at ? new Date(row.hubspot_synced_at).toISOString() : null
+  }
+}
+
+/** TASK-1242 — Marca el lead como sincronizado a HubSpot (guard de idempotencia del handoff). */
+export const markGraderLeadHubspotSynced = async (leadId: string): Promise<void> => {
+  await runGreenhousePostgresQuery(
+    `UPDATE greenhouse_growth.grader_leads SET hubspot_synced_at = NOW() WHERE lead_id = $1`,
+    [leadId]
+  )
+}
