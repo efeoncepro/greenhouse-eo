@@ -6,12 +6,21 @@
  * Registrar en docs/operations/FEATURE_FLAG_STATE_LEDGER.md (gate docs:closure-check).
  */
 export const GROWTH_FORMS_PUBLIC_API_FLAG = 'GROWTH_FORMS_PUBLIC_API_ENABLED'
+export const GROWTH_FORMS_DISPATCH_FLAG = 'GROWTH_FORMS_DISPATCH_ENABLED'
 
 const isTrue = (value: string | undefined): boolean => value?.trim().toLowerCase() === 'true'
 
 /** Kill switch del API público de forms. Default OFF. */
 export const isFormsPublicApiEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
   isTrue(env[GROWTH_FORMS_PUBLIC_API_FLAG])
+
+/**
+ * Gate del dispatcher productivo (ops-worker drain). Default OFF → el handler del
+ * worker hace no-op prod-safe (cero queries; el schema greenhouse_growth puede no
+ * estar migrado en prod). ON → drena submissions aceptadas y las entrega.
+ */
+export const isFormsDispatchEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+  isTrue(env[GROWTH_FORMS_DISPATCH_FLAG])
 
 /**
  * Límites de abuse-guard del motor (rate-limit per-email/per-IP). Forms no tiene costo

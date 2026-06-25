@@ -366,6 +366,10 @@ ENV_VARS="${ENV_VARS},GROWTH_AI_VISIBILITY_ANTHROPIC_ENABLED=${GROWTH_AI_VISIBIL
 ENV_VARS="${ENV_VARS},GROWTH_AI_VISIBILITY_PERPLEXITY_ENABLED=${GROWTH_AI_VISIBILITY_PERPLEXITY_ENABLED}"
 ENV_VARS="${ENV_VARS},GROWTH_AI_VISIBILITY_GEMINI_ENABLED=${GROWTH_AI_VISIBILITY_GEMINI_ENABLED}"
 ENV_VARS="${ENV_VARS},GROWTH_AI_VISIBILITY_LLM_EXTRACTION_ENABLED=${GROWTH_AI_VISIBILITY_LLM_EXTRACTION_ENABLED}"
+# TASK-1229 — Motor Growth Forms: gate prod-safe del dispatcher (default OFF; el
+# handler hace no-op sin queries hasta prender). Flip cuando forms vaya a vivo.
+GROWTH_FORMS_DISPATCH_ENABLED="${GROWTH_FORMS_DISPATCH_ENABLED:-false}"
+ENV_VARS="${ENV_VARS},GROWTH_FORMS_DISPATCH_ENABLED=${GROWTH_FORMS_DISPATCH_ENABLED}"
 ENV_VARS="${ENV_VARS},OPENAI_API_KEY_SECRET_REF=${OPENAI_API_KEY_SECRET_REF}"
 ENV_VARS="${ENV_VARS},ANTHROPIC_API_KEY_SECRET_REF=${ANTHROPIC_API_KEY_SECRET_REF}"
 ensure_secret_accessor_binding "${OPENAI_API_KEY_SECRET_REF}:latest"
@@ -741,6 +745,19 @@ upsert_scheduler_job \
   "/growth/grader/drain" \
   '{"batchSize":1}'
 echo "  -> ops-growth-grader-drain: */5 * * * * (AI Visibility Grader async execution, TASK-1234)"
+
+# Growth Forms dispatch — TASK-1229.
+#
+# Cron */2 min: entrega async de submissions aceptadas del motor Growth Forms
+# (delivery SLA ≤2 min, mismo cadence que el outbox publisher). Gated: con
+# GROWTH_FORMS_DISPATCH_ENABLED OFF (default) el handler hace no-op (cero queries).
+# El adapter en 1229 es fake/echo; el HubSpot real es TASK-1230.
+upsert_scheduler_job \
+  "ops-growth-forms-dispatch" \
+  "*/2 * * * *" \
+  "/growth/forms/dispatch" \
+  '{}'
+echo "  -> ops-growth-forms-dispatch: */2 * * * * (Growth Forms delivery, TASK-1229)"
 
 # Email deliverability monitor — TASK-775 Slice 2.
 #

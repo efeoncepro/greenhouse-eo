@@ -119,6 +119,8 @@ import { probeNextAuthSecretRoundTrip } from '@/lib/auth/readiness'
 import { resolveCleanSeedDate } from '@/lib/finance/account-balances-clean-seed-resolver'
 import { drainPendingGraderRuns, recoverStuckRunningRuns } from '@/lib/growth/ai-visibility/run-engine'
 import { isGraderEnabled } from '@/lib/growth/ai-visibility/flags'
+import { dispatchPendingSubmissions } from '@/lib/growth/forms/dispatch'
+import { isFormsDispatchEnabled } from '@/lib/growth/forms/flags'
 
 import { computeRollingRematerializationWindow } from './finance-rematerialize-seed'
 import { getReactiveQueueDepth, InvalidDomainError } from './reactive-queue-depth'
@@ -1658,6 +1660,49 @@ const handleGrowthGraderDrain = async (req: IncomingMessage, res: ServerResponse
   }
 }
 
+// ─── /growth/forms/dispatch ─────────────────────────────────────────────────
+//
+// TASK-1229 — Motor Growth Forms: entrega async de submissions aceptadas. El submit
+// (Vercel) acepta + persiste {submission + consent + outbox event} en una tx y
+// responde 202; la ENTREGA al destino corre acá (Cloud Scheduler), drenando las
+// submissions pendientes vía el primitive `dispatchPendingSubmissions` (re-lee PG).
+// Razón Cloud Scheduler (no Vercel cron): mismo motivo que el outbox publisher
+// (TASK-773) — Vercel custom env (staging) no corre crons → la entrega quedaría
+// invisible en staging. En 1229 el adapter es fake/echo; el HubSpot real es TASK-1230.
+//
+// Gate prod-safe: con GROWTH_FORMS_DISPATCH_ENABLED OFF (default) el handler hace
+// no-op (cero queries; el schema greenhouse_growth puede no existir aún en prod).
+const handleGrowthFormsDispatch = async (req: IncomingMessage, res: ServerResponse) => {
+  const body = await readBody(req)
+
+  const limit = typeof body.limit === 'number' && body.limit > 0 ? Math.min(200, Math.floor(body.limit)) : 50
+
+  if (!isFormsDispatchEnabled()) {
+    json(res, 200, { ok: true, skipped: 'forms_dispatch_disabled', processed: 0, delivered: 0, failed: 0 })
+
+    return
+  }
+
+  console.log(`[ops-worker] POST /growth/forms/dispatch — limit=${limit}`)
+
+  try {
+    const summary = await dispatchPendingSubmissions(limit)
+
+    console.log(
+      `[ops-worker] /growth/forms/dispatch done — processed=${summary.processed} ` +
+      `delivered=${summary.delivered} failed=${summary.failed}`
+    )
+
+    json(res, 200, { ok: true, ...summary })
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown forms dispatch error'
+
+    console.error('[ops-worker] /growth/forms/dispatch failed:', message)
+    captureWithDomain(error, 'growth', { tags: { source: 'ops_worker_growth_forms_dispatch' } })
+    json(res, 502, { error: message })
+  }
+}
+
 // ─── /email-deliverability-monitor ──────────────────────────────────────────
 //
 // TASK-775 Slice 2 — Email deliverability monitor migrado de Vercel cron a
@@ -2298,6 +2343,12 @@ const server = createServer(async (req, res) => {
 
     if (method === 'POST' && path === '/growth/grader/drain') {
       await handleGrowthGraderDrain(req, res)
+
+      return
+    }
+
+    if (method === 'POST' && path === '/growth/forms/dispatch') {
+      await handleGrowthFormsDispatch(req, res)
 
       return
     }
