@@ -35,7 +35,10 @@ export const readLeadHandoffStatus = async (runId: string): Promise<LeadHandoffS
   try {
     const { report } = await readGraderReport({ runId })
 
-    scoreReleasable = report.gate.status === 'ready'
+    // Releasable = mismo predicado que el snapshot publish (ready/partial sí; rechaza solo
+    // insufficient_data/review_required). No ser más estricto que el snapshot.
+    scoreReleasable =
+      report.gate.status !== 'insufficient_data' && report.gate.status !== 'review_required'
   } catch (error) {
     if (!(error instanceof GraderReportError)) throw error
     // Sin score aún → no releasable (queda pending).

@@ -68,12 +68,28 @@ describe('executeLeadHandoff', () => {
     expect((await executeLeadHandoff('run-1')).reason).toBe('no_lead')
   })
 
-  it('score gateado (no ready) ⇒ skipped not_releasable (sin score falso)', async () => {
-    vi.mocked(readGraderReport).mockResolvedValue({ report: { ...readyReport().report, gate: { status: 'review_required' } } } as never)
+  it('score gateado (insufficient_data/review_required) ⇒ skipped not_releasable (sin score falso)', async () => {
+    for (const status of ['review_required', 'insufficient_data']) {
+      vi.clearAllMocks()
+      vi.mocked(isLeadHandoffEnabled).mockReturnValue(true)
+      vi.mocked(getGraderLeadForHandoff).mockResolvedValue(lead())
+      vi.mocked(readGraderReport).mockResolvedValue({ report: { ...readyReport().report, gate: { status } } } as never)
+
+      const result = await executeLeadHandoff('run-1')
+
+      expect(result, status).toMatchObject({ status: 'skipped', reason: 'not_releasable' })
+      expect(upsertLeadToHubSpot, status).not.toHaveBeenCalled()
+    }
+  })
+
+  it('gate `partial` SÍ es releasable (mismo predicado que el snapshot; bug del smoke)', async () => {
+    vi.mocked(readGraderReport).mockResolvedValue({ report: { ...readyReport().report, gate: { status: 'partial' } } } as never)
+    vi.mocked(upsertLeadToHubSpot).mockResolvedValue({ status: 'succeeded', contactId: 'c1', companyId: 'co1', retryable: false })
+
     const result = await executeLeadHandoff('run-1')
 
-    expect(result).toMatchObject({ status: 'skipped', reason: 'not_releasable' })
-    expect(upsertLeadToHubSpot).not.toHaveBeenCalled()
+    expect(result.status).toBe('succeeded')
+    expect(upsertLeadToHubSpot).toHaveBeenCalledOnce()
   })
 
   it('score not found ⇒ skipped no_score (no dead-letter)', async () => {

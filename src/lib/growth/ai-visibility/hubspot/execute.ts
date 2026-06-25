@@ -47,7 +47,10 @@ export const executeLeadHandoff = async (runId: string): Promise<LeadHandoffExec
   if (!lead) return skipped(runId, 'no_lead')
   if (!lead.consent) return skipped(runId, 'no_consent')
 
-  // Reporte + gate de honestidad: solo se sincroniza un score releasable (`ready` = completed).
+  // Reporte + gate de honestidad: solo se sincroniza un score RELEASABLE. Mismo predicado
+  // que `publishGraderReportSnapshot` (rechaza `insufficient_data`/`review_required`; `ready`
+  // y `partial` son publicables). NO ser más estricto que el snapshot, o un score real +
+  // publicado nunca llegaría a ventas (bug detectado en el smoke staging 2026-06-25).
   let report
 
   try {
@@ -61,7 +64,7 @@ export const executeLeadHandoff = async (runId: string): Promise<LeadHandoffExec
     throw error
   }
 
-  if (report.gate.status !== 'ready') {
+  if (report.gate.status === 'insufficient_data' || report.gate.status === 'review_required') {
     return skipped(runId, 'not_releasable')
   }
 
