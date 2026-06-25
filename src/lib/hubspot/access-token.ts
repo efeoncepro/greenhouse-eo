@@ -11,7 +11,9 @@ import { resolveSecretByRef } from '@/lib/secrets/secret-manager'
  * HubSpot paralelo (regla bridge). El token NUNCA se expone al browser.
  */
 const TOKEN_ENV_VAR = 'HUBSPOT_ACCESS_TOKEN'
-const TOKEN_GCP_SECRET = 'gcp:hubspot-access-token'
+// Ref canónico = nombre del secret a secas → projects/<project>/secrets/<name>/versions/latest.
+// NO usar `gcp:hubspot-access-token`: el `:` lo parsea como name=gcp/version=... (bug).
+const TOKEN_GCP_SECRET = 'hubspot-access-token'
 
 export const getHubSpotAccessToken = async (env: NodeJS.ProcessEnv = process.env): Promise<string> => {
   const envValue = env[TOKEN_ENV_VAR]?.trim()
