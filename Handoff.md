@@ -1,3 +1,13 @@
+## Incidente 2026-06-25 — Vercel auto-deploy detenido en push a `develop` (recuperado) — Claude
+
+> **Estado: RESUELTO (recuperado). Causa raíz: ventana transitoria del lado de Vercel, no del repo.**
+> - **Síntoma:** push a `develop` (`b47e67be0`, ~17:52 UTC) NO disparó auto-deploy de staging. Vercel mandó mails "Failed deployment" durante el día (7:21 / 12:16 / 12:25). El auto-deploy funcionó normal hasta ~mediodía y ahí se cortó.
+> - **Tell-tale diagnóstico (clave para recurrencia):** el commit bloqueado tenía **0 checks de `Vercel`** en su GitHub commit-status (`gh api repos/efeoncepro/greenhouse-eo/commits/<sha>/status`), mientras que un commit que SÍ desplegó esa mañana (`9c82b38c1`, ~10:46 Chile) tenía `Vercel success`. **0 checks de Vercel en el commit = problema del lado plataforma/Vercel, NO del repo.**
+> - **Descartado (NO eran la causa):** (a) `vercel.json` ignoreCommand — no existe, último touch TASK-775; (b) email del autor del commit — mismo autor `Julio Reyes <jreyes@efeonce.cl>` desplegó a las 10:46 y no a las 17:52; (c) desconexión Git — el repo sigue `Connected Mar 9`, Project→Settings→Git sano (Commit Status ON, Require Verified Commits = Inherit/Disabled); (d) `jreyes@efeonce.cl` está verificado en Vercel. El mail "not a member" (`julio.reyes@efeonce.org`) fue señal engañosa.
+> - **Workaround inmediato (usado, funcionó):** `vercel deploy --target staging` manual salta el gate de Git y crea el deployment. Con eso quedó **TASK-1253 live + verificado** en staging durante la ventana rota. Para prod: `vercel --prod`.
+> - **Resolución:** recuperó solo (o por re-auth del lado Vercel justo al probar). Prueba: push fresco `e03bc9485` → check **`Vercel success`** + deploy `8dxmookx0` **Ready** (staging). Auto-deploy end-to-end confirmado 2×.
+> - **Residual:** quedó un commit vacío de prueba `e03bc9485` en `develop` (inofensivo, solo disparó el deploy). Si recurre: chequear "0 checks de Vercel en el commit" → es Vercel/plataforma, no el repo; unblock = `vercel deploy` manual + revisar Vercel Team → Billing/Members por si es pausa de spend/seat.
+
 ## Sesión 2026-06-25 — TASK-1253 Growth Forms Validator Registry + Server-Side Authority — Claude
 
 > **Estado: code-complete, ROLLOUT PENDIENTE (flag `GROWTH_FORMS_SERVER_VALIDATION_ENABLED` default OFF).** No declarado "listo": la autoridad sólo actúa con el flag ON. Lifecycle queda `in-progress` por el Runtime Rollout Completion Gate.
