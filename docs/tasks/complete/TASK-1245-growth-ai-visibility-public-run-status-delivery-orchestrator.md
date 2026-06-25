@@ -10,7 +10,7 @@ TASK-1251 dejó `POST /run` con DOS paths (flag `GROWTH_GRADER_INTAKE_ON_FORMS_E
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Medio`
@@ -253,14 +253,26 @@ Slice 1 (reader/endpoint) -> Slice 2 (snapshot delivery) -> Slice 3 (hardening/s
 
 ## Acceptance Criteria
 
-- [ ] `GET /api/public/growth/ai-visibility/run/[publicId]` existe, es **read-only puro** (no publica snapshot ni dispara writes) y devuelve estados public-safe.
-- [ ] El auto-publish del snapshot vive en el path de finalización del worker (TASK-1234), gateado por auto-publicable (no `review_required`); `review_required` publica solo vía aprobación de TASK-1244.
-- [ ] El endpoint puede devolver `reportToken` solo cuando existe snapshot publicable.
-- [ ] `review_required`/`insufficient_data` no generan reporte definitivo ni filtran razones internas sensibles.
-- [ ] Doble poll concurrente no duplica snapshots ni dispara providers.
-- [ ] Reads publicos de status/report tienen hardening/rate-limit proporcional.
-- [ ] Tests cubren success, partial, review_required, failed, not-found, no-leak e idempotencia.
-- [ ] `TASK-1241` queda desbloqueada por un contrato real de poll.
+- [x] `GET /api/public/growth/ai-visibility/run/[handle]` existe, es **read-only puro** (no publica snapshot ni dispara writes) y devuelve estados public-safe. El handle es el **poll_token de alta entropía** (256 bits) o `submissionId`, NO el `public_id` secuencial (enumerable).
+- [x] El auto-publish del snapshot vive en el path de finalización del worker (`run-engine`, 4 puntos terminales), gateado por gate publicable (`ready`/`partial`); `review_required` → `in_review` (NUNCA auto-publica, espera TASK-1244); insufficient/failed → `unavailable`.
+- [x] El endpoint devuelve `reportToken` solo cuando existe snapshot publicable (`grader_reports` row).
+- [x] `review_required`/`insufficient_data` no generan reporte definitivo ni filtran razones internas (delivery state materializado bounded).
+- [x] Doble poll concurrente no duplica snapshots ni dispara providers (publish en finalizador único + `ON CONFLICT` idempotente; GET read-only).
+- [x] Reads públicos de status/report tienen rate-limit proporcional por IP (sin gasto LLM; fail-open; handle no enumerable de fondo).
+- [x] Tests cubren success, partial, review_required, failed, not-found, no-leak e idempotencia (status-reader 13 + finalizer 8 + read-guard 5 + signals 5).
+- [x] `TASK-1241` queda desbloqueada por un contrato real de poll (`pollToken`/`submissionId` → `GET /run/[handle]` → `reportToken` → `GET /report/[token]`).
+
+## Closure Note (2026-06-25)
+
+**Verdict QA:** CONDITIONAL PASS — `code complete, rollout pendiente` (staging smoke del poll→token gated por el launch EPIC-020).
+
+- **Decisión de diseño (operador-aprobada):** el `public_id` del run es **secuencial/enumerable** (`EO-GRUN-#####`) → no sirve como auth de un endpoint público sin sesión. Se introdujo `grader_runs.poll_token` (256-bit, alta entropía) como handle de poll; el `public_id` queda como id display/admin interno. El status reader resuelve **poll_token** (a-medida) o **submissionId** (convergente + su ventana `queued`), NUNCA el `public_id`.
+- **Slice 1** (reader + endpoint): migración `poll_token` + `readPublicGraderRunStatus(handle)` (DTO bounded queued/processing/ready/in_review/unavailable/not_found, sin PII/raw/razones internas) + `GET /run/[handle]` read-only + intake devuelve `pollToken`. SQL validada live (JOIN + security: `EO-GRUN-####` → 0 matches).
+- **Slice 2** (finalizer write-side): migración `public_delivery_state` (materialización O(1) leak-proof) + `finalizeRunDelivery` en la finalización del worker (auto-publish snapshot si releasable; review_required → in_review; resto → unavailable; best-effort). Validado live sobre **8 runs reales** (materializados correctamente, signals a steady).
+- **Slice 3** (hardening + signals): rate-limit de reads por IP (reusa `grader_intake_events`, outcomes `read_status`/`read_report`, fail-open) + 3 reliability signals (`public_status_read` posture; `public_delivery_pending` + `public_delivery_inconsistent` steady=0) wired al overview. Cierra el follow-up de rate-limit del `report/[token]`.
+- **Gates verdes:** `pnpm test` (8073) + `pnpm build` + `pnpm typecheck` + lint + `pg:doctor` + `docs:closure-check` (0 flags). 2 migraciones additive aplicadas+verificadas en dev PG; signals en steady (0/0).
+- **Integration points abiertos:** `review_required` → publish lo dispara la aprobación humana de **TASK-1244** (write-side). **TASK-1241** consume el contrato de poll. Email delivery del token → **TASK-1250** (OQ1 resuelta: fuera de scope, solo el contrato).
+- **Rollout pendiente (gated EPIC-020):** staging smoke low-volume del flujo `POST /run → poll /run/[handle] → ready → /report/[token]` con flag ON + worker activo.
 
 ## Verification
 

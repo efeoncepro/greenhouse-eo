@@ -1,5 +1,9 @@
 # TASK-1244 — Growth AI Visibility: Admin Evidence Review
 
+## Delta 2026-06-25 — integration point con TASK-1245 (complete)
+
+TASK-1245 dejó cableado el lado público de los runs `review_required`: el finalizador del worker materializa `grader_runs.public_delivery_state='in_review'` y **NUNCA auto-publica** el snapshot de un gate `review_required` (el status público responde `in_review`, espera honesta sin token). **Esta task (1244) es quien dispara el publish del snapshot al APROBAR**: el comando de aprobación debe (a) `publishGraderReportSnapshot({ runId })` y (b) actualizar `public_delivery_state='ready'` (o reusar `finalizeRunDelivery` tras mover el gate a publicable) para que el poll público (`GET /run/[handle]`) empiece a devolver el `reportToken`. Al RECHAZAR: dejar `public_delivery_state='unavailable'` (estado final honesto). NO publicar nunca sin aprobación humana (el gate `review_required` ya bloquea el auto-publish del worker).
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->

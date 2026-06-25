@@ -8,6 +8,17 @@
 > - **Resolución:** recuperó solo (o por re-auth del lado Vercel justo al probar). Prueba: push fresco `e03bc9485` → check **`Vercel success`** + deploy `8dxmookx0` **Ready** (staging). Auto-deploy end-to-end confirmado 2×.
 > - **Residual:** quedó un commit vacío de prueba `e03bc9485` en `develop` (inofensivo, solo disparó el deploy). Si recurre: chequear "0 checks de Vercel en el commit" → es Vercel/plataforma, no el repo; unblock = `vercel deploy` manual + revisar Vercel Team → Billing/Members por si es pausa de spend/seat.
 
+## Sesión 2026-06-25 — TASK-1245 Growth AI Visibility · Public Run Status + Delivery Orchestrator — Claude
+
+> **Estado: COMPLETE (code complete, rollout pendiente · gated EPIC-020).** Cierra el contrato público intake↔UI (poll→reporte). Movido a `complete/`. Local-first, sin push (a la espera de instrucción).
+> - **Decisión de diseño (operador-aprobada vía AskUserQuestion):** el `public_id` del run es **secuencial/enumerable** (`EO-GRUN-#####`) → no sirve como auth de un endpoint público sin sesión. Se introdujo `grader_runs.poll_token` (256-bit) como handle de poll no enumerable; el `public_id` queda display/admin interno.
+> - **Slice 1 (reader + endpoint):** migración `poll_token` + `readPublicGraderRunStatus(handle)` (resuelve poll_token o submissionId→lead→run + ventana `queued`; DTO bounded queued/processing/ready/in_review/unavailable/not_found, sin PII/raw/razones internas; reportToken solo con snapshot publicable) + `GET /run/[handle]` read-only puro + intake devuelve `pollToken`. SQL validada live (JOIN + `EO-GRUN-####`→0 matches).
+> - **Slice 2 (finalizer write-side):** migración `public_delivery_state` (materialización O(1) leak-proof) + `finalizeRunDelivery` en la finalización del worker (`run-engine`, 4 puntos terminales): succeeded/partial publicable → publishGraderReportSnapshot + ready; review_required → in_review (NUNCA auto-publica, espera **TASK-1244**); insufficient/failed → unavailable. Best-effort. **Validado live sobre 8 runs reales** (materializados; signals a steady).
+> - **Slice 3 (hardening + signals):** rate-limit de reads por IP (reusa `grader_intake_events`, outcomes `read_status`/`read_report`, fail-open; cierra el follow-up del `report/[token]`) + 3 reliability signals (`public_status_read` posture; `public_delivery_pending` + `public_delivery_inconsistent` steady=0) wired al overview.
+> - **Verde:** `pnpm test` full (8073) + build + typecheck + lint + `pg:doctor` + `docs:closure-check` (0 flags). 3 commits en develop. 2 migraciones additive aplicadas+verificadas en dev PG.
+> - **Desbloquea TASK-1241** (poll contract real). Integration points abiertos: **TASK-1244** (review_required → publish en approval), **TASK-1250** (email del reportToken; OQ1 resuelta: fuera de scope, solo el contrato).
+> - **Rollout pendiente (gated EPIC-020):** staging smoke low-volume `POST /run → poll /run/[handle] → ready → /report/[token]` con flag ON + worker activo. Sin flag nuevo (`*_ENABLED`); el knob `GROWTH_AI_VISIBILITY_PUBLIC_READ_PER_IP_PER_MIN` tiene default 60.
+
 ## Sesión 2026-06-25 — TASK-1257 Growth AI Visibility · captura de Nombre + Apellido en el intake — Claude
 
 > **Estado: COMPLETE (code complete, rollout pendiente · gated EPIC-020).** Cierra la sub-task que TASK-1242 dejó abierta (el contacto a ventas entraba sin nombre). Movido a `complete/`. Local-first, sin push.

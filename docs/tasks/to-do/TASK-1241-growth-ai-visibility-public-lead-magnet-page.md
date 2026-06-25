@@ -1,5 +1,14 @@
 # TASK-1241 — Growth AI Visibility: Public Lead Magnet Page
 
+## Delta 2026-06-25 — TASK-1245 complete: el contrato de poll YA existe
+
+El blocker de poll quedó cerrado por TASK-1245 (complete). El contrato real que esta página consume:
+
+- El intake (`POST /run`) devuelve `pollToken` (a-medida, alta entropía) y/o `submissionId` (convergente). **La página debe pollear por `pollToken ?? submissionId` — NUNCA por `runPublicId`** (es secuencial/enumerable; el reader lo rechaza).
+- Poll: `GET /api/public/growth/ai-visibility/run/[handle]` → DTO bounded `{ status, reportToken, message, retryAfterSeconds }`. Estados: `queued|processing|ready|in_review|unavailable|not_found`. Respetar `retryAfterSeconds` como backoff.
+- `ready` ⟹ `reportToken` presente → `GET /api/public/growth/ai-visibility/report/[token]`. `in_review` = espera honesta (sin token). `unavailable` = final honesto (recovery copy). `not_found` = 404.
+- Reads con rate-limit por IP (429 con copy `public_read_rate_limited`): tolerar 429 con backoff.
+
 ## Delta 2026-06-25 — impacto de TASK-1251 (convergencia sobre el motor)
 
 Cuando el flag `GROWTH_GRADER_INTAKE_ON_FORMS_ENGINE_ENABLED` esté ON (converge-before-launch), `POST /run` devuelve `submissionId` (no `runPublicId`) como handle de poll. La página debe leer `submissionId ?? runPublicId` del response y pollear vía TASK-1245 (que resuelve ambos). No asumir que el run existe inmediatamente tras el 202: en el path convergente el run se encola async (estado inicial `queued`). Follow-up posible: re-render del lead magnet vía el renderer portable del motor (TASK-1231) consumiendo el `render_contract` del grader-form gobernado (`fdef-ai-visibility-grader`) — fuera de scope de 1251.

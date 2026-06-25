@@ -792,3 +792,13 @@ Módulo `growth` `expectedSignalKinds` ahora incluye `test_lane`. DB vacía → 
 - `growth.ai_visibility.run_stuck_running` (runtime) — runs en `running` desde hace > `GROWTH_AI_VISIBILITY_STUCK_RUNNING_THRESHOLD_MINUTES` (90 min) ⇒ crash/timeout mid-run; `recoverStuckRunningRuns` los finaliza con la evidencia ya persistida. steady=0; >0 → error.
 
 Date-math segura (timestamptz − timestamptz vía `make_interval`, nunca `EXTRACT(EPOCH FROM (date−date))`); SQL ejercitada contra PG real. Detección live 2026-06-24: 1 run huérfano real (`running`) del timeout inline de TASK-1233 → `run_stuck_running=1` hasta el primer drain.
+
+## Delta 2026-06-25 — módulo `growth`: signals de entrega pública (TASK-1245)
+
+3 signals nuevos sobre la entrega pública del run del AI Visibility Grader (`src/lib/reliability/queries/growth-ai-visibility-public-delivery-signals.ts`, wired en `get-reliability-overview.ts`):
+
+- `growth.ai_visibility.public_status_read` (posture) — volumen de reads públicos (status + report token) en 24 h; visibilidad de tráfico/DoS. steady = cualquiera (informativo).
+- `growth.ai_visibility.public_delivery_pending` (data_quality, steady=0) — runs terminales (succeeded/partial) cuyo finalizador NO materializó la entrega (`public_delivery_state='pending'`) >15 min después de terminar: auto-publish estancado/caído. 1-3 → warning, >3 → error.
+- `growth.ai_visibility.public_delivery_inconsistent` (data_quality, steady=0) — invariante `public_delivery_state='ready' ⟹ existe snapshot publicable`; una fila `ready` sin snapshot es corrupción del estado materializado.
+
+DB vacía / pre-launch → steady ok. Error de lectura → degradación honesta (severity unknown). Spec: `docs/tasks/complete/TASK-1245-growth-ai-visibility-public-run-status-delivery-orchestrator.md`.
