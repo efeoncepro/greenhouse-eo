@@ -85,6 +85,7 @@ Reglas obligatorias:
 
 - **TASK-1256** (UI) — el submit-gating consume el endpoint `verify-email`.
 - Dispatcher de destinos (HubSpot) — el lead lleva ahora flags de calidad/verificación.
+- **TASK-1246** (lanzamiento público del Grader / lead magnet) — **fuertemente recomendado** al cutover (no hard-block): mejora calidad de lead desde el día uno. Si su rollout apura, 1246 puede lanzar con política `warn` y subir a `block_field` post-launch.
 
 ### Files owned
 

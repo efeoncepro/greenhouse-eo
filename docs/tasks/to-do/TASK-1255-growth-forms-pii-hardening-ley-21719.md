@@ -79,6 +79,7 @@ Reglas obligatorias:
 
 - **TASK-1256** (cockpit UI) — el masking + reveal affordance se consumen en el admin.
 - Dispatcher (HubSpot) — confirmar que el RUT cifrado NO se intenta enviar a destinos.
+- **TASK-1246** (lanzamiento público del Grader / lead magnet) — **bloquea su cutover**: lanzar un lead magnet público que captura PII (incl. RUT) a escala sin la postura Ley 21.719 es exposición legal. Esta task es prerrequisito de 1246.
 
 ### Files owned
 

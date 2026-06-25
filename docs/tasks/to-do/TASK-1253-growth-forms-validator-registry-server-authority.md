@@ -81,6 +81,7 @@ Reglas obligatorias:
 - **TASK-1254** (email verification) — el validador `corporate_email` vive en este registry; B depende de A.
 - **TASK-1255** (PII hardening) — consume la clasificación de campos sensibles que esta task formaliza.
 - **TASK-1256** (UI máscaras + gate) — el renderer consume el registry; D depende de A.
+- **TASK-1246** (lanzamiento público del Grader / lead magnet) — **bloquea su cutover**: el lead magnet captura PII pública vía el motor de formularios (convergencia TASK-1251); no se puede lanzar sin validación server-side real. Esta task es prerrequisito de 1246.
 - ⚠️ **Colisión con TASK-1229/1231/1232** (motor de formularios, Codex in-flight): esta task modifica `contracts.ts`, `commands.ts`, `store.ts`, `validation.ts`. **Coordinar merge order con Codex antes de tomar** — secuenciar después de que TASK-1232 cierre, o rebasear.
 
 ### Files owned

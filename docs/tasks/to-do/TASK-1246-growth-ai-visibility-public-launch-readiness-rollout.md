@@ -18,7 +18,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `growth|ops|public-site|reliability`
-- Blocked by: `TASK-1241, TASK-1242, TASK-1244, TASK-1245, TASK-1250`
+- Blocked by: `TASK-1241, TASK-1242, TASK-1244, TASK-1245, TASK-1250, TASK-1253, TASK-1255`
 - Branch: `task/TASK-1246-growth-ai-visibility-public-launch-readiness-rollout`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -296,6 +296,12 @@ Slice 1 (checklist) -> Slice 2 (staging) -> Slice 3 (production). Produccion no 
 
 - Production analytics/conversion dashboard si no existe en Growth Forms.
 - A/B testing de copy/CTA posterior al primer launch.
+
+## Delta 2026-06-25
+
+- **Bloqueo de blindaje del motor de formularios añadido** — `Blocked by` ahora incluye `TASK-1253` (validación server-side / autoridad real del submit) y `TASK-1255` (PII hardening Ley 21.719). Razón: el lead magnet captura PII pública a escala (incluido RUT) **a través del motor de formularios** (vía convergencia TASK-1251). Lanzar públicamente sin validación de servidor (1253) ni postura de protección de datos (1255) es exposición legal + leads basura desde el día uno. Estas dos son prerrequisito de cutover, no opcionales.
+- **TASK-1254** (gate de correo corporativo) NO es hard-block pero sí fuertemente recomendado al lanzamiento; si su rollout apura, el primer launch puede salir con el form en política `warn` (etiqueta el lead como sospechoso sin rechazar) y subir a `block_field` post-launch. Documentar la decisión en el checklist de cutover.
+- Cruce registrado por trabajo en TASK-1253/1255 (creación del bloque Growth Forms Data Integrity, 2026-06-25).
 
 ## Open Questions
 
