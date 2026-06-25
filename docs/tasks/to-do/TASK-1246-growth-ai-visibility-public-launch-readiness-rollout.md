@@ -54,6 +54,11 @@ Revisar y respetar:
 
 Reglas obligatorias:
 
+- **Skill MANDATORIA `greenhouse-production-release` antes de CUALQUIER promoción/preflight/approval/rollback** (Slice 3). El cutover productivo va por el **release control plane** (preflight CLI 12 checks → release manifest + state machine append-only → orchestrator workflow → watchdog), NO por flips ad-hoc. Distinguir dos cosas: (a) **promoción de código `develop → main`** vía control plane; (b) **flip del flag** vía Vercel env (el código debe estar ya en `main` antes del flag ON en prod). NUNCA disparar el orquestador <8 min post-push a `main` (Vercel BUILDING race).
+- **Runtime Rollout Completion Gate:** `code complete ≠ operationally complete`. Verificar flags en TODOS los targets (prod/staging/preview/worker/Cloud Run), redeploy/restart aplicado (Vercel y Cloud Run NO toman env vars en caliente), integración externa probada con evidencia real.
+- **Path async en staging (footgun Figma 2026-05-03):** el outbox publisher + el reactive consumer del HubSpot handoff corren por **Cloud Scheduler + ops-worker** (NO Vercel cron, que solo corre en Production). El smoke de staging debe confirmar que esos jobs están activos en staging, si no el handoff "pasa" pero nunca entrega.
+- **Higiene de secretos para `TURNSTILE_SECRET`:** publicar como scalar crudo (sin comillas/`\n`), vía Secret Manager; si se consume por `*_SECRET_REF`, **confirmar el grant `secretAccessor` al SA runtime** (`greenhouse-portal@`) — sin él, `resolveSecretByRef`→null y el error es engañoso ("not configured"). Verificar el consumer real (`/api/...` que valida captcha) post-rotación. Skill `greenhouse-secret-hygiene`.
+- **Vercel CLI scope (ISSUE-076):** antes de cualquier `vercel env`/mutation, `cat .vercel/project.json` debe retornar `prj_d9v6gihlDq4k1EXazPvzWhSU0qbl`; si no, pasar `--scope efeonce-7670142f`. NUNCA crear `VERCEL_AUTOMATION_BYPASS_SECRET` manual.
 - No prender produccion sin staging smoke end-to-end y rollback documentado.
 - No activar intake publico sin consent legal aprobado y Turnstile server-side.
 - No gastar providers de forma no acotada: flags, budget y signals deben estar visibles.
@@ -182,13 +187,15 @@ Reglas obligatorias:
 
 ### Slice 2 — Staging activation
 
-- Activar staging con `GROWTH_AI_VISIBILITY_PUBLIC_INTAKE_ENABLED=true` y Turnstile real.
-- Ejecutar smoke end-to-end: form -> run -> status -> report token -> public report -> email con adjunto -> HubSpot handoff.
+- Activar staging con `GROWTH_AI_VISIBILITY_PUBLIC_INTAKE_ENABLED=true` y Turnstile real (verificar grant `secretAccessor` del `TURNSTILE_SECRET`).
+- **Confirmar que los jobs Cloud Scheduler + ops-worker están activos en staging** (outbox publisher + reactive consumer del HubSpot handoff): sin esto el handoff async "pasa" pero no entrega.
+- Ejecutar smoke end-to-end: form -> run -> status -> report token -> public report -> email con adjunto -> HubSpot handoff. Incluir el path `review_required` (no auto-publica → aprobación 1244 → publica).
 
-### Slice 3 — Production release plan
+### Slice 3 — Production release plan (vía release control plane)
 
-- Preparar release control plane, prod envs OFF->ON con aprobacion humana, smoke prod low-volume y signals.
-- Dejar evidencia en Handoff/changelog y ledger de flags.
+- Invocar la skill `greenhouse-production-release`. **Promoción de código `develop → main`** vía preflight (12 checks) + release manifest + orchestrator (no flips ad-hoc; no disparar orquestador <8 min post-push).
+- Solo con el código ya en `main` + deploy Ready: flip de `GROWTH_AI_VISIBILITY_PUBLIC_INTAKE_ENABLED` ON en prod (Vercel env) con aprobación humana, budget bajo, smoke prod low-volume y signals steady.
+- Actualizar `FEATURE_FLAG_STATE_LEDGER.md`: fila por flag con estado **por environment** (prod/staging/preview); los que queden code-complete sin prender van a §Pendientes de acción. Dejar evidencia en Handoff/changelog.
 
 ## Out of Scope
 
@@ -214,6 +221,9 @@ Slice 1 (checklist) -> Slice 2 (staging) -> Slice 3 (production). Produccion no 
 | Consent legal insuficiente | legal/privacy | medium | sign-off antes de flag ON | launch checklist |
 | HubSpot pollution/duplicados | CRM | medium | idempotencia + dry-run + property approval | handoff failures |
 | Review gate no operable | safety | medium | `TASK-1244` complete + smoke review_required | publish 409 / pending queue |
+| Handoff async "verde" pero no entrega en staging | reliability | medium | confirmar Cloud Scheduler + ops-worker activos en staging (no Vercel cron) | outbox unpublished_lag / handoff pending |
+| `TURNSTILE_SECRET` resuelve null silencioso | security/launch | medium | grant `secretAccessor` a SA runtime + verificar consumer real post-rotación | captcha "not configured" / 500 |
+| Promoción dispara BUILDING race | release | low | no orquestar <8 min post-push a `main`; usar preflight + manifest | watchdog stale / Wait Vercel READY fail |
 
 ### Feature flags / cutover
 
@@ -258,6 +268,10 @@ Slice 1 (checklist) -> Slice 2 (staging) -> Slice 3 (production). Produccion no 
 - [ ] HubSpot handoff validado segun modo aprobado (dry-run o live controlado).
 - [ ] Signals de costo/abuso/run/delivery/handoff revisadas y documentadas.
 - [ ] Production cutover preparado con rollback flag OFF <5 min.
+- [ ] Promoción productiva ejecutada vía release control plane (preflight + manifest + orchestrator), NO flip ad-hoc; skill `greenhouse-production-release` invocada.
+- [ ] Jobs Cloud Scheduler + ops-worker confirmados activos en staging (outbox publisher + handoff reactive consumer); el handoff entrega de verdad, no solo responde 200.
+- [ ] `TURNSTILE_SECRET` con grant `secretAccessor` verificado contra el consumer real (captcha valida en staging).
+- [ ] `FEATURE_FLAG_STATE_LEDGER.md` con fila por flag y estado por environment; `pnpm docs:closure-check` verde.
 - [ ] Handoff/changelog/architecture delta actualizados con evidencia runtime.
 
 ## Verification

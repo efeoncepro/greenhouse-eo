@@ -55,8 +55,10 @@ Revisar y respetar:
 Reglas obligatorias:
 
 - El email se envía desde Greenhouse server-side usando `src/lib/email/delivery.ts`; no se llama Resend directo desde el dominio ni desde la UI.
-- El adjunto se genera desde el snapshot `PublicGraderReport` ya congelado, no desde el reporte interno on-read ni desde raw provider responses.
+- **Disparo write-side, NUNCA on-read (overlay arch #3 + consistencia con TASK-1245):** el dispatch del email es un **reactive consumer del evento de publicación/aprobación del snapshot** (el worker finaliza+publica el snapshot auto-publicable, o TASK-1244 aprueba → emite outbox event `growth.ai_visibility.report_email_requested` → consumer ejecuta `sendEmail`). NUNCA se dispara desde el `GET /run/[publicId]` de status (un poll público no envía correos). La pantalla (1241) y el email son dos consumers del MISMO delivery state.
+- El adjunto se genera desde el snapshot `PublicGraderReport` ya congelado, no desde el reporte interno on-read ni desde raw provider responses; **el builder es determinista** (mismo snapshot → mismos bytes), base de un resend idempotente.
 - `review_required`/`insufficient_data` no envían informe completo; si aplica, envían estado honesto o esperan aprobación según `TASK-1244/1245`.
+- **Consent-gate en el dispatch:** enviar solo si el consent snapshot del lead (TASK-1240) cubre la entrega del reporte; NUNCA enviar a un lead sin consent o con consent retirado. Email transaccional, no marketing (nurturing queda fuera).
 - El email del lead no viaja a providers AI; solo se usa para delivery/HubSpot/consent.
 - El envío es idempotente por run/report snapshot; no doble correo por doble poll.
 
@@ -83,14 +85,13 @@ Reglas obligatorias:
 
 ### Files owned
 
-- `src/lib/growth/ai-visibility/public-delivery/**`
-- `src/lib/growth/ai-visibility/report/**`
-- `src/emails/AiVisibilityGraderReportEmail.tsx`
-- `src/lib/email/templates.ts`
-- `src/lib/email/types.ts`
-- `src/lib/copy/dictionaries/es-CL/emails.ts`
-- `src/lib/email/template-copy.ts` [verificar si requiere tipos nuevos]
-- `src/lib/reliability/queries/**` [verificar nombre final de signal]
+- `src/lib/growth/ai-visibility/public-delivery/email/**` (el command + attachment builder — específicos)
+- `src/emails/AiVisibilityGraderReportEmail.tsx` (nuevo)
+- `src/lib/copy/dictionaries/es-CL/emails.ts` (agregar copy)
+- `src/lib/reliability/queries/growth-ai-visibility-report-email-*.ts` (señal nueva)
+- `docs/tasks/to-do/TASK-1250-growth-ai-visibility-email-report-delivery.md`
+
+Extend (NO owned — append, no apropiar): `src/lib/email/templates.ts` + `types.ts` + `template-copy.ts` (registrar el nuevo `EmailType`, +seed row en `email_type_config` el mismo PR si la tabla lo requiere); `src/lib/growth/ai-visibility/report/**` y `public-delivery/**` (compartidos con TASK-1235/1239/1245 — tocar con cuidado).
 
 ## Current Repo State
 
@@ -200,8 +201,8 @@ Reglas obligatorias:
   - No enviar informe si `review_required` no aprobado o `insufficient_data`.
   - El link público usa `reportToken`; no incluir ids internos secuenciales como secreto.
 - Tenant/space boundary: público sin sesión; auth del informe por token; recipient derivado de `grader_leads` consentido.
-- Idempotency/concurrency: idempotency key por `lead_id + report_id + email_type`; retry usa delivery layer y no duplica.
-- Audit/outbox/history: `email_deliveries` + optional outbox event `growth.ai_visibility.report_email_requested/sent/failed` [verificar catalog].
+- Idempotency/concurrency: idempotency key por `lead_id + report_id + email_type` **respaldada por UNIQUE a nivel DB** (no solo check app-level) para que disparos concurrentes (worker publish + retry) no doble-envíen; retry usa la delivery layer y no duplica.
+- Audit/outbox/history: outbox event `growth.ai_visibility.report_email_requested/sent/failed` (registrar en el event catalog) → reactive consumer ejecuta el envío; `email_deliveries` persiste el resultado; dead-letter tras N retries.
 
 ### Migration, backfill and rollout
 
@@ -271,11 +272,11 @@ Reglas obligatorias:
 - Usar `sendEmail()` con attachment y source metadata.
 - Idempotencia por lead/report/email type; retry/resend explicito separado.
 
-### Slice 4 — Signals + integration
+### Slice 4 — Signals + integration (reactive consumer)
 
-- Integrar con `TASK-1245` para disparar delivery cuando el report token queda listo.
-- Agregar signal/query de failures/dead-letter si la capa de email generica no basta.
-- Staging smoke con delivery real o dry-run si Resend no esta configurado.
+- Integrar con `TASK-1245` como **reactive consumer del evento de snapshot publicado/aprobado** (outbox `report_email_requested`), NO acoplado al GET de status. El dispatch corre async (worker/consumer), no en el request path público.
+- Agregar signal/query de failures/dead-letter si la capa de email generica no basta (rollup módulo `growth`).
+- Staging smoke con delivery real o dry-run si Resend no esta configurado; confirmar que el job del consumer corre en staging (Cloud Scheduler/ops-worker, no Vercel cron).
 
 ## Out of Scope
 
@@ -299,7 +300,8 @@ Slice 1 (template/type) -> Slice 2 (attachment) -> Slice 3 (command/idempotency)
 
 | Riesgo | Sistema | Probabilidad | Mitigation | Signal de alerta |
 |---|---|---|---|---|
-| Doble email por doble poll/retry | communications | medium | idempotency key por lead/report/type | duplicate delivery rows |
+| Doble email por doble poll/retry | communications | low | UNIQUE DB lead/report/type + disparo write-side (no on-read) | duplicate delivery rows |
+| Envío sin consent / consent retirado | privacy/legal | medium | consent-gate en dispatch contra el snapshot de consent de 1240 | sends sin consent match |
 | Adjuntar evidencia interna/raw | privacy/legal | medium | builder desde `PublicGraderReport` + leak tests | no-leak test failure |
 | Enviar reportes gateados | safety/legal | low | check `review_required`/`insufficient_data` antes de dispatch | dispatch blocked count |
 | Attachment excede limite provider | email delivery | medium | tamaño acotado + fallback link-only documentado | resend failure |
@@ -309,7 +311,7 @@ Slice 1 (template/type) -> Slice 2 (attachment) -> Slice 3 (command/idempotency)
 
 - Reusar `email_type_config` kill switch si aplica.
 - Production send se valida en `TASK-1246`; staging primero.
-- Si se agrega flag dedicado, default OFF: `GROWTH_AI_VISIBILITY_REPORT_EMAIL_ENABLED` [verificar necesidad].
+- Si se agrega flag dedicado, default OFF: `GROWTH_AI_VISIBILITY_REPORT_EMAIL_ENABLED` — **registrar fila en `FEATURE_FLAG_STATE_LEDGER.md` el mismo PR** (gate `pnpm docs:closure-check`).
 
 ### Rollback plan per slice
 
@@ -343,7 +345,8 @@ Slice 1 (template/type) -> Slice 2 (attachment) -> Slice 3 (command/idempotency)
 - [ ] Existe email type/template para `ai_visibility_grader_report` con subject, HTML y plain text.
 - [ ] El email incluye resumen breve, CTA al reporte tokenizado y aviso del adjunto.
 - [ ] El informe completo adjunto se genera desde `PublicGraderReport` snapshot, no desde raw/internal report.
-- [ ] Dispatch es idempotente por lead/report snapshot y no duplica en doble poll/retry.
+- [ ] Dispatch es idempotente por lead/report snapshot (UNIQUE a nivel DB) y no duplica en doble poll/retry; se dispara como reactive consumer del evento de publicación, NO desde el GET de status.
+- [ ] Consent-gate verificado: solo envía si el consent snapshot del lead cubre la entrega; nunca a consent ausente/retirado.
 - [ ] `review_required` sin aprobacion e `insufficient_data` no envian informe completo.
 - [ ] `email_deliveries` registra envio, status, source metadata y `has_attachments=true`.
 - [ ] Tests cubren template baseline, attachment no-leak, idempotency y blocked states.
@@ -376,4 +379,4 @@ Slice 1 (template/type) -> Slice 2 (attachment) -> Slice 3 (command/idempotency)
 ## Open Questions
 
 1. ¿Formato del adjunto V1: PDF o HTML? Propuesta: PDF si existe renderer/adapter disponible; si no, HTML adjunto public-safe + follow-up PDF premium.
-2. ¿El email se dispara inmediatamente al snapshot o espera que la UI lo muestre primero? Propuesta: se dispara al snapshot listo/idempotente; la pantalla y el email son dos consumers del mismo delivery state.
+2. ¿El email se dispara inmediatamente al snapshot o espera que la UI lo muestre primero? **Resuelto:** se dispara como reactive consumer del evento de publicación/aprobación del snapshot (write-side, no on-read GET); pantalla y email son dos consumers del mismo delivery state. Mecanismo consistente con el ajuste de TASK-1245 (publish en worker, no on-read).

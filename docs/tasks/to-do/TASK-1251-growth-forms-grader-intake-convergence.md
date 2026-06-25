@@ -61,7 +61,9 @@ Reglas obligatorias:
 
 - **No "estandarizar hacia abajo":** la convergencia es un upgrade — el grader debe terminar con MÁS robustez, no menos features. Si el motor aún no cubre una capacidad que el grader hoy tiene (p.ej. cost ceiling/budget diario de TASK-1240), esa capacidad se generaliza al motor, no se pierde.
 - **Cero regresión del lead magnet ya lanzado:** el contrato público (`POST /run` + poll + `reportToken`) se preserva byte-compatible durante el cutover; el migration corre detrás de flag con shadow antes del flip.
-- Extracción de primitives compartidos = refactor sin cambio de comportamiento observable; cubrir con tests de paridad antes/después.
+- Extracción de primitives compartidos = refactor sin cambio de comportamiento observable; cubrir con tests de paridad antes/después **exhaustivos sobre la frontera de decisión** (thresholds de rate-limit, borde del budget, captcha pass/fail, hashing) — no solo happy path; es un primitive de seguridad.
+- **El shadow es side-effect-free (crítico — el grader gasta LLM + email + HubSpot):** el path nuevo en sombra **compara el submission/contrato que PRODUCIRÍA, sin ejecutar efectos** — NO encola un run del grader (no gasto LLM), NO dispara email (TASK-1250), NO escribe a HubSpot (TASK-1242), NO crea un lead visible. Un "shadow" que escribe duplicaría costo y leads. Comparar shape/decisión, no ejecutar.
+- **Inmutabilidad de la evidencia de consent:** al bindear `grader_leads` al `form_submission_consent_snapshot` del motor, preservar el consent ORIGINAL (copy/versión que el lead efectivamente aceptó al capturar) — NUNCA re-atribuirlo retroactivamente a la versión actual del form del motor (integridad legal Ley 21.719/GDPR; el consent evidence es inmutable y atado a lo mostrado al capturar).
 - Submissions/attempts append-only o event-sourced; consent snapshot se conserva aunque falle delivery (invariante del motor).
 - El email del lead nunca viaja a providers AI; solo delivery/HubSpot/consent (invariante TASK-1240/1250 preservado).
 
@@ -137,9 +139,12 @@ Extend/shared (NO owned — propiedad de TASK-1229): la capa compartida `src/lib
   - El cost ceiling / budget diario que hoy tiene el grader (TASK-1240) NO se pierde: se generaliza al motor o se preserva como policy del host_surface del grader.
   - Migración append-only / reversible: no DELETE destructivo de `grader_leads`/`grader_intake_events` sin validar el payload de reemplazo (regla BigQuery/SQL del repo aplica a cualquier migración de período/ledger).
   - `email_hash`/`ip_hash` siguen hasheados; nunca PII cruda en eventos.
+  - **Binding `runPublicId`↔submission preservado:** el status reader de TASK-1245 (`GET /run/[publicId]`) debe seguir resolviendo estado→`reportToken` sobre el submission del motor; el `runPublicId` no cambia ni pierde su mapeo.
+  - El grader-form tiene **múltiples post-submit consumers** (encolar diagnóstico + HubSpot handoff 1242 + email 1250), no uno solo: modelar el enqueue del diagnóstico como destination/post-submit del motor sin romper el modelo de `form_destination` (ver Open Question — decide si el motor necesita generalizar a "internal async destinations").
 - Tenant/space boundary: público anónimo con captcha + rate-limit (igual que hoy); admin del form vía capabilities `growth.forms.*`.
 - Idempotency/concurrency: `dedupe_fingerprint`/idempotency token del motor; el run del grader sigue siendo idempotente por su clave actual.
-- Audit/outbox/history: el submission del motor + attempts son el ledger; el run del grader cuelga del submission.
+- **Boundary atómico del submit (NO atomizar los efectos externos):** la transacción síncrona del submit escribe todo-o-nada en una sola tx de Postgres `{form_submission + form_submission_consent_snapshot + outbox event(s)}`; el `200 OK` solo se devuelve con ese trío committeado. Los **múltiples post-submit consumers** (encolar grader-run + HubSpot handoff 1242 + email 1250) NO van dentro de esa tx (no 2PC sobre LLM/HubSpot/Resend; HubSpot caído no debe abortar la aceptación del lead): cada uno es un **reactive consumer idempotente** del evento committeado, con retry + dead-letter. Atomicidad del submit ✅ ≠ atomicidad de los efectos externos ❌. El fan-out a N consumers no es atómico entre sí; at-least-once + idempotencia = effectively-once.
+- Audit/outbox/history: el submission del motor + attempts son el ledger; el run del grader cuelga del submission vía el evento, no inline.
 
 ### Migration, backfill and rollout
 
@@ -237,6 +242,8 @@ La convergencia tiene dos pilares independientes en riesgo: (1) **extracción de
 | El grader pierde el cost ceiling/budget al converger | cost / reliability | medium | Generalizar el budget al motor (no eliminarlo) + test de circuit breaker | `public_intake_cost_window` |
 | Migración destructiva irreversible de `grader_leads` | migration | low | Solo additive + proyección read-only del histórico; revert por flag; nada de DELETE sin validar reemplazo | migration check + conteos |
 | Extracción del port cambia comportamiento de abuse/captcha sutilmente | security | medium | Tests de paridad antes/después (mismos accept/reject) | code review + `public_intake_blocked` |
+| Shadow ejecuta efectos (doble LLM run / doble lead / doble email) | cost / data / comms | medium | Shadow side-effect-free: compara shape, NO encola run / email / HubSpot / lead visible | doble `provider_observations` / leads duplicados |
+| Consent re-atribuido a versión actual del form (no la aceptada) | legal/privacy | medium | Preservar copy/versión original del consent en el snapshot; no reescribir histórico | audit de consent version |
 
 ### Feature flags / cutover
 
@@ -277,7 +284,9 @@ La convergencia tiene dos pilares independientes en riesgo: (1) **extracción de
 
 - [ ] Abuse-guard + captcha viven en una capa compartida `src/lib/growth/**` consumida por el motor y el grader; tests de paridad verdes (cero cambio observable de accept/reject).
 - [ ] Un submission gobernado del motor dispara el run del grader vía outbox + reactive (no inline); el grader es un `host_surface`/form del motor.
-- [ ] El contrato público `POST /run` + poll + `reportToken` permanece byte-compatible; smoke público sin regresión.
+- [ ] El contrato público `POST /run` + poll + `reportToken` permanece byte-compatible; smoke público sin regresión; el binding `runPublicId`↔submission preserva el status reader de TASK-1245.
+- [ ] El shadow es side-effect-free: comparó shape/decisión sin encolar run, email, HubSpot ni lead visible (cero doble gasto/lead durante la sombra).
+- [ ] El consent migrado preserva la copy/versión original aceptada por el lead (no re-atribuida a la versión actual del form).
 - [ ] El lead sigue llegando a `TASK-1242` (HubSpot) y `TASK-1250` (email); conteos de leads pre/post iguales.
 - [ ] El cost ceiling/budget del grader se preserva (generalizado al motor), no se pierde.
 - [ ] Migración additive + reversible por flag; sin DELETE destructivo de `grader_leads`/`grader_intake_events` sin validar reemplazo.
@@ -315,3 +324,5 @@ La convergencia tiene dos pilares independientes en riesgo: (1) **extracción de
 1. ¿El `POST /api/public/growth/ai-visibility/run` se preserva como fachada estable (recomendado, cero regresión) o se redirige al endpoint genérico del motor `POST /api/public/growth/forms/{slug}/submit`? Propuesta V1: fachada estable que internamente crea el submission.
 2. ¿`grader_leads`/`grader_intake_events` se migran a las tablas del motor o se conservan como proyección read-only del histórico mientras el motor pasa a ser el SoT? Decidir en discovery según el costo del backfill.
 3. ¿La capa compartida abuse-guard/captcha nace en `TASK-1229` (preferido) y esta task solo la consume, o la extrae esta task? Depende del estado de cierre de TASK-1229 al tomarla.
+4. **Modelado del destino del grader-run:** ¿el enqueue del diagnóstico se modela como un `form_destination` adapter (tipo "internal async job") del motor, o como un post-submit reactive consumer distinto del modelo de destinations (que en TASK-1230 es HubSpot-céntrico)? Decide si TASK-1229 debe generalizar su abstracción de destination a destinos internos. Propuesta: post-submit reactive consumer sobre el submission, separado del adapter de destination CRM.
+5. **Secuenciación vs launch (TASK-1246):** ¿la convergencia ocurre ANTES del launch público masivo (lanzar ya sobre el motor, menor riesgo) o DESPUÉS (migrar tráfico vivo, mayor riesgo)? Como 1246 es P1 y esta P2, el orden probable es launch-then-converge — la disciplina facade+shadow+flag+conteos+7d está diseñada precisamente para migrar tráfico vivo, pero conviene decidirlo explícito con el operador (idealmente converger antes del pico de tráfico).

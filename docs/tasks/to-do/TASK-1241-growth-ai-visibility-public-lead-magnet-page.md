@@ -139,6 +139,31 @@ Reglas obligatorias:
 - Copy source: `src/lib/copy/growth.ts`.
 - Access impact: `none` (público sin sesión; protegido por captcha + rate-limit del endpoint).
 
+### Approved visual direction
+
+- Product Design exploration approved by operator on 2026-06-25: **Answer Engine Signal Scan** as the base direction, incorporating the async stepper from **Guided Diagnostic Journey** and the "Qué recibes" proof block from **Report-First Lead Magnet**.
+- Durable visual references:
+  - Base target: `docs/assets/product-design/task-1241-ai-visibility-public-lead-magnet/answer-engine-signal-scan.png`
+  - Async/state reference: `docs/assets/product-design/task-1241-ai-visibility-public-lead-magnet/guided-diagnostic-journey.png`
+  - Output/proof reference: `docs/assets/product-design/task-1241-ai-visibility-public-lead-magnet/report-first-lead-magnet.png`
+- Visual objective: public, conversion-focused, modern and premium; it should feel like an Efeonce public product experience backed by Greenhouse, not like an internal admin dashboard.
+- First-screen hierarchy:
+  - Full-bleed public hero with the offer/category as the H1: AI Visibility / answer-engine visibility diagnostic. Hero text overlays the visual scene directly, not inside a card.
+  - Primary conversion surface visible in the first viewport: intake form for brand/site/market/category/work email/consent/Turnstile + CTA.
+  - Trust microcopy near the form: sampled diagnostic, privacy/consent posture, no raw provider responses, no guaranteed rankings.
+  - Hint of the next section visible on desktop/mobile: report preview with score, primary gap, dimensions and states.
+- Async/state pattern from option 2:
+  - Use a compact stepper/progress rail for `queued -> running -> report ready`; phase labels are public-safe and never provider-internal.
+  - `review_required` maps to a neutral "revisión" state; do not expose internal review reasons.
+- Output/proof pattern from option 3:
+  - Include a below-fold "Qué recibes" section showing report output, email delivery/link tokenizado and public-safe attachment expectation (TASK-1250 consumer), without making this UI responsible for email dispatch.
+  - Show value through the report artifact early enough to sell the exchange of email for report.
+- Avoided directions:
+  - No generic SaaS dashboard hero, no centered app-card-on-background, no split text/media hero, no nested card stack.
+  - No provider logos unless legal/provider terms explicitly allow them.
+  - No raw evidence, no "secret data found" framing, no guaranteed AI ranking claims.
+  - No Turnstile/reCAPTCHA ambiguity in implementation: visual placeholder must map to Cloudflare Turnstile.
+
 ### State inventory
 
 - Default: landing + form.
@@ -197,11 +222,17 @@ Reglas obligatorias:
 
 - Landing + form (§9.2: marca, sitio, país/mercado, industria/categoría, descripción, email, consent; opcionales) con validación + widget Turnstile (site key).
 - POST a `/api/public/.../run`; mapear outcomes (202/400/403/429/503/404) a estados con copy es-CL. Copy en `src/lib/copy/growth.ts`.
+- Implementar la dirección aprobada **Answer Engine Signal Scan**:
+  - hero público full-bleed con H1/offer y form visible en el primer viewport;
+  - form integrado al flujo de la página, no app-card aislada;
+  - trust/consent/Turnstile visibles y legibles sin fricción excesiva.
 
 ### Slice 2 — Estados async (poll) + render del reporte
 
 - Poll del estado del run (queued/running/partial/completed/review_required/failed, §9.3) sin internals de provider.
 - Al completar: leer el snapshot por token y renderizar el `PublicGraderReport` (headline KPI, 3-5 hallazgos, plan priorizado, tendencia, dimensiones viz-ready + **table-fallback**, disclaimer). Charts ECharts.
+- Incorporar el stepper de estados de **Guided Diagnostic Journey** y el bloque "Qué recibes" de **Report-First Lead Magnet**.
+- El report preview debe vender el valor del diagnóstico, pero el reporte completo sigue leyendo exclusivamente `PublicGraderReport`.
 
 ### Slice 3 — a11y + GVC + pulido enterprise
 
@@ -266,6 +297,7 @@ La página es **cliente puro** de los endpoints públicos: form → `POST /run` 
 
 - [ ] Se declaró `Execution profile: ui-ux` y `UI impact: flow`.
 - [ ] Form §9.2 + consent + Turnstile postea a `/api/public/.../run`; outcomes mapeados a estados con copy es-CL en `src/lib/copy/*`.
+- [ ] La implementación sigue la dirección visual aprobada: **Answer Engine Signal Scan** como base + async stepper de **Guided Diagnostic Journey** + bloque "Qué recibes" de **Report-First Lead Magnet**.
 - [ ] Estados async honestos (§9.3) por poll, nunca un blanco; reporte `partial` con disclosure.
 - [ ] Render del `PublicGraderReport` (headline/hallazgos/plan/tendencia/dimensiones + **table-fallback** + disclaimer); cliente puro (sin recomputo ni raw).
 - [ ] WCAG 2.2 AA: table-fallback, severidad nombrada, aria-live, focus; reduced-motion.

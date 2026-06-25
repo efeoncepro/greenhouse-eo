@@ -107,13 +107,37 @@ Reglas obligatorias:
 
 ### Surface & system decision
 
-- Surface: `/admin/growth/ai-visibility/review` o child del admin AI Visibility existente.
-- Composition Shell: `aplica` — lista/cola + detalle/sidecar.
+- Surface: `/admin/growth/ai-visibility/review` o child del admin AI Visibility existente. **Ruta interna** → viewCode routeGroup `internal`, NUNCA `client_*`.
+- Composition Shell: `aplica` — declarar composición `leadPlusContext` (cola lead + evidencia/decisión context); regiones singleton, sin grid/morph ad-hoc.
 - Primitive decision: `reuse` — CompositionShell, AdaptiveSidecar, GreenhouseAsyncActionButton, GreenhouseCommandFeedback, tables/cards existentes.
-- Adaptive density / The Seam: `aplica` — filas/cards de cola deben condensar en sidebars y mobile.
-- Floating/Sidecar/Dialog decision: sidecar para detalle; Dialog solo si rechazo requiere confirmacion destructiva/legal.
-- Copy source: `src/lib/copy/growth.ts`
-- Access impact: `entitlements` — capability `growth.ai_visibility.report.review` ya definida por TASK-1244.
+- Adaptive density / The Seam: `aplica` — filas/cards de cola condensan en sidebars y mobile con `card-density` (condensación honesta, el dato clave nunca desaparece).
+- Floating/Sidecar/Dialog decision: AdaptiveSidecar para detalle, mapeado a variante oficial **`reconciler`** (flujo de adjudicación aprobar/rechazar con evidencia) — NO drawer/modal custom, desktop = lane in-flow. Dialog solo para la confirmación del rechazo (acción de consecuencia legal/pública).
+- Copy source: `src/lib/copy/growth.ts` (invocar `greenhouse-ux-writing`, es-CL).
+- Access impact: `entitlements` — capability `growth.ai_visibility.report.review` definida por TASK-1244. **Cross-check:** confirmar que 1244 la granteó a ≥1 ROLE_CODE real interno (no existe rol `growth_*`); sin grant, la ruta queda permission-denied para todos. Nueva ruta `(dashboard)` → entrada obligatoria en `route-reachability-manifest.ts` + seed viewCode en `VIEW_REGISTRY` el mismo PR (TASK-827/982).
+
+### Approved visual direction
+
+- Product Design exploration approved by operator on 2026-06-25: **Review Command Center** as the base direction, incorporating the evidence/check ledger from **Evidence Ledger Review** and the public-safe decision checklist from **Reconciler Studio**.
+- Durable visual references:
+  - Base target: `docs/assets/product-design/task-1247-ai-visibility-admin-review/review-command-center.png`
+  - Evidence ledger reference: `docs/assets/product-design/task-1247-ai-visibility-admin-review/evidence-ledger-review.png`
+  - Reconciler/checklist reference: `docs/assets/product-design/task-1247-ai-visibility-admin-review/reconciler-studio.png`
+- Visual objective: internal, safety-oriented, modern and operational; the surface should feel like a release gate workbench, not a marketing dashboard or vanity analytics page.
+- First-screen hierarchy:
+  - Header with `GreenhouseBreadcrumbs`, page title, review counts/SLA/risk summary and capability-safe action posture.
+  - Primary queue lane with filters/search and dense pending rows: brand, score, gate reason, risk type, evidence completeness, age, reviewer/lock and conflict status.
+  - Reconciler/detail lane with WYSIWYG public report preview, internal bounded reasons, evidence completeness warning, audit trail and decision controls.
+  - Decision area with balanced approve/reject actions; no pre-focused approve CTA and no primary bias toward publishing.
+- Evidence ledger merge from option 2:
+  - Include a chronological/checklist-style evidence ledger for score gate, accuracy detector, public snapshot check, provider coverage and publish readiness.
+  - Ledger rows show status, bounded detail, impact and timestamp; use evidence peeks only for bounded internal snippets, never raw provider dumps.
+- Reconciler checklist merge from option 3:
+  - Decision panel includes a public-safe publish readiness checklist: exact public DTO preview, no raw evidence, disclaimer present, evidence complete or explicitly partial, rejection reason captured.
+  - Conflict state is first-class: "este reporte ya fue revisado/actualizado por otro operador" with refresh path, not a generic error.
+- Avoided directions:
+  - No public landing/hero treatment, no decorative gradients/orbs, no dashboard vanity tiles, no raw provider transcript table, no provider-logo wall.
+  - Do not make the public preview the only evidence; reviewer needs bounded internal reasons next to the exact public artifact.
+  - Do not implement desktop review as a modal or custom drawer; use in-flow Composition Shell / Adaptive Sidecar semantics.
 
 ### State inventory
 
@@ -121,7 +145,8 @@ Reglas obligatorias:
 - Loading: skeleton/loader de cola y detalle.
 - Empty: no hay reportes pendientes.
 - Error: reader falla o comando rechaza.
-- Degraded / partial: evidencia incompleta o run partial.
+- Degraded / partial: evidencia incompleta o run partial — **mostrar explícitamente "evidencia incompleta/Pendiente" (nunca render confiado sobre un slice fallido): aprobar sobre evidencia silenciosamente incompleta es el riesgo de seguridad #1 de esta surface.**
+- **Stale / conflicto entre revisores:** dos operadores abren el mismo `review_required`; uno acciona y el otro tiene una vista vieja. El comando de TASK-1244 debe tener guard de versión/estado; la UI surface el conflicto honesto ("Este reporte ya fue revisado por X — actualizando cola"), refresca y NO muestra error genérico. (No es el doble-submit del mismo usuario; es concurrencia multi-revisor.)
 - Permission denied: sin capability `report.review`.
 - Long content: evidencia/reasons scroll interno, no pagina horizontal.
 - Mobile / compact: cola y detalle apilados/drawer.
@@ -233,16 +258,23 @@ Reglas obligatorias:
 
 - Crear ruta admin con cola de `review_required` pendientes desde el reader de `TASK-1244`.
 - Estados loading/empty/error/permission.
+- Implementar la dirección aprobada **Review Command Center**:
+  - queue lane con filtros/search, risk summary y filas densas;
+  - selección visible y foco de teclado claro;
+  - indicadores explícitos de evidencia incompleta, lock/reviewer y conflicto multi-revisor.
 
 ### Slice 2 — Evidence detail + preview
 
 - Mostrar razones de review, accuracy findings internas bounded, score/report preview y snapshot/public preview si aplica.
 - Evitar raw provider text completo salvo que el reader interno lo permita explicitamente.
+- Incorporar el ledger/checklist de evidencia de **Evidence Ledger Review** y el checklist de decisión de **Reconciler Studio**.
+- El detalle debe mostrar el DTO público exacto que se publicaría, junto a razones internas bounded y readiness de publicación.
 
 ### Slice 3 — Approve/reject commands
 
 - Botones gobernados con `GreenhouseAsyncActionButton`/feedback.
 - Rechazo exige razon; approval/rejection actualiza cola y detalle.
+- Aprobar y rechazar deben tener peso visual equilibrado; aprobar comunica consecuencia pública y rechazar preserva la razón ante error de comando.
 
 ### Slice 4 — GVC + a11y
 
@@ -260,6 +292,12 @@ Reglas obligatorias:
 
 La UI debe ser un consumer del contrato `TASK-1244`: lista pendientes, lee detalle, ejecuta approve/reject. Debe usar Composition Shell como substrato y sidecar/inspector para preservar contexto. El reviewer necesita ver suficiente evidencia para decidir, pero la surface no debe normalizar ni recalcular el score.
 
+**Esta es una surface de gate de seguridad — el diseño debe reflejarlo:**
+
+- **WYSIWYG del artefacto público:** el reviewer ve el **DTO público EXACTO que se va a publicar** (el mismo `PublicGraderReport` que vería el prospecto, vía el preview de TASK-1239) lado a lado con las razones internas bounded. Se aprueba el artefacto real, no una aproximación.
+- **Framing de consecuencia (no sesgar a aprobar):** "Aprobar" comunica su consecuencia ("Esto publica el reporte al prospecto"); aprobar y rechazar tienen igual peso visual; ninguna acción de consecuencia está pre-enfocada por default. La confirmación de rechazo va en Dialog.
+- **Razón de rechazo = campo `forms-ux`:** label-above, `min length` razonable, error inline ("qué falta"), preserva el texto en error de comando. La razón ES el registro de auditoría del rechazo (la consume el command de 1244); tratarla como dato sensible (no loggear crudo si trae contexto del prospecto).
+
 ## Rollout Plan & Risk Matrix
 
 ### Slice ordering hard rule
@@ -270,8 +308,9 @@ Slice 1 -> Slice 2 -> Slice 3 -> Slice 4. No conectar acciones antes de tener es
 
 | Riesgo | Sistema | Probabilidad | Mitigation | Signal de alerta |
 |---|---|---|---|---|
-| Operador aprueba sin contexto suficiente | safety | medium | evidencia/reasons visibles + preview | rechazos post-publicacion |
-| Accion duplicada | data quality | low | command idempotente + pending disabled | command conflict |
+| Operador aprueba sin contexto suficiente | safety | medium | evidencia/reasons visibles + WYSIWYG público + evidencia incompleta explícita | rechazos post-publicacion |
+| Accion duplicada (mismo usuario) | data quality | low | command idempotente + pending disabled | command conflict |
+| Conflicto multi-revisor (dos operadores) | data quality/safety | medium | guard de versión/estado en command 1244 + UI surface conflicto honesto + refresh cola | command conflict 409 |
 | UI filtra raw sensitive evidence | privacy/legal | medium | bounded reader + copy interna | code review/GVC |
 | Overflow mobile en admin dense UI | UI | medium | Composition Shell + scroll-width check | GVC |
 
@@ -309,10 +348,16 @@ Slice 1 -> Slice 2 -> Slice 3 -> Slice 4. No conectar acciones antes de tener es
 - [ ] Se declaro `Execution profile: ui-ux` y `UI impact: flow`.
 - [ ] UI consume reader/commands de `TASK-1244`, sin logica de aprobacion local.
 - [ ] Cola, detalle, preview y acciones approve/reject cubren loading/empty/error/permission/pending.
+- [ ] La implementación sigue la dirección visual aprobada: **Review Command Center** como base + ledger de **Evidence Ledger Review** + checklist de **Reconciler Studio**.
 - [ ] Copy reusable vive en `src/lib/copy/*`.
-- [ ] GVC desktop+mobile capturado y mirado; `scrollWidth==clientWidth`.
+- [ ] GVC desktop+mobile capturado y mirado **en loop** (gates V1.5: layout/runtime/keyboard/enterpriseRubric); `scrollWidth==clientWidth`. Gate axe verde.
 - [ ] Focus/keyboard/reduced-motion validados.
 - [ ] No se filtra raw provider text o accuracy findings al publico; esta surface es interna.
+- [ ] Sidecar = `AdaptiveSidecarLayout` variante `reconciler` (no drawer/modal custom); Composition Shell con composición declarada.
+- [ ] El reviewer ve el DTO público EXACTO (WYSIWYG) + razones internas; evidencia incompleta se muestra explícita (no render confiado sobre slice fallido).
+- [ ] Conflicto multi-revisor surface honesto (no error genérico) apoyado en guard de versión/estado del command de 1244.
+- [ ] Razón de rechazo con `forms-ux` (label-above, min length, preserva en error) y tratada como dato sensible.
+- [ ] Ruta `(dashboard)` en `route-reachability-manifest.ts` + viewCode seed en `VIEW_REGISTRY` (mismo PR); capability `report.review` confirmada con grant a ROLE_CODE real.
 
 ## Verification
 

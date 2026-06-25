@@ -54,8 +54,11 @@ Revisar y respetar:
 
 Reglas obligatorias:
 
-- No cambiar pesos/umbrales sin golden eval antes/despues y versionado de `score_version`.
-- No llamar providers directo fuera de `src/lib/growth/ai-visibility/providers/**`.
+- **Eval-driven (decisión arch #10): ningún cambio de prompt NI de pesos/umbrales se mergea sin golden eval baseline + regresión.** Aplica por igual al prompt pack v2 (Slice 2) y a la recalibración (Slice 3) — cambiar el prompt cambia outputs igual que cambiar pesos.
+- **Anti-overfitting (el hallazgo de fondo): no recalibrar pesos contra el golden set y luego medir sobre el MISMO set** (siempre "mejora" sobre lo que ajustaste). Separar **calibration set** (tunear) de **holdout/validation set** (medir generalización) o usar cross-validation; reportar métricas sobre el holdout. Si el golden set es muy chico para split, documentar explícitamente que la recalibración es por hipótesis documentada (no fitted) y el límite estadístico.
+- **Provenance tuple por run:** cada `grader_run`/snapshot debe persistir la tupla que lo produjo — `prompt_pack_version` + `score_version`/pesos + **provider_set** + model versions — para que un score publicado sea reproducible/explicable ("¿cambió por pesos, prompt o mix de providers?"). El `score_version` se congela al run, nunca se recomputa histórico.
+- **El mix de providers es parte de la reproducibilidad del score:** habilitar Perplexity desplaza la distribución agregada; Slice 3 debe medir su efecto y los snapshots pre/post-Perplexity quedan version-tagged y comparables, no mezclados silenciosamente.
+- No llamar providers directo fuera de `src/lib/growth/ai-visibility/providers/**`; el adapter Perplexity **extiende el cliente LLM canónico** (`src/lib/ai/`), NO instancia un SDK paralelo. Secret vía `*_SECRET_REF` + **grant `secretAccessor` al SA runtime** (footgun silent-null); skippable si falta.
 - Perplexity debe nacer flag-gated y skippable si falta secret.
 - No bloquear public launch si la cobertura OpenAI/Anthropic/Gemini cumple el umbral definido por producto.
 
@@ -79,11 +82,12 @@ Reglas obligatorias:
 
 ### Files owned
 
-- `src/lib/growth/ai-visibility/providers/perplexity-adapter.ts`
-- `src/lib/growth/ai-visibility/scoring/config.ts`
+- `src/lib/growth/ai-visibility/providers/perplexity-adapter.ts` (nuevo/completar)
 - `src/lib/growth/ai-visibility/evals/**`
-- `src/lib/growth/ai-visibility/prompt-packs/**`
-- `docs/architecture/growth/ai-visibility/**`
+- `docs/architecture/growth/ai-visibility/**` (calibration/prompt-pack/golden-set docs)
+- `docs/tasks/to-do/TASK-1249-growth-ai-visibility-calibration-provider-completion.md`
+
+Extend (NO owned — de tasks completadas, versionar sin romper V1): `src/lib/growth/ai-visibility/scoring/config.ts` (TASK-1227), `src/lib/growth/ai-visibility/prompt-packs/**` (TASK-1228) — agregar v2/V1.1 versionado, mantener V1 reproducible.
 
 ## Current Repo State
 
@@ -122,8 +126,9 @@ Reglas obligatorias:
 - Invariantes que no se pueden romper:
   - Score deterministico; ningun LLM asigna score final.
   - Cambios de pesos/version no mutan snapshots publicos ya publicados.
+  - **Provenance tuple persistida por run/snapshot:** `prompt_pack_version` + `score_version`/pesos + `provider_set` + model versions; congelada al run, base de la reproducibilidad/explicabilidad del score.
   - Provider failures degradan a partial/skip, no rompen todo el run.
-  - Cost ceiling se respeta.
+  - Cost ceiling se respeta; eval re-runs cachean observaciones por input determinista (no re-pagar providers).
 - Tenant/space boundary: internal/staging only; no public PII to providers.
 - Idempotency/concurrency: evals re-ejecutables; smoke low-volume; no doble gasto innecesario.
 - Audit/outbox/history: registrar versiones y evidencia de calibracion en docs/architecture.
@@ -180,11 +185,13 @@ Reglas obligatorias:
 
 - Incorporar fixes del spike y casos del golden set.
 - Versionar prompt pack y mantener V1 reproducible.
+- **Gate de eval:** promover v2 solo con golden eval baseline + regresión vs v1 (eval-driven). Cachear las observaciones de provider por input de golden set determinista para no re-pagar LLM en cada re-run del eval.
 
-### Slice 3 — Calibration decision
+### Slice 3 — Calibration decision (anti-overfitting)
 
-- Re-ejecutar golden eval con providers disponibles.
-- Proponer score weights/thresholds V1.1 o documentar decision de mantener V1.
+- **Split del golden set en calibration vs holdout** (o cross-validation); tunear pesos sobre calibration, **reportar métricas sobre el holdout**. Si el set es muy chico, documentar el límite y que la recalibración es por hipótesis, no fitted.
+- Re-ejecutar golden eval con providers disponibles, midiendo el efecto del nuevo mix (Perplexity) sobre la distribución agregada.
+- Proponer score weights/thresholds V1.1 (nuevo `score_version` con provenance tuple) o documentar decision de mantener V1.
 
 ## Out of Scope
 
@@ -209,12 +216,14 @@ Slice 1 (provider) y Slice 2 (prompt pack) pueden avanzar en paralelo tras disco
 |---|---|---|---|---|
 | Perplexity payload real rompe parser | integration | medium | smoke low-volume + tests fixtures | provider_error_rate |
 | Recalibracion cambia scores sin version | data quality | medium | `score_version` nuevo o decision explicita | golden eval diff |
+| Overfitting al golden set (tunear y medir sobre el mismo set) | data quality/trust | medium | split calibration/holdout o cross-validation; métricas sobre holdout | mejora solo en train, no en holdout |
+| Score no reproducible (no se sabe qué lo movió) | trust/audit | medium | provenance tuple por run (prompt+score+provider_set+models) | snapshot sin tupla |
 | Costos altos en eval | cost | medium | N acotado + flags + budget | cost_budget_used |
 | Public snapshots cambian retrospectivamente | trust | low | snapshots inmutables + versioning | snapshot version audit |
 
 ### Feature flags / cutover
 
-- `GROWTH_AI_VISIBILITY_PERPLEXITY_ENABLED`
+- `GROWTH_AI_VISIBILITY_PERPLEXITY_ENABLED` — **registrar fila en `FEATURE_FLAG_STATE_LEDGER.md` el mismo PR** (gate `pnpm docs:closure-check`); si queda code-complete OFF, a §Pendientes.
 - Prompt/score version deben ser seleccionables/configurados sin romper V1.
 
 ### Rollback plan per slice
@@ -243,9 +252,11 @@ Esta task no activa produccion. Si el operador aprueba activar Perplexity o scor
 
 - [ ] Perplexity validado en staging o documentado como bloqueado por secret/quota.
 - [ ] Prompt pack v2 versionado o decision documentada de no promoverlo aun.
-- [ ] Golden eval antes/despues registrado con delta de scores y provider coverage.
-- [ ] Cualquier cambio de pesos/umbrales usa `score_version` nuevo o deja V1 intacto.
-- [ ] Public snapshots existentes no se modifican.
+- [ ] Golden eval antes/despues registrado con delta de scores y provider coverage; **métricas reportadas sobre holdout/validation (no solo sobre el set de calibración)** o límite documentado si el set es muy chico.
+- [ ] Cualquier cambio de pesos/umbrales usa `score_version` nuevo o deja V1 intacto; prompt pack v2 pasó el gate de eval (baseline + regresión).
+- [ ] Cada run/snapshot persiste la provenance tuple (prompt_pack_version + score_version/pesos + provider_set + model versions).
+- [ ] Perplexity vía cliente LLM canónico + secret con grant `secretAccessor`; flag en `FEATURE_FLAG_STATE_LEDGER.md`.
+- [ ] Public snapshots existentes no se modifican; pre/post-Perplexity quedan version-tagged.
 - [ ] Signals de provider/cost revisadas.
 
 ## Verification
