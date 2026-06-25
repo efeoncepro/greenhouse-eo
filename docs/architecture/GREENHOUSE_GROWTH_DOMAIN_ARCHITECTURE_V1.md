@@ -69,7 +69,7 @@ Future implementation should use:
 | Technical module key | `growth` |
 | PostgreSQL schema | `greenhouse_growth` |
 | TypeScript root | `src/lib/growth/` |
-| API family | `/api/growth/**` for authenticated Product APIs; `/api/public/growth/**` for public acquisition endpoints |
+| API family | `/api/growth/**` for authenticated Product APIs; `/api/public/growth/**` for public acquisition endpoints. **Delta TASK-1229:** las Product APIs admin del motor Growth Forms usan `/api/admin/growth/forms/**` (precedente del grader `/api/admin/growth/ai-visibility/**`, boring/precedente gana sobre `/api/growth/**`). Convención real vigente para superficies admin internas del dominio growth. |
 | Admin surface | `/admin/growth/**` |
 | Reliability signal prefix | `growth.*` |
 | Capability prefix | `growth.*` |

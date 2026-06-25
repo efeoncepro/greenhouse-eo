@@ -1208,3 +1208,18 @@ Revisit when:
 - `docs/context/05_voz-tono-estilo.md`
 - `docs/context/09_marca-agencia.md`
 - `docs/context/11_hubspot-bowtie.md`
+
+## Delta 2026-06-25 — TASK-1229 implementación (foundation backend/API parity)
+
+Shippeada la fundación del motor (local-first, develop, sin push). Decisiones resueltas de las 11 Open Questions del discovery + lo construido:
+
+- **7 aggregates** en `greenhouse_growth` (`form_definition`/`form_version`/`form_destination`/`form_host_surface`/`form_submission`/`form_submission_consent_snapshot`/`form_destination_attempt`) con state machines (CHECK), **published versions inmutables** (trigger), consent snapshot + attempts **append-only** (triggers; no DELETE). + columna `form_submission.ip_hash` (rate-limit per-IP sin IP cruda).
+- **Contracts Zod** browser-safe: `render_contract` (§19.3) / `submission_contract` / `destination_plan` / `telemetryPolicy` en `src/lib/growth/forms/contracts.ts`. **Policy compiler** con gate de publicación (warnings bloqueantes en consent/destination/retention/success/fields).
+- **Commands/readers** gobernados (`src/lib/growth/forms/{commands,readers,store,dispatch}.ts`): author/review/publish/deprecate/archive/destinations/surfaces/submit/retry. **Full API Parity**: un primitive, muchos consumers.
+- **8 capabilities** `growth.forms.*` (registry seed + `entitlements-catalog.ts` + grant en `runtime.ts` a `internal`/`efeonce_admin`/`efeonce_account`/`efeonce_operations` + coverage test). 8va `surfaces.manage` incluida (Arch §21 manda sobre Domain §8).
+- **APIs**: público `GET/POST /api/public/growth/forms/{slug}` (gated `GROWTH_FORMS_PUBLIC_API_ENABLED` default OFF); admin Product APIs bajo **`/api/admin/growth/forms/**`** (precedente del grader, NO el `/api/growth/**` del domain §4 — ver delta domain). Dual-gate `requireInternalTenantContext` + `can()`.
+- **Boundary atómico del submit**: `{form_submission + consent_snapshot + outbox event growth.forms.submission_accepted}` en una sola tx (`persistAcceptedSubmission`); el 202 sale sólo con ese trío committeado. **Entrega async, NUNCA inline** (dispatch + fake/echo adapter; el adapter HubSpot real = TASK-1230). Path productivo del dispatcher = ops-worker drain + Cloud Scheduler (**ROLLOUT pendiente**; hoy operable por `POST /api/admin/growth/forms/dispatch`).
+- **Transversal, NO grader-céntrico** (decisión OQ#11 + #5): el motor sirve a *cualquier* flujo (11 `form_kind`, destinos genéricos, port compartido). Los **destinos internos async** (p.ej. encolar un run del grader) NO se hornean en `form_destination` (que modela entrega externa); se modelan como **reactive consumers del outbox event `growth.forms.submission_accepted`**, keyed por `form_kind`/slug. Ese evento es el seam de extensión transversal — la convergencia TASK-1251 lo usa para el grader.
+- **Port compartido** `src/lib/growth/public-submission/` (captcha Turnstile + abuse-guard core `decideAbuse` + `hashIdentifier`): nace acá, lo re-exporta el grader (sin romperlo), lo consume forms. Cierra TASK-1251 OQ#3 — no hay captcha/abuse paralelo.
+- **Reliability**: 3 signals `growth.forms.*` (dead_letter_count, destination_failure_rate, submission_rejection_rate) wired en `get-reliability-overview`.
+- **Estado**: fundación operacionalmente completa en dev (smoke e2e author→publish→submit→dispatch→delivered, render contract browser-safe verificado). Público disabled by design (sin forms publicados). Pendiente de rollout productivo: dispatcher ops-worker + Cloud Scheduler, y el flip del flag (gated por TASK-1230/1232 + sign-off).

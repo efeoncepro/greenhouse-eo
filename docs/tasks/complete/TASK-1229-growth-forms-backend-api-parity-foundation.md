@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -161,7 +161,7 @@ Append-to (extender, no owned): `src/config/entitlements-catalog.ts` (+ capabili
   - Consent snapshot se conserva aunque falle delivery.
   - Surface authorization se valida antes de entregar render contract o aceptar submit.
   - Attempts son append-only o event-sourced con historia completa.
-  - **Delivery dispatch es async vía outbox + reactive consumer + dead_letter, NUNCA inline en el route handler de submit** (overlay arch #3 + trío state-machine #6). El submit acepta + persiste submission/consent + emite outbox event en la misma tx; un reactive consumer (Cloud Scheduler/ops-worker) drena y entrega al destino. El fake adapter de esta task se wirea por ese mismo path para que TASK-1230 (HubSpot real) NO herede un acoplamiento inline. Submission lifecycle `accepted -> routed -> destination_failed -> retrying -> delivered | dead_letter` se enforced con CHECK + audit.
+  - **Boundary atómico del submit + delivery async (overlay arch #3 + trío state-machine #6):** la transacción síncrona del submit escribe **todo-o-nada en una sola tx de Postgres** `{form_submission + form_submission_consent_snapshot + outbox event(s)}` — el `200 OK` solo se devuelve con ese trío committeado (sin esto: "aceptado pero consent perdido" / "aceptado pero sin evento downstream"). Los efectos (destino(s), y en consumers como el grader: encolar run + HubSpot + email) corren **async vía reactive consumer idempotente + dead_letter, NUNCA inline en el route handler** (no 2PC sobre LLM/HubSpot/Resend; un destino caído no aborta la aceptación). El fan-out a N consumers NO es atómico entre sí: at-least-once + idempotencia = effectively-once. El fake adapter de esta task se wirea por ese path para que TASK-1230 NO herede acoplamiento inline. Lifecycle `accepted -> routed -> destination_failed -> retrying -> delivered | dead_letter` con CHECK + audit.
   - Analytics/telemetry policy no puede emitir raw field values, PII, HubSpot property names, form GUIDs or destination internals.
 - Tenant/space boundary: public anonymous submit con `surface_id`/origin/embed key; admin APIs con tenant interno + capabilities `growth.forms.*`.
 - Idempotency/concurrency: `dedupe_fingerprint` + optional idempotency token; commands transaccionales; retries safe.
