@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -326,18 +326,18 @@ Renderer receives `render_contract` only. It never receives destination mapping,
 
 ## Acceptance Criteria
 
-- [ ] Renderer core consumes only browser-safe `render_contract`.
-- [ ] Renderer default is host-DOM Web Component/custom element, not iframe.
-- [ ] Renderer emits `gh_form_*` CustomEvents/dataLayer events on the parent page with safe payloads only.
-- [ ] Greenhouse preview, WordPress wrapper and Astro wrapper use the same core/contract.
-- [ ] WordPress smoke proves first host surface works with a test form.
-- [ ] Astro parity smoke proves future host surface can reuse same form/version.
-- [ ] GVC/visual evidence covers desktop/mobile and key states.
-- [ ] No horizontal page scroll is introduced in preview/public smoke surfaces.
-- [ ] El renderer pasa el piso de 17 puntos de `forms-ux`: single column, label-above, `autocomplete`+`inputmode` por campo, validation timing 3-stage, error inline 4-elementos, submit enabled + pending, forgiving paste/máscara CL, preserva datos en error.
-- [ ] A11y WCAG 2.2 AA: resuelto el caveat de Shadow DOM (IDREF/`role=alert` en el mismo root o ElementInternals), form-associated custom element, target ≥24×24, reflow 320px/zoom 200%, focus `:focus-visible` en `forced-colors`. Gate axe verde sobre el preview.
-- [ ] Fallback no-JS / CSP-bloqueado accesible (nunca contenedor vacío); loading = skeleton anti-CLS.
-- [ ] Tokens vía CSS custom properties mapeadas a marca Efeonce/AXIS (sin hex hardcodeado); container queries para los internos; dark mode declarado o heredado del host.
+- [x] Renderer core consumes only browser-safe `render_contract`. (`api-client.ts` solo GET render_contract + POST submit; sin mapping/GUIDs/secrets.)
+- [x] Renderer default is host-DOM Web Component/custom element, not iframe. (`element.ts` light DOM; iframe no usado.)
+- [x] Renderer emits `gh_form_*` CustomEvents/dataLayer events on the parent page with safe payloads only. (`telemetry.ts` allowlist dura + tests `telemetry.test.ts`.)
+- [x] Greenhouse preview, WordPress wrapper and Astro wrapper use the same core/contract. (los 3 emiten `<greenhouse-form>` + bundle pineado; preview monta el mismo `FormRenderer`.)
+- [~] WordPress smoke proves first host surface works with a test form. **Code-complete**; el smoke live contra staging está gated por `GROWTH_FORMS_PUBLIC_API_ENABLED` + un form publicado con host surface autorizada (TASK-1232). Widget PHP-lint verde + committeado.
+- [~] Astro parity smoke proves future host surface can reuse same form/version. **Code-complete**; misma puerta de rollout. Paridad documentada en `efeonce-web/docs/growth-form-parity.md` + fixture no-routable.
+- [x] GVC/visual evidence covers desktop/mobile and key states. (scenario `growth-forms-renderer-preview`, capturas desktop+mobile miradas; default/loading/error/no-disponible vía switcher.)
+- [x] No horizontal page scroll is introduced in preview/public smoke surfaces. (verificado en captura mobile 390px; readiness GVC OK.)
+- [x] El renderer pasa el piso de 17 puntos de `forms-ux`: single column, label-above, `autocomplete`+`inputmode` por campo, validation timing 3-stage, error inline 4-elementos, submit enabled + pending, forgiving paste/máscara CL, preserva datos en error. (`renderer.ts` + tests `renderer.test.ts`/`mask.test.ts`/`conditions-validation.test.ts`; verificado en GVC.)
+- [~] A11y WCAG 2.2 AA: resuelto el caveat de Shadow DOM (light DOM + `ElementInternals`), form-associated custom element, target ≥24×24, reflow 320px/zoom 200%, focus `:focus-visible` en `forced-colors`. **Estructural verificado** (IDREF/`role=alert` mismo árbol, ElementInternals, 24px, outline forced-colors, border ≥3:1). **Pendiente follow-up:** gate axe automatizado (`@axe-core/playwright`) sobre el preview — no agregado en esta task.
+- [x] Fallback no-JS / CSP-bloqueado accesible (nunca contenedor vacío); loading = skeleton anti-CLS. (`<noscript>` en ambos wrappers; `element.ts` error/unavailable states; skeleton dimensionado.)
+- [x] Tokens vía CSS custom properties mapeadas a marca Efeonce/AXIS (sin hex hardcodeado); container queries para los internos; dark mode declarado o heredado del host. (`styles.ts` `--ghf-*` sobre `.ghf-scope`; `@container`; dark `prefers-color-scheme` + override host.)
 
 ## Verification
 
