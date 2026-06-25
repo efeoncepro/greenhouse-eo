@@ -173,6 +173,9 @@ export const GH_GROWTH_AI_VISIBILITY = {
     not_found: 'No encontramos este análisis. Revisa el enlace o solicita uno nuevo.'
   } satisfies Record<'queued' | 'processing' | 'ready' | 'in_review' | 'unavailable' | 'not_found', string>,
 
+  // Rate-limit de reads públicos (TASK-1245 Slice 3): 429 honesto, sin revelar el límite exacto.
+  public_read_rate_limited: 'Demasiadas solicitudes. Espera un momento e intenta de nuevo.',
+
   // Exactitud de marca (TASK-1238, INTERNAL): etiqueta por tipo de inexactitud (admin review).
   accuracy_kind_label: {
     category_mismatch: 'Categoría equivocada',

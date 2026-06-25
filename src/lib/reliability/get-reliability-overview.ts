@@ -173,6 +173,7 @@ import { getWorkforceUnlinkedInternalUsersSignal } from './queries/workforce-unl
 import { getGrowthAiVisibilitySignals } from './queries/growth-ai-visibility-signals'
 import { getGrowthAiVisibilityScoringSignals } from './queries/growth-ai-visibility-scoring-signals'
 import { getGrowthAiVisibilityPublicIntakeSignals } from './queries/growth-ai-visibility-public-intake-signals'
+import { getGrowthAiVisibilityPublicDeliverySignals } from './queries/growth-ai-visibility-public-delivery-signals'
 import { getGrowthFormsSignals } from './queries/growth-forms-signals'
 import { getGrowthFormsHubspotSignals } from './queries/growth-forms-hubspot-signals'
 import { getGrowthAiVisibilityLeadHandoffSignals } from './queries/growth-ai-visibility-lead-handoff-signals'
@@ -620,6 +621,7 @@ interface ReliabilityOverviewSources {
   growthAiVisibility?: ReliabilitySignal[] | null
   growthAiVisibilityScoring?: ReliabilitySignal[] | null
   growthAiVisibilityPublicIntake?: ReliabilitySignal[] | null
+  growthAiVisibilityPublicDelivery?: ReliabilitySignal[] | null
   growthForms?: ReliabilitySignal[] | null
   growthFormsHubspot?: ReliabilitySignal[] | null
   growthAiVisibilityLeadHandoff?: ReliabilitySignal[] | null
@@ -1033,6 +1035,7 @@ export const buildReliabilityOverview = (
     ...(sources.growthAiVisibility ?? []),
     ...(sources.growthAiVisibilityScoring ?? []),
     ...(sources.growthAiVisibilityPublicIntake ?? []),
+    ...(sources.growthAiVisibilityPublicDelivery ?? []),
     ...(sources.growthForms ?? []),
     ...(sources.growthFormsHubspot ?? []),
     ...(sources.growthAiVisibilityLeadHandoff ?? []),
@@ -1418,6 +1421,12 @@ export const getReliabilityOverview = async (
     preloadedSources.growthAiVisibilityPublicIntake !== undefined
       ? preloadedSources.growthAiVisibilityPublicIntake
       : await getGrowthAiVisibilityPublicIntakeSignals().catch(() => null)
+
+  // TASK-1245 — entrega pública (read volume / delivery estancada / inconsistente). DB vacía → steady ok.
+  const growthAiVisibilityPublicDelivery =
+    preloadedSources.growthAiVisibilityPublicDelivery !== undefined
+      ? preloadedSources.growthAiVisibilityPublicDelivery
+      : await getGrowthAiVisibilityPublicDeliverySignals().catch(() => null)
 
   // TASK-1229 — Growth Forms engine (dead-letter / failure / rejection). Sin forms
   // publicados / DB vacía → steady ok.
@@ -2337,6 +2346,7 @@ export const getReliabilityOverview = async (
     growthAiVisibility,
     growthAiVisibilityScoring,
     growthAiVisibilityPublicIntake,
+    growthAiVisibilityPublicDelivery,
     growthForms,
     growthFormsHubspot,
     growthAiVisibilityLeadHandoff,

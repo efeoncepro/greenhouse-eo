@@ -1,7 +1,12 @@
 import { NextResponse } from 'next/server'
 
+import { GH_GROWTH_AI_VISIBILITY } from '@/lib/copy/growth'
+import { checkPublicReadAllowed } from '@/lib/growth/ai-visibility/public-delivery/read-guard'
 import { readPublicGraderRunStatus } from '@/lib/growth/ai-visibility/public-delivery/status-reader'
 import { captureWithDomain } from '@/lib/observability/capture'
+
+const getClientIp = (request: Request): string | null =>
+  request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || request.headers.get('x-real-ip') || null
 
 /**
  * TASK-1245 — `GET /api/public/growth/ai-visibility/run/[handle]` (EPIC-020)
@@ -17,10 +22,15 @@ import { captureWithDomain } from '@/lib/observability/capture'
  */
 export const dynamic = 'force-dynamic'
 
-export async function GET(_request: Request, { params }: { params: Promise<{ handle: string }> }) {
+export async function GET(request: Request, { params }: { params: Promise<{ handle: string }> }) {
   const { handle } = await params
 
   try {
+    // Rate-limit proporcional por IP (sin gasto LLM). El handle no enumerable es la protección de fondo.
+    if (!(await checkPublicReadAllowed(getClientIp(request), 'status'))) {
+      return NextResponse.json({ error: GH_GROWTH_AI_VISIBILITY.public_read_rate_limited }, { status: 429 })
+    }
+
     const status = await readPublicGraderRunStatus(handle)
 
     return NextResponse.json(
