@@ -7,6 +7,7 @@
  */
 export const GROWTH_FORMS_PUBLIC_API_FLAG = 'GROWTH_FORMS_PUBLIC_API_ENABLED'
 export const GROWTH_FORMS_DISPATCH_FLAG = 'GROWTH_FORMS_DISPATCH_ENABLED'
+export const GROWTH_FORMS_HUBSPOT_SECURE_SUBMIT_FLAG = 'GROWTH_FORMS_HUBSPOT_SECURE_SUBMIT_ENABLED'
 
 const isTrue = (value: string | undefined): boolean => value?.trim().toLowerCase() === 'true'
 
@@ -21,6 +22,14 @@ export const isFormsPublicApiEnabled = (env: NodeJS.ProcessEnv = process.env): b
  */
 export const isFormsDispatchEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
   isTrue(env[GROWTH_FORMS_DISPATCH_FLAG])
+
+/**
+ * Gate del adapter HubSpot Forms secure-submit (TASK-1230). Default OFF → el adapter
+ * resuelve skip controlado (no llama a HubSpot). Prod-safe: sin el flag, cero writes
+ * a HubSpot aunque exista un destino `hubspot_forms_secure_submit` configurado.
+ */
+export const isFormsHubSpotSecureSubmitEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+  isTrue(env[GROWTH_FORMS_HUBSPOT_SECURE_SUBMIT_FLAG])
 
 /**
  * Límites de abuse-guard del motor (rate-limit per-email/per-IP). Forms no tiene costo

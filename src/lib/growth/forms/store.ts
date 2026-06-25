@@ -617,6 +617,26 @@ export const listAttemptsForSubmission = async (submissionId: string): Promise<F
     [submissionId],
   )
 
+export type FormConsentSnapshotRow = {
+  submission_id: string
+  consent_policy_version: string
+  legal_basis: string
+  checkboxes_json: unknown
+  notice_text_hash: string | null
+  privacy_url: string | null
+  created_at: Date
+}
+
+export const getConsentSnapshot = async (submissionId: string): Promise<FormConsentSnapshotRow | null> => {
+  const rows = await query<FormConsentSnapshotRow>(
+    `SELECT * FROM greenhouse_growth.form_submission_consent_snapshot WHERE submission_id = $1`,
+    [submissionId],
+  )
+
+  
+return rows[0] ?? null
+}
+
 export const countDeadLetterAttempts = async (): Promise<number> => {
   const rows = await query<{ n: string }>(
     `SELECT COUNT(*)::text AS n FROM greenhouse_growth.form_destination_attempt WHERE status = 'dead_letter'`,

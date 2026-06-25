@@ -253,12 +253,12 @@ export const submitForm = async (rawInput: PublicSubmitInput, context: SubmitCon
   const emailRaw = typeof input.fields.email === 'string' ? input.fields.email : null
   const leadEmailHash = hashIdentifier(emailRaw, FORMS_EMAIL_SALT)
   const ipHash = hashIdentifier(context.ip ?? null, FORMS_IP_SALT)
-  const normalizedFields: Record<string, unknown> = {}
-
-  for (const [key, value] of Object.entries(input.fields)) {
-    if (key === 'email') continue // el email no se persiste crudo
-    normalizedFields[key] = value
-  }
+  // El motor es una capa de ENTREGA: `normalized_fields_json` es el payload entregable
+  // (incluye el email) que el dispatcher async manda al destino (HubSpot, etc.). La
+  // minimización de PII se gobierna por `persistence_mode` + retención (arch §8.4 "raw
+  // with retention when necessary"), NO descartando el dato que el form debe entregar.
+  // `lead_email_hash` queda como clave de dedupe/rate-limit, separada del payload.
+  const normalizedFields: Record<string, unknown> = { ...input.fields }
 
   // Rate-limit (abuse-guard core compartido): per-email → per-IP. Forms sin costo LLM
   // → budget Infinity (sólo opera el rate-limit, no el circuit-breaker de costo).
