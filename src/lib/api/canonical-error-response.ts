@@ -81,6 +81,9 @@ export type CanonicalErrorCode =
   | 'ico_sync_source_not_connected'
   // Finance fiscal scope (TASK-725) — sin entidad legal operating configurada.
   | 'fiscal_entity_unavailable'
+  // Growth Forms engine (TASK-1229).
+  | 'growth_form_invalid_input'
+  | 'growth_form_not_found'
 // Reserved for future canonical codes — extender aquí cuando emerjan
 // nuevos error paths estructurales. NUNCA usar strings ad-hoc.
 
@@ -257,6 +260,17 @@ const CANONICAL_ERRORS: Record<CanonicalErrorCode, CanonicalErrorDefinition> = {
     // Reintentar no resuelve: hay que conectar Notion primero (wizard de onboarding).
     message:
       'Este cliente aún no tiene Notion conectado, así que no se puede activar su sync de ICO. Conéctalo primero desde el onboarding.',
+    actionable: false
+  },
+  // TASK-1229 — Growth Forms engine.
+  growth_form_invalid_input: {
+    status: 400,
+    message: 'Revisa los datos del formulario. Falta un campo obligatorio o un valor no es válido.',
+    actionable: true
+  },
+  growth_form_not_found: {
+    status: 404,
+    message: 'No encontramos ese formulario. Puede que se haya archivado o no exista.',
     actionable: false
   }
 }
