@@ -296,6 +296,28 @@ const CATALOG_ITEMS: CatalogItem[] = [
     icon: 'tabler-layout-cards'
   },
   {
+    id: 'growth-forms-renderer',
+    title: 'Growth Forms renderer',
+    description:
+      'Preview del renderer portable Growth Forms (TASK-1231): el mismo core Web Component <greenhouse-form> que WordPress y Astro montan en producción, consumiendo solo el render_contract gobernado (Full API Parity). Sin lógica de destino/vendor en el browser. Composiciones static/conditional/multi-step y estados loading/error/no-disponible, montados desde fixtures.',
+    route: '/design-system/growth-forms-renderer',
+    category: 'Patterns',
+    kind: 'Pattern',
+    status: 'Hardening',
+    owner: 'src/growth-forms-renderer/*',
+    tags: ['growth', 'forms', 'web component', 'renderer', 'portable', 'wordpress', 'astro'],
+    searchAliases: [
+      'growth forms',
+      'formularios',
+      'web component',
+      'greenhouse-form',
+      'render contract',
+      'portable renderer',
+      'wordpress astro'
+    ],
+    icon: 'tabler-forms'
+  },
+  {
     id: 'buttons',
     title: 'Buttons',
     description: 'Primitive para jerarquía de comandos, tono, iconos y estados async.',

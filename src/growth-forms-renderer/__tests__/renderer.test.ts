@@ -4,7 +4,7 @@ import { describe, expect, it, vi, beforeEach } from 'vitest'
 
 import type { RendererApiConfig } from '../api-client'
 import { FormRenderer } from '../renderer'
-import { conditionalContractFixture, multiStepContractFixture, staticContractFixture } from './fixtures'
+import { conditionalContractFixture, multiStepContractFixture, staticContractFixture } from '../fixtures'
 
 const api: RendererApiConfig = { baseUrl: 'https://gh.test', slug: 'ai-visibility-intake', surfaceId: 'wordpress-public' }
 

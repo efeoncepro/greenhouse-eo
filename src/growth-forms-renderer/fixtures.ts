@@ -1,4 +1,4 @@
-import type { RenderContract } from '../contract'
+import type { RenderContract } from './contract'
 
 /** Fixture browser-safe mínimo (static) para tests + preview. */
 export const staticContractFixture = (over: Partial<RenderContract> = {}): RenderContract => ({

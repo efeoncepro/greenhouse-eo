@@ -154,6 +154,13 @@ export const DECLARED_CHILD_ROUTES: readonly ChildRouteDeclaration[] = [
       'Adaptive Card density Lab (TASK-1115) — child surface del Design System para el contrato de densidad de cards (full/condensed/peek por container query); capacidad hermana del Composition Shell; alcanzable desde el catalogo canonico /design-system.'
   },
   {
+    route: '/design-system/growth-forms-renderer',
+    parent: '/design-system',
+    via: 'inline-link',
+    reason:
+      'Growth Forms portable renderer preview (TASK-1231) — child surface del Design System que monta el mismo core Web Component que WordPress/Astro renderizan en produccion, desde fixtures del render_contract; alcanzable desde el catalogo canonico /design-system.'
+  },
+  {
     route: '/design-system/handoff',
     parent: '/design-system',
     via: 'inline-link',
