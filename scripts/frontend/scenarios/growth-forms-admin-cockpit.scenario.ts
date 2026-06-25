@@ -11,7 +11,7 @@ export const scenario: CaptureScenario = {
   name: 'growth-forms-admin-cockpit',
   route: '/admin/growth/forms',
   viewport: { width: 1440, height: 900 },
-  initialHoldMs: 1800,
+  initialHoldMs: 6000,
   finalHoldMs: 600,
   assertions: [
     { kind: 'noErrorBoundary' },

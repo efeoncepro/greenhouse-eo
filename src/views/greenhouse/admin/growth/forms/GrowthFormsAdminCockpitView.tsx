@@ -41,6 +41,27 @@ import type {
 
 type SidecarMode = 'inspector' | 'composer' | 'evidence'
 
+type DecisionAction = 'openEvidence' | 'dispatch' | 'review' | 'smoke' | 'monitor'
+
+type DecisionTone = 'success' | 'warning' | 'error' | 'info'
+
+type DecisionRecommendation = {
+  title: string
+  body: string
+  icon: string
+  tone: DecisionTone
+  action: DecisionAction
+  actionLabel: string
+}
+
+type DeliveryStepState = 'pending' | 'complete' | 'attention' | 'blocked'
+
+type DeliveryStep = {
+  label: string
+  state: DeliveryStepState
+  detail: string
+}
+
 type DraftFormState = {
   name: string
   slug: string
@@ -80,6 +101,36 @@ const STATUS_TONE: Record<string, 'default' | 'success' | 'warning' | 'error' | 
 
 const STATUS_LABELS = GH_GROWTH_FORMS.statuses
 
+const HEALTH_PRIORITY: Record<GrowthFormsHealthState, number> = {
+  dead_letter: 0,
+  attention: 1,
+  setup: 2,
+  draft: 3,
+  ready: 4,
+  healthy: 5,
+}
+
+const DECISION_TONE_CHIP: Record<DecisionTone, 'success' | 'warning' | 'error' | 'info'> = {
+  success: 'success',
+  warning: 'warning',
+  error: 'error',
+  info: 'info',
+}
+
+const DELIVERY_STEP_TONE: Record<DeliveryStepState, 'default' | 'success' | 'warning' | 'error' | 'info'> = {
+  pending: 'default',
+  complete: 'success',
+  attention: 'warning',
+  blocked: 'error',
+}
+
+const DELIVERY_STEP_ICON: Record<DeliveryStepState, string> = {
+  pending: 'tabler-circle-dashed',
+  complete: 'tabler-circle-check',
+  attention: 'tabler-alert-triangle',
+  blocked: 'tabler-alert-octagon',
+}
+
 const formatStatus = (status: string | null | undefined) => {
   if (!status) return 'N/A'
 
@@ -95,6 +146,124 @@ const formatDate = (value: string | null | undefined) => {
 const compactId = (value: string | null | undefined) => (value ? `${value.slice(0, 8)}...` : 'N/A')
 
 const formatPercent = (value: number) => `${value}%`
+
+const resolveDecisionRecommendation = (
+  form: GrowthFormsCockpitVm['forms'][number],
+  submissions: GrowthFormsCockpitSubmissionVm[],
+): DecisionRecommendation => {
+  if (form.deadLetterCount > 0 || form.health === 'dead_letter') {
+    return {
+      title: GH_GROWTH_FORMS.decision.deadLetterTitle,
+      body: GH_GROWTH_FORMS.decision.deadLetterBody,
+      icon: 'tabler-alert-octagon',
+      tone: 'error',
+      action: 'openEvidence',
+      actionLabel: GH_GROWTH_FORMS.actions.openEvidence,
+    }
+  }
+
+  if (form.retryQueueCount > 0 || form.health === 'attention') {
+    return {
+      title: GH_GROWTH_FORMS.decision.retryTitle,
+      body: GH_GROWTH_FORMS.decision.retryBody,
+      icon: 'tabler-rotate-clockwise',
+      tone: 'warning',
+      action: 'dispatch',
+      actionLabel: GH_GROWTH_FORMS.actions.dispatch,
+    }
+  }
+
+  if (form.destinations.length === 0) {
+    return {
+      title: GH_GROWTH_FORMS.decision.destinationTitle,
+      body: GH_GROWTH_FORMS.decision.destinationBody,
+      icon: 'tabler-plug-connected-x',
+      tone: 'warning',
+      action: 'monitor',
+      actionLabel: GH_GROWTH_FORMS.actions.keepWatching,
+    }
+  }
+
+  if (form.surfaces.length === 0) {
+    return {
+      title: GH_GROWTH_FORMS.decision.surfaceTitle,
+      body: GH_GROWTH_FORMS.decision.surfaceBody,
+      icon: 'tabler-browser-x',
+      tone: 'warning',
+      action: 'monitor',
+      actionLabel: GH_GROWTH_FORMS.actions.keepWatching,
+    }
+  }
+
+  if (form.latestVersionStatus === 'draft' || form.latestVersionStatus === 'review' || form.health === 'draft') {
+    return {
+      title: GH_GROWTH_FORMS.decision.reviewTitle,
+      body: GH_GROWTH_FORMS.decision.reviewBody,
+      icon: 'tabler-checkup-list',
+      tone: 'info',
+      action: 'review',
+      actionLabel: GH_GROWTH_FORMS.actions.review,
+    }
+  }
+
+  if (form.latestVersionStatus === 'published' && submissions.length === 0) {
+    return {
+      title: GH_GROWTH_FORMS.decision.smokeTitle,
+      body: GH_GROWTH_FORMS.decision.smokeBody,
+      icon: 'tabler-test-pipe',
+      tone: 'info',
+      action: 'smoke',
+      actionLabel: GH_GROWTH_FORMS.actions.planSmoke,
+    }
+  }
+
+  return {
+    title: GH_GROWTH_FORMS.decision.monitorTitle,
+    body: GH_GROWTH_FORMS.decision.monitorBody,
+    icon: 'tabler-radar',
+    tone: 'success',
+    action: 'openEvidence',
+    actionLabel: GH_GROWTH_FORMS.actions.openEvidence,
+  }
+}
+
+const resolveDeliveryPath = (submissions: GrowthFormsCockpitSubmissionVm[]): DeliveryStep[] => {
+  const latest = submissions[0] ?? null
+  const attempts = latest?.attempts ?? []
+  const hasAttempt = attempts.length > 0
+  const hasConsent = Boolean(latest?.consent)
+  const hasDelivered = latest?.status === 'delivered' || attempts.some(attempt => attempt.status === 'delivered' || attempt.status === 'succeeded')
+
+  const hasAttention =
+    latest?.status === 'retrying' ||
+    latest?.status === 'destination_failed' ||
+    attempts.some(attempt => attempt.status === 'retrying' || attempt.status === 'failed' || attempt.status === 'pending')
+
+  const hasBlocked = latest?.status === 'dead_letter' || latest?.status === 'rejected' || attempts.some(attempt => attempt.status === 'dead_letter')
+
+  return [
+    {
+      label: GH_GROWTH_FORMS.deliveryPath.accepted,
+      state: latest ? (latest.status === 'rejected' ? 'blocked' : 'complete') : 'pending',
+      detail: latest ? formatDate(latest.createdAt) : GH_GROWTH_FORMS.deliveryPath.pending,
+    },
+    {
+      label: GH_GROWTH_FORMS.deliveryPath.routed,
+      state: hasBlocked ? 'blocked' : hasAttempt ? 'complete' : 'pending',
+      detail: latest ? `${attempts.length} ${GH_GROWTH_FORMS.units.attempts}` : GH_GROWTH_FORMS.deliveryPath.pending,
+    },
+    {
+      label: GH_GROWTH_FORMS.deliveryPath.delivered,
+      state: hasBlocked ? 'blocked' : hasDelivered ? 'complete' : hasAttention ? 'attention' : 'pending',
+      detail: hasDelivered ? GH_GROWTH_FORMS.deliveryPath.complete : hasAttention ? GH_GROWTH_FORMS.deliveryPath.attention : GH_GROWTH_FORMS.deliveryPath.pending,
+    },
+    {
+      label: GH_GROWTH_FORMS.deliveryPath.evidence,
+      state: hasConsent ? 'complete' : latest ? 'attention' : 'pending',
+      detail: hasConsent ? GH_GROWTH_FORMS.sections.consent : GH_GROWTH_FORMS.deliveryPath.pending,
+    },
+  ]
+}
 
 const normalizeSlug = (value: string) =>
   value
@@ -227,6 +396,170 @@ const MetricTile = ({
   </Box>
 )
 
+const EmptyInsight = ({
+  icon,
+  title,
+  body,
+}: {
+  icon: string
+  title: string
+  body: string
+}) => (
+  <Box
+    sx={theme => ({
+      border: `1px dashed ${theme.palette.divider}`,
+      borderRadius: `${theme.shape.customBorderRadius?.sm ?? theme.shape.borderRadius}px`,
+      bgcolor: alpha(theme.palette.action.hover, 0.48),
+      p: 2,
+      display: 'grid',
+      gridTemplateColumns: 'auto minmax(0, 1fr)',
+      gap: 1.5,
+      alignItems: 'flex-start',
+      minWidth: 0,
+    })}
+  >
+    <Box
+      aria-hidden='true'
+      sx={theme => ({
+        display: 'inline-grid',
+        placeItems: 'center',
+        inlineSize: 36,
+        blockSize: 36,
+        borderRadius: `${theme.shape.customBorderRadius?.sm ?? theme.shape.borderRadius}px`,
+        bgcolor: alpha(theme.palette.primary.main, 0.1),
+        color: 'primary.main',
+      })}
+    >
+      <i className={icon} />
+    </Box>
+    <Stack spacing={0.5} sx={{ minWidth: 0 }}>
+      <Typography variant='subtitle2' sx={sectionTitleSx}>
+        {title}
+      </Typography>
+      <Typography variant='body2' color='text.primary'>
+        {body}
+      </Typography>
+    </Stack>
+  </Box>
+)
+
+const DecisionPanel = ({
+  decision,
+  onAction,
+}: {
+  decision: DecisionRecommendation
+  onAction: (action: DecisionAction) => void
+}) => {
+  const isPassiveAction = decision.action === 'monitor' || decision.action === 'smoke' || decision.tone === 'success'
+  const buttonTone = decision.action === 'dispatch' ? 'warning' : decision.tone === 'error' ? 'error' : 'primary'
+
+  return (
+    <Box
+      data-capture='growth-forms-next-best-action'
+      sx={theme => ({
+        border: `1px solid ${alpha(theme.palette[decision.tone].main, 0.36)}`,
+        borderRadius: `${theme.shape.customBorderRadius?.md ?? theme.shape.borderRadius}px`,
+        bgcolor: alpha(theme.palette[decision.tone].main, 0.08),
+        p: 2,
+        display: 'grid',
+        gap: 1.5,
+        minWidth: 0,
+      })}
+    >
+      <Stack direction='row' alignItems='flex-start' spacing={1.5} sx={{ minWidth: 0 }}>
+        <Box
+          aria-hidden='true'
+          sx={theme => ({
+            display: 'inline-grid',
+            placeItems: 'center',
+            inlineSize: 40,
+            blockSize: 40,
+            borderRadius: `${theme.shape.customBorderRadius?.sm ?? theme.shape.borderRadius}px`,
+            bgcolor: alpha(theme.palette[decision.tone].main, 0.14),
+            color: `${decision.tone}.dark`,
+            flex: '0 0 auto',
+          })}
+        >
+          <i className={decision.icon} />
+        </Box>
+        <Stack spacing={0.5} sx={{ minWidth: 0 }}>
+          <Stack direction='row' spacing={1} alignItems='center' flexWrap='wrap'>
+            <Typography variant='overline' color='text.primary'>
+              {GH_GROWTH_FORMS.sections.nextBestAction}
+            </Typography>
+            <GreenhouseChip
+              kind='status'
+              size='small'
+              variant='label'
+              tone={DECISION_TONE_CHIP[decision.tone]}
+              label={decision.title}
+            />
+          </Stack>
+          <Typography variant='body2' color='text.primary'>
+            {decision.body}
+          </Typography>
+        </Stack>
+      </Stack>
+      <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent='flex-start'>
+        <GreenhouseButton
+          size='small'
+          variant={isPassiveAction ? 'outlined' : 'solid'}
+          tone={buttonTone}
+          kind='custom'
+          leadingIconClassName={decision.icon}
+          onClick={() => onAction(decision.action)}
+        >
+          {decision.actionLabel}
+        </GreenhouseButton>
+      </Stack>
+    </Box>
+  )
+}
+
+const DeliveryPathPanel = ({ steps }: { steps: DeliveryStep[] }) => (
+  <Box data-capture='growth-forms-delivery-path' sx={{ ...sectionSurfaceSx, p: 2 }}>
+    <Typography variant='subtitle2' gutterBottom sx={sectionTitleSx}>
+      {GH_GROWTH_FORMS.sections.deliveryPath}
+    </Typography>
+    <Box
+      sx={{
+        display: 'grid',
+        gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, minmax(0, 1fr))' },
+        gap: 1,
+        minWidth: 0,
+      }}
+    >
+      {steps.map(step => (
+        <Box
+          key={step.label}
+          sx={theme => ({
+            border: `1px solid ${theme.palette.divider}`,
+            borderRadius: `${theme.shape.customBorderRadius?.sm ?? theme.shape.borderRadius}px`,
+            p: 1.25,
+            display: 'grid',
+            gap: 0.75,
+            minWidth: 0,
+          })}
+        >
+          <Stack direction='row' alignItems='center' spacing={1} sx={{ minWidth: 0 }}>
+            <GreenhouseChip
+              kind='status'
+              size='small'
+              variant='label'
+              tone={DELIVERY_STEP_TONE[step.state]}
+              iconClassName={DELIVERY_STEP_ICON[step.state]}
+              label={step.label}
+            />
+          </Stack>
+          <Typography variant='caption' color='text.primary' sx={{ overflowWrap: 'anywhere' }}>
+            {step.detail}
+          </Typography>
+        </Box>
+      ))}
+    </Box>
+  </Box>
+)
+
 const OperationalPulse = ({ data }: { data: GrowthFormsCockpitVm }) => {
   const publishedCoverage = data.summary.totalForms > 0 ? Math.round((data.summary.publishedForms / data.summary.totalForms) * 100) : 0
   const hasDeliveryRisk = data.summary.deadLetters > 0 || data.summary.retryQueue > 0
@@ -316,9 +649,11 @@ const StatusChip = ({ status, tone }: { status: string | null | undefined; tone?
 const DestinationList = ({ destinations }: { destinations: GrowthFormsCockpitDestinationVm[] }) => {
   if (destinations.length === 0) {
     return (
-      <Typography variant='body2' color='text.primary'>
-        {GH_GROWTH_FORMS.helper.noDestinations}
-      </Typography>
+      <EmptyInsight
+        icon='tabler-plug-connected-x'
+        title={GH_GROWTH_FORMS.helper.noDestinationsTitle}
+        body={GH_GROWTH_FORMS.helper.noDestinationsBody}
+      />
     )
   }
 
@@ -335,9 +670,9 @@ const DestinationList = ({ destinations }: { destinations: GrowthFormsCockpitDes
           }}
         >
           <Stack direction='row' alignItems='center' justifyContent='space-between' spacing={1}>
-          <Typography variant='subtitle2' sx={{ ...sectionTitleSx, minWidth: 0, overflowWrap: 'anywhere' }}>
-            {destination.provider}
-          </Typography>
+            <Typography variant='subtitle2' sx={{ ...sectionTitleSx, minWidth: 0, overflowWrap: 'anywhere' }}>
+              {destination.provider}
+            </Typography>
             <StatusChip status={destination.enabled ? destination.endpointStatus : 'disabled'} tone={destination.enabled ? undefined : 'default'} />
           </Stack>
           <Typography variant='caption' color='text.primary'>
@@ -349,33 +684,45 @@ const DestinationList = ({ destinations }: { destinations: GrowthFormsCockpitDes
   )
 }
 
-const SurfaceList = ({ surfaces }: { surfaces: GrowthFormsCockpitSurfaceVm[] }) => (
-  <Stack spacing={1}>
-    {surfaces.slice(0, 4).map(surface => (
-      <Box
-        key={surface.surfaceId}
-        sx={{
-          display: 'grid',
-          gap: 0.5,
-          border: theme => `1px solid ${theme.palette.divider}`,
-          borderRadius: theme => `${theme.shape.customBorderRadius.sm}px`,
-          p: 1.5,
-          minWidth: 0,
-        }}
-      >
-        <Stack direction='row' alignItems='center' justifyContent='space-between' spacing={1}>
-          <Typography variant='subtitle2' sx={{ ...sectionTitleSx, minWidth: 0, overflowWrap: 'anywhere' }}>
-            {surface.surfaceName}
+const SurfaceList = ({ surfaces }: { surfaces: GrowthFormsCockpitSurfaceVm[] }) => {
+  if (surfaces.length === 0) {
+    return (
+      <EmptyInsight
+        icon='tabler-browser-x'
+        title={GH_GROWTH_FORMS.helper.noSurfacesTitle}
+        body={GH_GROWTH_FORMS.helper.noSurfacesBody}
+      />
+    )
+  }
+
+  return (
+    <Stack spacing={1}>
+      {surfaces.slice(0, 4).map(surface => (
+        <Box
+          key={surface.surfaceId}
+          sx={{
+            display: 'grid',
+            gap: 0.5,
+            border: theme => `1px solid ${theme.palette.divider}`,
+            borderRadius: theme => `${theme.shape.customBorderRadius.sm}px`,
+            p: 1.5,
+            minWidth: 0,
+          }}
+        >
+          <Stack direction='row' alignItems='center' justifyContent='space-between' spacing={1}>
+            <Typography variant='subtitle2' sx={{ ...sectionTitleSx, minWidth: 0, overflowWrap: 'anywhere' }}>
+              {surface.surfaceName}
+            </Typography>
+            <StatusChip status={surface.status} />
+          </Stack>
+          <Typography variant='caption' color='text.primary'>
+            {surface.surfaceKind} · {surface.rendererChannel} · {surface.originAllowlist[0] ?? 'origin governed'}
           </Typography>
-          <StatusChip status={surface.status} />
-        </Stack>
-        <Typography variant='caption' color='text.primary'>
-          {surface.surfaceKind} · {surface.rendererChannel} · {surface.originAllowlist[0] ?? 'origin governed'}
-        </Typography>
-      </Box>
-    ))}
-  </Stack>
-)
+        </Box>
+      ))}
+    </Stack>
+  )
+}
 
 const SubmissionsList = ({
   submissions,
@@ -386,9 +733,11 @@ const SubmissionsList = ({
 }) => {
   if (submissions.length === 0) {
     return (
-      <Typography variant='body2' color='text.primary'>
-        {GH_GROWTH_FORMS.helper.noSubmissions}
-      </Typography>
+      <EmptyInsight
+        icon='tabler-inbox-off'
+        title={GH_GROWTH_FORMS.helper.noSubmissionsTitle}
+        body={GH_GROWTH_FORMS.helper.noSubmissionsBody}
+      />
     )
   }
 
@@ -449,9 +798,11 @@ const EvidenceLedger = ({ submissions }: { submissions: GrowthFormsCockpitSubmis
           {GH_GROWTH_FORMS.sections.evidenceLedger}
         </Typography>
         {attempts.length === 0 ? (
-          <Typography variant='body2' color='text.primary'>
-            {GH_GROWTH_FORMS.helper.noSubmissions}
-          </Typography>
+          <EmptyInsight
+            icon='tabler-history-off'
+            title={GH_GROWTH_FORMS.helper.noSubmissionsTitle}
+            body={GH_GROWTH_FORMS.helper.noSubmissionsBody}
+          />
         ) : (
           <Stack spacing={1.25}>
             {attempts.map(attempt => (
@@ -629,6 +980,23 @@ const GrowthFormsAdminCockpitView = ({ data }: { data: GrowthFormsCockpitVm }) =
     })
   }, [data.forms, healthFilter, search])
 
+  const visibleForms = useMemo(
+    () =>
+      [...filteredForms].sort((first, second) => {
+        const healthDelta = HEALTH_PRIORITY[first.health] - HEALTH_PRIORITY[second.health]
+
+        if (healthDelta !== 0) return healthDelta
+
+        return (second.lastSubmissionAt ?? second.latestPublishedAt ?? second.latestVersionCreatedAt ?? '').localeCompare(
+          first.lastSubmissionAt ?? first.latestPublishedAt ?? first.latestVersionCreatedAt ?? '',
+        )
+      }),
+    [filteredForms],
+  )
+
+  const selectedDecision = selectedForm ? resolveDecisionRecommendation(selectedForm, selectedSubmissions) : null
+  const selectedDeliveryPath = resolveDeliveryPath(selectedSubmissions)
+
   const showToast = (severity: 'success' | 'error', message: string) => {
     setLiveStatus(message)
     setToast({ open: true, severity, message })
@@ -711,6 +1079,31 @@ const GrowthFormsAdminCockpitView = ({ data }: { data: GrowthFormsCockpitVm }) =
     selectForm(formId)
   }
 
+  const runDecisionAction = (action: DecisionAction) => {
+    switch (action) {
+      case 'openEvidence':
+        setSidecarMode('evidence')
+        break
+      case 'dispatch':
+        runDispatch()
+        break
+      case 'review':
+        runLifecycle('review')
+        break
+      case 'smoke':
+        setSidecarMode('evidence')
+        setLiveStatus(GH_GROWTH_FORMS.decision.smokeBody)
+        showToast('success', GH_GROWTH_FORMS.toast.smokePlanned)
+        break
+      case 'monitor':
+        setLiveStatus(GH_GROWTH_FORMS.decision.monitorBody)
+        showToast('success', GH_GROWTH_FORMS.toast.monitoringKept)
+        break
+      default:
+        break
+    }
+  }
+
   const table = (
     <Box data-capture='growth-forms-command-center' sx={{ ...sectionSurfaceSx, minWidth: 0, overflow: 'hidden' }}>
       <Stack
@@ -772,7 +1165,7 @@ const GrowthFormsAdminCockpitView = ({ data }: { data: GrowthFormsCockpitVm }) =
             </TableRow>
           </TableHead>
           <TableBody>
-            {filteredForms.map(form => {
+            {visibleForms.map(form => {
               const selected = selectedForm?.formId === form.formId
 
               return (
@@ -848,7 +1241,7 @@ const GrowthFormsAdminCockpitView = ({ data }: { data: GrowthFormsCockpitVm }) =
                 </TableRow>
               )
             })}
-            {filteredForms.length === 0 ? (
+            {visibleForms.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={7}>
                   <Alert severity='info' icon={<i className='tabler-filter-search' />}>
@@ -899,8 +1292,10 @@ const GrowthFormsAdminCockpitView = ({ data }: { data: GrowthFormsCockpitVm }) =
         </GreenhouseButton>
       </Stack>
 
+      {selectedDecision ? <DecisionPanel decision={selectedDecision} onAction={runDecisionAction} /> : null}
+
       <Box sx={{ ...sectionSurfaceSx, p: 2 }}>
-          <Typography variant='subtitle2' gutterBottom sx={sectionTitleSx}>
+        <Typography variant='subtitle2' gutterBottom sx={sectionTitleSx}>
           {GH_GROWTH_FORMS.sections.readiness}
         </Typography>
         <Stack direction='row' spacing={1} flexWrap='wrap'>
@@ -910,6 +1305,8 @@ const GrowthFormsAdminCockpitView = ({ data }: { data: GrowthFormsCockpitVm }) =
           <GreenhouseChip kind='metric' size='small' variant='label' tone={selectedForm.deadLetterCount > 0 ? 'error' : 'success'} label={`${selectedForm.retryQueueCount} ${GH_GROWTH_FORMS.units.retry}`} />
         </Stack>
       </Box>
+
+      <DeliveryPathPanel steps={selectedDeliveryPath} />
 
       <Box sx={{ ...sectionSurfaceSx, p: 2 }}>
         <Typography variant='subtitle2' gutterBottom sx={sectionTitleSx}>
@@ -1026,12 +1423,14 @@ const GrowthFormsAdminCockpitView = ({ data }: { data: GrowthFormsCockpitVm }) =
       sx={{
         ...sectionSurfaceSx,
         p: 2,
+        pb: { xs: 2, md: 12 },
         boxSizing: 'border-box',
         width: '100%',
         maxWidth: '100%',
         minHeight: '100%',
         overflowX: 'hidden',
         overflowY: 'auto',
+        scrollPaddingBlockEnd: theme => theme.spacing(12),
       }}
     >
       <Box
