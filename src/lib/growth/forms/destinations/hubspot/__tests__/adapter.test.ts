@@ -22,6 +22,8 @@ const submission = (fields: Record<string, unknown> = { email: 'lead@example.com
   dedupe_fingerprint: 'fp',
   request_id: null,
   ip_hash: null,
+  delivery_attempts: 0,
+  next_attempt_at: null,
   created_at: new Date(),
   updated_at: new Date(),
 })

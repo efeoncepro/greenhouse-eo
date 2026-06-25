@@ -98,6 +98,8 @@ export type FormSubmissionRow = {
   dedupe_fingerprint: string | null
   request_id: string | null
   ip_hash: string | null
+  delivery_attempts: number
+  next_attempt_at: Date | null
   created_at: Date
   updated_at: Date
 }
@@ -565,14 +567,33 @@ export const countAcceptedSubmissionsByHash = async (
 return Number(rows[0]?.n ?? 0)
 }
 
-/** Submissions aceptadas/fallidas que el dispatcher debe rutear (sin attempt terminal). */
+/**
+ * Submissions listas para (re)entrega: aceptadas o en retry cuyo `next_attempt_at`
+ * venció. NUNCA incluye `delivered`/`dead_letter` (terminales) — at-most-once.
+ */
 export const listSubmissionsPendingDispatch = async (limit = 50): Promise<FormSubmissionRow[]> =>
   query<FormSubmissionRow>(
     `SELECT * FROM greenhouse_growth.form_submission
-     WHERE status IN ('accepted', 'routed', 'destination_failed', 'retrying')
+     WHERE status IN ('accepted', 'routed', 'retrying')
+       AND (next_attempt_at IS NULL OR next_attempt_at <= NOW())
      ORDER BY created_at ASC LIMIT $1`,
     [Math.min(Math.max(limit, 1), 200)],
   )
+
+/** Transición atómica del estado de entrega (status + contador + próximo retry). */
+export const updateSubmissionDeliveryState = async (
+  submissionId: string,
+  input: { status: string; deliveryAttempts?: number; nextAttemptAt?: Date | null },
+): Promise<void> => {
+  await query(
+    `UPDATE greenhouse_growth.form_submission
+       SET status = $2,
+           delivery_attempts = COALESCE($3, delivery_attempts),
+           next_attempt_at = $4
+     WHERE submission_id = $1`,
+    [submissionId, input.status, input.deliveryAttempts ?? null, input.nextAttemptAt ?? null],
+  )
+}
 
 // ─── Destination attempts (append-only ledger) ────────────────────────────────
 

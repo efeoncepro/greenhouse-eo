@@ -6503,10 +6503,12 @@ export interface GreenhouseGrowthFormHostSurface {
 export interface GreenhouseGrowthFormSubmission {
   created_at: Generated<Timestamp>;
   dedupe_fingerprint: string | null;
+  delivery_attempts: Generated<number>;
   form_id: string;
   form_version_id: string;
   ip_hash: string | null;
   lead_email_hash: string | null;
+  next_attempt_at: Timestamp | null;
   normalized_fields_json: Generated<Json>;
   page_name: string | null;
   page_uri: string | null;

@@ -298,7 +298,9 @@ export const destinationPlanEntrySchema = z.object({
   deliveryMode: z.enum(DELIVERY_MODES),
   enabled: z.boolean(),
   fieldAllowlist: z.array(z.string()).default([]),
-  mapping: z.record(z.string(), z.string()).default({}),
+  // Config del destino (string→unknown): el compiler NO valida su forma específica —
+  // cada adapter valida su mapping (HubSpot: portalId/formGuid/fieldMapping anidado).
+  mapping: z.record(z.string(), z.unknown()).default({}),
   retryPolicy: z
     .object({ maxRetries: z.number().int().min(0).max(10).default(5), backoffSeconds: z.number().int().positive().default(60) })
     .default({ maxRetries: 5, backoffSeconds: 60 }),
