@@ -2,6 +2,8 @@ import 'server-only'
 
 import crypto from 'node:crypto'
 
+import { computeClRutCheckDigit } from '@/lib/identity-documents'
+
 import { PersonLegalProfileValidationError } from './errors'
 import { resolvePiiNormalizationPepper } from './normalize-pepper'
 import type { PersonDocumentType } from './types'
@@ -27,26 +29,9 @@ interface DocumentValidator {
   formatDisplay(normalizedValue: string): string
 }
 
-/**
- * Calcula digito verificador modulo 11 para Chile.
- * https://es.wikipedia.org/wiki/Rol_%C3%9Anico_Tributario#C%C3%A1lculo_del_d%C3%ADgito_verificador
- */
-const computeClRutCheckDigit = (numericPart: string): string => {
-  const reversed = numericPart.split('').reverse().map(Number)
-  const factors = [2, 3, 4, 5, 6, 7]
-  let sum = 0
-
-  for (let i = 0; i < reversed.length; i++) {
-    sum += reversed[i]! * factors[i % 6]!
-  }
-
-  const remainder = 11 - (sum % 11)
-
-  if (remainder === 11) return '0'
-  if (remainder === 10) return 'K'
-
-  return String(remainder)
-}
+// `computeClRutCheckDigit` (módulo-11) vive en el core isomórfico compartido
+// `@/lib/identity-documents` (TASK-1253). Misma fuente de verdad del algoritmo
+// que el motor de formularios growth y el renderer portable. Aquí se importa.
 
 const CL_RUT_VALIDATOR: DocumentValidator = {
   normalize(rawInput: string): string {
