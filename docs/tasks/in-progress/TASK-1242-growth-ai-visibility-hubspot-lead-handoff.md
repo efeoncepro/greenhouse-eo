@@ -22,7 +22,7 @@ TASK-1251 **preservó `grader_leads` como la fuente del lead** (sin cambio de fu
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `growth|crm|integrations`
-- Blocked by: `TASK-1240`
+- Blocked by: `none` (TASK-1240/1235 complete)
 - Branch: `task/TASK-1242-growth-ai-visibility-hubspot-lead-handoff`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -30,6 +30,12 @@ TASK-1251 **preservó `grader_leads` como la fuente del lead** (sin cambio de fu
 ## Summary
 
 Convertir el lead capturado en el intake público (`grader_leads`, TASK-1240) en un **lead de ventas en HubSpot** (EPIC-020 D): `syncAiVisibilityRunToHubSpot` crea/actualiza el contact/company + props `ai_visibility_*` (score, `primary_gap`, `recommended_motion`) + lifecycle stage, vía el patrón **outbox + reactive consumer** (no POST inline en la route). Cierra el bow-tie: el grader (acquisition) entrega el lead a ventas (SQL).
+
+## Estado de ejecución — `code complete, rollout pendiente` (2026-06-25)
+
+Los 3 slices están implementados, con typecheck + build + 509 tests focales (incluye 26 del handoff + grant coverage + reliability) en verde. **NO se mueve a `complete/`** (Runtime Rollout Completion Gate): el flag `GROWTH_AI_VISIBILITY_LEAD_HANDOFF_ENABLED` está OFF, las **HubSpot custom properties `ai_visibility_*` + grupo "AEO" no existen aún** (out-of-band, portal 48713323), y falta el **smoke real contra HubSpot staging**. Commits: Slice 1 (command/mapper/event), Slice 2 (consumer/CRM client/flag/signal), Slice 3 (capability/endpoint/reader), docs (catalog/ledger).
+
+**Pendiente de rollout:** (1) crear properties + grupo AEO en HubSpot; (2) `vercel env add GROWTH_AI_VISIBILITY_LEAD_HANDOFF_ENABLED true staging` + redeploy; (3) smoke staging (publicar snapshot de run real con lead → outbox → consumer upsert contact/company en HubSpot + `hubspot_synced_at` + signal `lead_handoff_uncovered` steady=0); (4) prod vía release control plane. **Sub-task aparte** (decisión operador): captura de `first_name`/`last_name` en el intake público + columnas en `grader_leads` (1242 ya mapea `firstname`/`lastname` cuando existan).
 
 ## Delta 2026-06-25 — frontera con el HubSpot destination adapter del Forms engine (TASK-1230)
 
