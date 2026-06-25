@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -365,8 +365,10 @@ Renderer receives `render_contract` only. It never receives destination mapping,
 
 ## Open Questions
 
-- Final package/distribution path for renderer bundle.
-- Whether WordPress wrapper lives in greenhouse-eo bridge tooling or public-site runtime repo.
-- **Dependencia upstream a TASK-1229 `render_contract` (§19.3):** ¿el contract agrega `autocomplete` (token WHATWG) + `inputmode` por campo, o el renderer los deriva por categoría con tabla determinista? Sin uno de los dos no se cumple el piso de autofill de `forms-ux`. Si es lo primero, abrir delta/follow-up en TASK-1229.
-- **Máscara display-vs-stored:** ¿el contract declara un hint de máscara/formato por campo (RUT/teléfono CL) para que el renderer formatee mientras el server valida el valor crudo? Hoy `normalizeWith` es server-only.
-- **Shadow DOM sí/no:** decisión de discovery — impacta directamente cómo se asocian errores y live regions (a11y). Documentar la decisión y su mitigación.
+### Resoluciones de discovery (2026-06-25, agente)
+
+- **Package/distribution path → RESUELTO.** Core framework-light en **vanilla TS** bajo `src/growth-forms-renderer/**`, bundle con **esbuild** (pin como devDependency) a `public/growth-forms/renderer-<channel>.js` (canal `preview|beta|stable`, Arch §19.2 "Greenhouse-served static asset for early V1"). CDN/package-import = swap reversible futuro. Sin Lit (boring-tech, evita dep en bundle público). Veredicto `arch-architect`.
+- **WordPress wrapper location → RESUELTO.** Vive en el repo runtime `efeoncepro/efeonce-public-site-runtime` (`wp-content/...`), NO en greenhouse-eo. Astro wrapper en `efeoncepro/efeonce-web` (`src/...`). Decisión del operador 2026-06-25: implementar los 4 slices con commit a siblings (previa verificación CI/CD por las reglas cross-repo de CLAUDE.md).
+- **`autocomplete`/`inputmode` → RESUELTO (sin dependencia upstream).** El `render_contract.fields` (TASK-1229 `fieldDefinitionSchema`) **ya declara** `autocomplete` + `inputMode` por campo. El renderer los aplica directo; tabla determinista categoría→token solo como fallback cuando vienen vacíos.
+- **Máscara display-vs-stored → RESUELTO (V1).** El contract no expone hint de máscara hoy. El renderer aplica máscara de *display* derivada por `field.type`+`inputMode` (RUT/tel CL, determinista y documentada), pero **envía el valor crudo** (server valida/normaliza con `normalizeWith`). Follow-up opcional a 1229 si se quiere hint explícito por campo.
+- **Shadow DOM → RESUELTO: Light DOM + `ElementInternals`.** Form-associated custom element (`attachInternals()`) en light DOM: IDREF (`aria-describedby`/`aria-labelledby`) y `role="alert"` viven en el mismo árbol (no cruzan shadow boundary), autofill/password-managers funcionan, hereda CSS vars del host. Aislamiento por prefijo `ghf-` + `@layer`. Veredicto `a11y-architect` (causa #1 de a11y rota = IDREF cruzando shadow root).
