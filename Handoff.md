@@ -1,3 +1,17 @@
+## Sesión 2026-06-25 — EPIC-020 AI Visibility lead magnet gaps convertidos a TASK-1245..1249 — Codex
+
+> **Estado:** docs/task-planning only; sin runtime/code. A partir de la revisión de las tasks creadas por Claude para EPIC-020, se registraron las piezas faltantes como tasks formales y se sincronizó el backlog.
+> - **Tasks creadas:** `TASK-1245` Public Run Status + Report Delivery Orchestrator (P1 backend-data; poll público `runPublicId -> status -> reportToken` + hardening), `TASK-1246` Public Launch Readiness + Rollout (P1 backend-data/ops; legal consent + Turnstile + flags + staging/prod gates), `TASK-1247` Admin Review UI (P2 ui-ux; consumer de comandos `TASK-1244`), `TASK-1248` Client Report UI (P2 ui-ux; consumer de reader `TASK-1243`), `TASK-1249` Calibration + Provider Completion (P2 backend-data; Perplexity + prompt pack v2 + golden eval/recalibración).
+> - **Dependencia corregida:** `TASK-1241` ahora queda bloqueada por `TASK-1245`, porque la UI pública asumía poll de estado por `runPublicId` pero el repo solo tenía `POST /run` y `GET /report/[token]`.
+> - **Índices sincronizados:** `docs/tasks/README.md`, `docs/tasks/TASK_ID_REGISTRY.md` y `docs/epics/to-do/EPIC-020-public-ai-visibility-lead-magnet-program.md`; siguiente ID disponible `TASK-1250`.
+
+## Sesión 2026-06-25 — EPIC-020 email report delivery agregado como TASK-1250 — Codex
+
+> **Estado:** docs/task-planning only; sin runtime/code. A pedido del operador, se agregó la pieza faltante de delivery por correo: el reporte no solo debe verse en pantalla, también debe llegar al email del lead con un resumen breve y un informe completo adjunto.
+> - **Task creada:** `TASK-1250` Growth AI Visibility: Email Report Delivery (P1 backend-data, UI impact copy). Scope: template React Email transaccional, resumen breve, link tokenizado, adjunto completo generado server-side desde `PublicGraderReport`, dispatch idempotente por lead/report snapshot y tracking en `greenhouse_notifications.email_deliveries`.
+> - **Dependencia de launch:** `TASK-1246` ahora queda bloqueada también por `TASK-1250`; el staging smoke end-to-end debe incluir `public report -> email con adjunto -> HubSpot`.
+> - **Índices sincronizados:** `docs/tasks/README.md`, `docs/tasks/TASK_ID_REGISTRY.md` y `EPIC-020`; siguiente ID disponible `TASK-1251`.
+
 ## Sesión 2026-06-24 — TASK-1240 AI Visibility: Public Run Intake + Abuse/Cost — CODE COMPLETE (dev; rollout pendiente) — Claude · EPIC-020 B
 
 > **Estado:** TASK-1240 **`complete` (code complete dev; rollout OPERATIVAMENTE BLOQUEADO)** en `develop` local-first (movida a `complete/`). El **único WRITE público** del dominio (el lead magnet). 2 migraciones aplicadas en `greenhouse-pg-dev` + `db.d.ts`. **Sin push remoto.** Pendientes de push acumulados: **TASK-1238, 1239, 1240** (las 3 committeadas, ninguna pusheada).

@@ -29,6 +29,15 @@
 
 Implementar el destination adapter HubSpot Forms `hsforms-v3-secure-submit` para accepted submissions del motor Growth Forms, con mapping versionado, consent payload server-side, retry/dead-letter, signals y smoke contra un form de prueba. El adapter nace encapsulado como `endpointStatus=legacy_supported` y preparado para migrar a un endpoint date-versioned futuro.
 
+## Delta 2026-06-25 — coexistencia con el HubSpot lead handoff del grader (TASK-1242)
+
+Este adapter (form submission → HubSpot **Forms** secure-submit) **coexiste** con `TASK-1242` (lead handoff del AI Visibility Grader: `grader_leads` → contact/company + props `ai_visibility_*` vía el Cloud Run hubspot bridge). Son dos integraciones HubSpot distintas y legítimas en `growth`:
+
+- **1230 (esta task):** entrega de *submissions* de cualquier form del motor a HubSpot **Forms** API.
+- **1242:** handoff CRM/ventas del lead del grader (prop backfill + lifecycle) — no es un submit de formulario.
+
+Frontera dura compartida: ambos **reusan el resolver de token canónico** + `captureWithDomain(err,'integrations.hubspot',…)`; **NUNCA** un cliente HubSpot paralelo. Coordinar el scope del private app (esta task exige scope `forms`; 1242 usa el bridge) para no pisarse.
+
 ## Why This Task Exists
 
 El primer destino CRM real del motor sera HubSpot, pero public runtimes no deben llamar HubSpot ni conocer property names/form GUIDs. La arquitectura requiere mantener atribucion/consent de HubSpot Forms sin que HubSpot sea renderer ni source of truth. Falta convertir el fake/no-op destination de TASK-1229 en un adapter real, testeado y observable.
@@ -82,6 +91,7 @@ Reglas obligatorias:
 
 - `TASK-1232` First real form migration.
 - Futuras destination policies `hubspot_forms_secure_submit`.
+- Coexiste con `TASK-1242` (grader HubSpot lead handoff) — integraciones HubSpot distintas, mismo token + discipline; ver Delta 2026-06-25.
 
 ### Files owned
 

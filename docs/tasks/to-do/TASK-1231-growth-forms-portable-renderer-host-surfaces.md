@@ -29,6 +29,10 @@
 
 Construir el renderer portable del motor Growth Forms como Web Component/custom element con wrappers finos para Greenhouse Next.js preview, WordPress public site y Astro parity. WordPress es el primer host surface, pero el core debe ser agnostico y consumir el mismo `render_contract` que Astro y Greenhouse.
 
+## Delta 2026-06-25 — primer consumer real candidato = el lead magnet del grader (TASK-1241)
+
+El renderer portable de esta task tiene un **primer consumer concreto identificado**: la página pública del AI Visibility Grader (`TASK-1241`), que hoy construye su form **a mano** (sin heredar la robustez del motor gobernado: reintentos, consent snapshot, observabilidad, operabilidad por Nexa/MCP). Cuando el `render_contract` (TASK-1229) y este renderer estén estables, TASK-1241 debería **re-renderizar vía este Web Component** en lugar de su form hand-built — un **upgrade** que lo vuelve robusto por construcción — y esa migración al motor sería el **first migration de TASK-1232**. Diseñar el `render_contract`/host surface contemplando ese caso (campos del intake del grader §9.2: marca, sitio, país, industria, descripción, work email, consent + **widget captcha embebible** Turnstile) para que la convergencia no exija rediseñar el contrato.
+
 ## Why This Task Exists
 
 El primer consumer real sera el sitio publico WordPress actual, pero Efeonce migrara progresivamente a Astro. Si se crea un renderer WordPress-native, el motor nace acoplado al runtime que queremos dejar atras. La arquitectura exige un core portable, host surface registry y wrappers que no cambien comportamiento ni mapping.
@@ -86,6 +90,7 @@ Reglas obligatorias:
 
 - `TASK-1232` Growth Forms admin cockpit + first migration.
 - Future migration from WordPress to Astro.
+- `TASK-1241` (lead magnet del grader) = primer consumer real candidato del renderer (hoy hand-built); ver Delta de convergencia 2026-06-25.
 
 ### Files owned
 
@@ -125,7 +130,7 @@ Reglas obligatorias:
 
 - Surface: Web Component/custom element in the host page DOM + Greenhouse Next.js preview + WordPress wrapper + Astro wrapper.
 - Composition Shell: `aplica` for Greenhouse preview page only; public wrappers embed into host layout.
-- Primitive decision: `new` — portable Growth Form renderer primitive/core, with wrappers as adapters.
+- Primitive decision: `new` — portable Growth Form renderer primitive/core, with wrappers as adapters. **Gobernanza:** el core es un Web Component framework-light, NO un primitive MUI/Vuexy `Custom*` — el protocolo Primitive+Variants+Kinds aplica al **wrapper de preview de Greenhouse** (registrar en `/admin/design-system` catalog + child route en `route-reachability-manifest.ts` + scenario GVC), NO al core portable (que se rige por su propio versionado `preview|beta|stable`).
 - Adaptive density / The Seam: `aplica` for form containers inside variable-width public layouts.
 - Floating/Sidecar/Dialog decision: no modal default; host page decides placement, renderer handles form states.
 - Copy source: render contract/copy refs; reusable UI copy should live in `src/lib/copy/*` if added to Greenhouse.
@@ -177,6 +182,41 @@ Reglas obligatorias:
 - Measurement checks: parent page receives expected `gh_form_*` events through DOM listener and GTM/dataLayer-compatible payload.
 - Before/after evidence: N/A first implementation; capture against render contract fixtures.
 - Known visual debt: public-site WordPress host CSS may impose constraints; wrapper must document overrides.
+
+### Forms-UX floor (no negociable — skill `forms-ux`)
+
+El renderer ES un formulario; debe pasar el piso de 17 puntos antes de cerrar. Mínimos duros:
+
+- **Single column** (solo paired fields comparten fila: ciudad/región, mes/año); **label SIEMPRE arriba del input**, nunca placeholder-as-label (falla WCAG 3.3.2). Placeholder = ejemplo, no label.
+- **`autocomplete` (token WHATWG) + `inputmode` por campo** aplicados desde el `render_contract` — email→`email`, name→`name`, tel→`tel inputmode=tel`, company→`organization`, etc. Sin esto los password managers/autofill se rompen y la abandon rate sube. **Dependencia upstream (ver Open Questions):** el `render_contract.fields` (TASK-1229 §19.3) NO declara hoy `autocomplete`/`inputmode`; o lo agrega 1229, o el renderer mapea categoría→token con tabla determinista documentada.
+- **Validation timing 3-stage:** silent mientras tipea (untouched) → validar `onBlur` la primera vez → `onChange` una vez que el campo erró → server-confirm en submit. NUNCA validar un campo intacto ni desde el primer keystroke.
+- **Error inline (4 elementos):** borde/ícono/texto + `aria-invalid="true"` + `aria-describedby`→id del error + `role="alert"`. Texto = "qué pasó + cómo se arregla", es-CL.
+- **Submit = verbo de acción** (no "Enviar" genérico cuando el contract define algo mejor), **enabled** (no disabled-until-valid: validar al click + focus al primer inválido). Estado pending ("Enviando…") + prevención de doble submit.
+- **Forgiving paste / máscara CL:** aceptar RUT/teléfono en cualquier formato, mostrar enmascarado, **validar/enviar el valor sin máscara**. Hint de máscara debería venir del contract (hoy `normalizeWith` es server-only — ver Open Questions).
+- **Preservar datos en error de server** (NUNCA limpiar el form). Multi-step (`multi_step_light`): validación por paso en "Siguiente", "Atrás" preserva datos, indicador de progreso; sin autosave en V1 light.
+
+### A11y floor del Web Component (skill `a11y-architect`, WCAG 2.2 AA)
+
+- **Shadow DOM caveat (load-bearing):** las asociaciones IDREF (`aria-describedby`/`aria-labelledby`) y los live regions `role="alert"` **no cruzan límites de shadow root**. Si el core usa Shadow DOM, label+input+error deben vivir en el MISMO shadow root, o usar light DOM / `ElementInternals`. Decidir y documentar en discovery — es la causa #1 de a11y rota en form Web Components.
+- **Form-associated custom element:** usar `attachInternals()` (ElementInternals API) para que el campo participe en submit nativo, validación y autofill del navegador. Sin esto, autofill y password managers fallan (liga con el punto de `autocomplete` arriba).
+- **13-row floor + SC de alto riesgo:** target size ≥24×24 (checkboxes/radios/consent), focus visible `:focus-visible` ≥3:1 que sobrevive `forced-colors` (usar `outline`, no `box-shadow`), **reflow a 320px + zoom 200%** (no solo 390px sin scroll), reduced-motion.
+- **Gate automatizado axe** (`@axe-core/playwright` / jest-axe) sobre el preview de Greenhouse + fixtures, además de GVC visual.
+
+### Degradación honesta + progressive enhancement (skill `state-design`)
+
+- **Fallback no-JS / CSP-bloqueado obligatorio:** si JS no carga o el host bloquea el script, mostrar un path accesible (link/contact estático o `<noscript>`), NUNCA un contenedor vacío. Un form público que requiere JS para siquiera renderizar es frágil en hosts hostiles.
+- **Loading = skeleton dimensionado** a la forma final del form (anti-CLS), no spinner de página.
+- **Contract-fetch parcial:** si falta el contract o no está `published`, fallback seguro con copy honesto ("Formulario no disponible"), nunca blank. Submit NO usa optimistic UI (tiene validación de server) — correcto omitirlo.
+
+### Token + CSS portable (skill `modern-ui`)
+
+- **Tokens = CSS custom properties** mapeadas a la marca Efeonce/AXIS (NUNCA hex hardcodeado), con override por host vía variables; dentro de Greenhouse el preview usa `theme`/motion tokens, fuera usa las CSS vars públicas. Un type family + un accent (restraint).
+- **Container queries (`@container`), no `@media`,** para los internos del form (se adapta a su slot: sidebar / full-width / modal) — alinea con "Adaptive density / The Seam".
+- **Dark mode:** declarar par de tokens dark o heredar el theme del host (los hosts WordPress/Astro pueden tener secciones oscuras); no asumir light-only.
+
+### Copy del renderer (skill `greenhouse-ux-writing`)
+
+- Distinguir **copy del form** (labels/consent/success/error de campo → vienen del `render_contract`, autorados en 1229/1232) del **copy de sistema del renderer** (loading/error de carga/reintentar/fallback). El copy de sistema necesita tabla i18n propia (default es-CL, driven por `locale=` del embed) porque el core portable NO puede importar `src/lib/copy/*`; el preview de Greenhouse sí usa el copy canónico.
 
 ## Hybrid Execution Justification
 
@@ -294,6 +334,10 @@ Renderer receives `render_contract` only. It never receives destination mapping,
 - [ ] Astro parity smoke proves future host surface can reuse same form/version.
 - [ ] GVC/visual evidence covers desktop/mobile and key states.
 - [ ] No horizontal page scroll is introduced in preview/public smoke surfaces.
+- [ ] El renderer pasa el piso de 17 puntos de `forms-ux`: single column, label-above, `autocomplete`+`inputmode` por campo, validation timing 3-stage, error inline 4-elementos, submit enabled + pending, forgiving paste/máscara CL, preserva datos en error.
+- [ ] A11y WCAG 2.2 AA: resuelto el caveat de Shadow DOM (IDREF/`role=alert` en el mismo root o ElementInternals), form-associated custom element, target ≥24×24, reflow 320px/zoom 200%, focus `:focus-visible` en `forced-colors`. Gate axe verde sobre el preview.
+- [ ] Fallback no-JS / CSP-bloqueado accesible (nunca contenedor vacío); loading = skeleton anti-CLS.
+- [ ] Tokens vía CSS custom properties mapeadas a marca Efeonce/AXIS (sin hex hardcodeado); container queries para los internos; dark mode declarado o heredado del host.
 
 ## Verification
 
@@ -323,3 +367,6 @@ Renderer receives `render_contract` only. It never receives destination mapping,
 
 - Final package/distribution path for renderer bundle.
 - Whether WordPress wrapper lives in greenhouse-eo bridge tooling or public-site runtime repo.
+- **Dependencia upstream a TASK-1229 `render_contract` (§19.3):** ¿el contract agrega `autocomplete` (token WHATWG) + `inputmode` por campo, o el renderer los deriva por categoría con tabla determinista? Sin uno de los dos no se cumple el piso de autofill de `forms-ux`. Si es lo primero, abrir delta/follow-up en TASK-1229.
+- **Máscara display-vs-stored:** ¿el contract declara un hint de máscara/formato por campo (RUT/teléfono CL) para que el renderer formatee mientras el server valida el valor crudo? Hoy `normalizeWith` es server-only.
+- **Shadow DOM sí/no:** decisión de discovery — impacta directamente cómo se asocian errores y live regions (a11y). Documentar la decisión y su mitigación.

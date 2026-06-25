@@ -105,6 +105,7 @@ Reglas obligatorias:
 - `TASK-1231` Portable renderer + host surfaces.
 - `TASK-1232` Growth Forms admin cockpit + first migration.
 - Futuras capacidades `growth.forms.*` para Nexa/MCP/CLI.
+- **Convergencia EPIC-020 (grader):** el lead magnet (`TASK-1241`) es consumer candidato del renderer/`render_contract` (`TASK-1231`) y first-migration de `TASK-1232`; el handoff HubSpot del grader (`TASK-1242`) coexiste con el destination adapter (`TASK-1230`). El intake a-medida (`TASK-1240`) es la versión artesanal que **este motor gobernado vuelve robusta** (contratos, consent, reintentos/dead-letter, abuse-guard, observabilidad, operabilidad Nexa/MCP) — la convergencia es un **upgrade**, no una deduplicación. Ver Delta 2026-06-25 + Open Questions.
 
 ### Files owned
 

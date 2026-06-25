@@ -43,6 +43,12 @@ El motor del grader está completo y verificado (TASK-1226/1227/1234/1235/1236/1
 - `TASK-1242` — **(D) HubSpot Lead Handoff** (backend, integration): `syncAiVisibilityRunToHubSpot` upserta contact/company + props `ai_visibility_*` + lifecycle desde `primary_gap`/`recommended_motion`, vía outbox + reactive. **P2.**
 - `TASK-1243` — **(E) Client-Scoped Report Access** (backend, reader): reader client-scoped (binding run↔org) gateado por capability `client_*`, mismo `buildGraderReport`. Tercer consumer de la parity; UI portal = follow-up. **P2.**
 - `TASK-1244` — **(F) Admin Evidence Review** (backend, command): cola + `approve`/`reject` (state machine + audit) de `review_required` antes del release público; el publish honra la aprobación. Gate humano YMYL. **P2.**
+- `TASK-1245` — **(G) Public Run Status + Delivery Orchestrator** (backend, api): endpoint público de poll por `runPublicId`, estados public-safe y delivery idempotente de `reportToken` cuando existe snapshot publicable. **P1.**
+- `TASK-1246` — **(H) Public Launch Readiness + Rollout** (ops/backend): legal consent + Turnstile + flags/envs + staging smoke end-to-end + release control plane + rollback. **P1.**
+- `TASK-1247` — **(I) Admin Review UI** (ui-ux): cola y detalle interno para operar approve/reject de `review_required` usando `TASK-1244`. **P2.**
+- `TASK-1248` — **(J) Client Report UI** (ui-ux): superficie del portal cliente sobre el reader client-scoped de `TASK-1243`. **P2.**
+- `TASK-1249` — **(K) Calibration + Provider Completion** (backend, data-quality): Perplexity, prompt pack v2 y recalibración/golden eval; calidad del motor no bloqueante del MVP. **P2.**
+- `TASK-1250` — **(L) Email Report Delivery** (backend, communications): email transaccional al lead con resumen breve, link tokenizado e informe completo adjunto generado desde el snapshot público. **P1.**
 
 ## Existing Related Work
 
@@ -57,8 +63,11 @@ El motor del grader está completo y verificado (TASK-1226/1227/1234/1235/1236/1
 - [ ] Los 3 consumers (público/admin/cliente) consumen `buildGraderReport` vía contrato gobernado; cero lógica de reporte duplicada por superficie (parity verificada).
 - [ ] Snapshot inmutable tokenizado: un link público no cambia si el score recomputa; `expires_at` respetado.
 - [ ] Flujo público end-to-end live en staging: input + consent → run async → reporte → lead en HubSpot con `primary_gap`/`recommended_motion`.
+- [ ] El prospecto recibe email transaccional con resumen breve, link tokenizado e informe completo adjunto.
+- [ ] Poll público `runPublicId → status → reportToken` existe como contrato backend gobernado, sin lógica de status dentro de la UI.
 - [ ] Control de abuso/costo activo (rate-limit + cost ceiling + modo `light`); sin gasto LLM no acotado.
 - [ ] `review_required` no se auto-publica: gate humano (F) antes de exponer al público (seguridad YMYL).
+- [ ] Launch readiness con consent legal, captcha, flags, smoke staging y rollback documentado.
 - [ ] Triple documentación + reliability signals por capa; rollout proporcional (prod via release control plane).
 
 ## Non-goals

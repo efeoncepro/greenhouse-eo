@@ -25,7 +25,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `growth|ui`
-- Blocked by: `TASK-1239`
+- Blocked by: `TASK-1239, TASK-1240, TASK-1245`
 - Branch: `task/TASK-1241-growth-ai-visibility-public-lead-magnet-page`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -33,6 +33,15 @@
 ## Summary
 
 La **cara pública del lead magnet** (EPIC-020 C): landing + formulario de captura (§9.2 + consent + widget Turnstile) que postea a `POST /api/public/.../run` (TASK-1240), muestra los estados async honestos (§9.3) por poll, y **renderiza el `PublicGraderReport`** (snapshot por token, TASK-1239) — radar/bar viz-ready + table-fallback. Consume los endpoints públicos ya construidos; NO crea lógica de negocio (Full API parity: la UI es cliente del primitive).
+
+## Delta 2026-06-25 — convergencia con el Growth Forms engine (TASK-1229/1231/1232)
+
+Esta página construye su formulario de captura **a mano** (§9.2) y postea al intake a-medida del grader (`POST /run`, TASK-1240). El **Growth Forms engine** (TASK-1229) es el **motor gobernado** que da robustez y riqueza a *cualquier* formulario: contratos versionados, validación/policy compiler, consent snapshot, entrega con reintentos + dead-letter, abuse-guard/captcha, observabilidad y operabilidad por Nexa/MCP/CLI (Full API Parity). El form hand-built de esta página **no hereda nada de eso** — es la versión artesanal del mismo problema.
+
+Decisión (no bloquear el lanzamiento de EPIC-020): **esta task ships con el form hand-built** — el motor aún es `to-do` y bloquearía el lanzamiento. Pero se **registra la convergencia** como un **upgrade** (no una deduplicación): llevar este form al motor lo vuelve robusto por construcción.
+
+- El lead magnet de esta task es el **candidato natural a "primer form real"** que **TASK-1232** migra al motor (TASK-1232 ya recomienda "un lead magnet nuevo" como first migration, justamente para no chocar con el intake a-medida de TASK-1240).
+- Cuando el motor esté estable, esta página debería **re-renderizar vía el renderer portable de TASK-1231** consumiendo el mismo `render_contract`, y su submit pasar al path gobernado del motor — heredando reintentos/consent/observabilidad/operabilidad que hoy no tiene. Hasta entonces, mantener el form hand-built **sin duplicar lógica de negocio** (Full API parity: sigue siendo cliente de los endpoints públicos).
 
 ## Why This Task Exists
 
@@ -77,6 +86,7 @@ Reglas obligatorias:
 ### Depends on
 
 - `TASK-1240` (complete dev) — `POST /api/public/growth/ai-visibility/run` (flag `GROWTH_AI_VISIBILITY_PUBLIC_INTAKE_ENABLED`).
+- `TASK-1245` — `GET /api/public/growth/ai-visibility/run/[publicId]` + delivery de `reportToken` para poll.
 - `TASK-1239` (complete dev) — `GET /api/public/growth/ai-visibility/report/[token]`.
 - `TASK-1234` (complete) — el worker async ejecuta el run encolado.
 - Turnstile **site key** (out-of-band) + el secret server-side (TASK-1240).
@@ -85,6 +95,8 @@ Reglas obligatorias:
 
 - Cierra el flujo end-to-end del lead magnet (input → reporte) visible al prospecto.
 - Coordina con EPIC-019 (hosting de landing) y EPIC-020 D (HubSpot recibe el lead).
+- Candidato a **primer form real gobernado por el motor** (`TASK-1232` first migration) y primer consumer del **renderer portable** (`TASK-1231`) — migrarlo lo vuelve robusto por construcción; ver Delta de convergencia 2026-06-25.
+- Comparte el `reportToken` con la **entrega por email** (`TASK-1250`): pantalla y email son dos consumers del mismo delivery state (`TASK-1245`).
 
 ### Files owned
 
@@ -285,4 +297,4 @@ La página es **cliente puro** de los endpoints públicos: form → `POST /run` 
 ## Open Questions
 
 1. **¿Dónde se hospeda la página?** Next.js public route en greenhouse-eo (más simple, reusa primitives + endpoints) vs WordPress/Kinsta (sitio marketing, EPIC-019). Decidir en Discovery con EPIC-019 (la decisión Astro/Next/WordPress del arch sigue abierta).
-2. ¿El flujo muestra el reporte inline tras el poll, o envía el link del snapshot por email (o ambos)? V1 sugerido: inline + opción de link.
+2. ¿El flujo muestra el reporte inline tras el poll, o envía el link del snapshot por email (o ambos)? V1 sugerido: inline + email. **La entrega por email (cuerpo breve + link tokenizado + adjunto public-safe) la implementa `TASK-1250`** (consumer del mismo delivery state de `TASK-1245`); esta página es el consumer en pantalla. Ambos comparten el `reportToken`.

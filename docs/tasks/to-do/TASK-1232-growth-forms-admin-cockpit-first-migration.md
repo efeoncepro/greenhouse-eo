@@ -84,6 +84,7 @@ Reglas obligatorias:
 - `TASK-1230` HubSpot secure-submit adapter.
 - `TASK-1231` portable renderer + WordPress host surface.
 - Selection of first real form: AI Visibility intake or one lead magnet.
+- `TASK-1241` (lead magnet del grader) = candidato concreto a **primer form real**: migrar su form hand-built al motor (evita el choque con el intake a-medida de TASK-1240). Ver Delta de TASK-1241 2026-06-25.
 
 ### Blocks / Impacts
 
@@ -127,13 +128,13 @@ Reglas obligatorias:
 
 ### Surface & system decision
 
-- Surface: `/admin/growth/forms` or route selected during discovery.
-- Composition Shell: `aplica` — cockpit with primary list/detail and contextual inspector.
-- Primitive decision: `reuse` — CompositionShell, GreenhouseBreadcrumbs, tables/cards/chips/buttons/sidecar as existing primitives; new primitive only if repeated platform need emerges.
-- Adaptive density / The Seam: `aplica` for form cards/rows and submission/destination summaries.
-- Floating/Sidecar/Dialog decision: sidecar for form/submission/destination detail; dialog only for destructive/deprecate confirmation.
-- Copy source: `src/lib/copy/*` for reusable labels/states; local one-off only for fixture form copy.
-- Access impact: `entitlements`/capabilities `growth.forms.*`.
+- Surface: `/admin/growth/forms` or route selected during discovery. **Ruta interna** → viewCode en routeGroup `internal`, **NUNCA sembrado a `client_*`**.
+- Composition Shell: `aplica` — declarar composición explícita `leadPlusContext` (lista primary + inspector aside) o `split`; regiones singleton (`primary`/`aside`), `fluidity='rich'`. NO inventar grid/morph ad-hoc (lint `greenhouse/no-ad-hoc-layout-morph`).
+- Primitive decision: `reuse` — `CompositionShell`, `GreenhouseBreadcrumbs`, tablas/cards/chips/buttons como primitives existentes; new primitive solo si emerge necesidad de plataforma repetida.
+- Adaptive density / The Seam: `aplica` — usar el contrato `card-density` (`useContainerDensity` + `resolveCardDensity` → `full`/`condensed`/`peek`) en form cards/rows y summaries; **condensación honesta, NUNCA clip/overflow/`—`** (el valor clave nunca desaparece).
+- Floating/Sidecar/Dialog decision: usar `AdaptiveSidecarLayout`/`adaptive-sidecar-controller` (NO drawer/modal custom; desktop = lane in-flow full-height, no boxed overlay), mapeando a variantes oficiales: **detalle de form/submission/destination → `inspector`**, **authoring de form/version → `composer`**, **evidencia de destination attempt → `evidence`**. Dialog solo para confirmación destructiva (deprecate/archive).
+- Copy source: `src/lib/copy/growth-forms.ts` para labels/states reusables (invocar `greenhouse-ux-writing`, es-CL tuteo, lint `greenhouse/no-untokenized-copy`); one-off local solo para copy de fixture.
+- Access impact: `entitlements`/capabilities `growth.forms.*` — **granteadas a ≥1 ROLE_CODE real (interno) + coverage test el mismo PR** (no existe rol `growth_*`; candidatos `efeonce_admin`/`efeonce_account`/`efeonce_operations`). Nuevo viewCode → seed migration en `VIEW_REGISTRY` el mismo PR (TASK-827) + ruta alcanzable por nav + `route-reachability-manifest.ts` (TASK-982).
 
 ### State inventory
 
@@ -301,7 +302,13 @@ Reglas obligatorias:
 
 ## Detailed Spec
 
-The cockpit should be operational and dense, not marketing-like: list/detail/sidecar, lifecycle states, destination health and submission evidence. For first migration, prefer a low-risk lead magnet unless AI Visibility intake dependencies are ready.
+The cockpit should be operational and dense, not marketing-like: list/detail/sidecar, lifecycle states, destination health and submission evidence.
+
+**UI de authoring = disciplina `forms-ux` (no es un visual builder).** El authoring de definition/version es en sí un formulario complejo: usar un stepper/`composer` (author → review → publish) con validación por paso, label-above, `CustomAutocomplete` (NUNCA `Popover > Select`; ≤2 clicks), preservar datos en error, y el piso de 17 puntos para los inputs del cockpit. NO drag-and-drop builder en V1.
+
+**Honest degradation del delivery health (skill `state-design`):** la salud de entrega (HubSpot/destination) NUNCA pinta verde ni blank cuando la señal es desconocida — `SourceResult<T>`: `ok` muestra el valor, `empty` muestra "Sin intentos", `degraded` muestra "Pendiente" + razón. El cockpit no puede mentir salud cuando el signal no resolvió.
+
+**Primer form — de-risk + colisión con TASK-1240:** preferir un lead magnet de bajo riesgo para la PRIMERA migración. Si se elige el **AI Visibility intake**, NO doble-construir: ese intake ya existe a-medida (`grader_leads`/`grader_intake_events`, TASK-1240) — migrarlo al motor ES la convergencia grader↔forms (ver Open Question de TASK-1229), requiere coordinar con el dueño de TASK-1240 y NO es trivial. Por eso el primer form debería ser un lead magnet nuevo, dejando la convergencia del grader como migración posterior dedicada.
 
 ## Rollout Plan & Risk Matrix
 
@@ -364,8 +371,12 @@ The cockpit should be operational and dense, not marketing-like: list/detail/sid
 - [ ] First form is configured through the engine with host surface, consent, destination and success behavior.
 - [ ] WordPress smoke proves public host -> Greenhouse -> destination path works.
 - [ ] WordPress smoke proves parent-page GTM/dataLayer-compatible `gh_form_*` events fire for view/start/submit/accepted or rejected without raw field values.
-- [ ] GVC desktop/mobile evidence exists for cockpit and public form states.
+- [ ] GVC desktop/mobile evidence exists for cockpit and public form states, verificada **en loop** (capturar → mirar frame → ajustar → recapturar) con gates GVC V1.5 (`quality.layout`/`runtime`/`keyboard`/`enterpriseRubric`), no one-shot.
 - [ ] Rollback path for first form is documented and tested/staged.
+- [ ] Sidecar usa `AdaptiveSidecarLayout` con variantes oficiales (inspector/composer/evidence), NO drawer/modal custom; Composition Shell con composición declarada.
+- [ ] Ruta `(dashboard)` alcanzable por nav + entrada en `route-reachability-manifest.ts`; viewCode nuevo con seed migration en `VIEW_REGISTRY` (mismo PR); capabilities `growth.forms.*` con grant a ROLE_CODE real interno + coverage test verde.
+- [ ] Authoring UI pasa el piso `forms-ux` (Autocomplete no Popover>Select, validación por paso, preserva datos); gate axe verde sobre el cockpit.
+- [ ] Delivery health usa degradación honesta (nunca verde/blank cuando el signal es desconocido).
 
 ## Verification
 
@@ -397,5 +408,5 @@ The cockpit should be operational and dense, not marketing-like: list/detail/sid
 
 ## Open Questions
 
-- First real form choice: AI Visibility intake vs lead magnet.
-- Whether production cutover belongs in this task or a tiny release follow-up after staging smoke.
+- First real form choice: AI Visibility intake vs lead magnet. **Recomendación:** lead magnet de bajo riesgo (el AI Visibility intake colisiona con TASK-1240 y arrastra la convergencia grader↔forms — migración dedicada posterior, no esta task).
+- Whether production cutover belongs in this task or a tiny release follow-up after staging smoke. **Recomendación:** cerrar 1232 en cockpit + first-form publish + WordPress **staging** smoke; mover el **production cutover** (Slice 4) a un follow-up gateado por release/operator sign-off — reduce blast radius y alinea con el release control plane.

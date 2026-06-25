@@ -27,6 +27,18 @@
 
 Convertir el lead capturado en el intake público (`grader_leads`, TASK-1240) en un **lead de ventas en HubSpot** (EPIC-020 D): `syncAiVisibilityRunToHubSpot` crea/actualiza el contact/company + props `ai_visibility_*` (score, `primary_gap`, `recommended_motion`) + lifecycle stage, vía el patrón **outbox + reactive consumer** (no POST inline en la route). Cierra el bow-tie: el grader (acquisition) entrega el lead a ventas (SQL).
 
+## Delta 2026-06-25 — frontera con el HubSpot destination adapter del Forms engine (TASK-1230)
+
+Hay **dos caminos de escritura a HubSpot en el dominio `growth`** que NO deben confundirse ni colapsar en un tercer cliente:
+
+| Esta task (1242) — lead/CRM handoff | TASK-1230 — form submission delivery |
+|---|---|
+| `grader_leads` → upsert contact/company + back-fill props `ai_visibility_*` + lifecycle | una *submission* de cualquier form del motor → HubSpot **Forms** API (`/submissions/v3/.../secure/submit`) |
+| Vía el **Cloud Run hubspot bridge** (patrón integraciones) | Vía el **destination adapter** del forms engine (TASK-1229 path) |
+| Dispara al **completar el run** del grader | Dispara al **aceptar un submit** |
+
+Son **complementarios, no redundantes** (uno es backfill CRM orientado a ventas; el otro es la entrega gobernada de submissions de cualquier form del motor). Frontera dura compartida: ambos **reusan el resolver de token canónico** + `captureWithDomain(err,'integrations.hubspot',…)`; **NUNCA** un cliente HubSpot paralelo. Si el grader migra su intake al forms engine (convergencia TASK-1229/1232), evaluar si este handoff sigue siendo un paso aparte (probable) o se modela como `destination` adicional del submission — decisión diferida, fuera de esta task.
+
 ## Why This Task Exists
 
 El intake público (TASK-1240) captura el lead (email + consent + marca) pero **no lo sincroniza a HubSpot** — el lead muere en `grader_leads` sin llegar a ventas. El valor comercial del lead magnet es justamente el handoff: el reporte ya produce `primary_gap` + `recommended_motion` (TASK-1235) que orientan el siguiente movimiento comercial. Sin esto, el grader genera leads que nadie trabaja.
@@ -76,6 +88,7 @@ Reglas obligatorias:
 
 - Cierra el bow-tie del lead magnet (acquisition → ventas).
 - Alimenta el "AI Visibility Snapshot" (artefacto de ventas en HubSpot/Account 360).
+- Coexiste con el HubSpot **destination adapter** del Forms engine (`TASK-1230`) — integraciones HubSpot distintas, mismo token + discipline; ver Delta de frontera 2026-06-25.
 
 ### Files owned
 
