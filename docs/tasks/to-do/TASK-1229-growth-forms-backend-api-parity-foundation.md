@@ -41,6 +41,23 @@ El motor de formularios debe nacer bajo Full API Parity. Si primero nace como wr
 - Exponer public GET/POST y Product APIs gobernadas para operar el motor sin UI-only paths.
 - Dejar fake/no-op destination adapter y fixtures suficientes para tests deterministas.
 
+## Delta 2026-06-25 — reconciliar con el intake a-medida del grader (TASK-1240)
+
+Esta task se diseñó el 2026-06-24. Al día siguiente, **TASK-1240 (EPIC-020 B) shippeó un intake público a-medida para el AI Visibility Grader** que es un precursor del primitive genérico que esta task crea, viviendo en el mismo schema `greenhouse_growth`:
+
+| TASK-1229 planea (genérico) | TASK-1240 ya existe (a-medida, grader) |
+|---|---|
+| abuse/rate-limit per-IP/form/surface + budget | `src/lib/growth/ai-visibility/public-intake/abuse-guard.ts` (per-IP/per-email + budget diario) |
+| honeypot / captcha port | `src/lib/growth/ai-visibility/public-intake/captcha.ts` |
+| `form_submission_consent_snapshot` | `greenhouse_growth.grader_leads` + `CHECK(consent = TRUE)` + `consent_at` |
+| submissions/attempts append-only con hashing | `greenhouse_growth.grader_intake_events` (append-only, IDs hasheados) |
+| public submit endpoint | `POST /api/public/growth/ai-visibility/run` |
+
+**Implicación para esta task (no romper SSOT — overlay arch #8):**
+
+- El forms engine **reusa/generaliza** esos primitives (extraer el captcha port y el abuse-guard a una capa compartida de `growth`), **no los reinventa** dentro de `src/lib/growth/forms/**`.
+- El intake del grader queda declarado como **candidato a primera migración** sobre el forms engine (el domain arch §6.1 ya dice "forms can feed AI diagnostics such as AI Visibility Grader"). NO se migra en esta task, pero se nombra la convergencia para no canonizar dos stacks paralelos de public-submission en `greenhouse_growth`. Ver Open Questions.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 1 — CONTEXT & CONSTRAINTS
      "Que necesito entender antes de planificar?"
@@ -94,10 +111,11 @@ Reglas obligatorias:
 - `src/lib/growth/forms/**`
 - `src/app/api/public/growth/forms/**`
 - `src/app/api/admin/growth/forms/**`
-- `src/config/entitlements-catalog.ts`
-- `src/lib/reliability/**`
+- `src/lib/reliability/queries/growth-forms-*.ts` (señales `growth.forms.*` específicas — NO owned `src/lib/reliability/**` completo, que es shared/hot)
 - `docs/architecture/GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md`
 - `docs/tasks/to-do/TASK-1229-growth-forms-backend-api-parity-foundation.md`
+
+Append-to (extender, no owned): `src/config/entitlements-catalog.ts` (+ capabilities registry + runtime grants) — agregar las `growth.forms.*`, no apropiarse del archivo.
 
 ## Current Repo State
 
@@ -105,13 +123,16 @@ Reglas obligatorias:
 
 - Arquitectura/ADR docs-only del motor.
 - Full API Parity ADR y proceso backend-data.
-- Dominio `growth` documentado, pero sin runtime `src/lib/growth/forms/**` aun.
+- Dominio `growth` documentado; schema `greenhouse_growth` ya existe (TASK-1226) con el ledger del grader.
+- Sin runtime `src/lib/growth/forms/**` aun.
+- **Prior art reusable (TASK-1240, ver Delta 2026-06-25):** abuse-guard (rate-limit per-IP/email + budget diario), captcha port, consent CHECK append-only y un intake público funcionando para el grader. Esta task generaliza esos patrones, no los duplica.
 
 ### Gap
 
-- No existen aggregates, commands/readers, APIs, capabilities ni host surface registry para formularios.
+- No existen aggregates, commands/readers, APIs, capabilities ni host surface registry **genéricos** para formularios (el intake del grader es a-medida, no portable a WordPress/Astro/otros host surfaces).
 - No existe render contract consumible por WordPress/Astro/Greenhouse Next.js.
-- No existe submissions ledger ni destination attempt model para HubSpot/futuros destinos.
+- No existe submissions ledger **genérico** ni destination attempt model para HubSpot/futuros destinos (el `grader_leads`/`grader_intake_events` es específico del grader y no modela destinations/attempts/retry/dead-letter).
+- No existe capa compartida de abuse-guard/captcha extraída del grader hacia `growth`.
 
 ## Backend/Data Contract
 
@@ -139,6 +160,7 @@ Reglas obligatorias:
   - Consent snapshot se conserva aunque falle delivery.
   - Surface authorization se valida antes de entregar render contract o aceptar submit.
   - Attempts son append-only o event-sourced con historia completa.
+  - **Delivery dispatch es async vía outbox + reactive consumer + dead_letter, NUNCA inline en el route handler de submit** (overlay arch #3 + trío state-machine #6). El submit acepta + persiste submission/consent + emite outbox event en la misma tx; un reactive consumer (Cloud Scheduler/ops-worker) drena y entrega al destino. El fake adapter de esta task se wirea por ese mismo path para que TASK-1230 (HubSpot real) NO herede un acoplamiento inline. Submission lifecycle `accepted -> routed -> destination_failed -> retrying -> delivered | dead_letter` se enforced con CHECK + audit.
   - Analytics/telemetry policy no puede emitir raw field values, PII, HubSpot property names, form GUIDs or destination internals.
 - Tenant/space boundary: public anonymous submit con `surface_id`/origin/embed key; admin APIs con tenant interno + capabilities `growth.forms.*`.
 - Idempotency/concurrency: `dedupe_fingerprint` + optional idempotency token; commands transaccionales; retries safe.
@@ -180,7 +202,7 @@ Reglas obligatorias:
 - [ ] Lógica en primitives `src/lib/growth/forms/**`, no en UI/wrappers/routes ad hoc.
 - [ ] Capabilities modeladas como aggregate/resource/command, no como botones.
 - [ ] Reads via readers; writes via commands con authorization, idempotencia, audit/outbox y errores sanitizados.
-- [ ] Capabilities `growth.forms.*` + grants iniciales + coverage test si se gatean.
+- [ ] Capabilities `growth.forms.*` seedeadas en `capabilities_registry` + catalog TS, **granteadas a ≥1 ROLE_CODE real en el mismo PR** + coverage test verde (`capability-grant-coverage.test.ts` rompe el build si una capability `can()`-checked no tiene grant). NO existe un rol `growth_*` en los 14 ROLE_CODES; nombrar explícitamente los grantees reales (candidatos: `efeonce_admin` + `efeonce_account` / `efeonce_operations` para author/review/publish/destinations; `growth.forms.read`/`submissions.read` más amplio según necesidad). El "si se gatean" no es escape: si la capability se `can()`-checkea, requiere grant.
 - [ ] Camino programático declarado para Product API, Nexa/MCP planned path, CLI/runbook y verification harness.
 - [ ] Writes aptos para `propose -> confirm -> execute` cuando sean consumidos por Nexa.
 - [ ] Un primitive, muchos consumers; cero lógica duplicada por surface.
@@ -216,8 +238,10 @@ Reglas obligatorias:
 ### Slice 3 — Public/admin APIs and fake adapter
 
 - Crear `GET /api/public/growth/forms/{formSlug}` y `POST /api/public/growth/forms/{formSlug}/submit`.
-- Crear Product APIs admin bajo `/api/admin/growth/forms/**` para las capabilities iniciales.
-- Implementar fake/no-op destination adapter y smoke fixtures.
+- Crear Product APIs admin bajo `/api/admin/growth/forms/**` para las capabilities iniciales (precedente del grader; ver nota de path abajo).
+- Implementar fake/no-op destination adapter **wireado por outbox event + reactive consumer** (NO llamado inline en el submit handler), con `form_destination_attempt` append-only + retry/dead-letter.
+
+> Nota de path: el domain arch §4 menciona `/api/growth/**` para Product APIs autenticadas, pero el runtime ya establecido del grader usa `/api/admin/growth/ai-visibility/**`. Esta task sigue ese precedente (`/api/admin/growth/forms/**`, boring/precedente gana) y agrega un delta corto al domain arch §4 reflejando la convención real, en vez de arrastrar la divergencia.
 
 ### Slice 4 — Observability and verification
 
@@ -260,6 +284,7 @@ Seguir `GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md` §§7-21. La i
 
 - Considerar `GROWTH_FORMS_PUBLIC_API_ENABLED=false` y/o published form status como gate.
 - Sin formularios reales publicados en esta task; cutover operativo = disabled/test-only.
+- **Si se introduce el flag `GROWTH_FORMS_PUBLIC_API_ENABLED`, registrar su fila en `docs/operations/FEATURE_FLAG_STATE_LEDGER.md` el mismo PR** (y en §Pendientes de acción si queda code-complete sin prender). `pnpm docs:closure-check` (feature-flags-audit --strict) bloquea el cierre si un `*_ENABLED` en código no tiene fila en el ledger.
 
 ### Rollback plan per slice
 
@@ -318,6 +343,8 @@ N/A — no provider writes or public form rollout in this task.
 - [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
 - [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
 - [ ] Arquitectura forms actualizada si el runtime decide nombres/contratos distintos a los planeados.
+- [ ] Domain arch §4 actualizado con delta de path real (`/api/admin/growth/**`) si se confirma el precedente.
+- [ ] Si se introdujo `GROWTH_FORMS_PUBLIC_API_ENABLED`, fila agregada a `FEATURE_FLAG_STATE_LEDGER.md` y `pnpm docs:closure-check` verde.
 
 ## Follow-ups
 
@@ -329,3 +356,4 @@ N/A — no provider writes or public form rollout in this task.
 
 - Nombre fisico definitivo de tablas y flags durante discovery.
 - Si el public API nace disabled por env flag o solo por ausencia de forms `published`.
+- **Convergencia grader↔forms:** ¿el intake del grader (TASK-1240: `grader_leads`/`grader_intake_events`/abuse-guard/captcha) migra a consumir el forms engine, y en qué task? Esta task NO lo migra, pero define los contratos para que sea posible. Decidir si el abuse-guard + captcha port se extraen a una capa compartida `src/lib/growth/**` en esta task o en una follow-up.
