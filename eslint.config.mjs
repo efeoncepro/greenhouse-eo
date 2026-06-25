@@ -462,6 +462,32 @@ export default [
     }
   },
 
+  // TASK-1253 — Guard de pureza isomórfica. El core de validadores
+  // (`src/lib/growth/forms/validators/**`) y `src/lib/identity-documents/**` los
+  // importa el renderer portable (bundle esbuild WordPress/Astro) Y el servidor
+  // (`submitForm`). NUNCA deben importar `server-only`, `node:*`, Zod ni capas
+  // server-only (postgres/secrets/bigquery): romperían el bundle portable o
+  // filtrarían código server al browser. Paridad cliente↔servidor por construcción.
+  {
+    files: ['src/lib/identity-documents/**/*.ts', 'src/lib/growth/forms/validators/**/*.ts'],
+    ignores: ['**/__tests__/**'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          paths: [
+            { name: 'server-only', message: 'TASK-1253: el core isomórfico no puede importar server-only (lo bundlea el renderer portable).' },
+            { name: 'zod', message: 'TASK-1253: el core isomórfico es Zod-free (no inflar el bundle portable del renderer).' }
+          ],
+          patterns: [
+            { group: ['node:*'], message: 'TASK-1253: el core isomórfico no puede importar node builtins (corre en el browser).' },
+            { group: ['@/lib/postgres/*', '@/lib/db', '@/lib/secrets/*', '@/lib/bigquery'], message: 'TASK-1253: el core isomórfico no puede tocar capas server-only.' }
+          ]
+        }
+      ]
+    }
+  },
+
   // TASK-890 Slice 3 — la lint rule no-inline-payroll-scope-gate se desactiva
   // SOLO en los archivos donde el patrón aparece legítimamente:
   //  * src/lib/payroll/exit-eligibility/** — el resolver canónico (LATERAL JOIN

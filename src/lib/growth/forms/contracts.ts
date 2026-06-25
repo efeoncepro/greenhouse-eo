@@ -12,6 +12,8 @@
  */
 import { z } from 'zod'
 
+import { NAMED_VALIDATORS } from './validators/core'
+
 // ─── Enums de dominio (state machines vía CHECK en DB; espejo en TS) ───────────
 
 export const FORM_KINDS = [
@@ -100,6 +102,7 @@ export const FIELD_TYPES = [
   'email',
   'tel',
   'url',
+  'national_id',
   'textarea',
   'select',
   'multiselect',
@@ -211,6 +214,12 @@ export const fieldDefinitionSchema = z.object({
   maxLength: z.number().int().positive().max(10_000).optional(),
   autocomplete: z.string().max(40).optional(),
   inputMode: z.string().max(20).optional(),
+  // Validador declarativo (catálogo CURADO, anti-ReDoS): el admin elige de
+  // NAMED_VALIDATORS, NUNCA inyecta regex. Si se omite, el registry deriva el
+  // default por `type` (TASK-1253). `validatorParams.country` (ISO alpha-2)
+  // gobierna national_id / e164_phone.
+  validator: z.enum(NAMED_VALIDATORS).optional(),
+  validatorParams: z.object({ country: z.string().length(2).optional() }).optional(),
   // Reglas declarativas, NO JavaScript arbitrario (Arch §11.1).
   visibleWhen: z.array(fieldConditionSchema).optional(),
   requiredWhen: z.array(fieldConditionSchema).optional(),
