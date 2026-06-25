@@ -7,15 +7,22 @@
  */
 import 'server-only'
 
+import { z } from 'zod'
+
+import { captureWithDomain } from '@/lib/observability/capture'
+
 import {
+  type FieldDefinition,
   type FormKind,
   type PublicSubmitInput,
   type PublicSubmitResult,
   type RiskProfile,
+  fieldDefinitionSchema,
   publicSubmitInputSchema,
 } from './contracts'
 import { dedupeFingerprint } from './hash'
-import { resolveFormsAbuseLimits } from './flags'
+import { isFormsServerValidationEnabled, resolveFormsAbuseLimits } from './flags'
+import { validateFieldValue } from './validators/core'
 import { compileFormVersion } from './policy-compiler'
 import {
   type CaptchaVerifier,
@@ -198,6 +205,42 @@ export interface SubmitContext {
  * destino es async (dispatcher), NUNCA inline. Devuelve outcome (no throws para
  * bloqueos esperados; espeja `createPublicGraderRun`).
  */
+export type RevalidateOutcome =
+  | { ok: true; normalizedFields: Record<string, unknown> }
+  | { ok: false; fieldKey: string; reasonCode: string }
+
+/**
+ * TASK-1253 — Re-validación + normalización server-side (autoridad). Valida los campos
+ * PRESENTES no-vacíos con el registry canónico (MISMO core que el renderer → paridad),
+ * normaliza, y rechaza al primer campo con formato inválido. El required condicional y
+ * el consent se resuelven en sus propios gates; este paso cierra el "POST directo mete
+ * basura". NUNCA incluir el valor crudo en logs/errores.
+ */
+export const revalidateAndNormalizeFields = (
+  fieldDefs: FieldDefinition[],
+  rawFields: Record<string, unknown>,
+): RevalidateOutcome => {
+  const normalized: Record<string, unknown> = { ...rawFields }
+
+  for (const field of fieldDefs) {
+    if (field.type === 'hidden' || field.type === 'consent') continue
+
+    const raw = rawFields[field.key]
+
+    if (raw == null || (typeof raw === 'string' && raw.trim() === '')) continue
+
+    const result = validateFieldValue(field, raw)
+
+    if (!result.valid && result.reasonCode) {
+      return { ok: false, fieldKey: field.key, reasonCode: result.reasonCode }
+    }
+
+    normalized[field.key] = result.normalized
+  }
+
+  return { ok: true, normalizedFields: normalized }
+}
+
 export const submitForm = async (rawInput: PublicSubmitInput, context: SubmitContext): Promise<PublicSubmitResult> => {
   const parsed = publicSubmitInputSchema.safeParse(rawInput)
 
@@ -249,16 +292,39 @@ export const submitForm = async (rawInput: PublicSubmitInput, context: SubmitCon
 
   if (consentRequired && !input.consent) return { outcome: 'consent_required', reason: 'consent requerido' }
 
-  // Normalización mínima + hashes (nunca PII cruda en el ledger: ni email ni IP).
-  const emailRaw = typeof input.fields.email === 'string' ? input.fields.email : null
+  // TASK-1253 — Autoridad de validación server-side. El renderer valida por UX, pero un
+  // POST directo puede inyectar basura: re-validamos con el MISMO registry canónico
+  // (paridad) y normalizamos (email lowercased / E.164 / RUT / número). Gated por flag
+  // (default OFF) con degradación honesta. El `normalized_fields_json` resultante es el
+  // payload entregable (incluye el email) que el dispatcher async manda al destino; la
+  // minimización de PII se gobierna por persistence_mode + retención (arch §8.4), NO
+  // descartando el dato que el form debe entregar. `lead_email_hash` queda como clave de
+  // dedupe/rate-limit, separada del payload.
+  let normalizedFields: Record<string, unknown> = { ...input.fields }
+
+  if (isFormsServerValidationEnabled()) {
+    const parsedDefs = z.array(fieldDefinitionSchema).safeParse(version.field_schema_json)
+
+    if (parsedDefs.success) {
+      const revalidated = revalidateAndNormalizeFields(parsedDefs.data, input.fields)
+
+      if (!revalidated.ok) return { outcome: 'invalid', reason: 'Revisa los datos del formulario.' }
+
+      normalizedFields = revalidated.normalizedFields
+    } else {
+      // Degradación honesta: field_schema_json no parseable (form legacy/corrupto). NO
+      // rechazar (no romper el form); emitir señal a Sentry y seguir con el raw.
+      captureWithDomain(new Error('growth.forms server validation: field_schema_json no parseable'), 'growth', {
+        extra: { formId: version.form_id, formVersionId: version.form_version_id },
+      })
+    }
+  }
+
+  // Hashes (nunca PII cruda en el ledger: ni email ni IP). El email se hashea YA
+  // normalizado para que dedupe/rate-limit no mientan con formatos heterogéneos.
+  const emailRaw = typeof normalizedFields.email === 'string' ? normalizedFields.email : null
   const leadEmailHash = hashIdentifier(emailRaw, FORMS_EMAIL_SALT)
   const ipHash = hashIdentifier(context.ip ?? null, FORMS_IP_SALT)
-  // El motor es una capa de ENTREGA: `normalized_fields_json` es el payload entregable
-  // (incluye el email) que el dispatcher async manda al destino (HubSpot, etc.). La
-  // minimización de PII se gobierna por `persistence_mode` + retención (arch §8.4 "raw
-  // with retention when necessary"), NO descartando el dato que el form debe entregar.
-  // `lead_email_hash` queda como clave de dedupe/rate-limit, separada del payload.
-  const normalizedFields: Record<string, unknown> = { ...input.fields }
 
   // Rate-limit (abuse-guard core compartido): per-email → per-IP. Forms sin costo LLM
   // → budget Infinity (sólo opera el rate-limit, no el circuit-breaker de costo).

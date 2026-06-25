@@ -8,6 +8,7 @@
 export const GROWTH_FORMS_PUBLIC_API_FLAG = 'GROWTH_FORMS_PUBLIC_API_ENABLED'
 export const GROWTH_FORMS_DISPATCH_FLAG = 'GROWTH_FORMS_DISPATCH_ENABLED'
 export const GROWTH_FORMS_HUBSPOT_SECURE_SUBMIT_FLAG = 'GROWTH_FORMS_HUBSPOT_SECURE_SUBMIT_ENABLED'
+export const GROWTH_FORMS_SERVER_VALIDATION_FLAG = 'GROWTH_FORMS_SERVER_VALIDATION_ENABLED'
 
 const isTrue = (value: string | undefined): boolean => value?.trim().toLowerCase() === 'true'
 
@@ -30,6 +31,17 @@ export const isFormsDispatchEnabled = (env: NodeJS.ProcessEnv = process.env): bo
  */
 export const isFormsHubSpotSecureSubmitEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
   isTrue(env[GROWTH_FORMS_HUBSPOT_SECURE_SUBMIT_FLAG])
+
+/**
+ * Gate de la autoridad de validación server-side (TASK-1253). Default OFF →
+ * comportamiento legacy (`submitForm` NO re-valida por tipo; el cliente valida por UX).
+ * ON → `submitForm` re-valida con el MISMO registry canónico que el renderer, normaliza
+ * (email lowercased / E.164 / RUT / número) y rechaza payloads con formato inválido
+ * (cierra el "POST directo mete basura"). Patrón canónico flag default-OFF + shadow +
+ * flip tras staging. Registrar en docs/operations/FEATURE_FLAG_STATE_LEDGER.md.
+ */
+export const isFormsServerValidationEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+  isTrue(env[GROWTH_FORMS_SERVER_VALIDATION_FLAG])
 
 /**
  * Límites de abuse-guard del motor (rate-limit per-email/per-IP). Forms no tiene costo
