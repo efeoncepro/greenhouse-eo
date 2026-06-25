@@ -76,3 +76,15 @@ export const GROWTH_GRADER_INTAKE_ON_FORMS_ENGINE_FLAG = 'GROWTH_GRADER_INTAKE_O
 
 export const isGraderIntakeOnFormsEngineEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
   isTrue(env[GROWTH_GRADER_INTAKE_ON_FORMS_ENGINE_FLAG])
+
+/**
+ * TASK-1242 — HubSpot lead handoff. Default OFF: el reactive consumer resuelve disabled y
+ * produce `skipped` (NUNCA escribe a HubSpot, NUNCA crash). El enqueue del evento igual
+ * ocurre (barato); el gate vive en el WRITE (execute) para no perder eventos al prender.
+ * Con ON: el consumer hace el upsert contact/company en HubSpot (cliente in-app directo).
+ * Registrar en docs/operations/FEATURE_FLAG_STATE_LEDGER.md (gate docs:closure-check).
+ */
+export const GROWTH_AI_VISIBILITY_LEAD_HANDOFF_FLAG = 'GROWTH_AI_VISIBILITY_LEAD_HANDOFF_ENABLED'
+
+export const isLeadHandoffEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+  isTrue(env[GROWTH_AI_VISIBILITY_LEAD_HANDOFF_FLAG])

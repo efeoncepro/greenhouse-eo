@@ -175,6 +175,7 @@ import { getGrowthAiVisibilityScoringSignals } from './queries/growth-ai-visibil
 import { getGrowthAiVisibilityPublicIntakeSignals } from './queries/growth-ai-visibility-public-intake-signals'
 import { getGrowthFormsSignals } from './queries/growth-forms-signals'
 import { getGrowthFormsHubspotSignals } from './queries/growth-forms-hubspot-signals'
+import { getGrowthAiVisibilityLeadHandoffSignals } from './queries/growth-ai-visibility-lead-handoff-signals'
 // TASK-1082 — Knowledge Platform ingestion signals (moduleKey 'knowledge').
 import { getKnowledgeNotionIngestDeadLetterSignal } from './queries/knowledge-notion-ingest-dead-letter'
 import { getKnowledgeQuarantineCountSignal } from './queries/knowledge-quarantine-count'
@@ -621,6 +622,7 @@ interface ReliabilityOverviewSources {
   growthAiVisibilityPublicIntake?: ReliabilitySignal[] | null
   growthForms?: ReliabilitySignal[] | null
   growthFormsHubspot?: ReliabilitySignal[] | null
+  growthAiVisibilityLeadHandoff?: ReliabilitySignal[] | null
 
   /** TASK-1201 — Finance AI anomaly-materialization staleness (heartbeat del SoT de signals). */
   financeAiStaleMaterialization?: ReliabilitySignal | null
@@ -1033,6 +1035,7 @@ export const buildReliabilityOverview = (
     ...(sources.growthAiVisibilityPublicIntake ?? []),
     ...(sources.growthForms ?? []),
     ...(sources.growthFormsHubspot ?? []),
+    ...(sources.growthAiVisibilityLeadHandoff ?? []),
     // TASK-812 — Previred/LRE artifact registry drift.
     ...(sources.payrollComplianceExportDrift ? [sources.payrollComplianceExportDrift] : []),
     // TASK-863 V1.5.2 — Final settlement PDF status drift (DB document_status vs
@@ -1428,6 +1431,12 @@ export const getReliabilityOverview = async (
     preloadedSources.growthFormsHubspot !== undefined
       ? preloadedSources.growthFormsHubspot
       : await getGrowthFormsHubspotSignals().catch(() => null)
+
+  // TASK-1242 — HubSpot lead handoff (leads con score listo sin sincronizar).
+  const growthAiVisibilityLeadHandoff =
+    preloadedSources.growthAiVisibilityLeadHandoff !== undefined
+      ? preloadedSources.growthAiVisibilityLeadHandoff
+      : await getGrowthAiVisibilityLeadHandoffSignals().catch(() => null)
 
   const payrollComplianceExportDrift =
     preloadedSources.payrollComplianceExportDrift !== undefined
@@ -2330,6 +2339,7 @@ export const getReliabilityOverview = async (
     growthAiVisibilityPublicIntake,
     growthForms,
     growthFormsHubspot,
+    growthAiVisibilityLeadHandoff,
     payrollComplianceExportDrift,
     payrollContractorDoubleRailOverlap,
     payrollDeelMemberWithoutContractId,

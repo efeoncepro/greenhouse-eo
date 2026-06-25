@@ -80,6 +80,7 @@ import { knowledgeNotionIngestProjection } from './knowledge-notion-ingest'
 import { sampleSprintHubSpotOutboundProjection } from './sample-sprint-hubspot-outbound'
 import { sampleSprintRuntimeCacheInvalidationProjection } from './sample-sprint-runtime-cache-invalidation'
 import { growthGraderRunFromSubmissionProjection } from './growth-grader-run-from-submission'
+import { growthAiVisibilityLeadHandoffProjection } from './growth-ai-visibility-lead-handoff'
 
 // DEPRECATED: personOperationalProjection removed — replaced by personIntelligenceProjection
 // DEPRECATED: icoMemberProjection kept for backward compat (BQ → Postgres sync) but person_intelligence
@@ -171,4 +172,5 @@ registerProjection(contractorPayableExpenseMaterializeProjection)
   registerProjection(notionFtrWritebackProjection) // TASK-903 Slice 2 — PATCH Notion select [GH] FTR PRODUCTIVO con veredicto del snapshot, gated NOTION_FTR_WRITEBACK_ENABLED (default OFF)
   registerProjection(knowledgeNotionIngestProjection) // TASK-1094 — re-fetch + gate + re-ingest idempotente | deprecación de páginas de knowledge Notion (webhook-triggered); gated upstream por NOTION_KNOWLEDGE_WEBHOOK_ENABLED
   registerProjection(growthGraderRunFromSubmissionProjection) // TASK-1251 — growth.forms.submission_accepted (grader-form) → enqueue grader run + materialize lead linked to submission (idempotent, PII-safe); drenado por ops-reactive-growth
+  registerProjection(growthAiVisibilityLeadHandoffProjection) // TASK-1242 — growth.ai_visibility.lead_handoff_requested → upsert contact/company en HubSpot (in-app directo, idempotente, consent+score gated); drenado por ops-reactive-growth
 }
