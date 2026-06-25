@@ -56,10 +56,14 @@ export interface ValidatorParams {
   country?: string
 }
 
-/** Shape estructural mínima de un campo (NO `FieldDefinition` — evita acoplar Zod). */
+/**
+ * Shape estructural mínima de un campo (NO `FieldDefinition` — evita acoplar Zod).
+ * `validator` es `string` (no el enum) para aceptar el wire format desacoplado del
+ * renderer; un nombre desconocido cae al default por `type` (degradación segura).
+ */
 export interface ValidatorFieldShape {
   type: string
-  validator?: NamedValidator | null
+  validator?: string | null
   validatorParams?: ValidatorParams | null
 }
 
@@ -201,9 +205,19 @@ const TYPE_DEFAULT_VALIDATOR: Record<string, NamedValidator> = {
   consent: 'consent',
 }
 
-/** Resuelve el validador nombrado de un campo: override explícito → default por type → text. */
-export const resolveValidatorName = (field: ValidatorFieldShape): NamedValidator =>
-  field.validator ?? TYPE_DEFAULT_VALIDATOR[field.type] ?? 'text'
+const isNamedValidator = (value: string | null | undefined): value is NamedValidator =>
+  value != null && (NAMED_VALIDATORS as readonly string[]).includes(value)
+
+/**
+ * Resuelve el validador nombrado de un campo: override explícito (si es un validador
+ * conocido) → default por `type` → `text`. Un `validator` string desconocido NO rompe:
+ * cae al default por type (degradación segura, anti-ReDoS por construcción).
+ */
+export const resolveValidatorName = (field: ValidatorFieldShape): NamedValidator => {
+  if (isNamedValidator(field.validator)) return field.validator
+
+  return TYPE_DEFAULT_VALIDATOR[field.type] ?? 'text'
+}
 
 /** Ejecuta un validador nombrado sobre un valor crudo. Punto de entrada canónico. */
 export const validateFormValue = (
