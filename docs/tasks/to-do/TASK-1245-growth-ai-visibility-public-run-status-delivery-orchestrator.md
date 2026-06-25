@@ -1,5 +1,9 @@
 # TASK-1245 — Growth AI Visibility: Public Run Status + Report Delivery Orchestrator
 
+## Delta 2026-06-25 — impacto de TASK-1251 (convergencia sobre el motor)
+
+TASK-1251 dejó `POST /run` con DOS paths (flag `GROWTH_GRADER_INTAKE_ON_FORMS_ENGINE_ENABLED`, default OFF): el a-medida devuelve `runPublicId` (run encolado inline), el convergente devuelve `submissionId` (el run lo crea un reactive consumer, async). **El status reader debe resolver AMBOS handles:** por `runPublicId` directo (path a-medida) y por `submissionId` → `grader_leads.submission_id` → `run_id` → estado/reportToken (path convergente). En el path convergente hay una ventana corta `submission aceptado pero run aún no encolado` (el reactive consumer `growth_grader_run_from_submission` corre vía `ops-reactive-growth` ~cada 5 min): el poll debe representarla como `queued`, no como error/404. El binding `grader_leads.submission_id` (UNIQUE parcial) es additive y ya existe.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->

@@ -1,5 +1,9 @@
 # TASK-1241 — Growth AI Visibility: Public Lead Magnet Page
 
+## Delta 2026-06-25 — impacto de TASK-1251 (convergencia sobre el motor)
+
+Cuando el flag `GROWTH_GRADER_INTAKE_ON_FORMS_ENGINE_ENABLED` esté ON (converge-before-launch), `POST /run` devuelve `submissionId` (no `runPublicId`) como handle de poll. La página debe leer `submissionId ?? runPublicId` del response y pollear vía TASK-1245 (que resuelve ambos). No asumir que el run existe inmediatamente tras el 202: en el path convergente el run se encola async (estado inicial `queued`). Follow-up posible: re-render del lead magnet vía el renderer portable del motor (TASK-1231) consumiendo el `render_contract` del grader-form gobernado (`fdef-ai-visibility-grader`) — fuera de scope de 1251.
+
 ## Delta 2026-06-25 — el renderer portable (TASK-1231) está listo para la convergencia
 
 - TASK-1231 (renderer portable Growth Forms) está **code-complete**. El form de esta página puede dejar de ser hand-built y **re-renderizarse vía `<greenhouse-form>`** (heredando reintentos, consent snapshot, observabilidad `gh_form_*`, validación 3-stage y operabilidad por Nexa/MCP por construcción) — ese upgrade sería el **first migration de TASK-1232**.

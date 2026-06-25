@@ -1,5 +1,9 @@
 # TASK-1242 — Growth AI Visibility: HubSpot Lead Handoff
 
+## Delta 2026-06-25 — impacto de TASK-1251 (convergencia sobre el motor)
+
+TASK-1251 **preservó `grader_leads` como la fuente del lead** (sin cambio de fuente para esta task). En el path convergente el lead lo materializa el reactive consumer `growth_grader_run_from_submission` (con un campo nuevo additive `submission_id`); el shape de `grader_leads` que esta task lee no cambia. Recomendación de modelado (consistente con 1251): el HubSpot handoff es **otro reactive consumer del mismo evento `growth.forms.submission_accepted`** del grader-form (o del lead ya materializado), idempotente, separado del enqueue del diagnóstico — NO un `form_destination` CRM inline. El email (PII) sigue viviendo sólo en el lead con consent.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->

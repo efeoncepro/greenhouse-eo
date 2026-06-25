@@ -1,5 +1,9 @@
 # TASK-1232 — Growth Forms Admin Cockpit + First Migration
 
+## Delta 2026-06-25 — impacto de TASK-1251 (primera migración real de un form)
+
+TASK-1251 ejecutó **de facto la primera migración de un form real al motor**: el AI Visibility Grader quedó sembrado como form gobernado (`fdef-ai-visibility-grader`) con su submission/consent/outbox + un reactive consumer post-submit (`growth_grader_run_from_submission`, projection domain `growth`). Patrón establecido a reusar (no inventar otro): **fachada estable** sobre el endpoint legacy + **submission del motor** + **reactive consumer idempotente** para el efecto post-submit + **flag default-OFF (converge-before-launch)** + **binding additive** al ledger legacy. Como el grader NO se renderiza por el GET genérico del motor (tiene su página propia, TASK-1241), su `form_version` es un FK anchor (no pasó por el compiler de publicación). El admin cockpit de 1232 debería poder listar/observar este form como cualquier otro.
+
 ## Delta 2026-06-25 — desbloqueada por TASK-1231 (renderer + host surfaces)
 
 - TASK-1231 (renderer portable + host surfaces) está **code-complete** — cerrada la última dependencia bloqueante (1229 ✅, 1230 ✅, **1231 ✅**). El cockpit ya tiene contra qué previsualizar/publicar.

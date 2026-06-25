@@ -40,6 +40,16 @@ Para lanzar EPIC-020 rápido, TASK-1240 shippeó un intake público **a-medida**
 - Preservar el contrato público vigente (`POST /run` + poll + `reportToken`) durante el cutover: cero regresión para el lead magnet ya lanzado.
 - Dejar el grader heredando del motor: consent snapshot, attempts append-only + retry/dead-letter, signals canónicas `growth.forms.*`, y camino programático (Nexa/MCP/CLI) por construcción.
 
+## Delta 2026-06-25 — Recalibración de discovery + implementación (Claude)
+
+**Recalibración (la premisa de la spec cambió):** la spec asumía un lead magnet **ya lanzado** con tráfico vivo a migrar. Discovery confirmó que **el grader público NO ha lanzado**: `GROWTH_AI_VISIBILITY_PUBLIC_INTAKE_ENABLED` está **OFF en todos los environments** (rollout pendiente sign-off legal + captcha secret) y TASK-1245 (status reader `GET /run/[publicId]`), 1246 (launch), 1241/1242/1250 están **todos en to-do/**. → **No hay tráfico vivo que migrar, ni poll contract construido que preservar byte-a-byte.** El camino real es **converge-before-launch** (menor riesgo): el contrato HTTP de `POST /run` se mantiene estable, pero la maquinaria de "shadow + flip de tráfico vivo + 7d" se simplifica porque no hay tráfico hasta el launch. Decisión del operador (2026-06-25): **convergencia completa ahora**.
+
+**Diseño bloqueado (arch-architect):** el grader es un **form gobernado del motor** (seed `fdef-ai-visibility-grader`); `POST /run` es una **fachada** detrás de `GROWTH_GRADER_INTAKE_ON_FORMS_ENGINE_ENABLED` (default OFF) que persiste un **submission del motor** (`form_submission + consent_snapshot + outbox`, una tx) y devuelve el `submission_id` como handle de poll; un **reactive consumer** (`growth_grader_run_from_submission`, projection domain `growth`) encola el run + materializa el lead — **post-submit reactivo, no inline** (boundary atómico = submission+consent+outbox). El enqueue se modela como reactive consumer (OQ#4), NO como `form_destination` adapter (deja `form_destination` limpio para entregas reales HubSpot/email).
+
+**Open Questions resueltas:** OQ#1 → fachada estable (no redirect). OQ#2 → `grader_leads` se conserva; el binding additive `submission_id` linkea lead↔submission (sin backfill: histórico a-medida queda NULL). OQ#3 → el port compartido nació en TASK-1229; **captcha ya convergió** (re-export), esta task convergió el **abuse-guard**. OQ#4 → reactive consumer (no destination). OQ#5 → converge-before-launch (la realidad lo decide).
+
+**Estado: `code complete, rollout pendiente`** (Runtime Rollout Completion Gate). Construido + verde + verificado en dev PG: Slice 1 (abuse-guard → core compartido `decideAbuse`), Slice 2a (migración seed + binding + flag), Slice 2b (fachada + reactive consumer + branch route), Slice 3 (UNIQUE parcial defense-in-depth). **Pendiente de rollout (no ejecutable ahora):** prender el flag + crear el cron `ops-reactive-growth` (deploy ops-worker) + conteos post-flip — todo gated por el **launch del intake (TASK-1246)**. **Slice 4 (retiro del stack a-medida) está diferido por la regla dura de la propia spec** (≥7d post-flip estable, NUNCA en el mismo PR del cutover) — no ejecutable hasta después del launch + flip.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 1 — CONTEXT & CONSTRAINTS
      "Que necesito entender antes de planificar?"
