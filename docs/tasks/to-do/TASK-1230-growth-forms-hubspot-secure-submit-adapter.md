@@ -74,8 +74,8 @@ Reglas obligatorias:
 
 ### Depends on
 
-- `TASK-1229` Growth Forms Backend/API Parity Foundation.
-- HubSpot private app/token/secret posture disponible via Secret Manager/Vercel env siguiendo patrones existentes.
+- `TASK-1229` Growth Forms Backend/API Parity Foundation (provee el destination interface + outbox/consumer path + state machine de attempts).
+- HubSpot private app token. **Reusar el resolver canónico existente** (`hubspot-access-token` en GCP Secret Manager / `HUBSPOT_ACCESS_TOKEN`, vía `gcp:hubspot-access-token` — ver `src/lib/hubspot/list-services-for-company.ts` y `src/lib/sync/projections/hubspot-services-intake.ts`). **Verificar en discovery que el private app tiene scope `forms`** (secure submit lo exige); si requiere un secret nuevo/scoped, seguir higiene de secretos (scalar crudo sin comillas/`\n`, `*_SECRET_REF`, `validateSecretFormat`) y NO crear cliente HubSpot paralelo.
 - Un HubSpot test form/form GUID aprobado para smoke.
 
 ### Blocks / Impacts
@@ -85,10 +85,11 @@ Reglas obligatorias:
 
 ### Files owned
 
-- `src/lib/growth/forms/**`
-- `src/lib/hubspot/**` only if discovery confirms a shared helper belongs there
-- `src/app/api/admin/growth/forms/**`
+- `src/lib/growth/forms/destinations/hubspot/**` (el adapter — archivos nuevos específicos)
+- `src/lib/reliability/queries/growth-forms-hubspot-*.ts` (señales del adapter)
 - `docs/tasks/to-do/TASK-1230-growth-forms-hubspot-secure-submit-adapter.md`
+
+Extend/shared (NO owned — propiedad de TASK-1229): `src/lib/growth/forms/**` (interface de destination/attempts), `src/app/api/admin/growth/forms/**` (admin retry/manage). `src/lib/hubspot/**` solo si discovery confirma que un helper compartido pertenece ahí (reusar resolver de token, no duplicar cliente).
 
 ## Current Repo State
 
@@ -129,9 +130,12 @@ Reglas obligatorias:
   - Mapping uses allowlisted HubSpot property names from server-side destination config.
   - Raw HubSpot errors/tokens are never stored unsanitized.
   - Adapter does not create deals, quotes or commercial records.
+  - **El POST a HubSpot corre en el reactive consumer (ops-worker), NUNCA inline en el route handler de submit de Vercel** (CLAUDE.md §Integraciones/infra: "NUNCA ejecutar POST/PATCH a HubSpot inline en un route handler Vercel — outbox event + reactive consumer"). El submit acepta + emite outbox event (path de TASK-1229); el consumer drena y ejecuta el adapter. Esto compone con el invariante de delivery dispatch que TASK-1229 establece.
+  - **Errores capturados vía `captureWithDomain(err, 'integrations.hubspot', { extra })`, NUNCA `Sentry.captureException` directo** (CLAUDE.md §Integraciones/infra; `src/lib/observability/capture.ts` ya define el dominio).
+  - **Idempotencia endurecida (no "where possible"):** HubSpot Forms secure submit NO es idempotente server-side — cada POST crea una submission nueva. La garantía de at-most-once delivery exitosa vive en Greenhouse: el state machine de `form_destination_attempt` solo reintenta attempts en estado `failed`, marca `delivered` atómicamente (CHECK + tx), y NUNCA re-entrega una submission ya `delivered`. Retry sin esta guardia duplica leads en HubSpot.
 - Tenant/space boundary: internal Efeonce Growth admin config + public submission accepted via surface registry.
-- Idempotency/concurrency: delivery attempts dedupe by submission/destination/idempotency key where possible; retry safe.
-- Audit/outbox/history: append-only destination attempts; audit for retry/dead-letter.
+- Idempotency/concurrency: at-most-once delivery exitosa garantizada por el state machine de attempts (solo reintenta `failed`, marca `delivered` atómicamente); NO depender de idempotencia de HubSpot (no existe en secure submit).
+- Audit/outbox/history: outbox event en la tx de accept (TASK-1229) → reactive consumer ejecuta el adapter; destination attempts append-only; audit para retry/dead-letter; señal dead-letter espejando `src/lib/reliability/queries/hubspot-companies-intake-dead-letter.ts`.
 
 ### Migration, backfill and rollout
 
@@ -146,7 +150,7 @@ Reglas obligatorias:
 - Auth/access gate: server-side secret access only; admin retry/manage via capability.
 - Sensitive data posture: contact PII, free text, consent evidence; no secrets in logs.
 - Error contract: sanitized provider error classes; no raw HubSpot responses in public API.
-- Abuse/rate-limit posture: inherited from public submit; adapter retry policy bounded.
+- Abuse/rate-limit posture: inherited from public submit; adapter retry policy bounded con **exponential backoff + jitter** y **circuit breaker** (cuando HubSpot está caído, fail-fast hacia dead-letter, no martillar el endpoint); tras N intentos → `dead_letter` (humano interviene).
 
 ### Runtime evidence
 
@@ -169,7 +173,7 @@ Reglas obligatorias:
 - [ ] Adapter delivery, retry and dead-letter are canonical commands/readers, not HubSpot portal manual-only actions.
 - [ ] Admin UI/Nexa/CLI future consumers can inspect attempts and request retry through same primitive.
 - [ ] Writes remain server-side and propose-confirm-execute compatible when invoked by agent surfaces.
-- [ ] Capability and access path documented for destination management and retry.
+- [ ] Reusar capabilities `growth.forms.destinations.manage` + `growth.forms.retry_delivery` (definidas en domain arch §8 / seedeadas por TASK-1229) — NO crear capabilities nuevas. Si esta task `can()`-checkea alguna, grant a ≥1 ROLE_CODE real + coverage test verde el mismo PR.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -194,9 +198,9 @@ Reglas obligatorias:
 
 ### Slice 2 — Delivery attempts, retry and signals
 
-- Wire adapter into destination router behind disabled/configured destination.
-- Record attempts and retry/dead-letter outcomes.
-- Add signals and logs for HubSpot failures without leaking payload/secrets.
+- Wire adapter into destination router **ejecutado por el reactive consumer (ops-worker), no inline en el submit handler**, behind disabled/configured destination.
+- Record attempts and retry/dead-letter outcomes con backoff+jitter+circuit breaker; state machine garantiza at-most-once delivery exitosa.
+- Add signals (`captureWithDomain('integrations.hubspot', ...)`) and logs for HubSpot failures without leaking payload/secrets.
 
 ### Slice 3 — Test form smoke
 
@@ -237,6 +241,7 @@ Use the HubSpot adapter metadata defined in the ADR. The canonical adapter input
 
 - Adapter disabled until configured per destination.
 - Optional `GROWTH_FORMS_HUBSPOT_SECURE_SUBMIT_ENABLED=false` if repo pattern favors env flags.
+- **Si se introduce el flag, registrar su fila en `docs/operations/FEATURE_FLAG_STATE_LEDGER.md` el mismo PR** (gate `pnpm docs:closure-check` / feature-flags-audit --strict bloquea el cierre si falta).
 
 ### Rollback plan per slice
 
@@ -292,6 +297,7 @@ Use the HubSpot adapter metadata defined in the ADR. The canonical adapter input
 - [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
 - [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
 - [ ] HubSpot endpoint status/migration target stays documented.
+- [ ] Si se introdujo `GROWTH_FORMS_HUBSPOT_SECURE_SUBMIT_ENABLED`, fila agregada a `FEATURE_FLAG_STATE_LEDGER.md` y `pnpm docs:closure-check` verde.
 
 ## Follow-ups
 
