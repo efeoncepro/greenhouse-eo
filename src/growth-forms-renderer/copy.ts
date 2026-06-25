@@ -33,6 +33,8 @@ export interface RendererSystemCopy {
     email: string
     url: string
     tel: string
+    nationalId: string
+    date: string
     number: string
     maxLength: (max: number) => string
     consentRequired: string
@@ -61,6 +63,8 @@ const esCL: RendererSystemCopy = {
     email: 'Ingresa un correo válido (ej. nombre@empresa.com).',
     url: 'Ingresa una dirección web válida (ej. https://tuempresa.com).',
     tel: 'Ingresa un teléfono válido (ej. +56 9 1234 5678).',
+    nationalId: 'Ingresa un RUT válido (ej. 12.345.678-5).',
+    date: 'Ingresa una fecha válida (ej. 2026-06-25).',
     number: 'Ingresa un número válido.',
     maxLength: max => `Máximo ${max} caracteres.`,
     consentRequired: 'Necesitas aceptar para continuar.',
@@ -101,6 +105,8 @@ const enUS: RendererSystemCopy = {
     email: 'Enter a valid email (e.g. name@company.com).',
     url: 'Enter a valid web address (e.g. https://yourcompany.com).',
     tel: 'Enter a valid phone number (e.g. +56 9 1234 5678).',
+    nationalId: 'Enter a valid national ID (e.g. 12.345.678-5).',
+    date: 'Enter a valid date (e.g. 2026-06-25).',
     number: 'Enter a valid number.',
     maxLength: max => `${max} characters max.`,
     consentRequired: 'You need to accept to continue.',

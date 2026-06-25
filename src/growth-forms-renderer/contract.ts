@@ -18,6 +18,7 @@ export type RendererFieldType =
   | 'email'
   | 'tel'
   | 'url'
+  | 'national_id'
   | 'textarea'
   | 'select'
   | 'multiselect'
@@ -74,6 +75,10 @@ export interface RendererFieldDefinition {
   autocomplete?: string
   /** `email | tel | numeric | decimal | url | text`. Lo declara el contract. */
   inputMode?: string
+  /** Validador declarativo del catálogo curado (TASK-1253). Default por `type` si se omite. */
+  validator?: string
+  /** Params del validador (ISO alpha-2 país para national_id / e164_phone). */
+  validatorParams?: { country?: string }
   visibleWhen?: RendererFieldCondition[]
   requiredWhen?: RendererFieldCondition[]
 }

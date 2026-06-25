@@ -1,18 +1,49 @@
 /**
- * TASK-1231 — Growth Forms portable renderer · validación cliente (UX, no autoridad).
+ * TASK-1231 / TASK-1253 — Growth Forms portable renderer · validación cliente (UX, no autoridad).
  *
- * El backend es la autoridad (Arch §20: re-valida y re-evalúa condiciones en submit).
+ * El backend es la autoridad (Arch §20: `submitForm` re-valida con el MISMO registry).
  * Esta capa es solo UX: piso `forms-ux` validation timing 3-stage. SIEMPRE valida el
  * valor **crudo** (no el display enmascarado).
+ *
+ * TASK-1253: el formato/normalización lo decide el **validator registry canónico**
+ * (`@/lib/growth/forms/validators/core`, core puro isomórfico) — la misma fuente de
+ * verdad que el servidor. Paridad por construcción: aquí solo se mapea el `reasonCode`
+ * a la copy es-CL/en-US del renderer. El empty/required (condicional) + maxLength + el
+ * caso consent quedan en esta capa.
  */
+import {
+  validateFieldValue,
+  type FormValidatorReasonCode,
+} from '@/lib/growth/forms/validators/core'
+
 import type { RendererFieldDefinition } from './contract'
 import { isFieldRequired, type FieldValues } from './conditions'
 import type { RendererSystemCopy } from './copy'
 
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-// Teléfono CL crudo: +56 + 9 dígitos (móvil/fijo); tolerante a 8-9 dígitos.
-const PHONE_CL_RE = /^\+?56\d{8,9}$/
-const URL_RE = /^https?:\/\/[^\s.]+\.[^\s]{2,}$/i
+/** Mapea el reasonCode del registry canónico al mensaje es-CL/en-US del renderer. */
+const reasonToMessage = (reason: FormValidatorReasonCode, copy: RendererSystemCopy): string => {
+  switch (reason) {
+    case 'email_format':
+      return copy.errors.email
+    case 'phone_format':
+      return copy.errors.tel
+    case 'url_format':
+      return copy.errors.url
+    case 'number_format':
+      return copy.errors.number
+    case 'date_format':
+      return copy.errors.date
+    case 'national_id_format':
+    case 'national_id_check_digit':
+      return copy.errors.nationalId
+    case 'consent_required':
+      return copy.errors.consentRequired
+    case 'field_required':
+    case 'national_id_required':
+    default:
+      return copy.errors.required
+  }
+}
 
 const asString = (value: FieldValues[string] | undefined): string => {
   if (Array.isArray(value)) return value.join(',')
@@ -53,17 +84,13 @@ export const validateField = (
 
   const value = asString(raw)
 
-  switch (field.type) {
-    case 'email':
-      return EMAIL_RE.test(value) ? null : copy.errors.email
-    case 'tel':
-      return PHONE_CL_RE.test(value.replace(/\s/g, '')) ? null : copy.errors.tel
-    case 'url':
-      return URL_RE.test(value) ? null : copy.errors.url
-    case 'number':
-      return Number.isFinite(Number(value)) ? null : copy.errors.number
-    default:
-      break
+  // Formato + normalización vía registry canónico compartido con el servidor
+  // (paridad). Valida el valor CRUDO. `text`/`textarea`/`select`/etc. → validador
+  // `text` (passthrough), igual que el comportamiento previo (sin chequeo de formato).
+  const result = validateFieldValue(field, value)
+
+  if (!result.valid && result.reasonCode) {
+    return reasonToMessage(result.reasonCode, copy)
   }
 
   if (field.maxLength && value.length > field.maxLength) {

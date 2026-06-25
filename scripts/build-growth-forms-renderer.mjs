@@ -36,6 +36,10 @@ const result = await build({
   entryPoints: [entry],
   bundle: true,
   format: 'iife',
+  // TASK-1253: el renderer importa el validator registry canónico isomórfico
+  // (`@/lib/growth/forms/validators/core` → `@/lib/identity-documents`, ambos puros).
+  // El guard de pureza (eslint) garantiza que esos módulos no traigan server-only/node.
+  alias: { '@': resolve(repoRoot, 'src') },
   target: ['es2021'],
   minify: true,
   sourcemap: false,
