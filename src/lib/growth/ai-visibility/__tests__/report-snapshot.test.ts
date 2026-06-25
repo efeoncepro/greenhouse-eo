@@ -31,8 +31,13 @@ vi.mock('../report/command', () => ({
   }
 }))
 
-// pg client mockeado: capturamos los INSERT/SELECT.
-const sql: { calls: Array<{ text: string; params: unknown[] }> } = { calls: [] }
+// pg client mockeado: capturamos los INSERT/SELECT. Los flags controlan si el
+// INSERT/SELECT devuelve fila (idempotencia / not-found).
+const sql: {
+  calls: Array<{ text: string; params: unknown[] }>
+  insertReturnsRow: boolean
+  selectReturnsRow: boolean
+} = { calls: [], insertReturnsRow: true, selectReturnsRow: true }
 
 const fakeRow = {
   report_id: 'grpt-1',
@@ -58,13 +63,11 @@ vi.mock('@/lib/postgres/client', () => ({
   }
 }))
 
-// flags de comportamiento del mock pg
-const sqlFlags = sql as typeof sql & { insertReturnsRow: boolean; selectReturnsRow: boolean }
 
 beforeEach(() => {
   sql.calls = []
-  sqlFlags.insertReturnsRow = true
-  sqlFlags.selectReturnsRow = true
+  sql.insertReturnsRow = true
+  sql.selectReturnsRow = true
   reportState.gate = 'ready'
 })
 
@@ -94,8 +97,8 @@ describe('growth/ai-visibility — public report snapshot (TASK-1239)', () => {
   })
 
   it('idempotente: conflicto → recupera el snapshot existente (no duplica)', async () => {
-    sqlFlags.insertReturnsRow = false // ON CONFLICT DO NOTHING → 0 filas
-    sqlFlags.selectReturnsRow = true
+    sql.insertReturnsRow = false // ON CONFLICT DO NOTHING → 0 filas
+    sql.selectReturnsRow = true
     const { publishGraderReportSnapshot } = await import('../report/snapshot')
     const result = await publishGraderReportSnapshot({ runId: 'run-snap' })
 
@@ -110,7 +113,7 @@ describe('growth/ai-visibility — public report snapshot (TASK-1239)', () => {
     expect(found?.reportToken).toBe('grt-deadbeef')
     expect(sql.calls[0].text).toContain('expires_at IS NULL OR expires_at > NOW()')
 
-    sqlFlags.selectReturnsRow = false
+    sql.selectReturnsRow = false
     expect(await readPublicGraderReport('grt-missing')).toBeNull()
   })
 })
