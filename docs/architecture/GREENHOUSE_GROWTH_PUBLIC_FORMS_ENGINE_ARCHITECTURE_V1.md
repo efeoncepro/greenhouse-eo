@@ -1223,3 +1223,14 @@ Shippeada la fundación del motor (local-first, develop, sin push). Decisiones r
 - **Port compartido** `src/lib/growth/public-submission/` (captcha Turnstile + abuse-guard core `decideAbuse` + `hashIdentifier`): nace acá, lo re-exporta el grader (sin romperlo), lo consume forms. Cierra TASK-1251 OQ#3 — no hay captcha/abuse paralelo.
 - **Reliability**: 3 signals `growth.forms.*` (dead_letter_count, destination_failure_rate, submission_rejection_rate) wired en `get-reliability-overview`.
 - **Estado**: fundación operacionalmente completa en dev (smoke e2e author→publish→submit→dispatch→delivered, render contract browser-safe verificado). Público disabled by design (sin forms publicados). Pendiente de rollout productivo: dispatcher ops-worker + Cloud Scheduler, y el flip del flag (gated por TASK-1230/1232 + sign-off).
+
+## Delta 2026-06-25 — TASK-1230: HubSpot Forms secure-submit adapter (§22)
+
+Primer destino CRM real del motor, **live-verificado** contra HubSpot:
+
+- **Adapter** `src/lib/growth/forms/destinations/hubspot/`: POST a `https://api.hsforms.com/submissions/v3/integration/secure/submit/{portalId}/{formGuid}` (`adapterVersion=hsforms-v3-secure-submit`, `endpointStatus=legacy_supported`, `migrationTarget=date_versioned_forms_submission_api_when_available`). Server-side, corre en el dispatcher async (ops-worker), NUNCA inline. El browser nunca conoce portalId/formGuid/property names (viven en `form_destination.mapping_json`). Mapper allowlist: solo se envían campos en `fieldMapping`. Reusa el token canónico (`src/lib/hubspot/access-token.ts`, ref `hubspot-access-token` — **NO** `gcp:hubspot-access-token`, que `resolveSecretByRef` parsea mal).
+- **State machine de entrega** (at-most-once): migración additive `form_submission.delivery_attempts` + `next_attempt_at`. Fallas retryables (429/5xx/timeout/token) → `retrying` + backoff exponencial+jitter (cap 1h); tras MAX=5 → `dead_letter`. Fallas no-retryables (400/401/403/404/mapping) → `dead_letter` inmediato. Nunca re-entrega una submission `delivered` (HubSpot secure-submit NO es idempotente). El `attempt.status` terminal alimenta el signal dead-letter.
+- **Gate**: `GROWTH_FORMS_HUBSPOT_SECURE_SUBMIT_ENABLED` (default OFF → `skipped`, cero writes a HubSpot). Signal `growth.forms.hubspot_submit_failed`.
+- **Fix de diseño (1229)**: `submitForm` ahora persiste el email en `normalized_fields_json` (es el payload entregable; `lead_email_hash` queda para dedupe) — un motor de entrega necesita el dato para el dispatch async. Gobernado por `persistence_mode` + retención (§8.4).
+- **Compiler**: `destination_plan.mapping` relajado a `string→unknown` (no es HubSpot-aware; cada adapter valida su forma).
+- **Live smoke verificado** (portal 48713323, form `836277c5-…`): submit→dispatch→HubSpot 200→`delivered`. Confirma scope `forms` del token. **Rollout que queda**: flip del flag para tráfico productivo (gated por TASK-1232 primer form + sign-off).

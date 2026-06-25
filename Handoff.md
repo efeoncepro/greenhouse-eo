@@ -1,3 +1,13 @@
+## Sesión 2026-06-25 — TASK-1230 HubSpot Forms secure-submit adapter — COMPLETE (live-verificado) — Claude
+
+> **Estado:** `complete` (movida a `complete/`), local-first en `develop`, **commits sin push** (espera instrucción). Sigue a TASK-1229.
+> - **Construido (3 slices):** adapter `src/lib/growth/forms/destinations/hubspot/` (POST a HubSpot Forms secure-submit, server-side, token canónico compartido `src/lib/hubspot/access-token.ts`, mapper allowlist, gate `GROWTH_FORMS_HUBSPOT_SECURE_SUBMIT_ENABLED` OFF→skipped) + 9 unit tests; wiring en el dispatch + **state machine de entrega at-most-once** (migración additive `form_submission.delivery_attempts`+`next_attempt_at`; retryables→retrying+backoff exp+jitter, MAX=5→dead_letter; no-retryables→dead_letter; nunca re-entrega `delivered`) + signal `growth.forms.hubspot_submit_failed`.
+> - **🔴 LIVE SMOKE VERIFICADO** contra el HubSpot test form real que creó el operador (portal 48713323, form `836277c5-0580-4f06-9da6-2db1689f627d`): submit→dispatch→**HubSpot 200**, attempt succeeded, submission `delivered`. Confirma scope `forms` del token.
+> - **Bug fixes:** (1) ref del token era `gcp:hubspot-access-token` → `resolveSecretByRef` lo parsea como secret=gcp/version=... (NOT_FOUND); ref canónico = `hubspot-access-token`. (2) `submitForm` (1229) descartaba el email del payload → un motor de entrega async lo necesita; ahora `normalized_fields_json` lo incluye (lead_email_hash queda para dedupe). (3) compiler `destination_plan.mapping` relajado a string→unknown (no HubSpot-aware).
+> - **Gates verdes:** 9 adapter tests + state-machine smoke + LIVE smoke; `pnpm test` full **7936 passed**; `pnpm build` OK; flag audit ✓; tsc EXIT 0.
+> - **Rollout que queda (no bloquea el cierre):** flip de `GROWTH_FORMS_HUBSPOT_SECURE_SUBMIT_ENABLED` para tráfico productivo, gated por TASK-1232 (primer form real) + sign-off. El live smoke ya probó el path real.
+> - **Pendiente operador:** ¿push? (commits 1230 locales).
+
 ## Sesión 2026-06-25 — TASK-1229 Growth Forms engine — COMPLETE (foundation; rollout dispatcher pendiente) — Claude
 
 > **Estado:** `complete` (movida a `complete/`), local-first en `develop`, **6 commits sin push** (espera instrucción del operador). El operador aprobó implementar end-to-end tras el checkpoint.
