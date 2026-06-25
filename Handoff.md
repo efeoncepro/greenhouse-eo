@@ -1,3 +1,13 @@
+## Sesión 2026-06-25 — Growth Forms ENGINE LIVE EN STAGING (3 flags ON, verificado) — Claude
+
+> **Estado:** rollout aplicado a `develop`/staging por pedido del operador. **Los 3 flags forms ON en staging; prod sigue OFF** (gated por TASK-1232 primer form real + sign-off).
+> - **`GROWTH_FORMS_PUBLIC_API_ENABLED`** (Vercel staging): `vercel env add` + redeploy `greenhouse-d6szlyp11` (Ready). **Verificado live:** `GET /api/public/growth/forms/{slug}` en staging devuelve el render contract (`greenhouse-growth-public-forms.v1`), no `disabled`.
+> - **`GROWTH_FORMS_DISPATCH_ENABLED`** + **`GROWTH_FORMS_HUBSPOT_SECURE_SUBMIT_ENABLED`** (Cloud Run ops-worker): set ON vía `deploy.sh` ENV-branch staging (durable) + secret_accessor binding del worker SA → `hubspot-access-token`. Ops Worker Deploy `success`; confirmado en el servicio `DISPATCH=true HUBSPOT=true`. El scheduler `ops-growth-forms-dispatch` (*/2) drena y entrega.
+> - **Verdad live:** `vercel env ls` + `gcloud run services describe ops-worker`. Estado humano: `FEATURE_FLAG_STATE_LEDGER.md` (las 3 filas = staging ON).
+> - **Revert (<5 min):** flags a false (Vercel rm + redeploy / `gcloud run services update`).
+> - **Docs:** funcional (`docs/documentation/growth/motor-formularios-publicos.md` §Estado de rollout) + runbook nuevo (`docs/manual-de-uso/growth/operar-motor-formularios.md`) + ledger.
+> - **Pendiente prod:** flip de los 3 flags en producción tras TASK-1232 (primer form real) + sign-off.
+
 ## Sesión 2026-06-25 — TASK-1230 HubSpot Forms secure-submit adapter — COMPLETE (live-verificado) — Claude
 
 > **Estado:** `complete` (movida a `complete/`), local-first en `develop`, **commits sin push** (espera instrucción). Sigue a TASK-1229.

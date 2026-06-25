@@ -32,14 +32,18 @@ La idea clave: **cualquier** formulario que nazca del motor hereda robustez por 
 - **Formulario:** `borrador → revision → publicado → deprecado → archivado`. Solo el publicado se muestra al publico; una vez publicado, su contenido es inmutable (editar crea una version nueva).
 - **Submission:** `recibida → aceptada → ruteada → entregada`, o `rechazada` (spam/consentimiento/origen no autorizado), o `fallo de entrega → reintento → dead-letter` (necesita humano).
 
+## Estado de rollout
+
+- **Staging (`develop`): VIVO** desde 2026-06-25. Los tres flags estan ON: el API publico (`GROWTH_FORMS_PUBLIC_API_ENABLED`), el dispatcher de entrega (`GROWTH_FORMS_DISPATCH_ENABLED`) y el adapter HubSpot real (`GROWTH_FORMS_HUBSPOT_SECURE_SUBMIT_ENABLED`). Verificado: el endpoint publico responde el render contract y una submission real llego a un HubSpot test form (200).
+- **Produccion: APAGADO.** Se prende cuando exista un formulario real publicado (TASK-1232) + sign-off del operador. La verdad live de los flags es `vercel env ls` + el servicio Cloud Run `ops-worker`; el estado humano vive en `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`.
+
 ## Que NO hace (todavia)
 
 - No tiene aun una pantalla visual para operarlo (eso llega con el cockpit, TASK-1232) — por ahora se opera por API.
-- No escribe a HubSpot de verdad todavia (usa un adaptador de prueba; el real es TASK-1230).
-- El API publico nace **apagado** (sin formularios publicados) hasta que se complete el rollout.
+- En **produccion** sigue apagado hasta el primer formulario real (TASK-1232) + sign-off.
 
 ## Detalle tecnico
 
-> Arquitectura: [GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md) (§Delta 2026-06-25).
-> Codigo: `src/lib/growth/forms/**` (commands/readers/compiler/dispatch), `src/lib/growth/public-submission/**` (port compartido captcha + abuse-guard), `src/app/api/public/growth/forms/**` + `src/app/api/admin/growth/forms/**`.
-> Manual de operacion paso a paso: pendiente, llega con el admin cockpit (TASK-1232).
+> Arquitectura: [GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md) (§Delta 2026-06-25 + §22 HubSpot).
+> Codigo: `src/lib/growth/forms/**` (commands/readers/compiler/dispatch) + `src/lib/growth/forms/destinations/hubspot/**` (adapter), `src/lib/growth/public-submission/**` (port compartido captcha + abuse-guard), `src/app/api/public/growth/forms/**` + `src/app/api/admin/growth/forms/**`.
+> Operacion paso a paso: [docs/manual-de-uso/growth/operar-motor-formularios.md](../../manual-de-uso/growth/operar-motor-formularios.md). El cockpit visual llega con TASK-1232.
