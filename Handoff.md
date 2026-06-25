@@ -1,3 +1,10 @@
+## Sesión 2026-06-25 — TASK-1229 Growth Forms engine — Discovery+Plan, detenida en checkpoint (sin código) — Claude
+
+> **Estado:** `in-progress` (movida de `to-do/`), local-first en `develop`, **sin push**. `/implement-task TASK-1229`. **Detenida en checkpoint humano (P1 / blast alto) ANTES de escribir código**, como manda el harness. Cero runtime/code aún.
+> - **Discovery (2 subagentes):** contrato de arquitectura completo (`GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md` §§7-26 + ADR + domain §4/§6.1) + reuse map. El stack `src/lib/growth/ai-visibility/public-intake/**` (`abuse-guard.ts`/`captcha.ts`/`store.ts`/`create-public-run.ts`) es el **template literal a generalizar**. Outbox in-tx `publishOutboxEvent(event, client)` (`src/lib/sync/publish-event.ts`); señales copiando `growth-ai-visibility-public-intake-signals.ts` + wire en `get-reliability-overview.ts`; capabilities 3-way (registry seed + `entitlements-catalog.ts` + `runtime.ts` grant + coverage test); migración espejo de `migrations/...task-1226-greenhouse-growth-schema.sql`.
+> - **11 Open Questions del arch resueltas con recomendación** (path admin `/api/admin/growth/forms/**`; columnas `retention_policy`/`commercial_handoff_policy`; embed key folded V1; 8va capability `surfaces.manage`; grant targets `efeonce_admin`/`efeonce_account`/`efeonce_operations`; evento outbox `growth.forms.submission_accepted` + dispatch en ops-worker drain espejo del grader, NO inline NI vercel cron; FK `surface_id`; attempts append-only por fila; fake adapter pluggable; `form_definition.status` activo/archivado vs version lifecycle; boundary grader sin auto-deal).
+> - **Plan de 4 slices** (1 migraciones+contratos → 2 commands/readers/compiler → 3 public/admin APIs+fake adapter → 4 observabilidad+tests). **Pendiente: aprobación del operador para empezar Slice 1.**
+
 ## Sesión 2026-06-25 — EPIC-020 AI Visibility lead magnet gaps convertidos a TASK-1245..1249 — Codex
 
 > **Estado:** docs/task-planning only; sin runtime/code. A partir de la revisión de las tasks creadas por Claude para EPIC-020, se registraron las piezas faltantes como tasks formales y se sincronizó el backlog.

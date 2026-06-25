@@ -6439,6 +6439,117 @@ export interface GreenhouseFinanceVatMonthlyPositions {
   vat_position_id: string;
 }
 
+export interface GreenhouseGrowthFormDefinition {
+  created_at: Generated<Timestamp>;
+  created_by: string | null;
+  default_locale: Generated<string>;
+  form_id: Generated<string>;
+  form_kind: string;
+  name: string;
+  owner_team: string | null;
+  purpose: string;
+  risk_profile: Generated<string>;
+  slug: string;
+  status: Generated<string>;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseGrowthFormDestination {
+  adapter_kind: Generated<string>;
+  adapter_version: Generated<string>;
+  consent_requirements_json: Generated<Json>;
+  created_at: Generated<Timestamp>;
+  delivery_mode: Generated<string>;
+  destination_id: Generated<string>;
+  enabled: Generated<boolean>;
+  endpoint_status: Generated<string>;
+  form_version_id: string;
+  mapping_json: Generated<Json>;
+  provider: string;
+  retry_policy_json: Generated<Json>;
+}
+
+export interface GreenhouseGrowthFormDestinationAttempt {
+  adapter_version: string;
+  attempt_id: Generated<string>;
+  completed_at: Timestamp | null;
+  created_at: Generated<Timestamp>;
+  destination_id: string;
+  error_class: string | null;
+  external_id: string | null;
+  http_status: number | null;
+  next_retry_at: Timestamp | null;
+  provider: string;
+  retry_count: Generated<number>;
+  status: Generated<string>;
+  submission_id: string;
+}
+
+export interface GreenhouseGrowthFormHostSurface {
+  allowed_form_slugs_json: Generated<Json>;
+  created_at: Generated<Timestamp>;
+  csp_requirements_json: Generated<Json>;
+  embed_key_hash: string | null;
+  embed_key_id: string | null;
+  origin_allowlist_json: Generated<Json>;
+  renderer_channel: Generated<string>;
+  status: Generated<string>;
+  surface_id: Generated<string>;
+  surface_kind: string;
+  surface_name: string;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseGrowthFormSubmission {
+  created_at: Generated<Timestamp>;
+  dedupe_fingerprint: string | null;
+  form_id: string;
+  form_version_id: string;
+  lead_email_hash: string | null;
+  normalized_fields_json: Generated<Json>;
+  page_name: string | null;
+  page_uri: string | null;
+  rejection_reason_class: string | null;
+  request_id: string | null;
+  status: Generated<string>;
+  submission_id: Generated<string>;
+  surface_id: string | null;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseGrowthFormSubmissionConsentSnapshot {
+  checkboxes_json: Generated<Json>;
+  consent_policy_version: string;
+  created_at: Generated<Timestamp>;
+  hubspot_legal_consent_options_json: Generated<Json>;
+  legal_basis: Generated<string>;
+  notice_text_hash: string | null;
+  privacy_url: string | null;
+  submission_id: string;
+}
+
+export interface GreenhouseGrowthFormVersion {
+  analytics_policy_json: Generated<Json>;
+  commercial_handoff_policy_json: Generated<Json>;
+  consent_policy_version: string | null;
+  copy_refs_json: Generated<Json>;
+  created_at: Generated<Timestamp>;
+  data_classification_json: Generated<Json>;
+  destination_policy_json: Generated<Json>;
+  field_schema_json: Generated<Json>;
+  form_id: string;
+  form_version_id: Generated<string>;
+  locale: Generated<string>;
+  published_at: Timestamp | null;
+  retention_policy_json: Generated<Json>;
+  status: Generated<string>;
+  style_variant: string | null;
+  success_behavior_json: Generated<Json>;
+  ui_policy_json: Generated<Json>;
+  validation_schema_json: Generated<Json>;
+  version: number;
+}
+
 export interface GreenhouseGrowthGraderIntakeEvents {
   created_at: Generated<Timestamp>;
   email_hash: string | null;
@@ -10727,6 +10838,13 @@ export interface DB {
   "greenhouse_finance.tax_codes": GreenhouseFinanceTaxCodes;
   "greenhouse_finance.vat_ledger_entries": GreenhouseFinanceVatLedgerEntries;
   "greenhouse_finance.vat_monthly_positions": GreenhouseFinanceVatMonthlyPositions;
+  "greenhouse_growth.form_definition": GreenhouseGrowthFormDefinition;
+  "greenhouse_growth.form_destination": GreenhouseGrowthFormDestination;
+  "greenhouse_growth.form_destination_attempt": GreenhouseGrowthFormDestinationAttempt;
+  "greenhouse_growth.form_host_surface": GreenhouseGrowthFormHostSurface;
+  "greenhouse_growth.form_submission": GreenhouseGrowthFormSubmission;
+  "greenhouse_growth.form_submission_consent_snapshot": GreenhouseGrowthFormSubmissionConsentSnapshot;
+  "greenhouse_growth.form_version": GreenhouseGrowthFormVersion;
   "greenhouse_growth.grader_intake_events": GreenhouseGrowthGraderIntakeEvents;
   "greenhouse_growth.grader_leads": GreenhouseGrowthGraderLeads;
   "greenhouse_growth.grader_profiles": GreenhouseGrowthGraderProfiles;

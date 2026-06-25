@@ -1940,7 +1940,20 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     // de EntitlementAction). La key `report.publish` conserva la intención.
     actions: ['execute'] as const,
     defaultScope: 'tenant'
-  }
+  },
+  // TASK-1229 — Growth Forms engine (dominio growth.forms). 8 capabilities gobernadas
+  // (Full API Parity): cada acción de negocio nace como command/reader, no como botón.
+  // Grant en runtime.ts (internal ∪ EFEONCE_ADMIN ∪ EFEONCE_ACCOUNT ∪ EFEONCE_OPERATIONS)
+  // mismo PR. `publish/author/review/manage/retry` → acción `execute` (la intención vive
+  // en la key); `read`/`submissions.read` → `read`.
+  { key: 'growth.forms.read', module: 'growth', actions: ['read'] as const, defaultScope: 'tenant' },
+  { key: 'growth.forms.author', module: 'growth', actions: ['execute'] as const, defaultScope: 'tenant' },
+  { key: 'growth.forms.review', module: 'growth', actions: ['execute'] as const, defaultScope: 'tenant' },
+  { key: 'growth.forms.publish', module: 'growth', actions: ['execute'] as const, defaultScope: 'tenant' },
+  { key: 'growth.forms.submissions.read', module: 'growth', actions: ['read'] as const, defaultScope: 'tenant' },
+  { key: 'growth.forms.destinations.manage', module: 'growth', actions: ['execute'] as const, defaultScope: 'tenant' },
+  { key: 'growth.forms.retry_delivery', module: 'growth', actions: ['execute'] as const, defaultScope: 'tenant' },
+  { key: 'growth.forms.surfaces.manage', module: 'growth', actions: ['execute'] as const, defaultScope: 'tenant' }
 ] as const
 
 export type EntitlementCapabilityDefinition = (typeof ENTITLEMENT_CAPABILITY_CATALOG)[number]

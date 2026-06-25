@@ -218,6 +218,40 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
     })
   }
 
+  // TASK-1229 — Growth Forms engine. Operación interna del motor de formularios
+  // públicos (author/review/publish/destinations/surfaces/submissions/retry). V1
+  // internal-only: route_group internal ∪ EFEONCE_ADMIN ∪ EFEONCE_ACCOUNT ∪
+  // EFEONCE_OPERATIONS (account/operations operan growth/GTM). Los `client_*` NO lo
+  // ven. Cada capability nace gobernada (Full API Parity): un primitive, muchos
+  // consumers (admin cockpit, Nexa/MCP, CLI) sobre los mismos commands/readers.
+  if (
+    hasRouteGroup(subject, 'internal') ||
+    hasRole(subject, ROLE_CODES.EFEONCE_ADMIN) ||
+    hasRole(subject, ROLE_CODES.EFEONCE_ACCOUNT) ||
+    hasRole(subject, ROLE_CODES.EFEONCE_OPERATIONS)
+  ) {
+    const formsSource: TenantEntitlementSource = hasRouteGroup(subject, 'internal') ? 'route_group' : 'role'
+
+    const FORMS_READ_CAPS = ['growth.forms.read', 'growth.forms.submissions.read'] as const
+
+    for (const capability of FORMS_READ_CAPS) {
+      addEntitlement(entries, { module: 'growth', capability, action: 'read', scope: 'tenant', source: formsSource })
+    }
+
+    const FORMS_EXECUTE_CAPS = [
+      'growth.forms.author',
+      'growth.forms.review',
+      'growth.forms.publish',
+      'growth.forms.destinations.manage',
+      'growth.forms.retry_delivery',
+      'growth.forms.surfaces.manage',
+    ] as const
+
+    for (const capability of FORMS_EXECUTE_CAPS) {
+      addEntitlement(entries, { module: 'growth', capability, action: 'execute', scope: 'tenant', source: formsSource })
+    }
+  }
+
   if (hasRouteGroup(subject, 'people') || hasAuthorizedView(subject, 'equipo.personas')) {
     const source: TenantEntitlementSource = hasRouteGroup(subject, 'people') ? 'route_group' : 'authorized_view'
 
