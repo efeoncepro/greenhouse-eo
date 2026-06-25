@@ -1941,6 +1941,16 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     actions: ['execute'] as const,
     defaultScope: 'tenant'
   },
+  // TASK-1242 — lead_handoff.execute: re-trigger/replay gobernado del handoff de un lead a
+  // HubSpot (Full API Parity). El worker automático corre con identidad de sistema (sin
+  // capability); esta gatea la superficie operada por humano/agente (endpoint admin, Nexa,
+  // CLI). Grant en runtime.ts mismo PR.
+  {
+    key: 'growth.ai_visibility.lead_handoff.execute',
+    module: 'growth',
+    actions: ['execute'] as const,
+    defaultScope: 'tenant'
+  },
   // TASK-1229 — Growth Forms engine (dominio growth.forms). 8 capabilities gobernadas
   // (Full API Parity): cada acción de negocio nace como command/reader, no como botón.
   // Grant en runtime.ts (internal ∪ EFEONCE_ADMIN ∪ EFEONCE_ACCOUNT ∪ EFEONCE_OPERATIONS)

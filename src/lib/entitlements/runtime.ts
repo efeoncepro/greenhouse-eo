@@ -216,6 +216,15 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
       scope: 'tenant',
       source
     })
+
+    // TASK-1242 — lead_handoff.execute: re-trigger/replay del handoff de un lead a HubSpot.
+    addEntitlement(entries, {
+      module: 'growth',
+      capability: 'growth.ai_visibility.lead_handoff.execute',
+      action: 'execute',
+      scope: 'tenant',
+      source
+    })
   }
 
   // TASK-1229 — Growth Forms engine. Operación interna del motor de formularios
