@@ -50,3 +50,14 @@ export const GROWTH_AI_VISIBILITY_ASYNC_EXECUTION_FLAG = 'GROWTH_AI_VISIBILITY_A
 
 export const isAsyncExecutionEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
   isTrue(env[GROWTH_AI_VISIBILITY_ASYNC_EXECUTION_FLAG])
+
+/**
+ * TASK-1240 — Intake público (lead magnet). Default OFF: el POST público está cerrado
+ * (404) hasta el rollout + sign-off legal del consent + secret de captcha. Gateado además
+ * por el kill switch `isGraderEnabled`. Con ON: el endpoint público acepta el intake
+ * (captcha + rate-limit + cost ceiling) y encola un run `public_diagnostic`+`light`.
+ */
+export const GROWTH_AI_VISIBILITY_PUBLIC_INTAKE_FLAG = 'GROWTH_AI_VISIBILITY_PUBLIC_INTAKE_ENABLED'
+
+export const isPublicIntakeEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+  isGraderEnabled(env) && isTrue(env[GROWTH_AI_VISIBILITY_PUBLIC_INTAKE_FLAG])

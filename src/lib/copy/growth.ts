@@ -152,6 +152,16 @@ export const GH_GROWTH_AI_VISIBILITY = {
   provider_finding_absent: (label: string, resolved: number) =>
     `Invisible en ${label}: no apareces en ${resolved} ${resolved === 1 ? 'respuesta evaluada' : 'respuestas evaluadas'}.`,
 
+  // Intake público del lead magnet (TASK-1240): mensajes es-CL por resultado (cliente público).
+  public_intake: {
+    accepted: 'Estamos preparando tu análisis. En unos minutos estará listo.',
+    disabled: 'El análisis público no está disponible por ahora.',
+    invalid: 'Revisa los datos: marca, sitio, mercado, categoría, un email válido y aceptar los términos.',
+    captcha_failed: 'No pudimos verificar que no eres un robot. Recarga la página e intenta de nuevo.',
+    rate_limited: 'Alcanzaste el límite de análisis por hoy. Intenta de nuevo mañana.',
+    cost_blocked: 'Estamos con mucha demanda en este momento. Intenta de nuevo en unos minutos.'
+  } satisfies Record<'accepted' | 'disabled' | 'invalid' | 'captcha_failed' | 'rate_limited' | 'cost_blocked', string>,
+
   // Exactitud de marca (TASK-1238, INTERNAL): etiqueta por tipo de inexactitud (admin review).
   accuracy_kind_label: {
     category_mismatch: 'Categoría equivocada',
