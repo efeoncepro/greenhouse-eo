@@ -93,6 +93,8 @@ export type FormSubmissionRow = {
   page_name: string | null
   lead_email_hash: string | null
   normalized_fields_json: unknown
+  /** TASK-1255 — national_id cifrado (AES-256-GCM), fuera del blob en claro. Map fieldKey → envelope. */
+  encrypted_fields_json: unknown
   status: string
   rejection_reason_class: string | null
   dedupe_fingerprint: string | null
