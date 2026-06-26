@@ -6,6 +6,7 @@
  * Registrar en docs/operations/FEATURE_FLAG_STATE_LEDGER.md (gate docs:closure-check).
  */
 export const GROWTH_FORMS_PUBLIC_API_FLAG = 'GROWTH_FORMS_PUBLIC_API_ENABLED'
+export const GROWTH_FORMS_CATALOG_API_FLAG = 'GROWTH_FORMS_CATALOG_API_ENABLED'
 export const GROWTH_FORMS_DISPATCH_FLAG = 'GROWTH_FORMS_DISPATCH_ENABLED'
 export const GROWTH_FORMS_HUBSPOT_SECURE_SUBMIT_FLAG = 'GROWTH_FORMS_HUBSPOT_SECURE_SUBMIT_ENABLED'
 export const GROWTH_FORMS_SERVER_VALIDATION_FLAG = 'GROWTH_FORMS_SERVER_VALIDATION_ENABLED'
@@ -17,6 +18,19 @@ const isTrue = (value: string | undefined): boolean => value?.trim().toLowerCase
 /** Kill switch del API público de forms. Default OFF. */
 export const isFormsPublicApiEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
   isTrue(env[GROWTH_FORMS_PUBLIC_API_FLAG])
+
+/**
+ * Gate del endpoint de catálogo externo de forms insertables (TASK-1258), consumido
+ * server-side por el plugin WordPress / Nexa / futuros hosts vía credencial per-site.
+ * Default OFF → `GET /api/public/growth/forms/catalog` resuelve 404 `disabled`.
+ *
+ * Flag SEPARADO de `GROWTH_FORMS_PUBLIC_API_ENABLED` a propósito: el editor necesita
+ * listar forms insertables ANTES de abrir el render/submit público (se elige el form
+ * para embeber durante la preparación del launch). Se puede prender en staging/prod de
+ * forma independiente. Registrar en docs/operations/FEATURE_FLAG_STATE_LEDGER.md.
+ */
+export const isFormsCatalogApiEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+  isTrue(env[GROWTH_FORMS_CATALOG_API_FLAG])
 
 /**
  * Gate del dispatcher productivo (ops-worker drain). Default OFF → el handler del

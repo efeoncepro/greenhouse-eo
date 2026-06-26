@@ -82,6 +82,7 @@
     "claude-md:inventory": "node scripts/ci/claude-md.mjs inventory",
     "claude-md:rule-audit": "node scripts/ci/claude-md.mjs audit",
     "growth:ai-visibility:smoke": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/growth/ai-visibility-smoke.ts",
+    "growth:forms:embed-key": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/growth/mint-surface-embed-key.ts",
     "finance:rematerialize-balances": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/finance/rematerialize-account-balances.ts",
     "finance:conciliate-mar-apr": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/finance/conciliate-march-april-2026.ts",
     "finance:fix-factoring": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/finance/fix-factoring-inflows-mar-apr.ts",

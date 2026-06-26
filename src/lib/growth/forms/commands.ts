@@ -21,7 +21,9 @@ import {
   publicSubmitInputSchema,
   resolveEmailPolicy,
 } from './contracts'
+import { mintEmbedKey, verifyEmbedKeySecret } from './embed-key'
 import { dedupeFingerprint } from './hash'
+import { type InsertableFormCatalogEntryVm, listInsertableFormCatalog } from './readers'
 import {
   isFormsEmailVerificationEnabled,
   isFormsPiiEncryptionEnabled,
@@ -59,6 +61,7 @@ import {
   persistAcceptedSubmission,
   setDestinationEnabled,
   setHostSurfaceStatus,
+  updateHostSurfaceEmbedKey,
   updateVersionStatus,
 } from './store'
 
@@ -185,6 +188,56 @@ export const addDestination = insertDestination
 export const setDestinationEnabledCommand = setDestinationEnabled
 export const createHostSurface = insertHostSurface
 export const setHostSurfaceStatusCommand = setHostSurfaceStatus
+
+// ─── External form catalog + per-site embed key (TASK-1258 — precond TASK-1259) ─
+
+/**
+ * Mintea (o rota) la credencial per-site de una surface. Persiste el hash; devuelve el
+ * secreto crudo UNA sola vez para que el operador lo configure server-side en el plugin
+ * WordPress (NUNCA en el browser). Command gobernado: la autorización (capability) se
+ * aplica en la capa API/CLI; este command es dominio puro.
+ */
+export type SetSurfaceEmbedKeyResult =
+  | { ok: true; embedKeyId: string; secret: string }
+  | { ok: false; reason: 'surface_not_found' }
+
+export const setSurfaceEmbedKey = async (surfaceId: string): Promise<SetSurfaceEmbedKeyResult> => {
+  const minted = mintEmbedKey()
+  const updated = await updateHostSurfaceEmbedKey(surfaceId, minted.embedKeyId, minted.embedKeyHash)
+
+  if (!updated) return { ok: false, reason: 'surface_not_found' }
+
+  return { ok: true, embedKeyId: minted.embedKeyId, secret: minted.secret }
+}
+
+/**
+ * Resuelve el catálogo externo de forms insertables autorizando por surface + origin +
+ * credencial per-site (embed key). Las fallas de auth colapsan a `unauthorized` (anti
+ * enumeración: no se filtra cuál chequeo falló). El secreto se compara timing-safe contra
+ * `embed_key_hash`; una surface sin embed key provisionada NO autoriza (la credencial es
+ * obligatoria para el catálogo, a diferencia del render/submit que sólo validan origin/slug).
+ */
+export type ExternalFormCatalogResult =
+  | { ok: true; entries: InsertableFormCatalogEntryVm[] }
+  | { ok: false; reason: 'missing_credentials' | 'unauthorized' }
+
+export const resolveExternalFormCatalog = async (input: {
+  surfaceId: string | null
+  embedKeySecret: string | null
+  origin: string | null
+}): Promise<ExternalFormCatalogResult> => {
+  if (!input.surfaceId || !input.embedKeySecret) return { ok: false, reason: 'missing_credentials' }
+
+  const surface = await getHostSurfaceById(input.surfaceId)
+
+  if (!surface || surface.status !== 'active') return { ok: false, reason: 'unauthorized' }
+  if (!originAllowed(surface.origin_allowlist_json, input.origin)) return { ok: false, reason: 'unauthorized' }
+  if (!verifyEmbedKeySecret(input.embedKeySecret, surface.embed_key_hash)) return { ok: false, reason: 'unauthorized' }
+
+  const entries = await listInsertableFormCatalog(surface)
+
+  return { ok: true, entries }
+}
 
 // ─── Public submit (el command más cargado) ──────────────────────────────────
 

@@ -395,6 +395,28 @@ export const setHostSurfaceStatus = async (
   await query(`UPDATE greenhouse_growth.form_host_surface SET status = $2 WHERE surface_id = $1`, [surfaceId, status])
 }
 
+/**
+ * TASK-1258 — Setea (rota) la credencial per-site de una surface: persiste el
+ * `embed_key_id` (público) + `embed_key_hash` (sha256 del secreto). El secreto crudo
+ * NUNCA toca la DB. Devuelve la surface actualizada o null si el id no existe.
+ */
+export const updateHostSurfaceEmbedKey = async (
+  surfaceId: string,
+  embedKeyId: string,
+  embedKeyHash: string,
+): Promise<FormHostSurfaceRow | null> => {
+  const rows = await query<FormHostSurfaceRow>(
+    `UPDATE greenhouse_growth.form_host_surface
+       SET embed_key_id = $2, embed_key_hash = $3, updated_at = NOW()
+     WHERE surface_id = $1
+     RETURNING *`,
+    [surfaceId, embedKeyId, embedKeyHash],
+  )
+
+
+return rows[0] ?? null
+}
+
 // ─── Submissions (write path: in-tx submission + consent + outbox event) ──────
 
 export interface PersistSubmissionInput {

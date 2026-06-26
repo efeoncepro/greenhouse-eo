@@ -187,6 +187,108 @@ return {
 
 export const listHostSurfacesAdmin = listHostSurfaces
 
+// ─── External form catalog (TASK-1258 — precondición de TASK-1259) ────────────
+
+/**
+ * Readiness del destino de un form, derivada honesta (regla TASK-1232: nunca pintar
+ * verde si la señal es desconocida). Le dice al editor externo si insertar el form
+ * realmente entrega leads o si quedaría capturando sin destino activo.
+ *   - `ready`                 — ≥1 destino habilitado con delivery `direct`.
+ *   - `review_only`           — habilitado pero entrega tras revisión humana.
+ *   - `manual_only`           — habilitado pero entrega 100% manual.
+ *   - `destination_disabled`  — hay destinos pero ninguno entrega (deshabilitado/disabled).
+ *   - `no_destination`        — el form no tiene destino configurado.
+ */
+export type DestinationReadiness = 'ready' | 'review_only' | 'manual_only' | 'destination_disabled' | 'no_destination'
+
+export const resolveDestinationReadiness = (destinations: Pick<FormDestinationRow, 'enabled' | 'delivery_mode'>[]): DestinationReadiness => {
+  if (destinations.length === 0) return 'no_destination'
+
+  const enabled = destinations.filter(destination => destination.enabled)
+
+  if (enabled.length === 0) return 'destination_disabled'
+  if (enabled.some(destination => destination.delivery_mode === 'direct')) return 'ready'
+  if (enabled.some(destination => destination.delivery_mode === 'after_review')) return 'review_only'
+  if (enabled.some(destination => destination.delivery_mode === 'manual_only')) return 'manual_only'
+
+  // Habilitados pero todos con delivery_mode 'disabled' ⇒ no entregan.
+  return 'destination_disabled'
+}
+
+/**
+ * Entrada del catálogo externo: SOLO metadata browser/editor-safe (sin GUIDs HubSpot,
+ * property names, mapping ni secretos). Es lo que el selector de TASK-1259 muestra para
+ * elegir qué form insertar.
+ */
+export interface InsertableFormCatalogEntryVm {
+  displayName: string
+  formSlug: string
+  formKind: string
+  /** Versión publicada (la insertable). */
+  version: number
+  versionStatus: 'published'
+  defaultLocale: string
+  /** Surfaces activas donde este slug es insertable (allowlist vacía ⇒ cualquier slug). */
+  surfaceIds: string[]
+  destinationReadiness: DestinationReadiness
+}
+
+const allowlistIncludesSlug = (allowlist: unknown, slug: string): boolean =>
+  Array.isArray(allowlist) && (allowlist.length === 0 || allowlist.includes(slug))
+
+/**
+ * Catálogo gobernado de forms INSERTABLES para una surface (un reader, muchos consumers:
+ * plugin WordPress vía endpoint, Nexa/MCP, cockpit). "Insertable" = definición activa
+ * CON una versión publicada. Si la surface tiene `allowed_form_slugs` no vacío, el
+ * catálogo se acota a esos slugs; vacío ⇒ todos los publicados. NUNCA expone destino crudo.
+ */
+export const listInsertableFormCatalog = async (
+  surface: Pick<FormHostSurfaceRow, 'allowed_form_slugs_json'>,
+): Promise<InsertableFormCatalogEntryVm[]> => {
+  const surfaceAllowlist = Array.isArray(surface.allowed_form_slugs_json)
+    ? (surface.allowed_form_slugs_json as string[])
+    : []
+
+  const scopeToAllowlist = surfaceAllowlist.length > 0
+
+  const [definitions, activeSurfaces] = await Promise.all([
+    listFormDefinitions(),
+    listHostSurfaces(),
+  ])
+
+  const insertableSurfaces = activeSurfaces.filter(s => s.status === 'active')
+  const entries: InsertableFormCatalogEntryVm[] = []
+
+  for (const definition of definitions) {
+    if (definition.status !== 'active') continue
+    if (scopeToAllowlist && !surfaceAllowlist.includes(definition.slug)) continue
+
+    const publishedVersion = await getPublishedVersionBySlug(definition.slug)
+
+    if (!publishedVersion) continue
+
+    const destinations = await listDestinationsForVersion(publishedVersion.form_version_id)
+
+    const surfaceIds = insertableSurfaces
+      .filter(s => allowlistIncludesSlug(s.allowed_form_slugs_json, definition.slug))
+      .map(s => s.surface_id)
+
+    entries.push({
+      displayName: definition.name,
+      formSlug: definition.slug,
+      formKind: definition.form_kind,
+      version: publishedVersion.version,
+      versionStatus: 'published',
+      defaultLocale: definition.default_locale,
+      surfaceIds,
+      destinationReadiness: resolveDestinationReadiness(destinations),
+    })
+  }
+
+
+return entries.sort((a, b) => a.displayName.localeCompare(b.displayName))
+}
+
 // ─── Admin cockpit (TASK-1232) ───────────────────────────────────────────────
 
 export type GrowthFormsHealthState = 'draft' | 'setup' | 'ready' | 'healthy' | 'attention' | 'dead_letter'

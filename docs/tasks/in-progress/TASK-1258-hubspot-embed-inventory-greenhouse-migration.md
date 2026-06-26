@@ -3,6 +3,7 @@
 ## Delta 2026-06-26
 
 - **Esta task hereda las patas "página WordPress viva" de TASK-1232 (cerrada complete) y el cutover real de TASK-1261.** TASK-1232 quedó complete con su gate #1 (→destination full-loop) probado live contra un HubSpot TEST form (`836277c5`) vía `dispatchPendingSubmissions`; lo que falta es el mundo real: (a) **swap del embed** del form "Lead Gen - Web" en `/diseno-de-sitios-web/` (HubSpot embed → `<greenhouse-form>`), (b) **smoke del submit + dataLayer en la página padre viva**, (c) el **cutover productivo del destino** de TASK-1261 (`delivery_mode='disabled'`→`'direct'` apuntando al GUID productivo `de4593c3`) **bundle con el flip prod de los flags** `GROWTH_FORMS_PUBLIC_API_ENABLED` **+** `GROWTH_FORMS_SERVER_VALIDATION_ENABLED` (decisión operador 2026-06-26: en prod ambos están OFF/sin tráfico → deben flipearse juntos en este launch para que el primer submit prod nazca validado; flipearlos sueltos antes es no-op no-verificable). El form gobernado + destino ya están sembrados (TASK-1261); el delivery loop ya está probado (solo falta el form productivo real + el embed vivo).
+- **Precondición backend para TASK-1259 explicitada (revisión arquitectónica 2026-06-26).** El selector WordPress de `TASK-1259` consume dos contratos que hoy NO existen y que esta task debe entregar (su goal ya dice "dejar listo el insumo backend para el editor/selector de TASK-1259", pero no los enumeraba): (1) **reader/endpoint gobernado de catálogo externo** de forms publicados/insertables (`displayName`, `formSlug`, `version`, `versionStatus`, `surfaceId(s)`, `destinationReadiness`), consumible cross-origin por el plugin WordPress, Nexa/MCP y futuros hosts — los readers actuales no cubren el caso: `getPublishedRenderContract` es por-slug y `listFormsAdmin`/`listHostSurfacesAdmin` son admin/session-gated; (2) **modelo de auth del editor externo** (credencial per-site server-side en el plugin + allowlist de origins + scope read-only de catálogo), decisión Safety hard-to-reverse. Acción: incorporar ambos al scope/`Backend/Data Contract` antes de cerrar o crear follow-up explícito si se difiere. `TASK-1259` queda `blocked` hasta que existan (un reader, muchos consumers — Full API Parity).
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
@@ -12,7 +13,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
