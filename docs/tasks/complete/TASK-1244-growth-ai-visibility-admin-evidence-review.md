@@ -10,7 +10,7 @@ TASK-1245 dejó cableado el lado público de los runs `review_required`: el fina
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -268,3 +268,35 @@ El control de release es un state-machine + CHECK + audit (patrón canónico). L
 1. ¿El estado de revisión vive en `grader_scores` (columna) o en una tabla `grader_report_reviews` (con audit)? Propuesta: tabla dedicada con audit append-only (mejor para historial de revisiones).
 2. ¿`requestAiVisibilityReportReview` explícito o el `review_required` del score ya es la solicitud? Propuesta: el `review_required` ES la solicitud (no duplicar); la task añade approve/reject.
 3. ¿Rol interno que revisa? Propuesta: `efeonce_admin` + `efeonce_account` (o un rol de growth si existe). Confirmar contra `role-codes.ts`.
+
+## Closure 2026-06-26 — code complete (dev); rollout pendiente
+
+**Open Questions resueltas:**
+
+1. **Estado de revisión:** tabla dedicada `greenhouse_growth.grader_report_reviews` **append-only** (= audit + estado en una sola tabla, espejo de la inmutabilidad de `grader_reports`). El estado vigente de un `(run_id, score_version)` = la fila más reciente; **AUSENCIA de fila = `pending`** → no se toca el writer de scoring (additive puro, backfill no-op).
+2. **`requestReview` explícito:** NO. El `review_required` del score (TASK-1227/1238) ES la solicitud; esta task sólo añade approve/reject. La cola = `review_required` sin decisión.
+3. **Rol que revisa:** mismo set interno del dominio (`route_group internal ∪ EFEONCE_ADMIN ∪ AI_TOOLING_ADMIN`), NO `efeonce_account` (no estaba en el bloque growth → no se amplió superficie). Rationale: el reviewer del gate YMYL debe ser ≥ privilegiado que el publisher (`report.publish` vive en ese bloque).
+
+**Implementado (2 slices):**
+
+- **Slice 1** — migración `20260626001120742_task-1244-grader-report-reviews.sql` (append-only: CHECK enum + reason-no-vacía-en-rejected + trigger `block_report_review_mutation` + DO anti-marker + GRANTs); state machine pura `review/state.ts` (`resolveReviewTransition`: `pending→approved|rejected`, idempotente, anti-flip terminal); capability `growth.ai_visibility.report.review` (`entitlements-catalog.ts`) + grant (`runtime.ts`).
+- **Slice 2** — `review/queries.ts` (`readReportReviewState`, `isReportReviewApproved`, `listPendingReportReviews`); `review/commands.ts` (`approveAiVisibilityReport`/`rejectAiVisibilityReport`); `report/snapshot.ts` honra la aprobación (gate `review_required`+`approved` → publicable; `insufficient_data` jamás); `setPublicDeliveryState` exportado; 3 endpoints admin (`GET /reviews` + `POST /runs/[runId]/review/{approve,reject}`); signal `report_review_pending` (`growth-ai-visibility-public-delivery-signals.ts`).
+
+**Decisiones de diseño clave:**
+
+- **Aprobación ligada a `score_version`:** un re-score (nueva versión `review_required`) NO hereda la decisión → re-revisión obligatoria (anti "approve-once auto-release futuro"; propiedad de seguridad YMYL).
+- **Approve idempotente = recovery:** re-aprobar no re-inserta pero re-drivea publish + delivery `ready` (cubre un fallo parcial post-aprobación).
+- **Paridad con la publish route:** approve dispara el HubSpot lead handoff (non-fatal) igual que un publish normal — un `review_required` aprobado es un reporte publicado a todos los efectos.
+
+**Evidencia runtime:**
+
+- Migración aplicada+verificada en dev PG (474 tablas, types regen). CHECK (reject sin reason, decision inválido) y append-only (UPDATE/DELETE bloqueados en 2 capas: GRANT + trigger) **ejercitados live**.
+- SQL embebida (CTE de la cola + subquery del signal + date-math `INTERVAL '24 hours'`) validada contra PG real (gate TASK-893).
+- 16 tests nuevos (7 state machine + 4 publish-gate + 7 commands + 1 signal). Full suite **8092 passed** + `pnpm build` exit 0 + `local:check` (lint+tsc) verdes.
+
+**Rollout pendiente (NO operativamente completo):**
+
+- **Dry-run aprobar→publish sobre un `review_required` real:** no ejecutable en dev (los flags de providers están OFF → no se produce un `review_required` real). Pendiente en **staging** con worker activo + flag ON (gated por EPIC-020).
+- **UI admin de revisión:** TASK-1247 (desbloqueada por esta task; cliente puro de los endpoints).
+- **Grant a roles operativos** más allá del set interno actual = decisión de cutover (EPIC-020 H / TASK-1246).
+- Artefacto de test en dev: una fila `approved` con `score_version='__inv_test__'` quedó en `grader_report_reviews` (append-only, no borrable sin disable trigger; inofensiva — versión bogus que ningún reader real matchea).

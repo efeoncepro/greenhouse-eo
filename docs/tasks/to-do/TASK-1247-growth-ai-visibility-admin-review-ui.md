@@ -1,5 +1,15 @@
 # TASK-1247 — Growth AI Visibility: Admin Review UI
 
+## Delta 2026-06-26 — desbloqueada por TASK-1244 (complete dev)
+
+El backend del gate humano ya existe — esta UI es cliente puro de él (Full API parity). Consumir, sin lógica nueva de negocio:
+
+- **Cola:** `GET /api/admin/growth/ai-visibility/reviews` → `{ items: [{ runId, scoreVersion, reviewReasons, finishedAt, createdAt }], total }` (reader `listPendingReportReviews`).
+- **Acciones:** `POST /api/admin/growth/ai-visibility/runs/[runId]/review/approve` (body opcional `{ reason }`) → `{ runId, scoreVersion, state:'approved', reportToken }`; `POST …/review/reject` (body `{ reason }` **obligatorio**, 422 `reason_required` si falta) → `{ state:'rejected' }`. Errores: 409 `not_reviewable`/`invalid_transition` (mostrar copy es-CL, NO botón "Reintentar" — son estructurales).
+- **Capability:** `growth.ai_visibility.report.review` (ya gateando los endpoints; la UI debe ocultar las acciones sin la capability).
+- **Evidencia a mostrar:** `reviewReasons` (ya agrega scoring TASK-1227 + exactitud de marca TASK-1238) + el reporte interno (`GET /runs/[runId]/report`). Recordar: el motivo de `review_required` es INTERNAL-only (nunca exponerlo público).
+- **Detalle del run existente:** el botón aprobar/rechazar vive idealmente en el detalle del run admin (no inventar otra superficie de regiones).
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
