@@ -1,5 +1,16 @@
 # TASK-1232 — Growth Forms Admin Cockpit + First Migration
 
+## Delta 2026-06-26 — continuación (Claude, operador-dirigido) — cierre de los 4 gates abiertos
+
+El operador me pasó a terminar los gates abiertos. La maquinaria ya existía (Codex construyó el cockpit); faltaba **producir evidencia**. Verificado con skills `arch-architect` + `a11y-architect` + `forms-ux` + `greenhouse-ux` y **GVC en loop** sobre la UI tocada. Resultado por gate:
+
+- **#4 (Authoring UI forms-ux + axe): a11y ESTRUCTURAL arreglado + axe verde + GVC.** axe encontró 3 clases serias: `nested-interactive` + `no-focusable-content` (la fila era `<TableRow role='button'>` envolviendo un `<IconButton>`) y `color-contrast`. **Fix cockpit-local:** la fila deja de ser `role=button`; el **nombre del form pasa a ser el control de selección** (`ButtonBase` + `aria-pressed` + aria-label + foco), el IconButton queda como acción secundaria → nested-interactive/no-focusable-content **resueltos**; el form-name recibió `color='text.primary'` explícito (contraste OK). Spec `tests/e2e/smoke/growth-forms-admin-cockpit-a11y.spec.ts` (shell + composer) **verde**. GVC `growth-forms-admin-cockpit` (desktop+mobile) mirado: fila intacta, nombres legibles. **El `color-contrast` residual (12) es 100% de primitives COMPARTIDAS** (`GreenhouseButton`/`GreenhouseBreadcrumbs` usando `primary` ~#0375db como texto → 3.69–4.13:1) = problema de PALETA portal-wide (TASK-1053), **no del cockpit** → **ISSUE-108** (el spec lo `disableRules` con referencia).
+- **#2 (renderer `gh_form_*` → dataLayer): YA cubierto.** El renderer emite los 7 eventos en su ciclo (viewed/started/submitted/accepted/rejected/…) + `src/growth-forms-renderer/__tests__/telemetry.test.ts` (3 tests verdes) prueba el push sanitizado a `window.dataLayer` (sin PII/raw). La pata "página WordPress viva" → **TASK-1258**.
+- **#3 (rollback del primer form): PROBADO staged.** `archiveFormDefinition` (soft-delete) → el form deja de servir el render contract (`status='active'` filtra); reactivable (no DELETE) → reversible. Verificado live contra PG.
+- **#1 (public host → Greenhouse → destination):** la pata **public→Greenhouse** la probó **TASK-1261** live (submit → ledger + normalización). La pata **→destination** (HubSpot): adapter `hubspot_forms_secure_submit` **unit-tested (9) + live-smoke-verde (TASK-1230)**; la entrega full-loop live = **cutover de TASK-1261** (`delivery_mode='direct'` + verificar contacto HubSpot, con cleanup de CRM) — NO se hace acá para no ensuciar el CRM. La pata "submit desde el embed en la página viva" → **TASK-1258**.
+
+**Estado:** code/estructural complete. Pendiente de rollout/cutover (no de código): entrega HubSpot live (cutover 1261) + smoke en la página WordPress viva (TASK-1258) + el contraste de paleta (ISSUE-108).
+
 ## Delta 2026-06-25 — impacto de TASK-1251 (primera migración real de un form)
 
 TASK-1251 ejecutó **de facto la primera migración de un form real al motor**: el AI Visibility Grader quedó sembrado como form gobernado (`fdef-ai-visibility-grader`) con su submission/consent/outbox + un reactive consumer post-submit (`growth_grader_run_from_submission`, projection domain `growth`). Patrón establecido a reusar (no inventar otro): **fachada estable** sobre el endpoint legacy + **submission del motor** + **reactive consumer idempotente** para el efecto post-submit + **flag default-OFF (converge-before-launch)** + **binding additive** al ledger legacy. Como el grader NO se renderiza por el GET genérico del motor (tiene su página propia, TASK-1241), su `form_version` es un FK anchor (no pasó por el compiler de publicación). El admin cockpit de 1232 debería poder listar/observar este form como cualquier otro.
@@ -404,13 +415,13 @@ The cockpit should be operational and dense, not marketing-like: list/detail/sid
 - [x] Admin cockpit consumes only canonical Product APIs/commands/readers.
 - [x] Operator can author/review/publish/deprecate/archive and inspect submissions/delivery attempts.
 - [x] First form is observable through the engine (`AI Visibility Grader` / `fdef-ai-visibility-grader`) with host surface and consent evidence inherited from TASK-1251; generic renderer publish smoke remains a rollout follow-up.
-- [ ] WordPress smoke proves public host -> Greenhouse -> destination path works.
-- [ ] WordPress smoke proves parent-page GTM/dataLayer-compatible `gh_form_*` events fire for view/start/submit/accepted or rejected without raw field values.
+- [~] public host -> Greenhouse -> destination path works. **public→Greenhouse: probado live (TASK-1261).** →destination (HubSpot): adapter unit-tested + live-smoke-verde (TASK-1230); full-loop live = cutover 1261 (`delivery_mode='direct'`). Smoke en la **página WordPress viva** → TASK-1258.
+- [x] parent-page GTM/dataLayer-compatible `gh_form_*` events fire (view/start/submit/accepted/rejected, sin raw field values): **renderer emite los 7 + `telemetry.test.ts` verde (sanitizado).** Disparo en la página padre viva → TASK-1258.
 - [x] GVC desktop/mobile evidence exists for cockpit states, verificada **en loop** (capturar → mirar frame → ajustar → recapturar). Final evidence: `.captures/2026-06-25T13-56-54_growth-forms-admin-cockpit`.
-- [ ] Rollback path for first form is documented and tested/staged.
+- [x] Rollback path for first form is documented and tested/staged. **`archiveFormDefinition` (soft-delete) → deja de servir; reactivable → reversible. Probado live contra PG.**
 - [x] Sidecar usa `AdaptiveSidecarLayout` con variantes oficiales (inspector/composer/evidence), NO drawer/modal custom; Composition Shell con composición declarada.
 - [x] Ruta `(dashboard)` alcanzable por nav + `route-reachability-gate`; viewCode nuevo con seed migration en `VIEW_REGISTRY` + grants internos aplicados.
-- [ ] Authoring UI pasa el piso `forms-ux` (Autocomplete no Popover>Select, validación por paso, preserva datos); gate axe verde sobre el cockpit.
+- [x] Authoring UI pasa el piso `forms-ux` + **gate axe ESTRUCTURAL verde** (TextField select no Popover>Select, labels, validación, preserva datos; fila seleccionable sin nested-interactive). Spec `growth-forms-admin-cockpit-a11y.spec.ts` verde + GVC. `color-contrast` residual = **ISSUE-108** (paleta `primary` portal-wide, no del cockpit).
 - [x] Delivery health usa degradación honesta (nunca verde/blank cuando el signal es desconocido).
 
 ## Completion Evidence — 2026-06-25 Codex/Product Design

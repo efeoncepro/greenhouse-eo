@@ -8,6 +8,16 @@
 > - **Resolución:** recuperó solo (o por re-auth del lado Vercel justo al probar). Prueba: push fresco `e03bc9485` → check **`Vercel success`** + deploy `8dxmookx0` **Ready** (staging). Auto-deploy end-to-end confirmado 2×.
 > - **Residual:** quedó un commit vacío de prueba `e03bc9485` en `develop` (inofensivo, solo disparó el deploy). Si recurre: chequear "0 checks de Vercel en el commit" → es Vercel/plataforma, no el repo; unblock = `vercel deploy` manual + revisar Vercel Team → Billing/Members por si es pausa de spend/seat.
 
+## Sesión 2026-06-26 — TASK-1232 Growth Forms Admin Cockpit · cierre de gates (continuación operador-dirigida) — Claude
+
+> **Estado: gates #2/#3/#4-estructural cerrados; #1 + contraste de paleta = rollout/cutover. Code/estructural complete.** El operador me pasó la task de Codex a terminar. Skills `arch-architect`+`a11y-architect`+`forms-ux`+`greenhouse-ux` + **GVC en loop**.
+> - **#4 (axe):** la revisión de la UI "ya construida" **encontró a11y real roto** — axe: `nested-interactive`+`no-focusable-content` (fila = `<TableRow role='button'>` con `<IconButton>` adentro) + `color-contrast`. **Fix:** fila ya no es button; el **nombre del form es el control de selección** (`ButtonBase`+aria-pressed+aria-label), IconButton = acción secundaria; form-name `text.primary`. Spec `growth-forms-admin-cockpit-a11y.spec.ts` **verde** + GVC mirado.
+> - **Hallazgo grande:** el `color-contrast` residual (12) es 100% de primitives compartidas (`GreenhouseButton`/`GreenhouseBreadcrumbs` usando `primary` ~#0375db como texto → 3.69–4.13:1) = **el color `primary` del portal FALLA WCAG 4.5:1 como texto, portal-wide** (toca TASK-1053 Restraint). **ISSUE-108** filed. NO lo parcheé (blast radius + es decisión de design-system). El spec lo `disableRules` con referencia.
+> - **#2:** renderer emite los 7 `gh_form_*` a dataLayer sanitizado + `telemetry.test.ts` verde (ya existía, sin conectar). Live-page → 1258.
+> - **#3:** rollback probado live (`archiveFormDefinition` soft-delete → deja de servir → reversible).
+> - **#1:** public→Greenhouse probado por 1261; →destination = adapter unit-tested + live-smoke 1230; full-loop live = **cutover 1261** (`delivery_mode='direct'`, no lo hice para no ensuciar el CRM). Live-WordPress → 1258.
+> - **Pendiente (rollout, no código):** entrega HubSpot live (cutover 1261), smoke en página WordPress viva (1258), contraste de paleta (ISSUE-108). 1232 sigue in-progress (de Codex) hasta que el operador decida moverla.
+
 ## Sesión 2026-06-26 — TASK-1261 Growth Forms · 1ª migración comercial real (HubSpot "Lead Gen - Web") + flip 1253 — Claude
 
 > **Estado: form publicado + shadow verde + flag 1253 ON en staging (verificado live). Pendiente: cutover (prod flip + swap embed = TASK-1258).** Local-first, pusheado a develop.

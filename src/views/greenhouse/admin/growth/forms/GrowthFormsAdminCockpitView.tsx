@@ -1,6 +1,6 @@
 'use client'
 
-import type { FormEvent, KeyboardEvent } from 'react'
+import type { FormEvent } from 'react'
 import { useMemo, useState, useTransition } from 'react'
 
 import { useRouter } from 'next/navigation'
@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation'
 import Alert from '@mui/material/Alert'
 import Box from '@mui/material/Box'
 import Divider from '@mui/material/Divider'
+import ButtonBase from '@mui/material/ButtonBase'
 import IconButton from '@mui/material/IconButton'
 import LinearProgress from '@mui/material/LinearProgress'
 import MenuItem from '@mui/material/MenuItem'
@@ -1072,13 +1073,6 @@ const GrowthFormsAdminCockpitView = ({ data }: { data: GrowthFormsCockpitVm }) =
     setSidecarMode('inspector')
   }
 
-  const handleRowKeyDown = (event: KeyboardEvent<HTMLTableRowElement>, formId: string) => {
-    if (event.key !== 'Enter' && event.key !== ' ') return
-
-    event.preventDefault()
-    selectForm(formId)
-  }
-
   const runDecisionAction = (action: DecisionAction) => {
     switch (action) {
       case 'openEvidence':
@@ -1173,14 +1167,7 @@ const GrowthFormsAdminCockpitView = ({ data }: { data: GrowthFormsCockpitVm }) =
                   key={form.formId}
                   hover
                   selected={selected}
-                  role='button'
-                  tabIndex={0}
-                  aria-label={`${GH_GROWTH_FORMS.aria.selectForm}: ${form.name}`}
-                  aria-pressed={selected}
-                  onClick={() => selectForm(form.formId)}
-                  onKeyDown={event => handleRowKeyDown(event, form.formId)}
                   sx={{
-                    cursor: 'pointer',
                     borderLeft: theme => `4px solid ${selected ? theme.palette.primary.main : 'transparent'}`,
                     transition: theme => theme.transitions.create(['background-color', 'border-color', 'box-shadow'], {
                       duration: theme.transitions.duration.shortest,
@@ -1191,21 +1178,37 @@ const GrowthFormsAdminCockpitView = ({ data }: { data: GrowthFormsCockpitVm }) =
                     '&:hover': {
                       bgcolor: theme => alpha(theme.palette.primary.main, 0.05),
                     },
-                    '&:focus-visible': {
-                      outline: theme => `2px solid ${theme.palette.primary.main}`,
-                      outlineOffset: -4,
-                    },
                   }}
                 >
                   <TableCell>
-                    <Stack spacing={0.5} sx={{ minWidth: 0 }}>
-                      <Typography variant='subtitle2' sx={{ overflowWrap: 'anywhere' }}>
-                        {form.name}
-                      </Typography>
-                      <Typography variant='caption' color='text.primary'>
-                        /{form.slug} · {GH_GROWTH_FORMS.units.version}{form.latestVersion ?? 'N/A'} · {form.formKind}
-                      </Typography>
-                    </Stack>
+                    {/* Selección accesible: el NOMBRE es el control (button), no la fila —
+                        evita nested-interactive (la fila ya no es role=button) y deja el
+                        IconButton de inspect como acción secundaria independiente. */}
+                    <ButtonBase
+                      onClick={() => selectForm(form.formId)}
+                      aria-pressed={selected}
+                      aria-label={`${GH_GROWTH_FORMS.aria.selectForm}: ${form.name}`}
+                      sx={{
+                        display: 'block',
+                        textAlign: 'left',
+                        width: '100%',
+                        minWidth: 0,
+                        borderRadius: theme => theme.shape.customBorderRadius.sm,
+                        '&:focus-visible': {
+                          outline: theme => `2px solid ${theme.palette.primary.main}`,
+                          outlineOffset: 2,
+                        },
+                      }}
+                    >
+                      <Stack spacing={0.5} sx={{ minWidth: 0 }}>
+                        <Typography variant='subtitle2' color='text.primary' sx={{ overflowWrap: 'anywhere' }}>
+                          {form.name}
+                        </Typography>
+                        <Typography variant='caption' color='text.primary'>
+                          /{form.slug} · {GH_GROWTH_FORMS.units.version}{form.latestVersion ?? 'N/A'} · {form.formKind}
+                        </Typography>
+                      </Stack>
+                    </ButtonBase>
                   </TableCell>
                   <TableCell>
                     <Stack direction='row' spacing={0.75} flexWrap='wrap'>
