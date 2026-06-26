@@ -469,7 +469,15 @@ export default [
   // server-only (postgres/secrets/bigquery): romperían el bundle portable o
   // filtrarían código server al browser. Paridad cliente↔servidor por construcción.
   {
-    files: ['src/lib/identity-documents/**/*.ts', 'src/lib/growth/forms/validators/**/*.ts'],
+    files: [
+      'src/lib/identity-documents/**/*.ts',
+      'src/lib/growth/forms/validators/**/*.ts',
+      // TASK-1254 — los módulos browser-safe de email-verification (dataset + Tier 1)
+      // son isomórficos: los importa `validators/core.ts` (corporate_email) y el renderer.
+      // El resto de email-verification/ (provider/orchestrator/cache) SÍ es server-only.
+      'src/lib/growth/forms/email-verification/email-domain-data.ts',
+      'src/lib/growth/forms/email-verification/tier1.ts',
+    ],
     ignores: ['**/__tests__/**'],
     rules: {
       'no-restricted-imports': [

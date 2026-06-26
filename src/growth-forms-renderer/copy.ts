@@ -36,6 +36,8 @@ export interface RendererSystemCopy {
     nationalId: string
     date: string
     number: string
+    corporate: string
+    disposable: string
     maxLength: (max: number) => string
     consentRequired: string
   }
@@ -66,6 +68,8 @@ const esCL: RendererSystemCopy = {
     nationalId: 'Ingresa un RUT válido (ej. 12.345.678-5).',
     date: 'Ingresa una fecha válida (ej. 2026-06-25).',
     number: 'Ingresa un número válido.',
+    corporate: 'Usa el correo de tu empresa, no uno personal (ej. nombre@tuempresa.com).',
+    disposable: 'Este correo es temporal. Usa tu correo de empresa para continuar.',
     maxLength: max => `Máximo ${max} caracteres.`,
     consentRequired: 'Necesitas aceptar para continuar.',
   },
@@ -108,6 +112,8 @@ const enUS: RendererSystemCopy = {
     nationalId: 'Enter a valid national ID (e.g. 12.345.678-5).',
     date: 'Enter a valid date (e.g. 2026-06-25).',
     number: 'Enter a valid number.',
+    corporate: 'Use your company email, not a personal one (e.g. name@yourcompany.com).',
+    disposable: 'This is a temporary email. Use your company email to continue.',
     maxLength: max => `${max} characters max.`,
     consentRequired: 'You need to accept to continue.',
   },

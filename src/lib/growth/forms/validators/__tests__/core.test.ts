@@ -15,6 +15,41 @@ describe('email_syntax', () => {
   })
 })
 
+describe('corporate_email (TASK-1254)', () => {
+  it('acepta un dominio corporativo y normaliza', () => {
+    const r = validateFormValue('corporate_email', '  Nombre@Acme.COM ')
+
+    expect(r.valid).toBe(true)
+    expect(r.normalized).toBe('nombre@acme.com')
+    expect(r.reasonCode).toBeNull()
+  })
+
+  it('rechaza free providers con email_not_corporate', () => {
+    for (const email of ['a@gmail.com', 'b@hotmail.com', 'c@outlook.cl', 'd@yahoo.com.mx']) {
+      expect(validateFormValue('corporate_email', email).reasonCode, email).toBe('email_not_corporate')
+    }
+  })
+
+  it('rechaza desechables con email_disposable (distinto de no-corporativo)', () => {
+    expect(validateFormValue('corporate_email', 'x@mailinator.com').reasonCode).toBe('email_disposable')
+    expect(validateFormValue('corporate_email', 'y@10minutemail.com').reasonCode).toBe('email_disposable')
+  })
+
+  it('rechaza sintaxis inválida con email_format', () => {
+    expect(validateFormValue('corporate_email', 'no-arroba').reasonCode).toBe('email_format')
+  })
+
+  it('vacío ⇒ field_required (el caller maneja required condicional)', () => {
+    expect(validateFormValue('corporate_email', '   ').reasonCode).toBe('field_required')
+  })
+
+  it('resuelve por validator explícito sobre el default por type', () => {
+    expect(resolveValidatorName({ type: 'email', validator: 'corporate_email' })).toBe('corporate_email')
+    // El default de `type:email` sigue siendo email_syntax (backward compat, opt-in al gate).
+    expect(resolveValidatorName({ type: 'email' })).toBe('email_syntax')
+  })
+})
+
 describe('e164_phone', () => {
   it('prefija calling code del país cuando falta +', () => {
     expect(validateFormValue('e164_phone', '912345678', { country: 'CL' }).normalized).toBe('+56912345678')

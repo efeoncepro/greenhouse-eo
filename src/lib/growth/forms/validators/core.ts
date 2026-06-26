@@ -19,9 +19,12 @@
  */
 import { validateNationalIdByCountry, type NationalIdReasonCode } from '@/lib/identity-documents'
 
+import { classifyEmailTier1 } from '../email-verification/tier1'
+
 export const NAMED_VALIDATORS = [
   'text',
   'email_syntax',
+  'corporate_email',
   'e164_phone',
   'url',
   'national_id',
@@ -34,6 +37,8 @@ export type NamedValidator = (typeof NAMED_VALIDATORS)[number]
 export type FormValidatorReasonCode =
   | 'field_required'
   | 'email_format'
+  | 'email_not_corporate'
+  | 'email_disposable'
   | 'phone_format'
   | 'url_format'
   | 'number_format'
@@ -111,6 +116,34 @@ const validateEmail = (raw: unknown): FormFieldValidationResult => {
   if (!EMAIL_RE.test(v)) return { valid: false, normalized: v, formatted: v, reasonCode: 'email_format' }
 
   return ok(v)
+}
+
+/**
+ * Email corporativo (Tier 1, gratis, síncrono): sintaxis OK + dominio NO free/personal
+ * NI desechable. Es el gate duro "que no cotice cualquiera con gmail" a nivel de campo.
+ * El veredicto profundo de deliverability (Tier 2, provider pago) es server-only async
+ * (orquestador `email-verification/`), NUNCA acá: este core es isomórfico y sin red.
+ * `email_disposable` se distingue de `email_not_corporate` para que el caller pueda dar
+ * un mensaje y una señal de calidad distintos (un desechable es peor que un gmail).
+ */
+const validateCorporateEmail = (raw: unknown): FormFieldValidationResult => {
+  const v = asString(raw).trim().toLowerCase()
+
+  if (v.length === 0) return required()
+
+  const t1 = classifyEmailTier1(v)
+
+  if (!t1.syntaxValid) return { valid: false, normalized: v, formatted: v, reasonCode: 'email_format' }
+
+  if (t1.isDisposable) {
+    return { valid: false, normalized: t1.normalizedEmail, formatted: t1.normalizedEmail, reasonCode: 'email_disposable' }
+  }
+
+  if (!t1.isCorporate) {
+    return { valid: false, normalized: t1.normalizedEmail, formatted: t1.normalizedEmail, reasonCode: 'email_not_corporate' }
+  }
+
+  return ok(t1.normalizedEmail)
 }
 
 /**
@@ -228,6 +261,8 @@ export const validateFormValue = (
   switch (validator) {
     case 'email_syntax':
       return validateEmail(rawValue)
+    case 'corporate_email':
+      return validateCorporateEmail(rawValue)
     case 'e164_phone':
       return validateE164Phone(rawValue, params)
     case 'url':

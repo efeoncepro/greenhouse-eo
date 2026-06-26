@@ -25,6 +25,10 @@ const reasonToMessage = (reason: FormValidatorReasonCode, copy: RendererSystemCo
   switch (reason) {
     case 'email_format':
       return copy.errors.email
+    case 'email_not_corporate':
+      return copy.errors.corporate
+    case 'email_disposable':
+      return copy.errors.disposable
     case 'phone_format':
       return copy.errors.tel
     case 'url_format':

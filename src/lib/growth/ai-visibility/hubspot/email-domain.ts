@@ -1,5 +1,7 @@
 import 'server-only'
 
+import { PERSONAL_OR_DISPOSABLE_DOMAINS } from '@/lib/growth/forms/email-verification/email-domain-data'
+
 /**
  * TASK-1242 — Clasificador de dominio de email (corporate vs personal/free).
  *
@@ -11,57 +13,13 @@ import 'server-only'
  * Default conservador: ante cualquier duda (dominio vacío, malformado, o en la lista de
  * free providers) → `personal`. Preferimos no crear una company antes que crear una mala.
  *
- * Heurística, no verdad absoluta: la lista de free providers es acotada y mantenible; un
- * dominio corporativo raro mal clasificado como personal solo pierde la asociación de
- * company (el contact igual se crea). Es promovible a `src/lib/**` compartido si otro
- * dominio lo necesita (commercial, account-360); hoy vive acá porque lo posee TASK-1242.
+ * TASK-1254 — SSOT: la lista de dominios free/desechables YA NO vive acá. Consume el
+ * dataset canónico browser-safe `email-verification/email-domain-data.ts` (mismo que
+ * alimenta el Tier 1 + el validador `corporate_email`). Una sola lista, sin divergencia.
+ * El conjunto `PERSONAL_OR_DISPOSABLE_DOMAINS` es un superconjunto del legacy (más
+ * proveedores free/desechables conocidos), así que la clasificación solo gana precisión:
+ * algún dominio antes mal marcado como corporativo ahora entra correcto como personal.
  */
-
-/**
- * Proveedores de email personal/gratuito + dominios desechables comunes. Acotado a propósito:
- * cubre el grueso de los leads B2C que NO representan una empresa. Mantener ordenado.
- */
-const PERSONAL_EMAIL_DOMAINS = new Set<string>([
-  // Globales mainstream
-  'gmail.com',
-  'googlemail.com',
-  'outlook.com',
-  'hotmail.com',
-  'live.com',
-  'msn.com',
-  'yahoo.com',
-  'ymail.com',
-  'icloud.com',
-  'me.com',
-  'mac.com',
-  'aol.com',
-  'protonmail.com',
-  'proton.me',
-  'gmx.com',
-  'gmx.net',
-  'mail.com',
-  'zoho.com',
-  'yandex.com',
-  'tutanota.com',
-  // Locales LATAM frecuentes
-  'hotmail.es',
-  'hotmail.cl',
-  'outlook.es',
-  'outlook.cl',
-  'yahoo.es',
-  'yahoo.com.mx',
-  'yahoo.com.ar',
-  'live.cl',
-  'terra.cl',
-  'vtr.net',
-  // Desechables / temporales
-  'mailinator.com',
-  'guerrillamail.com',
-  '10minutemail.com',
-  'tempmail.com',
-  'trashmail.com',
-  'yopmail.com',
-])
 
 export type EmailDomainClass = 'corporate' | 'personal'
 
@@ -98,7 +56,7 @@ export const extractEmailDomain = (email: string | null | undefined): string | n
 export const classifyEmailDomain = (email: string | null | undefined): EmailDomainClassification => {
   const domain = extractEmailDomain(email)
 
-  if (!domain || PERSONAL_EMAIL_DOMAINS.has(domain)) {
+  if (!domain || PERSONAL_OR_DISPOSABLE_DOMAINS.has(domain)) {
     return { domain, classification: 'personal', isCorporate: false }
   }
 
