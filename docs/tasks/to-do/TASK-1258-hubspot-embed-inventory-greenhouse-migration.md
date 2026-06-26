@@ -63,6 +63,7 @@ Revisar y respetar:
 Reglas obligatorias:
 
 - No copiar codigo GPL del plugin HubSpot; solo usarlo como referencia arquitectonica/patron de adapter.
+- El plugin HubSpot `leadin` queda **read-only**: no patch, no fork, no override, no monkey patch.
 - WordPress no es source of truth: solo descubre, monta y reporta estado. Definiciones, versiones, destinos, consent y delivery viven en Greenhouse.
 - Ningun patch a WordPress se aplica sin `dry-run`, diff revisable, allowlist de posts/pages y rollback documentado.
 - El destino HubSpot se conserva via el adapter seguro de Greenhouse (`TASK-1230`), no via embeds directos `hbspt.forms.create`.
@@ -232,6 +233,7 @@ Reglas obligatorias:
 
 - Construir el selector/editor visual de WordPress/Elementor/Gutenberg → **TASK-1259**.
 - Reemplazar el tracking global HubSpot por motor propio Greenhouse.
+- Modificar el plugin HubSpot `leadin` o cualquier archivo de ese plugin.
 - Retirar/desinstalar el plugin `leadin` de WordPress.
 - Migrar submissions historicos desde HubSpot.
 - Redisenar forms o copy comercial; esta task conserva comportamiento salvo el pipeline de submit.

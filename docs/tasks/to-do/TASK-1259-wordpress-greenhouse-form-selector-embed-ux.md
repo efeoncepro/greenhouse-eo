@@ -65,6 +65,7 @@ Reglas obligatorias:
 - El editor WordPress no autoriza ni modifica definitions; solo selecciona forms publicados y registra surfaces.
 - El widget/block/shortcode no contiene logica de validacion, condiciones, destinos ni tracking avanzado.
 - No copiar codigo del plugin HubSpot; usar su modelo de integracion como referencia de UX.
+- El plugin HubSpot `leadin` queda **read-only**: no patch, no fork, no override, no monkey patch.
 - Copy visible reutilizable debe venir de la capa canonica o quedar documentado para canonizacion.
 - Cualquier UI visible requiere evidencia GVC/browser y scroll-width check desktop/mobile donde aplique.
 
@@ -255,6 +256,7 @@ Reglas obligatorias:
 - Form builder dentro de WordPress.
 - Cambios al adapter HubSpot secure submit salvo wiring necesario ya expuesto por contracts existentes.
 - Desinstalar o reemplazar globalmente el plugin HubSpot `leadin`.
+- Modificar el plugin HubSpot `leadin` o cualquier archivo de ese plugin.
 
 ## Detailed Spec
 
