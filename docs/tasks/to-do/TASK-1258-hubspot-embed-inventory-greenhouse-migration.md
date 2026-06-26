@@ -1,5 +1,9 @@
 # TASK-1258 — HubSpot Embed Inventory + Greenhouse Forms Migration Control Plane
 
+## Delta 2026-06-26
+
+- **Esta task hereda las patas "página WordPress viva" de TASK-1232 (cerrada complete) y el cutover real de TASK-1261.** TASK-1232 quedó complete con su gate #1 (→destination full-loop) probado live contra un HubSpot TEST form (`836277c5`) vía `dispatchPendingSubmissions`; lo que falta es el mundo real: (a) **swap del embed** del form "Lead Gen - Web" en `/diseno-de-sitios-web/` (HubSpot embed → `<greenhouse-form>`), (b) **smoke del submit + dataLayer en la página padre viva**, (c) el **cutover productivo del destino** de TASK-1261 (`delivery_mode='disabled'`→`'direct'` apuntando al GUID productivo `de4593c3`) **bundle con el flip prod de los flags** `GROWTH_FORMS_PUBLIC_API_ENABLED` **+** `GROWTH_FORMS_SERVER_VALIDATION_ENABLED` (decisión operador 2026-06-26: en prod ambos están OFF/sin tráfico → deben flipearse juntos en este launch para que el primer submit prod nazca validado; flipearlos sueltos antes es no-op no-verificable). El form gobernado + destino ya están sembrados (TASK-1261); el delivery loop ya está probado (solo falta el form productivo real + el embed vivo).
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"

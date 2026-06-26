@@ -1,5 +1,9 @@
 # TASK-1261 — Primera migración comercial real: form HubSpot "Lead Gen - Web" → Growth Form gobernado
 
+## Delta 2026-06-26 — delivery loop (→destination) PROBADO LIVE contra el HubSpot TEST form
+
+Cutover de **prueba** (operador-dirigido), aislado del CRM productivo: override del `form_destination` a `delivery_mode='direct'` + GUID **TEST** `836277c5-0580-4f06-9da6-2db1689f627d` ("Test-Greenhouse", NO el productivo `de4593c3`) + fieldMapping reducido (firstName/lastName/email) + submission fresca **sin** consent snapshot (el TEST form tiene `legalConsentOptions.type='none'`). `dispatchPendingSubmissions` (el mismo primitive del ops-worker) → `form_destination_attempt='succeeded'`+`http_status=200`+submission→`delivered`. CRM limpio (`createNewContactForNewEmail:false` → 200 sin contacto). **Destino revertido** a `disabled` + GUID productivo + fieldMapping completo. Esto cierra **TASK-1232 gate #1 (→destination full-loop)**. El **cutover real** (flip prod del flag + `delivery_mode='direct'` productivo + swap del embed) sigue siendo **TASK-1258 apply**, coordinado. Residual: la prueba validó el mecanismo con 3 campos; las 10 props custom del productivo se asientan en la extracción de la HubSpot Forms API (autoridad), su prueba final = primer submit real vía el embed.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->

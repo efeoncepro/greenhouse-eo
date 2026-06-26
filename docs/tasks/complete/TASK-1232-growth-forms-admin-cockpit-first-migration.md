@@ -1,5 +1,15 @@
 # TASK-1232 — Growth Forms Admin Cockpit + First Migration
 
+## Delta 2026-06-26 — CIERRE a complete (Claude, operador-dirigido) — gate #1 →destination probado live
+
+El operador aprobó mover la task a **complete**. El único gate que faltaba evidencia live (#1, public host → Greenhouse → **destination**) quedó **probado contra el HubSpot TEST form** (cutover de prueba de TASK-1261, NO el productivo):
+
+- **#1 →destination (full-loop live): VERDE.** Corrí `dispatchPendingSubmissions` (el **mismo primitive** del ops-worker) sobre una submission fresca con el destino en `delivery_mode='direct'` apuntando al TEST form `836277c5-…` ("Test-Greenhouse"). Resultado: `form_destination_attempt.status='succeeded'`, `http_status=200`, `external_id='hsforms-fsub-06e04f4f…'`, submission→`delivered`. CRM limpio (el form de prueba tiene `createNewContactForNewEmail:false` → no creó contacto). El destino se **revirtió** a `disabled` + GUID productivo `de4593c3` + fieldMapping completo. La pata public→Greenhouse ya estaba probada live por TASK-1261 (202 + normalización).
+  - **Residual honesto:** la prueba validó el *mecanismo* de entrega (auth/secure-submit/body/state-machine/200) con un mapping de 3 campos del form de prueba; NO probó que las 10 propiedades custom del form productivo acepten — eso se asienta en que el mapping se extrajo de la HubSpot Forms API real (autoridad) y su prueba final será el primer submit real vía el swap del embed (**TASK-1258**).
+  - **Artefacto en dev:** quedó 1 submission tagged `TASK-1261 cutover test` + su attempt `succeeded` en el ledger append-only `form_destination_attempt` (trigger `block_attempt_delete` bloquea DELETE incluso a `ops` — inmutable por diseño TASK-1229). No se fuerza; sintético, sin PII real.
+
+**Patas descopadas (NO bloquean el cierre — son rollout de OTRA task):** el smoke en la **página WordPress viva** (embed swap + dataLayer en la página padre real) → **TASK-1258**; el **contraste de paleta `primary`** portal-wide (WCAG 4.5:1 como texto) → **ISSUE-108** (toca TASK-1053, decisión de design-system, no del cockpit). Lifecycle → `complete`.
+
 ## Delta 2026-06-26 — continuación (Claude, operador-dirigido) — cierre de los 4 gates abiertos
 
 El operador me pasó a terminar los gates abiertos. La maquinaria ya existía (Codex construyó el cockpit); faltaba **producir evidencia**. Verificado con skills `arch-architect` + `a11y-architect` + `forms-ux` + `greenhouse-ux` y **GVC en loop** sobre la UI tocada. Resultado por gate:
@@ -54,7 +64,7 @@ Implementation guidance:
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -63,7 +73,7 @@ Implementation guidance:
 - UI impact: `flow`
 - Backend impact: `integration`
 - Epic: `none`
-- Status real: `Code-complete cockpit enterprise; public WordPress/dataLayer smoke pending`
+- Status real: `Complete — cockpit enterprise + gate #1 →destination probado live (TEST form); WordPress-live smoke → TASK-1258, contraste → ISSUE-108`
 - Rank: `TBD`
 - Domain: `growth|public-site|hubspot|ui|api`
 - Blocked by: `none`
@@ -415,7 +425,7 @@ The cockpit should be operational and dense, not marketing-like: list/detail/sid
 - [x] Admin cockpit consumes only canonical Product APIs/commands/readers.
 - [x] Operator can author/review/publish/deprecate/archive and inspect submissions/delivery attempts.
 - [x] First form is observable through the engine (`AI Visibility Grader` / `fdef-ai-visibility-grader`) with host surface and consent evidence inherited from TASK-1251; generic renderer publish smoke remains a rollout follow-up.
-- [~] public host -> Greenhouse -> destination path works. **public→Greenhouse: probado live (TASK-1261).** →destination (HubSpot): adapter unit-tested + live-smoke-verde (TASK-1230); full-loop live = cutover 1261 (`delivery_mode='direct'`). Smoke en la **página WordPress viva** → TASK-1258.
+- [x] public host -> Greenhouse -> destination path works. **public→Greenhouse: probado live (TASK-1261).** **→destination (HubSpot): full-loop probado live 2026-06-26** contra el TEST form `836277c5` vía `dispatchPendingSubmissions` (mismo primitive del ops-worker): `form_destination_attempt='succeeded'` + `http_status=200` + submission→`delivered`; destino revertido a `disabled`+productivo. Smoke en la **página WordPress viva** (embed real) → TASK-1258.
 - [x] parent-page GTM/dataLayer-compatible `gh_form_*` events fire (view/start/submit/accepted/rejected, sin raw field values): **renderer emite los 7 + `telemetry.test.ts` verde (sanitizado).** Disparo en la página padre viva → TASK-1258.
 - [x] GVC desktop/mobile evidence exists for cockpit states, verificada **en loop** (capturar → mirar frame → ajustar → recapturar). Final evidence: `.captures/2026-06-25T13-56-54_growth-forms-admin-cockpit`.
 - [x] Rollback path for first form is documented and tested/staged. **`archiveFormDefinition` (soft-delete) → deja de servir; reactivable → reversible. Probado live contra PG.**
@@ -450,13 +460,13 @@ The cockpit should be operational and dense, not marketing-like: list/detail/sid
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
-- [ ] First-form migration and rollback evidence linked in task/handoff.
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`complete`)
+- [x] el archivo vive en la carpeta correcta (`complete/`)
+- [x] `docs/tasks/README.md` + `TASK_ID_REGISTRY.md` sincronizados con el cierre
+- [x] `Handoff.md` actualizado (sesión 2026-06-26 cutover →destination + cierre)
+- [x] `changelog.md` actualizado (entrada 2026-06-26 cutover →destination + complete)
+- [x] cross-impact: TASK-1261 (delivery loop probado) + TASK-1258 (pata WordPress-live hereda) + ISSUE-108 (contraste)
+- [x] First-form migration + rollback evidence linked: gate #3 (`archiveFormDefinition` live) + gate #1 (cutover →destination live, ver Delta 2026-06-26 CIERRE).
 
 ## Follow-ups
 

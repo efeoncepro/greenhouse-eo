@@ -307,6 +307,7 @@ Veredicto de arquitectura (arch-architect, Greenhouse overlay): un registry, val
 
 ## Follow-ups
 
+- **Flip prod de `GROWTH_FORMS_SERVER_VALIDATION_ENABLED` diferido al cutover de TASK-1258 (decisión operador 2026-06-26).** En prod TODOS los flags growth forms están OFF (verificado live `vercel env ls production`, incl. `PUBLIC_API`) → no hay tráfico; flipear la validación sola sería no-op y no smoke-verificable (Runtime Rollout Gate). Debe flipearse **bundle con `GROWTH_FORMS_PUBLIC_API_ENABLED`** en el launch prod de TASK-1258, para que el primer submit prod real nazca validado. Staging quedó ON+verificado live (shadow vía TASK-1261 → 0 falsos rechazos). Ver ledger `FEATURE_FLAG_STATE_LEDGER.md` fila `GROWTH_FORMS_SERVER_VALIDATION_ENABLED`.
 - Implementar validadores AR/BR/MX en `identity-documents/` cuando entre el primer cliente fuera de CL.
 - Backfill opcional de normalización sobre `form_submission` históricas.
 

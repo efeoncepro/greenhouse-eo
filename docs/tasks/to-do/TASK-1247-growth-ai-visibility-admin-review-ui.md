@@ -4,6 +4,8 @@
 
 El backend del gate humano ya existe — esta UI es cliente puro de él (Full API parity). Consumir, sin lógica nueva de negocio:
 
+- **Navegación (decisión operador 2026-06-26):** la surface debe quedar bajo el menú top-level **Growth** como sibling de **Forms**, con label visible de menú **AEO Grader**. No usar "AI Visibility" como label de menú aunque el dominio técnico siga siendo `growth.ai_visibility`; la página puede titular/explicar "AI Visibility Grader" dentro del contenido.
+- **View registry:** seed de `viewCode` propio sugerido `administracion.growth_ai_visibility`, `route_group='admin'`, `route_path='/admin/growth/ai-visibility'`, icono relacionado al grader/scan y grants internos alineados con `growth.ai_visibility.report.review`. La ruta puede abrir la review queue como default o redirigir a `/admin/growth/ai-visibility/review`, pero la entrada del menú debe ser **Growth → AEO Grader**.
 - **Cola:** `GET /api/admin/growth/ai-visibility/reviews` → `{ items: [{ runId, scoreVersion, reviewReasons, finishedAt, createdAt }], total }` (reader `listPendingReportReviews`).
 - **Acciones:** `POST /api/admin/growth/ai-visibility/runs/[runId]/review/approve` (body opcional `{ reason }`) → `{ runId, scoreVersion, state:'approved', reportToken }`; `POST …/review/reject` (body `{ reason }` **obligatorio**, 422 `reason_required` si falta) → `{ state:'rejected' }`. Errores: 409 `not_reviewable`/`invalid_transition` (mostrar copy es-CL, NO botón "Reintentar" — son estructurales).
 - **Capability:** `growth.ai_visibility.report.review` (ya gateando los endpoints; la UI debe ocultar las acciones sin la capability).
@@ -28,7 +30,7 @@ El backend del gate humano ya existe — esta UI es cliente puro de él (Full AP
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `growth|ai|ui|reliability`
-- Blocked by: `TASK-1244`
+- Blocked by: `none`
 - Branch: `task/TASK-1247-growth-ai-visibility-admin-review-ui`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -43,7 +45,7 @@ Construye la superficie interna para operar el gate humano de `review_required`:
 
 ## Goal
 
-- Crear `/admin/growth/ai-visibility/review` o integrar la cola en `/admin/growth/ai-visibility`.
+- Crear `/admin/growth/ai-visibility` como surface admin del grader, alcanzable desde **Growth → AEO Grader**; la review queue puede vivir como default o child `/review`.
 - Mostrar evidencia interna suficiente para decidir sin filtrar raw innecesario.
 - Ejecutar approve/reject via comandos gobernados, con estados de pending/success/error y audit visible.
 
@@ -65,6 +67,7 @@ Reglas obligatorias:
 - La UI no aprueba por si sola; consume `approveAiVisibilityReport`/`rejectAiVisibilityReport`.
 - No mostrar el DTO publico como unica evidencia: el reviewer necesita razones internas bounded.
 - No crear dialogs/drawers paralelos si `AdaptiveSidecar` o `CompositionShell` resuelven el flujo.
+- La entrada de navegación visible debe ser **Growth → AEO Grader**; no crear un top-level nuevo ni colgarlo de Forms.
 - Copy visible en `src/lib/copy/growth.ts` o archivo canonico de copy del dominio.
 
 ## Normative Docs
@@ -89,6 +92,10 @@ Reglas obligatorias:
 
 - `src/app/(dashboard)/admin/growth/ai-visibility/**` [verificar route group vigente]
 - `src/views/growth/ai-visibility/admin/**`
+- `migrations/*_task-1247-*.sql` para seed de `administracion.growth_ai_visibility`
+- `src/config/greenhouse-nomenclature.ts` / `src/config/greenhouse-navigation-copy.ts` para copy de menú **AEO Grader**
+- `src/lib/admin/view-access-catalog.ts` si el catálogo admin requiere registrar el viewCode
+- `src/lib/navigation/route-reachability-manifest.ts`
 - `src/lib/copy/growth.ts`
 - `scripts/frontend/scenarios/growth-ai-visibility-admin-review.*` [verificar extension DSL]
 
@@ -117,13 +124,13 @@ Reglas obligatorias:
 
 ### Surface & system decision
 
-- Surface: `/admin/growth/ai-visibility/review` o child del admin AI Visibility existente. **Ruta interna** → viewCode routeGroup `internal`, NUNCA `client_*`.
+- Surface: `/admin/growth/ai-visibility` como entrada principal de menú **Growth → AEO Grader**; `/review` puede ser child/deep link. **Ruta admin interna** → viewCode routeGroup `admin`, NUNCA `client_*`.
 - Composition Shell: `aplica` — declarar composición `leadPlusContext` (cola lead + evidencia/decisión context); regiones singleton, sin grid/morph ad-hoc.
 - Primitive decision: `reuse` — CompositionShell, AdaptiveSidecar, GreenhouseAsyncActionButton, GreenhouseCommandFeedback, tables/cards existentes.
 - Adaptive density / The Seam: `aplica` — filas/cards de cola condensan en sidebars y mobile con `card-density` (condensación honesta, el dato clave nunca desaparece).
 - Floating/Sidecar/Dialog decision: AdaptiveSidecar para detalle, mapeado a variante oficial **`reconciler`** (flujo de adjudicación aprobar/rechazar con evidencia) — NO drawer/modal custom, desktop = lane in-flow. Dialog solo para la confirmación del rechazo (acción de consecuencia legal/pública).
-- Copy source: `src/lib/copy/growth.ts` (invocar `greenhouse-ux-writing`, es-CL).
-- Access impact: `entitlements` — capability `growth.ai_visibility.report.review` definida por TASK-1244. **Cross-check:** confirmar que 1244 la granteó a ≥1 ROLE_CODE real interno (no existe rol `growth_*`); sin grant, la ruta queda permission-denied para todos. Nueva ruta `(dashboard)` → entrada obligatoria en `route-reachability-manifest.ts` + seed viewCode en `VIEW_REGISTRY` el mismo PR (TASK-827/982).
+- Copy source: `src/config/greenhouse-nomenclature.ts` / `src/config/greenhouse-navigation-copy.ts` para label/subtitle de menú; `src/lib/copy/growth.ts` para copy funcional de la surface (invocar `greenhouse-ux-writing`, es-CL).
+- Access impact: `views|entitlements` — seed `administracion.growth_ai_visibility` con label **AEO Grader** bajo Growth y capability `growth.ai_visibility.report.review` definida por TASK-1244. **Cross-check:** confirmar que 1244 la granteó a ≥1 ROLE_CODE real interno (no existe rol `growth_*`); sin grant, la ruta queda permission-denied para todos. Nueva ruta `(dashboard)` → entrada obligatoria en `route-reachability-manifest.ts` + seed viewCode en `VIEW_REGISTRY` el mismo PR (TASK-827/982).
 
 ### Approved visual direction
 
@@ -266,7 +273,8 @@ Reglas obligatorias:
 
 ### Slice 1 — Review queue surface
 
-- Crear ruta admin con cola de `review_required` pendientes desde el reader de `TASK-1244`.
+- Crear ruta admin `/admin/growth/ai-visibility` con cola de `review_required` pendientes desde el reader de `TASK-1244`.
+- Seedear navegación/view registry para que el menú muestre **Growth → AEO Grader** como sibling de **Forms**.
 - Estados loading/empty/error/permission.
 - Implementar la dirección aprobada **Review Command Center**:
   - queue lane con filtros/search, risk summary y filas densas;
@@ -356,6 +364,8 @@ Slice 1 -> Slice 2 -> Slice 3 -> Slice 4. No conectar acciones antes de tener es
 ## Acceptance Criteria
 
 - [ ] Se declaro `Execution profile: ui-ux` y `UI impact: flow`.
+- [ ] La entrada de menú queda bajo **Growth** con label visible **AEO Grader**, como sibling de **Forms**.
+- [ ] Existe `viewCode` propio para la surface del grader (sugerido `administracion.growth_ai_visibility`) con route group `admin`, grants internos y guard de página alineado a `growth.ai_visibility.report.review`.
 - [ ] UI consume reader/commands de `TASK-1244`, sin logica de aprobacion local.
 - [ ] Cola, detalle, preview y acciones approve/reject cubren loading/empty/error/permission/pending.
 - [ ] La implementación sigue la dirección visual aprobada: **Review Command Center** como base + ledger de **Evidence Ledger Review** + checklist de **Reconciler Studio**.
