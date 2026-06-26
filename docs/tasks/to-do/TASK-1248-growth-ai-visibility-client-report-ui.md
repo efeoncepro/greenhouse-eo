@@ -1,5 +1,9 @@
 # TASK-1248 — Growth AI Visibility: Client Report UI
 
+## Delta 2026-06-26
+
+- **Dependencia reader DESBLOQUEADA por TASK-1243 (complete).** El reader client-scoped + el contrato programático ya existen: esta UI es cliente puro. Consumir: endpoint BFF `GET /api/client-portal/growth/ai-visibility/report[?runId=...]` → `{ report: ClientGraderReport }` (DTO leak-safe, sin evidencia cruda; recommendations sin cap). Auth ya resuelta server-side (`requireClientTenantContext` + capability `growth.ai_visibility.report.read_client` + org de sesión); la UI no agrega lógica de acceso. Errores canónicos: `grader_run_not_found` (sin reporte / org sin run reportable / score aún no listo — NO mostrar "Reintentar", es estructural) + `forbidden`/`client_tenant_required`. Sigue bloqueada por **TASK-1252** (artifact design system). Reader: `src/lib/growth/ai-visibility/client/command.ts` (vía curated `src/lib/client-portal/readers/curated/growth-ai-visibility.ts`).
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->

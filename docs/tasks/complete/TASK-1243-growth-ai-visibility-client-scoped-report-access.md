@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -228,11 +228,11 @@ El reader cliente es el 3.er consumer de la parity: mismo `buildGraderReport`, p
 
 ## Acceptance Criteria
 
-- [ ] Binding `run/profile ↔ org cliente` (additive o derivable) + capability `client_*` + grant (guard coverage).
-- [ ] `readClientGraderReport` deriva la org de la sesión, filtra por org, delega en `buildGraderReport`.
-- [ ] Tenant boundary: cliente A NO ve runs de cliente B (test que lo prueba).
-- [ ] DTO cliente sin evidencia cruda de provider (leak test).
-- [ ] Sin reimplementación del builder (un primitive, muchos consumers).
+- [x] Binding `run/profile ↔ org cliente` (additive: `grader_profiles.organization_id` FK→organizations) + capability dedicada `growth.ai_visibility.report.read_client` + grant a `client_*` (guard coverage verde).
+- [x] `readClientGraderReport(organizationId, runId?)` deriva la org de la sesión (endpoint), filtra por org (store JOIN), delega en `buildGraderReport` (vía reuso de `readGraderReport`).
+- [x] Tenant boundary: cliente A NO ve runs de cliente B (`client-report-reader.test.ts` lo prueba; SQL del JOIN ejercitada live contra PG).
+- [x] DTO cliente (`ClientGraderReport`) sin evidencia cruda de provider (`report-client-leak.test.ts`, 3 capas).
+- [x] Sin reimplementación del builder (un primitive, muchos consumers: `readClientGraderReport` reusa `readGraderReport` + `buildGraderReport`).
 
 ## Verification
 
@@ -242,20 +242,25 @@ El reader cliente es el 3.er consumer de la parity: mismo `buildGraderReport`, p
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` sincronizado (`in-progress`/`complete`)
-- [ ] archivo en la carpeta correcta
-- [ ] `docs/tasks/README.md` + `TASK_ID_REGISTRY.md` sincronizados
-- [ ] `Handoff.md` + `changelog.md` actualizados
-- [ ] arch `## Delta` + `EPIC-020` Child Task E
-- [ ] chequeo de impacto cruzado (TASK-1235/1239 + client portal)
+- [x] `Lifecycle` sincronizado (`complete`)
+- [x] archivo en la carpeta correcta (`complete/`)
+- [x] `docs/tasks/README.md` + `TASK_ID_REGISTRY.md` sincronizados
+- [x] `Handoff.md` + `changelog.md` actualizados
+- [x] arch `## Delta` (`GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md`) + `EPIC-020` Child Task E
+- [x] chequeo de impacto cruzado (TASK-1248 desbloqueada parcialmente; TASK-1235/1239 + client portal)
+
+## Status real
+
+`Code complete + verificado (full test clean 0 failed + build ✓ + grant coverage + SQL live).` **Rollout pendiente (no de código):** poblar `grader_profiles.organization_id` para orgs cliente reales = intake/onboarding cliente (fuera de scope); el reader queda gated por capability `report.read_client` (granteada) + requiere un perfil con org + un run reportable. La UI del portal = TASK-1248.
+
+## Resolución de Open Questions (Discovery)
+
+1. **Binding = columna `grader_profiles.organization_id`** (nullable, additive, FK text → `greenhouse_core.organizations` ON DELETE SET NULL). El run deriva su org vía `profile_id → profile.organization_id`. Tabla de asociación descartada: 1 perfil de marca ↔ 1 org en V1 (over-engineering una M:N inexistente).
+2. **Capability DEDICADA `growth.ai_visibility.report.read_client`** (no scope-overload de `report.read` interno). Rationale: least-privilege explícito + patrón cliente del repo (`client_portal.pulse.read`, `organization.*` son capabilities propias) + desacopla el acceso cliente del lifecycle del read interno. (El framework SÍ soporta scope-based, pero el acoplamiento lo hacía frágil.)
+3. **On-read scoped** (no el snapshot inmutable). El snapshot es para el link público anónimo (TASK-1239); el cliente autenticado ve su reporte vivo con el mismo `buildGraderReport`.
 
 ## Follow-ups
 
-- Surface del grader en el portal cliente (UI; consume este reader vía BFF).
+- Surface del grader en el portal cliente (UI; consume este reader vía BFF) → **TASK-1248**.
+- Poblar `grader_profiles.organization_id` desde el intake/onboarding cliente (write path; fuera de scope de este reader).
 - Nexa cliente: operar el reporte desde la conversational experience (parity).
-
-## Open Questions
-
-1. ¿El binding `run ↔ org` es columna en `grader_profiles` (`organization_id`) o tabla de asociación? Depende de si un perfil de marca puede pertenecer a varias orgs. Decidir en Discovery.
-2. ¿Capability propia `report.read_client` o reuso de `report.read` con scope cliente? Propuesta: scope-based sobre la existente si el framework lo permite; sino capability propia. Decidir con el entitlements model.
-3. ¿El cliente ve el snapshot inmutable (TASK-1239) o el reporte on-read scoped? Propuesta: on-read scoped (interno-vivo para el cliente); el snapshot es para el link público.
