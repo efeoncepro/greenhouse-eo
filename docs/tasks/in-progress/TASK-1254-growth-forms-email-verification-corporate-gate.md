@@ -307,7 +307,8 @@ Veredicto arch-architect: local-first, provider-gated, cacheado. Tier 1 resuelve
 
 ## Follow-ups
 
-- Mantenimiento de la lista de dominios desechables (fuente + cadencia de refresh).
+- **Lista comprensiva de GRATIS/públicos: HECHA (2026-06-26).** `comprehensive-free-domains.ts` (server-only, 4.462 dominios, willwhite/freemail MIT) + regen tool `scripts/growth/regenerate-free-email-domains.mjs`. La autoridad server (orquestador) la consulta además de la lista corta browser-safe → cubre el long-tail ("etc y similares"). Verificado live en staging. Follow-up: cron de refresh del regen tool (hoy es manual).
+- **Lista de DESECHABLES comprensiva (88k) — diferida a propósito.** La lista comunitaria de temporales (88.173 dominios, agresiva/autogenerada) NO se vendorizó: riesgo de falso positivo bloqueando un prospecto enterprise real (peor error para Efeonce que dejar pasar un temporal). Si se quiere subir cobertura de desechables, evaluar una fuente curada de menor FP o el provider Tier 2. Hoy se cubren los desechables conocidos (baseline).
 - Lead scoring / enriquecimiento de compañía desde el dominio del email.
 
 ## Open Questions
