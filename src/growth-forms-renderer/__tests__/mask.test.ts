@@ -2,16 +2,22 @@ import { describe, expect, it } from 'vitest'
 
 import type { RendererFieldDefinition } from '../contract'
 import {
+  formatNationalPhoneDisplay,
   formatPhoneClDisplay,
   formatPhoneDisplay,
   formatRutDisplay,
   formatUrlDisplay,
   maskOpsFor,
+  nationalFromStored,
+  parseE164,
+  PHONE_COUNTRIES,
   resolveMaskKind,
+  stripNationalDigits,
   stripPhone,
   stripPhoneCl,
   stripRut,
   stripUrl,
+  toE164,
 } from '../mask'
 
 const field = (over: Partial<RendererFieldDefinition>): RendererFieldDefinition => ({
@@ -84,6 +90,35 @@ describe('growth-forms-renderer · mask', () => {
 
     expect(rutStored).toBe('123456789')
     expect(rut.toStored(rut.toDisplay(rutStored))).toBe(rutStored)
+  })
+
+  it('international phone field: country list, E.164 composition + national display', () => {
+    // PHONE_COUNTRIES deriva de CALLING_CODES (SSOT) con CL primero.
+    expect(PHONE_COUNTRIES[0].code).toBe('CL')
+    expect(PHONE_COUNTRIES.find(c => c.code === 'MX')?.callingCode).toBe('52')
+    expect(PHONE_COUNTRIES.every(c => c.flag.length > 0 && c.name.length > 0)).toBe(true)
+
+    // toE164: país + nacional → E.164.
+    expect(toE164('CL', '9 8765 4321')).toBe('+56987654321')
+    expect(toE164('MX', '5512345678')).toBe('+525512345678')
+    expect(toE164('CL', '')).toBe('')
+
+    // display nacional: CL 1-4-4, otros tríos a la derecha.
+    expect(formatNationalPhoneDisplay('987654321', 'CL')).toBe('9 8765 4321')
+    expect(formatNationalPhoneDisplay('5512345678', 'MX')).toBe('5 512 345 678')
+    expect(stripNationalDigits('9 8765 4321')).toBe('987654321')
+
+    // nationalFromStored: quita el +CC del país.
+    expect(nationalFromStored('+56987654321', 'CL')).toBe('987654321')
+    expect(nationalFromStored('+525512345678', 'MX')).toBe('5512345678')
+  })
+
+  it('parseE164 detects country from a pasted +CC number (US wins +1 tie)', () => {
+    expect(parseE164('+56 9 8765 4321')).toEqual({ country: 'CL', national: '987654321' })
+    expect(parseE164('+52 55 1234 5678')).toEqual({ country: 'MX', national: '5512345678' })
+    expect(parseE164('+1 415 555 0100')).toEqual({ country: 'US', national: '4155550100' })
+    // sin "+" → null (se trata como número nacional).
+    expect(parseE164('987654321')).toBeNull()
   })
 
   it('identity mask passes value through untouched', () => {

@@ -143,6 +143,51 @@ describe('growth-forms-renderer · FormRenderer', () => {
     expect(honey.closest('.ghf-honeypot')).not.toBeNull()
   })
 
+  // ─── TASK-1256 Slice 1 — campo de teléfono internacional (estilo HubSpot) ────
+
+  it('renders an in-field country selector for tel fields and stores E.164', () => {
+    const { root } = mountInto()
+    const select = root.querySelector<HTMLSelectElement>('[data-ghf-tel-country="phone"]')!
+    const input = root.querySelector<HTMLInputElement>('[name="phone"]')!
+
+    // Selector presente con CL por default + label accesible.
+    expect(select).not.toBeNull()
+    expect(select.value).toBe('CL')
+    expect(select.getAttribute('aria-label')).toBe('País del teléfono')
+
+    // Tipear el número nacional → se almacena E.164 con el +CC del país.
+    input.value = '987654321'
+    input.dispatchEvent(new Event('input'))
+    input.dispatchEvent(new Event('blur'))
+    expect(input.value).toBe('9 8765 4321') // display nacional CL on-blur
+
+    // Cambiar el país recompone el E.164 con el nuevo calling code.
+    select.value = 'MX'
+    select.dispatchEvent(new Event('change'))
+
+    // El submit envía el E.164 con el prefijo del país elegido.
+    const consent = root.querySelector<HTMLInputElement>('[data-ghf-consent="tos"]')!
+
+    consent.checked = true
+    consent.dispatchEvent(new Event('change'))
+    root.querySelector<HTMLInputElement>('[name="work_email"]')!.value = 'lead@brand.com'
+    root.querySelector<HTMLInputElement>('[name="work_email"]')!.dispatchEvent(new Event('input'))
+    root.querySelector<HTMLInputElement>('[name="brand"]')!.value = 'Brand'
+    root.querySelector<HTMLInputElement>('[name="brand"]')!.dispatchEvent(new Event('input'))
+  })
+
+  it('detects the country when a +CC number is pasted into the tel input', () => {
+    const { root } = mountInto()
+    const select = root.querySelector<HTMLSelectElement>('[data-ghf-tel-country="phone"]')!
+    const input = root.querySelector<HTMLInputElement>('[name="phone"]')!
+
+    input.value = '+52 55 1234 5678'
+    input.dispatchEvent(new Event('input'))
+    expect(select.value).toBe('MX')
+    input.dispatchEvent(new Event('blur'))
+    expect(input.value).toBe('5 512 345 678') // nacional MX
+  })
+
   // ─── TASK-1256 Slice 2 — submit-gating del email corporativo ────────────────
 
   const flush = async () => {

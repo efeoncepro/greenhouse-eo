@@ -16,7 +16,15 @@ import type {
   RendererStep,
 } from './contract'
 import { isFieldRequired, isFieldVisible, type FieldValues } from './conditions'
-import { maskOpsFor } from './mask'
+import {
+  formatNationalPhoneDisplay,
+  maskOpsFor,
+  nationalFromStored,
+  parseE164,
+  PHONE_COUNTRIES,
+  stripNationalDigits,
+  toE164,
+} from './mask'
 import { resolveSystemCopy, type RendererSystemCopy } from './copy'
 import { validateField, validateFields, type FieldErrors } from './validation'
 import { createTelemetryEmitter, type TelemetryEmitter, type TelemetryPayload } from './telemetry'
@@ -86,6 +94,9 @@ export class FormRenderer {
   /** Endpoint OFF (404 `disabled`) → degradación honesta: dejar de llamar. */
   private emailVerifyDisabled = false
   private static readonly EMAIL_VERIFY_DEBOUNCE_MS = 450
+
+  /** País seleccionado por campo de teléfono (selector in-field estilo HubSpot). */
+  private readonly telCountry = new Map<string, string>()
 
   constructor(private readonly opts: FormRendererOptions) {
     this.doc = opts.doc ?? document
@@ -330,8 +341,11 @@ export class FormRenderer {
         return cb
       }
 
+      case 'tel':
+        return this.renderTelControl(field, common)
+
       default: {
-        const inputType = field.type === 'number' ? 'number' : field.type === 'date' ? 'date' : field.type === 'email' ? 'email' : field.type === 'url' ? 'url' : field.type === 'tel' ? 'tel' : 'text'
+        const inputType = field.type === 'number' ? 'number' : field.type === 'date' ? 'date' : field.type === 'email' ? 'email' : field.type === 'url' ? 'url' : 'text'
         const input = el(this.doc, 'input', { ...common, type: inputType, class: 'ghf-input' })
 
         if (field.maxLength) input.setAttribute('maxlength', String(field.maxLength))
@@ -342,6 +356,87 @@ export class FormRenderer {
         return input
       }
     }
+  }
+
+  /**
+   * Campo de teléfono internacional (estilo HubSpot): selector de país in-field
+   * (bandera + calling code) + input nacional. El valor almacenado/enviado es E.164
+   * (`+CC<nacional>`); el server valida. Pegar un `+CC…` detecta el país. Formateo
+   * on-blur (robusto: sin saltos de cursor / IME). a11y: `<select>` nativo etiquetado.
+   */
+  private renderTelControl(field: RendererFieldDefinition, common: Record<string, string>): HTMLElement {
+    const initialCountry = (this.telCountry.get(field.key) ?? field.validatorParams?.country ?? 'CL').toUpperCase()
+
+    this.telCountry.set(field.key, initialCountry)
+
+    const wrapper = el(this.doc, 'div', { class: 'ghf-tel' })
+
+    const select = el(this.doc, 'select', { class: 'ghf-tel-country', 'aria-label': this.copy.phoneCountryAria })
+
+    select.dataset.ghfTelCountry = field.key
+
+    for (const country of PHONE_COUNTRIES) {
+      const option = el(this.doc, 'option', { value: country.code }, `${country.flag} +${country.callingCode}`)
+
+      option.title = country.name
+      if (country.code === initialCountry) option.setAttribute('selected', 'selected')
+      select.appendChild(option)
+    }
+
+    const input = el(this.doc, 'input', { ...common, type: 'tel', class: 'ghf-input ghf-tel-input' })
+
+    if (field.placeholder) input.setAttribute('placeholder', field.placeholder)
+    const national = nationalFromStored(this.fieldStr(field.key), initialCountry)
+
+    input.value = national ? formatNationalPhoneDisplay(national, initialCountry) : ''
+
+    const recompute = (countryOverride?: string) => {
+      const country = (countryOverride ?? this.telCountry.get(field.key) ?? initialCountry).toUpperCase()
+      const digits = stripNationalDigits(input.value)
+
+      this.values[field.key] = toE164(country, digits)
+    }
+
+    select.addEventListener('change', () => {
+      const next = select.value.toUpperCase()
+
+      this.telCountry.set(field.key, next)
+      const digits = stripNationalDigits(input.value)
+
+      input.value = digits ? formatNationalPhoneDisplay(digits, next) : ''
+      recompute(next)
+      this.onValueChange(field)
+    })
+
+    input.addEventListener('input', () => {
+      // Pegado de un número con +CC → detectar país y reflejarlo en el selector.
+      const parsed = parseE164(input.value)
+
+      if (parsed) {
+        this.telCountry.set(field.key, parsed.country)
+        select.value = parsed.country
+        input.value = parsed.national
+      }
+
+      recompute()
+      this.maybeStart()
+      if (this.errors[field.key]) this.revalidateField(field)
+    })
+
+    input.addEventListener('blur', () => {
+      this.touched.add(field.key)
+      const country = this.telCountry.get(field.key) ?? initialCountry
+      const digits = stripNationalDigits(input.value)
+
+      if (digits) input.value = formatNationalPhoneDisplay(digits, country)
+      recompute(country)
+      this.revalidateField(field)
+    })
+
+    wrapper.appendChild(select)
+    wrapper.appendChild(input)
+
+    return wrapper
   }
 
   /** Cablea inputs de texto con máscara forgiving + timing 3-stage. */

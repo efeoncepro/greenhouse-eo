@@ -28,6 +28,8 @@ export interface RendererSystemCopy {
   emailVerifying: string
   /** Affordance typo-suggest: "¿Quisiste decir nombre@empresa.com?". */
   emailSuggestion: (suggested: string) => string
+  /** aria-label del selector de país del teléfono internacional. */
+  phoneCountryAria: string
   stepProgress: (current: number, total: number) => string
   stepNext: string
   stepBack: string
@@ -61,6 +63,7 @@ const esCL: RendererSystemCopy = {
   successFallback: 'Recibimos tu información. Gracias.',
   emailVerifying: 'Verificando correo…',
   emailSuggestion: suggested => `¿Quisiste decir ${suggested}?`,
+  phoneCountryAria: 'País del teléfono',
   stepProgress: (current, total) => `Paso ${current} de ${total}`,
   stepNext: 'Continuar',
   stepBack: 'Atrás',
@@ -107,6 +110,7 @@ const enUS: RendererSystemCopy = {
   successFallback: 'We received your information. Thank you.',
   emailVerifying: 'Checking email…',
   emailSuggestion: suggested => `Did you mean ${suggested}?`,
+  phoneCountryAria: 'Phone country',
   stepProgress: (current, total) => `Step ${current} of ${total}`,
   stepNext: 'Continue',
   stepBack: 'Back',

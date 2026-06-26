@@ -101,6 +101,7 @@ export const RENDERER_CSS = `
   .ghf-input:focus-visible,
   .ghf-textarea:focus-visible,
   .ghf-select:focus-visible,
+  .ghf-tel-country:focus-visible,
   .ghf-check input:focus-visible,
   .ghf-btn:focus-visible {
     outline: 2px solid var(--ghf-focus);
@@ -133,6 +134,17 @@ export const RENDERER_CSS = `
     text-decoration: underline; cursor: pointer; min-height: 24px;
   }
   .ghf-verify-suggest:hover { color: var(--ghf-border-strong); }
+
+  /* TASK-1256 — teléfono internacional: selector de país + input nacional. */
+  .ghf-tel { display: flex; align-items: stretch; gap: 8px; min-width: 0; }
+  .ghf-tel-country {
+    font: inherit; color: var(--ghf-fg); background: var(--ghf-field-bg);
+    border: 1px solid var(--ghf-border); border-radius: var(--ghf-radius);
+    padding: 10px 8px; min-height: 44px; flex: 0 0 auto; max-width: 9.5rem; cursor: pointer;
+  }
+  .ghf-tel-country:hover { border-color: var(--ghf-border-strong); }
+  .ghf-tel-input { flex: 1 1 auto; min-width: 0; }
+  .ghf-field[data-invalid="true"] .ghf-tel-country { border-color: var(--ghf-error); }
 
   .ghf-check { display: flex; align-items: flex-start; gap: 10px; cursor: pointer; }
   .ghf-check input { width: 24px; height: 24px; flex: 0 0 auto; accent-color: var(--ghf-accent); }

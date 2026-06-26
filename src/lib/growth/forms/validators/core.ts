@@ -84,12 +84,22 @@ const ISO_DATE_RE = /^\d{4}-\d{2}-\d{2}$/
 export const CALLING_CODES: Record<string, string> = {
   CL: '56',
   AR: '54',
+  BO: '591',
   BR: '55',
+  CA: '1',
   CO: '57',
+  CR: '506',
+  EC: '593',
+  ES: '34',
+  GB: '44',
+  GT: '502',
   MX: '52',
+  PA: '507',
   PE: '51',
-  UY: '598',
+  PY: '595',
   US: '1',
+  UY: '598',
+  VE: '58',
 }
 
 const asString = (value: unknown): string => {
