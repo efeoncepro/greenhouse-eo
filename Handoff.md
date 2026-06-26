@@ -8,6 +8,17 @@
 > - **Resolución:** recuperó solo (o por re-auth del lado Vercel justo al probar). Prueba: push fresco `e03bc9485` → check **`Vercel success`** + deploy `8dxmookx0` **Ready** (staging). Auto-deploy end-to-end confirmado 2×.
 > - **Residual:** quedó un commit vacío de prueba `e03bc9485` en `develop` (inofensivo, solo disparó el deploy). Si recurre: chequear "0 checks de Vercel en el commit" → es Vercel/plataforma, no el repo; unblock = `vercel deploy` manual + revisar Vercel Team → Billing/Members por si es pausa de spend/seat.
 
+## Sesión 2026-06-26 — TASK-1261 Growth Forms · 1ª migración comercial real (HubSpot "Lead Gen - Web") + flip 1253 — Claude
+
+> **Estado: form publicado + shadow verde + flag 1253 ON en staging (verificado live). Pendiente: cutover (prod flip + swap embed = TASK-1258).** Local-first, pusheado a develop.
+> - **Origen:** el operador quería recrear el form de `/diseno-de-sitios-web/` para tener un form real con que prender la validación server-side (TASK-1253). Resultó ser un form HubSpot → lo recreé como Growth Form gobernado de Greenhouse = primer paso real de la migración HubSpot→Greenhouse (TASK-1258), eligiendo el operador "Opción B" (destino HubSpot real).
+> - **Fidelidad desde HubSpot Forms API** (no del screenshot): form "Lead Gen - Web" `de4593c3` → 10 campos + textos de ayuda + consent + opciones de selects exactos. Seed durable (migración, ids estables patrón grader): definition + version published + host_surface + destination HubSpot seguro (`fieldMapping`→property names, `delivery_mode='disabled'` para no ensuciar el CRM durante el shadow).
+> - **Skills invocadas (arch-architect + forms-ux)** destaparon 2 cosas reales: helper text vía `copy_refs_json.copy['<key>.help']` (el `FieldDefinition` no tiene campo description); `consent_policy_version` es bloqueante para publicar.
+> - **Shadow de 1253 (batería real+borde) → 0 falsos rechazos**; normaliza +56/email/url, rechaza basura. Flip de `GROWTH_FORMS_SERVER_VALIDATION_ENABLED` a ON en staging + **verificación LIVE contra el deploy** (email malo→400 invalid; buena→202 accepted + normalizada en `normalized_fields_json`). Captcha staging usa llaves de test Turnstile (token dummy pasa).
+> - **Colisión de id:** existía TASK-1260 (tracking-engine); renumeré lo mío a **TASK-1261** (archivo + migración + entrada pgmigrations dev consistente; task:lint template=1).
+> - **⚠️ Orphan ajeno sin commitear:** `TASK-1258`/`TASK-1259` modificados + `TASK-1260-tracking` nuevo (regla "leadin read-only", probablemente Codex) quedaron en el working tree. **NO los toqué ni commiteé** — son de otro dueño. Decidir commitear/stashear.
+> - **Pendiente (cutover, fuera de scope 1261):** flip prod del flag, `delivery_mode='direct'`, swap del embed en WordPress en vivo (= TASK-1258 apply, coordinado). Test submission `ShadowLive` quedó en staging PG (delivery disabled → sin HubSpot).
+
 ## Sesión 2026-06-26 — TASK-1244 Growth AI Visibility · Admin Evidence Review (gate humano YMYL) — Claude
 
 > **Estado: COMPLETE (code complete, rollout pendiente · gated EPIC-020).** EPIC-020 F. La pieza que **desbloquea** un `review_required` (hoy atascado en `in_review` por el finalizer de TASK-1245) o lo cierra. Movido a `complete/`. Local-first, sin push.

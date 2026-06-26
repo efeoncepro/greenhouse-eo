@@ -150,7 +150,7 @@ El form se siembra con ids estables (`fdef-efeonce-lead-gen-web` / `fver-efeonce
 - [x] Destino HubSpot seguro cableado (GUID real + fieldMapping + consentText), `delivery_mode='disabled'` para el shadow.
 - [x] Render contract verificado completo contra PG real.
 - [x] Shadow de TASK-1253: 0 falsos rechazos (normaliza phone/email/url, rechaza solo basura).
-- [ ] Flip de `GROWTH_FORMS_SERVER_VALIDATION_ENABLED` en staging (sign-off del operador).
+- [x] Flip de `GROWTH_FORMS_SERVER_VALIDATION_ENABLED` en staging (2026-06-26) + **verificación live contra el deploy**: email malo → `400 invalid`; submission buena → `202 accepted` + normalizada en `form_submission.normalized_fields_json` (`+56 9 8765 4321`→`+56987654321`, mayúsc.→minúsc., `empresa.cl`→`https://empresa.cl`). Sin delivery a HubSpot (`disabled`).
 
 ## Verification
 
