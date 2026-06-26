@@ -225,6 +225,17 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
       scope: 'tenant',
       source
     })
+
+    // TASK-1244 — report.review: gate humano de release YMYL (aprobar/rechazar +
+    // ver la cola de `review_required`). Mismo set interno que report.publish: el
+    // reviewer del lead magnet debe ser ≥ privilegiado que quien publica el snapshot.
+    addEntitlement(entries, {
+      module: 'growth',
+      capability: 'growth.ai_visibility.report.review',
+      action: 'execute',
+      scope: 'tenant',
+      source
+    })
   }
 
   // TASK-1229 — Growth Forms engine. Operación interna del motor de formularios

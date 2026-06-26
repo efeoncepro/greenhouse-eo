@@ -10,7 +10,7 @@ TASK-1245 dejó cableado el lado público de los runs `review_required`: el fina
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`

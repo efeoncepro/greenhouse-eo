@@ -1951,6 +1951,17 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     actions: ['execute'] as const,
     defaultScope: 'tenant'
   },
+  // TASK-1244 — report.review: gate humano de release YMYL. Aprobar/rechazar (+ ver la
+  // cola) un reporte `review_required` ANTES de publicarlo al público. Acción canónica
+  // `execute` (verbo de gobernanza; el LLM nunca aprueba — propose→confirm→execute). El
+  // reviewer debe ser ≥ privilegiado que el publisher (report.publish): mismo set interno.
+  // Grant en runtime.ts mismo PR.
+  {
+    key: 'growth.ai_visibility.report.review',
+    module: 'growth',
+    actions: ['execute'] as const,
+    defaultScope: 'tenant'
+  },
   // TASK-1229 — Growth Forms engine (dominio growth.forms). 8 capabilities gobernadas
   // (Full API Parity): cada acción de negocio nace como command/reader, no como botón.
   // Grant en runtime.ts (internal ∪ EFEONCE_ADMIN ∪ EFEONCE_ACCOUNT ∪ EFEONCE_OPERATIONS)

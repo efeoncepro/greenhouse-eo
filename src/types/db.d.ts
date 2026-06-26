@@ -6602,6 +6602,16 @@ export interface GreenhouseGrowthGraderProfiles {
   website_url: string | null;
 }
 
+export interface GreenhouseGrowthGraderReportReviews {
+  created_at: Generated<Timestamp>;
+  decision: string;
+  reason: string | null;
+  review_id: Generated<string>;
+  reviewed_by_user_id: string;
+  run_id: string;
+  score_version: string;
+}
+
 export interface GreenhouseGrowthGraderReports {
   as_of: Generated<Timestamp>;
   audience: Generated<string>;
@@ -10856,6 +10866,7 @@ export interface DB {
   "greenhouse_growth.grader_intake_events": GreenhouseGrowthGraderIntakeEvents;
   "greenhouse_growth.grader_leads": GreenhouseGrowthGraderLeads;
   "greenhouse_growth.grader_profiles": GreenhouseGrowthGraderProfiles;
+  "greenhouse_growth.grader_report_reviews": GreenhouseGrowthGraderReportReviews;
   "greenhouse_growth.grader_reports": GreenhouseGrowthGraderReports;
   "greenhouse_growth.grader_runs": GreenhouseGrowthGraderRuns;
   "greenhouse_growth.grader_scores": GreenhouseGrowthGraderScores;
