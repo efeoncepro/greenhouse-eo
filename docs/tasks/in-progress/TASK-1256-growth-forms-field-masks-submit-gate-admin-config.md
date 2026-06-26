@@ -10,7 +10,7 @@ El submit-gating de email que esta task expone en UI ya tiene su backend goberna
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -310,4 +310,4 @@ El renderer es portable y ya tiene `mask.ts`; se extiende, no se reemplaza. El s
 
 ## Open Questions
 
-- Path real del builder/cockpit admin de forms (¿lo crea TASK-1232 o esta task?). Resolver con Codex en Discovery.
+- ~~Path real del builder/cockpit admin de forms (¿lo crea TASK-1232 o esta task?). Resolver con Codex en Discovery.~~ **Resuelto 2026-06-26 (Discovery):** TASK-1232 está **complete** y owns el cockpit base en `src/views/greenhouse/admin/growth/forms/GrowthFormsAdminCockpitView.tsx` (page `src/app/(dashboard)/admin/growth/forms/page.tsx`, viewCode `administracion.growth_forms`). Esta task **extiende ese cockpit aditivamente** (Slice 4 = masking PII + reveal en el sidecar de evidencia; Slice 3 = builder de validadores por campo), NO lo reescribe — alineado con "no rediseñar el cockpit base". El builder de validadores (Slice 3) nace como sub-superficie del cockpit existente (sidecar `composer`/inspector), persistiendo `validation_schema_json` declarativo vía el command de form-definition de TASK-1232/1253.
