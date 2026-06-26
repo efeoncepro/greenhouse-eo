@@ -33,5 +33,9 @@ export default async function Page() {
 
   const data = await getGrowthFormsCockpitAdmin()
 
-  return <GrowthFormsAdminCockpitView data={data} />
+  // TASK-1256 Slice 4 — el affordance de reveal de PII se oculta sin esta capability
+  // (más restringida que el read masked; la autoridad real vive en el command server).
+  const canRevealPii = can(tenant, 'growth.forms.lead_pii.reveal', 'read', 'tenant')
+
+  return <GrowthFormsAdminCockpitView data={data} canRevealPii={canRevealPii} />
 }

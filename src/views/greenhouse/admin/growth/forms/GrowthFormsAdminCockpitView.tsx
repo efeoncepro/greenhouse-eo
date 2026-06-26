@@ -1,12 +1,17 @@
 'use client'
 
 import type { FormEvent } from 'react'
-import { useMemo, useState, useTransition } from 'react'
+import { useCallback, useEffect, useMemo, useState, useTransition } from 'react'
 
 import { useRouter } from 'next/navigation'
 
 import Alert from '@mui/material/Alert'
 import Box from '@mui/material/Box'
+import CircularProgress from '@mui/material/CircularProgress'
+import Dialog from '@mui/material/Dialog'
+import DialogActions from '@mui/material/DialogActions'
+import DialogContent from '@mui/material/DialogContent'
+import DialogTitle from '@mui/material/DialogTitle'
 import Divider from '@mui/material/Divider'
 import ButtonBase from '@mui/material/ButtonBase'
 import IconButton from '@mui/material/IconButton'
@@ -30,8 +35,10 @@ import { alpha, type SxProps, type Theme } from '@mui/material/styles'
 import { AnimatedCounter } from '@/components/greenhouse'
 import { AdaptiveSidecarLayout, CompositionShell, GreenhouseBreadcrumbs, GreenhouseButton, GreenhouseChip } from '@/components/greenhouse/primitives'
 import { Motion } from '@/components/greenhouse/motion'
+import { parseApiErrorPayload } from '@/lib/api/parse-error-response'
 import { GH_GROWTH_FORMS } from '@/lib/copy/growth-forms'
 import { formatDateTime } from '@/lib/format'
+import type { MaskedLeadField, MaskedLeadView } from '@/lib/growth/forms/pii/types'
 import type {
   GrowthFormsCockpitDestinationVm,
   GrowthFormsCockpitSubmissionVm,
@@ -778,11 +785,243 @@ const SubmissionsList = ({
   )
 }
 
-const EvidenceLedger = ({ submissions }: { submissions: GrowthFormsCockpitSubmissionVm[] }) => {
+const GH_PII = GH_GROWTH_FORMS.leadPii
+
+const MIN_REVEAL_REASON = 10
+
+type LeadPanelState = 'loading' | 'ready' | 'empty' | 'error'
+
+/**
+ * TASK-1256 Slice 4 — datos del lead con PII enmascarada por default + reveal gobernado.
+ * Consume `GET …/lead` (masked) y `POST …/reveal` (capability + reason + audit + outbox).
+ * El affordance de reveal sólo aparece con `canRevealPii`; la autoridad real vive en el
+ * command server. La UI sólo dispara, nunca descifra.
+ */
+const LeadPiiPanel = ({ submissionId, canRevealPii }: { submissionId: string; canRevealPii: boolean }) => {
+  const [state, setState] = useState<LeadPanelState>('loading')
+  const [fields, setFields] = useState<MaskedLeadField[]>([])
+  const [revealed, setRevealed] = useState<Record<string, string>>({})
+  const [dialogField, setDialogField] = useState<MaskedLeadField | null>(null)
+  const [reason, setReason] = useState('')
+  const [revealing, setRevealing] = useState(false)
+  const [revealError, setRevealError] = useState<string | null>(null)
+
+  const load = useCallback(async () => {
+    setState('loading')
+    setRevealed({})
+
+    try {
+      const response = await fetch(`/api/admin/growth/forms/submissions/${submissionId}/lead`)
+
+      if (!response.ok) {
+        setState('error')
+
+        return
+      }
+
+      const body = (await response.json()) as { lead?: MaskedLeadView }
+      const leadFields = body.lead?.fields ?? []
+
+      setFields(leadFields)
+      setState(leadFields.length === 0 ? 'empty' : 'ready')
+    } catch {
+      setState('error')
+    }
+  }, [submissionId])
+
+  useEffect(() => {
+    void load()
+  }, [load])
+
+  const openReveal = (field: MaskedLeadField) => {
+    setDialogField(field)
+    setReason('')
+    setRevealError(null)
+  }
+
+  const closeReveal = () => {
+    if (revealing) return
+    setDialogField(null)
+    setReason('')
+    setRevealError(null)
+  }
+
+  const submitReveal = async () => {
+    if (!dialogField) return
+
+    if (reason.trim().length < MIN_REVEAL_REASON) {
+      setRevealError(GH_PII.reasonHint)
+
+      return
+    }
+
+    setRevealing(true)
+    setRevealError(null)
+
+    try {
+      const response = await fetch(`/api/admin/growth/forms/submissions/${submissionId}/reveal`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ fieldKey: dialogField.key, reason: reason.trim() }),
+      })
+
+      if (!response.ok) {
+        const body = await response.json().catch(() => null)
+
+        setRevealError(parseApiErrorPayload(body, GH_PII.revealError).message)
+        setRevealing(false)
+
+        return
+      }
+
+      const result = (await response.json()) as { fieldKey: string; value: string }
+
+      setRevealed(current => ({ ...current, [result.fieldKey]: result.value }))
+      setDialogField(null)
+      setReason('')
+    } catch {
+      setRevealError(GH_PII.revealError)
+    }
+
+    setRevealing(false)
+  }
+
+  return (
+    <Box data-capture='growth-forms-lead-pii' sx={{ ...sectionSurfaceSx, p: 2 }}>
+      <Stack direction='row' alignItems='center' spacing={1} sx={{ mb: 0.5 }}>
+        <i className='tabler-shield-lock' aria-hidden='true' />
+        <Typography variant='subtitle2' sx={sectionTitleSx}>{GH_PII.sectionTitle}</Typography>
+      </Stack>
+      <Typography variant='caption' color='text.primary' sx={{ display: 'block', mb: 1.5 }}>
+        {GH_PII.sectionHint}
+      </Typography>
+
+      {state === 'loading' ? (
+        <Stack direction='row' alignItems='center' spacing={1} sx={{ py: 1 }}>
+          <CircularProgress size={16} aria-hidden='true' />
+          <Typography variant='body2' color='text.primary'>{GH_PII.loading}</Typography>
+        </Stack>
+      ) : state === 'empty' ? (
+        <EmptyInsight icon='tabler-database-off' title={GH_PII.empty} body={GH_PII.sectionHint} />
+      ) : state === 'error' ? (
+        <Alert
+          severity='warning'
+          icon={<i className='tabler-alert-triangle' />}
+          action={(
+            <GreenhouseButton size='small' variant='text' kind='custom' onClick={() => void load()}>
+              {GH_PII.retry}
+            </GreenhouseButton>
+          )}
+        >
+          {GH_PII.error}
+        </Alert>
+      ) : (
+        <Stack spacing={1}>
+          {fields.map(field => {
+            const revealedValue = revealed[field.key]
+
+            return (
+              <Box
+                key={field.key}
+                sx={theme => ({
+                  border: `1px solid ${theme.palette.divider}`,
+                  borderRadius: `${theme.shape.customBorderRadius.sm}px`,
+                  p: 1.5,
+                  display: 'grid',
+                  gap: 0.5,
+                  minWidth: 0,
+                })}
+              >
+                <Stack direction='row' alignItems='center' justifyContent='space-between' spacing={1}>
+                  <Typography variant='caption' color='text.primary' sx={{ textTransform: 'uppercase', letterSpacing: 0.4 }}>
+                    {field.label ?? field.key}
+                  </Typography>
+                  {field.isRevealable ? (
+                    <GreenhouseChip
+                      kind='status'
+                      size='small'
+                      variant='label'
+                      tone={revealedValue ? 'success' : 'default'}
+                      iconClassName={revealedValue ? 'tabler-lock-open' : 'tabler-lock'}
+                      label={revealedValue ? GH_PII.revealedBadge : GH_PII.maskedBadge}
+                    />
+                  ) : null}
+                </Stack>
+                <Stack direction='row' alignItems='center' justifyContent='space-between' spacing={1} sx={{ minWidth: 0 }}>
+                  <Typography variant='monoId' color='text.primary' sx={{ overflowWrap: 'anywhere', minWidth: 0 }}>
+                    {revealedValue ?? field.maskedValue ?? '—'}
+                  </Typography>
+                  {field.isRevealable && !revealedValue && canRevealPii ? (
+                    <GreenhouseButton
+                      size='small'
+                      variant='outlined'
+                      kind='custom'
+                      leadingIconClassName='tabler-eye'
+                      onClick={() => openReveal(field)}
+                    >
+                      {GH_PII.revealCta}
+                    </GreenhouseButton>
+                  ) : null}
+                </Stack>
+              </Box>
+            )
+          })}
+          {!canRevealPii && fields.some(field => field.isRevealable) ? (
+            <Typography variant='caption' color='text.primary'>{GH_PII.noCapabilityHint}</Typography>
+          ) : null}
+        </Stack>
+      )}
+
+      <Dialog open={Boolean(dialogField)} onClose={closeReveal} maxWidth='xs' fullWidth>
+        <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <i className='tabler-shield-lock' aria-hidden='true' />
+          {GH_PII.dialogTitle}
+        </DialogTitle>
+        <DialogContent>
+          <Alert severity='info' icon={<i className='tabler-info-circle' />} sx={{ mb: 2 }}>
+            {GH_PII.dialogNotice}
+          </Alert>
+          <TextField
+            label={GH_PII.reasonLabel}
+            placeholder={GH_PII.reasonPlaceholder}
+            helperText={revealError ?? GH_PII.reasonHint}
+            error={Boolean(revealError)}
+            value={reason}
+            onChange={event => setReason(event.target.value)}
+            multiline
+            minRows={2}
+            fullWidth
+            autoFocus
+            disabled={revealing}
+          />
+        </DialogContent>
+        <DialogActions>
+          <GreenhouseButton variant='outlined' kind='custom' onClick={closeReveal} disabled={revealing}>
+            {GH_PII.cancel}
+          </GreenhouseButton>
+          <GreenhouseButton
+            variant='solid'
+            tone='primary'
+            kind='custom'
+            leadingIconClassName='tabler-eye'
+            onClick={() => void submitReveal()}
+            disabled={revealing}
+          >
+            {revealing ? GH_PII.revealing : GH_PII.confirmReveal}
+          </GreenhouseButton>
+        </DialogActions>
+      </Dialog>
+    </Box>
+  )
+}
+
+const EvidenceLedger = ({ submissions, canRevealPii }: { submissions: GrowthFormsCockpitSubmissionVm[]; canRevealPii: boolean }) => {
   const attempts = submissions.flatMap(submission => submission.attempts.map(attempt => ({ ...attempt, submission }))).slice(0, 12)
 
   return (
     <Stack spacing={2}>
+      {submissions[0] ? <LeadPiiPanel submissionId={submissions[0].submissionId} canRevealPii={canRevealPii} /> : null}
+
       {submissions[0]?.consent ? (
         <Box sx={{ ...sectionSurfaceSx, p: 2 }}>
           <Typography variant='subtitle2' gutterBottom sx={sectionTitleSx}>
@@ -951,7 +1190,7 @@ const Composer = ({
   )
 }
 
-const GrowthFormsAdminCockpitView = ({ data }: { data: GrowthFormsCockpitVm }) => {
+const GrowthFormsAdminCockpitView = ({ data, canRevealPii }: { data: GrowthFormsCockpitVm; canRevealPii: boolean }) => {
   const router = useRouter()
   const [selectedId, setSelectedId] = useState(data.forms[0]?.formId ?? null)
   const [sidecarMode, setSidecarMode] = useState<SidecarMode>('inspector')
@@ -1328,7 +1567,7 @@ const GrowthFormsAdminCockpitView = ({ data }: { data: GrowthFormsCockpitVm }) =
       <Box sx={{ ...sectionSurfaceSx, p: 2 }}>
         <Stack direction='row' alignItems='center' justifyContent='space-between' spacing={1} sx={{ mb: 1.5 }}>
           <Typography variant='subtitle2' sx={sectionTitleSx}>{GH_GROWTH_FORMS.sections.recentSubmissions}</Typography>
-          <GreenhouseButton size='small' variant='text' kind='custom' onClick={() => setSidecarMode('evidence')}>
+          <GreenhouseButton size='small' variant='text' kind='custom' dataCapture='growth-forms-open-evidence' onClick={() => setSidecarMode('evidence')}>
             {GH_GROWTH_FORMS.actions.openEvidence}
           </GreenhouseButton>
         </Stack>
@@ -1502,7 +1741,7 @@ const GrowthFormsAdminCockpitView = ({ data }: { data: GrowthFormsCockpitVm }) =
       {sidecarMode === 'composer' ? (
         <Composer onCancel={() => setSidecarMode('inspector')} onSubmit={createDraft} pending={isPending} />
       ) : sidecarMode === 'evidence' ? (
-        <EvidenceLedger submissions={selectedSubmissions} />
+        <EvidenceLedger submissions={selectedSubmissions} canRevealPii={canRevealPii} />
       ) : (
         inspector
       )}
