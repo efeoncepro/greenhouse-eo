@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 
 import { verifyEmail } from '@/lib/growth/forms/email-verification'
 import { allowVerifyRequest } from '@/lib/growth/forms/email-verification/rate-limit'
-import { isFormsEmailVerificationEnabled } from '@/lib/growth/forms/flags'
+import { isFormsEmailVerificationEnabled, isFormsPublicApiEnabled } from '@/lib/growth/forms/flags'
 import { captureWithDomain } from '@/lib/observability/capture'
 
 /**
@@ -11,8 +11,9 @@ import { captureWithDomain } from '@/lib/observability/capture'
  * Endpoint público debounced que el cliente consume para habilitar/deshabilitar el submit
  * (UX). El cliente NUNCA llama al provider: el secreto vive server-only y solo este endpoint
  * (o `submitForm`) lo orquesta. La AUTORIDAD del gate es `submitForm` (re-verifica). Devuelve
- * un veredicto sanitizado (NUNCA el payload crudo del provider). Gateado por
- * `GROWTH_FORMS_EMAIL_VERIFICATION_ENABLED` (default OFF → 404). Rate-limit best-effort por IP.
+ * un veredicto sanitizado (NUNCA el payload crudo del provider). Gateado por el master switch
+ * `GROWTH_FORMS_PUBLIC_API_ENABLED` **Y** `GROWTH_FORMS_EMAIL_VERIFICATION_ENABLED` (default OFF
+ * → 404): no se expone independiente de la superficie pública de forms. Rate-limit por IP.
  */
 export const dynamic = 'force-dynamic'
 
@@ -22,7 +23,7 @@ const getClientIp = (request: Request): string | null =>
 export async function POST(_request: Request, { params }: { params: Promise<{ formSlug: string }> }) {
   await params // formSlug no se usa para verificar (la verificación es por email), pero mantiene la ruta consistente.
 
-  if (!isFormsEmailVerificationEnabled()) {
+  if (!isFormsPublicApiEnabled() || !isFormsEmailVerificationEnabled()) {
     return NextResponse.json({ outcome: 'disabled', message: 'No disponible.' }, { status: 404 })
   }
 
