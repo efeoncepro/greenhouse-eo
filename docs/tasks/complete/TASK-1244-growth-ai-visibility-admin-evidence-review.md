@@ -293,10 +293,10 @@ El control de release es un state-machine + CHECK + audit (patrón canónico). L
 - Migración aplicada+verificada en dev PG (474 tablas, types regen). CHECK (reject sin reason, decision inválido) y append-only (UPDATE/DELETE bloqueados en 2 capas: GRANT + trigger) **ejercitados live**.
 - SQL embebida (CTE de la cola + subquery del signal + date-math `INTERVAL '24 hours'`) validada contra PG real (gate TASK-893).
 - 16 tests nuevos (7 state machine + 4 publish-gate + 7 commands + 1 signal). Full suite **8092 passed** + `pnpm build` exit 0 + `local:check` (lint+tsc) verdes.
+- **Dry-run end-to-end contra PG real (DEV, datos sembrados vía writers canónicos)** — runs `grun-b7de2c48-…` (approve) + `grun-29c8657d-…` (reject), marca `__dryrun_1244_*`. Verificado el contrato completo: (1) pre-aprobación `publishGraderReportSnapshot` rechaza con `not_releasable` (el gate honra el estado); (2) la cola contiene el run pre-decisión; (3) `approveAiVisibilityReport` → `approved` + token `grt-…` + `public_delivery_state='ready'` + 1 fila en `grader_reports` + reporte servible por `readPublicGraderReport(token)` + el run sale de la cola; (4) re-aprobar es idempotente (token estable); (5) `rejectAiVisibilityReport` → `rejected` + `unavailable` + 0 snapshots + fuera de la cola; (6) anti-flip `rejected→approve` bloqueado (`invalid_transition`). **El acceptance criterion "aprobar un `review_required` real → publish funciona" queda verificado a nivel runtime** (con datos sembrados; un `review_required` producido por el pipeline público real requiere staging, gated EPIC-020).
 
-**Rollout pendiente (NO operativamente completo):**
+**Estado: backend operativamente verificado en dev; pendientes fuera del scope de 1244:**
 
-- **Dry-run aprobar→publish sobre un `review_required` real:** no ejecutable en dev (los flags de providers están OFF → no se produce un `review_required` real). Pendiente en **staging** con worker activo + flag ON (gated por EPIC-020).
-- **UI admin de revisión:** TASK-1247 (desbloqueada por esta task; cliente puro de los endpoints).
-- **Grant a roles operativos** más allá del set interno actual = decisión de cutover (EPIC-020 H / TASK-1246).
-- Artefacto de test en dev: una fila `approved` con `score_version='__inv_test__'` quedó en `grader_report_reviews` (append-only, no borrable sin disable trigger; inofensiva — versión bogus que ningún reader real matchea).
+- **UI admin de revisión:** TASK-1247 (desbloqueada por esta task; cliente puro de los endpoints — no es parte de 1244).
+- **Staging smoke con un `review_required` producido por el pipeline público real** + **grant a roles operativos de cutover:** gated por EPIC-020 H / TASK-1246 (el intake público está flag OFF en prod; el dominio entero se prende en el launch readiness).
+- Artefactos append-only en dev (no borrables sin disable trigger; inofensivos — marca/versión sintética que ningún reader real matchea): fila `approved` `score_version='__inv_test__'` (invariant check) + las decisiones/snapshot de los 2 runs `__dryrun_1244_*`.
