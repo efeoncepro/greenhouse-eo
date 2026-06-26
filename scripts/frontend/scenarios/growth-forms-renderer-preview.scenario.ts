@@ -1,12 +1,17 @@
-// TASK-1231 — Growth Forms portable renderer preview (verificación interna GVC).
+// TASK-1231 / TASK-1256 — Growth Forms portable renderer preview (verificación interna GVC).
 // El mismo core Web Component que WordPress/Astro renderizan en producción, montado
-// desde fixtures del render_contract bajo el Design System.
+// desde fixtures del render_contract bajo el Design System. TASK-1256 agrega la
+// secuencia "Integridad": máscaras por país + submit-gating del email corporativo.
 
 import type { CaptureScenario } from '../lib/scenario'
 
 export const scenario: CaptureScenario = {
   name: 'growth-forms-renderer-preview',
   route: '/design-system/growth-forms-renderer',
+  // fill/press son seguros: el preview usa un `fetch` simulado (offline) que nunca
+  // toca el API real ni persiste nada — solo ejercita máscaras + gate en el cliente.
+  mutating: true,
+  safeForCapture: true,
   viewport: { width: 1280, height: 900 },
   viewports: [
     { name: 'desktop', width: 1280, height: 900 },
@@ -34,6 +39,34 @@ export const scenario: CaptureScenario = {
       label: 'growth-forms-renderer-default',
       clipSelector: '[data-capture="growth-forms-renderer-canvas"]',
       note: 'Formulario interactivo (estado default)'
+    },
+    // TASK-1256 — fixture "Integridad": máscaras por país + gate corporativo.
+    {
+      kind: 'click',
+      selector: 'button:has-text("Integridad")',
+      note: 'Cambia a la composición de integridad de datos'
+    },
+    { kind: 'sleep', ms: 600, note: 'Re-monta el renderer con el fixture Integridad' },
+    {
+      kind: 'fill',
+      selector: '[name="phone"]',
+      value: '987654321',
+      note: 'Teléfono sin formato — la máscara CL lo formatea al salir'
+    },
+    { kind: 'press', key: 'Tab', note: 'Blur del teléfono → aplica máscara +56 9 …' },
+    {
+      kind: 'fill',
+      selector: '[name="work_email"]',
+      value: 'ana@gmail.com',
+      note: 'Correo personal en un campo corporate_email → debe gatear'
+    },
+    { kind: 'press', key: 'Tab', note: 'Blur del correo → dispara verificación + gate' },
+    { kind: 'sleep', ms: 900, note: 'Roundtrip de /verify-email (simulado en el preview)' },
+    {
+      kind: 'mark',
+      label: 'growth-forms-renderer-integrity-gate',
+      clipSelector: '[data-capture="growth-forms-renderer-canvas"]',
+      note: 'Máscara de teléfono aplicada + gate corporativo + typo-suggest'
     },
     {
       kind: 'mark',
