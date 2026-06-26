@@ -87,6 +87,7 @@ export const dataIntegrityContractFixture = (): RenderContract =>
       },
       { key: 'national_id', type: 'national_id', label: 'RUT', validatorParams: { country: 'CL' } },
       { key: 'website', type: 'url', label: 'Sitio web', inputMode: 'url' },
+      { key: 'message', type: 'textarea', label: 'Cuéntanos tu objetivo', maxLength: 300 },
     ],
   })
 

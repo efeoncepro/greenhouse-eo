@@ -47,6 +47,15 @@ export const scenario: CaptureScenario = {
       note: 'Cambia a la composición de integridad de datos'
     },
     { kind: 'sleep', ms: 600, note: 'Re-monta el renderer con el fixture Integridad' },
+    // Enviar vacío → resumen de errores accesible (patrón GOV.UK).
+    { kind: 'click', selector: '[data-ghf-primary]', note: 'Enviar vacío → resumen de errores' },
+    { kind: 'sleep', ms: 300, note: 'Render del resumen' },
+    {
+      kind: 'mark',
+      label: 'growth-forms-renderer-error-summary',
+      clipSelector: '[data-capture="growth-forms-renderer-canvas"]',
+      note: 'Resumen de errores accesible al enviar (links que enfocan el campo)'
+    },
     {
       kind: 'fill',
       selector: '[name="phone"]',
@@ -77,6 +86,8 @@ export const scenario: CaptureScenario = {
     },
     { kind: 'press', key: 'Tab', note: 'Verifica + confirma corporativo' },
     { kind: 'sleep', ms: 700, note: 'Roundtrip de verificación (simulado)' },
+    { kind: 'fill', selector: '[name="company"]', value: 'Efeonce', note: 'Empresa' },
+    { kind: 'press', key: 'Tab', note: 'Blur empresa' },
     {
       kind: 'fill',
       selector: '[name="national_id"]',
@@ -84,6 +95,8 @@ export const scenario: CaptureScenario = {
       note: 'RUT válido → ✓ success'
     },
     { kind: 'press', key: 'Tab', note: 'Blur del RUT → formato + ✓' },
+    { kind: 'fill', selector: '[name="message"]', value: 'Queremos mejorar nuestra visibilidad en IA.', note: 'Muestra el contador de caracteres' },
+    { kind: 'click', selector: '[data-ghf-consent="tos"]', note: 'Acepta consentimiento → listo para enviar' },
     { kind: 'sleep', ms: 300, note: 'Asienta el estado reactivo' },
     {
       kind: 'mark',

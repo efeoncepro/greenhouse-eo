@@ -144,6 +144,36 @@ export const RENDERER_CSS = `
   }
   .ghf-verify-suggest:hover { color: var(--ghf-border-strong); }
 
+  /* TASK-1256 Slice 1d — resumen de errores accesible (patrón GOV.UK). */
+  .ghf-error-summary {
+    border: 1px solid var(--ghf-error); border-inline-start-width: 4px;
+    border-radius: var(--ghf-radius); background: var(--ghf-error-bg);
+    padding: 12px 16px; display: grid; gap: 8px;
+  }
+  .ghf-error-summary:focus-visible { outline: 2px solid var(--ghf-focus); outline-offset: 2px; }
+  .ghf-error-summary-title { margin: 0; font-weight: 700; color: var(--ghf-error); font-size: 0.9375rem; }
+  .ghf-error-summary-list { margin: 0; padding-inline-start: 18px; display: grid; gap: 4px; }
+  .ghf-error-summary-list a { color: var(--ghf-error); text-underline-offset: 2px; }
+
+  /* TASK-1256 Slice 1d — hint "listo para enviar / faltan N". */
+  .ghf-actions-wrap { display: grid; gap: 8px; }
+  .ghf-readiness { margin: 0; font-size: 0.8125rem; color: var(--ghf-muted); display: flex; align-items: center; gap: 6px; }
+  .ghf-readiness:empty { display: none; }
+  .ghf-readiness[data-ready="true"] { color: var(--ghf-success); font-weight: 600; }
+  .ghf-readiness[data-ready="true"]::before { content: "✓"; font-weight: 700; }
+
+  /* TASK-1256 Slice 1d — contador de caracteres. */
+  .ghf-counter { margin: 2px 0 0; font-size: 0.75rem; color: var(--ghf-muted); text-align: end; }
+  .ghf-counter[data-near="true"] { color: var(--ghf-error); }
+
+  /* TASK-1256 Slice 1d — aviso de borrador recuperado. */
+  .ghf-draft-note { margin: 0; font-size: 0.8125rem; color: var(--ghf-muted); display: flex; align-items: center; gap: 6px; }
+  .ghf-draft-note::before { content: "↩"; flex: 0 0 auto; }
+
+  /* TASK-1256 Slice 1d — micro-motion (neutralizado por el bloque reduced-motion global). */
+  .ghf-field[data-status="success"] .ghf-status-icon { animation: ghf-pop 180ms ease-out; }
+  .ghf-error { animation: ghf-fade 160ms ease-out; }
+
   /* TASK-1256 — teléfono internacional: selector de país + input nacional. */
   .ghf-tel { display: flex; align-items: stretch; gap: 8px; min-width: 0; }
   .ghf-tel-country {
@@ -187,6 +217,8 @@ export const RENDERER_CSS = `
 
   @keyframes ghf-shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
   @keyframes ghf-spin { to { transform: rotate(360deg); } }
+  @keyframes ghf-pop { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  @keyframes ghf-fade { from { opacity: 0; transform: translateY(-2px); } to { opacity: 1; transform: none; } }
 
   @media (prefers-reduced-motion: reduce) {
     greenhouse-form *, greenhouse-form *::before, greenhouse-form *::after,

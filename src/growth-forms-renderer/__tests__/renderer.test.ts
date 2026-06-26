@@ -26,6 +26,7 @@ describe('growth-forms-renderer · FormRenderer', () => {
   beforeEach(() => {
     document.body.replaceChildren()
     ;(window as unknown as { dataLayer?: unknown[] }).dataLayer = []
+    window.localStorage.clear()
   })
 
   it('renders labels above inputs with autocomplete + inputmode from the contract', () => {
@@ -353,5 +354,98 @@ describe('growth-forms-renderer · FormRenderer', () => {
     // Campo no gateado: la verificación es advisory → typo-suggest sí, bloqueo no.
     expect(root.querySelector('.ghf-error')).toBeNull()
     expect(root.querySelector('.ghf-verify-suggest')).not.toBeNull()
+  })
+
+  // ─── TASK-1256 Slice 1d — endurecimiento UX ─────────────────────────────────
+
+  it('shows an accessible error summary on submit; its links focus the field', () => {
+    const { root } = mountInto()
+
+    root.querySelector('form')!.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }))
+
+    const summary = root.querySelector<HTMLElement>('[data-ghf-error-summary]')
+
+    expect(summary).not.toBeNull()
+    expect(summary!.getAttribute('role')).toBe('alert')
+    const links = summary!.querySelectorAll('a')
+
+    expect(links.length).toBeGreaterThan(0)
+    // El link enfoca el campo correspondiente.
+    links[0].dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }))
+    expect(document.activeElement?.getAttribute('name')).toBeTruthy()
+
+    // Al corregir un campo en vivo, su entrada desaparece del resumen (no queda stale).
+    const before = summary!.querySelectorAll('a').length
+    const email = root.querySelector<HTMLInputElement>('[name="work_email"]')!
+
+    email.value = 'ana@empresa.com'
+    email.dispatchEvent(new Event('input'))
+    const after = root.querySelector('[data-ghf-error-summary]')?.querySelectorAll('a').length ?? 0
+
+    expect(after).toBe(before - 1)
+  })
+
+  it('reflects "faltan N" → "listo para enviar" reactively near submit', () => {
+    const { root } = mountInto()
+    const readiness = root.querySelector<HTMLElement>('[data-ghf-readiness]')!
+
+    // Antes de empezar: oculto.
+    expect(readiness.textContent).toBe('')
+
+    // Al empezar con campos pendientes: cuenta los faltantes.
+    const email = root.querySelector<HTMLInputElement>('[name="work_email"]')!
+
+    email.value = 'lead@brand.com'
+    email.dispatchEvent(new Event('input'))
+    expect(readiness.textContent).toMatch(/Falta/)
+    expect(readiness.getAttribute('data-ready')).toBe('false')
+
+    // Completar todo lo requerido → "Listo para enviar".
+    const brand = root.querySelector<HTMLInputElement>('[name="brand"]')!
+
+    brand.value = 'Brand'
+    brand.dispatchEvent(new Event('input'))
+    const consent = root.querySelector<HTMLInputElement>('[data-ghf-consent="tos"]')!
+
+    consent.checked = true
+    consent.dispatchEvent(new Event('change'))
+
+    expect(readiness.getAttribute('data-ready')).toBe('true')
+    expect(readiness.textContent).toBe('Listo para enviar')
+  })
+
+  it('updates the character counter live for maxLength fields', () => {
+    const { root } = mountInto()
+    const textarea = root.querySelector<HTMLTextAreaElement>('[name="message"]')!
+    const counter = textarea.closest('.ghf-field')!.querySelector('.ghf-counter')!
+
+    expect(counter.textContent).toBe('0 / 500')
+    textarea.value = 'Hola equipo'
+    textarea.dispatchEvent(new Event('input'))
+    expect(counter.textContent).toBe('11 / 500')
+  })
+
+  it('restores a PII-safe draft on mount — email yes, national_id never', () => {
+    // Sembrar un borrador con correo (no-PII regulada) + cédula (PII regulada).
+    window.localStorage.setItem(
+      'ghf-draft:ai-visibility-intake:fv_demo_1',
+      JSON.stringify({ savedAt: Date.now(), values: { work_email: 'vuelta@empresa.com', national_id: '123456785' } }),
+    )
+
+    const contract = staticContractFixture({
+      fields: [
+        { key: 'work_email', type: 'email', label: 'Correo', required: true, autocomplete: 'email' },
+        { key: 'national_id', type: 'national_id', label: 'RUT', validatorParams: { country: 'CL' } },
+      ],
+      consent: undefined,
+    })
+
+    const { root } = mountInto(contract)
+
+    // El correo se recupera; la cédula NUNCA (no se persiste ni se restaura).
+    expect(root.querySelector<HTMLInputElement>('[name="work_email"]')!.value).toBe('vuelta@empresa.com')
+    expect(root.querySelector<HTMLInputElement>('[name="national_id"]')!.value).toBe('')
+    // Aviso de borrador recuperado visible.
+    expect(root.querySelector('.ghf-draft-note')).not.toBeNull()
   })
 })

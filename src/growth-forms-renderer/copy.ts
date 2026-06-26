@@ -24,6 +24,14 @@ export interface RendererSystemCopy {
   submitError: string
   formRegionAria: string
   successFallback: string
+  /** Título del resumen de errores accesible al enviar (TASK-1256 Slice 1d). */
+  errorSummaryTitle: string
+  /** Hint vivo de campos pendientes junto al submit. */
+  fieldsRemaining: (count: number) => string
+  /** Afirmación cuando no quedan campos pendientes. */
+  readyToSend: string
+  /** Aviso de borrador recuperado desde localStorage (PII-safe). */
+  draftRestored: string
   /** Estado inline mientras corre la verificación de correo (TASK-1256 Slice 2). */
   emailVerifying: string
   /** Affordance typo-suggest: "¿Quisiste decir nombre@empresa.com?". */
@@ -61,6 +69,10 @@ const esCL: RendererSystemCopy = {
   submitError: 'No pudimos enviar tu formulario. Intenta de nuevo en unos minutos.',
   formRegionAria: 'Formulario',
   successFallback: 'Recibimos tu información. Gracias.',
+  errorSummaryTitle: 'Revisa estos campos para continuar',
+  fieldsRemaining: count => (count === 1 ? 'Falta 1 campo' : `Faltan ${count} campos`),
+  readyToSend: 'Listo para enviar',
+  draftRestored: 'Recuperamos lo que habías escrito.',
   emailVerifying: 'Verificando correo…',
   emailSuggestion: suggested => `¿Quisiste decir ${suggested}?`,
   phoneCountryAria: 'País del teléfono',
@@ -108,6 +120,10 @@ const enUS: RendererSystemCopy = {
   submitError: 'We couldn’t send your form. Please try again in a few minutes.',
   formRegionAria: 'Form',
   successFallback: 'We received your information. Thank you.',
+  errorSummaryTitle: 'Review these fields to continue',
+  fieldsRemaining: count => (count === 1 ? '1 field left' : `${count} fields left`),
+  readyToSend: 'Ready to send',
+  draftRestored: 'We restored what you had typed.',
   emailVerifying: 'Checking email…',
   emailSuggestion: suggested => `Did you mean ${suggested}?`,
   phoneCountryAria: 'Phone country',

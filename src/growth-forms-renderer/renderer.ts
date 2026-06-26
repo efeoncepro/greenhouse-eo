@@ -105,6 +105,15 @@ export class FormRenderer {
   private readonly statusTimers = new Map<string, ReturnType<typeof setTimeout>>()
   private static readonly STATUS_ERROR_DEBOUNCE_MS = 600
 
+  // ─── UX hardening (TASK-1256 Slice 1d) ───────────────────────────────────────
+  /** Hubo un intento de submit → muestra el resumen de errores accesible. */
+  private submitAttempted = false
+  /** Se restauró un borrador PII-safe de localStorage → muestra el aviso una vez. */
+  private draftRestored = false
+  private draftSaveTimer: ReturnType<typeof setTimeout> | null = null
+  private static readonly DRAFT_DEBOUNCE_MS = 600
+  private static readonly DRAFT_TTL_MS = 7 * 24 * 60 * 60 * 1000
+
   constructor(private readonly opts: FormRendererOptions) {
     this.doc = opts.doc ?? document
     this.contract = opts.contract
@@ -130,6 +139,13 @@ export class FormRenderer {
 
     for (const field of this.contract.fields) {
       this.values[field.key] = field.type === 'consent' || field.type === 'checkbox' ? false : ''
+    }
+
+    // Restaura un borrador PII-safe (sin cédula/consent) si existe (TASK-1256 Slice 1d).
+    try {
+      if (this.restoreDraft()) this.draftRestored = true
+    } catch {
+      // best-effort: un borrador corrupto nunca rompe el montaje.
     }
   }
 
@@ -169,6 +185,7 @@ export class FormRenderer {
     this.verifyTimers.clear()
     for (const timer of this.statusTimers.values()) clearTimeout(timer)
     this.statusTimers.clear()
+    if (this.draftSaveTimer) clearTimeout(this.draftSaveTimer)
     this.opts.root.replaceChildren()
   }
 
@@ -184,6 +201,18 @@ export class FormRenderer {
       e.preventDefault()
       void this.handlePrimaryAction()
     })
+
+    // Aviso de borrador recuperado (una sola vez, no intrusivo) — TASK-1256 Slice 1d.
+    if (this.draftRestored) {
+      form.appendChild(el(this.doc, 'p', { class: 'ghf-draft-note', role: 'status' }, this.copy.draftRestored))
+    }
+
+    // Resumen de errores accesible (patrón GOV.UK) tras un intento de envío.
+    if (this.submitAttempted) {
+      const summary = this.buildErrorSummary()
+
+      if (summary) form.appendChild(summary)
+    }
 
     const steps = this.steps
 
@@ -232,6 +261,8 @@ export class FormRenderer {
         this.patchEmailVerifyDom(f)
       }
     }
+
+    this.patchReadinessHint()
   }
 
   private renderField(field: RendererFieldDefinition): HTMLElement {
@@ -284,6 +315,16 @@ export class FormRenderer {
 
     if (helpText && helpId) wrap.appendChild(el(this.doc, 'p', { class: 'ghf-help', id: helpId }, helpText))
     if (error) wrap.appendChild(el(this.doc, 'p', { class: 'ghf-error', id: errorId, role: 'alert' }, error))
+
+    // Contador de caracteres para campos con límite (aria-hidden: el maxlength nativo es
+    // el contrato SR; el contador es ayuda visual). TASK-1256 Slice 1d.
+    if (field.maxLength && (field.type === 'text' || field.type === 'textarea')) {
+      const current = typeof this.values[field.key] === 'string' ? (this.values[field.key] as string).length : 0
+      const counter = el(this.doc, 'p', { class: 'ghf-counter', 'aria-hidden': 'true' }, `${current} / ${field.maxLength}`)
+
+      counter.dataset.near = current >= field.maxLength * 0.9 ? 'true' : 'false'
+      wrap.appendChild(counter)
+    }
 
     return wrap
   }
@@ -425,6 +466,7 @@ export class FormRenderer {
       input.value = digits ? formatNationalPhoneDisplay(digits, next) : ''
       recompute(next)
       this.liveStatus(field)
+      this.onFieldEdited()
       this.onValueChange(field)
     })
 
@@ -445,6 +487,7 @@ export class FormRenderer {
       recompute()
       this.maybeStart()
       this.liveStatus(field)
+      this.onFieldEdited()
     })
 
     input.addEventListener('blur', () => {
@@ -606,6 +649,233 @@ export class FormRenderer {
 
   private static readonly isDigit = (char: string): boolean => char >= '0' && char <= '9'
 
+  // ─── UX hardening (TASK-1256 Slice 1d) ───────────────────────────────────────
+
+  /** Llamar tras cualquier edición de campo: refresca hint de listo + guarda borrador. */
+  private onFieldEdited(): void {
+    this.patchReadinessHint()
+    this.scheduleDraftSave()
+  }
+
+  /** Cuántos campos visibles bloquean el envío (requeridos vacíos + inválidos + consent). */
+  private remainingBlockers(): number {
+    const visible = this.fieldsForStep().filter(f => f.type !== 'hidden' && isFieldVisible(f, this.values))
+    let count = Object.keys(validateFields(visible, this.values, this.copy)).length
+
+    if (this.isLastStep()) {
+      for (const box of this.contract.consent?.checkboxes ?? []) {
+        if (box.required !== false && this.consentState[box.key] !== true) count += 1
+      }
+    }
+
+    return count
+  }
+
+  /** Hint vivo junto al submit: "Faltan N campos" → "Listo para enviar ✓". */
+  private patchReadinessHint(): void {
+    const node = this.opts.root.querySelector<HTMLElement>('[data-ghf-readiness]')
+
+    if (!node) return
+
+    if (!this.started) {
+      node.textContent = ''
+      node.removeAttribute('data-ready')
+
+      return
+    }
+
+    const remaining = this.remainingBlockers()
+
+    if (remaining === 0) {
+      node.textContent = this.copy.readyToSend
+      node.dataset.ready = 'true'
+      // Sin bloqueos: limpia el summary assertive de un intento de envío previo.
+      this.setSummary('')
+    } else {
+      node.textContent = this.copy.fieldsRemaining(remaining)
+      node.dataset.ready = 'false'
+    }
+  }
+
+  /** Actualiza el contador de caracteres de un campo con `maxLength`. */
+  private patchCounter(field: RendererFieldDefinition, input: HTMLInputElement | HTMLTextAreaElement): void {
+    if (!field.maxLength) return
+    const wrap = input.closest('.ghf-field')
+    const counter = wrap?.querySelector<HTMLElement>('.ghf-counter')
+
+    if (!counter) return
+    const length = input.value.length
+
+    counter.textContent = `${length} / ${field.maxLength}`
+    counter.dataset.near = length >= field.maxLength * 0.9 ? 'true' : 'false'
+  }
+
+  // ─── Borrador PII-safe (localStorage) ────────────────────────────────────────
+
+  private draftKey(): string {
+    return `ghf-draft:${this.contract.form.slug}:${this.contract.form.formVersionId}`
+  }
+
+  /** Un campo NO se persiste si es PII regulada (cédula), consentimiento u oculto. */
+  private isDraftablePersisted(field: RendererFieldDefinition): boolean {
+    if (field.type === 'national_id' || resolveValidatorName(field) === 'national_id') return false
+    if (field.type === 'consent' || field.type === 'checkbox' || field.type === 'hidden') return false
+
+    return true
+  }
+
+  private scheduleDraftSave(): void {
+    if (this.draftSaveTimer) clearTimeout(this.draftSaveTimer)
+    this.draftSaveTimer = setTimeout(() => this.persistDraft(), FormRenderer.DRAFT_DEBOUNCE_MS)
+  }
+
+  private persistDraft(): void {
+    if (typeof window === 'undefined' || !window.localStorage) return
+
+    const values: Record<string, string | string[]> = {}
+
+    for (const field of this.contract.fields) {
+      if (!this.isDraftablePersisted(field)) continue
+      const value = this.values[field.key]
+
+      if (typeof value === 'string' && value.trim() !== '') values[field.key] = value
+      else if (Array.isArray(value) && value.length > 0) values[field.key] = value
+    }
+
+    try {
+      if (Object.keys(values).length === 0) {
+        window.localStorage.removeItem(this.draftKey())
+
+        return
+      }
+
+      window.localStorage.setItem(this.draftKey(), JSON.stringify({ savedAt: Date.now(), values }))
+    } catch {
+      // cuota llena / modo privado: el borrador es best-effort, no romper el form.
+    }
+  }
+
+  /** Restaura valores NO-PII del borrador en `this.values`. Devuelve true si restauró algo. */
+  private restoreDraft(): boolean {
+    if (typeof window === 'undefined' || !window.localStorage) return false
+
+    let raw: string | null = null
+
+    try {
+      raw = window.localStorage.getItem(this.draftKey())
+    } catch {
+      return false
+    }
+
+    if (!raw) return false
+
+    let parsed: { savedAt?: number; values?: Record<string, unknown> }
+
+    try {
+      parsed = JSON.parse(raw) as typeof parsed
+    } catch {
+      this.clearDraft()
+
+      return false
+    }
+
+    if (typeof parsed?.savedAt === 'number' && Date.now() - parsed.savedAt > FormRenderer.DRAFT_TTL_MS) {
+      this.clearDraft()
+
+      return false
+    }
+
+    const stored = parsed?.values ?? {}
+    let restored = false
+
+    for (const field of this.contract.fields) {
+      if (!this.isDraftablePersisted(field)) continue
+      const value = stored[field.key]
+
+      if (typeof value === 'string' && value.trim() !== '') {
+        this.values[field.key] = value
+        restored = true
+      } else if (Array.isArray(value) && value.length > 0) {
+        this.values[field.key] = value.map(String)
+        restored = true
+      }
+    }
+
+    return restored
+  }
+
+  private clearDraft(): void {
+    if (typeof window === 'undefined' || !window.localStorage) return
+
+    try {
+      window.localStorage.removeItem(this.draftKey())
+    } catch {
+      // ignore
+    }
+  }
+
+  /** Resumen de errores accesible (patrón GOV.UK): título + links que enfocan el campo. */
+  private buildErrorSummary(): HTMLElement | null {
+    const entries: { focusSelector: string; text: string }[] = []
+
+    for (const field of this.fieldsForStep()) {
+      if (field.type === 'hidden' || !isFieldVisible(field, this.values)) continue
+      const error = this.errors[field.key]
+
+      if (error) entries.push({ focusSelector: `[name="${CSS.escape(field.key)}"]`, text: `${this.fieldLabel(field)}: ${error}` })
+    }
+
+    if (this.isLastStep()) {
+      for (const box of this.contract.consent?.checkboxes ?? []) {
+        if (box.required !== false && this.consentState[box.key] !== true) {
+          entries.push({ focusSelector: `[data-ghf-consent="${CSS.escape(box.key)}"]`, text: `${box.label ?? box.copyRef ?? 'Consentimiento'}: ${this.copy.errors.consentRequired}` })
+        }
+      }
+    }
+
+    if (entries.length === 0) return null
+
+    const box = el(this.doc, 'div', { class: 'ghf-error-summary', role: 'alert', tabindex: '-1' })
+
+    box.dataset.ghfErrorSummary = 'true'
+    box.appendChild(el(this.doc, 'p', { class: 'ghf-error-summary-title' }, this.copy.errorSummaryTitle))
+    const list = el(this.doc, 'ul', { class: 'ghf-error-summary-list' })
+
+    for (const entry of entries) {
+      const item = el(this.doc, 'li')
+      const link = el(this.doc, 'a', { href: '#' }, entry.text)
+
+      link.addEventListener('click', event => {
+        event.preventDefault()
+        const target = this.opts.root.querySelector<HTMLElement>(entry.focusSelector)
+
+        target?.focus?.()
+        target?.scrollIntoView?.({ block: 'center', behavior: 'smooth' })
+      })
+      item.appendChild(link)
+      list.appendChild(item)
+    }
+
+    box.appendChild(list)
+
+    return box
+  }
+
+  /**
+   * Mantiene el resumen de errores en sync cuando los errores se corrigen en vivo (no
+   * re-renderiza el form). Sólo actualiza/elimina el resumen existente — se crea en submit.
+   */
+  private patchErrorSummary(): void {
+    if (!this.submitAttempted) return
+    const existing = this.opts.root.querySelector('[data-ghf-error-summary]')
+
+    if (!existing) return
+    const fresh = this.buildErrorSummary()
+
+    if (fresh) existing.replaceWith(fresh)
+    else existing.remove()
+  }
+
   /** Cablea inputs de texto con máscara forgiving + timing 3-stage. */
   private wireText(field: RendererFieldDefinition, input: HTMLInputElement | HTMLTextAreaElement): void {
     const mask = maskOpsFor(field)
@@ -616,6 +886,8 @@ export class FormRenderer {
       // Validación reactiva live (success ✓ inmediato, error diferido). Reemplaza el
       // Stage-3 "solo si ya erró": ahora el feedback es reactivo desde que se tipea.
       this.liveStatus(field)
+      this.patchCounter(field, input)
+      this.onFieldEdited()
       // Verificación de correo debounced mientras tipea (UX, no autoridad).
       if (field.type === 'email') this.scheduleEmailVerify(field)
     })
@@ -665,6 +937,8 @@ export class FormRenderer {
       cb.addEventListener('change', () => {
         this.consentState[box.key] = cb.checked
         this.maybeStart()
+        this.patchReadinessHint()
+        this.patchErrorSummary()
       })
       label.appendChild(cb)
       label.appendChild(el(this.doc, 'span', {}, box.label ?? box.copyRef ?? 'Acepto'))
@@ -713,7 +987,16 @@ export class FormRenderer {
 
     actions.appendChild(primary)
 
-    return actions
+    // Hint vivo de "campos pendientes / listo para enviar" (TASK-1256 Slice 1d).
+    const wrapper = el(this.doc, 'div', { class: 'ghf-actions-wrap' })
+
+    wrapper.appendChild(actions)
+    const readiness = el(this.doc, 'p', { class: 'ghf-readiness', 'aria-live': 'polite' })
+
+    readiness.dataset.ghfReadiness = 'true'
+    if (isLast) wrapper.appendChild(readiness)
+
+    return wrapper
   }
 
   private submitLabel(): string {
@@ -734,6 +1017,7 @@ export class FormRenderer {
     if (this.started) return
     this.started = true
     this.telemetry.emit('gh_form_started', {})
+    this.patchReadinessHint()
   }
 
   private onValueChange(field: RendererFieldDefinition): void {
@@ -745,6 +1029,7 @@ export class FormRenderer {
     )
 
     if (this.errors[field.key]) this.revalidateField(field)
+    this.onFieldEdited()
     if (affectsVisibility) this.renderForm()
   }
 
@@ -791,6 +1076,9 @@ export class FormRenderer {
       control.removeAttribute('aria-invalid')
       existing?.remove()
     }
+
+    // Mantiene el resumen de errores accesible en sync al corregir en vivo.
+    this.patchErrorSummary()
   }
 
   // ─── Email verification (TASK-1256 Slice 2) ──────────────────────────────────
@@ -968,19 +1256,16 @@ export class FormRenderer {
     this.errors = validateFields(stepFields, this.values, this.copy)
     const consentError = this.isLastStep() ? this.validateConsent() : null
 
-    // Campos inválidos primero: re-render para mostrar el error inline + foco al primero.
-    if (Object.keys(this.errors).length > 0) {
+    // Hay errores (de campo o de consentimiento): mostrar el resumen accesible arriba,
+    // re-render con errores inline, y enfocar el resumen (patrón GOV.UK). TASK-1256 Slice 1d.
+    if (Object.keys(this.errors).length > 0 || consentError) {
+      this.submitAttempted = true
       this.renderForm()
       this.setSummary(consentError ?? this.copy.validationSummary(Object.keys(this.errors).length))
-      this.focusFirstInvalid()
+      const summary = this.opts.root.querySelector<HTMLElement>('[data-ghf-error-summary]')
 
-      return
-    }
-
-    // Campos OK pero falta consentimiento requerido.
-    if (consentError) {
-      this.setSummary(consentError)
-      this.focusPrimary()
+      if (summary) summary.focus?.()
+      else this.focusFirstInvalid()
 
       return
     }
@@ -1046,6 +1331,7 @@ export class FormRenderer {
         ...(result.submissionId ? { correlation_id: result.submissionId } : {}),
         success_behavior: this.contract.successBehavior.kind,
       })
+      this.clearDraft() // enviado OK → el borrador ya no aplica.
       this.renderSuccess()
 
       return
