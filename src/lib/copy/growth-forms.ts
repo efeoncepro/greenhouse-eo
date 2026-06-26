@@ -87,6 +87,8 @@ export const GH_GROWTH_FORMS = {
     defaultPurpose: 'Capturar interés comercial low-risk desde una surface pública gobernada.',
     emailLabel: 'Email de trabajo',
     companyLabel: 'Organización',
+    phoneLabel: 'Teléfono',
+    rutLabel: 'RUT',
     interestLabel: 'Interés principal',
     interestAiVisibility: 'AI Visibility',
     interestAutomation: 'Automatización',
@@ -210,6 +212,20 @@ export const GH_GROWTH_FORMS = {
     smokePlanned: 'Smoke preparado. Revisa evidencia y host surface antes de tráfico real.',
     monitoringKept: 'Monitoreo activo. Vuelve a evidencia ante nuevos submissions.',
     actionFailed: 'No se pudo completar la acción. Revisa permisos o readiness.',
+  },
+  // TASK-1256 Slice 3 — builder de validadores/política desde el catálogo curado.
+  builder: {
+    sectionTitle: 'Validación y datos',
+    sectionHint: 'Elige del catálogo gobernado. No hay regex libre: cada validador es seguro por construcción.',
+    emailGateLabel: 'Gate de correo corporativo',
+    emailGateOff: 'Sin gate (cualquier correo)',
+    emailGateWarn: 'Advertir (marca el lead como sospechoso)',
+    emailGateBlock: 'Bloquear (solo correo de empresa)',
+    emailGateHint: 'Bloquear rechaza gmail/temporales antes de aceptar el lead.',
+    collectPhone: 'Pedir teléfono',
+    phoneCountryLabel: 'País por defecto del teléfono',
+    collectRut: 'Pedir RUT / cédula',
+    rutCountryLabel: 'País del documento',
   },
   // TASK-1256 Slice 4 — datos del lead con PII enmascarada + reveal gobernado.
   leadPii: {

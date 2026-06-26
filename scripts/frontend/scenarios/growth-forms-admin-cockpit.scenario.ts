@@ -33,5 +33,14 @@ export const scenario: CaptureScenario = {
     { kind: 'click', selector: '[data-capture="growth-forms-new-draft-sidecar"]', timeout: 8000 },
     { kind: 'sleep', ms: 450 },
     { kind: 'mark', label: 'growth-forms-composer', clipSelector: '[data-capture="growth-forms-sidecar-panel"]', note: 'Composer variant with starter governed form payload' },
+    // TASK-1256 Slice 3 — builder de validadores/política (catálogo curado, sin regex).
+    { kind: 'click', selector: '[data-capture="growth-forms-builder-validation"] input[type="checkbox"]', timeout: 6000 },
+    { kind: 'sleep', ms: 350 },
+    {
+      kind: 'mark',
+      label: 'growth-forms-builder-validation',
+      clipSelector: '[data-capture="growth-forms-builder-validation"]',
+      note: 'Validadores/política por campo: gate corporativo + país del teléfono + RUT, sin regex libre',
+    },
   ],
 }

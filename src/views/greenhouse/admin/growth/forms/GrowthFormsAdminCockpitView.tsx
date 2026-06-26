@@ -14,12 +14,14 @@ import DialogContent from '@mui/material/DialogContent'
 import DialogTitle from '@mui/material/DialogTitle'
 import Divider from '@mui/material/Divider'
 import ButtonBase from '@mui/material/ButtonBase'
+import FormControlLabel from '@mui/material/FormControlLabel'
 import IconButton from '@mui/material/IconButton'
 import LinearProgress from '@mui/material/LinearProgress'
 import MenuItem from '@mui/material/MenuItem'
 import Paper from '@mui/material/Paper'
 import Snackbar from '@mui/material/Snackbar'
 import Stack from '@mui/material/Stack'
+import Switch from '@mui/material/Switch'
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
@@ -35,6 +37,7 @@ import { alpha, type SxProps, type Theme } from '@mui/material/styles'
 import { AnimatedCounter } from '@/components/greenhouse'
 import { AdaptiveSidecarLayout, CompositionShell, GreenhouseBreadcrumbs, GreenhouseButton, GreenhouseChip } from '@/components/greenhouse/primitives'
 import { Motion } from '@/components/greenhouse/motion'
+import { PHONE_COUNTRIES } from '@/growth-forms-renderer/mask'
 import { parseApiErrorPayload } from '@/lib/api/parse-error-response'
 import { GH_GROWTH_FORMS } from '@/lib/copy/growth-forms'
 import { formatDateTime } from '@/lib/format'
@@ -70,12 +73,19 @@ type DeliveryStep = {
   detail: string
 }
 
+type EmailGate = 'off' | 'warn' | 'block'
+
 type DraftFormState = {
   name: string
   slug: string
   purpose: string
   formKind: 'lead_magnet' | 'subscribe' | 'contact' | 'diagnostic_intake'
   riskProfile: 'low' | 'medium' | 'high'
+  // TASK-1256 Slice 3 — validación/política por campo desde el catálogo curado.
+  emailGate: EmailGate
+  collectPhone: boolean
+  phoneCountry: string
+  collectRut: boolean
 }
 
 const HEALTH_TONE: Record<GrowthFormsHealthState, 'default' | 'success' | 'warning' | 'error' | 'info'> = {
@@ -287,21 +297,32 @@ const defaultDraftState: DraftFormState = {
   purpose: GH_GROWTH_FORMS.starter.defaultPurpose,
   formKind: 'lead_magnet',
   riskProfile: 'low',
+  emailGate: 'block',
+  collectPhone: false,
+  phoneCountry: 'CL',
+  collectRut: false,
 }
 
-const buildStarterPayload = (state: DraftFormState) => ({
-  slug: state.slug,
-  name: state.name,
-  formKind: state.formKind,
-  purpose: state.purpose,
-  riskProfile: state.riskProfile,
-  fieldSchema: [
+/** Mapea el gate del builder a la política de email persistida (validation_schema_json). */
+const EMAIL_GATE_TO_MODE: Record<EmailGate, 'off' | 'warn' | 'block_field'> = {
+  off: 'off',
+  warn: 'warn',
+  block: 'block_field',
+}
+
+const buildStarterPayload = (state: DraftFormState) => {
+  // El gate corporativo elige el validador del campo email (catálogo curado, no regex).
+  const emailValidator = state.emailGate === 'off' ? 'email_syntax' : 'corporate_email'
+
+  const fieldSchema: Record<string, unknown>[] = [
     {
       key: 'email',
       type: 'email',
       label: GH_GROWTH_FORMS.starter.emailLabel,
       required: true,
       autocomplete: 'email',
+      inputMode: 'email',
+      validator: emailValidator,
     },
     {
       key: 'company',
@@ -310,6 +331,42 @@ const buildStarterPayload = (state: DraftFormState) => ({
       required: true,
       autocomplete: 'organization',
     },
+  ]
+
+  const dataClassification: Record<string, string> = {
+    email: 'contact_pii',
+    company: 'company',
+    interest: 'public',
+    consent: 'consent_evidence',
+  }
+
+  if (state.collectPhone) {
+    fieldSchema.push({
+      key: 'phone',
+      type: 'tel',
+      label: GH_GROWTH_FORMS.starter.phoneLabel,
+      required: false,
+      autocomplete: 'tel',
+      inputMode: 'tel',
+      validator: 'e164_phone',
+      validatorParams: { country: state.phoneCountry },
+    })
+    dataClassification.phone = 'contact_pii'
+  }
+
+  if (state.collectRut) {
+    fieldSchema.push({
+      key: 'national_id',
+      type: 'national_id',
+      label: GH_GROWTH_FORMS.starter.rutLabel,
+      required: false,
+      validator: 'national_id',
+      validatorParams: { country: 'CL' },
+    })
+    dataClassification.national_id = 'national_id'
+  }
+
+  fieldSchema.push(
     {
       key: 'interest',
       type: 'select',
@@ -327,25 +384,29 @@ const buildStarterPayload = (state: DraftFormState) => ({
       label: GH_GROWTH_FORMS.starter.consentLabel,
       required: true,
     },
-  ],
-  successBehavior: {
-    kind: 'review_pending',
-    message: GH_GROWTH_FORMS.starter.successMessage,
-  },
-  consentPolicyVersion: 'growth-public-forms.v1',
-  dataClassification: {
-    fields: {
-      email: 'contact_pii',
-      company: 'company',
-      interest: 'public',
-      consent: 'consent_evidence',
+  )
+
+  return {
+    slug: state.slug,
+    name: state.name,
+    formKind: state.formKind,
+    purpose: state.purpose,
+    riskProfile: state.riskProfile,
+    fieldSchema,
+    // TASK-1256 Slice 3 — política de email gobernada (gate corporativo) en el contrato.
+    validationSchema: { emailPolicy: { mode: EMAIL_GATE_TO_MODE[state.emailGate], fieldKey: 'email' } },
+    successBehavior: {
+      kind: 'review_pending',
+      message: GH_GROWTH_FORMS.starter.successMessage,
     },
-  },
-  analyticsPolicy: {
-    enabled: true,
-    fieldLevelAnalyticsDisabled: true,
-  },
-})
+    consentPolicyVersion: 'growth-public-forms.v1',
+    dataClassification: { fields: dataClassification },
+    analyticsPolicy: {
+      enabled: true,
+      fieldLevelAnalyticsDisabled: true,
+    },
+  }
+}
 
 const sectionSurfaceSx = {
   border: (theme: Theme) => `1px solid ${theme.palette.divider}`,
@@ -1170,6 +1231,56 @@ const Composer = ({
           <MenuItem value='high'>{GH_GROWTH_FORMS.riskProfiles.high}</MenuItem>
         </TextField>
       </Stack>
+
+      {/* TASK-1256 Slice 3 — validadores/política desde el catálogo curado (sin regex). */}
+      <Box data-capture='growth-forms-builder-validation' sx={{ ...sectionSurfaceSx, p: 2, display: 'grid', gap: 1.5 }}>
+        <Stack direction='row' alignItems='center' spacing={1}>
+          <i className='tabler-shield-check' aria-hidden='true' />
+          <Typography variant='subtitle2' sx={sectionTitleSx}>{GH_GROWTH_FORMS.builder.sectionTitle}</Typography>
+        </Stack>
+        <Typography variant='caption' color='text.primary'>{GH_GROWTH_FORMS.builder.sectionHint}</Typography>
+
+        <TextField
+          size='small'
+          select
+          label={GH_GROWTH_FORMS.builder.emailGateLabel}
+          value={draft.emailGate}
+          onChange={event => updateField('emailGate', event.target.value as EmailGate)}
+          helperText={GH_GROWTH_FORMS.builder.emailGateHint}
+          fullWidth
+        >
+          <MenuItem value='off'>{GH_GROWTH_FORMS.builder.emailGateOff}</MenuItem>
+          <MenuItem value='warn'>{GH_GROWTH_FORMS.builder.emailGateWarn}</MenuItem>
+          <MenuItem value='block'>{GH_GROWTH_FORMS.builder.emailGateBlock}</MenuItem>
+        </TextField>
+
+        <FormControlLabel
+          control={<Switch checked={draft.collectPhone} onChange={event => updateField('collectPhone', event.target.checked)} />}
+          label={GH_GROWTH_FORMS.builder.collectPhone}
+        />
+        {draft.collectPhone ? (
+          <TextField
+            size='small'
+            select
+            label={GH_GROWTH_FORMS.builder.phoneCountryLabel}
+            value={draft.phoneCountry}
+            onChange={event => updateField('phoneCountry', event.target.value)}
+            fullWidth
+          >
+            {PHONE_COUNTRIES.map(country => (
+              <MenuItem key={country.code} value={country.code}>
+                {country.flag} {country.name} (+{country.callingCode})
+              </MenuItem>
+            ))}
+          </TextField>
+        ) : null}
+
+        <FormControlLabel
+          control={<Switch checked={draft.collectRut} onChange={event => updateField('collectRut', event.target.checked)} />}
+          label={GH_GROWTH_FORMS.builder.collectRut}
+        />
+      </Box>
+
       <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} justifyContent='flex-end'>
         <GreenhouseButton type='button' variant='outlined' kind='custom' onClick={onCancel} disabled={pending} fullWidth>
           {GH_GROWTH_FORMS.actions.cancel}

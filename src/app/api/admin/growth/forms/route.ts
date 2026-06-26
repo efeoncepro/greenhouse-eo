@@ -79,6 +79,9 @@ export async function POST(request: Request) {
       riskProfile,
       locale: typeof body.locale === 'string' ? body.locale : undefined,
       fieldSchema: body.fieldSchema ?? [],
+      // TASK-1256 Slice 3 — el builder persiste la política de validación (emailPolicy)
+      // en validation_schema_json vía el command gobernado (el command ya lo aceptaba).
+      validationSchema: body.validationSchema,
       uiPolicy: body.uiPolicy,
       successBehavior: body.successBehavior,
       consentPolicyVersion: typeof body.consentPolicyVersion === 'string' ? body.consentPolicyVersion : undefined,
