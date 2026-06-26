@@ -22,6 +22,7 @@ import {
   GROWTH_AI_VISIBILITY_RECOMMENDATION_PACK_VERSION,
   GROWTH_AI_VISIBILITY_REPORT_VERSION,
   type CitationInsight,
+  type ClientGraderReport,
   type CompetitiveShareOfVoice,
   type GraderReport,
   type GraderReportGate,
@@ -416,6 +417,53 @@ export const toPublicGraderReport = (report: GraderReport): PublicGraderReport =
   sentimentSummary: report.sentimentSummary,
   positionSummary: report.positionSummary,
   // El trend es agregado puro (deltas numéricos, sin raw text) → public-safe.
+  trend: report.trend,
+  provenance: report.provenance,
+  disclaimer: report.disclaimer
+})
+
+/**
+ * TASK-1243 — Proyecta el reporte interno al DTO CLIENTE (3.er consumer de la parity).
+ * Reusa exactamente las mismas proyecciones leak-safe que el público (dimensiones sin
+ * `reason`/`recommendation`, recomendaciones sin `priority`, primaryGap sin `action`, y
+ * estructuralmente SIN `providerPresence`/`providerFindings`/`accuracyFindings`), con una
+ * sola diferencia: las recomendaciones NO se acotan a 3 (el cliente autenticado ve el set
+ * completo accionable). Mismo `buildGraderReport` upstream — sin reimplementación.
+ */
+export const toClientGraderReport = (report: GraderReport): ClientGraderReport => ({
+  reportVersion: report.reportVersion,
+  recommendationPackVersion: report.recommendationPackVersion,
+  audience: 'client',
+  gate: report.gate,
+  headline: report.headline,
+  overallScore: report.overallScore,
+  overallSeverity: report.overallSeverity,
+  findings: report.findings,
+  dimensions: report.dimensions.map(dimension => ({
+    key: dimension.key,
+    label: dimension.label,
+    explainer: dimension.explainer,
+    score: dimension.score,
+    max: dimension.max,
+    status: dimension.status,
+    severity: dimension.severity
+  })),
+  // Sin cap (el público acota a PUBLIC_RECOMMENDATIONS_MAX; el cliente ve todas).
+  recommendations: report.recommendations.map(toPublicRecommendation),
+  primaryGap: report.primaryGap
+    ? {
+        gapKey: report.primaryGap.gapKey,
+        dimensionKey: report.primaryGap.dimensionKey,
+        title: report.primaryGap.title,
+        severity: report.primaryGap.severity
+      }
+    : null,
+  recommendedMotion: report.recommendedMotion,
+  competitiveSov: report.competitiveSov,
+  sourceTypeSummary: report.sourceTypeSummary,
+  citationInsight: report.citationInsight,
+  sentimentSummary: report.sentimentSummary,
+  positionSummary: report.positionSummary,
   trend: report.trend,
   provenance: report.provenance,
   disclaimer: report.disclaimer

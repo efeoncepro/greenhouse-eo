@@ -314,6 +314,38 @@ export interface GraderReport {
   disclaimer: string
 }
 
+/**
+ * TASK-1243 — Reporte CLIENTE (3.er consumer de la parity). TIPO DISTINTO, leak-safe por
+ * construcción: como `PublicGraderReport` (sin campos para raw provider text, `providerPresence`,
+ * `providerFindings`, `accuracyFindings`, reasons internos de dimensión ni `priority` de
+ * recomendación), PERO entre el público y el interno — las recomendaciones NO se acotan a 3
+ * (el cliente autenticado ve el set completo accionable). El builder proyecta sólo campos
+ * seguros (capa B) + leak test (capa C). Lo consume el portal cliente vía su BFF.
+ */
+export interface ClientGraderReport {
+  reportVersion: GraderReportVersion
+  recommendationPackVersion: RecommendationPackVersion
+  audience: 'client'
+  gate: GraderReportGate
+  headline: ReportHeadline
+  overallScore: number | null
+  overallSeverity: GraderReportSeverity
+  findings: ReportFinding[]
+  dimensions: PublicReportDimension[]
+  /** Set COMPLETO de recomendaciones (sin el cap público de 3), sin `priority` interno. */
+  recommendations: PublicReportRecommendation[]
+  primaryGap: PublicPrimaryGap | null
+  recommendedMotion: RecommendedMotion | null
+  competitiveSov: CompetitiveShareOfVoice
+  sourceTypeSummary: SourceTypeCount[]
+  citationInsight: CitationInsight
+  sentimentSummary: SentimentSummary
+  positionSummary: PositionSummary
+  trend: ReportTrend
+  provenance: ReportProvenance
+  disclaimer: string
+}
+
 /** Proyección pública del primaryGap (sin action interna, sólo scent + título). */
 export interface PublicPrimaryGap {
   gapKey: RecommendationGapKey
