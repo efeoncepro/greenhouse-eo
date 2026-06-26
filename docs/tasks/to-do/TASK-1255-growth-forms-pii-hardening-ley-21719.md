@@ -1,5 +1,9 @@
 # TASK-1255 — Growth Forms PII Hardening (Ley 21.719)
 
+## Delta 2026-06-26 — nueva superficie con email (TASK-1254 code complete scaffold)
+
+TASK-1254 agregó verificación de email + cache. Postura PII ya alineada con esta task, pero a revisar al endurecer: la **`greenhouse_growth.email_verification_cache` guarda solo el hash del email (`email_hash`, sha256 salteado) + el veredicto — NUNCA el email crudo**. Las columnas nuevas `form_submission.email_quality`/`email_domain_class` son derivadas (no PII directa). El email crudo sigue viviendo solo en `form_submission.normalized_fields_json` (la superficie que esta task debe cubrir con cifrado/retención). El endpoint público `verify-email` no persiste el email crudo. Al implementar cifrado/retención, incluir la nueva superficie de cache en el inventario (aunque ya sea hash-only).
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->

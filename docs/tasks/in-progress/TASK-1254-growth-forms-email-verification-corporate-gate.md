@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -312,5 +312,25 @@ Veredicto arch-architect: local-first, provider-gated, cacheado. Tier 1 resuelve
 
 ## Open Questions
 
-- ¿Qué provider de verificación? (ZeroBounce / Kickbox / NeverBounce / Abstract — costo por call, cobertura LATAM, sandbox). Decisión de negocio antes de Slice 2.
-- ¿La lista de desechables vive como tabla seed (refrescable por cron) o módulo vendored? Recomendación: tabla seed + refresh.
+- ¿Qué provider de verificación? (ZeroBounce / Kickbox / NeverBounce / Abstract — costo por call, cobertura LATAM, sandbox). Decisión de negocio antes de Slice 2. **→ Resuelta (2026-06-26):** el operador pidió "lo más económico y efectivo". Decisión: la arquitectura económica es **Tier1-first** (Tier 1 local resuelve "no-gmail/no-desechable" gratis para ~90% del valor; Tier 2 pago solo si Tier 1 pasa, cacheado). El puerto queda **swappable** y se documenta **Abstract API** como primer adapter recomendado (free tier + MX/disposable, el más barato). El alta del provider + secreto + adapter real queda **diferido** (out-of-band) — hoy corre el adapter **noop** (`deliverable:'unknown'`).
+- ¿La lista de desechables vive como tabla seed (refrescable por cron) o módulo vendored? Recomendación: tabla seed + refresh. **→ Resuelta (2026-06-26):** **módulo vendored browser-safe** (`email-verification/email-domain-data.ts`) — Tier 1 debe ser isomórfico (lo bundlea el renderer; una tabla PG no sirve sync al cliente). El refresh dinámico (cron desde tabla) queda como follow-up (mergea sobre el baseline vendored).
+
+## Progreso 2026-06-26 — code complete (scaffold sin provider), rollout pendiente
+
+Implementado local-first en `develop` (sin push), gated OFF. Estado: **`code complete, rollout pendiente`** (NO `complete`).
+
+**Hecho y verificado:**
+
+- **Slice 1** (commit `a20f99dd1`): dataset canónico browser-safe (`email-domain-data.ts`: free/desechable/role/typo) + `tier1.ts` (`classifyEmailTier1`: sintaxis, normalización gmail dots/`+`, isCorporate/isDisposable/isRoleBased, typo-suggest) + validador `corporate_email` en el registry canónico (`reasonCode` `email_not_corporate`/`email_disposable`; `type:email` sigue default `email_syntax` → opt-in) + **consolidación SSOT** de `ai-visibility/hubspot/email-domain.ts` (TASK-1242) al dataset compartido (una sola lista) + copy es-CL/en-US en el renderer + guard de pureza eslint extendido. Renderer hereda paridad por construcción.
+- **Slice 2-3** (commit `1e945d4ce`): migración additive `email_verification_cache` (hash + veredicto + TTL, NUNCA email crudo) + `form_submission.email_quality/email_domain_class` (aplicada a dev, `db.d.ts` regenerado, DO-block anti pre-up-marker) + puerto `EmailVerificationProvider` + **noop adapter** + orquestador `verifyEmail` (Tier1-first → Tier2 solo si corporativo + provider listo → cache → circuit breaker, no-throwing) + cache-store (SQL ejercitado vs PG real) + rate-limit per-IP best-effort + endpoint público `POST /verify-email` (gated, 404 OFF) + gate de política en `submitForm` (`block_field`/`warn`/`tag_only`) + `emailPolicy` en `validation_schema_json` + flag `GROWTH_FORMS_EMAIL_VERIFICATION_ENABLED` (default OFF).
+- **Slice 4** (commit `42f579016`): el `block_field` persiste un rejected submission (reason_class, sin PII) → rechazo observable + 2 reliability signals desde data real (`growth.forms.email_rejection_rate` + `email_suspect_lead_rate`), wired en `get-reliability-overview`.
+- **Gates:** `pnpm test` full **8126 passed** / 0 fail · `pnpm build` **exit 0** (boundary server-only→client limpio) · `pnpm typecheck` limpio · lint limpio · smoke PG real del cache + del signal reader.
+
+**Pendiente de rollout (out-of-band, NO bloquea el scaffold):**
+
+1. Dar de alta el provider económico (Abstract API u otro) + secreto GCP + grant `secretAccessor` a `greenhouse-portal@` + adapter real en `resolveVerificationProvider()`.
+2. Definir la `emailPolicy` por form (`validation_schema_json.emailPolicy`) para los forms que lo requieran (ej. cotizador) — decisión de negocio.
+3. Flag ON en staging (arrancar en `warn`), shadow del `email_rejection_rate`, subir a `block_field` con sign-off. Luego prod vía release control plane.
+4. Follow-up signals `email_provider_error_rate` + `email_verification_cache_hit_rate` (requieren contadores de runtime; con noop serían data engañosa — deliberadamente NO emitidos).
+
+La task permanece en `in-progress/` hasta que el provider real + el rollout staging cierren los Slices 2-4 end-to-end.

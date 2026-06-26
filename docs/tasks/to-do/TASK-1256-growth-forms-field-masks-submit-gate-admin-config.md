@@ -1,5 +1,9 @@
 # TASK-1256 — Growth Forms Field Masks + Submit Gate + Admin Validator Config
 
+## Delta 2026-06-26 — backend del email gate ya disponible (TASK-1254 code complete scaffold)
+
+El submit-gating de email que esta task expone en UI ya tiene su backend gobernado: **endpoint `POST /api/public/growth/forms/{slug}/verify-email`** (debounced, devuelve `{ syntaxValid, isCorporate, isDisposable, isRoleBased, isFreeProvider, deliverable, quality, suggestion, reasonCode }` sanitizado) + validador `corporate_email` en el registry + `reasonCode` `email_not_corporate`/`email_disposable` (con copy es-CL/en-US ya en `growth-forms-renderer/copy.ts`). La UI de esta task **consume ese endpoint** para habilitar/deshabilitar el submit (la autoridad ya vive en `submitForm`; el botón es UX). El endpoint está gated por `GROWTH_FORMS_EMAIL_VERIFICATION_ENABLED` (default OFF). El `suggestion` (typo-suggest) está disponible para el affordance "¿quisiste decir …?".
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
