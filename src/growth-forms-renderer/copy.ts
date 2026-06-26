@@ -24,6 +24,10 @@ export interface RendererSystemCopy {
   submitError: string
   formRegionAria: string
   successFallback: string
+  /** Estado inline mientras corre la verificación de correo (TASK-1256 Slice 2). */
+  emailVerifying: string
+  /** Affordance typo-suggest: "¿Quisiste decir nombre@empresa.com?". */
+  emailSuggestion: (suggested: string) => string
   stepProgress: (current: number, total: number) => string
   stepNext: string
   stepBack: string
@@ -55,6 +59,8 @@ const esCL: RendererSystemCopy = {
   submitError: 'No pudimos enviar tu formulario. Intenta de nuevo en unos minutos.',
   formRegionAria: 'Formulario',
   successFallback: 'Recibimos tu información. Gracias.',
+  emailVerifying: 'Verificando correo…',
+  emailSuggestion: suggested => `¿Quisiste decir ${suggested}?`,
   stepProgress: (current, total) => `Paso ${current} de ${total}`,
   stepNext: 'Continuar',
   stepBack: 'Atrás',
@@ -99,6 +105,8 @@ const enUS: RendererSystemCopy = {
   submitError: 'We couldn’t send your form. Please try again in a few minutes.',
   formRegionAria: 'Form',
   successFallback: 'We received your information. Thank you.',
+  emailVerifying: 'Checking email…',
+  emailSuggestion: suggested => `Did you mean ${suggested}?`,
   stepProgress: (current, total) => `Step ${current} of ${total}`,
   stepNext: 'Continue',
   stepBack: 'Back',

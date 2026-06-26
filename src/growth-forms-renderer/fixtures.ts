@@ -57,6 +57,39 @@ export const conditionalContractFixture = (): RenderContract =>
     consent: undefined,
   })
 
+/**
+ * Fixture TASK-1256: integridad de datos — email corporativo gateado (`validator:
+ * corporate_email`), teléfono E.164 por país, RUT (national_id CL) y URL. Sirve para
+ * ver las máscaras (Slice 1) + el submit-gating (Slice 2) en el preview interno / GVC.
+ */
+export const dataIntegrityContractFixture = (): RenderContract =>
+  staticContractFixture({
+    composition: 'static',
+    fields: [
+      {
+        key: 'work_email',
+        type: 'email',
+        label: 'Correo de trabajo',
+        required: true,
+        autocomplete: 'email',
+        inputMode: 'email',
+        validator: 'corporate_email',
+      },
+      { key: 'company', type: 'text', label: 'Empresa', required: true, autocomplete: 'organization' },
+      {
+        key: 'phone',
+        type: 'tel',
+        label: 'Teléfono',
+        autocomplete: 'tel',
+        inputMode: 'tel',
+        validator: 'e164_phone',
+        validatorParams: { country: 'CL' },
+      },
+      { key: 'national_id', type: 'national_id', label: 'RUT', validatorParams: { country: 'CL' } },
+      { key: 'website', type: 'url', label: 'Sitio web', inputMode: 'url' },
+    ],
+  })
+
 /** Fixture multi_step_light de 2 pasos. */
 export const multiStepContractFixture = (): RenderContract =>
   staticContractFixture({

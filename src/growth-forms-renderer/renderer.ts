@@ -20,8 +20,9 @@ import { maskOpsFor } from './mask'
 import { resolveSystemCopy, type RendererSystemCopy } from './copy'
 import { validateField, validateFields, type FieldErrors } from './validation'
 import { createTelemetryEmitter, type TelemetryEmitter, type TelemetryPayload } from './telemetry'
-import { submitPublicForm, type RendererApiConfig } from './api-client'
+import { submitPublicForm, verifyPublicEmail, type RendererApiConfig } from './api-client'
 import { RENDERER_VERSION } from './version'
+import { validateFormValue } from '@/lib/growth/forms/validators/core'
 
 export interface FormRendererOptions {
   root: HTMLElement
@@ -74,6 +75,17 @@ export class FormRenderer {
   private submitting = false
   private started = false
   private destroyed = false
+
+  // ─── Email verification (TASK-1256 Slice 2) ──────────────────────────────────
+  /** Estado de la verificación de correo por campo (UX; la autoridad es `submitForm`). */
+  private readonly emailVerifyState = new Map<string, 'verifying' | 'done'>()
+  /** Typo-suggest devuelto por `/verify-email` por campo (afán "¿quisiste decir …?"). */
+  private readonly emailSuggestions = new Map<string, string>()
+  /** Timers de debounce de verificación por campo. */
+  private readonly verifyTimers = new Map<string, ReturnType<typeof setTimeout>>()
+  /** Endpoint OFF (404 `disabled`) → degradación honesta: dejar de llamar. */
+  private emailVerifyDisabled = false
+  private static readonly EMAIL_VERIFY_DEBOUNCE_MS = 450
 
   constructor(private readonly opts: FormRendererOptions) {
     this.doc = opts.doc ?? document
@@ -135,6 +147,8 @@ export class FormRenderer {
 
   destroy(): void {
     this.destroyed = true
+    for (const timer of this.verifyTimers.values()) clearTimeout(timer)
+    this.verifyTimers.clear()
     this.opts.root.replaceChildren()
   }
 
@@ -191,6 +205,13 @@ export class FormRenderer {
     form.appendChild(summary)
 
     root.appendChild(form)
+
+    // Re-aplica el estado de verificación de correo (sobrevive a re-renders completos).
+    for (const f of this.fieldsForStep()) {
+      if (f.type === 'email' && (this.emailVerifyState.has(f.key) || this.emailSuggestions.has(f.key))) {
+        this.patchEmailVerifyDom(f)
+      }
+    }
   }
 
   private renderField(field: RendererFieldDefinition): HTMLElement {
@@ -332,6 +353,8 @@ export class FormRenderer {
       this.maybeStart()
       // Stage 3: si ya erró, re-validar onChange para confirmar el fix.
       if (this.errors[field.key]) this.revalidateField(field)
+      // Verificación de correo debounced mientras tipea (UX, no autoridad).
+      if (field.type === 'email') this.scheduleEmailVerify(field)
     })
 
     input.addEventListener('blur', () => {
@@ -342,9 +365,14 @@ export class FormRenderer {
         const display = mask.toDisplay(this.values[field.key] as string)
 
         if (display !== input.value) input.value = display
+        // Re-almacena desde el display normalizado. Idempotente para rut/phone
+        // (stored→display→stored = stored) y deja la URL con scheme ya antepuesto.
+        this.values[field.key] = mask.toStored(input.value)
       }
 
       this.revalidateField(field)
+      // Al salir del campo de correo, verificar de inmediato (sin esperar el debounce).
+      if (field.type === 'email') this.scheduleEmailVerify(field, true)
     })
   }
 
@@ -415,6 +443,9 @@ export class FormRenderer {
     if (this.submitting) {
       primary.setAttribute('aria-disabled', 'true')
       primary.textContent = this.copy.submitPending
+    } else if (this.isVerifyingAny()) {
+      // Una verificación de correo en vuelo deshabilita el submit (UX; no autoridad).
+      primary.setAttribute('aria-disabled', 'true')
     }
 
     actions.appendChild(primary)
@@ -493,10 +524,169 @@ export class FormRenderer {
     }
   }
 
+  // ─── Email verification (TASK-1256 Slice 2) ──────────────────────────────────
+
+  private fieldStr(key: string): string {
+    const v = this.values[key]
+
+    return typeof v === 'string' ? v : ''
+  }
+
+  /** El campo aplica gate corporativo duro (el form lo opta vía `validator`). */
+  private isEmailGated(field: RendererFieldDefinition): boolean {
+    return field.type === 'email' && field.validator === 'corporate_email'
+  }
+
+  /** Programa la verificación de correo: debounced on-input, inmediata on-blur. */
+  private scheduleEmailVerify(field: RendererFieldDefinition, immediate = false): void {
+    if (this.emailVerifyDisabled || field.type !== 'email') return
+
+    const existing = this.verifyTimers.get(field.key)
+
+    if (existing) clearTimeout(existing)
+
+    if (immediate) {
+      void this.runEmailVerify(field)
+
+      return
+    }
+
+    this.verifyTimers.set(
+      field.key,
+      setTimeout(() => void this.runEmailVerify(field), FormRenderer.EMAIL_VERIFY_DEBOUNCE_MS),
+    )
+  }
+
+  /**
+   * Llama a `/verify-email` (debounced) y refleja el veredicto en UI. Solo verifica
+   * correos sintácticamente válidos. Degradación honesta: 404/error/rate-limited NO
+   * trabа el submit — el gate vive en `submitForm`. Ignora respuestas stale (el valor
+   * cambió mientras la verificación estaba en vuelo).
+   */
+  private async runEmailVerify(field: RendererFieldDefinition): Promise<void> {
+    if (this.destroyed || this.emailVerifyDisabled) return
+
+    const value = this.fieldStr(field.key)
+    const syntax = validateFormValue('email_syntax', value)
+
+    if (!syntax.valid) {
+      this.emailVerifyState.delete(field.key)
+      this.emailSuggestions.delete(field.key)
+      this.patchEmailVerifyDom(field)
+      this.patchPrimaryActionState()
+
+      return
+    }
+
+    this.emailVerifyState.set(field.key, 'verifying')
+    this.patchEmailVerifyDom(field)
+    this.patchPrimaryActionState()
+
+    const result = await verifyPublicEmail(this.api, value, this.fetchImpl)
+
+    // Stale guard: el usuario siguió tipeando → descartar este veredicto.
+    if (this.destroyed || this.fieldStr(field.key) !== value) return
+
+    if (result.outcome === 'disabled') {
+      this.emailVerifyDisabled = true
+      this.emailVerifyState.delete(field.key)
+      this.emailSuggestions.delete(field.key)
+    } else if (result.outcome !== 'ok') {
+      // rate_limited / error → degradación honesta: limpiar estado, sin bloquear.
+      this.emailVerifyState.delete(field.key)
+      this.emailSuggestions.delete(field.key)
+    } else {
+      this.emailVerifyState.set(field.key, 'done')
+
+      if (result.suggestion) this.emailSuggestions.set(field.key, result.suggestion)
+      else this.emailSuggestions.delete(field.key)
+
+      // Gate corporativo: refleja el veredicto del provider (cubre Tier 2 que el
+      // validador local no ve). Paridad con el validador local para Tier 1.
+      if (this.isEmailGated(field) && (result.reasonCode === 'email_not_corporate' || result.reasonCode === 'email_disposable')) {
+        this.errors[field.key] = result.reasonCode === 'email_disposable' ? this.copy.errors.disposable : this.copy.errors.corporate
+        this.touched.add(field.key)
+      }
+    }
+
+    this.patchFieldErrorDom(field.key)
+    this.patchEmailVerifyDom(field)
+    this.patchPrimaryActionState()
+  }
+
+  private isVerifyingAny(): boolean {
+    for (const state of this.emailVerifyState.values()) {
+      if (state === 'verifying') return true
+    }
+
+    return false
+  }
+
+  /** Disable visual del submit mientras alguna verificación de correo está en vuelo. */
+  private patchPrimaryActionState(): void {
+    if (this.submitting) return // el submit es dueño del label/estado durante el envío
+    const primary = this.opts.root.querySelector<HTMLElement>('[data-ghf-primary]')
+
+    if (!primary) return
+
+    if (this.isVerifyingAny()) primary.setAttribute('aria-disabled', 'true')
+    else primary.removeAttribute('aria-disabled')
+  }
+
+  /** Inserta/actualiza el indicador "verificando…" + el affordance typo-suggest. */
+  private patchEmailVerifyDom(field: RendererFieldDefinition): void {
+    const control = this.opts.root.querySelector<HTMLElement>(`[name="${CSS.escape(field.key)}"]`)
+    const wrap = control?.closest('.ghf-field')
+
+    if (!wrap) return
+
+    const verifying = this.emailVerifyState.get(field.key) === 'verifying'
+    const suggestion = this.emailSuggestions.get(field.key) ?? null
+
+    // Indicador "verificando…" (aria-live polite, sin spinner agresivo — reduced-motion).
+    const existingStatus = wrap.querySelector('.ghf-verify-status')
+
+    if (verifying) {
+      if (existingStatus) existingStatus.textContent = this.copy.emailVerifying
+      else wrap.appendChild(el(this.doc, 'p', { class: 'ghf-verify-status', 'aria-live': 'polite' }, this.copy.emailVerifying))
+    } else {
+      existingStatus?.remove()
+    }
+
+    // Affordance typo-suggest "¿quisiste decir …?" (clickable → aplica + re-verifica).
+    const existingSuggest = wrap.querySelector('.ghf-verify-suggest')
+
+    if (suggestion && !verifying) {
+      if (existingSuggest) existingSuggest.remove()
+      const button = el(this.doc, 'button', { type: 'button', class: 'ghf-verify-suggest' }, this.copy.emailSuggestion(suggestion))
+
+      button.addEventListener('click', () => {
+        this.values[field.key] = suggestion
+        if (control instanceof HTMLInputElement) control.value = suggestion
+        this.emailSuggestions.delete(field.key)
+        this.touched.add(field.key)
+        this.revalidateField(field)
+        this.scheduleEmailVerify(field, true)
+        control?.focus?.()
+      })
+      wrap.appendChild(button)
+    } else {
+      existingSuggest?.remove()
+    }
+  }
+
   // ─── Submit / next ───────────────────────────────────────────────────────---
 
   private async handlePrimaryAction(): Promise<void> {
     if (this.submitting) return
+
+    // No avanzar mientras una verificación de correo está en vuelo (botón aria-disabled).
+    if (this.isVerifyingAny()) {
+      this.setSummary(this.copy.emailVerifying)
+      this.focusPrimary()
+
+      return
+    }
 
     // Marcar todos los campos visibles del paso como touched para que validen.
     const stepFields = this.fieldsForStep().filter(f => isFieldVisible(f, this.values) && f.type !== 'hidden')

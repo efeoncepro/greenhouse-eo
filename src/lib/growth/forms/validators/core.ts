@@ -76,8 +76,12 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const URL_RE = /^https?:\/\/[^\s.]+\.[^\s]{2,}$/i
 const ISO_DATE_RE = /^\d{4}-\d{2}-\d{2}$/
 
-/** Calling codes E.164 para prefijar cuando el input no trae `+` (LATAM + US). */
-const CALLING_CODES: Record<string, string> = {
+/**
+ * Calling codes E.164 para prefijar cuando el input no trae `+` (LATAM + US).
+ * SSOT de los países con normalización/máscara de teléfono soportada — el renderer
+ * (`mask.ts`) lo importa para derivar la máscara por país sin duplicar la lista.
+ */
+export const CALLING_CODES: Record<string, string> = {
   CL: '56',
   AR: '54',
   BR: '55',

@@ -117,6 +117,23 @@ export const RENDERER_CSS = `
   }
   .ghf-error::before { content: "!"; flex: 0 0 auto; font-weight: 700; }
 
+  /* TASK-1256 Slice 2 — verificación de correo (estado + typo-suggest). */
+  .ghf-verify-status {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 0.8125rem; line-height: 1.4; color: var(--ghf-muted);
+  }
+  .ghf-verify-status::before {
+    content: ""; flex: 0 0 auto; inline-size: 12px; block-size: 12px; border-radius: 50%;
+    border: 2px solid var(--ghf-border); border-top-color: var(--ghf-accent);
+    animation: ghf-spin 0.7s linear infinite;
+  }
+  .ghf-verify-suggest {
+    align-self: flex-start; background: none; border: 0; padding: 2px 0;
+    font: inherit; font-size: 0.8125rem; color: var(--ghf-accent);
+    text-decoration: underline; cursor: pointer; min-height: 24px;
+  }
+  .ghf-verify-suggest:hover { color: var(--ghf-border-strong); }
+
   .ghf-check { display: flex; align-items: flex-start; gap: 10px; cursor: pointer; }
   .ghf-check input { width: 24px; height: 24px; flex: 0 0 auto; accent-color: var(--ghf-accent); }
   .ghf-check span { font-size: 0.875rem; line-height: 1.45; }
@@ -148,6 +165,7 @@ export const RENDERER_CSS = `
   .ghf-honeypot { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
 
   @keyframes ghf-shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+  @keyframes ghf-spin { to { transform: rotate(360deg); } }
 
   @media (prefers-reduced-motion: reduce) {
     greenhouse-form *, greenhouse-form *::before, greenhouse-form *::after,

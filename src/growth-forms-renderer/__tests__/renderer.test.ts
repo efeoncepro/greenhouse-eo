@@ -142,4 +142,124 @@ describe('growth-forms-renderer · FormRenderer', () => {
     expect(honey.getAttribute('autocomplete')).toBe('off')
     expect(honey.closest('.ghf-honeypot')).not.toBeNull()
   })
+
+  // ─── TASK-1256 Slice 2 — submit-gating del email corporativo ────────────────
+
+  const flush = async () => {
+    // verifyPublicEmail encadena `await fetch` + `await response.json()`; varias
+    // vueltas de macrotask vacían la cola de microtasks entre medio de forma robusta.
+    for (let i = 0; i < 5; i += 1) await new Promise(resolve => setTimeout(resolve, 0))
+  }
+
+  /** fetch que enruta verify-email a `verify()` y el submit a `accepted`. */
+  const routingFetch = (verify: () => Response | Promise<Response>) =>
+    vi.fn(async (url: string) => {
+      if (String(url).includes('/verify-email')) return verify()
+
+      return new Response(JSON.stringify({ outcome: 'accepted', submissionId: 'sub_1' }), { status: 202 })
+    }) as unknown as typeof fetch
+
+  const okVerdict = (over: Record<string, unknown> = {}) =>
+    new Response(
+      JSON.stringify({
+        outcome: 'ok',
+        syntaxValid: true,
+        isCorporate: true,
+        isDisposable: false,
+        isRoleBased: false,
+        isFreeProvider: false,
+        deliverable: 'deliverable',
+        quality: 'verified',
+        suggestion: null,
+        reasonCode: null,
+        ...over,
+      }),
+      { status: 200 },
+    )
+
+  const gatedContract = () =>
+    staticContractFixture({
+      fields: [{ key: 'work_email', type: 'email', label: 'Correo', required: true, validator: 'corporate_email', autocomplete: 'email' }],
+      consent: undefined,
+    })
+
+  const typeEmailAndBlur = (root: HTMLElement, value: string) => {
+    const email = root.querySelector<HTMLInputElement>('[name="work_email"]')!
+
+    email.value = value
+    email.dispatchEvent(new Event('input'))
+    email.dispatchEvent(new Event('blur'))
+  }
+
+  it('shows verifying state and disables submit while /verify-email is in flight', async () => {
+    let resolveVerify: (r: Response) => void = () => undefined
+
+    const pending = new Promise<Response>(resolve => {
+      resolveVerify = resolve
+    })
+
+    const { root } = mountInto(gatedContract(), routingFetch(() => pending))
+
+    typeEmailAndBlur(root, 'ana@empresa.com')
+
+    // El estado verificando + el disable del submit se aplican síncronamente al disparar.
+    expect(root.querySelector('.ghf-verify-status')?.textContent).toContain('Verificando')
+    expect(root.querySelector('[data-ghf-primary]')?.getAttribute('aria-disabled')).toBe('true')
+
+    resolveVerify(okVerdict())
+    await flush()
+
+    expect(root.querySelector('.ghf-verify-status')).toBeNull()
+    expect(root.querySelector('[data-ghf-primary]')?.getAttribute('aria-disabled')).toBeNull()
+  })
+
+  it('degrades honest when /verify-email is disabled (flag OFF, 404): no trap', async () => {
+    const { root } = mountInto(gatedContract(), routingFetch(() => new Response(JSON.stringify({ outcome: 'disabled' }), { status: 404 })))
+
+    typeEmailAndBlur(root, 'ana@empresa.com')
+    await flush()
+
+    // Sin estado verificando ni submit trabado: el gate vive en el server.
+    expect(root.querySelector('.ghf-verify-status')).toBeNull()
+    expect(root.querySelector('[data-ghf-primary]')?.getAttribute('aria-disabled')).toBeNull()
+    expect(root.querySelector('.ghf-error')).toBeNull()
+  })
+
+  it('blocks a corporate-gated field when the verdict says not corporate + offers typo-suggest', async () => {
+    const { root } = mountInto(
+      gatedContract(),
+      routingFetch(() => okVerdict({ isCorporate: false, quality: 'suspect', reasonCode: 'email_not_corporate', suggestion: 'ana@empresa.com' })),
+    )
+
+    typeEmailAndBlur(root, 'ana@gmial.com')
+    await flush()
+
+    const error = root.querySelector('.ghf-error')
+
+    expect(error?.textContent).toContain('correo de tu empresa')
+    const suggest = root.querySelector<HTMLButtonElement>('.ghf-verify-suggest')
+
+    expect(suggest?.textContent).toContain('¿Quisiste decir ana@empresa.com?')
+    suggest!.click()
+    expect(root.querySelector<HTMLInputElement>('[name="work_email"]')!.value).toBe('ana@empresa.com')
+  })
+
+  it('does not block a non-gated email field even if the verdict is not corporate (advisory only)', async () => {
+    const contract = staticContractFixture({
+      fields: [{ key: 'work_email', type: 'email', label: 'Correo', required: true, autocomplete: 'email' }],
+      consent: undefined,
+    })
+
+    const { root } = mountInto(
+      contract,
+      routingFetch(() => okVerdict({ isCorporate: false, quality: 'suspect', reasonCode: 'email_not_corporate', suggestion: 'ana@gmail.com' })),
+    )
+
+    typeEmailAndBlur(root, 'ana@gmail.com')
+    await flush()
+
+    // Campo no gateado: la verificación es advisory → typo-suggest sí, bloqueo no.
+    expect(root.querySelector('.ghf-error')).toBeNull()
+    expect(root.querySelector('.ghf-verify-suggest')).not.toBeNull()
+  })
 })

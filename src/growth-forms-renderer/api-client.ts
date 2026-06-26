@@ -53,6 +53,80 @@ export const fetchRenderContract = async (
   return (await response.json()) as RenderContract
 }
 
+/**
+ * Veredicto sanitizado de `/verify-email` (TASK-1254), espejo del payload del endpoint.
+ * El cliente NUNCA recibe el payload crudo del provider ni el tier interno. `outcome`
+ * distingue el veredicto real (`ok`) de la degradación honesta (`disabled` = flag OFF /
+ * 404, `rate_limited` = 429, `error` = red/5xx) — en degradación el submit NO se traba:
+ * la autoridad del gate vive en `submitForm` (TASK-1254).
+ */
+export type EmailVerifyResult =
+  | {
+      outcome: 'ok'
+      syntaxValid: boolean
+      isCorporate: boolean
+      isDisposable: boolean
+      isRoleBased: boolean
+      isFreeProvider: boolean
+      deliverable: 'deliverable' | 'undeliverable' | 'risky' | 'unknown'
+      quality: 'verified' | 'suspect' | 'unknown'
+      suggestion: string | null
+      reasonCode: 'email_format' | 'email_not_corporate' | 'email_disposable' | null
+    }
+  | { outcome: 'disabled' | 'rate_limited' | 'error' }
+
+/**
+ * Verifica un correo vía el endpoint público gobernado (debounced por el caller).
+ * Gateado por `GROWTH_FORMS_EMAIL_VERIFICATION_ENABLED`: si está OFF el endpoint
+ * responde 404 → `disabled` (degradación honesta, sin trabar el submit). NUNCA llama
+ * al provider directo: el secreto vive server-only y solo este endpoint lo orquesta.
+ */
+export const verifyPublicEmail = async (
+  config: RendererApiConfig,
+  email: string,
+  fetchImpl: typeof fetch = fetch,
+): Promise<EmailVerifyResult> => {
+  const url = join(config.baseUrl, `/api/public/growth/forms/${encodeURIComponent(config.slug)}/verify-email`)
+
+  let response: Response
+
+  try {
+    response = await fetchImpl(url, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', accept: 'application/json' },
+      body: JSON.stringify({ email }),
+    })
+  } catch {
+    return { outcome: 'error' }
+  }
+
+  if (response.status === 404) return { outcome: 'disabled' }
+  if (response.status === 429) return { outcome: 'rate_limited' }
+
+  let parsed: Record<string, unknown> = {}
+
+  try {
+    parsed = (await response.json()) as Record<string, unknown>
+  } catch {
+    return { outcome: 'error' }
+  }
+
+  if (!response.ok || parsed.outcome !== 'ok') return { outcome: 'error' }
+
+  return {
+    outcome: 'ok',
+    syntaxValid: Boolean(parsed.syntaxValid),
+    isCorporate: Boolean(parsed.isCorporate),
+    isDisposable: Boolean(parsed.isDisposable),
+    isRoleBased: Boolean(parsed.isRoleBased),
+    isFreeProvider: Boolean(parsed.isFreeProvider),
+    deliverable: (parsed.deliverable as 'deliverable' | 'undeliverable' | 'risky' | 'unknown') ?? 'unknown',
+    quality: (parsed.quality as 'verified' | 'suspect' | 'unknown') ?? 'unknown',
+    suggestion: typeof parsed.suggestion === 'string' ? parsed.suggestion : null,
+    reasonCode: (parsed.reasonCode as 'email_format' | 'email_not_corporate' | 'email_disposable' | null) ?? null,
+  }
+}
+
 export interface SubmitPayload {
   fields: Record<string, string | number | boolean | string[]>
   consent: boolean

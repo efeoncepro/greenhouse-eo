@@ -12,6 +12,7 @@ import { CompositionShell } from '@/components/greenhouse/primitives'
 import type { RenderContract } from '@/growth-forms-renderer/contract'
 import {
   conditionalContractFixture,
+  dataIntegrityContractFixture,
   multiStepContractFixture,
   staticContractFixture,
 } from '@/growth-forms-renderer/fixtures'
@@ -26,12 +27,13 @@ import {
  * Demuestra la regla "Greenhouse preview usa el mismo contract/core que public hosts".
  */
 
-type FixtureKey = 'static' | 'conditional' | 'multi_step'
+type FixtureKey = 'static' | 'conditional' | 'multi_step' | 'data_integrity'
 
 const FIXTURES: Record<FixtureKey, { label: string; build: () => RenderContract }> = {
   static: { label: 'Estático', build: staticContractFixture },
   conditional: { label: 'Condicional', build: conditionalContractFixture },
   multi_step: { label: 'Multi-paso', build: multiStepContractFixture },
+  data_integrity: { label: 'Integridad', build: dataIntegrityContractFixture },
 }
 
 type StateKey = 'live' | 'loading' | 'error' | 'unavailable'
@@ -43,12 +45,54 @@ const STATES: Record<StateKey, string> = {
   unavailable: 'No disponible',
 }
 
-/** `fetch` simulado: el submit siempre acepta; nunca toca el API real. */
-const previewFetch: typeof fetch = (async () =>
-  new Response(JSON.stringify({ outcome: 'accepted', submissionId: 'preview' }), {
+// Dominios "personales" para simular el gate corporativo en el preview (sin red real).
+const PREVIEW_FREE_DOMAINS = new Set(['gmail.com', 'hotmail.com', 'outlook.com', 'yahoo.com', 'icloud.com'])
+const PREVIEW_TYPOS: Record<string, string> = { 'gmial.com': 'gmail.com', 'hotmial.com': 'hotmail.com', 'gmai.com': 'gmail.com' }
+
+/**
+ * `fetch` simulado: el submit siempre acepta y `/verify-email` devuelve un veredicto
+ * verosímil (corporativo si el dominio no es personal, typo-suggest para errores
+ * comunes). Nunca toca el API real — demuestra el submit-gating (TASK-1256 Slice 2)
+ * offline para el preview interno / GVC.
+ */
+const previewFetch: typeof fetch = (async (input: RequestInfo | URL, init?: RequestInit) => {
+  const url = String(typeof input === 'string' ? input : input instanceof URL ? input.href : input.url)
+
+  if (url.includes('/verify-email')) {
+    const email = (() => {
+      try {
+        return String((JSON.parse(String(init?.body ?? '{}')) as { email?: unknown }).email ?? '').trim().toLowerCase()
+      } catch {
+        return ''
+      }
+    })()
+
+    const domain = email.split('@')[1] ?? ''
+    const isFreeProvider = PREVIEW_FREE_DOMAINS.has(domain)
+    const suggestion = PREVIEW_TYPOS[domain] ? email.replace(domain, PREVIEW_TYPOS[domain]) : null
+
+    return new Response(
+      JSON.stringify({
+        outcome: 'ok',
+        syntaxValid: email.includes('@'),
+        isCorporate: !isFreeProvider && email.includes('@'),
+        isDisposable: false,
+        isRoleBased: false,
+        isFreeProvider,
+        deliverable: 'unknown',
+        quality: isFreeProvider ? 'suspect' : 'verified',
+        suggestion,
+        reasonCode: isFreeProvider ? 'email_not_corporate' : null,
+      }),
+      { status: 200, headers: { 'content-type': 'application/json' } },
+    )
+  }
+
+  return new Response(JSON.stringify({ outcome: 'accepted', submissionId: 'preview' }), {
     status: 202,
     headers: { 'content-type': 'application/json' },
-  })) as typeof fetch
+  })
+}) as typeof fetch
 
 const LiveForm = ({ fixture }: { fixture: FixtureKey }) => {
   const ref = useRef<HTMLDivElement | null>(null)
