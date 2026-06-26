@@ -406,6 +406,9 @@ export interface PersistSubmissionInput {
   dedupeFingerprint: string | null
   requestId: string | null
   ipHash: string | null
+  /** TASK-1254 — calidad del lead derivada de la verificación de email (nullable). */
+  emailQuality?: 'verified' | 'suspect' | 'unknown' | null
+  emailDomainClass?: 'corporate' | 'personal' | 'disposable' | null
   consent: {
     consentPolicyVersion: string
     legalBasis?: string
@@ -425,8 +428,9 @@ export const persistAcceptedSubmission = async (input: PersistSubmissionInput): 
     const submissionRows = await client.query(
       `INSERT INTO greenhouse_growth.form_submission (
          form_id, form_version_id, surface_id, page_uri, page_name, lead_email_hash,
-         normalized_fields_json, status, dedupe_fingerprint, request_id, ip_hash)
-       VALUES ($1, $2, $3, $4, $5, $6, $7::jsonb, 'accepted', $8, $9, $10)
+         normalized_fields_json, status, dedupe_fingerprint, request_id, ip_hash,
+         email_quality, email_domain_class)
+       VALUES ($1, $2, $3, $4, $5, $6, $7::jsonb, 'accepted', $8, $9, $10, $11, $12)
        RETURNING *`,
       [
         input.formId,
@@ -439,6 +443,8 @@ export const persistAcceptedSubmission = async (input: PersistSubmissionInput): 
         input.dedupeFingerprint,
         input.requestId,
         input.ipHash,
+        input.emailQuality ?? null,
+        input.emailDomainClass ?? null,
       ],
     )
 

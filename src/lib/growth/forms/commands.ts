@@ -19,10 +19,16 @@ import {
   type RiskProfile,
   fieldDefinitionSchema,
   publicSubmitInputSchema,
+  resolveEmailPolicy,
 } from './contracts'
 import { dedupeFingerprint } from './hash'
-import { isFormsServerValidationEnabled, resolveFormsAbuseLimits } from './flags'
+import {
+  isFormsEmailVerificationEnabled,
+  isFormsServerValidationEnabled,
+  resolveFormsAbuseLimits,
+} from './flags'
 import { validateFieldValue } from './validators/core'
+import { verifyEmail } from './email-verification'
 import { compileFormVersion } from './policy-compiler'
 import {
   type CaptchaVerifier,
@@ -320,6 +326,33 @@ export const submitForm = async (rawInput: PublicSubmitInput, context: SubmitCon
     }
   }
 
+  // TASK-1254 — Gate de email por política del form (default OFF via flag). Tier 1 (gratis,
+  // síncrono) decide el gate; el veredicto profundo Tier 2 (provider) es async y NO bloquea.
+  // `block_field` rechaza si el email no es corporativo/no-desechable; `warn`/`tag_only` no
+  // bloquean, solo marcan la calidad del lead. Autoridad server-side (el botón es UX).
+  let emailQuality: 'verified' | 'suspect' | 'unknown' | null = null
+  let emailDomainClass: 'corporate' | 'personal' | 'disposable' | null = null
+
+  if (isFormsEmailVerificationEnabled()) {
+    const policy = resolveEmailPolicy(version.validation_schema_json)
+
+    if (policy.mode !== 'off') {
+      const emailValue = normalizedFields[policy.field]
+      const verdict = await verifyEmail(emailValue)
+
+      if (verdict.syntaxValid) {
+        emailDomainClass = verdict.isDisposable ? 'disposable' : verdict.isCorporate ? 'corporate' : 'personal'
+        emailQuality = verdict.quality
+
+        const failsCorporate = verdict.reasonCode === 'email_not_corporate' || verdict.reasonCode === 'email_disposable'
+
+        if (policy.mode === 'block_field' && failsCorporate) {
+          return { outcome: 'invalid', reason: 'Usa el correo de tu empresa para continuar.' }
+        }
+      }
+    }
+  }
+
   // Hashes (nunca PII cruda en el ledger: ni email ni IP). El email se hashea YA
   // normalizado para que dedupe/rate-limit no mientan con formatos heterogéneos.
   const emailRaw = typeof normalizedFields.email === 'string' ? normalizedFields.email : null
@@ -352,6 +385,8 @@ export const submitForm = async (rawInput: PublicSubmitInput, context: SubmitCon
     dedupeFingerprint: fingerprint,
     requestId: context.requestId ?? null,
     ipHash,
+    emailQuality,
+    emailDomainClass,
     consent: {
       consentPolicyVersion: version.consent_policy_version ?? 'unspecified',
       checkboxes: input.consentCheckboxes,

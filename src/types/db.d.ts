@@ -6439,6 +6439,22 @@ export interface GreenhouseFinanceVatMonthlyPositions {
   vat_position_id: string;
 }
 
+export interface GreenhouseGrowthEmailVerificationCache {
+  created_at: Generated<Timestamp>;
+  deliverable: Generated<string>;
+  domain: string | null;
+  email_hash: string;
+  expires_at: Timestamp;
+  is_corporate: Generated<boolean>;
+  is_disposable: Generated<boolean>;
+  is_free_provider: Generated<boolean>;
+  is_role_based: Generated<boolean>;
+  provider: Generated<string>;
+  updated_at: Generated<Timestamp>;
+  verified_at: Generated<Timestamp>;
+  verified_tier: Generated<string>;
+}
+
 export interface GreenhouseGrowthFormDefinition {
   created_at: Generated<Timestamp>;
   created_by: string | null;
@@ -6504,6 +6520,8 @@ export interface GreenhouseGrowthFormSubmission {
   created_at: Generated<Timestamp>;
   dedupe_fingerprint: string | null;
   delivery_attempts: Generated<number>;
+  email_domain_class: string | null;
+  email_quality: string | null;
   form_id: string;
   form_version_id: string;
   ip_hash: string | null;
@@ -10857,6 +10875,7 @@ export interface DB {
   "greenhouse_finance.tax_codes": GreenhouseFinanceTaxCodes;
   "greenhouse_finance.vat_ledger_entries": GreenhouseFinanceVatLedgerEntries;
   "greenhouse_finance.vat_monthly_positions": GreenhouseFinanceVatMonthlyPositions;
+  "greenhouse_growth.email_verification_cache": GreenhouseGrowthEmailVerificationCache;
   "greenhouse_growth.form_definition": GreenhouseGrowthFormDefinition;
   "greenhouse_growth.form_destination": GreenhouseGrowthFormDestination;
   "greenhouse_growth.form_destination_attempt": GreenhouseGrowthFormDestinationAttempt;

@@ -9,6 +9,7 @@ export const GROWTH_FORMS_PUBLIC_API_FLAG = 'GROWTH_FORMS_PUBLIC_API_ENABLED'
 export const GROWTH_FORMS_DISPATCH_FLAG = 'GROWTH_FORMS_DISPATCH_ENABLED'
 export const GROWTH_FORMS_HUBSPOT_SECURE_SUBMIT_FLAG = 'GROWTH_FORMS_HUBSPOT_SECURE_SUBMIT_ENABLED'
 export const GROWTH_FORMS_SERVER_VALIDATION_FLAG = 'GROWTH_FORMS_SERVER_VALIDATION_ENABLED'
+export const GROWTH_FORMS_EMAIL_VERIFICATION_FLAG = 'GROWTH_FORMS_EMAIL_VERIFICATION_ENABLED'
 
 const isTrue = (value: string | undefined): boolean => value?.trim().toLowerCase() === 'true'
 
@@ -42,6 +43,16 @@ export const isFormsHubSpotSecureSubmitEnabled = (env: NodeJS.ProcessEnv = proce
  */
 export const isFormsServerValidationEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
   isTrue(env[GROWTH_FORMS_SERVER_VALIDATION_FLAG])
+
+/**
+ * Gate de la verificación de email + gate corporativo por form (TASK-1254). Default OFF →
+ * `submitForm` NO aplica política de email (comportamiento legacy) y el endpoint público
+ * `verify-email` resuelve 404 `disabled`. ON → Tier 1 (gratis) + Tier 2 (provider, hoy
+ * noop) corren y la política del form (`block_field|warn|tag_only`) se aplica. Patrón
+ * flag default-OFF + shadow + flip. Registrar en docs/operations/FEATURE_FLAG_STATE_LEDGER.md.
+ */
+export const isFormsEmailVerificationEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+  isTrue(env[GROWTH_FORMS_EMAIL_VERIFICATION_FLAG])
 
 /**
  * Límites de abuse-guard del motor (rate-limit per-email/per-IP). Forms no tiene costo

@@ -297,6 +297,37 @@ export const submissionContractSchema = z.object({
 })
 export type SubmissionContract = z.infer<typeof submissionContractSchema>
 
+// ─── email_policy — TASK-1254 — gate corporativo por form (server-only) ────────
+
+/**
+ * Política de email por form. Vive en `form_version.validation_schema_json.emailPolicy`
+ * (no requiere columna nueva). Default `off` ⇒ el form se comporta como hoy (sin gate).
+ *  - `block_field`: rechaza el submit si el email no es corporativo/deliverable (gate duro).
+ *  - `warn`: deja enviar pero marca el lead como `suspect` (etiqueta, no bloquea).
+ *  - `tag_only`: nunca bloquea; solo clasifica la calidad del dominio.
+ */
+export const EMAIL_POLICY_MODES = ['off', 'block_field', 'warn', 'tag_only'] as const
+export type EmailPolicyMode = (typeof EMAIL_POLICY_MODES)[number]
+
+export const emailPolicySchema = z.object({
+  mode: z.enum(EMAIL_POLICY_MODES).default('off'),
+  /** Campo del form que lleva el email a gatear. */
+  field: z.string().default('email'),
+})
+export type EmailPolicy = z.infer<typeof emailPolicySchema>
+
+/** Extrae la política de email de `validation_schema_json`. Degradación segura ⇒ `off`. */
+export const resolveEmailPolicy = (validationSchemaJson: unknown): EmailPolicy => {
+  const raw =
+    validationSchemaJson && typeof validationSchemaJson === 'object'
+      ? (validationSchemaJson as Record<string, unknown>).emailPolicy
+      : undefined
+
+  const parsed = emailPolicySchema.safeParse(raw ?? {})
+
+  return parsed.success ? parsed.data : { mode: 'off', field: 'email' }
+}
+
 // ─── destination_plan — server-only (router de destinos) ──────────────────────
 
 export const destinationPlanEntrySchema = z.object({
