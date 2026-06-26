@@ -29,7 +29,12 @@ import { type GraderRunRow } from '../store'
 
 export type PublicDeliveryState = 'pending' | 'ready' | 'in_review' | 'unavailable'
 
-const setDeliveryState = async (runId: string, state: PublicDeliveryState): Promise<void> => {
+/**
+ * Materializa `grader_runs.public_delivery_state` (lo que el status público lee O(1)).
+ * Exportado para el gate humano de release (TASK-1244): al APROBAR un `review_required`
+ * el comando publica el snapshot y marca `ready`; al RECHAZAR, `unavailable` (final honesto).
+ */
+export const setPublicDeliveryState = async (runId: string, state: PublicDeliveryState): Promise<void> => {
   await runGreenhousePostgresQuery(
     `UPDATE greenhouse_growth.grader_runs SET public_delivery_state = $2 WHERE run_id = $1`,
     [runId, state],
@@ -48,7 +53,7 @@ export const finalizeRunDelivery = async (run: GraderRunRow): Promise<PublicDeli
 
   try {
     if (run.status === 'failed' || run.status === 'skipped') {
-      await setDeliveryState(run.runId, 'unavailable')
+      await setPublicDeliveryState(run.runId, 'unavailable')
 
       return 'unavailable'
     }
@@ -63,7 +68,7 @@ export const finalizeRunDelivery = async (run: GraderRunRow): Promise<PublicDeli
     } catch (error) {
       // Sin score/reporte derivable todavía → unavailable honesto (no reporte falso).
       if (error instanceof GraderReportError) {
-        await setDeliveryState(run.runId, 'unavailable')
+        await setPublicDeliveryState(run.runId, 'unavailable')
 
         return 'unavailable'
       }
@@ -72,20 +77,20 @@ export const finalizeRunDelivery = async (run: GraderRunRow): Promise<PublicDeli
     }
 
     if (gateStatus === 'review_required') {
-      await setDeliveryState(run.runId, 'in_review')
+      await setPublicDeliveryState(run.runId, 'in_review')
 
       return 'in_review'
     }
 
     if (gateStatus === 'insufficient_data') {
-      await setDeliveryState(run.runId, 'unavailable')
+      await setPublicDeliveryState(run.runId, 'unavailable')
 
       return 'unavailable'
     }
 
     // ready | partial → publicar snapshot idempotente + materializar ready.
     await publishGraderReportSnapshot({ runId: run.runId })
-    await setDeliveryState(run.runId, 'ready')
+    await setPublicDeliveryState(run.runId, 'ready')
 
     return 'ready'
   } catch (error) {

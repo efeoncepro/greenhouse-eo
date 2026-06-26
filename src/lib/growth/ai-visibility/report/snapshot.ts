@@ -14,6 +14,8 @@ import 'server-only'
 
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
+import { isReportReviewApproved } from '../review/queries'
+
 import { readGraderReport } from './command'
 import { type PublicGraderReport } from './contracts'
 
@@ -65,11 +67,25 @@ export const publishGraderReportSnapshot = async (input: {
 }): Promise<PublishedSnapshot> => {
   const { report, publicReport } = await readGraderReport({ runId: input.runId, scoreVersion: input.scoreVersion })
 
-  if (report.gate.status === 'insufficient_data' || report.gate.status === 'review_required') {
+  // `insufficient_data` NUNCA es publicable (cobertura insuficiente; no hay revisión que lo
+  // desbloquee). `review_required` SÓLO es publicable con aprobación humana vigente para esa
+  // `score_version` (TASK-1244): el gate consulta el estado de revisión, no lo bloquea ciego.
+  if (report.gate.status === 'insufficient_data') {
     throw new GraderSnapshotError(
       'not_releasable',
-      'El reporte no es publicable en su estado actual (requiere cobertura suficiente y sin revisión pendiente).'
+      'El reporte no es publicable: cobertura insuficiente.'
     )
+  }
+
+  if (report.gate.status === 'review_required') {
+    const approved = await isReportReviewApproved(report.runId, report.scoreVersion)
+
+    if (!approved) {
+      throw new GraderSnapshotError(
+        'not_releasable',
+        'El reporte requiere revisión humana antes de publicarse (aprobación pendiente o rechazada).'
+      )
+    }
   }
 
   const inserted = await runGreenhousePostgresQuery<RawSnapshot>(
