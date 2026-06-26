@@ -69,6 +69,8 @@ export interface AuthorDraftFormInput {
   riskProfile?: RiskProfile
   locale?: string
   fieldSchema: unknown
+  /** TASK-1254 — política de validación por form (incluye emailPolicy del gate corporativo). */
+  validationSchema?: unknown
   uiPolicy?: unknown
   successBehavior?: unknown
   consentPolicyVersion?: string
@@ -100,6 +102,7 @@ export const authorDraftForm = async (input: AuthorDraftFormInput): Promise<{ fo
     formId: definition.form_id,
     locale: input.locale ?? definition.default_locale,
     fieldSchema: input.fieldSchema,
+    validationSchema: input.validationSchema,
     uiPolicy: input.uiPolicy,
     successBehavior: input.successBehavior,
     consentPolicyVersion: input.consentPolicyVersion ?? null,
