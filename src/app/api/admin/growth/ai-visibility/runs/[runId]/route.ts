@@ -36,7 +36,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ run
     const run = await getGraderRun(runId)
 
     if (!run) {
-      return canonicalErrorResponse('internal_error', { statusOverride: 404, extra: { reason: 'run_not_found' } })
+      return canonicalErrorResponse('grader_run_not_found', { extra: { reason: 'run_not_found' } })
     }
 
     const observations = await getRunObservations(runId)

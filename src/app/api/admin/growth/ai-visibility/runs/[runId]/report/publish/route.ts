@@ -61,11 +61,11 @@ export async function POST(request: Request, { params }: { params: Promise<{ run
     })
   } catch (error) {
     if (error instanceof GraderReportError && (error.code === 'run_not_found' || error.code === 'score_not_found')) {
-      return canonicalErrorResponse('internal_error', { statusOverride: 404, extra: { reason: error.code } })
+      return canonicalErrorResponse('grader_run_not_found', { extra: { reason: error.code } })
     }
 
     if (error instanceof GraderSnapshotError && error.code === 'not_releasable') {
-      return canonicalErrorResponse('internal_error', { statusOverride: 409, extra: { reason: 'not_releasable' } })
+      return canonicalErrorResponse('grader_report_not_releasable', { extra: { reason: 'not_releasable' } })
     }
 
     captureWithDomain(error, 'growth', { tags: { source: 'growth_ai_visibility_report_publish_route' } })

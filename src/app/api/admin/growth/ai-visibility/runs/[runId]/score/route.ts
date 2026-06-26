@@ -42,7 +42,7 @@ export async function POST(_request: Request, { params }: { params: Promise<{ ru
     })
   } catch (error) {
     if (error instanceof GraderScoringError && (error.code === 'run_not_found' || error.code === 'profile_not_found')) {
-      return canonicalErrorResponse('internal_error', { statusOverride: 404, extra: { reason: error.code } })
+      return canonicalErrorResponse('grader_run_not_found', { extra: { reason: error.code } })
     }
 
     captureWithDomain(error, 'growth', { tags: { source: 'growth_ai_visibility_score_route' } })

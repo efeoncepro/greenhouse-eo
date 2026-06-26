@@ -84,11 +84,13 @@ export type CanonicalErrorCode =
   // Growth Forms engine (TASK-1229).
   | 'growth_form_invalid_input'
   | 'growth_form_not_found'
-  // Growth AI Visibility · admin evidence review gate (TASK-1244).
+  // Growth AI Visibility · admin grader routes (TASK-1226/1235/1239) + review gate (TASK-1244).
+  | 'grader_run_not_found'
+  | 'grader_run_invalid_input'
+  | 'grader_report_not_releasable'
   | 'grader_report_not_reviewable'
   | 'grader_report_invalid_review_transition'
   | 'grader_report_review_reason_required'
-  | 'grader_report_not_found'
 // Reserved for future canonical codes — extender aquí cuando emerjan
 // nuevos error paths estructurales. NUNCA usar strings ad-hoc.
 
@@ -278,9 +280,24 @@ const CANONICAL_ERRORS: Record<CanonicalErrorCode, CanonicalErrorDefinition> = {
     message: 'No encontramos ese formulario. Puede que se haya archivado o no exista.',
     actionable: false
   },
-  // Growth AI Visibility · admin evidence review gate (TASK-1244). Errores estructurales
-  // (no se resuelven reintentando) → actionable: false; reason-required es validación
-  // del input (el operador agrega el motivo y reenvía) → actionable: true.
+  // Growth AI Visibility · admin grader routes (TASK-1226/1235/1239) + review gate (TASK-1244).
+  // Errores estructurales (no se resuelven reintentando) → actionable: false; los de input
+  // (el operador corrige y reenvía) → actionable: true.
+  grader_run_not_found: {
+    status: 404,
+    message: 'No encontramos ese análisis del grader, o aún no tiene datos para mostrar.',
+    actionable: false
+  },
+  grader_run_invalid_input: {
+    status: 400,
+    message: 'Revisa los datos del análisis: falta un campo obligatorio o un valor no es válido.',
+    actionable: true
+  },
+  grader_report_not_releasable: {
+    status: 409,
+    message: 'El reporte no es publicable en su estado actual (requiere cobertura suficiente o aprobación de revisión).',
+    actionable: false
+  },
   grader_report_not_reviewable: {
     status: 409,
     message: 'Este reporte no está en revisión: solo se aprueba o rechaza un reporte marcado para revisión humana.',
@@ -295,11 +312,6 @@ const CANONICAL_ERRORS: Record<CanonicalErrorCode, CanonicalErrorDefinition> = {
     status: 422,
     message: 'Indica el motivo del rechazo para continuar (queda en el registro interno).',
     actionable: true
-  },
-  grader_report_not_found: {
-    status: 404,
-    message: 'No encontramos ese reporte o aún no tiene un análisis para revisar.',
-    actionable: false
   }
 }
 

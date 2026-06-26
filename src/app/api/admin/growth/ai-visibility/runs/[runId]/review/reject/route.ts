@@ -42,7 +42,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ run
     return NextResponse.json(result)
   } catch (error) {
     if (error instanceof GraderReportError && (error.code === 'run_not_found' || error.code === 'score_not_found')) {
-      return canonicalErrorResponse('grader_report_not_found', { extra: { reason: error.code } })
+      return canonicalErrorResponse('grader_run_not_found', { extra: { reason: error.code } })
     }
 
     if (error instanceof ReportReviewError) {

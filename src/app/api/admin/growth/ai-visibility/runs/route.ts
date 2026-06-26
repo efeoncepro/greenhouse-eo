@@ -96,7 +96,7 @@ export async function POST(request: Request) {
   try {
     body = (await request.json()) as RunBody
   } catch {
-    return canonicalErrorResponse('internal_error', { statusOverride: 400, extra: { reason: 'invalid_json' } })
+    return canonicalErrorResponse('grader_run_invalid_input', { extra: { reason: 'invalid_json' } })
   }
 
   const brandName = asNonEmptyString(body.brandName)
@@ -107,18 +107,17 @@ export async function POST(request: Request) {
   const runKind = body.runKind ?? 'smoke'
 
   if (!brandName || !market || !locale || !category) {
-    return canonicalErrorResponse('internal_error', {
-      statusOverride: 400,
+    return canonicalErrorResponse('grader_run_invalid_input', {
       extra: { reason: 'missing_required_fields', required: ['brandName', 'market', 'locale', 'category'] }
     })
   }
 
   if (!isGrowthAiVisibilityExecutionMode(mode)) {
-    return canonicalErrorResponse('internal_error', { statusOverride: 400, extra: { reason: 'invalid_mode' } })
+    return canonicalErrorResponse('grader_run_invalid_input', { extra: { reason: 'invalid_mode' } })
   }
 
   if (!isGrowthAiVisibilityRunKind(runKind)) {
-    return canonicalErrorResponse('internal_error', { statusOverride: 400, extra: { reason: 'invalid_run_kind' } })
+    return canonicalErrorResponse('grader_run_invalid_input', { extra: { reason: 'invalid_run_kind' } })
   }
 
   const competitorsDeclared = Array.isArray(body.competitorsDeclared)
