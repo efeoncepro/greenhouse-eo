@@ -317,6 +317,20 @@ Veredicto arch-architect: postura tiered. `national_id` (cédula) = cifrado at-r
 - ~~Ventana de retención por defecto (días)~~ — **RESUELTO 2026-06-26 (operador):** default **24 meses**, configurable por form, base legal "interés legítimo" B2B. La purga **NO corre** hasta sign-off legal (flag `GROWTH_FORMS_RETENTION_PURGE_ENABLED` default OFF). Slice 4 se diseña con este default pero queda diferida.
 - ~~¿Cifrado determinista vs aleatorio con IV?~~ — **RESUELTO 2026-06-26 (Claude, opción robusta):** **IV aleatorio por fila** con **AES-256-GCM**; IV (12 bytes) + authTag (16 bytes) almacenados junto al ciphertext. No se necesita búsqueda por RUT. El dedup ya usa `lead_email_hash`, no el RUT.
 
+## Progress 2026-06-26 — Slices 1-3 code-complete (rollout pendiente)
+
+- **Slice 1 (masking reader) — DONE.** `pii/mask.ts` + `pii/classify.ts` + `pii/masked-reader.ts` (`getSubmissionLeadMasked`, masked por default, resuelve national_id vía `field_schema_json`; soporta cifrado ON con mask precomputado y legacy/OFF enmascarando en lectura). 17 tests.
+- **Slice 2 (cifrado at-rest) — DONE.** `pii/encryption.ts` (AES-256-GCM, IV aleatorio + authTag, key Secret Manager) + `splitAndEncryptPii` (saca national_id del blob en claro → `encrypted_fields_json`) + `submitForm` gated por `GROWTH_FORMS_PII_ENCRYPTION_ENABLED` (fail-closed: outcome `error` 503 si ON sin key) + boundary incondicional en el dispatcher (`redactNationalIdFromBlob`). Email/tel/empresa fluyen normal a HubSpot; SOLO national_id se redacta. 11 tests + round-trip real.
+- **Slice 3 (reveal gobernado) — DONE.** `pii/reveal.ts` (`revealSubmissionPiiField`, reason ≥10 + audit append-only + outbox en tx) + `pii/audit.ts` + capability `growth.forms.lead_pii.reveal` (catálogo + grant least-privilege EFEONCE_ADMIN ∪ EFEONCE_OPERATIONS + coverage test) + evento `growth.forms.lead_pii.revealed` + signal `growth.forms.pii_reveal_without_reason` (steady=0) + rutas parity `GET .../lead` (masked) y `POST .../reveal` (gobernado). 6 tests.
+- **Migración aplicada a dev:** `form_submission.encrypted_fields_json` + `lead_pii_reveal_audit` (append-only + trigger anti-UPDATE/DELETE + DO block). db.d.ts regenerado.
+- **Rollout pendiente (Runtime Rollout Completion Gate):** flag `GROWTH_FORMS_PII_ENCRYPTION_ENABLED` **OFF en todos los environments**; key creada en Secret Manager (no publicada como Vercel env por environment todavía). Lifecycle **NO** se mueve a complete: `code complete, rollout pendiente`.
+
+### Slice 4 (retención + purga) — DIFERIDA (decisión operador)
+
+- Espera **sign-off legal** sobre la ventana de retención. Default acordado a sembrar cuando se implemente: **24 meses**, configurable por form, base legal "interés legítimo" B2B.
+- Diseño previsto: columna `retention_expires_at` (additive, `created_at + ventana`) + política/base legal por form junto al consent snapshot + job de purga idempotente (`WHERE retention_expires_at < now() AND NOT purged`) en Cloud Scheduler/ops-worker + audit de purga append-only + signal `growth.forms.retention_overdue`. Flag `GROWTH_FORMS_RETENTION_PURGE_ENABLED` (default OFF) — **aún NO declarado en código** (no se declara hasta implementar, para no romper el gate de flags con un flag inerte).
+- Backfill de cifrado de national_id histórico (dry-run → allowlist → batch) también queda en Slice 4 (corre tras verificar Slice 2 en staging).
+
 ## Execution Decisions 2026-06-26 (operador checkpoint)
 
 - **Alcance autorizado: Slices 1-3 completas** (masking reader + cifrado at-rest national_id + reveal gobernado). **Slice 4 (retención/purga) diferida** hasta que legal confirme la ventana; se siembra el default 24m + flag OFF + base legal/finalidad por form, sin job de purga corriendo.

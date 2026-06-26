@@ -1109,6 +1109,14 @@ Spec: `docs/tasks/in-progress/TASK-1175-design-handoff-control-plane-full-api-pa
 
 **Payload v1**: `{ schemaVersion: 1, submissionId, formId, formVersionId }`. Se emite **in-tx** con `{form_submission + form_submission_consent_snapshot}`; el 202 OK del submit sólo sale con ese trío committeado. La entrega a destinos externos (HubSpot/email/webhook) y cualquier efecto downstream corren **async vía reactive consumer idempotente + dead-letter, NUNCA inline** (overlay #3 + CLAUDE.md outbox). **Seam transversal (no grader-céntrico):** este evento es el hook genérico para que *cualquier* flujo interno reaccione a un submit aceptado — p.ej. la convergencia TASK-1251 suscribe un consumer que encola el run del grader. Los destinos internos async NO se hornean en `form_destination` (que modela entrega externa: hubspot/crm_contact/email/webhook/greenhouse_only); se modelan como reactive consumers de este evento, keyed por `form_kind`/slug. Fan-out a N consumers = at-least-once + idempotencia = effectively-once.
 
+## Delta 2026-06-26 — TASK-1255: `growth.forms.lead_pii.revealed` (reveal gobernado de PII)
+
+| Evento | Versión | Aggregate | Emisor | Consumer |
+| --- | --- | --- | --- | --- |
+| `growth.forms.lead_pii.revealed` | v1 | `growth_form_submission` (`fsub-{uuid}`) | command `revealSubmissionPiiField` (`src/lib/growth/forms/pii/reveal.ts`), in-tx con la fila de audit append-only | trail de auditoría (lo lee el signal `growth.forms.pii_reveal_without_reason`); sin proyección downstream |
+
+**Payload v1**: `{ submissionId, formId, revealedField, piiClass, actorUserId, reason }`. Se emite **in-tx** con la fila `lead_pii_reveal_audit` (append-only). **NUNCA lleva el valor revelado** (cédula/email/teléfono) — sólo qué campo + clase PII + actor + razón. El reveal exige capability fina `growth.forms.lead_pii.reveal` + `reason` ≥ 10 (validados antes del command). Postura PII completa: `docs/documentation/growth/postura-pii-formularios.md` (TASK-1255, Ley 21.719).
+
 ## Delta 2026-06-25 — TASK-1242: `growth.ai_visibility.lead_handoff_requested` (HubSpot lead handoff)
 
 | Evento                                          | Versión | Aggregate                                  | Emisor                                                                                                  | Consumer                                                                                                              |
