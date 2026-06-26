@@ -10,7 +10,7 @@ El submit-gating de email que esta task expone en UI ya tiene su backend goberna
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -278,13 +278,15 @@ El renderer es portable y ya tiene `mask.ts`; se extiende, no se reemplaza. El s
 
 ## Acceptance Criteria
 
-- [ ] El campo teléfono muestra máscara/formato por país (default país del form); RUT y URL con máscara/normalización.
-- [ ] El botón submit se deshabilita mientras verifica y cuando el email no es corporativo (política block); muestra mensaje es-CL + typo-suggest.
-- [ ] El builder admin configura tipo/validador/máscara/política por campo desde el catálogo curado; no hay campo de regex libre.
-- [ ] El cockpit muestra PII masked por default; el reveal pide reason ≥ N y está oculto sin capability.
-- [ ] Estados loading/empty/error/degraded/permission/mobile cubiertos.
-- [ ] Copy visible en `src/lib/copy/*`, validado es-CL.
-- [ ] GVC desktop + mobile capturado y mirado; sin scroll horizontal en 390px.
+- [x] El campo teléfono muestra máscara/formato por país (selector de país in-field estilo HubSpot, default país del form); RUT y URL con máscara/normalización.
+- [x] El botón submit se deshabilita mientras verifica y cuando el email no es corporativo (política block); muestra mensaje es-CL + typo-suggest. Degradación honesta si `/verify-email` OFF.
+- [x] El builder admin configura tipo/validador/máscara/política por campo desde el catálogo curado; no hay campo de regex libre. (gate corporativo + país tel + RUT vía dropdowns/toggles).
+- [x] El cockpit muestra PII masked por default; el reveal pide reason ≥ 10 y está oculto sin capability `growth.forms.lead_pii.reveal`.
+- [x] Estados loading/empty/error/degraded/permission/mobile cubiertos.
+- [x] Copy visible en `src/lib/copy/*` (renderer: `copy.ts` browser-safe; cockpit: `GH_GROWTH_FORMS`), validado es-CL.
+- [x] GVC desktop + mobile capturado y mirado; sin scroll horizontal en 390px.
+
+> **Extras shippeados (a pedido del operador):** Slice 1b teléfono internacional con selector de país in-field (HubSpot), Slice 1c **validación reactiva live** (✓ success al instante + error reactivo + máscara as-you-type con caret preservado), Slice 1d **endurecimiento UX** (resumen de errores accesible GOV.UK + "listo para enviar/faltan N" + contador de caracteres + micro-motion + autoguardado de borrador PII-safe en localStorage).
 
 ## Verification
 
@@ -295,13 +297,24 @@ El renderer es portable y ya tiene `mask.ts`; se extiende, no se reemplaza. El s
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` sincronizado
-- [ ] archivo en carpeta correcta
-- [ ] `docs/tasks/README.md` sincronizado
-- [ ] `Handoff.md` actualizado
-- [ ] `changelog.md` actualizado
-- [ ] chequeo de impacto cruzado (TASK-1253/1254/1255 + TASK-1232)
-- [ ] GVC desktop+mobile adjuntado y mirado
+- [x] `Lifecycle` sincronizado (complete)
+- [x] archivo en carpeta correcta (`complete/`)
+- [x] `docs/tasks/README.md` sincronizado
+- [x] `Handoff.md` actualizado
+- [x] `changelog.md` actualizado
+- [x] chequeo de impacto cruzado (TASK-1253/1254/1255 + TASK-1232: extiende el cockpit, no lo reescribe)
+- [x] GVC desktop+mobile adjuntado y mirado (renderer preview + cockpit PII + builder)
+
+## Closing Summary (2026-06-26)
+
+**Estado: complete (code-complete + UI verificada; runtime enforcement gated por flags de TASK-1253/1254/1255).** 8 commits en develop (`6aa5e93b`..`5c337ae7`), local-first, sin push.
+
+- **Slice 1/1b/1c/1d (renderer portable):** máscaras por país (E.164 SSOT `CALLING_CODES`, RUT, URL), teléfono internacional con selector de país in-field, validación reactiva live (✓/error + máscara as-you-type), endurecimiento UX (resumen de errores GOV.UK, listo-para-enviar, contador, autoguardado PII-safe). 45 tests renderer.
+- **Slice 2 (submit-gating email):** `verifyPublicEmail` debounced + estado verificando + typo-suggest + degradación honesta. Gate duro solo para `validator='corporate_email'`.
+- **Slice 3 (builder):** sección "Validación y datos" en el Composer (gate corporativo + país tel + RUT, dropdowns/toggles, sin regex). Backend mínimo: la ruta POST forms ahora forwardea `validationSchema` (gap de TASK-1254). Smoke write-path: emailPolicy + validators persisten.
+- **Slice 4 (cockpit PII):** panel masked + reveal gobernado (capability + reason ≥10 + audit/outbox de TASK-1255). GVC con datos reales.
+
+**Runtime Rollout:** TASK-1256 no introduce flag propio. La UI funciona y degrada honesto sin los flags de backend; el enforcement completo (gate corporativo server, cifrado national_id) depende de `GROWTH_FORMS_{SERVER_VALIDATION,EMAIL_VERIFICATION,PII_ENCRYPTION}_ENABLED` — propiedad de TASK-1253/1254/1255. Gates de cierre: `pnpm test` 8183 verdes · `pnpm build` OK · typecheck/lint limpios · renderer:build OK · docs:closure-check (0 flags nuevos).
 
 ## Follow-ups
 

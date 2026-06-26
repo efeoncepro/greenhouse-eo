@@ -53,3 +53,27 @@ POST /api/admin/growth/forms/submissions/{submissionId}/reveal
 - Auditoría: `greenhouse_growth.lead_pii_reveal_audit` (append-only).
 - Señal: `growth.forms.pii_reveal_without_reason` (estado sano = 0).
 - Spec: [TASK-1255](../../tasks/in-progress/TASK-1255-growth-forms-pii-hardening-ley-21719.md).
+
+## Delta 2026-06-26 (TASK-1256) — ya tiene interfaz en el cockpit
+
+Lo anterior describía los contratos; ahora hay UI en el cockpit de Growth Forms (`/admin/growth/forms`).
+
+### Revelar un dato de un lead (desde el cockpit)
+
+1. Selecciona el formulario y abre **Abrir evidencia** en el inspector.
+2. En **Datos del lead** verás los campos sensibles **enmascarados** por default (ej. `c***@empresa.com`, `12.345.6**-K`) con el chip **Enmascarado**.
+3. Si tienes permiso, cada dato revelable muestra el botón **Revelar**. Al pulsarlo se abre un diálogo:
+   - Escribe el **Motivo del acceso** (mínimo 10 caracteres).
+   - Un aviso te recuerda que la acción **queda registrada** con tu usuario, la fecha y el motivo.
+   - Pulsa **Revelar dato**. El valor se muestra y queda en la bitácora.
+4. Si **no** tienes la capability `growth.forms.lead_pii.reveal`, no verás el botón Revelar (solo el dato enmascarado) — es esperado.
+
+### Configurar la validación de un formulario (builder)
+
+Al crear un formulario (botón **Nuevo formulario** → Composer), en la sección **Validación y datos**:
+
+- **Gate de correo corporativo**: *Sin gate* / *Advertir* / *Bloquear*. "Bloquear" rechaza gmail/temporales antes de aceptar el lead.
+- **Pedir teléfono** (con país por defecto) y **Pedir RUT / cédula**: agregan esos campos con su validador correcto.
+- Todo se elige de un **catálogo gobernado** (listas/interruptores). No hay campo de "regex" — cada validador es seguro por construcción.
+
+> Detalle técnico: la config se persiste en una versión nueva del formulario (las publicadas son inmutables). Spec: [TASK-1256](../../tasks/complete/TASK-1256-growth-forms-field-masks-submit-gate-admin-config.md).
