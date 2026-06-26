@@ -383,6 +383,10 @@ export const PUBLIC_SUBMIT_OUTCOMES = [
   'captcha_failed',
   'form_not_published',
   'disabled',
+  // TASK-1255 — fail-closed: el motor no pudo procesar de forma segura (p.ej. cifrado de
+  // PII habilitado pero la key no está disponible). NUNCA se persiste PII en claro creyendo
+  // cifrarla; se rechaza el submit y se reintenta al resolver la causa.
+  'error',
 ] as const
 export type PublicSubmitOutcome = (typeof PUBLIC_SUBMIT_OUTCOMES)[number]
 

@@ -17,6 +17,7 @@ const submission = (fields: Record<string, unknown> = { email: 'lead@example.com
   page_name: 'LP',
   lead_email_hash: 'hash',
   normalized_fields_json: fields,
+  encrypted_fields_json: {},
   status: 'accepted',
   rejection_reason_class: null,
   dedupe_fingerprint: 'fp',

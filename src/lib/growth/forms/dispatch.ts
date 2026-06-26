@@ -9,11 +9,16 @@
  */
 import 'server-only'
 
+import { z } from 'zod'
+
+import { fieldDefinitionSchema, type FieldDefinition } from './contracts'
 import { deliverToHubSpotForms, HUBSPOT_FORMS_ADAPTER_KIND } from './destinations/hubspot'
+import { redactNationalIdFromBlob } from './pii/boundary'
 import {
   type FormDestinationRow,
   type FormSubmissionRow,
   getConsentSnapshot,
+  getFormVersionById,
   insertAttempt,
   listDestinationsForVersion,
   listSubmissionsPendingDispatch,
@@ -70,13 +75,46 @@ export interface DispatchSummary {
  *   - intentos >= MAX → `dead_letter`
  *   - todos `skipped` (adapter disabled) → se deja como está (se reintenta al prender)
  */
+/** Resuelve los FieldDefinition de una versión (cacheado por run). null si no parsea. */
+const resolveVersionFieldDefs = async (
+  formVersionId: string,
+  cache: Map<string, FieldDefinition[] | null>,
+): Promise<FieldDefinition[] | null> => {
+  if (cache.has(formVersionId)) return cache.get(formVersionId) ?? null
+
+  const version = await getFormVersionById(formVersionId)
+  const parsed = version ? z.array(fieldDefinitionSchema).safeParse(version.field_schema_json) : null
+  const defs = parsed && parsed.success ? parsed.data : null
+
+  cache.set(formVersionId, defs)
+
+  return defs
+}
+
+const asBlobRecord = (value: unknown): Record<string, unknown> =>
+  value && typeof value === 'object' && !Array.isArray(value) ? (value as Record<string, unknown>) : {}
+
 export const dispatchPendingSubmissions = async (limit = 50): Promise<DispatchSummary> => {
   const pending = await listSubmissionsPendingDispatch(limit)
   let delivered = 0
   let failed = 0
   let deadLetter = 0
 
-  for (const submission of pending) {
+  // Cache de field defs por versión: el redactor de national_id se aplica a cada submission.
+  const fieldDefsByVersion = new Map<string, FieldDefinition[] | null>()
+
+  for (const rawSubmission of pending) {
+    // TASK-1255 — Boundary national_id → destinos: redacta la cédula del blob ANTES de
+    // que cualquier adapter lo lea (incondicional respecto del flag de cifrado).
+    const fieldDefs = await resolveVersionFieldDefs(rawSubmission.form_version_id, fieldDefsByVersion)
+
+    const submission: FormSubmissionRow = fieldDefs
+      ? {
+          ...rawSubmission,
+          normalized_fields_json: redactNationalIdFromBlob(asBlobRecord(rawSubmission.normalized_fields_json), fieldDefs),
+        }
+      : rawSubmission
+
     const destinations = (await listDestinationsForVersion(submission.form_version_id)).filter(
       d => d.enabled && d.delivery_mode === 'direct',
     )

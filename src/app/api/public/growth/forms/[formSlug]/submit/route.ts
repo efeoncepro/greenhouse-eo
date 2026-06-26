@@ -25,6 +25,7 @@ const STATUS_BY_OUTCOME: Record<PublicSubmitOutcome, number> = {
   captcha_failed: 403,
   form_not_published: 404,
   disabled: 404,
+  error: 503,
 }
 
 const getClientIp = (request: Request): string | null =>

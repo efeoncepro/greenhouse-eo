@@ -405,6 +405,8 @@ export interface PersistSubmissionInput {
   pageName: string | null
   leadEmailHash: string | null
   normalizedFields: Record<string, unknown>
+  /** TASK-1255 — national_id cifrado (map fieldKey → envelope). Default `{}` (sin cédula). */
+  encryptedFields?: Record<string, unknown>
   dedupeFingerprint: string | null
   requestId: string | null
   ipHash: string | null
@@ -430,9 +432,9 @@ export const persistAcceptedSubmission = async (input: PersistSubmissionInput): 
     const submissionRows = await client.query(
       `INSERT INTO greenhouse_growth.form_submission (
          form_id, form_version_id, surface_id, page_uri, page_name, lead_email_hash,
-         normalized_fields_json, status, dedupe_fingerprint, request_id, ip_hash,
+         normalized_fields_json, encrypted_fields_json, status, dedupe_fingerprint, request_id, ip_hash,
          email_quality, email_domain_class)
-       VALUES ($1, $2, $3, $4, $5, $6, $7::jsonb, 'accepted', $8, $9, $10, $11, $12)
+       VALUES ($1, $2, $3, $4, $5, $6, $7::jsonb, $8::jsonb, 'accepted', $9, $10, $11, $12, $13)
        RETURNING *`,
       [
         input.formId,
@@ -442,6 +444,7 @@ export const persistAcceptedSubmission = async (input: PersistSubmissionInput): 
         input.pageName,
         input.leadEmailHash,
         JSON.stringify(input.normalizedFields),
+        JSON.stringify(input.encryptedFields ?? {}),
         input.dedupeFingerprint,
         input.requestId,
         input.ipHash,

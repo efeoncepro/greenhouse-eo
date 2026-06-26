@@ -10,6 +10,7 @@ export const GROWTH_FORMS_DISPATCH_FLAG = 'GROWTH_FORMS_DISPATCH_ENABLED'
 export const GROWTH_FORMS_HUBSPOT_SECURE_SUBMIT_FLAG = 'GROWTH_FORMS_HUBSPOT_SECURE_SUBMIT_ENABLED'
 export const GROWTH_FORMS_SERVER_VALIDATION_FLAG = 'GROWTH_FORMS_SERVER_VALIDATION_ENABLED'
 export const GROWTH_FORMS_EMAIL_VERIFICATION_FLAG = 'GROWTH_FORMS_EMAIL_VERIFICATION_ENABLED'
+export const GROWTH_FORMS_PII_ENCRYPTION_FLAG = 'GROWTH_FORMS_PII_ENCRYPTION_ENABLED'
 
 const isTrue = (value: string | undefined): boolean => value?.trim().toLowerCase() === 'true'
 
@@ -53,6 +54,17 @@ export const isFormsServerValidationEnabled = (env: NodeJS.ProcessEnv = process.
  */
 export const isFormsEmailVerificationEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
   isTrue(env[GROWTH_FORMS_EMAIL_VERIFICATION_FLAG])
+
+/**
+ * Gate del cifrado at-rest de national_id (TASK-1255). Default OFF → comportamiento
+ * legacy (la cédula queda en claro en `normalized_fields_json`). ON → `submitForm`
+ * separa los campos national_id del blob, los cifra (AES-256-GCM, key en Secret
+ * Manager) y los persiste en `encrypted_fields_json` (boundary: el dispatcher ya no
+ * los ve). Patrón flag default-OFF + shadow + flip tras staging. Requiere la key
+ * provisionada. Registrar en docs/operations/FEATURE_FLAG_STATE_LEDGER.md.
+ */
+export const isFormsPiiEncryptionEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+  isTrue(env[GROWTH_FORMS_PII_ENCRYPTION_FLAG])
 
 /**
  * Límites de abuse-guard del motor (rate-limit per-email/per-IP). Forms no tiene costo

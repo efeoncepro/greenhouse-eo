@@ -24,9 +24,12 @@ import {
 import { dedupeFingerprint } from './hash'
 import {
   isFormsEmailVerificationEnabled,
+  isFormsPiiEncryptionEnabled,
   isFormsServerValidationEnabled,
   resolveFormsAbuseLimits,
 } from './flags'
+import { splitAndEncryptPii } from './pii/encryption'
+import type { EncryptedFieldEnvelope } from './pii/types'
 import { validateFieldValue } from './validators/core'
 import { verifyEmail } from './email-verification'
 import { compileFormVersion } from './policy-compiler'
@@ -309,13 +312,15 @@ export const submitForm = async (rawInput: PublicSubmitInput, context: SubmitCon
   // minimización de PII se gobierna por persistence_mode + retención (arch §8.4), NO
   // descartando el dato que el form debe entregar. `lead_email_hash` queda como clave de
   // dedupe/rate-limit, separada del payload.
+  // field_schema_json se parsea UNA vez: lo consumen la re-validación server (TASK-1253)
+  // y el cifrado de national_id (TASK-1255).
+  const parsedFieldDefs = z.array(fieldDefinitionSchema).safeParse(version.field_schema_json)
+
   let normalizedFields: Record<string, unknown> = { ...input.fields }
 
   if (isFormsServerValidationEnabled()) {
-    const parsedDefs = z.array(fieldDefinitionSchema).safeParse(version.field_schema_json)
-
-    if (parsedDefs.success) {
-      const revalidated = revalidateAndNormalizeFields(parsedDefs.data, input.fields)
+    if (parsedFieldDefs.success) {
+      const revalidated = revalidateAndNormalizeFields(parsedFieldDefs.data, input.fields)
 
       if (!revalidated.ok) return { outcome: 'invalid', reason: 'Revisa los datos del formulario.' }
 
@@ -369,6 +374,26 @@ export const submitForm = async (rawInput: PublicSubmitInput, context: SubmitCon
     }
   }
 
+  // TASK-1255 — Cifrado at-rest de national_id (cédula), gated default OFF. Saca los
+  // campos national_id del blob en claro y los cifra (AES-256-GCM) → encrypted_fields_json.
+  // Boundary: tras esto el dispatcher (que lee normalized_fields_json) ya no ve la cédula.
+  // El email gate corrió ANTES (email NO es national_id, sigue en el blob). Fail-closed:
+  // si el cifrado está ON pero la key falla, NO se persiste la cédula en claro — se rechaza.
+  let encryptedFields: Record<string, EncryptedFieldEnvelope> = {}
+
+  if (isFormsPiiEncryptionEnabled() && parsedFieldDefs.success) {
+    try {
+      const split = await splitAndEncryptPii(parsedFieldDefs.data, normalizedFields)
+
+      normalizedFields = split.remaining
+      encryptedFields = split.encrypted
+    } catch (error) {
+      captureWithDomain(error, 'growth', { extra: { stage: 'pii_encryption_split', formId: version.form_id } })
+
+      return { outcome: 'error', reason: 'No fue posible procesar tus datos de forma segura. Intenta más tarde.' }
+    }
+  }
+
   // Hashes (nunca PII cruda en el ledger: ni email ni IP). El email se hashea YA
   // normalizado para que dedupe/rate-limit no mientan con formatos heterogéneos.
   const emailRaw = typeof normalizedFields.email === 'string' ? normalizedFields.email : null
@@ -398,6 +423,7 @@ export const submitForm = async (rawInput: PublicSubmitInput, context: SubmitCon
     pageName: input.pageName ?? null,
     leadEmailHash,
     normalizedFields,
+    encryptedFields,
     dedupeFingerprint: fingerprint,
     requestId: context.requestId ?? null,
     ipHash,
