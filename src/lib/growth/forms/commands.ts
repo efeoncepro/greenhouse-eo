@@ -347,6 +347,19 @@ export const submitForm = async (rawInput: PublicSubmitInput, context: SubmitCon
         const failsCorporate = verdict.reasonCode === 'email_not_corporate' || verdict.reasonCode === 'email_disposable'
 
         if (policy.mode === 'block_field' && failsCorporate) {
+          // Registra el rechazo (sin PII: solo reason_class) para que el signal de
+          // rejection rate lo vea. La spike de este signal es la alerta canónica de
+          // "el gate corporativo está matando conversión" (risk matrix).
+          const emailReasonClass = verdict.reasonCode === 'email_disposable' ? 'email_disposable' : 'email_not_corporate'
+
+          await insertRejectedSubmission({
+            formId: version.form_id,
+            formVersionId: version.form_version_id,
+            surfaceId,
+            reasonClass: emailReasonClass,
+            requestId: context.requestId ?? null,
+          }).catch(error => captureWithDomain(error, 'growth', { extra: { stage: 'email_gate_rejection_persist' } }))
+
           return { outcome: 'invalid', reason: 'Usa el correo de tu empresa para continuar.' }
         }
       }

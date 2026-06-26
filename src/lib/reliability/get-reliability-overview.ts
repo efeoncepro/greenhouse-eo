@@ -175,6 +175,7 @@ import { getGrowthAiVisibilityScoringSignals } from './queries/growth-ai-visibil
 import { getGrowthAiVisibilityPublicIntakeSignals } from './queries/growth-ai-visibility-public-intake-signals'
 import { getGrowthAiVisibilityPublicDeliverySignals } from './queries/growth-ai-visibility-public-delivery-signals'
 import { getGrowthFormsSignals } from './queries/growth-forms-signals'
+import { getGrowthFormsEmailSignals } from './queries/growth-forms-email-signals'
 import { getGrowthFormsHubspotSignals } from './queries/growth-forms-hubspot-signals'
 import { getGrowthAiVisibilityLeadHandoffSignals } from './queries/growth-ai-visibility-lead-handoff-signals'
 // TASK-1082 — Knowledge Platform ingestion signals (moduleKey 'knowledge').
@@ -623,6 +624,7 @@ interface ReliabilityOverviewSources {
   growthAiVisibilityPublicIntake?: ReliabilitySignal[] | null
   growthAiVisibilityPublicDelivery?: ReliabilitySignal[] | null
   growthForms?: ReliabilitySignal[] | null
+  growthFormsEmail?: ReliabilitySignal[] | null
   growthFormsHubspot?: ReliabilitySignal[] | null
   growthAiVisibilityLeadHandoff?: ReliabilitySignal[] | null
 
@@ -1037,6 +1039,7 @@ export const buildReliabilityOverview = (
     ...(sources.growthAiVisibilityPublicIntake ?? []),
     ...(sources.growthAiVisibilityPublicDelivery ?? []),
     ...(sources.growthForms ?? []),
+    ...(sources.growthFormsEmail ?? []),
     ...(sources.growthFormsHubspot ?? []),
     ...(sources.growthAiVisibilityLeadHandoff ?? []),
     // TASK-812 — Previred/LRE artifact registry drift.
@@ -1434,6 +1437,12 @@ export const getReliabilityOverview = async (
     preloadedSources.growthForms !== undefined
       ? preloadedSources.growthForms
       : await getGrowthFormsSignals().catch(() => null)
+
+  // TASK-1254 — Gate de correo corporativo (rechazos + leads sospechosos).
+  const growthFormsEmail =
+    preloadedSources.growthFormsEmail !== undefined
+      ? preloadedSources.growthFormsEmail
+      : await getGrowthFormsEmailSignals().catch(() => null)
 
   // TASK-1230 — HubSpot Forms secure-submit adapter (fallos/dead-letter de entrega).
   const growthFormsHubspot =
@@ -2348,6 +2357,7 @@ export const getReliabilityOverview = async (
     growthAiVisibilityPublicIntake,
     growthAiVisibilityPublicDelivery,
     growthForms,
+    growthFormsEmail,
     growthFormsHubspot,
     growthAiVisibilityLeadHandoff,
     payrollComplianceExportDrift,
