@@ -5,6 +5,7 @@ import { captureWithDomain } from '@/lib/observability/capture'
 
 import { getCachedVerification, upsertVerification, type EmailVerificationVerdict } from './cache-store'
 import { classifyEmailTier1 } from './tier1'
+import { isComprehensiveFreeProvider } from './comprehensive-free-domains'
 import { resolveVerificationProvider, type DeliverabilityVerdict, type EmailVerificationProvider } from './provider'
 
 /**
@@ -151,14 +152,22 @@ export const verifyEmail = async (rawEmail: unknown, options: VerifyOptions = {}
     }
   }
 
+  // Augmentación server-side: la lista comprensiva (~4.5k dominios, willwhite/freemail)
+  // atrapa el long-tail de proveedores gratis/públicos que la lista corta browser-safe no
+  // tiene. Solo SUMA cobertura free (nunca reclasifica un corporativo): si el dominio no era
+  // desechable y está en la lista grande → es free → no corporativo. Esto cierra el "etc y
+  // similares" (Yahoo/Hotmail regionales, proveedores obscuros) en la AUTORIDAD server.
+  const isFreeProvider = t1.isFreeProvider || (!t1.isDisposable && isComprehensiveFreeProvider(t1.domain))
+  const isCorporate = !isFreeProvider && !t1.isDisposable
+
   const base = {
     syntaxValid: true,
-    isCorporate: t1.isCorporate,
+    isCorporate,
     isDisposable: t1.isDisposable,
     isRoleBased: t1.isRoleBased,
-    isFreeProvider: t1.isFreeProvider,
+    isFreeProvider,
     suggestion: t1.suggestion,
-    reasonCode: reasonFor(t1.isDisposable, t1.isCorporate),
+    reasonCode: reasonFor(t1.isDisposable, isCorporate),
   }
 
   const emailHash = hashIdentifier(t1.dedupeKey, EMAIL_VERIFY_SALT)
@@ -183,17 +192,17 @@ export const verifyEmail = async (rawEmail: unknown, options: VerifyOptions = {}
   }
 
   // Tier 2 SOLO si Tier 1 pasa (corporativo, no desechable) y el provider está listo.
-  const wantsTier2 = t1.isCorporate && !t1.isDisposable && provider.isReady()
+  const wantsTier2 = isCorporate && !t1.isDisposable && provider.isReady()
   const deliverable = wantsTier2 ? await runTier2(provider, t1.normalizedEmail, now) : 'unknown'
   const verifiedTier: 'tier1' | 'tier2' = wantsTier2 && deliverable !== 'unknown' ? 'tier2' : 'tier1'
   const degraded = wantsTier2 && deliverable === 'unknown'
 
   const verdict: EmailVerificationVerdict = {
     domain: t1.domain,
-    isCorporate: t1.isCorporate,
+    isCorporate,
     isDisposable: t1.isDisposable,
     isRoleBased: t1.isRoleBased,
-    isFreeProvider: t1.isFreeProvider,
+    isFreeProvider,
     deliverable,
     verifiedTier,
     provider: verifiedTier === 'tier2' ? provider.name : 'tier1_only',

@@ -53,6 +53,17 @@ describe('verifyEmail — Tier 1 first + provider gating', () => {
     expect(upsertVerification).toHaveBeenCalledOnce()
   })
 
+  it('la lista comprensiva server atrapa un free provider del long-tail (no en el baseline)', async () => {
+    const provider = readyProvider('deliverable')
+    // 126.com es un proveedor gratis real (willwhite/freemail) que NO está en la lista corta.
+    const r = await verifyEmail('alguien@126.com', { provider })
+
+    expect(provider.verify).not.toHaveBeenCalled()
+    expect(r.isFreeProvider).toBe(true)
+    expect(r.isCorporate).toBe(false)
+    expect(r.reasonCode).toBe('email_not_corporate')
+  })
+
   it('NO corre Tier 2 si el dominio no es corporativo (Tier1-first economía)', async () => {
     const provider = readyProvider('deliverable')
     const r = await verifyEmail('persona@gmail.com', { provider })
