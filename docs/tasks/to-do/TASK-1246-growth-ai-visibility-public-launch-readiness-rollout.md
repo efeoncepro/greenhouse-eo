@@ -303,6 +303,17 @@ Slice 1 (checklist) -> Slice 2 (staging) -> Slice 3 (production). Produccion no 
 - **TASK-1254** (gate de correo corporativo) NO es hard-block pero sí fuertemente recomendado al lanzamiento; si su rollout apura, el primer launch puede salir con el form en política `warn` (etiqueta el lead como sospechoso sin rechazar) y subir a `block_field` post-launch. Documentar la decisión en el checklist de cutover.
 - Cruce registrado por trabajo en TASK-1253/1255 (creación del bloque Growth Forms Data Integrity, 2026-06-25).
 
+## Delta 2026-06-26
+
+- **Bloqueo confirmado en runtime — NO arrancar rollout.** Verificación de los `Blocked by` al 2026-06-26:
+  - ✅ complete: TASK-1242 (HubSpot handoff), TASK-1244 (review humano), TASK-1245 (status + token), TASK-1234 (worker async).
+  - ❌ **to-do**: TASK-1241 (página pública), TASK-1250 (email + adjunto), TASK-1255 (PII hardening Ley 21.719).
+  - 🔶 **in-progress**: TASK-1253 (validación server-side / autoridad del submit).
+- **Evidencia de código, no solo lifecycle:**
+  - No existe page route pública (`find src/app … *ai-visibility*page*` → vacío). El API de intake existe (`src/app/api/public/growth/ai-visibility/run/route.ts`) pero sin formulario público → el smoke e2e de Slice 2 (`form → run → status → report → email`) es inejecutable.
+  - TASK-1253 documenta que `submitForm` server **no re-valida por tipo** hoy → encender intake público es el riesgo "leads basura desde día uno" del Delta 2026-06-25.
+- **Conclusión:** Slice 2 (staging smoke) imposible sin 1241 + 1250; Slice 3 (cutover) legalmente bloqueado por 1253 + 1255 (prerrequisitos no opcionales). Task permanece `to-do` hasta destrabar. Sin push.
+
 ## Open Questions
 
 1. ¿El primer launch sera Next.js Greenhouse route o sitio publico WordPress/Astro? Propuesta: seguir la decision de `TASK-1241`/EPIC-019 y no duplicar.
