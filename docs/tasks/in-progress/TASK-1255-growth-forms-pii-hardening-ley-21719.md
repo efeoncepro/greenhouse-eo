@@ -10,7 +10,7 @@ TASK-1254 agregó verificación de email + cache. Postura PII ya alineada con es
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -314,5 +314,11 @@ Veredicto arch-architect: postura tiered. `national_id` (cédula) = cifrado at-r
 
 ## Open Questions
 
-- Ventana de retención por defecto (días) — definir con legal.
-- ¿Cifrado determinista (permite buscar por RUT) vs aleatorio con IV (más seguro, no buscable)? Recomendación: aleatorio con IV salvo que se necesite búsqueda por RUT.
+- ~~Ventana de retención por defecto (días)~~ — **RESUELTO 2026-06-26 (operador):** default **24 meses**, configurable por form, base legal "interés legítimo" B2B. La purga **NO corre** hasta sign-off legal (flag `GROWTH_FORMS_RETENTION_PURGE_ENABLED` default OFF). Slice 4 se diseña con este default pero queda diferida.
+- ~~¿Cifrado determinista vs aleatorio con IV?~~ — **RESUELTO 2026-06-26 (Claude, opción robusta):** **IV aleatorio por fila** con **AES-256-GCM**; IV (12 bytes) + authTag (16 bytes) almacenados junto al ciphertext. No se necesita búsqueda por RUT. El dedup ya usa `lead_email_hash`, no el RUT.
+
+## Execution Decisions 2026-06-26 (operador checkpoint)
+
+- **Alcance autorizado: Slices 1-3 completas** (masking reader + cifrado at-rest national_id + reveal gobernado). **Slice 4 (retención/purga) diferida** hasta que legal confirme la ventana; se siembra el default 24m + flag OFF + base legal/finalidad por form, sin job de purga corriendo.
+- **Key de cifrado: GCP Secret Manager** (key simétrica 256-bit) + cifrado application-layer **AES-256-GCM** — elegido por ser lo más económico/funcional (sin costo ni latencia por-llamada de KMS CMEK en cada reveal). Grant `secretAccessor` a `greenhouse-portal@`.
+- **TASK-1253 (blocker):** su código (`national_id` field type, validator registry, `src/lib/identity-documents/` módulo-11, normalización canónica RUT, re-validación server) está aterrizado y testeado; detección de "qué campo es national_id" se resuelve por JOIN submission ↔ `field_schema_json` (`type === 'national_id'`), NO desde el blob persistido. El cierre formal de 1253 no bloquea el código de 1255.

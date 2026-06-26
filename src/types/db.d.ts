@@ -6522,6 +6522,7 @@ export interface GreenhouseGrowthFormSubmission {
   delivery_attempts: Generated<number>;
   email_domain_class: string | null;
   email_quality: string | null;
+  encrypted_fields_json: Generated<Json>;
   form_id: string;
   form_version_id: string;
   ip_hash: string | null;
@@ -6681,6 +6682,20 @@ export interface GreenhouseGrowthGraderScores {
   score_status: string;
   score_version: string;
   updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseGrowthLeadPiiRevealAudit {
+  action: Generated<string>;
+  actor_email: string | null;
+  actor_user_id: string;
+  audit_id: Generated<string>;
+  created_at: Generated<Timestamp>;
+  diff_json: Generated<Json>;
+  form_id: string;
+  ip_address: string | null;
+  reason: string;
+  submission_id: string;
+  user_agent: string | null;
 }
 
 export interface GreenhouseGrowthNormalizedFindings {
@@ -10890,6 +10905,7 @@ export interface DB {
   "greenhouse_growth.grader_reports": GreenhouseGrowthGraderReports;
   "greenhouse_growth.grader_runs": GreenhouseGrowthGraderRuns;
   "greenhouse_growth.grader_scores": GreenhouseGrowthGraderScores;
+  "greenhouse_growth.lead_pii_reveal_audit": GreenhouseGrowthLeadPiiRevealAudit;
   "greenhouse_growth.normalized_findings": GreenhouseGrowthNormalizedFindings;
   "greenhouse_growth.prompt_packs": GreenhouseGrowthPromptPacks;
   "greenhouse_growth.provider_observations": GreenhouseGrowthProviderObservations;

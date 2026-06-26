@@ -1,3 +1,10 @@
+## Sesión 2026-06-26 — TASK-1255 Growth Forms · PII Hardening Ley 21.719 (cifrado national_id + reveal gobernado) — Claude — EN CURSO
+
+> **Estado: in-progress (develop, local-first, sin push).** `/implement-task 1255`. Checkpoint operador: **Slices 1-3 completas** (Slice 1 masking reader + Slice 2 cifrado at-rest national_id + Slice 3 reveal gobernado capability+reason+audit). **Slice 4 (retención/purga) diferida** hasta sign-off legal sobre la ventana (default sembrado 24m, flag OFF).
+> - **Decisiones:** key = **GCP Secret Manager** key simétrica 256-bit + AES-256-GCM app-layer (lo más económico/funcional vs KMS CMEK). IV aleatorio por fila (IV 12B + authTag 16B almacenados). Reveal pattern replica `person-legal-profile` (capability + reason + audit append-only + outbox + signal).
+> - **Blocker TASK-1253:** su código (`national_id` field type, validator registry, `identity-documents/` módulo-11, normalización RUT, re-validación server) ya aterrizado/testeado; detección de national_id = JOIN submission ↔ `field_schema_json` (`type==='national_id'`), no self-describing en el blob. Cierre formal de 1253 no bloquea el código de 1255.
+> - **Gap que cierra:** `national_id` hoy en claro en `normalized_fields_json` (store.ts:442); sin masking en readers; dispatcher manda national_id a HubSpot si el admin lo mapea (sin bloqueo de código → boundary nuevo).
+
 ## Sesión 2026-06-26 — TASK-1254 Growth Forms · Email Verification + Corporate Gate (scaffold sin provider) — Claude
 
 > **Estado: code complete (scaffold sin provider real), rollout pendiente. Lifecycle `in-progress` (NO complete).** Local-first en `develop`, sin push. `/implement-task 1254`. Alcance acordado con el operador: **Slice 1 + scaffold de Slices 2-4 sin provider real** (puerto + migración + endpoint stubbeados, noop adapter, gated OFF, listo para enchufar provider). Provider: "lo más económico y efectivo" → Tier1-first + Abstract API documentado como primer adapter.
