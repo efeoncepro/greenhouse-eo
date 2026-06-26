@@ -29,6 +29,8 @@ export interface GraderProfileRow {
   category: string | null
   competitorsDeclared: string[]
   status: string
+  /** TASK-1243 — binding a la organización cliente (null = perfil interno/público). */
+  organizationId: string | null
 }
 
 /** Prompt resuelto persistido en el run (resumibilidad del worker async, TASK-1234). */
@@ -72,7 +74,8 @@ const projectProfile = (row: RawProfile): GraderProfileRow => ({
   locale: String(row.locale),
   category: (row.category as string | null) ?? null,
   competitorsDeclared: (row.competitors_declared as string[] | null) ?? [],
-  status: String(row.status)
+  status: String(row.status),
+  organizationId: (row.organization_id as string | null) ?? null
 })
 
 const projectRun = (row: RawRun): GraderRunRow => ({
@@ -235,6 +238,48 @@ export const getGraderRun = async (runId: string): Promise<GraderRunRow | null> 
   const rows = await runGreenhousePostgresQuery<RawRun>(
     `SELECT * FROM greenhouse_growth.grader_runs WHERE run_id = $1 LIMIT 1`,
     [runId]
+  )
+
+  return rows[0] ? projectRun(rows[0]) : null
+}
+
+/** Estados de run con score utilizable para un reporte (mismo criterio que el snapshot público). */
+const CLIENT_REPORTABLE_RUN_STATUSES = ['succeeded', 'partial'] as const
+
+/**
+ * TASK-1243 — Run de un cliente por id, derivando la org vía `profile_id → organization_id`.
+ * Devuelve el run SOLO si pertenece a un perfil de ESA organización; `null` si no existe o es
+ * de otra org (tenant boundary duro: no se revela la existencia de runs ajenos). El JOIN es
+ * solo para el filtro por org; `r.*` preserva el shape de `projectRun`.
+ */
+export const getClientGraderRunById = async (input: {
+  runId: string
+  organizationId: string
+}): Promise<GraderRunRow | null> => {
+  const rows = await runGreenhousePostgresQuery<RawRun>(
+    `SELECT r.* FROM greenhouse_growth.grader_runs r
+       JOIN greenhouse_growth.grader_profiles p ON p.profile_id = r.profile_id
+      WHERE r.run_id = $1 AND p.organization_id = $2
+      LIMIT 1`,
+    [input.runId, input.organizationId]
+  )
+
+  return rows[0] ? projectRun(rows[0]) : null
+}
+
+/**
+ * TASK-1243 — Run reportable más reciente de una organización cliente (status succeeded/partial),
+ * ordenado por término real (`finished_at`) y luego creación. `null` si la org no tiene runs
+ * reportables. Tenant-scoped por `grader_profiles.organization_id` (server-side, nunca del browser).
+ */
+export const getLatestClientGraderRun = async (organizationId: string): Promise<GraderRunRow | null> => {
+  const rows = await runGreenhousePostgresQuery<RawRun>(
+    `SELECT r.* FROM greenhouse_growth.grader_runs r
+       JOIN greenhouse_growth.grader_profiles p ON p.profile_id = r.profile_id
+      WHERE p.organization_id = $1 AND r.status = ANY($2::text[])
+      ORDER BY r.finished_at DESC NULLS LAST, r.created_at DESC
+      LIMIT 1`,
+    [organizationId, [...CLIENT_REPORTABLE_RUN_STATUSES]]
   )
 
   return rows[0] ? projectRun(rows[0]) : null

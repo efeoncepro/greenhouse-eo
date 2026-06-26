@@ -2258,6 +2258,17 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
         source: 'role'
       })
     }
+
+    // TASK-1243 — 3.er consumer de la parity del AI Visibility Grader: el cliente ve el
+    // reporte de SU organización (DTO sin evidencia cruda). Scope 'own' (su propia org,
+    // derivada server-side). Cubre client_executive/client_manager/client_specialist.
+    addEntitlement(entries, {
+      module: 'growth',
+      capability: 'growth.ai_visibility.report.read_client',
+      action: 'read',
+      scope: 'own',
+      source: 'role'
+    })
   }
 
   // TASK-910 — Notion Demo Teamspace Sandbox capabilities (canonical defense in depth).

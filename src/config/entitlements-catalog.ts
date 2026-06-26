@@ -1962,6 +1962,18 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     actions: ['execute'] as const,
     defaultScope: 'tenant'
   },
+  // TASK-1243 — report.read_client: 3.er consumer de la parity. Un usuario `client_*`
+  // autenticado ve el reporte del grader de SU organización (DTO cliente sin evidencia
+  // cruda de provider). Capability DEDICADA (no scope-overload de report.read interno):
+  // least-privilege explícito + desacopla el acceso cliente del lifecycle del read interno.
+  // defaultScope `own` (su propia org, derivada server-side del orgContext de sesión).
+  // Grant a client_executive/client_manager/client_specialist en runtime.ts mismo PR.
+  {
+    key: 'growth.ai_visibility.report.read_client',
+    module: 'growth',
+    actions: ['read'] as const,
+    defaultScope: 'own'
+  },
   // TASK-1229 — Growth Forms engine (dominio growth.forms). 8 capabilities gobernadas
   // (Full API Parity): cada acción de negocio nace como command/reader, no como botón.
   // Grant en runtime.ts (internal ∪ EFEONCE_ADMIN ∪ EFEONCE_ACCOUNT ∪ EFEONCE_OPERATIONS)

@@ -6595,6 +6595,7 @@ export interface GreenhouseGrowthGraderProfiles {
   created_at: Generated<Timestamp>;
   locale: string;
   market: string;
+  organization_id: string | null;
   profile_id: Generated<string>;
   public_id: Generated<string>;
   status: Generated<string>;
