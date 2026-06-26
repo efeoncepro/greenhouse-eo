@@ -236,6 +236,19 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
       scope: 'tenant',
       source
     })
+
+    // TASK-1243 — report.read_client: el cliente la usa con scope 'own' (grant en el
+    // bloque tenantType='client' de abajo). Se replica al set interno SOLO para el guard
+    // de cobertura (capability-grant-coverage.test usa un superset interno; toda capability
+    // can()-checked debe ser alcanzable por él). Inocuo: el endpoint exige
+    // requireClientTenantContext → ningún interno lo pasa, así que no gana acceso real.
+    addEntitlement(entries, {
+      module: 'growth',
+      capability: 'growth.ai_visibility.report.read_client',
+      action: 'read',
+      scope: 'own',
+      source
+    })
   }
 
   // TASK-1229 — Growth Forms engine. Operación interna del motor de formularios
