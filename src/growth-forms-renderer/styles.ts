@@ -29,6 +29,7 @@ export const RENDERER_CSS = `
     --ghf-border-strong: #5b6472;
     --ghf-error: #b32338;
     --ghf-error-bg: #fdecef;
+    --ghf-success: #1f9d57;
     --ghf-radius: 8px;
     --ghf-gap: 16px;
     --ghf-focus: #2563eb;
@@ -54,6 +55,7 @@ export const RENDERER_CSS = `
       --ghf-accent-contrast: #0b0f16;
       --ghf-error: #ff8aa0;
       --ghf-error-bg: #2a151b;
+      --ghf-success: #34d399;
     }
   }
 
@@ -117,6 +119,13 @@ export const RENDERER_CSS = `
     font-size: 0.8125rem; line-height: 1.4; color: var(--ghf-error);
   }
   .ghf-error::before { content: "!"; flex: 0 0 auto; font-weight: 700; }
+
+  /* TASK-1256 Slice 1c — estado reactivo: ✓ verde al validar (reward early). */
+  .ghf-control { position: relative; display: block; min-width: 0; }
+  .ghf-status-icon { position: absolute; right: 12px; top: 22px; pointer-events: none; display: none; line-height: 1; }
+  .ghf-field[data-status="success"] .ghf-status-icon { display: block; color: var(--ghf-success); }
+  .ghf-field[data-status="success"] .ghf-status-icon::before { content: "✓"; font-weight: 700; }
+  .ghf-field[data-status="success"] .ghf-input { border-color: var(--ghf-success); padding-right: 36px; }
 
   /* TASK-1256 Slice 2 — verificación de correo (estado + typo-suggest). */
   .ghf-verify-status {

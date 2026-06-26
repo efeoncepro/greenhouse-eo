@@ -68,6 +68,29 @@ export const scenario: CaptureScenario = {
       clipSelector: '[data-capture="growth-forms-renderer-canvas"]',
       note: 'Máscara de teléfono aplicada + gate corporativo + typo-suggest'
     },
+    // Estado reactivo de éxito: corrige el correo + completa RUT → ✓ verde live.
+    {
+      kind: 'fill',
+      selector: '[name="work_email"]',
+      value: 'ana@empresa.com',
+      note: 'Correo corporativo → ✓ success reactivo'
+    },
+    { kind: 'press', key: 'Tab', note: 'Verifica + confirma corporativo' },
+    { kind: 'sleep', ms: 700, note: 'Roundtrip de verificación (simulado)' },
+    {
+      kind: 'fill',
+      selector: '[name="national_id"]',
+      value: '123456785',
+      note: 'RUT válido → ✓ success'
+    },
+    { kind: 'press', key: 'Tab', note: 'Blur del RUT → formato + ✓' },
+    { kind: 'sleep', ms: 300, note: 'Asienta el estado reactivo' },
+    {
+      kind: 'mark',
+      label: 'growth-forms-renderer-reactive-success',
+      clipSelector: '[data-capture="growth-forms-renderer-canvas"]',
+      note: 'Estado reactivo: ✓ success en correo corporativo + RUT válido'
+    },
     {
       kind: 'mark',
       label: 'growth-forms-renderer-fullpage',

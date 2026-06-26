@@ -30,7 +30,7 @@ import { validateField, validateFields, type FieldErrors } from './validation'
 import { createTelemetryEmitter, type TelemetryEmitter, type TelemetryPayload } from './telemetry'
 import { submitPublicForm, verifyPublicEmail, type RendererApiConfig } from './api-client'
 import { RENDERER_VERSION } from './version'
-import { validateFormValue } from '@/lib/growth/forms/validators/core'
+import { resolveValidatorName, validateFormValue } from '@/lib/growth/forms/validators/core'
 
 export interface FormRendererOptions {
   root: HTMLElement
@@ -98,6 +98,13 @@ export class FormRenderer {
   /** País seleccionado por campo de teléfono (selector in-field estilo HubSpot). */
   private readonly telCountry = new Map<string, string>()
 
+  // ─── Validación reactiva (TASK-1256 Slice 1c) ────────────────────────────────
+  /** Estado live por campo: neutro mientras se completa, success al validar, error al fallar. */
+  private readonly fieldStatus = new Map<string, 'neutral' | 'success' | 'error'>()
+  /** Timers de "punish late": muestran el error tras una pausa, no en cada tecla. */
+  private readonly statusTimers = new Map<string, ReturnType<typeof setTimeout>>()
+  private static readonly STATUS_ERROR_DEBOUNCE_MS = 600
+
   constructor(private readonly opts: FormRendererOptions) {
     this.doc = opts.doc ?? document
     this.contract = opts.contract
@@ -160,6 +167,8 @@ export class FormRenderer {
     this.destroyed = true
     for (const timer of this.verifyTimers.values()) clearTimeout(timer)
     this.verifyTimers.clear()
+    for (const timer of this.statusTimers.values()) clearTimeout(timer)
+    this.statusTimers.clear()
     this.opts.root.replaceChildren()
   }
 
@@ -237,6 +246,7 @@ export class FormRenderer {
     const wrap = el(this.doc, 'div', {
       class: `ghf-field${isPaired ? '' : ' ghf-field--full'}`,
       'data-invalid': error ? 'true' : 'false',
+      'data-status': this.fieldStatus.get(field.key) ?? 'neutral',
     })
 
     const label = this.fieldLabel(field)
@@ -252,6 +262,9 @@ export class FormRenderer {
     const describedBy = [helpId, error ? errorId : undefined].filter(Boolean).join(' ')
     const control = this.renderControl(field, fieldId, required, describedBy)
 
+    // Campos de entrada de una línea muestran el ícono de estado reactivo (✓ al validar).
+    const supportsStatusIcon = ['text', 'email', 'tel', 'url', 'national_id', 'number', 'date'].includes(field.type)
+
     if (field.type === 'checkbox' || field.type === 'consent') {
       // Layout label-al-lado para checkboxes.
       const checkWrap = el(this.doc, 'label', { class: 'ghf-check', for: fieldId })
@@ -259,6 +272,12 @@ export class FormRenderer {
       checkWrap.appendChild(control)
       checkWrap.appendChild(el(this.doc, 'span', {}, label))
       wrap.appendChild(checkWrap)
+    } else if (supportsStatusIcon) {
+      const controlWrap = el(this.doc, 'div', { class: 'ghf-control' })
+
+      controlWrap.appendChild(control)
+      controlWrap.appendChild(el(this.doc, 'span', { class: 'ghf-status-icon', 'aria-hidden': 'true' }))
+      wrap.appendChild(controlWrap)
     } else {
       wrap.appendChild(control)
     }
@@ -405,6 +424,7 @@ export class FormRenderer {
 
       input.value = digits ? formatNationalPhoneDisplay(digits, next) : ''
       recompute(next)
+      this.liveStatus(field)
       this.onValueChange(field)
     })
 
@@ -418,9 +438,13 @@ export class FormRenderer {
         input.value = parsed.national
       }
 
+      // Máscara EN VIVO del número nacional, con el caret preservado.
+      const country = this.telCountry.get(field.key) ?? initialCountry
+
+      this.applyMaskedLive(input, value => formatNationalPhoneDisplay(value, country), FormRenderer.isDigit)
       recompute()
       this.maybeStart()
-      if (this.errors[field.key]) this.revalidateField(field)
+      this.liveStatus(field)
     })
 
     input.addEventListener('blur', () => {
@@ -439,6 +463,149 @@ export class FormRenderer {
     return wrapper
   }
 
+  // ─── Validación reactiva (TASK-1256 Slice 1c) ────────────────────────────────
+
+  /** ¿El campo tiene validación real (≠ texto libre / consent)? → muestra ✓ al validar. */
+  private hasMeaningfulValidator(field: RendererFieldDefinition): boolean {
+    const name = resolveValidatorName(field)
+
+    return name !== 'text' && name !== 'consent'
+  }
+
+  private isFieldEmpty(key: string): boolean {
+    const value = this.values[key]
+
+    if (Array.isArray(value)) return value.length === 0
+    if (typeof value === 'boolean') return value === false
+
+    return (value ?? '').toString().trim() === ''
+  }
+
+  private setFieldStatus(field: RendererFieldDefinition, status: 'neutral' | 'success' | 'error'): void {
+    this.fieldStatus.set(field.key, status)
+    const control = this.opts.root.querySelector<HTMLElement>(`[name="${CSS.escape(field.key)}"]`)
+    const wrap = control?.closest('.ghf-field')
+
+    if (wrap) (wrap as HTMLElement).dataset.status = status
+  }
+
+  /**
+   * Evaluación reactiva on-input ("reward early, punish late", forms-ux):
+   *  - vacío → neutro (no se grita "requerido" mientras se tipea; eso es on-blur).
+   *  - válido → ✓ success inmediato (si el campo tiene validación real).
+   *  - inválido: si venía de success → error inmediato (rompiste algo válido);
+   *    si no → error diferido tras una pausa (debounce), nunca en cada tecla.
+   */
+  private liveStatus(field: RendererFieldDefinition): void {
+    const key = field.key
+    const pending = this.statusTimers.get(key)
+
+    if (pending) {
+      clearTimeout(pending)
+      this.statusTimers.delete(key)
+    }
+
+    if (this.isFieldEmpty(key)) {
+      delete this.errors[key]
+      this.patchFieldErrorDom(key)
+      this.setFieldStatus(field, 'neutral')
+
+      return
+    }
+
+    const error = validateField(field, this.values, this.copy)
+
+    if (!error) {
+      delete this.errors[key]
+      this.patchFieldErrorDom(key)
+      this.setFieldStatus(field, this.hasMeaningfulValidator(field) ? 'success' : 'neutral')
+
+      return
+    }
+
+    // Inválido no-vacío.
+    if (this.fieldStatus.get(key) === 'success' || this.errors[key]) {
+      // Venías de válido (o ya estaba en error): mostrar el error de inmediato.
+      this.errors[key] = error
+      this.touched.add(key)
+      this.patchFieldErrorDom(key)
+      this.setFieldStatus(field, 'error')
+
+      return
+    }
+
+    // Primera vez inválido mientras tipea: aún neutro; el error aparece tras la pausa.
+    this.setFieldStatus(field, 'neutral')
+    this.statusTimers.set(
+      key,
+      setTimeout(() => {
+        this.statusTimers.delete(key)
+        if (this.destroyed || this.isFieldEmpty(key)) return
+        const late = validateField(field, this.values, this.copy)
+
+        if (late) {
+          this.errors[key] = late
+          this.touched.add(key)
+          this.patchFieldErrorDom(key)
+          this.setFieldStatus(field, 'error')
+        }
+      }, FormRenderer.STATUS_ERROR_DEBOUNCE_MS),
+    )
+  }
+
+  /**
+   * Aplica una máscara de display EN VIVO preservando el caret: cuenta los chars
+   * "significativos" (según `isSig`) antes del caret, reformatea, y reubica el caret
+   * tras la misma cantidad. Evita el salto de cursor del formateo as-you-type.
+   */
+  private applyMaskedLive(input: HTMLInputElement, format: (value: string) => string, isSig: (char: string) => boolean): void {
+    const previous = input.value
+    const caret = input.selectionStart ?? previous.length
+
+    let sigBefore = 0
+
+    for (let i = 0; i < caret; i += 1) {
+      if (isSig(previous[i])) sigBefore += 1
+    }
+
+    const formatted = format(previous)
+
+    if (formatted === previous) return
+    input.value = formatted
+
+    if (sigBefore === 0) {
+      try {
+        input.setSelectionRange(0, 0)
+      } catch {
+        // jsdom / inputs sin selección: ignorar.
+      }
+
+      return
+    }
+
+    let seen = 0
+    let position = formatted.length
+
+    for (let i = 0; i < formatted.length; i += 1) {
+      if (isSig(formatted[i])) {
+        seen += 1
+
+        if (seen === sigBefore) {
+          position = i + 1
+          break
+        }
+      }
+    }
+
+    try {
+      input.setSelectionRange(position, position)
+    } catch {
+      // jsdom / inputs sin selección: ignorar.
+    }
+  }
+
+  private static readonly isDigit = (char: string): boolean => char >= '0' && char <= '9'
+
   /** Cablea inputs de texto con máscara forgiving + timing 3-stage. */
   private wireText(field: RendererFieldDefinition, input: HTMLInputElement | HTMLTextAreaElement): void {
     const mask = maskOpsFor(field)
@@ -446,8 +613,9 @@ export class FormRenderer {
     input.addEventListener('input', () => {
       this.values[field.key] = mask.toStored(input.value)
       this.maybeStart()
-      // Stage 3: si ya erró, re-validar onChange para confirmar el fix.
-      if (this.errors[field.key]) this.revalidateField(field)
+      // Validación reactiva live (success ✓ inmediato, error diferido). Reemplaza el
+      // Stage-3 "solo si ya erró": ahora el feedback es reactivo desde que se tipea.
+      this.liveStatus(field)
       // Verificación de correo debounced mientras tipea (UX, no autoridad).
       if (field.type === 'email') this.scheduleEmailVerify(field)
     })
@@ -593,6 +761,12 @@ export class FormRenderer {
     }
 
     this.patchFieldErrorDom(field.key)
+
+    // Estado reactivo on-blur/submit (Stage 2): error → rojo; válido no-vacío → ✓;
+    // vacío → neutro (el "requerido" ya está en `error` si el campo lo es).
+    if (error) this.setFieldStatus(field, 'error')
+    else if (!this.isFieldEmpty(field.key)) this.setFieldStatus(field, this.hasMeaningfulValidator(field) ? 'success' : 'neutral')
+    else this.setFieldStatus(field, 'neutral')
   }
 
   /** Actualiza solo el DOM del error de un campo (sin re-render completo). */
@@ -705,6 +879,9 @@ export class FormRenderer {
     }
 
     this.patchFieldErrorDom(field.key)
+    // Estado reactivo del correo tras el veredicto: error si gateó, ✓ si quedó válido.
+    if (this.errors[field.key]) this.setFieldStatus(field, 'error')
+    else if (!this.isFieldEmpty(field.key)) this.setFieldStatus(field, 'success')
     this.patchEmailVerifyDom(field)
     this.patchPrimaryActionState()
   }

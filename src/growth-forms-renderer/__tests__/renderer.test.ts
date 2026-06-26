@@ -143,6 +143,53 @@ describe('growth-forms-renderer · FormRenderer', () => {
     expect(honey.closest('.ghf-honeypot')).not.toBeNull()
   })
 
+  // ─── TASK-1256 Slice 1c — validación reactiva (live error/success + máscara live) ──
+
+  const fieldStatus = (root: HTMLElement, name: string): string | null =>
+    root.querySelector(`[name="${name}"]`)?.closest('.ghf-field')?.getAttribute('data-status') ?? null
+
+  it('reacts live: ✓ success the moment a value becomes valid (no blur needed)', () => {
+    const { root } = mountInto()
+    const email = root.querySelector<HTMLInputElement>('[name="work_email"]')!
+
+    // Mientras se completa: sin rojo (neutro), sin gritar.
+    email.value = 'ana@'
+    email.dispatchEvent(new Event('input'))
+    expect(fieldStatus(root, 'work_email')).toBe('neutral')
+    expect(root.querySelector('.ghf-error')).toBeNull()
+
+    // Apenas es válido: ✓ success inmediato, sin esperar el blur.
+    email.value = 'ana@empresa.com'
+    email.dispatchEvent(new Event('input'))
+    expect(fieldStatus(root, 'work_email')).toBe('success')
+  })
+
+  it('reacts live: error appears immediately when a previously-valid value is broken', () => {
+    const { root } = mountInto()
+    const email = root.querySelector<HTMLInputElement>('[name="work_email"]')!
+
+    email.value = 'ana@empresa.com'
+    email.dispatchEvent(new Event('input'))
+    expect(fieldStatus(root, 'work_email')).toBe('success')
+
+    // Romper el valor válido → error reactivo inmediato (sin cambiar de campo).
+    email.value = 'ana@empresa'
+    email.dispatchEvent(new Event('input'))
+    expect(fieldStatus(root, 'work_email')).toBe('error')
+    expect(root.querySelector('.ghf-error')?.textContent).toBeTruthy()
+  })
+
+  it('formats the phone national number live (as-you-type), not only on blur', () => {
+    const { root } = mountInto()
+    const input = root.querySelector<HTMLInputElement>('[name="phone"]')!
+
+    input.value = '987654321'
+    input.dispatchEvent(new Event('input'))
+    // El formato se aplica EN VIVO en el input (sin esperar el blur).
+    expect(input.value).toBe('9 8765 4321')
+    expect(fieldStatus(root, 'phone')).toBe('success')
+  })
+
   // ─── TASK-1256 Slice 1 — campo de teléfono internacional (estilo HubSpot) ────
 
   it('renders an in-field country selector for tel fields and stores E.164', () => {
