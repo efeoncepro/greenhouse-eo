@@ -84,6 +84,9 @@ export type CanonicalErrorCode =
   // Growth Forms engine (TASK-1229).
   | 'growth_form_invalid_input'
   | 'growth_form_not_found'
+  | 'growth_submission_not_found'
+  | 'growth_lead_field_not_revealable'
+  | 'growth_lead_reveal_reason_required'
   // Growth AI Visibility · admin grader routes (TASK-1226/1235/1239) + review gate (TASK-1244).
   | 'grader_run_not_found'
   | 'grader_run_invalid_input'
@@ -279,6 +282,22 @@ const CANONICAL_ERRORS: Record<CanonicalErrorCode, CanonicalErrorDefinition> = {
     status: 404,
     message: 'No encontramos ese formulario. Puede que se haya archivado o no exista.',
     actionable: false
+  },
+  // TASK-1255 — Growth Forms PII reveal gobernado.
+  growth_submission_not_found: {
+    status: 404,
+    message: 'No encontramos ese lead.',
+    actionable: false
+  },
+  growth_lead_field_not_revealable: {
+    status: 404,
+    message: 'Ese campo no se puede revelar.',
+    actionable: false
+  },
+  growth_lead_reveal_reason_required: {
+    status: 400,
+    message: 'Indica una razón de al menos 10 caracteres para revelar este dato (queda auditado).',
+    actionable: true
   },
   // Growth AI Visibility · admin grader routes (TASK-1226/1235/1239) + review gate (TASK-1244).
   // Errores estructurales (no se resuelven reintentando) → actionable: false; los de input

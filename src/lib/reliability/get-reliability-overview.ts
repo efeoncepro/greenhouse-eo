@@ -177,6 +177,7 @@ import { getGrowthAiVisibilityPublicDeliverySignals } from './queries/growth-ai-
 import { getGrowthFormsSignals } from './queries/growth-forms-signals'
 import { getGrowthFormsEmailSignals } from './queries/growth-forms-email-signals'
 import { getGrowthFormsHubspotSignals } from './queries/growth-forms-hubspot-signals'
+import { getGrowthFormsPiiSignals } from './queries/growth-forms-pii-signals'
 import { getGrowthAiVisibilityLeadHandoffSignals } from './queries/growth-ai-visibility-lead-handoff-signals'
 // TASK-1082 — Knowledge Platform ingestion signals (moduleKey 'knowledge').
 import { getKnowledgeNotionIngestDeadLetterSignal } from './queries/knowledge-notion-ingest-dead-letter'
@@ -626,6 +627,7 @@ interface ReliabilityOverviewSources {
   growthForms?: ReliabilitySignal[] | null
   growthFormsEmail?: ReliabilitySignal[] | null
   growthFormsHubspot?: ReliabilitySignal[] | null
+  growthFormsPii?: ReliabilitySignal[] | null
   growthAiVisibilityLeadHandoff?: ReliabilitySignal[] | null
 
   /** TASK-1201 — Finance AI anomaly-materialization staleness (heartbeat del SoT de signals). */
@@ -1041,6 +1043,7 @@ export const buildReliabilityOverview = (
     ...(sources.growthForms ?? []),
     ...(sources.growthFormsEmail ?? []),
     ...(sources.growthFormsHubspot ?? []),
+    ...(sources.growthFormsPii ?? []),
     ...(sources.growthAiVisibilityLeadHandoff ?? []),
     // TASK-812 — Previred/LRE artifact registry drift.
     ...(sources.payrollComplianceExportDrift ? [sources.payrollComplianceExportDrift] : []),
@@ -1449,6 +1452,12 @@ export const getReliabilityOverview = async (
     preloadedSources.growthFormsHubspot !== undefined
       ? preloadedSources.growthFormsHubspot
       : await getGrowthFormsHubspotSignals().catch(() => null)
+
+  // TASK-1255 — Reveal de PII de leads sin razón válida (enforcement saltado).
+  const growthFormsPii =
+    preloadedSources.growthFormsPii !== undefined
+      ? preloadedSources.growthFormsPii
+      : await getGrowthFormsPiiSignals().catch(() => null)
 
   // TASK-1242 — HubSpot lead handoff (leads con score listo sin sincronizar).
   const growthAiVisibilityLeadHandoff =
@@ -2359,6 +2368,7 @@ export const getReliabilityOverview = async (
     growthForms,
     growthFormsEmail,
     growthFormsHubspot,
+    growthFormsPii,
     growthAiVisibilityLeadHandoff,
     payrollComplianceExportDrift,
     payrollContractorDoubleRailOverlap,

@@ -1986,7 +1986,12 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
   { key: 'growth.forms.submissions.read', module: 'growth', actions: ['read'] as const, defaultScope: 'tenant' },
   { key: 'growth.forms.destinations.manage', module: 'growth', actions: ['execute'] as const, defaultScope: 'tenant' },
   { key: 'growth.forms.retry_delivery', module: 'growth', actions: ['execute'] as const, defaultScope: 'tenant' },
-  { key: 'growth.forms.surfaces.manage', module: 'growth', actions: ['execute'] as const, defaultScope: 'tenant' }
+  { key: 'growth.forms.surfaces.manage', module: 'growth', actions: ['execute'] as const, defaultScope: 'tenant' },
+  // TASK-1255 — Reveal gobernado de PII de un lead (cédula/email/teléfono). MÁS sensible
+  // que `submissions.read` (que devuelve masked): el unmasked exige esta capability fina +
+  // reason + audit append-only. Grant least-privilege (EFEONCE_ADMIN ∪ EFEONCE_OPERATIONS,
+  // NO EFEONCE_ACCOUNT) en runtime.ts mismo PR.
+  { key: 'growth.forms.lead_pii.reveal', module: 'growth', actions: ['read'] as const, defaultScope: 'tenant' }
 ] as const
 
 export type EntitlementCapabilityDefinition = (typeof ENTITLEMENT_CAPABILITY_CATALOG)[number]

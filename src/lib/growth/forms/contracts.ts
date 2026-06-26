@@ -402,6 +402,13 @@ export interface PublicSubmitResult {
 export const FORM_SUBMISSION_ACCEPTED_EVENT = 'growth.forms.submission_accepted' as const
 export const FORM_SUBMISSION_AGGREGATE = 'growth_form_submission' as const
 
+/**
+ * TASK-1255 — Evento de reveal de PII (cédula/email/teléfono) en el cockpit. Trail
+ * append-only; lo lee el signal `growth.forms.pii_reveal_without_reason`. NUNCA
+ * lleva el valor revelado en el payload, sólo qué campo + actor + razón.
+ */
+export const FORM_LEAD_PII_REVEALED_EVENT = 'growth.forms.lead_pii.revealed' as const
+
 export interface FormSubmissionAcceptedEventPayload {
   schemaVersion: 1
   submissionId: string

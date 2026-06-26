@@ -285,6 +285,22 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
     }
   }
 
+  // TASK-1255 — Reveal de PII de leads (cédula/email/teléfono): MÁS restringido que el
+  // read masked. Least-privilege: solo admin internos y operaciones (NO efeonce_account,
+  // que vende pero no necesita ver cédulas crudas). reason + audit obligatorios en runtime.
+  if (
+    hasRole(subject, ROLE_CODES.EFEONCE_ADMIN) ||
+    hasRole(subject, ROLE_CODES.EFEONCE_OPERATIONS)
+  ) {
+    addEntitlement(entries, {
+      module: 'growth',
+      capability: 'growth.forms.lead_pii.reveal',
+      action: 'read',
+      scope: 'tenant',
+      source: 'role',
+    })
+  }
+
   if (hasRouteGroup(subject, 'people') || hasAuthorizedView(subject, 'equipo.personas')) {
     const source: TenantEntitlementSource = hasRouteGroup(subject, 'people') ? 'route_group' : 'authorized_view'
 
