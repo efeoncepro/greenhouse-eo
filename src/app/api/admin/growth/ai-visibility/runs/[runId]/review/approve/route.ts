@@ -42,11 +42,20 @@ export async function POST(request: Request, { params }: { params: Promise<{ run
     return NextResponse.json(result)
   } catch (error) {
     if (error instanceof GraderReportError && (error.code === 'run_not_found' || error.code === 'score_not_found')) {
-      return canonicalErrorResponse('internal_error', { statusOverride: 404, extra: { reason: error.code } })
+      return canonicalErrorResponse('grader_report_not_found', { extra: { reason: error.code } })
     }
 
     if (error instanceof ReportReviewError) {
-      return canonicalErrorResponse('internal_error', { statusOverride: 409, extra: { reason: error.code } })
+      // not_reviewable / invalid_transition: estructurales (actionable=false). reason_required
+      // no aplica a approve (sin reason obligatoria) pero se mapea por completitud.
+      const code =
+        error.code === 'not_reviewable'
+          ? 'grader_report_not_reviewable'
+          : error.code === 'reason_required'
+            ? 'grader_report_review_reason_required'
+            : 'grader_report_invalid_review_transition'
+
+      return canonicalErrorResponse(code, { extra: { reason: error.code } })
     }
 
     captureWithDomain(error, 'growth', {

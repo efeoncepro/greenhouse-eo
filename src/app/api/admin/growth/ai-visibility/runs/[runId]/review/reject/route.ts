@@ -42,13 +42,18 @@ export async function POST(request: Request, { params }: { params: Promise<{ run
     return NextResponse.json(result)
   } catch (error) {
     if (error instanceof GraderReportError && (error.code === 'run_not_found' || error.code === 'score_not_found')) {
-      return canonicalErrorResponse('internal_error', { statusOverride: 404, extra: { reason: error.code } })
+      return canonicalErrorResponse('grader_report_not_found', { extra: { reason: error.code } })
     }
 
     if (error instanceof ReportReviewError) {
-      const status = error.code === 'reason_required' ? 422 : 409
+      const code =
+        error.code === 'reason_required'
+          ? 'grader_report_review_reason_required'
+          : error.code === 'not_reviewable'
+            ? 'grader_report_not_reviewable'
+            : 'grader_report_invalid_review_transition'
 
-      return canonicalErrorResponse('internal_error', { statusOverride: status, extra: { reason: error.code } })
+      return canonicalErrorResponse(code, { extra: { reason: error.code } })
     }
 
     captureWithDomain(error, 'growth', {
