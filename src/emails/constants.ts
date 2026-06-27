@@ -31,5 +31,13 @@ export const APP_URL = 'https://greenhouse.efeoncepro.com'
  * a cold prospect sees Efeonce, not the internal portal product. White wordmark
  * (520×122) reused from the report PDF, served by the prod custom domain (no SSO).
  * The Efeonce URL / legal name / slogan live in the brand SSOT (`@/config/efeonce-brand`) — import there, never redefine.
+ *
+ * Served from the GCS public media bucket (NOT a Vercel/portal path): the white wordmark
+ * `efeonce-wordmark-white.png` (520×122) lives under `emails/` in both buckets. The portal
+ * `/branding/pdf/*` path only exists on whatever branch is deployed to that domain — an email
+ * must load from an env-agnostic, always-public origin (mismo patrón que los hero images de
+ * los leave emails). `gcloud storage cp public/branding/pdf/efeonce-wordmark-white.png gs://…/emails/`.
  */
-export const EFEONCE_LOGO_URL = 'https://greenhouse.efeoncepro.com/branding/pdf/efeonce-wordmark-white.png'
+const EMAIL_MEDIA_BUCKET = process.env.GREENHOUSE_PUBLIC_MEDIA_BUCKET || 'efeonce-group-greenhouse-public-media-prod'
+
+export const EFEONCE_LOGO_URL = `https://storage.googleapis.com/${EMAIL_MEDIA_BUCKET}/emails/efeonce-wordmark-white.png`

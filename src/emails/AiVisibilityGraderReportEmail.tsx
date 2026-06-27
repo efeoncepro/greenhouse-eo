@@ -120,34 +120,30 @@ const summaryRow = (label: string, value: string, emphasis = false) => (
   </table>
 )
 
+// Stacked (NOT 2-col): label as a small eyebrow above the value, full-width below.
+// A 2-col table cramped the value on mobile (~320px); stacking reads well at any width.
 const insightRow = (label: string, value: string) => (
-  <table style={{ width: '100%', borderCollapse: 'collapse', margin: '0 0 4px' }}>
-    <tbody>
-      <tr>
-        <td style={{
-          padding: '8px 0 0',
-          fontFamily: EMAIL_FONTS.heading,
-          fontSize: '13px',
-          fontWeight: 600,
-          color: EMAIL_COLORS.primary,
-          width: '38%',
-          verticalAlign: 'top',
-        }}>
-          {label}
-        </td>
-        <td style={{
-          padding: '8px 0 0',
-          fontFamily: EMAIL_FONTS.body,
-          fontSize: '14px',
-          lineHeight: '21px',
-          color: EMAIL_COLORS.secondary,
-          verticalAlign: 'top',
-        }}>
-          {value}
-        </td>
-      </tr>
-    </tbody>
-  </table>
+  <div style={{ margin: '0 0 12px' }}>
+    <div style={{
+      fontFamily: EMAIL_FONTS.heading,
+      fontSize: '11px',
+      fontWeight: 700,
+      letterSpacing: '0.04em',
+      textTransform: 'uppercase' as const,
+      color: EMAIL_COLORS.primary,
+      margin: '0 0 3px',
+    }}>
+      {label}
+    </div>
+    <div style={{
+      fontFamily: EMAIL_FONTS.body,
+      fontSize: '14px',
+      lineHeight: '21px',
+      color: EMAIL_COLORS.secondary,
+    }}>
+      {value}
+    </div>
+  </div>
 )
 
 export default function AiVisibilityGraderReportEmail({

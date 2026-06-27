@@ -118,6 +118,17 @@ export interface SendEmailInput<TContext extends EmailTemplateContext = EmailTem
   priority?: EmailPriority
 }
 
+/**
+ * AGENCY-branded email types: sender = **Efeonce** (the agency), NOT the platform sender
+ * `getEmailFromAddress()` (which today is the carried-debt "Efeonce Greenhouse"). These are
+ * public, agency-facing surfaces (lead magnet) where a cold prospect must see Efeonce. The
+ * address stays a Resend-verified domain; only the display name differs.
+ */
+export const AGENCY_FROM_ADDRESS = 'Efeonce <greenhouse@efeoncepro.com>'
+export const AGENCY_BRANDED_EMAIL_TYPES: ReadonlySet<EmailType> = new Set<EmailType>([
+  'ai_visibility_grader_report'
+])
+
 export interface SendEmailResult {
   deliveryId: string
   resendId: string | null
