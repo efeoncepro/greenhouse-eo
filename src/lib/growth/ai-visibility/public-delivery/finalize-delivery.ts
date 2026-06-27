@@ -27,6 +27,8 @@ import { GraderReportError, readGraderReport } from '../report/command'
 import { publishGraderReportSnapshot } from '../report/snapshot'
 import { type GraderRunRow } from '../store'
 
+import { requestAiVisibilityReportEmail } from './email/request-report-email'
+
 export type PublicDeliveryState = 'pending' | 'ready' | 'in_review' | 'unavailable'
 
 /**
@@ -91,6 +93,18 @@ export const finalizeRunDelivery = async (run: GraderRunRow): Promise<PublicDeli
     // ready | partial → publicar snapshot idempotente + materializar ready.
     await publishGraderReportSnapshot({ runId: run.runId })
     await setPublicDeliveryState(run.runId, 'ready')
+
+    // TASK-1250 — el snapshot publicado dispara el email de entrega al lead (enqueue gobernado,
+    // write-side). Best-effort, idéntico al boundary del handoff: un fallo del enqueue NUNCA
+    // rompe la finalización del run (el dispatch claim garantiza envío único al drenarse).
+    try {
+      await requestAiVisibilityReportEmail({ runId: run.runId, trigger: 'report_published' })
+    } catch (emailError) {
+      captureWithDomain(emailError, 'growth', {
+        tags: { source: 'growth_ai_visibility_finalize_delivery', stage: 'report_email_enqueue' },
+        extra: { runId: run.runId },
+      })
+    }
 
     return 'ready'
   } catch (error) {

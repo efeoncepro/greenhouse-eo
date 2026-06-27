@@ -22,6 +22,7 @@ import { captureWithDomain } from '@/lib/observability/capture'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
 import { syncAiVisibilityRunToHubSpot } from '../hubspot/command'
+import { requestAiVisibilityReportEmail } from '../public-delivery/email/request-report-email'
 import { readGraderReport } from '../report/command'
 import { publishGraderReportSnapshot } from '../report/snapshot'
 import { setPublicDeliveryState } from '../public-delivery/finalize-delivery'
@@ -114,6 +115,17 @@ export const approveAiVisibilityReport = async (input: {
   } catch (handoffError) {
     captureWithDomain(handoffError, 'growth', {
       tags: { source: 'growth_ai_visibility_report_review_approve', stage: 'lead_handoff_enqueue' },
+      extra: { runId: input.runId }
+    })
+  }
+
+  // TASK-1250 — paridad: el snapshot aprobado también dispara el email de entrega al lead
+  // (enqueue gobernado, no-fatal). Un fallo acá no rompe la aprobación.
+  try {
+    await requestAiVisibilityReportEmail({ runId: input.runId, trigger: 'report_published' })
+  } catch (emailError) {
+    captureWithDomain(emailError, 'growth', {
+      tags: { source: 'growth_ai_visibility_report_review_approve', stage: 'report_email_enqueue' },
       extra: { runId: input.runId }
     })
   }

@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server'
 import { canonicalErrorResponse } from '@/lib/api/canonical-error-response'
 import { can } from '@/lib/entitlements/runtime'
 import { syncAiVisibilityRunToHubSpot } from '@/lib/growth/ai-visibility/hubspot/command'
+import { requestAiVisibilityReportEmail } from '@/lib/growth/ai-visibility/public-delivery/email/request-report-email'
 import { GraderReportError } from '@/lib/growth/ai-visibility/report/command'
 import { GraderSnapshotError, publishGraderReportSnapshot } from '@/lib/growth/ai-visibility/report/snapshot'
 import { captureWithDomain } from '@/lib/observability/capture'
@@ -49,6 +50,17 @@ export async function POST(request: Request, { params }: { params: Promise<{ run
     } catch (handoffError) {
       captureWithDomain(handoffError, 'growth', {
         tags: { source: 'growth_ai_visibility_report_publish_route', stage: 'lead_handoff_enqueue' },
+        extra: { runId }
+      })
+    }
+
+    // TASK-1250 — paridad: el snapshot publicado también dispara el email de entrega al lead
+    // (enqueue gobernado). No-fatal: un fallo del enqueue no rompe la publicación.
+    try {
+      await requestAiVisibilityReportEmail({ runId, trigger: 'report_published' })
+    } catch (emailError) {
+      captureWithDomain(emailError, 'growth', {
+        tags: { source: 'growth_ai_visibility_report_publish_route', stage: 'report_email_enqueue' },
         extra: { runId }
       })
     }

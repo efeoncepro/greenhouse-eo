@@ -140,7 +140,7 @@ describe('dispatchAiVisibilityReportEmail', () => {
 
     expect(res).toMatchObject({ status: 'succeeded', retryable: false })
     expect(mocks.send).toHaveBeenCalledTimes(1)
-    const sendArg = mocks.send.mock.calls[0][0] as Record<string, unknown>
+    const sendArg = mocks.send.mock.calls[0][0] as unknown as Record<string, unknown>
 
     expect(sendArg.emailType).toBe('ai_visibility_grader_report')
     expect(sendArg.domain).toBe('growth')
@@ -170,7 +170,7 @@ describe('dispatchAiVisibilityReportEmail', () => {
 
     await dispatchAiVisibilityReportEmail(RUN_ID)
 
-    const ctx = (mocks.send.mock.calls[0][0] as Record<string, unknown>).context as Record<string, unknown>
+    const ctx = (mocks.send.mock.calls[0][0] as unknown as Record<string, unknown>).context as Record<string, unknown>
 
     expect(ctx.isPartial).toBe(true)
   })
