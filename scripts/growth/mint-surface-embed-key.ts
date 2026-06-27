@@ -94,7 +94,9 @@ const main = async () => {
   console.log('\n⚠️  Guardá el SECRET server-side en el plugin WordPress. NO vuelve a mostrarse.\n')
 }
 
-main().catch(error => {
-  console.error(`mint-surface-embed-key failed: ${error instanceof Error ? error.message : String(error)}`)
-  process.exit(1)
-})
+main()
+  .then(() => process.exit(0)) // el pool Postgres mantiene vivo el event loop; salir explícito.
+  .catch(error => {
+    console.error(`mint-surface-embed-key failed: ${error instanceof Error ? error.message : String(error)}`)
+    process.exit(1)
+  })
