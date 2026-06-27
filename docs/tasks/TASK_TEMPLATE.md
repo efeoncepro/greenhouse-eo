@@ -14,7 +14,7 @@ Para tasks con impacto backend/data, ver [`TASK_BACKEND_DATA_ADDENDUM.md`](TASK_
 3. Llenar Zone 0 y Zone 1 completas
 4. Zone 2 no se llena al crear la task — es responsabilidad del agente que la toma
 5. Llenar Zone 3 y Zone 4 con el detalle que tengas disponible
-6. Si la task toca UI visible, copy, layout, estados, interaccion, motion, primitive o GVC, declarar `Execution profile: ui-ux`, completar `UI impact` y copiar el bloque de [`TASK_UI_UX_ADDENDUM.md`](TASK_UI_UX_ADDENDUM.md)
+6. Si la task toca UI visible, copy, layout, estados, interaccion, motion, primitive o GVC, declarar `Execution profile: ui-ux`, completar `UI impact`, registrar `Wireframe: docs/ui/wireframes/TASK-###-short-slug.md`, registrar `Flow: docs/ui/flows/TASK-###-short-slug-flow.md` cuando `UI impact: flow` o existan sidecars/modales/drawers/navegacion entre pantallas, registrar `Motion: docs/ui/motion/TASK-###-short-slug-motion.md` cuando `UI impact: motion` o existan motion/microinteracciones no triviales, y copiar el bloque de [`TASK_UI_UX_ADDENDUM.md`](TASK_UI_UX_ADDENDUM.md)
 7. Si la task toca backend, datos, DB, API, commands, readers, migrations, sync, cron, webhooks o integraciones, declarar `Execution profile: backend-data`, completar `Backend impact` y copiar el bloque de [`TASK_BACKEND_DATA_ADDENDUM.md`](TASK_BACKEND_DATA_ADDENDUM.md)
 8. Si `UI impact != none` y `Backend impact != none`, preferir split en dos tasks (`backend-data` foundation + `ui-ux` consumer). Si se conserva una task hibrida, agregar `## Hybrid Execution Justification`.
 9. Para tasks `umbrella` o `policy`: Zone 3 (Detailed Spec) puede omitirse; Verification es revision manual
@@ -42,6 +42,9 @@ Para tasks con impacto backend/data, ver [`TASK_BACKEND_DATA_ADDENDUM.md`](TASK_
 - Type: `implementation`
 - Execution profile: `standard`
 - UI impact: `none`
+- Wireframe: `none`
+- Flow: `none`
+- Motion: `none`
 - Backend impact: `none`
 - Epic: `[optional EPIC-###]`
 - Status real: `Diseno`
@@ -121,7 +124,12 @@ Reglas obligatorias:
 
 [Condicional. Omitir si `Execution profile: standard` y `UI impact: none`.
 Si `Execution profile: ui-ux` o `UI impact` no es `none`, copiar y completar
-el bloque de `docs/tasks/TASK_UI_UX_ADDENDUM.md`.]
+el bloque de `docs/tasks/TASK_UI_UX_ADDENDUM.md` y apuntar `Wireframe` en
+`## Status` a un archivo existente bajo `docs/ui/wireframes/`. Si `UI impact`
+es `flow` o la UI coordina sidecar/drawer/modal/popover/rutas, apuntar `Flow`
+a un archivo existente bajo `docs/ui/flows/`. Si `UI impact` es `motion` o la
+UI introduce motion/microinteracciones no triviales, apuntar `Motion` a un
+archivo existente bajo `docs/ui/motion/`.]
 
 ## Backend/Data Contract
 

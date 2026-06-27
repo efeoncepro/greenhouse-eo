@@ -33,6 +33,19 @@ For every visible UI change, decide:
 - **Responsive**: desktop/laptop/mobile screenshots required for meaningful UI.
 - **Verification**: `pnpm design:lint`, relevant tests, Playwright screenshot loop.
 
+## Wireframe Contract (mandatory for UI work)
+
+Before writing JSX for a new or materially changed visible UI, create or update a
+wireframe under `docs/ui/wireframes/` when the surface is new, reusable,
+client/public/executive-facing, has meaningful states/copy, includes charts,
+report artifacts, PDF/email output, or is based on a Product Design asset.
+
+Use `docs/ui/wireframes/WIREFRAME_TEMPLATE.md`. The wireframe must link the
+approved visual asset, map the layout skeleton, list copy ids, define state
+copy, document accessibility/chart alternatives, list GVC markers, and name the
+primitive/adapters decision. If a tiny one-off does not need a wireframe, state
+why before coding.
+
 ## Primitive + Variants + Kinds Method
 
 Use `docs/architecture/GREENHOUSE_UI_PRIMITIVE_VARIANTS_DECISION_V1.md` for reusable UI.

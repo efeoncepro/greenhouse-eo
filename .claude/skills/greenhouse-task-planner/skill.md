@@ -31,6 +31,9 @@ Read the user's input. It can be a loose line, a paragraph with context, or a pr
 - **What type of task** — `implementation` (produces code), `umbrella` (coordinates child tasks), or `policy` (formalizes decisions/documentation)
 - **Execution profile** — `standard`, `ui-ux`, or `backend-data`
 - **UI impact** — `none`, `copy`, `layout`, `interaction`, `motion`, `primitive`, or `flow`
+- **Wireframe** — `none` for non-UI tasks, or an existing `docs/ui/wireframes/TASK-###-short-slug.md` for UI tasks
+- **Flow** — `none` unless `UI impact: flow` or the UI coordinates sidecars, drawers, modals, popovers, or route/screen transitions; then an existing `docs/ui/flows/TASK-###-short-slug-flow.md`
+- **Motion** — `none` unless `UI impact: motion` or the UI introduces non-trivial motion/microinteractions; then an existing `docs/ui/motion/TASK-###-short-slug-motion.md`
 - **Backend impact** — `none`, `api`, `db`, `migration`, `command`, `reader`, `sync`, `cron`, `webhook`, or `integration`
 - **How big it is** (estimated effort: Bajo, Medio, Alto)
 - **How urgent it is** (priority: P0, P1, P2, P3)
@@ -80,7 +83,9 @@ Write the complete `.md` file following the structure of `docs/tasks/TASK_TEMPLA
 
 - Default: `Execution profile: standard`, `UI impact: none`, and `Backend impact: none`.
 - If the task touches visible UI, copy, layout, interaction, motion, primitive, flow, mockup, Figma, GVC, or visual evidence, use `Execution profile: ui-ux` and classify `UI impact`.
-- If `Execution profile = ui-ux` or `UI impact != none`, include a completed `## UI/UX Contract` section copied from `docs/tasks/TASK_UI_UX_ADDENDUM.md`.
+- If `Execution profile = ui-ux` or `UI impact != none`, include a completed `## UI/UX Contract` section copied from `docs/tasks/TASK_UI_UX_ADDENDUM.md` and write `Wireframe: docs/ui/wireframes/TASK-###-short-slug.md` in Status, pointing to an existing wireframe file.
+- If `UI impact = flow` or the UI coordinates sidecars, drawers, modals, popovers, or route/screen transitions, write `Flow: docs/ui/flows/TASK-###-short-slug-flow.md` in Status, pointing to an existing flow contract file.
+- If `UI impact = motion` or the UI introduces non-trivial motion/microinteractions, write `Motion: docs/ui/motion/TASK-###-short-slug-motion.md` in Status, pointing to an existing motion contract file.
 - UI/UX tasks must specify experience brief, surface/system decision, state inventory, interaction contract, motion/microinteractions, and visual verification.
 - UI/UX acceptance criteria must be binary: primitive decision, copy source, state coverage, motion/reduced-motion, GVC evidence when applicable, and page-level horizontal scroll checks when layout changes.
 - For `ui-standard` and `ui-platform`, GVC desktop + mobile evidence is required unless the task explicitly explains why runtime visual evidence does not apply.
@@ -146,6 +151,6 @@ After user confirmation:
 - **Do not duplicate existing specs.** If a CODEX_TASK or architecture doc already covers part of the scope, reference that document in `Detailed Spec` or `Normative Docs` instead of copying its content.
 - **Use project terminology.** Use canonical names: `space_id`, ICO Engine, etc. Do not paraphrase or rename.
 - **Rollout Plan & Risk Matrix is canonical.** Toda task de tipo `implementation` que toque runtime de produccion DEBE incluir esta seccion poblada con detalle. Si la task es trivial (doc-only, microcopy, refactor local), declarar explicito por que el rollout es trivial. NUNCA dejar la seccion vacia o con solo "N/A" sin justificacion. Patron canonico desde 2026-05-13 (TASK-872 review arch-architect detecto que sin esta seccion, agentes pueden ejecutar slices fuera de orden y romper SCIM/SSO/payroll).
-- **UI/UX contract is canonical for visible work.** Do not create a generic implementation task when the brief touches UI/UX. Set `Execution profile: ui-ux`, classify `UI impact`, complete `## UI/UX Contract`, and keep the evidence proportional with `ui-lite|ui-standard|ui-platform`.
+- **UI/UX contract is canonical for visible work.** Do not create a generic implementation task when the brief touches UI/UX. Set `Execution profile: ui-ux`, classify `UI impact`, register an existing wireframe under `docs/ui/wireframes/`, register an existing flow contract under `docs/ui/flows/` when interaction crosses surfaces/routes, register an existing motion contract under `docs/ui/motion/` when motion/microinteractions are non-trivial, complete `## UI/UX Contract`, and keep the evidence proportional with `ui-lite|ui-standard|ui-platform`.
 - **Backend/Data contract is canonical for runtime/data work.** Do not create a generic implementation task when the brief touches API, DB, commands, readers, migrations, sync, cron, webhooks, integrations, or source-of-truth/data contracts. Set `Execution profile: backend-data`, classify `Backend impact`, complete `## Backend/Data Contract`, and keep the evidence proportional with `backend-lite|backend-standard|backend-critical`.
 - **Hybrid UI/backend work splits by default.** When a capability combines reusable backend/data work with visible UI, create a `backend-data` foundation task and a dependent `ui-ux` consumer task. Keep one vertical hybrid task only when it is small, reversible, avoids risky migration/schema work, and includes `## Hybrid Execution Justification` plus explicit slice order.

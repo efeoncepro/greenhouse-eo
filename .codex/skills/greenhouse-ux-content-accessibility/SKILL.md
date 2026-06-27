@@ -81,8 +81,12 @@ Use `GREENHOUSE_UI_ORCHESTRATION_V1.md` only if pattern selection is still unres
    - warning
    - error
    - success if relevant
-4. Rewrite labels, helper text, CTAs, and feedback copy.
-5. Check accessibility basics before finishing.
+4. For new/material UI, record the final wording in a wireframe under
+   `docs/ui/wireframes/` using `WIREFRAME_TEMPLATE.md`, or update the existing
+   wireframe. Include copy ids, dynamic values, state copy, aria labels, chart
+   alternatives and GVC markers before JSX locks the strings.
+5. Rewrite labels, helper text, CTAs, and feedback copy.
+6. Check accessibility basics before finishing.
 
 ## UX writing rules
 
@@ -129,6 +133,7 @@ For rewrite tasks, return:
 - improved copy
 - reason for the change
 - accessibility or usability issue addressed
+- wireframe path when the copy belongs to new/material UI, or reason it was not needed
 
 For implementation tasks, also:
 

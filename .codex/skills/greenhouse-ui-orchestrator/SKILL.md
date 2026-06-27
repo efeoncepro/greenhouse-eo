@@ -70,11 +70,15 @@ Normalize it into:
    - state coverage
    - microcopy quality
    - accessibility basics
-7. Decide whether the implementation belongs in:
+7. Create or register the UI wireframe in `docs/ui/wireframes/` before JSX when
+   the surface is new, visible, reusable, client/public/executive-facing,
+   state/copy-heavy, chart/report/PDF/email-based, or tied to a Product Design
+   asset. Use `docs/ui/wireframes/WIREFRAME_TEMPLATE.md`.
+8. Decide whether the implementation belongs in:
    - `src/components/greenhouse/*`
    - `src/views/greenhouse/<module>/*`
    - `src/views/greenhouse/admin/**`
-8. Return an implementation-ready recommendation.
+9. Return an implementation-ready recommendation.
 
 ## Hard rules
 
@@ -110,6 +114,7 @@ When responding, include:
 - recommended pattern
 - optional alternate pattern if it is materially useful
 - local target path
+- wireframe path or explicit reason no wireframe is needed
 - `full-version` references
 - guardrails and anti-patterns
 - validation notes

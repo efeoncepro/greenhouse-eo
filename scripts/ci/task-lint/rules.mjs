@@ -1,3 +1,6 @@
+import { existsSync } from 'node:fs'
+import { join } from 'node:path'
+
 const REQUIRED_SECTIONS = [
   'summary',
   'why this task exists',
@@ -44,12 +47,51 @@ const BACKEND_DATA_DOMAINS = [
 ]
 
 const BACKEND_DATA_IMPACTS = new Set(['api', 'db', 'migration', 'command', 'reader', 'sync', 'cron', 'webhook', 'integration'])
+const WIREFRAME_PATH_RE = /^docs\/ui\/wireframes\/(?:TASK-\d{3,}(?:\.\d+)?-[^`|\s]+|[a-z0-9][a-z0-9-]*\.md)$/
+const FLOW_PATH_RE = /^docs\/ui\/flows\/(?:TASK-\d{3,}(?:\.\d+)?-[^`|\s]+|[a-z0-9][a-z0-9-]*\.md)$/
+const MOTION_PATH_RE = /^docs\/ui\/motion\/(?:TASK-\d{3,}(?:\.\d+)?-[^`|\s]+|[a-z0-9][a-z0-9-]*\.md)$/
+
+const FLOW_TRIGGER_RE =
+  /\b(drawer|sidecar|modal|dialog|popover|floating surface|floating-surface|deep link|deep-link|cross-route|route change|navigation|navegacion|navegación|pantalla destino|screen transition)\b/i
+
+const MOTION_TRIGGER_RE =
+  /\b(motion|microinteraction|microinteractions|microinteraccion|microinteracciones|animation|animated|animacion|animación|transition|transicion|transición|framer|gsap|lottie|reduced motion|reduced-motion|animatedcounter|stagger|layout morph)\b/i
 
 const hasSection = (task, section) => task.sections.has(section)
 
 const sectionLine = (task, section) => task.sections.get(section)?.line
 
 const sectionContent = (task, section) => task.sections.get(section)?.content ?? ''
+
+const relevantFlowContent = task =>
+  [
+    'summary',
+    'why this task exists',
+    'goal',
+    'dependencies & impact',
+    'current repo state',
+    'scope',
+    'detailed spec',
+    'acceptance criteria',
+    'verification'
+  ]
+    .map(section => sectionContent(task, section))
+    .join('\n')
+
+const relevantMotionContent = task =>
+  [
+    'summary',
+    'why this task exists',
+    'goal',
+    'dependencies & impact',
+    'current repo state',
+    'scope',
+    'detailed spec',
+    'acceptance criteria',
+    'verification'
+  ]
+    .map(section => sectionContent(task, section))
+    .join('\n')
 
 const isLightweightImplementation = task => {
   const effort = task.effort ?? ''
@@ -296,6 +338,185 @@ const checkUiUxContract = task => {
   ]
 }
 
+const checkUiWireframeContract = (task, context) => {
+  if (!isUiUxImpacted(task)) return []
+
+  const rawWireframe = task.status.fields.Wireframe ?? task.status.fields.wireframe ?? ''
+  const wireframe = rawWireframe.replace(/^`(.+)`$/, '$1').trim()
+  const severity = context.changed || context.task ? 'error' : 'warning'
+
+  if (!wireframe || wireframe === 'none' || wireframe === 'n/a') {
+    return [
+      finding({
+        task,
+        rule: 'ui-wireframe-contract',
+        severity,
+        line: task.status.hasStatus ? task.status.startLine : undefined,
+        message:
+          'UI task must declare `Wireframe: docs/ui/wireframes/...` in ## Status before implementation. Create/register the wireframe or set UI impact to none with rationale.'
+      })
+    ]
+  }
+
+  if (!WIREFRAME_PATH_RE.test(wireframe)) {
+    return [
+      finding({
+        task,
+        rule: 'ui-wireframe-contract',
+        severity,
+        line: task.status.fieldLines.Wireframe ?? task.status.fieldLines.wireframe,
+        message: `Wireframe path "${wireframe}" must point to docs/ui/wireframes/*.md.`
+      })
+    ]
+  }
+
+  if (context.repoRoot && !existsSync(join(context.repoRoot, wireframe))) {
+    return [
+      finding({
+        task,
+        rule: 'ui-wireframe-contract',
+        severity,
+        line: task.status.fieldLines.Wireframe ?? task.status.fieldLines.wireframe,
+        message: `Wireframe file "${wireframe}" does not exist. Create it before implementation or correct the path.`
+      })
+    ]
+  }
+
+  return []
+}
+
+const checkUiFlowContract = (task, context) => {
+  if (!isUiUxImpacted(task)) return []
+
+  const rawFlow = task.status.fields.Flow ?? task.status.fields.flow ?? ''
+  const flow = rawFlow.replace(/^`(.+)`$/, '$1').trim()
+  const severity = context.changed || context.task ? 'error' : 'warning'
+  const flowRequired = task.uiImpact === 'flow'
+  const likelyNeedsFlow = FLOW_TRIGGER_RE.test(relevantFlowContent(task))
+
+  if (!flow || flow === 'none' || flow === 'n/a') {
+    if (flowRequired) {
+      return [
+        finding({
+          task,
+          rule: 'ui-flow-contract',
+          severity,
+          line: task.status.hasStatus ? task.status.startLine : undefined,
+          message:
+            'UI flow task must declare `Flow: docs/ui/flows/...` in ## Status before implementation. Create/register the flow contract or reduce UI impact with rationale.'
+        })
+      ]
+    }
+
+    if (likelyNeedsFlow) {
+      return [
+        finding({
+          task,
+          rule: 'ui-flow-contract',
+          severity: 'warning',
+          line: task.status.hasStatus ? task.status.startLine : undefined,
+          message:
+            'Task text references modal/drawer/sidecar/popover/navigation behavior but Flow is none. Add a flow contract if multiple surfaces or route transitions are in scope.'
+        })
+      ]
+    }
+
+    return []
+  }
+
+  if (!FLOW_PATH_RE.test(flow)) {
+    return [
+      finding({
+        task,
+        rule: 'ui-flow-contract',
+        severity,
+        line: task.status.fieldLines.Flow ?? task.status.fieldLines.flow,
+        message: `Flow path "${flow}" must point to docs/ui/flows/*.md.`
+      })
+    ]
+  }
+
+  if (context.repoRoot && !existsSync(join(context.repoRoot, flow))) {
+    return [
+      finding({
+        task,
+        rule: 'ui-flow-contract',
+        severity,
+        line: task.status.fieldLines.Flow ?? task.status.fieldLines.flow,
+        message: `Flow file "${flow}" does not exist. Create it before implementation or correct the path.`
+      })
+    ]
+  }
+
+  return []
+}
+
+const checkUiMotionContract = (task, context) => {
+  if (!isUiUxImpacted(task)) return []
+
+  const rawMotion = task.status.fields.Motion ?? task.status.fields.motion ?? ''
+  const motion = rawMotion.replace(/^`(.+)`$/, '$1').trim()
+  const severity = context.changed || context.task ? 'error' : 'warning'
+  const motionRequired = task.uiImpact === 'motion'
+  const likelyNeedsMotion = MOTION_TRIGGER_RE.test(relevantMotionContent(task))
+
+  if (!motion || motion === 'none' || motion === 'n/a') {
+    if (motionRequired) {
+      return [
+        finding({
+          task,
+          rule: 'ui-motion-contract',
+          severity,
+          line: task.status.hasStatus ? task.status.startLine : undefined,
+          message:
+            'UI motion task must declare `Motion: docs/ui/motion/...` in ## Status before implementation. Create/register the motion contract or reduce UI impact with rationale.'
+        })
+      ]
+    }
+
+    if (likelyNeedsMotion) {
+      return [
+        finding({
+          task,
+          rule: 'ui-motion-contract',
+          severity: 'warning',
+          line: task.status.hasStatus ? task.status.startLine : undefined,
+          message:
+            'Task text references motion/microinteraction/animation behavior but Motion is none. Add a motion contract if non-trivial motion or interaction feedback is in scope.'
+        })
+      ]
+    }
+
+    return []
+  }
+
+  if (!MOTION_PATH_RE.test(motion)) {
+    return [
+      finding({
+        task,
+        rule: 'ui-motion-contract',
+        severity,
+        line: task.status.fieldLines.Motion ?? task.status.fieldLines.motion,
+        message: `Motion path "${motion}" must point to docs/ui/motion/*.md.`
+      })
+    ]
+  }
+
+  if (context.repoRoot && !existsSync(join(context.repoRoot, motion))) {
+    return [
+      finding({
+        task,
+        rule: 'ui-motion-contract',
+        severity,
+        line: task.status.fieldLines.Motion ?? task.status.fieldLines.motion,
+        message: `Motion file "${motion}" does not exist. Create it before implementation or correct the path.`
+      })
+    ]
+  }
+
+  return []
+}
+
 const checkBackendDataContract = task => {
   if (!isBackendDataImpacted(task)) return []
   if (hasSection(task, 'backend/data contract')) return []
@@ -370,6 +591,21 @@ export const RULES = [
     id: 'ui-ux-contract',
     appliesTo: task => task.kind === 'template',
     check: checkUiUxContract
+  },
+  {
+    id: 'ui-wireframe-contract',
+    appliesTo: task => task.kind === 'template',
+    check: checkUiWireframeContract
+  },
+  {
+    id: 'ui-flow-contract',
+    appliesTo: task => task.kind === 'template',
+    check: checkUiFlowContract
+  },
+  {
+    id: 'ui-motion-contract',
+    appliesTo: task => task.kind === 'template',
+    check: checkUiMotionContract
   },
   {
     id: 'backend-data-contract',

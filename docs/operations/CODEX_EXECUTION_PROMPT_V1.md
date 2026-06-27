@@ -208,7 +208,7 @@ Si la task tiene `Execution profile: ui-ux`, `UI impact != none`, toca UI visibl
 Condición mínima recomendada:
 
 ```text
-/goal [TASK-###] UI enterprise-ready: las skills product design aplicables fueron cargadas antes de JSX; la decisión primitive reuse/extend/new quedó documentada; no hay HEX/font/px hardcodeado fuera de tokens; copy visible vive en la capa canónica; GVC desktop+mobile corrió en loop y los frames PNG fueron revisados; scrollWidth==clientWidth en desktop y 390px o hay blocker exacto; no hay overlaps, clipping incoherente ni console/page errors; docs, handoff y gates proporcionales están sincronizados.
+/goal [TASK-###] UI enterprise-ready: las skills product design aplicables fueron cargadas antes de JSX; el wireframe está declarado en la task, existe bajo docs/ui/wireframes y pasa pnpm ui:wireframe-check --task TASK-###; si hay flow, sidecar, drawer, modal, popover o navegación cruzada, el flow contract está declarado, existe bajo docs/ui/flows y pasa pnpm ui:flow-check --task TASK-###; si hay motion o microinteracciones no triviales, el motion contract está declarado, existe bajo docs/ui/motion y pasa pnpm ui:motion-check --task TASK-###; la decisión primitive reuse/extend/new quedó documentada; no hay HEX/font/px hardcodeado fuera de tokens; copy visible vive en la capa canónica; GVC desktop+mobile corrió en loop y los frames PNG fueron revisados; scrollWidth==clientWidth en desktop y 390px o hay blocker exacto; no hay overlaps, clipping incoherente ni console/page errors; docs, handoff y gates proporcionales están sincronizados.
 ```
 
 No declares UI lista si esa condición no está demostrada en la conversación con comandos, rutas de captura y hallazgos resueltos o bloqueadores exactos.
@@ -226,7 +226,7 @@ IMPLEMENTACIÓN
 - No leas secretos DB directo desde código nuevo.
 - Migraciones: crea con `pnpm migrate:create <slug>`; no fabriques nombres a mano.
 - Copy reusable vive en `src/lib/copy/*` o nomenclatura canónica; no hardcodees copy reutilizable en JSX.
-- UI visible: aplica `DESIGN.md`, primitive lookup, token mapping y GVC (`pnpm fe:capture`) con revisión visual real.
+- UI visible: aplica `DESIGN.md`, `pnpm ui:wireframe-check --task TASK-###`, `pnpm ui:flow-check --task TASK-###` cuando aplique, `pnpm ui:motion-check --task TASK-###` cuando aplique, primitive lookup, token mapping y GVC (`pnpm fe:capture`) con revisión visual real.
 - Acciones destructivas o blast radius alto: confirma antes.
 
 VALIDACIÓN

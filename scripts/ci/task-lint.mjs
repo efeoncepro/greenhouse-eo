@@ -231,6 +231,10 @@ export const lintTasks = ({ repoRoot, options }) => {
     findings.push(
       ...runRules(tasks[index], {
         ...context,
+        repoRoot,
+        changed: options.changed,
+        active: options.active,
+        task: options.task,
         enforceErrors,
         isLastTask: index === tasks.length - 1
       })

@@ -66,11 +66,16 @@ Avoid standalone pages, parallel themes, copied demo pages, direct `Intl.*` form
 ## Workflow
 
 1. Normalize the request: surface, audience, user task, data shape, action density, and states.
-2. Present a short plan for approval before coding when the user asks for approval or the surface is broad.
-3. Implement a route-local mockup with typed mock data and real Greenhouse components.
-4. Include loading shape, empty, partial, warning, error, and success states where applicable.
-5. Keep backend integration seams clear: no fake API routes unless explicitly needed.
-6. Validate before presenting:
+2. Create or update the wireframe in `docs/ui/wireframes/` before JSX when the
+   mockup/prototype is intended to inform implementation, has real microcopy,
+   states, charts, report/PDF/email output, or is client/public/executive-facing.
+   Link any Product Design asset and include copy ids, states, a11y notes and
+   GVC markers. If this is a throwaway visual spike, state that explicitly.
+3. Present a short plan for approval before coding when the user asks for approval or the surface is broad.
+4. Implement a route-local mockup with typed mock data and real Greenhouse components.
+5. Include loading shape, empty, partial, warning, error, and success states where applicable.
+6. Keep backend integration seams clear: no fake API routes unless explicitly needed.
+7. Validate before presenting:
    - `pnpm exec tsc --noEmit --pretty false`
    - `pnpm lint`
    - `pnpm design:lint`
@@ -78,7 +83,9 @@ Avoid standalone pages, parallel themes, copied demo pages, direct `Intl.*` form
 
 ## Output
 
-Report the local URL, files changed, validations run, auth/session requirement, and known mock-data limits.
+Report the local URL, files changed, wireframe path or explicit reason no
+wireframe was required, validations run, auth/session requirement, and known
+mock-data limits.
 
 ## Acceptance Bar
 

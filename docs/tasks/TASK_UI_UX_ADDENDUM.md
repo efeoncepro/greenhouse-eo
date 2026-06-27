@@ -6,6 +6,48 @@ layout, estados, interaccion, motion, primitive, flujo de producto o evidencia v
 Este addendum no reemplaza `TASK_TEMPLATE.md`: lo extiende cuando `Execution profile` sea
 `ui-ux` o cuando `UI impact` sea distinto de `none`.
 
+## Wireframe Gate
+
+Toda task `ui-ux` o con `UI impact != none` debe declarar en `## Status`:
+
+```md
+- Wireframe: `docs/ui/wireframes/TASK-###-short-slug.md`
+```
+
+El archivo debe existir antes de implementar JSX/copy visible. Para cambios realmente
+triviales que no necesitan wireframe, la task debe mantener `UI impact: none` y explicar
+la razon en `Current Repo State` o `Out of Scope`; no usar `Wireframe: none` con impacto UI.
+
+## Flow Gate
+
+Toda task con `UI impact: flow` debe declarar en `## Status`:
+
+```md
+- Flow: `docs/ui/flows/TASK-###-short-slug-flow.md`
+```
+
+El archivo debe existir antes de implementar JSX/copy visible. Para tasks UI que
+no sean `flow`, `Flow: none` es valido solo si la superficie no coordina sidecar,
+drawer, modal, popover, navegación entre pantallas, deep links, query params,
+dirty-state confirmation ni una secuencia GVC. Si el texto de la task menciona
+esas piezas y deja `Flow: none`, `task-lint` emite warning para forzar decisión
+explícita.
+
+## Motion Gate
+
+Toda task con `UI impact: motion` debe declarar en `## Status`:
+
+```md
+- Motion: `docs/ui/motion/TASK-###-short-slug-motion.md`
+```
+
+El archivo debe existir antes de implementar JSX/copy visible. Para tasks UI que
+no sean `motion`, `Motion: none` es valido solo si no hay motion,
+microinteracciones, animaciones, transiciones no triviales, Framer/GSAP/Lottie,
+animated counters/charts/empty states ni feedback temporal que afecte confianza,
+foco o recuperacion. Si el texto de la task menciona esas piezas y deja
+`Motion: none`, `task-lint` emite warning para forzar decisión explícita.
+
 ## Cuándo aplica
 
 Usar este addendum si la task toca cualquiera de estos puntos:
@@ -102,6 +144,9 @@ Declarar el nivel dentro de `## UI/UX Contract`.
 Agregar criterios binarios como corresponda:
 
 - [ ] Se declaro `Execution profile: ui-ux` y `UI impact` segun el alcance real.
+- [ ] Se declaro `Wireframe: docs/ui/wireframes/TASK-###-short-slug.md` y el archivo existe.
+- [ ] Si `UI impact: flow` o hay sidecar/drawer/modal/popover/navegacion cruzada, se declaro `Flow: docs/ui/flows/TASK-###-short-slug-flow.md` y el archivo existe.
+- [ ] Si `UI impact: motion` o hay motion/microinteracciones no triviales, se declaro `Motion: docs/ui/motion/TASK-###-short-slug-motion.md` y el archivo existe.
 - [ ] **Full API Parity:** si la UI expone una **acción de negocio** (capability que afecta estado/permisos/datos/aprobaciones/exports/recoveries/reportes/config), la lógica vive en un contrato gobernado server-side, NO en el componente; entonces `Backend impact != none` y aplica el **Capability Definition of Done** de `TASK_BACKEND_DATA_ADDENDUM.md` (preferir dos tasks: `backend-data` el contrato + `ui-ux` el cliente). La UI es cliente del primitive, igual que Nexa/MCP — no una segunda implementación.
 - [ ] La task declara si reusa, extiende o crea primitive; no nace un componente paralelo sin razon.
 - [ ] El copy visible reusable vive en `src/lib/copy/*` o nomenclatura canonica.
@@ -120,8 +165,13 @@ Agregar criterios binarios como corresponda:
 
 ## Rollout del Enforcement
 
-El enforcement nace `warning-first`:
+El wireframe es gate duro para tasks UI cambiadas o revisadas en modo focal; el
+resto del contrato UI/UX mantiene rollout `warning-first` para no migrar backlog
+historico de golpe:
 
-1. `pnpm task:lint --changed` advierte si una task UI activa no tiene `## UI/UX Contract`.
-2. Legacy y backlog historico quedan exentos salvo que se editen.
-3. Cuando el backlog nuevo ya use el campo consistentemente, se puede promover a error para tasks nuevas.
+1. `pnpm task:lint --changed` bloquea si una task UI cambiada no declara un wireframe existente en `docs/ui/wireframes/`.
+2. `pnpm task:lint --changed` bloquea si una task con `UI impact: flow` no declara un flow contract existente en `docs/ui/flows/`.
+3. `pnpm task:lint --changed` bloquea si una task con `UI impact: motion` no declara un motion contract existente en `docs/ui/motion/`.
+4. `pnpm ui:wireframe-check --task TASK-###`, `pnpm ui:flow-check --task TASK-###` y `pnpm ui:motion-check --task TASK-###` son los atajos focales para revisar estos gates.
+5. `pnpm task:lint --changed` advierte si una task UI activa no tiene `## UI/UX Contract`.
+6. Legacy y backlog historico quedan exentos salvo que se editen.

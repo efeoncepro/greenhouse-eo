@@ -72,11 +72,16 @@ Avoid:
    - data shape
    - action density
    - states needed
-2. Present a short plan for approval before coding when the user asks for approval or the surface is broad.
-3. Implement a route-local mockup with typed mock data and real Greenhouse components.
-4. Include the expected states: loading shape, empty, partial, warning, error, and success where applicable.
-5. Keep backend integration seams clear: no fake API routes unless explicitly needed for the prototype.
-6. Validate before presenting:
+2. Create or update the wireframe in `docs/ui/wireframes/` before JSX when the
+   mockup/prototype is intended to inform implementation, has real microcopy,
+   states, charts, report/PDF/email output, or is client/public/executive-facing.
+   Link any Product Design asset and include copy ids, states, a11y notes and
+   GVC markers. If this is a throwaway visual spike, state that explicitly.
+3. Present a short plan for approval before coding when the user asks for approval or the surface is broad.
+4. Implement a route-local mockup with typed mock data and real Greenhouse components.
+5. Include the expected states: loading shape, empty, partial, warning, error, and success where applicable.
+6. Keep backend integration seams clear: no fake API routes unless explicitly needed for the prototype.
+7. Validate before presenting:
    - `pnpm exec tsc --noEmit --pretty false`
    - `pnpm lint`
    - `pnpm design:lint` for UI work
@@ -88,6 +93,7 @@ When finished, report:
 
 - local URL
 - files created/changed
+- wireframe path or explicit reason no wireframe was required
 - validations run
 - whether the route requires an authenticated dashboard session
 - any known limits of the mock data
