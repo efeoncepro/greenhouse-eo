@@ -58,6 +58,7 @@ Revisar y respetar:
 - `docs/architecture/GREENHOUSE_AI_VISIBILITY_GRADER_CALIBRATION_V1.md` — decisiones de calibracion y limites del golden set.
 - `docs/tasks/complete/TASK-1227-growth-ai-visibility-normalization-scoring-engine.md` — `NormalizedFinding`, `llm-extraction.ts`, default OFF.
 - `docs/tasks/complete/TASK-1249-growth-ai-visibility-calibration-provider-completion.md` — provider completion + decision de mantener score V1.
+- `docs/tasks/to-do/TASK-1272-growth-ai-visibility-category-taxonomy-contract.md` — taxonomia gobernada para que `categoryAssociations` no sean strings libres product-facing.
 - `docs/operations/FEATURE_FLAG_STATE_LEDGER.md` — flags del grader y registro de cualquier flag nuevo.
 
 Reglas obligatorias:
@@ -66,6 +67,7 @@ Reglas obligatorias:
 - **NUNCA** enviar PII del lead a proveedores. El extractor recibe solo `answerExcerpt` + marca/dominio del perfil, igual que el hook actual.
 - **NUNCA** instanciar SDKs paralelos ni `fetch` crudo. Reusar `src/lib/ai/openai.ts`, `src/lib/ai/google-genai.ts` y `src/lib/ai/anthropic.ts`.
 - **NUNCA** cambiar el default productivo sin eval y flag. El default seguro inicial es equivalente al estado actual: extraction OFF o Anthropic unchanged; el nuevo proveedor se prende por flag/shadow.
+- **NUNCA** publicar categorias libres del proveedor como verdad de producto. `categoryAssociations` debe mapear a la taxonomia gobernada de `TASK-1272` o degradar a `unknown` / `needs_review`.
 - **Preservar `unknown`** cuando la evidencia o el schema no alcanzan. Fallo de proveedor/schema → finding determinista intacto.
 
 ## Normative Docs
@@ -84,12 +86,14 @@ Reglas obligatorias:
 
 - `TASK-1227` — normalized finding contract + current LLM extraction hook.
 - `TASK-1249` — provider set completion and calibration posture.
+- `TASK-1272` — requerido para habilitar category associations product-facing; sentiment/drift pueden shippear sin bloquearse por taxonomia si preservan `categoryAssociations` como internal-only o `unknown`.
 - Canonical AI clients under `src/lib/ai/*`.
 
 ### Blocks / Impacts
 
 - Enables meaningful `sentimentSummary` from `TASK-1237` without making Anthropic the permanent cost center.
 - Improves `message_alignment` evidence coverage when prose extraction is ON.
+- Feeds `TASK-1272` with raw category candidates, but does not define category taxonomy or publish free-form categories.
 - Reduces launch/runtime cost risk for `TASK-1246` and report/email/client surfaces (`TASK-1241`, `TASK-1248`, `TASK-1250`).
 
 ### Files owned
@@ -122,6 +126,7 @@ Reglas obligatorias:
 - No hay eval focal que compare Anthropic vs Gemini/OpenAI en sentiment/prose extraction.
 - No hay cost ceiling especifico para el paso de extraccion de prosa.
 - El default operacional para sentiment real depende de prender un hook Anthropic caro.
+- No hay taxonomia gobernada para `categoryAssociations`; esta task solo puede emitir candidatos o categorias mapeadas por `TASK-1272`, no labels libres product-facing.
 
 ## Backend/Data Contract
 
@@ -232,6 +237,8 @@ N/A — no nueva capability de negocio. La task modifica un primitive interno (`
 
 El extractor debe producir el mismo shape que hoy devuelve `enrichFindingWithLlm`: `brandMentioned`, `sentimentLabel`, `sentimentScore`, `categoryAssociations`, `messageDriftClaims`, `confidence`. El router recibe el finding determinista, la observation y el contexto `{ subjectBrand, subjectDomain }`; selecciona provider segun flags y presupuesto; valida schema; sanitiza arrays; y si algo falla retorna el finding determinista intacto. La salida debe incluir metadata interna suficiente para evaluacion (provider/model/version/cost estimate), sin contaminar el DTO publico.
 
+Para categorias, el extractor puede producir **raw category candidates** con evidencia, pero el dominio solo puede publicar o puntuar `categoryAssociations` si pasan por la taxonomia gobernada de `TASK-1272`. Hasta entonces, las categorias del proveedor deben quedarse internal-only, `unknown`, o `needs_review`; no pueden alimentar `category_ownership` fuerte ni copy del reporte publico como verdad de producto.
+
 ### Sentiment methodology contract
 
 La metodologia aceptada para V1 es **structured sentiment extraction over answer-engine excerpts**, no `sentiment analytics` estadistico ni inferencia reputacional amplia. La unidad de analisis es una respuesta/excerpt de un answer engine, y el objetivo es clasificar el **sentimiento hacia la marca sujeto** cuando la evidencia lo permite.
@@ -255,6 +262,7 @@ El eval compara al menos:
 - drift claims no vacios solo cuando hay evidencia.
 - schema-valid response rate.
 - costo estimado por run light/full.
+- exactitud de category candidates solo como input de `TASK-1272`; ningun candidato libre cuenta como categoria product-facing.
 
 El cutover debe ser evidencia-first: no basta con que un proveedor sea mas barato; debe mantener calidad aceptable y degradar honestamente.
 
@@ -318,6 +326,7 @@ El cutover debe ser evidencia-first: no basta con que un proveedor sea mas barat
 - [ ] Golden eval reports sentiment/prose quality, schema-valid rate, latency and cost estimate per provider.
 - [ ] Sentiment methodology is tested as `sentiment toward subject brand`, not general answer tone; `unknown`/`mixed` semantics are covered by fixtures.
 - [ ] `sentimentScore` is treated as auxiliary until calibrated; product/report logic uses label/count/net semantics unless a documented calibration decision says otherwise.
+- [ ] `categoryAssociations` product-facing quedan mapeadas por `TASK-1272` o degradan a `unknown` / `needs_review`; ningun string libre de proveedor alimenta `category_ownership` fuerte ni reporte publico.
 - [ ] Cutover decision is documented; default provider changes only if quality/cost gates pass.
 - [ ] Scoring remains deterministic from persisted findings; `grader_score` is never assigned by an LLM.
 - [ ] Failure path returns the deterministic finding intact and captures sanitized growth-domain errors.
