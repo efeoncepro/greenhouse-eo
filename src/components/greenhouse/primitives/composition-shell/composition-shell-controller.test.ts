@@ -30,6 +30,7 @@ describe('resolveComposition', () => {
       nexaMoment: 'leadPlusContext',
       queueInspector: 'split',
       workspaceDetail: 'split',
+      workbench: 'masterDetail',
       reader: 'focused',
       custom: 'single'
     }
@@ -62,6 +63,22 @@ describe('config + region metadata', () => {
     })
     expect(resolveCompositionConfig({ composition: 'leadPlusContext' }).contentRegions).toEqual(['lead', 'primary'])
     expect(resolveCompositionConfig({ composition: 'split' }).contentRegions).toEqual(['primary', 'aside'])
+  })
+
+  it('masterDetail: navigator (aside) angosto IZQ + detail (primary) ancho DER; drawer del primary en compact', () => {
+    const md = resolveCompositionConfig({ composition: 'masterDetail' })
+
+    expect(md).toMatchObject({ layout: 'split', condensesPrimary: false, compactDrawerRegion: 'primary' })
+    // El orden de contentRegions = orden de columnas del grid (navigator → detail).
+    expect(md.contentRegions).toEqual(['aside', 'primary'])
+    // Grid invertido vs split: clamp angosto PRIMERO (nav), 1fr ancho DESPUÉS (detail).
+    expect(md.splitTemplateColumns?.sm).toBe('clamp(280px, 32%, 400px) minmax(0, 1fr)')
+    // El nav (aside) baja su min para que el clamp gobierne (anti overflow compact).
+    expect(md.regionMinInlineSize?.aside).toBe(0)
+  })
+
+  it('workbench kind → masterDetail (composición existente)', () => {
+    expect(resolveComposition({ kind: 'workbench' })).toBe('masterDetail')
   })
 
   it('cada región tiene un view-transition-name único (singleton — constraint VT)', () => {
@@ -98,17 +115,52 @@ describe('resolveSizeClass (M3 breakpoints)', () => {
 })
 
 describe('resolveCompositionLayout', () => {
-  it('split se sostiene en expanded/medium; colapsa a stack + drawer en compact', () => {
-    expect(resolveCompositionLayout('split', 'expanded')).toEqual({ layout: 'split', asideAsDrawer: false })
-    expect(resolveCompositionLayout('split', 'medium')).toEqual({ layout: 'split', asideAsDrawer: false })
-    expect(resolveCompositionLayout('split', 'compact')).toEqual({ layout: 'stack', asideAsDrawer: true })
+  it('split se sostiene en expanded/medium; colapsa a stack + aside drawer en compact', () => {
+    expect(resolveCompositionLayout('split', 'expanded')).toEqual({
+      layout: 'split',
+      drawerRegion: null,
+      asideAsDrawer: false
+    })
+    expect(resolveCompositionLayout('split', 'medium')).toEqual({
+      layout: 'split',
+      drawerRegion: null,
+      asideAsDrawer: false
+    })
+    expect(resolveCompositionLayout('split', 'compact')).toEqual({
+      layout: 'stack',
+      drawerRegion: 'aside',
+      asideAsDrawer: true
+    })
   })
 
-  it('leadPlusContext / single / focused siempre stack', () => {
+  it('masterDetail se sostiene en expanded/medium; colapsa el PRIMARY (detail) a drawer en compact (aside se queda)', () => {
+    expect(resolveCompositionLayout('masterDetail', 'expanded')).toEqual({
+      layout: 'split',
+      drawerRegion: null,
+      asideAsDrawer: false
+    })
+    expect(resolveCompositionLayout('masterDetail', 'medium')).toEqual({
+      layout: 'split',
+      drawerRegion: null,
+      asideAsDrawer: false
+    })
+    // Semántica de drawer invertida vs split: colapsa primary, NO aside.
+    expect(resolveCompositionLayout('masterDetail', 'compact')).toEqual({
+      layout: 'stack',
+      drawerRegion: 'primary',
+      asideAsDrawer: false
+    })
+  })
+
+  it('leadPlusContext / single / focused siempre stack, sin drawer', () => {
     for (const sc of ['compact', 'medium', 'expanded'] as const) {
-      expect(resolveCompositionLayout('leadPlusContext', sc).layout).toBe('stack')
-      expect(resolveCompositionLayout('single', sc).layout).toBe('stack')
-      expect(resolveCompositionLayout('focused', sc).layout).toBe('stack')
+      for (const c of ['leadPlusContext', 'single', 'focused'] as const) {
+        const resolved = resolveCompositionLayout(c, sc)
+
+        expect(resolved.layout).toBe('stack')
+        expect(resolved.drawerRegion).toBeNull()
+        expect(resolved.asideAsDrawer).toBe(false)
+      }
     }
   })
 })
@@ -175,7 +227,7 @@ describe('reduceCompositionShellState (morph lifecycle + dirty guard)', () => {
 })
 
 describe('reduceCompositionShellState — hardening (property + concurrency, TASK-1119 Slice 5)', () => {
-  const COMPOSITIONS: CompositionShellComposition[] = ['single', 'leadPlusContext', 'split', 'focused']
+  const COMPOSITIONS: CompositionShellComposition[] = ['single', 'leadPlusContext', 'split', 'focused', 'masterDetail']
   const PHASES = ['dormant', 'composing', 'composed']
 
   // PRNG determinístico (mulberry32) — reproducible, sin Math.random.

@@ -55,12 +55,15 @@ const regionSx = (
   region: CompositionShellRegion,
   condense: boolean,
   rich: boolean,
-  reduced: boolean
+  reduced: boolean,
+  minInlineOverride?: number
 ) => {
   const meta = COMPOSITION_SHELL_REGION_META[region]
+  // Override per-composición del min (p.ej. masterDetail usa `aside` como navigator angosto → min 0).
+  const minInline = minInlineOverride ?? meta.minInlineSize
 
   const base = {
-    minInlineSize: meta.minInlineSize > 0 ? { xs: 0, sm: `${meta.minInlineSize}px` } : 0,
+    minInlineSize: minInline > 0 ? { xs: 0, sm: `${minInline}px` } : 0,
     containerType: 'inline-size' as const,
     outline: 'none'
   }
@@ -86,6 +89,7 @@ const CompositionShell = ({
   sizeClass: sizeClassOverride,
   leadLabel = 'Respuesta',
   asideLabel = 'Panel contextual',
+  detailLabel = 'Detalle',
   instanceId,
   // Default `rich` (decisión del operador 2026-06-14): la coreografía rica (stagger de entrada) es el
   // estándar — más moderna y atractiva. Reduced-motion horneado + el primer paint no se retrasa (el stagger
@@ -116,8 +120,9 @@ const CompositionShell = ({
   const [measuredSizeClass, setMeasuredSizeClass] = useState<CompositionShellSizeClass>('expanded')
   const sizeClass = sizeClassOverride ?? measuredSizeClass
 
-  // `split` en compact → `aside` se vuelve drawer temporal (disclosure local, el resto apila).
-  const [asideDrawerOpen, setAsideDrawerOpen] = useState(false)
+  // split/masterDetail en compact → la región declarada (`compactDrawerRegion`) se vuelve drawer temporal
+  // (disclosure local, el resto apila). split → aside; masterDetail → primary (detail).
+  const [drawerOpen, setDrawerOpen] = useState(false)
 
   // Gate de hidratación para el reveal de framer-motion: el SSR + primer paint montan en estado FINAL
   // (`initial=false`) → el HTML del server matchea el cliente (sin hydration mismatch). El stagger de
@@ -144,13 +149,13 @@ const CompositionShell = ({
     return () => observer.disconnect()
   }, [sizeClassOverride])
 
-  const { layout, asideAsDrawer } = resolveCompositionLayout(resolvedComposition, sizeClass)
+  const { layout, drawerRegion } = resolveCompositionLayout(resolvedComposition, sizeClass)
 
-  // Cuando el aside deja de ser drawer (volvemos a expanded/medium) cerramos el drawer para no dejar
+  // Cuando ya no hay región-drawer (volvemos a expanded/medium) cerramos el drawer para no dejar
   // un overlay abierto huérfano tras el reflow.
   useEffect(() => {
-    if (!asideAsDrawer && asideDrawerOpen) setAsideDrawerOpen(false)
-  }, [asideAsDrawer, asideDrawerOpen])
+    if (!drawerRegion && drawerOpen) setDrawerOpen(false)
+  }, [drawerRegion, drawerOpen])
 
   // La región que lidera la composición (lead si la monta, sino primary) — destino del focus tras el morph.
   const leadingRegion: CompositionShellRegion = config.contentRegions.includes('lead') ? 'lead' : 'primary'
@@ -217,6 +222,7 @@ const CompositionShell = ({
 
     const isLeading = region === leadingRegion
     const condense = region === 'primary' && config.condensesPrimary
+    const minInlineOverride = config.regionMinInlineSize?.[region]
 
     // a11y: lead = region etiquetada; aside = complementary; primary/dock = flujo plano.
     const a11yProps =
@@ -252,7 +258,7 @@ const CompositionShell = ({
           initial={hasMounted ? motionProps.initial : false}
           animate={motionProps.animate}
           transition={interruptible ? compositionInterruptibleLayoutTransition(reduced) : motionProps.transition}
-          sx={regionSx(theme, region, condense, true, reduced)}
+          sx={regionSx(theme, region, condense, true, reduced, minInlineOverride)}
         >
           {content}
         </Box>
@@ -260,14 +266,15 @@ const CompositionShell = ({
     }
 
     return (
-      <Box key={region} {...shared} sx={regionSx(theme, region, condense, false, reduced)}>
+      <Box key={region} {...shared} sx={regionSx(theme, region, condense, false, reduced, minInlineOverride)}>
         {content}
       </Box>
     )
   }
 
-  // Regiones de contenido in-flow. Si el aside es drawer en compact, se separa del flujo (va al Drawer).
-  const inFlowContentRegions = config.contentRegions.filter(r => regions[r] && !(r === 'aside' && asideAsDrawer))
+  // Regiones de contenido in-flow. La región que colapsa a drawer en compact (`drawerRegion`) se separa
+  // del flujo (va al Drawer): split → aside; masterDetail → primary.
+  const inFlowContentRegions = config.contentRegions.filter(r => regions[r] && r !== drawerRegion)
 
   // Secuencia DUEÑA del shell (SSR-safe): el shell asigna el índice de stagger central en orden de DOM
   // (dock → contenido → overlay) y cada región revela explícito con ese delay. NO usamos `staggerChildren` de
@@ -284,10 +291,14 @@ const CompositionShell = ({
         sx={{
           display: 'grid',
           gap: 5,
-          // En xs (teléfono) `split` apila: el piso de 360px del aside no cabe en un viewport de ~390 y
-          // empujaría el scrollWidth de página (clase ISSUE-015). Desde sm el aside vuelve a su columna.
-          // Esto es CSS-level, complementario al colapso a drawer del size-class compact (asideAsDrawer).
-          gridTemplateColumns: { xs: '1fr', sm: 'minmax(0, 1fr) clamp(320px, 32%, 480px)' },
+          // En xs (teléfono) la composición split apila: el piso de la lane angosta no cabe en ~390 y
+          // empujaría el scrollWidth de página (clase ISSUE-015). Desde sm vuelve a 2 columnas.
+          // Data-driven por composición (split: primary ancho + aside angosto; masterDetail: nav angosto +
+          // detail ancho). Complementario al colapso a drawer del size-class compact (drawerRegion).
+          gridTemplateColumns: config.splitTemplateColumns ?? {
+            xs: '1fr',
+            sm: 'minmax(0, 1fr) clamp(320px, 32%, 480px)'
+          },
           alignItems: 'start',
           '& > *': { minInlineSize: 0 }
         }}
@@ -319,38 +330,46 @@ const CompositionShell = ({
     return () => cleanups.forEach(fn => fn())
   }, [inFlowRegionKey, vtId])
 
-  // El aside como drawer temporal (compact + split). MUI Drawer temporary aporta focus trap + aria-modal +
-  // Esc nativos. El trigger es disclosure local (mecanismo, no dominio); usa el label accesible del aside.
-  const asideDrawer: ReactNode =
-    asideAsDrawer && regions.aside ? (
+  // La región-drawer temporal (compact). MUI Drawer temporary aporta focus trap + aria-modal + Esc nativos.
+  // El trigger es disclosure local (mecanismo, no dominio). Generalizado por `drawerRegion`:
+  //  - split → aside (inspector), label `asideLabel`, paper `complementary`.
+  //  - masterDetail → primary (detail canvas), label `detailLabel`, paper `region`.
+  // Los `data-capture` se mantienen estables por región (`composition-shell-aside-drawer*` intacto para
+  // los consumers de split — QuoteBuilderShell depende de ese selector).
+  const isPrimaryDrawer = drawerRegion === 'primary'
+  const drawerLabel = isPrimaryDrawer ? detailLabel : asideLabel
+
+  const drawerNode: ReactNode =
+    drawerRegion && regions[drawerRegion] ? (
       <>
         <Button
           variant='tonal'
-          onClick={() => setAsideDrawerOpen(true)}
+          onClick={() => setDrawerOpen(true)}
           aria-haspopup='dialog'
-          aria-expanded={asideDrawerOpen}
-          startIcon={<i className='tabler-layout-sidebar-right' />}
-          data-capture='composition-shell-aside-drawer-trigger'
+          aria-expanded={drawerOpen}
+          startIcon={<i className={isPrimaryDrawer ? 'tabler-layout-sidebar-right-expand' : 'tabler-layout-sidebar-right'} />}
+          data-capture={`composition-shell-${drawerRegion}-drawer-trigger`}
           sx={{ alignSelf: 'flex-start' }}
         >
-          {asideLabel}
+          {drawerLabel}
         </Button>
         <Drawer
           anchor='right'
-          open={asideDrawerOpen}
-          onClose={() => setAsideDrawerOpen(false)}
+          open={drawerOpen}
+          onClose={() => setDrawerOpen(false)}
           ModalProps={{ keepMounted: false }}
           slotProps={{
             paper: {
-              component: 'aside',
-              role: 'complementary',
-              'aria-label': asideLabel,
-              sx: { width: 'min(420px, 88vw)', p: 5 }
+              component: isPrimaryDrawer ? 'section' : 'aside',
+              role: isPrimaryDrawer ? 'region' : 'complementary',
+              'aria-label': drawerLabel,
+              // El detail canvas necesita más ancho que el inspector; el aside conserva su ancho histórico.
+              sx: { width: isPrimaryDrawer ? 'min(480px, 92vw)' : 'min(420px, 88vw)', p: 5 }
             }
           }}
-          data-capture='composition-shell-aside-drawer'
+          data-capture={`composition-shell-${drawerRegion}-drawer`}
         >
-          {regions.aside}
+          {regions[drawerRegion]}
         </Drawer>
       </>
     ) : null
@@ -370,7 +389,7 @@ const CompositionShell = ({
       <Stack spacing={5} sx={{ minInlineSize: 0 }}>
         {/* dock (composer / action dock) — aditivo a cualquier composición; lidera arriba (patrón AI Overviews). */}
         {dockNode}
-        {asideDrawer}
+        {drawerNode}
         {body}
         {/* overlay — fallback excepcional; el consumer decide su tratamiento (drawer/modal) en su contenido. */}
         {overlayNode}

@@ -51,8 +51,29 @@ export const COMPOSITION_SHELL_COMPOSITION_CONFIG: Record<
     contentRegions: ['lead', 'primary'],
     condensesPrimary: true
   },
-  split: { composition: 'split', layout: 'split', contentRegions: ['primary', 'aside'], condensesPrimary: false },
-  focused: { composition: 'focused', layout: 'stack', contentRegions: ['primary'], condensesPrimary: false }
+  split: {
+    composition: 'split',
+    layout: 'split',
+    contentRegions: ['primary', 'aside'],
+    condensesPrimary: false,
+    // primary ancho + aside angosto; en compact el aside se esconde a drawer.
+    compactDrawerRegion: 'aside',
+    splitTemplateColumns: { xs: '1fr', sm: 'minmax(0, 1fr) clamp(320px, 32%, 480px)' }
+  },
+  focused: { composition: 'focused', layout: 'stack', contentRegions: ['primary'], condensesPrimary: false },
+  masterDetail: {
+    composition: 'masterDetail',
+    layout: 'split',
+    // Orden = orden de columnas del grid: navigator (aside, angosto, IZQ) → detail (primary, ancho, DER).
+    contentRegions: ['aside', 'primary'],
+    condensesPrimary: false,
+    // Inverso de `split`: en compact se esconde el DETAIL (primary) a drawer y el navigator (aside) se queda.
+    compactDrawerRegion: 'primary',
+    splitTemplateColumns: { xs: '1fr', sm: 'clamp(280px, 32%, 400px) minmax(0, 1fr)' },
+    // El aside es navigator angosto: su min default (360) forzaría overflow en compact stack; lo bajamos
+    // para que el clamp del grid gobierne (anti ISSUE-015).
+    regionMinInlineSize: { aside: 0 }
+  }
 }
 
 const KIND_TO_COMPOSITION: Record<CompositionShellKind, CompositionShellComposition> = {
@@ -60,6 +81,7 @@ const KIND_TO_COMPOSITION: Record<CompositionShellKind, CompositionShellComposit
   nexaMoment: 'leadPlusContext',
   queueInspector: 'split',
   workspaceDetail: 'split',
+  workbench: 'masterDetail',
   reader: 'focused',
   custom: 'single'
 }
@@ -95,13 +117,22 @@ export const resolveSizeClass = (availableWidth?: number): CompositionShellSizeC
 export interface ResolvedCompositionLayout {
   /** `split` solo se sostiene si la composición es split Y hay espacio; sino colapsa a `stack`. */
   layout: 'stack' | 'split'
-  /** En compact, `aside` se vuelve drawer temporal (semántica modal) en lugar de lane in-flow. */
+  /**
+   * En compact, qué región de contenido se vuelve drawer temporal (semántica modal) en lugar de lane
+   * in-flow. `split` → `aside`; `masterDetail` → `primary`. `null` → ninguna (stack plano).
+   */
+  drawerRegion: CompositionShellRegion | null
+  /**
+   * Conveniencia legacy: `true` sii la región que colapsa a drawer es `aside` (= comportamiento histórico
+   * de `split`). Derivado de `drawerRegion`. Mantiene compat con consumers/tests previos a `masterDetail`.
+   */
   asideAsDrawer: boolean
 }
 
 /**
  * Resuelve el layout efectivo por composición + size class. Puro.
- * - `split` en expanded/medium → split lanes; en compact → stack + aside como drawer temporal.
+ * - `split`/`masterDetail` en expanded/medium → split lanes; en compact → stack + la región declarada
+ *   en `config.compactDrawerRegion` como drawer temporal (split → aside, masterDetail → primary).
  * - `leadPlusContext`/`single`/`focused` → siempre stack.
  */
 export const resolveCompositionLayout = (
@@ -111,14 +142,16 @@ export const resolveCompositionLayout = (
   const config = COMPOSITION_SHELL_COMPOSITION_CONFIG[composition]
 
   if (config.layout === 'split' && sizeClass !== 'compact') {
-    return { layout: 'split', asideAsDrawer: false }
+    return { layout: 'split', drawerRegion: null, asideAsDrawer: false }
   }
 
   if (config.layout === 'split' && sizeClass === 'compact') {
-    return { layout: 'stack', asideAsDrawer: true }
+    const drawerRegion = config.compactDrawerRegion ?? null
+
+    return { layout: 'stack', drawerRegion, asideAsDrawer: drawerRegion === 'aside' }
   }
 
-  return { layout: 'stack', asideAsDrawer: false }
+  return { layout: 'stack', drawerRegion: null, asideAsDrawer: false }
 }
 
 // ── State machine + collision / dirty-guard reducer ──────────────────────────
