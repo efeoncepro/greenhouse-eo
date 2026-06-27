@@ -1,5 +1,9 @@
 # TASK-1241 — Growth AI Visibility: Public Lead Magnet Page
 
+## Delta 2026-06-27 — Report Artifact Design System implementado (TASK-1252)
+
+El render del reporte YA existe como sistema reusable feature-local: **NO inventar componentes paralelos**. Consumir `AiVisibilityReportArtifact` (web) desde `@/components/growth/ai-visibility/report-artifact` con `model={modelFromPublicReport(publicReport, 'publicWeb')}` + `header`. El modelo, la disclosure matrix (engine snapshot = internal-only), el copy (`GH_GROWTH_AI_VISIBILITY_REPORT_ARTIFACT`), la a11y y el no-leak test ya están horneados. Esta página aporta data real (`readPublicGraderReport(token)`) + estados loading/empty/error/poll del consumer.
+
 ## Delta 2026-06-25 — TASK-1245 complete: el contrato de poll YA existe
 
 El blocker de poll quedó cerrado por TASK-1245 (complete). El contrato real que esta página consume:

@@ -1,12 +1,31 @@
 # TASK-1252 — Growth AI Visibility: Report Artifact Design System
 
+## Delta 2026-06-27 — estructurar el top-line del informe por los 5 niveles del framework Efeonce
+
+- **Recomendación de producto (de la revisión del framework propietario "Niveles para existir en un internet de agentes"):** el top-line del report artifact debe estructurarse **literalmente como los niveles del framework** — **Be Found · Be Readable · Be Correct · Be Actionable · Be Intrinsic** — con las 7 dimensiones de percepción + los 2 ejes de readiness (TASK-1266) mapeados **debajo** de cada nivel. Así el lead magnet y el pitch comercial hablan el mismo idioma: el prospecto ve su score en los mismos niveles que la agencia le vende.
+- **Modelo honesto a respetar en el diseño (regla dura: no mezclar ejes ortogonales):** el informe presenta DOS ejes, no una barra lineal única. Eje percepción (Found → Readable → Correct → Intrinsic) y eje operabilidad agéntica (Actionable como track propio). NUNCA fusionar el score de percepción con el de `agentic_readiness` en un solo número; mostrarlos lado a lado.
+- **Be Correct (5º nivel, nuevo):** el informe debe tener una sección de "cómo te representa la IA" (exactitud) — surface public-safe del accuracy detector (`hallucinated_feature` / `confused_with_competitor`), sin exponer raw provider text ni accuracy findings internos. Alta sensibilidad emocional para la marca → tratarla como sección de primera clase del artefacto.
+- **Fuente del framework:** skill `seo-aeo` → `efeonce/EFEONCE_AGENTIC_READINESS_FRAMEWORK.md` (metodología canónica de 5 niveles + mapeo 1:1 al grader).
+- Cruce registrado por la revisión de gaps del grader (creación de TASK-1265…1270, 2026-06-27).
+
+## Delta 2026-06-27 (PM) — implementado feature-local (Slices A–D)
+
+El sistema se implementó **feature-local** (Open Question 2 resuelta: NO se promueve a primitive platform-level; vive en `src/components/growth/ai-visibility/report-artifact/**`, se promoverá solo si aparece reuse fuera de AI Visibility).
+
+- **Slice A — Report MODEL + copy** (`report-artifact/model.ts` + `src/lib/copy/growth.ts`): SoT compartido PURO — variants (`publicWeb`/`clientPortal`/`attachment`/`adminPreview`), render target por variant (web vs print), audiencia/leak boundary por variant, mapeo de las 7 dimensiones canónicas a los 5 niveles del framework, disclosure matrix, severidad→tone, ejes percepción/agentic separados, y 3 adapters DTO→`ReportArtifactModel` (`modelFromPublicReport`/`modelFromClientReport`/`modelFromInternalReport`). Copy reusable `GH_GROWTH_AI_VISIBILITY_REPORT_ARTIFACT` (reusa el `GH_GROWTH_AI_VISIBILITY` existente; no duplica).
+- **Slice B — Web render adapter** (`report-artifact/web/AiVisibilityReportArtifact.tsx` + `fixtures.ts`): render React/MUI que consume el modelo real; mockup `/growth/ai-visibility/report-artifact/mockup` pasó a **harness delgado** del artifact real (sin shape inventado). Fixture = `GraderReport` interno → DTOs public/client con los **builders reales**.
+- **Slice C — no-leak visual test** (`__tests__/report-artifact-no-leak.test.tsx`, defensa capa C): el render público/cliente NO pinta data internal-only; engine snapshot solo en adminPreview. GVC desktop+mobile (iPhone 13) sin h-scroll.
+- **Slice D — print/attachment adapter** (`report-artifact/print/AiVisibilityReportPrint.tsx`): adapter SEPARADO print/PDF-safe (sin JS/motion/`@container`/Recharts/AnimatedCounter), barras estáticas + tabla, cover standalone. Barrel `index.ts`.
+
+**Decisión de disclosure (hallazgo durante implementación):** el **desempeño por proveedor / "Visibilidad por motor" (engine snapshot/trend) es INTERNAL-ONLY** — `providerPresence`/`providerFindings` no están en `PublicGraderReport` (los leak tests lo bloquean) y exponer scores por motor al público puede violar términos de proveedor (§9/§13). En `publicWeb`/`clientPortal`/`attachment` solo se muestra la **lista** de proveedores muestreados (`provenance.providersSampled`); el snapshot por motor vive solo en `adminPreview`. El mockup aprobado mostraba engine snapshot en publicWeb → se reubicó a adminPreview en la disclosure matrix.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Medio`

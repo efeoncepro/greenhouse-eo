@@ -1,3 +1,18 @@
+## Sesion 2026-06-27 — TASK-1252 AI Visibility Report Artifact Design System — Claude — ✅ complete (local, sin push)
+
+> **Estado: complete en repo local (develop local-first, sin push).** Se implementó el sistema reusable feature-local del informe del AI Visibility Grader (`/implement-task 1252`, slices A→E) tras aprobar el mockup. Decisión: feature-local (Open Question 2), NO primitive platform-level.
+> - **Slice A** `report-artifact/model.ts` (PURO) + copy `GH_GROWTH_AI_VISIBILITY_REPORT_ARTIFACT` en `src/lib/copy/growth.ts`: variants, render target, disclosure matrix, mapeo 7 dims→5 niveles, ejes percepción/agentic, 3 adapters DTO→`ReportArtifactModel`.
+> - **Slice B** `web/AiVisibilityReportArtifact.tsx` + `fixtures.ts` (GraderReport interno → public/client con builders reales); el mockup `/growth/ai-visibility/report-artifact/mockup` pasó a harness delgado del artifact real (sin shape inventado).
+> - **Slice C** `__tests__/report-artifact-no-leak.test.tsx` (defensa capa C, render no filtra internal-only) + GVC desktop/mobile sin h-scroll.
+> - **Slice D** `print/AiVisibilityReportPrint.tsx` (attachment print/PDF-safe estático) + barrel `index.ts`.
+> - **Slice E** docs (arch Delta + task spec Delta + sync 1241/1248/1250 + changelog + registry/README), lifecycle → complete.
+> - **Hallazgo de disclosure (importante):** el desempeño por proveedor / "Visibilidad por motor" (engine snapshot/trend) es **internal-only** (`providerPresence`/`providerFindings` no están en `PublicGraderReport`; exponerlo viola §9/§13) → reubicado a `adminPreview` en la disclosure matrix. El mockup aprobado lo mostraba en publicWeb; el sistema real lo restringe a admin. Público/cliente/attachment solo ven `provenance.providersSampled`.
+> - **Gates de cierre verdes:** `pnpm test` (8225 passed, 0 failed) + `pnpm build` (producción OK) + tsc + eslint + design:lint + `task:lint --task TASK-1252` (template=1, 0/0).
+> - **Bonus de la sesión:** logo Gemini multicolor real resuelto (kind `geminiColor` derivado del `gemini-logotype.svg` de AXIS quitándole el wordmark; documentado en el controller + lab) + masthead enterprise del informe (ambos commiteados antes del implement-task).
+> - **Follow-up creado:** `TASK-1273` (renderer PDF premium del attachment; react-pdf) — list-ready (template=1, 0/0). V1 del attachment es print-HTML; el PDF real es esa task.
+> - **Deuda ajena anotada:** `TASK-1250` tiene un error pre-existente `ui-wireframe-contract` en `ops:lint` (UI task sin wireframe declarado) — NO introducido por esta sesión (solo se le agregó una nota Delta de consumer); lo resuelve esa task al implementarse.
+> - **Sin push** (local-first; el operador no pidió push). Codex trabajó `TASK-1265` en paralelo — se stagearon solo paths propios, nunca `git add -A`.
+
 ## Sesion 2026-06-27 — TASK-1265 Google AI Overview adapter — Codex — 🚧 code complete local, rollout pendiente
 
 > **Estado: code complete en repo local (develop local-first, sin push).** Por instruccion del operador, se paso del prep-only de DataForSEO a implementar el provider `google_ai_overview`: adapter canonico sobre DataForSEO AI Mode Live Advanced, flag `GROWTH_AI_VISIBILITY_GOOGLE_AIO_ENABLED` default OFF, cost por request, policy/registry/normalizer/copy, parser lock, golden eval y migracion additive de CHECK constraints para `provider_observations` + `normalized_findings`. Se movio `TASK-1265` a `docs/tasks/in-progress/` y se sincronizo `docs/tasks/README.md`. Guardrail: no tocar el WIP ajeno de `TASK-1252`/mockup que ya estaba en el worktree.

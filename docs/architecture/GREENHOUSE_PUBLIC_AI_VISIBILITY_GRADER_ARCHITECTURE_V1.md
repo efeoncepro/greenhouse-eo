@@ -1341,3 +1341,14 @@ Se agrega `google_ai_overview` como quinto provider gobernado del grader. El obj
 - **Parser lock:** hay test focal para `ai_overview`, `ai_overview_element`, referencias heterogeneas (`references`/`links`/`sources`) y golden eval nuevo para una cita owned de `efeoncepro.com`.
 
 Estado operativo: code complete local/dev. Pendiente para cerrar runtime: aplicar migracion en ambientes, deploy con flag OFF, flip staging low-volume, smoke real con observation/citas en PG y decidir rotacion de la credencial DataForSEO antes de produccion porque fue compartida inicialmente en captura/chat.
+
+## Delta 2026-06-27 — Report Artifact Design System (TASK-1252)
+
+El render del `grader_report` (§7.7) se materializó como **sistema reusable feature-local** en `src/components/growth/ai-visibility/report-artifact/**` (Full API Parity: un modelo, muchos consumers; la UI no recalcula score/gaps/tendencia).
+
+- **Report MODEL (SoT compartido, puro)** `report-artifact/model.ts`: variants `publicWeb`/`clientPortal`/`attachment`/`adminPreview`, render target por variant (web vs print), audiencia/leak boundary por variant, **disclosure matrix** (`REPORT_SECTION_VISIBILITY` + `reportSectionVisible`), mapeo de las 7 dimensiones canónicas a los 5 niveles del framework (Delta 2026-06-27), severidad→tone, ejes percepción/agentic separados, y 3 adapters DTO→`ReportArtifactModel` (`modelFromPublicReport`/`modelFromClientReport`/`modelFromInternalReport`).
+- **Render adapters por target:** `web/AiVisibilityReportArtifact.tsx` (React/MUI, charts vivos, motion, a11y) y `print/AiVisibilityReportPrint.tsx` (print/PDF-safe, sin JS/motion/`@container`/Recharts; barras estáticas + tabla). Mismo modelo, render distinto — NO un componente MUI forzado a ser también PDF.
+- **Disclosure (hardening):** el desempeño por proveedor / "Visibilidad por motor" (`providerPresence`) es **INTERNAL-ONLY** → solo `adminPreview`. Público/cliente/attachment solo ven la lista `provenance.providersSampled`. Defensa capa C cerrada con `report-artifact/__tests__/report-artifact-no-leak.test.tsx` (el render no filtra `providerFindings`/`accuracyFindings`/internal text).
+- **Copy:** `GH_GROWTH_AI_VISIBILITY_REPORT_ARTIFACT` en `src/lib/copy/growth.ts` (reusa el `GH_GROWTH_AI_VISIBILITY` existente).
+- **Consumers:** TASK-1241 (publicWeb), TASK-1248 (clientPortal), TASK-1250 (attachment) consumen el artifact; aportan data real + estados + acceso. Doc funcional/manual se entrega con esas superficies de usuario.
+- **Deuda conocida:** V1 del attachment es print-HTML estático; renderer PDF premium (react-pdf) = follow-up declarado en TASK-1252.

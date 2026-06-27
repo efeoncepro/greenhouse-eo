@@ -1,5 +1,9 @@
 # TASK-1250 — Growth AI Visibility: Email Report Delivery
 
+## Delta 2026-06-27 — Report Artifact Design System implementado (TASK-1252)
+
+El informe adjunto completo YA tiene su adapter: `AiVisibilityReportPrint` (print/PDF-safe, sin JS/motion/Recharts) desde `@/components/growth/ai-visibility/report-artifact`, con `model={modelFromPublicReport(publicReport, 'attachment')}`. El cuerpo del email (resumen breve) sigue siendo el React Email de esta task — NO confundir: attachment = documento standalone print-safe; email body = constraints de email-client. V1 del attachment es print-HTML; renderer PDF premium queda como follow-up declarado en TASK-1252.
+
 ## Delta 2026-06-25 — impacto de TASK-1251 (convergencia sobre el motor)
 
 TASK-1251 **preservó `grader_leads` como la fuente del lead** (email + consent) — sin cambio de fuente para el email delivery. En el path convergente el lead se materializa vía el reactive consumer (campo additive `submission_id`); el shape leído no cambia. El email delivery debe ser **un reactive consumer idempotente más** del lead/submission (post-submit, con retry + dead-letter), nunca inline en el request — espeja el boundary atómico de 1251 (HubSpot/Resend caídos no abortan la aceptación del lead). El email sigue siendo PII con consent y nunca viaja a providers AI.
