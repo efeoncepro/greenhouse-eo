@@ -1,5 +1,9 @@
 # TASK-1246 — Growth AI Visibility: Public Launch Readiness + Rollout
 
+## Delta 2026-06-27 — email delivery (TASK-1250) code-complete, sumar al readiness
+
+TASK-1250 quedó **code complete** (sin push, sin prod): el lead recibe el informe por email transaccional + PDF adjunto, disparado write-side desde la publicación del snapshot, con idempotencia DB-level + consent-gate. **Sumar al checklist de launch readiness de esta task** el rollout del email (gated, default OFF): (1) `bash services/ops-worker/deploy.sh` (el bundle del worker incluye el reactive consumer del email + el report PDF renderer); (2) flip `GROWTH_AI_VISIBILITY_REPORT_EMAIL_ENABLED=true` **dual-location** (ops-worker via gcloud + declararlo en `deploy.sh` staging ON/prod OFF, mismo patrón que el handoff); (3) smoke staging E2E: run con lead consentido → snapshot publicado → email recibido con link + adjunto + `grader_report_email_dispatches.status='sent'` + no doble-envío en retry + signal `growth.ai_visibility.report_email_failed` steady=0; (4) **out-of-band:** from-address/branding del lead magnet (marca **Efeonce** agencia) + sign-off legal/consent del email. El smoke E2E del lead magnet ahora incluye `form → report → email con adjunto`.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->

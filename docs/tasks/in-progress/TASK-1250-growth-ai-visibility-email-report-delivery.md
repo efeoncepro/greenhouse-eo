@@ -1,5 +1,23 @@
 # TASK-1250 — Growth AI Visibility: Email Report Delivery
 
+## Delta 2026-06-27 — implementación (code complete · rollout pendiente)
+
+Implementada local-first (develop, sin push), 4 slices de código + docs. **NO movida a `complete/` — rollout pendiente** (Runtime Rollout Completion Gate): flag OFF + ops-worker sin redeploy + sin smoke staging.
+
+**Hecho (con evidencia):**
+
+- `EmailType` `ai_visibility_grader_report` + `EmailDomain growth` + template `AiVisibilityGraderReportEmail.tsx` (dirección **Report Packet Delivery**, marca **Efeonce** vía `EmailLayout brand='efeonce'`) + copy es-CL en `emails.ts` + plain text + preview meta. Baseline test 5/5 (render es/en + banner parcial + score null + guard de marca Efeonce, sin "Efeonce Greenhouse").
+- Attachment builder `buildAiVisibilityReportAttachment` → `renderAiVisibilityReportPdf(variant attachment)` (TASK-1273), determinista + leak-safe por tipo. No-leak test (input público sin marcadores INTERNAL + PDF real `%PDF-`).
+- Migration `greenhouse_growth.grader_report_email_dispatches` (UNIQUE DB `(report_id, email_type)`) **aplicada+verificada en dev PG** + seed `email_type_config` + flag `GROWTH_AI_VISIBILITY_REPORT_EMAIL_ENABLED` (default OFF, registrado en ledger).
+- Command `dispatchAiVisibilityReportEmail` (gates: flag → consent → snapshot → report-state `ready`/`partial` → claim idempotente → `sendEmail`) + ledger de claim atómico. Test 8/8 (blocked states + idempotencia + happy + partial). Claim ON CONFLICT ejercitado vs PG real.
+- Evento `growth.ai_visibility.report_email_requested` + command de enqueue `requestAiVisibilityReportEmail` en los **3 puntos de publicación** (auto-finalize, aprobación, publish route, no-fatal) + projection `growth_ai_visibility_report_email` (lane `ops-reactive-growth`) + reliability signal `growth.ai_visibility.report_email_failed` + EVENT_CATALOG.
+
+**Gates verdes:** `pnpm test` full **8245/0** · `pnpm build` prod (exit 0) · typecheck · lint full · `worker:runtime-deps-gate` · `flags:audit` 0 sin registrar.
+
+**Open Question 1 resuelta:** adjunto = **PDF** (TASK-1273), no HTML.
+
+**Pendiente de rollout (owner: operador, gated por TASK-1246):** redeploy ops-worker (`bash services/ops-worker/deploy.sh`) + flip flag dual-location (ops-worker + Vercel) + smoke staging E2E (run con lead → snapshot → email + adjunto + `status='sent'` + no doble-envío + signal steady=0) + from-address/sign-off legal del lead magnet. Prod = release control plane + EPIC-020.
+
 ## Delta 2026-06-27 — Renderer PDF premium del adjunto LISTO (TASK-1273, complete)
 
 El adjunto ya NO necesita ser print-HTML: TASK-1273 entregó el renderer PDF real. **Para el attachment, invocar:**
@@ -38,6 +56,8 @@ TASK-1251 **preservó `grader_leads` como la fuente del lead** (email + consent)
 - Type: `implementation`
 - Execution profile: `backend-data`
 - UI impact: `copy`
+- UI ready: `no`
+- Wireframe: `docs/ui/wireframes/TASK-1250-ai-visibility-email-report-delivery.md`
 - Backend impact: `sync`
 - Epic: `EPIC-020`
 - Status real: `Diseno`

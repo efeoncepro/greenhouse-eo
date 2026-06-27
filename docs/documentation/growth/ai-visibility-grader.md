@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.10
+> **Version:** 1.11
 > **Creado:** 2026-06-24 por Claude (TASK-1226)
-> **Ultima actualizacion:** 2026-06-27 por Codex (TASK-1265, Google AI Overview / AI Mode)
+> **Ultima actualizacion:** 2026-06-27 por Claude (TASK-1250, entrega del informe por email)
 > **Documentacion tecnica:** [GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md)
 
 # AI Visibility Grader — Motor de Providers (Growth)
@@ -103,6 +103,20 @@ Una vez que un análisis tiene puntaje, el sistema arma un **reporte** que tradu
 Este reporte es el **insumo** de las superficies que vienen después (página pública, AI Visibility Snapshot en HubSpot, revisión en el admin). Todavía no se muestra en pantalla ni se envía a ningún lado: es la pieza de datos que esas superficies van a renderizar.
 
 > Detalle técnico: `GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md` §Delta 2026-06-24 (TASK-1235) + §7.7/§8.4. Código: `src/lib/growth/ai-visibility/report/**`, copy `src/lib/copy/growth.ts`. Lectura: `GET /api/admin/growth/ai-visibility/runs/[runId]/report`.
+
+## Entrega por email (el prospecto recibe su informe — TASK-1250)
+
+Mostrar el resultado en pantalla no basta: si el prospecto cierra la pestaña, pierde su diagnóstico. Por eso, cuando el reporte queda **listo y publicable**, el sistema le **envía el informe a su correo** — un email transaccional (no marketing, no newsletter).
+
+- **Qué recibe:** un correo claro con su **hallazgo principal** (puntuación, brecha principal y un insight prioritario en formato "qué detectamos / por qué importa / qué hacer ahora"), un **botón al informe en línea** (link seguro con expiración) y el **informe completo adjunto en PDF**.
+- **De parte de quién:** el correo viene de **Efeonce** (la agencia), no del portal Greenhouse — es una superficie pública de la agencia, igual que su PDF adjunto.
+- **Cuándo se envía:** automáticamente, en cuanto el análisis se publica (lo dispara la publicación del informe, nunca el solo hecho de que alguien abra el link de estado). Pantalla y email son dos caras del mismo resultado.
+- **Solo con permiso:** se envía **únicamente si el lead aceptó recibirlo** (consent). Nunca a alguien sin consentimiento. El correo del lead se usa solo para esta entrega y para el CRM, **jamás se manda a los motores de IA**.
+- **Un solo correo:** aunque el sistema reintente o haya dos disparos, el prospecto recibe **un único email principal** por informe (idempotencia garantizada a nivel base de datos). Un resend explícito es una acción aparte.
+- **Honestidad:** si el informe es parcial (algún motor no respondió a tiempo), el correo lo dice claramente. Un informe en revisión o sin datos suficientes **no se envía**.
+- **Seguro de compartir:** el adjunto es la versión **pública** del informe — nunca incluye el texto crudo de los motores, los hallazgos internos de exactitud ni datos privados.
+
+> Detalle técnico: `GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md` §Delta 2026-06-27 (TASK-1250). Código: `src/lib/growth/ai-visibility/public-delivery/email/**`, template `src/emails/AiVisibilityGraderReportEmail.tsx`. Evento `growth.ai_visibility.report_email_requested` → consumer `growth_ai_visibility_report_email`. **Estado: code complete, rollout pendiente** (flag `GROWTH_AI_VISIBILITY_REPORT_EMAIL_ENABLED` OFF; activación gated por TASK-1246). Operación: [manual de smoke](../../manual-de-uso/growth/ai-visibility-grader-smoke.md).
 
 ## Que no hace (todavia)
 

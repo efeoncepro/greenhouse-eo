@@ -48,7 +48,7 @@ El motor del grader está completo y verificado (TASK-1226/1227/1234/1235/1236/1
 - `TASK-1247` — **(I) Admin Review UI** (ui-ux): cola y detalle interno para operar approve/reject de `review_required` usando `TASK-1244`. **P2.**
 - `TASK-1248` — **(J) Client Report UI** (ui-ux): superficie del portal cliente sobre el reader client-scoped de `TASK-1243`, consumiendo el artifact design system de `TASK-1252`. **P2.**
 - `TASK-1249` — **(K) Calibration + Provider Completion** (backend, data-quality): Perplexity, prompt pack v2 y recalibración/golden eval; calidad del motor no bloqueante del MVP. **P2.**
-- `TASK-1250` — **(L) Email Report Delivery** (backend, communications): email transaccional al lead con resumen breve, link tokenizado e informe completo adjunto generado desde el snapshot público. **P1.**
+- `TASK-1250` ✅ **code complete (dev); rollout pendiente** — **(L) Email Report Delivery** (backend, communications): email transaccional al lead con resumen breve + insight prioritario + link tokenizado + **PDF completo adjunto** (TASK-1273), disparado write-side (reactive consumer del snapshot publicado) con idempotencia DB-level + consent-gate. Marca **Efeonce** (agencia), no el portal. Flag `GROWTH_AI_VISIBILITY_REPORT_EMAIL_ENABLED` default OFF. **P1. Pendiente:** redeploy ops-worker + flip flag dual-location + smoke staging (gated por TASK-1246).
 - `TASK-1252` — **(M) Report Artifact Design System** (ui-ux): visual y sistema reusable del informe completo del grader, con componentes/variants para web publica, portal cliente, attachment y admin preview. **P1.**
 
 ## Existing Related Work
