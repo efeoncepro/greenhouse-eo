@@ -1,5 +1,14 @@
 # TASK-1248 — AI Visibility Client Report Wireframe
 
+## Delta 2026-06-27 — realineado a Concepto C (Split Workbench, master-detail)
+
+El operador eligió vía `/product-design-loop` el **concepto C — Split Workbench** (asset durable `docs/assets/product-design/task-1248-ai-visibility-client-report/split-workbench-final-target.png`), porque la superficie es para **clientes autenticados** (no prospectos) y amerita una vista rica. **Esto SUPERSEDE la arquitectura de layout A (dashboard + sidecar inspector)** descrita más abajo:
+
+- **Layout = master-detail.** `Top strip` (breadcrumb + título + org chip + fecha) · **Left rail (~38%)** navigator con secciones `Dimensiones` (7 filas score+status dot) y `Recomendaciones` (filas priorizadas + impact chip, una seleccionada) · **Right detail canvas (~62%)** con el detalle del ítem seleccionado: contexto de score + charts Recharts (trend del snapshot + presencia por motor) + `¿Por qué importa?` + tiles de señal segura + CTA.
+- El **detail canvas es el pane primario** (no un sidecar inspector flotante). En mobile el detalle se abre como drawer temporal del primitive con focus restore a la fila seleccionada.
+- **Reuse:** 4.º view-adapter del `ReportArtifactModel` (`modelFromClientReport`, SSOT) recompuesto; chart/card primitives del artifact + `MetricSummaryCard` + `GreenhouseChartCard`. NO embeber el render vertical del artifact, NO ECharts (Recharts).
+- **Sigue vigente de abajo (independiente del layout):** Copy Ledger, State Copy (9 estados), Accessibility Contract (ajustar "sidecar" → "detail canvas / drawer mobile"), GVC markers + V1-honest (charts = trend del snapshot + providerPresence, sin monitoreo recurrente prometido).
+
 ## Meta
 
 - Status: `ready-for-implementation`

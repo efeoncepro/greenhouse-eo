@@ -1,12 +1,19 @@
 # TASK-1248 — Growth AI Visibility: Client Report UI
 
-## Delta 2026-06-27 (PM) — reconciliación reuse-del-artifact (NO reconstruir, NO ECharts)
+## Delta 2026-06-27 (PM·2) — dirección elegida vía product-design-loop: **Split Workbench (concepto C)**
 
-Pre-toma, review con product-design + arch + SEO detectó inconsistencia interna: el Delta de abajo manda **consumir** el artifact de TASK-1252, pero el Scope/Detailed Spec/risk-matrix/acceptance todavía decían "construir dimension matrix + **ECharts** + cards a mano". El artifact (`AiVisibilityReportArtifact` web) **ya renderiza** score gauge, dimensiones (barras), tendencia y recomendaciones, y lo hace en **Recharts** (`AppRecharts`), **no ECharts**. Reconciliación aplicada:
+El operador corrió `/product-design-loop` (3 conceptos IA) y eligió el **concepto C — Split Workbench (master-detail)** sobre la dirección previa A (Executive Signal Command/sidecar), con el rationale explícito: **esta superficie es para CLIENTES autenticados, no prospectos** → una vista rica/data-dense es lo correcto; A se queda pobre. Asset durable: `docs/assets/product-design/task-1248-ai-visibility-client-report/split-workbench-final-target.png`.
 
-- **NO introducir ECharts.** El render del reporte es SSOT del artifact (Recharts). Esta task lo consume; cualquier mini-chart adicional (señales del sidecar) reusa el mismo enfoque del artifact, sin una 2.ª lib de charts.
-- **El trabajo neto real es:** (1) BFF route + page shell cliente, (2) consumir `AiVisibilityReportArtifact` con `modelFromClientReport(clientReport)` (variant `clientPortal`), (3) **estados cliente** (loading/empty/pending/partial/denied/error) — net-new, (4) **`ContextualSidecar` inspector de recomendación** — net-new (el artifact lista recomendaciones inline, NO tiene sidecar por-recomendación), (5) GVC + a11y.
-- Componentes "candidatos" `AiVisibilityScoreHero`/`AiVisibilityDimensionBreakdown` del wireframe **no existen como componentes**: el artifact los renderiza internamente (solo `MetricSummaryCard` existe como primitive, útil para las cards de señal del sidecar). No crearlos como fork del artifact.
+**Patrón C (master-detail workbench):**
+- **Top strip:** breadcrumb + 'AI Visibility Snapshot' + org chip + fecha.
+- **Left rail (~38%):** lista navegable en 2 secciones — `Dimensiones` (7 filas seleccionables con score + status dot) y `Recomendaciones` (filas priorizadas con impact chip); una seleccionada.
+- **Right detail canvas (~62%):** detalle del ítem seleccionado — header con contexto de score, charts (tendencia del snapshot + presencia por motor), `¿Por qué importa?`, tiles de señal segura, CTA `Agendar conversación`.
+
+**Reuse / arquitectura (resuelve el reabrir de C):** C es un **4.º view-adapter del MISMO `ReportArtifactModel`** (consistente con los adapters web/print/PDF que ya tiene el artifact). Consume `modelFromClientReport(clientReport)` (el modelo es SSOT) y **recompone** con primitives existentes (trend Recharts del artifact, `MetricSummaryCard`, chart cards) — **NO** forkea el scoring, **NO** inventa un render paralelo del reporte, **NO** introduce ECharts (charts = Recharts, una sola lib). El render vertical del artifact (`AiVisibilityReportArtifact`) NO se embebe tal cual acá (C es otra composición); lo que se reusa es su **modelo + primitives de chart/card**.
+
+**V1-honest (guardrail de monitor):** los charts muestran el **trend que el snapshot YA trae + `providerPresence`** (presencia por motor) — NO una serie "12 semanas" fabricada ni monitoreo continuo. El copy NUNCA promete una suscripción de monitoreo recurrente (ese SKU no existe aún).
+
+**Pendiente de realineación (en esta misma sesión):** wireframe/flow/motion estaban construidos sobre A/sidecar; se realinean al master-detail de C abajo. La matriz de estados, copy ledger, a11y de charts y los gates siguen vigentes.
 
 ## Delta 2026-06-27 — Report Artifact Design System implementado (TASK-1252)
 
@@ -127,33 +134,27 @@ Reglas obligatorias:
 ### Surface & system decision
 
 - Surface: ruta client-scoped bajo portal cliente [verificar convencion]. **Ruta cliente** → viewCode routeGroup `client`, sembrado SOLO a roles `client_*`.
-- Composition Shell: `aplica` — composición `focused`/`single` (lectura de reporte) o `leadPlusContext` si hay sidecar de recomendación; declarar la composición, sin grid/morph ad-hoc.
-- Primitive decision: `reuse` — `AiVisibilityReportArtifact` (TASK-1252, render SSOT del reporte, charts Recharts), CompositionShell, ContextualSidecar, Adaptive Card density. NO reconstruir el reporte ni introducir ECharts.
+- Composition Shell: `aplica` — composición **master-detail** (nav rail + detail canvas) del concepto C; declarar la composición vigente que lo soporte, sin grid/morph ad-hoc.
+- Primitive decision: `reuse` — el **modelo** `ReportArtifactModel` (`modelFromClientReport`, SSOT) recompuesto como 4.º view-adapter (workbench), + chart/card primitives del artifact + `MetricSummaryCard` + `GreenhouseChartCard` + CompositionShell. NO embeber el render vertical del artifact, NO forkear scoring, NO introducir ECharts (charts Recharts).
 - Adaptive density / The Seam: `aplica` — reporte nace adaptable (`card-density`, condensación honesta).
-- Floating/Sidecar/Dialog decision: AdaptiveSidecar variante `inspector` opcional para detalle de recomendación; no Dialog salvo accion sensible. No drawer custom.
+- Floating/Sidecar/Dialog decision: el detalle vive en el **detail canvas** del master-detail (pane primario derecho), NO en un sidecar inspector flotante; en mobile el detalle se abre como drawer temporal del primitive o navegación in-page. No Dialog salvo acción sensible. No drawer custom.
 - Copy source: `src/lib/copy/growth.ts` (invocar `greenhouse-ux-writing`, es-CL; **es un touchpoint de cliente — cuidar marca Efeonce + tono**).
 - Access impact: `entitlements` — capability/scope cliente definido por `TASK-1243`. **Anti-corruption boundary:** consumir el reader client-scoped de 1243 a través del boundary del portal cliente; **NUNCA importar un reader de dominio productor (growth) directo en una vista cliente** (lint `no-cross-domain-import-from-client-portal`). Tenant boundary server-side; NUNCA computar scope/visibilidad en cliente. Nueva ruta `(dashboard)` → `route-reachability-manifest.ts` + seed viewCode en `VIEW_REGISTRY` el mismo PR (TASK-827/982).
 
 ### Approved visual direction
 
-- Product Design exploration approved by operator on 2026-06-25: **Executive Signal Command** as the base direction, with the **Evidence-Safe Workbench** sidecar pattern merged for recommendation detail.
-- Durable visual references:
-  - Base target: `docs/assets/product-design/task-1248-ai-visibility-client-report/executive-signal-command.png`
-  - Sidecar/detail reference: `docs/assets/product-design/task-1248-ai-visibility-client-report/evidence-safe-workbench-sidecar.png`
-- Visual objective: modern, robust, attractive and highly functional, while still reading as a Greenhouse client portal surface, not a public marketing report or decorative dashboard.
-- First-screen hierarchy:
-  - Header with `GreenhouseBreadcrumbs`, client-safe tenant/status cues, report date/as-of and sampled/disclaimer metadata.
-  - Lead region with headline + overall score + named severity + trend delta/context; the score must never appear as an isolated number.
-  - Primary region with the seven report dimensions as scannable horizontal bars/table-like rows, each with score, status and severity label.
-  - Context/action region with the prioritized gap, recommended motion, next step and safe CTA.
-- Sidecar merge from option 3:
-  - Use `ContextualSidecar` / Adaptive Sidecar `variant='inspector'` for selected recommendation detail.
-  - Sidecar content: why the recommendation matters, first step, expected outcome, safe aggregate signals (`citationInsight`, `sentimentSummary`, `positionSummary`, `trend`) and CTA.
-  - Desktop sidecar is in-flow/full-height; mobile becomes temporary drawer via the primitive. Focus restore required.
-- Avoided directions:
-  - Do not use the more editorial **Narrative Report Canvas** as the base for V1; it can inform copy rhythm, but not layout architecture.
-  - Do not over-index on **AI Visibility Monitor** language; V1 is a snapshot/latest report and must not imply recurring paid monitoring until that product exists.
-  - No hero/landing treatment, no nested card stack, no raw evidence table, no decorative gradient/orb background, no custom drawer.
+- **Dirección elegida (operador, 2026-06-27, vía `/product-design-loop`): Concepto C — Split Workbench (master-detail).** Reemplaza la dirección previa A (Executive Signal Command/sidecar). Rationale: superficie para **CLIENTES autenticados, no prospectos** → vista rica/data-dense; A se quedaba pobre.
+- Durable visual reference:
+  - Final target: `docs/assets/product-design/task-1248-ai-visibility-client-report/split-workbench-final-target.png`
+  - (Histórico, dirección A descartada: `executive-signal-command-final-target.png` / `evidence-safe-workbench-sidecar.png`.)
+- Visual objective: modern, robust, attractive, data-dense pero legible; lee como portal cliente Greenhouse (no marketing público).
+- Arquitectura de layout (concepto C):
+  - **Top strip:** `GreenhouseBreadcrumbs` + 'AI Visibility Snapshot' + org chip + fecha/as-of + sampled/disclaimer.
+  - **Left rail (~38%):** navigator master — sección `Dimensiones` (7 filas seleccionables: label + score + status dot, severidad nombrada) + sección `Recomendaciones` (filas priorizadas con impact chip); una seleccionada.
+  - **Right detail canvas (~62%):** detalle del ítem seleccionado — contexto de score (nunca número aislado), charts Recharts (trend del snapshot + presencia por motor), `¿Por qué importa?`, tiles de señal segura (`citationInsight`/`sentimentSummary`/`positionSummary`/`trend`), CTA gobernado.
+- V1-honest / avoided:
+  - Los charts muestran el **trend que el snapshot YA trae + `providerPresence`** — NO una serie multi-semana fabricada ni monitoreo continuo. El copy NUNCA promete una suscripción de monitoreo recurrente (SKU inexistente).
+  - No hero/landing, no raw evidence table, no gradiente/orb decorativo, no drawer custom, no ECharts (charts = Recharts).
 
 ### State inventory
 
@@ -174,8 +175,8 @@ Reglas obligatorias:
 - Primary interaction: abrir reporte, explorar dimensiones/recomendaciones, seguir CTA a conversar/solicitar plan.
 - Hover / focus / active: cards/charts accesibles.
 - Pending / disabled: CTAs deshabilitados si no hay reporte.
-- Escape / click-away: sidecar opcional cierra.
-- Focus restore: vuelve al card que abrio detalle.
+- Escape / click-away: en mobile el drawer del detalle cierra; en desktop el detail canvas no es modal (selección lo intercambia).
+- Focus restore: tras cerrar el drawer mobile, foco vuelve a la fila seleccionada del navigator.
 - Latency feedback: loading y partial claros.
 - Toast / alert behavior: errores persistentes dentro de la pagina.
 
@@ -183,7 +184,7 @@ Reglas obligatorias:
 
 - Motion primitive: `Motion|CSS`
 - Enter / exit: entrada de secciones del reporte.
-- Layout morph: Composition Shell si hay sidecar.
+- Layout morph: detail canvas intercambia contenido al seleccionar una fila del navigator (master-detail).
 - Stagger: opcional y reducido.
 - Timing / easing token: tokens del design system.
 - Reduced-motion fallback: sin animacion, valores finales.
@@ -217,14 +218,13 @@ Reglas obligatorias:
 - Crear ruta cliente que consume el reader/API de `TASK-1243`.
 - Estados loading/empty/error/permission.
 
-### Slice 2 — Report rendering (CONSUMIR el artifact, no reconstruir)
+### Slice 2 — Report rendering (Split Workbench: 4.º view-adapter del modelo)
 
-- **Consumir** `AiVisibilityReportArtifact` (web) con `model={modelFromClientReport(clientReport)}` (variant `clientPortal`). El artifact YA renderiza headline, score gauge, tendencia (Recharts), dimensiones (barras) y plan priorizado, con table fallback y severidad nombrada. **NO** reimplementar esas secciones ni introducir ECharts (el artifact usa Recharts; una sola lib de charts).
-- **Net-new sobre el artifact** (lo que esta task sí construye):
-  - `CompositionShell` `leadPlusContext` como envoltura de la página cliente (lead = artifact / context = sidecar).
-  - **`ContextualSidecar` `variant='inspector'`** para detalle de la recomendación seleccionada — el artifact lista recomendaciones inline pero NO tiene sidecar por-recomendación. Desktop in-flow non-modal / mobile drawer con focus restore.
-  - Cards de señal segura del sidecar (citation share, sentimiento, posición) con `MetricSummaryCard` + reuso del enfoque de charts del artifact (Recharts), con table fallback.
-- Si el artifact necesita un ajuste para encajar en el shell cliente (p.ej. ocultar una sección), expandir el artifact (variant/prop) — NUNCA forkearlo.
+- **Consumir el MODELO** `modelFromClientReport(clientReport)` (`ReportArtifactModel`, SSOT) y **recomponerlo** como workbench master-detail. NO embeber el render vertical de `AiVisibilityReportArtifact` (C es otra composición); NO forkear scoring; NO introducir ECharts (charts = Recharts, una sola lib).
+- **Left rail (navigator):** lista de `Dimensiones` (7 filas, score + status dot, severidad nombrada no color-only) + `Recomendaciones` (filas priorizadas con impact chip). Una seleccionada (estado `aria-pressed`/selected persistente).
+- **Right detail canvas:** detalle del ítem seleccionado — header con contexto de score, **charts en Recharts** (tendencia del snapshot + presencia por motor `providerPresence`), `¿Por qué importa?`, tiles de señal segura (`MetricSummaryCard`), CTA gobernado. Charts con table fallback + `role="img"`/aria + keyboard.
+- **Primitives:** reusar los chart/card primitives del artifact + `MetricSummaryCard` + `GreenhouseChartCard`. La composición master-detail se arma con `CompositionShell` (regiones nav + detail) o el primitive de layout vigente — verificar en Discovery qué composición soporta; NO inventar grid/morph ad-hoc.
+- **Mobile:** el detail canvas colapsa; selección de fila abre el detalle (drawer temporal del primitive o navegación in-page), con focus restore.
 
 ### Slice 3 — Client actions
 
@@ -251,7 +251,7 @@ La vista cliente debe ser un consumer autenticado del mismo artefacto de reporte
 - **Score global** → gauge con **contexto/benchmark** (no número solo): tabular-nums, banda/semáforo nombrado, comparación explícita ("vs medición anterior"). (Lo entrega el artifact; verificar.)
 - **Tendencia** → line/area chart honesto; **brecha principal** anotada, no enterrada en tabla. (Artifact.)
 - **Dimensiones** → barras (eje **empieza en 0**), severidad **nombrada + ícono/forma, NUNCA color-only** + **table fallback**. (Artifact.)
-- **Charts = Recharts** (los que ya usa el artifact, `AppRecharts`); **NO introducir ECharts** ni una 2.ª lib. Cualquier mini-chart adicional del sidecar (citation share/sentimiento) reusa el mismo enfoque, `lazy`/`ssr:false`, respeta `prefers-reduced-motion`, `role="img"`/`aria-label` + table fallback + keyboard nav.
+- **Charts = Recharts** (los que ya usa el artifact, `AppRecharts`); **NO introducir ECharts** ni una 2.ª lib. Los charts del detail canvas (trend del snapshot + presencia por motor + señales) reusan el mismo enfoque, `lazy`/`ssr:false`, respeta `prefers-reduced-motion`, `role="img"`/`aria-label` + table fallback + keyboard nav.
 - Paleta **colorblind-safe** verificada en dark mode; números con `Intl.NumberFormat` es-CL. (Heredado del artifact + aplicar a las cards de señal nuevas.)
 
 **CTA → handoff comercial gobernado:** si un CTA ("solicitar conversación/plan") crea trabajo comercial, debe consumir un **command gobernado existente** del handoff growth→commercial (explícito + auditable, NUNCA mutación silenciosa de estado comercial — domain arch §7). Si no existe, V1 es read-only/contacto y se abre follow-up. Copy honesto: NO prometer el monitor recurrente que aún no se construye.
@@ -308,7 +308,7 @@ Slice 1 -> Slice 2 -> Slice 3 -> Slice 4. No agregar CTAs mutativos si no existe
 - [ ] UI consume exclusivamente el reader/API client-scoped de `TASK-1243`.
 - [ ] Tenant mismatch queda bloqueado server-side y representado como permission/not-found seguro.
 - [ ] Reporte renderiza score, tendencia, dimensiones, plan y disclaimer sin raw evidence.
-- [ ] La implementación sigue la dirección visual aprobada: **Executive Signal Command** como base + sidecar inspector de recomendación de **Evidence-Safe Workbench**.
+- [ ] La implementación sigue la dirección visual elegida: **Split Workbench (concepto C)** — navigator master-detail (left rail dimensiones+recomendaciones / right detail canvas), no el sidecar de A.
 - [ ] Copy reusable vive en `src/lib/copy/*`.
 - [ ] GVC desktop+mobile capturado y mirado **en loop** (rubric V1.5); `scrollWidth==clientWidth`. Gate axe verde.
 - [ ] Se CONSUME `AiVisibilityReportArtifact` (variant `clientPortal`), sin reconstruir el reporte ni introducir ECharts (charts = Recharts del artifact). Charts tienen table fallback, `aria`, keyboard nav y severidad no color-only; bar desde 0, sin dual-axis/pie>3/3D; paleta colorblind-safe probada en dark.

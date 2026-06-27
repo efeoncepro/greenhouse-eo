@@ -1,5 +1,15 @@
 # TASK-1248 — AI Visibility Client Report UI Motion Contract
 
+## Delta 2026-06-27 — realineado a Concepto C (Split Workbench, master-detail)
+
+Dirección elegida = **concepto C — Split Workbench**. El motion es esencialmente el mismo (subordinado a la decisión, no teatral), reubicado al master-detail:
+
+- **Selección de fila** en el navigator → estado seleccionado persistente (text/icon/chip + surface token), `aria` selected. No hover-only.
+- **Detail canvas swap** al seleccionar → reemplazo de contenido del pane derecho (desktop, non-modal) / drawer temporal del primitive (mobile, focus trap + restore). Reduced-motion → swap/instant.
+- **Sin animated score count-up** (score = estimación, no se dramatiza); charts entran ≤400ms, respetan `prefers-reduced-motion`.
+- Imports forbidden (igual): framer-motion/gsap/lottie directos. Todo vía primitives + tokens.
+- Donde abajo dice "sidecar", léase "detail canvas (desktop) / drawer (mobile)".
+
 ## Meta
 
 - Status: `ready-for-implementation`

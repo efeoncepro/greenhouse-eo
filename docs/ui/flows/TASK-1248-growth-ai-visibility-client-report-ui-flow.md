@@ -1,5 +1,15 @@
 # TASK-1248 — AI Visibility Client Report UI Flow Contract
 
+## Delta 2026-06-27 — realineado a Concepto C (Split Workbench, master-detail)
+
+Dirección elegida vía `/product-design-loop` = **concepto C — Split Workbench** (cliente autenticado, vista rica). **Supersede el flow A (sidecar inspector)**:
+
+- **Surfaces:** (1) **Navigator master** (left rail) — listas de Dimensiones + Recomendaciones, filas seleccionables; (2) **Detail canvas** (right pane primario) — intercambia contenido al seleccionar; NO es un sidecar flotante. (3) Mobile: la fila seleccionada abre el detalle como drawer temporal del primitive / navegación in-page.
+- **Flow map:** entry → load (skeleton master-detail) → ready (primera fila seleccionada por default en desktop) → seleccionar fila → el detail canvas swap in-place (desktop) / drawer (mobile) → CTA gobernado → exit/recovery.
+- **State machine:** los mismos estados (loading/ready/detailOpen/partial/pending/empty/denied/error) aplican; `detailOpen` = detail canvas con ítem seleccionado (desktop in-flow, mobile drawer).
+- **Focus:** selección por teclado (Enter/Space) en filas del navigator; mobile drawer con focus trap + restore a la fila. Desktop detail canvas non-modal (no atrapa foco).
+- **Sigue vigente:** routing contract, data/command boundaries, failure paths, GVC plan (ajustar "sidecar" → "detail canvas / drawer mobile").
+
 ## Meta
 
 - Status: `ready-for-implementation`
