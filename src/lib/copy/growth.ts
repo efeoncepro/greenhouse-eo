@@ -194,3 +194,140 @@ export const GH_GROWTH_AI_VISIBILITY = {
   disclaimer:
     'Diagnóstico muestreado y asistido por IA. No garantiza posiciones ni resultados; refleja una muestra de respuestas en la fecha del análisis.'
 } as const
+
+/**
+ * TASK-1252 — AI Visibility Report Artifact · copy reusable del informe completo.
+ *
+ * Labels/títulos/disclaimers del report artifact (web + attachment + admin/client).
+ * SoT de copy del artefacto; todos los render adapters y consumers (TASK-1241/1248/
+ * 1250) lo heredan, no lo redeciden. Reusa `GH_GROWTH_AI_VISIBILITY` para severidad,
+ * gate, trend, sentimiento y disclaimer (no se duplica). Validado con
+ * `greenhouse-ux-writing`: es-CL tuteo, factual no alarmista, "estimación, no
+ * garantía de ranking" centralizado aquí.
+ */
+export const GH_GROWTH_AI_VISIBILITY_REPORT_ARTIFACT = {
+  header: {
+    title: 'Informe de visibilidad en IA',
+    reportDateLabel: 'Fecha del informe',
+    analyzedPeriodLabel: 'Período analizado',
+    comparisonLabel: 'Comparado con',
+    publicSafeChip: 'Público-safe',
+    publicSafeHelper: 'Contenido sin datos confidenciales ni crudos',
+    verifiedOrgAria: 'Organización verificada'
+  },
+  narrative: {
+    eyebrow: 'Lo que encontramos'
+  },
+  // Framework de 5 niveles (Delta 2026-06-27). Labels + pregunta guía por nivel.
+  levelsBand: {
+    title: 'Niveles para existir en un internet de agentes',
+    perceptionAxis: 'Percepción · ¿te mencionan?',
+    agenticAxis: 'Operabilidad · ¿te pueden usar?',
+    coverageBadge: 'En cobertura'
+  },
+  level: {
+    found: { ordinal: '01', label: 'Que te encuentre', labelEn: 'Be Found', question: '¿Existes para la IA?' },
+    readable: { ordinal: '02', label: 'Que te entienda', labelEn: 'Be Readable', question: '¿Te puede leer sin adivinar?' },
+    correct: {
+      ordinal: '03',
+      label: 'Que te represente bien',
+      labelEn: 'Be Correct',
+      question: '¿Lo que dice de ti es verdad?',
+      coverageNote: 'Qué tan fielmente te representa la IA.'
+    },
+    actionable: {
+      ordinal: '04',
+      label: 'Que pueda actuar',
+      labelEn: 'Be Actionable',
+      question: '¿Te pueden usar, no solo citar?',
+      coverageNote: 'Si los agentes de IA pueden operar tu sitio.'
+    },
+    intrinsic: { ordinal: '05', label: 'Que te prefiera', labelEn: 'Be Intrinsic', question: '¿Eres el default?' }
+  } satisfies Record<
+    'found' | 'readable' | 'correct' | 'actionable' | 'intrinsic',
+    { ordinal: string; label: string; labelEn: string; question: string; coverageNote?: string }
+  >,
+  verdict: {
+    title: 'Veredicto ejecutivo',
+    scoreLabel: 'Visibilidad estimada',
+    scoreContext: 'Nivel intermedio · los líderes de tu categoría superan 85.',
+    scoreDisclaimer: 'Estimación, no garantía de ranking',
+    coverageLabel: 'Motores consultados',
+    coverageValue: (responded: number, sampled: number) => `${responded} de ${sampled} motores respondieron`,
+    contextLabel: 'Contexto del informe',
+    contextValue: 'Datos agregados y públicos',
+    contextHelper: 'Sin datos crudos ni confidenciales.'
+  },
+  primaryGap: { title: 'Brecha principal', impactLabel: 'Impacto' },
+  recommendedMotion: { title: 'Movimiento recomendado', impactLabel: 'Impacto esperado' },
+  dimensions: {
+    title: 'Desempeño por dimensión',
+    colDimension: 'Dimensión',
+    colScore: 'Puntaje (0-100)',
+    colSeverity: 'Severidad',
+    colComment: 'Qué significa'
+  },
+  sov: {
+    title: 'Share of Voice competitivo',
+    helper: 'Participación de menciones de tu marca frente a competidores en respuestas de IA.',
+    brandLabel: 'Tu marca',
+    shareLabel: 'Share of Voice',
+    mentionsLabel: 'menciones'
+  },
+  engineSnapshot: {
+    // INTERNAL-ONLY (adminPreview): desempeño por proveedor; nunca público.
+    title: 'Visibilidad por motor (interno)',
+    helper: 'Desempeño por proveedor. Solo vista interna — no se expone al público ni al cliente.',
+    presentLabel: (present: number, resolved: number) => `${present} de ${resolved} respuestas`
+  },
+  signals: {
+    title: 'Resumen de señales AEO',
+    citationShareTitle: 'Share de citas (promedio)',
+    citationShareHelper: (cited: number, total: number) => `Menciones con cita: ${cited} de ${total}`,
+    sentimentTitle: 'Sentimiento de menciones',
+    sentimentBasis: (n: number) => `Basado en ${n} menciones calificadas por IA.`,
+    prominenceTitle: 'Prominencia de marca',
+    prominenceHelper: 'Mejor posición y posición promedio en respuestas de IA.',
+    prominenceBest: (best: number) => `Mejor: #${best}`,
+    prominenceAverage: (avg: number) => `Promedio: #${avg}`,
+    trendTitle: 'Tendencia de visibilidad',
+    trendAxisLabel: 'Puntaje de visibilidad estimada (0-100)'
+  },
+  recommendations: {
+    title: 'Recomendaciones prioritarias',
+    colAction: 'Acción recomendada',
+    colDescription: 'Descripción',
+    colSeverity: 'Prioridad',
+    detailLink: 'Ver plan detallado de acciones'
+  },
+  provenance: {
+    title: 'Proveniencia y metodología',
+    asOf: 'Datos al',
+    sampledProviders: 'Proveedores muestreados',
+    promptCount: 'Prompts evaluados',
+    scoreVersion: 'Versión del score',
+    promptPackVersion: 'Versión del prompt pack'
+  },
+  footer: {
+    publicSafeStamp: 'Contenido público-safe: sin evidencia cruda.'
+  },
+  // Estados del artefacto (gate + consumer): título + cuerpo + CTA. Honestos, sin precisión falsa.
+  state: {
+    partial: {
+      title: 'Reporte parcial',
+      body: 'Algunas fuentes no respondieron a tiempo. El puntaje y las conclusiones pueden cambiar cuando se complete la cobertura.'
+    },
+    insufficient_data: {
+      title: 'Datos insuficientes',
+      body: 'La muestra disponible no alcanza para estimar visibilidad con confianza.'
+    },
+    review_required: {
+      title: 'Tu reporte se está preparando',
+      body: 'Estamos revisando que el informe no incluya datos internos ni señales incompletas.'
+    },
+    no_trend: {
+      title: 'Sin histórico comparable',
+      body: 'Este informe aún no tiene una medición anterior comparable.'
+    }
+  }
+} as const
