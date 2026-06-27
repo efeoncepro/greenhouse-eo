@@ -373,7 +373,9 @@ export default [
       'src/app/global-error.tsx',
       'src/app/public/**',
       'src/emails/**',
-      'src/lib/finance/pdf/**'
+      'src/lib/finance/pdf/**',
+      // TASK-1273 — AI Visibility Report PDF (react-pdf StyleSheet: HEX/fontFamily/fontSize crudos legítimos).
+      'src/components/growth/ai-visibility/report-artifact/pdf/**'
     ],
     rules: {
       'greenhouse/no-hardcoded-fontfamily': 'off',
