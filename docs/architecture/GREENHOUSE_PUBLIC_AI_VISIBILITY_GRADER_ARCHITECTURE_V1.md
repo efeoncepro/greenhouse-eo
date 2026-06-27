@@ -669,6 +669,8 @@ UI implementation must follow Greenhouse UI rules: Composition Shell by default,
 
 ## 11. Programmatic contract and API parity
 
+> **Delta 2026-06-27 (TASK-1248) — 3.er consumer (cliente) shipped.** Cerró el consumer cliente de la parity: ruta del portal cliente `/growth/ai-visibility/report` (routeGroup `client`, viewCode `cliente.ai_visibility_report`) que consume `readClientGraderReport` (TASK-1243) **vía el boundary del portal cliente** (`@/lib/client-portal/readers/curated/growth-ai-visibility`, nunca import directo de growth) + capability `growth.ai_visibility.report.read_client` + org de sesión (server-side; la UI no computa scope). El render es el **4.º view-adapter** del `ReportArtifactModel` (TASK-1252): un **Split Workbench master-detail** (`modelFromClientReport` → recomposición navigator↔detail), NO reusa el render vertical del artifact ni forkea scoring; charts Recharts (sin ECharts). Estado de preparación neutral ("se está preparando") que **NUNCA** expone la razón interna de `review_required`. Para el primitive de layout se agregó la composición `masterDetail` a `CompositionShell` (ver `ui-platform/PRIMITIVES.md`). **Rollout:** la ruta renderiza con datos por construcción cuando exista un grader run reportable con `grader_profiles.organization_id` enlazado a la org del cliente (intake cliente); la verificación visual se hizo contra el mockup harness con el fixture canónico.
+
 The UI and public page must consume canonical primitives. Planned capability surface:
 
 ### 11.1 Readers

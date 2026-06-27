@@ -1,5 +1,17 @@
 # TASK-1248 — Growth AI Visibility: Client Report UI
 
+## Cierre 2026-06-27 — implementado (Split Workbench, concepto C) · local-first, sin push
+
+Entregado en 5 slices (commits en `develop`, sin push):
+
+- **Slice 0 — primitive `masterDetail` en CompositionShell** (`a1fa547a6`): 4.º variant (navigator angosto IZQ + detail canvas ancho DER, inverso de `split`), data-driven (`splitTemplateColumns`/`compactDrawerRegion`/`regionMinInlineSize`), kind `workbench`; no-regresión de los 4 consumers de `split` (data-capture `aside-drawer` + ancho 420/88vw preservados); Lab + `PRIMITIVES.md`; 39 tests verdes.
+- **Slices 1-3 — ruta cliente + view + governance** (`276ce2f04`): `/growth/ai-visibility/report` (routeGroup `client`), 3.er consumer de Full API Parity; server-side `requireClientTenantContext` + capability `growth.ai_visibility.report.read_client` + org de sesión; consume el reader client-scoped vía boundary del portal cliente (TASK-1243); Split Workbench = 4.º view-adapter de `modelFromClientReport` (no forkea scoring, no embebe el render vertical, no ECharts — charts Recharts/`MetricTrendCard` + barras `LinearProgress` accesibles); estados empty/preparing/error/permission (preparing NUNCA expone `review_required`); CTA read-only V1 (contacto Efeonce, sin prometer monitor); viewCode `cliente.ai_visibility_report` (VIEW_REGISTRY TS + migration seed `20260627204627526`, 3 client roles + efeonce_admin) + route-reachability (deep-link).
+- **Slice 4 — GVC + polish** (`7a38dcd43`): mockup harness `/growth/ai-visibility/report/mockup` (fixture `SAMPLE_CLIENT_REPORT`) + scenario `growth-ai-visibility-client-report`; **GVC mirado en loop** desktop 1440 + mobile 390 (split desktop, drawer "Ver detalle" mobile, sin overflow, sin error boundary); polish: labels de dimensión es-CL (`dimension_label` — el label del contrato es inglés, defecto en superficie cliente), detail de recomendación enriquecido con su dimensión origen.
+
+**Gates:** `pnpm local:check` (lint+tsc) verde · `pnpm build` (Turbopack) verde · `pnpm test` 8245 pass (3 flakes de timeout en `HrLeaveView`, verdes en aislado, ajenos a TASK-1248) · composition-shell 39/39 · `route-reachability-gate` 0 orphans · `task:lint`/`ui:*-check` errors=0 · `docs:closure-check` clean (sin flags nuevos). **Migration aplicada** a `greenhouse-pg-dev` (viewCode=1, grants=4).
+
+**Rollout:** la ruta real es client-scoped y muestra `empty` sin un grader run reportable por-org (los `grader_profiles` tienen `organization_id` NULL hoy; la persona `agent-client` no resuelve org). La verificación visual con datos se hizo contra el mockup harness (fixture canónico). Cuando un cliente real tenga un grader run con su org enlazada, el workbench renderiza el reporte por construcción (mismo reader/modelo). Estado: **code complete + GVC verificado en harness; el render con datos reales en la ruta productiva queda pendiente de tener un grader run client-scoped (data), no de código.**
+
 ## Delta 2026-06-27 (PM·2) — dirección elegida vía product-design-loop: **Split Workbench (concepto C)**
 
 El operador corrió `/product-design-loop` (3 conceptos IA) y eligió el **concepto C — Split Workbench (master-detail)** sobre la dirección previa A (Executive Signal Command/sidecar), con el rationale explícito: **esta superficie es para CLIENTES autenticados, no prospectos** → una vista rica/data-dense es lo correcto; A se queda pobre. Asset durable: `docs/assets/product-design/task-1248-ai-visibility-client-report/split-workbench-final-target.png`.
@@ -29,14 +41,14 @@ El render del reporte YA existe como sistema reusable feature-local: consumir `A
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
 - Execution profile: `ui-ux`
 - UI impact: `flow`
-- UI ready: `no`
+- UI ready: `yes`
 - Wireframe: `docs/ui/wireframes/TASK-1248-growth-ai-visibility-client-report-ui.md`
 - Flow: `docs/ui/flows/TASK-1248-growth-ai-visibility-client-report-ui-flow.md`
 - Motion: `docs/ui/motion/TASK-1248-growth-ai-visibility-client-report-ui-motion.md`
