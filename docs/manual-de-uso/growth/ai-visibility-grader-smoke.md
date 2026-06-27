@@ -152,6 +152,26 @@ Verificación local (sin endpoint), contra un run real con score:
 # (patrón scripts/_dryrun-report.ts: runGreenhousePostgresQuery + readGraderReport)
 ```
 
+## Entrega del informe por email (TASK-1250) — rollout + smoke
+
+El email al lead se dispara write-side cuando se publica el snapshot (reactive consumer `growth_ai_visibility_report_email`, lane `ops-reactive-growth`), NUNCA on-read. Marca **Efeonce**, adjunto = PDF de TASK-1273.
+
+**Rollout (dual-location, espeja el handoff):**
+
+- El WRITE (`dispatchAiVisibilityReportEmail`) corre en el **ops-worker**: redeploy con `bash services/ops-worker/deploy.sh` (o push a develop → GitHub Actions) — el flag `GROWTH_AI_VISIBILITY_REPORT_EMAIL_ENABLED` queda declarativo en `deploy.sh` (staging ON / prod OFF).
+- Verificar el flag en el servicio: `gcloud run services describe ops-worker --region us-east4 --project efeonce-group --format=json | grep REPORT_EMAIL`.
+- Logo del email: el wordmark blanco Efeonce se sirve desde el **bucket GCS público** (`gs://efeonce-group-greenhouse-public-media-{staging,prod}/emails/efeonce-wordmark-white.png`), NO desde `/branding/pdf` del portal (ese path solo existe en el branch desplegado). Si el logo no aparece, confirmar que el objeto está en el bucket del environment.
+
+**Smoke E2E (staging):**
+
+1. Tener un run con lead consentido + snapshot publicado (`public_delivery_state='ready'`). Para un envío real, apuntar el email del lead a un inbox que controles.
+2. Encolar: `requestAiVisibilityReportEmail({ runId, trigger: 'admin_resend' })` (o publicar el snapshot, que lo dispara solo).
+3. Esperar el drain (Cloud Scheduler: `ops-outbox-publish` cada 2 min → `ops-reactive-growth` cada 5 min).
+4. Verificar: `greenhouse_growth.grader_report_email_dispatches.status='sent'` (1 fila, sin doble-envío) + `greenhouse_notifications.email_deliveries.has_attachments=true` + el correo recibido (marca Efeonce + PDF). Re-smoke de un dispatch ya enviado: `UPDATE … SET status='failed'` → re-encolar (el claim reclama failed).
+5. Signal: `growth.ai_visibility.report_email_failed` debe quedar en steady (sin failed >15 min).
+
+**Prod:** gated por release control plane develop→main + EPIC-020 + sign-off legal/from-address del lead magnet (TASK-1246).
+
 ## Problemas comunes
 
 - **"Tenant lookup failed" / fallo de auth en staging:** ADC de gcloud vencida → `gcloud auth login` + `gcloud auth application-default login` + reintentar.

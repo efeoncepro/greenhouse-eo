@@ -2,7 +2,9 @@
 
 ## Delta 2026-06-27 — implementación (code complete · rollout pendiente)
 
-Implementada local-first (develop, sin push), 4 slices de código + docs. **NO movida a `complete/` — rollout pendiente** (Runtime Rollout Completion Gate): flag OFF + ops-worker sin redeploy + sin smoke staging.
+Implementada + **rollout STAGING desplegado y verificado E2E** (operador pidió "rollout de inmediato"). Movida a `complete/`: staging operativamente verificado + confirmación visual del operador; prod gated por release control plane + EPIC-020 + sign-off legal (consistente con los hermanos intake/handoff staging-ON/prod-OFF).
+
+**Rollout staging (2026-06-27):** push develop → Ops Worker Deploy (rev `00410-59r`) + Vercel staging; flag `GROWTH_AI_VISIBILITY_REPORT_EMAIL_ENABLED=true` (deploy.sh staging ON/prod OFF + Vercel staging). **Smoke E2E real verde** (2 envíos): lead consentido `grun-689323b1` → enqueue → outbox published → reactive-growth drenó → dispatch `sent` (1 fila, sin doble-envío) + `email_deliveries.has_attachments=true` + email Efeonce + PDF adjunto entregado al inbox del operador. **Iteración de fixes visuales (feedback del operador sobre el email real):** logo → bucket GCS (404 prod del path `/branding/pdf`), insight mobile → stack vertical, sender "Efeonce Greenhouse" → "Efeonce" (resolver `AGENCY_BRANDED_EMAIL_TYPES`); re-send verde (`resend_id 566a0b8d`, reclaim-failed path probado live) + **confirmado visualmente por el operador ("está perfecto")**.
 
 **Hecho (con evidencia):**
 
@@ -49,7 +51,7 @@ TASK-1251 **preservó `grader_leads` como la fuente del lead** (email + consent)
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Medio`
