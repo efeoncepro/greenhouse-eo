@@ -2,7 +2,7 @@ import 'server-only'
 
 import { resolve } from 'node:path'
 
-import { Document, Image, Page, StyleSheet, Text, View } from '@react-pdf/renderer'
+import { Circle, Document, Image, Page, Path, StyleSheet, Svg, Text, View } from '@react-pdf/renderer'
 
 import { EFEONCE_LEGAL_NAME_FALLBACK, EFEONCE_URL } from '@/config/efeonce-brand'
 import { EfeoncePdfFooter } from '@/lib/finance/pdf/efeonce-pdf-footer'
@@ -68,7 +68,10 @@ const clampPct = (n: number): number => Math.max(0, Math.min(100, n))
 
 const s = StyleSheet.create({
   // ── cover (full navy) ──
-  cover: { backgroundColor: K.navy, color: '#fff', paddingHorizontal: P.padX, paddingTop: P.padTop, position: 'relative' },
+  // El navy se pinta con un View de fondo (NO Page.backgroundColor): react-pdf
+  // corrompe el render de <Svg> sobre un Page con backgroundColor (color + arco).
+  cover: { color: '#fff', paddingHorizontal: P.padX, paddingTop: P.padTop, position: 'relative' },
+  coverBackdrop: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: K.navy },
   // Ancho EXPLÍCITO por aspecto real (837.07:196.68 ≈ 4.256) — react-pdf <Image>
   // con width:'auto' estira al ancho del contenedor (deforma el wordmark).
   coverWm: { width: 85, height: 20 },
@@ -76,11 +79,11 @@ const s = StyleSheet.create({
   coverOrg: { fontFamily: F.displayBold, fontSize: 42, letterSpacing: -1.2, marginTop: 8, color: '#fff' },
   coverPeriod: { fontFamily: F.body, fontSize: 10, color: K.onNavyStrong, marginTop: 12 },
   coverHero: { flexDirection: 'row', alignItems: 'center', gap: 28, marginTop: 64 },
-  // Score badge = anillo View (border) en color de severidad. NO Svg: react-pdf
-  // tiene un bug de compositing de <Svg> sobre Page con backgroundColor (el stroke
-  // ámbar sale verde y el dasharray no se aplica). El número porta el valor; el
-  // anillo porta la severidad. Verificado contra fondo navy.
-  gaugeWrap: { width: 118, height: 118, borderRadius: 59, borderWidth: 9, borderStyle: 'solid', alignItems: 'center', justifyContent: 'center' },
+  // Gauge = arco Svg <Path> (relleno proporcional al score) sobre el backdrop navy.
+  // Path (no dasharray) + colores OPACOS: el navy se pinta con coverBackdrop, no
+  // con Page.backgroundColor — así react-pdf renderiza bien el arco y el color.
+  gaugeWrap: { position: 'relative', width: 118, height: 118 },
+  gaugeCtr: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, alignItems: 'center', justifyContent: 'center' },
   gaugeNum: { fontFamily: F.displayExtra, fontSize: 38, color: '#fff', lineHeight: 1 },
   gaugeUnit: { fontFamily: F.body, fontSize: 8, color: K.onNavyStrong, marginTop: 3 },
   verdictTitle: { fontFamily: F.display, fontSize: 14, color: '#fff', marginTop: 6 },
@@ -160,7 +163,10 @@ const s = StyleSheet.create({
 
   // recommendations
   rec: { flexDirection: 'row', gap: 11, marginTop: 11 },
-  recNum: { width: 21, height: 21, borderRadius: 6, backgroundColor: K.navy, color: '#fff', fontFamily: F.displayBold, fontSize: 10, alignItems: 'center', justifyContent: 'center', textAlign: 'center' },
+  // View contenedor (centra el dígito vertical+horizontalmente; un <Text> con
+  // justifyContent NO centra en vertical en react-pdf → el número quedaba arriba).
+  recNum: { width: 21, height: 21, borderRadius: 6, backgroundColor: K.navy, alignItems: 'center', justifyContent: 'center' },
+  recNumText: { color: '#fff', fontFamily: F.displayBold, fontSize: 10, lineHeight: 1 },
   recBody: { flex: 1 },
   recTitleRow: { flexDirection: 'row', alignItems: 'center', gap: 7 },
   recTitle: { fontFamily: F.bodyBold, fontSize: 10, color: K.text },
@@ -187,12 +193,38 @@ export interface AiVisibilityReportPdfProps {
 }
 
 const Gauge = ({ score, severity }: { score: number | null; severity: GraderReportSeverity }) => {
-  const ring = score === null || severity === 'sin_dato' ? K.onNavyTrack : toneDot(severity)
+  const size = 118
+  const c = size / 2
+  const r = 49
+  const sw = 10
+  const pct = score === null ? 0 : clampPct(score) / 100
+  const arcColor = severity === 'sin_dato' ? K.gaugeTrackOnNavy : toneDot(severity)
+
+  // Arco como <Path> A (no dasharray): empieza arriba (-90°) y barre `pct` del círculo.
+  const a0 = -Math.PI / 2
+  const a1 = a0 + 2 * Math.PI * pct
+  const x0 = c + r * Math.cos(a0)
+  const y0 = c + r * Math.sin(a0)
+  const x1 = c + r * Math.cos(a1)
+  const y1 = c + r * Math.sin(a1)
+  const largeArc = pct > 0.5 ? 1 : 0
+  const arcPath = `M ${x0.toFixed(2)} ${y0.toFixed(2)} A ${r} ${r} 0 ${largeArc} 1 ${x1.toFixed(2)} ${y1.toFixed(2)}`
 
   return (
-    <View style={[s.gaugeWrap, { borderColor: ring }]}>
-      <Text style={s.gaugeNum}>{score === null ? '—' : score}</Text>
-      <Text style={s.gaugeUnit}>de 100</Text>
+    <View style={s.gaugeWrap}>
+      <Svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ position: 'absolute' }}>
+        <Circle cx={c} cy={c} r={r} stroke={K.gaugeTrackOnNavy} strokeWidth={sw} fill='none' />
+        {score !== null && pct >= 0.999 ? (
+          <Circle cx={c} cy={c} r={r} stroke={arcColor} strokeWidth={sw} fill='none' />
+        ) : null}
+        {score !== null && pct > 0 && pct < 0.999 ? (
+          <Path d={arcPath} stroke={arcColor} strokeWidth={sw} strokeLinecap='round' fill='none' />
+        ) : null}
+      </Svg>
+      <View style={s.gaugeCtr}>
+        <Text style={s.gaugeNum}>{score === null ? '—' : score}</Text>
+        <Text style={s.gaugeUnit}>de 100</Text>
+      </View>
     </View>
   )
 }
@@ -237,6 +269,7 @@ const AiVisibilityReportPdf = ({ model, header }: AiVisibilityReportPdfProps) =>
     <Document title={`${C.header.title} — ${header.organizationName}`} author='Efeonce' creator='Greenhouse EO' producer='Greenhouse EO'>
       {/* ── PAGE 1 · COVER (full navy hero) ── */}
       <Page size='A4' style={s.cover}>
+        <View style={s.coverBackdrop} fixed />
         <Image src={asset('branding/pdf/efeonce-wordmark-white.png')} style={s.coverWm} />
         <Text style={s.coverEyebrow}>{C.header.title}</Text>
         <Text style={s.coverOrg}>{header.organizationName}</Text>
@@ -504,7 +537,9 @@ const AiVisibilityReportPdf = ({ model, header }: AiVisibilityReportPdfProps) =>
             <Text style={s.sectionTitle}>{C.recommendations.title}</Text>
             {model.recommendations.map((rec, idx) => (
               <View key={rec.gapKey} style={s.rec}>
-                <Text style={s.recNum}>{idx + 1}</Text>
+                <View style={s.recNum}>
+                  <Text style={s.recNumText}>{idx + 1}</Text>
+                </View>
                 <View style={s.recBody}>
                   <View style={s.recTitleRow}>
                     <Text style={s.recTitle}>{rec.title}</Text>

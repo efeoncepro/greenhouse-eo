@@ -39,7 +39,10 @@ export const ReportPdfColors = {
   onNavyStrong: 'rgba(255,255,255,0.78)',
   onNavyMuted: 'rgba(255,255,255,0.55)',
   onNavyFaint: 'rgba(255,255,255,0.5)',
-  onNavyTrack: 'rgba(255,255,255,0.16)'
+  onNavyTrack: 'rgba(255,255,255,0.16)',
+  // Track OPACO del gauge sobre navy (= blanco 16% pre-blended sobre #023c70).
+  // react-pdf corrompe el alpha de stroke Svg sobre navy → usar opaco.
+  gaugeTrackOnNavy: '#2a5b87'
 } as const
 
 /** Familias registradas por `ensurePdfFontsRegistered` (register-fonts.ts). */
