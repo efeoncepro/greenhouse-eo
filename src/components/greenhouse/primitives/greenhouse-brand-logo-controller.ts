@@ -25,6 +25,7 @@ export type GreenhouseBrandLogoFamily =
 
 export type GreenhouseBrandLogoKind =
   | 'geminiIsotype'
+  | 'geminiColor'
   | 'geminiOnBlue'
   | 'geminiOnNeutral'
   | 'geminiLogotype'
@@ -296,6 +297,21 @@ export const GREENHOUSE_BRAND_LOGO_KIND_CONFIG = {
     variant: 'isotype',
     ariaLabel: 'Gemini',
     assetSrc: createAxisBrandLogoAssetSrc('gemini-isotype.svg'),
+    tone: 'geminiFullColor'
+  },
+  // Sparkle multicolor oficial de Gemini (degradado real rojo→naranja→verde→azul).
+  // `geminiIsotype` (gemini-isotype.svg) renderiza AZUL PLANO en runtime — sus colores
+  // viven enmascarados fuera del viewBox. El degradado correcto SOLO existe en el
+  // `gemini-logotype.svg` de AXIS (nodo Figma 12267-95), que trae el wordmark "Gemini".
+  // `gemini-isotype-color.svg` se DERIVA de ese logotype quitándole las 8 paths del
+  // wordmark (fill="black") y ajustando el viewBox al sparkle — conserva intactos el
+  // <pattern> + imagen base64 + masks originales (NO hand-trace). Usar ESTE kind cuando
+  // se necesite el sparkle multicolor de Gemini (badges de motor, report artifact, etc.).
+  geminiColor: {
+    family: 'gemini',
+    variant: 'isotype',
+    ariaLabel: 'Gemini',
+    assetSrc: createAxisBrandLogoAssetSrc('gemini-isotype-color.svg'),
     tone: 'geminiFullColor'
   },
   geminiOnBlue: {

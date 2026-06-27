@@ -108,9 +108,16 @@ type KindSpecimen = {
 const GEMINI_KIND_SPECIMENS: KindSpecimen[] = [
   {
     kind: 'geminiIsotype',
-    title: 'Isotipo',
+    title: 'Isotipo (azul)',
     figmaProperty: 'Property 1=Isotipo',
-    description: 'Marca cromática independiente para contextos donde Gemini ya está nombrado cerca.'
+    description: 'Marca cromática independiente para contextos donde Gemini ya está nombrado cerca. Renderiza azul plano.'
+  },
+  {
+    kind: 'geminiColor',
+    title: 'Isotipo multicolor',
+    figmaProperty: 'Derivado de Logotipo (sin wordmark)',
+    description:
+      'Sparkle con el degradado oficial de Gemini (rojo→naranja→verde→azul). Derivado del logotipo de AXIS quitándole la palabra "Gemini". Usar este kind para badges de motor y artefactos de reporte.'
   },
   {
     kind: 'geminiOnBlue',
