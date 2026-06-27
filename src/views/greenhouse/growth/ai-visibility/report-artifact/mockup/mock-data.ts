@@ -111,7 +111,8 @@ export const REPORT_COPY = {
     analyzedPeriodLabel: 'Período analizado',
     comparisonLabel: 'Comparado con',
     publicSafeChip: 'Público-safe',
-    publicSafeHelper: 'Contenido sin datos confidenciales ni crudos'
+    publicSafeHelper: 'Contenido sin datos confidenciales ni crudos',
+    verifiedOrgAria: 'Organización verificada'
   },
   variants: {
     label: 'Variante del artefacto',

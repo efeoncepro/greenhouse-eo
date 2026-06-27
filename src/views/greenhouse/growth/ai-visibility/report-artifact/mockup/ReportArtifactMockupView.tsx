@@ -895,54 +895,93 @@ const ArtifactHeader = () => {
   const [periodEnd, setPeriodEnd] = useState<Date | null>(new Date(2025, 4, 18))
 
   return (
-    <Stack
-      direction={{ xs: 'column', lg: 'row' }}
-      alignItems={{ xs: 'flex-start', lg: 'center' }}
-      justifyContent='space-between'
-      spacing={4}
-    >
-      <Stack direction='row' spacing={6} alignItems='center' divider={<Divider orientation='vertical' flexItem />}>
-        <Box component='img' src={resolveBrandAssets('efeonce')?.wordmarkSrc} alt='Efeonce' sx={{ height: 28, width: 'auto' }} />
-        <Box>
-          <Typography variant='h4'>{REPORT_COPY.header.title}</Typography>
-          <Stack direction='row' spacing={2} alignItems='center' sx={{ mt: 0.5 }}>
-            <i className='tabler-world' />
-            <Typography variant='subtitle1' sx={{ fontWeight: 600 }}>
-              {REPORT_VM.organizationName}
-            </Typography>
-            <i className='tabler-rosette-discount-check-filled' />
-          </Stack>
-        </Box>
-      </Stack>
-      <Stack direction='row' spacing={4} alignItems='flex-end' flexWrap='wrap' useFlexGap>
-        <Box>
-          <Typography variant='caption' color='text.disabled' sx={{ display: 'block' }}>
-            {REPORT_COPY.header.reportDateLabel}
-          </Typography>
-          <Stack direction='row' spacing={1} alignItems='center' sx={{ mt: 0.5 }}>
-            <i className='tabler-calendar-event' />
-            <Typography variant='body2' sx={{ fontWeight: 600 }}>
-              {REPORT_VM.reportDate}
-            </Typography>
-          </Stack>
-        </Box>
-        <Box>
-          <Typography variant='caption' color='text.disabled' sx={{ display: 'block', mb: 1 }}>
-            {REPORT_COPY.header.analyzedPeriodLabel}
-          </Typography>
-          <Stack direction='row' spacing={2} alignItems='center'>
-            <Box sx={{ width: 138 }}>
-              <GreenhouseDatePicker label='Desde' value={periodStart} onChange={setPeriodStart} maxDate={periodEnd ?? undefined} dateFormat='dd MMM yyyy' />
+    <Card variant='outlined' data-capture='ai-visibility-report-masthead'>
+      <CardContent sx={{ py: 4 }}>
+        <Stack
+          direction={{ xs: 'column', lg: 'row' }}
+          alignItems={{ xs: 'flex-start', lg: 'center' }}
+          justifyContent='space-between'
+          spacing={{ xs: 5, lg: 4 }}
+        >
+          {/* Identidad — letterhead: marca Efeonce · informe · organización verificada */}
+          <Stack
+            direction='row'
+            spacing={5}
+            alignItems='center'
+            divider={<Divider orientation='vertical' flexItem sx={{ my: 0.5 }} />}
+          >
+            <Box
+              component='img'
+              src={resolveBrandAssets('efeonce')?.wordmarkSrc}
+              alt='Efeonce'
+              sx={{ height: 30, width: 'auto', flexShrink: 0 }}
+            />
+            <Box>
+              <Typography variant='h4' sx={{ textWrap: 'balance' }}>
+                {REPORT_COPY.header.title}
+              </Typography>
+              <Stack direction='row' spacing={1.5} alignItems='center' flexWrap='wrap' useFlexGap sx={{ mt: 1 }}>
+                <Stack direction='row' spacing={1.5} alignItems='center'>
+                  <i className='tabler-world' aria-hidden style={{ fontSize: '1.125rem', color: 'var(--mui-palette-text-secondary)' }} />
+                  <Typography variant='subtitle1' sx={{ fontWeight: 600 }}>
+                    {REPORT_VM.organizationName}
+                  </Typography>
+                  <i
+                    className='tabler-rosette-discount-check-filled'
+                    role='img'
+                    aria-label={REPORT_COPY.header.verifiedOrgAria}
+                    style={{ fontSize: '1.125rem', color: 'var(--mui-palette-primary-main)' }}
+                  />
+                </Stack>
+                <Chip
+                  size='small'
+                  variant='tonal'
+                  color='success'
+                  icon={<i className='tabler-shield-check' aria-hidden />}
+                  label={REPORT_COPY.header.publicSafeChip}
+                />
+              </Stack>
             </Box>
-            <Box sx={{ color: 'text.disabled' }}>–</Box>
-            <Box sx={{ width: 138 }}>
-              <GreenhouseDatePicker label='Hasta' value={periodEnd} onChange={setPeriodEnd} minDate={periodStart ?? undefined} dateFormat='dd MMM yyyy' />
+          </Stack>
+
+          {/* Meta-strip — fecha del informe · período analizado · público-safe */}
+          <Stack
+            direction='row'
+            spacing={4}
+            alignItems='center'
+            flexWrap='wrap'
+            useFlexGap
+            divider={<Divider orientation='vertical' flexItem sx={{ display: { xs: 'none', sm: 'block' }, my: 0.5 }} />}
+          >
+            <Box>
+              <Typography variant='overline' color='text.secondary' sx={{ display: 'block' }}>
+                {REPORT_COPY.header.reportDateLabel}
+              </Typography>
+              <Stack direction='row' spacing={1} alignItems='center' sx={{ mt: 0.5 }}>
+                <i className='tabler-calendar-event' aria-hidden style={{ fontSize: '1.125rem', color: 'var(--mui-palette-text-secondary)' }} />
+                <Typography variant='body2' sx={{ fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>
+                  {REPORT_VM.reportDate}
+                </Typography>
+              </Stack>
+            </Box>
+            <Box>
+              <Typography variant='overline' color='text.secondary' sx={{ display: 'block', mb: 1 }}>
+                {REPORT_COPY.header.analyzedPeriodLabel}
+              </Typography>
+              <Stack direction='row' spacing={1.5} alignItems='flex-end'>
+                <Box sx={{ width: 156 }}>
+                  <GreenhouseDatePicker label='Desde' value={periodStart} onChange={setPeriodStart} maxDate={periodEnd ?? undefined} dateFormat='dd MMM yyyy' />
+                </Box>
+                <Box sx={{ color: 'text.secondary', pb: 1.25 }}>–</Box>
+                <Box sx={{ width: 156 }}>
+                  <GreenhouseDatePicker label='Hasta' value={periodEnd} onChange={setPeriodEnd} minDate={periodStart ?? undefined} dateFormat='dd MMM yyyy' />
+                </Box>
+              </Stack>
             </Box>
           </Stack>
-        </Box>
-        <Chip variant='tonal' color='success' icon={<i className='tabler-shield-check' />} label={REPORT_COPY.header.publicSafeChip} sx={{ mb: 0.5 }} />
-      </Stack>
-    </Stack>
+        </Stack>
+      </CardContent>
+    </Card>
   )
 }
 
