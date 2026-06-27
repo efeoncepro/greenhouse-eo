@@ -75,12 +75,24 @@
 ## GVC / Micro Evidence
 
 - Scenario:
+- Scenario file:
+- Route:
 - Viewports:
 - Required steps:
+- Required captures:
 - Required frame labels:
 - Required `data-capture` markers:
 - Assertions:
 - Reduced-motion evidence:
+
+## Design Decision Log
+
+- Decision:
+- Alternatives considered:
+- Why this pattern:
+- Reuse / extend / new primitive:
+- Open risks:
+- Follow-up:
 
 ## Acceptance Checklist
 
@@ -91,3 +103,4 @@
 - [ ] Imports use approved Greenhouse wrappers/primitives.
 - [ ] Performance guardrails avoid layout thrash and excessive animation.
 - [ ] GVC/micro evidence proves the meaningful interaction, not only a static screenshot.
+- [ ] Design decision log explains why this motion is needed and what was rejected.

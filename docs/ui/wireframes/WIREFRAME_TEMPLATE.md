@@ -8,6 +8,7 @@
 - Intended consumers:
 - Copy source:
 - Primitive decision:
+- UI ready target: `no|yes`
 
 ## Brief
 
@@ -50,11 +51,39 @@
 
 ## Implementation Mapping
 
+- Route / surface:
 - Primitives:
-- Variants:
-- GVC markers:
+- Variants / kinds:
+- Component candidates:
+- Copy source:
+- Data reader / command:
+- API parity:
+- Access / capability:
 - Runtime consumers:
 - Print/email/PDF considerations:
+- GVC markers:
+
+## GVC Scenario Plan
+
+- Scenario file:
+- Route:
+- Viewports:
+- Required steps:
+- Required captures:
+- Required `data-capture` markers:
+- Assertions:
+- Scroll-width checks:
+- Accessibility/focus checks:
+- Reduced-motion evidence:
+
+## Design Decision Log
+
+- Decision:
+- Alternatives considered:
+- Why this pattern:
+- Reuse / extend / new primitive:
+- Open risks:
+- Follow-up:
 
 ## Acceptance Checklist
 
@@ -64,3 +93,6 @@
 - [ ] No copy implies a guarantee when data is estimated.
 - [ ] Charts have table/text alternatives.
 - [ ] State and aria copy is ready for implementation.
+- [ ] Implementation mapping names primitive, copy source, data contract and route/surface.
+- [ ] GVC scenario plan is specific enough for `pnpm fe:capture` or a new scenario file.
+- [ ] Design decision log explains reuse/extend/new before JSX starts.

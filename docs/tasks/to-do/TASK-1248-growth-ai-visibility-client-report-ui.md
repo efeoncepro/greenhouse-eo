@@ -17,6 +17,7 @@
 - Type: `implementation`
 - Execution profile: `ui-ux`
 - UI impact: `flow`
+- UI ready: `no`
 - Wireframe: `docs/ui/wireframes/TASK-1248-growth-ai-visibility-client-report-ui.md`
 - Flow: `docs/ui/flows/TASK-1248-growth-ai-visibility-client-report-ui-flow.md`
 - Motion: `docs/ui/motion/TASK-1248-growth-ai-visibility-client-report-ui-motion.md`

@@ -194,6 +194,28 @@
 - GVC markers: `ai-visibility-report`, `ai-visibility-report-score`, `ai-visibility-report-recommendations`, `ai-visibility-report-provenance`, `ai-visibility-report-attachment-preview`.
 - Visual source: keep the Product Design PNG as a baseline reference; implementation should validate via GVC once runtime exists.
 
+## GVC Scenario Plan
+
+- Scenario file: create `scripts/frontend/scenarios/ai-visibility-report-artifact.scenario.ts` with web and static/attachment specimens.
+- Route: design-system lab or report artifact preview route created by implementation.
+- Viewports: desktop 1440px, laptop 1280px, mobile 390px and print/PDF preview width.
+- Required steps: load full report, validate partial report, preview attachment/static variant, inspect chart/table fallback.
+- Required captures: full artifact, partial artifact, insufficient data, public-safe review state, attachment preview and mobile stacked layout.
+- Required `data-capture` markers: `ai-visibility-report`, `ai-visibility-report-score`, `ai-visibility-report-recommendations`, `ai-visibility-report-provenance`, `ai-visibility-report-attachment-preview`.
+- Assertions: public artifact has no provider findings, raw prompts, raw text, raw citation URLs or internal ids; disclaimers remain visible.
+- Scroll-width checks: desktop and mobile 390px must satisfy `scrollWidth <= clientWidth`; attachment preview must not clip tables.
+- Accessibility/focus checks: chart table alternatives exist; headings preserve report order; static variants do not depend on hover.
+- Reduced-motion evidence: web variant honors reduced motion; attachment/PDF variant is static by design.
+
+## Design Decision Log
+
+- Decision: define one report artifact system with web and static adapters instead of separate consumer-specific reports.
+- Alternatives considered: embed the report design inside TASK-1241/1248, use only dashboard cards, or make PDF/email a separate visual language.
+- Why this pattern: the same report must feed public page, client portal and attachment without disclosure drift or copy duplication.
+- Reuse / extend / new primitive: likely new/extended report artifact primitive family under the growth domain; primitives must still reuse Greenhouse cards, charts, typography and motion contracts.
+- Open risks: framework-level top-line changes from the Efeonce 5-level model must be reconciled before implementation finalizes the section order.
+- Follow-up: update this contract after TASK-1265...1270 settle the additional grader/readiness signals.
+
 ## Acceptance Checklist
 
 - [ ] All visible strings from the approved visual have a copy id.
@@ -206,3 +228,4 @@
 - [ ] Charts have table/text alternatives.
 - [ ] Severity and status are not color-only.
 - [ ] No raw provider text, prompts, raw citation URLs, internal IDs or accuracy findings are exposed.
+- [ ] Implementation mapping, GVC scenario plan and design decision log stay aligned before moving `UI ready` to `yes`.

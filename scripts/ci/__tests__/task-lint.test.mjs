@@ -20,6 +20,7 @@ const taskFixture = ({
   domain = 'ops',
   executionProfile = 'standard',
   uiImpact = 'none',
+  uiReady = 'n/a',
   wireframe = 'none',
   flow = 'none',
   motion = 'none',
@@ -40,6 +41,7 @@ const taskFixture = ({
 - Type: \`implementation\`
 - Execution profile: \`${executionProfile}\`
 - UI impact: \`${uiImpact}\`
+- UI ready: \`${uiReady}\`
 - Wireframe: \`${wireframe}\`
 - Flow: \`${flow}\`
 - Motion: \`${motion}\`
@@ -393,6 +395,124 @@ const cases = [
 
       assert.equal(result.errors.length, 0)
       assert.equal(result.warnings.some(item => item.rule === 'ui-ux-contract'), true)
+      rmSync(root, { recursive: true, force: true })
+    }
+  },
+  {
+    name: 'warns when a UI task omits the UI readiness field',
+    run: () => {
+      const root = createRepo()
+
+      write(join(root, 'docs', 'tasks', 'to-do', 'TASK-999-fixture.md'), taskFixture({
+        domain: 'ui|platform',
+        executionProfile: 'ui-ux',
+        uiImpact: 'layout',
+        wireframe: 'docs/ui/wireframes/TASK-999-fixture.md'
+      }).replace('- UI ready: `n/a`\n', ''))
+
+      const result = lintTasks({ repoRoot: root, options: { format: 'json', strict: false, changed: false, task: 'TASK-999' } })
+
+      assert.equal(result.warnings.some(item => item.rule === 'ui-readiness-gate'), true)
+      rmSync(root, { recursive: true, force: true })
+    }
+  },
+  {
+    name: 'errors when the UI readiness field has an invalid value',
+    run: () => {
+      const root = createRepo()
+
+      write(join(root, 'docs', 'tasks', 'to-do', 'TASK-999-fixture.md'), taskFixture({
+        domain: 'ui|platform',
+        executionProfile: 'ui-ux',
+        uiImpact: 'layout',
+        uiReady: 'maybe',
+        wireframe: 'docs/ui/wireframes/TASK-999-fixture.md'
+      }))
+
+      const result = lintTasks({ repoRoot: root, options: { format: 'json', strict: false, changed: false, task: 'TASK-999' } })
+
+      assert.equal(result.errors.some(item => item.rule === 'ui-readiness-gate'), true)
+      rmSync(root, { recursive: true, force: true })
+    }
+  },
+  {
+    name: 'requires implementation mapping, GVC plan and decision log before UI ready yes',
+    run: () => {
+      const root = createRepo()
+
+      write(join(root, 'docs', 'tasks', 'to-do', 'TASK-999-fixture.md'), taskFixture({
+        domain: 'ui|platform',
+        executionProfile: 'ui-ux',
+        uiImpact: 'layout',
+        uiReady: 'yes',
+        wireframe: 'docs/ui/wireframes/TASK-999-fixture.md',
+        uiUxContract: [
+          '## UI/UX Contract',
+          '',
+          '### Experience brief',
+          '',
+          '- UI rigor: `ui-standard`',
+          '- Usuario / rol: operador interno'
+        ].join('\n')
+      }))
+
+      const result = lintTasks({ repoRoot: root, options: { format: 'json', strict: false, changed: false, task: 'TASK-999' } })
+
+      assert.equal(result.errors.some(item => item.rule === 'ui-readiness-gate'), true)
+      rmSync(root, { recursive: true, force: true })
+    }
+  },
+  {
+    name: 'accepts UI ready yes when mapping, GVC plan and decision log are present',
+    run: () => {
+      const root = createRepo()
+
+      write(join(root, 'docs', 'ui', 'wireframes', 'TASK-999-fixture.md'), [
+        '# TASK-999 Fixture Wireframe',
+        '',
+        '## Implementation Mapping',
+        '',
+        '- Primitive: existing.',
+        '',
+        '## GVC Scenario Plan',
+        '',
+        '- Scenario: fixture.',
+        '',
+        '## Design Decision Log',
+        '',
+        '- Decision: reuse existing primitive.'
+      ].join('\n'))
+      write(join(root, 'docs', 'tasks', 'to-do', 'TASK-999-fixture.md'), taskFixture({
+        domain: 'ui|platform',
+        executionProfile: 'ui-ux',
+        uiImpact: 'layout',
+        uiReady: 'yes',
+        wireframe: 'docs/ui/wireframes/TASK-999-fixture.md',
+        uiUxContract: [
+          '## UI/UX Contract',
+          '',
+          '### Experience brief',
+          '',
+          '- UI rigor: `ui-standard`',
+          '',
+          '### Implementation mapping',
+          '',
+          '- Primitive: existing.',
+          '',
+          '### GVC scenario plan',
+          '',
+          '- Scenario: fixture.',
+          '',
+          '### Design decision log',
+          '',
+          '- Decision: reuse existing primitive.'
+        ].join('\n')
+      }))
+
+      const result = lintTasks({ repoRoot: root, options: { format: 'json', strict: false, changed: false, task: 'TASK-999' } })
+
+      assert.equal(result.errors.some(item => item.rule === 'ui-readiness-gate'), false)
+      assert.equal(result.warnings.some(item => item.rule === 'ui-readiness-gate'), false)
       rmSync(root, { recursive: true, force: true })
     }
   },

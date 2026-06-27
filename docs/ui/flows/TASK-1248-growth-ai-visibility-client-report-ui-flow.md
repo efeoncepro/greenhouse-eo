@@ -115,6 +115,15 @@
 - Scroll-width checks: `scrollWidth == clientWidth` on desktop and mobile 390px.
 - Accessibility/focus checks: keyboard selection, Escape behavior, focus restore after drawer close, complementary vs modal semantics.
 
+## Design Decision Log
+
+- Decision: base report remains a single client page; recommendation details open in a contextual sidecar on desktop and drawer on compact.
+- Alternatives considered: route-per-recommendation, modal detail, permanently visible right rail.
+- Why this pattern: the user compares score, gaps and recommendation detail without losing report context; compact still gets a focused drawer.
+- Reuse / extend / new primitive: reuse `ContextualSidecar`/Adaptive Sidecar behavior; no custom drawer/modal.
+- Open risks: final route/query behavior must be confirmed once the client portal route exists.
+- Follow-up: if recommendation deep-linking becomes required, extend this flow with query/hash behavior instead of adding ad hoc state.
+
 ## Acceptance Checklist
 
 - [ ] `TASK-1248` declares this file in `Flow`.
@@ -125,3 +134,4 @@
 - [ ] The CTA does not mutate business state without a governed command/route.
 - [ ] Failure paths do not expose provider internals, review reasons or tenant existence.
 - [ ] GVC sequence captures prove desktop and mobile interaction, not only the static report.
+- [ ] Design decision log remains aligned with the implemented surface behavior.

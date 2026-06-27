@@ -71,7 +71,9 @@ Every wireframe should include:
 5. **State Copy** — ready, loading, empty, partial, error and denied states.
 6. **Accessibility Contract** — headings, chart alternatives and focus notes.
 7. **Implementation Mapping** — copy source, primitives, variants and adapters.
-8. **Acceptance Checklist** — what must remain true in implementation.
+8. **GVC Scenario Plan** — route, viewports, markers, assertions and scroll/focus checks.
+9. **Design Decision Log** — pattern chosen, alternatives rejected and follow-up risk.
+10. **Acceptance Checklist** — what must remain true in implementation.
 
 ## Copy ID Convention
 
@@ -111,6 +113,12 @@ A wireframe is ready for implementation only when:
 
 - it links to the approved visual target;
 - it names the primitive/reuse decision;
+- it maps route/surface, component candidates, copy source, data reader/command, API parity and access/capability;
+- it includes a GVC scenario plan with captures, markers, assertions and desktop/mobile expectations;
+- it records the design decision log: selected pattern, rejected alternatives and why;
 - every visible string has a copy id or a declared one-off reason;
 - public/client-safe disclosure is explicit;
 - GVC markers and state captures are listed.
+
+Only after those checks pass should the owning task move `UI ready` from `no`
+to `yes`.

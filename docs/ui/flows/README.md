@@ -58,7 +58,8 @@ Every flow contract should include:
 9. **Data & Command Boundaries** — readers, commands, APIs and cache behavior.
 10. **Failure Paths** — denied, stale, partial, unsaved, timeout, empty.
 11. **GVC Scenario Plan** — desktop/mobile sequence captures and markers.
-12. **Acceptance Checklist** — binary checks for implementation.
+12. **Design Decision Log** — why these surfaces/routes were chosen.
+13. **Acceptance Checklist** — binary checks for implementation.
 
 ## Relationship To Wireframes
 
@@ -68,3 +69,5 @@ Every flow contract should include:
 - A single task can have one wireframe and one flow contract.
 - Platform primitives may have multiple flow contracts if variants differ
   materially, such as modal vs non-modal inspector behavior.
+- `UI ready: yes` requires the declared flow contract to include both
+  `## GVC Scenario Plan` and `## Design Decision Log` when `Flow` is not `none`.

@@ -1,4 +1,4 @@
-import { existsSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 
 const REQUIRED_SECTIONS = [
@@ -23,6 +23,7 @@ const POLICY_TYPES = new Set(['umbrella', 'policy'])
 const SENSITIVE_DOMAINS = ['finance', 'payroll', 'auth', 'identity', 'billing', 'cloud', 'data', 'production']
 const UI_DOMAINS = ['ui', 'design-system', 'motion', 'accessibility']
 const UI_IMPACTS = new Set(['copy', 'layout', 'interaction', 'motion', 'primitive', 'flow'])
+const UI_READY_VALUES = new Set(['yes', 'no', 'n/a', 'na'])
 
 const BACKEND_DATA_DOMAINS = [
   'api',
@@ -62,6 +63,26 @@ const hasSection = (task, section) => task.sections.has(section)
 const sectionLine = (task, section) => task.sections.get(section)?.line
 
 const sectionContent = (task, section) => task.sections.get(section)?.content ?? ''
+
+const stripStatusValue = value => value.replace(/^`(.+)`$/, '$1').trim()
+
+const normalizeStatusValue = value => stripStatusValue(value).toLowerCase()
+
+const hasMarkdownHeading = (source, heading) => {
+  const escaped = heading.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+
+  return new RegExp(`^#{2,6}\\s+${escaped}\\s*$`, 'im').test(source)
+}
+
+const readRepoFile = (context, relativePath) => {
+  if (!context.repoRoot || !relativePath || relativePath === 'none' || relativePath === 'n/a') return null
+
+  const absolutePath = join(context.repoRoot, relativePath)
+
+  if (!existsSync(absolutePath)) return null
+
+  return readFileSync(absolutePath, 'utf8')
+}
 
 const relevantFlowContent = task =>
   [
@@ -338,6 +359,178 @@ const checkUiUxContract = task => {
   ]
 }
 
+const checkUiReadinessGate = (task, context) => {
+  const fields = task.status.fields
+  const rawUiReady = fields['UI ready'] ?? fields['UI Ready'] ?? fields['ui ready'] ?? ''
+  const uiReady = normalizeStatusValue(rawUiReady)
+  const severity = context.changed || context.task ? 'error' : 'warning'
+  const findings = []
+
+  if (!isUiUxImpacted(task)) {
+    if (rawUiReady && !UI_READY_VALUES.has(uiReady)) {
+      findings.push(
+        finding({
+          task,
+          rule: 'ui-readiness-gate',
+          severity,
+          line: task.status.fieldLines['UI ready'] ?? task.status.fieldLines['UI Ready'],
+          message: `UI ready must be one of yes, no or n/a. Received "${rawUiReady}".`
+        })
+      )
+    }
+
+    return findings
+  }
+
+  if (!rawUiReady) {
+    return [
+      finding({
+        task,
+        rule: 'ui-readiness-gate',
+        severity: 'warning',
+        line: task.status.hasStatus ? task.status.startLine : undefined,
+        message:
+          'UI task should declare `UI ready: yes|no|n/a` in ## Status. Use `no` until wireframe, implementation mapping, GVC plan and decision log are ready.'
+      })
+    ]
+  }
+
+  if (!UI_READY_VALUES.has(uiReady)) {
+    return [
+      finding({
+        task,
+        rule: 'ui-readiness-gate',
+        severity,
+        line: task.status.fieldLines['UI ready'] ?? task.status.fieldLines['UI Ready'],
+        message: `UI ready must be one of yes, no or n/a. Received "${rawUiReady}".`
+      })
+    ]
+  }
+
+  if (uiReady !== 'yes') return []
+
+  if (!hasSection(task, 'ui/ux contract')) {
+    findings.push(
+      finding({
+        task,
+        rule: 'ui-readiness-gate',
+        severity,
+        message: '`UI ready: yes` requires a completed "## UI/UX Contract".'
+      })
+    )
+  } else {
+    const contract = sectionContent(task, 'ui/ux contract')
+    const requiredContractHeadings = ['Implementation mapping', 'GVC scenario plan', 'Design decision log']
+
+    for (const heading of requiredContractHeadings) {
+      if (!hasMarkdownHeading(contract, heading)) {
+        findings.push(
+          finding({
+            task,
+            rule: 'ui-readiness-gate',
+            severity,
+            line: sectionLine(task, 'ui/ux contract'),
+            message: `\`UI ready: yes\` requires "### ${heading}" inside "## UI/UX Contract".`
+          })
+        )
+      }
+    }
+  }
+
+  const wireframe = stripStatusValue(fields.Wireframe ?? fields.wireframe ?? '')
+  const wireframeSource = readRepoFile(context, wireframe)
+
+  if (!wireframeSource) {
+    findings.push(
+      finding({
+        task,
+        rule: 'ui-readiness-gate',
+        severity,
+        line: task.status.fieldLines.Wireframe ?? task.status.fieldLines.wireframe,
+        message: '`UI ready: yes` requires an existing wireframe file.'
+      })
+    )
+  } else {
+    for (const heading of ['Implementation Mapping', 'GVC Scenario Plan', 'Design Decision Log']) {
+      if (!hasMarkdownHeading(wireframeSource, heading)) {
+        findings.push(
+          finding({
+            task,
+            rule: 'ui-readiness-gate',
+            severity,
+            line: task.status.fieldLines.Wireframe ?? task.status.fieldLines.wireframe,
+            message: `\`UI ready: yes\` requires "${heading}" in the wireframe file.`
+          })
+        )
+      }
+    }
+  }
+
+  const flow = stripStatusValue(fields.Flow ?? fields.flow ?? '')
+  const flowSource = readRepoFile(context, flow)
+
+  if (flow && !['none', 'n/a'].includes(flow.toLowerCase())) {
+    if (!flowSource) {
+      findings.push(
+        finding({
+          task,
+          rule: 'ui-readiness-gate',
+          severity,
+          line: task.status.fieldLines.Flow ?? task.status.fieldLines.flow,
+          message: '`UI ready: yes` requires the declared flow contract file to exist.'
+        })
+      )
+    } else {
+      for (const heading of ['GVC Scenario Plan', 'Design Decision Log']) {
+        if (!hasMarkdownHeading(flowSource, heading)) {
+          findings.push(
+            finding({
+              task,
+              rule: 'ui-readiness-gate',
+              severity,
+              line: task.status.fieldLines.Flow ?? task.status.fieldLines.flow,
+              message: `\`UI ready: yes\` requires "${heading}" in the flow contract file.`
+            })
+          )
+        }
+      }
+    }
+  }
+
+  const motion = stripStatusValue(fields.Motion ?? fields.motion ?? '')
+  const motionSource = readRepoFile(context, motion)
+
+  if (motion && !['none', 'n/a'].includes(motion.toLowerCase())) {
+    if (!motionSource) {
+      findings.push(
+        finding({
+          task,
+          rule: 'ui-readiness-gate',
+          severity,
+          line: task.status.fieldLines.Motion ?? task.status.fieldLines.motion,
+          message: '`UI ready: yes` requires the declared motion contract file to exist.'
+        })
+      )
+    } else {
+      for (const heading of ['GVC / Micro Evidence', 'Design Decision Log']) {
+        if (!hasMarkdownHeading(motionSource, heading)) {
+          findings.push(
+            finding({
+              task,
+              rule: 'ui-readiness-gate',
+              severity,
+              line: task.status.fieldLines.Motion ?? task.status.fieldLines.motion,
+              message: `\`UI ready: yes\` requires "${heading}" in the motion contract file.`
+            })
+          )
+        }
+      }
+    }
+  }
+
+  return findings
+}
+
 const checkUiWireframeContract = (task, context) => {
   if (!isUiUxImpacted(task)) return []
 
@@ -591,6 +784,11 @@ export const RULES = [
     id: 'ui-ux-contract',
     appliesTo: task => task.kind === 'template',
     check: checkUiUxContract
+  },
+  {
+    id: 'ui-readiness-gate',
+    appliesTo: task => task.kind === 'template',
+    check: checkUiReadinessGate
   },
   {
     id: 'ui-wireframe-contract',

@@ -92,6 +92,15 @@
 - Assertions: no animated values overstate precision, no raw provider evidence, reduced-motion/static equivalent exists.
 - Reduced-motion evidence: documented primitive-level fallback or GVC reduced-motion pass.
 
+## Design Decision Log
+
+- Decision: report artifact motion is optional on web and static by default for print/PDF/email.
+- Alternatives considered: animated score reveal, animated chart geometry, full-document entrance.
+- Why this pattern: the artifact carries trust/legal-safe interpretation; motion cannot imply precision or hide disclosure.
+- Reuse / extend / new primitive: reuse Greenhouse Motion/primitive defaults for web only; static adapters use no runtime motion.
+- Open risks: future interactive report variants may need a separate flow/motion contract if they add expansion or comparison.
+- Follow-up: validate motion against the Efeonce 5-level framework once TASK-1265...1270 settle the final report hierarchy.
+
 ## Acceptance Checklist
 
 - [ ] `TASK-1252` declares this file in `Motion`.
@@ -101,3 +110,4 @@
 - [ ] Reduced-motion behavior preserves report meaning.
 - [ ] No direct animation library imports are introduced in report consumers.
 - [ ] GVC/static evidence proves the artifact is readable without animation.
+- [ ] Design decision log explains why static report adapters do not depend on motion.

@@ -34,6 +34,7 @@ Extract from the user's request:
 - task type: `implementation`, `umbrella`, or `policy`
 - execution profile: `standard`, `ui-ux`, or `backend-data`
 - UI impact: `none`, `copy`, `layout`, `interaction`, `motion`, `primitive`, or `flow`
+- UI ready: `n/a` for non-UI tasks, `no` until implementation mapping, GVC scenario plan and design decision log are complete, `yes` only after those gates pass
 - wireframe path when UI impact is not `none`
 - flow path when UI impact is `flow` or the UI coordinates sidecars, drawers, modals, popovers, or route/screen transitions
 - motion path when UI impact is `motion` or the UI introduces non-trivial motion/microinteractions
@@ -80,6 +81,7 @@ Rules:
 - do not fill Zone 2
 - do not write `Checkpoint` or `Mode` in Status
 - always write `Execution profile`, `UI impact`, and `Backend impact` in Status
+- always write `UI ready`; use `n/a` for non-UI tasks and `no` for new UI tasks unless the wireframe/UI contract already include implementation mapping, GVC scenario plan and design decision log
 - if `Execution profile = ui-ux` or `UI impact != none`, include a completed `## UI/UX Contract` section copied from `docs/tasks/TASK_UI_UX_ADDENDUM.md` and write `Wireframe: docs/ui/wireframes/TASK-###-short-slug.md` in Status, pointing to an existing wireframe file
 - if `UI impact = flow` or the UI coordinates sidecars, drawers, modals, popovers, or route/screen transitions, write `Flow: docs/ui/flows/TASK-###-short-slug-flow.md` in Status, pointing to an existing flow contract file
 - if `UI impact = motion` or the UI introduces non-trivial motion/microinteractions, write `Motion: docs/ui/motion/TASK-###-short-slug-motion.md` in Status, pointing to an existing motion contract file
@@ -91,6 +93,7 @@ Rules:
 - make `Out of Scope` explicit
 - make acceptance criteria binary and testable
 - for UI/UX tasks, include binary acceptance criteria for primitive decision, copy source, state coverage, motion/reduced-motion, GVC evidence when applicable, and page-level horizontal scroll checks when layout changes
+- for UI/UX tasks, include binary acceptance criteria for `UI ready` staying `no` until implementation mapping, GVC scenario plan and design decision log are complete; if set to `yes`, `pnpm task:lint --task TASK-###` must pass with zero findings
 - for UI/UX tasks, include a binary acceptance criterion that the task declares an existing `docs/ui/wireframes/...` file and passes `pnpm ui:wireframe-check --task TASK-###`
 - for UI/UX flow tasks, include a binary acceptance criterion that the task declares an existing `docs/ui/flows/...` file and passes `pnpm ui:flow-check --task TASK-###`
 - for UI/UX motion tasks, include a binary acceptance criterion that the task declares an existing `docs/ui/motion/...` file and passes `pnpm ui:motion-check --task TASK-###`

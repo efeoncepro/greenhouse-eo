@@ -31,6 +31,7 @@ Read the user's input. It can be a loose line, a paragraph with context, or a pr
 - **What type of task** — `implementation` (produces code), `umbrella` (coordinates child tasks), or `policy` (formalizes decisions/documentation)
 - **Execution profile** — `standard`, `ui-ux`, or `backend-data`
 - **UI impact** — `none`, `copy`, `layout`, `interaction`, `motion`, `primitive`, or `flow`
+- **UI ready** — `n/a` for non-UI tasks, `no` until implementation mapping, GVC scenario plan and design decision log are complete, `yes` only after those gates pass
 - **Wireframe** — `none` for non-UI tasks, or an existing `docs/ui/wireframes/TASK-###-short-slug.md` for UI tasks
 - **Flow** — `none` unless `UI impact: flow` or the UI coordinates sidecars, drawers, modals, popovers, or route/screen transitions; then an existing `docs/ui/flows/TASK-###-short-slug-flow.md`
 - **Motion** — `none` unless `UI impact: motion` or the UI introduces non-trivial motion/microinteractions; then an existing `docs/ui/motion/TASK-###-short-slug-motion.md`
@@ -79,15 +80,17 @@ Write the complete `.md` file following the structure of `docs/tasks/TASK_TEMPLA
 
 **Zone 2 is NOT filled in.** It is the responsibility of the agent that takes the task, not the one that creates it.
 
-**Execution profile, UI impact, and Backend impact are always written in Status.**
+**Execution profile, UI impact, UI ready, and Backend impact are always written in Status.**
 
-- Default: `Execution profile: standard`, `UI impact: none`, and `Backend impact: none`.
+- Default: `Execution profile: standard`, `UI impact: none`, `UI ready: n/a`, and `Backend impact: none`.
 - If the task touches visible UI, copy, layout, interaction, motion, primitive, flow, mockup, Figma, GVC, or visual evidence, use `Execution profile: ui-ux` and classify `UI impact`.
+- For UI tasks, keep `UI ready: no` until the wireframe and `## UI/UX Contract` include implementation mapping, GVC scenario plan and design decision log; set `yes` only when `pnpm task:lint --task TASK-###` passes with zero findings.
 - If `Execution profile = ui-ux` or `UI impact != none`, include a completed `## UI/UX Contract` section copied from `docs/tasks/TASK_UI_UX_ADDENDUM.md` and write `Wireframe: docs/ui/wireframes/TASK-###-short-slug.md` in Status, pointing to an existing wireframe file.
 - If `UI impact = flow` or the UI coordinates sidecars, drawers, modals, popovers, or route/screen transitions, write `Flow: docs/ui/flows/TASK-###-short-slug-flow.md` in Status, pointing to an existing flow contract file.
 - If `UI impact = motion` or the UI introduces non-trivial motion/microinteractions, write `Motion: docs/ui/motion/TASK-###-short-slug-motion.md` in Status, pointing to an existing motion contract file.
 - UI/UX tasks must specify experience brief, surface/system decision, state inventory, interaction contract, motion/microinteractions, and visual verification.
 - UI/UX acceptance criteria must be binary: primitive decision, copy source, state coverage, motion/reduced-motion, GVC evidence when applicable, and page-level horizontal scroll checks when layout changes.
+- UI/UX acceptance criteria must include the `UI ready` gate: it remains `no` until implementation mapping, GVC scenario plan and design decision log are complete; if it is `yes`, focal task lint must pass.
 - For `ui-standard` and `ui-platform`, GVC desktop + mobile evidence is required unless the task explicitly explains why runtime visual evidence does not apply.
 - If the task touches backend, data, DB, API, commands, readers, migrations, sync, cron, webhooks, integrations, or source-of-truth/data contracts, use `Execution profile: backend-data` and classify `Backend impact`.
 - If `Execution profile = backend-data` or `Backend impact != none`, include a completed `## Backend/Data Contract` section copied from `docs/tasks/TASK_BACKEND_DATA_ADDENDUM.md`.

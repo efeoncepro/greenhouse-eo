@@ -13,6 +13,7 @@
 - Type: `implementation`
 - Execution profile: `ui-ux`
 - UI impact: `primitive`
+- UI ready: `no`
 - Wireframe: `docs/ui/wireframes/TASK-1252-growth-ai-visibility-report-artifact-design-system.md`
 - Flow: `none`
 - Motion: `docs/ui/motion/TASK-1252-growth-ai-visibility-report-artifact-design-system-motion.md`

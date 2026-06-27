@@ -162,6 +162,28 @@
 - Runtime consumers: authenticated client portal only in V1; do not imply recurring monitor until product exists.
 - Print/email/PDF considerations: none in this view; full report artifact and attachment rules live in `TASK-1252` / `TASK-1250`.
 
+## GVC Scenario Plan
+
+- Scenario file: create or extend `scripts/frontend/scenarios/client-ai-visibility-report.scenario.ts`.
+- Route: final client portal route for `GET /api/client-portal/growth/ai-visibility/report`; confirm during implementation.
+- Viewports: desktop 1440px, laptop 1280px and mobile 390px.
+- Required steps: load ready report, select a recommendation, open sidecar, close via Escape, restore focus, validate mobile drawer.
+- Required captures: ready, loading/skeleton, empty/no report, partial, denied, sidecar open desktop, drawer open mobile.
+- Required `data-capture` markers: `client-ai-visibility-report`, `client-ai-visibility-score`, `client-ai-visibility-dimensions`, `client-ai-visibility-actions`, `client-ai-visibility-recommendation-detail`, `client-ai-visibility-signals`.
+- Assertions: no raw provider text, no internal ids, CTA present only when governed, `grader_run_not_found` renders empty/not-available.
+- Scroll-width checks: desktop and mobile 390px must satisfy `scrollWidth <= clientWidth`.
+- Accessibility/focus checks: selected recommendation restores focus after sidecar/drawer close; score and charts have text/table alternatives.
+- Reduced-motion evidence: primitive-level reduced-motion contract or capture with reduced motion enabled.
+
+## Design Decision Log
+
+- Decision: use a client-scoped command/report surface with `CompositionShell leadPlusContext` plus contextual inspector.
+- Alternatives considered: static report-only page, modal-only recommendation detail, full dashboard with recurring monitor controls.
+- Why this pattern: the customer needs one decision path with supporting evidence; sidecar keeps context visible without overpromising a monitor product.
+- Reuse / extend / new primitive: reuse Composition Shell, ContextualSidecar, report cards and chart primitives; extend only if TASK-1252 creates artifact-level primitives.
+- Open risks: final client route and exact report DTO shape must be verified when implementation starts.
+- Follow-up: promote this scenario to baseline diff once TASK-1252 artifact primitives exist.
+
 ## Acceptance Checklist
 
 - [ ] All visible strings from the approved visual have a copy id or data-source note.
@@ -174,3 +196,4 @@
 - [ ] Desktop sidecar is in-flow; mobile sidecar uses primitive drawer behavior with focus restore.
 - [ ] No raw provider text, prompts, raw citation URLs, internal IDs or accuracy findings are exposed.
 - [ ] GVC markers and state captures are ready for implementation.
+- [ ] Implementation mapping, GVC scenario plan and design decision log stay aligned before moving `UI ready` to `yes`.

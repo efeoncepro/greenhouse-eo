@@ -94,6 +94,15 @@
 - Assertions: selected state remains visible without motion, focus restore after drawer close, no console/page errors, no horizontal overflow.
 - Reduced-motion evidence: either a reduced-motion GVC pass or a documented primitive-level reduced-motion contract.
 
+## Design Decision Log
+
+- Decision: keep motion functional and local to selection feedback, sidecar/drawer continuity and pending/disabled cues.
+- Alternatives considered: animated score count-up, full report entrance choreography, bespoke drawer transitions.
+- Why this pattern: the score is an estimate and the task is decision support; motion should orient and confirm, not dramatize.
+- Reuse / extend / new primitive: reuse primitive motion defaults and tokenized CSS; no direct GSAP/Framer imports in the view.
+- Open risks: if TASK-1252 introduces artifact-level motion, this view must inherit those primitives instead of duplicating.
+- Follow-up: add reduced-motion capture once the runtime scenario exists.
+
 ## Acceptance Checklist
 
 - [ ] `TASK-1248` declares this file in `Motion`.
@@ -103,3 +112,4 @@
 - [ ] The score and chart values do not animate in a way that overstates precision.
 - [ ] No direct animation library imports are introduced in the view.
 - [ ] GVC/micro evidence proves selection, drawer close and focus restore.
+- [ ] Design decision log explains why motion remains subordinate to decision support.

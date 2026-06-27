@@ -57,7 +57,8 @@ Every motion contract should include:
 8. **Accessibility & Feedback** — focus, live regions, color-independent state.
 9. **Performance Guardrails** — compositor-only expectations and no layout thrash.
 10. **GVC/Micro Evidence** — sequence captures, frame labels and assertions.
-11. **Acceptance Checklist** — binary checks for implementation.
+11. **Design Decision Log** — why motion is needed and what was rejected.
+12. **Acceptance Checklist** — binary checks for implementation.
 
 ## Relationship To Other UI Contracts
 
@@ -67,3 +68,6 @@ Every motion contract should include:
 - If motion is purely the default behavior of an existing primitive and does not
   change meaning, a separate motion contract is not required; declare
   `Motion: none` and rely on the primitive contract.
+- `UI ready: yes` requires the declared motion contract to include both
+  `## GVC / Micro Evidence` and `## Design Decision Log` when `Motion` is not
+  `none`.

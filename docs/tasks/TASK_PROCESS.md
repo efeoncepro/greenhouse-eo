@@ -28,7 +28,7 @@ Para tasks con impacto backend/data, ver [`TASK_BACKEND_DATA_ADDENDUM.md`](TASK_
 - Consultar `docs/tasks/TASK_ID_REGISTRY.md` para reservar el siguiente ID disponible antes de crear una task nueva
 - Si la task pertenece a un programa mayor, declarar `Epic: EPIC-###` dentro de `## Status` y sincronizarla con `docs/epics/`
 - Branch convention: `task/TASK-###-short-slug` (e.g., `task/TASK-003-finance-dashboard-fix`)
-- Las tasks con UI visible usan el mismo `TASK-###`, pero declaran `Execution profile: ui-ux`, `UI impact`, `Wireframe: docs/ui/wireframes/...`, `Flow: docs/ui/flows/...|none`, `Motion: docs/ui/motion/...|none` y completan `## UI/UX Contract`.
+- Las tasks con UI visible usan el mismo `TASK-###`, pero declaran `Execution profile: ui-ux`, `UI impact`, `UI ready`, `Wireframe: docs/ui/wireframes/...`, `Flow: docs/ui/flows/...|none`, `Motion: docs/ui/motion/...|none` y completan `## UI/UX Contract`.
 - Las tasks con backend/data usan el mismo `TASK-###`, pero declaran `Execution profile: backend-data`, `Backend impact` y completan `## Backend/Data Contract`.
 
 ---
@@ -50,7 +50,7 @@ El campo `Type` en Zone 0 determina que zonas y pasos aplican. Cuando hay duda, 
 | Execution profile | Cuando usar | Contrato adicional |
 |---|---|---|
 | `standard` | Docs, tooling o cambios sin superficie visible ni contrato runtime/data relevante | Template base |
-| `ui-ux` | Cualquier cambio visible, copy, layout, estados, interaccion, motion, primitive, flujo o GVC | `Wireframe: docs/ui/wireframes/...` + `Flow: docs/ui/flows/...` cuando aplique + `Motion: docs/ui/motion/...` cuando aplique + `## UI/UX Contract` desde `TASK_UI_UX_ADDENDUM.md` |
+| `ui-ux` | Cualquier cambio visible, copy, layout, estados, interaccion, motion, primitive, flujo o GVC | `UI ready: no|yes` + `Wireframe: docs/ui/wireframes/...` + `Flow: docs/ui/flows/...` cuando aplique + `Motion: docs/ui/motion/...` cuando aplique + `## UI/UX Contract` desde `TASK_UI_UX_ADDENDUM.md` |
 | `backend-data` | API, DB, readers, commands, migrations, sync, cron, webhook, integration o source-of-truth/data contract | `## Backend/Data Contract` desde `TASK_BACKEND_DATA_ADDENDUM.md` |
 
 `UI impact` ayuda a clasificar el alcance visible:
@@ -230,6 +230,13 @@ Reglas V1:
   apuntando a un archivo existente. En revision focal (`--task`) o cambios (`--changed`)
   esto es `error`; menciones de motion/microinteracciones/animaciones/transiciones con
   `Motion: none` generan warning para forzar decision explicita.
+- Tasks template con impacto UI/UX deben declarar `UI ready: no|yes|n/a`; ausencia
+  genera warning para rollout gradual. `UI ready: yes` es gate duro en revision focal
+  o cambios: exige `## UI/UX Contract` con `### Implementation mapping`,
+  `### GVC scenario plan` y `### Design decision log`; ademas exige que el wireframe
+  tenga `## Implementation Mapping`, `## GVC Scenario Plan` y `## Design Decision Log`.
+  Si hay `Flow` o `Motion` declarados, esos contratos tambien deben incluir sus planes
+  de evidencia y decision log. Hasta entonces la task debe quedarse en `UI ready: no`.
 - Tasks template con impacto UI/UX sin `## UI/UX Contract` y tasks template con impacto backend/data sin
   `## Backend/Data Contract` generan `warning` en rollout warn-first; no bloquean hasta que el backlog
   nuevo demuestre adopcion estable.

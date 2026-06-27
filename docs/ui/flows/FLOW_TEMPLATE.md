@@ -97,12 +97,25 @@
 ## GVC Scenario Plan
 
 - Scenario:
+- Scenario file:
+- Route:
 - Viewports:
 - Required steps:
+- Required captures:
 - Required `data-capture` markers:
 - Assertions:
 - Scroll-width checks:
 - Accessibility/focus checks:
+- Reduced-motion evidence:
+
+## Design Decision Log
+
+- Decision:
+- Alternatives considered:
+- Why this pattern:
+- Reuse / extend / new primitive:
+- Open risks:
+- Follow-up:
 
 ## Acceptance Checklist
 
@@ -113,3 +126,4 @@
 - [ ] Data readers/commands are named and UI-only business logic is avoided.
 - [ ] Failure paths are user-safe and do not expose internals.
 - [ ] GVC sequence captures prove the flow, not only static screens.
+- [ ] Design decision log explains why the flow uses these surfaces/routes.
