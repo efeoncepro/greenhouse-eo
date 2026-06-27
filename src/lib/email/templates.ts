@@ -1,5 +1,6 @@
 import 'server-only'
 
+import AiVisibilityGraderReportEmail, { type AiVisibilityReportEmailInsight } from '@/emails/AiVisibilityGraderReportEmail'
 import InvitationEmail from '@/emails/InvitationEmail'
 import LeaveRequestDecisionEmail from '@/emails/LeaveRequestDecisionEmail'
 import LeaveRequestPendingReviewEmail from '@/emails/LeaveRequestPendingReviewEmail'
@@ -1471,5 +1472,121 @@ registerPreviewMeta('quote_share', {
     { key: 'customMessage', label: 'Mensaje custom', type: 'text' },
     { key: 'hasPdfAttached', label: 'Incluye PDF', type: 'boolean' },
     { key: 'pdfFileName', label: 'Nombre del PDF', type: 'text' }
+  ]
+})
+
+// ── TASK-1250 — AI Visibility Grader report delivery (Efeonce lead magnet) ──────
+
+interface AiVisibilityReportEmailContext extends EmailTemplateContext {
+  organizationName: string
+  scoreValue: number | null
+  levelLabel: string | null
+  primaryGapTitle: string | null
+  isPartial: boolean
+  insight: AiVisibilityReportEmailInsight | null
+  reportUrl: string
+  attachmentFilename: string
+  attachmentSizeLabel: string | null
+  /** PDF bytes built server-side from the frozen PublicGraderReport snapshot (TASK-1273). Optional in preview. */
+  pdfBuffer?: Buffer
+  locale?: 'es' | 'en'
+}
+
+const buildAiVisibilityReportPlainText = (context: AiVisibilityReportEmailContext) => {
+  const isEn = context.locale === 'en'
+
+  const scoreLine = context.scoreValue === null
+    ? (isEn ? 'Estimated visibility: no data' : 'Visibilidad estimada: sin dato')
+    : (isEn ? `Estimated visibility: ${context.scoreValue} / 100` : `Visibilidad estimada: ${context.scoreValue} / 100`)
+
+  const partialLine = isEn
+    ? 'Partial delivery: some engines did not respond in time.'
+    : 'Entrega parcial: algunos motores no respondieron a tiempo.'
+
+  return [
+    isEn ? 'Your AI visibility report is ready' : 'Tu informe de visibilidad en IA está listo',
+    '',
+    isEn
+      ? `We analyzed how ${context.organizationName} shows up across AI engines and search.`
+      : `Analizamos la visibilidad de ${context.organizationName} en los motores de IA y buscadores.`,
+    context.isPartial ? partialLine : '',
+    '',
+    scoreLine,
+    context.primaryGapTitle ? (isEn ? `Main gap: ${context.primaryGapTitle}` : `Brecha principal: ${context.primaryGapTitle}`) : '',
+    '',
+    isEn ? `Open your secure report: ${context.reportUrl}` : `Abre tu informe seguro: ${context.reportUrl}`,
+    isEn
+      ? `The full report is attached as a PDF (${context.attachmentFilename}).`
+      : `El informe completo va adjunto en PDF (${context.attachmentFilename}).`,
+    '',
+    '— Efeonce · efeoncepro.com'
+  ].filter(Boolean).join('\n')
+}
+
+registerTemplate('ai_visibility_grader_report', (context: AiVisibilityReportEmailContext) => {
+  const isEn = context.locale === 'en'
+
+  return {
+    subject: isEn
+      ? (context.isPartial
+        ? 'Your AI visibility report is ready (partial delivery) — Efeonce'
+        : 'Your AI visibility report is ready — Efeonce')
+      : getMicrocopy().emails.subjects.aiVisibilityGraderReport(context.isPartial),
+    react: AiVisibilityGraderReportEmail({
+      organizationName: context.organizationName,
+      scoreValue: context.scoreValue,
+      levelLabel: context.levelLabel,
+      primaryGapTitle: context.primaryGapTitle,
+      isPartial: context.isPartial,
+      insight: context.insight,
+      reportUrl: context.reportUrl,
+      attachmentFilename: context.attachmentFilename,
+      attachmentSizeLabel: context.attachmentSizeLabel,
+      locale: context.locale ?? 'es'
+    }),
+    text: buildAiVisibilityReportPlainText(context),
+    ...(context.pdfBuffer
+      ? {
+        attachments: [{
+          filename: context.attachmentFilename,
+          content: context.pdfBuffer,
+          contentType: 'application/pdf'
+        }]
+      }
+      : {})
+  }
+})
+
+registerPreviewMeta('ai_visibility_grader_report', {
+  label: 'Informe de visibilidad en IA (lead magnet Efeonce)',
+  description: 'Entrega del informe del AI Visibility Grader al lead: resumen + insight prioritario + link tokenizado + PDF adjunto público-safe. Marca Efeonce (agencia), no el portal.',
+  domain: 'growth',
+  supportsLocale: true,
+  defaultProps: {
+    organizationName: 'Tu marca',
+    scoreValue: 72,
+    levelLabel: 'Intermedio',
+    primaryGapTitle: 'Autoridad temática',
+    isPartial: false,
+    insight: {
+      detection: 'Tu marca aparece en IA y buscadores, pero con baja asociación temática en tu categoría.',
+      importance: 'Limita tu visibilidad en respuestas generativas y en resultados relevantes.',
+      action: 'Publica 2-3 contenidos pilar sobre tus temas clave y consigue menciones en sitios de tu industria.'
+    },
+    reportUrl: 'https://greenhouse.efeoncepro.com/grader/r/grt-preview-token',
+    attachmentFilename: 'informe-visibilidad-ia.pdf',
+    attachmentSizeLabel: '~2 MB',
+    locale: 'es'
+  },
+  propsSchema: [
+    { key: 'organizationName', label: 'Marca evaluada', type: 'text' },
+    { key: 'scoreValue', label: 'Visibilidad estimada (0-100)', type: 'number' },
+    { key: 'levelLabel', label: 'Nivel', type: 'text' },
+    { key: 'primaryGapTitle', label: 'Brecha principal', type: 'text' },
+    { key: 'isPartial', label: 'Entrega parcial', type: 'boolean' },
+    { key: 'reportUrl', label: 'Link tokenizado', type: 'text' },
+    { key: 'attachmentFilename', label: 'Nombre del adjunto', type: 'text' },
+    { key: 'attachmentSizeLabel', label: 'Tamaño del adjunto', type: 'text' },
+    { key: 'locale', label: 'Idioma', type: 'select', options: ['es', 'en'] }
   ]
 })

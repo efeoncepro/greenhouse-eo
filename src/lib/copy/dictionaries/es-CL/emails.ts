@@ -337,6 +337,50 @@ export const emails: EmailsCopy = {
     defaultClosingNote: 'Resumen automático basado en los insights materializados del período. Abre Greenhouse para ver el detalle completo.',
     plainTextOpenPortal: 'Abre el portal para ver el detalle completo.'
   },
+  growth: {
+    aiVisibilityReport: {
+      previewText: () => 'Tu informe de visibilidad en IA está listo',
+      heading: 'Recibiste tu informe completo',
+      headingPartial: 'Tu informe de visibilidad está listo',
+      greeting: 'Hola,',
+      intro: organizationName =>
+        `Analizamos la visibilidad de ${organizationName} en los motores de IA y buscadores. Acá tienes tu hallazgo principal; el informe completo va adjunto en PDF y disponible por un enlace seguro.`,
+      partialBanner:
+        'Entrega parcial: algunos motores no respondieron a tiempo. El informe refleja los resultados disponibles.',
+      summary: {
+        scoreLabel: 'Visibilidad estimada',
+        scoreSuffix: '/ 100',
+        scoreEmpty: 'Sin dato',
+        levelLabel: 'Nivel',
+        gapLabel: 'Brecha principal',
+        gapEmpty: '—',
+        contentLabel: 'Contenido',
+        contentValue: 'Público · apto para compartir'
+      },
+      insight: {
+        eyebrow: 'Prioridad #1',
+        detectionLabel: 'Qué detectamos',
+        importanceLabel: 'Por qué importa',
+        actionLabel: 'Qué hacer ahora'
+      },
+      cta: 'Abrir informe seguro',
+      ctaHelp: 'El enlace te da acceso seguro al informe en línea y al PDF adjunto del reporte.',
+      attachment: {
+        title: 'Informe completo adjunto',
+        formatPrefix: 'Documento PDF',
+        description: 'Contiene el análisis detallado, las brechas, las oportunidades y los próximos pasos.'
+      },
+      why: {
+        title: '¿Por qué recibiste este informe?',
+        body: 'Lo solicitaste desde el diagnóstico de visibilidad en IA y aceptaste recibirlo. Es público y seguro de compartir: no incluye información confidencial.'
+      },
+      fallback: {
+        title: 'Si el botón no funciona, copia este enlace seguro',
+        note: 'Por tu seguridad, este enlace tiene una expiración.'
+      },
+      automatedFooter: () => 'Efeonce Group SpA · Correo automático del diagnóstico de visibilidad en IA. efeoncepro.com'
+    }
+  },
   notificationCategories: {
     delivery_update: {
       label: 'Delivery updates',
@@ -416,6 +460,10 @@ export const emails: EmailsCopy = {
     leaveReviewConfirmation: leaveTypeName => `Revisión registrada — ${leaveTypeName}`,
     leaveRequestSubmitted: leaveTypeName => `Solicitud de permiso enviada — ${leaveTypeName}`,
     leaveRequestPendingReview: (memberName, leaveTypeName) => `${memberName} — ${leaveTypeName}`,
-    quoteShare: (quotationNumber, versionNumber, clientName) => `Propuesta ${quotationNumber} v${versionNumber} para ${clientName}`
+    quoteShare: (quotationNumber, versionNumber, clientName) => `Propuesta ${quotationNumber} v${versionNumber} para ${clientName}`,
+    aiVisibilityGraderReport: isPartial =>
+      isPartial
+        ? 'Tu informe de visibilidad en IA está listo (entrega parcial) — Efeonce'
+        : 'Tu informe de visibilidad en IA está listo — Efeonce'
   }
 }

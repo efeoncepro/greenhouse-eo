@@ -2,9 +2,21 @@ import {
   Body, Container, Head, Hr, Html, Img, Link, Preview, Section, Text
 } from '@react-email/components'
 
+import { EFEONCE_SLOGAN_TEXT, EFEONCE_URL_HTTPS } from '@/config/efeonce-brand'
 import { getMicrocopy } from '@/lib/copy'
 
-import { APP_URL, EMAIL_COLORS, EMAIL_FONTS, LOGO_URL } from '../constants'
+import { APP_URL, EFEONCE_LOGO_URL, EMAIL_COLORS, EMAIL_FONTS, LOGO_URL } from '../constants'
+
+/**
+ * Brand masthead identity of the email.
+ *  - `greenhouse` (default): the Efeonce PLATFORM — used by every portal/transactional
+ *    email to a user who logs into Greenhouse.
+ *  - `efeonce`: the AGENCY brand — used by public, agency-facing surfaces (e.g. the
+ *    AI Visibility Grader lead magnet, TASK-1250) sent to cold prospects who do NOT
+ *    know the portal. NOTE: "Efeonce Greenhouse" is NOT a brand — it's carried debt
+ *    in the default from-address + greenhouse tagline; do not perpetuate it.
+ */
+export type EmailBrand = 'greenhouse' | 'efeonce'
 
 interface EmailLayoutProps {
   children: React.ReactNode
@@ -12,6 +24,7 @@ interface EmailLayoutProps {
   lang?: 'es' | 'en'
   locale?: 'es' | 'en'
   unsubscribeUrl?: string
+  brand?: EmailBrand
 }
 
 const LEGACY_EN_LAYOUT_COPY = {
@@ -19,9 +32,10 @@ const LEGACY_EN_LAYOUT_COPY = {
   unsubscribe: 'Unsubscribe from these emails'
 }
 
-export default function EmailLayout({ children, previewText, lang, locale = 'es', unsubscribeUrl }: EmailLayoutProps) {
+export default function EmailLayout({ children, previewText, lang, locale = 'es', unsubscribeUrl, brand = 'greenhouse' }: EmailLayoutProps) {
   const effectiveLang = lang ?? locale
   const layoutCopy = getMicrocopy().emails.layout
+  const isEfeonceBrand = brand === 'efeonce'
 
   const automatedDisclaimer = effectiveLang === 'en'
     ? LEGACY_EN_LAYOUT_COPY.automatedDisclaimer
@@ -30,6 +44,16 @@ export default function EmailLayout({ children, previewText, lang, locale = 'es'
   const unsubscribeLabel = effectiveLang === 'en'
     ? LEGACY_EN_LAYOUT_COPY.unsubscribe
     : layoutCopy.unsubscribe
+
+  // Masthead identity: Efeonce (agency) for public lead-magnet surfaces, Greenhouse
+  // (platform) for portal emails. "Efeonce Greenhouse" is never a brand here.
+  const mastheadHref = isEfeonceBrand ? EFEONCE_URL_HTTPS : APP_URL
+  const mastheadLogoSrc = isEfeonceBrand ? EFEONCE_LOGO_URL : LOGO_URL
+  const mastheadLogoAlt = isEfeonceBrand ? 'Efeonce' : layoutCopy.logoAlt
+  // Efeonce wordmark is 520×122 (≈4.26:1); keep aspect at 150×35 to avoid distortion.
+  const mastheadLogoWidth = isEfeonceBrand ? 150 : 160
+  const mastheadLogoHeight = isEfeonceBrand ? 35 : 37
+  const footerTagline = isEfeonceBrand ? EFEONCE_SLOGAN_TEXT : layoutCopy.tagline
 
   return (
     <Html lang={effectiveLang} dir="ltr">
@@ -55,12 +79,12 @@ export default function EmailLayout({ children, previewText, lang, locale = 'es'
           padding: '28px 0 24px',
           textAlign: 'center' as const,
         }}>
-          <Link href={APP_URL} style={{ textDecoration: 'none' }}>
+          <Link href={mastheadHref} style={{ textDecoration: 'none' }}>
             <Img
-              src={LOGO_URL}
-              alt={layoutCopy.logoAlt}
-              width={160}
-              height={37}
+              src={mastheadLogoSrc}
+              alt={mastheadLogoAlt}
+              width={mastheadLogoWidth}
+              height={mastheadLogoHeight}
               style={{ margin: '0 auto', display: 'block' }}
             />
           </Link>
@@ -98,7 +122,7 @@ export default function EmailLayout({ children, previewText, lang, locale = 'es'
             lineHeight: '20px',
             margin: '0 0 4px',
           }}>
-            {layoutCopy.tagline}
+            {footerTagline}
           </Text>
           <Text style={{
             fontFamily: EMAIL_FONTS.body,

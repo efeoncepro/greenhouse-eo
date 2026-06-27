@@ -1,6 +1,6 @@
 import type { ReactElement } from 'react'
 
-export type EmailDomain = 'identity' | 'payroll' | 'finance' | 'hr' | 'delivery' | 'system'
+export type EmailDomain = 'identity' | 'payroll' | 'finance' | 'hr' | 'delivery' | 'system' | 'growth'
 
 export type EmailType =
   | 'password_reset'
@@ -21,6 +21,7 @@ export type EmailType =
   | 'leave_request_pending_review'
   | 'quote_share'
   | 'contractor_remittance_paid'
+  | 'ai_visibility_grader_report'
 
 export type EmailDeliveryStatus = 'pending' | 'sent' | 'failed' | 'skipped' | 'rate_limited' | 'delivered' | 'dead_letter'
 
@@ -50,6 +51,7 @@ export const EMAIL_PRIORITY_MAP: Record<string, EmailPriority> = {
   weekly_executive_digest:      'broadcast',
   quote_share:                  'transactional',
   contractor_remittance_paid:   'transactional',
+  ai_visibility_grader_report:  'transactional',
 }
 
 export interface EmailRecipient {

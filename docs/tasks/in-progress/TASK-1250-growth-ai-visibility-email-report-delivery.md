@@ -31,7 +31,7 @@ TASK-1251 **preservó `grader_leads` como la fuente del lead** (email + consent)
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Medio`
