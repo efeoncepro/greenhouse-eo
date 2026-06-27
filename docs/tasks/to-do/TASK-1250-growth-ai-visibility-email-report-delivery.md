@@ -1,5 +1,22 @@
 # TASK-1250 — Growth AI Visibility: Email Report Delivery
 
+## Delta 2026-06-27 — Renderer PDF premium del adjunto LISTO (TASK-1273, complete)
+
+El adjunto ya NO necesita ser print-HTML: TASK-1273 entregó el renderer PDF real. **Para el attachment, invocar:**
+
+```ts
+import { renderAiVisibilityReportPdf, modelFromPublicReport } from '@/components/growth/ai-visibility/report-artifact'
+
+const model = modelFromPublicReport(publicReport, 'attachment')
+const pdfBuffer = await renderAiVisibilityReportPdf({
+  model,
+  header: { organizationName, reportDate, periodLabel }
+})
+// adjuntar pdfBuffer como application/pdf (filename p.ej. `informe-visibilidad-ia-<org>.pdf`)
+```
+
+Es server-only (usa `renderToBuffer`), leak-safe por construcción (solo variant `attachment`), 4 páginas A4 con fuentes embebidas. **Open Question V1 de TASK-1273 (¿PDF directo o print-HTML como fallback?) = decisión de ESTA task:** se recomienda el PDF directo (fidelidad cross-cliente real); el print-HTML queda disponible como fallback si se quiere validar tamaño/entregabilidad antes. Mantener `has_attachments=true` + leak test del attachment.
+
 ## Delta 2026-06-27 — Report Artifact Design System implementado (TASK-1252)
 
 El informe adjunto completo YA tiene su adapter: `AiVisibilityReportPrint` (print/PDF-safe, sin JS/motion/Recharts) desde `@/components/growth/ai-visibility/report-artifact`, con `model={modelFromPublicReport(publicReport, 'attachment')}`. El cuerpo del email (resumen breve) sigue siendo el React Email de esta task — NO confundir: attachment = documento standalone print-safe; email body = constraints de email-client. V1 del attachment es print-HTML; renderer PDF premium queda como follow-up declarado en TASK-1252.

@@ -1,5 +1,9 @@
 # TASK-1252 — Growth AI Visibility: Report Artifact Design System
 
+## Delta 2026-06-27 — deuda conocida cerrada: renderer PDF premium (TASK-1273)
+
+La deuda conocida declarada por esta task ("V1 del attachment es print-HTML; renderer PDF premium = follow-up") **quedó cerrada por TASK-1273**: existe un tercer render adapter PDF real (`report-artifact/pdf/AiVisibilityReportPdf.tsx` + `renderAiVisibilityReportPdf`), sobre el mismo `ReportArtifactModel` (variant `attachment`), con paridad de disclosure. El print-HTML (`AiVisibilityReportPrint`) sigue disponible; TASK-1250 decide cuál adjuntar.
+
 ## Delta 2026-06-27 — estructurar el top-line del informe por los 5 niveles del framework Efeonce
 
 - **Recomendación de producto (de la revisión del framework propietario "Niveles para existir en un internet de agentes"):** el top-line del report artifact debe estructurarse **literalmente como los niveles del framework** — **Be Found · Be Readable · Be Correct · Be Actionable · Be Intrinsic** — con las 7 dimensiones de percepción + los 2 ejes de readiness (TASK-1266) mapeados **debajo** de cada nivel. Así el lead magnet y el pitch comercial hablan el mismo idioma: el prospecto ve su score en los mismos niveles que la agencia le vende.

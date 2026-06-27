@@ -1,3 +1,15 @@
+## Sesion 2026-06-27 — TASK-1273 AI Visibility Report PDF Premium Renderer — Claude — ✅ complete (local, sin push)
+
+> **Estado: complete en repo local (develop local-first, sin push).** Tercer render adapter del report artifact (web · print-HTML · **PDF**), sobre el mismo `ReportArtifactModel`, cerrando la deuda de TASK-1252. Implementado tras aprobar el mockup en loop con el operador (5 iteraciones de dirección: portada full-navy, assets de marca reales embebidos, eslogan canónico al cierre, redistribución de páginas, gauge parcial real).
+> - **Archivos nuevos:** `src/components/growth/ai-visibility/report-artifact/pdf/{AiVisibilityReportPdf.tsx, render-ai-visibility-report-pdf.ts, report-pdf-tokens.ts}` + `__tests__/report-artifact-pdf-no-leak.test.tsx`; barrel `index.ts` exporta el renderer; `scripts/build-pdf-brand-assets.ts` extendido (REPORT_ASSETS) → PNGs en `public/branding/pdf/{efeonce-wordmark-white,engine-gemini,engine-gpt,engine-claude,engine-perplexity}.png`; source `public/images/logos/axis/perplexity-icon.svg`; exención eslint `report-artifact/pdf/**`.
+> - **Entrypoint para TASK-1250:** `renderAiVisibilityReportPdf({ model, header })` → `Buffer` PDF. `model = modelFromPublicReport(publicReport, 'attachment')`; `header: ReportHeader = { organizationName, reportDate, periodLabel }`. Reusa `ensurePdfFontsRegistered`/`EfeoncePdfFooter`/`EfeonceSloganPdf` de `src/lib/finance/pdf/`.
+> - **Aprendizajes react-pdf (load-bearing):** (1) `<Image>` con `width:'auto'` deforma el logo → ancho explícito por aspecto. (2) `<Svg>` sobre `Page.backgroundColor` corrompe color (ámbar→verde) y dasharray → pintar el navy con un `View` de fondo + usar `<Path>` con colores opacos. (3) `strokeDasharray` de un valor pinta el anillo completo → arco por `<Path A>`. (4) un `<Text>` con `justifyContent` NO centra vertical → envolver el número en `<View>`. (5) `<Image>` solo PNG/JPG (no SVG) → rasterizar.
+> - **Gates verdes:** report-artifact 9/9 (incl. no-leak + render smoke), `pnpm typecheck`, `pnpm lint` full, `pnpm build` prod (boundary server-only/client del barrel OK). Sin migración/flag.
+> - **Nota:** `tsconfig.json` apareció truncado a 0 bytes mid-build (probable race del primer build que maté con SIGTERM o proceso concurrente); restaurado con `git checkout`. Vigilar si reaparece.
+> - **Pendiente menor (no bloqueante):** "Versión del score" muestra el valor crudo `ai_visibility_score_v1` (real, paridad con print adapter); si se quiere un display amigable, es follow-up de copy.
+
+---
+
 ## Sesion 2026-06-27 — TASK-1252 AI Visibility Report Artifact Design System — Claude — ✅ complete (local, sin push)
 
 > **Estado: complete en repo local (develop local-first, sin push).** Se implementó el sistema reusable feature-local del informe del AI Visibility Grader (`/implement-task 1252`, slices A→E) tras aprobar el mockup. Decisión: feature-local (Open Question 2), NO primitive platform-level.

@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Medio`
@@ -225,14 +225,14 @@ El PDF es el tercer render adapter del report artifact (web · print-HTML · PDF
 
 ## Acceptance Criteria
 
-- [ ] Existe `AiVisibilityReportPdf` que renderiza un PDF real desde `ReportArtifactModel` (variant `attachment`).
-- [ ] El PDF tiene cover standalone con marca Efeonce desde el SSOT (sin `AxisWordmark`).
-- [ ] Paridad de secciones y disclosure con el print adapter (sin trend ni engine snapshot; público-safe).
-- [ ] Charts como SVG/tabla estática; documento sin JS runtime ni comportamiento dinámico.
-- [ ] Paginación A4 sin cortes a mitad de bloque; fuentes embebidas.
-- [ ] No-leak test verde sobre el render PDF (sin `providerFindings`/`accuracyFindings`/raw text/IDs internos).
-- [ ] El renderer se exporta desde el barrel `report-artifact/index.ts`.
-- [ ] TASK-1250 queda documentada sobre cómo invocar el renderer para el adjunto.
+- [x] Existe `AiVisibilityReportPdf` que renderiza un PDF real desde `ReportArtifactModel` (variant `attachment`).
+- [x] El PDF tiene cover standalone con marca Efeonce desde el SSOT (sin `AxisWordmark`).
+- [x] Paridad de secciones y disclosure con el print adapter (sin trend ni engine snapshot crudo; público-safe). Nota: la presencia por motor (engineSnapshot, conteos + logos) SÍ es pública en attachment per disclosure matrix; lo internal-only es la narrativa cruda.
+- [x] Charts vectoriales (`<Svg><Path>` gauge + barras `View`); documento sin JS runtime ni comportamiento dinámico.
+- [x] Paginación A4 (4 páginas) sin cortes a mitad de bloque; fuentes embebidas (`ensurePdfFontsRegistered`).
+- [x] No-leak test verde sobre el render PDF (sin `providerFindings`/`accuracyFindings`/raw text/IDs internos) + render smoke `%PDF-`.
+- [x] El renderer se exporta desde el barrel `report-artifact/index.ts` (`AiVisibilityReportPdf` + `renderAiVisibilityReportPdf`).
+- [x] TASK-1250 queda documentada sobre cómo invocar el renderer para el adjunto (Delta en su spec con snippet).
 
 ## Verification
 
@@ -243,12 +243,12 @@ El PDF es el tercer render adapter del report artifact (web · print-HTML · PDF
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` sincronizado (`in-progress`/`complete`)
-- [ ] archivo en la carpeta correcta
-- [ ] `docs/tasks/README.md` + `TASK_ID_REGISTRY.md` sincronizados
-- [ ] `Handoff.md` + `changelog.md` actualizados
-- [ ] `EPIC-020` y `TASK-1250` sincronizados como consumer del renderer
-- [ ] chequeo de impacto cruzado ejecutado
+- [x] `Lifecycle` sincronizado (`complete`)
+- [x] archivo en la carpeta correcta (`complete/`)
+- [x] `docs/tasks/README.md` + `TASK_ID_REGISTRY.md` sincronizados
+- [x] `Handoff.md` + `changelog.md` actualizados
+- [x] `EPIC-020` y `TASK-1250` sincronizados como consumer del renderer (Delta en TASK-1250)
+- [x] chequeo de impacto cruzado ejecutado (TASK-1250 consumer + TASK-1252 deuda cerrada)
 
 ## Follow-ups
 
