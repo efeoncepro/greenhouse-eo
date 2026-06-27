@@ -18,7 +18,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-020`
-- Status real: `Diseno`
+- Status real: `Diseno — DataForSEO connection prep done; provider implementation pending`
 - Rank: `TBD`
 - Domain: `growth|ai|integrations|reliability`
 - Blocked by: `none`
@@ -102,6 +102,7 @@ Reglas obligatorias:
 - Policy resolver con cost guard + tier-down (`policy.ts`, `cost.ts`).
 - Normalización + scoring agnósticos del provider (consumen `GrowthAiVisibilityProviderObservation`).
 - Golden eval set + smoke harness (`evals/`).
+- Preparatory connection slice (2026-06-27): DataForSEO fue seleccionado como fuente SERP/answer-engine para esta task; el acceso se aprovisiona como Secret Manager ref `greenhouse-dataforseo-api-password` + env `DATAFORSEO_API_LOGIN`/`DATAFORSEO_API_PASSWORD_SECRET_REF`; el cliente canónico vive en `src/lib/ai/dataforseo.ts`. Esto **no** implementa todavía el provider `google_ai_overview`, no toca el adapter registry, no extiende el enum/check DB, no enciende flags y no ejecuta smoke real del grader.
 
 ### Gap
 
@@ -290,5 +291,5 @@ El provider de AI Overviews es estructuralmente un adapter más: recibe `(prompt
 
 ## Open Questions
 
-1. ¿Qué fuente SERP/answer-engine se contrata (DataForSEO / Serper / SerpAPI)? Decide costo, cobertura de citas y ToS. Propuesta: la de mejor relación cobertura-de-AI-Overview / costo, con bloque de citas estructurado.
+1. ¿Qué fuente SERP/answer-engine se contrata (DataForSEO / Serper / SerpAPI)? → **Resuelta 2026-06-27:** DataForSEO queda seleccionado como fuente inicial. Prep slice ya dejó cliente canónico + Secret Manager/Vercel env refs, pero el provider `google_ai_overview` completo sigue pendiente.
 2. ¿El provider id vive como enum DB o como constante TS? Confirmar en Discovery para decidir si hay migration o solo cambio de código.
