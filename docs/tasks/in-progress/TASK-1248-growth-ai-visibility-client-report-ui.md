@@ -29,7 +29,7 @@ El render del reporte YA existe como sistema reusable feature-local: consumir `A
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -213,6 +213,17 @@ Reglas obligatorias:
 
 ## Scope
 
+### Slice 0 — Primitive: composición `masterDetail` en CompositionShell (NUEVO, decidido 2026-06-27)
+
+Discovery del implement-task detectó que el concepto C (master-detail) **NO mapea** a ninguna composición vigente de `CompositionShell` (`single`/`leadPlusContext`/`split`/`focused`). `split` = `minmax(0,1fr)` + `clamp(320px,32%,480px)` (primary ancho + **aside angosto que colapsa a drawer**) = patrón del concepto A. El operador eligió **extender la primitive** (camino canónico, reusable). Slice 0 (Primitive+Variants+Kinds completo, ANTES de la vista):
+
+- Agregar composición **`masterDetail`** a `composition-shell-types.ts` (`CompositionShellComposition` union) + `COMPOSITION_SHELL_COMPOSITION_CONFIG` (controller) + `KIND_TO_COMPOSITION` si aplica.
+- Layout nuevo: **nav angosto IZQUIERDA + detail ancho DERECHA** (`clamp(280px,32%,400px) minmax(0,1fr)`), inverso al `split`. En compact: **el DETAIL (ancho) colapsa a drawer al seleccionar**, el nav (angosto) se queda — semántica de drawer invertida respecto a `split` (hoy colapsa el `aside`). Region min-sizes ajustadas.
+- Hornear a11y (foco/teclado/SR del navigator + detail), reduced-motion, view-transition per-instance (sin romper el guard de singleton VT-name), y NO regresionar los 3 consumers vivos de `split` (RoadmapCockpitView, growth-forms-renderer preview).
+- **Lab interno** en `/admin/design-system/composition-shell` (o el Lab vigente de la primitive) mostrando `masterDetail` + registrar en el catálogo del design system + route-reachability.
+- **GVC** del Lab (desktop+mobile) + contrato en `docs/architecture/ui-platform/PRIMITIVES.md` (CompositionShell §masterDetail) + nodo AXIS si aplica.
+- Tests: no-regresión de los consumers `split` + el morph/VT del nuevo layout.
+
 ### Slice 1 — Client route and data binding
 
 - Crear ruta cliente que consume el reader/API de `TASK-1243`.
@@ -260,7 +271,7 @@ La vista cliente debe ser un consumer autenticado del mismo artefacto de reporte
 
 ### Slice ordering hard rule
 
-Slice 1 -> Slice 2 -> Slice 3 -> Slice 4. No agregar CTAs mutativos si no existe command gobernado.
+**Slice 0 (primitive `masterDetail` en CompositionShell + Lab + GVC + no-regresión de los consumers `split`) MUST ship ANTES de Slice 1** — la vista cliente consume la composición nueva. Luego Slice 1 -> 2 -> 3 -> 4. No agregar CTAs mutativos si no existe command gobernado. La primitive toca blast radius compartido → su slice se hace con cuidado (protocolo completo + no-regresión), idealmente en sesión dedicada.
 
 ### Risk matrix
 
