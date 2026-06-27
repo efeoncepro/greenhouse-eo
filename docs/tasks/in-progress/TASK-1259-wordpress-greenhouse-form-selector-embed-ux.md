@@ -1,5 +1,12 @@
 # TASK-1259 — WordPress Greenhouse Form Selector + Embed UX
 
+## Delta 2026-06-26 (sesión Claude — selector construido, deploy/verificación pendientes)
+
+- **Desbloqueada:** la precondición backend (catálogo + auth) la entregó y verificó live (staging) TASK-1258. 1259 es cliente puro.
+- **Slice 1 (contract) + Slice 2 (selector Elementor) construidos** en el runtime repo `efeonce-public-site-runtime` (commit `27c1468`, plugin `eo-elementor-widgets` v0.7.0→v0.8.0, **sin deploy a Kinsta**): `class-eo-growth-catalog-client.php` (proxy server-side al catálogo de TASK-1258, embed key per-site desde constantes wp-config, transient cache, degradación honesta) + widget con SELECT formulario+surface poblados del catálogo, backward-compatible con los inputs manuales. `php -l` OK.
+- **Decisión arquitectura (arch-architect):** config-driven + degradación honesta, apunta a prod por default. **RECHAZADO** bypass SSO de staging en wp-config de prod. End-state (plugin vivo → catálogo prod) = rollout prod del catálogo (release control plane), no disparado aquí.
+- **Pendiente operador-coordinado:** deploy a Kinsta (`scp`+cache purge) · rollout prod del catálogo (para que el dropdown puebla end-to-end) · verificación editor vivo + GVC · **Slice 3 Gutenberg block diferido** (Open Question resuelta: Elementor-first). Manual actualizado.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
@@ -8,7 +15,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -85,29 +92,42 @@ Reglas obligatorias:
 - `TASK-1232` Growth Forms Admin Cockpit + First Migration.
 - Runtime WordPress/Elementor plugin surface de Efeonce (verificar repo/runtime durante Plan).
 
+### Preconditions backend (owned por TASK-1258, NO por esta task)
+
+Esta task es `Backend impact: none` **solo porque** estos dos contratos los entrega `TASK-1258`. Si al iniciar Plan no existen, la task queda `blocked` — NO se abre un endpoint WordPress-only ad hoc aquí (violaría Full API Parity: un reader, muchos consumers).
+
+1. **Reader/endpoint gobernado de catálogo externo**: lista de forms publicados/insertables con `displayName`, `formSlug`, `version`, `versionStatus`, `surfaceId(s)` permitidos y `destinationReadiness`. Es un contrato `resource`/`search` estable, consumible por el plugin WordPress (host externo), Nexa/MCP y futuros hosts (Astro). Los readers existentes (`getPublishedRenderContract` por slug, `listFormsAdmin`/`listHostSurfacesAdmin` admin/session-gated) NO cubren este caso: el primero es por-form, los segundos no son consumibles cross-origin.
+2. **Modelo de auth del editor externo**: cómo el plugin WordPress se autentica contra el catálogo (API key per-site / token de servicio / proxy server-side del plugin). Decisión de Safety hard-to-reverse — el endpoint expone qué forms existen al sitio público. Default propuesto: credencial per-site server-side en el plugin (el navegador del editor no porta el secret), allowlist de origins, scope read-only de catálogo. Owned por `TASK-1258`; esta task lo consume y lo refleja en el state inventory (`Permission denied` / `Error credencial`).
+
 ### Blocks / Impacts
 
 - Migracion progresiva de paginas Efeonce desde embeds HubSpot a Growth Forms.
 - Operacion editorial del sitio publico WordPress.
 - Futuro motor de tracking propio, porque el embed debe emitir eventos estables sin asumir HubSpot.
 
+### Consumidos (read-only, NO owned por esta task)
+
+- `src/growth-forms-renderer/**` — primitive portable autorado/owned por `TASK-1231` (complete). Esta task lo monta, no lo muta.
+- `src/lib/growth/forms/contracts.ts` — contrato canónico autorado por `TASK-1229`, owned por `TASK-1258`. Esta task tipa contra él; no lo edita.
+- Reader/endpoint gobernado de catálogo externo de forms publicados — **debe existir desde `TASK-1258`** (ver Dependencies). Si no existe, esta task está bloqueada, no abre un backend slice propio.
+
 ### Files owned
 
-- `src/growth-forms-renderer/**`
-- `src/lib/growth/forms/contracts.ts`
 - `docs/manual-de-uso/growth/incrustar-formulario-wordpress-astro.md`
 - `docs/documentation/growth/motor-formularios-publicos.md`
 - `scripts/frontend/scenarios/**` si se crea escenario GVC para preview/host smoke
-- Runtime WordPress Efeonce `eo-elementor-widgets` / block / shortcode files (path exacto a verificar en Plan)
+- Runtime WordPress en **repo separado `efeonce-public-site-runtime`** (`eo-elementor-widgets` widget existente + block/shortcode nuevos). ⚠️ **Cross-repo**: aplica el protocolo de `CLAUDE.md → Cross-repo action safety` (verificar relevancia + estado de auto-deploy del repo target ANTES de commitear; preferir PR + review si tiene auto-deploy productivo). NO commit directo a `main` de ese repo sin esos checks.
 
 ## Current Repo State
 
 ### Already exists
 
-- Renderer portable `<greenhouse-form>` y API publica de render/submit.
-- Arquitectura para host surfaces WordPress/Astro.
+- Renderer portable `<greenhouse-form>` y API publica de render/submit. **El custom element ya es singleton-safe** (`src/growth-forms-renderer/element.ts:207`: `if (customElements.get(ELEMENT_TAG)) return`) y el bundle está **pineado** (`public/growth-forms/renderer-<channel>.js`). El riesgo de duplicación NO está en `customElements.define`, sino en **doble enqueue del mismo bundle** desde shortcode + Elementor: se resuelve con handle único de `wp_enqueue_script` (dedup nativo WP), no con un mecanismo nuevo.
+- **Widget Elementor `greenhouse_growth_form` YA EXISTE** en `eo-elementor-widgets`, repo **`efeonce-public-site-runtime`** (creado por TASK-1231/1232; arch-doc §host surfaces, línea 1256). El wrapper Astro `GrowthForm.astro` vive en `efeonce-web`. **Esta task EXTIENDE el widget existente con UX de selección; NO crea uno nuevo** (duplicarlo = el double-mount que la risk matrix marca).
+- **Host surfaces se pre-aprovisionan en el cockpit (TASK-1232)** vía `createHostSurface`/`growth.forms.surfaces.manage`. Una surface es un primitive de seguridad (`origin_allowlist` + `allowed_form_slugs`, validado en submit). El editor WordPress **selecciona** una surface activa existente; **NUNCA la crea/edita**.
+- Telemetría del renderer **PII-safe por construcción**: `sanitizeTelemetryPayload` + `RENDERER_ALLOWED_PAYLOAD_KEYS` (allowlist) + `RENDERER_GTM_EVENTS` (set cerrado). El adapter no agrega eventos propios.
 - Admin cockpit Growth Forms en progreso.
-- Scripts public-site para inspeccion/deploy dry-run.
+- Scripts public-site para inspeccion/deploy dry-run (`scripts/public-website/**`, contra repo `efeonce-public-site-runtime` vía WP-CLI/SSH Kinsta).
 
 ### Gap
 
@@ -228,20 +248,23 @@ Reglas obligatorias:
 
 ### Slice 1 — Editor contract + catalog read
 
-- Definir el DTO que el selector consume: forms publicados, version, slug, display name, destination readiness, allowed surfaces.
-- Reusar reader/API de `TASK-1258`/`TASK-1232`; no crear endpoint WordPress-only ad hoc.
+- **Verificar primero** que la precondición backend de `TASK-1258` existe: endpoint gobernado de catálogo externo + modelo de auth del editor (ver Dependencies → Preconditions backend). Si falta, marcar `blocked` y coordinar con TASK-1258 antes de avanzar.
+- Tipar el cliente del selector contra ese contrato: `displayName`, `formSlug`, `version`, `versionStatus`, `surfaceId(s)`, `destinationReadiness`. El selector es cliente puro: no define el DTO ni el reader, los consume.
+- Reusar reader/API de `TASK-1258`/`TASK-1232`; **NUNCA** crear endpoint WordPress-only ad hoc (Full API Parity: un reader, muchos consumers).
 
 ### Slice 2 — WordPress shortcode/block selector
 
 - Crear o extender shortcode/block para insertar Growth Forms desde un selector.
-- Persistir solo referencia estable (`formSlug`, version/surface segun contract), no snapshots de campos.
+- Persistir solo referencia estable (`formSlug`, version, `surfaceId` seleccionado del contract), no snapshots de campos.
+- **Seleccionar una surface activa pre-aprovisionada** (origin/slug allowlist ya gobernados en el cockpit); el editor NUNCA crea/edita surfaces desde WordPress (sería un write `growth.forms.surfaces.manage` y ensancharía allowlists de seguridad).
 - Soportar edicion de un embed existente sin perder configuracion.
+- Enqueue del bundle pineado con **handle único `wp_enqueue_script`** (dedup nativo) — no reimplementar singleton; el element ya es idempotente.
 
 ### Slice 3 — Elementor widget parity
 
-- Crear o extender widget Elementor equivalente al bloque/shortcode.
+- **Extender el widget Elementor existente `greenhouse_growth_form`** (`eo-elementor-widgets`, repo `efeonce-public-site-runtime`) con la UX de selección; NO crear un widget paralelo.
 - Mostrar preview honesto: loading, no publicado, destination no listo, render publico.
-- Evitar que Elementor duplique scripts del renderer.
+- Reusar el mismo handle de enqueue que Slice 2 para que Elementor NO cargue el bundle dos veces.
 
 ### Slice 4 — Evidence + docs
 
@@ -275,6 +298,7 @@ La experiencia objetivo debe sentirse como una version Greenhouse del flujo HubS
 | Riesgo | Sistema | Probabilidad | Mitigation | Signal de alerta |
 |---|---|---|---|---|
 | Editor guarda snapshots obsoletos del form | wordpress / growth | medium | persistir referencias/versiones, no field schema | mismatch de version en preview |
+| Editor crea/ensancha host surface desde WordPress (allowlist origin/slug) | growth / security | high | surface es read-only selection; crear surfaces queda en cockpit (`growth.forms.surfaces.manage`) | surface nueva con origin/slug inesperado en submit |
 | Elementor duplica scripts o monta dos forms | wordpress / public-site | medium | singleton loader + detector de duplicate root | console error / double submit |
 | UI permite insertar form no publicado | growth | medium | readiness visible + command/reader bloquea segun contract | public render 404/unpublished |
 | CSS del host rompe el renderer | public-site / ui | medium | CSS vars namespaced + GVC/public preview | scroll-width/visual regression |
@@ -322,7 +346,8 @@ La experiencia objetivo debe sentirse como una version Greenhouse del flujo HubS
 - [ ] Selector lista solo forms publicados/insertables segun contrato Greenhouse.
 - [ ] Editor inserta/edita embed sin escribir IDs manualmente.
 - [ ] Shortcode/block y Elementor widget renderizan el mismo form/version.
-- [ ] Public preview carga `<greenhouse-form>` una sola vez y no duplica scripts.
+- [ ] Public preview carga `<greenhouse-form>` una sola vez y no duplica scripts (handle único de enqueue; element ya singleton).
+- [ ] El editor solo selecciona surfaces activas pre-aprovisionadas; no existe path para crear/editar surface desde WordPress.
 - [ ] Estados empty/error/unpublished/destination-not-ready son visibles y accionables.
 - [ ] GVC/browser evidence cubre desktop/mobile y scroll-width.
 - [ ] Tracking propio queda fuera de scope y no se introduce dependencia nueva a HubSpot tracking.
@@ -355,5 +380,20 @@ La experiencia objetivo debe sentirse como una version Greenhouse del flujo HubS
 
 ## Open Questions
 
-- ¿Selector vive primero como Elementor widget, Gutenberg block o ambos en la misma entrega?
-- ¿El catalogo se consulta directo desde Greenhouse API o via proxy/plugin server-side de WordPress para controlar auth/caching?
+- ¿Selector vive primero como Elementor widget, Gutenberg block o ambos en la misma entrega? (no bloqueante; el slice ordering permite Slice 2 block/shortcode primero y Slice 3 Elementor después.)
+
+## Resolved Constraints
+
+- **Catálogo vía proxy server-side del plugin, NO fetch directo desde el navegador del editor** (cierra la 2ª Open Question original). Razón: el secret de catálogo no puede viajar al cliente; el plugin server-side porta la credencial per-site, aplica caching y expone solo lo necesario al editor. El endpoint gobernado + auth lo entrega `TASK-1258` (ver Preconditions backend). Esto también habilita allowlist de origins y caching sin acoplar el navegador a Greenhouse API.
+
+## Hard Rules (anti-regresión)
+
+- **NUNCA** el plugin/widget escribe `formId`/`formSlug`/snapshots de campos a mano: solo referencia estable + surface metadata desde el catálogo gobernado.
+- **NUNCA** crear un reader/endpoint de catálogo WordPress-only: si falta, es trabajo de `TASK-1258` (un reader, muchos consumers — Full API Parity).
+- **NUNCA** mutar `src/growth-forms-renderer/**` ni `src/lib/growth/forms/contracts.ts` desde esta task (consumidos, owned por TASK-1231/1229/1258).
+- **NUNCA** exponer el secret de catálogo al navegador del editor (proxy server-side del plugin).
+- **NUNCA** el editor WordPress crea/edita host surfaces: solo **selecciona** una surface activa pre-aprovisionada en el cockpit. Crear surfaces es write `growth.forms.surfaces.manage` (primitive de seguridad: origin/slug allowlist) y NO pertenece a este dominio.
+- **NUNCA** duplicar el widget Elementor `greenhouse_growth_form`: extender el existente en `efeonce-public-site-runtime`.
+- **NUNCA** el adapter (shortcode/block/Elementor) emite telemetría propia ni hace `dataLayer.push` directo: solo el emisor sanitizado del renderer (`sanitizeTelemetryPayload` + allowlist).
+- **SIEMPRE** un solo enqueue del bundle pineado por página (handle único `wp_enqueue_script`); el element ya es idempotente (`customElements.get` guard). El riesgo es el doble bundle, no el doble `define`.
+- **SIEMPRE** que se toque el repo `efeonce-public-site-runtime`, aplicar el protocolo cross-repo de `CLAUDE.md`.

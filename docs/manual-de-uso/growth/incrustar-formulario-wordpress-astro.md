@@ -35,11 +35,17 @@ multi-paso) y estados (cargando / error / no disponible) desde fixtures.
 2. En el buscador de widgets escribe **"Growth Form"** (categoria **Greenhouse**) y
    arrastralo a la pagina.
 3. En el panel del widget:
-   - **Slug del formulario**: el slug publicado (ej. `ai-visibility-intake`).
-   - **Surface ID**: `wordpress-public` (o el que se registro para este sitio).
+   - **Formulario (catálogo)**: elige de la lista desplegable un formulario publicado de
+     Greenhouse. Cada opcion muestra el nombre, la version y si esta listo para recibir
+     leads (ej. `Lead Gen - Web — v1 · listo para recibir leads`). **Ya no escribes el
+     slug a mano** (TASK-1259).
+   - **Surface (catálogo)**: elige la host surface activa donde se mostrara (o deja
+     "Surface por defecto del sitio").
    - **Idioma**: `Español (CL)` o `English (US)`.
    - **URL de contacto (fallback sin JS)**: opcional; se muestra si el navegador
      bloquea JavaScript.
+   - **Slug manual / Surface manual (fallback)**: solo aparecen si no eliges del
+     catalogo o si el catalogo no esta disponible. Para casos avanzados o de respaldo.
    - **Runtime (avanzado)** — normalmente no se toca: canal (`preview`/`beta`/`stable`),
      Greenhouse base URL, embed key.
    - **Marca** (pestaña Estilo): color de acento + ancho maximo.
@@ -48,6 +54,26 @@ multi-paso) y estados (cargando / error / no disponible) desde fixtures.
 
 > El widget solo emite `<greenhouse-form …>` y carga el bundle pineado de Greenhouse.
 > Nunca cambia campos ni destinos.
+
+### Configurar el catálogo del selector (una vez por sitio)
+
+El desplegable de formularios sale del **catálogo gobernado de Greenhouse** (TASK-1258),
+que el plugin consulta **server-side** (el navegador del editor nunca ve la credencial).
+Para que el desplegable se pueble, configura estas constantes en `wp-config.php`:
+
+```php
+define( 'GREENHOUSE_GROWTH_CATALOG_SURFACE_ID', 'fhsf-efeonce-lead-gen-web' ); // host surface de este sitio
+define( 'GREENHOUSE_GROWTH_CATALOG_EMBED_KEY', '<secreto>' );                  // embed key per-site (se mintea en Greenhouse)
+// Opcional — por defecto apunta a produccion:
+// define( 'GREENHOUSE_GROWTH_CATALOG_BASE_URL', 'https://greenhouse.efeoncepro.com' );
+```
+
+- La **embed key** se genera en Greenhouse con `pnpm growth:forms:embed-key --surface-id <id>`
+  (el secreto se muestra una sola vez; guardalo aqui, nunca en git ni en el navegador).
+- Si las constantes no estan o el catalogo no responde, el panel lo dice y caes al
+  **slug manual** (los embeds existentes siguen funcionando, sin romperse).
+- El catalogo requiere que `GROWTH_FORMS_CATALOG_API_ENABLED` este ON en el entorno
+  Greenhouse al que apunta el plugin. En produccion eso va por el release control plane.
 
 ## Astro
 
