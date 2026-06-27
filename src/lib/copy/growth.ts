@@ -352,13 +352,22 @@ export const GH_GROWTH_AI_VISIBILITY_REPORT_ARTIFACT = {
  */
 export const GH_GROWTH_AI_VISIBILITY_CLIENT_REPORT = {
   page: {
-    breadcrumbRoot: 'Greenhouse',
-    breadcrumbGrowth: 'Crecimiento',
-    title: 'Visibilidad en IA',
-    subtitle: 'Cómo te ve la inteligencia artificial cuando responde por tu categoría.',
+    breadcrumbRoot: 'Clientes',
+    breadcrumbGrowth: 'AI Visibility',
+    breadcrumbLeaf: 'Diagnóstico',
+    title: 'AI Visibility Snapshot',
     orgChipAria: 'Organización del informe',
     asOfLabel: 'Datos al',
     samplingNote: 'Medición sobre una muestra de respuestas de IA, no un monitoreo continuo.'
+  },
+  summary: {
+    scoreLabel: 'Puntaje de visibilidad',
+    scoreOutOf: 'de 100',
+    comparePrevious: 'vs medición anterior',
+    noPrevious: 'Primera medición',
+    perceptionAxisLabel: 'Percepción',
+    agenticAxisLabel: 'Operabilidad',
+    agenticCoverage: 'En cobertura'
   },
   navigator: {
     ariaLabel: 'Navegador del informe: dimensiones y recomendaciones',
@@ -367,54 +376,60 @@ export const GH_GROWTH_AI_VISIBILITY_CLIENT_REPORT = {
     dimensionsEmpty: 'Aún no hay dimensiones medidas.',
     recommendationsEmpty: 'Sin recomendaciones: tu visibilidad está en buen estado.',
     rowScoreAria: 'Puntaje',
-    selectHint: 'Selecciona un ítem para ver el detalle'
+    // El contador "Mostrando N de N recomendaciones".
+    recommendationsCount: (shown: number, total: number) => `Mostrando ${shown} de ${total} recomendaciones`
   },
   detail: {
     overviewTitle: 'Resumen',
     openDetail: 'Ver detalle',
-    scoreLabel: 'Puntaje de visibilidad',
+    // Eyebrow del ítem seleccionado.
+    recommendationEyebrow: (index: number, total: number) => `Recomendación ${index} de ${total}`,
+    dimensionEyebrow: 'Dimensión',
+    relatedScoreLabel: 'Puntaje relacionado',
     scoreOutOf: 'de 100',
     scoreNoData: 'Sin dato',
     comparePrevious: 'vs medición anterior',
     noPrevious: 'Primera medición',
-    perceptionAxisLabel: 'Percepción · ¿te mencionan?',
-    agenticAxisLabel: 'Operabilidad · ¿te pueden usar?',
-    agenticCoverage: 'En cobertura',
     whyItMatters: '¿Por qué importa?',
     whatToDo: 'Qué hacer',
-    motionLabel: 'Enfoque sugerido',
-    trendTitle: 'Tendencia',
-    trendMetricName: 'Visibilidad',
-    providerPresenceTitle: 'Presencia por motor',
-    providerPresenceHelp: 'En cuántas respuestas apareces, por motor de IA.',
-    providerPresenceAria: 'Presencia por motor de IA',
-    providerOf: 'de',
-    signalsTitle: 'Señales',
-    dimensionScoreContext: 'Puntaje de esta dimensión, en una escala de 0 a 100.'
+    // Charts.
+    trendPanelTitle: 'Tendencia',
+    trendPanelHelp: 'Tu puntaje frente a la medición anterior.',
+    trendNoHistory: 'Primera medición — aún no hay un histórico comparable.',
+    trendAxisPrevious: 'Anterior',
+    trendAxisCurrent: 'Actual',
+    platformPanelTitle: 'Menciones por plataforma',
+    platformPanelHelp: 'En cuántas respuestas apareces, por motor de IA (actual).',
+    platformPanelAria: 'Menciones por motor de IA',
+    platformOf: 'de',
+    signalsTitle: 'Señales de respaldo',
+    signalsHelp: 'Indicadores actuales que sostienen tu visibilidad.'
   },
   signals: {
-    citationTitle: 'Citas a tu sitio',
+    citationTitle: 'Menciones con fuente citada',
     citationHelp: 'De las respuestas con fuentes, cuántas citan tu dominio.',
-    citationNoData: 'Sin citas evaluables',
-    sentimentTitle: 'Sentimiento',
-    sentimentHelp: 'Saldo del tono con que la IA habla de tu marca.',
-    positionTitle: 'Posición',
+    sentimentTitle: 'Sentimiento positivo',
+    sentimentHelp: 'Cuánto del tono con que la IA habla de tu marca es positivo.',
+    enginesTitle: 'Modelos que te mencionan',
+    enginesHelp: 'Cuántos motores de IA te mencionan en sus respuestas.',
+    positionTitle: 'Posición promedio',
     positionHelp: 'Qué tan arriba apareces cuando te mencionan.',
-    positionBest: 'Mejor',
-    positionAverage: 'Promedio',
-    positionNoData: 'Sin posición resuelta'
+    sovTitle: 'Participación de menciones',
+    sovHelp: 'Tus menciones frente al total (tú + competidores).',
+    noData: 'Sin dato'
   },
-  cta: {
-    scheduleConversation: 'Agendar conversación',
-    scheduleHelp: 'Conversemos cómo mejorar tu visibilidad con tu equipo de Efeonce.',
-    ariaLabel: 'Agendar una conversación con tu equipo de Efeonce'
+  // Affordance de soporte (NO venta): el cliente YA contrató AEO y está en el portal privado.
+  support: {
+    title: '¿Dudas con esta recomendación?',
+    body: 'Tu equipo de Efeonce trabaja tu visibilidad contigo.',
+    action: 'Hablar con tu equipo',
+    ariaLabel: 'Escribir a tu equipo de Efeonce sobre tu visibilidad en IA'
   },
   states: {
     loadingTitle: 'Preparando tu informe de visibilidad…',
     empty: {
-      title: 'Aún no tienes un informe de visibilidad',
-      body: 'Cuando midamos cómo te ve la IA, tu informe aparece aquí con tu puntaje y las acciones recomendadas.',
-      cta: 'Solicitar diagnóstico'
+      title: 'Aún no tenemos tu medición de visibilidad',
+      body: 'Tu equipo de Efeonce está preparando tu primera medición. Cuando esté lista, tu informe aparece aquí.'
     },
     preparing: {
       title: 'Tu informe se está preparando',

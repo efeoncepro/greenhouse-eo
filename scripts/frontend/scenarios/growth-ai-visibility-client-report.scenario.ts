@@ -28,12 +28,12 @@ export const scenario: CaptureScenario = {
     { kind: 'noLoginRedirect', reason: 'mockup vive bajo dashboard autenticado' },
     { kind: 'noErrorBoundary', reason: 'la captura no debe ser un error boundary' }
   ],
+  // En desktop el clip de `composition-shell` muestra el split completo (navigator + detail canvas rico).
+  // En compact el detail vive en drawer, así que el mismo clip muestra el navigator + trigger (sin fallo).
   steps: [
-    { kind: 'mark', label: '01-overview', clipSelector: '[data-capture="client-ai-visibility-overview"]' },
-    { kind: 'scroll', selector: '[data-capture="composition-shell"]', scrollBlock: 'center' },
-    { kind: 'mark', label: '02-workbench', clipSelector: '[data-capture="composition-shell"]' },
-    { kind: 'scroll', selector: '[data-capture="client-ai-visibility-actions"]', scrollBlock: 'center' },
-    { kind: 'mark', label: '03-actions', clipSelector: '[data-capture="client-ai-visibility-actions"]' }
+    { kind: 'mark', label: '01-summary', clipSelector: '[data-capture="client-ai-visibility-overview"]' },
+    { kind: 'scroll', selector: '[data-capture="composition-shell"]', scrollBlock: 'start' },
+    { kind: 'mark', label: '02-workbench', clipSelector: '[data-capture="composition-shell"]' }
   ]
 }
 

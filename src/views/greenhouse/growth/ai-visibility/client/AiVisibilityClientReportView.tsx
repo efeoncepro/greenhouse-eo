@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useMemo, useState, type ReactNode } from 'react'
 
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
@@ -8,24 +8,19 @@ import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import Chip from '@mui/material/Chip'
 import Divider from '@mui/material/Divider'
-import LinearProgress from '@mui/material/LinearProgress'
-import List from '@mui/material/List'
 import ListItemButton from '@mui/material/ListItemButton'
-import ListSubheader from '@mui/material/ListSubheader'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
+import { useTheme } from '@mui/material/styles'
 
-import {
-  CompositionShell,
-  GreenhouseBreadcrumbs,
-  MetricSummaryCard,
-  MetricTrendCard,
-  type MetricTrendTone
-} from '@/components/greenhouse/primitives'
+import { Area, AreaChart, Bar, BarChart, LabelList, ResponsiveContainer, XAxis, YAxis } from 'recharts'
+
+import { CompositionShell, GreenhouseBreadcrumbs } from '@/components/greenhouse/primitives'
 import type { OperationalStatusTone } from '@/components/greenhouse/primitives/OperationalStatusBadge'
 // Importamos del módulo `model` directo (NO del barrel): el barrel re-exporta el render PDF `server-only`
 // (@react-pdf/renderer) y meterlo en el bundle de cliente rompería el build (server-only transitivo).
-import { REPORT_SEVERITY_TONE, type ReportArtifactModel } from '@/components/growth/ai-visibility/report-artifact/model'
+import { type ReportArtifactModel } from '@/components/growth/ai-visibility/report-artifact/model'
+import AppRecharts from '@/libs/styles/AppRecharts'
 import { GH_GROWTH_AI_VISIBILITY, GH_GROWTH_AI_VISIBILITY_CLIENT_REPORT } from '@/lib/copy/growth'
 import { formatNumber } from '@/lib/format/number'
 import type { GraderReportSeverity } from '@/lib/growth/ai-visibility/report/contracts'
@@ -35,11 +30,11 @@ import type { ScoreDimensionKey } from '@/lib/growth/ai-visibility/scoring/confi
  * TASK-1248 — Portal cliente · AI Visibility (Split Workbench, concepto C).
  *
  * 4.º view-adapter del MISMO `ReportArtifactModel` (SSOT, TASK-1252): NO forkea scoring, NO embebe el
- * render vertical del artifact, NO introduce ECharts. Recompone el modelo como un workbench master-detail:
- * navigator (Dimensiones + Recomendaciones) ↔ detail canvas. La banda de resumen + señales + CTA viven a
- * nivel de página (siempre visibles); el `CompositionShell composition='masterDetail'` gobierna el split
- * navigator/detail en desktop y el drawer del detalle en compact. V1-honest: la tendencia es el delta
- * run-over-run que el snapshot YA trae (no una serie fabricada); el copy NUNCA promete monitoreo recurrente.
+ * render vertical del artifact, NO introduce ECharts (charts Recharts). Recompone el modelo como un
+ * workbench master-detail: navigator (Dimensiones + Recomendaciones) ↔ **detail canvas RICO** con todo el
+ * detalle del ítem seleccionado (puntaje relacionado + 2 charts + ¿por qué importa? + señales de respaldo).
+ * El `CompositionShell composition='masterDetail'` gobierna el split desktop y el drawer del detalle en
+ * compact. V1-honest: la tendencia es el delta run-over-run real (no una serie multi-semana fabricada).
  */
 
 const C = GH_GROWTH_AI_VISIBILITY_CLIENT_REPORT
@@ -47,7 +42,6 @@ const SEV = GH_GROWTH_AI_VISIBILITY.severity_label
 const DIM_EXPLAINER = GH_GROWTH_AI_VISIBILITY.dimension_explainer
 const DIM_LABEL = GH_GROWTH_AI_VISIBILITY.dimension_label
 
-// Helper canónico es-CL (locale context) — NO raw Intl (lint greenhouse/no-raw-locale-formatting).
 const fmt = (value: number): string => formatNumber(value)
 
 // Severidad nombrada → token semántico (NUNCA color-only: siempre acompañada del label).
@@ -56,13 +50,6 @@ const severityThemeColor: Record<GraderReportSeverity, OperationalStatusTone> = 
   atencion: 'warning',
   critico: 'error',
   sin_dato: 'secondary'
-}
-
-// Tono del MetricTrendCard (no admite neutral → sin_dato va sin tono = gris por defecto).
-const severityTrendTone = (severity: GraderReportSeverity): MetricTrendTone | null => {
-  const tone = REPORT_SEVERITY_TONE[severity]
-
-  return tone === 'neutral' ? null : tone
 }
 
 type Selection =
@@ -84,6 +71,16 @@ const SeverityDot = ({ severity }: { severity: GraderReportSeverity }) => (
   />
 )
 
+const scoreText = (score: number | null): string => (score === null ? '—' : fmt(score))
+
+// Chip de severidad nombrado. `sin_dato` se pinta neutro (outlined), NO con el `secondary` olivo del tema.
+const SeverityChip = ({ severity, size }: { severity: GraderReportSeverity; size?: 'small' | 'medium' }) =>
+  severity === 'sin_dato' ? (
+    <Chip size={size} variant='outlined' label={SEV[severity]} />
+  ) : (
+    <Chip size={size} variant='tonal' color={severityThemeColor[severity]} label={SEV[severity]} />
+  )
+
 // ── Navigator rail (aside region) ─────────────────────────────────────────────
 const NavigatorRail = ({
   model,
@@ -94,395 +91,559 @@ const NavigatorRail = ({
   selection: Selection
   onSelect: (next: Selection) => void
 }) => (
-  <Stack spacing={4} sx={{ minWidth: 0 }}>
-    <List
-      disablePadding
-      aria-label={C.navigator.dimensionsHeader}
-      subheader={
-        <ListSubheader disableSticky disableGutters sx={{ bgcolor: 'transparent', lineHeight: 2 }}>
-          <Typography variant='overline' color='text.secondary'>
-            {C.navigator.dimensionsHeader}
-          </Typography>
-        </ListSubheader>
-      }
-    >
-      {model.dimensions.map(dim => {
-        const selected = selection.type === 'dimension' && selection.key === dim.key
-
-        return (
-          <ListItemButton
-            key={dim.key}
-            selected={selected}
-            aria-current={selected ? 'true' : undefined}
-            onClick={() => onSelect({ type: 'dimension', key: dim.key })}
-            sx={theme => ({ borderRadius: `${theme.shape.customBorderRadius.sm}px`, gap: 3, py: 2 })}
-          >
-            <SeverityDot severity={dim.severity} />
-            <Stack sx={{ minWidth: 0, flex: 1 }}>
-              <Typography variant='body2' sx={{ fontWeight: 500 }} noWrap>
-                {DIM_LABEL[dim.key]}
-              </Typography>
-              <Typography variant='caption' color='text.secondary'>
-                {SEV[dim.severity]}
-              </Typography>
-            </Stack>
-            <Typography variant='body2' sx={{ fontVariantNumeric: 'tabular-nums', fontWeight: 600 }}>
-              {dim.score === null ? '—' : fmt(dim.score)}
-            </Typography>
-          </ListItemButton>
-        )
-      })}
-    </List>
-
-    <Divider />
-
-    <List
-      disablePadding
-      aria-label={C.navigator.recommendationsHeader}
-      subheader={
-        <ListSubheader disableSticky disableGutters sx={{ bgcolor: 'transparent', lineHeight: 2 }}>
-          <Typography variant='overline' color='text.secondary'>
-            {C.navigator.recommendationsHeader}
-          </Typography>
-        </ListSubheader>
-      }
-    >
-      {model.recommendations.length === 0 ? (
-        <Typography variant='body2' color='text.secondary' sx={{ px: 2, py: 1 }}>
-          {C.navigator.recommendationsEmpty}
-        </Typography>
-      ) : (
-        model.recommendations.map(rec => {
-          const selected = selection.type === 'recommendation' && selection.gapKey === rec.gapKey
+  <Stack spacing={5} sx={{ minWidth: 0 }}>
+    <Stack spacing={2}>
+      <Typography variant='overline' color='text.secondary'>
+        {C.navigator.dimensionsHeader}
+      </Typography>
+      <Stack component='ul' role='listbox' aria-label={C.navigator.dimensionsHeader} sx={{ listStyle: 'none', p: 0, m: 0 }} spacing={1}>
+        {model.dimensions.map((dim, i) => {
+          const selected = selection.type === 'dimension' && selection.key === dim.key
 
           return (
             <ListItemButton
-              key={rec.gapKey}
+              key={dim.key}
+              component='li'
+              role='option'
               selected={selected}
-              aria-current={selected ? 'true' : undefined}
-              onClick={() => onSelect({ type: 'recommendation', gapKey: rec.gapKey })}
-              sx={theme => ({ borderRadius: `${theme.shape.customBorderRadius.sm}px`, gap: 3, py: 2, alignItems: 'flex-start' })}
+              aria-selected={selected}
+              onClick={() => onSelect({ type: 'dimension', key: dim.key })}
+              sx={theme => ({
+                borderRadius: `${theme.shape.customBorderRadius.sm}px`,
+                gap: 3,
+                py: 2,
+                border: '1px solid',
+                borderColor: selected ? 'primary.main' : 'divider'
+              })}
             >
-              <SeverityDot severity={rec.severity} />
-              <Stack sx={{ minWidth: 0, flex: 1 }} spacing={1}>
-                <Typography variant='body2' sx={{ fontWeight: 500 }}>
-                  {rec.title}
+              <Typography variant='body2' color='text.secondary' sx={{ fontVariantNumeric: 'tabular-nums', minWidth: 16 }}>
+                {i + 1}
+              </Typography>
+              <Stack sx={{ minWidth: 0, flex: 1 }}>
+                <Typography variant='body2' sx={{ fontWeight: 500 }} noWrap>
+                  {DIM_LABEL[dim.key]}
                 </Typography>
-                <Chip
-                  size='small'
-                  variant='tonal'
-                  color={severityThemeColor[rec.severity]}
-                  label={SEV[rec.severity]}
-                  sx={{ alignSelf: 'flex-start' }}
-                />
+                <Typography variant='caption' color='text.secondary'>
+                  {SEV[dim.severity]}
+                </Typography>
               </Stack>
+              <Typography variant='body2' sx={{ fontVariantNumeric: 'tabular-nums', fontWeight: 600 }}>
+                {scoreText(dim.score)}
+              </Typography>
+              <SeverityDot severity={dim.severity} />
             </ListItemButton>
           )
-        })
+        })}
+      </Stack>
+    </Stack>
+
+    <Divider />
+
+    <Stack spacing={2}>
+      <Typography variant='overline' color='text.secondary'>
+        {C.navigator.recommendationsHeader}
+      </Typography>
+      {model.recommendations.length === 0 ? (
+        <Typography variant='body2' color='text.secondary'>
+          {C.navigator.recommendationsEmpty}
+        </Typography>
+      ) : (
+        <>
+          <Stack component='ul' role='listbox' aria-label={C.navigator.recommendationsHeader} sx={{ listStyle: 'none', p: 0, m: 0 }} spacing={1}>
+            {model.recommendations.map((rec, i) => {
+              const selected = selection.type === 'recommendation' && selection.gapKey === rec.gapKey
+
+              return (
+                <ListItemButton
+                  key={rec.gapKey}
+                  component='li'
+                  role='option'
+                  selected={selected}
+                  aria-selected={selected}
+                  onClick={() => onSelect({ type: 'recommendation', gapKey: rec.gapKey })}
+                  sx={theme => ({
+                    borderRadius: `${theme.shape.customBorderRadius.sm}px`,
+                    gap: 3,
+                    py: 2,
+                    alignItems: 'center',
+                    border: '1px solid',
+                    borderColor: selected ? 'primary.main' : 'divider'
+                  })}
+                >
+                  <Typography variant='body2' color='text.secondary' sx={{ fontVariantNumeric: 'tabular-nums', minWidth: 16 }}>
+                    {i + 1}
+                  </Typography>
+                  <Typography variant='body2' sx={{ fontWeight: 500, flex: 1, minWidth: 0 }}>
+                    {rec.title}
+                  </Typography>
+                  <SeverityChip size='small' severity={rec.severity} />
+                </ListItemButton>
+              )
+            })}
+          </Stack>
+          <Typography variant='caption' color='text.secondary'>
+            {C.navigator.recommendationsCount(model.recommendations.length, model.recommendations.length)}
+          </Typography>
+        </>
       )}
-    </List>
+    </Stack>
   </Stack>
 )
 
-// ── Detail canvas (primary region) ────────────────────────────────────────────
-const DimensionDetail = ({ model, dimKey }: { model: ReportArtifactModel; dimKey: ScoreDimensionKey }) => {
-  const dim = model.dimensions.find(d => d.key === dimKey)
-
-  if (!dim) return null
-
-  const dimTrend = model.trend.status === 'con_tendencia' ? model.trend.dimensions.find(d => d.key === dimKey) : undefined
-
-  const trendSeries =
-    dimTrend && dimTrend.previous !== null && dimTrend.current !== null
-      ? [
-          { label: C.detail.comparePrevious, value: dimTrend.previous },
-          { label: C.detail.trendTitle, value: dimTrend.current }
-        ]
-      : null
-
-  return (
-    <Stack spacing={5}>
-      <Stack spacing={2}>
-        <Stack direction='row' spacing={3} alignItems='center' justifyContent='space-between' flexWrap='wrap' useFlexGap>
-          <Typography variant='h5'>{DIM_LABEL[dim.key]}</Typography>
-          <Chip variant='tonal' color={severityThemeColor[dim.severity]} label={SEV[dim.severity]} />
-        </Stack>
-        <Stack direction='row' spacing={2} alignItems='baseline'>
-          <Typography variant='kpiValue' sx={{ fontVariantNumeric: 'tabular-nums' }}>
-            {dim.score === null ? '—' : fmt(dim.score)}
-          </Typography>
-          <Typography variant='body2' color='text.secondary'>
-            {C.detail.scoreOutOf}
-          </Typography>
-        </Stack>
-        <LinearProgress
-          variant='determinate'
-          value={dim.score ?? 0}
-          color={severityThemeColor[dim.severity] === 'secondary' ? 'inherit' : severityThemeColor[dim.severity]}
-          aria-label={`${dim.label}: ${dim.score === null ? C.detail.scoreNoData : fmt(dim.score)} ${C.detail.scoreOutOf}`}
-          sx={{ height: 8, borderRadius: 999 }}
-        />
-        <Typography variant='caption' color='text.secondary'>
-          {C.detail.dimensionScoreContext}
+// ── Chart panels (Recharts, honest, a11y) ─────────────────────────────────────
+const PanelShell = ({ title, help, children }: { title: string; help?: string; children: ReactNode }) => (
+  <Card variant='outlined' sx={theme => ({ borderRadius: `${theme.shape.customBorderRadius.md}px`, height: '100%' })}>
+    <CardContent>
+      <Stack spacing={0.5} sx={{ mb: 3 }}>
+        <Typography variant='subtitle1' sx={{ fontWeight: 600 }}>
+          {title}
         </Typography>
+        {help ? (
+          <Typography variant='caption' color='text.secondary'>
+            {help}
+          </Typography>
+        ) : null}
       </Stack>
-
-      <Box>
-        <Typography variant='overline' color='text.secondary'>
-          {C.detail.whyItMatters}
-        </Typography>
-        <Typography variant='body1' sx={{ mt: 1 }}>
-          {DIM_EXPLAINER[dim.key]}
-        </Typography>
-      </Box>
-
-      {trendSeries ? (
-        <MetricTrendCard
-          title={dim.label}
-          metricName={C.detail.trendTitle}
-          periodLabel={C.detail.comparePrevious}
-          value={dimTrend?.current ?? null}
-          series={trendSeries}
-          tone={severityTrendTone(dim.severity)}
-          format='integer'
-          dataCapture='client-ai-visibility-dimension-trend'
-        />
-      ) : null}
-    </Stack>
-  )
-}
-
-const RecommendationDetail = ({ model, gapKey }: { model: ReportArtifactModel; gapKey: string }) => {
-  const rec = model.recommendations.find(r => r.gapKey === gapKey)
-
-  if (!rec) return null
-
-  // Dimensión que origina la recomendación (conecta rec ↔ dimensión: contexto de score + por qué importa).
-  const dim = model.dimensions.find(d => d.key === rec.dimensionKey)
-
-  return (
-    <Stack spacing={5}>
-      <Stack spacing={2}>
-        <Stack direction='row' spacing={3} alignItems='center' justifyContent='space-between' flexWrap='wrap' useFlexGap>
-          <Typography variant='h5'>{rec.title}</Typography>
-          <Chip variant='tonal' color={severityThemeColor[rec.severity]} label={SEV[rec.severity]} />
-        </Stack>
-      </Stack>
-
-      <Box>
-        <Typography variant='overline' color='text.secondary'>
-          {C.detail.whatToDo}
-        </Typography>
-        <Typography variant='body1' sx={{ mt: 1 }}>
-          {rec.action}
-        </Typography>
-      </Box>
-
-      {dim ? (
-        <Box
-          sx={theme => ({
-            p: 4,
-            borderRadius: `${theme.shape.customBorderRadius.md}px`,
-            backgroundColor: theme.palette.action.hover
-          })}
-        >
-          <Stack direction='row' spacing={2} alignItems='center' justifyContent='space-between'>
-            <Typography variant='subtitle1' sx={{ fontWeight: 600 }}>
-              {DIM_LABEL[dim.key]}
-            </Typography>
-            <Typography variant='body2' sx={{ fontVariantNumeric: 'tabular-nums', fontWeight: 600 }}>
-              {dim.score === null ? '—' : fmt(dim.score)} / 100
-            </Typography>
-          </Stack>
-          <LinearProgress
-            variant='determinate'
-            value={dim.score ?? 0}
-            color={severityThemeColor[dim.severity] === 'secondary' ? 'inherit' : severityThemeColor[dim.severity]}
-            aria-label={`${DIM_LABEL[dim.key]}: ${dim.score === null ? C.detail.scoreNoData : fmt(dim.score)} ${C.detail.scoreOutOf}`}
-            sx={{ height: 8, borderRadius: 999, mt: 2 }}
-          />
-          <Typography variant='body2' color='text.secondary' sx={{ mt: 2 }}>
-            {DIM_EXPLAINER[dim.key]}
-          </Typography>
-        </Box>
-      ) : null}
-    </Stack>
-  )
-}
-
-const DetailCanvas = ({ model, selection }: { model: ReportArtifactModel; selection: Selection }) => (
-  <Card variant='outlined' sx={theme => ({ borderRadius: `${theme.shape.customBorderRadius.lg}px`, height: '100%' })}>
-    <CardContent sx={{ p: { xs: 4, md: 6 } }}>
-      {selection.type === 'dimension' ? (
-        <DimensionDetail model={model} dimKey={selection.key} />
-      ) : (
-        <RecommendationDetail model={model} gapKey={selection.gapKey} />
-      )}
+      {children}
     </CardContent>
   </Card>
 )
 
-// ── Overview band (page-level, always visible) ────────────────────────────────
-const OverviewBand = ({ model }: { model: ReportArtifactModel }) => {
-  const overall = model.trend.status === 'con_tendencia' ? model.trend.overall : null
-
-  const compareLabel =
-    overall && overall.delta !== null
-      ? `${overall.delta > 0 ? '↑' : overall.delta < 0 ? '↓' : ''} ${fmt(Math.abs(overall.delta))} ${C.detail.comparePrevious}`.trim()
-      : C.detail.noPrevious
+const TrendPanel = ({
+  current,
+  previous,
+  tone
+}: {
+  current: number | null
+  previous: number | null
+  tone: OperationalStatusTone
+}) => {
+  const theme = useTheme()
+  const accent = tone === 'secondary' ? theme.palette.text.secondary : theme.palette[tone].main
+  const hasHistory = current !== null && previous !== null
+  const delta = hasHistory ? current - previous : null
 
   return (
-    <Card
-      variant='outlined'
-      data-capture='client-ai-visibility-overview'
-      sx={theme => ({ borderRadius: `${theme.shape.customBorderRadius.lg}px` })}
-    >
-      <CardContent>
-        <Stack
-          direction={{ xs: 'column', md: 'row' }}
-          spacing={6}
-          alignItems={{ xs: 'flex-start', md: 'center' }}
-          divider={<Divider orientation='vertical' flexItem sx={{ display: { xs: 'none', md: 'block' } }} />}
+    <PanelShell title={C.detail.trendPanelTitle} help={C.detail.trendPanelHelp}>
+      <Stack direction='row' spacing={3} alignItems='baseline' sx={{ mb: 2 }}>
+        <Typography variant='kpiValue' sx={{ fontVariantNumeric: 'tabular-nums' }}>
+          {scoreText(current)}
+        </Typography>
+        {delta !== null ? (
+          <Typography
+            variant='body2'
+            sx={{ fontWeight: 600, color: delta > 0 ? 'success.main' : delta < 0 ? 'error.main' : 'text.secondary' }}
+          >
+            {delta > 0 ? '↑' : delta < 0 ? '↓' : ''} {fmt(Math.abs(delta))} {C.detail.comparePrevious}
+          </Typography>
+        ) : (
+          <Typography variant='body2' color='text.secondary'>
+            {C.detail.noPrevious}
+          </Typography>
+        )}
+      </Stack>
+      {hasHistory ? (
+        <Box sx={{ height: 140 }} role='img' aria-label={`${C.detail.trendPanelTitle}: ${C.detail.trendAxisPrevious} ${fmt(previous)}, ${C.detail.trendAxisCurrent} ${fmt(current)}`}>
+          <AppRecharts sx={{ height: '100%', width: '100%' }}>
+            <ResponsiveContainer width='100%' height='100%'>
+              <AreaChart
+                data={[
+                  { label: C.detail.trendAxisPrevious, value: previous },
+                  { label: C.detail.trendAxisCurrent, value: current }
+                ]}
+                margin={{ top: 8, right: 12, left: -24, bottom: 0 }}
+              >
+                <defs>
+                  <linearGradient id='clientTrendFill' x1='0' y1='0' x2='0' y2='1'>
+                    <stop offset='0%' stopColor={accent} stopOpacity={0.24} />
+                    <stop offset='100%' stopColor={accent} stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <XAxis dataKey='label' tickLine={false} axisLine={false} />
+                <YAxis domain={[0, 100]} tickLine={false} axisLine={false} width={32} />
+                <Area type='monotone' dataKey='value' stroke={accent} strokeWidth={2} fill='url(#clientTrendFill)' dot />
+              </AreaChart>
+            </ResponsiveContainer>
+          </AppRecharts>
+        </Box>
+      ) : (
+        <Box
+          sx={theme => ({
+            height: 140,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            borderRadius: `${theme.shape.customBorderRadius.sm}px`,
+            backgroundColor: theme.palette.action.hover,
+            px: 4
+          })}
         >
-          <Stack spacing={1} sx={{ minWidth: 0 }}>
-            <Typography variant='overline' color='text.secondary'>
-              {C.detail.scoreLabel}
-            </Typography>
-            <Stack direction='row' spacing={3} alignItems='baseline' flexWrap='wrap' useFlexGap>
-              <Typography variant='kpiValue' sx={{ fontVariantNumeric: 'tabular-nums' }}>
-                {model.overallScore === null ? '—' : fmt(model.overallScore)}
-              </Typography>
-              <Typography variant='body2' color='text.secondary'>
-                {C.detail.scoreOutOf}
-              </Typography>
-              <Chip
-                variant='tonal'
-                color={severityThemeColor[model.overallSeverity]}
-                label={SEV[model.overallSeverity]}
-              />
-            </Stack>
-            <Typography variant='caption' color='text.secondary'>
-              {compareLabel}
-            </Typography>
-          </Stack>
-
-          <Stack direction='row' spacing={6} flexWrap='wrap' useFlexGap>
-            <Stack spacing={1}>
-              <Typography variant='overline' color='text.secondary'>
-                {C.detail.perceptionAxisLabel}
-              </Typography>
-              <Typography variant='h5' sx={{ fontVariantNumeric: 'tabular-nums' }}>
-                {model.perceptionAxisScore === null ? '—' : fmt(model.perceptionAxisScore)}
-              </Typography>
-            </Stack>
-            <Stack spacing={1}>
-              <Typography variant='overline' color='text.secondary'>
-                {C.detail.agenticAxisLabel}
-              </Typography>
-              <Typography variant='body2' color='text.secondary' sx={{ pt: 2 }}>
-                {C.detail.agenticCoverage}
-              </Typography>
-            </Stack>
-          </Stack>
-        </Stack>
-      </CardContent>
-    </Card>
+          <Typography variant='body2' color='text.secondary' textAlign='center'>
+            {C.detail.trendNoHistory}
+          </Typography>
+        </Box>
+      )}
+    </PanelShell>
   )
 }
 
-// ── Signals row (page-level, always visible) ──────────────────────────────────
-const SignalsRow = ({ model }: { model: ReportArtifactModel }) => {
-  const citationValue =
-    model.citationInsight.ownDomainShare === null
-      ? C.signals.citationNoData
-      : `${fmt(Math.round(model.citationInsight.ownDomainShare))}%`
-
-  const positionValue = model.positionSummary.best === null ? C.signals.positionNoData : `#${fmt(model.positionSummary.best)}`
-
-  const sentimentValue =
-    model.sentimentSummary.net === 'sin_dato'
-      ? '—'
-      : model.sentimentSummary.net.charAt(0).toUpperCase() + model.sentimentSummary.net.slice(1)
-
-  return (
-    <Box
-      sx={{
-        display: 'grid',
-        gap: 5,
-        gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, minmax(0, 1fr))', lg: 'repeat(3, minmax(0, 1fr))' }
-      }}
-    >
-      <MetricSummaryCard
-        icon='tabler-link'
-        iconColor='info'
-        title={C.signals.citationTitle}
-        value={citationValue}
-        subtitle={C.signals.citationHelp}
-        tooltip={C.signals.citationHelp}
-      />
-      <MetricSummaryCard
-        icon='tabler-mood-smile'
-        iconColor='primary'
-        title={C.signals.sentimentTitle}
-        value={sentimentValue}
-        subtitle={C.signals.sentimentHelp}
-        tooltip={C.signals.sentimentHelp}
-      />
-      <MetricSummaryCard
-        icon='tabler-trophy'
-        iconColor='warning'
-        title={C.signals.positionTitle}
-        value={positionValue}
-        subtitle={C.signals.positionHelp}
-        tooltip={C.signals.positionHelp}
-      />
-    </Box>
-  )
-}
-
-// ── Provider presence (page-level bars; honest counts, accessible) ────────────
-const ProviderPresence = ({ model }: { model: ReportArtifactModel }) => {
+const PlatformPanel = ({ model }: { model: ReportArtifactModel }) => {
+  const theme = useTheme()
   const engines = model.engineSnapshot ?? []
 
   if (engines.length === 0) return null
 
-  return (
-    <Card variant='outlined' sx={theme => ({ borderRadius: `${theme.shape.customBorderRadius.lg}px` })}>
-      <CardContent>
-        <Stack spacing={1}>
-          <Typography variant='h5'>{C.detail.providerPresenceTitle}</Typography>
-          <Typography variant='body2' color='text.secondary'>
-            {C.detail.providerPresenceHelp}
-          </Typography>
-        </Stack>
-        <Stack spacing={4} sx={{ mt: 4 }} aria-label={C.detail.providerPresenceAria}>
-          {engines.map(engine => {
-            const pct = engine.resolved > 0 ? Math.round((engine.present / engine.resolved) * 100) : 0
-            const label = engine.provider.charAt(0).toUpperCase() + engine.provider.slice(1)
-            const countLabel = `${fmt(engine.present)} ${C.detail.providerOf} ${fmt(engine.resolved)}`
+  const data = engines.map(e => ({
+    label: e.provider.charAt(0).toUpperCase() + e.provider.slice(1),
+    value: e.present,
+    resolved: e.resolved
+  }))
 
-            return (
-              <Stack key={engine.provider} spacing={1}>
-                <Stack direction='row' justifyContent='space-between' spacing={2}>
-                  <Typography variant='body2' sx={{ fontWeight: 500 }}>
-                    {label}
-                  </Typography>
-                  <Typography variant='body2' color='text.secondary' sx={{ fontVariantNumeric: 'tabular-nums' }}>
-                    {countLabel}
-                  </Typography>
-                </Stack>
-                <LinearProgress
-                  variant='determinate'
-                  value={pct}
-                  aria-label={`${label}: ${countLabel}`}
-                  sx={{ height: 8, borderRadius: 999 }}
-                />
+  const maxResolved = Math.max(...engines.map(e => e.resolved), 1)
+  const ariaSummary = data.map(d => `${d.label} ${d.value} ${C.detail.platformOf} ${d.resolved}`).join('; ')
+
+  return (
+    <PanelShell title={C.detail.platformPanelTitle} help={C.detail.platformPanelHelp}>
+      <Box sx={{ height: 180 }} role='img' aria-label={`${C.detail.platformPanelAria}: ${ariaSummary}`}>
+        <AppRecharts sx={{ height: '100%', width: '100%' }}>
+          <ResponsiveContainer width='100%' height='100%'>
+            <BarChart data={data} margin={{ top: 20, right: 8, left: -24, bottom: 0 }}>
+              <XAxis dataKey='label' tickLine={false} axisLine={false} />
+              <YAxis domain={[0, maxResolved]} tickLine={false} axisLine={false} width={32} allowDecimals={false} />
+              <Bar
+                dataKey='value'
+                fill={theme.palette.primary.main}
+                radius={[4, 4, 0, 0]}
+                maxBarSize={48}
+                isAnimationActive={false}
+              >
+                <LabelList dataKey='value' position='top' />
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </AppRecharts>
+      </Box>
+    </PanelShell>
+  )
+}
+
+// ── Signal tiles (señales de respaldo, honest) ────────────────────────────────
+const SignalTile = ({ label, value, help }: { label: string; value: string; help: string }) => (
+  <Card variant='outlined' sx={theme => ({ borderRadius: `${theme.shape.customBorderRadius.md}px`, height: '100%' })}>
+    <CardContent sx={{ p: 4 }}>
+      <Stack spacing={1}>
+        <Typography variant='caption' color='text.secondary'>
+          {label}
+        </Typography>
+        <Typography variant='h5' sx={{ fontVariantNumeric: 'tabular-nums' }}>
+          {value}
+        </Typography>
+        <Typography variant='caption' color='text.secondary'>
+          {help}
+        </Typography>
+      </Stack>
+    </CardContent>
+  </Card>
+)
+
+const SignalTiles = ({ model }: { model: ReportArtifactModel }) => {
+  const citation =
+    model.citationInsight.ownDomainShare === null ? C.signals.noData : `${fmt(Math.round(model.citationInsight.ownDomainShare))}%`
+
+  const sentiment =
+    model.sentimentSummary.evaluated > 0
+      ? `${fmt(Math.round((model.sentimentSummary.positive / model.sentimentSummary.evaluated) * 100))}%`
+      : C.signals.noData
+
+  const engines = model.engineSnapshot ?? []
+
+  const enginesMentioning =
+    engines.length > 0 ? `${fmt(engines.filter(e => e.present > 0).length)} / ${fmt(engines.length)}` : C.signals.noData
+
+  const position = model.positionSummary.average === null ? C.signals.noData : `#${fmt(model.positionSummary.average)}`
+
+  const competitorTotal = model.competitiveSov.competitors.reduce((sum, c) => sum + c.mentions, 0)
+  const sovDenom = model.competitiveSov.brandMentions + competitorTotal
+  const sov = sovDenom > 0 ? `${fmt(Math.round((model.competitiveSov.brandMentions / sovDenom) * 100))}%` : C.signals.noData
+
+  const tiles = [
+    { label: C.signals.citationTitle, value: citation, help: C.signals.citationHelp },
+    { label: C.signals.sentimentTitle, value: sentiment, help: C.signals.sentimentHelp },
+    { label: C.signals.enginesTitle, value: enginesMentioning, help: C.signals.enginesHelp },
+    { label: C.signals.positionTitle, value: position, help: C.signals.positionHelp },
+    { label: C.signals.sovTitle, value: sov, help: C.signals.sovHelp }
+  ]
+
+  return (
+    <Stack spacing={2}>
+      <Typography variant='subtitle1' sx={{ fontWeight: 600 }}>
+        {C.detail.signalsTitle}
+      </Typography>
+      <Box
+        sx={{
+          display: 'grid',
+          gap: 3,
+          gridTemplateColumns: { xs: 'repeat(2, minmax(0, 1fr))', md: 'repeat(3, minmax(0, 1fr))', xl: 'repeat(5, minmax(0, 1fr))' }
+        }}
+      >
+        {tiles.map(t => (
+          <SignalTile key={t.label} label={t.label} value={t.value} help={t.help} />
+        ))}
+      </Box>
+    </Stack>
+  )
+}
+
+// ── Detail canvas (primary region — the rich pane) ────────────────────────────
+const DetailCanvas = ({ model, selection }: { model: ReportArtifactModel; selection: Selection }) => {
+  const theme = useTheme()
+
+  const rec = selection.type === 'recommendation' ? model.recommendations.find(r => r.gapKey === selection.gapKey) : undefined
+  const recIndex = rec ? model.recommendations.findIndex(r => r.gapKey === rec.gapKey) + 1 : 0
+
+  // Dimensión relevante: la que origina la recomendación, o la seleccionada.
+  const dimKey = rec ? rec.dimensionKey : selection.type === 'dimension' ? selection.key : undefined
+  const dim = dimKey ? model.dimensions.find(d => d.key === dimKey) : undefined
+
+  const severity = rec?.severity ?? dim?.severity ?? 'sin_dato'
+  const eyebrow = rec ? C.detail.recommendationEyebrow(recIndex, model.recommendations.length) : C.detail.dimensionEyebrow
+  const title = rec ? rec.title : dim ? DIM_LABEL[dim.key] : ''
+  const lead = rec ? rec.action : dim ? DIM_EXPLAINER[dim.key] : ''
+
+  // Tendencia honesta de la dimensión relevante (run-over-run del snapshot).
+  const dimTrend = model.trend.status === 'con_tendencia' && dim ? model.trend.dimensions.find(d => d.key === dim.key) : undefined
+
+  return (
+    <Card
+      variant='outlined'
+      data-capture='client-ai-visibility-detail'
+      sx={{ borderRadius: `${theme.shape.customBorderRadius.lg}px`, height: '100%' }}
+    >
+      <CardContent sx={{ p: { xs: 4, md: 6 } }}>
+        <Stack spacing={6}>
+          {/* Header — eyebrow + chip, luego título a ancho completo, score relacionado como stat-card aparte */}
+          <Stack spacing={4}>
+            <Stack direction='row' spacing={3} alignItems='center' justifyContent='space-between'>
+              <Typography variant='overline' color='primary.main'>
+                {eyebrow}
+              </Typography>
+              <SeverityChip severity={severity} />
+            </Stack>
+            <Stack
+              direction={{ xs: 'column', md: 'row' }}
+              spacing={4}
+              alignItems={{ xs: 'stretch', md: 'flex-start' }}
+              justifyContent='space-between'
+            >
+              <Stack spacing={2} sx={{ minWidth: 0, flex: 1 }}>
+                <Typography variant='h4'>{title}</Typography>
+                <Typography variant='body1' color='text.secondary'>
+                  {lead}
+                </Typography>
               </Stack>
-            )
-          })}
+              {dim ? (
+                <Box
+                  sx={theme => ({
+                    flexShrink: 0,
+                    minWidth: 200,
+                    p: 3,
+                    borderRadius: `${theme.shape.customBorderRadius.md}px`,
+                    border: `1px solid ${theme.palette.divider}`,
+                    backgroundColor: theme.palette.action.hover
+                  })}
+                >
+                  <Typography variant='overline' color='text.secondary' display='block'>
+                    {C.detail.relatedScoreLabel}
+                  </Typography>
+                  <Stack direction='row' spacing={1} alignItems='baseline' sx={{ mt: 1 }}>
+                    <Typography variant='kpiValue' sx={{ fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>
+                      {scoreText(dim.score)}
+                    </Typography>
+                    <Typography variant='body2' color='text.secondary'>
+                      {C.detail.scoreOutOf}
+                    </Typography>
+                  </Stack>
+                  <Typography variant='caption' color='text.secondary' display='block' sx={{ mt: 1 }}>
+                    {DIM_LABEL[dim.key]}
+                  </Typography>
+                </Box>
+              ) : null}
+            </Stack>
+          </Stack>
+
+          {/* Charts row */}
+          <Box
+            sx={{
+              display: 'grid',
+              gap: 5,
+              gridTemplateColumns: { xs: '1fr', lg: 'repeat(2, minmax(0, 1fr))' }
+            }}
+          >
+            <TrendPanel
+              current={dimTrend?.current ?? dim?.score ?? model.overallScore}
+              previous={dimTrend?.previous ?? null}
+              tone={severityThemeColor[severity]}
+            />
+            <PlatformPanel model={model} />
+          </Box>
+
+          {/* ¿Por qué importa? */}
+          {dim ? (
+            <Box
+              sx={theme => ({
+                display: 'flex',
+                gap: 4,
+                p: 4,
+                borderRadius: `${theme.shape.customBorderRadius.md}px`,
+                backgroundColor: theme.palette.action.hover
+              })}
+            >
+              <Box
+                aria-hidden='true'
+                sx={theme => ({
+                  flexShrink: 0,
+                  width: 44,
+                  height: 44,
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: theme.palette.primary.main,
+                  backgroundColor: theme.palette.background.paper,
+                  border: `1px solid ${theme.palette.divider}`
+                })}
+              >
+                <i className='tabler-star' />
+              </Box>
+              <Stack spacing={1}>
+                <Typography variant='subtitle1' sx={{ fontWeight: 600 }}>
+                  {C.detail.whyItMatters}
+                </Typography>
+                <Typography variant='body2' color='text.secondary'>
+                  {DIM_EXPLAINER[dim.key]}
+                </Typography>
+              </Stack>
+            </Box>
+          ) : null}
+
+          {/* Señales de respaldo */}
+          <SignalTiles model={model} />
+
+          {/* Soporte contextual (NO venta — cliente ya contrató AEO) */}
+          <Stack
+            direction={{ xs: 'column', sm: 'row' }}
+            spacing={3}
+            alignItems={{ xs: 'flex-start', sm: 'center' }}
+            justifyContent='space-between'
+            data-capture='client-ai-visibility-actions'
+            sx={theme => ({ pt: 4, borderTop: `1px solid ${theme.palette.divider}` })}
+          >
+            <Stack spacing={0.5} sx={{ minWidth: 0 }}>
+              <Typography variant='subtitle1' sx={{ fontWeight: 600 }}>
+                {C.support.title}
+              </Typography>
+              <Typography variant='body2' color='text.secondary'>
+                {C.support.body}
+              </Typography>
+            </Stack>
+            <Button
+              variant='tonal'
+              startIcon={<i className='tabler-message-2' />}
+              href='mailto:hola@efeonce.com'
+              aria-label={C.support.ariaLabel}
+              sx={{ flexShrink: 0 }}
+            >
+              {C.support.action}
+            </Button>
+          </Stack>
         </Stack>
       </CardContent>
     </Card>
+  )
+}
+
+// ── Top strip + compact overall summary ───────────────────────────────────────
+const SummaryStrip = ({ model, organizationName, asOfLabel }: { model: ReportArtifactModel; organizationName: string; asOfLabel: string | null }) => {
+  const overall = model.trend.status === 'con_tendencia' ? model.trend.overall : null
+  const delta = overall?.delta ?? null
+
+  return (
+    <Stack spacing={3} data-capture='client-ai-visibility-overview'>
+      <GreenhouseBreadcrumbs
+        items={[
+          { label: C.page.breadcrumbRoot, href: '/home' },
+          { label: organizationName },
+          { label: C.page.breadcrumbGrowth },
+          { label: C.page.breadcrumbLeaf }
+        ]}
+      />
+      <Stack direction='row' spacing={3} alignItems='center' justifyContent='space-between' flexWrap='wrap' useFlexGap>
+        <Stack direction='row' spacing={3} alignItems='center' flexWrap='wrap' useFlexGap>
+          <Typography variant='h4'>{C.page.title}</Typography>
+          <Chip variant='tonal' color='primary' icon={<i className='tabler-building' />} label={organizationName} aria-label={C.page.orgChipAria} />
+        </Stack>
+        {asOfLabel ? (
+          <Stack direction='row' spacing={1} alignItems='center' sx={{ color: 'text.secondary' }}>
+            <i className='tabler-calendar' aria-hidden='true' />
+            <Typography variant='body2' color='text.secondary'>
+              {C.page.asOfLabel} {asOfLabel}
+            </Typography>
+          </Stack>
+        ) : null}
+      </Stack>
+
+      <Card variant='outlined' sx={theme => ({ borderRadius: `${theme.shape.customBorderRadius.lg}px` })}>
+        <CardContent>
+          <Stack
+            direction={{ xs: 'column', md: 'row' }}
+            spacing={{ xs: 4, md: 6 }}
+            alignItems={{ xs: 'flex-start', md: 'center' }}
+            divider={<Divider orientation='vertical' flexItem sx={{ display: { xs: 'none', md: 'block' } }} />}
+          >
+            <Stack spacing={0.5} sx={{ minWidth: 0 }}>
+              <Typography variant='overline' color='text.secondary'>
+                {C.summary.scoreLabel}
+              </Typography>
+              <Stack direction='row' spacing={2} alignItems='baseline' flexWrap='wrap' useFlexGap>
+                <Typography variant='kpiValue' sx={{ fontVariantNumeric: 'tabular-nums' }}>
+                  {scoreText(model.overallScore)}
+                </Typography>
+                <Typography variant='body2' color='text.secondary'>
+                  {C.summary.scoreOutOf}
+                </Typography>
+                <SeverityChip severity={model.overallSeverity} />
+              </Stack>
+              <Typography variant='caption' color='text.secondary'>
+                {delta !== null
+                  ? `${delta > 0 ? '↑' : delta < 0 ? '↓' : ''} ${fmt(Math.abs(delta))} ${C.summary.comparePrevious}`.trim()
+                  : C.summary.noPrevious}
+              </Typography>
+            </Stack>
+            <Stack direction='row' spacing={6} flexWrap='wrap' useFlexGap>
+              <Stack spacing={0.5}>
+                <Typography variant='overline' color='text.secondary'>
+                  {C.summary.perceptionAxisLabel}
+                </Typography>
+                <Typography variant='h5' sx={{ fontVariantNumeric: 'tabular-nums' }}>
+                  {scoreText(model.perceptionAxisScore)}
+                </Typography>
+              </Stack>
+              <Stack spacing={0.5}>
+                <Typography variant='overline' color='text.secondary'>
+                  {C.summary.agenticAxisLabel}
+                </Typography>
+                <Typography variant='body2' color='text.secondary' sx={{ pt: 1.5 }}>
+                  {C.summary.agenticCoverage}
+                </Typography>
+              </Stack>
+            </Stack>
+          </Stack>
+        </CardContent>
+      </Card>
+      <Typography variant='caption' color='text.secondary'>
+        {C.page.samplingNote}
+      </Typography>
+    </Stack>
   )
 }
 
@@ -493,7 +654,7 @@ export interface AiVisibilityClientReportViewProps {
 }
 
 const AiVisibilityClientReportView = ({ model, organizationName, asOfLabel }: AiVisibilityClientReportViewProps) => {
-  // Default: la brecha principal (primaryGap) si existe; sino la primera dimensión. Predecible + accionable.
+  // Default: la brecha principal (primaryGap) si existe; sino la primera recomendación; sino la 1.ª dimensión.
   const defaultSelection = useMemo<Selection>(() => {
     if (model.primaryGap) {
       const rec = model.recommendations.find(r => r.gapKey === model.primaryGap?.gapKey)
@@ -501,72 +662,18 @@ const AiVisibilityClientReportView = ({ model, organizationName, asOfLabel }: Ai
       if (rec) return { type: 'recommendation', gapKey: rec.gapKey }
     }
 
+    if (model.recommendations.length > 0) return { type: 'recommendation', gapKey: model.recommendations[0].gapKey }
     if (model.dimensions.length > 0) return { type: 'dimension', key: model.dimensions[0].key }
 
-    return { type: 'recommendation', gapKey: model.recommendations[0]?.gapKey ?? '' }
+    return { type: 'dimension', key: 'ai_visibility' }
   }, [model])
 
   const [selection, setSelection] = useState<Selection>(defaultSelection)
 
-  const overallTrend = model.trend.status === 'con_tendencia' ? model.trend.overall : null
-
-  const overallTrendSeries =
-    overallTrend && overallTrend.previous !== null && overallTrend.current !== null
-      ? [
-          { label: C.detail.comparePrevious, value: overallTrend.previous },
-          { label: C.detail.trendTitle, value: overallTrend.current }
-        ]
-      : null
-
   return (
     <Stack spacing={6} sx={{ p: { xs: 4, md: 6 }, minWidth: 0 }} data-capture='client-ai-visibility-report'>
-      {/* Top strip: breadcrumb + título + org + as-of */}
-      <Stack spacing={2}>
-        <GreenhouseBreadcrumbs
-          items={[
-            { label: C.page.breadcrumbRoot, href: '/home' },
-            { label: C.page.breadcrumbGrowth },
-            { label: C.page.title }
-          ]}
-        />
-        <Stack direction='row' spacing={3} alignItems='center' justifyContent='space-between' flexWrap='wrap' useFlexGap>
-          <Stack spacing={1} sx={{ minWidth: 0 }}>
-            <Typography variant='h4'>{C.page.title}</Typography>
-            <Typography variant='body1' color='text.secondary'>
-              {C.page.subtitle}
-            </Typography>
-          </Stack>
-          <Chip variant='tonal' color='primary' label={organizationName} aria-label={C.page.orgChipAria} />
-        </Stack>
-        {asOfLabel ? (
-          <Typography variant='caption' color='text.secondary'>
-            {C.page.asOfLabel} {asOfLabel} · {C.page.samplingNote}
-          </Typography>
-        ) : (
-          <Typography variant='caption' color='text.secondary'>
-            {C.page.samplingNote}
-          </Typography>
-        )}
-      </Stack>
+      <SummaryStrip model={model} organizationName={organizationName} asOfLabel={asOfLabel} />
 
-      <OverviewBand model={model} />
-
-      {overallTrendSeries ? (
-        <MetricTrendCard
-          title={C.detail.trendMetricName}
-          metricName={C.detail.trendTitle}
-          periodLabel={C.detail.comparePrevious}
-          value={overallTrend?.current ?? null}
-          series={overallTrendSeries}
-          tone={severityTrendTone(model.overallSeverity)}
-          format='integer'
-          dataCapture='client-ai-visibility-trend'
-        />
-      ) : null}
-
-      <SignalsRow model={model} />
-
-      {/* Workbench master-detail: navigator (aside) ↔ detalle (primary) */}
       <CompositionShell
         composition='masterDetail'
         instanceId='client-ai-visibility'
@@ -577,35 +684,6 @@ const AiVisibilityClientReportView = ({ model, organizationName, asOfLabel }: Ai
           primary: <DetailCanvas model={model} selection={selection} />
         }}
       />
-
-      <ProviderPresence model={model} />
-
-      {/* CTA gobernado read-only V1: contacto al equipo Efeonce (sin mutación comercial silenciosa). */}
-      <Card variant='outlined' sx={theme => ({ borderRadius: `${theme.shape.customBorderRadius.lg}px` })} data-capture='client-ai-visibility-actions'>
-        <CardContent>
-          <Stack
-            direction={{ xs: 'column', sm: 'row' }}
-            spacing={4}
-            alignItems={{ xs: 'flex-start', sm: 'center' }}
-            justifyContent='space-between'
-          >
-            <Stack spacing={1} sx={{ minWidth: 0 }}>
-              <Typography variant='h5'>{C.cta.scheduleConversation}</Typography>
-              <Typography variant='body2' color='text.secondary'>
-                {C.cta.scheduleHelp}
-              </Typography>
-            </Stack>
-            <Button
-              variant='contained'
-              startIcon={<i className='tabler-calendar-event' />}
-              href='mailto:hola@efeonce.com'
-              aria-label={C.cta.ariaLabel}
-            >
-              {C.cta.scheduleConversation}
-            </Button>
-          </Stack>
-        </CardContent>
-      </Card>
     </Stack>
   )
 }

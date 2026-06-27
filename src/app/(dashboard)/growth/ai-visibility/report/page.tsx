@@ -29,7 +29,6 @@ import AiVisibilityClientReportView from '@/views/greenhouse/growth/ai-visibilit
 export const dynamic = 'force-dynamic'
 
 const C = GH_GROWTH_AI_VISIBILITY_CLIENT_REPORT
-const CONTACT_HREF = 'mailto:hola@efeonce.com'
 
 const StateShell = ({ children }: { children: ReactNode }) => (
   <Box sx={{ p: 6, maxWidth: 720, mx: 'auto' }}>{children}</Box>
@@ -56,16 +55,7 @@ export default async function AiVisibilityClientReportPage() {
   if (!tenant.organizationId) {
     return (
       <StateShell>
-        <EmptyState
-          icon='tabler-chart-bar-off'
-          title={C.states.empty.title}
-          description={C.states.empty.body}
-          action={
-            <Button variant='contained' href={CONTACT_HREF}>
-              {C.states.empty.cta}
-            </Button>
-          }
-        />
+        <EmptyState icon='tabler-chart-bar-off' title={C.states.empty.title} description={C.states.empty.body} />
       </StateShell>
     )
   }
@@ -86,16 +76,7 @@ export default async function AiVisibilityClientReportPage() {
       if (error.code === 'not_found') {
         return (
           <StateShell>
-            <EmptyState
-              icon='tabler-chart-bar-off'
-              title={C.states.empty.title}
-              description={C.states.empty.body}
-              action={
-                <Button variant='contained' href={CONTACT_HREF}>
-                  {C.states.empty.cta}
-                </Button>
-              }
-            />
+            <EmptyState icon='tabler-chart-bar-off' title={C.states.empty.title} description={C.states.empty.body} />
           </StateShell>
         )
       }
