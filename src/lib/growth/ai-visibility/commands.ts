@@ -13,7 +13,8 @@ import {
   type GrowthAiVisibilityProviderId,
   type GrowthAiVisibilityRunKind
 } from './contracts'
-import { GROWTH_AI_VISIBILITY_PROMPT_PACK_VERSION, resolvePromptInputs } from './prompt-pack'
+import { resolvePromptInputs } from './prompt-pack'
+import { resolvePromptPack } from './prompt-packs'
 import {
   enqueueGraderRun,
   executeGraderRun,
@@ -33,6 +34,8 @@ export interface RunGraderDiagnosticInput {
   runKind: GrowthAiVisibilityRunKind
   /** Excluye los prompts que nombran la marca (descubrimiento puro / AEO). Default false. */
   discoveryOnly?: boolean
+  /** Versión del prompt pack a usar. Default V1 (snapshots reproducibles); V2 opt-in. */
+  promptPackVersion?: string
   onlyProviders?: GrowthAiVisibilityProviderId[]
   idempotencyKey?: string | null
   /** Adapters inyectables (smoke/tests con fake). Default = registry real. */
@@ -42,6 +45,7 @@ export interface RunGraderDiagnosticInput {
 /** Resuelve el input ejecutable del run (prompts del pack + perfil) — compartido por run/enqueue. */
 const buildExecuteInput = (input: RunGraderDiagnosticInput) => {
   const competitorsDeclared = input.competitorsDeclared ?? []
+  const pack = resolvePromptPack(input.promptPackVersion)
 
   const prompts = resolvePromptInputs(
     {
@@ -50,7 +54,7 @@ const buildExecuteInput = (input: RunGraderDiagnosticInput) => {
       market: input.market,
       competitor: competitorsDeclared[0] ?? null
     },
-    { includeBrandNamed: !input.discoveryOnly }
+    { pack, includeBrandNamed: !input.discoveryOnly }
   )
 
   return {
@@ -64,7 +68,7 @@ const buildExecuteInput = (input: RunGraderDiagnosticInput) => {
     },
     runKind: input.runKind,
     mode: input.mode,
-    promptPackVersion: GROWTH_AI_VISIBILITY_PROMPT_PACK_VERSION,
+    promptPackVersion: pack.version,
     prompts,
     idempotencyKey: input.idempotencyKey ?? null,
     onlyProviders: input.onlyProviders,
