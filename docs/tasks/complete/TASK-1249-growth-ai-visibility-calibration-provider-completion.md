@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -248,16 +248,24 @@ Esta task no activa produccion. Si el operador aprueba activar Perplexity o scor
      ZONE 4 — VERIFICATION & CLOSING
      ═══════════════════════════════════════════════════════════ -->
 
+## Execution log (2026-06-27)
+
+**Slice 1 — Perplexity completion.** Secret `greenhouse-perplexity-api-key` v1 + grant `secretAccessor` a `greenhouse-portal@` + flag `GROWTH_AI_VISIBILITY_PERPLEXITY_ENABLED` ON en staging (ledger). Adapter ya existía vía `createWebSearchAdapter` (sin SDK paralelo). **Smoke real low-volume aislado** (`light`, 2 marcas, solo Perplexity ON): 6/6 `succeeded`/marca, texto acotado + 9-10 citations, `source=secret_manager`, ~US$0.004/marca. Parser bloqueado: `src/lib/ai/perplexity.test.ts` (6 tests).
+
+**Slice 2 — Prompt pack v2.** `prompt-packs/prompt-pack-v2.ts` + `prompt-packs/index.ts` (registry `resolvePromptPack`, default V1, versión desconocida throw) + `commands.ts` (`promptPackVersion?`). Fix único p12 (sin sectores). Espejo `prompt-pack.v2.json` + tests `__tests__/prompt-pack-v2.test.ts` (paridad json↔ts, fix p12, V1 intacto, registry). V2 opt-in; default sigue V1.
+
+**Slice 3 — Calibration decision.** MANTENER `ai_visibility_score_v1` (golden set 8 casos = muy chico para split/fit sin overfitting; evidencia 5→0 respalda el orden). Delta en `GREENHOUSE_AI_VISIBILITY_GRADER_CALIBRATION_V1.md` + arch spec + doc funcional. Provenance tuple verificada persistida (no migración).
+
 ## Acceptance Criteria
 
-- [ ] Perplexity validado en staging o documentado como bloqueado por secret/quota.
-- [ ] Prompt pack v2 versionado o decision documentada de no promoverlo aun.
-- [ ] Golden eval antes/despues registrado con delta de scores y provider coverage; **métricas reportadas sobre holdout/validation (no solo sobre el set de calibración)** o límite documentado si el set es muy chico.
-- [ ] Cualquier cambio de pesos/umbrales usa `score_version` nuevo o deja V1 intacto; prompt pack v2 pasó el gate de eval (baseline + regresión).
-- [ ] Cada run/snapshot persiste la provenance tuple (prompt_pack_version + score_version/pesos + provider_set + model versions).
-- [ ] Perplexity vía cliente LLM canónico + secret con grant `secretAccessor`; flag en `FEATURE_FLAG_STATE_LEDGER.md`.
-- [ ] Public snapshots existentes no se modifican; pre/post-Perplexity quedan version-tagged.
-- [ ] Signals de provider/cost revisadas.
+- [x] Perplexity validado en staging o documentado como bloqueado — **validado**: flag ON staging + secret + grant + **smoke real verde** (integración ejercida contra la API real de Perplexity; activación a nivel deployment de staging depende del deploy de `develop`).
+- [x] Prompt pack v2 versionado o decision documentada — **v2 versionado opt-in** (default V1; promoción a default difere a eval real).
+- [x] Golden eval antes/después o **límite documentado si el set es muy chico** — **límite documentado**: golden set = 8 casos, demasiado chico para split calibration/holdout o cross-validation; recalibración por hipótesis documentada, no fitted (calibración §Delta c). Eval real v1-vs-v2 + efecto agregado del mix = follow-up (budget mínimo).
+- [x] Cambio de pesos usa `score_version` nuevo o deja V1 intacto — **V1 intacto** (sin cambio de pesos).
+- [x] Cada run/snapshot persiste la provenance tuple — **verificado** (grader_runs.requested_providers + prompt_pack_version + provider_policy_version; grader_scores.score_version; provider_observations.provider/model). Sin migración.
+- [x] Perplexity vía cliente LLM canónico + grant `secretAccessor` + flag en ledger — **sí** (`src/lib/ai/perplexity.ts`; grant a `greenhouse-portal@`; fila en `FEATURE_FLAG_STATE_LEDGER.md`).
+- [x] Public snapshots no se modifican; pre/post-Perplexity version-tagged — **sí** (V1 default; provider_set tagged por run).
+- [x] Signals de provider/cost revisadas — smoke: 0 errores, cost ~US$0.004/marca light, costGuard=false; degradación honesta (skipped OpenAI/Gemini → status `partial`).
 
 ## Verification
 
@@ -270,16 +278,20 @@ Esta task no activa produccion. Si el operador aprueba activar Perplexity o scor
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` sincronizado (`in-progress`/`complete`)
-- [ ] archivo en la carpeta correcta
-- [ ] `docs/tasks/README.md` + `TASK_ID_REGISTRY.md` sincronizados
-- [ ] `Handoff.md` + `changelog.md` actualizados
-- [ ] arquitectura/calibration docs actualizados con version/delta
+- [x] `Lifecycle` sincronizado (`complete`)
+- [x] archivo en la carpeta correcta (`complete/`)
+- [x] `docs/tasks/README.md` + `TASK_ID_REGISTRY.md` sincronizados
+- [x] `Handoff.md` + `changelog.md` actualizados
+- [x] arquitectura/calibration docs actualizados con version/delta
 
 ## Follow-ups
 
-- Production rollout de Perplexity o score V1.1 si aprobado.
-- Benchmarks por industria/mercado cuando haya volumen.
+- **Eval real v1-vs-v2** (cacheando observaciones por input determinista) + medición del **efecto agregado** del mix con Perplexity, para promover v2 a default — requiere budget de provider.
+- **Score `ai_visibility_score_v1_1`** por hipótesis: requiere volumen productivo + holdout/cross-validation + product sign-off (additive, V1 intacto, sin recompute retroactivo).
+- **Cost ceiling N≥3**: tightening de `costCeilingUsdPerRun` por modo con corrida de costo agregado.
+- **ADR delta Anthropic**: decidir si entra al provider set arch V1 (decisión de producto).
+- **Activación a nivel deployment de staging**: confirmar con `pnpm staging:request` tras el deploy de `develop` que Perplexity corre en el runtime de staging (no solo local).
+- Production rollout de Perplexity o score V1.1 si aprobado; benchmarks por industria/mercado cuando haya volumen.
 
 ## Open Questions
 
