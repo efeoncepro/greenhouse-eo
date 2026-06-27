@@ -35,6 +35,17 @@ export const GH_GROWTH_AI_VISIBILITY = {
     revenue_intent_coverage: '¿Apareces en preguntas de compra, comparación o implementación?'
   } satisfies Record<ScoreDimensionKey, string>,
 
+  // Label es-CL por dimensión para superficies de cliente (el label canónico del contrato es inglés).
+  dimension_label: {
+    ai_visibility: 'Visibilidad en IA',
+    entity_clarity: 'Claridad de entidad',
+    category_ownership: 'Dominio de categoría',
+    competitive_sov: 'Participación frente a competencia',
+    citation_quality: 'Calidad de las citas',
+    message_alignment: 'Alineación del mensaje',
+    revenue_intent_coverage: 'Cobertura de intención de compra'
+  } satisfies Record<ScoreDimensionKey, string>,
+
   // Severidad nombrada (la superficie la mapea a token AXIS + encoding secundario).
   severity_label: {
     critico: 'Crítico',
@@ -360,6 +371,7 @@ export const GH_GROWTH_AI_VISIBILITY_CLIENT_REPORT = {
   },
   detail: {
     overviewTitle: 'Resumen',
+    openDetail: 'Ver detalle',
     scoreLabel: 'Puntaje de visibilidad',
     scoreOutOf: 'de 100',
     scoreNoData: 'Sin dato',

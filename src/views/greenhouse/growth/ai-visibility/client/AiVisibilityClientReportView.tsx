@@ -45,6 +45,7 @@ import type { ScoreDimensionKey } from '@/lib/growth/ai-visibility/scoring/confi
 const C = GH_GROWTH_AI_VISIBILITY_CLIENT_REPORT
 const SEV = GH_GROWTH_AI_VISIBILITY.severity_label
 const DIM_EXPLAINER = GH_GROWTH_AI_VISIBILITY.dimension_explainer
+const DIM_LABEL = GH_GROWTH_AI_VISIBILITY.dimension_label
 
 // Helper canónico es-CL (locale context) — NO raw Intl (lint greenhouse/no-raw-locale-formatting).
 const fmt = (value: number): string => formatNumber(value)
@@ -119,7 +120,7 @@ const NavigatorRail = ({
             <SeverityDot severity={dim.severity} />
             <Stack sx={{ minWidth: 0, flex: 1 }}>
               <Typography variant='body2' sx={{ fontWeight: 500 }} noWrap>
-                {dim.label}
+                {DIM_LABEL[dim.key]}
               </Typography>
               <Typography variant='caption' color='text.secondary'>
                 {SEV[dim.severity]}
@@ -203,7 +204,7 @@ const DimensionDetail = ({ model, dimKey }: { model: ReportArtifactModel; dimKey
     <Stack spacing={5}>
       <Stack spacing={2}>
         <Stack direction='row' spacing={3} alignItems='center' justifyContent='space-between' flexWrap='wrap' useFlexGap>
-          <Typography variant='h5'>{dim.label}</Typography>
+          <Typography variant='h5'>{DIM_LABEL[dim.key]}</Typography>
           <Chip variant='tonal' color={severityThemeColor[dim.severity]} label={SEV[dim.severity]} />
         </Stack>
         <Stack direction='row' spacing={2} alignItems='baseline'>
@@ -256,6 +257,9 @@ const RecommendationDetail = ({ model, gapKey }: { model: ReportArtifactModel; g
 
   if (!rec) return null
 
+  // Dimensión que origina la recomendación (conecta rec ↔ dimensión: contexto de score + por qué importa).
+  const dim = model.dimensions.find(d => d.key === rec.dimensionKey)
+
   return (
     <Stack spacing={5}>
       <Stack spacing={2}>
@@ -273,6 +277,35 @@ const RecommendationDetail = ({ model, gapKey }: { model: ReportArtifactModel; g
           {rec.action}
         </Typography>
       </Box>
+
+      {dim ? (
+        <Box
+          sx={theme => ({
+            p: 4,
+            borderRadius: `${theme.shape.customBorderRadius.md}px`,
+            backgroundColor: theme.palette.action.hover
+          })}
+        >
+          <Stack direction='row' spacing={2} alignItems='center' justifyContent='space-between'>
+            <Typography variant='subtitle1' sx={{ fontWeight: 600 }}>
+              {DIM_LABEL[dim.key]}
+            </Typography>
+            <Typography variant='body2' sx={{ fontVariantNumeric: 'tabular-nums', fontWeight: 600 }}>
+              {dim.score === null ? '—' : fmt(dim.score)} / 100
+            </Typography>
+          </Stack>
+          <LinearProgress
+            variant='determinate'
+            value={dim.score ?? 0}
+            color={severityThemeColor[dim.severity] === 'secondary' ? 'inherit' : severityThemeColor[dim.severity]}
+            aria-label={`${DIM_LABEL[dim.key]}: ${dim.score === null ? C.detail.scoreNoData : fmt(dim.score)} ${C.detail.scoreOutOf}`}
+            sx={{ height: 8, borderRadius: 999, mt: 2 }}
+          />
+          <Typography variant='body2' color='text.secondary' sx={{ mt: 2 }}>
+            {DIM_EXPLAINER[dim.key]}
+          </Typography>
+        </Box>
+      ) : null}
     </Stack>
   )
 }
@@ -299,7 +332,11 @@ const OverviewBand = ({ model }: { model: ReportArtifactModel }) => {
       : C.detail.noPrevious
 
   return (
-    <Card variant='outlined' sx={theme => ({ borderRadius: `${theme.shape.customBorderRadius.lg}px` })}>
+    <Card
+      variant='outlined'
+      data-capture='client-ai-visibility-overview'
+      sx={theme => ({ borderRadius: `${theme.shape.customBorderRadius.lg}px` })}
+    >
       <CardContent>
         <Stack
           direction={{ xs: 'column', md: 'row' }}
@@ -534,7 +571,7 @@ const AiVisibilityClientReportView = ({ model, organizationName, asOfLabel }: Ai
         composition='masterDetail'
         instanceId='client-ai-visibility'
         asideLabel={C.navigator.ariaLabel}
-        detailLabel={C.detail.overviewTitle}
+        detailLabel={C.detail.openDetail}
         regions={{
           aside: <NavigatorRail model={model} selection={selection} onSelect={setSelection} />,
           primary: <DetailCanvas model={model} selection={selection} />
