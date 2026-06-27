@@ -135,6 +135,7 @@ export const GH_GROWTH_AI_VISIBILITY = {
     anthropic: 'Claude (Anthropic)',
     perplexity: 'Perplexity',
     gemini: 'Gemini (Google)',
+    google_ai_overview: 'Google AI Overview / AI Mode',
     manual_import: 'Evidencia cargada'
   } satisfies Record<NormalizedFindingProvider, string>,
 

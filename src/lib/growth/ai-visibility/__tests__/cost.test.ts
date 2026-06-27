@@ -53,6 +53,14 @@ describe('growth/ai-visibility — cost estimator', () => {
     expect(gemini).toBeCloseTo(0.3, 5)
   })
 
+  it('google_ai_overview usa costo reportado por DataForSEO incluso si no hubo bloque AI', () => {
+    expect(
+      estimateObservationCostUsd(
+        obs({ provider: 'google_ai_overview', status: 'skipped', usage: { dataforseo_cost_usd: 0.004 } })
+      )
+    ).toBeCloseTo(0.004, 6)
+  })
+
   it('estimateRunCostUsd suma el conjunto', () => {
     const total = estimateRunCostUsd([
       obs({ provider: 'openai', usage: { input_tokens: 1_000_000, output_tokens: 0 } }), // $2

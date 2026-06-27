@@ -22,6 +22,7 @@ export const NORMALIZED_FINDING_PROVIDERS = [
   'anthropic',
   'perplexity',
   'gemini',
+  'google_ai_overview',
   'manual_import'
 ] as const
 

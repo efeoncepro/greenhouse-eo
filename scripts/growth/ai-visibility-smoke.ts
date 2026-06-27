@@ -37,7 +37,8 @@ const forceFake = process.env.GROWTH_SMOKE_FAKE === '1' || !isGraderEnabled()
 const fakeAdapters = (): Partial<Record<GrowthAiVisibilityProviderId, ProviderAdapter>> => ({
   openai: createFakeProviderAdapter({ provider: 'openai', behavior: 'succeed' }),
   perplexity: createFakeProviderAdapter({ provider: 'perplexity', behavior: 'succeed' }),
-  gemini: createFakeProviderAdapter({ provider: 'gemini', behavior: 'succeed' })
+  gemini: createFakeProviderAdapter({ provider: 'gemini', behavior: 'succeed' }),
+  google_ai_overview: createFakeProviderAdapter({ provider: 'google_ai_overview', behavior: 'succeed' })
 })
 
 const main = async () => {

@@ -21,7 +21,10 @@ const PROVIDER_PRICING: Record<GrowthAiVisibilityProviderId, ProviderPricing> = 
   openai: { inputPerMillion: 2, outputPerMillion: 8 },
   anthropic: { inputPerMillion: 3, outputPerMillion: 15 },
   perplexity: { inputPerMillion: 1, outputPerMillion: 1 },
-  gemini: { inputPerMillion: 0.3, outputPerMillion: 2.5 }
+  gemini: { inputPerMillion: 0.3, outputPerMillion: 2.5 },
+  // DataForSEO cobra por request SERP, no por tokens. El adapter persiste
+  // `dataforseo_cost_usd` en usage cuando la API reporta costo.
+  google_ai_overview: { inputPerMillion: 0, outputPerMillion: 0 }
 }
 
 const readTokenCount = (usage: Record<string, unknown>, keys: string[]): number => {
@@ -40,6 +43,12 @@ const readTokenCount = (usage: Record<string, unknown>, keys: string[]): number 
 export const estimateObservationCostUsd = (
   observation: GrowthAiVisibilityProviderObservation
 ): number => {
+  if (observation.provider === 'google_ai_overview') {
+    const requestCost = observation.usage.dataforseo_cost_usd
+
+    return typeof requestCost === 'number' && Number.isFinite(requestCost) ? Number(requestCost.toFixed(6)) : 0
+  }
+
   if (observation.status !== 'succeeded') {
     return 0
   }

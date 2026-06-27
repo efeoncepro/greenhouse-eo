@@ -46,7 +46,7 @@ const POLICY_BY_MODE: Record<GrowthAiVisibilityExecutionMode, GrowthAiVisibility
   light: {
     policyVersion: GROWTH_AI_VISIBILITY_PROVIDER_POLICY_VERSION,
     mode: 'light',
-    eligibleProviders: ['openai', 'perplexity', 'gemini'],
+    eligibleProviders: ['openai', 'perplexity', 'gemini', 'google_ai_overview'],
     maxPromptsPerRun: 6,
     perCallTimeoutMs: 20_000,
     maxRetriesPerCall: 1,

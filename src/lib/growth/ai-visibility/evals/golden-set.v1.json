@@ -55,6 +55,11 @@
       "id": "gs08_efeonce_trust_no_reviews_openai",
       "input": { "promptId": "p07", "provider": "openai", "brandId": "subject_efeonce", "subjectBrand": "Efeonce", "subjectDomain": "efeoncepro.com", "promptText": "¿Es Efeonce una agencia confiable para marketing y diseño?", "evidenceExcerpt": "Declara: no se encontró evidencia pública ni reseñas independientes confiables sobre Efeonce.", "samplingObserved": "consistent" },
       "expectedFinding": { "brandMentioned": "yes", "brandRank": null, "competitorsMentioned": [], "sentimentLabel": "unknown", "sentimentScore": null, "categoryAssociations": ["ecosistema/socio estratégico"], "messageDriftClaims": [], "citationDomains": ["efeoncepro.com"], "sourceTypes": ["owned"], "commercialIntentMatch": "no", "confidence": 0.6, "schemaVersion": "normalized_finding_v1", "trustSignal": "no_independent_reviews_found" }
+    },
+    {
+      "id": "gs09_efeonce_google_ai_overview_owned_citation",
+      "input": { "promptId": "p14", "provider": "google_ai_overview", "brandId": "subject_efeonce", "subjectBrand": "Efeonce", "subjectDomain": "efeoncepro.com", "promptText": "What does Efeonce do and who does it serve?", "evidenceExcerpt": "Google AI Mode describes Efeonce and cites efeoncepro.com.", "samplingObserved": "single provider parser lock" },
+      "expectedFinding": { "brandMentioned": "yes", "brandRank": null, "competitorsMentioned": [], "sentimentLabel": "unknown", "sentimentScore": null, "categoryAssociations": [], "messageDriftClaims": [], "citationDomains": ["efeoncepro.com"], "sourceTypes": ["unknown"], "commercialIntentMatch": "partial", "confidence": 0.8, "schemaVersion": "normalized_finding_v1" }
     }
   ]
 }

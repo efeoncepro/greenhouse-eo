@@ -1,3 +1,9 @@
+## Sesion 2026-06-27 — TASK-1265 Google AI Overview adapter — Codex — 🚧 code complete local, rollout pendiente
+
+> **Estado: code complete en repo local (develop local-first, sin push).** Por instruccion del operador, se paso del prep-only de DataForSEO a implementar el provider `google_ai_overview`: adapter canonico sobre DataForSEO AI Mode Live Advanced, flag `GROWTH_AI_VISIBILITY_GOOGLE_AIO_ENABLED` default OFF, cost por request, policy/registry/normalizer/copy, parser lock, golden eval y migracion additive de CHECK constraints para `provider_observations` + `normalized_findings`. Se movio `TASK-1265` a `docs/tasks/in-progress/` y se sincronizo `docs/tasks/README.md`. Guardrail: no tocar el WIP ajeno de `TASK-1252`/mockup que ya estaba en el worktree.
+> - **Pendiente para cerrar runtime:** aplicar migracion/deploy, flip staging low-volume, smoke real con `google_ai_overview` y verificar `citations[]` en PG. No se marca complete porque falta evidencia staging.
+> - **Riesgo secret:** la credencial DataForSEO fue compartida originalmente por captura/chat; antes de prod hay que rotarla o aceptar explicitamente ese riesgo en el rollout.
+
 ## Sesion 2026-06-27 — TASK-1265 DataForSEO connection prep — Codex — ✅ prep only
 
 > **Estado: preparacion de conexion lista; TASK-1265 sigue `to-do`.** Por instruccion del operador, NO se tomo toda la task: no se implemento el provider `google_ai_overview`, no se toco el adapter registry/policy/cost model/flags/DB enum, no se ejecuto smoke SERP del grader y no se movio lifecycle. Quedo agregado el cliente canonico server-side `src/lib/ai/dataforseo.ts` con test focal `src/lib/ai/__tests__/dataforseo.test.ts`, mas `.env.example` con `DATAFORSEO_API_LOGIN` y `DATAFORSEO_API_PASSWORD_SECRET_REF`.

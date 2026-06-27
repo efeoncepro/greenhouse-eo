@@ -13,13 +13,17 @@ describe('growth/ai-visibility — provider policy resolver', () => {
 
     expect(policy.eligibleProviders).not.toContain('anthropic')
     expect(policy.eligibleProviders).toContain('openai')
+    expect(policy.eligibleProviders).toContain('google_ai_overview')
     expect(isProviderEligibleForMode('anthropic', 'light')).toBe(false)
     expect(isProviderEligibleForMode('openai', 'light')).toBe(true)
+    expect(isProviderEligibleForMode('google_ai_overview', 'light')).toBe(true)
   })
 
-  it('full e internal_audit incluyen Anthropic', () => {
+  it('full e internal_audit incluyen Anthropic y Google AI Overview', () => {
     expect(resolveProviderPolicy('full').eligibleProviders).toContain('anthropic')
+    expect(resolveProviderPolicy('full').eligibleProviders).toContain('google_ai_overview')
     expect(resolveProviderPolicy('internal_audit').eligibleProviders).toContain('anthropic')
+    expect(resolveProviderPolicy('internal_audit').eligibleProviders).toContain('google_ai_overview')
     expect(isProviderEligibleForMode('anthropic', 'full')).toBe(true)
     expect(isProviderEligibleForMode('anthropic', 'internal_audit')).toBe(true)
   })

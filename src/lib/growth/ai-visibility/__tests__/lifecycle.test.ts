@@ -16,11 +16,12 @@ import {
 } from '../lifecycle'
 
 describe('growth/ai-visibility — contract guards', () => {
-  it('reconoce provider ids válidos (incluido anthropic del ADR delta)', () => {
+  it('reconoce provider ids válidos (incluido google_ai_overview de TASK-1265)', () => {
     expect(isGrowthAiVisibilityProviderId('openai')).toBe(true)
     expect(isGrowthAiVisibilityProviderId('anthropic')).toBe(true)
     expect(isGrowthAiVisibilityProviderId('perplexity')).toBe(true)
     expect(isGrowthAiVisibilityProviderId('gemini')).toBe(true)
+    expect(isGrowthAiVisibilityProviderId('google_ai_overview')).toBe(true)
     expect(isGrowthAiVisibilityProviderId('mistral')).toBe(false)
     expect(isGrowthAiVisibilityProviderId(42)).toBe(false)
   })
@@ -41,6 +42,7 @@ describe('growth/ai-visibility — contract guards', () => {
     expect(isGrowthAiVisibilitySkipErrorCode('provider_disabled')).toBe(true)
     expect(isGrowthAiVisibilitySkipErrorCode('grader_disabled')).toBe(true)
     expect(isGrowthAiVisibilitySkipErrorCode('no_capability')).toBe(true)
+    expect(isGrowthAiVisibilitySkipErrorCode('no_ai_overview_block')).toBe(true)
     expect(isGrowthAiVisibilitySkipErrorCode('rate_limited')).toBe(false)
     expect(isGrowthAiVisibilitySkipErrorCode('timeout')).toBe(false)
     expect(isGrowthAiVisibilitySkipErrorCode('provider_error')).toBe(false)

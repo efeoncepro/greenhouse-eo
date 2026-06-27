@@ -12,6 +12,7 @@ import 'server-only'
 import { GROWTH_AI_VISIBILITY_PROVIDER_IDS, type GrowthAiVisibilityProviderId } from '../contracts'
 import { createAnthropicProviderAdapter } from './anthropic-adapter'
 import { createGeminiProviderAdapter } from './gemini-adapter'
+import { createGoogleAiOverviewProviderAdapter } from './google-ai-overview-adapter'
 import { createOpenAIProviderAdapter } from './openai-adapter'
 import { createPerplexityProviderAdapter } from './perplexity-adapter'
 import { type ProviderAdapter } from './types'
@@ -23,7 +24,8 @@ export const createGrowthAiVisibilityProviderAdapters = (): Record<
   openai: createOpenAIProviderAdapter(),
   anthropic: createAnthropicProviderAdapter(),
   perplexity: createPerplexityProviderAdapter(),
-  gemini: createGeminiProviderAdapter()
+  gemini: createGeminiProviderAdapter(),
+  google_ai_overview: createGoogleAiOverviewProviderAdapter()
 })
 
 export const createGrowthAiVisibilityProviderAdapter = (

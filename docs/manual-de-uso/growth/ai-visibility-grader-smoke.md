@@ -1,22 +1,23 @@
 # Manual — Correr el AI Visibility Grader (smoke + endpoint)
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.6 · **Ultima actualizacion:** 2026-06-24 por Claude (TASK-1235, leer el reporte de un run)
+> **Version:** 1.7 · **Ultima actualizacion:** 2026-06-27 por Codex (TASK-1265, Google AI Overview via DataForSEO)
 >
 > **Para que sirve:** ejecutar una corrida acotada (low-volume) del AI Visibility Grader contra los answer engines, para validar el motor end-to-end. Por defecto usa un proveedor simulado (no gasta dinero); con flags + secrets corre proveedores reales. Dos caminos: el **CLI** (`pnpm growth:ai-visibility:smoke`, local/dev) y el **endpoint interno** (`/api/admin/growth/ai-visibility/runs`, mismo primitive, apto staging).
 
 ## Estado actual del rollout (2026-06-24)
 
 - **staging:** `GROWTH_AI_VISIBILITY_GRADER_ENABLED` + `_OPENAI_ENABLED` + `_ANTHROPIC_ENABLED` + `_GEMINI_ENABLED` **ON**. El endpoint corre proveedores reales (OpenAI/Anthropic/Gemini). Gemini usa **Gemini 3** (`gemini-3-flash-preview` vía Vertex grounding; ajustable con `GREENHOUSE_GEMINI_GROUNDED_MODEL` sin redeploy). Costo Gemini ~$0.016/marca (light, el más barato del set).
+- **Google AI Overview / AI Mode (TASK-1265):** adapter code-complete via DataForSEO detrás de `GROWTH_AI_VISIBILITY_GOOGLE_AIO_ENABLED` (default OFF). Usa `DATAFORSEO_API_LOGIN` + `DATAFORSEO_API_PASSWORD_SECRET_REF`; no scrapea Google directo. Si Google/DataForSEO no devuelve bloque AI Mode, la observation queda `skipped:no_ai_overview_block`, no `succeeded` vacío. DataForSEO reporta costo por request, no por tokens.
 - **ejecución async (TASK-1234): ON en staging.** `GROWTH_AI_VISIBILITY_ASYNC_EXECUTION_ENABLED=true` (environment `staging`). El endpoint **encola** el run (responde HTTP 202 + runId) y el worker Cloud Run (`ops-worker`, scheduler `ops-growth-grader-drain` cada 5 min) lo ejecuta sin límite de tiempo. Esto es lo único que permite correr runs `full`/`internal_audit` multi-provider (que antes morían por el timeout de la función Vercel). Verificado end-to-end: un run `full` real corrió ~12 min sin timeout. Con la flag OFF el endpoint vuelve a ejecutar inline (sólo `light`/OpenAI cabe).
 - **producción:** OFF (follow-up pesado: migración `greenhouse_growth` + capabilities seed vía release control plane develop→main + env prod + sign-off). El worker es compartido staging+prod, pero el drain hace **no-op prod-safe** mientras el grader esté OFF en prod.
-- **Perplexity:** OFF (sin cliente con grounding/creds aún).
+- **Perplexity:** ON en staging desde 2026-06-27.
 - Verdad live de flags: `vercel env ls`. Estado humano: `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`.
 
 ## Antes de empezar
 
 - Acceso a la base PostgreSQL de Greenhouse (el smoke persiste en `greenhouse_growth`). Local: `pnpm pg:connect` levanta el proxy.
-- Para **proveedores reales**: secrets en GCP Secret Manager (`greenhouse-openai-api-key`, `greenhouse-anthropic-api-key`; Perplexity/Gemini cuando haya creds) + `gcloud auth login` y `gcloud auth application-default login` vigentes.
+- Para **proveedores reales**: secrets en GCP Secret Manager (`greenhouse-openai-api-key`, `greenhouse-anthropic-api-key`, `greenhouse-perplexity-api-key`, `greenhouse-dataforseo-api-password`; Gemini via Vertex/WIF) + `gcloud auth login` y `gcloud auth application-default login` vigentes.
 - Los flags nacen en OFF (ver `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`).
 
 ## Paso a paso
@@ -44,6 +45,16 @@ GROWTH_AI_VISIBILITY_GRADER_ENABLED=true \
 GROWTH_AI_VISIBILITY_OPENAI_ENABLED=true \
 pnpm growth:ai-visibility:smoke
 ```
+
+Smoke solo con Google AI Overview / AI Mode (DataForSEO):
+
+```bash
+GROWTH_AI_VISIBILITY_GRADER_ENABLED=true \
+GROWTH_AI_VISIBILITY_GOOGLE_AIO_ENABLED=true \
+pnpm growth:ai-visibility:smoke
+```
+
+Para una prueba estrictamente local con Secret Manager, define además `GCP_PROJECT=efeonce-group` si tu ADC no trae project por defecto. No incluyas el password DataForSEO en `.env.local`; debe resolverse por `DATAFORSEO_API_PASSWORD_SECRET_REF`.
 
 ### 3. Usar el endpoint interno (mismo primitive — apto staging)
 

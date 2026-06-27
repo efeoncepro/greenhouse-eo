@@ -1,14 +1,14 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.9
+> **Version:** 1.10
 > **Creado:** 2026-06-24 por Claude (TASK-1226)
-> **Ultima actualizacion:** 2026-06-24 por Claude (TASK-1238, exactitud de marca)
+> **Ultima actualizacion:** 2026-06-27 por Codex (TASK-1265, Google AI Overview / AI Mode)
 > **Documentacion tecnica:** [GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md)
 
 # AI Visibility Grader — Motor de Providers (Growth)
 
 ## Que hace
 
-Mide como los "answer engines" de IA (ChatGPT/OpenAI, Claude/Anthropic, Perplexity, Gemini) representan a una marca cuando alguien les pregunta por un servicio. El objetivo es ver si la marca **aparece o no** cuando un comprador busca proveedores, que dicen de ella y a quien citan.
+Mide como los "answer engines" de IA (ChatGPT/OpenAI, Claude/Anthropic, Perplexity, Gemini y Google AI Overview / AI Mode via DataForSEO) representan a una marca cuando alguien les pregunta por un servicio. El objetivo es ver si la marca **aparece o no** cuando un comprador busca proveedores, que dicen de ella y a quien citan.
 
 Esta capa es la **fundacion del motor**: corre los prompts contra los providers, guarda la evidencia cruda y deja senales de salud. Todavia **no** calcula el puntaje final ni arma el reporte publico (eso es un paso posterior).
 
@@ -31,7 +31,7 @@ Esta capa es la **fundacion del motor**: corre los prompts contra los providers,
 ## Estados de una observacion
 
 - `succeeded`: el provider respondio.
-- `skipped`: el provider esta apagado o sin credenciales (esperado mientras el grader este OFF).
+- `skipped`: el provider esta apagado, sin credenciales o la superficie no devolvio bloque de respuesta para esa query. En Google AI Overview / AI Mode esto se guarda como `no_ai_overview_block`, nunca como exito vacio.
 - `failed` / `rate_limited`: hubo un error o limite de uso.
 
 ## Por que no consume secretos por defecto
@@ -51,6 +51,7 @@ Hay un primitive server-side único (`executeGraderRun`) y todos lo consumen igu
 - **staging:** encendido para OpenAI + Anthropic + **Gemini** + **Perplexity** (corre proveedores reales; verificado). Gemini usa la última generación disponible (**Gemini 3**, `gemini-3-flash-preview` vía Vertex) porque el grader debe medir con el modelo que la gente usa hoy; el modelo es ajustable por env sin redeploy.
 - **producción:** apagado — el encendido es un proceso aparte (migración + release controlado) que se hará después.
 - **Perplexity:** **encendido en staging (TASK-1249).** Usa el cliente canónico `src/lib/ai/perplexity.ts` (Sonar, search-grounded). Smoke real low-volume verde (6/6 respuestas con citas). El proveedor set arch (OpenAI/Perplexity/Gemini) queda **completo**.
+- **Google AI Overview / AI Mode:** **code complete, flag OFF (TASK-1265).** Usa DataForSEO como fuente gobernada, sin scraping directo de Google. Si DataForSEO no trae bloque de AI Overview/AI Mode, la observacion queda `skipped:no_ai_overview_block`. El costo se mide por request reportado por DataForSEO. DataForSEO documenta AI Mode como English-only hoy, asi que el adapter manda `language_code=en` y conserva mercado/location para segmentar.
 - **Prompt pack v2 (TASK-1249):** existe como versión seleccionable (corrige el prompt p12, que nombraba sectores y ensuciaba las marcas de control). El **default sigue siendo v1** hasta una validación real; v2 es opt-in.
 - **Pesos del score:** se mantiene **V1** (decisión documentada — el set de calibración es muy chico para reajustar pesos sin sobreajustar; detalle en `GREENHOUSE_AI_VISIBILITY_GRADER_CALIBRATION_V1.md` §Delta 2026-06-27).
 

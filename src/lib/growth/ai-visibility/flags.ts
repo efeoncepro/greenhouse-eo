@@ -15,7 +15,8 @@ export const GROWTH_AI_VISIBILITY_PROVIDER_FLAGS: Record<GrowthAiVisibilityProvi
   openai: 'GROWTH_AI_VISIBILITY_OPENAI_ENABLED',
   anthropic: 'GROWTH_AI_VISIBILITY_ANTHROPIC_ENABLED',
   perplexity: 'GROWTH_AI_VISIBILITY_PERPLEXITY_ENABLED',
-  gemini: 'GROWTH_AI_VISIBILITY_GEMINI_ENABLED'
+  gemini: 'GROWTH_AI_VISIBILITY_GEMINI_ENABLED',
+  google_ai_overview: 'GROWTH_AI_VISIBILITY_GOOGLE_AIO_ENABLED'
 }
 
 const isTrue = (value: string | undefined): boolean => value?.trim().toLowerCase() === 'true'

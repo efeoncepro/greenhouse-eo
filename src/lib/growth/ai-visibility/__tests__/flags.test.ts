@@ -35,5 +35,12 @@ describe('growth/ai-visibility — feature flags (default OFF)', () => {
         env({ GROWTH_AI_VISIBILITY_GRADER_ENABLED: 'true', GROWTH_AI_VISIBILITY_OPENAI_ENABLED: 'true' })
       )
     ).toBe(false)
+
+    expect(
+      isProviderFlagEnabled(
+        'google_ai_overview',
+        env({ GROWTH_AI_VISIBILITY_GRADER_ENABLED: 'true', GROWTH_AI_VISIBILITY_GOOGLE_AIO_ENABLED: 'true' })
+      )
+    ).toBe(true)
   })
 })

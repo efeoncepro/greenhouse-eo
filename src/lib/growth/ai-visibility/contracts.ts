@@ -23,8 +23,16 @@
 /**
  * Answer engines observados. El arch V1 definió OpenAI/Perplexity/Gemini;
  * el ADR delta (2026-06-24, spike TASK-1228) adoptó Anthropic al set V1.
+ * TASK-1265 agrega Google AI Overviews / AI Mode como canal SERP gobernado
+ * vía DataForSEO (no scraping directo de Google).
  */
-export const GROWTH_AI_VISIBILITY_PROVIDER_IDS = ['openai', 'anthropic', 'perplexity', 'gemini'] as const
+export const GROWTH_AI_VISIBILITY_PROVIDER_IDS = [
+  'openai',
+  'anthropic',
+  'perplexity',
+  'gemini',
+  'google_ai_overview'
+] as const
 
 export type GrowthAiVisibilityProviderId = (typeof GROWTH_AI_VISIBILITY_PROVIDER_IDS)[number]
 
@@ -111,7 +119,8 @@ export const GROWTH_AI_VISIBILITY_PROVIDER_ERROR_CODES = [
   'timeout',
   'provider_error',
   'invalid_response',
-  'no_capability'
+  'no_capability',
+  'no_ai_overview_block'
 ] as const
 
 export type GrowthAiVisibilityProviderErrorCode =
@@ -122,7 +131,8 @@ export const GROWTH_AI_VISIBILITY_SKIP_ERROR_CODES: readonly GrowthAiVisibilityP
   'grader_disabled',
   'provider_disabled',
   'missing_secret',
-  'no_capability'
+  'no_capability',
+  'no_ai_overview_block'
 ]
 
 export const isGrowthAiVisibilitySkipErrorCode = (

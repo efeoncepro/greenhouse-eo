@@ -6,19 +6,20 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
 - Type: `implementation`
 - Execution profile: `backend-data`
 - UI impact: `none`
+- UI ready: `n/a`
 - Wireframe: `none`
 - Flow: `none`
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-020`
-- Status real: `Diseno — DataForSEO connection prep done; provider implementation pending`
+- Status real: `Code complete en dev/local — google_ai_overview adapter implementado; rollout staging/prod pendiente`
 - Rank: `TBD`
 - Domain: `growth|ai|integrations|reliability`
 - Blocked by: `none`
@@ -103,11 +104,12 @@ Reglas obligatorias:
 - Normalización + scoring agnósticos del provider (consumen `GrowthAiVisibilityProviderObservation`).
 - Golden eval set + smoke harness (`evals/`).
 - Preparatory connection slice (2026-06-27): DataForSEO fue seleccionado como fuente SERP/answer-engine para esta task; el acceso se aprovisiona como Secret Manager ref `greenhouse-dataforseo-api-password` + env `DATAFORSEO_API_LOGIN`/`DATAFORSEO_API_PASSWORD_SECRET_REF`; el cliente canónico vive en `src/lib/ai/dataforseo.ts`. Esto **no** implementa todavía el provider `google_ai_overview`, no toca el adapter registry, no extiende el enum/check DB, no enciende flags y no ejecuta smoke real del grader.
+- Implementation slice (2026-06-27): `google_ai_overview` implementado como adapter canónico sobre DataForSEO AI Mode Live Advanced; registrado en contratos TS, registry, policy, flags, cost, copy, normalizer, smoke fake adapters, golden eval y parser lock. Migración additive agregada para extender los CHECK constraints de `provider_observations.provider` y `normalized_findings.provider`.
 
 ### Gap
 
-- Cero cobertura de Google AI Overviews / AI Mode (la superficie de mayor volumen de búsqueda).
-- No hay adapter ni cost model para una fuente SERP/answer-engine de terceros.
+- Cobertura de Google AI Overviews / AI Mode ya existe en código, pero falta aplicar migración/deploy y hacer smoke real en staging antes de activar el flag.
+- No hay rollout productivo ni evidencia PG real de `provider_observations` con `google_ai_overview`.
 - Copilot/Bing tampoco se mide (alcance secundario de esta task).
 
 ## Backend/Data Contract
@@ -163,17 +165,41 @@ Reglas obligatorias:
 
 ### Acceptance criteria additions
 
-- [ ] Source of truth, contract surface and consumers are named with real paths or objects.
-- [ ] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
-- [ ] Migration/backfill/rollback posture is explicit and proportional to risk.
-- [ ] Runtime or DB evidence is listed for any change beyond docs/tooling.
-- [ ] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks.
+- [x] Source of truth, contract surface and consumers are named with real paths or objects.
+- [x] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
+- [x] Migration/backfill/rollback posture is explicit and proportional to risk.
+- [x] Runtime or DB evidence is listed for any change beyond docs/tooling.
+- [x] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
      El agente que toma esta task ejecuta Discovery y produce
      plan.md segun TASK_PROCESS.md. No llenar al crear la task.
      ═══════════════════════════════════════════════════════════ -->
+
+## Discovery & Plan — 2026-06-27
+
+### Discovery
+
+- DataForSEO queda confirmado como fuente inicial; el endpoint usado por el adapter es Google AI Mode Live Advanced (`/v3/serp/google/ai_mode/live/advanced`).
+- DataForSEO documenta AI Mode como English-only hoy; el adapter conserva `location_name` por market pero manda `language_code='en'`.
+- El provider id vive en constantes TS **y** en CHECK constraints DB, por lo que la implementacion requiere migracion additive.
+- `Gemini` no sustituye Google AI Overview / AI Mode: se conserva como provider separado porque retrieval/citations difieren.
+
+### Execution plan
+
+- Extender contratos TS/DB/flag/policy/cost/copy/normalizer con `google_ai_overview`.
+- Implementar adapter server-only sobre `src/lib/ai/dataforseo.ts`, sin scraping directo ni PII.
+- Parser lock: aceptar bloques `ai_overview`, `ai_overview_element`, `ai_mode` y referencias heterogeneas.
+- Degradacion honesta: HTTP 200 sin bloque AI devuelve `skipped:no_ai_overview_block` con costo retenido.
+- Actualizar golden eval, smoke fake adapter, ledger, manual, doc funcional, arquitectura y handoff.
+
+### Implementation notes
+
+- El adapter no llama DataForSEO si falta master flag, provider flag o credencial.
+- El costo por request se toma de `usage.dataforseo_cost_usd` y no depende de tokens.
+- El flag queda OFF hasta deploy + smoke staging low-volume.
+- La credencial fue compartida inicialmente en captura/chat; antes de produccion hay que rotarla o documentar aceptacion explicita del riesgo.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 3 — EXECUTION SPEC
@@ -259,30 +285,34 @@ El provider de AI Overviews es estructuralmente un adapter más: recibe `(prompt
 
 ## Acceptance Criteria
 
-- [ ] El adapter `google_ai_overview` implementa el interface canónico y se registra en el adapter registry sin lógica paralela.
-- [ ] El provider corre detrás de `GROWTH_AI_VISIBILITY_GOOGLE_AIO_ENABLED` (default OFF) + entra al policy resolver con cost guard.
-- [ ] Una query sin bloque AI Overview produce observation `skipped` con `error_code`, no un `succeeded` vacío.
-- [ ] Golden eval + parser lock test verdes para el provider nuevo.
+- [x] El adapter `google_ai_overview` implementa el interface canónico y se registra en el adapter registry sin lógica paralela.
+- [x] El provider corre detrás de `GROWTH_AI_VISIBILITY_GOOGLE_AIO_ENABLED` (default OFF) + entra al policy resolver con cost guard.
+- [x] Una query sin bloque AI Overview produce observation `skipped` con `error_code`, no un `succeeded` vacío.
+- [x] Golden eval + parser lock test verdes para el provider nuevo.
 - [ ] Smoke real en staging deja observation `succeeded` con `citations[]` pobladas en `provider_observations`.
-- [ ] Secret de la fuente resuelto server-side vía `*_SECRET_REF` con `secretAccessor` verificado; cero hardcode.
-- [ ] `FEATURE_FLAG_STATE_LEDGER.md` con fila del flag y estado por environment.
+- [x] Secret de la fuente resuelto server-side vía `*_SECRET_REF` con `secretAccessor` verificado; cero hardcode.
+- [x] `FEATURE_FLAG_STATE_LEDGER.md` con fila del flag y estado por environment.
 
 ## Verification
 
-- `pnpm lint`
-- `pnpm tsc --noEmit`
-- `pnpm test`
-- Smoke real del provider en staging + verificación PG de la observation
+- `pnpm lint` — PASS (2026-06-27)
+- `pnpm typecheck` — PASS (2026-06-27)
+- `pnpm exec vitest run src/lib/growth/ai-visibility/__tests__/google-ai-overview-adapter.test.ts src/lib/growth/ai-visibility/__tests__/flags.test.ts src/lib/growth/ai-visibility/__tests__/policy.test.ts src/lib/growth/ai-visibility/__tests__/cost.test.ts src/lib/growth/ai-visibility/__tests__/lifecycle.test.ts src/lib/growth/ai-visibility/__tests__/normalization-contracts.test.ts src/lib/growth/ai-visibility/__tests__/review-gates-eval.test.ts` — PASS, 43/43 (2026-06-27)
+- `pnpm task:lint --task TASK-1265` — PASS, template=1 errors=0 warnings=0 (2026-06-27)
+- `pnpm ops:lint --changed` — PASS, errors=0 warnings=0 (2026-06-27)
+- `pnpm migration-marker-gate` — PASS (2026-06-27)
+- `pnpm docs:closure-check` — PASS con warnings conservadores no bloqueantes (`architecture_doc_monolith`, `missing_project_context_check`) (2026-06-27)
+- Smoke real del provider en staging + verificación PG de la observation [pendiente rollout; no cerrado en esta iteracion]
 
 ## Closing Protocol
 
 - [ ] `Lifecycle` del markdown sincronizado
-- [ ] el archivo vive en la carpeta correcta
-- [ ] `docs/tasks/README.md` sincronizado
-- [ ] `Handoff.md` actualizado
-- [ ] `changelog.md` actualizado
-- [ ] chequeo de impacto cruzado (TASK-1240 budget, TASK-1268 citas, TASK-1246 rollout)
-- [ ] `FEATURE_FLAG_STATE_LEDGER.md` actualizado
+- [x] el archivo vive en la carpeta correcta
+- [x] `docs/tasks/README.md` sincronizado
+- [x] `Handoff.md` actualizado
+- [x] `changelog.md` actualizado
+- [x] chequeo de impacto cruzado (TASK-1240 budget, TASK-1268 citas, TASK-1246 rollout)
+- [x] `FEATURE_FLAG_STATE_LEDGER.md` actualizado
 
 ## Follow-ups
 
@@ -291,5 +321,5 @@ El provider de AI Overviews es estructuralmente un adapter más: recibe `(prompt
 
 ## Open Questions
 
-1. ¿Qué fuente SERP/answer-engine se contrata (DataForSEO / Serper / SerpAPI)? → **Resuelta 2026-06-27:** DataForSEO queda seleccionado como fuente inicial. Prep slice ya dejó cliente canónico + Secret Manager/Vercel env refs, pero el provider `google_ai_overview` completo sigue pendiente.
-2. ¿El provider id vive como enum DB o como constante TS? Confirmar en Discovery para decidir si hay migration o solo cambio de código.
+1. ¿Qué fuente SERP/answer-engine se contrata (DataForSEO / Serper / SerpAPI)? → **Resuelta 2026-06-27:** DataForSEO queda seleccionado como fuente inicial. Prep slice dejó cliente canónico + Secret Manager/Vercel env refs; implementation slice agregó el provider `google_ai_overview`.
+2. ¿El provider id vive como enum DB o como constante TS? → **Resuelta 2026-06-27:** vive en constantes TS y en CHECK constraints DB; se agregó migración additive para ambos constraints.
