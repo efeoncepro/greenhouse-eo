@@ -12,8 +12,10 @@
 import { describe, expect, it } from 'vitest'
 
 import { renderWithTheme } from '@/test/render'
+import { GH_GROWTH_AI_VISIBILITY_REPORT_ARTIFACT } from '@/lib/copy/growth'
 
 import AiVisibilityReportArtifact, { type ReportHeader } from '../web/AiVisibilityReportArtifact'
+import AiVisibilityReportPrint from '../print/AiVisibilityReportPrint'
 import { SAMPLE_CLIENT_REPORT, SAMPLE_INTERNAL_REPORT, SAMPLE_PUBLIC_REPORT } from '../fixtures'
 import { modelFromClientReport, modelFromInternalReport, modelFromPublicReport, reportSectionVisible } from '../model'
 
@@ -31,6 +33,7 @@ window.IntersectionObserver = MockObserver as unknown as typeof IntersectionObse
 window.ResizeObserver = MockObserver as unknown as typeof ResizeObserver
 
 const HEADER: ReportHeader = { organizationName: 'Globe', reportDate: '20 may 2025', periodLabel: '5–18 may 2025' }
+const C_TREND_TITLE = GH_GROWTH_AI_VISIBILITY_REPORT_ARTIFACT.signals.trendTitle
 
 // Strings internal-only que NUNCA deben aparecer en el render público/cliente.
 const INTERNAL_LEAK_STRINGS = [
@@ -78,5 +81,23 @@ describe('AiVisibilityReportArtifact — no-leak visual', () => {
     const { container } = renderWithTheme(<AiVisibilityReportArtifact model={model} header={HEADER} />)
 
     expect(container.textContent).toContain('Visibilidad por motor (interno)')
+  })
+
+  it('print/attachment adapter renderiza público-safe (sin leak, sin trend/engine)', () => {
+    const model = modelFromPublicReport(SAMPLE_PUBLIC_REPORT, 'attachment')
+    const { container } = renderWithTheme(<AiVisibilityReportPrint model={model} header={HEADER} />)
+    const html = container.innerHTML
+
+    for (const leak of INTERNAL_LEAK_STRINGS) {
+      expect(html).not.toContain(leak)
+    }
+
+    // Contenido esperado del attachment.
+    expect(container.textContent).toContain('Globe')
+    expect(container.textContent).toContain('Competidor A')
+    // attachment NO incluye tendencia ni engine snapshot (disclosure matrix).
+    expect(reportSectionVisible('attachment', 'trend')).toBe(false)
+    expect(reportSectionVisible('attachment', 'engineSnapshot')).toBe(false)
+    expect(container.textContent).not.toContain(C_TREND_TITLE)
   })
 })

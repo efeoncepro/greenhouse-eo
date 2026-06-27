@@ -19,6 +19,7 @@ import TabList from '@mui/lab/TabList'
 import Typography from '@mui/material/Typography'
 
 import AiVisibilityReportArtifact from '@/components/growth/ai-visibility/report-artifact/web/AiVisibilityReportArtifact'
+import AiVisibilityReportPrint from '@/components/growth/ai-visibility/report-artifact/print/AiVisibilityReportPrint'
 import {
   modelFromClientReport,
   modelFromInternalReport,
@@ -130,6 +131,12 @@ const ReportArtifactMockupView = () => {
                 El consumer (página pública / portal cliente) maneja este estado, no el artefacto.
               </Typography>
             </Stack>
+          </CardContent>
+        </Card>
+      ) : variant === 'attachment' ? (
+        <Card variant='outlined'>
+          <CardContent sx={{ bgcolor: 'action.hover' }}>
+            <AiVisibilityReportPrint model={model} header={MOCK_REPORT_HEADER} />
           </CardContent>
         </Card>
       ) : (
