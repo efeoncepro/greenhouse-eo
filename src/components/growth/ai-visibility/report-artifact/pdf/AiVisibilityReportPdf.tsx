@@ -69,7 +69,9 @@ const clampPct = (n: number): number => Math.max(0, Math.min(100, n))
 const s = StyleSheet.create({
   // ── cover (full navy) ──
   cover: { backgroundColor: K.navy, color: '#fff', paddingHorizontal: P.padX, paddingTop: P.padTop, position: 'relative' },
-  coverWm: { height: 20, width: 'auto' },
+  // Ancho EXPLÍCITO por aspecto real (837.07:196.68 ≈ 4.256) — react-pdf <Image>
+  // con width:'auto' estira al ancho del contenedor (deforma el wordmark).
+  coverWm: { width: 85, height: 20 },
   coverEyebrow: { fontFamily: F.bodySemibold, fontSize: 7, letterSpacing: 1.4, color: K.onNavyMuted, textTransform: 'uppercase', marginTop: 46 },
   coverOrg: { fontFamily: F.displayBold, fontSize: 42, letterSpacing: -1.2, marginTop: 8, color: '#fff' },
   coverPeriod: { fontFamily: F.body, fontSize: 10, color: K.onNavyStrong, marginTop: 12 },
@@ -175,7 +177,7 @@ const s = StyleSheet.create({
   disc: { marginTop: 14, paddingTop: 11, borderTopWidth: 1, borderTopColor: K.divider, borderTopStyle: 'solid' },
   discText: { fontFamily: F.body, fontSize: 7, color: K.subtle, lineHeight: 1.5 },
   closing: { marginTop: 18, paddingTop: 13, borderTopWidth: 1, borderTopColor: K.divider, borderTopStyle: 'solid', alignItems: 'center' },
-  closingLogo: { height: 18, width: 'auto', marginBottom: 8 },
+  closingLogo: { width: 77, height: 18, marginBottom: 8 },
   closingLegal: { fontFamily: F.body, fontSize: 6.5, color: K.subtle, marginTop: 7 }
 })
 
