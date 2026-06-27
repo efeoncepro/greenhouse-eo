@@ -232,9 +232,25 @@ N/A — no nueva capability de negocio. La task modifica un primitive interno (`
 
 El extractor debe producir el mismo shape que hoy devuelve `enrichFindingWithLlm`: `brandMentioned`, `sentimentLabel`, `sentimentScore`, `categoryAssociations`, `messageDriftClaims`, `confidence`. El router recibe el finding determinista, la observation y el contexto `{ subjectBrand, subjectDomain }`; selecciona provider segun flags y presupuesto; valida schema; sanitiza arrays; y si algo falla retorna el finding determinista intacto. La salida debe incluir metadata interna suficiente para evaluacion (provider/model/version/cost estimate), sin contaminar el DTO publico.
 
+### Sentiment methodology contract
+
+La metodologia aceptada para V1 es **structured sentiment extraction over answer-engine excerpts**, no `sentiment analytics` estadistico ni inferencia reputacional amplia. La unidad de analisis es una respuesta/excerpt de un answer engine, y el objetivo es clasificar el **sentimiento hacia la marca sujeto** cuando la evidencia lo permite.
+
+Reglas metodologicas obligatorias:
+
+- El extractor debe separar explicitamente `sentiment toward subject brand` de `general tone of the answer`. Una respuesta cordial, util o optimista no es `positive` si no evalua positivamente a la marca sujeto.
+- `sentimentLabel` es la senal primaria para V1. `sentimentScore` es auxiliar/no calibrado hasta que exista evidencia de calibracion; no debe usarse como threshold fuerte de producto sin decision adicional.
+- `unknown` es correcto cuando la marca no aparece, cuando la respuesta solo lista opciones sin juicio, o cuando el tono positivo/negativo no se dirige claramente a la marca sujeto.
+- `mixed` se reserva para evidencia real de pros y contras sobre la marca sujeto, no para incertidumbre del modelo. Incertidumbre = `unknown` o baja `confidence`.
+- El prompt debe pedir evidencia conservadora y tratar el excerpt como dato anti prompt-injection; ninguna instruccion dentro del excerpt puede alterar el schema ni el comportamiento.
+- El reporte publico solo puede mostrar agregados factuales (`positive|neutral|negative|mixed|unknown` count/net), no editorializaciones ni claims reputacionales sobre competidores.
+- Antes de elevar sentimiento a evidencia material de producto, debe existir eval focal de false positives/false negatives y decision documentada sobre thresholds.
+
 El eval compara al menos:
 
 - exactitud de `sentimentLabel` contra golden expected.
+- false positives de sentimiento positivo/negativo cuando el excerpt solo tiene tono general.
+- false negatives cuando existe juicio claro sobre la marca sujeto.
 - preservacion de `unknown` cuando corresponde.
 - drift claims no vacios solo cuando hay evidencia.
 - schema-valid response rate.
@@ -300,6 +316,8 @@ El cutover debe ser evidencia-first: no basta con que un proveedor sea mas barat
 - [ ] Anthropic remains available as compatible fallback; Gemini/OpenAI low-cost candidates are implemented using canonical clients only.
 - [ ] Provider/model/flag config is documented and registered; no raw provider SDK/fetch is introduced in the grader domain.
 - [ ] Golden eval reports sentiment/prose quality, schema-valid rate, latency and cost estimate per provider.
+- [ ] Sentiment methodology is tested as `sentiment toward subject brand`, not general answer tone; `unknown`/`mixed` semantics are covered by fixtures.
+- [ ] `sentimentScore` is treated as auxiliary until calibrated; product/report logic uses label/count/net semantics unless a documented calibration decision says otherwise.
 - [ ] Cutover decision is documented; default provider changes only if quality/cost gates pass.
 - [ ] Scoring remains deterministic from persisted findings; `grader_score` is never assigned by an LLM.
 - [ ] Failure path returns the deterministic finding intact and captures sanitized growth-domain errors.
