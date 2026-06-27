@@ -916,6 +916,15 @@ export const VIEW_REGISTRY: GovernanceViewRegistryEntry[] = [
     description: 'Web Delivery operativo. Módulo Wave.',
     routePath: '/web-delivery',
     routeGroup: 'client'
+  },
+  {
+    viewCode: 'cliente.ai_visibility_report',
+    section: 'cliente',
+    label: 'Visibilidad en IA',
+    description:
+      'Informe AI Visibility client-scoped (TASK-1248): cómo te ve la IA — puntaje, dimensiones, recomendaciones y tendencia. Deep-link, sin evidencia cruda.',
+    routePath: '/growth/ai-visibility/report',
+    routeGroup: 'client'
   }
 ]
 

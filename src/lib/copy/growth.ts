@@ -331,3 +331,91 @@ export const GH_GROWTH_AI_VISIBILITY_REPORT_ARTIFACT = {
     }
   }
 } as const
+
+/**
+ * TASK-1248 — Portal cliente · AI Visibility (workbench master-detail). Copy es-CL (tuteo) del
+ * 4.º consumer del reporte: navigator (Dimensiones + Recomendaciones) + detail canvas. Touchpoint
+ * de CLIENTE → tono cálido/profesional, marca Greenhouse by Efeonce; data-first, número con contexto,
+ * estados honestos. NUNCA promete un monitoreo recurrente (ese SKU no existe). Validado con
+ * `greenhouse-ux-writing`.
+ */
+export const GH_GROWTH_AI_VISIBILITY_CLIENT_REPORT = {
+  page: {
+    breadcrumbRoot: 'Greenhouse',
+    breadcrumbGrowth: 'Crecimiento',
+    title: 'Visibilidad en IA',
+    subtitle: 'Cómo te ve la inteligencia artificial cuando responde por tu categoría.',
+    orgChipAria: 'Organización del informe',
+    asOfLabel: 'Datos al',
+    samplingNote: 'Medición sobre una muestra de respuestas de IA, no un monitoreo continuo.'
+  },
+  navigator: {
+    ariaLabel: 'Navegador del informe: dimensiones y recomendaciones',
+    dimensionsHeader: 'Dimensiones',
+    recommendationsHeader: 'Recomendaciones',
+    dimensionsEmpty: 'Aún no hay dimensiones medidas.',
+    recommendationsEmpty: 'Sin recomendaciones: tu visibilidad está en buen estado.',
+    rowScoreAria: 'Puntaje',
+    selectHint: 'Selecciona un ítem para ver el detalle'
+  },
+  detail: {
+    overviewTitle: 'Resumen',
+    scoreLabel: 'Puntaje de visibilidad',
+    scoreOutOf: 'de 100',
+    scoreNoData: 'Sin dato',
+    comparePrevious: 'vs medición anterior',
+    noPrevious: 'Primera medición',
+    perceptionAxisLabel: 'Percepción · ¿te mencionan?',
+    agenticAxisLabel: 'Operabilidad · ¿te pueden usar?',
+    agenticCoverage: 'En cobertura',
+    whyItMatters: '¿Por qué importa?',
+    whatToDo: 'Qué hacer',
+    motionLabel: 'Enfoque sugerido',
+    trendTitle: 'Tendencia',
+    trendMetricName: 'Visibilidad',
+    providerPresenceTitle: 'Presencia por motor',
+    providerPresenceHelp: 'En cuántas respuestas apareces, por motor de IA.',
+    providerPresenceAria: 'Presencia por motor de IA',
+    providerOf: 'de',
+    signalsTitle: 'Señales',
+    dimensionScoreContext: 'Puntaje de esta dimensión, en una escala de 0 a 100.'
+  },
+  signals: {
+    citationTitle: 'Citas a tu sitio',
+    citationHelp: 'De las respuestas con fuentes, cuántas citan tu dominio.',
+    citationNoData: 'Sin citas evaluables',
+    sentimentTitle: 'Sentimiento',
+    sentimentHelp: 'Saldo del tono con que la IA habla de tu marca.',
+    positionTitle: 'Posición',
+    positionHelp: 'Qué tan arriba apareces cuando te mencionan.',
+    positionBest: 'Mejor',
+    positionAverage: 'Promedio',
+    positionNoData: 'Sin posición resuelta'
+  },
+  cta: {
+    scheduleConversation: 'Agendar conversación',
+    scheduleHelp: 'Conversemos cómo mejorar tu visibilidad con tu equipo de Efeonce.',
+    ariaLabel: 'Agendar una conversación con tu equipo de Efeonce'
+  },
+  states: {
+    loadingTitle: 'Preparando tu informe de visibilidad…',
+    empty: {
+      title: 'Aún no tienes un informe de visibilidad',
+      body: 'Cuando midamos cómo te ve la IA, tu informe aparece aquí con tu puntaje y las acciones recomendadas.',
+      cta: 'Solicitar diagnóstico'
+    },
+    preparing: {
+      title: 'Tu informe se está preparando',
+      body: 'Estamos terminando de medir tu visibilidad. Vuelve en un rato y estará listo.'
+    },
+    error: {
+      title: 'No pudimos cargar tu informe',
+      body: 'Tuvimos un problema al traer tus datos. Intenta de nuevo en unos minutos.',
+      retry: 'Reintentar'
+    },
+    permissionDenied: {
+      title: 'No tienes acceso a este informe',
+      body: 'Tu cuenta no tiene permiso para ver la visibilidad en IA. Contacta a tu equipo de Efeonce.'
+    }
+  }
+} as const

@@ -341,6 +341,13 @@ export const DECLARED_CHILD_ROUTES: readonly ChildRouteDeclaration[] = [
     via: 'inline-link',
     reason:
       'Geometry Lab (TASK-1050) — child surface del Design System para spacing/radius AXIS y la extension Greenhouse xxl/display, alcanzable desde el catalogo canonico /design-system.'
+  },
+  {
+    route: '/growth/ai-visibility/report',
+    parent: '/home',
+    via: 'inline-link',
+    reason:
+      'AI Visibility client report (TASK-1248) — surface client-scoped (routeGroup client, viewCode cliente.ai_visibility_report). Deep-link primero (OQ resuelta): se alcanza desde Account 360 / el handoff del Report Packet Delivery (TASK-1250), no como item de nav principal hasta que exista el monitor recurrente. Gateada server-side por client tenant + capability growth.ai_visibility.report.read_client.'
   }
 ]
 
