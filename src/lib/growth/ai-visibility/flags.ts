@@ -89,3 +89,17 @@ export const GROWTH_AI_VISIBILITY_LEAD_HANDOFF_FLAG = 'GROWTH_AI_VISIBILITY_LEAD
 
 export const isLeadHandoffEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
   isTrue(env[GROWTH_AI_VISIBILITY_LEAD_HANDOFF_FLAG])
+
+/**
+ * TASK-1250 — Email transaccional de entrega del informe al lead. Default OFF: el reactive
+ * consumer resuelve disabled y produce `skipped` (NUNCA envía email, NUNCA crash). El enqueue
+ * del evento igual ocurre (barato); el gate vive en el WRITE (dispatch) para no perder eventos
+ * al prender. Con ON: el consumer arma el adjunto PDF público-safe + envía vía `sendEmail`,
+ * con consent-gate, gate de estado del reporte e idempotencia DB-level por (report_id, email_type).
+ * No production send hasta TASK-1246. Registrar en docs/operations/FEATURE_FLAG_STATE_LEDGER.md
+ * (gate docs:closure-check).
+ */
+export const GROWTH_AI_VISIBILITY_REPORT_EMAIL_FLAG = 'GROWTH_AI_VISIBILITY_REPORT_EMAIL_ENABLED'
+
+export const isReportEmailDeliveryEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+  isTrue(env[GROWTH_AI_VISIBILITY_REPORT_EMAIL_FLAG])
