@@ -46,11 +46,13 @@ Hay un primitive server-side único (`executeGraderRun`) y todos lo consumen igu
 - **CLI de smoke:** `pnpm growth:ai-visibility:smoke` (ver el [manual](../../manual-de-uso/growth/ai-visibility-grader-smoke.md)).
 - **A futuro:** la UI pública, el admin, Nexa/MCP, el report builder y el handoff a HubSpot consumirán el MISMO primitive — ninguno llamará a los proveedores por su cuenta.
 
-## Estado del rollout (2026-06-24)
+## Estado del rollout (2026-06-27)
 
-- **staging:** encendido para OpenAI + Anthropic + **Gemini** (corre proveedores reales; verificado). Gemini usa la última generación disponible (**Gemini 3**, `gemini-3-flash-preview` vía Vertex) porque el grader debe medir con el modelo que la gente usa hoy; el modelo es ajustable por env sin redeploy.
+- **staging:** encendido para OpenAI + Anthropic + **Gemini** + **Perplexity** (corre proveedores reales; verificado). Gemini usa la última generación disponible (**Gemini 3**, `gemini-3-flash-preview` vía Vertex) porque el grader debe medir con el modelo que la gente usa hoy; el modelo es ajustable por env sin redeploy.
 - **producción:** apagado — el encendido es un proceso aparte (migración + release controlado) que se hará después.
-- **Perplexity:** apagado hasta tener credenciales (no tiene cliente con grounding aún).
+- **Perplexity:** **encendido en staging (TASK-1249).** Usa el cliente canónico `src/lib/ai/perplexity.ts` (Sonar, search-grounded). Smoke real low-volume verde (6/6 respuestas con citas). El proveedor set arch (OpenAI/Perplexity/Gemini) queda **completo**.
+- **Prompt pack v2 (TASK-1249):** existe como versión seleccionable (corrige el prompt p12, que nombraba sectores y ensuciaba las marcas de control). El **default sigue siendo v1** hasta una validación real; v2 es opt-in.
+- **Pesos del score:** se mantiene **V1** (decisión documentada — el set de calibración es muy chico para reajustar pesos sin sobreajustar; detalle en `GREENHOUSE_AI_VISIBILITY_GRADER_CALIBRATION_V1.md` §Delta 2026-06-27).
 
 ## Del dato al puntaje (findings y score — TASK-1227)
 

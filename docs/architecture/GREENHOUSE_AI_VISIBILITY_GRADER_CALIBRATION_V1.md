@@ -127,3 +127,40 @@ El arch V1 define providers OpenAI/Perplexity/Gemini. Este spike incluyó **Anth
 2. **Gemini/Perplexity** cuando haya credenciales (completar el provider set arch V1).
 3. **ADR delta**: decidir si Anthropic entra al provider set V1.
 4. **Prompt pack v2**: fix p12 ("aerolínea/banca" contamina controles); p06 ya corregido en el harness.
+
+## Delta 2026-06-27 — TASK-1249 (provider completion + decisión de pesos)
+
+Cierra los follow-ups #2 y #4 y resuelve formalmente el #1 como **decisión documentada**, no como fit.
+
+### a) Perplexity completado (follow-up #2)
+
+- Secret `greenhouse-perplexity-api-key` (v1) provisionado + grant `secretAccessor` al SA runtime `greenhouse-portal@`; flag `GROWTH_AI_VISIBILITY_PERPLEXITY_ENABLED` ON en staging (ledger). Gemini ya lo había cerrado `TASK-1233`. **El provider set arch V1 (OpenAI/Perplexity/Gemini) queda completo y operativo.**
+- **Smoke real low-volume** (aislado a Perplexity, modo `light`, 2 marcas fixture): **6/6 prompts `succeeded` por marca**, cada observación con texto acotado + **9-10 citations** parseadas, `source=secret_manager`, sin errores. Perplexity (Sonar) es una fuente search-grounded válida y barata (~US$0.004/marca en `light`), más rápida/barata que Anthropic+web_search (§5). El parser del cliente canónico maneja el payload real (`citations` como array de URLs) — bloqueado con test de fixture.
+
+### b) Efecto del nuevo mix de providers sobre la reproducibilidad
+
+- El **provider set es parte de la provenance** y ya se persiste por run (`grader_runs.requested_providers` + `prompt_pack_version` + `provider_policy_version`; `grader_scores.score_version`; `provider_observations.provider/model`). Los snapshots **pre/post-Perplexity quedan version-tagged y comparables, no mezclados en silencio** — un score publicado es reproducible/explicable por construcción (¿cambió por pesos, prompt o mix de providers?).
+- Medición del **efecto agregado** de sumar Perplexity sobre la distribución de scores: requiere una corrida multi-provider scoreada pre/post (gasto de budget mayor) → **follow-up** (no se ejecutó en esta task; decisión de budget mínimo del operador 2026-06-27).
+
+### c) Decisión de pesos del score (follow-up #1) — **MANTENER V1**
+
+`score_version = ai_visibility_score_v1` se **mantiene intacto**. Rationale (anti-overfitting honesto):
+
+- **El golden set son 8 casos** → estadísticamente **demasiado chico para un split calibration/holdout o cross-validation** que generalice. Tunear pesos contra esos 8 casos y medir sobre los mismos sería overfitting puro ("siempre mejora sobre lo que ajustaste").
+- La evidencia del spike (escala de discriminación **5→0**, §4.bis) **respalda el ordenamiento de pesos de V1** — AI Visibility (peso 25, el más alto) es justo la dimensión que discrimina limpio techo→piso. No hay señal que contradiga el orden hipótesis; sí falta **volumen productivo** para un fit defendible.
+- Por lo tanto **no se recalibran pesos por fit**. Un eventual `ai_visibility_score_v1_1` queda como **follow-up que requiere (i) volumen productivo real, (ii) split o cross-validation con holdout, y (iii) product sign-off** (cambiar pesos mueve scores publicados). Sería additive (V1 intacto, nuevo `score_version`), nunca un recompute retroactivo de snapshots.
+
+### d) Prompt pack v2 (follow-up #4)
+
+- Creado `prompt-pack.v2` (additive, V1 intacto/reproducible, **opt-in** vía `promptPackVersion`). Fix único: **p12** deja de nombrar sectores ("aerolínea o banca") que contaminaban los controles. p06 ya estaba resuelto por `resolvePromptInputs` (gating de `{{competitor}}`).
+- **Default de runtime sigue siendo V1.** Promover v2 a default cambia outputs → requiere **golden eval real (baseline + regresión)** por la regla eval-driven (decisión arch #10). Como el golden eval determinista es *observation-based* (no *prompt-based*), validar v2 exige una corrida real v1-vs-v2 cacheando observaciones por input determinista → **follow-up** (budget mínimo esta task).
+
+### Estado de follow-ups tras esta task
+
+| # | Follow-up | Estado |
+|---|---|---|
+| 1 | Recalibrar pesos | **Decisión: mantener V1** (set muy chico para fit; evidencia respalda el orden). V1.1 difere a volumen + sign-off. |
+| 2 | Gemini/Perplexity | **HECHO** (Gemini TASK-1233; Perplexity TASK-1249, smoke real verde). |
+| 3 | ADR delta Anthropic | Abierto (decisión de producto). |
+| 4 | Prompt pack v2 | **HECHO como artefacto opt-in**; activación a default difiere a eval real. |
+| 5 | Eval real v1-vs-v2 + efecto agregado del mix + cost ceiling N≥3 | Abierto (requiere budget de provider). |
