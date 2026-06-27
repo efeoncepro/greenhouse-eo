@@ -5,8 +5,9 @@
  *
  * Render React/MUI del informe a partir del `ReportArtifactModel` (SoT compartido).
  * NO calcula score/gaps/tendencia: sólo presenta campos del modelo. Las secciones se
- * gobiernan por la disclosure matrix (`reportSectionVisible`) — `engineSnapshot` solo
- * aparece en `adminPreview`. Tokens AXIS (sin HEX/fontSize inline), copy es-CL desde
+ * gobiernan por la disclosure matrix (`reportSectionVisible`); `engineSnapshot` (visibilidad
+ * por motor: logo + nombre + presencia) es público-safe y se muestra en todas las variants.
+ * Tokens AXIS (sin HEX/fontSize inline), copy es-CL desde
  * `src/lib/copy/growth.ts`, a11y: heading order, score semántico, charts con fallback,
  * severidad nombrada + ícono (nunca color-only). El attachment/print usa OTRO adapter.
  */
@@ -78,11 +79,25 @@ const LEVEL_ICON: Record<ReportLevelId, string> = {
   intrinsic: 'tabler-trophy'
 }
 
-const ENGINE_LOGO: Record<string, GreenhouseBrandLogoKind> = {
+// Logo por motor: AXIS brand kinds para Gemini/ChatGPT/Claude; Perplexity vía iconify
+// bundleado (`logos:perplexity-icon`). NUNCA reusar un logo por otro (cada motor se identifica).
+const ENGINE_LOGO_KIND: Record<string, GreenhouseBrandLogoKind> = {
   gemini: 'geminiColor',
+  google_ai_overview: 'geminiColor',
   openai: 'gptIsotype',
-  anthropic: 'claudeIsologo',
-  perplexity: 'gptIsotype'
+  anthropic: 'claudeIsologo'
+}
+
+const EngineLogo = ({ provider }: { provider: string }) => {
+  if (provider === 'perplexity') {
+    return <i className='logos-perplexity-icon' aria-hidden style={{ fontSize: '1.5rem' }} />
+  }
+
+  const kind = ENGINE_LOGO_KIND[provider]
+
+  if (kind) return <GreenhouseBrandLogoMark kind={kind} size='small' />
+
+  return <i className='tabler-robot' aria-hidden style={{ fontSize: '1.5rem', color: 'var(--mui-palette-text-secondary)' }} />
 }
 
 const SectionHeading = ({ title, helper, ordinal }: { title: string; helper?: string; ordinal?: number }) => (
@@ -355,7 +370,7 @@ const LevelsSection = ({ model }: { model: ReportArtifactModel }) => (
 const DimensionsSection = ({ model }: { model: ReportArtifactModel }) => (
   <Card variant='outlined' data-capture='ai-visibility-report-dimensions'>
     <CardContent>
-      <SectionHeading title={C.dimensions.title} ordinal={3} />
+      <SectionHeading title={C.dimensions.title} ordinal={4} />
       <Stack spacing={3} component='ul' sx={{ listStyle: 'none', p: 0, m: 0 }}>
         {model.dimensions.map(dim => {
           const color = toneToColor(dim.severity)
@@ -436,7 +451,7 @@ const AeoSignalsSection = ({ model }: { model: ReportArtifactModel }) => {
   return (
     <Card variant='outlined' data-capture='ai-visibility-report-aeo-signals'>
       <CardContent>
-        <SectionHeading title={C.signals.title} ordinal={4} />
+        <SectionHeading title={C.signals.title} ordinal={5} />
         <Grid container spacing={4}>
           <Grid size={{ xs: 12, sm: 4 }}>
             <Typography variant='overline' color='text.secondary'>
@@ -492,7 +507,7 @@ const CompetitiveSovSection = ({ model }: { model: ReportArtifactModel }) => {
   return (
     <Card variant='outlined' data-capture='ai-visibility-report-sov'>
       <CardContent>
-        <SectionHeading title={C.sov.title} helper={C.sov.helper} ordinal={5} />
+        <SectionHeading title={C.sov.title} helper={C.sov.helper} ordinal={6} />
         <Stack spacing={2.5}>
           {rows.map(row => (
             <Box key={row.name}>
@@ -539,7 +554,7 @@ const TrendSection = ({ model }: { model: ReportArtifactModel }) => {
     return (
       <Card variant='outlined' data-capture='ai-visibility-report-trend'>
         <CardContent>
-          <SectionHeading title={C.signals.trendTitle} ordinal={6} />
+          <SectionHeading title={C.signals.trendTitle} ordinal={7} />
           <Stack direction='row' spacing={1.5} alignItems='center'>
             <i className='tabler-chart-line' aria-hidden style={{ color: 'var(--mui-palette-text-secondary)' }} />
             <Typography variant='body2' color='text.secondary'>
@@ -559,7 +574,7 @@ const TrendSection = ({ model }: { model: ReportArtifactModel }) => {
   return (
     <Card variant='outlined' data-capture='ai-visibility-report-trend'>
       <CardContent>
-        <SectionHeading title={C.signals.trendTitle} ordinal={6} />
+        <SectionHeading title={C.signals.trendTitle} ordinal={7} />
         <Stack direction='row' spacing={2} alignItems='baseline' sx={{ mb: 2 }}>
           <Typography variant='kpiValue'>{trend.overall.current}</Typography>
           <Chip
@@ -609,7 +624,7 @@ const TrendSection = ({ model }: { model: ReportArtifactModel }) => {
 const RecommendationsSection = ({ model }: { model: ReportArtifactModel }) => (
   <Card variant='outlined' data-capture='ai-visibility-report-recommendations'>
     <CardContent>
-      <SectionHeading title={C.recommendations.title} ordinal={7} />
+      <SectionHeading title={C.recommendations.title} ordinal={8} />
       <Stack spacing={3} component='ol' sx={{ listStyle: 'none', p: 0, m: 0 }}>
         {model.recommendations.map((rec, idx) => {
           const color = toneToColor(rec.severity)
@@ -645,28 +660,34 @@ const EngineSnapshotSection = ({ model }: { model: ReportArtifactModel }) => {
   if (!model.engineSnapshot?.length) return null
 
   return (
-    <Card variant='outlined' data-capture='ai-visibility-report-engine-snapshot' sx={{ borderColor: 'warning.main' }}>
+    <Card variant='outlined' data-capture='ai-visibility-report-engine-snapshot'>
       <CardContent>
-        <SectionHeading title={C.engineSnapshot.title} helper={C.engineSnapshot.helper} />
+        <SectionHeading title={C.engineSnapshot.title} helper={C.engineSnapshot.helper} ordinal={3} />
         <Stack spacing={2.5}>
           {model.engineSnapshot.map(engine => {
             const pct = engine.resolved === 0 ? 0 : Math.round((engine.present / engine.resolved) * 100)
-            const logo = ENGINE_LOGO[engine.provider]
+            const barColor = pct >= 70 ? 'success' : pct >= 45 ? 'warning' : 'error'
+
+            const name =
+              GH_GROWTH_AI_VISIBILITY.provider_label[engine.provider as keyof typeof GH_GROWTH_AI_VISIBILITY.provider_label] ??
+              engine.provider
 
             return (
               <Stack key={engine.provider} direction='row' spacing={2} alignItems='center'>
-                {logo && <GreenhouseBrandLogoMark kind={logo} size='small' />}
+                <Box sx={{ width: 28, display: 'flex', justifyContent: 'center', flexShrink: 0 }}>
+                  <EngineLogo provider={engine.provider} />
+                </Box>
                 <Box sx={{ flex: 1 }}>
                   <Stack direction='row' justifyContent='space-between' sx={{ mb: 0.5 }}>
                     <Typography variant='body2' sx={{ fontWeight: 600 }}>
-                      {GH_GROWTH_AI_VISIBILITY.provider_label[engine.provider as keyof typeof GH_GROWTH_AI_VISIBILITY.provider_label] ?? engine.provider}
+                      {name}
                     </Typography>
                     <Typography variant='monoAmount' color='text.secondary'>
                       {C.engineSnapshot.presentLabel(engine.present, engine.resolved)}
                     </Typography>
                   </Stack>
                   <Box sx={{ height: 8, borderRadius: theme.shape.customBorderRadius.sm, bgcolor: theme.palette.action.hover, overflow: 'hidden' }}>
-                    <Box sx={{ height: '100%', width: `${pct}%`, bgcolor: 'warning.main', borderRadius: 'inherit' }} />
+                    <Box sx={{ height: '100%', width: `${pct}%`, bgcolor: `${barColor}.main`, borderRadius: 'inherit' }} />
                   </Box>
                 </Box>
               </Stack>

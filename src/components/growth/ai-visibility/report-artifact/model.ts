@@ -12,9 +12,10 @@
  *    → `PublicGraderReport`; `clientPortal` → `ClientGraderReport`; `adminPreview`
  *    → `GraderReport` (interno). Los tipos ya bloquean el leak por construcción.
  *  - `null ≠ 0`: una dimensión/eje sin evidencia es `sin_dato`, NUNCA 0.
- *  - Score por proveedor (engine snapshot/trend) es INTERNAL-ONLY: solo `adminPreview`.
- *    El público sólo ve la LISTA de proveedores muestreados (`provenance.providersSampled`),
- *    nunca su desempeño por motor.
+ *  - `engineSnapshot` = presencia por motor (CONTEOS) de la marca evaluada, con logo +
+ *    nombre por motor → PÚBLICO-SAFE (el headline del lead magnet), se muestra en todas
+ *    las variants. Lo único internal-only es `providerFindings` (la NARRATIVA cruda por
+ *    motor), que NUNCA entra al modelo público/cliente.
  *  - Dos ejes ortogonales: percepción (¿te mencionan?) y operabilidad agéntica
  *    (¿te pueden usar?). NUNCA se fusionan en un número único.
  */
@@ -117,13 +118,16 @@ export type ReportArtifactSectionId = (typeof REPORT_SECTION_IDS)[number]
 
 /**
  * Disclosure matrix: qué secciones se muestran por variant, en orden de lectura
- * editorial. `engineSnapshot` (desempeño por proveedor) es INTERNAL-ONLY → solo
- * `adminPreview`. El resto deriva de campos presentes en el DTO de la audiencia.
+ * editorial. `engineSnapshot` = presencia por motor (CONTEOS) de la marca evaluada,
+ * con logo + nombre por motor → es público-safe (el headline del lead magnet) y se
+ * muestra en TODAS las variants. Lo único internal-only es `providerFindings` (la
+ * narrativa cruda por motor), que NUNCA entra al modelo público/cliente.
  */
 export const REPORT_SECTION_VISIBILITY: Record<ReportArtifactVariant, ReportArtifactSectionId[]> = {
   publicWeb: [
     'verdict',
     'levels',
+    'engineSnapshot',
     'primaryGap',
     'dimensions',
     'aeoSignals',
@@ -136,6 +140,7 @@ export const REPORT_SECTION_VISIBILITY: Record<ReportArtifactVariant, ReportArti
   clientPortal: [
     'verdict',
     'levels',
+    'engineSnapshot',
     'primaryGap',
     'dimensions',
     'aeoSignals',
@@ -148,6 +153,7 @@ export const REPORT_SECTION_VISIBILITY: Record<ReportArtifactVariant, ReportArti
   attachment: [
     'verdict',
     'levels',
+    'engineSnapshot',
     'primaryGap',
     'dimensions',
     'aeoSignals',
@@ -228,7 +234,7 @@ export interface ReportArtifactModel {
   trend: ReportTrend
   provenance: ReportProvenance
   disclaimer: string
-  /** INTERNAL-ONLY (adminPreview): desempeño por proveedor. `undefined` en público/cliente. */
+  /** Presencia por motor (conteos) de la marca evaluada — público-safe, con logo + nombre. */
   engineSnapshot?: ProviderPresence[]
 }
 
@@ -315,7 +321,10 @@ const baseModel = (
   positionSummary: report.positionSummary,
   trend: report.trend,
   provenance: report.provenance,
-  disclaimer: report.disclaimer
+  disclaimer: report.disclaimer,
+  // TASK-1252 — presencia por motor (conteos) de la marca evaluada. Público-safe: es la
+  // visibilidad del sujeto por canal (el valor del lead magnet), con logo + nombre por motor.
+  engineSnapshot: report.providerPresence
 })
 
 /** publicWeb / attachment ← `PublicGraderReport` (lead magnet, leak-safe por tipo). */

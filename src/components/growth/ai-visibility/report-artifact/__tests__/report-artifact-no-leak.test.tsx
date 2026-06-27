@@ -16,8 +16,8 @@ import { GH_GROWTH_AI_VISIBILITY_REPORT_ARTIFACT } from '@/lib/copy/growth'
 
 import AiVisibilityReportArtifact, { type ReportHeader } from '../web/AiVisibilityReportArtifact'
 import AiVisibilityReportPrint from '../print/AiVisibilityReportPrint'
-import { SAMPLE_CLIENT_REPORT, SAMPLE_INTERNAL_REPORT, SAMPLE_PUBLIC_REPORT } from '../fixtures'
-import { modelFromClientReport, modelFromInternalReport, modelFromPublicReport, reportSectionVisible } from '../model'
+import { SAMPLE_CLIENT_REPORT, SAMPLE_PUBLIC_REPORT } from '../fixtures'
+import { modelFromClientReport, modelFromPublicReport, reportSectionVisible } from '../model'
 
 // jsdom no trae IntersectionObserver (AnimatedCounter) ni ResizeObserver (Recharts).
 class MockObserver {
@@ -36,12 +36,13 @@ const HEADER: ReportHeader = { organizationName: 'Globe', reportDate: '20 may 20
 const C_TREND_TITLE = GH_GROWTH_AI_VISIBILITY_REPORT_ARTIFACT.signals.trendTitle
 
 // Strings internal-only que NUNCA deben aparecer en el render público/cliente.
+// Nota: la PRESENCIA por motor (sección "Visibilidad por motor" con conteos + logo + nombre)
+// SÍ es pública (TASK-1252); lo internal-only es la NARRATIVA cruda por motor (providerFindings).
 const INTERNAL_LEAK_STRINGS = [
   'INTERNAL',
   'invisible en Perplexity',
   'confusión con una marca homónima',
-  'Confusión de identidad',
-  'Visibilidad por motor (interno)'
+  'Confusión de identidad'
 ]
 
 describe('AiVisibilityReportArtifact — no-leak visual', () => {
@@ -69,18 +70,20 @@ describe('AiVisibilityReportArtifact — no-leak visual', () => {
     }
   })
 
-  it('engineSnapshot solo es visible en adminPreview (disclosure matrix)', () => {
-    expect(reportSectionVisible('publicWeb', 'engineSnapshot')).toBe(false)
-    expect(reportSectionVisible('clientPortal', 'engineSnapshot')).toBe(false)
-    expect(reportSectionVisible('attachment', 'engineSnapshot')).toBe(false)
+  it('engineSnapshot (visibilidad por motor) es público en todas las variants', () => {
+    expect(reportSectionVisible('publicWeb', 'engineSnapshot')).toBe(true)
+    expect(reportSectionVisible('clientPortal', 'engineSnapshot')).toBe(true)
+    expect(reportSectionVisible('attachment', 'engineSnapshot')).toBe(true)
     expect(reportSectionVisible('adminPreview', 'engineSnapshot')).toBe(true)
   })
 
-  it('adminPreview sí muestra el engine snapshot interno', () => {
-    const model = modelFromInternalReport(SAMPLE_INTERNAL_REPORT)
+  it('publicWeb muestra "Visibilidad por motor" con logos + nombres de motor', () => {
+    const model = modelFromPublicReport(SAMPLE_PUBLIC_REPORT)
     const { container } = renderWithTheme(<AiVisibilityReportArtifact model={model} header={HEADER} />)
 
-    expect(container.textContent).toContain('Visibilidad por motor (interno)')
+    expect(container.textContent).toContain('Visibilidad por motor')
+    expect(container.textContent).toContain('Gemini (Google)')
+    expect(container.textContent).toContain('Perplexity')
   })
 
   it('print/attachment adapter renderiza público-safe (sin leak, sin trend/engine)', () => {
@@ -95,9 +98,10 @@ describe('AiVisibilityReportArtifact — no-leak visual', () => {
     // Contenido esperado del attachment.
     expect(container.textContent).toContain('Globe')
     expect(container.textContent).toContain('Competidor A')
-    // attachment NO incluye tendencia ni engine snapshot (disclosure matrix).
+    // attachment SÍ incluye visibilidad por motor (público-safe) pero NO tendencia.
+    expect(reportSectionVisible('attachment', 'engineSnapshot')).toBe(true)
     expect(reportSectionVisible('attachment', 'trend')).toBe(false)
-    expect(reportSectionVisible('attachment', 'engineSnapshot')).toBe(false)
+    expect(container.textContent).toContain('Gemini (Google)')
     expect(container.textContent).not.toContain(C_TREND_TITLE)
   })
 })

@@ -148,6 +148,37 @@ const AiVisibilityReportPrint = ({ model, header }: AiVisibilityReportPrintProps
         </Box>
       )}
 
+      {/* Visibilidad por motor (presencia por canal — público-safe, con nombre por motor) */}
+      {show('engineSnapshot') && model.engineSnapshot?.length ? (
+        <Box sx={{ mb: 5 }} data-capture='ai-visibility-report-print-engine'>
+          <PrintHeading title={C.engineSnapshot.title} helper={C.engineSnapshot.helper} />
+          <Stack spacing={2}>
+            {model.engineSnapshot.map(engine => {
+              const pct = engine.resolved === 0 ? 0 : Math.round((engine.present / engine.resolved) * 100)
+
+              const name =
+                GH_GROWTH_AI_VISIBILITY.provider_label[
+                  engine.provider as keyof typeof GH_GROWTH_AI_VISIBILITY.provider_label
+                ] ?? engine.provider
+
+              return (
+                <Box key={engine.provider}>
+                  <Stack direction='row' justifyContent='space-between'>
+                    <Typography variant='body2' sx={{ fontWeight: 600 }}>
+                      {name}
+                    </Typography>
+                    <Typography variant='monoAmount' color='text.secondary'>
+                      {C.engineSnapshot.presentLabel(engine.present, engine.resolved)}
+                    </Typography>
+                  </Stack>
+                  <StaticBar value={pct} color={pct >= 70 ? 'var(--mui-palette-success-main)' : pct >= 45 ? 'var(--mui-palette-warning-main)' : 'var(--mui-palette-error-main)'} />
+                </Box>
+              )
+            })}
+          </Stack>
+        </Box>
+      ) : null}
+
       {/* Primary gap */}
       {show('primaryGap') && model.primaryGap && (
         <Box sx={{ mb: 5 }}>

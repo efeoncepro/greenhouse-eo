@@ -412,7 +412,10 @@ export const toPublicGraderReport = (report: GraderReport): PublicGraderReport =
   recommendedMotion: report.recommendedMotion,
   competitiveSov: report.competitiveSov,
   sourceTypeSummary: report.sourceTypeSummary,
-  // TASK-1237 — agregados seguros (%/conteos). `providerFindings` se OMITE (detalle por canal, internal-only).
+  // TASK-1252 — presencia por motor (conteos): visibilidad propia por canal, público-safe.
+  // `providerFindings` (narrativa cruda por motor) se OMITE (internal-only).
+  providerPresence: report.providerPresence,
+  // TASK-1237 — agregados seguros (%/conteos).
   citationInsight: report.citationInsight,
   sentimentSummary: report.sentimentSummary,
   positionSummary: report.positionSummary,
@@ -425,10 +428,10 @@ export const toPublicGraderReport = (report: GraderReport): PublicGraderReport =
 /**
  * TASK-1243 — Proyecta el reporte interno al DTO CLIENTE (3.er consumer de la parity).
  * Reusa exactamente las mismas proyecciones leak-safe que el público (dimensiones sin
- * `reason`/`recommendation`, recomendaciones sin `priority`, primaryGap sin `action`, y
- * estructuralmente SIN `providerPresence`/`providerFindings`/`accuracyFindings`), con una
- * sola diferencia: las recomendaciones NO se acotan a 3 (el cliente autenticado ve el set
- * completo accionable). Mismo `buildGraderReport` upstream — sin reimplementación.
+ * `reason`/`recommendation`, recomendaciones sin `priority`, primaryGap sin `action`,
+ * SÍ con `providerPresence` = conteos por motor, y estructuralmente SIN `providerFindings`/
+ * `accuracyFindings`), con una sola diferencia: las recomendaciones NO se acotan a 3 (el
+ * cliente autenticado ve el set completo accionable). Mismo `buildGraderReport` upstream.
  */
 export const toClientGraderReport = (report: GraderReport): ClientGraderReport => ({
   reportVersion: report.reportVersion,
@@ -461,6 +464,8 @@ export const toClientGraderReport = (report: GraderReport): ClientGraderReport =
   recommendedMotion: report.recommendedMotion,
   competitiveSov: report.competitiveSov,
   sourceTypeSummary: report.sourceTypeSummary,
+  // TASK-1252 — presencia por motor (conteos), igual que el público. `providerFindings` sigue internal-only.
+  providerPresence: report.providerPresence,
   citationInsight: report.citationInsight,
   sentimentSummary: report.sentimentSummary,
   positionSummary: report.positionSummary,

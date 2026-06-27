@@ -30,6 +30,8 @@ export const scenario: CaptureScenario = {
   steps: [
     { kind: 'mark', label: '01-score-gauge', clipSelector: '[data-capture="ai-visibility-report-score"]' },
     { kind: 'mark', label: '02-readiness-levels', clipSelector: '[data-capture="ai-visibility-report-levels"]' },
+    { kind: 'scroll', selector: '[data-capture="ai-visibility-report-engine-snapshot"]', scrollBlock: 'center' },
+    { kind: 'mark', label: '02b-engine-visibility', clipSelector: '[data-capture="ai-visibility-report-engine-snapshot"]' },
     { kind: 'scroll', selector: '[data-capture="ai-visibility-report-dimensions"]', scrollBlock: 'center' },
     { kind: 'mark', label: '03-dimensions', clipSelector: '[data-capture="ai-visibility-report-dimensions"]' },
     { kind: 'scroll', selector: '[data-capture="ai-visibility-report-aeo-signals"]', scrollBlock: 'center' },

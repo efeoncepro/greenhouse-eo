@@ -51,7 +51,9 @@ describe('growth/ai-visibility — client report DTO (defensa en 3 capas)', () =
   it('capa A — el tipo cliente no tiene campos para evidencia interna', () => {
     const client = toClientGraderReport(buildWithSensitiveEvidence())
 
-    expect('providerPresence' in client).toBe(false)
+    // TASK-1252: presencia por motor (conteos) SÍ es visible para el cliente (visibilidad por canal).
+    expect('providerPresence' in client).toBe(true)
+    // La narrativa cruda por motor + exactitud siguen internal-only.
     expect('providerFindings' in client).toBe(false)
     expect('accuracyFindings' in client).toBe(false)
     expect(client.dimensions.every(d => !('reason' in d))).toBe(true)

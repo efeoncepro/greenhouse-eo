@@ -316,11 +316,11 @@ export interface GraderReport {
 
 /**
  * TASK-1243 — Reporte CLIENTE (3.er consumer de la parity). TIPO DISTINTO, leak-safe por
- * construcción: como `PublicGraderReport` (sin campos para raw provider text, `providerPresence`,
- * `providerFindings`, `accuracyFindings`, reasons internos de dimensión ni `priority` de
- * recomendación), PERO entre el público y el interno — las recomendaciones NO se acotan a 3
- * (el cliente autenticado ve el set completo accionable). El builder proyecta sólo campos
- * seguros (capa B) + leak test (capa C). Lo consume el portal cliente vía su BFF.
+ * construcción: como `PublicGraderReport` (sin campos para raw provider text, `providerFindings`,
+ * `accuracyFindings`, reasons internos de dimensión ni `priority` de recomendación; SÍ lleva
+ * `providerPresence` = conteos de visibilidad por canal, TASK-1252), PERO entre el público y el
+ * interno — las recomendaciones NO se acotan a 3 (el cliente autenticado ve el set completo
+ * accionable). El builder proyecta sólo campos seguros (capa B) + leak test (capa C). Lo consume el portal cliente vía su BFF.
  */
 export interface ClientGraderReport {
   reportVersion: GraderReportVersion
@@ -338,6 +338,9 @@ export interface ClientGraderReport {
   recommendedMotion: RecommendedMotion | null
   competitiveSov: CompetitiveShareOfVoice
   sourceTypeSummary: SourceTypeCount[]
+  // TASK-1252 — presencia por motor (conteos), igual que el público: la visibilidad propia
+  // por canal SÍ se muestra. `providerFindings` (narrativa cruda) sigue internal-only.
+  providerPresence: ProviderPresence[]
   citationInsight: CitationInsight
   sentimentSummary: SentimentSummary
   positionSummary: PositionSummary
@@ -356,8 +359,9 @@ export interface PublicPrimaryGap {
 
 /**
  * Reporte PÚBLICO (lead magnet). TIPO DISTINTO que estructuralmente NO tiene campos
- * para raw provider text, prompts, citation URLs, reasons internos ni presencia por
- * motor. El builder sólo lee campos seguros (defensa capa B) + leak test (capa C).
+ * para raw provider text, prompts, citation URLs, reasons internos ni la NARRATIVA cruda
+ * por motor (`providerFindings`). SÍ lleva `providerPresence` (conteos de visibilidad
+ * propia por canal, TASK-1252). El builder sólo lee campos seguros (capa B) + leak test (capa C).
  */
 export interface PublicGraderReport {
   reportVersion: GraderReportVersion
@@ -374,7 +378,11 @@ export interface PublicGraderReport {
   recommendedMotion: RecommendedMotion | null
   competitiveSov: CompetitiveShareOfVoice
   sourceTypeSummary: SourceTypeCount[]
-  // TASK-1237 — agregados seguros (%/conteos). `providerFindings` NO va al público (detalle por canal).
+  // TASK-1252 — presencia por motor (CONTEOS resolved/present). Es la visibilidad propia
+  // de la marca por canal (headline del lead magnet "Visibilidad por motor"), público-safe.
+  // `providerFindings` (la NARRATIVA cruda por motor) sigue siendo internal-only y NO va aquí.
+  providerPresence: ProviderPresence[]
+  // TASK-1237 — agregados seguros (%/conteos).
   citationInsight: CitationInsight
   sentimentSummary: SentimentSummary
   positionSummary: PositionSummary

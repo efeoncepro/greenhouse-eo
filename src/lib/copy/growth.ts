@@ -275,9 +275,9 @@ export const GH_GROWTH_AI_VISIBILITY_REPORT_ARTIFACT = {
     mentionsLabel: 'menciones'
   },
   engineSnapshot: {
-    // INTERNAL-ONLY (adminPreview): desempeño por proveedor; nunca público.
-    title: 'Visibilidad por motor (interno)',
-    helper: 'Desempeño por proveedor. Solo vista interna — no se expone al público ni al cliente.',
+    // Presencia por motor (conteos) de la marca evaluada — público-safe, con logo + nombre por motor.
+    title: 'Visibilidad por motor',
+    helper: 'Tu visibilidad no es uniforme: cada motor de IA es un canal distinto.',
     presentLabel: (present: number, resolved: number) => `${present} de ${resolved} respuestas`
   },
   signals: {

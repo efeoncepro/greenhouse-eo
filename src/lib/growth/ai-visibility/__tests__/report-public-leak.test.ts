@@ -40,8 +40,11 @@ describe('growth/ai-visibility — public report DTO (defensa en 3 capas)', () =
   it('capa A — el tipo público no tiene campos para evidencia interna', () => {
     const pub = toPublicGraderReport(buildWithSensitiveEvidence())
 
-    expect('providerPresence' in pub).toBe(false)
-    // TASK-1237: el detalle por motor (providerFindings) es internal-only.
+    // TASK-1252: la presencia por motor (CONTEOS) SÍ es pública (visibilidad por canal del
+    // sujeto, headline del lead magnet). Solo conteos provider/resolved/present, sin texto.
+    expect('providerPresence' in pub).toBe(true)
+    expect(pub.providerPresence.every(p => Object.keys(p).sort().join() === 'present,provider,resolved')).toBe(true)
+    // TASK-1237: la NARRATIVA cruda por motor (providerFindings) sigue internal-only.
     expect('providerFindings' in pub).toBe(false)
     expect(pub.dimensions.every(d => !('reason' in d))).toBe(true)
     expect(pub.dimensions.every(d => !('recommendation' in d))).toBe(true)
