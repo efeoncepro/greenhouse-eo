@@ -8,7 +8,9 @@
 - Supporting asset: [evidence-safe-workbench-sidecar.png](../../assets/product-design/task-1248-ai-visibility-client-report/evidence-safe-workbench-sidecar.png)
 - Intended consumers: authenticated client portal route, future Account 360 deep-link, future recurring monitor entry point.
 - Copy source: planned extension of `src/lib/copy/growth.ts`
-- Primitive decision: reuse `CompositionShell` (`leadPlusContext`), `ContextualSidecar` / Adaptive Sidecar `variant='inspector'`, Greenhouse breadcrumbs/chips/buttons, report artifact sections from `TASK-1252`, adaptive metric cards and ECharts/table fallback.
+- Primitive decision: reuse `CompositionShell` (`leadPlusContext`), `ContextualSidecar` / Adaptive Sidecar `variant='inspector'`, Greenhouse breadcrumbs/chips/buttons, and **`AiVisibilityReportArtifact` (TASK-1252) as the report renderer** (variant `clientPortal`, charts in **Recharts** + table fallback). NOT ECharts; do not rebuild report sections.
+
+> **Artifact reuse note (Delta 2026-06-27 PM):** regions 2–8 below (header score, dimensions, recommendations list, trend, signals) are **rendered by `AiVisibilityReportArtifact`** consumed with `model={modelFromClientReport(clientReport)}` — the "component candidates" `AiVisibilityScoreHero` / `AiVisibilityDimensionBreakdown` are the artifact's **internal sections**, not standalone components to build. The genuinely **net-new** UI in this task is: the client **page shell** (`CompositionShell`), the **`ContextualSidecar` recommendation inspector** (region 5 — the artifact has no per-recommendation sidecar), the safe-signal cards inside the sidecar (`MetricSummaryCard`), and the **client state surfaces** (region 9). Charts = the artifact's Recharts; no ECharts, no 2nd chart lib.
 
 ## Brief
 

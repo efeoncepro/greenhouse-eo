@@ -1,5 +1,13 @@
 # TASK-1248 — Growth AI Visibility: Client Report UI
 
+## Delta 2026-06-27 (PM) — reconciliación reuse-del-artifact (NO reconstruir, NO ECharts)
+
+Pre-toma, review con product-design + arch + SEO detectó inconsistencia interna: el Delta de abajo manda **consumir** el artifact de TASK-1252, pero el Scope/Detailed Spec/risk-matrix/acceptance todavía decían "construir dimension matrix + **ECharts** + cards a mano". El artifact (`AiVisibilityReportArtifact` web) **ya renderiza** score gauge, dimensiones (barras), tendencia y recomendaciones, y lo hace en **Recharts** (`AppRecharts`), **no ECharts**. Reconciliación aplicada:
+
+- **NO introducir ECharts.** El render del reporte es SSOT del artifact (Recharts). Esta task lo consume; cualquier mini-chart adicional (señales del sidecar) reusa el mismo enfoque del artifact, sin una 2.ª lib de charts.
+- **El trabajo neto real es:** (1) BFF route + page shell cliente, (2) consumir `AiVisibilityReportArtifact` con `modelFromClientReport(clientReport)` (variant `clientPortal`), (3) **estados cliente** (loading/empty/pending/partial/denied/error) — net-new, (4) **`ContextualSidecar` inspector de recomendación** — net-new (el artifact lista recomendaciones inline, NO tiene sidecar por-recomendación), (5) GVC + a11y.
+- Componentes "candidatos" `AiVisibilityScoreHero`/`AiVisibilityDimensionBreakdown` del wireframe **no existen como componentes**: el artifact los renderiza internamente (solo `MetricSummaryCard` existe como primitive, útil para las cards de señal del sidecar). No crearlos como fork del artifact.
+
 ## Delta 2026-06-27 — Report Artifact Design System implementado (TASK-1252)
 
 El render del reporte YA existe como sistema reusable feature-local: consumir `AiVisibilityReportArtifact` (web) desde `@/components/growth/ai-visibility/report-artifact` con `model={modelFromClientReport(clientReport)}` (variant `clientPortal`: set completo de recomendaciones, sin internals). NO reimplementar componentes de reporte. Esta task aporta el BFF client-scoped (TASK-1243) + estados/acceso del portal cliente.
@@ -120,7 +128,7 @@ Reglas obligatorias:
 
 - Surface: ruta client-scoped bajo portal cliente [verificar convencion]. **Ruta cliente** → viewCode routeGroup `client`, sembrado SOLO a roles `client_*`.
 - Composition Shell: `aplica` — composición `focused`/`single` (lectura de reporte) o `leadPlusContext` si hay sidecar de recomendación; declarar la composición, sin grid/morph ad-hoc.
-- Primitive decision: `reuse` — report cards, charts ECharts, CompositionShell, Adaptive Card density.
+- Primitive decision: `reuse` — `AiVisibilityReportArtifact` (TASK-1252, render SSOT del reporte, charts Recharts), CompositionShell, ContextualSidecar, Adaptive Card density. NO reconstruir el reporte ni introducir ECharts.
 - Adaptive density / The Seam: `aplica` — reporte nace adaptable (`card-density`, condensación honesta).
 - Floating/Sidecar/Dialog decision: AdaptiveSidecar variante `inspector` opcional para detalle de recomendación; no Dialog salvo accion sensible. No drawer custom.
 - Copy source: `src/lib/copy/growth.ts` (invocar `greenhouse-ux-writing`, es-CL; **es un touchpoint de cliente — cuidar marca Efeonce + tono**).
@@ -209,15 +217,14 @@ Reglas obligatorias:
 - Crear ruta cliente que consume el reader/API de `TASK-1243`.
 - Estados loading/empty/error/permission.
 
-### Slice 2 — Report rendering
+### Slice 2 — Report rendering (CONSUMIR el artifact, no reconstruir)
 
-- Renderizar headline, score, tendencia, dimensiones, hallazgos public-safe y plan priorizado.
-- Table fallback de charts y severidad nombrada.
-- Implementar la dirección aprobada **Executive Signal Command + recommendation inspector sidecar**:
-  - `CompositionShell` con lead/primary/context regions.
-  - `MetricSummaryCard`/report metric cards adaptables para score, tendencia, citation share, sentimiento y posición.
-  - Dimension matrix como barras horizontales + table fallback, no chart aislado sin tabla.
-  - `ContextualSidecar` para detalle de recomendación seleccionada, no drawer custom.
+- **Consumir** `AiVisibilityReportArtifact` (web) con `model={modelFromClientReport(clientReport)}` (variant `clientPortal`). El artifact YA renderiza headline, score gauge, tendencia (Recharts), dimensiones (barras) y plan priorizado, con table fallback y severidad nombrada. **NO** reimplementar esas secciones ni introducir ECharts (el artifact usa Recharts; una sola lib de charts).
+- **Net-new sobre el artifact** (lo que esta task sí construye):
+  - `CompositionShell` `leadPlusContext` como envoltura de la página cliente (lead = artifact / context = sidecar).
+  - **`ContextualSidecar` `variant='inspector'`** para detalle de la recomendación seleccionada — el artifact lista recomendaciones inline pero NO tiene sidecar por-recomendación. Desktop in-flow non-modal / mobile drawer con focus restore.
+  - Cards de señal segura del sidecar (citation share, sentimiento, posición) con `MetricSummaryCard` + reuso del enfoque de charts del artifact (Recharts), con table fallback.
+- Si el artifact necesita un ajuste para encajar en el shell cliente (p.ej. ocultar una sección), expandir el artifact (variant/prop) — NUNCA forkearlo.
 
 ### Slice 3 — Client actions
 
@@ -239,13 +246,13 @@ Reglas obligatorias:
 
 La vista cliente debe ser un consumer autenticado del mismo artefacto de reporte, no una copia del public token reader. Debe preservar redaccion de evidencia y tenant boundary. El primer release puede ser read-only; cualquier CTA que cree trabajo comercial debe consumir commands existentes o abrir follow-up.
 
-**Data-viz (skill `dataviz-design`) — es el valor central porque el cliente lo lee sin apoyo de ventas; chart por pregunta:**
+**Data-viz (skill `dataviz-design`) — estas reglas son el CONTRATO que el artifact de TASK-1252 ya satisface; verificar al consumir, NO reconstruir.** El render del reporte es SSOT del artifact (Recharts). El cliente lo lee sin apoyo de ventas, así que al consumir el artifact (variant `clientPortal`) confirmar que se cumple:
 
-- **Score global** → big-number/gauge con **contexto/benchmark** (no un número solo): tabular-nums, banda/semáforo nombrado, comparación explícita ("vs categoría" / "vs medición anterior").
-- **Tendencia** → line chart (eje puede no empezar en 0, pero honesto); **brecha principal** → callout anotado sobre el chart, no enterrado en tabla.
-- **Dimensiones** → horizontal bar (eje **empieza en 0**), severidad **nombrada + ícono/forma, NUNCA color-only**.
-- **ECharts** (default del repo; una sola lib de charts), `lazy`/`dynamic ssr:false`, respeta `prefers-reduced-motion`, entrada ≤400ms. Habilitar el `aria` de ECharts + **table fallback** + `role="img"`/`aria-label` + keyboard nav (piso a11y de charts).
-- Paleta **colorblind-safe** verificada, probada en dark mode; números con `Intl.NumberFormat` locale-aware (es-CL). Insight AI (si aplica) como anotación editable, nunca como dato no-verificado.
+- **Score global** → gauge con **contexto/benchmark** (no número solo): tabular-nums, banda/semáforo nombrado, comparación explícita ("vs medición anterior"). (Lo entrega el artifact; verificar.)
+- **Tendencia** → line/area chart honesto; **brecha principal** anotada, no enterrada en tabla. (Artifact.)
+- **Dimensiones** → barras (eje **empieza en 0**), severidad **nombrada + ícono/forma, NUNCA color-only** + **table fallback**. (Artifact.)
+- **Charts = Recharts** (los que ya usa el artifact, `AppRecharts`); **NO introducir ECharts** ni una 2.ª lib. Cualquier mini-chart adicional del sidecar (citation share/sentimiento) reusa el mismo enfoque, `lazy`/`ssr:false`, respeta `prefers-reduced-motion`, `role="img"`/`aria-label` + table fallback + keyboard nav.
+- Paleta **colorblind-safe** verificada en dark mode; números con `Intl.NumberFormat` es-CL. (Heredado del artifact + aplicar a las cards de señal nuevas.)
 
 **CTA → handoff comercial gobernado:** si un CTA ("solicitar conversación/plan") crea trabajo comercial, debe consumir un **command gobernado existente** del handoff growth→commercial (explícito + auditable, NUNCA mutación silenciosa de estado comercial — domain arch §7). Si no existe, V1 es read-only/contacto y se abre follow-up. Copy honesto: NO prometer el monitor recurrente que aún no se construye.
 
@@ -261,7 +268,7 @@ Slice 1 -> Slice 2 -> Slice 3 -> Slice 4. No agregar CTAs mutativos si no existe
 |---|---|---|---|---|
 | Tenant leakage cliente A/B | identity/privacy | medium | reader server-side de TASK-1243 + tests | access denied mismatch |
 | Duplicar builder de reporte | architecture | low | consume DTO/reader existente | code review |
-| Charts inaccesibles | a11y | medium | table fallback + ECharts aria + keyboard + no color-only | axe/GVC |
+| Charts inaccesibles | a11y | medium | table fallback + chart aria (Recharts del artifact) + keyboard + no color-only | axe/GVC |
 | Chart engañoso (bar sin 0 / dual-axis / pie >3 / color-only) | dataviz/trust | medium | reglas duras dataviz: bar desde 0, no dual-axis, no pie>3, severidad nombrada | review dataviz |
 | Cliente ve internals del gate de review | privacy | medium | estado "en preparación" neutral; nunca razón `review_required` | review de copy/DTO |
 | UI promete monitor recurrente no construido | product | medium | copy honesto read-only V1 | review de copy |
@@ -304,7 +311,7 @@ Slice 1 -> Slice 2 -> Slice 3 -> Slice 4. No agregar CTAs mutativos si no existe
 - [ ] La implementación sigue la dirección visual aprobada: **Executive Signal Command** como base + sidecar inspector de recomendación de **Evidence-Safe Workbench**.
 - [ ] Copy reusable vive en `src/lib/copy/*`.
 - [ ] GVC desktop+mobile capturado y mirado **en loop** (rubric V1.5); `scrollWidth==clientWidth`. Gate axe verde.
-- [ ] Charts tienen table fallback, ECharts `aria`, keyboard nav y severidad no color-only; bar desde 0, sin dual-axis/pie>3/3D; paleta colorblind-safe probada en dark.
+- [ ] Se CONSUME `AiVisibilityReportArtifact` (variant `clientPortal`), sin reconstruir el reporte ni introducir ECharts (charts = Recharts del artifact). Charts tienen table fallback, `aria`, keyboard nav y severidad no color-only; bar desde 0, sin dual-axis/pie>3/3D; paleta colorblind-safe probada en dark.
 - [ ] Score con contexto/benchmark (no número solo); brecha principal anotada; comparación con período explícito; números `Intl.NumberFormat` es-CL.
 - [ ] Estado "en preparación" neutral; el cliente NUNCA ve la razón interna de `review_required` ni evidencia de review.
 - [ ] La vista consume el reader client-scoped vía el boundary del portal cliente (sin import directo de growth); ruta en `route-reachability-manifest.ts` + viewCode seed routeGroup `client`.
