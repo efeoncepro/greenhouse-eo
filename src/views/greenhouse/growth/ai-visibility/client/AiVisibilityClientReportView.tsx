@@ -701,12 +701,9 @@ const DetailCanvas = ({ model, selection }: { model: ReportArtifactModel; select
                   })}
                 >
                   <Stack spacing={2}>
-                    <Stack direction='row' spacing={2} alignItems='center' justifyContent='space-between'>
-                      <Typography variant='overline' color='text.secondary'>
-                        {C.detail.relatedScoreLabel}
-                      </Typography>
-                      <SeverityChip severity={dim.severity} size='small' />
-                    </Stack>
+                    <Typography variant='overline' color='text.secondary'>
+                      {C.detail.relatedScoreLabel}
+                    </Typography>
                     <Stack direction='row' spacing={1} alignItems='baseline'>
                       <Typography variant='kpiValue'>{scoreText(dim.score)}</Typography>
                       <Typography variant='body2' color='text.secondary'>
