@@ -289,7 +289,8 @@ El provider de AI Overviews es estructuralmente un adapter más: recibe `(prompt
 - [x] El provider corre detrás de `GROWTH_AI_VISIBILITY_GOOGLE_AIO_ENABLED` (default OFF) + entra al policy resolver con cost guard.
 - [x] Una query sin bloque AI Overview produce observation `skipped` con `error_code`, no un `succeeded` vacío.
 - [x] Golden eval + parser lock test verdes para el provider nuevo.
-- [x] Smoke real deja observation `succeeded` con `citations[]` pobladas en `provider_observations` (2026-06-28: validado contra la fuente real DataForSEO + persistencia PG real; ver evidencia abajo). Activación en el deployment de staging (push + flag flip) = paso de rollout pendiente.
+- [x] Smoke real deja observation `succeeded` con `citations[]` pobladas en `provider_observations` (2026-06-28: validado contra la fuente real DataForSEO + persistencia PG real, **y activado + verificado end-to-end en el ops-worker de staging**; ver evidencia abajo).
+- [x] Usable en los **3 endpoints** (public/client-portal/operator) por construcción (Full API Parity): el run-engine resuelve providers desde `policy.eligibleProviders` (sin lista paralela por endpoint), el adapter está siempre en el registry, y es elegible en los 3 modos (light/full/internal_audit). El flag los gatea uniforme.
 - [x] Secret de la fuente resuelto server-side vía `*_SECRET_REF` con `secretAccessor` verificado; cero hardcode.
 - [x] `FEATURE_FLAG_STATE_LEDGER.md` con fila del flag y estado por environment.
 
@@ -322,7 +323,18 @@ Cuenta DataForSEO verificada por el operador. Re-corrida del adapter canónico c
 - ✅ Honest degradation confirmada en la corrida pre-verificación (403 → `failed:provider_error`, nunca `succeeded` vacío).
 - Parser robusto: extrae texto + citas heterogéneas (reddit, youtube, salesforce, hockeystack…) → `GrowthAiVisibilityCitation` normalizado (url+domain+title).
 
-**Pendiente de rollout (no de código):** push develop → deploy staging (Vercel + ops-worker) + aplicar migración a staging DB + flip `GROWTH_AI_VISIBILITY_GOOGLE_AIO_ENABLED=true` en staging + smoke en el deployment + (al final) **rotar el password DataForSEO** (expuesto en chat durante la provisión). Prod gobernado por TASK-1246.
+### Activación staging VERDE end-to-end — 2026-06-28 (worker async)
+
+**Hallazgo de rollout:** staging corre el grader **async** (`GROWTH_AI_VISIBILITY_ASYNC_EXECUTION_ENABLED=true`), así que los 3 endpoints encolan y el run real lo ejecuta el **ops-worker Cloud Run** — su `deploy.sh` declaraba los flags de los 4 LLM pero NO `GOOGLE_AIO` ni las creds DataForSEO. Con solo el flag de Vercel, los 3 endpoints habrían encolado pero el worker haría skip. El switch operativo de staging es el **env del worker**.
+
+Aplicado:
+
+- **Vercel staging:** `GROWTH_AI_VISIBILITY_GOOGLE_AIO_ENABLED=true` (`vercel env add`).
+- **ops-worker (durable):** `services/ops-worker/deploy.sh` con branch `DEFAULT_GROWTH_GOOGLE_AIO_ENABLED` staging `true` / prod `false` + `DATAFORSEO_API_PASSWORD_SECRET_REF` + `ensure_secret_accessor_binding` + login `DATAFORSEO_API_LOGIN` inyectado por CI desde GH secret (`ops-worker-deploy.yml`). SA `greenhouse-portal@` ya con `secretAccessor`; la imagen desplegada (rev posterior al commit del adapter) ya trae el adapter.
+- **ops-worker (inmediato):** `gcloud run services update ops-worker --update-env-vars` (merge, mismo image) → rev viva `ops-worker-00411-rds`. ⚠️ El `ops-worker` es un Cloud Run **compartido staging+prod**; el branch del `deploy.sh` (prod OFF) mantiene prod apagado.
+- **Smoke real end-to-end (worker SA, no ADC local):** run `grun-61d1c683-f8fb-4ea5-8c7f-a8cd1a7020c7` (solo `google_ai_overview`, `mode=light`) drenado por el ops-worker (Cloud Scheduler `ops-growth-grader-drain` `*/5`) → observation `succeeded`, **27 citas**, `$0.004`, `dataforseo_status_code 20000` en `provider_observations`. Cierra el riesgo "secret resuelve null en el runtime del worker".
+
+**Pendiente (no de código, gated fuera de esta task):** prod (sign-off + migración/capabilities a prod + flag prod, gobernado por TASK-1246/EPIC-020) + **rotar el password DataForSEO** (expuesto en provisión).
 
 Follow-up opcional: reliability signal de cobertura por motor (distinguir `no_ai_overview_block` = "no apareces" esperado, de `failed` real); el aggregate `growth.ai_visibility.provider_call_skipped` ya cubre el status-mix base.
 
