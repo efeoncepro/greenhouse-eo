@@ -98,6 +98,6 @@ Greenhouse es un app Next.js con login para clientes (`(dashboard)`), pero **ya 
 ## Open questions (deliberadamente no decididas)
 
 1. **Forma de exponer el modelo:** extender `GET /report/[token]` para devolver el modelo vs endpoint `/model` paralelo vs `?format=model`. (Recomendado: extender con `model` en el payload + `modelVersion`, back-compat.)
-2. **App del hub:** ¿`efeonce-web` sirve también `think.efeoncepro.com` (Vercel multi-dominio, un proyecto, reuso total de brand+plumbing) vs repo/app Astro dedicada para el hub? (Recomendado: reusar `efeonce-web` salvo que se quiera el hub 100% desacoplado.)
+2. **App del hub:** ✅ **Resuelto (operador, 2026-06-28): `efeonce-web`** sirve `think.efeoncepro.com` (Vercel multi-dominio, un proyecto; reuso total de brand + patrón WP-headless). No se crea repo nuevo.
 3. **Ruta del informe dentro del hub:** `think.efeoncepro.com/ai-visibility/[publicId]` u otra; convención de rutas por lead magnet.
 4. **Landing del grader:** ¿se construye en el hub Astro, o el form sigue en WP posteando al mismo intake? (No bloquea el contrato.)
