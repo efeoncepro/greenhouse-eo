@@ -100,6 +100,11 @@ export type CanonicalErrorCode =
   | 'aeo_profile_required'
   | 'aeo_quota_exhausted'
   | 'aeo_cost_blocked'
+  // Growth Search Console connection · OAuth multi-tenant (TASK-1282).
+  | 'search_console_disabled'
+  | 'search_console_not_connected'
+  | 'search_console_oauth_state_invalid'
+  | 'search_console_oauth_failed'
 // Reserved for future canonical codes — extender aquí cuando emerjan
 // nuevos error paths estructurales. NUNCA usar strings ad-hoc.
 
@@ -364,6 +369,26 @@ const CANONICAL_ERRORS: Record<CanonicalErrorCode, CanonicalErrorDefinition> = {
     status: 429,
     message: 'El análisis AEO no está disponible temporalmente por alta demanda. Intenta más tarde.',
     actionable: false
+  },
+  search_console_disabled: {
+    status: 409,
+    message: 'La conexión con Search Console no está disponible por ahora.',
+    actionable: false
+  },
+  search_console_not_connected: {
+    status: 409,
+    message: 'Esta organización aún no tiene conectada una propiedad de Search Console.',
+    actionable: false
+  },
+  search_console_oauth_state_invalid: {
+    status: 400,
+    message: 'El enlace de conexión expiró o no es válido. Vuelve a iniciar la conexión con Search Console.',
+    actionable: true
+  },
+  search_console_oauth_failed: {
+    status: 502,
+    message: 'No pudimos completar la conexión con Search Console. Intenta de nuevo.',
+    actionable: true
   }
 }
 

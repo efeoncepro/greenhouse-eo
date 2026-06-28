@@ -6785,6 +6785,32 @@ export interface GreenhouseGrowthProviderObservations {
   usage: Generated<Json>;
 }
 
+export interface GreenhouseGrowthSearchConsoleConnections {
+  connected_at: Timestamp | null;
+  connected_by_user_id: string | null;
+  connection_id: Generated<string>;
+  created_at: Generated<Timestamp>;
+  last_error_code: string | null;
+  last_verified_at: Timestamp | null;
+  organization_id: string;
+  scopes: Generated<string[]>;
+  site_url: string;
+  status: Generated<string>;
+  token_secret_ref: string | null;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseGrowthSearchConsoleOauthStates {
+  consumed_at: Timestamp | null;
+  created_at: Generated<Timestamp>;
+  created_by_user_id: string | null;
+  expires_at: Timestamp;
+  organization_id: string;
+  site_url: string;
+  state_hash: string;
+  state_id: Generated<string>;
+}
+
 export interface GreenhouseHrContractorEngagementEvents {
   actor_user_id: string | null;
   contractor_engagement_id: string;
@@ -10946,6 +10972,8 @@ export interface DB {
   "greenhouse_growth.normalized_findings": GreenhouseGrowthNormalizedFindings;
   "greenhouse_growth.prompt_packs": GreenhouseGrowthPromptPacks;
   "greenhouse_growth.provider_observations": GreenhouseGrowthProviderObservations;
+  "greenhouse_growth.search_console_connections": GreenhouseGrowthSearchConsoleConnections;
+  "greenhouse_growth.search_console_oauth_states": GreenhouseGrowthSearchConsoleOauthStates;
   "greenhouse_hr.contractor_engagement_events": GreenhouseHrContractorEngagementEvents;
   "greenhouse_hr.contractor_engagements": GreenhouseHrContractorEngagements;
   "greenhouse_hr.contractor_invoice_assets": GreenhouseHrContractorInvoiceAssets;

@@ -558,7 +558,11 @@ export const STATIC_RELIABILITY_REGISTRY: ReliabilityModuleDefinition[] = [
       'greenhouse_growth.provider_observations'
     ],
     smokeTests: [],
-    filesOwned: ['src/lib/growth/**', 'src/lib/reliability/queries/growth-ai-visibility-*.ts'],
+    filesOwned: [
+      'src/lib/growth/**',
+      'src/lib/reliability/queries/growth-ai-visibility-*.ts',
+      'src/lib/reliability/queries/growth-search-console-*.ts'
+    ],
     expectedSignalKinds: ['data_quality', 'runtime', 'cost_guard', 'posture', 'test_lane', 'drift'],
     incidentDomainTag: 'growth'
   }

@@ -182,6 +182,7 @@ import { getGrowthFormsPiiSignals } from './queries/growth-forms-pii-signals'
 import { getGrowthAiVisibilityLeadHandoffSignals } from './queries/growth-ai-visibility-lead-handoff-signals'
 import { getGrowthAiVisibilityReportEmailSignals } from './queries/growth-ai-visibility-report-email-signals'
 import { getGrowthAiVisibilityEntitlementSignals } from './queries/growth-ai-visibility-entitlement-signals'
+import { getGrowthSearchConsoleTokenHealthSignal } from './queries/growth-search-console-token-health'
 // TASK-1082 — Knowledge Platform ingestion signals (moduleKey 'knowledge').
 import { getKnowledgeNotionIngestDeadLetterSignal } from './queries/knowledge-notion-ingest-dead-letter'
 import { getKnowledgeQuarantineCountSignal } from './queries/knowledge-quarantine-count'
@@ -635,6 +636,7 @@ interface ReliabilityOverviewSources {
   growthAiVisibilityLeadHandoff?: ReliabilitySignal[] | null
   growthAiVisibilityReportEmail?: ReliabilitySignal[] | null
   growthAiVisibilityEntitlement?: ReliabilitySignal[] | null
+  growthSearchConsoleTokenHealth?: ReliabilitySignal | null
 
   /** TASK-1201 — Finance AI anomaly-materialization staleness (heartbeat del SoT de signals). */
   financeAiStaleMaterialization?: ReliabilitySignal | null
@@ -1054,6 +1056,7 @@ export const buildReliabilityOverview = (
     ...(sources.growthAiVisibilityLeadHandoff ?? []),
     ...(sources.growthAiVisibilityReportEmail ?? []),
     ...(sources.growthAiVisibilityEntitlement ?? []),
+    ...(sources.growthSearchConsoleTokenHealth ? [sources.growthSearchConsoleTokenHealth] : []),
     // TASK-812 — Previred/LRE artifact registry drift.
     ...(sources.payrollComplianceExportDrift ? [sources.payrollComplianceExportDrift] : []),
     // TASK-863 V1.5.2 — Final settlement PDF status drift (DB document_status vs
@@ -1497,6 +1500,11 @@ export const getReliabilityOverview = async (
     preloadedSources.payrollComplianceExportDrift !== undefined
       ? preloadedSources.payrollComplianceExportDrift
       : await getPayrollComplianceExportDriftSignal().catch(() => null)
+
+  const growthSearchConsoleTokenHealth =
+    preloadedSources.growthSearchConsoleTokenHealth !== undefined
+      ? preloadedSources.growthSearchConsoleTokenHealth
+      : await getGrowthSearchConsoleTokenHealthSignal().catch(() => null)
 
   // TASK-957 Slice A — Contractor double-rail overlap. Corre regardless del flag
   // PAYROLL_CONTRACTOR_ENGAGEMENT_EXCLUSION_ENABLED (detector temprano). Steady=0:
@@ -2401,6 +2409,7 @@ export const getReliabilityOverview = async (
     growthAiVisibilityLeadHandoff,
     growthAiVisibilityReportEmail,
     growthAiVisibilityEntitlement,
+    growthSearchConsoleTokenHealth,
     payrollComplianceExportDrift,
     payrollContractorDoubleRailOverlap,
     payrollDeelMemberWithoutContractId,
