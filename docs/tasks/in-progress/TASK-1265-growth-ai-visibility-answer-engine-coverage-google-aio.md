@@ -304,6 +304,16 @@ El provider de AI Overviews es estructuralmente un adapter más: recibe `(prompt
 - `pnpm docs:closure-check` — PASS con warnings conservadores no bloqueantes (`architecture_doc_monolith`, `missing_project_context_check`) (2026-06-27)
 - Smoke real del provider en staging + verificación PG de la observation [pendiente rollout; no cerrado en esta iteracion]
 
+### Smoke real intentado — 2026-06-28 (BLOQUEADO en verificación de cuenta DataForSEO)
+
+Se ejecutó el adapter canónico contra DataForSEO en local (login + `DATAFORSEO_API_PASSWORD_SECRET_REF` de Vercel staging, secret resuelto vía Secret Manager + ADC, flags `GROWTH_AI_VISIBILITY_GRADER_ENABLED` + `GROWTH_AI_VISIBILITY_GOOGLE_AIO_ENABLED` ON). Resultado:
+
+- ✅ `isDataForSeoConfigured() = true`, `adapter.isEnabled() = true` — el secret resuelve correcto (source=secret_manager) y el auth llega a DataForSEO.
+- ❌ Ambos endpoints SERP (`/v3/serp/google/ai_mode/live/advanced` **y** `/v3/serp/google/organic/live/advanced`) devuelven **HTTP 403 · status_code 40104 — "Please verify your account before using the API"**. El adapter degradó honestamente a `failed:provider_error` (sin crash, sin contaminar score). El endpoint gratuito `/v3/appendix/user_data` sí responde 20000 (balance `money.total=1`).
+- **Blocker real (no es bug de código):** la cuenta DataForSEO está **sin verificar** → todo endpoint SERP bloqueado. Acción out-of-band del operador: completar verificación de cuenta en `https://app.dataforseo.com/` (y confirmar que el balance alcanza para el smoke low-volume de AI Mode). Tras verificar, re-correr el smoke → debe dar observation `succeeded` con `citations[]`.
+- El provider id `google_ai_overview` ya está habilitado en los CHECK constraints de `provider_observations`/`normalized_findings` (migración aplicada en dev DB).
+- Follow-up al cerrar (post-verificación): calibrar el reliability signal de cobertura por motor contra la mezcla real de status (`succeeded` vs `no_ai_overview_block` vs `failed`), distinguiendo `no_ai_overview_block` (esperado: "no apareces") de fallo real.
+
 ## Closing Protocol
 
 - [ ] `Lifecycle` del markdown sincronizado
