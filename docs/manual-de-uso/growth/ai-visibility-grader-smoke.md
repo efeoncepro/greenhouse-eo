@@ -1,7 +1,7 @@
 # Manual — Correr el AI Visibility Grader (smoke + endpoint)
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.7 · **Ultima actualizacion:** 2026-06-27 por Codex (TASK-1265, Google AI Overview via DataForSEO)
+> **Version:** 1.8 · **Ultima actualizacion:** 2026-06-28 por Codex (TASK-1269, Fix-It Artifacts)
 >
 > **Para que sirve:** ejecutar una corrida acotada (low-volume) del AI Visibility Grader contra los answer engines, para validar el motor end-to-end. Por defecto usa un proveedor simulado (no gasta dinero); con flags + secrets corre proveedores reales. Dos caminos: el **CLI** (`pnpm growth:ai-visibility:smoke`, local/dev) y el **endpoint interno** (`/api/admin/growth/ai-visibility/runs`, mismo primitive, apto staging).
 
@@ -12,6 +12,7 @@
 - **ejecución async (TASK-1234): ON en staging.** `GROWTH_AI_VISIBILITY_ASYNC_EXECUTION_ENABLED=true` (environment `staging`). El endpoint **encola** el run (responde HTTP 202 + runId) y el worker Cloud Run (`ops-worker`, scheduler `ops-growth-grader-drain` cada 5 min) lo ejecuta sin límite de tiempo. Esto es lo único que permite correr runs `full`/`internal_audit` multi-provider (que antes morían por el timeout de la función Vercel). Verificado end-to-end: un run `full` real corrió ~12 min sin timeout. Con la flag OFF el endpoint vuelve a ejecutar inline (sólo `light`/OpenAI cabe).
 - **producción:** OFF (follow-up pesado: migración `greenhouse_growth` + capabilities seed vía release control plane develop→main + env prod + sign-off). El worker es compartido staging+prod, pero el drain hace **no-op prod-safe** mientras el grader esté OFF en prod.
 - **Perplexity:** ON en staging desde 2026-06-27.
+- **Fix-It Artifacts (TASK-1269):** code complete pero `GROWTH_AI_VISIBILITY_FIX_IT_ENABLED` está OFF/default. No entregar al prospecto hasta revisión copy/legal + smoke staging por token público y run admin.
 - Verdad live de flags: `vercel env ls`. Estado humano: `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`.
 
 ## Antes de empezar
@@ -151,6 +152,33 @@ Verificación local (sin endpoint), contra un run real con score:
 # levanta el proxy + corre el builder vía readGraderReport sobre el run más reciente con score
 # (patrón scripts/_dryrun-report.ts: runGreenhousePostgresQuery + readGraderReport)
 ```
+
+## Generar Fix-It Artifacts (TASK-1269) — code complete, rollout pendiente
+
+Los Fix-It Artifacts se generan on-demand desde un reporte/snapshot existente y los probes del run. No llaman LLM, no escriben en el sitio del prospecto y quedan detrás de `GROWTH_AI_VISIBILITY_FIX_IT_ENABLED`.
+
+**Admin por run** (requiere sesión interna + capability `growth.ai_visibility.fix_it.generate`):
+
+```bash
+pnpm staging:request POST /api/admin/growth/ai-visibility/runs/<runId>/fix-it --pretty
+```
+
+**Público por token** (mismo token no enumerable del snapshot):
+
+```bash
+pnpm staging:request /api/public/growth/ai-visibility/report/<reportToken>/fix-it --pretty
+```
+
+Respuesta esperada: `{ runId, artifacts[] }`, con `kind`, `filename`, `mimeType`, `content`, `publicSafe`, `source`, `derivedFrom` y `pendingFields`.
+
+Validación antes de prender staging:
+
+1. Confirmar flag OFF responde no disponible/404.
+2. Encender `GROWTH_AI_VISIBILITY_FIX_IT_ENABLED=true` sólo en staging.
+3. Generar por run admin y por token público para el mismo snapshot.
+4. Parsear el artifact `json_ld_starter` como JSON y validar contra schema.org/Rich Results.
+5. Revisar que `llms.txt` esté formado y que los briefs no prometan rankings ni contengan evidence/reasons internos.
+6. Si pasa copy/legal, documentar el run/token usado y recién ahí considerar prod vía EPIC-020.
 
 ## Entrega del informe por email (TASK-1250) — rollout + smoke
 

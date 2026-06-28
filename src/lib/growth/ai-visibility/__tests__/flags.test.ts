@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { isGraderEnabled, isProviderFlagEnabled } from '../flags'
+import { isFixItArtifactsEnabled, isGraderEnabled, isProviderFlagEnabled } from '../flags'
 
 const env = (overrides: Record<string, string>): NodeJS.ProcessEnv => ({ ...overrides }) as NodeJS.ProcessEnv
 
@@ -40,6 +40,16 @@ describe('growth/ai-visibility — feature flags (default OFF)', () => {
       isProviderFlagEnabled(
         'google_ai_overview',
         env({ GROWTH_AI_VISIBILITY_GRADER_ENABLED: 'true', GROWTH_AI_VISIBILITY_GOOGLE_AIO_ENABLED: 'true' })
+      )
+    ).toBe(true)
+  })
+
+  it('fix-it artifacts requiere kill switch global + flag propio', () => {
+    expect(isFixItArtifactsEnabled(env({}))).toBe(false)
+    expect(isFixItArtifactsEnabled(env({ GROWTH_AI_VISIBILITY_FIX_IT_ENABLED: 'true' }))).toBe(false)
+    expect(
+      isFixItArtifactsEnabled(
+        env({ GROWTH_AI_VISIBILITY_GRADER_ENABLED: 'true', GROWTH_AI_VISIBILITY_FIX_IT_ENABLED: 'true' })
       )
     ).toBe(true)
   })

@@ -1966,6 +1966,15 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
   // autenticado ve el reporte del grader de SU organización (DTO cliente sin evidencia
   // cruda de provider). Capability DEDICADA (no scope-overload de report.read interno):
   // least-privilege explícito + desacopla el acceso cliente del lifecycle del read interno.
+  // TASK-1269 — fix_it.generate: generación gobernada de artefactos public-safe
+  // (JSON-LD, llms.txt, briefs) desde un reporte/probes existentes. No muta el sitio
+  // del prospecto; sólo entrega archivos deterministas. Grant en runtime.ts mismo PR.
+  {
+    key: 'growth.ai_visibility.fix_it.generate',
+    module: 'growth',
+    actions: ['execute'] as const,
+    defaultScope: 'tenant'
+  },
   // defaultScope `own` (su propia org, derivada server-side del orgContext de sesión).
   // Grant a client_executive/client_manager/client_specialist en runtime.ts mismo PR.
   {

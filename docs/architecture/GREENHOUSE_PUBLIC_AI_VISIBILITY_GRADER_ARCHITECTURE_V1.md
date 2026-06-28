@@ -1404,6 +1404,17 @@ Cierra el intercambio de valor del lead magnet: el reporte no solo se muestra en
 - **NUNCA** usar la marca "Greenhouse" ni "Efeonce Greenhouse" en esta superficie pública (lead magnet) — es **Efeonce** (agencia). Usar `EmailLayout brand='efeonce'`.
 - **SIEMPRE** que emerja un 4.º punto de publicación del snapshot, agregar ahí el enqueue `requestAiVisibilityReportEmail` (mismo riesgo de drift que el handoff). Rollout: redeploy del ops-worker + flip `GROWTH_AI_VISIBILITY_REPORT_EMAIL_ENABLED` (dual-location) — gated por TASK-1246. Signal: `growth.ai_visibility.report_email_failed`. Spec: `docs/tasks/.../TASK-1250-...md`.
 
+## Delta 2026-06-28 — Fix-It Artifacts (TASK-1269) · EPIC-020
+
+Cierra el loop diagnóstico → acción concreta: el grader ahora puede generar **artefactos fix-it public-safe** desde el snapshot/report + probe findings existentes, sin LLM y sin escribir en el sitio del prospecto.
+
+- **Primitive canónico:** `src/lib/growth/ai-visibility/fix-it/**`. `generateFixItArtifactsForRun(runId)` y `generateFixItArtifactsForPublicToken(reportToken)` derivan artifacts on-demand desde `PublicGraderReport` + `grader_profiles` + `readRunProbes(runId)`. No hay tabla/cache en V1; mismo input versionado → mismos artefactos.
+- **Artefactos V1:** `json_ld_starter` (`Organization` + `Service` cuando hay categoría), `llms_txt_starter`, `content_brief_aeo` y `entity_action_brief` cuando existen gaps de `knowledge_graph`/`wikidata`/`reddit_ugc`.
+- **Capability:** el namespace canónico del dominio es `growth.ai_visibility.*`; por eso la capability real es `growth.ai_visibility.fix_it.generate` (acción `execute`, scope `tenant`). La key genérica `report.fix_it.generate` de la task queda tratada como drift de spec, no como nuevo namespace.
+- **Routes:** admin `POST /api/admin/growth/ai-visibility/runs/[runId]/fix-it` exige `requireInternalTenantContext` + capability; público `GET /api/public/growth/ai-visibility/report/[token]/fix-it` usa el token no enumerable del snapshot como auth, igual que el read público.
+- **Flag:** `GROWTH_AI_VISIBILITY_FIX_IT_ENABLED` default OFF, gateado por `GROWTH_AI_VISIBILITY_GRADER_ENABLED`. Rollout requiere revisión copy/legal de claims, smoke staging por token/run y validación de JSON-LD/llms.txt.
+- **Public-safe boundary:** artifacts no contienen raw provider text, prompts, `accuracyFindings`, reasons internos de probes, raw errors ni claims de ranking garantizado. Campos faltantes quedan como `pendingFields`; el output es starter accionable, no publicación automática.
+
 ## Delta 2026-06-28 — Entitlement & Metering (TASK-1277)
 
 AEO deja de ser "un viewCode prendido role-wide a los 3 roles cliente" (error de plano de TASK-1248) y pasa a ser un **servicio con entitlement POR ORGANIZACIÓN + run gobernado y metered**. Un motor, **cuatro puertas**:

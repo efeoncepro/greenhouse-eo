@@ -144,6 +144,17 @@ export const isEntityProbesEnabled = (env: NodeJS.ProcessEnv = process.env): boo
   isProbesEnabled(env) && isTrue(env[GROWTH_AI_VISIBILITY_ENTITY_PROBES_FLAG])
 
 /**
+ * TASK-1269 — Fix-It Artifacts (JSON-LD / llms.txt / content briefs).
+ * Default OFF: los endpoints de generación no entregan artefactos hasta revisión
+ * de copy/legal. Gateado además por el kill switch global del grader. La generación
+ * es determinista/on-demand y no escribe en el sitio del prospecto.
+ */
+export const GROWTH_AI_VISIBILITY_FIX_IT_FLAG = 'GROWTH_AI_VISIBILITY_FIX_IT_ENABLED'
+
+export const isFixItArtifactsEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+  isGraderEnabled(env) && isTrue(env[GROWTH_AI_VISIBILITY_FIX_IT_FLAG])
+
+/**
  * TASK-1277 — Run gobernado de portal (chokepoint). Default OFF: las puertas cliente del
  * run (contratado/trial/pilot) están cerradas hasta el rollout + staging shadow. Gateado
  * además por el kill switch `isGraderEnabled`. Con ON: `requestGraderRunForOrganization`

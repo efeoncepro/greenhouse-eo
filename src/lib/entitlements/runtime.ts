@@ -241,6 +241,15 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
     // bloque tenantType='client' de abajo). Se replica al set interno SOLO para el guard
     // de cobertura (capability-grant-coverage.test usa un superset interno; toda capability
     // can()-checked debe ser alcanzable por él). Inocuo: el endpoint exige
+    // TASK-1269 — fix_it.generate: artefactos deterministas public-safe desde report+probes.
+    addEntitlement(entries, {
+      module: 'growth',
+      capability: 'growth.ai_visibility.fix_it.generate',
+      action: 'execute',
+      scope: 'tenant',
+      source
+    })
+
     // requireClientTenantContext → ningún interno lo pasa, así que no gana acceso real.
     addEntitlement(entries, {
       module: 'growth',

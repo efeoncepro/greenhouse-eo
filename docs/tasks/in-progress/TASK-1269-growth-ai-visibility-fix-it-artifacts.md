@@ -14,7 +14,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -26,10 +26,10 @@
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `EPIC-020`
-- Status real: `Diseno`
+- Status real: `Avanzada`
 - Rank: `TBD`
 - Domain: `growth|ai|reliability`
-- Blocked by: `TASK-1266`
+- Blocked by: `none`
 - Branch: `task/TASK-1269-growth-ai-visibility-fix-it-artifacts`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -58,7 +58,7 @@ Revisar y respetar:
 
 - `docs/architecture/GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md` — §7.7 report artifact, §11 programmatic contract, §13 privacy/security.
 - `docs/architecture/GREENHOUSE_FULL_API_PARITY_DECISION_V1.md` — command gobernado, un primitive muchos consumers.
-- `docs/tasks/to-do/TASK-1266-growth-ai-visibility-site-readiness-probe-layer.md` — probe findings (qué falta).
+- `docs/tasks/complete/TASK-1266-growth-ai-visibility-site-readiness-probe-layer.md` — probe findings (qué falta).
 - `docs/tasks/complete/TASK-1235-growth-ai-visibility-report-builder.md` — report como source.
 - Skill `seo-aeo` — `templates/` (jsonld, llms-txt, briefs) + `04_AEO_GEO`.
 
@@ -122,7 +122,7 @@ Reglas obligatorias:
 ### Contract surface
 
 - Contrato existente a respetar: `PublicGraderReport` leak-proof, recommendation engine, probe findings (TASK-1266).
-- Contrato nuevo o modificado: command `generateFixItArtifacts` + capability `report.fix_it.generate` + endpoint gobernado + tipo de artefacto public-safe.
+- Contrato nuevo o modificado: command `generateFixItArtifacts` + capability `growth.ai_visibility.fix_it.generate` + endpoint gobernado + tipo de artefacto public-safe.
 - Backward compatibility: `gated` (capability nueva; nada existente cambia).
 - Full API parity: command canónico server-side; UI/Nexa/MCP lo consumen por construcción; write LLM (si lo hay) por `propose→confirm→execute`.
 
@@ -148,7 +148,7 @@ Reglas obligatorias:
 
 ### Security and access
 
-- Auth/access gate: capability `report.fix_it.generate` para surfaces internas; público vía token del report.
+- Auth/access gate: capability `growth.ai_visibility.fix_it.generate` para surfaces internas; público vía token del report.
 - Sensitive data posture: sin PII; artefactos derivados de datos public-safe del report.
 - Error contract: errores sanitizados (`captureWithDomain`); sin raw provider error.
 - Abuse/rate-limit posture: hereda el rate-limit del read del report; cap de generación por token.
@@ -174,6 +174,38 @@ Reglas obligatorias:
      El agente que toma esta task ejecuta Discovery y produce
      plan.md segun TASK_PROCESS.md. No llenar al crear la task.
      ═══════════════════════════════════════════════════════════ -->
+
+## Discovery / Audit 2026-06-28 — Codex
+
+### Hallazgos
+
+- `TASK-1266` está completa y `TASK-1267` también aporta probes de entidad; el blocker documental se resolvió antes de implementar.
+- El snapshot público `greenhouse_growth.grader_reports` ya guarda `run_id`, por lo que el path público puede resolver token → run → profile/probes sin schema nuevo.
+- `PublicGraderReport` no contiene `brandName`/`websiteUrl` por diseño leak-safe; el command debe resolverlos server-side desde `grader_profiles`, no agregarlos al DTO público.
+- Drift de spec: el namespace `report.fix_it.generate` no existe en el catálogo; el dominio usa `growth.ai_visibility.*`. Decisión: capability real `growth.ai_visibility.fix_it.generate`.
+
+### Plan aplicado
+
+1. Crear módulo feature-local `src/lib/growth/ai-visibility/fix-it/**` con contracts, generators y command server-only.
+2. Generar on-demand artifacts deterministas public-safe: JSON-LD starter, `llms.txt`, content brief y brief de entidad si hay gaps KG/Wikidata/Reddit.
+3. Extender el snapshot reader para proyectar `runId` desde la fila existente (sin migración).
+4. Agregar capability + grant interno + flag `GROWTH_AI_VISIBILITY_FIX_IT_ENABLED` default OFF.
+5. Exponer endpoint admin por run y endpoint público por token.
+6. Cubrir con tests focales de generator, command, flag, snapshot projection y capability-grant.
+
+### Evidencia local parcial
+
+- `pnpm vitest run src/lib/growth/ai-visibility/__tests__/fix-it-artifacts.test.ts src/lib/growth/ai-visibility/__tests__/fix-it-command.test.ts src/lib/growth/ai-visibility/__tests__/flags.test.ts src/lib/growth/ai-visibility/__tests__/report-snapshot.test.ts src/lib/entitlements/capability-grant-coverage.test.ts` — pass (16 tests).
+- `pnpm tsc --noEmit` — pass.
+- `pnpm lint` — pass.
+- `pnpm test` — pass (1192 test files, 8361 tests; warnings jsdom canvas existentes, exit 0).
+- `pnpm build` — pass.
+- `pnpm flags:audit --strict` — pass (0 flags en código sin registrar).
+
+### Estado de cierre
+
+- Code complete local. La task permanece `in-progress` porque el rollout real sigue pendiente: `GROWTH_AI_VISIBILITY_FIX_IT_ENABLED` está OFF/default y falta smoke staging por run/token + validación schema.org/Rich Results + revisión copy/legal.
+- QA state esperado: `code complete, rollout pendiente`.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 3 — EXECUTION SPEC
@@ -244,29 +276,35 @@ El command toma un report snapshot (public-safe) + los probe findings de TASK-12
 
 ## Acceptance Criteria
 
-- [ ] `generateFixItArtifacts` es un command server-side reusable (no lógica de pantalla) con capability `report.fix_it.generate` + grant + coverage test en el mismo PR.
-- [ ] Genera `Organization`/`Service` JSON-LD válido contra schema.org desde el report + probe findings.
-- [ ] Genera `llms.txt` starter + content brief AEO-ready por gap prioritario.
-- [ ] Artefactos public-safe: leak test del contenido verde; cero raw provider text / internal reasons / claims de ranking garantizado.
-- [ ] Generación v1 determinista (sin LLM); cualquier variante LLM queda detrás del boundary gobernado + flag.
-- [ ] Fila por flag en `FEATURE_FLAG_STATE_LEDGER.md`.
+- [x] `generateFixItArtifacts` es un command server-side reusable (no lógica de pantalla) con capability `growth.ai_visibility.fix_it.generate` + grant interno + coverage test en el mismo PR. Nota: `report.fix_it.generate` era drift de spec contra el namespace real del dominio.
+- [x] Genera `Organization`/`Service` JSON-LD parseable desde el report + profile + probe findings.
+- [ ] Validación externa schema.org/Rich Results contra artifact de staging.
+- [x] Genera `llms.txt` starter + content brief AEO-ready por gap prioritario.
+- [x] Genera entity action brief cuando hay gaps medidos de Knowledge Graph/Wikidata/Reddit.
+- [x] Artefactos public-safe: leak test del contenido verde; cero raw provider text / internal reasons / claims de ranking garantizado.
+- [x] Generación v1 determinista (sin LLM); cualquier variante LLM queda detrás del boundary gobernado + flag.
+- [x] Fila por flag en `FEATURE_FLAG_STATE_LEDGER.md`.
 
 ## Verification
 
 - `pnpm lint`
 - `pnpm tsc --noEmit`
 - `pnpm test`
-- Generar artefactos de un report real en staging + validación schema.org + leak test
+- `pnpm build`
+- `pnpm flags:audit --strict`
+- `pnpm task:lint --task TASK-1269`
+- `pnpm ops:lint --changed`
+- Pendiente: generar artefactos de un report real en staging + validación schema.org/Rich Results + revisión copy/legal.
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown sincronizado
-- [ ] el archivo vive en la carpeta correcta
-- [ ] `docs/tasks/README.md` sincronizado
-- [ ] `Handoff.md` actualizado
-- [ ] `changelog.md` actualizado
+- [x] `Lifecycle` del markdown sincronizado
+- [x] el archivo vive en la carpeta correcta
+- [x] `docs/tasks/README.md` sincronizado
+- [x] `Handoff.md` actualizado
+- [x] `changelog.md` actualizado
 - [ ] chequeo de impacto cruzado (TASK-1266 findings, TASK-1250 email, TASK-1241 página)
-- [ ] `FEATURE_FLAG_STATE_LEDGER.md` actualizado
+- [x] `FEATURE_FLAG_STATE_LEDGER.md` actualizado
 
 ## Follow-ups
 

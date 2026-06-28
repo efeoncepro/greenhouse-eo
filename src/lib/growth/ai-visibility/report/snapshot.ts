@@ -31,6 +31,7 @@ export class GraderSnapshotError extends Error {
 
 export interface PublishedSnapshot {
   reportId: string
+  runId: string
   reportToken: string
   asOf: string
   expiresAt: string | null
@@ -39,6 +40,7 @@ export interface PublishedSnapshot {
 
 type RawSnapshot = {
   report_id: unknown
+  run_id: unknown
   report_token: unknown
   as_of: unknown
   expires_at: unknown
@@ -49,6 +51,7 @@ const toIso = (value: unknown): string => new Date(value as string | number | Da
 
 const projectSnapshot = (row: RawSnapshot): PublishedSnapshot => ({
   reportId: String(row.report_id),
+  runId: String(row.run_id),
   reportToken: String(row.report_token),
   asOf: toIso(row.as_of),
   expiresAt: row.expires_at ? toIso(row.expires_at) : null,
@@ -93,7 +96,7 @@ export const publishGraderReportSnapshot = async (input: {
        (run_id, score_version, report_version, recommendation_pack_version, audience, public_report_json, expires_at, created_by)
      VALUES ($1, $2, $3, $4, 'public', $5::jsonb, $6, $7)
      ON CONFLICT (run_id, score_version, report_version, recommendation_pack_version) DO NOTHING
-     RETURNING report_id, report_token, as_of, expires_at, public_report_json`,
+     RETURNING report_id, run_id, report_token, as_of, expires_at, public_report_json`,
     [
       report.runId,
       report.scoreVersion,
@@ -112,7 +115,7 @@ export const publishGraderReportSnapshot = async (input: {
   // Conflicto (mismo estado ya publicado): devolver el snapshot INMUTABLE existente
   // (el payload congelado original, no el recién derivado).
   const existing = await runGreenhousePostgresQuery<RawSnapshot>(
-    `SELECT report_id, report_token, as_of, expires_at, public_report_json
+    `SELECT report_id, run_id, report_token, as_of, expires_at, public_report_json
        FROM greenhouse_growth.grader_reports
       WHERE run_id = $1 AND score_version = $2 AND report_version = $3 AND recommendation_pack_version = $4
       LIMIT 1`,
@@ -133,7 +136,7 @@ export const publishGraderReportSnapshot = async (input: {
  */
 export const readPublicGraderReport = async (reportToken: string): Promise<PublishedSnapshot | null> => {
   const rows = await runGreenhousePostgresQuery<RawSnapshot>(
-    `SELECT report_id, report_token, as_of, expires_at, public_report_json
+    `SELECT report_id, run_id, report_token, as_of, expires_at, public_report_json
        FROM greenhouse_growth.grader_reports
       WHERE report_token = $1 AND (expires_at IS NULL OR expires_at > NOW())
       LIMIT 1`,

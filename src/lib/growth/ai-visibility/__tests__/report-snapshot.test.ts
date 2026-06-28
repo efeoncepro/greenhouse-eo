@@ -41,6 +41,7 @@ const sql: {
 
 const fakeRow = {
   report_id: 'grpt-1',
+  run_id: 'run-snap',
   report_token: 'grt-deadbeef',
   as_of: '2026-06-24T22:00:00.000Z',
   expires_at: null,

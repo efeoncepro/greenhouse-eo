@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.11
+> **Version:** 1.12
 > **Creado:** 2026-06-24 por Claude (TASK-1226)
-> **Ultima actualizacion:** 2026-06-27 por Claude (TASK-1250, entrega del informe por email)
+> **Ultima actualizacion:** 2026-06-28 por Codex (TASK-1269, Fix-It Artifacts code-complete)
 > **Documentacion tecnica:** [GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md)
 
 # AI Visibility Grader — Motor de Providers (Growth)
@@ -108,6 +108,18 @@ Este reporte es el **insumo** de las superficies que vienen después (página p�
 
 > Detalle técnico: `GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md` §Delta 2026-06-24 (TASK-1235) + §7.7/§8.4. Código: `src/lib/growth/ai-visibility/report/**`, copy `src/lib/copy/growth.ts`. Lectura: `GET /api/admin/growth/ai-visibility/runs/[runId]/report`.
 
+## Artefactos Fix-It (qué puede aplicar el prospecto)
+
+El diagnóstico ahora tiene una capa de entregables accionables: **Fix-It Artifacts**. Son archivos iniciales generados de forma determinista desde el reporte público, el perfil de marca y los probes técnicos/entity del sitio.
+
+- **Qué genera:** `Organization`/`Service` JSON-LD starter, `llms.txt`, content brief AEO-ready y un entity action brief cuando hay gaps medidos en Knowledge Graph, Wikidata o Reddit/UGC.
+- **Qué no hace:** no escribe en el sitio del prospecto, no crea perfiles externos, no promete rankings ni usa IA generativa para inventar copy. El output marca campos pendientes cuando faltan URLs, fuentes o perfiles oficiales.
+- **Seguridad:** hereda el boundary public-safe del reporte. No incluye texto crudo de providers, prompts, accuracy findings ni reasons internos de probes.
+- **Acceso:** interno por capability `growth.ai_visibility.fix_it.generate`; público por el token no enumerable del snapshot.
+- **Estado:** code complete, rollout pendiente. El flag `GROWTH_AI_VISIBILITY_FIX_IT_ENABLED` está OFF/default hasta revisión copy/legal y smoke staging con un reporte real.
+
+> Detalle técnico: `GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md` §Delta 2026-06-28 (TASK-1269). Código: `src/lib/growth/ai-visibility/fix-it/**`. Operación: [manual de smoke](../../manual-de-uso/growth/ai-visibility-grader-smoke.md).
+
 ## Entrega por email (el prospecto recibe su informe — TASK-1250)
 
 Mostrar el resultado en pantalla no basta: si el prospecto cierra la pestaña, pierde su diagnóstico. Por eso, cuando el reporte queda **listo y publicable**, el sistema le **envía el informe a su correo** — un email transaccional (no marketing, no newsletter).
@@ -127,6 +139,7 @@ Mostrar el resultado en pantalla no basta: si el prospecto cierra la pestaña, p
 - No publica nada al sitio publico ni a HubSpot.
 - No muestra el reporte en una pantalla ni lo auto-publica (la superficie visual + el snapshot inmutable son tasks posteriores).
 - No usa IA para escribir el reporte: el copy es plantilla determinista (la narrativa asistida por LLM es un follow-up).
+- No aplica automáticamente los Fix-It Artifacts: sólo los entrega para revisión/aplicación humana.
 - No mezcla datos de clientes: V1 es interno/pre-tenant.
 
 > Detalle tecnico: invariantes y contrato en [GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md) (§Delta 2026-06-24). Codigo: `src/lib/growth/ai-visibility/**`. Operacion: [manual de smoke](../../manual-de-uso/growth/ai-visibility-grader-smoke.md).
