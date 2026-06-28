@@ -87,9 +87,17 @@ Greenhouse es un app Next.js con login para clientes (`(dashboard)`), pero **ya 
 - **NUNCA** fetchear el reporte client-side con el token expuesto si se puede server-side (Astro SSR) — token server-side, sin CORS abierto.
 - **SIEMPRE** versionar el payload (`modelVersion`); breaking change = major + render adaptado en el mismo ciclo.
 
+## Decisiones de superficie (operador, 2026-06-28)
+
+- **Hub de lead magnets, no solo el informe.** El render vive en un **hub** que hospedará TODOS los lead magnets (el AI Visibility Grader y los futuros). Un property, muchas herramientas, un diseño, un GTM.
+- **Subdominio `think.efeoncepro.com`** (Astro en Vercel). **Forzado por infra:** `efeoncepro.com` (root) está en **Kinsta/WordPress sin reverse proxy** → la subcarpeta `efeoncepro.com/think` NO es viable. El subdominio apunta a Vercel, independiente de Kinsta. Canónico bajo `efeoncepro.com`; si se usa `efeonce.org`, 301 → canónico (nunca dos indexables).
+- **Consecuencia SEO (aceptada):** un subdominio construye autoridad desde cero (Google lo trata como sitio aparte). Mitigación: interlink desde el sitio WP, landing pages indexables del hub por herramienta, y autoridad propia de cada lead magnet. (El informe per-lead es `noindex`; lo indexable son las landings de las herramientas.)
+- **Marca: blend AXIS + marca pública.** El informe (y el hub) usan un token layer que **mezcla AXIS con la marca pública** (midnight/azure/royal) para que "se sienta producto". Capa de diseño compartida una vez, reusada por todos los lead magnets. Tarea de design system.
+- **Primera superficie Astro productiva.** `think.efeoncepro.com` es un buen primer surface Astro en producción bajo la marca, consistente con la estrategia de cutover incremental gobernado (TASK-1158), sin tocar el root WP/Kinsta.
+
 ## Open questions (deliberadamente no decididas)
 
 1. **Forma de exponer el modelo:** extender `GET /report/[token]` para devolver el modelo vs endpoint `/model` paralelo vs `?format=model`. (Recomendado: extender con `model` en el payload + `modelVersion`, back-compat.)
-2. **Marca del informe:** ¿usa 100% los tokens de marca pública de `efeonce-web` (midnight/azure/royal), o un blend con AXIS para que "se sienta producto"? Decisión de diseño (product-design), no de arquitectura.
-3. **Dominio/URL:** la página del informe vive bajo el dominio de `efeonce-web` (resuelve el tema de dominio sin DNS nuevo) — confirmar ruta (`/informe/[publicId]` u otra).
-4. **Landing:** ¿se migra de WordPress a `efeonce-web`, o el form sigue en WP posteando al mismo intake? (No bloquea el contrato.)
+2. **App del hub:** ¿`efeonce-web` sirve también `think.efeoncepro.com` (Vercel multi-dominio, un proyecto, reuso total de brand+plumbing) vs repo/app Astro dedicada para el hub? (Recomendado: reusar `efeonce-web` salvo que se quiera el hub 100% desacoplado.)
+3. **Ruta del informe dentro del hub:** `think.efeoncepro.com/ai-visibility/[publicId]` u otra; convención de rutas por lead magnet.
+4. **Landing del grader:** ¿se construye en el hub Astro, o el form sigue en WP posteando al mismo intake? (No bloquea el contrato.)
