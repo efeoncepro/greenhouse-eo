@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -284,12 +284,12 @@ El chokepoint es el único punto de entrada de runs de portal; reusa el cost cei
 
 ## Acceptance Criteria
 
-- [ ] AEO se gatea por módulo `ai_visibility_v1` asignado per-org; el grant por-rol de TASK-1248 quedó revertido y `client-role-visibility.test.ts` ajustado.
-- [ ] `requestGraderRunForOrganization` es el único entrypoint de runs de portal: gate entitlement → expiry → allowance → costo, consumo atómico, atribución `organization_id`.
-- [ ] Trial PLG: N/mes (default 3, config) con reset mensual + tope global; `quota_exhausted`/`cost_blocked` honestos.
-- [ ] Grupo Berel = `active` y ve `/aeo`; una org sin entitlement NO ve el módulo ni puede correr.
-- [ ] Capability del run de portal + grant en el mismo PR + coverage; errores canónicos; runs append-only; sin leaks.
-- [ ] Flags default OFF + staging shadow medido antes de cualquier flip de costo.
+- [x] AEO se gatea por módulo `ai_visibility_v1` asignado per-org; el grant por-rol de TASK-1248 quedó revertido (3 `client_*`) y `client-role-visibility.test.ts` ajustado.
+- [x] `requestGraderRunForOrganization` es el único entrypoint de runs de portal: gate entitlement → expiry → allowance → costo, consumo atómico (lock `FOR UPDATE`), atribución `organization_id`.
+- [x] Trial PLG: N/mes (default **1**, config) con reset mensual + tope global; `aeo_quota_exhausted`/`aeo_cost_blocked` honestos. _(número trial = decisión comercial: 1/mes; flip gateado por flag + sign-off — rollout pendiente)._
+- [x] Grupo Berel = `active` (tier contratado); una org sin entitlement NO ve el módulo ni puede correr (smoke real: Aguas Andinas → `not_entitled`). _(Berel "ve `/aeo`" depende del profile binding org — TASK-1278; hoy el render con datos reales espera ese binding.)_
+- [x] Capability del run de portal (`run.portal`) + del operador (`run.operator`) + grants en el mismo PR + coverage; errores canónicos; runs append-only; sin leaks.
+- [x] Flags default OFF; staging shadow + sign-off de costo = **rollout pendiente** (code complete).
 
 ## Verification
 
@@ -300,24 +300,31 @@ El chokepoint es el único punto de entrada de runs de portal; reusa el cost cei
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` sincronizado (`in-progress` al tomar, `complete` al cerrar)
-- [ ] archivo en la carpeta correcta
-- [ ] `docs/tasks/README.md` sincronizado
-- [ ] `Handoff.md` actualizado
-- [ ] `changelog.md` actualizado
-- [ ] chequeo de impacto cruzado (TASK-1248, TASK-1276, TASK-1278, TASK-1270)
-- [ ] Delta en `GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md` (entitlement & metering)
+- [x] `Lifecycle` sincronizado (`in-progress` al tomar, `complete` al cerrar)
+- [x] archivo en la carpeta correcta (`complete/`)
+- [x] `docs/tasks/README.md` sincronizado
+- [x] `Handoff.md` actualizado
+- [x] `changelog.md` actualizado
+- [x] chequeo de impacto cruzado (TASK-1248, TASK-1276, TASK-1278, TASK-1270) — ver Delta abajo
+- [x] Delta en `GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md` (entitlement & metering)
 
 ## Follow-ups
 
 - HubSpot expansion signal: cuando una org agota el trial o engancha → señal de cross-sell al pipeline Expansion + `aeo_check_result` (Motor 1). Posible task comercial.
 - Billing/atribución real del costo AEO per-org (hoy solo atribución).
 
-## Open Questions
+## Open Questions — resueltas
 
-- ¿El trial run auto-provisiona el `grader_profile` desde el dominio de la org, o pide un intake liviano (dominio/categoría) la primera vez? (afecta UX de TASK-1278).
-- Número trial definitivo (1 vs 3/mes) + tope global: decisión comercial.
-- ¿El tier contratado define allowance por cadencia (TASK-1270) o también on-demand dentro de fair-use?
+- **Profile del trial run:** RESUELTA (opción robusta) — el chokepoint **exige** un `grader_profile` enlazado a la org (`getGraderProfileForOrganization`); si falta → `aeo_profile_required` (sin adivinar). La auto-provisión desde el dominio / intake liviano es **UX de TASK-1278/1276** (binding `grader_profiles.organization_id`). Por eso Berel hoy resuelve `profile_required`.
+- **Número trial + tope global:** RESUELTA (decisión del operador) — trial **1/mes**, contratado **20/mes** (fair-use), pilot **3/mes**, tope global de trials **$25/mes**. Todos env-override (`GROWTH_AI_VISIBILITY_*`), defaults conservadores. Flip de costo gateado por flag + sign-off.
+- **Allowance del contratado:** RESUELTA — fair-use cap configurable (`_CONTRACTED_RUNS_PER_MONTH=20`), no ilimitado self-serve; la cadencia de TASK-1270 consume el mismo allowance del mes.
+
+## Cross-impact 2026-06-28 (cierre TASK-1277)
+
+- **TASK-1248** (vista cliente `/aeo`): el grant role-wide quedó revertido; el acceso ahora es por módulo `ai_visibility_v1`. Su page guard se reforzó (capability + `hasModuleAccess`). El `client-role-visibility.test` quedó recalibrado (AEO module-gated).
+- **TASK-1278** (UX tiering + PLG trial): consume el chokepoint + `resolveAeoEntitlement` (tier/allowance/periodResetAt/blockedReason) — ya disponibles. Dueña del profile binding (intake/auto-provisión) que hoy bloquea el run real (`aeo_profile_required`).
+- **TASK-1276** (vista operador): consume `requestGraderRunAsOperator` + capability `growth.ai_visibility.run.operator` + route `/api/admin/growth/ai-visibility/operator-run` — ya disponibles.
+- **TASK-1270** (recurring re-grade): el tier contratado usa su cadencia y consume el mismo allowance mensual del chokepoint.
 
 ## Delta 2026-06-28 — conectada al Master UI Flow del programa AEO
 
