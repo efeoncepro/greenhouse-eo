@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -17,7 +17,7 @@
 - UI impact: `none`
 - Backend impact: `integration`
 - Epic: `none`
-- Status real: `Discovery`
+- Status real: `Discovery complete`
 - Rank: `TBD`
 - Domain: `growth|public-site|analytics|hubspot`
 - Blocked by: `none`
@@ -202,6 +202,18 @@ Reglas obligatorias:
      aprobado. Ejecuta un slice, verifica, commitea, y avanza.
      ═══════════════════════════════════════════════════════════ -->
 
+## Execution Evidence
+
+### Delta 2026-06-28 — Discovery complete
+
+- Output canónico: `docs/architecture/GREENHOUSE_TRACKING_ENGINE_ARCHITECTURE_V1.md`.
+- Decisión propuesta: V1 híbrido. `dataLayer`/GTM siguen como measurement surface; Greenhouse agrega ingestion/event ledger gobernado para eventos behavioral; `greenhouse_growth.form_submission` sigue siendo el ledger autoritativo de conversiones; HubSpot/GA/GTM/BigQuery quedan como consumers/destinations/comparison sources.
+- Inventario live read-only confirmado en `https://efeoncepro.com/` (2026-06-28): Google tag `GT-KV5CNNKQ`, GTM `GTM-NGHPGRLZ`, HubSpot/Leadin `js.hs-scripts.com/48713323.js` con plugin `11.3.51`, HubSpot Content Embed, Clarity, Metricool, ActiveCampaign tracking, Contact Form 7/Send trackers y Site Kit.
+- Drift detectado: discovery WordPress 2026-06-14 registraba `leadin` `11.3.45`; la página live actual carga `11.3.51`.
+- Reutilización real documentada: `src/lib/growth/forms/contracts.ts`, `src/growth-forms-renderer/telemetry.ts`, `src/lib/growth/forms/commands.ts`, `src/lib/growth/forms/store.ts`, `src/lib/growth/forms/destinations/hubspot/adapter.ts`.
+- Follow-up formal no registrado todavía: la arquitectura propone secuencia de 5 tasks futuras (ingestion foundation, host adapters, attribution reconciliation, destination/export adapters, reporting/readers), pero crear `TASK-###` nuevos requiere aprobación del operador.
+- Runtime/code/plugins/DB: sin cambios.
+
 ## Scope
 
 ### Slice 1 — Current tracking inventory
@@ -289,29 +301,31 @@ N/A — discovery/documentation only. Any future runtime implementation must def
 
 ## Acceptance Criteria
 
-- [ ] Current tracking inventory names each source, destination, payload class and owner.
-- [ ] ADR/draft architecture defines event envelope, identity model, consent posture, attribution model and retention stance.
-- [ ] HubSpot plugin `leadin` is explicitly read-only in every proposed option.
-- [ ] V1 recommendation explains what Greenhouse owns vs what HubSpot/GTM/GA/warehouse consume.
-- [ ] Future task breakdown is sequenced and split by backend foundation, host adapters, destinations and reporting.
-- [ ] No runtime code, plugin edits, DB migrations or analytics collection changes are made in this task.
+- [x] Current tracking inventory names each source, destination, payload class and owner.
+- [x] ADR/draft architecture defines event envelope, identity model, consent posture, attribution model and retention stance.
+- [x] HubSpot plugin `leadin` is explicitly read-only in every proposed option.
+- [x] V1 recommendation explains what Greenhouse owns vs what HubSpot/GTM/GA/warehouse consume.
+- [x] Future task breakdown is sequenced and split by backend foundation, host adapters, destinations and reporting.
+- [x] No runtime code, plugin edits, DB migrations or analytics collection changes are made in this task.
 
 ## Verification
 
 - `pnpm task:lint --task TASK-1260`
 - `pnpm ops:lint --changed`
+- `pnpm docs:closure-check`
+- `pnpm docs:context-check`
 - Manual doc review against Growth Forms architecture §15/§15.1
-- Optional read-only browser/network evidence for current public-site tracking inventory
+- Read-only browser/network evidence for current public-site tracking inventory (`curl` against `efeoncepro.com` and `/servicios-contratar-hubspot/`)
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` sincronizado
-- [ ] archivo en carpeta correcta
-- [ ] `docs/tasks/README.md` sincronizado
-- [ ] `Handoff.md` actualizado con decision/open questions
-- [ ] `changelog.md` actualizado only if architecture/process changes
-- [ ] chequeo de impacto cruzado sobre `TASK-1258`, `TASK-1259`, `TASK-1231`, `TASK-1232`
-- [ ] follow-up tasks/ADR linked from this task
+- [x] `Lifecycle` sincronizado
+- [x] archivo en carpeta correcta
+- [x] `docs/tasks/README.md` sincronizado
+- [x] `Handoff.md` actualizado con decision/open questions
+- [x] `changelog.md` actualizado only if architecture/process changes
+- [x] chequeo de impacto cruzado sobre `TASK-1258`, `TASK-1259`, `TASK-1231`, `TASK-1232`
+- [x] follow-up tasks/ADR linked from this task
 
 ## Follow-ups
 
@@ -322,6 +336,6 @@ N/A — discovery/documentation only. Any future runtime implementation must def
 
 ## Open Questions
 
-- ¿V1 debe partir por server ingestion propio o por reconciliar `dataLayer` + server submissions?
-- ¿Necesitamos cookie first-party Greenhouse o basta session/correlation id por surface en V1?
-- ¿Cual sera el destino analitico principal: Greenhouse Postgres, BigQuery, HubSpot activity timeline, GA4 o una combinacion?
+- ¿V1 debe partir por server ingestion propio o por reconciliar `dataLayer` + server submissions? → Resuelto: V1 híbrido. `dataLayer` se mantiene para medición/GTM; Greenhouse agrega ingestion propio gated/default-off para eventos behavioral gobernados; conversion truth sigue server-side.
+- ¿Necesitamos cookie first-party Greenhouse o basta session/correlation id por surface en V1? → Resuelto: sí se recomienda first-party visitor/session pseudónimo, rotatable y consent-aware; no es identidad de persona ni auth. `hubspotutk` queda solo como contexto de atribución.
+- ¿Cual sera el destino analitico principal: Greenhouse Postgres, BigQuery, HubSpot activity timeline, GA4 o una combinacion? → Resuelto: Postgres es ledger operacional V1; BigQuery es export/warehouse downstream; HubSpot/GA/GTM son consumers/destinations, no source of truth.

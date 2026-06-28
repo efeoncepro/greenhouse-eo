@@ -1,3 +1,11 @@
+## Sesion 2026-06-28 — TASK-1260 Greenhouse Tracking Engine Discovery — Codex — ✅ complete (docs/architecture, sin runtime)
+
+> **Pedido:** `ejecuta task 1260`. **Resultado:** task movida a `complete/` con discovery/architecture spike cerrado. Se creó `docs/architecture/GREENHOUSE_TRACKING_ENGINE_ARCHITECTURE_V1.md` e índice propuesto en `docs/architecture/DECISIONS_INDEX.md`. Decisión recomendada: **V1 híbrido** — `dataLayer`/GTM siguen como measurement surface, Greenhouse agrega ingestion/ledger behavioral gobernado, y `greenhouse_growth.form_submission` sigue siendo la verdad autoritativa de conversiones. HubSpot/GA/GTM/BigQuery quedan como consumers/destinations/comparison sources, no SoT. **No hubo runtime/code/DB/plugin edits/cookies.**
+>
+> **Inventario live read-only:** `efeoncepro.com` carga Google tag `GT-KV5CNNKQ`, GTM `GTM-NGHPGRLZ`, HubSpot/Leadin `js.hs-scripts.com/48713323.js` con plugin `11.3.51` (drift vs discovery 2026-06-14 `11.3.45`), HubSpot Content Embed, Clarity, Metricool, ActiveCampaign tracking, CF7/Send trackers y Site Kit. La página `/servicios-contratar-hubspot/` mantiene widget Elementor `hubspot-form` + CF7 + HubSpot embed scripts.
+>
+> **Follow-ups propuestos, NO registrados:** 1) tracking ingestion foundation, 2) host adapters/renderer bridge, 3) attribution reconciliation, 4) destination/export adapters, 5) reporting/readers. Registrar `TASK-###` nuevos requiere aprobación del operador. Verificación local: `pnpm task:lint --task TASK-1260`, `pnpm ops:lint --changed`, `pnpm docs:closure-check`.
+
 ## Sesion 2026-06-28 — TASK-1267 Entity Infrastructure Probes — Claude — ✅ complete (code complete, rollout pendiente) · develop sin push
 
 > **Pedido:** `/implement-task 1267` — probes read-only del backbone real de entidad de la marca (Google Knowledge Graph / Wikidata / Reddit-UGC), reusando el probe gatherer de TASK-1266 (sin gatherer paralelo). **Resultado (2 slices, 2 commits, develop sin push):** tercer eje **ortogonal** `entity` del probe layer (lado a lado de `structural`/`agentic`, NUNCA blended).
