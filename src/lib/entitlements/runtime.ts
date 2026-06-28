@@ -237,10 +237,6 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
       source
     })
 
-    // TASK-1243 — report.read_client: el cliente la usa con scope 'own' (grant en el
-    // bloque tenantType='client' de abajo). Se replica al set interno SOLO para el guard
-    // de cobertura (capability-grant-coverage.test usa un superset interno; toda capability
-    // can()-checked debe ser alcanzable por él). Inocuo: el endpoint exige
     // TASK-1269 — fix_it.generate: artefactos deterministas public-safe desde report+probes.
     addEntitlement(entries, {
       module: 'growth',
@@ -250,6 +246,10 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
       source
     })
 
+    // TASK-1243 — report.read_client: el cliente la usa con scope 'own' (grant en el
+    // bloque tenantType='client' de abajo). Se replica al set interno SOLO para el guard
+    // de cobertura (capability-grant-coverage.test usa un superset interno; toda capability
+    // can()-checked debe ser alcanzable por él). Inocuo: el endpoint exige
     // requireClientTenantContext → ningún interno lo pasa, así que no gana acceso real.
     addEntitlement(entries, {
       module: 'growth',
@@ -290,6 +290,18 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
     addEntitlement(entries, {
       module: 'growth',
       capability: 'growth.ai_visibility.run.operator',
+      action: 'execute',
+      scope: 'tenant',
+      source: operatorSource
+    })
+
+    // TASK-1282 — search_console.connect: el operador conecta la propiedad Search
+    // Console de un cliente (OAuth 3-legged, token per-org) como parte de la operación
+    // growth/medición. Mismo set operador que run.operator (scope tenant = puede operar
+    // sobre cualquier org cliente; la org objetivo va horneada en el state firmado).
+    addEntitlement(entries, {
+      module: 'growth',
+      capability: 'growth.search_console.connect',
       action: 'execute',
       scope: 'tenant',
       source: operatorSource

@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -298,3 +298,26 @@ Flujo: `oauth/start` (capability-gated) genera la consent URL de Google con `acc
 1. ¿Schema destino de la tabla: `greenhouse_growth` (cerca del grader) o `greenhouse_crm` (cerca de la org/cliente)? Propuesta: `greenhouse_growth` (consumer principal = grader/medición). Resolver en Discovery.
 2. ¿La conexión se ofrece en el lane admin (operador conecta en nombre del cliente) o client-portal (el cliente se autoconecta), o ambos? Propuesta: ambos como consumers del mismo command; v1 entrypoint admin + el client-portal en la UI follow-up.
 3. ¿Storage del token: Secret Manager per-org (consistente con Notion per-cliente) vs columna cifrada con KMS? Propuesta: Secret Manager per-org (reusa el grant acotado de `greenhouse-portal@`).
+
+## Delta 2026-06-28 — code-complete, rollout pendiente (Claude)
+
+Implementado local-first en `develop` (sin push). **Open Questions resueltas según propuesta:** Q1 → `greenhouse_growth`; Q2 → ambos lanes consumen el mismo command, v1 entrypoint admin; Q3 → Secret Manager per-org.
+
+**Slices entregados:**
+
+- **Slice 1 — connection contract + per-org token storage.** Migraciones `…_task-1282-search-console-connections.sql` (tablas `search_console_connections` UNIQUE por org + `search_console_oauth_states` single-use firmado, FK a `greenhouse_core.organizations`, marker + DO-block + GRANTs) y `…_task-1282-search-console-capability.sql` (seed `growth.search_console.connect` en `capabilities_registry`). Aplicadas a `greenhouse-pg-dev` (dev/staging comparten instancia) + `db.d.ts` regenerado. Primitive `src/lib/growth/search-console/**` (oauth-client con `OAuth2Client`, state-store anti-CSRF, connection-store, secret-naming, api-client REST, command `start/complete/disconnect`, flag `GROWTH_SEARCH_CONSOLE_ENABLED` default OFF). Routes `GET /api/admin/growth/search-console/oauth/{start,callback}` (dual-gate `requireInternalTenantContext` + `can(...,'growth.search_console.connect',...)`). Capability en catálogo TS + grant runtime (set operador) + seed registry. 4 errores canónicos nuevos es-CL.
+- **Slice 2 — reader + signal.** `readSearchConsoleAnalytics(orgId, params)` (refresh→access, honest degradation `invalid_grant`/403 → `revoked` + signal). Signal `growth.search_console.token_unhealthy` (moduleKey growth, data_quality, steady 0) wired en `get-reliability-overview.ts` + glob en registry. Fila en `FEATURE_FLAG_STATE_LEDGER.md`.
+
+**Gates verdes:** full suite `8386 passed`, `pnpm build` (Turbopack) exit 0, `pnpm lint` 0 err, `pnpm typecheck` limpio, `pnpm pg:doctor` sano, `flags:audit --strict` (flag registrado), coverage + parity de entitlements. 33 tests focales nuevos.
+
+**Rollout pendiente (out-of-band, Runtime Rollout Completion Gate — por eso NO se mueve a `complete/`):**
+
+1. Crear OAuth 2.0 Client ID (web) en `efeonce-group` + consent screen branding + redirect URIs staging/prod → secrets `GOOGLE_SEARCH_CONSOLE_OAUTH_CLIENT_ID(_SECRET_REF)` / `_CLIENT_SECRET(_SECRET_REF)`.
+2. Verificación de Google del scope sensible `webmasters.readonly` (external user type, días) — test users mientras tanto.
+3. **Ampliar el grant IAM de secret-write** del SA `greenhouse-portal@` al prefijo `search-console-token-*` (hoy sólo `notion-integration-token-greenhouse-*`; sin esto `createOrAddSecretVersion` → `permission_denied`, que el command degrada honesto).
+4. Flip flag staging + OAuth round-trip real con propiedad de prueba → token en Secret Manager + fila `active` + reader devuelve filas + revocar → `revoked` + signal.
+5. Prod vía release control plane (migración + capability seed + env) tras sign-off.
+
+**Acceptance cubierta:** SoT/contract/consumers nombrados; token NUNCA en PG (test `command` verifica que el upsert recibe `tokenSecretRef`, no el token crudo); tenant isolation (test reader org A≠B); state firmado single-use; scope sólo `webmasters.readonly`; capability + grant + coverage; migración additive con marker + DO-block; flag default OFF + ledger; signal wired steady 0. Pendiente sólo el **#9** (OAuth round-trip real en staging) por la coordinación out-of-band.
+
+**Nota de concurrencia:** comparte worktree `develop` con WIP sin commitear de TASK-1269 (otro agente) en archivos compartidos (`entitlements-catalog.ts`, `runtime.ts`, `FEATURE_FLAG_STATE_LEDGER.md`, README/registry, grader arch/doc/manual). Mis cambios son aditivos en zonas distintas; no commiteado para no bundlear su WIP — el operador secuencia los commits.

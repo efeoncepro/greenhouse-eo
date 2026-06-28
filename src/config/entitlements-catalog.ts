@@ -1962,10 +1962,6 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     actions: ['execute'] as const,
     defaultScope: 'tenant'
   },
-  // TASK-1243 — report.read_client: 3.er consumer de la parity. Un usuario `client_*`
-  // autenticado ve el reporte del grader de SU organización (DTO cliente sin evidencia
-  // cruda de provider). Capability DEDICADA (no scope-overload de report.read interno):
-  // least-privilege explícito + desacopla el acceso cliente del lifecycle del read interno.
   // TASK-1269 — fix_it.generate: generación gobernada de artefactos public-safe
   // (JSON-LD, llms.txt, briefs) desde un reporte/probes existentes. No muta el sitio
   // del prospecto; sólo entrega archivos deterministas. Grant en runtime.ts mismo PR.
@@ -1975,6 +1971,10 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     actions: ['execute'] as const,
     defaultScope: 'tenant'
   },
+  // TASK-1243 — report.read_client: 3.er consumer de la parity. Un usuario `client_*`
+  // autenticado ve el reporte del grader de SU organización (DTO cliente sin evidencia
+  // cruda de provider). Capability DEDICADA (no scope-overload de report.read interno):
+  // least-privilege explícito + desacopla el acceso cliente del lifecycle del read interno.
   // defaultScope `own` (su propia org, derivada server-side del orgContext de sesión).
   // Grant a client_executive/client_manager/client_specialist en runtime.ts mismo PR.
   {
@@ -2018,7 +2018,13 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
   // que `submissions.read` (que devuelve masked): el unmasked exige esta capability fina +
   // reason + audit append-only. Grant least-privilege (EFEONCE_ADMIN ∪ EFEONCE_OPERATIONS,
   // NO EFEONCE_ACCOUNT) en runtime.ts mismo PR.
-  { key: 'growth.forms.lead_pii.reveal', module: 'growth', actions: ['read'] as const, defaultScope: 'tenant' }
+  { key: 'growth.forms.lead_pii.reveal', module: 'growth', actions: ['read'] as const, defaultScope: 'tenant' },
+  // TASK-1282 — Search Console connection. Conectar/desconectar la propiedad Google
+  // Search Console de una organización cliente (OAuth 3-legged, token per-org). Acción
+  // canónica `execute` (verbo de gobernanza: connect/disconnect son commands; el LLM
+  // nunca conecta directo). Grant set operador (internal ∪ EFEONCE_ADMIN ∪ EFEONCE_ACCOUNT
+  // ∪ EFEONCE_OPERATIONS ∪ AI_TOOLING_ADMIN) en runtime.ts mismo PR.
+  { key: 'growth.search_console.connect', module: 'growth', actions: ['execute'] as const, defaultScope: 'tenant' }
 ] as const
 
 export type EntitlementCapabilityDefinition = (typeof ENTITLEMENT_CAPABILITY_CATALOG)[number]

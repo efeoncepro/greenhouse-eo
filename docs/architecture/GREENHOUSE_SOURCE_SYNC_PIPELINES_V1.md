@@ -1,5 +1,17 @@
 # Greenhouse Source Sync Pipelines V1
 
+## Delta 2026-06-28 — TASK-1282 Google Search Console connection per-org (el token ES el scope)
+
+Tercera integración que aplica el patrón canónico **"el token ES el scope, per-cliente"** (mirror de Notion per-teamspace y HubSpot per-portal): la conexión OAuth 3-legged a **Google Search Console**. Cada organización cliente autoriza SU propiedad GSC (scope read-only `webmasters.readonly`); el **refresh token vive en Secret Manager** (`search-console-token-<org>`), NUNCA crudo en PG. La metadata (siteUrl, status, `token_secret_ref`, conectado_por) vive en `greenhouse_growth.search_console_connections` (UNIQUE por `organization_id`). Reads aislados tenant-safe por `readSearchConsoleAnalytics(orgId, …)`.
+
+Diferencias con el sync Notion/HubSpot (no es un sync ETL batch, es **pull on-demand**):
+
+- **No hay Cloud Run extractor ni Cloud Scheduler**: el reader resuelve el refresh token per-org y llama la Search Analytics Query API en el momento que un consumer lo pide (grader/medición EPIC-020, UI follow-up TASK-1283, Nexa/MCP). No materializa snapshot propio (la GSC API es la fuente).
+- **OAuth 3-legged con state firmado single-use**: `greenhouse_growth.search_console_oauth_states` guarda el SHA-256 del state + la org **anclada server-side** (anti-CSRF/confused-deputy). El lane admin v1 conecta en nombre del cliente con la org horneada en el state; el client-portal self-service es follow-up.
+- **Honest degradation**: si Google responde `invalid_grant`/403 (revocado), el reader marca `status=revoked` + emite la reliability signal `growth.search_console.token_unhealthy` (steady 0) y NUNCA inventa filas.
+
+Primitive: `src/lib/growth/search-console/**` (commands `connect`/`disconnect` + reader canónico). Capability gobernada `growth.search_console.connect`. Flag `GROWTH_SEARCH_CONSOLE_ENABLED` default OFF. **Rollout pendiente (out-of-band):** OAuth client + verificación del consent screen de Google + ampliar el grant IAM de secret-write de `greenhouse-portal@` al prefijo `search-console-token-*`. Spec: `docs/tasks/in-progress/TASK-1282-growth-search-console-multitenant-connection.md`.
+
 ## Delta 2026-06-20 — TASK-1209 proyección recurrente de facturas de exportación/exentas + visibilidad
 
 El step PG del sync Nubox (`upsertIncomeFromSale`) ya intentaba **cada** conformed sale por corrida (incluidas las facturas de exportación DTE 110/111/112), pero **toda factura exenta fallaba** registrada con `nubox_postgres_projection_failed` por el bug de exento de `buildIncomeTaxWriteFields` (ver Finance arch Delta TASK-1209). Con el fix, una factura de exportación válida con cliente resuelto **se materializa sola en el próximo sync** — sin scripts por cliente. Berel es fixture, no rama de código.
