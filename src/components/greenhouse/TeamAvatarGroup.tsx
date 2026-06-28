@@ -206,7 +206,7 @@ const TeamAvatarGroup = ({
             )
 
             return showTooltip ? (
-              <Tooltip key={index} title={brand.name} arrow placement='top' slotProps={axisTooltipSlotProps}>
+              <Tooltip key={index} title={brand.name} arrow placement='top' describeChild slotProps={axisTooltipSlotProps}>
                 {slot}
               </Tooltip>
             ) : (

@@ -2,7 +2,7 @@
 
 ## Meta
 
-- Status: `ready-for-implementation`
+- Status: `approved-canonical`
 - Owner task: `TASK-1252 — Growth AI Visibility: Report Artifact Design System`
 - Product Design asset: [executive-report-atlas-final-artifact-contract.png](../../assets/product-design/task-1252-ai-visibility-report-artifact-design-system/executive-report-atlas-final-artifact-contract.png)
 - Intended consumers: `publicWeb`, `clientPortal`, `attachment`, `adminPreview`
@@ -16,6 +16,16 @@
 - Job to be done: explain the AI visibility estimate in under 30 seconds without exposing raw evidence or implying guaranteed ranking.
 - Primary decision signal: estimated visibility score plus primary gap and recommended motion.
 - Non-goals: scoring changes, raw provider review, prompt disclosure, ranking guarantees, email body design.
+
+## Delta 2026-06-28 — Approved Report Artifact v1
+
+- The runtime mockup at `/growth/ai-visibility/report-artifact/mockup` is the approved visual/narrative contract for the AI Visibility report artifact.
+- The first fold is a two-column executive read: score verdict on the left, principal gap and recommended motion on the right, followed by a compact executive read strip that removes the previous empty desktop zone.
+- The score verdict uses `TeamAvatarGroup kind="brands"` for the evaluated engines (Gemini, ChatGPT, Claude, Perplexity) instead of a technical "4 de 4 motores respondieron" line.
+- The canonical narrative order is: executive verdict, executive read, 5-level framework, engine channels, competitive benchmark, dimension breakdown, AEO signals, Plan AEO, provenance/methodology.
+- GVC scenario `ai-visibility-report-artifact-mockup` now owns the baseline contract: `surfaceId=growth.ai-visibility.report-artifact`, `baselineName=ai-visibility-report-artifact-approved-v1`, approved capture `.captures/2026-06-28T11-57-25_ai-visibility-report-artifact-mockup`, durable baseline `scripts/frontend/baselines/growth.ai-visibility.report-artifact/**`.
+- Pre-baseline QA closed the tooltip `aria-prohibited-attr` warning and the dimension bar overflow warning; the approved capture only had `baseline_stale` before promotion.
+- Downstream consumers (`TASK-1248`, `TASK-1250`, `TASK-1273`) consume this model/narrative. Surface-specific chrome is allowed; redesigning the report logic/order is not.
 
 ## Delta 2026-06-28 — SEO/AEO narrative structure
 
@@ -37,7 +47,8 @@
 |---|---|---|---|---|
 | 0 | Artifact header | Brand, report identity and public-safe status | report header adapter | `report.headline`, `report.provenance` |
 | 0.1 | Variant switcher | Show adapter discipline for design-system preview | segmented control, docs-only | static variant metadata |
-| 1 | Executive verdict | Score, severity, coverage and partial cue | `AiVisibilityScoreHero` | `score`, `gate`, `provenance` |
+| 1 | Executive verdict | Score, severity, score disclaimer and evaluated engines | `AiVisibilityScoreHero` + `TeamAvatarGroup kind="brands"` | `score`, `gate`, `provenance.providersSampled` |
+| 1.1 | Executive read | Fill the desktop first-fold with decision-grade interpretation | `AiVisibilityExecutiveRead` | `primaryGap`, `recommendations[0]`, derived summary |
 | 2 | Primary gap | Name the main opportunity and impact | `AiVisibilityPrimaryGapCard` | `primaryGap` |
 | 3 | Recommended motion | Explain the motion without overpromising | `AiVisibilityRecommendedMotionCard` | `recommendations[0]`, `recommendedMotion` |
 | 4 | 5-level framework | Two-axis maturity model: perception lane + agentic operability lane | `AiVisibilityLevelsBand` | derived from `dimensions[]` |
@@ -47,9 +58,9 @@
 | 8 | AEO signals | Citation, sentiment, prominence, source mix and trend | `AiVisibilitySignalSummary` | `citationInsight`, `sentimentSummary`, `positionSummary`, `sourceTypeSummary`, `trend` |
 | 9 | Plan AEO | Prioritized remediation plan linked back to the affected level | `AiVisibilityRecommendationList` | `recommendations[]` |
 | 10 | Provenance | Method, versions, providers, baseline and generated date | `AiVisibilityProvenanceFooter` | `provenance` |
-| 8 | PDF preview | Prove attachment adapter can stand alone | print/PDF adapter preview | same report model |
-| 9 | Artifact contract | Make implementation boundaries visible | docs/preview table | static contract metadata |
-| 10 | Disclaimer footer | Legal-safe report framing | report footer | copy + `provenance` |
+| 11 | PDF/attachment adapter | Prove attachment adapter can stand alone | print/PDF adapter preview | same report model |
+| 12 | Artifact contract | Make implementation boundaries visible | docs/preview table | static contract metadata |
+| 13 | Disclaimer footer | Legal-safe report framing | report footer | copy + `provenance` |
 
 ## Copy Ledger
 
@@ -76,6 +87,8 @@
 | `growth.aiVisibility.reportArtifact.executiveVerdict.severityLabel` | Region 1 | Nivel: {severity} | `severity` | Named severity required. |
 | `growth.aiVisibility.reportArtifact.executiveVerdict.coverageLabel` | Region 1 | Cobertura de proveedores | none | Coverage block label. |
 | `growth.aiVisibility.reportArtifact.executiveVerdict.coverageValue` | Region 1 | {respondedProviders} de {sampledProviders} proveedores muestreados | `respondedProviders`, `sampledProviders` | No raw provider data. |
+| `growth.aiVisibility.reportArtifact.executiveVerdict.engineBrandsLabel` | Region 1 | Evaluado en | none | Approved web verdict label. |
+| `growth.aiVisibility.reportArtifact.executiveVerdict.engineBrands` | Region 1 | {providerLogos} | `provenance.providersSampled` | Render with `TeamAvatarGroup kind="brands"`; accessible label lists engine names. |
 | `growth.aiVisibility.reportArtifact.executiveVerdict.partialLabel` | Region 1 | Reporte parcial | none | Shows only when partial. |
 | `growth.aiVisibility.reportArtifact.executiveVerdict.pendingProvider` | Region 1 | {providerName} pendiente | `providerName` | If more than one, use count version. |
 | `growth.aiVisibility.reportArtifact.executiveVerdict.partialHelper` | Region 1 | Algunas fuentes no respondieron a tiempo. | none | Honest without internal detail. |
@@ -208,17 +221,18 @@
 - Print/PDF adapter: print-safe HTML or PDF renderer with static SVG/PNG charts plus table fallback. No ECharts runtime, no hover, no motion, no container-query dependency.
 - Email body: remains separate in `TASK-1250`; it may summarize this artifact but must not embed the whole report contract.
 - Copy source: extend `src/lib/copy/growth.ts` with the ids above or a structured `GH_GROWTH_AI_VISIBILITY_REPORT_ARTIFACT`.
-- GVC markers: `ai-visibility-report`, `ai-visibility-report-score`, `ai-visibility-report-recommendations`, `ai-visibility-report-provenance`, `ai-visibility-report-attachment-preview`.
-- Visual source: keep the Product Design PNG as a baseline reference; implementation should validate via GVC once runtime exists.
+- GVC markers: `ai-visibility-report`, `ai-visibility-report-score`, `ai-visibility-report-levels`, `ai-visibility-report-engine-snapshot`, `ai-visibility-report-dimensions`, `ai-visibility-report-aeo-signals`, `ai-visibility-report-sov`, `ai-visibility-report-recommendations`, `ai-visibility-report-provenance`.
+- Visual source: runtime mockup approved by operator + GVC baseline `growth.ai-visibility.report-artifact` / `ai-visibility-report-artifact-approved-v1`.
 
 ## GVC Scenario Plan
 
-- Scenario file: create `scripts/frontend/scenarios/ai-visibility-report-artifact.scenario.ts` with web and static/attachment specimens.
-- Route: design-system lab or report artifact preview route created by implementation.
-- Viewports: desktop 1440px, laptop 1280px, mobile 390px and print/PDF preview width.
-- Required steps: load full report, validate partial report, preview attachment/static variant, inspect chart/table fallback.
-- Required captures: full artifact, partial artifact, insufficient data, public-safe review state, attachment preview and mobile stacked layout.
-- Required `data-capture` markers: `ai-visibility-report`, `ai-visibility-report-score`, `ai-visibility-report-recommendations`, `ai-visibility-report-provenance`, `ai-visibility-report-attachment-preview`.
+- Scenario file: `scripts/frontend/scenarios/ai-visibility-report-artifact-mockup.scenario.ts`.
+- Route: `/growth/ai-visibility/report-artifact/mockup`.
+- Baseline: `surfaceId=growth.ai-visibility.report-artifact`, `baselineName=ai-visibility-report-artifact-approved-v1`, approved capture `.captures/2026-06-28T11-57-25_ai-visibility-report-artifact-mockup`.
+- Viewports: desktop 1440x900 and mobile iPhone 13.
+- Required steps: score gauge, 5-level framework, engine visibility, dimensions, AEO signals and share-of-voice.
+- Required captures: full approved artifact sections plus mobile stacked layout.
+- Required `data-capture` markers: `ai-visibility-report`, `ai-visibility-report-score`, `ai-visibility-report-levels`, `ai-visibility-report-engine-snapshot`, `ai-visibility-report-dimensions`, `ai-visibility-report-aeo-signals`, `ai-visibility-report-sov`.
 - Assertions: public artifact has no provider findings, raw prompts, raw text, raw citation URLs or internal ids; disclaimers remain visible.
 - Scroll-width checks: desktop and mobile 390px must satisfy `scrollWidth <= clientWidth`; attachment preview must not clip tables.
 - Accessibility/focus checks: chart table alternatives exist; headings preserve report order; static variants do not depend on hover.
@@ -227,22 +241,24 @@
 ## Design Decision Log
 
 - Decision: define one report artifact system with web and static adapters instead of separate consumer-specific reports.
+- Decision: canonize Approved Report Artifact v1 from the runtime mockup after operator approval; later work consumes this narrative contract rather than redesigning the report.
+- Decision: replace the technical engine-response line in the score verdict with `TeamAvatarGroup kind="brands"` under "Evaluado en" for a more commercial first read while retaining accessible engine names.
 - Alternatives considered: embed the report design inside TASK-1241/1248, use only dashboard cards, or make PDF/email a separate visual language.
 - Why this pattern: the same report must feed public page, client portal and attachment without disclosure drift or copy duplication.
 - Reuse / extend / new primitive: likely new/extended report artifact primitive family under the growth domain; primitives must still reuse Greenhouse cards, charts, typography and motion contracts.
-- Open risks: framework-level top-line changes from the Efeonce 5-level model must be reconciled before implementation finalizes the section order.
-- Follow-up: update this contract after TASK-1265...1270 settle the additional grader/readiness signals.
+- Open risks: future readiness probes from TASK-1266 may enrich `Be Actionable`; they must enter through the shared model without changing the approved narrative spine.
+- Follow-up: downstream consumers document only surface-specific composition, not a new report artifact.
 
 ## Acceptance Checklist
 
-- [ ] All visible strings from the approved visual have a copy id.
-- [ ] Dynamic values are explicit and locale-formatted.
-- [ ] The word "estimación" appears wherever the score could be mistaken for a ranking guarantee.
-- [ ] Partial state says what is missing without exposing provider internals.
-- [ ] Public-safe disclaimer appears in web and attachment.
-- [ ] Attachment/PDF adapter is explicitly separate from web components.
-- [ ] Email body is not treated as the full report artifact.
-- [ ] Charts have table/text alternatives.
-- [ ] Severity and status are not color-only.
-- [ ] No raw provider text, prompts, raw citation URLs, internal IDs or accuracy findings are exposed.
-- [ ] Implementation mapping, GVC scenario plan and design decision log stay aligned before moving `UI ready` to `yes`.
+- [x] All visible strings from the approved visual have a copy id or structured copy bucket.
+- [x] Dynamic values are explicit and locale-formatted.
+- [x] The word "estimación" appears wherever the score could be mistaken for a ranking guarantee.
+- [x] Partial state says what is missing without exposing provider internals.
+- [x] Public-safe disclaimer appears in web and attachment.
+- [x] Attachment/PDF adapter is explicitly separate from web components.
+- [x] Email body is not treated as the full report artifact.
+- [x] Charts have table/text alternatives.
+- [x] Severity and status are not color-only.
+- [x] No raw provider text, prompts, raw citation URLs, internal IDs or accuracy findings are exposed.
+- [x] Implementation mapping, GVC scenario plan and design decision log stay aligned before moving `UI ready` to `yes`.

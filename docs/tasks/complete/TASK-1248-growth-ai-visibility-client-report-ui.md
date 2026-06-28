@@ -1,5 +1,14 @@
 # TASK-1248 — Growth AI Visibility: Client Report UI
 
+## Delta 2026-06-28 — consume Approved Report Artifact v1 de TASK-1252
+
+`TASK-1252` queda canonizada como **Approved Report Artifact v1** (`/growth/ai-visibility/report-artifact/mockup`, baseline `growth.ai-visibility.report-artifact`). Esta vista cliente permanece desbloqueada y consume el mismo `ReportArtifactModel`; el workbench `/aeo` puede recomponer el modelo para una experiencia cliente rica, pero NO re-decide el informe, su disclosure ni su narrativa.
+
+- Mantener `modelFromClientReport(clientReport)` como fuente; no crear scoring/charts/copy paralelos.
+- Reusar el lenguaje aprobado: AEO, 5 niveles, Plan AEO, presencia por motor como canales AEO y `TeamAvatarGroup kind="brands"` para motores evaluados cuando aplique.
+- `providerPresence` es public/client-safe; `providerFindings`, `accuracyFindings`, prompts/raw text/citation URLs crudas, costos y razón interna de `review_required` siguen fuera del portal cliente.
+- Las capturas GVC del workbench deben revisar su chrome propio, pero cualquier sección de informe debe mantenerse compatible con el baseline aprobado de `TASK-1252`.
+
 ## Delta 2026-06-28 — naming AEO + recs reencuadradas + canonización primitive + parity fix (post-cierre)
 
 Iteración sobre el cierre, en `develop` sin push (commits `0430bb7af`, `a6c93ce77`, `528369a36`):

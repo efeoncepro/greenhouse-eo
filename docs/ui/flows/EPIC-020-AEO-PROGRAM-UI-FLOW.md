@@ -26,9 +26,11 @@ Todo el programa se apoya en **una sola fuente**: el motor del grader produce un
 
 **Regla de oro (modern-ui · restraint):** ninguna superficie inventa su propio layout de reporte; toda lectura del diagnóstico es un render del MISMO modelo. La diferencia entre superficies es **disclosure** (qué se muestra) + **chrome** (dónde vive), nunca el contenido base.
 
+**Approved Report Artifact v1 (TASK-1252):** el mockup `/growth/ai-visibility/report-artifact/mockup` queda como contrato visual/narrativo aprobado, con baseline GVC `surfaceId=growth.ai-visibility.report-artifact` / `baselineName=ai-visibility-report-artifact-approved-v1`.
+
 **Disclosure matrix (qué ve cada quién):**
-- Público / prospecto / cliente → `providerPresence`, score, dimensiones, brecha, plan, tendencia, share-of-voice (**público-safe**).
-- Internal-only (NUNCA al cliente/externo): `providerFindings` (narrativa cruda por motor), `accuracyFindings`, razón de `review_required`, engine snapshot, costo.
+- Público / prospecto / cliente → `providerPresence` / presencia por motor (logos + conteos agregados), score, dimensiones, brecha, plan, tendencia, share-of-voice (**público-safe**).
+- Internal-only (NUNCA al cliente/externo): `providerFindings` (narrativa cruda por motor), `accuracyFindings`, prompts, raw provider text, citation URLs crudas, IDs internos, razón de `review_required` y costo.
 
 ---
 

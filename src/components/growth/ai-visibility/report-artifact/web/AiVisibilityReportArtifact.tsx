@@ -12,15 +12,12 @@
  * severidad nombrada + ícono (nunca color-only). El attachment/print usa OTRO adapter.
  */
 
-import { useId } from 'react'
-
 import Box from '@mui/material/Box'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import Chip from '@mui/material/Chip'
 import Divider from '@mui/material/Divider'
 import Grid from '@mui/material/Grid'
-import LinearProgress from '@mui/material/LinearProgress'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import { alpha, useTheme } from '@mui/material/styles'
@@ -35,7 +32,6 @@ import {
 } from 'recharts'
 
 import AppRecharts from '@/libs/styles/AppRecharts'
-import { visuallyHiddenSx } from '@/components/greenhouse/accessibility'
 import AnimatedCounter from '@/components/greenhouse/AnimatedCounter'
 import TeamAvatarGroup, { type TeamAvatarGroupBrand } from '@/components/greenhouse/TeamAvatarGroup'
 import { GreenhouseBrandLogoMark, type GreenhouseBrandLogoKind } from '@/components/greenhouse/primitives'
@@ -513,9 +509,9 @@ const DimensionsSection = ({ model, ordinal = 5 }: { model: ReportArtifactModel;
                     </Stack>
                     <Stack spacing={2.25} component='ul' sx={{ listStyle: 'none', p: 0, m: 0 }}>
                       {group.dimensions.map(dim => {
-                        const color = toneToColor(dim.severity)
                         const empty = dim.score === null
                         const label = GH_GROWTH_AI_VISIBILITY.dimension_label[dim.key] ?? dim.label
+                        const score = empty ? 0 : (dim.score as number)
 
                         return (
                           <Box key={dim.key} component='li'>
@@ -527,19 +523,31 @@ const DimensionsSection = ({ model, ordinal = 5 }: { model: ReportArtifactModel;
                                 {empty ? C.levelsBand.coverageBadge : `${dim.score}/100`}
                               </Typography>
                             </Stack>
-                            <LinearProgress
-                              variant='determinate'
-                              value={empty ? 0 : (dim.score as number)}
-                              color={empty ? 'inherit' : color}
+                            <Box
+                              role='progressbar'
                               aria-label={`${label}: ${empty ? 'sin dato' : `${dim.score} de 100`}`}
+                              aria-valuemin={0}
+                              aria-valuemax={100}
+                              aria-valuenow={empty ? undefined : score}
+                              aria-valuetext={empty ? 'sin dato' : `${score} de 100`}
                               sx={{
+                                position: 'relative',
+                                overflow: 'hidden',
                                 height: 7,
+                                width: '100%',
+                                bgcolor: theme => alpha(theme.palette.text.primary, 0.08),
                                 borderRadius: theme => `${theme.shape.customBorderRadius.sm}px`,
-                                '& .MuiLinearProgress-bar': {
-                                  bgcolor: empty ? 'transparent' : scoreTextColor(dim.severity)
-                                }
                               }}
-                            />
+                            >
+                              <Box
+                                sx={{
+                                  height: '100%',
+                                  width: `${score}%`,
+                                  bgcolor: empty ? 'transparent' : scoreCssColor(dim.severity),
+                                  borderRadius: 'inherit'
+                                }}
+                              />
+                            </Box>
                             <Typography variant='body2' color='text.secondary' sx={{ mt: 0.5, display: 'block' }}>
                               {empty ? C.dimensions.coverageHelper : dim.explainer}
                             </Typography>
@@ -1091,14 +1099,13 @@ export interface AiVisibilityReportArtifactProps {
 }
 
 const AiVisibilityReportArtifact = ({ model, header }: AiVisibilityReportArtifactProps) => {
-  const labelId = useId()
   const isPublic = model.audience === 'public'
   const show = (section: Parameters<typeof reportSectionVisible>[1]) => reportSectionVisible(model.variant, section)
 
   return (
     <Box
       component='article'
-      aria-labelledby={labelId}
+      aria-label={`${C.header.title} — ${header.organizationName}`}
       data-capture='ai-visibility-report'
       sx={{
         minWidth: 0,
@@ -1142,9 +1149,6 @@ const AiVisibilityReportArtifact = ({ model, header }: AiVisibilityReportArtifac
         }
       }}
     >
-      <Typography id={labelId} component='h2' sx={visuallyHiddenSx}>
-        {C.header.title} — {header.organizationName}
-      </Typography>
       <Stack spacing={6}>
         <Masthead header={header} isPublic={isPublic} />
         {show('verdict') && (

@@ -16,12 +16,76 @@ export const scenario: CaptureScenario = {
   ],
   initialHoldMs: 4000,
   finalHoldMs: 500,
+  baseline: {
+    surfaceId: 'growth.ai-visibility.report-artifact',
+    baselineName: 'ai-visibility-report-artifact-approved-v1',
+    approvedMockupCaptureDir: '.captures/2026-06-28T11-57-25_ai-visibility-report-artifact-mockup',
+    requiredFrameLabels: [
+      '01-score-gauge',
+      '02-readiness-levels',
+      '02b-engine-visibility',
+      '03-dimensions',
+      '04-aeo-signals',
+      '05-share-of-voice'
+    ],
+    requiredRegions: [
+      '[data-capture="ai-visibility-report"]',
+      '[data-capture="ai-visibility-report-score"]',
+      '[data-capture="ai-visibility-report-levels"]',
+      '[data-capture="ai-visibility-report-engine-snapshot"]',
+      '[data-capture="ai-visibility-report-dimensions"]',
+      '[data-capture="ai-visibility-report-aeo-signals"]',
+      '[data-capture="ai-visibility-report-sov"]'
+    ],
+    maxDiffRatio: 0.08
+  },
   readiness: {
     selector: '[data-capture="ai-visibility-report"]',
     absentSelectors: ['.MuiSkeleton-root', '[data-testid="login-card"]'],
     waitForFonts: true,
     postReadyDelayMs: 800,
     timeout: 15000
+  },
+  quality: {
+    accessibility: {
+      enabled: true,
+      includeSelector: '[data-capture="ai-visibility-report"]',
+      failOnViolations: false
+    },
+    layout: {
+      enabled: true,
+      includeSelector: '[data-capture="ai-visibility-report"]',
+      failOnViolations: false
+    },
+    runtime: {
+      failOnConsoleError: true,
+      failOnPageError: true,
+      failOnHydrationWarning: true,
+      failOnHttpStatus: true,
+      ignoreUrlPatterns: ['/_next/', 'hot-update']
+    },
+    performance: {
+      enabled: true,
+      severity: 'warning',
+      maxDomNodes: 4000,
+      maxRequests: 80,
+      maxFcpMs: 12000
+    },
+    enterpriseRubric: {
+      enabled: true,
+      includeSelector: '[data-capture="ai-visibility-report"]',
+      failOnViolations: false,
+      expectedDataCaptureRegions: [
+        'ai-visibility-report',
+        'ai-visibility-report-score',
+        'ai-visibility-report-levels',
+        'ai-visibility-report-engine-snapshot',
+        'ai-visibility-report-dimensions',
+        'ai-visibility-report-aeo-signals',
+        'ai-visibility-report-sov'
+      ],
+      placeholderTerms: ['lorem', 'placeholder', 'fake', 'todo']
+    }
   },
   assertions: [
     { kind: 'noLoginRedirect', reason: 'mockup vive bajo dashboard autenticado' },

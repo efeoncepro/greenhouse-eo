@@ -1,5 +1,14 @@
 # TASK-1250 — Growth AI Visibility: Email Report Delivery
 
+## Delta 2026-06-28 — attachment/email alineados al Approved Report Artifact v1
+
+`TASK-1252` canonizó el **Approved Report Artifact v1**. Esta task queda desbloqueada respecto del design system: el email mantiene su cuerpo breve de entrega, pero el informe completo adjunto debe seguir el artefacto aprobado vía `modelFromPublicReport(publicReport, 'attachment')` + `renderAiVisibilityReportPdf`.
+
+- El cuerpo del email resume score/brecha/próximo paso; no es el informe completo ni debe re-skinnear la narrativa.
+- El PDF/attachment conserva la jerarquía del artefacto aprobado: veredicto, 5 niveles AEO, motores evaluados, benchmark, dimensiones, señales, Plan AEO, proveniencia y disclaimer.
+- `providerPresence` agregado es public-safe para el attachment; `providerFindings`, `accuracyFindings`, prompts/raw text, citation URLs crudas, IDs internos, costos y razones internas de review nunca viajan al lead.
+- Si el email necesita copy nuevo, debe apuntar a la misma nomenclatura AEO/Plan AEO y no prometer ranking garantizado.
+
 ## Delta 2026-06-27 — implementación (code complete · rollout pendiente)
 
 Implementada + **rollout STAGING desplegado y verificado E2E** (operador pidió "rollout de inmediato"). Movida a `complete/`: staging operativamente verificado + confirmación visual del operador; prod gated por release control plane + EPIC-020 + sign-off legal (consistente con los hermanos intake/handoff staging-ON/prod-OFF).
@@ -60,6 +69,7 @@ TASK-1251 **preservó `grader_leads` como la fuente del lead** (email + consent)
 - UI impact: `copy`
 - UI ready: `no`
 - Wireframe: `docs/ui/wireframes/TASK-1250-ai-visibility-email-report-delivery.md`
+- Motion: `docs/ui/motion/TASK-1250-ai-visibility-email-report-delivery-motion.md`
 - Backend impact: `sync`
 - Epic: `EPIC-020`
 - Status real: `Diseno`

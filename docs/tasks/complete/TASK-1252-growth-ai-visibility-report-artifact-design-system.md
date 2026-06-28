@@ -1,10 +1,23 @@
 # TASK-1252 — Growth AI Visibility: Report Artifact Design System
 
-## Delta 2026-06-28 — mapping 5-level ajustado sin reestructurar el artifact
+## Delta 2026-06-28 — Approved Report Artifact v1 canonizado (mockup aprobado por operador)
+
+El mockup runtime de `/growth/ai-visibility/report-artifact/mockup` queda canonizado como **Approved Report Artifact v1** para EPIC-020. Esta es la referencia que deben consumir `TASK-1241`, `TASK-1248`, `TASK-1250` y `TASK-1273`: no re-decidir narrativa, orden, disclosure ni componentes visuales del informe salvo constraint explícita de superficie.
+
+- **Source of truth:** `ReportArtifactModel` + adapters en `src/components/growth/ai-visibility/report-artifact/**`; copy en `GH_GROWTH_AI_VISIBILITY_REPORT_ARTIFACT`; ruta de revisión local `/growth/ai-visibility/report-artifact/mockup`.
+- **Narrativa aprobada:** veredicto ejecutivo con score estimado + `TeamAvatarGroup` de motores evaluados, lectura ejecutiva, framework AEO de 5 niveles, visibilidad por motor como canales AEO, benchmark competitivo, dimensiones agrupadas por nivel, señales AEO, Plan AEO, proveniencia/metodología y disclaimer public-safe.
+- **Disclosure aprobado:** `providerPresence`/presencia por motor (logos + conteos agregados) es público-safe y visible en public/client/attachment según adapter; `providerFindings`, `accuracyFindings`, prompts, raw provider text, citation URLs crudas, IDs internos, costo y razones internas de `review_required` siguen internal-only.
+- **Baseline visual:** scenario `scripts/frontend/scenarios/ai-visibility-report-artifact-mockup.scenario.ts` declara `surfaceId=growth.ai-visibility.report-artifact`, `baselineName=ai-visibility-report-artifact-approved-v1`, regiones obligatorias y gates warning-first de accesibilidad/layout/performance. Captura aprobada/promovida: `.captures/2026-06-28T11-57-25_ai-visibility-report-artifact-mockup`; home durable: `scripts/frontend/baselines/growth.ai-visibility.report-artifact/**`.
+- **Corrección pre-baseline:** antes de promover se cerraron los warnings de `aria-prohibited-attr` del `TeamAvatarGroup` (Tooltip usa `describeChild`) y el falso overflow de `LinearProgress` en dimensiones (barra propia accesible sin transform).
+- **Downstream:** `TASK-1248` puede recomponer el mismo modelo en workbench cliente sin diseñar otro informe; `TASK-1250` usa el PDF/attachment como documento standalone y deja el email como resumen; `TASK-1273` preserva la jerarquía narrativa en PDF salvo ajustes propios de paginación/print.
+
+**Estado downstream:** `TASK-1248` y `TASK-1250` quedan claramente desbloqueadas desde `TASK-1252`; si aparece bloqueo restante, debe venir de entitlement/data/rollout/email delivery, no del design system del artefacto.
+
+## Delta 2026-06-28 — mapping 5-level inicial (superseded por Approved Report Artifact v1)
 
 La delta del framework Efeonce se aplicó de forma acotada al contrato compartido: `REPORT_LEVEL_DIMENSIONS` ahora mapea `Be Correct` a `message_alignment` y deja `Be Actionable` como eje agéntico en cobertura hasta que TASK-1266 entregue readiness probes. El layout/render existente del artifact se mantiene: no se agregaron secciones nuevas ni se reordenó el informe.
 
-**Estado downstream:** `TASK-1248` y `TASK-1250` quedan desbloqueadas desde `TASK-1252`: pueden consumir el modelo/adapters existentes (`modelFromClientReport` para portal cliente; `modelFromPublicReport(report, 'attachment')` + PDF/print para adjunto) sin crear un artifact paralelo. Si tienen blockers restantes, ya no vienen del design system de `TASK-1252`.
+**Nota:** esta delta fue el ajuste mínimo previo a la revisión visual. Queda superseded por el Approved Report Artifact v1 de arriba, que sí canoniza el layout/narrativa runtime aprobados por el operador.
 
 ## Delta 2026-06-27 — deuda conocida cerrada: renderer PDF premium (TASK-1273)
 
@@ -42,7 +55,7 @@ El sistema se implementó **feature-local** (Open Question 2 resuelta: NO se pro
 - Type: `implementation`
 - Execution profile: `ui-ux`
 - UI impact: `primitive`
-- UI ready: `no`
+- UI ready: `yes`
 - Wireframe: `docs/ui/wireframes/TASK-1252-growth-ai-visibility-report-artifact-design-system.md`
 - Flow: `none`
 - Motion: `docs/ui/motion/TASK-1252-growth-ai-visibility-report-artifact-design-system-motion.md`
@@ -172,6 +185,31 @@ Reglas obligatorias:
 - **Dataviz (skill `dataviz-design`):** score = big-number/gauge **con contexto/benchmark** (nunca número aislado), `tabular-nums`; dimensiones = horizontal bar **desde 0**; severidad **nombrada + ícono/forma, NUNCA color-only**; paleta **colorblind-safe** (probada en dark para web); `null≠0` explícito; trend con eje honesto + delta con período explícito.
 - **A11y (skill `a11y-architect`) como parte del contrato, no solo verificación:** jerarquía de headings semántica, score como texto semántico (no solo visual), **charts con table fallback + `aria`/`role=img`** (el fallback dobla como representación de attachment), contraste AA en light/dark, links/anchors focusables en web. El path print-HTML preserva semántica/headings.
 - **Copy/legal (skill `greenhouse-ux-writing` + review legal):** regla dura **"estimación, no garantía de ranking"** centralizada acá; disclaimer public-safe es-CL; el score NUNCA se enuncia como promesa. Todo en `src/lib/copy/growth.ts`.
+
+### Implementation mapping
+
+- Shared model: `src/components/growth/ai-visibility/report-artifact/model.ts` (`ReportArtifactModel`, adapters DTO→model, disclosure matrix, 5-level mapping).
+- Web adapter aprobado: `src/components/growth/ai-visibility/report-artifact/web/AiVisibilityReportArtifact.tsx`, servido por `/growth/ai-visibility/report-artifact/mockup`.
+- Print/PDF adapters: `AiVisibilityReportPrint` y `renderAiVisibilityReportPdf`, ambos sobre variant `attachment` y sin re-decidir narrativa/disclosure.
+- Copy source: `GH_GROWTH_AI_VISIBILITY_REPORT_ARTIFACT` + nomenclatura AEO/Plan AEO desde `src/lib/copy/growth.ts`.
+- Downstream: `TASK-1248` puede recomponer el modelo en workbench cliente; `TASK-1250` usa PDF/attachment como documento completo; `TASK-1273` preserva la jerarquía en PDF.
+
+### GVC scenario plan
+
+- Scenario: `scripts/frontend/scenarios/ai-visibility-report-artifact-mockup.scenario.ts`.
+- Route: `/growth/ai-visibility/report-artifact/mockup`.
+- Baseline: `surfaceId=growth.ai-visibility.report-artifact`, `baselineName=ai-visibility-report-artifact-approved-v1`.
+- Approved capture: `.captures/2026-06-28T11-57-25_ai-visibility-report-artifact-mockup`.
+- Durable home: `scripts/frontend/baselines/growth.ai-visibility.report-artifact/**`.
+- Required frames: `01-score-gauge`, `02-readiness-levels`, `02b-engine-visibility`, `03-dimensions`, `04-aeo-signals`, `05-share-of-voice` for desktop and mobile.
+
+### Design decision log
+
+- Decision: canonize the current runtime mockup as **Approved Report Artifact v1** after operator approval.
+- Decision: use `TeamAvatarGroup kind="brands"` in the executive verdict for evaluated engines; avoid the colder "4 de 4 motores respondieron" commercial read.
+- Decision: `providerPresence`/engine presence is public-safe channel evidence; raw provider/accuracy findings remain internal-only.
+- Decision: keep the report artifact feature-local; promote to platform primitive only if reuse appears outside AI Visibility with full Primitive+Variants+Kinds protocol.
+- Guardrail: no downstream consumer may create a parallel report narrative; chrome can change by surface, the model/order/disclosure cannot.
 
 ### State inventory
 

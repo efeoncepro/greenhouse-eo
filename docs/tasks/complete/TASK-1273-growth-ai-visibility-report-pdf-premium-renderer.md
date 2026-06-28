@@ -1,5 +1,11 @@
 # TASK-1273 — Growth AI Visibility: Report PDF Premium Renderer
 
+## Delta 2026-06-28 — PDF hereda Approved Report Artifact v1
+
+`TASK-1252` canonizó el mockup web como **Approved Report Artifact v1**. El renderer PDF sigue siendo un adapter `attachment` del mismo `ReportArtifactModel`: puede adaptar paginación, densidad y charts estáticos por restricciones PDF, pero debe preservar la jerarquía narrativa aprobada (veredicto, 5 niveles AEO, motores evaluados, benchmark, dimensiones, señales, Plan AEO, proveniencia/disclaimer).
+
+La frontera de disclosure también queda sincronizada: `providerPresence` agregado es public-safe; `providerFindings`, `accuracyFindings`, prompts/raw text, citation URLs crudas, IDs internos, costos y razones internas de review son internal-only.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
