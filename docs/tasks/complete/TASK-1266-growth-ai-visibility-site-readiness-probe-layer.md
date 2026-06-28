@@ -292,9 +292,11 @@ Decisión arquitectónica central: **dos ejes ortogonales, no un número.** El o
 
 ## Resultado (cierre 2026-06-28)
 
-**Code complete, rollout pendiente.** 4 slices implementados (probe gatherer substrate + structural probes + agentic probes + report contract/signal/docs). Gates verdes: lint · tsc · `pnpm test` full · `pnpm build` · `flags:audit --strict`. Validado contra dominio real (vercel.com → `structural_readiness` 78.8, 4/5 dims medidas, CWV honestamente skipped). Migración `grader_probe_results` aplicada + verificada en dev PG.
+**Complete · rollout staging APLICADO + verificado E2E.** 4 slices implementados (probe gatherer substrate + structural probes + agentic probes + report contract/signal/docs). Gates verdes: lint · tsc · `pnpm test` full (8336) · `pnpm build` · `flags:audit --strict`. Migración `grader_probe_results` aplicada + verificada en dev PG.
 
-**Pendiente de runtime (rollout):** flip `GROWTH_AI_VISIBILITY_PROBES_ENABLED` + `..._AGENTIC_READINESS_ENABLED` en staging (Vercel **+ ops-worker** — dual-location, el gatherer corre en ambos paths) + run real sobre dominio de prueba → verificar `grader_probe_results` + score paralelo en PG → prod vía release control plane (EPIC-020). El ejercicio live de la reliability signal-query no se corrió en esta sesión (ADC gcloud vencida — env, no código; la SQL espeja verbatim el reader `growth-ai-visibility-scoring-signals` ya en prod, sin EXTRACT-epoch).
+**Rollout staging aplicado:** ops-worker deploy (GitHub Actions rev `83927197756`, healthy) + Vercel staging, ambos con `GROWTH_AI_VISIBILITY_PROBES_ENABLED` + `..._AGENTIC_READINESS_ENABLED` ON (dual-location: deploy.sh declarativo staging ON/prod OFF + `vercel env add`). **Smoke E2E real:** run admin `EO-GRUN-00025` (vercel.com, light/openai) → drenado por Cloud Scheduler `ops-growth-grader-drain` → `succeeded` → scored (percepción **33.3**) → **report con readiness lado a lado: `structural_readiness` 78.8** (robots 100 / json_ld 40 / llms 100 / sitemap 100 / CWV `sin_dato`) + **`agentic_readiness` 43.8** (api_discoverability 100 / dom_semantics 100 / well_known_mcp 0 / structured_actions 0 / WebMCP `sin_dato`). **Invariante no-blend confirmado en vivo** (percepción 33.3 intacta). **Reliability signals live:** `probe_failure_rate` 0/8 (ok) + `probe_headless_coverage` 2/10 (ok) — cerró el ejercicio live de la signal-query que en la sesión de código estaba bloqueado por ADC.
+
+**Pendiente:** **prod** (flags OFF, gated por EPIC-020 + release control plane develop→main).
 
 **Follow-up no-bloqueante:** cablear `HeadlessRenderer` (Chromium en el ops-worker) para activar CWV + WebMCP runtime detection — NO toca el substrate (la seam ya está); requiere sign-off de imagen (~200 MB) + budget.
 
