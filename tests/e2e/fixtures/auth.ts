@@ -1,4 +1,4 @@
-import { test, expect, type BrowserContext, type Page } from '@playwright/test'
+import { test, expect, type APIRequestContext, type BrowserContext, type Page } from '@playwright/test'
 
 const SIGN_IN_PATH_MARKERS = ['/login', '/signin', '/auth/signin', '/auth/access-denied']
 const DEFAULT_NAVIGATION_ATTEMPTS = 3
@@ -127,4 +127,19 @@ export async function gotoAuthenticated(page: Page, path: string) {
   await expectAuthenticated(page)
 
   return response
+}
+
+export async function getAuthenticatedJson<T = unknown>(
+  request: APIRequestContext,
+  path: string,
+  options: { timeoutMs?: number } = {}
+): Promise<T> {
+  const response = await request.get(path, {
+    timeout: options.timeoutMs ?? 60_000
+  })
+
+  expect(response.status(), `GET ${path} returned ${response.status()}`).toBeLessThan(400)
+  expect(response.headers()['content-type'] ?? '', `GET ${path} returned JSON`).toContain('application/json')
+
+  return response.json() as Promise<T>
 }

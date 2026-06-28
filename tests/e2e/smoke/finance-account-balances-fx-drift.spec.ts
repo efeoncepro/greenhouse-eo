@@ -1,4 +1,10 @@
-import { test, expect, gotoAuthenticated } from '../fixtures/auth'
+import { test, expect, getAuthenticatedJson } from '../fixtures/auth'
+
+interface ReliabilitySmokeSignal {
+  signalId?: string
+  severity?: string
+  evidence?: Array<{ label?: string; value?: string }>
+}
 
 /**
  * TASK-774 Slice 6 — verifica que el reliability signal
@@ -14,20 +20,23 @@ import { test, expect, gotoAuthenticated } from '../fixtures/auth'
  * bypass header (configurados en playwright.config.ts).
  */
 test.describe('finance.account_balances.fx_drift — TASK-774', () => {
-  test('reliability overview reports account_balances FX drift signal at count=0', async ({ page }) => {
-    const response = await gotoAuthenticated(page, '/api/admin/reliability')
+  test('reliability overview reports account_balances FX drift signal at count=0', async ({ request }) => {
+    test.setTimeout(75_000)
 
-    expect(response?.status(), 'overview status').toBeLessThan(400)
-
-    const body = await response!.json()
-
-    const allSignals = (body.modules ?? []).flatMap((m: { signals?: unknown[] }) => m.signals ?? [])
-
-    const fxDriftSignal = allSignals.find(
-      (s: { signalId?: string }) => s.signalId === 'finance.account_balances.fx_drift'
+    const body = await getAuthenticatedJson<{ modules?: Array<{ signals?: ReliabilitySmokeSignal[] }> }>(
+      request,
+      '/api/admin/reliability',
+      { timeoutMs: 70_000 }
     )
 
-    expect(fxDriftSignal, 'account_balances FX drift signal exists').toBeDefined()
+    const allSignals = (body.modules ?? []).flatMap(m => m.signals ?? [])
+
+    const fxDriftSignal = allSignals.find(s => s.signalId === 'finance.account_balances.fx_drift')
+
+    if (!fxDriftSignal) {
+      throw new Error('Missing account_balances FX drift signal')
+    }
+
     expect(fxDriftSignal.severity, 'fx drift severity').toBe('ok')
 
     const countEvidence = fxDriftSignal.evidence?.find(

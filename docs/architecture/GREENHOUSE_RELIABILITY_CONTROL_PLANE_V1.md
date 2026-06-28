@@ -5,7 +5,18 @@
 > Versión: `1.10`
 > Estado: `vigente`
 > Creada: `2026-04-25` por TASK-600
-> Última actualización: `2026-06-22` por TASK-845 (Node 24 app/test runtime)
+> Última actualización: `2026-06-28` por Playwright smoke false-red fix
+
+## Delta 2026-06-28 — Playwright API smoke contract + lane-scoped publishing
+
+El smoke de staging protege contratos funcionales; no debe convertir latencia de un endpoint JSON pesado en falla de producto ni propagar un spec platform/tooling a lanes de dominio no dueñas. La investigacion de los runs develop `fd50bea`, `0bd03e9` y `4a66fc0` encontro que `platform.cron.staging_drift` estaba sano (`count=0`), pero `cron-staging-parity.spec.ts` agotaba el budget al navegar con Chromium a `/api/admin/reliability`.
+
+Contrato vigente:
+
+- Los smoke specs API-only que validan endpoints JSON deben usar el request context autenticado (`getAuthenticatedJson()` en `tests/e2e/fixtures/auth.ts`) en vez de `page.goto()`. El contrato debe validar status `<400`, `content-type: application/json` y tener un timeout explicito acorde al endpoint.
+- Los smoke specs de navegacion/UI siguen usando `gotoAuthenticated()` o `gotoWithTransientRetries()`; no se deben mezclar helpers de UI para probar JSON API-only.
+- `pnpm sync:smoke-lane <lane-key>` debe filtrar el reporte Playwright compartido por lane antes de computar `total_tests`, `failed_tests`, `flakyCount` y `status` para `greenhouse_sync.smoke_lane_runs`.
+- Specs platform/tooling sin ownership de dominio no deben marcar rojos `finance.web`, `delivery.web` ni `identity.web`. Si se agrega un lane nuevo, debe declararse su mapping en `scripts/lib/smoke-lane-report.ts`; lanes desconocidas conservan fallback full-report hasta quedar mapeadas.
 
 ## Delta 2026-06-22 — TASK-845: Node 24 app/test/build runtime
 

@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import {
   deriveSpecStatus,
+  filterSmokeLaneSpecs,
   flattenPlaywrightReport,
   summarizeSmokeLaneSpecs,
   type PlaywrightReport,
@@ -88,5 +89,25 @@ describe('smoke-lane Playwright report parsing', () => {
       flaky: 1,
       skipped: 1
     })
+  })
+
+  it('filters the shared Playwright report by logical smoke lane', () => {
+    const specs = [
+      { title: 'cron drift steady', file: 'smoke/cron-staging-parity.spec.ts', status: 'failed' as const, durationMs: 1 },
+      { title: 'finance clients', file: 'smoke/finance-clients.spec.ts', status: 'passed' as const, durationMs: 1 },
+      { title: 'session', file: 'smoke/login-session.spec.ts', status: 'passed' as const, durationMs: 1 },
+      { title: 'people', file: 'smoke/people-360.spec.ts', status: 'passed' as const, durationMs: 1 }
+    ]
+
+    expect(filterSmokeLaneSpecs(specs, 'finance.web').map(spec => spec.file)).toEqual([
+      'smoke/finance-clients.spec.ts'
+    ])
+    expect(filterSmokeLaneSpecs(specs, 'identity.web').map(spec => spec.file)).toEqual([
+      'smoke/login-session.spec.ts'
+    ])
+    expect(filterSmokeLaneSpecs(specs, 'delivery.web').map(spec => spec.file)).toEqual([
+      'smoke/people-360.spec.ts'
+    ])
+    expect(filterSmokeLaneSpecs(specs, 'unknown.web')).toHaveLength(4)
   })
 })

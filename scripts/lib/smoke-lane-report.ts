@@ -44,6 +44,27 @@ export interface SmokeLaneReportTotals {
 
 const FAILED_RESULT_STATUSES = new Set(['failed', 'timedOut', 'interrupted'])
 
+const SMOKE_LANE_SPEC_FILE_PATTERNS: Record<string, RegExp[]> = {
+  'finance.web': [
+    /(?:^|\/)smoke\/finance-/,
+    /(?:^|\/)smoke\/hr-payroll\.spec\.ts$/,
+    /(?:^|\/)smoke\/my-payment-profile/,
+    /(?:^|\/)smoke\/payroll-table-density\.spec\.ts$/
+  ],
+  'delivery.web': [
+    /(?:^|\/)smoke\/agency-organizations-/,
+    /(?:^|\/)smoke\/organization-list-/,
+    /(?:^|\/)smoke\/people-360\.spec\.ts$/,
+    /(?:^|\/)smoke\/workforce-intake-flow\.spec\.ts$/
+  ],
+  'identity.web': [
+    /(?:^|\/)smoke\/admin-entitlements-governance\.spec\.ts$/,
+    /(?:^|\/)smoke\/admin-nav\.spec\.ts$/,
+    /(?:^|\/)smoke\/login-session\.spec\.ts$/,
+    /(?:^|\/)smoke\/shortcuts-dropdown\.spec\.ts$/
+  ]
+}
+
 const sumDurationMs = (test: PlaywrightTest): number =>
   (test.results ?? []).reduce((total, result) => total + Math.max(0, Math.trunc(result.duration ?? 0)), 0)
 
@@ -106,6 +127,17 @@ export const flattenPlaywrightReport = (report: PlaywrightReport): FlattenedSmok
     status: deriveSpecStatus(spec),
     durationMs: (spec.tests ?? []).reduce((total, test) => total + sumDurationMs(test), 0)
   }))
+}
+
+export const filterSmokeLaneSpecs = (
+  specs: FlattenedSmokeLaneSpec[],
+  laneKey: string
+): FlattenedSmokeLaneSpec[] => {
+  const patterns = SMOKE_LANE_SPEC_FILE_PATTERNS[laneKey]
+
+  if (!patterns) return specs
+
+  return specs.filter(spec => patterns.some(pattern => pattern.test(spec.file)))
 }
 
 export const summarizeSmokeLaneSpecs = (specs: FlattenedSmokeLaneSpec[]): SmokeLaneReportTotals => ({

@@ -1,4 +1,10 @@
-import { test, expect, gotoAuthenticated } from '../fixtures/auth'
+import { test, expect, getAuthenticatedJson } from '../fixtures/auth'
+
+interface ReliabilitySmokeSignal {
+  signalId?: string
+  severity?: string
+  evidence?: Array<{ label?: string; value?: string }>
+}
 
 /**
  * TASK-775 Slice 8 — verifica que el reliability signal `platform.cron.staging_drift`
@@ -9,24 +15,27 @@ import { test, expect, gotoAuthenticated } from '../fixtures/auth'
  * Steady state = 0. Si > 0, hay crons que no corren en staging custom env, y el
  * flujo downstream queda colgado silenciosamente.
  *
- * Hits el admin endpoint `/api/admin/reliability/overview` y busca el signal.
+ * Hits el admin endpoint `/api/admin/reliability` y busca el signal.
  */
 test.describe('platform.cron.staging_drift — TASK-775', () => {
-  test('reliability overview reports cron staging drift signal at count=0', async ({ page }) => {
-    const response = await gotoAuthenticated(page, '/api/admin/reliability')
+  test('reliability overview reports cron staging drift signal at count=0', async ({ request }) => {
+    test.setTimeout(75_000)
 
-    expect(response?.status(), 'overview status').toBeLessThan(400)
-
-    const body = await response!.json()
-
-    // Walk modules to find sync module signals
-    const allSignals = (body.modules ?? []).flatMap((m: { signals?: unknown[] }) => m.signals ?? [])
-
-    const driftSignal = allSignals.find(
-      (s: { signalId?: string }) => s.signalId === 'platform.cron.staging_drift'
+    const body = await getAuthenticatedJson<{ modules?: Array<{ signals?: ReliabilitySmokeSignal[] }> }>(
+      request,
+      '/api/admin/reliability',
+      { timeoutMs: 70_000 }
     )
 
-    expect(driftSignal, 'cron staging drift signal exists').toBeDefined()
+    // Walk modules to find sync module signals
+    const allSignals = (body.modules ?? []).flatMap(m => m.signals ?? [])
+
+    const driftSignal = allSignals.find(s => s.signalId === 'platform.cron.staging_drift')
+
+    if (!driftSignal) {
+      throw new Error('Missing cron staging drift signal')
+    }
+
     expect(driftSignal.severity, 'cron drift severity').toBe('ok')
 
     const countEvidence = driftSignal.evidence?.find(
