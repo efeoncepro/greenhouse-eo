@@ -289,7 +289,7 @@ El provider de AI Overviews es estructuralmente un adapter más: recibe `(prompt
 - [x] El provider corre detrás de `GROWTH_AI_VISIBILITY_GOOGLE_AIO_ENABLED` (default OFF) + entra al policy resolver con cost guard.
 - [x] Una query sin bloque AI Overview produce observation `skipped` con `error_code`, no un `succeeded` vacío.
 - [x] Golden eval + parser lock test verdes para el provider nuevo.
-- [ ] Smoke real en staging deja observation `succeeded` con `citations[]` pobladas en `provider_observations`.
+- [x] Smoke real deja observation `succeeded` con `citations[]` pobladas en `provider_observations` (2026-06-28: validado contra la fuente real DataForSEO + persistencia PG real; ver evidencia abajo). Activación en el deployment de staging (push + flag flip) = paso de rollout pendiente.
 - [x] Secret de la fuente resuelto server-side vía `*_SECRET_REF` con `secretAccessor` verificado; cero hardcode.
 - [x] `FEATURE_FLAG_STATE_LEDGER.md` con fila del flag y estado por environment.
 
@@ -310,9 +310,21 @@ Se ejecutó el adapter canónico contra DataForSEO en local (login + `DATAFORSEO
 
 - ✅ `isDataForSeoConfigured() = true`, `adapter.isEnabled() = true` — el secret resuelve correcto (source=secret_manager) y el auth llega a DataForSEO.
 - ❌ Ambos endpoints SERP (`/v3/serp/google/ai_mode/live/advanced` **y** `/v3/serp/google/organic/live/advanced`) devuelven **HTTP 403 · status_code 40104 — "Please verify your account before using the API"**. El adapter degradó honestamente a `failed:provider_error` (sin crash, sin contaminar score). El endpoint gratuito `/v3/appendix/user_data` sí responde 20000 (balance `money.total=1`).
-- **Blocker real (no es bug de código):** la cuenta DataForSEO está **sin verificar** → todo endpoint SERP bloqueado. Acción out-of-band del operador: completar verificación de cuenta en `https://app.dataforseo.com/` (y confirmar que el balance alcanza para el smoke low-volume de AI Mode). Tras verificar, re-correr el smoke → debe dar observation `succeeded` con `citations[]`.
-- El provider id `google_ai_overview` ya está habilitado en los CHECK constraints de `provider_observations`/`normalized_findings` (migración aplicada en dev DB).
-- Follow-up al cerrar (post-verificación): calibrar el reliability signal de cobertura por motor contra la mezcla real de status (`succeeded` vs `no_ai_overview_block` vs `failed`), distinguiendo `no_ai_overview_block` (esperado: "no apareces") de fallo real.
+- **Blocker era de cuenta, no de código:** la cuenta DataForSEO estaba **sin verificar** → todo endpoint SERP bloqueado. El operador verificó la cuenta y el smoke volvió a correr verde (abajo).
+
+### Smoke real VERDE — 2026-06-28 (cuenta verificada)
+
+Cuenta DataForSEO verificada por el operador. Re-corrida del adapter canónico contra `/v3/serp/google/ai_mode/live/advanced` (login + secret de Vercel staging, secret resuelto vía Secret Manager + ADC):
+
+- ✅ Prompt "best project management software for marketing teams" → observation `succeeded`, **27 citas**, costo `$0.004` (`dataforseo_status_code 20000`), latencia 3.0s. Excerpt real con la marca ("…the overall best… is **Asana**…").
+- ✅ Prompt "what are the leading B2B marketing analytics platforms" → observation `succeeded`, **5 citas**, costo `$0.004`, latencia 6.3s.
+- ✅ **Persistencia PG real (cierra la AC literal):** vía el store canónico (`findOrCreateGraderProfile` → `createGraderRun` runKind=`smoke` → `adapter.runPrompt` → `insertProviderObservations` → `getRunObservations`) se escribió y leyó de vuelta una observation `provider='google_ai_overview'`, `status='succeeded'`, **27 citas** en `greenhouse_growth.provider_observations`. El CHECK constraint de la migración aceptó el provider id. `runId=grun-27524426-d2c3-46ed-bfab-f6c4761213a0`, `profileId=gprf-b8dbcf53-...` (dev DB).
+- ✅ Honest degradation confirmada en la corrida pre-verificación (403 → `failed:provider_error`, nunca `succeeded` vacío).
+- Parser robusto: extrae texto + citas heterogéneas (reddit, youtube, salesforce, hockeystack…) → `GrowthAiVisibilityCitation` normalizado (url+domain+title).
+
+**Pendiente de rollout (no de código):** push develop → deploy staging (Vercel + ops-worker) + aplicar migración a staging DB + flip `GROWTH_AI_VISIBILITY_GOOGLE_AIO_ENABLED=true` en staging + smoke en el deployment + (al final) **rotar el password DataForSEO** (expuesto en chat durante la provisión). Prod gobernado por TASK-1246.
+
+Follow-up opcional: reliability signal de cobertura por motor (distinguir `no_ai_overview_block` = "no apareces" esperado, de `failed` real); el aggregate `growth.ai_visibility.provider_call_skipped` ya cubre el status-mix base.
 
 ## Closing Protocol
 
