@@ -21,6 +21,7 @@ export type EmailBrand = 'greenhouse' | 'efeonce'
 interface EmailLayoutProps {
   children: React.ReactNode
   previewText?: string
+  previewPadding?: 'default' | 'none'
   lang?: 'es' | 'en'
   locale?: 'es' | 'en'
   unsubscribeUrl?: string
@@ -32,7 +33,15 @@ const LEGACY_EN_LAYOUT_COPY = {
   unsubscribe: 'Unsubscribe from these emails'
 }
 
-export default function EmailLayout({ children, previewText, lang, locale = 'es', unsubscribeUrl, brand = 'greenhouse' }: EmailLayoutProps) {
+export default function EmailLayout({
+  children,
+  previewText,
+  previewPadding = 'default',
+  lang,
+  locale = 'es',
+  unsubscribeUrl,
+  brand = 'greenhouse'
+}: EmailLayoutProps) {
   const effectiveLang = lang ?? locale
   const layoutCopy = getMicrocopy().emails.layout
   const isEfeonceBrand = brand === 'efeonce'
@@ -64,7 +73,25 @@ export default function EmailLayout({ children, previewText, lang, locale = 'es'
         <meta name="supported-color-schemes" content="light" />
         <style>{`@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=DM+Sans:wght@400;500&display=swap');`}</style>
       </Head>
-      {previewText && <Preview>{previewText}</Preview>}
+      {previewText && (
+        previewPadding === 'none'
+          ? (
+            <div
+              style={{
+                display: 'none',
+                overflow: 'hidden',
+                lineHeight: '1px',
+                opacity: 0,
+                maxHeight: 0,
+                maxWidth: 0
+              }}
+              data-skip-in-text="true"
+            >
+              {previewText}
+            </div>
+            )
+          : <Preview>{previewText}</Preview>
+      )}
       <Body style={{
         backgroundColor: EMAIL_COLORS.background,
         fontFamily: EMAIL_FONTS.body,

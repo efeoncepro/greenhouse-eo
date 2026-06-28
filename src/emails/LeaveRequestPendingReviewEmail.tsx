@@ -99,7 +99,7 @@ export default function LeaveRequestPendingReviewEmail({
   const periodDisplay = `${formatDate(startDate, locale)} – ${formatDate(endDate, locale)}`
 
   return (
-    <EmailLayout previewText={`${memberName} — ${leaveTypeName}`} locale={locale}>
+    <EmailLayout previewText={`${memberName} — ${leaveTypeName}`} previewPadding="none" locale={locale}>
       {/* Hero image */}
       <Img
         src={HERO_IMAGE_URL}
