@@ -6,6 +6,14 @@
 >
 > **Follow-ups propuestos, NO registrados:** 1) tracking ingestion foundation, 2) host adapters/renderer bridge, 3) attribution reconciliation, 4) destination/export adapters, 5) reporting/readers. Registrar `TASK-###` nuevos requiere aprobación del operador. Verificación local: `pnpm task:lint --task TASK-1260`, `pnpm ops:lint --changed`, `pnpm docs:closure-check`.
 
+## Sesion 2026-06-28 — TASK-1267 rollout staging APLICADO + verificado E2E — Claude — ✅
+
+> **Cierre de rollout (a pedido del operador "prendámoslo y empújalo" + "saca la llave tú mismo" + "termina todo lo que falta").** Flag `ENTITY_PROBES` ON en staging (ops-worker verificado `gcloud` + Vercel `staging`, DUAL-LOCATION); pusheado a develop (`9f97855c4`, `fdc1146a1`); ops-worker deploys verdes.
+>
+> **KG api key obtenida por mí vía `gcloud`:** `gcloud services api-keys create --api-target=service=kgsearch.googleapis.com` (restringida a KG, probada live) → secret `greenhouse-google-knowledge-graph-api-key` (39 chars, sin newline — hygiene) + grant `secretAccessor` a `greenhouse-portal@` + ref wired en `deploy.sh` (staging) + Vercel `staging`. APIs habilitadas en `efeonce-group`: kgsearch + apikeys (+ **searchconsole** a pedido — pero habilitar API ≠ acceso a datos: GSC necesita que el dueño de la propiedad agregue nuestra identidad + OAuth/SA).
+>
+> **Smoke E2E real `EO-GRUN-00026`** (vercel.com, light/openai, drenado por el worker vía `gcloud scheduler jobs run ops-growth-grader-drain`): `grader_probe_results` con axis structural 5 / agentic 5 / **entity 3** — `wikidata` succeeded **100** (P856 + 38 wiki sitelinks), `knowledge_graph` succeeded **75** (KG key funcional, homónimo flaggeado sin dominio confirmado), `reddit_ugc` **failed/null** por HTTP 403 (Reddit bloquea búsqueda pública desde IP server → **honest degradation correcta: null, NO 0**, invariante confirmado en runtime real). **Follow-up opcional:** Reddit OAuth si se quiere señal Reddit confiable (la degradación honesta es aceptable). **Prod:** OFF (gated EPIC-020 + release control plane) — único pendiente, fuera de scope autónomo.
+
 ## Sesion 2026-06-28 — TASK-1267 Entity Infrastructure Probes — Claude — ✅ complete (code complete, rollout pendiente) · develop sin push
 
 > **Pedido:** `/implement-task 1267` — probes read-only del backbone real de entidad de la marca (Google Knowledge Graph / Wikidata / Reddit-UGC), reusando el probe gatherer de TASK-1266 (sin gatherer paralelo). **Resultado (2 slices, 2 commits, develop sin push):** tercer eje **ortogonal** `entity` del probe layer (lado a lado de `structural`/`agentic`, NUNCA blended).

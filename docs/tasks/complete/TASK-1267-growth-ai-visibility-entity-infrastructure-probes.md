@@ -33,7 +33,18 @@ suman 100 POR eje; meter entity en structural forzaría re-pesar el eje shipped 
 El report builder solo lee `.structural`/`.agentic` → el eje entity se computa + persiste pero su RENDER
 lo gobierna TASK-1252 (out of scope acá), sin regresión.
 
-**Commits:** `dc2699030` (Slice 1: KG+Wikidata + substrate) · `1662e5aa8` (Slice 2: Reddit + ledger).
+**Commits:** `dc2699030` (Slice 1: KG+Wikidata + substrate) · `1662e5aa8` (Slice 2: Reddit + ledger) · `9f97855c4` (flip staging) · `fdc1146a1` (KG api key publicada + wired).
+
+**Rollout staging APLICADO + verificado E2E (2026-06-28):**
+
+- Flag `ENTITY_PROBES` ON en staging — **ops-worker** (verificado `gcloud`: `GROWTH_AI_VISIBILITY_ENTITY_PROBES_ENABLED=true`) + **Vercel** `staging`. DUAL-LOCATION.
+- **KG api key creada vía `gcloud services api-keys create`** (restringida a `kgsearch.googleapis.com`, probada live) → secret `greenhouse-google-knowledge-graph-api-key` + grant `secretAccessor` a `greenhouse-portal@` + ref wired en `deploy.sh` + Vercel. APIs habilitadas: kgsearch + apikeys (+ searchconsole a pedido del operador).
+- **Smoke E2E real `EO-GRUN-00026`** (Vercel/vercel.com, light/openai, drenado por el worker): los 3 probes de entidad corrieron contra APIs reales y persistieron en `grader_probe_results` (axis counts: structural 5 / agentic 5 / **entity 3**):
+  - `wikidata` → **succeeded score 100**, confirmado por sitio oficial P856 + 38 sitelinks Wikipedia.
+  - `knowledge_graph` → **succeeded score 75** (KG api key funcional: 5 matches, resultScore 4870, Corporation/Organization; `domainConfirmed=false` → flag de homónimo — scoring honesto).
+  - `reddit_ugc` → **failed / null** por HTTP 403 (Reddit bloqueó la búsqueda pública desde la IP del server) → **honest degradation correcta: `null`, NO 0** (no medible ≠ ausente). Confirma el invariante en runtime real.
+- **Observación / follow-up:** Reddit `search.json` da 403 desde IPs de server. La degradación honesta es correcta, pero si se quiere señal Reddit confiable, el follow-up es Reddit OAuth (API oficial) — ya contemplado en §Open Questions/Follow-ups. No bloquea el cierre.
+- **Prod:** OFF (gated EPIC-020 + release control plane).
 
 ## Delta 2026-06-28 (creación)
 
