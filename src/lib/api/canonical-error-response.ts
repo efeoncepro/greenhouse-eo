@@ -94,6 +94,12 @@ export type CanonicalErrorCode =
   | 'grader_report_not_reviewable'
   | 'grader_report_invalid_review_transition'
   | 'grader_report_review_reason_required'
+  // AEO entitlement & metering · run chokepoint (TASK-1277).
+  | 'aeo_not_entitled'
+  | 'aeo_run_disabled'
+  | 'aeo_profile_required'
+  | 'aeo_quota_exhausted'
+  | 'aeo_cost_blocked'
 // Reserved for future canonical codes — extender aquí cuando emerjan
 // nuevos error paths estructurales. NUNCA usar strings ad-hoc.
 
@@ -331,6 +337,33 @@ const CANONICAL_ERRORS: Record<CanonicalErrorCode, CanonicalErrorDefinition> = {
     status: 422,
     message: 'Indica el motivo del rechazo para continuar (queda en el registro interno).',
     actionable: true
+  },
+  // AEO entitlement & metering · run chokepoint (TASK-1277). Bloqueos estructurales (no se
+  // resuelven reintentando ahora) → actionable: false.
+  aeo_not_entitled: {
+    status: 403,
+    message: 'Tu organización no tiene activado el análisis AEO. Habla con tu equipo de Efeonce para activarlo.',
+    actionable: false
+  },
+  aeo_run_disabled: {
+    status: 409,
+    message: 'El análisis AEO no está disponible en este momento. Intenta más tarde.',
+    actionable: false
+  },
+  aeo_profile_required: {
+    status: 409,
+    message: 'Aún falta configurar la marca a analizar de tu organización. Tu equipo de Efeonce la activa antes del primer análisis.',
+    actionable: false
+  },
+  aeo_quota_exhausted: {
+    status: 429,
+    message: 'Agotaste los análisis AEO incluidos este mes. Se renuevan el próximo período o puedes ampliar tu plan con Efeonce.',
+    actionable: false
+  },
+  aeo_cost_blocked: {
+    status: 429,
+    message: 'El análisis AEO no está disponible temporalmente por alta demanda. Intenta más tarde.',
+    actionable: false
   }
 }
 

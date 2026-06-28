@@ -249,6 +249,42 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
       scope: 'own',
       source
     })
+
+    // TASK-1277 — run.portal: el cliente la usa con scope 'own' (grant real en el bloque
+    // tenantType='client' de abajo). Se replica al set interno SOLO para el guard de cobertura
+    // (toda capability can()-checked debe ser alcanzable por el superset interno). Inocuo: la
+    // route exige requireClientTenantContext → ningún interno gana acceso real por esta vía.
+    addEntitlement(entries, {
+      module: 'growth',
+      capability: 'growth.ai_visibility.run.portal',
+      action: 'execute',
+      scope: 'own',
+      source
+    })
+  }
+
+  // TASK-1277 — run.operator: Growth/AM corre el motor AEO sobre cualquier cliente o prospecto
+  // como jugada de venta (ilimitado, costo atribuido a "sales"). Set: route_group internal ∪
+  // EFEONCE_ADMIN ∪ EFEONCE_ACCOUNT (AM, dueño del cross-sell) ∪ EFEONCE_OPERATIONS (growth ops)
+  // ∪ AI_TOOLING_ADMIN (opera el motor). Los client_* NUNCA tienen la puerta operador.
+  if (
+    hasRouteGroup(subject, 'internal') ||
+    hasRole(subject, ROLE_CODES.EFEONCE_ADMIN) ||
+    hasRole(subject, ROLE_CODES.EFEONCE_ACCOUNT) ||
+    hasRole(subject, ROLE_CODES.EFEONCE_OPERATIONS) ||
+    hasRole(subject, ROLE_CODES.AI_TOOLING_ADMIN)
+  ) {
+    const operatorSource: TenantEntitlementSource = hasRouteGroup(subject, 'internal')
+      ? 'route_group'
+      : 'role'
+
+    addEntitlement(entries, {
+      module: 'growth',
+      capability: 'growth.ai_visibility.run.operator',
+      action: 'execute',
+      scope: 'tenant',
+      source: operatorSource
+    })
   }
 
   // TASK-1229 — Growth Forms engine. Operación interna del motor de formularios
@@ -2295,6 +2331,17 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
       module: 'growth',
       capability: 'growth.ai_visibility.report.read_client',
       action: 'read',
+      scope: 'own',
+      source: 'role'
+    })
+
+    // TASK-1277 — run.portal: el cliente dispara un análisis AEO de SU org (scope 'own'). El
+    // ACCESO efectivo lo gobierna el chokepoint (entitlement del módulo → ventana → allowance →
+    // costo) y el módulo asignado per-org; esta capability es el plano fino "puede pedir un run".
+    addEntitlement(entries, {
+      module: 'growth',
+      capability: 'growth.ai_visibility.run.portal',
+      action: 'execute',
       scope: 'own',
       source: 'role'
     })

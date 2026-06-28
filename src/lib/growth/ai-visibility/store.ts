@@ -39,6 +39,26 @@ export interface GraderExecutionPrompt {
   promptText: string
 }
 
+/** TASK-1277 — puerta que originó el run (atribución de costo + conteo de allowance). */
+export type GraderRunSource =
+  | 'public'
+  | 'admin'
+  | 'portal_contracted'
+  | 'portal_trial'
+  | 'portal_pilot'
+  | 'operator_sales'
+
+/** TASK-1277 — bucket de costo del run. */
+export type GraderCostAttribution = 'client' | 'sales' | 'internal' | 'public'
+
+/** TASK-1277 — atribución per-org de un run (opcional; los runs legacy/public quedan sin org). */
+export interface GraderRunAttribution {
+  organizationId?: string | null
+  assignmentId?: string | null
+  runSource?: GraderRunSource | null
+  costAttribution?: GraderCostAttribution | null
+}
+
 export interface GraderRunRow {
   runId: string
   publicId: string
@@ -56,6 +76,11 @@ export interface GraderRunRow {
   costCeilingUsd: number | null
   /** Prompts resueltos a ejecutar (TASK-1234): el worker async los corre sin re-derivar. */
   executionPrompts: GraderExecutionPrompt[]
+  /** TASK-1277 — atribución per-org (null en runs public/admin legacy). */
+  organizationId: string | null
+  assignmentId: string | null
+  runSource: GraderRunSource | null
+  costAttribution: GraderCostAttribution | null
   startedAt: string | null
   finishedAt: string | null
   createdAt: string
@@ -95,6 +120,10 @@ const projectRun = (row: RawRun): GraderRunRow => ({
   executionPrompts: Array.isArray(row.execution_prompts)
     ? (row.execution_prompts as GraderExecutionPrompt[])
     : [],
+  organizationId: (row.organization_id as string | null) ?? null,
+  assignmentId: (row.assignment_id as string | null) ?? null,
+  runSource: (row.run_source as GraderRunSource | null) ?? null,
+  costAttribution: (row.cost_attribution as GraderCostAttribution | null) ?? null,
   startedAt: (row.started_at as string | null) ?? null,
   finishedAt: (row.finished_at as string | null) ?? null,
   createdAt: String(row.created_at)
@@ -168,6 +197,24 @@ export const getGraderProfile = async (profileId: string): Promise<GraderProfile
   return rows[0] ? projectProfile(rows[0]) : null
 }
 
+/**
+ * TASK-1277 — Perfil AEO enlazado a una org (binding TASK-1243). El chokepoint de portal/operador
+ * grade EL perfil de la org sujeto; si no hay perfil enlazado, el run no puede correr (intake/
+ * binding del perfil = TASK-1278/1276, fuera de este chokepoint). Devuelve el más reciente activo.
+ */
+export const getGraderProfileForOrganization = async (
+  organizationId: string
+): Promise<GraderProfileRow | null> => {
+  const rows = await runGreenhousePostgresQuery<RawProfile>(
+    `SELECT * FROM greenhouse_growth.grader_profiles
+      WHERE organization_id = $1 AND status = 'active'
+      ORDER BY created_at DESC LIMIT 1`,
+    [organizationId]
+  )
+
+  return rows[0] ? projectProfile(rows[0]) : null
+}
+
 // ── Runs ─────────────────────────────────────────────────────────────────────
 
 export const findRunByIdempotencyKey = async (key: string): Promise<GraderRunRow | null> => {
@@ -190,12 +237,15 @@ export const createGraderRun = async (input: {
   costCeilingUsd: number | null
   /** Prompts resueltos a ejecutar (TASK-1234). Default [] (legacy/discovery sin prompts). */
   executionPrompts?: GraderExecutionPrompt[]
+  /** TASK-1277 — atribución per-org (chokepoint de portal/operador). Default sin atribución. */
+  attribution?: GraderRunAttribution
 }): Promise<GraderRunRow> => {
   const rows = await runGreenhousePostgresQuery<RawRun>(
     `INSERT INTO greenhouse_growth.grader_runs
        (profile_id, run_kind, mode, status, provider_policy_version, prompt_pack_version,
-        requested_providers, idempotency_key, cost_ceiling_usd, execution_prompts)
-     VALUES ($1, $2, $3, 'pending', $4, $5, $6, $7, $8, $9::jsonb)
+        requested_providers, idempotency_key, cost_ceiling_usd, execution_prompts,
+        organization_id, assignment_id, run_source, cost_attribution)
+     VALUES ($1, $2, $3, 'pending', $4, $5, $6, $7, $8, $9::jsonb, $10, $11, $12, $13)
      RETURNING *`,
     [
       input.profileId,
@@ -206,7 +256,11 @@ export const createGraderRun = async (input: {
       input.requestedProviders,
       input.idempotencyKey,
       input.costCeilingUsd,
-      JSON.stringify(input.executionPrompts ?? [])
+      JSON.stringify(input.executionPrompts ?? []),
+      input.attribution?.organizationId ?? null,
+      input.attribution?.assignmentId ?? null,
+      input.attribution?.runSource ?? null,
+      input.attribution?.costAttribution ?? null
     ]
   )
 

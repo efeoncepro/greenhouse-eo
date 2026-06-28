@@ -56,13 +56,13 @@ export interface AeoEntitlement {
 
 const VALID_TIERS: ReadonlySet<string> = new Set<AeoTier>(['contracted', 'trial', 'pilot'])
 
-interface AssignmentRow {
+interface AssignmentRow extends Record<string, unknown> {
   assignment_id: string
   status: string
   metadata_json: Record<string, unknown> | null
 }
 
-interface AllowanceCountsRow {
+interface AllowanceCountsRow extends Record<string, unknown> {
   org_used: number
   global_trial_used: number
   period_reset_at: string

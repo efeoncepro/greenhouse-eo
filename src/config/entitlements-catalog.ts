@@ -1974,6 +1974,24 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     actions: ['read'] as const,
     defaultScope: 'own'
   },
+  // TASK-1277 — AEO run chokepoint (entitlement & metering). DOS capabilities:
+  //  - run.portal: un usuario `client_*` dispara un análisis AEO de SU org (gobernado:
+  //    entitlement → ventana → allowance → costo). scope `own`. Grant a client_* + set interno.
+  //  - run.operator: Growth/AM corre el motor sobre cualquier cliente o prospecto como jugada
+  //    de venta (ilimitado, costo a "sales"). scope `tenant`. Grant a efeonce_account/admin/
+  //    ai_tooling_admin/efeonce_operations. Ambos `can()`-checked en las routes (coverage).
+  {
+    key: 'growth.ai_visibility.run.portal',
+    module: 'growth',
+    actions: ['execute'] as const,
+    defaultScope: 'own'
+  },
+  {
+    key: 'growth.ai_visibility.run.operator',
+    module: 'growth',
+    actions: ['execute'] as const,
+    defaultScope: 'tenant'
+  },
   // TASK-1229 — Growth Forms engine (dominio growth.forms). 8 capabilities gobernadas
   // (Full API Parity): cada acción de negocio nace como command/reader, no como botón.
   // Grant en runtime.ts (internal ∪ EFEONCE_ADMIN ∪ EFEONCE_ACCOUNT ∪ EFEONCE_OPERATIONS)

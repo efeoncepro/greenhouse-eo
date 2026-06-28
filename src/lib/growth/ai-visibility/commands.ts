@@ -21,6 +21,7 @@ import {
   type EnqueueGraderRunResult,
   type ExecuteGraderRunResult
 } from './run-engine'
+import { type GraderRunAttribution } from './store'
 import { type ProviderAdapter } from './providers/types'
 
 export interface RunGraderDiagnosticInput {
@@ -40,6 +41,8 @@ export interface RunGraderDiagnosticInput {
   idempotencyKey?: string | null
   /** Adapters inyectables (smoke/tests con fake). Default = registry real. */
   adapters?: Partial<Record<GrowthAiVisibilityProviderId, ProviderAdapter>>
+  /** TASK-1277 — atribución per-org del run (chokepoint de portal/operador). */
+  attribution?: GraderRunAttribution
 }
 
 /** Resuelve el input ejecutable del run (prompts del pack + perfil) — compartido por run/enqueue. */
@@ -72,7 +75,8 @@ const buildExecuteInput = (input: RunGraderDiagnosticInput) => {
     prompts,
     idempotencyKey: input.idempotencyKey ?? null,
     onlyProviders: input.onlyProviders,
-    adapters: input.adapters
+    adapters: input.adapters,
+    attribution: input.attribution
   }
 }
 

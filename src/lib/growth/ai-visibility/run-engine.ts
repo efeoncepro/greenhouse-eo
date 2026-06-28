@@ -49,6 +49,7 @@ import {
   getRunObservations,
   insertProviderObservations,
   updateGraderRunStatus,
+  type GraderRunAttribution,
   type GraderRunRow
 } from './store'
 import { finalizeRunDelivery } from './public-delivery/finalize-delivery'
@@ -78,6 +79,8 @@ export interface ExecuteGraderRunInput {
   adapters?: ProviderAdapterMap
   /** Restringe a un subconjunto de providers (intersección con la policy). */
   onlyProviders?: GrowthAiVisibilityProviderId[]
+  /** TASK-1277 — atribución per-org del run (chokepoint de portal/operador). */
+  attribution?: GraderRunAttribution
 }
 
 export interface ExecuteGraderRunResult {
@@ -137,7 +140,8 @@ export const enqueueGraderRun = async (
     requestedProviders,
     idempotencyKey: input.idempotencyKey ?? null,
     costCeilingUsd: policy.costCeilingUsdPerRun,
-    executionPrompts
+    executionPrompts,
+    attribution: input.attribution
   })
 
   return { run, idempotentHit: false }
