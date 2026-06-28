@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
@@ -19,7 +19,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-020`
-- Status real: `Code complete en dev/local — google_ai_overview adapter implementado; rollout staging/prod pendiente`
+- Status real: `Complete — google_ai_overview activado + verificado end-to-end en staging (worker async, 3 endpoints). Prod gated por TASK-1246; rotar password DataForSEO (follow-ups fuera de scope)`
 - Rank: `TBD`
 - Domain: `growth|ai|integrations|reliability`
 - Blocked by: `none`
@@ -340,7 +340,7 @@ Follow-up opcional: reliability signal de cobertura por motor (distinguir `no_ai
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown sincronizado
+- [x] `Lifecycle` del markdown sincronizado (`complete`)
 - [x] el archivo vive en la carpeta correcta
 - [x] `docs/tasks/README.md` sincronizado
 - [x] `Handoff.md` actualizado
