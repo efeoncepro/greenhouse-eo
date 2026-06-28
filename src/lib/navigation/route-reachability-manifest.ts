@@ -343,6 +343,13 @@ export const DECLARED_CHILD_ROUTES: readonly ChildRouteDeclaration[] = [
       'Geometry Lab (TASK-1050) — child surface del Design System para spacing/radius AXIS y la extension Greenhouse xxl/display, alcanzable desde el catalogo canonico /design-system.'
   },
   {
+    route: '/design-system/team-avatar-group',
+    parent: '/design-system',
+    via: 'inline-link',
+    reason:
+      'Team Avatar Group Lab (TASK-1248) — child surface del Design System para la primitive TeamAvatarGroup (kinds members + brands/isotipos), alcanzable desde el catalogo canonico /design-system.'
+  },
+  {
     route: '/growth/ai-visibility/report',
     parent: '/home',
     via: 'inline-link',

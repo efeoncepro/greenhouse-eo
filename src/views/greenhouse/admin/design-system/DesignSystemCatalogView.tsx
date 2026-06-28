@@ -655,6 +655,20 @@ const CATALOG_ITEMS: CatalogItem[] = [
     icon: 'tabler-click'
   },
   {
+    id: 'team-avatar-group',
+    title: 'Team Avatar Group',
+    description:
+      'Grupo compacto de avatares solapados con tooltip + microinteracción pull-up. Kinds: members (personas, foto/iniciales) y brands (isotipos de motor/integración con Tooltip AXIS + label inline). TASK-1248.',
+    route: '/design-system/team-avatar-group',
+    category: 'Primitives',
+    kind: 'Primitive',
+    status: 'Canonical',
+    owner: 'TeamAvatarGroup',
+    tags: ['avatar', 'group', 'team', 'personas', 'isotipos', 'marcas', 'integraciones', 'overlap'],
+    searchAliases: ['team avatar', 'avatar group', 'isotipos', 'marcas', 'engines', 'evaluado en'],
+    icon: 'tabler-users'
+  },
+  {
     id: 'catalog',
     title: 'Catalog index',
     description: 'Home canónica para encontrar tokens, primitives, patrones y labs internos.',
