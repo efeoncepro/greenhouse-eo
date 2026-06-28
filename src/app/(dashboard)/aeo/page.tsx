@@ -106,7 +106,7 @@ export default async function AiVisibilityClientReportPage() {
           title={C.states.error.title}
           description={C.states.error.body}
           action={
-            <Button variant='tonal' href='/growth/ai-visibility/report'>
+            <Button variant='tonal' href='/aeo'>
               {C.states.error.retry}
             </Button>
           }

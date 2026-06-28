@@ -350,7 +350,7 @@ export const DECLARED_CHILD_ROUTES: readonly ChildRouteDeclaration[] = [
       'Team Avatar Group Lab (TASK-1248) — child surface del Design System para la primitive TeamAvatarGroup (kinds members + brands/isotipos), alcanzable desde el catalogo canonico /design-system.'
   },
   {
-    route: '/growth/ai-visibility/report',
+    route: '/aeo',
     parent: '/home',
     via: 'inline-link',
     reason:

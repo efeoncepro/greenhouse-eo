@@ -687,6 +687,14 @@ const DetailCanvas = ({ model, selection }: { model: ReportArtifactModel; select
                 <Typography variant='body1' color='text.secondary'>
                   {lead}
                 </Typography>
+                {rec ? (
+                  <Stack direction='row' spacing={1} alignItems='center' sx={{ color: 'text.secondary' }}>
+                    <i className='tabler-users' aria-hidden='true' />
+                    <Typography variant='caption' color='text.secondary'>
+                      {C.detail.planAgencyNote}
+                    </Typography>
+                  </Stack>
+                ) : null}
               </Stack>
               {dim ? (
                 <Box
@@ -855,8 +863,6 @@ const SummaryStrip = ({
       <GreenhouseBreadcrumbs
         items={[
           { label: C.page.breadcrumbRoot, href: '/home' },
-          { label: organizationName },
-          { label: C.page.breadcrumbGrowth },
           { label: C.page.breadcrumbLeaf }
         ]}
       />

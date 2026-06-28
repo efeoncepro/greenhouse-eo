@@ -357,10 +357,11 @@ export const GH_GROWTH_AI_VISIBILITY_REPORT_ARTIFACT = {
  */
 export const GH_GROWTH_AI_VISIBILITY_CLIENT_REPORT = {
   page: {
-    breadcrumbRoot: 'Clientes',
-    breadcrumbGrowth: 'AI Visibility',
-    breadcrumbLeaf: 'Diagnóstico',
-    title: 'AI Visibility Snapshot',
+    // Breadcrumb client-rooted (Inicio / AEO) — "Clientes/Org/Diagnóstico" es el modelo mental del operador
+    // interno, no del cliente viendo SU propio informe. AEO = término de mercado (como SEO), no "Visibilidad en IA".
+    breadcrumbRoot: 'Inicio',
+    breadcrumbLeaf: 'AEO',
+    title: 'AEO — Snapshot de visibilidad',
     orgChipAria: 'Organización del informe',
     asOfLabel: 'Datos al',
     samplingNote: 'Medición sobre una muestra de respuestas de IA, no un monitoreo continuo.'
@@ -376,20 +377,23 @@ export const GH_GROWTH_AI_VISIBILITY_CLIENT_REPORT = {
     evaluatedOn: 'Evaluado en'
   },
   navigator: {
-    ariaLabel: 'Navegador del informe: dimensiones y recomendaciones',
+    ariaLabel: 'Navegador del informe: dimensiones y plan AEO',
     dimensionsHeader: 'Dimensiones',
-    recommendationsHeader: 'Recomendaciones',
+    // Servicio done-for-you: NO es to-do del cliente; es el plan que ejecuta su equipo de Efeonce.
+    recommendationsHeader: 'Plan AEO',
     dimensionsEmpty: 'Aún no hay dimensiones medidas.',
-    recommendationsEmpty: 'Sin recomendaciones: tu visibilidad está en buen estado.',
+    recommendationsEmpty: 'Sin focos abiertos: tu visibilidad está en buen estado.',
     rowScoreAria: 'Puntaje',
-    // El contador "Mostrando N de N recomendaciones".
-    recommendationsCount: (shown: number, total: number) => `Mostrando ${shown} de ${total} recomendaciones`
+    // El contador "Mostrando N de N focos del plan".
+    recommendationsCount: (shown: number, total: number) => `Mostrando ${shown} de ${total} focos del plan`
   },
   detail: {
     overviewTitle: 'Resumen',
     openDetail: 'Ver detalle',
-    // Eyebrow del ítem seleccionado.
-    recommendationEyebrow: (index: number, total: number) => `Recomendación ${index} de ${total}`,
+    // Eyebrow del ítem seleccionado (done-for-you: "Foco del plan", no "Recomendación"/tarea del cliente).
+    recommendationEyebrow: (index: number, total: number) => `Foco ${index} de ${total} · Plan AEO`,
+    // Nota de propiedad: el equipo de Efeonce ejecuta el foco (no es tarea del cliente).
+    planAgencyNote: 'Tu equipo de Efeonce está trabajando este foco contigo.',
     dimensionEyebrow: 'Dimensión',
     relatedScoreLabel: 'Puntaje relacionado',
     relatedScoreHelp: 'Dimensión conectada con esta recomendación.',

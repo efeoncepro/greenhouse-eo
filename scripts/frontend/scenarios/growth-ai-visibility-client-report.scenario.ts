@@ -9,7 +9,7 @@ import type { CaptureScenario } from '../lib/scenario'
 
 export const scenario: CaptureScenario = {
   name: 'growth-ai-visibility-client-report',
-  route: '/growth/ai-visibility/report/mockup',
+  route: '/aeo/mockup',
   viewport: { width: 1440, height: 900 },
   viewports: [
     { name: 'desktop', width: 1440, height: 900 },

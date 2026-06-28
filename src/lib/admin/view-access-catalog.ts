@@ -920,10 +920,10 @@ export const VIEW_REGISTRY: GovernanceViewRegistryEntry[] = [
   {
     viewCode: 'cliente.ai_visibility_report',
     section: 'cliente',
-    label: 'Visibilidad en IA',
+    label: 'AEO',
     description:
-      'Informe AI Visibility client-scoped (TASK-1248): cómo te ve la IA — puntaje, dimensiones, recomendaciones y tendencia. Deep-link, sin evidencia cruda.',
-    routePath: '/growth/ai-visibility/report',
+      'Informe AEO client-scoped (TASK-1248): cómo te ve la IA — puntaje, dimensiones, plan AEO y tendencia. Deep-link, sin evidencia cruda.',
+    routePath: '/aeo',
     routeGroup: 'client'
   }
 ]
