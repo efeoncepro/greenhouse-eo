@@ -18,6 +18,7 @@
     "dev:turbo": "next dev --turbopack",
     "prebuild": "pnpm build:icons && pnpm catalog:check && pnpm next-global-entrypoint-gate && pnpm renderer:build",
     "build": "node scripts/run-next-build.mjs",
+    "build:fast": "NEXT_BUILD_CPUS=2 node scripts/run-next-build.mjs",
     "design:lint": "design.md lint DESIGN.md",
     "design:diff": "node scripts/design-diff.mjs",
     "design:export:tailwind": "design.md export --format tailwind DESIGN.md",

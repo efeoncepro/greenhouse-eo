@@ -32,16 +32,28 @@ const sourcemapsReady =
 // y a veces se pasa → SIGKILL. Causa estructural (1106 entrypoints). Dos picos:
 // compilación de Turbopack y los workers de static-generation (= os.cpus().length).
 //
-// Slice 3 — capamos los workers de static-generation SOLO en Vercel (`VERCEL=1`):
-// de `os.cpus().length` (~9 en el builder) a 4 → baja ese pico ~2x con poca
-// penalidad de tiempo. NO usamos `turbopackMemoryLimit`: medido en Vercel, un tope
-// por debajo del working set de Turbopack fuerza GC agresivo (thrashing) y el build
-// se cuelga 25 min+ en "Creating an optimized production build" — peor que el OOM
-// flaky. Sin un valor medido del pico, el tope es contraproducente; la palanca real
-// $0 para la fase de compilación es recortar el trabajo de Sentry (Slice 2, arriba).
-const isVercelBuild = process.env.VERCEL === '1'
+// Slice 3 — capamos los workers de static-generation: de `os.cpus().length` a 4 → baja
+// ese pico ~2x con poca penalidad de tiempo. NO usamos `turbopackMemoryLimit`: medido en
+// Vercel, un tope por debajo del working set de Turbopack fuerza GC agresivo (thrashing) y el
+// build se cuelga 25 min+ en "Creating an optimized production build" — peor que el OOM flaky.
+//
+// ISSUE-109 (2026-06-28) — el cap se aplica AHORA TAMBIÉN EN LOCAL, no solo en Vercel. En una
+// máquina de pocos cores/RAM (ej. 10c/16GB), `os.cpus().length` workers de static-generation, cada
+// uno heredando `--max-old-space-size=8192` (run-next-build.mjs) + Turbopack compilando, sobre-
+// suscriben la RAM → swap → la máquina entera se congela durante `pnpm build`. Capar a 4 workers
+// corta el pico ~2x. Override por env `NEXT_BUILD_CPUS` (ej. `build:fast` usa 2 para impacto mínimo).
+const resolveBuildCpus = (): number => {
+  const explicit = Number.parseInt(process.env.NEXT_BUILD_CPUS ?? '', 10)
 
-const vercelBuildMemoryCaps = isVercelBuild ? { cpus: 4 } : {}
+  if (Number.isFinite(explicit) && explicit > 0) {
+    return explicit
+  }
+
+  // Default conservador (Vercel + local): 4 workers. Valor medido (~2x menos pico de RAM).
+  return 4
+}
+
+const buildMemoryCaps = { cpus: resolveBuildCpus() }
 
 const nextConfig: NextConfig = {
   basePath: process.env.BASEPATH,
@@ -75,8 +87,8 @@ const nextConfig: NextConfig = {
   // src/app/globals.css.
   experimental: {
     viewTransition: true,
-    // TASK-1157 — cap de workers de static-generation, solo en Vercel (ver arriba).
-    ...vercelBuildMemoryCaps
+    // TASK-1157 + ISSUE-109 — cap de workers de static-generation (Vercel + local; ver arriba).
+    ...buildMemoryCaps
   }
 }
 
