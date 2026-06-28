@@ -22,7 +22,7 @@
 
 | Region | Slot | Purpose | Component candidate | Data source |
 |---|---|---|---|---|
-| 0 | Header del panel | Logo Google Search Console (isotipo vía `BrandIsotypes`, NUNCA SVG hand-transcrito) + título + chip de estado | `CardHeader` + `GreenhouseBrandIsotype` + `Chip` | `readSearchConsoleConnection(orgId)` (TASK-1282) |
+| 0 | Header del panel | Logo Google Search Console (isotipo vía `BrandIsotypes`, NUNCA SVG hand-transcrito) + título + chip de estado | `CardHeader` + `GreenhouseBrandIsotype` + `Chip` | `getSearchConsoleConnection(orgId)` (TASK-1282) |
 | 1 | Cuerpo — estado | Descripción contextual según estado (no conectado / conectado / revocado / error) | `CardContent` + `Typography` | connection status |
 | 2 | Cuerpo — detalle conectado | Propiedad (`site_url`) + "Última verificación: hace X" + "Conectado por" | `Stack` + `Typography` (tabular-nums para tiempo) | connection metadata |
 | 3 | Footer — acciones | CTA primaria (Conectar / Reconectar) o secundaria (Desconectar) según estado + capability | `CardActions` + `Button` | capability `growth.search_console.connect` |
@@ -69,7 +69,7 @@
 - Variants / kinds: card de conexión (estado), chip `success-ink|neutral|warning` por estado.
 - Component candidates: `SearchConsoleConnectionPanel` [nuevo, en `src/views/greenhouse/growth/**` o `src/components/greenhouse/integrations/**` — verificar].
 - Copy source: `src/lib/copy/growth.ts` (`GH_SEARCH_CONSOLE`) + `getMicrocopy()`.
-- Data reader / command: reader `readSearchConsoleConnection(orgId)` (estado) + commands `connect`/`disconnect` vía rutas OAuth de **TASK-1282** (`oauth/start` + `oauth/callback`).
+- Data reader / command: reader `getSearchConsoleConnection(orgId)` (estado) + commands `connect`/`disconnect` vía rutas OAuth de **TASK-1282** (`oauth/start` + `oauth/callback`).
 - API parity: la UI es consumer del primitive de TASK-1282; cero lógica de negocio en el componente (solo render del estado + disparo del command).
 - Access / capability: `growth.search_console.connect` (mostrar acciones); sin capability → estado read-only (sin botones).
 - Runtime consumers: este panel + Nexa (puede reportar/operar la conexión por el mismo contrato).

@@ -72,7 +72,7 @@ Reglas obligatorias:
 
 ### Depends on
 
-- `TASK-1282` — reader `readSearchConsoleConnection(orgId)` + commands connect/disconnect + rutas OAuth + capability `growth.search_console.connect`. **Bloqueante duro:** sin el contrato backend esta UI no tiene qué consumir.
+- `TASK-1282` — reader `getSearchConsoleConnection(orgId)` + commands connect/disconnect + rutas OAuth + capability `growth.search_console.connect`. **Bloqueante duro:** sin el contrato backend esta UI no tiene qué consumir.
 
 ### Blocks / Impacts
 
@@ -157,7 +157,7 @@ Reglas obligatorias:
 - Primitive / variant / kind: card de conexión + chip `success-ink|neutral|warning` + button + dialog.
 - Component candidates: `SearchConsoleConnectionPanel`.
 - Copy source: `src/lib/copy/growth.ts` (`GH_SEARCH_CONSOLE`).
-- Data reader / command: `readSearchConsoleConnection(orgId)` + connect/disconnect (TASK-1282).
+- Data reader / command: `getSearchConsoleConnection(orgId)` + connect/disconnect (TASK-1282).
 - API parity: consumer del primitive de TASK-1282; Nexa opera la conexión por el mismo contrato.
 - Access / capability: `growth.search_console.connect`.
 - States to implement: default/loading/empty/connecting/error/revoked/denied/mobile.
@@ -205,7 +205,7 @@ Reglas obligatorias:
 
 ### Slice 1 — Connection panel + estados + copy
 
-- `SearchConsoleConnectionPanel` con todos los estados (default/loading/empty/connecting/error/revoked/denied/mobile), consumiendo `readSearchConsoleConnection(orgId)`.
+- `SearchConsoleConnectionPanel` con todos los estados (default/loading/empty/connecting/error/revoked/denied/mobile), consumiendo `getSearchConsoleConnection(orgId)`.
 - Copy `GH_SEARCH_CONSOLE` en `src/lib/copy/growth.ts`; isotipo Google vía `BrandIsotypes`.
 - Montar en la sección Integraciones (ruta alcanzable / manifest).
 
@@ -305,5 +305,20 @@ Ver el wireframe (`docs/ui/wireframes/TASK-1283-search-console-connect.md`) y el
 
 ## Open Questions
 
-1. ¿Ruta canónica de la sección "Integraciones / Fuentes de datos" en el workspace (operador account-360 y portal cliente)? Resolver en Discovery contra `route-reachability-manifest.ts`.
-2. ¿El panel se ofrece primero en el lane operador (account-360) o en el portal cliente, o ambos a la vez? Propuesta: ambos como consumers del mismo componente; priorizar operador si el portal de Integraciones aún no existe.
+1. ¿Ruta canónica de la sección "Integraciones / Fuentes de datos" en el workspace (operador account-360 y portal cliente)? Resolver en Discovery contra `route-reachability-manifest.ts`. **Resuelto en el Delta 2026-06-28:** el host canónico es el account-360 del cliente (`src/views/greenhouse/agency/clients/**`), donde ya viven `NotionConnectPanel`/`TeamsConnectPanel`.
+2. ¿El panel se ofrece primero en el lane operador (account-360) o en el portal cliente, o ambos a la vez? Propuesta: ambos como consumers del mismo componente; priorizar operador si el portal de Integraciones aún no existe. **Resuelto en el Delta 2026-06-28:** v1 = lane operador (account-360); el portal cliente self-service requiere un follow-up de TASK-1282 (route client-portal + grant `client_*` scope `own`) que no existe aún.
+
+## Delta 2026-06-28 — reconciliación contra TASK-1282 (lo realmente shippeado) — Claude
+
+TASK-1282 quedó **code-complete (rollout pendiente)** y commiteado (`b7f05877` + `b3ec781d` en develop). Al revisar esta UI contra el contrato real, emergen ajustes que el implementador DEBE conocer antes de empezar (el wireframe + flow son robustos y siguen vigentes; estos son los puntos de integración finos):
+
+1. **Nombre del reader:** el contrato exporta `getSearchConsoleConnection(orgId)` (no `readSearchConsoleConnection`). Ya corregido en task/wireframe/flow.
+2. **Rutas que EXISTEN hoy:** solo `GET /api/admin/growth/search-console/oauth/start` y `GET /api/admin/growth/search-console/oauth/callback` (lane **admin/operador**). **NO existe** un endpoint HTTP de `disconnect` (TASK-1282 shippeó el command `disconnectSearchConsoleProperty` pero sin route). → esta task debe **agregar un route POST de disconnect** que invoque el command (o coordinar un mini-follow-up de TASK-1282). Sumar a Files owned.
+3. **El callback devuelve JSON, NO redirige al panel.** El flow asume `oauth/callback` → redirect a Integraciones con `?connected=1`/`?error=`. La implementación real del callback responde `NextResponse.json({ ok, status, siteUrl, organizationId })`. → para que el flujo cross-route funcione, el callback necesita un **modo redirect** (parametrizado por un `return_to` firmado o derivado) — agregarlo como ajuste de TASK-1282 en el Slice 2 de esta task, o un follow-up backend. Mientras no exista, el "retorno al panel con resultado" no es real.
+4. **`oauth/start` exige `siteUrl` + `organizationId` upfront.** El start hornea `organizationId` (lane admin = la org del cliente objetivo, NO la del operador) + `siteUrl` en el `state` firmado, y verifica ownership de esa propiedad **post-consent**. → la UI "Conectar" **no puede** disparar `oauth/start` a ciegas: el operador debe **ingresar/elegir la propiedad** (`sc-domain:ejemplo.com` o `https://ejemplo.com/`) antes del redirect. Esto contradice el supuesto "v1 = la propiedad que el cliente autoriza" del wireframe → resolver: agregar un **campo de propiedad** en el zero-state (o un picker post-consent en un follow-up de TASK-1282). El `organizationId` objetivo sale del contexto del account-360 (la org del cliente), NUNCA del browser sin validar.
+5. **Lane portal cliente NO está construido.** TASK-1282 grantea `growth.search_console.connect` solo al **set operador** (scope `tenant`) y solo expone rutas bajo `/api/admin/`. Un cliente self-conectándose necesitaría una route client-portal (org de sesión, scope `own`) + grant a `client_*` — ninguno existe. → **v1 de esta task = lane operador (account-360)**; el self-service del portal es un follow-up que primero amplía TASK-1282.
+6. **Isotipo Google falta.** `src/components/greenhouse/brand/BrandIsotypes.tsx` tiene `NotionIsotype`/`TeamsIsotype`/`HubSpotIsotype` pero **no Google/Search Console**. → agregar `GoogleSearchConsoleIsotype` (preferir glyph Tabler `tabler-brand-google`; si no existe en el bundle, path simple-icons verificado como HubSpot — NUNCA hand-transcrito). Sumar a Files owned.
+7. **Precedente directo a espejar:** `src/views/greenhouse/agency/clients/NotionConnectPanel.tsx` + `TeamsConnectPanel.tsx` son el patrón exacto (estado + CTA + isotipo + dialog). `SearchConsoleConnectionPanel` debe nacer como hermano de esos, montado en el account-360 del cliente.
+8. **Flag heredado correcto:** `GROWTH_SEARCH_CONSOLE_ENABLED` (default OFF) gatea el panel — sin flag, no se monta / locked.
+
+**Ajustes a Files owned (sumar):** `src/components/greenhouse/brand/BrandIsotypes.tsx` (Google isotype) + un route `POST /api/admin/growth/search-console/disconnect` + el ajuste del callback a modo redirect (si se hace acá y no como follow-up de TASK-1282). **Sigue bloqueada por TASK-1282** (code-complete pero rollout-pendiente: sin el consent screen de Google verificado + flag ON en staging, la verificación visual real con OAuth en vivo no es posible — usar estados mock para GVC mientras tanto).

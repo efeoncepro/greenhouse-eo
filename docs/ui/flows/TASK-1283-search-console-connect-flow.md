@@ -81,7 +81,7 @@
 
 ## Data & Command Boundaries
 
-- Readers: `readSearchConsoleConnection(orgId)` (estado/metadata de la conexión) — TASK-1282.
+- Readers: `getSearchConsoleConnection(orgId)` (estado/metadata de la conexión) — TASK-1282.
 - Commands: `connectSearchConsoleProperty` (vía `oauth/start`+`oauth/callback`) / `disconnectSearchConsoleProperty` — TASK-1282. Cero lógica de negocio en la UI.
 - API routes: `GET oauth/start`, `GET oauth/callback`, `POST disconnect` (TASK-1282) [verificar paths finales].
 - Optimistic updates: `disconnect` puede ser optimista (panel pasa a `not-connected` de inmediato) con rollback + toast si falla; `connect` NO es optimista (depende del consentimiento externo de Google).
