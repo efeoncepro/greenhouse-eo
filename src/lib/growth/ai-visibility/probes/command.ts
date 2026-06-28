@@ -14,10 +14,12 @@ import 'server-only'
  */
 
 import { captureWithDomain } from '@/lib/observability/capture'
+import { resolveSecret } from '@/lib/secrets/secret-manager'
 
-import { isAgenticReadinessEnabled, isProbesEnabled } from '../flags'
+import { isAgenticReadinessEnabled, isEntityProbesEnabled, isProbesEnabled } from '../flags'
 import { getGraderProfile, getGraderRun } from '../store'
-import { type HeadlessRenderer, type ProbeResult } from './contracts'
+import { type EntityProbeContext, type HeadlessRenderer, type ProbeResult } from './contracts'
+import { createEntityApiFetcher } from './entity-fetch'
 import { runProbes } from './gatherer'
 import { createProbeRegistry } from './registry'
 import { createProbeFetcher, resolveSubjectSite } from './safe-fetch'
@@ -36,6 +38,48 @@ export interface GatherRunProbesOptions {
   fetchImpl?: typeof fetch
   /** Override de env para resolver flags en tests. Default process.env. */
   env?: NodeJS.ProcessEnv
+}
+
+/** Env var canónica de la API key del Google Knowledge Graph (resuelve `..._SECRET_REF`). */
+const KNOWLEDGE_GRAPH_API_KEY_ENV = 'GOOGLE_KNOWLEDGE_GRAPH_API_KEY'
+
+interface BuildEntityContextInput {
+  brandName: string
+  domain: string
+  market: string
+  locale: string
+  fetchImpl?: typeof fetch
+  env: NodeJS.ProcessEnv
+}
+
+/**
+ * Arma el sub-contexto de entidad (TASK-1267): identidad de marca + fetcher externo
+ * host-allowlisted + API key del Knowledge Graph resuelta server-side. La key se resuelve
+ * best-effort: si no está configurada → null (el KG probe degrada honesto `not_configured`);
+ * Wikidata/Reddit no requieren auth. Nunca lanza por la resolución del secret.
+ */
+const buildEntityContext = async (input: BuildEntityContextInput): Promise<EntityProbeContext> => {
+  let knowledgeGraphApiKey: string | null = null
+
+  try {
+    const resolution = await resolveSecret({ envVarName: KNOWLEDGE_GRAPH_API_KEY_ENV, env: input.env })
+
+    knowledgeGraphApiKey = resolution.value
+  } catch (error) {
+    captureWithDomain(error, 'growth', {
+      level: 'info',
+      tags: { source: 'growth_ai_visibility_probe_command', reason: 'kg_key_resolve_failed' }
+    })
+  }
+
+  return {
+    brandName: input.brandName,
+    domain: input.domain,
+    market: input.market,
+    locale: input.locale,
+    fetch: createEntityApiFetcher({ fetchImpl: input.fetchImpl }),
+    knowledgeGraphApiKey
+  }
 }
 
 /**
@@ -66,14 +110,28 @@ export const gatherRunProbes = async (
 
     if (!site) return { results: [], skippedReason: 'no_public_website' }
 
+    const entityEnabled = isEntityProbesEnabled(env)
+
     const probes = createProbeRegistry({
       structural: true,
-      agentic: isAgenticReadinessEnabled(env)
+      agentic: isAgenticReadinessEnabled(env),
+      entity: entityEnabled
     })
 
     if (probes.length === 0) return { results: [], skippedReason: 'no_probes_registered' }
 
     const fetcher = createProbeFetcher(site.baseUrl, { fetchImpl: options.fetchImpl })
+
+    const entity = entityEnabled
+      ? await buildEntityContext({
+          brandName: profile.brandName,
+          domain: site.domain,
+          market: profile.market,
+          locale: profile.locale,
+          fetchImpl: options.fetchImpl,
+          env
+        })
+      : null
 
     const results = await runProbes({
       runId,
@@ -82,7 +140,8 @@ export const gatherRunProbes = async (
         domain: site.domain,
         baseUrl: site.baseUrl,
         fetcher,
-        headless: options.headless ?? null
+        headless: options.headless ?? null,
+        entity
       }
     })
 

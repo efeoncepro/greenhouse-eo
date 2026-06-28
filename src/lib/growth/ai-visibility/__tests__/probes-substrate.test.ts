@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import {
   isAgenticReadinessEnabled,
+  isEntityProbesEnabled,
   isProbesEnabled
 } from '../flags'
 import {
@@ -104,14 +105,25 @@ describe('TASK-1266 · probe gatherer', () => {
 
 describe('TASK-1266 · probe registry', () => {
   it('estructural sin agentic vs ambos ejes (agentic sólo si su flag está ON)', () => {
-    const structuralOnly = createProbeRegistry({ structural: true, agentic: false })
-    const both = createProbeRegistry({ structural: true, agentic: true })
+    const structuralOnly = createProbeRegistry({ structural: true, agentic: false, entity: false })
+    const both = createProbeRegistry({ structural: true, agentic: true, entity: false })
 
     expect(structuralOnly.length).toBeGreaterThan(0)
     expect(structuralOnly.every(p => p.axis === 'structural')).toBe(true)
     expect(both.some(p => p.axis === 'agentic')).toBe(true)
     expect(both.length).toBeGreaterThan(structuralOnly.length)
-    expect(createProbeRegistry({ structural: false, agentic: false })).toEqual([])
+    expect(createProbeRegistry({ structural: false, agentic: false, entity: false })).toEqual([])
+  })
+
+  it('TASK-1267 · el eje entity se agrega sólo con su flag (aditivo sobre structural)', () => {
+    const withEntity = createProbeRegistry({ structural: true, agentic: false, entity: true })
+    const structuralOnly = createProbeRegistry({ structural: true, agentic: false, entity: false })
+
+    expect(withEntity.some(p => p.axis === 'entity')).toBe(true)
+    expect(withEntity.length).toBeGreaterThan(structuralOnly.length)
+    expect(createProbeRegistry({ structural: false, agentic: false, entity: true }).every(p => p.axis === 'entity')).toBe(
+      true
+    )
   })
 })
 
@@ -135,6 +147,20 @@ describe('TASK-1266 · probe flags', () => {
           ...base,
           GROWTH_AI_VISIBILITY_PROBES_ENABLED: 'true',
           GROWTH_AI_VISIBILITY_AGENTIC_READINESS_ENABLED: 'true'
+        })
+      )
+    ).toBe(true)
+  })
+
+  it('TASK-1267 · entity requiere probes ON (default OFF)', () => {
+    expect(isEntityProbesEnabled(env({}))).toBe(false)
+    expect(isEntityProbesEnabled(env({ ...base, GROWTH_AI_VISIBILITY_ENTITY_PROBES_ENABLED: 'true' }))).toBe(false) // sin probes ON
+    expect(
+      isEntityProbesEnabled(
+        env({
+          ...base,
+          GROWTH_AI_VISIBILITY_PROBES_ENABLED: 'true',
+          GROWTH_AI_VISIBILITY_ENTITY_PROBES_ENABLED: 'true'
         })
       )
     ).toBe(true)

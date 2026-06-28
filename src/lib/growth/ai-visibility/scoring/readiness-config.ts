@@ -95,6 +95,28 @@ export const READINESS_DIMENSIONS: ReadinessDimensionConfig[] = [
     label: 'WebMCP tools',
     weight: 20,
     meaning: 'La página registra tools WebMCP (navigator.modelContext) — el techo de la operabilidad agéntica.'
+  },
+  // ── Eje entity (suma 100) — backbone de entidad de la marca EN EL MUNDO (TASK-1267) ──
+  {
+    key: 'knowledge_graph',
+    axis: 'entity',
+    label: 'Knowledge Graph',
+    weight: 40,
+    meaning: 'Google reconoce la marca como entidad en su Knowledge Graph (Knowledge Panel).'
+  },
+  {
+    key: 'wikidata',
+    axis: 'entity',
+    label: 'Wikidata / Wikipedia',
+    weight: 35,
+    meaning: 'La marca tiene una entrada estructurada en Wikidata que alimenta a los motores y LLMs.'
+  },
+  {
+    key: 'reddit_ugc',
+    axis: 'entity',
+    label: 'Presencia en Reddit / UGC',
+    weight: 25,
+    meaning: 'La marca tiene menciones en Reddit y fuentes UGC, una de las fuentes top de citas de los motores.'
   }
 ]
 

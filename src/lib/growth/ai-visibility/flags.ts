@@ -130,6 +130,20 @@ export const isAgenticReadinessEnabled = (env: NodeJS.ProcessEnv = process.env):
   isProbesEnabled(env) && isTrue(env[GROWTH_AI_VISIBILITY_AGENTIC_READINESS_FLAG])
 
 /**
+ * TASK-1267 — Eje `entity` (backbone real de entidad de la marca: Google Knowledge Graph,
+ * Wikidata/Wikipedia, presencia en Reddit/UGC). Probes read-only sobre APIs PÚBLICAS de
+ * terceros (no el sitio del sujeto). Default OFF. Requiere que los probes estén ON
+ * (`isProbesEnabled`): el eje entity es aditivo sobre el structural, no independiente —
+ * igual que el eje agentic. La API key del Knowledge Graph se resuelve server-side
+ * (`GOOGLE_KNOWLEDGE_GRAPH_API_KEY` / `..._SECRET_REF`); sin ella el KG probe degrada honesto.
+ * Registrar en docs/operations/FEATURE_FLAG_STATE_LEDGER.md (gate docs:closure-check).
+ */
+export const GROWTH_AI_VISIBILITY_ENTITY_PROBES_FLAG = 'GROWTH_AI_VISIBILITY_ENTITY_PROBES_ENABLED'
+
+export const isEntityProbesEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+  isProbesEnabled(env) && isTrue(env[GROWTH_AI_VISIBILITY_ENTITY_PROBES_FLAG])
+
+/**
  * TASK-1277 — Run gobernado de portal (chokepoint). Default OFF: las puertas cliente del
  * run (contratado/trial/pilot) están cerradas hasta el rollout + staging shadow. Gateado
  * además por el kill switch `isGraderEnabled`. Con ON: `requestGraderRunForOrganization`

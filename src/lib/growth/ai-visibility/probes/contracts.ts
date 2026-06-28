@@ -22,8 +22,14 @@
 export const PROBE_LAYER_VERSION = 'ai_readiness_probe_v1' as const
 export type ProbeLayerVersion = typeof PROBE_LAYER_VERSION
 
-/** Eje ortogonal al de percepción. NUNCA se fusionan entre sí ni con el overall de percepción. */
-export const PROBE_AXES = ['structural', 'agentic'] as const
+/**
+ * Ejes ortogonales al de percepción. NUNCA se fusionan entre sí ni con el overall de
+ * percepción. `structural` ("¿por qué no te citan?") y `agentic` ("¿te pueden usar los
+ * agentes?") prueban el SITIO del sujeto; `entity` (TASK-1267) prueba el BACKBONE de
+ * entidad de la marca EN EL MUNDO (Google Knowledge Graph / Wikidata / Reddit-UGC) —
+ * la causa que el eje de percepción `entity_clarity` solo ve reflejada.
+ */
+export const PROBE_AXES = ['structural', 'agentic', 'entity'] as const
 export type ProbeAxis = (typeof PROBE_AXES)[number]
 
 /**
@@ -42,7 +48,11 @@ export const PROBE_KINDS = [
   'api_discoverability', // OpenAPI / .well-known/ai-plugin.json discoverability
   'dom_semantics', // DOM semántico / ARIA / landmarks (HTTP-static; full version headless)
   'structured_actions', // potentialAction / SearchAction en JSON-LD
-  'webmcp_tools' // navigator.modelContext tools registradas (headless — degrada si no hay Chromium)
+  'webmcp_tools', // navigator.modelContext tools registradas (headless — degrada si no hay Chromium)
+  // Entity backbone (TASK-1267) — "¿existe tu entidad en el mundo que los motores razonan?"
+  'knowledge_graph', // Google Knowledge Graph API: ¿la marca es entidad conocida? (tipo, descripción)
+  'wikidata', // Wikidata/Wikipedia: ¿la marca tiene entrada estructurada? (sitelink + sitio oficial)
+  'reddit_ugc' // Reddit/UGC: presencia/menciones de la marca (fuente top de citas de ChatGPT)
 ] as const
 export type ProbeKind = (typeof PROBE_KINDS)[number]
 
@@ -113,6 +123,57 @@ export interface ProbeFetchInit {
  */
 export type ProbeFetcher = (path: string, init?: ProbeFetchInit) => Promise<ProbeFetchResult>
 
+// ── Entity API fetcher (terceros, host-allowlisted; TASK-1267) ────────────────
+
+export type EntityFetchErrorCode = 'timeout' | 'network' | 'blocked' | 'too_large' | 'http_error'
+
+/** Respuesta normalizada del fetcher externo. NUNCA lanza: un fallo → `ok=false` + `errorCode`. */
+export interface EntityFetchResult {
+  ok: boolean
+  /** HTTP status; 0 si fue error de red/timeout/bloqueo antes de respuesta. */
+  status: number
+  /** Cuerpo de texto acotado (truncado a un máximo defensivo). */
+  body: string
+  errorCode: EntityFetchErrorCode | null
+}
+
+export interface EntityFetchInit {
+  timeoutMs?: number
+  maxBytes?: number
+  /** Header Authorization opcional (p.ej. bearer de Reddit OAuth). NUNCA se loggea. */
+  authorization?: string
+}
+
+/**
+ * Fetcher read-only a APIs PÚBLICAS de entidad de TERCEROS (Google Knowledge Graph /
+ * Wikidata / Reddit). Distinto del `ProbeFetcher` del eje structural/agentic: ese está
+ * acotado al host del SUJETO (SSRF), este está acotado por ALLOWLIST a los hosts de las
+ * APIs de entidad. Recibe una URL absoluta; rechaza cualquier host fuera de la allowlist.
+ * Inyectable para tests.
+ */
+export type EntityApiFetcher = (url: string, init?: EntityFetchInit) => Promise<EntityFetchResult>
+
+/**
+ * Sub-contexto que necesitan los probes de entidad (TASK-1267): identidad de la marca para
+ * la consulta + desambiguación por dominio, idioma/mercado, el fetcher externo allowlisted,
+ * y la API key del Knowledge Graph resuelta server-side (null → el KG probe degrada
+ * `not_configured`, honest degradation; los demás no requieren auth).
+ */
+export interface EntityProbeContext {
+  /** Nombre de marca a consultar (del perfil del grader). */
+  brandName: string
+  /** Host del sujeto (p.ej. `example.com`) para desambiguar por dominio, no solo por nombre. */
+  domain: string
+  /** Mercado del run (p.ej. `CL`) — orienta relevancia/idioma. */
+  market: string
+  /** Locale del run (p.ej. `es-CL`) — del que se deriva el idioma de Wikidata/KG. */
+  locale: string
+  /** Fetcher externo host-allowlisted (KG/Wikidata/Reddit). */
+  fetch: EntityApiFetcher
+  /** API key de Google Knowledge Graph resuelta server-side; null → KG probe degrada honesto. */
+  knowledgeGraphApiKey: string | null
+}
+
 // ── Headless renderer seam (Chromium fuera de Vercel; null por defecto) ───────
 
 export interface HeadlessRenderResult {
@@ -151,6 +212,12 @@ export interface ProbeContext {
   fetcher: ProbeFetcher
   /** Renderer headless inyectado, o null (probes headless → skipped). */
   headless: HeadlessRenderer | null
+  /**
+   * Sub-contexto de entidad inyectado (TASK-1267), o ausente/null cuando el eje `entity`
+   * no está habilitado → los probes de entidad degradan a `skipped/no_entity_context`. Es
+   * OPTIONAL para no romper a los probes structural/agentic (que lo ignoran) ni a sus tests.
+   */
+  entity?: EntityProbeContext | null
 }
 
 export interface Probe {
@@ -169,4 +236,13 @@ export const NO_HEADLESS_OUTCOME: ProbeOutcome = {
   reason: 'Requiere render headless (Chromium); sin runtime disponible en este entorno.',
   evidence: {},
   errorCode: 'no_headless'
+}
+
+/** Outcome canónico para un probe de entidad sin sub-contexto inyectado (honest degradation). */
+export const NO_ENTITY_CONTEXT_OUTCOME: ProbeOutcome = {
+  status: 'skipped',
+  score: null,
+  reason: 'Eje de entidad no habilitado; sin contexto de marca/fetcher de entidad disponible.',
+  evidence: {},
+  errorCode: 'no_entity_context'
 }

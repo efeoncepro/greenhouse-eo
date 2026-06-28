@@ -10,10 +10,13 @@
 import { type Probe } from './contracts'
 import { STRUCTURAL_PROBES } from './structural'
 import { AGENTIC_PROBES } from './agentic'
+import { ENTITY_PROBES } from './entity'
 
 export interface ProbeRegistryAxes {
   structural: boolean
   agentic: boolean
+  /** TASK-1267 — eje entity (backbone de marca: KG/Wikidata/Reddit). Aditivo sobre structural. */
+  entity: boolean
 }
 
 export const createProbeRegistry = (axes: ProbeRegistryAxes): Probe[] => {
@@ -21,6 +24,7 @@ export const createProbeRegistry = (axes: ProbeRegistryAxes): Probe[] => {
 
   if (axes.structural) probes.push(...STRUCTURAL_PROBES)
   if (axes.agentic) probes.push(...AGENTIC_PROBES)
+  if (axes.entity) probes.push(...ENTITY_PROBES)
 
   return probes
 }

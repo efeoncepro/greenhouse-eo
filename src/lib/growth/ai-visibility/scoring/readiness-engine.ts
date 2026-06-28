@@ -45,6 +45,8 @@ export interface ReadinessScore {
   scoreVersion: ReadinessScoreVersion
   structural: AxisReadinessScore
   agentic: AxisReadinessScore
+  /** TASK-1267 — backbone de entidad de la marca (KG/Wikidata/Reddit), ortogonal a los otros. */
+  entity: AxisReadinessScore
 }
 
 const round1 = (value: number): number => Math.round(value * 10) / 10
@@ -93,6 +95,7 @@ export const computeReadinessScore = (probeResults: ProbeResult[]): ReadinessSco
   return {
     scoreVersion: AI_READINESS_SCORE_VERSION,
     structural: buildAxis('structural', byKind),
-    agentic: buildAxis('agentic', byKind)
+    agentic: buildAxis('agentic', byKind),
+    entity: buildAxis('entity', byKind)
   }
 }

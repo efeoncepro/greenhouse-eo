@@ -28,6 +28,7 @@ describe('TASK-1266 · readiness config', () => {
   it('los pesos suman 100 por eje', () => {
     expect(readinessAxisWeightSum('structural')).toBe(100)
     expect(readinessAxisWeightSum('agentic')).toBe(100)
+    expect(readinessAxisWeightSum('entity')).toBe(100) // TASK-1267
   })
 })
 
