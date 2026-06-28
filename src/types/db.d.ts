@@ -6607,6 +6607,22 @@ export interface GreenhouseGrowthGraderLeads {
   website_url: string | null;
 }
 
+export interface GreenhouseGrowthGraderProbeResults {
+  axis: string;
+  created_at: Generated<Timestamp>;
+  error_code: string | null;
+  evidence: Generated<Json>;
+  latency_ms: Generated<number>;
+  probe_id: Generated<string>;
+  probe_kind: string;
+  probe_layer_version: string;
+  reason: string;
+  run_id: string;
+  score: Numeric | null;
+  status: string;
+  updated_at: Generated<Timestamp>;
+}
+
 export interface GreenhouseGrowthGraderProfiles {
   brand_name: string;
   category: string | null;
@@ -10919,6 +10935,7 @@ export interface DB {
   "greenhouse_growth.form_version": GreenhouseGrowthFormVersion;
   "greenhouse_growth.grader_intake_events": GreenhouseGrowthGraderIntakeEvents;
   "greenhouse_growth.grader_leads": GreenhouseGrowthGraderLeads;
+  "greenhouse_growth.grader_probe_results": GreenhouseGrowthGraderProbeResults;
   "greenhouse_growth.grader_profiles": GreenhouseGrowthGraderProfiles;
   "greenhouse_growth.grader_report_email_dispatches": GreenhouseGrowthGraderReportEmailDispatches;
   "greenhouse_growth.grader_report_reviews": GreenhouseGrowthGraderReportReviews;

@@ -105,6 +105,31 @@ export const isReportEmailDeliveryEnabled = (env: NodeJS.ProcessEnv = process.en
   isTrue(env[GROWTH_AI_VISIBILITY_REPORT_EMAIL_FLAG])
 
 /**
+ * TASK-1266 — Site Readiness Probe Layer (gatherer de probes técnicos del sitio analizado).
+ * Default OFF: sin el flag, el probe gatherer no se invoca (el run sigue idéntico; sólo
+ * percepción). Gateado además por el kill switch `isGraderEnabled`. Con ON: tras ejecutar
+ * un run, el run-engine corre los probes structural (robots IA, JSON-LD, llms.txt, sitemap)
+ * read-only sobre el dominio del sujeto y persiste `grader_probe_results`. Es el flag MAESTRO
+ * del eje `structural`; el eje `agentic` requiere ADEMÁS `..._AGENTIC_READINESS_ENABLED`.
+ * Registrar en docs/operations/FEATURE_FLAG_STATE_LEDGER.md (gate docs:closure-check).
+ */
+export const GROWTH_AI_VISIBILITY_PROBES_FLAG = 'GROWTH_AI_VISIBILITY_PROBES_ENABLED'
+
+export const isProbesEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+  isGraderEnabled(env) && isTrue(env[GROWTH_AI_VISIBILITY_PROBES_FLAG])
+
+/**
+ * TASK-1266 — Eje `agentic` (operabilidad agéntica: WebMCP tools, .well-known/mcp, API
+ * discoverability, DOM semántico, potentialAction). Default OFF. Requiere que los probes estén
+ * ON (`isProbesEnabled`): el eje agentic es aditivo sobre el structural, no independiente.
+ * Registrar en docs/operations/FEATURE_FLAG_STATE_LEDGER.md (gate docs:closure-check).
+ */
+export const GROWTH_AI_VISIBILITY_AGENTIC_READINESS_FLAG = 'GROWTH_AI_VISIBILITY_AGENTIC_READINESS_ENABLED'
+
+export const isAgenticReadinessEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+  isProbesEnabled(env) && isTrue(env[GROWTH_AI_VISIBILITY_AGENTIC_READINESS_FLAG])
+
+/**
  * TASK-1277 — Run gobernado de portal (chokepoint). Default OFF: las puertas cliente del
  * run (contratado/trial/pilot) están cerradas hasta el rollout + staging shadow. Gateado
  * además por el kill switch `isGraderEnabled`. Con ON: `requestGraderRunForOrganization`

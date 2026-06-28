@@ -53,6 +53,7 @@ import {
   type GraderRunRow
 } from './store'
 import { finalizeRunDelivery } from './public-delivery/finalize-delivery'
+import { gatherRunProbes } from './probes/command'
 
 export interface GraderRunPromptInput {
   promptId: string
@@ -246,6 +247,10 @@ export const executeClaimedGraderRun = async (
   // TASK-1245 — auto-publish del snapshot + materialización del delivery state público (write-side,
   // NO on-read). succeeded/partial publicable → ready; review_required → in_review; resto → unavailable.
   await finalizeRunDelivery(finalized)
+
+  // TASK-1266 — Probes técnicos read-only del sitio analizado (eje structural/agentic, gated por flag,
+  // default OFF). Best-effort: la readiness NUNCA degrada el run de percepción (gatherRunProbes no lanza).
+  await gatherRunProbes(finalized.runId)
 
   return { run: finalized, observations, idempotentHit: false, costGuardTripped }
 }
