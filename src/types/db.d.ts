@@ -6663,6 +6663,8 @@ export interface GreenhouseGrowthGraderReports {
 }
 
 export interface GreenhouseGrowthGraderRuns {
+  assignment_id: string | null;
+  cost_attribution: string | null;
   cost_ceiling_usd: Numeric | null;
   created_at: Generated<Timestamp>;
   estimated_cost_usd: Generated<Numeric>;
@@ -6670,6 +6672,7 @@ export interface GreenhouseGrowthGraderRuns {
   finished_at: Timestamp | null;
   idempotency_key: string | null;
   mode: string;
+  organization_id: string | null;
   poll_token: Generated<string>;
   profile_id: string;
   prompt_pack_version: string;
@@ -6679,6 +6682,7 @@ export interface GreenhouseGrowthGraderRuns {
   requested_providers: Generated<string[]>;
   run_id: Generated<string>;
   run_kind: string;
+  run_source: string | null;
   started_at: Timestamp | null;
   status: Generated<string>;
 }

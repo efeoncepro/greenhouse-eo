@@ -103,3 +103,60 @@ export const GROWTH_AI_VISIBILITY_REPORT_EMAIL_FLAG = 'GROWTH_AI_VISIBILITY_REPO
 
 export const isReportEmailDeliveryEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
   isTrue(env[GROWTH_AI_VISIBILITY_REPORT_EMAIL_FLAG])
+
+/**
+ * TASK-1277 — Run gobernado de portal (chokepoint). Default OFF: las puertas cliente del
+ * run (contratado/trial/pilot) están cerradas hasta el rollout + staging shadow. Gateado
+ * además por el kill switch `isGraderEnabled`. Con ON: `requestGraderRunForOrganization`
+ * acepta runs de portal (entitlement → ventana → allowance → costo). La puerta operador
+ * (`requestGraderRunAsOperator`) NO depende de este flag — es capability-gated y unlimited.
+ * Registrar en docs/operations/FEATURE_FLAG_STATE_LEDGER.md (gate docs:closure-check).
+ */
+export const GROWTH_AI_VISIBILITY_PORTAL_RUN_FLAG = 'GROWTH_AI_VISIBILITY_PORTAL_RUN_ENABLED'
+
+export const isPortalRunEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+  isGraderEnabled(env) && isTrue(env[GROWTH_AI_VISIBILITY_PORTAL_RUN_FLAG])
+
+/**
+ * TASK-1277 — Tier trial PLG (self-serve para clientes existentes sin AEO contratado).
+ * Default OFF: aunque el portal run esté ON, el tier trial no entrega allowance hasta medir
+ * costo en shadow. Con ON: las orgs con assignment tier=trial reciben N runs/mes (config)
+ * con reset mensual + tope global mensual de costo (backstop). Registrar en el ledger.
+ */
+export const GROWTH_AI_VISIBILITY_TRIAL_FLAG = 'GROWTH_AI_VISIBILITY_TRIAL_ENABLED'
+
+export const isTrialTierEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+  isTrue(env[GROWTH_AI_VISIBILITY_TRIAL_FLAG])
+
+/**
+ * TASK-1277 — Config de allowance AEO por tier (per-org-per-mes) + tope global de trials.
+ * Defaults conservadores (sign-off comercial): trial 1/mes, contratado 20/mes (fair-use, NO
+ * ilimitado self-serve), pilot 3/mes, tope global de trials USD 25/mes (cost backstop que
+ * espeja el budget diario público de abuse-guard). Todos override-ables por env (sin deploy).
+ * El costo por-run del backstop usa el cost ceiling del modo `light` (defense conservadora).
+ */
+export interface AeoAllowanceConfig {
+  trialRunsPerMonth: number
+  contractedRunsPerMonth: number
+  pilotRunsPerMonth: number
+  trialGlobalMonthlyBudgetUsd: number
+}
+
+const toPositiveInt = (value: string | undefined, fallback: number): number => {
+  const parsed = Number.parseInt(value ?? '', 10)
+
+  return Number.isFinite(parsed) && parsed >= 0 ? parsed : fallback
+}
+
+const toPositiveFloat = (value: string | undefined, fallback: number): number => {
+  const parsed = Number.parseFloat(value ?? '')
+
+  return Number.isFinite(parsed) && parsed >= 0 ? parsed : fallback
+}
+
+export const resolveAeoAllowanceConfig = (env: NodeJS.ProcessEnv = process.env): AeoAllowanceConfig => ({
+  trialRunsPerMonth: toPositiveInt(env.GROWTH_AI_VISIBILITY_TRIAL_RUNS_PER_MONTH, 1),
+  contractedRunsPerMonth: toPositiveInt(env.GROWTH_AI_VISIBILITY_CONTRACTED_RUNS_PER_MONTH, 20),
+  pilotRunsPerMonth: toPositiveInt(env.GROWTH_AI_VISIBILITY_PILOT_RUNS_PER_MONTH, 3),
+  trialGlobalMonthlyBudgetUsd: toPositiveFloat(env.GROWTH_AI_VISIBILITY_TRIAL_GLOBAL_MONTHLY_BUDGET_USD, 25)
+})
