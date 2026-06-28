@@ -291,6 +291,10 @@ jobs:
         env:
           ENV: ${{ env.ENV }}
           EXPECTED_SHA: ${{ steps.resolve-worker-sha.outputs.expected_sha }}
+          # TASK-1265 — DataForSEO login para el provider google_ai_overview. El password se
+          # resuelve via secret ref en el worker; el login se inyecta acá como GH secret
+          # (enmascarado en logs) y viaja como env plano al worker (el adapter lo lee directo).
+          DATAFORSEO_API_LOGIN: ${{ secrets.DATAFORSEO_API_LOGIN }}
 
       - name: Verify deployment health
         run: |
