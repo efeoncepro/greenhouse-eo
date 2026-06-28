@@ -28,6 +28,31 @@ export const NORMALIZED_FINDING_PROVIDERS = [
 
 export type NormalizedFindingProvider = (typeof NORMALIZED_FINDING_PROVIDERS)[number]
 
+/**
+ * Surfaces canónicas del grader (taxonomía de producto, TASK-1265 delta 2026-06-28).
+ *
+ * Dos superficies de respuesta IA estructuralmente distintas; ambas miden lo mismo
+ * ("¿te mencionan/citan en la respuesta generada?"), pero el canal cambia:
+ *   - `answer_engines` — asistentes conversacionales (el usuario VA al chatbot):
+ *     ChatGPT (OpenAI), Claude (Anthropic), Perplexity, Gemini.
+ *   - `ai_search` — respuesta IA dentro del SERP (la IA está en la búsqueda que el
+ *     usuario ya usa): Google AI Overviews / AI Mode (→ futuro Bing Copilot).
+ *
+ * Naming en inglés a propósito (término estándar AEO/GEO; se trata como marca de
+ * producto, NO se traduce). Las labels visibles viven en `src/lib/copy/growth.ts`.
+ */
+export const GRADER_ENGINE_SURFACES = ['answer_engines', 'ai_search'] as const
+export type GraderEngineSurface = (typeof GRADER_ENGINE_SURFACES)[number]
+
+/** Clasificación motor → surface. `manual_import` = evidencia cargada por operador, sin surface propia. */
+export const GRADER_PROVIDER_SURFACE = {
+  openai: 'answer_engines',
+  anthropic: 'answer_engines',
+  perplexity: 'answer_engines',
+  gemini: 'answer_engines',
+  google_ai_overview: 'ai_search'
+} as const satisfies Record<Exclude<NormalizedFindingProvider, 'manual_import'>, GraderEngineSurface>
+
 export const BRAND_MENTIONED_VALUES = ['yes', 'no', 'ambiguous', 'unknown'] as const
 export type BrandMentioned = (typeof BRAND_MENTIONED_VALUES)[number]
 

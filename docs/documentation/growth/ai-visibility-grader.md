@@ -14,6 +14,10 @@ Esta capa es la **fundacion del motor**: corre los prompts contra los providers,
 
 ## Conceptos
 
+- **Surfaces (dos tipos de motor):** el grader mide dos superficies de respuesta IA distintas, con el mismo objetivo ("¿te mencionan/citan?") pero distinto canal:
+  - **Answer Engines** — asistentes conversacionales donde el usuario *va* al chatbot: **ChatGPT (OpenAI), Claude (Anthropic), Perplexity, Gemini**.
+  - **AI Search** — la respuesta IA *dentro* del buscador que el usuario ya usa: **Google AI Overviews / AI Mode** (a futuro Bing Copilot).
+  - Se reportan separadas porque una marca puede ser fuerte en una e invisible en la otra. Los nombres van en inglés (estándar de la industria AEO/GEO, no se traducen). Detalle técnico: `normalization/contracts.ts` (`GRADER_PROVIDER_SURFACE`).
 - **Run (corrida):** una ejecucion del grader para una marca, en un modo (`light` barato / `full` completo / `internal_audit` interno).
 - **Observacion:** el resultado de una pregunta a un provider. Guarda un extracto de la respuesta, las citas (sitios que el motor referencio), tokens usados, latencia y estado.
 - **Evidencia ≠ verdad:** lo que dice un provider es un dato observado, no un hecho de negocio. El puntaje y el reporte se derivan despues, con reglas versionadas.
@@ -51,7 +55,7 @@ Hay un primitive server-side único (`executeGraderRun`) y todos lo consumen igu
 - **staging:** encendido para OpenAI + Anthropic + **Gemini** + **Perplexity** (corre proveedores reales; verificado). Gemini usa la última generación disponible (**Gemini 3**, `gemini-3-flash-preview` vía Vertex) porque el grader debe medir con el modelo que la gente usa hoy; el modelo es ajustable por env sin redeploy.
 - **producción:** apagado — el encendido es un proceso aparte (migración + release controlado) que se hará después.
 - **Perplexity:** **encendido en staging (TASK-1249).** Usa el cliente canónico `src/lib/ai/perplexity.ts` (Sonar, search-grounded). Smoke real low-volume verde (6/6 respuestas con citas). El proveedor set arch (OpenAI/Perplexity/Gemini) queda **completo**.
-- **Google AI Overview / AI Mode:** **code complete, flag OFF (TASK-1265).** Usa DataForSEO como fuente gobernada, sin scraping directo de Google. Si DataForSEO no trae bloque de AI Overview/AI Mode, la observacion queda `skipped:no_ai_overview_block`. El costo se mide por request reportado por DataForSEO. DataForSEO documenta AI Mode como English-only hoy, asi que el adapter manda `language_code=en` y conserva mercado/location para segmentar.
+- **Google AI Overviews / AI Mode (surface AI Search):** **encendido + verificado en staging (TASK-1265, 2026-06-28).** Usa DataForSEO como fuente gobernada, sin scraping directo de Google. Smoke real verde end-to-end (observación `succeeded` con 27 citas en PG, ejecutada por el worker real). Está disponible en los 3 entrypoints de análisis (público / cliente / operador) por construcción. Si DataForSEO no trae bloque de AI Overview/AI Mode, la observación queda `skipped:no_ai_overview_block` (es "no apareces", no un fallo). El costo se mide por request reportado por DataForSEO. DataForSEO documenta AI Mode como English-only hoy, así que el adapter manda `language_code=en` y conserva mercado/location para segmentar. **Producción:** apagado (gated por el launch) + rotar la credencial DataForSEO antes de prod.
 - **Prompt pack v2 (TASK-1249):** existe como versión seleccionable (corrige el prompt p12, que nombraba sectores y ensuciaba las marcas de control). El **default sigue siendo v1** hasta una validación real; v2 es opt-in.
 - **Pesos del score:** se mantiene **V1** (decisión documentada — el set de calibración es muy chico para reajustar pesos sin sobreajustar; detalle en `GREENHOUSE_AI_VISIBILITY_GRADER_CALIBRATION_V1.md` §Delta 2026-06-27).
 

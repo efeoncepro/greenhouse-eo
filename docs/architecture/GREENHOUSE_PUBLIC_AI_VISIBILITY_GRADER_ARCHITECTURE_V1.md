@@ -1344,6 +1344,24 @@ Se agrega `google_ai_overview` como quinto provider gobernado del grader. El obj
 
 Estado operativo: code complete local/dev. Pendiente para cerrar runtime: aplicar migracion en ambientes, deploy con flag OFF, flip staging low-volume, smoke real con observation/citas en PG y decidir rotacion de la credencial DataForSEO antes de produccion porque fue compartida inicialmente en captura/chat.
 
+## Delta 2026-06-28 — TASK-1265 activación staging + taxonomía de surfaces (Answer Engines / AI Search) · EPIC-020
+
+### Taxonomía canónica de surfaces (naming de producto)
+
+El grader mide dos **surfaces** de respuesta IA estructuralmente distintas. Ambas miden lo mismo ("¿te mencionan/citan en la respuesta generada?"), pero el canal cambia — y por eso se reportan separadas (una marca puede ser fuerte en una e invisible en la otra):
+
+| Surface | Qué es | Motores | Métrica |
+|---|---|---|---|
+| **Answer Engines** | Asistentes conversacionales (el usuario VA al chatbot) | ChatGPT (OpenAI), Claude (Anthropic), Perplexity, Gemini | brand mentions + citations en la respuesta |
+| **AI Search** | Respuesta IA dentro del SERP (la IA está en la búsqueda que el usuario ya usa) | Google AI Overviews / AI Mode (→ futuro Bing Copilot) | citations/presence en el bloque AI |
+
+- **Naming en inglés a propósito** (término estándar AEO/GEO); se tratan como marca de producto y **NO se traducen** (igual que "dashboard"). El paraguas del producto sigue siendo *Answer Engine Visibility* / *AI Visibility Grader*.
+- **SoT de la taxonomía:** `GRADER_ENGINE_SURFACES` + `GraderEngineSurface` + `GRADER_PROVIDER_SURFACE` (mapping motor→surface) en `src/lib/growth/ai-visibility/normalization/contracts.ts`. Labels visibles: `GH_GROWTH_AI_VISIBILITY.surface_label` en `src/lib/copy/growth.ts`. `manual_import` = evidencia cargada por operador, sin surface propia.
+
+### Activación staging (verificada end-to-end)
+
+`google_ai_overview` quedó **activado + verificado en staging** (no solo code-complete). Hallazgo: staging corre el grader **async** → el run real lo ejecuta el **ops-worker Cloud Run** (no Vercel), así que el flag + creds DataForSEO viven en el env del worker (`services/ops-worker/deploy.sh` branch staging ON / prod OFF + `DATAFORSEO_API_PASSWORD_SECRET_REF` + login vía GH secret en `ops-worker-deploy.yml`; SA `greenhouse-portal@` con `secretAccessor`). Smoke real verde end-to-end: run `grun-61d1c683…` solo-AIO drenado por el worker → observation `succeeded`, 27 citas, `$0.004` en `provider_observations`. **Usable en los 3 endpoints** (public/client-portal/operator) por construcción (el run-engine resuelve providers desde `policy.eligibleProviders`; elegible en los 3 modos). Prod sigue OFF (gated TASK-1246) + rotar password DataForSEO. Migración CHECK aplicada (staging comparte `greenhouse-pg-dev`).
+
 ## Delta 2026-06-27 — Report Artifact Design System (TASK-1252)
 
 El render del `grader_report` (§7.7) se materializó como **sistema reusable feature-local** en `src/components/growth/ai-visibility/report-artifact/**` (Full API Parity: un modelo, muchos consumers; la UI no recalcula score/gaps/tendencia).

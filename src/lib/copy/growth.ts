@@ -19,7 +19,7 @@ import type {
   SentimentNet,
   TrendDirection
 } from '@/lib/growth/ai-visibility/report/contracts'
-import type { NormalizedFindingProvider } from '@/lib/growth/ai-visibility/normalization/contracts'
+import type { GraderEngineSurface, NormalizedFindingProvider } from '@/lib/growth/ai-visibility/normalization/contracts'
 import type { AccuracyFindingKind } from '@/lib/growth/ai-visibility/accuracy/contracts'
 import type { ScoreDimensionKey } from '@/lib/growth/ai-visibility/scoring/config'
 
@@ -149,6 +149,14 @@ export const GH_GROWTH_AI_VISIBILITY = {
     google_ai_overview: 'Google AI Overview / AI Mode',
     manual_import: 'Evidencia cargada'
   } satisfies Record<NormalizedFindingProvider, string>,
+
+  // Surfaces del grader — labels canónicas de producto (naming inglés, NO se traduce).
+  // Taxonomía + mapping motor→surface viven en normalization/contracts.ts (TASK-1265 delta).
+  // `answer_engines` = asistentes conversacionales · `ai_search` = respuesta IA en el SERP.
+  surface_label: {
+    answer_engines: 'Answer Engines',
+    ai_search: 'AI Search'
+  } satisfies Record<GraderEngineSurface, string>,
 
   sentiment_net_label: {
     positivo: 'Positivo',
