@@ -1,12 +1,28 @@
 # TASK-1263 — AI Visibility Grader: activar el gate de correo corporativo en el form
 
+## Baseline recalibration 2026-06-28 (pre-ejecución — premisa corregida)
+
+Discovery encontró que la **premisa original de la task era incompleta**. El gate de email de TASK-1254 vive **exclusivamente dentro de `submitForm`** (`src/lib/growth/forms/commands.ts`), pero el intake real del grader **nunca pasa por `submitForm`**:
+
+- El route `POST /api/public/growth/ai-visibility/run` despacha entre `createPublicGraderRun` (a-medida, prod) y `createPublicGraderRunViaFormsEngine` (forms-engine, staging ON) según `GROWTH_GRADER_INTAKE_ON_FORMS_ENGINE_ENABLED`.
+- **Ninguno** llama `submitForm`; la fachada de convergencia persiste con `persistAcceptedSubmission` directo. El único caller de `submitForm` es el route genérico `/api/public/growth/forms/[slug]/submit`, que el grader no usa.
+
+→ Publicar una versión del form con `emailPolicy.block_field` (lo que pedía la task) habría sido **configuración inerte**: nadie la lee en el path del grader. Cumple los AC literales pero **no el Goal** (gmail rechazado antes de gastar AI).
+
+**Decisiones del operador (2026-06-28):**
+
+1. **Cablear el gate en la fachada** (reusando el primitive), además de publicar la versión gobernada — único camino que cumple el Goal.
+2. **Ambos paths** (forms-engine de staging + a-medida de prod), para que el gate proteja el grader sin importar el estado del flag de convergencia (cubre el cutover de TASK-1246).
+
+**Impacto en el alcance:** sube de "config/data only" a **command real** (consistente con el header `Backend impact: command`). Diseño: un helper canónico `evaluateFormEmailGate` en `email-verification/` = **un primitive, 3 consumers** (`submitForm` + ambas fachadas del grader). Sin migración (`outcome` de `grader_intake_events` es `TEXT` libre). Detalle en Scope (abajo, Slices recalibrados).
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Bajo`

@@ -19,13 +19,11 @@ import {
   type RiskProfile,
   fieldDefinitionSchema,
   publicSubmitInputSchema,
-  resolveEmailPolicy,
 } from './contracts'
 import { mintEmbedKey, verifyEmbedKeySecret } from './embed-key'
 import { dedupeFingerprint } from './hash'
 import { type InsertableFormCatalogEntryVm, listInsertableFormCatalog } from './readers'
 import {
-  isFormsEmailVerificationEnabled,
   isFormsPiiEncryptionEnabled,
   isFormsServerValidationEnabled,
   resolveFormsAbuseLimits,
@@ -33,7 +31,7 @@ import {
 import { splitAndEncryptPii } from './pii/encryption'
 import type { EncryptedFieldEnvelope } from './pii/types'
 import { validateFieldValue } from './validators/core'
-import { verifyEmail } from './email-verification'
+import { evaluateFormEmailGate } from './email-verification'
 import { compileFormVersion } from './policy-compiler'
 import {
   type CaptchaVerifier,
@@ -387,44 +385,28 @@ export const submitForm = async (rawInput: PublicSubmitInput, context: SubmitCon
     }
   }
 
-  // TASK-1254 — Gate de email por política del form (default OFF via flag). Tier 1 (gratis,
-  // síncrono) decide el gate; el veredicto profundo Tier 2 (provider) es async y NO bloquea.
-  // `block_field` rechaza si el email no es corporativo/no-desechable; `warn`/`tag_only` no
-  // bloquean, solo marcan la calidad del lead. Autoridad server-side (el botón es UX).
-  let emailQuality: 'verified' | 'suspect' | 'unknown' | null = null
-  let emailDomainClass: 'corporate' | 'personal' | 'disposable' | null = null
+  // TASK-1254/1263 — Gate de email por política del form (default OFF via flag), vía el helper
+  // canónico `evaluateFormEmailGate` (un primitive, muchos consumers: submitForm + las dos
+  // fachadas del grader). Tier 1 (gratis, síncrono) decide el gate; el veredicto Tier 2 es
+  // async y NO bloquea. `block_field` rechaza si el email no es corporativo/no-desechable;
+  // `warn`/`tag_only` no bloquean, solo marcan la calidad. Autoridad server-side (el botón es UX).
+  const emailGate = await evaluateFormEmailGate(version.validation_schema_json, normalizedFields)
+  const emailQuality = emailGate.gated ? emailGate.quality : null
+  const emailDomainClass = emailGate.gated ? emailGate.domainClass : null
 
-  if (isFormsEmailVerificationEnabled()) {
-    const policy = resolveEmailPolicy(version.validation_schema_json)
+  if (emailGate.gated && emailGate.rejected) {
+    // Registra el rechazo (sin PII: solo reason_class) para que el signal de rejection rate
+    // lo vea. La spike de este signal es la alerta canónica de "el gate corporativo está
+    // matando conversión" (risk matrix).
+    await insertRejectedSubmission({
+      formId: version.form_id,
+      formVersionId: version.form_version_id,
+      surfaceId,
+      reasonClass: emailGate.rejectionClass ?? 'email_not_corporate',
+      requestId: context.requestId ?? null,
+    }).catch(error => captureWithDomain(error, 'growth', { extra: { stage: 'email_gate_rejection_persist' } }))
 
-    if (policy.mode !== 'off') {
-      const emailValue = normalizedFields[policy.field]
-      const verdict = await verifyEmail(emailValue)
-
-      if (verdict.syntaxValid) {
-        emailDomainClass = verdict.isDisposable ? 'disposable' : verdict.isCorporate ? 'corporate' : 'personal'
-        emailQuality = verdict.quality
-
-        const failsCorporate = verdict.reasonCode === 'email_not_corporate' || verdict.reasonCode === 'email_disposable'
-
-        if (policy.mode === 'block_field' && failsCorporate) {
-          // Registra el rechazo (sin PII: solo reason_class) para que el signal de
-          // rejection rate lo vea. La spike de este signal es la alerta canónica de
-          // "el gate corporativo está matando conversión" (risk matrix).
-          const emailReasonClass = verdict.reasonCode === 'email_disposable' ? 'email_disposable' : 'email_not_corporate'
-
-          await insertRejectedSubmission({
-            formId: version.form_id,
-            formVersionId: version.form_version_id,
-            surfaceId,
-            reasonClass: emailReasonClass,
-            requestId: context.requestId ?? null,
-          }).catch(error => captureWithDomain(error, 'growth', { extra: { stage: 'email_gate_rejection_persist' } }))
-
-          return { outcome: 'invalid', reason: 'Usa el correo de tu empresa para continuar.' }
-        }
-      }
-    }
+    return { outcome: 'invalid', reason: 'Usa el correo de tu empresa para continuar.' }
   }
 
   // TASK-1255 — Cifrado at-rest de national_id (cédula), gated default OFF. Saca los

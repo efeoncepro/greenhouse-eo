@@ -34,6 +34,11 @@ export interface PublicGraderRunInput {
 export const PUBLIC_INTAKE_OUTCOMES = [
   'accepted',
   'invalid',
+  // TASK-1263 — gate de correo corporativo (TASK-1254 emailPolicy.block_field): el email no
+  // es de empresa (gratis/personal) o es temporal/desechable. Rechazo ANTES de aceptar/encolar
+  // → no gasta providers AI ni dispara el handoff. Sólo aplica con el flag de email ON + el
+  // grader-form con `emailPolicy`; default OFF = comportamiento legacy (acepta cualquier email).
+  'email_not_corporate',
   'captcha_failed',
   'rate_limited',
   'cost_blocked',

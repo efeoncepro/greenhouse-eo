@@ -26,6 +26,9 @@ const getClientIp = (request: Request): string | null =>
 const STATUS_BY_OUTCOME: Record<PublicIntakeOutcome, number> = {
   accepted: 202,
   invalid: 400,
+  // TASK-1263 — gate de correo corporativo: 422 (sintaxis válida, falla la regla de negocio),
+  // distinto del 400 de `invalid` (datos malformados) para que el cliente/observabilidad lo separe.
+  email_not_corporate: 422,
   captcha_failed: 403,
   rate_limited: 429,
   cost_blocked: 503,

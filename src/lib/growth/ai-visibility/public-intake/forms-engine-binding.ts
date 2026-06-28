@@ -21,8 +21,14 @@ import 'server-only'
  */
 
 import { GH_GROWTH_AI_VISIBILITY } from '@/lib/copy/growth'
+import { evaluateFormEmailGate } from '@/lib/growth/forms/email-verification'
 import { dedupeFingerprint } from '@/lib/growth/forms/hash'
-import { findRecentDuplicate, persistAcceptedSubmission } from '@/lib/growth/forms/store'
+import {
+  findRecentDuplicate,
+  getPublishedVersionBySlug,
+  insertRejectedSubmission,
+  persistAcceptedSubmission,
+} from '@/lib/growth/forms/store'
 import { captureWithDomain } from '@/lib/observability/capture'
 
 import { isPublicIntakeEnabled } from '../flags'
@@ -44,7 +50,12 @@ import { type PublicIntakeContext } from './create-public-run'
 
 // IDs pineados por la migración task-1251 (seed del grader como form gobernado).
 export const GRADER_FORM_ID = 'fdef-ai-visibility-grader'
+export const GRADER_FORM_SLUG = 'ai-visibility-grader'
 // TASK-1257 — v2: agrega firstName/lastName al field_schema. La v1 quedó deprecada (migración Slice 2).
+// TASK-1263 — fallback: la fachada resuelve la versión publicada vigente por slug en runtime
+// (espeja `submitForm`), así el `emailPolicy` + el FK anchor siguen a la versión publicada más
+// alta sin re-pinear un constante por cada publish. Este id es sólo el default defensivo si la
+// resolución por slug falla (no debería: el grader está sembrado publicado).
 export const GRADER_FORM_VERSION_ID = 'fver-ai-visibility-grader-v2'
 export const GRADER_SURFACE_ID = 'fhsf-ai-visibility-grader'
 export const GRADER_CONSENT_POLICY_VERSION = 'ai-visibility-grader-consent-v1'
@@ -127,8 +138,36 @@ export const createPublicGraderRunViaFormsEngine = async (
     return result(decision.outcome, null)
   }
 
+  // 3. Resolución de la versión publicada vigente (espeja `submitForm`): el FK anchor del
+  //    submission Y la `emailPolicy` del gate salen de la versión publicada más alta del slug,
+  //    no de un constante re-pineado. Default defensivo al constante si la resolución falla.
+  const version = await getPublishedVersionBySlug(GRADER_FORM_SLUG)
+  const formVersionId = version?.form_version_id ?? GRADER_FORM_VERSION_ID
+
+  // 4. Gate de correo corporativo (TASK-1254/1263), ANTES de aceptar/encolar → un correo no
+  //    corporativo/temporal NO persiste submission, NO encola run, NO dispara handoff (ahorra
+  //    costo AI). Default OFF (flag) ó `emailPolicy.mode='off'` → no opina. El email es PII:
+  //    el rechazo persiste sólo reason_class (sin email) para el signal `email_rejection_rate`.
+  const emailGate = await evaluateFormEmailGate(version?.validation_schema_json, { email: input.email.trim() })
+
+  if (emailGate.gated && emailGate.rejected) {
+    await insertRejectedSubmission({
+      formId: GRADER_FORM_ID,
+      formVersionId,
+      surfaceId: GRADER_SURFACE_ID,
+      reasonClass: emailGate.rejectionClass ?? 'email_not_corporate',
+      requestId: context.idempotencyKey ?? null,
+    }).catch(error => captureWithDomain(error, 'growth', { tags: { source: 'growth_ai_visibility_public_intake_forms_engine' } }))
+
+    await recordIntakeEvent({ ipHash, emailHash, runId: null, estimatedCostUsd: null, outcome: 'email_not_corporate' }).catch(
+      () => {},
+    )
+
+    return result('email_not_corporate', null)
+  }
+
   try {
-    // 3. Dedupe de doble-submit (ventana 60 min) — espeja `submitForm` del motor y el
+    // 5. Dedupe de doble-submit (ventana 60 min) — espeja `submitForm` del motor y el
     //    `idempotentHit` del path a-medida. NO crea segundo submission/run/lead/costo.
     const fingerprint = dedupeFingerprint(GRADER_FORM_ID, [input.email.trim(), context.idempotencyKey ?? ''])
     const duplicate = await findRecentDuplicate(GRADER_FORM_ID, fingerprint)
@@ -137,10 +176,12 @@ export const createPublicGraderRunViaFormsEngine = async (
       return result('accepted', duplicate.submission_id)
     }
 
-    // 4. Persistir submission gobernado del motor (submission + consent + outbox, in-tx).
+    // 6. Persistir submission gobernado del motor (submission + consent + outbox, in-tx). La
+    //    calidad del email (verified/suspect + corporate/personal/disposable) viaja al submission
+    //    como en `submitForm` (etiqueta el lead aunque la política no sea block_field).
     const submission = await persistAcceptedSubmission({
       formId: GRADER_FORM_ID,
-      formVersionId: GRADER_FORM_VERSION_ID,
+      formVersionId,
       surfaceId: GRADER_SURFACE_ID,
       pageUri: null,
       pageName: null,
@@ -149,6 +190,8 @@ export const createPublicGraderRunViaFormsEngine = async (
       dedupeFingerprint: fingerprint,
       requestId: context.idempotencyKey ?? null,
       ipHash,
+      emailQuality: emailGate.gated ? emailGate.quality : null,
+      emailDomainClass: emailGate.gated ? emailGate.domainClass : null,
       consent: {
         consentPolicyVersion: GRADER_CONSENT_POLICY_VERSION,
         checkboxes: [],

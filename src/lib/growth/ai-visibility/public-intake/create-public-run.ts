@@ -15,6 +15,9 @@ import 'server-only'
  */
 
 import { GH_GROWTH_AI_VISIBILITY } from '@/lib/copy/growth'
+import { evaluateFormEmailGate } from '@/lib/growth/forms/email-verification'
+import { isFormsEmailVerificationEnabled } from '@/lib/growth/forms/flags'
+import { getPublishedVersionBySlug } from '@/lib/growth/forms/store'
 import { captureWithDomain } from '@/lib/observability/capture'
 
 import { enqueueGraderDiagnostic } from '../commands'
@@ -98,6 +101,26 @@ export const createPublicGraderRun = async (
     )
 
     return result(decision.outcome, null)
+  }
+
+  // 2.5 Gate de correo corporativo (TASK-1254/1263), ANTES de encolar → un correo no
+  //     corporativo/temporal NO encola run ni crea lead (ahorra costo AI). La política sale de
+  //     la versión publicada del grader-form ('ai-visibility-grader' slug). La resolución de la
+  //     versión (1 query) queda detrás del flag para NO pegarle a la DB en cada submit con el
+  //     gate apagado (default prod hasta TASK-1246). `emailPolicy.mode='off'` → no opina. El
+  //     rechazo del path a-medida se observa por su log nativo `grader_intake_events` (outcome
+  //     'email_not_corporate'); el signal `email_rejection_rate` (form_submission) cubre forms-engine.
+  if (isFormsEmailVerificationEnabled()) {
+    const publishedVersion = await getPublishedVersionBySlug('ai-visibility-grader')
+    const emailGate = await evaluateFormEmailGate(publishedVersion?.validation_schema_json, { email: input.email.trim() })
+
+    if (emailGate.gated && emailGate.rejected) {
+      await recordIntakeEvent({ ipHash, emailHash, runId: null, estimatedCostUsd: null, outcome: 'email_not_corporate' }).catch(
+        () => {}
+      )
+
+      return result('email_not_corporate', null)
+    }
   }
 
   // 3. Encolar el run (worker async, NO inline). EMAIL NUNCA viaja acá.

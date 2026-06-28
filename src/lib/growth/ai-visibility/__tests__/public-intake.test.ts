@@ -5,10 +5,17 @@ import { type PublicGraderRunInput } from '../public-intake/contracts'
 
 // ── Mocks ─────────────────────────────────────────────────────────────────────
 
+import type { EmailGateVerdict } from '@/lib/growth/forms/email-verification'
+
+const NOT_GATED: EmailGateVerdict = { gated: false, rejected: false, rejectionClass: null, quality: null, domainClass: null }
+
 const state = {
   intakeEnabled: true,
   abuse: { allowed: true, outcome: null as null | 'rate_limited' | 'cost_blocked' },
-  idempotentHit: false
+  idempotentHit: false,
+  // TASK-1263 — gate de correo corporativo (default OFF = legacy, no toca el grader-form).
+  emailFlag: false,
+  gate: NOT_GATED as EmailGateVerdict
 }
 
 const spies = {
@@ -19,6 +26,18 @@ const spies = {
 
 vi.mock('../flags', () => ({
   isPublicIntakeEnabled: () => state.intakeEnabled
+}))
+
+vi.mock('@/lib/growth/forms/flags', () => ({
+  isFormsEmailVerificationEnabled: () => state.emailFlag
+}))
+
+vi.mock('@/lib/growth/forms/store', () => ({
+  getPublishedVersionBySlug: async () => ({ form_version_id: 'fver-ai-visibility-grader-v3', validation_schema_json: {} })
+}))
+
+vi.mock('@/lib/growth/forms/email-verification', () => ({
+  evaluateFormEmailGate: async () => state.gate
 }))
 
 vi.mock('../commands', () => ({
@@ -74,6 +93,8 @@ beforeEach(() => {
   state.intakeEnabled = true
   state.abuse = { allowed: true, outcome: null }
   state.idempotentHit = false
+  state.emailFlag = false
+  state.gate = NOT_GATED
   spies.enqueue.mockClear()
   spies.insertLead.mockClear()
   spies.recordEvent.mockClear()
@@ -150,5 +171,36 @@ describe('growth/ai-visibility — public run intake (TASK-1240)', () => {
     expect(res.outcome).toBe('accepted')
     expect(spies.insertLead).not.toHaveBeenCalled()
     expect(spies.recordEvent).not.toHaveBeenCalled()
+  })
+
+  it('TASK-1263 — flag OFF (default prod): NO resuelve versión ni gateaa, encola normal', async () => {
+    // emailFlag=false → el guard salta la resolución de versión (no DB read en el hot path).
+    const { createPublicGraderRun } = await import('../public-intake/create-public-run')
+    const res = await createPublicGraderRun(baseInput, { ip: '1.2.3.4', captchaToken: 't', verifier: okVerifier })
+
+    expect(res.outcome).toBe('accepted')
+    expect(spies.enqueue).toHaveBeenCalledOnce()
+  })
+
+  it('TASK-1263 — flag ON + gate rechaza (gmail/temporal) → email_not_corporate, NO encola ni crea lead', async () => {
+    state.emailFlag = true
+    state.gate = { gated: true, rejected: true, rejectionClass: 'email_not_corporate', quality: 'suspect', domainClass: 'personal' }
+    const { createPublicGraderRun } = await import('../public-intake/create-public-run')
+    const res = await createPublicGraderRun(baseInput, { ip: '1.2.3.4', captchaToken: 't', verifier: okVerifier })
+
+    expect(res.outcome).toBe('email_not_corporate')
+    expect(spies.enqueue).not.toHaveBeenCalled() // ahorra costo AI: no encola el run
+    expect(spies.insertLead).not.toHaveBeenCalled()
+    expect(spies.recordEvent).toHaveBeenCalledWith(expect.objectContaining({ outcome: 'email_not_corporate' }))
+  })
+
+  it('TASK-1263 — flag ON + gate pasa (corporativo) → accepted, encola normal', async () => {
+    state.emailFlag = true
+    state.gate = { gated: true, rejected: false, rejectionClass: null, quality: 'verified', domainClass: 'corporate' }
+    const { createPublicGraderRun } = await import('../public-intake/create-public-run')
+    const res = await createPublicGraderRun(baseInput, { ip: '1.2.3.4', captchaToken: 't', verifier: okVerifier })
+
+    expect(res.outcome).toBe('accepted')
+    expect(spies.enqueue).toHaveBeenCalledOnce()
   })
 })

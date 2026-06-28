@@ -11,15 +11,25 @@ import { type PublicGraderRunInput } from '../public-intake/contracts'
  * captcha/abuse/dedupe/accepted) + el invariante PII (email va al submission, no se encola).
  */
 
+import type { EmailGateVerdict } from '@/lib/growth/forms/email-verification'
+
+const NOT_GATED: EmailGateVerdict = { gated: false, rejected: false, rejectionClass: null, quality: null, domainClass: null }
+
 const state = {
   intakeEnabled: true,
   abuse: { allowed: true, outcome: null as null | 'rate_limited' | 'cost_blocked' },
   duplicate: null as { submission_id: string } | null,
+  // TASK-1263 — versión publicada resuelta por slug (FK anchor + emailPolicy) y veredicto del gate.
+  publishedVersion: { form_version_id: 'fver-ai-visibility-grader-v2', validation_schema_json: {} } as
+    | { form_version_id: string; validation_schema_json: unknown }
+    | null,
+  gate: NOT_GATED as EmailGateVerdict,
 }
 
 const spies = {
   persist: vi.fn(),
   recordEvent: vi.fn(),
+  rejected: vi.fn(),
 }
 
 vi.mock('../flags', () => ({
@@ -40,8 +50,18 @@ vi.mock('@/lib/growth/forms/hash', () => ({
   dedupeFingerprint: () => 'fp-test',
 }))
 
+vi.mock('@/lib/growth/forms/email-verification', () => ({
+  evaluateFormEmailGate: async () => state.gate,
+}))
+
 vi.mock('@/lib/growth/forms/store', () => ({
+  getPublishedVersionBySlug: async () => state.publishedVersion,
   findRecentDuplicate: async () => state.duplicate,
+  insertRejectedSubmission: async (input: unknown) => {
+    spies.rejected(input)
+
+    return { submission_id: 'fsub-REJ' }
+  },
   persistAcceptedSubmission: async (input: unknown) => {
     spies.persist(input)
 
@@ -73,8 +93,11 @@ beforeEach(() => {
   state.intakeEnabled = true
   state.abuse = { allowed: true, outcome: null }
   state.duplicate = null
+  state.publishedVersion = { form_version_id: 'fver-ai-visibility-grader-v2', validation_schema_json: {} }
+  state.gate = NOT_GATED
   spies.persist.mockClear()
   spies.recordEvent.mockClear()
+  spies.rejected.mockClear()
 })
 
 describe('TASK-1251 — createPublicGraderRunViaFormsEngine (fachada del motor)', () => {
@@ -141,5 +164,40 @@ describe('TASK-1251 — createPublicGraderRunViaFormsEngine (fachada del motor)'
     expect((persistArg.normalizedFields as Record<string, unknown>).lastName).toBe('Pérez')
     expect((persistArg.consent as Record<string, unknown>).consentPolicyVersion).toBe('ai-visibility-grader-consent-v1')
     expect(spies.recordEvent).toHaveBeenCalledWith(expect.objectContaining({ outcome: 'accepted' }))
+  })
+
+  it('TASK-1263 — gate rechaza (gmail/temporal) → email_not_corporate, NO persiste, registra rechazo + evento', async () => {
+    state.gate = { gated: true, rejected: true, rejectionClass: 'email_not_corporate', quality: 'suspect', domainClass: 'personal' }
+    const { createPublicGraderRunViaFormsEngine } = await import('../public-intake/forms-engine-binding')
+    const res = await createPublicGraderRunViaFormsEngine(baseInput, { ip: '1.2.3.4', captchaToken: 't', verifier: okVerifier })
+
+    expect(res.outcome).toBe('email_not_corporate')
+    expect(spies.persist).not.toHaveBeenCalled() // NO acepta el lead ni encola → no gasta AI
+    expect(spies.rejected).toHaveBeenCalledWith(expect.objectContaining({ reasonClass: 'email_not_corporate' }))
+    expect(spies.recordEvent).toHaveBeenCalledWith(expect.objectContaining({ outcome: 'email_not_corporate' }))
+  })
+
+  it('TASK-1263 — gate pasa (corporativo) → accepted + persiste con email_quality/domain_class', async () => {
+    state.gate = { gated: true, rejected: false, rejectionClass: null, quality: 'verified', domainClass: 'corporate' }
+    const { createPublicGraderRunViaFormsEngine } = await import('../public-intake/forms-engine-binding')
+    const res = await createPublicGraderRunViaFormsEngine(baseInput, { ip: '1.2.3.4', captchaToken: 't', verifier: okVerifier })
+
+    expect(res.outcome).toBe('accepted')
+    const persistArg = spies.persist.mock.calls[0][0] as Record<string, unknown>
+
+    expect(persistArg.emailQuality).toBe('verified')
+    expect(persistArg.emailDomainClass).toBe('corporate')
+    expect(spies.rejected).not.toHaveBeenCalled()
+  })
+
+  it('TASK-1263 — el FK anchor sigue a la versión publicada resuelta por slug (no un constante)', async () => {
+    state.publishedVersion = { form_version_id: 'fver-ai-visibility-grader-v3', validation_schema_json: {} }
+    const { createPublicGraderRunViaFormsEngine } = await import('../public-intake/forms-engine-binding')
+
+    await createPublicGraderRunViaFormsEngine(baseInput, { ip: '1.2.3.4', captchaToken: 't', verifier: okVerifier })
+
+    const persistArg = spies.persist.mock.calls[0][0] as Record<string, unknown>
+
+    expect(persistArg.formVersionId).toBe('fver-ai-visibility-grader-v3')
   })
 })

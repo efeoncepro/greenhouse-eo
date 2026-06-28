@@ -8,6 +8,8 @@ import 'server-only'
  */
 export { verifyEmail } from './orchestrator'
 export type { EmailVerificationResult, EmailVerificationReasonCode, EmailQuality } from './orchestrator'
+export { evaluateFormEmailGate } from './gate'
+export type { EmailGateVerdict, EmailGateRejectionClass } from './gate'
 export {
   resolveVerificationProvider,
   noopVerificationProvider,

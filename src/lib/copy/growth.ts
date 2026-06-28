@@ -177,10 +177,15 @@ export const GH_GROWTH_AI_VISIBILITY = {
     accepted: 'Estamos preparando tu análisis. En unos minutos estará listo.',
     disabled: 'El análisis público no está disponible por ahora.',
     invalid: 'Revisa los datos: marca, sitio, mercado, categoría, un email válido y aceptar los términos.',
+    // TASK-1263 — rechazo del gate de correo corporativo (TASK-1254): correo personal/gratis o temporal.
+    email_not_corporate: 'Usa el correo de tu empresa para continuar. No aceptamos correos personales ni temporales.',
     captcha_failed: 'No pudimos verificar que no eres un robot. Recarga la página e intenta de nuevo.',
     rate_limited: 'Alcanzaste el límite de análisis por hoy. Intenta de nuevo mañana.',
     cost_blocked: 'Estamos con mucha demanda en este momento. Intenta de nuevo en unos minutos.'
-  } satisfies Record<'accepted' | 'disabled' | 'invalid' | 'captcha_failed' | 'rate_limited' | 'cost_blocked', string>,
+  } satisfies Record<
+    'accepted' | 'disabled' | 'invalid' | 'email_not_corporate' | 'captcha_failed' | 'rate_limited' | 'cost_blocked',
+    string
+  >,
 
   // Status público del run por poll (TASK-1245): mensajes es-CL honestos, sin razones internas
   // (review_required nunca revela el porqué). Cliente público del lead magnet.
