@@ -309,3 +309,7 @@ Ver el wireframe. La UI envuelve el workbench de TASK-1248 con un banner de tier
 
 - ¿El primer run de trial pide un intake liviano de dominio si la org no tiene `grader_profile`? (depende de la decisión de TASK-1277).
 - Número trial visible (1 vs 3): se toma de la config de TASK-1277.
+
+## Delta 2026-06-28 — conectada al Master UI Flow del programa AEO
+
+- Esta task es el nodo **S6** — tiering cliente + PLG trial (teaser/locked/trial/upsell) del flujo cross-surface del programa AEO. Su UI/flujo se conecta con todas las demás superficies (público → email/PDF → portal cliente tiers/PLG → operador cross-sell → Account 360) en el doc maestro **`docs/ui/flows/EPIC-020-AEO-PROGRAM-UI-FLOW.md`** (info-architecture + state-design + ux-writing + modern-ui). Toda UI del programa renderiza el `ReportArtifactModel` compartido (TASK-1252) y deriva su visibilidad del **entitlement** (TASK-1277), nunca del rol; cada acción mapea a un command gobernado (Full API Parity → Nexa por construcción).

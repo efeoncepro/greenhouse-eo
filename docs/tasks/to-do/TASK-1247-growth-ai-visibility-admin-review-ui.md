@@ -25,6 +25,10 @@ El backend del gate humano ya existe — esta UI es cliente puro de él (Full AP
 - Type: `implementation`
 - Execution profile: `ui-ux`
 - UI impact: `flow`
+- UI ready: `no`
+- Wireframe: `docs/ui/wireframes/TASK-1247-growth-ai-visibility-admin-review-ui.md`
+- Flow: `docs/ui/flows/TASK-1247-growth-ai-visibility-admin-review-ui-flow.md`
+- Motion: `docs/ui/motion/TASK-1247-growth-ai-visibility-admin-review-ui-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-020`
 - Status real: `Diseno`
@@ -403,3 +407,7 @@ Slice 1 -> Slice 2 -> Slice 3 -> Slice 4. No conectar acciones antes de tener es
 ## Open Questions
 
 1. ¿La surface vive como ruta dedicada `/review` o dentro del detalle de run existente? Propuesta: ruta dedicada con deep-link al detalle.
+
+## Delta 2026-06-28 — conectada al Master UI Flow del programa AEO
+
+- Esta task es el nodo **S13** — Admin Review UI (gate pre-publicación) del flujo cross-surface del programa AEO. Su UI/flujo se conecta con todas las demás superficies (público → email/PDF → portal cliente tiers/PLG → operador cross-sell → Account 360) en el doc maestro **`docs/ui/flows/EPIC-020-AEO-PROGRAM-UI-FLOW.md`** (info-architecture + state-design + ux-writing + modern-ui). Toda UI del programa renderiza el `ReportArtifactModel` compartido (TASK-1252) y deriva su visibilidad del **entitlement** (TASK-1277), nunca del rol; cada acción mapea a un command gobernado (Full API Parity → Nexa por construcción).

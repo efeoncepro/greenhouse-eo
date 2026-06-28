@@ -43,6 +43,10 @@ Cuando el flag `GROWTH_GRADER_INTAKE_ON_FORMS_ENGINE_ENABLED` esté ON (converge
 - Type: `implementation`
 - Execution profile: `ui-ux`
 - UI impact: `flow`
+- UI ready: `no`
+- Wireframe: `docs/ui/wireframes/TASK-1241-growth-ai-visibility-public-lead-magnet-page.md`
+- Flow: `docs/ui/flows/TASK-1241-growth-ai-visibility-public-lead-magnet-page-flow.md`
+- Motion: `docs/ui/motion/TASK-1241-growth-ai-visibility-public-lead-magnet-page-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-020`
 - Status real: `Diseno`
@@ -353,3 +357,7 @@ La página es **cliente puro** de los endpoints públicos: form → `POST /run` 
 
 1. **¿Dónde se hospeda la página?** Next.js public route en greenhouse-eo (más simple, reusa primitives + endpoints) vs WordPress/Kinsta (sitio marketing, EPIC-019). Decidir en Discovery con EPIC-019 (la decisión Astro/Next/WordPress del arch sigue abierta).
 2. ¿El flujo muestra el reporte inline tras el poll, o envía el link del snapshot por email (o ambos)? V1 sugerido: inline + email. **La entrega por email (cuerpo breve + link tokenizado + adjunto public-safe) la implementa `TASK-1250`** (consumer del mismo delivery state de `TASK-1245`); esta página es el consumer en pantalla. Ambos comparten el `reportToken`.
+
+## Delta 2026-06-28 — conectada al Master UI Flow del programa AEO
+
+- Esta task es el nodo **S1** — Lead Magnet Page + intake público del flujo cross-surface del programa AEO. Su UI/flujo se conecta con todas las demás superficies (público → email/PDF → portal cliente tiers/PLG → operador cross-sell → Account 360) en el doc maestro **`docs/ui/flows/EPIC-020-AEO-PROGRAM-UI-FLOW.md`** (info-architecture + state-design + ux-writing + modern-ui). Toda UI del programa renderiza el `ReportArtifactModel` compartido (TASK-1252) y deriva su visibilidad del **entitlement** (TASK-1277), nunca del rol; cada acción mapea a un command gobernado (Full API Parity → Nexa por construcción).

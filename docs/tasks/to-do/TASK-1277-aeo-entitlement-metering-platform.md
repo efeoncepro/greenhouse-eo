@@ -318,3 +318,7 @@ El chokepoint es el único punto de entrada de runs de portal; reusa el cost cei
 - ¿El trial run auto-provisiona el `grader_profile` desde el dominio de la org, o pide un intake liviano (dominio/categoría) la primera vez? (afecta UX de TASK-1278).
 - Número trial definitivo (1 vs 3/mes) + tope global: decisión comercial.
 - ¿El tier contratado define allowance por cadencia (TASK-1270) o también on-demand dentro de fair-use?
+
+## Delta 2026-06-28 — conectada al Master UI Flow del programa AEO
+
+- Esta task es el nodo **gate de resolución de superficie por entitlement/tier** (decide qué muestra cada superficie cliente) del flujo cross-surface del programa AEO. Su UI/flujo se conecta con todas las demás superficies (público → email/PDF → portal cliente tiers/PLG → operador cross-sell → Account 360) en el doc maestro **`docs/ui/flows/EPIC-020-AEO-PROGRAM-UI-FLOW.md`** (info-architecture + state-design + ux-writing + modern-ui). Toda UI del programa renderiza el `ReportArtifactModel` compartido (TASK-1252) y deriva su visibilidad del **entitlement** (TASK-1277), nunca del rol; cada acción mapea a un command gobernado (Full API Parity → Nexa por construcción).

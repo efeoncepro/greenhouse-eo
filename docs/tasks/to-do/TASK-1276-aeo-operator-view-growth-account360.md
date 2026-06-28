@@ -337,3 +337,7 @@ Ver el wireframe + flow contract declarados. El detalle por-cliente reusa el `ma
 
 - ¿El detalle operador usa un reader operador-scoped distinto del client-scoped (TASK-1243)? Resolver en Discovery.
 - ¿El cockpit cross-cliente necesita su propio reader agregado de scores por org? Resolver en Discovery.
+
+## Delta 2026-06-28 — conectada al Master UI Flow del programa AEO
+
+- Esta task es el nodo **S8/S9/S10/S11/S12** — vista operador (cockpit, detalle, run, enviar+oportunidad, Account 360 facet) del flujo cross-surface del programa AEO. Su UI/flujo se conecta con todas las demás superficies (público → email/PDF → portal cliente tiers/PLG → operador cross-sell → Account 360) en el doc maestro **`docs/ui/flows/EPIC-020-AEO-PROGRAM-UI-FLOW.md`** (info-architecture + state-design + ux-writing + modern-ui). Toda UI del programa renderiza el `ReportArtifactModel` compartido (TASK-1252) y deriva su visibilidad del **entitlement** (TASK-1277), nunca del rol; cada acción mapea a un command gobernado (Full API Parity → Nexa por construcción).

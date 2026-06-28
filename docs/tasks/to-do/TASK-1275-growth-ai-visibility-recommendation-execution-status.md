@@ -286,3 +286,7 @@ not_started <-> in_progress <-> done
 
 - Lane del API del command (`Product API interna` vs `api/platform/app`): resolver en Discovery.
 - ¿`reason` obligatorio al `dismissed`? (probable sí, para trazabilidad del descarte).
+
+## Delta 2026-06-28 — conectada al Master UI Flow del programa AEO
+
+- Esta task es el nodo **S7** — Plan AEO status (data que surfacean S5/S7) del flujo cross-surface del programa AEO. Su UI/flujo se conecta con todas las demás superficies (público → email/PDF → portal cliente tiers/PLG → operador cross-sell → Account 360) en el doc maestro **`docs/ui/flows/EPIC-020-AEO-PROGRAM-UI-FLOW.md`** (info-architecture + state-design + ux-writing + modern-ui). Toda UI del programa renderiza el `ReportArtifactModel` compartido (TASK-1252) y deriva su visibilidad del **entitlement** (TASK-1277), nunca del rol; cada acción mapea a un command gobernado (Full API Parity → Nexa por construcción).

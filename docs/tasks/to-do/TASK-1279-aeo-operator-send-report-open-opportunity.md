@@ -278,3 +278,7 @@ El command es el único camino de envío+oportunidad operator-triggered. Reusa e
 ## Open Questions
 
 - ¿El `consentRef` apunta a un registro de consentimiento existente (HubSpot/contacto) o se captura en el momento del envío? (definir en Discovery con comercial/legal).
+
+## Delta 2026-06-28 — conectada al Master UI Flow del programa AEO
+
+- Esta task es el nodo **S11** — command enviar informe + abrir oportunidad del flujo cross-surface del programa AEO. Su UI/flujo se conecta con todas las demás superficies (público → email/PDF → portal cliente tiers/PLG → operador cross-sell → Account 360) en el doc maestro **`docs/ui/flows/EPIC-020-AEO-PROGRAM-UI-FLOW.md`** (info-architecture + state-design + ux-writing + modern-ui). Toda UI del programa renderiza el `ReportArtifactModel` compartido (TASK-1252) y deriva su visibilidad del **entitlement** (TASK-1277), nunca del rol; cada acción mapea a un command gobernado (Full API Parity → Nexa por construcción).
