@@ -29,7 +29,7 @@
 
 ## Summary
 
-Convierte AEO de "un viewCode prendido a todos los roles cliente" (error de plano de TASK-1248) a un **servicio con entitlement por organización + run gobernado y metered**: un solo motor, tres puertas — público (lead magnet, ya existe), **contratado** (Grupo Berel, parte del servicio), y **trial PLG** (clientes existentes sin AEO reciben 1–3 revisiones/mes self-serve, con cap mensual + tope global de costo). El corazón es un **chokepoint gobernado de run** (`requestGraderRunForOrganization`) que chequea entitlement + ventana + allowance ANTES de incurrir costo.
+Convierte AEO de "un viewCode prendido a todos los roles cliente" (error de plano de TASK-1248) a un **servicio con entitlement por organización + run gobernado y metered**: un solo motor, **cuatro puertas** — público (lead magnet, ya existe), **contratado** (Grupo Berel, parte del servicio), **trial PLG** (clientes existentes sin AEO reciben 1–3 revisiones/mes self-serve, con cap mensual + tope global de costo) y **operador** (Growth/AM corre el motor sobre cualquier cliente o **prospecto HubSpot** como jugada de venta — capability-gated, **sin tope** (ilimitado), costo atribuido a "sales"). El corazón es un **chokepoint gobernado de run** que chequea entitlement + ventana + allowance ANTES de incurrir costo: `requestGraderRunForOrganization` (puertas cliente) y `requestGraderRunAsOperator` (puerta operador).
 
 ## Why This Task Exists
 
@@ -39,7 +39,8 @@ El motor del grader cuesta dinero real por run (~$0.10–0.15 light, ceiling $0.
 
 - AEO modelado como **módulo del portal** (`ai_visibility_v1`) gateado por `module_assignments` per-org, no por rol. Revertir el grant por-rol de TASK-1248.
 - **Chokepoint gobernado de run** que aplica, en todas las puertas de portal: entitlement → ventana (`expires_at`) → allowance (cupo) → costo. Self-serve nunca saltea el cupo.
-- Tres tiers provisionables: **contratado** (Berel, cadencia/contrato), **trial PLG** (1–3 runs/mes, reset mensual, tope global), **pilot** (AM, acotado). Grupo Berel = `active`; clientes existentes = trial default.
+- Tiers provisionables: **contratado** (Berel, cadencia/contrato), **trial PLG** (1–3 runs/mes, reset mensual, tope global), **pilot** (AM, acotado). Grupo Berel = `active`; clientes existentes = trial default.
+- **Puerta operador (4.ª)**: `requestGraderRunAsOperator` permite a Growth/AM correr el motor sobre cualquier cliente **o prospecto (org tipo prospect sincronizada de HubSpot company, TASK-706)** — capability `growth.ai_visibility.run.operator`, **ilimitado** (sin tope), costo atribuido a "sales", NO al allowance del cliente. Habilita el cross-sell de TASK-1276/1279.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 1 — CONTEXT & CONSTRAINTS
@@ -199,7 +200,8 @@ Reglas obligatorias:
 
 - `requestGraderRunForOrganization({ organizationId, requestedBy })`: gate entitlement → expiry → allowance → costo; consume allowance atómico; enqueue vía `enqueueGraderDiagnostic`; atribución `organization_id` en `grader_runs`.
 - Route `POST /api/client-portal/growth/ai-visibility/run` (capability + módulo) → chokepoint.
-- Capability + grant del run de portal (mismo PR) + coverage.
+- **Puerta operador**: `requestGraderRunAsOperator({ subjectOrganizationId, requestedBy })` (sujeto = cliente o prospecto org-sincronizada de HubSpot) — capability `growth.ai_visibility.run.operator`, **sin allowance/tope** (ilimitado), costo atribuido a "sales"; reusa el mismo enqueue + cost ceiling por-run. Route operador interna `[verificar lane]`.
+- Capability + grant del run de portal **y** del run operador (mismo PR) + coverage.
 
 ### Slice 4 — Provisión: Berel + trial default + commercial hook
 

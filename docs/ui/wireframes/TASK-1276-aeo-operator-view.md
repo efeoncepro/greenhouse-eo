@@ -27,6 +27,10 @@
 | 2 | Navigator (aside) | Dimensiones + Plan AEO (focos) del cliente seleccionado | `CompositionShell` masterDetail | report model |
 | 3 | Detail (primary) | Detalle del foco: diagnóstico + charts + **control de status** (write) | report-artifact view + status control | TASK-1275 command/reader |
 | 4 | Account 360 facet | Tile "AEO" en el Organization Workspace → deep-link al detalle del cliente | facet del workspace | org workspace projection |
+| 5 | Subject picker | elegir target: cliente contratado / sin AEO / prospecto HubSpot | combobox + búsqueda | reader orgs + prospectos (TASK-706) |
+| 6 | Run CTA (operador) | "Correr AEO" sobre el target (puerta operador, ilimitado) | `GreenhouseButton` | `requestGraderRunAsOperator` (TASK-1277) |
+| 7 | Foco competitivo | marca vs competidores / share of voice (gancho de venta) | charts del report | report model |
+| 8 | Send + opportunity | "Enviar informe + abrir oportunidad" — recipient + consent (prospecto) + confirm | confirm surface | `sendAeoReportAndOpenOpportunity` (TASK-1279) |
 
 ## Copy Ledger
 
@@ -37,6 +41,10 @@
 | `growth.aeo.operator.status.done` | 3 | Hecho | — | |
 | `growth.aeo.operator.status.dismissed` | 3 | Descartado | reason | requiere motivo |
 | `growth.aeo.account360.facet.title` | 4 | AEO | — | facet Account 360 |
+| `growth.aeo.operator.run.cta` | 6 | Correr AEO | — | puerta operador |
+| `growth.aeo.operator.send.cta` | 8 | Enviar informe + abrir oportunidad | — | consume TASK-1279 |
+| `growth.aeo.operator.send.consent_required` | 8 | Registra el consentimiento del contacto para enviar | — | prospecto, NUNCA cold send |
+| `growth.aeo.operator.send.sent` | 8 | Informe enviado · oportunidad abierta | deal link | éxito |
 
 ## State Copy
 

@@ -22,14 +22,14 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `ui`
-- Blocked by: `TASK-1275`
+- Blocked by: `TASK-1275, TASK-1277, TASK-1279`
 - Branch: `task/TASK-1276-aeo-operator-view-growth-account360`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
 ## Summary
 
-Vista **operador** del AEO de un cliente, fuera de `/admin`: un cockpit cross-cliente en **Growth** (`/growth/aeo`) + el detalle por-cliente (`/growth/aeo/[organizationId]`), también alcanzable como **facet "AEO" en el Account 360** (Organization Workspace). Reusa la `masterDetail` CompositionShell + el report model de TASK-1248 y agrega el control de **estado de ejecución del Plan AEO** (write del command de TASK-1275). Es la contraparte interna de la vista cliente read-only `/aeo`.
+Vista **operador** del AEO, fuera de `/admin`: un cockpit en **Growth** (`/growth/aeo`) + detalle por-sujeto (`/growth/aeo/[organizationId]`), también alcanzable como **facet "AEO" en el Account 360**. Reusa la `masterDetail` CompositionShell + el report model de TASK-1248. Hace dos cosas: (1) **gestión** del Plan AEO de clientes contratados (control de estado, write del command de TASK-1275); (2) **arma de cross-sell/prospección** — el operador elige un target (cliente sin AEO **o prospecto HubSpot**), corre el motor (puerta operador de TASK-1277), ve la **brecha competitiva**, y **envía el informe + abre oportunidad** (command de TASK-1279). Lee informes de clientes **y prospectos**.
 
 ## Why This Task Exists
 
@@ -40,6 +40,7 @@ El operador presta el servicio AEO pero hoy no tiene una superficie propia para 
 - Cockpit Growth/AEO cross-cliente (`/growth/aeo`) + detalle por-cliente (`/growth/aeo/[organizationId]`), viewCode interno (NUNCA `client_*`), reachable por nav.
 - Facet "AEO" en el Organization Workspace (Account 360) que deep-linkea al detalle por-cliente.
 - Control de estado de ejecución del Plan AEO (write del command TASK-1275) integrado en el detail canvas, reusando la `masterDetail` CompositionShell + el report model.
+- **Cross-sell/prospección**: subject picker (clientes contratados + clientes sin AEO + **prospectos HubSpot**), **correr el motor** sobre el target (puerta operador TASK-1277), **foco competitivo** (marca vs competidores), y acción **"Enviar informe + abrir oportunidad"** (consume el command de TASK-1279 vía `propose→confirm→execute`, con **captura de consentimiento** para prospectos).
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 1 — CONTEXT & CONSTRAINTS
@@ -73,9 +74,11 @@ Reglas obligatorias:
 
 ### Depends on
 
-- **TASK-1275** (command/reader de estado de ejecución) — bloqueante para el write.
+- **TASK-1275** (command/reader de estado de ejecución) — bloqueante para el write del Plan AEO.
+- **TASK-1277** (puerta operador `requestGraderRunAsOperator` + sujeto org/prospecto + entitlement) — bloqueante para correr el motor.
+- **TASK-1279** (command `sendAeoReportAndOpenOpportunity` + consent + HubSpot deal) — bloqueante para enviar + abrir oportunidad.
 - TASK-1248 (report model `modelFromClientReport` + `masterDetail` shell) — existe.
-- Organization Workspace projection / facets (Account 360) — `docs/architecture/agent-invariants/ORG_CLIENT_AGENT_INVARIANTS.md`.
+- Organization Workspace projection / facets (Account 360) + prospectos org-sincronizados de HubSpot (TASK-706) — `docs/architecture/agent-invariants/ORG_CLIENT_AGENT_INVARIANTS.md`.
 
 ### Blocks / Impacts
 
@@ -228,9 +231,20 @@ Reglas obligatorias:
 
 - Tile "AEO" en el Organization Workspace con deep-link al detalle por-cliente.
 
-### Slice 5 — GVC + cierre
+### Slice 5 — Cross-sell: subject picker + run operador + foco competitivo
 
-- Scenario `growth-aeo-operator`; GVC desktop + mobile mirado; gates + docs.
+- Subject picker (clientes contratados + clientes sin AEO + prospectos HubSpot org-sincronizados).
+- Acción "Correr AEO" sobre el target (consume `requestGraderRunAsOperator` de TASK-1277); estados preparando/ready/error.
+- Detalle con **foco competitivo** (marca vs competidores / share of voice) como gancho de venta.
+
+### Slice 6 — Enviar informe + abrir oportunidad (consume TASK-1279)
+
+- Acción "Enviar + abrir oportunidad": recipient picker + **captura de consentimiento** (prospecto) + confirmación `propose→confirm→execute` → llama `sendAeoReportAndOpenOpportunity` (TASK-1279).
+- Estados: consent requerido, enviado, deal abierto/vinculado, error honesto.
+
+### Slice 7 — GVC + cierre
+
+- Scenario `growth-aeo-operator`; GVC desktop + mobile mirado (gestión + cross-sell + envío); gates + docs.
 
 ## Out of Scope
 

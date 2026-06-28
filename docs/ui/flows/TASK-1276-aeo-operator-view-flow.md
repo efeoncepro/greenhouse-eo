@@ -77,13 +77,31 @@
 
 ## Data & Command Boundaries
 
-- Readers: reader del reporte operador-scoped `[verificar]` + `readRecommendationStatuses` (TASK-1275)
-- Commands: `setRecommendationStatus` (TASK-1275, gobernado)
-- API routes: ruta del command (lane `[verificar]`)
-- Optimistic updates: opcional (write rápido + rollback); decidir en Discovery
-- Cache / invalidation: revalidar el detalle tras el write
-- Audit / signals: audit append-only + outbox (TASK-1275)
-- Tenant / access boundary: operador solo ve/escribe orgs en su scope; capability para el write
+- Readers: reader del reporte operador-scoped `[verificar]` (clientes **y prospectos**) + `readRecommendationStatuses` (TASK-1275)
+- Commands: `setRecommendationStatus` (TASK-1275) · `requestGraderRunAsOperator` (TASK-1277, run sobre cliente/prospecto) · `sendAeoReportAndOpenOpportunity` (TASK-1279, envío + deal)
+- API routes: rutas de los commands (lane `[verificar]`)
+- Optimistic updates: opcional (status); el run y el envío NO son optimistic (esperan resultado)
+- Cache / invalidation: revalidar el detalle tras el write/run
+- Audit / signals: audit append-only + outbox (TASK-1275/1279); send log con consentimiento (TASK-1279)
+- Tenant / access boundary: operador solo ve/escribe orgs en su scope; capabilities `…recommendation.set_status`, `…run.operator`, `…opportunity.open`
+
+## Cross-Sell Extension — run operador + envío + consentimiento (amendment TASK-1276)
+
+Surfaces adicionales (sobre el detalle operador):
+
+| Surface | Role | Desktop | Compact | Primitive |
+|---|---|---|---|---|
+| Subject picker | elegir target (cliente contratado / sin AEO / prospecto HubSpot) | selector + búsqueda | apilado | combobox/lista |
+| Run CTA | correr el motor sobre el target | botón "Correr AEO" → preparando→ready | igual | `GreenhouseButton` |
+| Send + opportunity | enviar informe + abrir deal | confirmación `propose→confirm→execute` con **captura de consentimiento** (prospecto) | igual | confirm surface |
+
+Flow del cross-sell:
+
+1. Operador elige target (subject picker) → 2. "Correr AEO" (`requestGraderRunAsOperator`, TASK-1277) → preparando → reporte con **foco competitivo** → 3. "Enviar + abrir oportunidad": recipient + **consent gate** (prospecto requiere consentimiento capturado; cliente = relación) → confirmar → `sendAeoReportAndOpenOpportunity` (TASK-1279) envía email + crea/vincula deal HubSpot → 4. estado "enviado + oportunidad abierta" (con link al deal) o error honesto.
+
+Consent gate (state): `consent_required` (prospecto sin consentimiento → bloquea el envío con CTA "registrar consentimiento", NUNCA cold send) · `ready_to_send` · `sent`.
+
+Failure adicional: `consent_required` → mostrar el gate, no enviar; `hubspot_write_failed` → degradar honesto (informe enviado, deal pendiente de reintento).
 
 ## Failure Paths
 
