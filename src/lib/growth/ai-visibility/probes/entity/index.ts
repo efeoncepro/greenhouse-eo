@@ -9,8 +9,9 @@
 
 import { type Probe } from '../contracts'
 import { knowledgeGraphProbe } from './knowledge-graph'
+import { redditUgcProbe } from './reddit-ugc'
 import { wikidataProbe } from './wikidata'
 
-export const ENTITY_PROBES: Probe[] = [knowledgeGraphProbe, wikidataProbe]
+export const ENTITY_PROBES: Probe[] = [knowledgeGraphProbe, wikidataProbe, redditUgcProbe]
 
-export { knowledgeGraphProbe, wikidataProbe }
+export { knowledgeGraphProbe, redditUgcProbe, wikidataProbe }

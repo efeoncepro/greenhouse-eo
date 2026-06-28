@@ -7,6 +7,7 @@ import {
   type ProbeContext
 } from '../probes/contracts'
 import { knowledgeGraphProbe } from '../probes/entity/knowledge-graph'
+import { redditUgcProbe } from '../probes/entity/reddit-ugc'
 import { wikidataProbe } from '../probes/entity/wikidata'
 import { hostMatchesDomain, normalizeBrandName } from '../probes/entity/shared'
 
@@ -63,11 +64,12 @@ describe('TASK-1267 · entity shared helpers', () => {
 // ── honest degradation: sin sub-contexto de entidad ──────────────────────────
 
 describe('TASK-1267 · entity probes · honest degradation sin contexto', () => {
-  it('KG y Wikidata → skipped/no_entity_context si ctx.entity es null', async () => {
+  it('KG, Wikidata y Reddit → skipped/no_entity_context si ctx.entity es null', async () => {
     const kg = await knowledgeGraphProbe.run(ctx(null))
     const wd = await wikidataProbe.run(ctx(null))
+    const rd = await redditUgcProbe.run(ctx(null))
 
-    for (const outcome of [kg, wd]) {
+    for (const outcome of [kg, wd, rd]) {
       expect(outcome.status).toBe('skipped')
       expect(outcome.score).toBeNull()
       expect(outcome.errorCode).toBe('no_entity_context')
@@ -205,5 +207,61 @@ describe('TASK-1267 · wikidata probe', () => {
     expect(out.status).toBe('succeeded')
     expect(out.score).toBe(50)
     expect(out.evidence.entitiesFetched).toBe(false)
+  })
+})
+
+// ── Reddit / UGC probe ───────────────────────────────────────────────────────
+
+describe('TASK-1267 · reddit_ugc probe', () => {
+  it('búsqueda bloqueada/falla → failed (null, NO 0)', async () => {
+    const out = await redditUgcProbe.run(
+      ctx(entityCtx({ fetch: cannedFetcher([['reddit.com/search', { ok: false, status: 429, body: '', errorCode: 'http_error' }]]) }))
+    )
+
+    expect(out.status).toBe('failed')
+    expect(out.score).toBeNull()
+  })
+
+  it('sin menciones → succeeded score 0 (gap MEDIDO)', async () => {
+    const out = await redditUgcProbe.run(
+      ctx(entityCtx({ fetch: cannedFetcher([['reddit.com/search', ok(JSON.stringify({ data: { children: [] } }))]]) }))
+    )
+
+    expect(out.status).toBe('succeeded')
+    expect(out.score).toBe(0)
+    expect(out.evidence.mentions).toBe(0)
+  })
+
+  it('menciones con enlaces al dominio → score por volumen + domainLinkedMentions', async () => {
+    const children = [
+      { data: { subreddit: 'startups', url: 'https://acme.com/post', title: 'Acme launch' } },
+      { data: { subreddit: 'startups', url: 'https://reddit.com/r/startups/x', title: 'about Acme' } },
+      { data: { subreddit: 'SaaS', url: 'https://acme.com/blog', title: 'Acme review' } }
+    ]
+
+    const out = await redditUgcProbe.run(
+      ctx(entityCtx({ fetch: cannedFetcher([['reddit.com/search', ok(JSON.stringify({ data: { children } }))]]) }))
+    )
+
+    expect(out.status).toBe('succeeded')
+    expect(out.score).toBe(60) // 3 menciones → bucket medio
+    expect(out.evidence.mentions).toBe(3)
+    expect(out.evidence.domainLinkedMentions).toBe(2)
+    expect(out.evidence.subreddits).toEqual(['startups', 'SaaS'])
+  })
+
+  it('menciones por nombre sin enlaces al dominio → flaggea riesgo de homónimo', async () => {
+    const children = Array.from({ length: 12 }, (_, i) => ({
+      data: { subreddit: 'random', url: `https://reddit.com/r/random/${i}`, title: 'Acme (the other one)' }
+    }))
+
+    const out = await redditUgcProbe.run(
+      ctx(entityCtx({ fetch: cannedFetcher([['reddit.com/search', ok(JSON.stringify({ data: { children } }))]]) }))
+    )
+
+    expect(out.status).toBe('succeeded')
+    expect(out.score).toBe(100) // ≥10 menciones
+    expect(out.evidence.domainLinkedMentions).toBe(0)
+    expect(out.reason).toContain('homónimo')
   })
 })
