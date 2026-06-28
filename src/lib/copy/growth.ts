@@ -238,7 +238,12 @@ export const GH_GROWTH_AI_VISIBILITY_REPORT_ARTIFACT = {
   },
   level: {
     found: { ordinal: '01', label: 'Que te encuentre', labelEn: 'Be Found', question: '¿Existes para la IA?' },
-    readable: { ordinal: '02', label: 'Que te entienda', labelEn: 'Be Readable', question: '¿Te puede leer sin adivinar?' },
+    readable: {
+      ordinal: '02',
+      label: 'Que te entienda',
+      labelEn: 'Be Readable',
+      question: '¿Te puede leer sin adivinar?'
+    },
     correct: {
       ordinal: '03',
       label: 'Que te represente bien',
@@ -367,7 +372,8 @@ export const GH_GROWTH_AI_VISIBILITY_CLIENT_REPORT = {
     noPrevious: 'Primera medición',
     perceptionAxisLabel: 'Percepción',
     agenticAxisLabel: 'Operabilidad',
-    agenticCoverage: 'En cobertura'
+    agenticCoverage: 'En cobertura',
+    evaluatedOn: 'Evaluado en'
   },
   navigator: {
     ariaLabel: 'Navegador del informe: dimensiones y recomendaciones',
@@ -386,6 +392,7 @@ export const GH_GROWTH_AI_VISIBILITY_CLIENT_REPORT = {
     recommendationEyebrow: (index: number, total: number) => `Recomendación ${index} de ${total}`,
     dimensionEyebrow: 'Dimensión',
     relatedScoreLabel: 'Puntaje relacionado',
+    relatedScoreHelp: 'Dimensión conectada con esta recomendación.',
     scoreOutOf: 'de 100',
     scoreNoData: 'Sin dato',
     comparePrevious: 'vs medición anterior',
@@ -406,16 +413,16 @@ export const GH_GROWTH_AI_VISIBILITY_CLIENT_REPORT = {
     signalsHelp: 'Indicadores actuales que sostienen tu visibilidad.'
   },
   signals: {
-    citationTitle: 'Menciones con fuente citada',
-    citationHelp: 'De las respuestas con fuentes, cuántas citan tu dominio.',
+    citationTitle: 'Citas con fuente',
+    citationHelp: 'Respuestas que citan tu dominio.',
     sentimentTitle: 'Sentimiento positivo',
-    sentimentHelp: 'Cuánto del tono con que la IA habla de tu marca es positivo.',
-    enginesTitle: 'Modelos que te mencionan',
-    enginesHelp: 'Cuántos motores de IA te mencionan en sus respuestas.',
+    sentimentHelp: 'Menciones con tono favorable.',
+    enginesTitle: 'Motores con mención',
+    enginesHelp: 'Cobertura en modelos evaluados.',
     positionTitle: 'Posición promedio',
-    positionHelp: 'Qué tan arriba apareces cuando te mencionan.',
-    sovTitle: 'Participación de menciones',
-    sovHelp: 'Tus menciones frente al total (tú + competidores).',
+    positionHelp: 'Lugar cuando apareces.',
+    sovTitle: 'Share de menciones',
+    sovHelp: 'Tu marca vs. competidores.',
     noData: 'Sin dato'
   },
   // Affordance de soporte (NO venta): el cliente YA contrató AEO y está en el portal privado.

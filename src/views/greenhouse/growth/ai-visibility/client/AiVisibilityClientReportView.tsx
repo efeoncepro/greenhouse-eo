@@ -13,10 +13,13 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import { useTheme } from '@mui/material/styles'
 
-import { Area, AreaChart, Bar, BarChart, LabelList, ResponsiveContainer, XAxis, YAxis } from 'recharts'
+import { Area, AreaChart, Bar, BarChart, Cell, LabelList, ResponsiveContainer, XAxis, YAxis } from 'recharts'
 
 import { CompositionShell, GreenhouseBreadcrumbs } from '@/components/greenhouse/primitives'
 import type { OperationalStatusTone } from '@/components/greenhouse/primitives/OperationalStatusBadge'
+import TeamAvatarGroup, { type TeamAvatarGroupBrand } from '@/components/greenhouse/TeamAvatarGroup'
+import GreenhouseBrandLogoMark from '@/components/greenhouse/primitives/GreenhouseBrandLogoMark'
+import type { GreenhouseBrandLogoKind } from '@/components/greenhouse/primitives/greenhouse-brand-logo-controller'
 // Importamos del módulo `model` directo (NO del barrel): el barrel re-exporta el render PDF `server-only`
 // (@react-pdf/renderer) y meterlo en el bundle de cliente rompería el build (server-only transitivo).
 import { type ReportArtifactModel } from '@/components/growth/ai-visibility/report-artifact/model'
@@ -52,9 +55,73 @@ const severityThemeColor: Record<GraderReportSeverity, OperationalStatusTone> = 
   sin_dato: 'secondary'
 }
 
-type Selection =
-  | { type: 'dimension'; key: ScoreDimensionKey }
-  | { type: 'recommendation'; gapKey: string }
+type Selection = { type: 'dimension'; key: ScoreDimensionKey } | { type: 'recommendation'; gapKey: string }
+
+// Nombre de producto por proveedor (los isotipos los resuelve TeamAvatarGroup variante brand).
+const ENGINE_DISPLAY_NAME: Record<string, string> = {
+  openai: 'ChatGPT',
+  anthropic: 'Claude',
+  gemini: 'Gemini',
+  google_ai_overview: 'Gemini',
+  perplexity: 'Perplexity'
+}
+
+const engineBrands = (model: ReportArtifactModel): TeamAvatarGroupBrand[] =>
+  (model.engineSnapshot ?? []).map(e => ({
+    provider: e.provider,
+    name: ENGINE_DISPLAY_NAME[e.provider] ?? e.provider.charAt(0).toUpperCase() + e.provider.slice(1)
+  }))
+
+// Isotipo de motor (bare, sin avatar) — usado como tick del eje X del chart "Menciones por plataforma".
+// Espeja el mapeo de TeamAvatarGroup (misma fuente de marcas canónicas GreenhouseBrandLogoMark).
+const ENGINE_LOGO_KIND: Record<string, GreenhouseBrandLogoKind> = {
+  gemini: 'geminiColor',
+  google_ai_overview: 'geminiColor',
+  openai: 'gptIsotype',
+  anthropic: 'claudeIsologo'
+}
+
+const EngineIsotype = ({ provider, size }: { provider: string; size: number }) => {
+  const kind = ENGINE_LOGO_KIND[provider]
+
+  if (provider === 'perplexity') return <i className='logos-perplexity-icon' aria-hidden style={{ fontSize: size }} />
+  if (kind)
+    return (
+      <GreenhouseBrandLogoMark
+        kind={kind}
+        size='small'
+        decorative
+        sx={{ '& svg, & img': { width: size, height: size } }}
+      />
+    )
+
+  return <i className='tabler-robot' aria-hidden style={{ fontSize: size }} />
+}
+
+// Color de marca por proveedor (identidad de 3ros — NO tokens Greenhouse, espejo de los isotipos). Tiñe la
+// barra como canal de IDENTIDAD; el VALOR lo codifican longitud + label (Cleveland-McGill), no el color.
+/* eslint-disable greenhouse/no-hardcoded-hex-color -- 3rd-party brand identity colors, no son tokens Greenhouse */
+const ENGINE_BRAND_COLOR: Record<string, string> = {
+  gemini: '#4285F4',
+  google_ai_overview: '#4285F4',
+  openai: '#10A37F',
+  anthropic: '#D97757',
+  perplexity: '#20808D'
+}
+/* eslint-enable greenhouse/no-hardcoded-hex-color */
+
+// Tick del eje X: el isotipo del motor SUELTO (sin círculo — leen mejor a color, identidad propia);
+// foreignObject embebe el HTML dentro del SVG del chart.
+const EngineAxisTick = ({ x, y, payload }: { x?: number; y?: number; payload?: { value?: string } }) => (
+  <foreignObject x={(x ?? 0) - 16} y={(y ?? 0) + 8} width={32} height={32} style={{ overflow: 'visible' }}>
+    <Box
+      title={ENGINE_DISPLAY_NAME[payload?.value ?? ''] ?? payload?.value}
+      sx={{ width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+    >
+      <EngineIsotype provider={payload?.value ?? ''} size={28} />
+    </Box>
+  </foreignObject>
+)
 
 // ── Severity dot (named, never color-only) ────────────────────────────────────
 const SeverityDot = ({ severity }: { severity: GraderReportSeverity }) => (
@@ -65,8 +132,7 @@ const SeverityDot = ({ severity }: { severity: GraderReportSeverity }) => (
       width: 10,
       height: 10,
       borderRadius: '50%',
-      bgcolor:
-        severity === 'sin_dato' ? theme.palette.text.disabled : theme.palette[severityThemeColor[severity]].main
+      bgcolor: severity === 'sin_dato' ? theme.palette.text.disabled : theme.palette[severityThemeColor[severity]].main
     })}
   />
 )
@@ -96,7 +162,13 @@ const NavigatorRail = ({
       <Typography variant='overline' color='text.secondary'>
         {C.navigator.dimensionsHeader}
       </Typography>
-      <Stack component='ul' role='listbox' aria-label={C.navigator.dimensionsHeader} sx={{ listStyle: 'none', p: 0, m: 0 }} spacing={1}>
+      <Stack
+        component='ul'
+        role='listbox'
+        aria-label={C.navigator.dimensionsHeader}
+        sx={{ listStyle: 'none', p: 0, m: 0 }}
+        spacing={1}
+      >
         {model.dimensions.map((dim, i) => {
           const selected = selection.type === 'dimension' && selection.key === dim.key
 
@@ -116,18 +188,23 @@ const NavigatorRail = ({
                 borderColor: selected ? 'primary.main' : 'divider'
               })}
             >
-              <Typography variant='body2' color='text.secondary' sx={{ fontVariantNumeric: 'tabular-nums', minWidth: 16 }}>
+              <Typography variant='monoId' color='text.secondary' sx={{ minWidth: 16 }}>
                 {i + 1}
               </Typography>
               <Stack sx={{ minWidth: 0, flex: 1 }}>
-                <Typography variant='body2' sx={{ fontWeight: 500 }} noWrap>
+                <Typography
+                  variant='body2'
+                  color={selected ? 'text.primary' : 'text.secondary'}
+                  sx={{ fontWeight: selected ? 600 : undefined }}
+                  noWrap
+                >
                   {DIM_LABEL[dim.key]}
                 </Typography>
                 <Typography variant='caption' color='text.secondary'>
                   {SEV[dim.severity]}
                 </Typography>
               </Stack>
-              <Typography variant='body2' sx={{ fontVariantNumeric: 'tabular-nums', fontWeight: 600 }}>
+              <Typography variant='monoId' color={selected ? 'text.primary' : 'text.secondary'}>
                 {scoreText(dim.score)}
               </Typography>
               <SeverityDot severity={dim.severity} />
@@ -149,7 +226,13 @@ const NavigatorRail = ({
         </Typography>
       ) : (
         <>
-          <Stack component='ul' role='listbox' aria-label={C.navigator.recommendationsHeader} sx={{ listStyle: 'none', p: 0, m: 0 }} spacing={1}>
+          <Stack
+            component='ul'
+            role='listbox'
+            aria-label={C.navigator.recommendationsHeader}
+            sx={{ listStyle: 'none', p: 0, m: 0 }}
+            spacing={1}
+          >
             {model.recommendations.map((rec, i) => {
               const selected = selection.type === 'recommendation' && selection.gapKey === rec.gapKey
 
@@ -170,10 +253,14 @@ const NavigatorRail = ({
                     borderColor: selected ? 'primary.main' : 'divider'
                   })}
                 >
-                  <Typography variant='body2' color='text.secondary' sx={{ fontVariantNumeric: 'tabular-nums', minWidth: 16 }}>
+                  <Typography variant='monoId' color='text.secondary' sx={{ minWidth: 16 }}>
                     {i + 1}
                   </Typography>
-                  <Typography variant='body2' sx={{ fontWeight: 500, flex: 1, minWidth: 0 }}>
+                  <Typography
+                    variant='body2'
+                    color={selected ? 'text.primary' : 'text.secondary'}
+                    sx={{ fontWeight: selected ? 600 : undefined, flex: 1, minWidth: 0 }}
+                  >
                     {rec.title}
                   </Typography>
                   <SeverityChip size='small' severity={rec.severity} />
@@ -195,7 +282,7 @@ const PanelShell = ({ title, help, children }: { title: string; help?: string; c
   <Card variant='outlined' sx={theme => ({ borderRadius: `${theme.shape.customBorderRadius.md}px`, height: '100%' })}>
     <CardContent>
       <Stack spacing={0.5} sx={{ mb: 3 }}>
-        <Typography variant='subtitle1' sx={{ fontWeight: 600 }}>
+        <Typography variant='h5' component='h3'>
           {title}
         </Typography>
         {help ? (
@@ -226,9 +313,7 @@ const TrendPanel = ({
   return (
     <PanelShell title={C.detail.trendPanelTitle} help={C.detail.trendPanelHelp}>
       <Stack direction='row' spacing={3} alignItems='baseline' sx={{ mb: 2 }}>
-        <Typography variant='kpiValue' sx={{ fontVariantNumeric: 'tabular-nums' }}>
-          {scoreText(current)}
-        </Typography>
+        <Typography variant='kpiValue'>{scoreText(current)}</Typography>
         {delta !== null ? (
           <Typography
             variant='body2'
@@ -243,7 +328,11 @@ const TrendPanel = ({
         )}
       </Stack>
       {hasHistory ? (
-        <Box sx={{ height: 140 }} role='img' aria-label={`${C.detail.trendPanelTitle}: ${C.detail.trendAxisPrevious} ${fmt(previous)}, ${C.detail.trendAxisCurrent} ${fmt(current)}`}>
+        <Box
+          sx={{ height: 140 }}
+          role='img'
+          aria-label={`${C.detail.trendPanelTitle}: ${C.detail.trendAxisPrevious} ${fmt(previous)}, ${C.detail.trendAxisCurrent} ${fmt(current)}`}
+        >
           <AppRecharts sx={{ height: '100%', width: '100%' }}>
             <ResponsiveContainer width='100%' height='100%'>
               <AreaChart
@@ -261,7 +350,14 @@ const TrendPanel = ({
                 </defs>
                 <XAxis dataKey='label' tickLine={false} axisLine={false} />
                 <YAxis domain={[0, 100]} tickLine={false} axisLine={false} width={32} />
-                <Area type='monotone' dataKey='value' stroke={accent} strokeWidth={2} fill='url(#clientTrendFill)' dot />
+                <Area
+                  type='monotone'
+                  dataKey='value'
+                  stroke={accent}
+                  strokeWidth={2}
+                  fill='url(#clientTrendFill)'
+                  dot
+                />
               </AreaChart>
             </ResponsiveContainer>
           </AppRecharts>
@@ -294,30 +390,35 @@ const PlatformPanel = ({ model }: { model: ReportArtifactModel }) => {
   if (engines.length === 0) return null
 
   const data = engines.map(e => ({
-    label: e.provider.charAt(0).toUpperCase() + e.provider.slice(1),
+    provider: e.provider,
+    name: ENGINE_DISPLAY_NAME[e.provider] ?? e.provider.charAt(0).toUpperCase() + e.provider.slice(1),
     value: e.present,
     resolved: e.resolved
   }))
 
   const maxResolved = Math.max(...engines.map(e => e.resolved), 1)
-  const ariaSummary = data.map(d => `${d.label} ${d.value} ${C.detail.platformOf} ${d.resolved}`).join('; ')
+  const ariaSummary = data.map(d => `${d.name} ${d.value} ${C.detail.platformOf} ${d.resolved}`).join('; ')
 
   return (
     <PanelShell title={C.detail.platformPanelTitle} help={C.detail.platformPanelHelp}>
-      <Box sx={{ height: 180 }} role='img' aria-label={`${C.detail.platformPanelAria}: ${ariaSummary}`}>
+      <Box sx={{ height: 210 }} role='img' aria-label={`${C.detail.platformPanelAria}: ${ariaSummary}`}>
         <AppRecharts sx={{ height: '100%', width: '100%' }}>
           <ResponsiveContainer width='100%' height='100%'>
             <BarChart data={data} margin={{ top: 20, right: 8, left: -24, bottom: 0 }}>
-              <XAxis dataKey='label' tickLine={false} axisLine={false} />
+              <XAxis
+                dataKey='provider'
+                tickLine={false}
+                axisLine={false}
+                interval={0}
+                height={48}
+                tick={<EngineAxisTick />}
+              />
               <YAxis domain={[0, maxResolved]} tickLine={false} axisLine={false} width={32} allowDecimals={false} />
-              <Bar
-                dataKey='value'
-                fill={theme.palette.primary.main}
-                radius={[4, 4, 0, 0]}
-                maxBarSize={48}
-                isAnimationActive={false}
-              >
+              <Bar dataKey='value' radius={[4, 4, 0, 0]} maxBarSize={48} isAnimationActive={false}>
                 <LabelList dataKey='value' position='top' />
+                {data.map(d => (
+                  <Cell key={d.provider} fill={ENGINE_BRAND_COLOR[d.provider] ?? theme.palette.primary.main} />
+                ))}
               </Bar>
             </BarChart>
           </ResponsiveContainer>
@@ -328,19 +429,111 @@ const PlatformPanel = ({ model }: { model: ReportArtifactModel }) => {
 }
 
 // ── Signal tiles (señales de respaldo, honest) ────────────────────────────────
-const SignalTile = ({ label, value, help }: { label: string; value: string; help: string }) => (
+type SignalVisual =
+  | { kind: 'progress'; value: number | null; tone: 'primary' | 'success' | 'warning' }
+  | { kind: 'dots'; active: number; total: number }
+  | { kind: 'rank'; value: string }
+
+const clampPercent = (value: number | null): number => (value === null ? 0 : Math.max(0, Math.min(100, value)))
+
+const SignalVisualCue = ({ visual }: { visual: SignalVisual }) => {
+  if (visual.kind === 'dots') {
+    const total = Math.max(visual.total, 1)
+
+    return (
+      <Box sx={{ display: 'flex', gap: 1 }} aria-hidden='true'>
+        {Array.from({ length: total }).map((_, index) => (
+          <Box
+            key={index}
+            sx={theme => ({
+              width: 8,
+              height: 8,
+              borderRadius: '50%',
+              bgcolor: index < visual.active ? theme.palette.primary.main : theme.palette.action.selected
+            })}
+          />
+        ))}
+      </Box>
+    )
+  }
+
+  if (visual.kind === 'rank') {
+    return (
+      <Box
+        aria-hidden='true'
+        sx={theme => ({
+          minWidth: 34,
+          height: 24,
+          px: 2,
+          borderRadius: '9999px',
+          display: 'inline-flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          bgcolor: theme.palette.action.hover,
+          color: theme.palette.text.secondary,
+          ...theme.typography.monoId
+        })}
+      >
+        {visual.value}
+      </Box>
+    )
+  }
+
+  return (
+    <Box
+      aria-hidden='true'
+      sx={theme => ({
+        width: 76,
+        height: 6,
+        flexShrink: 0,
+        borderRadius: '9999px',
+        bgcolor: theme.palette.action.hover,
+        overflow: 'hidden'
+      })}
+    >
+      <Box
+        sx={theme => ({
+          width: `${clampPercent(visual.value)}%`,
+          height: '100%',
+          borderRadius: 'inherit',
+          bgcolor: theme.palette[visual.tone].main
+        })}
+      />
+    </Box>
+  )
+}
+
+const SignalTile = ({
+  label,
+  value,
+  help,
+  visual
+}: {
+  label: string
+  value: string
+  help: string
+  visual: SignalVisual
+}) => (
   <Card variant='outlined' sx={theme => ({ borderRadius: `${theme.shape.customBorderRadius.md}px`, height: '100%' })}>
-    <CardContent sx={{ p: 4 }}>
-      <Stack spacing={1}>
-        <Typography variant='caption' color='text.secondary'>
-          {label}
-        </Typography>
-        <Typography variant='h5' sx={{ fontVariantNumeric: 'tabular-nums' }}>
-          {value}
-        </Typography>
-        <Typography variant='caption' color='text.secondary'>
-          {help}
-        </Typography>
+    <CardContent sx={{ p: 3 }}>
+      <Stack spacing={2} sx={{ minHeight: 116 }}>
+        <Stack direction='row' spacing={2} alignItems='baseline' justifyContent='space-between'>
+          <Typography
+            variant={value === C.signals.noData ? 'body2' : 'kpiValue'}
+            color={value === C.signals.noData ? 'text.secondary' : 'text.primary'}
+          >
+            {value}
+          </Typography>
+          <SignalVisualCue visual={visual} />
+        </Stack>
+        <Stack spacing={0.5} sx={{ minWidth: 0 }}>
+          <Typography variant='h5' component='h4'>
+            {label}
+          </Typography>
+          <Typography variant='caption' color='text.secondary'>
+            {help}
+          </Typography>
+        </Stack>
       </Stack>
     </CardContent>
   </Card>
@@ -348,46 +541,89 @@ const SignalTile = ({ label, value, help }: { label: string; value: string; help
 
 const SignalTiles = ({ model }: { model: ReportArtifactModel }) => {
   const citation =
-    model.citationInsight.ownDomainShare === null ? C.signals.noData : `${fmt(Math.round(model.citationInsight.ownDomainShare))}%`
+    model.citationInsight.ownDomainShare === null
+      ? C.signals.noData
+      : `${fmt(Math.round(model.citationInsight.ownDomainShare))}%`
+
+  const citationValue =
+    model.citationInsight.ownDomainShare === null ? null : Math.round(model.citationInsight.ownDomainShare)
 
   const sentiment =
     model.sentimentSummary.evaluated > 0
       ? `${fmt(Math.round((model.sentimentSummary.positive / model.sentimentSummary.evaluated) * 100))}%`
       : C.signals.noData
 
-  const engines = model.engineSnapshot ?? []
+  const sentimentValue =
+    model.sentimentSummary.evaluated > 0
+      ? Math.round((model.sentimentSummary.positive / model.sentimentSummary.evaluated) * 100)
+      : null
 
-  const enginesMentioning =
-    engines.length > 0 ? `${fmt(engines.filter(e => e.present > 0).length)} / ${fmt(engines.length)}` : C.signals.noData
+  const engines = model.engineSnapshot ?? []
+  const enginesActive = engines.filter(e => e.present > 0).length
+
+  const enginesMentioning = engines.length > 0 ? `${fmt(enginesActive)} / ${fmt(engines.length)}` : C.signals.noData
 
   const position = model.positionSummary.average === null ? C.signals.noData : `#${fmt(model.positionSummary.average)}`
 
   const competitorTotal = model.competitiveSov.competitors.reduce((sum, c) => sum + c.mentions, 0)
   const sovDenom = model.competitiveSov.brandMentions + competitorTotal
-  const sov = sovDenom > 0 ? `${fmt(Math.round((model.competitiveSov.brandMentions / sovDenom) * 100))}%` : C.signals.noData
 
-  const tiles = [
-    { label: C.signals.citationTitle, value: citation, help: C.signals.citationHelp },
-    { label: C.signals.sentimentTitle, value: sentiment, help: C.signals.sentimentHelp },
-    { label: C.signals.enginesTitle, value: enginesMentioning, help: C.signals.enginesHelp },
-    { label: C.signals.positionTitle, value: position, help: C.signals.positionHelp },
-    { label: C.signals.sovTitle, value: sov, help: C.signals.sovHelp }
+  const sov =
+    sovDenom > 0 ? `${fmt(Math.round((model.competitiveSov.brandMentions / sovDenom) * 100))}%` : C.signals.noData
+
+  const sovValue = sovDenom > 0 ? Math.round((model.competitiveSov.brandMentions / sovDenom) * 100) : null
+
+  const tiles: Array<{ label: string; value: string; help: string; visual: SignalVisual }> = [
+    {
+      label: C.signals.citationTitle,
+      value: citation,
+      help: C.signals.citationHelp,
+      visual: { kind: 'progress', value: citationValue, tone: 'warning' }
+    },
+    {
+      label: C.signals.sentimentTitle,
+      value: sentiment,
+      help: C.signals.sentimentHelp,
+      visual: { kind: 'progress', value: sentimentValue, tone: 'success' }
+    },
+    {
+      label: C.signals.enginesTitle,
+      value: enginesMentioning,
+      help: C.signals.enginesHelp,
+      visual: { kind: 'dots', active: enginesActive, total: engines.length }
+    },
+    {
+      label: C.signals.positionTitle,
+      value: position,
+      help: C.signals.positionHelp,
+      visual: { kind: 'rank', value: position }
+    },
+    {
+      label: C.signals.sovTitle,
+      value: sov,
+      help: C.signals.sovHelp,
+      visual: { kind: 'progress', value: sovValue, tone: 'primary' }
+    }
   ]
 
   return (
     <Stack spacing={2}>
-      <Typography variant='subtitle1' sx={{ fontWeight: 600 }}>
+      <Typography variant='h5' component='h3'>
         {C.detail.signalsTitle}
       </Typography>
       <Box
         sx={{
           display: 'grid',
           gap: 3,
-          gridTemplateColumns: { xs: 'repeat(2, minmax(0, 1fr))', md: 'repeat(3, minmax(0, 1fr))', xl: 'repeat(5, minmax(0, 1fr))' }
+          gridTemplateColumns: {
+            xs: 'repeat(2, minmax(0, 1fr))',
+            md: 'repeat(3, minmax(0, 1fr))',
+            xl: 'repeat(5, minmax(0, 1fr))'
+          }
         }}
       >
         {tiles.map(t => (
-          <SignalTile key={t.label} label={t.label} value={t.value} help={t.help} />
+          <SignalTile key={t.label} label={t.label} value={t.value} help={t.help} visual={t.visual} />
         ))}
       </Box>
     </Stack>
@@ -398,20 +634,29 @@ const SignalTiles = ({ model }: { model: ReportArtifactModel }) => {
 const DetailCanvas = ({ model, selection }: { model: ReportArtifactModel; selection: Selection }) => {
   const theme = useTheme()
 
-  const rec = selection.type === 'recommendation' ? model.recommendations.find(r => r.gapKey === selection.gapKey) : undefined
+  const rec =
+    selection.type === 'recommendation' ? model.recommendations.find(r => r.gapKey === selection.gapKey) : undefined
+
   const recIndex = rec ? model.recommendations.findIndex(r => r.gapKey === rec.gapKey) + 1 : 0
 
   // Dimensión relevante: la que origina la recomendación, o la seleccionada.
   const dimKey = rec ? rec.dimensionKey : selection.type === 'dimension' ? selection.key : undefined
+
   const dim = dimKey ? model.dimensions.find(d => d.key === dimKey) : undefined
 
   const severity = rec?.severity ?? dim?.severity ?? 'sin_dato'
-  const eyebrow = rec ? C.detail.recommendationEyebrow(recIndex, model.recommendations.length) : C.detail.dimensionEyebrow
+
+  const eyebrow = rec
+    ? C.detail.recommendationEyebrow(recIndex, model.recommendations.length)
+    : C.detail.dimensionEyebrow
+
   const title = rec ? rec.title : dim ? DIM_LABEL[dim.key] : ''
   const lead = rec ? rec.action : dim ? DIM_EXPLAINER[dim.key] : ''
+  const relatedScorePercent = clampPercent(dim?.score ?? null)
 
   // Tendencia honesta de la dimensión relevante (run-over-run del snapshot).
-  const dimTrend = model.trend.status === 'con_tendencia' && dim ? model.trend.dimensions.find(d => d.key === dim.key) : undefined
+  const dimTrend =
+    model.trend.status === 'con_tendencia' && dim ? model.trend.dimensions.find(d => d.key === dim.key) : undefined
 
   return (
     <Card
@@ -436,7 +681,9 @@ const DetailCanvas = ({ model, selection }: { model: ReportArtifactModel; select
               justifyContent='space-between'
             >
               <Stack spacing={2} sx={{ minWidth: 0, flex: 1 }}>
-                <Typography variant='h4'>{title}</Typography>
+                <Typography variant='h5' component='h2'>
+                  {title}
+                </Typography>
                 <Typography variant='body1' color='text.secondary'>
                   {lead}
                 </Typography>
@@ -445,27 +692,57 @@ const DetailCanvas = ({ model, selection }: { model: ReportArtifactModel; select
                 <Box
                   sx={theme => ({
                     flexShrink: 0,
-                    minWidth: 200,
+                    minWidth: { xs: '100%', md: 260 },
+                    maxWidth: { md: 320 },
                     p: 3,
                     borderRadius: `${theme.shape.customBorderRadius.md}px`,
                     border: `1px solid ${theme.palette.divider}`,
-                    backgroundColor: theme.palette.action.hover
+                    backgroundColor: theme.palette.background.paper
                   })}
                 >
-                  <Typography variant='overline' color='text.secondary' display='block'>
-                    {C.detail.relatedScoreLabel}
-                  </Typography>
-                  <Stack direction='row' spacing={1} alignItems='baseline' sx={{ mt: 1 }}>
-                    <Typography variant='kpiValue' sx={{ fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>
-                      {scoreText(dim.score)}
-                    </Typography>
-                    <Typography variant='body2' color='text.secondary'>
-                      {C.detail.scoreOutOf}
-                    </Typography>
+                  <Stack spacing={2}>
+                    <Stack direction='row' spacing={2} alignItems='center' justifyContent='space-between'>
+                      <Typography variant='overline' color='text.secondary'>
+                        {C.detail.relatedScoreLabel}
+                      </Typography>
+                      <SeverityChip severity={dim.severity} size='small' />
+                    </Stack>
+                    <Stack direction='row' spacing={1} alignItems='baseline'>
+                      <Typography variant='kpiValue'>{scoreText(dim.score)}</Typography>
+                      <Typography variant='body2' color='text.secondary'>
+                        {C.detail.scoreOutOf}
+                      </Typography>
+                    </Stack>
+                    <Box
+                      aria-hidden='true'
+                      sx={theme => ({
+                        height: 6,
+                        borderRadius: '9999px',
+                        bgcolor: theme.palette.action.hover,
+                        overflow: 'hidden'
+                      })}
+                    >
+                      <Box
+                        sx={theme => ({
+                          width: `${relatedScorePercent}%`,
+                          height: '100%',
+                          borderRadius: 'inherit',
+                          bgcolor:
+                            dim.severity === 'sin_dato'
+                              ? theme.palette.text.disabled
+                              : theme.palette[severityThemeColor[dim.severity]].main
+                        })}
+                      />
+                    </Box>
+                    <Stack spacing={0.5}>
+                      <Typography variant='h5' component='p'>
+                        {DIM_LABEL[dim.key]}
+                      </Typography>
+                      <Typography variant='caption' color='text.secondary'>
+                        {C.detail.relatedScoreHelp}
+                      </Typography>
+                    </Stack>
                   </Stack>
-                  <Typography variant='caption' color='text.secondary' display='block' sx={{ mt: 1 }}>
-                    {DIM_LABEL[dim.key]}
-                  </Typography>
                 </Box>
               ) : null}
             </Stack>
@@ -516,7 +793,7 @@ const DetailCanvas = ({ model, selection }: { model: ReportArtifactModel; select
                 <i className='tabler-star' />
               </Box>
               <Stack spacing={1}>
-                <Typography variant='subtitle1' sx={{ fontWeight: 600 }}>
+                <Typography variant='h5' component='h3'>
                   {C.detail.whyItMatters}
                 </Typography>
                 <Typography variant='body2' color='text.secondary'>
@@ -539,7 +816,7 @@ const DetailCanvas = ({ model, selection }: { model: ReportArtifactModel; select
             sx={theme => ({ pt: 4, borderTop: `1px solid ${theme.palette.divider}` })}
           >
             <Stack spacing={0.5} sx={{ minWidth: 0 }}>
-              <Typography variant='subtitle1' sx={{ fontWeight: 600 }}>
+              <Typography variant='h5' component='h3'>
                 {C.support.title}
               </Typography>
               <Typography variant='body2' color='text.secondary'>
@@ -563,9 +840,18 @@ const DetailCanvas = ({ model, selection }: { model: ReportArtifactModel; select
 }
 
 // ── Top strip + compact overall summary ───────────────────────────────────────
-const SummaryStrip = ({ model, organizationName, asOfLabel }: { model: ReportArtifactModel; organizationName: string; asOfLabel: string | null }) => {
+const SummaryStrip = ({
+  model,
+  organizationName,
+  asOfLabel
+}: {
+  model: ReportArtifactModel
+  organizationName: string
+  asOfLabel: string | null
+}) => {
   const overall = model.trend.status === 'con_tendencia' ? model.trend.overall : null
   const delta = overall?.delta ?? null
+  const engines = engineBrands(model)
 
   return (
     <Stack spacing={3} data-capture='client-ai-visibility-overview'>
@@ -579,8 +865,16 @@ const SummaryStrip = ({ model, organizationName, asOfLabel }: { model: ReportArt
       />
       <Stack direction='row' spacing={3} alignItems='center' justifyContent='space-between' flexWrap='wrap' useFlexGap>
         <Stack direction='row' spacing={3} alignItems='center' flexWrap='wrap' useFlexGap>
-          <Typography variant='h4'>{C.page.title}</Typography>
-          <Chip variant='tonal' color='primary' icon={<i className='tabler-building' />} label={organizationName} aria-label={C.page.orgChipAria} />
+          <Typography variant='surfaceHeroTitle' component='h1'>
+            {C.page.title}
+          </Typography>
+          <Chip
+            variant='tonal'
+            color='primary'
+            icon={<i className='tabler-building' />}
+            label={organizationName}
+            aria-label={C.page.orgChipAria}
+          />
         </Stack>
         {asOfLabel ? (
           <Stack direction='row' spacing={1} alignItems='center' sx={{ color: 'text.secondary' }}>
@@ -595,48 +889,52 @@ const SummaryStrip = ({ model, organizationName, asOfLabel }: { model: ReportArt
       <Card variant='outlined' sx={theme => ({ borderRadius: `${theme.shape.customBorderRadius.lg}px` })}>
         <CardContent>
           <Stack
-            direction={{ xs: 'column', md: 'row' }}
-            spacing={{ xs: 4, md: 6 }}
-            alignItems={{ xs: 'flex-start', md: 'center' }}
-            divider={<Divider orientation='vertical' flexItem sx={{ display: { xs: 'none', md: 'block' } }} />}
+            direction={{ xs: 'column', lg: 'row' }}
+            spacing={4}
+            alignItems={{ xs: 'flex-start', lg: 'center' }}
+            justifyContent='space-between'
           >
-            <Stack spacing={0.5} sx={{ minWidth: 0 }}>
-              <Typography variant='overline' color='text.secondary'>
-                {C.summary.scoreLabel}
-              </Typography>
-              <Stack direction='row' spacing={2} alignItems='baseline' flexWrap='wrap' useFlexGap>
-                <Typography variant='kpiValue' sx={{ fontVariantNumeric: 'tabular-nums' }}>
-                  {scoreText(model.overallScore)}
-                </Typography>
-                <Typography variant='body2' color='text.secondary'>
-                  {C.summary.scoreOutOf}
-                </Typography>
-                <SeverityChip severity={model.overallSeverity} />
-              </Stack>
-              <Typography variant='caption' color='text.secondary'>
-                {delta !== null
-                  ? `${delta > 0 ? '↑' : delta < 0 ? '↓' : ''} ${fmt(Math.abs(delta))} ${C.summary.comparePrevious}`.trim()
-                  : C.summary.noPrevious}
-              </Typography>
-            </Stack>
-            <Stack direction='row' spacing={6} flexWrap='wrap' useFlexGap>
-              <Stack spacing={0.5}>
+            <Stack
+              direction={{ xs: 'column', md: 'row' }}
+              spacing={{ xs: 4, md: 6 }}
+              alignItems={{ xs: 'flex-start', md: 'center' }}
+              divider={<Divider orientation='vertical' flexItem sx={{ display: { xs: 'none', md: 'block' } }} />}
+            >
+              <Stack spacing={0.5} sx={{ minWidth: 0 }}>
                 <Typography variant='overline' color='text.secondary'>
-                  {C.summary.perceptionAxisLabel}
+                  {C.summary.scoreLabel}
                 </Typography>
-                <Typography variant='h5' sx={{ fontVariantNumeric: 'tabular-nums' }}>
-                  {scoreText(model.perceptionAxisScore)}
+                <Stack direction='row' spacing={2} alignItems='baseline' flexWrap='wrap' useFlexGap>
+                  <Typography variant='kpiValue'>{scoreText(model.overallScore)}</Typography>
+                  <Typography variant='body2' color='text.secondary'>
+                    {C.summary.scoreOutOf}
+                  </Typography>
+                  <SeverityChip severity={model.overallSeverity} />
+                </Stack>
+                <Typography variant='caption' color='text.secondary'>
+                  {delta !== null
+                    ? `${delta > 0 ? '↑' : delta < 0 ? '↓' : ''} ${fmt(Math.abs(delta))} ${C.summary.comparePrevious}`.trim()
+                    : C.summary.noPrevious}
                 </Typography>
               </Stack>
-              <Stack spacing={0.5}>
-                <Typography variant='overline' color='text.secondary'>
-                  {C.summary.agenticAxisLabel}
-                </Typography>
-                <Typography variant='body2' color='text.secondary' sx={{ pt: 1.5 }}>
-                  {C.summary.agenticCoverage}
-                </Typography>
+              <Stack direction='row' spacing={6} flexWrap='wrap' useFlexGap>
+                <Stack spacing={0.5}>
+                  <Typography variant='overline' color='text.secondary'>
+                    {C.summary.perceptionAxisLabel}
+                  </Typography>
+                  <Typography variant='monoId'>{scoreText(model.perceptionAxisScore)}</Typography>
+                </Stack>
+                <Stack spacing={0.5}>
+                  <Typography variant='overline' color='text.secondary'>
+                    {C.summary.agenticAxisLabel}
+                  </Typography>
+                  <Typography variant='body2' color='text.secondary' sx={{ pt: 1.5 }}>
+                    {C.summary.agenticCoverage}
+                  </Typography>
+                </Stack>
               </Stack>
             </Stack>
+            {engines.length > 0 ? <TeamAvatarGroup brands={engines} label={C.summary.evaluatedOn} size={40} /> : null}
           </Stack>
         </CardContent>
       </Card>
