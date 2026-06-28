@@ -1385,3 +1385,48 @@ Cierra el intercambio de valor del lead magnet: el reporte no solo se muestra en
 - **NUNCA** doble-enviar: el claim `UNIQUE(report_id, email_type)` es el guard atómico. **NUNCA** marcar el dispatch `sent` sin confirmar `result.status === 'sent'` de `sendEmail`.
 - **NUNCA** usar la marca "Greenhouse" ni "Efeonce Greenhouse" en esta superficie pública (lead magnet) — es **Efeonce** (agencia). Usar `EmailLayout brand='efeonce'`.
 - **SIEMPRE** que emerja un 4.º punto de publicación del snapshot, agregar ahí el enqueue `requestAiVisibilityReportEmail` (mismo riesgo de drift que el handoff). Rollout: redeploy del ops-worker + flip `GROWTH_AI_VISIBILITY_REPORT_EMAIL_ENABLED` (dual-location) — gated por TASK-1246. Signal: `growth.ai_visibility.report_email_failed`. Spec: `docs/tasks/.../TASK-1250-...md`.
+
+## Delta 2026-06-28 — Entitlement & Metering (TASK-1277)
+
+AEO deja de ser "un viewCode prendido role-wide a los 3 roles cliente" (error de plano de TASK-1248) y pasa a ser un **servicio con entitlement POR ORGANIZACIÓN + run gobernado y metered**. Un motor, **cuatro puertas**:
+
+```text
+Público (prospecto)       → createPublicGraderRun        (captcha + per-email/IP + budget diario global)   [existe]
+Portal contratado (Berel) → requestGraderRunForOrganization → tier=contracted (fair-use, cap/mes config)
+Portal trial PLG          → requestGraderRunForOrganization → tier=trial (N/mes + reset + tope global)
+Portal pilot (AM)         → requestGraderRunForOrganization → tier=pilot (acotado + expires_at)
+Operador (Growth/AM)      → requestGraderRunAsOperator    → ilimitado, costo "sales" (cross-sell)
+```
+
+### Plano de acceso (per-org, NO role-wide)
+
+- **Módulo `ai_visibility_v1`** en `greenhouse_client_portal.modules` (tier `addon`, `pricing_kind addon_usage`, `view_codes=['cliente.ai_visibility_report']`, `data_sources=['growth.ai_visibility']`). El acceso se gatea por `module_assignments` per-org, NO por `role_view_assignments`.
+- El grant role-wide de TASK-1248 (3 roles `client_*`) **fue revertido**; `efeonce_admin` se mantiene (soporte interno). El viewCode sigue registrado.
+- Page guard `/aeo`: defense in depth = capability fina `growth.ai_visibility.report.read_client` **+** `hasModuleAccess(org,'ai_visibility_v1')`.
+- El **tier** (contracted/trial/pilot) vive en `module_assignments.metadata_json.aeo_tier`; el cap del pilot puede sobreescribirse con `metadata_json.aeo_runs_per_month`.
+
+### Chokepoint gobernado (único entrypoint de runs de portal)
+
+- `requestGraderRunForOrganization` (`src/lib/growth/ai-visibility/request-run.ts`): gate `isPortalRunEnabled` → entitlement (`resolveAeoEntitlement`) → ventana (`expires_at`) → allowance → costo. **Claim atómico:** lock `FOR UPDATE` de la fila del assignment + recuento de runs `portal_%` del mes dentro de la tx → sin doble-consumo bajo carrera; el enqueue (que commitea el run con atribución) ocurre antes de liberar el lock.
+- `requestGraderRunAsOperator`: ilimitado (sin allowance/tope), costo atribuido a `sales`; gateado solo por capability `growth.ai_visibility.run.operator` + kill switch global.
+- **Atribución (los runs SON el ledger):** `grader_runs` += `organization_id` / `assignment_id` / `run_source` (`public|admin|portal_contracted|portal_trial|portal_pilot|operator_sales`) / `cost_attribution` (`client|sales|internal|public`). Allowance = COUNT de runs `portal_*` del período vs cap del tier. NO hay tabla allowance separada.
+- Los runs de portal/operador reusan `run_kind='public_diagnostic'` + `mode='light'`; el email de informe y el HubSpot lead handoff **skip sin `grader_lead`** (verificado), así que un run de portal/operador no dispara correo ni handoff inesperado.
+
+### Capabilities + errores + signals
+
+- Capabilities nuevas (catalog + runtime grants + `capabilities_registry` seed, mismo PR): `growth.ai_visibility.run.portal` (scope `own`, client_* + superset interno) y `growth.ai_visibility.run.operator` (scope `tenant`, efeonce_account/admin/operations/ai_tooling_admin).
+- Errores canónicos: `aeo_not_entitled` (403), `aeo_run_disabled` (409), `aeo_profile_required` (409), `aeo_quota_exhausted` (429), `aeo_cost_blocked` (429).
+- Reliability signals (modulo `growth`): `growth.ai_visibility.entitlement_integrity` (drift, steady=0 — runs de portal sin assignment = bypass), `growth.ai_visibility.trial_budget_window` (cost_guard), `growth.ai_visibility.run_attribution_window` (posture, cliente vs sales).
+
+### Config + flags (default OFF)
+
+- Flags: `GROWTH_AI_VISIBILITY_PORTAL_RUN_ENABLED`, `GROWTH_AI_VISIBILITY_TRIAL_ENABLED` (ledger `FEATURE_FLAG_STATE_LEDGER.md`).
+- Config env (override-able): `_TRIAL_RUNS_PER_MONTH=1`, `_CONTRACTED_RUNS_PER_MONTH=20`, `_PILOT_RUNS_PER_MONTH=3`, `_TRIAL_GLOBAL_MONTHLY_BUDGET_USD=25` (cost backstop que espeja el budget diario público).
+
+### Invariantes operativos para agentes (entitlement & metering — TASK-1277)
+
+- **NUNCA** llamar `enqueueGraderDiagnostic`/`runGraderDiagnostic` directo desde una route de portal: SIEMPRE pasar por el chokepoint `requestGraderRunForOrganization`/`requestGraderRunAsOperator` (gate entitlement + allowance + atribución). El signal `entitlement_integrity` detecta el bypass (steady=0).
+- **NUNCA** gatear AEO cliente por `role_view_assignments` ni por capability sola: el acceso per-org lo da `module_assignments` (módulo `ai_visibility_v1`). Capability = "puede"; módulo = "tiene".
+- **NUNCA** consumir allowance sin el lock atómico de la fila del assignment (evita doble-consumo). El conteo es sobre `grader_runs` (run_source `portal_%`), NO una tabla paralela.
+- **NUNCA** correr el tier trial sin `GROWTH_AI_VISIBILITY_TRIAL_ENABLED`; **NUNCA** prender los flags en prod sin staging shadow + sign-off comercial (qué orgs trial vs contratado + tope global). La puerta operador es ilimitada y atribuye costo a `sales` — NO consume allowance del cliente.
+- **NUNCA** seedear el módulo con `capabilities[]` que no sean `client_portal.*` (parity TASK-826); AEO declara `capabilities=[]` y autoriza por capability growth + módulo.
