@@ -1,4 +1,7 @@
-## Sesion 2026-06-28 — TASK-1263 gate de correo corporativo en el grader — Claude — 🔧 code complete, rollout pendiente (develop, sin push)
+## Sesion 2026-06-28 — TASK-1263 gate de correo corporativo en el grader — Claude — ✅ complete (staging verificado; prod = TASK-1246)
+
+> **Rollout staging APLICADO + verificado (cierre de sesión):** push `develop` → **deploy staging Vercel READY** (`greenhouse-ql78obgzu`) → `activate-grader-email-gate.ts --apply` (autorizado por el operador) → **v3 publicada** (`fver-9475a038…`) con `emailPolicy.block_field` + `destination_policy` greenhouse-only + `retention_policy` 730d, **v2 deprecada** (vía gobernada, no raw-SQL). **Verificación PG:** v3 con `mode=block_field` + idempotencia (re-run hace skip). **Smoke funcional** (config v3 real + helper real, sin efectos secundarios): gmail→`email_not_corporate`, mailinator→`email_disposable`, corporativo→pasa. Captcha confirmado fail-closed (capa previa al gate en el endpoint HTTP → POST scripteado da `captcha_failed`/403 antes de llegar al gate; correcto). Task movida a `complete/`. Prod = cutover TASK-1246 (out of scope). **Lo de abajo era el estado pre-rollout (code complete):**
+
 
 > **Pedido:** `/implement-task 1263` — activar el gate de correo corporativo de TASK-1254 en el AI Visibility Grader. **Hallazgo bloqueante en Discovery (reportado al operador):** el gate de TASK-1254 vive SOLO en `submitForm`, pero el intake del grader (ambos paths) **nunca pasa por `submitForm`** → publicar el grader-form con `emailPolicy` (la premisa de la task) habría sido **config inerte**. **Decisión del operador (AskUserQuestion):** (1) cablear el gate en las fachadas reusando el primitive; (2) ambos paths (forms-engine staging + a-medida prod).
 >

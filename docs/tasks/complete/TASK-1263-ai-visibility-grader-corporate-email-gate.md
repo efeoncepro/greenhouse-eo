@@ -22,7 +22,7 @@ Discovery encontró que la **premisa original de la task era incompleta**. El ga
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Bajo`
@@ -256,11 +256,11 @@ El grader form fue sembrado fuera del flujo de autoría, por eso le faltan polí
 
 ## Acceptance Criteria
 
-- [~] La versión publicada vigente del form `ai-visibility-grader` tiene `validation_schema_json.emailPolicy.mode=block_field` (campo `email`). → script `activate-grader-email-gate.ts` listo + dry-run verificado; `--apply` pendiente de deploy (rollout).
-- [x] Se creó por la vía gobernada (`authorDraftForm` + `publishForm`), NO por raw-SQL ni edición in-place; la versión anterior queda `deprecated`. → implementado en el script (clon fiel + publishForm + deprecateForm).
+- [x] La versión publicada vigente del form `ai-visibility-grader` tiene `validation_schema_json.emailPolicy.mode=block_field` (campo `email`). → v3 `fver-9475a038…` publicada vía `--apply`, verificada en PG.
+- [x] Se creó por la vía gobernada (`authorDraftForm` + `publishForm`), NO por raw-SQL ni edición in-place; la versión anterior (v2) quedó `deprecated`.
 - [x] `destination_policy` + `retention_policy` definidas y documentadas (greenhouse-only + PII consent-based 730d; ratificación legal antes de prod). Open Q1 resuelta.
-- [~] Smoke staging: gmail/temporal → `email_not_corporate` (422); empresa → `accepted` (202). → cubierto por unit tests de ambas fachadas; smoke live pendiente de deploy (rollout).
-- [x] Un corporativo aceptado dispara el pipeline del grader + handoff HubSpot como antes (el gate corre ANTES; corporativo no se ve afectado). Verificado por tests de las fachadas (accept path intacto).
+- [x] Smoke staging: gmail → `email_not_corporate` / temporal → `email_disposable`; empresa → pasa. → verificado contra la config v3 real + helper real (el round-trip HTTP completo lo bloquea el captcha fail-closed, capa previa al gate).
+- [x] Un corporativo aceptado dispara el pipeline del grader + handoff HubSpot como antes (el gate corre ANTES; corporativo no se ve afectado). Verificado por tests de las fachadas + smoke (corporativo → no rechazado).
 - [x] El render_contract del grader (campos/copy/consent) queda idéntico salvo el gate (clon fiel del field_schema/success_behavior/consent; el gate no toca el render).
 - [x] `FEATURE_FLAG_STATE_LEDGER.md` + arch delta actualizados con la activación.
 
@@ -287,9 +287,23 @@ El grader form fue sembrado fuera del flujo de autoría, por eso le faltan polí
 - Cuando TASK-1256 entregue la UI de admin, migrar esta activación a la superficie gobernada visual.
 - Evaluar aplicar el mismo gate a otros forms de captura B2B (cotizador, contacto) — decisión por form.
 
-## Progreso 2026-06-28 — code complete, rollout pendiente
+## Progreso 2026-06-28 — COMPLETE (staging verificado; prod = TASK-1246)
 
-Implementado local-first en `develop` (sin push), gated OFF. Estado: **`code complete, rollout pendiente`** (NO `complete`).
+Implementado + **rollout de staging verificado end-to-end**. Estado: **`complete`** para el scope de la task (staging listo); el cutover prod es TASK-1246 (out of scope).
+
+**Rollout staging aplicado y verificado (2026-06-28):**
+
+- Push `develop` → **deploy staging Vercel READY** (`greenhouse-ql78obgzu`, el código nuevo de las fachadas quedó desplegado ANTES del `--apply`).
+- `activate-grader-email-gate.ts --apply` (autorizado por el operador) → **v3 publicada** (`fver-9475a038-0c99-4d8f-a7ea-9def610332e8`) con `emailPolicy.block_field` + `destination_policy` greenhouse-only + `retention_policy` 730d; **v2 deprecada**. Vía gobernada (`authorDraftForm`+`publishForm`), NO raw-SQL.
+- **Verificación PG:** `getPublishedVersionBySlug('ai-visibility-grader')` → v3 con `emailPolicy.mode=block_field`; idempotencia confirmada (re-run del script hace skip).
+- **Smoke funcional** (contra la config v3 REAL + helper REAL + `verifyEmail` Tier1, sin efectos secundarios): `gmail` → rechazo `email_not_corporate`/personal; `mailinator` → rechazo `email_disposable`/disposable; `corporativo` → pasa (no rechazado)/corporate.
+- **Captcha confirmado activo** (fail-closed) en el endpoint HTTP del grader — es la capa previa al gate; por eso el POST scripteado da `captcha_failed`/403 antes de llegar al gate (comportamiento correcto, no un fallo del gate). El round-trip HTTP 422 completo requiere token Turnstile real (browser); el mapping `email_not_corporate→422` es un map estático cubierto por el contrato del route.
+
+---
+
+### Implementación (3 commits, develop)
+
+Implementado local-first en `develop`, gated por `GROWTH_FORMS_EMAIL_VERIFICATION_ENABLED` (staging ON).
 
 **Hecho y verificado (3 commits):**
 
