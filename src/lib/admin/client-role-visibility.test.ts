@@ -55,7 +55,12 @@ const CLIENT_VIEW_CODES_V1_4_FORWARD_LOOKING = [
   'cliente.web_delivery'
 ].sort()
 
-/** TASK-1248: viewCode del informe AEO client-scoped (route /aeo). Grant=TRUE a los 3 client roles. */
+/**
+ * TASK-1248/1277: viewCode del informe AEO client-scoped (route /aeo). SIGUE registrado en
+ * VIEW_REGISTRY, pero TASK-1277 revirtió el grant role-wide: AEO ya NO es client view role-wide
+ * — se gatea per-org por el módulo `ai_visibility_v1` (module_assignments). En esta matriz de
+ * grants role-wide queda grant=FALSE para los 3 client roles.
+ */
 const CLIENT_VIEW_CODES_TASK_1248 = ['cliente.ai_visibility_report'].sort()
 
 /** All client viewCodes en el registry (V1.0 legacy + V1.4 forward-looking + TASK-1248 = 23 total). */
@@ -132,17 +137,18 @@ const CLIENT_VISIBILITY_MATRIX: Record<string, Record<string, boolean>> = {
   client_executive: {
     ...TASK_285_LEGACY_MATRIX_V1_0.client_executive,
     ...TASK_827_FORWARD_LOOKING_MATRIX_V1_4.client_executive,
-    'cliente.ai_visibility_report': true
+    // TASK-1277: AEO module-gated (no role-wide) → grant=false en la matriz role-wide.
+    'cliente.ai_visibility_report': false
   },
   client_manager: {
     ...TASK_285_LEGACY_MATRIX_V1_0.client_manager,
     ...TASK_827_FORWARD_LOOKING_MATRIX_V1_4.client_manager,
-    'cliente.ai_visibility_report': true
+    'cliente.ai_visibility_report': false
   },
   client_specialist: {
     ...TASK_285_LEGACY_MATRIX_V1_0.client_specialist,
     ...TASK_827_FORWARD_LOOKING_MATRIX_V1_4.client_specialist,
-    'cliente.ai_visibility_report': true
+    'cliente.ai_visibility_report': false
   }
 }
 
@@ -194,23 +200,34 @@ describe('Client role visibility matrix (TASK-285 V1.0 + TASK-827 V1.4)', () => 
     expect(specGroups).toEqual(['client'])
   })
 
-  it('client_executive sees all 23 views (V1.0 + V1.4 + TASK-1248 AEO)', () => {
+  it('client_executive sees 22 views role-wide; AEO is module-gated, not role-wide (TASK-1277)', () => {
     const granted = Object.entries(CLIENT_VISIBILITY_MATRIX.client_executive)
       .filter(([, v]) => v)
       .map(([k]) => k)
 
-    expect(granted).toHaveLength(23)
+    const denied = Object.entries(CLIENT_VISIBILITY_MATRIX.client_executive)
+      .filter(([, v]) => !v)
+      .map(([k]) => k)
+
+    // 23 registry views - 1 module-gated (AEO) = 22 granted role-wide
+    expect(granted).toHaveLength(22)
+    expect(denied).toEqual(['cliente.ai_visibility_report'])
   })
 
-  it('client_manager sees all 23 views (V1.0 + V1.4 + TASK-1248 AEO)', () => {
+  it('client_manager sees 22 views role-wide; AEO is module-gated, not role-wide (TASK-1277)', () => {
     const granted = Object.entries(CLIENT_VISIBILITY_MATRIX.client_manager)
       .filter(([, v]) => v)
       .map(([k]) => k)
 
-    expect(granted).toHaveLength(23)
+    const denied = Object.entries(CLIENT_VISIBILITY_MATRIX.client_manager)
+      .filter(([, v]) => !v)
+      .map(([k]) => k)
+
+    expect(granted).toHaveLength(22)
+    expect(denied).toEqual(['cliente.ai_visibility_report'])
   })
 
-  it('client_specialist sees 20 views and is denied 3 (TASK-285 AC #2 preserved post-TASK-827/1248)', () => {
+  it('client_specialist sees 19 views and is denied 4 (3 V1.0 legacy + AEO module-gated, TASK-1277)', () => {
     const granted = Object.entries(CLIENT_VISIBILITY_MATRIX.client_specialist)
       .filter(([, v]) => v)
       .map(([k]) => k)
@@ -219,12 +236,13 @@ describe('Client role visibility matrix (TASK-285 V1.0 + TASK-827 V1.4)', () => 
       .filter(([, v]) => !v)
       .map(([k]) => k)
 
-    // 23 total - 3 V1.0 legacy denials (analytics, campanas, equipo) = 20 granted
-    expect(granted).toHaveLength(20)
-    expect(denied).toHaveLength(3)
+    // 23 total - 3 V1.0 legacy denials (analytics, campanas, equipo) - 1 AEO module-gated = 19 granted
+    expect(granted).toHaveLength(19)
+    expect(denied).toHaveLength(4)
     expect(denied).toContain('cliente.analytics')
     expect(denied).toContain('cliente.campanas')
     expect(denied).toContain('cliente.equipo')
+    expect(denied).toContain('cliente.ai_visibility_report')
   })
 
   it('specialist retains access to core navigation views (TASK-285 AC #5)', () => {

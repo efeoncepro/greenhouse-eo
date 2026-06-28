@@ -10,6 +10,7 @@ import {
   ClientGraderReportError,
   readClientGraderReport
 } from '@/lib/client-portal/readers/curated/growth-ai-visibility'
+import { hasModuleAccess } from '@/lib/client-portal/readers/native/module-resolver'
 import { GH_GROWTH_AI_VISIBILITY_CLIENT_REPORT } from '@/lib/copy/growth'
 import { can } from '@/lib/entitlements/runtime'
 import { captureWithDomain } from '@/lib/observability/capture'
@@ -56,6 +57,48 @@ export default async function AiVisibilityClientReportPage() {
     return (
       <StateShell>
         <EmptyState icon='tabler-chart-bar-off' title={C.states.empty.title} description={C.states.empty.body} />
+      </StateShell>
+    )
+  }
+
+  // TASK-1277 — AEO se gatea per-org por el módulo `ai_visibility_v1` asignado, NO role-wide
+  // (revert del grant de TASK-1248). Defense in depth: capability fina `report.read_client`
+  // (arriba) + módulo asignado a la org. Sin módulo → permission denied (misma UI, sin leak
+  // del module_key técnico). Degradación honesta si el resolver throw.
+  let hasAeoModule = false
+
+  try {
+    hasAeoModule = await hasModuleAccess(tenant.organizationId, 'ai_visibility_v1')
+  } catch (error) {
+    captureWithDomain(error, 'client_portal', {
+      tags: { source: 'client_ai_visibility_module_gate' },
+      extra: { organizationId: tenant.organizationId }
+    })
+
+    return (
+      <StateShell>
+        <EmptyState
+          icon='tabler-alert-triangle'
+          title={C.states.error.title}
+          description={C.states.error.body}
+          action={
+            <Button variant='tonal' href='/aeo'>
+              {C.states.error.retry}
+            </Button>
+          }
+        />
+      </StateShell>
+    )
+  }
+
+  if (!hasAeoModule) {
+    return (
+      <StateShell>
+        <EmptyState
+          icon='tabler-lock'
+          title={C.states.permissionDenied.title}
+          description={C.states.permissionDenied.body}
+        />
       </StateShell>
     )
   }
