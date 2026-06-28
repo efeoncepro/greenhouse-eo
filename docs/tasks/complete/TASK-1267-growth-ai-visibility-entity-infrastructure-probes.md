@@ -1,6 +1,41 @@
 # TASK-1267 — Growth AI Visibility: Entity Infrastructure Probes (Knowledge Graph / Wikidata / Reddit-UGC)
 
-## Delta 2026-06-28
+## Delta 2026-06-28 — IMPLEMENTADO (code complete, rollout pendiente)
+
+**Estado:** `code complete` — gates locales verdes (`pnpm test` 8355 pass · `pnpm build` OK ·
+`pnpm tsc` · `pnpm lint` · `flags:audit --strict` 0 sin registrar). Rollout pendiente (flag OFF
+en todos los environments + KG api key out-of-band + run real en staging). NO operativamente live.
+
+**Qué se implementó (reusando el substrate de TASK-1266, sin gatherer paralelo):**
+
+- **Tercer eje ortogonal `entity`** (backbone de entidad de la marca EN EL MUNDO), lado a lado de
+  `structural`/`agentic`, NUNCA blended. 3 `ProbeKind` nuevos: `knowledge_graph`, `wikidata`,
+  `reddit_ugc` (pesos 40/35/25 = 100 en `readiness-config.ts`; `ReadinessScore.entity` en el engine).
+- **Migración** `task-1267-grader-probe-axis-entity` (aplicada dev): extiende el CHECK de
+  `grader_probe_results.axis` a `('structural','agentic','entity')` — el spec decía "Migration: none
+  [verificar]" pero el CHECK inline de TASK-1266 RECHAZABA `entity`. `probe_kind` es TEXT libre → sin cambio.
+- **Fetcher externo host-allowlisted** (`probes/entity-fetch.ts`): read-only a `kgsearch.googleapis.com` /
+  `www.wikidata.org` / `www.reddit.com`. Distinto del `safe-fetch` SSRF (acotado al sujeto); NUNCA toca
+  el sitio del sujeto ni hosts arbitrarios. `EntityProbeContext` inyectado por flag en el command.
+- **Honest degradation `null≠0`** en los 3 probes: `no_entity_context` (eje off) / `not_configured`
+  (KG sin api key) / `failed` (fetch/parse) → null; **0 medido** (sin entrada/sin menciones) = gap real.
+- **Desambiguación por dominio, no solo por nombre:** KG por `result.url`, Wikidata por sitio oficial
+  P856, Reddit por `domainLinkedMentions` + caveat de homónimo en la razón.
+- **Secret hygiene:** KG api key vía `GOOGLE_KNOWLEDGE_GRAPH_API_KEY[_SECRET_REF]` (`resolveSecret`),
+  cero hardcode. **Reddit** (Open Question resuelta): búsqueda pública read-only en vez de OAuth → no
+  exige coordinar un secret de Reddit para shippear; degrada honesto si la quota lo bloquea.
+- **Flag** `GROWTH_AI_VISIBILITY_ENTITY_PROBES_ENABLED` (default OFF, aditivo sobre `PROBES` ON) +
+  fila en `FEATURE_FLAG_STATE_LEDGER.md` (Pendientes + Snapshot + Inventario).
+- **Tests:** 17 entity (degradación + scoring + desambiguación) + registry/flags/weightSum del eje entity.
+
+**Decisión de arquitectura:** eje `entity` NUEVO (no fold into `structural`) — los pesos de readiness
+suman 100 POR eje; meter entity en structural forzaría re-pesar el eje shipped (cambia scores existentes).
+El report builder solo lee `.structural`/`.agentic` → el eje entity se computa + persiste pero su RENDER
+lo gobierna TASK-1252 (out of scope acá), sin regresión.
+
+**Commits:** `dc2699030` (Slice 1: KG+Wikidata + substrate) · `1662e5aa8` (Slice 2: Reddit + ledger).
+
+## Delta 2026-06-28 (creación)
 
 - **Substrate disponible — cerrado por TASK-1266.** El probe gatherer (dependencia dura de esta task) quedó implementado (code complete). Reusar directamente `src/lib/growth/ai-visibility/probes/**`: interface `Probe (ctx) → ProbeOutcome{ status, score, reason, evidence }`, gatherer puro (`runProbes`) con honest degradation `null≠0`, fetcher read-only SSRF-guarded (`createProbeFetcher`), tabla `greenhouse_growth.grader_probe_results` (UPSERT por `run_id+probe_kind`), registry por eje, command `gatherRunProbes`, seam `HeadlessRenderer`. Los probes de entidad (Knowledge Graph / Wikidata / Reddit-UGC) = **nuevos `ProbeKind`** sumados a `PROBE_KINDS` + a `scoring/readiness-config.ts` (eje existente o uno nuevo `entity`) + registrados en su `index.ts`. **NO crear un gatherer paralelo.**
 
@@ -10,7 +45,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -237,12 +272,12 @@ Cada probe consulta una fuente pública de entidad y devuelve un `ProbeResult` c
 
 ## Acceptance Criteria
 
-- [ ] Probes de Knowledge Graph, Wikidata y Reddit corren dentro del probe gatherer de TASK-1266 (sin gatherer paralelo).
-- [ ] Cada probe produce evidencia con honest degradation `null≠0`.
-- [ ] Read-only sobre APIs/superficies públicas; rate-limit + timeout por fuente.
-- [ ] Desambiguación por dominio/sitio, no solo por nombre de marca.
-- [ ] API keys vía `*_SECRET_REF`; cero hardcode.
-- [ ] Fila por flag en `FEATURE_FLAG_STATE_LEDGER.md`.
+- [x] Probes de Knowledge Graph, Wikidata y Reddit corren dentro del probe gatherer de TASK-1266 (sin gatherer paralelo) — `ENTITY_PROBES` en `registry.ts` vía `createProbeRegistry({entity})`.
+- [x] Cada probe produce evidencia con honest degradation `null≠0` — `no_entity_context`/`not_configured`/`failed` → null; 0 medido = gap real (tests).
+- [x] Read-only sobre APIs/superficies públicas; rate-limit + timeout por fuente — `entity-fetch.ts` host-allowlisted, GET-only, timeout + maxBytes + courtesy UA, redirect manual.
+- [x] Desambiguación por dominio/sitio, no solo por nombre de marca — KG `result.url`, Wikidata P856, Reddit `domainLinkedMentions` + caveat de homónimo.
+- [x] API keys vía `*_SECRET_REF`; cero hardcode — `resolveSecret({GOOGLE_KNOWLEDGE_GRAPH_API_KEY})` server-side; Reddit público sin secret.
+- [x] Fila por flag en `FEATURE_FLAG_STATE_LEDGER.md` — Pendientes + Snapshot + Inventario (`flags:audit --strict` 0 sin registrar).
 
 ## Verification
 

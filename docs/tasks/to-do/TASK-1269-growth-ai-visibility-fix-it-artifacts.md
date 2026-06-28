@@ -1,5 +1,9 @@
 # TASK-1269 — Growth AI Visibility: Fix-It Artifacts (JSON-LD / llms.txt / Briefs as Deliverables)
 
+## Delta 2026-06-28 — findings de entidad disponibles (TASK-1267)
+
+- Además de los findings structural/agentic de TASK-1266, ahora existe el eje `entity` (TASK-1267): los `ProbeResult` de `knowledge_graph`/`wikidata`/`reddit_ugc` (mismo `readRunProbes(runId)`, `evidence` con `domainConfirmed`/`candidates`/`mentions`/`subreddits`) son materia prima para recomendaciones de entidad ESPECÍFICAS (ej. "no tienes entrada en Wikidata" / "sin Knowledge Panel" / "sin presencia en Reddit") en vez de genéricas. El fix-it puede generar artefactos de entidad accionables (ej. plantilla de entrada Wikidata, Organization JSON-LD con `sameAs` a perfiles, brief de PR/UGC) desde estos findings. Sigue siendo read-only: el grader NUNCA escribe en el sitio ni en las fuentes de entidad.
+
 ## Delta 2026-06-28
 
 - **Substrate de findings disponible — cerrado por TASK-1266.** Los probe results (qué falta: JSON-LD ausente, llms.txt 0, robots que bloquea bots IA, sin sitemap, etc.) ya se persisten en `greenhouse_growth.grader_probe_results` y se leen con `readRunProbes(runId)` (`src/lib/growth/ai-visibility/probes/command.ts`); cada `ProbeResult` lleva `score`, `reason` y `evidence` (status code, conteos, tipos schema.org, bots bloqueados) — exactamente la materia prima del fix-it. El report ya expone `readiness` (interno con reason; público/cliente sin reason). El generador de artefactos (Organization/Service JSON-LD, llms.txt starter, content brief AEO) consume estos findings; v1 determinista (LLM solo `propose→confirm→execute`). El grader NUNCA escribe en el sitio del prospecto (los probes son read-only; el fix-it entrega artefactos, no los aplica).

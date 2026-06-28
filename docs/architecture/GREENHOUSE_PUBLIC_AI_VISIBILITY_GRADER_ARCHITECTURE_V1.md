@@ -1497,3 +1497,28 @@ Operador (Growth/AM)      → requestGraderRunAsOperator    → ilimitado, costo
 - **NUNCA** ejecutar probes headless (CWV/WebMCP) en Vercel; corren en Cloud Run worker. Sin `HeadlessRenderer` → `skipped/no_headless`. WebMCP es el techo del eje agentic, no el único camino (MCP + structured data + DOM semántico pueden scorear alto).
 - **NUNCA** romper el run de percepción por un fallo de probes: `gatherRunProbes` es best-effort (no lanza). Un sitio caído degrada los probes, no el run.
 - **SIEMPRE** que agregues un probe nuevo: declará su `ProbeKind` + dimensión en `readiness-config.ts` con peso que mantenga la suma del eje en 100, registralo en `structural/index.ts` o `agentic/index.ts`, y mapeá su evidence public-safe (sin PII ni contenido crudo de terceros más allá de conteos/snippets acotados).
+
+## Delta 2026-06-28 — TASK-1267 Entity Infrastructure Probes · tercer eje `entity` (code complete dev; rollout pendiente) · EPIC-020
+
+**Qué agrega.** Un **tercer eje ortogonal** al probe layer de TASK-1266 — `entity` ("¿existe el backbone real de entidad de la marca EN EL MUNDO?") — reportado **lado a lado** de `structural`/`agentic`, **NUNCA fusionado**. Conecta el eje de percepción `entity_clarity` (que hoy solo infiere desde lo que dicen los motores) con su **CAUSA verificable**: una marca sin entrada en Wikidata ni Knowledge Panel casi siempre tiene `entity_clarity` bajo. Reusa el substrate de TASK-1266 (gatherer/registry/store/scoring), **sin gatherer paralelo**.
+
+**Probes (eje `entity`).** `knowledge_graph` (Google Knowledge Graph Search API: ¿la marca es entidad conocida? tipo/descripción/panel), `wikidata` (Wikidata/Wikipedia: `wbsearchentities` → `wbgetentities` para sitio oficial P856 + sitelinks), `reddit_ugc` (presencia/menciones en Reddit, fuente top de citas IA, vía búsqueda pública read-only). Pesos `readiness-config`: KG 40 / Wikidata 35 / Reddit 25 = 100.
+
+**Diferencia con structural/agentic — fetch a TERCEROS, no al sujeto.** Los probes de entidad NO prueban el sitio del sujeto sino APIs **públicas de terceros**, por lo que NO pueden usar el `safe-fetch` SSRF (acotado al host del sujeto). Usan `probes/entity-fetch.ts`: fetcher externo **host-allowlisted** (`kgsearch.googleapis.com` / `www.wikidata.org` / `www.reddit.com`), GET-only, timeout + maxBytes + courtesy UA, redirect manual (no persigue cross-host). Se inyecta vía `ProbeContext.entity` (`EntityProbeContext`: brandName/domain/market/locale + fetcher + KG api key); ausente → los probes degradan a `skipped/no_entity_context`.
+
+**Honest degradation + desambiguación.** `no_entity_context` (eje off) / `not_configured` (KG sin api key) / `failed` (fetch/parse) → `null`, excluido; el **0 medido** (sin entrada/sin menciones) SÍ cuenta. **Desambiguación por dominio, no solo por nombre:** KG por `result.url`, Wikidata por sitio oficial P856, Reddit por `domainLinkedMentions` + caveat de homónimo en la razón.
+
+**Migración.** `task-1267-grader-probe-axis-entity` (additive + idempotente + anti pre-up-marker): extiende el CHECK `grader_probe_results.axis` a `('structural','agentic','entity')`. El spec decía "Migration: none [verificar]" pero el CHECK inline de TASK-1266 RECHAZABA `entity` (finding real). `probe_kind` es TEXT libre → sin cambio.
+
+**Scoring + report.** `ReadinessScore.entity` se computa en el engine (additive). El report builder solo lee `.structural`/`.agentic` → el eje entity se persiste pero su **RENDER lo gobierna TASK-1252** (out of scope acá), sin regresión del contrato de report.
+
+**Flag + rollout.** `GROWTH_AI_VISIBILITY_ENTITY_PROBES_ENABLED` (default OFF, aditivo sobre `PROBES` ON, **DUAL-LOCATION** Vercel + ops-worker como TASK-1266). KG api key vía `GOOGLE_KNOWLEDGE_GRAPH_API_KEY[_SECRET_REF]` (sin ella el KG probe degrada honesto); Reddit público sin secret. **Rollout pendiente:** publicar KG api key + grant → flip staging + run real sobre marca con Knowledge Panel → prod (release control plane). Findings → TASK-1269; render → TASK-1252.
+
+### Invariantes operativos para agentes (Entity Infrastructure Probes — TASK-1267)
+
+- **NUNCA** consultar las APIs de entidad (KG/Wikidata/Reddit) fuera de `createEntityApiFetcher` (host-allowlisted, GET-only, read-only). El `safe-fetch` del eje structural/agentic NO sirve (está acotado al host del sujeto por SSRF) y el fetcher de entidad NO debe alcanzar el sitio del sujeto ni hosts fuera de la allowlist.
+- **NUNCA** scoreear `0` cuando una fuente de entidad no se pudo medir (sin api key, bloqueo/429, error de red/parse): honest degradation → `null` + `reason`. El **0 medido** (sin entrada Wikidata / sin Knowledge Panel / sin menciones Reddit) SÍ es un gap real.
+- **NUNCA** confirmar una entidad solo por nombre de marca: desambiguar por dominio (KG `result.url`, Wikidata sitio oficial P856, Reddit `domainLinkedMentions`) y flaggear el riesgo de homónimo en la evidencia/razón cuando no hay confirmación por dominio.
+- **NUNCA** hardcodear la KG api key: resolverla server-side con `resolveSecret({GOOGLE_KNOWLEDGE_GRAPH_API_KEY})` en el command; el probe la recibe vía `ctx.entity.knowledgeGraphApiKey` (null → degrada `not_configured`).
+- **NUNCA** loggear/exponer la api key ni contenido crudo de terceros más allá de conteos/tipos/snippets acotados public-safe; sin PII del lead (solo marca/dominio).
+- **SIEMPRE** que agregues una fuente de entidad nueva: nuevo `ProbeKind` + dimensión en `readiness-config.ts` (peso que mantenga la suma del eje `entity` en 100), registrala en `probes/entity/index.ts`, y añadí su host a `ENTITY_API_ALLOWED_HOSTS` si consulta una API nueva.
