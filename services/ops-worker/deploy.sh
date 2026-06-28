@@ -373,6 +373,10 @@ if [ "${ENV}" = "staging" ]; then
   # (gating en código). La KG api key se resuelve server-side (resolveSecret); sin ella el KG probe
   # degrada honesto `not_configured` (Wikidata/Reddit no requieren auth).
   DEFAULT_GROWTH_ENTITY_PROBES_ENABLED="true"
+  # TASK-1267 — KG api key publicada en Secret Manager (key restringida a kgsearch.googleapis.com,
+  # 2026-06-28). Staging la wirea; el worker la resuelve server-side (resolveSecret) + el conditional
+  # de abajo appendea el ref + bindea secretAccessor.
+  DEFAULT_GOOGLE_KG_KEY_SECRET_REF="greenhouse-google-knowledge-graph-api-key"
 else
   DEFAULT_GROWTH_GRADER_ENABLED="false"
   DEFAULT_GROWTH_OPENAI_ENABLED="false"
@@ -386,6 +390,7 @@ else
   DEFAULT_GROWTH_PROBES_ENABLED="false"
   DEFAULT_GROWTH_AGENTIC_READINESS_ENABLED="false"
   DEFAULT_GROWTH_ENTITY_PROBES_ENABLED="false"
+  DEFAULT_GOOGLE_KG_KEY_SECRET_REF=""
 fi
 GROWTH_AI_VISIBILITY_GRADER_ENABLED="${GROWTH_AI_VISIBILITY_GRADER_ENABLED:-${DEFAULT_GROWTH_GRADER_ENABLED}}"
 GROWTH_AI_VISIBILITY_OPENAI_ENABLED="${GROWTH_AI_VISIBILITY_OPENAI_ENABLED:-${DEFAULT_GROWTH_OPENAI_ENABLED}}"
@@ -403,7 +408,7 @@ GROWTH_AI_VISIBILITY_ENTITY_PROBES_ENABLED="${GROWTH_AI_VISIBILITY_ENTITY_PROBES
 # (mismo patrón que DATAFORSEO_API_LOGIN), para que un --set-env-vars destructivo no deje un
 # secret ref vacío y para no referenciar un secret inexistente. Sin ella → KG probe degrada
 # honesto `not_configured` (Wikidata/Reddit corren igual, no requieren auth).
-GOOGLE_KNOWLEDGE_GRAPH_API_KEY_SECRET_REF="${GOOGLE_KNOWLEDGE_GRAPH_API_KEY_SECRET_REF:-}"
+GOOGLE_KNOWLEDGE_GRAPH_API_KEY_SECRET_REF="${GOOGLE_KNOWLEDGE_GRAPH_API_KEY_SECRET_REF:-${DEFAULT_GOOGLE_KG_KEY_SECRET_REF}}"
 OPENAI_API_KEY_SECRET_REF="${OPENAI_API_KEY_SECRET_REF:-greenhouse-openai-api-key}"
 ANTHROPIC_API_KEY_SECRET_REF="${ANTHROPIC_API_KEY_SECRET_REF:-greenhouse-anthropic-api-key}"
 # TASK-1265 — DataForSEO (fuente SERP/AI Mode del provider google_ai_overview). El password
