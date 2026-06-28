@@ -1,5 +1,13 @@
 # TASK-1246 — Growth AI Visibility: Public Launch Readiness + Rollout
 
+## Delta 2026-06-28 — gate de correo corporativo del grader (TASK-1263) listo para el cutover
+
+TASK-1263 cableó el gate de correo corporativo (TASK-1254 `emailPolicy.block_field`) en **ambas fachadas** del intake del grader (`createPublicGraderRun` + `createPublicGraderRunViaFormsEngine`) vía el helper canónico `evaluateFormEmailGate` — gmail/temporal se rechaza ANTES de gastar AI (outcome `email_not_corporate`, 422). **Code complete, rollout pendiente.** Al planificar el launch público, incluir en el readiness/cutover:
+
+- **Secuencia obligatoria:** deploy del código (push develop → staging) **ANTES** de correr `scripts/growth/activate-grader-email-gate.ts --apply` (correrlo con el código viejo desplegado ancla submissions a una v2 deprecada y no gatea).
+- **Activación staging** del gate (`--apply` + smoke gmail→422 / corporativo→202) como parte del readiness.
+- **Prod:** flag `GROWTH_FORMS_EMAIL_VERIFICATION_ENABLED` ON + `--apply` contra PG prod + **ratificación legal de la `retention_policy`** del grader-form (PII consent-based 730d). Sin flag nuevo (reusa el de TASK-1254).
+
 ## Delta 2026-06-27 — email delivery (TASK-1250) code-complete, sumar al readiness
 
 TASK-1250 quedó **code complete** (sin push, sin prod): el lead recibe el informe por email transaccional + PDF adjunto, disparado write-side desde la publicación del snapshot, con idempotencia DB-level + consent-gate. **Sumar al checklist de launch readiness de esta task** el rollout del email (gated, default OFF): (1) `bash services/ops-worker/deploy.sh` (el bundle del worker incluye el reactive consumer del email + el report PDF renderer); (2) flip `GROWTH_AI_VISIBILITY_REPORT_EMAIL_ENABLED=true` **dual-location** (ops-worker via gcloud + declararlo en `deploy.sh` staging ON/prod OFF, mismo patrón que el handoff); (3) smoke staging E2E: run con lead consentido → snapshot publicado → email recibido con link + adjunto + `grader_report_email_dispatches.status='sent'` + no doble-envío en retry + signal `growth.ai_visibility.report_email_failed` steady=0; (4) **out-of-band:** from-address/branding del lead magnet (marca **Efeonce** agencia) + sign-off legal/consent del email. El smoke E2E del lead magnet ahora incluye `form → report → email con adjunto`.

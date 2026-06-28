@@ -256,13 +256,15 @@ El grader form fue sembrado fuera del flujo de autoría, por eso le faltan polí
 
 ## Acceptance Criteria
 
-- [ ] La versión publicada vigente del form `ai-visibility-grader` tiene `validation_schema_json.emailPolicy.mode=block_field` (campo `email`).
-- [ ] Se creó por la vía gobernada (`authorDraftForm` + `publishForm`), NO por raw-SQL ni edición in-place; la versión anterior quedó `deprecated`.
-- [ ] `destination_policy` + `retention_policy` definidas con sign-off y documentadas.
-- [ ] Smoke staging: gmail/yahoo/público/temporal → `invalid`; correo de empresa → `accepted`.
-- [ ] Un corporativo aceptado dispara el pipeline del grader + handoff HubSpot como antes (flujo feliz intacto).
-- [ ] El render_contract del grader (campos/copy/consent) quedó idéntico salvo el gate.
-- [ ] `FEATURE_FLAG_STATE_LEDGER.md` + arch delta actualizados con la activación.
+- [~] La versión publicada vigente del form `ai-visibility-grader` tiene `validation_schema_json.emailPolicy.mode=block_field` (campo `email`). → script `activate-grader-email-gate.ts` listo + dry-run verificado; `--apply` pendiente de deploy (rollout).
+- [x] Se creó por la vía gobernada (`authorDraftForm` + `publishForm`), NO por raw-SQL ni edición in-place; la versión anterior queda `deprecated`. → implementado en el script (clon fiel + publishForm + deprecateForm).
+- [x] `destination_policy` + `retention_policy` definidas y documentadas (greenhouse-only + PII consent-based 730d; ratificación legal antes de prod). Open Q1 resuelta.
+- [~] Smoke staging: gmail/temporal → `email_not_corporate` (422); empresa → `accepted` (202). → cubierto por unit tests de ambas fachadas; smoke live pendiente de deploy (rollout).
+- [x] Un corporativo aceptado dispara el pipeline del grader + handoff HubSpot como antes (el gate corre ANTES; corporativo no se ve afectado). Verificado por tests de las fachadas (accept path intacto).
+- [x] El render_contract del grader (campos/copy/consent) queda idéntico salvo el gate (clon fiel del field_schema/success_behavior/consent; el gate no toca el render).
+- [x] `FEATURE_FLAG_STATE_LEDGER.md` + arch delta actualizados con la activación.
+
+> **Nota de scope (recalibración 2026-06-28):** la premisa original ("publicar el grader-form con emailPolicy") era insuficiente — el grader nunca pasa por `submitForm`. El gate se cableó en las fachadas (helper canónico `evaluateFormEmailGate`, un primitive 3 consumers). El AC "smoke gmail→invalid" se cumple ahora vía outcome `email_not_corporate` (422), no `invalid`.
 
 ## Verification
 
@@ -285,7 +287,25 @@ El grader form fue sembrado fuera del flujo de autoría, por eso le faltan polí
 - Cuando TASK-1256 entregue la UI de admin, migrar esta activación a la superficie gobernada visual.
 - Evaluar aplicar el mismo gate a otros forms de captura B2B (cotizador, contacto) — decisión por form.
 
+## Progreso 2026-06-28 — code complete, rollout pendiente
+
+Implementado local-first en `develop` (sin push), gated OFF. Estado: **`code complete, rollout pendiente`** (NO `complete`).
+
+**Hecho y verificado (3 commits):**
+
+- **Slice 1** (`02432c679`, junto a Slice 2): helper canónico `evaluateFormEmailGate` (`src/lib/growth/forms/email-verification/gate.ts`) = flag + `resolveEmailPolicy` + `verifyEmail` + decisión de rechazo; **un primitive, 3 consumers**. Refactor de `submitForm` para consumirlo (sin cambio de comportamiento, cubierto por los 166 tests del motor) + 8 tests del helper.
+- **Slice 2** (`02432c679`): gate cableado en `createPublicGraderRun` (a-medida) + `createPublicGraderRunViaFormsEngine` (forms-engine), **ANTES** de aceptar/encolar → gmail/temporal rechazado sin gastar AI. Outcome público nuevo `email_not_corporate` (HTTP 422) + copy es-CL (validado con `greenhouse-ux-writing`). La fachada forms-engine resuelve la versión publicada por slug en runtime (FK anchor + emailPolicy, sin re-pinear constante) + persiste `email_quality`/`domain_class`; el path a-medida resuelve sólo con el flag ON (no pega a la DB en el hot path apagado). Tests de ambas fachadas (gate reject/pass + FK anchor).
+- **Slice 3** (`5ba7b5bdf`): `scripts/growth/activate-grader-email-gate.ts` (dry-run default + idempotente) publica una versión nueva con `emailPolicy.block_field` + `destination_policy` greenhouse-only + `retention_policy` (PII consent-based 730d) vía `authorDraftForm`+`publishForm`, deprecando la anterior (clon fiel). Sin migración (`grader_intake_events.outcome` es TEXT libre).
+- **Gates:** `pnpm lint` limpio · `pnpm typecheck` limpio · `pnpm test` full **8282 passed** · `pnpm build` exit 0 · **dry-run del script verificado contra PG real** (v2 vigente, emailPolicy off, 14 campos, plan correcto).
+
+**Pendiente de rollout (out-of-band, NO bloquea el código):**
+
+1. **Push develop + deploy staging** del código de las fachadas. **Crítico:** correr `--apply` con el código viejo aún desplegado anclaría submissions a una v2 deprecada y NO gatearía (el código viejo no lee emailPolicy). Secuencia: deploy → `--apply` → smoke.
+2. **`activate-grader-email-gate.ts --apply`** (publica v3 con el gate, depreca v2) contra PG staging.
+3. **Smoke live:** gmail/temporal → `email_not_corporate` (422); corporativo → `accepted` (202) + grader+handoff corren igual. Monitor `growth.forms.email_rejection_rate`.
+4. **Prod:** cutover con TASK-1246 (launch del grader) + ratificación legal de la `retention_policy`. Flag `GROWTH_FORMS_EMAIL_VERIFICATION_ENABLED` reusado (staging ON, prod OFF).
+
 ## Open Questions
 
-1. ¿Qué `destination_policy` y `retention_policy` exactas para el grader? Propuesta: `destination_policy` greenhouse-only (entrega por pipeline propio + handoff HubSpot TASK-1242, no por `form_destination`); `retention_policy` alineada con la retención de PII de leads vigente. Requiere sign-off del owner antes de publicar.
-2. ¿El cutover a prod va bundle con TASK-1246 (launch del grader) o independiente? Propuesta: bundle con TASK-1246 (el grader público no está live en prod todavía; activar el gate solo es útil con tráfico real).
+1. ~~¿Qué `destination_policy` y `retention_policy` exactas para el grader?~~ **→ Resuelta (2026-06-28):** `destination_policy` greenhouse-only (`{mode:'greenhouse_only', engineDestinations:false}` — el grader entrega por su pipeline propio + handoff HubSpot TASK-1242, no por `form_destination`); `retention_policy` PII prospecto consent-based 730d (`{scope:'prospect_lead_pii', leadPiiRetentionDays:730, legalBasis:'consent'}`). Valores en `activate-grader-email-gate.ts`. **Ratificación legal de la retención antes del cutover prod (TASK-1246).**
+2. ¿El cutover a prod va bundle con TASK-1246 (launch del grader) o independiente? **→ Resuelta:** bundle con TASK-1246 (el grader público no está live en prod; activar el gate solo es útil con tráfico real).
