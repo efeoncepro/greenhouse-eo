@@ -1,5 +1,11 @@
 # TASK-1252 — Growth AI Visibility: Report Artifact Design System
 
+## Delta 2026-06-28 — mapping 5-level ajustado sin reestructurar el artifact
+
+La delta del framework Efeonce se aplicó de forma acotada al contrato compartido: `REPORT_LEVEL_DIMENSIONS` ahora mapea `Be Correct` a `message_alignment` y deja `Be Actionable` como eje agéntico en cobertura hasta que TASK-1266 entregue readiness probes. El layout/render existente del artifact se mantiene: no se agregaron secciones nuevas ni se reordenó el informe.
+
+**Estado downstream:** `TASK-1248` y `TASK-1250` quedan desbloqueadas desde `TASK-1252`: pueden consumir el modelo/adapters existentes (`modelFromClientReport` para portal cliente; `modelFromPublicReport(report, 'attachment')` + PDF/print para adjunto) sin crear un artifact paralelo. Si tienen blockers restantes, ya no vienen del design system de `TASK-1252`.
+
 ## Delta 2026-06-27 — deuda conocida cerrada: renderer PDF premium (TASK-1273)
 
 La deuda conocida declarada por esta task ("V1 del attachment es print-HTML; renderer PDF premium = follow-up") **quedó cerrada por TASK-1273**: existe un tercer render adapter PDF real (`report-artifact/pdf/AiVisibilityReportPdf.tsx` + `renderAiVisibilityReportPdf`), sobre el mismo `ReportArtifactModel` (variant `attachment`), con paridad de disclosure. El print-HTML (`AiVisibilityReportPrint`) sigue disponible; TASK-1250 decide cuál adjuntar.

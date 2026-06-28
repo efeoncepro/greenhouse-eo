@@ -87,16 +87,16 @@ export const REPORT_LEVEL_AXIS: Record<ReportLevelId, ReportLevelAxis> = {
 
 /**
  * Mapeo canónico nivel → dimensiones del grader que lo explican (Delta 2026-06-27:
- * "las 7 dimensiones mapeadas debajo de cada nivel"). `correct` (exactitud) y
- * `actionable` (readiness agéntica, TASK-1266) aún no tienen dimensión pública
- * medible → quedan en cobertura ("En cobertura"), nunca con score fabricado.
+ * "las 7 dimensiones mapeadas debajo de cada nivel"). `actionable` pertenece al
+ * eje agéntico y espera los readiness probes de TASK-1266; por eso queda en cobertura
+ * hasta recibir métricas propias, nunca mezclado dentro del score de percepción.
  */
 export const REPORT_LEVEL_DIMENSIONS: Record<ReportLevelId, ScoreDimensionKey[]> = {
   found: ['ai_visibility'],
   readable: ['entity_clarity', 'category_ownership', 'citation_quality'],
-  correct: [],
+  correct: ['message_alignment'],
   actionable: [],
-  intrinsic: ['competitive_sov', 'message_alignment', 'revenue_intent_coverage']
+  intrinsic: ['competitive_sov', 'revenue_intent_coverage']
 }
 
 // ── Sections + disclosure matrix ──────────────────────────────────────────────
