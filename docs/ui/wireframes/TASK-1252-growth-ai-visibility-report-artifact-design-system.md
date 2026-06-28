@@ -17,6 +17,20 @@
 - Primary decision signal: estimated visibility score plus primary gap and recommended motion.
 - Non-goals: scoring changes, raw provider review, prompt disclosure, ranking guarantees, email body design.
 
+## Delta 2026-06-28 — SEO/AEO narrative structure
+
+- The top-line report narrative follows the Efeonce 5-level framework and keeps its two-axis truth visible:
+  - Perception axis: `Be Found -> Be Readable -> Be Correct -> Be Intrinsic`.
+  - Agentic operability axis: `Be Actionable` as an orthogonal track, not fused into the perception score.
+- The dimension breakdown is no longer a flat scorecard. It groups each technical dimension under the level it explains:
+  - `Be Found`: AI Visibility.
+  - `Be Readable`: Entity Clarity, Category Ownership, Citation Quality.
+  - `Be Correct`: Message Alignment until the dedicated accuracy signal lands.
+  - `Be Intrinsic`: Competitive SoV, Revenue Intent Coverage.
+- Engine presence is treated as channel evidence: each answer engine is a distinct AEO channel, with an explicit weakest-channel interpretation.
+- Recommendations are framed as `Plan AEO prioritario`, not a generic task list.
+- Provenance closes the loop as a measurement baseline: same prompt pack, same sampled engines and same score version for comparable trend.
+
 ## Layout Skeleton
 
 | Region | Slot | Purpose | Component candidate | Data source |
@@ -26,10 +40,13 @@
 | 1 | Executive verdict | Score, severity, coverage and partial cue | `AiVisibilityScoreHero` | `score`, `gate`, `provenance` |
 | 2 | Primary gap | Name the main opportunity and impact | `AiVisibilityPrimaryGapCard` | `primaryGap` |
 | 3 | Recommended motion | Explain the motion without overpromising | `AiVisibilityRecommendedMotionCard` | `recommendations[0]`, `recommendedMotion` |
-| 4 | Dimension breakdown | Compare report dimensions with score and severity | `AiVisibilityDimensionBreakdown` | `dimensions[]` |
-| 5 | AEO signals | Aggregate citation, sentiment, prominence and trend | `AiVisibilitySignalSummary` | `citationInsight`, `sentimentSummary`, `positionSummary`, `trend` |
-| 6 | Recommendations | Prioritized action list | `AiVisibilityRecommendationList` | `recommendations[]` |
-| 7 | Provenance | Method, versions, providers and generated date | `AiVisibilityProvenanceFooter` | `provenance` |
+| 4 | 5-level framework | Two-axis maturity model: perception lane + agentic operability lane | `AiVisibilityLevelsBand` | derived from `dimensions[]` |
+| 5 | Engine channels | Presence by answer engine + weakest-channel interpretation | `AiVisibilityEngineSnapshot` | `providerPresence[]` |
+| 6 | Competitive benchmark | Share of Voice vs. competitors, tied to Be Intrinsic | `AiVisibilityCompetitiveSov` | `competitiveSov` |
+| 7 | Dimension breakdown | Group dimensions by the framework level they explain | `AiVisibilityDimensionBreakdown` | `dimensions[]` + level mapping |
+| 8 | AEO signals | Citation, sentiment, prominence, source mix and trend | `AiVisibilitySignalSummary` | `citationInsight`, `sentimentSummary`, `positionSummary`, `sourceTypeSummary`, `trend` |
+| 9 | Plan AEO | Prioritized remediation plan linked back to the affected level | `AiVisibilityRecommendationList` | `recommendations[]` |
+| 10 | Provenance | Method, versions, providers, baseline and generated date | `AiVisibilityProvenanceFooter` | `provenance` |
 | 8 | PDF preview | Prove attachment adapter can stand alone | print/PDF adapter preview | same report model |
 | 9 | Artifact contract | Make implementation boundaries visible | docs/preview table | static contract metadata |
 | 10 | Disclaimer footer | Legal-safe report framing | report footer | copy + `provenance` |

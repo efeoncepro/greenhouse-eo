@@ -232,9 +232,16 @@ export const GH_GROWTH_AI_VISIBILITY_REPORT_ARTIFACT = {
   // Framework de 5 niveles (Delta 2026-06-27). Labels + pregunta guía por nivel.
   levelsBand: {
     title: 'Niveles para existir en un internet de agentes',
+    helper:
+      'El diagnóstico se lee en dos ejes: percepción de marca y operabilidad agéntica. El score principal no mezcla ambos.',
     perceptionAxis: 'Percepción · ¿te mencionan?',
+    perceptionTitle: 'Eje de percepción',
+    perceptionHelper: 'Cómo los motores te encuentran, entienden, representan y recomiendan.',
     agenticAxis: 'Operabilidad · ¿te pueden usar?',
-    coverageBadge: 'En cobertura'
+    agenticTitle: 'Eje de operabilidad',
+    agenticHelper: 'Qué tan listo está tu sitio para que un agente pueda actuar, no solo citarte.',
+    coverageBadge: 'En cobertura',
+    measuredBadge: 'Medido'
   },
   level: {
     found: { ordinal: '01', label: 'Que te encuentre', labelEn: 'Be Found', question: '¿Existes para la IA?' },
@@ -268,17 +275,29 @@ export const GH_GROWTH_AI_VISIBILITY_REPORT_ARTIFACT = {
     scoreLabel: 'Visibilidad estimada',
     scoreContext: 'Nivel intermedio · los líderes de tu categoría superan 85.',
     scoreDisclaimer: 'Estimación, no garantía de ranking',
+    engineBrandsLabel: 'Evaluado en',
     coverageLabel: 'Motores consultados',
     coverageValue: (responded: number, sampled: number) => `${responded} de ${sampled} motores respondieron`,
     contextLabel: 'Contexto del informe',
     contextValue: 'Datos agregados y públicos',
     contextHelper: 'Sin datos crudos ni confidenciales.'
   },
-  primaryGap: { title: 'Brecha principal', impactLabel: 'Impacto' },
+  primaryGap: {
+    title: 'Brecha principal',
+    impactLabel: 'Impacto',
+    executiveReadTitle: 'Lectura ejecutiva',
+    affectedLevelLabel: 'Nivel afectado',
+    evidenceLabel: 'Señal que lo sostiene',
+    nextProofLabel: 'Próxima prueba',
+    citationEvidence: (share: number | null) => (share === null ? 'Citas propias sin evidencia suficiente' : `${share}% de citas propias`),
+    nextProof: (promptPackVersion: string) => `Repetir con prompt pack ${promptPackVersion} para ver si sube la citabilidad.`
+  },
   recommendedMotion: { title: 'Movimiento recomendado', impactLabel: 'Impacto esperado' },
   dimensions: {
     title: 'Por qué ocurre',
-    helper: 'Lectura del framework AEO: dónde la IA te encuentra, te entiende, te representa y te prefiere.',
+    helper:
+      'Las dimensiones técnicas se agrupan bajo el nivel que explican; así el score deja de ser una lista plana y se vuelve diagnóstico.',
+    coverageHelper: 'Pendiente de medición específica; no se fabrica un puntaje cuando no hay evidencia suficiente.',
     colDimension: 'Dimensión',
     colScore: 'Puntaje (0-100)',
     colSeverity: 'Severidad',
@@ -286,7 +305,7 @@ export const GH_GROWTH_AI_VISIBILITY_REPORT_ARTIFACT = {
   },
   sov: {
     title: 'Benchmark competitivo',
-    helper: 'Qué parte del espacio de respuesta ocupas frente a otras marcas de la categoría.',
+    helper: 'Nivel 05 · Que te prefiera: qué parte del espacio de respuesta ocupas frente a otras marcas.',
     brandLabel: 'Tu marca',
     shareLabel: 'Share of Voice',
     mentionsLabel: 'menciones'
@@ -295,10 +314,14 @@ export const GH_GROWTH_AI_VISIBILITY_REPORT_ARTIFACT = {
     // Presencia por motor (conteos) de la marca evaluada — público-safe, con logo + nombre por motor.
     title: 'Canales de respuesta',
     helper: 'Cada motor de IA se comporta como un canal AEO distinto: mide dónde apareces y dónde se pierde presencia.',
-    presentLabel: (present: number, resolved: number) => `${present} de ${resolved} respuestas`
+    presentLabel: (present: number, resolved: number) => `${present} de ${resolved} respuestas`,
+    takeawayTitle: 'Lectura AEO por motor',
+    weakestTakeaway: (providerName: string) =>
+      `${providerName} es el canal con menor presencia; conviene revisar fuentes frescas, citas externas y contenido recuperable para ese motor.`
   },
   signals: {
-    title: 'Calidad de la presencia',
+    title: 'Calidad de la presencia AEO',
+    helper: 'No basta con aparecer: importa si te citan, cómo te describen y qué fuentes sostienen la respuesta.',
     citationShareTitle: 'Share de citas (promedio)',
     citationShareHelper: (cited: number, total: number) => `Menciones con cita: ${cited} de ${total}`,
     sentimentTitle: 'Sentimiento de menciones',
@@ -307,11 +330,15 @@ export const GH_GROWTH_AI_VISIBILITY_REPORT_ARTIFACT = {
     prominenceHelper: 'Mejor posición y posición promedio en respuestas de IA.',
     prominenceBest: (best: number) => `Mejor: #${best}`,
     prominenceAverage: (avg: number) => `Promedio: #${avg}`,
+    sourceMixTitle: 'Fuentes que sostienen la respuesta',
+    sourceMixHelper: 'Tipo de fuente citada o usada por la IA en la muestra.',
     trendTitle: 'Tendencia de visibilidad',
     trendAxisLabel: 'Puntaje de visibilidad estimada (0-100)'
   },
   recommendations: {
-    title: 'Recomendaciones prioritarias',
+    title: 'Plan AEO prioritario',
+    helper:
+      'Focos ordenados para mover el baseline: mejorar recuperación, citabilidad, exactitud y presencia competitiva sin prometer ranking.',
     colAction: 'Acción recomendada',
     colDescription: 'Descripción',
     colSeverity: 'Prioridad',
@@ -323,7 +350,10 @@ export const GH_GROWTH_AI_VISIBILITY_REPORT_ARTIFACT = {
     sampledProviders: 'Proveedores muestreados',
     promptCount: 'Prompts evaluados',
     scoreVersion: 'Versión del score',
-    promptPackVersion: 'Versión del prompt pack'
+    promptPackVersion: 'Versión del prompt pack',
+    baselineTitle: 'Baseline de medición',
+    baselineBody:
+      'Este snapshot es comparable solo si se repite con el mismo prompt pack, motores muestreados y versión de score. La tendencia mide Share of Voice, citas y exactitud sobre esa base.'
   },
   footer: {
     publicSafeStamp: 'Contenido público-safe: sin evidencia cruda.'

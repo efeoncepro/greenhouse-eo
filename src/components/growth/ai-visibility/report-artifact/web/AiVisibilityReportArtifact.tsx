@@ -37,12 +37,15 @@ import {
 import AppRecharts from '@/libs/styles/AppRecharts'
 import { visuallyHiddenSx } from '@/components/greenhouse/accessibility'
 import AnimatedCounter from '@/components/greenhouse/AnimatedCounter'
+import TeamAvatarGroup, { type TeamAvatarGroupBrand } from '@/components/greenhouse/TeamAvatarGroup'
 import { GreenhouseBrandLogoMark, type GreenhouseBrandLogoKind } from '@/components/greenhouse/primitives'
 import { resolveBrandAssets } from '@/components/greenhouse/brand-assets'
 import { GH_GROWTH_AI_VISIBILITY, GH_GROWTH_AI_VISIBILITY_REPORT_ARTIFACT as C } from '@/lib/copy/growth'
 import type { GraderReportSeverity } from '@/lib/growth/ai-visibility/report/contracts'
 
 import {
+  REPORT_DIMENSION_LEVEL,
+  REPORT_LEVEL_IDS,
   REPORT_SEVERITY_TONE,
   reportSectionVisible,
   type ReportArtifactLevel,
@@ -62,6 +65,26 @@ const toneToColor = (severity: GraderReportSeverity): MuiColor => {
   if (tone === 'error') return 'error'
 
   return 'secondary'
+}
+
+const scoreTextColor = (severity: GraderReportSeverity): string => {
+  const tone = REPORT_SEVERITY_TONE[severity]
+
+  if (tone === 'success') return 'success.dark'
+  if (tone === 'warning') return 'text.primary'
+  if (tone === 'error') return 'error.main'
+
+  return 'text.primary'
+}
+
+const scoreCssColor = (severity: GraderReportSeverity): string => {
+  const tone = REPORT_SEVERITY_TONE[severity]
+
+  if (tone === 'success') return 'var(--mui-palette-success-dark)'
+  if (tone === 'warning') return 'var(--mui-palette-text-primary)'
+  if (tone === 'error') return 'var(--mui-palette-error-main)'
+
+  return 'var(--mui-palette-text-primary)'
 }
 
 const SEVERITY_ICON: Record<GraderReportSeverity, string> = {
@@ -87,6 +110,20 @@ const ENGINE_LOGO_KIND: Record<string, GreenhouseBrandLogoKind> = {
   openai: 'gptIsotype',
   anthropic: 'claudeIsologo'
 }
+
+const ENGINE_DISPLAY_NAME: Record<string, string> = {
+  openai: 'ChatGPT',
+  anthropic: 'Claude',
+  gemini: 'Gemini',
+  google_ai_overview: 'Gemini',
+  perplexity: 'Perplexity'
+}
+
+const engineBrandsFromProviders = (providers: string[]): TeamAvatarGroupBrand[] =>
+  providers.map(provider => ({
+    provider,
+    name: ENGINE_DISPLAY_NAME[provider] ?? provider.charAt(0).toUpperCase() + provider.slice(1)
+  }))
 
 const EngineLogo = ({ provider }: { provider: string }) => {
   if (provider === 'perplexity') {
@@ -223,7 +260,7 @@ const ScoreGauge = ({ score, severity }: { score: number | null; severity: Grade
   const theme = useTheme()
   const color = toneToColor(severity)
   const trackColor = theme.palette.divider
-  const fillColor = color === 'secondary' ? theme.palette.text.disabled : theme.palette[color].main
+  const fillColor = color === 'warning' ? theme.palette.warning.dark : color === 'secondary' ? theme.palette.text.primary : theme.palette[color].main
   const pct = score === null ? 0 : Math.max(0, Math.min(100, score)) / 100
   const radius = 80
   const circumference = Math.PI * radius
@@ -244,7 +281,7 @@ const ScoreGauge = ({ score, severity }: { score: number | null; severity: Grade
       </Box>
       <Box sx={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-end', pb: 0.5 }}>
         {score === null ? (
-          <Typography variant='h4' color='text.disabled'>
+          <Typography variant='h4' color='text.primary'>
             —
           </Typography>
         ) : (
@@ -267,7 +304,7 @@ const ScoreGauge = ({ score, severity }: { score: number | null; severity: Grade
 
 const VerdictSection = ({ model }: { model: ReportArtifactModel }) => {
   const color = toneToColor(model.overallSeverity)
-  const coverage = model.provenance.providersSampled.length
+  const engineBrands = engineBrandsFromProviders(model.provenance.providersSampled)
 
   return (
     <Card variant='outlined' data-capture='ai-visibility-report-score'>
@@ -291,12 +328,7 @@ const VerdictSection = ({ model }: { model: ReportArtifactModel }) => {
             </Typography>
           </Stack>
           <Divider flexItem />
-          <Stack direction='row' spacing={1} alignItems='center'>
-            <i className='tabler-router' aria-hidden style={{ color: 'var(--mui-palette-text-secondary)' }} />
-            <Typography variant='caption' color='text.secondary'>
-              {C.verdict.coverageValue(coverage, coverage)}
-            </Typography>
-          </Stack>
+          {engineBrands.length > 0 ? <TeamAvatarGroup brands={engineBrands} label={C.verdict.engineBrandsLabel} size={36} /> : null}
         </Stack>
       </CardContent>
     </Card>
@@ -308,37 +340,117 @@ const VerdictSection = ({ model }: { model: ReportArtifactModel }) => {
 const LevelCard = ({ level }: { level: ReportArtifactLevel }) => {
   const copy = C.level[level.id]
   const isCoverage = level.status === 'coverage'
-  const color = toneToColor(level.severity)
 
   return (
-    <Card variant='outlined' sx={{ height: '100%' }}>
-      <CardContent>
-        <Stack spacing={1.5}>
-          <Stack direction='row' justifyContent='space-between' alignItems='center'>
-            <Typography variant='overline' color='text.secondary'>
-              {copy.ordinal}
-            </Typography>
-            <i className={LEVEL_ICON[level.id]} aria-hidden style={{ color: 'var(--mui-palette-text-secondary)' }} />
+    <Box
+      sx={{
+        height: '100%',
+        minWidth: 0,
+        border: theme => `1px solid ${theme.palette.divider}`,
+        borderRadius: theme => `${theme.shape.customBorderRadius.md}px`,
+        p: 3,
+        bgcolor: level.axis === 'agentic' ? 'action.hover' : 'background.paper'
+      }}
+    >
+      <Stack spacing={1.25} sx={{ height: '100%' }}>
+        <Stack direction='row' justifyContent='space-between' alignItems='center'>
+          <Typography variant='overline' color='text.secondary'>
+            {copy.ordinal}
+          </Typography>
+          <i className={LEVEL_ICON[level.id]} aria-hidden style={{ color: 'var(--mui-palette-text-secondary)' }} />
+        </Stack>
+        <Box sx={{ minWidth: 0 }}>
+          <Typography variant='subtitle1' sx={{ fontWeight: 600 }}>
+            {copy.label}
+          </Typography>
+          <Typography variant='caption' color='text.secondary' sx={{ display: 'block' }}>
+            {copy.labelEn} · {copy.question}
+          </Typography>
+        </Box>
+        {isCoverage ? (
+          <Stack spacing={1}>
+            <Chip size='small' variant='outlined' color='default' label={C.levelsBand.coverageBadge} />
+            {'coverageNote' in copy && copy.coverageNote && (
+              <Typography variant='caption' color='text.secondary'>
+                {copy.coverageNote}
+              </Typography>
+            )}
           </Stack>
-          <Box>
-            <Typography variant='subtitle1' sx={{ fontWeight: 600 }}>
-              {copy.label}
+        ) : (
+          <Stack direction='row' spacing={1} alignItems='baseline'>
+            <Typography variant='h5' color={scoreTextColor(level.severity)} sx={{ fontVariantNumeric: 'tabular-nums' }}>
+              {level.score}
             </Typography>
             <Typography variant='caption' color='text.secondary'>
-              {copy.labelEn} · {copy.question}
+              /100
             </Typography>
-          </Box>
-          {isCoverage ? (
-            <Chip size='small' variant='tonal' color='secondary' label={C.levelsBand.coverageBadge} />
-          ) : (
-            <Stack direction='row' spacing={1} alignItems='baseline'>
-              <Typography variant='h5' color={`${color}.main`} sx={{ fontVariantNumeric: 'tabular-nums' }}>
-                {level.score}
-              </Typography>
-              <Typography variant='caption' color='text.secondary'>
-                /100
-              </Typography>
+          </Stack>
+        )}
+      </Stack>
+    </Box>
+  )
+}
+
+const LevelsSection = ({ model }: { model: ReportArtifactModel }) => {
+  const perceptionLevels = model.levels.filter(level => level.axis === 'perception')
+  const agenticLevel = model.levels.find(level => level.axis === 'agentic')
+
+  return (
+    <Card variant='outlined' data-capture='ai-visibility-report-levels'>
+      <CardContent>
+        <SectionHeading title={C.levelsBand.title} helper={C.levelsBand.helper} ordinal={2} />
+        <Stack spacing={4}>
+          <Box>
+            <Stack direction='row' spacing={2} alignItems='center' flexWrap='wrap' useFlexGap sx={{ mb: 2 }}>
+              <Chip size='small' variant='tonal' color='info' label={C.levelsBand.perceptionAxis} />
+              <Typography variant='subtitle2'>{C.levelsBand.perceptionTitle}</Typography>
             </Stack>
+            <Typography variant='body2' color='text.secondary' sx={{ mb: 2 }}>
+              {C.levelsBand.perceptionHelper}
+            </Typography>
+            <Grid container spacing={3}>
+              {perceptionLevels.map(level => (
+                <Grid key={level.id} size={{ xs: 12, sm: 6, lg: 3 }}>
+                  <LevelCard level={level} />
+                </Grid>
+              ))}
+            </Grid>
+          </Box>
+
+          {agenticLevel && (
+            <Box>
+              <Stack direction='row' spacing={2} alignItems='center' flexWrap='wrap' useFlexGap sx={{ mb: 2 }}>
+                <Chip size='small' variant='outlined' color='default' label={C.levelsBand.agenticAxis} />
+                <Typography variant='subtitle2'>{C.levelsBand.agenticTitle}</Typography>
+              </Stack>
+              <Grid container spacing={3} alignItems='stretch'>
+                <Grid size={{ xs: 12, lg: 4 }}>
+                  <LevelCard level={agenticLevel} />
+                </Grid>
+                <Grid size={{ xs: 12, lg: 8 }}>
+                  <Box
+                    sx={{
+                      border: theme => `1px dashed ${theme.palette.divider}`,
+                      borderRadius: theme => `${theme.shape.customBorderRadius.md}px`,
+                      p: 3,
+                      display: 'flex',
+                      alignItems: 'center'
+                    }}
+                  >
+                    <Stack direction='row' spacing={2} alignItems='flex-start'>
+                      <i
+                        className='tabler-route-square'
+                        aria-hidden
+                        style={{ color: 'var(--mui-palette-text-secondary)', marginTop: 2 }}
+                      />
+                      <Typography variant='body2' color='text.secondary'>
+                        {C.levelsBand.agenticHelper}
+                      </Typography>
+                    </Stack>
+                  </Box>
+                </Grid>
+              </Grid>
+            </Box>
           )}
         </Stack>
       </CardContent>
@@ -346,96 +458,176 @@ const LevelCard = ({ level }: { level: ReportArtifactLevel }) => {
   )
 }
 
-const LevelsSection = ({ model }: { model: ReportArtifactModel }) => (
-  <Card variant='outlined' data-capture='ai-visibility-report-levels'>
-    <CardContent>
-      <SectionHeading title={C.levelsBand.title} ordinal={2} />
-      <Stack direction='row' spacing={2} sx={{ mb: 3 }} flexWrap='wrap' useFlexGap>
-        <Chip size='small' variant='tonal' color='info' label={C.levelsBand.perceptionAxis} />
-        <Chip size='small' variant='tonal' color='secondary' label={C.levelsBand.agenticAxis} />
-      </Stack>
-      <Grid container spacing={4}>
-        {model.levels.map(level => (
-          <Grid key={level.id} size={{ xs: 12, sm: 6, md: 2.4 }}>
-            <LevelCard level={level} />
-          </Grid>
-        ))}
-      </Grid>
-    </CardContent>
-  </Card>
-)
-
 // ── Dimensions ────────────────────────────────────────────────────────────────
 
-const DimensionsSection = ({ model, ordinal = 5 }: { model: ReportArtifactModel; ordinal?: number }) => (
-  <Card variant='outlined' data-capture='ai-visibility-report-dimensions'>
-    <CardContent>
-      <SectionHeading title={C.dimensions.title} helper={C.dimensions.helper} ordinal={ordinal} />
-      <Stack spacing={3} component='ul' sx={{ listStyle: 'none', p: 0, m: 0 }}>
-        {model.dimensions.map(dim => {
-          const color = toneToColor(dim.severity)
-          const empty = dim.score === null
+const DimensionsSection = ({ model, ordinal = 5 }: { model: ReportArtifactModel; ordinal?: number }) => {
+  const groups = REPORT_LEVEL_IDS.filter(levelId => levelId !== 'actionable')
+    .map(levelId => ({
+      levelId,
+      level: model.levels.find(level => level.id === levelId),
+      dimensions: model.dimensions.filter(dim => REPORT_DIMENSION_LEVEL[dim.key] === levelId)
+    }))
+    .filter(group => group.dimensions.length > 0)
 
-          return (
-            <Box key={dim.key} component='li'>
-              <Stack direction='row' justifyContent='space-between' alignItems='baseline' sx={{ mb: 0.5 }}>
-                <Typography variant='subtitle2'>{dim.label}</Typography>
-                <Stack direction='row' spacing={1} alignItems='center'>
-                  <i
-                    className={SEVERITY_ICON[dim.severity]}
-                    aria-hidden
-                    style={{ fontSize: '1rem', color: `var(--mui-palette-${color}-main)` }}
-                  />
-                  <Typography variant='monoAmount' color={empty ? 'text.disabled' : `${color}.main`}>
-                    {empty ? C.levelsBand.coverageBadge : `${dim.score}/100`}
-                  </Typography>
-                </Stack>
-              </Stack>
-              <LinearProgress
-                variant='determinate'
-                value={empty ? 0 : (dim.score as number)}
-                color={empty ? 'inherit' : color}
-                aria-label={`${dim.label}: ${empty ? 'sin dato' : `${dim.score} de 100`}`}
-                sx={{ height: 8, borderRadius: theme => theme.shape.customBorderRadius.sm }}
-              />
-              <Typography variant='caption' color='text.secondary' sx={{ mt: 0.5, display: 'block' }}>
-                {dim.explainer}
-              </Typography>
-            </Box>
-          )
-        })}
-      </Stack>
-    </CardContent>
-  </Card>
-)
+  return (
+    <Card variant='outlined' data-capture='ai-visibility-report-dimensions'>
+      <CardContent>
+        <SectionHeading title={C.dimensions.title} helper={C.dimensions.helper} ordinal={ordinal} />
+        <Grid container spacing={4}>
+          {groups.map(group => {
+            const levelCopy = C.level[group.levelId]
+
+            return (
+              <Grid key={group.levelId} size={{ xs: 12, md: 6, xl: 3 }}>
+                <Box
+                  sx={{
+                    height: '100%',
+                    minWidth: 0,
+                    border: theme => `1px solid ${theme.palette.divider}`,
+                    borderRadius: theme => `${theme.shape.customBorderRadius.md}px`,
+                    p: 3
+                  }}
+                >
+                  <Stack spacing={2.5}>
+                    <Stack direction='row' justifyContent='space-between' alignItems='flex-start' spacing={2}>
+                      <Box sx={{ minWidth: 0 }}>
+                        <Typography variant='overline' color='text.secondary' sx={{ display: 'block' }}>
+                          Nivel {levelCopy.ordinal}
+                        </Typography>
+                        <Typography variant='subtitle1' sx={{ fontWeight: 600 }}>
+                          {levelCopy.label}
+                        </Typography>
+                        <Typography variant='body2' color='text.secondary' sx={{ display: 'block' }}>
+                          {levelCopy.question}
+                        </Typography>
+                      </Box>
+                      {group.level && (
+                        <Chip
+                          size='small'
+                          variant={group.level.status === 'coverage' ? 'outlined' : 'tonal'}
+                          color={group.level.status === 'coverage' ? 'default' : toneToColor(group.level.severity)}
+                          label={group.level.status === 'coverage' ? C.levelsBand.coverageBadge : `${group.level.score}/100`}
+                          sx={{ flexShrink: 0 }}
+                        />
+                      )}
+                    </Stack>
+                    <Stack spacing={2.25} component='ul' sx={{ listStyle: 'none', p: 0, m: 0 }}>
+                      {group.dimensions.map(dim => {
+                        const color = toneToColor(dim.severity)
+                        const empty = dim.score === null
+                        const label = GH_GROWTH_AI_VISIBILITY.dimension_label[dim.key] ?? dim.label
+
+                        return (
+                          <Box key={dim.key} component='li'>
+                            <Stack direction='row' justifyContent='space-between' alignItems='baseline' spacing={2} sx={{ mb: 0.5 }}>
+                              <Typography variant='body2' sx={{ minWidth: 0, fontWeight: 600 }}>
+                                {label}
+                              </Typography>
+                              <Typography variant='monoAmount' color={empty ? 'text.primary' : scoreTextColor(dim.severity)} sx={{ flexShrink: 0 }}>
+                                {empty ? C.levelsBand.coverageBadge : `${dim.score}/100`}
+                              </Typography>
+                            </Stack>
+                            <LinearProgress
+                              variant='determinate'
+                              value={empty ? 0 : (dim.score as number)}
+                              color={empty ? 'inherit' : color}
+                              aria-label={`${label}: ${empty ? 'sin dato' : `${dim.score} de 100`}`}
+                              sx={{
+                                height: 7,
+                                borderRadius: theme => `${theme.shape.customBorderRadius.sm}px`,
+                                '& .MuiLinearProgress-bar': {
+                                  bgcolor: empty ? 'transparent' : scoreTextColor(dim.severity)
+                                }
+                              }}
+                            />
+                            <Typography variant='body2' color='text.secondary' sx={{ mt: 0.5, display: 'block' }}>
+                              {empty ? C.dimensions.coverageHelper : dim.explainer}
+                            </Typography>
+                          </Box>
+                        )
+                      })}
+                    </Stack>
+                  </Stack>
+                </Box>
+              </Grid>
+            )
+          })}
+        </Grid>
+      </CardContent>
+    </Card>
+  )
+}
 
 // ── Primary gap + recommended motion ──────────────────────────────────────────
 
 const PrimaryGapSection = ({ model }: { model: ReportArtifactModel }) => {
   if (!model.primaryGap) return null
-  const color = toneToColor(model.primaryGap.severity)
+  const affectedLevelId = REPORT_DIMENSION_LEVEL[model.primaryGap.dimensionKey]
+  const affectedLevelCopy = C.level[affectedLevelId]
 
   return (
-    <Card variant='outlined' data-capture='ai-visibility-report-primary-gap'>
-      <CardContent>
-        <Grid container spacing={4}>
-          <Grid size={{ xs: 12, md: 6 }}>
-            <SectionHeading title={C.primaryGap.title} />
-            <Stack direction='row' spacing={1.5} alignItems='flex-start'>
-              <i className='tabler-target-arrow' aria-hidden style={{ color: `var(--mui-palette-${color}-main)`, marginTop: 2 }} />
-              <Typography variant='body1'>{model.primaryGap.title}</Typography>
-            </Stack>
+    <Card variant='outlined' data-capture='ai-visibility-report-primary-gap' sx={{ height: '100%' }}>
+      <CardContent sx={{ height: '100%' }}>
+        <Stack spacing={4} sx={{ height: '100%' }}>
+          <Grid container spacing={4}>
+            <Grid size={{ xs: 12, md: 6 }}>
+              <SectionHeading title={C.primaryGap.title} />
+              <Stack direction='row' spacing={1.5} alignItems='flex-start'>
+                <i className='tabler-target-arrow' aria-hidden style={{ color: scoreCssColor(model.primaryGap.severity), marginTop: 2 }} />
+                <Typography variant='body1'>{model.primaryGap.title}</Typography>
+              </Stack>
+            </Grid>
+            <Grid size={{ xs: 12, md: 6 }}>
+              <SectionHeading title={C.recommendedMotion.title} />
+              <Stack direction='row' spacing={1.5} alignItems='flex-start'>
+                <i className='tabler-arrow-up-right' aria-hidden style={{ color: 'var(--mui-palette-primary-main)', marginTop: 2 }} />
+                <Typography variant='body1'>
+                  {model.recommendations[0]?.action ?? GH_GROWTH_AI_VISIBILITY.outcome_note}
+                </Typography>
+              </Stack>
+            </Grid>
           </Grid>
-          <Grid size={{ xs: 12, md: 6 }}>
-            <SectionHeading title={C.recommendedMotion.title} />
-            <Stack direction='row' spacing={1.5} alignItems='flex-start'>
-              <i className='tabler-arrow-up-right' aria-hidden style={{ color: 'var(--mui-palette-primary-main)', marginTop: 2 }} />
-              <Typography variant='body1'>
-                {model.recommendations[0]?.action ?? GH_GROWTH_AI_VISIBILITY.outcome_note}
-              </Typography>
-            </Stack>
-          </Grid>
-        </Grid>
+
+          <Box
+            sx={{
+              mt: 'auto',
+              border: theme => `1px solid ${theme.palette.divider}`,
+              borderRadius: theme => `${theme.shape.customBorderRadius.md}px`,
+              p: 3,
+              bgcolor: 'action.hover'
+            }}
+          >
+            <Typography variant='overline' color='text.secondary' sx={{ display: 'block', mb: 2 }}>
+              {C.primaryGap.executiveReadTitle}
+            </Typography>
+            <Grid container spacing={3}>
+              <Grid size={{ xs: 12, md: 4 }}>
+                <Typography variant='overline' color='text.secondary' sx={{ display: 'block' }}>
+                  {C.primaryGap.affectedLevelLabel}
+                </Typography>
+                <Typography variant='h6' color='text.primary'>
+                  {affectedLevelCopy.ordinal} · {affectedLevelCopy.label}
+                </Typography>
+              </Grid>
+              <Grid size={{ xs: 12, md: 4 }}>
+                <Typography variant='overline' color='text.secondary' sx={{ display: 'block' }}>
+                  {C.primaryGap.evidenceLabel}
+                </Typography>
+                <Typography variant='h6' color='text.primary'>
+                  {C.primaryGap.citationEvidence(model.citationInsight.ownDomainShare)}
+                </Typography>
+              </Grid>
+              <Grid size={{ xs: 12, md: 4 }}>
+                <Typography variant='overline' color='text.secondary' sx={{ display: 'block' }}>
+                  {C.primaryGap.nextProofLabel}
+                </Typography>
+                <Typography variant='body2' color='text.primary' sx={{ fontWeight: 600 }}>
+                  {C.primaryGap.nextProof(model.provenance.promptPackVersion)}
+                </Typography>
+              </Grid>
+            </Grid>
+          </Box>
+        </Stack>
       </CardContent>
     </Card>
   )
@@ -443,49 +635,131 @@ const PrimaryGapSection = ({ model }: { model: ReportArtifactModel }) => {
 
 // ── AEO signals ───────────────────────────────────────────────────────────────
 
+const SignalTile = ({
+  label,
+  value,
+  helper,
+  icon
+}: {
+  label: string
+  value: string
+  helper: string
+  icon: string
+}) => (
+  <Box
+    sx={{
+      height: '100%',
+      border: theme => `1px solid ${theme.palette.divider}`,
+      borderRadius: theme => `${theme.shape.customBorderRadius.md}px`,
+      p: 3,
+      minWidth: 0
+    }}
+  >
+    <Stack spacing={1}>
+      <Stack direction='row' spacing={1.5} alignItems='center'>
+        <i className={icon} aria-hidden style={{ color: 'var(--mui-palette-text-secondary)' }} />
+        <Typography variant='overline' color='text.secondary'>
+          {label}
+        </Typography>
+      </Stack>
+      <Typography variant='h5' sx={{ fontVariantNumeric: 'tabular-nums' }}>
+        {value}
+      </Typography>
+      <Typography variant='caption' color='text.secondary'>
+        {helper}
+      </Typography>
+    </Stack>
+  </Box>
+)
+
 const AeoSignalsSection = ({ model, ordinal = 6 }: { model: ReportArtifactModel; ordinal?: number }) => {
   const s = model.sentimentSummary
   const citation = model.citationInsight
   const pos = model.positionSummary
+  const maxSourceCount = Math.max(1, ...model.sourceTypeSummary.map(source => source.count))
 
   return (
     <Card variant='outlined' data-capture='ai-visibility-report-aeo-signals'>
       <CardContent>
-        <SectionHeading title={C.signals.title} ordinal={ordinal} />
+        <SectionHeading title={C.signals.title} helper={C.signals.helper} ordinal={ordinal} />
         <Grid container spacing={4}>
-          <Grid size={{ xs: 12 }}>
-            <Typography variant='overline' color='text.secondary'>
-              {C.signals.citationShareTitle}
-            </Typography>
-            <Typography variant='kpiValue' sx={{ display: 'block' }}>
-              {citation.ownDomainShare === null ? '—' : `${citation.ownDomainShare}%`}
-            </Typography>
-            <Typography variant='caption' color='text.secondary'>
-              {C.signals.citationShareHelper(citation.findingsCitingOwnDomain, citation.findingsWithCitations)}
-            </Typography>
+          <Grid size={{ xs: 12, md: 4 }}>
+            <SignalTile
+              icon='tabler-quote'
+              label={C.signals.citationShareTitle}
+              value={citation.ownDomainShare === null ? '—' : `${citation.ownDomainShare}%`}
+              helper={C.signals.citationShareHelper(citation.findingsCitingOwnDomain, citation.findingsWithCitations)}
+            />
           </Grid>
-          <Grid size={{ xs: 12 }}>
-            <Typography variant='overline' color='text.secondary'>
-              {C.signals.sentimentTitle}
-            </Typography>
-            <Typography variant='kpiValue' sx={{ display: 'block' }}>
-              {GH_GROWTH_AI_VISIBILITY.sentiment_net_label[s.net]}
-            </Typography>
-            <Typography variant='caption' color='text.secondary'>
-              {C.signals.sentimentBasis(s.evaluated)}
-            </Typography>
+          <Grid size={{ xs: 12, md: 4 }}>
+            <SignalTile
+              icon='tabler-mood-smile'
+              label={C.signals.sentimentTitle}
+              value={GH_GROWTH_AI_VISIBILITY.sentiment_net_label[s.net]}
+              helper={C.signals.sentimentBasis(s.evaluated)}
+            />
           </Grid>
-          <Grid size={{ xs: 12 }}>
-            <Typography variant='overline' color='text.secondary'>
-              {C.signals.prominenceTitle}
-            </Typography>
-            <Typography variant='kpiValue' sx={{ display: 'block' }}>
-              {pos.best === null ? '—' : `#${pos.best}`}
-            </Typography>
-            <Typography variant='caption' color='text.secondary'>
-              {pos.average === null ? C.signals.prominenceHelper : C.signals.prominenceAverage(pos.average)}
-            </Typography>
+          <Grid size={{ xs: 12, md: 4 }}>
+            <SignalTile
+              icon='tabler-list-numbers'
+              label={C.signals.prominenceTitle}
+              value={pos.best === null ? '—' : `#${pos.best}`}
+              helper={pos.average === null ? C.signals.prominenceHelper : C.signals.prominenceAverage(pos.average)}
+            />
           </Grid>
+          {model.sourceTypeSummary.length > 0 && (
+            <Grid size={{ xs: 12 }}>
+              <Box
+                sx={{
+                  border: theme => `1px solid ${theme.palette.divider}`,
+                  borderRadius: theme => `${theme.shape.customBorderRadius.md}px`,
+                  p: 3
+                }}
+              >
+                <Grid container spacing={3} alignItems='center'>
+                  <Grid size={{ xs: 12, md: 4 }}>
+                    <Typography variant='overline' color='text.secondary'>
+                      {C.signals.sourceMixTitle}
+                    </Typography>
+                    <Typography variant='caption' color='text.secondary' sx={{ display: 'block', mt: 0.5 }}>
+                      {C.signals.sourceMixHelper}
+                    </Typography>
+                  </Grid>
+                  <Grid size={{ xs: 12, md: 8 }}>
+                    <Stack spacing={1.25}>
+                      {model.sourceTypeSummary.map(source => (
+                        <Box key={source.sourceType}>
+                          <Stack direction='row' justifyContent='space-between' sx={{ mb: 0.5 }}>
+                            <Typography variant='caption'>{source.sourceType}</Typography>
+                            <Typography variant='monoAmount' color='text.secondary'>
+                              {source.count}
+                            </Typography>
+                          </Stack>
+                          <Box
+                            sx={{
+                              height: 6,
+                              borderRadius: theme => `${theme.shape.customBorderRadius.sm}px`,
+                              bgcolor: 'action.hover',
+                              overflow: 'hidden'
+                            }}
+                          >
+                            <Box
+                              sx={{
+                                height: '100%',
+                                width: `${(source.count / maxSourceCount) * 100}%`,
+                                bgcolor: 'primary.main',
+                                borderRadius: 'inherit'
+                              }}
+                            />
+                          </Box>
+                        </Box>
+                      ))}
+                    </Stack>
+                  </Grid>
+                </Grid>
+              </Box>
+            </Grid>
+          )}
         </Grid>
       </CardContent>
     </Card>
@@ -522,7 +796,7 @@ const CompetitiveSovSection = ({ model, ordinal = 4 }: { model: ReportArtifactMo
               <Box
                 sx={{
                   height: 10,
-                  borderRadius: theme.shape.customBorderRadius.sm,
+                  borderRadius: `${theme.shape.customBorderRadius.sm}px`,
                   bgcolor: row.isBrand ? alpha(theme.palette.primary.main, 0.18) : theme.palette.action.hover,
                   overflow: 'hidden'
                 }}
@@ -531,7 +805,7 @@ const CompetitiveSovSection = ({ model, ordinal = 4 }: { model: ReportArtifactMo
                   sx={{
                     height: '100%',
                     width: `${(row.mentions / max) * 100}%`,
-                    bgcolor: row.isBrand ? 'primary.main' : 'text.disabled',
+                    bgcolor: row.isBrand ? 'primary.main' : alpha(theme.palette.text.primary, 0.42),
                     borderRadius: 'inherit'
                   }}
                 />
@@ -628,10 +902,12 @@ const TrendSection = ({ model }: { model: ReportArtifactModel }) => {
 const RecommendationsSection = ({ model }: { model: ReportArtifactModel }) => (
   <Card variant='outlined' data-capture='ai-visibility-report-recommendations'>
     <CardContent>
-      <SectionHeading title={C.recommendations.title} ordinal={8} />
+      <SectionHeading title={C.recommendations.title} helper={C.recommendations.helper} ordinal={8} />
       <Stack spacing={3} component='ol' sx={{ listStyle: 'none', p: 0, m: 0 }}>
         {model.recommendations.map((rec, idx) => {
           const color = toneToColor(rec.severity)
+          const levelId = REPORT_DIMENSION_LEVEL[rec.dimensionKey]
+          const levelCopy = C.level[levelId]
 
           return (
             <Stack key={rec.gapKey} direction='row' spacing={2} component='li' alignItems='flex-start'>
@@ -643,7 +919,10 @@ const RecommendationsSection = ({ model }: { model: ReportArtifactModel }) => (
                 sx={{ fontVariantNumeric: 'tabular-nums', minWidth: 32 }}
               />
               <Box>
-                <Typography variant='subtitle2'>{rec.title}</Typography>
+                <Stack direction='row' spacing={1.5} alignItems='center' flexWrap='wrap' useFlexGap sx={{ mb: 0.5 }}>
+                  <Typography variant='subtitle2'>{rec.title}</Typography>
+                  <Chip size='small' variant='outlined' color='default' label={`${levelCopy.ordinal} · ${levelCopy.label}`} />
+                </Stack>
                 <Typography variant='body2' color='text.secondary'>
                   {rec.action}
                 </Typography>
@@ -663,6 +942,16 @@ const EngineSnapshotSection = ({ model }: { model: ReportArtifactModel }) => {
 
   if (!model.engineSnapshot?.length) return null
 
+  const providerName = (provider: string) =>
+    GH_GROWTH_AI_VISIBILITY.provider_label[provider as keyof typeof GH_GROWTH_AI_VISIBILITY.provider_label] ?? provider
+
+  const weakestEngine = model.engineSnapshot.reduce((weakest, current) => {
+    const weakestPct = weakest.resolved === 0 ? 0 : weakest.present / weakest.resolved
+    const currentPct = current.resolved === 0 ? 0 : current.present / current.resolved
+
+    return currentPct < weakestPct ? current : weakest
+  }, model.engineSnapshot[0])
+
   return (
     <Card variant='outlined' data-capture='ai-visibility-report-engine-snapshot'>
       <CardContent>
@@ -672,9 +961,7 @@ const EngineSnapshotSection = ({ model }: { model: ReportArtifactModel }) => {
             const pct = engine.resolved === 0 ? 0 : Math.round((engine.present / engine.resolved) * 100)
             const barColor = pct >= 70 ? 'success' : pct >= 45 ? 'warning' : 'error'
 
-            const name =
-              GH_GROWTH_AI_VISIBILITY.provider_label[engine.provider as keyof typeof GH_GROWTH_AI_VISIBILITY.provider_label] ??
-              engine.provider
+            const name = providerName(engine.provider)
 
             return (
               <Stack key={engine.provider} direction='row' spacing={2} alignItems='center'>
@@ -690,13 +977,35 @@ const EngineSnapshotSection = ({ model }: { model: ReportArtifactModel }) => {
                       {C.engineSnapshot.presentLabel(engine.present, engine.resolved)}
                     </Typography>
                   </Stack>
-                  <Box sx={{ height: 8, borderRadius: theme.shape.customBorderRadius.sm, bgcolor: theme.palette.action.hover, overflow: 'hidden' }}>
-                    <Box sx={{ height: '100%', width: `${pct}%`, bgcolor: `${barColor}.main`, borderRadius: 'inherit' }} />
+                  <Box sx={{ height: 8, borderRadius: `${theme.shape.customBorderRadius.sm}px`, bgcolor: theme.palette.action.hover, overflow: 'hidden' }}>
+                  <Box
+                    sx={{
+                      height: '100%',
+                      width: `${pct}%`,
+                      bgcolor: barColor === 'warning' ? 'warning.dark' : `${barColor}.main`,
+                      borderRadius: 'inherit'
+                    }}
+                  />
                   </Box>
                 </Box>
               </Stack>
             )
           })}
+          <Box
+            sx={{
+              borderRadius: `${theme.shape.customBorderRadius.md}px`,
+              bgcolor: 'action.hover',
+              p: 3,
+              minWidth: 0
+            }}
+          >
+            <Typography variant='overline' color='text.secondary' sx={{ display: 'block', mb: 0.5 }}>
+              {C.engineSnapshot.takeawayTitle}
+            </Typography>
+            <Typography variant='body2' color='text.secondary'>
+              {C.engineSnapshot.weakestTakeaway(providerName(weakestEngine.provider))}
+            </Typography>
+          </Box>
         </Stack>
       </CardContent>
     </Card>
@@ -732,6 +1041,24 @@ const ProvenanceSection = ({ model }: { model: ReportArtifactModel }) => {
             </Grid>
           ))}
         </Grid>
+        <Box
+          sx={{
+            mt: 4,
+            borderRadius: theme => `${theme.shape.customBorderRadius.md}px`,
+            bgcolor: 'action.hover',
+            p: 3
+          }}
+        >
+          <Stack direction='row' spacing={1.5} alignItems='flex-start'>
+            <i className='tabler-repeat' aria-hidden style={{ color: 'var(--mui-palette-text-secondary)', marginTop: 2 }} />
+            <Box>
+              <Typography variant='subtitle2'>{C.provenance.baselineTitle}</Typography>
+              <Typography variant='body2' color='text.secondary' sx={{ mt: 0.5 }}>
+                {C.provenance.baselineBody}
+              </Typography>
+            </Box>
+          </Stack>
+        </Box>
       </CardContent>
     </Card>
   )
@@ -776,6 +1103,40 @@ const AiVisibilityReportArtifact = ({ model, header }: AiVisibilityReportArtifac
       sx={{
         minWidth: 0,
         overflowX: 'clip',
+        '& .MuiTypography-caption, & .MuiTypography-body2, & .MuiTypography-overline, & .MuiTypography-subtitle1, & .MuiTypography-subtitle2, & .MuiTypography-monoAmount': {
+          color: theme => alpha(theme.palette.text.primary, 0.84)
+        },
+        '& .MuiChip-colorWarning': {
+          color: 'var(--mui-palette-text-primary)'
+        },
+        '& .MuiChip-colorWarning .MuiChip-label': {
+          color: 'inherit',
+          fontWeight: 600
+        },
+        '& .MuiChip-colorSuccess': {
+          color: 'var(--mui-palette-success-dark)'
+        },
+        '& .MuiChip-colorSuccess .MuiChip-label': {
+          color: 'inherit',
+          fontWeight: 600
+        },
+        '& .MuiChip-colorInfo': {
+          color: 'var(--mui-palette-info-dark)'
+        },
+        '& .MuiChip-colorInfo .MuiChip-label': {
+          color: 'inherit',
+          fontWeight: 600
+        },
+        '& .MuiChip-colorSecondary': {
+          color: 'var(--mui-palette-text-primary)'
+        },
+        '& .MuiChip-colorSecondary .MuiChip-label': {
+          color: 'inherit',
+          fontWeight: 600
+        },
+        '& .recharts-cartesian-axis-tick-value': {
+          fill: theme => alpha(theme.palette.text.primary, 0.78)
+        },
         '& [data-capture^="ai-visibility-report"]': {
           scrollMarginTop: 12
         }
@@ -810,16 +1171,19 @@ const AiVisibilityReportArtifact = ({ model, header }: AiVisibilityReportArtifac
           )}
 
           {show('dimensions') && (
-            <Grid size={{ xs: 12, lg: 8 }} sx={{ minWidth: 0 }}>
+            <Grid size={{ xs: 12 }} sx={{ minWidth: 0 }}>
               <DimensionsSection model={model} />
             </Grid>
           )}
 
+          {show('aeoSignals') && (
+            <Grid size={{ xs: 12, lg: 8 }} sx={{ minWidth: 0 }}>
+              <AeoSignalsSection model={model} />
+            </Grid>
+          )}
+
           <Grid size={{ xs: 12, lg: 4 }} sx={{ minWidth: 0 }}>
-            <Stack spacing={6}>
-              {show('aeoSignals') && <AeoSignalsSection model={model} />}
-              {show('trend') && <TrendSection model={model} />}
-            </Stack>
+            {show('trend') && <TrendSection model={model} />}
           </Grid>
 
           {show('recommendations') && (

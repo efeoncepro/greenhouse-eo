@@ -1,0 +1,44 @@
+{
+  "//": "Plantilla Organization — la entidad raíz de la marca. Pega en <head> dentro de <script type=\"application/ld+json\">. Reemplaza TODOS los placeholders. sameAs = perfiles autoritativos que prueban que es la misma entidad (clave para Knowledge Graph + AEO).",
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "@id": "https://EXAMPLE.com/#organization",
+  "name": "NOMBRE DE LA MARCA",
+  "legalName": "RAZÓN SOCIAL LEGAL",
+  "url": "https://EXAMPLE.com",
+  "logo": {
+    "@type": "ImageObject",
+    "url": "https://EXAMPLE.com/logo.png",
+    "width": 600,
+    "height": 60
+  },
+  "description": "DESCRIPCIÓN CANÓNICA Y CONSISTENTE DE LA ENTIDAD (la misma en todos lados).",
+  "foundingDate": "AAAA-MM-DD",
+  "founders": [
+    { "@type": "Person", "name": "NOMBRE FUNDADOR/A" }
+  ],
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "CALLE Y NÚMERO",
+    "addressLocality": "CIUDAD",
+    "addressRegion": "REGIÓN",
+    "postalCode": "CÓDIGO POSTAL",
+    "addressCountry": "CL"
+  },
+  "contactPoint": {
+    "@type": "ContactPoint",
+    "telephone": "+56-2-0000-0000",
+    "contactType": "customer service",
+    "email": "contacto@EXAMPLE.com",
+    "availableLanguage": ["es", "en"]
+  },
+  "sameAs": [
+    "https://www.linkedin.com/company/PERFIL",
+    "https://www.crunchbase.com/organization/PERFIL",
+    "https://www.wikidata.org/wiki/QXXXXXX",
+    "https://es.wikipedia.org/wiki/PERFIL",
+    "https://twitter.com/PERFIL",
+    "https://www.instagram.com/PERFIL",
+    "https://www.youtube.com/@PERFIL"
+  ]
+}

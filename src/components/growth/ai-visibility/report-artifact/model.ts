@@ -99,6 +99,17 @@ export const REPORT_LEVEL_DIMENSIONS: Record<ReportLevelId, ScoreDimensionKey[]>
   intrinsic: ['competitive_sov', 'revenue_intent_coverage']
 }
 
+/** Mapeo inverso para que los adapters agrupen la explicación técnica bajo el framework público. */
+export const REPORT_DIMENSION_LEVEL: Record<ScoreDimensionKey, ReportLevelId> = {
+  ai_visibility: 'found',
+  entity_clarity: 'readable',
+  category_ownership: 'readable',
+  citation_quality: 'readable',
+  message_alignment: 'correct',
+  competitive_sov: 'intrinsic',
+  revenue_intent_coverage: 'intrinsic'
+}
+
 // ── Sections + disclosure matrix ──────────────────────────────────────────────
 
 export const REPORT_SECTION_IDS = [

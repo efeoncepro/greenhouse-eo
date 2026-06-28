@@ -92,13 +92,25 @@ type TeamAvatarGroupProps = {
 // blanco (`background.paper`) recorta el solape, como en un AvatarGroup canónico.
 const BrandDisc = ({ brand, size }: { brand: TeamAvatarGroupBrand; size: number }) => {
   const kind = ENGINE_LOGO_KIND[brand.provider]
-  const glyphSize = Math.round(size * 0.6)
+  const glyphSize = Math.round(size * 0.52)
 
   const inner =
     brand.provider === 'perplexity' ? (
       <i className='logos-perplexity-icon' aria-hidden style={{ fontSize: glyphSize }} />
     ) : kind ? (
-      <GreenhouseBrandLogoMark kind={kind} size='small' decorative />
+      <GreenhouseBrandLogoMark
+        kind={kind}
+        size='small'
+        decorative
+        sx={{
+          inlineSize: glyphSize,
+          blockSize: glyphSize,
+          '& > span': {
+            inlineSize: glyphSize,
+            blockSize: glyphSize
+          }
+        }}
+      />
     ) : (
       <i className='tabler-robot' aria-hidden style={{ fontSize: glyphSize }} />
     )
