@@ -229,6 +229,38 @@ Reglas obligatorias:
 - Before/after evidence: N/A pagina nueva.
 - Known visual debt: depende de route shell cliente vigente.
 
+### Implementation mapping
+
+- Route / surface: `/aeo` (cliente; renombrada de `/growth/ai-visibility/report` en el Delta 2026-06-28) + harness `/aeo/mockup`.
+- Primitive / variant / kind: `CompositionShell` composición `masterDetail` (kind `workbench`) + report-artifact view (4.º view-adapter de `modelFromClientReport`) + `TeamAvatarGroup` kind `brands` (isotipos "Evaluado en") + `MetricSummaryCard`/chart cards (Recharts).
+- Component candidates: `AiVisibilityClientReportView` (navigator + detail canvas rico).
+- Copy source: `src/lib/copy/growth.ts` (`GH_GROWTH_AI_VISIBILITY_CLIENT_REPORT` + `dimension_label`; recs reencuadradas a "Plan AEO").
+- Data reader / command: reader client-scoped vía boundary del portal cliente (TASK-1243); read-only (sin command — el status de ejecución llega en TASK-1275/1276).
+- API parity: 3.er consumer (público/admin/cliente) sobre el mismo `buildGraderReport`/`ReportArtifactModel`.
+- Access / capability: capability `growth.ai_visibility.report.read_client` + viewCode `cliente.ai_visibility_report` (routeGroup `client`, 3 client roles + efeonce_admin).
+- States to implement: default/loading/empty/preparing/error/partial/denied/mobile.
+
+### GVC scenario plan
+
+- Scenario file: `scripts/frontend/scenarios/growth-ai-visibility-client-report.scenario.ts`
+- Route: `/aeo/mockup` (harness con fixture canónico; la ruta real es client-scoped y muestra empty sin grader run por-org).
+- Viewports: desktop 1440 + mobile 390.
+- Required steps: mark summary (clip overview) → scroll composition-shell → mark workbench (clip shell).
+- Required captures: `01-summary`, `02-workbench`.
+- Required `data-capture` markers: `client-ai-visibility-overview`, `composition-shell`, `client-ai-visibility-detail`.
+- Assertions: noLoginRedirect, noErrorBoundary.
+- Scroll-width checks: sin scroll horizontal desktop + 390.
+- Accessibility/focus checks: severidad nombrada (no color-only), charts con alternativa accesible, focus restore del drawer mobile.
+- Reduced-motion evidence: charts/motion degradan a estado final.
+
+### Design decision log
+
+- Decision: **Concepto C — Split Workbench (master-detail)** para cliente autenticado; naming **AEO** (`/aeo`); recs como **"Plan AEO" done-for-you** (no to-do del cliente).
+- Alternatives considered: Concepto A (Executive Signal Command/sidecar de prospecto) — descartado (se quedaba pobre para una superficie de cliente data-dense); "Visibilidad en IA" como naming — descartado (genérico vs el estándar de mercado AEO); CTA "Agendar conversación" — descartado (el cliente ya contrató, es soporte: "Hablar con tu equipo").
+- Why this pattern: el cliente ya contrató AEO → vista rica/recurrente, no sidecar de venta.
+- Reuse / extend / new primitive: `reuse` del report model + `extend` CompositionShell (composición `masterDetail` nueva, no-regresión de los 4 consumers de `split`) + canonización de `TeamAvatarGroup` kind `brands`.
+- Open risks: render con datos reales pendiente de un grader run con `grader_profiles.organization_id` enlazado (data, no código); status del Plan AEO pendiente de TASK-1275/1276.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
      El agente que toma esta task ejecuta Discovery y produce
