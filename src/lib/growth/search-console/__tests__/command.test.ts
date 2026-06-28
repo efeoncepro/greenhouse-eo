@@ -93,13 +93,14 @@ describe('startSearchConsoleConnection', () => {
     expect(state.createSearchConsoleOAuthState).toHaveBeenCalledWith({
       organizationId: 'org-a',
       siteUrl: 's',
-      createdByUserId: 'u'
+      createdByUserId: 'u',
+      returnToPath: null
     })
   })
 })
 
 describe('completeSearchConsoleConnection', () => {
-  const consumed = { organizationId: 'org-a', siteUrl: 'https://acme.com/', createdByUserId: 'u' }
+  const consumed = { organizationId: 'org-a', siteUrl: 'https://acme.com/', createdByUserId: 'u', returnToPath: null }
 
   it('state_invalid cuando el state no resuelve (forjado/reusado/expirado)', async () => {
     state.consumeSearchConsoleOAuthState.mockResolvedValue(null)
@@ -113,7 +114,7 @@ describe('completeSearchConsoleConnection', () => {
     oauth.exchangeCodeForTokens.mockResolvedValue({ refreshToken: null, accessToken: 'a', scopes: [] })
     const r = await completeSearchConsoleConnection({ rawState: 'x', code: 'c' })
 
-    expect(r).toEqual({ ok: false, errorCode: 'oauth_failed' })
+    expect(r).toEqual({ ok: false, errorCode: 'oauth_failed', returnToPath: null })
     expect(secrets.createOrAddSecretVersion).not.toHaveBeenCalled()
   })
 
@@ -123,7 +124,7 @@ describe('completeSearchConsoleConnection', () => {
     api.tokenCanAccessSite.mockResolvedValue(false)
     const r = await completeSearchConsoleConnection({ rawState: 'x', code: 'c' })
 
-    expect(r).toEqual({ ok: false, errorCode: 'site_not_accessible' })
+    expect(r).toEqual({ ok: false, errorCode: 'site_not_accessible', returnToPath: null })
     expect(secrets.createOrAddSecretVersion).not.toHaveBeenCalled()
   })
 
@@ -134,7 +135,7 @@ describe('completeSearchConsoleConnection', () => {
     secrets.createOrAddSecretVersion.mockResolvedValue({ ok: false, errorCode: 'permission_denied' })
     const r = await completeSearchConsoleConnection({ rawState: 'x', code: 'c' })
 
-    expect(r).toEqual({ ok: false, errorCode: 'secret_write_failed' })
+    expect(r).toEqual({ ok: false, errorCode: 'secret_write_failed', returnToPath: null })
     expect(store.upsertActiveSearchConsoleConnection).not.toHaveBeenCalled()
   })
 
@@ -163,6 +164,30 @@ describe('completeSearchConsoleConnection', () => {
 
     expect(upsertArg.tokenSecretRef).toBe('search-console-token-org-a')
     expect(JSON.stringify(upsertArg)).not.toContain('refresh-xyz')
+  })
+
+  it('ok: conserva returnToPath validado para que la route pueda redirigir al panel', async () => {
+    state.consumeSearchConsoleOAuthState.mockResolvedValue({
+      ...consumed,
+      returnToPath: '/agency/clients/org-a/lifecycle'
+    })
+    oauth.exchangeCodeForTokens.mockResolvedValue({
+      refreshToken: 'refresh-xyz',
+      accessToken: 'a',
+      scopes: ['https://www.googleapis.com/auth/webmasters.readonly']
+    })
+    api.tokenCanAccessSite.mockResolvedValue(true)
+    secrets.createOrAddSecretVersion.mockResolvedValue({ ok: true, secretId: 'search-console-token-org-a' })
+    store.upsertActiveSearchConsoleConnection.mockResolvedValue({
+      organizationId: 'org-a',
+      siteUrl: 'https://acme.com/',
+      status: 'active',
+      tokenSecretRef: 'search-console-token-org-a'
+    })
+
+    const r = await completeSearchConsoleConnection({ rawState: 'x', code: 'c' })
+
+    expect(r).toMatchObject({ ok: true, returnToPath: '/agency/clients/org-a/lifecycle' })
   })
 })
 

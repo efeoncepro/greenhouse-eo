@@ -32,6 +32,25 @@ const ERROR_TO_CANONICAL: Record<
   not_connected: 'search_console_not_connected'
 }
 
+const redirectWithResult = (
+  requestUrl: URL,
+  returnToPath: string,
+  result: 'connected' | 'error',
+  details?: Record<string, string | null>
+) => {
+  const target = new URL(returnToPath, requestUrl.origin)
+
+  target.searchParams.set('searchConsole', result)
+
+  for (const [key, value] of Object.entries(details ?? {})) {
+    if (value) {
+      target.searchParams.set(key, value)
+    }
+  }
+
+  return NextResponse.redirect(target, { status: 303 })
+}
+
 export async function GET(request: Request) {
   const { tenant, errorResponse } = await requireInternalTenantContext()
 
@@ -60,9 +79,17 @@ export async function GET(request: Request) {
     const result = await completeSearchConsoleConnection({ rawState: state, code })
 
     if (!result.ok) {
+      if (result.returnToPath) {
+        return redirectWithResult(url, result.returnToPath, 'error', { reason: result.errorCode })
+      }
+
       return canonicalErrorResponse(ERROR_TO_CANONICAL[result.errorCode], {
         extra: { reason: result.errorCode }
       })
+    }
+
+    if (result.returnToPath) {
+      return redirectWithResult(url, result.returnToPath, 'connected', { siteUrl: result.connection.siteUrl })
     }
 
     return NextResponse.json({

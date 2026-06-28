@@ -21,18 +21,54 @@ import {
 import { SEARCH_CONSOLE_STATE_TTL_MS } from './contracts'
 
 const hashState = (rawState: string): string => createHash('sha256').update(rawState).digest('hex')
+const STATE_RETURN_TO_SEPARATOR = '.'
+
+export const normalizeSearchConsoleReturnToPath = (value: string | null | undefined): string | null => {
+  const path = value?.trim()
+
+  if (!path || path.length > 512) {
+    return null
+  }
+
+  if (!path.startsWith('/') || path.startsWith('//') || path.includes('://') || /[\r\n]/.test(path)) {
+    return null
+  }
+
+  return path.startsWith('/agency/clients/') && path.includes('/lifecycle') ? path : null
+}
+
+const encodeReturnToPath = (path: string | null): string | null =>
+  path ? Buffer.from(path, 'utf8').toString('base64url') : null
+
+const decodeReturnToPath = (rawState: string): string | null => {
+  const encoded = rawState.split(STATE_RETURN_TO_SEPARATOR)[1]
+
+  if (!encoded) {
+    return null
+  }
+
+  try {
+    return normalizeSearchConsoleReturnToPath(Buffer.from(encoded, 'base64url').toString('utf8'))
+  } catch {
+    return null
+  }
+}
 
 export interface CreateSearchConsoleStateInput {
   organizationId: string
   siteUrl: string
   createdByUserId: string | null
+  returnToPath?: string | null
 }
 
 /** Crea el state row y devuelve el token raw (lo que se manda a Google). */
 export const createSearchConsoleOAuthState = async (
   input: CreateSearchConsoleStateInput
 ): Promise<string> => {
-  const rawState = randomBytes(32).toString('base64url')
+  const nonce = randomBytes(32).toString('base64url')
+  const returnToPath = normalizeSearchConsoleReturnToPath(input.returnToPath)
+  const encodedReturnTo = encodeReturnToPath(returnToPath)
+  const rawState = encodedReturnTo ? `${nonce}${STATE_RETURN_TO_SEPARATOR}${encodedReturnTo}` : nonce
   const stateHash = hashState(rawState)
   const expiresAt = new Date(Date.now() + SEARCH_CONSOLE_STATE_TTL_MS).toISOString()
 
@@ -50,6 +86,7 @@ export interface ConsumedSearchConsoleState {
   organizationId: string
   siteUrl: string
   createdByUserId: string | null
+  returnToPath: string | null
 }
 
 interface SearchConsoleStateRow {
@@ -103,7 +140,8 @@ export const consumeSearchConsoleOAuthState = async (
     return {
       organizationId: row.organization_id,
       siteUrl: row.site_url,
-      createdByUserId: row.created_by_user_id
+      createdByUserId: row.created_by_user_id,
+      returnToPath: decodeReturnToPath(rawState)
     }
   })
 }

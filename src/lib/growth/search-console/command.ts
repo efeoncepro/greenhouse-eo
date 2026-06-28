@@ -36,6 +36,7 @@ export interface StartSearchConsoleConnectionInput {
   organizationId: string
   siteUrl: string
   userId: string | null
+  returnToPath?: string | null
 }
 
 /**
@@ -60,7 +61,8 @@ export const startSearchConsoleConnection = async (
   const rawState = await createSearchConsoleOAuthState({
     organizationId: input.organizationId,
     siteUrl: input.siteUrl,
-    createdByUserId: input.userId
+    createdByUserId: input.userId,
+    returnToPath: input.returnToPath ?? null
   })
 
   return { ok: true, consentUrl: buildConsentUrl(config, rawState) }
@@ -88,7 +90,7 @@ export const completeSearchConsoleConnection = async (input: {
   const config = await resolveSearchConsoleOAuthConfig()
 
   if (!config) {
-    return { ok: false, errorCode: 'oauth_failed' }
+    return { ok: false, errorCode: 'oauth_failed', returnToPath: state.returnToPath }
   }
 
   try {
@@ -101,7 +103,7 @@ export const completeSearchConsoleConnection = async (input: {
         extra: { organizationId: state.organizationId }
       })
 
-      return { ok: false, errorCode: 'oauth_failed' }
+      return { ok: false, errorCode: 'oauth_failed', returnToPath: state.returnToPath }
     }
 
     // Verificación de propiedad: el token DEBE poder ver la propiedad elegida.
@@ -109,7 +111,7 @@ export const completeSearchConsoleConnection = async (input: {
     const canAccess = await tokenCanAccessSite(accessToken, state.siteUrl)
 
     if (!canAccess) {
-      return { ok: false, errorCode: 'site_not_accessible' }
+      return { ok: false, errorCode: 'site_not_accessible', returnToPath: state.returnToPath }
     }
 
     // Token → Secret Manager (NUNCA a PG). Honest degradation si el grant IAM falta.
@@ -122,7 +124,7 @@ export const completeSearchConsoleConnection = async (input: {
         extra: { organizationId: state.organizationId, reason: secretResult.reason }
       })
 
-      return { ok: false, errorCode: 'secret_write_failed' }
+      return { ok: false, errorCode: 'secret_write_failed', returnToPath: state.returnToPath }
     }
 
     const connection = await upsertActiveSearchConsoleConnection({
@@ -133,14 +135,14 @@ export const completeSearchConsoleConnection = async (input: {
       connectedByUserId: state.createdByUserId
     })
 
-    return { ok: true, connection }
+    return { ok: true, connection, returnToPath: state.returnToPath }
   } catch (error) {
     captureWithDomain(error, 'growth', {
       tags: { source: 'search_console_connect', stage: 'oauth_callback' },
       extra: { organizationId: state.organizationId }
     })
 
-    return { ok: false, errorCode: 'oauth_failed' }
+    return { ok: false, errorCode: 'oauth_failed', returnToPath: state.returnToPath }
   }
 }
 

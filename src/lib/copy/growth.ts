@@ -219,6 +219,66 @@ export const GH_GROWTH_AI_VISIBILITY = {
     'Diagnóstico muestreado y asistido por IA. No garantiza posiciones ni resultados; refleja una muestra de respuestas en la fecha del análisis.'
 } as const
 
+export const GH_SEARCH_CONSOLE = {
+  panel: {
+    title: 'Google Search Console',
+    subtitle: 'Mide la visibilidad de búsqueda de esta marca con datos reales de Google.',
+    lockedTitle: 'Search Console aún no está disponible',
+    lockedBody: 'La conexión está preparada, pero falta activar el flujo OAuth en este ambiente.',
+    deniedTitle: 'Conexión solo lectura',
+    deniedBody: 'Puedes ver el estado, pero necesitas permiso para conectar o desconectar esta fuente.',
+    propertyLabel: 'Propiedad',
+    propertyPlaceholder: 'sc-domain:ejemplo.com o https://ejemplo.com/',
+    propertyHelper: 'Ingresa la propiedad exacta que el cliente puede autorizar en Google.',
+    lastVerified: 'Última verificación',
+    connectedAt: 'Conectado',
+    notVerified: 'Sin verificación todavía'
+  },
+  status: {
+    connected: 'Conectado',
+    notConnected: 'No conectado',
+    revoked: 'Acceso revocado',
+    expired: 'Acceso expirado',
+    pending: 'Pendiente',
+    connecting: 'Conectando',
+    error: 'Error'
+  },
+  state: {
+    emptyTitle: 'Conecta la propiedad de búsqueda',
+    emptyBody: 'Autoriza una propiedad de Search Console para medir visibilidad orgánica sin pedir tokens manuales.',
+    connectedBody: 'Greenhouse puede leer Search Analytics de esta propiedad con scope de solo lectura.',
+    revokedBody: 'Google revocó o bloqueó el acceso. Reconecta para seguir midiendo.',
+    errorTitle: 'No pudimos completar la conexión',
+    errorBody: 'Revisa la propiedad e inténtalo de nuevo. Nunca mostramos errores crudos de Google.',
+    connectingTitle: 'Conectando con Google',
+    connectingBody: 'Te llevamos al consentimiento de Google. No cierres esta pestaña.'
+  },
+  cta: {
+    connect: 'Conectar',
+    reconnect: 'Reconectar',
+    disconnect: 'Desconectar',
+    retry: 'Reintentar',
+    cancel: 'Cancelar',
+    confirmDisconnect: 'Desconectar fuente'
+  },
+  disconnect: {
+    title: '¿Desconectar Search Console?',
+    body: 'Dejaremos de medir la visibilidad de búsqueda de esta marca hasta que vuelvas a conectar.',
+    success: 'Search Console quedó desconectado.',
+    error: 'No pudimos desconectar Search Console. Intenta de nuevo.'
+  },
+  feedback: {
+    connected: 'Search Console conectado.',
+    connectionFailed: 'No pudimos conectar Search Console.',
+    siteUrlMissing: 'Ingresa una propiedad de Search Console para continuar.'
+  },
+  aria: {
+    panel: 'Estado de conexión de Google Search Console',
+    propertyInput: 'Propiedad de Google Search Console',
+    disconnectDialog: 'Confirmación para desconectar Google Search Console'
+  }
+} as const
+
 /**
  * TASK-1252 — AI Visibility Report Artifact · copy reusable del informe completo.
  *

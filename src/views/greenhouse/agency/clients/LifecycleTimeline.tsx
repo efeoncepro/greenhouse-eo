@@ -28,6 +28,10 @@ import {
   useOnboardingEvidence
 } from '@/views/greenhouse/agency/clients/OnboardingEvidence'
 import { PortalUsersPanel } from '@/views/greenhouse/agency/clients/PortalUsersPanel'
+import {
+  SearchConsoleConnectionPanel,
+  type SearchConsoleConnectionPanelConnection
+} from '@/views/greenhouse/agency/clients/SearchConsoleConnectionPanel'
 import { isAutoDerivableItem } from '@/lib/client-lifecycle/evidence/evidence-types'
 import { GH_CLIENT_ONBOARDING as T } from '@/lib/copy/client-onboarding'
 import type {
@@ -160,6 +164,10 @@ interface Props {
   notionAnchors?: LifecycleNotionAnchorVm[]
   /** TASK-997 — equipo Teams anclado (surface en provision_communication_channels). */
   teamsAnchor?: LifecycleTeamsAnchorVm | null
+  /** TASK-1283 — conexión Google Search Console de la org cliente. */
+  searchConsoleConnection?: SearchConsoleConnectionPanelConnection | null
+  searchConsoleEnabled?: boolean
+  canManageSearchConsole?: boolean
 }
 
 const LifecycleTimeline = ({
@@ -171,7 +179,10 @@ const LifecycleTimeline = ({
   caseId,
   checklist,
   notionAnchors,
-  teamsAnchor
+  teamsAnchor,
+  searchConsoleConnection,
+  searchConsoleEnabled = false,
+  canManageSearchConsole = false
 }: Props) => {
   const theme = useTheme()
   const evidence = useOnboardingEvidence(caseId)
@@ -187,6 +198,17 @@ const LifecycleTimeline = ({
     </Stack>
   )
 
+  const SearchConsoleBlock = (
+    <Box sx={{ mb: 6, minWidth: 0 }} data-capture='search-console-connect-section'>
+      <SearchConsoleConnectionPanel
+        organizationId={organizationId}
+        connection={searchConsoleConnection ?? null}
+        enabled={searchConsoleEnabled}
+        canConnect={canManageSearchConsole}
+      />
+    </Box>
+  )
+
   if (degraded) {
     return (
       <Box sx={{ p: { xs: 4, md: 6 }, maxWidth: 1120, mx: 'auto' }}>
@@ -195,6 +217,7 @@ const LifecycleTimeline = ({
           <AlertTitle sx={{ fontWeight: 600 }}>No pudimos cargar el ciclo de vida</AlertTitle>
           Tuvimos un problema al leer el caso de onboarding. Refrescá la página para reintentar.
         </Alert>
+        <Box sx={{ mt: 6 }}>{SearchConsoleBlock}</Box>
       </Box>
     )
   }
@@ -216,6 +239,7 @@ const LifecycleTimeline = ({
             ) : undefined
           }
         />
+        <Box sx={{ mt: 6 }}>{SearchConsoleBlock}</Box>
       </Box>
     )
   }
@@ -266,6 +290,8 @@ const LifecycleTimeline = ({
           {T.timeline.healthyDescription}
         </Alert>
       )}
+
+      {SearchConsoleBlock}
 
       {/* TASK-997 — checklist del caso + anchors capturados (read-only) */}
       {checklist && checklist.length > 0 ? (

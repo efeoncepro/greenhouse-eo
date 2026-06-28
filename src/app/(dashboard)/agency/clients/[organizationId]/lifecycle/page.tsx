@@ -15,9 +15,15 @@ import {
 import { getOrganizationDisplayName } from '@/lib/client-onboarding/org-search'
 import { buildTenantEntitlementSubject } from '@/lib/commercial/party/route-entitlement-subject'
 import { can } from '@/lib/entitlements/runtime'
+import {
+  getSearchConsoleConnection,
+  isSearchConsoleEnabled,
+  type SearchConsoleConnection
+} from '@/lib/growth/search-console'
 import { captureWithDomain } from '@/lib/observability/capture'
 import { requireServerSession } from '@/lib/auth/require-server-session'
 import { getTenantContext } from '@/lib/tenant/get-tenant-context'
+import type { SearchConsoleConnectionPanelConnection } from '@/views/greenhouse/agency/clients/SearchConsoleConnectionPanel'
 
 export const metadata: Metadata = { title: 'Ciclo de vida del cliente | Greenhouse' }
 export const dynamic = 'force-dynamic'
@@ -45,24 +51,45 @@ const Page = async ({ params }: { params: Promise<{ organizationId: string }> })
   }
 
   const { organizationId } = await params
+  const canManageSearchConsole = can(subject, 'growth.search_console.connect', 'execute', 'tenant')
+  const searchConsoleEnabled = isSearchConsoleEnabled()
 
   let data: LifecycleTimelineData | null = null
   let organizationName = 'Cliente'
   let degraded = false
+  let searchConsoleConnection: SearchConsoleConnectionPanelConnection | null = null
   let checklist: LifecycleChecklistItemVm[] = []
   let notionAnchors: { notionDatabaseId: string; title: string }[] = []
   let teamsAnchor: { teamId: string; teamName: string } | null = null
   let caseId: string | null = null
 
   try {
-    const [timeline, name, activeCase] = await Promise.all([
+    const [timeline, name, activeCase, searchConsole] = await Promise.all([
       getLifecycleTimelineForOrganization(organizationId),
       getOrganizationDisplayName(organizationId),
-      getActiveCaseForOrganization(organizationId, 'onboarding')
+      getActiveCaseForOrganization(organizationId, 'onboarding'),
+      getSearchConsoleConnection(organizationId).catch(error => {
+        captureWithDomain(error, 'growth', {
+          tags: { source: 'client_lifecycle:search_console_connection_panel' },
+          extra: { organizationId }
+        })
+
+        return null as SearchConsoleConnection | null
+      })
     ])
 
     data = timeline
     organizationName = name ?? 'Cliente'
+    searchConsoleConnection = searchConsole
+      ? {
+          organizationId: searchConsole.organizationId,
+          siteUrl: searchConsole.siteUrl,
+          status: searchConsole.status,
+          connectedAt: searchConsole.connectedAt,
+          lastVerifiedAt: searchConsole.lastVerifiedAt,
+          lastErrorCode: searchConsole.lastErrorCode
+        }
+      : null
 
     if (activeCase) {
       caseId = activeCase.caseId
@@ -109,6 +136,9 @@ const Page = async ({ params }: { params: Promise<{ organizationId: string }> })
       checklist={checklist}
       notionAnchors={notionAnchors}
       teamsAnchor={teamsAnchor}
+      searchConsoleConnection={searchConsoleConnection}
+      searchConsoleEnabled={searchConsoleEnabled}
+      canManageSearchConsole={canManageSearchConsole}
     />
   )
 }

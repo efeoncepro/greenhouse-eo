@@ -33,7 +33,7 @@ export interface SearchConsoleConnection {
 
 /** Resultado del command connect/disconnect (discriminado por `ok`). */
 export type SearchConsoleCommandResult =
-  | { ok: true; connection: SearchConsoleConnection }
+  | { ok: true; connection: SearchConsoleConnection; returnToPath?: string | null }
   | {
       ok: false
       errorCode:
@@ -43,6 +43,7 @@ export type SearchConsoleCommandResult =
         | 'site_not_accessible'
         | 'secret_write_failed'
         | 'not_connected'
+      returnToPath?: string | null
     }
 
 /** Una fila de Search Analytics (Query API). */

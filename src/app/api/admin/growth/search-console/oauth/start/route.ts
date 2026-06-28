@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server'
 import { canonicalErrorResponse } from '@/lib/api/canonical-error-response'
 import { can } from '@/lib/entitlements/runtime'
 import { startSearchConsoleConnection } from '@/lib/growth/search-console'
+import { normalizeSearchConsoleReturnToPath } from '@/lib/growth/search-console/state-store'
 import { captureWithDomain } from '@/lib/observability/capture'
 import { requireInternalTenantContext } from '@/lib/tenant/authorization'
 
@@ -41,6 +42,7 @@ export async function GET(request: Request) {
   const url = new URL(request.url)
   const organizationId = asNonEmptyString(url.searchParams.get('organizationId'))
   const siteUrl = asNonEmptyString(url.searchParams.get('siteUrl'))
+  const returnToPath = normalizeSearchConsoleReturnToPath(url.searchParams.get('returnTo'))
 
   if (!organizationId || !siteUrl) {
     return canonicalErrorResponse('search_console_oauth_failed', {
@@ -53,7 +55,8 @@ export async function GET(request: Request) {
     const result = await startSearchConsoleConnection({
       organizationId,
       siteUrl,
-      userId: tenant.userId ?? null
+      userId: tenant.userId ?? null,
+      returnToPath
     })
 
     if (!result.ok) {
