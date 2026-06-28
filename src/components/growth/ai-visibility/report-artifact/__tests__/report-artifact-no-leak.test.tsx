@@ -77,11 +77,11 @@ describe('AiVisibilityReportArtifact — no-leak visual', () => {
     expect(reportSectionVisible('adminPreview', 'engineSnapshot')).toBe(true)
   })
 
-  it('publicWeb muestra "Visibilidad por motor" con logos + nombres de motor', () => {
+  it('publicWeb muestra canales de respuesta con logos + nombres de motor', () => {
     const model = modelFromPublicReport(SAMPLE_PUBLIC_REPORT)
     const { container } = renderWithTheme(<AiVisibilityReportArtifact model={model} header={HEADER} />)
 
-    expect(container.textContent).toContain('Visibilidad por motor')
+    expect(container.textContent).toContain(GH_GROWTH_AI_VISIBILITY_REPORT_ARTIFACT.engineSnapshot.title)
     expect(container.textContent).toContain('Gemini (Google)')
     expect(container.textContent).toContain('Perplexity')
   })

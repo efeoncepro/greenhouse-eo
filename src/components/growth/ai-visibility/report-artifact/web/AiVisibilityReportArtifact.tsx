@@ -367,10 +367,10 @@ const LevelsSection = ({ model }: { model: ReportArtifactModel }) => (
 
 // ── Dimensions ────────────────────────────────────────────────────────────────
 
-const DimensionsSection = ({ model }: { model: ReportArtifactModel }) => (
+const DimensionsSection = ({ model, ordinal = 5 }: { model: ReportArtifactModel; ordinal?: number }) => (
   <Card variant='outlined' data-capture='ai-visibility-report-dimensions'>
     <CardContent>
-      <SectionHeading title={C.dimensions.title} ordinal={4} />
+      <SectionHeading title={C.dimensions.title} helper={C.dimensions.helper} ordinal={ordinal} />
       <Stack spacing={3} component='ul' sx={{ listStyle: 'none', p: 0, m: 0 }}>
         {model.dimensions.map(dim => {
           const color = toneToColor(dim.severity)
@@ -443,7 +443,7 @@ const PrimaryGapSection = ({ model }: { model: ReportArtifactModel }) => {
 
 // ── AEO signals ───────────────────────────────────────────────────────────────
 
-const AeoSignalsSection = ({ model }: { model: ReportArtifactModel }) => {
+const AeoSignalsSection = ({ model, ordinal = 6 }: { model: ReportArtifactModel; ordinal?: number }) => {
   const s = model.sentimentSummary
   const citation = model.citationInsight
   const pos = model.positionSummary
@@ -451,9 +451,9 @@ const AeoSignalsSection = ({ model }: { model: ReportArtifactModel }) => {
   return (
     <Card variant='outlined' data-capture='ai-visibility-report-aeo-signals'>
       <CardContent>
-        <SectionHeading title={C.signals.title} ordinal={5} />
+        <SectionHeading title={C.signals.title} ordinal={ordinal} />
         <Grid container spacing={4}>
-          <Grid size={{ xs: 12, sm: 4 }}>
+          <Grid size={{ xs: 12 }}>
             <Typography variant='overline' color='text.secondary'>
               {C.signals.citationShareTitle}
             </Typography>
@@ -464,7 +464,7 @@ const AeoSignalsSection = ({ model }: { model: ReportArtifactModel }) => {
               {C.signals.citationShareHelper(citation.findingsCitingOwnDomain, citation.findingsWithCitations)}
             </Typography>
           </Grid>
-          <Grid size={{ xs: 12, sm: 4 }}>
+          <Grid size={{ xs: 12 }}>
             <Typography variant='overline' color='text.secondary'>
               {C.signals.sentimentTitle}
             </Typography>
@@ -475,7 +475,7 @@ const AeoSignalsSection = ({ model }: { model: ReportArtifactModel }) => {
               {C.signals.sentimentBasis(s.evaluated)}
             </Typography>
           </Grid>
-          <Grid size={{ xs: 12, sm: 4 }}>
+          <Grid size={{ xs: 12 }}>
             <Typography variant='overline' color='text.secondary'>
               {C.signals.prominenceTitle}
             </Typography>
@@ -494,7 +494,7 @@ const AeoSignalsSection = ({ model }: { model: ReportArtifactModel }) => {
 
 // ── Competitive Share of Voice ────────────────────────────────────────────────
 
-const CompetitiveSovSection = ({ model }: { model: ReportArtifactModel }) => {
+const CompetitiveSovSection = ({ model, ordinal = 4 }: { model: ReportArtifactModel; ordinal?: number }) => {
   const theme = useTheme()
 
   const rows = [
@@ -507,7 +507,7 @@ const CompetitiveSovSection = ({ model }: { model: ReportArtifactModel }) => {
   return (
     <Card variant='outlined' data-capture='ai-visibility-report-sov'>
       <CardContent>
-        <SectionHeading title={C.sov.title} helper={C.sov.helper} ordinal={6} />
+        <SectionHeading title={C.sov.title} helper={C.sov.helper} ordinal={ordinal} />
         <Stack spacing={2.5}>
           {rows.map(row => (
             <Box key={row.name}>
@@ -573,7 +573,7 @@ const TrendSection = ({ model }: { model: ReportArtifactModel }) => {
 
   return (
     <Card variant='outlined' data-capture='ai-visibility-report-trend'>
-      <CardContent>
+      <CardContent sx={{ position: 'relative', minWidth: 0, overflowX: 'clip' }}>
         <SectionHeading title={C.signals.trendTitle} ordinal={7} />
         <Stack direction='row' spacing={2} alignItems='baseline' sx={{ mb: 2 }}>
           <Typography variant='kpiValue'>{trend.overall.current}</Typography>
@@ -586,8 +586,12 @@ const TrendSection = ({ model }: { model: ReportArtifactModel }) => {
             }`.trim()}
           />
         </Stack>
-        <Box sx={{ height: 160 }} role='img' aria-label={`${C.signals.trendAxisLabel}. ${GH_GROWTH_AI_VISIBILITY.trend_status.con_tendencia}`}>
-          <AppRecharts>
+        <Box
+          sx={{ position: 'relative', width: '100%', height: 160, minWidth: 0, overflowX: 'clip' }}
+          role='img'
+          aria-label={`${C.signals.trendAxisLabel}. ${GH_GROWTH_AI_VISIBILITY.trend_status.con_tendencia}`}
+        >
+          <AppRecharts sx={{ width: '100%', height: '100%', minWidth: 0 }}>
             <ResponsiveContainer width='100%' height='100%'>
               <AreaChart data={data} margin={{ top: 8, right: 8, left: -24, bottom: 0 }}>
                 <defs>
@@ -765,7 +769,18 @@ const AiVisibilityReportArtifact = ({ model, header }: AiVisibilityReportArtifac
   const show = (section: Parameters<typeof reportSectionVisible>[1]) => reportSectionVisible(model.variant, section)
 
   return (
-    <Box component='article' aria-labelledby={labelId} data-capture='ai-visibility-report'>
+    <Box
+      component='article'
+      aria-labelledby={labelId}
+      data-capture='ai-visibility-report'
+      sx={{
+        minWidth: 0,
+        overflowX: 'clip',
+        '& [data-capture^="ai-visibility-report"]': {
+          scrollMarginTop: 12
+        }
+      }}
+    >
       <Typography id={labelId} component='h2' sx={visuallyHiddenSx}>
         {C.header.title} — {header.organizationName}
       </Typography>
@@ -780,13 +795,46 @@ const AiVisibilityReportArtifact = ({ model, header }: AiVisibilityReportArtifac
           </Grid>
         )}
         {show('levels') && <LevelsSection model={model} />}
-        {show('dimensions') && <DimensionsSection model={model} />}
-        {show('aeoSignals') && <AeoSignalsSection model={model} />}
-        {show('competitiveSov') && <CompetitiveSovSection model={model} />}
-        {show('trend') && <TrendSection model={model} />}
-        {show('engineSnapshot') && <EngineSnapshotSection model={model} />}
-        {show('recommendations') && <RecommendationsSection model={model} />}
-        {show('provenance') && <ProvenanceSection model={model} />}
+
+        <Grid container spacing={6} alignItems='stretch' data-capture='ai-visibility-report-analysis-grid'>
+          {show('engineSnapshot') && (
+            <Grid size={{ xs: 12, lg: 6 }} sx={{ minWidth: 0 }}>
+              <EngineSnapshotSection model={model} />
+            </Grid>
+          )}
+
+          {show('competitiveSov') && (
+            <Grid size={{ xs: 12, lg: 6 }} sx={{ minWidth: 0 }}>
+              <CompetitiveSovSection model={model} />
+            </Grid>
+          )}
+
+          {show('dimensions') && (
+            <Grid size={{ xs: 12, lg: 8 }} sx={{ minWidth: 0 }}>
+              <DimensionsSection model={model} />
+            </Grid>
+          )}
+
+          <Grid size={{ xs: 12, lg: 4 }} sx={{ minWidth: 0 }}>
+            <Stack spacing={6}>
+              {show('aeoSignals') && <AeoSignalsSection model={model} />}
+              {show('trend') && <TrendSection model={model} />}
+            </Stack>
+          </Grid>
+
+          {show('recommendations') && (
+            <Grid size={{ xs: 12, lg: 8 }} sx={{ minWidth: 0 }}>
+              <RecommendationsSection model={model} />
+            </Grid>
+          )}
+
+          {show('provenance') && (
+            <Grid size={{ xs: 12, lg: 4 }} sx={{ minWidth: 0 }}>
+              <ProvenanceSection model={model} />
+            </Grid>
+          )}
+        </Grid>
+
         {show('disclaimer') && <DisclaimerSection model={model} isPublic={isPublic} />}
       </Stack>
     </Box>

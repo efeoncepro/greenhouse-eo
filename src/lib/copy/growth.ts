@@ -277,27 +277,28 @@ export const GH_GROWTH_AI_VISIBILITY_REPORT_ARTIFACT = {
   primaryGap: { title: 'Brecha principal', impactLabel: 'Impacto' },
   recommendedMotion: { title: 'Movimiento recomendado', impactLabel: 'Impacto esperado' },
   dimensions: {
-    title: 'Desempeño por dimensión',
+    title: 'Por qué ocurre',
+    helper: 'Lectura del framework AEO: dónde la IA te encuentra, te entiende, te representa y te prefiere.',
     colDimension: 'Dimensión',
     colScore: 'Puntaje (0-100)',
     colSeverity: 'Severidad',
     colComment: 'Qué significa'
   },
   sov: {
-    title: 'Share of Voice competitivo',
-    helper: 'Participación de menciones de tu marca frente a competidores en respuestas de IA.',
+    title: 'Benchmark competitivo',
+    helper: 'Qué parte del espacio de respuesta ocupas frente a otras marcas de la categoría.',
     brandLabel: 'Tu marca',
     shareLabel: 'Share of Voice',
     mentionsLabel: 'menciones'
   },
   engineSnapshot: {
     // Presencia por motor (conteos) de la marca evaluada — público-safe, con logo + nombre por motor.
-    title: 'Visibilidad por motor',
-    helper: 'Tu visibilidad no es uniforme: cada motor de IA es un canal distinto.',
+    title: 'Canales de respuesta',
+    helper: 'Cada motor de IA se comporta como un canal AEO distinto: mide dónde apareces y dónde se pierde presencia.',
     presentLabel: (present: number, resolved: number) => `${present} de ${resolved} respuestas`
   },
   signals: {
-    title: 'Resumen de señales AEO',
+    title: 'Calidad de la presencia',
     citationShareTitle: 'Share de citas (promedio)',
     citationShareHelper: (cited: number, total: number) => `Menciones con cita: ${cited} de ${total}`,
     sentimentTitle: 'Sentimiento de menciones',

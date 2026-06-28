@@ -36,6 +36,7 @@ export const scenario: CaptureScenario = {
     { kind: 'mark', label: '03-dimensions', clipSelector: '[data-capture="ai-visibility-report-dimensions"]' },
     { kind: 'scroll', selector: '[data-capture="ai-visibility-report-aeo-signals"]', scrollBlock: 'center' },
     { kind: 'mark', label: '04-aeo-signals', clipSelector: '[data-capture="ai-visibility-report-aeo-signals"]' },
+    { kind: 'scroll', selector: '[data-capture="ai-visibility-report-sov"]', scrollBlock: 'center' },
     { kind: 'mark', label: '05-share-of-voice', clipSelector: '[data-capture="ai-visibility-report-sov"]' }
   ]
 }
