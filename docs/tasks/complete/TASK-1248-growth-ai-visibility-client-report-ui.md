@@ -1,5 +1,21 @@
 # TASK-1248 — Growth AI Visibility: Client Report UI
 
+## Delta 2026-06-28 — naming AEO + recs reencuadradas + canonización primitive + parity fix (post-cierre)
+
+Iteración sobre el cierre, en `develop` sin push (commits `0430bb7af`, `a6c93ce77`, `528369a36`):
+
+- **Naming AEO (decisión IA del operador):** el mercado estandariza **AEO (AI Engine Optimization)**, no "Visibilidad en IA" (genérico). Ruta cliente `/growth/ai-visibility/report` → **`/aeo`** (client-clean; "growth" es taxonomía INTERNA, leak en URL de cliente — el operador interno sí usa "growth", de ahí que la vista operador de Fase 3 viva en Growth). Migration forward-fix `20260628013012278` (view_registry route_path `/aeo` + label "AEO"; idempotente sobre el seed previo) + catalog + route-reachability + GVC scenario. Breadcrumb client-rooted **"Inicio / AEO"** (no "Clientes/Org/Diagnóstico"); título **"AEO — Snapshot de visibilidad"**.
+- **Recs reencuadradas (servicio done-for-you):** el cliente YA contrató AEO → las recomendaciones no son su to-do. Navigator "Recomendaciones" → **"Plan AEO"**; eyebrow "Recomendación i de n" → **"Foco i de n · Plan AEO"**; nota de propiedad **"Tu equipo de Efeonce está trabajando este foco contigo."** (V1 sin status; la capa de estado de ejecución llega como capability backend aparte — Fase 2).
+- **Canonización `TeamAvatarGroup` como primitive** (`0430bb7af`): la kind **`brands`** (isotipos de motor con Tooltip AXIS, shippeada en el summary "Evaluado en" + chart) se formalizó — barrel export, Lab `/design-system/team-avatar-group`, entrada en `DesignSystemCatalogView`, route-reachability, fila en `PRIMITIVES.md`.
+- **Parity fix de gobernanza** (`528369a36`): el viewCode `cliente.ai_visibility_report` ya estaba seedeado (view_registry + `role_view_assignments` para los 3 client roles), pero el test de parity TS↔seed (`client-role-visibility.test.ts`) no lo conocía → se agregó a la unión esperada + cobertura de matriz (3 client roles, grant=TRUE) + conteos (exec/manager 22→23, specialist 19→20 granted, denials 3 intactos).
+- **tsconfig:** se detectó y revirtió un cambio ajeno sin commit (`target ESNext→ES2017`, sin `downlevelIteration`) que habría roto gates.
+
+**Gates:** lint + tsc + `pnpm build` prod verdes (`/aeo` + `/aeo/mockup` en el árbol, ruta vieja eliminada) · `pnpm test` full **8248 passed / 0 fail** · migration `/aeo` aplicada+verificada en dev PG · **GVC mirado** (`/aeo/mockup` desktop: breadcrumb "Inicio / AEO" + título AEO + "PLAN AEO" + agency note + barras por proveedor + isotipos).
+
+**Seguimiento:** Fase 2 = capability de estado de ejecución de recomendaciones (backend, task nueva). Fase 3 = vista operador AEO en **Growth + facet Account 360** (NO admin), re-ubicando TASK-1247.
+
+---
+
 ## Cierre 2026-06-27 — implementado (Split Workbench, concepto C) · local-first, sin push
 
 Entregado en 5 slices (commits en `develop`, sin push):
