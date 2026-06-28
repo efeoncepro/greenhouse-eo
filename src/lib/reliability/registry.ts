@@ -559,7 +559,7 @@ export const STATIC_RELIABILITY_REGISTRY: ReliabilityModuleDefinition[] = [
     ],
     smokeTests: [],
     filesOwned: ['src/lib/growth/**', 'src/lib/reliability/queries/growth-ai-visibility-*.ts'],
-    expectedSignalKinds: ['data_quality', 'runtime', 'cost_guard', 'posture', 'test_lane'],
+    expectedSignalKinds: ['data_quality', 'runtime', 'cost_guard', 'posture', 'test_lane', 'drift'],
     incidentDomainTag: 'growth'
   }
 ]

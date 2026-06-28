@@ -180,6 +180,7 @@ import { getGrowthFormsHubspotSignals } from './queries/growth-forms-hubspot-sig
 import { getGrowthFormsPiiSignals } from './queries/growth-forms-pii-signals'
 import { getGrowthAiVisibilityLeadHandoffSignals } from './queries/growth-ai-visibility-lead-handoff-signals'
 import { getGrowthAiVisibilityReportEmailSignals } from './queries/growth-ai-visibility-report-email-signals'
+import { getGrowthAiVisibilityEntitlementSignals } from './queries/growth-ai-visibility-entitlement-signals'
 // TASK-1082 — Knowledge Platform ingestion signals (moduleKey 'knowledge').
 import { getKnowledgeNotionIngestDeadLetterSignal } from './queries/knowledge-notion-ingest-dead-letter'
 import { getKnowledgeQuarantineCountSignal } from './queries/knowledge-quarantine-count'
@@ -631,6 +632,7 @@ interface ReliabilityOverviewSources {
   growthFormsPii?: ReliabilitySignal[] | null
   growthAiVisibilityLeadHandoff?: ReliabilitySignal[] | null
   growthAiVisibilityReportEmail?: ReliabilitySignal[] | null
+  growthAiVisibilityEntitlement?: ReliabilitySignal[] | null
 
   /** TASK-1201 — Finance AI anomaly-materialization staleness (heartbeat del SoT de signals). */
   financeAiStaleMaterialization?: ReliabilitySignal | null
@@ -1048,6 +1050,7 @@ export const buildReliabilityOverview = (
     ...(sources.growthFormsPii ?? []),
     ...(sources.growthAiVisibilityLeadHandoff ?? []),
     ...(sources.growthAiVisibilityReportEmail ?? []),
+    ...(sources.growthAiVisibilityEntitlement ?? []),
     // TASK-812 — Previred/LRE artifact registry drift.
     ...(sources.payrollComplianceExportDrift ? [sources.payrollComplianceExportDrift] : []),
     // TASK-863 V1.5.2 — Final settlement PDF status drift (DB document_status vs
@@ -1473,6 +1476,13 @@ export const getReliabilityOverview = async (
     preloadedSources.growthAiVisibilityReportEmail !== undefined
       ? preloadedSources.growthAiVisibilityReportEmail
       : await getGrowthAiVisibilityReportEmailSignals().catch(() => null)
+
+  // TASK-1277 — entitlement & metering (integridad del chokepoint / budget de trials /
+  // atribución cliente vs sales). DB vacía / portal OFF → steady ok.
+  const growthAiVisibilityEntitlement =
+    preloadedSources.growthAiVisibilityEntitlement !== undefined
+      ? preloadedSources.growthAiVisibilityEntitlement
+      : await getGrowthAiVisibilityEntitlementSignals().catch(() => null)
 
   const payrollComplianceExportDrift =
     preloadedSources.payrollComplianceExportDrift !== undefined
@@ -2380,6 +2390,7 @@ export const getReliabilityOverview = async (
     growthFormsPii,
     growthAiVisibilityLeadHandoff,
     growthAiVisibilityReportEmail,
+    growthAiVisibilityEntitlement,
     payrollComplianceExportDrift,
     payrollContractorDoubleRailOverlap,
     payrollDeelMemberWithoutContractId,
