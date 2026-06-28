@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
@@ -265,13 +265,13 @@ Decisión arquitectónica central: **dos ejes ortogonales, no un número.** El o
 
 ## Acceptance Criteria
 
-- [ ] El probe gatherer corre como fuente paralela del run-engine, separado del pipeline de prompt-packs.
-- [ ] Probes structural (robots IA, JSON-LD, llms.txt, sitemap, CWV) producen `structural_readiness` con honest degradation `null≠0`.
-- [ ] Probes agentic (WebMCP tools, `.well-known/mcp`/API, DOM semántico, `potentialAction`) producen `agentic_readiness`.
-- [ ] El score de percepción `ai_visibility_score_v1` queda intacto y NO se fusiona con los ejes de readiness (test de no-blend verde).
-- [ ] Todos los probes son read-only sobre superficies públicas; cero auth/mutación; rate-limit cortés + timeout.
-- [ ] Lighthouse/WebMCP corren en Cloud Run worker, no en Vercel; degradan a `skipped` si no hay headless.
-- [ ] Reliability signal de probe failure/lag + fila(s) por flag en `FEATURE_FLAG_STATE_LEDGER.md`.
+- [x] El probe gatherer corre como fuente paralela del run-engine (`gatherRunProbes` post-step best-effort en `executeClaimedGraderRun`), separado del pipeline de prompt-packs.
+- [x] Probes structural (robots IA, JSON-LD, llms.txt, sitemap, CWV) producen `structural_readiness` con honest degradation `null≠0` (test + validado contra vercel.com).
+- [x] Probes agentic (WebMCP tools, `.well-known/mcp`/API, DOM semántico, `potentialAction`) producen `agentic_readiness`.
+- [x] El score de percepción `ai_visibility_score_v1` queda intacto y NO se fusiona con los ejes de readiness (test de no-blend verde — `report-readiness.test.ts`).
+- [x] Todos los probes son read-only sobre superficies públicas; cero auth/mutación; SSRF guard + timeout + cortesía (secuencial).
+- [x] Lighthouse/WebMCP corren en Cloud Run worker, no en Vercel; degradan a `skipped/no_headless` vía la seam `HeadlessRenderer` (default null) hasta cablear Chromium en el worker (follow-up; out-of-band coordination).
+- [x] Reliability signals de probe (`probe_failure_rate` + `probe_headless_coverage`) + filas por flag en `FEATURE_FLAG_STATE_LEDGER.md` (audit `--strict` verde).
 
 ## Verification
 
@@ -282,13 +282,21 @@ Decisión arquitectónica central: **dos ejes ortogonales, no un número.** El o
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown sincronizado
-- [ ] el archivo vive en la carpeta correcta
-- [ ] `docs/tasks/README.md` sincronizado
-- [ ] `Handoff.md` actualizado
-- [ ] `changelog.md` actualizado
-- [ ] chequeo de impacto cruzado (TASK-1252 report artifact, TASK-1267 entity probes, TASK-1269 fix-it)
-- [ ] `FEATURE_FLAG_STATE_LEDGER.md` actualizado
+- [x] `Lifecycle` del markdown sincronizado (`complete`)
+- [x] el archivo vive en la carpeta correcta (`complete/`)
+- [x] `docs/tasks/README.md` sincronizado
+- [x] `Handoff.md` actualizado
+- [x] `changelog.md` actualizado
+- [x] chequeo de impacto cruzado (TASK-1252 report artifact, TASK-1267 entity probes, TASK-1269 fix-it — deltas dejadas)
+- [x] `FEATURE_FLAG_STATE_LEDGER.md` actualizado
+
+## Resultado (cierre 2026-06-28)
+
+**Code complete, rollout pendiente.** 4 slices implementados (probe gatherer substrate + structural probes + agentic probes + report contract/signal/docs). Gates verdes: lint · tsc · `pnpm test` full · `pnpm build` · `flags:audit --strict`. Validado contra dominio real (vercel.com → `structural_readiness` 78.8, 4/5 dims medidas, CWV honestamente skipped). Migración `grader_probe_results` aplicada + verificada en dev PG.
+
+**Pendiente de runtime (rollout):** flip `GROWTH_AI_VISIBILITY_PROBES_ENABLED` + `..._AGENTIC_READINESS_ENABLED` en staging (Vercel **+ ops-worker** — dual-location, el gatherer corre en ambos paths) + run real sobre dominio de prueba → verificar `grader_probe_results` + score paralelo en PG → prod vía release control plane (EPIC-020). El ejercicio live de la reliability signal-query no se corrió en esta sesión (ADC gcloud vencida — env, no código; la SQL espeja verbatim el reader `growth-ai-visibility-scoring-signals` ya en prod, sin EXTRACT-epoch).
+
+**Follow-up no-bloqueante:** cablear `HeadlessRenderer` (Chromium en el ops-worker) para activar CWV + WebMCP runtime detection — NO toca el substrate (la seam ya está); requiere sign-off de imagen (~200 MB) + budget.
 
 ## Follow-ups
 

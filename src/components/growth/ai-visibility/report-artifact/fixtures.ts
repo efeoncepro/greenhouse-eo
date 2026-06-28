@@ -165,6 +165,9 @@ export const SAMPLE_INTERNAL_REPORT: GraderReport = {
     overall: { current: 63, previous: 58, delta: 5, direction: 'subio' },
     dimensions: []
   },
+  // TASK-1266 — readiness técnica (structural/agentic). El render del eje lo gobierna TASK-1252;
+  // este fixture lo deja en null (no se probó el sitio) hasta que TASK-1252 lo materialice visualmente.
+  readiness: null,
   provenance: {
     asOfDate: '2026-05-19',
     promptPackVersion: '2.3.1',

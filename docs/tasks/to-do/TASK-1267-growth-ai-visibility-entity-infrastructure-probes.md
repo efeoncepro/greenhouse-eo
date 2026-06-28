@@ -1,5 +1,9 @@
 # TASK-1267 — Growth AI Visibility: Entity Infrastructure Probes (Knowledge Graph / Wikidata / Reddit-UGC)
 
+## Delta 2026-06-28
+
+- **Substrate disponible — cerrado por TASK-1266.** El probe gatherer (dependencia dura de esta task) quedó implementado (code complete). Reusar directamente `src/lib/growth/ai-visibility/probes/**`: interface `Probe (ctx) → ProbeOutcome{ status, score, reason, evidence }`, gatherer puro (`runProbes`) con honest degradation `null≠0`, fetcher read-only SSRF-guarded (`createProbeFetcher`), tabla `greenhouse_growth.grader_probe_results` (UPSERT por `run_id+probe_kind`), registry por eje, command `gatherRunProbes`, seam `HeadlessRenderer`. Los probes de entidad (Knowledge Graph / Wikidata / Reddit-UGC) = **nuevos `ProbeKind`** sumados a `PROBE_KINDS` + a `scoring/readiness-config.ts` (eje existente o uno nuevo `entity`) + registrados en su `index.ts`. **NO crear un gatherer paralelo.**
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->

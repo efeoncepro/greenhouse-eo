@@ -15,6 +15,7 @@ import { captureWithDomain } from '@/lib/observability/capture'
 
 import { buildBrandTruth } from '../accuracy'
 import { extractCitationDomain } from '../observation'
+import { readRunProbes } from '../probes/command'
 import { readGraderScore } from '../scoring/command'
 import { getPreviousComparableScore } from '../scoring/store'
 import { getGraderProfile, getGraderRun } from '../store'
@@ -92,7 +93,10 @@ export const readGraderReport = async (input: {
         })
       : null
 
-    const report = buildGraderReport({ score, findings, run: runMeta, previous, subjectDomain, brandTruth })
+    // Probe results del sitio analizado (TASK-1266); vacío → readiness null (no se probó).
+    const probeResults = await readRunProbes(input.runId)
+
+    const report = buildGraderReport({ score, findings, run: runMeta, previous, subjectDomain, brandTruth, probeResults })
 
     return { report, publicReport: toPublicGraderReport(report) }
   } catch (error) {

@@ -172,6 +172,7 @@ import { getHubspotCompaniesIntakeDeadLetterSignal } from './queries/hubspot-com
 import { getWorkforceUnlinkedInternalUsersSignal } from './queries/workforce-unlinked-internal-users'
 import { getGrowthAiVisibilitySignals } from './queries/growth-ai-visibility-signals'
 import { getGrowthAiVisibilityScoringSignals } from './queries/growth-ai-visibility-scoring-signals'
+import { getGrowthAiVisibilityProbeSignals } from './queries/growth-ai-visibility-probe-signals'
 import { getGrowthAiVisibilityPublicIntakeSignals } from './queries/growth-ai-visibility-public-intake-signals'
 import { getGrowthAiVisibilityPublicDeliverySignals } from './queries/growth-ai-visibility-public-delivery-signals'
 import { getGrowthFormsSignals } from './queries/growth-forms-signals'
@@ -624,6 +625,7 @@ interface ReliabilityOverviewSources {
   workforceUnlinkedInternalUsers?: ReliabilitySignal | null
   growthAiVisibility?: ReliabilitySignal[] | null
   growthAiVisibilityScoring?: ReliabilitySignal[] | null
+  growthAiVisibilityProbe?: ReliabilitySignal[] | null
   growthAiVisibilityPublicIntake?: ReliabilitySignal[] | null
   growthAiVisibilityPublicDelivery?: ReliabilitySignal[] | null
   growthForms?: ReliabilitySignal[] | null
@@ -1042,6 +1044,7 @@ export const buildReliabilityOverview = (
     ...(sources.operationalPlCostCoverageDegraded ? [sources.operationalPlCostCoverageDegraded] : []),
     ...(sources.growthAiVisibility ?? []),
     ...(sources.growthAiVisibilityScoring ?? []),
+    ...(sources.growthAiVisibilityProbe ?? []),
     ...(sources.growthAiVisibilityPublicIntake ?? []),
     ...(sources.growthAiVisibilityPublicDelivery ?? []),
     ...(sources.growthForms ?? []),
@@ -1427,6 +1430,12 @@ export const getReliabilityOverview = async (
     preloadedSources.growthAiVisibilityScoring !== undefined
       ? preloadedSources.growthAiVisibilityScoring
       : await getGrowthAiVisibilityScoringSignals().catch(() => null)
+
+  // TASK-1266 — probes de site readiness (failure rate + cobertura headless). DB vacía / probes OFF → steady ok.
+  const growthAiVisibilityProbe =
+    preloadedSources.growthAiVisibilityProbe !== undefined
+      ? preloadedSources.growthAiVisibilityProbe
+      : await getGrowthAiVisibilityProbeSignals().catch(() => null)
 
   // TASK-1240 — intake público (rate/cost/blocked). DB vacía / intake OFF → steady ok.
   const growthAiVisibilityPublicIntake =
@@ -2382,6 +2391,7 @@ export const getReliabilityOverview = async (
     operationalPlCostCoverageDegraded,
     growthAiVisibility,
     growthAiVisibilityScoring,
+    growthAiVisibilityProbe,
     growthAiVisibilityPublicIntake,
     growthAiVisibilityPublicDelivery,
     growthForms,

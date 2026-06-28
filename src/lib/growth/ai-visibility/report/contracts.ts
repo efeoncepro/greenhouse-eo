@@ -15,6 +15,7 @@
  */
 
 import { type AccuracyConfidence, type AccuracyFindingKind } from '../accuracy/contracts'
+import { type ProbeAxis, type ProbeKind } from '../probes/contracts'
 import { type ScoreDimensionKey } from '../scoring/config'
 
 export const GROWTH_AI_VISIBILITY_REPORT_VERSION = 'ai_visibility_report_v1' as const
@@ -281,6 +282,68 @@ export interface ReportTrend {
   dimensions: DimensionTrend[]
 }
 
+// ── Readiness técnica (TASK-1266) — ejes ORTOGONALES al de percepción ─────────
+
+/**
+ * Readiness técnica del sitio analizado: dos ejes ORTOGONALES entre sí y al score de
+ * percepción (`ai_visibility_score_v1`), reportados LADO A LADO, NUNCA fusionados al overall
+ * de percepción. `structural` = "¿por qué no te citan?"; `agentic` = "¿te pueden usar los
+ * agentes?". Cada dimensión = un probe kind. `null ≠ 0`: dimensión sin evidencia medible →
+ * `status='empty'`/`severity='sin_dato'`, excluida del promedio del eje (NUNCA score 0).
+ */
+export interface ReportReadinessDimension {
+  key: ProbeKind
+  label: string
+  weight: number
+  score: number | null
+  max: 100
+  status: GraderReportDimensionStatus
+  severity: GraderReportSeverity
+  /** Razón renderizable (interna): qué se midió o por qué quedó sin medir. */
+  reason: string | null
+}
+
+export interface ReportReadinessAxis {
+  axis: ProbeAxis
+  /** Promedio ponderado de las dimensiones medidas del eje; null si ninguna se midió. */
+  overallScore: number | null
+  severity: GraderReportSeverity
+  dimensions: ReportReadinessDimension[]
+  coverage: { probed: number; measured: number }
+}
+
+/** Bloque de readiness del reporte INTERNO (incluye `reason` por dimensión). */
+export interface ReportReadiness {
+  scoreVersion: string
+  structural: ReportReadinessAxis
+  agentic: ReportReadinessAxis
+}
+
+/** Dimensión de readiness pública: estructuralmente sin `reason` interno (mirror de PublicReportDimension). */
+export interface PublicReportReadinessDimension {
+  key: ProbeKind
+  label: string
+  score: number | null
+  max: 100
+  status: GraderReportDimensionStatus
+  severity: GraderReportSeverity
+}
+
+export interface PublicReportReadinessAxis {
+  axis: ProbeAxis
+  overallScore: number | null
+  severity: GraderReportSeverity
+  dimensions: PublicReportReadinessDimension[]
+  coverage: { probed: number; measured: number }
+}
+
+/** Bloque de readiness público/cliente (sin reasons internos; sólo scores + severidad + cobertura). */
+export interface PublicReportReadiness {
+  scoreVersion: string
+  structural: PublicReportReadinessAxis
+  agentic: PublicReportReadinessAxis
+}
+
 // ── Aggregates ───────────────────────────────────────────────────────────────
 
 /** Reporte INTERNO completo (admin/sales). Incluye recomendaciones + presencia por motor. */
@@ -310,6 +373,8 @@ export interface GraderReport {
   sentimentSummary: SentimentSummary
   positionSummary: PositionSummary
   trend: ReportTrend
+  /** TASK-1266 — readiness técnica (structural + agentic), LADO A LADO del de percepción; null si no se probó. */
+  readiness: ReportReadiness | null
   provenance: ReportProvenance
   disclaimer: string
 }
@@ -345,6 +410,8 @@ export interface ClientGraderReport {
   sentimentSummary: SentimentSummary
   positionSummary: PositionSummary
   trend: ReportTrend
+  /** TASK-1266 — readiness técnica pública (sin reasons internos); null si no se probó. */
+  readiness: PublicReportReadiness | null
   provenance: ReportProvenance
   disclaimer: string
 }
@@ -387,6 +454,8 @@ export interface PublicGraderReport {
   sentimentSummary: SentimentSummary
   positionSummary: PositionSummary
   trend: ReportTrend
+  /** TASK-1266 — readiness técnica pública (sin reasons internos); null si no se probó. */
+  readiness: PublicReportReadiness | null
   provenance: ReportProvenance
   disclaimer: string
 }

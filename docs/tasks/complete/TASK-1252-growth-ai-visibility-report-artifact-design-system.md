@@ -1,5 +1,9 @@
 # TASK-1252 — Growth AI Visibility: Report Artifact Design System
 
+## Delta 2026-06-28 — eje de readiness disponible en el report contract (TASK-1266)
+
+- El report contract ahora carga un bloque **`readiness`** ortogonal al de percepción, reportado **lado a lado** (`ReportReadiness` interno con `reason`; `PublicReportReadiness` público/cliente sin `reason`, leak-safe): dos ejes `structural` ("¿por qué no te citan?") + `agentic` ("¿te pueden usar los agentes?"), cada uno con `overallScore` + `severity` nombrada + dimensiones (score/status/severity) + `coverage`. Es `null` cuando no se probó el sitio (additive/backward-compatible — el fixture `SAMPLE_INTERNAL_REPORT` quedó en `readiness: null`). **El render visual del eje es scope de esta task (TASK-1252):** materializar la lectura "Visibilidad (percepción) vs Readiness técnica (structural/agentic)" lado a lado, respetando que NUNCA se fusionan en un solo número y honrando `status='empty'`/`severity='sin_dato'` (honest degradation; ej. CWV/WebMCP que salen sin dato hasta cablear Chromium en el worker).
+
 ## Delta 2026-06-28 — Approved Report Artifact v1 canonizado (mockup aprobado por operador)
 
 El mockup runtime de `/growth/ai-visibility/report-artifact/mockup` queda canonizado como **Approved Report Artifact v1** para EPIC-020. Esta es la referencia que deben consumir `TASK-1241`, `TASK-1248`, `TASK-1250` y `TASK-1273`: no re-decidir narrativa, orden, disclosure ni componentes visuales del informe salvo constraint explícita de superficie.

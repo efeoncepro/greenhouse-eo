@@ -103,9 +103,14 @@ describe('TASK-1266 · probe gatherer', () => {
 // ── Registry: axis gating ────────────────────────────────────────────────────
 
 describe('TASK-1266 · probe registry', () => {
-  it('estructural sin agentic vs ambos ejes', () => {
-    // Slice 1: arrays vacíos; el contrato es que agentic sólo se incluye si el flag está ON.
-    expect(createProbeRegistry({ structural: true, agentic: false })).toEqual([])
+  it('estructural sin agentic vs ambos ejes (agentic sólo si su flag está ON)', () => {
+    const structuralOnly = createProbeRegistry({ structural: true, agentic: false })
+    const both = createProbeRegistry({ structural: true, agentic: true })
+
+    expect(structuralOnly.length).toBeGreaterThan(0)
+    expect(structuralOnly.every(p => p.axis === 'structural')).toBe(true)
+    expect(both.some(p => p.axis === 'agentic')).toBe(true)
+    expect(both.length).toBeGreaterThan(structuralOnly.length)
     expect(createProbeRegistry({ structural: false, agentic: false })).toEqual([])
   })
 })

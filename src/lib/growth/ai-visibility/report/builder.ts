@@ -16,8 +16,10 @@ import { GH_GROWTH_AI_VISIBILITY } from '@/lib/copy/growth'
 import { detectBrandInaccuracies, type BrandTruth } from '../accuracy'
 import { type GrowthAiVisibilityRunStatus } from '../contracts'
 import { type NormalizedFinding } from '../normalization/contracts'
+import { type ProbeResult } from '../probes/contracts'
 import { SCORE_DIMENSION_CONFIG_BY_KEY, type ScoreDimensionKey } from '../scoring/config'
 import { type DimensionScore, type PersistedGraderScore } from '../scoring/engine'
+import { computeReadinessScore, type AxisReadinessScore } from '../scoring/readiness-engine'
 import {
   GROWTH_AI_VISIBILITY_RECOMMENDATION_PACK_VERSION,
   GROWTH_AI_VISIBILITY_REPORT_VERSION,
@@ -30,7 +32,11 @@ import {
   type PositionSummary,
   type ProviderPresence,
   type PublicGraderReport,
+  type PublicReportReadiness,
+  type PublicReportReadinessAxis,
   type ReportAccuracyFinding,
+  type ReportReadiness,
+  type ReportReadinessAxis,
   type ReportDimension,
   type ReportFinding,
   type ReportHeadline,
@@ -66,6 +72,8 @@ export interface BuildGraderReportInput {
   subjectDomain?: string | null
   /** Verdad declarada de la marca para el detector de exactitud (TASK-1238); ausente → sin hallazgos. */
   brandTruth?: BrandTruth | null
+  /** Probe results del sitio analizado (TASK-1266); ausente/vacío → readiness null (no se probó). */
+  probeResults?: ProbeResult[] | null
 }
 
 const FINDINGS_MAX = 5
@@ -373,6 +381,59 @@ const buildProvenance = (
   promptCount: new Set(findings.map(f => f.promptId)).size
 })
 
+// ── Readiness técnica (TASK-1266) — ejes ortogonales, lado a lado ────────────
+
+const toReportReadinessAxis = (axis: AxisReadinessScore): ReportReadinessAxis => ({
+  axis: axis.axis,
+  overallScore: axis.overallScore,
+  severity: resolveSeverity(axis.overallScore),
+  dimensions: axis.dimensions.map(dimension => ({
+    key: dimension.key,
+    label: dimension.label,
+    weight: dimension.weight,
+    score: dimension.score,
+    max: 100,
+    status: dimension.status,
+    severity: resolveSeverity(dimension.score),
+    reason: dimension.reason
+  })),
+  coverage: axis.coverage
+})
+
+/** Deriva el bloque de readiness interno desde los probe results. PURO. */
+const buildReportReadiness = (probeResults: ProbeResult[]): ReportReadiness => {
+  const readiness = computeReadinessScore(probeResults)
+
+  return {
+    scoreVersion: readiness.scoreVersion,
+    structural: toReportReadinessAxis(readiness.structural),
+    agentic: toReportReadinessAxis(readiness.agentic)
+  }
+}
+
+const toPublicReadinessAxis = (axis: ReportReadinessAxis): PublicReportReadinessAxis => ({
+  axis: axis.axis,
+  overallScore: axis.overallScore,
+  severity: axis.severity,
+  // Mirror de PublicReportDimension: se omite `reason` interno (defensa capa B).
+  dimensions: axis.dimensions.map(dimension => ({
+    key: dimension.key,
+    label: dimension.label,
+    score: dimension.score,
+    max: dimension.max,
+    status: dimension.status,
+    severity: dimension.severity
+  })),
+  coverage: axis.coverage
+})
+
+/** Proyección pública/cliente del readiness: sin reasons internos (sólo scores + severidad + cobertura). */
+export const toPublicReportReadiness = (readiness: ReportReadiness): PublicReportReadiness => ({
+  scoreVersion: readiness.scoreVersion,
+  structural: toPublicReadinessAxis(readiness.structural),
+  agentic: toPublicReadinessAxis(readiness.agentic)
+})
+
 // ── Public projection (defensa capa B: sólo campos seguros) ──────────────────
 
 /**
@@ -421,6 +482,8 @@ export const toPublicGraderReport = (report: GraderReport): PublicGraderReport =
   positionSummary: report.positionSummary,
   // El trend es agregado puro (deltas numéricos, sin raw text) → public-safe.
   trend: report.trend,
+  // TASK-1266 — readiness técnica lado a lado del de percepción, public-safe (sin reasons internos).
+  readiness: report.readiness ? toPublicReportReadiness(report.readiness) : null,
   provenance: report.provenance,
   disclaimer: report.disclaimer
 })
@@ -470,6 +533,8 @@ export const toClientGraderReport = (report: GraderReport): ClientGraderReport =
   sentimentSummary: report.sentimentSummary,
   positionSummary: report.positionSummary,
   trend: report.trend,
+  // TASK-1266 — readiness técnica lado a lado del de percepción, public-safe (sin reasons internos).
+  readiness: report.readiness ? toPublicReportReadiness(report.readiness) : null,
   provenance: report.provenance,
   disclaimer: report.disclaimer
 })
@@ -523,6 +588,8 @@ export const buildGraderReport = (input: BuildGraderReportInput): GraderReport =
     sentimentSummary: buildSentimentSummary(findings),
     positionSummary: buildPositionSummary(findings),
     trend: buildReportTrend(score, run.promptPackVersion, previous ?? null),
+    // TASK-1266 — readiness técnica (ejes ortogonales) lado a lado; null si no se probó el sitio.
+    readiness: input.probeResults && input.probeResults.length > 0 ? buildReportReadiness(input.probeResults) : null,
     provenance: buildProvenance(score, findings, run),
     disclaimer: GH_GROWTH_AI_VISIBILITY.disclaimer
   }
