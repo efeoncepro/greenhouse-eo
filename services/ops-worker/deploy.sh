@@ -358,8 +358,11 @@ if [ "${ENV}" = "staging" ]; then
   DEFAULT_GROWTH_REPORT_EMAIL_ENABLED="true"
   # TASK-1279 — Cross-sell operador: el WRITE (executeOperatorReportSend → email + Lead HubSpot)
   # corre en este worker (reactive consumer growth_ai_visibility_operator_send, lane ops-reactive-growth).
-  # Staging ON (rollout 2026-06-29). Prod OFF (gated EPIC-020 + sign-off comercial/legal del copy a prospectos).
-  DEFAULT_GROWTH_OPERATOR_SEND_ENABLED="true"
+  # GATEADO OFF (2026-06-29): el smoke con SKY reveló que el grader genera un diagnóstico FALSO para
+  # marcas no-agencia (prompt pack hardcodeado a ICP Efeonce + taxonomy bypass del HubSpot industry enum).
+  # No se reabilita hasta que el motor de prompts brand-aware valide categoría + modelo de negocio
+  # (EPIC del prompt-generation engine). Ver ISSUE del falso-0.
+  DEFAULT_GROWTH_OPERATOR_SEND_ENABLED="false"
   # TASK-1265 — Google AI Overviews / AI Mode provider (DataForSEO). El run async del grader
   # ejecuta en este worker, así que el flag + creds DataForSEO deben vivir acá (no sólo en
   # Vercel) para que los 3 endpoints (public/client-portal/operator) midan AI Overviews.

@@ -306,6 +306,10 @@ Pedido del operador ("rollout y flag on ahora"). Aplicado a **staging** (prod si
   3. Cosmético: el audit `reason` no se limpiaba post-éxito del Lead (`COALESCE` → `$6`). Fix incluido.
 - **Pendiente prod:** sign-off comercial/legal del copy a prospectos + release control plane. La verificación live del **consent gate 422** (prospecto sin consent) no se ejerció E2E (no había prospecto con run publicado); está cubierta por unit tests + el CHECK duro en DB.
 
+## Delta 2026-06-29 — gateado OFF por ISSUE-110 (falso-0); reabilita TASK-1291
+
+El smoke E2E con SKY reveló que **el grader genera un diagnóstico FALSO** para marcas no-agencia/consumo (SKY = aerolínea grande salió score 0): el prompt pack está cableado al ICP de Efeonce ("¿qué agencias de {category}…?") + se inyecta el enum crudo de HubSpot (`AIRLINES_AVIATION`) como categoría. **El command de envío de esta task funciona perfecto** (email + Lead + asociaciones verificados); el problema es el **análisis** que alimenta el envío. Por eso el cross-sell se **gateó OFF** (flag removido de Vercel staging + ops-worker `false` rev `00424-p9z` + `deploy.sh` OFF): no se debe enviar un diagnóstico que puede ser falso. Causa raíz + plan en **ISSUE-110**; el motor brand-aware que lo arregla es **EPIC-021**. La **reabilitación segura** del cross-sell (gate de validación: no correr/enviar si categoría `unknown` o arquetipo no confirmado) es **TASK-1291**. Artefactos de prueba de SKY limpiados (Lead borrado + props de company limpiadas).
+
 ## Follow-ups
 
 - Plantilla de email operator-to-prospect (copy comercial + legal) si difiere del lead magnet.
