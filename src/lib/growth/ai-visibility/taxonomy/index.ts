@@ -1,3 +1,5 @@
 export * from './catalog'
 export * from './contracts'
+export * from './hubspot-industry-map'
 export * from './mapper'
+export * from './resolve-category'

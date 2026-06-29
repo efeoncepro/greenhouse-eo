@@ -173,6 +173,78 @@ export const CATEGORY_TAXONOMY: CategoryTaxonomy = {
       status: 'active'
     },
     {
+      id: 'industry:aviation',
+      level: 'industry',
+      label: { es: 'Aerolineas y aviacion', en: 'Airlines and aviation' },
+      aliases: ['aviation', 'aviacion', 'airline', 'airlines', 'aerolinea', 'aerolineas', 'aerospace', 'aeroespacial'],
+      parentIds: [],
+      examples: ['passenger airlines', 'low-cost carriers', 'aviation services'],
+      status: 'active'
+    },
+    {
+      id: 'industry:automotive',
+      level: 'industry',
+      label: { es: 'Automotriz', en: 'Automotive' },
+      aliases: ['automotive', 'automotriz', 'automotor', 'vehiculos', 'cars', 'autos'],
+      parentIds: [],
+      examples: ['car manufacturers', 'dealerships', 'mobility brands'],
+      status: 'active'
+    },
+    {
+      id: 'industry:telecommunications',
+      level: 'industry',
+      label: { es: 'Telecomunicaciones', en: 'Telecommunications' },
+      aliases: ['telecommunications', 'telecomunicaciones', 'telecom', 'telco', 'wireless', 'operador movil'],
+      parentIds: [],
+      examples: ['mobile carriers', 'broadband providers', 'telecom operators'],
+      status: 'active'
+    },
+    {
+      id: 'industry:consumer_goods',
+      level: 'industry',
+      label: { es: 'Bienes de consumo', en: 'Consumer goods' },
+      aliases: [
+        'consumer goods',
+        'bienes de consumo',
+        'cpg',
+        'consumer packaged goods',
+        'apparel',
+        'fashion',
+        'moda',
+        'cosmetics',
+        'cosmetica',
+        'belleza',
+        'luxury',
+        'lujo',
+        'sporting goods',
+        'consumer electronics',
+        'electronica de consumo'
+      ],
+      parentIds: [],
+      examples: ['apparel and fashion', 'cosmetics and personal care', 'household and electronics brands'],
+      status: 'active'
+    },
+    {
+      id: 'industry:food_beverage',
+      level: 'industry',
+      label: { es: 'Alimentos y bebidas', en: 'Food and beverage' },
+      aliases: [
+        'food and beverage',
+        'food beverages',
+        'alimentos y bebidas',
+        'alimentos',
+        'bebidas',
+        'restaurants',
+        'restaurantes',
+        'food production',
+        'wine and spirits',
+        'dairy'
+      ],
+      parentIds: [],
+      examples: ['food and beverage brands', 'restaurant chains', 'packaged food producers'],
+      status: 'active'
+    },
+    {
       id: 'sector:b2b_saas',
       level: 'sector',
       label: { es: 'B2B SaaS', en: 'B2B SaaS' },
