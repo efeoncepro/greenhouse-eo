@@ -373,9 +373,10 @@ if [ "${ENV}" = "staging" ]; then
   # (gating en código). La KG api key se resuelve server-side (resolveSecret); sin ella el KG probe
   # degrada honesto `not_configured` (Wikidata/Reddit no requieren auth).
   DEFAULT_GROWTH_ENTITY_PROBES_ENABLED="true"
-  # TASK-1270 — Re-grade recurrente AEO. Staging OFF por defecto hasta shadow con
-  # 1 perfil opt-in + budget sign-off; prod OFF gated por EPIC-020/release control.
-  DEFAULT_GROWTH_REGRADE_ENABLED="false"
+  # TASK-1270 — Re-grade recurrente AEO. Staging ON tras rollout develop
+  # (2026-06-29); prod OFF gated por EPIC-020/release control.
+  DEFAULT_GROWTH_REGRADE_ENABLED="true"
+  DEFAULT_GROWTH_REGRADE_SCHEDULER_PAUSED="false"
   # TASK-1267 — KG api key publicada en Secret Manager (key restringida a kgsearch.googleapis.com,
   # 2026-06-28). Staging la wirea; el worker la resuelve server-side (resolveSecret) + el conditional
   # de abajo appendea el ref + bindea secretAccessor.
@@ -394,6 +395,7 @@ else
   DEFAULT_GROWTH_AGENTIC_READINESS_ENABLED="false"
   DEFAULT_GROWTH_ENTITY_PROBES_ENABLED="false"
   DEFAULT_GROWTH_REGRADE_ENABLED="false"
+  DEFAULT_GROWTH_REGRADE_SCHEDULER_PAUSED="true"
   DEFAULT_GOOGLE_KG_KEY_SECRET_REF=""
 fi
 GROWTH_AI_VISIBILITY_GRADER_ENABLED="${GROWTH_AI_VISIBILITY_GRADER_ENABLED:-${DEFAULT_GROWTH_GRADER_ENABLED}}"
@@ -411,6 +413,7 @@ GROWTH_AI_VISIBILITY_ENTITY_PROBES_ENABLED="${GROWTH_AI_VISIBILITY_ENTITY_PROBES
 GROWTH_AI_VISIBILITY_REGRADE_ENABLED="${GROWTH_AI_VISIBILITY_REGRADE_ENABLED:-${DEFAULT_GROWTH_REGRADE_ENABLED}}"
 GROWTH_AI_VISIBILITY_REGRADE_BATCH_SIZE="${GROWTH_AI_VISIBILITY_REGRADE_BATCH_SIZE:-5}"
 GROWTH_AI_VISIBILITY_REGRADE_MONTHLY_BUDGET_USD="${GROWTH_AI_VISIBILITY_REGRADE_MONTHLY_BUDGET_USD:-50}"
+GROWTH_AI_VISIBILITY_REGRADE_SCHEDULER_PAUSED="${GROWTH_AI_VISIBILITY_REGRADE_SCHEDULER_PAUSED:-${DEFAULT_GROWTH_REGRADE_SCHEDULER_PAUSED}}"
 # TASK-1267 — KG api key (eje entity). Opcional: sólo se appendea + bindea si viene poblada
 # (mismo patrón que DATAFORSEO_API_LOGIN), para que un --set-env-vars destructivo no deje un
 # secret ref vacío y para no referenciar un secret inexistente. Sin ella → KG probe degrada
@@ -751,6 +754,11 @@ upsert_scheduler_job() {
       --project="${PROJECT_ID}" \
       --location="${REGION}" \
       --quiet
+  else
+    gcloud scheduler jobs resume "${job_name}" \
+      --project="${PROJECT_ID}" \
+      --location="${REGION}" \
+      --quiet 2>/dev/null || true
   fi
 }
 
@@ -855,16 +863,16 @@ echo "  -> ops-growth-grader-drain: */5 * * * * (AI Visibility Grader async exec
 
 # AI Visibility recurring re-grade — TASK-1270.
 #
-# Job declarado pero DESHABILITADO por defecto. El handler también gatea por
-# GROWTH_AI_VISIBILITY_REGRADE_ENABLED + opt-in por perfil + budget mensual. El
-# rollout real habilita el job sólo después de shadow staging con 1 perfil opt-in.
+# Staging activo tras rollout develop; production queda OFF/paused por default.
+# El handler gatea por GROWTH_AI_VISIBILITY_REGRADE_ENABLED + opt-in por perfil
+# + budget mensual, por lo que un job activo sin perfiles due es no-op.
 upsert_scheduler_job \
   "ops-growth-grader-regrade" \
   "0 8 * * *" \
   "/growth/grader/regrade" \
   '{"batchSize":5}' \
-  "true"
-echo "  -> ops-growth-grader-regrade: 0 8 * * * (PAUSED, AI Visibility recurring re-grade, TASK-1270)"
+  "${GROWTH_AI_VISIBILITY_REGRADE_SCHEDULER_PAUSED}"
+echo "  -> ops-growth-grader-regrade: 0 8 * * * (paused=${GROWTH_AI_VISIBILITY_REGRADE_SCHEDULER_PAUSED}, AI Visibility recurring re-grade, TASK-1270)"
 
 # Growth Forms dispatch — TASK-1229.
 #

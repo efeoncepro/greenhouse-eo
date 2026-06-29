@@ -18,7 +18,7 @@
 - Motion: `none`
 - Backend impact: `cron`
 - Epic: `EPIC-020`
-- Status real: `Code complete; rollout pendiente`
+- Status real: `Rollout staging en curso`
 - Rank: `TBD`
 - Domain: `growth|ai|ops|reliability`
 - Blocked by: `none`
@@ -137,7 +137,7 @@ Reglas obligatorias:
 ### Migration, backfill and rollout
 
 - Migration posture: `additive` (opt-in flag + cadence column en `grader_profiles`).
-- Default state: `flag OFF` (`GROWTH_AI_VISIBILITY_REGRADE_ENABLED`) + opt-in vacío.
+- Default state: staging `flag ON` (`GROWTH_AI_VISIBILITY_REGRADE_ENABLED`) tras rollout develop; production `flag OFF`; opt-in vacío por defecto.
 - Backfill plan: N/A (cadencia prospectiva).
 - Rollback path: flag OFF + deshabilitar Cloud Scheduler job + redeploy.
 - External coordination: Cloud Scheduler job en GCP (staging + prod) + budget sign-off.
@@ -210,7 +210,7 @@ Reglas obligatorias:
 
 ### Slice 2 — ops-worker handler + Cloud Scheduler job + budget guard
 
-- `POST /growth/grader/regrade` en ops-worker reusando el run-engine; Cloud Scheduler job `ops-growth-grader-regrade` en `deploy.sh` (staging + prod, pausado por defecto).
+- `POST /growth/grader/regrade` en ops-worker reusando el run-engine; Cloud Scheduler job `ops-growth-grader-regrade` en `deploy.sh` (activo en staging, pausado por default en production).
 - Cost ceiling + circuit breaker; flag `GROWTH_AI_VISIBILITY_REGRADE_ENABLED`.
 
 ### Slice 3 — Reliability signals + ledger
@@ -246,7 +246,7 @@ El re-grade es una aplicación de cadencia sobre el run-engine existente: un Clo
 
 ### Feature flags / cutover
 
-- `GROWTH_AI_VISIBILITY_REGRADE_ENABLED` (default `false`) + opt-in vacío. Cloud Scheduler job disabled hasta shadow staging. Revert: flag OFF + disable job + redeploy. <5 min.
+- `GROWTH_AI_VISIBILITY_REGRADE_ENABLED` staging `true` / production `false` + opt-in vacío por default. Cloud Scheduler job activo en staging y pausado por default en production. Revert staging: flag OFF + pause job + redeploy. <5 min.
 
 ### Rollback plan per slice
 
@@ -282,7 +282,7 @@ El re-grade es una aplicación de cadencia sobre el run-engine existente: un Clo
 - [x] Reliability signals de re-grade lag / costo / perfiles stale wired a `/admin/operations`.
 - [ ] `pnpm worker:runtime-deps-gate` verde; sin import `@core` worker-bundled.
 - [x] Fila por flag en `FEATURE_FLAG_STATE_LEDGER.md`.
-- [ ] Re-grade real de un perfil opt-in en staging vía Cloud Scheduler/manual run; permanece como rollout pendiente.
+- [ ] Re-grade real de un perfil opt-in en staging vía Cloud Scheduler/manual run; rollout staging en curso.
 
 ## Verification
 
@@ -298,7 +298,7 @@ El re-grade es una aplicación de cadencia sobre el run-engine existente: un Clo
 - [x] `set -a; source .env.local; set +a; pnpm secrets:audit`
 - [x] `pnpm route-reachability-gate`
 - [x] `pnpm test:observability:summary`
-- [ ] `pnpm migrate:status` (bloqueado localmente: Cloud SQL proxy no levantado en `127.0.0.1:15432`; migración no aplicada en esta sesión)
+- [x] `pnpm pg:connect:migrate` (migración TASK-1270 aplicada en Cloud SQL dev/staging; `src/types/db.d.ts` regenerado)
 - [ ] `NEXT_BUILD_CPUS=2 NODE_OPTIONS=--max-old-space-size=8192 pnpm build` (compilación Turbopack exitosa con warning preexistente de `roadmap/work-item-index`; proceso interrumpido tras quedar sin salida en etapa post-compile/TypeScript, con `tsc` explícito verde)
 - [ ] Re-grade real de un perfil opt-in en staging vía Cloud Scheduler/manual run
 

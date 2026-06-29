@@ -6633,6 +6633,11 @@ export interface GreenhouseGrowthGraderProfiles {
   organization_id: string | null;
   profile_id: Generated<string>;
   public_id: Generated<string>;
+  recurring_regrade_cadence: Generated<string>;
+  recurring_regrade_enabled: Generated<boolean>;
+  recurring_regrade_last_at: Timestamp | null;
+  recurring_regrade_last_run_id: string | null;
+  recurring_regrade_next_at: Timestamp | null;
   status: Generated<string>;
   updated_at: Generated<Timestamp>;
   website_url: string | null;
