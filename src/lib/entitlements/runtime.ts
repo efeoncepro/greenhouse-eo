@@ -329,6 +329,17 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
       source: operatorSource
     })
 
+    // TASK-1290 — prompt_set.manage: el operador autora (draft) + aprueba (draft→active) el set
+    // de prompts AEO por marca (define qué se le pregunta a los motores). Mismo set operador que
+    // run.operator. El command self-guarda con can() (profileId/setId arbitrario).
+    addEntitlement(entries, {
+      module: 'growth',
+      capability: 'growth.ai_visibility.prompt_set.manage',
+      action: 'execute',
+      scope: 'tenant',
+      source: operatorSource
+    })
+
     // TASK-1286 — entitlement.manage: el set operador completo NO recibe esta mutación.
     // Sólo AM (`efeonce_account`) y admin pueden asignar/cambiar/superseder tiers AEO.
     if (

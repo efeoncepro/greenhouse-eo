@@ -6679,6 +6679,25 @@ export interface GreenhouseGrowthGraderProfiles {
   website_url: string | null;
 }
 
+export interface GreenhouseGrowthGraderPromptSets {
+  approved_at: Timestamp | null;
+  approved_by: string | null;
+  business_model: string | null;
+  category_node_id: string | null;
+  created_at: Generated<Timestamp>;
+  created_by: string;
+  generation_strategy: string;
+  grounding_sources_json: Generated<Json>;
+  model: string | null;
+  profile_id: string;
+  prompts_json: Generated<Json>;
+  set_id: Generated<string>;
+  status: Generated<string>;
+  system_prompt_version: string | null;
+  updated_at: Generated<Timestamp>;
+  version: number;
+}
+
 export interface GreenhouseGrowthGraderRecommendationStatus {
   created_at: Generated<Timestamp>;
   organization_id: string;
@@ -6778,6 +6797,8 @@ export interface GreenhouseGrowthGraderRuns {
   poll_token: Generated<string>;
   profile_id: string;
   prompt_pack_version: string;
+  prompt_set_id: string | null;
+  prompt_set_version: number | null;
   provider_policy_version: string;
   public_delivery_state: Generated<string>;
   public_id: Generated<string>;
@@ -11051,6 +11072,7 @@ export interface DB {
   "greenhouse_growth.grader_leads": GreenhouseGrowthGraderLeads;
   "greenhouse_growth.grader_probe_results": GreenhouseGrowthGraderProbeResults;
   "greenhouse_growth.grader_profiles": GreenhouseGrowthGraderProfiles;
+  "greenhouse_growth.grader_prompt_sets": GreenhouseGrowthGraderPromptSets;
   "greenhouse_growth.grader_recommendation_status": GreenhouseGrowthGraderRecommendationStatus;
   "greenhouse_growth.grader_recommendation_status_history": GreenhouseGrowthGraderRecommendationStatusHistory;
   "greenhouse_growth.grader_report_email_dispatches": GreenhouseGrowthGraderReportEmailDispatches;

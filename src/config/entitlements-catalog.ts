@@ -2032,6 +2032,15 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     actions: ['execute'] as const,
     defaultScope: 'tenant'
   },
+  // TASK-1290 — prompt_set.manage: autorar (draft) + aprobar (draft→active) el set de prompts AEO
+  // por marca. Commands gobernados `createGraderPromptSetDraft`/`approveGraderPromptSet`,
+  // consumibles por la UI de review (TASK-1291) + Nexa. Grant = set operador (run.operator).
+  {
+    key: 'growth.ai_visibility.prompt_set.manage',
+    module: 'growth',
+    actions: ['execute'] as const,
+    defaultScope: 'tenant'
+  },
   // TASK-1286 — entitlement.manage: asignar/cambiar/superseder tiers AEO por org.
   // Command gobernado `assignAeoTier`, consumible por cockpit operador, Account-360 y Nexa
   // vía confirmación humana. Grant restringido a efeonce_account + efeonce_admin.

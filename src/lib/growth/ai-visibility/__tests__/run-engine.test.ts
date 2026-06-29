@@ -48,6 +48,8 @@ const makeRun = (input: Record<string, unknown>): GraderRunRow => ({
   assignmentId: (input.assignmentId as string | null) ?? null,
   runSource: (input.runSource as GraderRunRow['runSource']) ?? null,
   costAttribution: (input.costAttribution as GraderRunRow['costAttribution']) ?? null,
+  promptSetId: (input.promptSetId as string | null) ?? null,
+  promptSetVersion: (input.promptSetVersion as number | null) ?? null,
   startedAt: null,
   finishedAt: null,
   createdAt: '2026-06-24T00:00:00.000Z'

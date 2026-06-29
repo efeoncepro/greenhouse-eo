@@ -106,6 +106,9 @@ export interface GraderRunRow {
   assignmentId: string | null
   runSource: GraderRunSource | null
   costAttribution: GraderCostAttribution | null
+  /** TASK-1290 — provenance del prompt set usado (null = baseline/pack agencia). */
+  promptSetId: string | null
+  promptSetVersion: number | null
   startedAt: string | null
   finishedAt: string | null
   createdAt: string
@@ -161,6 +164,8 @@ const projectRun = (row: RawRun): GraderRunRow => ({
   assignmentId: (row.assignment_id as string | null) ?? null,
   runSource: (row.run_source as GraderRunSource | null) ?? null,
   costAttribution: (row.cost_attribution as GraderCostAttribution | null) ?? null,
+  promptSetId: (row.prompt_set_id as string | null) ?? null,
+  promptSetVersion: row.prompt_set_version != null ? Number(row.prompt_set_version) : null,
   startedAt: (row.started_at as string | null) ?? null,
   finishedAt: (row.finished_at as string | null) ?? null,
   createdAt: String(row.created_at)
@@ -276,13 +281,16 @@ export const createGraderRun = async (input: {
   executionPrompts?: GraderExecutionPrompt[]
   /** TASK-1277 — atribución per-org (chokepoint de portal/operador). Default sin atribución. */
   attribution?: GraderRunAttribution
+  /** TASK-1290 — provenance del prompt set autorado usado (null = baseline/pack agencia). */
+  promptSetId?: string | null
+  promptSetVersion?: number | null
 }): Promise<GraderRunRow> => {
   const rows = await runGreenhousePostgresQuery<RawRun>(
     `INSERT INTO greenhouse_growth.grader_runs
        (profile_id, run_kind, mode, status, provider_policy_version, prompt_pack_version,
         requested_providers, idempotency_key, cost_ceiling_usd, execution_prompts,
-        organization_id, assignment_id, run_source, cost_attribution)
-     VALUES ($1, $2, $3, 'pending', $4, $5, $6, $7, $8, $9::jsonb, $10, $11, $12, $13)
+        organization_id, assignment_id, run_source, cost_attribution, prompt_set_id, prompt_set_version)
+     VALUES ($1, $2, $3, 'pending', $4, $5, $6, $7, $8, $9::jsonb, $10, $11, $12, $13, $14, $15)
      RETURNING *`,
     [
       input.profileId,
@@ -297,7 +305,9 @@ export const createGraderRun = async (input: {
       input.attribution?.organizationId ?? null,
       input.attribution?.assignmentId ?? null,
       input.attribution?.runSource ?? null,
-      input.attribution?.costAttribution ?? null
+      input.attribution?.costAttribution ?? null,
+      input.promptSetId ?? null,
+      input.promptSetVersion ?? null
     ]
   )
 

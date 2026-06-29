@@ -59,6 +59,9 @@ import {
   type PromptFanOutType,
   type PromptIntentStage
 } from './prompt-packs/tag-vocabulary'
+import { resolvePromptInputs } from './prompt-pack'
+import { getActivePromptSet } from './prompt-packs/prompt-set-store'
+import { isArchetypePromptsEnabled } from './flags'
 
 export interface GraderRunPromptInput {
   promptId: string
@@ -143,7 +146,39 @@ export const enqueueGraderRun = async (
 
   const profile = await findOrCreateGraderProfile(input.profile)
 
-  const executionPrompts = input.prompts.slice(0, policy.maxPromptsPerRun).map(prompt => ({
+  // TASK-1290 Slice 2 — si hay un prompt set AUTORADO + `active` para el perfil (y el flag por
+  // arquetipo está ON), el run usa ESE set congelado (reproducible) en vez del baseline; los tags
+  // del set viajan con el run (Slice 0). Sin set active → se queda con el baseline (input.prompts).
+  let prompts = input.prompts
+  let promptSetId: string | null = null
+  let promptSetVersion: number | null = null
+
+  if (isArchetypePromptsEnabled()) {
+    const activeSet = await getActivePromptSet(profile.profileId)
+
+    if (activeSet && activeSet.prompts.length > 0) {
+      prompts = resolvePromptInputs(
+        {
+          brandName: profile.brandName,
+          category: input.profile.category ?? '',
+          market: profile.market,
+          competitor: profile.competitorsDeclared[0] ?? null
+        },
+        {
+          pack: {
+            version: `prompt-set.v${activeSet.version}`,
+            locale: profile.locale,
+            market: profile.market,
+            prompts: activeSet.prompts
+          }
+        }
+      )
+      promptSetId = activeSet.setId
+      promptSetVersion = activeSet.version
+    }
+  }
+
+  const executionPrompts = prompts.slice(0, policy.maxPromptsPerRun).map(prompt => ({
     promptId: prompt.promptId,
     promptText: prompt.promptText,
     // TASK-1290 Slice 0 — los tags viajan con el run (self-describing); el scorer los lee de acá.
@@ -163,7 +198,9 @@ export const enqueueGraderRun = async (
     idempotencyKey: input.idempotencyKey ?? null,
     costCeilingUsd: policy.costCeilingUsdPerRun,
     executionPrompts,
-    attribution: input.attribution
+    attribution: input.attribution,
+    promptSetId,
+    promptSetVersion
   })
 
   return { run, idempotentHit: false }
