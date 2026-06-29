@@ -172,6 +172,7 @@ import { getHubspotCompaniesIntakeDeadLetterSignal } from './queries/hubspot-com
 import { getWorkforceUnlinkedInternalUsersSignal } from './queries/workforce-unlinked-internal-users'
 import { getGrowthAiVisibilitySignals } from './queries/growth-ai-visibility-signals'
 import { getGrowthAiVisibilityScoringSignals } from './queries/growth-ai-visibility-scoring-signals'
+import { getGrowthAiVisibilityArchetypeCoverageSignals } from './queries/growth-ai-visibility-archetype-coverage-signals'
 import { getGrowthAiVisibilityCategorySignals } from './queries/growth-ai-visibility-category-signals'
 import { getGrowthAiVisibilityBusinessModelSignals } from './queries/growth-ai-visibility-business-model-signals'
 import { getGrowthAiVisibilityProbeSignals } from './queries/growth-ai-visibility-probe-signals'
@@ -633,6 +634,7 @@ interface ReliabilityOverviewSources {
   growthAiVisibility?: ReliabilitySignal[] | null
   growthAiVisibilityScoring?: ReliabilitySignal[] | null
   growthAiVisibilityProbe?: ReliabilitySignal[] | null
+  growthAiVisibilityArchetypeCoverage?: ReliabilitySignal[] | null
   growthAiVisibilityCategory?: ReliabilitySignal[] | null
   growthAiVisibilityBusinessModel?: ReliabilitySignal[] | null
   growthAiVisibilityPublicIntake?: ReliabilitySignal[] | null
@@ -1058,6 +1060,7 @@ export const buildReliabilityOverview = (
     ...(sources.growthAiVisibility ?? []),
     ...(sources.growthAiVisibilityScoring ?? []),
     ...(sources.growthAiVisibilityProbe ?? []),
+    ...(sources.growthAiVisibilityArchetypeCoverage ?? []),
     ...(sources.growthAiVisibilityCategory ?? []),
     ...(sources.growthAiVisibilityBusinessModel ?? []),
     ...(sources.growthAiVisibilityPublicIntake ?? []),
@@ -1455,6 +1458,13 @@ export const getReliabilityOverview = async (
     preloadedSources.growthAiVisibilityProbe !== undefined
       ? preloadedSources.growthAiVisibilityProbe
       : await getGrowthAiVisibilityProbeSignals().catch(() => null)
+
+  // TASK-1292 — cobertura de prompts por arquetipo (Capa A, determinista). Harness
+  // PURO: nunca null en steady. Drift = un arquetipo dejó de cubrir su buyer-intent.
+  const growthAiVisibilityArchetypeCoverage =
+    preloadedSources.growthAiVisibilityArchetypeCoverage !== undefined
+      ? preloadedSources.growthAiVisibilityArchetypeCoverage
+      : await getGrowthAiVisibilityArchetypeCoverageSignals().catch(() => null)
 
   const growthAiVisibilityCategory =
     preloadedSources.growthAiVisibilityCategory !== undefined
@@ -2447,6 +2457,7 @@ export const getReliabilityOverview = async (
     growthAiVisibility,
     growthAiVisibilityScoring,
     growthAiVisibilityProbe,
+    growthAiVisibilityArchetypeCoverage,
     growthAiVisibilityCategory,
     growthAiVisibilityBusinessModel,
     growthAiVisibilityPublicIntake,
