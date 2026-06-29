@@ -15,9 +15,10 @@
 
 - **S1 (guard):** `operator/subject-gradeable.ts` → `assertSubjectGradeable` (SoT puro, audience-aware): categoría vía `resolveRunCategory().resolved` (predicado TASK-1288), modelo confirmado (`!= unknown`) sólo para prospecto. Always-on en el surface operador (sin flag); wired en `requestGraderRunAsOperator` + `sendAeoReportAndCreateLead`. Error canónico `aeo_business_model_unconfirmed` + maps en las 3 routes. Tests: `subject-gradeable.test.ts` (8) + wiring run/send. Commit `87376c0c1`.
 - **S2 (signal):** `growth.ai_visibility.operator_gate_blocking` (drift) — prospectos org-linked no graduables mientras `OPERATOR_SEND_ENABLED` ON; wired en `get-reliability-overview` (5 sitios). Test (5). SQL type-safe (COALESCE boolean, sin date-math). Commit `5b948b192`.
-- **Reconciliación:** `OPERATOR_SEND_ENABLED` ya estaba staging-ON (TASK-1279). El gate hace ese ON seguro (SKY resuelto pasa, `unknown` bloquea). NO se introduce flag nuevo (gate always-on; reusa el flag de TASK-1279). NO hay migración (sin columna `operator_confirmed`: SSOT de TASK-1289).
-- **Gates verdes:** `pnpm test` full 8588/0 + `pnpm build` + lint + tsc. Smoke live PG bloqueado por ADC expiry (entorno); SQL column-verified contra los signals existentes + commercial-facts.
-- **Rollout pendiente:** deploy del guard a staging + smoke (SKY pasa / `unknown` bloquea); flip prod gateado por eval TASK-1292 + sign-off. Estado: **code complete, rollout pendiente** — no se mueve a `complete/`.
+- **Estado live del flag (verificado `vercel env ls`, 2026-06-29):** `OPERATOR_SEND_ENABLED` está **ABSENT en todos los envs Vercel** → la cross-sell SEND está gateada OFF (confirma la premisa de ISSUE-110; **corrige el ledger** que decía "staging ON" — quedó stale desde el smoke de TASK-1279). El gate hace seguro un futuro re-enable (SKY resuelto pasaría, `unknown` bloquea). NO se introduce flag nuevo (gate always-on; el run-operador queda protegido aunque el send siga OFF). NO hay migración (sin columna `operator_confirmed`: SSOT de TASK-1289).
+- **Gates verdes:** `pnpm test` full 8588/0 + `pnpm build` + lint + tsc.
+- **Rollout staging APLICADO (2026-06-29):** push develop → deploy `greenhouse-m5zjc4uyf` Ready. Signal `growth.ai_visibility.operator_gate_blocking` **live** en `/api/admin/reliability`: severity `ok` (NO `unknown` → mi SQL corre OK contra la PG real de staging, cierra el gap que el ADC local bloqueaba), `prospect_ungradeable=0`, `org_linked=2`, `operator_send_enabled=false`.
+- **Rollout pendiente:** flip prod gateado por eval TASK-1292 + sign-off comercial/legal. El re-enable de `OPERATOR_SEND_ENABLED` (la cross-sell SEND) también queda gateado por TASK-1292. Estado: **code complete, guard deployado a staging, re-enable del cross-sell pendiente** — no se mueve a `complete/`.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
@@ -239,8 +240,8 @@ Defense-in-depth: aunque el motor genere prompts correctos, el gate garantiza qu
 ## Acceptance Criteria
 
 - [x] `assertSubjectGradeable` bloquea run/envío operador si `category_node_id = unknown` o `business_model` no confirmado (prospecto); cliente exige al menos categoría resuelta. Wired en el chokepoint (`requestGraderRunAsOperator` + `sendAeoReportAndCreateLead`), errores canónicos (`aeo_category_unresolved` + `aeo_business_model_unconfirmed`). Tests verdes (subject-gradeable 8/8 + wiring run/send).
-- [ ] `GROWTH_AI_VISIBILITY_OPERATOR_SEND_ENABLED` — **rollout pendiente.** Reconciliación: ya estaba **staging-ON** (TASK-1279); el gate de esta task lo hace seguro (SKY resuelto pasa, `unknown` bloquea). No se flipea nada nuevo. Prod gated por eval TASK-1292 + sign-off comercial/legal.
-- [x] Reliability signal `growth.ai_visibility.operator_gate_blocking` (drift); test 5/5. [ ] smoke staging (bloqueo de `unknown`, paso de SKY) — **rollout pendiente** (requiere deploy del guard a staging + ADC para correr).
+- [ ] `GROWTH_AI_VISIBILITY_OPERATOR_SEND_ENABLED` — **re-enable pendiente (gateado por TASK-1292).** Estado live verificado: **ABSENT en todos los envs Vercel** (la cross-sell SEND está gateada OFF; corrige el ledger que decía "staging ON"). El guard de esta task hace seguro el re-enable; prod (y el re-enable staging) gated por eval TASK-1292 + sign-off comercial/legal.
+- [x] Reliability signal `growth.ai_visibility.operator_gate_blocking` (drift); test 5/5 + **live en staging** (`/api/admin/reliability`, severity `ok`, `prospect_ungradeable=0`/`org_linked=2` → SQL validado contra PG real). Smoke del guard cubierto por unit/wiring tests; el smoke del SEND requiere re-enable (gateado por TASK-1292).
 
 ## Verification
 

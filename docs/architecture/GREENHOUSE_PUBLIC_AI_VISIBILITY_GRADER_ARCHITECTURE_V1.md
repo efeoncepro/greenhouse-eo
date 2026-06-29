@@ -1943,9 +1943,13 @@ son **prospecto** (org no cliente) y **no graduables** (categoría/modelo sin re
 `getOrganizationCommercialFacts`), distinto de los signals atómicos `profile_category_unresolved` /
 `profile_business_model_unresolved`. SQL type-safe (COALESCE boolean, sin date-math).
 
-**Reconciliación de estado:** `OPERATOR_SEND_ENABLED` ya estaba **staging-ON** (rollout de TASK-1279). Este gate hace
-ese ON **seguro**: un envío sobre SKY (hoy resuelto: `sector:passenger_airlines` + `consumer_b2c`) **pasa**; sobre una
-marca `unknown` se **bloquea**. No introduce flag nuevo (el gate es always-on; reusa `OPERATOR_SEND_ENABLED`).
+**Estado live del flag (verificado 2026-06-29 vía `vercel env ls`):** `OPERATOR_SEND_ENABLED` está **ABSENT en todos los
+envs Vercel** → la cross-sell SEND está gateada OFF (el command la rechaza `aeo_send_disabled` antes de claimar). Esto
+**confirma la premisa de ISSUE-110** ("se gateó OFF") y **corrige el ledger** (filas TASK-1279 que decían "staging ON"
+quedaron stale desde el momento del smoke de TASK-1279). Este gate hace **seguro** un futuro re-enable: con el cross-sell
+ON, un envío sobre SKY (hoy resuelto: `sector:passenger_airlines` + `consumer_b2c`) **pasaría**; sobre una marca
+`unknown` se **bloquea**. No introduce flag nuevo (el gate es always-on; el run-operador queda protegido aunque el send
+siga OFF). El re-enable de `OPERATOR_SEND_ENABLED` sigue gateado por la eval golden-set (TASK-1292) + sign-off.
 
 **Reglas duras:**
 
