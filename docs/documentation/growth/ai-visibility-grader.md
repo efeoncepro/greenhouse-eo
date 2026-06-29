@@ -1,5 +1,5 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.14
+> **Version:** 1.15
 > **Creado:** 2026-06-24 por Claude (TASK-1226)
 > **Ultima actualizacion:** 2026-06-29 por Codex (auditoria DB/codebase/manual del grader)
 > **Documentacion tecnica:** [GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md)
@@ -57,9 +57,9 @@ Hay primitives server-side gobernados y todos los entrypoints consumen esos cami
 
 ## Estado del rollout (2026-06-29)
 
-- **staging:** grader encendido. El worker efectivo (`ops-worker-00417-m86`) tiene OpenAI + Anthropic + Gemini + Google AI Overview + probes + entity probes + email + HubSpot + re-grade encendidos. Gemini usa **Gemini 3** (`gemini-3-flash-preview` vía Vertex) y el modelo es ajustable por env.
+- **staging:** grader encendido. El worker efectivo (`ops-worker-00418-2m6`) tiene OpenAI + Anthropic + Perplexity + Gemini + Google AI Overview + probes + entity probes + email + HubSpot + re-grade encendidos. Gemini usa **Gemini 3** (`gemini-3-flash-preview` vía Vertex) y el modelo es ajustable por env.
 - **producción:** apagado — el encendido es un proceso aparte (migración + release controlado) que se hará después.
-- **Perplexity:** el adapter y secret existen y el smoke real local/staging previo fue verde. Drift operativo detectado el 2026-06-29: Vercel staging tiene el flag registrado, pero el worker async efectivo trae `GROWTH_AI_VISIBILITY_PERPLEXITY_ENABLED=false` por default de `services/ops-worker/deploy.sh`. Mientras el run se ejecute por worker, Perplexity queda fuera/`skipped` hasta prenderlo tambien ahi.
+- **Perplexity:** encendido en el ops-worker de staging desde el 2026-06-29 (`GROWTH_AI_VISIBILITY_PERPLEXITY_ENABLED=true`, revision `ops-worker-00418-2m6`). `services/ops-worker/deploy.sh` queda persistido con default staging ON / production OFF, para que futuros redeploys no lo apaguen. Falta un smoke async low-volume post-flip para capturar una observation nueva del worker.
 - **Google AI Overviews / AI Mode (surface AI Search):** **encendido + verificado en staging (TASK-1265, 2026-06-28).** Usa DataForSEO como fuente gobernada, sin scraping directo de Google. Smoke real verde end-to-end (observación `succeeded` con 27 citas en PG, ejecutada por el worker real). Está disponible en los 3 entrypoints de análisis (público / cliente / operador) por construcción. Si DataForSEO no trae bloque de AI Overview/AI Mode, la observación queda `skipped:no_ai_overview_block` (es "no apareces", no un fallo). El costo se mide por request reportado por DataForSEO. DataForSEO documenta AI Mode como English-only hoy, así que el adapter manda `language_code=en` y conserva mercado/location para segmentar. **Producción:** apagado (gated por el launch) + rotar la credencial DataForSEO antes de prod.
 - **DB staging/dev auditada:** 24 runs, 266 provider observations, 60 findings, 10 scores, 8 reports, 7 reviews, 23 probe results, 1 lead y 1 email dispatch. No hay perfiles org-bound opt-in para re-grade (`opt_in_profiles=0`, `due_profiles=0`).
 - **Prompt pack v2 (TASK-1249):** existe como versión seleccionable (corrige el prompt p12, que nombraba sectores y ensuciaba las marcas de control). El **default sigue siendo v1** hasta una validación real; v2 es opt-in.
@@ -172,7 +172,7 @@ Mostrar el resultado en pantalla no basta: si el prospecto cierra la pestaña, p
 - No aplica automáticamente los Fix-It Artifacts: sólo los entrega para revisión/aplicación humana.
 - No habilita todavía runs de portal/trial en producción; los flags `PORTAL_RUN` y `TRIAL` siguen OFF.
 - No tiene re-grade E2E con cliente real opt-in: el scheduler está ON en staging, pero la DB auditada no tiene perfiles due/opt-in.
-- No debe tratar Perplexity como provider efectivo del worker hasta prender el flag en `ops-worker`.
+- No debe tratar Perplexity como verificado post-flip hasta correr un smoke async low-volume en `ops-worker-00418-2m6` o posterior.
 - No debe prender producción sin release control plane, migraciones/capabilities, rotación de credenciales expuestas y sign-off legal/comercial.
 
 > Detalle tecnico: invariantes y contrato en [GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md) (§Delta 2026-06-24). Codigo: `src/lib/growth/ai-visibility/**`. Operacion: [manual de smoke](../../manual-de-uso/growth/ai-visibility-grader-smoke.md).

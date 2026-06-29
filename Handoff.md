@@ -1,3 +1,11 @@
+## Sesion 2026-06-29 — Ops Worker Perplexity flag ON — Codex — ✅ staging live, persistencia local
+
+> **Pedido:** prender Perplexity en el Ops Worker. No se cambio de worktree, no se hizo stash/reset y no se tocó el WIP paralelo de TASK-1278.
+>
+> **Live rollout:** `gcloud run services update ops-worker --project=efeonce-group --region=us-east4 --update-env-vars=GROWTH_AI_VISIBILITY_PERPLEXITY_ENABLED=true` creó `ops-worker-00418-2m6`, sirviendo 100% traffic. Verificado en Cloud Run: `GROWTH_AI_VISIBILITY_PERPLEXITY_ENABLED=true` junto a GRADER/OpenAI/Anthropic/Gemini/Google AIO/probes/email/HubSpot/re-grade ON. Producción sigue OFF por default.
+>
+> **Persistencia:** `services/ops-worker/deploy.sh` actualizado para que staging tenga `DEFAULT_GROWTH_PERPLEXITY_ENABLED=true` y production `false`; sin esto un redeploy habría vuelto a apagarlo. Docs/ledger/manual ajustados al estado `00418-2m6`. Pendiente recomendado: smoke async low-volume con `onlyProviders:['perplexity']` para confirmar observation nueva drenada por el worker.
+
 ## Sesion 2026-06-29 — AI Visibility Grader deep audit docs sync — Codex — ✅ docs/runtime reconciled
 
 > **Pedido:** revisar a profundidad el AI Visibility Grader en DB y codebase, comparar contra documentation/manual y actualizar lo que faltara. Skills usadas: `greenhouse-documentation-governor` + `seo-aeo`. Trabajo docs-only en `develop`, cuidando no mezclar el WIP concurrente de TASK-1278.

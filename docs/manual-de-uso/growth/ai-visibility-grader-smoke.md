@@ -1,17 +1,17 @@
 # Manual — Correr el AI Visibility Grader (smoke + endpoint)
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.10 · **Ultima actualizacion:** 2026-06-29 por Codex (auditoria DB/codebase/manual del grader)
+> **Version:** 1.11 · **Ultima actualizacion:** 2026-06-29 por Codex (Perplexity ON en ops-worker staging)
 >
 > **Para que sirve:** ejecutar una corrida acotada (low-volume) del AI Visibility Grader contra los answer engines, para validar el motor end-to-end. Por defecto usa un proveedor simulado (no gasta dinero); con flags + secrets corre proveedores reales. Dos caminos: el **CLI** (`pnpm growth:ai-visibility:smoke`, local/dev) y el **endpoint interno** (`/api/admin/growth/ai-visibility/runs`, mismo primitive, apto staging).
 
 ## Estado actual del rollout (2026-06-29)
 
-- **staging:** grader ON. El worker efectivo (`ops-worker-00417-m86`) tiene `GRADER`, OpenAI, Anthropic, Gemini, Google AI Overview, probes, agentic readiness, entity probes, email, HubSpot y re-grade ON. Gemini usa **Gemini 3** (`gemini-3-flash-preview` via Vertex grounding; ajustable con `GREENHOUSE_GEMINI_GROUNDED_MODEL` sin redeploy).
+- **staging:** grader ON. El worker efectivo (`ops-worker-00418-2m6`) tiene `GRADER`, OpenAI, Anthropic, Perplexity, Gemini, Google AI Overview, probes, agentic readiness, entity probes, email, HubSpot y re-grade ON. Gemini usa **Gemini 3** (`gemini-3-flash-preview` via Vertex grounding; ajustable con `GREENHOUSE_GEMINI_GROUNDED_MODEL` sin redeploy).
 - **Google AI Overview / AI Mode (TASK-1265):** ON en staging via DataForSEO. Usa `DATAFORSEO_API_LOGIN` + `DATAFORSEO_API_PASSWORD_SECRET_REF`; no scrapea Google directo. Si Google/DataForSEO no devuelve bloque AI Mode, la observation queda `skipped:no_ai_overview_block`, no `succeeded` vacío. DataForSEO reporta costo por request, no por tokens.
 - **ejecución async (TASK-1234): ON en staging.** `GROWTH_AI_VISIBILITY_ASYNC_EXECUTION_ENABLED=true` (environment `staging`). El endpoint **encola** el run (responde HTTP 202 + runId) y el worker Cloud Run (`ops-worker`, scheduler `ops-growth-grader-drain` cada 5 min) lo ejecuta sin límite de tiempo. Esto es lo único que permite correr runs `full`/`internal_audit` multi-provider (que antes morían por el timeout de la función Vercel). Verificado end-to-end: un run `full` real corrió ~12 min sin timeout. Con la flag OFF el endpoint vuelve a ejecutar inline (sólo `light`/OpenAI cabe).
 - **producción:** OFF (follow-up pesado: migración `greenhouse_growth` + capabilities seed vía release control plane develop→main + env prod + sign-off). El worker es compartido staging+prod, pero el drain hace **no-op prod-safe** mientras el grader esté OFF en prod.
-- **Perplexity:** adapter/secret/smoke previo OK, pero **no asumirlo efectivo en el worker actual**. Auditoria 2026-06-29: Vercel staging registra el flag, pero `ops-worker` trae `GROWTH_AI_VISIBILITY_PERPLEXITY_ENABLED=false` por default de `services/ops-worker/deploy.sh`; los runs async lo saltan hasta prenderlo tambien en Cloud Run/deploy.sh.
+- **Perplexity:** ON en el worker de staging desde 2026-06-29 (`GROWTH_AI_VISIBILITY_PERPLEXITY_ENABLED=true`, revision `ops-worker-00418-2m6`) y persistido en `services/ops-worker/deploy.sh` con default staging ON / prod OFF. Pendiente recomendado: smoke async low-volume con `onlyProviders:['perplexity']` para confirmar observation nueva drenada por el worker.
 - **Fix-It Artifacts (TASK-1269):** `GROWTH_AI_VISIBILITY_FIX_IT_ENABLED` ON en Vercel staging y prod OFF. Pendiente antes de entregar a prospecto/prod: smoke funcional por token público y run admin con reporte real + revisión copy/legal.
 - **Re-grade recurrente (TASK-1270):** staging/develop ON (`GROWTH_AI_VISIBILITY_REGRADE_ENABLED=true`) con Cloud Scheduler `ops-growth-grader-regrade` habilitado diario `0 8 * * *` (`America/Santiago`). Produccion OFF/paused. Smoke manual 2026-06-29 termino `skipped=no_due_profiles` porque no hay perfiles opt-in/due; no hubo costo.
 - **DB auditada:** `greenhouse_growth` tiene 24 runs, 266 observations, 10 scores, 8 reports, 7 reviews, 23 probe results, 1 lead y 1 email dispatch. No hay perfiles org-bound opt-in para re-grade.
@@ -394,7 +394,7 @@ gcloud run services describe ops-worker \
   --format='value(status.latestReadyRevisionName,spec.template.spec.containers[0].env)'
 ```
 
-La auditoria del 2026-06-29 encontro `GROWTH_AI_VISIBILITY_PERPLEXITY_ENABLED=false` en el worker aunque Vercel staging tenia el flag registrado. Para provider efectivo async, manda el worker.
+La auditoria del 2026-06-29 encontro primero `GROWTH_AI_VISIBILITY_PERPLEXITY_ENABLED=false` en el worker aunque Vercel staging tenia el flag registrado. Ese drift quedo corregido con revision `ops-worker-00418-2m6` (`true`) y `deploy.sh` persistente; para provider efectivo async, sigue mandando el worker.
 
 ## Problemas comunes
 
