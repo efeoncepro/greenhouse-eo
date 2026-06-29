@@ -6707,6 +6707,27 @@ export interface GreenhouseGrowthGraderReports {
   score_version: string;
 }
 
+export interface GreenhouseGrowthGraderReportSendLog {
+  consent_ref: string | null;
+  email_status: Generated<string>;
+  hubspot_company_id: string | null;
+  hubspot_contact_id: string | null;
+  hubspot_lead_id: string | null;
+  lead_status: Generated<string>;
+  lead_type: string;
+  legal_basis: string;
+  organization_id: string;
+  reason: string | null;
+  recipient_email: string;
+  recipient_name: string | null;
+  requested_at: Generated<Timestamp>;
+  requested_by: string;
+  resend_message_id: string | null;
+  run_id: string;
+  send_id: Generated<string>;
+  updated_at: Generated<Timestamp>;
+}
+
 export interface GreenhouseGrowthGraderRuns {
   assignment_id: string | null;
   cost_attribution: string | null;
@@ -10996,6 +11017,7 @@ export interface DB {
   "greenhouse_growth.grader_recommendation_status_history": GreenhouseGrowthGraderRecommendationStatusHistory;
   "greenhouse_growth.grader_report_email_dispatches": GreenhouseGrowthGraderReportEmailDispatches;
   "greenhouse_growth.grader_report_reviews": GreenhouseGrowthGraderReportReviews;
+  "greenhouse_growth.grader_report_send_log": GreenhouseGrowthGraderReportSendLog;
   "greenhouse_growth.grader_reports": GreenhouseGrowthGraderReports;
   "greenhouse_growth.grader_runs": GreenhouseGrowthGraderRuns;
   "greenhouse_growth.grader_scores": GreenhouseGrowthGraderScores;
