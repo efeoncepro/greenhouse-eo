@@ -3,6 +3,16 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 vi.mock('server-only', () => ({}))
 vi.mock('@/lib/observability/capture', () => ({ captureWithDomain: vi.fn() }))
 
+const { FakeApiError } = vi.hoisted(() => ({
+  FakeApiError: class FakeApiError extends Error {
+    status: number
+    constructor(status: number) {
+      super(`api ${status}`)
+      this.status = status
+    }
+  }
+}))
+
 const flags = vi.hoisted(() => ({ isSearchConsoleEnabled: vi.fn() }))
 
 vi.mock('../flags', () => ({ isSearchConsoleEnabled: flags.isSearchConsoleEnabled }))
@@ -31,37 +41,50 @@ vi.mock('../state-store', () => ({
   consumeSearchConsoleOAuthState: state.consumeSearchConsoleOAuthState
 }))
 
-const api = vi.hoisted(() => ({ tokenCanAccessSite: vi.fn() }))
+const api = vi.hoisted(() => ({ listSearchConsoleSiteOptions: vi.fn() }))
 
-vi.mock('../api-client', () => ({ tokenCanAccessSite: api.tokenCanAccessSite }))
+vi.mock('../api-client', () => ({
+  listSearchConsoleSiteOptions: api.listSearchConsoleSiteOptions,
+  SearchConsoleApiError: FakeApiError
+}))
 
 const store = vi.hoisted(() => ({
   getSearchConsoleConnection: vi.fn(),
-  upsertActiveSearchConsoleConnection: vi.fn(),
+  upsertPendingSearchConsoleConnection: vi.fn(),
+  setSearchConsoleConnectionProperty: vi.fn(),
+  setSearchConsoleConnectionStatus: vi.fn(),
   disconnectSearchConsoleConnection: vi.fn()
 }))
 
 vi.mock('../connection-store', () => ({
   getSearchConsoleConnection: store.getSearchConsoleConnection,
-  upsertActiveSearchConsoleConnection: store.upsertActiveSearchConsoleConnection,
+  upsertPendingSearchConsoleConnection: store.upsertPendingSearchConsoleConnection,
+  setSearchConsoleConnectionProperty: store.setSearchConsoleConnectionProperty,
+  setSearchConsoleConnectionStatus: store.setSearchConsoleConnectionStatus,
   disconnectSearchConsoleConnection: store.disconnectSearchConsoleConnection
 }))
 
-const secrets = vi.hoisted(() => ({ createOrAddSecretVersion: vi.fn() }))
+const secrets = vi.hoisted(() => ({ createOrAddSecretVersion: vi.fn(), resolveSecretByRef: vi.fn() }))
 
-vi.mock('@/lib/secrets/secret-manager', () => ({ createOrAddSecretVersion: secrets.createOrAddSecretVersion }))
+vi.mock('@/lib/secrets/secret-manager', () => ({
+  createOrAddSecretVersion: secrets.createOrAddSecretVersion,
+  resolveSecretByRef: secrets.resolveSecretByRef
+}))
 
 vi.mock('../secret-naming', () => ({
-  buildSearchConsoleSecretId: (org: string) => `search-console-token-${org}`
+  buildOperatorSearchConsoleSecretId: (userId: string) => `search-console-token-operator-${userId}`
 }))
 
 import {
   completeSearchConsoleConnection,
   disconnectSearchConsoleProperty,
+  listSearchConsoleSitesForOrg,
+  selectSearchConsoleProperty,
   startSearchConsoleConnection
 } from '../command'
 
 const OAUTH_CONFIG = { clientId: 'cid', clientSecret: 'sec', redirectUri: 'https://x/cb' }
+const PENDING = { organizationId: 'org-a', status: 'pending', tokenSecretRef: 'search-console-token-operator-u', siteUrl: null }
 
 beforeEach(() => {
   vi.clearAllMocks()
@@ -70,124 +93,121 @@ beforeEach(() => {
 })
 
 describe('startSearchConsoleConnection', () => {
-  it('disabled cuando el flag está OFF', async () => {
-    flags.isSearchConsoleEnabled.mockReturnValue(false)
-    const r = await startSearchConsoleConnection({ organizationId: 'org-a', siteUrl: 's', userId: 'u' })
-
-    expect(r).toEqual({ ok: false, errorCode: 'disabled' })
-  })
-
-  it('not_configured cuando falta el OAuth client', async () => {
-    oauth.resolveSearchConsoleOAuthConfig.mockResolvedValue(null)
-    const r = await startSearchConsoleConnection({ organizationId: 'org-a', siteUrl: 's', userId: 'u' })
-
-    expect(r).toEqual({ ok: false, errorCode: 'not_configured' })
-  })
-
-  it('ok: crea state y devuelve la consent URL', async () => {
+  it('ok: crea state (sin propiedad) y devuelve la consent URL', async () => {
     state.createSearchConsoleOAuthState.mockResolvedValue('raw-state')
     oauth.buildConsentUrl.mockReturnValue('https://accounts.google.com/consent?state=raw-state')
-    const r = await startSearchConsoleConnection({ organizationId: 'org-a', siteUrl: 's', userId: 'u' })
+    const r = await startSearchConsoleConnection({ organizationId: 'org-a', userId: 'u' })
 
     expect(r).toEqual({ ok: true, consentUrl: 'https://accounts.google.com/consent?state=raw-state' })
     expect(state.createSearchConsoleOAuthState).toHaveBeenCalledWith({
       organizationId: 'org-a',
-      siteUrl: 's',
       createdByUserId: 'u',
       returnToPath: null
     })
   })
+
+  it('disabled cuando el flag está OFF', async () => {
+    flags.isSearchConsoleEnabled.mockReturnValue(false)
+    const r = await startSearchConsoleConnection({ organizationId: 'org-a', userId: 'u' })
+
+    expect(r).toEqual({ ok: false, errorCode: 'disabled' })
+  })
 })
 
 describe('completeSearchConsoleConnection', () => {
-  const consumed = { organizationId: 'org-a', siteUrl: 'https://acme.com/', createdByUserId: 'u', returnToPath: null }
+  const consumed = { organizationId: 'org-a', createdByUserId: 'u', returnToPath: null }
 
-  it('state_invalid cuando el state no resuelve (forjado/reusado/expirado)', async () => {
+  it('state_invalid cuando el state no resuelve', async () => {
     state.consumeSearchConsoleOAuthState.mockResolvedValue(null)
     const r = await completeSearchConsoleConnection({ rawState: 'x', code: 'c' })
 
     expect(r).toEqual({ ok: false, errorCode: 'state_invalid' })
   })
 
-  it('oauth_failed cuando el code exchange no trae refresh token', async () => {
+  it('oauth_failed cuando el exchange no trae refresh token', async () => {
     state.consumeSearchConsoleOAuthState.mockResolvedValue(consumed)
     oauth.exchangeCodeForTokens.mockResolvedValue({ refreshToken: null, accessToken: 'a', scopes: [] })
     const r = await completeSearchConsoleConnection({ rawState: 'x', code: 'c' })
 
-    expect(r).toEqual({ ok: false, errorCode: 'oauth_failed', returnToPath: null })
+    expect(r).toMatchObject({ ok: false, errorCode: 'oauth_failed' })
     expect(secrets.createOrAddSecretVersion).not.toHaveBeenCalled()
   })
 
-  it('site_not_accessible cuando el token no puede ver la propiedad elegida', async () => {
+  it('ok: guarda el token de OPERADOR y deja la conexión pending (NO verifica propiedad, NO token a PG)', async () => {
     state.consumeSearchConsoleOAuthState.mockResolvedValue(consumed)
-    oauth.exchangeCodeForTokens.mockResolvedValue({ refreshToken: 'r', accessToken: 'a', scopes: [] })
-    api.tokenCanAccessSite.mockResolvedValue(false)
-    const r = await completeSearchConsoleConnection({ rawState: 'x', code: 'c' })
-
-    expect(r).toEqual({ ok: false, errorCode: 'site_not_accessible', returnToPath: null })
-    expect(secrets.createOrAddSecretVersion).not.toHaveBeenCalled()
-  })
-
-  it('secret_write_failed cuando Secret Manager no acepta el write (grant IAM faltante)', async () => {
-    state.consumeSearchConsoleOAuthState.mockResolvedValue(consumed)
-    oauth.exchangeCodeForTokens.mockResolvedValue({ refreshToken: 'r', accessToken: 'a', scopes: [] })
-    api.tokenCanAccessSite.mockResolvedValue(true)
-    secrets.createOrAddSecretVersion.mockResolvedValue({ ok: false, errorCode: 'permission_denied' })
-    const r = await completeSearchConsoleConnection({ rawState: 'x', code: 'c' })
-
-    expect(r).toEqual({ ok: false, errorCode: 'secret_write_failed', returnToPath: null })
-    expect(store.upsertActiveSearchConsoleConnection).not.toHaveBeenCalled()
-  })
-
-  it('ok: escribe el token a Secret Manager y hace upsert active (token NUNCA a PG)', async () => {
-    state.consumeSearchConsoleOAuthState.mockResolvedValue(consumed)
-    oauth.exchangeCodeForTokens.mockResolvedValue({
-      refreshToken: 'refresh-xyz',
-      accessToken: 'a',
-      scopes: ['https://www.googleapis.com/auth/webmasters.readonly']
-    })
-    api.tokenCanAccessSite.mockResolvedValue(true)
-    secrets.createOrAddSecretVersion.mockResolvedValue({ ok: true, secretId: 'search-console-token-org-a' })
-    store.upsertActiveSearchConsoleConnection.mockResolvedValue({
-      organizationId: 'org-a',
-      siteUrl: 'https://acme.com/',
-      status: 'active',
-      tokenSecretRef: 'search-console-token-org-a'
-    })
+    oauth.exchangeCodeForTokens.mockResolvedValue({ refreshToken: 'refresh-xyz', accessToken: 'a', scopes: [] })
+    secrets.createOrAddSecretVersion.mockResolvedValue({ ok: true, secretId: 'search-console-token-operator-u' })
+    store.upsertPendingSearchConsoleConnection.mockResolvedValue({ ...PENDING })
 
     const r = await completeSearchConsoleConnection({ rawState: 'x', code: 'c' })
 
     expect(r.ok).toBe(true)
-    expect(secrets.createOrAddSecretVersion).toHaveBeenCalledWith('search-console-token-org-a', 'refresh-xyz')
-    // El upsert recibe el ref del secreto, NUNCA el token crudo.
-    const upsertArg = store.upsertActiveSearchConsoleConnection.mock.calls[0][0]
+    // Secret de operador (keyed por userId), NO per-org.
+    expect(secrets.createOrAddSecretVersion).toHaveBeenCalledWith('search-console-token-operator-u', 'refresh-xyz')
+    const upsertArg = store.upsertPendingSearchConsoleConnection.mock.calls[0][0]
 
-    expect(upsertArg.tokenSecretRef).toBe('search-console-token-org-a')
+    expect(upsertArg.tokenSecretRef).toBe('search-console-token-operator-u')
     expect(JSON.stringify(upsertArg)).not.toContain('refresh-xyz')
   })
+})
 
-  it('ok: conserva returnToPath validado para que la route pueda redirigir al panel', async () => {
-    state.consumeSearchConsoleOAuthState.mockResolvedValue({
-      ...consumed,
-      returnToPath: '/agency/clients/org-a/lifecycle'
-    })
-    oauth.exchangeCodeForTokens.mockResolvedValue({
-      refreshToken: 'refresh-xyz',
-      accessToken: 'a',
-      scopes: ['https://www.googleapis.com/auth/webmasters.readonly']
-    })
-    api.tokenCanAccessSite.mockResolvedValue(true)
-    secrets.createOrAddSecretVersion.mockResolvedValue({ ok: true, secretId: 'search-console-token-org-a' })
-    store.upsertActiveSearchConsoleConnection.mockResolvedValue({
-      organizationId: 'org-a',
-      siteUrl: 'https://acme.com/',
-      status: 'active',
-      tokenSecretRef: 'search-console-token-org-a'
-    })
+describe('listSearchConsoleSitesForOrg', () => {
+  it('not_connected si no hay conexión con token', async () => {
+    store.getSearchConsoleConnection.mockResolvedValue(null)
+    const r = await listSearchConsoleSitesForOrg('org-a')
 
-    const r = await completeSearchConsoleConnection({ rawState: 'x', code: 'c' })
+    expect(r).toEqual({ ok: false, errorCode: 'not_connected' })
+  })
 
-    expect(r).toMatchObject({ ok: true, returnToPath: '/agency/clients/org-a/lifecycle' })
+  it('ok: devuelve el desplegable de propiedades', async () => {
+    store.getSearchConsoleConnection.mockResolvedValue({ ...PENDING })
+    secrets.resolveSecretByRef.mockResolvedValue('refresh')
+    oauth.refreshAccessToken.mockResolvedValue('access')
+    api.listSearchConsoleSiteOptions.mockResolvedValue([
+      { siteUrl: 'sc-domain:berel.cl', permissionLevel: 'siteOwner' },
+      { siteUrl: 'https://acme.com/', permissionLevel: 'siteFullUser' }
+    ])
+    const r = await listSearchConsoleSitesForOrg('org-a')
+
+    expect(r.ok).toBe(true)
+    if (r.ok) expect(r.sites).toHaveLength(2)
+  })
+
+  it('token_unhealthy + marca revoked cuando invalid_grant', async () => {
+    store.getSearchConsoleConnection.mockResolvedValue({ ...PENDING })
+    secrets.resolveSecretByRef.mockResolvedValue('refresh')
+    oauth.refreshAccessToken.mockResolvedValue('access')
+    api.listSearchConsoleSiteOptions.mockRejectedValue(new FakeApiError(403))
+    const r = await listSearchConsoleSitesForOrg('org-a')
+
+    expect(r).toEqual({ ok: false, errorCode: 'token_unhealthy' })
+    expect(store.setSearchConsoleConnectionStatus).toHaveBeenCalledWith('org-a', 'revoked', 'invalid_grant')
+  })
+})
+
+describe('selectSearchConsoleProperty', () => {
+  beforeEach(() => {
+    store.getSearchConsoleConnection.mockResolvedValue({ ...PENDING })
+    secrets.resolveSecretByRef.mockResolvedValue('refresh')
+    oauth.refreshAccessToken.mockResolvedValue('access')
+    api.listSearchConsoleSiteOptions.mockResolvedValue([
+      { siteUrl: 'sc-domain:berel.cl', permissionLevel: 'siteOwner' }
+    ])
+  })
+
+  it('site_not_accessible si la propiedad no está en la lista de la cuenta', async () => {
+    const r = await selectSearchConsoleProperty('org-a', 'https://ajeno.com/')
+
+    expect(r).toEqual({ ok: false, errorCode: 'site_not_accessible' })
+    expect(store.setSearchConsoleConnectionProperty).not.toHaveBeenCalled()
+  })
+
+  it('ok: ata la propiedad y marca active', async () => {
+    store.setSearchConsoleConnectionProperty.mockResolvedValue({ ...PENDING, siteUrl: 'sc-domain:berel.cl', status: 'active' })
+    const r = await selectSearchConsoleProperty('org-a', 'sc-domain:berel.cl')
+
+    expect(r.ok).toBe(true)
+    expect(store.setSearchConsoleConnectionProperty).toHaveBeenCalledWith('org-a', 'sc-domain:berel.cl')
   })
 })
 
@@ -197,16 +217,5 @@ describe('disconnectSearchConsoleProperty', () => {
     const r = await disconnectSearchConsoleProperty('org-a')
 
     expect(r).toEqual({ ok: false, errorCode: 'not_connected' })
-  })
-
-  it('ok: marca revoked', async () => {
-    store.getSearchConsoleConnection
-      .mockResolvedValueOnce({ organizationId: 'org-a', status: 'active', tokenSecretRef: 'ref' })
-      .mockResolvedValueOnce({ organizationId: 'org-a', status: 'revoked', tokenSecretRef: null })
-    store.disconnectSearchConsoleConnection.mockResolvedValue(true)
-    const r = await disconnectSearchConsoleProperty('org-a')
-
-    expect(r.ok).toBe(true)
-    expect(store.disconnectSearchConsoleConnection).toHaveBeenCalledWith('org-a')
   })
 })

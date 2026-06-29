@@ -34,6 +34,22 @@ export const buildSearchConsoleSecretId = (organizationId: string): string => {
     throw new Error('TASK-1282: organizationId inválido para secret id de Search Console')
   }
 
-
   return `${SECRET_PREFIX}-${slug}`
+}
+
+/**
+ * Secret id del token de OPERADOR (flujo property-picker estilo Semrush): un solo
+ * token por operador interno, reusado entre todas las orgs que ese operador conecta.
+ * Evita copiar el mismo refresh token N veces (uno por org). Las filas per-org sólo
+ * apuntan a este secret vía `token_secret_ref`. Prefijo cubierto por el grant IAM
+ * `search-console-token-*` del SA runtime.
+ */
+export const buildOperatorSearchConsoleSecretId = (userId: string): string => {
+  const slug = sanitizeForSecretId(userId)
+
+  if (!slug) {
+    throw new Error('TASK-1282: userId inválido para secret id de operador Search Console')
+  }
+
+  return `${SECRET_PREFIX}-operator-${slug}`
 }

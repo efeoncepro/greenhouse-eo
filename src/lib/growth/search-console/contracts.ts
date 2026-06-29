@@ -21,7 +21,8 @@ export type SearchConsoleConnectionStatus = 'active' | 'revoked' | 'expired' | '
  */
 export interface SearchConsoleConnection {
   organizationId: string
-  siteUrl: string
+  /** `null` mientras la conexión está `pending` (token guardado, propiedad sin elegir). */
+  siteUrl: string | null
   scopes: string[]
   status: SearchConsoleConnectionStatus
   tokenSecretRef: string | null
@@ -30,6 +31,22 @@ export interface SearchConsoleConnection {
   lastVerifiedAt: string | null
   lastErrorCode: string | null
 }
+
+/** Una propiedad de Search Console disponible para el operador (item del desplegable). */
+export interface SearchConsolePropertyOption {
+  siteUrl: string
+  permissionLevel: string | null
+}
+
+/** Resultado de listar las propiedades disponibles (desplegable post-consentimiento). */
+export type SearchConsoleSitesResult =
+  | { ok: true; sites: SearchConsolePropertyOption[] }
+  | { ok: false; errorCode: 'disabled' | 'not_connected' | 'token_unhealthy' | 'query_failed' }
+
+/** Resultado de elegir/atar una propiedad a la org. */
+export type SelectSearchConsolePropertyResult =
+  | { ok: true; connection: SearchConsoleConnection }
+  | { ok: false; errorCode: 'disabled' | 'not_connected' | 'token_unhealthy' | 'site_not_accessible' }
 
 /** Resultado del command connect/disconnect (discriminado por `ok`). */
 export type SearchConsoleCommandResult =

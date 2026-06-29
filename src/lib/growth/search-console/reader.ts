@@ -42,9 +42,11 @@ export const readSearchConsoleAnalytics = async (
 
   const connection = await getSearchConsoleConnection(organizationId)
 
-  if (!connection || connection.status !== 'active' || !connection.tokenSecretRef) {
+  if (!connection || connection.status !== 'active' || !connection.tokenSecretRef || !connection.siteUrl) {
     return { ok: false, errorCode: 'not_connected', status: connection?.status ?? null }
   }
+
+  const siteUrl = connection.siteUrl
 
   const config = await resolveSearchConsoleOAuthConfig()
 
@@ -62,11 +64,11 @@ export const readSearchConsoleAnalytics = async (
 
   try {
     const accessToken = await refreshAccessToken(config, refreshToken)
-    const rows = await querySearchAnalytics(accessToken, connection.siteUrl, params)
+    const rows = await querySearchAnalytics(accessToken, siteUrl, params)
 
     await setSearchConsoleConnectionStatus(organizationId, 'active', null)
 
-    return { ok: true, siteUrl: connection.siteUrl, rows }
+    return { ok: true, siteUrl, rows }
   } catch (error) {
     if (isRevocationError(error)) {
       await setSearchConsoleConnectionStatus(organizationId, 'revoked', 'invalid_grant')

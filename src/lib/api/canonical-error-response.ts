@@ -105,6 +105,9 @@ export type CanonicalErrorCode =
   | 'search_console_not_connected'
   | 'search_console_oauth_state_invalid'
   | 'search_console_oauth_failed'
+  | 'search_console_token_unhealthy'
+  | 'search_console_property_not_accessible'
+  | 'search_console_sites_unavailable'
 // Reserved for future canonical codes — extender aquí cuando emerjan
 // nuevos error paths estructurales. NUNCA usar strings ad-hoc.
 
@@ -388,6 +391,21 @@ const CANONICAL_ERRORS: Record<CanonicalErrorCode, CanonicalErrorDefinition> = {
   search_console_oauth_failed: {
     status: 502,
     message: 'No pudimos completar la conexión con Search Console. Intenta de nuevo.',
+    actionable: true
+  },
+  search_console_token_unhealthy: {
+    status: 409,
+    message: 'La conexión con Search Console se revocó o expiró. Vuelve a conectar tu cuenta de Google.',
+    actionable: true
+  },
+  search_console_property_not_accessible: {
+    status: 409,
+    message: 'Esa propiedad no está disponible en la cuenta de Google con la que conectaste. Elige una de las propiedades que aparecen en la lista.',
+    actionable: true
+  },
+  search_console_sites_unavailable: {
+    status: 502,
+    message: 'No pudimos obtener tus propiedades de Search Console. Intenta de nuevo en unos minutos.',
     actionable: true
   }
 }

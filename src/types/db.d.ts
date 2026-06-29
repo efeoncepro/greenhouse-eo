@@ -6794,7 +6794,7 @@ export interface GreenhouseGrowthSearchConsoleConnections {
   last_verified_at: Timestamp | null;
   organization_id: string;
   scopes: Generated<string[]>;
-  site_url: string;
+  site_url: string | null;
   status: Generated<string>;
   token_secret_ref: string | null;
   updated_at: Generated<Timestamp>;

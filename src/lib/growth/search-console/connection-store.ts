@@ -24,7 +24,7 @@ const toIso = (value: unknown): string | null => {
 
 const mapRow = (row: ConnectionRow): SearchConsoleConnection => ({
   organizationId: String(row.organization_id),
-  siteUrl: String(row.site_url),
+  siteUrl: row.site_url == null ? null : String(row.site_url),
   scopes: Array.isArray(row.scopes) ? (row.scopes as string[]) : [],
   status: String(row.status) as SearchConsoleConnectionStatus,
   tokenSecretRef: (row.token_secret_ref as string | null) ?? null,
@@ -84,6 +84,60 @@ export const upsertActiveSearchConsoleConnection = async (
   )
 
   return mapRow(rows[0])
+}
+
+/**
+ * UPSERT de una conexión `pending`: token de operador ya guardado, propiedad SIN
+ * elegir (site_url NULL). El operador elegirá del desplegable (selectProperty).
+ */
+export const upsertPendingSearchConsoleConnection = async (input: {
+  organizationId: string
+  scopes: string[]
+  tokenSecretRef: string
+  connectedByUserId: string | null
+}): Promise<SearchConsoleConnection> => {
+  const rows = await runGreenhousePostgresQuery<ConnectionRow>(
+    `INSERT INTO greenhouse_growth.search_console_connections
+       (organization_id, site_url, scopes, status, token_secret_ref,
+        connected_by_user_id, connected_at, last_verified_at, last_error_code, updated_at)
+     VALUES ($1, NULL, $2, 'pending', $3, $4, NOW(), NOW(), NULL, NOW())
+     ON CONFLICT (organization_id) DO UPDATE SET
+       site_url = NULL,
+       scopes = EXCLUDED.scopes,
+       status = 'pending',
+       token_secret_ref = EXCLUDED.token_secret_ref,
+       connected_by_user_id = EXCLUDED.connected_by_user_id,
+       connected_at = NOW(),
+       last_verified_at = NOW(),
+       last_error_code = NULL,
+       updated_at = NOW()
+     RETURNING organization_id, site_url, scopes, status, token_secret_ref,
+               connected_by_user_id, connected_at, last_verified_at, last_error_code`,
+    [input.organizationId, input.scopes, input.tokenSecretRef, input.connectedByUserId]
+  )
+
+  return mapRow(rows[0])
+}
+
+/** Fija la propiedad elegida + marca `active` (la org pasa de pending → active). */
+export const setSearchConsoleConnectionProperty = async (
+  organizationId: string,
+  siteUrl: string
+): Promise<SearchConsoleConnection | null> => {
+  const rows = await runGreenhousePostgresQuery<ConnectionRow>(
+    `UPDATE greenhouse_growth.search_console_connections
+        SET site_url = $2,
+            status = 'active',
+            last_error_code = NULL,
+            last_verified_at = NOW(),
+            updated_at = NOW()
+      WHERE organization_id = $1
+      RETURNING organization_id, site_url, scopes, status, token_secret_ref,
+                connected_by_user_id, connected_at, last_verified_at, last_error_code`,
+    [organizationId, siteUrl]
+  )
+
+  return rows[0] ? mapRow(rows[0]) : null
 }
 
 /** Marca el status de la conexión (revoked/expired/pending) + opcional error code. */

@@ -56,7 +56,6 @@ const decodeReturnToPath = (rawState: string): string | null => {
 
 export interface CreateSearchConsoleStateInput {
   organizationId: string
-  siteUrl: string
   createdByUserId: string | null
   returnToPath?: string | null
 }
@@ -72,11 +71,13 @@ export const createSearchConsoleOAuthState = async (
   const stateHash = hashState(rawState)
   const expiresAt = new Date(Date.now() + SEARCH_CONSOLE_STATE_TTL_MS).toISOString()
 
+  // El flujo property-picker no pre-elige propiedad: `site_url` queda como placeholder
+  // ('') en el state. La propiedad se elige después del desplegable.
   await runGreenhousePostgresQuery(
     `INSERT INTO greenhouse_growth.search_console_oauth_states
        (state_hash, organization_id, site_url, created_by_user_id, expires_at)
-     VALUES ($1, $2, $3, $4, $5)`,
-    [stateHash, input.organizationId, input.siteUrl, input.createdByUserId, expiresAt]
+     VALUES ($1, $2, '', $3, $4)`,
+    [stateHash, input.organizationId, input.createdByUserId, expiresAt]
   )
 
   return rawState
@@ -84,7 +85,6 @@ export const createSearchConsoleOAuthState = async (
 
 export interface ConsumedSearchConsoleState {
   organizationId: string
-  siteUrl: string
   createdByUserId: string | null
   returnToPath: string | null
 }
@@ -139,7 +139,6 @@ export const consumeSearchConsoleOAuthState = async (
 
     return {
       organizationId: row.organization_id,
-      siteUrl: row.site_url,
       createdByUserId: row.created_by_user_id,
       returnToPath: decodeReturnToPath(rawState)
     }

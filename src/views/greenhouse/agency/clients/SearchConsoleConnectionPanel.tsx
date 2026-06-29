@@ -14,6 +14,7 @@ import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
 import DialogContentText from '@mui/material/DialogContentText'
 import DialogTitle from '@mui/material/DialogTitle'
+import MenuItem from '@mui/material/MenuItem'
 import Stack from '@mui/material/Stack'
 import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
@@ -29,7 +30,7 @@ import { formatRelative } from '@/lib/format'
 
 export interface SearchConsoleConnectionPanelConnection {
   organizationId: string
-  siteUrl: string
+  siteUrl: string | null
   status: 'active' | 'revoked' | 'expired' | 'pending'
   connectedAt: string | null
   lastVerifiedAt: string | null
@@ -41,6 +42,11 @@ interface SearchConsoleConnectionPanelProps {
   connection: SearchConsoleConnectionPanelConnection | null
   enabled: boolean
   canConnect: boolean
+}
+
+interface PropertyOption {
+  siteUrl: string
+  permissionLevel: string | null
 }
 
 const STATUS_META: Record<
@@ -57,8 +63,6 @@ const STATUS_META: Record<
   error: { label: T.status.error, color: 'error', icon: 'tabler-alert-circle' }
 }
 
-const normalizeSiteUrl = (value: string): string => value.trim()
-
 const resolveStatusKey = (
   enabled: boolean,
   connecting: boolean,
@@ -72,12 +76,8 @@ const resolveStatusKey = (
   return connection?.status ?? 'empty'
 }
 
-const buildStartUrl = (organizationId: string, siteUrl: string): string => {
-  const params = new URLSearchParams({
-    organizationId,
-    siteUrl,
-    returnTo: window.location.pathname
-  })
+const buildStartUrl = (organizationId: string): string => {
+  const params = new URLSearchParams({ organizationId, returnTo: window.location.pathname })
 
   return `/api/admin/growth/search-console/oauth/start?${params.toString()}`
 }
@@ -93,17 +93,21 @@ export const SearchConsoleConnectionPanel = ({
   const disconnectButtonRef = useRef<HTMLButtonElement | null>(null)
 
   const [localConnection, setLocalConnection] = useState(connection)
-  const [siteUrl, setSiteUrl] = useState(connection?.siteUrl ?? '')
   const [connecting, setConnecting] = useState(false)
   const [disconnecting, setDisconnecting] = useState(false)
   const [dialogOpen, setDialogOpen] = useState(false)
-  const [fieldError, setFieldError] = useState<string | null>(null)
   const [panelError, setPanelError] = useState<string | null>(null)
   const [announcement, setAnnouncement] = useState('')
 
+  // Property-picker (desplegable post-consentimiento).
+  const [sites, setSites] = useState<PropertyOption[] | null>(null)
+  const [sitesLoading, setSitesLoading] = useState(false)
+  const [sitesError, setSitesError] = useState<string | null>(null)
+  const [selectedSite, setSelectedSite] = useState('')
+  const [saving, setSaving] = useState(false)
+
   useEffect(() => {
     setLocalConnection(connection)
-    setSiteUrl(connection?.siteUrl ?? '')
   }, [connection])
 
   useEffect(() => {
@@ -119,11 +123,39 @@ export const SearchConsoleConnectionPanel = ({
     }
   }, [searchParams])
 
-  const statusKey = resolveStatusKey(enabled, connecting, localConnection, Boolean(panelError))
-  const statusMeta = STATUS_META[statusKey]
+  const isPending = localConnection?.status === 'pending'
   const isConnected = localConnection?.status === 'active'
   const needsReconnect = localConnection?.status === 'revoked' || localConnection?.status === 'expired'
   const canRunActions = enabled && canConnect
+
+  const loadSites = useCallback(async () => {
+    setSitesLoading(true)
+    setSitesError(null)
+
+    try {
+      const res = await fetch(`/api/admin/growth/search-console/sites?organizationId=${encodeURIComponent(organizationId)}`)
+
+      if (!res.ok) {
+        throw new Error('sites_failed')
+      }
+
+      const body = (await res.json()) as { sites?: PropertyOption[] }
+
+      setSites(body.sites ?? [])
+    } catch {
+      setSites(null)
+      setSitesError(T.feedback.sitesError)
+    } finally {
+      setSitesLoading(false)
+    }
+  }, [organizationId])
+
+  // Al quedar `pending` (cuenta conectada, propiedad sin elegir) cargamos el desplegable.
+  useEffect(() => {
+    if (isPending && canRunActions && sites === null && !sitesLoading && !sitesError) {
+      void loadSites()
+    }
+  }, [isPending, canRunActions, sites, sitesLoading, sitesError, loadSites])
 
   const verifiedLabel = useMemo(() => {
     if (!localConnection?.lastVerifiedAt) {
@@ -142,20 +174,47 @@ export const SearchConsoleConnectionPanel = ({
   }, [localConnection?.connectedAt])
 
   const handleConnect = useCallback(() => {
-    const normalized = normalizeSiteUrl(siteUrl)
-
-    if (!normalized) {
-      setFieldError(T.feedback.siteUrlMissing)
-
-      return
-    }
-
-    setFieldError(null)
     setPanelError(null)
     setConnecting(true)
     setAnnouncement(T.state.connectingBody)
-    window.location.assign(buildStartUrl(organizationId, normalized))
-  }, [organizationId, siteUrl])
+    window.location.assign(buildStartUrl(organizationId))
+  }, [organizationId])
+
+  const handleSelectProperty = useCallback(
+    async (siteUrl: string) => {
+      setSelectedSite(siteUrl)
+
+      if (!siteUrl) {
+        return
+      }
+
+      setSaving(true)
+      setSitesError(null)
+
+      try {
+        const res = await fetch('/api/admin/growth/search-console/select-property', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ organizationId, siteUrl })
+        })
+
+        if (!res.ok) {
+          throw new Error('select_failed')
+        }
+
+        setLocalConnection(current =>
+          current ? { ...current, status: 'active', siteUrl, lastErrorCode: null } : current
+        )
+        setAnnouncement(T.feedback.propertySaved)
+      } catch {
+        setSitesError(T.feedback.propertyNotAccessible)
+        setAnnouncement(T.feedback.propertyNotAccessible)
+      } finally {
+        setSaving(false)
+      }
+    },
+    [organizationId]
+  )
 
   const handleDisconnect = useCallback(async () => {
     setDisconnecting(true)
@@ -172,9 +231,9 @@ export const SearchConsoleConnectionPanel = ({
         throw new Error('disconnect_failed')
       }
 
-      setLocalConnection(current =>
-        current ? { ...current, status: 'revoked', lastErrorCode: null } : current
-      )
+      setLocalConnection(current => (current ? { ...current, status: 'revoked', lastErrorCode: null } : current))
+      setSites(null)
+      setSelectedSite('')
       setAnnouncement(T.disconnect.success)
       setDialogOpen(false)
     } catch {
@@ -186,17 +245,22 @@ export const SearchConsoleConnectionPanel = ({
     }
   }, [organizationId])
 
+  const statusKey = resolveStatusKey(enabled, connecting, localConnection, Boolean(panelError))
+  const statusMeta = STATUS_META[statusKey]
+
   const bodyCopy = !enabled
     ? T.panel.lockedBody
     : panelError
       ? panelError
       : isConnected
         ? T.state.connectedBody
-        : needsReconnect
-          ? T.state.revokedBody
-          : connecting
-            ? T.state.connectingBody
-            : T.state.emptyBody
+        : isPending
+          ? T.state.pendingBody
+          : needsReconnect
+            ? T.state.revokedBody
+            : connecting
+              ? T.state.connectingBody
+              : T.state.emptyBody
 
   return (
     <Box
@@ -259,7 +323,7 @@ export const SearchConsoleConnectionPanel = ({
           </Typography>
         )}
 
-        {localConnection ? (
+        {isConnected && localConnection?.siteUrl ? (
           <Box
             sx={{
               p: 3,
@@ -275,13 +339,7 @@ export const SearchConsoleConnectionPanel = ({
             <Tooltip title={localConnection.siteUrl} placement='top-start'>
               <Typography
                 variant='body2'
-                sx={{
-                  fontWeight: 600,
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                  minWidth: 0
-                }}
+                sx={{ fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}
               >
                 {localConnection.siteUrl}
               </Typography>
@@ -297,26 +355,54 @@ export const SearchConsoleConnectionPanel = ({
               ) : null}
             </Stack>
           </Box>
-        ) : canRunActions ? (
-          <CustomTextField
-            fullWidth
-            label={T.panel.propertyLabel}
-            value={siteUrl}
-            onChange={event => {
-              setSiteUrl(event.target.value)
-              setFieldError(null)
-            }}
-            placeholder={T.panel.propertyPlaceholder}
-            helperText={fieldError ?? T.panel.propertyHelper}
-            error={Boolean(fieldError)}
-            disabled={connecting}
-            slotProps={{
-              htmlInput: {
-                'aria-label': T.aria.propertyInput,
-                spellCheck: false
-              }
-            }}
-          />
+        ) : isPending && canRunActions ? (
+          <Box sx={{ minWidth: 0 }}>
+            {sitesLoading ? (
+              <Stack direction='row' spacing={2} alignItems='center'>
+                <CircularProgress size={18} />
+                <Typography variant='body2' sx={{ color: 'text.secondary' }}>
+                  {T.feedback.sitesLoading}
+                </Typography>
+              </Stack>
+            ) : sitesError ? (
+              <Alert
+                severity='warning'
+                variant='outlined'
+                sx={{ borderRadius: `${theme.shape.customBorderRadius.sm}px` }}
+                action={
+                  <Button color='inherit' size='small' onClick={() => void loadSites()}>
+                    {T.cta.retry}
+                  </Button>
+                }
+              >
+                {sitesError}
+              </Alert>
+            ) : sites && sites.length === 0 ? (
+              <Alert severity='info' variant='outlined' sx={{ borderRadius: `${theme.shape.customBorderRadius.sm}px` }}>
+                {T.feedback.sitesEmpty}
+              </Alert>
+            ) : (
+              <CustomTextField
+                select
+                fullWidth
+                label={T.panel.chooseProperty}
+                value={selectedSite}
+                onChange={event => void handleSelectProperty(event.target.value)}
+                helperText={T.panel.chooseHelper}
+                disabled={saving}
+                slotProps={{ select: { displayEmpty: true, 'aria-label': T.aria.propertySelect } }}
+              >
+                <MenuItem value='' disabled>
+                  {T.panel.chooseProperty}
+                </MenuItem>
+                {(sites ?? []).map(site => (
+                  <MenuItem key={site.siteUrl} value={site.siteUrl}>
+                    {site.siteUrl}
+                  </MenuItem>
+                ))}
+              </CustomTextField>
+            )}
+          </Box>
         ) : null}
 
         {canRunActions ? (
@@ -336,14 +422,14 @@ export const SearchConsoleConnectionPanel = ({
               >
                 {T.cta.disconnect}
               </Button>
-            ) : (
+            ) : isPending ? null : (
               <Button
                 variant='contained'
                 onClick={handleConnect}
                 disabled={connecting}
                 startIcon={connecting ? <CircularProgress size={16} color='inherit' /> : <i className='tabler-plug-connected' />}
               >
-                {needsReconnect ? T.cta.reconnect : panelError ? T.cta.retry : T.cta.connect}
+                {needsReconnect ? T.cta.reconnect : panelError ? T.cta.retry : T.cta.connectAccount}
               </Button>
             )}
           </Stack>

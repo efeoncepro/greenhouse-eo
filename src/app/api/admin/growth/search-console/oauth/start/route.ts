@@ -41,20 +41,19 @@ export async function GET(request: Request) {
 
   const url = new URL(request.url)
   const organizationId = asNonEmptyString(url.searchParams.get('organizationId'))
-  const siteUrl = asNonEmptyString(url.searchParams.get('siteUrl'))
   const returnToPath = normalizeSearchConsoleReturnToPath(url.searchParams.get('returnTo'))
 
-  if (!organizationId || !siteUrl) {
+  // Flujo property-picker: NO se pide propiedad acá; se elige del desplegable post-consent.
+  if (!organizationId) {
     return canonicalErrorResponse('search_console_oauth_failed', {
       statusOverride: 400,
-      extra: { reason: 'missing_organization_or_site' }
+      extra: { reason: 'missing_organization' }
     })
   }
 
   try {
     const result = await startSearchConsoleConnection({
       organizationId,
-      siteUrl,
       userId: tenant.userId ?? null,
       returnToPath
     })

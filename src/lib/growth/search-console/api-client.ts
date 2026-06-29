@@ -35,8 +35,10 @@ interface SitesListResponse {
   siteEntry?: Array<{ siteUrl?: string; permissionLevel?: string }>
 }
 
-/** Lista las propiedades que el token puede ver. */
-export const listSearchConsoleSites = async (accessToken: string): Promise<string[]> => {
+/** Lista las propiedades (con permissionLevel) que el token puede ver — para el desplegable. */
+export const listSearchConsoleSiteOptions = async (
+  accessToken: string
+): Promise<Array<{ siteUrl: string; permissionLevel: string | null }>> => {
   const response = await fetch(SITES_ENDPOINT, {
     headers: { Authorization: `Bearer ${accessToken}` },
     cache: 'no-store'
@@ -48,10 +50,16 @@ export const listSearchConsoleSites = async (accessToken: string): Promise<strin
 
   const body = (await response.json()) as SitesListResponse
 
-
   return (body.siteEntry ?? [])
-    .map(entry => entry.siteUrl)
-    .filter((value): value is string => typeof value === 'string')
+    .filter((entry): entry is { siteUrl: string; permissionLevel?: string } => typeof entry.siteUrl === 'string')
+    .map(entry => ({ siteUrl: entry.siteUrl, permissionLevel: entry.permissionLevel ?? null }))
+}
+
+/** Lista las propiedades (sólo siteUrl) que el token puede ver. */
+export const listSearchConsoleSites = async (accessToken: string): Promise<string[]> => {
+  const options = await listSearchConsoleSiteOptions(accessToken)
+
+  return options.map(o => o.siteUrl)
 }
 
 /**

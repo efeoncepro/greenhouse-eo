@@ -9,6 +9,8 @@
 export {
   startSearchConsoleConnection,
   completeSearchConsoleConnection,
+  listSearchConsoleSitesForOrg,
+  selectSearchConsoleProperty,
   disconnectSearchConsoleProperty,
   type StartSearchConsoleConnectionInput,
   type StartSearchConsoleConnectionResult
@@ -25,6 +27,9 @@ export {
   type SearchConsoleConnection,
   type SearchConsoleConnectionStatus,
   type SearchConsoleCommandResult,
+  type SearchConsolePropertyOption,
+  type SearchConsoleSitesResult,
+  type SelectSearchConsolePropertyResult,
   type SearchConsoleAnalyticsParams,
   type SearchConsoleAnalyticsResult,
   type SearchConsoleAnalyticsRow,

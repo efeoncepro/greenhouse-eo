@@ -233,6 +233,8 @@ export const GH_SEARCH_CONSOLE = {
     propertyLabel: 'Propiedad',
     propertyPlaceholder: 'sc-domain:ejemplo.com o https://ejemplo.com/',
     propertyHelper: 'Ingresa la propiedad exacta que el cliente puede autorizar en Google.',
+    chooseProperty: 'Elige la propiedad',
+    chooseHelper: 'Estas son las propiedades que tu cuenta de Google puede ver.',
     lastVerified: 'Última verificación',
     connectedAt: 'Conectado',
     notVerified: 'Sin verificación todavía'
@@ -254,12 +256,16 @@ export const GH_SEARCH_CONSOLE = {
     errorTitle: 'No pudimos completar la conexión',
     errorBody: 'Revisa la propiedad e inténtalo de nuevo. Nunca mostramos errores crudos de Google.',
     connectingTitle: 'Conectando con Google',
-    connectingBody: 'Te llevamos al consentimiento de Google. No cierres esta pestaña.'
+    connectingBody: 'Te llevamos al consentimiento de Google. No cierres esta pestaña.',
+    pendingTitle: 'Cuenta de Google conectada',
+    pendingBody: 'Elige qué propiedad de Search Console medir para esta marca.'
   },
   cta: {
     connect: 'Conectar',
+    connectAccount: 'Conectar con Google',
     reconnect: 'Reconectar',
     disconnect: 'Desconectar',
+    saveProperty: 'Guardar propiedad',
     retry: 'Reintentar',
     cancel: 'Cancelar',
     confirmDisconnect: 'Desconectar fuente'
@@ -273,11 +279,17 @@ export const GH_SEARCH_CONSOLE = {
   feedback: {
     connected: 'Search Console conectado.',
     connectionFailed: 'No pudimos conectar Search Console.',
-    siteUrlMissing: 'Ingresa una propiedad de Search Console para continuar.'
+    siteUrlMissing: 'Ingresa una propiedad de Search Console para continuar.',
+    sitesLoading: 'Cargando tus propiedades…',
+    sitesEmpty: 'Tu cuenta de Google no tiene propiedades en Search Console.',
+    sitesError: 'No pudimos obtener tus propiedades. Intenta de nuevo.',
+    propertySaved: 'Propiedad conectada.',
+    propertyNotAccessible: 'Esa propiedad no está disponible en tu cuenta.'
   },
   aria: {
     panel: 'Estado de conexión de Google Search Console',
     propertyInput: 'Propiedad de Google Search Console',
+    propertySelect: 'Selecciona la propiedad de Google Search Console',
     disconnectDialog: 'Confirmación para desconectar Google Search Console'
   }
 } as const
