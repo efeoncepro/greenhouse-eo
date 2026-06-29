@@ -18,6 +18,7 @@ interface GotoWithTransientRetriesOptions {
   attempts?: number
   timeoutMs?: number
   backoffMs?: number
+  waitUntil?: NonNullable<Parameters<Page['goto']>[1]>['waitUntil']
 }
 
 type PlaywrightCookie = Parameters<BrowserContext['addCookies']>[0][number]
@@ -95,12 +96,13 @@ export async function gotoWithTransientRetries(
   const attempts = options.attempts ?? DEFAULT_NAVIGATION_ATTEMPTS
   const timeoutMs = options.timeoutMs ?? DEFAULT_NAVIGATION_TIMEOUT_MS
   const backoffMs = options.backoffMs ?? DEFAULT_NAVIGATION_BACKOFF_MS
+  const waitUntil = options.waitUntil ?? 'domcontentloaded'
   let lastError: unknown
 
   for (let attempt = 1; attempt <= attempts; attempt += 1) {
     try {
       return await page.goto(path, {
-        waitUntil: 'domcontentloaded',
+        waitUntil,
         timeout: timeoutMs
       })
     } catch (error) {
@@ -117,8 +119,8 @@ export async function gotoWithTransientRetries(
   throw lastError
 }
 
-export async function gotoAuthenticated(page: Page, path: string) {
-  const response = await gotoWithTransientRetries(page, path)
+export async function gotoAuthenticated(page: Page, path: string, options: GotoWithTransientRetriesOptions = {}) {
+  const response = await gotoWithTransientRetries(page, path, options)
 
   if (response) {
     expect(response.status(), `GET ${path} returned ${response.status()}`).toBeLessThan(400)
