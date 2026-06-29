@@ -152,30 +152,37 @@ const associateContactToCompany = async (token: string, contactId: string, compa
   if (!res.ok) throw new HubSpotApiError(res.status)
 }
 
-/** Asociación default genérica (v4) `from → to`. Idempotente: re-asociar no duplica. */
-const associateDefault = async (
-  token: string,
-  fromType: string,
-  fromId: string,
-  toType: string,
-  toId: string,
-): Promise<void> => {
-  const res = await hubspotFetch(
-    token,
-    `/crm/v4/objects/${fromType}/${fromId}/associations/default/${toType}/${toId}`,
-    'PUT',
-  )
+// Association typeIds HUBSPOT_DEFINED (resueltos vía /crm/v4/associations/leads/{obj}/labels).
+// HubSpot EXIGE una asociación primaria a Contact o Company AL CREAR el Lead (no se puede crear suelto).
+const LEAD_TO_PRIMARY_CONTACT_TYPE_ID = 578
+const LEAD_TO_PRIMARY_COMPANY_TYPE_ID = 580
 
-  if (!res.ok) throw new HubSpotApiError(res.status)
-}
-
-/** Crea un objeto Lead (`leads`) con su `hs_lead_name` + props. Devuelve el lead id. */
+/** Crea un objeto Lead (`leads`) con su `hs_lead_name` + props + asociación primaria inline
+ *  (HubSpot exige LEAD_TO_PRIMARY_CONTACT o LEAD_TO_PRIMARY_COMPANY al crear). Devuelve el lead id. */
 const createLeadObject = async (
   token: string,
   lead: { name: string; properties: Record<string, string> },
+  contactId: string,
+  companyId: string | null,
 ): Promise<string> => {
   const properties: Record<string, string> = { hs_lead_name: lead.name, ...lead.properties }
-  const res = await hubspotFetch(token, '/crm/v3/objects/leads', 'POST', { properties })
+
+  const associations = [
+    {
+      to: { id: contactId },
+      types: [{ associationCategory: 'HUBSPOT_DEFINED', associationTypeId: LEAD_TO_PRIMARY_CONTACT_TYPE_ID }],
+    },
+    ...(companyId
+      ? [
+          {
+            to: { id: companyId },
+            types: [{ associationCategory: 'HUBSPOT_DEFINED', associationTypeId: LEAD_TO_PRIMARY_COMPANY_TYPE_ID }],
+          },
+        ]
+      : []),
+  ]
+
+  const res = await hubspotFetch(token, '/crm/v3/objects/leads', 'POST', { properties, associations })
 
   if (!res.ok) throw new HubSpotApiError(res.status)
 
@@ -227,19 +234,9 @@ export const createOperatorCrossSellLead = async (
       await associateContactToCompany(token, contactId, companyId)
     }
 
-    const leadId = await createLeadObject(token, input.lead)
-
-    // Asociación primaria Lead↔Contact (un lead vive colgado de un contacto).
-    await associateDefault(token, 'leads', leadId, 'contacts', contactId)
-
-    // Lead↔Company: best-effort (no es default en todos los portales). No es fatal.
-    if (companyId) {
-      try {
-        await associateDefault(token, 'leads', leadId, 'companies', companyId)
-      } catch {
-        // Silencioso: el Lead ya quedó creado + asociado al contacto. Se observará en el smoke.
-      }
-    }
+    // El Lead nace con su asociación primaria inline (HubSpot la exige al crear): Contact (primary)
+    // + Company (primary, si hay). No hace falta un PUT de asociación posterior.
+    const leadId = await createLeadObject(token, input.lead, contactId, companyId)
 
     return { status: 'succeeded', contactId, companyId, leadId, retryable: false, httpStatus: 200 }
   } catch (error) {
