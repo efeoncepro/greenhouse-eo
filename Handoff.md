@@ -1,3 +1,13 @@
+## Sesion 2026-06-29 — TASK-1278 AEO Client Tiering + PLG Trial UX — Claude — ✅ complete (code complete, rollout pendiente)
+
+> **Intake:** `/implement-task 1278`. La sesión previa (WIP sin commitear) dejó ~90% implementado: `page.tsx` de `/aeo` por tier, `AeoTierBanner`/`AeoRunCta`/`AeoLockedCard`, copy `GH_GROWTH_AI_VISIBILITY_CLIENT_TIERING` en `growth.ts`, harness GVC `/aeo/mockup/tiering` + scenario. Continué desde verificación + GVC + cierre (no rehíce las fases ya hechas). Trabajo en `develop` local-first, **sin push**.
+>
+> **Bug RSC encontrado y corregido (lo reportó el operador: "no sale nada" / error boundary).** `AeoTierBanner` y `AeoLockedCard` eran server components que pasaban `sx={theme => ({...})}` (función) a clientes MUI → `Functions cannot be passed directly to Client Components` → **500 en los estados locked/trial de la ruta real `/aeo`**, no solo el mockup. Fix: marcar ambos `'use client'` (props 100% serializables). No lo atrapan lint/tsc; lo detecté con `pnpm dev` + el log de Next + GVC. Lección: validar UI con dev/GVC real, no solo gates estáticos.
+>
+> **Verificación:** GVC desktop 1440 + mobile 390 de los 4 estados (contratado/trial-disponible/trial-agotado/locked) mirado en `.captures/2026-06-29T08-35-41_growth-aeo-client-tiering` — sin scroll horizontal, tier color-independiente, banner se apila en mobile, run CTA accesible, upsell honesto (no error). Skills product-design aplicadas (state-design Lane B: estados/honest-degradation OK). Gates: `pnpm lint` + `tsc` + `pnpm test` full **8404 passed** + `pnpm build` verdes; `task:lint`/`ui:wireframe-check`/`ui:readiness-check` sin findings; `route-reachability-gate` 0 huérfanos.
+>
+> **Cierre:** `Lifecycle: complete` + `UI ready: yes` + movida a `complete/`; `README.md`/`TASK_ID_REGISTRY.md`/`changelog.md` sincronizados; Delta de cierre en la spec. **Rollout pendiente:** depende de los flags de TASK-1277 (`PORTAL_RUN_ENABLED`/`TRIAL_ENABLED`) ON en staging + un grader run real client-scoped + provisión del módulo `ai_visibility_v1` por org; sin eso la ruta degrada honestamente a "Disponible próximamente"/teaser, no rompe. **Sin push** (esperando instrucción del operador). URL local para revisión: `http://localhost:3000/aeo/mockup/tiering`.
+
 ## Sesion 2026-06-29 — Ops Worker Perplexity flag ON — Codex — ✅ staging live, persistencia local
 
 > **Pedido:** prender Perplexity en el Ops Worker. No se cambio de worktree, no se hizo stash/reset y no se tocó el WIP paralelo de TASK-1278.

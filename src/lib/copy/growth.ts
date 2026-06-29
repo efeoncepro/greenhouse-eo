@@ -576,3 +576,72 @@ export const GH_GROWTH_AI_VISIBILITY_CLIENT_REPORT = {
     }
   }
 } as const
+
+/**
+ * TASK-1278 — Portal cliente · AEO tiering + PLG trial (nodo S6 del EPIC-020). Copy es-CL (tuteo)
+ * de los estados POR TIER alrededor del workbench (TASK-1248): banner de cupo trial, run self-serve,
+ * upsell al agotar y teaser/locked gratis para clientes sin AEO. Touchpoint de CLIENTE → tono cálido,
+ * Product-Led Growth honesto: el cupo agotado es un estado de upsell, NO un error; el teaser NO promete
+ * lo que el tier no da; NUNCA expone costo/engine interno. Tuteo neutro (jamás voseo). Validado con
+ * `greenhouse-ux-writing`.
+ */
+export const GH_GROWTH_AI_VISIBILITY_CLIENT_TIERING = {
+  // Banner de cupo (trial / pilot con revisiones disponibles).
+  banner: {
+    eyebrow: 'Prueba AEO',
+    eyebrowAria: 'Estado de tu prueba de AEO',
+    // "Te queda 1 de 3" / "Te quedan 2 de 3" — concordancia de número, número con contexto.
+    remaining: (remaining: number, cap: number): string =>
+      remaining === 1
+        ? `Te queda 1 de ${cap} ${cap === 1 ? 'revisión' : 'revisiones'} este mes`
+        : `Te quedan ${remaining} de ${cap} revisiones este mes`,
+    resets: (date: string): string => `Se renuevan el ${date}`,
+    help: 'Genera tu revisión del mes y mira cómo te ve la IA.'
+  },
+  // Run self-serve (botón → chokepoint). Estados honestos; sin exponer costo/engine.
+  run: {
+    cta: 'Generar revisión',
+    ctaAria: 'Generar tu revisión de visibilidad en IA',
+    preparingTitle: 'Tu revisión se está preparando',
+    preparingBody: 'Estamos midiendo cómo te ve la IA. Esto puede tomar unos minutos; la página se actualiza sola.',
+    refresh: 'Actualizar ahora',
+    // Degradación honesta cuando el run self-serve aún no está habilitado en este ambiente.
+    unavailable: 'Disponible próximamente',
+    unavailableHelp: 'Estamos activando las revisiones self-serve. Mientras tanto, tu equipo de Efeonce puede generarla.',
+    // Errores honestos del chokepoint (mapeados desde el código canónico es-CL del endpoint).
+    errorQuota: 'Ya usaste tus revisiones de este mes. Se renuevan el próximo período.',
+    errorProfile: 'Aún no tenemos los datos de tu marca para medir. Tu equipo de Efeonce los está preparando.',
+    errorBusy: 'Estamos con mucha demanda en este momento. Intenta de nuevo en unos minutos.',
+    errorGeneric: 'No pudimos generar la revisión. Intenta de nuevo en unos minutos.'
+  },
+  // Estado de cupo agotado = upsell (NO error). Reencuadra hacia AEO recurrente.
+  upsell: {
+    eyebrow: 'Prueba AEO',
+    title: 'Usaste tus revisiones de este mes',
+    body: (date: string): string =>
+      `Se renuevan el ${date}. Si quieres seguimiento continuo de cómo te ve la IA, activa AEO recurrente con tu equipo.`,
+    cta: 'Activar AEO recurrente',
+    ctaAria: 'Escribir a tu equipo de Efeonce para activar AEO recurrente'
+  },
+  // Teaser/locked GRATIS para clientes sin entitlement (no corre el motor). Cross-sell, sin self-checkout.
+  locked: {
+    eyebrow: 'AEO — AI Engine Optimization',
+    title: 'Descubre cómo te ve la IA',
+    body: 'ChatGPT, Gemini, Claude y Perplexity ya responden sobre tu marca. AEO mide qué dicen, en qué motores apareces y dónde te ganan tus competidores.',
+    bullets: [
+      'Tu presencia en cada motor de IA',
+      'Tu share de menciones frente a competidores',
+      'Un plan para mejorar tu visibilidad'
+    ],
+    cta: 'Habla con tu equipo',
+    ctaAria: 'Escribir a tu equipo de Efeonce sobre AEO',
+    note: 'Sin costo: tu equipo de Efeonce te muestra una primera revisión.'
+  },
+  // Prompt de primera revisión (trial con cupo pero aún sin informe).
+  firstRun: {
+    title: 'Aún no generaste tu revisión de este mes',
+    body: 'Genera tu primera revisión y mira cómo te ve la IA. Toma unos minutos.'
+  },
+  // Contacto del equipo (reusa el patrón del workbench: mailto al equipo de Efeonce).
+  teamMailto: 'mailto:hola@efeonce.com'
+} as const

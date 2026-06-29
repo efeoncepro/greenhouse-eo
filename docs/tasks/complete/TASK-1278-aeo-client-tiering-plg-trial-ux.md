@@ -6,14 +6,14 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
 - Execution profile: `ui-ux`
 - UI impact: `interaction`
-- UI ready: `no`
+- UI ready: `yes`
 - Wireframe: `docs/ui/wireframes/TASK-1278-aeo-client-tiering-plg-trial.md`
 - Flow: `none`
 - Motion: `none`
@@ -313,3 +313,12 @@ Ver el wireframe. La UI envuelve el workbench de TASK-1248 con un banner de tier
 ## Delta 2026-06-28 — conectada al Master UI Flow del programa AEO
 
 - Esta task es el nodo **S6** — tiering cliente + PLG trial (teaser/locked/trial/upsell) del flujo cross-surface del programa AEO. Su UI/flujo se conecta con todas las demás superficies (público → email/PDF → portal cliente tiers/PLG → operador cross-sell → Account 360) en el doc maestro **`docs/ui/flows/EPIC-020-AEO-PROGRAM-UI-FLOW.md`** (info-architecture + state-design + ux-writing + modern-ui). Toda UI del programa renderiza el `ReportArtifactModel` compartido (TASK-1252) y deriva su visibilidad del **entitlement** (TASK-1277), nunca del rol; cada acción mapea a un command gobernado (Full API Parity → Nexa por construcción).
+
+## Delta 2026-06-29 — cierre (code complete, rollout pendiente)
+
+- **Implementado y verificado.** Ruta real `/aeo` ([page.tsx](../../../src/app/(dashboard)/aeo/page.tsx)) resuelve la superficie por `resolveAeoEntitlement` (server-side, nunca por rol): sin módulo → `AeoLockedCard` (teaser gratis); contratado → workbench; trial/pilot → `AeoTierBanner` + `AeoRunCta` (run self-serve vía el ÚNICO command de portal de TASK-1277) + variante upsell al agotar cupo. Estados honestos (preparing/empty/error/denied) sin exponer costo/engine. Componentes en `src/views/greenhouse/growth/ai-visibility/client/`; copy es-CL tuteo en `growth.ts` (`GH_GROWTH_AI_VISIBILITY_CLIENT_TIERING`); harness GVC determinista `/aeo/mockup/tiering`.
+- **Bug RSC corregido (clase boundary).** `AeoTierBanner` y `AeoLockedCard` eran server components que pasaban `sx={theme => ({...})}` (función) a clientes MUI → `Functions cannot be passed directly to Client Components` → **500 en los estados locked/trial de la ruta real**, no solo el mockup. Fix: marcar ambos `'use client'` (props 100% serializables). Detectado con `pnpm dev` + log + GVC (no lo atrapan lint/tsc).
+- **GVC mirado** desktop 1440 + mobile 390 de los 4 estados (`growth-aeo-client-tiering`): sin scroll horizontal, tier/allowance como texto (color-independiente), banner se apila en mobile, run CTA accesible.
+- **Gates:** `pnpm lint` + `tsc` + `pnpm test` (full) + `pnpm build` verdes; `task:lint`/`ui:wireframe-check`/`ui:readiness-check` sin findings; `route-reachability-gate` 0 huérfanos (mockup excluido).
+- **Decisión vs wireframe:** el `AeoUpsellCard` separado se consolidó en la variante `blocked` de `AeoTierBanner` (un banner, dos estados honestos: cupo disponible / agotado=upsell).
+- **Rollout pendiente:** depende de los flags de TASK-1277 (`PORTAL_RUN_ENABLED`/`TRIAL_ENABLED`) ON en staging + un grader run real client-scoped + provisión comercial del módulo `ai_visibility_v1` por org. Sin eso la ruta degrada a "Disponible próximamente"/teaser, pero no rompe.

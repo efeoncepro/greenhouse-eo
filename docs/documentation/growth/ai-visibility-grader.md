@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.15
+> **Version:** 1.16
 > **Creado:** 2026-06-24 por Claude (TASK-1226)
-> **Ultima actualizacion:** 2026-06-29 por Codex (auditoria DB/codebase/manual del grader)
+> **Ultima actualizacion:** 2026-06-29 por Claude (TASK-1278 — experiencia cliente por tier + trial PLG en el portal)
 > **Documentacion tecnica:** [GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md)
 
 # AI Visibility Grader — Motor de Providers (Growth)
@@ -64,6 +64,18 @@ Hay primitives server-side gobernados y todos los entrypoints consumen esos cami
 - **DB staging/dev auditada:** 24 runs, 266 provider observations, 60 findings, 10 scores, 8 reports, 7 reviews, 23 probe results, 1 lead y 1 email dispatch. No hay perfiles org-bound opt-in para re-grade (`opt_in_profiles=0`, `due_profiles=0`).
 - **Prompt pack v2 (TASK-1249):** existe como versión seleccionable (corrige el prompt p12, que nombraba sectores y ensuciaba las marcas de control). El **default sigue siendo v1** hasta una validación real; v2 es opt-in.
 - **Pesos del score:** se mantiene **V1** (decisión documentada — el set de calibración es muy chico para reajustar pesos sin sobreajustar; detalle en `GREENHOUSE_AI_VISIBILITY_GRADER_CALIBRATION_V1.md` §Delta 2026-06-27).
+
+## Experiencia del cliente en el portal — tiers + trial PLG (TASK-1278)
+
+Cuando un cliente entra a **AEO** dentro del portal (`/aeo`), lo que ve depende de **qué tiene contratado su organización**, no de su rol. La decisión se resuelve del lado del servidor con el entitlement del módulo `ai_visibility_v1` (TASK-1277):
+
+- **Sin AEO contratado** → ve un **teaser gratis**: "Descubre cómo te ve la IA", con el valor del producto y un botón "Habla con tu equipo". **No corre el motor** (costo cero); es una invitación, no una puerta cerrada.
+- **AEO contratado** → ve su **informe completo** (el mismo workbench de visibilidad), sin contador de cupo. Su re-medición es el monitoreo recurrente, no un botón.
+- **Prueba (trial) o piloto** → ve un banner "**Te quedan N de M revisiones este mes**" con la fecha de renovación, y un botón "**Generar revisión**" para correr su análisis cuando le queda cupo. Cuando se le agotan, el banner cambia a "**Usaste tus revisiones de este mes**" + "Activar AEO recurrente" — es un **upsell, no un error**.
+
+El botón "Generar revisión" siempre pasa por el mismo control gobernado del servidor (el cliente nunca dispara el motor directo). Mientras la revisión se prepara, la pantalla muestra un estado "se está preparando" y se actualiza sola cuando el informe llega. Nunca se le muestra al cliente el costo ni los detalles internos del motor.
+
+> Detalle técnico: ruta `src/app/(dashboard)/aeo/page.tsx` (resuelve por `resolveAeoEntitlement`); componentes en `src/views/greenhouse/growth/ai-visibility/client/` (`AeoTierBanner`, `AeoRunCta`, `AeoLockedCard`); command de portal `requestGraderRunForOrganization` (TASK-1277). Spec: `docs/tasks/complete/TASK-1278-aeo-client-tiering-plg-trial-ux.md`.
 
 ## Del dato al puntaje (findings y score — TASK-1227)
 
