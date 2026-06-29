@@ -212,6 +212,18 @@ export const isCategoryGuardEnabled = (env: NodeJS.ProcessEnv = process.env): bo
   isTrue(env[GROWTH_AI_VISIBILITY_CATEGORY_GUARD_FLAG])
 
 /**
+ * TASK-1290 — Prompts por arquetipo (categoría × business_model × buyer-intent). Default OFF:
+ * el run usa el pack agencia v1 actual (no-op, no-regresión del lead magnet). Con ON: el run
+ * resuelve el baseline determinista del arquetipo del perfil (consumo/B2B/retail/…), o el set
+ * congelado autorado por LLM cuando exista y esté `active` (Slice 2/3). Se prende tras la eval
+ * verde (TASK-1292). Registrar en docs/operations/FEATURE_FLAG_STATE_LEDGER.md.
+ */
+export const GROWTH_AI_VISIBILITY_ARCHETYPE_PROMPTS_FLAG = 'GROWTH_AI_VISIBILITY_ARCHETYPE_PROMPTS_ENABLED'
+
+export const isArchetypePromptsEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+  isTrue(env[GROWTH_AI_VISIBILITY_ARCHETYPE_PROMPTS_FLAG])
+
+/**
  * TASK-1288 — Lectura grounded `brand_intelligence` (LLM sobre contenido del sitio + entity).
  * Default OFF: la lectura LLM (1×/marca/versión, cacheada) se activa tras sign-off de costo;
  * con OFF la resolución de categoría cae al prior determinista (HubSpot map + alias). Gateado

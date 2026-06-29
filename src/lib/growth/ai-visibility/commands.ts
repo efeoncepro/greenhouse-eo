@@ -16,6 +16,8 @@ import {
 } from './contracts'
 import { resolvePromptInputs } from './prompt-pack'
 import { resolvePromptPack } from './prompt-packs'
+import { resolveArchetypeBaselinePack } from './prompt-packs/archetypes/baseline-packs'
+import { isArchetypePromptsEnabled } from './flags'
 import {
   enqueueGraderRun,
   executeGraderRun,
@@ -36,6 +38,12 @@ export interface RunGraderDiagnosticInput {
   categoryNodeId?: string | null
   categoryLabel?: string | null
   categoryConfidence?: number | null
+  /**
+   * TASK-1290 — modelo de negocio del perfil (eje de buyer-intent). Detrás del flag
+   * `GROWTH_AI_VISIBILITY_ARCHETYPE_PROMPTS_ENABLED` selecciona el baseline del arquetipo
+   * (consumo/B2B/retail/…); sin flag o sin valor → pack agencia v1 (no-regresión).
+   */
+  businessModel?: string | null
   competitorsDeclared?: string[]
   mode: GrowthAiVisibilityExecutionMode
   runKind: GrowthAiVisibilityRunKind
@@ -54,7 +62,13 @@ export interface RunGraderDiagnosticInput {
 /** Resuelve el input ejecutable del run (prompts del pack + perfil) — compartido por run/enqueue. */
 const buildExecuteInput = (input: RunGraderDiagnosticInput) => {
   const competitorsDeclared = input.competitorsDeclared ?? []
-  const pack = resolvePromptPack(input.promptPackVersion)
+
+  // TASK-1290 — con el flag ON, el pack se resuelve por arquetipo (business_model) en vez del
+  // pack agencia v1 fijo. Default OFF / sin business_model → pack agencia (no-regresión bit-for-bit).
+  // Los tags del pack VIAJAN con el run (Slice 0) → el scorer mide con el framing del arquetipo.
+  const pack = isArchetypePromptsEnabled()
+    ? resolveArchetypeBaselinePack(input.businessModel)
+    : resolvePromptPack(input.promptPackVersion)
 
   // TASK-1288 — resolve the CANONICAL category (never the raw HubSpot enum) and guard the
   // run universally: every path (portal/operator/public/Nexa) converges here. The display

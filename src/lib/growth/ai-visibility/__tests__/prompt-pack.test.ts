@@ -34,4 +34,18 @@ describe('growth/ai-visibility — prompt pack interpolation', () => {
     expect(discovery.every(p => !namedIds.includes(p.promptId))).toBe(true)
     expect(discovery.length).toBeGreaterThan(0)
   })
+
+  it('TASK-1290 Slice 0 — los tags VIAJAN con cada prompt resuelto (llegan a execution_prompts)', () => {
+    const prompts = resolvePromptInputs({ ...VARS, competitor: 'Cebra' })
+    const p01 = prompts.find(p => p.promptId === 'p01')
+
+    // los 4 tags del pack acompañan al prompt resuelto (el scorer los lee del run, no del pack estático).
+    expect(p01).toMatchObject({
+      family: 'category_discovery',
+      fanOutType: 'related',
+      intentStage: 'awareness',
+      namesBrand: false
+    })
+    expect(prompts.every(p => p.family != null && p.intentStage != null && typeof p.namesBrand === 'boolean')).toBe(true)
+  })
 })

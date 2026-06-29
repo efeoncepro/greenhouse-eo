@@ -65,6 +65,8 @@ const buildRunInputFromProfile = (
   categoryNodeId: profile.categoryNodeId,
   categoryLabel: profile.categoryLabel,
   categoryConfidence: profile.categoryConfidence,
+  // TASK-1290 — eje de buyer-intent; detrás del flag selecciona el baseline del arquetipo.
+  businessModel: profile.businessModel,
   competitorsDeclared: profile.competitorsDeclared,
   mode: 'light',
   runKind: 'public_diagnostic'
