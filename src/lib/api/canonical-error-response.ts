@@ -104,6 +104,8 @@ export type CanonicalErrorCode =
   | 'aeo_assignment_invalid_input'
   | 'aeo_assignment_website_required'
   | 'aeo_assignment_org_not_found'
+  // AEO Plan recommendation execution status (TASK-1275).
+  | 'recommendation_status_invalid_input'
   // Growth Search Console connection · OAuth multi-tenant (TASK-1282).
   | 'search_console_disabled'
   | 'search_console_not_connected'
@@ -385,6 +387,11 @@ const CANONICAL_ERRORS: Record<CanonicalErrorCode, CanonicalErrorDefinition> = {
   aeo_assignment_invalid_input: {
     status: 400,
     message: 'Revisa la asignación AEO: falta un campo obligatorio o un valor no es válido.',
+    actionable: true
+  },
+  recommendation_status_invalid_input: {
+    status: 400,
+    message: 'Revisa el foco del Plan AEO: el estado o la recomendación no son válidos, o falta el motivo.',
     actionable: true
   },
   aeo_assignment_website_required: {

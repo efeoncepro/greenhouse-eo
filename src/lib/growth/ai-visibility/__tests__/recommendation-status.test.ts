@@ -34,8 +34,8 @@ const base = { subject, organizationId: ORG, recommendationKey: KEY, updatedBy: 
 beforeEach(() => {
   vi.clearAllMocks()
   fakeClient.query.mockReset()
-  vi.mocked(withGreenhousePostgresTransaction).mockImplementation(async (cb: never) =>
-    (cb as (c: typeof fakeClient) => unknown)(fakeClient)
+  vi.mocked(withGreenhousePostgresTransaction).mockImplementation(
+    (async (cb: (c: typeof fakeClient) => unknown) => cb(fakeClient)) as never
   )
 })
 
