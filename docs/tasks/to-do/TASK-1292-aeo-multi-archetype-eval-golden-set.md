@@ -37,9 +37,13 @@ Eval-driven: extiende el golden-set del grader (hoy calibrado solo sobre "agenci
 
 ## Goal
 
-- Golden-set extendido con casos por arquetipo (≥3: consumer_b2c, b2b_product_saas, retail_ecommerce) con expectativas de presencia/ausencia y framing correcto.
-- Harness de eval que corre el generador (TASK-1290) por arquetipo y valida que los prompts + la presencia esperada son coherentes (sin gastar en runs reales: fixtures + adapter fake; runs reales allowlisted + acotados como hoy).
-- Drift signal: alerta si un arquetipo deja de cubrir sus etapas de buyer-intent o si el caso de no-regresión agencia cambia.
+> **Decisión de diseño (análisis multi-skill arch/seo/commercial 2026-06-29): la eval son DOS capas ortogonales, no una.** El task original conflacionaba "cobertura del generador" (determinista) con "presencia real en el LLM" (no-determinista) en un único "golden-set v2 con presencia esperada" como CI pass/fail — esa es la trampa que el propio task advertía (eval frágil por LLM). Se separan explícitamente:
+
+- **Capa A — eval de cobertura del generador (DETERMINISTA · CI gate · drift signal).** Para cada arquetipo, `resolveArchetypeBaselinePack(businessModel)` (función PURA) debe cubrir las etapas de buyer-intent mínimas exigibles **archetype-aware** + framing correcto, **sin fuga de agencia**. Esta es la red de no-regresión real. NO usa LLM, NO usa fixtures de "presencia" (scriptear el fake-adapter para "hacer aparecer a SKY" sería tautología: testea el scorer contra tu propio fixture, no el generador).
+- **Capa B — smoke real allowlisted (EVIDENCIA, NO gate de CI).** Un run real SKY consumo score ≠ 0 valida el claim end-to-end, pero es no-determinista → es evidencia acotada (allowlisted + sin gasto en CI), NUNCA un pass/fail que pueda bloquear merges.
+- **Anclaje de no-regresión agencia = DOS invariantes + 1 wiring** (no uno): (1) identidad referencial `resolveArchetypeBaselinePack('b2b_service_provider') === GROWTH_AI_VISIBILITY_PROMPT_PACK_V1`; (2) `runGoldenEval` sobre `golden-set.v1.json` sin cambios + `score_version` intacto; (3) wiring: con `GROWTH_AI_VISIBILITY_ARCHETYPE_PROMPTS_ENABLED` ON, `buildExecuteInput` selecciona el pack del arquetipo.
+- **Drift signal:** alerta si un arquetipo deja de cubrir sus etapas mínimas (matriz archetype-aware) o si cualquiera de los anclajes agencia cambia.
+- **Alcance = los 6 packs shipped + generic** (consumer_b2c, b2b_product_saas, retail_ecommerce, **marketplace, public_institution** + **generic/unknown**), no solo 3. La eval de cobertura es barata y determinista; cubrir solo 3 deja marketplace/public_institution/generic con cero protección de regresión — el mismo modo de falla silenciosa que motivó EPIC-021.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 1 — CONTEXT & CONSTRAINTS
@@ -77,9 +81,10 @@ Reglas obligatorias:
 
 ### Files owned
 
-- `src/lib/growth/ai-visibility/evals/golden-set.v2.json` (multi-arquetipo) `[verificar naming]`
-- `src/lib/growth/ai-visibility/evals/*` (harness por arquetipo) `[verificar]`
-- `src/lib/reliability/queries/growth-ai-visibility-*-signals.ts` (drift signal) `[verificar]`
+- `src/lib/growth/ai-visibility/evals/archetype-coverage-eval.v1.json` (NO `golden-set.v2`: es otra clase de artefacto — `{arquetipo → aserciones de cobertura}`, no `{input → expectedFinding}`. Precedente canónico: `category-taxonomy-eval.v1.json` de TASK-1272). `golden-set.v1.json` se conserva intacto como ancla del scorer.
+- `src/lib/growth/ai-visibility/evals/archetype-coverage-eval.ts` (harness `runArchetypeCoverageEval`, PURO; reusa `resolveArchetypeBaselinePack` + `tag-vocabulary`).
+- `src/lib/growth/ai-visibility/__tests__/archetype-coverage-eval.test.ts` (suite CI) + test de wiring `buildExecuteInput` flag ON.
+- `src/lib/reliability/queries/growth-ai-visibility-archetype-coverage-signals.ts` (drift signal). Espeja los signals growth existentes (`growth-ai-visibility-*-signals.ts`).
 
 ## Current Repo State
 
@@ -103,7 +108,7 @@ Reglas obligatorias:
 
 ### Contract surface
 
-- Contrato nuevo: `runArchetypeEval(goldenSet) → { perArchetype: pass/fail, regressionAgency: pass/fail }`; golden-set v2.
+- Contrato nuevo: `runArchetypeCoverageEval(matrix) → { perArchetype: pass/fail, regressionAgency: pass/fail }` (PURO, sin LLM); fixture `archetype-coverage-eval.v1.json`. `golden-set.v1.json` se conserva como ancla del scorer (no se versiona a v2 — es otra clase de artefacto).
 - Backward compatibility: `additive` (v1 se conserva como anclaje).
 - Full API parity: harness interno (CI/CLI); sin UI.
 
@@ -154,17 +159,23 @@ Reglas obligatorias:
 
 ## Scope
 
-### Slice 1 — Golden-set v2 multi-arquetipo
+### Slice 1 — Matriz de cobertura + `archetype-coverage-eval.v1.json`
 
-- Casos para consumer_b2c (aerolínea), b2b_product_saas, retail_ecommerce + anclaje agencia. Expectativas de framing + presencia.
+- Definir la **matriz archetype-aware `{arquetipo → etapas mínimas exigibles}`** (el contrato real, derivado del JTBD de cada modelo + amplitud de Query Fan-Out). Archetype-aware: `public_institution` NO exige `purchase_intent` (sin transacción comercial); `consumer_b2c` exige `local`, `b2b_product_saas` exige `enterprise`, etc. Cubre los **6 packs + generic**.
+- Fixture `archetype-coverage-eval.v1.json`: por arquetipo, etapas mínimas + framing esperado (category-noun) + aserción `noAgencyLeak` + cobertura de fan-out (≥3 de los 4 `PROMPT_FAN_OUT_TYPES`).
 
-### Slice 2 — Harness + CI gate
+### Slice 2 — Harness `runArchetypeCoverageEval` + CI gate (Capa A, determinista)
 
-- `runArchetypeEval` corre el generador por arquetipo + no-regresión agencia; integrado a la suite.
+- `runArchetypeCoverageEval` corre sobre `resolveArchetypeBaselinePack` (PURO, sin LLM/provider) y valida la matriz; integrado a la suite.
+- **Anclaje agencia (los 2 invariantes + wiring):** (1) identidad referencial `resolveArchetypeBaselinePack('b2b_service_provider') === GROWTH_AI_VISIBILITY_PROMPT_PACK_V1`; (2) `runGoldenEval` sobre `golden-set.v1.json` sin cambios + `score_version` intacto; (3) wiring `buildExecuteInput` flag ON selecciona el pack del arquetipo.
 
-### Slice 3 — Drift signal
+### Slice 3 — Drift signal de cobertura
 
-- Reliability signal de cobertura de etapas por arquetipo.
+- Reliability signal `growth.ai_visibility.archetype_coverage_gap` (cobertura de etapas mínimas por arquetipo vs la matriz). Steady esperado = 0 gaps.
+
+### Slice 4 (opcional, allowlisted) — Capa B: smoke real de evidencia
+
+- Run real SKY consumo consistente con la expectativa (score ≠ 0). **EVIDENCIA, NO gate de CI** — allowlisted + acotado, nunca bloquea merges (no-determinismo del LLM).
 
 ## Out of Scope
 
@@ -217,9 +228,11 @@ La eval es la red que permite generalizar prompts sin re-romper casos. Determini
 
 ## Acceptance Criteria
 
-- [ ] Golden-set v2 cubre ≥3 arquetipos (consumer_b2c, b2b_product_saas, retail_ecommerce) + el anclaje agencia; expectativas de framing + presencia.
-- [ ] Harness `runArchetypeEval` corre en la suite; el caso agencia pasa idéntico (no-regresión); eval determinista por fixtures.
-- [ ] Drift signal de cobertura de etapas por arquetipo en steady esperado.
+- [ ] `archetype-coverage-eval.v1.json` + matriz archetype-aware cubren los **6 packs + generic** (no solo 3); etapas mínimas por arquetipo, framing category-noun, `noAgencyLeak`, cobertura fan-out ≥3/4.
+- [ ] Harness `runArchetypeCoverageEval` corre en la suite, **determinista (sin LLM/provider)**.
+- [ ] Anclaje agencia: (1) identidad referencial pack v1; (2) `runGoldenEval`/`golden-set.v1` + `score_version` intactos; (3) wiring `buildExecuteInput` flag ON.
+- [ ] Drift signal `archetype_coverage_gap` en steady = 0.
+- [ ] (opcional/allowlisted) smoke real SKY ≠ 0 como evidencia — NO gate de CI.
 
 ## Verification
 
@@ -243,4 +256,5 @@ La eval es la red que permite generalizar prompts sin re-romper casos. Determini
 
 ## Open Questions
 
-- ¿Cuántas marcas reales por arquetipo se usan como casos (1 fuerte + 1 débil, como el golden-set actual)? (definir en Discovery con AEO).
+- **La decisión que importa (NO "cuántas marcas"):** la **matriz `{arquetipo → etapas mínimas exigibles}`** archetype-aware. Es el contrato real del drift signal; sin ella "cada arquetipo cubre sus etapas" no es testeable. Definir en Discovery con seo-aeo (Query Fan-Out) + commercial-expert (JTBD por modelo de negocio). Punto de partida verificado contra los packs shipped: consumer_b2c {awareness, consideration, comparison, trust, purchase_intent, local, risk, message_recall}; b2b_product_saas {awareness, problem_aware, consideration, comparison, trust, purchase_intent, enterprise, risk, message_recall}; retail_ecommerce {awareness, consideration, comparison, trust, purchase_intent, local, risk, message_recall}; public_institution {awareness, consideration, local, message_recall} (SIN purchase_intent — no hay transacción comercial).
+- Las marcas reales para la Capa B (allowlisted) solo se usan como evidencia, no como fixtures de CI: 1 fuerte + 1 débil por arquetipo conocido basta (SKY ya validado en el smoke de TASK-1290).
