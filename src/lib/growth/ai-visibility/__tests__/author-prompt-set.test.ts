@@ -110,7 +110,7 @@ describe('artefacto del system prompt', () => {
   it('el system prompt y el schema codifican el vocabulario cerrado + no-leading', () => {
     expect(AUTHOR_SYSTEM_PROMPT).toContain('NO-LEADING')
     expect(AUTHOR_SYSTEM_PROMPT).toContain('Query Fan-Out')
-    expect((AUTHOR_PROMPT_SET_JSON_SCHEMA.properties.prompts.items.properties.intentStage as { enum: string[] }).enum)
+    expect(AUTHOR_PROMPT_SET_JSON_SCHEMA.properties.prompts.items.properties.intentStage.enum as readonly string[])
       .toContain('purchase_intent')
   })
 })
