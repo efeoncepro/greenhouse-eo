@@ -1,19 +1,20 @@
 # Manual — Correr el AI Visibility Grader (smoke + endpoint)
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.9 · **Ultima actualizacion:** 2026-06-29 por Codex (TASK-1270, re-grade recurrente staging)
+> **Version:** 1.10 · **Ultima actualizacion:** 2026-06-29 por Codex (auditoria DB/codebase/manual del grader)
 >
 > **Para que sirve:** ejecutar una corrida acotada (low-volume) del AI Visibility Grader contra los answer engines, para validar el motor end-to-end. Por defecto usa un proveedor simulado (no gasta dinero); con flags + secrets corre proveedores reales. Dos caminos: el **CLI** (`pnpm growth:ai-visibility:smoke`, local/dev) y el **endpoint interno** (`/api/admin/growth/ai-visibility/runs`, mismo primitive, apto staging).
 
-## Estado actual del rollout (2026-06-24)
+## Estado actual del rollout (2026-06-29)
 
-- **staging:** `GROWTH_AI_VISIBILITY_GRADER_ENABLED` + `_OPENAI_ENABLED` + `_ANTHROPIC_ENABLED` + `_GEMINI_ENABLED` **ON**. El endpoint corre proveedores reales (OpenAI/Anthropic/Gemini). Gemini usa **Gemini 3** (`gemini-3-flash-preview` vía Vertex grounding; ajustable con `GREENHOUSE_GEMINI_GROUNDED_MODEL` sin redeploy). Costo Gemini ~$0.016/marca (light, el más barato del set).
-- **Google AI Overview / AI Mode (TASK-1265):** adapter code-complete via DataForSEO detrás de `GROWTH_AI_VISIBILITY_GOOGLE_AIO_ENABLED` (default OFF). Usa `DATAFORSEO_API_LOGIN` + `DATAFORSEO_API_PASSWORD_SECRET_REF`; no scrapea Google directo. Si Google/DataForSEO no devuelve bloque AI Mode, la observation queda `skipped:no_ai_overview_block`, no `succeeded` vacío. DataForSEO reporta costo por request, no por tokens.
+- **staging:** grader ON. El worker efectivo (`ops-worker-00417-m86`) tiene `GRADER`, OpenAI, Anthropic, Gemini, Google AI Overview, probes, agentic readiness, entity probes, email, HubSpot y re-grade ON. Gemini usa **Gemini 3** (`gemini-3-flash-preview` via Vertex grounding; ajustable con `GREENHOUSE_GEMINI_GROUNDED_MODEL` sin redeploy).
+- **Google AI Overview / AI Mode (TASK-1265):** ON en staging via DataForSEO. Usa `DATAFORSEO_API_LOGIN` + `DATAFORSEO_API_PASSWORD_SECRET_REF`; no scrapea Google directo. Si Google/DataForSEO no devuelve bloque AI Mode, la observation queda `skipped:no_ai_overview_block`, no `succeeded` vacío. DataForSEO reporta costo por request, no por tokens.
 - **ejecución async (TASK-1234): ON en staging.** `GROWTH_AI_VISIBILITY_ASYNC_EXECUTION_ENABLED=true` (environment `staging`). El endpoint **encola** el run (responde HTTP 202 + runId) y el worker Cloud Run (`ops-worker`, scheduler `ops-growth-grader-drain` cada 5 min) lo ejecuta sin límite de tiempo. Esto es lo único que permite correr runs `full`/`internal_audit` multi-provider (que antes morían por el timeout de la función Vercel). Verificado end-to-end: un run `full` real corrió ~12 min sin timeout. Con la flag OFF el endpoint vuelve a ejecutar inline (sólo `light`/OpenAI cabe).
 - **producción:** OFF (follow-up pesado: migración `greenhouse_growth` + capabilities seed vía release control plane develop→main + env prod + sign-off). El worker es compartido staging+prod, pero el drain hace **no-op prod-safe** mientras el grader esté OFF en prod.
-- **Perplexity:** ON en staging desde 2026-06-27.
-- **Fix-It Artifacts (TASK-1269):** code complete pero `GROWTH_AI_VISIBILITY_FIX_IT_ENABLED` está OFF/default. No entregar al prospecto hasta revisión copy/legal + smoke staging por token público y run admin.
+- **Perplexity:** adapter/secret/smoke previo OK, pero **no asumirlo efectivo en el worker actual**. Auditoria 2026-06-29: Vercel staging registra el flag, pero `ops-worker` trae `GROWTH_AI_VISIBILITY_PERPLEXITY_ENABLED=false` por default de `services/ops-worker/deploy.sh`; los runs async lo saltan hasta prenderlo tambien en Cloud Run/deploy.sh.
+- **Fix-It Artifacts (TASK-1269):** `GROWTH_AI_VISIBILITY_FIX_IT_ENABLED` ON en Vercel staging y prod OFF. Pendiente antes de entregar a prospecto/prod: smoke funcional por token público y run admin con reporte real + revisión copy/legal.
 - **Re-grade recurrente (TASK-1270):** staging/develop ON (`GROWTH_AI_VISIBILITY_REGRADE_ENABLED=true`) con Cloud Scheduler `ops-growth-grader-regrade` habilitado diario `0 8 * * *` (`America/Santiago`). Produccion OFF/paused. Smoke manual 2026-06-29 termino `skipped=no_due_profiles` porque no hay perfiles opt-in/due; no hubo costo.
+- **DB auditada:** `greenhouse_growth` tiene 24 runs, 266 observations, 10 scores, 8 reports, 7 reviews, 23 probe results, 1 lead y 1 email dispatch. No hay perfiles org-bound opt-in para re-grade.
 - Verdad live de flags: `vercel env ls`. Estado humano: `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`.
 
 ## Antes de empezar
@@ -230,7 +231,7 @@ pnpm staging:request /api/admin/growth/ai-visibility/runs/<runId>/report --prett
 Devuelve `{ report, publicReport }`:
 
 - `report` = vista **interna** completa: `gate` (con `reason` + `nextAction`), `headline` (KPI dominante), `dimensions` (7, cada una con `score`/`status`/`severity`/`explainer` + `recommendation`), `recommendations` priorizadas, `primaryGap` + `recommendedMotion`, `competitiveSov`, `sourceTypeSummary`, **`providerPresence`** (presencia por motor) y `provenance`.
-- `publicReport` = DTO **público seguro**: el mismo headline/score/findings/competidores top/fuentes/disclaimer, **sin** `providerPresence`, sin reasons internos ni `priority`, sin texto crudo de los motores.
+- `publicReport` = DTO **público seguro**: headline/score/findings/competidores top/fuentes/disclaimer, `providerPresence` agregado (conteos por motor), `citationInsight`, `citationSourceBreakdown`, `categoryTaxonomySummary`, `sentimentSummary`, `positionSummary`, `trend` y readiness public-safe si hubo probes. No incluye texto crudo de motores, prompts, `providerFindings`, accuracy findings, reasons internos ni dominios crudos de citación.
 
 Requiere la capability `growth.ai_visibility.report.read` (roles internos / `efeonce_admin` / `ai_tooling_admin`). Si el run no tiene score aún → `404 score_not_found` (corre `score` primero).
 
@@ -241,7 +242,43 @@ Verificación local (sin endpoint), contra un run real con score:
 # (patrón scripts/_dryrun-report.ts: runGreenhousePostgresQuery + readGraderReport)
 ```
 
-## Generar Fix-It Artifacts (TASK-1269) — code complete, rollout pendiente
+## Public delivery, review gate y lectura publica
+
+La entrega publica es write-side: el worker finaliza el run y decide `ready`, `in_review` o `unavailable`. Un GET publico nunca publica ni dispara email/HubSpot.
+
+```bash
+# Poll publico por pollToken o submissionId
+pnpm staging:request /api/public/growth/ai-visibility/run/<handle> --pretty
+
+# Leer snapshot publico por token no enumerable
+pnpm staging:request /api/public/growth/ai-visibility/report/<reportToken> --pretty
+```
+
+Estados sanos:
+
+- `queued` / `processing`: run pendiente o corriendo.
+- `ready`: existe snapshot publico y el response incluye `reportToken`.
+- `in_review`: score `review_required`; espera aprobación humana.
+- `unavailable`: fallo, `insufficient_data`, rechazo humano o run no publicable.
+
+Review humano:
+
+```bash
+# Cola de reviews pendientes
+pnpm staging:request /api/admin/growth/ai-visibility/reviews --pretty
+
+# Aprobar un run review_required y publicar snapshot
+pnpm staging:request POST /api/admin/growth/ai-visibility/runs/<runId>/review/approve \
+  '{"reason":"Revisado contra evidencia y apto para release"}'
+
+# Rechazar y dejar unavailable
+pnpm staging:request POST /api/admin/growth/ai-visibility/runs/<runId>/review/reject \
+  '{"reason":"Confusion de entidad no publicable"}'
+```
+
+Regla: `review_required` solo publica con aprobación humana sobre la misma `score_version`; `insufficient_data` no se publica nunca.
+
+## Generar Fix-It Artifacts (TASK-1269) — staging ON, smoke funcional pendiente
 
 Los Fix-It Artifacts se generan on-demand desde un reporte/snapshot existente y los probes del run. No llaman LLM, no escriben en el sitio del prospecto y quedan detrás de `GROWTH_AI_VISIBILITY_FIX_IT_ENABLED`.
 
@@ -259,14 +296,47 @@ pnpm staging:request /api/public/growth/ai-visibility/report/<reportToken>/fix-i
 
 Respuesta esperada: `{ runId, artifacts[] }`, con `kind`, `filename`, `mimeType`, `content`, `publicSafe`, `source`, `derivedFrom` y `pendingFields`.
 
-Validación antes de prender staging:
+Validación antes de considerar prod:
 
-1. Confirmar flag OFF responde no disponible/404.
-2. Encender `GROWTH_AI_VISIBILITY_FIX_IT_ENABLED=true` sólo en staging.
-3. Generar por run admin y por token público para el mismo snapshot.
+1. Confirmar `GROWTH_AI_VISIBILITY_FIX_IT_ENABLED=true` en Vercel staging y OFF en prod.
+2. Generar por run admin y por token público para el mismo snapshot.
+3. Confirmar que el flag OFF responde no disponible/404 en un environment controlado.
 4. Parsear el artifact `json_ld_starter` como JSON y validar contra schema.org/Rich Results.
 5. Revisar que `llms.txt` esté formado y que los briefs no prometan rankings ni contengan evidence/reasons internos.
 6. Si pasa copy/legal, documentar el run/token usado y recién ahí considerar prod vía EPIC-020.
+
+## Probes de readiness y evidencia en DB
+
+Los probes corren best-effort despues del run de percepción. Fallar o saltar un probe no rompe el run; `score=null` significa "no medido", no 0. El 0 medido sí es gap real.
+
+```sql
+SELECT axis, probe_kind, status, score, reason
+FROM greenhouse_growth.grader_probe_results
+WHERE run_id = '<run_uuid>'
+ORDER BY axis, probe_kind;
+```
+
+Ejes esperados:
+
+- `structural`: robots IA, JSON-LD, llms.txt, sitemap, CWV (CWV puede quedar `skipped/no_headless`).
+- `agentic`: `.well-known/mcp`, API discoverability, potentialAction, DOM semantics, WebMCP (WebMCP puede quedar `skipped/no_headless`).
+- `entity`: Knowledge Graph, Wikidata/Wikipedia, Reddit UGC. KG requiere secret; Reddit puede degradar por 403/limit.
+
+## HubSpot handoff
+
+El handoff corre solo para leads consentidos y reportes publicables. Runs de portal/operador sin `grader_lead` hacen skip sano.
+
+```bash
+# Reintentar handoff de un run publicable con lead consentido
+pnpm staging:request POST /api/admin/growth/ai-visibility/runs/<runId>/lead-handoff --pretty
+```
+
+Checks:
+
+- `GROWTH_AI_VISIBILITY_LEAD_HANDOFF_ENABLED=true` en Vercel y ops-worker.
+- `grader_leads.consent=true`.
+- Score/report publicable (`completed` o partial publicable; no `insufficient_data`).
+- `hubspot_synced_at` queda seteado en `grader_leads` tras exito.
 
 ## Entrega del informe por email (TASK-1250) — rollout + smoke
 
@@ -287,6 +357,44 @@ El email al lead se dispara write-side cuando se publica el snapshot (reactive c
 5. Signal: `growth.ai_visibility.report_email_failed` debe quedar en steady (sin failed >15 min).
 
 **Prod:** gated por release control plane develop→main + EPIC-020 + sign-off legal/from-address del lead magnet (TASK-1246).
+
+## Auditoria rapida DB/runtime
+
+Usa esto cuando sospeches drift entre docs, worker y base:
+
+```sql
+SELECT table_name
+FROM information_schema.tables
+WHERE table_schema = 'greenhouse_growth'
+ORDER BY table_name;
+
+SELECT status, mode, run_kind, run_source, cost_attribution, count(*) AS runs, round(sum(coalesce(estimated_cost_usd,0))::numeric, 4) AS cost
+FROM greenhouse_growth.grader_runs
+GROUP BY status, mode, run_kind, run_source, cost_attribution
+ORDER BY runs DESC;
+
+SELECT provider, status, count(*)
+FROM greenhouse_growth.provider_observations
+GROUP BY provider, status
+ORDER BY provider, status;
+
+SELECT
+  count(*) FILTER (WHERE recurring_regrade_enabled) AS opt_in_profiles,
+  count(*) FILTER (WHERE recurring_regrade_enabled AND recurring_regrade_next_at <= now()) AS due_profiles,
+  count(*) FILTER (WHERE organization_id IS NOT NULL) AS org_bound_profiles
+FROM greenhouse_growth.grader_profiles;
+```
+
+Runtime live del worker:
+
+```bash
+gcloud run services describe ops-worker \
+  --project=efeonce-group \
+  --region=us-east4 \
+  --format='value(status.latestReadyRevisionName,spec.template.spec.containers[0].env)'
+```
+
+La auditoria del 2026-06-29 encontro `GROWTH_AI_VISIBILITY_PERPLEXITY_ENABLED=false` en el worker aunque Vercel staging tenia el flag registrado. Para provider efectivo async, manda el worker.
 
 ## Problemas comunes
 

@@ -1203,7 +1203,7 @@ Materializa el `grader_report` (§7.7) como **derivación on-read pura** del `gr
 Cargar junto a los §Delta de provider adapters + normalization/scoring al tocar el reporte.
 
 - **NUNCA** computar el reporte desde otra fuente que `grader_score` + `normalized_findings` versionados. El reporte es **función pura** de `(run_id, score_version, report_version, recommendation_pack_version)` → recomputar produce el mismo reporte (determinismo, sin LLM en score/gaps; el copy es plantilla es-CL en `GH_GROWTH_AI_VISIBILITY`, NUNCA generación libre). Primitive canónico: `readGraderReport` (server-only) → `buildGraderReport` (puro). Versiones: `ai_visibility_report_v1` + `ai_visibility_recommendation_pack_v1`.
-- **NUNCA** filtrar raw provider text/prompts/citation domains/reasons internos al DTO público. El público (`PublicGraderReport`) es un **tipo distinto** que estructuralmente no tiene campos para evidencia cruda (capa A) + el builder sólo lee campos seguros (capa B) + leak test (capa C). `providerPresence` (presencia por motor, Open Q3 → SÍ en V1) es **internal-only**. Los nombres de competidores SÍ se muestran (§7.7 "top competitors").
+- **NUNCA** filtrar raw provider text/prompts/citation domains/reasons internos al DTO público. El público (`PublicGraderReport`) es un **tipo distinto** que estructuralmente no tiene campos para evidencia cruda (capa A) + el builder sólo lee campos seguros (capa B) + leak test (capa C). `providerPresence` (presencia por motor, conteos resolved/present) es **public-safe desde TASK-1273**; lo internal-only es `providerFindings`, raw text, prompts, citation domains crudos, accuracy findings y reasons internos. Los nombres de competidores SÍ se muestran (§7.7 "top competitors").
 - **NUNCA** pintar `null` como `0`. Cada dimensión es `SourceResult`: `status='ok'` (medido, incluido `score:0` = gap real) vs `status='empty'`/`severity='sin_dato'` (sin evidencia, excluida del promedio, NUNCA fabricada). La severidad es **valor nombrado** (`critico|atencion|optimo|sin_dato`), nunca un color.
 - **NUNCA** emitir un reporte definitivo sobre un score gateado. Los gates `insufficient_data`/`review_required` (del score) + `partial` (del run) se propagan al `report.gate` con **razón + próxima acción** renderizables (no sólo un enum, no precisión falsa, no auto-release).
 - **NUNCA** entregar las recomendaciones como lista plana. Salen **priorizadas** (peso de la dimensión × tamaño del gap, RICE-ish) → `primaryGap` + `recommendedMotion` (alimentan el HubSpot handoff §7.8). El headline = mayor brecha ponderada (KPI dominante).
@@ -1229,7 +1229,7 @@ El `grader_report` surfacea 4 señales AEO (skill `seo-aeo` §07) que el sistema
 ### Invariantes operativos para agentes (signal enrichment)
 
 - **NUNCA** computar el citation share propio comparando dominios sin normalizar. Se reusa `extractCitationDomain` (lowercase + strip `www`) — idéntico a cómo se normalizan los `citationDomains` del finding — y la comparación es por igualdad exacta. `subjectDomain` se deriva en `readGraderReport` (del `websiteUrl` del perfil), igual que el scoring command. **`null≠0`**: sin respuestas con citas → `ownDomainShare=null` (sin dato), NUNCA `0`.
-- **NUNCA** exponer los dominios crudos de citación al DTO público. El citation share es **solo %/conteos**; el detalle por motor (`providerFindings`) es **INTERNAL-only** (no viaja al público, espeja `providerPresence`). Los 3 agregados seguros (citation share, sentiment, position) SÍ van al público. Leak test extendido.
+- **NUNCA** exponer los dominios crudos de citación al DTO público. El citation share es **solo %/conteos**; el detalle narrativo por motor (`providerFindings`) es **INTERNAL-only** (no viaja al público). `providerPresence` agregado por motor sí va al público/cliente como conteo seguro. Los 3 agregados seguros (citation share, sentiment, position) SÍ van al público. Leak test extendido.
 - **NUNCA** editorializar sobre competidores en el resumen de sentimiento — es factual sobre la marca sujeto (saldo nombrado `positivo|neutral|negativo|mixto|sin_dato`, empate → `mixto`, sin evaluación → `sin_dato`).
 - Las 4 señales son **derivación pura** de findings ya persistidos: el mismo input produce el mismo enriquecimiento. Sin capability nueva (reusa `report.read`); sin migración; sin signal nuevo.
 
@@ -1489,7 +1489,7 @@ Operador (Growth/AM)      → requestGraderRunAsOperator    → ilimitado, costo
 - **NUNCA** correr el tier trial sin `GROWTH_AI_VISIBILITY_TRIAL_ENABLED`; **NUNCA** prender los flags en prod sin staging shadow + sign-off comercial (qué orgs trial vs contratado + tope global). La puerta operador es ilimitada y atribuye costo a `sales` — NO consume allowance del cliente.
 - **NUNCA** seedear el módulo con `capabilities[]` que no sean `client_portal.*` (parity TASK-826); AEO declara `capabilities=[]` y autoriza por capability growth + módulo.
 
-## Delta 2026-06-29 — TASK-1270 recurring Share-of-Voice re-grade (code complete dev; rollout pendiente) · EPIC-020
+## Delta 2026-06-29 — TASK-1270 recurring Share-of-Voice re-grade (staging rollout aplicado; E2E cliente pendiente) · EPIC-020
 
 **Qué agrega.** El grader deja de ser sólo snapshot point-in-time para perfiles de cliente opt-in: `src/lib/growth/ai-visibility/regrade/**` selecciona perfiles `grader_profiles.recurring_regrade_enabled=true` con cadencia vencida, encola un run `full` idempotente y deja que el worker async existente (`/growth/grader/drain`, TASK-1234) ejecute el run con el run-engine canónico. El trend de TASK-1236 se mantiene on-read sobre el histórico: no hay pipeline paralelo de SoV ni tabla de score nueva.
 
@@ -1501,7 +1501,7 @@ Operador (Growth/AM)      → requestGraderRunAsOperator    → ilimitado, costo
 
 **Budget guard.** Flag `GROWTH_AI_VISIBILITY_REGRADE_ENABLED` default OFF. Config env `GROWTH_AI_VISIBILITY_REGRADE_BATCH_SIZE` (default 5) y `GROWTH_AI_VISIBILITY_REGRADE_MONTHLY_BUDGET_USD` (default 50). Antes de claim/enqueue, el batch suma `estimated_cost_usd` de runs recurrentes del mes y calcula slots restantes contra el `costCeilingUsdPerRun` del modo `full`; si el presupuesto se agotó, responde `budget_exhausted` sin tocar perfiles ni encolar.
 
-**Worker + Scheduler.** Nuevo endpoint ops-worker `POST /growth/grader/regrade` (no llama providers; sólo encola). `services/ops-worker/deploy.sh` declara `ops-growth-grader-regrade` diario `0 8 * * *`, **pausado por defecto**, con handler también gateado por flag. Esto conserva la regla dura: Cloud Scheduler + ops-worker, NUNCA Vercel cron.
+**Worker + Scheduler.** Nuevo endpoint ops-worker `POST /growth/grader/regrade` (no llama providers; sólo encola). `services/ops-worker/deploy.sh` declara `ops-growth-grader-regrade` diario `0 8 * * *`, pausado por defecto salvo staging. Esto conserva la regla dura: Cloud Scheduler + ops-worker, NUNCA Vercel cron. Auditoria live 2026-06-29: staging `ops-worker-00417-m86` Ready con `GROWTH_AI_VISIBILITY_REGRADE_ENABLED=true`, Scheduler `ENABLED`, smoke manual `claimed=0 enqueued=0 failed=0 skipped=no_due_profiles` porque la DB no tiene perfiles opt-in/due.
 
 **Observabilidad.** Nuevo reader `getGrowthAiVisibilityRegradeSignals()` registrado en `/admin/operations` con 3 signals: `growth.ai_visibility.regrade_lag`, `growth.ai_visibility.regrade_cost`, `growth.ai_visibility.regrade_stale_profiles`. DB vacía / flag OFF / sin perfiles opt-in → steady ok.
 
@@ -1535,7 +1535,7 @@ Operador (Growth/AM)      → requestGraderRunAsOperator    → ilimitado, costo
 - **NUNCA** correr `activate-grader-email-gate.ts --apply` antes de desplegar el código de las fachadas (ancla a versión deprecada + no gatea). Secuencia: deploy → `--apply` → smoke.
 - **NUNCA** publicar el grader-form por raw-SQL ni editar in-place una versión published (inmutable por trigger): usar el script gobernado (`authorDraftForm`+`publishForm`).
 
-## Delta 2026-06-28 — TASK-1266 Site Readiness Probe Layer · structural AEO + agentic-web readiness (code complete dev; rollout pendiente) · EPIC-020
+## Delta 2026-06-28 — TASK-1266 Site Readiness Probe Layer · structural AEO + agentic-web readiness (staging ON) · EPIC-020
 
 **Qué agrega.** Una **segunda fuente de evidencia** del run-engine: probes técnicos **read-only** sobre las superficies públicas del sitio analizado (no LLM, no prompts). Conecta *percepción → causa*: el report dejaba de decir solo "eres invisible" y pasa a poder decir "porque bloqueas GPTBot y no tienes structured data". Produce dos ejes **ortogonales** al score de percepción, reportados **lado a lado, NUNCA fusionados** al overall: `structural_readiness` ("¿por qué no te citan?") y `agentic_readiness` ("¿te pueden *usar* los agentes?", lente WebMCP — diferenciador vs el AEO Grader de HubSpot, que solo mide percepción).
 
@@ -1551,7 +1551,7 @@ Operador (Growth/AM)      → requestGraderRunAsOperator    → ilimitado, costo
 
 **Observabilidad.** 2 reliability signals (`growth.ai_visibility.probe_failure_rate` data_quality, steady~0, `skipped` excluido del denominador; `growth.ai_visibility.probe_headless_coverage` posture/informativo — explica por qué CWV/WebMCP salen sin dato hasta cablear Chromium). Errores de probe → `captureWithDomain(err,'growth')`; nunca al cliente.
 
-**Rollout.** Code-complete + unit-tested + validado contra dominio real (vercel.com: robots 100 / json_ld 40 / llms 100 / sitemap 100 (7247 URLs) / CWV skipped → structural 78.8). Pendiente: flip `GROWTH_AI_VISIBILITY_PROBES_ENABLED` + `..._AGENTIC_READINESS_ENABLED` (Vercel + ops-worker) en staging + run real → prod vía release control plane (EPIC-020). Habilita TASK-1267 (entity infra probes — reusan el substrate) y TASK-1269 (fix-it artifacts — consumen los findings).
+**Rollout.** Staging ON en Vercel + ops-worker para `GROWTH_AI_VISIBILITY_PROBES_ENABLED` y `GROWTH_AI_VISIBILITY_AGENTIC_READINESS_ENABLED`; prod OFF. Validado contra dominio real (vercel.com: robots 100 / json_ld 40 / llms 100 / sitemap 100 (7247 URLs) / CWV skipped → structural 78.8) y DB auditada con 23 `grader_probe_results`. Headless sigue degradando a `skipped/no_headless` hasta cablear Chromium. Prod queda gated por release control plane (EPIC-020). Habilita TASK-1267 (entity infra probes — reusan el substrate) y TASK-1269 (fix-it artifacts — consumen los findings).
 
 ### Invariantes operativos para agentes (Site Readiness Probe Layer — TASK-1266)
 
@@ -1562,7 +1562,7 @@ Operador (Growth/AM)      → requestGraderRunAsOperator    → ilimitado, costo
 - **NUNCA** romper el run de percepción por un fallo de probes: `gatherRunProbes` es best-effort (no lanza). Un sitio caído degrada los probes, no el run.
 - **SIEMPRE** que agregues un probe nuevo: declará su `ProbeKind` + dimensión en `readiness-config.ts` con peso que mantenga la suma del eje en 100, registralo en `structural/index.ts` o `agentic/index.ts`, y mapeá su evidence public-safe (sin PII ni contenido crudo de terceros más allá de conteos/snippets acotados).
 
-## Delta 2026-06-28 — TASK-1267 Entity Infrastructure Probes · tercer eje `entity` (code complete dev; rollout pendiente) · EPIC-020
+## Delta 2026-06-28 — TASK-1267 Entity Infrastructure Probes · tercer eje `entity` (staging ON) · EPIC-020
 
 **Qué agrega.** Un **tercer eje ortogonal** al probe layer de TASK-1266 — `entity` ("¿existe el backbone real de entidad de la marca EN EL MUNDO?") — reportado **lado a lado** de `structural`/`agentic`, **NUNCA fusionado**. Conecta el eje de percepción `entity_clarity` (que hoy solo infiere desde lo que dicen los motores) con su **CAUSA verificable**: una marca sin entrada en Wikidata ni Knowledge Panel casi siempre tiene `entity_clarity` bajo. Reusa el substrate de TASK-1266 (gatherer/registry/store/scoring), **sin gatherer paralelo**.
 
@@ -1576,7 +1576,7 @@ Operador (Growth/AM)      → requestGraderRunAsOperator    → ilimitado, costo
 
 **Scoring + report.** `ReadinessScore.entity` se computa en el engine (additive). El report builder solo lee `.structural`/`.agentic` → el eje entity se persiste pero su **RENDER lo gobierna TASK-1252** (out of scope acá), sin regresión del contrato de report.
 
-**Flag + rollout.** `GROWTH_AI_VISIBILITY_ENTITY_PROBES_ENABLED` (default OFF, aditivo sobre `PROBES` ON, **DUAL-LOCATION** Vercel + ops-worker como TASK-1266). KG api key vía `GOOGLE_KNOWLEDGE_GRAPH_API_KEY[_SECRET_REF]` (sin ella el KG probe degrada honesto); Reddit público sin secret. **Rollout pendiente:** publicar KG api key + grant → flip staging + run real sobre marca con Knowledge Panel → prod (release control plane). Findings → TASK-1269; render → TASK-1252.
+**Flag + rollout.** `GROWTH_AI_VISIBILITY_ENTITY_PROBES_ENABLED` (default OFF, aditivo sobre `PROBES` ON, **DUAL-LOCATION** Vercel + ops-worker como TASK-1266). Staging ON, prod OFF. KG api key está en Secret Manager y wired por `GOOGLE_KNOWLEDGE_GRAPH_API_KEY_SECRET_REF`; sin ella el KG probe degrada honesto. E2E verificado en staging sobre vercel.com (KG/Wikidata con datos, Reddit degradando por 403 de forma honesta). Prod queda gated por release control plane. Findings → TASK-1269; render → TASK-1252.
 
 ### Invariantes operativos para agentes (Entity Infrastructure Probes — TASK-1267)
 

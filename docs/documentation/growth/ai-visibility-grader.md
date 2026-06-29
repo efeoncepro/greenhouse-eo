@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.13
+> **Version:** 1.14
 > **Creado:** 2026-06-24 por Claude (TASK-1226)
-> **Ultima actualizacion:** 2026-06-29 por Codex (TASK-1270, re-grade recurrente staging)
+> **Ultima actualizacion:** 2026-06-29 por Codex (auditoria DB/codebase/manual del grader)
 > **Documentacion tecnica:** [GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md)
 
 # AI Visibility Grader — Motor de Providers (Growth)
@@ -10,7 +10,7 @@
 
 Mide como los "answer engines" de IA (ChatGPT/OpenAI, Claude/Anthropic, Perplexity, Gemini y Google AI Overview / AI Mode via DataForSEO) representan a una marca cuando alguien les pregunta por un servicio. El objetivo es ver si la marca **aparece o no** cuando un comprador busca proveedores, que dicen de ella y a quien citan.
 
-Esta capa es la **fundacion del motor**: corre los prompts contra los providers, guarda la evidencia cruda y deja senales de salud. Todavia **no** calcula el puntaje final ni arma el reporte publico (eso es un paso posterior).
+El grader ya es una capacidad completa de diagnostico y monitoreo: corre prompts contra providers, guarda evidencia cruda, normaliza findings, calcula score, arma reporte interno/publico, publica snapshots seguros, orquesta email/HubSpot cuando corresponde, ejecuta probes tecnicos/entity del sitio y puede re-gradear perfiles de cliente opt-in en el tiempo. La evidencia sigue siendo muestral y asistida por IA: sirve para decision comercial y priorizacion AEO, no como verdad absoluta del negocio.
 
 ## Conceptos
 
@@ -44,18 +44,24 @@ El grader nace **apagado** (flags `GROWTH_AI_VISIBILITY_*_ENABLED` en OFF). Sin 
 
 ## Como se opera hoy
 
-Hay un primitive server-side único (`executeGraderRun`) y todos lo consumen igual:
+Hay primitives server-side gobernados y todos los entrypoints consumen esos caminos, no adapters paralelos:
 
 - **Endpoint interno:** `GET/POST /api/admin/growth/ai-visibility/runs` (+ `/<runId>` para el detalle), solo para usuarios internos con la capability correspondiente. Lista corridas y dispara una nueva.
+- **Endpoint operador:** `POST /api/admin/growth/ai-visibility/operator-run` permite a Growth/AM correr un diagnostico sobre una organizacion/prospecto con costo atribuido a ventas.
+- **Endpoint cliente:** `POST /api/client-portal/growth/ai-visibility/run` existe para runs gobernados por entitlement del modulo `ai_visibility_v1`; hoy sigue apagado por flags de portal/trial.
+- **Intake publico:** `POST /api/public/growth/ai-visibility/run` acepta lead consentido, captcha y abuse/cost guard; puede usar el motor Growth Forms. El email/PII nunca viaja a providers.
+- **Status/reporte publico:** `GET /api/public/growth/ai-visibility/run/[handle]` usa `poll_token` o `submissionId` no enumerable; `GET /api/public/growth/ai-visibility/report/[token]` lee snapshots inmutables.
+- **Worker async:** Cloud Run `ops-worker` drena runs (`/growth/grader/drain`), entrega email/HubSpot via outbox/reactive consumers y ejecuta re-grade recurrente (`/growth/grader/regrade`).
 - **CLI de smoke:** `pnpm growth:ai-visibility:smoke` (ver el [manual](../../manual-de-uso/growth/ai-visibility-grader-smoke.md)).
-- **A futuro:** la UI pública, el admin, Nexa/MCP, el report builder y el handoff a HubSpot consumirán el MISMO primitive — ninguno llamará a los proveedores por su cuenta.
+- **UI/report surfaces:** la pantalla publica, el portal cliente, PDF/email y artefactos Fix-It leen DTOs public-safe/client-safe; ninguno llama proveedores por su cuenta.
 
-## Estado del rollout (2026-06-27)
+## Estado del rollout (2026-06-29)
 
-- **staging:** encendido para OpenAI + Anthropic + **Gemini** + **Perplexity** (corre proveedores reales; verificado). Gemini usa la última generación disponible (**Gemini 3**, `gemini-3-flash-preview` vía Vertex) porque el grader debe medir con el modelo que la gente usa hoy; el modelo es ajustable por env sin redeploy.
+- **staging:** grader encendido. El worker efectivo (`ops-worker-00417-m86`) tiene OpenAI + Anthropic + Gemini + Google AI Overview + probes + entity probes + email + HubSpot + re-grade encendidos. Gemini usa **Gemini 3** (`gemini-3-flash-preview` vía Vertex) y el modelo es ajustable por env.
 - **producción:** apagado — el encendido es un proceso aparte (migración + release controlado) que se hará después.
-- **Perplexity:** **encendido en staging (TASK-1249).** Usa el cliente canónico `src/lib/ai/perplexity.ts` (Sonar, search-grounded). Smoke real low-volume verde (6/6 respuestas con citas). El proveedor set arch (OpenAI/Perplexity/Gemini) queda **completo**.
+- **Perplexity:** el adapter y secret existen y el smoke real local/staging previo fue verde. Drift operativo detectado el 2026-06-29: Vercel staging tiene el flag registrado, pero el worker async efectivo trae `GROWTH_AI_VISIBILITY_PERPLEXITY_ENABLED=false` por default de `services/ops-worker/deploy.sh`. Mientras el run se ejecute por worker, Perplexity queda fuera/`skipped` hasta prenderlo tambien ahi.
 - **Google AI Overviews / AI Mode (surface AI Search):** **encendido + verificado en staging (TASK-1265, 2026-06-28).** Usa DataForSEO como fuente gobernada, sin scraping directo de Google. Smoke real verde end-to-end (observación `succeeded` con 27 citas en PG, ejecutada por el worker real). Está disponible en los 3 entrypoints de análisis (público / cliente / operador) por construcción. Si DataForSEO no trae bloque de AI Overview/AI Mode, la observación queda `skipped:no_ai_overview_block` (es "no apareces", no un fallo). El costo se mide por request reportado por DataForSEO. DataForSEO documenta AI Mode como English-only hoy, así que el adapter manda `language_code=en` y conserva mercado/location para segmentar. **Producción:** apagado (gated por el launch) + rotar la credencial DataForSEO antes de prod.
+- **DB staging/dev auditada:** 24 runs, 266 provider observations, 60 findings, 10 scores, 8 reports, 7 reviews, 23 probe results, 1 lead y 1 email dispatch. No hay perfiles org-bound opt-in para re-grade (`opt_in_profiles=0`, `due_profiles=0`).
 - **Prompt pack v2 (TASK-1249):** existe como versión seleccionable (corrige el prompt p12, que nombraba sectores y ensuciaba las marcas de control). El **default sigue siendo v1** hasta una validación real; v2 es opt-in.
 - **Pesos del score:** se mantiene **V1** (decisión documentada — el set de calibración es muy chico para reajustar pesos sin sobreajustar; detalle en `GREENHOUSE_AI_VISIBILITY_GRADER_CALIBRATION_V1.md` §Delta 2026-06-27).
 
@@ -106,6 +112,16 @@ La verificacion de staging hecha el 2026-06-29 fue segura y sin costo: el schedu
 
 > Detalle tecnico: `GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md` §Delta 2026-06-29 (TASK-1270). Operacion: [manual de smoke](../../manual-de-uso/growth/ai-visibility-grader-smoke.md#re-grade-recurrente--scheduler-task-1270).
 
+## Entrega publica y review gate
+
+El grader separa el write-side del read-side:
+
+- **Finalizer:** cuando el worker termina un run, `finalizeRunDelivery` decide si el resultado queda `ready`, `in_review` o `unavailable`.
+- **Snapshot publico:** si el resultado es publicable, `grader_reports` guarda un `PublicGraderReport` inmutable con token no enumerable. Re-publicar el mismo estado devuelve el mismo snapshot; no muta el reporte.
+- **Review humano:** `review_required` nunca se auto-publica. Un reviewer interno aprueba o rechaza; la aprobación publica el snapshot y libera el poll publico. `insufficient_data` nunca es publicable.
+- **Status publico:** el lead ve `queued`, `processing`, `ready`, `in_review` o `unavailable`; nunca ve PII, texto crudo de providers ni reasons internos.
+- **HubSpot/email:** se disparan write-side al publicar/solicitar entrega, no por abrir el link.
+
 ## El reporte (qué le mostramos al prospecto)
 
 Una vez que un análisis tiene puntaje, el sistema arma un **reporte** que traduce los números en una historia accionable. NO inventa nada: es una **derivación directa** del puntaje y la evidencia ya guardados — el mismo análisis siempre produce el mismo reporte.
@@ -116,10 +132,11 @@ Una vez que un análisis tiene puntaje, el sistema arma un **reporte** que tradu
 - **Honestidad:** una dimensión **sin evidencia** se muestra como "sin dato" (no como 0). Un 0 medido sí es un problema real. Si faltó cobertura o hay lenguaje sensible, el reporte lo dice con su razón y próximo paso, sin fingir precisión.
 - **Tendencia (vs análisis anterior):** si la marca ya tiene un análisis previo comparable, el reporte muestra cuánto **subió o bajó** cada dimensión y el puntaje global desde la última vez (la visibilidad en IA se mide por tendencia, no por una foto). Si es el primer análisis dice "primer análisis"; si el anterior usó otra versión de preguntas, lo marca como "no comparable" en vez de inventar un cambio.
 - **Exactitud de marca (¿la IA dice la verdad de ti?):** además de medir si apareces, el sistema revisa si la IA dice cosas **factualmente equivocadas** sobre la marca — te ubica en otra categoría, te confunde con otra empresa o te atribuye algo que no es. Compara lo que dice la IA contra los datos **declarados** de la marca (categoría, competidores). Es conservador: si hay una confusión de identidad clara, el análisis **se marca para revisión humana** antes de poder publicarse (importante para clientes sensibles como bancos o aerolíneas), en vez de afirmar por su cuenta que "la IA miente". Este detalle es **solo de uso interno** — al público nunca se le muestra "la IA se equivoca de ti", solo el equipo lo revisa.
-- **Señales extra:** el reporte también muestra si la IA **cita tu propio sitio** (qué porcentaje de las respuestas con fuentes te citan a ti), el **sentimiento** con que se habla de la marca, tu **posición** cuando apareces (1.º vs 5.º), y en **qué motor** apareces o no (ej. "presente en Gemini, invisible en Perplexity"). El detalle por motor es solo para uso interno; el resto es seguro para la versión pública. Si un dato no se midió, dice "sin dato" (nunca un 0 falso).
-- **Dos versiones:** una **interna** completa (para ventas/admin, con presencia por motor y detalle) y una **pública segura** que nunca incluye el texto crudo de los motores ni las fuentes privadas (sólo el puntaje, los competidores top, el resumen de fuentes y los próximos pasos, con el aviso de que es un diagnóstico muestreado por IA).
+- **Señales extra:** el reporte también muestra si la IA **cita tu propio sitio** (qué porcentaje de las respuestas con fuentes te citan a ti), el **sentimiento** con que se habla de la marca, tu **posición** cuando apareces, tendencia vs run anterior, taxonomía de categoría, breakdown seguro de citas y **presencia por motor** (`providerPresence`, conteos public-safe). Lo que no viaja al público es el texto crudo, prompts, `providerFindings`, accuracy findings, reasons internos ni dominios crudos no resumidos.
+- **Readiness del sitio:** si los probes corrieron, el reporte agrega ejes side-by-side de readiness estructural, agentic y entity. No se mezclan con el score de percepción.
+- **Dos versiones:** una **interna** completa (para ventas/admin, con presencia por motor, reasons y detalle operacional) y una **pública segura** que conserva score, hallazgos, competidores top, presencia por motor agregada, resumen de fuentes/readiness y próximos pasos, con el aviso de que es un diagnóstico muestreado por IA.
 
-Este reporte es el **insumo** de las superficies que vienen después (página pública, AI Visibility Snapshot en HubSpot, revisión en el admin). Todavía no se muestra en pantalla ni se envía a ningún lado: es la pieza de datos que esas superficies van a renderizar.
+Este reporte ya alimenta el snapshot público, PDF/email, HubSpot y surfaces cliente/admin. La UI pública/portal puede evolucionar, pero el contrato de datos ya existe y se gobierna desde `src/lib/growth/ai-visibility/report/**`.
 
 > Detalle técnico: `GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md` §Delta 2026-06-24 (TASK-1235) + §7.7/§8.4. Código: `src/lib/growth/ai-visibility/report/**`, copy `src/lib/copy/growth.ts`. Lectura: `GET /api/admin/growth/ai-visibility/runs/[runId]/report`.
 
@@ -131,7 +148,7 @@ El diagnóstico ahora tiene una capa de entregables accionables: **Fix-It Artifa
 - **Qué no hace:** no escribe en el sitio del prospecto, no crea perfiles externos, no promete rankings ni usa IA generativa para inventar copy. El output marca campos pendientes cuando faltan URLs, fuentes o perfiles oficiales.
 - **Seguridad:** hereda el boundary public-safe del reporte. No incluye texto crudo de providers, prompts, accuracy findings ni reasons internos de probes.
 - **Acceso:** interno por capability `growth.ai_visibility.fix_it.generate`; público por el token no enumerable del snapshot.
-- **Estado:** code complete, rollout pendiente. El flag `GROWTH_AI_VISIBILITY_FIX_IT_ENABLED` está OFF/default hasta revisión copy/legal y smoke staging con un reporte real.
+- **Estado:** staging tiene `GROWTH_AI_VISIBILITY_FIX_IT_ENABLED` encendido en Vercel y producción sigue OFF. Pendiente: smoke funcional por token público y run admin con reporte real + revisión copy/legal antes de prod.
 
 > Detalle técnico: `GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md` §Delta 2026-06-28 (TASK-1269). Código: `src/lib/growth/ai-visibility/fix-it/**`. Operación: [manual de smoke](../../manual-de-uso/growth/ai-visibility-grader-smoke.md).
 
@@ -147,14 +164,15 @@ Mostrar el resultado en pantalla no basta: si el prospecto cierra la pestaña, p
 - **Honestidad:** si el informe es parcial (algún motor no respondió a tiempo), el correo lo dice claramente. Un informe en revisión o sin datos suficientes **no se envía**.
 - **Seguro de compartir:** el adjunto es la versión **pública** del informe — nunca incluye el texto crudo de los motores, los hallazgos internos de exactitud ni datos privados.
 
-> Detalle técnico: `GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md` §Delta 2026-06-27 (TASK-1250). Código: `src/lib/growth/ai-visibility/public-delivery/email/**`, template `src/emails/AiVisibilityGraderReportEmail.tsx`. Evento `growth.ai_visibility.report_email_requested` → consumer `growth_ai_visibility_report_email`. **Estado: code complete, rollout pendiente** (flag `GROWTH_AI_VISIBILITY_REPORT_EMAIL_ENABLED` OFF; activación gated por TASK-1246). Operación: [manual de smoke](../../manual-de-uso/growth/ai-visibility-grader-smoke.md).
+> Detalle técnico: `GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md` §Delta 2026-06-27 (TASK-1250). Código: `src/lib/growth/ai-visibility/public-delivery/email/**`, template `src/emails/AiVisibilityGraderReportEmail.tsx`. Evento `growth.ai_visibility.report_email_requested` → consumer `growth_ai_visibility_report_email`. **Estado:** staging ON en worker + Vercel y smoke real ya dejó 1 dispatch enviado; producción OFF/gated por TASK-1246. Operación: [manual de smoke](../../manual-de-uso/growth/ai-visibility-grader-smoke.md).
 
-## Que no hace (todavia)
+## Límites actuales
 
-- No publica nada al sitio publico ni a HubSpot.
-- No muestra el reporte en una pantalla ni lo auto-publica (la superficie visual + el snapshot inmutable son tasks posteriores).
-- No usa IA para escribir el reporte: el copy es plantilla determinista (la narrativa asistida por LLM es un follow-up).
+- No usa IA para escribir el score ni la narrativa central del reporte: el score y el reporte son deterministas/versionados; la extracción LLM opcional solo enriquece campos acotados y está OFF por defecto.
 - No aplica automáticamente los Fix-It Artifacts: sólo los entrega para revisión/aplicación humana.
-- No mezcla datos de clientes: V1 es interno/pre-tenant.
+- No habilita todavía runs de portal/trial en producción; los flags `PORTAL_RUN` y `TRIAL` siguen OFF.
+- No tiene re-grade E2E con cliente real opt-in: el scheduler está ON en staging, pero la DB auditada no tiene perfiles due/opt-in.
+- No debe tratar Perplexity como provider efectivo del worker hasta prender el flag en `ops-worker`.
+- No debe prender producción sin release control plane, migraciones/capabilities, rotación de credenciales expuestas y sign-off legal/comercial.
 
 > Detalle tecnico: invariantes y contrato en [GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md) (§Delta 2026-06-24). Codigo: `src/lib/growth/ai-visibility/**`. Operacion: [manual de smoke](../../manual-de-uso/growth/ai-visibility-grader-smoke.md).
