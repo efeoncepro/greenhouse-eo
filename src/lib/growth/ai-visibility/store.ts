@@ -31,6 +31,12 @@ export interface GraderProfileRow {
   status: string
   /** TASK-1243 — binding a la organización cliente (null = perfil interno/público). */
   organizationId: string | null
+  /** TASK-1270 — opt-in explícito para re-grade recurrente de cliente entitled. */
+  recurringRegradeEnabled: boolean
+  recurringRegradeCadence: 'weekly' | 'monthly'
+  recurringRegradeNextAt: string | null
+  recurringRegradeLastRunId: string | null
+  recurringRegradeLastAt: string | null
 }
 
 /** Prompt resuelto persistido en el run (resumibilidad del worker async, TASK-1234). */
@@ -100,7 +106,12 @@ const projectProfile = (row: RawProfile): GraderProfileRow => ({
   category: (row.category as string | null) ?? null,
   competitorsDeclared: (row.competitors_declared as string[] | null) ?? [],
   status: String(row.status),
-  organizationId: (row.organization_id as string | null) ?? null
+  organizationId: (row.organization_id as string | null) ?? null,
+  recurringRegradeEnabled: Boolean(row.recurring_regrade_enabled ?? false),
+  recurringRegradeCadence: row.recurring_regrade_cadence === 'weekly' ? 'weekly' : 'monthly',
+  recurringRegradeNextAt: (row.recurring_regrade_next_at as string | null) ?? null,
+  recurringRegradeLastRunId: (row.recurring_regrade_last_run_id as string | null) ?? null,
+  recurringRegradeLastAt: (row.recurring_regrade_last_at as string | null) ?? null
 })
 
 const projectRun = (row: RawRun): GraderRunRow => ({

@@ -182,6 +182,7 @@ import { getGrowthFormsPiiSignals } from './queries/growth-forms-pii-signals'
 import { getGrowthAiVisibilityLeadHandoffSignals } from './queries/growth-ai-visibility-lead-handoff-signals'
 import { getGrowthAiVisibilityReportEmailSignals } from './queries/growth-ai-visibility-report-email-signals'
 import { getGrowthAiVisibilityEntitlementSignals } from './queries/growth-ai-visibility-entitlement-signals'
+import { getGrowthAiVisibilityRegradeSignals } from './queries/growth-ai-visibility-regrade-signals'
 import { getGrowthSearchConsoleTokenHealthSignal } from './queries/growth-search-console-token-health'
 // TASK-1082 — Knowledge Platform ingestion signals (moduleKey 'knowledge').
 import { getKnowledgeNotionIngestDeadLetterSignal } from './queries/knowledge-notion-ingest-dead-letter'
@@ -636,6 +637,7 @@ interface ReliabilityOverviewSources {
   growthAiVisibilityLeadHandoff?: ReliabilitySignal[] | null
   growthAiVisibilityReportEmail?: ReliabilitySignal[] | null
   growthAiVisibilityEntitlement?: ReliabilitySignal[] | null
+  growthAiVisibilityRegrade?: ReliabilitySignal[] | null
   growthSearchConsoleTokenHealth?: ReliabilitySignal | null
 
   /** TASK-1201 — Finance AI anomaly-materialization staleness (heartbeat del SoT de signals). */
@@ -1056,6 +1058,7 @@ export const buildReliabilityOverview = (
     ...(sources.growthAiVisibilityLeadHandoff ?? []),
     ...(sources.growthAiVisibilityReportEmail ?? []),
     ...(sources.growthAiVisibilityEntitlement ?? []),
+    ...(sources.growthAiVisibilityRegrade ?? []),
     ...(sources.growthSearchConsoleTokenHealth ? [sources.growthSearchConsoleTokenHealth] : []),
     // TASK-812 — Previred/LRE artifact registry drift.
     ...(sources.payrollComplianceExportDrift ? [sources.payrollComplianceExportDrift] : []),
@@ -1495,6 +1498,12 @@ export const getReliabilityOverview = async (
     preloadedSources.growthAiVisibilityEntitlement !== undefined
       ? preloadedSources.growthAiVisibilityEntitlement
       : await getGrowthAiVisibilityEntitlementSignals().catch(() => null)
+
+  // TASK-1270 — recurring re-grade cadence/cost/stale profile signals.
+  const growthAiVisibilityRegrade =
+    preloadedSources.growthAiVisibilityRegrade !== undefined
+      ? preloadedSources.growthAiVisibilityRegrade
+      : await getGrowthAiVisibilityRegradeSignals().catch(() => null)
 
   const payrollComplianceExportDrift =
     preloadedSources.payrollComplianceExportDrift !== undefined
@@ -2409,6 +2418,7 @@ export const getReliabilityOverview = async (
     growthAiVisibilityLeadHandoff,
     growthAiVisibilityReportEmail,
     growthAiVisibilityEntitlement,
+    growthAiVisibilityRegrade,
     growthSearchConsoleTokenHealth,
     payrollComplianceExportDrift,
     payrollContractorDoubleRailOverlap,

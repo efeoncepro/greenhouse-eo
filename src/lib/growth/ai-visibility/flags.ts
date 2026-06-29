@@ -179,6 +179,15 @@ export const isTrialTierEnabled = (env: NodeJS.ProcessEnv = process.env): boolea
   isTrue(env[GROWTH_AI_VISIBILITY_TRIAL_FLAG])
 
 /**
+ * TASK-1270 — Re-grade recurrente de perfiles AEO opt-in. Default OFF. Requiere
+ * el kill switch global del grader y corre sólo desde ops-worker/Cloud Scheduler.
+ */
+export const GROWTH_AI_VISIBILITY_REGRADE_FLAG = 'GROWTH_AI_VISIBILITY_REGRADE_ENABLED'
+
+export const isRecurringRegradeEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+  isGraderEnabled(env) && isTrue(env[GROWTH_AI_VISIBILITY_REGRADE_FLAG])
+
+/**
  * TASK-1277 — Config de allowance AEO por tier (per-org-per-mes) + tope global de trials.
  * Defaults conservadores (sign-off comercial): trial 1/mes, contratado 20/mes (fair-use, NO
  * ilimitado self-serve), pilot 3/mes, tope global de trials USD 25/mes (cost backstop que
@@ -209,4 +218,19 @@ export const resolveAeoAllowanceConfig = (env: NodeJS.ProcessEnv = process.env):
   contractedRunsPerMonth: toPositiveInt(env.GROWTH_AI_VISIBILITY_CONTRACTED_RUNS_PER_MONTH, 20),
   pilotRunsPerMonth: toPositiveInt(env.GROWTH_AI_VISIBILITY_PILOT_RUNS_PER_MONTH, 3),
   trialGlobalMonthlyBudgetUsd: toPositiveFloat(env.GROWTH_AI_VISIBILITY_TRIAL_GLOBAL_MONTHLY_BUDGET_USD, 25)
+})
+
+export interface RecurringRegradeConfig {
+  batchSize: number
+  monthlyBudgetUsd: number
+}
+
+/**
+ * Re-grade usa modo `full` (cross-engine SoV), por eso tiene presupuesto mensual
+ * propio además del cost ceiling per-run de policy.ts. Defaults conservadores y
+ * override-ables por env; con flag OFF no se consulta ni gasta.
+ */
+export const resolveRecurringRegradeConfig = (env: NodeJS.ProcessEnv = process.env): RecurringRegradeConfig => ({
+  batchSize: Math.max(1, Math.min(50, toPositiveInt(env.GROWTH_AI_VISIBILITY_REGRADE_BATCH_SIZE, 5))),
+  monthlyBudgetUsd: toPositiveFloat(env.GROWTH_AI_VISIBILITY_REGRADE_MONTHLY_BUDGET_USD, 50)
 })

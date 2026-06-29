@@ -1489,6 +1489,30 @@ Operador (Growth/AM)      → requestGraderRunAsOperator    → ilimitado, costo
 - **NUNCA** correr el tier trial sin `GROWTH_AI_VISIBILITY_TRIAL_ENABLED`; **NUNCA** prender los flags en prod sin staging shadow + sign-off comercial (qué orgs trial vs contratado + tope global). La puerta operador es ilimitada y atribuye costo a `sales` — NO consume allowance del cliente.
 - **NUNCA** seedear el módulo con `capabilities[]` que no sean `client_portal.*` (parity TASK-826); AEO declara `capabilities=[]` y autoriza por capability growth + módulo.
 
+## Delta 2026-06-29 — TASK-1270 recurring Share-of-Voice re-grade (code complete dev; rollout pendiente) · EPIC-020
+
+**Qué agrega.** El grader deja de ser sólo snapshot point-in-time para perfiles de cliente opt-in: `src/lib/growth/ai-visibility/regrade/**` selecciona perfiles `grader_profiles.recurring_regrade_enabled=true` con cadencia vencida, encola un run `full` idempotente y deja que el worker async existente (`/growth/grader/drain`, TASK-1234) ejecute el run con el run-engine canónico. El trend de TASK-1236 se mantiene on-read sobre el histórico: no hay pipeline paralelo de SoV ni tabla de score nueva.
+
+**Modelo de datos.** Migración additive `20260629103000000_task-1270-recurring-regrade.sql`: `grader_profiles.recurring_regrade_enabled` (default false), `recurring_regrade_cadence` (`weekly|monthly`, default monthly), `recurring_regrade_next_at`, `recurring_regrade_last_run_id`, `recurring_regrade_last_at`, índice parcial de perfiles due y capability `growth.ai_visibility.regrade.manage` para superficies futuras de opt-in/cadencia. No hay backfill: la cadencia es prospectiva y explícita.
+
+**Gating + scope.** Sólo perfiles activos con `organization_id` y assignment vigente `ai_visibility_v1` con `metadata_json.aeo_tier='contracted'` entran al scheduler. Leads públicos one-shot quedan fuera por construcción. El run se atribuye como `run_source='portal_contracted'` y `cost_attribution='client'`, reusando el ledger/allowance de TASK-1277 en vez de crear un contador paralelo.
+
+**Idempotencia y concurrencia.** El claim de perfiles usa `FOR UPDATE OF p SKIP LOCKED` y adelanta `recurring_regrade_next_at` según la cadencia. Cada run usa idempotency key `growth-ai-visibility-regrade:{profileId}:{cadence}:{windowStart}` (`windowStart` mensual o lunes UTC semanal), por lo que reintentos del job no duplican gasto dentro de la ventana.
+
+**Budget guard.** Flag `GROWTH_AI_VISIBILITY_REGRADE_ENABLED` default OFF. Config env `GROWTH_AI_VISIBILITY_REGRADE_BATCH_SIZE` (default 5) y `GROWTH_AI_VISIBILITY_REGRADE_MONTHLY_BUDGET_USD` (default 50). Antes de claim/enqueue, el batch suma `estimated_cost_usd` de runs recurrentes del mes y calcula slots restantes contra el `costCeilingUsdPerRun` del modo `full`; si el presupuesto se agotó, responde `budget_exhausted` sin tocar perfiles ni encolar.
+
+**Worker + Scheduler.** Nuevo endpoint ops-worker `POST /growth/grader/regrade` (no llama providers; sólo encola). `services/ops-worker/deploy.sh` declara `ops-growth-grader-regrade` diario `0 8 * * *`, **pausado por defecto**, con handler también gateado por flag. Esto conserva la regla dura: Cloud Scheduler + ops-worker, NUNCA Vercel cron.
+
+**Observabilidad.** Nuevo reader `getGrowthAiVisibilityRegradeSignals()` registrado en `/admin/operations` con 3 signals: `growth.ai_visibility.regrade_lag`, `growth.ai_visibility.regrade_cost`, `growth.ai_visibility.regrade_stale_profiles`. DB vacía / flag OFF / sin perfiles opt-in → steady ok.
+
+### Invariantes operativos para agentes (Recurring re-grade — TASK-1270)
+
+- **NUNCA** activar el job sin `GROWTH_AI_VISIBILITY_REGRADE_ENABLED=true`, 1 perfil opt-in controlado en staging y budget sign-off. El job existe pausado; habilitarlo es rollout, no merge de código.
+- **NUNCA** re-gradear perfiles públicos/lead magnet one-shot. El scheduler sólo toma perfiles con `organization_id`, opt-in explícito y módulo AEO contratado.
+- **NUNCA** crear pipeline paralelo para SoV/trend: el re-grade sólo encola runs; `grader_runs` + `grader_scores` + `report/trend.ts` siguen siendo la verdad.
+- **NUNCA** cambiar `run_source` sin revisar el ledger de TASK-1277: los recurring runs hoy usan `portal_contracted` para quedar en el conteo/costo de cliente.
+- **SIEMPRE** que se haga rollout: aplicar migración, deploy worker con flag OFF, opt-in de 1 perfil, despausar job staging, disparar `gcloud scheduler jobs run ops-growth-grader-regrade`, verificar run `pending→running→terminal`, trend actualizado y signals steady/costo antes de prod.
+
 ## Delta 2026-06-28 — TASK-1263 gate de correo corporativo cableado en el intake del grader (code complete dev; rollout pendiente) · EPIC-020
 
 **Premisa corregida (Discovery).** El gate de correo corporativo de TASK-1254 (`emailPolicy.mode=block_field`) vive **exclusivamente dentro de `submitForm`** (`src/lib/growth/forms/commands.ts`), pero el intake del grader **nunca pasa por `submitForm`**: el route `POST /api/public/growth/ai-visibility/run` despacha entre `createPublicGraderRun` (a-medida, TASK-1240) y `createPublicGraderRunViaFormsEngine` (forms-engine, TASK-1251), y ambos persisten/encolan por su cuenta (`persistAcceptedSubmission` / `enqueueGraderDiagnostic`), sin tocar `submitForm`. → Publicar el grader-form con `emailPolicy` (la idea original de TASK-1263) habría sido **configuración inerte**. Decisión del operador: cablear el gate en ambas fachadas reusando el primitive.

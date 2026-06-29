@@ -295,6 +295,16 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
       source: operatorSource
     })
 
+    // TASK-1270 — regrade.manage: gobierna surfaces futuras de opt-in/cadencia; el
+    // scheduler automático corre como sistema y no depende de sesión humana.
+    addEntitlement(entries, {
+      module: 'growth',
+      capability: 'growth.ai_visibility.regrade.manage',
+      action: 'execute',
+      scope: 'tenant',
+      source: operatorSource
+    })
+
     // TASK-1282 — search_console.connect: el operador conecta la propiedad Search
     // Console de un cliente (OAuth 3-legged, token per-org) como parte de la operación
     // growth/medición. Mismo set operador que run.operator (scope tenant = puede operar

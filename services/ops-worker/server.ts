@@ -119,6 +119,7 @@ import { probeNextAuthSecretRoundTrip } from '@/lib/auth/readiness'
 import { resolveCleanSeedDate } from '@/lib/finance/account-balances-clean-seed-resolver'
 import { drainPendingGraderRuns, recoverStuckRunningRuns } from '@/lib/growth/ai-visibility/run-engine'
 import { isGraderEnabled } from '@/lib/growth/ai-visibility/flags'
+import { handleRecurringRegradeBatch } from '@/lib/growth/ai-visibility/regrade'
 import { dispatchPendingSubmissions } from '@/lib/growth/forms/dispatch'
 import { isFormsDispatchEnabled } from '@/lib/growth/forms/flags'
 
@@ -1660,6 +1661,42 @@ const handleGrowthGraderDrain = async (req: IncomingMessage, res: ServerResponse
   }
 }
 
+// ─── /growth/grader/regrade ─────────────────────────────────────────────────
+//
+// TASK-1270 — Re-grade recurrente de perfiles AEO opt-in. Este handler NO ejecuta
+// providers directamente: selecciona perfiles due, encola runs `full` idempotentes
+// y deja que `/growth/grader/drain` los reclame/ejecute con el run-engine canónico.
+// Cloud Scheduler > ops-worker por la misma razón que TASK-1234: staging visible y
+// duración/costo fuera del request Vercel.
+//
+// Body opcional: {batchSize?: number}
+const handleGrowthGraderRegrade = async (req: IncomingMessage, res: ServerResponse) => {
+  const body = await readBody(req)
+
+  const batchSize = typeof body.batchSize === 'number' && body.batchSize > 0
+    ? Math.min(50, Math.floor(body.batchSize))
+    : undefined
+
+  console.log(`[ops-worker] POST /growth/grader/regrade — batchSize=${batchSize ?? 'default'}`)
+
+  try {
+    const result = await handleRecurringRegradeBatch({ batchSize })
+
+    console.log(
+      `[ops-worker] /growth/grader/regrade done — claimed=${result.claimedProfiles} ` +
+        `enqueued=${result.enqueuedRuns} failed=${result.failedProfiles} skipped=${result.skipped ?? 'none'}`
+    )
+
+    json(res, 200, result)
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown grader regrade error'
+
+    console.error('[ops-worker] /growth/grader/regrade failed:', message)
+    captureWithDomain(error, 'growth', { tags: { source: 'ops_worker_growth_grader_regrade' } })
+    json(res, 502, { error: message })
+  }
+}
+
 // ─── /growth/forms/dispatch ─────────────────────────────────────────────────
 //
 // TASK-1229 — Motor Growth Forms: entrega async de submissions aceptadas. El submit
@@ -2343,6 +2380,12 @@ const server = createServer(async (req, res) => {
 
     if (method === 'POST' && path === '/growth/grader/drain') {
       await handleGrowthGraderDrain(req, res)
+
+      return
+    }
+
+    if (method === 'POST' && path === '/growth/grader/regrade') {
+      await handleGrowthGraderRegrade(req, res)
 
       return
     }

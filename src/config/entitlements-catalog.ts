@@ -2001,6 +2001,15 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     actions: ['execute'] as const,
     defaultScope: 'tenant'
   },
+  // TASK-1270 — regrade.manage: gobernanza futura del opt-in/cadencia del re-grade
+  // recurrente. El batch automático corre como sistema desde ops-worker; esta capability
+  // queda para surfaces humanas/agentes que habiliten/deshabiliten el monitoreo.
+  {
+    key: 'growth.ai_visibility.regrade.manage',
+    module: 'growth',
+    actions: ['execute'] as const,
+    defaultScope: 'tenant'
+  },
   // TASK-1229 — Growth Forms engine (dominio growth.forms). 8 capabilities gobernadas
   // (Full API Parity): cada acción de negocio nace como command/reader, no como botón.
   // Grant en runtime.ts (internal ∪ EFEONCE_ADMIN ∪ EFEONCE_ACCOUNT ∪ EFEONCE_OPERATIONS)
