@@ -184,6 +184,7 @@ import { getGrowthFormsPiiSignals } from './queries/growth-forms-pii-signals'
 import { getGrowthAiVisibilityLeadHandoffSignals } from './queries/growth-ai-visibility-lead-handoff-signals'
 import { getGrowthAiVisibilityReportEmailSignals } from './queries/growth-ai-visibility-report-email-signals'
 import { getGrowthAiVisibilityOperatorSendSignals } from './queries/growth-ai-visibility-operator-send-signals'
+import { getGrowthAiVisibilityOperatorGateSignals } from './queries/growth-ai-visibility-operator-gate-signals'
 import { getGrowthAiVisibilityEntitlementSignals } from './queries/growth-ai-visibility-entitlement-signals'
 import { getGrowthAiVisibilityRegradeSignals } from './queries/growth-ai-visibility-regrade-signals'
 import { getGrowthSearchConsoleTokenHealthSignal } from './queries/growth-search-console-token-health'
@@ -643,6 +644,7 @@ interface ReliabilityOverviewSources {
   growthAiVisibilityLeadHandoff?: ReliabilitySignal[] | null
   growthAiVisibilityReportEmail?: ReliabilitySignal[] | null
   growthAiVisibilityOperatorSend?: ReliabilitySignal[] | null
+  growthAiVisibilityOperatorGate?: ReliabilitySignal[] | null
   growthAiVisibilityEntitlement?: ReliabilitySignal[] | null
   growthAiVisibilityRegrade?: ReliabilitySignal[] | null
   growthSearchConsoleTokenHealth?: ReliabilitySignal | null
@@ -1067,6 +1069,7 @@ export const buildReliabilityOverview = (
     ...(sources.growthAiVisibilityLeadHandoff ?? []),
     ...(sources.growthAiVisibilityReportEmail ?? []),
     ...(sources.growthAiVisibilityOperatorSend ?? []),
+    ...(sources.growthAiVisibilityOperatorGate ?? []),
     ...(sources.growthAiVisibilityEntitlement ?? []),
     ...(sources.growthAiVisibilityRegrade ?? []),
     ...(sources.growthSearchConsoleTokenHealth ? [sources.growthSearchConsoleTokenHealth] : []),
@@ -1518,6 +1521,12 @@ export const getReliabilityOverview = async (
     preloadedSources.growthAiVisibilityOperatorSend !== undefined
       ? preloadedSources.growthAiVisibilityOperatorSend
       : await getGrowthAiVisibilityOperatorSendSignals().catch(() => null)
+
+  // TASK-1291 — gate de validación del cross-sell (prospectos no graduables mientras el flag está ON).
+  const growthAiVisibilityOperatorGate =
+    preloadedSources.growthAiVisibilityOperatorGate !== undefined
+      ? preloadedSources.growthAiVisibilityOperatorGate
+      : await getGrowthAiVisibilityOperatorGateSignals().catch(() => null)
 
   // TASK-1277 — entitlement & metering (integridad del chokepoint / budget de trials /
   // atribución cliente vs sales). DB vacía / portal OFF → steady ok.
@@ -2449,6 +2458,7 @@ export const getReliabilityOverview = async (
     growthAiVisibilityLeadHandoff,
     growthAiVisibilityReportEmail,
     growthAiVisibilityOperatorSend,
+    growthAiVisibilityOperatorGate,
     growthAiVisibilityEntitlement,
     growthAiVisibilityRegrade,
     growthSearchConsoleTokenHealth,
