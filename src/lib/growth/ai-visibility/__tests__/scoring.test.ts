@@ -101,6 +101,33 @@ describe('growth/ai-visibility — scoring engine', () => {
     expect(sov?.score).toBe(0) // 0 marca / 3 competidores
   })
 
+  it('category ownership exige categoria canonica cuando hay senales de categoria', () => {
+    const freeForm = computeGraderScore('run-1', [
+      finding({
+        findingId: 'f1',
+        promptId: 'p03',
+        brandMentioned: 'yes',
+        confidence: 0.85,
+        categoryAssociations: ['categoria inventada por el proveedor']
+      })
+    ]).dimensions.find(d => d.key === 'category_ownership')
+
+    expect(freeForm?.score).toBe(0)
+    expect(freeForm?.reasons[0]).toContain('categoría canónica: 0')
+
+    const canonical = computeGraderScore('run-1', [
+      finding({
+        findingId: 'f1',
+        promptId: 'p03',
+        brandMentioned: 'yes',
+        confidence: 0.85,
+        categoryAssociations: ['ASaaS']
+      })
+    ]).dimensions.find(d => d.key === 'category_ownership')
+
+    expect(canonical?.score).toBe(100)
+  })
+
   it('sin findings → overallScore null (insufficient, sin inventar)', () => {
     const result = computeGraderScore('run-1', [])
 

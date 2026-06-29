@@ -21,8 +21,15 @@ import { SCORE_DIMENSION_CONFIG_BY_KEY, type ScoreDimensionKey } from '../scorin
 import { type DimensionScore, type PersistedGraderScore } from '../scoring/engine'
 import { computeReadinessScore, type AxisReadinessScore } from '../scoring/readiness-engine'
 import {
+  CATEGORY_TAXONOMY_VERSION,
+  getCategoryTaxonomyNode,
+  mapCategoryCandidatesToTaxonomy,
+  normalizeCategoryAssociationIds
+} from '../taxonomy'
+import {
   GROWTH_AI_VISIBILITY_RECOMMENDATION_PACK_VERSION,
   GROWTH_AI_VISIBILITY_REPORT_VERSION,
+  type CategoryTaxonomySummary,
   type CitationInsight,
   type CitationSourceBreakdown,
   type ClientGraderReport,
@@ -354,6 +361,52 @@ const buildPositionSummary = (findings: NormalizedFinding[]): PositionSummary =>
   }
 }
 
+/** Categorias gobernadas agregadas. Nunca expone raw LLM candidates ni legacy labels libres. */
+const buildCategoryTaxonomySummary = (findings: NormalizedFinding[]): CategoryTaxonomySummary => {
+  const rawAssociations = findings.flatMap(finding => finding.categoryAssociations)
+
+  const mappedAssociations = mapCategoryCandidatesToTaxonomy({
+    candidates: rawAssociations,
+    evidenceSource: 'legacy_string'
+  })
+
+  const canonicalIds = normalizeCategoryAssociationIds(rawAssociations)
+  const counts = new Map<string, number>()
+
+  for (const nodeId of canonicalIds) {
+    counts.set(nodeId, rawAssociations.filter(candidate => normalizeCategoryAssociationIds([candidate]).includes(nodeId)).length)
+  }
+
+  const categories = [...counts.entries()]
+    .map(([nodeId, count]) => {
+      const node = getCategoryTaxonomyNode(nodeId)
+
+      if (!node) return null
+
+      return {
+        nodeId,
+        level: node.level,
+        label: node.label,
+        count,
+        taxonomyVersion: CATEGORY_TAXONOMY_VERSION
+      }
+    })
+    .filter((entry): entry is NonNullable<typeof entry> => entry !== null)
+    .sort((a, b) => (b.count !== a.count ? b.count - a.count : a.nodeId.localeCompare(b.nodeId)))
+
+  const ambiguousCount = mappedAssociations.filter(association => association.mappingStatus === 'ambiguous').length
+  const unmappedCount = mappedAssociations.filter(association => association.mappingStatus === 'needs_review').length
+
+  return {
+    taxonomyVersion: CATEGORY_TAXONOMY_VERSION,
+    status: rawAssociations.length === 0 ? 'unknown' : categories.length > 0 ? 'mapped' : 'needs_review',
+    categories,
+    totalSignals: rawAssociations.length,
+    unmappedCount,
+    ambiguousCount
+  }
+}
+
 /**
  * Hallazgos narrativos por motor (cada motor es un canal distinto) desde la
  * presencia por proveedor. INTERNAL ONLY. Solo motores con respuestas evaluables.
@@ -504,6 +557,8 @@ export const toPublicGraderReport = (report: GraderReport): PublicGraderReport =
   citationInsight: report.citationInsight,
   // TASK-1268 — dominios agregados top-N, sin URLs ni paths.
   citationSourceBreakdown: report.citationSourceBreakdown,
+  // TASK-1272 — categorias canonicas agregadas, sin candidatos raw.
+  categoryTaxonomySummary: report.categoryTaxonomySummary,
   sentimentSummary: report.sentimentSummary,
   positionSummary: report.positionSummary,
   // El trend es agregado puro (deltas numéricos, sin raw text) → public-safe.
@@ -557,6 +612,7 @@ export const toClientGraderReport = (report: GraderReport): ClientGraderReport =
   providerPresence: report.providerPresence,
   citationInsight: report.citationInsight,
   citationSourceBreakdown: report.citationSourceBreakdown,
+  categoryTaxonomySummary: report.categoryTaxonomySummary,
   sentimentSummary: report.sentimentSummary,
   positionSummary: report.positionSummary,
   trend: report.trend,
@@ -619,6 +675,7 @@ export const buildGraderReport = (input: BuildGraderReportInput): GraderReport =
     accuracyFindings: buildAccuracyFindings(findings, input.brandTruth ?? null),
     citationInsight: buildCitationInsight(findings, input.subjectDomain ?? null),
     citationSourceBreakdown,
+    categoryTaxonomySummary: buildCategoryTaxonomySummary(findings),
     sentimentSummary: buildSentimentSummary(findings),
     positionSummary: buildPositionSummary(findings),
     trend: buildReportTrend(score, run.promptPackVersion, previous ?? null),

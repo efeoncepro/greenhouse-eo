@@ -1246,6 +1246,22 @@ La frontera public-safe cambia de "no exponer dominios crudos" a "exponer sólo 
 - **NUNCA** inventar dominios cuando el run no trae citas evaluables: usar `domains=[]` + `reason='sin_citas_evaluables'`.
 - **SIEMPRE** enriquecer digital PR desde dominios no propios; el dominio propio sirve para clasificación/contexto, no como target principal de PR externa.
 
+## Delta 2026-06-29 — TASK-1272 category taxonomy + brand categorization contract (code complete dev)
+
+El grader agrega un source of truth repo-governed para categorización de marca en `src/lib/growth/ai-visibility/taxonomy/**`: `CATEGORY_TAXONOMY` versionada (`category_taxonomy_v1`), tipos `CategoryTaxonomyNode`/`CategoryAssociation`, validador y mapper determinista `mapCategoryCandidateToTaxonomy`. La taxonomía separa los niveles `industry`, `sector`, `product_service_category`, `use_case`, `buyer_persona` y `market`, con aliases es/en, parentIds, ejemplos y estado `active|deprecated|internal`. El catálogo V1 parte amplio y granular (122 nodos: 18 industrias, 21 sectores, 35 categorías, 19 casos de uso, 15 buyer personas y 14 mercados) para reconocer categorías reales sin depender de strings libres del LLM.
+
+El contrato de compatibilidad para V1 mantiene `NormalizedFinding.categoryAssociations: string[]` y la columna `greenhouse_growth.normalized_findings.category_associations` sin migración. La diferencia semántica es que los nuevos writes desde `llm-extraction.ts` guardan sólo IDs canónicos; los strings legacy se aceptan como candidatos y se mapean on-read/on-score vía compat layer. Candidatos desconocidos o ambiguos degradan a `needs_review`/`ambiguous` en el mapper y NO se publican como label de producto.
+
+`scoreCategoryOwnership` ahora distingue entre "hay señales de categoría" y "hay categoría canónica": si un finding trae strings no mapeados, esos strings no cuentan como ownership fuerte. Si no hay señales de categoría porque el extractor no corrió, se preserva el fallback determinista de presencia en descubrimiento para no romper V1 con el hook OFF. El report agrega `categoryTaxonomySummary` para internal/public/client: IDs canónicos agregados, nivel, label es/en, count y versión de taxonomía; nunca raw candidates, excerpts ni razonamiento interno.
+
+### Invariantes operativos para agentes (category taxonomy)
+
+- **NUNCA** publicar labels libres de un provider/LLM como verdad de producto. Todo output visible de categoría debe salir de `CATEGORY_TAXONOMY` o degradar a `unknown`/`needs_review`.
+- **NUNCA** dejar que un LLM cree categorías canónicas en runtime. El LLM sólo puede proponer candidatos; `mapCategoryCandidateToTaxonomy` gobierna el mapping.
+- **NUNCA** mezclar niveles taxonómicos: industria, sector, categoría de producto/servicio, caso de uso, buyer/persona y mercado son dimensiones distintas.
+- **NUNCA** usar strings no mapeados para inflar `category_ownership`; si hay categoría intentada pero no canónica, cuenta como brecha/review, no como evidencia fuerte.
+- **SIEMPRE** preservar la frontera public-safe: `categoryTaxonomySummary` puede exponer ID/label/nivel/count/versión, pero no candidatos raw, excerpts, prompts ni cadenas internas.
+
 ## Delta 2026-06-24 — TASK-1238 brand accuracy / hallucination monitoring (complete dev)
 
 Detecta cuándo la IA dice cosas **factualmente falsas** de la marca (no sólo ausente/negativo) contrastando los findings contra la **verdad declarada** del perfil (`brand_name`/`category`/`competitors_declared`) — "no basta aparecer; importa que la IA diga la verdad" (skill `seo-aeo` §07C; crítico en YMYL/Globe). Módulo puro `src/lib/growth/ai-visibility/accuracy/` (`buildBrandTruth` + `detectBrandInaccuracies` + `hasLikelyHallucination`); escalación en `review-gates/gates.ts`; surface internal-only en `report/builder.ts`; signal en `reliability/queries/growth-ai-visibility-scoring-signals.ts`. **Sin migración, sin tocar el `grader_score` numérico, sin capability nueva** (OQ1 resuelta → NO nueva dimensión en score v1; OQ2 → verdad declarada limitada, `service_description` = follow-up; OQ3 → determinista-first).

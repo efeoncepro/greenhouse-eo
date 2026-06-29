@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `EPIC-020`
-- Status real: `Diseno`
+- Status real: `Cerrada`
 - Rank: `TBD`
 - Domain: `growth|ai|data-quality|reliability`
 - Blocked by: `none`
@@ -176,11 +176,11 @@ Reglas obligatorias:
 
 ### Acceptance criteria additions
 
-- [ ] Source of truth, contract surface and consumers are named with real paths or objects.
-- [ ] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
-- [ ] Migration/backfill/rollback posture is explicit and proportional to risk.
-- [ ] Runtime or DB evidence is listed for any change beyond docs/tooling.
-- [ ] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks.
+- [x] Source of truth, contract surface and consumers are named with real paths or objects.
+- [x] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
+- [x] Migration/backfill/rollback posture is explicit and proportional to risk.
+- [x] Runtime or DB evidence is listed for any change beyond docs/tooling.
+- [x] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks.
 
 ## Capability Definition of Done — Full API Parity gate
 
@@ -191,6 +191,31 @@ N/A — no nueva capability de negocio. La task modifica primitives internos de 
      El agente que toma esta task ejecuta Discovery y produce
      plan.md segun TASK_PROCESS.md. No llenar al crear la task.
      ═══════════════════════════════════════════════════════════ -->
+
+## Discovery / Audit — 2026-06-29
+
+### Verified runtime/contracts
+
+- `NormalizedFinding.categoryAssociations` sigue siendo `string[]` y se persiste en `greenhouse_growth.normalized_findings.category_associations`; no hay columna JSON/metadata para asociaciones ricas.
+- `normalizeObservation()` preserva `categoryAssociations=[]`; el hook `enrichFindingWithLlm()` es el unico punto que hoy puede proponer categorias de prosa.
+- `scoreCategoryOwnership()` trataba cualquier string como evidencia fuerte cuando existian datos de categoria.
+- `buildGraderReport()` ya es el punto canonico para agregados public-safe; `PublicGraderReport`/`ClientGraderReport` son tipos separados.
+
+### Decisions
+
+- V1 no crea migracion: `category_associations` mantiene `string[]`, pero los nuevos writes guardan **IDs canonicos** de taxonomia.
+- Los strings historicos/legacy (`marketing`, `ASaaS`, `Inbound Marketing`, etc.) se tratan como candidatos y pasan por compat mapper antes de scoring/report.
+- Candidatos desconocidos o ambiguos no se publican como labels y no cuentan como `category_ownership` fuerte.
+- `categoryTaxonomySummary` es el agregado public-safe para reportes: ID canonico, nivel, label es/en, count y version de taxonomia; nunca raw candidate text.
+
+## Implementation Plan — 2026-06-29
+
+1. Crear `src/lib/growth/ai-visibility/taxonomy/` con contratos, catalogo versionado, validador, mapper y barrel.
+2. Integrar mapper en `llm-extraction.ts` para que el LLM entregue candidatos raw pero el finding guarde solo IDs canonicos.
+3. Endurecer `scoreCategoryOwnership` para distinguir señales de categoria vs categoria canonica.
+4. Agregar `categoryTaxonomySummary` al report interno/publico/cliente y mantener leak-safe.
+5. Ajustar brand accuracy para comparar categoria declarada contra aliases/IDs canonicos.
+6. Agregar tests de catalogo/mapper, scoring, report summary y leak de candidatos no gobernados.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 3 — EXECUTION SPEC
@@ -338,14 +363,37 @@ Todo eso debe provenir de categorias gobernadas, no de una frase libre del prove
 
 ## Acceptance Criteria
 
-- [ ] Existe un source of truth versionado para categorias del grader bajo `src/lib/growth/ai-visibility/taxonomy/`.
-- [ ] La taxonomia separa industria, sector, categoria de producto/servicio, caso de uso, buyer/persona y mercado.
-- [ ] `categoryAssociations` product-facing se alimenta solo de categorias canonicas o degrada a `unknown` / `needs_review`.
-- [ ] El LLM/prose extractor no puede publicar categorias libres como verdad de producto.
-- [ ] `scoreCategoryOwnership` distingue evidencia canonica de strings legacy/free-form.
-- [ ] Golden/eval fixtures cubren marcas de multiples industrias y al menos un caso ambiguo/homonimo.
-- [ ] `PublicGraderReport` no expone raw excerpts ni candidatos internos.
-- [ ] Rollback y shadow/cutover quedan documentados en la task/arquitectura aplicable.
+- [x] Existe un source of truth versionado para categorias del grader bajo `src/lib/growth/ai-visibility/taxonomy/`.
+- [x] La taxonomia separa industria, sector, categoria de producto/servicio, caso de uso, buyer/persona y mercado.
+- [x] `categoryAssociations` product-facing se alimenta solo de categorias canonicas o degrada a `unknown` / `needs_review`.
+- [x] El LLM/prose extractor no puede publicar categorias libres como verdad de producto.
+- [x] `scoreCategoryOwnership` distingue evidencia canonica de strings legacy/free-form.
+- [x] Golden/eval fixtures cubren marcas de multiples industrias y al menos un caso ambiguo/homonimo.
+- [x] `PublicGraderReport` no expone raw excerpts ni candidatos internos.
+- [x] Rollback y shadow/cutover quedan documentados en la task/arquitectura aplicable.
+
+## Execution Evidence — 2026-06-29
+
+- Implementado `src/lib/growth/ai-visibility/taxonomy/**` (`CATEGORY_TAXONOMY_VERSION=category_taxonomy_v1`, catalogo amplio/granular de 122 nodos, tipos, validador y mapper).
+- `enrichFindingWithLlm()` ahora mapea candidatos a IDs canonicos antes de escribir `categoryAssociations`.
+- `scoreCategoryOwnership()` ya no cuenta strings libres/no mapeados como ownership fuerte.
+- `buildGraderReport()` agrega `categoryTaxonomySummary` a internal/public/client report DTOs sin raw candidates.
+- `detectBrandInaccuracies()` compara categoria declarada contra aliases/IDs canonicos.
+- Tests focales: `category-taxonomy`, `scoring`, `report-builder`, `report-public-leak`, `report-client-leak`, `fix-it-command`, `fix-it-artifacts`, `client-report-reader` → 45/45 passing.
+- Eval fixture nuevo: `src/lib/growth/ai-visibility/evals/category-taxonomy-eval.v1.json`; cubre mapeos multi-industria/sector/persona/mercado + `ambiguous` + `needs_review`.
+- Amplitud V1 verificada: 18 industrias, 21 sectores, 35 categorias de producto/servicio, 19 casos de uso, 15 buyer personas y 14 mercados.
+- Suite AI Visibility explícita: `pnpm exec vitest run $(rg --files src/lib/growth/ai-visibility/__tests__ -g '*.test.ts')` → 52 files / 359 tests passing.
+- ESLint focal sobre archivos de TASK-1272 → passing.
+- `pnpm lint` global → passing.
+- `pnpm task:lint --task TASK-1272` → errors=0 warnings=0.
+- `pnpm task:lint --changed` → scanned=2, template=2, errors=0 warnings=0.
+- `pnpm ops:lint --changed` → errors=0 warnings=0.
+- `git diff --check` → passing.
+- `docs:closure-check` scoped via `node scripts/check-documentation-closure.mjs -- <paths TASK-1272>` → warnings no bloqueantes: `architecture_doc_monolith` para el doc histórico del grader y `ui_docs_check` por fixture visible; no hay UI runtime ni nueva workflow visible en esta task.
+- `pnpm docs:context-check` → errors=0; warnings históricos de tamaño de `Handoff.md`.
+- `pnpm qa:gates --changed --agent codex --task TASK-1272 --data --docs` → advisory contaminado por WIP ajeno Search Console/TASK-1283 en el worktree; los dominios auth/secrets/migration sugeridos corresponden a esos archivos ajenos, no al delta propio de TASK-1272.
+- `pnpm test -- src/lib/growth/ai-visibility` ejecutado según spec, pero en este workspace filtró el repo completo y falló por 5 tests ajenos de `src/lib/growth/search-console/__tests__/command.test.ts` (WIP TASK-1283), no por AI Visibility.
+- `tsc --noEmit` global bloqueado por cambios ajenos de Search Console/TASK-1283 (`siteUrl: string | null` vs `string` en `src/lib/growth/search-console/reader.ts` y page lifecycle); no corresponde a TASK-1272.
 
 ## Handoff Notes
 
@@ -355,8 +403,8 @@ Todo eso debe provenir de categorias gobernadas, no de una frase libre del prove
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown sincronizado.
-- [ ] El archivo vive en la carpeta correcta.
-- [ ] `docs/tasks/README.md` sincronizado.
-- [ ] `docs/tasks/TASK_ID_REGISTRY.md` sincronizado.
-- [ ] `Handoff.md` actualizado si la ejecucion cambia estado operativo o deja rollout pendiente.
+- [x] `Lifecycle` del markdown sincronizado.
+- [x] El archivo vive en la carpeta correcta.
+- [x] `docs/tasks/README.md` sincronizado.
+- [x] `docs/tasks/TASK_ID_REGISTRY.md` sincronizado.
+- [x] `Handoff.md` actualizado si la ejecucion cambia estado operativo o deja rollout pendiente.

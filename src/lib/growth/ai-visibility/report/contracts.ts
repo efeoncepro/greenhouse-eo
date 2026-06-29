@@ -18,6 +18,7 @@ import { type AccuracyConfidence, type AccuracyFindingKind } from '../accuracy/c
 import { type GrowthAiVisibilityProviderId } from '../contracts'
 import { type ProbeAxis, type ProbeKind } from '../probes/contracts'
 import { type ScoreDimensionKey } from '../scoring/config'
+import { type CategoryTaxonomyLevel, type CategoryTaxonomyVersion } from '../taxonomy'
 
 export const GROWTH_AI_VISIBILITY_REPORT_VERSION = 'ai_visibility_report_v1' as const
 export const GROWTH_AI_VISIBILITY_RECOMMENDATION_PACK_VERSION = 'ai_visibility_recommendation_pack_v1' as const
@@ -244,6 +245,30 @@ export interface PositionSummary {
   ranked: number
 }
 
+// ── Governed category taxonomy summary (TASK-1272) ──────────────────────────
+
+export const CATEGORY_TAXONOMY_SUMMARY_STATUSES = ['mapped', 'unknown', 'needs_review'] as const
+export type CategoryTaxonomySummaryStatus = (typeof CATEGORY_TAXONOMY_SUMMARY_STATUSES)[number]
+
+/** Categoria agregada public-safe: ID canonico + labels, sin raw candidate text. */
+export interface ReportCategoryAssociation {
+  nodeId: string
+  level: CategoryTaxonomyLevel
+  label: { es: string; en: string }
+  count: number
+  taxonomyVersion: CategoryTaxonomyVersion
+}
+
+/** Resumen por taxonomia gobernada. `unmappedCount` no expone los strings crudos. */
+export interface CategoryTaxonomySummary {
+  taxonomyVersion: CategoryTaxonomyVersion
+  status: CategoryTaxonomySummaryStatus
+  categories: ReportCategoryAssociation[]
+  totalSignals: number
+  unmappedCount: number
+  ambiguousCount: number
+}
+
 // ── Citation source domain breakdown (TASK-1268) ────────────────────────────
 
 export const CITATION_SOURCE_CLASSIFICATIONS = ['own_domain', 'competitor', 'third_party', 'ugc'] as const
@@ -396,6 +421,7 @@ export interface GraderReport {
   accuracyFindings: ReportAccuracyFinding[]
   citationInsight: CitationInsight
   citationSourceBreakdown: CitationSourceBreakdown
+  categoryTaxonomySummary: CategoryTaxonomySummary
   sentimentSummary: SentimentSummary
   positionSummary: PositionSummary
   trend: ReportTrend
@@ -434,6 +460,7 @@ export interface ClientGraderReport {
   providerPresence: ProviderPresence[]
   citationInsight: CitationInsight
   citationSourceBreakdown: CitationSourceBreakdown
+  categoryTaxonomySummary: CategoryTaxonomySummary
   sentimentSummary: SentimentSummary
   positionSummary: PositionSummary
   trend: ReportTrend
@@ -479,6 +506,7 @@ export interface PublicGraderReport {
   // TASK-1237 — agregados seguros (%/conteos).
   citationInsight: CitationInsight
   citationSourceBreakdown: CitationSourceBreakdown
+  categoryTaxonomySummary: CategoryTaxonomySummary
   sentimentSummary: SentimentSummary
   positionSummary: PositionSummary
   trend: ReportTrend

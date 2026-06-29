@@ -9,6 +9,7 @@
  */
 
 import { type NormalizedFinding } from '../normalization/contracts'
+import { mapCategoryCandidateToTaxonomy, normalizeCategoryAssociationIds } from '../taxonomy'
 import { type AccuracyFinding, type BrandTruth } from './contracts'
 
 const normalizeToken = (value: string): string => value.toLowerCase().trim()
@@ -53,17 +54,28 @@ const detectCategoryMismatch = (findings: NormalizedFinding[], truth: BrandTruth
 
   if (categoryToken.length === 0) return null
 
+  const declaredCategory = mapCategoryCandidateToTaxonomy({
+    candidate: truth.category,
+    evidenceSource: 'declared_profile'
+  })
+
   const branded = findings.filter(f => f.brandMentioned === 'yes' && f.categoryAssociations.length > 0)
 
   if (branded.length === 0) return null
 
-  const anyDeclaredMatch = branded.some(f =>
-    f.categoryAssociations.some(association => {
+  const anyDeclaredMatch = branded.some(f => {
+    const canonicalIds = normalizeCategoryAssociationIds(f.categoryAssociations)
+
+    if (declaredCategory.mappingStatus === 'mapped' && declaredCategory.nodeId) {
+      return canonicalIds.includes(declaredCategory.nodeId)
+    }
+
+    return f.categoryAssociations.some(association => {
       const token = normalizeToken(association)
 
       return token.includes(categoryToken) || categoryToken.includes(token)
     })
-  )
+  })
 
   if (anyDeclaredMatch) return null
 

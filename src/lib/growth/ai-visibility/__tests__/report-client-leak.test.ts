@@ -27,6 +27,7 @@ const SENSITIVE_DRIFT = 'la IA dijo que somos los más baratos del mercado'
 const SENSITIVE_CITATION = 'foro-privado-interno.example.com'
 const SENSITIVE_CITATION_URL = `https://${SENSITIVE_CITATION}/private/path?token=secret`
 const SENSITIVE_REVIEW = 'detalle interno de review que no debe salir'
+const SENSITIVE_CATEGORY_CANDIDATE = 'categoria interna inventada por el proveedor'
 
 // Las 6 dimensiones driver en gap → 6 recomendaciones (>3) para probar que el cliente NO se acota.
 const buildWithSensitiveEvidence = () => {
@@ -39,6 +40,7 @@ const buildWithSensitiveEvidence = () => {
     makeFinding({
       brandMentioned: 'yes',
       competitorsMentioned: ['Acme'],
+      categoryAssociations: [SENSITIVE_CATEGORY_CANDIDATE],
       messageDriftClaims: [SENSITIVE_DRIFT],
       citationDomains: [SENSITIVE_CITATION],
       sourceTypes: ['owned']
@@ -96,6 +98,7 @@ describe('growth/ai-visibility — client report DTO (defensa en 3 capas)', () =
     expect(serialized).not.toContain('/private/path')
     expect(serialized).not.toContain('token=secret')
     expect(serialized).not.toContain('Private')
+    expect(serialized).not.toContain(SENSITIVE_CATEGORY_CANDIDATE)
     expect(serialized).not.toContain(SENSITIVE_REVIEW)
   })
 

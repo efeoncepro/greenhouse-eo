@@ -33,6 +33,7 @@ import {
   type NormalizedFinding,
   type SentimentLabel
 } from './contracts'
+import { mapCategoryCandidatesToTaxonomy, toCanonicalCategoryAssociationIds } from '../taxonomy'
 
 const EXTRACTION_MODEL = 'claude-haiku-4-5-20251001'
 
@@ -131,7 +132,12 @@ export const enrichFindingWithLlm = async (
         finding.brandMentioned === 'unknown' || finding.brandMentioned === 'ambiguous' ? brandMentioned : finding.brandMentioned,
       sentimentLabel,
       sentimentScore,
-      categoryAssociations: sanitizeStringArray(data.categoryAssociations, 8),
+      categoryAssociations: toCanonicalCategoryAssociationIds(
+        mapCategoryCandidatesToTaxonomy({
+          candidates: sanitizeStringArray(data.categoryAssociations, 8),
+          evidenceSource: 'llm_candidate'
+        })
+      ),
       messageDriftClaims: sanitizeStringArray(data.messageDriftClaims, 5),
       confidence: clamp01(typeof data.confidence === 'number' ? data.confidence : finding.confidence)
     }

@@ -166,6 +166,29 @@ describe('growth/ai-visibility — report builder', () => {
     expect(report.recommendations.find(rec => rec.gapKey === 'weak_citation_quality')?.action).toContain('g2.com, reddit.com')
   })
 
+  it('categoryTaxonomySummary expone categorias canonicas agregadas sin candidatos raw', () => {
+    const report = buildGraderReport({
+      score: makeScore({ category_ownership: 25 }),
+      findings: [
+        makeFinding({ brandMentioned: 'yes', categoryAssociations: ['ASaaS', 'marketing'] }),
+        makeFinding({ brandMentioned: 'yes', categoryAssociations: ['categoria secreta del proveedor'] })
+      ],
+      run: RUN
+    })
+
+    expect(report.categoryTaxonomySummary.status).toBe('mapped')
+    expect(report.categoryTaxonomySummary.categories.map(category => category.nodeId)).toEqual([
+      'category:growth_operating_system',
+      'sector:marketing_services'
+    ])
+    expect(report.categoryTaxonomySummary.unmappedCount).toBe(1)
+
+    const pub = JSON.stringify(report.categoryTaxonomySummary)
+
+    expect(pub).not.toContain('categoria secreta del proveedor')
+    expect(pub).toContain('Growth Operating System')
+  })
+
   it('competitiveSov como lista comparable; sourceTypeSummary categórico; presencia por motor', () => {
     const findings = [
       makeFinding({ provider: 'openai', brandMentioned: 'yes', competitorsMentioned: ['Acme', 'Globex'], sourceTypes: ['owned', 'news'] }),

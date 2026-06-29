@@ -156,6 +156,29 @@ export const SAMPLE_INTERNAL_REPORT: GraderReport = {
     uniqueDomains: 4,
     reason: null
   },
+  categoryTaxonomySummary: {
+    taxonomyVersion: 'category_taxonomy_v1',
+    status: 'mapped',
+    categories: [
+      {
+        nodeId: 'category:aeo_ai_visibility',
+        level: 'product_service_category',
+        label: { es: 'AEO / AI Visibility', en: 'AEO / AI Visibility' },
+        count: 18,
+        taxonomyVersion: 'category_taxonomy_v1'
+      },
+      {
+        nodeId: 'sector:martech',
+        level: 'sector',
+        label: { es: 'Martech', en: 'Martech' },
+        count: 12,
+        taxonomyVersion: 'category_taxonomy_v1'
+      }
+    ],
+    totalSignals: 30,
+    unmappedCount: 0,
+    ambiguousCount: 0
+  },
   sentimentSummary: {
     positive: 38,
     neutral: 45,

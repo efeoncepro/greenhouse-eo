@@ -13,6 +13,7 @@ import {
   type GrowthAiVisibilityPromptDefinition
 } from '../prompt-packs/prompt-pack-v1'
 import { type NormalizedFinding } from '../normalization/contracts'
+import { hasCanonicalCategoryAssociations } from '../taxonomy'
 import {
   AI_VISIBILITY_SCORE_VERSION,
   SCORE_DIMENSION_CONFIG_BY_KEY,
@@ -141,19 +142,20 @@ const scoreCategoryOwnership = (findings: NormalizedFinding[]): DimensionScore =
   }
 
   // Dueño de categoría = presente en descubrimiento Y asociado a la categoría.
-  // Si hay datos de categoría (LLM) se exige asociación explícita; si no, se usa
-  // la sola presencia en descubrimiento (determinista, menor señal).
+  // Si hay señales de categoría (LLM/legacy) se exige asociación canónica; strings
+  // libres no mapeados NO cuentan como ownership fuerte. Si no hay señales, se usa
+  // la sola presencia en descubrimiento como fallback determinista de menor señal.
   const present = discovery.filter(f => f.brandMentioned === 'yes').length
-  const owns = discovery.filter(f => f.brandMentioned === 'yes' && f.categoryAssociations.length > 0).length
-  const hasCategoryData = discovery.some(f => f.categoryAssociations.length > 0)
-  const base = hasCategoryData ? owns : present
+  const owns = discovery.filter(f => f.brandMentioned === 'yes' && hasCanonicalCategoryAssociations(f.categoryAssociations)).length
+  const hasCategorySignals = discovery.some(f => f.categoryAssociations.length > 0)
+  const base = hasCategorySignals ? owns : present
 
   return dimension(
     'category_ownership',
     (base / discovery.length) * 100,
     discovery.length,
     avgConfidence(discovery),
-    [`Presente en ${present}/${discovery.length} prompts de descubrimiento (con categoría explícita: ${owns}).`]
+    [`Presente en ${present}/${discovery.length} prompts de descubrimiento (con categoría canónica: ${owns}).`]
   )
 }
 
