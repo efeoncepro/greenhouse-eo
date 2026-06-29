@@ -1,3 +1,7 @@
+## Sesion 2026-06-29 — TASK-1271 Prose Extraction Router (cost-efficient) — Claude — 🔧 in-progress
+
+> **Intake:** `/implement-task 1271`. Task `to-do` → `in-progress` (sin branch; develop local-first, sin push). Backend-data / integration. Desacopla el hook de prose extraction (sentiment/category/drift) de Anthropic en un puerto `ProseExtractionProvider` + router con candidatos low-cost (Gemini/OpenAI) usando los clientes canónicos `src/lib/ai/*`, todo gateado y **behavior-preserving** (flags OFF → comportamiento actual; default `anthropic`). Open Questions resueltas con la propuesta de la spec: (1) no decidir el default por intuición → eval ambos en Slice 3; (2) shadow solo en eval allowlisted (no doble costo en runs normales). `grader_score` sigue determinista; fallo/schema-invalid → finding determinista intacto.
+
 ## Sesion 2026-06-29 — TASK-1285 website canónica + rollout staging TASK-1277 — Claude — ✅ complete
 
 > **Contexto:** continuación de la sesión de TASK-1278. El operador pidió "terminar todo lo que falte de 1277" (rollout) y, al diagnosticar Berel, detectó que su web (`berel.com`, en HubSpot) NO se persistía en la org → pidió arreglarlo robusto+escalable (invocando arch-architect). Trabajo en `develop` local-first.
