@@ -4,7 +4,7 @@ import 'server-only'
 // report-artifact barrel: the barrel re-exports the 'use client' web component (MUI),
 // which would bloat / break the ops-worker esbuild bundle (@core boundary) where the
 // reactive email consumer runs. The model is pure TS; the PDF renderer is server-only.
-import { modelFromPublicReport } from '@/components/growth/ai-visibility/report-artifact/model'
+import { modelFromPublicReport, type ReportArtifactModel } from '@/components/growth/ai-visibility/report-artifact/model'
 import { renderAiVisibilityReportPdf } from '@/components/growth/ai-visibility/report-artifact/pdf/render-ai-visibility-report-pdf'
 import type { ReportHeader } from '@/components/growth/ai-visibility/report-artifact/web/AiVisibilityReportArtifact'
 import type { PublicGraderReport } from '@/lib/growth/ai-visibility/report/contracts'
@@ -58,12 +58,16 @@ const formatSizeLabel = (bytes: number): string => {
 export const buildAiVisibilityReportAttachmentFilename = (organizationName: string): string =>
   `informe-visibilidad-ia-${slugifyOrganization(organizationName)}.pdf`
 
-export const buildAiVisibilityReportAttachment = async (input: {
-  publicReport: PublicGraderReport
+/**
+ * Núcleo: renderiza el adjunto desde un `ReportArtifactModel` ya armado. Lo usan tanto el path
+ * público (snapshot → modelFromPublicReport) como el cross-sell operador (TASK-1279, reporte
+ * leak-safe del cliente → modelFromClientReport), sin duplicar el render PDF.
+ */
+export const buildAiVisibilityReportAttachmentFromModel = async (input: {
+  model: ReportArtifactModel
   header: ReportHeader
 }): Promise<AiVisibilityReportAttachment> => {
-  const model = modelFromPublicReport(input.publicReport, 'attachment')
-  const content = await renderAiVisibilityReportPdf({ model, header: input.header })
+  const content = await renderAiVisibilityReportPdf({ model: input.model, header: input.header })
 
   return {
     filename: buildAiVisibilityReportAttachmentFilename(input.header.organizationName),
@@ -73,3 +77,12 @@ export const buildAiVisibilityReportAttachment = async (input: {
     byteLength: content.length
   }
 }
+
+export const buildAiVisibilityReportAttachment = async (input: {
+  publicReport: PublicGraderReport
+  header: ReportHeader
+}): Promise<AiVisibilityReportAttachment> =>
+  buildAiVisibilityReportAttachmentFromModel({
+    model: modelFromPublicReport(input.publicReport, 'attachment'),
+    header: input.header
+  })

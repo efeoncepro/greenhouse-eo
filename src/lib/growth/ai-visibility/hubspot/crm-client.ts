@@ -152,6 +152,107 @@ const associateContactToCompany = async (token: string, contactId: string, compa
   if (!res.ok) throw new HubSpotApiError(res.status)
 }
 
+/** Asociación default genérica (v4) `from → to`. Idempotente: re-asociar no duplica. */
+const associateDefault = async (
+  token: string,
+  fromType: string,
+  fromId: string,
+  toType: string,
+  toId: string,
+): Promise<void> => {
+  const res = await hubspotFetch(
+    token,
+    `/crm/v4/objects/${fromType}/${fromId}/associations/default/${toType}/${toId}`,
+    'PUT',
+  )
+
+  if (!res.ok) throw new HubSpotApiError(res.status)
+}
+
+/** Crea un objeto Lead (`leads`) con su `hs_lead_name` + props. Devuelve el lead id. */
+const createLeadObject = async (
+  token: string,
+  lead: { name: string; properties: Record<string, string> },
+): Promise<string> => {
+  const properties: Record<string, string> = { hs_lead_name: lead.name, ...lead.properties }
+  const res = await hubspotFetch(token, '/crm/v3/objects/leads', 'POST', { properties })
+
+  if (!res.ok) throw new HubSpotApiError(res.status)
+
+  return idFromObject(res.json)
+}
+
+/** Input del cross-sell operador (TASK-1279). Tipado sobre las primitives compartidas — sin
+ *  importar desde `operator/` (evita ciclo operator↔hubspot). */
+export interface OperatorCrossSellLeadInput {
+  contact: HubSpotContactUpsert
+  company: HubSpotCompanyUpsert | null
+  lead: { name: string; properties: Record<string, string> }
+}
+
+export interface OperatorCrossSellLeadResult {
+  status: 'succeeded' | 'failed'
+  contactId?: string | null
+  companyId?: string | null
+  leadId?: string | null
+  errorClass?: string
+  httpStatus?: number | null
+  retryable: boolean
+}
+
+/**
+ * TASK-1279 — Cross-sell operador: upsert Company (por dominio de la org) + Contact (por email) +
+ * crea un **Lead** (objeto `leads`) asociado a ambos. NUNCA crea un Deal. El Lead se crea primero
+ * y se asocia vía el endpoint `default` (v4) — mismo patrón probado que `associateContactToCompany`,
+ * sin hardcodear typeIds. La asociación Lead↔Company es best-effort (no todos los portales tienen
+ * esa asociación default); su fallo NO tumba el Lead. Resultado sanitizado; el llamador decide
+ * retry vs dead-letter por `retryable`.
+ */
+export const createOperatorCrossSellLead = async (
+  input: OperatorCrossSellLeadInput,
+): Promise<OperatorCrossSellLeadResult> => {
+  let token: string
+
+  try {
+    token = await getHubSpotAccessToken()
+  } catch {
+    return { status: 'failed', errorClass: 'token_unavailable', retryable: true, httpStatus: null }
+  }
+
+  try {
+    const companyId = input.company ? await upsertCompany(token, input.company) : null
+    const contactId = await upsertContact(token, input.contact)
+
+    if (companyId) {
+      await associateContactToCompany(token, contactId, companyId)
+    }
+
+    const leadId = await createLeadObject(token, input.lead)
+
+    // Asociación primaria Lead↔Contact (un lead vive colgado de un contacto).
+    await associateDefault(token, 'leads', leadId, 'contacts', contactId)
+
+    // Lead↔Company: best-effort (no es default en todos los portales). No es fatal.
+    if (companyId) {
+      try {
+        await associateDefault(token, 'leads', leadId, 'companies', companyId)
+      } catch {
+        // Silencioso: el Lead ya quedó creado + asociado al contacto. Se observará en el smoke.
+      }
+    }
+
+    return { status: 'succeeded', contactId, companyId, leadId, retryable: false, httpStatus: 200 }
+  } catch (error) {
+    if (error instanceof HubSpotApiError) {
+      return { status: 'failed', errorClass: error.errorClass, retryable: error.retryable, httpStatus: error.httpStatus }
+    }
+
+    const isAbort = error instanceof Error && error.name === 'TimeoutError'
+
+    return { status: 'failed', errorClass: isAbort ? 'timeout' : 'network_error', retryable: true, httpStatus: null }
+  }
+}
+
 /**
  * Orquesta el upsert del lead: company (si corporativo) → contact → asociación. Devuelve un
  * resultado sanitizado; los errores esperados se clasifican (retryable) en vez de propagar crudo.

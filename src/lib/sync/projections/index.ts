@@ -81,6 +81,7 @@ import { sampleSprintHubSpotOutboundProjection } from './sample-sprint-hubspot-o
 import { sampleSprintRuntimeCacheInvalidationProjection } from './sample-sprint-runtime-cache-invalidation'
 import { growthGraderRunFromSubmissionProjection } from './growth-grader-run-from-submission'
 import { growthAiVisibilityLeadHandoffProjection } from './growth-ai-visibility-lead-handoff'
+import { growthAiVisibilityOperatorSendProjection } from './growth-ai-visibility-operator-send'
 import { growthAiVisibilityReportEmailProjection } from './growth-ai-visibility-report-email'
 
 // DEPRECATED: personOperationalProjection removed — replaced by personIntelligenceProjection
@@ -175,4 +176,5 @@ registerProjection(contractorPayableExpenseMaterializeProjection)
   registerProjection(growthGraderRunFromSubmissionProjection) // TASK-1251 — growth.forms.submission_accepted (grader-form) → enqueue grader run + materialize lead linked to submission (idempotent, PII-safe); drenado por ops-reactive-growth
   registerProjection(growthAiVisibilityLeadHandoffProjection) // TASK-1242 — growth.ai_visibility.lead_handoff_requested → upsert contact/company en HubSpot (in-app directo, idempotente, consent+score gated); drenado por ops-reactive-growth
   registerProjection(growthAiVisibilityReportEmailProjection) // TASK-1250 — growth.ai_visibility.report_email_requested → email de entrega del informe al lead (adjunto PDF público-safe, consent+estado gated, idempotente DB-level); drenado por ops-reactive-growth
+  registerProjection(growthAiVisibilityOperatorSendProjection) // TASK-1279 — growth.ai_visibility.report_send_requested → envío operador del informe + creación del Lead HubSpot (cross-sell, público-safe, consent-gated, idempotente por sub-paso); drenado por ops-reactive-growth
 }

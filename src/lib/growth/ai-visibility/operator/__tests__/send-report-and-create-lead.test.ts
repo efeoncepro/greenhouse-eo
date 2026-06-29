@@ -7,6 +7,7 @@ const state = vi.hoisted(() => ({
   flagEnabled: true,
   org: null as Record<string, unknown> | null,
   run: { runId: 'run-1' } as Record<string, unknown> | null,
+  reportToken: 'grt-1' as string | null,
   claim: { claimed: true, sendId: 'send-1' } as { claimed: boolean; sendId: string | null }
 }))
 
@@ -18,6 +19,7 @@ const spies = vi.hoisted(() => ({
 vi.mock('@/lib/entitlements/runtime', () => ({ can: () => state.canResult }))
 vi.mock('../../flags', () => ({ isOperatorSendEnabled: () => state.flagEnabled }))
 vi.mock('../../store', () => ({ getClientGraderRunById: async () => state.run }))
+vi.mock('../../hubspot/report-link', () => ({ getLatestReportTokenForRun: async () => state.reportToken }))
 vi.mock('../organization-commercial-facts', () => ({
   getOrganizationCommercialFacts: async () => state.org
 }))
@@ -59,6 +61,7 @@ beforeEach(() => {
   state.flagEnabled = true
   state.org = CLIENT_ORG
   state.run = { runId: 'run-1' }
+  state.reportToken = 'grt-1'
   state.claim = { claimed: true, sendId: 'send-1' }
 })
 
@@ -96,6 +99,14 @@ describe('sendAeoReportAndCreateLead', () => {
     const result = await sendAeoReportAndCreateLead(baseInput)
 
     expect(result).toEqual({ status: 'blocked', reason: 'report_unavailable' })
+  })
+
+  it('rechaza informe sin snapshot público publicado (report_unavailable)', async () => {
+    state.reportToken = null
+    const result = await sendAeoReportAndCreateLead(baseInput)
+
+    expect(result).toEqual({ status: 'blocked', reason: 'report_unavailable' })
+    expect(spies.publishOutboxEvent).not.toHaveBeenCalled()
   })
 
   it('rechaza prospecto sin consentimiento (consent_required) — NUNCA cold send', async () => {

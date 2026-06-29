@@ -21,6 +21,7 @@ import { type TenantEntitlementSubject } from '@/lib/entitlements/types'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 
 import { isOperatorSendEnabled } from '../flags'
+import { getLatestReportTokenForRun } from '../hubspot/report-link'
 import { getClientGraderRunById } from '../store'
 import { getOrganizationCommercialFacts } from './organization-commercial-facts'
 import {
@@ -94,6 +95,14 @@ export const sendAeoReportAndCreateLead = async (
   const run = await getClientGraderRunById({ runId: input.runId, organizationId: input.organizationId })
 
   if (!run) {
+    return { status: 'blocked', reason: 'report_unavailable' }
+  }
+
+  // El envío externo usa el SNAPSHOT PÚBLICO (público-safe + URL compartible). Si el run aún no
+  // se publicó, no hay informe que enviar → feedback inmediato al operador (publica primero).
+  const reportToken = await getLatestReportTokenForRun(input.runId)
+
+  if (!reportToken) {
     return { status: 'blocked', reason: 'report_unavailable' }
   }
 

@@ -22,6 +22,10 @@ export const AI_VISIBILITY_COMPANY_PROPERTIES = {
   competitorsDetected: 'ai_visibility_competitors_detected',
   reportUrl: 'ai_visibility_report_url',
   lastRunAt: 'ai_visibility_last_run_at',
+  // TASK-1279 — resultado del check AEO (¿aparece la marca en las respuestas de IA?).
+  // Property NUEVA (no existía en el portal): se provisiona out-of-band ANTES del flag-on.
+  // String libre con el label canónico es-CL; promover a single-select es follow-up de HubSpot.
+  aeoCheckResult: 'aeo_check_result',
 } as const
 
 /** Custom properties de Contact (actividad del lead). Email/nombre/apellido son nativas, no acá. */
@@ -46,5 +50,6 @@ export const AI_VISIBILITY_PROPERTY_DEFINITIONS: HubSpotPropertyDefinition[] = [
   { name: AI_VISIBILITY_COMPANY_PROPERTIES.competitorsDetected, label: 'AI Visibility Competitors Detected', type: 'string', objectType: 'companies', groupName: AEO_PROPERTY_GROUP_NAME },
   { name: AI_VISIBILITY_COMPANY_PROPERTIES.reportUrl, label: 'AI Visibility Report URL', type: 'string', objectType: 'companies', groupName: AEO_PROPERTY_GROUP_NAME },
   { name: AI_VISIBILITY_COMPANY_PROPERTIES.lastRunAt, label: 'AI Visibility Last Run At', type: 'datetime', objectType: 'companies', groupName: AEO_PROPERTY_GROUP_NAME },
+  { name: AI_VISIBILITY_COMPANY_PROPERTIES.aeoCheckResult, label: 'AEO Check Result', type: 'string', objectType: 'companies', groupName: AEO_PROPERTY_GROUP_NAME },
   { name: AI_VISIBILITY_CONTACT_PROPERTIES.lastSubmitAt, label: 'AI Visibility Last Submit At', type: 'datetime', objectType: 'contacts', groupName: AEO_PROPERTY_GROUP_NAME },
 ]
