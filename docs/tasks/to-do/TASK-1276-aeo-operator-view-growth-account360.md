@@ -22,7 +22,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `ui`
-- Blocked by: `TASK-1275, TASK-1277, TASK-1279`
+- Blocked by: `TASK-1275, TASK-1279, TASK-1287`
 - Branch: `task/TASK-1276-aeo-operator-view-growth-account360`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -74,9 +74,10 @@ Reglas obligatorias:
 
 ### Depends on
 
-- **TASK-1275** (command/reader de estado de ejecución) — bloqueante para el write del Plan AEO.
-- **TASK-1277** (puerta operador `requestGraderRunAsOperator` + sujeto org/prospecto + entitlement) — bloqueante para correr el motor.
-- **TASK-1279** (command `sendAeoReportAndOpenOpportunity` + consent + HubSpot deal) — bloqueante para enviar + abrir oportunidad.
+- **TASK-1287** (readers operador-scoped: `readOperatorScopedAeoReport` + `readOperatorCrossOrgAeoScores`) — bloqueante para el detalle (Slice 1) y el cockpit (Slice 3). Cierra el `[verificar]` del reader operador-scoped.
+- **TASK-1275** (command/reader de estado de ejecución) — bloqueante para el write del Plan AEO (Slice 2).
+- **TASK-1279** (command `sendAeoReportAndOpenOpportunity` + consent + legalBasis + dealIntent + HubSpot deal) — bloqueante para enviar + abrir oportunidad (Slice 6).
+- **TASK-1277** (puerta operador `requestGraderRunForOrganization`/run gobernado + entitlement) — **complete**; provee el run del motor (Slice 5). Reader que expone = `resolveAeoEntitlement` (entitlement, NO el reporte; el reporte lo provee TASK-1287).
 - TASK-1248 (report model `modelFromClientReport` + `masterDetail` shell) — existe.
 - Organization Workspace projection / facets (Account 360) + prospectos org-sincronizados de HubSpot (TASK-706) — `docs/architecture/agent-invariants/ORG_CLIENT_AGENT_INVARIANTS.md`.
 
@@ -165,7 +166,7 @@ Reglas obligatorias:
 - Primitive / variant / kind: CompositionShell `masterDetail` (kind `workbench`), `TeamAvatarGroup` `brands`
 - Component candidates: view-adapter operador de `modelFromClientReport` + control de status nuevo
 - Copy source: `src/lib/copy/growth.ts`
-- Data reader / command: `readRecommendationStatuses` + `setRecommendationStatus` (TASK-1275) + reader del reporte operador-scoped `[verificar]`
+- Data reader / command: `readRecommendationStatuses` + `setRecommendationStatus` (TASK-1275) + `readOperatorScopedAeoReport` + `readOperatorCrossOrgAeoScores` (TASK-1287)
 - API parity: el write es el command gobernado de TASK-1275; UI = cliente del primitive
 - Access / capability: viewCode interno (sección Growth, routeGroup `internal`) + capability del write
 - States to implement: default/loading/empty/error/partial/denied/mobile
@@ -260,7 +261,11 @@ Ver el wireframe + flow contract declarados. El detalle por-cliente reusa el `ma
 
 ### Slice ordering hard rule
 
-- Bloqueada por TASK-1275 (command/reader). Slice 1 (detalle) → Slice 2 (write status) → Slice 3 (cockpit) → Slice 4 (facet) → Slice 5 (GVC/cierre). El write (Slice 2) no existe sin TASK-1275.
+- **Dos mitades con blockers distintos** (pueden cerrarse de forma independiente):
+  - **Gestión del Plan AEO (Slices 1-4)** — bloqueada por **TASK-1287** (readers) + **TASK-1275** (write status). Orden interno: Slice 1 (detalle, necesita el reader operador-scoped de TASK-1287) → Slice 2 (write status, no existe sin TASK-1275) → Slice 3 (cockpit, necesita el agregado cross-org de TASK-1287) → Slice 4 (facet Account 360). Esta mitad puede **shippear sin esperar a TASK-1279**.
+  - **Cross-sell/prospección (Slices 5-6)** — Slice 5 (run operador) usa TASK-1277 (complete); Slice 6 (enviar + abrir oportunidad) bloqueada por **TASK-1279**. Slice 6 NO existe sin TASK-1279.
+- **Slice 7 (GVC + cierre)** corre al final de la(s) mitad(es) que se entreguen.
+- Regla dura: NUNCA cerrar Slice 1/3 sin los readers de TASK-1287; NUNCA cerrar Slice 2 sin TASK-1275; NUNCA cerrar Slice 6 sin TASK-1279.
 
 ### Risk matrix
 
@@ -335,9 +340,21 @@ Ver el wireframe + flow contract declarados. El detalle por-cliente reusa el `ma
 
 ## Open Questions
 
-- ¿El detalle operador usa un reader operador-scoped distinto del client-scoped (TASK-1243)? Resolver en Discovery.
-- ¿El cockpit cross-cliente necesita su propio reader agregado de scores por org? Resolver en Discovery.
+- ~~¿El detalle operador usa un reader operador-scoped distinto del client-scoped (TASK-1243)?~~ **Resuelto 2026-06-29:** sí → `readOperatorScopedAeoReport` en **TASK-1287**.
+- ~~¿El cockpit cross-cliente necesita su propio reader agregado de scores por org?~~ **Resuelto 2026-06-29:** sí → `readOperatorCrossOrgAeoScores` en **TASK-1287**.
+- El subject picker de cross-sell (Slice 5) necesita listar también orgs **sin** AEO + prospectos; TASK-1287 acota su agregado a orgs CON AEO. ¿De dónde sale el listado de targets sin AEO (reader de orgs/prospectos general vs extender TASK-1287)? Resolver en Discovery.
 
 ## Delta 2026-06-28 — conectada al Master UI Flow del programa AEO
 
 - Esta task es el nodo **S8/S9/S10/S11/S12** — vista operador (cockpit, detalle, run, enviar+oportunidad, Account 360 facet) del flujo cross-surface del programa AEO. Su UI/flujo se conecta con todas las demás superficies (público → email/PDF → portal cliente tiers/PLG → operador cross-sell → Account 360) en el doc maestro **`docs/ui/flows/EPIC-020-AEO-PROGRAM-UI-FLOW.md`** (info-architecture + state-design + ux-writing + modern-ui). Toda UI del programa renderiza el `ReportArtifactModel` compartido (TASK-1252) y deriva su visibilidad del **entitlement** (TASK-1277), nunca del rol; cada acción mapea a un command gobernado (Full API Parity → Nexa por construcción).
+
+## Delta 2026-06-29 — review multi-lente (product-UI · arquitectura · comercial · AEO)
+
+Ajustes tras revisión con las skills `greenhouse-product-ui-architect`, `arch-architect`, `commercial-expert`, `seo-aeo`:
+
+- **Backend impact legitimado (`none` se mantiene).** El detalle y el cockpit necesitaban un reader operador-scoped + un agregado cross-org que NO existían (TASK-1277 solo expone `resolveAeoEntitlement`, no el reporte). Se separó la foundation backend en **TASK-1287** (readers `readOperatorScopedAeoReport` + `readOperatorCrossOrgAeoScores`, capability + grant), respetando la disciplina hybrid (backend-data foundation antes que ui-ux consumer). Esta task queda UI pura consumiéndolos.
+- **Drift de dependencias corregido.** TASK-1277 está **complete** → fuera de `Blocked by`. Blockers reales: **TASK-1275 + TASK-1279 + TASK-1287**.
+- **Slice ordering reescrito.** La hard rule referenciaba 5 slices (estructura vieja); ahora declara las **dos mitades** (gestión Slices 1-4 / cross-sell Slices 5-6) con blockers distintos y la independencia de cierre.
+- **Send surface (Slice 6) — primitive + campos.** El "enviar + abrir oportunidad" es un write riesgoso de baja frecuencia: NO va embutido en el detail canvas; se modela como **AdaptiveSidecar `composer`** (o stepper/Dialog), non-modal en desktop. Además el command de TASK-1279 exige **`legalBasis` + `dealIntent`** (no solo consent + recipient) → la superficie debe capturarlos. Ver wireframe Copy Ledger.
+- **Foco competitivo per-motor (AEO).** El Share of Voice se muestra **por motor** (AI Overviews / ChatGPT / Perplexity / Gemini), no como agregado único (~11% de solape de citas entre motores). Ver wireframe Region 7.
+- **Subject picker — dos motions legibles (comercial).** Cliente sin AEO = Expansion (land-and-expand); prospecto = New Business. TASK-1279 ya ramifica el pipeline; la UI debe separar visualmente los dos grupos del picker.

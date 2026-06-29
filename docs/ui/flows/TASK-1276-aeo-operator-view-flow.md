@@ -77,8 +77,8 @@
 
 ## Data & Command Boundaries
 
-- Readers: reader del reporte operador-scoped `[verificar]` (clientes **y prospectos**) + `readRecommendationStatuses` (TASK-1275)
-- Commands: `setRecommendationStatus` (TASK-1275) · `requestGraderRunAsOperator` (TASK-1277, run sobre cliente/prospecto) · `sendAeoReportAndOpenOpportunity` (TASK-1279, envío + deal)
+- Readers: `readOperatorScopedAeoReport` + `readOperatorCrossOrgAeoScores` (TASK-1287, clientes **y prospectos**, scope operador) + `readRecommendationStatuses` (TASK-1275)
+- Commands: `setRecommendationStatus` (TASK-1275) · `requestGraderRunForOrganization` (TASK-1277, run sobre cliente/prospecto) · `sendAeoReportAndOpenOpportunity` (TASK-1279, envío + deal)
 - API routes: rutas de los commands (lane `[verificar]`)
 - Optimistic updates: opcional (status); el run y el envío NO son optimistic (esperan resultado)
 - Cache / invalidation: revalidar el detalle tras el write/run
@@ -91,13 +91,13 @@ Surfaces adicionales (sobre el detalle operador):
 
 | Surface | Role | Desktop | Compact | Primitive |
 |---|---|---|---|---|
-| Subject picker | elegir target (cliente contratado / sin AEO / prospecto HubSpot) | selector + búsqueda | apilado | combobox/lista |
+| Subject picker | elegir target, **agrupado por motion**: clientes con AEO · clientes sin AEO (Expansion) · prospectos HubSpot (New Business) | selector + búsqueda con grupos | apilado | combobox/lista agrupada |
 | Run CTA | correr el motor sobre el target | botón "Correr AEO" → preparando→ready | igual | `GreenhouseButton` |
-| Send + opportunity | enviar informe + abrir deal | confirmación `propose→confirm→execute` con **captura de consentimiento** (prospecto) | igual | confirm surface |
+| Send + opportunity | enviar informe + abrir deal | `propose→confirm→execute` con **consent + legalBasis + dealIntent**, en lane in-flow non-modal | drawer temporal en compact | **AdaptiveSidecar `composer`** (NO confirm embutido en el detail canvas) |
 
 Flow del cross-sell:
 
-1. Operador elige target (subject picker) → 2. "Correr AEO" (`requestGraderRunAsOperator`, TASK-1277) → preparando → reporte con **foco competitivo** → 3. "Enviar + abrir oportunidad": recipient + **consent gate** (prospecto requiere consentimiento capturado; cliente = relación) → confirmar → `sendAeoReportAndOpenOpportunity` (TASK-1279) envía email + crea/vincula deal HubSpot → 4. estado "enviado + oportunidad abierta" (con link al deal) o error honesto.
+1. Operador elige target (subject picker, agrupado por motion) → 2. "Correr AEO" (`requestGraderRunForOrganization`, TASK-1277) → preparando → reporte con **foco competitivo per-motor** (AI Overviews · ChatGPT · Perplexity · Gemini, no agregado único) → 3. "Enviar + abrir oportunidad" (AdaptiveSidecar `composer`): recipient + **consent gate** (prospecto requiere consentimiento capturado; cliente = relación) + `legalBasis` + `dealIntent` (Expansion cliente / New Business prospecto) → confirmar → `sendAeoReportAndOpenOpportunity` (TASK-1279) envía email + crea/vincula deal HubSpot → 4. estado "enviado + oportunidad abierta" (con link al deal) o error honesto.
 
 Consent gate (state): `consent_required` (prospecto sin consentimiento → bloquea el envío con CTA "registrar consentimiento", NUNCA cold send) · `ready_to_send` · `sent`.
 
