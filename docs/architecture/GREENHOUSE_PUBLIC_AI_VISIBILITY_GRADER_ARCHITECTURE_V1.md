@@ -1663,3 +1663,31 @@ el report builder/scoring (reusar `readGraderReport`+`toClientGraderReport`). **
 org sin run/score en el cockpit (degradación honesta `null`). El client reader (TASK-1243) y el scoring quedan
 intactos. **V1 = capability-gated:** un interno con la capability lee cualquier client-org; el scoping per-AM no
 existe como primitive (TASK-1277 tampoco) → follow-up.
+
+## Delta 2026-06-29 — TASK-1286 Governed AEO tier assignment command · EPIC-020
+
+La asignación de tiers AEO deja de depender de scripts CLI como único camino operativo y pasa a un
+command gobernado: **`assignAeoTier({ organizationId, tier, reason, requestedBy, expiresAt? })`**
+en `src/lib/growth/ai-visibility/assign-tier.ts`. El command es el primitive único para cockpit operador,
+Account-360, Nexa y runbooks; la UI/Nexa consumen el Product API `POST /api/admin/growth/ai-visibility/assign-tier`
+con confirmación humana y capability check.
+
+**Source of truth.** El tier sigue viviendo en `greenhouse_client_portal.module_assignments`
+(`module_key='ai_visibility_v1'`, `metadata_json.aeo_tier`) y el writer canónico sigue siendo
+`enableClientPortalModule`. TASK-1286 sólo extiende ese writer con `metadataJson` opcional para que AEO no cree un
+INSERT paralelo. Cambios de tier y `tier='none'` cierran la fila abierta vía `expireClientPortalModule`
+(`effective_to` + `status='expired'`), nunca con DELETE.
+
+**Auto-profile.** `provisionGraderProfileForOrganization(organizationId)` en
+`src/lib/growth/ai-visibility/provision-profile.ts` extrae la lógica del script legacy y crea/retorna un
+`grader_profile` activo desde `greenhouse_core.organizations.website_url`. Aplica a `trial`, `contracted` y
+`pilot`, porque los tres habilitan runs. Si la org no tiene `website_url` canónica, el command falla con
+`aeo_assignment_website_required` antes de mutar el entitlement.
+
+**Access.** Capability nueva `growth.ai_visibility.entitlement.manage` (`execute`, `tenant`) seedeada en
+`capabilities_registry` y granteada sólo a `efeonce_account` + `efeonce_admin`. No la hereda todo el set operador
+de `run.operator`; correr el motor y modificar el entitlement son permisos distintos.
+
+**Invariantes operativos.** NUNCA escribir `module_assignments` para AEO con raw INSERT fuera de
+`enableClientPortalModule`. NUNCA activar un tier que habilite run sin profile enlazado o sin web canónica. NUNCA
+tratar `none` como borrado; siempre supersede append-only. `pilot` requiere `expiresAt`.

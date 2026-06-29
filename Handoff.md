@@ -1,3 +1,29 @@
+## Sesion 2026-06-29 — TASK-1286 AEO assign tier governed command — Codex — 🚧 code complete, smoke mutacional pendiente
+
+> **Intake:** operador confirmó el `/goal` recomendado y pidió `TASK-1286`, `mantente en develop`. Hook ejecutado: `pnpm codex:task-hook TASK-1286 --develop`. Sin branch/worktree nuevo; excepción documentada. Subagentes no usados: la task comparte un mismo contrato causal (`module_assignments` + capability + command + endpoint + profile).
+>
+> **Implementado:** command server-side `assignAeoTier({ organizationId, tier, reason, requestedBy, expiresAt? })` en `src/lib/growth/ai-visibility/assign-tier.ts`; tiers cerrados `trial|contracted|pilot|none`; `pilot` exige `expiresAt`; `none` supersede append-only vía `expireClientPortalModule`; cambios de tier expiran la fila abierta y reactivan vía `enableClientPortalModule`; idempotencia por tier/status. `enableClientPortalModule` se extendió con `metadataJson` opcional para persistir `module_assignments.metadata_json.aeo_tier` sin writer paralelo. Helper `provisionGraderProfileForOrganization` extraído a `src/lib/growth/ai-visibility/provision-profile.ts`; el script legacy ahora delega en el helper.
+>
+> **API/access:** nuevo `POST /api/admin/growth/ai-visibility/assign-tier` con `requireInternalTenantContext`, `can('growth.ai_visibility.entitlement.manage','execute','tenant')`, errores canónicos es-CL (`invalid_tier`, `invalid_input`, `website_required`, `org_not_found`) y response safe. Capability `growth.ai_visibility.entitlement.manage` agregada al catálogo TS, runtime grant sólo a `efeonce_account` + `efeonce_admin`, y migration seed `20260629112455151_task-1286-aeo-entitlement-manage-capability.sql`.
+>
+> **DB/runtime:** `pnpm pg:connect:migrate` aplicado OK en Cloud SQL dev/staging; sólo corrió la migration TASK-1286 y regeneró `src/types/db.d.ts` sin diff. No se ejecutó smoke mutacional `assign trial -> run -> none` porque requiere una org sandbox/aprobada; no se debe mutar un cliente real para cerrar una task.
+>
+> **Runtime update posterior aprobado por operador:** Sky Airlines (`org-b9977f96-f7ef-4afb-bb26-7355d78c981f`, web `https://skyairline.com`) recibió `trial` AEO vía `assignAeoTier`. Resultado: assignment `cpma-44c05156-db5d-4354-a04d-385887fdbdb1`, grader profile `EO-GAVP-0015` (`gprf-dc5f82eb-a967-4bf2-9684-15419933120a`), entitlement resuelto `hasModule=true`, `tier=trial`, `allowanceCap=1`, `allowanceUsed=0`, `allowanceRemaining=1`, `blockedReason=null`. No se disparó `requestGraderRunForOrganization` para no consumir el trial/costo; no se ejecutó `none` porque Sky debe quedar activo.
+>
+> **Gates:** `pnpm task:lint --task TASK-1286` pass; `pnpm ops:lint --changed` pass con warnings preexistentes de TASK-1287 registry parity; focal vitest 5 files / 42 tests pass; ESLint focal pass; `NODE_OPTIONS=--max-old-space-size=8192 pnpm exec tsc --noEmit` pass; `pnpm migration-marker-gate` pass (warning legacy TASK-1277). El `tsc` baseline sin heap abortó por OOM de Node.
+>
+> **Estado:** task queda en `docs/tasks/in-progress/` como `code complete, rollout/smoke mutacional pendiente`. Para cerrar complete: elegir org sandbox/aprobada con `organizations.website_url`, ejecutar `assignAeoTier('trial')`, confirmar `resolveAeoEntitlement` + `requestGraderRunForOrganization` sin `profile_required`, ejecutar `assignAeoTier('none')`, y documentar evidencia.
+
+## Sesion 2026-06-29 — Codex TASK hook goal preflight + subagentes explícitos — Codex — ✅ harness actualizado
+
+> **Pedido:** el operador reportó que al delegar tasks Codex no estaba habilitando subagentes y pidió revisar/ajustar lo necesario.
+>
+> **Causa raíz:** la capacidad existe en Codex desktop pero está lazy-loaded vía `tool_search` (`multi_agent_v1`); además, el prompt canónico sólo decía `SUBAGENTES: sí/no + por qué`, mientras `docs/tasks/TASK_PROCESS.md` tiene el protocolo fuerte. Resultado: el hook no convertía la decisión `fork` en acción operativa ni dejaba una señal explícita para cumplir la política de herramientas.
+>
+> **Cambio:** `CODEX_EXECUTION_PROMPT_V1` ahora incluye `GOAL PREFLIGHT`: si el operador pide ejecutar/implementar/continuar una `TASK-###` y no entregó `/goal`, Codex debe proponer un `/goal` recomendado y esperar confirmación antes del hook. `pnpm codex:task-hook` acepta `--subagents` / `--parallel-agents` / `--fork-agents` (combinable con `--develop`) y el prompt impreso agrega autorización `subagentes autorizados`. `CODEX_EXECUTION_PROMPT_V1` también incluye `SUBAGENT TOOLING`: assessment `sequential|fork`, carga de `multi_agent_v1` vía `tool_search` cuando hay autorización, ownership exclusivo por subagente, consolidación/verificación por el agente principal y fallback documentado `fork recomendado, no autorizado/no disponible`. La skill `.codex/skills/greenhouse-task-execution-hook` y `scripts/check-codex-task-harness.mjs` quedaron sincronizados.
+>
+> **Uso esperado:** primero `/goal` recomendado si el operador no lo dio; luego, con confirmación, ejecutar `pnpm codex:task-hook TASK-###` (más `--develop`/`--subagents` si aplica). Si la task amerita fork pero no hubo autorización explícita, documentar recomendación/razón en Audit/Plan y pedir checkpoint si el riesgo lo requiere.
+
 ## Sesion 2026-06-29 — TASK-1271 Prose Extraction Router (cost-efficient) — Claude — ✅ complete (code complete; cutover = follow-up)
 
 > **Intake:** `/implement-task 1271`. Backend-data / integration. Desacopló el hook de prose extraction (sentiment/category/drift) de Anthropic en un puerto `ProseExtractionProvider` + router (`src/lib/growth/ai-visibility/normalization/prose-extraction/`). Trabajo en `develop` local-first, **sin push**.
@@ -34057,3 +34083,17 @@ Análisis con skill `arch-architect` (global + overlay Greenhouse) y ajuste de l
 ## TASK-1287 — AEO Operator-Scoped Report Readers — en progreso (develop, local-first) — 2026-06-29 — Claude
 
 Tomada de `to-do/` → `in-progress/` (Lifecycle sincronizado, README + registry actualizados). Foundation backend (reader-only) que desbloquea TASK-1276 Slices 1/3: `readOperatorScopedAeoReport({organizationId})` + `readOperatorCrossOrgAeoScores()` + capability `growth.ai_visibility.report.read_operator` (grant `efeonce_account`+`efeonce_admin`). Reusa el report builder de TASK-1235 (NO forkea scoring); tenant-safe por scope operador; honest degradation `null≠0`. Surgió del review multi-lente de TASK-1276 (commit `83e41bbf8`). Trabajo en develop, sin push hasta instrucción explícita.
+
+---
+
+## TASK-1287 — AEO Operator-Scoped Report Readers — COMPLETE (develop, local, sin push) — 2026-06-29 — Claude
+
+Foundation backend (reader-only, additive) que desbloquea TASK-1276 Slices 1/3. Cerrada end-to-end:
+
+- **`readOperatorScopedAeoReport({subject,organizationId,runId?})`** (`src/lib/growth/ai-visibility/operator/command.ts`): reporte AEO de cualquier cliente/prospecto en scope operador. Reusa `readGraderReport`+`toClientGraderReport` (NO forkea scoring) → `ClientGraderReport` leak-safe. **Self-guarda con `can('growth.ai_visibility.report.read_operator','read','tenant')`** por recibir org arbitraria (distinción dura vs el client reader de TASK-1243). Errores `OperatorGraderReportError {forbidden|not_found|report_unavailable}`.
+- **`readOperatorCrossOrgAeoScores({subject})`** → `store.listOperatorCrossOrgAeoScores`: agregado del cockpit (module_assignments ai_visibility_v1 vigente → organizations → último grader_run reportable LATERAL → grader_scores.overall_score LATERAL). Degradación honesta `null≠0`. **SQL ejercido contra PG real** (gate TASK-893): Grupo Berel `contracted`, `latestScore=null`.
+- Capability `growth.ai_visibility.report.read_operator` + grant operador en `runtime.ts` (mismo set que `run.operator`) + seed migration `20260629110431032`. Coverage automático verde.
+- **Gates:** typecheck full + suite completa (8453 passed) + build (wrapper aislado `run-next-build.mjs`) + 8 focal tests + smoke PG. `task:lint` template=1/0/0.
+- Commits: `3e4e255db` (Slice 1), `ddb945247` (Slice 2), `2a5f9b382` (Slice 3), `9fd33e7b2` (cierre).
+
+Nota concurrencia: durante esta sesión Codex tenía WIP sin commitear de su "task execution harness" (AGENTS/CLAUDE/project_context/Handoff/changelog/codex scripts). NO lo barrí — stageé solo paths explícitos míos. Estas entradas (Handoff/changelog) quedan SIN stagear para que las commitees junto al WIP de Codex. Sin push (local-first).

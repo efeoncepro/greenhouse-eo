@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -19,7 +19,7 @@
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `EPIC-020`
-- Status real: `Diseno`
+- Status real: `En ejecución Codex 2026-06-29`
 - Rank: `TBD`
 - Domain: `growth`
 - Blocked by: `none`
@@ -175,6 +175,41 @@ Reglas obligatorias:
      plan.md segun TASK_PROCESS.md. No llenar al crear la task.
      ═══════════════════════════════════════════════════════════ -->
 
+## Audit / Intake
+
+- 2026-06-29 — Codex toma TASK-1286 en `develop` por instrucción explícita del operador (`--develop`); no se crea branch/worktree.
+- Hook ejecutado: `pnpm codex:task-hook TASK-1286 --develop`.
+- Goal activo: implementar `assignAeoTier` backend-data robusto, sin UI ni billing, manteniendo `develop`, con capability/grant/coverage, endpoint Product API, helper idempotente de profile y cierre documental.
+- Subagentes: no usados. La task cruza un mismo contrato causal (`module_assignments` + capability + command + endpoint + profile) y partirlo aumentaría riesgo de drift.
+- Ownership: sin PR abierto para `TASK-1286`; no se encontró branch existente de la task.
+- Baseline antes de código:
+  - `pnpm task:lint --task TASK-1286` → pass.
+  - `pnpm ops:lint --changed` → pass con warnings preexistentes de TASK-1287 registry parity.
+  - `pnpm lint` → falló por `padding-line-between-statements` en `scripts/codex-task-hook.mjs` (WIP de proceso previo), corregido antes de código de dominio.
+  - `pnpm exec tsc --noEmit` → abortó por heap de Node (~4GB) antes de reportar errores; se reemplaza por checks focales + reintento con heap mayor si aplica.
+
+## Discovery Notes
+
+- `enableClientPortalModule` ya es el writer canónico de `greenhouse_client_portal.module_assignments`, con tx única, audit, outbox y cache invalidation, pero no aceptaba `metadata_json`; se extenderá con `metadataJson` opcional sin romper callers.
+- `expireClientPortalModule` ya modela el cierre append-only (`effective_to` + `status='expired'`) y debe usarse para `tier='none'` y para superseder cambios de tier/status antes de reactivar.
+- `resolveAeoEntitlement` lee `metadata_json.aeo_tier`; por lo tanto `trial` y `contracted` no pueden compartir una fila `active` sin metadata distinta.
+- La lógica de auto-profile vive en `scripts/growth/provision-grader-profile-for-org.ts`; se extraerá a `src/lib/growth/ai-visibility/provision-profile.ts` y el script pasará a usar el helper.
+- El endpoint seguirá el patrón de `POST /api/admin/growth/ai-visibility/operator-run`: `requireInternalTenantContext`, `can(...)`, `canonicalErrorResponse`, `captureWithDomain`.
+
+## Execution Plan
+
+1. Capability/grants: agregar `growth.ai_visibility.entitlement.manage` al catálogo TS, runtime grant a `efeonce_account` + `efeonce_admin`, y migration seed en `capabilities_registry`.
+2. Profile helper: extraer `provisionGraderProfileForOrganization(organizationId)` con idempotencia, `website_required`, `org_not_found` y derivación market/locale desde país.
+3. Command: implementar `assignAeoTier({ organizationId, tier, reason, requestedBy, expiresAt? })`, enum cerrado, profile preflight para tiers que habilitan run, supersede append-only vía `expireClientPortalModule`, enable vía `enableClientPortalModule(metadataJson)`.
+4. Product API: crear `POST /api/admin/growth/ai-visibility/assign-tier`, gateado por `growth.ai_visibility.entitlement.manage`, con errores canónicos es-CL.
+5. Tests/docs: cubrir tiers, idempotencia, supersede y website_required; actualizar arquitectura grader, handoff, changelog e índices.
+
+## Decisions
+
+- Auto-profile aplica a `trial`, `contracted` y `pilot` porque los tres habilitan runs y el chokepoint exige `grader_profile.organization_id`.
+- `pilot` requiere `expiresAt` explícito, delegando la validación final al writer canónico.
+- Endpoint Product API: `src/app/api/admin/growth/ai-visibility/assign-tier/route.ts`, consistente con TASK-1277 y consumidor operador/Account-360/Nexa con confirmación humana.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 3 — EXECUTION SPEC
      ═══════════════════════════════════════════════════════════ -->
@@ -254,29 +289,50 @@ Un command, varios consumers. `assignAeoTier` es el único entrypoint gobernado 
 
 ## Acceptance Criteria
 
-- [ ] `assignAeoTier` es el único command gobernado de asignación de tier AEO; **compone** `enableClientPortalModule` (no raw INSERT) + audit + outbox.
-- [ ] Auto-provisión del `grader_profile` desde `organizations.website_url`; si NULL → `website_required` honesto (no asigna a medias, no inventa dominio).
-- [ ] `tier='none'` = supersede (append-only, NUNCA DELETE); `pilot` exige expiry; tier inválido rechazado.
-- [ ] Capability `growth.ai_visibility.entitlement.manage` + grant (`efeonce_account` + `efeonce_admin`) + coverage en el mismo PR; errores canónicos es-CL.
-- [ ] Endpoint Product API expone el command (consumible por TASK-1276 / Account-360 / Nexa).
-- [ ] DB/runtime evidence: assign trial → auto-profile → entitlement refleja → run deja de pedir profile → `none` supersede.
+- [x] `assignAeoTier` es el único command gobernado de asignación de tier AEO; **compone** `enableClientPortalModule` (no raw INSERT) + audit + outbox.
+- [x] Auto-provisión del `grader_profile` desde `organizations.website_url`; si NULL → `website_required` honesto (no asigna a medias, no inventa dominio).
+- [x] `tier='none'` = supersede (append-only, NUNCA DELETE); `pilot` exige expiry; tier inválido rechazado.
+- [x] Capability `growth.ai_visibility.entitlement.manage` + grant (`efeonce_account` + `efeonce_admin`) + coverage en el mismo PR; errores canónicos es-CL.
+- [x] Endpoint Product API expone el command (consumible por TASK-1276 / Account-360 / Nexa).
+- [ ] DB/runtime evidence mutacional: assign trial → auto-profile → entitlement refleja → run deja de pedir profile → `none` supersede. **Pendiente deliberado:** requiere una org sandbox/aprobada para no mutar clientes reales.
+
+## Implementation Delta 2026-06-29
+
+- `enableClientPortalModule` acepta `metadataJson` opcional y lo persiste en `module_assignments.metadata_json`, además de audit/outbox payloads.
+- `provisionGraderProfileForOrganization` extrae el script legacy a helper server-side idempotente; el script `scripts/growth/provision-grader-profile-for-org.ts` ahora delega en ese helper.
+- `assignAeoTier` implementa enum cerrado `trial|contracted|pilot|none`, profile preflight, idempotencia por tier/status, supersede vía `expireClientPortalModule`, enable vía `enableClientPortalModule`, y `pilot` con `expiresAt` obligatorio.
+- `POST /api/admin/growth/ai-visibility/assign-tier` expone el command con `requireInternalTenantContext`, `growth.ai_visibility.entitlement.manage` y errores canónicos es-CL.
+- Capability `growth.ai_visibility.entitlement.manage` agregada a catálogo TS, runtime grant y migration seed aplicada en Cloud SQL dev/staging.
+- Delta arquitectónico agregado en `GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md`.
 
 ## Verification
 
-- `pnpm lint`
-- `pnpm typecheck`
-- `pnpm test`
-- `pnpm migrate:up` + verify capability seed + smoke del command contra PG real (assign/none/auto-profile/website_required)
+- `pnpm task:lint --task TASK-1286` → pass.
+- `pnpm ops:lint --changed` → pass con warnings preexistentes de TASK-1287 registry parity.
+- `pnpm exec vitest run src/lib/growth/ai-visibility/__tests__/assign-tier.test.ts src/lib/growth/ai-visibility/__tests__/provision-profile.test.ts src/lib/client-portal/commands/__tests__/enable-module.test.ts src/lib/entitlements/runtime.test.ts src/lib/entitlements/capability-grant-coverage.test.ts` → 5 files / 42 tests pass.
+- `pnpm exec eslint <TASK-1286 touched files>` → pass.
+- `NODE_OPTIONS=--max-old-space-size=8192 pnpm exec tsc --noEmit` → pass. Baseline normal sin heap abortó por OOM de Node.
+- `pnpm migration-marker-gate` → pass (0 errors; warning legacy TASK-1277).
+- `pnpm pg:connect:migrate` → pass; aplicó `20260629112455151_task-1286-aeo-entitlement-manage-capability` y regeneró `src/types/db.d.ts` sin diff.
+- Runtime smoke parcial aprobado por operador (2026-06-29): `assignAeoTier` asignó `trial` a Sky Airlines (`org-b9977f96-f7ef-4afb-bb26-7355d78c981f`), creó assignment `cpma-44c05156-db5d-4354-a04d-385887fdbdb1` y grader profile `EO-GAVP-0015`; `resolveAeoEntitlement` devuelve `hasModule=true`, `tier=trial`, `allowanceCap=1`, `allowanceUsed=0`, `allowanceRemaining=1`, `blockedReason=null`.
+- `pnpm lint` → pass.
+- `pnpm test` → 1209 files / 8469 tests pass; 15 files / 104 tests skipped.
+- `pnpm docs:closure-check` → pass con warning existente `architecture_doc_monolith` para la arquitectura del grader.
+- `pnpm codex:task-hook:check` → pass.
+- `pnpm docs:context-check` → pass con warnings históricos por tamaño de `Handoff.md`.
+- `pnpm claude-md check` → pass.
+- `git diff --check` → pass.
+- No ejecutado: `requestGraderRunForOrganization` real para Sky, porque dispararía un run/costo y consumiría el cupo trial. Tampoco se ejecutó `tier='none'`, porque el objetivo operativo era dejar Sky con trial activo.
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` sincronizado (`in-progress` al tomar, `complete` al cerrar)
-- [ ] archivo en la carpeta correcta
-- [ ] `docs/tasks/README.md` sincronizado
-- [ ] `Handoff.md` actualizado
-- [ ] `changelog.md` actualizado
-- [ ] chequeo de impacto cruzado (TASK-1276, TASK-1277, TASK-1285)
-- [ ] Delta en la arch spec del grader (entitlement governance command)
+- [x] `Lifecycle` sincronizado (`in-progress` al tomar; cierre queda `code complete, rollout pendiente` por smoke mutacional).
+- [x] archivo en la carpeta correcta.
+- [x] `docs/tasks/README.md` sincronizado.
+- [x] `Handoff.md` actualizado.
+- [x] `changelog.md` actualizado.
+- [x] chequeo de impacto cruzado (TASK-1276, TASK-1277, TASK-1285).
+- [x] Delta en la arch spec del grader (entitlement governance command).
 
 ## Follow-ups
 
@@ -286,5 +342,5 @@ Un command, varios consumers. `assignAeoTier` es el único entrypoint gobernado 
 
 ## Open Questions
 
-- ¿El command auto-provisiona profile también para `contracted`/`pilot`, o solo `trial`? (default propuesto: para todo tier que habilite run).
-- ¿El endpoint vive en `api/admin/growth/**` o en un lane de Product API distinto? (resolver en Discovery según el patrón de TASK-1277).
+- Resuelta 2026-06-29: auto-provisiona para todo tier que habilita run (`trial`, `contracted`, `pilot`).
+- Resuelta 2026-06-29: endpoint Product API en `api/admin/growth/**`, siguiendo el patrón de TASK-1277.

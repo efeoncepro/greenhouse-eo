@@ -111,6 +111,7 @@ describe('enableClientPortalModule', () => {
       module_key: 'creative_hub_globe_v1',
       status: 'active',
       source: 'manual_admin',
+      metadata_json: {},
       effective_from: '2026-05-12'
     })
 
@@ -168,6 +169,35 @@ describe('enableClientPortalModule', () => {
       status: 'pilot',
       expires_at: '2026-08-12T00:00:00Z'
     })
+  })
+
+  it('persists optional metadata_json and includes it in audit/outbox payloads', async () => {
+    await enableClientPortalModule({
+      ...BASE_INPUT,
+      metadataJson: { aeo_tier: 'trial' }
+    })
+
+    const insert = mocks.insertedRows.find(r => r.table.includes('module_assignments'))
+
+    expect(insert?.values).toMatchObject({
+      metadata_json: { aeo_tier: 'trial' }
+    })
+    expect(mocks.recordAssignmentEvent).toHaveBeenCalledWith(
+      expect.objectContaining({
+        payload: expect.objectContaining({
+          metadataJson: { aeo_tier: 'trial' }
+        })
+      }),
+      expect.anything()
+    )
+    expect(mocks.publishOutboxEvent).toHaveBeenCalledWith(
+      expect.objectContaining({
+        payload: expect.objectContaining({
+          metadataJson: { aeo_tier: 'trial' }
+        })
+      }),
+      expect.anything()
+    )
   })
 
   it('idempotent: same status returns existing assignment without emitting outbox', async () => {

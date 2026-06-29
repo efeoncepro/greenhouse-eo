@@ -35,6 +35,7 @@ try {
           effort: task.status.Effort ?? null,
           branch: task.status.Branch ?? null,
           developOverride: options.develop,
+          subagentsAuthorized: options.subagents,
           currentBranch: getCurrentBranch(repoRoot),
           prompt,
         },
@@ -55,6 +56,7 @@ function parseArgs(rawArgs) {
   const parsed = {
     taskRef: null,
     develop: false,
+    subagents: false,
     json: false,
     promptOnly: false,
     help: false,
@@ -63,6 +65,11 @@ function parseArgs(rawArgs) {
   for (const arg of rawArgs) {
     if (arg === '--develop' || arg === '--stay-on-develop') {
       parsed.develop = true
+      continue
+    }
+
+    if (arg === '--subagents' || arg === '--parallel-agents' || arg === '--fork-agents') {
+      parsed.subagents = true
       continue
     }
 
@@ -107,9 +114,11 @@ Usage:
   pnpm codex:task-hook 1033
   pnpm codex:task-hook docs/tasks/to-do/TASK-1033-greenhouse-floating-surface-primitive.md
   pnpm codex:task-hook TASK-1033 --develop
+  pnpm codex:task-hook TASK-1033 --subagents
 
 Options:
   --develop, --stay-on-develop  Record an explicit operator branch override.
+  --subagents                   Record explicit operator authorization to use sub-agents when the plan selects fork.
   --prompt-only                 Print only the substituted execution prompt.
   --json                        Print machine-readable output.
 `)
@@ -242,11 +251,15 @@ function buildPrompt(repoRoot, task, hookOptions) {
     ? '\n\nInstrucción explícita del operador para esta ejecución: **mantente en develop, no cambies de rama**. Documenta esta excepción en Audit/Plan/Handoff.\n'
     : ''
 
+  const subagentOverride = hookOptions.subagents
+    ? '\n\nInstrucción explícita del operador para esta ejecución: **subagentes autorizados**. Si Discovery/Plan selecciona `fork`, carga el tooling multi-agent disponible y delega slices independientes con ownership exclusivo; si no conviene fork, documenta por qué.\n'
+    : ''
+
   return promptMatch[1]
     .replaceAll('[TASK-###]', task.id)
     .replace(
       `Vas a implementar la task **${task.id}** ubicada en \`docs/tasks/{to-do,in-progress}/TASK-###-*.md\` dentro del repo \`greenhouse-eo\`.`,
-      `Vas a implementar la task **${task.id}** ubicada en \`${task.relativePath}\` dentro del repo \`greenhouse-eo\`.${branchOverride}`,
+      `Vas a implementar la task **${task.id}** ubicada en \`${task.relativePath}\` dentro del repo \`greenhouse-eo\`.${branchOverride}${subagentOverride}`,
     )
 }
 
@@ -281,6 +294,7 @@ function printHookOutput(repoRoot, task, prompt, hookOptions) {
   console.log(`Declared branch: ${task.status.Branch ?? '(missing)'}`)
   console.log(`Current branch: ${currentBranch}`)
   console.log(`Develop override: ${hookOptions.develop ? 'yes' : 'no'}`)
+  console.log(`Subagents authorized: ${hookOptions.subagents ? 'yes' : 'no'}`)
   console.log('')
   console.log('Apply the following prompt before implementation:')
   console.log('')

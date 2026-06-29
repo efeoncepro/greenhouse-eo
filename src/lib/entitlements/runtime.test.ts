@@ -116,6 +116,31 @@ describe('getTenantEntitlements', () => {
     expect(can(entitlements, 'finance.status', 'read', 'tenant')).toBe(false)
   })
 
+  it('grants AEO entitlement mutation only to account leads and admins', () => {
+    const accountEntitlements = getTenantEntitlements(buildSubject({
+      roleCodes: [ROLE_CODES.EFEONCE_ACCOUNT],
+      primaryRoleCode: ROLE_CODES.EFEONCE_ACCOUNT,
+      routeGroups: ['internal', 'commercial']
+    }))
+
+    const adminEntitlements = getTenantEntitlements(buildSubject({
+      roleCodes: [ROLE_CODES.EFEONCE_ADMIN],
+      primaryRoleCode: ROLE_CODES.EFEONCE_ADMIN,
+      routeGroups: ['internal', 'admin']
+    }))
+
+    const operationsEntitlements = getTenantEntitlements(buildSubject({
+      roleCodes: [ROLE_CODES.EFEONCE_OPERATIONS],
+      primaryRoleCode: ROLE_CODES.EFEONCE_OPERATIONS,
+      routeGroups: ['internal']
+    }))
+
+    expect(can(accountEntitlements, 'growth.ai_visibility.entitlement.manage', 'execute', 'tenant')).toBe(true)
+    expect(can(adminEntitlements, 'growth.ai_visibility.entitlement.manage', 'execute', 'tenant')).toBe(true)
+    expect(can(operationsEntitlements, 'growth.ai_visibility.run.operator', 'execute', 'tenant')).toBe(true)
+    expect(can(operationsEntitlements, 'growth.ai_visibility.entitlement.manage', 'execute', 'tenant')).toBe(false)
+  })
+
   it('keeps engagement approval gated to efeonce admins', () => {
     const accountLeadEntitlements = getTenantEntitlements(buildSubject({
       roleCodes: [ROLE_CODES.EFEONCE_ACCOUNT],

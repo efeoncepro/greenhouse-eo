@@ -100,6 +100,10 @@ export type CanonicalErrorCode =
   | 'aeo_profile_required'
   | 'aeo_quota_exhausted'
   | 'aeo_cost_blocked'
+  | 'aeo_assignment_invalid_tier'
+  | 'aeo_assignment_invalid_input'
+  | 'aeo_assignment_website_required'
+  | 'aeo_assignment_org_not_found'
   // Growth Search Console connection · OAuth multi-tenant (TASK-1282).
   | 'search_console_disabled'
   | 'search_console_not_connected'
@@ -371,6 +375,27 @@ const CANONICAL_ERRORS: Record<CanonicalErrorCode, CanonicalErrorDefinition> = {
   aeo_cost_blocked: {
     status: 429,
     message: 'El análisis AEO no está disponible temporalmente por alta demanda. Intenta más tarde.',
+    actionable: false
+  },
+  aeo_assignment_invalid_tier: {
+    status: 400,
+    message: 'El tier AEO no es válido. Usa trial, contracted, pilot o none.',
+    actionable: true
+  },
+  aeo_assignment_invalid_input: {
+    status: 400,
+    message: 'Revisa la asignación AEO: falta un campo obligatorio o un valor no es válido.',
+    actionable: true
+  },
+  aeo_assignment_website_required: {
+    status: 422,
+    message:
+      'Esta organización aún no tiene una web canónica. Completa website_url antes de activar AEO.',
+    actionable: false
+  },
+  aeo_assignment_org_not_found: {
+    status: 404,
+    message: 'No encontramos esa organización activa para asignar AEO.',
     actionable: false
   },
   search_console_disabled: {

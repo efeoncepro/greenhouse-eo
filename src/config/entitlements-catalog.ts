@@ -2012,6 +2012,15 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     actions: ['execute'] as const,
     defaultScope: 'tenant'
   },
+  // TASK-1286 — entitlement.manage: asignar/cambiar/superseder tiers AEO por org.
+  // Command gobernado `assignAeoTier`, consumible por cockpit operador, Account-360 y Nexa
+  // vía confirmación humana. Grant restringido a efeonce_account + efeonce_admin.
+  {
+    key: 'growth.ai_visibility.entitlement.manage',
+    module: 'growth',
+    actions: ['execute'] as const,
+    defaultScope: 'tenant'
+  },
   // TASK-1270 — regrade.manage: gobernanza futura del opt-in/cadencia del re-grade
   // recurrente. El batch automático corre como sistema desde ops-worker; esta capability
   // queda para surfaces humanas/agentes que habiliten/deshabiliten el monitoreo.

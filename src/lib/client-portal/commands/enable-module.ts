@@ -53,6 +53,7 @@ export interface EnableClientPortalModuleInput {
 
   readonly source: AssignmentSource
   readonly sourceRefJson?: Record<string, unknown>
+  readonly metadataJson?: Record<string, unknown>
 
   /** ISO date `YYYY-MM-DD`. */
   readonly effectiveFrom: string
@@ -176,6 +177,7 @@ export const enableClientPortalModule = async (
         status: targetStatus,
         source: input.source,
         source_ref_json: (input.sourceRefJson ?? {}) as never,
+        metadata_json: (input.metadataJson ?? {}) as never,
         effective_from: input.effectiveFrom,
         expires_at: input.expiresAt ?? null,
         approved_by_user_id: input.approvedByUserId,
@@ -192,6 +194,7 @@ export const enableClientPortalModule = async (
         payload: {
           source: input.source,
           sourceRefJson: input.sourceRefJson ?? {},
+          metadataJson: input.metadataJson ?? {},
           reason: input.reason,
           overrideBusinessLineMismatch: input.overrideBusinessLineMismatch === true,
           overrideReason: input.overrideReason
@@ -211,6 +214,7 @@ export const enableClientPortalModule = async (
           organizationId: input.organizationId,
           moduleKey: input.moduleKey,
           status: targetStatus,
+          metadataJson: input.metadataJson ?? {},
           source: input.source,
           effectiveFrom: input.effectiveFrom,
           expiresAt: input.expiresAt ?? null

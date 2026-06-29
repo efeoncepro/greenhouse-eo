@@ -307,6 +307,21 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
       source: operatorSource
     })
 
+    // TASK-1286 — entitlement.manage: el set operador completo NO recibe esta mutación.
+    // Sólo AM (`efeonce_account`) y admin pueden asignar/cambiar/superseder tiers AEO.
+    if (
+      hasRole(subject, ROLE_CODES.EFEONCE_ADMIN) ||
+      hasRole(subject, ROLE_CODES.EFEONCE_ACCOUNT)
+    ) {
+      addEntitlement(entries, {
+        module: 'growth',
+        capability: 'growth.ai_visibility.entitlement.manage',
+        action: 'execute',
+        scope: 'tenant',
+        source: 'role'
+      })
+    }
+
     // TASK-1270 — regrade.manage: gobierna surfaces futuras de opt-in/cadencia; el
     // scheduler automático corre como sistema y no depende de sesión humana.
     addEntitlement(entries, {

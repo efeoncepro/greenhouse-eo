@@ -26,6 +26,21 @@ Run this skill when the operator message includes any of:
 Do not run it for general questions, brainstorming, mini-tasks, issues, or local
 changes unless the operator explicitly asks to use the TASK hook.
 
+## Goal Preflight
+
+Before running the hook for an execution request, check whether the operator has
+already provided an explicit `/goal` in the current conversation.
+
+- If the operator asks Codex to execute, implement, or continue a `TASK-###` and
+  has not provided `/goal`, first propose a recommended `/goal` for that task and
+  wait for the operator to approve it or provide their own.
+- The recommended goal must include closure objective, required evidence, scope
+  limits, correct state when rollout/runtime evidence is missing, and whether
+  `mantente en develop` or subagents are recommended.
+- If the operator already provided `/goal`, continue to the required command.
+- If the operator explicitly says to execute without a goal, document the
+  exception in Audit/Plan/Handoff and continue to the required command.
+
 ## Required Command
 
 Before writing code, run:
@@ -45,6 +60,19 @@ run:
 
 ```bash
 pnpm codex:task-hook TASK-### --develop
+```
+
+If the operator explicitly asks to use subagents, delegation, parallel agents, or
+parallelized execution for the task, include:
+
+```bash
+pnpm codex:task-hook TASK-### --subagents
+```
+
+Combine flags when both apply:
+
+```bash
+pnpm codex:task-hook TASK-### --develop --subagents
 ```
 
 Apply the prompt printed by the command before implementation.
@@ -69,6 +97,9 @@ its temporary branch before closing unless the operator asks to keep it.
 - For UI/UX tasks, that prompt requires an explicit UI enterprise-ready goal
   guard before JSX/copy work: use Claude Code `/goal` when running there, or the
   native Codex goal mechanism/equivalent hard gate when running in Codex.
+- For explicitly authorized subagent runs, that prompt requires Codex to load
+  available multi-agent tooling when Discovery/Plan selects `fork`, assign
+  disjoint ownership, and consolidate/verify the combined result.
 - `pnpm codex:task-hook:check` verifies the hook, prompt, aliases, entrypoint
   references, and a live active-task smoke.
 - This is not a Git hook or runtime listener; Codex must execute the command when

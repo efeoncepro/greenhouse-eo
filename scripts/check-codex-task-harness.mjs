@@ -39,11 +39,23 @@ requireIncludes('CODEX prompt', sources.prompt, 'MODO DE RAMA / WORKTREE')
 requireIncludes('CODEX prompt', sources.prompt, 'pnpm qa:gates --changed')
 requireIncludes('CODEX prompt', sources.prompt, 'pnpm docs:closure-check')
 requireIncludes('CODEX prompt', sources.prompt, 'greenhouse-documentation-governor')
+requireIncludes('CODEX prompt', sources.prompt, 'GOAL PREFLIGHT')
+requireIncludes('CODEX prompt', sources.prompt, 'propone un `/goal` recomendado')
 requireIncludes('CODEX prompt', sources.prompt, 'UI/UX GOAL GUARD')
 requireIncludes('CODEX prompt', sources.prompt, '/goal [TASK-###] UI enterprise-ready')
+requireIncludes('CODEX prompt', sources.prompt, 'SUBAGENT TOOLING')
+requireIncludes('CODEX prompt', sources.prompt, 'multi_agent_v1')
+requireIncludes('CODEX prompt', sources.prompt, 'fork recomendado, no autorizado/no disponible')
+requireIncludes('CODEX hook', sources.hook, '--subagents')
 requireIncludes('CODEX skill', sources.skill, '/implement-task ###')
+requireIncludes('CODEX skill', sources.skill, 'Goal Preflight')
+requireIncludes('CODEX skill', sources.skill, '--subagents')
 requireIncludes('AGENTS.md', sources.agents, '/implement-task ###')
+requireIncludes('AGENTS.md', sources.agents, 'Goal preflight TASK-* para Codex')
+requireIncludes('AGENTS.md', sources.agents, '--subagents')
 requireIncludes('CLAUDE.md', sources.claude, '/implement-task ###')
+requireIncludes('CLAUDE.md', sources.claude, 'Delta Codex goal preflight')
+requireIncludes('CLAUDE.md', sources.claude, '--subagents')
 requireIncludes('Claude command', sources.claudeCommand, 'TASK-###|###')
 requireIncludes('Claude command', sources.claudeCommand, '/goal TASK-### UI enterprise-ready')
 requireIncludes('project_context.md', sources.projectContext, '/implement-task ###')
@@ -77,6 +89,20 @@ if (!activeTask) {
 
     if (!output.includes('mantente en develop')) {
       failures.push('hook smoke: --develop prompt did not include develop override')
+    }
+
+    const subagentOutput = execFileSync(
+      'node',
+      ['scripts/codex-task-hook.mjs', activeTask, '--develop', '--subagents', '--prompt-only'],
+      {
+        cwd: repoRoot,
+        encoding: 'utf8',
+        stdio: ['ignore', 'pipe', 'pipe'],
+      },
+    )
+
+    if (!subagentOutput.includes('subagentes autorizados')) {
+      failures.push('hook smoke: --subagents prompt did not include explicit authorization')
     }
   } catch (error) {
     failures.push(`hook smoke failed for ${activeTask}: ${error.message}`)
