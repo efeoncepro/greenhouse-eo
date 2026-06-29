@@ -64,6 +64,9 @@ export default [
       'scripts/lib/server-only-empty.cjs',
       'tests/playwright/test-results/**',
       'artifacts/**',
+      // Scratch/temp dir (gitignored) — agents drop throwaway verify scripts here; never lint them.
+      'tmp/**',
+      '**/tmp/**',
       '**/* (1).js',
       '**/* (1).jsx',
       '**/* (1).ts',
