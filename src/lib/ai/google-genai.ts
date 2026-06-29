@@ -129,3 +129,62 @@ export const runGeminiGroundedSearch = async (input: {
     latencyMs
   }
 }
+
+// ── Structured output runner (TASK-1271) ──────────────────────────────────────
+
+/** Default Gemini model para structured output low-cost (verificable al calibrar). */
+export const GEMINI_STRUCTURED_DEFAULT_MODEL = 'gemini-2.5-flash-lite'
+
+export interface GeminiStructuredResult<T> {
+  data: T
+  model: string
+  usage: { inputTokens: number; outputTokens: number }
+}
+
+/**
+ * Fuerza una respuesta JSON vía Vertex (`responseMimeType: application/json` +
+ * `responseJsonSchema`). Devuelve el JSON parseado tipado + modelo + usage. LANZA
+ * en error de SDK/credencial/parse (el caller lo mapea a degradación honesta).
+ * `thinkingBudget: 0` para mantener barato/determinista el paso de extracción.
+ */
+export const generateStructuredGemini = async <T>(input: {
+  model?: string
+  system: string
+  prompt: string
+  jsonSchema: Record<string, unknown>
+  maxOutputTokens?: number
+  temperature?: number
+}): Promise<GeminiStructuredResult<T>> => {
+  const client = await getGoogleGenAIClient()
+  const model = input.model?.trim() || GEMINI_STRUCTURED_DEFAULT_MODEL
+
+  const response = await client.models.generateContent({
+    model,
+    contents: input.prompt,
+    config: {
+      systemInstruction: input.system,
+      temperature: input.temperature ?? 0,
+      maxOutputTokens: input.maxOutputTokens ?? 1024,
+      thinkingConfig: { thinkingBudget: 0 },
+      responseMimeType: 'application/json',
+      responseJsonSchema: input.jsonSchema
+    }
+  })
+
+  const text = response.text?.trim()
+
+  if (!text) {
+    throw new Error('Gemini structured response vacío.')
+  }
+
+  const usage = response.usageMetadata
+
+  return {
+    data: JSON.parse(text) as T,
+    model,
+    usage: {
+      inputTokens: typeof usage?.promptTokenCount === 'number' ? usage.promptTokenCount : 0,
+      outputTokens: typeof usage?.candidatesTokenCount === 'number' ? usage.candidatesTokenCount : 0
+    }
+  }
+}

@@ -72,14 +72,14 @@ describe('prose-extraction router — fallback matrix (honest degradation)', () 
     expect(generateStructuredAnthropicMock).not.toHaveBeenCalled()
   })
 
-  it('proveedor no registrado (forzado) → not_configured', async () => {
+  it('proveedor desconocido (no en el registry) → not_configured, sin tocar clientes', async () => {
     process.env[FLAG] = 'true'
 
-    const result = await runProseExtraction(validInput, { provider: 'gemini' })
+    const result = await runProseExtraction(validInput, { provider: 'mistral' as never })
 
     expect(result.fields).toBeNull()
     expect(result.metadata.status).toBe('not_configured')
-    expect(result.metadata.providerId).toBe('gemini')
+    expect(generateStructuredAnthropicMock).not.toHaveBeenCalled()
   })
 
   it('proveedor sin secret → not_configured (sin invocar extract)', async () => {

@@ -18,6 +18,8 @@ import { captureWithDomain } from '@/lib/observability/capture'
 
 import { isLlmExtractionEnabled, resolveProseExtractionConfig } from '../../flags'
 import { anthropicProseProvider } from './anthropic-provider'
+import { geminiProseProvider } from './gemini-provider'
+import { openAiProseProvider } from './openai-provider'
 import {
   PROSE_EXTRACTION_VERSION,
   sanitizeProseExtractionOutput,
@@ -42,12 +44,15 @@ const EXTRACTION_PRICING: Record<ProseExtractionProviderId, { inputPerMillion: n
 }
 
 /**
- * Registry de adapters registrados. Slice 1 registra sólo `anthropic`
- * (behavior-preserving); Slice 2 agrega `gemini`/`openai`. Si el flag selecciona un
- * proveedor NO registrado, el router degrada honesto (`not_configured`).
+ * Registry de adapters. `anthropic` es el default behavior-preserving; `gemini`/
+ * `openai` son candidatos low-cost (TASK-1271 Slice 2) opt-in por flag + evaluados
+ * antes del cutover. Si el flag selecciona un proveedor sin secret/credencial, el
+ * router degrada honesto (`not_configured`).
  */
 const PROVIDER_REGISTRY: Partial<Record<ProseExtractionProviderId, ProseExtractionProvider>> = {
-  anthropic: anthropicProseProvider
+  anthropic: anthropicProseProvider,
+  gemini: geminiProseProvider,
+  openai: openAiProseProvider
 }
 
 /** Acceso de sólo lectura al registry (consumido por el harness de eval, Slice 3). */
@@ -112,7 +117,11 @@ export const runProseExtraction = async (
     return { fields: null, metadata: fallbackMetadata('not_configured', providerId) }
   }
 
-  if (!(await provider.isConfigured())) {
+  // `isConfigured()` puede lanzar (ej. credencial Vertex ausente) → degradar honesto,
+  // NUNCA propagar. El router no lanza por construcción.
+  const configured = await provider.isConfigured().catch(() => false)
+
+  if (!configured) {
     return { fields: null, metadata: fallbackMetadata('not_configured', providerId) }
   }
 
