@@ -57,13 +57,30 @@ El baseline por arquetipo y el system prompt del autor codifican **qué stages e
 
 1290 no construye UI, pero `grader_prompt_sets.prompts_json` debe cargar lo que el reconciler de TASK-1291 (Adaptive Sidecar, variant `reconciler`) necesita para un review con contexto, no una lista plana: por query, además de los tags, un `rationale` corto (por qué esta pregunta) y `groundingRef` (qué señal del snapshot la motivó). Así el review agrupa por `intentStage`/`family`, marca `namesBrand`, y muestra el **diff vs baseline** del arquetipo. Garantizar el shape acá evita re-trabajo en 1291.
 
+## Implementación 2026-06-29 — COMPLETE (develop local, sin push)
+
+4 slices. El corazón del fix de ISSUE-110 (SKY medible con prompts de consumo).
+
+- **S0** `prompt-packs/tag-vocabulary.ts` (enums cerrados, consolida `REVENUE_INTENT_STAGES` antes duplicado) + tags viajan en `GraderRunPromptInput`/`execution_prompts`; `scoreGraderRun` arma `promptTagCatalog` desde el run → normalizer + scorer leen de ahí (fallback pack v1). **Fix de correctitud:** sin esto un set con ids nuevos corrompía el score. Test bit-for-bit agencia + decouple.
+- **S1** `prompt-packs/archetypes/baseline-packs.ts` (`resolveArchetypeBaselinePack`): packs por arquetipo con JTBD real; agencia = v1 exacto; `unknown`→genérico. Flag `GROWTH_AI_VISIBILITY_ARCHETYPE_PROMPTS_ENABLED`; `buildExecuteInput` selecciona por arquetipo; `businessModel` fluye del perfil.
+- **S2** migración `grader_prompt_sets` (versionado + lifecycle `draft→approved→active`, un solo active, supersede atómico) + provenance en `grader_runs` + capability `growth.ai_visibility.prompt_set.manage`. `prompt-set-store` + `prompt-set-command` gobernado. `enqueueGraderRun` resuelve el set active (o baseline). **El LLM NO corre por run.**
+- **S3** `prompt-packs/authoring/` (`authorPromptSet` + system prompt versionado `aeo-author.v1` derivado de seo-aeo + JTBD; router gemini→openai→anthropic; sanitizer + vocabulario cerrado + NO-LEADING; degradación honesta → baseline). Command `authorGraderPromptSetDraft`. Flag `GROWTH_AI_VISIBILITY_PROMPT_AUTHORING_ENABLED`.
+
+**Verificación live (`greenhouse-pg-dev`, gemini):** S2 lifecycle (draft v1→active, v2→active+v1 superseded, one-active). S3 autoría SKY → status `ok`, 15 prompts consumo (8 discovery, 0 agency leak, 7 stages): "mejores aerolíneas low cost en Chile", "Santiago-Calama", "LATAM vs JetSmart". Decouple bit-for-bit (caso agencia).
+
+**Gates:** `pnpm test` full + `pnpm build` + `pnpm local:check` + capability-grant-coverage verdes.
+
+**Decisión (delta a la spec):** capability DEDICADA `prompt_set.manage` (acción gobernada distinta) en vez de reuse; vocabulario de tags cerrado consolidado en `tag-vocabulary.ts`.
+
+**Rollout pendiente (Runtime Rollout Completion Gate):** flags `ARCHETYPE_PROMPTS` + `PROMPT_AUTHORING` OFF en todos los environments. Las 2 AC de "run real SKY scored ≠ 0" quedan **rollout-pending**: requieren prender el flag en staging + correr un run scored end-to-end (la autoría + el decouple están verificados; el run scored con flag ON es el paso de rollout, gateado por el review TASK-1291 + la eval TASK-1292). Prod vía release control plane (EPIC-021).
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -224,9 +241,9 @@ Reglas obligatorias:
 
 ### Acceptance criteria additions
 
-- [ ] SoT (`grader_prompt_sets` artefacto versionado + provenance) y los commands (author/approve/resolve) nombrados; scoring inalterado.
-- [ ] LLM autora al momento de autoría (no por run); el run usa el set `active` congelado (reproducible); fallback a baseline determinista.
-- [ ] No regresión: el baseline `b2b_service_provider` es idéntico al pack actual.
+- [x] SoT (`grader_prompt_sets` artefacto versionado + provenance) y los commands (author/approve/resolve) nombrados; scoring inalterado.
+- [x] LLM autora al momento de autoría (no por run); el run usa el set `active` congelado (reproducible); fallback a baseline determinista.
+- [x] No regresión: el baseline `b2b_service_provider` es idéntico al pack actual.
 - [ ] Run real SKY con set autorado → score realista ≠ 0 (evidencia); un solo `active` por perfil; LLM vía cliente canónico + secret server-side.
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -322,10 +339,10 @@ El LLM autor **mina el espacio de queries de buyer-intent** (no es el grounding 
 
 ## Acceptance Criteria
 
-- [ ] **Scoring desacoplado del pack estático (Slice 0):** el normalizer y el scorer leen `family`/`fanOutType`/`intentStage`/`namesBrand` del set RESUELTO del run (tags persistidos en `execution_prompts`), no de `GROWTH_AI_VISIBILITY_PROMPT_PACK_V1`; un set con ids nuevos produce el score CORRECTO (no near-0 por tags `undefined`). Tags de un vocabulario CERRADO (`tag-vocabulary.ts`); `score_version` inalterado; caso agencia bit-for-bit idéntico.
-- [ ] **Autoría LLM (no por run):** `authorPromptSet` produce un `draft` por marca vía el cliente canónico `src/lib/ai/*` (structured + cost-bounded, no-leading, schema-validado contra los enums cerrados); el LLM NO corre por run.
-- [ ] **Artefacto congelado + reproducible:** `grader_prompt_sets` versionado con lifecycle `draft→approved→active` (un solo `active` por perfil, supersede append-only); el run resuelve el set `active` (2 runs de la misma marca = mismo set).
-- [ ] **Baseline + no-regresión:** sin set `active` → baseline determinista del arquetipo (no enum crudo); el baseline `b2b_service_provider` es **idéntico** al `prompt-pack-v1` actual (test bit-for-bit).
+- [x] **Scoring desacoplado del pack estático (Slice 0):** el normalizer y el scorer leen `family`/`fanOutType`/`intentStage`/`namesBrand` del set RESUELTO del run (tags persistidos en `execution_prompts`), no de `GROWTH_AI_VISIBILITY_PROMPT_PACK_V1`; un set con ids nuevos produce el score CORRECTO (no near-0 por tags `undefined`). Tags de un vocabulario CERRADO (`tag-vocabulary.ts`); `score_version` inalterado; caso agencia bit-for-bit idéntico.
+- [x] **Autoría LLM (no por run):** `authorPromptSet` produce un `draft` por marca vía el cliente canónico `src/lib/ai/*` (structured + cost-bounded, no-leading, schema-validado contra los enums cerrados); el LLM NO corre por run.
+- [x] **Artefacto congelado + reproducible:** `grader_prompt_sets` versionado con lifecycle `draft→approved→active` (un solo `active` por perfil, supersede append-only); el run resuelve el set `active` (2 runs de la misma marca = mismo set).
+- [x] **Baseline + no-regresión:** sin set `active` → baseline determinista del arquetipo (no enum crudo); el baseline `b2b_service_provider` es **idéntico** al `prompt-pack-v1` actual (test bit-for-bit).
 - [ ] Run real sobre SKY (staging, set autorado+aprobado) genera prompts de consumo y devuelve score realista ≠ 0 (evidencia); scoring inalterado (mismo `score_version`); provenance del set en el run; flag + fallback honesto.
 
 ## Verification
@@ -337,13 +354,13 @@ El LLM autor **mina el espacio de queries de buyer-intent** (no es el grounding 
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` sincronizado
-- [ ] archivo en la carpeta correcta
-- [ ] `docs/tasks/README.md` sincronizado
-- [ ] `Handoff.md` actualizado
-- [ ] `changelog.md` actualizado
-- [ ] chequeo de impacto cruzado (EPIC-021, TASK-1291/1292, ISSUE-110)
-- [ ] Delta en `GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md` (prompt generation por arquetipo)
+- [x] `Lifecycle` sincronizado
+- [x] archivo en la carpeta correcta
+- [x] `docs/tasks/README.md` sincronizado
+- [x] `Handoff.md` actualizado
+- [x] `changelog.md` actualizado
+- [x] chequeo de impacto cruzado (EPIC-021, TASK-1291/1292, ISSUE-110)
+- [x] Delta en `GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md` (prompt generation por arquetipo)
 
 ## Follow-ups
 

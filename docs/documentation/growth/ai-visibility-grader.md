@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.19
+> **Version:** 1.20
 > **Creado:** 2026-06-24 por Claude (TASK-1226)
-> **Ultima actualizacion:** 2026-06-29 por Claude (TASK-1289 — clasificación de modelo de negocio, eje de buyer-intent)
+> **Ultima actualizacion:** 2026-06-29 por Claude (TASK-1290 — prompts por arquetipo + autoría LLM congelada)
 > **Documentacion tecnica:** [GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md)
 
 # AI Visibility Grader — Motor de Providers (Growth)
@@ -214,6 +214,16 @@ Saber la **categoría** no basta: una misma categoría tiene marcas muy distinta
 - **Ejemplos reales:** Sky Airlines, Grupo Berel (pinturas) y Banco de Chile → "marca de consumo"; Vercel → "producto/software B2B"; Efeonce → "proveedor de servicios B2B".
 
 > Detalle técnico: §Delta TASK-1289 en [GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md). Código: `src/lib/growth/ai-visibility/taxonomy/business-model.ts` + `override-business-model.ts`. Eje `business_model` en `grader_profiles` (aditivo, sin flag); lo consumen los packs de prompts (TASK-1290).
+
+## Qué preguntas le hace a los motores (prompts por marca — TASK-1290)
+
+El grader mide si una marca aparece haciéndole a los motores de IA las preguntas que un **comprador real** haría. Antes esas preguntas estaban fijas y pensadas para agencias ("¿qué agencias de {categoría} hay?"), lo que daba un "0" falso a marcas de consumo. Ahora las preguntas se **generan por marca** según su categoría y su modelo de negocio.
+
+- **Cada marca tiene su propio set de preguntas.** Una aerolínea recibe preguntas de pasajero ("mejores aerolíneas low cost", "¿qué aerolíneas vuelan de Santiago a Calama?", reseñas, equipaje, precio); un software B2B, preguntas de evaluación (integraciones, seguridad, alternativas); una agencia, las de antes. Mezcla preguntas de **descubrimiento** (que NO nombran la marca — miden si te encuentran a ciegas) y de marca (reputación, riesgo).
+- **El set se arma una vez y se congela.** Un asistente de IA propone las preguntas (entendiendo qué hace la marca); una persona del equipo las revisa y aprueba; a partir de ahí el grader usa ese set fijo en cada medición (reproducible, sin costo extra por medición). Si no hay un set aprobado, usa una plantilla por arquetipo (consumo/B2B/retail/…) — nunca preguntas rotas.
+- **La forma de puntuar NO cambió.** Sólo cambian las preguntas; el cálculo del puntaje (presencia, share of voice, citación) es el mismo.
+
+> Detalle técnico: §Delta TASK-1290 en [GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md). Código: `src/lib/growth/ai-visibility/prompt-packs/{archetypes,authoring}/*` + `prompt-set-store.ts`. Detrás de los flags `GROWTH_AI_VISIBILITY_ARCHETYPE_PROMPTS_ENABLED` + `GROWTH_AI_VISIBILITY_PROMPT_AUTHORING_ENABLED` (default OFF; rollout tras eval TASK-1292 + review TASK-1291).
 
 ## Límites actuales
 

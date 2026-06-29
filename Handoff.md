@@ -1,3 +1,21 @@
+## Sesion 2026-06-29 — TASK-1290 AEO archetype prompt packs — Claude — ✅ complete (develop local, sin push)
+
+> **Qué:** EPIC-021, el corazón del fix de ISSUE-110. Reemplaza el prompt pack único de agencia por un prompt set generado por marca (categoría × `business_model` × buyer-intent), sin tocar el scoring determinista. Precedido por un análisis multi-skill (arch/seo/commercial/product-design) que destapó un defecto de correctitud bloqueante.
+>
+> **4 slices (develop, sin push):**
+> - **S0 (correctitud load-bearing):** el scorer (`scoring/engine.ts`) y el normalizer (`normalization/normalizer.ts`) leían los tags (`namesBrand`/`intentStage`/`family`) del pack ESTÁTICO por `promptId`, pero los tags no viajaban con el run → un set con ids nuevos corrompía el score en silencio (2º mecanismo del falso-0). Fix: `tag-vocabulary.ts` (enums cerrados, consolida `REVENUE_INTENT_STAGES` antes duplicado); los 4 tags viajan en `execution_prompts`; `scoreGraderRun` arma `promptTagCatalog` del run → normalizer+scorer leen de ahí (fallback pack v1 → agencia bit-for-bit). `score_version` intacto.
+> - **S1:** `resolveArchetypeBaselinePack` — baselines deterministas por arquetipo (consumo/B2B-saas/retail/marketplace/público + genérico; agencia=v1 exacto; `unknown`→genérico NUNCA agencia). Flag `GROWTH_AI_VISIBILITY_ARCHETYPE_PROMPTS_ENABLED`.
+> - **S2:** tabla `grader_prompt_sets` versionada + lifecycle `draft→approved→active` (un solo active, supersede atómico) + provenance en `grader_runs` + capability `growth.ai_visibility.prompt_set.manage`. `enqueueGraderRun` resuelve el set active (o baseline). El LLM NO corre por run.
+> - **S3:** autoría LLM `authorPromptSet` (`prompt-packs/authoring/`): router gemini→openai→anthropic vía cliente canónico `src/lib/ai/*`, system prompt VERSIONADO `aeo-author.v1` (seo-aeo §04 + JTBD, NO-LEADING, vocabulario cerrado), sanitizer, degradación honesta→baseline. Flag `GROWTH_AI_VISIBILITY_PROMPT_AUTHORING_ENABLED`.
+>
+> **Verificación live (`greenhouse-pg-dev`, gemini):** S2 lifecycle (v1→active, v2→active+v1 superseded). S3 autoría SKY → status `ok`, 15 prompts consumo (8 discovery, 0 agency leak, 7 stages): "mejores aerolíneas low cost en Chile", "Santiago-Calama", "LATAM vs JetSmart". Decouple bit-for-bit agencia.
+>
+> **Gates:** `pnpm test` full + `pnpm build` + `pnpm local:check` + capability-grant-coverage verdes.
+>
+> **Rollout pendiente:** flags `ARCHETYPE_PROMPTS` + `PROMPT_AUTHORING` OFF. 2 AC ("run real SKY scored ≠ 0") quedan rollout-pending: requieren prender el flag en staging + run scored end-to-end (autoría + decouple verificados; el run scored con flag ON es el paso de rollout, gateado por review TASK-1291 + eval TASK-1292). Prod vía release control plane (EPIC-021).
+>
+> **Commits develop:** `bfaf91b42` (S0) · `5dcd1035c` (S1) · `6e993d570` (S2) · `63f588ed3` (S3) · docs (este). Spec previa ajustada: `acbd1203c`.
+
 ## Sesion 2026-06-29 — TASK-1289 AEO business model classification — Claude — ✅ complete (develop local, sin push)
 
 > **Qué:** EPIC-021 2º paso de ISSUE-110. Eje `business_model` (buyer-intent, ortogonal a la categoría) en `grader_profiles`, derivado del snapshot `brand_intelligence` (TASK-1288) con override operador. Universal — sirve para cualquier marca (consumo/B2B-svc/B2B-saas/retail/marketplace/público), NO sólo aerolíneas/agencias.
@@ -34228,3 +34246,51 @@ Se implementó el HTML local `/Users/jreye/Documents/AEO/landing-aeo-efeonce-moc
 Conversión: el formulario del mockup NO se copió como fake form. En su lugar quedó un bloque placeholder editable que apunta a `https://meetings.hubspot.com/efeoncepro/agenda-discovery` y documenta que debe reemplazarse por el formulario HubSpot oficial del diagnóstico AEO cuando exista el mapping. Claims/estadísticas fueron trasladados desde el mockup como base creativa; antes de paid/campaign launch conviene validar fuentes y citas externas.
 
 Validación: `php -l` del script de build OK; guardado vía `pnpm public-website:wpcli -- --eval-file ./tmp/build-aeo-2-elementor-landing-20260629.php --wp-user 12` OK (`rootCount=8`). `curl` de la URL pública normal devolvió el H1 nuevo, `gh-aeo-hero`, Yoast metadata y JSON-LD. Playwright screenshots generadas en `/tmp/aeo-2-desktop.png` y `/tmp/aeo-2-mobile.png`; desktop y mobile se ven estables, header/footer del tema intactos. Medición Playwright: desktop `scrollWidth=1440/clientWidth=1440`, mobile `scrollWidth=390/clientWidth=390`, `sections=8`, `headerCount=1`, `hasJsonLd=true`.
+
+### Hero refinement — COMPLETE 2026-06-29 — Codex
+
+El operador pidió aplicar la revisión de Product Design al primer fold. Se refinó solo el hero de `/aeo-2/` (`postId=250265`) con `Document::save()` y CSS page-scoped en `_elementor_page_settings.custom_css`; Home y el menú global no se tocaron. Backups internos creados en metas `_gh_backup_before_aeo_hero_v2_*` y `_gh_backup_before_aeo_hero_v2_mobile_tune_*`.
+
+Cambios: H1 compactado y alineado a la izquierda (`Tu cliente ya pregunta...`), bajada más específica de AEO, reassurance más concreta (`score`, competidores citados, prompts), proof chips con países, y visual derecho reemplazado por una preview de diagnóstico AEO (`gh-aeo-diagnostic-preview`) con score, competidores citados y riesgo detectado. CSS markers: `gh-aeo-hero-v2-refinement` + `gh-aeo-hero-v2-mobile-tune`.
+
+Validación: WP-CLI remoto OK (`heroTitle`, `heroSub`, `heroNote`, `heroProof`, `heroVisual`, `heroClasses` true). `curl` público confirmó `gh-aeo-hero-v2`, el nuevo H1 y la preview. Playwright screenshots: `/tmp/aeo-2-hero-v2b-desktop.png` y `/tmp/aeo-2-hero-v2b-mobile.png`. Medición final: desktop `scrollWidth=1440/clientWidth=1440`, hero `813px`, H1 `294px`, card `644px`; mobile `scrollWidth=390/clientWidth=390`, hero `1362px`, H1 `234px`, card `586px`, `sections=8`.
+
+### Hero correction after operator review — COMPLETE 2026-06-29 — Codex
+
+El operador rechazó el cambio anterior: el texto seguía cayendo demasiado hacia abajo y no debía cambiarse el módulo derecho tipo chat. Se corrigió sobre la misma página `/aeo-2/` (`postId=250265`), sin tocar Home ni el menú.
+
+Corrección aplicada: se restauró el visual derecho original tipo conversación (`gh-aeo-answer`) y se eliminó la preview de diagnóstico (`hasDiagnosticPreview=false`). Se corrigió la causa indicada por el operador: el hero estaba demasiado encajonado lateralmente, así que se agregó `gh-aeo-hero-chat-width-fix` solo al root del hero y se ajustó el padding lateral/columnas/tipografía con el marker `gh-aeo-hero-type-width-tune`. Hubo una microincidencia durante la corrección: la clase se aplicó también a tres hijos por un match demasiado amplio; se saneó inmediatamente y quedó `rootClassCount=1`.
+
+Validación final: `curl` público normal devuelve `gh-aeo-answer` y no `gh-aeo-diagnostic-preview`. Playwright: desktop `1440` sin overflow (`scrollWidth=1440/clientWidth=1440`), H1 `183px`, hero `790px`; wide `2048` sin overflow (`2048/2048`), H1 `260px`, hero `884px`; mobile `390` sin overflow (`390/390`), H1 `223px`, hero `1418px`. Capturas finales: `/tmp/aeo-2-chat-width-fix3-desktop.png`, `/tmp/aeo-2-chat-width-fix3-mobile.png`, `/tmp/aeo-2-chat-width-fix3-wide-viewport.png`.
+
+### Title tracking correction — COMPLETE 2026-06-29 — Codex
+
+El operador detectó que el H1 se veía con demasiado aire entre letras. Se inspeccionó el runtime del tema Ohio: títulos de la home usan `DM Sans` con tracking negativo (`letter-spacing` aprox. `-3.42px` en el H1 de home), mientras que el H1 de `/aeo-2/` estaba en `DM Sans` pero con `letter-spacing: normal`.
+
+Corrección vigente: se mantiene la familia del tema (`DM Sans`; no Poppins) y se aplica solo tracking page-scoped con marker `gh-aeo-title-tracking-fix`. Se retiró el intento intermedio de override a Poppins (`gh-aeo-title-typography-fix`) y el `@import` de Google Fonts para evitar drift visual y problemas de render en Elementor/Ohio.
+
+Validación: WP-CLI remoto confirmó `hasTrackingMarker=true`, `hasPoppinsImport=false`, `hasPoppinsOverride=false`. Playwright computado: desktop H1 `"DM Sans", Inter, sans-serif`, `letterSpacing=-1.944px`; wide H1 `"DM Sans", Inter, sans-serif`, `letterSpacing=-2.7648px`; mobile H1 `"DM Sans", Inter, sans-serif`, `letterSpacing=-1.3338px`; sin overflow en `1440`, `2048` ni `390`. Capturas: `/tmp/aeo-2-dmsans-tracking-desktop.png`, `/tmp/aeo-2-dmsans-tracking-wide.png`, `/tmp/aeo-2-dmsans-tracking-mobile.png`.
+
+### Remove monospace from AEO page modules — COMPLETE 2026-06-29 — Codex
+
+El operador pidió quitar todo lo que se sintiera `monospace` en `/aeo-2/`, porque no corresponde a la tipografía usada por el sitio. Se inspeccionó el documento Elementor y no había ocurrencias en widgets HTML; la fuente venía del `custom_css` page-scoped.
+
+Corrección: se reemplazaron los stacks `ui-monospace, SFMono-Regular, Menlo, monospace` por `Inter, system-ui, -apple-system, "Segoe UI", sans-serif` en chips, notas, labels y el visual tipo chat. Se mantuvo `DM Sans` para títulos y no se agregó ningún import externo. Marker vigente: `gh-aeo-sans-type`.
+
+Validación: WP-CLI remoto reportó `customCssMonospaceCount=0`; `curl` público no devuelve `ui-monospace`, `SFMono`, `Menlo` ni `monospace` en la página; Playwright computó `Inter` para eyebrow, prompt, label y foot del módulo chat, sin overflow en desktop `1440/1440` ni mobile `390/390`. Capturas: `/tmp/aeo-2-sans-type-desktop.png`, `/tmp/aeo-2-sans-type-mobile.png`.
+
+### Blue hero composition + spacing cleanup — COMPLETE 2026-06-29 — Codex
+
+El operador pidió llevar el hero de `/aeo-2/` hacia una composición azul tipo home y luego señaló errores de espaciado/elementos. Se mantuvo intacto el módulo derecho tipo chat (`heroans` / `gh-aeo-answer`) y se trabajó solo el copy izquierdo + CSS page-scoped.
+
+Cambios vigentes: H1 conservado según decisión del operador (`Tu próximo cliente ya le pregunta a la IA qué comprar.<br>¿Apareces tú, o tu competencia?`); bajada convertida en answer capsule AEO (`medimos si ChatGPT, Gemini, Perplexity y Claude te citan...`); microcopy del CTA reducido a `Recibe tu score, prompts críticos y competidores citados en 24–48h.`; hero con fondo azul/gradiente inspirado en home; texto invertido; eyebrow convertido en chip real; gaps controlados entre eyebrow/H1/subcopy/CTA/nota/chips; mobile corregido para no colapsar ancho. Markers CSS principales: `gh-aeo-hero-aeo-optimization`, `gh-aeo-hero-blue-composition`, `gh-aeo-blue-hero-polish`, `gh-aeo-blue-hero-spacing-cleanup`.
+
+Validación: WP-CLI confirmó `rightModuleUnchanged=true` con hash `e0b951b2456a83578cd9e22005900521` en las mutaciones. `curl` público devuelve el H1 nuevo y `gh-aeo-answer`, sin `gh-aeo-diagnostic-preview`. Playwright final: desktop `1440` sin overflow (`scrollWidth=1440/clientWidth=1440`), hero `744px`, gaps `42/42/48/18/38`; wide `2048` sin overflow, hero `913px`; mobile `390` sin overflow, hero `1273px`, gaps `28/24/28/18/24`. Capturas finales: `/tmp/aeo-2-blue-hero-clean-desktop.png`, `/tmp/aeo-2-blue-hero-clean-wide.png`, `/tmp/aeo-2-blue-hero-clean-mobile.png`.
+
+### Header like Home — COMPLETE 2026-06-29 — Codex
+
+El operador pidió que el header de `/aeo-2/` se vea como en Home: transparente sobre el hero azul, logo blanco/inverse y menú claro. Se comparó Home (`postId=2791`) vs AEO (`postId=250265`) en metas Ohio y estilos computados. Hallazgo: ambos headers eran transparentes, pero AEO salía con `with-header-1 with-spacer`, logo azul (`main-blue-logo.svg`) y contenido en `top=120px`; Home salía con `with-header-3`, sin spacer, logo inverse y contenido desde `top=0`.
+
+Cambio aplicado en `/aeo-2/`: se copiaron desde Home los metas `page_header_logo_style=light_variant`, `page_header_menu_style=inherit`, `page_header_menu_style_settings=custom`, `page_header_menu_text_typo={"color":"rgba(255,255,255,0.75)"}`, `page_header_add_cap=0`, `page_header_search_visibility=1`, `page_header_search_position=standard`. Luego se añadió padding superior page-scoped al hero con marker `gh-aeo-header-overlay-spacing` para que el contenido respire debajo del header overlay y no se encime con el logo. Backups internos: `_gh_backup_before_aeo_header_like_home_*` y `_gh_backup_before_aeo_header_overlay_spacing_*`.
+
+Validación final: Playwright en desktop confirma `bodyClass` con `with-header-3` y sin `with-spacer`, `#masthead position=absolute`, `heroTop=0`, `contentTop=0`, logo visible `inverse-logo_1.svg`, menú principal `rgba(255,255,255,0.75)`, `overlapsLogoTag=false`, sin overflow `1440/1440`. Mobile también sin overflow `390/390` y sin overlap. Capturas: `/tmp/aeo-2-header-final-desktop.png`, `/tmp/aeo-2-header-final-mobile.png`.
