@@ -251,6 +251,7 @@ import {
 import { getCommercialOrganizationIncompleteIdentitySignal } from './queries/commercial-organization-incomplete-identity'
 import { getCommercialOrganizationIndustryNoncanonicalSignal } from './queries/commercial-organization-industry-noncanonical'
 import { getCommercialOrganizationTypeLifecycleDriftSignal } from './queries/commercial-organization-type-lifecycle-drift'
+import { getOrganizationWebsiteUrlUnsyncedSignal } from './queries/organization-website-url-unsynced'
 // TASK-1212 — cotizaciones emitidas sin líneas (autoría fuera del command atómico). Roll up `commercial`.
 import { getCommercialQuoteAuthoredWithoutCommandSignal } from './queries/commercial-quote-authored-without-command'
 import {
@@ -2277,6 +2278,8 @@ export const getReliabilityOverview = async (
           getCommercialClientActiveWithoutSpaceSignal().catch(() => null),
           // TASK-997 Slice 1 — industria fuera del enum canónico HubSpot (data quality).
           getCommercialOrganizationIndustryNoncanonicalSignal().catch(() => null),
+          // TASK-1285 — web del cliente en el raw layer pero NO promovida a la org canónica.
+          getOrganizationWebsiteUrlUnsyncedSignal().catch(() => null),
           // TASK-992 — Client Lifecycle Orchestrator signals (roll up bajo `commercial`).
           getClientLifecycleOnboardingStalledSignal().catch(() => null),
           getClientLifecycleChecklistOrphanItemsSignal().catch(() => null),

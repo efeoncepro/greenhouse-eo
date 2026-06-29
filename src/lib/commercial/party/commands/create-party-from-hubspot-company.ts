@@ -4,6 +4,7 @@ import { randomUUID } from 'node:crypto'
 
 import { withTransaction } from '@/lib/db'
 import { nextPublicId } from '@/lib/account-360/id-generation'
+import { normalizeWebsiteUrl } from '@/lib/account-360/normalize-website-url'
 import {
   deriveOrganizationType,
   isCanonicalOrganizationWriteEnabled
@@ -43,6 +44,13 @@ export interface CreatePartyFromHubSpotCompanyInput {
    * default ciego 'CL' que dejó a Grupo Berel (MX) marcado como Chile.
    */
   country?: string | null
+  /**
+   * TASK-1285 — URL/web real de la company HubSpot (domain/website del raw layer
+   * `greenhouse_crm.companies`). Se normaliza vía `normalizeWebsiteUrl` y se persiste
+   * en `organizations.website_url` para que el sitio del cliente sea un atributo canónico
+   * (lo consume el grader AEO, el Account-360, etc.). NULL si HubSpot no lo trae.
+   */
+  websiteUrl?: string | null
   actor: PartyActor
 }
 
@@ -87,6 +95,7 @@ export const createPartyFromHubSpotCompany = async (
     const actorId = input.actor.userId ?? (input.actor.system ? 'system' : 'hubspot_sync')
     const organizationId = normalizeOrganizationId()
     const organizationName = input.defaultName?.trim() || `HubSpot Company ${hubspotCompanyId}`
+    const websiteUrl = normalizeWebsiteUrl(input.websiteUrl)
 
     // TASK-991 Slice 1 — root-cause fix de Grupo Berel (gated, shadow). Cuando
     // CLIENT_BIRTH_CANONICAL_WRITE_ENABLED está ON, la puerta HubSpot escribe
@@ -112,12 +121,13 @@ export const createPartyFromHubSpotCompany = async (
              lifecycle_stage_by,
              organization_type,
              country,
+             website_url,
              origin,
              active,
              status,
              created_at,
              updated_at
-           ) VALUES ($1, $2, $3, $4, $5, NOW(), $6, $7, $8, $9, 'hubspot_sync', TRUE, 'active', NOW(), NOW())
+           ) VALUES ($1, $2, $3, $4, $5, NOW(), $6, $7, $8, $9, $10, 'hubspot_sync', TRUE, 'active', NOW(), NOW())
            RETURNING organization_id, commercial_party_id::text AS commercial_party_id`,
           [
             organizationId,
@@ -131,7 +141,8 @@ export const createPartyFromHubSpotCompany = async (
               lifecycleStage: initialStage,
               hasClientRole: initialStage === 'active_client'
             }),
-            input.country?.trim() || null
+            input.country?.trim() || null,
+            websiteUrl
           ]
         )
       : await txClient.query<{
@@ -146,13 +157,14 @@ export const createPartyFromHubSpotCompany = async (
              lifecycle_stage_since,
              lifecycle_stage_source,
              lifecycle_stage_by,
+             website_url,
              active,
              status,
              created_at,
              updated_at
-           ) VALUES ($1, $2, $3, $4, NOW(), $5, $6, TRUE, 'active', NOW(), NOW())
+           ) VALUES ($1, $2, $3, $4, NOW(), $5, $6, $7, TRUE, 'active', NOW(), NOW())
            RETURNING organization_id, commercial_party_id::text AS commercial_party_id`,
-          [organizationId, organizationName, hubspotCompanyId, initialStage, source, actorId]
+          [organizationId, organizationName, hubspotCompanyId, initialStage, source, actorId, websiteUrl]
         )
 
     const row = inserted.rows[0]

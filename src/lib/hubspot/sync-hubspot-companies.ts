@@ -48,6 +48,7 @@ interface HubSpotCompanySourceRow {
   legal_name: string | null
   lifecycle_stage: string | null
   country_code: string | null
+  website_url: string | null
   source_updated_at: Date | string | null
   synced_at: Date | string
   updated_at: Date | string
@@ -134,6 +135,7 @@ const listSourceRows = async ({
       'legal_name',
       'lifecycle_stage',
       'country_code',
+      'website_url',
       'source_updated_at',
       'synced_at',
       'updated_at'
@@ -317,6 +319,9 @@ export const syncHubSpotCompanies = async (
             // TASK-991 Slice 2 — propaga el country real de HubSpot (Berel: MX, no
             // el default ciego 'CL'). Solo se persiste cuando el flag canónico está ON.
             country: row.country_code ?? null,
+            // TASK-1285 — propaga la web del raw layer → organizations.website_url
+            // (normalizada en el command). Antes quedaba sólo en crm.companies.
+            websiteUrl: row.website_url ?? null,
             actor
           })
 

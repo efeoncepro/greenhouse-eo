@@ -4,6 +4,7 @@ import type { PoolClient } from 'pg'
 
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { generateOrganizationId, nextPublicId } from '@/lib/account-360/id-generation'
+import { normalizeWebsiteUrl } from '@/lib/account-360/normalize-website-url'
 import {
   deriveOrganizationType,
   type OrganizationOrigin,
@@ -246,6 +247,12 @@ export const upsertCanonicalOrganization = async (
      * antes de pasarlo; aquí se persiste tal cual (COALESCE preserva en UPDATE).
      */
     industry?: string | null
+    /**
+     * TASK-1285 — URL/web canónica de la org. Se normaliza vía `normalizeWebsiteUrl`
+     * (SSOT del transform) antes de persistir. COALESCE-preserve por default; sólo
+     * sobreescribe con `overrideIdentity`.
+     */
+    websiteUrl?: string | null
     hubspotCompanyId?: string | null
     lifecycleStage?: string | null
     hasClientRole?: boolean
@@ -269,6 +276,7 @@ export const upsertCanonicalOrganization = async (
   })
 
   const origin: OrganizationOrigin = input.origin ?? 'manual'
+  const websiteUrl = normalizeWebsiteUrl(input.websiteUrl)
 
   if (input.existingOrganizationId?.trim()) {
     // overrideIdentity=true: `COALESCE($n, col)` sobreescribe cuando se provee
@@ -279,13 +287,15 @@ export const upsertCanonicalOrganization = async (
            tax_id = COALESCE($6, tax_id),
            tax_id_type = COALESCE($7, tax_id_type),
            country = COALESCE($8, country),
-           industry = COALESCE($10, industry)`
+           industry = COALESCE($10, industry),
+           website_url = COALESCE($11, website_url)`
       : `legal_name = COALESCE(NULLIF(legal_name, ''), $4),
            hubspot_company_id = COALESCE(hubspot_company_id, $5),
            tax_id = COALESCE(tax_id, $6),
            tax_id_type = COALESCE(tax_id_type, $7),
            country = COALESCE(NULLIF(country, ''), $8),
-           industry = COALESCE(NULLIF(industry, ''), $10)`
+           industry = COALESCE(NULLIF(industry, ''), $10),
+           website_url = COALESCE(NULLIF(website_url, ''), $11)`
 
     await queryRows(
       `UPDATE greenhouse_core.organizations
@@ -305,7 +315,8 @@ export const upsertCanonicalOrganization = async (
         input.taxIdType?.trim() || null,
         input.country?.trim() || null,
         origin,
-        input.industry?.trim() || null
+        input.industry?.trim() || null,
+        websiteUrl
       ],
       client
     )
@@ -320,8 +331,8 @@ export const upsertCanonicalOrganization = async (
     `INSERT INTO greenhouse_core.organizations (
       organization_id, public_id, organization_name, legal_name,
       tax_id, tax_id_type, country, hubspot_company_id, organization_type, origin,
-      industry, status, active, created_at, updated_at
-    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, 'active', TRUE, NOW(), NOW())`,
+      industry, website_url, status, active, created_at, updated_at
+    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, 'active', TRUE, NOW(), NOW())`,
     [
       newOrganizationId,
       publicId,
@@ -333,7 +344,8 @@ export const upsertCanonicalOrganization = async (
       input.hubspotCompanyId?.trim() || null,
       organizationType,
       origin,
-      input.industry?.trim() || null
+      input.industry?.trim() || null,
+      websiteUrl
     ],
     client
   )
