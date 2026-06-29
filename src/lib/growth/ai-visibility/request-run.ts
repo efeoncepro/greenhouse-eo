@@ -27,6 +27,8 @@ import { isRunCategoryBlocked } from './category-guard'
 import { enqueueGraderDiagnostic, type RunGraderDiagnosticInput } from './commands'
 import { resolveAeoEntitlement, type AeoTier } from './entitlement'
 import { isGraderEnabled, isPortalRunEnabled, isTrialTierEnabled } from './flags'
+import { getOrganizationCommercialFacts } from './operator/organization-commercial-facts'
+import { assertSubjectGradeable } from './operator/subject-gradeable'
 import { getGraderProfileForOrganization, type GraderProfileRow, type GraderRunSource } from './store'
 
 export type RequestRunBlockedReason =
@@ -34,6 +36,7 @@ export type RequestRunBlockedReason =
   | 'not_entitled'
   | 'profile_required'
   | 'category_unresolved'
+  | 'business_model_unconfirmed'
   | 'quota_exhausted'
   | 'cost_blocked'
 
@@ -229,9 +232,24 @@ export const requestGraderRunAsOperator = async (input: {
     return { status: 'blocked', reason: 'profile_required' }
   }
 
-  // TASK-1288 — el operador tampoco corre/envía sobre un prospecto con categoría no resuelta.
-  if (isRunCategoryBlocked({ categoryNodeId: profile.categoryNodeId, rawCategory: profile.category }, env)) {
-    return { status: 'blocked', reason: 'category_unresolved' }
+  // TASK-1291 — gate unificado del operador (always-on, defense-in-depth): no correr sobre una marca
+  // no resuelta. Audiencia derivada server-side del tipo real de la org (NUNCA del operador); si la
+  // org no se resuelve, se trata como prospecto (lo más estricto). Prospecto exige categoría + modelo;
+  // cliente exige categoría. Reemplaza el pre-check sólo-categoría flag-gated de TASK-1288 en esta puerta.
+  const facts = await getOrganizationCommercialFacts(input.subjectOrganizationId)
+  const audience = facts?.isClient ? 'client' : 'prospect'
+
+  const gradeable = assertSubjectGradeable({
+    categoryNodeId: profile.categoryNodeId,
+    categoryLabel: profile.categoryLabel,
+    categoryConfidence: profile.categoryConfidence,
+    rawCategory: profile.category,
+    businessModel: profile.businessModel,
+    audience
+  })
+
+  if (!gradeable.ok) {
+    return { status: 'blocked', reason: gradeable.reason }
   }
 
   // Atribución del assignment del subject SI existe (auditoría); NO se exige entitlement —

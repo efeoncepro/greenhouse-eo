@@ -15,6 +15,9 @@ const state = {
   graderEnabled: true,
   entitlement: null as Record<string, unknown> | null,
   profile: null as Record<string, unknown> | null,
+  // TASK-1291 — gate del operador mockeado a nivel wiring (la lógica pura vive en subject-gradeable.test.ts).
+  gradeable: { ok: true } as { ok: true } | { ok: false; reason: string },
+  facts: { isClient: false } as Record<string, unknown> | null,
   usedInTx: 0,
   enqueueResult: {
     run: { runId: 'grun-1', publicId: 'EO-GRUN-1', pollToken: 'tok-1' },
@@ -39,6 +42,14 @@ vi.mock('../entitlement', () => ({
 
 vi.mock('../store', () => ({
   getGraderProfileForOrganization: async () => state.profile
+}))
+
+vi.mock('../operator/organization-commercial-facts', () => ({
+  getOrganizationCommercialFacts: async () => state.facts
+}))
+
+vi.mock('../operator/subject-gradeable', () => ({
+  assertSubjectGradeable: () => state.gradeable
 }))
 
 vi.mock('../commands', () => ({
@@ -108,6 +119,8 @@ beforeEach(() => {
   state.graderEnabled = true
   state.entitlement = entitlement()
   state.profile = PROFILE
+  state.gradeable = { ok: true }
+  state.facts = { isClient: false }
   state.usedInTx = 0
   state.enqueueResult = {
     run: { runId: 'grun-1', publicId: 'EO-GRUN-1', pollToken: 'tok-1' },
@@ -227,5 +240,21 @@ describe('requestGraderRunAsOperator', () => {
         })
       })
     )
+  })
+
+  it('TASK-1291: blocked category_unresolved cuando el gate bloquea por categoría', async () => {
+    state.gradeable = { ok: false, reason: 'category_unresolved' }
+    const r = await requestGraderRunAsOperator({ subjectOrganizationId: 'org-prospect', requestedBy: 'am1' })
+
+    expect(r).toEqual({ status: 'blocked', reason: 'category_unresolved' })
+    expect(spies.enqueue).not.toHaveBeenCalled()
+  })
+
+  it('TASK-1291: blocked business_model_unconfirmed sobre prospecto sin modelo confirmado', async () => {
+    state.gradeable = { ok: false, reason: 'business_model_unconfirmed' }
+    const r = await requestGraderRunAsOperator({ subjectOrganizationId: 'org-prospect', requestedBy: 'am1' })
+
+    expect(r).toEqual({ status: 'blocked', reason: 'business_model_unconfirmed' })
+    expect(spies.enqueue).not.toHaveBeenCalled()
   })
 })

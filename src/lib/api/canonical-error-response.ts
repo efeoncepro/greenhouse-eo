@@ -99,6 +99,7 @@ export type CanonicalErrorCode =
   | 'aeo_run_disabled'
   | 'aeo_profile_required'
   | 'aeo_category_unresolved'
+  | 'aeo_business_model_unconfirmed'
   | 'aeo_quota_exhausted'
   | 'aeo_cost_blocked'
   | 'aeo_assignment_invalid_tier'
@@ -378,6 +379,11 @@ const CANONICAL_ERRORS: Record<CanonicalErrorCode, CanonicalErrorDefinition> = {
   aeo_category_unresolved: {
     status: 409,
     message: 'Todavía no pudimos clasificar la categoría de esta marca. Tu equipo de Efeonce la confirma antes de correr el análisis.',
+    actionable: false
+  },
+  aeo_business_model_unconfirmed: {
+    status: 409,
+    message: 'Falta confirmar el modelo de negocio de esta marca antes de correr o enviar el análisis a un prospecto. Tu equipo de Efeonce lo confirma primero.',
     actionable: false
   },
   aeo_quota_exhausted: {

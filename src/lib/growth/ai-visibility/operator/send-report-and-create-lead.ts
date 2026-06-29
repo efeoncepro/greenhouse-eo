@@ -22,8 +22,9 @@ import { publishOutboxEvent } from '@/lib/sync/publish-event'
 
 import { isOperatorSendEnabled } from '../flags'
 import { getLatestReportTokenForRun } from '../hubspot/report-link'
-import { getClientGraderRunById } from '../store'
+import { getClientGraderRunById, getGraderProfileForOrganization } from '../store'
 import { getOrganizationCommercialFacts } from './organization-commercial-facts'
+import { assertSubjectGradeable } from './subject-gradeable'
 import {
   GROWTH_AI_VISIBILITY_REPORT_SEND_AGGREGATE,
   GROWTH_AI_VISIBILITY_REPORT_SEND_REQUESTED_EVENT,
@@ -38,6 +39,8 @@ export type SendReportBlockedReason =
   | 'organization_not_found'
   | 'report_unavailable'
   | 'consent_required'
+  | 'category_unresolved'
+  | 'business_model_unconfirmed'
 
 export type SendReportAndCreateLeadResult =
   | { status: 'queued'; sendId: string; leadType: ReportSendLeadType; idempotentHit: boolean }
@@ -87,6 +90,25 @@ export const sendAeoReportAndCreateLead = async (
 
   if (!org) {
     return { status: 'blocked', reason: 'organization_not_found' }
+  }
+
+  // TASK-1291 — gate de validación pre-envío (defense-in-depth, mismo SoT que el run operador): no
+  // enviar un informe sobre una marca no resuelta (ISSUE-110). Prospecto exige categoría + modelo de
+  // negocio; cliente exige categoría. La audiencia se deriva del tipo real de la org (igual que el
+  // leadType abajo) — el operador NUNCA la decide. Sin perfil resoluble = no validable = bloqueo.
+  const profile = await getGraderProfileForOrganization(input.organizationId)
+
+  const gradeable = assertSubjectGradeable({
+    categoryNodeId: profile?.categoryNodeId ?? null,
+    categoryLabel: profile?.categoryLabel ?? null,
+    categoryConfidence: profile?.categoryConfidence ?? null,
+    rawCategory: profile?.category ?? null,
+    businessModel: profile?.businessModel ?? null,
+    audience: org.isClient ? 'client' : 'prospect'
+  })
+
+  if (!gradeable.ok) {
+    return { status: 'blocked', reason: gradeable.reason }
   }
 
   // El run debe existir y pertenecer a ESTA org (tenant boundary) y ser reportable

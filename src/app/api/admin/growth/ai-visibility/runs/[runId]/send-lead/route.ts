@@ -29,7 +29,9 @@ const BLOCK_TO_CANONICAL: Record<SendReportBlockedReason, CanonicalErrorCode> = 
   invalid_recipient: 'aeo_send_invalid_input',
   organization_not_found: 'aeo_send_invalid_input',
   report_unavailable: 'aeo_send_report_unavailable',
-  consent_required: 'aeo_send_consent_required'
+  consent_required: 'aeo_send_consent_required',
+  category_unresolved: 'aeo_category_unresolved',
+  business_model_unconfirmed: 'aeo_business_model_unconfirmed'
 }
 
 interface SendLeadBody {
