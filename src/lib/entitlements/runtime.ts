@@ -295,6 +295,18 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
       source: operatorSource
     })
 
+    // TASK-1287 — report.read_operator: leer el reporte AEO de cualquier cliente/prospecto
+    // (detalle operador) y el agregado cross-org (cockpit). Mismo set operador que run.operator
+    // (quien corre el motor debe poder leer su salida). El reader self-guarda con can() porque
+    // recibe una org arbitraria. Read leak-safe (shape ClientGraderReport), sin evidencia cruda.
+    addEntitlement(entries, {
+      module: 'growth',
+      capability: 'growth.ai_visibility.report.read_operator',
+      action: 'read',
+      scope: 'tenant',
+      source: operatorSource
+    })
+
     // TASK-1270 — regrade.manage: gobierna surfaces futuras de opt-in/cadencia; el
     // scheduler automático corre como sistema y no depende de sesión humana.
     addEntitlement(entries, {

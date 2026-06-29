@@ -1930,6 +1930,17 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     actions: ['read'] as const,
     defaultScope: 'tenant'
   },
+  // TASK-1287 — report.read_operator: lectura del reporte AEO (shape ClientGraderReport
+  // leak-safe) y del agregado cross-org del cockpit, para operadores internos (Growth/AM).
+  // NO expone evidencia cruda de provider. Distinta de report.read (cliente, scope por su
+  // propio tenant): el operador lee una org ARBITRARIA → el reader self-guarda con can().
+  // Grant en runtime.ts = mismo set operador que run.operator.
+  {
+    key: 'growth.ai_visibility.report.read_operator',
+    module: 'growth',
+    actions: ['read'] as const,
+    defaultScope: 'tenant'
+  },
   // TASK-1239 — report.publish: congelar el snapshot público inmutable + emitir token
   // (EPIC-020 A). Mint interno gobernado; la LECTURA pública es token-based (sin
   // capability). Grant en runtime.ts mismo PR.
