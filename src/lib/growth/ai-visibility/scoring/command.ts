@@ -14,10 +14,17 @@ import { captureWithDomain } from '@/lib/observability/capture'
 
 import { buildBrandTruth, detectBrandInaccuracies } from '../accuracy'
 import { extractCitationDomain } from '../observation'
-import { getGraderProfile, getGraderRun, getRunObservations } from '../store'
+import { getGraderProfile, getGraderRun, getRunObservations, type GraderExecutionPrompt } from '../store'
 import { normalizeObservation } from '../normalization/normalizer'
 import { enrichFindingWithLlm } from '../normalization/llm-extraction'
 import { type NormalizedFinding } from '../normalization/contracts'
+import {
+  isPromptFamily,
+  isPromptFanOutType,
+  isPromptIntentStage,
+  type PromptTag,
+  type PromptTagCatalog
+} from '../prompt-packs/tag-vocabulary'
 import { computeGraderScore, type PersistedGraderScore } from './engine'
 import { resolveScoreStatus } from '../review-gates/gates'
 import { getGraderScore, getNormalizedFindings, upsertGraderScore, upsertNormalizedFindings } from './store'
@@ -35,6 +42,36 @@ export class GraderScoringError extends Error {
 export interface ScoreGraderRunResult {
   score: PersistedGraderScore
   findings: NormalizedFinding[]
+}
+
+/**
+ * TASK-1290 Slice 0 — Catálogo de tags (promptId → tags) del set RESUELTO del run, construido
+ * desde `execution_prompts`. Una entrada sólo si el prompt persistió tags bien formados (enums
+ * cerrados); los runs legacy (sin tags) producen un catálogo vacío y el normalizer/scorer caen
+ * al pack estático v1 (no-regresión). El catálogo es la fuente de los tags, NO el pack estático.
+ */
+const buildPromptTagCatalog = (executionPrompts: GraderExecutionPrompt[] | undefined): PromptTagCatalog => {
+  const catalog: PromptTagCatalog = new Map()
+
+  for (const prompt of executionPrompts ?? []) {
+    if (
+      isPromptFamily(prompt.family) &&
+      isPromptFanOutType(prompt.fanOutType) &&
+      isPromptIntentStage(prompt.intentStage) &&
+      typeof prompt.namesBrand === 'boolean'
+    ) {
+      const tag: PromptTag = {
+        family: prompt.family,
+        fanOutType: prompt.fanOutType,
+        intentStage: prompt.intentStage,
+        namesBrand: prompt.namesBrand
+      }
+
+      catalog.set(prompt.promptId, tag)
+    }
+  }
+
+  return catalog
 }
 
 /**
@@ -61,13 +98,17 @@ export const scoreGraderRun = async (input: {
 
   const observations = await getRunObservations(input.runId)
 
+  // TASK-1290 Slice 0 — tags del set del run (no del pack estático); legacy → catálogo vacío → fallback.
+  const promptTagCatalog = buildPromptTagCatalog(run.executionPrompts)
+
   const findings: NormalizedFinding[] = []
 
   for (const observation of observations) {
     const deterministic = normalizeObservation(observation, {
       subjectBrand: profile.brandName,
       subjectDomain,
-      competitorsDeclared: profile.competitorsDeclared
+      competitorsDeclared: profile.competitorsDeclared,
+      promptTags: promptTagCatalog.get(observation.promptId) ?? null
     })
 
     // Hook LLM aislado (flag OFF por defecto → devuelve el determinista intacto).
@@ -82,7 +123,7 @@ export const scoreGraderRun = async (input: {
   try {
     await upsertNormalizedFindings(findings)
 
-    const raw = computeGraderScore(input.runId, findings)
+    const raw = computeGraderScore(input.runId, findings, promptTagCatalog)
 
     // Detector de exactitud de marca (TASK-1238): contrasta los findings contra la
     // verdad declarada; una inexactitud probable escala el gate a review_required.

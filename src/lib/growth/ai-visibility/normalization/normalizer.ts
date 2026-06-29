@@ -11,10 +11,8 @@
  * DOMINIO (`efeoncepro.com`), NO por name-match ingenuo (colisión con `f11.es`).
  */
 
-import {
-  GROWTH_AI_VISIBILITY_PROMPT_PACK_V1,
-  type GrowthAiVisibilityPromptDefinition
-} from '../prompt-packs/prompt-pack-v1'
+import { GROWTH_AI_VISIBILITY_PROMPT_PACK_V1 } from '../prompt-packs/prompt-pack-v1'
+import { MESSAGE_RECALL_STAGE, isRevenueIntentStage, type PromptTag } from '../prompt-packs/tag-vocabulary'
 import {
   type GrowthAiVisibilityProviderObservation,
   type GrowthAiVisibilitySourceType
@@ -35,13 +33,25 @@ export interface NormalizationContext {
   competitorsDeclared: string[]
   /** Override del finding id (default = observationId). */
   findingId?: string
+  /**
+   * TASK-1290 Slice 0 — tags del prompt del set RESUELTO del run. El normalizer los lee de acá,
+   * NO del pack estático. `null`/ausente → fallback al pack v1 por id (runs legacy / caso agencia).
+   */
+  promptTags?: PromptTag | null
 }
 
-/** Intent stages que representan intención de compra/comparación (revenue intent). */
-const REVENUE_INTENT_STAGES = new Set(['consideration', 'comparison', 'purchase_intent', 'enterprise', 'local'])
+/** Fallback: tags del pack estático v1 por id (runs legacy sin tags persistidos / caso agencia). */
+const staticPackTag = (promptId: string): PromptTag | undefined => {
+  const prompt = GROWTH_AI_VISIBILITY_PROMPT_PACK_V1.prompts.find(p => p.id === promptId)
 
-const lookupPrompt = (promptId: string): GrowthAiVisibilityPromptDefinition | undefined =>
-  GROWTH_AI_VISIBILITY_PROMPT_PACK_V1.prompts.find(prompt => prompt.id === promptId)
+  return prompt
+    ? { family: prompt.family, fanOutType: prompt.fanOutType, intentStage: prompt.intentStage, namesBrand: prompt.namesBrand }
+    : undefined
+}
+
+/** Resuelve los tags de un prompt: del set del run (preferido) o del pack estático (fallback). */
+const resolvePromptTag = (promptId: string, runTag: PromptTag | null | undefined): PromptTag | undefined =>
+  runTag ?? staticPackTag(promptId)
 
 const normalizeForMatch = (value: string): string => value.toLowerCase().trim()
 
@@ -81,12 +91,12 @@ const resolveBrandPresence = (
   observation: GrowthAiVisibilityProviderObservation,
   context: NormalizationContext,
   citationDomains: string[],
-  prompt: GrowthAiVisibilityPromptDefinition | undefined
+  tag: PromptTag | undefined
 ): BrandPresence => {
   const excerpt = observation.answerExcerpt ?? ''
   const domainCited = context.subjectDomain ? citationDomains.includes(context.subjectDomain) : false
   const nameInExcerpt = nameAppearsInText(context.subjectBrand, excerpt)
-  const isDiscovery = prompt ? !prompt.namesBrand : false
+  const isDiscovery = tag ? !tag.namesBrand : false
 
   // Presencia confirmada por dominio del sujeto → señal fuerte.
   if (domainCited) {
@@ -114,20 +124,20 @@ const resolveBrandPresence = (
 
 const resolveCommercialIntent = (
   brandMentioned: NormalizedFinding['brandMentioned'],
-  prompt: GrowthAiVisibilityPromptDefinition | undefined
+  tag: PromptTag | undefined
 ): CommercialIntentMatch => {
-  if (!prompt) {
+  if (!tag) {
     return 'unknown'
   }
 
-  if (REVENUE_INTENT_STAGES.has(prompt.intentStage)) {
+  if (isRevenueIntentStage(tag.intentStage)) {
     if (brandMentioned === 'yes') return 'yes'
     if (brandMentioned === 'no') return 'no'
 
     return 'unknown'
   }
 
-  if (prompt.intentStage === 'message_recall') {
+  if (tag.intentStage === MESSAGE_RECALL_STAGE) {
     return brandMentioned === 'yes' ? 'partial' : 'unknown'
   }
 
@@ -167,9 +177,9 @@ export const normalizeObservation = (
     return finding
   }
 
-  const prompt = lookupPrompt(observation.promptId)
+  const tag = resolvePromptTag(observation.promptId, context.promptTags)
   const citationDomains = dedupe(observation.citations.map(citation => citation.domain))
-  const presence = resolveBrandPresence(observation, context, citationDomains, prompt)
+  const presence = resolveBrandPresence(observation, context, citationDomains, tag)
 
   return {
     ...finding,
@@ -177,7 +187,7 @@ export const normalizeObservation = (
     competitorsMentioned: resolveCompetitors(observation, context),
     citationDomains,
     sourceTypes: resolveSourceTypes(observation),
-    commercialIntentMatch: resolveCommercialIntent(presence.brandMentioned, prompt),
+    commercialIntentMatch: resolveCommercialIntent(presence.brandMentioned, tag),
     confidence: presence.confidence
     // sentimentLabel/sentimentScore/categoryAssociations/messageDriftClaims/brandRank
     // quedan en su default unknown/null/[] — los enriquece el hook LLM (flag OFF).

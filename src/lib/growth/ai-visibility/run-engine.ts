@@ -54,10 +54,25 @@ import {
 } from './store'
 import { finalizeRunDelivery } from './public-delivery/finalize-delivery'
 import { gatherRunProbes } from './probes/command'
+import {
+  type PromptFamily,
+  type PromptFanOutType,
+  type PromptIntentStage
+} from './prompt-packs/tag-vocabulary'
 
 export interface GraderRunPromptInput {
   promptId: string
   promptText: string
+  /**
+   * TASK-1290 Slice 0 — tags del set RESUELTO que VIAJAN con el run (persistidos en
+   * `execution_prompts`). El scorer/normalizer los leen de acá, NO del pack estático;
+   * sin esto un set con ids nuevos colapsa el score en silencio. Opcionales: un run
+   * legacy sin tags cae al lookup del pack estático (no-regresión).
+   */
+  family?: PromptFamily
+  fanOutType?: PromptFanOutType
+  intentStage?: PromptIntentStage
+  namesBrand?: boolean
 }
 
 type ProviderAdapterMap = Partial<Record<GrowthAiVisibilityProviderId, ProviderAdapter>>
@@ -128,9 +143,15 @@ export const enqueueGraderRun = async (
 
   const profile = await findOrCreateGraderProfile(input.profile)
 
-  const executionPrompts = input.prompts
-    .slice(0, policy.maxPromptsPerRun)
-    .map(prompt => ({ promptId: prompt.promptId, promptText: prompt.promptText }))
+  const executionPrompts = input.prompts.slice(0, policy.maxPromptsPerRun).map(prompt => ({
+    promptId: prompt.promptId,
+    promptText: prompt.promptText,
+    // TASK-1290 Slice 0 — los tags viajan con el run (self-describing); el scorer los lee de acá.
+    family: prompt.family,
+    fanOutType: prompt.fanOutType,
+    intentStage: prompt.intentStage,
+    namesBrand: prompt.namesBrand
+  }))
 
   const run = await createGraderRun({
     profileId: profile.profileId,

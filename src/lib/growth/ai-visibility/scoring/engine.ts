@@ -8,10 +8,12 @@
  * insufficient_data/review_required vive en `review-gates/` (Slice 5).
  */
 
+import { GROWTH_AI_VISIBILITY_PROMPT_PACK_V1 } from '../prompt-packs/prompt-pack-v1'
 import {
-  GROWTH_AI_VISIBILITY_PROMPT_PACK_V1,
-  type GrowthAiVisibilityPromptDefinition
-} from '../prompt-packs/prompt-pack-v1'
+  isRevenueIntentStage,
+  type PromptTag,
+  type PromptTagCatalog
+} from '../prompt-packs/tag-vocabulary'
 import { type NormalizedFinding } from '../normalization/contracts'
 import { hasCanonicalCategoryAssociations } from '../taxonomy'
 import {
@@ -22,8 +24,10 @@ import {
   type ScoreDimensionKey
 } from './config'
 
-const REVENUE_INTENT_STAGES = new Set(['consideration', 'comparison', 'purchase_intent', 'enterprise', 'local'])
 const CREDIBLE_SOURCE_TYPES = new Set(['owned', 'earned', 'news'])
+
+/** Resuelve los tags de un prompt: del set RESUELTO del run (preferido) o del pack v1 (fallback legacy/agencia). */
+type TagResolver = (promptId: string) => PromptTag | undefined
 
 export interface DimensionScore {
   key: ScoreDimensionKey
@@ -59,19 +63,25 @@ export interface PersistedGraderScore extends RawGraderScore {
 
 const round1 = (value: number): number => Math.round(value * 10) / 10
 
-const lookupPrompt = (promptId: string): GrowthAiVisibilityPromptDefinition | undefined =>
-  GROWTH_AI_VISIBILITY_PROMPT_PACK_V1.prompts.find(prompt => prompt.id === promptId)
+/** Fallback: tags del pack estático v1 por id (runs legacy sin tags persistidos / caso agencia). */
+const staticPackTag = (promptId: string): PromptTag | undefined => {
+  const prompt = GROWTH_AI_VISIBILITY_PROMPT_PACK_V1.prompts.find(p => p.id === promptId)
 
-const isDiscovery = (finding: NormalizedFinding): boolean => {
-  const prompt = lookupPrompt(finding.promptId)
-
-  return prompt ? !prompt.namesBrand : false
+  return prompt
+    ? { family: prompt.family, fanOutType: prompt.fanOutType, intentStage: prompt.intentStage, namesBrand: prompt.namesBrand }
+    : undefined
 }
 
-const isRevenueIntent = (finding: NormalizedFinding): boolean => {
-  const prompt = lookupPrompt(finding.promptId)
+const isDiscovery = (finding: NormalizedFinding, resolveTag: TagResolver): boolean => {
+  const tag = resolveTag(finding.promptId)
 
-  return prompt ? REVENUE_INTENT_STAGES.has(prompt.intentStage) : false
+  return tag ? !tag.namesBrand : false
+}
+
+const isRevenueIntent = (finding: NormalizedFinding, resolveTag: TagResolver): boolean => {
+  const tag = resolveTag(finding.promptId)
+
+  return tag ? isRevenueIntentStage(tag.intentStage) : false
 }
 
 const avgConfidence = (findings: NormalizedFinding[]): number =>
@@ -97,8 +107,8 @@ const dimension = (
 
 // ── Dimension scorers ────────────────────────────────────────────────────────
 
-const scoreAiVisibility = (findings: NormalizedFinding[]): DimensionScore => {
-  const discovery = findings.filter(f => isDiscovery(f) && (f.brandMentioned === 'yes' || f.brandMentioned === 'no'))
+const scoreAiVisibility = (findings: NormalizedFinding[], resolveTag: TagResolver): DimensionScore => {
+  const discovery = findings.filter(f => isDiscovery(f, resolveTag) && (f.brandMentioned === 'yes' || f.brandMentioned === 'no'))
 
   if (discovery.length === 0) {
     return emptyDimension('ai_visibility', 'Sin prompts de descubrimiento resueltos.')
@@ -134,8 +144,8 @@ const scoreEntityClarity = (findings: NormalizedFinding[]): DimensionScore => {
   )
 }
 
-const scoreCategoryOwnership = (findings: NormalizedFinding[]): DimensionScore => {
-  const discovery = findings.filter(f => isDiscovery(f) && (f.brandMentioned === 'yes' || f.brandMentioned === 'no'))
+const scoreCategoryOwnership = (findings: NormalizedFinding[], resolveTag: TagResolver): DimensionScore => {
+  const discovery = findings.filter(f => isDiscovery(f, resolveTag) && (f.brandMentioned === 'yes' || f.brandMentioned === 'no'))
 
   if (discovery.length === 0) {
     return emptyDimension('category_ownership', 'Sin prompts de descubrimiento de categoría resueltos.')
@@ -219,8 +229,8 @@ const scoreMessageAlignment = (findings: NormalizedFinding[]): DimensionScore =>
   )
 }
 
-const scoreRevenueIntentCoverage = (findings: NormalizedFinding[]): DimensionScore => {
-  const revenue = findings.filter(f => isRevenueIntent(f) && (f.brandMentioned === 'yes' || f.brandMentioned === 'no'))
+const scoreRevenueIntentCoverage = (findings: NormalizedFinding[], resolveTag: TagResolver): DimensionScore => {
+  const revenue = findings.filter(f => isRevenueIntent(f, resolveTag) && (f.brandMentioned === 'yes' || f.brandMentioned === 'no'))
 
   if (revenue.length === 0) {
     return emptyDimension('revenue_intent_coverage', 'Sin prompts de revenue intent resueltos.')
@@ -237,7 +247,7 @@ const scoreRevenueIntentCoverage = (findings: NormalizedFinding[]): DimensionSco
   )
 }
 
-const SCORERS: Array<(findings: NormalizedFinding[]) => DimensionScore> = [
+const SCORERS: Array<(findings: NormalizedFinding[], resolveTag: TagResolver) => DimensionScore> = [
   scoreAiVisibility,
   scoreEntityClarity,
   scoreCategoryOwnership,
@@ -252,8 +262,19 @@ const SCORERS: Array<(findings: NormalizedFinding[]) => DimensionScore> = [
  * dimensiones con evidencia (score != null), renormalizando pesos. PURO.
  * El brand ya viene resuelto en los findings, así que no requiere contexto extra.
  */
-export const computeGraderScore = (runId: string, findings: NormalizedFinding[]): RawGraderScore => {
-  const dimensions = SCORERS.map(scorer => scorer(findings))
+export const computeGraderScore = (
+  runId: string,
+  findings: NormalizedFinding[],
+  /**
+   * TASK-1290 Slice 0 — catálogo de tags del set RESUELTO del run (promptId → tags). El scorer
+   * lee los tags de acá, NO del pack estático. Ausente / id no presente → fallback al pack v1
+   * (runs legacy / caso agencia → score bit-for-bit idéntico). `score_version` NO cambia (sólo
+   * cambia la FUENTE de los tags, no la fórmula).
+   */
+  promptTagCatalog?: PromptTagCatalog
+): RawGraderScore => {
+  const resolveTag: TagResolver = promptId => promptTagCatalog?.get(promptId) ?? staticPackTag(promptId)
+  const dimensions = SCORERS.map(scorer => scorer(findings, resolveTag))
   const scored = dimensions.filter((d): d is DimensionScore & { score: number } => d.score !== null)
 
   const weightSum = scored.reduce((sum, d) => sum + d.weight, 0)
@@ -266,8 +287,8 @@ export const computeGraderScore = (runId: string, findings: NormalizedFinding[])
 
   const promptFamilies = new Set(
     findings
-      .map(f => GROWTH_AI_VISIBILITY_PROMPT_PACK_V1.prompts.find(p => p.id === f.promptId)?.family)
-      .filter((family): family is string => Boolean(family))
+      .map(f => resolveTag(f.promptId)?.family)
+      .filter((family): family is PromptTag['family'] => Boolean(family))
   ).size
 
   return {

@@ -7,13 +7,19 @@
  * inmutable: cambios → versión nueva (v2…).
  */
 
+import {
+  type PromptFamily,
+  type PromptFanOutType,
+  type PromptIntentStage
+} from './tag-vocabulary'
+
 export const GROWTH_AI_VISIBILITY_PROMPT_PACK_VERSION = 'prompt-pack.v1'
 
 export interface GrowthAiVisibilityPromptDefinition {
   id: string
-  family: string
-  fanOutType: string
-  intentStage: string
+  family: PromptFamily
+  fanOutType: PromptFanOutType
+  intentStage: PromptIntentStage
   namesBrand: boolean
   text: string
 }

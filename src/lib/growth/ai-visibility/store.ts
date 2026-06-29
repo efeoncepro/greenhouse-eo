@@ -54,6 +54,14 @@ export interface GraderProfileRow {
 export interface GraderExecutionPrompt {
   promptId: string
   promptText: string
+  /**
+   * TASK-1290 Slice 0 — tags del set que viajan con el run (JSONB additive). El scorer/
+   * normalizer los leen de acá (no del pack estático). Ausentes en runs legacy → fallback.
+   */
+  family?: string
+  fanOutType?: string
+  intentStage?: string
+  namesBrand?: boolean
 }
 
 /** TASK-1277 — puerta que originó el run (atribución de costo + conteo de allowance). */

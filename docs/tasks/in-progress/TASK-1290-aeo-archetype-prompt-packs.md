@@ -63,7 +63,7 @@ El baseline por arquetipo y el system prompt del autor codifican **qué stages e
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`

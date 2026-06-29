@@ -50,7 +50,15 @@ export const resolvePromptInputs = (
   return pack.prompts
     .filter(prompt => includeBrandNamed || !prompt.namesBrand)
     .filter(prompt => !(/\{\{competitor\}\}/.test(prompt.text) && !vars.competitor))
-    .map(prompt => ({ promptId: prompt.id, promptText: interpolate(prompt.text, resolved) }))
+    .map(prompt => ({
+      promptId: prompt.id,
+      promptText: interpolate(prompt.text, resolved),
+      // TASK-1290 Slice 0 — los tags viajan con el run (el scorer los lee de acá, no del pack estático).
+      family: prompt.family,
+      fanOutType: prompt.fanOutType,
+      intentStage: prompt.intentStage,
+      namesBrand: prompt.namesBrand
+    }))
 }
 
 export { GROWTH_AI_VISIBILITY_PROMPT_PACK_V1, GROWTH_AI_VISIBILITY_PROMPT_PACK_VERSION } from './prompt-packs/prompt-pack-v1'
