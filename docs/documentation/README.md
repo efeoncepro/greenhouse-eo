@@ -98,7 +98,7 @@ La documentacion funcional no reemplaza el manual ni la arquitectura. Explica qu
 
 ### Growth
 
-- [AI Visibility Grader — Motor de Providers](growth/ai-visibility-grader.md) — cómo mide Greenhouse la visibilidad de una marca en los answer engines de IA (OpenAI/Anthropic/Perplexity/Gemini): runs, observaciones, evidencia ≠ verdad, estados, providers tras flags (default OFF), el endpoint interno y por qué nace apagado. Foundation TASK-1226 (el scoring/reporte es TASK-1227).
+- [AI Visibility Grader — Motor de Providers](growth/ai-visibility-grader.md) — cómo mide Greenhouse la visibilidad de una marca en los answer engines de IA (OpenAI/Anthropic/Perplexity/Gemini): runs, observaciones, evidencia ≠ verdad, estados, providers tras flags, endpoint interno, ejecución async, reporte, Fix-It/email y re-grade recurrente de clientes opt-in. Foundation TASK-1226; scoring/reporte TASK-1227/1235; re-grade TASK-1270.
 - [Conexion a Google Search Console](growth/conexion-search-console.md) — cómo conecta Greenhouse la propiedad de Search Console de cada marca (datos reales de búsqueda, solo lectura): modelo operador-mediado estilo Semrush (un token de operador + desplegable de propiedades), estados de conexión, quién la opera y quién consume los datos. TASK-1282 (staging verificado E2E con Grupo Berel).
 
 ### HR y Nomina

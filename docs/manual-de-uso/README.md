@@ -31,7 +31,7 @@ La diferencia con otras capas de documentacion:
 
 ### Growth
 
-- [Correr el AI Visibility Grader (smoke + endpoint)](growth/ai-visibility-grader-smoke.md) — como ejecutar una corrida del grader (fake sin secretos / proveedor real uno por vez), interpretar estados (`skipped`/`partial`/`costGuard`), usar el endpoint interno `GET`/`POST /api/admin/growth/ai-visibility/runs`, el estado actual de flags (staging ON) y troubleshooting.
+- [Correr el AI Visibility Grader (smoke + endpoint)](growth/ai-visibility-grader-smoke.md) — como ejecutar una corrida del grader (fake sin secretos / proveedor real uno por vez), interpretar estados (`skipped`/`partial`/`costGuard`), usar el endpoint interno, operar el worker async y verificar/revertir el re-grade recurrente por Scheduler (TASK-1270).
 - [Conectar Google Search Console a una marca](growth/conectar-search-console.md) — paso a paso para conectar la propiedad de Search Console de un cliente (modelo operador-mediado: conectas tu cuenta una vez, eliges la propiedad del desplegable), estados, qué no hacer, problemas comunes (org_internal, "no pudimos obtener tus propiedades", grant `secretAccessor`) y verificación.
 
 ### Identidad y acceso

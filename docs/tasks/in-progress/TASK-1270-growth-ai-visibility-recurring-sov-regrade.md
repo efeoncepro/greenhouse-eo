@@ -313,6 +313,8 @@ El re-grade es una aplicación de cadencia sobre el run-engine existente: un Clo
 - [x] `docs/tasks/README.md` sincronizado
 - [x] `Handoff.md` actualizado
 - [x] `changelog.md` actualizado
+- [x] Documentacion funcional actualizada: `docs/documentation/growth/ai-visibility-grader.md`
+- [x] Manual/runbook actualizado: `docs/manual-de-uso/growth/ai-visibility-grader-smoke.md`
 - [x] chequeo de impacto cruzado (TASK-1240 budget, TASK-1236 trend)
 - [x] `FEATURE_FLAG_STATE_LEDGER.md` actualizado
 

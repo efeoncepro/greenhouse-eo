@@ -1,7 +1,7 @@
 # Manual — Correr el AI Visibility Grader (smoke + endpoint)
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.8 · **Ultima actualizacion:** 2026-06-28 por Codex (TASK-1269, Fix-It Artifacts)
+> **Version:** 1.9 · **Ultima actualizacion:** 2026-06-29 por Codex (TASK-1270, re-grade recurrente staging)
 >
 > **Para que sirve:** ejecutar una corrida acotada (low-volume) del AI Visibility Grader contra los answer engines, para validar el motor end-to-end. Por defecto usa un proveedor simulado (no gasta dinero); con flags + secrets corre proveedores reales. Dos caminos: el **CLI** (`pnpm growth:ai-visibility:smoke`, local/dev) y el **endpoint interno** (`/api/admin/growth/ai-visibility/runs`, mismo primitive, apto staging).
 
@@ -13,6 +13,7 @@
 - **producción:** OFF (follow-up pesado: migración `greenhouse_growth` + capabilities seed vía release control plane develop→main + env prod + sign-off). El worker es compartido staging+prod, pero el drain hace **no-op prod-safe** mientras el grader esté OFF en prod.
 - **Perplexity:** ON en staging desde 2026-06-27.
 - **Fix-It Artifacts (TASK-1269):** code complete pero `GROWTH_AI_VISIBILITY_FIX_IT_ENABLED` está OFF/default. No entregar al prospecto hasta revisión copy/legal + smoke staging por token público y run admin.
+- **Re-grade recurrente (TASK-1270):** staging/develop ON (`GROWTH_AI_VISIBILITY_REGRADE_ENABLED=true`) con Cloud Scheduler `ops-growth-grader-regrade` habilitado diario `0 8 * * *` (`America/Santiago`). Produccion OFF/paused. Smoke manual 2026-06-29 termino `skipped=no_due_profiles` porque no hay perfiles opt-in/due; no hubo costo.
 - Verdad live de flags: `vercel env ls`. Estado humano: `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`.
 
 ## Antes de empezar
@@ -116,6 +117,93 @@ inline como antes; sólo `light`/OpenAI cabe). **En staging ya está APLICADO y 
 - **Producción:** fuera de scope (release control plane develop→main). El worker es compartido staging+prod, pero el drain hace **no-op prod-safe** (`isGraderEnabled()` OFF en prod → cero queries, no requiere que `greenhouse_growth` exista en prod).
 - **Revert (<5 min):** `GROWTH_AI_VISIBILITY_ASYNC_EXECUTION_ENABLED=false` → el endpoint vuelve a inline para `light`.
 - **Recovery de huérfanos:** el drain corre `recoverStuckRunningRuns` antes de drenar — un run colgado en `running` > 90 min se finaliza con la evidencia ya persistida (signal `run_stuck_running`).
+
+## Re-grade recurrente / Scheduler (TASK-1270)
+
+Este flujo vuelve a correr el grader para perfiles de cliente que aceptaron monitoreo recurrente. No sirve para leads one-shot ni para forzar un analisis manual: para eso usa el endpoint admin de runs.
+
+### Antes de tocarlo
+
+- Confirmar que la migracion `20260629103000000_task-1270-recurring-regrade` esta aplicada (`pnpm pg:connect:status` debe decir que no hay migraciones pendientes).
+- Confirmar flags live en el worker:
+
+```bash
+gcloud run services describe ops-worker \
+  --project=efeonce-group \
+  --region=us-east4 \
+  --format='value(spec.template.spec.containers[0].env)'
+```
+
+- Confirmar Scheduler:
+
+```bash
+gcloud scheduler jobs describe ops-growth-grader-regrade \
+  --project=efeonce-group \
+  --location=us-east4
+```
+
+Estado esperado en staging: `state: ENABLED`, schedule `0 8 * * *`, timezone `America/Santiago`. Estado esperado en produccion: pausado/off hasta release control plane + budget sign-off.
+
+### Smoke seguro sin costo
+
+Ejecuta manualmente el Scheduler:
+
+```bash
+gcloud scheduler jobs run ops-growth-grader-regrade \
+  --project=efeonce-group \
+  --location=us-east4
+```
+
+Luego revisa logs del worker:
+
+```bash
+gcloud logging read \
+  'resource.type="cloud_run_revision" AND resource.labels.service_name="ops-worker" AND textPayload:"/growth/grader/regrade"' \
+  --project=efeonce-group \
+  --limit=20 \
+  --format='value(textPayload)'
+```
+
+Si no hay perfiles opt-in/due, el resultado sano es:
+
+```text
+claimed=0 enqueued=0 failed=0 skipped=no_due_profiles
+```
+
+Eso prueba Scheduler + endpoint + flag sin gastar en providers.
+
+### E2E real con un perfil opt-in
+
+No activar opt-in al azar. Usa solo una organizacion cliente contratada para AEO y con aprobacion del operador.
+
+1. Identificar un `grader_profile` con `organization_id` y modulo `ai_visibility_v1` contratado (`module_assignments.metadata_json.aeo_tier='contracted'`).
+2. Activar opt-in gobernado para ese perfil: `recurring_regrade_enabled=true`, `recurring_regrade_cadence='monthly'`, `recurring_regrade_next_at <= now()`.
+3. Ejecutar `gcloud scheduler jobs run ops-growth-grader-regrade ...`.
+4. Verificar logs: `claimed=1`, `enqueued=1`, `failed=0`.
+5. Esperar el drain async (`ops-growth-grader-drain`) o dispararlo manualmente si estas en ventana de smoke.
+6. Confirmar que el run recurrente pasa por `pending -> running -> terminal` (`succeeded|partial|failed` honesto) y que el reporte muestra tendencia si hay un run previo comparable.
+7. Revisar signals en `/admin/operations`: `growth.ai_visibility.regrade_lag`, `growth.ai_visibility.regrade_cost`, `growth.ai_visibility.regrade_stale_profiles`.
+8. Documentar runId, perfil, costo observado y decision de rollback/continuar en `Handoff.md` y la task.
+
+### Revert rapido staging
+
+1. Apagar el flag del worker (`GROWTH_AI_VISIBILITY_REGRADE_ENABLED=false`) o redeploy con el default off.
+2. Pausar el Scheduler:
+
+```bash
+gcloud scheduler jobs pause ops-growth-grader-regrade \
+  --project=efeonce-group \
+  --location=us-east4
+```
+
+3. Verificar que un run manual del Scheduler ya no encola perfiles.
+
+### Que no hacer
+
+- No re-gradear perfiles publicos/lead magnet one-shot.
+- No habilitar produccion sin release control plane, budget sign-off y un E2E staging con perfil opt-in.
+- No cambiar la cadencia masivamente sin revisar costo mensual esperado.
+- No crear un cron paralelo en Vercel: este flujo es Cloud Scheduler + ops-worker.
 
 ## Que significan los estados
 

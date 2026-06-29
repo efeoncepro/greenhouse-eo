@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.12
+> **Version:** 1.13
 > **Creado:** 2026-06-24 por Claude (TASK-1226)
-> **Ultima actualizacion:** 2026-06-28 por Codex (TASK-1269, Fix-It Artifacts code-complete)
+> **Ultima actualizacion:** 2026-06-29 por Codex (TASK-1270, re-grade recurrente staging)
 > **Documentacion tecnica:** [GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md)
 
 # AI Visibility Grader — Motor de Providers (Growth)
@@ -90,6 +90,21 @@ OpenAI + Anthropic + Gemini 3 que tardó unos 12 minutos y terminó sin cortarse
 En producción todavía no está prendido (va por su proceso aparte).
 
 > Detalle técnico: `GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md` §Delta 2026-06-24 (TASK-1234). Operación/rollout: [manual de smoke](../../manual-de-uso/growth/ai-visibility-grader-smoke.md).
+
+## Re-grade recurrente (monitoreo AEO en el tiempo — TASK-1270)
+
+El grader ya no sirve solo como diagnostico puntual. Para clientes con AEO contratado, Greenhouse puede volver a correr el analisis en una cadencia gobernada y comparar el resultado contra corridas anteriores. Eso convierte el diagnostico en **monitoreo recurrente de Share of Voice / AI Visibility**.
+
+- **A quien aplica:** solo perfiles de cliente con `organization_id`, modulo `ai_visibility_v1` contratado y opt-in explicito (`recurring_regrade_enabled=true`). Los leads del lead magnet siguen siendo one-shot salvo upgrade/consentimiento.
+- **Como corre:** Cloud Scheduler llama al ops-worker (`POST /growth/grader/regrade`) y el worker solo encola runs `full`; la ejecucion real la toma el worker async existente. No hay Vercel cron ni pipeline paralelo.
+- **Cadencia:** default mensual (`monthly`), configurable por perfil (`weekly|monthly`) cuando exista una superficie gobernada para administrarlo.
+- **Control de costo:** batch pequeno, idempotencia por ventana de cadencia y budget mensual (`GROWTH_AI_VISIBILITY_REGRADE_MONTHLY_BUDGET_USD`). Si no hay presupuesto o no hay perfiles due, el job termina sin gastar.
+- **Que actualiza:** crea un nuevo run comparable. El trend del reporte se deriva desde el historico existente; no se escribe una tabla nueva de tendencia.
+- **Estado actual:** staging/develop esta encendido (`GROWTH_AI_VISIBILITY_REGRADE_ENABLED=true`) y el Scheduler `ops-growth-grader-regrade` esta habilitado diario a las 08:00 America/Santiago. Produccion sigue apagado/pausado.
+
+La verificacion de staging hecha el 2026-06-29 fue segura y sin costo: el scheduler corrio, pero no habia perfiles opt-in/due (`claimed=0 enqueued=0 failed=0 skipped=no_due_profiles`). Falta el E2E con un perfil contratado opt-in que cree un run recurrente y llegue a estado terminal.
+
+> Detalle tecnico: `GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md` §Delta 2026-06-29 (TASK-1270). Operacion: [manual de smoke](../../manual-de-uso/growth/ai-visibility-grader-smoke.md#re-grade-recurrente--scheduler-task-1270).
 
 ## El reporte (qué le mostramos al prospecto)
 
