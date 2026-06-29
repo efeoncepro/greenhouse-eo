@@ -791,6 +791,7 @@ DB vacía / grader OFF → todos en estado sano (`ok`/`awaiting_data`), steady e
 - `growth.ai_visibility.insufficient_data_rate` (data_quality) — fracción de `grader_scores` con `score_status=insufficient_data` (30 días).
 - `growth.ai_visibility.report_review_required_rate` (posture) — fracción `review_required` (comportamiento de seguridad esperado, severity ok).
 - `growth.ai_visibility.prompt_pack_eval_regression` (test_lane) — corre el golden eval (1228) sobre el normalizer determinista; `error` si hay divergencias deterministas vs el baseline.
+- `growth.ai_visibility.archetype_coverage_gap` (test_lane, TASK-1292) — corre `runArchetypeCoverageEval` sobre la matriz `archetype-coverage-eval.v1.json` (Capa A determinista de EPIC-021); `error` si un arquetipo deja de cubrir su contrato de buyer-intent (etapas mínimas archetype-aware, amplitud de fan-out, sin fuga de framing de agencia, framing category-noun). Steady = 0 gaps. Red de no-regresión del falso-0 de ISSUE-110.
 - `growth.ai_visibility.normalization_failed` + `growth.ai_visibility.score_recompute_failed` (runtime) — **stub** (sin failure-ledger todavía; los fallos van a Sentry domain=growth). Follow-up: tabla de intentos (patrón `auth_attempts`).
 
 Módulo `growth` `expectedSignalKinds` ahora incluye `test_lane`. DB vacía → todos en estado sano.

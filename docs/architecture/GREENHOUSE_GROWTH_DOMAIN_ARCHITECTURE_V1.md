@@ -233,6 +233,7 @@ Initial signal families:
 - CRM sync: `growth.ai_visibility.hubspot_sync_failed`;
 - cost: `growth.ai_visibility.cost_budget_used`;
 - prompt quality: `growth.ai_visibility.prompt_pack_eval_regression`.
+- archetype prompt coverage: `growth.ai_visibility.archetype_coverage_gap` (TASK-1292; cada arquetipo cubre su buyer-intent, steady=0 gaps).
 
 The domain should be visible in Ops/Reliability like other first-class Greenhouse modules once runtime work begins.
 

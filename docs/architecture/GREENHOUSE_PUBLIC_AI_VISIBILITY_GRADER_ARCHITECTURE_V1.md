@@ -830,6 +830,7 @@ Planned signals:
 | `growth.ai_visibility.hubspot_sync_failed` | integration | 0 unresolved failures. |
 | `growth.ai_visibility.cost_budget_used` | cost | Below daily/monthly budget threshold. |
 | `growth.ai_visibility.prompt_pack_eval_regression` | quality | 0 active regressions. |
+| `growth.ai_visibility.archetype_coverage_gap` | quality | 0 gaps — cada arquetipo cubre su buyer-intent (TASK-1292). |
 | `growth.ai_visibility.provider_latency_p95` | performance | Within public UX budget. |
 
 ### 15.2 SLOs
@@ -1963,3 +1964,33 @@ siga OFF). El re-enable de `OPERATOR_SEND_ENABLED` sigue gateado por la eval gol
 verificación runtime (deploy a staging + smoke: SKY pasa / `unknown` bloquea) queda pendiente del deploy. El flip a
 **prod** sigue gateado por la eval golden-set (TASK-1292) + sign-off comercial/legal. **Follow-up:** UI de review
 operador (`ui-ux`) — confirmar categoría/modelo + preview de prompts antes de un prospecto.
+
+## Delta 2026-06-29 — TASK-1292 Eval de cobertura por arquetipo + drift signal (cierre EPIC-021) · EPIC-021
+
+**Red de no-regresión que habilita reabilitar el cross-sell.** Análisis multi-skill (arch/seo/commercial) recalibró el
+diseño: la eval son **dos capas ortogonales**, no una.
+
+- **Capa A — cobertura del generador (DETERMINISTA · CI gate · drift signal).** `archetype-coverage-eval.v1.json` es una
+  **matriz gobernada `{arquetipo → etapas mínimas exigibles}`** archetype-aware (los **6 packs + generic**, no solo 3). El
+  harness PURO `runArchetypeCoverageEval` (`evals/archetype-coverage-eval.ts`) verifica, sobre el pack que resuelve
+  `resolveArchetypeBaselinePack`, que cada arquetipo cubra: etapas mínimas de buyer-intent (archetype-aware —
+  `public_institution` SIN `purchase_intent`/`enterprise`/`comparison`; `marketplace` SIN `purchase_intent`/`local`;
+  consumer/retail → `local`; saas/agencia → `enterprise`), amplitud de Query Fan-Out (≥3 de 4), **sin fuga de framing de
+  agencia** (`noAgencyLeak`, todos salvo el arquetipo agencia) y framing category-noun (`{{category}}`). Es el **SSOT**
+  consumido por el CI test y por el signal — patrón `runGoldenEval` ← `prompt_pack_eval_regression`.
+- **Capa B — smoke real (EVIDENCIA, NO gate de CI).** Un run real SKY consumo score ≠ 0 valida el claim end-to-end, pero es
+  no-determinista (LLM) → es evidencia allowlisted + acotada, **nunca** un pass/fail que pueda bloquear merges.
+- **Anclaje de no-regresión (3):** (1) identidad referencial `resolveArchetypeBaselinePack('b2b_service_provider') ===
+  GROWTH_AI_VISIBILITY_PROMPT_PACK_V1` (ya en `archetype-baseline-packs.test.ts` de TASK-1290, no se duplica); (2)
+  `runGoldenEval` sobre `golden-set.v1.json` sin divergencias deterministas + `score_version` intacto; (3) wiring
+  `buildExecuteInput`/run-engine con el flag ON (TASK-1290). El **scoring NO cambia**: la eval mide cobertura de prompts, no
+  recalibra pesos.
+- **Drift signal** `growth.ai_visibility.archetype_coverage_gap` (test_lane, steady = 0 gaps) en `/admin/operations`. `error`
+  si un arquetipo deja de cubrir su contrato (riesgo de re-introducir el falso-0 de ISSUE-110).
+- **Naming:** `archetype-coverage-eval.v1.json` (NO `golden-set.v2` — es otra clase de artefacto: `{arquetipo → aserciones de
+  cobertura}` vs `{input → expectedFinding}`; precedente `category-taxonomy-eval.v1.json`). `golden-set.v1.json` intacto.
+
+**Repo-only:** sin migración, sin capability, sin flag, sin UI, sin DB. Gates: test focales 16/0; el eval corre en CI + en
+cada lectura del reliability overview. Con esta red verde, el flip de los flags `ARCHETYPE_PROMPTS`/`PROMPT_AUTHORING` y la
+reabilitación del cross-sell (TASK-1291) quedan habilitados con confianza (gateados por sign-off comercial/legal + el smoke
+real de la Capa B).

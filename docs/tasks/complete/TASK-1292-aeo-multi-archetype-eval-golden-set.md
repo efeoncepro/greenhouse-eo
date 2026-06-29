@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -228,11 +228,11 @@ La eval es la red que permite generalizar prompts sin re-romper casos. Determini
 
 ## Acceptance Criteria
 
-- [ ] `archetype-coverage-eval.v1.json` + matriz archetype-aware cubren los **6 packs + generic** (no solo 3); etapas mínimas por arquetipo, framing category-noun, `noAgencyLeak`, cobertura fan-out ≥3/4.
-- [ ] Harness `runArchetypeCoverageEval` corre en la suite, **determinista (sin LLM/provider)**.
-- [ ] Anclaje agencia: (1) identidad referencial pack v1; (2) `runGoldenEval`/`golden-set.v1` + `score_version` intactos; (3) wiring `buildExecuteInput` flag ON.
-- [ ] Drift signal `archetype_coverage_gap` en steady = 0.
-- [ ] (opcional/allowlisted) smoke real SKY ≠ 0 como evidencia — NO gate de CI.
+- [x] `archetype-coverage-eval.v1.json` + matriz archetype-aware cubren los **6 packs + generic** (no solo 3); etapas mínimas por arquetipo, framing category-noun, `noAgencyLeak`, cobertura fan-out ≥3/4.
+- [x] Harness `runArchetypeCoverageEval` corre en la suite, **determinista (sin LLM/provider)** — `archetype-coverage-eval.test.ts` (test con dientes: detecta etapa ausente + pack swap).
+- [x] Anclaje agencia: (1) identidad referencial pack v1 (ancla en `archetype-baseline-packs.test.ts` de TASK-1290); (2) `runGoldenEval`/`golden-set.v1` + `score_version` intactos (re-aserta en este test); (3) wiring `buildExecuteInput`/run-engine flag ON (cubierto por TASK-1290).
+- [x] Drift signal `archetype_coverage_gap` en steady = 0 (`growth-ai-visibility-archetype-coverage-signals.ts` + wired en overview; test de steady=ok).
+- [ ] (opcional/allowlisted) smoke real SKY ≠ 0 como evidencia — NO gate de CI. **Diferido**: requiere LLM/ADC; es evidencia de la Capa B, no gate. SKY ya quedó validado en el smoke live de TASK-1290 (15 prompts consumo, 0 agency leak).
 
 ## Verification
 
@@ -242,13 +242,13 @@ La eval es la red que permite generalizar prompts sin re-romper casos. Determini
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` sincronizado
-- [ ] archivo en la carpeta correcta
-- [ ] `docs/tasks/README.md` sincronizado
-- [ ] `Handoff.md` actualizado
-- [ ] `changelog.md` actualizado
-- [ ] chequeo de impacto cruzado (EPIC-021, TASK-1290/1291, ISSUE-110)
-- [ ] Delta en `GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md` (eval multi-arquetipo)
+- [x] `Lifecycle` sincronizado (`complete`)
+- [x] archivo en la carpeta correcta (`complete/`)
+- [x] `docs/tasks/README.md` sincronizado + `TASK_ID_REGISTRY.md`
+- [ ] `Handoff.md` actualizado — **pendiente coordinación**: Codex tiene WIP uncommitted en `Handoff.md` (Public Site AEO); no se toca para no clobberear su sesión activa. Entrada lista para pegar (ver Handoff cuando su WIP aterrice).
+- [ ] `changelog.md` actualizado — **pendiente coordinación** (misma razón).
+- [x] chequeo de impacto cruzado (EPIC-021 cerrado, TASK-1290/1291, ISSUE-110): TASK-1291 desbloqueado (la eval verde es su criterio de reabilitación).
+- [x] Delta en `GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md` (+ `RELIABILITY_CONTROL_PLANE_V1` + `GROWTH_DOMAIN_ARCHITECTURE_V1`)
 
 ## Follow-ups
 
