@@ -1720,3 +1720,41 @@ done-for-you y la vista operador (TASK-1276) lo escriba.
 org arbitraria sin self-guard `can()`. NUNCA UPDATE/DELETE del history (append-only por trigger). NUNCA emitir
 outbox en el no-op. `done` no cierra la gap — un follow-up puede derivar "marcado `done` pero el re-grade
 posterior a `sourceRunId` regresó → revisar". V1 = capability-gated (sin scoping per-AM; follow-up).
+
+## Delta 2026-06-29 — TASK-1279 Cross-sell operador: enviar informe + crear Lead (close loop) · EPIC-020
+
+Cierra el loop comercial del Motor 1/2: tras correr+publicar AEO sobre un cliente o **prospecto** (org sincronizada
+de HubSpot company, TASK-706), el operador **envía el informe + crea/asocia un Lead de HubSpot** de forma trazable.
+**Objeto comercial = Lead (objeto `leads`), NUNCA Deal/Negocio** (corrección del operador): el diagnóstico es
+pre-pitch (tope del bowtie); el Deal es un momento posterior (oportunidad calificada). Crear un Deal acá inflaría
+el pipeline.
+
+- **Command** `sendAeoReportAndCreateLead` (`operator/`, Full API parity → Nexa por construcción): gatea
+  (capability `growth.ai_visibility.lead.open` + flag + email + snapshot público publicado), **DERIVA server-side**
+  el tipo comercial de la org (cliente=`expansion`/`service_relationship` vs prospecto=`new_business`/`legitimate_interest`),
+  aplica el **consent gate** (prospecto sin `consentRef` → 422 `aeo_send_consent_required`; NUNCA cold send),
+  claima el audit + publica el outbox event en una tx (idempotencia `UNIQUE(run_id, lower(recipient_email))`).
+- **Audit** append-only `greenhouse_growth.grader_report_send_log` (CHECK duro: `legitimate_interest` ⇒ `consent_ref`).
+- **Reactive consumer** `executeOperatorReportSend` (lane `ops-reactive-growth`): dos sub-pasos idempotentes —
+  (1) **email** público-safe (mismo path leak-safe del lead magnet: snapshot → `renderAiVisibilityReportPdf` →
+  `sendEmail`, marca **Efeonce**); (2) **Lead HubSpot** vía cliente in-app directo (`createOperatorCrossSellLead`:
+  upsert Contact/Company + `POST crm/v3/objects/leads` + asociaciones v4 default) + `aeo_check_result` en la Company.
+- **Route** `POST /api/admin/growth/ai-visibility/runs/[runId]/send-lead` (dual-gate interno).
+- **Signal** `growth.ai_visibility.operator_send_failed` (steady=0).
+- **Flag** `GROWTH_AI_VISIBILITY_OPERATOR_SEND_ENABLED` (default OFF).
+
+### Invariantes operativos para agentes (Cross-sell operador — TASK-1279)
+
+- **NUNCA** crear un **Deal** en este flujo — el objeto comercial del diagnóstico AEO es un **Lead** (`leads`),
+  asociado a Contact y/o Company. El Deal es un paso comercial posterior (fuera de scope).
+- **NUNCA** confiar en el operador para decidir cliente vs prospecto: el tipo comercial se deriva server-side de
+  `greenhouse_core.organizations` (`organization_type`/`lifecycle_stage`). El consent gate cuelga de esa derivación.
+- **NUNCA** envío en frío a prospecto: exige `consentRef` (consentimiento capturado post-conversación) +
+  `legalBasis='legitimate_interest'`; sin eso → 422 (+ CHECK duro en DB).
+- **NUNCA** email/HubSpot inline en el route: el write va por outbox → reactive consumer (`ops-reactive-growth`),
+  que re-lee el send log; idempotencia por `(run_id, recipient)` + por sub-paso (`email_status`/`lead_status`).
+- **NUNCA** enviar un informe no publicado: el command exige snapshot público (`report_unavailable` si falta);
+  el email a un externo usa el variant público-safe (mismo DTO que el lead magnet), NUNCA evidencia interna.
+- **Rollout pendiente** (flag OFF): provisionar la property HubSpot `aeo_check_result` (NO existe hoy en el portal,
+  verificado live 2026-06-29) + confirmar el objeto `leads` + smoke staging real (email + Lead + consent gate 422)
+  + sign-off comercial/legal del copy a prospectos → prod vía release control plane (EPIC-020).

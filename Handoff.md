@@ -1,3 +1,29 @@
+## Sesion 2026-06-29 — TASK-1279 AEO Operator Cross-Sell (enviar informe + crear Lead) — Claude — ✅ complete (code complete, rollout pendiente)
+
+> **Intake:** `/implement-task 1279`. Backend-data / integration · EPIC-020 (nodo S11). Trabajo en `develop` local-first, **sin push**. Skills cargadas en el pre-trabajo (arch + commercial + seo-aeo + product-ui). Blocker TASK-1277 ya estaba **complete** → desbloqueada.
+>
+> **Corrección del operador incorporada:** el objeto comercial es un **Lead de HubSpot** (objeto `leads`, asociado a Contact/Company), **NUNCA un Deal/Negocio** — el diagnóstico AEO es pre-pitch (tope del bowtie); el Deal es posterior. Toda la task se reorientó a Lead. El operador también confirmó que el objeto `leads` "se encuentra por la API" → verificado live vía REST (`crm/v3/objects/leads`, el MCP HubSpot no soporta ese objeto pero la API sí).
+>
+> **Implementado (4 slices, commits `9f84c5e7b` · `f20065981` · `2fc691d9e` · `4e2ba8071`):** migración audit `greenhouse_growth.grader_report_send_log` (UNIQUE run+recipient, CHECK consent) + command `sendAeoReportAndCreateLead` (deriva server-side cliente/prospecto, consent gate 422, claim+publish en tx) + flag `GROWTH_AI_VISIBILITY_OPERATOR_SEND_ENABLED` (OFF) + errores canónicos + route `POST /api/admin/growth/ai-visibility/runs/[runId]/send-lead` + capability `growth.ai_visibility.lead.open` + crm-client `createOperatorCrossSellLead` (`POST crm/v3/objects/leads` + asociaciones v4) + property `aeo_check_result` (Company) + executor `executeOperatorReportSend` (email público-safe reusando lead-magnet path + Lead, 2 sub-pasos idempotentes) + projection `growth_ai_visibility_operator_send` (lane `ops-reactive-growth`) + signal `growth.ai_visibility.operator_send_failed`.
+>
+> **Gates:** `pnpm test` full **8496** verde · `pnpm build` compiló (boundary/bundle OK) · `eslint .` 0 err · `tsc --noEmit` · `pg:doctor` healthy · `docs:closure-check` flag-audit 0 sin registrar · SQL ejercida contra PG real (claim + dedup case-insensitive + signal). 17 tests focales nuevos. EVENT_CATALOG + arch doc (cross-sell close loop + invariantes) + changelog + ledger + README + registry sincronizados.
+>
+> **Hallazgo importante:** `aeo_check_result` **NO existe** en el portal HubSpot (la spec/docs asumían que sí, en deals) — agregado a las property definitions; **provisión out-of-band es prerequisito de rollout**.
+>
+> **Rollout pendiente (flag OFF):** (1) provisionar `aeo_check_result` (Company) + (2) confirmar asociaciones del objeto `leads` + (3) flag ON ops-worker + Vercel staging + (4) smoke staging real (run operador publicado → `send-lead` → email `sent` + Lead creado + consent 422) + (5) sign-off comercial/legal del copy a prospectos → prod vía release control plane (EPIC-020). Consumidor UI = TASK-1276.
+>
+> **Nota de convivencia:** Codex tenía `Handoff.md` + `tests/e2e/{fixtures/auth.ts,smoke/admin-nav.spec.ts}` modificados sin commitear (fix smoke `/admin`). NO los toqué ni stageé en mis commits de código; este Handoff co-commitea la entrada doc-only de Codex (su fix de código sigue uncommitted para que Codex lo cierre).
+
+## Sesion 2026-06-29 — GitHub Actions Playwright smoke /admin — Codex — ✅ local fix verified
+
+> **Contexto:** revisión manual del correo de alertas Outlook priorizó `greenhouse-eo` GitHub Actions; Sky quedó fuera porque el fallo reportado ya estaba resuelto/atribuido a rate limit del guard de GitHub.
+>
+> **Causa raíz:** el workflow `Playwright E2E smoke` fallaba en `tests/e2e/smoke/admin-nav.spec.ts` porque `gotoAuthenticated()` esperaba `domcontentloaded`. En staging `/admin` responde HTTP 200 y renderiza shell visible, pero ese evento puede no completarse dentro del timeout por comportamiento Next/RSC/prefetch, generando falso negativo.
+>
+> **Cambio:** `gotoWithTransientRetries()`/`gotoAuthenticated()` ahora aceptan `waitUntil` opcional y conservan `domcontentloaded` por defecto. Sólo el smoke `/admin` usa `waitUntil: 'commit'` y mantiene sus aserciones de status `<400`, `body` visible y ausencia de errores fatales.
+>
+> **Evidencia:** focal Playwright staging verde con agent auth + Vercel bypass (`tests/e2e/smoke/admin-nav.spec.ts`, chromium, 1 passed); ESLint focal verde; `pnpm typecheck` verde; `git diff --check` verde. No hubo push/deploy/commit.
+
 ## Sesion 2026-06-29 — TASK-1286 AEO assign tier governed command — Codex — ✅ complete
 
 > **Intake:** operador confirmó el `/goal` recomendado y pidió `TASK-1286`, `mantente en develop`. Hook ejecutado: `pnpm codex:task-hook TASK-1286 --develop`. Sin branch/worktree nuevo; excepción documentada. Subagentes no usados: la task comparte un mismo contrato causal (`module_assignments` + capability + command + endpoint + profile).
