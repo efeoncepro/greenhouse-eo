@@ -1910,3 +1910,52 @@ preguntas reales donde SKY debe aparecer (vs el "¿qué agencias de aerolíneas 
 verde (TASK-1292) + review del copy autorado (TASK-1291). Migración + lifecycle aplicados en `greenhouse-pg-dev`. Prod
 vía release control plane (EPIC-021). **Follow-ups:** re-autoría automática al cambiar el sitio/categoría (alimenta el
 re-grade TASK-1270); API routes HTTP de author/approve/resolve; eval (TASK-1292).
+
+## Delta 2026-06-29 — TASK-1291 Gate de validación pre-run/envío del operador · EPIC-021
+
+**Defense-in-depth de ISSUE-110.** Aunque el motor (TASK-1288/1289/1290) ya genere prompts correctos, este gate
+garantiza que el cross-sell operador NUNCA corra/envíe un informe sobre una marca **no resuelta** — el caso que produjo
+el falso-0 de SKY y que, enviado a un prospecto, destruye credibilidad. 2 slices, sin migración.
+
+### SoT del gate — `assertSubjectGradeable` (audience-aware, always-on)
+
+`operator/subject-gradeable.ts`: función PURA `assertSubjectGradeable({ categoryNodeId, categoryConfidence, businessModel, audience }) → ok | blocked(reason)`.
+
+- **categoría:** reusa `resolveRunCategory().resolved` (TASK-1288 — mismo predicado, incluye umbral de confianza; NO una
+  noción paralela). No resuelta → `category_unresolved`.
+- **modelo de negocio:** sólo para `audience='prospect'`, exige `business_model` confirmado (`!= unknown/null`) →
+  `business_model_unconfirmed`. "Confirmado" = el valor resuelto (grounded read o `operator_override` de TASK-1289);
+  **NO** hay columna `operator_confirmed` paralela (la provenance + confianza de TASK-1289 ya lo codifican — SSOT).
+- **audiencia:** derivada server-side de `getOrganizationCommercialFacts.isClient` (NUNCA del operador): cliente con
+  relación → categoría basta (la relación legitima el envío como servicio); prospecto → categoría **y** modelo.
+
+**Always-on en el surface operador (sin flag):** a diferencia del guard de categoría público (flag-gated por la cola de
+`unknown` legacy del lead magnet), el cross-sell operador no tiene esa preocupación → el gate corre siempre. Wired en
+los DOS chokepoints: `requestGraderRunAsOperator` (run) y `sendAeoReportAndCreateLead` (envío + Lead HubSpot). Error
+canónico es-CL `aeo_business_model_unconfirmed` (409, actionable=false) + el existente `aeo_category_unresolved`,
+mapeados en las 3 routes (`operator-run`, `send-lead`, `client-portal/run`).
+
+### Signal — `growth.ai_visibility.operator_gate_blocking` (drift)
+
+Ata el estado del flag del cross-sell con la población que el gate bloquearía: cuenta perfiles ORG-LINKED activos que
+son **prospecto** (org no cliente) y **no graduables** (categoría/modelo sin resolver). Flag `OPERATOR_SEND_ENABLED` OFF
+→ `ok` (pre-launch); ON → 0 ok / 1-5 warning / >5 error. Predicado COMPUESTO de prospecto (espejo de
+`getOrganizationCommercialFacts`), distinto de los signals atómicos `profile_category_unresolved` /
+`profile_business_model_unresolved`. SQL type-safe (COALESCE boolean, sin date-math).
+
+**Reconciliación de estado:** `OPERATOR_SEND_ENABLED` ya estaba **staging-ON** (rollout de TASK-1279). Este gate hace
+ese ON **seguro**: un envío sobre SKY (hoy resuelto: `sector:passenger_airlines` + `consumer_b2c`) **pasa**; sobre una
+marca `unknown` se **bloquea**. No introduce flag nuevo (el gate es always-on; reusa `OPERATOR_SEND_ENABLED`).
+
+**Reglas duras:**
+
+- **NUNCA** correr/enviar el cross-sell operador sobre un prospecto sin categoría resuelta Y modelo confirmado (usar
+  `assertSubjectGradeable` en el chokepoint, NO parchear por-callsite).
+- **NUNCA** confiar en el operador para la audiencia: derivarla server-side de `getOrganizationCommercialFacts`.
+- **NUNCA** crear una marca booleana `operator_confirmed` paralela: "confirmado" = `business_model != unknown` vía el
+  override gobernado existente (SSOT de TASK-1289).
+
+**Rollout (pendiente):** guard + signal **code-complete** en `develop` (sin push); full test 8588/0 + build verdes. La
+verificación runtime (deploy a staging + smoke: SKY pasa / `unknown` bloquea) queda pendiente del deploy. El flip a
+**prod** sigue gateado por la eval golden-set (TASK-1292) + sign-off comercial/legal. **Follow-up:** UI de review
+operador (`ui-ux`) — confirmar categoría/modelo + preview de prompts antes de un prospecto.

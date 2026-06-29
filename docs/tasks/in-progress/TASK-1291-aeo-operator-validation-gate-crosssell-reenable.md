@@ -11,6 +11,14 @@
 - El **eje `business_model`** ya está persistido + override gobernado (`overrideProfileBusinessModel`, capability `growth.ai_visibility.profile.set_business_model`). El review/confirm del operador debe incluir el `business_model` junto a la categoría (ambos pueden quedar `unknown` y ambos deben confirmarse antes de correr sobre prospecto). Reusar el command de override existente (NO crear otro write path).
 - Existe el signal `growth.ai_visibility.profile_business_model_unresolved` (org-linked sin resolver, steady 0) — el gate de TASK-1291 trata `business_model unknown` igual que `category unknown`: "no correr sobre prospecto sin confirmar".
 
+## Delta 2026-06-29 — implementación (code complete, rollout pendiente)
+
+- **S1 (guard):** `operator/subject-gradeable.ts` → `assertSubjectGradeable` (SoT puro, audience-aware): categoría vía `resolveRunCategory().resolved` (predicado TASK-1288), modelo confirmado (`!= unknown`) sólo para prospecto. Always-on en el surface operador (sin flag); wired en `requestGraderRunAsOperator` + `sendAeoReportAndCreateLead`. Error canónico `aeo_business_model_unconfirmed` + maps en las 3 routes. Tests: `subject-gradeable.test.ts` (8) + wiring run/send. Commit `87376c0c1`.
+- **S2 (signal):** `growth.ai_visibility.operator_gate_blocking` (drift) — prospectos org-linked no graduables mientras `OPERATOR_SEND_ENABLED` ON; wired en `get-reliability-overview` (5 sitios). Test (5). SQL type-safe (COALESCE boolean, sin date-math). Commit `5b948b192`.
+- **Reconciliación:** `OPERATOR_SEND_ENABLED` ya estaba staging-ON (TASK-1279). El gate hace ese ON seguro (SKY resuelto pasa, `unknown` bloquea). NO se introduce flag nuevo (gate always-on; reusa el flag de TASK-1279). NO hay migración (sin columna `operator_confirmed`: SSOT de TASK-1289).
+- **Gates verdes:** `pnpm test` full 8588/0 + `pnpm build` + lint + tsc. Smoke live PG bloqueado por ADC expiry (entorno); SQL column-verified contra los signals existentes + commercial-facts.
+- **Rollout pendiente:** deploy del guard a staging + smoke (SKY pasa / `unknown` bloquea); flip prod gateado por eval TASK-1292 + sign-off. Estado: **code complete, rollout pendiente** — no se mueve a `complete/`.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
@@ -230,9 +238,9 @@ Defense-in-depth: aunque el motor genere prompts correctos, el gate garantiza qu
 
 ## Acceptance Criteria
 
-- [ ] `assertSubjectGradeable` bloquea run/envío operador si `category_node_id = unknown` o `business_model` no confirmado (prospecto); cliente exige al menos categoría resuelta. Wired en el chokepoint, errores canónicos.
-- [ ] `GROWTH_AI_VISIBILITY_OPERATOR_SEND_ENABLED` reabilitado en staging SOLO tras evidencia del motor (run SKY realista + eval verde); prod gated por sign-off.
-- [ ] Reliability signal de bloqueos por validación; smoke staging (bloqueo de `unknown`, paso de SKY) verde.
+- [x] `assertSubjectGradeable` bloquea run/envío operador si `category_node_id = unknown` o `business_model` no confirmado (prospecto); cliente exige al menos categoría resuelta. Wired en el chokepoint (`requestGraderRunAsOperator` + `sendAeoReportAndCreateLead`), errores canónicos (`aeo_category_unresolved` + `aeo_business_model_unconfirmed`). Tests verdes (subject-gradeable 8/8 + wiring run/send).
+- [ ] `GROWTH_AI_VISIBILITY_OPERATOR_SEND_ENABLED` — **rollout pendiente.** Reconciliación: ya estaba **staging-ON** (TASK-1279); el gate de esta task lo hace seguro (SKY resuelto pasa, `unknown` bloquea). No se flipea nada nuevo. Prod gated por eval TASK-1292 + sign-off comercial/legal.
+- [x] Reliability signal `growth.ai_visibility.operator_gate_blocking` (drift); test 5/5. [ ] smoke staging (bloqueo de `unknown`, paso de SKY) — **rollout pendiente** (requiere deploy del guard a staging + ADC para correr).
 
 ## Verification
 
@@ -257,4 +265,4 @@ Defense-in-depth: aunque el motor genere prompts correctos, el gate garantiza qu
 
 ## Open Questions
 
-- ¿El "arquetipo confirmado" requiere una marca explícita en DB (operator-confirmed) o basta `business_model != unknown`? (definir en Discovery con comercial).
+- ~~¿El "arquetipo confirmado" requiere una marca explícita en DB (operator-confirmed) o basta `business_model != unknown`?~~ **RESUELTO (2026-06-29):** basta `business_model != unknown`, **sin columna `operator_confirmed` paralela**. Rationale: TASK-1289 ya codifica la provenance (`business_model_source ∈ {brand_intelligence, category_heuristic, operator_override, unknown}` + confianza); "confirmado por operador" = `source='operator_override'` (conf 1.0) vía el override gobernado existente (`overrideProfileBusinessModel`). Una columna booleana nueva sería un SSOT paralelo y violaría la instrucción de la spec ("reusar el override, NO crear otro write path"). Decisión arch SSOT.
