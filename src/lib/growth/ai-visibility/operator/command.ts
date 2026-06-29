@@ -21,7 +21,12 @@ import 'server-only'
 import { can } from '@/lib/entitlements/runtime'
 import { type TenantEntitlementSubject } from '@/lib/entitlements/types'
 
-import { getClientGraderRunById, getLatestClientGraderRun } from '../store'
+import {
+  getClientGraderRunById,
+  getLatestClientGraderRun,
+  listOperatorCrossOrgAeoScores,
+  type OperatorAeoCockpitRow
+} from '../store'
 import { readGraderReport, GraderReportError } from '../report/command'
 import { type ClientGraderReport } from '../report/contracts'
 import { toClientGraderReport } from '../report/builder'
@@ -90,4 +95,24 @@ export const readOperatorScopedAeoReport = async (
 
     throw error
   }
+}
+
+export type { OperatorAeoCockpitRow }
+
+/**
+ * Lista el agregado cross-org de scores AEO para el cockpit operador (TASK-1276): orgs CON AEO
+ * vigente + tier + último run reportable + score (degradación honesta `null` cuando no hay run/score).
+ * Self-guarda con la misma capability operador (`report.read_operator`). Solo lectura.
+ */
+export const readOperatorCrossOrgAeoScores = async (input: {
+  subject: TenantEntitlementSubject
+}): Promise<OperatorAeoCockpitRow[]> => {
+  if (!can(input.subject, 'growth.ai_visibility.report.read_operator', 'read', 'tenant')) {
+    throw new OperatorGraderReportError(
+      'forbidden',
+      'No tienes acceso al cockpit AEO de operador.'
+    )
+  }
+
+  return listOperatorCrossOrgAeoScores()
 }

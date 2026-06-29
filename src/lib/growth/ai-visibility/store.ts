@@ -11,6 +11,8 @@ import 'server-only'
 
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
+import { AI_VISIBILITY_MODULE_KEY } from './entitlement'
+
 import {
   type GrowthAiVisibilityExecutionMode,
   type GrowthAiVisibilityProviderId,
@@ -364,6 +366,73 @@ export const listGraderRuns = async (input: { limit?: number; profileId?: string
       )
 
   return rows.map(projectRun)
+}
+
+/**
+ * TASK-1287 — Agregado cross-org de scores AEO para el cockpit operador (TASK-1276).
+ *
+ * Lista las orgs CON AEO (módulo `ai_visibility_v1` vigente = `effective_to IS NULL`) con su tier,
+ * su último run reportable y su score. NO hay VIEW canónica: el join `module_assignments →
+ * organizations → grader_profiles → último grader_run → grader_scores` se resuelve acá una sola vez.
+ * Degradación honesta: org con AEO pero sin run reportable o sin score → `latestRunId/latestScore`
+ * = `null` (NUNCA `0`, que mentiría sobre el estado del diagnóstico). El gate de capability vive en
+ * el reader operador (`readOperatorCrossOrgAeoScores`), no en esta capa de persistencia.
+ * SQL ejercido contra PG real (gate TASK-893); todas las columnas temporales son TIMESTAMPTZ.
+ */
+export interface OperatorAeoCockpitRow {
+  organizationId: string
+  organizationName: string
+  organizationType: string
+  aeoTier: string | null
+  assignmentStatus: string
+  latestRunId: string | null
+  latestRunAt: string | null
+  latestScore: number | null
+}
+
+export const listOperatorCrossOrgAeoScores = async (): Promise<OperatorAeoCockpitRow[]> => {
+  const rows = await runGreenhousePostgresQuery<Record<string, unknown>>(
+    `SELECT
+       ma.organization_id,
+       o.organization_name,
+       o.organization_type,
+       ma.metadata_json->>'aeo_tier' AS aeo_tier,
+       ma.status AS assignment_status,
+       lr.run_id AS latest_run_id,
+       lr.finished_at AS latest_run_at,
+       ls.overall_score AS latest_score
+     FROM greenhouse_client_portal.module_assignments ma
+     JOIN greenhouse_core.organizations o ON o.organization_id = ma.organization_id
+     LEFT JOIN LATERAL (
+       SELECT r.run_id, r.finished_at
+       FROM greenhouse_growth.grader_runs r
+       JOIN greenhouse_growth.grader_profiles p ON p.profile_id = r.profile_id
+       WHERE p.organization_id = ma.organization_id AND r.status = ANY($2::text[])
+       ORDER BY r.finished_at DESC NULLS LAST, r.created_at DESC
+       LIMIT 1
+     ) lr ON TRUE
+     LEFT JOIN LATERAL (
+       SELECT s.overall_score
+       FROM greenhouse_growth.grader_scores s
+       WHERE s.run_id = lr.run_id
+       ORDER BY s.created_at DESC
+       LIMIT 1
+     ) ls ON TRUE
+     WHERE ma.module_key = $1 AND ma.effective_to IS NULL
+     ORDER BY ls.overall_score DESC NULLS LAST, o.organization_name`,
+    [AI_VISIBILITY_MODULE_KEY, [...CLIENT_REPORTABLE_RUN_STATUSES]]
+  )
+
+  return rows.map((row) => ({
+    organizationId: String(row.organization_id),
+    organizationName: String(row.organization_name),
+    organizationType: String(row.organization_type),
+    aeoTier: (row.aeo_tier as string | null) ?? null,
+    assignmentStatus: String(row.assignment_status),
+    latestRunId: (row.latest_run_id as string | null) ?? null,
+    latestRunAt: (row.latest_run_at as string | null) ?? null,
+    latestScore: row.latest_score != null ? Number(row.latest_score) : null
+  }))
 }
 
 /**

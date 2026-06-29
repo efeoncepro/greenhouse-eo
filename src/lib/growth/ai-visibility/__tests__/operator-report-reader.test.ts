@@ -15,7 +15,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 vi.mock('../store', () => ({
   getClientGraderRunById: vi.fn(),
-  getLatestClientGraderRun: vi.fn()
+  getLatestClientGraderRun: vi.fn(),
+  listOperatorCrossOrgAeoScores: vi.fn()
 }))
 
 vi.mock('../report/command', async () => {
@@ -32,11 +33,15 @@ vi.mock('../report/builder', async () => {
 
 vi.mock('@/lib/entitlements/runtime', () => ({ can: vi.fn() }))
 
-import { getClientGraderRunById, getLatestClientGraderRun } from '../store'
+import { getClientGraderRunById, getLatestClientGraderRun, listOperatorCrossOrgAeoScores } from '../store'
 import { GraderReportError, readGraderReport } from '../report/command'
 import { toClientGraderReport } from '../report/builder'
 import { can } from '@/lib/entitlements/runtime'
-import { OperatorGraderReportError, readOperatorScopedAeoReport } from '../operator/command'
+import {
+  OperatorGraderReportError,
+  readOperatorCrossOrgAeoScores,
+  readOperatorScopedAeoReport
+} from '../operator/command'
 
 const ORG = 'org-aerolinea-a'
 
@@ -111,5 +116,30 @@ describe('readOperatorScopedAeoReport', () => {
     await expect(readOperatorScopedAeoReport({ subject, organizationId: ORG })).rejects.toBeInstanceOf(
       OperatorGraderReportError
     )
+  })
+})
+
+describe('readOperatorCrossOrgAeoScores (cockpit)', () => {
+  it('forbidden sin la capability (y NO consulta el agregado)', async () => {
+    vi.mocked(can).mockReturnValue(false)
+
+    await expect(readOperatorCrossOrgAeoScores({ subject })).rejects.toMatchObject({ code: 'forbidden' })
+    expect(listOperatorCrossOrgAeoScores).not.toHaveBeenCalled()
+  })
+
+  it('con la capability delega al agregado del store y preserva la degradación honesta (null≠0)', async () => {
+    vi.mocked(can).mockReturnValue(true)
+
+    const cockpit = [
+      { organizationId: 'org-a', organizationName: 'A', organizationType: 'client', aeoTier: 'contracted', assignmentStatus: 'active', latestRunId: 'grun-1', latestRunAt: '2026-06-29T00:00:00.000Z', latestScore: 72 },
+      { organizationId: 'org-b', organizationName: 'B', organizationType: 'client', aeoTier: 'trial', assignmentStatus: 'active', latestRunId: null, latestRunAt: null, latestScore: null }
+    ]
+
+    vi.mocked(listOperatorCrossOrgAeoScores).mockResolvedValue(cockpit)
+
+    const result = await readOperatorCrossOrgAeoScores({ subject })
+
+    expect(result).toBe(cockpit)
+    expect(result[1].latestScore).toBeNull()
   })
 })
