@@ -15,6 +15,7 @@
  */
 
 import { type AccuracyConfidence, type AccuracyFindingKind } from '../accuracy/contracts'
+import { type GrowthAiVisibilityProviderId } from '../contracts'
 import { type ProbeAxis, type ProbeKind } from '../probes/contracts'
 import { type ScoreDimensionKey } from '../scoring/config'
 
@@ -243,6 +244,30 @@ export interface PositionSummary {
   ranked: number
 }
 
+// ── Citation source domain breakdown (TASK-1268) ────────────────────────────
+
+export const CITATION_SOURCE_CLASSIFICATIONS = ['own_domain', 'competitor', 'third_party', 'ugc'] as const
+export type CitationSourceClassification = (typeof CITATION_SOURCE_CLASSIFICATIONS)[number]
+
+export const CITATION_SOURCE_BREAKDOWN_REASONS = ['sin_citas_evaluables'] as const
+export type CitationSourceBreakdownReason = (typeof CITATION_SOURCE_BREAKDOWN_REASONS)[number]
+
+/** Dominio agregado public-safe: sin URL/path/title/raw text. */
+export interface CitationSourceDomain {
+  domain: string
+  count: number
+  engines: GrowthAiVisibilityProviderId[]
+  classification: CitationSourceClassification
+}
+
+/** Top-N acotado de dominios que alimentan las respuestas del run. */
+export interface CitationSourceBreakdown {
+  domains: CitationSourceDomain[]
+  totalCitations: number
+  uniqueDomains: number
+  reason: CitationSourceBreakdownReason | null
+}
+
 // ── Temporal trend (TASK-1236) ───────────────────────────────────────────────
 
 /**
@@ -370,6 +395,7 @@ export interface GraderReport {
   /** Hallazgos de exactitud de marca (TASK-1238) — INTERNAL ONLY; la señal pública es el gate. */
   accuracyFindings: ReportAccuracyFinding[]
   citationInsight: CitationInsight
+  citationSourceBreakdown: CitationSourceBreakdown
   sentimentSummary: SentimentSummary
   positionSummary: PositionSummary
   trend: ReportTrend
@@ -407,6 +433,7 @@ export interface ClientGraderReport {
   // por canal SÍ se muestra. `providerFindings` (narrativa cruda) sigue internal-only.
   providerPresence: ProviderPresence[]
   citationInsight: CitationInsight
+  citationSourceBreakdown: CitationSourceBreakdown
   sentimentSummary: SentimentSummary
   positionSummary: PositionSummary
   trend: ReportTrend
@@ -451,6 +478,7 @@ export interface PublicGraderReport {
   providerPresence: ProviderPresence[]
   // TASK-1237 — agregados seguros (%/conteos).
   citationInsight: CitationInsight
+  citationSourceBreakdown: CitationSourceBreakdown
   sentimentSummary: SentimentSummary
   positionSummary: PositionSummary
   trend: ReportTrend

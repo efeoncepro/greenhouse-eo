@@ -1,3 +1,11 @@
+## Sesion 2026-06-28 — TASK-1268 Growth AI Visibility Citation Source Domain Breakdown — Codex — ✅ complete
+
+> **Pedido:** `ejecuta task 1268`. Hook Codex ejecutado (`pnpm codex:task-hook 1268`). Intake: checkout limpio en `develop`, sin branch local `1268`; se mantiene local-first sin worktree/branch nuevo. Task movida `to-do → in-progress → complete`, `Lifecycle` sincronizado y README/registry apuntan a `docs/tasks/complete/TASK-1268-growth-ai-visibility-citation-source-breakdown.md`.
+>
+> **Resultado:** `citationSourceBreakdown` additive en `GraderReport`, `PublicGraderReport` y `ClientGraderReport`: top-N dominios registrables desde `provider_observations.citations`, conteo, motores y clasificación `own_domain|competitor|third_party|ugc`. Reusa `getRunObservations` + report builder canónico; no hay tabla, migración, flag ni write path. Public-safe: dominios agregados sin URLs/path/title/raw text; leak tests público/cliente extendidos. `weak_citation_quality` ahora añade targets concretos de PR digital cuando hay dominios no propios.
+>
+> **Evidencia local:** tests focales report/breakdown/leak/fix-it/client reader 42/42, `NODE_OPTIONS=--max-old-space-size=8192 pnpm exec tsc --noEmit --pretty false`, `pnpm lint` verdes. Pendiente sólo si se quiere evidencia runtime adicional: construir un report staging sobre un run con citas reales y confirmar el top-N (no requiere rollout).
+
 ## Sesion 2026-06-28 — TASK-1283 Growth Search Console Connection UI — Codex — 🚧 code complete, rollout pendiente
 
 > **Pedido:** `Invoca las skills de product design y ejecuta task 1283`; el hook inicial bloqueó porque `TASK-1283` declaraba `Blocked by: TASK-1282`. El operador aclaró que `TASK-1282` ya está implementada; se verificó en repo que el contrato `src/lib/growth/search-console/**` y rutas OAuth existen, y se resolvió el drift documental: `TASK-1283` queda desbloqueada para implementación porque `TASK-1282` está code-complete, pero la evidencia OAuth real puede quedar como rollout pendiente por consent screen/secrets/IAM/flag staging. También se declaró `Backend impact: api` por los ajustes pequeños que la propia delta exige (`POST disconnect` + callback redirect).

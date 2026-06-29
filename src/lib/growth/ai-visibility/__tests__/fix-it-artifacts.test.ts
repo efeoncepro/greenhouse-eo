@@ -30,6 +30,7 @@ const REPORT: PublicGraderReport = {
   sourceTypeSummary: [],
   providerPresence: [],
   citationInsight: { ownDomainShare: null, findingsWithCitations: 0, findingsCitingOwnDomain: 0 },
+  citationSourceBreakdown: { domains: [], totalCitations: 0, uniqueDomains: 0, reason: 'sin_citas_evaluables' },
   sentimentSummary: { positive: 0, neutral: 0, negative: 0, mixed: 0, evaluated: 0, net: 'sin_dato' },
   positionSummary: { best: null, average: null, ranked: 0 },
   trend: { status: 'sin_historico', reason: 'Sin histórico', previousAsOf: null, overall: null, dimensions: [] },

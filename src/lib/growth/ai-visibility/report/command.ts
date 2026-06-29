@@ -18,7 +18,7 @@ import { extractCitationDomain } from '../observation'
 import { readRunProbes } from '../probes/command'
 import { readGraderScore } from '../scoring/command'
 import { getPreviousComparableScore } from '../scoring/store'
-import { getGraderProfile, getGraderRun } from '../store'
+import { getGraderProfile, getGraderRun, getRunObservations } from '../store'
 import { buildGraderReport, toPublicGraderReport, type ReportRunMeta } from './builder'
 import { type PreviousScoreInput } from './trend'
 import { type GraderReport, type PublicGraderReport } from './contracts'
@@ -95,8 +95,19 @@ export const readGraderReport = async (input: {
 
     // Probe results del sitio analizado (TASK-1266); vacío → readiness null (no se probó).
     const probeResults = await readRunProbes(input.runId)
+    const observations = await getRunObservations(input.runId)
 
-    const report = buildGraderReport({ score, findings, run: runMeta, previous, subjectDomain, brandTruth, probeResults })
+    const report = buildGraderReport({
+      score,
+      findings,
+      run: runMeta,
+      previous,
+      subjectDomain,
+      brandTruth,
+      probeResults,
+      observations,
+      competitorsDeclared: profile?.competitorsDeclared ?? []
+    })
 
     return { report, publicReport: toPublicGraderReport(report) }
   } catch (error) {

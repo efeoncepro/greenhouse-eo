@@ -145,6 +145,17 @@ export const SAMPLE_INTERNAL_REPORT: GraderReport = {
     findingsWithCitations: 100,
     findingsCitingOwnDomain: 32
   },
+  citationSourceBreakdown: {
+    domains: [
+      { domain: 'g2.com', count: 18, engines: ['openai', 'perplexity'], classification: 'third_party' },
+      { domain: 'reddit.com', count: 11, engines: ['perplexity'], classification: 'ugc' },
+      { domain: 'globe.com', count: 9, engines: ['gemini', 'openai'], classification: 'own_domain' },
+      { domain: 'competidor-a.com', count: 7, engines: ['anthropic'], classification: 'competitor' }
+    ],
+    totalCitations: 45,
+    uniqueDomains: 4,
+    reason: null
+  },
   sentimentSummary: {
     positive: 38,
     neutral: 45,

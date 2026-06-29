@@ -1233,6 +1233,19 @@ El `grader_report` surfacea 4 señales AEO (skill `seo-aeo` §07) que el sistema
 - **NUNCA** editorializar sobre competidores en el resumen de sentimiento — es factual sobre la marca sujeto (saldo nombrado `positivo|neutral|negativo|mixto|sin_dato`, empate → `mixto`, sin evaluación → `sin_dato`).
 - Las 4 señales son **derivación pura** de findings ya persistidos: el mismo input produce el mismo enriquecimiento. Sin capability nueva (reusa `report.read`); sin migración; sin signal nuevo.
 
+## Delta 2026-06-28 — TASK-1268 citation source domain breakdown (complete dev)
+
+El `grader_report` agrega `citationSourceBreakdown`: top-N de dominios registrables que alimentan las respuestas del run, derivado **on-read** desde `greenhouse_growth.provider_observations.citations` vía `getRunObservations` + reducer puro `report/citation-breakdown.ts`. No crea tabla, migration, flag ni write path. Cada dominio expone sólo `{ domain, count, engines[], classification }`, con clasificación `own_domain|competitor|third_party|ugc` contra el dominio del sujeto, competidores declarados parseables y señales UGC/social. Runs sin citas degradan honestamente a `domains=[]` + `reason='sin_citas_evaluables'`.
+
+La frontera public-safe cambia de "no exponer dominios crudos" a "exponer sólo dominio registrable agregado": el DTO público/cliente puede mostrar `g2.com` o `reddit.com`, pero NUNCA URL, path, title, excerpt, prompt ni host privado completo. El leak test público/cliente cubre `citationSourceBreakdown`; subdominios sensibles se colapsan a registrable (`foro-privado-interno.example.com` → `example.com`). La recomendación `weak_citation_quality` se enriquece con targets no propios cuando existen, para que `digital_pr_citations` diga dónde actuar y no sólo "consigue más citas".
+
+### Invariantes operativos para agentes (citation source breakdown)
+
+- **NUNCA** exponer URL/path/query/title ni raw provider text desde citations. `citationSourceBreakdown` sólo contiene dominio registrable agregado, conteos, motores y clasificación.
+- **NUNCA** crear tabla o write path para este desglose: es derivación on-read del evidence ledger append-only (`provider_observations.citations`) dentro del report builder canónico.
+- **NUNCA** inventar dominios cuando el run no trae citas evaluables: usar `domains=[]` + `reason='sin_citas_evaluables'`.
+- **SIEMPRE** enriquecer digital PR desde dominios no propios; el dominio propio sirve para clasificación/contexto, no como target principal de PR externa.
+
 ## Delta 2026-06-24 — TASK-1238 brand accuracy / hallucination monitoring (complete dev)
 
 Detecta cuándo la IA dice cosas **factualmente falsas** de la marca (no sólo ausente/negativo) contrastando los findings contra la **verdad declarada** del perfil (`brand_name`/`category`/`competitors_declared`) — "no basta aparecer; importa que la IA diga la verdad" (skill `seo-aeo` §07C; crítico en YMYL/Globe). Módulo puro `src/lib/growth/ai-visibility/accuracy/` (`buildBrandTruth` + `detectBrandInaccuracies` + `hasLikelyHallucination`); escalación en `review-gates/gates.ts`; surface internal-only en `report/builder.ts`; signal en `reliability/queries/growth-ai-visibility-scoring-signals.ts`. **Sin migración, sin tocar el `grader_score` numérico, sin capability nueva** (OQ1 resuelta → NO nueva dimensión en score v1; OQ2 → verdad declarada limitada, `service_description` = follow-up; OQ3 → determinista-first).

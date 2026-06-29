@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Bajo`
@@ -230,27 +230,27 @@ El agregador recorre las `citations` de las observations del run, normaliza cada
 
 ## Acceptance Criteria
 
-- [ ] El agregador deriva el breakdown por dominio desde `provider_observations.citations` sin tabla ni write path nuevo.
-- [ ] `citationSourceBreakdown` (top-N + clasificación) expuesto public-safe; leak test del campo verde.
-- [ ] Normalización a eTLD+1 correcta con casos borde testeados.
-- [ ] Run sin citas → campo vacío con razón (honest degradation), sin dominios inventados.
-- [ ] La recomendación de digital PR apunta a dominios concretos del breakdown.
+- [x] El agregador deriva el breakdown por dominio desde `provider_observations.citations` sin tabla ni write path nuevo. — `report/citation-breakdown.ts` + `readGraderReport` vía `getRunObservations`.
+- [x] `citationSourceBreakdown` (top-N + clasificación) expuesto public-safe; leak test del campo verde. — `GraderReport`/`PublicGraderReport`/`ClientGraderReport`, leak tests público/cliente.
+- [x] Normalización a eTLD+1 correcta con casos borde testeados. — `www`, subdominios, `co.uk` y dominio propio/competidor/UGC en `citation-breakdown.test.ts`.
+- [x] Run sin citas → campo vacío con razón (honest degradation), sin dominios inventados. — `reason: sin_citas_evaluables`.
+- [x] La recomendación de digital PR apunta a dominios concretos del breakdown. — `weak_citation_quality` añade targets no propios cuando existen.
 
 ## Verification
 
-- `pnpm lint`
-- `pnpm tsc --noEmit`
-- `pnpm test`
-- Build de report de un run real en staging + verificación del breakdown
+- [x] `pnpm lint`
+- [x] `NODE_OPTIONS=--max-old-space-size=8192 pnpm exec tsc --noEmit --pretty false`
+- [x] `pnpm test src/lib/growth/ai-visibility/__tests__/citation-breakdown.test.ts src/lib/growth/ai-visibility/__tests__/report-builder.test.ts src/lib/growth/ai-visibility/__tests__/report-public-leak.test.ts src/lib/growth/ai-visibility/__tests__/report-client-leak.test.ts src/lib/growth/ai-visibility/__tests__/report-enrichment.test.ts src/lib/growth/ai-visibility/__tests__/client-report-reader.test.ts src/lib/growth/ai-visibility/__tests__/fix-it-command.test.ts src/lib/growth/ai-visibility/__tests__/fix-it-artifacts.test.ts`
+- [ ] Build de report de un run real en staging + verificación del breakdown — no ejecutado en esta pasada; recomendado como smoke opcional porque no hay rollout/env/DB change.
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown sincronizado
-- [ ] el archivo vive en la carpeta correcta
-- [ ] `docs/tasks/README.md` sincronizado
-- [ ] `Handoff.md` actualizado
-- [ ] `changelog.md` actualizado
-- [ ] chequeo de impacto cruzado (TASK-1265 citas AI Overviews, TASK-1269 fix-it, TASK-1252 render)
+- [x] `Lifecycle` del markdown sincronizado
+- [x] el archivo vive en la carpeta correcta
+- [x] `docs/tasks/README.md` sincronizado
+- [x] `Handoff.md` actualizado
+- [x] `changelog.md` actualizado
+- [x] chequeo de impacto cruzado (TASK-1265 citas AI Overviews, TASK-1269 fix-it, TASK-1252 render): campo additive; fixtures fix-it y report artifact actualizados; render visual de breakdown sigue fuera de scope (TASK-1252/TASK-1248 consumers futuros).
 
 ## Follow-ups
 

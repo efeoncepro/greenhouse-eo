@@ -172,6 +172,9 @@ export const GH_GROWTH_AI_VISIBILITY = {
   provider_finding_absent: (label: string, resolved: number) =>
     `Invisible en ${label}: no apareces en ${resolved} ${resolved === 1 ? 'respuesta evaluada' : 'respuestas evaluadas'}.`,
 
+  citation_source_targeting: (domains: string[]) =>
+    `Prioriza presencia y menciones en ${domains.join(', ')}; esos dominios ya están moldeando las respuestas sobre la categoría.`,
+
   // Intake público del lead magnet (TASK-1240): mensajes es-CL por resultado (cliente público).
   public_intake: {
     accepted: 'Estamos preparando tu análisis. En unos minutos estará listo.',

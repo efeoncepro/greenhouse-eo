@@ -14,7 +14,7 @@
 import { GH_GROWTH_AI_VISIBILITY } from '@/lib/copy/growth'
 
 import { detectBrandInaccuracies, type BrandTruth } from '../accuracy'
-import { type GrowthAiVisibilityRunStatus } from '../contracts'
+import { type GrowthAiVisibilityProviderObservation, type GrowthAiVisibilityRunStatus } from '../contracts'
 import { type NormalizedFinding } from '../normalization/contracts'
 import { type ProbeResult } from '../probes/contracts'
 import { SCORE_DIMENSION_CONFIG_BY_KEY, type ScoreDimensionKey } from '../scoring/config'
@@ -24,6 +24,7 @@ import {
   GROWTH_AI_VISIBILITY_RECOMMENDATION_PACK_VERSION,
   GROWTH_AI_VISIBILITY_REPORT_VERSION,
   type CitationInsight,
+  type CitationSourceBreakdown,
   type ClientGraderReport,
   type CompetitiveShareOfVoice,
   type GraderReport,
@@ -46,6 +47,7 @@ import {
   type SentimentSummary,
   type SourceTypeCount
 } from './contracts'
+import { buildCitationSourceBreakdown, summarizeCitationTargets } from './citation-breakdown'
 import {
   buildRecommendations,
   pickPrimaryGap,
@@ -74,6 +76,10 @@ export interface BuildGraderReportInput {
   brandTruth?: BrandTruth | null
   /** Probe results del sitio analizado (TASK-1266); ausente/vacío → readiness null (no se probó). */
   probeResults?: ProbeResult[] | null
+  /** Observations del run para breakdown por dominio de cita (TASK-1268). */
+  observations?: GrowthAiVisibilityProviderObservation[] | null
+  /** Competidores declarados en el perfil; se usan sólo si son dominios parseables. */
+  competitorsDeclared?: string[] | null
 }
 
 const FINDINGS_MAX = 5
@@ -204,6 +210,24 @@ const buildFindings = (
   }
 
   return findings
+}
+
+const enrichRecommendationsWithCitationTargets = (
+  recommendations: ReportRecommendation[],
+  breakdown: CitationSourceBreakdown
+): ReportRecommendation[] => {
+  const targets = summarizeCitationTargets(breakdown)
+
+  if (targets.length === 0) return recommendations
+
+  return recommendations.map(recommendation => {
+    if (recommendation.gapKey !== 'weak_citation_quality') return recommendation
+
+    return {
+      ...recommendation,
+      action: `${recommendation.action} ${GH_GROWTH_AI_VISIBILITY.citation_source_targeting(targets)}`
+    }
+  })
 }
 
 // ── Comparables + presence + provenance ──────────────────────────────────────
@@ -478,6 +502,8 @@ export const toPublicGraderReport = (report: GraderReport): PublicGraderReport =
   providerPresence: report.providerPresence,
   // TASK-1237 — agregados seguros (%/conteos).
   citationInsight: report.citationInsight,
+  // TASK-1268 — dominios agregados top-N, sin URLs ni paths.
+  citationSourceBreakdown: report.citationSourceBreakdown,
   sentimentSummary: report.sentimentSummary,
   positionSummary: report.positionSummary,
   // El trend es agregado puro (deltas numéricos, sin raw text) → public-safe.
@@ -530,6 +556,7 @@ export const toClientGraderReport = (report: GraderReport): ClientGraderReport =
   // TASK-1252 — presencia por motor (conteos), igual que el público. `providerFindings` sigue internal-only.
   providerPresence: report.providerPresence,
   citationInsight: report.citationInsight,
+  citationSourceBreakdown: report.citationSourceBreakdown,
   sentimentSummary: report.sentimentSummary,
   positionSummary: report.positionSummary,
   trend: report.trend,
@@ -546,9 +573,15 @@ export const buildGraderReport = (input: BuildGraderReportInput): GraderReport =
   const { score, findings, run, previous } = input
   const providerPresence = buildProviderPresence(findings)
 
+  const citationSourceBreakdown = buildCitationSourceBreakdown({
+    observations: input.observations ?? [],
+    subjectDomain: input.subjectDomain ?? null,
+    competitorsDeclared: input.competitorsDeclared ?? []
+  })
+
   const gateStatus = resolveGateStatus(score, run.status)
   const scoredInputs = score.dimensions.map(d => ({ key: d.key, score: d.score, weight: d.weight }))
-  const recommendations = buildRecommendations(scoredInputs)
+  const recommendations = enrichRecommendationsWithCitationTargets(buildRecommendations(scoredInputs), citationSourceBreakdown)
   const recommendationByDimension = new Map(recommendations.map(r => [r.dimensionKey, r]))
 
   const dimensions = score.dimensions.map(dimension => {
@@ -585,6 +618,7 @@ export const buildGraderReport = (input: BuildGraderReportInput): GraderReport =
     providerFindings: buildProviderFindings(providerPresence),
     accuracyFindings: buildAccuracyFindings(findings, input.brandTruth ?? null),
     citationInsight: buildCitationInsight(findings, input.subjectDomain ?? null),
+    citationSourceBreakdown,
     sentimentSummary: buildSentimentSummary(findings),
     positionSummary: buildPositionSummary(findings),
     trend: buildReportTrend(score, run.promptPackVersion, previous ?? null),

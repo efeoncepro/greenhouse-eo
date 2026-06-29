@@ -25,6 +25,7 @@ const RUN: ReportRunMeta = {
 
 const SENSITIVE_DRIFT = 'la IA dijo que somos los más baratos del mercado'
 const SENSITIVE_CITATION = 'foro-privado-interno.example.com'
+const SENSITIVE_CITATION_URL = `https://${SENSITIVE_CITATION}/private/path?token=secret`
 const SENSITIVE_REVIEW = 'detalle interno de review que no debe salir'
 
 // Las 6 dimensiones driver en gap → 6 recomendaciones (>3) para probar que el cliente NO se acota.
@@ -44,7 +45,32 @@ const buildWithSensitiveEvidence = () => {
     })
   ]
 
-  return buildGraderReport({ score, findings, run: RUN })
+  return buildGraderReport({
+    score,
+    findings,
+    run: RUN,
+    observations: [
+      {
+        observationId: 'obs-sensitive',
+        runId: 'run-fixture',
+        promptId: 'p01',
+        provider: 'openai',
+        model: 'model',
+        status: 'succeeded',
+        answerTextHash: null,
+        answerExcerpt: null,
+        citations: [{ url: SENSITIVE_CITATION_URL, domain: SENSITIVE_CITATION, title: 'Private' }],
+        usage: {},
+        latencyMs: 10,
+        providerRequestHash: 'hash',
+        rawEvidencePointer: null,
+        errorCode: null,
+        providerPolicyVersion: 'policy.v1',
+        promptPackVersion: 'prompt-pack.v1',
+        createdAt: '2026-06-24T12:00:00.000Z'
+      }
+    ]
+  })
 }
 
 describe('growth/ai-visibility — client report DTO (defensa en 3 capas)', () => {
@@ -66,7 +92,10 @@ describe('growth/ai-visibility — client report DTO (defensa en 3 capas)', () =
     const serialized = JSON.stringify(toClientGraderReport(buildWithSensitiveEvidence()))
 
     expect(serialized).not.toContain(SENSITIVE_DRIFT)
-    expect(serialized).not.toContain(SENSITIVE_CITATION)
+    expect(serialized).not.toContain(SENSITIVE_CITATION_URL)
+    expect(serialized).not.toContain('/private/path')
+    expect(serialized).not.toContain('token=secret')
+    expect(serialized).not.toContain('Private')
     expect(serialized).not.toContain(SENSITIVE_REVIEW)
   })
 

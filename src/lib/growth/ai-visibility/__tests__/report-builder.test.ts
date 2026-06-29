@@ -126,6 +126,46 @@ describe('growth/ai-visibility — report builder', () => {
     expect(report.recommendedMotion).toBe('entity_foundation')
   })
 
+  it('citationSourceBreakdown enriquece la recomendación de digital PR con dominios concretos', () => {
+    const score = makeScore({ ai_visibility: 40, citation_quality: 10, entity_clarity: 80 })
+
+    const report = buildGraderReport({
+      score,
+      findings: [],
+      run: RUN,
+      subjectDomain: 'acme.com',
+      observations: [
+        {
+          observationId: 'obs-1',
+          runId: 'run-fixture',
+          promptId: 'p01',
+          provider: 'perplexity',
+          model: 'sonar',
+          status: 'succeeded',
+          answerTextHash: null,
+          answerExcerpt: null,
+          citations: [
+            { url: 'https://www.g2.com/products/acme', domain: 'www.g2.com' },
+            { url: 'https://reddit.com/r/saas/comments/1', domain: 'reddit.com', sourceType: 'social' },
+            { url: 'https://acme.com/use-cases', domain: 'acme.com' }
+          ],
+          usage: {},
+          latencyMs: 10,
+          providerRequestHash: 'hash',
+          rawEvidencePointer: null,
+          errorCode: null,
+          providerPolicyVersion: 'policy.v1',
+          promptPackVersion: 'prompt-pack.v1',
+          createdAt: '2026-06-24T12:00:00.000Z'
+        }
+      ]
+    })
+
+    expect(report.citationSourceBreakdown.domains.map(domain => domain.domain)).toEqual(['acme.com', 'g2.com', 'reddit.com'])
+    expect(report.citationSourceBreakdown.domains.find(domain => domain.domain === 'reddit.com')?.classification).toBe('ugc')
+    expect(report.recommendations.find(rec => rec.gapKey === 'weak_citation_quality')?.action).toContain('g2.com, reddit.com')
+  })
+
   it('competitiveSov como lista comparable; sourceTypeSummary categórico; presencia por motor', () => {
     const findings = [
       makeFinding({ provider: 'openai', brandMentioned: 'yes', competitorsMentioned: ['Acme', 'Globex'], sourceTypes: ['owned', 'news'] }),
