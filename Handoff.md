@@ -1,3 +1,13 @@
+## Sesion 2026-06-29 — TASK-1288 AEO Brand Intelligence + categoría canónica — Claude — 🚧 in-progress (Discovery/Plan, checkpoint)
+
+> **Intake:** `/implement-task 1288`. Foundation de **EPIC-021** (desbloquea TASK-1289/1290/1291/1292; cierra el 1er paso de ISSUE-110 — el falso-0 de SKY). Backend-data / `migration`, P1, blast alto (toca el perfil del grader live + guard que bloquea runs + lead magnet + introduce lectura LLM). Trabajo en `develop` local-first, **sin push**. Movida a `in-progress/`, `Lifecycle: in-progress`, README sync.
+>
+> **Qué construye:** (1) `brand_intelligence` = lectura grounded compartida de la marca (LLM canónico `src/lib/ai/*` sobre el contenido legible del sitio + entity KG/Wikidata → snapshot estructurado `{what_the_brand_does, candidate_category_node, candidate_business_model, signals_used, confidence}`, versionado/cacheado por marca) que TASK-1289 (modelo) + TASK-1290 (prompts) CONSUMEN (se lee una vez, se derivan tres cosas). (2) Resolución de **categoría canónica** por cascada con confianza: HubSpot enum = prior/baseline determinista, snapshot = autoritativo, entity = cruce, `unknown` si baja confianza. Persiste `category_node_id`/`category_label`/`category_confidence`/`category_source` en `grader_profiles`; deja de inyectar el enum crudo de HubSpot en los prompts. (3) Guard `unknown` (flag `GROWTH_AI_VISIBILITY_CATEGORY_GUARD_ENABLED`) en el chokepoint de run + signal `growth.ai_visibility.profile_category_unresolved`.
+>
+> **Modelo de input (decidido con el operador):** fetch autónomo — la semilla ya existe (`grader_profiles.website_url` + nombre); el operador NO llena formulario, solo confirma/corrige el resultado (TASK-1291). Lectura read-only de sitio público, sin consent (el consent es para enviar).
+>
+> **Estado:** Discovery en curso (2 explore-lite mapeando el módulo grader + cliente LLM + signals/migraciones). Plan de slices a presentar en **checkpoint humano** (P1/blast alto) antes de escribir código. **Convivencia Codex:** `tests/e2e/{fixtures/auth.ts,smoke/admin-nav.spec.ts}` siguen modificados sin commitear por Codex — NO tocar ni stagear.
+
 ## Sesion 2026-06-29 — TASK-1279 AEO Operator Cross-Sell (enviar informe + crear Lead) — Claude — ✅ complete (code complete, rollout pendiente)
 
 > **Intake:** `/implement-task 1279`. Backend-data / integration · EPIC-020 (nodo S11). Trabajo en `develop` local-first, **sin push**. Skills cargadas en el pre-trabajo (arch + commercial + seo-aeo + product-ui). Blocker TASK-1277 ya estaba **complete** → desbloqueada.
