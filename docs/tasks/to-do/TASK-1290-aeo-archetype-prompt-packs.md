@@ -17,7 +17,7 @@
 - Wireframe: `none`
 - Flow: `none`
 - Motion: `none`
-- Backend impact: `command`
+- Backend impact: `migration`
 - Epic: `EPIC-021`
 - Status real: `Diseno`
 - Rank: `TBD`
@@ -29,17 +29,18 @@
 
 ## Summary
 
-El corazón del fix: reemplazar el prompt pack único (cableado a "¿qué agencias/proveedores de {category} ayudan a empresas enterprise?") por un **generador de fan-out por arquetipo × etapa de buyer-intent**. Para `consumer_b2c` (SKY) genera intención de consumo ("¿cuáles son las mejores aerolíneas en {market}?"); para `b2b_service_provider` el set actual; para `b2b_product_saas`/`retail_ecommerce`/`marketplace` sus framings. El **scoring se queda determinista e idéntico** (presencia/SoV/citación se computan igual); solo cambian las preguntas. Cierra el núcleo de ISSUE-110.
+El corazón del fix: reemplazar el prompt pack único (cableado a "¿qué agencias/proveedores de {category} ayudan a empresas enterprise?") por un **prompt set generado por marca**. El patrón canónico es **LLM-autora-luego-congela**: al momento de AUTORÍA, un LLM investiga el espacio de buyer-intent real de la marca (categoría canónica + modelo de negocio + sitio) y propone el fan-out; ese set se **persiste como artefacto versionado e inmutable** atado al perfil, **se revisa** (operador/AEO, obligatorio para prospectos) y **se congela**; los **runs usan el set congelado y aprobado** → deterministas, reproducibles y baratos (el LLM corrió una vez al autorar, **NUNCA por run**). Plantillas por arquetipo = **baseline determinista / fallback** (sin LLM disponible o casos triviales). El **scoring se queda determinista e idéntico** (presencia/SoV/citación se computan igual); solo cambian las preguntas. Cierra el núcleo de ISSUE-110.
 
 ## Why This Task Exists
 
-Es la pieza que hace que el grader **mida la realidad**. Hoy `prompt-pack-v1.ts` (y v2) son una lista estática agencia-only; el Query Fan-Out (seo-aeo) debe reflejar el journey de compra real de la marca, que depende del modelo de negocio (TASK-1289) + la categoría canónica (TASK-1288). Sin esto, SKY (y toda marca de consumo) seguirá saliendo 0.
+Es la pieza que hace que el grader **mida la realidad**. Hoy `prompt-pack-v1.ts` (y v2) son una lista estática agencia-only; el Query Fan-Out / prompt-research (seo-aeo §04) debe reflejar el journey de compra **real** de la marca (rutas/precio para una aerolínea, "cuenta sin comisiones" para un banco…), que una plantilla genérica no captura. La interpretación de "qué le preguntaría un comprador real a la IA sobre esta marca" es exactamente lo que un LLM hace bien — pero debe quedar **congelado y reproducible** para poder medir en el tiempo, evaluar y no sesgar la medición. Sin esto, SKY (y toda marca de consumo/no-agencia) seguirá saliendo 0.
 
 ## Goal
 
-- Generador `buildPromptSet({ brandName, categoryNodeId, categoryLabel, businessModel, market, locale, competitors, year })` que produce el fan-out apropiado al arquetipo, cubriendo las etapas (awareness · consideration · comparison · trust · purchase) con los tipos de sub-query del Query Fan-Out (related/comparative/implicit/recent).
-- Plantillas por arquetipo (spine determinista, versionado/inmutable como los packs actuales). El scoring NO cambia. Provenance del arquetipo + versión del pack en el run.
-- LLM-assist OPCIONAL y gated (solo categorías long-tail; su salida pasa por review/eval, nunca cruda a un run) — o diferido a follow-up.
+- **Autoría (LLM):** `authorPromptSet({ brandName, categoryNodeId, categoryLabel, businessModel, market, locale, competitors, websiteSignals? })` propone, vía el cliente LLM canónico (`src/lib/ai/*`), un fan-out que cubre las etapas (awareness · consideration · comparison · trust · purchase) con los tipos de sub-query del Query Fan-Out (related/comparative/implicit/recent), acotado en costo. NO leading (no preguntas redactadas para que la marca aparezca).
+- **Artefacto congelado:** el set se persiste versionado + inmutable (lifecycle `draft → approved → active`), con provenance (modelo, inputs, estrategia). Los **runs referencian el set `active` aprobado**; misma marca → mismo set (reproducible).
+- **Baseline determinista:** plantillas por arquetipo como fallback cuando no hay LLM / set aprobado, garantizando no-regresión bit-for-bit del caso agencia.
+- El **scoring NO cambia**; provenance del set/versión en el run.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 1 — CONTEXT & CONSTRAINTS
@@ -50,15 +51,19 @@ Es la pieza que hace que el grader **mida la realidad**. Hoy `prompt-pack-v1.ts`
 Revisar y respetar:
 
 - `docs/architecture/GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md` (prompt packs inmutables + versionados; scoring determinista)
+- `docs/architecture/GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md` (invariantes de providers LLM — usar el cliente canónico de `src/lib/ai/*`, secret server-side)
 - `docs/epics/to-do/EPIC-021-aeo-brand-aware-prompt-generation-engine.md`
 - seo-aeo `modules/04_AEO_GEO.md` (Query Fan-Out, prompt/answer-space research)
 
 Reglas obligatorias:
 
+- **El LLM autora, NUNCA por run.** El LLM corre en el momento de AUTORÍA del set (una vez por marca/versión); el set se congela; los runs usan el set `active` aprobado. Generar prompts en vivo por run rompe la reproducibilidad (no se puede medir en el tiempo / evaluar drift), el costo y la seguridad.
 - El scoring (presencia/SoV/citación) **NO cambia** — solo cambian los prompts. Cualquier cambio de scoring es regresión.
-- Los packs por arquetipo son **inmutables + versionados** (cambios → versión nueva), igual que el pack actual.
-- Interpolación como **dato delimitado** (anti prompt-injection), nunca PII; prompts con `{{competitor}}` sin competidor se descartan (patrón existente).
-- El run persiste **provenance**: `business_model`, `category_node_id`, versión del pack/arquetipo usado.
+- El prompt set es **inmutable + versionado** (cambios → versión nueva), con lifecycle `draft → approved → active` (append-only). Un set `active` no se edita; se supersede con una versión nueva aprobada.
+- **NUNCA** instanciar un SDK LLM nuevo en este dominio — usar el cliente canónico de `src/lib/ai/*` (helper structured); secret server-side; output validado contra schema; degradación honesta (sin LLM / schema inválido → baseline determinista, NO prompts rotos ni enum crudo).
+- **No leading**: el LLM no debe redactar prompts diseñados para que la marca aparezca (sesgaría la medición); el review + eval (TASK-1292) lo controla.
+- Interpolación de marca/categoría como **dato delimitado** (anti prompt-injection), nunca PII; prompts con `{{competitor}}` sin competidor se descartan (patrón existente).
+- El run persiste **provenance**: `business_model`, `category_node_id`, id/versión del prompt set usado.
 
 ## Normative Docs
 
@@ -80,11 +85,13 @@ Reglas obligatorias:
 
 ### Files owned
 
-- `src/lib/growth/ai-visibility/prompt-packs/archetypes/*.ts` (plantillas por arquetipo) `[verificar naming]`
-- `src/lib/growth/ai-visibility/prompt-packs/build-prompt-set.ts` (generador) `[verificar]`
-- `src/lib/growth/ai-visibility/prompt-pack.ts` (usar el generador)
-- `src/lib/growth/ai-visibility/run-engine.ts` (provenance del arquetipo/pack)
-- migración (si la provenance del arquetipo se persiste en `grader_runs`) `[verificar]`
+- `migrations/<ts>_task-1290-grader-prompt-sets.sql` (tabla `grader_prompt_sets` + provenance en `grader_runs`)
+- `src/lib/growth/ai-visibility/prompt-packs/archetypes/*.ts` (baseline determinista por arquetipo) `[verificar naming]`
+- `src/lib/growth/ai-visibility/prompt-packs/author-prompt-set.ts` (autoría LLM vía cliente canónico) `[verificar]`
+- `src/lib/growth/ai-visibility/prompt-packs/prompt-set-store.ts` (lifecycle draft→approved→active + resolve active) `[verificar]`
+- `src/lib/growth/ai-visibility/prompt-pack.ts` (resolver el set active, fallback baseline)
+- `src/lib/growth/ai-visibility/run-engine.ts` (provenance del prompt set)
+- `src/lib/ai/*` (reuse del cliente LLM canónico + helper structured — NO SDK nuevo)
 
 ## Current Repo State
 
@@ -95,64 +102,66 @@ Reglas obligatorias:
 
 ### Gap
 
-- No hay packs por arquetipo ni generador; el run siempre usa el pack agencia.
+- No hay prompt set por marca, ni autoría LLM, ni artefacto persistido/versionado, ni baseline por arquetipo; el run siempre usa el pack agencia en código.
 
 ## Backend/Data Contract
 
 ### Backend/data brief
 
-- Backend rigor: `backend-critical` (cambia qué se le pregunta a los motores reales en TODAS las puertas del grader)
-- Impacto principal: `command` (generador) (+ `migration` si se persiste provenance del arquetipo)
-- Source of truth afectado: los packs por arquetipo (artefactos versionados) + provenance en `grader_runs`
-- Consumidores afectados: run-engine (3 puertas: público/cliente/operador) · eval (TASK-1292)
+- Backend rigor: `backend-critical` (cambia qué se le pregunta a los motores reales en TODAS las puertas del grader + introduce autoría LLM)
+- Impacto principal: `migration` (artefacto del prompt set) + `command` (autoría LLM + lifecycle) + `integration` (cliente LLM canónico)
+- Source of truth afectado: nuevo `greenhouse_growth.grader_prompt_sets` (artefacto versionado por perfil) + provenance en `grader_runs`
+- Consumidores afectados: run-engine (3 puertas: público/cliente/operador) · review operador (TASK-1291) · eval (TASK-1292)
 - Runtime target: `local|staging|production`
 
 ### Contract surface
 
-- Contrato nuevo: `buildPromptSet(profileVars) → GraderRunPromptInput[]` (resuelve arquetipo → pack → interpola). Provenance del arquetipo + versión en el run.
-- Backward compatibility: `compatible` para el caso agencia (debe producir el MISMO set que hoy para `b2b_service_provider`); `additive` para los nuevos arquetipos.
-- Full API parity: el generador es el único camino de resolución de prompts; las 3 puertas lo usan por construcción.
+- Contratos nuevos: `authorPromptSet(profileVars) → draft set` (LLM, cliente canónico `src/lib/ai/*`, structured + cost-bounded) · `approvePromptSet(setId)` (draft→active, congela) · `resolveActivePromptSet(profileId) → GraderRunPromptInput[]` (lo que usa el run). Baseline determinista por arquetipo como fallback.
+- Backward compatibility: `compatible` para el caso agencia (el baseline `b2b_service_provider` produce el MISMO set que hoy); `additive` para el artefacto + arquetipos nuevos.
+- Full API parity: la autoría/approve/resolución son commands/readers gobernados; las 3 puertas resuelven el set `active` por construcción.
 
 ### Data model and invariants
 
-- Entidades: packs por arquetipo (en código, versionados); `grader_runs` (+ provenance del arquetipo si se persiste).
+- Entidades: `grader_prompt_sets` (`set_id`, `profile_id`, `version`, `business_model`, `category_node_id`, `prompts_json`, `generation_strategy` `llm`|`template_baseline`, `model`, `status` `draft`|`approved`|`active`|`superseded`, `created_by`, `approved_by`, timestamps); baseline por arquetipo en código (versionado). `grader_runs` (+ `prompt_set_id`/`version` provenance).
 - Invariantes:
-  - Para `b2b_service_provider` el set es **idéntico** al actual (no regresión del lead magnet).
-  - Cada arquetipo cubre las etapas de buyer-intent con el framing correcto; interpolación delimitada; descarte de `{{competitor}}` sin competidor.
-  - Scoring inalterado (mismo `score_version`).
-- Tenant/space boundary: el run ya es per-org.
-- Idempotency/concurrency: la generación es determinista (mismas vars → mismo set).
-- Audit/outbox/history: provenance (arquetipo + versión) en el run; el `execution_prompts` ya se persiste.
+  - Un perfil tiene a lo sumo UN set `active`; aprobar uno nuevo supersede el anterior (append-only, no edit-in-place).
+  - El run usa el set `active`; misma marca → mismo set (reproducible). Si no hay set `active` → baseline determinista del arquetipo (no prompts rotos, no enum crudo).
+  - Para `b2b_service_provider` el baseline es **idéntico** al pack actual (no regresión del lead magnet).
+  - Scoring inalterado (mismo `score_version`); el LLM NO toca el score.
+  - LLM output validado contra schema; prompts no-leading; interpolación delimitada; descarte de `{{competitor}}` sin competidor.
+- Tenant/space boundary: el set es per-profile (per-org).
+- Idempotency/concurrency: la AUTORÍA LLM no es determinista (por eso se congela un artefacto); la RESOLUCIÓN en run es determinista (lee el set `active`). Approve por claim atómico (un solo `active`).
+- Audit/outbox/history: `grader_prompt_sets` append-only + provenance (modelo, inputs, quién aprobó); provenance del set en el run.
 
 ### Migration, backfill and rollout
 
-- Migration posture: `additive` (si se persiste provenance del arquetipo) o `repo-only`.
-- Default state: detrás de flag `..._ARCHETYPE_PROMPTS_ENABLED` (default OFF): con OFF el generador devuelve el pack agencia actual (no-op); con ON resuelve por arquetipo.
-- Backfill plan: ninguno (afecta runs nuevos).
-- Rollback path: flag OFF → vuelve al pack agencia.
-- External coordination: review del copy de los prompts por arquetipo (comercial/AEO).
+- Migration posture: `additive` (tabla `grader_prompt_sets` + columna provenance en `grader_runs`).
+- Default state: detrás de flag `GROWTH_AI_VISIBILITY_ARCHETYPE_PROMPTS_ENABLED` (default OFF): con OFF el run usa el pack agencia actual (no-op); con ON resuelve el set `active` (o baseline). La AUTORÍA LLM gateada por su propio flag + el kill switch global del grader; secret server-side.
+- Backfill plan: autorar (o baseline) un set `active` para los perfiles existentes (dry-run; los de consumo se re-autoran). Idempotente.
+- Rollback path: flag OFF → pack agencia; reverse migration (drop tabla); el LLM-author se apaga por flag.
+- External coordination: review del copy de los prompts autorados (comercial/AEO) — gate de TASK-1291; sign-off de costo de la autoría LLM.
 
 ### Security and access
 
-- Auth/access gate: sin nueva capability (consumido por el run ya gobernado).
-- Sensitive data posture: sin PII; interpolación delimitada anti-injection.
-- Error contract: canónico; degradación honesta si falta arquetipo (cae a un default seguro + signal, no a prompts rotos).
-- Abuse/rate-limit posture: n/a (mismo costo por run; mismo nº de prompts por etapa).
+- Auth/access gate: autoría/approve gateados por capability operador del grader (reuse); resolución sin capability (run ya gobernado).
+- Sensitive data posture: sin PII; el LLM recibe marca/categoría/sitio (públicos), nunca PII; interpolación delimitada anti-injection; secret LLM server-side (`*_SECRET_REF`).
+- Error contract: canónico; degradación honesta — sin LLM / schema inválido / sin set `active` → baseline determinista + signal, NUNCA prompts rotos ni enum crudo.
+- Abuse/rate-limit posture: la autoría LLM es 1×/marca/versión (no por run) + cost ceiling; el run no agrega costo LLM.
 
 ### Runtime evidence
 
-- Local checks: tests del generador (agencia = set idéntico al actual; consumer_b2c = prompts de consumo; cada arquetipo cubre etapas; descarte de competitor).
-- DB/runtime checks: run real sobre SKY (staging) con flag ON → prompts de consumo → SKY aparece → score realista ≠ 0.
-- Integration checks: los 3 endpoints (público/cliente/operador) resuelven prompts por arquetipo.
-- Reliability signals/logs: signal de runs con arquetipo `unknown`/fallback.
-- Production verification sequence: flag ON staging → run SKY realista → eval (TASK-1292) verde → prod.
+- Local checks: tests del baseline (agencia = set idéntico al actual; cada arquetipo cubre etapas; descarte de competitor) + del lifecycle del artefacto (un solo `active`, supersede) + del fallback (sin LLM → baseline).
+- DB/runtime checks: autorar+aprobar un set para SKY (staging) → run usa el set `active` → prompts de consumo → SKY aparece → score realista ≠ 0; reproducibilidad (2 runs, mismo set).
+- Integration checks: los 3 endpoints resuelven el set `active`; el cliente LLM canónico responde structured + acotado en costo.
+- Reliability signals/logs: signal de runs con baseline-fallback (sin set `active`) + de autorías LLM fallidas.
+- Production verification sequence: flag ON staging → autorar SKY → review → run realista → eval (TASK-1292) verde → prod.
 
 ### Acceptance criteria additions
 
-- [ ] SoT (packs por arquetipo + provenance) y generador nombrados; scoring inalterado.
-- [ ] No regresión: `b2b_service_provider` produce el set idéntico al actual.
-- [ ] Run real SKY con score realista ≠ 0 (evidencia).
-- [ ] Flag + degradación honesta si falta arquetipo.
+- [ ] SoT (`grader_prompt_sets` artefacto versionado + provenance) y los commands (author/approve/resolve) nombrados; scoring inalterado.
+- [ ] LLM autora al momento de autoría (no por run); el run usa el set `active` congelado (reproducible); fallback a baseline determinista.
+- [ ] No regresión: el baseline `b2b_service_provider` es idéntico al pack actual.
+- [ ] Run real SKY con set autorado → score realista ≠ 0 (evidencia); un solo `active` por perfil; LLM vía cliente canónico + secret server-side.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -164,40 +173,42 @@ Reglas obligatorias:
 
 ## Scope
 
-### Slice 1 — Generador + arquetipo agencia (no regresión)
+### Slice 1 — Baseline determinista por arquetipo (no regresión)
 
-- `build-prompt-set.ts` + el arquetipo `b2b_service_provider` que reproduce **idéntico** el pack actual. Test de no-regresión vs `prompt-pack-v1`.
+- Plantillas por arquetipo (`b2b_service_provider` reproduce **idéntico** el pack actual — test de no-regresión vs `prompt-pack-v1`; `consumer_b2c`/`b2b_product_saas`/`retail_ecommerce`/`marketplace`/`public_institution` cubren las etapas). Es el fallback determinista.
 
-### Slice 2 — Arquetipos nuevos
+### Slice 2 — Artefacto del prompt set + lifecycle
 
-- Plantillas para `consumer_b2c`, `b2b_product_saas`, `retail_ecommerce`, `marketplace` (+ `public_institution`) cubriendo las etapas de buyer-intent. Tests por arquetipo.
+- Migration `grader_prompt_sets` (versionado, `draft→approved→active`, provenance) + `prompt-set-store.ts` (resolve active, approve atómico un-solo-active, supersede). `run-engine` referencia el set active (o baseline) + provenance.
 
-### Slice 3 — Wiring + provenance + flag
+### Slice 3 — Autoría LLM + flag
 
-- `prompt-pack.ts`/`run-engine.ts` usan el generador; provenance del arquetipo/versión en el run; flag `..._ARCHETYPE_PROMPTS_ENABLED`.
+- `author-prompt-set.ts`: el LLM (cliente canónico `src/lib/ai/*`, structured + cost-bounded) propone un set `draft` por marca; validación de schema + no-leading; fallback a baseline si falla. Flag `GROWTH_AI_VISIBILITY_ARCHETYPE_PROMPTS_ENABLED` + flag propio de la autoría LLM. (El approve/review operador vive en TASK-1291; acá se expone el command de approve.)
 
 ## Out of Scope
 
-- El gate de validación del operador (TASK-1291).
+- El gate de validación + la UI de review operador (TASK-1291).
 - La eval golden-set por arquetipo (TASK-1292).
-- LLM-assist productivo (a lo sumo un slice follow-up gated por eval).
+- Re-autoría automática recurrente del set (cuando cambie el sitio/categoría) — follow-up.
 
 ## Detailed Spec
 
-El generador resuelve `business_model → arquetipo → plantillas`, interpola las vars canónicas (label de categoría de TASK-1288, no el enum) y produce el fan-out. El scoring downstream es agnóstico al arquetipo (mide presencia/SoV/citación sobre las observaciones, sin importar la pregunta). Esto garantiza que generalizar los prompts NO toca el motor de score.
+Dos tiempos separados. **Autoría** (no por run): el LLM, dada la marca + categoría canónica (label, no enum) + modelo de negocio + señales del sitio, propone el fan-out de buyer-intent; se valida (schema, no-leading) y se persiste como `draft`. **Aprobación**: operador/AEO revisa (TASK-1291) y aprueba → el set queda `active` (congelado, inmutable). **Medición** (cada run): el run-engine resuelve el set `active` del perfil (determinista, reproducible, sin costo LLM) o, si no hay, cae al **baseline determinista** del arquetipo. El scoring downstream es agnóstico a la pregunta (mide presencia/SoV/citación sobre las observaciones) → generalizar los prompts NO toca el motor de score. Esto resuelve la tensión "LLM interpreta vs reproducibilidad": el LLM interpreta **una vez al autorar**; el run mide con un set **fijo**.
 
 ## Rollout Plan & Risk Matrix
 
 ### Slice ordering hard rule
 
-- S1 (generador + agencia no-regresión) → S2 (arquetipos nuevos) → S3 (wiring + flag). Bloqueada por TASK-1288/1289.
+- S1 (baseline + agencia no-regresión) → S2 (artefacto + lifecycle) → S3 (autoría LLM + flag). Bloqueada por TASK-1288/1289. El set autorado NO se usa en prod sin review (TASK-1291) + eval (TASK-1292).
 
 ### Risk matrix
 
 | Riesgo | Sistema | Probabilidad | Mitigation | Signal de alerta |
 |---|---|---|---|---|
-| Regresión del lead magnet (set agencia cambia) | growth | medium | test de no-regresión bit-for-bit vs pack actual + flag | diff en `execution_prompts` del caso agencia |
-| Arquetipo nuevo con prompts pobres | growth | medium | review de copy AEO + eval (TASK-1292) gate | score irreal en eval |
+| Regresión del lead magnet (baseline agencia cambia) | growth | medium | test de no-regresión bit-for-bit vs pack actual + flag | diff en `execution_prompts` del caso agencia |
+| LLM genera prompts pobres / leading / off-topic | growth | medium | review operador (TASK-1291) + eval (TASK-1292) + no-leading constraint + schema | score irreal en eval / review rechaza |
+| LLM por run (no reproducible) por error de diseño | growth | low | autoría 1×/marca/versión + set congelado; el run resuelve, no genera | costo LLM por run / set cambia entre runs |
+| Sin set active → prompts rotos | growth | low | fallback a baseline determinista (no enum crudo) + signal | runs con baseline-fallback |
 | Arquetipo `unknown` → prompts rotos | growth | low | fallback seguro + signal (no inyectar enum) | runs con arquetipo fallback |
 
 ### Feature flags / cutover
@@ -214,14 +225,15 @@ El generador resuelve `business_model → arquetipo → plantillas`, interpola l
 
 ### Production verification sequence
 
-1. flag OFF: verificar set agencia idéntico (no-regresión).
-2. flag ON staging: run SKY → prompts consumo → score realista.
+1. flag OFF: verificar baseline agencia idéntico (no-regresión).
+2. flag ON staging: autorar (LLM) un set para SKY → review → approve → run usa el set active → prompts consumo → score realista; 2 runs = mismo set (reproducible).
 3. eval (TASK-1292) verde multi-arquetipo.
-4. prod tras sign-off.
+4. prod tras sign-off (review del copy autorado + costo LLM).
 
 ### Out-of-band coordination required
 
-- Review del copy de los prompts por arquetipo (comercial/AEO).
+- Review del copy de los prompts autorados por el LLM (comercial/AEO) — gate de TASK-1291.
+- Sign-off de costo de la autoría LLM (1×/marca/versión).
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 4 — VERIFICATION & CLOSING
@@ -229,10 +241,10 @@ El generador resuelve `business_model → arquetipo → plantillas`, interpola l
 
 ## Acceptance Criteria
 
-- [ ] `buildPromptSet` resuelve `business_model → arquetipo → fan-out` por etapas de buyer-intent; interpola la label canónica (no el enum); descarta `{{competitor}}` sin competidor.
-- [ ] No-regresión: para `b2b_service_provider` el set es **idéntico** al `prompt-pack-v1` actual (test bit-for-bit).
-- [ ] Run real sobre SKY (staging, flag ON) genera prompts de consumo y devuelve score realista ≠ 0 (evidencia).
-- [ ] Scoring inalterado (mismo `score_version`); provenance del arquetipo/versión en el run; flag + fallback honesto.
+- [ ] **Autoría LLM (no por run):** `authorPromptSet` produce un `draft` por marca vía el cliente canónico `src/lib/ai/*` (structured + cost-bounded, no-leading, schema-validado); el LLM NO corre por run.
+- [ ] **Artefacto congelado + reproducible:** `grader_prompt_sets` versionado con lifecycle `draft→approved→active` (un solo `active` por perfil, supersede append-only); el run resuelve el set `active` (2 runs de la misma marca = mismo set).
+- [ ] **Baseline + no-regresión:** sin set `active` → baseline determinista del arquetipo (no enum crudo); el baseline `b2b_service_provider` es **idéntico** al `prompt-pack-v1` actual (test bit-for-bit).
+- [ ] Run real sobre SKY (staging, set autorado+aprobado) genera prompts de consumo y devuelve score realista ≠ 0 (evidencia); scoring inalterado (mismo `score_version`); provenance del set en el run; flag + fallback honesto.
 
 ## Verification
 
@@ -253,9 +265,11 @@ El generador resuelve `business_model → arquetipo → plantillas`, interpola l
 
 ## Follow-ups
 
-- LLM-assist gated (eval-backed) para categorías long-tail donde la plantilla queda genérica.
-- Sub-segmentación por mercado/locale más fina si el buyer-intent difiere mucho por país.
+- Re-autoría automática del set cuando cambie el sitio/categoría/competidores de la marca (cadencia, opt-in) — alimenta el re-grade recurrente (TASK-1270).
+- Sub-segmentación por mercado/locale más fina si el buyer-intent difiere mucho por país (un set `active` por (perfil, market)).
 
 ## Open Questions
 
-- ¿Persistir la provenance del arquetipo en `grader_runs` (columna) o basta con la versión del pack? (definir en Discovery).
+- ¿La autoría LLM usa también señales del **sitio** de la marca (scrape/probe ya existente de TASK-1266) como contexto, o solo marca+categoría+modelo? (mejora la riqueza; definir en Discovery + costo).
+- ¿El review/approve (TASK-1291) es obligatorio para TODA marca o solo prospectos (cliente contratado podría auto-aprobar el baseline)? (definir con comercial).
+- ¿Qué modelo LLM para la autoría (Gemini/Anthropic/OpenAI del cliente canónico) y su cost ceiling por autoría? (definir con el dueño de costo AEO).

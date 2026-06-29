@@ -39,7 +39,7 @@ El problema es un **programa multi-capa**, no una sola task: hay que (1) dejar d
 
 - `TASK-1288` — **Resolución de categoría canónica** (taxonomía + mapeo del HubSpot industry enum + label localizada + guard "no resuelta → bloquea"). Foundation; desbloquea al resto.
 - `TASK-1289` — **Clasificación de modelo de negocio** (`business_model` en el perfil: consumer_b2c / b2b_service_provider / b2b_product_saas / retail_ecommerce / marketplace / public_institution; clasificador determinista + override operador).
-- `TASK-1290` — **Packs de prompts por arquetipo × buyer-intent** (generador + packs; reemplaza el pack único de agencia; Query Fan-Out por etapa; scoring determinista INTACTO; provenance en el run).
+- `TASK-1290` — **Prompt set generado por marca (LLM-autora-luego-congela)** + baseline determinista por arquetipo. El LLM autora el fan-out de buyer-intent por marca UNA vez → se persiste versionado/inmutable (`grader_prompt_sets`) → review → congela; los runs usan el set `active` (deterministas, sin costo LLM por run). Reemplaza el pack único de agencia; scoring INTACTO.
 - `TASK-1291` — **Gate de validación pre-run del operador + reabilitación del cross-sell** (chokepoint: bloquea run/envío si categoría `unknown` o arquetipo no confirmado; review/approval del operador para prospectos). Reabre TASK-1279 con seguridad.
 - `TASK-1292` — **Eval golden-set por arquetipo + drift signals** (regresión multi-arquetipo: aerolínea consumo, SaaS B2B, retail).
 
@@ -62,6 +62,6 @@ El problema es un **programa multi-capa**, no una sola task: hay que (1) dejar d
 ## Non-goals
 
 - Reescribir el motor de scoring (presencia/SoV/citación se quedan; solo cambian los prompts).
-- Generación LLM libre de prompts por run (no determinista, hostil a eval) — se permite a lo sumo LLM-assist gated por review para categorías long-tail.
+- **Generar prompts con LLM en vivo por cada run** (no reproducible, hostil a eval, costo por run, sesgo). El patrón canónico es **LLM-autora-luego-congela**: el LLM autora el set por marca UNA vez (con review + eval), se congela como artefacto versionado, y los runs usan ese set fijo (deterministas). Ver TASK-1290.
 - Resolver la entidad/Knowledge Graph de cada marca (eje aparte; ver TASK-1267).
 - Cambiar el contrato del cross-sell (TASK-1279) más allá del gate de validación.
