@@ -321,3 +321,22 @@ Implementado local-first en `develop` (sin push). **Open Questions resueltas seg
 **Acceptance cubierta:** SoT/contract/consumers nombrados; token NUNCA en PG (test `command` verifica que el upsert recibe `tokenSecretRef`, no el token crudo); tenant isolation (test reader org A≠B); state firmado single-use; scope sólo `webmasters.readonly`; capability + grant + coverage; migración additive con marker + DO-block; flag default OFF + ledger; signal wired steady 0. Pendiente sólo el **#9** (OAuth round-trip real en staging) por la coordinación out-of-band.
 
 **Nota de concurrencia:** comparte worktree `develop` con WIP sin commitear de TASK-1269 (otro agente) en archivos compartidos (`entitlements-catalog.ts`, `runtime.ts`, `FEATURE_FLAG_STATE_LEDGER.md`, README/registry, grader arch/doc/manual). Mis cambios son aditivos en zonas distintas; no commiteado para no bundlear su WIP — el operador secuencia los commits.
+
+## Delta 2026-06-29 — rollout staging + redesign property-picker (Claude)
+
+**Rollout staging aplicado** (commits previos + config out-of-band): IAM grant secret-write ampliado a `search-console-token-*` (condición `client-integration-tokens`); OAuth client web "Greenhouse Search Console" creado en `efeonce-group`; secret `greenhouse-search-console-oauth-client-secret` + grant secretAccessor a `greenhouse-portal@`; Vercel staging `GOOGLE_SEARCH_CONSOLE_OAUTH_CLIENT_ID` + `_CLIENT_SECRET_SECRET_REF` + `GROWTH_SEARCH_CONSOLE_ENABLED=true`. Wiring smoke verde (oauth/start → consent URL válida → Google account chooser; fila de state persistida).
+
+**Decisión de modelo (consent):** la app pasó a **External + En producción** (no Internal/Testing). Internal sólo acepta cuentas `@efeonce.org` → bloquea el self-service de clientes (cuentas externas). Testing expira los refresh tokens a 7 días → rompería la conexión persistente. External+Producción sin verificación de Google = aviso "app no verificada" durante el consentimiento (aceptable en onboarding guiado; ~100 grants hasta verificar, suficiente para la escala B2B). **NO** se creó proyecto GCP dedicado (descartado: el consent screen compartido con el Google-login del portal no es problema porque el login es Microsoft).
+
+**Redesign property-picker (feedback del operador), commit `714a78175`:** el flujo original exigía **tipear el `site_url` exacto** antes de consentir → reemplazado por el patrón Semrush. Cambios:
+
+- **Token de OPERADOR** (`search-console-token-operator-<userId>`): un solo refresh token reusable entre todas las orgs que el operador conecta (resuelve la redundancia "secret per-org"). Las filas per-org sólo apuntan a ese secret.
+- **Property-picker:** `oauth/start` ya no pide propiedad; el callback guarda el token y deja la conexión `pending`; el reader `listSearchConsoleSitesForOrg` lista TODAS las propiedades de la cuenta (`sites.list`); el operador elige del **desplegable**; el command `selectSearchConsoleProperty` valida server-side que la propiedad esté en la cuenta (anti-binding ajeno) y marca `active`.
+- **Endpoints nuevos:** `GET /api/admin/growth/search-console/sites` + `POST /api/admin/growth/search-console/select-property`.
+- **Migración aditiva:** `site_url` nullable (la conexión vive `pending` hasta elegir).
+- **Errores canónicos específicos:** `search_console_token_unhealthy` / `search_console_property_not_accessible` / `search_console_sites_unavailable` — el panel ahora distingue la causa (ya no un genérico opaco).
+- **UI:** el panel (`SearchConsoleConnectionPanel`) reemplaza el input de texto por un `<Select>` poblado del desplegable.
+
+**Gates:** tsc, lint, `pnpm test` full **8399**, build — verdes. 23 tests focales del dominio. Pusheado a `develop`; deploy staging live (oauth/start sin siteUrl → 302 Google confirmado).
+
+**Pendiente:** smoke humano del flujo nuevo (operador consiente con `@efeoncepro.com` → elige propiedad → backend verifica token de operador en Secret Manager + fila `active` + reader); prod vía release control plane + (opcional) verificación de Google para quitar el aviso. Follow-up opcional: reusar el token de operador para 2.ª+ org sin re-consentir.

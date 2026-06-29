@@ -1,3 +1,15 @@
+## Sesion 2026-06-29 — TASK-1282 Search Console · rollout staging + property-picker redesign — Claude — 🚧 staging verificado (wiring), pendiente smoke humano del flujo nuevo
+
+> **Rollout staging aplicado:** IAM grant secret-write ampliado a `search-console-token-*` (condición `client-integration-tokens`); OAuth client web "Greenhouse Search Console" creado en `efeonce-group` (Internal→**External/En producción** para permitir cuentas externas como `@efeoncepro.com`); secret `greenhouse-search-console-oauth-client-secret` + grant secretAccessor a `greenhouse-portal@`; Vercel staging `GOOGLE_SEARCH_CONSOLE_OAUTH_CLIENT_ID`/`_CLIENT_SECRET_SECRET_REF` + `GROWTH_SEARCH_CONSOLE_ENABLED=true`. Wiring smoke verde (oauth/start → consent URL válida → Google).
+>
+> **Redesign property-picker (feedback del operador), commit `714a78175` pusheado:** el flujo viejo exigía tipear el `site_url` exacto antes de consentir → reemplazado por el patrón Semrush. **Token de OPERADOR** (un solo refresh token `search-console-token-operator-<userId>`, reusable entre orgs — NO un secret copiado per-org). `oauth/start` ya no pide propiedad; el callback guarda el token y deja la conexión `pending`; el panel lista TODAS las propiedades de la cuenta (`sites.list`) en un **desplegable** y el operador elige. Reader `listSearchConsoleSitesForOrg` + command `selectSearchConsoleProperty` (valida server-side que la propiedad esté en la cuenta — anti-binding ajeno). Endpoints `GET /sites` + `POST /select-property`. Migración aditiva (`site_url` nullable). Errores canónicos específicos (`token_unhealthy`/`property_not_accessible`/`sites_unavailable`) — el panel ahora distingue la causa.
+>
+> **Gates:** tsc, lint, `pnpm test` full **8399**, build — todo verde. 23 tests focales del dominio. Commiteado vía índice aislado (sin arrastrar el trabajo concurrente de Codex).
+>
+> **Decisión de modelo (consent):** app **External** (no Internal) porque el self-service de clientes necesita cuentas fuera de `efeonce.org`. Modo **En producción** (no Testing) porque en Testing los refresh tokens expiran a 7 días y romperían la conexión. Sin verificación de Google = aviso "app no verificada" durante el consentimiento (aceptable en onboarding guiado; ~100 grants hasta verificar, de sobra para la escala B2B). NO se creó proyecto GCP dedicado (descartado por el operador — el consent screen compartido con el Google-login no es problema porque el login del portal es Microsoft).
+>
+> **Pendiente:** smoke humano del flujo nuevo (operador consiente con `@efeoncepro.com` → elige propiedad del desplegable → backend verifica token + fila `active` + reader). Follow-up opcional: reusar el token de operador para 2.ª+ org sin re-consentir.
+
 ## Sesion 2026-06-29 — TASK-1272 Growth AI Visibility Category Taxonomy — Codex — ✅ complete
 
 > **Pedido:** `Ejecuta task 1272`. Hook Codex ejecutado (`pnpm codex:task-hook 1272`). Intake: checkout limpio en `develop`, task movida `to-do → in-progress → complete`, `Lifecycle` sincronizado y README/registry apuntan a `docs/tasks/complete/TASK-1272-growth-ai-visibility-category-taxonomy-contract.md`. Trabajo local-first, sin branch/worktree nuevo.
