@@ -2012,6 +2012,16 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     actions: ['execute'] as const,
     defaultScope: 'tenant'
   },
+  // TASK-1275 — recommendation.set_status: el operador (Growth/AM) registra el avance de
+  // ejecución del Plan AEO por (org × gap key). Write gobernado `setRecommendationStatus`,
+  // consumible por la vista operador (TASK-1276) + Nexa/MCP. El reader del status es
+  // gate-agnostic (cliente lo VE read-only por su tenant). Grant = set operador (run.operator).
+  {
+    key: 'growth.ai_visibility.recommendation.set_status',
+    module: 'growth',
+    actions: ['execute'] as const,
+    defaultScope: 'tenant'
+  },
   // TASK-1286 — entitlement.manage: asignar/cambiar/superseder tiers AEO por org.
   // Command gobernado `assignAeoTier`, consumible por cockpit operador, Account-360 y Nexa
   // vía confirmación humana. Grant restringido a efeonce_account + efeonce_admin.

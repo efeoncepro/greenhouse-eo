@@ -307,6 +307,17 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
       source: operatorSource
     })
 
+    // TASK-1275 — recommendation.set_status: el operador registra el avance del Plan AEO
+    // (estado por org × gap key). Mismo set operador que run.operator (quien ejecuta el
+    // servicio AEO marca su progreso). El command self-guarda con can() (org arbitraria).
+    addEntitlement(entries, {
+      module: 'growth',
+      capability: 'growth.ai_visibility.recommendation.set_status',
+      action: 'execute',
+      scope: 'tenant',
+      source: operatorSource
+    })
+
     // TASK-1286 — entitlement.manage: el set operador completo NO recibe esta mutación.
     // Sólo AM (`efeonce_account`) y admin pueden asignar/cambiar/superseder tiers AEO.
     if (
