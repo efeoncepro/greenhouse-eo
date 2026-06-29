@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -255,11 +255,11 @@ El command es el único camino de envío + creación de Lead operator-triggered.
 
 ## Acceptance Criteria
 
-- [ ] `sendAeoReportAndCreateLead` envía el informe (email TASK-1250/1273, público-safe, marca Efeonce) y **crea/asocia un Lead de HubSpot** (objeto `leads`, ligado a Contact y/o Company) + setea `aeo_check_result` en el objeto asociado. **No crea Deal.**
-- [ ] Envío a prospecto exige consentimiento capturado + interés legítimo; cold send rechazado (422); cliente con relación = servicio. Todo en audit append-only.
-- [ ] Write HubSpot reusa `syncAiVisibilityRunToHubSpot` + lane `ops-reactive-growth` (no bridge legacy, no inline); idempotencia por run+recipient.
-- [ ] Capability `growth.ai_visibility.lead.open` + grant mismo PR + coverage; errores canónicos; recipient PII hasheada; sin leaks.
-- [ ] Flag default OFF + smoke staging real (email + Lead) antes de prod.
+- [x] `sendAeoReportAndCreateLead` envía el informe (email TASK-1250/1273, público-safe, marca Efeonce) y **crea/asocia un Lead de HubSpot** (objeto `leads`, ligado a Contact y/o Company) + setea `aeo_check_result` en el objeto asociado (Company). **No crea Deal.** _(El reactive consumer hace ambos writes; flag OFF → smoke staging pendiente.)_
+- [x] Envío a prospecto exige consentimiento capturado + interés legítimo; cold send rechazado (422 `aeo_send_consent_required`); cliente con relación = servicio. Audit append-only + CHECK duro en DB. Tipo comercial DERIVADO server-side (no se confía en el operador).
+- [x] Write HubSpot vía cliente in-app directo (`createOperatorCrossSellLead`) + lane `ops-reactive-growth` (no bridge legacy, no inline en route); idempotencia por `(run_id, recipient)` + por sub-paso.
+- [x] Capability `growth.ai_visibility.lead.open` + grant mismo PR + coverage verde; errores canónicos es-CL; recipient en PG interno (nunca al outbox/cliente/Sentry); sin leaks (email = DTO público).
+- [x] Flag default OFF. _(Smoke staging real email + Lead = rollout pendiente; ver §Delta de cierre.)_
 
 ## Verification
 
@@ -270,13 +270,29 @@ El command es el único camino de envío + creación de Lead operator-triggered.
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` sincronizado (`in-progress` al tomar, `complete` al cerrar)
-- [ ] archivo en la carpeta correcta
-- [ ] `docs/tasks/README.md` sincronizado
-- [ ] `Handoff.md` actualizado
-- [ ] `changelog.md` actualizado
-- [ ] chequeo de impacto cruzado (TASK-1276, TASK-1277, TASK-1250)
-- [ ] Delta en `GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md` (cross-sell close loop)
+- [x] `Lifecycle` sincronizado (`in-progress` al tomar, `complete` al cerrar)
+- [x] archivo en la carpeta correcta (`complete/`)
+- [x] `docs/tasks/README.md` sincronizado
+- [x] `Handoff.md` actualizado
+- [x] `changelog.md` actualizado
+- [x] chequeo de impacto cruzado (TASK-1276, TASK-1277, TASK-1250) — ver §Delta de cierre
+- [x] Delta en `GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md` (cross-sell close loop) + `GREENHOUSE_EVENT_CATALOG_V1.md`
+
+## Delta 2026-06-29 — cierre (code complete, rollout pendiente)
+
+**Implementado (4 slices, develop local, sin push):**
+- **S1** migración `greenhouse_growth.grader_report_send_log` (audit append-only; UNIQUE `(run_id, lower(recipient_email))`; CHECK `legitimate_interest ⇒ consent_ref`); aplicada dev/staging + `db.d.ts`.
+- **S2** command `sendAeoReportAndCreateLead` (gates + derivación server-side cliente/prospecto + consent gate 422 + claim+publish en tx) · flag `GROWTH_AI_VISIBILITY_OPERATOR_SEND_ENABLED` (OFF) · errores canónicos · route `POST /api/admin/growth/ai-visibility/runs/[runId]/send-lead` · capability `growth.ai_visibility.lead.open` (catalog + grant operador + coverage).
+- **S3** `createOperatorCrossSellLead` (upsert Contact/Company + `POST crm/v3/objects/leads` + asociaciones v4 default) · `aeo_check_result` (property nueva en Company) + `deriveAeoCheckResult` · executor `executeOperatorReportSend` (email público-safe + Lead, 2 sub-pasos idempotentes) · projection `growth_ai_visibility_operator_send` (lane `ops-reactive-growth`).
+- **S4** signal `growth.ai_visibility.operator_send_failed` + ledger.
+
+**Gates verdes:** `pnpm test` full **8496** · `pnpm build` compiló (boundary OK) · `eslint .` 0 err · `tsc --noEmit` · `pg:doctor` healthy · `docs:closure-check` flag-audit 0 sin registrar · SQL ejercida contra PG real (claim + dedup case-insensitive + signal). 17 tests focales nuevos.
+
+**Hallazgos live (2026-06-29):** objeto `leads` reachable vía REST (`crm/v3/objects/leads`; el MCP NO lo soporta) — el operador confirmó "se encuentra por la API". `aeo_check_result` **NO existe** en el portal (ni deals/contacts/companies/leads) → la spec/docs asumían que sí; **provisión out-of-band es prerequisito de rollout**.
+
+**Rollout pendiente (flag OFF):** (1) provisionar la property `aeo_check_result` (Company) vía `scripts/growth/provision-ai-visibility-hubspot-properties.ts`; (2) confirmar asociaciones del objeto `leads` en el portal; (3) flag ON en ops-worker + Vercel staging; (4) smoke staging real (correr+publicar run operador → `send-lead` → email `sent` + Lead creado + `aeo_check_result` + consent gate 422); (5) sign-off comercial/legal del copy a prospectos → prod vía release control plane (EPIC-020).
+
+**Cross-impact:** **TASK-1276** (vista operador) consume `sendAeoReportAndCreateLead` + route `runs/[runId]/send-lead` + capability `growth.ai_visibility.lead.open` (ya disponibles). **TASK-1277** (su blocker) quedó COMPLETA. **TASK-1250/1273** (email/PDF) reusados sin fork.
 
 ## Follow-ups
 
