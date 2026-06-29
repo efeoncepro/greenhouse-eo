@@ -37,7 +37,8 @@ Foundation transversal de EPIC-021: introduce **`brand_intelligence`** — una *
 
 ## Goal
 
-- **`brand_intelligence` snapshot compartido:** lectura grounded (LLM sobre site probe + entity) → estructura `{ what_the_brand_does, candidate_category_node, candidate_business_model, signals_used, confidence }`, cacheada/versionada por marca, **consumida por TASK-1288/1289/1290**. Output estructurado vía el cliente LLM canónico (`src/lib/ai/*`); degradación honesta sin señales.
+- **`brand_intelligence` snapshot compartido:** lectura grounded → estructura `{ what_the_brand_does, candidate_category_node, candidate_business_model, signals_used, confidence }`, cacheada/versionada por marca, **consumida por TASK-1288/1289/1290**. Output estructurado vía el cliente LLM canónico (`src/lib/ai/*`); degradación honesta sin señales.
+- **Modelo de input (autónomo, sin formulario):** la **semilla** es lo que ya existe — `grader_profiles.website_url` (TASK-1285, derivado de la org; para prospecto viene del sync HubSpot company TASK-706) + el nombre de la marca. NO se le pide al operador llenar datos para arrancar. La lectura **trae el contenido legible** del sitio (home/about), no solo el probe técnico de TASK-1266 (robots/JSON-LD/sitemap) — el LLM necesita el texto para entender la marca — más el eje **entity** (KG/Wikidata, TASK-1267). Leer un sitio público es read-only y NO requiere consentimiento del sujeto (el consent es para *enviar*, no para analizar). El operador entra solo a **confirmar/corregir** el resultado (TASK-1291); el único input que podría faltar es la URL (borde: ausente/incorrecta).
 - **Categoría canónica derivada:** persistir `category_node_id` (nodo de la taxonomía) + `category_label` localizada, resueltos por cascada — HubSpot enum (prior/baseline determinista) → brand_intelligence grounded (autoritativo) → cruce entity → `unknown` si baja confianza. Reemplaza el enum crudo. El LLM/clasificador elige un nodo REAL de la taxonomía (usando `aliases`/`examples`) o `unknown`, NUNCA inventa.
 - **Guard + confirmación:** `category_node_id = unknown` (o confianza baja) ⇒ el run de portal/operador y el envío se bloquean con razón canónica; el operador confirma/corrige en el review unificado (TASK-1291).
 
@@ -85,7 +86,8 @@ Reglas obligatorias:
 ### Files owned
 
 - `migrations/<ts>_task-1288-brand-intelligence-canonical-category.sql` (snapshot `grader_brand_intelligence` + columnas `category_node_id`/`category_label`/`category_confidence` en `grader_profiles`; backfill)
-- `src/lib/growth/ai-visibility/brand-intelligence/read-brand-intelligence.ts` (lectura grounded compartida: LLM sobre site probe + entity → snapshot estructurado) `[verificar]`
+- `src/lib/growth/ai-visibility/brand-intelligence/read-brand-intelligence.ts` (lectura grounded compartida: LLM sobre contenido del sitio + entity → snapshot estructurado) `[verificar]`
+- `src/lib/growth/ai-visibility/brand-intelligence/fetch-site-content.ts` (traída read-only del contenido legible home/about; reusa/extiende el probe de TASK-1266) `[verificar]`
 - `src/lib/growth/ai-visibility/taxonomy/hubspot-industry-map.ts` (diccionario HubSpot enum → nodo, prior/baseline) `[verificar naming]`
 - `src/lib/growth/ai-visibility/taxonomy/resolve-category.ts` (resolver por cascada con confianza) `[verificar]`
 - `src/lib/growth/ai-visibility/provision-profile.ts` (usar el resolver, no `org.industry` crudo)
@@ -98,12 +100,13 @@ Reglas obligatorias:
 ### Already exists
 
 - Taxonomía canónica con nodos `industry:*` + labels `{es,en}` + aliases (`taxonomy/catalog.ts` + `mapper.ts`).
+- **La semilla ya existe:** `grader_profiles.website_url` (TASK-1285) + nombre de marca; site probe técnico (TASK-1266) + entity probes KG/Wikidata (TASK-1267) que ya van al sitio/entidad read-only.
 - `provision-profile.ts` que setea `category = org.industry` (el bug).
 - `prompt-pack.ts` que interpola `{{category}}` = `vars.category`.
 
 ### Gap
 
-- No hay `brand_intelligence` (lectura grounded compartida), ni resolver por cascada con confianza, ni persistencia de `category_node_id`/`category_label`/confianza, ni guard de `unknown`; el enum crudo se inyecta directo.
+- No hay `brand_intelligence` (lectura grounded compartida), ni la traída del **contenido legible** del sitio (el probe de TASK-1266 es técnico, no trae el texto home/about que el LLM necesita para entender la marca), ni resolver por cascada con confianza, ni persistencia de `category_node_id`/`category_label`/confianza, ni guard de `unknown`; el enum crudo se inyecta directo.
 
 ## Backend/Data Contract
 
