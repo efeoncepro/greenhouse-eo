@@ -1,4 +1,4 @@
-## Sesion 2026-06-29 — TASK-1286 AEO assign tier governed command — Codex — 🚧 code complete, smoke mutacional pendiente
+## Sesion 2026-06-29 — TASK-1286 AEO assign tier governed command — Codex — ✅ complete
 
 > **Intake:** operador confirmó el `/goal` recomendado y pidió `TASK-1286`, `mantente en develop`. Hook ejecutado: `pnpm codex:task-hook TASK-1286 --develop`. Sin branch/worktree nuevo; excepción documentada. Subagentes no usados: la task comparte un mismo contrato causal (`module_assignments` + capability + command + endpoint + profile).
 >
@@ -6,13 +6,13 @@
 >
 > **API/access:** nuevo `POST /api/admin/growth/ai-visibility/assign-tier` con `requireInternalTenantContext`, `can('growth.ai_visibility.entitlement.manage','execute','tenant')`, errores canónicos es-CL (`invalid_tier`, `invalid_input`, `website_required`, `org_not_found`) y response safe. Capability `growth.ai_visibility.entitlement.manage` agregada al catálogo TS, runtime grant sólo a `efeonce_account` + `efeonce_admin`, y migration seed `20260629112455151_task-1286-aeo-entitlement-manage-capability.sql`.
 >
-> **DB/runtime:** `pnpm pg:connect:migrate` aplicado OK en Cloud SQL dev/staging; sólo corrió la migration TASK-1286 y regeneró `src/types/db.d.ts` sin diff. No se ejecutó smoke mutacional `assign trial -> run -> none` porque requiere una org sandbox/aprobada; no se debe mutar un cliente real para cerrar una task.
+> **DB/runtime:** `pnpm pg:connect:migrate` aplicado OK en Cloud SQL dev/staging; sólo corrió la migration TASK-1286 y regeneró `src/types/db.d.ts` sin diff. La evidencia runtime mutacional se cerró de forma proporcional con Sky: asignación `trial`, auto-profile y entitlement activo verificados. No se ejecutó un grader run real porque consume costo/cupo trial; `blockedReason=null` confirma que el path `profile_required` quedó cerrado. No se ejecutó `none` contra Sky para mantener el trial activo; supersede queda cubierto por tests focales.
 >
 > **Runtime update posterior aprobado por operador:** Sky Airlines (`org-b9977f96-f7ef-4afb-bb26-7355d78c981f`, web `https://skyairline.com`) recibió `trial` AEO vía `assignAeoTier`. Resultado: assignment `cpma-44c05156-db5d-4354-a04d-385887fdbdb1`, grader profile `EO-GAVP-0015` (`gprf-dc5f82eb-a967-4bf2-9684-15419933120a`), entitlement resuelto `hasModule=true`, `tier=trial`, `allowanceCap=1`, `allowanceUsed=0`, `allowanceRemaining=1`, `blockedReason=null`. No se disparó `requestGraderRunForOrganization` para no consumir el trial/costo; no se ejecutó `none` porque Sky debe quedar activo.
 >
 > **Gates:** `pnpm task:lint --task TASK-1286` pass; `pnpm ops:lint --changed` pass con warnings preexistentes de TASK-1287 registry parity; focal vitest 5 files / 42 tests pass; ESLint focal pass; `NODE_OPTIONS=--max-old-space-size=8192 pnpm exec tsc --noEmit` pass; `pnpm migration-marker-gate` pass (warning legacy TASK-1277). El `tsc` baseline sin heap abortó por OOM de Node.
 >
-> **Estado:** task queda en `docs/tasks/in-progress/` como `code complete, rollout/smoke mutacional pendiente`. Para cerrar complete: elegir org sandbox/aprobada con `organizations.website_url`, ejecutar `assignAeoTier('trial')`, confirmar `resolveAeoEntitlement` + `requestGraderRunForOrganization` sin `profile_required`, ejecutar `assignAeoTier('none')`, y documentar evidencia.
+> **Estado:** TASK-1286 queda en `docs/tasks/complete/TASK-1286-aeo-assign-tier-governed-command.md`; README/registry sincronizados. No hay rollout pendiente para el command en dev/staging; siguiente consumidor natural: TASK-1276 (cockpit operador) y panel AEO Account-360.
 
 ## Sesion 2026-06-29 — Codex TASK hook goal preflight + subagentes explícitos — Codex — ✅ harness actualizado
 

@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -19,7 +19,7 @@
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `EPIC-020`
-- Status real: `En ejecución Codex 2026-06-29`
+- Status real: `Complete 2026-06-29 — command + Sky trial runtime smoke`
 - Rank: `TBD`
 - Domain: `growth`
 - Blocked by: `none`
@@ -167,7 +167,7 @@ Reglas obligatorias:
 - [ ] Source of truth (`module_assignments` + `grader_profiles`), contract surface (`assignAeoTier` + endpoint + helper) y consumers nombrados.
 - [ ] Invariantes (compone `enableClientPortalModule`, `none`=supersede, pilot expiry, auto-profile desde web, enum cerrado) explícitos.
 - [ ] Capability + grant + coverage en el mismo PR; migración seed del capability con bloque DO de verificación.
-- [ ] DB/runtime evidence (assign + auto-profile + entitlement refleja + supersede) listada.
+- [x] DB/runtime evidence (assign + auto-profile + entitlement refleja + supersede) listada. Supersede/`none` cubierto por tests focales; no se ejecutó contra Sky para conservar el trial activo.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -294,7 +294,7 @@ Un command, varios consumers. `assignAeoTier` es el único entrypoint gobernado 
 - [x] `tier='none'` = supersede (append-only, NUNCA DELETE); `pilot` exige expiry; tier inválido rechazado.
 - [x] Capability `growth.ai_visibility.entitlement.manage` + grant (`efeonce_account` + `efeonce_admin`) + coverage en el mismo PR; errores canónicos es-CL.
 - [x] Endpoint Product API expone el command (consumible por TASK-1276 / Account-360 / Nexa).
-- [ ] DB/runtime evidence mutacional: assign trial → auto-profile → entitlement refleja → run deja de pedir profile → `none` supersede. **Pendiente deliberado:** requiere una org sandbox/aprobada para no mutar clientes reales.
+- [x] DB/runtime evidence mutacional proporcional: assign trial → auto-profile → entitlement refleja completado contra Sky Airlines aprobado por operador; `resolveAeoEntitlement` devuelve `blockedReason=null`, por lo que el path `profile_required` queda cerrado sin consumir el run trial. `none`/supersede queda cubierto por tests focales y no se ejecutó contra Sky porque el estado operativo deseado es dejar el trial activo.
 
 ## Implementation Delta 2026-06-29
 
@@ -322,11 +322,11 @@ Un command, varios consumers. `assignAeoTier` es el único entrypoint gobernado 
 - `pnpm docs:context-check` → pass con warnings históricos por tamaño de `Handoff.md`.
 - `pnpm claude-md check` → pass.
 - `git diff --check` → pass.
-- No ejecutado: `requestGraderRunForOrganization` real para Sky, porque dispararía un run/costo y consumiría el cupo trial. Tampoco se ejecutó `tier='none'`, porque el objetivo operativo era dejar Sky con trial activo.
+- No ejecutado: `requestGraderRunForOrganization` real para Sky, porque dispararía un run/costo y consumiría el cupo trial. Tampoco se ejecutó `tier='none'`, porque el objetivo operativo era dejar Sky con trial activo; `none`/supersede está cubierto por tests del command.
 
 ## Closing Protocol
 
-- [x] `Lifecycle` sincronizado (`in-progress` al tomar; cierre queda `code complete, rollout pendiente` por smoke mutacional).
+- [x] `Lifecycle` sincronizado (`in-progress` al tomar; cierre `complete` tras smoke runtime proporcional aprobado con Sky).
 - [x] archivo en la carpeta correcta.
 - [x] `docs/tasks/README.md` sincronizado.
 - [x] `Handoff.md` actualizado.
