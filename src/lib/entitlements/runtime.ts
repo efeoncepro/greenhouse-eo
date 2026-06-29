@@ -318,6 +318,17 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
       source: operatorSource
     })
 
+    // TASK-1289 — profile.set_business_model: el operador corrige el modelo de negocio
+    // derivado de un perfil AEO (reencuadra el buyer-intent de todo run futuro de la org).
+    // Mismo set operador que run.operator. El command self-guarda con can() (profile arbitrario).
+    addEntitlement(entries, {
+      module: 'growth',
+      capability: 'growth.ai_visibility.profile.set_business_model',
+      action: 'execute',
+      scope: 'tenant',
+      source: operatorSource
+    })
+
     // TASK-1286 — entitlement.manage: el set operador completo NO recibe esta mutación.
     // Sólo AM (`efeonce_account`) y admin pueden asignar/cambiar/superseder tiers AEO.
     if (

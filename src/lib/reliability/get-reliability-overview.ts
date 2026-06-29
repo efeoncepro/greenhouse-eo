@@ -173,6 +173,7 @@ import { getWorkforceUnlinkedInternalUsersSignal } from './queries/workforce-unl
 import { getGrowthAiVisibilitySignals } from './queries/growth-ai-visibility-signals'
 import { getGrowthAiVisibilityScoringSignals } from './queries/growth-ai-visibility-scoring-signals'
 import { getGrowthAiVisibilityCategorySignals } from './queries/growth-ai-visibility-category-signals'
+import { getGrowthAiVisibilityBusinessModelSignals } from './queries/growth-ai-visibility-business-model-signals'
 import { getGrowthAiVisibilityProbeSignals } from './queries/growth-ai-visibility-probe-signals'
 import { getGrowthAiVisibilityPublicIntakeSignals } from './queries/growth-ai-visibility-public-intake-signals'
 import { getGrowthAiVisibilityPublicDeliverySignals } from './queries/growth-ai-visibility-public-delivery-signals'
@@ -632,6 +633,7 @@ interface ReliabilityOverviewSources {
   growthAiVisibilityScoring?: ReliabilitySignal[] | null
   growthAiVisibilityProbe?: ReliabilitySignal[] | null
   growthAiVisibilityCategory?: ReliabilitySignal[] | null
+  growthAiVisibilityBusinessModel?: ReliabilitySignal[] | null
   growthAiVisibilityPublicIntake?: ReliabilitySignal[] | null
   growthAiVisibilityPublicDelivery?: ReliabilitySignal[] | null
   growthForms?: ReliabilitySignal[] | null
@@ -1055,6 +1057,7 @@ export const buildReliabilityOverview = (
     ...(sources.growthAiVisibilityScoring ?? []),
     ...(sources.growthAiVisibilityProbe ?? []),
     ...(sources.growthAiVisibilityCategory ?? []),
+    ...(sources.growthAiVisibilityBusinessModel ?? []),
     ...(sources.growthAiVisibilityPublicIntake ?? []),
     ...(sources.growthAiVisibilityPublicDelivery ?? []),
     ...(sources.growthForms ?? []),
@@ -1454,6 +1457,12 @@ export const getReliabilityOverview = async (
     preloadedSources.growthAiVisibilityCategory !== undefined
       ? preloadedSources.growthAiVisibilityCategory
       : await getGrowthAiVisibilityCategorySignals().catch(() => null)
+
+  // TASK-1289 — perfiles de marca con business_model sin resolver (buyer-intent indefinido).
+  const growthAiVisibilityBusinessModel =
+    preloadedSources.growthAiVisibilityBusinessModel !== undefined
+      ? preloadedSources.growthAiVisibilityBusinessModel
+      : await getGrowthAiVisibilityBusinessModelSignals().catch(() => null)
 
   // TASK-1240 — intake público (rate/cost/blocked). DB vacía / intake OFF → steady ok.
   const growthAiVisibilityPublicIntake =
@@ -2430,6 +2439,7 @@ export const getReliabilityOverview = async (
     growthAiVisibilityScoring,
     growthAiVisibilityProbe,
     growthAiVisibilityCategory,
+    growthAiVisibilityBusinessModel,
     growthAiVisibilityPublicIntake,
     growthAiVisibilityPublicDelivery,
     growthForms,

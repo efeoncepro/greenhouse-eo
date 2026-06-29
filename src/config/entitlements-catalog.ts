@@ -2022,6 +2022,16 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     actions: ['execute'] as const,
     defaultScope: 'tenant'
   },
+  // TASK-1289 — profile.set_business_model: el operador (Growth/AM) corrige el `business_model`
+  // derivado de un perfil AEO (consumer_b2c/b2b_*/retail/marketplace/public/unknown). Command
+  // gobernado `overrideProfileBusinessModel` (auditado append-only), consumible por la vista
+  // operador + Nexa/MCP vía propose→confirm→execute. Grant = set operador (run.operator).
+  {
+    key: 'growth.ai_visibility.profile.set_business_model',
+    module: 'growth',
+    actions: ['execute'] as const,
+    defaultScope: 'tenant'
+  },
   // TASK-1286 — entitlement.manage: asignar/cambiar/superseder tiers AEO por org.
   // Command gobernado `assignAeoTier`, consumible por cockpit operador, Account-360 y Nexa
   // vía confirmación humana. Grant restringido a efeonce_account + efeonce_admin.
