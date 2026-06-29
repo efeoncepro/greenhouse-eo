@@ -6,9 +6,34 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-06-29 — Cierre (code complete; cutover de proveedor = follow-up evidencia-first)
+
+Implementado en 3 slices, develop local-first (sin push hasta instrucción del operador):
+
+- **Slice 1** — Puerto `ProseExtractionProvider` + router (`src/lib/growth/ai-visibility/normalization/prose-extraction/`)
+  con degradación honesta (NUNCA lanza). `enrichFindingWithLlm` delega al router; merge (taxonomy + refine-only-if-ambiguous)
+  intacto. Default `anthropic` = behavior-preserving (mismo Haiku, mismo schema).
+- **Slice 2** — Candidatos low-cost: `generateStructuredOpenAI` (Responses API json_schema) + `generateStructuredGemini`
+  (Vertex responseMimeType json) agregados a los clientes canónicos `src/lib/ai/*` (additive, sin SDK paralelo). Adapters
+  gemini/openai registrados (opt-in por flag). Flags `_PROSE_EXTRACTION_PROVIDER` (default anthropic) + `_SHADOW_ENABLED` +
+  config en el ledger (audit --strict verde). Robustez: `isConfigured()` que lanza → `not_configured`.
+- **Slice 3** — Harness de eval/cost provider-injectable + fixtures metodológicos (sentiment-toward-brand vs tono general;
+  unknown/mixed; drift) + CLI staging con tope de presupuesto acumulado (shadow allowlisted → cero costo extra en runs).
+  Decisión de cutover documentada (Delta arquitectura + calibración): **default sigue `anthropic`; candidatos OFF hasta
+  evidencia de staging shadow.**
+
+**Gates verdes:** `pnpm test` full **8445 passed**, `pnpm build` (Turbopack) OK, typecheck + eslint 0 err,
+`docs:closure-check` + `flags:audit --strict` OK. 30 tests focales nuevos (router fallback matrix, merge semantics,
+provider dispatch, structured clients, eval scoring).
+
+**Estado de rollout:** code complete; el comportamiento productivo es **idéntico al previo** (flags OFF / default anthropic),
+así que NADA queda operativamente bloqueado. El **flip de proveedor** (elegir Gemini/OpenAI como default) es un follow-up
+evidencia-first: requiere correr el CLI `scripts/growth/ai-visibility-prose-eval.ts` en staging shadow con presupuesto
+acotado + documentar el veredicto + flip de `_PROSE_EXTRACTION_PROVIDER` en staging; prod sólo vía release gate de EPIC-020.
+
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -320,16 +345,16 @@ El cutover debe ser evidencia-first: no basta con que un proveedor sea mas barat
 
 ## Acceptance Criteria
 
-- [ ] `enrichFindingWithLlm` delegates through a provider-agnostic router while preserving current behavior when all new flags are OFF.
-- [ ] Anthropic remains available as compatible fallback; Gemini/OpenAI low-cost candidates are implemented using canonical clients only.
-- [ ] Provider/model/flag config is documented and registered; no raw provider SDK/fetch is introduced in the grader domain.
-- [ ] Golden eval reports sentiment/prose quality, schema-valid rate, latency and cost estimate per provider.
-- [ ] Sentiment methodology is tested as `sentiment toward subject brand`, not general answer tone; `unknown`/`mixed` semantics are covered by fixtures.
-- [ ] `sentimentScore` is treated as auxiliary until calibrated; product/report logic uses label/count/net semantics unless a documented calibration decision says otherwise.
-- [ ] `categoryAssociations` product-facing quedan mapeadas por `TASK-1272` o degradan a `unknown` / `needs_review`; ningun string libre de proveedor alimenta `category_ownership` fuerte ni reporte publico.
-- [ ] Cutover decision is documented; default provider changes only if quality/cost gates pass.
-- [ ] Scoring remains deterministic from persisted findings; `grader_score` is never assigned by an LLM.
-- [ ] Failure path returns the deterministic finding intact and captures sanitized growth-domain errors.
+- [x] `enrichFindingWithLlm` delegates through a provider-agnostic router while preserving current behavior when all new flags are OFF.
+- [x] Anthropic remains available as compatible fallback; Gemini/OpenAI low-cost candidates are implemented using canonical clients only.
+- [x] Provider/model/flag config is documented and registered; no raw provider SDK/fetch is introduced in the grader domain.
+- [x] Golden eval reports sentiment/prose quality, schema-valid rate, latency and cost estimate per provider.
+- [x] Sentiment methodology is tested as `sentiment toward subject brand`, not general answer tone; `unknown`/`mixed` semantics are covered by fixtures.
+- [x] `sentimentScore` is treated as auxiliary until calibrated; product/report logic uses label/count/net semantics unless a documented calibration decision says otherwise.
+- [x] `categoryAssociations` product-facing quedan mapeadas por `TASK-1272` o degradan a `unknown` / `needs_review`; ningun string libre de proveedor alimenta `category_ownership` fuerte ni reporte publico.
+- [x] Cutover decision is documented; default provider changes only if quality/cost gates pass.
+- [x] Scoring remains deterministic from persisted findings; `grader_score` is never assigned by an LLM.
+- [x] Failure path returns the deterministic finding intact and captures sanitized growth-domain errors.
 
 ## Verification
 

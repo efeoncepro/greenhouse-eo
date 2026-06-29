@@ -1,5 +1,9 @@
 # TASK-1246 — Growth AI Visibility: Public Launch Readiness + Rollout
 
+## Delta 2026-06-29 — palanca de costo de prosa lista (TASK-1271, evidencia-first)
+
+TASK-1271 desacopló la extracción de prosa (sentiment/category/drift) de Anthropic en un router provider-agnóstico con candidatos low-cost (Gemini Flash-Lite / OpenAI nano) + harness de eval/cost (`scripts/growth/ai-visibility-prose-eval.ts`). **Default sigue `anthropic` (behavior-preserving) y la extracción sigue OFF** — nada cambia hoy. Pero al planificar el launch público, si se decide activar `sentimentSummary` real, existe ahora una palanca de costo evidencia-first: correr el CLI en staging shadow (presupuesto acotado), comparar exactitud + costo por proveedor, documentar el veredicto y flip de `_PROSE_EXTRACTION_PROVIDER` ANTES de prender `GROWTH_AI_VISIBILITY_LLM_EXTRACTION_ENABLED` en volumen. Incluir esto en el readiness/cutover de costo del launch.
+
 ## Delta 2026-06-28 — gate de correo corporativo del grader (TASK-1263) listo para el cutover
 
 TASK-1263 cableó el gate de correo corporativo (TASK-1254 `emailPolicy.block_field`) en **ambas fachadas** del intake del grader (`createPublicGraderRun` + `createPublicGraderRunViaFormsEngine`) vía el helper canónico `evaluateFormEmailGate` — gmail/temporal se rechaza ANTES de gastar AI (outcome `email_not_corporate`, 422). **Code complete, rollout pendiente.** Al planificar el launch público, incluir en el readiness/cutover:

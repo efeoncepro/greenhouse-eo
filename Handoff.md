@@ -1,6 +1,14 @@
-## Sesion 2026-06-29 — TASK-1271 Prose Extraction Router (cost-efficient) — Claude — 🔧 in-progress
+## Sesion 2026-06-29 — TASK-1271 Prose Extraction Router (cost-efficient) — Claude — ✅ complete (code complete; cutover = follow-up)
 
-> **Intake:** `/implement-task 1271`. Task `to-do` → `in-progress` (sin branch; develop local-first, sin push). Backend-data / integration. Desacopla el hook de prose extraction (sentiment/category/drift) de Anthropic en un puerto `ProseExtractionProvider` + router con candidatos low-cost (Gemini/OpenAI) usando los clientes canónicos `src/lib/ai/*`, todo gateado y **behavior-preserving** (flags OFF → comportamiento actual; default `anthropic`). Open Questions resueltas con la propuesta de la spec: (1) no decidir el default por intuición → eval ambos en Slice 3; (2) shadow solo en eval allowlisted (no doble costo en runs normales). `grader_score` sigue determinista; fallo/schema-invalid → finding determinista intacto.
+> **Intake:** `/implement-task 1271`. Backend-data / integration. Desacopló el hook de prose extraction (sentiment/category/drift) de Anthropic en un puerto `ProseExtractionProvider` + router (`src/lib/growth/ai-visibility/normalization/prose-extraction/`). Trabajo en `develop` local-first, **sin push**.
+>
+> **3 slices.** (1) Puerto + router con degradación honesta (NUNCA lanza); `enrichFindingWithLlm` delega, merge intacto; default `anthropic` behavior-preserving. (2) Candidatos low-cost: `generateStructuredOpenAI` + `generateStructuredGemini` agregados a los clientes canónicos `src/lib/ai/*` (additive, sin SDK paralelo); adapters gemini/openai opt-in por flag; flags `_PROSE_EXTRACTION_PROVIDER`/`_SHADOW_ENABLED`/config en el ledger. Robustez: `isConfigured()` que lanza → `not_configured`. (3) Harness eval/cost provider-injectable + fixtures metodológicos (sentiment-toward-brand vs tono general; unknown/mixed; drift) + CLI staging con tope de presupuesto (shadow allowlisted → cero costo en runs).
+>
+> **Decisión de cutover (documentada, Delta arquitectura + calibración):** el default productivo **sigue `anthropic`**; los candidatos low-cost quedan **listos pero OFF** hasta evidencia de staging shadow (Open Questions resueltas: no elegir por intuición → eval ambos; shadow solo allowlisted). `grader_score` sigue determinista; fallo/schema-invalid → finding determinista intacto.
+>
+> **Gates verdes:** `pnpm test` full **8445 passed** + `pnpm build` (Turbopack) + typecheck + eslint 0 err + `docs:closure-check` + `flags:audit --strict`. 30 tests focales nuevos.
+>
+> **Rollout:** code complete; comportamiento productivo **idéntico al previo** (flags OFF / default anthropic) → nada operativamente bloqueado. El flip de proveedor es follow-up evidencia-first (correr el CLI `scripts/growth/ai-visibility-prose-eval.ts` en staging shadow → documentar veredicto → flip `_PROSE_EXTRACTION_PROVIDER` staging → prod vía EPIC-020). **Sin push** (esperando instrucción del operador).
 
 ## Sesion 2026-06-29 — TASK-1285 website canónica + rollout staging TASK-1277 — Claude — ✅ complete
 
