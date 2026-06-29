@@ -72,7 +72,11 @@ describe('provisionGraderProfileForOrganization', () => {
       'https://acme.cl',
       'CL',
       'es-CL',
-      'retail',
+      'retail', // raw industry preserved (additive, ISSUE-110: never interpolated into prompts)
+      'industry:retail', // resolved canonical node
+      'Retail', // denormalized es label
+      0.7, // hubspot_map prior confidence
+      'hubspot_map',
       [],
       'org-1'
     ])

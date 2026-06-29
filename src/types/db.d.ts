@@ -6626,6 +6626,10 @@ export interface GreenhouseGrowthGraderProbeResults {
 export interface GreenhouseGrowthGraderProfiles {
   brand_name: string;
   category: string | null;
+  category_confidence: Numeric | null;
+  category_label: string | null;
+  category_node_id: string | null;
+  category_source: string | null;
   competitors_declared: Generated<string[]>;
   created_at: Generated<Timestamp>;
   locale: string;

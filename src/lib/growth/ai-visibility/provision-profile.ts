@@ -2,6 +2,8 @@ import 'server-only'
 
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
+import { resolveCanonicalCategory } from './taxonomy'
+
 // country (ISO-2) -> market + locale del grader. Conservador; ampliar cuando emerja otro país.
 const MARKET_BY_COUNTRY: Record<string, { market: string; locale: string }> = {
   MX: { market: 'MX', locale: 'es-MX' },
@@ -128,10 +130,18 @@ export const provisionGraderProfileForOrganization = async (
 
   const { market, locale } = resolveMarketLocale(org.country)
 
+  // Resolve the RAW industry string to a canonical taxonomy node (ISSUE-110): the raw
+  // enum is preserved in `category` (additive) but NEVER interpolated into prompts; the
+  // canonical node + provenance drive the engine. Slice 2 is deterministic (HubSpot prior
+  // + taxonomy alias); Slice 4 passes the grounded brand_intelligence candidate.
+  const resolvedCategory = resolveCanonicalCategory({ industry: org.industry })
+
   const inserted = await runGreenhousePostgresQuery<ProfileRow>(
     `INSERT INTO greenhouse_growth.grader_profiles
-       (brand_name, website_url, market, locale, category, competitors_declared, organization_id, status)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, 'active')
+       (brand_name, website_url, market, locale, category,
+        category_node_id, category_label, category_confidence, category_source,
+        competitors_declared, organization_id, status)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, 'active')
      RETURNING profile_id, public_id`,
     [
       org.organization_name,
@@ -139,6 +149,10 @@ export const provisionGraderProfileForOrganization = async (
       market,
       locale,
       org.industry,
+      resolvedCategory.nodeId,
+      resolvedCategory.label?.es ?? null,
+      resolvedCategory.confidence,
+      resolvedCategory.source,
       [],
       org.organization_id
     ]
