@@ -55,6 +55,15 @@ on:
       # recoverStuckRunningRuns). Sin este filter, cambios al run-engine/store del
       # grader NO triggerean redeploy y el worker queda con código stale.
       - 'src/lib/growth/ai-visibility/**'
+      # TASK-1279 — el worker bundlea los reactive consumers del grader (lead-handoff,
+      # report-email, operator-send) que importan estos deps transitivos. Sin estos
+      # filters + sus entradas en WORKER_RUNTIME_PATHS, un cambio SOLO a estos paths
+      # (ej. crm-client del Lead HubSpot) triggerea el workflow pero el drift-check lo
+      # salta (git diff --quiet no ve diff en runtime paths) → worker queda stale.
+      - 'src/components/growth/ai-visibility/**'
+      - 'src/lib/hubspot/**'
+      - 'src/emails/**'
+      - 'src/lib/observability/**'
   workflow_dispatch:
     inputs:
       environment:
@@ -193,7 +202,12 @@ jobs:
               src/lib/auth-secrets.ts \
               src/lib/secrets \
               src/lib/reliability \
-              src/lib/notion-metrics)"
+              src/lib/notion-metrics \
+              src/lib/growth/ai-visibility \
+              src/components/growth/ai-visibility \
+              src/lib/hubspot \
+              src/emails \
+              src/lib/observability)"
             RESOLUTION_SOURCE="latest-worker-runtime-path"
           else
             RESOLVED_SHA="${GITHUB_SHA}"
@@ -252,6 +266,11 @@ jobs:
             src/lib/secrets
             src/lib/reliability
             src/lib/notion-metrics
+            src/lib/growth/ai-visibility
+            src/components/growth/ai-visibility
+            src/lib/hubspot
+            src/emails
+            src/lib/observability
           )
 
           CURRENT_REVISION="$(gcloud run services describe ops-worker \
