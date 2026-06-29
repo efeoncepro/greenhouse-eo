@@ -1,3 +1,4 @@
+export * from './business-model'
 export * from './catalog'
 export * from './contracts'
 export * from './hubspot-industry-map'
