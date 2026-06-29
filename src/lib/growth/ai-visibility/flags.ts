@@ -188,6 +188,19 @@ export const isRecurringRegradeEnabled = (env: NodeJS.ProcessEnv = process.env):
   isGraderEnabled(env) && isTrue(env[GROWTH_AI_VISIBILITY_REGRADE_FLAG])
 
 /**
+ * TASK-1279 — Cross-sell operador: enviar el informe AEO + crear un Lead de HubSpot
+ * (objeto `leads`, asociado a Contact/Company — NUNCA un Deal). Default OFF: el command
+ * gobernado rechaza el envío (y el reactive consumer hace skip controlado) hasta el smoke
+ * staging real (email + Lead) + sign-off comercial/legal del copy a prospectos + provisión
+ * de la property `aeo_check_result` en HubSpot. Gateado además por el kill switch global.
+ * Registrar en docs/operations/FEATURE_FLAG_STATE_LEDGER.md (gate docs:closure-check).
+ */
+export const GROWTH_AI_VISIBILITY_OPERATOR_SEND_FLAG = 'GROWTH_AI_VISIBILITY_OPERATOR_SEND_ENABLED'
+
+export const isOperatorSendEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+  isGraderEnabled(env) && isTrue(env[GROWTH_AI_VISIBILITY_OPERATOR_SEND_FLAG])
+
+/**
  * TASK-1277 — Config de allowance AEO por tier (per-org-per-mes) + tope global de trials.
  * Defaults conservadores (sign-off comercial): trial 1/mes, contratado 20/mes (fair-use, NO
  * ilimitado self-serve), pilot 3/mes, tope global de trials USD 25/mes (cost backstop que

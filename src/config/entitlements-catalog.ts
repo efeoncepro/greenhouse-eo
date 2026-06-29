@@ -2031,6 +2031,16 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     actions: ['execute'] as const,
     defaultScope: 'tenant'
   },
+  // TASK-1279 — lead.open: cross-sell operador. Enviar el informe AEO + crear/asociar un Lead
+  // de HubSpot (objeto `leads`, NO un Deal). Command gobernado `sendAeoReportAndCreateLead`,
+  // consumible por la vista operador (TASK-1276) + Nexa vía propose→confirm→execute. Grant =
+  // set operador (mismo que run.operator). Distinta de lead_handoff.execute (lead del form público).
+  {
+    key: 'growth.ai_visibility.lead.open',
+    module: 'growth',
+    actions: ['execute'] as const,
+    defaultScope: 'tenant'
+  },
   // TASK-1270 — regrade.manage: gobernanza futura del opt-in/cadencia del re-grade
   // recurrente. El batch automático corre como sistema desde ops-worker; esta capability
   // queda para surfaces humanas/agentes que habiliten/deshabiliten el monitoreo.

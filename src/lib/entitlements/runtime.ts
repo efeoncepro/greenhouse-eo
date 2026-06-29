@@ -343,6 +343,17 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
       source: operatorSource
     })
 
+    // TASK-1279 — lead.open: enviar el informe AEO + crear un Lead HubSpot (cross-sell). Mismo
+    // set operador que run.operator (quien corre el motor cierra el loop comercial). El command
+    // self-guarda con can() (org arbitraria) + consent gate server-side (interés legítimo).
+    addEntitlement(entries, {
+      module: 'growth',
+      capability: 'growth.ai_visibility.lead.open',
+      action: 'execute',
+      scope: 'tenant',
+      source: operatorSource
+    })
+
     // TASK-1282 — search_console.connect: el operador conecta la propiedad Search
     // Console de un cliente (OAuth 3-legged, token per-org) como parte de la operación
     // growth/medición. Mismo set operador que run.operator (scope tenant = puede operar

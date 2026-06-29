@@ -104,6 +104,11 @@ export type CanonicalErrorCode =
   | 'aeo_assignment_invalid_input'
   | 'aeo_assignment_website_required'
   | 'aeo_assignment_org_not_found'
+  // AEO operator cross-sell: send report + create Lead (TASK-1279).
+  | 'aeo_send_invalid_input'
+  | 'aeo_send_consent_required'
+  | 'aeo_send_report_unavailable'
+  | 'aeo_send_disabled'
   // AEO Plan recommendation execution status (TASK-1275).
   | 'recommendation_status_invalid_input'
   // Growth Search Console connection · OAuth multi-tenant (TASK-1282).
@@ -403,6 +408,27 @@ const CANONICAL_ERRORS: Record<CanonicalErrorCode, CanonicalErrorDefinition> = {
   aeo_assignment_org_not_found: {
     status: 404,
     message: 'No encontramos esa organización activa para asignar AEO.',
+    actionable: false
+  },
+  aeo_send_invalid_input: {
+    status: 400,
+    message: 'Revisa el envío del informe AEO: falta el correo del destinatario o un dato no es válido.',
+    actionable: true
+  },
+  aeo_send_consent_required: {
+    status: 422,
+    message:
+      'Para enviar el informe a un prospecto necesitas registrar el consentimiento capturado en la conversación previa. No se permite envío en frío.',
+    actionable: false
+  },
+  aeo_send_report_unavailable: {
+    status: 409,
+    message: 'Aún no hay un informe AEO listo para enviar de esta organización. Corre el análisis primero.',
+    actionable: false
+  },
+  aeo_send_disabled: {
+    status: 409,
+    message: 'El envío de informes AEO no está disponible en este momento.',
     actionable: false
   },
   search_console_disabled: {
