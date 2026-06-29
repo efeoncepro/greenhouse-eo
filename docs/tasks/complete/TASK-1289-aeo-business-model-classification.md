@@ -6,13 +6,29 @@
 - El enum candidato vive en `brand-intelligence/contracts.ts` (`BRAND_BUSINESS_MODELS`); esta task lo formaliza como columna en `grader_profiles` + el override del operador.
 - `desbloqueada` (TASK-1288 complete).
 
+## Implementación 2026-06-29 — COMPLETE (develop local, sin push)
+
+3 slices. Universal por construcción (no sólo aerolíneas/agencias) — el operador lo reforzó explícitamente.
+
+- **S1** `src/lib/growth/ai-visibility/taxonomy/business-model.ts`: `classifyBusinessModel` cascade grounded (`brand_intelligence` candidate ≥0.6) > heurística de categoría conservadora > `unknown` honesto. Reusa `BRAND_BUSINESS_MODELS` como SoT del enum. ABSTIENE en macros ambiguas (manufacturing/finance/healthcare/technology…) — NUNCA defaultea a agencia (causa raíz ISSUE-110). `business-model.test.ts` (7 tests por arquetipo + abstención + grounded-wins).
+- **S2** migración aditiva `grader_profiles` += `business_model`/`_confidence`/`_source` (CHECK enum cerrado) + partial index + `grader_business_model_history` append-only (trigger) + capability seed `growth.ai_visibility.profile.set_business_model`. `provision-profile.ts` setea el derivado (heurística) en provisión; `store.ts` projecta; `scripts/growth/backfill-business-model.ts` `--grounded` (lee snapshot existente, sin LLM extra) + audita. `db.d.ts` regenerado.
+- **S3** `override-business-model.ts`: command gobernado/auditado (capability + grant operador en runtime.ts + catalog; tx atómica current+history+outbox `growth.ai_visibility.business_model_overridden` v1; no-op idempotente; `source='operator_override'` + conf 1.0). Signal `growth.ai_visibility.profile_business_model_unresolved` (4 wire spots).
+
+**Verificación live (`greenhouse-pg-dev`):** migración + backfill grounded aplicados. SKY→`consumer_b2c` (1.0), Berel (`industry:manufacturing`, heurística abstiene)→`consumer_b2c` (0.95 grounded), Banco de Chile→`consumer_b2c`, Vercel→`b2b_product_saas`, Efeonce→`b2b_service_provider`. Override smoke Asana `unknown`→`b2b_product_saas` auditado + no-op idempotente + history append-only. Signal `ok` (2/2 org-linked).
+
+**Gates:** `pnpm test` full 8544 passed · `pnpm build` clean · `pnpm local:check` 0 err · capability-grant-coverage verde.
+
+**Decisiones (deltas a la spec):** (1) `business_model_source` con provenance honesta `{brand_intelligence, category_heuristic, operator_override, unknown}` en vez del umbrella `{derived, operator_override}` (consistente con `category_source`). (2) Capability DEDICADA en vez de reuse (acción gobernada distinta, blast real: reencuadra todo run futuro de la org; más auditable + least-privilege).
+
+**Follow-ups:** API route + canonical error (`aeo_business_model_*`) para el consumer HTTP del override; LLM-assist para marcas multi-modelo; sign-off comercial del set de arquetipos. Consumo real del eje = TASK-1290; gate de run = TASK-1291.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -224,9 +240,9 @@ Reglas obligatorias:
 
 ## Acceptance Criteria
 
-- [ ] `grader_profiles.business_model` (enum cerrado + CHECK) persistido por un clasificador determinista; `unknown` honesto, sin default a agencia.
-- [ ] Backfill idempotente; SKY clasifica `consumer_b2c`; signal de `unknown`.
-- [ ] Command de override operador gobernado + auditado (source `operator_override`).
+- [x] `grader_profiles.business_model` (enum cerrado + CHECK) persistido por un clasificador determinista; `unknown` honesto, sin default a agencia.
+- [x] Backfill idempotente; SKY clasifica `consumer_b2c`; signal de `unknown`.
+- [x] Command de override operador gobernado + auditado (source `operator_override`).
 
 ## Verification
 

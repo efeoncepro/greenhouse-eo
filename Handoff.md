@@ -1,14 +1,39 @@
-## Sesion 2026-06-29 — Public Site AEO Elementor draft base — Codex — ✅ draft creado
+## Sesion 2026-06-29 — TASK-1289 AEO business model classification — Claude — ✅ complete (develop local, sin push)
 
-> **Pedido:** crear una nueva pagina editable con Elementor para usarla como base de la futura pagina AEO, copiando el hero actual de la home publica sin modificar la home.
+> **Qué:** EPIC-021 2º paso de ISSUE-110. Eje `business_model` (buyer-intent, ortogonal a la categoría) en `grader_profiles`, derivado del snapshot `brand_intelligence` (TASK-1288) con override operador. Universal — sirve para cualquier marca (consumo/B2B-svc/B2B-saas/retail/marketplace/público), NO sólo aerolíneas/agencias.
 >
-> **Resultado:** se creo en WordPress/Kinsta la pagina `AEO` como **draft no publicado** (`postId=250255`, slug `aeo`). Link admin: `https://efeoncepro.com/wp-admin/post.php?post=250255&action=edit`; link Elementor: `https://efeoncepro.com/wp-admin/post.php?post=250255&action=elementor`.
+> **Slices (3, develop, sin push):**
+> - S1 `taxonomy/business-model.ts`: `classifyBusinessModel` (cascade grounded > heurística de categoría conservadora > `unknown` honesto). Reusa `BRAND_BUSINESS_MODELS` como SoT. ABSTIENE en macros ambiguas — NUNCA defaultea a agencia. 7 tests.
+> - S2 migration aditiva: `grader_profiles` += `business_model`/`_confidence`/`_source` (CHECK enum) + `grader_business_model_history` append-only + capability seed `growth.ai_visibility.profile.set_business_model`. `provision-profile` setea el derivado; store projecta; backfill `--grounded` (lee snapshot existente, sin LLM extra). db.d.ts regenerado.
+> - S3 `override-business-model.ts`: command gobernado/auditado (capability + grant operador + tx current+history+outbox `growth.ai_visibility.business_model_overridden` v1, no-op idempotente, conf 1.0). Signal `growth.ai_visibility.profile_business_model_unresolved` wired (4 spots).
 >
-> **Fuente copiada:** home publica `page_id=2791` (`Home 2`), container hero Elementor `55718ee3`. Se copio solo el hero como root container de la pagina nueva; no se copio el carrusel inferior ni se toco header/menu/logo. El container conserva `clb__dark_section` y suma clases semanticas `gh-owned gh-section-hero gh-section-aeo-hero` para gobernanza futura.
+> **Verificación live (`greenhouse-pg-dev`):** migración + backfill grounded aplicados. SKY→`consumer_b2c` (1.0), Berel (`industry:manufacturing`, heurística abstiene)→`consumer_b2c` (0.95 grounded), Banco de Chile→`consumer_b2c`, Vercel→`b2b_product_saas`, Efeonce→`b2b_service_provider`. Override smoke (Asana unknown→b2b_product_saas) auditado + no-op idempotente + history append-only. Signal `ok` (2/2 org-linked resueltos).
 >
-> **Metas/layout:** se copiaron las metas Ohio de canvas desde la home para evitar page headline/breadcrumb/top padding extra; verificado `page_header_title_visibility=0`, `page_breadcrumbs_visibility=0`, `page_add_top_padding=0`, `page_add_wrapper=0`. La pagina queda con `_elementor_edit_mode=builder`, `_elementor_template_type=wp-page`, `rootCount=1`, `rootId=55718ee3`.
+> **Gates:** `pnpm test` full 8544 passed · `pnpm build` clean · `pnpm local:check` 0 err · capability-grant-coverage verde.
 >
-> **Evidencia:** scripts temporales WP-CLI ejecutados via `pnpm public-website:wpcli -- --eval-file ... --wp-user 12`; `php -l` verde en los scripts; verificacion remota read-only devolvio `ok=true`, `status=draft`, `heroFound=true` y widgets hijos `ohio_video`, `ohio_icon_box`, `ohio_heading`, containers CTA/proof. No se purgo cache porque no hay publicacion ni cambio al frontend publico. Scripts temporales locales eliminados.
+> **Rollout:** aditivo, sin flag nuevo. El consumo real del eje = TASK-1290 (prompts por arquetipo); gate de run = TASK-1291. Prod vía release control plane (EPIC-021). **Follow-up:** API route + canonical error para el override HTTP; LLM-assist multi-modelo; sign-off comercial del set de arquetipos.
+>
+> **Commits develop:** `6a44ee0e8` (S1) · `3627bfcf7` (S2) · `66eedd529` (S3) · docs (este).
+
+## Sesion 2026-06-29 — Public Site AEO Elementor home clone — Codex — ✅ draft corregido
+
+> **Pedido:** crear una nueva pagina editable con Elementor para usarla como base de la futura pagina AEO. Primer intento copio solo el hero y el operador indico que eso movia/rompia demasiado el contexto; se corrigio sobrescribiendo el borrador AEO con un **clon completo de la home**.
+>
+> **Resultado vigente:** pagina `AEO` como **draft no publicado** (`postId=250255`, slug `aeo`). Link admin: `https://efeoncepro.com/wp-admin/post.php?post=250255&action=edit`; link Elementor: `https://efeoncepro.com/wp-admin/post.php?post=250255&action=elementor`.
+>
+> **Fuente copiada:** home publica `page_id=2791` (`Home 2`). Se copio el arbol Elementor completo de la home y sus `_elementor_page_settings` (`eael_ext_toc_title`, `custom_css`) con `Document::save()` sobre el draft AEO; la home publicada no se modifico. La verificacion remota devolvio `rootCount=17` en origen y destino, con root IDs `55718ee3`, `ac888b4`, `f394c97`, `793e2d0`, `4d91132`, `4ad0388`, `5976cc8`, `35b37da`, `6f28161`, `5015b32f`, `4a6917ed`, `d69f91e`, `4c9b093a`, `44ef7d36`, `5576f1fb`, `59c659c2`, `6c516ae`.
+>
+> **Metas/layout:** se copiaron las metas Ohio de canvas desde la home para evitar page headline/breadcrumb/top padding extra; verificado `page_header_title_visibility=0`, `page_breadcrumbs_visibility=0`, `page_add_top_padding=0`, `page_add_wrapper=0`. La pagina queda con `_elementor_edit_mode=builder`, `_elementor_template_type=wp-page`, `status=draft`.
+>
+> **Evidencia:** scripts temporales WP-CLI ejecutados via `pnpm public-website:wpcli -- --eval-file ... --wp-user 12`; `php -l` verde. Antes de sobrescribir el primer intento, se guardo backup meta en el propio draft bajo `_gh_backup_before_full_home_clone_<timestamp>`. No se purgo cache porque no hay publicacion ni cambio al frontend publico. Scripts temporales locales eliminados.
+>
+> **Fix posterior por editor roto:** al abrir en Elementor, el clon se veia roto porque `_elementor_page_settings.custom_css` habia sido copiado con selectores hardcodeados `.elementor-2791` de la home. Se aplico fix solo al draft `250255`: reemplazo `elementor-2791`→`elementor-250255` y `post-2791`→`post-250255` en page settings, `Document::save()` y delete de CSS Elementor del post. Verificacion remota: `settingsHas2791=false`, `settingsHas250255=true`, `rootCount=17`, status `draft`. Home publicada intacta.
+>
+> **Fix adicional por herencia del editor Home:** el operador confirmo que el problema tambien existe al abrir la Home en Elementor, por lo que el clon heredaba ese comportamiento. Se corrigio **solo en AEO**: `page-id-2791`→`page-id-250255`, se agregaron reglas clone-only que no dependen de `body.home/front-page`, y se cargo `Material Symbols Outlined` en el custom CSS del draft para que ligaduras como `widgets`, `downloading`, `app_badging`, `sports_basketball`, `star` no aparezcan como texto gigante en el canvas del editor. Verificacion remota: `settingsHasSourcePageId=false`, `settingsHasDestinationPageId=true`, `hasMaterialSymbolsImport=true`, `hasFixMarker=true`, `rootCount=17`. Home sigue intacta.
+>
+> **Cambio de rumbo del operador:** el clon del home queda descartado como base de trabajo. El operador creo/abrio una pagina limpia en Elementor: `https://efeoncepro.com/aeo-2/`. Inspeccion read-only: `postId=250265`, title `AEO`, slug `aeo-2`, status `publish`, `_elementor_edit_mode=builder`, `_elementor_template_type=wp-page`, Elementor `rootCount=0`, settings solo `eael_ext_toc_title`, metas Ohio en `inherit`. **Base vigente para construir la landing AEO: `postId=250265` (`/aeo-2/`)**, no el clon `250255`.
+>
+> **Cleanup posterior:** a pedido del operador, la pagina vieja/clon `postId=250255`, slug `aeo`, status previo `draft`, fue movida a papelera con `wp_trash_post()` via WP-CLI. Verificacion: `afterStatus=trash`. La base vigente `postId=250265`, slug `aeo-2`, queda `publish` e intacta.
 
 ## Sesion 2026-06-29 — Home publica Efeonce hero refresh — Codex — ✅ aplicado live
 
@@ -34191,3 +34216,15 @@ Contrato backend del avance del Plan AEO (org × gap_key). Cerrada end-to-end en
 - Gates: typecheck + suite full (8479) + build + 10 focal + smoke PG (UPSERT/history/FK ROLLBACK).
 
 **Coordinación con Codex (TASK-1286):** Codex trabajó TASK-1286 en vivo sobre los mismos entitlements files. Hubo un incidente: un `git commit` mío barrió por error el índice (que Codex tenía full-staged) — lo revertí con `git reset --mixed HEAD~1` SIN perder nada de Codex; Codex luego commiteó limpio (`085d0faa8`); mi Slice 2/3 editó los entitlements files ya libres. Lección: con Codex concurrente, verificar `git diff --cached --stat` ANTES de cada commit (el índice puede tener WIP ajeno staged). Desbloquea TASK-1276 (write) + follow-up TASK-1248 (read). Sin push (local-first).
+
+---
+
+## Public site — AEO landing /aeo-2/ Elementor modular base — COMPLETE 2026-06-29 — Codex
+
+Página vigente: `https://efeoncepro.com/aeo-2/` (`postId=250265`, title `AEO`, slug `aeo-2`, status `publish`). El intento previo `/aeo` (`postId=250255`) quedó en trash por instrucción del operador; no reusar como base. Home público (`postId=2791`) NO fue modificado.
+
+Se implementó el HTML local `/Users/jreye/Documents/AEO/landing-aeo-efeonce-mockup.html` como landing modular de Elementor/Ohio, no como bloque HTML monolítico: 8 secciones raíz (`hero`, market, pipeline, levels, diagnostic, why, conversion, faq), usando contenedores/widgets Elementor y `ohio_heading`/`ohio_button` donde aplica. Se omitieron `<head>`, nav y footer del mockup porque el tema Ohio los gobierna. La página incluye schema JSON-LD `ProfessionalService` + `FAQPage`, Yoast title/metadescription/canonical, y CSS page-scoped `gh-aeo-landing-v1` en `_elementor_page_settings`.
+
+Conversión: el formulario del mockup NO se copió como fake form. En su lugar quedó un bloque placeholder editable que apunta a `https://meetings.hubspot.com/efeoncepro/agenda-discovery` y documenta que debe reemplazarse por el formulario HubSpot oficial del diagnóstico AEO cuando exista el mapping. Claims/estadísticas fueron trasladados desde el mockup como base creativa; antes de paid/campaign launch conviene validar fuentes y citas externas.
+
+Validación: `php -l` del script de build OK; guardado vía `pnpm public-website:wpcli -- --eval-file ./tmp/build-aeo-2-elementor-landing-20260629.php --wp-user 12` OK (`rootCount=8`). `curl` de la URL pública normal devolvió el H1 nuevo, `gh-aeo-hero`, Yoast metadata y JSON-LD. Playwright screenshots generadas en `/tmp/aeo-2-desktop.png` y `/tmp/aeo-2-mobile.png`; desktop y mobile se ven estables, header/footer del tema intactos. Medición Playwright: desktop `scrollWidth=1440/clientWidth=1440`, mobile `scrollWidth=390/clientWidth=390`, `sections=8`, `headerCount=1`, `hasJsonLd=true`.

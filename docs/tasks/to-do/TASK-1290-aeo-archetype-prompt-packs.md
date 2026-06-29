@@ -6,6 +6,12 @@
 - La **categoría canónica** (`category_node_id` + label) ya está persistida en `grader_profiles`; el autor usa el nodo (arquetipo) + `fine_category` (especificidad). El prompt del grounded read fue validado con skill seo-aeo (entidad buyer-facing que alimenta este fan-out).
 - `desbloqueada` (TASK-1288 complete).
 
+## Delta 2026-06-29 — TASK-1289 shipped (eje `business_model` listo para consumir)
+
+- **El eje `business_model` YA EXISTE** persistido en `grader_profiles` (`business_model`/`business_model_confidence`/`business_model_source`), derivado por `classifyBusinessModel` (`src/lib/growth/ai-visibility/taxonomy/business-model.ts`) + override operador gobernado. Enum `BUSINESS_MODELS` (= `BRAND_BUSINESS_MODELS`): `consumer_b2c`/`b2b_service_provider`/`b2b_product_saas`/`retail_ecommerce`/`marketplace`/`public_institution`/`unknown`. Verificado live: SKY/Berel/Banco de Chile→`consumer_b2c`, Vercel→`b2b_product_saas`, Efeonce→`b2b_service_provider`.
+- **Regla dura (reforzada por el operador 2026-06-29):** los packs DEBEN ser **universales** — un generador por arquetipo (categoría × `business_model` × buyer-intent) que produzca el Query Fan-Out apropiado a CUALQUIER marca (consumo/B2B/retail/marketplace/público), NO un pack agencia-only con casos especiales. El de agencia es UN arquetipo entre varios, no el default. Con `business_model=unknown` degradar honesto (gate TASK-1291), NUNCA caer al pack de agencia por defecto (eso re-introduce ISSUE-110).
+- `business_model` se lee del perfil (`GraderProfileRow.businessModel`); NO se re-clasifica en 1290.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->

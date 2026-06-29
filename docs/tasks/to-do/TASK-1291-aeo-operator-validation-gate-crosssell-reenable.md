@@ -6,6 +6,11 @@
 - El snapshot `grader_brand_intelligence` (con `confidence` + provenance) es el insumo del review. `category_source`/`category_confidence` ya en `grader_profiles`.
 - `desbloqueada` (TASK-1288 complete).
 
+## Delta 2026-06-29 — TASK-1289 shipped (eje `business_model` + signal de `unknown`)
+
+- El **eje `business_model`** ya está persistido + override gobernado (`overrideProfileBusinessModel`, capability `growth.ai_visibility.profile.set_business_model`). El review/confirm del operador debe incluir el `business_model` junto a la categoría (ambos pueden quedar `unknown` y ambos deben confirmarse antes de correr sobre prospecto). Reusar el command de override existente (NO crear otro write path).
+- Existe el signal `growth.ai_visibility.profile_business_model_unresolved` (org-linked sin resolver, steady 0) — el gate de TASK-1291 trata `business_model unknown` igual que `category unknown`: "no correr sobre prospecto sin confirmar".
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->

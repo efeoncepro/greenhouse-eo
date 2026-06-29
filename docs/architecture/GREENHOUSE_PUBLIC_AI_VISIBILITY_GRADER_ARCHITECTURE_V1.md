@@ -1801,3 +1801,48 @@ limpio en portal/operador (`category_unresolved` blocked, sin malgastar allowanc
 **Rollout pendiente** (flags OFF): prender `CATEGORY_GUARD` SÓLO tras backfill grounded verificado (sino bloquea el
 lead magnet con `unknown` legacy); `BRAND_INTELLIGENCE` tras sign-off de costo LLM (1×/marca/versión, cacheado).
 Migración + backfill grounded aplicados en `greenhouse-pg-dev`. Prod vía release control plane (EPIC-021).
+
+## Delta 2026-06-29 — TASK-1289 Modelo de negocio (eje de buyer-intent, ortogonal a la categoría) · EPIC-021
+
+**Cierra el 2º paso de ISSUE-110.** El defecto de fondo del falso-0 de SKY no era sólo la categoría: el grader
+asumía que **toda** marca es una agencia/proveedor B2B (el ICP histórico de Efeonce). El `business_model` es el eje
+explícito que decide el **framing de buyer-intent** de los prompts (TASK-1290). Es **ortogonal** a la categoría (una
+misma categoría tiene marcas de consumo y B2B) y **universal**: sirve para cualquier tipo de marca (consumo, B2B
+servicios, B2B SaaS, retail/ecommerce, marketplace, institución pública), NO sólo aerolíneas/agencias.
+
+**Enum cerrado (SoT compartido con el grounded read):** `consumer_b2c` · `b2b_service_provider` · `b2b_product_saas`
+· `retail_ecommerce` · `marketplace` · `public_institution` · `unknown`. `BUSINESS_MODELS` re-exporta
+`BRAND_BUSINESS_MODELS` (el snapshot ya emite `candidate_business_model`) — un solo enum, no dos.
+
+**Clasificador determinista (`classifyBusinessModel`, el spine):** cascade grounded (`brand_intelligence` candidate,
+conf ≥ 0.6 → autoritativo) > **heurística de categoría conservadora** (sólo nodos de señal inequívoca) > `unknown`
+honesto. La heurística **ABSTIENE** en macros genuinamente ambiguas (manufacturing, finance, healthcare, technology,
+education…) — NUNCA defaultea a agencia (eso ES el bug). El grounded read resuelve la cola larga; el override la
+corrige. Smoke live (gemini, sobre snapshots existentes): SKY→`consumer_b2c` (1.0), Grupo Berel
+(`industry:manufacturing`, heurística abstiene)→`consumer_b2c` (0.95 grounded), Banco de Chile→`consumer_b2c`,
+Vercel→`b2b_product_saas`, Efeonce→`b2b_service_provider`.
+
+**Persistencia + provenance:** `grader_profiles` += `business_model` (SoT) / `business_model_confidence` /
+`business_model_source` (`brand_intelligence`|`category_heuristic`|`operator_override`|`unknown`, mirror honesto de
+`category_source`). Tabla `grader_business_model_history` append-only (trigger anti-mutación) con cada (re)derivación
+y override. La provisión setea el derivado (heurística); el backfill `--grounded` lo sube desde el snapshot (sin LLM
+extra — lee el snapshot existente); el operador lo corrige.
+
+**Override gobernado (Full API Parity):** `overrideProfileBusinessModel` — capability dedicada
+`growth.ai_visibility.profile.set_business_model` (grant operador en runtime.ts; una acción gobernada distinta:
+reencuadra todo run futuro de la org). Tx atómica `UPDATE grader_profiles` + `INSERT history` + outbox
+`growth.ai_visibility.business_model_overridden` v1; no-op idempotente; `source='operator_override'` + `confidence=1.0`.
+Signal `growth.ai_visibility.profile_business_model_unresolved` (org-linked sin resolver, steady 0; live `ok` 2/2).
+
+**Reglas duras:**
+- **NUNCA** defaultear `business_model` a agencia/B2B por ausencia de señal — `unknown` honesto (causa raíz de ISSUE-110).
+- **NUNCA** derivar el modelo SÓLO del nombre: la heurística usa la categoría canónica y abstiene en lo ambiguo.
+- **NUNCA** tratar el eje como sinónimo de la categoría: son ortogonales (una categoría tiene marcas B2C y B2B).
+- **NUNCA** override fuera del command gobernado (auditado): el `business_model_source='operator_override'` no se hand-setea.
+- **SIEMPRE** el grounded candidate confiable gana sobre la heurística; el operador gana sobre ambos (con auditoría).
+
+**Rollout:** aditivo (columnas + tabla audit + capability + signal), sin flag nuevo. Migración + backfill grounded
+aplicados en `greenhouse-pg-dev`. El consumo real del eje (prompts por arquetipo) lo gatea TASK-1290; el gate de
+run lo gatea TASK-1291. Prod vía release control plane (EPIC-021). **Follow-up:** API route + canonical error
+(`aeo_business_model_*`) para el consumer HTTP del override; LLM-assist para marcas multi-modelo; sign-off comercial
+del set de arquetipos (financial_institution/public_b2g se modelan como consumer_b2c/public_institution + `fine_category`).

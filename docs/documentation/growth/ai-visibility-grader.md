@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.18
+> **Version:** 1.19
 > **Creado:** 2026-06-24 por Claude (TASK-1226)
-> **Ultima actualizacion:** 2026-06-29 por Claude (TASK-1288 — Brand Intelligence + categoría canónica, dos planos)
+> **Ultima actualizacion:** 2026-06-29 por Claude (TASK-1289 — clasificación de modelo de negocio, eje de buyer-intent)
 > **Documentacion tecnica:** [GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md)
 
 # AI Visibility Grader — Motor de Providers (Growth)
@@ -203,6 +203,17 @@ Para que el análisis sirva a **cualquier** tipo de marca (no solo agencias), el
 - **Ejemplos reales:** Sky Airlines → "aerolíneas de pasajeros"; Grupo Berel → "manufactura" + "fabricante de pinturas"; Banco de Chile (que tenía la industria mal puesta) → el sistema lo corrigió a "finanzas".
 
 > Detalle técnico: §Delta TASK-1288 en [GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md). Código: `src/lib/growth/ai-visibility/{taxonomy,brand-intelligence}/**`. Lectura grounded detrás del flag `GROWTH_AI_VISIBILITY_BRAND_INTELLIGENCE_ENABLED` (OFF por costo).
+
+## Cómo entiende el modelo de negocio de cada marca (TASK-1289)
+
+Saber la **categoría** no basta: una misma categoría tiene marcas muy distintas (un banco que atiende personas y un banco que vende software a empresas son ambos "finanzas", pero sus clientes buscan cosas opuestas). Por eso el grader también clasifica el **modelo de negocio** de la marca — el eje que decide **cómo se le pregunta a los motores**. Esto cierra el segundo trozo del "0" falso: el sistema ya no asume que toda marca es una agencia que le vende a otras empresas.
+
+- **Sirve para cualquier marca, no solo aerolíneas o agencias.** Los modelos posibles son: marca de consumo (B2C), proveedor de servicios B2B, producto/software B2B, retail/ecommerce, marketplace, institución pública, o "sin resolver".
+- **Lo deriva de lo que ya entendió.** Usa la lectura de la marca (Brand Intelligence) cuando hay confianza; si no, una pista conservadora desde la categoría. En categorías ambiguas (manufactura, finanzas, salud) **no adivina** — queda "sin resolver" y lo decide la lectura del sitio o una persona. **Nunca** asume "agencia" por defecto (ese era justo el error).
+- **Una persona del equipo puede corregirlo.** Si la clasificación quedó mal, un operador (Growth/AM) la cambia con un registro auditado de quién, cuándo y de qué a qué.
+- **Ejemplos reales:** Sky Airlines, Grupo Berel (pinturas) y Banco de Chile → "marca de consumo"; Vercel → "producto/software B2B"; Efeonce → "proveedor de servicios B2B".
+
+> Detalle técnico: §Delta TASK-1289 en [GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md). Código: `src/lib/growth/ai-visibility/taxonomy/business-model.ts` + `override-business-model.ts`. Eje `business_model` en `grader_profiles` (aditivo, sin flag); lo consumen los packs de prompts (TASK-1290).
 
 ## Límites actuales
 
