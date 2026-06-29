@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -257,12 +257,12 @@ not_started <-> in_progress <-> done
 
 ## Acceptance Criteria
 
-- [ ] Existe `greenhouse_growth.grader_recommendation_status` (con `source_run_id` FK nullable) + history (append-only) con CHECK del enum (`not_started|in_progress|blocked|done|dismissed`) y GRANTs runtime; migración con bloque DO de verificación.
-- [ ] `setRecommendationStatus` self-guarda con la capability, valida `recommendation_key` contra `RECOMMENDATION_GAP_KEYS`, exige `reason` en `blocked|dismissed`, es idempotente no-op (mismo status+reason → sin history/outbox), atómico (current+history+outbox) y emite errores canónicos.
-- [ ] `readRecommendationStatuses` devuelve el status por recomendación de una org; degrada honesto cuando no hay filas.
-- [ ] Capability `growth.ai_visibility.recommendation.set_status` registrada (DB + TS) + grant a ≥1 rol operador real + coverage test verde.
-- [ ] Evento outbox `growth.ai_visibility.recommendation_status_changed` en el event catalog y publicándose en dev.
-- [ ] Sin lógica duplicada: UI/Nexa/MCP consumen el mismo command/reader (Full API Parity).
+- [x] Existe `greenhouse_growth.grader_recommendation_status` (con `source_run_id` FK nullable) + history (append-only vía trigger) con CHECK del enum (`not_started|in_progress|blocked|done|dismissed`) y GRANTs runtime; migración con bloque DO de verificación. Verificado contra PG real (2 tablas, 18 cols, CHECK con `blocked`).
+- [x] `setRecommendationStatus` self-guarda con la capability, valida `recommendation_key` contra `RECOMMENDATION_GAP_KEYS`, exige `reason` en `blocked|dismissed`, es idempotente no-op (mismo status+reason → sin history/outbox), atómico (current+history+outbox transaccional) y emite errores canónicos. 10 focal tests + SQL ejercido contra PG real (ROLLBACK).
+- [x] `readRecommendationStatuses` devuelve el status por recomendación de una org; degrada honesto `[]` cuando no hay filas.
+- [x] Capability `growth.ai_visibility.recommendation.set_status` registrada (DB seed + TS catalog) + grant al set operador + coverage test verde (2/2).
+- [x] Evento outbox `growth.ai_visibility.recommendation_status_changed` v1 en el event catalog (Delta); emitido transaccional desde el command (test verifica payload + client).
+- [x] Sin lógica duplicada: el primitive vive en `src/lib/growth/ai-visibility/recommendation-status.ts`; route + UI/Nexa/MCP son clientes (Full API Parity).
 
 ## Verification
 
@@ -273,13 +273,13 @@ not_started <-> in_progress <-> done
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` sincronizado (`in-progress` al tomar, `complete` al cerrar)
-- [ ] archivo en la carpeta correcta
-- [ ] `docs/tasks/README.md` sincronizado
-- [ ] `Handoff.md` actualizado
-- [ ] `changelog.md` actualizado
-- [ ] chequeo de impacto cruzado (TASK-1276, TASK-1248)
-- [ ] Delta en `GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md` con el contrato de status
+- [x] `Lifecycle` sincronizado (`in-progress` al tomar, `complete` al cerrar)
+- [x] archivo en la carpeta correcta (`complete/`)
+- [x] `docs/tasks/README.md` sincronizado + `TASK_ID_REGISTRY.md`
+- [x] `Handoff.md` actualizado
+- [x] `changelog.md` actualizado
+- [x] chequeo de impacto cruzado: TASK-1276 (consume `setRecommendationStatus` + `readRecommendationStatuses` — su wireframe/flow ya los nombra) y TASK-1248 (follow-up read del status); ambos siguen en su estado.
+- [x] Delta en `GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md` con el contrato de status
 
 ## Follow-ups
 
@@ -288,7 +288,7 @@ not_started <-> in_progress <-> done
 
 ## Open Questions
 
-- Lane del API del command (`Product API interna` vs `api/platform/app`): resolver en Discovery.
+- ~~Lane del API del command (`Product API interna` vs `api/platform/app`)~~ **Resuelto:** Product API interna `/api/admin/growth/ai-visibility/recommendation-status` (mismo lane que `assign-tier` de TASK-1286).
 - ~~¿`reason` obligatorio al `dismissed`?~~ **Resuelto 2026-06-29:** sí, `reason` obligatorio en `dismissed` Y `blocked` (trazabilidad del descarte/bloqueo); opcional en el resto.
 
 ## Delta 2026-06-29 — review multi-lente (arch · commercial · seo-aeo · product/state-design)

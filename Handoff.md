@@ -34097,3 +34097,19 @@ Foundation backend (reader-only, additive) que desbloquea TASK-1276 Slices 1/3. 
 - Commits: `3e4e255db` (Slice 1), `ddb945247` (Slice 2), `2a5f9b382` (Slice 3), `9fd33e7b2` (cierre).
 
 Nota concurrencia: durante esta sesión Codex tenía WIP sin commitear de su "task execution harness" (AGENTS/CLAUDE/project_context/Handoff/changelog/codex scripts). NO lo barrí — stageé solo paths explícitos míos. Estas entradas (Handoff/changelog) quedan SIN stagear para que las commitees junto al WIP de Codex. Sin push (local-first).
+
+---
+
+## TASK-1275 — Recommendation Execution-Status del Plan AEO — COMPLETE (develop, local, sin push) — 2026-06-29 — Claude
+
+Contrato backend del avance del Plan AEO (org × gap_key). Cerrada end-to-end en 3 slices:
+
+- **Schema** (`greenhouse_growth`): `grader_recommendation_status` + `_history` (append-only por trigger). Ancla `org × gap_key` PERSISTENTE entre re-grades (sin run_id en la PK) + `source_run_id` FK provenance. CHECK `not_started|in_progress|blocked|done|dismissed` (estado `blocked` nuevo del review).
+- **Command/reader** (`recommendation-status.ts`): `setRecommendationStatus` self-guarda con `can()`, valida key contra `RECOMMENDATION_GAP_KEYS` + reason obligatorio en blocked/dismissed, idempotencia no-op real, UPSERT+history+outbox transaccional. `readRecommendationStatuses` gate-agnostic + degradación honesta.
+- **Capability** `recommendation.set_status` + grant operador + seed migration; coverage verde.
+- **Evento** `growth.ai_visibility.recommendation_status_changed` v1 (EVENT_CATALOG Delta).
+- **Route** `POST/GET /api/admin/growth/ai-visibility/recommendation-status` (parity).
+- Commits: `3fcf9c8e7` (intake), `9dd085d87` (S1), `be2e1f1ba` (S2), `276cb6950` (S3).
+- Gates: typecheck + suite full (8479) + build + 10 focal + smoke PG (UPSERT/history/FK ROLLBACK).
+
+**Coordinación con Codex (TASK-1286):** Codex trabajó TASK-1286 en vivo sobre los mismos entitlements files. Hubo un incidente: un `git commit` mío barrió por error el índice (que Codex tenía full-staged) — lo revertí con `git reset --mixed HEAD~1` SIN perder nada de Codex; Codex luego commiteó limpio (`085d0faa8`); mi Slice 2/3 editó los entitlements files ya libres. Lección: con Codex concurrente, verificar `git diff --cached --stat` ANTES de cada commit (el índice puede tener WIP ajeno staged). Desbloquea TASK-1276 (write) + follow-up TASK-1248 (read). Sin push (local-first).

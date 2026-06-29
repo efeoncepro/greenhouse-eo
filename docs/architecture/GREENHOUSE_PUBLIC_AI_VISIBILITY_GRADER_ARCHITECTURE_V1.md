@@ -1691,3 +1691,32 @@ de `run.operator`; correr el motor y modificar el entitlement son permisos disti
 **Invariantes operativos.** NUNCA escribir `module_assignments` para AEO con raw INSERT fuera de
 `enableClientPortalModule`. NUNCA activar un tier que habilite run sin profile enlazado o sin web canónica. NUNCA
 tratar `none` como borrado; siempre supersede append-only. `pilot` requiere `expiresAt`.
+
+## Delta 2026-06-29 — TASK-1275 Recommendation execution-status del Plan AEO · EPIC-020
+
+Contrato gobernado del avance de cada recomendación (gap key) del Plan AEO por organización — la capa
+backend que faltaba para que la vista cliente (`/aeo`, TASK-1248) muestre el avance del servicio
+done-for-you y la vista operador (TASK-1276) lo escriba.
+
+- **Schema** (`greenhouse_growth`): `grader_recommendation_status` (current-state, `UNIQUE(organization_id,
+  recommendation_key)`) + `grader_recommendation_status_history` (append-only vía trigger). Ancla
+  `org × gap_key` **persistente entre re-grades** (la PK NO incluye `run_id`); `source_run_id` FK nullable
+  → `grader_runs` = provenance del run que el operador miraba. State machine
+  `not_started|in_progress|blocked|done|dismissed` (CHECK).
+- **Command** `setRecommendationStatus` (`src/lib/growth/ai-visibility/recommendation-status.ts`):
+  self-guarda con `can('growth.ai_visibility.recommendation.set_status','execute','tenant')` (org arbitraria);
+  valida `recommendation_key` contra `RECOMMENDATION_GAP_KEYS` (app-level; el pack es versionado) + `status`
+  enum + `reason` obligatorio en `blocked`/`dismissed`; **idempotencia no-op real** (mismo status+reason →
+  sin history ni outbox); UPSERT current + INSERT history + `publishOutboxEvent` **transaccional** en un
+  `withGreenhousePostgresTransaction`.
+- **Reader** `readRecommendationStatuses(organizationId)`: gate-agnostic (cliente por
+  `requireClientTenantContext` / operador por capability), degradación honesta `[]` = "sin seguimiento aún".
+- **Evento** `growth.ai_visibility.recommendation_status_changed` v1 (`{ org, recommendationKey, fromStatus,
+  toStatus, sourceRunId, updatedBy, reason }`) — sin consumer reactivo en V1; habilita futuro CS health-score/QBR.
+- **Surface** `POST/GET /api/admin/growth/ai-visibility/recommendation-status` (parity; Nexa/MCP consumen el mismo primitive).
+
+**Semántica load-bearing:** `done` = Efeonce **ejecutó el trabajo** del foco, NO "gap cerrada / AEO terminado"
+(el AEO es continuo; el próximo re-grade mide el efecto). **Invariantes:** NUNCA un reader/command que reciba
+org arbitraria sin self-guard `can()`. NUNCA UPDATE/DELETE del history (append-only por trigger). NUNCA emitir
+outbox en el no-op. `done` no cierra la gap — un follow-up puede derivar "marcado `done` pero el re-grade
+posterior a `sourceRunId` regresó → revisar". V1 = capability-gated (sin scoping per-AM; follow-up).

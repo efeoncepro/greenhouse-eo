@@ -9311,3 +9311,7 @@ Comando operativo:
 ## 2026-06-29 — TASK-1287 AEO Operator-Scoped Report Readers (foundation de la vista operador) — EPIC-020
 
 Foundation backend (reader-only, additive) de los dos readers operador-scoped que la vista operador AEO (TASK-1276) consume: `readOperatorScopedAeoReport` (reporte por-org en scope operador; reusa el report builder, NO forkea scoring; self-guarda con `can()` por recibir org arbitraria; `ClientGraderReport` leak-safe) + `readOperatorCrossOrgAeoScores` (agregado del cockpit cross-org con degradación honesta `null≠0`, SQL ejercido contra PG real). Capability `growth.ai_visibility.report.read_operator` + grant operador (mismo set que `run.operator`) + seed migration. Sin push (local). Gates: typecheck + suite full (8453) + build + 8 focal + smoke PG.
+
+## 2026-06-29 — TASK-1275 Recommendation Execution-Status del Plan AEO (contrato backend) — EPIC-020
+
+Estado de ejecución del Plan AEO por organización × recomendación (gap key), persistente entre re-grades con `source_run_id` de provenance. Tabla `grader_recommendation_status` + history append-only, state machine `not_started|in_progress|blocked|done|dismissed` (`blocked`/`dismissed` con reason), command `setRecommendationStatus` (self-guard, idempotencia no-op, UPSERT+history+outbox transaccional) + reader gate-agnostic + capability + evento `recommendation_status_changed` + route parity. Desbloquea la vista operador (TASK-1276, write) y el follow-up cliente (TASK-1248, read). Sin push (local). Gates: typecheck + suite full (8479) + build + 10 focal + smoke PG.
