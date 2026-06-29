@@ -234,3 +234,58 @@ export const resolveRecurringRegradeConfig = (env: NodeJS.ProcessEnv = process.e
   batchSize: Math.max(1, Math.min(50, toPositiveInt(env.GROWTH_AI_VISIBILITY_REGRADE_BATCH_SIZE, 5))),
   monthlyBudgetUsd: toPositiveFloat(env.GROWTH_AI_VISIBILITY_REGRADE_MONTHLY_BUDGET_USD, 50)
 })
+
+/**
+ * TASK-1271 — Prose extraction router. El extractor de prosa (sentiment/category/
+ * drift) sigue gateado por `GROWTH_AI_VISIBILITY_LLM_EXTRACTION_ENABLED` (default OFF);
+ * estos controles solo eligen QUÉ proveedor lo ejecuta cuando ese flag está ON.
+ *
+ * `_PROVIDER` (default `anthropic`, behavior-preserving): proveedor productivo del
+ * extractor. Un valor inválido o no registrado degrada al fallback determinista.
+ * `_SHADOW_ENABLED` (default OFF): NO afecta el path de runs; lo consume sólo el
+ * harness/CLI de eval (TASK-1271 Slice 3) para comparar proveedores sin gastar en
+ * runs normales (Open Question #2 → eval allowlisted, no doble llamado por run).
+ */
+export const GROWTH_AI_VISIBILITY_PROSE_EXTRACTION_PROVIDER_FLAG = 'GROWTH_AI_VISIBILITY_PROSE_EXTRACTION_PROVIDER'
+
+export const GROWTH_AI_VISIBILITY_PROSE_EXTRACTION_SHADOW_FLAG =
+  'GROWTH_AI_VISIBILITY_PROSE_EXTRACTION_SHADOW_ENABLED'
+
+export const PROSE_EXTRACTION_PROVIDER_IDS = ['anthropic', 'gemini', 'openai'] as const
+export type ProseExtractionProviderFlagValue = (typeof PROSE_EXTRACTION_PROVIDER_IDS)[number]
+
+/** Proveedor productivo del extractor. Default `anthropic`; valor desconocido → `anthropic`. */
+export const resolveProseExtractionProvider = (
+  env: NodeJS.ProcessEnv = process.env
+): ProseExtractionProviderFlagValue => {
+  const raw = env[GROWTH_AI_VISIBILITY_PROSE_EXTRACTION_PROVIDER_FLAG]?.trim().toLowerCase()
+
+  return (PROSE_EXTRACTION_PROVIDER_IDS as readonly string[]).includes(raw ?? '')
+    ? (raw as ProseExtractionProviderFlagValue)
+    : 'anthropic'
+}
+
+export const isProseExtractionShadowEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+  isTrue(env[GROWTH_AI_VISIBILITY_PROSE_EXTRACTION_SHADOW_FLAG])
+
+export interface ProseExtractionConfig {
+  provider: ProseExtractionProviderFlagValue
+  /** Tope de tokens de salida por extracción (circuit breaker de costo). */
+  maxOutputTokens: number
+  /** Cost ceiling estimado por extracción (USD); si se excede, se registra para alerta. */
+  maxCostUsd: number
+}
+
+/**
+ * Config del extractor (override por env, defaults conservadores). El paso de
+ * extracción es cognitivamente simple → 1024 tokens basta; el cost ceiling es un
+ * guard de presupuesto, no contabilidad exacta.
+ */
+export const resolveProseExtractionConfig = (env: NodeJS.ProcessEnv = process.env): ProseExtractionConfig => ({
+  provider: resolveProseExtractionProvider(env),
+  maxOutputTokens: Math.max(
+    256,
+    Math.min(4096, toPositiveInt(env.GROWTH_AI_VISIBILITY_PROSE_EXTRACTION_MAX_TOKENS, 1024))
+  ),
+  maxCostUsd: toPositiveFloat(env.GROWTH_AI_VISIBILITY_PROSE_EXTRACTION_MAX_COST_USD, 0.02)
+})
