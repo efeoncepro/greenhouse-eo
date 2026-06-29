@@ -1,4 +1,4 @@
-## Sesion 2026-06-29 — TASK-1270 Growth AI Visibility Recurring Re-Grade — Codex — 🚧 rollout staging en curso
+## Sesion 2026-06-29 — TASK-1270 Growth AI Visibility Recurring Re-Grade — Codex — 🚧 staging rollout aplicado; E2E opt-in pendiente
 
 > **Intake:** pedido `Ejcuta task 1270 y leugo documenta todo lo necesario y luego commit`. Hook Codex ejecutado (`pnpm codex:task-hook 1270`). Trabajo en `develop`, sin branch/worktree nuevo aunque la task declara `task/TASK-1270-growth-ai-visibility-recurring-sov-regrade`; excepción local-first documentada. Se respeta el archivo no trackeado ajeno `docs/documentation/growth/conexion-search-console.md`.
 >
@@ -10,7 +10,7 @@
 >
 > **Signals/docs:** reliability signals `growth.ai_visibility.regrade_lag`, `growth.ai_visibility.regrade_cost`, `growth.ai_visibility.regrade_stale_profiles` wired al overview operativo. Docs actualizadas: arquitectura del grader, feature flag ledger, changelog, task lifecycle/README/registry.
 >
-> **Rollout ejecutado parcialmente:** migración TASK-1270 aplicada en Cloud SQL dev/staging con `pnpm pg:connect:migrate` (columns + capability seed OK; `src/types/db.d.ts` regenerado). Pendiente inmediato: push `develop` para disparar `ops-worker-deploy.yml`, verificar revisión Cloud Run con env `GROWTH_AI_VISIBILITY_REGRADE_ENABLED=true`, verificar Scheduler `ops-growth-grader-regrade` `state=ENABLED`, y smoke `/growth/grader/regrade`. Si no hay perfiles opt-in due, el smoke esperado es `no_due_profiles` (cero costo); para smoke E2E con run real falta opt-in gobernado de 1 perfil contratado. Prod sólo con budget sign-off + release control plane.
+> **Rollout staging aplicado:** migración TASK-1270 aplicada en Cloud SQL dev/staging con `pnpm pg:connect:migrate` (columns + capability seed OK; `src/types/db.d.ts` regenerado). Push `develop` OK (`b5cf815d7`); GitHub Actions `Ops Worker Deploy` run `28348663069` verde en 10m6s; revisión Cloud Run `ops-worker-00417-m86` sirve `GIT_SHA=b5cf815d7cfb20f11ac3833d7f299214a2b90bc5`, `Ready=True`, `GROWTH_AI_VISIBILITY_REGRADE_ENABLED=true`. Scheduler `ops-growth-grader-regrade` verificado `state=ENABLED`, schedule `0 8 * * *`, timezone `America/Santiago`, URI `/growth/grader/regrade`. Smoke manual `gcloud scheduler jobs run ops-growth-grader-regrade`: logs `claimed=0 enqueued=0 failed=0 skipped=no_due_profiles`; DB tiene `opt_in_profiles=0`, `due_profiles=0`, por lo que el smoke fue no-op y sin costo. **Pendiente para mover a complete:** opt-in gobernado de 1 perfil contratado + smoke E2E que cree run recurrente `pending→terminal` y confirme trend/signals. Prod sólo con budget sign-off + release control plane.
 
 ## Sesion 2026-06-29 — TASK-1282 Search Console · rollout staging + property-picker redesign — Claude — ✅ staging VERIFICADO E2E (Berel conectado, datos reales), prod pendiente
 

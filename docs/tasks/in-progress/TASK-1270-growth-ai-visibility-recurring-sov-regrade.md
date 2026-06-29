@@ -18,7 +18,7 @@
 - Motion: `none`
 - Backend impact: `cron`
 - Epic: `EPIC-020`
-- Status real: `Rollout staging en curso`
+- Status real: `Staging rollout aplicado; E2E opt-in pendiente`
 - Rank: `TBD`
 - Domain: `growth|ai|ops|reliability`
 - Blocked by: `none`
@@ -280,9 +280,10 @@ El re-grade es una aplicación de cadencia sobre el run-engine existente: un Clo
 - [x] Re-grade idempotente con lock por perfil (`SKIP LOCKED`); sin runs solapados.
 - [x] Cost ceiling + circuit breaker: budget agotado → degrada con señal, no gasta de más.
 - [x] Reliability signals de re-grade lag / costo / perfiles stale wired a `/admin/operations`.
-- [ ] `pnpm worker:runtime-deps-gate` verde; sin import `@core` worker-bundled.
+- [x] `pnpm worker:runtime-deps-gate` verde; sin import `@core` worker-bundled.
 - [x] Fila por flag en `FEATURE_FLAG_STATE_LEDGER.md`.
-- [ ] Re-grade real de un perfil opt-in en staging vía Cloud Scheduler/manual run; rollout staging en curso.
+- [x] Cloud Scheduler/manual smoke staging sin perfiles due (`claimed=0 enqueued=0 failed=0 skipped=no_due_profiles`, cero costo).
+- [ ] Re-grade real de un perfil opt-in en staging vía Cloud Scheduler/manual run; pendiente de opt-in gobernado.
 
 ## Verification
 
@@ -299,6 +300,9 @@ El re-grade es una aplicación de cadencia sobre el run-engine existente: un Clo
 - [x] `pnpm route-reachability-gate`
 - [x] `pnpm test:observability:summary`
 - [x] `pnpm pg:connect:migrate` (migración TASK-1270 aplicada en Cloud SQL dev/staging; `src/types/db.d.ts` regenerado)
+- [x] Push `develop` `b5cf815d7`; `Ops Worker Deploy` run `28348663069` verde; Cloud Run `ops-worker-00417-m86` `Ready=True`.
+- [x] `gcloud scheduler jobs describe ops-growth-grader-regrade` → `state=ENABLED`, `0 8 * * *`, `America/Santiago`.
+- [x] `gcloud scheduler jobs run ops-growth-grader-regrade` + logs Cloud Run → `claimed=0 enqueued=0 failed=0 skipped=no_due_profiles` (DB: `opt_in_profiles=0`, `due_profiles=0`).
 - [ ] `NEXT_BUILD_CPUS=2 NODE_OPTIONS=--max-old-space-size=8192 pnpm build` (compilación Turbopack exitosa con warning preexistente de `roadmap/work-item-index`; proceso interrumpido tras quedar sin salida en etapa post-compile/TypeScript, con `tsc` explícito verde)
 - [ ] Re-grade real de un perfil opt-in en staging vía Cloud Scheduler/manual run
 
