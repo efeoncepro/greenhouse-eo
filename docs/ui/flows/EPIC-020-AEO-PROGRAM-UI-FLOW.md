@@ -65,7 +65,7 @@ La superficie que ve una persona **se deriva de su tier de entitlement** (TASK-1
 | S8 | **Operator cockpit** | `/growth/aeo` | operador | a crear | 1276 |
 | S9 | **Operator per-subject detail** | `/growth/aeo/[organizationId]` | operador | a crear | 1276 |
 | S10 | **Subject picker + run operador** | en S8/S9 | operador | a crear | 1276+1277 |
-| S11 | **Enviar informe + abrir oportunidad** | confirm en S9 (consent gate) | operador | a crear | 1276+1279 |
+| S11 | **Enviar informe + crear Lead** (HubSpot `leads`, no Deal) | confirm en S9 (consent gate) | operador | a crear | 1276+1279 |
 | S12 | **Account 360 facet "AEO"** | Organization Workspace | operador | a crear | 1276 |
 | S13 | **Admin Review UI** (gate pre-publicación) | `/api/admin/.../reviews` UI | admin reviewer | a crear | 1247 |
 | S14 | **Report artifact (render compartido)** | web/print/pdf | todas | hecho | 1252/1273 |
@@ -116,11 +116,11 @@ S8 cockpit /growth/aeo (lista clientes+prospectos con score+último run)
   → S10 subject picker (cliente contratado / sin AEO / prospecto HubSpot org-sincronizado)
   → S10 "Correr AEO" (requestGraderRunAsOperator, ilimitado, costo→sales) → preparing → S9
   → S9 detalle con FOCO COMPETITIVO (marca vs competidores / share-of-voice = gancho)  [dataviz-design]
-  → S11 "Enviar informe + abrir oportunidad":
+  → S11 "Enviar informe + crear Lead":
         consent gate → prospecto requiere consentimiento capturado (post-conversación); cliente=relación
-        → propose→confirm→execute → sendAeoReportAndOpenOpportunity (TASK-1279)
-        → S3 email al contacto + deal HubSpot (Expansion cliente / New Business prospecto) + aeo_check_result
-  → estado "enviado · oportunidad abierta" (link al deal) o degradación honesta (email ok, deal pendiente)
+        → propose→confirm→execute → sendAeoReportAndCreateLead (TASK-1279)
+        → S3 email al contacto + Lead HubSpot (objeto `leads`, tipo expansion cliente / new_business prospecto, asociado a Contact/Company) + aeo_check_result en el objeto asociado
+  → estado "enviado · Lead creado" (link al Lead) o degradación honesta (email ok, Lead pendiente). NO crea Deal: la conversión Lead→Deal es posterior
 ```
 - **Entrada alterna:** S12 Account 360 facet "AEO" → deep-link a S9 del cliente.
 
@@ -170,7 +170,7 @@ Cada acción visible = un command server-side (UI/Nexa/MCP son clientes del mism
 | Leer report (cliente) | reader client-scoped (boundary) | 1243 | S5 |
 | Leer status del Plan | `readRecommendationStatuses` | 1275 | S5/S7 |
 | Escribir status del Plan | `setRecommendationStatus` | 1275 | S7 (operador) · Nexa |
-| Enviar + abrir oportunidad | `sendAeoReportAndOpenOpportunity` | 1279 | S11 · Nexa |
+| Enviar + crear Lead (no Deal) | `sendAeoReportAndCreateLead` | 1279 | S11 · Nexa |
 | Aprobar/publicar run | review/approve · report/publish | 1247 | S13 |
 
 → Consecuencia: **Nexa puede operar todo el programa** ("corré AEO de Sky y mandáselo") por construcción.
@@ -221,7 +221,7 @@ Cada acción visible = un command server-side (UI/Nexa/MCP son clientes del mism
 | 1276 | S8/S9/S10/S11/S12 operador | to-do |
 | 1277 | resolución de superficie por tier (gate) | to-do |
 | 1278 | S6 tiering + PLG | to-do |
-| 1279 | S11 enviar + oportunidad (command) | to-do |
+| 1279 | S11 enviar + crear Lead (command) | to-do |
 
 ---
 
