@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.16
+> **Version:** 1.17
 > **Creado:** 2026-06-24 por Claude (TASK-1226)
-> **Ultima actualizacion:** 2026-06-29 por Claude (TASK-1278 — experiencia cliente por tier + trial PLG en el portal)
+> **Ultima actualizacion:** 2026-06-29 por Claude (TASK-1279 — cross-sell operador: enviar informe + crear Lead, no Deal)
 > **Documentacion tecnica:** [GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md)
 
 # AI Visibility Grader — Motor de Providers (Growth)
@@ -177,6 +177,20 @@ Mostrar el resultado en pantalla no basta: si el prospecto cierra la pestaña, p
 - **Seguro de compartir:** el adjunto es la versión **pública** del informe — nunca incluye el texto crudo de los motores, los hallazgos internos de exactitud ni datos privados.
 
 > Detalle técnico: `GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md` §Delta 2026-06-27 (TASK-1250). Código: `src/lib/growth/ai-visibility/public-delivery/email/**`, template `src/emails/AiVisibilityGraderReportEmail.tsx`. Evento `growth.ai_visibility.report_email_requested` → consumer `growth_ai_visibility_report_email`. **Estado:** staging ON en worker + Vercel y smoke real ya dejó 1 dispatch enviado; producción OFF/gated por TASK-1246. Operación: [manual de smoke](../../manual-de-uso/growth/ai-visibility-grader-smoke.md).
+
+## Cross-sell del operador — enviar informe + crear Lead (TASK-1279)
+
+Cuando un operador de Efeonce (Growth/Account) corre el grader sobre un **cliente** o un **prospecto** (una empresa que ya existe en HubSpot) y ve la brecha frente a sus competidores, puede **enviar el informe** a la persona de contacto y, al mismo tiempo, **abrir un Lead en HubSpot** de forma trazable. Es el cierre comercial del diagnóstico: correr → mostrar la situación → enviar → registrar el interés.
+
+**Qué crea: un Lead, NO un Negocio (Deal).** El diagnóstico es una conversación temprana (tope del embudo). Por eso se crea un **Lead** (asociado al Contacto y/o la Empresa), nunca un Deal. Un Deal es un momento comercial más avanzado (una oportunidad ya calificada); crearlo en esta etapa ensuciaría el pipeline. El Lead nace con un tipo según la relación: **expansión** (cliente actual) o **nuevo negocio** (prospecto).
+
+**Regla de consentimiento (nunca en frío).** El envío a un **prospecto** solo se permite por **interés legítimo** y con un **consentimiento capturado** en una conversación previa (se registra una referencia al consentimiento, nunca el dato crudo). Sin ese consentimiento el sistema **rechaza el envío**. A un **cliente con relación activa** se le envía como parte del servicio. Todo envío queda en una bitácora que no se borra (quién envió, a quién, qué informe, con qué base legal, qué Lead se creó).
+
+**Qué recibe el contacto.** El mismo informe público-seguro del lead magnet (PDF con marca Efeonce), sin datos internos del motor. El resultado del análisis ("aparece / no aparece / no verificado") queda registrado en la Empresa dentro de HubSpot.
+
+**Cómo se opera.** Hoy, vía el contrato programático gobernado (`POST /api/admin/growth/ai-visibility/runs/[runId]/send-lead`) y, a futuro, desde la vista de operador y desde Nexa (con confirmación humana). Requiere que el informe del análisis esté **publicado** antes de enviarlo. El envío real está **apagado por flag** hasta completar el rollout (ver manual). Si algo falla (entrega o creación del Lead), un proceso en segundo plano lo reintenta sin re-enviar lo ya enviado, y una señal de salud lo marca.
+
+> Detalle técnico: §Delta TASK-1279 en [GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md). Operación paso a paso: [manual — enviar informe + crear Lead](../../manual-de-uso/growth/enviar-informe-aeo-crear-lead.md).
 
 ## Límites actuales
 
