@@ -6572,6 +6572,22 @@ export interface GreenhouseGrowthFormVersion {
   version: number;
 }
 
+export interface GreenhouseGrowthGraderBrandIntelligence {
+  brand_intelligence_id: Generated<string>;
+  candidate_business_model: string | null;
+  candidate_category_node: string | null;
+  confidence: Numeric | null;
+  created_at: Generated<Timestamp>;
+  fine_category: string | null;
+  model: string | null;
+  profile_id: string;
+  provider: string | null;
+  signals_used: Generated<Json>;
+  status: Generated<string>;
+  version: number;
+  what_the_brand_does: string | null;
+}
+
 export interface GreenhouseGrowthGraderIntakeEvents {
   created_at: Generated<Timestamp>;
   email_hash: string | null;
@@ -11013,6 +11029,7 @@ export interface DB {
   "greenhouse_growth.form_submission": GreenhouseGrowthFormSubmission;
   "greenhouse_growth.form_submission_consent_snapshot": GreenhouseGrowthFormSubmissionConsentSnapshot;
   "greenhouse_growth.form_version": GreenhouseGrowthFormVersion;
+  "greenhouse_growth.grader_brand_intelligence": GreenhouseGrowthGraderBrandIntelligence;
   "greenhouse_growth.grader_intake_events": GreenhouseGrowthGraderIntakeEvents;
   "greenhouse_growth.grader_leads": GreenhouseGrowthGraderLeads;
   "greenhouse_growth.grader_probe_results": GreenhouseGrowthGraderProbeResults;

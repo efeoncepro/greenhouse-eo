@@ -27,7 +27,10 @@ const spies = { enqueue: vi.fn(), outbox: vi.fn() }
 vi.mock('../flags', () => ({
   isPortalRunEnabled: () => state.portalEnabled,
   isTrialTierEnabled: () => state.trialEnabled,
-  isGraderEnabled: () => state.graderEnabled
+  isGraderEnabled: () => state.graderEnabled,
+  // TASK-1288 — guard de categoría OFF en estos tests (default productivo); su cobertura
+  // específica vive en category-guard.test.ts.
+  isCategoryGuardEnabled: () => false
 }))
 
 vi.mock('../entitlement', () => ({
