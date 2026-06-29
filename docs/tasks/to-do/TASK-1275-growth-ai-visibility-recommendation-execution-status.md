@@ -29,7 +29,7 @@
 
 ## Summary
 
-Crea el contrato gobernado de **estado de ejecución de las recomendaciones del Plan AEO** (por organización × recomendación): un operador de Efeonce marca cada foco como `not_started | in_progress | done | dismissed`, con audit append-only + outbox. Es la capa backend que falta para que la vista cliente del informe AEO (TASK-1248, `/aeo`) muestre el status del "Plan AEO" (hoy V1 sin status) y para que la vista operador (TASK-1276) lo edite.
+Crea el contrato gobernado de **estado de ejecución de las recomendaciones del Plan AEO** (por organización × recomendación = gap key, **persistente entre re-grades**): un operador de Efeonce marca cada foco como `not_started | in_progress | blocked | done | dismissed`, con `source_run_id` de provenance, audit append-only + outbox. Es la capa backend que falta para que la vista cliente del informe AEO (TASK-1248, `/aeo`) muestre el status del "Plan AEO" (hoy V1 sin status) y para que la vista operador (TASK-1276) lo edite.
 
 ## Why This Task Exists
 
@@ -37,8 +37,8 @@ TASK-1248 cerró la vista cliente reencuadrando las recomendaciones como **"Plan
 
 ## Goal
 
-- Tabla canónica de estado de ejecución por `organization_id` × recomendación (gap key) × grader run, con state machine + CHECK + audit trio.
-- Command gobernado `setRecommendationStatus` (capability + grant en el mismo PR, tenant-safe, idempotente, audit + outbox, errores canónicos) y reader `readRecommendationStatuses`.
+- Tabla canónica de estado de ejecución por `organization_id` × recomendación (gap key), **persistente entre re-grades** (la PK NO incluye `run_id`), con `source_run_id` de provenance, state machine + CHECK + audit trio.
+- Command gobernado `setRecommendationStatus` (capability + grant en el mismo PR, tenant-safe, idempotente **no-op real**, valida `recommendation_key` contra `RECOMMENDATION_GAP_KEYS`, audit + outbox, errores canónicos) y reader `readRecommendationStatuses`.
 - Contrato consumible por la vista cliente (read-only del status) y por la vista operador (write) — TASK-1276 — sin lógica duplicada por consumer.
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -60,8 +60,8 @@ Reglas obligatorias:
 
 - La regla de negocio vive en `src/lib/growth/ai-visibility/**` (command + reader), NUNCA dentro de un componente UI.
 - Capability nueva + grant a ≥1 rol real en el MISMO PR (guard `src/lib/entitlements/capability-grant-coverage.test.ts`).
-- Migration con marker `-- Up Migration` + bloque DO de verificación post-DDL (anti pre-up-marker bug); CHECK constraint para el enum de status.
-- Tenant-safe: el status se ancla a `organization_id`; un operador solo puede escribir sobre orgs en su scope; el cliente solo lee el status de SU org (espeja `requireClientTenantContext` de TASK-1248).
+- Migration con marker `-- Up Migration` + bloque DO de verificación post-DDL (anti pre-up-marker bug); CHECK constraint para el enum de status (`not_started|in_progress|blocked|done|dismissed`). `recommendation_key` NO se valida con CHECK SQL hardcodeado (el pack es versionado en TS) sino a nivel app contra `RECOMMENDATION_GAP_KEYS`.
+- Tenant-safe: el status se ancla a `organization_id`; el write self-guarda con la capability (V1 = capability-gated: un interno con la capability escribe sobre cualquier client-org; el scoping per-AM no existe como primitive — igual que TASK-1277/1287 — y queda follow-up). El cliente solo lee el status de SU org (espeja `requireClientTenantContext` de TASK-1248).
 - Escritura apta para `propose → confirm → execute` (runtime de acción gobernada Nexa); el LLM nunca escribe directo.
 
 ## Normative Docs
@@ -116,19 +116,21 @@ Reglas obligatorias:
 ### Contract surface
 
 - Contrato existente a respetar: reader client-scoped del reporte (TASK-1243) + `RecommendationGapKey`.
-- Contrato nuevo: command `setRecommendationStatus({ organizationId, recommendationKey, status, reason? })` + reader `readRecommendationStatuses(organizationId)` + evento outbox `growth.ai_visibility.recommendation_status_changed`.
+- Contrato nuevo: command `setRecommendationStatus({ organizationId, recommendationKey, status, sourceRunId?, reason? })` + reader `readRecommendationStatuses(organizationId)` + evento outbox `growth.ai_visibility.recommendation_status_changed` con payload `{ organizationId, recommendationKey, fromStatus, toStatus, sourceRunId, updatedBy, reason? }` (rico para que un futuro CS health-score / QBR digest lo consuma sin reproceso).
 - Backward compatibility: `compatible` (additive; sin status, la UI degrada a "sin seguimiento aún").
 - Full API parity: la regla vive en `src/lib/growth/ai-visibility/**`; UI/Nexa/MCP son clientes del mismo command/reader.
 
 ### Data model and invariants
 
-- Entidades/tablas afectadas: `greenhouse_growth.grader_recommendation_status` (current-state) + `greenhouse_growth.grader_recommendation_status_history` (append-only) `[verificar schema greenhouse_growth]`.
+- Entidades/tablas afectadas: `greenhouse_growth.grader_recommendation_status` (current-state) + `greenhouse_growth.grader_recommendation_status_history` (append-only). Schema `greenhouse_growth` confirmado (TASK-1226).
 - Invariantes:
-  - `status` ∈ `{not_started, in_progress, done, dismissed}` (CHECK constraint).
-  - Una fila current-state por `(organization_id, recommendation_key)`; las transiciones son append-only en el history (NUNCA UPDATE destructivo del history).
-  - El status pertenece a una `organization_id` cliente; jamás se materializa para un perfil sin org enlazada.
-- Tenant/space boundary: write gated por capability + scope de org del operador; read client-scoped por `requireClientTenantContext` (cliente) o por scope de org (operador).
-- Idempotency/concurrency: command idempotente por `(organization_id, recommendation_key, status)`; transición dentro de `withTransaction` (current-state + history + outbox atómicos).
+  - `status` ∈ `{not_started, in_progress, blocked, done, dismissed}` (CHECK constraint). `blocked` = esperando insumo del cliente/externo (con `reason`); `dismissed` = el equipo descarta el foco (con `reason`).
+  - `recommendation_key` ∈ `RECOMMENDATION_GAP_KEYS` (6 gap keys) — validado a nivel app contra el contrato TS (NO CHECK SQL, el pack es versionado). Supuesto: la gap key es estable entre `recommendation_pack_version` (v1); un pack v2 que renombre/elimine una key requeriría migración de status.
+  - Una fila current-state por `(organization_id, recommendation_key)` — **persistente entre re-grades** (la PK NO incluye `run_id`). `source_run_id` (FK nullable a `grader_runs`) registra el run que el operador miraba al setear el status (provenance), sin atar la persistencia al run.
+  - `done` = Efeonce **ejecutó el trabajo** del foco, NO "gap cerrada / AEO terminado" (el AEO es continuo; el próximo re-grade mide el efecto). Los consumers (1248/1276) etiquetan acorde.
+  - Las transiciones son append-only en el history (NUNCA UPDATE destructivo del history). El status pertenece a una `organization_id` cliente; jamás se materializa para un perfil sin org enlazada.
+- Tenant/space boundary: write self-guarda con la capability (V1 capability-gated, sin scoping per-AM — ver Reglas obligatorias); read client-scoped por `requireClientTenantContext` (cliente) o por capability (operador).
+- Idempotency/concurrency: **no-op real** — si el `status` Y el `reason` entrantes igualan el current-state, el command NO appendea history ni publica outbox (evita inundar el history append-only). Toda transición real corre dentro de `withTransaction` (current-state UPSERT + history INSERT + outbox INSERT atómicos).
 - Audit/outbox/history: history append-only + evento outbox (reactive/Nexa). Sin borrar filas.
 
 ### Migration, backfill and rollout
@@ -141,8 +143,8 @@ Reglas obligatorias:
 
 ### Security and access
 
-- Auth/access gate: capability `growth.ai_visibility.recommendation.set_status` (write, roles internos operador) + read gateado por org scope / capability de lectura del informe.
-- Sensitive data posture: sin PII (gap keys + status + org_id); `reason` opcional es texto operativo, no sensible.
+- Auth/access gate: capability `growth.ai_visibility.recommendation.set_status` (write; el reader self-guarda con esta capability por recibir org arbitraria, igual que TASK-1287) + read cliente por `requireClientTenantContext`. Grant al set operador (mismo que `run.operator`/`report.read_operator`).
+- Sensitive data posture: sin PII (gap keys + status + org_id + run_id); `reason` es texto operativo, no sensible (obligatorio en `blocked|dismissed`).
 - Error contract: `canonicalErrorResponse` + `captureWithDomain(err, 'growth', …)`; sin prosa cruda inglesa al cliente.
 - Abuse/rate-limit posture: write gated por capability + idempotencia; sin rate-limit dedicado (volumen bajo, operador interno).
 
@@ -176,12 +178,12 @@ Reglas obligatorias:
 
 ### Slice 1 — Schema + state machine + audit
 
-- Migration additive: `grader_recommendation_status` (current-state) + `grader_recommendation_status_history` (append-only) + CHECK del enum + GRANTs runtime + bloque DO de verificación.
+- Migration additive: `grader_recommendation_status` (current-state, con `source_run_id` FK nullable) + `grader_recommendation_status_history` (append-only) + CHECK del enum (`not_started|in_progress|blocked|done|dismissed`) + GRANTs runtime + bloque DO de verificación.
 - Regenerar `src/types/db.d.ts`.
 
 ### Slice 2 — Command + reader + capability/grant
 
-- `setRecommendationStatus` (write gobernado: capability, tenant-safe, idempotente, `withTransaction` current+history+outbox, errores canónicos).
+- `setRecommendationStatus` (write gobernado: capability self-guard, valida `recommendation_key` contra `RECOMMENDATION_GAP_KEYS` + `reason` obligatorio si `blocked|dismissed`, idempotencia no-op real, `withTransaction` current+history+outbox, errores canónicos).
 - `readRecommendationStatuses(organizationId)` (reader canónico).
 - Capability `growth.ai_visibility.recommendation.set_status` en registry (DB seed) + catalog TS + grant a ≥1 rol operador real en `runtime.ts` (mismo PR) + coverage test.
 - Evento outbox `growth.ai_visibility.recommendation_status_changed` en el event catalog.
@@ -189,7 +191,7 @@ Reglas obligatorias:
 ### Slice 3 — API surface (parity) + tests
 
 - Ruta del command `[verificar lane: product API interna]` + reader expuesto para los consumers.
-- Focal tests: transición, idempotencia, boundary (org ajena rechazada), enum CHECK, leak-safe.
+- Focal tests: transición, idempotencia no-op (mismo status+reason → sin history/outbox), `recommendation_key` inválida rechazada, `reason` obligatorio en `blocked|dismissed`, boundary (sin capability rechazado), enum CHECK, leak-safe.
 
 ## Out of Scope
 
@@ -203,12 +205,14 @@ State machine canónica (sin orden forzado entre estados; cualquier transición 
 
 ```text
 not_started <-> in_progress <-> done
-"dismissed" alcanzable desde cualquier estado (foco descartado por el equipo, con reason)
+"blocked"   alcanzable desde cualquier estado (esperando insumo del cliente/externo, reason OBLIGATORIO)
+"dismissed" alcanzable desde cualquier estado (foco descartado por el equipo, reason OBLIGATORIO)
 ```
 
-- `grader_recommendation_status(organization_id, recommendation_key, status, updated_by, updated_at, reason)` UNIQUE`(organization_id, recommendation_key)`.
-- `grader_recommendation_status_history(...append-only..., changed_by, changed_at, from_status, to_status, reason)`.
-- El command hace UPSERT del current-state + INSERT del history + INSERT outbox, todo en una tx.
+- `grader_recommendation_status(organization_id, recommendation_key, status, source_run_id, updated_by, updated_at, reason)` UNIQUE`(organization_id, recommendation_key)`. `source_run_id` FK nullable → `greenhouse_growth.grader_runs(run_id)` (ON DELETE SET NULL; provenance, no atadura de persistencia).
+- `grader_recommendation_status_history(...append-only..., source_run_id, changed_by, changed_at, from_status, to_status, reason)`.
+- El command: valida `recommendation_key ∈ RECOMMENDATION_GAP_KEYS` + `reason` obligatorio si `status ∈ {blocked, dismissed}`; si `(status,reason)` == current → no-op; si cambia → UPSERT current-state + INSERT history + INSERT outbox, todo en una tx.
+- **`done` NO cierra la gap**: el siguiente re-grade puede reabrirla (score peor). Un follow-up (no scope) puede derivar la señal "marcado `done`, pero el run posterior a `source_run_id` regresó → revisar" comparando `source_run_id` con el último run.
 
 ## Rollout Plan & Risk Matrix
 
@@ -253,8 +257,8 @@ not_started <-> in_progress <-> done
 
 ## Acceptance Criteria
 
-- [ ] Existe `greenhouse_growth.grader_recommendation_status` + history (append-only) con CHECK del enum y GRANTs runtime; migración con bloque DO de verificación.
-- [ ] `setRecommendationStatus` es tenant-safe, idempotente, atómico (current+history+outbox) y emite errores canónicos.
+- [ ] Existe `greenhouse_growth.grader_recommendation_status` (con `source_run_id` FK nullable) + history (append-only) con CHECK del enum (`not_started|in_progress|blocked|done|dismissed`) y GRANTs runtime; migración con bloque DO de verificación.
+- [ ] `setRecommendationStatus` self-guarda con la capability, valida `recommendation_key` contra `RECOMMENDATION_GAP_KEYS`, exige `reason` en `blocked|dismissed`, es idempotente no-op (mismo status+reason → sin history/outbox), atómico (current+history+outbox) y emite errores canónicos.
 - [ ] `readRecommendationStatuses` devuelve el status por recomendación de una org; degrada honesto cuando no hay filas.
 - [ ] Capability `growth.ai_visibility.recommendation.set_status` registrada (DB + TS) + grant a ≥1 rol operador real + coverage test verde.
 - [ ] Evento outbox `growth.ai_visibility.recommendation_status_changed` en el event catalog y publicándose en dev.
@@ -285,7 +289,18 @@ not_started <-> in_progress <-> done
 ## Open Questions
 
 - Lane del API del command (`Product API interna` vs `api/platform/app`): resolver en Discovery.
-- ¿`reason` obligatorio al `dismissed`? (probable sí, para trazabilidad del descarte).
+- ~~¿`reason` obligatorio al `dismissed`?~~ **Resuelto 2026-06-29:** sí, `reason` obligatorio en `dismissed` Y `blocked` (trazabilidad del descarte/bloqueo); opcional en el resto.
+
+## Delta 2026-06-29 — review multi-lente (arch · commercial · seo-aeo · product/state-design)
+
+6 ajustes tras revisión con las skills `arch-architect`, `commercial-expert`, `seo-aeo`, `greenhouse-product-ui-architect`:
+
+- **Ancla = `org × gap_key` persistente (drift resuelto) + `source_run_id` provenance.** El Summary decía "× grader run"; el schema correcto NO incluye `run_id` en la PK (el status persiste entre re-grades). Se agrega `source_run_id` (FK nullable) como provenance del run que el operador miraba — habilita el follow-up "marcado `done` pero el re-grade posterior regresó → revisar".
+- **Semántica de `done`:** = Efeonce ejecutó el trabajo del foco, NO "gap cerrada / AEO terminado" (el AEO es continuo). Documentado para que 1248/1276 no lo etiqueten como "resuelto".
+- **Estado nuevo `blocked`** (esperando insumo del cliente/externo, `reason` obligatorio): cubre el caso real (entity facts, sign-off PR, info de oferta) y es palanca comercial/QBR (hace visible la dependencia del cliente). Enum = `not_started|in_progress|blocked|done|dismissed`.
+- **`recommendation_key` validada** contra `RECOMMENDATION_GAP_KEYS` (6) a nivel app (NO CHECK SQL; el pack es versionado en TS).
+- **Idempotencia = no-op real:** mismo `status`+`reason` → sin history ni outbox (anti inundación del history append-only).
+- **Scoping honesto + payload del evento:** V1 capability-gated (sin scoping per-AM, consistente con TASK-1277/1287; el reader self-guarda con `can()`). El evento outbox lleva `from→to + source_run_id + updatedBy` para un futuro CS health-score / QBR digest. Open Question de `reason` resuelta (obligatorio en `blocked|dismissed`).
 
 ## Delta 2026-06-28 — conectada al Master UI Flow del programa AEO
 
