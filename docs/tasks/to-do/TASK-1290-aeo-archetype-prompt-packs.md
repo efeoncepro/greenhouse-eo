@@ -77,7 +77,7 @@ Reglas obligatorias:
 
 ### Depende de
 
-- **TASK-1288** (categoría canónica + label) y **TASK-1289** (business_model). Bloqueante.
+- **TASK-1288** (categoría canónica + label + **`brand_intelligence` snapshot compartido** que el autor LLM consume como grounding) y **TASK-1289** (business_model). Bloqueante.
 
 ### Impacta a
 
@@ -202,7 +202,7 @@ Dos tiempos separados. **Autoría** (no por run): el LLM, dada la marca + catego
 
 El LLM autor **mina el espacio de queries de buyer-intent** (no es el grounding de la medición — el grounding real es el run contra los motores; el LLM sólo *propone* las preguntas). Dos decisiones canónicas:
 
-- **Autoría *grounded* (no a ciegas):** el LLM recibe señales REALES de la marca como contexto, no solo el nombre/categoría: el **site probe** (TASK-1266, ya existe), la lista de **competidores** declarados, y (si está disponible) **datos de búsqueda** (Semrush/PAA). Esto hace las queries específicas y locales (rutas/precio para una aerolínea), no genéricas. Lo usado queda en `grounding_sources_json` (provenance). Degradación honesta: sin señales → autoría solo desde marca+categoría+modelo (peor, pero no roto) o baseline.
+- **Autoría *grounded* (no a ciegas):** el LLM recibe el **`brand_intelligence` snapshot compartido** (TASK-1288 — ya leyó el site probe TASK-1266 + entity TASK-1267 y entendió qué hace la marca) + la categoría canónica + el modelo de negocio + competidores. **NO re-lee el sitio** (consume el snapshot; la lectura es una sola pasada compartida). Esto hace las queries específicas y locales (rutas/precio para una aerolínea), no genéricas. Lo usado queda en `grounding_sources_json` (provenance). Degradación honesta: sin snapshot → autoría solo desde marca+categoría+modelo (peor, pero no roto) o baseline.
 - **System prompt = experto AEO versionado, derivado de la doctrina canónica:** el rol del LLM NO se inventa — se deriva de la skill `seo-aeo` (Query Fan-Out, etapas de buyer-intent, sub-query types, framing por modelo de negocio, restricción **no-leading**) + la taxonomía del pack actual (`family`/`fanOutType`/`intentStage`/`namesBrand`). El system prompt es un **artefacto versionado** (`system_prompt_version` en el set): cambiarlo cambia la versión del set → la **eval (TASK-1292) lo re-valida** (ningún cambio del "cerebro" sin eval).
 - **Output ESTRUCTURADO, no texto libre:** el LLM devuelve queries tipadas con sus tags (`family`/`fanOutType`/`intentStage`/`namesBrand`/`text`), mismo shape que el pack actual, vía el helper structured del cliente canónico. Es obligatorio: el **scoring depende de esos tags** (ej. `namesBrand=false` = prompt de descubrimiento). Texto suelto rompería el motor.
 

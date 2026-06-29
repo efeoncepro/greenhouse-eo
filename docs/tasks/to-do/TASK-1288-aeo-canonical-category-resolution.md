@@ -1,4 +1,4 @@
-# TASK-1288 — AEO: resolución de categoría canónica (taxonomía + mapeo HubSpot enum + label)
+# TASK-1288 — AEO: Brand Intelligence (lectura grounded compartida) + resolución de categoría canónica
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
@@ -29,17 +29,17 @@
 
 ## Summary
 
-Deja de inyectar el enum crudo de HubSpot (`organizations.industry = 'AIRLINES_AVIATION'`) en los prompts del grader. El perfil pasa a guardar una **categoría canónica** resuelta contra la taxonomía (`taxonomy/catalog.ts`): `category_node_id` (ej. `industry:transportation_airlines`) + `category_label` localizada. Resolver canónico con cascada de fuentes (HubSpot industry enum → website intelligence → fallback), tabla de mapeo HubSpot→taxonomía, y un **guard**: categoría no resuelta (`unknown`) bloquea el run/envío en vez de generar un prompt roto. Foundation de EPIC-021; primer paso del cierre de **ISSUE-110**.
+Foundation transversal de EPIC-021: introduce **`brand_intelligence`** — una **lectura grounded compartida** de la marca (LLM lee el **site probe** de TASK-1266 + el eje **entity** de TASK-1267 (KG/Wikidata) y produce un snapshot estructurado) que **TASK-1288/1289/1290 consumen** (categoría, modelo de negocio, prompts) — se lee UNA vez, se derivan tres cosas. Sobre esa base, esta task **resuelve la categoría canónica**: el perfil deja de guardar el enum crudo de HubSpot (`organizations.industry = 'AIRLINES_AVIATION'`) y persiste `category_node_id` (nodo de `taxonomy/catalog.ts`, ej. `industry:transportation_airlines`) + `category_label` localizada. Resolución por **cascada con confianza**: el enum de HubSpot es un **prior barato** (mapeo determinista = baseline), el **brand_intelligence grounded** es la señal **autoritativa** (lee qué hace la marca + cómo la clasifica el mercado), cruzada con entity; **confianza baja/ambigua → `unknown` → confirmación humana** (el review unificado de TASK-1291). Guard: `unknown` bloquea el run/envío en vez de generar un prompt roto. Primer paso del cierre de **ISSUE-110**.
 
 ## Why This Task Exists
 
-`provisionGraderProfileForOrganization` escribe `org.industry` crudo en `grader_profiles.category`, y `prompt-pack.ts` lo interpola literal en `{{category}}` → "¿qué agencias de **AIRLINES_AVIATION** ayudan a empresas?". Aun arreglando el framing (TASK-1290), un enum en mayúsculas-guión en el texto del prompt es basura. La taxonomía canónica (`catalog.ts`, nodos `industry:*` con label `{es,en}`) ya existe pero se está **bypasseando**. Sin una categoría canónica + label, ningún prompt (de ningún arquetipo) puede redactarse bien.
+`provisionGraderProfileForOrganization` escribe `org.industry` crudo en `grader_profiles.category`, y `prompt-pack.ts` lo interpola literal → "¿qué agencias de **AIRLINES_AVIATION** ayudan a empresas?". Pero el enum de HubSpot es **poco confiable** (lo llena un vendedor a mano: genérico, equivocado o vacío) → mapearlo 1:1 hereda sus errores. La señal **autoritativa de qué es una marca es su sitio + su entidad** (cómo la clasifica el mercado/los motores), no el enum. Y como la categoría, el modelo de negocio (TASK-1289) y los prompts (TASK-1290) necesitan **la misma lectura de la marca**, conviene leerla una vez (snapshot compartido) y derivar — no tres lecturas inconsistentes ni un artefacto monolítico que acople lo estable (categoría) a lo volátil (prompts). Sin categoría canónica + label correctas, ningún prompt (de ningún arquetipo) se redacta bien.
 
 ## Goal
 
-- Resolver y persistir en `grader_profiles`: `category_node_id` (nodo de la taxonomía) + `category_label` (label localizada del nodo), reemplazando el uso del enum crudo.
-- Tabla/diccionario de mapeo **HubSpot industry enum → nodo de taxonomía** (extensible), con cascada: HubSpot enum → website intelligence (señal secundaria) → `unknown`.
-- Guard: `category_node_id = unknown` ⇒ el run de portal/operador y el envío se bloquean con razón canónica (no se corre con categoría sin resolver).
+- **`brand_intelligence` snapshot compartido:** lectura grounded (LLM sobre site probe + entity) → estructura `{ what_the_brand_does, candidate_category_node, candidate_business_model, signals_used, confidence }`, cacheada/versionada por marca, **consumida por TASK-1288/1289/1290**. Output estructurado vía el cliente LLM canónico (`src/lib/ai/*`); degradación honesta sin señales.
+- **Categoría canónica derivada:** persistir `category_node_id` (nodo de la taxonomía) + `category_label` localizada, resueltos por cascada — HubSpot enum (prior/baseline determinista) → brand_intelligence grounded (autoritativo) → cruce entity → `unknown` si baja confianza. Reemplaza el enum crudo. El LLM/clasificador elige un nodo REAL de la taxonomía (usando `aliases`/`examples`) o `unknown`, NUNCA inventa.
+- **Guard + confirmación:** `category_node_id = unknown` (o confianza baja) ⇒ el run de portal/operador y el envío se bloquean con razón canónica; el operador confirma/corrige en el review unificado (TASK-1291).
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 1 — CONTEXT & CONSTRAINTS
@@ -50,13 +50,16 @@ Deja de inyectar el enum crudo de HubSpot (`organizations.industry = 'AIRLINES_A
 Revisar y respetar:
 
 - `docs/architecture/GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md`
+- `docs/architecture/GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md` (invariantes providers LLM — cliente canónico `src/lib/ai/*`, secret server-side)
 - `docs/architecture/agent-invariants/INTEGRATIONS_INFRA_AGENT_INVARIANTS.md` (HubSpot = fuente, no SoT; el enum se mapea, no se usa crudo)
-- Taxonomía existente: `src/lib/growth/ai-visibility/taxonomy/{catalog,contracts,mapper}.ts`
+- Taxonomía existente: `src/lib/growth/ai-visibility/taxonomy/{catalog,contracts,mapper}.ts`; site probe (TASK-1266) + entity probes (TASK-1267) como señales de grounding
 
 Reglas obligatorias:
 
+- **Patrón transversal (SSOT + derivaciones):** la lectura grounded (`brand_intelligence`) se hace UNA vez por marca (input compartido, cacheado/versionado); **categoría (acá), modelo de negocio (TASK-1289) y prompts (TASK-1290) son DERIVACIONES separadas** con su propio almacenamiento + fallback. NO mezclar lo estable (categoría/modelo, SoT del perfil) con lo volátil (prompt set) en un mismo artefacto; NO leer el sitio 3 veces.
 - **NUNCA** persistir ni interpolar el enum crudo de HubSpot en un prompt. El SoT es el `category_node_id` canónico + su label localizada.
-- El mapeo HubSpot→taxonomía es un diccionario versionado/extensible; un enum no mapeado degrada a `unknown` (honesto), nunca inventa un nodo.
+- **Cascada con confianza, no fuente única:** HubSpot enum = prior/baseline determinista; brand_intelligence grounded (site + entity) = autoritativo; salida acotada a un nodo REAL de la taxonomía (`aliases`/`examples`) o `unknown`. NUNCA inventar un nodo. Confianza baja/ambigua → `unknown` → confirmación humana (TASK-1291), nunca adivinar en silencio.
+- **LLM vía cliente canónico** `src/lib/ai/*` (helper structured, secret server-side); degradación honesta: sin LLM / sin señales → cae al mapeo determinista del enum o `unknown`, NUNCA prompts rotos. Provenance del snapshot (señales usadas + confianza + versión) persistida.
 - El guard de `unknown` aplica en el chokepoint de run (no parchear por-callsite); errores canónicos es-CL.
 
 ## Normative Docs
@@ -81,12 +84,14 @@ Reglas obligatorias:
 
 ### Files owned
 
-- `migrations/<ts>_task-1288-grader-profile-canonical-category.sql` (columnas `category_node_id`, `category_label`; backfill)
-- `src/lib/growth/ai-visibility/taxonomy/hubspot-industry-map.ts` (diccionario HubSpot enum → nodo) `[verificar naming]`
-- `src/lib/growth/ai-visibility/taxonomy/resolve-category.ts` (resolver canónico con cascada) `[verificar]`
+- `migrations/<ts>_task-1288-brand-intelligence-canonical-category.sql` (snapshot `grader_brand_intelligence` + columnas `category_node_id`/`category_label`/`category_confidence` en `grader_profiles`; backfill)
+- `src/lib/growth/ai-visibility/brand-intelligence/read-brand-intelligence.ts` (lectura grounded compartida: LLM sobre site probe + entity → snapshot estructurado) `[verificar]`
+- `src/lib/growth/ai-visibility/taxonomy/hubspot-industry-map.ts` (diccionario HubSpot enum → nodo, prior/baseline) `[verificar naming]`
+- `src/lib/growth/ai-visibility/taxonomy/resolve-category.ts` (resolver por cascada con confianza) `[verificar]`
 - `src/lib/growth/ai-visibility/provision-profile.ts` (usar el resolver, no `org.industry` crudo)
 - `src/lib/growth/ai-visibility/prompt-pack.ts` (interpolar la label canónica, no el enum)
-- `src/lib/growth/ai-visibility/request-run.ts` (guard `unknown`) `[verificar]`
+- `src/lib/growth/ai-visibility/request-run.ts` (guard `unknown`/baja confianza) `[verificar]`
+- `src/lib/ai/*` (reuse del cliente LLM canónico — NO SDK nuevo)
 
 ## Current Repo State
 
@@ -98,57 +103,58 @@ Reglas obligatorias:
 
 ### Gap
 
-- No hay mapeo HubSpot industry enum → nodo de taxonomía, ni resolver canónico, ni persistencia de `category_node_id`/`category_label`, ni guard de `unknown`.
+- No hay `brand_intelligence` (lectura grounded compartida), ni resolver por cascada con confianza, ni persistencia de `category_node_id`/`category_label`/confianza, ni guard de `unknown`; el enum crudo se inyecta directo.
 
 ## Backend/Data Contract
 
 ### Backend/data brief
 
-- Backend rigor: `backend-critical` (toca el perfil del grader live + un guard que bloquea runs + el lead magnet)
-- Impacto principal: `migration` (+ `command`/`reader`)
-- Source of truth afectado: `grader_profiles.category_node_id` + `category_label` (nuevo SoT canónico); `organizations.industry` es fuente, no SoT
-- Consumidores afectados: prompt-pack / run-engine / TASK-1289/1290/1291 · lead magnet · cross-sell operador
+- Backend rigor: `backend-critical` (toca el perfil del grader live + guard que bloquea runs + lead magnet + introduce lectura LLM)
+- Impacto principal: `migration` (snapshot + columnas) + `integration` (cliente LLM canónico) + `command`/`reader`
+- Source of truth afectado: `grader_profiles.category_node_id`/`category_label` (SoT canónico) + `grader_brand_intelligence` (snapshot compartido); `organizations.industry` es fuente, no SoT
+- Consumidores afectados: prompt-pack / run-engine / **TASK-1289 (modelo) + TASK-1290 (prompts) consumen el snapshot** / TASK-1291 (review) · lead magnet · cross-sell operador
 - Runtime target: `local|staging|production`
 
 ### Contract surface
 
-- Contrato nuevo: `resolveCanonicalCategory({ hubspotIndustry?, websiteUrl?, brandName? }) → { nodeId, label, source: 'hubspot_map'|'website'|'unknown' }`; columnas `category_node_id`/`category_label` en `grader_profiles`.
-- Backward compatibility: `additive` (columnas nuevas; `category` legacy se conserva durante la migración + backfill).
-- Full API parity: el resolver es un helper canónico reusado por provisión + cualquier consumer; no UI nueva.
+- Contratos nuevos: `readBrandIntelligence({ profileId, brandName, websiteUrl, hubspotIndustry?, siteProbe?, entitySignals? }) → snapshot` (grounded, LLM structured) · `resolveCanonicalCategory(snapshot, { hubspotIndustry? }) → { nodeId, label, source: 'hubspot_map'|'brand_intelligence'|'entity'|'unknown', confidence }`; columnas en `grader_profiles` + tabla `grader_brand_intelligence`.
+- Backward compatibility: `additive` (`category` legacy se conserva durante migración + backfill).
+- Full API parity: el snapshot + resolver son helpers canónicos reusados por provisión + TASK-1289/1290; el review/confirm es command gobernado (TASK-1291).
 
 ### Data model and invariants
 
-- Entidades: `grader_profiles` (+`category_node_id` TEXT, +`category_label` TEXT). Diccionario de mapeo en código (versionado).
+- Entidades: `grader_brand_intelligence` (`profile_id`, `version`, `summary_json` {what_the_brand_does, candidate_category_node, candidate_business_model}, `signals_used_json`, `confidence`, `model`, `created_at`) — snapshot cacheado/versionado por marca. `grader_profiles` (+`category_node_id`, +`category_label`, +`category_confidence`, +`category_source`).
 - Invariantes:
-  - `category_node_id` ∈ nodos de `CATEGORY_TAXONOMY` ∪ `'unknown'`; nunca un enum HubSpot crudo.
-  - `category_label` = label localizada del nodo (es-CL por defecto); si `unknown` → null.
-  - El resolver es puro/determinista para una entrada dada (testeable); el LLM-assist (si se agrega) queda fuera de scope.
-- Tenant/space boundary: el perfil ya es per-org.
-- Idempotency/concurrency: backfill idempotente (solo filas sin `category_node_id`).
-- Audit/outbox/history: ninguno nuevo (resolución determinista); reliability signal de cobertura (perfiles `unknown`).
+  - `category_node_id` ∈ nodos de `CATEGORY_TAXONOMY` ∪ `'unknown'`; NUNCA un enum HubSpot crudo ni un nodo inventado.
+  - El snapshot se lee UNA vez por marca (cacheado); TASK-1289/1290 lo CONSUMEN (no re-leen el sitio). Categoría/modelo (estables, en `grader_profiles`) y prompt set (volátil, su propio artefacto) viven separados.
+  - Resolución por cascada: HubSpot map (prior) + brand_intelligence (autoritativo) + entity (cruce) → confianza; baja → `unknown`. La parte determinista (HubSpot map) es pura/testeable; la parte LLM se congela en el snapshot (reproducible) y se confirma humano si baja confianza.
+  - `category_label` = label localizada del nodo; si `unknown` → null.
+- Tenant/space boundary: el perfil/snapshot ya es per-org.
+- Idempotency/concurrency: backfill idempotente; el snapshot se regenera con versión nueva (no edit-in-place).
+- Audit/outbox/history: snapshot versionado + provenance (señales + confianza + modelo); reliability signal de cobertura (perfiles `unknown`/baja confianza).
 
 ### Migration, backfill and rollout
 
-- Migration posture: `additive` (columnas nullable + backfill).
-- Default state: el resolver se usa en provisión nueva de inmediato; el guard `unknown` detrás de flag hasta backfill + verificación.
-- Backfill plan: re-resolver `category_node_id`/`category_label` de los perfiles existentes desde `organizations.industry` + website (dry-run primero; reporta % `unknown`).
-- Rollback path: revert PR (los consumers caen al `category` legacy) + reverse migration.
-- External coordination: revisar el catálogo de HubSpot industry enums vigente para completar el mapeo.
+- Migration posture: `additive` (snapshot + columnas nullable + backfill).
+- Default state: el resolver determinista (HubSpot map) se usa de inmediato; la lectura LLM grounded + el guard `unknown` detrás de flag hasta backfill + verificación.
+- Backfill plan: generar `brand_intelligence` + resolver categoría de los perfiles existentes (dry-run; report de cobertura + confianza; SKY/Berel verificados).
+- Rollback path: revert PR (consumers caen al `category` legacy) + reverse migration; la lectura LLM se apaga por flag.
+- External coordination: revisar el catálogo de HubSpot industry enums vigente (mapeo) + sign-off de costo de la lectura LLM (1×/marca/versión).
 
 ### Security and access
 
-- Auth/access gate: helper interno; sin nueva capability (consumido por la provisión ya gobernada).
-- Sensitive data posture: sin PII (categoría/industria es pública).
-- Error contract: guard `unknown` → `canonicalErrorResponse('aeo_category_unresolved', …)` (nuevo code) en el chokepoint; `captureWithDomain(err,'growth',…)`.
-- Abuse/rate-limit posture: n/a (resolución local).
+- Auth/access gate: helper interno; el confirm/override = capability operador (TASK-1291).
+- Sensitive data posture: sin PII (categoría/industria/sitio son públicos); secret LLM server-side (`*_SECRET_REF`).
+- Error contract: guard `unknown` → `canonicalErrorResponse('aeo_category_unresolved', …)` (nuevo code) en el chokepoint; degradación honesta sin LLM → mapeo determinista; `captureWithDomain(err,'growth',…)`.
+- Abuse/rate-limit posture: la lectura LLM es 1×/marca/versión (cacheada) + cost ceiling; el run no agrega costo LLM.
 
 ### Runtime evidence
 
-- Local checks: tests del resolver (HubSpot enum conocido → nodo; desconocido → unknown; website fallback) + del guard.
-- DB/runtime checks: migrate verify de columnas; backfill dry-run + report de cobertura sobre perfiles reales (Berel, SKY, etc.).
-- Integration checks: un perfil con `industry='AIRLINES_AVIATION'` resuelve a `industry:transportation_airlines` (o el nodo correcto) con label "Aerolíneas".
-- Reliability signals/logs: `growth.ai_visibility.profile_category_unresolved` (count perfiles `unknown`, steady objetivo bajo).
-- Production verification sequence: migrate staging → backfill dry-run → backfill apply → verify SKY/Berel resuelven → flip guard.
+- Local checks: tests del mapeo determinista (enum conocido → nodo; desconocido → unknown) + del resolver por cascada (prior + snapshot + entity → confianza) + del guard + degradación sin LLM.
+- DB/runtime checks: migrate verify; backfill dry-run + report de cobertura/confianza sobre perfiles reales (Berel, SKY).
+- Integration checks: SKY (`industry='AIRLINES_AVIATION'` + sitio skyairline.com) → brand_intelligence lee "aerolínea" → `industry:transportation_airlines` (o el nodo correcto) label "Aerolíneas", confianza alta; cliente LLM canónico responde structured + acotado.
+- Reliability signals/logs: `growth.ai_visibility.profile_category_unresolved` (count `unknown`/baja confianza, steady bajo).
+- Production verification sequence: migrate staging → backfill dry-run → backfill apply → verify SKY/Berel resuelven correcto → flip guard.
 
 ### Acceptance criteria additions
 
@@ -167,31 +173,31 @@ Reglas obligatorias:
 
 ## Scope
 
-### Slice 1 — Mapeo + resolver canónico
+### Slice 1 — Mapeo determinista (baseline) + resolver por cascada
 
-- `hubspot-industry-map.ts` (diccionario HubSpot enum → nodo de taxonomía) + `resolveCanonicalCategory` (cascada HubSpot → website → unknown). Tests.
+- `hubspot-industry-map.ts` (diccionario HubSpot enum → nodo, prior/baseline) + `resolveCanonicalCategory` que combina prior + snapshot + entity con confianza → nodo o `unknown`. Tests.
 
-### Slice 2 — Persistencia + provisión
+### Slice 2 — Brand Intelligence (lectura grounded compartida)
 
-- Migration: `category_node_id` + `category_label` en `grader_profiles`. `provision-profile.ts` usa el resolver (no `org.industry` crudo). Backfill idempotente + report.
+- Migration `grader_brand_intelligence` (snapshot versionado) + `read-brand-intelligence.ts`: LLM (cliente canónico `src/lib/ai/*`, structured) sobre el site probe (TASK-1266) + entity (TASK-1267) → `{ what_the_brand_does, candidate_category_node, candidate_business_model, signals_used, confidence }`. Degradación honesta sin señales. **Lo consumen TASK-1289/1290.**
 
-### Slice 3 — Render + guard
+### Slice 3 — Persistencia + provisión + backfill
 
-- `prompt-pack.ts` interpola la label canónica. Guard `unknown` en el chokepoint (`request-run.ts`) detrás de flag + error canónico `aeo_category_unresolved`.
+- Migration: `category_node_id`/`category_label`/`category_confidence`/`category_source` en `grader_profiles`. `provision-profile.ts` usa el resolver (no `org.industry` crudo). Backfill idempotente (genera snapshot + resuelve) + report de cobertura/confianza.
 
-### Slice 4 — Signal
+### Slice 4 — Render + guard + signal
 
-- Reliability signal `profile_category_unresolved`.
+- `prompt-pack.ts` interpola la label canónica. Guard `unknown`/baja confianza en el chokepoint (`request-run.ts`) detrás de flag + error canónico `aeo_category_unresolved`. Reliability signal `profile_category_unresolved`.
 
 ## Out of Scope
 
-- El framing por arquetipo / packs de prompts (TASK-1290).
-- El eje `business_model` (TASK-1289).
-- LLM-assist para resolver categorías long-tail (follow-up).
+- El framing por arquetipo / packs de prompts (TASK-1290) — consume el snapshot.
+- La DERIVACIÓN del `business_model` y su override (TASK-1289) — consume el snapshot; acá solo se persiste el `candidate_business_model` dentro del snapshot.
+- El **review/confirm unificado** del operador (TASK-1291).
 
 ## Detailed Spec
 
-El resolver es la única vía para poblar la categoría del perfil. HubSpot industry enum es una **fuente** (mapeada), nunca el dato. El nodo canónico + su label localizada alimentan a los prompts (TASK-1290) y al clasificador de modelo de negocio (TASK-1289). El guard `unknown` evita correr el motor con una categoría que produciría prompts basura.
+`brand_intelligence` es el input compartido: se lee la marca UNA vez (grounded: sitio + entity) y se congela un snapshot; **categoría (acá), modelo (TASK-1289) y prompts (TASK-1290) son derivaciones separadas** de ese snapshot, cada una con su almacenamiento + fallback (no se lee el sitio 3 veces, no se acopla lo estable a lo volátil). La categoría se resuelve por **cascada con confianza**: HubSpot enum (prior barato) + brand_intelligence (autoritativo: qué hace la marca) + entity (cómo la clasifica el mercado) → un nodo REAL de la taxonomía o `unknown`. Baja confianza → `unknown` → el operador confirma (TASK-1291). El guard `unknown` evita correr el motor con una categoría que produciría prompts basura. HubSpot industry enum es **fuente** (mapeada/cruzada), nunca el dato.
 
 ## Rollout Plan & Risk Matrix
 
@@ -238,10 +244,11 @@ El resolver es la única vía para poblar la categoría del perfil. HubSpot indu
 
 ## Acceptance Criteria
 
-- [ ] `grader_profiles` persiste `category_node_id` (nodo canónico) + `category_label`; el enum crudo de HubSpot ya no se interpola en ningún prompt.
-- [ ] `resolveCanonicalCategory` mapea HubSpot enum → nodo (con website fallback) o `unknown`; determinista + testeado; mapeo extensible.
-- [ ] Backfill idempotente aplicado + report de cobertura; SKY/Berel resuelven a nodo+label correctos.
-- [ ] Guard `unknown` (flag) bloquea run/envío con `aeo_category_unresolved`; signal `profile_category_unresolved` en steady esperado.
+- [ ] `brand_intelligence` snapshot compartido (grounded: site probe + entity, LLM structured vía cliente canónico, versionado + provenance) existe y **es consumido por TASK-1289/1290** (no se re-lee el sitio); degradación honesta sin señales.
+- [ ] `grader_profiles` persiste `category_node_id` (nodo canónico) + `category_label` + `category_confidence` + `category_source`; el enum crudo de HubSpot ya no se interpola en ningún prompt.
+- [ ] `resolveCanonicalCategory` resuelve por cascada con confianza (HubSpot prior + brand_intelligence + entity → nodo real o `unknown`); NUNCA inventa un nodo; el mapeo determinista es testeado/extensible.
+- [ ] Backfill idempotente aplicado + report de cobertura/confianza; **SKY resuelve `industry:transportation_airlines` (o el correcto), NO un enum crudo**.
+- [ ] Guard `unknown`/baja confianza (flag) bloquea run/envío con `aeo_category_unresolved` → confirmación humana (TASK-1291); signal `profile_category_unresolved` en steady esperado.
 
 ## Verification
 
@@ -262,9 +269,11 @@ El resolver es la única vía para poblar la categoría del perfil. HubSpot indu
 
 ## Follow-ups
 
-- LLM-assist para resolver categorías long-tail / sub-categorías finas (cuando el diccionario quede corto).
+- Re-lectura del `brand_intelligence` cuando cambie el sitio/entidad de la marca (cadencia, opt-in) — alimenta el re-grade recurrente (TASK-1270) + la re-autoría de prompts (TASK-1290).
 - Mapear también `sub_category` (nodos hijos de la taxonomía) si el buyer-intent lo requiere.
 
 ## Open Questions
 
-- ¿La taxonomía actual (`catalog.ts`) tiene un nodo apropiado para aerolíneas/transporte de consumo, o hay que extenderla? (definir en Discovery; puede requerir agregar nodos `industry:*`).
+- ¿La taxonomía actual (`catalog.ts`) tiene un nodo apropiado para aerolíneas/transporte de consumo + las categorías de marcas de consumo (banca, retail), o hay que extenderla? (definir en Discovery; probable agregar nodos `industry:*`).
+- ¿El `brand_intelligence` snapshot vive en una tabla propia (`grader_brand_intelligence`) o como columnas JSON en `grader_profiles`? (recomendación: tabla versionada por la cadencia de re-lectura; definir en Discovery).
+- ¿Qué modelo LLM para la lectura + su cost ceiling (1×/marca)? (alinear con TASK-1290, mismo cliente canónico).

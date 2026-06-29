@@ -29,7 +29,7 @@
 
 ## Summary
 
-Introduce el eje que falta para que el grader generalice: el **modelo de negocio** de la marca. Nuevo atributo `business_model` en `grader_profiles` (`consumer_b2c` / `b2b_service_provider` / `b2b_product_saas` / `retail_ecommerce` / `marketplace` / `public_institution`), que decide el **framing del buyer-intent** de los prompts (TASK-1290). Clasificador determinista desde la categoría canónica (TASK-1288) + señales, con **override del operador**. Parte de EPIC-021 / cierre de ISSUE-110.
+Introduce el eje que falta para que el grader generalice: el **modelo de negocio** de la marca. Nuevo atributo `business_model` en `grader_profiles` (`consumer_b2c` / `b2b_service_provider` / `b2b_product_saas` / `retail_ecommerce` / `marketplace` / `public_institution`), que decide el **framing del buyer-intent** de los prompts (TASK-1290). **DERIVA del `brand_intelligence` snapshot compartido** (TASK-1288 — el `candidate_business_model` ya viene del LLM grounded que leyó el sitio; NO se re-lee el sitio), con **override del operador**. Parte de EPIC-021 / cierre de ISSUE-110.
 
 ## Why This Task Exists
 
@@ -37,7 +37,7 @@ El defecto de fondo del falso-0 de SKY no es solo la categoría: es que el grade
 
 ## Goal
 
-- Persistir `business_model` (enum cerrado) en `grader_profiles`, derivado por un clasificador determinista (categoría canónica + heurísticas) con **override** explícito del operador.
+- Persistir `business_model` (enum cerrado) en `grader_profiles`, **derivado del `candidate_business_model` del `brand_intelligence` snapshot** (TASK-1288, ya grounded en el sitio) + confianza, con **override** explícito del operador. NO re-leer el sitio (consume el snapshot compartido).
 - Default conservador + honesto: si no se puede clasificar con confianza → un valor `unknown`/needs-review que el gate de TASK-1291 trata como "no correr sobre prospecto sin confirmar".
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -66,7 +66,7 @@ Reglas obligatorias:
 
 ### Depende de
 
-- **TASK-1288** (categoría canónica) — el clasificador la usa como señal principal. Bloqueante.
+- **TASK-1288** (categoría canónica + **`brand_intelligence` snapshot compartido**) — el `business_model` se deriva del `candidate_business_model` del snapshot. Bloqueante.
 
 ### Impacta a
 

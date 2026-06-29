@@ -28,6 +28,10 @@ El problema es un **programa multi-capa**, no una sola task: hay que (1) dejar d
 - El cross-sell operador (TASK-1279) se **reabilita con seguridad**: rechaza correr/enviar si la categoría no se resolvió o el arquetipo no fue confirmado.
 - El scoring (presencia / SoV / citación) sigue **determinista e idéntico**; solo cambian las preguntas. La eval cubre ≥3 arquetipos.
 
+## Patrón transversal — Brand Intelligence (lectura grounded compartida)
+
+Decisión de arquitectura (arch + seo + product, 2026-06-29): NO un artefacto monolítico que mezcle lo estable con lo volátil, NI tres lecturas del sitio. **Una sola lectura grounded de la marca (`brand_intelligence` snapshot, owned by TASK-1288) → tres DERIVACIONES separadas:** categoría (1288) y modelo de negocio (1289) son hechos estables (SoT del perfil); el prompt set (1290) es un artefacto volátil aparte. Se leen del MISMO snapshot (coherencia + costo: una lectura por marca), cada uno con su fallback (categoría → diccionario HubSpot; modelo → unknown; prompts → baseline), y se **confirman JUNTOS** en un solo review humano (TASK-1291, Adaptive Sidecar `reconciler`). El grounding de la MEDICIÓN sigue siendo el run contra los motores reales — el snapshot solo alimenta la autoría.
+
 ## Architecture Alignment
 
 - `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
@@ -37,7 +41,7 @@ El problema es un **programa multi-capa**, no una sola task: hay que (1) dejar d
 
 ## Child Tasks
 
-- `TASK-1288` — **Resolución de categoría canónica** (taxonomía + mapeo del HubSpot industry enum + label localizada + guard "no resuelta → bloquea"). Foundation; desbloquea al resto.
+- `TASK-1288` — **Brand Intelligence (lectura grounded compartida) + resolución de categoría canónica.** Lee la marca UNA vez (LLM sobre site probe TASK-1266 + entity TASK-1267 → snapshot estructurado) y resuelve la categoría canónica por cascada con confianza (HubSpot enum = prior, snapshot = autoritativo, entity = cruce; `unknown` → confirma humano). **El snapshot es el input compartido que 1289/1290 consumen.** Foundation; desbloquea al resto.
 - `TASK-1289` — **Clasificación de modelo de negocio** (`business_model` en el perfil: consumer_b2c / b2b_service_provider / b2b_product_saas / retail_ecommerce / marketplace / public_institution; clasificador determinista + override operador).
 - `TASK-1290` — **Prompt set generado por marca (LLM-autora-luego-congela)** + baseline determinista por arquetipo. El LLM autora el fan-out de buyer-intent por marca UNA vez → se persiste versionado/inmutable (`grader_prompt_sets`) → review → congela; los runs usan el set `active` (deterministas, sin costo LLM por run). Reemplaza el pack único de agencia; scoring INTACTO.
 - `TASK-1291` — **Gate de validación pre-run del operador + reabilitación del cross-sell** (chokepoint: bloquea run/envío si categoría `unknown` o arquetipo no confirmado; review/approval del operador para prospectos). Reabre TASK-1279 con seguridad.

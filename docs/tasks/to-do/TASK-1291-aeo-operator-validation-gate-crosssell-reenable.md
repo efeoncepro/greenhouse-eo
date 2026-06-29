@@ -39,7 +39,7 @@ TASK-1279 (cross-sell) se **gateó OFF** porque podía enviar un diagnóstico fa
 
 - Guard en el chokepoint de run operador + en el command de envío (`sendAeoReportAndCreateLead`): bloquear si `category_node_id = unknown` o `business_model` no confirmado, con error canónico.
 - Reabilitar `GROWTH_AI_VISIBILITY_OPERATOR_SEND_ENABLED` (revertir el gate OFF de ISSUE-110) tras verificar el motor end-to-end.
-- Contrato programático del "validar/confirmar categoría+arquetipo" (reader + command de confirmación); la superficie visible de review = follow-up `ui-ux`.
+- Contrato programático del **review unificado**: un solo momento donde el operador confirma/corrige **lo que entendimos de la marca** (categoría + modelo de negocio + preview de los prompts autorados) — todo junto, derivado del `brand_intelligence` snapshot (TASK-1288). Reader + command de confirmación; la superficie visible (Adaptive Sidecar `reconciler`) = follow-up `ui-ux` dentro de EPIC-021.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 1 — CONTEXT & CONSTRAINTS
