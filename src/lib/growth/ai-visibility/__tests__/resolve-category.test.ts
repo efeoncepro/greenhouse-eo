@@ -82,4 +82,23 @@ describe('growth/ai-visibility — resolveCanonicalCategory (cascade with confid
     expect(resolved.nodeId).toBe('industry:finance')
     expect(resolved.source).toBe('hubspot_map')
   })
+
+  it('modelo de dos planos: free-text fino resuelve al sector (MID), enum al macro', () => {
+    // Lo fino que un sector curado capta resuelve a ese sector...
+    const midCases: Array<[string, string]> = [
+      ['supermercado', 'sector:supermarkets_grocery'],
+      ['aerolinea de pasajeros', 'sector:passenger_airlines'],
+      ['banca retail', 'sector:retail_consumer_banking'],
+      ['moda', 'sector:apparel_fashion'],
+      ['cosmetica', 'sector:beauty_personal_care']
+    ]
+
+    for (const [candidate, expectedNodeId] of midCases) {
+      expect(resolveCanonicalCategory({ industry: candidate }).nodeId).toBe(expectedNodeId)
+    }
+
+    // ...mientras que el enum estructurado sigue resolviendo al macro (bucket confiable).
+    expect(resolveCanonicalCategory({ industry: 'AIRLINES_AVIATION' }).nodeId).toBe('industry:aviation')
+    expect(resolveCanonicalCategory({ industry: 'RETAIL' }).nodeId).toBe('industry:retail')
+  })
 })

@@ -202,18 +202,14 @@ export const CATEGORY_TAXONOMY: CategoryTaxonomy = {
     {
       id: 'industry:consumer_goods',
       level: 'industry',
+      // Macro bucket. Los sub-verticales finos (moda, belleza, electrónica) viven como sector
+      // (plano mid) o como `fine_category` del snapshot grounded — NO se enumeran como industrias.
       label: { es: 'Bienes de consumo', en: 'Consumer goods' },
       aliases: [
         'consumer goods',
         'bienes de consumo',
         'cpg',
         'consumer packaged goods',
-        'apparel',
-        'fashion',
-        'moda',
-        'cosmetics',
-        'cosmetica',
-        'belleza',
         'luxury',
         'lujo',
         'sporting goods',
@@ -233,15 +229,76 @@ export const CATEGORY_TAXONOMY: CategoryTaxonomy = {
         'food beverages',
         'alimentos y bebidas',
         'alimentos',
-        'bebidas',
-        'restaurants',
-        'restaurantes',
         'food production',
-        'wine and spirits',
         'dairy'
       ],
       parentIds: [],
       examples: ['food and beverage brands', 'restaurant chains', 'packaged food producers'],
+      status: 'active'
+    },
+    {
+      // Plano MID — sectores de consumo curados (sólo donde el buyer journey difiere del macro).
+      // Lo más fino que esto vive como `fine_category` del snapshot grounded, NUNCA como nodo.
+      id: 'sector:passenger_airlines',
+      level: 'sector',
+      label: { es: 'Aerolineas de pasajeros', en: 'Passenger airlines' },
+      aliases: ['passenger airline', 'passenger airlines', 'aerolinea de pasajeros', 'low cost carrier', 'vuelos'],
+      parentIds: ['industry:aviation'],
+      examples: ['low-cost carriers', 'full-service airlines'],
+      status: 'active'
+    },
+    {
+      id: 'sector:supermarkets_grocery',
+      level: 'sector',
+      label: { es: 'Supermercados y abarrotes', en: 'Supermarkets and grocery' },
+      aliases: ['supermarket', 'supermarkets', 'supermercado', 'supermercados', 'grocery', 'abarrotes'],
+      parentIds: ['industry:retail'],
+      examples: ['supermarket chains', 'grocery retailers'],
+      status: 'active'
+    },
+    {
+      id: 'sector:apparel_fashion',
+      level: 'sector',
+      label: { es: 'Moda y vestuario', en: 'Apparel and fashion' },
+      aliases: ['apparel', 'fashion', 'moda', 'ropa', 'vestuario', 'indumentaria'],
+      parentIds: ['industry:consumer_goods'],
+      examples: ['fashion brands', 'apparel retailers'],
+      status: 'active'
+    },
+    {
+      id: 'sector:beauty_personal_care',
+      level: 'sector',
+      label: { es: 'Belleza y cuidado personal', en: 'Beauty and personal care' },
+      aliases: ['beauty', 'cosmetics', 'cosmetica', 'belleza', 'cuidado personal', 'skincare', 'maquillaje'],
+      parentIds: ['industry:consumer_goods'],
+      examples: ['cosmetics brands', 'skincare brands', 'personal care'],
+      status: 'active'
+    },
+    {
+      id: 'sector:restaurants_foodservice',
+      level: 'sector',
+      label: { es: 'Restaurantes y foodservice', en: 'Restaurants and foodservice' },
+      aliases: ['restaurant', 'restaurants', 'restaurante', 'restaurantes', 'foodservice', 'gastronomia'],
+      parentIds: ['industry:food_beverage'],
+      examples: ['restaurant chains', 'quick-service restaurants', 'food service'],
+      status: 'active'
+    },
+    {
+      id: 'sector:beverages',
+      level: 'sector',
+      label: { es: 'Bebidas', en: 'Beverages' },
+      aliases: ['beverage', 'beverages', 'bebidas', 'bebestibles', 'drinks', 'wine and spirits', 'vinos y licores'],
+      parentIds: ['industry:food_beverage'],
+      examples: ['soft drinks', 'wine and spirits', 'beverage brands'],
+      status: 'active'
+    },
+    {
+      id: 'sector:retail_consumer_banking',
+      level: 'sector',
+      label: { es: 'Banca de personas', en: 'Retail and consumer banking' },
+      aliases: ['retail banking', 'banca retail', 'banca de personas', 'banca personas', 'consumer banking'],
+      parentIds: ['industry:finance'],
+      examples: ['consumer banks', 'retail banking divisions'],
       status: 'active'
     },
     {
