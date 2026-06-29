@@ -224,6 +224,17 @@ export const isArchetypePromptsEnabled = (env: NodeJS.ProcessEnv = process.env):
   isTrue(env[GROWTH_AI_VISIBILITY_ARCHETYPE_PROMPTS_FLAG])
 
 /**
+ * TASK-1290 Slice 3 — Autoría LLM del prompt set por marca. Default OFF: sin el flag, el autor
+ * cae al baseline determinista del arquetipo (Slice 1) — NUNCA prompts rotos. Gateado además por
+ * el kill switch global del grader. El LLM corre 1×/marca/versión (al autorar), NUNCA por run; el
+ * set se congela (approve) y los runs lo reproducen. Registrar en FEATURE_FLAG_STATE_LEDGER.md.
+ */
+export const GROWTH_AI_VISIBILITY_PROMPT_AUTHORING_FLAG = 'GROWTH_AI_VISIBILITY_PROMPT_AUTHORING_ENABLED'
+
+export const isPromptAuthoringEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+  isGraderEnabled(env) && isTrue(env[GROWTH_AI_VISIBILITY_PROMPT_AUTHORING_FLAG])
+
+/**
  * TASK-1288 — Lectura grounded `brand_intelligence` (LLM sobre contenido del sitio + entity).
  * Default OFF: la lectura LLM (1×/marca/versión, cacheada) se activa tras sign-off de costo;
  * con OFF la resolución de categoría cae al prior determinista (HubSpot map + alias). Gateado

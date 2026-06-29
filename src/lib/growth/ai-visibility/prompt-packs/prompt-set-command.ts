@@ -12,6 +12,8 @@ import 'server-only'
 import { can } from '@/lib/entitlements/runtime'
 import { type TenantEntitlementSubject } from '@/lib/entitlements/types'
 
+import { resolveArchetypeBaselinePack } from './archetypes/baseline-packs'
+import { authorPromptSet, AUTHOR_PROMPT_SET_MAX_OUTPUT_TOKENS, type AuthorPromptSetStatus } from './authoring/author-prompt-set'
 import {
   approvePromptSet,
   createDraftPromptSet,
@@ -19,7 +21,8 @@ import {
   listPromptSets,
   PromptSetLifecycleError,
   type CreateDraftPromptSetInput,
-  type GraderPromptSetRow
+  type GraderPromptSetRow,
+  type PromptSetPrompt
 } from './prompt-set-store'
 
 export class PromptSetCommandError extends Error {
@@ -47,6 +50,72 @@ export const createGraderPromptSetDraft = async (
   assertCanManage(input.subject)
 
   return createDraftPromptSet(input)
+}
+
+export interface AuthorGraderPromptSetDraftInput {
+  subject: TenantEntitlementSubject
+  profileId: string
+  brandName: string
+  categoryNodeId: string | null
+  categoryLabel: string
+  businessModel: string
+  market: string
+  locale: string
+  competitors: string[]
+  /** Grounding del snapshot brand_intelligence (TASK-1288) — opcional. */
+  whatTheBrandDoes?: string | null
+  fineCategory?: string | null
+  createdBy: string
+}
+
+export interface AuthorGraderPromptSetDraftResult {
+  draft: GraderPromptSetRow
+  /** `ok` = autorado por LLM; el resto = se usó el baseline determinista del arquetipo (fallback honesto). */
+  authoringStatus: AuthorPromptSetStatus
+}
+
+/**
+ * Autora un `draft` para una marca: LLM si está disponible (Query Fan-Out brand-specific), o el
+ * baseline determinista del arquetipo como fallback honesto (NUNCA prompts rotos). Gobernado. NO
+ * lo activa (eso es `approveGraderPromptSet`, tras el review TASK-1291).
+ */
+export const authorGraderPromptSetDraft = async (
+  input: AuthorGraderPromptSetDraftInput
+): Promise<AuthorGraderPromptSetDraftResult> => {
+  assertCanManage(input.subject)
+
+  const authored = await authorPromptSet({
+    brandName: input.brandName,
+    categoryLabel: input.categoryLabel,
+    businessModel: input.businessModel,
+    market: input.market,
+    locale: input.locale,
+    competitors: input.competitors,
+    whatTheBrandDoes: input.whatTheBrandDoes ?? null,
+    fineCategory: input.fineCategory ?? null,
+    maxTokens: AUTHOR_PROMPT_SET_MAX_OUTPUT_TOKENS
+  })
+
+  // Fallback honesto: sin LLM/flag/schema → el baseline determinista del arquetipo (Slice 1).
+  const usingLlm = authored.prompts !== null
+
+  const prompts: PromptSetPrompt[] = usingLlm
+    ? authored.prompts!
+    : resolveArchetypeBaselinePack(input.businessModel).prompts.map(p => ({ ...p }))
+
+  const draft = await createDraftPromptSet({
+    profileId: input.profileId,
+    businessModel: input.businessModel,
+    categoryNodeId: input.categoryNodeId,
+    prompts,
+    generationStrategy: usingLlm ? 'llm' : 'template_baseline',
+    model: authored.model,
+    systemPromptVersion: usingLlm ? authored.systemPromptVersion : null,
+    groundingSources: authored.groundingSources,
+    createdBy: input.createdBy
+  })
+
+  return { draft, authoringStatus: authored.status }
 }
 
 /** Aprueba un set (`draft`/`approved` → `active`, congela). Gobernado + atómico (un solo active). */
