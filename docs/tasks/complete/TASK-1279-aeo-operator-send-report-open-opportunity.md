@@ -294,6 +294,18 @@ El command es el único camino de envío + creación de Lead operator-triggered.
 
 **Cross-impact:** **TASK-1276** (vista operador) consume `sendAeoReportAndCreateLead` + route `runs/[runId]/send-lead` + capability `growth.ai_visibility.lead.open` (ya disponibles). **TASK-1277** (su blocker) quedó COMPLETA. **TASK-1250/1273** (email/PDF) reusados sin fork.
 
+## Delta 2026-06-29 — rollout staging aplicado + smoke E2E verde (Sky Airlines)
+
+Pedido del operador ("rollout y flag on ahora"). Aplicado a **staging** (prod sigue OFF, gated EPIC-020 + sign-off comercial/legal):
+
+- **Infra:** `deploy.sh` flag staging ON / prod OFF · property HubSpot `aeo_check_result` **provisionada** (companies, grupo `aeo` — NO existía en el portal) · `vercel env add ... staging` · push `develop` → Vercel staging + ops-worker con flag ON.
+- **Smoke E2E POSITIVO verde** (Sky Airlines, cliente trial AEO → upsell legítimo): operator-run `EO-GRUN-00029` → score (overall **0**, "no aparece en IA") → publish → `send-lead` (202, `expansion`) → reactive consumer drenó → **email `sent`** (Resend) + **Lead HubSpot `566830815132`** "Diagnóstico AEO — Sky Airlines" asociado **Primary** a contact + Sky company + **`aeo_check_result='No aparece'`** en la company (verificado vía API). Wiring smoke previo: `409 aeo_send_report_unavailable` (run no publicado) + `400 aeo_send_invalid_input` — prueban flag ON + gates sin side effects.
+- **2 bugs reales encontrados + fijados por el smoke:**
+  1. `crm-client.createOperatorCrossSellLead` creaba el Lead **sin** asociación → HubSpot `400 VALIDATION_ERROR` (el objeto `leads` EXIGE `LEAD_TO_PRIMARY_CONTACT`/`COMPANY` **inline al crear**). Fix: asociación primaria inline (typeIds 578 contact / 580 company). Commit `eb7c2b4ab`.
+  2. **`.github/workflows/ops-worker-deploy.yml` drift-check** no incluía `src/lib/growth/ai-visibility` en `WORKER_RUNTIME_PATHS` → cambios solo-growth triggeaban el workflow pero el deploy se saltaba (worker stale; afectaba TASK-1242/1250 también). Fix: agregados growth/ai-visibility + components/growth/ai-visibility + hubspot + emails + observability a los 3 lists. Commit `141ead4a3`.
+  3. Cosmético: el audit `reason` no se limpiaba post-éxito del Lead (`COALESCE` → `$6`). Fix incluido.
+- **Pendiente prod:** sign-off comercial/legal del copy a prospectos + release control plane. La verificación live del **consent gate 422** (prospecto sin consent) no se ejerció E2E (no había prospecto con run publicado); está cubierta por unit tests + el CHECK duro en DB.
+
 ## Follow-ups
 
 - Plantilla de email operator-to-prospect (copy comercial + legal) si difiere del lead magnet.

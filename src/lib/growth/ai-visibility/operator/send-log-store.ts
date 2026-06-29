@@ -169,7 +169,7 @@ export const markReportSendLead = async (
             hubspot_lead_id = COALESCE($3, hubspot_lead_id),
             hubspot_contact_id = COALESCE($4, hubspot_contact_id),
             hubspot_company_id = COALESCE($5, hubspot_company_id),
-            reason = COALESCE($6, reason),
+            reason = $6,
             updated_at = NOW()
       WHERE send_id = $1`,
     [
