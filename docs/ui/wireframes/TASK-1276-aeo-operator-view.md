@@ -76,7 +76,7 @@
 - Variants / kinds: composición `masterDetail`, kind `workbench`
 - Component candidates: reuso del view-adapter de `modelFromClientReport` en variante operador + control de status nuevo
 - Copy source: `src/lib/copy/growth.ts`
-- Data reader / command: `readRecommendationStatuses` + `setRecommendationStatus` (TASK-1275) + reader del reporte operador-scoped `[verificar]`
+- Data reader / command: `readRecommendationStatuses` + `setRecommendationStatus` (TASK-1275) + `readOperatorScopedAeoReport` + `readOperatorCrossOrgAeoScores` (TASK-1287, complete)
 - API parity: la escritura de status es el command gobernado de TASK-1275 (UI = cliente del primitive)
 - Access / capability: viewCode interno (sección Growth, routeGroup `internal`, NUNCA `client_*`) + capability `growth.ai_visibility.recommendation.set_status` para el write
 - Runtime consumers: operador UI (write) · Nexa/MCP (por construcción)

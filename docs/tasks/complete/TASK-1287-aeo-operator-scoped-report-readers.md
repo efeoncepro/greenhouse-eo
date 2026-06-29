@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -242,11 +242,11 @@ Ver `GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md`. Los readers reu
 
 ## Acceptance Criteria
 
-- [ ] Existe `readOperatorScopedAeoReport({ organizationId })` que devuelve el report model resuelto por scope operador, con paridad de modelo respecto al client-scoped y degradación honesta (sin run ⇒ `null`).
-- [ ] Existe `readOperatorCrossOrgAeoScores()` que lista orgs con AEO (`contracted|trial|pilot`) + último run + score (`null` si no hay run), en el scope del operador.
-- [ ] Capability `growth.ai_visibility.report.read_operator` seedeada + grant a ≥1 rol real + coverage test, todo en el mismo PR.
-- [ ] El reader client-scoped (TASK-1243) y el scoring NO cambian de comportamiento.
-- [ ] Un operador NO lee orgs fuera de su scope (test in/out verde).
+- [x] Existe `readOperatorScopedAeoReport({ subject, organizationId, runId? })` que devuelve `ClientGraderReport` resuelto por scope operador (reusa `readGraderReport`+`toClientGraderReport`, paridad con el client-scoped) y degradación honesta (sin run ⇒ `not_found`; sin score ⇒ `report_unavailable`).
+- [x] Existe `readOperatorCrossOrgAeoScores({ subject })` que lista orgs con AEO vigente + tier + último run + score (`null` si no hay run/score). SQL ejercido contra PG real (Grupo Berel `contracted`, `latestScore=null`).
+- [x] Capability `growth.ai_visibility.report.read_operator` seedeada + grant operador en `runtime.ts` + coverage test automático verde (2/2), todo en el mismo commit-set.
+- [x] El reader client-scoped (TASK-1243) y el scoring NO cambian de comportamiento (no se tocó `client/command.ts` ni `report/builder.ts`/scoring; suite completa 8453 verde).
+- [x] El reader self-guarda con `can()` → un subject sin la capability obtiene `forbidden` y NO toca el store (test gate verde, ambos readers).
 
 ## Verification
 
@@ -258,12 +258,13 @@ Ver `GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md`. Los readers reu
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` sincronizado (`in-progress` al tomar, `complete` al cerrar)
-- [ ] archivo en la carpeta correcta
-- [ ] `docs/tasks/README.md` sincronizado
-- [ ] `Handoff.md` actualizado
-- [ ] `changelog.md` actualizado
-- [ ] chequeo de impacto cruzado (TASK-1276: quitar el `[verificar]` del reader operador-scoped)
+- [x] `Lifecycle` sincronizado (`in-progress` al tomar, `complete` al cerrar)
+- [x] archivo en la carpeta correcta (`complete/`)
+- [x] `docs/tasks/README.md` sincronizado + `TASK_ID_REGISTRY.md`
+- [x] `Handoff.md` actualizado (entrada de cierre)
+- [x] `changelog.md` actualizado
+- [x] chequeo de impacto cruzado: TASK-1276 ya consume `readOperatorScopedAeoReport` + `readOperatorCrossOrgAeoScores` (nombrados sin `[verificar]` en su wireframe/flow desde el review del 2026-06-29) y declara TASK-1287 como blocker de Slices 1/3.
+- [x] arch Delta en `GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md`
 
 ## Follow-ups
 

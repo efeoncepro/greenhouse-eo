@@ -1635,3 +1635,31 @@ publican strings libres de proveedor como `categoryAssociations`: el dominio (`l
 a la taxonomía gobernada (TASK-1272) o degradan a `unknown`/`needs_review`. **NUNCA** se cambia el default
 productivo sin eval + flag. **SIEMPRE** preservar `unknown` cuando la evidencia/schema no alcanzan. `sentimentScore`
 es auxiliar/no calibrado: la lógica de producto/reporte usa label/count/net, no threshold fuerte de score.
+
+## Delta 2026-06-29 — TASK-1287 Operator-scoped report readers (foundation de la vista operador) · EPIC-020
+
+Foundation backend (reader-only, additive) de los dos readers que la vista operador AEO (TASK-1276) consume
+y que no existían — contraparte interna del reader client-scoped (TASK-1243):
+
+- **`readOperatorScopedAeoReport({ subject, organizationId, runId? })`** (`src/lib/growth/ai-visibility/operator/command.ts`):
+  lee el reporte AEO de **cualquier** cliente/prospecto en scope operador. Reusa la orquestación canónica
+  (`readGraderReport` → `toClientGraderReport`) — **NO forkea scoring** — y devuelve `ClientGraderReport`
+  leak-safe (mismo shape que renderiza `modelFromClientReport`). Distinción dura vs el client reader: éste
+  recibe una org **arbitraria**, por lo que **self-guarda** con `can('growth.ai_visibility.report.read_operator',
+  'read', 'tenant')` (el client reader se protege derivando la org de su propio tenant). Errores de dominio
+  `OperatorGraderReportError {forbidden|not_found|report_unavailable}`.
+- **`readOperatorCrossOrgAeoScores({ subject })`** (delega a `store.ts:listOperatorCrossOrgAeoScores`): agregado
+  del cockpit cross-org — orgs con AEO vigente (`module_assignments.module_key='ai_visibility_v1'`,
+  `effective_to IS NULL`) + tier + último run reportable (LATERAL) + `grader_scores.overall_score` (LATERAL).
+  No hay VIEW canónica; el join se resuelve una vez. **Degradación honesta:** org con AEO sin run/score →
+  `latestRunId/latestScore = null` (NUNCA `0`). SQL ejercido contra PG real (gate TASK-893; columnas temporales TIMESTAMPTZ).
+
+**Capability nueva** `growth.ai_visibility.report.read_operator` (read/tenant) seedeada en `capabilities_registry` +
+grant en el bloque operador de `runtime.ts` (mismo set que `run.operator` de TASK-1277: `internal` ∪ `efeonce_admin`
+∪ `efeonce_account` ∪ `efeonce_operations` ∪ `ai_tooling_admin`); coverage automático.
+
+**Invariantes (resumen).** **NUNCA** un reader que reciba org arbitraria sin self-guard `can()`. **NUNCA** forkear
+el report builder/scoring (reusar `readGraderReport`+`toClientGraderReport`). **NUNCA** materializar `0` para una
+org sin run/score en el cockpit (degradación honesta `null`). El client reader (TASK-1243) y el scoring quedan
+intactos. **V1 = capability-gated:** un interno con la capability lee cualquier client-org; el scoping per-AM no
+existe como primitive (TASK-1277 tampoco) → follow-up.
