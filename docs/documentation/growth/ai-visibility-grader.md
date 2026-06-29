@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.17
+> **Version:** 1.18
 > **Creado:** 2026-06-24 por Claude (TASK-1226)
-> **Ultima actualizacion:** 2026-06-29 por Claude (TASK-1279 — cross-sell operador: enviar informe + crear Lead, no Deal)
+> **Ultima actualizacion:** 2026-06-29 por Claude (TASK-1288 — Brand Intelligence + categoría canónica, dos planos)
 > **Documentacion tecnica:** [GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md)
 
 # AI Visibility Grader — Motor de Providers (Growth)
@@ -191,6 +191,18 @@ Cuando un operador de Efeonce (Growth/Account) corre el grader sobre un **client
 **Cómo se opera.** Hoy, vía el contrato programático gobernado (`POST /api/admin/growth/ai-visibility/runs/[runId]/send-lead`) y, a futuro, desde la vista de operador y desde Nexa (con confirmación humana). Requiere que el informe del análisis esté **publicado** antes de enviarlo. El envío real está **apagado por flag** hasta completar el rollout (ver manual). Si algo falla (entrega o creación del Lead), un proceso en segundo plano lo reintenta sin re-enviar lo ya enviado, y una señal de salud lo marca.
 
 > Detalle técnico: §Delta TASK-1279 en [GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md). Operación paso a paso: [manual — enviar informe + crear Lead](../../manual-de-uso/growth/enviar-informe-aeo-crear-lead.md).
+
+## Cómo entiende la categoría de cada marca (Brand Intelligence — TASK-1288)
+
+Para que el análisis sirva a **cualquier** tipo de marca (no solo agencias), el grader primero entiende **qué es** la marca antes de preguntarle a los motores. Esto resuelve el problema que antes daba un "0" falso a marcas como una aerolínea: el sistema le preguntaba "¿qué agencias de aerolíneas hay?", una pregunta sin sentido.
+
+- **El campo "industria" no es confiable.** En las organizaciones, la industria viene de fuentes mezcladas (un código de HubSpot, un texto en español del registro chileno, o vacío). Por eso no se le cree directamente.
+- **Lee la marca una sola vez (Brand Intelligence).** El sistema visita el sitio de la marca (su contenido legible) y consulta cómo la conoce el mercado (Knowledge Graph/Wikipedia), y con eso entiende qué hace. Esa lectura se guarda y la reusan la categoría, el modelo de negocio y los prompts — no se lee tres veces.
+- **Modelo de dos planos.** Las categorías grandes (macro) y medianas (mid) son una lista corta y gobernada; el detalle fino (ej. "fabricante de pinturas", "aerolínea low-cost") se guarda como **dato descriptivo**, no como una categoría nueva. Así no hay que inventar una categoría por cada nicho.
+- **Si no se puede clasificar con confianza, queda "sin resolver"** y un humano lo confirma — el sistema nunca adivina en silencio.
+- **Ejemplos reales:** Sky Airlines → "aerolíneas de pasajeros"; Grupo Berel → "manufactura" + "fabricante de pinturas"; Banco de Chile (que tenía la industria mal puesta) → el sistema lo corrigió a "finanzas".
+
+> Detalle técnico: §Delta TASK-1288 en [GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md). Código: `src/lib/growth/ai-visibility/{taxonomy,brand-intelligence}/**`. Lectura grounded detrás del flag `GROWTH_AI_VISIBILITY_BRAND_INTELLIGENCE_ENABLED` (OFF por costo).
 
 ## Límites actuales
 

@@ -1,5 +1,11 @@
 # TASK-1291 — AEO: gate de validación pre-run del operador + reabilitación segura del cross-sell
 
+## Delta 2026-06-29 — foundation (TASK-1288) shipped
+
+- **El guard `unknown` YA EXISTE** (TASK-1288): `commands.ts buildExecuteInput` (chokepoint universal) bloquea con `aeo_category_unresolved` detrás del flag `GROWTH_AI_VISIBILITY_CATEGORY_GUARD_ENABLED` (OFF) + pre-check limpio en portal/operador (`category_unresolved` blocked). El signal `growth.ai_visibility.profile_category_unresolved` ya está cableado. Esta task agrega el **review/confirm unificado** del operador (categoría + modelo + prompts juntos, Adaptive Sidecar `reconciler`) + reabilita TASK-1279.
+- El snapshot `grader_brand_intelligence` (con `confidence` + provenance) es el insumo del review. `category_source`/`category_confidence` ya en `grader_profiles`.
+- `desbloqueada` (TASK-1288 complete).
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->

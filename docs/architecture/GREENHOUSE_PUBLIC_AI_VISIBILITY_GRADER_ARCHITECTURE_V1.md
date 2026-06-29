@@ -1758,3 +1758,46 @@ el pipeline.
 - **Rollout pendiente** (flag OFF): provisionar la property HubSpot `aeo_check_result` (NO existe hoy en el portal,
   verificado live 2026-06-29) + confirmar el objeto `leads` + smoke staging real (email + Lead + consent gate 422)
   + sign-off comercial/legal del copy a prospectos → prod vía release control plane (EPIC-020).
+
+## Delta 2026-06-29 — TASK-1288 Brand Intelligence (lectura grounded compartida) + categoría canónica · EPIC-021
+
+**Cierra el 1er paso de ISSUE-110** (el grader daba falso-0 a marcas no-agencia: SKY salió 0 porque el perfil
+inyectaba el enum crudo de HubSpot — `AIRLINES_AVIATION` — directo en los prompts). Foundation transversal de
+EPIC-021: desbloquea TASK-1289 (modelo de negocio), TASK-1290 (prompts por arquetipo) y TASK-1291 (gate/review).
+
+**Modelo de dos planos (decisión operador — "industrias hay muchas"):** la taxonomía gobernada NO enumera cada
+vertical. **Macro (`industry`, ~24) + Mid (`sector`, curado sólo donde el buyer journey difiere)**; la cola larga
+fina (p.ej. "fabricante de pinturas", "aerolínea low-cost") vive como **DATO** (`fine_category` en el snapshot),
+NUNCA como nodo. El nodo (macro/mid) elige el arquetipo de prompt; el descriptor fino da especificidad al fan-out.
+
+**Patrón SSOT + derivaciones:** la marca se lee UNA vez (`brand_intelligence` snapshot grounded: LLM sobre el
+contenido legible del sitio + entity KG/Wikidata) y **categoría (1288), modelo de negocio (1289) y prompts (1290)
+son derivaciones separadas** de ese snapshot — no 3 lecturas, no un monolito que acople lo estable a lo volátil.
+
+**Resolución por cascada con confianza** (`resolveCanonicalCategory`): grounded `brand_intelligence` (autoritativo)
+> HubSpot enum map (prior barato, mapeo COMPLETO del enum coverage-tested) > taxonomy alias (free-text) > `unknown`
+honesto. El `organizations.industry` es un mosaico de vocabularios (HubSpot enum + CIIU español + ~317 NULL) — por
+eso no se le cree y la lectura grounded es la solución universal. El LLM se constriñe a un nodo REAL o `unknown`
+(defense-in-depth sobre el prompt). Smoke live (gemini): SKY→`sector:passenger_airlines`, Berel→`industry:manufacturing`,
+Banco de Chile (dato HubSpot mal "marketing y diseño")→`industry:finance` **corregido**.
+
+**Persistencia:** `grader_profiles` += `category_node_id` (SoT) / `category_label` / `category_confidence` /
+`category_source`; tabla `grader_brand_intelligence` (snapshot versionado + supersede, 1 active/perfil, provenance).
+El `category` raw se preserva (additive) pero NUNCA es la fuente para prompts.
+
+**Guard universal:** en `commands.ts buildExecuteInput` (chokepoint común de los 3 run paths: portal/operador/público)
+la categoría se resuelve y su **label canónica** reemplaza el enum en los prompts; un `unknown`/baja confianza bloquea
+el run con `aeo_category_unresolved` (es-CL) detrás de `GROWTH_AI_VISIBILITY_CATEGORY_GUARD_ENABLED` (OFF). Pre-check
+limpio en portal/operador (`category_unresolved` blocked, sin malgastar allowance). Signal
+`growth.ai_visibility.profile_category_unresolved` (org-linked unresolved, steady 0).
+
+**Reglas duras:**
+- **NUNCA** persistir/interpolar el enum crudo de HubSpot en un prompt — el SoT es `category_node_id` + label.
+- **NUNCA** enumerar un nicho como nodo nuevo (paints_coatings, etc.): macro/mid gobernado + `fine_category` como dato.
+- **NUNCA** el LLM inventa un nodo: el orchestrator lo constriñe a un nodo REAL activo o `unknown`.
+- **NUNCA** instanciar un SDK LLM en el módulo: adapters sobre el cliente canónico `src/lib/ai/*` (secret server-side).
+- **SIEMPRE** degradación honesta: sin LLM/sin señales → cae al prior determinista, NUNCA prompts rotos.
+
+**Rollout pendiente** (flags OFF): prender `CATEGORY_GUARD` SÓLO tras backfill grounded verificado (sino bloquea el
+lead magnet con `unknown` legacy); `BRAND_INTELLIGENCE` tras sign-off de costo LLM (1×/marca/versión, cacheado).
+Migración + backfill grounded aplicados en `greenhouse-pg-dev`. Prod vía release control plane (EPIC-021).

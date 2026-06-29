@@ -1,5 +1,11 @@
 # TASK-1290 — AEO: packs de prompts por arquetipo × buyer-intent (reemplaza el pack único de agencia)
 
+## Delta 2026-06-29 — foundation (TASK-1288) shipped
+
+- **El `brand_intelligence` snapshot YA EXISTE** y es el **grounding compartido** que el autor LLM consume (NO re-lee el sitio): `what_the_brand_does`, `candidate_category_node` (macro/mid), **`fine_category`** (descriptor buyer-facing, la cola larga como dato), `candidate_business_model`. Tabla `grader_brand_intelligence` + módulo `src/lib/growth/ai-visibility/brand-intelligence/`.
+- La **categoría canónica** (`category_node_id` + label) ya está persistida en `grader_profiles`; el autor usa el nodo (arquetipo) + `fine_category` (especificidad). El prompt del grounded read fue validado con skill seo-aeo (entidad buyer-facing que alimenta este fan-out).
+- `desbloqueada` (TASK-1288 complete).
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->

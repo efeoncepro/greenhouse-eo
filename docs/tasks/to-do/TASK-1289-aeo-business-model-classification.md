@@ -1,5 +1,11 @@
 # TASK-1289 — AEO: clasificación de modelo de negocio (arquetipo del buyer-intent)
 
+## Delta 2026-06-29 — foundation (TASK-1288) shipped
+
+- **El `brand_intelligence` snapshot YA EXISTE** (tabla `grader_brand_intelligence`, módulo `src/lib/growth/ai-visibility/brand-intelligence/`): el grounded read ya emite `candidate_business_model` (enum `BRAND_BUSINESS_MODELS`: consumer_b2c/b2b_service_provider/b2b_product_saas/retail_ecommerce/marketplace/public_institution/unknown). Esta task ya NO lee el sitio — **DERIVA** del snapshot. Verificado live: Berel/SKY/Banco de Chile → `consumer_b2c`.
+- El enum candidato vive en `brand-intelligence/contracts.ts` (`BRAND_BUSINESS_MODELS`); esta task lo formaliza como columna en `grader_profiles` + el override del operador.
+- `desbloqueada` (TASK-1288 complete).
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
