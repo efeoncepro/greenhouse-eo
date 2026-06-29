@@ -62,6 +62,8 @@ Reglas obligatorias:
 - El prompt set es **inmutable + versionado** (cambios → versión nueva), con lifecycle `draft → approved → active` (append-only). Un set `active` no se edita; se supersede con una versión nueva aprobada.
 - **NUNCA** instanciar un SDK LLM nuevo en este dominio — usar el cliente canónico de `src/lib/ai/*` (helper structured); secret server-side; output validado contra schema; degradación honesta (sin LLM / schema inválido → baseline determinista, NO prompts rotos ni enum crudo).
 - **No leading**: el LLM no debe redactar prompts diseñados para que la marca aparezca (sesgaría la medición); el review + eval (TASK-1292) lo controla.
+- **System prompt del autor = artefacto versionado derivado de `seo-aeo`** (NO un "eres experto SEO" ad-hoc): codifica Query Fan-Out + etapas de buyer-intent + sub-query types + framing por modelo de negocio + restricción no-leading + la taxonomía del pack actual (`family`/`fanOutType`/`intentStage`/`namesBrand`). Su versión (`system_prompt_version`) es parte de la provenance del set; cambiarla re-dispara la eval.
+- **Output estructurado** (queries tipadas con sus tags, mismo shape que el pack actual) vía el helper structured del cliente canónico; el scoring depende de los tags, así que texto libre es inaceptable.
 - Interpolación de marca/categoría como **dato delimitado** (anti prompt-injection), nunca PII; prompts con `{{competitor}}` sin competidor se descartan (patrón existente).
 - El run persiste **provenance**: `business_model`, `category_node_id`, id/versión del prompt set usado.
 
@@ -87,7 +89,8 @@ Reglas obligatorias:
 
 - `migrations/<ts>_task-1290-grader-prompt-sets.sql` (tabla `grader_prompt_sets` + provenance en `grader_runs`)
 - `src/lib/growth/ai-visibility/prompt-packs/archetypes/*.ts` (baseline determinista por arquetipo) `[verificar naming]`
-- `src/lib/growth/ai-visibility/prompt-packs/author-prompt-set.ts` (autoría LLM vía cliente canónico) `[verificar]`
+- `src/lib/growth/ai-visibility/prompt-packs/author-prompt-set.ts` (autoría LLM vía cliente canónico + grounding sources) `[verificar]`
+- `src/lib/growth/ai-visibility/prompt-packs/author-system-prompt.ts` (system prompt experto AEO versionado, derivado de seo-aeo) + schema structured `[verificar]`
 - `src/lib/growth/ai-visibility/prompt-packs/prompt-set-store.ts` (lifecycle draft→approved→active + resolve active) `[verificar]`
 - `src/lib/growth/ai-visibility/prompt-pack.ts` (resolver el set active, fallback baseline)
 - `src/lib/growth/ai-visibility/run-engine.ts` (provenance del prompt set)
@@ -122,7 +125,7 @@ Reglas obligatorias:
 
 ### Data model and invariants
 
-- Entidades: `grader_prompt_sets` (`set_id`, `profile_id`, `version`, `business_model`, `category_node_id`, `prompts_json`, `generation_strategy` `llm`|`template_baseline`, `model`, `status` `draft`|`approved`|`active`|`superseded`, `created_by`, `approved_by`, timestamps); baseline por arquetipo en código (versionado). `grader_runs` (+ `prompt_set_id`/`version` provenance).
+- Entidades: `grader_prompt_sets` (`set_id`, `profile_id`, `version`, `business_model`, `category_node_id`, `prompts_json` (queries **estructuradas**: `family`/`fanOutType`/`intentStage`/`namesBrand`/`text`, mismo shape que el pack actual), `generation_strategy` `llm`|`template_baseline`, `model`, `system_prompt_version` (versión del cerebro AEO autor), `grounding_sources_json` (qué señales reales se usaron: site_probe/competitors/search_data), `status` `draft`|`approved`|`active`|`superseded`, `created_by`, `approved_by`, timestamps); baseline por arquetipo en código (versionado). `grader_runs` (+ `prompt_set_id`/`version` provenance).
 - Invariantes:
   - Un perfil tiene a lo sumo UN set `active`; aprobar uno nuevo supersede el anterior (append-only, no edit-in-place).
   - El run usa el set `active`; misma marca → mismo set (reproducible). Si no hay set `active` → baseline determinista del arquetipo (no prompts rotos, no enum crudo).
@@ -194,6 +197,14 @@ Reglas obligatorias:
 ## Detailed Spec
 
 Dos tiempos separados. **Autoría** (no por run): el LLM, dada la marca + categoría canónica (label, no enum) + modelo de negocio + señales del sitio, propone el fan-out de buyer-intent; se valida (schema, no-leading) y se persiste como `draft`. **Aprobación**: operador/AEO revisa (TASK-1291) y aprueba → el set queda `active` (congelado, inmutable). **Medición** (cada run): el run-engine resuelve el set `active` del perfil (determinista, reproducible, sin costo LLM) o, si no hay, cae al **baseline determinista** del arquetipo. El scoring downstream es agnóstico a la pregunta (mide presencia/SoV/citación sobre las observaciones) → generalizar los prompts NO toca el motor de score. Esto resuelve la tensión "LLM interpreta vs reproducibilidad": el LLM interpreta **una vez al autorar**; el run mide con un set **fijo**.
+
+### Estrategia de autoría LLM (grounded + experto AEO)
+
+El LLM autor **mina el espacio de queries de buyer-intent** (no es el grounding de la medición — el grounding real es el run contra los motores; el LLM sólo *propone* las preguntas). Dos decisiones canónicas:
+
+- **Autoría *grounded* (no a ciegas):** el LLM recibe señales REALES de la marca como contexto, no solo el nombre/categoría: el **site probe** (TASK-1266, ya existe), la lista de **competidores** declarados, y (si está disponible) **datos de búsqueda** (Semrush/PAA). Esto hace las queries específicas y locales (rutas/precio para una aerolínea), no genéricas. Lo usado queda en `grounding_sources_json` (provenance). Degradación honesta: sin señales → autoría solo desde marca+categoría+modelo (peor, pero no roto) o baseline.
+- **System prompt = experto AEO versionado, derivado de la doctrina canónica:** el rol del LLM NO se inventa — se deriva de la skill `seo-aeo` (Query Fan-Out, etapas de buyer-intent, sub-query types, framing por modelo de negocio, restricción **no-leading**) + la taxonomía del pack actual (`family`/`fanOutType`/`intentStage`/`namesBrand`). El system prompt es un **artefacto versionado** (`system_prompt_version` en el set): cambiarlo cambia la versión del set → la **eval (TASK-1292) lo re-valida** (ningún cambio del "cerebro" sin eval).
+- **Output ESTRUCTURADO, no texto libre:** el LLM devuelve queries tipadas con sus tags (`family`/`fanOutType`/`intentStage`/`namesBrand`/`text`), mismo shape que el pack actual, vía el helper structured del cliente canónico. Es obligatorio: el **scoring depende de esos tags** (ej. `namesBrand=false` = prompt de descubrimiento). Texto suelto rompería el motor.
 
 ## Rollout Plan & Risk Matrix
 
@@ -270,6 +281,6 @@ Dos tiempos separados. **Autoría** (no por run): el LLM, dada la marca + catego
 
 ## Open Questions
 
-- ¿La autoría LLM usa también señales del **sitio** de la marca (scrape/probe ya existente de TASK-1266) como contexto, o solo marca+categoría+modelo? (mejora la riqueza; definir en Discovery + costo).
 - ¿El review/approve (TASK-1291) es obligatorio para TODA marca o solo prospectos (cliente contratado podría auto-aprobar el baseline)? (definir con comercial).
 - ¿Qué modelo LLM para la autoría (Gemini/Anthropic/OpenAI del cliente canónico) y su cost ceiling por autoría? (definir con el dueño de costo AEO).
+- ¿El `system_prompt_version` del autor vive como artefacto en código (string versionado) o en DB para editarlo sin deploy? (recomendación: código + eval-gated; definir en Discovery).
