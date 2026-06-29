@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -39,7 +39,7 @@ TASK-1276 (vista operador) reusa el report model de TASK-1248, pero el reader de
 
 - Reader `readOperatorScopedAeoReport({ organizationId })` que devuelve el mismo modelo de reporte que consume TASK-1248/1252/1276, resuelto por **scope de org del operador** (no por tenant cliente), reusando el report builder canónico (TASK-1235) sin forkear scoring.
 - Reader `readOperatorCrossOrgAeoScores()` que devuelve la lista de orgs con AEO (entitlement `contracted|trial|pilot`) + último run + score agregado, para el cockpit.
-- Capability de lectura operador `growth.ai_visibility.report.read_operator` + grant a roles internos (mismo PR, coverage test), tenant-safe (un operador solo ve orgs de su scope), honest degradation (`null` ≠ `0` cuando no hay run).
+- Capability de lectura operador `growth.ai_visibility.report.read_operator` + grant a roles internos (mismo PR, coverage test), capability-gated (V1: un interno con la capability lee cualquier client-org — alineado con el grant operador de TASK-1277; el scoping per-AM no existe como primitive y queda follow-up), honest degradation (`null` ≠ `0` cuando no hay run).
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 1 — CONTEXT & CONSTRAINTS
@@ -124,7 +124,7 @@ Reglas obligatorias:
   - El report builder/scoring NO se forkea: mismo modelo, distinta resolución de scope.
   - `score: null` / `lastRunAt: null` cuando no hay run elegible — NUNCA `0`.
   - El reader client-scoped (TASK-1243) NO cambia de comportamiento.
-- Tenant/space boundary: el operador resuelve orgs por su scope (capability + org scope); un operador NUNCA lee una org fuera de su scope. Prospecto = `organization` tipo prospect (TASK-706).
+- Tenant/space boundary: el reader recibe una org ARBITRARIA → **self-guard obligatorio** con `can(subject, 'growth.ai_visibility.report.read_operator', 'read', 'tenant')` (a diferencia del client reader, que se protege derivando la org del propio tenant). V1 = capability-gated: interno con la capability lee cualquier client-org; el scoping per-AM no existe como primitive (TASK-1277 tampoco) → follow-up. Prospecto = `organization` tipo prospect (TASK-706).
 - Idempotency/concurrency: reads puros, sin escritura.
 - Audit/outbox/history: `none` (read-only). Rationale: lectura no muta estado; el audit de acciones vive en los commands (TASK-1275/1279).
 
@@ -138,7 +138,7 @@ Reglas obligatorias:
 
 ### Security and access
 
-- Auth/access gate: capability `growth.ai_visibility.report.read_operator` (interna, Growth/AM) + grant `efeonce_account` + `efeonce_admin` (mismo PR + coverage). Read gateado por scope de org del operador.
+- Auth/access gate: capability `growth.ai_visibility.report.read_operator` (interna, Growth/AM) + grant a `internal` route group ∪ `efeonce_admin` ∪ `efeonce_account` ∪ `efeonce_operations` (mismo set que el bloque operador de TASK-1277 `run.operator`; quien corre debe poder leer) + coverage automático. El reader self-guarda con `can()`.
 - Sensitive data posture: el reporte operador puede incluir señales internas; respetar el disclosure del modelo (no exponer engine-snapshot interno a superficies públicas; esto es interno operador).
 - Error contract: errores canónicos (`canonicalErrorResponse` / `CanonicalErrorCode`); `captureWithDomain` para fallos de lectura; honest degradation, no `.catch(() => [])`.
 - Abuse/rate-limit posture: N/A (read interno gateado por capability).
@@ -173,7 +173,7 @@ Reglas obligatorias:
 ### Slice 1 — Capability de lectura operador + grant + coverage
 
 - Seed `growth.ai_visibility.report.read_operator` en `capabilities_registry` (migration) + `entitlements-catalog.ts`.
-- Grant a `efeonce_account` + `efeonce_admin` en `runtime.ts` + fila en `capability-grant-coverage.test.ts` (mismo PR).
+- Grant a `internal` ∪ `efeonce_admin` ∪ `efeonce_account` ∪ `efeonce_operations` en `runtime.ts` (mismo set que `run.operator` de TASK-1277); coverage test automático (grep de `can()`).
 
 ### Slice 2 — `readOperatorScopedAeoReport({ organizationId })`
 
