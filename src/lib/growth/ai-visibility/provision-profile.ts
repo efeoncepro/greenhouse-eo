@@ -2,7 +2,7 @@ import 'server-only'
 
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
-import { resolveCanonicalCategory } from './taxonomy'
+import { classifyBusinessModel, resolveCanonicalCategory } from './taxonomy'
 
 // country (ISO-2) -> market + locale del grader. Conservador; ampliar cuando emerja otro país.
 const MARKET_BY_COUNTRY: Record<string, { market: string; locale: string }> = {
@@ -136,12 +136,19 @@ export const provisionGraderProfileForOrganization = async (
   // + taxonomy alias); Slice 4 passes the grounded brand_intelligence candidate.
   const resolvedCategory = resolveCanonicalCategory({ industry: org.industry })
 
+  // TASK-1289 — business_model (buyer-intent axis, orthogonal to category). At provision time
+  // there is no grounded brand_intelligence snapshot yet (same as category), so the deterministic
+  // category heuristic is the prior; the grounded backfill upgrades it, the operator overrides it.
+  // NEVER defaulted to agency (ISSUE-110) — ambiguous categories resolve to honest `unknown`.
+  const classifiedBusinessModel = classifyBusinessModel({ categoryNodeId: resolvedCategory.nodeId })
+
   const inserted = await runGreenhousePostgresQuery<ProfileRow>(
     `INSERT INTO greenhouse_growth.grader_profiles
        (brand_name, website_url, market, locale, category,
         category_node_id, category_label, category_confidence, category_source,
+        business_model, business_model_confidence, business_model_source,
         competitors_declared, organization_id, status)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, 'active')
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, 'active')
      RETURNING profile_id, public_id`,
     [
       org.organization_name,
@@ -153,6 +160,9 @@ export const provisionGraderProfileForOrganization = async (
       resolvedCategory.label?.es ?? null,
       resolvedCategory.confidence,
       resolvedCategory.source,
+      classifiedBusinessModel.businessModel,
+      classifiedBusinessModel.confidence,
+      classifiedBusinessModel.source,
       [],
       org.organization_id
     ]

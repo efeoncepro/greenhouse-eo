@@ -77,6 +77,9 @@ describe('provisionGraderProfileForOrganization', () => {
       'Retail', // denormalized es label
       0.7, // hubspot_map prior confidence
       'hubspot_map',
+      'unknown', // TASK-1289 business_model: industry:retail is ambiguous (consumer vs ecommerce) → honest unknown
+      0, // business_model_confidence
+      'unknown', // business_model_source
       [],
       'org-1'
     ])

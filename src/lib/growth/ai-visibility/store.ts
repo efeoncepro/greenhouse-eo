@@ -34,6 +34,10 @@ export interface GraderProfileRow {
   categoryLabel: string | null
   categoryConfidence: number | null
   categorySource: string | null
+  /** TASK-1289 — modelo de negocio (eje de buyer-intent, ortogonal a la categoría). 'unknown' honesto. */
+  businessModel: string | null
+  businessModelConfidence: number | null
+  businessModelSource: string | null
   competitorsDeclared: string[]
   status: string
   /** TASK-1243 — binding a la organización cliente (null = perfil interno/público). */
@@ -115,6 +119,9 @@ const projectProfile = (row: RawProfile): GraderProfileRow => ({
   categoryLabel: (row.category_label as string | null) ?? null,
   categoryConfidence: row.category_confidence != null ? Number(row.category_confidence) : null,
   categorySource: (row.category_source as string | null) ?? null,
+  businessModel: (row.business_model as string | null) ?? null,
+  businessModelConfidence: row.business_model_confidence != null ? Number(row.business_model_confidence) : null,
+  businessModelSource: (row.business_model_source as string | null) ?? null,
   competitorsDeclared: (row.competitors_declared as string[] | null) ?? [],
   status: String(row.status),
   organizationId: (row.organization_id as string | null) ?? null,

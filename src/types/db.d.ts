@@ -6588,6 +6588,19 @@ export interface GreenhouseGrowthGraderBrandIntelligence {
   what_the_brand_does: string | null;
 }
 
+export interface GreenhouseGrowthGraderBusinessModelHistory {
+  changed_at: Generated<Timestamp>;
+  changed_by: string;
+  confidence: Numeric | null;
+  from_business_model: string | null;
+  history_id: Generated<string>;
+  organization_id: string | null;
+  profile_id: string;
+  reason: string | null;
+  to_business_model: string;
+  to_source: string;
+}
+
 export interface GreenhouseGrowthGraderIntakeEvents {
   created_at: Generated<Timestamp>;
   email_hash: string | null;
@@ -6641,6 +6654,9 @@ export interface GreenhouseGrowthGraderProbeResults {
 
 export interface GreenhouseGrowthGraderProfiles {
   brand_name: string;
+  business_model: string | null;
+  business_model_confidence: Numeric | null;
+  business_model_source: string | null;
   category: string | null;
   category_confidence: Numeric | null;
   category_label: string | null;
@@ -11030,6 +11046,7 @@ export interface DB {
   "greenhouse_growth.form_submission_consent_snapshot": GreenhouseGrowthFormSubmissionConsentSnapshot;
   "greenhouse_growth.form_version": GreenhouseGrowthFormVersion;
   "greenhouse_growth.grader_brand_intelligence": GreenhouseGrowthGraderBrandIntelligence;
+  "greenhouse_growth.grader_business_model_history": GreenhouseGrowthGraderBusinessModelHistory;
   "greenhouse_growth.grader_intake_events": GreenhouseGrowthGraderIntakeEvents;
   "greenhouse_growth.grader_leads": GreenhouseGrowthGraderLeads;
   "greenhouse_growth.grader_probe_results": GreenhouseGrowthGraderProbeResults;
