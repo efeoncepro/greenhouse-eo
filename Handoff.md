@@ -1,3 +1,15 @@
+## Sesion 2026-06-29 — Public Site AEO Elementor draft base — Codex — ✅ draft creado
+
+> **Pedido:** crear una nueva pagina editable con Elementor para usarla como base de la futura pagina AEO, copiando el hero actual de la home publica sin modificar la home.
+>
+> **Resultado:** se creo en WordPress/Kinsta la pagina `AEO` como **draft no publicado** (`postId=250255`, slug `aeo`). Link admin: `https://efeoncepro.com/wp-admin/post.php?post=250255&action=edit`; link Elementor: `https://efeoncepro.com/wp-admin/post.php?post=250255&action=elementor`.
+>
+> **Fuente copiada:** home publica `page_id=2791` (`Home 2`), container hero Elementor `55718ee3`. Se copio solo el hero como root container de la pagina nueva; no se copio el carrusel inferior ni se toco header/menu/logo. El container conserva `clb__dark_section` y suma clases semanticas `gh-owned gh-section-hero gh-section-aeo-hero` para gobernanza futura.
+>
+> **Metas/layout:** se copiaron las metas Ohio de canvas desde la home para evitar page headline/breadcrumb/top padding extra; verificado `page_header_title_visibility=0`, `page_breadcrumbs_visibility=0`, `page_add_top_padding=0`, `page_add_wrapper=0`. La pagina queda con `_elementor_edit_mode=builder`, `_elementor_template_type=wp-page`, `rootCount=1`, `rootId=55718ee3`.
+>
+> **Evidencia:** scripts temporales WP-CLI ejecutados via `pnpm public-website:wpcli -- --eval-file ... --wp-user 12`; `php -l` verde en los scripts; verificacion remota read-only devolvio `ok=true`, `status=draft`, `heroFound=true` y widgets hijos `ohio_video`, `ohio_icon_box`, `ohio_heading`, containers CTA/proof. No se purgo cache porque no hay publicacion ni cambio al frontend publico. Scripts temporales locales eliminados.
+
 ## Sesion 2026-06-29 — Home publica Efeonce hero refresh — Codex — ✅ aplicado live
 
 > **Contexto:** trabajo directo sobre la home publica `https://efeoncepro.com/` (`page_id=2791`, Elementor container hero `55718ee3`). El operador pidio intervenir **solo desde debajo del menu/logo**; no tocar header, menu ni logo. Flujo usado: `tmp/update-home-hero-20260629.php` + `Document::save()` de Elementor, con snapshot/restore de `_thumbnail_id`, `page_header_title_background_type` y `page_header_title_background_image`; cache Kinsta purgada tras cada apply.
@@ -33,6 +45,8 @@
 > - **Gates:** `pnpm test` full **8524 passed / 0 failed** + `pnpm build` Turbopack limpio + lint + typecheck + `docs:closure-check` (0 flags sin registrar). Docs sincronizados: arch Delta, doc funcional v1.18, changelog, FEATURE_FLAG_STATE_LEDGER (2 flags), Deltas a TASK-1289/1290/1291, memoria.
 > - **Rollout pendiente:** prender `CATEGORY_GUARD` SÓLO tras backfill grounded verificado (sino bloquea el lead magnet con `unknown` legacy); `BRAND_INTELLIGENCE` tras sign-off de costo LLM (1×/marca/versión cacheado) → prod vía release control plane (EPIC-021). Siguen TASK-1289 (modelo de negocio, desbloqueada) → 1290 → 1291 → 1292.
 > - **Convivencia Codex:** `tests/e2e/{fixtures/auth.ts,smoke/admin-nav.spec.ts}` siguen modificados sin commitear por Codex — NO los toqué ni stageé; este cierre co-commitea solo las entradas doc-only de Codex en changelog/Handoff (su hero refresh de la home pública).
+>
+> **ROLLOUT STAGING aplicado + verificado runtime (2026-06-29, "hagamos el rollout"):** push `develop`→`769acf6dd` → Vercel staging Ready (mismo SHA, `18:25:38 UTC`) + **Ops Worker Deploy success** (deploy.sh BRAND_INTELLIGENCE staging ON / CATEGORY_GUARD OFF) + Vercel staging env `GROWTH_AI_VISIBILITY_BRAND_INTELLIGENCE_ENABLED=true`. Migraciones + backfill (determinista + grounded) ya en `greenhouse-pg-dev` (= DB staging). **Verificación E2E runtime:** operator run nuevo en SKY en staging (`EO-GRUN-00030`, 202) → `execution_prompts` usan la **label canónica "Aerolíneas de pasajeros"** y el enum crudo **"AIRLINES_AVIATION" desapareció** (check false). El fix core es code-level → live sin flag. **CI rojo SOLO por `Playwright E2E smoke / admin-nav.spec.ts`** (timeout `/admin` `page.goto`) = issue PRE-EXISTENTE de Codex con fix uncommitted/no-pusheado, NO relacionado con TASK-1288 (mis cambios no tocan /admin ni tests/e2e; el smoke growth `growth-forms-admin-cockpit-a11y` pasó ✓). **CATEGORY_GUARD OFF** (se prende con TASK-1291). **Prod pendiente:** release control plane (EPIC-021).
 
 ## Sesion 2026-06-29 — TASK-1279 AEO Operator Cross-Sell (enviar informe + crear Lead) — Claude — ✅ complete (code complete, rollout pendiente)
 
