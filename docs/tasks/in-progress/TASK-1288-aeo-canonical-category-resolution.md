@@ -85,15 +85,21 @@ Reglas obligatorias:
 
 ### Files owned
 
-- `migrations/<ts>_task-1288-brand-intelligence-canonical-category.sql` (snapshot `grader_brand_intelligence` + columnas `category_node_id`/`category_label`/`category_confidence` en `grader_profiles`; backfill)
-- `src/lib/growth/ai-visibility/brand-intelligence/read-brand-intelligence.ts` (lectura grounded compartida: LLM sobre contenido del sitio + entity → snapshot estructurado) `[verificar]`
-- `src/lib/growth/ai-visibility/brand-intelligence/fetch-site-content.ts` (traída read-only del contenido legible home/about; reusa/extiende el probe de TASK-1266) `[verificar]`
-- `src/lib/growth/ai-visibility/taxonomy/hubspot-industry-map.ts` (diccionario HubSpot enum → nodo, prior/baseline) `[verificar naming]`
-- `src/lib/growth/ai-visibility/taxonomy/resolve-category.ts` (resolver por cascada con confianza) `[verificar]`
+- `migrations/<ts>_task-1288-grader-profile-canonical-category.sql` (columnas `category_node_id`/`category_label`/`category_confidence`/`category_source` en `grader_profiles`; additive)
+- `migrations/<ts>_task-1288-grader-brand-intelligence.sql` (tabla snapshot `grader_brand_intelligence` versionada)
+- `src/lib/growth/ai-visibility/taxonomy/catalog.ts` (agregar nodo aviación + enriquecer `aliases` de nodos con los enums HubSpot — recalibración: reuse del mapper canónico, NO diccionario paralelo)
+- `src/lib/growth/ai-visibility/taxonomy/resolve-category.ts` (resolver por cascada con confianza: envuelve `mapCategoryCandidateToTaxonomy` como prior + snapshot + entity) `[verificar]`
+- `src/lib/growth/ai-visibility/brand-intelligence/*` (módulo mirror de `normalization/prose-extraction/`: contracts + prompt/schema + router degradation-honest + adapters por provider + `read-brand-intelligence.ts`) `[verificar]`
+- `src/lib/growth/ai-visibility/brand-intelligence/fetch-site-content.ts` (traída read-only del contenido legible home/about — nuevo: el probe TASK-1266 NO trae texto) `[verificar]`
+- `src/lib/growth/ai-visibility/brand-intelligence/store.ts` (persistencia del snapshot vía `runGreenhousePostgresQuery`) `[verificar]`
 - `src/lib/growth/ai-visibility/provision-profile.ts` (usar el resolver, no `org.industry` crudo)
+- `src/lib/growth/ai-visibility/commands.ts` (guard `unknown`/baja confianza en `buildExecuteInput` — recalibración: chokepoint universal de los 3 paths, NO `request-run.ts`)
 - `src/lib/growth/ai-visibility/prompt-pack.ts` (interpolar la label canónica, no el enum)
-- `src/lib/growth/ai-visibility/request-run.ts` (guard `unknown`/baja confianza) `[verificar]`
+- `src/lib/growth/ai-visibility/flags.ts` (flags `*_CATEGORY_GUARD_ENABLED` + `*_BRAND_INTELLIGENCE_ENABLED`, default OFF)
+- `src/lib/reliability/queries/growth-ai-visibility-category-signals.ts` + wiring en `get-reliability-overview.ts` (signal `profile_category_unresolved`) `[verificar]`
 - `src/lib/ai/*` (reuse del cliente LLM canónico — NO SDK nuevo)
+- `src/lib/api/canonical-error-response.ts` (nuevo code `aeo_category_unresolved`)
+- backfill: `scripts/growth/backfill-canonical-category.ts` (dry-run + report) `[verificar]`
 
 ## Current Repo State
 
@@ -176,21 +182,27 @@ Reglas obligatorias:
 
 ## Scope
 
-### Slice 1 — Mapeo determinista (baseline) + resolver por cascada
+> **Recalibración 2026-06-29 (post-Discovery, aprobada):** orden re-ordenado para shipear el fix determinista (sin LLM, bajo riesgo) primero; brand_intelligence (LLM grounded) entra aditivo al final. Guard en `commands.ts buildExecuteInput` (chokepoint universal de los 3 paths). Mapeo = reuse del mapper canónico + enriquecer aliases, NO diccionario paralelo.
 
-- `hubspot-industry-map.ts` (diccionario HubSpot enum → nodo, prior/baseline) + `resolveCanonicalCategory` que combina prior + snapshot + entity con confianza → nodo o `unknown`. Tests.
+### Slice 1 — Taxonomía universal + resolver determinista
 
-### Slice 2 — Brand Intelligence (lectura grounded compartida)
+> **Alcance = TODOS los tipos de marca, NO aerolíneas/agencias** (corrección operador 2026-06-29). La aerolínea (SKY) es el caso que destapó el bug, no el scope. Cherry-pick de "nodo aviación" sería repetir el pecado de ISSUE-110.
 
-- Migration `grader_brand_intelligence` (snapshot versionado) + `read-brand-intelligence.ts`: LLM (cliente canónico `src/lib/ai/*`, structured) sobre el site probe (TASK-1266) + entity (TASK-1267) → `{ what_the_brand_does, candidate_category_node, candidate_business_model, signals_used, confidence }`. Degradación honesta sin señales. **Lo consumen TASK-1289/1290.**
+- **Cobertura universal de la taxonomía:** auditar los 18 nodos `industry:*` (hoy sesgados a B2B/SaaS/agencia) y extenderla para hospedar el espectro completo de marcas: consumo masivo, retail/e-commerce, banca/finanzas, aerolíneas/transporte de pasajeros, hotelería/turismo, telco, automotriz, alimentos/bebidas, salud de consumo, entretenimiento/medios, energía, educación, etc. Agregar los nodos faltantes (aviación de pasajeros entre ellos), no uno suelto.
+- **Mapeo del catálogo COMPLETO de HubSpot industry enum → nodo** (no cherry-pick): enriquecer `aliases` de los nodos con TODOS los ~150 valores del enum HubSpot vigente, de modo que cualquier industria resuelva a un nodo real o a `unknown` honesto. Report de cobertura del enum.
+- `resolve-category.ts` (`resolveCanonicalCategory`) envuelve `mapCategoryCandidateToTaxonomy` (prior) → `{nodeId,label,source,confidence}` ∪ `unknown` (estructura lista para la cascada de S4). Tests con marcas de varios tipos (aerolínea, banco, retailer, SaaS, agencia, hotel) → nodo correcto; enum desconocido → `unknown`.
 
-### Slice 3 — Persistencia + provisión + backfill
+### Slice 2 — Persistencia + provisión + backfill determinista
 
-- Migration: `category_node_id`/`category_label`/`category_confidence`/`category_source` en `grader_profiles`. `provision-profile.ts` usa el resolver (no `org.industry` crudo). Backfill idempotente (genera snapshot + resuelve) + report de cobertura/confianza.
+- Migration: `category_node_id`/`category_label`/`category_confidence`/`category_source` en `grader_profiles`. `provision-profile.ts` usa el resolver (no `org.industry` crudo). Backfill idempotente + report de cobertura/confianza. _SKY/Berel resuelven a nodo+label reales._
 
-### Slice 4 — Render + guard + signal
+### Slice 3 — Render + guard + flag + signal
 
-- `prompt-pack.ts` interpola la label canónica. Guard `unknown`/baja confianza en el chokepoint (`request-run.ts`) detrás de flag + error canónico `aeo_category_unresolved`. Reliability signal `profile_category_unresolved`.
+- `prompt-pack.ts` interpola la label canónica. Guard `unknown`/baja confianza en `buildExecuteInput` (commands.ts, los 3 paths) detrás de `GROWTH_AI_VISIBILITY_CATEGORY_GUARD_ENABLED` (OFF) + error canónico `aeo_category_unresolved`. Reliability signal `profile_category_unresolved` wired en `get-reliability-overview.ts`.
+
+### Slice 4 — Brand Intelligence (lectura grounded compartida)
+
+- Migration `grader_brand_intelligence` (snapshot versionado) + módulo `brand-intelligence/*` (mirror de `normalization/prose-extraction/`: schema plano + adapters por provider + router degradation-honest) + `fetch-site-content.ts` (contenido legible) → `{ what_the_brand_does, candidate_category_node, candidate_business_model, signals_used, confidence }`, detrás de `GROWTH_AI_VISIBILITY_BRAND_INTELLIGENCE_ENABLED` (OFF). Upgradea `resolveCanonicalCategory` a cascada (prior=mapper + autoritativo=snapshot + cruce=entity). Backfill regenera con confianza grounded. Degradación honesta sin LLM/señales. **Lo consumen TASK-1289/1290.**
 
 ## Out of Scope
 
