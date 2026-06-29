@@ -181,6 +181,7 @@ import { getGrowthFormsHubspotSignals } from './queries/growth-forms-hubspot-sig
 import { getGrowthFormsPiiSignals } from './queries/growth-forms-pii-signals'
 import { getGrowthAiVisibilityLeadHandoffSignals } from './queries/growth-ai-visibility-lead-handoff-signals'
 import { getGrowthAiVisibilityReportEmailSignals } from './queries/growth-ai-visibility-report-email-signals'
+import { getGrowthAiVisibilityOperatorSendSignals } from './queries/growth-ai-visibility-operator-send-signals'
 import { getGrowthAiVisibilityEntitlementSignals } from './queries/growth-ai-visibility-entitlement-signals'
 import { getGrowthAiVisibilityRegradeSignals } from './queries/growth-ai-visibility-regrade-signals'
 import { getGrowthSearchConsoleTokenHealthSignal } from './queries/growth-search-console-token-health'
@@ -637,6 +638,7 @@ interface ReliabilityOverviewSources {
   growthFormsPii?: ReliabilitySignal[] | null
   growthAiVisibilityLeadHandoff?: ReliabilitySignal[] | null
   growthAiVisibilityReportEmail?: ReliabilitySignal[] | null
+  growthAiVisibilityOperatorSend?: ReliabilitySignal[] | null
   growthAiVisibilityEntitlement?: ReliabilitySignal[] | null
   growthAiVisibilityRegrade?: ReliabilitySignal[] | null
   growthSearchConsoleTokenHealth?: ReliabilitySignal | null
@@ -1058,6 +1060,7 @@ export const buildReliabilityOverview = (
     ...(sources.growthFormsPii ?? []),
     ...(sources.growthAiVisibilityLeadHandoff ?? []),
     ...(sources.growthAiVisibilityReportEmail ?? []),
+    ...(sources.growthAiVisibilityOperatorSend ?? []),
     ...(sources.growthAiVisibilityEntitlement ?? []),
     ...(sources.growthAiVisibilityRegrade ?? []),
     ...(sources.growthSearchConsoleTokenHealth ? [sources.growthSearchConsoleTokenHealth] : []),
@@ -1492,6 +1495,12 @@ export const getReliabilityOverview = async (
     preloadedSources.growthAiVisibilityReportEmail !== undefined
       ? preloadedSources.growthAiVisibilityReportEmail
       : await getGrowthAiVisibilityReportEmailSignals().catch(() => null)
+
+  // TASK-1279 — cross-sell operador (envío informe + Lead HubSpot en failed sin recuperar).
+  const growthAiVisibilityOperatorSend =
+    preloadedSources.growthAiVisibilityOperatorSend !== undefined
+      ? preloadedSources.growthAiVisibilityOperatorSend
+      : await getGrowthAiVisibilityOperatorSendSignals().catch(() => null)
 
   // TASK-1277 — entitlement & metering (integridad del chokepoint / budget de trials /
   // atribución cliente vs sales). DB vacía / portal OFF → steady ok.
@@ -2420,6 +2429,7 @@ export const getReliabilityOverview = async (
     growthFormsPii,
     growthAiVisibilityLeadHandoff,
     growthAiVisibilityReportEmail,
+    growthAiVisibilityOperatorSend,
     growthAiVisibilityEntitlement,
     growthAiVisibilityRegrade,
     growthSearchConsoleTokenHealth,
