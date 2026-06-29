@@ -164,3 +164,18 @@ Cierra los follow-ups #2 y #4 y resuelve formalmente el #1 como **decisión docu
 | 3 | ADR delta Anthropic | Abierto (decisión de producto). |
 | 4 | Prompt pack v2 | **HECHO como artefacto opt-in**; activación a default difiere a eval real. |
 | 5 | Eval real v1-vs-v2 + efecto agregado del mix + cost ceiling N≥3 | Abierto (requiere budget de provider). |
+
+## Delta 2026-06-29 — TASK-1271 prose extraction provider eval (cutover evidencia-first)
+
+La extracción de prosa (sentiment/category/drift) pasó a un router provider-agnóstico con candidatos
+low-cost (Gemini/OpenAI) además de Anthropic. El **cutover de proveedor es evidencia-first**: el harness
+`evals/prose-extraction-eval.ts` + fixtures metodológicos (`prose-extraction-methodology-fixtures.ts`) +
+CLI `scripts/growth/ai-visibility-prose-eval.ts` miden exactitud de `sentimentLabel`, false positives
+(sentimiento de marca inventado desde tono general), false negatives, preservación de `unknown`, drift,
+schema-valid rate, latencia y **costo estimado por proveedor** con tope de presupuesto acumulado.
+
+**Estado:** default productivo sigue `anthropic` (behavior-preserving). El veredicto de cutover (qué
+candidato low-cost, si alguno) requiere la corrida de staging shadow con presupuesto acotado — se documenta
+en `GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md` §Delta TASK-1271 antes de cambiar el default.
+Relacionado con el follow-up #5 (eval real + cost ceiling N≥3): este harness es el vehículo de esa medición
+para el paso de extracción de prosa.

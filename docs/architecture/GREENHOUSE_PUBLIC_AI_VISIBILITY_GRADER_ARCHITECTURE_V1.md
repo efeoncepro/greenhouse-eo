@@ -1587,3 +1587,51 @@ Operador (Growth/AM)      → requestGraderRunAsOperator    → ilimitado, costo
 - **NUNCA** hardcodear la KG api key: resolverla server-side con `resolveSecret({GOOGLE_KNOWLEDGE_GRAPH_API_KEY})` en el command; el probe la recibe vía `ctx.entity.knowledgeGraphApiKey` (null → degrada `not_configured`).
 - **NUNCA** loggear/exponer la api key ni contenido crudo de terceros más allá de conteos/tipos/snippets acotados public-safe; sin PII del lead (solo marca/dominio).
 - **SIEMPRE** que agregues una fuente de entidad nueva: nuevo `ProbeKind` + dimensión en `readiness-config.ts` (peso que mantenga la suma del eje `entity` en 100), registrala en `probes/entity/index.ts`, y añadí su host a `ENTITY_API_ALLOWED_HOSTS` si consulta una API nueva.
+
+## Delta 2026-06-29 — TASK-1271 Prose Extraction Router (cost-efficient, evidencia-first) · EPIC-020
+
+**Qué cambia.** El hook de extracción de prosa (`enrichFindingWithLlm`) — el único paso que llena
+`sentimentLabel`/`sentimentScore`/`categoryAssociations`/`messageDriftClaims` y refina `brandMentioned`
+ambiguo — pasa de estar acoplado a Anthropic a un **puerto provider-agnóstico** + **router** con
+degradación honesta. Vive en `src/lib/growth/ai-visibility/normalization/prose-extraction/`:
+`contracts.ts` (`ProseExtractionProvider`, `ProseExtractionResult`, `sanitizeProseExtractionOutput`),
+`prompt.ts` (system+schema compartidos, metodología sentiment-toward-brand), `{anthropic,gemini,openai}-provider.ts`
+(adapters sobre los clientes canónicos `src/lib/ai/*`), `router.ts` (`runProseExtraction`). El scoring
+(`scoreGraderRun`) y el `grader_score` siguen **deterministas**: el router NUNCA asigna score.
+
+**Clientes canónicos extendidos (additive).** `src/lib/ai/openai.ts` → `generateStructuredOpenAI`
+(Responses API `json_schema`); `src/lib/ai/google-genai.ts` → `generateStructuredGemini` (Vertex
+`responseMimeType: application/json` + `responseJsonSchema`). Anthropic ya tenía `generateStructuredAnthropic`.
+No se instanció ningún SDK/fetch paralelo en el dominio del grader.
+
+**Default behavior-preserving.** `GROWTH_AI_VISIBILITY_LLM_EXTRACTION_ENABLED` sigue gateando el extractor
+(default OFF). `GROWTH_AI_VISIBILITY_PROSE_EXTRACTION_PROVIDER` (default `anthropic`) elige el proveedor
+cuando el extractor está ON → con todos los flags como están, el comportamiento es idéntico al de TASK-1227
+(mismo modelo Haiku, mismo schema, mismo merge con la taxonomía gobernada TASK-1272). Config no-`*_ENABLED`:
+`_PROSE_EXTRACTION_MAX_TOKENS` (1024), `_PROSE_EXTRACTION_MAX_COST_USD` (0.02, guard de presupuesto),
+`_PROSE_EXTRACTION_MODEL_{ANTHROPIC,GEMINI,OPENAI}` (override de modelo sin deploy).
+
+**Degradación honesta (router NUNCA lanza).** flag OFF / excerpt vacío / proveedor sin secret /
+`isConfigured()` que lanza / schema inválido / proveedor que lanza → `fields=null` ⇒ el caller conserva
+el finding determinista intacto; el error crudo va a `captureWithDomain('growth')`, nunca al cliente. La
+metadata interna (provider/model/cost/usage/latency) viaja aparte, NO contamina `NormalizedFinding` ni el DTO público.
+
+**Eval/cost harness (cutover evidencia-first).** `evals/prose-extraction-eval.ts` (provider-injectable, scoring
+PURO) + `evals/prose-extraction-methodology-fixtures.ts` (sentiment-toward-brand vs tono general; unknown/mixed;
+drift) + CLI `scripts/growth/ai-visibility-prose-eval.ts` (providers reales con **tope de presupuesto acumulado**).
+La eval mide exactitud de `sentimentLabel`, false positives/negatives, preservación de `unknown`, drift,
+schema-valid rate, latencia y costo por proveedor.
+
+**Decisión de cutover (este PR).** **El default productivo NO cambia: sigue `anthropic`.** Los candidatos
+low-cost (Gemini Flash-Lite / OpenAI nano, modelos override-ables) quedan **implementados y listos pero
+OFF**, a la espera de evidencia. Open Questions resueltas: (1) NO se elige Gemini vs OpenAI por intuición —
+ambos se evalúan con el CLI en staging shadow antes de decidir; (2) el shadow es **allowlisted** (sólo el
+CLI de eval), NO se dispara doble-provider en runs normales → cero costo extra en producción. Secuencia de
+cutover: local/eval verde → staging shadow con presupuesto acotado → comparar exactitud + costo → documentar
+veredicto acá → flip de `_PROSE_EXTRACTION_PROVIDER` en staging → prod sólo vía release gate de EPIC-020.
+
+**Invariantes (resumen).** **NUNCA** un LLM asigna `grader_score` (sólo campos de prosa). **NUNCA** se
+publican strings libres de proveedor como `categoryAssociations`: el dominio (`llm-extraction.ts`) los mapea
+a la taxonomía gobernada (TASK-1272) o degradan a `unknown`/`needs_review`. **NUNCA** se cambia el default
+productivo sin eval + flag. **SIEMPRE** preservar `unknown` cuando la evidencia/schema no alcanzan. `sentimentScore`
+es auxiliar/no calibrado: la lógica de producto/reporte usa label/count/net, no threshold fuerte de score.
