@@ -29,6 +29,11 @@ export interface GraderProfileRow {
   market: string
   locale: string
   category: string | null
+  /** TASK-1288 — categoría canónica resuelta (SoT). 'unknown' o un nodo `industry:*`/etc. */
+  categoryNodeId: string | null
+  categoryLabel: string | null
+  categoryConfidence: number | null
+  categorySource: string | null
   competitorsDeclared: string[]
   status: string
   /** TASK-1243 — binding a la organización cliente (null = perfil interno/público). */
@@ -106,6 +111,10 @@ const projectProfile = (row: RawProfile): GraderProfileRow => ({
   market: String(row.market),
   locale: String(row.locale),
   category: (row.category as string | null) ?? null,
+  categoryNodeId: (row.category_node_id as string | null) ?? null,
+  categoryLabel: (row.category_label as string | null) ?? null,
+  categoryConfidence: row.category_confidence != null ? Number(row.category_confidence) : null,
+  categorySource: (row.category_source as string | null) ?? null,
   competitorsDeclared: (row.competitors_declared as string[] | null) ?? [],
   status: String(row.status),
   organizationId: (row.organization_id as string | null) ?? null,

@@ -31,6 +31,7 @@ const BLOCK_TO_CANONICAL: Record<RequestRunBlockedReason, CanonicalErrorCode> = 
   disabled: 'aeo_run_disabled',
   not_entitled: 'aeo_not_entitled',
   profile_required: 'aeo_profile_required',
+  category_unresolved: 'aeo_category_unresolved',
   quota_exhausted: 'aeo_quota_exhausted',
   cost_blocked: 'aeo_cost_blocked'
 }

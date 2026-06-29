@@ -8,6 +8,7 @@ import 'server-only'
  * y (futuro) Nexa/MCP — un primitive, muchos consumers (Full API parity).
  */
 
+import { assertRunCategoryResolved, resolveRunCategory } from './category-guard'
 import {
   type GrowthAiVisibilityExecutionMode,
   type GrowthAiVisibilityProviderId,
@@ -29,7 +30,12 @@ export interface RunGraderDiagnosticInput {
   websiteUrl?: string | null
   market: string
   locale: string
+  /** Raw category text (public intake form / legacy). Resolved to a canonical node at run time. */
   category: string
+  /** TASK-1288 — resolved canonical category from the profile (portal/operator paths). */
+  categoryNodeId?: string | null
+  categoryLabel?: string | null
+  categoryConfidence?: number | null
   competitorsDeclared?: string[]
   mode: GrowthAiVisibilityExecutionMode
   runKind: GrowthAiVisibilityRunKind
@@ -50,10 +56,23 @@ const buildExecuteInput = (input: RunGraderDiagnosticInput) => {
   const competitorsDeclared = input.competitorsDeclared ?? []
   const pack = resolvePromptPack(input.promptPackVersion)
 
+  // TASK-1288 — resolve the CANONICAL category (never the raw HubSpot enum) and guard the
+  // run universally: every path (portal/operator/public/Nexa) converges here. The display
+  // label replaces the raw enum in the prompts; an unresolved category blocks the run
+  // (behind the guard flag) instead of producing garbage prompts (ISSUE-110).
+  const runCategory = resolveRunCategory({
+    categoryNodeId: input.categoryNodeId,
+    categoryLabel: input.categoryLabel,
+    categoryConfidence: input.categoryConfidence,
+    rawCategory: input.category
+  })
+
+  assertRunCategoryResolved(runCategory)
+
   const prompts = resolvePromptInputs(
     {
       brandName: input.brandName,
-      category: input.category,
+      category: runCategory.displayLabel || input.category,
       market: input.market,
       competitor: competitorsDeclared[0] ?? null
     },
@@ -66,7 +85,7 @@ const buildExecuteInput = (input: RunGraderDiagnosticInput) => {
       websiteUrl: input.websiteUrl ?? null,
       market: input.market,
       locale: input.locale,
-      category: input.category,
+      category: runCategory.displayLabel || input.category,
       competitorsDeclared
     },
     runKind: input.runKind,

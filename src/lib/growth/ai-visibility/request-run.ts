@@ -23,15 +23,17 @@ import { captureWithDomain } from '@/lib/observability/capture'
 import { runGreenhousePostgresQuery, withGreenhousePostgresTransaction } from '@/lib/postgres/client'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 
+import { isRunCategoryBlocked } from './category-guard'
 import { enqueueGraderDiagnostic, type RunGraderDiagnosticInput } from './commands'
 import { resolveAeoEntitlement, type AeoTier } from './entitlement'
 import { isGraderEnabled, isPortalRunEnabled, isTrialTierEnabled } from './flags'
-import { getGraderProfileForOrganization, type GraderRunSource } from './store'
+import { getGraderProfileForOrganization, type GraderProfileRow, type GraderRunSource } from './store'
 
 export type RequestRunBlockedReason =
   | 'disabled'
   | 'not_entitled'
   | 'profile_required'
+  | 'category_unresolved'
   | 'quota_exhausted'
   | 'cost_blocked'
 
@@ -51,19 +53,18 @@ const portalRunSourceForTier = (tier: AeoTier): GraderRunSource =>
   tier === 'contracted' ? 'portal_contracted' : tier === 'pilot' ? 'portal_pilot' : 'portal_trial'
 
 /** Construye el input ejecutable (modo light, public_diagnostic) desde el perfil de la org. */
-const buildRunInputFromProfile = (profile: {
-  brandName: string
-  websiteUrl: string | null
-  market: string
-  locale: string
-  category: string | null
-  competitorsDeclared: string[]
-}): Omit<RunGraderDiagnosticInput, 'attribution' | 'idempotencyKey'> => ({
+const buildRunInputFromProfile = (
+  profile: GraderProfileRow
+): Omit<RunGraderDiagnosticInput, 'attribution' | 'idempotencyKey'> => ({
   brandName: profile.brandName,
   websiteUrl: profile.websiteUrl,
   market: profile.market,
   locale: profile.locale,
   category: profile.category ?? '',
+  // TASK-1288 — la categoría canónica resuelta del perfil (SoT); el run usa la label, no el enum.
+  categoryNodeId: profile.categoryNodeId,
+  categoryLabel: profile.categoryLabel,
+  categoryConfidence: profile.categoryConfidence,
   competitorsDeclared: profile.competitorsDeclared,
   mode: 'light',
   runKind: 'public_diagnostic'
@@ -124,6 +125,11 @@ export const requestGraderRunForOrganization = async (input: {
 
   if (!profile) {
     return { status: 'blocked', reason: 'profile_required' }
+  }
+
+  // TASK-1288 — pre-check limpio (sin malgastar allowance): categoría no resuelta bloquea el run.
+  if (isRunCategoryBlocked({ categoryNodeId: profile.categoryNodeId, rawCategory: profile.category }, env)) {
+    return { status: 'blocked', reason: 'category_unresolved' }
   }
 
   const tier = entitlement.tier
@@ -219,6 +225,11 @@ export const requestGraderRunAsOperator = async (input: {
 
   if (!profile) {
     return { status: 'blocked', reason: 'profile_required' }
+  }
+
+  // TASK-1288 — el operador tampoco corre/envía sobre un prospecto con categoría no resuelta.
+  if (isRunCategoryBlocked({ categoryNodeId: profile.categoryNodeId, rawCategory: profile.category }, env)) {
+    return { status: 'blocked', reason: 'category_unresolved' }
   }
 
   // Atribución del assignment del subject SI existe (auditoría); NO se exige entitlement —

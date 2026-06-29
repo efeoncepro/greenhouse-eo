@@ -172,6 +172,7 @@ import { getHubspotCompaniesIntakeDeadLetterSignal } from './queries/hubspot-com
 import { getWorkforceUnlinkedInternalUsersSignal } from './queries/workforce-unlinked-internal-users'
 import { getGrowthAiVisibilitySignals } from './queries/growth-ai-visibility-signals'
 import { getGrowthAiVisibilityScoringSignals } from './queries/growth-ai-visibility-scoring-signals'
+import { getGrowthAiVisibilityCategorySignals } from './queries/growth-ai-visibility-category-signals'
 import { getGrowthAiVisibilityProbeSignals } from './queries/growth-ai-visibility-probe-signals'
 import { getGrowthAiVisibilityPublicIntakeSignals } from './queries/growth-ai-visibility-public-intake-signals'
 import { getGrowthAiVisibilityPublicDeliverySignals } from './queries/growth-ai-visibility-public-delivery-signals'
@@ -630,6 +631,7 @@ interface ReliabilityOverviewSources {
   growthAiVisibility?: ReliabilitySignal[] | null
   growthAiVisibilityScoring?: ReliabilitySignal[] | null
   growthAiVisibilityProbe?: ReliabilitySignal[] | null
+  growthAiVisibilityCategory?: ReliabilitySignal[] | null
   growthAiVisibilityPublicIntake?: ReliabilitySignal[] | null
   growthAiVisibilityPublicDelivery?: ReliabilitySignal[] | null
   growthForms?: ReliabilitySignal[] | null
@@ -1052,6 +1054,7 @@ export const buildReliabilityOverview = (
     ...(sources.growthAiVisibility ?? []),
     ...(sources.growthAiVisibilityScoring ?? []),
     ...(sources.growthAiVisibilityProbe ?? []),
+    ...(sources.growthAiVisibilityCategory ?? []),
     ...(sources.growthAiVisibilityPublicIntake ?? []),
     ...(sources.growthAiVisibilityPublicDelivery ?? []),
     ...(sources.growthForms ?? []),
@@ -1446,6 +1449,11 @@ export const getReliabilityOverview = async (
     preloadedSources.growthAiVisibilityProbe !== undefined
       ? preloadedSources.growthAiVisibilityProbe
       : await getGrowthAiVisibilityProbeSignals().catch(() => null)
+
+  const growthAiVisibilityCategory =
+    preloadedSources.growthAiVisibilityCategory !== undefined
+      ? preloadedSources.growthAiVisibilityCategory
+      : await getGrowthAiVisibilityCategorySignals().catch(() => null)
 
   // TASK-1240 — intake público (rate/cost/blocked). DB vacía / intake OFF → steady ok.
   const growthAiVisibilityPublicIntake =
@@ -2421,6 +2429,7 @@ export const getReliabilityOverview = async (
     growthAiVisibility,
     growthAiVisibilityScoring,
     growthAiVisibilityProbe,
+    growthAiVisibilityCategory,
     growthAiVisibilityPublicIntake,
     growthAiVisibilityPublicDelivery,
     growthForms,

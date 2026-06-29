@@ -201,6 +201,28 @@ export const isOperatorSendEnabled = (env: NodeJS.ProcessEnv = process.env): boo
   isGraderEnabled(env) && isTrue(env[GROWTH_AI_VISIBILITY_OPERATOR_SEND_FLAG])
 
 /**
+ * TASK-1288 — Guard de categoría no resuelta. Default OFF: cuando ON, un run/envío cuyo
+ * perfil tenga `category_node_id = unknown` (o confianza baja) se bloquea con razón canónica
+ * en vez de generar prompts basura (ISSUE-110). Se prende sólo tras el backfill verificado
+ * (no romper el lead magnet con muchos `unknown` legacy). Registrar en el ledger.
+ */
+export const GROWTH_AI_VISIBILITY_CATEGORY_GUARD_FLAG = 'GROWTH_AI_VISIBILITY_CATEGORY_GUARD_ENABLED'
+
+export const isCategoryGuardEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+  isTrue(env[GROWTH_AI_VISIBILITY_CATEGORY_GUARD_FLAG])
+
+/**
+ * TASK-1288 — Lectura grounded `brand_intelligence` (LLM sobre contenido del sitio + entity).
+ * Default OFF: la lectura LLM (1×/marca/versión, cacheada) se activa tras sign-off de costo;
+ * con OFF la resolución de categoría cae al prior determinista (HubSpot map + alias). Gateado
+ * además por el kill switch global del grader. Registrar en el ledger.
+ */
+export const GROWTH_AI_VISIBILITY_BRAND_INTELLIGENCE_FLAG = 'GROWTH_AI_VISIBILITY_BRAND_INTELLIGENCE_ENABLED'
+
+export const isBrandIntelligenceEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+  isGraderEnabled(env) && isTrue(env[GROWTH_AI_VISIBILITY_BRAND_INTELLIGENCE_FLAG])
+
+/**
  * TASK-1277 — Config de allowance AEO por tier (per-org-per-mes) + tope global de trials.
  * Defaults conservadores (sign-off comercial): trial 1/mes, contratado 20/mes (fair-use, NO
  * ilimitado self-serve), pilot 3/mes, tope global de trials USD 25/mes (cost backstop que
