@@ -1,6 +1,6 @@
 ---
 name: greenhouse-gvc-playwright
-description: Robust Playwright handling for Greenhouse Visual Capture (GVC) — how to author scenarios and ad-hoc Playwright WITHOUT fumbling selectors, waits, readiness or captures. Invoke whenever you write or debug a `.scenario.ts`, run `pnpm fe:capture`, drop to ad-hoc Playwright, or a capture comes back wrong (skeleton/login captured, selector timeout, flaky, clipped, "no encuentro el selector", Turbopack Compiling…). Distills the proven techniques from microsoft/webwright's `local_browser.py` (aria-tree observation, user-facing locators, layered timeouts, graceful degrade) + the Greenhouse-specific GVC gotchas. Triggers: "GVC", "fe:capture", "scenario", "Playwright", "selector", "readiness", "captura", "aria snapshot", "no encuentro el selector", "captura sale mal", "skeleton", "clipSelector", "networkidle".
+description: Robust Playwright handling for Greenhouse Visual Capture (GVC), ad-hoc Playwright, and public WordPress/Elementor landing verification — how to observe before authoring and avoid fumbling selectors, waits, readiness, computed styles or captures. Invoke whenever you write or debug a `.scenario.ts`, run `pnpm fe:capture`, work on public-site/WordPress landings, drop to ad-hoc Playwright, or a capture comes back wrong (skeleton/login captured, selector timeout, flaky, clipped, "no encuentro el selector", Turbopack Compiling…). Distills the proven techniques from microsoft/webwright's `local_browser.py` (aria-tree observation, user-facing locators, layered timeouts, graceful degrade) + the Greenhouse-specific GVC/public-site gotchas. Triggers: "GVC", "fe:capture", "scenario", "Playwright", "WordPress landing", "public site", "Elementor", "selector", "readiness", "captura", "aria snapshot", "computed style", "no encuentro el selector", "captura sale mal", "skeleton", "clipSelector", "networkidle".
 type: reference
 ---
 
@@ -105,6 +105,18 @@ El DSL de GVC cubre captura/scroll/interacción/baseline. Caé a Playwright ad-h
 - Guardá artifacts bajo `.captures/` y **documentá por qué no bastó GVC**.
 - Si el flujo es repetible, **promovelo a scenario** (`scripts/frontend/scenarios/`) — el artefacto durable es el DSL determinístico, no un `.mjs` huérfano.
 - Reusá `lib/auth.ts` + `lib/browser.ts` (auth + lifecycle ya resueltos); no reinventes el setup.
+
+## Public WordPress / Elementor landing mode
+
+Cuando el target es `efeoncepro.com` u otra landing pública WordPress/Elementor, **también aplica Webwright**, aunque no exista una ruta local Greenhouse ni un scenario GVC previo.
+
+Reglas:
+
+- **Observá antes de tocar:** primero inspeccioná DOM/render real con Playwright (`domcontentloaded`, no `networkidle` como única verdad), roles/texto/selector estable, screenshots y computed styles. No hagas cambios Elementor basados solo en memoria o en un PNG del operador.
+- **Computed style es el contrato:** para typography/layout bugs, lee `getComputedStyle()` en desktop y mobile 390. La cascada Ohio/Elementor puede hacer que el CSS correcto exista en el HTML pero no gane en runtime.
+- **Promové probes repetibles a comando durable:** si un bug puede volver, no lo dejes como `tmp/*.mjs`; crea un script repo-level o scenario que falle. Ejemplo vigente: `pnpm public-website:verify-aeo-form-typography`.
+- **No adoptes code-as-action de Webwright:** el agente no debe ejecutar código libre como superficie runtime de producto. Se importan las técnicas de observación, locators, layered timeouts y graceful degrade; las mutaciones siguen por el carril gobernado (`Document::save()`, backups, cache purge, Playwright verification).
+- **Scope público:** para landings WordPress, captura evidencia desktop + mobile 390, overflow (`scrollWidth - clientWidth`), y los estados relevantes (forms, accordions, reduced-motion) antes de cerrar.
 
 ---
 
