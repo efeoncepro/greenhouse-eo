@@ -30,6 +30,7 @@ import { validateField, validateFields, type FieldErrors } from './validation'
 import { createTelemetryEmitter, type TelemetryEmitter, type TelemetryPayload } from './telemetry'
 import { submitPublicForm, verifyPublicEmail, type RendererApiConfig } from './api-client'
 import { RENDERER_VERSION } from './version'
+import { TurnstileTokenClient } from './turnstile'
 import { resolveValidatorName, validateFormValue } from '@/lib/growth/forms/validators/core'
 
 export interface FormRendererOptions {
@@ -72,6 +73,7 @@ export class FormRenderer {
   private readonly pageContext: NonNullable<FormRendererOptions['pageContext']>
   private readonly fetchImpl: typeof fetch
   private readonly instanceId = `ghf-${++idSeq}`
+  private turnstile: TurnstileTokenClient | null = null
 
   private values: FieldValues = {}
   private errors: FieldErrors = {}
@@ -186,6 +188,8 @@ export class FormRenderer {
     for (const timer of this.statusTimers.values()) clearTimeout(timer)
     this.statusTimers.clear()
     if (this.draftSaveTimer) clearTimeout(this.draftSaveTimer)
+    this.turnstile?.destroy()
+    this.turnstile = null
     this.opts.root.replaceChildren()
   }
 
@@ -1307,6 +1311,21 @@ export class FormRenderer {
 
     this.submitting = true
     this.renderForm()
+
+    let captchaToken: string | undefined
+
+    try {
+      captchaToken = await this.resolveCaptchaToken()
+    } catch {
+      this.submitting = false
+      this.telemetry.emit('gh_form_submission_rejected', { reason_class: 'captcha_failed' })
+      this.renderForm()
+      this.setSummary(this.copy.submitError)
+      this.focusPrimary()
+
+      return
+    }
+
     this.telemetry.emit('gh_form_submitted', {})
 
     const result = await submitPublicForm(
@@ -1320,11 +1339,13 @@ export class FormRenderer {
         pageName: this.pageContext.pageName,
         referrer: this.pageContext.referrer,
         formVersionId: this.contract.form.formVersionId,
+        captchaToken,
       },
       this.fetchImpl,
     )
 
     this.submitting = false
+    this.turnstile?.reset()
 
     if (result.outcome === 'accepted') {
       this.telemetry.emit('gh_form_submission_accepted', {
@@ -1341,6 +1362,20 @@ export class FormRenderer {
     this.renderForm()
     this.setSummary(this.copy.submitError)
     this.focusPrimary()
+  }
+
+  private async resolveCaptchaToken(): Promise<string | undefined> {
+    const captcha = this.contract.security?.captcha
+
+    if (!captcha || captcha.required === false) return undefined
+
+    if (captcha.provider !== 'turnstile' || captcha.mode !== 'invisible' || captcha.execution !== 'submit') {
+      throw new Error('captcha_provider_unsupported')
+    }
+
+    this.turnstile ??= new TurnstileTokenClient(this.doc, captcha)
+
+    return this.turnstile.execute()
   }
 
   private collectFieldValues(): Record<string, string | number | boolean | string[]> {

@@ -249,6 +249,20 @@ export const successBehaviorSchema = z.object({
 })
 export type SuccessBehavior = z.infer<typeof successBehaviorSchema>
 
+export const captchaSecuritySchema = z.object({
+  provider: z.literal('turnstile'),
+  required: z.boolean().default(true),
+  mode: z.literal('invisible').default('invisible'),
+  siteKey: z.string().min(1).max(200),
+  execution: z.literal('submit').default('submit'),
+})
+export type CaptchaSecurity = z.infer<typeof captchaSecuritySchema>
+
+export const renderSecuritySchema = z.object({
+  captcha: captchaSecuritySchema.optional(),
+})
+export type RenderSecurity = z.infer<typeof renderSecuritySchema>
+
 export const renderContractSchema = z.object({
   contractVersion: z.literal(CONTRACT_VERSION),
   form: z.object({
@@ -274,6 +288,7 @@ export const renderContractSchema = z.object({
     allowedOrigins: z.array(z.string()).default([]),
     rendererChannel: z.enum(RENDERER_CHANNELS).default('stable'),
   }),
+  security: renderSecuritySchema.optional(),
   telemetryPolicy: telemetryPolicySchema,
 })
 export type RenderContract = z.infer<typeof renderContractSchema>

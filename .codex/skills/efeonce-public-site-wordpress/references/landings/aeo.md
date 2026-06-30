@@ -53,14 +53,14 @@ Validate this hash before/after unrelated Elementor saves.
 
 The conversion widget `convers` uses a custom HTML bridge, not the generic `<greenhouse-form>` renderer.
 
-Reason: generic renderer does not yet emit Turnstile `captchaToken`.
+Reason: the generic renderer emits Turnstile `captchaToken` since TASK-1294, but the live AEO bridge remains in place until a separate WordPress/visual migration protects layout, validation behavior, `heroans`, Kinsta cache and Playwright/GVC evidence.
 
 Identifiers:
 
 - Form slug: `efeonce-aeo-diagnostic`
 - Form definition: `fdef-efeonce-aeo-diagnostic`
-- Current published version: `fver-bc5a1cfe-76eb-4658-9fe9-ab0c8fb0a657` (v2)
-- Deprecated v1: `fver-efeonce-aeo-diagnostic-v1`
+- Current published version: `fver-9507f6a7-431d-4215-a699-9c713328b69b` (v3; declares `ui_policy_json.security.captcha`)
+- Deprecated versions: v2 `fver-bc5a1cfe-76eb-4658-9fe9-ab0c8fb0a657`, v1 `fver-efeonce-aeo-diagnostic-v1`
 - Surface: `fhsf-efeonce-aeo-diagnostic`
 - API base: `https://greenhouse.efeoncepro.com`
 - Turnstile site key in WordPress: `0x4AAAAAADqwX2R7v-k9pItv`
@@ -89,6 +89,7 @@ Email contract:
 
 - `email.validator=corporate_email`
 - `validation_schema.emailPolicy={mode:"block_field",field:"email"}`
+- `ui_policy_json.security.captcha={provider:"turnstile",required:true,mode:"invisible",siteKey:"0x4AAAAAADqwX2R7v-k9pItv",execution:"submit"}` in v3. Public `GET` serializes this only after TASK-1294 code is deployed; public `POST` already fails closed without token.
 - Gmail/free/disposable must be blocked inline before `/submit`.
 - The bridge must use debounced `/verify-email`, `aria-invalid`, `aria-describedby`, field-level errors, and success only after remote verification.
 
@@ -98,7 +99,7 @@ Email contract:
 - `.gh-aeo-form-card` is a transparent Elementor host: no border, no shadow, no padding.
 - `.gh-aeo-growth-form-card` is the only visible card.
 - Do not expose internal kickers such as `Growth Forms · Diagnóstico AEO`.
-- Public card starts with `Solicita tu diagnóstico`.
+- Public card starts with `Solicita tu diagnóstico AEO`.
 
 Typography:
 
@@ -115,13 +116,18 @@ pnpm public-website:verify-aeo-form-typography
 ## FAQ Contract
 
 - FAQ root: `faq5b46`, `.gh-aeo-faq`.
+- FAQ header: `faqeyeb` uses eyebrow `Antes de avanzar`; the `ohio_heading` title is `Respuestas claras para decidir`. Keep the header decision-oriented, not generic `Preguntas frecuentes`.
 - FAQ widget: `faqlist`, `ohio_accordion`, `.gh-aeo-faq-accordion`, 9 tabs.
 - Schema/init widget: `schema3`, `.gh-aeo-jsonld`.
 - Keep JSON-LD `ProfessionalService` + `FAQPage` in `schema3`.
+- FAQ copy is decision-oriented: explain what AEO optimizes, 5 levels, SEO difference, diagnostic deliverable, price, timing, contract/permanence, industry fit, and HubSpot dependency.
+- When `faqlist` copy changes, sync the `FAQPage` node inside `schema3` JSON-LD `@graph` in the same `Document::save()`.
 - Current scoped initializer: `gh-aeo-faq-accordion-init-v5`.
 - The initializer owns click/keyboard, ARIA, measured-height motion, and toggle-close behavior. Clicking an open item must close it and leave no active item (`activeIndex=-1`).
 - Do not restore `height:auto`/`display:none` as the transition mechanism; it causes the visible pop. Use measured pixel height and reduced-motion fallback.
-- Current CSS markers: `gh-aeo-faq-compact-density-v1`, `gh-aeo-faq-compact-density-v2`, `gh-aeo-faq-accordion-motion-v1`, `gh-aeo-faq-accordion-motion-v2`.
+- Current visual treatment is a lightweight editorial list, not a card. `.gh-aeo-faq-accordion` and inner `.ohio-widget.accordion` must stay transparent with `border:0`, `box-shadow:none`, `border-radius:0`.
+- Do not restore the teal answer rail; `.accordion-body` must not use `border-left`.
+- Current CSS markers: `gh-aeo-faq-compact-density-v1`, `gh-aeo-faq-compact-density-v2`, `gh-aeo-faq-accordion-motion-v1`, `gh-aeo-faq-accordion-motion-v2`, `gh-aeo-faq-editorial-list-v1`, `gh-aeo-faq-editorial-list-v2`, `gh-aeo-faq-editorial-list-v3`.
 
 ## Verification Checklist
 

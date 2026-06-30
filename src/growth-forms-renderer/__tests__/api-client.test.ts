@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 
-import { type RendererApiConfig, verifyPublicEmail } from '../api-client'
+import { submitPublicForm, type RendererApiConfig, verifyPublicEmail } from '../api-client'
 
 const api: RendererApiConfig = { baseUrl: 'https://gh.test', slug: 'ai-visibility-intake' }
 
@@ -83,5 +83,28 @@ describe('growth-forms-renderer · verifyPublicEmail', () => {
       expect(result.suggestion).toBe('ana@gmail.com')
       expect(result.reasonCode).toBe('email_not_corporate')
     }
+  })
+})
+
+describe('growth-forms-renderer · submitPublicForm', () => {
+  it('passes captchaToken through the public submit body when provided', async () => {
+    const fetchImpl = vi.fn(async () => jsonResponse({ outcome: 'accepted', submissionId: 'sub_1' }, 202)) as unknown as typeof fetch
+
+    const result = await submitPublicForm(
+      api,
+      {
+        fields: { email: 'ana@empresa.com' },
+        consent: true,
+        consentCheckboxes: [],
+        captchaToken: 'turnstile-token',
+      },
+      fetchImpl,
+    )
+
+    expect(result.outcome).toBe('accepted')
+    const body = JSON.parse((fetchImpl as unknown as { mock: { calls: Array<[string, { body: string }]> } }).mock.calls[0][1].body)
+
+    expect(body.captchaToken).toBe('turnstile-token')
+    expect(body.fields.email).toBe('ana@empresa.com')
   })
 })

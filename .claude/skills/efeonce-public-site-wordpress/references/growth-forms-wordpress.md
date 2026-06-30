@@ -7,7 +7,7 @@ Use this reference for public Growth Forms embeds and the AEO bridge.
 - Greenhouse owns form definitions, versions, render contracts, submissions, consent, validation, destinations, dispatch, and retries.
 - WordPress is a host surface. It must not own HubSpot mapping, portal credentials, Turnstile secret, or destination logic.
 - Generic public renderer is `<greenhouse-form>`, served from Greenhouse.
-- AEO currently uses a temporary custom HTML bridge because the generic renderer does not yet emit Turnstile `captchaToken`.
+- AEO currently uses a temporary custom HTML bridge for live-layout control. Since TASK-1294 the generic renderer can emit Turnstile `captchaToken`; since TASK-1296 the AEO v3 form declares `ui_policy_json.security.captcha`. Migrating AEO still requires a separate governed WordPress/visual task and the TASK-1294 code rollout that serializes `security` in public `GET`.
 
 Canonical docs:
 
@@ -44,7 +44,7 @@ The widget is a thin host adapter. It emits:
 
 It never changes fields, validations, conditions, destinations, or mapping.
 
-Do not use the generic widget for AEO `/aeo-2/` until the renderer emits Turnstile `captchaToken`.
+Do not swap AEO `/aeo-2/` from its bridge to the generic widget without a dedicated migration task: Elementor backup, `heroans` hash guard, Kinsta purge, Playwright/GVC desktop + mobile 390, Growth Forms smoke and dataLayer check.
 
 ## Verification
 

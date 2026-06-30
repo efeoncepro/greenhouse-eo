@@ -1,7 +1,7 @@
 # Incrustar un formulario de Growth en un sitio (WordPress / Astro)
 
 > **Tipo:** Manual de uso / runbook operativo
-> **Version:** 1.1 — 2026-06-30 (Codex, AEO `/aeo-2/` live bridge note)
+> **Version:** 1.2 — 2026-06-30 (Codex, TASK-1294 Turnstile renderer parity)
 > **Doc funcional:** [docs/documentation/growth/motor-formularios-publicos.md](../../documentation/growth/motor-formularios-publicos.md)
 > **Arquitectura:** [GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md) §19 + §Delta TASK-1231
 
@@ -24,14 +24,16 @@ consentimiento y destino del lead viven en Greenhouse.
    origen de Greenhouse (ver "CSP" abajo).
 
 > Nota vigente: la landing AEO `/aeo-2/` no usa todavia el widget generico
-> `greenhouse_growth_form`. Usa un host bridge HTML con Turnstile invisible porque el
-> renderer portable `<greenhouse-form>` aun no emite `captchaToken`. Ese bridge debe
-> consultar `/verify-email` antes de Turnstile para respetar el gate corporativo del
-> form (`corporate_email` + `emailPolicy.block_field`) y debe mostrar validación inline
-> por campo, no solo un status global. Cuando el renderer soporte Turnstile, se debe
-> migrar ese host a `<greenhouse-form form="efeonce-aeo-diagnostic"
-> surface="fhsf-efeonce-aeo-diagnostic" locale="es-CL">` sin mover campos, validacion,
-> mapping ni destinos a WordPress.
+> `greenhouse_growth_form`. Usa un host bridge HTML con Turnstile invisible por decision
+> de rollout visual, no porque falte el token en el renderer: desde TASK-1294
+> `<greenhouse-form>` emite `captchaToken` cuando el contract declara
+> `security.captcha`, y desde TASK-1296 la version AEO v3 ya declara esa metadata en
+> `ui_policy_json` (la serializacion publica depende del deploy de TASK-1294). El bridge debe seguir consultando `/verify-email` antes de
+> Turnstile para respetar el gate corporativo del form (`corporate_email` +
+> `emailPolicy.block_field`) y debe mostrar validación inline por campo, no solo un
+> status global. La migracion a `<greenhouse-form form="efeonce-aeo-diagnostic"
+> surface="fhsf-efeonce-aeo-diagnostic" locale="es-CL">` requiere task WordPress
+> separada, con backup Elementor, cache purge y Playwright desktop/mobile 390.
 
 ## Vista previa interna (antes de tocar un sitio)
 
@@ -124,8 +126,9 @@ de paridad no-routable: `src/pages/_growth-form-parity.astro`.
 - **No** apuntes a un canal `stable` antes de aprobar el smoke; deja `preview`/`beta`.
 - **No** copies el bundle del renderer al sitio: siempre se carga desde Greenhouse
   (asi todos los sitios quedan en la misma version).
-- **No** reemplaces el bridge AEO `/aeo-2/` por el widget generico hasta que el renderer
-  emita `captchaToken`; hacerlo rompe el submit con Turnstile.
+- **No** reemplaces el bridge AEO `/aeo-2/` por el widget generico sin task de migracion
+  y smoke visual/runtime. El renderer ya emite `captchaToken`, pero el cambio live exige
+  backup Elementor, protección del hero y verificacion desktop/mobile 390.
 
 ## Problemas comunes
 
@@ -134,6 +137,9 @@ de paridad no-routable: `src/pages/_growth-form-parity.astro`.
   esta OFF en ese environment.
 - **No carga nada / consola con error de CSP**: el CSP del sitio bloquea el script o la
   API de Greenhouse (ver CSP).
+- **El submit vuelve `captcha_failed`**: si el form declara `security.captcha`, verifica
+  que el site key publico de Turnstile viva en el render contract y que el secret
+  server-side `TURNSTILE_SECRET` este configurado en el environment de Greenhouse.
 - **Autocompletar no funciona**: revisa que el formulario publicado declare
   `autocomplete`/`inputMode` por campo (vienen del render_contract).
 
@@ -142,6 +148,7 @@ de paridad no-routable: `src/pages/_growth-form-parity.astro`.
 El bundle se carga cross-origin desde Greenhouse. El CSP del sitio debe permitir:
 
 - `script-src` → el origen de Greenhouse (para `renderer-<canal>.js`).
+- `script-src` → `https://challenges.cloudflare.com` si el form usa Turnstile invisible.
 - `connect-src` → el origen de Greenhouse (para la API publica de render/submit).
 
 ## Referencias tecnicas
