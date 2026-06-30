@@ -245,6 +245,7 @@ Reglas obligatorias:
 - **Resolución por `formKey` sin ruta nueva**: hacer que el segmento `[formSlug]` (GET/submit/verify-email) acepte slug O uuid; agregar un disambiguador determinista (regex UUID v4 estricto) que rutee a `getFormDefinitionByKey` vs `getFormDefinitionBySlug`. NO crear ruta `by-key/` ni superficie CORS/OPTIONS nueva; el CORS compartido (`cors.ts`) ya cubre el segmento.
 - Actualizar `<greenhouse-form>` para aceptar `form-key` además de `form` (agregar a `observedAttributes`); `api-client` usa `formKey` como path segment cuando está presente.
 - Mantener rutas/atributo por slug backward-compatible.
+- **Affordance chromeless transversal (todos los hosts, no AEO-only):** hoy "quitar la card" del renderer es un truco implícito (`--ghf-bg: transparent`) — abstracción con fuga que cada host re-deriva. Agregar al renderer un atributo de primera clase `appearance` (`surface` por defecto = comportamiento actual; `bare`/chromeless = fondo transparente sin chrome) en `observedAttributes`, mapeado al token interno. Browser-safe, sin lógica de negocio. Objetivo: que cualquier landing/host opte por chromeless de forma consistente sin escribir CSS scoped propio. Documentar el contrato de tematización (`--ghf-*` + `appearance` + `color-scheme="light"` + composición de card) en el manual canónico `incrustar-formulario-wordpress-astro.md` como receta reusable. Es el primer consumidor real `TASK-1298` (AEO), pero la capacidad es de plataforma.
 
 ### Slice 3 — Render copy command + validation gate
 
@@ -397,6 +398,7 @@ N/A — repo + DB/version rollout; WordPress queda para `TASK-1298`.
 - [ ] Public/render contracts exponen `formKey` sin exponer destination IDs/secrets; `formId` permanece (backward-compat).
 - [ ] La identidad NO se llama `form_guid`/`formGuid` en ningún punto nuevo; el `formGuid` de HubSpot quedó intacto/server-only.
 - [ ] `<greenhouse-form>` puede cargar por `form-key` y el path por `form`/slug sigue funcionando, vía el segmento `[formSlug]` con disambiguador (sin ruta/CORS nueva).
+- [ ] El renderer acepta `appearance="bare"` (chromeless) además del default `surface`, como capacidad transversal de plataforma; el contrato de tematización (`--ghf-*` + `appearance` + `color-scheme="light"` + composición de card) queda documentado en `incrustar-formulario-wordpress-astro.md` como receta reusable por cualquier host.
 - [ ] `authorDraftForm` acepta `copyRefs` y los pasa a `insertFormVersion`.
 - [ ] El copy del render contract pasa por `copyDisplaySchema` (`safeParse`) en serialización; un copy no-string/nested/secret-shaped es rechazado y no aparece en el contrato público.
 - [ ] Existe script idempotente dry-run/apply por `formKey` para publicar copy renderizable AEO sin editar version publicada in-place; el copy proviene de un SoT validado con `greenhouse-ux-writing`.

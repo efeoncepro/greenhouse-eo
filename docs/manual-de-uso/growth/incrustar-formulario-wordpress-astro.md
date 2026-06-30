@@ -106,6 +106,58 @@ import GrowthForm from '@components/interactive/GrowthForm.astro';
 Componente: `src/components/interactive/GrowthForm.astro` (repo `efeonce-web`). Fixture
 de paridad no-routable: `src/pages/_growth-form-parity.astro`.
 
+## Tematización y composición de card (transversal — cualquier sitio)
+
+> Esta receta es **transversal**: sirve para AEO y para cualquier landing/host. El
+> renderer es el mismo para todos los sitios; lo único que cambia por sitio es este CSS
+> scoped. No la copies como CSS "de AEO": es el patrón canónico de incrustación.
+
+**El renderer NO dibuja una card.** No trae borde, sombra, radio ni padding alrededor del
+formulario; solo un relleno de fondo (`--ghf-bg`, blanco en claro / oscuro en dark) y los
+estilos de los campos. Esto significa dos cosas:
+
+1. **Composición de card recomendada (Opción A):** si tu sección ya tiene una card
+   aprobada (borde + sombra + radio + padding), deja **esa** card como la única superficie
+   visible y mete el renderer adentro **transparente**. No le des chrome de card al
+   renderer (evita "card sobre card" y deja un solo dueño del estilo de card).
+
+   ```css
+   .mi-seccion greenhouse-form {
+     --ghf-bg: transparent;   /* la card visible es la del host, no el renderer */
+   }
+   ```
+
+2. **Tipografía consistente con el sitio:** el renderer usa `system-ui` por defecto.
+   Si tu sitio usa otra familia (ej. DM Sans en Ohio), pásala por token para que el
+   formulario no se sienta "de otra tipografía":
+
+   ```css
+   .mi-seccion greenhouse-form {
+     --ghf-font: "DM Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+   }
+   ```
+
+**Tokens themables** (CSS custom properties, NUNCA hex inline; valores reales en
+`src/growth-forms-renderer/styles.ts`): `--ghf-font`, `--ghf-bg`, `--ghf-fg`,
+`--ghf-muted`, `--ghf-accent` (+`--ghf-accent-contrast`), `--ghf-field-bg`, `--ghf-border`
+(+`--ghf-border-strong`), `--ghf-error` (+`--ghf-error-bg`), `--ghf-success`,
+`--ghf-radius`, `--ghf-gap`, `--ghf-focus`. El widget Elementor ya expone acento + ancho
+máximo en la pestaña **Estilo**; el resto se ajusta con CSS scoped al contenedor.
+
+**Modo claro/oscuro — gotcha importante:** por defecto el renderer sigue el modo del SO
+del visitante (`prefers-color-scheme`). Si tu sección es una **banda clara**, un visitante
+con el SO en oscuro vería el formulario oscuro y descuadrado. Forzá claro en el embed:
+
+```html
+<greenhouse-form form-key="…" surface="…" locale="es-CL" color-scheme="light"> … </greenhouse-form>
+```
+
+(Hoy `color-scheme` solo fuerza **light**; no hay forzar-dark.)
+
+> **En evaluación (TASK-1297):** un atributo de conveniencia `appearance` (`surface` por
+> defecto / `bare` = chromeless) para no tener que escribir `--ghf-bg: transparent` a mano
+> en cada sitio. Hasta que exista, usá el token `--ghf-bg: transparent`.
+
 ## Que significan los estados (lo que vera el visitante)
 
 - **Cargando**: un esqueleto del formulario (no un spinner de pagina).

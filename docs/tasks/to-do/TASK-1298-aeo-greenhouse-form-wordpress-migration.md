@@ -283,19 +283,21 @@ Lo que el renderer NO trae y la task debe autorar como markup WordPress (NO exis
 Embed objetivo:
 
 ```html
-<greenhouse-form form-key="<AEO_FORM_KEY>" surface="fhsf-efeonce-aeo-diagnostic" locale="es-CL" color-scheme="light">
+<greenhouse-form form-key="<AEO_FORM_KEY>" surface="fhsf-efeonce-aeo-diagnostic" locale="es-CL" color-scheme="light" appearance="bare">
   <!-- Fallback no-JS / si el renderer no carga: el direct-link aprobado -->
   <a href="<AGENDA_URL>">¿Prefieres coordinar directo? Agenda una conversación →</a>
 </greenhouse-form>
 ```
 
-`<AEO_FORM_KEY>` debe venir del `form_key` real publicado por `TASK-1297`; no inventarlo ni reemplazarlo por slug/surface/page. `color-scheme="light"` es obligatorio (la banda `convers` es clara; sin él, un visitante con OS dark vería el form oscuro). El contenido interno de `<greenhouse-form>` es el fallback no-JS (el renderer NO auto-renderiza `noScriptFallback`). El host debe cargar el renderer desde `https://greenhouse.efeoncepro.com/growth-forms/renderer-latest.js` siguiendo el contrato del widget/host actual. Si el widget Elementor existente ya provee esta carga, preferirlo sobre HTML manual.
+`<AEO_FORM_KEY>` debe venir del `form_key` real publicado por `TASK-1297`; no inventarlo ni reemplazarlo por slug/surface/page. `color-scheme="light"` es obligatorio (la banda `convers` es clara; sin él, un visitante con OS dark vería el form oscuro). `appearance="bare"` (chromeless, lo entrega `TASK-1297`) es la forma canónica de dejar el renderer sin chrome dentro de la card AEO; si por timing aún no estuviera, el equivalente es `--ghf-bg: transparent` en CSS scoped. El contenido interno de `<greenhouse-form>` es el fallback no-JS (el renderer NO auto-renderiza `noScriptFallback`). El host debe cargar el renderer desde `https://greenhouse.efeoncepro.com/growth-forms/renderer-latest.js` siguiendo el contrato del widget/host actual. Si el widget Elementor existente ya provee esta carga, preferirlo sobre HTML manual.
 
-Tematización CSS scoped (dentro de `.gh-aeo-conversion`):
+Esta migración es el **primer consumidor real** del contrato de tematización transversal (`--ghf-*` + `appearance` + `color-scheme` + composición de card) documentado en `docs/manual-de-uso/growth/incrustar-formulario-wordpress-astro.md` → §"Tematización y composición de card (transversal)". No re-derivar la receta acá: consumir la del manual.
+
+Tematización CSS scoped (dentro de `.gh-aeo-conversion`) — solo lo específico de AEO sobre la receta transversal:
 
 ```css
 .gh-aeo-conversion greenhouse-form {
-  --ghf-bg: transparent;            /* la card visible es .gh-aeo-growth-form-card, no el renderer */
+  /* appearance="bare" ya deja el renderer transparente; --ghf-bg solo como fallback si no está */
   --ghf-font: "DM Sans", system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 ```
