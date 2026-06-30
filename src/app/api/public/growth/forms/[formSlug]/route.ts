@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 
+import { publicFormsCorsHeaders, publicFormsOptionsResponse } from '@/app/api/public/growth/forms/cors'
 import { isFormsPublicApiEnabled } from '@/lib/growth/forms/flags'
 import { getPublishedRenderContract } from '@/lib/growth/forms/readers'
 import { captureWithDomain } from '@/lib/observability/capture'
@@ -14,9 +15,17 @@ import { captureWithDomain } from '@/lib/observability/capture'
  */
 export const dynamic = 'force-dynamic'
 
+const METHODS = 'GET, OPTIONS'
+
+export function OPTIONS(request: Request) {
+  return publicFormsOptionsResponse(request, METHODS)
+}
+
 export async function GET(request: Request, { params }: { params: Promise<{ formSlug: string }> }) {
+  const headers = publicFormsCorsHeaders(request, METHODS)
+
   if (!isFormsPublicApiEnabled()) {
-    return NextResponse.json({ error: 'No disponible.' }, { status: 404 })
+    return NextResponse.json({ error: 'No disponible.' }, { status: 404, headers })
   }
 
   const { formSlug } = await params
@@ -28,13 +37,13 @@ export async function GET(request: Request, { params }: { params: Promise<{ form
     const contract = await getPublishedRenderContract(formSlug, { surfaceId, origin })
 
     if (!contract) {
-      return NextResponse.json({ error: 'Formulario no encontrado.' }, { status: 404 })
+      return NextResponse.json({ error: 'Formulario no encontrado.' }, { status: 404, headers })
     }
 
-    return NextResponse.json(contract, { status: 200 })
+    return NextResponse.json(contract, { status: 200, headers })
   } catch (error) {
     captureWithDomain(error, 'growth', { tags: { source: 'growth_forms_public_render_route' } })
 
-    return NextResponse.json({ error: 'No fue posible cargar el formulario.' }, { status: 502 })
+    return NextResponse.json({ error: 'No fue posible cargar el formulario.' }, { status: 502, headers })
   }
 }

@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.2
+> **Version:** 1.3
 > **Creado:** 2026-06-25 por Claude (TASK-1229)
-> **Ultima actualizacion:** 2026-06-25 por Codex (TASK-1232 — cockpit operativo Growth Forms)
+> **Ultima actualizacion:** 2026-06-30 por Codex (AEO `/aeo-2/` live bridge)
 > **Documentacion tecnica:** [GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md)
 
 # Motor de Formularios Publicos de Growth
@@ -35,7 +35,28 @@ La idea clave: **cualquier** formulario que nazca del motor hereda robustez por 
 ## Estado de rollout
 
 - **Staging (`develop`): VIVO** desde 2026-06-25. Los tres flags estan ON: el API publico (`GROWTH_FORMS_PUBLIC_API_ENABLED`), el dispatcher de entrega (`GROWTH_FORMS_DISPATCH_ENABLED`) y el adapter HubSpot real (`GROWTH_FORMS_HUBSPOT_SECURE_SUBMIT_ENABLED`). Verificado: el endpoint publico responde el render contract y una submission real llego a un HubSpot test form (200).
-- **Produccion: APAGADO.** Se prende con release/sign-off del operador despues de publicar un form generico con host surface autorizado y ejecutar smoke WordPress/dataLayer. La verdad live de los flags es `vercel env ls` + el servicio Cloud Run `ops-worker`; el estado humano vive en `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`.
+- **Produccion: ACTIVO de forma acotada para AEO `/aeo-2/`.** El primer submit productivo publico usa el form `efeonce-aeo-diagnostic` y una host bridge HTML en WordPress porque el renderer portable aun no emite `captchaToken` para Turnstile. El rollout generico de `<greenhouse-form>` en sitios publicos sigue pendiente de esa integracion + smoke WordPress/dataLayer. La verdad live de los flags es `vercel env ls` + el servicio Cloud Run `ops-worker`; el estado humano vive en `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`.
+
+## Primer form productivo publico — AEO `/aeo-2/`
+
+La landing publica `https://efeoncepro.com/aeo-2/` (`postId=250265`) ya envia leads al motor gobernado:
+
+- Form slug: `efeonce-aeo-diagnostic`.
+- Definition/version: `fdef-efeonce-aeo-diagnostic` / `fver-efeonce-aeo-diagnostic-v1`.
+- Host surface: `fhsf-efeonce-aeo-diagnostic`.
+- API base: `https://greenhouse.efeoncepro.com`.
+- HubSpot destination: portal `48713323`, form GUID `8649e76c-8b01-41f3-9b0c-5713d7b4dba6` (`AEO - Lead Form`).
+- Campos publicados: `firstName`, `email`, `brandWebsite`, `country`, `companySize`, `mainCompetitor`.
+- Mapping HubSpot: `firstName -> firstname`, `email -> email`, `country -> pais_gh`, `companySize -> tamano_de_la_empresa`, `mainCompetitor -> marca_de_competencia`.
+- `brandWebsite` queda persistido en Greenhouse pero no se envia a HubSpot hasta que exista una propiedad/campo correspondiente en ese form.
+
+La landing usa un bridge HTML con Turnstile invisible en el widget Elementor `convers`. Esto es una excepcion controlada, no un fork del producto: campos, consentimiento, validacion, CORS, captcha, persistence policy y destination plan siguen viviendo en Greenhouse. Cuando el renderer portable soporte Turnstile, el host debe volver a:
+
+```html
+<greenhouse-form form="efeonce-aeo-diagnostic" surface="fhsf-efeonce-aeo-diagnostic" locale="es-CL"></greenhouse-form>
+```
+
+Contrato runtime y CORS: [growth-public-forms-runtime-contract.md](../../architecture/growth-public-forms-runtime-contract.md).
 
 ## Como se muestra el formulario (renderer portable) — TASK-1231
 
@@ -61,13 +82,13 @@ El cockpit es un command center operativo, no un builder visual completo. Permit
 
 La UI consume readers/APIs del motor (`src/lib/growth/forms/**`, `/api/admin/growth/forms/**`) y usa primitives canónicas de Greenhouse (`CompositionShell`, `AdaptiveSidecarLayout`, breadcrumbs, buttons, chips, motion y tokens tipográficos). La navegación top-level es **Growth → Forms**.
 
-Primer form real observado: **AI Visibility Grader** (`fdef-ai-visibility-grader`) convergido por TASK-1251 como anchor del motor. Ese form tiene pagina propia y no prueba por si solo el renderer generico WordPress; el smoke publico WordPress/dataLayer de un form renderizado queda como follow-up de rollout/sign-off.
+Primeros forms reales observados: **AI Visibility Grader** (`fdef-ai-visibility-grader`) como anchor interno del motor, y **AEO Diagnostic** (`fdef-efeonce-aeo-diagnostic`) como primer submit productivo publico en WordPress. El AEO prueba el motor publico + HubSpot destination + CORS + Turnstile, pero usa host bridge HTML; el smoke publico del renderer generico `<greenhouse-form>` queda como follow-up de rollout/sign-off.
 
 ## Que NO hace (todavia)
 
-- En **produccion** sigue apagado hasta el primer formulario real (TASK-1232) + sign-off.
+- En **produccion** el motor ya esta activo de forma acotada para AEO `/aeo-2/`; no generalizarlo a cualquier embed sin revisar flags, host surface, CORS, Turnstile y smoke.
 - El cockpit no es un drag-and-drop builder; authoring avanzado queda para un follow-up si patrones repetidos lo justifican.
-- El renderer es **code-complete**; para verlo en un sitio real productivo se requiere publicar un form genérico con host surface autorizado y ejecutar smoke WordPress/dataLayer antes de producción. No agrega flags nuevos (reusa `GROWTH_FORMS_PUBLIC_API_ENABLED`).
+- El renderer es **code-complete**, pero no reemplaza el bridge AEO hasta emitir `captchaToken` para Turnstile. Para usarlo en un sitio real productivo generico se requiere host surface autorizado y smoke WordPress/dataLayer. No agrega flags nuevos (reusa `GROWTH_FORMS_PUBLIC_API_ENABLED`).
 
 ## Detalle tecnico
 

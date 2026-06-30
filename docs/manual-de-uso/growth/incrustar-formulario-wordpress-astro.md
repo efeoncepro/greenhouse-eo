@@ -1,7 +1,7 @@
 # Incrustar un formulario de Growth en un sitio (WordPress / Astro)
 
 > **Tipo:** Manual de uso / runbook operativo
-> **Version:** 1.0 — 2026-06-25 (Claude, TASK-1231)
+> **Version:** 1.1 — 2026-06-30 (Codex, AEO `/aeo-2/` live bridge note)
 > **Doc funcional:** [docs/documentation/growth/motor-formularios-publicos.md](../../documentation/growth/motor-formularios-publicos.md)
 > **Arquitectura:** [GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md) §19 + §Delta TASK-1231
 
@@ -18,9 +18,17 @@ consentimiento y destino del lead viven en Greenhouse.
 2. Tiene que existir una **host surface** registrada para ese sitio, con el origen del
    sitio en su allowlist (ej. `wordpress-public` para WordPress, `astro` para Astro).
 3. El **flag publico** `GROWTH_FORMS_PUBLIC_API_ENABLED` tiene que estar ON en el
-   environment de Greenhouse que el sitio apunta (staging: ON; produccion: gated).
+   environment de Greenhouse que el sitio apunta (staging: ON; produccion: ON solo
+   para rollouts aprobados; AEO `/aeo-2/` ya usa el motor por bridge HTML).
 4. El **CSP del sitio** debe permitir cargar el script y llamar a la API desde el
    origen de Greenhouse (ver "CSP" abajo).
+
+> Nota vigente: la landing AEO `/aeo-2/` no usa todavia el widget generico
+> `greenhouse_growth_form`. Usa un host bridge HTML con Turnstile invisible porque el
+> renderer portable `<greenhouse-form>` aun no emite `captchaToken`. Cuando el renderer
+> soporte Turnstile, se debe migrar ese host a `<greenhouse-form form="efeonce-aeo-diagnostic"
+> surface="fhsf-efeonce-aeo-diagnostic" locale="es-CL">` sin mover campos, mapping ni
+> destinos a WordPress.
 
 ## Vista previa interna (antes de tocar un sitio)
 
@@ -113,6 +121,8 @@ de paridad no-routable: `src/pages/_growth-form-parity.astro`.
 - **No** apuntes a un canal `stable` antes de aprobar el smoke; deja `preview`/`beta`.
 - **No** copies el bundle del renderer al sitio: siempre se carga desde Greenhouse
   (asi todos los sitios quedan en la misma version).
+- **No** reemplaces el bridge AEO `/aeo-2/` por el widget generico hasta que el renderer
+  emita `captchaToken`; hacerlo rompe el submit con Turnstile.
 
 ## Problemas comunes
 

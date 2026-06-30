@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 
+import { publicFormsCorsHeaders, publicFormsOptionsResponse } from '@/app/api/public/growth/forms/cors'
 import { verifyEmail } from '@/lib/growth/forms/email-verification'
 import { allowVerifyRequest } from '@/lib/growth/forms/email-verification/rate-limit'
 import { isFormsEmailVerificationEnabled, isFormsPublicApiEnabled } from '@/lib/growth/forms/flags'
@@ -17,18 +18,26 @@ import { captureWithDomain } from '@/lib/observability/capture'
  */
 export const dynamic = 'force-dynamic'
 
+const METHODS = 'POST, OPTIONS'
+
 const getClientIp = (request: Request): string | null =>
   request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || request.headers.get('x-real-ip') || null
 
+export function OPTIONS(request: Request) {
+  return publicFormsOptionsResponse(request, METHODS)
+}
+
 export async function POST(_request: Request, { params }: { params: Promise<{ formSlug: string }> }) {
+  const headers = publicFormsCorsHeaders(_request, METHODS)
+
   await params // formSlug no se usa para verificar (la verificación es por email), pero mantiene la ruta consistente.
 
   if (!isFormsPublicApiEnabled() || !isFormsEmailVerificationEnabled()) {
-    return NextResponse.json({ outcome: 'disabled', message: 'No disponible.' }, { status: 404 })
+    return NextResponse.json({ outcome: 'disabled', message: 'No disponible.' }, { status: 404, headers })
   }
 
   if (!allowVerifyRequest(getClientIp(_request))) {
-    return NextResponse.json({ outcome: 'rate_limited', message: 'Demasiados intentos. Espera un momento.' }, { status: 429 })
+    return NextResponse.json({ outcome: 'rate_limited', message: 'Demasiados intentos. Espera un momento.' }, { status: 429, headers })
   }
 
   let body: Record<string, unknown>
@@ -36,7 +45,7 @@ export async function POST(_request: Request, { params }: { params: Promise<{ fo
   try {
     body = (await _request.json()) as Record<string, unknown>
   } catch {
-    return NextResponse.json({ outcome: 'invalid', message: 'Solicitud inválida.' }, { status: 400 })
+    return NextResponse.json({ outcome: 'invalid', message: 'Solicitud inválida.' }, { status: 400, headers })
   }
 
   const email = typeof body.email === 'string' ? body.email : ''
@@ -58,11 +67,11 @@ export async function POST(_request: Request, { params }: { params: Promise<{ fo
         suggestion: verdict.suggestion,
         reasonCode: verdict.reasonCode,
       },
-      { status: 200 },
+      { status: 200, headers },
     )
   } catch (error) {
     captureWithDomain(error, 'growth', { tags: { source: 'growth_forms_verify_email_route' } })
 
-    return NextResponse.json({ outcome: 'invalid', message: 'No fue posible verificar el correo.' }, { status: 502 })
+    return NextResponse.json({ outcome: 'invalid', message: 'No fue posible verificar el correo.' }, { status: 502, headers })
   }
 }

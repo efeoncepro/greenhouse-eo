@@ -1,3 +1,47 @@
+## Sesion 2026-06-29 — Public Site AEO `/aeo-2/` FAQ con Ohio Accordion — Codex — ✅ aplicado live
+
+> **Pedido:** reemplazar/optimizar la seccion `Preguntas frecuentes` usando el acordeon Ohio (`ohio_accordion`) como primitive canonica.
+>
+> **Resultado:** se trabajo solo `postId=250265` (`/aeo-2/`), sin tocar Home (`postId=2791`) ni el hero. El widget `faqlist` dejo de ser `text-editor` con `<details>` y ahora es `widgetType=ohio_accordion`, clase `.gh-aeo-faq-accordion`, `block_layout=outline`, con 9 tabs y la primera pregunta abierta por defecto. Se agrego estilo scoped para una superficie unica tipo FAQ (`gh-aeo-faq-ohio-accordion-v1`, `gh-aeo-faq-ohio-accordion-active-body-fix-v1`, `gh-aeo-faq-accordion-body-padding-v2`) y un inicializador scoped en el HTML widget `schema3` (`gh-aeo-faq-accordion-init-v1`) porque el handler Ohio renderizaba la primitive pero no estaba alternando paneles correctamente en el frontend publico de esta landing.
+>
+> **Guardas:** cambios aplicados con `Document::save()`. Backups meta creados: `_gh_backup_before_aeo_faq_ohio_accordion_20260630T20260630T004715Z`, `_gh_backup_before_aeo_faq_accordion_tune_20260630T20260630T005244Z`, `_gh_backup_before_aeo_faq_accordion_init_20260630T20260630T005441Z` y `_gh_backup_before_aeo_faq_accordion_body_padding_20260630T20260630T005642Z`. `heroans` permanecio estable con hash `e0b951b2456a83578cd9e22005900521`. Kinsta cache purgada despues de cada write.
+>
+> **Evidencia:** Playwright publico desktop/mobile/reduced-motion: `hasDetails=false`, `hasAccordion=true`, `dataOhioAccordion=true`, `itemCount=9`, `visibleCount=1`, click abre la segunda pregunta (`¿Cuáles son los 5 niveles del AEO?`) en desktop y mobile, `scrollWidth=clientWidth` (`1440` desktop / `390` mobile), `transitionDuration=0s` en reduced-motion. Capturas: `/tmp/aeo-faq-ohio-accordion-desktop-20260630.png`, `/tmp/aeo-faq-ohio-accordion-mobile-20260630.png`, `/tmp/aeo-faq-ohio-accordion-reduced-motion-20260630.png`.
+>
+> **Hotfix posterior de click:** el operador reporto que el accordion no abria. Se reprodujo: el click llegaba, pero el handler Ohio dejaba el panel con `visible`/`aria-expanded=true` y sin clase `active`, quedando con altura `0`. Se agrego inicializador scoped v2 (`gh-aeo-faq-accordion-init-v2`) en fase capture para fijar `active`, `visible`, `hidden`, `display`, `height` y ARIA antes de que el handler conflictivo colapse el panel. Backup meta: `_gh_backup_before_aeo_faq_accordion_click_fix_v2_20260630T20260630T085628Z`; `heroans` siguio estable (`e0b951b2456a83578cd9e22005900521`) y cache Kinsta purgada. Verificacion Playwright: click en `.accordion-button`, `.icon-button` y `.accordion-header` abre la segunda pregunta con altura `111px`; mobile abre la tercera con altura `170.97px`; desktop/mobile sin overflow. Capturas: `/tmp/aeo-faq-accordion-click-fixed-desktop-20260630.png`, `/tmp/aeo-faq-accordion-click-fixed-mobile-20260630.png`.
+
+## Sesion 2026-06-29 — Public Site AEO `/aeo-2/` seccion Por que nosotros — Codex — ✅ aplicado live
+
+> **Pedido:** invocar skills de UI/IX/Motion/Typography y optimizar la seccion `Por que nosotros`, visible despues del diagnostico, sin tocar Home ni el hero.
+>
+> **Resultado:** se trabajo solo `postId=250265` (`/aeo-2/`). La seccion `why5421` queda como `.gh-aeo-why gh-aeo-why-optimized`: H2 con acento teal en `Cerrarlo`, comparativa en dos cards (`Medir por tu cuenta` vs `Surround Discovery`), objecion honesta en banda navy (`¿Y si esto lo hace mi propio equipo?`), proof strip con marcas LatAm como pills, dos credenciales (`HubSpot Solutions Partner` y `Liderado por Julio Reyes`) y callout final `Ventaja de timing`. Se agregaron los markers CSS page-scoped `gh-aeo-why-section-simple-fallback` y `gh-aeo-why-section-tune-v2`; la microinteraccion queda en hover sutil y se desactiva con `prefers-reduced-motion`.
+>
+> **Guardas:** cambio aplicado con `Document::save()`. Backups meta creados: `_gh_backup_before_aeo_why_optimized_20260630T004200Z`, `_gh_backup_before_aeo_why_simple_fix_20260630T005400Z` y `_gh_backup_before_aeo_why_tune_20260630T010500Z`. `heroans` permanecio estable con hash `e0b951b2456a83578cd9e22005900521`. Kinsta cache purgada despues de los writes.
+>
+> **Aprendizaje operativo:** un primer intento con HTML rico/nested `<div>` dentro de widgets `text-editor` fue rechazado por Elementor/Ohio y el frontend mostro lorem ipsum. Se corrigio con markup seguro para Elementor (`small`, `h3`, `p`, `ul/li`, `span`) y CSS fallback. No reintroducir estructuras ricas dentro de `text-editor`; si se requieren logos/imagenes reales en esa seccion, usar widget/HTML widget seguro y verificar live.
+>
+> **Evidencia:** Playwright publico desktop/mobile/reduced-motion: desktop `scrollWidth=clientWidth=1440`, mobile `scrollWidth=clientWidth=390`, reduced-motion `transitionDuration=0s` y `translate=0px`; cards comparativas igualadas en altura (`340px` desktop, `405.58px` mobile); H2 conserva tracking de display y H3 internos quedan con letter-spacing normal. Capturas: `/tmp/aeo-why-optimized-desktop-20260630.png`, `/tmp/aeo-why-optimized-mobile-20260630.png`, `/tmp/aeo-why-optimized-reduced-motion-20260630.png`.
+
+## Sesion 2026-06-29 — Public Site AEO `/aeo-2/` seccion diagnostico — Codex — ✅ aplicado live
+
+> **Pedido:** invocar skills de UI/UX y optimizar la seccion `Tu Diagnóstico de Visibilidad en IA`.
+>
+> **Resultado:** se trabajo solo `postId=250265` (`/aeo-2/`), sin tocar Home (`postId=2791`) ni el hero. La seccion `.gh-aeo-diagnostic` ahora queda como bloque de cuatro entregables en grid 2x2 desktop / 1 columna mobile, con labels de resultado (`Score por motor`, `Mapa competitivo`, `Prompts críticos`, `Primeros movimientos`) y una banda navy de `Lectura experta` que aclara que no es un reporte automatico. Se agregaron los markers CSS page-scoped `gh-aeo-diagnostic-section-optimized` y `gh-aeo-diagnostic-section-tune-v2`; tambien se neutralizo el padding heredado de `.gh-aeo-card` solo dentro de esta seccion.
+>
+> **Guardas:** cambio aplicado con `Document::save()`. Backups meta creados: `_gh_backup_before_aeo_diagnostic_optimized_20260630T001900Z` y `_gh_backup_before_aeo_diagnostic_tune_20260630T002800Z`. `heroans` permanecio estable con hash `e0b951b2456a83578cd9e22005900521`. Kinsta cache purgada despues de cada write.
+>
+> **Evidencia:** Playwright publico desktop/mobile: desktop `scrollWidth=clientWidth=1440`, mobile `scrollWidth=clientWidth=390`, grid desktop `532px 532px`, 4 cards alineadas en filas iguales, mobile 1 columna. H2 conserva tracking de display (`-1.728px` desktop / `-1.152px` mobile); titulos internos y labels de cards quedan con `letterSpacing=normal`, `textTransform=none`. Capturas: `/tmp/aeo-diagnostic-optimized-desktop-20260630.png` y `/tmp/aeo-diagnostic-optimized-mobile-20260630.png`.
+
+## Sesion 2026-06-29 — Public Site AEO `/aeo-2/` letter-spacing global — Codex — ✅ aplicado live
+
+> **Pedido:** revisar el letter-spacing de toda la landing AEO, no solo de las secciones `pipelin` y `levels`.
+>
+> **Resultado:** se trabajó solo `postId=250265` (`/aeo-2/`), sin tocar Home (`postId=2791`) ni cambiar el módulo derecho del hero. Se agregó CSS page-scoped con marker `gh-aeo-global-letter-spacing-system`: H1/H2 conservan tracking de display (`h1` ≈ `-0.047em`, `h2` ≈ `-0.045em`) y todo el resto de texto dentro de `.gh-aeo` queda con `letter-spacing: 0/normal` y `text-transform: none`. Esto normaliza eyebrows, labels, chips, source marks, años, body copy, H3/H4, CTAs y FAQ sin romper el acento teal aprobado.
+>
+> **Guardas:** cambio aplicado con `Document::save()`. Backup meta creado: `_gh_backup_before_aeo_global_letter_spacing_20260630T000507Z`. `heroans` permaneció estable con hash `e0b951b2456a83578cd9e22005900521`. Kinsta cache purgada después del write.
+>
+> **Evidencia:** auditoría Playwright desktop/mobile sobre 172 nodos de texto: `suspiciousCount=0`, `uppercaseCount=0`, `overflowX=0`. Display permitido final: hero H1 desktop `letterSpacing=-2.0304px`, section H2 desktop `letterSpacing=-1.728px`; mobile H1 `-1.6497px`, H2 entre `-1.152px` y `-1.49175px` según tamaño. Capturas full page: `/tmp/aeo-global-letter-spacing-final-desktop-20260630.png` y `/tmp/aeo-global-letter-spacing-final-mobile-20260630.png`.
+
 ## Sesion 2026-06-29 — Public Site AEO `/aeo-2/` cierre documental completo — Codex — ✅ docs sincronizados
 
 > **Pedido:** documentar todo lo aprendido y ejecutado durante la iteracion live de la landing AEO en skills y docs correspondientes.
@@ -34350,3 +34394,21 @@ El operador pidió que el header de `/aeo-2/` se vea como en Home: transparente 
 Cambio aplicado en `/aeo-2/`: se copiaron desde Home los metas `page_header_logo_style=light_variant`, `page_header_menu_style=inherit`, `page_header_menu_style_settings=custom`, `page_header_menu_text_typo={"color":"rgba(255,255,255,0.75)"}`, `page_header_add_cap=0`, `page_header_search_visibility=1`, `page_header_search_position=standard`. Luego se añadió padding superior page-scoped al hero con marker `gh-aeo-header-overlay-spacing` para que el contenido respire debajo del header overlay y no se encime con el logo. Backups internos: `_gh_backup_before_aeo_header_like_home_*` y `_gh_backup_before_aeo_header_overlay_spacing_*`.
 
 Validación final: Playwright en desktop confirma `bodyClass` con `with-header-3` y sin `with-spacer`, `#masthead position=absolute`, `heroTop=0`, `contentTop=0`, logo visible `inverse-logo_1.svg`, menú principal `rgba(255,255,255,0.75)`, `overlapsLogoTag=false`, sin overflow `1440/1440`. Mobile también sin overflow `390/390` y sin overlap. Capturas: `/tmp/aeo-2-header-final-desktop.png`, `/tmp/aeo-2-header-final-mobile.png`.
+
+### Conversion Growth Forms-style diagnostic card — COMPLETE 2026-06-30 — Codex
+
+El operador pidió reemplazar el placeholder de `Solicita tu diagnóstico` por un Growth Forms de Greenhouse con los campos del mockup. Se actualizó solo la card de conversión de `/aeo-2/` (`postId=250265`), sin tocar Home ni el hero. Backups internos creados: `_gh_backup_before_aeo_growth_form_section_20260630T090824Z`, `_gh_backup_before_aeo_growth_form_select_fix_20260630T091031Z`, `_gh_backup_before_aeo_growth_form_input_fix_20260630T091201Z`.
+
+Estado vigente: la card ahora muestra un formulario visual `gh-aeo-growth-form-card` con metadata `data-greenhouse-growth-form="ai-visibility-grader"` / `data-growth-surface="fhsf-ai-visibility-grader"` y campos `Nombre`, `Email corporativo`, `Marca / sitio web`, `País`, `Tamaño de empresa`, `Principal competidor (opcional)`. El CTA principal conserva salida segura a `https://meetings.hubspot.com/efeoncepro/agenda-discovery`, más trust bullets y link de privacidad. No se creó un submit falso: producción respondió `404 No disponible` para `GET /api/public/growth/forms/ai-visibility-grader` y `outcome=disabled` para `POST /api/public/growth/ai-visibility/run`, por lo que el envío real queda bloqueado hasta el rollout productivo de Growth Forms/AEO intake.
+
+Validación: guardado vía `Document::save()` con hash `heroans` preservado (`e0b951b2456a83578cd9e22005900521`) y cache Kinsta purgada. Playwright desktop/mobile confirmó 6 labels, 4 inputs, 2 selects, CTA a meetings, texto de privacidad, `heroans` presente y sin overflow (`1440/1440`, `390/390`). Capturas locales: `tmp/aeo-growth-form-verify/aeo-growth-form-desktop.png` y `tmp/aeo-growth-form-verify/aeo-growth-form-mobile.png`.
+
+### Conversion Growth Forms live bridge — COMPLETE 2026-06-30 — Codex
+
+El operador corrigió que el form no debía ser `ai-visibility-grader` y entregó el HubSpot form correcto: portal `48713323`, GUID `8649e76c-8b01-41f3-9b0c-5713d7b4dba6` (`AEO - Lead Form`). Se creó en la DB compartida el form gobernado `efeonce-aeo-diagnostic` (`fdef-efeonce-aeo-diagnostic`, versión publicada `fver-efeonce-aeo-diagnostic-v1`) y la surface pública `fhsf-efeonce-aeo-diagnostic`. Mapping HubSpot: `firstName→firstname`, `email→email`, `country→pais_gh`, `companySize→tamano_de_la_empresa`, `mainCompetitor→marca_de_competencia`; `brandWebsite` queda persistido en Greenhouse pero no se mapea porque el form de HubSpot no expone campo equivalente.
+
+Runtime: Claude cargó `TURNSTILE_SECRET` en Vercel Production y el submit pasó de `captcha_not_configured` a `missing_token`. Se desplegó un ajuste CORS en Growth Forms público (`src/app/api/public/growth/forms/cors.ts` + rutas `GET/POST/verify-email`; deploy prod `greenhouse-qbxqrrzpm`) para permitir `https://efeoncepro.com` y `https://www.efeoncepro.com` en `GET/POST/OPTIONS`. Smoke live: `OPTIONS` 204 con ACAO, `GET` contrato 200 con 6 fields, y `POST` sin token 403 `captcha_failed/missing_token` con ACAO.
+
+WordPress: se reemplazó solo el widget HTML de conversión (`convers`, clases `gh-aeo-form-card gh-aeo-growth-form-host`) por un host bridge scoped con Turnstile invisible y POST a `https://greenhouse.efeoncepro.com/api/public/growth/forms/efeonce-aeo-diagnostic/submit`. No se tocó Home ni el hero; `heroans` quedó intacto (`md5=e0b951b2456a83578cd9e22005900521`). Backups meta nuevos: `_gh_backup_before_aeo_growth_form_live_bridge_20260630T094856Z` y `_gh_backup_before_aeo_growth_form_live_bridge_20260630T095442Z`. Cache Kinsta purgada (`wp kinsta cache purge --all`).
+
+Validación: `php -l` del script WP OK; ESLint focal de rutas CORS OK; Vercel build/deploy prod OK. `curl` público de `/aeo-2/` confirmó nuevo slug/surface, sin `ai-visibility-grader`, Turnstile loader y `gh-aeo-answer`. Playwright desktop/mobile: form presente, 6 campos + honeypot, `oldSlug=false`, `hasTurnstileLoader=true`, `overflow=0`, `consoleErrors=[]`; browser fetch desde `efeoncepro.com` sin token devuelve `403 captcha_failed/missing_token` sin crear lead. Capturas: `/tmp/aeo-2-growth-form-desktop.png`, `/tmp/aeo-2-growth-form-mobile.png`.

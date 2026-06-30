@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 
+import { publicFormsCorsHeaders, publicFormsOptionsResponse } from '@/app/api/public/growth/forms/cors'
 import { type PublicSubmitInput, type PublicSubmitOutcome } from '@/lib/growth/forms/contracts'
 import { submitForm } from '@/lib/growth/forms/commands'
 import { isFormsPublicApiEnabled } from '@/lib/growth/forms/flags'
@@ -14,6 +15,8 @@ import { captureWithDomain } from '@/lib/observability/capture'
  * NUNCA inline. Gateado por `GROWTH_FORMS_PUBLIC_API_ENABLED` (default OFF → 404).
  */
 export const dynamic = 'force-dynamic'
+
+const METHODS = 'POST, OPTIONS'
 
 const STATUS_BY_OUTCOME: Record<PublicSubmitOutcome, number> = {
   accepted: 202,
@@ -31,9 +34,15 @@ const STATUS_BY_OUTCOME: Record<PublicSubmitOutcome, number> = {
 const getClientIp = (request: Request): string | null =>
   request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || request.headers.get('x-real-ip') || null
 
+export function OPTIONS(request: Request) {
+  return publicFormsOptionsResponse(request, METHODS)
+}
+
 export async function POST(request: Request, { params }: { params: Promise<{ formSlug: string }> }) {
+  const headers = publicFormsCorsHeaders(request, METHODS)
+
   if (!isFormsPublicApiEnabled()) {
-    return NextResponse.json({ outcome: 'disabled', message: 'No disponible.' }, { status: 404 })
+    return NextResponse.json({ outcome: 'disabled', message: 'No disponible.' }, { status: 404, headers })
   }
 
   const { formSlug } = await params
@@ -43,7 +52,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ for
   try {
     body = (await request.json()) as Record<string, unknown>
   } catch {
-    return NextResponse.json({ outcome: 'invalid', message: 'Solicitud inválida.' }, { status: 400 })
+    return NextResponse.json({ outcome: 'invalid', message: 'Solicitud inválida.' }, { status: 400, headers })
   }
 
   // El browser nunca manda destination mapping; sólo lo declarado por el contrato.
@@ -74,11 +83,11 @@ export async function POST(request: Request, { params }: { params: Promise<{ for
 
     return NextResponse.json(
       { outcome: result.outcome, submissionId: result.submissionId, message: result.reason },
-      { status: STATUS_BY_OUTCOME[result.outcome] },
+      { status: STATUS_BY_OUTCOME[result.outcome], headers },
     )
   } catch (error) {
     captureWithDomain(error, 'growth', { tags: { source: 'growth_forms_public_submit_route' } })
 
-    return NextResponse.json({ outcome: 'invalid', message: 'No fue posible procesar tu solicitud.' }, { status: 502 })
+    return NextResponse.json({ outcome: 'invalid', message: 'No fue posible procesar tu solicitud.' }, { status: 502, headers })
   }
 }
