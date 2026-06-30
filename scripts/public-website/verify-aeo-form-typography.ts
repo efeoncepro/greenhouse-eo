@@ -15,7 +15,6 @@ type ViewportCheck = {
   sectionTitle: TextProbe
   formTitle: TextProbe
   zeroTracking: TextProbe[]
-  formFontFamily: string
   screenshot: string
 }
 
@@ -96,36 +95,18 @@ async function main() {
       await page.goto(targetUrl, { waitUntil: 'networkidle', timeout: 60000 })
       await page.locator('.gh-aeo-conversion').scrollIntoViewIfNeeded()
 
-      // TASK-1298 — el formulario AEO ya no es un bridge HTML: lo pinta el renderer
-      // portable <greenhouse-form> (light DOM, clases `.ghf-*`). Esperar a que monte
-      // antes de leer computed styles, si no los selectores de control no existen aún.
-      await page
-        .locator('.gh-aeo-conversion greenhouse-form .ghf-btn')
-        .first()
-        .waitFor({ state: 'visible', timeout: 30000 })
-
       const sectionTitle = await readProbe(page, '.gh-aeo-conversion .gh-aeo-section-title .title')
       const formTitle = await readProbe(page, '.gh-aeo-conversion .gh-aeo-growth-form-title')
 
-      // title/lead/proof siguen siendo markup WordPress (se conservan en la card).
-      // label/input/button ahora son del renderer: `.ghf-label` / `.ghf-input` / `.ghf-btn`.
       const zeroSelectors = [
         '.gh-aeo-conversion .gh-aeo-growth-form-lead',
-        '.gh-aeo-conversion greenhouse-form .ghf-label',
-        '.gh-aeo-conversion greenhouse-form .ghf-input',
-        '.gh-aeo-conversion greenhouse-form .ghf-btn',
+        '.gh-aeo-conversion .gh-aeo-growth-form-label',
+        '.gh-aeo-conversion .gh-aeo-growth-form-input',
+        '.gh-aeo-conversion .gh-aeo-growth-form-button',
         '.gh-aeo-conversion .gh-aeo-growth-form-proof',
       ]
 
       const zeroTracking = await Promise.all(zeroSelectors.map(selector => readProbe(page, selector)))
-
-      // TASK-1298 — el renderer debe heredar el stack DM Sans (--ghf-font scoped),
-      // no caer al default system-ui, para no clashear con la tipografía de la landing.
-      const formFontFamily = await page
-        .locator('.gh-aeo-conversion greenhouse-form .ghf-input')
-        .first()
-        .evaluate(node => getComputedStyle(node as HTMLElement).fontFamily)
-
       const overflowX = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)
 
       const screenshot = `${screenshotDir.replace(/\/$/, '')}/aeo-form-typography-gate-${testCase.name}.png`
@@ -135,10 +116,6 @@ async function main() {
       assertTitleTracking(`${testCase.name} section title`, sectionTitle)
       assertTitleTracking(`${testCase.name} form title`, formTitle)
       zeroTracking.forEach((probe, index) => assertZeroTracking(`${testCase.name} zero tracking ${zeroSelectors[index]}`, probe))
-
-      if (!/dm sans/i.test(formFontFamily)) {
-        throw new Error(`${testCase.name} renderer font-family is "${formFontFamily}"; expected the DM Sans stack (--ghf-font scoped)`)
-      }
 
       if (overflowX !== 0) {
         throw new Error(`${testCase.name} has horizontal overflow: ${overflowX}px`)
@@ -151,7 +128,6 @@ async function main() {
         sectionTitle,
         formTitle,
         zeroTracking,
-        formFontFamily,
         screenshot,
       })
 

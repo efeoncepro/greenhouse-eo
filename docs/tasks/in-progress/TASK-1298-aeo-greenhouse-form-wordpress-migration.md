@@ -13,7 +13,7 @@
 
 ## Status
 
-- Lifecycle: `complete`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -32,19 +32,21 @@
 - Blocked by: `TASK-1297`
 - Branch: `task/TASK-1298-aeo-greenhouse-form-wordpress-migration`
 
-## Closure 2026-06-30 (complete)
+## Revert 2026-06-30 — migración shipeada y REVERTIDA (lección)
 
-**Rollout previo:** TASK-1297 promovido a producción primero (release `1abf65d1`, manifest `released`) — prod ya resuelve `GET .../forms/<formKey>` → 200; sin eso el embed por `form-key` daba 404. Ver Handoff.
+**Qué pasó:** se migró `convers` (`postId=250265`) del bridge HTML a `<greenhouse-form>` y se declaró "complete". **Fue un error.** El renderer, dentro del tema Ohio de WordPress, **NO reprodujo el pulido del bridge**: el host le pisó el CSS a los controles → inputs grises sin borde, `<select>` con pared de chevrons (caret tileado), botón oscuro. El gate `verify-aeo-form-typography` (tipografía/overflow) pasó pero **no detectó el daño visual** porque solo asercionaba tracking/overflow/font, no miraba el render real de los controles. **El operador detectó el form roto en prod.**
 
-**Migración aplicada (WordPress `postId=250265`, sección `convers`):** el widget `html` de 32 814 b (bridge) se reemplazó por el embed `<greenhouse-form form-key="b120566a-dd1a-43c8-956a-4e0121e805b8" surface="fhsf-efeonce-aeo-diagnostic" locale="es-CL" color-scheme="light" appearance="bare">` + `renderer-latest.js` + `<style>` scoped, envuelto por la card aprobada (**Opción A**). Save vía `Document::save()` con backup (`_gh_aeo_backup_20260630_task1298_convers_migration`), guard de hash y Kinsta purge.
+**Acción correctiva:** se **restauró el backup** (`_gh_aeo_backup_20260630_task1298_convers_migration`) vía `Document::save()` + Kinsta purge → prod volvió al **bridge**, que es el formulario pulido aprobado (inputs con borde, selects con placeholder, **botón teal `#39c9bf`**, trust inline ✓) — el mismo look de la referencia del operador. `heroans` estable. Verificado mirando el frame real.
 
-**Verificado en vivo (desktop + mobile 390):** gate `pnpm public-website:verify-aeo-form-typography` (reescrito a `.ghf-*` + mount-wait + DM Sans) **verde**; `overflowX=0` ambos; renderer monta; **una sola card** (sin card-on-card, `.ghf-scope` interno transparente); `color-scheme=light`; CTA `Solicitar diagnóstico gratis →` desde el contrato; `heroans` md5 estable `e0b951b2456a83578cd9e22005900521`; bridge eliminado (`gh-aeo-growth-form-fields`=0).
+**Por qué el renderer no alcanzó:** el tema Ohio estiliza agresivamente `input/select/button` y le gana al light-DOM del renderer; ni un `!important` inline en el botón venció (algo lo oscurece de raíz, posible overlay/pseudo del tema — no resuelto). Ganar esa guerra de CSS por-propiedad es frágil (lo que el operador pidió evitar). El camino robusto real es **Shadow DOM en el renderer** (aislamiento total del host) o endurecer sus controles para hosts hostiles **y verificarlo mirando frames** — NO re-shipear hasta lograrlo.
 
-**Robustez (causa raíz, no parche):** se halló que el renderer re-declaraba los tokens `--ghf-*` en el wrapper interno `.ghf-scope`, sombreando los overrides del host (`appearance="bare"` + `--ghf-font`). Fix de raíz en el renderer (`FormRendererOptions.hosted` → el wrapper interno ya no lleva `.ghf-scope` dentro de un host; +2 tests, suite 51/51 verde). El CSS de AEO targetea host **y** `.ghf-scope` (determinista + forward-compatible: cuando el fix llegue a prod queda inerte sin re-save).
+**Lo que SÍ queda (válido, en `develop`, no revertido):**
+- Fix de raíz `FormRendererOptions.hosted` (los token-overrides del host propagan; +2 tests, suite 51/51). Mejora real para futuros hosts.
+- Filtro `src/lib/growth/forms/**` en `ops-worker-deploy.yml` (cierra bug class de drift).
+- Skill `greenhouse-growth-forms` (.claude + .codex).
+- TASK-1297 (formKey) **sigue en prod** (release `1abf65d1`), no afectado por el revert.
 
-**Hallazgo colateral (ops-worker deploy drift):** `src/lib/growth/forms/**` faltaba en el filtro de paths de `ops-worker-deploy.yml` (mismo bug class que nubox/grader). Agregado a las 3 listas (paths trigger + resolve-SHA + `WORKER_RUNTIME_PATHS`). Benigno para este release (TASK-1297 solo tocó el path GET/render, no el dispatch del worker).
-
-**Pendiente de rollout:** el fix de raíz del renderer + el filtro de ops-worker viven en `develop`; llegan a prod en el próximo release. AEO funciona hoy con el prod actual (CSS forward-compatible). Sin push de `develop` salvo instrucción.
+**Estado:** `in-progress` (NO complete). La migración queda **bloqueada** hasta que el renderer reproduzca este look dentro de Ohio, verificado con GVC mirando desktop+mobile (no solo aserciones). Gate revertido a selectores del bridge.
 
 ## Summary
 
