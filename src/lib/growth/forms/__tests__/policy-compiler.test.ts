@@ -10,6 +10,7 @@ import type { FormDefinitionRow, FormDestinationRow, FormVersionRow } from '../s
 
 const definition = (overrides: Partial<FormDefinitionRow> = {}): FormDefinitionRow => ({
   form_id: 'fdef-1',
+  form_key: '00000000-0000-4000-8000-000000000001',
   slug: 'test-form',
   name: 'Test',
   form_kind: 'lead_magnet',

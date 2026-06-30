@@ -6460,6 +6460,7 @@ export interface GreenhouseGrowthFormDefinition {
   created_by: string | null;
   default_locale: Generated<string>;
   form_id: Generated<string>;
+  form_key: Generated<string>;
   form_kind: string;
   name: string;
   owner_team: string | null;

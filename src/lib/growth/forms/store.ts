@@ -19,6 +19,9 @@ import {
 
 export type FormDefinitionRow = {
   form_id: string
+  /** TASK-1297 — identidad estable, opaca e inmutable (UUID). Pública/browser-safe.
+   *  NUNCA es el HubSpot destination form GUID. Distinta de form_id/slug/version/surface. */
+  form_key: string
   slug: string
   name: string
   form_kind: string
@@ -173,7 +176,18 @@ export const getFormDefinitionBySlug = async (slug: string): Promise<FormDefinit
     [slug],
   )
 
-  
+
+return rows[0] ?? null
+}
+
+/** TASK-1297 — resuelve la definición por su identidad estable `form_key` (UUID). */
+export const getFormDefinitionByKey = async (formKey: string): Promise<FormDefinitionRow | null> => {
+  const rows = await query<FormDefinitionRow>(
+    `SELECT * FROM greenhouse_growth.form_definition WHERE form_key = $1`,
+    [formKey],
+  )
+
+
 return rows[0] ?? null
 }
 
