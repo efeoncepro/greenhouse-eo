@@ -10,6 +10,8 @@ type: reference
 
 **Origen:** técnicas destiladas de `microsoft/webwright` `src/webwright/environments/local_browser.py` (Apache-2.0, Microsoft; SOTA en Mind2Web 86.7%) — el *craft* probado, **NO** su runtime de ejecución de código libre. GVC se queda determinístico y gobernado; solo le agregamos ojos en el loop de autoría.
 
+**Plugin Webwright local:** en el entorno Codex de Julio está instalado `webwright@webwright-local` (marketplace adaptador `~/.codex/plugins/webwright-marketplace`, plugin cache `~/.codex/plugins/cache/webwright-local/webwright/0.1.0`) con runtime Python + Playwright Firefox/Chromium verificado. Si un turno nuevo expone la skill/plugin `webwright` o `@webwright`, úsalo para exploración compleja, descubrimiento de selectores, flujos largos o scripts reproducibles de observación. Al cerrar trabajo Greenhouse, traduce lo aprendido a GVC/scenario/gate durable; no reemplaza `pnpm fe:capture`, `pnpm public-website:*` ni la verificación desktop/mobile.
+
 ---
 
 ## Regla #1 — Observá ANTES de autorar (aria snapshot). No adivines selectores.
@@ -115,6 +117,7 @@ Reglas:
 - **Observá antes de tocar:** primero inspeccioná DOM/render real con Playwright (`domcontentloaded`, no `networkidle` como única verdad), roles/texto/selector estable, screenshots y computed styles. No hagas cambios Elementor basados solo en memoria o en un PNG del operador.
 - **Computed style es el contrato:** para typography/layout bugs, lee `getComputedStyle()` en desktop y mobile 390. La cascada Ohio/Elementor puede hacer que el CSS correcto exista en el HTML pero no gane en runtime.
 - **Promové probes repetibles a comando durable:** si un bug puede volver, no lo dejes como `tmp/*.mjs`; crea un script repo-level o scenario que falle. Ejemplo vigente: `pnpm public-website:verify-aeo-form-typography`.
+- **Webwright cuando aporte:** si la landing requiere exploración multi-step, estados interactivos, o una auditoría de varias secciones, puedes arrancar con `@webwright`/skill Webwright para producir un script y screenshots de observación. Luego cristaliza el contrato en GVC, Playwright repo-level o un comando `public-website:*` antes de cerrar.
 - **No adoptes code-as-action de Webwright:** el agente no debe ejecutar código libre como superficie runtime de producto. Se importan las técnicas de observación, locators, layered timeouts y graceful degrade; las mutaciones siguen por el carril gobernado (`Document::save()`, backups, cache purge, Playwright verification).
 - **Scope público:** para landings WordPress, captura evidencia desktop + mobile 390, overflow (`scrollWidth - clientWidth`), y los estados relevantes (forms, accordions, reduced-motion) antes de cerrar.
 
