@@ -47,7 +47,7 @@ La landing publica `https://efeoncepro.com/aeo-2/` (`postId=250265`) ya envia le
 - API base: `https://greenhouse.efeoncepro.com`.
 - HubSpot destination: portal `48713323`, form GUID `8649e76c-8b01-41f3-9b0c-5713d7b4dba6` (`AEO - Lead Form`).
 - Campos publicados: `firstName`, `email`, `brandWebsite`, `country`, `companySize`, `mainCompetitor`.
-- Gate de email: `email.validator=corporate_email` + `validation_schema.emailPolicy={mode:"block_field",field:"email"}`. El bridge AEO consulta `/verify-email` antes de Turnstile y el servidor vuelve a validar en `submitForm`.
+- Gate de email: `email.validator=corporate_email` + `validation_schema.emailPolicy={mode:"block_field",field:"email"}`. El bridge AEO replica temporalmente el patrón reactivo del renderer: error inline en `email`, estado `Verificando correo…`, `/verify-email` debounced y success solo tras verificación remota. Antes de Turnstile vuelve a verificar, y el servidor revalida en `submitForm`.
 - Mapping HubSpot: `firstName -> firstname`, `email -> email`, `country -> pais_gh`, `companySize -> tamano_de_la_empresa`, `mainCompetitor -> marca_de_competencia`.
 - `brandWebsite` queda persistido en Greenhouse pero no se envia a HubSpot hasta que exista una propiedad/campo correspondiente en ese form.
 

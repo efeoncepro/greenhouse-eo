@@ -196,24 +196,27 @@ Elementos clave:
 
 | Pieza | Element ID / clase | Contrato |
 | --- | --- | --- |
-| Root | `convers`, `.gh-aeo-conversion` | Seccion clara antes del FAQ; no tocar el hero ni Home para ajustar este bloque. |
+| Root | `convers`, `.gh-aeo-conversion` | Banda clara propia antes del FAQ; no tocar el hero ni Home para ajustar este bloque. |
 | Header | `convers`, `.gh-aeo-section-header` | Eyebrow `Tu primer paso`, H2 `Descubre hoy cómo te ve la IA. Gratis.` y bajada `Recibe tu Diagnóstico de Visibilidad en IA...`. |
-| Form card | `convers`, widget `html`, `.gh-aeo-form-card gh-aeo-growth-form-host` | Card estilo Growth Forms, con metadata `data-greenhouse-growth-form="efeonce-aeo-diagnostic"` y `data-growth-surface="fhsf-efeonce-aeo-diagnostic"`. |
+| Form host/card | `convers`, widget `html`, `.gh-aeo-form-card gh-aeo-growth-form-host` + `.gh-aeo-growth-form-card` | El host Elementor `.gh-aeo-form-card` debe ser transparente, sin borde, sin sombra y sin padding para evitar card-on-card; la única superficie visible es `.gh-aeo-growth-form-card`, con metadata `data-greenhouse-growth-form="efeonce-aeo-diagnostic"` y `data-growth-surface="fhsf-efeonce-aeo-diagnostic"`. |
 | Campos | `.gh-aeo-growth-form-fields` | `Nombre`, `Email corporativo`, `Marca / sitio web`, `País`, `Tamaño de empresa`, `Principal competidor (opcional)`. |
-| CTA principal | `.gh-aeo-growth-form-button` | `Quiero mi diagnóstico gratis →`; primero consulta `POST /verify-email` para bloquear correos no corporativos, luego ejecuta Turnstile invisible y finalmente `POST https://greenhouse.efeoncepro.com/api/public/growth/forms/efeonce-aeo-diagnostic/submit`. |
+| CTA principal | `.gh-aeo-growth-form-button` | `Quiero mi diagnóstico gratis →`; respeta validación reactiva por campo, consulta `POST /verify-email` para bloquear correos no corporativos, luego ejecuta Turnstile invisible y finalmente `POST https://greenhouse.efeoncepro.com/api/public/growth/forms/efeonce-aeo-diagnostic/submit`. |
 | Trust/privacidad | `.gh-aeo-growth-form-proof`, `.gh-aeo-growth-form-privacy` | Mantener `Sin costo`, `Sin compromiso`, `Sin amarres`, `Tus datos están seguros` y link a `/politica-de-privacidad/`. |
 
 Guardrails:
 
 - No capturar datos en WordPress. WordPress solo renderiza la card y manda el payload al endpoint publico gobernado de Greenhouse con `surfaceId`, campos, `consent:true`, `captchaToken`, `pageUri` y honeypot.
 - El formulario gobernado vigente es `efeonce-aeo-diagnostic` (`fdef-efeonce-aeo-diagnostic`, versión publicada `fver-bc5a1cfe-76eb-4658-9fe9-ab0c8fb0a657` / v2) y la surface es `fhsf-efeonce-aeo-diagnostic`. Destination HubSpot: portal `48713323`, form GUID `8649e76c-8b01-41f3-9b0c-5713d7b4dba6`.
-- El campo `email` debe usar `validator=corporate_email` y la versión publicada debe conservar `validation_schema.emailPolicy={mode:"block_field",field:"email"}`. El bridge HTML consulta `/api/public/growth/forms/efeonce-aeo-diagnostic/verify-email` antes de pedir Turnstile; si el correo es Gmail/free/disposable, muestra error y no llama `/submit`.
+- El campo `email` debe usar `validator=corporate_email` y la versión publicada debe conservar `validation_schema.emailPolicy={mode:"block_field",field:"email"}`. El bridge HTML consulta `/api/public/growth/forms/efeonce-aeo-diagnostic/verify-email` de forma reactiva/debounced y antes de pedir Turnstile; si el correo es Gmail/free/disposable, muestra el error inline en el campo email y no llama `/submit`.
+- El bridge temporal debe mantener capacidades de Growth Forms: errores por campo con `role="alert"`, `aria-invalid`, `aria-describedby`, estado `Verificando correo…` junto al campo y success del email solo después de `/verify-email` real. Los errores requeridos aplican a `firstName`, `email` y `brandWebsite`; `country` y `companySize` siguen opcionales según el contrato publicado vigente.
 - Mapping HubSpot vigente: `firstName → firstname`, `email → email`, `country → pais_gh`, `companySize → tamano_de_la_empresa`, `mainCompetitor → marca_de_competencia`. `brandWebsite` se conserva en Greenhouse pero no se envia a HubSpot porque el form `AEO - Lead Form` no expone un campo equivalente.
 - El renderer canonico `<greenhouse-form>` todavia no emite `captchaToken`; por eso la landing usa un host bridge HTML scoped con Turnstile invisible. Cuando el renderer incorpore Turnstile, migrar a `<greenhouse-form form="efeonce-aeo-diagnostic" surface="fhsf-efeonce-aeo-diagnostic" locale="es-CL">`.
 - El API publico de Growth Forms necesita CORS para `https://efeoncepro.com` / `https://www.efeoncepro.com` en `GET`, `POST` y `OPTIONS`; se corrigio en producción el 2026-06-30.
+- La separación visual pertenece a la seccion `.gh-aeo-conversion`, hoy como banda `#f4f8fa`; no volver a resolverla con una card exterior alrededor del formulario. Si se ajusta el fondo, hacerlo en la seccion, no en `.gh-aeo-form-card`.
+- No exponer metadata interna en la landing. El kicker técnico `Growth Forms · Diagnóstico AEO` no debe renderizarse; la card pública empieza con `Solicita tu diagnóstico`.
 - El bloque actual debe mantener `letter-spacing:0` en labels, inputs, trust bullets y links. El H2 de la seccion conserva el tracking display global de la landing.
 - Los selects necesitan `appearance:none` + caret scoped; el theme Ohio puede repetir flechas nativas si se elimina ese CSS.
-- Verificar desktop/mobile: 4 inputs, 2 selects, CTA teal, privacidad visible, `scrollWidth == clientWidth`, Gmail/free email bloqueado con `/verify-email` y `submit=0`, y browser fetch desde la pagina devuelve `captcha_failed/missing_token` si se prueba sin token (sin crear lead).
+- Verificar desktop/mobile: banda de seccion visible, una sola card de formulario, host exterior sin borde/sombra/padding, sin kicker técnico, 4 inputs, 2 selects, CTA teal, privacidad visible, `scrollWidth == clientWidth`, Gmail/free email bloqueado inline con `/verify-email` y `submit=0`, required errors inline para `firstName`/`email`/`brandWebsite`, success de email corporativo solo después de `/verify-email`, y browser fetch desde la pagina devuelve `captcha_failed/missing_token` si se prueba sin token (sin crear lead).
 
 ## Seccion FAQ actual
 

@@ -9356,3 +9356,15 @@ Estado de ejecución del Plan AEO por organización × recomendación (gap key),
 - El CTA vivo apunta a HubSpot Meetings para evitar capturas falsas mientras producción mantiene apagados el render contract público de Growth Forms y el intake AEO (`No disponible` / `outcome=disabled`).
 - Guardado vía Elementor `Document::save()`, backups meta creados, Kinsta cache purgada y `heroans` preservado con hash `e0b951b2456a83578cd9e22005900521`.
 - Verificado con Playwright desktop/mobile: campos visibles, CTA/privacidad correctos y sin overflow en 1440px ni 390px.
+
+## 2026-06-30 — Public Site AEO `/aeo-2/`: Growth Forms inline validation
+
+- El bridge temporal AEO ahora replica validación reactiva de Growth Forms: errores inline por campo, `aria-invalid`/`aria-describedby`, verificación `/verify-email` debounced junto al email y success del email solo tras verificación corporativa remota.
+- Gmail/free/disposable queda bloqueado antes de Turnstile y sin `/submit`; los requeridos vigentes (`firstName`, `email`, `brandWebsite`) muestran su error en campo, mientras `country` y `companySize` siguen opcionales según el contrato publicado.
+- Guardado vía Elementor `Document::save()`, Kinsta cache purgada y `heroans` preservado con hash `e0b951b2456a83578cd9e22005900521`; verificado con Playwright desktop/mobile 390px sin overflow.
+
+## 2026-06-30 — Public Site AEO `/aeo-2/`: conversión single-surface
+
+- La sección de conversión recuperó fondo propio como banda clara antes del FAQ, sin reintroducir card exterior alrededor del formulario.
+- `.gh-aeo-form-card` queda como host transparente sin borde/sombra/padding; `.gh-aeo-growth-form-card` es la única card visible.
+- Se removió el kicker técnico `Growth Forms · Diagnóstico AEO` del HTML público y se verificó desktop/mobile 390px sin overflow, sin kicker y con validación reactiva intacta.

@@ -27,8 +27,9 @@ consentimiento y destino del lead viven en Greenhouse.
 > `greenhouse_growth_form`. Usa un host bridge HTML con Turnstile invisible porque el
 > renderer portable `<greenhouse-form>` aun no emite `captchaToken`. Ese bridge debe
 > consultar `/verify-email` antes de Turnstile para respetar el gate corporativo del
-> form (`corporate_email` + `emailPolicy.block_field`). Cuando el renderer soporte
-> Turnstile, se debe migrar ese host a `<greenhouse-form form="efeonce-aeo-diagnostic"
+> form (`corporate_email` + `emailPolicy.block_field`) y debe mostrar validación inline
+> por campo, no solo un status global. Cuando el renderer soporte Turnstile, se debe
+> migrar ese host a `<greenhouse-form form="efeonce-aeo-diagnostic"
 > surface="fhsf-efeonce-aeo-diagnostic" locale="es-CL">` sin mover campos, validacion,
 > mapping ni destinos a WordPress.
 
