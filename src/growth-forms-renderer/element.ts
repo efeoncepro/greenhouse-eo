@@ -148,6 +148,10 @@ export class GreenhouseFormElement extends HTMLElement {
       pageContext: this.pageContext(),
       colorScheme: this.getAttribute('color-scheme') === 'light' ? 'light' : undefined,
       doc,
+      // El custom element ES el scope (declara tokens + container-type + box-sizing vía
+      // el selector `greenhouse-form`). El wrapper interno NO lleva `.ghf-scope` para no
+      // sombrear los overrides del host (appearance="bare" + tokens del sitio).
+      hosted: true,
     })
     this.renderer.mount()
   }

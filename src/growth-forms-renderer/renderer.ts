@@ -46,6 +46,16 @@ export interface FormRendererOptions {
   doc?: Document
   /** Fuerza el esquema de color (si no, hereda `prefers-color-scheme`). */
   colorScheme?: 'light' | 'dark'
+  /**
+   * `true` cuando el core se monta DENTRO de un host `<greenhouse-form>` (custom element).
+   * En ese caso el host ES el scope: declara los tokens `--ghf-*`, `container-type`,
+   * `display` y la box-sizing (`greenhouse-form *`). El wrapper interno NO debe llevar
+   * `.ghf-scope`, porque ese selector re-declara los tokens base y SOMBREA los overrides
+   * del host (`greenhouse-form { --ghf-* }` y `appearance="bare"` dejaban de propagar al
+   * contenido). Cuando es `false`/undefined (mount standalone en un div suelto, p. ej. el
+   * preview interno de Greenhouse), el root SÍ recibe `.ghf-scope` como scope raíz.
+   */
+  hosted?: boolean
 }
 
 const el = <K extends keyof HTMLElementTagNameMap>(
@@ -173,10 +183,16 @@ export class FormRenderer {
   // ─── Render ───────────────────────────────────────────────────────────────--
 
   mount(): void {
-    // Marca el root como scope del renderer: los tokens `--ghf-*` se definen sobre
-    // `.ghf-scope`, así el core funciona montado en un div cualquiera (preview Greenhouse)
-    // o dentro de `<greenhouse-form>` (hosts públicos) — sin depender del tag.
-    this.opts.root.classList.add('ghf-scope')
+    // El scope del renderer (tokens `--ghf-*` + container-type + box-sizing) lo provee
+    // `.ghf-scope` en el mount standalone (div suelto / preview interno Greenhouse).
+    // Dentro de un host `<greenhouse-form>` el HOST ya es el scope: añadir `.ghf-scope`
+    // al wrapper interno re-declararía los tokens base y sombrearía los overrides del
+    // host (`greenhouse-form { --ghf-* }` y `appearance="bare"`). Por eso solo se marca
+    // cuando NO está hosted. Ver `FormRendererOptions.hosted`.
+    if (!this.opts.hosted) {
+      this.opts.root.classList.add('ghf-scope')
+    }
+
     if (this.opts.colorScheme) this.opts.root.setAttribute('data-color-scheme', this.opts.colorScheme)
     this.telemetry.emit('gh_form_viewed', {})
     this.renderForm()

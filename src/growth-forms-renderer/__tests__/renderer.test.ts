@@ -32,6 +32,37 @@ describe('growth-forms-renderer · FormRenderer', () => {
     window.localStorage.clear()
   })
 
+  it('scopes the standalone mount root with .ghf-scope (div mount / internal preview)', () => {
+    const { root } = mountInto()
+
+    expect(root.classList.contains('ghf-scope')).toBe(true)
+  })
+
+  it('does NOT add .ghf-scope when hosted inside <greenhouse-form> (host is the scope, TASK-1298)', () => {
+    // El host declara los tokens --ghf-* (selector `greenhouse-form`); re-declararlos en
+    // el wrapper interno (.ghf-scope) sombrearía los overrides del host — appearance="bare"
+    // y `greenhouse-form { --ghf-font/--ghf-bg }` dejaban de propagar al contenido.
+    const host = document.createElement('div')
+
+    document.body.appendChild(host)
+    const root = document.createElement('div')
+
+    host.appendChild(root)
+
+    const renderer = new FormRenderer({
+      root,
+      contract: staticContractFixture(),
+      api,
+      fetchImpl: okFetch(),
+      doc: document,
+      hosted: true,
+    })
+
+    renderer.mount()
+
+    expect(root.classList.contains('ghf-scope')).toBe(false)
+  })
+
   it('renders labels above inputs with autocomplete + inputmode from the contract', () => {
     const { root } = mountInto()
     const email = root.querySelector<HTMLInputElement>('[name="work_email"]')!
