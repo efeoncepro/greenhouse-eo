@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-05-10 por Claude
-> **Ultima actualizacion:** 2026-05-24 por Codex
+> **Ultima actualizacion:** 2026-06-30 por Claude
 > **Documentacion tecnica:** [TASK-851](../../tasks/in-progress/TASK-851-production-release-orchestrator-workflow.md), [CLAUDE.md §Production Release Orchestrator invariants](../../../CLAUDE.md), [GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md](../../architecture/GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md)
 
 # Orquestador de Release a Producción
@@ -90,6 +90,17 @@ TASK-851 worker deploy.sh verify ──┘
                                   ↓
                   [TASK-854] Dashboard UI lee historico
 ```
+
+## Cómo se opera (interfaces para agentes)
+
+El orquestador es un workflow GitHub Actions, pero el operador casi nunca lo dispara "a mano". Lo conduce un agente a través de una de dos interfaces equivalentes, ambas clientes del **mismo** control plane (la skill `greenhouse-production-release` es la fuente de verdad):
+
+| Agente | Interfaz | Qué es |
+|---|---|---|
+| **Claude Code** | slash command **`/release`** | Harness de proceso (`.claude/commands/release.md`) que invoca la skill mandatoria y encadena los gates del camino canónico. Acepta modos: `/release`, `/release <sha>`, `/release rollback`, `/release watchdog`, `/release drift`, `/release break-glass`. |
+| **Codex** | skill directa | Codex no usa archivos de slash command; invoca `.codex/skills/greenhouse-production-release/SKILL.md` directamente (un release no es `TASK-###`/`ISSUE-###`, así que no pasa por un hook `pnpm codex:*-hook`). |
+
+Ninguna interfaz es un motor de release nuevo: las dos terminan corriendo `production-release.yml` y escribiendo en `release_manifests`. La diferencia con disparar el workflow crudo es que el harness **fuerza el orden seguro** (preflight → promoción → orquestador → approval → workers/Vercel/Azure → health → manifest → watchdog → flags del ledger) y exige aprobación humana explícita por cada mutación externa (push, dispatch, approval gate, deploy, flags, rollback). El agente lee y propone; la persona autoriza cada paso.
 
 ## Roles + permisos
 

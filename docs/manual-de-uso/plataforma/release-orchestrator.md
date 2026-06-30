@@ -1,7 +1,7 @@
 > **Tipo de documento:** Manual de uso (operador)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-05-10 por Claude
-> **Ultima actualizacion:** 2026-05-24 por Codex
+> **Ultima actualizacion:** 2026-06-30 por Claude
 > **Documentacion tecnica:** [CLAUDE.md §Production Release Orchestrator invariants (TASK-851)](../../../CLAUDE.md), [Spec TASK-851](../../tasks/in-progress/TASK-851-production-release-orchestrator-workflow.md), [GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md](../../architecture/GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md)
 
 # Production Release Orchestrator
@@ -90,6 +90,31 @@ Cada transition: UPDATE atomic en `release_manifests` + audit row en `release_st
 - **NUNCA** forzar transitions fuera de la matrix canónica via CLI. `assertValidReleaseStateTransition` lo throw fail-loud.
 - **NUNCA** flagear `--override-batch-policy` (en preflight) sin reason >=20 chars + capability + post-mortem comprometido. Audit row registra la decisión.
 - **NUNCA** disparar el orquestador cuando staging tiene blockers (Sentry critical issues o watchdog manual rojo verificado). Resolverlos primero.
+
+## Atajo para agentes — el slash command `/release` (Claude Code)
+
+Desde 2026-06-30 existe el slash command **`/release`** ([.claude/commands/release.md](../../../.claude/commands/release.md)) que arranca el flujo de paso a producción dentro de Claude Code. **No es un nuevo motor de release**: es un harness de proceso que invoca la skill mandatoria `greenhouse-production-release` y encadena los gates del camino canónico documentado en este manual + el [runbook](../../operations/runbooks/production-release.md). La fuente de verdad sigue siendo la skill + `CLAUDE.md` + el runbook; el command los sirve, no los reemplaza.
+
+### Cómo se invoca
+
+| Entrada | Qué hace |
+|---|---|
+| `/release` | Release normal del HEAD verde de `develop`; el agente te confirma el `target_sha` antes de promover |
+| `/release <sha>` | Release apuntando a un SHA específico |
+| `/release rollback` | Modo rollback (decision tree severidad → `pnpm release:rollback` con dry-run primero) |
+| `/release watchdog` | Corre `pnpm release:watchdog --json` y reporta drift |
+| `/release drift` | Diagnóstico de `worker_revision_drift` + re-intento del orquestador |
+| `/release break-glass <razón>` | Modo incidente (requiere tu aprobación explícita + razón + plan documentado) |
+
+### Qué garantiza (y qué NO hace por su cuenta)
+
+- **Regla de oro:** el command **nunca** ejecuta `git push`, `gh workflow run`, approval gate, deploy, `vercel env add`, rollback ni transición de manifest sin tu **aprobación explícita para esa mutación**. Por defecto solo lee, diagnostica y te propone el comando exacto; tú autorizas cada paso. Aprobar un paso ≠ aprobar el siguiente.
+- Respeta los invariantes duros del control plane: no trata un `push:main` como release completo, no aprueba workers sueltos, no dispara el orquestador <8 min post-push (Vercel BUILDING race), no muta `release_manifests` por SQL.
+- Relee `FEATURE_FLAG_STATE_LEDGER.md` → `§ Pendientes de acción` al planear y al cerrar, porque el deploy del código NO prende los flags `*_ENABLED` (default OFF).
+
+### Equivalente en Codex
+
+Codex **no usa archivos de slash command** `.md`. Sus alias slash (`/implement-task`, `/issue`) son triggers que mapean a hooks `pnpm codex:*-hook`, y un release no es una `TASK-###`/`ISSUE-###`. El equivalente de `/release` en Codex es **invocar directamente la skill** `.codex/skills/greenhouse-production-release/SKILL.md`, que ya existe y carga los mismos invariantes. Ambos agentes terminan en el mismo control plane.
 
 ## Problemas comunes
 
