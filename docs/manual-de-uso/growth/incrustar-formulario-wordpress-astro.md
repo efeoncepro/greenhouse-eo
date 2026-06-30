@@ -154,9 +154,23 @@ con el SO en oscuro vería el formulario oscuro y descuadrado. Forzá claro en e
 
 (Hoy `color-scheme` solo fuerza **light**; no hay forzar-dark.)
 
-> **En evaluación (TASK-1297):** un atributo de conveniencia `appearance` (`surface` por
-> defecto / `bare` = chromeless) para no tener que escribir `--ghf-bg: transparent` a mano
-> en cada sitio. Hasta que exista, usá el token `--ghf-bg: transparent`.
+**Atributo de conveniencia `appearance` (TASK-1297, disponible):** `appearance="surface"`
+(por defecto, comportamiento actual) o `appearance="bare"` (chromeless: el renderer queda
+con fondo transparente, sin escribir `--ghf-bg: transparent` a mano). Para integrar el
+renderer dentro de una card del host sin card-on-card, preferí `appearance="bare"` sobre el
+token CSS.
+
+```html
+<greenhouse-form form-key="<UUID>" surface="<surfaceId>" locale="es-CL" appearance="bare" color-scheme="light"></greenhouse-form>
+```
+
+**Identidad estable `form-key` (TASK-1297, recomendado):** además de `form="<slug>"`, el
+renderer acepta `form-key="<UUID>"` — la identidad opaca, estable e inmutable del formulario
+(no cambia por nueva versión, rename de slug ni nuevo surface). Preferila sobre `slug` para
+embeds y mutaciones; `slug` queda como alias humano/backward-compatible. La misma ruta pública
+(`/api/public/growth/forms/{ref}`) resuelve por slug **o** por form-key (UUID) — no hay endpoint
+nuevo. El `form-key` es público/opaco; **NUNCA** es el HubSpot destination form GUID (server-only).
+El catálogo del selector (`InsertableFormCatalogEntryVm.formKey`) ya lo expone.
 
 ## Que significan los estados (lo que vera el visitante)
 

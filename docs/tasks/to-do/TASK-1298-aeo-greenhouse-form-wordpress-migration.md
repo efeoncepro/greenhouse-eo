@@ -116,7 +116,7 @@ Reglas obligatorias:
 - Conversion section: `convers`, `.gh-aeo-conversion`.
 - Temporary bridge host/card: `.gh-aeo-form-card gh-aeo-growth-form-host` + `.gh-aeo-growth-form-card`.
 - Renderer endpoint: `https://greenhouse.efeoncepro.com/growth-forms/renderer-latest.js`.
-- Public contract: slug `efeonce-aeo-diagnostic`, real `formKey` pendiente de `TASK-1297`, surface `fhsf-efeonce-aeo-diagnostic`, `security.captcha` present.
+- Public contract: slug `efeonce-aeo-diagnostic`, **`formKey` real `b120566a-dd1a-43c8-956a-4e0121e805b8`** (TASK-1297 complete), versión publicada v4 `fver-dbdd6a02-7e89-4d65-b29e-7228b7475a94` con `copy.submit="Solicitar diagnóstico gratis →"` + `security.captcha`, surface `fhsf-efeonce-aeo-diagnostic`. GET por formKey === por slug verificado.
 - Typography gate: `pnpm public-website:verify-aeo-form-typography`.
 
 ### Gap

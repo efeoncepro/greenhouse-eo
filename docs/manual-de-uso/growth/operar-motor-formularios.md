@@ -86,6 +86,17 @@ Señales reliability (en `/admin/operations`): `growth.forms.dead_letter_count`,
 - No llamar a HubSpot inline desde el submit: la entrega SIEMPRE corre en el dispatcher async (overlay #3).
 - No reintentar manualmente una submission `delivered` (duplica el lead en HubSpot — secure-submit NO es idempotente).
 
+## Publicar copy renderizable de un form (TASK-1297)
+
+Para que el renderer muestre un CTA aprobado (ej. `Solicitar diagnóstico gratis →`) en vez del
+default per-tipo, el copy se publica en el render contract (`copy.submit`). NO se edita una versión
+publicada in-place: se clona, se setea el copy y se publica una versión nueva. El patrón canónico es
+un script idempotente que resuelve el form por su `form_key` (identidad estable, no por etiqueta/slug),
+muestra slug/form_id/surface antes de mutar, preserva fields/validación/Turnstile/destinos, y corre
+dry-run por defecto. Ejemplo (AEO): `scripts/growth/activate-aeo-render-copy-contract.ts` —
+`npx tsx --require ./scripts/lib/server-only-shim.cjs scripts/growth/activate-aeo-render-copy-contract.ts`
+(dry-run) y `--apply` para publicar. El `form_key` real de un form: `SELECT slug, form_key FROM greenhouse_growth.form_definition`.
+
 ## Referencias tecnicas
 
 - Arquitectura: `docs/architecture/GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md` (§Delta 2026-06-25 + §22).

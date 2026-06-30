@@ -69,7 +69,8 @@ El mismo formulario se ve igual en WordPress, en Astro y en la vista interna de 
 - **Mide sin exponer datos.** Avisa a la pagina cuando alguien ve, empieza, envia o completa el formulario (para Google Tag Manager), pero **nunca** manda el correo, el telefono ni el texto escrito en esos eventos.
 - **Accesible y en celular.** Etiquetas arriba de cada campo, errores que el lector de pantalla anuncia, foco que salta al primer error, botones grandes, y sin scroll horizontal en pantallas chicas.
 - **Donde se ve por dentro:** Greenhouse tiene una vista interna de referencia en **Design System → Growth Forms renderer** (solo equipo Efeonce) para previsualizar como se vera en los sitios publicos.
-- **Como se incrusta:** en WordPress hay un widget de Elementor ("Greenhouse Growth Form"); en Astro un componente; ambos solo piden el slug del formulario. Paso a paso en el [manual de incrustacion](../../manual-de-uso/growth/incrustar-formulario-wordpress-astro.md).
+- **Como se incrusta:** en WordPress hay un widget de Elementor ("Greenhouse Growth Form"); en Astro un componente; ambos piden el formulario por su identidad. Paso a paso en el [manual de incrustacion](../../manual-de-uso/growth/incrustar-formulario-wordpress-astro.md).
+- **Identidad estable `form-key` (TASK-1297):** cada formulario tiene una identidad propia, opaca e inmutable (un `form_key` tipo UUID) que no cambia aunque se publique una versión nueva, se renombre el slug o se muestre en otro sitio. Es la forma recomendada de referenciarlo en embeds y mutaciones (el slug queda como alias legible). Es pública/opaca y **nunca** es el identificador de destino de HubSpot. El renderer también acepta `appearance="bare"` para integrarse dentro de una tarjeta del sitio sin "tarjeta sobre tarjeta", y el texto del botón puede venir del formulario publicado (`copy.submit`) en vez de un default genérico.
 
 ## Cockpit operativo — TASK-1232
 

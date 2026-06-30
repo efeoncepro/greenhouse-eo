@@ -1,12 +1,16 @@
-## Sesion 2026-06-30 — TASK-1297 Growth Forms stable identity (`formKey`) + render copy contract — Claude — 🔧 in-progress
+## Sesion 2026-06-30 — TASK-1297 Growth Forms stable identity (`formKey`) + render copy contract — Claude — ✅ complete
 
 > **Pedido:** implementar TASK-1297 (`/implement-task 1297`), local-first en `develop`, sin push.
 >
-> **Estado:** task movida `to-do/`→`in-progress/`; README/registry sincronizados + naming corregido (`form_guid`→`form_key`). Trabajo en `develop` local-first, sin branch.
+> **Resultado:** 5 slices completos + AEO apply ejecutado (autorización explícita del operador). `greenhouse_growth.form_definition.form_key` (UUID NOT NULL UNIQUE) es la identidad pública estable/opaca; `formKey` se expone en `RenderContract.form`, catálogo editor-safe y telemetry allowlist. Las 3 rutas públicas `[formSlug]` resuelven por slug **o** por `form_key` (UUID) vía `resolveFormSlugFromRef` (sin ruta ni CORS nueva). `<greenhouse-form>` acepta `form-key` + `appearance="bare"` (chromeless transversal). `authorDraftForm` propaga `copyRefs`; el copy del render contract pasa por `sanitizeRenderCopy` (gate browser-safe por-entrada).
 >
-> **Alcance (5 slices):** (1) migration additive `form_definition.form_key UUID NOT NULL UNIQUE DEFAULT gen_random_uuid()` + store/readers `getFormDefinitionByKey`; (2) `formKey` en `RenderContract.form` + mirror renderer + catálogo editor-safe + telemetry allowlists; resolución por key vía segmento `[formSlug]` slug-or-uuid (sin ruta/CORS nueva); atributo `form-key` + `appearance` chromeless transversal en el renderer; (3) `copyRefs` en `authorDraftForm` + `copyDisplaySchema` browser-safe en `policy-compiler`; (4) script idempotente AEO por formKey; (5) docs + GUIDs reales.
+> **AEO apply:** se publicó la **v4 `fver-dbdd6a02-7e89-4d65-b29e-7228b7475a94`** con `copy.submit="Solicitar diagnóstico gratis →"`, preservando Turnstile + destino HubSpot (v3 `fver-9507f6a7…` deprecada). `form_key` reales: AEO `b120566a-dd1a-43c8-956a-4e0121e805b8`, grader `69cd5269-5f97-4d32-99c4-0b23f41aa2f5` (distintos).
+>
+> **Evidencia:** migration aplicada a dev (0 duplicados); dry-run + apply del script; verificado contra PG real que GET por formKey === por slug (misma v4), `copy.submit` + `security.captcha` presentes, sin leak de mapping/portal/GUID. Gate de cierre: `pnpm test` full verde (8609 passed), `pnpm build` compiló OK, `local:check` verde, 30+ tests focales (parity/policy/catalog/api-client/telemetry) verdes.
 >
 > **Naming fijado (F1):** identidad pública = `form_key`/`formKey`/`form-key`; NUNCA `form_guid`/`formGuid` (ese es el GUID de destino HubSpot, server-only).
+>
+> **Rollout:** code + data complete en la DB compartida (dev/prod-serving). Sin efecto visible en producción hasta TASK-1298 (el bridge HTML de `/aeo-2/` aún tiene el CTA hardcodeado; el swap a `<greenhouse-form form-key>` consume `copy.submit`). No se tocó WordPress. Sin push (local-first).
 
 ## Sesion 2026-06-30 — TASK-1296 AEO Growth Form Turnstile security contract — Codex — ✅ complete
 
